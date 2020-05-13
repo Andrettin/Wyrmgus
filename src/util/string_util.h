@@ -35,6 +35,20 @@ namespace string {
 
 static inline const std::string empty_str;
 
+//case-insensitive find
+inline size_t ci_find(const std::string &str, const std::string &find)
+{
+	auto iterator = std::search(str.begin(), str.end(), find.begin(), find.end(), [](const char c1, const char c2) {
+		return std::toupper(c1) == std::toupper(c2);
+	});
+
+	if (iterator == str.end()) {
+		return std::string::npos;
+	}
+
+	return iterator - str.begin();
+}
+
 inline std::vector<std::string> split(const std::string &str, const char delimiter)
 {
 	std::vector<std::string> string_list;
@@ -60,6 +74,15 @@ inline void replace(std::string &str, const std::string &find, const std::string
 		str.replace(pos, find.length(), replace);
 		pos += replace.length();
 	}
+}
+
+inline void capitalize(std::string &str)
+{
+	if (str.empty()) {
+		return;
+	}
+
+	str[0] = toupper(str[0]);
 }
 
 inline bool to_bool(const std::string &str)
