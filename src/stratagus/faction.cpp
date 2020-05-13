@@ -33,6 +33,7 @@
 #include "grand_strategy.h" //for the faction tier string to enum conversion
 #include "luacallback.h"
 #include "player_color.h"
+#include "unit/unit_type.h"
 
 namespace stratagus {
 
@@ -292,6 +293,11 @@ unit_type *faction::get_class_unit_type(const unit_class *unit_class) const
 	}
 
 	return this->civilization->get_class_unit_type(unit_class);
+}
+
+bool faction::is_class_unit_type(const unit_type *unit_type) const
+{
+	return unit_type == this->get_class_unit_type(unit_type->get_unit_class());
 }
 
 CUpgrade *faction::get_class_upgrade(const upgrade_class *upgrade_class) const

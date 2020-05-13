@@ -865,6 +865,10 @@ static bool AiRequestSupply()
 			return false;
 		}
 
+		if (AiPlayer->Player->Faction != -1 && !stratagus::faction::get_all()[AiPlayer->Player->Faction]->is_class_unit_type(&type)) {
+			continue;
+		}
+
 		if (!AiRequestedTypeAllowed(*AiPlayer->Player, type)) {
 			continue;
 		}

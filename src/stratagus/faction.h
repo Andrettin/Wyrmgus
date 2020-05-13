@@ -139,6 +139,8 @@ public:
 		}
 	}
 
+	bool is_class_unit_type(const unit_type *unit_type) const;
+
 	CUpgrade *get_class_upgrade(const upgrade_class *upgrade_class) const;
 
 	void set_class_upgrade(const upgrade_class *upgrade_class, CUpgrade *upgrade)
