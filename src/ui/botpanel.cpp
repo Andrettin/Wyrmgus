@@ -1556,10 +1556,7 @@ static void UpdateButtonPanelMultipleUnits(const std::vector<std::unique_ptr<str
 		
 		// any unit or unit in list
 		if (button->UnitMask[0] != '*'
-			//Wyrmgus start
-//			&& !strstr(button->UnitMask.c_str(), unit_ident)) {
 			&& !strstr(button->UnitMask.c_str(), unit_ident) && !used_by_all) {
-			//Wyrmgus end
 			continue;
 		}
 
@@ -1601,6 +1598,7 @@ static void UpdateButtonPanelSingleUnit(const CUnit &unit, const std::vector<std
 	//
 	//  FIXME: johns: some hacks for cancel buttons
 	//
+	bool only_cancel_allowed = true;
 	if (unit.CurrentAction() == UnitAction::Built) {
 		// Trick 17 to get the cancel-build button
 		strcpy_s(unit_ident, sizeof(unit_ident), ",cancel-build,");
@@ -1612,6 +1610,7 @@ static void UpdateButtonPanelSingleUnit(const CUnit &unit, const std::vector<std
 		strcpy_s(unit_ident, sizeof(unit_ident), ",cancel-upgrade,");
 	} else {
 		sprintf(unit_ident, ",%s,", unit.Type->Ident.c_str());
+		only_cancel_allowed = false;
 	}
 	for (const stratagus::button *button : stratagus::button::get_all()) {
 		Assert(0 < button->get_pos() && button->get_pos() <= (int)UI.ButtonPanel.Buttons.size());
@@ -1623,7 +1622,7 @@ static void UpdateButtonPanelSingleUnit(const CUnit &unit, const std::vector<std
 
 		// any unit or unit in list
 		if (button->UnitMask[0] != '*'
-			&& !strstr(button->UnitMask.c_str(), unit_ident) && !stratagus::vector::contains(button->get_unit_classes(), unit.Type->get_unit_class())) {
+			&& !strstr(button->UnitMask.c_str(), unit_ident) && (only_cancel_allowed || !stratagus::vector::contains(button->get_unit_classes(), unit.Type->get_unit_class()))) {
 			continue;
 		}
 		//Wyrmgus start
