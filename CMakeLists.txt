@@ -381,7 +381,6 @@ set(ui_SRCS
 	src/ui/botpanel.cpp
 	src/ui/button.cpp
 	src/ui/button_checks.cpp
-	src/ui/button_level.cpp
 	src/ui/contenttype.cpp
 	src/ui/cursor.cpp
 	src/ui/icon.cpp

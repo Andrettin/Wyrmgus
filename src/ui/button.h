@@ -33,7 +33,6 @@
 #include "ui/button_cmd.h"
 #include "ui/icon.h"
 
-class CButtonLevel;
 class CUnit;
 struct lua_State;
 
@@ -42,6 +41,7 @@ int CclDefineButton(lua_State *l);
 namespace stratagus {
 
 class button;
+class button_level;
 class unit_class;
 
 typedef bool (*button_check_func)(const CUnit &, const button &);
@@ -51,6 +51,7 @@ class button : public data_entry, public data_type<button>
 	Q_OBJECT
 
 	Q_PROPERTY(int pos MEMBER pos READ get_pos)
+	Q_PROPERTY(stratagus::button_level* level MEMBER level READ get_level)
 
 public:
 	static constexpr const char *class_identifier = "button";
@@ -65,7 +66,7 @@ public:
 	button &operator =(const button &other_button)
 	{
 		this->pos = other_button.pos;
-		this->Level = other_button.Level;
+		this->level = other_button.level;
 		this->AlwaysShow = other_button.AlwaysShow;
 		this->Action = other_button.Action;
 		this->Value = other_button.Value;
@@ -95,6 +96,11 @@ public:
 		return this->pos;
 	}
 
+	button_level *get_level() const
+	{
+		return this->level;
+	}
+
 	const CUnit *get_unit() const;
 	const unit_type *get_value_unit_type(const CUnit *unit) const;
 
@@ -110,7 +116,7 @@ public:
 	}
 
 	int pos = 0; //button position in the grid
-	CButtonLevel *Level = nullptr;		/// requires button level
+	button_level *level = nullptr;		/// requires button level
 	bool AlwaysShow = false;			/// button is always shown but drawn grayscale if not available
 	ButtonCmd Action = ButtonCmd::Move;	/// command on button press
 	int Value = 0;					/// extra value for command

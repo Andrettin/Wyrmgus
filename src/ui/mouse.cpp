@@ -39,6 +39,7 @@
 #include "character.h"
 //Wyrmgus end
 #include "commands.h"
+#include "database/defines.h"
 #include "font.h"
 #include "item.h"
 #include "map/map.h"
@@ -72,10 +73,6 @@
 #include "video.h"
 #include "widgets.h"
 #include "world.h"
-
-/*----------------------------------------------------------------------------
---  Variables
-----------------------------------------------------------------------------*/
 
 #define ICON_SIZE_X (UI.ButtonPanel.Buttons[0].Style->Width)
 #define ICON_SIZE_Y (UI.ButtonPanel.Buttons[0].Style->Height)
@@ -1141,7 +1138,7 @@ static void HandleMouseOn(const PixelPos screenPos)
 			}
 		}
 		//Wyrmgus start
-		if (Selected.size() == 1 && Selected[0]->HasInventory() && CurrentButtonLevel == CButtonLevel::InventoryButtonLevel) {
+		if (Selected.size() == 1 && Selected[0]->HasInventory() && CurrentButtonLevel == stratagus::defines::get()->get_inventory_button_level()) {
 			const size_t size = UI.InventoryButtons.size();
 
 			for (size_t i = std::min<size_t>(Selected[0]->InsideCount, size); i != 0;) {

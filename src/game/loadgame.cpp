@@ -138,7 +138,6 @@ void CleanModules()
 	CleanGroups();
 	CleanUpgradeModifiers();
 	CleanButtons();
-	CButtonLevel::ClearButtonLevels();
 	CMap::Map.Clean();
 	CMap::Map.CleanFogOfWar();
 	CTimeOfDaySchedule::ClearTimeOfDaySchedules();

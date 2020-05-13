@@ -29,21 +29,17 @@
 
 #pragma once
 
-/*----------------------------------------------------------------------------
---  Includes
-----------------------------------------------------------------------------*/
-
 #include "sound/unitsound.h"
 #include "ui/icon.h"
 #include "vec2i.h"
 
-class CButtonLevel;
 class CUIButton;
 class CUnit;
 struct EventCallback;
 
 namespace stratagus {
 	class button;
+	class button_level;
 }
 
 /// Button area under cursor
@@ -188,7 +184,7 @@ extern bool LeaveStops;
 extern cursor_on CursorOn;
 
 /// vladi: used for unit buttons sub-menus etc
-extern CButtonLevel *CurrentButtonLevel;
+extern stratagus::button_level *CurrentButtonLevel;
 /// Last drawn popup : used to speed up drawing
 extern stratagus::button *LastDrawnButtonPopup;
 

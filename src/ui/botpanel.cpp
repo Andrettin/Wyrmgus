@@ -91,7 +91,7 @@
 /// Last drawn popup : used to speed up drawing
 stratagus::button *LastDrawnButtonPopup;
 /// for unit buttons sub-menus etc.
-CButtonLevel *CurrentButtonLevel = nullptr;
+stratagus::button_level *CurrentButtonLevel = nullptr;
 /// Pointer to current buttons
 std::vector<std::unique_ptr<stratagus::button>> CurrentButtons;
 
@@ -1540,7 +1540,7 @@ static void UpdateButtonPanelMultipleUnits(const std::vector<std::unique_ptr<str
 	//Wyrmgus end
 
 	for (const stratagus::button *button : stratagus::button::get_all()) {
-		if (button->Level != CurrentButtonLevel) {
+		if (button->get_level() != CurrentButtonLevel) {
 			continue;
 		}
 
@@ -1616,7 +1616,7 @@ static void UpdateButtonPanelSingleUnit(const CUnit &unit, const std::vector<std
 		Assert(0 < button->get_pos() && button->get_pos() <= (int)UI.ButtonPanel.Buttons.size());
 
 		// Same level
-		if (button->Level != CurrentButtonLevel) {
+		if (button->get_level() != CurrentButtonLevel) {
 			continue;
 		}
 
@@ -1769,7 +1769,7 @@ void CButtonPanel::DoClicked_SelectTarget(int button)
 	GameCursor = UI.get_cursor(stratagus::cursor_type::yellow_hair);
 	CursorAction = CurrentButtons[button]->Action;
 	CursorValue = CurrentButtons[button]->Value;
-	CurrentButtonLevel = CButtonLevel::CancelButtonLevel; // the cancel-only button level
+	CurrentButtonLevel = stratagus::defines::get()->get_cancel_button_level(); // the cancel-only button level
 	UI.ButtonPanel.Update();
 	UI.StatusLine.Set(_("Select Target"));
 }
@@ -1876,7 +1876,7 @@ void CButtonPanel::DoClicked_StandGround()
 
 void CButtonPanel::DoClicked_Button(int button)
 {
-	CurrentButtonLevel = CButtonLevel::GetButtonLevel(CurrentButtons[button]->ValueStr);
+	CurrentButtonLevel = stratagus::button_level::try_get(CurrentButtons[button]->ValueStr);
 	LastDrawnButtonPopup = nullptr;
 	UI.ButtonPanel.Update();
 }
@@ -1932,7 +1932,7 @@ void CButtonPanel::DoClicked_Build(int button)
 		UI.StatusLine.ClearCosts();
 		CursorBuilding = &type;
 		// FIXME: check is this check necessary?
-		CurrentButtonLevel = CButtonLevel::CancelButtonLevel; // the cancel-only button level
+		CurrentButtonLevel = stratagus::defines::get()->get_cancel_button_level(); // the cancel-only button level
 		UI.ButtonPanel.Update();
 	}
 }

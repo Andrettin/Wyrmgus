@@ -1094,12 +1094,12 @@ static int CclDefineUnitType(lua_State *l)
 		} else if (!strcmp(value, "BoardSize")) {
 			type->BoardSize = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "ButtonLevelForTransporter")) {
-			type->ButtonLevelForTransporter = CButtonLevel::GetButtonLevel(LuaToString(l, -1));
+			type->ButtonLevelForTransporter = stratagus::button_level::get(LuaToString(l, -1));
 		//Wyrmgus start
 		} else if (!strcmp(value, "ButtonPos")) {
 			type->ButtonPos = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "ButtonLevel")) {
-			type->ButtonLevel = CButtonLevel::GetButtonLevel(LuaToString(l, -1));
+			type->ButtonLevel = stratagus::button_level::get(LuaToString(l, -1));
 		} else if (!strcmp(value, "ButtonPopup")) {
 			type->ButtonPopup = LuaToString(l, -1);
 		} else if (!strcmp(value, "ButtonHint")) {
@@ -4148,7 +4148,7 @@ static int CclSetModTrains(lua_State *l)
 		std::string button_definition = "DefineButton({\n";
 		button_definition += "\tPos = " + std::to_string((long long) type->ModTrains[mod_file][i]->ButtonPos) + ",\n";
 		if (type->ModTrains[mod_file][i]->ButtonLevel) {
-			button_definition += "\tLevel = " + type->ModTrains[mod_file][i]->ButtonLevel->Ident + ",\n";
+			button_definition += "\tLevel = " + type->ModTrains[mod_file][i]->ButtonLevel->get_identifier() + ",\n";
 		}
 		button_definition += "\tAction = ";
 		if (type->ModTrains[mod_file][i]->BoolFlag[BUILDING_INDEX].value) {

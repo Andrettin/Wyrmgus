@@ -2045,7 +2045,7 @@ static bool EditorCallbackMouse_EditUnitArea(const PixelPos &screenPos)
 			}
 			CurrentButtons[j]->Hint = Editor.ShownUnitTypes[i]->get_name();
 			CurrentButtons[j]->pos = j;
-			CurrentButtons[j]->Level = 0;
+			CurrentButtons[j]->level = nullptr;
 			CurrentButtons[j]->Action = ButtonCmd::EditorUnit;
 			CurrentButtons[j]->ValueStr = Editor.ShownUnitTypes[i]->Ident;
 			CurrentButtons[j]->Value = Editor.ShownUnitTypes[i]->Slot;

@@ -48,7 +48,6 @@ class CPlayerColorGraphic;
 class CSpell;
 class CUnitTypeVariation;
 //Wyrmgus start
-class CButtonLevel;
 class CUniqueItem;
 //Wyrmgus end
 struct lua_State;
@@ -62,6 +61,7 @@ int CclDefineUnitType(lua_State *l);
 
 namespace stratagus {
 	class animation_set;
+	class button_level;
 	class dependency;
 	class faction;
 	class missile_type;
@@ -1035,10 +1035,10 @@ public:
 	int ClicksToExplode;            /// Number of consecutive clicks until unit suicides.
 	int MaxOnBoard;                 /// Number of Transporter slots.
 	int BoardSize;                  /// How much "cells" unit occupies inside transporter
-	CButtonLevel *ButtonLevelForTransporter;  /// On which button level game will show units inside transporter
+	stratagus::button_level *ButtonLevelForTransporter;  /// On which button level game will show units inside transporter
 	//Wyrmgus start
 	int ButtonPos;					/// Position of this unit as a train/build button
-	CButtonLevel *ButtonLevel;		/// Level of this unit's button
+	stratagus::button_level *ButtonLevel;		/// Level of this unit's button
 	std::string ButtonPopup;		/// Popup of this unit's button
 	std::string ButtonHint;			/// Hint of this unit's button
 	std::string ButtonKey;			/// Hotkey of this unit's button

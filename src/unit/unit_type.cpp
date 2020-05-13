@@ -1253,7 +1253,7 @@ void unit_type::initialize()
 		std::string button_definition = "DefineButton({\n";
 		button_definition += "\tPos = " + std::to_string((long long) this->Trains[i]->ButtonPos) + ",\n";
 		if (this->Trains[i]->ButtonLevel) {
-			button_definition += "\tLevel = " + this->Trains[i]->ButtonLevel->Ident + ",\n";
+			button_definition += "\tLevel = " + this->Trains[i]->ButtonLevel->get_identifier() + ",\n";
 		}
 		button_definition += "\tAction = ";
 		if (this->Trains[i]->BoolFlag[BUILDING_INDEX].value) {

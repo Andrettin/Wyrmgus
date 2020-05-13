@@ -27,10 +27,6 @@
 //      02111-1307, USA.
 //
 
-/*----------------------------------------------------------------------------
---  Includes
-----------------------------------------------------------------------------*/
-
 #include "stratagus.h"
 
 #include "config.h"
@@ -60,7 +56,6 @@
 #include "time/time_of_day.h"
 #include "time/time_of_day_schedule.h"
 #include "ui/button.h"
-#include "ui/button_level.h"
 #include "ui/icon.h"
 #include "unit/unit_type.h"
 #include "util/util.h"
@@ -68,17 +63,9 @@
 
 #include <boost/tokenizer.hpp>
 
-/*----------------------------------------------------------------------------
---  Variables
-----------------------------------------------------------------------------*/
-
 static boost::escaped_list_separator<char> ConfigTokenizerSeparator("\\", " \t\r", "\"");
 static boost::tokenizer<boost::escaped_list_separator<char>> ConfigTokenizer(std::string(), ConfigTokenizerSeparator);
 	
-/*----------------------------------------------------------------------------
---  Functions
-----------------------------------------------------------------------------*/
-
 /**
 **	@brief	Parse a configuration data file
 **
@@ -240,11 +227,6 @@ void CConfigData::ProcessConfigData(const std::vector<CConfigData *> &config_dat
 		if (config_data->Tag == "button") {
 			if (!define_only) {
 				stratagus::button::ProcessConfigData(config_data);
-			}
-		} else if (config_data->Tag == "button_level") {
-			CButtonLevel *button_level = CButtonLevel::GetOrAddButtonLevel(ident);
-			if (!define_only) {
-				button_level->ProcessConfigData(config_data);
 			}
 		} else if (config_data->Tag == "campaign") {
 			stratagus::campaign *campaign = stratagus::campaign::get_or_add(ident, nullptr);

@@ -66,8 +66,7 @@ void button::ProcessConfigData(const CConfigData *config_data)
 		if (key == "pos") {
 			button->pos = std::stoi(value);
 		} else if (key == "level") {
-			value = FindAndReplaceString(value, "_", "-");
-			button->Level = CButtonLevel::GetButtonLevel(value);
+			button->level = button_level::get(value);
 		} else if (key == "always_show") {
 			button->AlwaysShow = string::to_bool(value);
 		} else if (key == "icon") {
@@ -300,8 +299,8 @@ void button::initialize()
 				break;
 				//Wyrmgus end
 			case ButtonCmd::Button:
-				if (CButtonLevel::GetButtonLevel(this->ValueStr)) {
-					this->Value = CButtonLevel::GetButtonLevel(this->ValueStr)->ID;
+				if (!this->ValueStr.empty()) {
+					this->Value = button_level::get(this->ValueStr)->get_index();
 				} else {
 					this->Value = 0;
 				}
@@ -404,8 +403,8 @@ void button::CleanTriggerData() const
 
 int button::GetLevelID() const
 {
-	if (this->Level) {
-		return this->Level->ID;
+	if (this->get_level() != nullptr) {
+		return this->get_level()->get_index();
 	} else {
 		return 0;
 	}

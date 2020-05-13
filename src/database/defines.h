@@ -31,6 +31,7 @@
 
 namespace stratagus {
 
+class button_level;
 class dialogue;
 class player_color;
 class sml_data;
@@ -51,6 +52,8 @@ class defines final : public QObject, public singleton<defines>
 	Q_PROPERTY(bool documents_modules_loading_enabled MEMBER documents_modules_loading_enabled READ is_documents_modules_loading_enabled)
 	Q_PROPERTY(stratagus::dialogue* campaign_victory_dialogue MEMBER campaign_victory_dialogue READ get_campaign_victory_dialogue)
 	Q_PROPERTY(stratagus::dialogue* campaign_defeat_dialogue MEMBER campaign_defeat_dialogue READ get_campaign_defeat_dialogue)
+	Q_PROPERTY(stratagus::button_level* inventory_button_level MEMBER inventory_button_level READ get_inventory_button_level)
+	Q_PROPERTY(stratagus::button_level* cancel_button_level MEMBER cancel_button_level READ get_cancel_button_level)
 
 public:
 	void load(const std::filesystem::path &base_path);
@@ -132,6 +135,16 @@ public:
 		return this->campaign_defeat_dialogue;
 	}
 
+	button_level *get_inventory_button_level() const
+	{
+		return this->inventory_button_level;
+	}
+
+	button_level *get_cancel_button_level() const
+	{
+		return this->cancel_button_level;
+	}
+
 private:
 	QSize tile_size;
 	QSize icon_size;
@@ -143,6 +156,8 @@ private:
 	bool documents_modules_loading_enabled = true;
 	dialogue *campaign_victory_dialogue = nullptr;
 	dialogue *campaign_defeat_dialogue = nullptr;
+	button_level *inventory_button_level = nullptr;
+	button_level *cancel_button_level = nullptr;
 };
 
 }

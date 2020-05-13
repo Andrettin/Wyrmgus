@@ -58,6 +58,7 @@
 #include "time/calendar.h"
 #include "time/time_of_day.h"
 #include "time/timeline.h"
+#include "ui/button_level.h"
 #include "ui/cursor.h"
 #include "ui/cursor_type.h"
 #include "ui/icon.h"
@@ -170,6 +171,8 @@ QVariant database::process_sml_property_value(const sml_property &property, cons
 			new_property_value = QVariant::fromValue(age::get(property.get_value()));
 		} else if (property_class_name == "stratagus::animation_set*") {
 			new_property_value = QVariant::fromValue(animation_set::get(property.get_value()));
+		} else if (property_class_name == "stratagus::button_level*") {
+			new_property_value = QVariant::fromValue(button_level::get(property.get_value()));
 		} else if (property_class_name == "stratagus::calendar*") {
 			new_property_value = QVariant::fromValue(calendar::get(property.get_value()));
 		} else if (property_class_name == "stratagus::character*") {

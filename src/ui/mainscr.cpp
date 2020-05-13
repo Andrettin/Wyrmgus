@@ -772,7 +772,7 @@ static void DrawUnitInfo(CUnit &unit)
 	}
 	
 	//Wyrmgus start
-	if (unit.HasInventory() && unit.InsideCount && CurrentButtonLevel == CButtonLevel::InventoryButtonLevel) {
+	if (unit.HasInventory() && unit.InsideCount && CurrentButtonLevel == stratagus::defines::get()->get_inventory_button_level()) {
 		DrawUnitInfo_inventory(unit);
 		return;
 	}
@@ -1002,7 +1002,7 @@ void DrawPopups()
 			LastDrawnButtonPopup = nullptr;
 		}
 		
-		if (!(Selected[0]->Player != CPlayer::GetThisPlayer() && !CPlayer::GetThisPlayer()->IsAllied(*Selected[0]->Player) && !CPlayer::GetThisPlayer()->HasBuildingAccess(*Selected[0]->Player)) && Selected[0]->HasInventory() && Selected[0]->InsideCount && CurrentButtonLevel == CButtonLevel::InventoryButtonLevel) {
+		if (!(Selected[0]->Player != CPlayer::GetThisPlayer() && !CPlayer::GetThisPlayer()->IsAllied(*Selected[0]->Player) && !CPlayer::GetThisPlayer()->HasBuildingAccess(*Selected[0]->Player)) && Selected[0]->HasInventory() && Selected[0]->InsideCount && CurrentButtonLevel == stratagus::defines::get()->get_inventory_button_level()) {
 		CUnit *uins = Selected[0]->UnitInside;
 		size_t j = 0;
 
@@ -1036,7 +1036,7 @@ void DrawPopups()
 						}
 					}
 					ba->pos = j;
-					ba->Level = CButtonLevel::InventoryButtonLevel;
+					ba->level = stratagus::defines::get()->get_inventory_button_level();
 					ba->Action = ButtonCmd::Unit;
 					ba->Value = UnitNumber(*uins);
 					ba->Popup = "popup_item_inventory";
@@ -1058,7 +1058,7 @@ void DrawPopups()
 				//Wyrmgus start
 	//			ButtonUnderCursor == i && KeyState != KeyStateInput) {
 				ButtonUnderCursor == i && KeyState != KeyStateInput
-				&& CurrentButtons[i]->Level == CurrentButtonLevel && IsButtonAllowed(*Selected[0], *CurrentButtons[i])) {
+				&& CurrentButtons[i]->get_level() == CurrentButtonLevel && IsButtonAllowed(*Selected[0], *CurrentButtons[i])) {
 				//Wyrmgus end
 					DrawPopup(*CurrentButtons[i], UI.ButtonPanel.Buttons[i].X, UI.ButtonPanel.Buttons[i].Y);
 			}

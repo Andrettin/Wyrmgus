@@ -8,8 +8,6 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name button_level.h - The button level header file. */
-//
 //      (c) Copyright 2018-2020 by Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
@@ -29,29 +27,37 @@
 
 #pragma once
 
-/*----------------------------------------------------------------------------
---  Includes
-----------------------------------------------------------------------------*/
+#include "database/data_entry.h"
+#include "database/data_type.h"
 
-#include "data_type.h"
+namespace stratagus {
 
-/*----------------------------------------------------------------------------
---  Declarations
-----------------------------------------------------------------------------*/
-
-class CButtonLevel : public CDataType
+class button_level final : public data_entry, public data_type<button_level>
 {
+	Q_OBJECT
+
 public:
-	static CButtonLevel *GetButtonLevel(const std::string &ident, const bool should_find = true);
-	static CButtonLevel *GetOrAddButtonLevel(const std::string &ident);
-	static void ClearButtonLevels();
+	static constexpr const char *class_identifier = "button_level";
+	static constexpr const char *database_folder = "button_levels";
+
+	static button_level *add(const std::string &identifier, const stratagus::module *module)
+	{
+		button_level *button_level = data_type::add(identifier, module);
+		button_level->index = button_level::get_all().size() - 1;
+		return button_level;
+	}
+
+	button_level(const std::string &identifier) : data_entry(identifier)
+	{
+	}
+
+	int get_index() const
+	{
+		return this->index + 1; //the index starts at 1, so that buttons with a null button level have a value of 0
+	}
 	
-	static std::vector<CButtonLevel *> ButtonLevels;	/// Button levels
-	static std::map<std::string, CButtonLevel *> ButtonLevelsByIdent;
-	static CButtonLevel *CancelButtonLevel;
-	static CButtonLevel *InventoryButtonLevel;
-	
-	virtual void ProcessConfigData(const CConfigData *config_data) override;
-	
-	int ID = -1;									/// ID of the button level (starting at 1)
+private:
+	int index = -1;
 };
+
+}
