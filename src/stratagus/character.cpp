@@ -604,7 +604,7 @@ void character::UpdateAttributes()
 	for (int i = 0; i < MaxAttributes; ++i) {
 		int var = GetAttributeVariableIndex(i);
 		this->Attributes[i] = this->get_unit_type()->DefaultStat.Variables[var].Value;
-		for (const CUpgradeModifier *modifier : CUpgradeModifier::UpgradeModifiers) {
+		for (const stratagus::upgrade_modifier *modifier : stratagus::upgrade_modifier::UpgradeModifiers) {
 			if (
 				(this->Trait != nullptr && modifier->UpgradeId == this->Trait->ID)
 				|| std::find(this->Abilities.begin(), this->Abilities.end(), CUpgrade::get_all()[modifier->UpgradeId]) != this->Abilities.end()

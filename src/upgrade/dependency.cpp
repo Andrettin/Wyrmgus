@@ -640,13 +640,13 @@ bool CheckDependencies(const CUpgrade *target, const CPlayer *player, bool ignor
 		if (stratagus::faction::get_all()[player->Faction]->HolyOrderDeity) {
 			CUpgrade *deity_upgrade = stratagus::faction::get_all()[player->Faction]->HolyOrderDeity->DeityUpgrade;
 			if (deity_upgrade) {
-				for (CUpgradeModifier *upgrade_modifier : target->UpgradeModifiers) {
-					if (std::find(upgrade_modifier->RemoveUpgrades.begin(), upgrade_modifier->RemoveUpgrades.end(), deity_upgrade) != upgrade_modifier->RemoveUpgrades.end()) {
+				for (stratagus::upgrade_modifier *upgrade_modifier : target->UpgradeModifiers) {
+					if (stratagus::vector::contains(upgrade_modifier->RemoveUpgrades, deity_upgrade)) {
 						return false;
 					}
 				}
-				for (CUpgradeModifier *upgrade_modifier : deity_upgrade->UpgradeModifiers) {
-					if (std::find(upgrade_modifier->RemoveUpgrades.begin(), upgrade_modifier->RemoveUpgrades.end(), target) != upgrade_modifier->RemoveUpgrades.end()) {
+				for (stratagus::upgrade_modifier *upgrade_modifier : deity_upgrade->UpgradeModifiers) {
+					if (stratagus::vector::contains(upgrade_modifier->RemoveUpgrades, target)) {
 						return false;
 					}
 				}

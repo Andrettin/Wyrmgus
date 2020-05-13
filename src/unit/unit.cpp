@@ -1344,10 +1344,10 @@ void CUnit::ChooseButtonIcon(const ButtonCmd button_action)
 		}
 	}
 
-	for (int i = (CUpgradeModifier::UpgradeModifiers.size() - 1); i >= 0; --i) {
-		const CUpgradeModifier *modifier = CUpgradeModifier::UpgradeModifiers[i];
+	for (int i = (stratagus::upgrade_modifier::UpgradeModifiers.size() - 1); i >= 0; --i) {
+		const stratagus::upgrade_modifier *modifier = stratagus::upgrade_modifier::UpgradeModifiers[i];
 		const CUpgrade *upgrade = CUpgrade::get_all()[modifier->UpgradeId];
-		if (this->Player->Allow.Upgrades[upgrade->ID] == 'R' && modifier->ApplyTo[this->Type->Slot] == 'X') {
+		if (this->Player->Allow.Upgrades[upgrade->ID] == 'R' && modifier->applies_to(this->Type)) {
 			if (
 				(
 					(button_action == ButtonCmd::Attack && ((upgrade->is_weapon() && upgrade->Item->get_item_class() != stratagus::item_class::bow) || upgrade->is_arrows()))
@@ -1440,10 +1440,10 @@ void CUnit::EquipItem(CUnit &item, bool affect_character)
 	
 	if (item_slot == stratagus::item_slot::weapon && EquippedItems[static_cast<int>(item_slot)].size() == 0) {
 		// remove the upgrade modifiers from weapon technologies or from abilities which require the base weapon class but aren't compatible with this weapon's class; and apply upgrade modifiers from abilities which require this weapon's class
-		for (const CUpgradeModifier *modifier : CUpgradeModifier::UpgradeModifiers) {
+		for (const stratagus::upgrade_modifier *modifier : stratagus::upgrade_modifier::UpgradeModifiers) {
 			const CUpgrade *modifier_upgrade = CUpgrade::get_all()[modifier->UpgradeId];
 			if (
-				(modifier_upgrade->is_weapon() && Player->Allow.Upgrades[modifier_upgrade->ID] == 'R' && modifier->ApplyTo[Type->Slot] == 'X')
+				(modifier_upgrade->is_weapon() && Player->Allow.Upgrades[modifier_upgrade->ID] == 'R' && modifier->applies_to(this->Type))
 				|| (modifier_upgrade->is_ability() && this->GetIndividualUpgrade(modifier_upgrade) && modifier_upgrade->WeaponClasses.size() > 0 && std::find(modifier_upgrade->WeaponClasses.begin(), modifier_upgrade->WeaponClasses.end(), this->Type->WeaponClasses[0]) != modifier_upgrade->WeaponClasses.end() && std::find(modifier_upgrade->WeaponClasses.begin(), modifier_upgrade->WeaponClasses.end(), item_class) == modifier_upgrade->WeaponClasses.end())
 			) {
 				if (this->GetIndividualUpgrade(modifier_upgrade)) {
@@ -1467,32 +1467,32 @@ void CUnit::EquipItem(CUnit &item, bool affect_character)
 		}
 	} else if (item_slot == stratagus::item_slot::shield && EquippedItems[static_cast<int>(item_slot)].size() == 0) {
 		// remove the upgrade modifiers from shield technologies
-		for (const CUpgradeModifier *modifier : CUpgradeModifier::UpgradeModifiers) {
+		for (const stratagus::upgrade_modifier *modifier : stratagus::upgrade_modifier::UpgradeModifiers) {
 			const CUpgrade *modifier_upgrade = CUpgrade::get_all()[modifier->UpgradeId];
-			if (modifier_upgrade->is_shield() && Player->Allow.Upgrades[modifier_upgrade->ID] == 'R' && modifier->ApplyTo[Type->Slot] == 'X') {
+			if (modifier_upgrade->is_shield() && Player->Allow.Upgrades[modifier_upgrade->ID] == 'R' && modifier->applies_to(this->Type)) {
 				RemoveIndividualUpgradeModifier(*this, modifier);
 			}
 		}
 	} else if (item_slot == stratagus::item_slot::boots && EquippedItems[static_cast<int>(item_slot)].size() == 0) {
 		// remove the upgrade modifiers from boots technologies
-		for (const CUpgradeModifier *modifier : CUpgradeModifier::UpgradeModifiers) {
+		for (const stratagus::upgrade_modifier *modifier : stratagus::upgrade_modifier::UpgradeModifiers) {
 			const CUpgrade *modifier_upgrade = CUpgrade::get_all()[modifier->UpgradeId];
-			if (modifier_upgrade->is_boots() && Player->Allow.Upgrades[modifier_upgrade->ID] == 'R' && modifier->ApplyTo[Type->Slot] == 'X') {
+			if (modifier_upgrade->is_boots() && Player->Allow.Upgrades[modifier_upgrade->ID] == 'R' && modifier->applies_to(this->Type)) {
 				RemoveIndividualUpgradeModifier(*this, modifier);
 			}
 		}
 	} else if (item_slot == stratagus::item_slot::arrows && EquippedItems[static_cast<int>(item_slot)].size() == 0) {
 		// remove the upgrade modifiers from arrows technologies
-		for (const CUpgradeModifier *modifier : CUpgradeModifier::UpgradeModifiers) {
+		for (const stratagus::upgrade_modifier *modifier : stratagus::upgrade_modifier::UpgradeModifiers) {
 			const CUpgrade *modifier_upgrade = CUpgrade::get_all()[modifier->UpgradeId];
-			if (modifier_upgrade->is_arrows() && Player->Allow.Upgrades[modifier_upgrade->ID] == 'R' && modifier->ApplyTo[Type->Slot] == 'X') {
+			if (modifier_upgrade->is_arrows() && Player->Allow.Upgrades[modifier_upgrade->ID] == 'R' && modifier->applies_to(this->Type)) {
 				RemoveIndividualUpgradeModifier(*this, modifier);
 			}
 		}
 	}
 	
 	if (item.Unique && item.Unique->Set && this->EquippingItemCompletesSet(&item)) {
-		for (const CUpgradeModifier *modifier : item.Unique->Set->UpgradeModifiers) {
+		for (const stratagus::upgrade_modifier *modifier : item.Unique->Set->UpgradeModifiers) {
 			ApplyIndividualUpgradeModifier(*this, modifier);
 		}
 	}
@@ -1613,7 +1613,7 @@ void CUnit::DeequipItem(CUnit &item, bool affect_character)
 	}
 	
 	if (item.Unique && item.Unique->Set && this->DeequippingItemBreaksSet(&item)) {
-		for (const CUpgradeModifier *modifier : item.Unique->Set->UpgradeModifiers) {
+		for (const stratagus::upgrade_modifier *modifier : item.Unique->Set->UpgradeModifiers) {
 			RemoveIndividualUpgradeModifier(*this, modifier);
 		}
 	}
@@ -1642,10 +1642,10 @@ void CUnit::DeequipItem(CUnit &item, bool affect_character)
 	
 	if (item_slot == stratagus::item_slot::weapon && EquippedItems[static_cast<int>(item_slot)].size() == 0) {
 		// restore the upgrade modifiers from weapon technologies, and apply ability effects that are weapon class-specific accordingly
-		for (const CUpgradeModifier *modifier : CUpgradeModifier::UpgradeModifiers) {
+		for (const stratagus::upgrade_modifier *modifier : stratagus::upgrade_modifier::UpgradeModifiers) {
 			const CUpgrade *modifier_upgrade = CUpgrade::get_all()[modifier->UpgradeId];
 			if (
-				(modifier_upgrade->is_weapon() && Player->Allow.Upgrades[modifier->UpgradeId] == 'R' && modifier->ApplyTo[Type->Slot] == 'X')
+				(modifier_upgrade->is_weapon() && Player->Allow.Upgrades[modifier->UpgradeId] == 'R' && modifier->applies_to(this->Type))
 				|| (modifier_upgrade->is_ability() && this->GetIndividualUpgrade(modifier_upgrade) && modifier_upgrade->WeaponClasses.size() > 0 && std::find(modifier_upgrade->WeaponClasses.begin(), modifier_upgrade->WeaponClasses.end(), this->Type->WeaponClasses[0]) != modifier_upgrade->WeaponClasses.end() && std::find(modifier_upgrade->WeaponClasses.begin(), modifier_upgrade->WeaponClasses.end(), item_class) == modifier_upgrade->WeaponClasses.end())
 			) {
 				if (this->GetIndividualUpgrade(modifier_upgrade)) {
@@ -1669,25 +1669,25 @@ void CUnit::DeequipItem(CUnit &item, bool affect_character)
 		}
 	} else if (item_slot == stratagus::item_slot::shield && EquippedItems[static_cast<int>(item_slot)].size() == 0) {
 		// restore the upgrade modifiers from shield technologies
-		for (const CUpgradeModifier *modifier : CUpgradeModifier::UpgradeModifiers) {
+		for (const stratagus::upgrade_modifier *modifier : stratagus::upgrade_modifier::UpgradeModifiers) {
 			const CUpgrade *modifier_upgrade = CUpgrade::get_all()[modifier->UpgradeId];
-			if (modifier_upgrade->is_shield() && Player->Allow.Upgrades[modifier_upgrade->ID] == 'R' && modifier->ApplyTo[Type->Slot] == 'X') {
+			if (modifier_upgrade->is_shield() && Player->Allow.Upgrades[modifier_upgrade->ID] == 'R' && modifier->applies_to(this->Type)) {
 				ApplyIndividualUpgradeModifier(*this, modifier);
 			}
 		}
 	} else if (item_slot == stratagus::item_slot::boots && EquippedItems[static_cast<int>(item_slot)].size() == 0) {
 		// restore the upgrade modifiers from boots technologies
-		for (const CUpgradeModifier *modifier : CUpgradeModifier::UpgradeModifiers) {
+		for (const stratagus::upgrade_modifier *modifier : stratagus::upgrade_modifier::UpgradeModifiers) {
 			const CUpgrade *modifier_upgrade = CUpgrade::get_all()[modifier->UpgradeId];
-			if (modifier_upgrade->is_boots() && Player->Allow.Upgrades[modifier_upgrade->ID] == 'R' && modifier->ApplyTo[Type->Slot] == 'X') {
+			if (modifier_upgrade->is_boots() && Player->Allow.Upgrades[modifier_upgrade->ID] == 'R' && modifier->applies_to(this->Type)) {
 				ApplyIndividualUpgradeModifier(*this, modifier);
 			}
 		}
 	} else if (item_slot == stratagus::item_slot::arrows && EquippedItems[static_cast<int>(item_slot)].size() == 0) {
 		// restore the upgrade modifiers from arrows technologies
-		for (const CUpgradeModifier *modifier : CUpgradeModifier::UpgradeModifiers) {
+		for (const stratagus::upgrade_modifier *modifier : stratagus::upgrade_modifier::UpgradeModifiers) {
 			const CUpgrade *modifier_upgrade = CUpgrade::get_all()[modifier->UpgradeId];
-			if (modifier_upgrade->is_arrows() && Player->Allow.Upgrades[modifier_upgrade->ID] == 'R' && modifier->ApplyTo[Type->Slot] == 'X') {
+			if (modifier_upgrade->is_arrows() && Player->Allow.Upgrades[modifier_upgrade->ID] == 'R' && modifier->applies_to(this->Type)) {
 				ApplyIndividualUpgradeModifier(*this, modifier);
 			}
 		}
@@ -4724,9 +4724,9 @@ void CUnit::ChangeOwner(CPlayer &newplayer, bool show_change)
 	//Wyrmgus end
 
 	//apply upgrades of the new player, if the old one doesn't have that upgrade
-	for (const CUpgradeModifier *modifier : CUpgradeModifier::UpgradeModifiers) {
+	for (const stratagus::upgrade_modifier *modifier : stratagus::upgrade_modifier::UpgradeModifiers) {
 		const CUpgrade *modifier_upgrade = CUpgrade::get_all()[modifier->UpgradeId];
-		if (oldplayer->Allow.Upgrades[modifier_upgrade->ID] != 'R' && newplayer.Allow.Upgrades[modifier_upgrade->ID] == 'R' && modifier->ApplyTo[Type->Slot] == 'X') { //if the old player doesn't have the modifier's upgrade (but the new one does), and the upgrade is applicable to the unit
+		if (oldplayer->Allow.Upgrades[modifier_upgrade->ID] != 'R' && newplayer.Allow.Upgrades[modifier_upgrade->ID] == 'R' && modifier->applies_to(this->Type)) { //if the old player doesn't have the modifier's upgrade (but the new one does), and the upgrade is applicable to the unit
 			//Wyrmgus start
 //			ApplyIndividualUpgradeModifier(*this, modifier);
 			if ( // don't apply equipment-related upgrades if the unit has an item of that equipment type equipped
@@ -5581,7 +5581,7 @@ int CUnit::GetItemVariableChange(const CUnit *item, int variable_index, bool inc
 		}
 		
 		if (!item->Identified) { //if the item is unidentified, don't show the effects of its affixes
-			for (const CUpgradeModifier *modifier : CUpgradeModifier::UpgradeModifiers) {
+			for (const stratagus::upgrade_modifier *modifier : stratagus::upgrade_modifier::UpgradeModifiers) {
 				if (
 					(item->Prefix != nullptr && modifier->UpgradeId == item->Prefix->ID)
 					|| (item->Suffix != nullptr && modifier->UpgradeId == item->Suffix->ID)
@@ -5633,7 +5633,7 @@ int CUnit::GetItemVariableChange(const CUnit *item, int variable_index, bool inc
 				}
 			}
 		} else if (EquippedItems[static_cast<int>(item_slot)].size() == 0 && (item_slot == stratagus::item_slot::weapon || item_slot == stratagus::item_slot::shield || item_slot == stratagus::item_slot::boots || item_slot == stratagus::item_slot::arrows)) {
-			for (const CUpgradeModifier *modifier : CUpgradeModifier::UpgradeModifiers) {
+			for (const stratagus::upgrade_modifier *modifier : stratagus::upgrade_modifier::UpgradeModifiers) {
 				const CUpgrade *modifier_upgrade = CUpgrade::get_all()[modifier->UpgradeId];
 				if (
 					(
@@ -5643,7 +5643,7 @@ int CUnit::GetItemVariableChange(const CUnit *item, int variable_index, bool inc
 							|| (modifier_upgrade->is_boots() && item_slot == stratagus::item_slot::boots)
 							|| (modifier_upgrade->is_arrows() && item_slot == stratagus::item_slot::arrows)
 						)
-						&& Player->Allow.Upgrades[modifier_upgrade->ID] == 'R' && modifier->ApplyTo[Type->Slot] == 'X'
+						&& Player->Allow.Upgrades[modifier_upgrade->ID] == 'R' && modifier->applies_to(this->Type)
 					)
 					|| (item_slot == stratagus::item_slot::weapon && modifier_upgrade->is_ability() && this->GetIndividualUpgrade(modifier_upgrade) && modifier_upgrade->WeaponClasses.size() > 0 && modifier_upgrade->WeaponClasses.contains(this->GetCurrentWeaponClass()) && !modifier_upgrade->WeaponClasses.contains(item->Type->get_item_class()))
 				) {

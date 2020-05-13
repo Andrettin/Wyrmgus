@@ -8,8 +8,6 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name upgrade_modifier.h - The upgrade modifier header file. */
-//
 //      (c) Copyright 1999-2020 by Vladi Belperchinov-Shabanski,
 //		Jimmy Salmon and Andrettin
 //
@@ -30,52 +28,60 @@
 
 #pragma once
 
-/*----------------------------------------------------------------------------
---  Includes
-----------------------------------------------------------------------------*/
-
 #include "upgrade/upgrade_structs.h" //for CUnitStats
-
-/*----------------------------------------------------------------------------
---  Declarations
-----------------------------------------------------------------------------*/
 
 class CConfigData;
 class CDynasty;
 class CUpgrade;
+struct lua_State;
+
+int CclDefineModifier(lua_State *l);
 
 namespace stratagus {
-	class faction;
-	class sml_data;
-	class sml_property;
-	class unit_type;
-}
+
+class faction;
+class sml_data;
+class sml_property;
+class unit_class;
+class unit_type;
 
 /**
 **  This is the modifier of an upgrade.
 **  This does the real action of an upgrade, and an upgrade can have multiple
 **  modifiers.
 */
-class CUpgradeModifier
+class upgrade_modifier
 {
 public:
-	CUpgradeModifier();
-	~CUpgradeModifier()
+	upgrade_modifier();
+	~upgrade_modifier()
 	{
 		if (this->ModifyPercent) {
 			delete [] this->ModifyPercent;
 		}
 	}
 	
-	static std::vector<CUpgradeModifier *> UpgradeModifiers;
+	static std::vector<upgrade_modifier *> UpgradeModifiers;
 	
 	void ProcessConfigData(const CConfigData *config_data);
-	void process_sml_property(const stratagus::sml_property &property);
-	void process_sml_scope(const stratagus::sml_data &scope);
+	void process_sml_property(const sml_property &property);
+	void process_sml_scope(const sml_data &scope);
+
+	const std::vector<unit_type *> &get_unit_types() const
+	{
+		return this->unit_types;
+	}
 	
-	int GetUnitStock(stratagus::unit_type *unit_type) const;
-	void SetUnitStock(stratagus::unit_type *unit_type, int quantity);
-	void ChangeUnitStock(stratagus::unit_type *unit_type, int quantity);
+	const std::vector<unit_class *> &get_unit_classes() const
+	{
+		return this->unit_classes;
+	}
+
+	bool applies_to(const unit_type *unit_type) const;
+	
+	int GetUnitStock(unit_type *unit_type) const;
+	void SetUnitStock(unit_type *unit_type, int quantity);
+	void ChangeUnitStock(unit_type *unit_type, int quantity);
 
 	int UpgradeId = 0;						/// used to filter required modifier
 
@@ -83,22 +89,29 @@ public:
 	int *ModifyPercent = nullptr;			/// use for percent modifiers
 	int SpeedResearch = 0;					/// speed factor for researching
 	int ImproveIncomes[MaxCosts];			/// improve incomes
-	std::map<stratagus::unit_type *, int> UnitStock;	/// unit stock
+	std::map<unit_type *, int> UnitStock;	/// unit stock
 	// allow/forbid bitmaps -- used as chars for example:
 	// `?' -- leave as is, `F' -- forbid, `A' -- allow
 	// TODO: see below allow more semantics?
 	// TODO: pointers or ids would be faster and less memory use
 	int  ChangeUnits[UnitTypeMax];			/// add/remove allowed units
 	char ChangeUpgrades[UpgradeMax];		/// allow/forbid upgrades
-	char ApplyTo[UnitTypeMax];				/// which unit types are affected
+private:
+	std::vector<unit_type *> unit_types; //which unit types are affected
+	std::vector<unit_class *> unit_classes; //which unit classes are affected
 
-	stratagus::unit_type *ConvertTo = nullptr;			/// convert to this unit-type.
+public:
+	unit_type *ConvertTo = nullptr;			/// convert to this unit-type.
 
 	//Wyrmgus start
 	int change_civilization_to = -1;		/// changes the player's civilization to this one
-	stratagus::faction *ChangeFactionTo = nullptr;	/// changes the player's faction to this one
+	faction *ChangeFactionTo = nullptr;	/// changes the player's faction to this one
 	CDynasty *ChangeDynastyTo = nullptr;	/// changes the player's dynasty to this one
 	
 	std::vector<CUpgrade *> RemoveUpgrades;	/// Upgrades to be removed when this upgrade modifier is implented
 	//Wyrmgus end
+
+	friend int ::CclDefineModifier(lua_State *l);
 };
+
+}

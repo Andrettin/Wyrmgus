@@ -387,7 +387,7 @@ std::string GetUniqueItemEffectsString(const std::string &item_ident)
 				variable_value = item->ResourcesHeld;
 			}
 			
-			for (const CUpgradeModifier *modifier : CUpgradeModifier::UpgradeModifiers) {
+			for (const stratagus::upgrade_modifier *modifier : stratagus::upgrade_modifier::UpgradeModifiers) {
 				if (
 					(item->Prefix != nullptr && modifier->UpgradeId == item->Prefix->ID)
 					|| (item->Suffix != nullptr && modifier->UpgradeId == item->Suffix->ID)

@@ -8,8 +8,6 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name upgrade_modifier.cpp - The upgrade modifier source file. */
-//
 //      (c) Copyright 1999-2020 by Vladi Belperchinov-Shabanski, Jimmy Salmon
 //		and Andrettin
 //
@@ -28,55 +26,40 @@
 //      02111-1307, USA.
 //
 
-/*----------------------------------------------------------------------------
---  Includes
-----------------------------------------------------------------------------*/
-
 #include "stratagus.h"
 
 #include "upgrade/upgrade_modifier.h"
 
 #include "config.h"
+#include "unit/unit_class.h"
 #include "unit/unit_type.h"
 #include "upgrade/upgrade.h"
 #include "util/string_util.h"
+#include "util/vector_util.h"
 
-/*----------------------------------------------------------------------------
---  Variables
-----------------------------------------------------------------------------*/
+namespace stratagus {
 
 /// Upgrades modifiers
-std::vector<CUpgradeModifier *> CUpgradeModifier::UpgradeModifiers;
+std::vector<upgrade_modifier *> upgrade_modifier::UpgradeModifiers;
 
-/*----------------------------------------------------------------------------
---  Functions
-----------------------------------------------------------------------------*/
-
-CUpgradeModifier::CUpgradeModifier()
+upgrade_modifier::upgrade_modifier()
 {
 	memset(this->ChangeUnits, 0, sizeof(this->ChangeUnits));
 	
 	memset(this->ChangeUpgrades, '?', sizeof(this->ChangeUpgrades));
-	memset(this->ApplyTo, '?', sizeof(this->ApplyTo));
 	this->Modifier.Variables.resize(UnitTypeVar.GetNumberVariable());
 	this->ModifyPercent = new int[UnitTypeVar.GetNumberVariable()];
 	memset(this->ModifyPercent, 0, UnitTypeVar.GetNumberVariable() * sizeof(int));
 }
 
-void CUpgradeModifier::ProcessConfigData(const CConfigData *config_data)
+void upgrade_modifier::ProcessConfigData(const CConfigData *config_data)
 {
 	for (size_t i = 0; i < config_data->Properties.size(); ++i) {
 		std::string key = config_data->Properties[i].first;
 		std::string value = config_data->Properties[i].second;
 		
 		if (key == "apply_to") {
-			value = FindAndReplaceString(value, "_", "-");
-			const int unit_type_id = UnitTypeIdByIdent(value.c_str());
-			if (unit_type_id != -1) {
-				this->ApplyTo[unit_type_id] = 'X';
-			} else {
-				fprintf(stderr, "Invalid unit type: \"%s\".\n", value.c_str());
-			}
+			this->unit_types.push_back(unit_type::get(value));
 		} else if (key == "remove_upgrade") {
 			value = FindAndReplaceString(value, "_", "-");
 			CUpgrade *removed_upgrade = CUpgrade::get(value);
@@ -100,7 +83,7 @@ void CUpgradeModifier::ProcessConfigData(const CConfigData *config_data)
 	}
 }
 
-void CUpgradeModifier::process_sml_property(const stratagus::sml_property &property)
+void upgrade_modifier::process_sml_property(const sml_property &property)
 {
 	const std::string &key = property.get_key();
 	const std::string &value = property.get_value();
@@ -121,41 +104,55 @@ void CUpgradeModifier::process_sml_property(const stratagus::sml_property &prope
 	}
 }
 
-void CUpgradeModifier::process_sml_scope(const stratagus::sml_data &scope)
+void upgrade_modifier::process_sml_scope(const sml_data &scope)
 {
 	const std::string &tag = scope.get_tag();
+	const std::vector<std::string> &values = scope.get_values();
 
-	if (tag == "units") {
-		for (const std::string &value : scope.get_values()) {
-			const int unit_type_id = UnitTypeIdByIdent(value.c_str());
-			if (unit_type_id != -1) {
-				this->ApplyTo[unit_type_id] = 'X';
-			} else {
-				throw std::runtime_error("Invalid unit type: \"" + value + "\".");
-			}
+	if (tag == "unit_types") {
+		for (const std::string &value : values) {
+			this->unit_types.push_back(unit_type::get(value));
+		}
+	} else if (tag == "unit_classes") {
+		for (const std::string &value : values) {
+			this->unit_classes.push_back(unit_class::get(value));
 		}
 	} else {
 		throw std::runtime_error("Invalid upgrade modifier property: \"" + tag + "\".");
 	}
 }
 
-int CUpgradeModifier::GetUnitStock(stratagus::unit_type *unit_type) const
+bool upgrade_modifier::applies_to(const unit_type *unit_type) const
 {
-	if (unit_type && this->UnitStock.find(unit_type) != this->UnitStock.end()) {
-		return this->UnitStock.find(unit_type)->second;
+	if (vector::contains(this->get_unit_types(), unit_type)) {
+		return true;
+	}
+
+	if (unit_type->get_unit_class() != nullptr && vector::contains(this->get_unit_classes(), unit_type->get_unit_class())) {
+		return true;
+	}
+
+	return false;
+}
+
+int upgrade_modifier::GetUnitStock(unit_type *unit_type) const
+{
+	auto find_iterator = this->UnitStock.find(unit_type);
+	if (unit_type && find_iterator != this->UnitStock.end()) {
+		return find_iterator->second;
 	} else {
 		return 0;
 	}
 }
 
-void CUpgradeModifier::SetUnitStock(stratagus::unit_type *unit_type, int quantity)
+void upgrade_modifier::SetUnitStock(unit_type *unit_type, int quantity)
 {
 	if (!unit_type) {
 		return;
 	}
 	
 	if (quantity == 0) {
-		if (this->UnitStock.find(unit_type) != this->UnitStock.end()) {
+		if (this->UnitStock.contains(unit_type)) {
 			this->UnitStock.erase(unit_type);
 		}
 	} else {
@@ -163,7 +160,9 @@ void CUpgradeModifier::SetUnitStock(stratagus::unit_type *unit_type, int quantit
 	}
 }
 
-void CUpgradeModifier::ChangeUnitStock(stratagus::unit_type *unit_type, int quantity)
+void upgrade_modifier::ChangeUnitStock(unit_type *unit_type, int quantity)
 {
 	this->SetUnitStock(unit_type, this->GetUnitStock(unit_type) + quantity);
+}
+
 }

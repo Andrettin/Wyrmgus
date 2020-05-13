@@ -664,9 +664,7 @@ void CGrandStrategyFaction::SetTechnology(int upgrade_id, bool has_technology, b
 	for (size_t z = 0; z < CUpgrade::get_all()[upgrade_id]->UpgradeModifiers.size(); ++z) {
 		for (const stratagus::unit_type *unit_type : stratagus::unit_type::get_all()) {
 				
-			Assert(CUpgrade::get_all()[upgrade_id]->UpgradeModifiers[z]->ApplyTo[unit_type->Slot] == '?' || CUpgrade::get_all()[upgrade_id]->UpgradeModifiers[z]->ApplyTo[unit_type->Slot] == 'X');
-
-			if (CUpgrade::get_all()[upgrade_id]->UpgradeModifiers[z]->ApplyTo[unit_type->Slot] == 'X') {
+			if (CUpgrade::get_all()[upgrade_id]->UpgradeModifiers[z]->applies_to(unit_type)) {
 				if (CUpgrade::get_all()[upgrade_id]->UpgradeModifiers[z]->Modifier.Variables[POINTS_INDEX].Value) {
 					this->MilitaryScoreBonus[unit_type->Slot] += CUpgrade::get_all()[upgrade_id]->UpgradeModifiers[z]->Modifier.Variables[POINTS_INDEX].Value * change;
 				}

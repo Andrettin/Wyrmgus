@@ -41,7 +41,6 @@
 class CDeityDomain;
 class CSchoolOfMagic;
 class CUniqueItem;
-class CUpgradeModifier;
 struct lua_State;
 
 namespace stratagus {
@@ -51,6 +50,7 @@ namespace stratagus {
 	class icon;
 	class unit_type;
 	class upgrade_class;
+	class upgrade_modifier;
 	enum class item_class;
 }
 
@@ -233,7 +233,7 @@ public:
 	stratagus::item_class Work;			/// Form in which was inscribed (i.e. scroll or book), if is a literary work
 	int Year = 0;						/// Year of publication, if is a literary work
 	stratagus::character *Author = nullptr;		/// Author of this literary work (if it is one)
-	std::vector<CUpgradeModifier *> UpgradeModifiers;	/// Upgrade modifiers for this upgrade
+	std::vector<stratagus::upgrade_modifier *> UpgradeModifiers;	/// Upgrade modifiers for this upgrade
 	std::vector<CUniqueItem *> UniqueItems;	/// Unique items who form a part of this set upgrade
 	std::vector<stratagus::unit_type *> ScaledCostUnits;	/// Units for which the upgrade's costs are scaled
 	std::vector<CDeityDomain *> DeityDomains;	/// Deity domains to which this ability belongs

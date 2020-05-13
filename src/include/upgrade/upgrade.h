@@ -30,19 +30,14 @@
 
 #pragma once
 
-/*----------------------------------------------------------------------------
---  Declarations
-----------------------------------------------------------------------------*/
-
 class CFile;
 class CPlayer;
 class CUpgrade;
 class CUnit;
-class CUpgradeModifier;
 
-/*----------------------------------------------------------------------------
---  Functions
-----------------------------------------------------------------------------*/
+namespace stratagus {
+	class upgrade_modifier;
+}
 
 /// init upgrade/allow structures
 extern void InitUpgrades();
@@ -76,9 +71,9 @@ extern void UpgradeLost(CPlayer &player, int id);
 /// Apply researched upgrades when map is loading
 extern void ApplyUpgrades();
 
-extern void ApplyIndividualUpgradeModifier(CUnit &unit, const CUpgradeModifier *um); /// Apply upgrade modifier of an individual upgrade
+extern void ApplyIndividualUpgradeModifier(CUnit &unit, const stratagus::upgrade_modifier *um); /// Apply upgrade modifier of an individual upgrade
 //Wyrmgus start
-extern void RemoveIndividualUpgradeModifier(CUnit &unit, const CUpgradeModifier *um);
+extern void RemoveIndividualUpgradeModifier(CUnit &unit, const stratagus::upgrade_modifier *um);
 extern void AbilityAcquire(CUnit &unit, CUpgrade *upgrade, bool save = true);
 extern void AbilityLost(CUnit &unit, CUpgrade *upgrade, bool lose_all = false);
 extern void TraitAcquire(CUnit &unit, CUpgrade *upgrade);
