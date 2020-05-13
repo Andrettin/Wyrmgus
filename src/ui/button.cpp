@@ -175,14 +175,64 @@ void button::process_sml_property(const sml_property &property)
 		} else {
 			throw std::runtime_error("Invalid button action: \"" + value + "\".");
 		}
+	} else if (key == "value") {
+		this->ValueStr = value;
 	} else if (key == "key") {
 		this->Key = GetHotKey(value);
 	} else if (key == "hint") {
 		this->Hint = value;
+	} else if (key == "description") {
+		this->Description = value;
 	} else if (key == "popup") {
 		this->Popup = value;
 	} else if (key == "icon") {
 		this->Icon.Name = value;
+	} else if (key == "allowed") {
+		if (value == "check_true") {
+			this->Allowed = ButtonCheckTrue;
+		} else if (value == "check_false") {
+			this->Allowed = ButtonCheckFalse;
+		} else if (value == "check_upgrade") {
+			this->Allowed = ButtonCheckUpgrade;
+		} else if (value == "check_upgrade_not") {
+			this->Allowed = ButtonCheckUpgradeNot;
+		} else if (value == "check_upgrade_or") {
+			this->Allowed = ButtonCheckUpgradeOr;
+		} else if (value == "check_individual_upgrade") {
+			this->Allowed = ButtonCheckIndividualUpgrade;
+		} else if (value == "check_individual_upgrade_or") {
+			this->Allowed = ButtonCheckIndividualUpgradeOr;
+		} else if (value == "check_unit_variable") {
+			this->Allowed = ButtonCheckUnitVariable;
+		} else if (value == "check_units_or") {
+			this->Allowed = ButtonCheckUnitsOr;
+		} else if (value == "check_units_and") {
+			this->Allowed = ButtonCheckUnitsAnd;
+		} else if (value == "check_units_not") {
+			this->Allowed = ButtonCheckUnitsNot;
+		} else if (value == "check_network") {
+			this->Allowed = ButtonCheckNetwork;
+		} else if (value == "check_no_network") {
+			this->Allowed = ButtonCheckNoNetwork;
+		} else if (value == "check_no_work") {
+			this->Allowed = ButtonCheckNoWork;
+		} else if (value == "check_no_research") {
+			this->Allowed = ButtonCheckNoResearch;
+		} else if (value == "check_attack") {
+			this->Allowed = ButtonCheckAttack;
+		} else if (value == "check_upgrade_to") {
+			this->Allowed = ButtonCheckUpgradeTo;
+		} else if (value == "check_research") {
+			this->Allowed = ButtonCheckResearch;
+		} else if (value == "check_single_research") {
+			this->Allowed = ButtonCheckSingleResearch;
+		} else if (value == "check_has_inventory") {
+			this->Allowed = ButtonCheckHasInventory;
+		} else if (value == "check_has_sub_buttons") {
+			this->Allowed = ButtonCheckHasSubButtons;
+		} else {
+			throw std::runtime_error("Invalid button check: \"" + value + "\".");
+		}
 	} else {
 		data_entry::process_sml_property(property);
 	}
