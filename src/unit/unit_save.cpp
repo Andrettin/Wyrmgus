@@ -405,17 +405,19 @@ void SaveUnit(const CUnit &unit, CFile &file)
 			file.printf(",\n  \"layer-variation\", \"%s\", %d", GetImageLayerNameById(i).c_str(), unit.LayerVariation[i]);
 		}
 	}
-	for (std::map<stratagus::unit_type *, int>::const_iterator iterator = unit.Type->Stats[unit.Player->Index].UnitStock.begin(); iterator != unit.Type->Stats[unit.Player->Index].UnitStock.end(); ++iterator) {
-		stratagus::unit_type *unit_type = iterator->first;
-		
+
+	for (const auto &kv_pair : unit.Type->Stats[unit.Player->Index].UnitStock) {
+		const stratagus::unit_type *unit_type = stratagus::unit_type::get_all()[kv_pair.first];
+
 		if (unit.GetUnitStock(unit_type) != 0) {
 			file.printf(",\n  \"unit-stock\", \"%s\", %d", unit_type->Ident.c_str(), unit.GetUnitStock(unit_type));
 		}
-		
+
 		if (unit.GetUnitStockReplenishmentTimer(unit_type) != 0) {
 			file.printf(",\n  \"unit-stock-replenishment-timer\", \"%s\", %d", unit_type->Ident.c_str(), unit.GetUnitStockReplenishmentTimer(unit_type));
 		}
 	}
+
 	for (std::map<int, int>::const_iterator iterator = unit.IndividualUpgrades.begin(); iterator != unit.IndividualUpgrades.end(); ++iterator) {
 		int upgrade_id = iterator->first;
 		CUpgrade *upgrade = CUpgrade::get_all()[upgrade_id];

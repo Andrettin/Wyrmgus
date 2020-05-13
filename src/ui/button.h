@@ -95,11 +95,14 @@ public:
 		return this->pos;
 	}
 
+	const CUnit *get_unit() const;
+	const unit_type *get_value_unit_type(const CUnit *unit) const;
+
 	void SetTriggerData() const;
 	void CleanTriggerData() const;
 	int GetLevelID() const;
-	int GetKey() const;
-	std::string GetHint() const;
+	int get_key() const;
+	std::string get_hint() const;
 
 	const std::vector<unit_class *> &get_unit_classes() const
 	{

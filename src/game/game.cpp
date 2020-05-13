@@ -510,9 +510,10 @@ int WriteMapSetup(const char *mapSetup, CMap &map, int writeTerrain, bool is_mod
 			}
 			f->printf("},\n");
 			f->printf("\tUnitStock = {");
-			for (std::map<stratagus::unit_type *, int>::const_iterator iterator = unit_type->DefaultStat.UnitStock.begin(); iterator != unit_type->DefaultStat.UnitStock.end(); ++iterator) {
-				stratagus::unit_type *unit_type = iterator->first;
-				int unit_stock = iterator->second;
+			for (const auto &kv_pair : unit_type->DefaultStat.UnitStock) {
+				const stratagus::unit_type *unit_type = stratagus::unit_type::get_all()[kv_pair.first];
+				const int unit_stock = kv_pair.second;
+
 				if (unit_stock != 0 && (!unit_type->Parent || unit_stock != unit_type->Parent->DefaultStat.GetUnitStock(unit_type))) {
 					f->printf("\"%s\", ", unit_type->Ident.c_str());
 					f->printf("%d, ", unit_stock);
@@ -760,13 +761,16 @@ int WriteMapSetup(const char *mapSetup, CMap &map, int writeTerrain, bool is_mod
 						f->printf("SetModStat(\"%s\", \"%s\", \"ImproveProduction\", %d, \"%s\")\n", mod_file.c_str(), unit_type->Ident.c_str(), unit_type->ModDefaultStats[CMap::Map.Info.Filename].ImproveIncomes[j], DefaultResourceNames[j].c_str());
 					}
 				}
-				for (std::map<stratagus::unit_type *, int>::const_iterator iterator = unit_type->ModDefaultStats[CMap::Map.Info.Filename].UnitStock.begin(); iterator != unit_type->ModDefaultStats[CMap::Map.Info.Filename].UnitStock.end(); ++iterator) {
-					const stratagus::unit_type *unit_type = iterator->first;
-					int unit_stock = iterator->second;
+
+				for (const auto &kv_pair : unit_type->ModDefaultStats[CMap::Map.Info.Filename].UnitStock) {
+					const stratagus::unit_type *unit_type = stratagus::unit_type::get_all()[kv_pair.first];
+					const int unit_stock = kv_pair.second;
+
 					if (unit_stock != 0) {
 						f->printf("SetModStat(\"%s\", \"%s\", \"UnitStock\", %d, \"%s\")\n", mod_file.c_str(), unit_type->Ident.c_str(), unit_stock, unit_type->Ident.c_str());
 					}
 				}
+
 				for (size_t j = 0; j < UnitTypeVar.GetNumberVariable(); ++j) {
 					if (unit_type->ModDefaultStats[CMap::Map.Info.Filename].Variables[j].Value != 0) {
 						f->printf("SetModStat(\"%s\", \"%s\", \"%s\", %d, \"Value\")\n", mod_file.c_str(), unit_type->Ident.c_str(), UnitTypeVar.VariableNameLookup[j], unit_type->ModDefaultStats[CMap::Map.Info.Filename].Variables[j].Value);

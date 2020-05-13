@@ -158,31 +158,36 @@ int CUnitStats::GetPrice() const
 	return cost;
 }
 
-int CUnitStats::GetUnitStock(stratagus::unit_type *unit_type) const
+int CUnitStats::GetUnitStock(const stratagus::unit_type *unit_type) const
 {
-	if (unit_type && this->UnitStock.find(unit_type) != this->UnitStock.end()) {
-		return this->UnitStock.find(unit_type)->second;
+	if (!unit_type) {
+		return 0;
+	}
+
+	auto find_iterator = this->UnitStock.find(unit_type->Slot);
+	if (find_iterator != this->UnitStock.end()) {
+		return find_iterator->second;
 	} else {
 		return 0;
 	}
 }
 
-void CUnitStats::SetUnitStock(stratagus::unit_type *unit_type, int quantity)
+void CUnitStats::SetUnitStock(const stratagus::unit_type *unit_type, int quantity)
 {
 	if (!unit_type) {
 		return;
 	}
 	
 	if (quantity <= 0) {
-		if (this->UnitStock.find(unit_type) != this->UnitStock.end()) {
-			this->UnitStock.erase(unit_type);
+		if (this->UnitStock.contains(unit_type->Slot)) {
+			this->UnitStock.erase(unit_type->Slot);
 		}
 	} else {
-		this->UnitStock[unit_type] = quantity;
+		this->UnitStock[unit_type->Slot] = quantity;
 	}
 }
 
-void CUnitStats::ChangeUnitStock(stratagus::unit_type *unit_type, int quantity)
+void CUnitStats::ChangeUnitStock(const stratagus::unit_type *unit_type, int quantity)
 {
 	this->SetUnitStock(unit_type, this->GetUnitStock(unit_type) + quantity);
 }
@@ -1458,14 +1463,13 @@ static void ApplyUpgradeModifier(CPlayer &player, const stratagus::upgrade_modif
 						player.Incomes[j] = std::max(player.Incomes[j], stat.ImproveIncomes[j]);
 					}
 				}
-				//Wyrmgus start
+
 				stat.ResourceDemand[j] += um->Modifier.ResourceDemand[j];
-				//Wyrmgus end
 			}
 			
-			for (std::map<stratagus::unit_type *, int>::const_iterator iterator = um->Modifier.UnitStock.begin(); iterator != um->Modifier.UnitStock.end(); ++iterator) {
-				stratagus::unit_type *unit_type = iterator->first;
-				int unit_stock = iterator->second;
+			for (const auto &kv_pair : um->Modifier.UnitStock) {
+				const stratagus::unit_type *unit_type = stratagus::unit_type::get_all()[kv_pair.first];
+				const int unit_stock = kv_pair.second;
 				if (unit_stock != 0) {
 					stat.ChangeUnitStock(unit_type, unit_stock);
 				}
@@ -1581,9 +1585,9 @@ static void ApplyUpgradeModifier(CPlayer &player, const stratagus::upgrade_modif
 						//Wyrmgus end
 					}
 					
-					for (std::map<stratagus::unit_type *, int>::const_iterator iterator = um->Modifier.UnitStock.begin(); iterator != um->Modifier.UnitStock.end(); ++iterator) {
-						stratagus::unit_type *unit_type = iterator->first;
-						int unit_stock = iterator->second;
+					for (const auto &kv_pair : um->Modifier.UnitStock) {
+						const stratagus::unit_type *unit_type = stratagus::unit_type::get_all()[kv_pair.first];
+						const int unit_stock = kv_pair.second;
 						if (unit_stock < 0) {
 							unit.ChangeUnitStock(unit_type, unit_stock);
 						}
@@ -1752,15 +1756,15 @@ static void RemoveUpgradeModifier(CPlayer &player, const stratagus::upgrade_modi
 				stat.ResourceDemand[j] -= um->Modifier.ResourceDemand[j];
 				//Wyrmgus end
 			}
-			
-			for (std::map<stratagus::unit_type *, int>::const_iterator iterator = um->Modifier.UnitStock.begin(); iterator != um->Modifier.UnitStock.end(); ++iterator) {
-				stratagus::unit_type *unit_type = iterator->first;
-				int unit_stock = iterator->second;
+
+			for (const auto &kv_pair : um->Modifier.UnitStock) {
+				const stratagus::unit_type *unit_type = stratagus::unit_type::get_all()[kv_pair.first];
+				const int unit_stock = kv_pair.second;
 				if (unit_stock != 0) {
-					stat.ChangeUnitStock(unit_type, - unit_stock);
+					stat.ChangeUnitStock(unit_type, -unit_stock);
 				}
 			}
-			
+
 			int varModified = 0;
 			for (unsigned int j = 0; j < UnitTypeVar.GetNumberVariable(); j++) {
 				varModified |= um->Modifier.Variables[j].Value
@@ -1873,11 +1877,11 @@ static void RemoveUpgradeModifier(CPlayer &player, const stratagus::upgrade_modi
 						//Wyrmgus end
 					}
 					
-					for (std::map<stratagus::unit_type *, int>::const_iterator iterator = um->Modifier.UnitStock.begin(); iterator != um->Modifier.UnitStock.end(); ++iterator) {
-						stratagus::unit_type *unit_type = iterator->first;
-						int unit_stock = iterator->second;
+					for (const auto &kv_pair : um->Modifier.UnitStock) {
+						const stratagus::unit_type *unit_type = stratagus::unit_type::get_all()[kv_pair.first];
+						const int unit_stock = kv_pair.second;
 						if (unit_stock > 0) {
-							unit.ChangeUnitStock(unit_type, - unit_stock);
+							unit.ChangeUnitStock(unit_type, -unit_stock);
 						}
 					}
 				}
@@ -1997,9 +2001,9 @@ void ApplyIndividualUpgradeModifier(CUnit &unit, const stratagus::upgrade_modifi
 		//Wyrmgus end
 	}
 	
-	for (std::map<stratagus::unit_type *, int>::const_iterator iterator = um->Modifier.UnitStock.begin(); iterator != um->Modifier.UnitStock.end(); ++iterator) {
-		stratagus::unit_type *unit_type = iterator->first;
-		int unit_stock = iterator->second;
+	for (const auto &kv_pair : um->Modifier.UnitStock) {
+		const stratagus::unit_type *unit_type = stratagus::unit_type::get_all()[kv_pair.first];
+		const int unit_stock = kv_pair.second;
 		if (unit_stock < 0) {
 			unit.ChangeUnitStock(unit_type, unit_stock);
 		}
@@ -2092,12 +2096,12 @@ void RemoveIndividualUpgradeModifier(CUnit &unit, const stratagus::upgrade_modif
 		}
 		//Wyrmgus end
 	}
-	
-	for (std::map<stratagus::unit_type *, int>::const_iterator iterator = um->Modifier.UnitStock.begin(); iterator != um->Modifier.UnitStock.end(); ++iterator) {
-		stratagus::unit_type *unit_type = iterator->first;
-		int unit_stock = iterator->second;
+
+	for (const auto &kv_pair : um->Modifier.UnitStock) {
+		const stratagus::unit_type *unit_type = stratagus::unit_type::get_all()[kv_pair.first];
+		const int unit_stock = kv_pair.second;
 		if (unit_stock > 0) {
-			unit.ChangeUnitStock(unit_type, - unit_stock);
+			unit.ChangeUnitStock(unit_type, -unit_stock);
 		}
 	}
 	

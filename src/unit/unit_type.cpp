@@ -655,6 +655,10 @@ void unit_type::process_sml_property(const sml_property &property)
 	} else if (key == "priority") {
 		this->DefaultStat.Variables[PRIORITY_INDEX].Value = std::stoi(value);
 		this->DefaultStat.Variables[PRIORITY_INDEX].Max = std::stoi(value);
+	} else if (key == "button_key") {
+		this->ButtonKey = value;
+	} else if (key == "button_hint") {
+		this->ButtonHint = value;
 	} else if (key == "type") {
 		if (value == "land") {
 			this->UnitType = UnitTypeType::Land;
@@ -1970,11 +1974,14 @@ void UpdateUnitStats(stratagus::unit_type &type, int reset)
 					type.MapDefaultStat.Variables[i].Enable = iterator->second.Variables[i].Enable;
 				}
 			}
-			for (std::map<stratagus::unit_type *, int>::const_iterator unit_stock_iterator = iterator->second.UnitStock.begin(); unit_stock_iterator != iterator->second.UnitStock.end(); ++unit_stock_iterator) {
-				stratagus::unit_type *unit_type = unit_stock_iterator->first;
-				int unit_stock = unit_stock_iterator->second;
+
+			for (const auto &unit_stock_kv_pair : iterator->second.UnitStock) {
+				const stratagus::unit_type *unit_type = stratagus::unit_type::get_all()[unit_stock_kv_pair.first];
+				const int unit_stock = unit_stock_kv_pair.second;
+
 				type.MapDefaultStat.ChangeUnitStock(unit_type, unit_stock);
 			}
+
 			for (int i = 0; i < MaxCosts; ++i) {
 				type.MapDefaultStat.Costs[i] += iterator->second.Costs[i];
 				type.MapDefaultStat.ImproveIncomes[i] += iterator->second.ImproveIncomes[i];

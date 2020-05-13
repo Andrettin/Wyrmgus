@@ -212,16 +212,14 @@ int TransformUnitIntoType(CUnit &unit, const stratagus::unit_type &newtype)
 		//Wyrmgus end
 	}
 
-	//Wyrmgus start
-	for (std::map<stratagus::unit_type *, int>::iterator iterator = unit.UnitStock.begin(); iterator != unit.UnitStock.end(); ++iterator) {
-		stratagus::unit_type *unit_type = iterator->first;
-		
-		int unit_stock_change = newstats.GetUnitStock(unit_type) - oldstats.GetUnitStock(unit_type);
+	for (const auto &kv_pair : unit.UnitStock) {
+		const stratagus::unit_type *unit_type = stratagus::unit_type::get_all()[kv_pair.first];
+
+		const int unit_stock_change = newstats.GetUnitStock(unit_type) - oldstats.GetUnitStock(unit_type);
 		if (unit_stock_change < 0) {
 			unit.ChangeUnitStock(unit_type, unit_stock_change);
 		}
 	}
-	//Wyrmgus end
 	
 	//drop units that can no longer be in the container
 	if (unit.UnitInside) {

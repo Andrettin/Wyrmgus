@@ -319,10 +319,11 @@ static void AiCheckUnits()
 				}
 
 				bool mercenary_recruited = false;
-				for (std::map<stratagus::unit_type *, int>::iterator iterator = mercenary_building->UnitStock.begin(); iterator != mercenary_building->UnitStock.end(); ++iterator) {
-					stratagus::unit_type *mercenary_type = iterator->first;
+				for (const auto &kv_pair : mercenary_building->UnitStock) {
+					stratagus::unit_type *mercenary_type = stratagus::unit_type::get_all()[kv_pair.first];
+					const int unit_stock = kv_pair.second;
 					if (
-						iterator->second
+						unit_stock > 0
 						&& !mercenary_type->BoolFlag[ITEM_INDEX].value
 						&& CheckDependencies(mercenary_type, CPlayer::Players[i])
 						&& AiPlayer->Player->CheckLimits(*mercenary_type) >= 1

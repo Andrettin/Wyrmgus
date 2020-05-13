@@ -284,7 +284,7 @@ static bool CanShowPopupContent(const PopupConditionPanel *condition,
 		return true;
 	}
 
-	if (condition->HasHint && button.GetHint().empty()) {
+	if (condition->HasHint && button.get_hint().empty()) {
 		return false;
 	}
 
@@ -1024,21 +1024,17 @@ void CButtonPanel::Draw()
 		//  Tutorial show command key in icons
 		//
 		if (ShowCommandKey) {
-			if (button->GetKey() == gcn::Key::K_ESCAPE) {
-				//Wyrmgus start
-//				strcpy_s(buf, sizeof(buf), "ESC");
+			const int key = button->get_key();
+			if (key == gcn::Key::K_ESCAPE) {
 				strcpy_s(buf, sizeof(buf), "Esc");
-				//Wyrmgus end
-			//Wyrmgus start
-			} else if (button->GetKey() == gcn::Key::K_PAGE_UP) {
+			} else if (key == gcn::Key::K_PAGE_UP) {
 				strcpy_s(buf, sizeof(buf), "PgUp");
-			} else if (button->GetKey() == gcn::Key::K_PAGE_DOWN) {
+			} else if (key == gcn::Key::K_PAGE_DOWN) {
 				strcpy_s(buf, sizeof(buf), "PgDwn");
-			} else if (button->GetKey() == gcn::Key::K_DELETE) {
+			} else if (key == gcn::Key::K_DELETE) {
 				strcpy_s(buf, sizeof(buf), "Del");
-			//Wyrmgus end
 			} else {
-				buf[0] = toupper(button->GetKey());
+				buf[0] = toupper(key);
 				buf[1] = '\0';
 			}
 		} else {
@@ -2351,7 +2347,7 @@ int CButtonPanel::DoKey(int key)
 		}
 
 		for (int i = 0; i < (int)UI.ButtonPanel.Buttons.size(); ++i) {
-			if (CurrentButtons[i]->get_pos() != -1 && key == CurrentButtons[i]->GetKey()) {
+			if (CurrentButtons[i]->get_pos() != -1 && key == CurrentButtons[i]->get_key()) {
 				UI.ButtonPanel.DoClicked(i);
 				return 1;
 			}

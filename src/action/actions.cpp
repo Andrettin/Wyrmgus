@@ -338,21 +338,21 @@ static void HandleBuffsEachCycle(CUnit &unit)
 		}
 	}
 
-	for (std::map<stratagus::unit_type *, int>::const_iterator iterator = unit.Type->Stats[unit.Player->Index].UnitStock.begin(); iterator != unit.Type->Stats[unit.Player->Index].UnitStock.end(); ++iterator) {
-		stratagus::unit_type *unit_type = iterator->first;
-		int unit_stock = iterator->second;
-		
+	for (const auto &kv_pair : unit.Type->Stats[unit.Player->Index].UnitStock) {
+		stratagus::unit_type *unit_type = stratagus::unit_type::get_all()[kv_pair.first];
+		const int unit_stock = kv_pair.second;
+
 		if (unit_stock <= 0) {
 			continue;
 		}
-		
+
 		if (unit.GetUnitStockReplenishmentTimer(unit_type) > 0) {
 			unit.ChangeUnitStockReplenishmentTimer(unit_type, -1);
 			if (unit.GetUnitStockReplenishmentTimer(unit_type) == 0 && unit.GetUnitStock(unit_type) < unit_stock) { //if timer reached 0, replenish 1 of the stock
 				unit.ChangeUnitStock(unit_type, 1);
 			}
 		}
-			
+
 		//if the unit still has less stock than its max, re-init the unit stock timer
 		if (unit.GetUnitStockReplenishmentTimer(unit_type) == 0 && unit.GetUnitStock(unit_type) < unit_stock && CheckDependencies(unit_type, unit.Player)) {
 			unit.SetUnitStockReplenishmentTimer(unit_type, unit_type->Stats[unit.Player->Index].Costs[TimeCost] * 50);

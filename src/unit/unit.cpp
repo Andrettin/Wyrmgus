@@ -5727,36 +5727,41 @@ int CUnit::GetPrice() const
 	return cost;
 }
 
-int CUnit::GetUnitStock(stratagus::unit_type *unit_type) const
+int CUnit::GetUnitStock(const stratagus::unit_type *unit_type) const
 {
-	if (unit_type && this->UnitStock.find(unit_type) != this->UnitStock.end()) {
-		return this->UnitStock.find(unit_type)->second;
+	if (unit_type == nullptr) {
+		return 0;
+	}
+
+	auto find_iterator = this->UnitStock.find(unit_type->Slot);
+	if (find_iterator != this->UnitStock.end()) {
+		return find_iterator->second;
 	} else {
 		return 0;
 	}
 }
 
-void CUnit::SetUnitStock(stratagus::unit_type *unit_type, int quantity)
+void CUnit::SetUnitStock(const stratagus::unit_type *unit_type, const int quantity)
 {
 	if (!unit_type) {
 		return;
 	}
 	
 	if (quantity <= 0) {
-		if (this->UnitStock.find(unit_type) != this->UnitStock.end()) {
-			this->UnitStock.erase(unit_type);
+		if (this->UnitStock.contains(unit_type->Slot)) {
+			this->UnitStock.erase(unit_type->Slot);
 		}
 	} else {
-		this->UnitStock[unit_type] = quantity;
+		this->UnitStock[unit_type->Slot] = quantity;
 	}
 }
 
-void CUnit::ChangeUnitStock(stratagus::unit_type *unit_type, int quantity)
+void CUnit::ChangeUnitStock(const stratagus::unit_type *unit_type, const int quantity)
 {
 	this->SetUnitStock(unit_type, this->GetUnitStock(unit_type) + quantity);
 }
 
-int CUnit::GetUnitStockReplenishmentTimer(stratagus::unit_type *unit_type) const
+int CUnit::GetUnitStockReplenishmentTimer(const stratagus::unit_type *unit_type) const
 {
 	if (this->UnitStockReplenishmentTimers.find(unit_type) != this->UnitStockReplenishmentTimers.end()) {
 		return this->UnitStockReplenishmentTimers.find(unit_type)->second;
@@ -5765,7 +5770,7 @@ int CUnit::GetUnitStockReplenishmentTimer(stratagus::unit_type *unit_type) const
 	}
 }
 
-void CUnit::SetUnitStockReplenishmentTimer(stratagus::unit_type *unit_type, int quantity)
+void CUnit::SetUnitStockReplenishmentTimer(const stratagus::unit_type *unit_type, int quantity)
 {
 	if (!unit_type) {
 		return;
@@ -5780,7 +5785,7 @@ void CUnit::SetUnitStockReplenishmentTimer(stratagus::unit_type *unit_type, int 
 	}
 }
 
-void CUnit::ChangeUnitStockReplenishmentTimer(stratagus::unit_type *unit_type, int quantity)
+void CUnit::ChangeUnitStockReplenishmentTimer(const stratagus::unit_type *unit_type, int quantity)
 {
 	this->SetUnitStockReplenishmentTimer(unit_type, this->GetUnitStockReplenishmentTimer(unit_type) + quantity);
 }

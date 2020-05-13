@@ -75,16 +75,16 @@ public:
 	bool operator != (const CUnitStats &rhs) const;
 	
  	int GetPrice() const;
-	int GetUnitStock(stratagus::unit_type *unit_type) const;
-	void SetUnitStock(stratagus::unit_type *unit_type, int quantity);
-	void ChangeUnitStock(stratagus::unit_type *unit_type, int quantity);
+	int GetUnitStock(const stratagus::unit_type *unit_type) const;
+	void SetUnitStock(const stratagus::unit_type *unit_type, int quantity);
+	void ChangeUnitStock(const stratagus::unit_type *unit_type, int quantity);
 public:
 	std::vector<stratagus::unit_variable> Variables;           /// user defined variable.
 	int Costs[MaxCosts];            /// current costs of the unit
 	int Storing[MaxCosts];          /// storage increasing
 	int ImproveIncomes[MaxCosts];   /// Gives player an improved income
 	int ResourceDemand[MaxCosts];	/// Resource demand
-	std::map<stratagus::unit_type *, int> UnitStock;	/// Units in stock
+	std::map<int, int> UnitStock;	/// Units in stock
 };
 
 class CUpgrade final : public stratagus::detailed_data_entry, public stratagus::data_type<CUpgrade>, public CDataType

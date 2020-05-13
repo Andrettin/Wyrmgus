@@ -3208,10 +3208,10 @@ void DrawPieMenu()
 			if (UI.ButtonPanel.ShowCommandKey) {
 				const char *text;
 
-				if (buttons[i]->GetKey() == 27) {
+				if (buttons[i]->get_key() == 27) {
 					text = "ESC";
 				} else {
-					buf[0] = toupper(buttons[i]->GetKey());
+					buf[0] = toupper(buttons[i]->get_key());
 					text = (const char *)buf;
 				}
 				label.DrawClip(x + 4, y + 4, text);
