@@ -27,10 +27,6 @@
 
 #pragma once
 
-/*----------------------------------------------------------------------------
---  Includes
-----------------------------------------------------------------------------*/
-
 #include "ui/button_cmd.h"
 #include "ui/icon.h"
 //Wyrmgus start
@@ -39,10 +35,6 @@
 #include "upgrade/upgrade_structs.h"
 #include "vec2i.h"
 
-/*----------------------------------------------------------------------------
---  Definitons
-----------------------------------------------------------------------------*/
-
 static constexpr int STORE_OVERALL = 0;
 static constexpr int STORE_BUILDING = 1;
 static constexpr int STORE_BOTH = 2;
@@ -50,10 +42,6 @@ static constexpr int STORE_BOTH = 2;
 static constexpr int SPEEDUP_FACTOR = 100;
 
 static constexpr int DefaultTradeCost = 30;
-
-/*----------------------------------------------------------------------------
---  Declarations
-----------------------------------------------------------------------------*/
 
 class CCurrency;
 class CDeity;
@@ -254,7 +242,10 @@ public:
 	CCurrency *GetCurrency() const;
 	void ShareUpgradeProgress(CPlayer &player, CUnit &unit);
 	int get_player_color_usage_count(const stratagus::player_color *player_color) const;
+
+	stratagus::unit_type *get_class_unit_type(const stratagus::unit_class *unit_class) const;
 	bool has_upgrade_class(const stratagus::upgrade_class *upgrade_class) const;
+
 	bool HasSettlement(const stratagus::site *settlement) const;
 	bool HasSettlementNearWaterZone(int water_zone) const;
 	stratagus::site *GetNearestSettlement(const Vec2i &pos, int z, const Vec2i &size) const;

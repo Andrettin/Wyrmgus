@@ -8,8 +8,6 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name mouse.cpp - The mouse handling. */
-//
 //      (c) Copyright 1998-2020 by Lutz Sammer, Jimmy Salmon and Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
@@ -496,17 +494,16 @@ static bool DoRightButton_Worker(CUnit &unit, CUnit *dest, const Vec2i &pos, int
 	//Wyrmgus start
 	//if the clicked unit is a settlement site, build on it
 	if (UnitUnderCursor != nullptr && dest != nullptr && dest != &unit && dest->Type == settlement_site_unit_type && (dest->Player->Index == PlayerNumNeutral || dest->Player->Index == unit.Player->Index)) {
-		for (stratagus::unit_type *unit_type : stratagus::unit_type::get_all()) {
-			if (unit_type && unit_type->BoolFlag[TOWNHALL_INDEX].value && CheckDependencies(unit_type, unit.Player) && CanBuildUnitType(&unit, *unit_type, dest->tilePos, 1, false, dest->MapLayer->ID)) {
-				if (stratagus::vector::contains(AiHelpers.get_builders(unit_type), unit.Type) || stratagus::vector::contains(AiHelpers.get_builder_classes(unit_type->get_unit_class()), unit.Type->get_unit_class())) {
-					dest->Blink = 4;
-					SendCommandBuildBuilding(unit, dest->tilePos, *unit_type, flush, dest->MapLayer->ID);
-					if (!acknowledged) {
-						PlayUnitSound(unit, stratagus::unit_sound_type::build);
-						acknowledged = 1;
-					}
-					return true;
+		stratagus::unit_type *town_hall_type = unit.Player->get_class_unit_type(stratagus::defines::get()->get_town_hall_class());
+		if (town_hall_type != nullptr && CheckDependencies(town_hall_type, unit.Player) && CanBuildUnitType(&unit, *town_hall_type, dest->tilePos, 1, false, dest->MapLayer->ID)) {
+			if (stratagus::vector::contains(AiHelpers.get_builders(town_hall_type), unit.Type) || stratagus::vector::contains(AiHelpers.get_builder_classes(town_hall_type->get_unit_class()), unit.Type->get_unit_class())) {
+				dest->Blink = 4;
+				SendCommandBuildBuilding(unit, dest->tilePos, *town_hall_type, flush, dest->MapLayer->ID);
+				if (!acknowledged) {
+					PlayUnitSound(unit, stratagus::unit_sound_type::build);
+					acknowledged = 1;
 				}
+				return true;
 			}
 		}
 	}

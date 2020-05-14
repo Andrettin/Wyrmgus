@@ -64,15 +64,8 @@
 */
 CBuildRestrictionOnTop *OnTopDetails(const stratagus::unit_type &type, const stratagus::unit_type *parent)
 {
-	//Wyrmgus start
-//	for (std::vector<CBuildRestriction *>::const_iterator i = unit.Type->BuildingRules.begin();
-	for (std::vector<CBuildRestriction *>::const_iterator i = type.BuildingRules.begin();
-	//Wyrmgus end
-		//Wyrmgus start
-//		 i != unit.Type->BuildingRules.end(); ++i) {
-		i != type.BuildingRules.end(); ++i) {
-		//Wyrmgus end
-		CBuildRestrictionOnTop *ontopb = dynamic_cast<CBuildRestrictionOnTop *>(*i);
+	for (const auto &b :type.BuildingRules) {
+		CBuildRestrictionOnTop *ontopb = dynamic_cast<CBuildRestrictionOnTop *>(b.get());
 
 		if (ontopb) {
 			if (!parent) {
@@ -84,11 +77,11 @@ CBuildRestrictionOnTop *OnTopDetails(const stratagus::unit_type &type, const str
 			}
 			continue;
 		}
-		CBuildRestrictionAnd *andb = dynamic_cast<CBuildRestrictionAnd *>(*i);
+		CBuildRestrictionAnd *andb = dynamic_cast<CBuildRestrictionAnd *>(b.get());
 
 		if (andb) {
-			for (std::vector<CBuildRestriction *>::iterator j = andb->_or_list.begin(); j != andb->_or_list.end(); ++j) {
-				CBuildRestrictionOnTop *ontopb = dynamic_cast<CBuildRestrictionOnTop *>(*j);
+			for (const auto &sub_b : andb->and_list) {
+				CBuildRestrictionOnTop *ontopb = dynamic_cast<CBuildRestrictionOnTop *>(sub_b.get());
 				if (ontopb) {
 					if (!parent) {
 						// Guess this is right
@@ -109,31 +102,26 @@ CBuildRestrictionOnTop *OnTopDetails(const stratagus::unit_type &type, const str
 */
 bool CBuildRestrictionAnd::Check(const CUnit *builder, const stratagus::unit_type &type, const Vec2i &pos, CUnit *&ontoptarget, int z) const
 {
-	for (std::vector<CBuildRestriction *>::const_iterator i = _or_list.begin(); i != _or_list.end(); ++i) {
-		//Wyrmgus start
-//		if (!(*i)->Check(builder, type, pos, ontoptarget)) {
-		if (!(*i)->Check(builder, type, pos, ontoptarget, z)) {
-		//Wyrmgus end
+	for (const auto &b : this->and_list) {
+		if (!b->Check(builder, type, pos, ontoptarget, z)) {
 			return false;
 		}
 	}
 	return true;
 }
 
-//Wyrmgus start
 /**
 **  Check Or Restriction
 */
 bool CBuildRestrictionOr::Check(const CUnit *builder, const stratagus::unit_type &type, const Vec2i &pos, CUnit *&ontoptarget, int z) const
 {
-	for (std::vector<CBuildRestriction *>::const_iterator i = _or_list.begin(); i != _or_list.end(); ++i) {
-		if ((*i)->Check(builder, type, pos, ontoptarget, z)) {
+	for (const auto &b : this->or_list) {
+		if (b->Check(builder, type, pos, ontoptarget, z)) {
 			return true;
 		}
 	}
 	return false;
 }
-//Wyrmgus end
 
 /**
 **  Init Distance Restriction
@@ -571,21 +559,11 @@ CUnit *CanBuildHere(const CUnit *unit, const stratagus::unit_type &type, const V
 	// Check special rules for AI players
 	if (unit && unit->Player->AiEnabled) {
 		bool aiChecked = true;
-		size_t count = type.AiBuildingRules.size();
-		if (count > 0) {
-			//Wyrmgus start
-//			CUnit *ontoptarget = nullptr;
-			//Wyrmgus end
-			for (unsigned int i = 0; i < count; ++i) {
-				CBuildRestriction *rule = type.AiBuildingRules[i];
-				//Wyrmgus start
+		if (!type.AiBuildingRules.empty()) {
+			for (const auto &rule : type.AiBuildingRules) {
 				CUnit *ontoptarget = nullptr;
-				//Wyrmgus end
 				// All checks processed, did we really have success
-				//Wyrmgus start
-//				if (rule->Check(unit, type, pos, ontoptarget)) {
 				if (rule->Check(unit, type, pos, ontoptarget, z)) {
-				//Wyrmgus end
 					// We passed a full ruleset
 					aiChecked = true;
 					break;
@@ -599,16 +577,11 @@ CUnit *CanBuildHere(const CUnit *unit, const stratagus::unit_type &type, const V
 		}
 	}
 
-	size_t count = type.BuildingRules.size();
-	if (count > 0) {
-		for (unsigned int i = 0; i < count; ++i) {
-			CBuildRestriction *rule = type.BuildingRules[i];
+	if (!type.BuildingRules.empty()) {
+		for (const auto &rule : type.BuildingRules) {
 			CUnit *ontoptarget = nullptr;
 			// All checks processed, did we really have success
-			//Wyrmgus start
-//			if (rule->Check(unit, type, pos, ontoptarget)) {
 			if (rule->Check(unit, type, pos, ontoptarget, z)) {
-			//Wyrmgus end
 				// We passed a full ruleset return
 				if (unit == nullptr) {
 					return ontoptarget ? ontoptarget : (CUnit *)1;

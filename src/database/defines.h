@@ -38,6 +38,7 @@ class sml_data;
 class sml_property;
 class terrain_type;
 class time_of_day;
+class unit_class;
 
 class defines final : public QObject, public singleton<defines>
 {
@@ -54,6 +55,7 @@ class defines final : public QObject, public singleton<defines>
 	Q_PROPERTY(stratagus::dialogue* campaign_defeat_dialogue MEMBER campaign_defeat_dialogue READ get_campaign_defeat_dialogue)
 	Q_PROPERTY(stratagus::button_level* inventory_button_level MEMBER inventory_button_level READ get_inventory_button_level)
 	Q_PROPERTY(stratagus::button_level* cancel_button_level MEMBER cancel_button_level READ get_cancel_button_level)
+	Q_PROPERTY(stratagus::unit_class* town_hall_class MEMBER town_hall_class READ get_town_hall_class)
 
 public:
 	void load(const std::filesystem::path &base_path);
@@ -145,6 +147,11 @@ public:
 		return this->cancel_button_level;
 	}
 
+	unit_class *get_town_hall_class() const
+	{
+		return this->town_hall_class;
+	}
+
 private:
 	QSize tile_size;
 	QSize icon_size;
@@ -158,6 +165,7 @@ private:
 	dialogue *campaign_defeat_dialogue = nullptr;
 	button_level *inventory_button_level = nullptr;
 	button_level *cancel_button_level = nullptr;
+	unit_class *town_hall_class = nullptr;
 };
 
 }

@@ -474,63 +474,64 @@ class CBuildRestriction
 {
 public:
 	virtual ~CBuildRestriction() {}
+
+	virtual std::unique_ptr<CBuildRestriction> duplicate() const = 0;
+
 	virtual void Init() {};
 	virtual bool Check(const CUnit *builder, const stratagus::unit_type &type, const Vec2i &pos, CUnit *&ontoptarget, int z) const = 0;
 };
 
-class CBuildRestrictionAnd : public CBuildRestriction
+class CBuildRestrictionAnd final : public CBuildRestriction
 {
 public:
-	virtual ~CBuildRestrictionAnd()
+	virtual std::unique_ptr<CBuildRestriction> duplicate() const override
 	{
-		for (std::vector<CBuildRestriction *>::const_iterator i = _or_list.begin();
-			 i != _or_list.end(); ++i) {
-			delete *i;
+		auto b = std::make_unique<CBuildRestrictionAnd>();
+		for (const auto &build_restriction : this->and_list) {
+			b->and_list.push_back(build_restriction->duplicate());
 		}
-		_or_list.clear();
+		return b;
 	}
-	virtual void Init()
-	{
-		for (std::vector<CBuildRestriction *>::const_iterator i = _or_list.begin();
-			 i != _or_list.end(); ++i) {
-			(*i)->Init();
-		}
-	}
-	virtual bool Check(const CUnit *builder, const stratagus::unit_type &type, const Vec2i &pos, CUnit *&ontoptarget, int z) const;
 
-	void push_back(CBuildRestriction *restriction) { _or_list.push_back(restriction); }
+	virtual void Init() override
+	{
+		for (const auto &build_restriction : this->and_list) {
+			build_restriction->Init();
+		}
+	}
+
+	virtual bool Check(const CUnit *builder, const stratagus::unit_type &type, const Vec2i &pos, CUnit *&ontoptarget, int z) const override;
+
 public:
-	std::vector<CBuildRestriction *> _or_list;
+	std::vector<std::unique_ptr<CBuildRestriction>> and_list;
 };
 
-//Wyrmgus start
-class CBuildRestrictionOr : public CBuildRestriction
+class CBuildRestrictionOr final : public CBuildRestriction
 {
 public:
-	virtual ~CBuildRestrictionOr()
+	virtual std::unique_ptr<CBuildRestriction> duplicate() const override
 	{
-		for (std::vector<CBuildRestriction *>::const_iterator i = _or_list.begin();
-			 i != _or_list.end(); ++i) {
-			delete *i;
+		auto b = std::make_unique<CBuildRestrictionOr>();
+		for (const auto &build_restriction : this->or_list) {
+			b->or_list.push_back(build_restriction->duplicate());
 		}
-		_or_list.clear();
+		return b;
 	}
-	virtual void Init()
-	{
-		for (std::vector<CBuildRestriction *>::const_iterator i = _or_list.begin();
-			 i != _or_list.end(); ++i) {
-			(*i)->Init();
-		}
-	}
-	virtual bool Check(const CUnit *builder, const stratagus::unit_type &type, const Vec2i &pos, CUnit *&ontoptarget, int z) const;
 
-	void push_back(CBuildRestriction *restriction) { _or_list.push_back(restriction); }
+	virtual void Init() override
+	{
+		for (const auto &build_restriction : this->or_list) {
+			build_restriction->Init();
+		}
+	}
+
+	virtual bool Check(const CUnit *builder, const stratagus::unit_type &type, const Vec2i &pos, CUnit *&ontoptarget, int z) const override;
+
 public:
-	std::vector<CBuildRestriction *> _or_list;
+	std::vector<std::unique_ptr<CBuildRestriction>> or_list;
 };
-//Wyrmgus end
 
-class CBuildRestrictionAddOn : public CBuildRestriction
+class CBuildRestrictionAddOn final : public CBuildRestriction
 {
 	class functor
 	{
@@ -543,16 +544,25 @@ class CBuildRestrictionAddOn : public CBuildRestriction
 	};
 public:
 	CBuildRestrictionAddOn() : Offset(0, 0) {}
-	virtual ~CBuildRestrictionAddOn() {}
-	virtual void Init();
-	virtual bool Check(const CUnit *builder, const stratagus::unit_type &type, const Vec2i &pos, CUnit *&ontoptarget, int z) const;
+
+	virtual std::unique_ptr<CBuildRestriction> duplicate() const override
+	{
+		auto b = std::make_unique<CBuildRestrictionAddOn>();
+		b->Offset = this->Offset;
+		b->ParentName = this->ParentName;
+		b->Parent = this->Parent;
+		return b;
+	}
+
+	virtual void Init() override;
+	virtual bool Check(const CUnit *builder, const stratagus::unit_type &type, const Vec2i &pos, CUnit *&ontoptarget, int z) const override;
 
 	Vec2i Offset;           /// offset from the main building to place this
 	std::string ParentName; /// building that is unit is an addon too.
 	stratagus::unit_type *Parent = nullptr;      /// building that is unit is an addon too.
 };
 
-class CBuildRestrictionOnTop : public CBuildRestriction
+class CBuildRestrictionOnTop final : public CBuildRestriction
 {
 	class functor
 	{
@@ -565,23 +575,45 @@ class CBuildRestrictionOnTop : public CBuildRestriction
 		const Vec2i pos;  //functor work position
 	};
 public:
-	CBuildRestrictionOnTop() : ReplaceOnDie(0), ReplaceOnBuild(0) {};
-	virtual ~CBuildRestrictionOnTop() {};
-	virtual void Init();
-	virtual bool Check(const CUnit *builder, const stratagus::unit_type &type, const Vec2i &pos, CUnit *&ontoptarget, int z) const;
+	virtual std::unique_ptr<CBuildRestriction> duplicate() const override
+	{
+		auto b = std::make_unique<CBuildRestrictionOnTop>();
+		b->ParentName = this->ParentName;
+		b->Parent = this->Parent;
+		b->ReplaceOnDie = this->ReplaceOnDie;
+		b->ReplaceOnBuild = this->ReplaceOnBuild;
+		return b;
+	}
+
+	virtual void Init() override;
+	virtual bool Check(const CUnit *builder, const stratagus::unit_type &type, const Vec2i &pos, CUnit *&ontoptarget, int z) const override;
 
 	std::string ParentName;  /// building that is unit is an addon too.
 	stratagus::unit_type *Parent = nullptr;       /// building that is unit is an addon too.
-	int ReplaceOnDie: 1;     /// recreate the parent on destruction
-	int ReplaceOnBuild: 1;   /// remove the parent, or just build over it.
+	int ReplaceOnDie = 0;     /// recreate the parent on destruction
+	int ReplaceOnBuild = 0;   /// remove the parent, or just build over it.
 };
 
-class CBuildRestrictionDistance : public CBuildRestriction
+class CBuildRestrictionDistance final : public CBuildRestriction
 {
 public:
-	virtual ~CBuildRestrictionDistance() {};
-	virtual void Init();
-	virtual bool Check(const CUnit *builder, const stratagus::unit_type &type, const Vec2i &pos, CUnit *&ontoptarget, int z) const;
+	virtual std::unique_ptr<CBuildRestriction> duplicate() const override
+	{
+		auto b = std::make_unique<CBuildRestrictionDistance>();
+		b->Distance = this->Distance;
+		b->DistanceType = this->DistanceType;
+		b->RestrictTypeName = this->RestrictTypeName;
+		b->RestrictTypeOwner = this->RestrictTypeOwner;
+		b->RestrictType = this->RestrictType;
+		b->restrict_class_name = this->restrict_class_name;
+		b->restrict_class = this->restrict_class;
+		b->CheckBuilder = this->CheckBuilder;
+		b->Diagonal = this->Diagonal;
+		return b;
+	}
+
+	virtual void Init() override;
+	virtual bool Check(const CUnit *builder, const stratagus::unit_type &type, const Vec2i &pos, CUnit *&ontoptarget, int z) const override;
 
 	int Distance = 0;        /// distance to build (circle)
 	DistanceTypeType DistanceType;
@@ -594,13 +626,24 @@ public:
 	bool Diagonal = true;
 };
 
-class CBuildRestrictionHasUnit : public CBuildRestriction
+class CBuildRestrictionHasUnit final : public CBuildRestriction
 {
 public:
 	CBuildRestrictionHasUnit() : Count(0), RestrictType(nullptr) {};
-	virtual ~CBuildRestrictionHasUnit() {};
-	virtual void Init();
-	virtual bool Check(const CUnit *builder, const stratagus::unit_type &type, const Vec2i &pos, CUnit *&ontoptarget, int z) const;
+
+	virtual std::unique_ptr<CBuildRestriction> duplicate() const override
+	{
+		auto b = std::make_unique<CBuildRestrictionHasUnit>();
+		b->Count = this->Count;
+		b->CountType = this->CountType;
+		b->RestrictTypeName = this->RestrictTypeName;
+		b->RestrictType = this->RestrictType;
+		b->RestrictTypeOwner = this->RestrictTypeOwner;
+		return b;
+	}
+
+	virtual void Init() override;
+	virtual bool Check(const CUnit *builder, const stratagus::unit_type &type, const Vec2i &pos, CUnit *&ontoptarget, int z) const override;
 	
 	int Count;
 	DistanceTypeType CountType;
@@ -609,7 +652,7 @@ public:
 	std::string RestrictTypeOwner;
 };
 
-class CBuildRestrictionSurroundedBy : public CBuildRestriction
+class CBuildRestrictionSurroundedBy final : public CBuildRestriction
 {
 public:
 	CBuildRestrictionSurroundedBy()
@@ -617,9 +660,22 @@ public:
 	{
 	}
 
-	virtual ~CBuildRestrictionSurroundedBy() {};
-	virtual void Init();
-	virtual bool Check(const CUnit *builder, const stratagus::unit_type &type, const Vec2i &pos, CUnit *&ontoptarget, int z) const;
+	virtual std::unique_ptr<CBuildRestriction> duplicate() const override
+	{
+		auto b = std::make_unique<CBuildRestrictionSurroundedBy>();
+		b->Distance = this->Distance;
+		b->DistanceType = this->DistanceType;
+		b->Count = this->Count;
+		b->CountType = this->CountType;
+		b->RestrictTypeName = this->RestrictTypeName;
+		b->RestrictTypeOwner = this->RestrictTypeOwner;
+		b->RestrictType = this->RestrictType;
+		b->CheckBuilder = this->CheckBuilder;
+		return b;
+	}
+
+	virtual void Init() override;
+	virtual bool Check(const CUnit *builder, const stratagus::unit_type &type, const Vec2i &pos, CUnit *&ontoptarget, int z) const override;
 	
 	int Distance;
 	DistanceTypeType DistanceType;
@@ -631,18 +687,23 @@ public:
 	bool CheckBuilder;
 };
 
-//Wyrmgus start
-class CBuildRestrictionTerrain : public CBuildRestriction
+class CBuildRestrictionTerrain final : public CBuildRestriction
 {
 public:
-	virtual ~CBuildRestrictionTerrain() {};
-	virtual void Init();
-	virtual bool Check(const CUnit *builder, const stratagus::unit_type &type, const Vec2i &pos, CUnit *&ontoptarget, int z) const;
+	virtual std::unique_ptr<CBuildRestriction> duplicate() const override
+	{
+		auto b = std::make_unique<CBuildRestrictionTerrain>();
+		b->RestrictTerrainTypeName = this->RestrictTerrainTypeName;
+		b->RestrictTerrainType = this->RestrictTerrainType;
+		return b;
+	}
+
+	virtual void Init() override;
+	virtual bool Check(const CUnit *builder, const stratagus::unit_type &type, const Vec2i &pos, CUnit *&ontoptarget, int z) const override;
 
 	std::string RestrictTerrainTypeName;
 	stratagus::terrain_type *RestrictTerrainType = nullptr;
 };
-//Wyrmgus end
 
 //Wyrmgus start
 class CSpeciesPhylum
@@ -1106,8 +1167,8 @@ public:
 	//Wyrmgus start
 	std::vector<CUnitTypeVariation *> LayerVariations[MaxImageLayers];	/// Layer variation information
 	//Wyrmgus end
-	std::vector<CBuildRestriction *> BuildingRules;   /// Rules list for building a building.
-	std::vector<CBuildRestriction *> AiBuildingRules; /// Rules list for for AI to build a building.
+	std::vector<std::unique_ptr<CBuildRestriction>> BuildingRules;   /// Rules list for building a building.
+	std::vector< std::unique_ptr<CBuildRestriction>> AiBuildingRules; /// Rules list for for AI to build a building.
 	CColor NeutralMinimapColorRGB;   /// Minimap Color for Neutral Units.
 
 	CUnitSound Sound;				/// Sounds for events

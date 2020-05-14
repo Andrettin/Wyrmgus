@@ -36,6 +36,7 @@
 #include "action/action_repair.h"
 #include "action/action_resource.h"
 #include "commands.h"
+#include "database/defines.h"
 #include "faction.h"
 #include "map/map.h"
 #include "map/map_layer.h"
@@ -2355,7 +2356,7 @@ void AiCheckSettlementConstruction()
 		return;
 	}
 
-	stratagus::unit_type *town_hall_type = stratagus::faction::get_all()[AiPlayer->Player->Faction]->get_class_unit_type(stratagus::unit_class::get("town_hall"));
+	stratagus::unit_type *town_hall_type = stratagus::faction::get_all()[AiPlayer->Player->Faction]->get_class_unit_type(stratagus::defines::get()->get_town_hall_class());
 	if (town_hall_type == nullptr) {
 		return;
 	}

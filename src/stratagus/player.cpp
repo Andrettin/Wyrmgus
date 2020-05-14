@@ -1568,6 +1568,16 @@ int CPlayer::get_player_color_usage_count(const stratagus::player_color *player_
 	return count;
 }
 
+stratagus::unit_type *CPlayer::get_class_unit_type(const stratagus::unit_class *unit_class) const
+{
+	const stratagus::faction *faction = this->get_faction();
+	if (faction == nullptr) {
+		return nullptr;
+	}
+
+	return faction->get_class_unit_type(unit_class);
+}
+
 bool CPlayer::has_upgrade_class(const stratagus::upgrade_class *upgrade_class) const
 {
 	if (this->Race == -1 || upgrade_class == nullptr) {

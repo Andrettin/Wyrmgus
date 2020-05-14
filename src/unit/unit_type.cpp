@@ -579,16 +579,8 @@ unit_type::~unit_type()
 	BoolFlag.clear();
 
 	// Free Building Restrictions if there are any
-	for (std::vector<CBuildRestriction *>::iterator b = BuildingRules.begin();
-		 b != BuildingRules.end(); ++b) {
-		delete *b;
-	}
-	BuildingRules.clear();
-	for (std::vector<CBuildRestriction *>::iterator b = AiBuildingRules.begin();
-		 b != AiBuildingRules.end(); ++b) {
-		delete *b;
-	}
-	AiBuildingRules.clear();
+	this->BuildingRules.clear();
+	this->AiBuildingRules.clear();
 
 	delete[] AutoCastActive;
 
@@ -1585,6 +1577,15 @@ void unit_type::SetParent(const unit_type *parent_type)
 		this->StartingResources.push_back(parent_type->StartingResources[i]);
 	}
 	this->PersonalNames = parent_type->PersonalNames;
+
+	for (const auto &building_rule : parent_type->BuildingRules) {
+		this->BuildingRules.push_back(building_rule->duplicate());
+	}
+
+	for (const auto &building_rule : parent_type->AiBuildingRules) {
+		this->AiBuildingRules.push_back(building_rule->duplicate());
+	}
+
 	for (CUnitTypeVariation *parent_variation : parent_type->Variations) {
 		CUnitTypeVariation *variation = new CUnitTypeVariation;
 		
@@ -2600,15 +2601,13 @@ void InitUnitType(stratagus::unit_type &type)
 	type.StillFrame = GetStillFrame(type);
 
 	// Lookup BuildingTypes
-	for (std::vector<CBuildRestriction *>::iterator b = type.BuildingRules.begin();
-		 b < type.BuildingRules.end(); ++b) {
-		(*b)->Init();
+	for (const auto &b : type.BuildingRules) {
+		b->Init();
 	}
 
 	// Lookup AiBuildingTypes
-	for (std::vector<CBuildRestriction *>::iterator b = type.AiBuildingRules.begin();
-		 b < type.AiBuildingRules.end(); ++b) {
-		(*b)->Init();
+	for (const auto &b : type.AiBuildingRules) {
+		b->Init();
 	}
 }
 //Wyrmgus end
