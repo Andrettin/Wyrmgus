@@ -1416,7 +1416,7 @@ bool unit_type::CanSelect(GroupSelectionMode mode) const
 void unit_type::SetParent(const unit_type *parent_type)
 {
 	if (!parent_type->is_defined()) {
-		throw std::runtime_error("Unit type \"" + this->get_identifier() + "\" is inheriting features from a non-defined parent (\"" + parent_type->get_identifier() + "\").");
+		throw std::runtime_error("Unit type \"" + this->get_identifier() + "\" is inheriting features from non-defined parent \"" + parent_type->get_identifier() + "\".");
 	}
 	
 	this->Parent = parent_type;

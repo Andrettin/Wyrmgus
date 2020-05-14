@@ -277,25 +277,19 @@ void CUpgrade::ProcessConfigData(const CConfigData *config_data)
 			this->Dependency = new stratagus::and_dependency;
 			this->Dependency->ProcessConfigData(child_config_data);
 		} else if (child_config_data->Tag == "modifier") {
-			stratagus::upgrade_modifier *modifier = new stratagus::upgrade_modifier;
+			auto modifier = std::make_unique<stratagus::upgrade_modifier>();
 			modifier->UpgradeId = this->ID;
-			this->UpgradeModifiers.push_back(modifier);
 			
 			modifier->ProcessConfigData(child_config_data);
 			
-			stratagus::upgrade_modifier::UpgradeModifiers.push_back(modifier);
+			stratagus::upgrade_modifier::UpgradeModifiers.push_back(modifier.get());
+			this->modifiers.push_back(std::move(modifier));
 		} else {
 			fprintf(stderr, "Invalid upgrade property: \"%s\".\n", child_config_data->Tag.c_str());
 		}
 	}
-	
-	for (CUpgrade *other_upgrade : CUpgrade::get_all()) { //add the upgrade to the incompatible affix's counterpart list here
-		if (this->IncompatibleAffixes[other_upgrade->ID]) {
-			other_upgrade->IncompatibleAffixes[this->ID] = true;
-		}
-	}
 
-	this->initialize();
+	this->set_defined(true);
 }
 
 void CUpgrade::process_sml_property(const stratagus::sml_property &property)
@@ -303,7 +297,10 @@ void CUpgrade::process_sml_property(const stratagus::sml_property &property)
 	const std::string &key = property.get_key();
 	const std::string &value = property.get_value();
 
-	if (key == "faction") {
+	if (key == "parent") {
+		CUpgrade *parent_upgrade = CUpgrade::get(value);
+		this->set_parent(parent_upgrade);
+	} else if (key == "faction") {
 		const stratagus::faction *faction = stratagus::faction::get(value);
 		this->faction = faction->ID;
 	} else {
@@ -328,13 +325,13 @@ void CUpgrade::process_sml_scope(const stratagus::sml_data &scope)
 			}
 		});
 	} else if (tag == "modifier") {
-		stratagus::upgrade_modifier *modifier = new stratagus::upgrade_modifier;
+		auto modifier = std::make_unique<stratagus::upgrade_modifier>();
 		modifier->UpgradeId = this->ID;
-		this->UpgradeModifiers.push_back(modifier);
 
 		stratagus::database::process_sml_data(modifier, scope);
 
-		stratagus::upgrade_modifier::UpgradeModifiers.push_back(modifier);
+		stratagus::upgrade_modifier::UpgradeModifiers.push_back(modifier.get());
+		this->modifiers.push_back(std::move(modifier));
 	} else if (tag == "predependencies") {
 		this->Predependency = new stratagus::and_dependency;
 		stratagus::database::process_sml_data(this->Predependency, scope);
@@ -346,6 +343,12 @@ void CUpgrade::process_sml_scope(const stratagus::sml_data &scope)
 
 void CUpgrade::initialize()
 {
+	for (CUpgrade *other_upgrade : CUpgrade::get_all()) { //add the upgrade to the incompatible affix's counterpart list here
+		if (this->IncompatibleAffixes[other_upgrade->ID]) {
+			other_upgrade->IncompatibleAffixes[this->ID] = true;
+		}
+	}
+
 	if (this->get_upgrade_class() != nullptr) { //if class is defined, then use this upgrade to help build the classes table, and add this upgrade to the civilization class table (if the civilization is defined)
 		const stratagus::upgrade_class *upgrade_class = this->get_upgrade_class();
 		if (this->get_faction() != -1) {
@@ -363,6 +366,54 @@ void CUpgrade::initialize()
 	data_entry::initialize();
 }
 
+void CUpgrade::set_parent(const CUpgrade *parent_upgrade)
+{
+	if (!parent_upgrade->is_defined()) {
+		throw std::runtime_error("Upgrade \"" + this->get_identifier() + "\" is inheriting features from non-defined parent \"" + parent_upgrade->get_identifier() + "\".");
+	}
+
+	this->set_name(parent_upgrade->get_name());
+	this->icon = parent_upgrade->get_icon();
+	this->upgrade_class = parent_upgrade->get_upgrade_class();
+	this->set_description(parent_upgrade->get_description());
+	this->set_quote(parent_upgrade->get_quote());
+	this->set_background(parent_upgrade->get_background());
+	this->effects_string = parent_upgrade->get_effects_string();
+	this->requirements_string = parent_upgrade->get_requirements_string();
+	for (int i = 0; i < MaxCosts; ++i) {
+		this->Costs[i] = parent_upgrade->Costs[i];
+		this->ScaledCosts[i] = parent_upgrade->ScaledCosts[i];
+		this->GrandStrategyProductionEfficiencyModifier[i] = parent_upgrade->GrandStrategyProductionEfficiencyModifier[i];
+	}
+	for (int i = 0; i < static_cast<int>(stratagus::item_class::count); ++i) {
+		this->ItemPrefix[i] = parent_upgrade->ItemPrefix[i];
+		this->ItemSuffix[i] = parent_upgrade->ItemSuffix[i];
+	}
+	this->MaxLimit = parent_upgrade->MaxLimit;
+	this->MagicLevel = parent_upgrade->MagicLevel;
+	this->ability = parent_upgrade->is_ability();
+	this->weapon = parent_upgrade->is_weapon();
+	this->shield = parent_upgrade->is_shield();
+	this->boots = parent_upgrade->is_boots();
+	this->arrows = parent_upgrade->is_arrows();
+	this->Item = parent_upgrade->Item;
+	this->MagicPrefix = parent_upgrade->MagicPrefix;
+	this->MagicSuffix = parent_upgrade->MagicSuffix;
+	this->RunicAffix = parent_upgrade->RunicAffix;
+	this->Work = parent_upgrade->Work;
+	this->UniqueOnly = parent_upgrade->UniqueOnly;
+	for (size_t i = 0; i < parent_upgrade->ScaledCostUnits.size(); ++i) {
+		this->ScaledCostUnits.push_back(parent_upgrade->ScaledCostUnits[i]);
+	}
+
+	for (const auto &modifier : parent_upgrade->get_modifiers()) {
+		std::unique_ptr<stratagus::upgrade_modifier> duplicated_modifier = modifier->duplicate();
+		duplicated_modifier->UpgradeId = this->ID;
+		stratagus::upgrade_modifier::UpgradeModifiers.push_back(duplicated_modifier.get());
+		this->modifiers.push_back(std::move(duplicated_modifier));
+	}
+}
+
 /**
 **  Init upgrade/allow structures
 */
@@ -375,12 +426,6 @@ void InitUpgrades()
 */
 void CleanUpgradeModifiers()
 {
-	//
-	//  Free the upgrade modifiers.
-	//
-	for (size_t i = 0; i < stratagus::upgrade_modifier::UpgradeModifiers.size(); ++i) {
-		delete stratagus::upgrade_modifier::UpgradeModifiers[i];
-	}
 	stratagus::upgrade_modifier::UpgradeModifiers.clear();
 }
 
@@ -400,6 +445,12 @@ void CUpgrade::set_upgrade_class(stratagus::upgrade_class *upgrade_class)
 		this->get_upgrade_class()->add_upgrade(this);
 	}
 }
+
+void CUpgrade::add_modifier(std::unique_ptr<stratagus::upgrade_modifier> &&modifier)
+{
+	this->modifiers.push_back(std::move(modifier));
+}
+
 
 /**
 **  Save state of the dependencies to file.
@@ -464,40 +515,7 @@ static int CclDefineUpgrade(lua_State *l)
 		
 		if (!strcmp(value, "Parent")) {
 			CUpgrade *parent_upgrade = CUpgrade::get(LuaToString(l, -1));
-
-			upgrade->set_name(parent_upgrade->get_name());
-			upgrade->icon = parent_upgrade->get_icon();
-			upgrade->upgrade_class = parent_upgrade->get_upgrade_class();
-			upgrade->set_description(parent_upgrade->get_description());
-			upgrade->set_quote(parent_upgrade->get_quote());
-			upgrade->set_background(parent_upgrade->get_background());
-			upgrade->effects_string = parent_upgrade->get_effects_string();
-			upgrade->requirements_string = parent_upgrade->get_requirements_string();
-			for (int i = 0; i < MaxCosts; ++i) {
-				upgrade->Costs[i] = parent_upgrade->Costs[i];
-				upgrade->ScaledCosts[i] = parent_upgrade->ScaledCosts[i];
-				upgrade->GrandStrategyProductionEfficiencyModifier[i] = parent_upgrade->GrandStrategyProductionEfficiencyModifier[i];
-			}
-			for (int i = 0; i < static_cast<int>(stratagus::item_class::count); ++i) {
-				upgrade->ItemPrefix[i] = parent_upgrade->ItemPrefix[i];
-				upgrade->ItemSuffix[i] = parent_upgrade->ItemSuffix[i];
-			}
-			upgrade->MaxLimit = parent_upgrade->MaxLimit;
-			upgrade->MagicLevel = parent_upgrade->MagicLevel;
-			upgrade->ability = parent_upgrade->is_ability();
-			upgrade->weapon = parent_upgrade->is_weapon();
-			upgrade->shield = parent_upgrade->is_shield();
-			upgrade->boots = parent_upgrade->is_boots();
-			upgrade->arrows = parent_upgrade->is_arrows();
-			upgrade->Item = parent_upgrade->Item;
-			upgrade->MagicPrefix = parent_upgrade->MagicPrefix;
-			upgrade->MagicSuffix = parent_upgrade->MagicSuffix;
-			upgrade->RunicAffix = parent_upgrade->RunicAffix;
-			upgrade->Work = parent_upgrade->Work;
-			upgrade->UniqueOnly = parent_upgrade->UniqueOnly;
-			for (size_t i = 0; i < parent_upgrade->ScaledCostUnits.size(); ++i) {
-				upgrade->ScaledCostUnits.push_back(parent_upgrade->ScaledCostUnits[i]);
-			}
+			upgrade->set_parent(parent_upgrade);
 		} else if (!strcmp(value, "Name")) {
 			upgrade->set_name(LuaToString(l, -1));
 		} else if (!strcmp(value, "Icon")) {
@@ -687,11 +705,7 @@ static int CclDefineUpgrade(lua_State *l)
 		}
 	}
 	
-	for (CUpgrade *other_upgrade : CUpgrade::get_all()) { //add the upgrade to the incompatible affix's counterpart list here
-		if (upgrade->IncompatibleAffixes[other_upgrade->ID]) {
-			other_upgrade->IncompatibleAffixes[upgrade->ID] = true;
-		}
-	}
+	upgrade->set_defined(true);
 	
 	return 0;
 }
@@ -706,7 +720,7 @@ static int CclDefineModifier(lua_State *l)
 {
 	const int args = lua_gettop(l);
 
-	stratagus::upgrade_modifier *um = new stratagus::upgrade_modifier;
+	auto um = std::make_unique<stratagus::upgrade_modifier>();
 
 	std::string upgrade_ident = LuaToString(l, 1);
 	um->UpgradeId = UpgradeIdByIdent(upgrade_ident);
@@ -714,10 +728,6 @@ static int CclDefineModifier(lua_State *l)
 		LuaError(l, "Error when defining upgrade modifier: upgrade \"%s\" doesn't exist." _C_ upgrade_ident.c_str());
 	}
 	
-	//Wyrmgus start
-	CUpgrade::get_all()[um->UpgradeId]->UpgradeModifiers.push_back(um);
-	//Wyrmgus end
-
 	for (int j = 1; j < args; ++j) {
 		if (!lua_istable(l, j + 1)) {
 			LuaError(l, "incorrect argument");
@@ -837,8 +847,9 @@ static int CclDefineModifier(lua_State *l)
 		}
 	}
 
-	stratagus::upgrade_modifier::UpgradeModifiers.push_back(um);
-	
+	stratagus::upgrade_modifier::UpgradeModifiers.push_back(um.get());
+	CUpgrade::get_all()[um->UpgradeId]->add_modifier(std::move(um));
+
 	return 0;
 }
 
@@ -1140,7 +1151,7 @@ static int CclGetUpgradeData(lua_State *l)
 			}
 		}
 
-		for (const stratagus::upgrade_modifier *upgrade_modifier : upgrade->UpgradeModifiers) {
+		for (const auto &upgrade_modifier : upgrade->get_modifiers()) {
 			for (const stratagus::unit_type *unit_type : upgrade_modifier->get_unit_types()) {
 				applies_to.push_back(unit_type->get_identifier());
 			}
@@ -2171,8 +2182,8 @@ void UpgradeAcquire(CPlayer &player, const CUpgrade *upgrade)
 	}
 	//Wyrmgus end
 	
-	for (size_t z = 0; z < upgrade->UpgradeModifiers.size(); ++z) {
-		ApplyUpgradeModifier(player, upgrade->UpgradeModifiers[z]);
+	for (const auto &modifier : upgrade->get_modifiers()) {
+		ApplyUpgradeModifier(player, modifier.get());
 	}
 
 	player.check_age();
@@ -2219,8 +2230,8 @@ void UpgradeLost(CPlayer &player, int id)
 		}
 	}
 
-	for (const stratagus::upgrade_modifier *modifier : upgrade->UpgradeModifiers) {
-		RemoveUpgradeModifier(player, modifier);
+	for (const auto &modifier : upgrade->get_modifiers()) {
+		RemoveUpgradeModifier(player, modifier.get());
 	}
 	//Wyrmgus end
 
@@ -2246,8 +2257,8 @@ void ApplyUpgrades()
 				CPlayer::Players[p]->UpgradeTimers.Upgrades[id] = upgrade->Costs[TimeCost];
 				AllowUpgradeId(*CPlayer::Players[p], id, 'R');  // research done
 
-				for (size_t z = 0; z < upgrade->UpgradeModifiers.size(); ++z) {
-					ApplyUpgradeModifier(*CPlayer::Players[p], upgrade->UpgradeModifiers[z]);
+				for (const auto &modifier : upgrade->get_modifiers()) {
+					ApplyUpgradeModifier(*CPlayer::Players[p], modifier.get());
 				}
 			}
 		}
@@ -2357,11 +2368,11 @@ void IndividualUpgradeAcquire(CUnit &unit, const CUpgrade *upgrade)
 	}
 
 	if (!upgrade->is_ability() || upgrade->WeaponClasses.empty() || upgrade->WeaponClasses.contains(unit.GetCurrentWeaponClass())) {
-		for (size_t z = 0; z < upgrade->UpgradeModifiers.size(); ++z) {
+		for (const auto &modifier : upgrade->get_modifiers()) {
 			bool applies_to_this = false;
 			bool applies_to_any_unit_types = false;
 			for (const stratagus::unit_type *unit_type : stratagus::unit_type::get_all()) {
-				if (upgrade->UpgradeModifiers[z]->applies_to(unit_type)) {
+				if (modifier->applies_to(unit_type)) {
 					applies_to_any_unit_types = true;
 					if (unit_type == unit.Type) {
 						applies_to_this = true;
@@ -2370,7 +2381,7 @@ void IndividualUpgradeAcquire(CUnit &unit, const CUpgrade *upgrade)
 				}
 			}
 			if (applies_to_this || !applies_to_any_unit_types) { //if the modifier isn't designated as being for a specific unit type, or is designated for this unit's unit type, apply it
-				ApplyIndividualUpgradeModifier(unit, upgrade->UpgradeModifiers[z]);
+				ApplyIndividualUpgradeModifier(unit, modifier.get());
 			}
 		}
 	}
@@ -2410,11 +2421,11 @@ void IndividualUpgradeLost(CUnit &unit, const CUpgrade *upgrade, bool lose_all)
 
 	//Wyrmgus start
 	if (!upgrade->is_ability() || upgrade->WeaponClasses.empty() || upgrade->WeaponClasses.contains(unit.GetCurrentWeaponClass())) {
-		for (size_t z = 0; z < upgrade->UpgradeModifiers.size(); ++z) {
+		for (const auto &modifier : upgrade->get_modifiers()) {
 			bool applies_to_this = false;
 			bool applies_to_any_unit_types = false;
 			for (const stratagus::unit_type *unit_type : stratagus::unit_type::get_all()) {
-				if (upgrade->UpgradeModifiers[z]->applies_to(unit_type)) {
+				if (modifier->applies_to(unit_type)) {
 					applies_to_any_unit_types = true;
 					if (unit_type == unit.Type) {
 						applies_to_this = true;
@@ -2423,7 +2434,7 @@ void IndividualUpgradeLost(CUnit &unit, const CUpgrade *upgrade, bool lose_all)
 				}
 			}
 			if (applies_to_this || !applies_to_any_unit_types) { //if the modifier isn't designated as being for a specific unit type, or is designated for this unit's unit type, remove it
-				RemoveIndividualUpgradeModifier(unit, upgrade->UpgradeModifiers[z]);
+				RemoveIndividualUpgradeModifier(unit, modifier.get());
 			}
 		}
 	}
@@ -2539,7 +2550,7 @@ std::string GetUpgradeEffectsString(const std::string &upgrade_ident, bool grand
 		
 		bool first_element = true;
 		//check if the upgrade makes modifications to any units
-		for (size_t z = 0; z < upgrade->UpgradeModifiers.size(); ++z) {
+		for (const auto &modifier : upgrade->get_modifiers()) {
 			if (grand_strategy) { // don't show modifiers in the grand strategy mode for now
 				continue;
 			}
@@ -2568,22 +2579,22 @@ std::string GetUpgradeEffectsString(const std::string &upgrade_ident, bool grand
 					}
 				}
 
-				if (upgrade->UpgradeModifiers[z]->Modifier.Variables[var].Value != 0) {
+				if (modifier->Modifier.Variables[var].Value != 0) {
 					if (!first_var) {
 						upgrade_effects_string += padding_string;
 					} else {
 						first_var = false;
 					}
 
-					if (IsBooleanVariable(var) && upgrade->UpgradeModifiers[z]->Modifier.Variables[var].Value < 0) {
+					if (IsBooleanVariable(var) && modifier->Modifier.Variables[var].Value < 0) {
 						upgrade_effects_string += "Lose ";
 					}
 										
 					if (!IsBooleanVariable(var)) {
-						if (upgrade->UpgradeModifiers[z]->Modifier.Variables[var].Value > 0) {
+						if (modifier->Modifier.Variables[var].Value > 0) {
 							upgrade_effects_string += "+";
 						}
-						upgrade_effects_string += std::to_string((long long) upgrade->UpgradeModifiers[z]->Modifier.Variables[var].Value);
+						upgrade_effects_string += std::to_string(modifier->Modifier.Variables[var].Value);
 						if (IsPercentageVariable(var)) {
 							upgrade_effects_string += "%";
 						}
@@ -2594,7 +2605,7 @@ std::string GetUpgradeEffectsString(const std::string &upgrade_ident, bool grand
 						
 					bool first_unit_type = true;
 					for (const stratagus::unit_type *unit_type : stratagus::unit_type::get_all()) {
-						if (upgrade->UpgradeModifiers[z]->applies_to(unit_type)) {
+						if (modifier->applies_to(unit_type)) {
 							if (!first_unit_type) {
 								upgrade_effects_string += ", ";
 							} else {
@@ -2607,17 +2618,17 @@ std::string GetUpgradeEffectsString(const std::string &upgrade_ident, bool grand
 					}
 				}
 					
-				if (upgrade->UpgradeModifiers[z]->Modifier.Variables[var].Increase != 0) {
+				if (modifier->Modifier.Variables[var].Increase != 0) {
 					if (!first_var) {
 						upgrade_effects_string += padding_string;
 					} else {
 						first_var = false;
 					}
 
-					if (upgrade->UpgradeModifiers[z]->Modifier.Variables[var].Increase > 0) {
+					if (modifier->Modifier.Variables[var].Increase > 0) {
 						upgrade_effects_string += "+";
 					}
-					upgrade_effects_string += std::to_string((long long) upgrade->UpgradeModifiers[z]->Modifier.Variables[var].Increase);
+					upgrade_effects_string += std::to_string(modifier->Modifier.Variables[var].Increase);
 					upgrade_effects_string += " ";
 											
 					upgrade_effects_string += GetVariableDisplayName(var, true);
@@ -2627,17 +2638,17 @@ std::string GetUpgradeEffectsString(const std::string &upgrade_ident, bool grand
 			if (!grand_strategy) {
 				bool first_res = true;
 				for (int i = 0; i < MaxCosts; ++i) {
-					if (upgrade->UpgradeModifiers[z]->Modifier.ImproveIncomes[i]) {
+					if (modifier->Modifier.ImproveIncomes[i]) {
 						if (!first_res) {
 							upgrade_effects_string += padding_string;
 						} else {
 							first_res = false;
 						}
 							
-						if (upgrade->UpgradeModifiers[z]->Modifier.ImproveIncomes[i] > 0) {
+						if (modifier->Modifier.ImproveIncomes[i] > 0) {
 							upgrade_effects_string += "+";
 						}
-						upgrade_effects_string += std::to_string((long long) upgrade->UpgradeModifiers[z]->Modifier.ImproveIncomes[i]);
+						upgrade_effects_string += std::to_string(modifier->Modifier.ImproveIncomes[i]);
 						upgrade_effects_string += "%";
 						upgrade_effects_string += " ";
 						upgrade_effects_string += CapitalizeString(DefaultResourceNames[i]);
@@ -2645,7 +2656,7 @@ std::string GetUpgradeEffectsString(const std::string &upgrade_ident, bool grand
 							
 						bool first_unit_type = true;
 						for (const stratagus::unit_type *unit_type : stratagus::unit_type::get_all()) {
-							if (upgrade->UpgradeModifiers[z]->applies_to(unit_type)) {
+							if (modifier->applies_to(unit_type)) {
 								if (!first_unit_type) {
 									upgrade_effects_string += ", ";
 								} else {

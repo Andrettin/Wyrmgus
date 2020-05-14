@@ -1882,9 +1882,9 @@ std::vector<stratagus::character *> CPlayer::get_recruitable_heroes_from_list(co
 */
 bool CPlayer::UpgradeRemovesExistingUpgrade(const CUpgrade *upgrade, bool ignore_lower_priority) const
 {
-	for (size_t z = 0; z < upgrade->UpgradeModifiers.size(); ++z) {
-		for (size_t j = 0; j < upgrade->UpgradeModifiers[z]->RemoveUpgrades.size(); ++j) {
-			const CUpgrade *removed_upgrade = upgrade->UpgradeModifiers[z]->RemoveUpgrades[j];
+	for (const auto &modifier : upgrade->get_modifiers()) {
+		for (size_t j = 0; j < modifier->RemoveUpgrades.size(); ++j) {
+			const CUpgrade *removed_upgrade = modifier->RemoveUpgrades[j];
 			bool has_upgrade = this->AiEnabled ? AiHasUpgrade(*this->Ai, removed_upgrade, true) : (UpgradeIdAllowed(*this, removed_upgrade->ID) == 'R');
 			if (has_upgrade) {
 				if (ignore_lower_priority && this->Faction != -1 && stratagus::faction::get_all()[this->Faction]->GetUpgradePriority(removed_upgrade) < stratagus::faction::get_all()[this->Faction]->GetUpgradePriority(upgrade)) {

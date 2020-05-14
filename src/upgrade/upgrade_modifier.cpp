@@ -52,6 +52,29 @@ upgrade_modifier::upgrade_modifier()
 	memset(this->ModifyPercent, 0, UnitTypeVar.GetNumberVariable() * sizeof(int));
 }
 
+std::unique_ptr<upgrade_modifier> upgrade_modifier::duplicate() const
+{
+	auto modifier = std::make_unique<upgrade_modifier>();
+
+	modifier->Modifier = this->Modifier;
+	memcpy(modifier->ModifyPercent, this->ModifyPercent, sizeof(UnitTypeVar.GetNumberVariable()));
+	modifier->SpeedResearch = this->SpeedResearch;
+	memcpy(modifier->ImproveIncomes, this->ImproveIncomes, sizeof(modifier->ImproveIncomes));
+	modifier->UnitStock = this->UnitStock;
+	memcpy(modifier->ChangeUnits, this->ChangeUnits, sizeof(modifier->ChangeUnits));
+	memcpy(modifier->ChangeUpgrades, this->ChangeUpgrades, sizeof(modifier->ChangeUpgrades));
+	modifier->unit_types = this->unit_types;
+	modifier->unit_classes = this->unit_classes;
+	modifier->ConvertTo = this->ConvertTo;
+	modifier->change_civilization_to = this->change_civilization_to;
+	modifier->ChangeFactionTo = this->ChangeFactionTo;
+	modifier->ChangeDynastyTo = this->ChangeDynastyTo;
+	modifier->RemoveUpgrades = this->RemoveUpgrades;
+
+	return modifier;
+}
+
+
 void upgrade_modifier::ProcessConfigData(const CConfigData *config_data)
 {
 	for (size_t i = 0; i < config_data->Properties.size(); ++i) {

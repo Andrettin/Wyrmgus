@@ -661,12 +661,12 @@ void CGrandStrategyFaction::SetTechnology(int upgrade_id, bool has_technology, b
 	int change = has_technology ? 1 : -1;
 		
 	//add military score bonuses
-	for (size_t z = 0; z < CUpgrade::get_all()[upgrade_id]->UpgradeModifiers.size(); ++z) {
+	for (const auto &modifier : CUpgrade::get_all()[upgrade_id]->get_modifiers()) {
 		for (const stratagus::unit_type *unit_type : stratagus::unit_type::get_all()) {
 				
-			if (CUpgrade::get_all()[upgrade_id]->UpgradeModifiers[z]->applies_to(unit_type)) {
-				if (CUpgrade::get_all()[upgrade_id]->UpgradeModifiers[z]->Modifier.Variables[POINTS_INDEX].Value) {
-					this->MilitaryScoreBonus[unit_type->Slot] += CUpgrade::get_all()[upgrade_id]->UpgradeModifiers[z]->Modifier.Variables[POINTS_INDEX].Value * change;
+			if (modifier->applies_to(unit_type)) {
+				if (modifier->Modifier.Variables[POINTS_INDEX].Value) {
+					this->MilitaryScoreBonus[unit_type->Slot] += modifier->Modifier.Variables[POINTS_INDEX].Value * change;
 				}
 			}
 		}

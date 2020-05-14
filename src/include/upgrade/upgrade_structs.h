@@ -121,6 +121,8 @@ public:
 	virtual void process_sml_scope(const stratagus::sml_data &scope) override;
 	virtual void initialize() override;
 
+	void set_parent(const CUpgrade *parent_upgrade);
+
 	stratagus::icon *get_icon() const
 	{
 		return this->icon;
@@ -198,6 +200,13 @@ public:
 		return this->arrows;
 	}
 
+	const std::vector<std::unique_ptr<stratagus::upgrade_modifier>> &get_modifiers() const
+	{
+		return this->modifiers;
+	}
+
+	void add_modifier(std::unique_ptr<stratagus::upgrade_modifier> &&modifier);
+
 private:
 	stratagus::upgrade_class *upgrade_class = nullptr; //upgrade class (e.g. siege weapon projectile I)
 	stratagus::civilization *civilization = nullptr; //which civilization this upgrade belongs to, if any
@@ -233,7 +242,9 @@ public:
 	stratagus::item_class Work;			/// Form in which was inscribed (i.e. scroll or book), if is a literary work
 	int Year = 0;						/// Year of publication, if is a literary work
 	stratagus::character *Author = nullptr;		/// Author of this literary work (if it is one)
-	std::vector<stratagus::upgrade_modifier *> UpgradeModifiers;	/// Upgrade modifiers for this upgrade
+private:
+	std::vector<std::unique_ptr<stratagus::upgrade_modifier>> modifiers; //upgrade modifiers for this upgrade
+public:
 	std::vector<CUniqueItem *> UniqueItems;	/// Unique items who form a part of this set upgrade
 	std::vector<stratagus::unit_type *> ScaledCostUnits;	/// Units for which the upgrade's costs are scaled
 	std::vector<CDeityDomain *> DeityDomains;	/// Deity domains to which this ability belongs

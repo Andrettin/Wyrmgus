@@ -1492,8 +1492,8 @@ void CUnit::EquipItem(CUnit &item, bool affect_character)
 	}
 	
 	if (item.Unique && item.Unique->Set && this->EquippingItemCompletesSet(&item)) {
-		for (const stratagus::upgrade_modifier *modifier : item.Unique->Set->UpgradeModifiers) {
-			ApplyIndividualUpgradeModifier(*this, modifier);
+		for (const auto &modifier : item.Unique->Set->get_modifiers()) {
+			ApplyIndividualUpgradeModifier(*this, modifier.get());
 		}
 	}
 
@@ -1613,8 +1613,8 @@ void CUnit::DeequipItem(CUnit &item, bool affect_character)
 	}
 	
 	if (item.Unique && item.Unique->Set && this->DeequippingItemBreaksSet(&item)) {
-		for (const stratagus::upgrade_modifier *modifier : item.Unique->Set->UpgradeModifiers) {
-			RemoveIndividualUpgradeModifier(*this, modifier);
+		for (const auto &modifier : item.Unique->Set->get_modifiers()) {
+			RemoveIndividualUpgradeModifier(*this, modifier.get());
 		}
 	}
 
@@ -1819,8 +1819,8 @@ void CUnit::ApplyAuraEffect(int aura_index)
 void CUnit::SetPrefix(CUpgrade *prefix)
 {
 	if (Prefix != nullptr) {
-		for (size_t z = 0; z < Prefix->UpgradeModifiers.size(); ++z) {
-			RemoveIndividualUpgradeModifier(*this, Prefix->UpgradeModifiers[z]);
+		for (const auto &modifier : Prefix->get_modifiers()) {
+			RemoveIndividualUpgradeModifier(*this, modifier.get());
 		}
 		this->Variable[MAGICLEVEL_INDEX].Value -= Prefix->MagicLevel;
 		this->Variable[MAGICLEVEL_INDEX].Max -= Prefix->MagicLevel;
@@ -1831,8 +1831,8 @@ void CUnit::SetPrefix(CUpgrade *prefix)
 	}
 	Prefix = prefix;
 	if (Prefix != nullptr) {
-		for (size_t z = 0; z < Prefix->UpgradeModifiers.size(); ++z) {
-			ApplyIndividualUpgradeModifier(*this, Prefix->UpgradeModifiers[z]);
+		for (const auto &modifier : Prefix->get_modifiers()) {
+			ApplyIndividualUpgradeModifier(*this, modifier.get());
 		}
 		this->Variable[MAGICLEVEL_INDEX].Value += Prefix->MagicLevel;
 		this->Variable[MAGICLEVEL_INDEX].Max += Prefix->MagicLevel;
@@ -1844,8 +1844,8 @@ void CUnit::SetPrefix(CUpgrade *prefix)
 void CUnit::SetSuffix(CUpgrade *suffix)
 {
 	if (Suffix != nullptr) {
-		for (size_t z = 0; z < Suffix->UpgradeModifiers.size(); ++z) {
-			RemoveIndividualUpgradeModifier(*this, Suffix->UpgradeModifiers[z]);
+		for (const auto &modifier : Suffix->get_modifiers()) {
+			RemoveIndividualUpgradeModifier(*this, modifier.get());
 		}
 		this->Variable[MAGICLEVEL_INDEX].Value -= Suffix->MagicLevel;
 		this->Variable[MAGICLEVEL_INDEX].Max -= Suffix->MagicLevel;
@@ -1856,8 +1856,8 @@ void CUnit::SetSuffix(CUpgrade *suffix)
 	}
 	Suffix = suffix;
 	if (Suffix != nullptr) {
-		for (size_t z = 0; z < Suffix->UpgradeModifiers.size(); ++z) {
-			ApplyIndividualUpgradeModifier(*this, Suffix->UpgradeModifiers[z]);
+		for (const auto &modifier : Suffix->get_modifiers()) {
+			ApplyIndividualUpgradeModifier(*this, modifier.get());
 		}
 		this->Variable[MAGICLEVEL_INDEX].Value += Suffix->MagicLevel;
 		this->Variable[MAGICLEVEL_INDEX].Max += Suffix->MagicLevel;
@@ -5555,21 +5555,21 @@ int CUnit::GetItemVariableChange(const CUnit *item, int variable_index, bool inc
 	int value = 0;
 	if (item->Work != nullptr) {
 		if (this->GetIndividualUpgrade(item->Work) == 0) {
-			for (size_t z = 0; z < item->Work->UpgradeModifiers.size(); ++z) {
+			for (const auto &modifier : item->Work->get_modifiers()) {
 				if (!increase) {
-					value += item->Work->UpgradeModifiers[z]->Modifier.Variables[variable_index].Value;
+					value += modifier->Modifier.Variables[variable_index].Value;
 				} else {
-					value += item->Work->UpgradeModifiers[z]->Modifier.Variables[variable_index].Increase;
+					value += modifier->Modifier.Variables[variable_index].Increase;
 				}
 			}
 		}
 	} else if (item->Elixir != nullptr) {
 		if (this->GetIndividualUpgrade(item->Elixir) == 0) {
-			for (size_t z = 0; z < item->Elixir->UpgradeModifiers.size(); ++z) {
+			for (const auto &modifier : item->Elixir->get_modifiers()) {
 				if (!increase) {
-					value += item->Elixir->UpgradeModifiers[z]->Modifier.Variables[variable_index].Value;
+					value += modifier->Modifier.Variables[variable_index].Value;
 				} else {
-					value += item->Elixir->UpgradeModifiers[z]->Modifier.Variables[variable_index].Increase;
+					value += modifier->Modifier.Variables[variable_index].Increase;
 				}
 			}
 		}
@@ -5597,11 +5597,11 @@ int CUnit::GetItemVariableChange(const CUnit *item, int variable_index, bool inc
 		
 		if (item->Unique && item->Unique->Set) {
 			if (this->EquippingItemCompletesSet(item)) {
-				for (size_t z = 0; z < item->Unique->Set->UpgradeModifiers.size(); ++z) {
+				for (const auto &modifier : item->Unique->Set->get_modifiers()) {
 					if (!increase) {
-						value += item->Unique->Set->UpgradeModifiers[z]->Modifier.Variables[variable_index].Value;
+						value += modifier->Modifier.Variables[variable_index].Value;
 					} else {
-						value += item->Unique->Set->UpgradeModifiers[z]->Modifier.Variables[variable_index].Increase;
+						value += modifier->Modifier.Variables[variable_index].Increase;
 					}
 				}
 			}
@@ -5623,11 +5623,11 @@ int CUnit::GetItemVariableChange(const CUnit *item, int variable_index, bool inc
 			}
 			if (equipped_item != item && equipped_item->Unique && equipped_item->Unique->Set) {
 				if (this->DeequippingItemBreaksSet(equipped_item)) {
-					for (size_t z = 0; z < equipped_item->Unique->Set->UpgradeModifiers.size(); ++z) {
+					for (const auto &modifier : equipped_item->Unique->Set->get_modifiers()) {
 						if (!increase) {
-							value -= equipped_item->Unique->Set->UpgradeModifiers[z]->Modifier.Variables[variable_index].Value;
+							value -= modifier->Modifier.Variables[variable_index].Value;
 						} else {
-							value -= equipped_item->Unique->Set->UpgradeModifiers[z]->Modifier.Variables[variable_index].Increase;
+							value -= modifier->Modifier.Variables[variable_index].Increase;
 						}
 					}
 				}
@@ -6418,9 +6418,9 @@ bool CUnit::IsSpellEmpowered(const CSpell *spell) const
 */
 bool CUnit::UpgradeRemovesExistingUpgrade(const CUpgrade *upgrade) const
 {
-	for (size_t z = 0; z < upgrade->UpgradeModifiers.size(); ++z) {
-		for (size_t j = 0; j < upgrade->UpgradeModifiers[z]->RemoveUpgrades.size(); ++j) {
-			if (this->GetIndividualUpgrade(upgrade->UpgradeModifiers[z]->RemoveUpgrades[j]) > 0) {
+	for (const auto &modifier : upgrade->get_modifiers()) {
+		for (size_t j = 0; j < modifier->RemoveUpgrades.size(); ++j) {
+			if (this->GetIndividualUpgrade(modifier->RemoveUpgrades[j]) > 0) {
 				return true;
 			}
 		}

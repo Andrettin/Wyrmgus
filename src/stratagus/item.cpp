@@ -299,23 +299,23 @@ std::string GetItemEffectsString(const std::string &item_ident)
 		}
 		
 		if (item->Elixir) {
-			for (size_t z = 0; z < item->Elixir->UpgradeModifiers.size(); ++z) {
-				if (item->Elixir->UpgradeModifiers[z]->Modifier.Variables[var].Value != 0) {
+			for (const auto &modifier : item->Elixir->get_modifiers()) {
+				if (modifier->Modifier.Variables[var].Value != 0) {
 					if (!first_var) {
 						item_effects_string += ", ";
 					} else {
 						first_var = false;
 					}
 											
-					if (IsBooleanVariable(var) && item->Elixir->UpgradeModifiers[z]->Modifier.Variables[var].Value < 0) {
+					if (IsBooleanVariable(var) && modifier->Modifier.Variables[var].Value < 0) {
 						item_effects_string += "Lose ";
 					}
 					
 					if (!IsBooleanVariable(var)) {
-						if (item->Elixir->UpgradeModifiers[z]->Modifier.Variables[var].Value >= 0 && var != HITPOINTHEALING_INDEX) {
+						if (modifier->Modifier.Variables[var].Value >= 0 && var != HITPOINTHEALING_INDEX) {
 							item_effects_string += "+";
 						}
-						item_effects_string += std::to_string((long long) item->Elixir->UpgradeModifiers[z]->Modifier.Variables[var].Value);
+						item_effects_string += std::to_string(modifier->Modifier.Variables[var].Value);
 						if (IsPercentageVariable(var)) {
 							item_effects_string += "%";
 						}
@@ -325,17 +325,17 @@ std::string GetItemEffectsString(const std::string &item_ident)
 					item_effects_string += GetVariableDisplayName(var);
 				}
 				
-				if (item->Elixir->UpgradeModifiers[z]->Modifier.Variables[var].Increase != 0) {
+				if (modifier->Modifier.Variables[var].Increase != 0) {
 					if (!first_var) {
 						item_effects_string += ", ";
 					} else {
 						first_var = false;
 					}
 												
-					if (item->Elixir->UpgradeModifiers[z]->Modifier.Variables[var].Increase > 0) {
+					if (modifier->Modifier.Variables[var].Increase > 0) {
 						item_effects_string += "+";
 					}
-					item_effects_string += std::to_string((long long) item->Elixir->UpgradeModifiers[z]->Modifier.Variables[var].Increase);
+					item_effects_string += std::to_string(modifier->Modifier.Variables[var].Increase);
 					item_effects_string += " ";
 												
 					item_effects_string += GetVariableDisplayName(var, true);
@@ -465,9 +465,9 @@ std::string GetUniqueItemEffectsString(const std::string &item_ident)
 				int variable_value = 0;
 				int variable_increase = 0;
 
-				for (size_t z = 0; z < item->Set->UpgradeModifiers.size(); ++z) {
-					variable_value += item->Set->UpgradeModifiers[z]->Modifier.Variables[var].Value;
-					variable_increase += item->Set->UpgradeModifiers[z]->Modifier.Variables[var].Increase;
+				for (const auto &modifier : item->Set->get_modifiers()) {
+					variable_value += modifier->Modifier.Variables[var].Value;
+					variable_increase += modifier->Modifier.Variables[var].Increase;
 				}
 							
 				if (variable_value != 0) {

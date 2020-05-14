@@ -53,6 +53,8 @@ class unit_type;
 class upgrade_modifier
 {
 public:
+	static std::vector<upgrade_modifier *> UpgradeModifiers;
+
 	upgrade_modifier();
 	~upgrade_modifier()
 	{
@@ -60,8 +62,8 @@ public:
 			delete [] this->ModifyPercent;
 		}
 	}
-	
-	static std::vector<upgrade_modifier *> UpgradeModifiers;
+
+	std::unique_ptr<upgrade_modifier> duplicate() const;
 	
 	void ProcessConfigData(const CConfigData *config_data);
 	void process_sml_property(const sml_property &property);
