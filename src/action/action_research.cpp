@@ -56,10 +56,7 @@ static constexpr int CancelResearchCostsFactor = 100;
 --  Functions
 ----------------------------------------------------------------------------*/
 
-//Wyrmgus start
-///* static */ COrder *COrder::NewActionResearch(CUnit &unit, CUpgrade &upgrade)
-/* static */ COrder *COrder::NewActionResearch(CUnit &unit, CUpgrade &upgrade, int player)
-//Wyrmgus end
+COrder *COrder::NewActionResearch(CUnit &unit, const CUpgrade &upgrade, int player)
 {
 	COrder_Research *order = new COrder_Research();
 

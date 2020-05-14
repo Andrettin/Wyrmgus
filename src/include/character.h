@@ -234,7 +234,7 @@ private:
 	site *home_settlement = nullptr; //the home settlement of this character, where they can preferentially be recruited
 public:
 	std::vector<CDeity *> Deities;		/// Deities chosen by this character to worship
-	std::vector<CUpgrade *> Abilities;
+	std::vector<const CUpgrade *> Abilities;
 	std::vector<CUpgrade *> ReadWorks;
 	std::vector<CUpgrade *> ConsumedElixirs;
 	std::vector<CUpgrade *> AuthoredWorks;	/// Literary works of which this character is the author

@@ -140,7 +140,7 @@ struct TriggerDataType {
 	//Wyrmgus end
 	const stratagus::unit_type *Type;  /// Type used in trigger;
 	//Wyrmgus start
-	CUpgrade *Upgrade; /// Upgrade used in trigger
+	const CUpgrade *Upgrade; /// Upgrade used in trigger
 	int *Resource;		/// Resource used in trigger
 	stratagus::faction *Faction; /// Faction used in trigger
 	//Wyrmgus end

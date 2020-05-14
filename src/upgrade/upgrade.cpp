@@ -303,6 +303,8 @@ void CUpgrade::process_sml_property(const stratagus::sml_property &property)
 	} else if (key == "faction") {
 		const stratagus::faction *faction = stratagus::faction::get(value);
 		this->faction = faction->ID;
+	} else if (key == "button_key") {
+		this->button_key = value;
 	} else {
 		data_entry::process_sml_property(property);
 	}
@@ -2276,7 +2278,7 @@ void ApplyUpgrades()
 **  @param unit     Unit learning the upgrade.
 **  @param upgrade  Upgrade learned.
 */
-void AbilityAcquire(CUnit &unit, CUpgrade *upgrade, bool save)
+void AbilityAcquire(CUnit &unit, const CUpgrade *upgrade, bool save)
 {
 	unit.Variable[LEVELUP_INDEX].Value -= 1;
 	unit.Variable[LEVELUP_INDEX].Max = unit.Variable[LEVELUP_INDEX].Value;

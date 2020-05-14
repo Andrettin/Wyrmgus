@@ -472,26 +472,27 @@ bool AiRequestedTypeAllowed(const CPlayer &player, const stratagus::unit_type &t
 	return false;
 }
 
-//Wyrmgus start
 static bool AiRequestedUpgradeAllowed(const CPlayer &player, const CUpgrade *upgrade, bool allow_can_build_researcher = false)
 {
 	if (UpgradeIdAllowed(*AiPlayer->Player, upgrade->ID) != 'A') {
 		return false;
 	}
-	if (upgrade->ID >= (int) AiHelpers.Research.size()) {
-		return false;
-	}
-	const size_t size = AiHelpers.Research[upgrade->ID].size();
-	for (size_t i = 0; i < size; ++i) {
-		stratagus::unit_type &researcher = *AiHelpers.Research[upgrade->ID][i];
 
-		if ((player.GetUnitTypeAiActiveCount(&researcher) > 0 || (allow_can_build_researcher && AiRequestedTypeAllowed(player, researcher))) && CheckDependencies(upgrade, &player)) {
+	for (const stratagus::unit_type *researcher_type : AiHelpers.get_researchers(upgrade)) {
+		if ((player.GetUnitTypeAiActiveCount(researcher_type) > 0 || (allow_can_build_researcher && AiRequestedTypeAllowed(player, *researcher_type))) && CheckDependencies(upgrade, &player)) {
 			return true;
 		}
 	}
+
+	for (const stratagus::unit_class *researcher_class : AiHelpers.get_researcher_classes(upgrade->get_upgrade_class())) {
+		const stratagus::unit_type *researcher_type = AiPlayer->Player->get_class_unit_type(researcher_class);
+		if (researcher_type != nullptr && (player.GetUnitTypeAiActiveCount(researcher_type) > 0 || (allow_can_build_researcher && AiRequestedTypeAllowed(player, *researcher_type))) && CheckDependencies(upgrade, &player)) {
+			return true;
+		}
+	}
+
 	return false;
 }
-//Wyrmgus end
 
 struct cnode {
 	int unit_cost;
@@ -1081,7 +1082,7 @@ static int AiMakeUnit(stratagus::unit_type &typeToMake, const Vec2i &nearPos, in
 **
 **  @note        We must check if the dependencies are fulfilled.
 */
-static bool AiResearchUpgrade(const stratagus::unit_type &type, CUpgrade &what)
+static bool AiResearchUpgrade(const stratagus::unit_type &type, const CUpgrade &what)
 {
 	std::vector<CUnit *> table;
 
@@ -1090,10 +1091,7 @@ static bool AiResearchUpgrade(const stratagus::unit_type &type, CUpgrade &what)
 		CUnit &unit = *table[i];
 
 		if (unit.IsIdle()) {
-			//Wyrmgus start
-//			CommandResearch(unit, what, FlushCommands);
 			CommandResearch(unit, what, AiPlayer->Player->Index, FlushCommands);
-			//Wyrmgus end
 			return true;
 		}
 	}
@@ -1105,13 +1103,10 @@ static bool AiResearchUpgrade(const stratagus::unit_type &type, CUpgrade &what)
 **
 **  @param upgrade  Upgrade to research
 */
-void AiAddResearchRequest(CUpgrade *upgrade)
+void AiAddResearchRequest(const CUpgrade *upgrade)
 {
 	// Check if resources are available.
-	//Wyrmgus start
-//	const int costNeeded = AiCheckCosts(upgrade->Costs);
 	const int costNeeded = AiCheckUpgradeCosts(*upgrade);
-	//Wyrmgus end
 
 	if (costNeeded) {
 		AiPlayer->NeededMask |= costNeeded;
@@ -1120,25 +1115,18 @@ void AiAddResearchRequest(CUpgrade *upgrade)
 	//
 	// Check if we have a place for the upgrade to research
 	//
-	const int n = AiHelpers.Research.size();
-	std::vector<std::vector<stratagus::unit_type *> > &tablep = AiHelpers.Research;
-
-	if (upgrade->ID >= n) { // Oops not known.
-		DebugPrint("%d: AiAddResearchRequest I: Nothing known about '%s'\n"
-				   _C_ AiPlayer->Player->Index _C_ upgrade->Ident.c_str());
-		return;
-	}
-	std::vector<stratagus::unit_type *> &table = tablep[upgrade->ID];
-	if (table.empty()) { // Oops not known.
-		DebugPrint("%d: AiAddResearchRequest II: Nothing known about '%s'\n"
-				   _C_ AiPlayer->Player->Index _C_ upgrade->Ident.c_str());
-		return;
-	}
-
-	for (unsigned int i = 0; i < table.size(); ++i) {
+	for (const stratagus::unit_type *researcher_type : AiHelpers.get_researchers(upgrade)) {
 		// The type is available
-		if (AiPlayer->Player->GetUnitTypeAiActiveCount(table[i])
-			&& AiResearchUpgrade(*table[i], *upgrade)) {
+		if (AiPlayer->Player->GetUnitTypeAiActiveCount(researcher_type)
+			&& AiResearchUpgrade(*researcher_type, *upgrade)) {
+			return;
+		}
+	}
+
+	for (const stratagus::unit_class *researcher_class : AiHelpers.get_researcher_classes(upgrade->get_upgrade_class())) {
+		const stratagus::unit_type *researcher_type = AiPlayer->Player->get_class_unit_type(researcher_class);
+		if (researcher_type != nullptr && AiPlayer->Player->GetUnitTypeAiActiveCount(researcher_type)
+			&& AiResearchUpgrade(*researcher_type, *upgrade)) {
 			return;
 		}
 	}
@@ -2522,10 +2510,10 @@ void AiCheckUpgrades()
 		return;
 	}
 
-	std::vector<CUpgrade *> potential_upgrades = AiPlayer->Player->GetResearchableUpgrades();
+	std::vector<const CUpgrade *> potential_upgrades = AiPlayer->Player->GetResearchableUpgrades();
 	
 	for (size_t i = 0; i < potential_upgrades.size(); ++i) {
-		CUpgrade *upgrade = potential_upgrades[i];
+		const CUpgrade *upgrade = potential_upgrades[i];
 		
 		if (!AiRequestedUpgradeAllowed(*AiPlayer->Player, upgrade)) {
 			continue;

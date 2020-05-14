@@ -59,6 +59,8 @@ public:
 
 	static void ProcessConfigData(const CConfigData *config_data);
 
+	static void add_button_key_to_name(std::string &value_name, const std::string &button_key);
+
 	button(const std::string &identifier = "") : data_entry(identifier)
 	{
 	}
@@ -103,6 +105,7 @@ public:
 
 	const CUnit *get_unit() const;
 	const unit_type *get_value_unit_type(const CUnit *unit) const;
+	const CUpgrade *get_value_upgrade(const CUnit *unit) const;
 
 	void SetTriggerData() const;
 	void CleanTriggerData() const;

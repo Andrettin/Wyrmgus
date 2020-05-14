@@ -1204,10 +1204,7 @@ void CommandCancelUpgradeTo(CUnit &unit)
 **  @param what   what to research.
 **  @param flush  if true, flush command queue.
 */
-//Wyrmgus start
-//void CommandResearch(CUnit &unit, CUpgrade &what, int flush)
-void CommandResearch(CUnit &unit, CUpgrade &what, int player, int flush)
-//Wyrmgus end
+void CommandResearch(CUnit &unit, const CUpgrade &what, int player, int flush)
 {
 	if (IsUnitValidForNetwork(unit) == false) {
 		return ;
@@ -1233,10 +1230,7 @@ void CommandResearch(CUnit &unit, CUpgrade &what, int player, int flush)
 	if (order == nullptr) {
 		return;
 	}
-	//Wyrmgus start
-//	*order = COrder::NewActionResearch(unit, what);
 	*order = COrder::NewActionResearch(unit, what, player);
-	//Wyrmgus end
 	ClearSavedAction(unit);
 }
 

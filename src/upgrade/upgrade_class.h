@@ -53,6 +53,11 @@ public:
 	{
 	}
 
+	int get_index() const
+	{
+		return this->index;
+	}
+
 	const std::vector<CUpgrade *> &get_upgrades() const
 	{
 		return this->upgrades;

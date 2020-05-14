@@ -1500,8 +1500,8 @@ CCurrency *CPlayer::GetCurrency() const
 
 void CPlayer::ShareUpgradeProgress(CPlayer &player, CUnit &unit)
 {
-	std::vector<CUpgrade *> upgrade_list = this->GetResearchableUpgrades();
-	std::vector<CUpgrade *> potential_upgrades;
+	std::vector<const CUpgrade *> upgrade_list = this->GetResearchableUpgrades();
+	std::vector<const CUpgrade *> potential_upgrades;
 
 	for (size_t i = 0; i < upgrade_list.size(); ++i) {
 		if (this->Allow.Upgrades[upgrade_list[i]->ID] != 'R') {
@@ -1533,7 +1533,7 @@ void CPlayer::ShareUpgradeProgress(CPlayer &player, CUnit &unit)
 	}
 	
 	if (potential_upgrades.size() > 0) {
-		CUpgrade *chosen_upgrade = potential_upgrades[SyncRand(potential_upgrades.size())];
+		const CUpgrade *chosen_upgrade = potential_upgrades[SyncRand(potential_upgrades.size())];
 		
 		if (!chosen_upgrade->get_name().empty()) {
 			player.Notify(NotifyGreen, unit.tilePos, unit.MapLayer->ID, _("%s acquired through contact with %s"), chosen_upgrade->get_name().c_str(), this->Name.c_str());
@@ -1576,6 +1576,16 @@ stratagus::unit_type *CPlayer::get_class_unit_type(const stratagus::unit_class *
 	}
 
 	return faction->get_class_unit_type(unit_class);
+}
+
+CUpgrade *CPlayer::get_class_upgrade(const stratagus::upgrade_class *upgrade_class) const
+{
+	const stratagus::faction *faction = this->get_faction();
+	if (faction == nullptr) {
+		return nullptr;
+	}
+
+	return faction->get_class_upgrade(upgrade_class);
 }
 
 bool CPlayer::has_upgrade_class(const stratagus::upgrade_class *upgrade_class) const
@@ -1741,14 +1751,19 @@ bool CPlayer::HasUnitBuilder(const stratagus::unit_type *type, const stratagus::
 
 bool CPlayer::HasUpgradeResearcher(const CUpgrade *upgrade) const
 {
-	if (upgrade->ID < (int) AiHelpers.Research.size()) {
-		for (size_t j = 0; j < AiHelpers.Research[upgrade->ID].size(); ++j) {
-			stratagus::unit_type *researcher_type = AiHelpers.Research[upgrade->ID][j];
-			if (this->GetUnitTypeCount(researcher_type) > 0 || HasUnitBuilder(researcher_type)) {
-				return true;
-			}
+	for (const stratagus::unit_type *researcher_type : AiHelpers.get_researchers(upgrade)) {
+		if (this->GetUnitTypeCount(researcher_type) > 0 || HasUnitBuilder(researcher_type)) {
+			return true;
 		}
 	}
+
+	for (const stratagus::unit_class *researcher_class : AiHelpers.get_researcher_classes(upgrade->get_upgrade_class())) {
+		const stratagus::unit_type *researcher_type = this->get_class_unit_type(researcher_class);
+		if (researcher_type != nullptr && (this->GetUnitTypeCount(researcher_type) > 0 || this->HasUnitBuilder(researcher_type))) {
+			return true;
+		}
+	}
+
 	return false;
 }
 
@@ -2141,17 +2156,23 @@ std::set<int> CPlayer::get_builder_landmasses(const stratagus::unit_type *buildi
 	return builder_landmasses;
 }
 
-std::vector<CUpgrade *> CPlayer::GetResearchableUpgrades()
+std::vector<const CUpgrade *> CPlayer::GetResearchableUpgrades()
 {
-	std::vector<CUpgrade *> researchable_upgrades;
-	for (std::map<const stratagus::unit_type *, int>::iterator iterator = this->UnitTypesAiActiveCount.begin(); iterator != this->UnitTypesAiActiveCount.end(); ++iterator) {
-		const stratagus::unit_type *type = iterator->first;
-		if (type->Slot < ((int) AiHelpers.ResearchedUpgrades.size())) {
-			for (size_t i = 0; i < AiHelpers.ResearchedUpgrades[type->Slot].size(); ++i) {
-				CUpgrade *upgrade = AiHelpers.ResearchedUpgrades[type->Slot][i];
-				if (std::find(researchable_upgrades.begin(), researchable_upgrades.end(), upgrade) == researchable_upgrades.end()) {
-					researchable_upgrades.push_back(upgrade);
-				}
+	std::vector<const CUpgrade *> researchable_upgrades;
+
+	for (const auto &kv_pair : this->UnitTypesAiActiveCount) {
+		const stratagus::unit_type *type = kv_pair.first;
+
+		for (const CUpgrade *upgrade : AiHelpers.get_researched_upgrades(type)) {
+			if (!stratagus::vector::contains(researchable_upgrades, upgrade)) {
+				researchable_upgrades.push_back(upgrade);
+			}
+		}
+
+		for (const stratagus::upgrade_class *upgrade_class : AiHelpers.get_researched_upgrade_classes(type->get_unit_class())) {
+			const CUpgrade *upgrade = this->get_class_upgrade(upgrade_class);
+			if (upgrade != nullptr && !stratagus::vector::contains(researchable_upgrades, upgrade)) {
+				researchable_upgrades.push_back(upgrade);
 			}
 		}
 	}
@@ -2706,7 +2727,7 @@ bool CPlayer::can_accept_quest(const stratagus::quest *quest)
 			
 			bool has_researcher = this->HasUpgradeResearcher(upgrade);
 				
-			if (!has_researcher && upgrade->ID < (int) AiHelpers.Research.size()) { //check if the quest includes an objective to build a researcher of the upgrade
+			if (!has_researcher) { //check if the quest includes an objective to build a researcher of the upgrade
 				for (CQuestObjective *second_objective : quest->Objectives) {
 					if (second_objective == objective) {
 						continue;
@@ -2728,7 +2749,7 @@ bool CPlayer::can_accept_quest(const stratagus::quest *quest)
 						}
 
 						for (const stratagus::unit_type *unit_type : unit_types) {
-							if (std::find(AiHelpers.Research[upgrade->ID].begin(), AiHelpers.Research[upgrade->ID].end(), unit_type) != AiHelpers.Research[upgrade->ID].end()) { //if the unit type of the other objective is a researcher of this upgrade
+							if (stratagus::vector::contains(AiHelpers.get_researchers(upgrade), unit_type) || stratagus::vector::contains(AiHelpers.get_researcher_classes(upgrade->get_upgrade_class()), unit_type->get_unit_class())) { //if the unit type of the other objective is a researcher of this upgrade
 								has_researcher = true;
 								break;
 							}
@@ -2880,7 +2901,7 @@ std::string CPlayer::has_failed_quest(const stratagus::quest *quest) // returns 
 			if (this->Allow.Upgrades[upgrade->ID] != 'R') {
 				bool has_researcher = this->HasUpgradeResearcher(upgrade);
 				
-				if (!has_researcher && upgrade->ID < (int) AiHelpers.Research.size()) { //check if the quest includes an objective to build a researcher of the upgrade
+				if (!has_researcher) { //check if the quest includes an objective to build a researcher of the upgrade
 					for (CPlayerQuestObjective *second_objective : this->QuestObjectives) {
 						const CQuestObjective *second_quest_objective = second_objective->get_quest_objective();
 						if (second_quest_objective->get_quest() != quest || second_objective == objective || second_objective->Counter >= second_quest_objective->get_quantity()) { //if the objective has been fulfilled, then there should be a researcher, if there isn't it is due to i.e. the researcher having been destroyed later on, or upgraded to another type, and then the quest should fail if the upgrade can no longer be researched
@@ -2903,7 +2924,7 @@ std::string CPlayer::has_failed_quest(const stratagus::quest *quest) // returns 
 							}
 
 							for (const stratagus::unit_type *unit_type : unit_types) {
-								if (std::find(AiHelpers.Research[upgrade->ID].begin(), AiHelpers.Research[upgrade->ID].end(), unit_type) != AiHelpers.Research[upgrade->ID].end()) { //if the unit type of the other objective is a researcher of this upgrade
+								if (stratagus::vector::contains(AiHelpers.get_researchers(upgrade), unit_type) || stratagus::vector::contains(AiHelpers.get_researcher_classes(upgrade->get_upgrade_class()), unit_type->get_unit_class())) { //if the unit type of the other objective is a researcher of this upgrade
 									has_researcher = true;
 									break;
 								}

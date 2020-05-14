@@ -244,6 +244,7 @@ public:
 	int get_player_color_usage_count(const stratagus::player_color *player_color) const;
 
 	stratagus::unit_type *get_class_unit_type(const stratagus::unit_class *unit_class) const;
+	CUpgrade *get_class_upgrade(const stratagus::upgrade_class *upgrade_class) const;
 	bool has_upgrade_class(const stratagus::upgrade_class *upgrade_class) const;
 
 	bool HasSettlement(const stratagus::site *settlement) const;
@@ -259,7 +260,7 @@ public:
 	std::string GetFactionTitleName() const;
 	std::string GetCharacterTitleName(const int title_type, const stratagus::gender gender) const;
 	std::set<int> get_builder_landmasses(const stratagus::unit_type *building) const;	/// Builds a vector with builder landmasses; the building is the structure to be built by the builder in question
-	std::vector<CUpgrade *> GetResearchableUpgrades();
+	std::vector<const CUpgrade *> GetResearchableUpgrades();
 	//Wyrmgus end
 
 	/// Clear turn related player data

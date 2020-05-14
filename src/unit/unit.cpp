@@ -995,7 +995,7 @@ void CUnit::SetCharacter(const std::string &character_ident, bool custom_hero)
 	}
 			
 	//load learned abilities
-	std::vector<CUpgrade *> abilities_to_remove;
+	std::vector<const CUpgrade *> abilities_to_remove;
 	for (size_t i = 0; i < this->Character->Abilities.size(); ++i) {
 		if (CanLearnAbility(this->Character->Abilities[i])) {
 			AbilityAcquire(*this, this->Character->Abilities[i], false);
@@ -6298,7 +6298,7 @@ bool CUnit::HasInventory() const
 	return false;
 }
 
-bool CUnit::CanLearnAbility(CUpgrade *ability, bool pre) const
+bool CUnit::CanLearnAbility(const CUpgrade *ability, bool pre) const
 {
 	if (!strncmp(ability->Ident.c_str(), "upgrade-deity-", 14)) { //if is a deity choice "ability", only allow for custom heroes (but display the icon for already-acquired deities for all heroes)
 		if (!this->Character) {

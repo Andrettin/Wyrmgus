@@ -48,7 +48,8 @@ enum class ButtonCmd {
 	TrainClass, //train order (unit class)
 	StandGround,    /// order stand ground
 	Return,         /// order return goods
-	Research,       /// order reseach
+	Research, //research order
+	ResearchClass, //research order (upgrade class)
 	LearnAbility,   /// order learn ability
 	ExperienceUpgradeTo,   /// order upgrade (experience)
 	UpgradeTo,      /// order upgrade

@@ -431,12 +431,15 @@ bool ButtonCheckResearch(const CUnit &unit, const stratagus::button &button)
 		return false;
 	}
 
+	const CUpgrade *upgrade = button.get_value_upgrade(&unit);
+
 	// check if allowed
-	if (!CheckDependencies(CUpgrade::get(button.ValueStr), unit.Player, false, true)) {
+	if (!CheckDependencies(upgrade, unit.Player, false, true)) {
 		return false;
 	}
-	if (button.Action == ButtonCmd::Research
-		&& UpgradeIdentAllowed(*unit.Player, button.ValueStr) != 'A' && UpgradeIdentAllowed(*unit.Player, button.ValueStr) != 'R') {
+
+	if ((button.Action == ButtonCmd::Research || button.Action == ButtonCmd::ResearchClass)
+		&& UpgradeIdAllowed(*unit.Player, upgrade->ID) != 'A' && UpgradeIdAllowed(*unit.Player, upgrade->ID) != 'R') {
 		return false;
 	}
 	return true;

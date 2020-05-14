@@ -717,7 +717,8 @@ void FreeAi()
 	AiHelpers.builders.clear();
 	AiHelpers.builder_classes.clear();
 	AiHelpers.Upgrade.clear();
-	AiHelpers.Research.clear();
+	AiHelpers.researchers.clear();
+	AiHelpers.researcher_classes.clear();
 	AiHelpers.Repair.clear();
 	AiHelpers.UnitLimit.clear();
 	AiHelpers.Equiv.clear();
@@ -727,7 +728,8 @@ void FreeAi()
 	AiHelpers.SellMarkets.clear();
 	AiHelpers.BuyMarkets.clear();
 	AiHelpers.ProducedResources.clear();
-	AiHelpers.ResearchedUpgrades.clear();
+	AiHelpers.researched_upgrades.clear();
+	AiHelpers.researched_upgrade_classes.clear();
 	AiHelpers.UpgradesTo.clear();
 	AiHelpers.ExperienceUpgrades.clear();
 	AiHelpers.LearnableAbilities.clear();

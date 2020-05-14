@@ -149,10 +149,7 @@ extern void CommandTransformIntoType(CUnit &unit, stratagus::unit_type &type);
 /// Prepare command cancel upgrade to
 extern void CommandCancelUpgradeTo(CUnit &unit);
 /// Prepare command research
-//Wyrmgus start
-//extern void CommandResearch(CUnit &unit, CUpgrade &what, int flush);
-extern void CommandResearch(CUnit &unit, CUpgrade &what, int player, int flush);
-//Wyrmgus end
+extern void CommandResearch(CUnit &unit, const CUpgrade &what, int player, int flush);
 /// Prepare command cancel research
 extern void CommandCancelResearch(CUnit &unit);
 //Wyrmgus start
@@ -269,10 +266,7 @@ extern void SendCommandCancelUpgradeTo(CUnit &unit);
 extern void SendCommandTransformInto(CUnit &unit, stratagus::unit_type &what, int flush);
 //Wyrmgus end
 /// Send research command
-//Wyrmgus start
-//extern void SendCommandResearch(CUnit &unit, CUpgrade &what, int flush);
-extern void SendCommandResearch(CUnit &unit, CUpgrade &what, int player, int flush);
-//Wyrmgus end
+extern void SendCommandResearch(CUnit &unit, const CUpgrade &what, int player, int flush);
 /// Send cancel research command
 extern void SendCommandCancelResearch(CUnit &unit);
 //Wyrmgus start

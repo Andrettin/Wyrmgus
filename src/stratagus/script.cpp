@@ -527,9 +527,9 @@ static const stratagus::unit_type **Str2TypeRef(lua_State *l, const char *s)
 **
 **  @todo better check for error (restrict param).
 */
-static CUpgrade **Str2UpgradeRef(lua_State *l, const char *s)
+static const CUpgrade **Str2UpgradeRef(lua_State *l, const char *s)
 {
-	CUpgrade **res = nullptr; // Result.
+	const CUpgrade **res = nullptr; // Result.
 
 	Assert(l);
 	if (!strcmp(s, "Upgrade")) {
@@ -640,9 +640,9 @@ const stratagus::unit_type **CclParseTypeDesc(lua_State *l)
 **
 **  @return   upgrade reference definition.
 */
-CUpgrade **CclParseUpgradeDesc(lua_State *l)
+const CUpgrade **CclParseUpgradeDesc(lua_State *l)
 {
-	CUpgrade **res = nullptr;
+	const CUpgrade **res = nullptr;
 
 	if (lua_isstring(l, -1)) {
 		res = Str2UpgradeRef(l, LuaToString(l, -1));
@@ -1335,7 +1335,7 @@ std::string EvalString(const StringDesc *s)
 	const CUnit *unit;  // Temporary unit
 	//Wyrmgus start
 	const stratagus::unit_type **type;	// Temporary unit type
-	CUpgrade **upgrade;	// Temporary upgrade
+	const CUpgrade **upgrade;	// Temporary upgrade
 	int **resource;		// Temporary resource
 	stratagus::faction **faction;	// Temporary faction
 	//Wyrmgus end

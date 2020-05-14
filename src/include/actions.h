@@ -161,10 +161,7 @@ public:
 //	static COrder *NewActionRepair(const Vec2i &pos);
 	static COrder *NewActionRepair(const Vec2i &pos, int z);
 	//Wyrmgus end
-	//Wyrmgus start
-//	static COrder *NewActionResearch(CUnit &unit, CUpgrade &upgrade);
-	static COrder *NewActionResearch(CUnit &unit, CUpgrade &upgrade, int player);
-	//Wyrmgus end
+	static COrder *NewActionResearch(CUnit &unit, const CUpgrade &upgrade, int player);
 	static COrder *NewActionResource(CUnit &harvester, const Vec2i &pos, int z);
 	static COrder *NewActionResource(CUnit &harvester, CUnit &mine);
 	static COrder *NewActionReturnGoods(CUnit &harvester, CUnit *depot);

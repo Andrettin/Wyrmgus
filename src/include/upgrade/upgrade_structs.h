@@ -175,6 +175,11 @@ public:
 		this->requirements_string = requirements_string;
 	}
 
+	const std::string &get_button_key() const
+	{
+		return this->button_key;
+	}
+
 	bool is_ability() const
 	{
 		return this->ability;
@@ -214,6 +219,7 @@ private:
 	std::string effects_string; //effects string of the upgrade
 	std::string requirements_string; //requirements string of the upgrade
 	stratagus::icon *icon = nullptr; //icon to display to the user
+	std::string button_key;
 	bool ability = false;
 	bool weapon = false;
 	bool shield = false;

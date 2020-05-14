@@ -629,24 +629,14 @@ void SendCommandTransformInto(CUnit &unit, stratagus::unit_type &what, int flush
 ** @param what     research-type of the research.
 ** @param flush    Flag flush all pending commands.
 */
-//Wyrmgus start
-//void SendCommandResearch(CUnit &unit, CUpgrade &what, int flush)
-void SendCommandResearch(CUnit &unit, CUpgrade &what, int player, int flush)
-//Wyrmgus end
+void SendCommandResearch(CUnit &unit, const CUpgrade &what, int player, int flush)
 {
 	if (!IsNetworkGame()) {
-		//Wyrmgus start
-//		CommandLog("research", &unit, flush, -1, -1, NoUnitP, what.Ident.c_str(), -1);
-//		CommandResearch(unit, what, flush);
-		CommandLog("research", &unit, flush, -1, -1, NoUnitP, what.Ident.c_str(), player);
+		CommandLog("research", &unit, flush, -1, -1, NoUnitP, what.get_identifier().c_str(), player);
 		CommandResearch(unit, what, player, flush);
-		//Wyrmgus end
 	} else {
 		NetworkSendCommand(MessageCommandResearch, unit,
-						   //Wyrmgus start
-//						   what.ID, 0, NoUnitP, nullptr, flush);
 						   what.ID, player, NoUnitP, nullptr, flush);
-						   //Wyrmgus end
 	}
 }
 

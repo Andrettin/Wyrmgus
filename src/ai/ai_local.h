@@ -46,6 +46,7 @@ namespace stratagus {
 	class site;
 	class unit_class;
 	class unit_type;
+	class upgrade_class;
 }
 
 /**
@@ -350,7 +351,7 @@ public:
 	unsigned long LastCanNotMoveGameCycle = 0;	/// Last can not move cycle
 	std::vector<AiRequestType> UnitTypeRequests;	/// unit-types to build/train request,priority list
 	std::vector<stratagus::unit_type *> UpgradeToRequests;		/// Upgrade to unit-type requested and priority list
-	std::vector<CUpgrade *> ResearchRequests;		/// Upgrades requested and priority list
+	std::vector<const CUpgrade *> ResearchRequests;		/// Upgrades requested and priority list
 	std::vector<AiBuildQueue> UnitTypeBuilt;		/// What the resource manager should build
 	int LastRepairBuilding = 0;						/// Last building checked for repair in this turn
 	//Wyrmgus start
@@ -418,6 +419,54 @@ public:
 		return empty_vector;
 	}
 
+	const std::vector<stratagus::unit_type *> &get_researchers(const CUpgrade *upgrade) const
+	{
+		static std::vector<stratagus::unit_type *> empty_vector;
+
+		auto find_iterator = this->researchers.find(upgrade);
+		if (find_iterator != this->researchers.end()) {
+			return find_iterator->second;
+		}
+
+		return empty_vector;
+	}
+
+	const std::vector<const stratagus::unit_class *> &get_researcher_classes(const stratagus::upgrade_class *upgrade_class) const
+	{
+		static std::vector<const stratagus::unit_class *> empty_vector;
+
+		auto find_iterator = this->researcher_classes.find(upgrade_class);
+		if (find_iterator != this->researcher_classes.end()) {
+			return find_iterator->second;
+		}
+
+		return empty_vector;
+	}
+
+	const std::vector<const CUpgrade *> &get_researched_upgrades(const stratagus::unit_type *unit_type) const
+	{
+		static std::vector<const CUpgrade *> empty_vector;
+
+		auto find_iterator = this->researched_upgrades.find(unit_type);
+		if (find_iterator != this->researched_upgrades.end()) {
+			return find_iterator->second;
+		}
+
+		return empty_vector;
+	}
+
+	const std::vector<const stratagus::upgrade_class *> &get_researched_upgrade_classes(const stratagus::unit_class *unit_class) const
+	{
+		static std::vector<const stratagus::upgrade_class *> empty_vector;
+
+		auto find_iterator = this->researched_upgrade_classes.find(unit_class);
+		if (find_iterator != this->researched_upgrade_classes.end()) {
+			return find_iterator->second;
+		}
+
+		return empty_vector;
+	}
+
 	//unit types associated with lists of other unit types which can train them
 	std::map<const stratagus::unit_type *, std::vector<stratagus::unit_type *>> trainers;
 
@@ -435,11 +484,13 @@ public:
 	** units/buildings which could do the upgrade.
 	*/
 	std::vector<std::vector<stratagus::unit_type *> > Upgrade;
-	/**
-	** The index is the research that should be made, giving a table of all
-	** units/buildings which could research this upgrade.
-	*/
-	std::vector<std::vector<stratagus::unit_type *> > Research;
+
+	//upgrades associated with lists of unit types which can research them
+	std::map<const CUpgrade *, std::vector<stratagus::unit_type *>> researchers;
+
+	//upgrade classes associated with lists of unit classes which can research them
+	std::map<const stratagus::upgrade_class *, std::vector<const stratagus::unit_class *>> researcher_classes;
+
 	/**
 	** The index is the unit that should be repaired, giving a table of all
 	** units/buildings which could repair this unit.
@@ -487,11 +538,11 @@ public:
 	*/
 	std::vector<std::vector<int> > ProducedResources;
 
-	/**
-	** The index is the unit type, giving a table of all
-	** upgrades that it can research.
-	*/
-	std::vector<std::vector<CUpgrade *> > ResearchedUpgrades;
+	//unit types associated with lists of upgrades which they can research
+	std::map<const stratagus::unit_type *, std::vector<const CUpgrade *>> researched_upgrades;
+
+	//unit classes associated with lists of upgrade classes which they can research
+	std::map<const stratagus::unit_class *, std::vector<const stratagus::upgrade_class *>> researched_upgrade_classes;
 
 	/**
 	** The index is the unit that should perform an upgrade, giving a table of all
@@ -542,7 +593,7 @@ extern void AiAddUnitTypeRequest(stratagus::unit_type &type, const int count, co
 /// Add upgrade-to request to resource manager
 extern void AiAddUpgradeToRequest(stratagus::unit_type &type);
 /// Add research request to resource manager
-extern void AiAddResearchRequest(CUpgrade *upgrade);
+extern void AiAddResearchRequest(const CUpgrade *upgrade);
 /// Periodic called resource manager handler
 extern void AiResourceManager();
 /// Ask the ai to explore around pos

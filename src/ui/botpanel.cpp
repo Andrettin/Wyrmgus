@@ -85,6 +85,7 @@
 #include "unit/unit_type_variation.h"
 #include "upgrade/dependency.h"
 #include "upgrade/upgrade.h"
+#include "upgrade/upgrade_class.h"
 #include "util/vector_util.h"
 #include "video.h"
 
@@ -391,15 +392,15 @@ static bool CanShowPopupContent(const PopupConditionPanel *condition,
 		}
 	}
 	
-	CUpgrade *upgrade = nullptr;
-	if (button.Action == ButtonCmd::Research || button.Action == ButtonCmd::LearnAbility) {
-		upgrade = CUpgrade::get_all()[button.Value];
+	const CUpgrade *upgrade = nullptr;
+	if (button.Action == ButtonCmd::Research || button.Action == ButtonCmd::ResearchClass || button.Action == ButtonCmd::LearnAbility) {
+		upgrade = button.get_value_upgrade(Selected[0]);
 	} else if (button.Action == ButtonCmd::Faction && !stratagus::faction::get_all()[CPlayer::GetThisPlayer()->Faction]->DevelopsTo[button.Value]->FactionUpgrade.empty()) {
 		upgrade = CUpgrade::get(stratagus::faction::get_all()[CPlayer::GetThisPlayer()->Faction]->DevelopsTo[button.Value]->FactionUpgrade);
 	}
 	
 	if (condition->UpgradeResearched != CONDITION_TRUE) {
-		if ((condition->UpgradeResearched == CONDITION_ONLY) ^ ((((button.Action == ButtonCmd::Research || button.Action == ButtonCmd::Faction) && UpgradeIdAllowed(*CPlayer::GetThisPlayer(), upgrade->ID) == 'R') || (button.Action == ButtonCmd::LearnAbility && Selected[0]->GetIndividualUpgrade(upgrade) >= upgrade->MaxLimit)))) {
+		if ((condition->UpgradeResearched == CONDITION_ONLY) ^ ((((button.Action == ButtonCmd::Research || button.Action == ButtonCmd::ResearchClass || button.Action == ButtonCmd::Faction) && UpgradeIdAllowed(*CPlayer::GetThisPlayer(), upgrade->ID) == 'R') || (button.Action == ButtonCmd::LearnAbility && Selected[0]->GetIndividualUpgrade(upgrade) >= upgrade->MaxLimit)))) {
 			return false;
 		}
 	}
@@ -429,7 +430,7 @@ static bool CanShowPopupContent(const PopupConditionPanel *condition,
 	}
 	
 	if (condition->RequirementsString != CONDITION_TRUE) {
-		if ((condition->RequirementsString == CONDITION_ONLY) ^ ((button.Action == ButtonCmd::Research || button.Action == ButtonCmd::LearnAbility || button.Action == ButtonCmd::Faction || button.Action == ButtonCmd::Train || button.Action == ButtonCmd::TrainClass || button.Action == ButtonCmd::Build || button.Action == ButtonCmd::BuildClass || button.Action == ButtonCmd::UpgradeTo || button.Action == ButtonCmd::Buy) && !IsButtonUsable(*Selected[0], button) && Selected[0]->Player == CPlayer::GetThisPlayer() && ((type && !type->RequirementsString.empty()) ||  ((button.Action == ButtonCmd::Research || button.Action == ButtonCmd::LearnAbility || button.Action == ButtonCmd::Faction) && !upgrade->get_requirements_string().empty())))) {
+		if ((condition->RequirementsString == CONDITION_ONLY) ^ ((button.Action == ButtonCmd::Research || button.Action == ButtonCmd::ResearchClass || button.Action == ButtonCmd::LearnAbility || button.Action == ButtonCmd::Faction || button.Action == ButtonCmd::Train || button.Action == ButtonCmd::TrainClass || button.Action == ButtonCmd::Build || button.Action == ButtonCmd::BuildClass || button.Action == ButtonCmd::UpgradeTo || button.Action == ButtonCmd::Buy) && !IsButtonUsable(*Selected[0], button) && Selected[0]->Player == CPlayer::GetThisPlayer() && ((type && !type->RequirementsString.empty()) ||  ((button.Action == ButtonCmd::Research || button.Action == ButtonCmd::ResearchClass || button.Action == ButtonCmd::LearnAbility || button.Action == ButtonCmd::Faction) && !upgrade->get_requirements_string().empty())))) {
 			return false;
 		}
 	}
@@ -749,6 +750,8 @@ void DrawPopup(const stratagus::button &button, int x, int y, bool above)
 
 	const stratagus::unit_class *unit_class = nullptr;
 	const stratagus::unit_type *unit_type = nullptr;
+	const stratagus::upgrade_class *upgrade_class = nullptr;
+	const CUpgrade *upgrade = nullptr;
 
 	switch (button.Action) {
 		case ButtonCmd::Build:
@@ -770,6 +773,15 @@ void DrawPopup(const stratagus::button &button, int x, int y, bool above)
 		case ButtonCmd::Unit:
 			unit_type = UnitManager.GetSlotUnit(button.Value).Type;
 			break;
+		case ButtonCmd::Research:
+			upgrade = CUpgrade::get_all()[button.Value];
+			break;
+		case ButtonCmd::ResearchClass:
+			upgrade_class = stratagus::upgrade_class::get_all()[button.Value];
+			if (Selected[0]->Player->get_faction() != nullptr) {
+				upgrade = Selected[0]->Player->get_faction()->get_class_upgrade(upgrade_class);
+			}
+			break;
 		default:
 			break;
 	}
@@ -778,7 +790,8 @@ void DrawPopup(const stratagus::button &button, int x, int y, bool above)
 
 	switch (button.Action) {
 		case ButtonCmd::Research:
-			CPlayer::GetThisPlayer()->GetUpgradeCosts(CUpgrade::get_all()[button.Value], Costs);
+		case ButtonCmd::ResearchClass:
+			CPlayer::GetThisPlayer()->GetUpgradeCosts(upgrade, Costs);
 			break;
 		case ButtonCmd::SpellCast:
 			memcpy(Costs, CSpell::Spells[button.Value]->Costs, sizeof(CSpell::Spells[button.Value]->Costs));
@@ -1056,7 +1069,8 @@ void CButtonPanel::Draw()
 		const CPlayer *player = Selected[0]->Player;
 		const stratagus::faction *player_faction = player->Faction != -1 ? stratagus::faction::get_all()[player->Faction] : nullptr;
 
-		stratagus::unit_type *button_unit_type = nullptr;
+		const stratagus::unit_type *button_unit_type = nullptr;
+		const CUpgrade *button_upgrade = nullptr;
 		switch (button->Action) {
 			case ButtonCmd::Train:
 			case ButtonCmd::Build:
@@ -1068,6 +1082,14 @@ void CButtonPanel::Draw()
 			case ButtonCmd::TrainClass:
 				if (player_faction != nullptr) {
 					button_unit_type = player_faction->get_class_unit_type(stratagus::unit_class::get_all()[button->Value]);
+				}
+				break;
+			case ButtonCmd::Research:
+				button_upgrade = CUpgrade::get_all()[button->Value];
+				break;
+			case ButtonCmd::ResearchClass:
+				if (player_faction != nullptr) {
+					button_upgrade = player_faction->get_class_upgrade(stratagus::upgrade_class::get_all()[button->Value]);
 				}
 				break;
 		}
@@ -1085,8 +1107,8 @@ void CButtonPanel::Draw()
 			button_icon = button_unit_type->Icon.Icon;
 		} else if (button->Action == ButtonCmd::Buy) {
 			button_icon = UnitManager.GetSlotUnit(button->Value).GetIcon().Icon;
-		} else if (button->Action == ButtonCmd::Research && button->Icon.Name.empty() && CUpgrade::get_all()[button->Value]->get_icon()) {
-			button_icon = CUpgrade::get_all()[button->Value]->get_icon();
+		} else if ((button->Action == ButtonCmd::Research || button->Action == ButtonCmd::ResearchClass) && button->Icon.Name.empty() && button_upgrade->get_icon()) {
+			button_icon = button_upgrade->get_icon();
 		} else if (button->Action == ButtonCmd::Faction && button->Icon.Name.empty() && stratagus::faction::get_all()[CPlayer::GetThisPlayer()->Faction]->DevelopsTo[button->Value]->get_icon() != nullptr) {
 			button_icon = stratagus::faction::get_all()[CPlayer::GetThisPlayer()->Faction]->DevelopsTo[button->Value]->get_icon();
 		}
@@ -1141,7 +1163,7 @@ void CButtonPanel::Draw()
 					label.Draw(pos.x + 46 - GetGameFont().Width(number_string), pos.y + 0, number_string);
 				}
 			} else if ( //draw researched technologies (or acquired abilities) grayed
-				button->Action == ButtonCmd::Research && UpgradeIdentAllowed(*CPlayer::GetThisPlayer(), button->ValueStr) == 'R'
+				((button->Action == ButtonCmd::Research || button->Action == ButtonCmd::ResearchClass) && UpgradeIdAllowed(*CPlayer::GetThisPlayer(), button_upgrade->ID) == 'R')
 				|| (button->Action == ButtonCmd::LearnAbility && Selected[0]->GetIndividualUpgrade(CUpgrade::get(button->ValueStr)) == CUpgrade::get(button->ValueStr)->MaxLimit)
 			) {
 				button_icon->DrawUnitIcon(*UI.ButtonPanel.Buttons[i].Style,
@@ -1214,6 +1236,34 @@ bool IsButtonAllowed(const CUnit &unit, const stratagus::button &buttonaction)
 
 	const stratagus::unit_class *unit_class = nullptr;
 	stratagus::unit_type *unit_type = nullptr;
+	const stratagus::upgrade_class *upgrade_class = nullptr;
+	const CUpgrade *upgrade = nullptr;
+
+	switch (buttonaction.Action) {
+		case ButtonCmd::Train:
+		case ButtonCmd::Build:
+		case ButtonCmd::UpgradeTo:
+		case ButtonCmd::ExperienceUpgradeTo:
+			unit_type = stratagus::unit_type::get_all()[buttonaction.Value];
+			break;
+		case ButtonCmd::TrainClass:
+		case ButtonCmd::BuildClass:
+			unit_class = stratagus::unit_class::get_all()[buttonaction.Value];
+			if (unit.Player->get_faction() != nullptr) {
+				unit_type = unit.Player->get_faction()->get_class_unit_type(unit_class);
+			}
+			break;
+		case ButtonCmd::Research:
+		case ButtonCmd::LearnAbility:
+			upgrade = CUpgrade::get_all()[buttonaction.Value];
+			break;
+		case ButtonCmd::ResearchClass:
+			upgrade_class = stratagus::upgrade_class::get_all()[buttonaction.Value];
+			if (unit.Player->get_faction() != nullptr) {
+				upgrade = unit.Player->get_faction()->get_class_upgrade(upgrade_class);
+			}
+			break;
+	}
 
 	// Check button-specific cases
 	switch (buttonaction.Action) {
@@ -1270,71 +1320,44 @@ bool IsButtonAllowed(const CUnit &unit, const stratagus::button &buttonaction)
 			}
 			break;
 		case ButtonCmd::Train:
+		case ButtonCmd::TrainClass:
+			if (unit_type == nullptr) {
+				break;
+			}
+
 			// Check if building queue is enabled
 			if (!EnableTrainingQueue && unit.CurrentAction() == UnitAction::Train) {
 				break;
 			}
-			if (unit.Player->Index == PlayerNumNeutral && !unit.CanHireMercenary(stratagus::unit_type::get_all()[buttonaction.Value])) {
+			if (unit.Player->Index == PlayerNumNeutral && !unit.CanHireMercenary(unit_type)) {
 				break;
 			}
 		// FALL THROUGH
 		case ButtonCmd::UpgradeTo:
-		case ButtonCmd::Research:
 		case ButtonCmd::Build:
-			if (buttonaction.Action == ButtonCmd::Research) {
-				res = CheckDependencies(CUpgrade::get_all()[buttonaction.Value], unit.Player, false, true, !CPlayer::GetThisPlayer()->IsTeamed(unit));
-				if (res) {
-					//Wyrmgus start
-	//				res = UpgradeIdentAllowed(*unit.Player, buttonaction.ValueStr) == 'A';
-					res = (UpgradeIdentAllowed(*CPlayer::GetThisPlayer(), buttonaction.ValueStr) == 'A' || UpgradeIdentAllowed(*CPlayer::GetThisPlayer(), buttonaction.ValueStr) == 'R') && CheckDependencies(CUpgrade::get_all()[buttonaction.Value], CPlayer::GetThisPlayer(), false, true); //also check for the dependencies for this player (rather than the unit) as an extra for researches, so that the player doesn't research too advanced technologies at neutral buildings
-					res = res && (!unit.Player->UpgradeTimers.Upgrades[UpgradeIdByIdent(buttonaction.ValueStr)] || unit.Player->UpgradeTimers.Upgrades[UpgradeIdByIdent(buttonaction.ValueStr)] == CUpgrade::get_all()[UpgradeIdByIdent(buttonaction.ValueStr)]->Costs[TimeCost]); //don't show if is being researched elsewhere
-					//Wyrmgus end
-				}
-			} else {
-				res = CheckDependencies(stratagus::unit_type::get_all()[buttonaction.Value], unit.Player, false, true, !CPlayer::GetThisPlayer()->IsTeamed(unit));
-			}
-			break;
-		case ButtonCmd::TrainClass:
-			// Check if building queue is enabled
-			if (!EnableTrainingQueue && unit.CurrentAction() == UnitAction::Train) {
-				break;
-			}
-
-			unit_class = stratagus::unit_class::get_all()[buttonaction.Value];
-			if (unit.Player->Faction != -1) {
-				unit_type = stratagus::faction::get_all()[unit.Player->Faction]->get_class_unit_type(unit_class);
-			}
-
-			if (unit_type == nullptr) {
-				break;
-			}
-
-			if (unit.Player->Index == PlayerNumNeutral && !unit.CanHireMercenary(unit_type)) {
-				break;
-			}
-
-			res = CheckDependencies(unit_type, unit.Player, false, true, !CPlayer::GetThisPlayer()->IsTeamed(unit));
-			break;
 		case ButtonCmd::BuildClass:
-			unit_class = stratagus::unit_class::get_all()[buttonaction.Value];
-			if (unit.Player->Faction != -1) {
-				unit_type = stratagus::faction::get_all()[unit.Player->Faction]->get_class_unit_type(unit_class);
-			}
-
 			if (unit_type == nullptr) {
 				break;
 			}
 
 			res = CheckDependencies(unit_type, unit.Player, false, true, !CPlayer::GetThisPlayer()->IsTeamed(unit));
+			break;
+		case ButtonCmd::Research:
+		case ButtonCmd::ResearchClass:
+			res = CheckDependencies(upgrade, unit.Player, false, true, !CPlayer::GetThisPlayer()->IsTeamed(unit));
+			if (res) {
+				res = (UpgradeIdAllowed(*CPlayer::GetThisPlayer(), upgrade->ID) == 'A' || UpgradeIdAllowed(*CPlayer::GetThisPlayer(), upgrade->ID) == 'R') && CheckDependencies(upgrade, CPlayer::GetThisPlayer(), false, true); //also check for the dependencies for this player (rather than the unit) as an extra for researches, so that the player doesn't research too advanced technologies at neutral buildings
+				res = res && (!unit.Player->UpgradeTimers.Upgrades[upgrade->ID] || unit.Player->UpgradeTimers.Upgrades[upgrade->ID] == upgrade->Costs[TimeCost]); //don't show if is being researched elsewhere
+			}
 			break;
 		case ButtonCmd::ExperienceUpgradeTo:
-			res = CheckDependencies(stratagus::unit_type::get_all()[buttonaction.Value], &unit, true, true);
+			res = CheckDependencies(unit_type, &unit, true, true);
 			if (res && unit.Character != nullptr) {
-				res = std::find(unit.Character->ForbiddenUpgrades.begin(), unit.Character->ForbiddenUpgrades.end(), stratagus::unit_type::get_all()[buttonaction.Value]) == unit.Character->ForbiddenUpgrades.end();
+				res = !stratagus::vector::contains(unit.Character->ForbiddenUpgrades, unit_type);
 			}
 			break;
 		case ButtonCmd::LearnAbility:
-			res = unit.CanLearnAbility(CUpgrade::get(buttonaction.ValueStr), true);
+			res = unit.CanLearnAbility(upgrade, true);
 			break;
 		case ButtonCmd::SpellCast:
 			res = CSpell::Spells[buttonaction.Value]->IsAvailableForUnit(unit);
@@ -1411,6 +1434,34 @@ bool IsButtonUsable(const CUnit &unit, const stratagus::button &buttonaction)
 
 	const stratagus::unit_class *unit_class = nullptr;
 	stratagus::unit_type *unit_type = nullptr;
+	const stratagus::upgrade_class *upgrade_class = nullptr;
+	const CUpgrade *upgrade = nullptr;
+
+	switch (buttonaction.Action) {
+		case ButtonCmd::Train:
+		case ButtonCmd::Build:
+		case ButtonCmd::UpgradeTo:
+		case ButtonCmd::ExperienceUpgradeTo:
+			unit_type = stratagus::unit_type::get_all()[buttonaction.Value];
+			break;
+		case ButtonCmd::TrainClass:
+		case ButtonCmd::BuildClass:
+			unit_class = stratagus::unit_class::get_all()[buttonaction.Value];
+			if (unit.Player->get_faction() != nullptr) {
+				unit_type = unit.Player->get_faction()->get_class_unit_type(unit_class);
+			}
+			break;
+		case ButtonCmd::Research:
+		case ButtonCmd::LearnAbility:
+			upgrade = CUpgrade::get_all()[buttonaction.Value];
+			break;
+		case ButtonCmd::ResearchClass:
+			upgrade_class = stratagus::upgrade_class::get_all()[buttonaction.Value];
+			if (unit.Player->get_faction() != nullptr) {
+				upgrade = unit.Player->get_faction()->get_class_upgrade(upgrade_class);
+			}
+			break;
+	}
 
 	// Check button-specific cases
 	switch (buttonaction.Action) {
@@ -1433,30 +1484,24 @@ bool IsButtonUsable(const CUnit &unit, const stratagus::button &buttonaction)
 			res = true;
 			break;
 		case ButtonCmd::Train:
-		case ButtonCmd::UpgradeTo:
-		case ButtonCmd::Research:
-		case ButtonCmd::Build:
-			if (buttonaction.Action == ButtonCmd::Research) {
-				res = CheckDependencies(CUpgrade::get_all()[buttonaction.Value], unit.Player, false, false, !CPlayer::GetThisPlayer()->IsTeamed(unit));
-				if (res) {
-					res = UpgradeIdentAllowed(*CPlayer::GetThisPlayer(), buttonaction.ValueStr) == 'A' && CheckDependencies(CUpgrade::get_all()[buttonaction.Value], CPlayer::GetThisPlayer(), false, false); //also check for the dependencies of this player extra for researches, so that the player doesn't research too advanced technologies at neutral buildings
-				}
-			} else {
-				res = CheckDependencies(stratagus::unit_type::get_all()[buttonaction.Value], unit.Player, false, false, !CPlayer::GetThisPlayer()->IsTeamed(unit));
-			}
-			break;
 		case ButtonCmd::TrainClass:
+		case ButtonCmd::UpgradeTo:
+		case ButtonCmd::Build:
 		case ButtonCmd::BuildClass:
-			unit_class = stratagus::unit_class::get_all()[buttonaction.Value];
-			unit_type = stratagus::faction::get_all()[unit.Player->Faction]->get_class_unit_type(unit_class);
-
 			res = CheckDependencies(unit_type, unit.Player, false, false, !CPlayer::GetThisPlayer()->IsTeamed(unit));
 			break;
+		case ButtonCmd::Research:
+		case ButtonCmd::ResearchClass:
+			res = CheckDependencies(upgrade, unit.Player, false, false, !CPlayer::GetThisPlayer()->IsTeamed(unit));
+			if (res) {
+				res = UpgradeIdAllowed(*CPlayer::GetThisPlayer(), upgrade->ID) == 'A' && CheckDependencies(upgrade, CPlayer::GetThisPlayer(), false, false); //also check for the dependencies of this player extra for researches, so that the player doesn't research too advanced technologies at neutral buildings
+			}
+			break;
 		case ButtonCmd::ExperienceUpgradeTo:
-			res = CheckDependencies(stratagus::unit_type::get_all()[buttonaction.Value], &unit, true, false) && unit.Variable[LEVELUP_INDEX].Value >= 1;
+			res = CheckDependencies(unit_type, &unit, true, false) && unit.Variable[LEVELUP_INDEX].Value >= 1;
 			break;
 		case ButtonCmd::LearnAbility:
-			res = unit.CanLearnAbility(CUpgrade::get(buttonaction.ValueStr));
+			res = unit.CanLearnAbility(upgrade);
 			break;
 		case ButtonCmd::SpellCast:
 			res = CSpell::Spells[buttonaction.Value]->IsAvailableForUnit(unit);
@@ -1660,12 +1705,23 @@ static void UpdateButtonPanelSingleUnit(const CUnit &unit, const std::vector<std
 
 		// Special case for researches
 		int researchCheck = true;
-		if (button->AlwaysShow && !allow && button->Action == ButtonCmd::Research
-			//Wyrmgus start
-//			&& UpgradeIdentAllowed(*unit.Player, button->ValueStr) == 'R') {
-			&& UpgradeIdentAllowed(*CPlayer::GetThisPlayer(), button->ValueStr) == 'R') {
-			//Wyrmgus end
-			researchCheck = false;
+		if (button->AlwaysShow && !allow && (button->Action == ButtonCmd::Research || button->Action == ButtonCmd::ResearchClass)) {
+			const CUpgrade *upgrade = nullptr;
+
+			switch (button->Action) {
+				case ButtonCmd::Research:
+					upgrade = CUpgrade::get_all()[button->Value];
+					break;
+				case ButtonCmd::ResearchClass:
+					if (Selected[0]->Player->get_faction() != nullptr) {
+						upgrade = Selected[0]->Player->get_faction()->get_class_upgrade(stratagus::upgrade_class::get_all()[button->Value]);
+					}
+					break;
+			}
+
+			if (UpgradeIdAllowed(*CPlayer::GetThisPlayer(), upgrade->ID) == 'R') {
+				researchCheck = false;
+			}
 		}
 		
 		// is button allowed after all?
@@ -2062,7 +2118,6 @@ void CButtonPanel::DoClicked_UpgradeTo(int button)
 	}
 }
 
-//Wyrmgus start
 void CButtonPanel::DoClicked_ExperienceUpgradeTo(int button)
 {
 	// FIXME: store pointer in button table!
@@ -2098,30 +2153,22 @@ void CButtonPanel::DoClicked_ExperienceUpgradeTo(int button)
 		SelectedUnitChanged();
 	}
 }
-//Wyrmgus end
 
-void CButtonPanel::DoClicked_Research(int button)
+void CButtonPanel::DoClicked_Research(const std::unique_ptr<stratagus::button> &button)
 {
-	const int index = CurrentButtons[button]->Value;
+	const CUpgrade *button_upgrade = button->get_value_upgrade(Selected[0]);
 	//Wyrmgus start
 	int upgrade_costs[MaxCosts];
-	CPlayer::GetThisPlayer()->GetUpgradeCosts(CUpgrade::get_all()[index], upgrade_costs);
-//	if (!Selected[0]->Player->CheckCosts(CUpgrade::get_all()[index]->Costs)) {
+	CPlayer::GetThisPlayer()->GetUpgradeCosts(button_upgrade, upgrade_costs);
 	if (!CPlayer::GetThisPlayer()->CheckCosts(upgrade_costs)) {
-	//Wyrmgus end
 		//PlayerSubCosts(player,Upgrades[i].Costs);
-		//Wyrmgus start
-//		SendCommandResearch(*Selected[0], *CUpgrade::get_all()[index], !(KeyModifiers & ModifierShift));
-		SendCommandResearch(*Selected[0], *CUpgrade::get_all()[index], CPlayer::GetThisPlayer()->Index, !(KeyModifiers & ModifierShift));
-		//Wyrmgus end
+		SendCommandResearch(*Selected[0], *button_upgrade, CPlayer::GetThisPlayer()->Index, !(KeyModifiers & ModifierShift));
 		UI.StatusLine.Clear();
 		UI.StatusLine.ClearCosts();
-		//Wyrmgus start
 		LastDrawnButtonPopup = nullptr;
 		ButtonUnderCursor = -1;
 		OldButtonUnderCursor = -1;
 		UI.ButtonPanel.Update();
-		//Wyrmgus end
 	}
 }
 
@@ -2287,9 +2334,11 @@ void CButtonPanel::DoClicked(int button)
 
 	//Wyrmgus start
 	if (!IsButtonUsable(*Selected[0], *CurrentButtons[button])) {
+		const CUpgrade *button_upgrade = CurrentButtons[button]->get_value_upgrade(Selected[0]);
+
 		if (
-			(CurrentButtons[button]->Action == ButtonCmd::Research && UpgradeIdentAllowed(*CPlayer::GetThisPlayer(), CurrentButtons[button]->ValueStr) == 'R')
-			|| (CurrentButtons[button]->Action == ButtonCmd::LearnAbility && Selected[0]->GetIndividualUpgrade(CUpgrade::get(CurrentButtons[button]->ValueStr)) == CUpgrade::get(CurrentButtons[button]->ValueStr)->MaxLimit)
+			((CurrentButtons[button]->Action == ButtonCmd::Research || CurrentButtons[button]->Action == ButtonCmd::ResearchClass) && UpgradeIdAllowed(*CPlayer::GetThisPlayer(), button_upgrade->ID) == 'R')
+			|| (CurrentButtons[button]->Action == ButtonCmd::LearnAbility && Selected[0]->GetIndividualUpgrade(button_upgrade) == button_upgrade->MaxLimit)
 		) {
 			CPlayer::GetThisPlayer()->Notify(NotifyYellow, Selected[0]->tilePos, Selected[0]->MapLayer->ID, "%s", _("The upgrade has already been acquired"));
 		} else if (CurrentButtons[button]->Action == ButtonCmd::Buy && CPlayer::GetThisPlayer()->Heroes.size() >= PlayerHeroMax && CurrentButtons[button]->Value != -1 && UnitManager.GetSlotUnit(CurrentButtons[button]->Value).Character != nullptr) {
@@ -2345,7 +2394,10 @@ void CButtonPanel::DoClicked(int button)
 			DoClicked_Train(CurrentButtons[button]);
 			break;
 		case ButtonCmd::UpgradeTo: { DoClicked_UpgradeTo(button); break; }
-		case ButtonCmd::Research: { DoClicked_Research(button); break; }
+		case ButtonCmd::Research:
+		case ButtonCmd::ResearchClass:
+			DoClicked_Research(CurrentButtons[button]);
+			break;
 		case ButtonCmd::CallbackAction: { DoClicked_CallbackAction(button); break; }
 		//Wyrmgus start
 		case ButtonCmd::LearnAbility: { DoClicked_LearnAbility(button); break; }

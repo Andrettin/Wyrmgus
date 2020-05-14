@@ -47,6 +47,7 @@
 #include "unit/unit_type.h"
 #include "unit/unit_type_type.h"
 #include "upgrade/upgrade.h"
+#include "upgrade/upgrade_class.h"
 #include "util/vector_util.h"
 
 /**
@@ -82,6 +83,46 @@ static void AiHelperInsert(std::map<const stratagus::unit_type *, std::vector<st
 
 static void AiHelperInsert(std::map<const stratagus::unit_class *, std::vector<const stratagus::unit_class *>> &table,
 	const stratagus::unit_class *key, const stratagus::unit_class *target)
+{
+	if (table.contains(key) && stratagus::vector::contains(table[key], target)) {
+		return;
+	}
+
+	table[key].push_back(target);
+}
+
+static void AiHelperInsert(std::map<const CUpgrade *, std::vector<stratagus::unit_type *>> &table,
+	const CUpgrade *key, stratagus::unit_type *target)
+{
+	if (table.contains(key) && stratagus::vector::contains(table[key], target)) {
+		return;
+	}
+
+	table[key].push_back(target);
+}
+
+static void AiHelperInsert(std::map<const stratagus::upgrade_class *, std::vector<const stratagus::unit_class *>> &table,
+	const stratagus::upgrade_class *key, const stratagus::unit_class *target)
+{
+	if (table.contains(key) && stratagus::vector::contains(table[key], target)) {
+		return;
+	}
+
+	table[key].push_back(target);
+}
+
+static void AiHelperInsert(std::map<const stratagus::unit_type *, std::vector<const CUpgrade *>> &table,
+	const stratagus::unit_type *key, const CUpgrade *target)
+{
+	if (table.contains(key) && stratagus::vector::contains(table[key], target)) {
+		return;
+	}
+
+	table[key].push_back(target);
+}
+
+static void AiHelperInsert(std::map<const stratagus::unit_class *, std::vector<const stratagus::upgrade_class *>> &table,
+	const stratagus::unit_class *key, const stratagus::upgrade_class *target)
 {
 	if (table.contains(key) && stratagus::vector::contains(table[key], target)) {
 		return;
@@ -324,7 +365,8 @@ static void InitAiHelper(AiHelper &aiHelper)
 	AiHelpers.builders.clear();
 	AiHelpers.builder_classes.clear();
 	AiHelpers.Upgrade.clear();
-	AiHelpers.Research.clear();
+	AiHelpers.researchers.clear();
+	AiHelpers.researcher_classes.clear();
 	AiHelpers.Repair.clear();
 	AiHelpers.UnitLimit.clear();
 	AiHelpers.Mines.clear();
@@ -332,7 +374,8 @@ static void InitAiHelper(AiHelper &aiHelper)
 	AiHelpers.SellMarkets.clear();
 	AiHelpers.BuyMarkets.clear();
 	AiHelpers.ProducedResources.clear();
-	AiHelpers.ResearchedUpgrades.clear();
+	AiHelpers.researched_upgrades.clear();
+	AiHelpers.researched_upgrade_classes.clear();
 	AiHelpers.UpgradesTo.clear();
 	AiHelpers.ExperienceUpgrades.clear();
 	AiHelpers.LearnableAbilities.clear();
@@ -431,18 +474,23 @@ static void InitAiHelper(AiHelper &aiHelper)
 				break;
 			}
 			case ButtonCmd::Research : {
-				int researchId = UpgradeIdByIdent(button->ValueStr);
+				const CUpgrade *upgrade = CUpgrade::get(button->ValueStr);
 
-				for (std::vector<stratagus::unit_type *>::const_iterator j = unitmask.begin(); j != unitmask.end(); ++j) {
-					AiHelperInsert(aiHelper.Research, researchId, **j);
-				}
-				
-				for (std::vector<stratagus::unit_type *>::const_iterator j = unitmask.begin(); j != unitmask.end(); ++j) {
-					AiHelperInsert(aiHelper.ResearchedUpgrades, (**j).Slot, *CUpgrade::get_all()[researchId]);
+				for (stratagus::unit_type *researcher : unitmask) {
+					AiHelperInsert(aiHelper.researchers, upgrade, researcher);
+					AiHelperInsert(aiHelper.researched_upgrades, researcher, upgrade);
 				}
 				break;
 			}
-			//Wyrmgus start
+			case ButtonCmd::ResearchClass: {
+				const stratagus::upgrade_class *upgrade_class = stratagus::upgrade_class::get(button->ValueStr);
+
+				for (const stratagus::unit_class *researcher : button->get_unit_classes()) {
+					AiHelperInsert(aiHelper.researcher_classes, upgrade_class, researcher);
+					AiHelperInsert(aiHelper.researched_upgrade_classes, researcher, upgrade_class);
+				}
+				break;
+			}
 			case ButtonCmd::SellResource : {
 				int resource = GetResourceIdByName(button->ValueStr.c_str());
 
@@ -485,7 +533,6 @@ static void InitAiHelper(AiHelper &aiHelper)
 				}
 				break;
 			}
-			//Wyrmgus end
 			default:
 				break;
 		}
