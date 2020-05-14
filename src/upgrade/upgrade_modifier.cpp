@@ -118,7 +118,20 @@ void upgrade_modifier::process_sml_scope(const sml_data &scope)
 			this->unit_classes.push_back(unit_class::get(value));
 		}
 	} else {
-		throw std::runtime_error("Invalid upgrade modifier property: \"" + tag + "\".");
+		const std::string variable_name = string::snake_case_to_pascal_case(tag);
+		const int index = UnitTypeVar.VariableNameLookup[variable_name.c_str()]; // variable index
+		if (index != -1) { // valid index
+			scope.for_each_property([&](const sml_property &property) {
+				const std::string &key = property.get_key();
+				if (key == "percent_value") {
+					this->ModifyPercent[index] = std::stoi(property.get_value());
+				} else {
+					throw std::runtime_error("Invalid upgrade modifier variable property: \"" + key + "\".");
+				}
+			});
+		} else {
+			throw std::runtime_error("Invalid upgrade modifier scope: \"" + tag + "\".");
+		}
 	}
 }
 
