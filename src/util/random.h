@@ -59,10 +59,10 @@ public:
 	void reset_seed(const bool default)
 	{
 		if (default) {
-			this->set_seed(this->random_device());
-		} else {
 			//reset the seed to the default
 			this->set_seed(random::default_seed);
+		} else {
+			this->set_seed(this->random_device());
 		}
 	}
 
