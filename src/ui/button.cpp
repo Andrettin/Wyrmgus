@@ -64,7 +64,7 @@ void button::ProcessConfigData(const CConfigData *config_data)
 		} else if (key == "level") {
 			button->level = button_level::get(value);
 		} else if (key == "always_show") {
-			button->AlwaysShow = string::to_bool(value);
+			button->always_show = string::to_bool(value);
 		} else if (key == "icon") {
 			button->Icon.Name = value;
 		} else if (key == "action") {
@@ -250,7 +250,15 @@ void button::process_sml_scope(const sml_data &scope)
 	const std::string &tag = scope.get_tag();
 	const std::vector<std::string> &values = scope.get_values();
 
-	if (tag == "unit_classes") {
+	if (tag == "unit_types") {
+		for (const std::string &value : values) {
+			if (this->UnitMask.empty()) {
+				this->UnitMask += ",";
+			}
+			this->UnitMask += unit_type::get(value)->get_identifier();
+			this->UnitMask += ",";
+		}
+	} else if (tag == "unit_classes") {
 		for (const std::string &value : values) {
 			this->unit_classes.push_back(unit_class::get(value));
 		}
@@ -261,6 +269,8 @@ void button::process_sml_scope(const sml_data &scope)
 
 void button::initialize()
 {
+	const button_level *level = nullptr;
+
 	if (!this->ValueStr.empty()) {
 		switch (this->Action) {
 			case ButtonCmd::SpellCast:
@@ -296,7 +306,11 @@ void button::initialize()
 				break;
 			case ButtonCmd::Button:
 				if (!this->ValueStr.empty()) {
-					this->Value = button_level::get(this->ValueStr)->get_index();
+					level = button_level::get(this->ValueStr);
+				}
+
+				if (level != nullptr) {
+					this->Value = level->get_index();
 				} else {
 					this->Value = 0;
 				}
@@ -621,7 +635,7 @@ std::string GetButtonActionNameById(const ButtonCmd button_action)
 		case ButtonCmd::Salvage:
 			return "salvage";
 		case ButtonCmd::EnterMapLayer:
-			return "enter-map-layer";
+			return "enter_map_layer";
 		case ButtonCmd::Unit:
 			return "unit";
 		case ButtonCmd::EditorUnit:
@@ -699,7 +713,7 @@ ButtonCmd GetButtonActionIdByName(const std::string &button_action)
 		return ButtonCmd::BuyResource;
 	} else if (button_action == "salvage") {
 		return ButtonCmd::Salvage;
-	} else if (button_action == "enter-map-layer") {
+	} else if (button_action == "enter_map_layer") {
 		return ButtonCmd::EnterMapLayer;
 	} else if (button_action == "unit") {
 		return ButtonCmd::Unit;

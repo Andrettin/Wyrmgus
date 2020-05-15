@@ -505,7 +505,7 @@ bool ButtonCheckHasSubButtons(const CUnit &unit, const stratagus::button &button
 			continue;
 		}
 		
-		if (!other_button->AlwaysShow && !IsButtonAllowed(unit, *other_button)) {
+		if (!other_button->is_always_shown() && !IsButtonAllowed(unit, *other_button)) {
 			continue;
 		}
 		

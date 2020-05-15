@@ -1015,7 +1015,7 @@ void CButtonPanel::Draw()
 		//Wyrmgus start
 		//for neutral units, don't draw buttons that aren't training buttons (in other words, only draw buttons which are usable by neutral buildings)
 		if (
-			!button->AlwaysShow
+			!button->is_always_shown()
 			&& Selected[0]->Player != CPlayer::GetThisPlayer()
 			&& !CPlayer::GetThisPlayer()->IsTeamed(*Selected[0])
 			&& CPlayer::GetThisPlayer()->HasBuildingAccess(*Selected[0]->Player, button->Action)
@@ -1214,7 +1214,7 @@ void CButtonPanel::Draw()
 */
 bool IsButtonAllowed(const CUnit &unit, const stratagus::button &buttonaction)
 {
-	if (buttonaction.AlwaysShow) {
+	if (buttonaction.is_always_shown()) {
 		return true;
 	}
 	
@@ -1625,7 +1625,7 @@ static void UpdateButtonPanelMultipleUnits(const std::vector<std::unique_ptr<str
 		}
 
 		bool allow = true;
-		if (button->AlwaysShow == false) {
+		if (button->is_always_shown() == false) {
 			for (size_t i = 0; i != Selected.size(); ++i) {
 				if (!IsButtonAllowed(*Selected[i], *button)) {
 					allow = false;
@@ -1692,7 +1692,7 @@ static void UpdateButtonPanelSingleUnit(const CUnit &unit, const std::vector<std
 		//Wyrmgus start
 //		int allow = IsButtonAllowed(unit, buttonaction);
 		bool allow = true; // check all selected units, as different units of the same type may have different allowed buttons
-		if (button->AlwaysShow == false) {
+		if (button->is_always_shown() == false) {
 			for (size_t j = 0; j != Selected.size(); ++j) {
 				if (!IsButtonAllowed(*Selected[j], *button)) {
 					allow = false;
@@ -1705,7 +1705,7 @@ static void UpdateButtonPanelSingleUnit(const CUnit &unit, const std::vector<std
 
 		// Special case for researches
 		int researchCheck = true;
-		if (button->AlwaysShow && !allow && (button->Action == ButtonCmd::Research || button->Action == ButtonCmd::ResearchClass)) {
+		if (button->is_always_shown() && !allow && (button->Action == ButtonCmd::Research || button->Action == ButtonCmd::ResearchClass)) {
 			const CUpgrade *upgrade = nullptr;
 
 			switch (button->Action) {
@@ -1725,7 +1725,7 @@ static void UpdateButtonPanelSingleUnit(const CUnit &unit, const std::vector<std
 		}
 		
 		// is button allowed after all?
-		if ((button->AlwaysShow && buttonActions[pos - 1]->get_pos() == -1 && researchCheck) || allow) {
+		if ((button->is_always_shown() && buttonActions[pos - 1]->get_pos() == -1 && researchCheck) || allow) {
 			// OverWrite, So take last valid button.
 			*buttonActions[pos - 1] = *button;
 		}
@@ -2327,7 +2327,7 @@ void CButtonPanel::DoClicked(int button)
 	//
 	//Wyrmgus start
 //	if (CurrentButtons[button]->get_pos() == -1 || !ThisPlayer->IsTeamed(*Selected[0])) {
-	if (CurrentButtons[button]->get_pos() == -1 || (!CurrentButtons[button]->AlwaysShow && !CPlayer::GetThisPlayer()->IsTeamed(*Selected[0]) && !CPlayer::GetThisPlayer()->HasBuildingAccess(*Selected[0]->Player, CurrentButtons[button]->Action)) || (!CurrentButtons[button]->AlwaysShow && !CPlayer::GetThisPlayer()->IsTeamed(*Selected[0]) && CPlayer::GetThisPlayer()->HasBuildingAccess(*Selected[0]->Player, CurrentButtons[button]->Action) && !IsNeutralUsableButtonAction(CurrentButtons[button]->Action))) { //allow neutral units to be used (but only for training or as transporters)
+	if (CurrentButtons[button]->get_pos() == -1 || (!CurrentButtons[button]->is_always_shown() && !CPlayer::GetThisPlayer()->IsTeamed(*Selected[0]) && !CPlayer::GetThisPlayer()->HasBuildingAccess(*Selected[0]->Player, CurrentButtons[button]->Action)) || (!CurrentButtons[button]->is_always_shown() && !CPlayer::GetThisPlayer()->IsTeamed(*Selected[0]) && CPlayer::GetThisPlayer()->HasBuildingAccess(*Selected[0]->Player, CurrentButtons[button]->Action) && !IsNeutralUsableButtonAction(CurrentButtons[button]->Action))) { //allow neutral units to be used (but only for training or as transporters)
 	//Wyrmgus end
 		return;
 	}

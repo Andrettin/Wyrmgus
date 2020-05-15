@@ -52,6 +52,7 @@ class button : public data_entry, public data_type<button>
 
 	Q_PROPERTY(int pos MEMBER pos READ get_pos)
 	Q_PROPERTY(stratagus::button_level* level MEMBER level READ get_level)
+	Q_PROPERTY(bool always_show MEMBER always_show READ is_always_shown)
 
 public:
 	static constexpr const char *class_identifier = "button";
@@ -69,7 +70,7 @@ public:
 	{
 		this->pos = other_button.pos;
 		this->level = other_button.level;
-		this->AlwaysShow = other_button.AlwaysShow;
+		this->always_show = other_button.always_show;
 		this->Action = other_button.Action;
 		this->Value = other_button.Value;
 		this->Payload = other_button.Payload;
@@ -103,6 +104,11 @@ public:
 		return this->level;
 	}
 
+	bool is_always_shown() const
+	{
+		return this->always_show;
+	}
+
 	const CUnit *get_unit() const;
 	const unit_type *get_value_unit_type(const CUnit *unit) const;
 	const CUpgrade *get_value_upgrade(const CUnit *unit) const;
@@ -120,7 +126,9 @@ public:
 
 	int pos = 0; //button position in the grid
 	button_level *level = nullptr;		/// requires button level
-	bool AlwaysShow = false;			/// button is always shown but drawn grayscale if not available
+private:
+	bool always_show = false;			/// button is always shown but drawn grayscale if not available
+public:
 	ButtonCmd Action = ButtonCmd::Move;	/// command on button press
 	int Value = 0;					/// extra value for command
 	void *Payload = nullptr;

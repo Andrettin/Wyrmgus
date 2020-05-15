@@ -937,7 +937,7 @@ static int CclDefineButton(lua_State *l)
 		} else if (!strcmp(value, "Level")) {
 			button->level = stratagus::button_level::get(LuaToString(l, -1));
 		} else if (!strcmp(value, "AlwaysShow")) {
-			button->AlwaysShow = LuaToBoolean(l, -1);
+			button->always_show = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "Icon")) {
 			button->Icon.Name = LuaToString(l, -1);
 		} else if (!strcmp(value, "Action")) {
