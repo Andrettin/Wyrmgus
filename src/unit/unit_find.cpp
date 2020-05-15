@@ -519,7 +519,7 @@ private:
 
 private:
 	const CUnit &worker;
-	const ResourceInfo &resinfo;
+	const stratagus::resource_info &resinfo;
 	const CUnit *deposit;
 	unsigned int movemask;
 	int maxRange;

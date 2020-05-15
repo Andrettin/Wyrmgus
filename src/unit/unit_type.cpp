@@ -25,10 +25,6 @@
 //      02111-1307, USA.
 //
 
-/*----------------------------------------------------------------------------
---  Includes
-----------------------------------------------------------------------------*/
-
 #include "stratagus.h"
 
 #include "unit/unit_type.h"
@@ -380,47 +376,47 @@
 */
 /**
 **
-**  @class ResourceInfo unit_type.h
+**  @class resource_info unit_type.h
 **
 ** \#include "unit/unit_type.h"
 **
 **    This class contains information about how a unit will harvest a resource.
 **
-**  ResourceInfo::FileWhenLoaded
+**  resource_info::FileWhenLoaded
 **
 **    The harvester's animation file will change when it's loaded.
 **
-**  ResourceInfo::FileWhenEmpty;
+**  resource_info::FileWhenEmpty;
 **
 **    The harvester's animation file will change when it's empty.
 **    The standard animation is used only when building/repairing.
 **
 **
-**  ResourceInfo::HarvestFromOutside
+**  resource_info::HarvestFromOutside
 **
 **    Unit will harvest from the outside. The unit will use it's
 **    Attack animation (seems it turned into a generic Action anim.)
 **
-**  ResourceInfo::ResourceId
+**  resource_info::ResourceId
 **
 **    The resource this is for. Mostly redundant.
 **
-**  ResourceInfo::FinalResource
+**  resource_info::FinalResource
 **
 **    The resource is converted to this at the depot. Useful for
 **    a fisherman who harvests fish, but it all turns to food at the
 **    depot.
 **
-**  ResourceInfo::FinalResourceConversionRate
+**  resource_info::FinalResourceConversionRate
 **
 **    The rate at which the resource is converted to the final resource at the depot. Useful for
 **    silver mines returning a lower amount of gold.
 **
-**  ResourceInfo::WaitAtResource
+**  resource_info::WaitAtResource
 **
 **    Cycles the unit waits while inside a resource.
 **
-**  ResourceInfo::ResourceStep
+**  resource_info::ResourceStep
 **
 **    The unit makes so-caled mining cycles. Each mining cycle
 **    it does some sort of animation and gains ResourceStep
@@ -430,22 +426,22 @@
 **    it's considered infinity, and ResourceCapacity will now
 **    be the limit.
 **
-**  ResourceInfo::ResourceCapacity
+**  resource_info::ResourceCapacity
 **
 **    Maximum amount of resources a harvester can carry. The
 **    actual amount can be modified while unloading.
 **
-**  ResourceInfo::LoseResources
+**  resource_info::LoseResources
 **
 **    Special lossy behaviour for loaded harvesters. Harvesters
 **    with loads other than 0 and ResourceCapacity will lose their
 **    cargo on any new order.
 **
-**  ResourceInfo::WaitAtDepot
+**  resource_info::WaitAtDepot
 **
 **    Cycles the unit waits while inside the depot to unload.
 **
-**  ResourceInfo::TerrainHarvester
+**  resource_info::TerrainHarvester
 **
 **    The unit will harvest terrain. For now this only works
 **    for wood. maybe it could be made to work for rocks, but
@@ -475,10 +471,6 @@ std::vector<CSpeciesOrder *> SpeciesOrders;
 std::vector<CSpeciesClass *> SpeciesClasses;
 std::vector<CSpeciesPhylum *> SpeciesPhylums;
 //Wyrmgus end
-
-/*----------------------------------------------------------------------------
---  Functions
-----------------------------------------------------------------------------*/
 
 int GetResourceIdByName(const char *resourceName)
 {
@@ -585,14 +577,13 @@ unit_type::~unit_type()
 	delete[] AutoCastActive;
 
 	for (int res = 0; res < MaxCosts; ++res) {
-		if (this->ResInfo[res]) {
+		if (this->ResInfo[res] != nullptr) {
 			if (this->ResInfo[res]->SpriteWhenLoaded) {
 				CGraphic::Free(this->ResInfo[res]->SpriteWhenLoaded);
 			}
 			if (this->ResInfo[res]->SpriteWhenEmpty) {
 				CGraphic::Free(this->ResInfo[res]->SpriteWhenEmpty);
 			}
-			delete this->ResInfo[res];
 		}
 	}
 
@@ -633,7 +624,7 @@ void unit_type::process_sml_property(const sml_property &property)
 
 	if (key == "parent") {
 		const unit_type *parent_type = unit_type::get(value);
-		this->SetParent(parent_type);
+		this->set_parent(parent_type);
 	} else if (key == "icon") {
 		this->Icon.Name = value;
 		this->Icon.Icon = nullptr;
@@ -729,6 +720,19 @@ void unit_type::process_sml_scope(const sml_data &scope)
 			unit_type *item = unit_type::get(value);
 			this->DefaultEquipment[item_slot] = item;
 		});
+	} else if (tag == "resource_gathering") {
+		scope.for_each_child([&](const sml_data &child_scope) {
+			const std::string &tag = child_scope.get_tag();
+			const resource *resource = resource::get(tag);
+
+			if (this->ResInfo[resource->ID] == nullptr) {
+				auto resource_info = std::make_unique<stratagus::resource_info>(this, resource);
+				this->ResInfo[resource->ID] = std::move(resource_info);
+			}
+
+			resource_info *res_info_ptr = this->ResInfo[resource->ID].get();
+			database::process_sml_data(res_info_ptr, child_scope);
+		});
 	} else if (tag == "sounds") {
 		scope.for_each_property([&](const sml_property &property) {
 			const std::string &key = property.get_key();
@@ -816,7 +820,7 @@ void unit_type::ProcessConfigData(const CConfigData *config_data)
 			this->set_name(value);
 		} else if (key == "parent") {
 			unit_type *parent_type = unit_type::get(value);
-			this->SetParent(parent_type);
+			this->set_parent(parent_type);
 		} else if (key == "civilization") {
 			stratagus::civilization *civilization = civilization::get(value);
 			this->civilization = civilization;
@@ -1413,7 +1417,7 @@ bool unit_type::CanSelect(GroupSelectionMode mode) const
 	return false;
 }
 
-void unit_type::SetParent(const unit_type *parent_type)
+void unit_type::set_parent(const unit_type *parent_type)
 {
 	if (!parent_type->is_defined()) {
 		throw std::runtime_error("Unit type \"" + this->get_identifier() + "\" is inheriting features from non-defined parent \"" + parent_type->get_identifier() + "\".");
@@ -1516,17 +1520,8 @@ void unit_type::SetParent(const unit_type *parent_type)
 		this->CanStore[i] = parent_type->CanStore[i];
 		this->GrandStrategyProductionEfficiencyModifier[i] = parent_type->GrandStrategyProductionEfficiencyModifier[i];
 		
-		if (parent_type->ResInfo[i]) {
-			ResourceInfo *res = new ResourceInfo;
-			res->ResourceId = i;
-			this->ResInfo[i] = res;
-			res->ResourceStep = parent_type->ResInfo[i]->ResourceStep;
-			res->WaitAtResource = parent_type->ResInfo[i]->WaitAtResource;
-			res->WaitAtDepot = parent_type->ResInfo[i]->WaitAtDepot;
-			res->ResourceCapacity = parent_type->ResInfo[i]->ResourceCapacity;
-			res->LoseResources = parent_type->ResInfo[i]->LoseResources;
-			res->FileWhenEmpty = parent_type->ResInfo[i]->FileWhenEmpty;
-			res->FileWhenLoaded = parent_type->ResInfo[i]->FileWhenLoaded;
+		if (parent_type->ResInfo[i] != nullptr) {
+			this->ResInfo[i] = parent_type->ResInfo[i]->duplicate(this);
 		}
 	}
 	
@@ -1969,6 +1964,25 @@ std::vector<std::string> unit_type::GetPotentialPersonalNames(stratagus::faction
 	}
 	
 	return potential_names;
+}
+
+void resource_info::process_sml_property(const sml_property &property)
+{
+	const std::string &key = property.get_key();
+	const std::string &value = property.get_value();
+
+	if (key == "image_file") {
+		this->image_file = database::get_graphics_path(this->get_unit_type()->get_module()) / value;
+	} else if (key == "loaded_image_file") {
+		this->loaded_image_file = database::get_graphics_path(this->get_unit_type()->get_module()) / value;
+	} else {
+		throw std::runtime_error("Invalid resource gathering info property: \"" + key + "\".");
+	}
+}
+
+void resource_info::process_sml_scope(const sml_data &scope)
+{
+	throw std::runtime_error("Invalid resource gathering info scope: \"" + scope.get_tag() + "\".");
 }
 
 }
@@ -2626,18 +2640,20 @@ void LoadUnitTypeSprite(stratagus::unit_type &type)
 
 	if (type.BoolFlag[HARVESTER_INDEX].value) {
 		for (int i = 0; i < MaxCosts; ++i) {
-			ResourceInfo *resinfo = type.ResInfo[i];
+			const std::unique_ptr<stratagus::resource_info> &resinfo = type.ResInfo[i];
 			if (!resinfo) {
 				continue;
 			}
-			if (!resinfo->FileWhenLoaded.empty()) {
-				resinfo->SpriteWhenLoaded = CPlayerColorGraphic::New(resinfo->FileWhenLoaded, type.get_frame_size());
-				resinfo->SpriteWhenLoaded->Load(false, stratagus::defines::get()->get_scale_factor());
-			}
-			if (!resinfo->FileWhenEmpty.empty()) {
-				resinfo->SpriteWhenEmpty = CPlayerColorGraphic::New(resinfo->FileWhenEmpty,
-																	type.get_frame_size());
+
+			if (!resinfo->get_image_file().empty()) {
+				resinfo->SpriteWhenEmpty = CPlayerColorGraphic::New(resinfo->get_image_file().string(),
+					type.get_frame_size());
 				resinfo->SpriteWhenEmpty->Load(false, stratagus::defines::get()->get_scale_factor());
+			}
+
+			if (!resinfo->get_loaded_image_file().empty()) {
+				resinfo->SpriteWhenLoaded = CPlayerColorGraphic::New(resinfo->get_loaded_image_file().string(), type.get_frame_size());
+				resinfo->SpriteWhenLoaded->Load(false, stratagus::defines::get()->get_scale_factor());
 			}
 		}
 	}

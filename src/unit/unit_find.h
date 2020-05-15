@@ -36,10 +36,6 @@
 #include "unit/unit.h"
 #include "unit/unit_type.h"
 
-/*----------------------------------------------------------------------------
---  Declarations
-----------------------------------------------------------------------------*/
-
 class CPlayer;
 class CUnit;
 enum class UnitTypeType;

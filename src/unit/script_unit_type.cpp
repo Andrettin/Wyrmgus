@@ -674,9 +674,9 @@ static int CclDefineUnitType(lua_State *l)
 			type->set_name(LuaToString(l, -1));
 		//Wyrmgus start
 		} else if (!strcmp(value, "Parent")) {
-			std::string parent_ident = LuaToString(l, -1);
-			stratagus::unit_type *parent_type = stratagus::unit_type::get(parent_ident);
-			type->SetParent(parent_type);
+			const std::string parent_ident = LuaToString(l, -1);
+			const stratagus::unit_type *parent_type = stratagus::unit_type::get(parent_ident);
+			type->set_parent(parent_type);
 		} else if (!strcmp(value, "Variations")) {
 			type->DefaultStat.Variables[VARIATION_INDEX].Enable = 1;
 			type->DefaultStat.Variables[VARIATION_INDEX].Value = 0;
@@ -1383,10 +1383,7 @@ static int CclDefineUnitType(lua_State *l)
 			const int args = lua_rawlen(l, -1);
 			for (int j = 0; j < args; ++j) {
 				lua_rawgeti(l, -1, j + 1);
-				//Wyrmgus start
-//				ResourceInfo *res = new ResourceInfo;
-				ResourceInfo *res;
-				//Wyrmgus end
+				stratagus::resource_info *res = nullptr;
 				if (!lua_istable(l, -1)) {
 					LuaError(l, "incorrect argument");
 				}
@@ -1396,18 +1393,11 @@ static int CclDefineUnitType(lua_State *l)
 					++k;
 					if (!strcmp(value, "resource-id")) {
 						lua_rawgeti(l, -1, k + 1);
-						//Wyrmgus start
-//						res->ResourceId = CclGetResourceByName(l);
-//						type->ResInfo[res->ResourceId] = res;
 						int resource_id = CclGetResourceByName(l);
-						//allow redefinition
-						res = type->ResInfo[resource_id];
-						if (!res) {
-							res = new ResourceInfo;
-							type->ResInfo[resource_id] = res;
+						if (type->ResInfo[resource_id] == nullptr) {
+							type->ResInfo[resource_id] = std::make_unique<stratagus::resource_info>(type, stratagus::resource::get_all()[resource_id]);
 						}
-						res->ResourceId = resource_id;
-						//Wyrmgus end
+						res = type->ResInfo[resource_id].get();
 						lua_pop(l, 1);
 					} else if (!strcmp(value, "resource-step")) {
 						res->ResourceStep = LuaToNumber(l, -1, k + 1);
@@ -1417,33 +1407,18 @@ static int CclDefineUnitType(lua_State *l)
 						res->WaitAtDepot = LuaToNumber(l, -1, k + 1);
 					} else if (!strcmp(value, "resource-capacity")) {
 						res->ResourceCapacity = LuaToNumber(l, -1, k + 1);
-					//Wyrmgus start
-					/*
-					} else if (!strcmp(value, "terrain-harvester")) {
-						res->TerrainHarvester = 1;
-						--k;
-					*/
-					//Wyrmgus end
 					} else if (!strcmp(value, "lose-resources")) {
 						res->LoseResources = 1;
 						--k;
-					//Wyrmgus start
-					/*
-					} else if (!strcmp(value, "harvest-from-outside")) {
-						res->HarvestFromOutside = 1;
-						--k;
-					*/
-					//Wyrmgus end
 					} else if (!strcmp(value, "file-when-empty")) {
-						res->FileWhenEmpty = LuaToString(l, -1, k + 1);
+						res->image_file = LuaToString(l, -1, k + 1);
 					} else if (!strcmp(value, "file-when-loaded")) {
-						res->FileWhenLoaded = LuaToString(l, -1, k + 1);
+						res->loaded_image_file = LuaToString(l, -1, k + 1);
 					} else {
 						printf("\n%s\n", type->get_name().c_str());
 						LuaError(l, "Unsupported tag: %s" _C_ value);
 					}
 				}
-				Assert(res->ResourceId);
 				lua_pop(l, 1);
 			}
 			type->BoolFlag[HARVESTER_INDEX].value = 1;

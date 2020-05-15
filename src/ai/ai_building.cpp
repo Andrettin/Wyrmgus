@@ -622,7 +622,7 @@ bool AiFindBuildingPlace(const CUnit &worker, const stratagus::unit_type &type, 
 	
 	//Mines and Depots
 	for (int i = 1; i < MaxCosts; ++i) {
-		ResourceInfo *resinfo = worker.Type->ResInfo[i];
+		const std::unique_ptr<stratagus::resource_info> &resinfo = worker.Type->ResInfo[i];
 		//Depots
 		if (type.CanStore[i]) {
 			//Wyrmgus start

@@ -107,21 +107,73 @@ enum ImageLayers {
 };
 //Wyrmgus end
 
-class ResourceInfo
+namespace stratagus {
+
+class resource_info
 {
 public:
-	std::string FileWhenLoaded;     /// Change the graphic when the unit is loaded.
-	std::string FileWhenEmpty;      /// Change the graphic when the unit is empty.
+	explicit resource_info(const unit_type *unit_type, const resource *resource)
+		: unit_type(unit_type), resource(resource)
+	{
+	}
+
+	std::unique_ptr<resource_info> duplicate(const unit_type *unit_type) const
+	{
+		auto duplicate = std::make_unique<resource_info>(unit_type, this->get_resource());
+
+		duplicate->ResourceStep = this->ResourceStep;
+		duplicate->WaitAtResource = this->WaitAtResource;
+		duplicate->WaitAtDepot = this->WaitAtDepot;
+		duplicate->ResourceCapacity = this->ResourceCapacity;
+		duplicate->LoseResources = this->LoseResources;
+		duplicate->image_file = this->image_file;
+		duplicate->loaded_image_file = this->loaded_image_file;
+
+		return duplicate;
+	}
+
+	void process_sml_property(const sml_property &property);
+	void process_sml_scope(const sml_data &scope);
+
+	const unit_type *get_unit_type() const
+	{
+		return this->unit_type;
+	}
+
+	const resource *get_resource() const
+	{
+		return this->resource;
+	}
+
+	const std::filesystem::path &get_image_file() const
+	{
+		return this->image_file;
+	}
+
+	const std::filesystem::path &get_loaded_image_file() const
+	{
+		return this->loaded_image_file;
+	}
+
+private:
+	const unit_type *unit_type = nullptr; //the unit type to which the resource info belongs
+	const resource *resource = nullptr;        /// the resource harvested. Redundant.
+	std::filesystem::path image_file;      /// Change the graphic when the unit is empty.
+	std::filesystem::path loaded_image_file;     /// Change the graphic when the unit is loaded.
+public:
 	unsigned WaitAtResource = 0;    /// Cycles the unit waits while mining.
 	unsigned ResourceStep = 0;      /// Resources the unit gains per mining cycle.
 	int      ResourceCapacity = 0;  /// Max amount of resources to carry.
 	unsigned WaitAtDepot = 0;       /// Cycles the unit waits while returning.
-	unsigned ResourceId = 0;        /// Id of the resource harvested. Redundant.
 	unsigned char LoseResources = 0; /// The unit will lose it's resource when distracted.
 	//  Runtime info:
 	CPlayerColorGraphic *SpriteWhenLoaded = nullptr; /// The graphic corresponding to FileWhenLoaded.
 	CPlayerColorGraphic *SpriteWhenEmpty = nullptr;  /// The graphic corresponding to FileWhenEmpty
+
+	friend int ::CclDefineUnitType(lua_State *l);
 };
+
+}
 
 // Index for boolflag already defined
 enum {
@@ -923,7 +975,7 @@ public:
 	bool CanSelect(GroupSelectionMode mode = GroupSelectionMode::SELECTABLE_BY_RECTANGLE_ONLY) const;
 	
 	//Wyrmgus start
-	void SetParent(const unit_type *parent_type);
+	void set_parent(const unit_type *parent_type);
 	void RemoveButtons(const ButtonCmd button_action = ButtonCmd::None, const std::string &mod_file = "");
 	void UpdateDefaultBoolFlags();
 	int GetAvailableLevelUpUpgrades() const;
@@ -1162,7 +1214,7 @@ public:
 	//Wyrmgus start
 	int GrandStrategyProductionEfficiencyModifier[MaxCosts];	/// production modifier for a particular resource for grand strategy mode (used for buildings)
 	//Wyrmgus end
-	ResourceInfo *ResInfo[MaxCosts];    /// Resource information.
+	std::unique_ptr<resource_info> ResInfo[MaxCosts];    /// Resource information.
 	std::vector<CUnitTypeVariation *> Variations;						/// Variation information
 	//Wyrmgus start
 	std::vector<CUnitTypeVariation *> LayerVariations[MaxImageLayers];	/// Layer variation information

@@ -1415,9 +1415,6 @@ static int AiAssignHarvester(CUnit &unit, const stratagus::resource *resource)
 		AiPlayer->Scouts.erase(std::remove(AiPlayer->Scouts.begin(), AiPlayer->Scouts.end(), &unit), AiPlayer->Scouts.end());
 	}
 
-	const ResourceInfo &resinfo = *unit.Type->ResInfo[resource->ID];
-	Assert(&resinfo);
-
 	//Wyrmgus start
 	/*
 	if (resinfo.TerrainHarvester) {
