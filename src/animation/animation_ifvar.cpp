@@ -32,6 +32,7 @@
 #include "animation/animation_ifvar.h"
 
 #include "unit/unit.h"
+#include "util/string_util.h"
 
 //IfVar compare types
 enum EIfVarBinOp {
@@ -77,16 +78,11 @@ void CAnimation_IfVar::Action(CUnit &unit, int &/*move*/, int /*scale*/) const
 */
 void CAnimation_IfVar::Init(const char *s, lua_State *)
 {
-	const std::string str(s);
-	const size_t len = str.size();
+	const std::vector<std::string> str_list = string::split(s, ' ');
 
-	size_t begin = 0;
-	size_t end = std::min(len, str.find(' ', begin));
-	this->leftVar.assign(str, begin, end - begin);
+	this->leftVar = str_list.at(0);
 
-	begin = std::min(len, str.find_first_not_of(' ', end));
-	end = std::min(len, str.find(' ', begin));
-	std::string op(str, begin, end - begin);
+	const std::string op = str_list.at(1);
 
 	if (op == ">=") {
 		this->binOpFunc = binOpGreaterEqual;
@@ -126,13 +122,9 @@ void CAnimation_IfVar::Init(const char *s, lua_State *)
 		}
 	}
 
-	begin = std::min(len, str.find_first_not_of(' ', end));
-	end = std::min(len, str.find(' ', begin));
-	this->rightVar.assign(str, begin, end - begin);
+	this->rightVar = str_list.at(2);
 
-	begin = std::min(len, str.find_first_not_of(' ', end));
-	end = std::min(len, str.find(' ', begin));
-	std::string label(str, begin, end - begin);
+	const std::string label = str_list.at(3);
 
 	FindLabelLater(&this->gotoLabel, label);
 }
