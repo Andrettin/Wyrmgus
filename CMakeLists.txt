@@ -105,7 +105,6 @@ set(animation_SRCS
 	src/animation/animation_randomsound.cpp
 	src/animation/animation_randomwait.cpp
 	src/animation/animation_rotate.cpp
-	src/animation/animation_setplayervar.cpp
 	src/animation/animation_setvar.cpp
 	src/animation/animation_sound.cpp
 	src/animation/animation_spawnmissile.cpp
@@ -602,7 +601,6 @@ set(stratagus_animation_HDRS
 	src/include/animation/animation_randomsound.h
 	src/include/animation/animation_randomwait.h
 	src/include/animation/animation_rotate.h
-	src/include/animation/animation_setplayervar.h
 	src/include/animation/animation_setvar.h
 	src/include/animation/animation_sound.h
 	src/include/animation/animation_spawnmissile.h

@@ -26,10 +26,6 @@
 //      02111-1307, USA.
 //
 
-/*----------------------------------------------------------------------------
---  Includes
-----------------------------------------------------------------------------*/
-
 #include "stratagus.h"
 
 #include "action/action_spellcast.h"
@@ -50,7 +46,6 @@
 #include "animation/animation_randomsound.h"
 #include "animation/animation_randomwait.h"
 #include "animation/animation_rotate.h"
-#include "animation/animation_setplayervar.h"
 #include "animation/animation_setvar.h"
 #include "animation/animation_sound.h"
 #include "animation/animation_spawnmissile.h"
@@ -219,31 +214,6 @@ int ParseAnimInt(const CUnit &unit, const char *parseint)
 			return 1;
 		}
 		return 0;
-	} else if (s[0] == 'p') { //player variable detected
-		char *next;
-		if (*cur == '(') {
-			++cur;
-			char *end = strchr(cur, ')');
-			if (end == nullptr) {
-				fprintf(stderr, "ParseAnimInt: expected ')'\n");
-				ExitFatal(1);
-			}
-			*end = '\0';
-			next = end + 1;
-		} else {
-			next = strchr(cur, '.');
-		}
-		if (next == nullptr) {
-			fprintf(stderr, "Need also specify the %s player's property\n", cur);
-			ExitFatal(1);
-		} else {
-			*next = '\0';
-		}
-		char *arg = strchr(next + 1, '.');
-		if (arg != nullptr) {
-			*arg = '\0';
-		}
-		return GetPlayerData(ParseAnimPlayer(unit, cur), next + 1, arg + 1);
 	} else if (s[0] == 'r') { //random value
 		char *next = strchr(cur, '.');
 		if (next == nullptr) {
@@ -540,8 +510,6 @@ void animation_set::process_sml_scope(const sml_data &scope)
 				anim = std::make_unique<CAnimation_IfVar>();
 			} else if (key == "set-var") {
 				anim = std::make_unique<CAnimation_SetVar>();
-			} else if (key == "set-player-var") {
-				anim = std::make_unique<CAnimation_SetPlayerVar>();
 			} else if (key == "die") {
 				anim = std::make_unique<CAnimation_Die>();
 			} else if (key == "rotate") {
@@ -726,8 +694,6 @@ static std::unique_ptr<CAnimation> ParseAnimationFrame(lua_State *l, const char 
 		anim = std::make_unique<CAnimation_IfVar>();
 	} else if (op1 == "set-var") {
 		anim = std::make_unique<CAnimation_SetVar>();
-	} else if (op1 == "set-player-var") {
-		anim = std::make_unique<CAnimation_SetPlayerVar>();
 	} else if (op1 == "die") {
 		anim = std::make_unique<CAnimation_Die>();
 	} else if (op1 == "rotate") {
