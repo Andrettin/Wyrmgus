@@ -440,11 +440,14 @@ void PlayUnitSound(const CUnit &unit, const stratagus::unit_sound_type unit_soun
 	bool selection = (unit_sound_type == stratagus::unit_sound_type::selected || unit_sound_type == stratagus::unit_sound_type::construction);
 	Origin source = {&unit, unsigned(UnitNumber(unit))};
 	
-	//Wyrmgus start
-//	if (UnitSoundIsPlaying(&source)) {
 	//don't speak if already speaking
 	if (stratagus::is_voice_unit_sound_type(unit_sound_type) && UnitSoundIsPlaying(&source)) {
-	//Wyrmgus end
+		return;
+	}
+
+	const int volume = CalculateVolume(false, ViewPointDistanceToUnit(unit), stratagus::get_unit_sound_type_range(unit_sound_type)) * sound->VolumePercent / 100;
+
+	if (volume == 0) {
 		return;
 	}
 
@@ -452,14 +455,9 @@ void PlayUnitSound(const CUnit &unit, const stratagus::unit_sound_type unit_soun
 	if (channel == -1) {
 		return;
 	}
-	//Wyrmgus start
-//	SetChannelVolume(channel, CalculateVolume(false, ViewPointDistanceToUnit(unit), sound->Range));
-	SetChannelVolume(channel, CalculateVolume(false, ViewPointDistanceToUnit(unit), stratagus::get_unit_sound_type_range(unit_sound_type)) * sound->VolumePercent / 100);
-	//Wyrmgus end
+	SetChannelVolume(channel, volume);
 	SetChannelStereo(channel, CalculateStereo(unit));
-	//Wyrmgus start
 	SetChannelVoiceGroup(channel, unit_sound_type);
-	//Wyrmgus end
 }
 
 /**
