@@ -29,36 +29,36 @@
 
 namespace stratagus::point {
 
-inline int to_index(const int x, const int y, const int width)
+inline constexpr int to_index(const int x, const int y, const int width)
 {
 	return x + y * width;
 }
 
-inline int to_index(const int x, const int y, const QSize &size)
+inline constexpr int to_index(const int x, const int y, const QSize &size)
 {
 	return point::to_index(x, y, size.width());
 }
 
-inline int to_index(const QPoint &point, const QSize &size)
+inline constexpr int to_index(const QPoint &point, const QSize &size)
 {
 	return point::to_index(point.x(), point.y(), size);
 }
 
-inline QPoint from_index(const int index, const int width)
+inline constexpr QPoint from_index(const int index, const int width)
 {
 	return QPoint(index % width, index / width);
 }
 
-inline QPoint from_index(const int index, const QSize &size)
+inline constexpr QPoint from_index(const int index, const QSize &size)
 {
 	return point::from_index(index, size.width());
 }
 
-inline QSize to_size(const QPoint &point)
+inline constexpr QSize to_size(const QPoint &point)
 {
 	return QSize(point.x(), point.y());
 }
 
-extern int distance_to(const QPoint &point, const QPoint &other_point);
+extern constexpr int distance_to(const QPoint &point, const QPoint &other_point);
 
 }

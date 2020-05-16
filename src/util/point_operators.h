@@ -31,11 +31,16 @@
 
 #pragma once
 
-namespace stratagus::size {
-
-inline constexpr QPoint to_point(const QSize &size)
+inline constexpr const QPoint &operator /=(QPoint &lhs, const int rhs)
 {
-	return QPoint(size.width(), size.height());
+	lhs.setX(lhs.x() / rhs);
+	lhs.setY(lhs.y() / rhs);
+	return lhs;
 }
 
+inline constexpr QPoint operator /(const QPoint &lhs, const int rhs)
+{
+	QPoint res(lhs);
+	res /= rhs;
+	return res;
 }

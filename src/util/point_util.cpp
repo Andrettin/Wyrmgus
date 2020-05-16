@@ -31,7 +31,7 @@
 
 namespace stratagus::point {
 
-int distance_to(const QPoint &point, const QPoint &other_point)
+constexpr int distance_to(const QPoint &point, const QPoint &other_point)
 {
 	const int dx = point.x() - other_point.x();
 	const int dy = point.y() - other_point.y();

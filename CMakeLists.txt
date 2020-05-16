@@ -1414,20 +1414,6 @@ add_custom_command(OUTPUT tolua.cpp
 add_executable(stratagus WIN32 ${stratagus_SRCS} ${stratagus_HDRS})
 
 target_precompile_headers(stratagus PRIVATE
-	<SDL.h>
-	<QApplication>
-	<QAudioFormat>
-	<QColor>
-	<QDateTime>
-	<QImage>
-	<QMetaProperty>
-	<QObject>
-	<QPoint>
-	<QStandardPaths>
-	<QString>
-	<QThread>
-	<QVariant>
-	<QVariantList>
 	<algorithm>
 	<cassert>
 	<cctype>
@@ -1464,6 +1450,22 @@ target_precompile_headers(stratagus PRIVATE
 	<typeinfo>
 	<variant>
 	<vector>
+	<QApplication>
+	<QAudioFormat>
+	<QColor>
+	<QDateTime>
+	<QImage>
+	<QMetaProperty>
+	<QObject>
+	<QPoint>
+	<QStandardPaths>
+	<QString>
+	<QThread>
+	<QVariant>
+	<QVariantList>
+	<SDL.h>
+	src/util/point_operators.h #to ensure the / operator with an int as RHS is used instead of the Qt one with qreal (which uses rounding)
+	src/util/size_operators.h #as above
 )
 
 target_link_libraries(stratagus ${stratagus_LIBS})

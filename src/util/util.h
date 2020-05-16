@@ -49,7 +49,7 @@ extern int MyRand();
 ----------------------------------------------------------------------------*/
 
 /// Compute a square root using ints
-extern long isqrt(long num);
+extern constexpr long isqrt(long num);
 
 inline int square(int v)
 {

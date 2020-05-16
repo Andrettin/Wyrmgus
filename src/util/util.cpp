@@ -85,11 +85,11 @@ int MyRand()
 **
 **  @return     The integer square root.
 */
-long isqrt(long num)
+constexpr long isqrt(long num)
 {
-	long squaredbit;
-	long remainder;
-	long root;
+	long squaredbit = 0;
+	long remainder = 0;
+	long root = 0;
 
 	if (num < 1) {
 		return 0;
