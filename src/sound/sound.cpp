@@ -550,7 +550,7 @@ void PlayGameSound(stratagus::sound *sound, unsigned char volume, bool always)
 		return;
 	}
 
-	const int volume = CalculateVolume(true, volume, sound->range) * sound->VolumePercent / 100;
+	volume = CalculateVolume(true, volume, sound->range) * sound->VolumePercent / 100;
 	if (volume == 0) {
 		return;
 	}
