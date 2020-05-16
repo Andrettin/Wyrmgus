@@ -31,14 +31,14 @@
 
 #include "animation.h"
 
-class CAnimation_Wait : public CAnimation
+class CAnimation_Wait final : public CAnimation
 {
 public:
 	CAnimation_Wait() : CAnimation(AnimationWait) {}
 
-	virtual void Action(CUnit &unit, int &move, int scale) const;
-	virtual void Init(const char *s, lua_State *l);
+	virtual void Action(CUnit &unit, int &move, int scale) const override;
+	virtual void Init(const char *s, lua_State *l) override;
 
 private:
-	std::string wait;
+	int wait = 0;
 };

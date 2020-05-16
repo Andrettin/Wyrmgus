@@ -27,10 +27,6 @@
 //      02111-1307, USA.
 //
 
-/*----------------------------------------------------------------------------
---  Includes
-----------------------------------------------------------------------------*/
-
 #include "stratagus.h"
 
 #include "animation/animation_randomrotate.h"
@@ -38,18 +34,18 @@
 #include "animation/animation_rotate.h"
 #include "unit/unit.h"
 
-/* virtual */ void CAnimation_RandomRotate::Action(CUnit &unit, int &/*move*/, int /*scale*/) const
+void CAnimation_RandomRotate::Action(CUnit &unit, int &/*move*/, int /*scale*/) const
 {
 	Assert(unit.Anim.Anim == this);
 
 	if (SyncRand(2)) {
-		UnitRotate(unit, -ParseAnimInt(unit, this->rotateStr.c_str()));
+		UnitRotate(unit, -this->rotate);
 	} else {
-		UnitRotate(unit, ParseAnimInt(unit, this->rotateStr.c_str()));
+		UnitRotate(unit, this->rotate);
 	}
 }
 
-/* virtual */ void CAnimation_RandomRotate::Init(const char *s, lua_State *)
+void CAnimation_RandomRotate::Init(const char *s, lua_State *)
 {
-	this->rotateStr = s;
+	this->rotate = std::stoi(s);
 }

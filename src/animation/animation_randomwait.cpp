@@ -27,39 +27,30 @@
 //      02111-1307, USA.
 //
 
-/*----------------------------------------------------------------------------
---  Includes
-----------------------------------------------------------------------------*/
-
 #include "stratagus.h"
 
 #include "animation/animation_randomwait.h"
 
 #include "unit/unit.h"
+#include "util/string_util.h"
 
-/* virtual */ void CAnimation_RandomWait::Action(CUnit &unit, int &/*move*/, int /*scale*/) const
+void CAnimation_RandomWait::Action(CUnit &unit, int &/*move*/, int /*scale*/) const
 {
 	Assert(unit.Anim.Anim == this);
 
-	const int arg1 = ParseAnimInt(unit, this->minWait.c_str());
-	const int arg2 = ParseAnimInt(unit, this->maxWait.c_str());
+	const int arg1 = this->min_wait;
+	const int arg2 = this->max_wait;
 
 	unit.Anim.Wait = arg1 + SyncRand(arg2 - arg1 + 1);
 }
 
 /*
-** s = "minWait MaxWait"
+** s = "min_wait max_wait"
 */
-/* virtual */ void CAnimation_RandomWait::Init(const char *s, lua_State *)
+void CAnimation_RandomWait::Init(const char *s, lua_State *)
 {
-	const std::string str(s);
-	const size_t len = str.size();
+	const std::vector<std::string> str_list = string::split(s, ' ');
 
-	size_t begin = 0;
-	size_t end = str.find(' ', begin);
-	this->minWait.assign(str, begin, end - begin);
-
-	begin = std::min(len, str.find_first_not_of(' ', end));
-	end = std::min(len, str.find(' ', begin));
-	this->maxWait.assign(str, begin, end - begin);
+	this->min_wait = std::stoi(str_list.at(0));
+	this->max_wait = std::stoi(str_list.at(1));
 }

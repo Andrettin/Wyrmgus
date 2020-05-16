@@ -31,14 +31,14 @@
 
 #include "animation.h"
 
-class CAnimation_Move : public CAnimation
+class CAnimation_Move final : public CAnimation
 {
 public:
 	CAnimation_Move() : CAnimation(AnimationMove) {}
 
-	virtual void Action(CUnit &unit, int &move, int scale) const;
-	virtual void Init(const char *s, lua_State *l);
+	virtual void Action(CUnit &unit, int &move, int scale) const override;
+	virtual void Init(const char *s, lua_State *l) override;
 
 private:
-	std::string moveStr;
+	int move = 0;
 };

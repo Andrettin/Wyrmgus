@@ -31,15 +31,15 @@
 
 #include "animation.h"
 
-class CAnimation_RandomGoto : public CAnimation
+class CAnimation_RandomGoto final : public CAnimation
 {
 public:
-	CAnimation_RandomGoto() : CAnimation(AnimationRandomGoto), gotoLabel(nullptr) {}
+	CAnimation_RandomGoto() : CAnimation(AnimationRandomGoto) {}
 
-	virtual void Action(CUnit &unit, int &move, int scale) const;
-	virtual void Init(const char *s, lua_State *l);
+	virtual void Action(CUnit &unit, int &move, int scale) const override;
+	virtual void Init(const char *s, lua_State *l) override;
 
 private:
-	std::string randomStr;
-	CAnimation *gotoLabel;
+	int random = 0;
+	CAnimation *gotoLabel = nullptr;
 };

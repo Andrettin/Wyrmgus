@@ -27,20 +27,16 @@
 //      02111-1307, USA.
 //
 
-/*----------------------------------------------------------------------------
---  Includes
-----------------------------------------------------------------------------*/
-
 #include "stratagus.h"
 
 #include "animation/animation_wait.h"
 
 #include "unit/unit.h"
 
-/* virtual */ void CAnimation_Wait::Action(CUnit &unit, int &/*move*/, int scale) const
+void CAnimation_Wait::Action(CUnit &unit, int &/*move*/, int scale) const
 {
 	Assert(unit.Anim.Anim == this);
-	unit.Anim.Wait = ParseAnimInt(unit, this->wait.c_str()) << scale >> 8;
+	unit.Anim.Wait = this->wait << scale >> 8;
 	if (unit.Variable[SLOW_INDEX].Value) { // unit is slowed down
 		unit.Anim.Wait <<= 1;
 	}
@@ -52,7 +48,7 @@
 	}
 }
 
-/* virtual */ void CAnimation_Wait::Init(const char *s, lua_State *)
+void CAnimation_Wait::Init(const char *s, lua_State *)
 {
-	this->wait = s;
+	this->wait = std::stoi(s);
 }

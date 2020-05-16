@@ -31,7 +31,7 @@
 
 #include "animation.h"
 
-class CAnimation_IfVar : public CAnimation
+class CAnimation_IfVar final : public CAnimation
 {
 public:
 	CAnimation_IfVar() : CAnimation(AnimationIfVar), binOpFunc(nullptr), gotoLabel(nullptr) {}

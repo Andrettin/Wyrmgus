@@ -27,10 +27,6 @@
 //      02111-1307, USA.
 //
 
-/*----------------------------------------------------------------------------
---  Includes
-----------------------------------------------------------------------------*/
-
 #include "stratagus.h"
 
 #include "animation/animation_ifvar.h"
@@ -63,7 +59,7 @@ static bool binOpXor(int lhs, int rhs) { return (lhs ^ rhs) != 0; }
 static bool binOpNot(int lhs, int rhs = 0) { return (bool)(!lhs); }
 static bool returnFalse(int, int) { return false; }
 
-/* virtual */ void CAnimation_IfVar::Action(CUnit &unit, int &/*move*/, int /*scale*/) const
+void CAnimation_IfVar::Action(CUnit &unit, int &/*move*/, int /*scale*/) const
 {
 	Assert(unit.Anim.Anim == this);
 
@@ -79,7 +75,7 @@ static bool returnFalse(int, int) { return false; }
 /*
 ** s = "leftOp Op rigthOp gotoLabel"
 */
-/* virtual */ void CAnimation_IfVar::Init(const char *s, lua_State *)
+void CAnimation_IfVar::Init(const char *s, lua_State *)
 {
 	const std::string str(s);
 	const size_t len = str.size();

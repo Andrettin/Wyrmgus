@@ -27,25 +27,21 @@
 //      02111-1307, USA.
 //
 
-/*----------------------------------------------------------------------------
---  Includes
-----------------------------------------------------------------------------*/
-
 #include "stratagus.h"
 
 #include "animation/animation_move.h"
 
 #include "unit/unit.h"
 
-/* virtual */ void CAnimation_Move::Action(CUnit &unit, int &move, int /*scale*/) const
+void CAnimation_Move::Action(CUnit &unit, int &move, int /*scale*/) const
 {
 	Assert(unit.Anim.Anim == this);
 	Assert(!move);
 
-	move = ParseAnimInt(unit, this->moveStr.c_str());
+	move = this->move;
 }
 
-/* virtual */ void CAnimation_Move::Init(const char *s, lua_State *)
+void CAnimation_Move::Init(const char *s, lua_State *)
 {
-	this->moveStr = s;
+	this->move = std::stoi(s);
 }

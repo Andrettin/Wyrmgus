@@ -31,16 +31,19 @@
 
 #include "animation.h"
 
-class CAnimation_ExactFrame : public CAnimation
+class CAnimation_ExactFrame final : public CAnimation
 {
 public:
 	CAnimation_ExactFrame() : CAnimation(AnimationExactFrame) {}
 
-	virtual void Action(CUnit &unit, int &move, int scale) const;
-	virtual void Init(const char *s, lua_State *l);
+	virtual void Action(CUnit &unit, int &move, int scale) const override;
+	virtual void Init(const char *s, lua_State *l) override;
 
-	int ParseAnimInt(const CUnit *unit) const;
+	int get_frame() const
+	{
+		return this->frame;
+	}
 
 private:
-	std::string frame;
+	int frame = 0;
 };

@@ -27,21 +27,18 @@
 //      02111-1307, USA.
 //
 
-/*----------------------------------------------------------------------------
---  Includes
-----------------------------------------------------------------------------*/
-
 #include "stratagus.h"
 
 #include "animation/animation_randomgoto.h"
 
 #include "unit/unit.h"
+#include "util/string_util.h"
 
-/* virtual */ void CAnimation_RandomGoto::Action(CUnit &unit, int &/*move*/, int /*scale*/) const
+void CAnimation_RandomGoto::Action(CUnit &unit, int &/*move*/, int /*scale*/) const
 {
 	Assert(unit.Anim.Anim == this);
 
-	if (SyncRand(100) < ParseAnimInt(unit, this->randomStr.c_str())) {
+	if (SyncRand(100) < this->random) {
 		unit.Anim.Anim = this->gotoLabel;
 	}
 }
@@ -49,18 +46,12 @@
 /*
 **  s : "percent label"
 */
-/* virtual */ void CAnimation_RandomGoto::Init(const char *s, lua_State *)
+void CAnimation_RandomGoto::Init(const char *s, lua_State *)
 {
-	const std::string str(s);
-	const size_t len = str.size();
+	const std::vector<std::string> str_list = string::split(s, ' ');
 
-	size_t begin = 0;
-	size_t end = str.find(' ', begin);
-	this->randomStr.assign(str, begin, end - begin);
+	this->random = std::stoi(str_list.at(0));
 
-	begin = std::min(len, str.find_first_not_of(' ', end));
-	end = std::min(len, str.find(' ', begin));
-	const std::string label(str, begin, end - begin);
-
+	const std::string &label = str_list.at(1);
 	FindLabelLater(&this->gotoLabel, label);
 }

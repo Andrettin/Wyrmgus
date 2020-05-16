@@ -31,16 +31,16 @@
 
 #include "animation.h"
 
-class CAnimation_Rotate : public CAnimation
+class CAnimation_Rotate final : public CAnimation
 {
 public:
 	CAnimation_Rotate() : CAnimation(AnimationRotate) {}
 
-	virtual void Action(CUnit &unit, int &move, int scale) const;
-	virtual void Init(const char *s, lua_State *l);
+	virtual void Action(CUnit &unit, int &move, int scale) const override;
+	virtual void Init(const char *s, lua_State *l) override;
 
 private:
-	std::string rotateStr;
+	int rotate = 0;
 };
 
 extern void UnitRotate(CUnit &unit, int rotate);

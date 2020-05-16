@@ -31,15 +31,19 @@
 
 #include "animation.h"
 
-class CAnimation_Frame : public CAnimation
+class CAnimation_Frame final : public CAnimation
 {
 public:
 	CAnimation_Frame() : CAnimation(AnimationFrame) {}
 
-	virtual void Action(CUnit &unit, int &move, int scale) const;
-	virtual void Init(const char *s, lua_State *l);
+	virtual void Action(CUnit &unit, int &move, int scale) const override;
+	virtual void Init(const char *s, lua_State *l) override;
 
-	int ParseAnimInt(const CUnit *unit) const;
+	int get_frame() const
+	{
+		return this->frame;
+	}
+
 private:
-	std::string frame;
+	int frame = 0;
 };

@@ -36,10 +36,10 @@ class CAnimation_RandomWait : public CAnimation
 public:
 	CAnimation_RandomWait() : CAnimation(AnimationRandomWait) {}
 
-	virtual void Action(CUnit &unit, int &move, int scale) const;
-	virtual void Init(const char *s, lua_State *l);
+	virtual void Action(CUnit &unit, int &move, int scale) const override;
+	virtual void Init(const char *s, lua_State *l) override;
 
 private:
-	std::string minWait;
-	std::string maxWait;
+	int min_wait = 0;
+	int max_wait = 0;
 };

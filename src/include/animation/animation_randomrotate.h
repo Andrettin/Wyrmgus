@@ -31,14 +31,14 @@
 
 #include "animation.h"
 
-class CAnimation_RandomRotate : public CAnimation
+class CAnimation_RandomRotate final : public CAnimation
 {
 public:
 	CAnimation_RandomRotate() : CAnimation(AnimationRandomRotate) {}
 
-	virtual void Action(CUnit &unit, int &move, int scale) const;
-	virtual void Init(const char *s, lua_State *l);
+	virtual void Action(CUnit &unit, int &move, int scale) const override;
+	virtual void Init(const char *s, lua_State *l) override;
 
 private:
-	std::string rotateStr;
+	int rotate = 0;
 };

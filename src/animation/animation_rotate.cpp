@@ -27,10 +27,6 @@
 //      02111-1307, USA.
 //
 
-/*----------------------------------------------------------------------------
---  Includes
-----------------------------------------------------------------------------*/
-
 #include "stratagus.h"
 
 #include "animation/animation_rotate.h"
@@ -50,25 +46,14 @@ void UnitRotate(CUnit &unit, int rotate)
 	UnitUpdateHeading(unit);
 }
 
-/* virtual */ void CAnimation_Rotate::Action(CUnit &unit, int &/*move*/, int /*scale*/) const
+void CAnimation_Rotate::Action(CUnit &unit, int &/*move*/, int /*scale*/) const
 {
 	Assert(unit.Anim.Anim == this);
 
-	if (!strcmp(this->rotateStr.c_str(), "target") && unit.CurrentOrder()->HasGoal()) {
-		COrder &order = *unit.CurrentOrder();
-		const CUnit &target = *order.GetGoal();
-		if (target.Destroyed) {
-			order.ClearGoal();
-			return;
-		}
-		const Vec2i pos = target.tilePos + target.GetHalfTileSize() - unit.tilePos;
-		UnitHeadingFromDeltaXY(unit, pos);
-	} else {
-		UnitRotate(unit, ParseAnimInt(unit, this->rotateStr.c_str()));
-	}
+	UnitRotate(unit, this->rotate);
 }
 
-/* virtual */ void CAnimation_Rotate::Init(const char *s, lua_State *)
+void CAnimation_Rotate::Init(const char *s, lua_State *)
 {
-	this->rotateStr = s;
+	this->rotate = std::stoi(s);
 }

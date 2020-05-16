@@ -27,10 +27,6 @@
 //      02111-1307, USA.
 //
 
-/*----------------------------------------------------------------------------
---  Includes
-----------------------------------------------------------------------------*/
-
 #include "stratagus.h"
 
 #include "animation/animation_frame.h"
@@ -38,26 +34,17 @@
 #include "ui/ui.h"
 #include "unit/unit.h"
 
-/* virtual */ void CAnimation_Frame::Action(CUnit &unit, int &/*move*/, int /*scale*/) const
+void CAnimation_Frame::Action(CUnit &unit, int &/*move*/, int /*scale*/) const
 {
 	Assert(unit.Anim.Anim == this);
 	if (unit.Type->BoolFlag[BUILDING_INDEX].value && unit.Type->NumDirections == 1 && FancyBuildings && unit.Type->BoolFlag[NORANDOMPLACING_INDEX].value == false && unit.Frame < 0) {
 	} else {
-		unit.Frame = ParseAnimInt(&unit);
+		unit.Frame = this->frame;
 	}
 	UnitUpdateHeading(unit);
 }
 
-/* virtual */ void CAnimation_Frame::Init(const char *s, lua_State *)
+void CAnimation_Frame::Init(const char *s, lua_State *)
 {
-	this->frame = s;
-}
-
-int CAnimation_Frame::ParseAnimInt(const CUnit *unit) const
-{
-	if (unit == nullptr) {
-		return atoi(this->frame.c_str());
-	} else {
-		return ::ParseAnimInt(*unit, this->frame.c_str());
-	}
+	this->frame = std::stoi(s);
 }
