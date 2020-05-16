@@ -2495,13 +2495,13 @@ void CUnit::UpdateSoldUnits()
 
 				while (!potential_civilization_heroes.empty() && static_cast<int>(potential_heroes.size()) < recruitable_hero_max) {
 					stratagus::character *hero = potential_civilization_heroes[SyncRand(potential_civilization_heroes.size())];
+					stratagus::vector::remove(potential_civilization_heroes, hero);
 
 					if (stratagus::vector::contains(potential_heroes, hero)) {
 						continue;
 					}
 
 					potential_heroes.push_back(hero);
-					stratagus::vector::remove(potential_civilization_heroes, hero);
 				}
 			}
 		}
