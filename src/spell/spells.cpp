@@ -882,19 +882,14 @@ int SpellCast(CUnit &caster, const CSpell &spell, CUnit *target, const Vec2i &go
 			if (spell.Target == TargetType::Self) {
 				PlayUnitSound(caster, spell.SoundWhenCast.Sound);
 			} else {
-				//Wyrmgus start
-//				PlayGameSound(spell.SoundWhenCast.Sound, CalculateVolume(false, ViewPointDistance(target ? target->tilePos : goalPos), spell.SoundWhenCast.Sound->Range));
 				PlayGameSound(spell.SoundWhenCast.Sound, CalculateVolume(false, ViewPointDistance(target ? target->tilePos : goalPos), spell.SoundWhenCast.Sound->range) * spell.SoundWhenCast.Sound->VolumePercent / 100);
-				//Wyrmgus end
 			}
-		//Wyrmgus start
 		} else if (caster.Type->MapSound.Hit.Sound) { //if the spell has no sound-when-cast designated, use the unit's hit sound instead (if any)
 			if (spell.Target == TargetType::Self) {
 				PlayUnitSound(caster, caster.Type->MapSound.Hit.Sound);
 			} else {
 				PlayGameSound(caster.Type->MapSound.Hit.Sound, CalculateVolume(false, ViewPointDistance(target ? target->tilePos : goalPos), caster.Type->MapSound.Hit.Sound->range) * caster.Type->MapSound.Hit.Sound->VolumePercent / 100);
 			}
-		//Wyrmgus end
 		}
 		
 		int modifier = 100;

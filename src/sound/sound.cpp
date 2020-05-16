@@ -479,16 +479,15 @@ void PlayUnitSound(const CUnit &unit, stratagus::sound *sound)
 	if (!sound) {
 		return;
 	}
-	//Wyrmgus start
+
 	if (unit.MapLayer != UI.CurrentMapLayer) {
 		return;
 	}
-	//Wyrmgus end
+
 	Origin source = {&unit, unsigned(UnitNumber(unit))};
-	//Wyrmgus start
-//	unsigned char volume = CalculateVolume(false, ViewPointDistanceToUnit(unit), sound->Range);
-	unsigned char volume = CalculateVolume(false, ViewPointDistanceToUnit(unit), sound->range) * sound->VolumePercent / 100;
-	//Wyrmgus end
+
+	const int volume = CalculateVolume(false, ViewPointDistanceToUnit(unit), sound->range) * sound->VolumePercent / 100;
+
 	if (volume == 0) {
 		return;
 	}
@@ -518,10 +517,8 @@ void PlayMissileSound(const Missile &missile, stratagus::sound *sound)
 	clamp(&stereo, -128, 127);
 
 	Origin source = {nullptr, 0};
-	//Wyrmgus start
-//	unsigned char volume = CalculateVolume(false, ViewPointDistanceToMissile(missile), sound->Range);
-	unsigned char volume = CalculateVolume(false, ViewPointDistanceToMissile(missile), sound->range) * sound->VolumePercent / 100;
-	//Wyrmgus end
+	const int volume = CalculateVolume(false, ViewPointDistanceToMissile(missile), sound->range) * sound->VolumePercent / 100;
+
 	if (volume == 0) {
 		return;
 	}
@@ -553,14 +550,17 @@ void PlayGameSound(stratagus::sound *sound, unsigned char volume, bool always)
 		return;
 	}
 
+	const int volume = CalculateVolume(true, volume, sound->range) * sound->VolumePercent / 100;
+	if (volume == 0) {
+		return;
+	}
+
 	int channel = PlaySample(sample);
 	if (channel == -1) {
 		return;
 	}
-	//Wyrmgus start
-//	SetChannelVolume(channel, CalculateVolume(true, volume, sound->Range));
-	SetChannelVolume(channel, CalculateVolume(true, volume, sound->range) * sound->VolumePercent / 100);
-	//Wyrmgus end
+
+	SetChannelVolume(channel, volume);
 }
 
 static std::map<int, LuaActionListener *> ChannelMap;
