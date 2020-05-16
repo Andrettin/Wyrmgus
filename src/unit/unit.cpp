@@ -6910,7 +6910,7 @@ static void HitUnit_LastAttack(const CUnit *attacker, CUnit &target)
 		}
 	}
 
-	if (GameCycle > (lastattack + 2 * (CYCLES_PER_SECOND * 60)) && attacker && !target.Type->BoolFlag[BUILDING_INDEX].value) { //only trigger this every two minutes for the unit
+	if (GameCycle > (lastattack + 2 * (CYCLES_PER_SECOND * 60)) && attacker) { //only trigger this every two minutes for the unit
 		if (
 			target.Player->AiEnabled
 			&& !attacker->Type->BoolFlag[INDESTRUCTIBLE_INDEX].value // don't attack indestructible units back
