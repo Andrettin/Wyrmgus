@@ -4,9 +4,9 @@
 /// Description
 #define DESCRIPTION NAME " - Strategy Gaming Engine"
 
-#define StratagusMajorVersion 3
-#define StratagusMinorVersion 5
-#define StratagusPatchLevel 5
+#define StratagusMajorVersion 4
+#define StratagusMinorVersion 0
+#define StratagusPatchLevel 0
 #define StratagusPatchLevel2 0
 
 #define _version_stringify_(s) #s
@@ -33,4 +33,4 @@
 #define LICENSE "GPL 2.0"
 
 /// Copyright
-#define COPYRIGHT "Copyright (c) 1998-2015 by The Stratagus Project"
+#define COPYRIGHT "Copyright (c) 1998-2020 by The Stratagus Project"
