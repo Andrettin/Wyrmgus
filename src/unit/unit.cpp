@@ -6876,10 +6876,10 @@ int ThreatCalculate(const CUnit &unit, const CUnit &dest)
 
 static void HitUnit_LastAttack(const CUnit *attacker, CUnit &target)
 {
-	const unsigned long lastattack = target.Attacked;
+	const unsigned long last_attack_cycle = target.Attacked;
 
 	target.Attacked = GameCycle ? GameCycle : 1;
-	if (target.Type->BoolFlag[WALL_INDEX].value || (lastattack && GameCycle <= lastattack + 2 * CYCLES_PER_SECOND)) {
+	if (target.Type->BoolFlag[WALL_INDEX].value || (last_attack_cycle && GameCycle <= (last_attack_cycle + 2 * CYCLES_PER_SECOND))) {
 		return;
 	}
 	// NOTE: perhaps this should also be moved into the notify?
@@ -6906,7 +6906,8 @@ static void HitUnit_LastAttack(const CUnit *attacker, CUnit &target)
 		}
 	}
 
-	if (GameCycle > (lastattack + 2 * (CYCLES_PER_SECOND * 60)) && attacker) { //only trigger this every two minutes for the unit
+	//only trigger this every two minutes for the unit
+	if (attacker && (last_attack_cycle == 0 || GameCycle > (last_attack_cycle + 2 * (CYCLES_PER_SECOND * 60)))) {
 		if (
 			target.Player->AiEnabled
 			&& !attacker->Type->BoolFlag[INDESTRUCTIBLE_INDEX].value // don't attack indestructible units back
