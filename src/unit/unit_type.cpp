@@ -741,6 +741,22 @@ void unit_type::process_sml_scope(const sml_data &scope)
 		});
 
 		this->DefaultStat.Variables[VARIATION_INDEX].Max = static_cast<int>(this->variations.size());
+	} else if (tag == "button_icons") {
+		this->ButtonIcons.clear();
+
+		scope.for_each_property([&](const sml_property &property) {
+			const std::string &key = property.get_key();
+			const std::string &value = property.get_value();
+
+			const ButtonCmd button_action = GetButtonActionIdByName(key);
+			if (button_action != ButtonCmd::None) {
+				this->ButtonIcons[button_action].Name = value;
+				this->ButtonIcons[button_action].Icon = nullptr;
+				this->ButtonIcons[button_action].Load();
+			} else {
+				throw std::runtime_error("Button action \"" + key + "\" doesn't exist.");
+			}
+		});
 	} else if (tag == "sounds") {
 		scope.for_each_property([&](const sml_property &property) {
 			const std::string &key = property.get_key();
