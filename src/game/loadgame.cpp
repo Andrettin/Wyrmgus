@@ -108,7 +108,6 @@ void CleanModules()
 	EndReplayLog();
 	CleanMessages();
 
-	stratagus::database::get()->clear();
 	CleanUserInterface();
 	CleanFonts();
 	FreeAi();
@@ -146,6 +145,8 @@ void CleanModules()
 	CleanReplayLog();
 	CSpell::ClearSpells();
 	FreePathfinder();
+
+	stratagus::database::get()->clear();
 
 	UnitTypeVar.Init(); // internal script. should be to a better place, don't find for restart.
 }
