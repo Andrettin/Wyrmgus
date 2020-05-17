@@ -60,6 +60,7 @@ class faction : public detailed_data_entry, public data_type<faction>
 	Q_PROPERTY(stratagus::civilization* civilization MEMBER civilization READ get_civilization)
 	Q_PROPERTY(stratagus::icon* icon MEMBER icon READ get_icon)
 	Q_PROPERTY(stratagus::player_color* color MEMBER color READ get_color)
+	Q_PROPERTY(QVariantList acquired_upgrades READ get_acquired_upgrades_qstring_list)
 
 public:
 	static constexpr const char *class_identifier = "faction";
@@ -88,6 +89,7 @@ public:
 	{
 		this->resources.clear();
 		this->diplomacy_states.clear();
+		this->acquired_upgrades.clear();
 	}
 
 	civilization *get_civilization() const
@@ -184,6 +186,20 @@ public:
 		return this->diplomacy_states;
 	}
 
+	const std::vector<CUpgrade *> &get_acquired_upgrades() const
+	{
+		return this->acquired_upgrades;
+	}
+
+	QVariantList get_acquired_upgrades_qstring_list() const;
+
+	Q_INVOKABLE void add_acquired_upgrade(CUpgrade *upgrade)
+	{
+		this->acquired_upgrades.push_back(upgrade);
+	}
+
+	Q_INVOKABLE void remove_acquired_upgrade(CUpgrade *upgrade);
+
 	std::string FactionUpgrade;											/// faction upgrade applied when the faction is set
 	std::string Adjective;												/// adjective pertaining to the faction
 	std::string DefaultAI = "land-attack";
@@ -237,6 +253,7 @@ public:
 private:
 	std::map<const resource *, int> resources;
 	std::map<const faction *, diplomacy_state> diplomacy_states;
+	std::vector<CUpgrade *> acquired_upgrades;
 public:
 	std::map<std::pair<CDate, faction *>, diplomacy_state> HistoricalDiplomacyStates;	/// dates in which this faction's diplomacy state to another faction changed; diplomacy state mapped to year and faction
 	std::map<std::pair<CDate, int>, int> HistoricalResources;	/// dates in which this faction's storage of a particular resource changed; resource quantities mapped to date and resource

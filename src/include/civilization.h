@@ -65,6 +65,7 @@ class civilization final : public detailed_data_entry, public data_type<civiliza
 	Q_PROPERTY(QString default_color READ get_default_color_qstring)
 	Q_PROPERTY(CUpgrade* upgrade MEMBER upgrade READ get_upgrade)
 	Q_PROPERTY(QStringList ship_names READ get_ship_names_qstring_list)
+	Q_PROPERTY(QVariantList acquired_upgrades READ get_acquired_upgrades_qstring_list)
 
 public:
 	static constexpr const char *class_identifier = "civilization";
@@ -83,8 +84,14 @@ public:
 
 	~civilization();
 
+	virtual void process_sml_property(const sml_property &property) override;
 	virtual void process_sml_scope(const sml_data &scope) override;
 	virtual void initialize() override;
+
+	virtual void reset_history() override
+	{
+		this->acquired_upgrades.clear();
+	}
 
 	civilization *get_parent_civilization() const
 	{
@@ -270,6 +277,20 @@ public:
 		this->characters.push_back(character);
 	}
 
+	const std::vector<CUpgrade *> &get_acquired_upgrades() const
+	{
+		return this->acquired_upgrades;
+	}
+
+	QVariantList get_acquired_upgrades_qstring_list() const;
+
+	Q_INVOKABLE void add_acquired_upgrade(CUpgrade *upgrade)
+	{
+		this->acquired_upgrades.push_back(upgrade);
+	}
+
+	Q_INVOKABLE void remove_acquired_upgrade(CUpgrade *upgrade);
+
 	int ID = -1;
 private:
 	species *species = nullptr; //the civilization's species (e.g. human)
@@ -315,6 +336,9 @@ public:
 	std::vector<CDeity *> Deities;
 	std::vector<site *> sites; //sites used for this civilization if a randomly-generated one is required
 	std::string MinisterTitles[MaxCharacterTitles][static_cast<int>(gender::count)][MaxGovernmentTypes][static_cast<int>(faction_tier::count)]; /// this civilization's minister title for each minister type and government type
+private:
+	std::vector<CUpgrade *> acquired_upgrades;
+public:
 	std::map<std::string, std::map<CDate, bool>> HistoricalUpgrades;	/// historical upgrades of the faction, with the date of change
 
 	friend int ::CclDefineCivilization(lua_State *l);

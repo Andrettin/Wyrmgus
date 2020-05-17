@@ -107,6 +107,8 @@ void unit_sound_set::process_sml_property(const sml_property &property)
 		this->Harvest[resource->ID].Name = value;
 	} else if (key == "help") {
 		this->Help.Name = value;
+	} else if (key == "help_town") {
+		this->HelpTown.Name = value;
 	} else if (key == "dead") {
 		this->Dead[ANIMATIONS_DEATHTYPES].Name = value;
 	} else if (key.find("dead_") != std::string::npos) {

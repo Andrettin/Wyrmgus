@@ -1013,8 +1013,6 @@ static int CclDefineCivilization(lua_State *l)
 		}
 	}
 
-	civilization->initialize();	
-	
 	return 0;
 }
 

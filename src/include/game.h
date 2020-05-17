@@ -57,6 +57,8 @@ public:
 		this->current_date = date;
 	}
 
+	void apply_player_history();
+
 	void do_cycle();
 
 private:

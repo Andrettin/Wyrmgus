@@ -55,6 +55,18 @@ civilization::~civilization()
 	}
 }
 
+void civilization::process_sml_property(const sml_property &property)
+{
+	const std::string &key = property.get_key();
+	const std::string &value = property.get_value();
+
+	if (key == "adjective") {
+		this->Adjective = value;
+	} else {
+		data_entry::process_sml_property(property);
+	}
+}
+
 void civilization::process_sml_scope(const sml_data &scope)
 {
 	const std::string &tag = scope.get_tag();
@@ -166,6 +178,17 @@ void civilization::process_sml_scope(const sml_data &scope)
 
 		std::sort(this->AiBuildingTemplates.begin(), this->AiBuildingTemplates.end(), [](CAiBuildingTemplate *a, CAiBuildingTemplate *b) {
 			return a->get_priority() > b->get_priority();
+		});
+	} else if (tag == "personal_names") {
+		if (!values.empty()) {
+			vector::merge(this->personal_names[gender::none], values);
+		}
+
+		scope.for_each_child([&](const sml_data &child_scope) {
+			const std::string &tag = child_scope.get_tag();
+
+			const stratagus::gender gender = string_to_gender(tag);
+			vector::merge(this->personal_names[gender], child_scope.get_values());
 		});
 	} else if (tag == "unit_class_names") {
 		scope.for_each_child([&](const sml_data &child_scope) {
@@ -559,6 +582,16 @@ CUpgrade *civilization::get_class_upgrade(const upgrade_class *upgrade_class) co
 	}
 
 	return nullptr;
+}
+
+QVariantList civilization::get_acquired_upgrades_qstring_list() const
+{
+	return container::to_qvariant_list(this->get_acquired_upgrades());
+}
+
+void civilization::remove_acquired_upgrade(CUpgrade *upgrade)
+{
+	vector::remove(this->acquired_upgrades, upgrade);
 }
 
 }
