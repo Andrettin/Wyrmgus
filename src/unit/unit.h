@@ -48,7 +48,6 @@ class CUniqueItem;
 class CUnit;
 class CUnitPtr;
 class CUnitStats;
-class CUnitTypeVariation;
 class CUpgrade;
 class CViewport;
 class PathFinderData;
@@ -63,6 +62,7 @@ namespace stratagus {
 	class player_color;
 	class time_of_day;
 	class unit_type;
+	class unit_type_variation;
 	enum class item_class;
 	enum class item_slot;
 }
@@ -193,12 +193,12 @@ public:
 	void Retrain();
 	void HealingItemAutoUse();
 	void SetCharacter(const std::string &character_full_name, bool custom_hero = false);
-	bool CheckTerrainForVariation(const CUnitTypeVariation *variation) const;
-	bool CheckSeasonForVariation(const CUnitTypeVariation *variation) const;
+	bool CheckTerrainForVariation(const stratagus::unit_type_variation *variation) const;
+	bool CheckSeasonForVariation(const stratagus::unit_type_variation *variation) const;
 	void ChooseVariation(const stratagus::unit_type *new_type = nullptr, bool ignore_old_variation = false, int image_layer = -1);
-	void SetVariation(CUnitTypeVariation *new_variation, const stratagus::unit_type *new_type = nullptr, int image_layer = -1);
-	const CUnitTypeVariation *GetVariation() const;
-	const CUnitTypeVariation *GetLayerVariation(const unsigned int image_layer) const;
+	void SetVariation(stratagus::unit_type_variation *new_variation, const stratagus::unit_type *new_type = nullptr, int image_layer = -1);
+	const stratagus::unit_type_variation *GetVariation() const;
+	const stratagus::unit_type_variation *GetLayerVariation(const unsigned int image_layer) const;
 	void UpdateButtonIcons();
 	void ChooseButtonIcon(const ButtonCmd button_action);
 	void EquipItem(CUnit &item, bool affect_character = true);

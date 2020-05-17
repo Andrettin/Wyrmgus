@@ -46,7 +46,6 @@ class CConstruction;
 class CFile;
 class CPlayerColorGraphic;
 class CSpell;
-class CUnitTypeVariation;
 //Wyrmgus start
 class CUniqueItem;
 //Wyrmgus end
@@ -71,6 +70,7 @@ namespace stratagus {
 	class time_of_day;
 	class unit_class;
 	class unit_type;
+	class unit_type_variation;
 	class world;
 	enum class gender;
 	enum class item_class;
@@ -853,6 +853,7 @@ class unit_type final : public detailed_data_entry, public data_type<unit_type>,
 	Q_PROPERTY(QString image_file READ get_image_file_qstring)
 	Q_PROPERTY(QSize frame_size MEMBER frame_size READ get_frame_size)
 	Q_PROPERTY(int draw_level MEMBER draw_level READ get_draw_level)
+	Q_PROPERTY(stratagus::item_class item_class MEMBER item_class READ get_item_class)
 	Q_PROPERTY(stratagus::unit_type* corpse_type MEMBER corpse_type READ get_corpse_type)
 
 public:
@@ -980,8 +981,8 @@ public:
 	void UpdateDefaultBoolFlags();
 	int GetAvailableLevelUpUpgrades() const;
 	int GetResourceStep(const int resource, const int player) const;
-	const CUnitTypeVariation *GetDefaultVariation(const CPlayer *player, const int image_layer = -1) const;
-	CUnitTypeVariation *GetVariation(const std::string &variation_name, int image_layer = -1) const;
+	const unit_type_variation *GetDefaultVariation(const CPlayer *player, const int image_layer = -1) const;
+	unit_type_variation *GetVariation(const std::string &variation_name, int image_layer = -1) const;
 	std::string GetRandomVariationIdent(int image_layer = -1) const;
 	const std::string &GetDefaultName(const CPlayer *player) const;
 	CPlayerColorGraphic *GetDefaultLayerSprite(const CPlayer *player, const int image_layer) const;
@@ -1021,6 +1022,11 @@ public:
 	const std::string &get_button_key() const
 	{
 		return this->button_key;
+	}
+
+	const std::vector<std::unique_ptr<unit_type_variation>> &get_variations() const
+	{
+		return this->variations;
 	}
 
 public:
@@ -1215,9 +1221,11 @@ public:
 	int GrandStrategyProductionEfficiencyModifier[MaxCosts];	/// production modifier for a particular resource for grand strategy mode (used for buildings)
 	//Wyrmgus end
 	std::unique_ptr<resource_info> ResInfo[MaxCosts];    /// Resource information.
-	std::vector<CUnitTypeVariation *> Variations;						/// Variation information
+private:
+	std::vector<std::unique_ptr<unit_type_variation>> variations;
+public:
 	//Wyrmgus start
-	std::vector<CUnitTypeVariation *> LayerVariations[MaxImageLayers];	/// Layer variation information
+	std::vector<std::unique_ptr<unit_type_variation>> LayerVariations[MaxImageLayers];	/// Layer variation information
 	//Wyrmgus end
 	std::vector<std::unique_ptr<CBuildRestriction>> BuildingRules;   /// Rules list for building a building.
 	std::vector< std::unique_ptr<CBuildRestriction>> AiBuildingRules; /// Rules list for for AI to build a building.

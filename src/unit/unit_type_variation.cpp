@@ -39,7 +39,9 @@
 #include "ui/button.h"
 #include "video.h"
 
-CUnitTypeVariation::~CUnitTypeVariation()
+namespace stratagus {
+
+unit_type_variation::~unit_type_variation()
 {
 	if (this->Sprite) {
 		CGraphic::Free(this->Sprite);
@@ -65,32 +67,56 @@ CUnitTypeVariation::~CUnitTypeVariation()
 	}
 }
 
-/**
-**	@brief	Process data provided by a configuration file
-**
-**	@param	config_data	The configuration data
-*/
-void CUnitTypeVariation::ProcessConfigData(const CConfigData *config_data)
+void unit_type_variation::process_sml_property(const sml_property &property)
+{
+	const std::string &key = property.get_key();
+	const std::string &value = property.get_value();
+
+	if (key == "image_file") {
+		this->image_file = database::get_graphics_path(this->unit_type->get_module()) / value;
+	} else if (key == "icon") {
+		this->Icon.Name = value;
+	} else {
+		throw std::runtime_error("Invalid unit type variation property: \"" + key + "\".");
+	}
+}
+
+void unit_type_variation::process_sml_scope(const sml_data &scope)
+{
+	const std::string &tag = scope.get_tag();
+	const std::vector<std::string> &values = scope.get_values();
+
+	if (tag == "terrain_types") {
+		for (const std::string &value : values) {
+			this->Terrains.push_back(terrain_type::get(value));
+		}
+	} else if (tag == "forbidden_terrain_types") {
+		for (const std::string &value : values) {
+			this->TerrainsForbidden.push_back(terrain_type::get(value));
+		}
+	} else if (tag == "seasons") {
+		for (const std::string &value : values) {
+			this->Seasons.push_back(season::get(value));
+		}
+	} else if (tag == "forbidden_seasons") {
+		for (const std::string &value : values) {
+			this->ForbiddenSeasons.push_back(season::get(value));
+		}
+	} else {
+		throw std::runtime_error("Invalid unit type variation scope: \"" + tag + "\".");
+	}
+}
+
+void unit_type_variation::ProcessConfigData(const CConfigData *config_data)
 {
 	for (size_t i = 0; i < config_data->Properties.size(); ++i) {
 		std::string key = config_data->Properties[i].first;
 		std::string value = config_data->Properties[i].second;
 		
-		if (key == "variation_id") {
-			value = FindAndReplaceString(value, "_", "-");
-			this->VariationId = value;
-		} else if (key == "layer") {
-			value = FindAndReplaceString(value, "_", "-");
-			this->ImageLayer = GetImageLayerIdByName(value);
-			if (this->ImageLayer == -1) {
-				fprintf(stderr, "Invalid image layer: \"%s\".\n", value.c_str());
-			}
-		} else if (key == "type_name") {
+		if (key == "type_name") {
 			this->TypeName = value;
 		} else if (key == "button_key") {
 			this->button_key = value;
-		} else if (key == "file") {
-			this->File = CMod::GetCurrentModPath() + value;
 		} else if (key == "shadow_file") {
 			this->ShadowFile = CMod::GetCurrentModPath() + value;
 		} else if (key == "light_file") {
@@ -105,7 +131,7 @@ void CUnitTypeVariation::ProcessConfigData(const CConfigData *config_data)
 			this->Icon.Icon = nullptr;
 			this->Icon.Load();
 		} else if (key == "animations") {
-			this->Animations = stratagus::animation_set::get(value);
+			this->Animations = animation_set::get(value);
 		} else if (key == "construction") {
 			value = FindAndReplaceString(value, "_", "-");
 			this->Construction = ConstructionByIdent(value);
@@ -119,26 +145,26 @@ void CUnitTypeVariation::ProcessConfigData(const CConfigData *config_data)
 			const CUpgrade *upgrade = CUpgrade::get(value);
 			this->UpgradesForbidden.push_back(upgrade);
 		} else if (key == "item_class_equipped") {
-			this->item_classes_equipped.insert(stratagus::string_to_item_class(value));
+			this->item_classes_equipped.insert(string_to_item_class(value));
 		} else if (key == "item_class_not_equipped") {
-			this->item_classes_not_equipped.insert(stratagus::string_to_item_class(value));
+			this->item_classes_not_equipped.insert(string_to_item_class(value));
 		} else if (key == "item_equipped") {
-			const stratagus::unit_type *unit_type = stratagus::unit_type::get(value);
+			const stratagus::unit_type *unit_type = unit_type::get(value);
 			this->ItemsEquipped.push_back(unit_type);
 		} else if (key == "item_not_equipped") {
-			const stratagus::unit_type *unit_type = stratagus::unit_type::get(value);
+			const stratagus::unit_type *unit_type = unit_type::get(value);
 			this->ItemsNotEquipped.push_back(unit_type);
 		} else if (key == "terrain") {
-			const stratagus::terrain_type *terrain_type = stratagus::terrain_type::get(value);
+			const terrain_type *terrain_type = terrain_type::get(value);
 			this->Terrains.push_back(terrain_type);
 		} else if (key == "forbidden_terrain") {
-			const stratagus::terrain_type *terrain_type = stratagus::terrain_type::get(value);
+			const terrain_type *terrain_type = terrain_type::get(value);
 			this->TerrainsForbidden.push_back(terrain_type);
 		} else if (key == "season") {
-			const stratagus::season *season = stratagus::season::get(value);
+			const season *season = season::get(value);
 			this->Seasons.push_back(season);
 		} else if (key == "forbidden_season") {
-			const stratagus::season *season = stratagus::season::get(value);
+			const season *season = season::get(value);
 			this->ForbiddenSeasons.push_back(season);
 		} else if (key == "resource_min") {
 			this->ResourceMin = std::stoi(value);
@@ -275,4 +301,6 @@ void CUnitTypeVariation::ProcessConfigData(const CConfigData *config_data)
 			fprintf(stderr, "Invalid unit type variation property: \"%s\".\n", child_config_data->Tag.c_str());
 		}
 	}
+}
+
 }

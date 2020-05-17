@@ -681,21 +681,16 @@ static int CclDefineUnitType(lua_State *l)
 			type->DefaultStat.Variables[VARIATION_INDEX].Enable = 1;
 			type->DefaultStat.Variables[VARIATION_INDEX].Value = 0;
 			//remove previously defined variations, if any
-			for (CUnitTypeVariation *variation : type->Variations) {
-				delete variation;
-			}
-			type->Variations.clear();
+			type->variations.clear();
 			//remove previously defined layer variations, if any
 			for (int i = 0; i < MaxImageLayers; ++i) {
-				for (CUnitTypeVariation *variation : type->LayerVariations[i]) {
-					delete variation;
-				}
 				type->LayerVariations[i].clear();
 			}
 			const int args = lua_rawlen(l, -1);
 			for (int j = 0; j < args; ++j) {
 				lua_rawgeti(l, -1, j + 1);
-				CUnitTypeVariation *variation = new CUnitTypeVariation;
+				std::unique_ptr<stratagus::unit_type_variation> variation;
+				int image_layer = -1;
 				if (!lua_istable(l, -1)) {
 					LuaError(l, "incorrect argument (expected table for variations)");
 				}
@@ -705,25 +700,16 @@ static int CclDefineUnitType(lua_State *l)
 					++k;
 					if (!strcmp(value, "layer")) {
 						std::string image_layer_name = LuaToString(l, -1, k + 1);
-						variation->ImageLayer = GetImageLayerIdByName(image_layer_name);
-						if (variation->ImageLayer != -1) {
-							variation->ID = type->LayerVariations[variation->ImageLayer].size();
-							type->LayerVariations[variation->ImageLayer].push_back(variation);
-						} else {
-							LuaError(l, "Image layer \"%s\" doesn't exist." _C_ image_layer_name.c_str());
-						}
+						image_layer = GetImageLayerIdByName(image_layer_name);
 					} else if (!strcmp(value, "variation-id")) {
-						variation->VariationId = LuaToString(l, -1, k + 1);
-						if (variation->ImageLayer == -1) {
-							variation->ID = type->Variations.size();
-							type->Variations.push_back(variation);
-						}
+						const std::string variation_identifier = LuaToString(l, -1, k + 1);
+						variation = std::make_unique<stratagus::unit_type_variation>(variation_identifier, type, image_layer);
 					} else if (!strcmp(value, "type-name")) {
 						variation->TypeName = LuaToString(l, -1, k + 1);
 					} else if (!strcmp(value, "button-key")) {
 						variation->button_key = LuaToString(l, -1, k + 1);
 					} else if (!strcmp(value, "file")) {
-						variation->File = LuaToString(l, -1, k + 1);
+						variation->image_file = LuaToString(l, -1, k + 1);
 					} else if (!strcmp(value, "file-when-loaded")) {
 						const int res = GetResourceIdByName(LuaToString(l, -1, k + 1));
 						++k;
@@ -817,11 +803,18 @@ static int CclDefineUnitType(lua_State *l)
 						LuaError(l, "Unsupported tag: %s" _C_ value);
 					}
 				}
+
+				if (variation->ImageLayer != -1) {
+					type->LayerVariations[variation->ImageLayer].push_back(std::move(variation));
+				} else {
+					type->variations.push_back(std::move(variation));
+				}
+
 				// Assert(variation->VariationId);
 				lua_pop(l, 1);
 			}
 			
-			type->DefaultStat.Variables[VARIATION_INDEX].Max = type->Variations.size();
+			type->DefaultStat.Variables[VARIATION_INDEX].Max = type->variations.size();
 		//Wyrmgus end
 		} else if (!strcmp(value, "Image")) {
 			if (!lua_istable(l, -1)) {
@@ -2579,9 +2572,9 @@ static int CclGetUnitTypeData(lua_State *l)
 		return 1;
 	} else if (!strcmp(data, "Variations")) {
 		std::vector<std::string> variation_idents;
-		for (CUnitTypeVariation *variation : type->Variations) {
-			if (std::find(variation_idents.begin(), variation_idents.end(), variation->VariationId) == variation_idents.end()) {
-				variation_idents.push_back(variation->VariationId);
+		for (const auto &variation : type->get_variations()) {
+			if (std::find(variation_idents.begin(), variation_idents.end(), variation->get_identifier()) == variation_idents.end()) {
+				variation_idents.push_back(variation->get_identifier());
 			}
 		}
 		
@@ -2598,9 +2591,9 @@ static int CclGetUnitTypeData(lua_State *l)
 		const int image_layer = GetImageLayerIdByName(image_layer_name);
 		
 		std::vector<std::string> variation_idents;
-		for (CUnitTypeVariation *layer_variation : type->LayerVariations[image_layer]) {
-			if (std::find(variation_idents.begin(), variation_idents.end(), layer_variation->VariationId) == variation_idents.end()) {
-				variation_idents.push_back(layer_variation->VariationId);
+		for (const auto &layer_variation : type->LayerVariations[image_layer]) {
+			if (std::find(variation_idents.begin(), variation_idents.end(), layer_variation->get_identifier()) == variation_idents.end()) {
+				variation_idents.push_back(layer_variation->get_identifier());
 			}
 		}
 		
@@ -3169,7 +3162,7 @@ void UpdateUnitVariables(CUnit &unit)
 	}
 
 	//Wyrmgus
-	unit.Variable[VARIATION_INDEX].Max = unit.Type->Variations.size();
+	unit.Variable[VARIATION_INDEX].Max = unit.Type->get_variations().size();
 	unit.Variable[VARIATION_INDEX].Enable = 1;
 	unit.Variable[VARIATION_INDEX].Value = unit.Variation;
 

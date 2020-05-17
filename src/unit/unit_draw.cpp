@@ -135,7 +135,7 @@ void DrawUnitSelection(const CViewport &vp, const CUnit &unit)
 	int frame_height = type.get_frame_height() * scale_factor;
 	int sprite_width = (type.Sprite ? type.Sprite->Width : 0);
 	int sprite_height = (type.Sprite ? type.Sprite->Height : 0);
-	const CUnitTypeVariation *variation = unit.GetVariation();
+	const stratagus::unit_type_variation *variation = unit.GetVariation();
 	if (variation && variation->FrameWidth && variation->FrameHeight) {
 		frame_width = variation->FrameWidth * scale_factor;
 		frame_height = variation->FrameHeight * scale_factor;
@@ -931,7 +931,7 @@ static void DrawConstructionShadow(const CUnit &unit, const stratagus::unit_type
 {
 	PixelPos pos = screenPos;
 	const int scale_factor = stratagus::defines::get()->get_scale_factor();
-	const CUnitTypeVariation *variation = unit.GetVariation();
+	const stratagus::unit_type_variation *variation = unit.GetVariation();
 	if (cframe->File == ConstructionFileConstruction) {
 		if (variation && variation->Construction) {
 			if (variation->Construction->ShadowSprite) {
@@ -995,7 +995,7 @@ static void DrawConstruction(const int player, const CConstructionFrame *cframe,
 	const int scale_factor = stratagus::defines::get()->get_scale_factor();
 	const stratagus::player_color *player_color = CPlayer::Players[player]->get_player_color();
 	if (cframe->File == ConstructionFileConstruction) {
-		const CUnitTypeVariation *variation = unit.GetVariation();
+		const stratagus::unit_type_variation *variation = unit.GetVariation();
 		if (variation && variation->Construction) {
 			const CConstruction &construction = *variation->Construction;
 			pos.x -= construction.Width * scale_factor / 2;
@@ -1022,7 +1022,7 @@ static void DrawConstruction(const int player, const CConstructionFrame *cframe,
 //		pos.y += type.OffsetY - type.Height / 2;
 		int frame_width = type.get_frame_width();
 		int frame_height = type.get_frame_height();
-		const CUnitTypeVariation *variation = unit.GetVariation();
+		const stratagus::unit_type_variation *variation = unit.GetVariation();
 		if (variation && variation->FrameWidth && variation->FrameHeight) {
 			frame_width = variation->FrameWidth;
 			frame_height = variation->FrameHeight;
@@ -1128,7 +1128,7 @@ void CUnit::Draw(const CViewport &vp) const
 	DrawUnitSelection(vp, *this);
 	//Wyrmgus end
 
-	const CUnitTypeVariation *variation = this->GetVariation();
+	const stratagus::unit_type_variation *variation = this->GetVariation();
 
 	if (state == 1 && under_construction && cframe) {
 		//Wyrmgus start

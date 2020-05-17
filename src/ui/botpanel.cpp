@@ -1099,8 +1099,8 @@ void CButtonPanel::Draw()
 			button_icon = Selected[0]->UnitInside->GetButtonIcon(button->Action);
 		} else if (button->Icon.Name.empty() && Selected[0]->GetButtonIcon(button->Action) != nullptr) {
 			button_icon = Selected[0]->GetButtonIcon(button->Action);
-		} else if (button->Action == ButtonCmd::ExperienceUpgradeTo && Selected[0]->GetVariation() && button_unit_type->GetVariation(Selected[0]->GetVariation()->VariationId) != nullptr && !button_unit_type->GetVariation(Selected[0]->GetVariation()->VariationId)->Icon.Name.empty()) {
-			button_icon = button_unit_type->GetVariation(Selected[0]->GetVariation()->VariationId)->Icon.Icon;
+		} else if (button->Action == ButtonCmd::ExperienceUpgradeTo && Selected[0]->GetVariation() && button_unit_type->GetVariation(Selected[0]->GetVariation()->get_identifier()) != nullptr && !button_unit_type->GetVariation(Selected[0]->GetVariation()->get_identifier())->Icon.Name.empty()) {
+			button_icon = button_unit_type->GetVariation(Selected[0]->GetVariation()->get_identifier())->Icon.Icon;
 		} else if ((button->Action == ButtonCmd::Train || button->Action == ButtonCmd::TrainClass || button->Action == ButtonCmd::Build || button->Action == ButtonCmd::BuildClass || button->Action == ButtonCmd::UpgradeTo || button->Action == ButtonCmd::ExperienceUpgradeTo) && button->Icon.Name.empty() && button_unit_type->GetDefaultVariation(CPlayer::GetThisPlayer()) != nullptr && !button_unit_type->GetDefaultVariation(CPlayer::GetThisPlayer())->Icon.Name.empty()) {
 			button_icon = button_unit_type->GetDefaultVariation(CPlayer::GetThisPlayer())->Icon.Icon;
 		} else if ((button->Action == ButtonCmd::Train || button->Action == ButtonCmd::TrainClass || button->Action == ButtonCmd::Build || button->Action == ButtonCmd::BuildClass || button->Action == ButtonCmd::UpgradeTo || button->Action == ButtonCmd::ExperienceUpgradeTo) && button->Icon.Name.empty() && !button_unit_type->Icon.Name.empty()) {

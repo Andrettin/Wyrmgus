@@ -467,7 +467,7 @@ void CMapLayer::SetSeason(CScheduledSeason *season)
 		if (
 			unit && unit->IsAlive() && unit->MapLayer == this
 		) {
-			const CUnitTypeVariation *variation = unit->GetVariation();
+			const stratagus::unit_type_variation *variation = unit->GetVariation();
 			if (variation && !unit->CheckSeasonForVariation(variation)) {
 				unit->ChooseVariation(); //choose a new variation, as the old one has become invalid due to the season change
 			}

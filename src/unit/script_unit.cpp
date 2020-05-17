@@ -1924,8 +1924,8 @@ static int CclSetUnitVariable(lua_State *l)
 		unit->SetCharacter(LuaToString(l, 3), true);
 	} else if (!strcmp(name, "Variation")) {
 		size_t variation_index = LuaToNumber(l, 3);
-		if (variation_index >= 0 && variation_index < unit->Type->Variations.size()) {
-			unit->SetVariation(unit->Type->Variations[variation_index]);
+		if (variation_index >= 0 && variation_index < unit->Type->get_variations().size()) {
+			unit->SetVariation(unit->Type->get_variations()[variation_index].get());
 			unit->Variable[VARIATION_INDEX].Value = unit->Variation;
 		}
 	} else if (!strcmp(name, "LayerVariation")) {
@@ -1935,7 +1935,7 @@ static int CclSetUnitVariable(lua_State *l)
 		if (image_layer != -1) {
 			size_t variation_index = LuaToNumber(l, 4);
 			if (variation_index >= 0 && variation_index < unit->Type->LayerVariations[image_layer].size()) {
-				unit->SetVariation(unit->Type->LayerVariations[image_layer][variation_index], nullptr, image_layer);
+				unit->SetVariation(unit->Type->LayerVariations[image_layer][variation_index].get(), nullptr, image_layer);
 			}
 		} else {
 			LuaError(l, "Image layer \"%s\" doesn't exist." _C_ image_layer_name.c_str());

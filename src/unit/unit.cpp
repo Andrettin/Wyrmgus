@@ -623,7 +623,7 @@ void CUnit::SetResourcesHeld(int quantity)
 {
 	this->ResourcesHeld = quantity;
 	
-	const CUnitTypeVariation *variation = this->GetVariation();
+	const stratagus::unit_type_variation *variation = this->GetVariation();
 	if (
 		variation
 		&& (
@@ -1059,7 +1059,7 @@ void CUnit::SetCharacter(const std::string &character_ident, bool custom_hero)
 	this->UpdateXPRequired();
 }
 
-bool CUnit::CheckTerrainForVariation(const CUnitTypeVariation *variation) const
+bool CUnit::CheckTerrainForVariation(const stratagus::unit_type_variation *variation) const
 {
 	//if the variation has one or more terrain set as a precondition, then all tiles underneath the unit must match at least one of those terrains
 	if (variation->Terrains.size() > 0) {
@@ -1097,7 +1097,7 @@ bool CUnit::CheckTerrainForVariation(const CUnitTypeVariation *variation) const
 	return true;
 }
 
-bool CUnit::CheckSeasonForVariation(const CUnitTypeVariation *variation) const
+bool CUnit::CheckSeasonForVariation(const stratagus::unit_type_variation *variation) const
 {
 	if (
 		!variation->Seasons.empty()
@@ -1124,21 +1124,21 @@ void CUnit::ChooseVariation(const stratagus::unit_type *new_type, bool ignore_ol
 		if (this->Character != nullptr && !this->Character->get_variation().empty()) {
 			priority_variation = this->Character->get_variation();
 		} else if (this->GetVariation() != nullptr) {
-			priority_variation = this->GetVariation()->VariationId;
+			priority_variation = this->GetVariation()->get_identifier();
 		}
 	} else {
 		if (image_layer == HairImageLayer && this->Character != nullptr && !this->Character->get_variation().empty()) {
 			priority_variation = this->Character->get_variation();
 		} else if (this->GetLayerVariation(image_layer)) {
-			priority_variation = this->GetLayerVariation(image_layer)->VariationId;
+			priority_variation = this->GetLayerVariation(image_layer)->get_identifier();
 		}
 	}
 	
-	std::vector<CUnitTypeVariation *> type_variations;
-	const std::vector<CUnitTypeVariation *> &variation_list = image_layer == -1 ? (new_type != nullptr ? new_type->Variations : this->Type->Variations) : (new_type != nullptr ? new_type->LayerVariations[image_layer] : this->Type->LayerVariations[image_layer]);
+	std::vector<stratagus::unit_type_variation *> type_variations;
+	const std::vector<std::unique_ptr<stratagus::unit_type_variation>> &variation_list = image_layer == -1 ? (new_type != nullptr ? new_type->get_variations() : this->Type->get_variations()) : (new_type != nullptr ? new_type->LayerVariations[image_layer] : this->Type->LayerVariations[image_layer]);
 	
 	bool found_similar = false;
-	for (CUnitTypeVariation *variation : variation_list) {
+	for (const auto &variation : variation_list) {
 		if (variation->ResourceMin && this->ResourcesHeld < variation->ResourceMin) {
 			continue;
 		}
@@ -1146,11 +1146,11 @@ void CUnit::ChooseVariation(const stratagus::unit_type *new_type, bool ignore_ol
 			continue;
 		}
 		
-		if (!this->CheckSeasonForVariation(variation)) {
+		if (!this->CheckSeasonForVariation(variation.get())) {
 			continue;
 		}
 		
-		if (!this->CheckTerrainForVariation(variation)) {
+		if (!this->CheckTerrainForVariation(variation.get())) {
 			continue;
 		}
 		
@@ -1229,7 +1229,7 @@ void CUnit::ChooseVariation(const stratagus::unit_type *new_type, bool ignore_ol
 		if ((requires_weapon && !found_weapon) || (requires_shield && !found_shield)) {
 			continue;
 		}
-		if (!ignore_old_variation && !priority_variation.empty() && (variation->VariationId.find(priority_variation) != std::string::npos || priority_variation.find(variation->VariationId) != std::string::npos)) { // if the priority variation's ident is included in that of a new viable variation (or vice-versa), give priority to the new variation over others
+		if (!ignore_old_variation && !priority_variation.empty() && (variation->get_identifier().find(priority_variation) != std::string::npos || priority_variation.find(variation->get_identifier()) != std::string::npos)) { // if the priority variation's ident is included in that of a new viable variation (or vice-versa), give priority to the new variation over others
 			if (!found_similar) {
 				found_similar = true;
 				type_variations.clear();
@@ -1240,7 +1240,7 @@ void CUnit::ChooseVariation(const stratagus::unit_type *new_type, bool ignore_ol
 			}
 		}
 		for (int j = 0; j < variation->Weight; ++j) {
-			type_variations.push_back(variation);
+			type_variations.push_back(variation.get());
 		}
 	}
 	if (type_variations.size() > 0) {
@@ -1248,7 +1248,7 @@ void CUnit::ChooseVariation(const stratagus::unit_type *new_type, bool ignore_ol
 	}
 }
 
-void CUnit::SetVariation(CUnitTypeVariation *new_variation, const stratagus::unit_type *new_type, int image_layer)
+void CUnit::SetVariation(stratagus::unit_type_variation *new_variation, const stratagus::unit_type *new_type, int image_layer)
 {
 	if (image_layer == -1) {
 		if (
@@ -1257,25 +1257,25 @@ void CUnit::SetVariation(CUnitTypeVariation *new_variation, const stratagus::uni
 		) { //if the old (if any) or the new variation has specific animations, set the unit's frame to its type's still frame
 			this->Frame = this->Type->StillFrame;
 		}
-		this->Variation = new_variation ? new_variation->ID : 0;
+		this->Variation = new_variation ? new_variation->get_index() : 0;
 	} else {
-		this->LayerVariation[image_layer] = new_variation ? new_variation->ID : -1;
+		this->LayerVariation[image_layer] = new_variation ? new_variation->get_index() : -1;
 	}
 }
 
-const CUnitTypeVariation *CUnit::GetVariation() const
+const stratagus::unit_type_variation *CUnit::GetVariation() const
 {
-	if (this->Variation < (int) this->Type->Variations.size()) {
-		return this->Type->Variations[this->Variation];
+	if (this->Variation < static_cast<int>(this->Type->get_variations().size())) {
+		return this->Type->get_variations()[this->Variation].get();
 	}
 	
 	return nullptr;
 }
 
-const CUnitTypeVariation *CUnit::GetLayerVariation(const unsigned int image_layer) const
+const stratagus::unit_type_variation *CUnit::GetLayerVariation(const unsigned int image_layer) const
 {
 	if (this->LayerVariation[image_layer] >= 0 && this->LayerVariation[image_layer] < (int) this->Type->LayerVariations[image_layer].size()) {
-		return this->Type->LayerVariations[image_layer][this->LayerVariation[image_layer]];
+		return this->Type->LayerVariations[image_layer][this->LayerVariation[image_layer]].get();
 	}
 	
 	return nullptr;
@@ -1327,13 +1327,13 @@ void CUnit::ChooseButtonIcon(const ButtonCmd button_action)
 		}
 	}
 	
-	const CUnitTypeVariation *variation = this->GetVariation();
+	const stratagus::unit_type_variation *variation = this->GetVariation();
 	if (variation && variation->ButtonIcons.find(button_action) != variation->ButtonIcons.end()) {
 		this->ButtonIcons[button_action] = variation->ButtonIcons.find(button_action)->second.Icon;
 		return;
 	}
 	for (int i = 0; i < MaxImageLayers; ++i) {
-		const CUnitTypeVariation *layer_variation = this->GetLayerVariation(i);
+		const stratagus::unit_type_variation *layer_variation = this->GetLayerVariation(i);
 		if (layer_variation && layer_variation->ButtonIcons.find(button_action) != layer_variation->ButtonIcons.end()) {
 			this->ButtonIcons[button_action] = layer_variation->ButtonIcons.find(button_action)->second.Icon;
 			return;
@@ -1508,7 +1508,7 @@ void CUnit::EquipItem(CUnit &item, bool affect_character)
 	EquippedItems[static_cast<int>(item_slot)].push_back(&item);
 	
 	//change variation, if the current one has become forbidden
-	const CUnitTypeVariation *variation = this->GetVariation();
+	const stratagus::unit_type_variation *variation = this->GetVariation();
 	if (
 		variation
 		&& (
@@ -1519,7 +1519,7 @@ void CUnit::EquipItem(CUnit &item, bool affect_character)
 		ChooseVariation(); //choose a new variation now
 	}
 	for (int i = 0; i < MaxImageLayers; ++i) {
-		const CUnitTypeVariation *layer_variation = this->GetLayerVariation(i);
+		const stratagus::unit_type_variation *layer_variation = this->GetLayerVariation(i);
 		if (
 			layer_variation
 			&& (
@@ -1690,7 +1690,7 @@ void CUnit::DeequipItem(CUnit &item, bool affect_character)
 	}
 	
 	//change variation, if the current one has become forbidden
-	const CUnitTypeVariation *variation = this->GetVariation();
+	const stratagus::unit_type_variation *variation = this->GetVariation();
 	if (
 		variation
 		&& (
@@ -1701,7 +1701,7 @@ void CUnit::DeequipItem(CUnit &item, bool affect_character)
 		ChooseVariation(); //choose a new variation now
 	}
 	for (int i = 0; i < MaxImageLayers; ++i) {
-		const CUnitTypeVariation *layer_variation = this->GetLayerVariation(i);
+		const stratagus::unit_type_variation *layer_variation = this->GetLayerVariation(i);
 
 		if (
 			layer_variation
@@ -3759,7 +3759,7 @@ void CUnit::Place(const Vec2i &pos, int z)
 			}
 		}
 		
-		const CUnitTypeVariation *variation = this->GetVariation();
+		const stratagus::unit_type_variation *variation = this->GetVariation();
 		if (variation) {
 			// if a unit that is on the tile has a terrain-dependent or season-dependent variation that is not compatible with the new tile, or if this is the first position the unit is being placed in, repick the unit's variation
 			if (!old_map_layer || !this->CheckTerrainForVariation(variation) || !this->CheckSeasonForVariation(variation)) {
@@ -4582,7 +4582,7 @@ bool CUnit::IsVisibleInViewport(const CViewport &vp) const
 
 	int frame_width = this->Type->get_frame_width();
 	int frame_height = this->Type->get_frame_height();
-	const CUnitTypeVariation *variation = this->GetVariation();
+	const stratagus::unit_type_variation *variation = this->GetVariation();
 	if (variation && variation->FrameWidth && variation->FrameHeight) {
 		frame_width = variation->FrameWidth;
 		frame_height = variation->FrameHeight;
@@ -5319,8 +5319,8 @@ CUnit *UnitOnScreen(int x, int y)
 //						  (type.Width - type.Sprite->Width) / 2 + type.BoxOffsetX;
 //		unitSpritePos.y = unitSpritePos.y - type.BoxHeight / 2 -
 //						  (type.Height - type.Sprite->Height) / 2 + type.BoxOffsetY;
-		const CUnitTypeVariation *variation = unit.GetVariation();
-		if (variation && variation->FrameWidth && variation->FrameHeight && !variation->File.empty()) {
+		const stratagus::unit_type_variation *variation = unit.GetVariation();
+		if (variation && variation->FrameWidth && variation->FrameHeight && !variation->get_image_file().empty()) {
 			unitSpritePos.x = unitSpritePos.x - type.get_box_width() * scale_factor / 2 -
 							  (variation->FrameWidth * scale_factor - variation->Sprite->Width) / 2 + type.BoxOffsetX * scale_factor;
 			unitSpritePos.y = unitSpritePos.y - type.get_box_height() * scale_factor / 2 -
@@ -6466,7 +6466,7 @@ bool CUnit::HasAdjacentRailForUnitType(const stratagus::unit_type *type) const
 
 stratagus::animation_set *CUnit::GetAnimations() const
 {
-	const CUnitTypeVariation *variation = this->GetVariation();
+	const stratagus::unit_type_variation *variation = this->GetVariation();
 	if (variation && variation->Animations) {
 		return variation->Animations;
 	} else {
@@ -6476,7 +6476,7 @@ stratagus::animation_set *CUnit::GetAnimations() const
 
 CConstruction *CUnit::GetConstruction() const
 {
-	const CUnitTypeVariation *variation = this->GetVariation();
+	const stratagus::unit_type_variation *variation = this->GetVariation();
 	if (variation && variation->Construction) {
 		return variation->Construction;
 	} else {
@@ -6494,7 +6494,7 @@ IconConfig CUnit::GetIcon() const
 		return this->Unique->Icon;
 	}
 	
-	const CUnitTypeVariation *variation = this->GetVariation();
+	const stratagus::unit_type_variation *variation = this->GetVariation();
 	if (variation && variation->Icon.Icon) {
 		return variation->Icon;
 	} else {
@@ -6526,12 +6526,12 @@ MissileConfig CUnit::GetMissile() const
 
 CPlayerColorGraphic *CUnit::GetLayerSprite(int image_layer) const
 {
-	const CUnitTypeVariation *layer_variation = this->GetLayerVariation(image_layer);
+	const stratagus::unit_type_variation *layer_variation = this->GetLayerVariation(image_layer);
 	if (layer_variation && layer_variation->Sprite) {
 		return layer_variation->Sprite;
 	}
 	
-	const CUnitTypeVariation *variation = this->GetVariation();
+	const stratagus::unit_type_variation *variation = this->GetVariation();
 	if (variation && variation->LayerSprites[image_layer]) {
 		return variation->LayerSprites[image_layer];
 	} else if (this->Type->LayerSprites[image_layer])  {
@@ -6578,7 +6578,7 @@ std::string CUnit::GetTypeName() const
 		return _("Deity");
 	}
 	
-	const CUnitTypeVariation *variation = this->GetVariation();
+	const stratagus::unit_type_variation *variation = this->GetVariation();
 	if (variation && !variation->TypeName.empty()) {
 		return _(variation->TypeName.c_str());
 	} else {

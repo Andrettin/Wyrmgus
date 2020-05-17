@@ -125,9 +125,9 @@ static void MapAnimSounds(stratagus::unit_type &type)
 		MapAnimSounds2(type.get_animation_set()->Harvest[i].get());
 	}
 	//Wyrmgus start
-	for (CUnitTypeVariation *variation : type.Variations) {
+	for (const auto &variation : type.get_variations()) {
 		if (!variation) {
-			continue;
+			throw std::runtime_error("Unit type \"" + type.get_identifier() + "\" has an null variation.");
 		}
 		if (!variation->Animations) {
 			continue;

@@ -319,12 +319,8 @@ void CUpgrade::process_sml_scope(const stratagus::sml_data &scope)
 			const std::string &key = property.get_key();
 			const std::string &value = property.get_value();
 
-			const int resource = GetResourceIdByName(key.c_str());
-			if (resource != -1) {
-				this->Costs[resource] = std::stoi(value);
-			} else {
-				fprintf(stderr, "Invalid resource: \"%s\".\n", key.c_str());
-			}
+			const stratagus::resource *resource = stratagus::resource::get(key);
+			this->Costs[resource->ID] = std::stoi(value);
 		});
 	} else if (tag == "modifier") {
 		auto modifier = std::make_unique<stratagus::upgrade_modifier>();
@@ -374,7 +370,9 @@ void CUpgrade::set_parent(const CUpgrade *parent_upgrade)
 		throw std::runtime_error("Upgrade \"" + this->get_identifier() + "\" is inheriting features from non-defined parent \"" + parent_upgrade->get_identifier() + "\".");
 	}
 
-	this->set_name(parent_upgrade->get_name());
+	if (this->get_name().empty()) {
+		this->set_name(parent_upgrade->get_name());
+	}
 	this->icon = parent_upgrade->get_icon();
 	this->upgrade_class = parent_upgrade->get_upgrade_class();
 	this->set_description(parent_upgrade->get_description());
@@ -1626,7 +1624,7 @@ static void ApplyUpgradeModifier(CPlayer &player, const stratagus::upgrade_modif
 				}
 				
 				//change variation if current one becomes forbidden
-				const CUnitTypeVariation *current_variation = unit.GetVariation();
+				const stratagus::unit_type_variation *current_variation = unit.GetVariation();
 				if (current_variation) {
 					bool upgrade_forbidden = false;
 					for (const CUpgrade *forbidden_upgrade : current_variation->UpgradesForbidden) {
@@ -1640,7 +1638,7 @@ static void ApplyUpgradeModifier(CPlayer &player, const stratagus::upgrade_modif
 					}
 				}
 				for (int i = 0; i < MaxImageLayers; ++i) {
-					const CUnitTypeVariation *current_layer_variation = unit.GetLayerVariation(i);
+					const stratagus::unit_type_variation *current_layer_variation = unit.GetLayerVariation(i);
 					if (current_layer_variation) {
 						bool upgrade_forbidden = false;
 						for (const CUpgrade *forbidden_upgrade : current_layer_variation->UpgradesForbidden) {
@@ -1918,7 +1916,7 @@ static void RemoveUpgradeModifier(CPlayer &player, const stratagus::upgrade_modi
 				}
 				
 				//change variation if current one becomes forbidden
-				const CUnitTypeVariation *current_variation = unit.GetVariation();
+				const stratagus::unit_type_variation *current_variation = unit.GetVariation();
 				if (current_variation) {
 					bool upgrade_required = false;
 					for (const CUpgrade *required_upgrade : current_variation->UpgradesRequired) {
@@ -1932,7 +1930,7 @@ static void RemoveUpgradeModifier(CPlayer &player, const stratagus::upgrade_modi
 					}
 				}
 				for (int i = 0; i < MaxImageLayers; ++i) {
-					const CUnitTypeVariation *current_layer_variation = unit.GetLayerVariation(i);
+					const stratagus::unit_type_variation *current_layer_variation = unit.GetLayerVariation(i);
 					if (current_layer_variation) {
 						bool upgrade_required = false;
 						for (const CUpgrade *required_upgrade : current_layer_variation->UpgradesRequired) {
@@ -2024,7 +2022,7 @@ void ApplyIndividualUpgradeModifier(CUnit &unit, const stratagus::upgrade_modifi
 	
 	//Wyrmgus start
 	//change variation if current one becomes forbidden
-	const CUnitTypeVariation *current_variation = unit.GetVariation();
+	const stratagus::unit_type_variation *current_variation = unit.GetVariation();
 	if (current_variation) {
 		bool upgrade_forbidden = false;
 		for (const CUpgrade *forbidden_upgrade : current_variation->UpgradesForbidden) {
@@ -2038,7 +2036,7 @@ void ApplyIndividualUpgradeModifier(CUnit &unit, const stratagus::upgrade_modifi
 		}
 	}
 	for (int i = 0; i < MaxImageLayers; ++i) {
-		const CUnitTypeVariation *current_layer_variation = unit.GetLayerVariation(i);
+		const stratagus::unit_type_variation *current_layer_variation = unit.GetLayerVariation(i);
 		if (current_layer_variation) {
 			bool upgrade_forbidden = false;
 			for (const CUpgrade *forbidden_upgrade : current_layer_variation->UpgradesForbidden) {
@@ -2120,7 +2118,7 @@ void RemoveIndividualUpgradeModifier(CUnit &unit, const stratagus::upgrade_modif
 	
 	//Wyrmgus start
 	//change variation if current one becomes forbidden
-	const CUnitTypeVariation *current_variation = unit.GetVariation();
+	const stratagus::unit_type_variation *current_variation = unit.GetVariation();
 	if (current_variation) {
 		bool upgrade_required = false;
 		for (const CUpgrade *required_upgrade : current_variation->UpgradesRequired) {
@@ -2134,7 +2132,7 @@ void RemoveIndividualUpgradeModifier(CUnit &unit, const stratagus::upgrade_modif
 		}
 	}
 	for (int i = 0; i < MaxImageLayers; ++i) {
-		const CUnitTypeVariation *current_layer_variation = unit.GetLayerVariation(i);
+		const stratagus::unit_type_variation *current_layer_variation = unit.GetLayerVariation(i);
 		if (current_layer_variation) {
 			bool upgrade_required = false;
 			for (const CUpgrade *required_upgrade : current_layer_variation->UpgradesRequired) {

@@ -494,7 +494,7 @@ static void DrawUnitInfo_Training(const CUnit &unit)
 		if (UI.SingleTrainingButton) {
 			const COrder_Train &order = *static_cast<COrder_Train *>(unit.CurrentOrder());
 			//Wyrmgus sta
-			const CUnitTypeVariation *variation = order.GetUnitType().GetDefaultVariation(CPlayer::GetThisPlayer());
+			const stratagus::unit_type_variation *variation = order.GetUnitType().GetDefaultVariation(CPlayer::GetThisPlayer());
 //			stratagus::icon &icon = *order.GetUnitType().Icon.Icon;
 			stratagus::icon &icon = (variation && variation->Icon.Icon) ? *variation->Icon.Icon : *order.GetUnitType().Icon.Icon;
 			//Wyrmgus end
@@ -530,7 +530,7 @@ static void DrawUnitInfo_Training(const CUnit &unit)
 					if (j >= UI.TrainingButtons.size()) {
 						break;
 					}
-					const CUnitTypeVariation *variation = order.GetUnitType().GetDefaultVariation(CPlayer::GetThisPlayer());
+					const stratagus::unit_type_variation *variation = order.GetUnitType().GetDefaultVariation(CPlayer::GetThisPlayer());
 					stratagus::icon &icon = (variation && variation->Icon.Icon) ? *variation->Icon.Icon : *order.GetUnitType().Icon.Icon;
 					//Wyrmgus start
 //					const int flag = (ButtonAreaUnderCursor == ButtonAreaTraining

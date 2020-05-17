@@ -117,7 +117,7 @@
 **
 **    Animation scripts for the different actions. Currently the
 **    animations still, move, attack and die are supported.
-**  @see stratagus::animation_set
+**  @see animation_set
 **  @see CAnimation
 **
 **  unit_type::Icon
@@ -583,16 +583,6 @@ unit_type::~unit_type()
 		}
 	}
 
-	for (CUnitTypeVariation *variation : this->Variations) {
-		delete variation;
-	}
-	
-	for (int i = 0; i < MaxImageLayers; ++i) {
-		for (CUnitTypeVariation *layer_variation : this->LayerVariations[i]) {
-			delete layer_variation;
-		}
-	}
-
 	CGraphic::Free(Sprite);
 	CGraphic::Free(ShadowSprite);
 	//Wyrmgus start
@@ -699,7 +689,15 @@ void unit_type::process_sml_scope(const sml_data &scope)
 	const std::string &tag = scope.get_tag();
 	const std::vector<std::string> &values = scope.get_values();
 
-	if (tag == "weapon_classes") {
+	if (tag == "costs") {
+		scope.for_each_property([&](const stratagus::sml_property &property) {
+			const std::string &key = property.get_key();
+			const std::string &value = property.get_value();
+
+			const stratagus::resource *resource = resource::get(key);
+			this->DefaultStat.Costs[resource->ID] = std::stoi(value);
+		});
+	} else if (tag == "weapon_classes") {
 		for (const std::string &value : values) {
 			this->WeaponClasses.push_back(string_to_item_class(value));
 		}
@@ -729,6 +727,20 @@ void unit_type::process_sml_scope(const sml_data &scope)
 			resource_info *res_info_ptr = this->ResInfo[resource->ID].get();
 			database::process_sml_data(res_info_ptr, child_scope);
 		});
+	} else if (tag == "variations") {
+		this->DefaultStat.Variables[VARIATION_INDEX].Enable = 1;
+		this->DefaultStat.Variables[VARIATION_INDEX].Value = 0;
+
+		scope.for_each_child([&](const sml_data &child_scope) {
+			const std::string &tag = child_scope.get_tag();
+			auto variation = std::make_unique<unit_type_variation>(tag, this);
+
+			database::process_sml_data(variation, child_scope);
+
+			this->variations.push_back(std::move(variation));
+		});
+
+		this->DefaultStat.Variables[VARIATION_INDEX].Max = static_cast<int>(this->variations.size());
 	} else if (tag == "sounds") {
 		scope.for_each_property([&](const sml_property &property) {
 			const std::string &key = property.get_key();
@@ -794,6 +806,12 @@ void unit_type::process_sml_scope(const sml_data &scope)
 				throw std::runtime_error("Invalid sound tag: \"" + key + "\".");
 			}
 		});
+	} else if (tag == "predependencies") {
+		this->Predependency = new and_dependency;
+		database::process_sml_data(this->Predependency, scope);
+	} else if (tag == "dependencies") {
+		this->Dependency = new and_dependency;
+		database::process_sml_data(this->Dependency, scope);
 	} else {
 		data_entry::process_sml_scope(scope);
 	}
@@ -1138,22 +1156,6 @@ void unit_type::ProcessConfigData(const CConfigData *config_data)
 		} else if (child_config_data->Tag == "dependencies") {
 			this->Dependency = new and_dependency;
 			this->Dependency->ProcessConfigData(child_config_data);
-		} else if (child_config_data->Tag == "variation") {
-			this->DefaultStat.Variables[VARIATION_INDEX].Enable = 1;
-			this->DefaultStat.Variables[VARIATION_INDEX].Value = 0;
-			
-			CUnitTypeVariation *variation = new CUnitTypeVariation;
-			variation->ProcessConfigData(child_config_data);
-			
-			if (variation->ImageLayer == -1) {
-				variation->ID = this->Variations.size();
-				this->Variations.push_back(variation);
-			} else {
-				variation->ID = this->LayerVariations[variation->ImageLayer].size();
-				this->LayerVariations[variation->ImageLayer].push_back(variation);
-			}
-			
-			this->DefaultStat.Variables[VARIATION_INDEX].Max = this->Variations.size();
 		} else {
 			std::string tag = string::snake_case_to_pascal_case(child_config_data->Tag);
 			
@@ -1577,85 +1579,16 @@ void unit_type::set_parent(const unit_type *parent_type)
 		this->AiBuildingRules.push_back(building_rule->duplicate());
 	}
 
-	for (CUnitTypeVariation *parent_variation : parent_type->Variations) {
-		CUnitTypeVariation *variation = new CUnitTypeVariation;
-		
-		variation->ID = this->Variations.size();
-		this->Variations.push_back(variation);
-		
-		variation->VariationId = parent_variation->VariationId;
-		variation->TypeName = parent_variation->TypeName;
-		variation->button_key = parent_variation->button_key;
-		variation->File = parent_variation->File;
-		for (unsigned int i = 0; i < MaxCosts; ++i) {
-			variation->FileWhenLoaded[i] = parent_variation->FileWhenLoaded[i];
-			variation->FileWhenEmpty[i] = parent_variation->FileWhenEmpty[i];
-		}
-		variation->ShadowFile = parent_variation->ShadowFile;
-		variation->LightFile = parent_variation->LightFile;
-		variation->FrameWidth = parent_variation->FrameWidth;
-		variation->FrameHeight = parent_variation->FrameHeight;
-		variation->ResourceMin = parent_variation->ResourceMin;
-		variation->ResourceMax = parent_variation->ResourceMax;
-		variation->Weight = parent_variation->Weight;
-		variation->Icon.Name = parent_variation->Icon.Name;
-		variation->Icon.Icon = nullptr;
-		if (!variation->Icon.Name.empty()) {
-			variation->Icon.Load();
-		}
-		if (parent_variation->Animations) {
-			variation->Animations = parent_variation->Animations;
-		}
-		variation->Construction = parent_variation->Construction;
-		variation->UpgradesRequired = parent_variation->UpgradesRequired;
-		variation->UpgradesForbidden = parent_variation->UpgradesForbidden;
-		variation->item_classes_equipped = parent_variation->item_classes_equipped;
-		variation->item_classes_not_equipped = parent_variation->item_classes_not_equipped;
-		for (size_t i = 0; i < parent_variation->ItemsEquipped.size(); ++i) {
-			variation->ItemsEquipped.push_back(parent_variation->ItemsEquipped[i]);
-		}
-		for (size_t i = 0; i < parent_variation->ItemsNotEquipped.size(); ++i) {
-			variation->ItemsNotEquipped.push_back(parent_variation->ItemsNotEquipped[i]);
-		}
-		for (size_t i = 0; i < parent_variation->Terrains.size(); ++i) {
-			variation->Terrains.push_back(parent_variation->Terrains[i]);
-		}
-		
-		for (int i = 0; i < MaxImageLayers; ++i) {
-			variation->LayerFiles[i] = parent_variation->LayerFiles[i];
-		}
-		for (std::map<ButtonCmd, IconConfig>::iterator iterator = parent_variation->ButtonIcons.begin(); iterator != parent_variation->ButtonIcons.end(); ++iterator) {
-			variation->ButtonIcons[iterator->first].Name = iterator->second.Name;
-			variation->ButtonIcons[iterator->first].Icon = nullptr;
-			variation->ButtonIcons[iterator->first].Load();
-		}
+	for (const auto &parent_variation : parent_type->variations) {
+		this->variations.push_back(parent_variation->duplicate(this));
 	}
 	
 	for (int i = 0; i < MaxImageLayers; ++i) {
 		this->LayerFiles[i] = parent_type->LayerFiles[i];
 		
 		//inherit layer variations
-		for (CUnitTypeVariation *parent_variation : parent_type->LayerVariations[i]) {
-			CUnitTypeVariation *variation = new CUnitTypeVariation;
-			
-			variation->ID = this->LayerVariations[i].size();
-			this->LayerVariations[i].push_back(variation);
-				
-			variation->VariationId = parent_variation->VariationId;
-			variation->File = parent_variation->File;
-			variation->UpgradesRequired = parent_variation->UpgradesRequired;
-			variation->UpgradesForbidden = parent_variation->UpgradesForbidden;
-			variation->item_classes_equipped = parent_variation->item_classes_equipped;
-			variation->item_classes_not_equipped = parent_variation->item_classes_not_equipped;
-			for (size_t u = 0; u < parent_variation->ItemsEquipped.size(); ++u) {
-				variation->ItemsEquipped.push_back(parent_variation->ItemsEquipped[u]);
-			}
-			for (size_t u = 0; u < parent_variation->ItemsNotEquipped.size(); ++u) {
-				variation->ItemsNotEquipped.push_back(parent_variation->ItemsNotEquipped[u]);
-			}
-			for (size_t u = 0; u < parent_variation->Terrains.size(); ++u) {
-				variation->Terrains.push_back(parent_variation->Terrains[u]);
-			}
+		for (const auto &parent_variation : parent_type->LayerVariations[i]) {
+			this->LayerVariations[i].push_back(parent_variation->duplicate(this));
 		}
 	}
 	for (std::map<ButtonCmd, IconConfig>::const_iterator iterator = parent_type->ButtonIcons.begin(); iterator != parent_type->ButtonIcons.end(); ++iterator) {
@@ -1682,19 +1615,19 @@ void unit_type::UpdateDefaultBoolFlags()
 //Wyrmgus start
 void unit_type::RemoveButtons(const ButtonCmd button_action, const std::string &mod_file)
 {
-	int buttons_size = stratagus::button::get_all().size();
+	int buttons_size = button::get_all().size();
 	for (int i = (buttons_size - 1); i >= 0; --i) {
-		if (button_action != ButtonCmd::None && stratagus::button::get_all()[i]->Action != button_action) {
+		if (button_action != ButtonCmd::None && button::get_all()[i]->Action != button_action) {
 			continue;
 		}
-		if (!mod_file.empty() && stratagus::button::get_all()[i]->Mod != mod_file) {
+		if (!mod_file.empty() && button::get_all()[i]->Mod != mod_file) {
 			continue;
 		}
 		
-		if (stratagus::button::get_all()[i]->UnitMask == ("," + this->Ident + ",")) { //delete the appropriate buttons
-			stratagus::button::remove(stratagus::button::get_all()[i]);
-		} else if (stratagus::button::get_all()[i]->UnitMask.find(this->Ident) != std::string::npos) { //remove this unit from the "ForUnit" array of the appropriate buttons
-			stratagus::button::get_all()[i]->UnitMask = FindAndReplaceString(stratagus::button::get_all()[i]->UnitMask, this->Ident + ",", "");
+		if (button::get_all()[i]->UnitMask == ("," + this->Ident + ",")) { //delete the appropriate buttons
+			button::remove(button::get_all()[i]);
+		} else if (button::get_all()[i]->UnitMask.find(this->Ident) != std::string::npos) { //remove this unit from the "ForUnit" array of the appropriate buttons
+			button::get_all()[i]->UnitMask = FindAndReplaceString(button::get_all()[i]->UnitMask, this->Ident + ",", "");
 		}
 	}
 }
@@ -1766,10 +1699,10 @@ int unit_type::GetResourceStep(const int resource, const int player) const
 	return resource_step;
 }
 
-const CUnitTypeVariation *unit_type::GetDefaultVariation(const CPlayer *player, const int image_layer) const
+const unit_type_variation *unit_type::GetDefaultVariation(const CPlayer *player, const int image_layer) const
 {
-	const std::vector<CUnitTypeVariation *> &variation_list = image_layer == -1 ? this->Variations : this->LayerVariations[image_layer];
-	for (CUnitTypeVariation *variation : variation_list) {
+	const std::vector<std::unique_ptr<unit_type_variation>> &variation_list = image_layer == -1 ? this->get_variations() : this->LayerVariations[image_layer];
+	for (const auto &variation : variation_list) {
 		bool upgrades_check = true;
 		for (const CUpgrade *required_upgrade : variation->UpgradesRequired) {
 			if (UpgradeIdentAllowed(*player, required_upgrade->Ident.c_str()) != 'R') {
@@ -1790,17 +1723,17 @@ const CUnitTypeVariation *unit_type::GetDefaultVariation(const CPlayer *player, 
 		if (upgrades_check == false) {
 			continue;
 		}
-		return variation;
+		return variation.get();
 	}
 	return nullptr;
 }
 
-CUnitTypeVariation *unit_type::GetVariation(const std::string &variation_name, int image_layer) const
+unit_type_variation *unit_type::GetVariation(const std::string &variation_name, int image_layer) const
 {
-	const std::vector<CUnitTypeVariation *> &variation_list = image_layer == -1 ? this->Variations : this->LayerVariations[image_layer];
-	for (CUnitTypeVariation *variation : variation_list) {
-		if (variation->VariationId == variation_name) {
-			return variation;
+	const std::vector<std::unique_ptr<unit_type_variation>> &variation_list = image_layer == -1 ? this->get_variations() : this->LayerVariations[image_layer];
+	for (const auto &variation : variation_list) {
+		if (variation->get_identifier() == variation_name) {
+			return variation.get();
 		}
 	}
 	return nullptr;
@@ -1810,9 +1743,9 @@ std::string unit_type::GetRandomVariationIdent(int image_layer) const
 {
 	std::vector<std::string> variation_idents;
 	
-	const std::vector<CUnitTypeVariation *> &variation_list = image_layer == -1 ? this->Variations : this->LayerVariations[image_layer];
-	for (const CUnitTypeVariation *variation : variation_list) {
-		variation_idents.push_back(variation->VariationId);
+	const std::vector<std::unique_ptr<unit_type_variation>> &variation_list = image_layer == -1 ? this->get_variations() : this->LayerVariations[image_layer];
+	for (const auto &variation : variation_list) {
+		variation_idents.push_back(variation->get_identifier());
 	}
 	
 	if (variation_idents.size() > 0) {
@@ -1824,7 +1757,7 @@ std::string unit_type::GetRandomVariationIdent(int image_layer) const
 
 const std::string &unit_type::GetDefaultName(const CPlayer *player) const
 {
-	const CUnitTypeVariation *variation = this->GetDefaultVariation(player);
+	const unit_type_variation *variation = this->GetDefaultVariation(player);
 	if (variation && !variation->TypeName.empty()) {
 		return variation->TypeName;
 	} else {
@@ -1834,7 +1767,7 @@ const std::string &unit_type::GetDefaultName(const CPlayer *player) const
 
 CPlayerColorGraphic *unit_type::GetDefaultLayerSprite(const CPlayer *player, int image_layer) const
 {
-	const CUnitTypeVariation *variation = this->GetDefaultVariation(player);
+	const unit_type_variation *variation = this->GetDefaultVariation(player);
 	if (this->LayerVariations[image_layer].size() > 0 && this->GetDefaultVariation(player, image_layer)->Sprite) {
 		return this->GetDefaultVariation(player, image_layer)->Sprite;
 	} else if (variation && variation->LayerSprites[image_layer]) {
@@ -1848,7 +1781,7 @@ CPlayerColorGraphic *unit_type::GetDefaultLayerSprite(const CPlayer *player, int
 
 const std::string &unit_type::get_default_button_key(const CPlayer *player) const
 {
-	const CUnitTypeVariation *variation = this->GetDefaultVariation(player);
+	const unit_type_variation *variation = this->GetDefaultVariation(player);
 	if (variation != nullptr && !variation->get_button_key().empty()) {
 		return variation->get_button_key();
 	} else {
@@ -2685,15 +2618,15 @@ void LoadUnitTypeSprite(stratagus::unit_type &type)
 	//Wyrmgus end
 
 	//Wyrmgus start
-	for (CUnitTypeVariation *variation : type.Variations) {
+	for (const auto &variation : type.get_variations()) {
 		int frame_width = type.get_frame_size().width();
 		int frame_height = type.get_frame_size().height();
 		if (variation->FrameWidth && variation->FrameHeight) {
 			frame_width = variation->FrameWidth;
 			frame_height = variation->FrameHeight;
 		}
-		if (!variation->File.empty()) {
-			variation->Sprite = CPlayerColorGraphic::New(variation->File, frame_width, frame_height);
+		if (!variation->get_image_file().empty()) {
+			variation->Sprite = CPlayerColorGraphic::New(variation->get_image_file().string(), frame_width, frame_height);
 			variation->Sprite->Load(false, stratagus::defines::get()->get_scale_factor());
 		}
 		if (!variation->ShadowFile.empty()) {
@@ -2724,9 +2657,9 @@ void LoadUnitTypeSprite(stratagus::unit_type &type)
 	}
 	
 	for (int i = 0; i < MaxImageLayers; ++i) {
-		for (CUnitTypeVariation *layer_variation : type.LayerVariations[i]) {
-			if (!layer_variation->File.empty()) {
-				layer_variation->Sprite = CPlayerColorGraphic::New(layer_variation->File, type.get_frame_size());
+		for (const auto &layer_variation : type.LayerVariations[i]) {
+			if (!layer_variation->get_image_file().empty()) {
+				layer_variation->Sprite = CPlayerColorGraphic::New(layer_variation->get_image_file().string(), type.get_frame_size());
 				layer_variation->Sprite->Load(false, stratagus::defines::get()->get_scale_factor());
 			}
 		}
@@ -2772,7 +2705,7 @@ void LoadUnitType(stratagus::unit_type &type)
 		type.Icon.Load();
 	}
 
-	for (CUnitTypeVariation *variation : type.Variations) {
+	for (const auto &variation : type.get_variations()) {
 		if (!variation->Icon.Name.empty()) {
 			variation->Icon.Load();
 		}
