@@ -134,6 +134,35 @@ void unit_sound_set::process_sml_scope(const sml_data &scope)
 	throw std::runtime_error("Invalid unit sound set scope: \"" + scope.get_tag() + "\".");
 }
 
+void unit_sound_set::map_sounds()
+{
+	this->Selected.MapSound();
+	this->Acknowledgement.MapSound();
+	this->Attack.MapSound();
+	this->Idle.MapSound();
+	this->Build.MapSound();
+	this->Ready.MapSound();
+	this->Repair.MapSound();
+	this->Hit.MapSound();
+	this->Miss.MapSound();
+	this->FireMissile.MapSound();
+	this->Step.MapSound();
+	this->StepDirt.MapSound();
+	this->StepGrass.MapSound();
+	this->StepGravel.MapSound();
+	this->StepMud.MapSound();
+	this->StepStone.MapSound();
+	this->Used.MapSound();
+	for (int i = 0; i < MaxCosts; ++i) {
+		this->Harvest[i].MapSound();
+	}
+	this->Help.MapSound();
+	this->HelpTown.MapSound();
+	for (int i = 0; i <= ANIMATIONS_DEATHTYPES; ++i) {
+		this->Dead[i].MapSound();
+	}
+}
+
 }
 
 static void MapAnimSound(CAnimation *anim)
@@ -228,50 +257,13 @@ void MapUnitSounds()
 	}
 
 	for (stratagus::civilization *civilization : stratagus::civilization::get_all()) {
-		civilization->UnitSounds.Selected.MapSound();
-		civilization->UnitSounds.Acknowledgement.MapSound();
-		civilization->UnitSounds.Attack.MapSound();
-		civilization->UnitSounds.Idle.MapSound();
-		civilization->UnitSounds.Build.MapSound();
-		civilization->UnitSounds.Ready.MapSound();
-		civilization->UnitSounds.Repair.MapSound();
-		for (int j = 0; j < MaxCosts; ++j) {
-			civilization->UnitSounds.Harvest[j].MapSound();
-		}
-		civilization->UnitSounds.Help.MapSound();
-		civilization->UnitSounds.HelpTown.MapSound();
+		civilization->UnitSounds.map_sounds();
 	}
 
 	// Parse all units sounds.
 	for (stratagus::unit_type *unit_type : stratagus::unit_type::get_all()) {
 		MapAnimSounds(*unit_type);
 
-		unit_type->MapSound.Selected.MapSound();
-		unit_type->MapSound.Acknowledgement.MapSound();
-		unit_type->MapSound.Attack.MapSound();
-		//Wyrmgus start
-		unit_type->MapSound.Idle.MapSound();
-		unit_type->MapSound.Hit.MapSound();
-		unit_type->MapSound.Miss.MapSound();
-		unit_type->MapSound.FireMissile.MapSound();
-		unit_type->MapSound.Step.MapSound();
-		unit_type->MapSound.StepDirt.MapSound();
-		unit_type->MapSound.StepGrass.MapSound();
-		unit_type->MapSound.StepGravel.MapSound();
-		unit_type->MapSound.StepMud.MapSound();
-		unit_type->MapSound.StepStone.MapSound();
-		unit_type->MapSound.Used.MapSound();
-		//Wyrmgus end
-		unit_type->MapSound.Build.MapSound();
-		unit_type->MapSound.Ready.MapSound();
-		unit_type->MapSound.Repair.MapSound();
-		for (int i = 0; i < MaxCosts; ++i) {
-			unit_type->MapSound.Harvest[i].MapSound();
-		}
-		unit_type->MapSound.Help.MapSound();
-
-		for (int i = 0; i <= ANIMATIONS_DEATHTYPES; ++i) {
-			unit_type->MapSound.Dead[i].MapSound();
-		}
+		unit_type->MapSound.map_sounds();
 	}
 }

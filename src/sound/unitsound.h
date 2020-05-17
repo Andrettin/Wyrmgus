@@ -75,6 +75,8 @@ public:
 	void process_sml_property(const sml_property &property);
 	void process_sml_scope(const sml_data &scope);
 
+	void map_sounds();
+
 	SoundConfig Selected;           /// selected by user
 	SoundConfig Acknowledgement;    /// acknowledge of use command
 	SoundConfig Attack;             /// attack confirm command
