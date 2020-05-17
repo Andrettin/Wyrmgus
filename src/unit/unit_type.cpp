@@ -758,70 +758,7 @@ void unit_type::process_sml_scope(const sml_data &scope)
 			}
 		});
 	} else if (tag == "sounds") {
-		scope.for_each_property([&](const sml_property &property) {
-			const std::string &key = property.get_key();
-			const std::string &value = property.get_value();
-
-			if (key == "selected") {
-				this->Sound.Selected.Name = value;
-			} else if (key == "acknowledge") {
-				this->Sound.Acknowledgement.Name = value;
-			} else if (key == "attack") {
-				this->Sound.Attack.Name = value;
-			} else if (key == "idle") {
-				this->Sound.Idle.Name = value;
-			} else if (key == "hit") {
-				this->Sound.Hit.Name = value;
-			} else if (key == "miss") {
-				this->Sound.Miss.Name = value;
-			} else if (key == "fire_missile") {
-				this->Sound.FireMissile.Name = value;
-			} else if (key == "step") {
-				this->Sound.Step.Name = value;
-			} else if (key == "step_dirt") {
-				this->Sound.StepDirt.Name = value;
-			} else if (key == "step_grass") {
-				this->Sound.StepGrass.Name = value;
-			} else if (key == "step_gravel") {
-				this->Sound.StepGravel.Name = value;
-			} else if (key == "step_mud") {
-				this->Sound.StepMud.Name = value;
-			} else if (key == "step_stone") {
-				this->Sound.StepStone.Name = value;
-			} else if (key == "used") {
-				this->Sound.Used.Name = value;
-			} else if (key == "build") {
-				this->Sound.Build.Name = value;
-			} else if (key == "ready") {
-				this->Sound.Ready.Name = value;
-			} else if (key == "repair") {
-				this->Sound.Repair.Name = value;
-			} else if (key.find("harvest_") != std::string::npos) {
-				std::string resource_identifier = key;
-				string::replace(resource_identifier, "harvest_", "");
-				const resource *resource = resource::get(resource_identifier);
-				this->Sound.Harvest[resource->ID].Name = value;
-			} else if (key == "help") {
-				this->Sound.Help.Name = value;
-			} else if (key == "dead") {
-				this->Sound.Dead[ANIMATIONS_DEATHTYPES].Name = value;
-			} else if (key.find("dead_") != std::string::npos) {
-				std::string death_type_identifier = key;
-				string::replace(death_type_identifier, "dead_", "");
-				int death;
-				for (death = 0; death < ANIMATIONS_DEATHTYPES; ++death) {
-					if (death_type_identifier == ExtraDeathTypes[death]) {
-						this->Sound.Dead[death].Name = value;
-						break;
-					}
-				}
-				if (death == ANIMATIONS_DEATHTYPES) {
-					throw std::runtime_error("Invalid death type: \"" + death_type_identifier + "\".");
-				}
-			} else {
-				throw std::runtime_error("Invalid sound tag: \"" + key + "\".");
-			}
-		});
+		database::process_sml_data(this->Sound, scope);
 	} else if (tag == "predependencies") {
 		this->Predependency = new and_dependency;
 		database::process_sml_data(this->Predependency, scope);
@@ -1964,7 +1901,7 @@ void UpdateUnitStats(stratagus::unit_type &type, int reset)
 		}
 		
 		type.MapSound = type.Sound;
-		for (std::map<std::string, CUnitSound>::iterator iterator = type.ModSounds.begin(); iterator != type.ModSounds.end(); ++iterator) {
+		for (std::map<std::string, stratagus::unit_sound_set>::iterator iterator = type.ModSounds.begin(); iterator != type.ModSounds.end(); ++iterator) {
 			if (!iterator->second.Selected.Name.empty()) {
 				type.MapSound.Selected = iterator->second.Selected;
 			}

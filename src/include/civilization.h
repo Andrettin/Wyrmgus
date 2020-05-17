@@ -281,7 +281,7 @@ private:
 	std::string default_color; //name of the civilization's default color (used for the encyclopedia, tech tree, etc.)
 	CUpgrade *upgrade = nullptr;
 public:
-	CUnitSound UnitSounds;			/// sounds for unit events
+	unit_sound_set UnitSounds;			/// sounds for unit events
 	CLanguage *Language = nullptr;	/// the language used by the civilization
 private:
 	calendar *calendar = nullptr;	/// the calendar used by the civilization

@@ -1661,7 +1661,6 @@ void CreateGame(const std::string &filename, CMap *map, bool is_mod)
 	//
 	// Sound part
 	//
-	LoadUnitSounds();
 	MapUnitSounds();
 	if (SoundEnabled()) {
 		InitSoundClient();

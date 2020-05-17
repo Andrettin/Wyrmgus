@@ -74,6 +74,8 @@ void civilization::process_sml_scope(const sml_data &scope)
 				throw std::runtime_error("Button action \"" + key + "\" doesn't exist.");
 			}
 		});
+	} else if (tag == "unit_sounds") {
+		database::process_sml_data(this->UnitSounds, scope);
 	} else if (tag == "ui_fillers") {
 		this->ui_fillers.clear();
 

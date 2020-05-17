@@ -205,7 +205,6 @@ void LoadModules()
 
 	InitPathfinder();
 
-	LoadUnitSounds();
 	MapUnitSounds();
 	if (SoundEnabled()) {
 		InitSoundClient();

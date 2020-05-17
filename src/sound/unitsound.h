@@ -62,14 +62,19 @@ public:
 	stratagus::sound *Sound;        /// identifier send to sound server
 };
 
+namespace stratagus {
+
 /**
 **  The sounds of the units.
 **
 **  Played for the various events.
 */
-class CUnitSound
+class unit_sound_set
 {
 public:
+	void process_sml_property(const sml_property &property);
+	void process_sml_scope(const sml_data &scope);
+
 	SoundConfig Selected;           /// selected by user
 	SoundConfig Acknowledgement;    /// acknowledge of use command
 	SoundConfig Attack;             /// attack confirm command
@@ -97,19 +102,7 @@ public:
 	SoundConfig Dead[ANIMATIONS_DEATHTYPES + 1];             /// unit is killed
 };
 
-/*----------------------------------------------------------------------------
---  Variables
-----------------------------------------------------------------------------*/
-
-/*----------------------------------------------------------------------------
---  Functions
-----------------------------------------------------------------------------*/
-
-/**
-**  Loads sounds defined in unitsound.c. Should be replaced by ccl loading of
-**  sounds.
-*/
-extern void LoadUnitSounds();
+}
 
 /**
 **  Performs the mapping between sound names and sound* for each unit type.

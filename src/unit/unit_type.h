@@ -1231,10 +1231,10 @@ public:
 	std::vector< std::unique_ptr<CBuildRestriction>> AiBuildingRules; /// Rules list for for AI to build a building.
 	CColor NeutralMinimapColorRGB;   /// Minimap Color for Neutral Units.
 
-	CUnitSound Sound;				/// Sounds for events
-	CUnitSound MapSound;			/// Sounds for events, map-specific
+	unit_sound_set Sound;				/// Sounds for events
+	unit_sound_set MapSound;			/// Sounds for events, map-specific
 	//Wyrmgus start
-	std::map<std::string, CUnitSound> ModSounds;
+	std::map<std::string, unit_sound_set> ModSounds;
 	//Wyrmgus end
 
 	int PoisonDrain;                /// How much health is drained every second when poisoned
