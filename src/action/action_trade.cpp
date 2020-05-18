@@ -272,7 +272,7 @@ COrder *COrder::NewActionTrade(CUnit &dest, CUnit &home_market)
 					goal->Remove(nullptr);
 					LetUnitDie(*goal);
 				} else {
-					if (!IsNetworkGame() && goal->Container->Character && goal->Container->Player->AiEnabled == false && goal->Type->BoolFlag[ITEM_INDEX].value && goal->Container->HasInventory()) {
+					if (!IsNetworkGame() && goal->Container->Character && goal->Container->Player == CPlayer::GetThisPlayer() && goal->Type->BoolFlag[ITEM_INDEX].value && goal->Container->HasInventory()) {
 						CPersistentItem *item = goal->Container->Character->GetItem(*goal);
 						goal->Container->Character->Items.erase(std::remove(goal->Container->Character->Items.begin(), goal->Container->Character->Items.end(), item), goal->Container->Character->Items.end());
 						delete item;

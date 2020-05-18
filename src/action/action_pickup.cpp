@@ -214,7 +214,7 @@ enum {
 			goal->TTL = 0; //remove item destruction timer when picked up
 			
 			goal->Remove(&unit);
-			if (!IsNetworkGame() && unit.Character && unit.Player->AiEnabled == false) { //if the unit has a persistent character, store the item for it
+			if (!IsNetworkGame() && unit.Character && unit.Player == CPlayer::GetThisPlayer()) { //if the unit has a persistent character, store the item for it
 				CPersistentItem *item = new CPersistentItem;
 				item->Owner = unit.Character;
 				unit.Character->Items.push_back(item);

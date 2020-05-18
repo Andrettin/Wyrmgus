@@ -120,7 +120,7 @@
 			type = new_unit_type;
 		}
 	}
-	if (target->Character && target->Character->Custom && target->Character->get_civilization() && this->civilization != nullptr && this->civilization != target->Character->get_civilization()) {
+	if (target->Character && target->Character->Custom && target->Character->get_civilization() && this->civilization != nullptr && this->civilization != target->Character->get_civilization() && target->Player == CPlayer::GetThisPlayer()) {
 		target->Character->civilization = this->civilization;
 		SaveHero(target->Character);
 	}
@@ -190,7 +190,7 @@
 //	UnitClearOrders(*target);
 //	target->Release();
 	if (!IsNetworkGame() && target->Character != nullptr && &caster == target) { //save persistent data
-		if (target->Player->AiEnabled == false) {
+		if (target->Player == CPlayer::GetThisPlayer()) {
 			target->Character->set_unit_type(type);
 			SaveHero(target->Character);
 		}

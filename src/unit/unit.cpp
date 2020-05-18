@@ -834,7 +834,7 @@ void CUnit::Retrain()
 						TransformUnitIntoType(*this, *unit_type);
 						if (!IsNetworkGame() && Character != nullptr) {	//save the unit-type experience upgrade for persistent characters
 							if (Character->get_unit_type() != unit_type) {
-								if (Player->AiEnabled == false) {
+								if (this->Player == CPlayer::GetThisPlayer()) {
 									Character->set_unit_type(unit_type);
 									SaveHero(Character);
 									CAchievement::CheckAchievements();
@@ -1000,9 +1000,14 @@ void CUnit::SetCharacter(const std::string &character_ident, bool custom_hero)
 		}
 	}
 	
-	for (size_t i = 0; i < abilities_to_remove.size(); ++i) {
-		stratagus::vector::remove(this->Character->Abilities, abilities_to_remove[i]);
-		SaveHero(this->Character);
+	if (!abilities_to_remove.empty()) {
+		for (size_t i = 0; i < abilities_to_remove.size(); ++i) {
+			stratagus::vector::remove(this->Character->Abilities, abilities_to_remove[i]);
+		}
+
+		if (this->Player == CPlayer::GetThisPlayer()) {
+			SaveHero(this->Character);
+		}
 	}
 	
 	//load read works
@@ -1493,7 +1498,7 @@ void CUnit::EquipItem(CUnit &item, bool affect_character)
 		}
 	}
 
-	if (!IsNetworkGame() && Character && this->Player->AiEnabled == false && affect_character) {
+	if (!IsNetworkGame() && Character && this->Player == CPlayer::GetThisPlayer() && affect_character) {
 		if (Character->GetItem(item) != nullptr) {
 			if (!Character->IsItemEquipped(Character->GetItem(item))) {
 				Character->EquippedItems[static_cast<int>(item_slot)].push_back(Character->GetItem(item));
@@ -1622,7 +1627,7 @@ void CUnit::DeequipItem(CUnit &item, bool affect_character)
 		return;
 	}
 	
-	if (!IsNetworkGame() && Character && this->Player->AiEnabled == false && affect_character) {
+	if (!IsNetworkGame() && Character && this->Player == CPlayer::GetThisPlayer() && affect_character) {
 		if (Character->GetItem(item) != nullptr) {
 			if (Character->IsItemEquipped(Character->GetItem(item))) {
 				stratagus::vector::remove(this->Character->EquippedItems[static_cast<int>(item_slot)], this->Character->GetItem(item));
@@ -1729,7 +1734,7 @@ void CUnit::ReadWork(CUpgrade *work, bool affect_character)
 {
 	IndividualUpgradeAcquire(*this, work);
 	
-	if (!IsNetworkGame() && Character && this->Player->AiEnabled == false && affect_character) {
+	if (!IsNetworkGame() && Character && this->Player == CPlayer::GetThisPlayer() && affect_character) {
 		if (std::find(Character->ReadWorks.begin(), Character->ReadWorks.end(), work) == Character->ReadWorks.end()) {
 			Character->ReadWorks.push_back(work);
 			SaveHero(Character);
@@ -1741,7 +1746,7 @@ void CUnit::ConsumeElixir(CUpgrade *elixir, bool affect_character)
 {
 	IndividualUpgradeAcquire(*this, elixir);
 	
-	if (!IsNetworkGame() && Character && this->Player->AiEnabled == false && affect_character) {
+	if (!IsNetworkGame() && Character && this->Player == CPlayer::GetThisPlayer() && affect_character) {
 		if (std::find(Character->ConsumedElixirs.begin(), Character->ConsumedElixirs.end(), elixir) == Character->ConsumedElixirs.end()) {
 			Character->ConsumedElixirs.push_back(elixir);
 			SaveHero(Character);
@@ -1821,7 +1826,7 @@ void CUnit::SetPrefix(CUpgrade *prefix)
 		this->Variable[MAGICLEVEL_INDEX].Value -= Prefix->MagicLevel;
 		this->Variable[MAGICLEVEL_INDEX].Max -= Prefix->MagicLevel;
 	}
-	if (!IsNetworkGame() && Container && Container->Character && Container->Player->AiEnabled == false && Container->Character->GetItem(*this) != nullptr && Container->Character->GetItem(*this)->Prefix != prefix) { //update the persistent item, if applicable and if it hasn't been updated yet
+	if (!IsNetworkGame() && Container && Container->Character && Container->Player == CPlayer::GetThisPlayer() && Container->Character->GetItem(*this) != nullptr && Container->Character->GetItem(*this)->Prefix != prefix) { //update the persistent item, if applicable and if it hasn't been updated yet
 		Container->Character->GetItem(*this)->Prefix = prefix;
 		SaveHero(Container->Character);
 	}
@@ -1846,7 +1851,7 @@ void CUnit::SetSuffix(CUpgrade *suffix)
 		this->Variable[MAGICLEVEL_INDEX].Value -= Suffix->MagicLevel;
 		this->Variable[MAGICLEVEL_INDEX].Max -= Suffix->MagicLevel;
 	}
-	if (!IsNetworkGame() && Container && Container->Character && Container->Player->AiEnabled == false && Container->Character->GetItem(*this) != nullptr && Container->Character->GetItem(*this)->Suffix != suffix) { //update the persistent item, if applicable and if it hasn't been updated yet
+	if (!IsNetworkGame() && Container && Container->Character && Container->Player == CPlayer::GetThisPlayer() && Container->Character->GetItem(*this) != nullptr && Container->Character->GetItem(*this)->Suffix != suffix) { //update the persistent item, if applicable and if it hasn't been updated yet
 		Container->Character->GetItem(*this)->Suffix = suffix;
 		SaveHero(Container->Character);
 	}
@@ -1864,7 +1869,7 @@ void CUnit::SetSuffix(CUpgrade *suffix)
 
 void CUnit::SetSpell(CSpell *spell)
 {
-	if (!IsNetworkGame() && Container && Container->Character && Container->Player->AiEnabled == false && Container->Character->GetItem(*this) != nullptr && Container->Character->GetItem(*this)->Spell != spell) { //update the persistent item, if applicable and if it hasn't been updated yet
+	if (!IsNetworkGame() && Container && Container->Character && Container->Player == CPlayer::GetThisPlayer() && Container->Character->GetItem(*this) != nullptr && Container->Character->GetItem(*this)->Spell != spell) { //update the persistent item, if applicable and if it hasn't been updated yet
 		Container->Character->GetItem(*this)->Spell = spell;
 		SaveHero(Container->Character);
 	}
@@ -1880,7 +1885,7 @@ void CUnit::SetWork(CUpgrade *work)
 		this->Variable[MAGICLEVEL_INDEX].Max -= this->Work->MagicLevel;
 	}
 	
-	if (!IsNetworkGame() && Container && Container->Character && Container->Player->AiEnabled == false && Container->Character->GetItem(*this) != nullptr && Container->Character->GetItem(*this)->Work != work) { //update the persistent item, if applicable and if it hasn't been updated yet
+	if (!IsNetworkGame() && Container && Container->Character && Container->Player == CPlayer::GetThisPlayer() && Container->Character->GetItem(*this) != nullptr && Container->Character->GetItem(*this)->Work != work) { //update the persistent item, if applicable and if it hasn't been updated yet
 		Container->Character->GetItem(*this)->Work = work;
 		SaveHero(Container->Character);
 	}
@@ -1902,7 +1907,7 @@ void CUnit::SetElixir(CUpgrade *elixir)
 		this->Variable[MAGICLEVEL_INDEX].Max -= this->Elixir->MagicLevel;
 	}
 	
-	if (!IsNetworkGame() && Container && Container->Character && Container->Player->AiEnabled == false && Container->Character->GetItem(*this) != nullptr && Container->Character->GetItem(*this)->Elixir != elixir) { //update the persistent item, if applicable and if it hasn't been updated yet
+	if (!IsNetworkGame() && Container && Container->Character && Container->Player == CPlayer::GetThisPlayer() && Container->Character->GetItem(*this) != nullptr && Container->Character->GetItem(*this)->Elixir != elixir) { //update the persistent item, if applicable and if it hasn't been updated yet
 		Container->Character->GetItem(*this)->Elixir = elixir;
 		SaveHero(Container->Character);
 	}
@@ -1955,7 +1960,7 @@ void CUnit::SetUnique(CUniqueItem *unique)
 
 void CUnit::Identify()
 {
-	if (!IsNetworkGame() && Container && Container->Character && Container->Player->AiEnabled == false && Container->Character->GetItem(*this) != nullptr && Container->Character->GetItem(*this)->Identified != true) { //update the persistent item, if applicable and if it hasn't been updated yet
+	if (!IsNetworkGame() && Container && Container->Character && Container->Player == CPlayer::GetThisPlayer() && Container->Character->GetItem(*this) != nullptr && Container->Character->GetItem(*this)->Identified != true) { //update the persistent item, if applicable and if it hasn't been updated yet
 		Container->Character->GetItem(*this)->Identified = true;
 		SaveHero(Container->Character);
 	}
@@ -3599,7 +3604,7 @@ void CUnit::XPChanged()
 		this->IncreaseLevel(1);
 	}
 	
-	if (!IsNetworkGame() && this->Character != nullptr && this->Player->AiEnabled == false) {
+	if (!IsNetworkGame() && this->Character != nullptr && this->Player == CPlayer::GetThisPlayer()) {
 		this->Character->ExperiencePercent = (this->Variable[XP_INDEX].Value * 100) / this->Variable[XPREQUIRED_INDEX].Value;
 		SaveHero(this->Character);
 	}
@@ -7224,10 +7229,7 @@ static void HitUnit_AttackBack(CUnit &attacker, CUnit &target)
 	const int threshold = 30;
 	COrder *savedOrder = nullptr;
 
-	//Wyrmgus start
-//	if (target.Player->AiEnabled == false) {
-	if (target.Player->AiEnabled == false && target.Player->Type != PlayerNeutral) { // allow neutral units to strike back
-	//Wyrmgus end
+	if (target.Player == CPlayer::GetThisPlayer() && target.Player->Type != PlayerNeutral) { // allow neutral units to strike back
 		if (target.CurrentAction() == UnitAction::Attack) {
 			COrder_Attack &order = dynamic_cast<COrder_Attack &>(*target.CurrentOrder());
 			if (order.IsWeakTargetSelected() == false) {

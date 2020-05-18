@@ -3169,7 +3169,7 @@ void UpdateUnitVariables(CUnit &unit)
 	unit.Variable[TRANSPARENCY_INDEX].Max = 100;
 
 	unit.Variable[LEVEL_INDEX].Max = 100000;
-	if (!IsNetworkGame() && unit.Character != nullptr && unit.Player->AiEnabled == false) {
+	if (!IsNetworkGame() && unit.Character != nullptr && unit.Player == CPlayer::GetThisPlayer()) {
 		if (unit.Variable[LEVEL_INDEX].Value > unit.Character->Level) { //save level, if unit has a persistent character
 			unit.Character->Level = unit.Variable[LEVEL_INDEX].Value;
 			SaveHero(unit.Character);

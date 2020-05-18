@@ -2129,7 +2129,7 @@ void CButtonPanel::DoClicked_ExperienceUpgradeTo(int button)
 				Selected[i]->Variable[LEVELUP_INDEX].Max = Selected[i]->Variable[LEVELUP_INDEX].Value;
 				if (!IsNetworkGame() && Selected[i]->Character != nullptr) {	//save the unit-type experience upgrade for persistent characters
 					if (Selected[i]->Character->get_unit_type()->Slot != type.Slot) {
-						if (Selected[i]->Player->AiEnabled == false) {
+						if (Selected[i]->Player == CPlayer::GetThisPlayer()) {
 							Selected[i]->Character->set_unit_type(stratagus::unit_type::get_all()[CurrentButtons[button]->Value]);
 							SaveHero(Selected[i]->Character);
 							CAchievement::CheckAchievements();

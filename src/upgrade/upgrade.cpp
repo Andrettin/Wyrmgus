@@ -2281,7 +2281,7 @@ void AbilityAcquire(CUnit &unit, const CUpgrade *upgrade, bool save)
 	unit.Variable[LEVELUP_INDEX].Value -= 1;
 	unit.Variable[LEVELUP_INDEX].Max = unit.Variable[LEVELUP_INDEX].Value;
 	if (!IsNetworkGame() && unit.Character != nullptr && save) {
-		if (unit.Player->AiEnabled == false) { //save ability learning, if unit has a character and it is persistent, and the character doesn't have the ability yet
+		if (unit.Player == CPlayer::GetThisPlayer()) { //save ability learning, if unit has a character and it is persistent, and the character doesn't have the ability yet
 			unit.Character->Abilities.push_back(upgrade);
 			SaveHero(unit.Character);
 		}
@@ -2303,7 +2303,7 @@ void AbilityLost(CUnit &unit, CUpgrade *upgrade, bool lose_all)
 	unit.Variable[LEVELUP_INDEX].Enable = 1;
 	if (!IsNetworkGame() && unit.Character != nullptr) {
 		if (std::find(unit.Character->Abilities.begin(), unit.Character->Abilities.end(), upgrade) != unit.Character->Abilities.end()) {
-			if (unit.Player->AiEnabled == false) { //save ability learning, if unit has a character and it is persistent, and the character doesn't have the ability yet
+			if (unit.Player == CPlayer::GetThisPlayer()) { //save ability learning, if unit has a character and it is persistent, and the character doesn't have the ability yet
 				stratagus::vector::remove(unit.Character->Abilities, upgrade);
 				SaveHero(unit.Character);
 			}
@@ -2360,7 +2360,7 @@ void IndividualUpgradeAcquire(CUnit &unit, const CUpgrade *upgrade)
 					IndividualUpgradeAcquire(unit, domain_upgrade);
 				}
 			}
-			if (unit.Character && std::find(unit.Character->Deities.begin(), unit.Character->Deities.end(), upgrade_deity) == unit.Character->Deities.end()) {
+			if (unit.Character && std::find(unit.Character->Deities.begin(), unit.Character->Deities.end(), upgrade_deity) == unit.Character->Deities.end() && unit.Player == CPlayer::GetThisPlayer()) {
 				unit.Character->Deities.push_back(upgrade_deity);
 				SaveHero(unit.Character);
 			}
@@ -2412,7 +2412,7 @@ void IndividualUpgradeLost(CUnit &unit, const CUpgrade *upgrade, bool lose_all)
 					IndividualUpgradeLost(unit, domain_upgrade);
 				}
 			}
-			if (unit.Character) {
+			if (unit.Character && unit.Player == CPlayer::GetThisPlayer()) {
 				unit.Character->Deities.erase(std::remove(unit.Character->Deities.begin(), unit.Character->Deities.end(), upgrade_deity), unit.Character->Deities.end());
 				SaveHero(unit.Character);
 			}
