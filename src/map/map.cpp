@@ -2567,9 +2567,9 @@ void CMap::AdjustTileMapTransitions(const Vec2i &min_pos, const Vec2i &max_pos, 
 						continue;
 					}
 					stratagus::terrain_type *tile_terrain = GetTileTerrain(Vec2i(x + sub_x, y + sub_y), false, z);
-					if (mf.Terrain != tile_terrain && std::find(mf.Terrain->BorderTerrains.begin(), mf.Terrain->BorderTerrains.end(), tile_terrain) == mf.Terrain->BorderTerrains.end()) {
+					if (mf.Terrain != tile_terrain && !stratagus::vector::contains(mf.Terrain->BorderTerrains, tile_terrain)) {
 						for (stratagus::terrain_type *border_terrain : mf.Terrain->BorderTerrains) {
-							if (std::find(border_terrain->BorderTerrains.begin(), border_terrain->BorderTerrains.end(), mf.Terrain) != border_terrain->BorderTerrains.end() && std::find(border_terrain->BorderTerrains.begin(), border_terrain->BorderTerrains.end(), tile_terrain) != border_terrain->BorderTerrains.end()) {
+							if (stratagus::vector::contains(border_terrain->BorderTerrains, mf.Terrain) && stratagus::vector::contains(border_terrain->BorderTerrains, tile_terrain)) {
 								mf.SetTerrain(border_terrain);
 								break;
 							}
