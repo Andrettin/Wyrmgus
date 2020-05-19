@@ -388,7 +388,7 @@ Vec2i CMap::GenerateUnitLocation(const stratagus::unit_type *unit_type, const st
 		if (player != nullptr) {
 			Select(random_pos - Vec2i(32, 32), random_pos + Vec2i(unit_type->get_tile_width() - 1, unit_type->get_tile_height() - 1) + Vec2i(32, 32), table, z, MakeAndPredicate(HasNotSamePlayerAs(*player), HasNotSamePlayerAs(*CPlayer::Players[PlayerNumNeutral])));
 		} else if (!unit_type->GivesResource) {
-			if (unit_type->BoolFlag[PREDATOR_INDEX].value || (unit_type->BoolFlag[PEOPLEAVERSION_INDEX].value && (unit_type->UnitType == UnitTypeType::Fly || unit_type->UnitType == UnitTypeType::Space))) {
+			if (unit_type->BoolFlag[NEUTRAL_HOSTILE_INDEX].value || unit_type->BoolFlag[PREDATOR_INDEX].value || (unit_type->BoolFlag[PEOPLEAVERSION_INDEX].value && (unit_type->UnitType == UnitTypeType::Fly || unit_type->UnitType == UnitTypeType::Space))) {
 				Select(random_pos - Vec2i(16, 16), random_pos + Vec2i(unit_type->get_tile_width() - 1, unit_type->get_tile_height() - 1) + Vec2i(16, 16), table, z, MakeOrPredicate(HasNotSamePlayerAs(*CPlayer::Players[PlayerNumNeutral]), HasSameTypeAs(*settlement_site_unit_type)));
 			} else {
 				Select(random_pos - Vec2i(8, 8), random_pos + Vec2i(unit_type->get_tile_width() - 1, unit_type->get_tile_height() - 1) + Vec2i(8, 8), table, z, HasNotSamePlayerAs(*CPlayer::Players[PlayerNumNeutral]));
