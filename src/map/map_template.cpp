@@ -1490,9 +1490,12 @@ void map_template::ApplyUnits(const QPoint &template_start_pos, const QPoint &ma
 		
 		faction *unit_faction = historical_unit->get_faction();
 		CPlayer *unit_player = unit_faction ? GetFactionPlayer(unit_faction) : nullptr;
-		unit_type *unit_type = historical_unit->get_unit_type();
-		if (unit_type == nullptr && historical_unit->get_unit_class() != nullptr) {
-			unit_type = unit_faction->get_class_unit_type(historical_unit->get_unit_class());
+		unit_type *unit_type = nullptr;
+		if (!historical_unit->get_unit_types().empty()) {
+			unit_type = historical_unit->get_unit_types()[SyncRand(historical_unit->get_unit_types().size())];
+		} else if (!historical_unit->get_unit_classes().empty()) {
+			const unit_class *unit_class = historical_unit->get_unit_classes()[SyncRand(historical_unit->get_unit_classes().size())];
+			unit_type = unit_faction->get_class_unit_type(unit_class);
 		}
 
 		if (unit_type == nullptr) {

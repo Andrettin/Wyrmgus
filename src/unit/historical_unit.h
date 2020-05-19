@@ -43,8 +43,8 @@ class historical_unit : public named_data_entry, public data_type<historical_uni
 {
 	Q_OBJECT
 
-	Q_PROPERTY(stratagus::unit_class* unit_class MEMBER unit_class READ get_unit_class)
-	Q_PROPERTY(stratagus::unit_type* unit_type MEMBER unit_type READ get_unit_type)
+	Q_PROPERTY(stratagus::unit_class* unit_class READ get_unit_class WRITE set_unit_class)
+	Q_PROPERTY(stratagus::unit_type* unit_type READ get_unit_type WRITE set_unit_type)
 	Q_PROPERTY(int quantity MEMBER quantity READ get_quantity)
 	Q_PROPERTY(int resources_held MEMBER resources_held READ get_resources_held)
 	Q_PROPERTY(bool ai_active MEMBER ai_active READ is_ai_active)
@@ -59,18 +59,49 @@ public:
 	historical_unit(const std::string &identifier);
 	~historical_unit();
 	
+	virtual void process_sml_scope(const sml_data &scope) override;
 	virtual void process_sml_dated_scope(const sml_data &scope, const QDateTime &date) override;
 	virtual void check() const override;
 	virtual void reset_history() override;
 
-	unit_class *get_unit_class() const
+	const std::vector<unit_class *> &get_unit_classes() const
 	{
-		return this->unit_class;
+		return this->unit_classes;
 	}
 
-	stratagus::unit_type *get_unit_type() const
+	unit_class *get_unit_class() const
 	{
-		return this->unit_type;
+		if (!this->get_unit_classes().empty()) {
+			return this->get_unit_classes().front();
+		}
+
+		return nullptr;
+	}
+
+	void set_unit_class(unit_class *unit_class)
+	{
+		this->unit_classes.clear();
+		this->unit_classes.push_back(unit_class);
+	}
+
+	const std::vector<unit_type *> &get_unit_types() const
+	{
+		return this->unit_types;
+	}
+
+	unit_type *get_unit_type() const
+	{
+		if (!this->get_unit_types().empty()) {
+			return this->get_unit_types().front();
+		}
+
+		return nullptr;
+	}
+
+	void set_unit_type(unit_type *unit_type)
+	{
+		this->unit_types.clear();
+		this->unit_types.push_back(unit_type);
 	}
 
 	int get_quantity() const
@@ -109,8 +140,8 @@ public:
 	}
 	
 private:
-	stratagus::unit_class *unit_class = nullptr; //the unit's unit class
-	stratagus::unit_type *unit_type = nullptr; //the unit's unit type
+	std::vector<unit_class *> unit_classes; //the unit's possible unit classes
+	std::vector<unit_type *> unit_types; //the unit's possible unit types
 	int quantity = 1; //how many in-game units does this historical unit result in when applied
 	int resources_held = 0; //how much of the unit's resource, if any, does the unit contain
 	bool ai_active = true; //whether the unit's AI is active

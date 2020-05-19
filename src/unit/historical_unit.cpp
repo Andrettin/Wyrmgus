@@ -33,6 +33,7 @@
 #include "faction.h"
 #include "map/historical_location.h"
 #include "player.h"
+#include "unit/unit_class.h"
 #include "unit/unit_type.h"
 
 namespace stratagus {
@@ -43,6 +44,44 @@ historical_unit::historical_unit(const std::string &identifier) : named_data_ent
 
 historical_unit::~historical_unit()
 {
+}
+
+void historical_unit::process_sml_scope(const sml_data &scope)
+{
+	const std::string &tag = scope.get_tag();
+	const std::vector<std::string> &values = scope.get_values();
+
+	if (tag == "unit_classes") {
+		for (const std::string &value : values) {
+			this->unit_classes.push_back(unit_class::get(value));
+		}
+
+		scope.for_each_property([&](const sml_property &property) {
+			const std::string &key = property.get_key();
+			const std::string &value = property.get_value();
+			unit_class *unit_class = unit_class::get(key);
+			const int weight = std::stoi(value);
+			for (int i = 0; i < weight; ++i) {
+				this->unit_classes.push_back(unit_class);
+			}
+		});
+	} else if (tag == "unit_types") {
+		for (const std::string &value : values) {
+			this->unit_types.push_back(unit_type::get(value));
+		}
+
+		scope.for_each_property([&](const sml_property &property) {
+			const std::string &key = property.get_key();
+			const std::string &value = property.get_value();
+			unit_type *unit_type = unit_type::get(key);
+			const int weight = std::stoi(value);
+			for (int i = 0; i < weight; ++i) {
+				this->unit_types.push_back(unit_type);
+			}
+		});
+	} else {
+		data_entry::process_sml_scope(scope);
+	}
 }
 
 void historical_unit::process_sml_dated_scope(const sml_data &scope, const QDateTime &date)
@@ -62,7 +101,7 @@ void historical_unit::process_sml_dated_scope(const sml_data &scope, const QDate
 
 void historical_unit::check() const
 {
-	if (this->get_unit_type() == nullptr && this->get_unit_class() == nullptr) {
+	if (this->get_unit_types().empty() && this->get_unit_classes().empty()) {
 		throw std::runtime_error("Historical unit \"" + this->get_identifier() + "\" has neither a unit type nor a unit class.");
 	}
 }
