@@ -348,7 +348,10 @@ const CUnit *button::get_unit() const
 		case ButtonCmd::Unit:
 			return &UnitManager.GetSlotUnit(this->Value);
 		default:
-			return Selected[0];
+			if (!Selected.empty()) {
+				return Selected[0];
+			}
+			return nullptr;
 	}
 }
 
