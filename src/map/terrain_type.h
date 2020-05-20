@@ -74,7 +74,7 @@ public:
 		terrain_type *terrain_type = terrain_type::try_get_by_character(character);
 
 		if (terrain_type == nullptr) {
-			throw std::runtime_error("No terrain type found for character: " + std::string(character, 1) + ".");
+			throw std::runtime_error("No terrain type found for character: " + std::string(1, character) + ".");
 		}
 
 		return terrain_type;
