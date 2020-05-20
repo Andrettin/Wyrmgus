@@ -1488,86 +1488,8 @@ void map_template::ApplyUnits(const QPoint &template_start_pos, const QPoint &ma
 			continue;
 		}
 		
-		faction *unit_faction = historical_unit->get_faction();
-		CPlayer *unit_player = unit_faction ? GetFactionPlayer(unit_faction) : nullptr;
-		unit_type *unit_type = nullptr;
-		if (!historical_unit->get_unit_types().empty()) {
-			unit_type = historical_unit->get_unit_types()[SyncRand(historical_unit->get_unit_types().size())];
-		} else if (!historical_unit->get_unit_classes().empty()) {
-			const unit_class *unit_class = historical_unit->get_unit_classes()[SyncRand(historical_unit->get_unit_classes().size())];
-			unit_type = unit_faction->get_class_unit_type(unit_class);
-		}
-
-		if (unit_type == nullptr) {
-			continue;
-		}
-		
-		const bool in_another_map_template = historical_unit->get_location()->map_template != this;
-		if (in_another_map_template) {
-			continue;
-		}
-
-		if (historical_unit->get_location()->Position.x != -1 && historical_unit->get_location()->Position.y != -1 && !this->contains_pos(historical_unit->get_location()->Position)) {
-			continue;
-		}
-
-		QPoint unit_pos = this->get_location_map_position(historical_unit->get_location(), template_start_pos, map_start_pos, false);
-		
-		if (unit_pos.x() == -1 && unit_pos.y() == -1) {
-			if (!random) { //apply units whose position is that of a randomly-placed site, or that of their player's start position, together with randomly-placed units
-				continue;
-			}
-			
-			unit_pos = this->get_location_map_position(historical_unit->get_location(), template_start_pos, map_start_pos, true);
-			
-			if (unit_pos.x() == -1 && unit_pos.y() == -1) {
-				unit_pos = CMap::Map.GenerateUnitLocation(unit_type, unit_faction, map_start_pos, map_end - Vec2i(1, 1), z);
-				if (unit_pos.x() != -1 && unit_pos.y() != -1) {
-					unit_pos += unit_type->get_tile_center_pos_offset();
-				}
-			}
-		} else {
-			if (random) {
-				continue;
-			}
-		}
-		
-		const QPoint unit_top_left_pos = unit_pos - unit_type->get_tile_center_pos_offset();
-		const QPoint unit_bottom_right_pos = unit_top_left_pos + size::to_point(unit_type->get_tile_size()) - QPoint(1, 1);
-		if (!CMap::Map.Info.IsPointOnMap(unit_top_left_pos, z) || !CMap::Map.Info.IsPointOnMap(unit_bottom_right_pos, z) || !this->contains_map_pos(unit_top_left_pos) || !this->contains_map_pos(unit_bottom_right_pos)) { //units whose faction hasn't been created already and who don't have a valid historical location set won't be created
-			continue;
-		}
-		
-		if (unit_faction != nullptr) {
-			unit_player = GetOrAddFactionPlayer(unit_faction);
-			if (!unit_player) {
-				continue;
-			}
-			if (!unit_type->BoolFlag[ITEM_INDEX].value && unit_player->StartPos.x == 0 && unit_player->StartPos.y == 0) {
-				unit_player->SetStartView(unit_pos, z);
-			}
-		} else {
-			unit_player = CPlayer::Players[PlayerNumNeutral];
-		}
-		for (int i = 0; i < historical_unit->get_quantity(); ++i) {
-			//item units only use factions to generate special properties for them
-			CUnit *unit = CreateUnit(unit_top_left_pos, *unit_type, unit_type->BoolFlag[ITEM_INDEX].value ? CPlayer::Players[PlayerNumNeutral] : unit_player, z);
-			if (unit_type->BoolFlag[ITEM_INDEX].value) {
-				unit->GenerateSpecialProperties(nullptr, unit_player, false);
-			}
-			if (historical_unit->get_resources_held() != 0) {
-				unit->SetResourcesHeld(historical_unit->get_resources_held());
-				unit->Variable[GIVERESOURCE_INDEX].Value = historical_unit->get_resources_held();
-				unit->Variable[GIVERESOURCE_INDEX].Max = historical_unit->get_resources_held();
-				unit->Variable[GIVERESOURCE_INDEX].Enable = 1;
-			}
-			if (!historical_unit->is_ai_active()) {
-				unit->Active = 0;
-				unit_player->ChangeUnitTypeAiActiveCount(unit_type, -1);
-			}
-			if (historical_unit->get_ttl() != 0) {
-				unit->TTL = historical_unit->get_ttl();
-			}
+		for (int i = 0; i < historical_unit->get_repeat_count(); ++i) {
+			this->apply_historical_unit(historical_unit, template_start_pos, map_start_pos, map_end, z, random);
 		}
 	}
 	
@@ -1636,6 +1558,92 @@ void map_template::ApplyUnits(const QPoint &template_start_pos, const QPoint &ma
 		unit->SetCharacter(character->Ident);
 		unit->Active = 0;
 		hero_player->ChangeUnitTypeAiActiveCount(character->get_unit_type(), -1);
+	}
+}
+
+void map_template::apply_historical_unit(const historical_unit *historical_unit, const QPoint &template_start_pos, const QPoint &map_start_pos, const QPoint &map_end, const int z, const bool random) const
+{
+	faction *unit_faction = historical_unit->get_faction();
+	CPlayer *unit_player = unit_faction ? GetFactionPlayer(unit_faction) : nullptr;
+	unit_type *unit_type = nullptr;
+	if (!historical_unit->get_unit_types().empty()) {
+		unit_type = historical_unit->get_unit_types()[SyncRand(historical_unit->get_unit_types().size())];
+	} else if (!historical_unit->get_unit_classes().empty()) {
+		const unit_class *unit_class = historical_unit->get_unit_classes()[SyncRand(historical_unit->get_unit_classes().size())];
+		unit_type = unit_faction->get_class_unit_type(unit_class);
+	}
+
+	if (unit_type == nullptr) {
+		return;
+	}
+
+	const bool in_another_map_template = historical_unit->get_location()->map_template != this;
+	if (in_another_map_template) {
+		return;
+	}
+
+	if (historical_unit->get_location()->Position.x != -1 && historical_unit->get_location()->Position.y != -1 && !this->contains_pos(historical_unit->get_location()->Position)) {
+		return;
+	}
+
+	QPoint unit_pos = this->get_location_map_position(historical_unit->get_location(), template_start_pos, map_start_pos, false);
+
+	if (unit_pos.x() == -1 && unit_pos.y() == -1) {
+		if (!random) { //apply units whose position is that of a randomly-placed site, or that of their player's start position, together with randomly-placed units
+			return;
+		}
+
+		unit_pos = this->get_location_map_position(historical_unit->get_location(), template_start_pos, map_start_pos, true);
+
+		if (unit_pos.x() == -1 && unit_pos.y() == -1) {
+			unit_pos = CMap::Map.GenerateUnitLocation(unit_type, unit_faction, map_start_pos, map_end - Vec2i(1, 1), z);
+			if (unit_pos.x() != -1 && unit_pos.y() != -1) {
+				unit_pos += unit_type->get_tile_center_pos_offset();
+			}
+		}
+	} else {
+		if (random) {
+			return;
+		}
+	}
+
+	const QPoint unit_top_left_pos = unit_pos - unit_type->get_tile_center_pos_offset();
+	const QPoint unit_bottom_right_pos = unit_top_left_pos + size::to_point(unit_type->get_tile_size()) - QPoint(1, 1);
+	if (!CMap::Map.Info.IsPointOnMap(unit_top_left_pos, z) || !CMap::Map.Info.IsPointOnMap(unit_bottom_right_pos, z) || !this->contains_map_pos(unit_top_left_pos) || !this->contains_map_pos(unit_bottom_right_pos)) { //units whose faction hasn't been created already and who don't have a valid historical location set won't be created
+		return;
+	}
+
+	if (unit_faction != nullptr) {
+		unit_player = GetOrAddFactionPlayer(unit_faction);
+		if (!unit_player) {
+			return;
+		}
+		if (!unit_type->BoolFlag[ITEM_INDEX].value && unit_player->StartPos.x == 0 && unit_player->StartPos.y == 0) {
+			unit_player->SetStartView(unit_pos, z);
+		}
+	} else {
+		unit_player = CPlayer::Players[PlayerNumNeutral];
+	}
+
+	for (int i = 0; i < historical_unit->get_quantity(); ++i) {
+		//item units only use factions to generate special properties for them
+		CUnit *unit = CreateUnit(unit_top_left_pos, *unit_type, unit_type->BoolFlag[ITEM_INDEX].value ? CPlayer::Players[PlayerNumNeutral] : unit_player, z);
+		if (unit_type->BoolFlag[ITEM_INDEX].value) {
+			unit->GenerateSpecialProperties(nullptr, unit_player, false);
+		}
+		if (historical_unit->get_resources_held() != 0) {
+			unit->SetResourcesHeld(historical_unit->get_resources_held());
+			unit->Variable[GIVERESOURCE_INDEX].Value = historical_unit->get_resources_held();
+			unit->Variable[GIVERESOURCE_INDEX].Max = historical_unit->get_resources_held();
+			unit->Variable[GIVERESOURCE_INDEX].Enable = 1;
+		}
+		if (!historical_unit->is_ai_active()) {
+			unit->Active = 0;
+			unit_player->ChangeUnitTypeAiActiveCount(unit_type, -1);
+		}
+		if (historical_unit->get_ttl() != 0) {
+			unit->TTL = historical_unit->get_ttl();
+		}
 	}
 }
 

@@ -45,6 +45,7 @@ class historical_unit : public named_data_entry, public data_type<historical_uni
 
 	Q_PROPERTY(stratagus::unit_class* unit_class READ get_unit_class WRITE set_unit_class)
 	Q_PROPERTY(stratagus::unit_type* unit_type READ get_unit_type WRITE set_unit_type)
+	Q_PROPERTY(int repeat_count MEMBER repeat_count READ get_repeat_count)
 	Q_PROPERTY(int quantity MEMBER quantity READ get_quantity)
 	Q_PROPERTY(int resources_held MEMBER resources_held READ get_resources_held)
 	Q_PROPERTY(bool ai_active MEMBER ai_active READ is_ai_active)
@@ -104,6 +105,11 @@ public:
 		this->unit_types.push_back(unit_type);
 	}
 
+	int get_repeat_count() const
+	{
+		return this->repeat_count;
+	}
+
 	int get_quantity() const
 	{
 		return this->quantity;
@@ -142,6 +148,7 @@ public:
 private:
 	std::vector<unit_class *> unit_classes; //the unit's possible unit classes
 	std::vector<unit_type *> unit_types; //the unit's possible unit types
+	int repeat_count = 1; //how many times should this historical unit be applied in the game; this differs from the quantity field in that if the unit has a random position, then each time it is applied that will be done in a different location
 	int quantity = 1; //how many in-game units does this historical unit result in when applied
 	int resources_held = 0; //how much of the unit's resource, if any, does the unit contain
 	bool ai_active = true; //whether the unit's AI is active
