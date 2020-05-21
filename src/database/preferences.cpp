@@ -27,6 +27,7 @@
 
 #include "database/preferences.h"
 
+#include "campaign.h"
 #include "database/database.h"
 #include "database/sml_data.h"
 #include "database/sml_parser.h"
@@ -48,12 +49,7 @@ void preferences::load()
 
 	sml_parser parser(preferences_path);
 	const sml_data data = parser.parse();
-
-	data.for_each_element([&](const sml_property &property) {
-		this->process_sml_property(property);
-	}, [&](const sml_data &scope) {
-		this->process_sml_scope(scope);
-	});
+	database::process_sml_data(this, data);
 }
 
 void preferences::save() const
@@ -68,6 +64,9 @@ void preferences::save() const
 	sml_data data(preferences_path.filename().stem().string());
 
 	data.add_property("scale_factor", std::to_string(this->get_scale_factor()));
+	if (this->get_selected_campaign() != nullptr) {
+		data.add_property("selected_campaign", this->get_selected_campaign()->get_identifier());
+	}
 
 	data.print_to_dir(preferences_path.parent_path());
 }

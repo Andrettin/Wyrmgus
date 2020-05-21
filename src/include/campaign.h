@@ -140,3 +140,6 @@ public:
 
 extern void SetCurrentCampaign(const std::string &campaign_ident);
 extern std::string GetCurrentCampaign();
+
+std::string get_selected_campaign();
+void set_selected_campaign(const std::string campaign_identifier);

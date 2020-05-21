@@ -31,6 +31,7 @@
 
 #include "civilization.h"
 #include "config.h"
+#include "database/preferences.h"
 #include "faction.h"
 #include "game.h"
 #include "map/map_template.h"
@@ -229,5 +230,23 @@ std::string GetCurrentCampaign()
 		return "";
 	} else {
 		return current_campaign->GetIdent();
+	}
+}
+
+std::string get_selected_campaign()
+{
+	if (stratagus::preferences::get()->get_selected_campaign() != nullptr) {
+		return stratagus::preferences::get()->get_selected_campaign()->get_identifier();
+	}
+
+	return std::string();
+}
+
+void set_selected_campaign(const std::string campaign_identifier)
+{
+	if (!campaign_identifier.empty()) {
+		stratagus::preferences::get()->set_selected_campaign(stratagus::campaign::get(campaign_identifier));
+	} else {
+		stratagus::preferences::get()->set_selected_campaign(nullptr);
 	}
 }

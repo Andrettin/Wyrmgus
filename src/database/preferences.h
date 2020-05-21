@@ -31,6 +31,7 @@
 
 namespace stratagus {
 
+class campaign;
 class sml_data;
 class sml_property;
 
@@ -39,6 +40,7 @@ class preferences final : public QObject, public singleton<preferences>
 	Q_OBJECT
 
 	Q_PROPERTY(int scale_factor READ get_scale_factor WRITE set_scale_factor)
+	Q_PROPERTY(stratagus::campaign* selected_campaign READ get_selected_campaign WRITE set_selected_campaign)
 
 public:
 	std::filesystem::path get_path() const;
@@ -57,8 +59,19 @@ public:
 		this->scale_factor = factor;
 	}
 
+	campaign *get_selected_campaign() const
+	{
+		return this->selected_campaign;
+	}
+
+	void set_selected_campaign(campaign *campaign)
+	{
+		this->selected_campaign = campaign;
+	}
+
 private:
 	int scale_factor = 1;
+	campaign *selected_campaign = nullptr;
 };
 
 }

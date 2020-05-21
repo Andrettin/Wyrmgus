@@ -44,12 +44,7 @@ void defines::load(const std::filesystem::path &data_path)
 
 	sml_parser parser(defines_path);
 	const sml_data data = parser.parse();
-
-	data.for_each_element([&](const sml_property &property) {
-		this->process_sml_property(property);
-	}, [&](const sml_data &scope) {
-		this->process_sml_scope(scope);
-	});
+	database::process_sml_data(this, data);
 
 	this->scale_factor = preferences::get()->get_scale_factor();
 }

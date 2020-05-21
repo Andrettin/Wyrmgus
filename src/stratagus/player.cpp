@@ -4268,7 +4268,11 @@ bool CPlayer::HasBuildingAccess(const CPlayer &player, const ButtonCmd button_ac
 	if (player.IsEnemy(*this)) {
 		return false;
 	}
-	
+
+	if (player.get_faction() == nullptr) {
+		return false;
+	}
+
 	if (player.Type == PlayerNeutral) {
 		return true;
 	}

@@ -29,6 +29,7 @@
 
 #include "age.h"
 #include "animation.h"
+#include "campaign.h"
 #include "character.h"
 #include "civilization.h"
 #include "database/data_type_metadata.h"
@@ -175,6 +176,8 @@ QVariant database::process_sml_property_value(const sml_property &property, cons
 			new_property_value = QVariant::fromValue(button_level::get(property.get_value()));
 		} else if (property_class_name == "stratagus::calendar*") {
 			new_property_value = QVariant::fromValue(calendar::get(property.get_value()));
+		} else if (property_class_name == "stratagus::campaign*") {
+			new_property_value = QVariant::fromValue(campaign::get(property.get_value()));
 		} else if (property_class_name == "stratagus::character*") {
 			new_property_value = QVariant::fromValue(character::get(property.get_value()));
 		} else if (property_class_name == "stratagus::civilization*") {
