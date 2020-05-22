@@ -2160,31 +2160,50 @@ void CUnit::GenerateSpecialProperties(CUnit *dropper, CPlayer *dropper_player, b
 		unique_chance /= 4;
 	}
 
-	if (SyncRand(100) >= (100 - magic_affix_chance)) {
-		this->GenerateWork(dropper, dropper_player);
+	if (allow_unique) {
+		const bool is_unique = SyncRand(1000) >= (1000 - unique_chance);
+		if (is_unique) {
+			this->GenerateUnique(dropper, dropper_player);
+		}
 	}
-	if (SyncRand(100) >= (100 - magic_affix_chance)) {
-		this->GeneratePrefix(dropper, dropper_player);
-	}
-	if (SyncRand(100) >= (100 - magic_affix_chance)) {
-		this->GenerateSuffix(dropper, dropper_player);
-	}
-	if (this->Prefix == nullptr && this->Suffix == nullptr && this->Work == nullptr && this->Elixir == nullptr && SyncRand(100) >= (100 - magic_affix_chance)) {
-		this->GenerateSpell(dropper, dropper_player);
-	}
-	if (allow_unique && SyncRand(1000) >= (1000 - unique_chance)) {
-		this->GenerateUnique(dropper, dropper_player);
+
+	if (this->Unique == nullptr) {
+		if (this->Type->get_item_class() == stratagus::item_class::scroll || this->Type->get_item_class() == stratagus::item_class::book || this->Type->get_item_class() == stratagus::item_class::ring || this->Type->get_item_class() == stratagus::item_class::amulet || this->Type->get_item_class() == stratagus::item_class::horn || always_magic) { //scrolls, books, jewelry and horns must always have a property
+			magic_affix_chance = 100;
+		}
+
+		const bool is_magic = SyncRand(100) >= (100 - magic_affix_chance);
+		if (is_magic) {
+			std::vector<int> magic_types{0, 1, 2, 3};
+
+			while (!magic_types.empty()) {
+				const int magic_type = magic_types[SyncRand(magic_types.size())];
+				stratagus::vector::remove(magic_types, magic_type);
+
+				switch (magic_type) {
+					case 0:
+						this->GenerateWork(dropper, dropper_player);
+						break;
+					case 1:
+						this->GeneratePrefix(dropper, dropper_player);
+						break;
+					case 2:
+						this->GenerateSuffix(dropper, dropper_player);
+						break;
+					case 3:
+						this->GenerateSpell(dropper, dropper_player);
+						break;
+				}
+
+				if (this->Prefix != nullptr || this->Suffix != nullptr || this->Work != nullptr || this->Elixir != nullptr || this->Spell != nullptr) {
+					break;
+				}
+			}
+		}
 	}
 	
 	if (this->Type->BoolFlag[ITEM_INDEX].value && (this->Prefix != nullptr || this->Suffix != nullptr)) {
 		this->Identified = false;
-	}
-	
-	if (
-		this->Prefix == nullptr && this->Suffix == nullptr && this->Spell == nullptr && this->Work == nullptr && this->Elixir == nullptr
-		&& (this->Type->get_item_class() == stratagus::item_class::scroll || this->Type->get_item_class() == stratagus::item_class::book || this->Type->get_item_class() == stratagus::item_class::ring || this->Type->get_item_class() == stratagus::item_class::amulet || this->Type->get_item_class() == stratagus::item_class::horn || always_magic)
-	) { //scrolls, books, jewelry and horns must always have a property
-		this->GenerateSpecialProperties(dropper, dropper_player, allow_unique, sold_item, always_magic);
 	}
 }
 			
