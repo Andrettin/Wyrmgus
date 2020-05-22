@@ -169,6 +169,8 @@ class quest final : public detailed_data_entry, public data_type<quest>
 	Q_PROPERTY(stratagus::icon* icon MEMBER icon READ get_icon)
 	Q_PROPERTY(stratagus::player_color* player_color MEMBER player_color READ get_player_color)
 	Q_PROPERTY(bool unobtainable MEMBER unobtainable READ is_unobtainable)
+	Q_PROPERTY(bool uncompleteable MEMBER uncompleteable READ is_uncompleteable)
+	Q_PROPERTY(bool unfailable MEMBER unfailable READ is_unfailable)
 
 public:
 	static constexpr const char *class_identifier = "quest";
@@ -200,6 +202,16 @@ public:
 	bool is_unobtainable() const
 	{
 		return this->unobtainable;
+	}
+
+	bool is_uncompleteable() const
+	{
+		return this->uncompleteable;
+	}
+
+	bool is_unfailable() const
+	{
+		return this->unfailable;
 	}
 
 	bool IsCompleted() const
@@ -243,9 +255,9 @@ public:
 	bool Competitive = false;			/// Whether a player completing the quest causes it to fail for others
 private:
 	bool unobtainable = false;			/// Whether the quest can be obtained normally (or only through triggers)
+	bool uncompleteable = false;		/// Whether the quest can be completed normally (or only through triggers)
+	bool unfailable = false;			/// Whether the quest can fail normally
 public:
-	bool Uncompleteable = false;		/// Whether the quest can be completed normally (or only through triggers)
-	bool Unfailable = false;			/// Whether the quest can fail normally
 	bool Completed = false;				/// Whether the quest has been completed
 	bool CurrentCompleted = false;		/// Whether the quest has been completed in the current game
 	stratagus::dialogue *IntroductionDialogue = nullptr;

@@ -2821,7 +2821,7 @@ bool CPlayer::can_accept_quest(const stratagus::quest *quest)
 
 bool CPlayer::has_completed_quest(const stratagus::quest *quest)
 {
-	if (quest->Uncompleteable) {
+	if (quest->is_uncompleteable()) {
 		return false;
 	}
 	
@@ -2850,7 +2850,7 @@ std::string CPlayer::has_failed_quest(const stratagus::quest *quest) // returns 
 		return "Another faction has completed the quest before you could.";
 	}
 
-	if (quest->Unfailable) {
+	if (quest->is_unfailable()) {
 		return "";
 	}
 

@@ -116,9 +116,9 @@ static int CclDefineQuest(lua_State *l)
 		} else if (!strcmp(value, "Unobtainable")) {
 			quest->unobtainable = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "Uncompleteable")) {
-			quest->Uncompleteable = LuaToBoolean(l, -1);
+			quest->uncompleteable = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "Unfailable")) {
-			quest->Unfailable = LuaToBoolean(l, -1);
+			quest->unfailable = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "Icon")) {
 			quest->icon = stratagus::icon::get(LuaToString(l, -1));
 		} else if (!strcmp(value, "IntroductionDialogue")) {
