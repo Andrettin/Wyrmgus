@@ -754,6 +754,7 @@ set(stratagus_util_HDRS
 	src/util/string_util.h
 	src/util/type_traits.h
 	src/util/util.h
+	src/util/vector_random_util.h
 	src/util/vector_util.h
 )
 
