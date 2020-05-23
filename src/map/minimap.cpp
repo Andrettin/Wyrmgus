@@ -186,7 +186,6 @@ void minimap::Create()
 		this->UpdateTerrain(z);
 		this->update_territories(z);
 	}
-	//Wyrmgus end
 
 	NumMinimapEvents = 0;
 }
@@ -854,11 +853,6 @@ bool minimap::are_units_visible() const
 bool minimap::is_fog_of_war_visible() const
 {
 	return this->get_mode() != minimap_mode::territories;
-}
-
-int minimap::get_territory_tile_range(const int z) const
-{
-	return std::max(0, (CMap::Map.Info.MapWidths[z] / this->W) - 1);
 }
 
 }

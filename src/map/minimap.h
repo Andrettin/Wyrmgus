@@ -97,8 +97,6 @@ public:
 	bool are_units_visible() const;
 	bool is_fog_of_war_visible() const;
 
-	int get_territory_tile_range(const int z) const;
-
 public:
 	int X = 0;
 	int Y = 0;

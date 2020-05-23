@@ -239,7 +239,6 @@ void site::update_border_tiles()
 	}
 
 	const int z = this->get_site_unit()->MapLayer->ID;
-	const int minimap_territory_tile_range = UI.Minimap.get_territory_tile_range(z);
 	for (const QPoint &tile_pos : this->border_tiles) {
 		CMap::Map.CalculateTileOwnershipTransition(tile_pos, z);
 
