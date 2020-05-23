@@ -577,6 +577,11 @@ CPlayer *CPlayer::GetPlayer(const int index)
 	return CPlayer::Players[index];
 }
 
+const QColor &CPlayer::get_minimap_color() const
+{
+	return this->get_player_color()->get_colors().at(stratagus::defines::get()->get_minimap_color_index());
+}
+
 void CPlayer::Save(CFile &file) const
 {
 	const CPlayer &p = *this;
@@ -1290,7 +1295,6 @@ void CPlayer::SetFaction(const stratagus::faction *faction)
 		
 		if (player_color != nullptr) {
 			this->player_color = player_color;
-			this->minimap_color = player_color->get_colors()[0];
 
 			//update the borders on the minimap for the new color
 			for (const auto &kv_pair : this->UnitsByType) {
@@ -1300,7 +1304,7 @@ void CPlayer::SetFaction(const stratagus::faction *faction)
 				}
 
 				for (const CUnit *town_hall : kv_pair.second) {
-					town_hall->settlement->update_border_tiles(true);
+					town_hall->settlement->update_minimap_territory();
 				}
 			}
 		}
@@ -2270,7 +2274,6 @@ void CPlayer::Clear()
 	this->LostTownHallTimer = 0;
 	this->HeroCooldownTimer = 0;
 	//Wyrmgus end
-	this->minimap_color = QColor();
 	this->UpgradeTimers.Clear();
 	for (size_t i = 0; i < MaxCosts; ++i) {
 		this->SpeedResourcesHarvest[i] = SPEEDUP_FACTOR;
@@ -3880,12 +3883,10 @@ void SetPlayersPalette()
 	for (int i = 0; i < PlayerMax - 1; ++i) {
 		if (CPlayer::Players[i]->Faction == -1) {
 			CPlayer::Players[i]->player_color = stratagus::player_color::get_all()[SyncRand(stratagus::player_color::get_all().size())];
-			CPlayer::Players[i]->minimap_color = CPlayer::Players[i]->player_color->get_colors()[0];
 		}
 	}
 
 	CPlayer::Players[PlayerNumNeutral]->player_color = stratagus::defines::get()->get_neutral_player_color();
-	CPlayer::Players[PlayerNumNeutral]->minimap_color = CPlayer::Players[PlayerNumNeutral]->player_color->get_colors()[0];
 }
 
 /**
@@ -3926,10 +3927,9 @@ void CPlayer::Notify(int type, const Vec2i &pos, int z, const char *fmt, ...) co
 			break;
 		default: color = ColorWhite;
 	}
-	//Wyrmgus start
-//	UI.Minimap.AddEvent(pos, color);
+
 	UI.Minimap.AddEvent(pos, z, color);
-	//Wyrmgus end
+
 	if (this == CPlayer::GetThisPlayer()) {
 		//Wyrmgus start
 //		SetMessageEvent(pos, "%s", temp);

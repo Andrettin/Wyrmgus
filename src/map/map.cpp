@@ -1180,6 +1180,7 @@ void PreprocessMap()
 				CMap::Map.CalculateTileTerrainFeature(tile_pos, z);
 				mf.UpdateSeenTile();
 				UI.Minimap.UpdateXY(tile_pos, z);
+				UI.Minimap.update_territory_xy(tile_pos, z);
 				if (mf.playerInfo.IsTeamVisible(*CPlayer::GetThisPlayer())) {
 					CMap::Map.MarkSeenTile(mf, z);
 				}

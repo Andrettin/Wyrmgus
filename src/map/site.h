@@ -131,14 +131,31 @@ public:
 	void add_border_tile(const QPoint &tile_pos)
 	{
 		this->border_tiles.push_back(tile_pos);
+
+		if (this->territory_rect.isNull()) {
+			this->territory_rect = QRect(tile_pos, QSize(1, 1));
+		} else {
+			if (tile_pos.x() < this->territory_rect.x()) {
+				this->territory_rect.setX(tile_pos.x());
+			} else if (tile_pos.x() > this->territory_rect.right()) {
+				this->territory_rect.setRight(tile_pos.x());
+			}
+			if (tile_pos.y() < this->territory_rect.y()) {
+				this->territory_rect.setY(tile_pos.y());
+			} else if (tile_pos.y() > this->territory_rect.bottom()) {
+				this->territory_rect.setBottom(tile_pos.y());
+			}
+		}
 	}
 
 	void clear_border_tiles()
 	{
 		this->border_tiles.clear();
+		this->territory_rect = QRect();
 	}
 
-	void update_border_tiles(const bool minimap_only);
+	void update_border_tiles();
+	void update_minimap_territory();
 
 	const std::vector<faction *> &get_cores() const
 	{
@@ -192,6 +209,7 @@ public:
 	std::vector<std::tuple<CDate, CDate, const unit_type *, CUniqueItem *, int>> HistoricalResources; /// Historical resources, with start and end date; the integer at the end is the resource quantity
 private:
 	std::vector<QPoint> border_tiles; //the tiles for this settlement which border the territory of another settlement
+	QRect territory_rect; //the territory rectangle of the site
 
 	friend int ::CclDefineSite(lua_State *l);
 };

@@ -1,10 +1,11 @@
-class CMinimap
+$using namespace stratagus;
+
+class minimap
 {
 	int X;
 	int Y;
 	int W;
 	int H;
-	bool WithTerrain;
 	bool ShowSelected;
 	bool Transparent;
 };

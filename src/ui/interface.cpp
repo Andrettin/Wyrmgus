@@ -41,6 +41,7 @@
 #include "iolib.h"
 #include "map/map.h"
 #include "map/map_layer.h"
+#include "map/minimap_mode.h"
 #include "network.h"
 #include "player.h"
 #include "player_color.h"
@@ -484,17 +485,10 @@ static void UiRecallMapPosition(unsigned position)
 	UI.SelectedViewport->Set(SavedMapPosition[position], stratagus::defines::get()->get_scaled_tile_size() / 2);
 }
 
-/**
-**  Toggle terrain display on/off.
-*/
-void UiToggleTerrain()
+void UiToggleMinimapMode()
 {
-	UI.Minimap.WithTerrain ^= 1;
-	if (UI.Minimap.WithTerrain) {
-		UI.StatusLine.Set(_("Terrain displayed."));
-	} else {
-		UI.StatusLine.Set(_("Terrain hidden."));
-	}
+	UI.Minimap.toggle_mode();
+	UI.StatusLine.Set(_(stratagus::get_minimap_mode_name(UI.Minimap.get_mode())));
 }
 
 /**
@@ -956,7 +950,7 @@ static bool CommandKey(int key)
 			if (KeyModifiers & ModifierAlt) {
 				break;
 			}
-			UiToggleTerrain();
+			UiToggleMinimapMode();
 			break;
 
 		case SDLK_UP:

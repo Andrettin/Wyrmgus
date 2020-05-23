@@ -200,7 +200,7 @@ class CUserInterface
 
 	vector<CUIUserButton> UserButtons;
 
-	CMinimap Minimap;
+	minimap Minimap;
 	CStatusLine StatusLine;
 	CUITimer Timer;
 };
@@ -702,7 +702,6 @@ void UiFindLevelUpUnit();
 void UiFindHeroUnit(int hero_index);
 //Wyrmgus end
 void CycleViewportMode(int step);
-void UiToggleTerrain();
 void UiTrackUnit();
 void SetNewViewportMode(ViewportModeType new_mode);
 

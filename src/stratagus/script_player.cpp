@@ -161,7 +161,6 @@ void CPlayer::Load(lua_State *l)
 			this->age = stratagus::age::get(LuaToString(l, j + 1));
 		} else if (!strcmp(value, "player-color")) {
 			this->player_color = stratagus::player_color::get(LuaToString(l, j + 1));
-			this->minimap_color = player_color->get_colors()[0];
 		//Wyrmgus end
 		} else if (!strcmp(value, "ai-name")) {
 			this->AiName = LuaToString(l, j + 1);

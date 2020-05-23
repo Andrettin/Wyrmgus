@@ -635,6 +635,7 @@ set(stratagus_map_HDRS
 	src/map/map_layer.h
 	src/map/map_template.h
 	src/map/minimap.h
+	src/map/minimap_mode.h
 	src/map/region.h
 	src/map/site.h
 	src/map/terrain_type.h

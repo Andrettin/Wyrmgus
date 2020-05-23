@@ -448,9 +448,9 @@ public:
 		return MapRGBA(f, color.R, color.G, color.B, color.A);
 	}
 
-	inline Uint32 MapRGBA(SDL_PixelFormat *f, const QColor &color)
+	inline Uint32 MapRGBA(const QColor &color)
 	{
-		return MapRGBA(f, color.red(), color.green(), color.blue(), color.alpha());
+		return MapRGBA(nullptr, color.red(), color.green(), color.blue(), color.alpha());
 	}
 
 	inline void GetRGB(Uint32 c, SDL_PixelFormat *f, Uint8 *r, Uint8 *g, Uint8 *b)
@@ -459,12 +459,23 @@ public:
 		*g = (c >> GSHIFT) & 0xff;
 		*b = (c >> BSHIFT) & 0xff;
 	}
+
 	inline void GetRGBA(Uint32 c, SDL_PixelFormat *f, Uint8 *r, Uint8 *g, Uint8 *b, Uint8 *a)
 	{
 		*r = (c >> RSHIFT) & 0xff;
 		*g = (c >> GSHIFT) & 0xff;
 		*b = (c >> BSHIFT) & 0xff;
 		*a = (c >> ASHIFT) & 0xff;
+	}
+
+	inline QColor GetRGBA(const Uint32 c) const
+	{
+		QColor color;
+		color.setRed((c >> RSHIFT) & 0xff);
+		color.setGreen((c >> GSHIFT) & 0xff);
+		color.setBlue((c >> BSHIFT) & 0xff);
+		color.setAlpha((c >> ASHIFT) & 0xff);
+		return color;
 	}
 
 	int Width;

@@ -8,8 +8,6 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name minimap.h - The minimap headerfile. */
-//
 //      (c) Copyright 1998-2020 by Lutz Sammer, Jimmy Salmon and Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
@@ -32,93 +30,99 @@
 #include "color.h"
 #include "vec2i.h"
 
+#ifdef USE_OPENGL
+#ifdef __APPLE__
+#define GL_GLEXT_PROTOTYPES 1
+#endif
+#include "SDL_opengl.h"
+#endif
+
+class CUnit;
 class CViewport;
 
-struct SDL_Surface;
+namespace stratagus {
 
-/*----------------------------------------------------------------------------
---  Declarations
-----------------------------------------------------------------------------*/
+enum class minimap_mode;
 
-class CMinimap
+class minimap
 {
-	template <const int BPP>
-	void UpdateMapTerrain(void *const mpixels, const int mpitch,
-						  const void *const tpixels, const int tpitch);
+public:
+	minimap();
 
+private:
 	void UpdateTerrain(int z);
-
-	template <const int BPP>
-	void UpdateSeen(void *const pixels, const int pitch);
+	void update_territories(const int z);
 
 public:
-	//Wyrmgus start
-//	CMinimap() : X(0), Y(0), W(0), H(0), XOffset(0), YOffset(0),
-	CMinimap() : X(0), Y(0), W(0), H(0),
-	//Wyrmgus end
-		WithTerrain(false), ShowSelected(false),
-		Transparent(false), UpdateCache(false) {}
-
 	void UpdateXY(const Vec2i &pos, int z);
 	void UpdateSeenXY(const Vec2i &) {}
+	void update_territory_xy(const QPoint &pos, const int z);
 	void Update();
 	void Create();
+	void create_textures(const int z);
+	void create_texture(GLuint &texture, const unsigned char *texture_data, const int z);
 #if defined(USE_OPENGL) || defined(USE_GLES)
 	void FreeOpenGL();
 	void Reload();
 #endif
 	void Destroy();
 	void Draw() const;
+	void draw_texture(const GLuint &texture, const unsigned char *texture_data, const int z) const;
 	void DrawViewportArea(const CViewport &viewport) const;
-	//Wyrmgus start
-//	void AddEvent(const Vec2i &pos, IntColor color);
+	void DrawUnitOn(CUnit &unit, int red_phase);
 	void AddEvent(const Vec2i &pos, int z, IntColor color);
-	//Wyrmgus end
 
 	Vec2i ScreenToTilePos(const PixelPos &screenPos) const;
 	PixelPos TilePosToScreenPos(const Vec2i &tilePos) const;
 
 	bool Contains(const PixelPos &screenPos) const;
 
+	minimap_mode get_mode() const
+	{
+		return this->mode;
+	}
+
+	void set_mode(const minimap_mode mode)
+	{
+		if (mode == this->get_mode()) {
+			return;
+		}
+
+		this->mode = mode;
+		this->UpdateCache = true;
+	}
+
+	void toggle_mode();
+	bool is_terrain_visible() const;
+	bool are_units_visible() const;
+	bool is_fog_of_war_visible() const;
+
 	int get_territory_tile_range(const int z) const;
 
 public:
-	int X;
-	int Y;
-	int W;
-	int H;
-	//Wyrmgus start
-//	int XOffset;
-//	int YOffset;
+	int X = 0;
+	int Y = 0;
+	int W = 0;
+	int H = 0;
 	std::vector<int> XOffset;
 	std::vector<int> YOffset;
-	//Wyrmgus end
-	bool WithTerrain;
-	bool ShowSelected;
-	bool Transparent;
-	bool UpdateCache;
+	bool ShowSelected = false;
+	bool Transparent = false;
+	bool UpdateCache = false;
+
+private:
+	minimap_mode mode;
+	std::vector<GLuint> terrain_textures;
+	std::vector<GLuint> textures;
+
+	// Minimap surface with terrain only (for OpenGL)
+	std::vector<unsigned char *> terrain_surface_gl;
+
+	// Minimap surface with units (for OpenGL)
+	std::vector<unsigned char *> surface_gl;
+
+	//minimap surface with territories
+	std::vector<unsigned char *> territories_surface_gl;
 };
 
-#if defined(USE_OPENGL) || defined(USE_GLES)
-// Minimap surface with units (for OpenGL)
-//Wyrmgus start
-//extern unsigned char *MinimapSurfaceGL;
-extern std::vector<unsigned char *> MinimapSurfaceGL;
-//Wyrmgus end
-// Minimap surface with terrain only (for OpenGL)
-//Wyrmgus start
-//extern unsigned char *MinimapTerrainSurfaceGL;
-extern std::vector<unsigned char *> MinimapTerrainSurfaceGL;
-//Wyrmgus end
-#endif
-
-// Minimap surface with units (for software)
-//Wyrmgus start
-//extern SDL_Surface *MinimapSurface;
-extern std::vector<SDL_Surface *> MinimapSurface;
-//Wyrmgus end
-// Minimap surface with terrain only (for software)
-//Wyrmgus start
-//extern SDL_Surface *MinimapTerrainSurface;
-extern std::vector<SDL_Surface *> MinimapTerrainSurface;
-//Wyrmgus end
+}

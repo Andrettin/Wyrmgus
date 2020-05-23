@@ -467,7 +467,6 @@ static void DisplayLoop()
 
 	//
 	// Map scrolling
-	
 	//
 	DoScrollArea(MouseScrollState | KeyScrollState, (KeyModifiers & ModifierControl) != 0, MouseScrollState == 0 && KeyScrollState > 0);
 

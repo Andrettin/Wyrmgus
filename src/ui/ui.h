@@ -50,6 +50,7 @@ class LuaActionListener;
 
 namespace stratagus {
 	class cursor;
+	class minimap;
 	enum class cursor_type;
 }
 
@@ -478,7 +479,7 @@ public:
 	std::vector<CUIUserButton> UserButtons; /// User buttons
 
 	// The minimap
-	CMinimap Minimap;                   /// minimap
+	stratagus::minimap Minimap;
 	IntColor ViewportCursorColor;       /// minimap cursor color
 
 	// The status line

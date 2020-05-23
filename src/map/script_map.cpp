@@ -448,18 +448,6 @@ static int CclGetFogOfWar(lua_State *l)
 }
 
 /**
-**  Enable display of terrain in minimap.
-**
-**  @param l  Lua state.
-*/
-static int CclSetMinimapTerrain(lua_State *l)
-{
-	LuaCheckArgs(l, 1);
-	UI.Minimap.WithTerrain = LuaToBoolean(l, 1);
-	return 0;
-}
-
-/**
 **  Fog of war opacity.
 **
 **  @param l  Lua state.
@@ -2101,7 +2089,6 @@ void MapCclRegister()
 
 	lua_register(Lua, "SetFogOfWar", CclSetFogOfWar);
 	lua_register(Lua, "GetFogOfWar", CclGetFogOfWar);
-	lua_register(Lua, "SetMinimapTerrain", CclSetMinimapTerrain);
 
 	lua_register(Lua, "SetFogOfWarGraphics", CclSetFogOfWarGraphics);
 	lua_register(Lua, "SetFogOfWarOpacity", CclSetFogOfWarOpacity);

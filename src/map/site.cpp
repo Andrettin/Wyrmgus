@@ -217,7 +217,8 @@ void site::set_owner(CPlayer *player)
 	}
 
 	this->owner = player;
-	this->update_border_tiles(false);
+	this->update_border_tiles();
+	this->update_minimap_territory();
 	this->owner_faction = player ? player->get_faction() : nullptr;
 }
 
@@ -231,59 +232,53 @@ void site::remove_building_class(unit_class *building_class)
 	vector::remove_one(this->building_classes, building_class);
 }
 
-void site::update_border_tiles(const bool minimap_only)
+void site::update_border_tiles()
 {
-	if (this->get_site_unit() != nullptr) {
-		const int z = this->get_site_unit()->MapLayer->ID;
-		const int minimap_territory_tile_range = UI.Minimap.get_territory_tile_range(z);
-		for (const QPoint &tile_pos : this->border_tiles) {
-			if (!minimap_only) {
-				CMap::Map.CalculateTileOwnershipTransition(tile_pos, z);
-			}
+	if (this->get_site_unit() == nullptr) {
+		return;
+	}
 
-			for (int minimap_offset_x = -minimap_territory_tile_range; minimap_offset_x <= minimap_territory_tile_range; ++minimap_offset_x) {
-				for (int minimap_offset_y = -minimap_territory_tile_range; minimap_offset_y <= minimap_territory_tile_range; ++minimap_offset_y) {
-					const QPoint minimap_tile_pos(tile_pos.x() + minimap_offset_x, tile_pos.y() + minimap_offset_y);
+	const int z = this->get_site_unit()->MapLayer->ID;
+	const int minimap_territory_tile_range = UI.Minimap.get_territory_tile_range(z);
+	for (const QPoint &tile_pos : this->border_tiles) {
+		CMap::Map.CalculateTileOwnershipTransition(tile_pos, z);
 
-					if (!CMap::Map.Info.IsPointOnMap(minimap_tile_pos, z)) {
-						continue;
-					}
+		//update adjacent tiles with different settlements as well
+		for (int x_offset = -1; x_offset <= 1; ++x_offset) {
+			for (int y_offset = -1; y_offset <= 1; ++y_offset) {
+				if (x_offset == 0 && y_offset == 0) {
+					continue;
+				}
 
-					UI.Minimap.UpdateXY(minimap_tile_pos, z);
+				const QPoint adjacent_pos(tile_pos.x() + x_offset, tile_pos.y() + y_offset);
+				if (!CMap::Map.Info.IsPointOnMap(adjacent_pos, z)) {
+					continue;
+				}
+
+				CMapField *adjacent_tile = CMap::Map.Field(adjacent_pos, z);
+				if (adjacent_tile->get_settlement() != nullptr && adjacent_tile->get_settlement() != this) {
+					CMap::Map.CalculateTileOwnershipTransition(adjacent_pos, z);
 				}
 			}
+		}
+	}
+}
 
-			//update adjacent tiles with different settlements as well
-			for (int x_offset = -1; x_offset <= 1; ++x_offset) {
-				for (int y_offset = -1; y_offset <= 1; ++y_offset) {
-					if (x_offset == 0 && y_offset == 0) {
-						continue;
-					}
+void site::update_minimap_territory()
+{
+	if (this->get_site_unit() == nullptr) {
+		return;
+	}
 
-					const QPoint adjacent_pos(tile_pos.x() + x_offset, tile_pos.y() + y_offset);
-					if (!CMap::Map.Info.IsPointOnMap(adjacent_pos, z)) {
-						continue;
-					}
+	const int z = this->get_site_unit()->MapLayer->ID;
 
-					CMapField *adjacent_tile = CMap::Map.Field(adjacent_pos, z);
-					if (adjacent_tile->get_settlement() != nullptr && adjacent_tile->get_settlement() != this) {
-						if (!minimap_only) {
-							CMap::Map.CalculateTileOwnershipTransition(adjacent_pos, z);
-						}
+	for (int x = this->territory_rect.x(); x <= this->territory_rect.right(); ++x) {
+		for (int y = this->territory_rect.y(); y <= this->territory_rect.bottom(); ++y) {
+			const QPoint tile_pos(x, y);
+			const CMapField *tile = CMap::Map.Field(tile_pos, z);
 
-						for (int minimap_offset_x = -minimap_territory_tile_range; minimap_offset_x <= minimap_territory_tile_range; ++minimap_offset_x) {
-							for (int minimap_offset_y = -minimap_territory_tile_range; minimap_offset_y <= minimap_territory_tile_range; ++minimap_offset_y) {
-								const QPoint minimap_tile_pos(adjacent_pos.x() + minimap_offset_x, adjacent_pos.y() + minimap_offset_y);
-
-								if (!CMap::Map.Info.IsPointOnMap(minimap_tile_pos, z)) {
-									continue;
-								}
-
-								UI.Minimap.UpdateXY(minimap_tile_pos, z);
-							}
-						}
-					}
-				}
+			if (tile->get_settlement() == this) {
+				UI.Minimap.update_territory_xy(tile_pos, z);
 			}
 		}
 	}

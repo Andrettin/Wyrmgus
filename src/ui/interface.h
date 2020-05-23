@@ -259,8 +259,8 @@ extern void SetHoldClickDelay(int delay);
 extern void UiTogglePause();
 /// Toggle big map
 extern void UiToggleBigMap();
-/// Toggle terrain display on/off.
-extern void UiToggleTerrain();
+/// Toggle minimap mode.
+extern void UiToggleMinimapMode();
 /// Find the next idle worker
 extern void UiFindIdleWorker();
 //Wyrmgus start

@@ -111,10 +111,7 @@ public:
 		return this->player_color;
 	}
 
-	const QColor &get_minimap_color() const
-	{
-		return this->minimap_color;
-	}
+	const QColor &get_minimap_color() const;
 
 	int Index = 0;          /// player as number
 	std::string Name;   /// name of non computer
@@ -214,7 +211,6 @@ public:
 	
 private:
 	const stratagus::player_color *player_color = nullptr; /// player color for units and portraits
-	QColor minimap_color;           /// color of units on minimap
 
 public:
 	std::vector<CUnit *> FreeWorkers;	/// Container for free workers
