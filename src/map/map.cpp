@@ -1101,7 +1101,7 @@ bool UnitTypeCanBeAt(const stratagus::unit_type &type, const Vec2i &pos, int z)
 			}
 
 			const CMapField *tile = CMap::Map.Field(pos.x + addx + index, z);
-			if (tile->CheckMask(mask) == true || tile->Terrain == nullptr) {
+			if (tile->CheckMask(mask) == true || (tile->Terrain == nullptr && stratagus::game::get()->get_current_campaign() != nullptr)) {
 				return false;
 			}
 			
