@@ -1375,13 +1375,13 @@ void CommandSharedVision(int player, bool state, int opponent)
 	}
 
 	// Compute Before and after.
-	const int before = CPlayer::Players[player]->IsBothSharedVision(*CPlayer::Players[opponent]);
+	const int before = CPlayer::Players[player]->has_mutual_shared_vision_with(*CPlayer::Players[opponent]);
 	if (state == false) {
 		CPlayer::Players[player]->UnshareVisionWith(*CPlayer::Players[opponent]);
 	} else {
 		CPlayer::Players[player]->ShareVisionWith(*CPlayer::Players[opponent]);
 	}
-	const int after = CPlayer::Players[player]->IsBothSharedVision(*CPlayer::Players[opponent]);
+	const int after = CPlayer::Players[player]->has_mutual_shared_vision_with(*CPlayer::Players[opponent]);
 
 	if (before && !after) {
 		// Don't share vision anymore. Give each other explored terrain for good-bye.
@@ -1417,13 +1417,13 @@ void CommandSharedVision(int player, bool state, int opponent)
 				CMapField &mf = *CMap::Map.Field(i, z);
 				CMapFieldPlayerInfo &mfp = mf.playerInfo;
 
-				if (mfp.Visible[player] && !mfp.Visible[opponent] && !CPlayer::Players[player]->Revealed) {
+				if (mfp.Visible[player] && !mfp.Visible[opponent] && !CPlayer::Players[player]->is_revealed()) {
 					mfp.Visible[opponent] = 1;
 					if (opponent == CPlayer::GetThisPlayer()->Index) {
 						CMap::Map.MarkSeenTile(mf, z);
 					}
 				}
-				if (mfp.Visible[opponent] && !mfp.Visible[player] && !CPlayer::Players[opponent]->Revealed) {
+				if (mfp.Visible[opponent] && !mfp.Visible[player] && !CPlayer::Players[opponent]->is_revealed()) {
 					mfp.Visible[player] = 1;
 					if (player == CPlayer::GetThisPlayer()->Index) {
 						CMap::Map.MarkSeenTile(mf, z);

@@ -863,7 +863,7 @@ void AiForce::Attack(const Vec2i &pos, int z)
 			z = enemy->MapLayer->ID;
 			if (!AiPlayer->Player->IsEnemy(*enemy->Player) && enemy->Player->Type != PlayerNeutral) {
 				AiPlayer->Player->SetDiplomacyEnemyWith(*enemy->Player);
-				if (AiPlayer->Player->IsSharedVision(*enemy->Player)) {
+				if (AiPlayer->Player->has_shared_vision_with(*enemy->Player)) {
 					CommandSharedVision(AiPlayer->Player->Index, false, enemy->Player->Index);
 				}
 			}
@@ -875,7 +875,7 @@ void AiForce::Attack(const Vec2i &pos, int z)
 			CPlayer *enemy_wall_owner = CMap::Map.Field(enemy_wall_pos, enemy_wall_map_layer)->get_owner();
 			if (!AiPlayer->Player->IsEnemy(*enemy_wall_owner) && enemy_wall_owner->Type != PlayerNeutral) {
 				AiPlayer->Player->SetDiplomacyEnemyWith(*enemy_wall_owner);
-				if (AiPlayer->Player->IsSharedVision(*enemy_wall_owner)) {
+				if (AiPlayer->Player->has_shared_vision_with(*enemy_wall_owner)) {
 					CommandSharedVision(AiPlayer->Player->Index, false, enemy_wall_owner->Index);
 				}
 			}
@@ -1658,7 +1658,7 @@ void AiForce::Update()
 				this->GoalMapLayer = unit->MapLayer->ID;
 				if (!AiPlayer->Player->IsEnemy(*unit->Player) && unit->Player->Type != PlayerNeutral) {
 					AiPlayer->Player->SetDiplomacyEnemyWith(*unit->Player);
-					if (AiPlayer->Player->IsSharedVision(*unit->Player)) {
+					if (AiPlayer->Player->has_shared_vision_with(*unit->Player)) {
 						CommandSharedVision(AiPlayer->Player->Index, false, unit->Player->Index);
 					}
 				}
@@ -1668,7 +1668,7 @@ void AiForce::Update()
 				CPlayer *enemy_wall_owner = CMap::Map.Field(enemy_wall_pos, enemy_wall_map_layer)->get_owner();
 				if (!AiPlayer->Player->IsEnemy(*enemy_wall_owner) && enemy_wall_owner->Type != PlayerNeutral) {
 					AiPlayer->Player->SetDiplomacyEnemyWith(*enemy_wall_owner);
-					if (AiPlayer->Player->IsSharedVision(*enemy_wall_owner)) {
+					if (AiPlayer->Player->has_shared_vision_with(*enemy_wall_owner)) {
 						CommandSharedVision(AiPlayer->Player->Index, false, enemy_wall_owner->Index);
 					}
 				}
@@ -1768,7 +1768,7 @@ void AiForce::Update()
 				this->GoalMapLayer = unit->MapLayer->ID;
 				if (!AiPlayer->Player->IsEnemy(*unit->Player) && unit->Player->Type != PlayerNeutral) {
 					AiPlayer->Player->SetDiplomacyEnemyWith(*unit->Player);
-					if (AiPlayer->Player->IsSharedVision(*unit->Player)) {
+					if (AiPlayer->Player->has_shared_vision_with(*unit->Player)) {
 						CommandSharedVision(AiPlayer->Player->Index, false, unit->Player->Index);
 					}
 				}
@@ -1782,7 +1782,7 @@ void AiForce::Update()
 				CPlayer *enemy_wall_owner = CMap::Map.Field(enemy_wall_pos, enemy_wall_map_layer)->get_owner();
 				if (!AiPlayer->Player->IsEnemy(*enemy_wall_owner) && enemy_wall_owner->Type != PlayerNeutral) {
 					AiPlayer->Player->SetDiplomacyEnemyWith(*enemy_wall_owner);
-					if (AiPlayer->Player->IsSharedVision(*enemy_wall_owner)) {
+					if (AiPlayer->Player->has_shared_vision_with(*enemy_wall_owner)) {
 						CommandSharedVision(AiPlayer->Player->Index, false, enemy_wall_owner->Index);
 					}
 				}

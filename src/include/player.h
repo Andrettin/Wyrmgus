@@ -102,8 +102,14 @@ public:
 
 	static std::vector<CPlayer *> Players;	//all players
 
+	static const std::vector<const CPlayer *> &get_revealed_players()
+	{
+		return CPlayer::revealed_players;
+	}
+
 private:
 	static CPlayer *ThisPlayer; //player on local computer
+	static inline std::vector<const CPlayer *> revealed_players;
 
 public:
 	const stratagus::player_color *get_player_color() const
@@ -139,6 +145,13 @@ public:
 //	inline void SetStartView(const Vec2i &pos) { StartPos = pos; }
 	inline void SetStartView(const Vec2i &pos, int z) { StartPos = pos; StartMapLayer = z; }
 	//Wyrmgus end
+
+	bool is_revealed() const
+	{
+		return this->revealed;
+	}
+
+	void set_revealed(const bool revealed);
 
 	int Resources[MaxCosts];      /// resources in overall store
 	int MaxResources[MaxCosts];   /// max resources can be stored
@@ -177,9 +190,9 @@ public:
 	//Wyrmgus end
 
 	bool AiEnabled = false; //handle AI on local computer
-	//Wyrmgus start
-	bool Revealed = false; //whether the player has been revealed (i.e. after losing the last town hall)
-	//Wyrmgus end
+private:
+	bool revealed = false; //whether the player has been revealed (i.e. after losing the last town hall)
+public:
 	PlayerAi *Ai = nullptr;          /// Ai structure pointer
 
 	int NumBuildings = 0;   /// # buildings
@@ -394,10 +407,16 @@ public:
 	bool IsAllied(const CPlayer &player) const;
 	bool IsAllied(const CUnit &unit) const;
 	bool IsVisionSharing() const;
-	bool IsSharedVision(const CPlayer &player) const;
-	bool IsSharedVision(const CUnit &unit) const;
-	bool IsBothSharedVision(const CPlayer &player) const;
-	bool IsBothSharedVision(const CUnit &unit) const;
+
+	const std::set<int> &get_shared_vision() const
+	{
+		return this->shared_vision;
+	}
+
+	bool has_shared_vision_with(const CPlayer &player) const;
+	bool has_shared_vision_with(const CUnit &unit) const;
+	bool has_mutual_shared_vision_with(const CPlayer &player) const;
+	bool has_mutual_shared_vision_with(const CUnit &unit) const;
 	bool IsTeamed(const CPlayer &player) const;
 	bool IsTeamed(const CUnit &unit) const;
 	//Wyrmgus start
@@ -432,8 +451,9 @@ private:
 	std::vector<CUnit *> Units; /// units of this player
 	unsigned int Enemy = 0;     /// enemy bit field for this player
 	unsigned int Allied = 0;    /// allied bit field for this player
-	unsigned int SharedVision = 0; /// shared vision bit field
+	std::set<int> shared_vision; /// set of player indexes that this player has shared vision with
 
+	friend void CleanPlayers();
 	friend void SetPlayersPalette();
 };
 

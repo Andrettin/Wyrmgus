@@ -4266,7 +4266,7 @@ void UpdateForNewUnit(const CUnit &unit, int upgrade)
 	//Wyrmgus start
 	if (player.LostTownHallTimer != 0 && type.BoolFlag[TOWNHALL_INDEX].value && CPlayer::GetThisPlayer()->HasContactWith(player)) {
 		player.LostTownHallTimer = 0;
-		player.Revealed = false;
+		player.set_revealed(false);
 		for (int j = 0; j < NumPlayers; ++j) {
 			if (player.Index != j && CPlayer::Players[j]->Type != PlayerNobody) {
 				CPlayer::Players[j]->Notify(_("%s has rebuilt a town hall, and will no longer be revealed!"), player.Name.c_str());
@@ -4543,16 +4543,21 @@ bool CUnit::IsVisible(const CPlayer &player) const
 	if (VisCount[player.Index]) {
 		return true;
 	}
-	for (int p = 0; p < PlayerMax; ++p) {
-		//Wyrmgus start
-//		if (p != player.Index && player.IsBothSharedVision(*CPlayer::Players[p])) {
-		if (p != player.Index && (player.IsBothSharedVision(*CPlayer::Players[p]) || CPlayer::Players[p]->Revealed)) {
-		//Wyrmgus end
+
+	for (const int p : player.get_shared_vision()) {
+		if (player.has_mutual_shared_vision_with(*CPlayer::Players[p])) {
 			if (VisCount[p]) {
 				return true;
 			}
 		}
 	}
+
+	for (const CPlayer *other_player : CPlayer::get_revealed_players()) {
+		if (VisCount[other_player->Index]) {
+			return true;
+		}
+	}
+
 	return false;
 }
 
@@ -7860,9 +7865,9 @@ bool CUnit::IsAllied(const CUnit &unit) const
 **
 **  @param x  Player to check
 */
-bool CUnit::IsSharedVision(const CPlayer &player) const
+bool CUnit::has_shared_vision_with(const CPlayer &player) const
 {
-	return this->Player->IsSharedVision(player);
+	return this->Player->has_shared_vision_with(player);
 }
 
 /**
@@ -7870,9 +7875,9 @@ bool CUnit::IsSharedVision(const CPlayer &player) const
 **
 **  @param x  Unit to check
 */
-bool CUnit::IsSharedVision(const CUnit &unit) const
+bool CUnit::has_shared_vision_with(const CUnit &unit) const
 {
-	return IsSharedVision(*unit.Player);
+	return this->has_shared_vision_with(*unit.Player);
 }
 
 /**
@@ -7880,9 +7885,9 @@ bool CUnit::IsSharedVision(const CUnit &unit) const
 **
 **  @param x  Player to check
 */
-bool CUnit::IsBothSharedVision(const CPlayer &player) const
+bool CUnit::has_mutual_shared_vision_with(const CPlayer &player) const
 {
-	return this->Player->IsBothSharedVision(player);
+	return this->Player->has_mutual_shared_vision_with(player);
 }
 
 /**
@@ -7890,9 +7895,9 @@ bool CUnit::IsBothSharedVision(const CPlayer &player) const
 **
 **  @param x  Unit to check
 */
-bool CUnit::IsBothSharedVision(const CUnit &unit) const
+bool CUnit::has_mutual_shared_vision_with(const CUnit &unit) const
 {
-	return IsBothSharedVision(*unit.Player);
+	return this->has_mutual_shared_vision_with(*unit.Player);
 }
 
 /**

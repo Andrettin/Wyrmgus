@@ -521,6 +521,7 @@ void InitPlayers()
 void CleanPlayers()
 {
 	CPlayer::SetThisPlayer(nullptr);
+	CPlayer::revealed_players.clear();
 	for (unsigned int i = 0; i < PlayerMax; ++i) {
 		CPlayer::Players[i]->Clear();
 	}
@@ -582,6 +583,21 @@ const QColor &CPlayer::get_minimap_color() const
 	return this->get_player_color()->get_colors().at(stratagus::defines::get()->get_minimap_color_index());
 }
 
+void CPlayer::set_revealed(const bool revealed)
+{
+	if (revealed == this->is_revealed()) {
+		return;
+	}
+
+	this->revealed = revealed;
+
+	if (revealed) {
+		CPlayer::revealed_players.push_back(this);
+	} else {
+		stratagus::vector::remove(CPlayer::revealed_players, this);
+	}
+}
+
 void CPlayer::Save(CFile &file) const
 {
 	const CPlayer &p = *this;
@@ -628,7 +644,7 @@ void CPlayer::Save(CFile &file) const
 	}
 	file.printf("\", \"shared-vision\", \"");
 	for (int j = 0; j < PlayerMax; ++j) {
-		file.printf("%c", (p.SharedVision & (1 << j)) ? 'X' : '_');
+		file.printf("%c", p.shared_vision.contains(j) ? 'X' : '_');
 	}
 	file.printf("\",\n  \"start\", {%d, %d},\n", p.StartPos.x, p.StartPos.y);
 	//Wyrmgus start
@@ -721,11 +737,9 @@ void CPlayer::Save(CFile &file) const
 	// TotalNumUnits done by load units.
 	// NumBuildings done by load units.
 	
-	//Wyrmgus start
-	if (p.Revealed) {
+	if (p.is_revealed()) {
 		file.printf(" \"revealed\",");
 	}
-	//Wyrmgus end
 	
 	file.printf(" \"supply\", %d,", p.Supply);
 	file.printf(" \"trade-cost\", %d,", p.TradeCost);
@@ -1099,9 +1113,7 @@ void CPlayer::Init(/* PlayerTypes */ int type)
 	} else {
 		this->AiEnabled = false;
 	}
-	//Wyrmgus start
-	this->Revealed = false;
-	//Wyrmgus end
+	this->revealed = false;
 	++NumPlayers;
 }
 
@@ -2207,7 +2219,7 @@ void CPlayer::Clear()
 	this->Team = 0;
 	this->Enemy = 0;
 	this->Allied = 0;
-	this->SharedVision = 0;
+	this->shared_vision.clear();
 	this->StartPos.x = 0;
 	this->StartPos.y = 0;
 	//Wyrmgus start
@@ -2242,9 +2254,7 @@ void CPlayer::Clear()
 	this->Modifiers.clear();
 	//Wyrmgus end
 	this->AiEnabled = false;
-	//Wyrmgus start
-	this->Revealed = false;
-	//Wyrmgus end
+	this->revealed = false;
 	this->Ai = 0;
 	this->Units.resize(0);
 	this->FreeWorkers.resize(0);
@@ -3785,9 +3795,8 @@ void PlayersEachCycle()
 	for (int player = 0; player < NumPlayers; ++player) {
 		CPlayer *p = CPlayer::Players[player];
 		
-		//Wyrmgus start
-		if (p->LostTownHallTimer && !p->Revealed && p->LostTownHallTimer < ((int) GameCycle) && CPlayer::GetThisPlayer()->HasContactWith(*p)) {
-			p->Revealed = true;
+		if (p->LostTownHallTimer && !p->is_revealed() && p->LostTownHallTimer < ((int) GameCycle) && CPlayer::GetThisPlayer()->HasContactWith(*p)) {
+			p->set_revealed(true);
 			for (int j = 0; j < NumPlayers; ++j) {
 				if (player != j && CPlayer::Players[j]->Type != PlayerNobody) {
 					CPlayer::Players[j]->Notify(_("%s's units have been revealed!"), p->Name.c_str());
@@ -3808,7 +3817,6 @@ void PlayersEachCycle()
 		if (p->HeroCooldownTimer) {
 			p->HeroCooldownTimer--;
 		}
-		//Wyrmgus end
 
 		if (p->AiEnabled) {
 			AiEachCycle(*p);
@@ -4024,33 +4032,27 @@ void CPlayer::SetDiplomacyCrazyWith(const CPlayer &player)
 	this->Enemy |= 1 << player.Index;
 	this->Allied |= 1 << player.Index;
 	
-	//Wyrmgus start
 	if (GameCycle > 0 && player.Index == CPlayer::GetThisPlayer()->Index) {
 		CPlayer::GetThisPlayer()->Notify(_("%s changed their diplomatic stance with us to Crazy"), _(this->Name.c_str()));
 	}
-	//Wyrmgus end
 }
 
 void CPlayer::ShareVisionWith(const CPlayer &player)
 {
-	this->SharedVision |= (1 << player.Index);
+	this->shared_vision.insert(player.Index);
 	
-	//Wyrmgus start
 	if (GameCycle > 0 && player.Index == CPlayer::GetThisPlayer()->Index) {
 		CPlayer::GetThisPlayer()->Notify(_("%s is now sharing vision with us"), _(this->Name.c_str()));
 	}
-	//Wyrmgus end
 }
 
 void CPlayer::UnshareVisionWith(const CPlayer &player)
 {
-	this->SharedVision &= ~(1 << player.Index);
+	this->shared_vision.erase(player.Index);
 	
-	//Wyrmgus start
 	if (GameCycle > 0 && player.Index == CPlayer::GetThisPlayer()->Index) {
 		CPlayer::GetThisPlayer()->Notify(_("%s is no longer sharing vision with us"), _(this->Name.c_str()));
 	}
-	//Wyrmgus end
 }
 
 //Wyrmgus start
@@ -4137,40 +4139,39 @@ bool CPlayer::IsAllied(const CUnit &unit) const
 
 bool CPlayer::IsVisionSharing() const
 {
-	return SharedVision != 0;
+	return !this->shared_vision.empty();
 }
 
 /**
 **  Check if the player shares vision with the player
 */
-bool CPlayer::IsSharedVision(const CPlayer &player) const
+bool CPlayer::has_shared_vision_with(const CPlayer &player) const
 {
-	return (SharedVision & (1 << player.Index)) != 0;
+	return this->shared_vision.contains(player.Index);
 }
 
 /**
 **  Check if the player shares vision with the unit
 */
-bool CPlayer::IsSharedVision(const CUnit &unit) const
+bool CPlayer::has_shared_vision_with(const CUnit &unit) const
 {
-	return IsSharedVision(*unit.Player);
+	return this->has_shared_vision_with(*unit.Player);
 }
 
 /**
 **  Check if the both players share vision
 */
-bool CPlayer::IsBothSharedVision(const CPlayer &player) const
+bool CPlayer::has_mutual_shared_vision_with(const CPlayer &player) const
 {
-	return (SharedVision & (1 << player.Index)) != 0
-		   && (player.SharedVision & (1 << Index)) != 0;
+	return this->shared_vision.contains(player.Index) && player.shared_vision.contains(this->Index);
 }
 
 /**
 **  Check if the player and the unit share vision
 */
-bool CPlayer::IsBothSharedVision(const CUnit &unit) const
+bool CPlayer::has_mutual_shared_vision_with(const CUnit &unit) const
 {
-	return IsBothSharedVision(*unit.Player);
+	return this->has_mutual_shared_vision_with(*unit.Player);
 }
 
 /**

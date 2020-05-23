@@ -188,9 +188,9 @@ void CPlayer::Load(lua_State *l)
 			value = LuaToString(l, j + 1);
 			for (int i = 0; i < PlayerMax && *value; ++i, ++value) {
 				if (*value == '-' || *value == '_' || *value == ' ') {
-					this->SharedVision &= ~(1 << i);
+					this->shared_vision.erase(i);
 				} else {
-					this->SharedVision |= (1 << i);
+					this->shared_vision.insert(i);
 				}
 			}
 		} else if (!strcmp(value, "start")) {
@@ -293,7 +293,7 @@ void CPlayer::Load(lua_State *l)
 			--j;
 		//Wyrmgus start
 		} else if (!strcmp(value, "revealed")) {
-			this->Revealed = true;
+			this->set_revealed(true);
 			--j;
 		//Wyrmgus end
 		} else if (!strcmp(value, "supply")) {

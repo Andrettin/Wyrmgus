@@ -1474,10 +1474,7 @@ void UIHandleMouseMove(const PixelPos &cursorPos)
 			CMapField &mf = *UI.CurrentMapLayer->Field(tilePos);
 			for (int i = 0; i < PlayerMax; ++i) {
 				if (mf.playerInfo.IsTeamExplored(*CPlayer::Players[i])
-					//Wyrmgus start
-//					&& (i == CPlayer::GetThisPlayer()->Index || CPlayer::Players[i]->IsBothSharedVision(*CPlayer::GetThisPlayer()))) {
-					&& (i == CPlayer::GetThisPlayer()->Index || CPlayer::Players[i]->IsBothSharedVision(*CPlayer::GetThisPlayer()) || CPlayer::Players[i]->Revealed)) {
-					//Wyrmgus end
+					&& (i == CPlayer::GetThisPlayer()->Index || CPlayer::Players[i]->has_mutual_shared_vision_with(*CPlayer::GetThisPlayer()) || CPlayer::Players[i]->is_revealed())) {
 					show = true;
 					break;
 				}

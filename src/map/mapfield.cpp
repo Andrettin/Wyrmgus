@@ -734,29 +734,38 @@ unsigned char CMapFieldPlayerInfo::TeamVisibilityState(const CPlayer &player) co
 	if (IsVisible(player)) {
 		return 2;
 	}
+
 	unsigned char maxVision = 0;
+
 	if (IsExplored(player)) {
 		maxVision = 1;
 	}
-	for (int i = 0; i != PlayerMax ; ++i) {
-		//Wyrmgus start
-//		if (player.IsBothSharedVision(*CPlayer::Players[i])) {
-		if (player.IsBothSharedVision(*CPlayer::Players[i]) || CPlayer::Players[i]->Revealed) {
-		//Wyrmgus end
-			//Wyrmgus start
-			if (CPlayer::Players[i]->Revealed && !player.IsBothSharedVision(*CPlayer::Players[i]) && Visible[i] < 2) { //don't show a revealed player's explored tiles, only the currently visible ones
-				continue;
-			}
-			//Wyrmgus end
+
+	for (int i : player.get_shared_vision()) {
+		if (player.has_mutual_shared_vision_with(*CPlayer::Players[i])) {
 			maxVision = std::max<unsigned char>(maxVision, Visible[i]);
 			if (maxVision >= 2) {
 				return 2;
 			}
 		}
 	}
+
+	for (const CPlayer *other_player : CPlayer::get_revealed_players()) {
+		const int other_player_index = other_player->Index;
+		if (Visible[other_player_index] < 2) { //don't show a revealed player's explored tiles, only the currently visible ones
+			continue;
+		}
+
+		maxVision = std::max<unsigned char>(maxVision, Visible[other_player_index]);
+		if (maxVision >= 2) {
+			return 2;
+		}
+	}
+
 	if (maxVision == 1 && CMap::Map.NoFogOfWar) {
 		return 2;
 	}
+
 	return maxVision;
 }
 
