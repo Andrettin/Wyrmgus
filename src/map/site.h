@@ -69,6 +69,7 @@ public:
 	{
 	}
 
+	virtual void process_sml_scope(const sml_data &scope) override;
 	virtual void ProcessConfigData(const CConfigData *config_data) override;
 	virtual void initialize() override;
 

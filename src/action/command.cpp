@@ -1343,14 +1343,12 @@ void CommandDiplomacy(const int player, const diplomacy_state state, const int o
 		case diplomacy_state::enemy:
 			CPlayer::Players[player]->SetDiplomacyEnemyWith(*CPlayer::Players[opponent]);
 			break;
-		//Wyrmgus start
 		case diplomacy_state::overlord:
 			CPlayer::Players[opponent]->SetOverlord(CPlayer::Players[player]);
 			break;
 		case diplomacy_state::vassal:
 			CPlayer::Players[player]->SetOverlord(CPlayer::Players[opponent]);
 			break;
-		//Wyrmgus end
 		case diplomacy_state::crazy:
 			CPlayer::Players[player]->SetDiplomacyCrazyWith(*CPlayer::Players[opponent]);
 			break;

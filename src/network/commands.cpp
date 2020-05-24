@@ -736,7 +736,6 @@ void SendCommandDiplomacy(const int player, const diplomacy_state state, const i
 				CommandLog("diplomacy", NoUnitP, 0, player, opponent,
 						   NoUnitP, "enemy", -1);
 				break;
-			//Wyrmgus start
 			case diplomacy_state::overlord:
 				CommandLog("diplomacy", NoUnitP, 0, player, opponent,
 						   NoUnitP, "overlord", -1);
@@ -745,7 +744,6 @@ void SendCommandDiplomacy(const int player, const diplomacy_state state, const i
 				CommandLog("diplomacy", NoUnitP, 0, player, opponent,
 						   NoUnitP, "vassal", -1);
 				break;
-			//Wyrmgus end
 			case diplomacy_state::crazy:
 				CommandLog("diplomacy", NoUnitP, 0, player, opponent,
 						   NoUnitP, "crazy", -1);

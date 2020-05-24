@@ -419,9 +419,9 @@ public:
 	bool has_mutual_shared_vision_with(const CUnit &unit) const;
 	bool IsTeamed(const CPlayer &player) const;
 	bool IsTeamed(const CUnit &unit) const;
-	//Wyrmgus start
 	bool IsOverlordOf(const CPlayer &player, bool include_indirect = false) const;
 	bool IsVassalOf(const CPlayer &player, bool include_indirect = false) const;
+	//Wyrmgus start
 	bool HasContactWith(const CPlayer &player) const;
 	bool HasNeutralFactionType() const;
 	bool HasBuildingAccess(const CPlayer &player, const ButtonCmd button_action = ButtonCmd::None) const;
@@ -439,9 +439,7 @@ public:
 	void ShareVisionWith(const CPlayer &player);
 	void UnshareVisionWith(const CPlayer &player);
 	
-	//Wyrmgus start
 	void SetOverlord(CPlayer *player);
-	//Wyrmgus end
 
 	void Init(/* PlayerTypes */ int type);
 	void Save(CFile &file) const;

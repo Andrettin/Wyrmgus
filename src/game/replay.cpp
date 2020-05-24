@@ -978,12 +978,10 @@ static void DoNextReplay()
 			state = diplomacy_state::allied;
 		} else if (!strcmp(val, "enemy")) {
 			state = diplomacy_state::enemy;
-		//Wyrmgus start
 		} else if (!strcmp(val, "overlord")) {
 			state = diplomacy_state::overlord;
 		} else if (!strcmp(val, "vassal")) {
 			state = diplomacy_state::vassal;
-		//Wyrmgus end
 		} else if (!strcmp(val, "crazy")) {
 			state = diplomacy_state::crazy;
 		} else {

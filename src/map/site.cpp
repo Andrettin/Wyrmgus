@@ -48,6 +48,20 @@
 
 namespace stratagus {
 
+void site::process_sml_scope(const sml_data &scope)
+{
+	const std::string &tag = scope.get_tag();
+
+	if (tag == "cultural_names") {
+		scope.for_each_property([&](const sml_property &property) {
+			const civilization *civilization = civilization::get(property.get_key());
+			this->CulturalNames[civilization] = property.get_value();
+		});
+	} else {
+		data_entry::process_sml_scope(scope);
+	}
+}
+
 void site::ProcessConfigData(const CConfigData *config_data)
 {
 	for (size_t i = 0; i < config_data->Properties.size(); ++i) {
@@ -81,8 +95,6 @@ void site::ProcessConfigData(const CConfigData *config_data)
 			for (size_t j = 0; j < child_config_data->Properties.size(); ++j) {
 				std::string key = child_config_data->Properties[j].first;
 				std::string value = child_config_data->Properties[j].second;
-				
-				key = FindAndReplaceString(key, "_", "-");
 				
 				const civilization *civilization = civilization::get(key);
 				this->CulturalNames[civilization] = value;
