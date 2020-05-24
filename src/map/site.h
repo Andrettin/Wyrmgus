@@ -192,6 +192,8 @@ public:
 		return this->color;
 	}
 
+	const QColor &get_minimap_color() const;
+
 	const std::vector<character *> &get_characters() const
 	{
 		return this->characters;

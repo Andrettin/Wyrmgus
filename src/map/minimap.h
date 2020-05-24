@@ -44,7 +44,7 @@ namespace stratagus {
 
 enum class minimap_mode;
 
-class minimap
+class minimap final
 {
 public:
 	minimap();

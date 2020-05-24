@@ -490,7 +490,7 @@ void minimap::update_territory_pixel(const int mx, const int my, const int z)
 		const bool is_settlement_water = settlement_center_tile->Flags & (MapFieldWaterAllowed | MapFieldCoastAllowed);
 		const bool is_settlement_space = settlement_center_tile->Flags & MapFieldSpace;
 		if (is_tile_water == is_settlement_water && is_tile_space == is_settlement_space) {
-			const QColor settlement_color = mf.get_settlement()->get_color()->get_colors()[minimap_color_index];
+			const QColor settlement_color = mf.get_settlement()->get_minimap_color();
 			*(uint32_t *) &(this->settlements_surface_gl[z][pixel_index]) = Video.MapRGBA(settlement_color);
 		}
 	}

@@ -31,6 +31,7 @@
 
 #include "civilization.h"
 #include "config.h"
+#include "database/defines.h"
 #include "faction.h"
 #include "item.h"
 #include "map/map.h"
@@ -336,6 +337,11 @@ void site::remove_region(region *region)
 {
 	vector::remove(this->regions, region);
 	region->remove_site(this);
+}
+
+const QColor &site::get_minimap_color() const
+{
+	return this->get_color()->get_colors().at(defines::get()->get_minimap_color_index());
 }
 
 }
