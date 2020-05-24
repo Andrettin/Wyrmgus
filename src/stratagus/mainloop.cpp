@@ -562,8 +562,9 @@ void GameMainLoop()
 		}
 		
 		//update the sold units of all units before starting, to make sure they fit the current conditions
-		for (CUnitManager::Iterator it = UnitManager.begin(); it != UnitManager.end(); ++it) {
-			CUnit *unit = *it;
+		//make a copy of the units list, as updating the sold units can change the list
+		const std::vector<CUnit *> units(UnitManager.begin(), UnitManager.end());
+		for (CUnit *unit : units) {
 			if (unit && unit->IsAlive()) {
 				unit->UpdateSoldUnits();
 			}
