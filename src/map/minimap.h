@@ -121,6 +121,9 @@ private:
 
 	//minimap surface with territories
 	std::vector<unsigned char *> territories_surface_gl;
+
+	//minimap surface with territories, including non-land tiles
+	std::vector<unsigned char *> territories_with_non_land_surface_gl;
 };
 
 }

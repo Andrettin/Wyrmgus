@@ -1089,10 +1089,7 @@ bool CheckedCanMoveToMask(const Vec2i &pos, int mask, int z)
 bool UnitTypeCanBeAt(const stratagus::unit_type &type, const Vec2i &pos, int z)
 {
 	const int mask = type.MovementMask;
-	//Wyrmgus start
-//	unsigned int index = pos.y * CMap::Map.Info.MapWidth;
 	unsigned int index = pos.y * CMap::Map.Info.MapWidths[z];
-	//Wyrmgus end
 
 	for (int addy = 0; addy < type.get_tile_height(); ++addy) {
 		for (int addx = 0; addx < type.get_tile_width(); ++addx) {
@@ -1106,10 +1103,7 @@ bool UnitTypeCanBeAt(const stratagus::unit_type &type, const Vec2i &pos, int z)
 			}
 			
 		}
-		//Wyrmgus start
-//		index += CMap::Map.Info.MapWidth;
 		index += CMap::Map.Info.MapWidths[z];
-		//Wyrmgus end
 	}
 	return true;
 }

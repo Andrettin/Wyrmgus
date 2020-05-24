@@ -178,6 +178,9 @@ void minimap::Create()
 		this->territories_surface_gl.push_back(new unsigned char[MinimapTextureWidth[z] * MinimapTextureHeight[z] * 4]);
 		memset(this->territories_surface_gl[z], 0, MinimapTextureWidth[z] * MinimapTextureHeight[z] * 4);
 
+		this->territories_with_non_land_surface_gl.push_back(new unsigned char[MinimapTextureWidth[z] * MinimapTextureHeight[z] * 4]);
+		memset(this->territories_with_non_land_surface_gl[z], 0, MinimapTextureWidth[z] * MinimapTextureHeight[z] * 4);
+
 		this->surface_gl.push_back(new unsigned char[MinimapTextureWidth[z] * MinimapTextureHeight[z] * 4]);
 		memset(this->surface_gl[z], 0, MinimapTextureWidth[z] * MinimapTextureHeight[z] * 4);
 
@@ -289,7 +292,7 @@ void minimap::UpdateTerrain(int z)
 			const int base_yofs = stratagus::defines::get()->get_scaled_tile_height() * (base_tile / base_tilepitch);
 			//Wyrmgus end
 
-			Uint32 c;
+			uint32_t c;
 
 			QColor color = GetTileGraphicPixel(xofs, yofs, mx, my, scalex, scaley, z, terrain, season);
 
@@ -299,7 +302,7 @@ void minimap::UpdateTerrain(int z)
 
 			c = Video.MapRGB(0, color.red(), color.green(), color.blue());
 
-			*(Uint32 *)&(this->terrain_surface_gl[z][(mx + my * MinimapTextureWidth[z]) * 4]) = c;
+			*(uint32_t *)&(this->terrain_surface_gl[z][(mx + my * MinimapTextureWidth[z]) * 4]) = c;
 		}
 	}
 }
@@ -307,22 +310,37 @@ void minimap::UpdateTerrain(int z)
 void minimap::update_territories(const int z)
 {
 	const CMapLayer *map_layer = CMap::Map.MapLayers[z];
+	const int non_land_territory_alpha = defines::get()->get_minimap_non_land_territory_alpha();
 	
 	for (int my = YOffset[z]; my < H - YOffset[z]; ++my) {
 		for (int mx = XOffset[z]; mx < W - XOffset[z]; ++mx) {
 			QColor color(Qt::transparent);
+			QColor with_non_land_color = color;
 
 			const CMapField &mf = *map_layer->Field(Minimap2MapX[z][mx] + Minimap2MapY[z][my]);
-			if (mf.get_settlement() != nullptr && !(mf.Flags & (MapFieldWaterAllowed | MapFieldCoastAllowed | MapFieldSpace))) {
-				if (mf.get_owner() != nullptr) {
-					color = mf.get_owner()->get_minimap_color();
+			if (mf.get_settlement() != nullptr) {
+				if (!(mf.Flags & (MapFieldWaterAllowed | MapFieldCoastAllowed | MapFieldSpace))) {
+					if (mf.get_owner() != nullptr) {
+						color = mf.get_owner()->get_minimap_color();
+					} else {
+						color = CPlayer::Players[PlayerNumNeutral]->get_minimap_color();
+					}
+					with_non_land_color = color;
 				} else {
-					color = CPlayer::Players[PlayerNumNeutral]->get_minimap_color();
+					if (mf.get_owner() != nullptr) {
+						with_non_land_color = mf.get_owner()->get_minimap_color();
+					} else {
+						with_non_land_color = CPlayer::Players[PlayerNumNeutral]->get_minimap_color();
+					}
+					with_non_land_color.setAlpha(non_land_territory_alpha);
 				}
 			}
 
-			const Uint32 c = Video.MapRGBA(color);
-			*(Uint32 *)&(this->territories_surface_gl[z][(mx + my * MinimapTextureWidth[z]) * 4]) = c;
+			const uint32_t c = Video.MapRGBA(color);
+			*(uint32_t *) &(this->territories_surface_gl[z][(mx + my * MinimapTextureWidth[z]) * 4]) = c;
+
+			const uint32_t with_non_land_c = Video.MapRGBA(with_non_land_color);
+			*(uint32_t *) &(this->territories_with_non_land_surface_gl[z][(mx + my * MinimapTextureWidth[z]) * 4]) = with_non_land_c;
 		}
 	}
 }
@@ -413,7 +431,7 @@ void minimap::UpdateXY(const Vec2i &pos, int z)
 			const int base_yofs = stratagus::defines::get()->get_scaled_tile_height() * (base_tile / base_tilepitch);
 			//Wyrmgus end
 
-			Uint32 c;
+			uint32_t c;
 
 			QColor color = GetTileGraphicPixel(xofs, yofs, mx, my, scalex, scaley, z, terrain, season);
 
@@ -422,7 +440,7 @@ void minimap::UpdateXY(const Vec2i &pos, int z)
 			}
 
 			c = Video.MapRGB(0, color.red(), color.green(), color.blue());
-			*(Uint32 *)&(this->terrain_surface_gl[z][(mx + my * MinimapTextureWidth[z]) * 4]) = c;
+			*(uint32_t *) &(this->terrain_surface_gl[z][(mx + my * MinimapTextureWidth[z]) * 4]) = c;
 		}
 	}
 }
@@ -435,6 +453,7 @@ void minimap::update_territory_xy(const QPoint &pos, const int z)
 
 	const int ty = pos.y() * CMap::Map.Info.MapWidths[z];
 	const int tx = pos.x();
+	const int non_land_territory_alpha = defines::get()->get_minimap_non_land_territory_alpha();
 
 	for (int my = YOffset[z]; my < H - YOffset[z]; ++my) {
 		const int y = Minimap2MapY[z][my];
@@ -456,18 +475,32 @@ void minimap::update_territory_xy(const QPoint &pos, const int z)
 			}
 
 			QColor color(Qt::transparent);
+			QColor with_non_land_color = color;
 			const CMapField &mf = *CMap::Map.MapLayers[z]->Field(x + y);
 
-			if (mf.get_settlement() != nullptr && !(mf.Flags & (MapFieldWaterAllowed | MapFieldCoastAllowed | MapFieldSpace))) {
-				if (mf.get_owner() != nullptr) {
-					color = mf.get_owner()->get_minimap_color();
+			if (mf.get_settlement() != nullptr) {
+				if (!(mf.Flags & (MapFieldWaterAllowed | MapFieldCoastAllowed | MapFieldSpace))) {
+					if (mf.get_owner() != nullptr) {
+						color = mf.get_owner()->get_minimap_color();
+					} else {
+						color = CPlayer::Players[PlayerNumNeutral]->get_minimap_color();
+					}
+					with_non_land_color = color;
 				} else {
-					color = CPlayer::Players[PlayerNumNeutral]->get_minimap_color();
+					if (mf.get_owner() != nullptr) {
+						with_non_land_color = mf.get_owner()->get_minimap_color();
+					} else {
+						with_non_land_color = CPlayer::Players[PlayerNumNeutral]->get_minimap_color();
+					}
+					with_non_land_color.setAlpha(non_land_territory_alpha);
 				}
 			}
 
-			const Uint32 c = Video.MapRGBA(color);
-			*(Uint32 *) &(this->territories_surface_gl[z][(mx + my * MinimapTextureWidth[z]) * 4]) = c;
+			const uint32_t c = Video.MapRGBA(color);
+			*(uint32_t *) &(this->territories_surface_gl[z][(mx + my * MinimapTextureWidth[z]) * 4]) = c;
+
+			const uint32_t with_non_land_c = Video.MapRGBA(with_non_land_color);
+			*(uint32_t *) &(this->territories_with_non_land_surface_gl[z][(mx + my * MinimapTextureWidth[z]) * 4]) = with_non_land_c;
 		}
 	}
 }
@@ -497,7 +530,7 @@ void minimap::DrawUnitOn(CUnit &unit, int red_phase)
 		return;
 	}
 
-	Uint32 color;
+	uint32_t color;
 	if (unit.GetDisplayPlayer() == PlayerNumNeutral) {
 		color = Video.MapRGB(TheScreen->format, type->NeutralMinimapColorRGB);
 	} else if (unit.Player == CPlayer::GetThisPlayer() && !Editor.Running) {
@@ -529,7 +562,7 @@ void minimap::DrawUnitOn(CUnit &unit, int red_phase)
 	while (w-- >= 0) {
 		int h = h0;
 		while (h-- >= 0) {
-			*(Uint32 *)&(this->surface_gl[z][((mx + w) + (my + h) * MinimapTextureWidth[z]) * 4]) = color;
+			*(uint32_t *) &(this->surface_gl[z][((mx + w) + (my + h) * MinimapTextureWidth[z]) * 4]) = color;
 		}
 	}
 }
@@ -553,8 +586,15 @@ void minimap::Update()
 		memset(this->surface_gl[z], 0, MinimapTextureWidth[z] * MinimapTextureHeight[z] * 4);
 	}
 
-	if (this->get_mode() == minimap_mode::territories) {
-		memcpy(this->surface_gl[z], this->territories_surface_gl[z], MinimapTextureWidth[z] * MinimapTextureHeight[z] * 4);
+	switch (this->get_mode()) {
+		case minimap_mode::territories:
+			memcpy(this->surface_gl[z], this->territories_surface_gl[z], MinimapTextureWidth[z] * MinimapTextureHeight[z] * 4);
+			break;
+		case minimap_mode::territories_with_non_land:
+			memcpy(this->surface_gl[z], this->territories_with_non_land_surface_gl[z], MinimapTextureWidth[z] * MinimapTextureHeight[z] * 4);
+			break;
+		default:
+			break;
 	}
 
 	const uint32_t unexplored_color = Video.MapRGB(nullptr, 0, 0, 0);
@@ -562,7 +602,7 @@ void minimap::Update()
 	for (int my = 0; my < H; ++my) {
 		for (int mx = 0; mx < W; ++mx) {
 			if (mx < XOffset[z] || mx >= W - XOffset[z] || my < YOffset[z] || my >= H - YOffset[z]) {
-				*(Uint32 *)&(this->surface_gl[z][(mx + my * MinimapTextureWidth[z]) * 4]) = Video.MapRGB(nullptr, 0, 0, 0);
+				*(uint32_t *) &(this->surface_gl[z][(mx + my * MinimapTextureWidth[z]) * 4]) = Video.MapRGB(nullptr, 0, 0, 0);
 				continue;
 			}
 			
@@ -577,11 +617,11 @@ void minimap::Update()
 
 			switch (visiontype) {
 				case 0:
-					*(Uint32 *) &(this->surface_gl[z][(mx + my * MinimapTextureWidth[z]) * 4]) = unexplored_color;
+					*(uint32_t *) &(this->surface_gl[z][(mx + my * MinimapTextureWidth[z]) * 4]) = unexplored_color;
 					break;
 				case 1:
 					if (this->is_fog_of_war_visible()) {
-						Uint32 *c = (Uint32 *) &(this->surface_gl[z][(mx + my * MinimapTextureWidth[z]) * 4]);
+						uint32_t *c = (uint32_t *) &(this->surface_gl[z][(mx + my * MinimapTextureWidth[z]) * 4]);
 						if (*c == 0) {
 							*c = explored_color;
 						}
@@ -740,6 +780,11 @@ void minimap::Destroy()
 	}
 	this->territories_surface_gl.clear();
 
+	for (size_t z = 0; z < this->territories_with_non_land_surface_gl.size(); ++z) {
+		delete[] this->territories_with_non_land_surface_gl[z];
+	}
+	this->territories_with_non_land_surface_gl.clear();
+
 	for (size_t z = 0; z < this->surface_gl.size(); ++z) {
 		if (this->surface_gl[z]) {
 			glDeleteTextures(1, &this->textures[z]);
@@ -847,12 +892,24 @@ bool minimap::is_terrain_visible() const
 
 bool minimap::are_units_visible() const
 {
-	return this->get_mode() != minimap_mode::territories;
+	switch (this->get_mode()) {
+		case minimap_mode::territories:
+		case minimap_mode::territories_with_non_land:
+			return false;
+		default:
+			return true;
+	}
 }
 
 bool minimap::is_fog_of_war_visible() const
 {
-	return this->get_mode() != minimap_mode::territories;
+	switch (this->get_mode()) {
+		case minimap_mode::territories:
+		case minimap_mode::territories_with_non_land:
+			return false;
+		default:
+			return true;
+	}
 }
 
 }

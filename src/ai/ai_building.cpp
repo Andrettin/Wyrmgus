@@ -48,18 +48,12 @@
 --  Functions
 ----------------------------------------------------------------------------*/
 
-//Wyrmgus start
-//static bool IsPosFree(const Vec2i &pos, const CUnit &exceptionUnit)
 static bool IsPosFree(const Vec2i &pos, const CUnit &exceptionUnit, int z)
-//Wyrmgus end
 {
 	if (CMap::Map.Info.IsPointOnMap(pos, z) == false) {
 		return false;
 	}
-	//Wyrmgus start
-//	const CMapField &mf = *CMap::Map.Field(pos);
 	const CMapField &mf = *CMap::Map.Field(pos, z);
-	//Wyrmgus end
 	const CUnitCache &unitCache = mf.UnitCache;
 	if (std::find(unitCache.begin(), unitCache.end(), &exceptionUnit) != unitCache.end()) {
 		return true;

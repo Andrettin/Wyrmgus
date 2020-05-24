@@ -49,6 +49,7 @@ class defines final : public QObject, public singleton<defines>
 	Q_PROPERTY(stratagus::player_color* conversible_player_color MEMBER conversible_player_color READ get_conversible_player_color)
 	Q_PROPERTY(stratagus::player_color* neutral_player_color MEMBER neutral_player_color READ get_neutral_player_color)
 	Q_PROPERTY(int minimap_color_index MEMBER minimap_color_index READ get_minimap_color_index)
+	Q_PROPERTY(int minimap_non_land_territory_alpha MEMBER minimap_non_land_territory_alpha READ get_minimap_non_land_territory_alpha)
 	Q_PROPERTY(stratagus::time_of_day* underground_time_of_day MEMBER underground_time_of_day READ get_underground_time_of_day)
 	Q_PROPERTY(stratagus::terrain_type* border_terrain_type MEMBER border_terrain_type READ get_border_terrain_type)
 	Q_PROPERTY(bool documents_modules_loading_enabled MEMBER documents_modules_loading_enabled READ is_documents_modules_loading_enabled)
@@ -118,6 +119,11 @@ public:
 		return this->minimap_color_index;
 	}
 
+	int get_minimap_non_land_territory_alpha() const
+	{
+		return this->minimap_non_land_territory_alpha;
+	}
+
 	time_of_day *get_underground_time_of_day() const
 	{
 		return this->underground_time_of_day;
@@ -165,6 +171,7 @@ private:
 	player_color *conversible_player_color = nullptr;
 	player_color *neutral_player_color = nullptr;
 	int minimap_color_index = 0;
+	int minimap_non_land_territory_alpha = 64;
 	terrain_type *border_terrain_type = nullptr;
 	time_of_day *underground_time_of_day = nullptr;
 	bool documents_modules_loading_enabled = true;
