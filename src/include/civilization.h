@@ -36,7 +36,6 @@
 
 class CAiBuildingTemplate;
 class CCurrency;
-class CDeity;
 class CForceTemplate;
 class CLanguage;
 class CUpgrade;
@@ -48,6 +47,7 @@ int CclDefineCivilization(lua_State *l);
 namespace stratagus {
 
 class calendar;
+class deity;
 class quest;
 class species;
 class unit_class;
@@ -333,7 +333,7 @@ private:
 	std::vector<CFiller> ui_fillers;
 	std::vector<character *> characters;
 public:
-	std::vector<CDeity *> Deities;
+	std::vector<deity *> Deities;
 	std::vector<site *> sites; //sites used for this civilization if a randomly-generated one is required
 	std::string MinisterTitles[MaxCharacterTitles][static_cast<int>(gender::count)][MaxGovernmentTypes][static_cast<int>(faction_tier::count)]; /// this civilization's minister title for each minister type and government type
 private:

@@ -1104,6 +1104,10 @@ void map_template::apply_sites(const QPoint &template_start_pos, const QPoint &m
 		}
 		
 		unit_type *pathway_type = nullptr;
+		if (site->get_pathway_class() != nullptr) {
+			pathway_type = site_owner->get_class_unit_type(site->get_pathway_class());
+		}
+
 		for (size_t j = 0; j < site->HistoricalBuildings.size(); ++j) {
 			if (
 				start_date.ContainsDate(std::get<0>(site->HistoricalBuildings[j]))
@@ -1157,7 +1161,7 @@ void map_template::apply_sites(const QPoint &template_start_pos, const QPoint &m
 				unit->UpdateBuildingSettlementAssignment();
 			}
 
-			if (pathway_type) {
+			if (pathway_type != nullptr) {
 				for (int x = unit->tilePos.x - 1; x < unit->tilePos.x + unit->Type->get_tile_width() + 1; ++x) {
 					for (int y = unit->tilePos.y - 1; y < unit->tilePos.y + unit->Type->get_tile_height() + 1; ++y) {
 						if (!CMap::Map.Info.IsPointOnMap(x, y, unit->MapLayer)) {
@@ -1231,7 +1235,7 @@ void map_template::apply_sites(const QPoint &template_start_pos, const QPoint &m
 				if (unit_type->BoolFlag[TOWNHALL_INDEX].value && (!building_owner || building_owner == site_owner)) {
 					unit->UpdateBuildingSettlementAssignment();
 				}
-				if (pathway_type) {
+				if (pathway_type != nullptr) {
 					for (int x = unit->tilePos.x - 1; x < unit->tilePos.x + unit->Type->get_tile_width() + 1; ++x) {
 						for (int y = unit->tilePos.y - 1; y < unit->tilePos.y + unit->Type->get_tile_height() + 1; ++y) {
 							if (!CMap::Map.Info.IsPointOnMap(x, y, unit->MapLayer)) {

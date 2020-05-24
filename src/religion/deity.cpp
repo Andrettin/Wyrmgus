@@ -25,10 +25,6 @@
 //      02111-1307, USA.
 //
 
-/*----------------------------------------------------------------------------
---  Includes
-----------------------------------------------------------------------------*/
-
 #include "stratagus.h"
 
 #include "religion/deity.h"
@@ -46,95 +42,10 @@
 #include "upgrade/upgrade.h"
 #include "util/string_util.h"
 
-/*----------------------------------------------------------------------------
---  Variables
-----------------------------------------------------------------------------*/
+namespace stratagus {
 
-std::vector<CDeity *> CDeity::Deities;
-std::map<std::string, CDeity *> CDeity::DeitiesByIdent;
-std::map<const CUpgrade *, CDeity *> CDeity::DeitiesByUpgrade;
-
-/*----------------------------------------------------------------------------
---  Functions
-----------------------------------------------------------------------------*/
-
-/**
-**	@brief	Get a deity
-**
-**	@param	ident		The deity's string identifier
-**	@param	should_find	Whether it is an error if the deity could not be found; this is true by default
-**
-**	@return	The deity if found, or null otherwise
-*/
-CDeity *CDeity::GetDeity(const std::string &ident, const bool should_find)
-{
-	std::map<std::string, CDeity *>::const_iterator find_iterator = DeitiesByIdent.find(ident);
-	
-	if (find_iterator != DeitiesByIdent.end()) {
-		return find_iterator->second;
-	}
-	
-	if (should_find) {
-		fprintf(stderr, "Invalid deity: \"%s\".\n", ident.c_str());
-	}
-	
-	return nullptr;
-}
-
-/**
-**	@brief	Get or add a deity
-**
-**	@param	ident	The deity's string identifier
-**
-**	@return	The deity if found, or a newly-created one otherwise
-*/
-CDeity *CDeity::GetOrAddDeity(const std::string &ident)
-{
-	CDeity *deity = GetDeity(ident, false);
-	
-	if (!deity) {
-		deity = new CDeity;
-		deity->Ident = ident;
-		Deities.push_back(deity);
-		DeitiesByIdent[ident] = deity;
-	}
-	
-	return deity;
-}
-
-/**
-**	@brief	Get a deity by its respective upgrade
-**
-**	@param	upgrade	The deity's upgrade
-**	@param	should_find	Whether it is an error if the deity could not be found; this is true by default
-**
-**	@return	The upgrade's deity, if any
-*/
-CDeity *CDeity::GetDeityByUpgrade(const CUpgrade *upgrade, const bool should_find)
-{
-	if (DeitiesByUpgrade.find(upgrade) != DeitiesByUpgrade.end()) {
-		return DeitiesByUpgrade.find(upgrade)->second;
-	}
-	
-	if (should_find) {
-		fprintf(stderr, "No deity found for upgrade: \"%s\".\n", upgrade->Ident.c_str());
-	}
-	
-	return nullptr;
-}
-
-/**
-**	@brief	Remove the existing deities
-*/
-void CDeity::ClearDeities()
-{
-	for (size_t i = 0; i < Deities.size(); ++i) {
-		delete Deities[i];
-	}
-	Deities.clear();
-}
-
-CDeity::CDeity() : gender(stratagus::gender::none)
+deity::deity(const std::string &identifier)
+	: detailed_data_entry(identifier), CDataType(identifier), gender(gender::none)
 {
 }
 
@@ -143,24 +54,23 @@ CDeity::CDeity() : gender(stratagus::gender::none)
 **
 **	@param	config_data	The configuration data
 */
-void CDeity::ProcessConfigData(const CConfigData *config_data)
+void deity::ProcessConfigData(const CConfigData *config_data)
 {
 	for (size_t i = 0; i < config_data->Properties.size(); ++i) {
 		std::string key = config_data->Properties[i].first;
 		std::string value = config_data->Properties[i].second;
 		
 		if (key == "name") {
-			this->Name = value;
+			this->set_name(value);
 		} else if (key == "pantheon") {
 			value = FindAndReplaceString(value, "_", "-");
 			this->Pantheon = CPantheon::GetPantheon(value);
 		} else if (key == "gender") {
-			this->gender = stratagus::string_to_gender(value);
+			this->gender = string_to_gender(value);
 		} else if (key == "major") {
 			this->Major = string::to_bool(value);
 		} else if (key == "civilization") {
-			value = FindAndReplaceString(value, "_", "-");
-			stratagus::civilization *civilization = stratagus::civilization::get(value);
+			civilization *civilization = civilization::get(value);
 			this->civilizations.push_back(civilization);
 			civilization->Deities.push_back(this);
 		} else if (key == "religion") {
@@ -176,30 +86,30 @@ void CDeity::ProcessConfigData(const CConfigData *config_data)
 				this->Domains.push_back(deity_domain);
 			}
 		} else if (key == "description") {
-			this->Description = value;
+			this->set_description(value);
 		} else if (key == "background") {
-			this->Background = value;
+			this->set_background(value);
 		} else if (key == "quote") {
-			this->Quote = value;
+			this->set_quote(value);
 		} else if (key == "icon") {
 			value = FindAndReplaceString(value, "_", "-");
 			this->Icon.Name = value;
 			this->Icon.Icon = nullptr;
 			this->Icon.Load();
 		} else if (key == "home_plane") {
-			stratagus::plane *plane = stratagus::plane::get(value);
+			plane *plane = plane::get(value);
 			this->home_plane = plane;
 		} else if (key == "deity_upgrade") {
 			value = FindAndReplaceString(value, "_", "-");
 			CUpgrade *upgrade = CUpgrade::get(value);
 			this->DeityUpgrade = upgrade;
-			CDeity::DeitiesByUpgrade[upgrade] = this;
+			deity::deities_by_upgrade[upgrade] = this;
 		} else if (key == "character_upgrade") {
 			value = FindAndReplaceString(value, "_", "-");
 			CUpgrade *upgrade = CUpgrade::get(value);
 			this->CharacterUpgrade = upgrade;
 		} else if (key == "holy_order") {
-			stratagus::faction *holy_order = stratagus::faction::get(value);
+			faction *holy_order = faction::get(value);
 			this->HolyOrders.push_back(holy_order);
 			holy_order->HolyOrderDeity = this;
 		} else {
@@ -213,9 +123,7 @@ void CDeity::ProcessConfigData(const CConfigData *config_data)
 				std::string key = child_config_data->Properties[j].first;
 				std::string value = child_config_data->Properties[j].second;
 				
-				key = FindAndReplaceString(key, "_", "-");
-				
-				const stratagus::civilization *civilization = stratagus::civilization::get(key);
+				const civilization *civilization = civilization::get(key);
 				this->CulturalNames[civilization] = value;
 			}
 		} else {
@@ -245,13 +153,15 @@ void CDeity::ProcessConfigData(const CConfigData *config_data)
 **
 **	@return	The name if present, or an empty string otherwise
 */
-std::string CDeity::GetCulturalName(const stratagus::civilization *civilization) const
+std::string deity::GetCulturalName(const civilization *civilization) const
 {
-	std::map<const stratagus::civilization *, std::string>::const_iterator find_iterator = this->CulturalNames.find(civilization);
+	const auto find_iterator = this->CulturalNames.find(civilization);
 	
 	if (find_iterator != this->CulturalNames.end()) {
 		return find_iterator->second;
 	}
 	
 	return std::string();
+}
+
 }

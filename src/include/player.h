@@ -44,7 +44,6 @@ static constexpr int SPEEDUP_FACTOR = 100;
 static constexpr int DefaultTradeCost = 30;
 
 class CCurrency;
-class CDeity;
 class CDeityDomain;
 class CDynasty;
 class CFile;
@@ -68,6 +67,7 @@ namespace stratagus {
 	class calendar;
 	class character;
 	class civilization;
+	class deity;
 	class player_color;
 	class quest;
 	class site;
@@ -180,7 +180,7 @@ public:
 	std::map<const stratagus::unit_type *, std::vector<CUnit *>> UnitsByType;			/// units owned by this player for each type
 	std::map<const stratagus::unit_type *, std::vector<CUnit *>> AiActiveUnitsByType;	/// AI active units owned by this player for each type
 	std::vector<CUnit *> Heroes;											/// hero units owned by this player
-	std::vector<CDeity *> Deities;											/// deities chosen by this player
+	std::vector<stratagus::deity *> Deities;								/// deities chosen by this player
 	std::vector<stratagus::quest *> AvailableQuests;			/// quests available to this player
 	std::vector<stratagus::quest *> CurrentQuests;				/// quests being pursued by this player
 	std::vector<const stratagus::quest *> CompletedQuests;		/// quests completed by this player

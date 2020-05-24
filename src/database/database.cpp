@@ -53,6 +53,7 @@
 #include "plane.h"
 #include "player_color.h"
 #include "quest.h"
+#include "religion/deity.h"
 #include "resource.h"
 #include "sound/sound.h"
 #include "species.h"
@@ -186,6 +187,8 @@ QVariant database::process_sml_property_value(const sml_property &property, cons
 			new_property_value = QVariant::fromValue(cursor::get(property.get_value()));
 		} else if (property_class_name == "stratagus::cursor_type") {
 			new_property_value = QVariant::fromValue(string_to_cursor_type(property.get_value()));
+		} else if (property_class_name == "stratagus::deity*") {
+			new_property_value = QVariant::fromValue(deity::get(property.get_value()));
 		} else if (property_class_name == "stratagus::dialogue*") {
 			new_property_value = QVariant::fromValue(dialogue::get(property.get_value()));
 		} else if (property_class_name == "stratagus::faction*") {

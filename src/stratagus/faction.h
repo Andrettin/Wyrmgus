@@ -35,7 +35,6 @@
 
 class CAiBuildingTemplate;
 class CCurrency;
-class CDeity;
 class CDynasty;
 class CForceTemplate;
 class CUpgrade;
@@ -47,6 +46,7 @@ namespace stratagus {
 
 class character;
 class civilization;
+class deity;
 class icon;
 class resource;
 class unit_class;
@@ -73,7 +73,7 @@ public:
 		return faction;
 	}
 
-	faction(const std::string &identifier) : detailed_data_entry(identifier)
+	explicit faction(const std::string &identifier) : detailed_data_entry(identifier)
 	{
 	}
 
@@ -217,7 +217,7 @@ public:
 	bool DefiniteArticle = false;										/// whether the faction's name should be preceded by a definite article (e.g. "the Netherlands")
 	icon *icon = nullptr;												/// Faction's icon
 	CCurrency *Currency = nullptr;										/// The faction's currency
-	CDeity *HolyOrderDeity = nullptr;									/// deity this faction belongs to, if it is a holy order
+	deity *HolyOrderDeity = nullptr;									/// deity this faction belongs to, if it is a holy order
 	LuaCallback *Conditions = nullptr;
 private:
 	player_color *color = nullptr; /// faction color

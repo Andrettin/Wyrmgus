@@ -8,8 +8,6 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name deity.h - The deity header file. */
-//
 //      (c) Copyright 2018-2020 by Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
@@ -29,22 +27,18 @@
 
 #pragma once
 
-/*----------------------------------------------------------------------------
---  Includes
-----------------------------------------------------------------------------*/
-
+#include "database/data_type.h"
+#include "database/detailed_data_entry.h"
 #include "data_type.h"
 #include "ui/icon.h"
-
-/*----------------------------------------------------------------------------
---  Declarations
-----------------------------------------------------------------------------*/
 
 class CDeityDomain;
 class CPantheon;
 class CReligion;
 class CUpgrade;
 struct lua_State;
+
+int CclDefineDeity(lua_State *l);
 
 namespace stratagus {
 	class civilization;
@@ -56,49 +50,57 @@ namespace stratagus {
 static constexpr int MAJOR_DEITY_DOMAIN_MAX = 3; //major deities can only have up to three domains
 static constexpr int MINOR_DEITY_DOMAIN_MAX = 1; //minor deities can only have one domain
 
-class CDeity : public CDataType
+namespace stratagus {
+
+class deity : public detailed_data_entry, public data_type<deity>, public CDataType
 {
 public:
-	static CDeity *GetDeity(const std::string &ident, const bool should_find = true);
-	static CDeity *GetOrAddDeity(const std::string &ident);
-	static CDeity *GetDeityByUpgrade(const CUpgrade *upgrade, const bool should_find = true);
-	static void ClearDeities();
-	
-	static std::vector<CDeity *> Deities;		/// Deities
-	static std::map<std::string, CDeity *> DeitiesByIdent;
-	static std::map<const CUpgrade *, CDeity *> DeitiesByUpgrade;
+	static constexpr const char *class_identifier = "deity";
+	static constexpr const char *database_folder = "deities";
 
-	CDeity();
+	static deity *get_by_upgrade(const CUpgrade *upgrade)
+	{
+		auto find_iterator = deity::deities_by_upgrade.find(upgrade);
+		if (find_iterator != deity::deities_by_upgrade.end()) {
+			return find_iterator->second;
+		}
+
+		return nullptr;
+	}
+	
+private:
+	static inline std::map<const CUpgrade *, deity *> deities_by_upgrade;
+
+public:
+	explicit deity(const std::string &identifier);
 	
 	virtual void ProcessConfigData(const CConfigData *config_data) override;
 	
-	std::string GetCulturalName(const stratagus::civilization *civilization) const;
+	std::string GetCulturalName(const civilization *civilization) const;
 
-	stratagus::plane *get_home_plane() const
+	plane *get_home_plane() const
 	{
 		return this->home_plane;
 	}
 	
 	stratagus::gender gender;					//deity's gender
 	bool Major = false;							//whether the deity is a major one or not
-	std::string Name;							//name of the deity
-	std::string Description;
-	std::string Background;
-	std::string Quote;
 	CPantheon *Pantheon = nullptr;				//pantheon to which the deity belongs
 private:
-	stratagus::plane *home_plane = nullptr;				//the home plane of the deity
+	plane *home_plane = nullptr;				//the home plane of the deity
 public:
 	CUpgrade *DeityUpgrade = nullptr;			//the deity's upgrade applied to a player that worships it
 	CUpgrade *CharacterUpgrade = nullptr;		//the deity's upgrade applied to its character as an individual upgrade
 	IconConfig Icon;							//deity's icon
-	std::vector<stratagus::civilization *> civilizations;	//civilizations which may worship the deity
+	std::vector<civilization *> civilizations;	//civilizations which may worship the deity
 	std::vector<CReligion *> Religions;			//religions for which this deity is available
 	std::vector<std::string> Feasts;
 	std::vector<CDeityDomain *> Domains;
-	std::vector<stratagus::faction *> HolyOrders;			//holy orders of this deity
+	std::vector<faction *> HolyOrders;			//holy orders of this deity
 	std::vector<CUpgrade *> Abilities;			//abilities linked to this deity
-	std::map<const stratagus::civilization *, std::string> CulturalNames;	//names of the deity in different cultures (for example, Odin is known as Hroptatyr by the dwarves)
+	std::map<const civilization *, std::string> CulturalNames;	//names of the deity in different cultures (for example, Odin is known as Hroptatyr by the dwarves)
 
-	friend int CclDefineDeity(lua_State *l);
+	friend int ::CclDefineDeity(lua_State *l);
 };
+
+}

@@ -27,10 +27,6 @@
 //      02111-1307, USA.
 //
 
-/*----------------------------------------------------------------------------
---  Includes
-----------------------------------------------------------------------------*/
-
 #include "stratagus.h"
 
 #include "player.h"
@@ -75,10 +71,6 @@
 #include "ui/ui.h"
 #include "util/util.h"
 //Wyrmgus end
-
-/*----------------------------------------------------------------------------
---  Functions
-----------------------------------------------------------------------------*/
 
 extern CUnit *CclGetUnitFromRef(lua_State *l);
 
@@ -2072,14 +2064,14 @@ static int CclDefineDeity(lua_State *l)
 	}
 
 	std::string deity_ident = LuaToString(l, 1);
-	CDeity *deity = CDeity::GetOrAddDeity(deity_ident);
+	stratagus::deity *deity = stratagus::deity::get_or_add(deity_ident, nullptr);
 	
 	//  Parse the list:
 	for (lua_pushnil(l); lua_next(l, 2); lua_pop(l, 1)) {
 		const char *value = LuaToString(l, -2);
 		
 		if (!strcmp(value, "Name")) {
-			deity->Name = LuaToString(l, -1);
+			deity->set_name(LuaToString(l, -1));
 		} else if (!strcmp(value, "Pantheon")) {
 			deity->Pantheon = CPantheon::GetPantheon(LuaToString(l, -1));
 		} else if (!strcmp(value, "Gender")) {
@@ -2087,18 +2079,18 @@ static int CclDefineDeity(lua_State *l)
 		} else if (!strcmp(value, "Major")) {
 			deity->Major = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "Description")) {
-			deity->Description = LuaToString(l, -1);
+			deity->set_description(LuaToString(l, -1));
 		} else if (!strcmp(value, "Background")) {
-			deity->Background = LuaToString(l, -1);
+			deity->set_background(LuaToString(l, -1));
 		} else if (!strcmp(value, "Quote")) {
-			deity->Quote = LuaToString(l, -1);
+			deity->set_quote(LuaToString(l, -1));
 		} else if (!strcmp(value, "HomePlane")) {
 			stratagus::plane *plane = stratagus::plane::get(LuaToString(l, -1));
 			deity->home_plane = plane;
 		} else if (!strcmp(value, "DeityUpgrade")) {
 			CUpgrade *upgrade = CUpgrade::get(LuaToString(l, -1));
 			deity->DeityUpgrade = upgrade;
-			CDeity::DeitiesByUpgrade[upgrade] = deity;
+			stratagus::deity::deities_by_upgrade[upgrade] = deity;
 		} else if (!strcmp(value, "CharacterUpgrade")) {
 			CUpgrade *upgrade = CUpgrade::get(LuaToString(l, -1));
 			deity->CharacterUpgrade = upgrade;
@@ -3241,10 +3233,10 @@ static int CclGetDeityDomains(lua_State *l)
 
 static int CclGetDeities(lua_State *l)
 {
-	lua_createtable(l, CDeity::Deities.size(), 0);
-	for (size_t i = 1; i <= CDeity::Deities.size(); ++i)
+	lua_createtable(l, stratagus::deity::get_all().size(), 0);
+	for (size_t i = 1; i <= stratagus::deity::get_all().size(); ++i)
 	{
-		lua_pushstring(l, CDeity::Deities[i-1]->Ident.c_str());
+		lua_pushstring(l, stratagus::deity::get_all()[i-1]->Ident.c_str());
 		lua_rawseti(l, -2, i);
 	}
 	return 1;
@@ -3335,14 +3327,11 @@ static int CclGetDeityData(lua_State *l)
 		LuaError(l, "incorrect argument");
 	}
 	std::string deity_ident = LuaToString(l, 1);
-	const CDeity *deity = CDeity::GetDeity(deity_ident);
-	if (!deity) {
-		return 0;
-	}
+	const stratagus::deity *deity = stratagus::deity::get(deity_ident);
 	const char *data = LuaToString(l, 2);
 
 	if (!strcmp(data, "Name")) {
-		lua_pushstring(l, deity->Name.c_str());
+		lua_pushstring(l, deity->get_name().c_str());
 		return 1;
 	} else if (!strcmp(data, "Pantheon")) {
 		if (deity->Pantheon) {
@@ -3352,13 +3341,13 @@ static int CclGetDeityData(lua_State *l)
 		}
 		return 1;
 	} else if (!strcmp(data, "Description")) {
-		lua_pushstring(l, deity->Description.c_str());
+		lua_pushstring(l, deity->get_description().c_str());
 		return 1;
 	} else if (!strcmp(data, "Background")) {
-		lua_pushstring(l, deity->Background.c_str());
+		lua_pushstring(l, deity->get_background().c_str());
 		return 1;
 	} else if (!strcmp(data, "Quote")) {
-		lua_pushstring(l, deity->Quote.c_str());
+		lua_pushstring(l, deity->get_quote().c_str());
 		return 1;
 	} else if (!strcmp(data, "Major")) {
 		lua_pushboolean(l, deity->Major);

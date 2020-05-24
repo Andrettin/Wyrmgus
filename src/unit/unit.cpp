@@ -6581,7 +6581,7 @@ std::string CUnit::GetName() const
 			}
 		}
 		
-		return this->Character->Deity->Name;
+		return this->Character->Deity->get_name();
 	}
 	
 	std::string name = this->Name;

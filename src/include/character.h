@@ -34,7 +34,6 @@
 #include "time/date.h"
 #include "ui/icon.h"
 
-class CDeity;
 class CDeityDomain;
 class CFile;
 class CLanguage;
@@ -54,6 +53,7 @@ int CclDefineCustomHero(lua_State *l);
 namespace stratagus {
 	class calendar;
 	class civilization;
+	class deity;
 	class dependency;
 	class faction;
 	class historical_location;
@@ -221,7 +221,7 @@ private:
 	stratagus::unit_type *unit_type = nullptr;
 public:
 	CUpgrade *Trait = nullptr;
-	CDeity *Deity = nullptr;			/// The deity which the character is (if it is a deity)
+	deity *Deity = nullptr;			/// The deity which the character is (if it is a deity)
 	character *Father = nullptr;		/// Character's father
 	character *Mother = nullptr;		/// Character's mother
 	LuaCallback *Conditions = nullptr;
@@ -233,7 +233,7 @@ public:
 private:
 	site *home_settlement = nullptr; //the home settlement of this character, where they can preferentially be recruited
 public:
-	std::vector<CDeity *> Deities;		/// Deities chosen by this character to worship
+	std::vector<deity *> Deities;		/// Deities chosen by this character to worship
 	std::vector<const CUpgrade *> Abilities;
 	std::vector<CUpgrade *> ReadWorks;
 	std::vector<CUpgrade *> ConsumedElixirs;

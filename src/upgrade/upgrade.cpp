@@ -2169,7 +2169,7 @@ void UpgradeAcquire(CPlayer &player, const CUpgrade *upgrade)
 
 	//Wyrmgus start
 	if (!strncmp(upgrade->Ident.c_str(), "upgrade-deity-", 14) && strncmp(upgrade->Ident.c_str(), "upgrade-deity-domain-", 21)) { // if is a deity upgrade, but isn't a deity domain upgrade
-		CDeity *upgrade_deity = CDeity::GetDeityByUpgrade(upgrade);
+		stratagus::deity *upgrade_deity = stratagus::deity::get_by_upgrade(upgrade);
 		if (upgrade_deity) {
 			for (size_t i = 0; i < upgrade_deity->Domains.size(); ++i) {
 				CUpgrade *domain_upgrade = upgrade_deity->Domains[i]->Upgrade;
@@ -2218,7 +2218,7 @@ void UpgradeLost(CPlayer &player, int id)
 	//Wyrmgus start
 	CUpgrade *upgrade = CUpgrade::get_all()[id];
 	if (!strncmp(upgrade->Ident.c_str(), "upgrade-deity-", 14) && strncmp(upgrade->Ident.c_str(), "upgrade-deity-domain-", 21)) { // if is a deity upgrade, but isn't a deity domain upgrade
-		CDeity *upgrade_deity = CDeity::GetDeityByUpgrade(upgrade);
+		stratagus::deity *upgrade_deity = stratagus::deity::get_by_upgrade(upgrade);
 		if (upgrade_deity) {
 			for (size_t i = 0; i < upgrade_deity->Domains.size(); ++i) {
 				CUpgrade *domain_upgrade = upgrade_deity->Domains[i]->Upgrade;
@@ -2352,7 +2352,7 @@ void IndividualUpgradeAcquire(CUnit &unit, const CUpgrade *upgrade)
 	unit.SetIndividualUpgrade(upgrade, unit.GetIndividualUpgrade(upgrade) + 1);
 	
 	if (!strncmp(upgrade->Ident.c_str(), "upgrade-deity-", 14) && strncmp(upgrade->Ident.c_str(), "upgrade-deity-domain-", 21)) { // if is a deity upgrade, but isn't a deity domain upgrade
-		CDeity *upgrade_deity = CDeity::GetDeityByUpgrade(upgrade);
+		stratagus::deity *upgrade_deity = stratagus::deity::get_by_upgrade(upgrade);
 		if (upgrade_deity) {
 			for (size_t i = 0; i < upgrade_deity->Domains.size(); ++i) {
 				CUpgrade *domain_upgrade = upgrade_deity->Domains[i]->Upgrade;
@@ -2404,7 +2404,7 @@ void IndividualUpgradeLost(CUnit &unit, const CUpgrade *upgrade, bool lose_all)
 	unit.SetIndividualUpgrade(upgrade, unit.GetIndividualUpgrade(upgrade) - 1);
 
 	if (!strncmp(upgrade->Ident.c_str(), "upgrade-deity-", 14) && strncmp(upgrade->Ident.c_str(), "upgrade-deity-domain-", 21)) { // if is a deity upgrade, but isn't a deity domain upgrade
-		CDeity *upgrade_deity = CDeity::GetDeityByUpgrade(upgrade);
+		stratagus::deity *upgrade_deity = stratagus::deity::get_by_upgrade(upgrade);
 		if (upgrade_deity) {
 			for (size_t i = 0; i < upgrade_deity->Domains.size(); ++i) {
 				CUpgrade *domain_upgrade = upgrade_deity->Domains[i]->Upgrade;

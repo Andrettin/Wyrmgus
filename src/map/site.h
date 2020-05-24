@@ -49,7 +49,7 @@ class region;
 class unit_class;
 class unit_type;
 
-class site : public named_data_entry, public data_type<site>, public CDataType
+class site final : public named_data_entry, public data_type<site>, public CDataType
 {
 	Q_OBJECT
 
@@ -58,6 +58,7 @@ class site : public named_data_entry, public data_type<site>, public CDataType
 	Q_PROPERTY(QPoint pos MEMBER pos READ get_pos)
 	Q_PROPERTY(stratagus::faction* owner_faction MEMBER owner_faction READ get_owner_faction)
 	Q_PROPERTY(QVariantList building_classes READ get_building_classes_qvariant_list)
+	Q_PROPERTY(stratagus::unit_class* pathway_class MEMBER pathway_class READ get_pathway_class)
 	Q_PROPERTY(QVariantList cores READ get_cores_qvariant_list)
 	Q_PROPERTY(QVariantList regions READ get_regions_qvariant_list)
 
@@ -65,7 +66,7 @@ public:
 	static constexpr const char *class_identifier = "site";
 	static constexpr const char *database_folder = "sites";
 
-	site(const std::string &identifier) : named_data_entry(identifier), CDataType(identifier)
+	explicit site(const std::string &identifier) : named_data_entry(identifier), CDataType(identifier)
 	{
 	}
 
@@ -77,6 +78,7 @@ public:
 	{
 		this->owner_faction = nullptr;
 		this->building_classes.clear();
+		this->pathway_class = nullptr;
 	}
 
 	std::string GetCulturalName(const civilization *civilization) const;
@@ -128,6 +130,11 @@ public:
 	}
 
 	Q_INVOKABLE void remove_building_class(unit_class *building_class);
+
+	unit_class *get_pathway_class() const
+	{
+		return this->pathway_class;
+	}
 
 	void add_border_tile(const QPoint &tile_pos)
 	{
@@ -202,6 +209,7 @@ private:
 	std::vector<character *> characters; //characters which can be recruited at this site
 	faction *owner_faction = nullptr; //used for the owner history of the site, and after game start is 	set to its player owner's faction
 	std::vector<unit_class *> building_classes; //used by history; applied as buildings at scenario start
+	unit_class *pathway_class = nullptr;
 public:
 	std::map<CDate, const faction *> HistoricalOwners;			/// Historical owners of the site
 	std::map<CDate, int> HistoricalPopulation;					/// Historical population

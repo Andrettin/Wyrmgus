@@ -247,7 +247,7 @@ void CConfigData::ProcessConfigData(const std::vector<CConfigData *> &config_dat
 				currency->ProcessConfigData(config_data);
 			}
 		} else if (config_data->Tag == "deity") {
-			CDeity *deity = CDeity::GetOrAddDeity(ident);
+			stratagus::deity *deity = stratagus::deity::get_or_add(ident, nullptr);
 			if (!define_only) {
 				deity->ProcessConfigData(config_data);
 			}

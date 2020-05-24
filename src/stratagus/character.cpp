@@ -96,10 +96,8 @@ void character::process_sml_scope(const sml_data &scope)
 
 	if (tag == "deities") {
 		for (const std::string &value : values) {
-			CDeity *deity = CDeity::GetDeity(value);
-			if (deity) {
-				this->Deities.push_back(deity);
-			}
+			deity *deity = deity::get(value);
+			this->Deities.push_back(deity);
 		}
 	} else {
 		data_entry::process_sml_scope(scope);
@@ -187,11 +185,8 @@ void character::ProcessConfigData(const CConfigData *config_data)
 				}
 			}
 		} else if (key == "deity") {
-			value = FindAndReplaceString(value, "_", "-");
-			CDeity *deity = CDeity::GetDeity(value);
-			if (deity) {
-				this->Deities.push_back(deity);
-			}
+			deity *deity = deity::get(value);
+			this->Deities.push_back(deity);
 		} else if (key == "description") {
 			this->set_description(value);
 		} else if (key == "background") {
