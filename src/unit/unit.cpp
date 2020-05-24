@@ -5440,6 +5440,11 @@ QPoint CUnit::get_center_tile_pos() const
 	return first_container->tilePos + first_container->Type->get_tile_center_pos_offset();
 }
 
+const CMapField *CUnit::get_center_tile() const
+{
+	return this->MapLayer->Field(this->get_center_tile_pos());
+}
+
 QPoint CUnit::get_scaled_pixel_offset() const
 {
 	return this->get_pixel_offset() * stratagus::defines::get()->get_scale_factor();

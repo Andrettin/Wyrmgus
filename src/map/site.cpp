@@ -38,6 +38,7 @@
 #include "map/map_template.h"
 #include "map/region.h"
 #include "player.h" //for factions
+#include "player_color.h"
 #include "province.h" //for regions
 #include "unit/unit.h"
 #include "unit/unit_class.h"
@@ -45,6 +46,7 @@
 #include "util/container_util.h"
 #include "util/string_util.h"
 #include "util/vector_util.h"
+#include "util/vector_random_util.h"
 
 namespace stratagus {
 
@@ -164,6 +166,11 @@ void site::ProcessConfigData(const CConfigData *config_data)
 
 void site::initialize()
 {
+	//if a settlement has no color assigned to it, assign a random one instead
+	if (this->is_major() && this->get_color() == nullptr) {
+		this->color = vector::get_random(player_color::get_all());
+	}
+
 	for (faction *core_faction : this->get_cores()) {
 		core_faction->get_civilization()->sites.push_back(this);
 	}

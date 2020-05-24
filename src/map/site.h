@@ -45,6 +45,7 @@ class character;
 class civilization;
 class faction;
 class map_template;
+class player_color;
 class region;
 class unit_class;
 class unit_type;
@@ -61,6 +62,7 @@ class site final : public named_data_entry, public data_type<site>, public CData
 	Q_PROPERTY(stratagus::unit_class* pathway_class MEMBER pathway_class READ get_pathway_class)
 	Q_PROPERTY(QVariantList cores READ get_cores_qvariant_list)
 	Q_PROPERTY(QVariantList regions READ get_regions_qvariant_list)
+	Q_PROPERTY(stratagus::player_color* color MEMBER color READ get_color)
 
 public:
 	static constexpr const char *class_identifier = "site";
@@ -185,6 +187,11 @@ public:
 	Q_INVOKABLE void add_region(region *region);
 	Q_INVOKABLE void remove_region(region *region);
 
+	player_color *get_color() const
+	{
+		return this->color;
+	}
+
 	const std::vector<character *> &get_characters() const
 	{
 		return this->characters;
@@ -206,6 +213,7 @@ private:
 public:
 	std::map<const civilization *, std::string> CulturalNames;	/// Names for the site for each different culture/civilization
 private:
+	player_color *color = nullptr; /// color used to represent the site e.g. on the minimap
 	std::vector<character *> characters; //characters which can be recruited at this site
 	faction *owner_faction = nullptr; //used for the owner history of the site, and after game start is 	set to its player owner's faction
 	std::vector<unit_class *> building_classes; //used by history; applied as buildings at scenario start

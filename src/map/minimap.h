@@ -57,6 +57,7 @@ public:
 	void UpdateXY(const Vec2i &pos, int z);
 	void UpdateSeenXY(const Vec2i &) {}
 	void update_territory_xy(const QPoint &pos, const int z);
+	void update_territory_pixel(const int mx, const int my, const int z);
 	void Update();
 	void Create();
 	void create_textures(const int z);
@@ -124,6 +125,9 @@ private:
 
 	//minimap surface with territories, including non-land tiles
 	std::vector<unsigned char *> territories_with_non_land_surface_gl;
+
+	//minimap surface with settlement territories
+	std::vector<unsigned char *> settlements_surface_gl;
 };
 
 }

@@ -370,6 +370,7 @@ public:
 	PixelSize get_half_tile_pixel_size() const;
 	PixelSize get_scaled_half_tile_pixel_size() const;
 	QPoint get_center_tile_pos() const;
+	const CMapField *get_center_tile() const;
 
 	const QPoint &get_pixel_offset() const
 	{
