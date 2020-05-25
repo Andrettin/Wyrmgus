@@ -44,6 +44,9 @@
 #include "game.h"
 #include "map/map.h"
 #include "map/map_layer.h"
+#include "map/minimap_mode.h"
+#include "map/site.h"
+#include "map/tileset.h"
 #include "menus.h"
 #include "network.h"
 #include "plane.h"
@@ -1153,6 +1156,42 @@ void DrawPopups()
 	
 	if (ButtonAreaUnderCursor == ButtonAreaMapLayerWorld) {
 		DrawGenericPopup(stratagus::world::get_all()[ButtonUnderCursor]->get_name(), UI.WorldButtons[ButtonUnderCursor].X, UI.WorldButtons[ButtonUnderCursor].Y);
+	}
+
+	if (CursorOn == cursor_on::minimap) {
+		const QPoint tile_pos = UI.Minimap.ScreenToTilePos(CursorScreenPos);
+		if (CMap::Map.Info.IsPointOnMap(tile_pos, UI.CurrentMapLayer->ID)) {
+			const CMapField *tile = UI.CurrentMapLayer->Field(tile_pos);
+			std::string popup_str;
+
+			switch (UI.Minimap.get_mode()) {
+				case stratagus::minimap_mode::territories:
+					if (tile->get_owner() != nullptr && !(tile->Flags & (MapFieldWaterAllowed | MapFieldCoastAllowed | MapFieldSpace))) {
+						popup_str = tile->get_owner()->Name;
+					}
+					break;
+				case stratagus::minimap_mode::territories_with_non_land:
+					if (tile->get_owner() != nullptr) {
+						popup_str = tile->get_owner()->Name;
+					}
+					break;
+				case stratagus::minimap_mode::settlements:
+					if (tile->get_settlement() != nullptr && (tile->Flags & (MapFieldWaterAllowed | MapFieldCoastAllowed)) == (tile->get_settlement()->get_site_unit()->get_center_tile()->Flags & (MapFieldWaterAllowed | MapFieldCoastAllowed)) && (tile->Flags & MapFieldSpace) == (tile->get_settlement()->get_site_unit()->get_center_tile()->Flags & MapFieldSpace)) {
+						if (tile->get_owner() != nullptr) {
+							popup_str = tile->get_settlement()->GetCulturalName(tile->get_owner()->get_civilization());
+						} else {
+							popup_str = tile->get_settlement()->get_name();
+						}
+					}
+					break;
+				default:
+					break;
+			}
+
+			if (!popup_str.empty()) {
+				DrawGenericPopup(popup_str, CursorScreenPos.x, CursorScreenPos.y);
+			}
+		}
 	}
 }
 //Wyrmgus end

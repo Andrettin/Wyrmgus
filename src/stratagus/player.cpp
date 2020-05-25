@@ -904,7 +904,6 @@ void CreatePlayer(int type)
 	player->Init(type);
 }
 
-//Wyrmgus start
 CPlayer *GetFactionPlayer(const stratagus::faction *faction)
 {
 	if (!faction) {
@@ -923,40 +922,36 @@ CPlayer *GetFactionPlayer(const stratagus::faction *faction)
 CPlayer *GetOrAddFactionPlayer(const stratagus::faction *faction)
 {
 	CPlayer *faction_player = GetFactionPlayer(faction);
-	if (faction_player) {
+	if (faction_player != nullptr) {
 		return faction_player;
 	}
 	
 	// no player belonging to this faction, so let's make an unused player slot be created for it
 	
 	for (int i = 0; i < NumPlayers; ++i) {
-		if (CPlayer::Players[i]->Type == PlayerNobody) {
-			CPlayer::Players[i]->Type = PlayerComputer;
-			CPlayer::Players[i]->set_civilization(faction->get_civilization()->ID);
-			CPlayer::Players[i]->SetFaction(faction);
-			CPlayer::Players[i]->AiEnabled = true;
-			CPlayer::Players[i]->AiName = faction->DefaultAI;
-			CPlayer::Players[i]->Team = 1;
-			CPlayer::Players[i]->Resources[CopperCost] = 2500; // give the new player enough resources to start up
-			CPlayer::Players[i]->Resources[WoodCost] = 2500;
-			CPlayer::Players[i]->Resources[StoneCost] = 2500;
-			return CPlayer::Players[i];
+		CPlayer *player = CPlayer::Players[i];
+		if (player->Type == PlayerNobody) {
+			player->Type = PlayerComputer;
+			player->set_civilization(faction->get_civilization()->ID);
+			player->SetFaction(faction);
+			player->AiEnabled = true;
+			player->AiName = faction->DefaultAI;
+			player->Team = 1;
+			player->Resources[CopperCost] = 2500; // give the new player enough resources to start up
+			player->Resources[WoodCost] = 2500;
+			player->Resources[StoneCost] = 2500;
+			return player;
 		}
 	}
 	
-	fprintf(stderr, "Cannot add player for faction \"%s\": no player slots available.\n", faction->get_identifier().c_str());
-	
-	return nullptr;
+	throw std::runtime_error("Cannot add player for faction \"" + faction->get_identifier() + "\": no player slots available.");
 }
-//Wyrmgus end
 
 void CPlayer::Init(/* PlayerTypes */ int type)
 {
 	std::vector<CUnit *>().swap(this->Units);
 	std::vector<CUnit *>().swap(this->FreeWorkers);
-	//Wyrmgus start
 	std::vector<CUnit *>().swap(this->LevelUpUnits);
-	//Wyrmgus end
 
 	//  Take first slot for person on this computer,
 	//  fill other with computer players.

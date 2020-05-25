@@ -1509,11 +1509,10 @@ void UIHandleMouseMove(const PixelPos &cursorPos)
 	} else if (CursorOn == cursor_on::minimap) {
 		const Vec2i tilePos = UI.Minimap.ScreenToTilePos(cursorPos);
 
-		if (UI.CurrentMapLayer->Field(tilePos)->playerInfo.IsTeamExplored(*CPlayer::GetThisPlayer()) || ReplayRevealMap) {
-			//Wyrmgus start
-//			UnitUnderCursor = UnitOnMapTile(tilePos, UnitTypeType::None);
-			UnitUnderCursor = UnitOnMapTile(tilePos, UnitTypeType::None, UI.CurrentMapLayer->ID);
-			//Wyrmgus end
+		if (UI.Minimap.are_units_visible()) {
+			if (UI.CurrentMapLayer->Field(tilePos)->playerInfo.IsTeamExplored(*CPlayer::GetThisPlayer()) || ReplayRevealMap) {
+				UnitUnderCursor = UnitOnMapTile(tilePos, UnitTypeType::None, UI.CurrentMapLayer->ID);
+			}
 		}
 	}
 
