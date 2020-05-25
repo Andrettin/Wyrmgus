@@ -45,9 +45,9 @@
 #include "unit/unit_class.h"
 #include "unit/unit_type.h"
 #include "util/container_util.h"
+#include "util/random.h"
 #include "util/string_util.h"
 #include "util/vector_util.h"
-#include "util/vector_random_util.h"
 
 namespace stratagus {
 
@@ -168,8 +168,8 @@ void site::ProcessConfigData(const CConfigData *config_data)
 void site::initialize()
 {
 	//if a settlement has no color assigned to it, assign a random one instead
-	if (this->is_major() && this->get_color() == nullptr) {
-		this->color = vector::get_random(player_color::get_all());
+	if (this->is_major() && !this->get_minimap_color().isValid()) {
+		this->minimap_color = QColor(random::get()->generate(256), random::get()->generate(256), random::get()->generate(256));
 	}
 
 	for (faction *core_faction : this->get_cores()) {
@@ -341,7 +341,7 @@ void site::remove_region(region *region)
 
 const QColor &site::get_minimap_color() const
 {
-	return this->get_color()->get_colors().at(defines::get()->get_minimap_color_index());
+	return this->minimap_color;
 }
 
 }
