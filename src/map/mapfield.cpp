@@ -687,6 +687,16 @@ bool CMapField::CheckMask(int mask) const
 	//Wyrmgus end
 }
 
+bool CMapField::is_water() const
+{
+	return this->Flags & (MapFieldWaterAllowed | MapFieldCoastAllowed);
+}
+
+bool CMapField::is_space() const
+{
+	return this->Flags & MapFieldSpace;
+}
+
 /// Returns true, if water on the map tile field
 bool CMapField::WaterOnMap() const
 {

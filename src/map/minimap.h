@@ -112,22 +112,15 @@ public:
 private:
 	minimap_mode mode;
 	std::vector<GLuint> terrain_textures;
-	std::vector<GLuint> textures;
+	std::vector<GLuint> overlay_textures;
 
 	// Minimap surface with terrain only (for OpenGL)
-	std::vector<unsigned char *> terrain_surface_gl;
+	std::vector<unsigned char *> terrain_texture_data;
 
-	// Minimap surface with units (for OpenGL)
-	std::vector<unsigned char *> surface_gl;
+	std::map<minimap_mode, std::vector<unsigned char *>> mode_overlay_texture_data;
 
-	//minimap surface with territories
-	std::vector<unsigned char *> territories_surface_gl;
-
-	//minimap surface with territories, including non-land tiles
-	std::vector<unsigned char *> territories_with_non_land_surface_gl;
-
-	//minimap surface with settlement territories
-	std::vector<unsigned char *> settlements_surface_gl;
+	//texture data for the overlay with units and unexplored terrain
+	std::vector<unsigned char *> overlay_texture_data;
 };
 
 }

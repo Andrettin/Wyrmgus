@@ -1176,7 +1176,7 @@ void DrawPopups()
 					}
 					break;
 				case stratagus::minimap_mode::settlements:
-					if (tile->get_settlement() != nullptr && (tile->Flags & (MapFieldWaterAllowed | MapFieldCoastAllowed)) == (tile->get_settlement()->get_site_unit()->get_center_tile()->Flags & (MapFieldWaterAllowed | MapFieldCoastAllowed)) && (tile->Flags & MapFieldSpace) == (tile->get_settlement()->get_site_unit()->get_center_tile()->Flags & MapFieldSpace)) {
+					if (tile->get_settlement() != nullptr && tile->is_water() == tile->get_settlement()->get_site_unit()->get_center_tile()->is_water() && tile->is_space() == tile->get_settlement()->get_site_unit()->get_center_tile()->is_space()) {
 						if (tile->get_owner() != nullptr) {
 							popup_str = tile->get_settlement()->GetCulturalName(tile->get_owner()->get_civilization());
 						} else {

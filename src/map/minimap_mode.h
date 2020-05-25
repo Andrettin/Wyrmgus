@@ -60,4 +60,16 @@ inline const char *get_minimap_mode_name(const minimap_mode mode)
 	throw std::runtime_error("Invalid minimap mode: \"" + std::to_string(static_cast<int>(mode)) + "\".");
 }
 
+inline bool minimap_mode_has_overlay(const minimap_mode mode)
+{
+	switch (mode) {
+		case minimap_mode::territories:
+		case minimap_mode::territories_with_non_land:
+		case minimap_mode::settlements:
+			return true;
+		default:
+			return false;
+	}
+}
+
 }
