@@ -1159,7 +1159,7 @@ void DrawPopups()
 	}
 
 	if (CursorOn == cursor_on::minimap) {
-		const QPoint tile_pos = UI.Minimap.ScreenToTilePos(CursorScreenPos);
+		const QPoint tile_pos = UI.Minimap.screen_to_tile_pos(CursorScreenPos);
 		if (CMap::Map.Info.IsPointOnMap(tile_pos, UI.CurrentMapLayer->ID)) {
 			const CMapField *tile = UI.CurrentMapLayer->Field(tile_pos);
 			std::string popup_str;

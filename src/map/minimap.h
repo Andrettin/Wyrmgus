@@ -73,10 +73,25 @@ public:
 	void DrawUnitOn(CUnit &unit, int red_phase);
 	void AddEvent(const Vec2i &pos, int z, IntColor color);
 
-	Vec2i ScreenToTilePos(const PixelPos &screenPos) const;
-	PixelPos TilePosToScreenPos(const Vec2i &tilePos) const;
+	QPoint texture_to_tile_pos(const QPoint &texture_pos) const;
+	QPoint screen_to_tile_pos(const QPoint &screen_pos) const;
+	QPoint tile_to_texture_pos(const QPoint &tile_pos) const;
+	QPoint tile_to_screen_pos(const QPoint &tile_pos) const;
+
+	int get_width() const
+	{
+		return this->W;
+	}
+
+	int get_height() const
+	{
+		return this->H;
+	}
 
 	bool Contains(const PixelPos &screenPos) const;
+
+	int get_texture_width(const size_t z) const;
+	int get_texture_height(const size_t z) const;
 
 	minimap_mode get_mode() const
 	{

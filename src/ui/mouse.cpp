@@ -1380,7 +1380,7 @@ void UIHandleMouseMove(const PixelPos &cursorPos)
 
 	// Restrict mouse to minimap when dragging
 	if (OldCursorOn == cursor_on::minimap && CursorOn != cursor_on::minimap && (MouseButtons & LeftButton)) {
-		const Vec2i cursorPos = UI.Minimap.ScreenToTilePos(CursorScreenPos);
+		const Vec2i cursorPos = UI.Minimap.screen_to_tile_pos(CursorScreenPos);
 
 		RestrictCursorToMinimap();
 		UI.SelectedViewport->Center(CMap::Map.tile_pos_to_scaled_map_pixel_pos_center(cursorPos));
@@ -1507,7 +1507,7 @@ void UIHandleMouseMove(const PixelPos &cursorPos)
 		}
 		//Wyrmgus end
 	} else if (CursorOn == cursor_on::minimap) {
-		const Vec2i tilePos = UI.Minimap.ScreenToTilePos(cursorPos);
+		const Vec2i tilePos = UI.Minimap.screen_to_tile_pos(cursorPos);
 
 		if (UI.Minimap.are_units_visible()) {
 			if (UI.CurrentMapLayer->Field(tilePos)->playerInfo.IsTeamExplored(*CPlayer::GetThisPlayer()) || ReplayRevealMap) {
@@ -1538,7 +1538,7 @@ void UIHandleMouseMove(const PixelPos &cursorPos)
 				}
 			}
 			if (CursorOn == cursor_on::minimap && (MouseButtons & RightButton)) {
-				const Vec2i cursorPos = UI.Minimap.ScreenToTilePos(CursorScreenPos);
+				const Vec2i cursorPos = UI.Minimap.screen_to_tile_pos(CursorScreenPos);
 				//  Minimap move viewpoint
 				UI.SelectedViewport->Center(CMap::Map.tile_pos_to_scaled_map_pixel_pos_center(cursorPos));
 			}
@@ -1577,7 +1577,7 @@ void UIHandleMouseMove(const PixelPos &cursorPos)
 
 	if (CursorOn == cursor_on::minimap && (MouseButtons & LeftButton)) {
 		//  Minimap move viewpoint
-		const Vec2i cursorPos = UI.Minimap.ScreenToTilePos(CursorScreenPos);
+		const Vec2i cursorPos = UI.Minimap.screen_to_tile_pos(CursorScreenPos);
 
 		UI.SelectedViewport->Center(CMap::Map.tile_pos_to_scaled_map_pixel_pos_center(cursorPos));
 		CursorStartScreenPos = CursorScreenPos;
@@ -2240,7 +2240,7 @@ static void UISelectStateButtonDown(unsigned)
 	//  Clicking on the minimap.
 	//
 	if (CursorOn == cursor_on::minimap) {
-		const Vec2i cursorTilePos = UI.Minimap.ScreenToTilePos(CursorScreenPos);
+		const Vec2i cursorTilePos = UI.Minimap.screen_to_tile_pos(CursorScreenPos);
 
 		if (MouseButtons & LeftButton) {
 			const PixelPos mapPixelPos = CMap::Map.tile_pos_to_map_pixel_pos_center(cursorTilePos);
@@ -2387,7 +2387,7 @@ static void UIHandleButtonDown_OnMap(unsigned button)
 
 static void UIHandleButtonDown_OnMinimap(unsigned button)
 {
-	const Vec2i cursorTilePos = UI.Minimap.ScreenToTilePos(CursorScreenPos);
+	const Vec2i cursorTilePos = UI.Minimap.screen_to_tile_pos(CursorScreenPos);
 
 	if (MouseButtons & LeftButton) { // enter move mini-mode
 		UI.SelectedViewport->Center(CMap::Map.tile_pos_to_scaled_map_pixel_pos_center(cursorTilePos));

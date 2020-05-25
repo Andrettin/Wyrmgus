@@ -1627,7 +1627,7 @@ static void EditorCallbackButtonDown(unsigned button)
 	// Click on minimap
 	if (CursorOn == cursor_on::minimap) {
 		if (MouseButtons & LeftButton) { // enter move mini-mode
-			const Vec2i tilePos = UI.Minimap.ScreenToTilePos(CursorScreenPos);
+			const Vec2i tilePos = UI.Minimap.screen_to_tile_pos(CursorScreenPos);
 			UI.SelectedViewport->Center(CMap::Map.tile_pos_to_scaled_map_pixel_pos_center(tilePos));
 		}
 		return;
@@ -2225,7 +2225,7 @@ static void EditorCallbackMouse(const PixelPos &pos)
 	// Minimap move viewpoint
 	if (CursorOn == cursor_on::minimap && (MouseButtons & LeftButton)) {
 		RestrictCursorToMinimap();
-		const Vec2i tilePos = UI.Minimap.ScreenToTilePos(CursorScreenPos);
+		const Vec2i tilePos = UI.Minimap.screen_to_tile_pos(CursorScreenPos);
 
 		UI.SelectedViewport->Center(CMap::Map.tile_pos_to_scaled_map_pixel_pos_center(tilePos));
 		return;

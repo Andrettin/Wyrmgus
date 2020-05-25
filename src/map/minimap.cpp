@@ -57,25 +57,13 @@ static constexpr int ATTACK_BLINK_DURATION = 7 * CYCLES_PER_SECOND;
 
 static constexpr int SCALE_PRECISION = 100;
 
-#if defined(USE_OPENGL) || defined(USE_GLES)
-//Wyrmgus start
-//static int MinimapTextureWidth;
-//static int MinimapTextureHeight;
 static std::vector<int> MinimapTextureWidth;
 static std::vector<int> MinimapTextureHeight;
-//Wyrmgus end
-#endif
 
-//Wyrmgus start
-//static int *Minimap2MapX;                  /// fast conversion table
-//static int *Minimap2MapY;                  /// fast conversion table
-//static int Map2MinimapX[MaxMapWidth];      /// fast conversion table
-//static int Map2MinimapY[MaxMapHeight];     /// fast conversion table
 static std::vector<int *> Minimap2MapX;                  /// fast conversion table
 static std::vector<int *> Minimap2MapY;                  /// fast conversion table
 static std::vector<int *> Map2MinimapX;      /// fast conversion table
 static std::vector<int *> Map2MinimapY;     /// fast conversion table
-//Wyrmgus end
 
 // MinimapScale:
 // 32x32 64x64 96x96 128x128 256x256 512x512 ...
@@ -133,11 +121,14 @@ void minimap::Create()
 		int n = std::max(CMap::Map.Info.MapWidths[z], CMap::Map.Info.MapHeights[z]);
 		n = std::max(n, 32);
 
-		MinimapScaleX.push_back((W * MINIMAP_FAC + n - 1) / n);
-		MinimapScaleY.push_back((H * MINIMAP_FAC + n - 1) / n);
+		const int texture_width = this->get_texture_width(z);
+		const int texture_height = this->get_texture_height(z);
 
-		XOffset.push_back((W - (CMap::Map.Info.MapWidths[z] * MinimapScaleX[z]) / MINIMAP_FAC + 1) / 2);
-		YOffset.push_back((H - (CMap::Map.Info.MapHeights[z] * MinimapScaleY[z]) / MINIMAP_FAC + 1) / 2);
+		MinimapScaleX.push_back((texture_width * MINIMAP_FAC + n - 1) / n);
+		MinimapScaleY.push_back((texture_height * MINIMAP_FAC + n - 1) / n);
+
+		XOffset.push_back((texture_width - (CMap::Map.Info.MapWidths[z] * MinimapScaleX[z]) / MINIMAP_FAC + 1) / 2);
+		YOffset.push_back((texture_height - (CMap::Map.Info.MapHeights[z] * MinimapScaleY[z]) / MINIMAP_FAC + 1) / 2);
 
 		DebugPrint("MinimapScale %d %d (%d %d), X off %d, Y off %d\n" _C_
 				   MinimapScaleX[z] / MINIMAP_FAC _C_ MinimapScaleY[z] / MINIMAP_FAC _C_
@@ -147,14 +138,14 @@ void minimap::Create()
 		//
 		// Calculate minimap fast lookup tables.
 		//
-		Minimap2MapX.push_back(new int[W * H]);
-		memset(Minimap2MapX[z], 0, W * H * sizeof(int));
-		Minimap2MapY.push_back(new int[W * H]);
-		memset(Minimap2MapY[z], 0, W * H * sizeof(int));
-		for (int i = XOffset[z]; i < W - XOffset[z]; ++i) {
+		Minimap2MapX.push_back(new int[texture_width * texture_height]);
+		memset(Minimap2MapX[z], 0, texture_width * texture_height * sizeof(int));
+		Minimap2MapY.push_back(new int[texture_width * texture_height]);
+		memset(Minimap2MapY[z], 0, texture_width * texture_height * sizeof(int));
+		for (int i = XOffset[z]; i < texture_width - XOffset[z]; ++i) {
 			Minimap2MapX[z][i] = ((i - XOffset[z]) * MINIMAP_FAC) / MinimapScaleX[z];
 		}
-		for (int i = YOffset[z]; i < H - YOffset[z]; ++i) {
+		for (int i = YOffset[z]; i < texture_height - YOffset[z]; ++i) {
 			Minimap2MapY[z][i] = (((i - YOffset[z]) * MINIMAP_FAC) / MinimapScaleY[z]) * CMap::Map.Info.MapWidths[z];
 		}
 		Map2MinimapX.push_back(new int[CMap::Map.Info.MapWidths[z]]);
@@ -169,9 +160,9 @@ void minimap::Create()
 		}
 
 		// Palette updated from UpdateMinimapTerrain()
-		for (MinimapTextureWidth[z] = 1; MinimapTextureWidth[z] < W; MinimapTextureWidth[z] <<= 1) {
+		for (MinimapTextureWidth[z] = 1; MinimapTextureWidth[z] < texture_width; MinimapTextureWidth[z] <<= 1) {
 		}
-		for (MinimapTextureHeight[z] = 1; MinimapTextureHeight[z] < H; MinimapTextureHeight[z] <<= 1) {
+		for (MinimapTextureHeight[z] = 1; MinimapTextureHeight[z] < texture_height; MinimapTextureHeight[z] <<= 1) {
 		}
 
 		this->terrain_texture_data.push_back(new unsigned char[MinimapTextureWidth[z] * MinimapTextureHeight[z] * 4]);
@@ -218,12 +209,9 @@ void minimap::FreeOpenGL()
 */
 void minimap::Reload()
 {
-	//Wyrmgus start
-//	CreateMinimapTexture();
 	for (size_t z = 0; z < CMap::Map.MapLayers.size(); ++z) {
 		this->create_textures(z);
 	}
-	//Wyrmgus end
 }
 
 /**
@@ -253,19 +241,15 @@ void minimap::UpdateTerrain(int z)
 	
 	const stratagus::season *season = CMap::Map.MapLayers[z]->GetSeason();
 
-	//Wyrmgus start
-//	const int tilepitch = Map.TileGraphic->Surface->w / stratagus::defines::get()->get_scaled_tile_width();
-	//Wyrmgus end
-
 	const CMapLayer *map_layer = CMap::Map.MapLayers[z];
+	const int texture_width = this->get_texture_width(z);
+	const int texture_height = this->get_texture_height(z);
 	
 	//
 	//  Pixel 7,6 7,14, 15,6 15,14 are taken for the minimap picture.
 	//
-	for (int my = YOffset[z]; my < H - YOffset[z]; ++my) {
-		for (int mx = XOffset[z]; mx < W - XOffset[z]; ++mx) {
-			//Wyrmgus start
-//			const int tile = Map.Fields[Minimap2MapX[mx] + Minimap2MapY[my]].getGraphicTile();
+	for (int my = YOffset[z]; my < texture_height - YOffset[z]; ++my) {
+		for (int mx = XOffset[z]; mx < texture_width - XOffset[z]; ++mx) {
 			const CMapField &mf = *map_layer->Field(Minimap2MapX[z][mx] + Minimap2MapY[z][my]);
 			stratagus::terrain_type *terrain = mf.playerInfo.SeenOverlayTerrain ? mf.playerInfo.SeenOverlayTerrain : mf.playerInfo.SeenTerrain;
 			int tile = mf.playerInfo.SeenOverlayTerrain ? mf.playerInfo.SeenOverlaySolidTile : mf.playerInfo.SeenSolidTile;
@@ -280,21 +264,16 @@ void minimap::UpdateTerrain(int z)
 				base_terrain = mf.Terrain;
 				base_tile = mf.SolidTile;
 			}
-			//Wyrmgus end
 			
-			//Wyrmgus start
 			int tilepitch = terrain->get_graphics(season)->get_width() / stratagus::defines::get()->get_scaled_tile_width();
 			
 			int base_tilepitch = base_terrain->get_graphics(season)->get_width() / stratagus::defines::get()->get_scaled_tile_width();
-			//Wyrmgus end
 	
 			const int xofs = stratagus::defines::get()->get_scaled_tile_width() * (tile % tilepitch);
 			const int yofs = stratagus::defines::get()->get_scaled_tile_height() * (tile / tilepitch);
 			
-			//Wyrmgus start
 			const int base_xofs = stratagus::defines::get()->get_scaled_tile_width() * (base_tile % base_tilepitch);
 			const int base_yofs = stratagus::defines::get()->get_scaled_tile_height() * (base_tile / base_tilepitch);
-			//Wyrmgus end
 
 			uint32_t c;
 
@@ -313,8 +292,11 @@ void minimap::UpdateTerrain(int z)
 
 void minimap::update_territories(const int z)
 {
-	for (int my = YOffset[z]; my < H - YOffset[z]; ++my) {
-		for (int mx = XOffset[z]; mx < W - XOffset[z]; ++mx) {
+	const int texture_width = this->get_texture_width(z);
+	const int texture_height = this->get_texture_height(z);
+
+	for (int my = YOffset[z]; my < texture_height - YOffset[z]; ++my) {
+		for (int mx = XOffset[z]; mx < texture_width - XOffset[z]; ++mx) {
 			this->update_territory_pixel(mx, my, z);
 		}
 	}
@@ -350,7 +332,10 @@ void minimap::UpdateXY(const Vec2i &pos, int z)
 	const int ty = pos.y * CMap::Map.Info.MapWidths[z];
 	const int tx = pos.x;
 
-	for (int my = YOffset[z]; my < H - YOffset[z]; ++my) {
+	const int texture_width = this->get_texture_width(z);
+	const int texture_height = this->get_texture_height(z);
+
+	for (int my = YOffset[z]; my < texture_height - YOffset[z]; ++my) {
 		const int y = Minimap2MapY[z][my];
 		if (y < ty) {
 			continue;
@@ -359,7 +344,7 @@ void minimap::UpdateXY(const Vec2i &pos, int z)
 			break;
 		}
 
-		for (int mx = XOffset[z]; mx < W - XOffset[z]; ++mx) {
+		for (int mx = XOffset[z]; mx < texture_width - XOffset[z]; ++mx) {
 			const int x = Minimap2MapX[z][mx];
 
 			if (x < tx) {
@@ -369,13 +354,6 @@ void minimap::UpdateXY(const Vec2i &pos, int z)
 				break;
 			}
 
-			//Wyrmgus start
-			/*
-			int tile = Map.Fields[x + y].playerInfo.SeenTile;
-			if (!tile) {
-				tile = Map.Fields[x + y].getGraphicTile();
-			}
-			*/
 			const CMapField &mf = *CMap::Map.MapLayers[z]->Field(x + y);
 			stratagus::terrain_type *terrain = mf.playerInfo.SeenOverlayTerrain ? mf.playerInfo.SeenOverlayTerrain : mf.playerInfo.SeenTerrain;
 			int tile = mf.playerInfo.SeenOverlayTerrain ? mf.playerInfo.SeenOverlaySolidTile : mf.playerInfo.SeenSolidTile;
@@ -390,21 +368,16 @@ void minimap::UpdateXY(const Vec2i &pos, int z)
 				base_terrain = mf.Terrain;
 				base_tile = mf.SolidTile;
 			}
-			//Wyrmgus end
 
-			//Wyrmgus start
 			int tilepitch = terrain->get_graphics(season)->get_width() / stratagus::defines::get()->get_scaled_tile_width();
 			
 			int base_tilepitch = base_terrain->get_graphics(season)->get_width() / stratagus::defines::get()->get_scaled_tile_width();
-			//Wyrmgus end
 	
 			const int xofs = stratagus::defines::get()->get_scaled_tile_width() * (tile % tilepitch);
 			const int yofs = stratagus::defines::get()->get_scaled_tile_height() * (tile / tilepitch);
 			
-			//Wyrmgus start
 			const int base_xofs = stratagus::defines::get()->get_scaled_tile_width() * (base_tile % base_tilepitch);
 			const int base_yofs = stratagus::defines::get()->get_scaled_tile_height() * (base_tile / base_tilepitch);
-			//Wyrmgus end
 
 			uint32_t c;
 
@@ -422,11 +395,14 @@ void minimap::UpdateXY(const Vec2i &pos, int z)
 
 void minimap::update_territory_xy(const QPoint &pos, const int z)
 {
+	const int texture_width = this->get_texture_width(z);
+	const int texture_height = this->get_texture_height(z);
+
 	const int ty = pos.y() * CMap::Map.Info.MapWidths[z];
 	const int tx = pos.x();
 	const int non_land_territory_alpha = defines::get()->get_minimap_non_land_territory_alpha();
 
-	for (int my = YOffset[z]; my < H - YOffset[z]; ++my) {
+	for (int my = YOffset[z]; my < texture_height - YOffset[z]; ++my) {
 		const int y = Minimap2MapY[z][my];
 		if (y < ty) {
 			continue;
@@ -435,7 +411,7 @@ void minimap::update_territory_xy(const QPoint &pos, const int z)
 			break;
 		}
 
-		for (int mx = XOffset[z]; mx < W - XOffset[z]; ++mx) {
+		for (int mx = XOffset[z]; mx < texture_width - XOffset[z]; ++mx) {
 			const int x = Minimap2MapX[z][mx];
 
 			if (x < tx) {
@@ -503,6 +479,8 @@ void minimap::update_territory_pixel(const int mx, const int my, const int z)
 void minimap::DrawUnitOn(CUnit &unit, int red_phase)
 {
 	const int z = UI.CurrentMapLayer->ID;
+	const int texture_width = this->get_texture_width(z);
+	const int texture_height = this->get_texture_height(z);
 
 	const stratagus::unit_type *type;
 
@@ -542,13 +520,13 @@ void minimap::DrawUnitOn(CUnit &unit, int red_phase)
 	int my = 1 + UI.Minimap.YOffset[z] + Map2MinimapY[z][unit.tilePos.y];
 	int w = Map2MinimapX[z][type->get_tile_width()];
 
-	if (mx + w >= UI.Minimap.W) { // clip right side
-		w = UI.Minimap.W - mx;
+	if (mx + w >= texture_width) { // clip right side
+		w = texture_width - mx;
 	}
 
 	int h0 = Map2MinimapY[z][type->get_tile_height()];
-	if (my + h0 >= UI.Minimap.H) { // clip bottom side
-		h0 = UI.Minimap.H - my;
+	if (my + h0 >= texture_height) { // clip bottom side
+		h0 = texture_height - my;
 	}
 
 	while (w-- >= 0) {
@@ -582,11 +560,14 @@ void minimap::Update()
 		memcpy(this->overlay_texture_data[z], this->mode_overlay_texture_data[this->get_mode()][z], MinimapTextureWidth[z] * MinimapTextureHeight[z] * 4);
 	}
 
+	const int texture_width = this->get_texture_width(z);
+	const int texture_height = this->get_texture_height(z);
+
 	const uint32_t unexplored_color = Video.MapRGB(nullptr, 0, 0, 0);
 	const uint32_t explored_color = Video.MapRGBA(nullptr, 0, 0, 0, 128); //explored but not visible
-	for (int my = 0; my < H; ++my) {
-		for (int mx = 0; mx < W; ++mx) {
-			if (mx < XOffset[z] || mx >= W - XOffset[z] || my < YOffset[z] || my >= H - YOffset[z]) {
+	for (int my = 0; my < texture_height; ++my) {
+		for (int mx = 0; mx < texture_width; ++mx) {
+			if (mx < XOffset[z] || mx >= texture_width - XOffset[z] || my < YOffset[z] || my >= texture_height - YOffset[z]) {
 				*(uint32_t *) &(this->overlay_texture_data[z][(mx + my * MinimapTextureWidth[z]) * 4]) = Video.MapRGB(nullptr, 0, 0, 0);
 				continue;
 			}
@@ -697,52 +678,48 @@ void minimap::draw_texture(const GLuint &texture, const unsigned char *texture_d
 	glBegin(GL_QUADS);
 	glTexCoord2f(0.0f, 0.0f);
 	glVertex2i(X, Y);
-	glTexCoord2f(0.0f, (float) H / MinimapTextureHeight[z]);
+	glTexCoord2f(0.0f, (float) this->get_texture_height(z) / MinimapTextureHeight[z]);
 	glVertex2i(X, Y + H);
-	glTexCoord2f((float) W / MinimapTextureWidth[z], (float) H / MinimapTextureHeight[z]);
+	glTexCoord2f((float) this->get_texture_width(z) / MinimapTextureWidth[z], (float) this->get_texture_height(z) / MinimapTextureHeight[z]);
 	glVertex2i(X + W, Y + H);
-	glTexCoord2f((float) W / MinimapTextureWidth[z], 0.0f);
+	glTexCoord2f((float) this->get_texture_width(z) / MinimapTextureWidth[z], 0.0f);
 	glVertex2i(X + W, Y);
 	glEnd();
 #endif
 }
 
-/**
-**  Convert screen position to tile map coordinate.
-**
-**  @param screenPos  Screen pixel coordinate.
-**
-**  @return   Tile coordinate.
-*/
-Vec2i minimap::ScreenToTilePos(const PixelPos &screenPos) const
+QPoint minimap::texture_to_tile_pos(const QPoint &texture_pos) const
 {
-	//Wyrmgus start
-//	Vec2i tilePos((((screenPos.x - X - XOffset) * MINIMAP_FAC) / MinimapScaleX),
-//				  (((screenPos.y - Y - YOffset) * MINIMAP_FAC) / MinimapScaleY));
-	Vec2i tilePos((((screenPos.x - X - XOffset[UI.CurrentMapLayer->ID]) * MINIMAP_FAC) / MinimapScaleX[UI.CurrentMapLayer->ID]),
-				  (((screenPos.y - Y - YOffset[UI.CurrentMapLayer->ID]) * MINIMAP_FAC) / MinimapScaleY[UI.CurrentMapLayer->ID]));
-	//Wyrmgus end
+	const int z = UI.CurrentMapLayer->ID;
+	Vec2i tile_pos(((texture_pos.x() - XOffset[z]) * MINIMAP_FAC) / MinimapScaleX[z],
+		((texture_pos.y() - YOffset[z]) * MINIMAP_FAC) / MinimapScaleY[z]);
 
-	CMap::Map.Clamp(tilePos, UI.CurrentMapLayer->ID);
+	CMap::Map.Clamp(tile_pos, UI.CurrentMapLayer->ID);
 
-	return tilePos;
+	return tile_pos;
 }
 
-/**
-**  Convert tile map coordinate to screen position.
-**
-**  @param tilePos  Tile coordinate.
-**
-**  @return   Screen pixel coordinate.
-*/
-PixelPos minimap::TilePosToScreenPos(const Vec2i &tilePos) const
+QPoint minimap::screen_to_tile_pos(const QPoint &screen_pos) const
 {
-	//Wyrmgus start
-//	const PixelPos screenPos(X + XOffset + (tilePos.x * MinimapScaleX) / MINIMAP_FAC,
-//							 Y + YOffset + (tilePos.y * MinimapScaleY) / MINIMAP_FAC);
-	const PixelPos screenPos(X + XOffset[UI.CurrentMapLayer->ID] + (tilePos.x * MinimapScaleX[UI.CurrentMapLayer->ID]) / MINIMAP_FAC,
-							 Y + YOffset[UI.CurrentMapLayer->ID] + (tilePos.y * MinimapScaleY[UI.CurrentMapLayer->ID]) / MINIMAP_FAC);
-	//Wyrmgus end
+	const int z = UI.CurrentMapLayer->ID;
+	const QPoint texture_pos((screen_pos.x() - X) * this->get_texture_width(z) / this->get_width(), (screen_pos.y() - Y) * this->get_texture_height(z) / this->get_height());
+
+	return this->texture_to_tile_pos(texture_pos);
+}
+
+QPoint minimap::tile_to_texture_pos(const QPoint &tile_pos) const
+{
+	const int z = UI.CurrentMapLayer->ID;
+	QPoint screenPos(XOffset[z] + (tile_pos.x() * MinimapScaleX[z]) / MINIMAP_FAC, YOffset[z] + (tile_pos.y() * MinimapScaleY[z]) / MINIMAP_FAC);
+	return screenPos;
+}
+
+QPoint minimap::tile_to_screen_pos(const QPoint &tile_pos) const
+{
+	const int z = UI.CurrentMapLayer->ID;
+	const QPoint texture_pos = this->tile_to_texture_pos(tile_pos);
+	QPoint screenPos(X + texture_pos.x() * this->get_width() / this->get_texture_width(z),
+							 Y + texture_pos.y() * this->get_height() / this->get_texture_height(z));
 	return screenPos;
 }
 
@@ -808,13 +785,10 @@ void minimap::Destroy()
 void minimap::DrawViewportArea(const CViewport &viewport) const
 {
 	// Determine and save region below minimap cursor
-	const PixelPos screenPos = TilePosToScreenPos(viewport.MapPos);
-	//Wyrmgus start
-//	int w = (viewport.MapWidth * MinimapScaleX) / MINIMAP_FAC;
-//	int h = (viewport.MapHeight * MinimapScaleY) / MINIMAP_FAC;
-	int w = (viewport.MapWidth * MinimapScaleX[UI.CurrentMapLayer->ID]) / MINIMAP_FAC;
-	int h = (viewport.MapHeight * MinimapScaleY[UI.CurrentMapLayer->ID]) / MINIMAP_FAC;
-	//Wyrmgus end
+	const int z = UI.CurrentMapLayer->ID;
+	const PixelPos screenPos = this->tile_to_screen_pos(viewport.MapPos);
+	int w = (viewport.MapWidth * MinimapScaleX[z]) / MINIMAP_FAC * this->get_width() / this->get_texture_width(z);
+	int h = (viewport.MapHeight * MinimapScaleY[z]) / MINIMAP_FAC * this->get_height() / this->get_texture_height(z);
 
 	// Draw cursor as rectangle (Note: unclipped, as it is always visible)
 	//Wyrmgus start
@@ -834,7 +808,7 @@ void minimap::AddEvent(const Vec2i &pos, int z, IntColor color)
 		return;
 	}
 	if (z == UI.CurrentMapLayer->ID) {
-		MinimapEvents[NumMinimapEvents].pos = TilePosToScreenPos(pos);
+		MinimapEvents[NumMinimapEvents].pos = this->tile_to_screen_pos(pos);
 		MinimapEvents[NumMinimapEvents].Size = (W < H) ? W / 3 : H / 3;
 		MinimapEvents[NumMinimapEvents].Color = color;
 		++NumMinimapEvents;
@@ -854,8 +828,18 @@ void minimap::AddEvent(const Vec2i &pos, int z, IntColor color)
 
 bool minimap::Contains(const PixelPos &screenPos) const
 {
-	return this->X <= screenPos.x && screenPos.x < this->X + this->W
-		   && this->Y <= screenPos.y && screenPos.y < this->Y + this->H;
+	return this->X <= screenPos.x && screenPos.x < this->X + this->get_width()
+		   && this->Y <= screenPos.y && screenPos.y < this->Y + this->get_height();
+}
+
+int minimap::get_texture_width(const size_t z) const
+{
+	return std::max(this->get_width(), CMap::Map.Info.MapWidths[z]);
+}
+
+int minimap::get_texture_height(const size_t z) const
+{
+	return std::max(this->get_height(), CMap::Map.Info.MapHeights[z]);
 }
 
 void minimap::toggle_mode()
