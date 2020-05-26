@@ -710,6 +710,7 @@ QPoint minimap::screen_to_tile_pos(const QPoint &screen_pos) const
 	const int z = UI.CurrentMapLayer->ID;
 
 	QPoint texture_pos = screen_pos;
+	texture_pos -= QPoint(this->X, this->Y);
 
 	if (this->is_zoomed() && this->can_zoom(z)) {
 		const QRect rect = this->get_texture_draw_rect(z);
@@ -719,8 +720,6 @@ QPoint minimap::screen_to_tile_pos(const QPoint &screen_pos) const
 		texture_pos.setX(texture_pos.x() * this->get_texture_width(z) / this->get_width());
 		texture_pos.setY(texture_pos.y() * this->get_texture_height(z) / this->get_height());
 	}
-
-	texture_pos -= QPoint(this->X, this->Y);
 
 	return this->texture_to_tile_pos(texture_pos);
 }
