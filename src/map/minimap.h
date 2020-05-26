@@ -115,7 +115,7 @@ public:
 
 	void set_zoomed(const bool zoomed)
 	{
-		this->zoomed = true;
+		this->zoomed = zoomed;
 	}
 
 	bool can_zoom(const int z) const
