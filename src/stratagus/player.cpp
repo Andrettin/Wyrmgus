@@ -1268,6 +1268,7 @@ void CPlayer::SetFaction(const stratagus::faction *faction)
 
 				if (usage_count < best_usage_count) {
 					available_colors.clear();
+					best_rgb_difference = -1;
 				}
 
 				int rgb_difference = -1;
@@ -1300,22 +1301,24 @@ void CPlayer::SetFaction(const stratagus::faction *faction)
 			}
 		}
 		
-		if (player_color != nullptr) {
-			this->player_color = player_color;
+		if (player_color == nullptr) {
+			throw std::runtime_error("No player color chosen for player \"" + this->Name + "\" (" + std::to_string(this->Index) + ").");
+		}
 
-			//update the borders on the minimap for the new color
-			for (const auto &kv_pair : this->UnitsByType) {
-				const stratagus::unit_type *unit_type = kv_pair.first;
-				if (!unit_type->BoolFlag[TOWNHALL_INDEX].value) {
-					continue;
-				}
+		this->player_color = player_color;
 
-				for (const CUnit *town_hall : kv_pair.second) {
-					town_hall->settlement->update_minimap_territory();
-				}
+		//update the borders on the minimap for the new color
+		for (const auto &kv_pair : this->UnitsByType) {
+			const stratagus::unit_type *unit_type = kv_pair.first;
+			if (!unit_type->BoolFlag[TOWNHALL_INDEX].value) {
+				continue;
+			}
+
+			for (const CUnit *town_hall : kv_pair.second) {
+				town_hall->settlement->update_minimap_territory();
 			}
 		}
-	
+
 		if (!stratagus::faction::get_all()[this->Faction]->FactionUpgrade.empty()) {
 			CUpgrade *faction_upgrade = CUpgrade::try_get(stratagus::faction::get_all()[this->Faction]->FactionUpgrade);
 			if (faction_upgrade && this->Allow.Upgrades[faction_upgrade->ID] != 'R') {
