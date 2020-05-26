@@ -215,17 +215,6 @@ void minimap::Reload()
 }
 
 /**
-**  Calculate the tile graphic pixel
-*/
-static inline QColor GetTileGraphicPixel(int xofs, int yofs, int mx, int my, int scalex, int scaley, int z, stratagus::terrain_type *terrain, const stratagus::season *season)
-{
-	const int scale_factor = stratagus::defines::get()->get_scale_factor();
-	int x = (xofs + (7 * scale_factor) + ((mx * SCALE_PRECISION) % scalex) / SCALE_PRECISION * 8);
-	int y = (yofs + (6 * scale_factor) + ((my * SCALE_PRECISION) % scaley) / SCALE_PRECISION * 8);
-	return terrain->get_graphics(season)->get_image().pixelColor(x / scale_factor, y / scale_factor);
-}
-
-/**
 **  Update a mini-map from the tiles of the map.
 */
 void minimap::UpdateTerrain(int z)
@@ -239,53 +228,21 @@ void minimap::UpdateTerrain(int z)
 		scaley = 1;
 	}
 	
-	const stratagus::season *season = CMap::Map.MapLayers[z]->GetSeason();
+	const season *season = CMap::Map.MapLayers[z]->GetSeason();
 
 	const CMapLayer *map_layer = CMap::Map.MapLayers[z];
 	const int texture_width = this->get_texture_width(z);
 	const int texture_height = this->get_texture_height(z);
 	
-	//
-	//  Pixel 7,6 7,14, 15,6 15,14 are taken for the minimap picture.
-	//
 	for (int my = YOffset[z]; my < texture_height - YOffset[z]; ++my) {
 		for (int mx = XOffset[z]; mx < texture_width - XOffset[z]; ++mx) {
 			const CMapField &mf = *map_layer->Field(Minimap2MapX[z][mx] + Minimap2MapY[z][my]);
-			stratagus::terrain_type *terrain = mf.playerInfo.SeenOverlayTerrain ? mf.playerInfo.SeenOverlayTerrain : mf.playerInfo.SeenTerrain;
-			int tile = mf.playerInfo.SeenOverlayTerrain ? mf.playerInfo.SeenOverlaySolidTile : mf.playerInfo.SeenSolidTile;
-			if (!terrain) {
-				terrain = mf.OverlayTerrain ? mf.OverlayTerrain : mf.Terrain;
-				tile = mf.OverlayTerrain ? mf.OverlaySolidTile : mf.SolidTile;
-			}
-			
-			stratagus::terrain_type *base_terrain = mf.playerInfo.SeenTerrain;
-			int base_tile = mf.playerInfo.SeenSolidTile;
-			if (!base_terrain) {
-				base_terrain = mf.Terrain;
-				base_tile = mf.SolidTile;
-			}
-			
-			int tilepitch = terrain->get_graphics(season)->get_width() / stratagus::defines::get()->get_scaled_tile_width();
-			
-			int base_tilepitch = base_terrain->get_graphics(season)->get_width() / stratagus::defines::get()->get_scaled_tile_width();
+			const terrain_type *terrain = mf.GetTopTerrain(true);
 	
-			const int xofs = stratagus::defines::get()->get_scaled_tile_width() * (tile % tilepitch);
-			const int yofs = stratagus::defines::get()->get_scaled_tile_height() * (tile / tilepitch);
-			
-			const int base_xofs = stratagus::defines::get()->get_scaled_tile_width() * (base_tile % base_tilepitch);
-			const int base_yofs = stratagus::defines::get()->get_scaled_tile_height() * (base_tile / base_tilepitch);
+			const QColor color = terrain ? terrain->get_minimap_color(season) : QColor(0, 0, 0);
 
-			uint32_t c;
-
-			QColor color = GetTileGraphicPixel(xofs, yofs, mx, my, scalex, scaley, z, terrain, season);
-
-			if (color.alpha() == 0) { //transparent pixel, use base instead
-				color = GetTileGraphicPixel(base_xofs, base_yofs, mx, my, scalex, scaley, z, base_terrain, season);
-			}
-
-			c = Video.MapRGB(0, color.red(), color.green(), color.blue());
-
-			*(uint32_t *)&(this->terrain_texture_data[z][(mx + my * MinimapTextureWidth[z]) * 4]) = c;
+			const uint32_t c = Video.MapRGB(0, color.red(), color.green(), color.blue());
+			*(uint32_t *) &(this->terrain_texture_data[z][(mx + my * MinimapTextureWidth[z]) * 4]) = c;
 		}
 	}
 }
@@ -323,11 +280,7 @@ void minimap::UpdateXY(const Vec2i &pos, int z)
 		scaley = 1;
 	}
 
-	const stratagus::season *season = CMap::Map.MapLayers[z]->GetSeason();
-
-	//
-	//  Pixel 7,6 7,14, 15,6 15,14 are taken for the minimap picture.
-	//
+	const season *season = CMap::Map.MapLayers[z]->GetSeason();
 
 	const int ty = pos.y * CMap::Map.Info.MapWidths[z];
 	const int tx = pos.x;
@@ -355,39 +308,11 @@ void minimap::UpdateXY(const Vec2i &pos, int z)
 			}
 
 			const CMapField &mf = *CMap::Map.MapLayers[z]->Field(x + y);
-			stratagus::terrain_type *terrain = mf.playerInfo.SeenOverlayTerrain ? mf.playerInfo.SeenOverlayTerrain : mf.playerInfo.SeenTerrain;
-			int tile = mf.playerInfo.SeenOverlayTerrain ? mf.playerInfo.SeenOverlaySolidTile : mf.playerInfo.SeenSolidTile;
-			if (!terrain) {
-				terrain = mf.OverlayTerrain ? mf.OverlayTerrain : mf.Terrain;
-				tile = mf.OverlayTerrain ? mf.OverlaySolidTile : mf.SolidTile;
-			}
-			
-			stratagus::terrain_type *base_terrain = mf.playerInfo.SeenTerrain;
-			int base_tile = mf.playerInfo.SeenSolidTile;
-			if (!base_terrain) {
-				base_terrain = mf.Terrain;
-				base_tile = mf.SolidTile;
-			}
+			const terrain_type *terrain = mf.GetTopTerrain(true);
 
-			int tilepitch = terrain->get_graphics(season)->get_width() / stratagus::defines::get()->get_scaled_tile_width();
-			
-			int base_tilepitch = base_terrain->get_graphics(season)->get_width() / stratagus::defines::get()->get_scaled_tile_width();
-	
-			const int xofs = stratagus::defines::get()->get_scaled_tile_width() * (tile % tilepitch);
-			const int yofs = stratagus::defines::get()->get_scaled_tile_height() * (tile / tilepitch);
-			
-			const int base_xofs = stratagus::defines::get()->get_scaled_tile_width() * (base_tile % base_tilepitch);
-			const int base_yofs = stratagus::defines::get()->get_scaled_tile_height() * (base_tile / base_tilepitch);
+			const QColor color = terrain ? terrain->get_minimap_color(season) : QColor(0, 0, 0);
 
-			uint32_t c;
-
-			QColor color = GetTileGraphicPixel(xofs, yofs, mx, my, scalex, scaley, z, terrain, season);
-
-			if (color.alpha() == 0) { //transparent pixel, use base instead
-				color = GetTileGraphicPixel(base_xofs, base_yofs, mx, my, scalex, scaley, z, base_terrain, season);
-			}
-
-			c = Video.MapRGB(0, color.red(), color.green(), color.blue());
+			const uint32_t c = Video.MapRGB(0, color.red(), color.green(), color.blue());
 			*(uint32_t *) &(this->terrain_texture_data[z][(mx + my * MinimapTextureWidth[z]) * 4]) = c;
 		}
 	}
@@ -482,7 +407,7 @@ void minimap::DrawUnitOn(CUnit &unit, int red_phase)
 	const int texture_width = this->get_texture_width(z);
 	const int texture_height = this->get_texture_height(z);
 
-	const stratagus::unit_type *type;
+	const unit_type *type;
 
 	if (Editor.Running || ReplayRevealMap || unit.IsVisible(*CPlayer::GetThisPlayer())) {
 		type = unit.Type;

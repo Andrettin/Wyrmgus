@@ -34,6 +34,7 @@
 #include "iolib.h"
 #include "map/map.h"
 #include "map/tileset.h"
+#include "player_color.h"
 #include "time/season.h"
 #include "upgrade/upgrade_structs.h"
 #include "util/container_util.h"
@@ -48,6 +49,10 @@ void terrain_type::LoadTerrainTypeGraphics()
 	for (terrain_type *terrain_type : terrain_type::get_all()) {
 		if (terrain_type->graphics != nullptr) {
 			terrain_type->graphics->Load(false, defines::get()->get_scale_factor());
+
+			if (!terrain_type->minimap_color.isValid()) {
+				terrain_type->calculate_minimap_color();
+			}
 		}
 
 		if (terrain_type->transition_graphics != nullptr) {
@@ -55,7 +60,12 @@ void terrain_type::LoadTerrainTypeGraphics()
 		}
 
 		for (const auto &kv_pair : terrain_type->season_graphics) {
+			const season *season = kv_pair.first;
 			kv_pair.second->Load(false, defines::get()->get_scale_factor());
+
+			if (!terrain_type->season_minimap_colors[season].isValid()) {
+				terrain_type->calculate_minimap_color(season);
+			}
 		}
 
 		if (terrain_type->elevation_graphics != nullptr) {
@@ -191,6 +201,13 @@ void terrain_type::process_sml_scope(const sml_data &scope)
 			const std::filesystem::path filepath = property.get_value();
 
 			this->season_image_files[season] = filepath;
+		});
+	} else if (tag == "season_minimap_colors") {
+		scope.for_each_child([&](const sml_data &child_scope) {
+			const season *season = season::get(child_scope.get_tag());
+			const QColor color = child_scope.to_color();
+
+			this->season_minimap_colors[season] = color;
 		});
 	} else if (tag == "transition_tiles" || tag == "adjacent_transition_tiles") {
 		scope.for_each_child([&](const sml_data &child_scope) {
@@ -420,6 +437,82 @@ void terrain_type::set_color(const QColor &color)
 
 	this->color = color;
 	terrain_type::terrain_types_by_color[color] = this;
+}
+
+const QColor &terrain_type::get_minimap_color(const season *season) const
+{
+	if (season != nullptr) {
+		auto find_iterator = this->season_minimap_colors.find(season);
+
+		if (find_iterator != this->season_minimap_colors.end()) {
+			return find_iterator->second;
+		}
+	}
+
+	return this->minimap_color;
+}
+
+void terrain_type::calculate_minimap_color(const season *season)
+{
+	if (this == defines::get()->get_border_terrain_type()) {
+		return;
+	}
+
+	const CGraphic *graphic = this->get_graphics(season);
+	const std::vector<int> &solid_tiles = this->get_solid_tiles();
+
+	if (solid_tiles.empty()) {
+		throw std::runtime_error("Terrain type \"" + this->get_identifier() + "\" has no solid tiles with which to calculate its minimap color.");
+	}
+
+	const QImage &image = graphic->get_image();
+	const QSize &frame_size = graphic->get_original_frame_size();
+
+	int pixel_count = 0;
+	int red = 0;
+	int green = 0;
+	int blue = 0;
+
+	for (const int solid_tile : solid_tiles) {
+		const QPoint frame_pos = graphic->get_frame_pos(solid_tile);
+		const QPoint frame_pixel_pos(frame_pos.x() * frame_size.width(), frame_pos.y() * frame_size.height());
+
+		for (int x_offset = 0; x_offset < frame_size.width(); ++x_offset) {
+			for (int y_offset = 0; y_offset < frame_size.height(); ++y_offset) {
+				const QPoint pixel_pos = frame_pixel_pos + QPoint(x_offset, y_offset);
+				const QColor pixel_color = image.pixelColor(pixel_pos);
+
+				if (pixel_color.alpha() == 0) { //fully transparent pixel
+					continue;
+				}
+
+				if (vector::contains(defines::get()->get_conversible_player_color()->get_colors(), pixel_color)) {
+					continue;
+				}
+
+				red += pixel_color.red();
+				green += pixel_color.green();
+				blue += pixel_color.blue();
+				pixel_count++;
+			}
+		}
+	}
+
+	if (pixel_count == 0) {
+		throw std::runtime_error("No valid solid tile pixels for calculating the minimap color for terrain type \"" + this->get_identifier() + "\".");
+	}
+
+	red /= pixel_count;
+	green /= pixel_count;
+	blue /= pixel_count;
+
+	const QColor minimap_color(red, green, blue);
+
+	if (season != nullptr) {
+		this->season_minimap_colors[season] = minimap_color;
+	} else {
+		this->minimap_color = minimap_color;
+	}
 }
 
 void terrain_type::map_to_tile_number(const int tile_number)

@@ -51,6 +51,7 @@ class terrain_type : public named_data_entry, public data_type<terrain_type>, pu
 	Q_OBJECT
 
 	Q_PROPERTY(QColor color READ get_color WRITE set_color)
+	Q_PROPERTY(QColor minimap_color MEMBER minimap_color READ get_minimap_color)
 	Q_PROPERTY(QString image_file READ get_image_file_qstring)
 	Q_PROPERTY(QString transition_image_file READ get_transition_image_file_qstring)
 	Q_PROPERTY(QString elevation_image_file READ get_elevation_image_file_qstring)
@@ -182,6 +183,8 @@ public:
 	}
 
 	void set_color(const QColor &color);
+	const QColor &get_minimap_color(const season *season = nullptr) const;
+	void calculate_minimap_color(const season *season = nullptr);
 
 	void map_to_tile_number(const int tile_number);
 
@@ -385,6 +388,8 @@ public:
 private:
 	char character = 0;
 	QColor color;
+	QColor minimap_color; //color used to represent the terrain type on the minimap
+	std::map<const season *, QColor> season_minimap_colors;
 public:
 	int ID = -1;
 	int SolidAnimationFrames = 0;
