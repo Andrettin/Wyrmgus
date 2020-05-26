@@ -108,10 +108,27 @@ public:
 		this->UpdateCache = true;
 	}
 
+	bool is_zoomed() const
+	{
+		return this->zoomed;
+	}
+
+	void set_zoomed(const bool zoomed)
+	{
+		this->zoomed = true;
+	}
+
+	bool can_zoom(const int z) const
+	{
+		return this->get_texture_width(z) != this->get_width() || this->get_texture_height(z) != this->get_height();
+	}
+
 	void toggle_mode();
 	bool is_terrain_visible() const;
 	bool are_units_visible() const;
 	bool is_fog_of_war_visible() const;
+
+	QRect get_texture_draw_rect(const int z) const;
 
 public:
 	int X = 0;
@@ -126,6 +143,7 @@ public:
 
 private:
 	minimap_mode mode;
+	bool zoomed = false; //whether the minimap texture is being shown at full resolution
 	std::vector<GLuint> terrain_textures;
 	std::vector<GLuint> overlay_textures;
 

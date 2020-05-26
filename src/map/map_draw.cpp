@@ -157,7 +157,7 @@ PixelPos CViewport::TilePosToScreen_TopLeft(const Vec2i &tilePos) const
 	return this->scaled_map_to_screen_pixel_pos(mapPos);
 }
 
-/// convert tilepos coordonates into screen (take the center of the tile)
+/// convert tilepos coordinates into screen (take the center of the tile)
 PixelPos CViewport::TilePosToScreen_Center(const Vec2i &tilePos) const
 {
 	const PixelPos topLeft = TilePosToScreen_TopLeft(tilePos);

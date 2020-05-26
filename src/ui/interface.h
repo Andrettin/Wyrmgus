@@ -261,6 +261,7 @@ extern void UiTogglePause();
 extern void UiToggleBigMap();
 /// Toggle minimap mode.
 extern void UiToggleMinimapMode();
+extern void UiToggleMinimapZoom();
 /// Find the next idle worker
 extern void UiFindIdleWorker();
 //Wyrmgus start

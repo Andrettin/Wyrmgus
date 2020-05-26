@@ -675,14 +675,20 @@ void minimap::draw_texture(const GLuint &texture, const unsigned char *texture_d
 	glDisableClientState(GL_VERTEX_ARRAY);
 #endif
 #ifdef USE_OPENGL
+	const QRect texture_draw_rect = this->get_texture_draw_rect(z);
+	const float start_x = static_cast<float>(texture_draw_rect.x()) / MinimapTextureWidth[z];
+	const float start_y = static_cast<float>(texture_draw_rect.y()) / MinimapTextureHeight[z];
+	const float end_x = static_cast<float>(texture_draw_rect.x() + texture_draw_rect.width()) / MinimapTextureWidth[z];
+	const float end_y = static_cast<float>(texture_draw_rect.y() + texture_draw_rect.height()) / MinimapTextureHeight[z];
+
 	glBegin(GL_QUADS);
-	glTexCoord2f(0.0f, 0.0f);
+	glTexCoord2f(start_x, start_y);
 	glVertex2i(X, Y);
-	glTexCoord2f(0.0f, (float) this->get_texture_height(z) / MinimapTextureHeight[z]);
+	glTexCoord2f(start_x, end_y);
 	glVertex2i(X, Y + H);
-	glTexCoord2f((float) this->get_texture_width(z) / MinimapTextureWidth[z], (float) this->get_texture_height(z) / MinimapTextureHeight[z]);
+	glTexCoord2f(end_x, end_y);
 	glVertex2i(X + W, Y + H);
-	glTexCoord2f((float) this->get_texture_width(z) / MinimapTextureWidth[z], 0.0f);
+	glTexCoord2f(end_x, start_y);
 	glVertex2i(X + W, Y);
 	glEnd();
 #endif
@@ -702,7 +708,19 @@ QPoint minimap::texture_to_tile_pos(const QPoint &texture_pos) const
 QPoint minimap::screen_to_tile_pos(const QPoint &screen_pos) const
 {
 	const int z = UI.CurrentMapLayer->ID;
-	const QPoint texture_pos((screen_pos.x() - X) * this->get_texture_width(z) / this->get_width(), (screen_pos.y() - Y) * this->get_texture_height(z) / this->get_height());
+
+	QPoint texture_pos = screen_pos;
+
+	if (this->is_zoomed() && this->can_zoom(z)) {
+		const QRect rect = this->get_texture_draw_rect(z);
+		texture_pos.setX(texture_pos.x() + rect.x());
+		texture_pos.setY(texture_pos.y() + rect.y());
+	} else {
+		texture_pos.setX(texture_pos.x() * this->get_texture_width(z) / this->get_width());
+		texture_pos.setY(texture_pos.y() * this->get_texture_height(z) / this->get_height());
+	}
+
+	texture_pos -= QPoint(this->X, this->Y);
 
 	return this->texture_to_tile_pos(texture_pos);
 }
@@ -718,9 +736,20 @@ QPoint minimap::tile_to_screen_pos(const QPoint &tile_pos) const
 {
 	const int z = UI.CurrentMapLayer->ID;
 	const QPoint texture_pos = this->tile_to_texture_pos(tile_pos);
-	QPoint screenPos(X + texture_pos.x() * this->get_width() / this->get_texture_width(z),
-							 Y + texture_pos.y() * this->get_height() / this->get_texture_height(z));
-	return screenPos;
+	
+	QPoint screen_pos = texture_pos;
+	if (this->is_zoomed() && this->can_zoom(z)) {
+		const QRect rect = this->get_texture_draw_rect(z);
+		screen_pos.setX(screen_pos.x() - rect.x());
+		screen_pos.setY(screen_pos.y() - rect.y());
+	} else {
+		screen_pos.setX(screen_pos.x() * this->get_width() / this->get_texture_width(z));
+		screen_pos.setY(screen_pos.y() * this->get_height() / this->get_texture_height(z));
+	}
+
+	screen_pos += QPoint(this->X, this->Y);
+
+	return screen_pos;
 }
 
 /**
@@ -787,8 +816,14 @@ void minimap::DrawViewportArea(const CViewport &viewport) const
 	// Determine and save region below minimap cursor
 	const int z = UI.CurrentMapLayer->ID;
 	const PixelPos screenPos = this->tile_to_screen_pos(viewport.MapPos);
-	int w = (viewport.MapWidth * MinimapScaleX[z]) / MINIMAP_FAC * this->get_width() / this->get_texture_width(z);
-	int h = (viewport.MapHeight * MinimapScaleY[z]) / MINIMAP_FAC * this->get_height() / this->get_texture_height(z);
+	int w = (viewport.MapWidth * MinimapScaleX[z]) / MINIMAP_FAC;
+	int h = (viewport.MapHeight * MinimapScaleY[z]) / MINIMAP_FAC;
+	if (!this->is_zoomed() || !this->can_zoom(z)) {
+		w *= this->get_width();
+		w /= this->get_texture_width(z);
+		h *= this->get_height();
+		h /= this->get_texture_height(z);
+	}
 
 	// Draw cursor as rectangle (Note: unclipped, as it is always visible)
 	//Wyrmgus start
@@ -877,6 +912,27 @@ bool minimap::is_fog_of_war_visible() const
 			return false;
 		default:
 			return true;
+	}
+}
+
+QRect minimap::get_texture_draw_rect(const int z) const
+{
+	const int width = this->get_width();
+	const int height = this->get_height();
+	const int texture_width = this->get_texture_width(z);
+	const int texture_height = this->get_texture_height(z);
+
+	if (this->is_zoomed() && this->can_zoom(z)) {
+		const CViewport *viewport = UI.SelectedViewport;
+		const QPoint tile_pos = viewport->screen_center_to_tile_pos();
+		const QPoint texture_pos = this->tile_to_texture_pos(tile_pos);
+
+		const QPoint offset(width / 2, height / 2);
+		const int start_x = std::min(std::max(texture_pos.x() - (offset.x() - 1), 0), texture_width / 2);
+		const int start_y = std::min(std::max(texture_pos.y() - (offset.y() - 1), 0), texture_height / 2);
+		return QRect(start_x, start_y, width, height);
+	} else {
+		return QRect(0, 0, texture_width, texture_height);
 	}
 }
 

@@ -491,6 +491,18 @@ void UiToggleMinimapMode()
 	UI.StatusLine.Set(_(stratagus::get_minimap_mode_name(UI.Minimap.get_mode())));
 }
 
+void UiToggleMinimapZoom()
+{
+	if (UI.Minimap.can_zoom(UI.CurrentMapLayer->ID)) {
+		UI.Minimap.set_zoomed(!UI.Minimap.is_zoomed());
+		if (UI.Minimap.is_zoomed()) {
+			UI.StatusLine.Set(_("Zoomed Minimap"));
+		} else {
+			UI.StatusLine.Set(_("Unzoomed Minimap"));
+		}
+	}
+}
+
 /**
 **  Find the next idle worker, select it, and center on it
 */
@@ -945,12 +957,14 @@ static bool CommandKey(int key)
 			break;
 
 		case SDLK_TAB: // TAB toggles minimap.
-			// FIXME: more...
-			// FIXME: shift+TAB
 			if (KeyModifiers & ModifierAlt) {
 				break;
 			}
-			UiToggleMinimapMode();
+			if (KeyModifiers & ModifierShift) {
+				UiToggleMinimapZoom();
+			} else {
+				UiToggleMinimapMode();
+			}
 			break;
 
 		case SDLK_UP:
