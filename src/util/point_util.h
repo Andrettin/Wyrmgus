@@ -39,6 +39,11 @@ inline constexpr int to_index(const int x, const int y, const QSize &size)
 	return point::to_index(x, y, size.width());
 }
 
+inline constexpr int to_index(const QPoint &point, const int width)
+{
+	return point::to_index(point.x(), point.y(), width);
+}
+
 inline constexpr int to_index(const QPoint &point, const QSize &size)
 {
 	return point::to_index(point.x(), point.y(), size);
