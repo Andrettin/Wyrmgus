@@ -49,6 +49,7 @@
 #include "unit/unit.h" //for using CPreference
 //Wyrmgus end
 #include "util/image_util.h"
+#include "util/point_util.h"
 #include "video.h"
 #include "xbrz.h"
 
@@ -1350,6 +1351,16 @@ void CGraphic::SetOriginalSize()
 	this->Load();
 
 	this->Resized = false;
+}
+
+int CGraphic::get_frame_index(const QPoint &frame_pos) const
+{
+	return stratagus::point::to_index(frame_pos, this->get_frames_per_row());
+}
+
+QPoint CGraphic::get_frame_pos(const int frame_index) const
+{
+	return stratagus::point::from_index(frame_index, this->get_frames_per_row());
 }
 
 void FreeGraphics()

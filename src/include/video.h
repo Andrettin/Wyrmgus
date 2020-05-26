@@ -195,10 +195,8 @@ public:
 		return this->get_height() / this->get_frame_height();
 	}
 
-	int get_frame_index(const QPoint &frame_pos) const
-	{
-		return frame_pos.y() * this->get_frames_per_row() + frame_pos.x();
-	}
+	int get_frame_index(const QPoint &frame_pos) const;
+	QPoint get_frame_pos(const int frame_index) const;
 
 	const QImage &get_image() const
 	{
