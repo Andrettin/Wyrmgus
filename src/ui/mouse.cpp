@@ -1577,10 +1577,18 @@ void UIHandleMouseMove(const PixelPos &cursorPos)
 
 	if (CursorOn == cursor_on::minimap && (MouseButtons & LeftButton)) {
 		//  Minimap move viewpoint
-		const Vec2i cursorPos = UI.Minimap.screen_to_tile_pos(CursorScreenPos);
+		const Vec2i tile_pos = UI.Minimap.screen_to_tile_pos(CursorScreenPos);
 
-		UI.SelectedViewport->Center(CMap::Map.tile_pos_to_scaled_map_pixel_pos_center(cursorPos));
-		CursorStartScreenPos = CursorScreenPos;
+		UI.SelectedViewport->Center(CMap::Map.tile_pos_to_scaled_map_pixel_pos_center(tile_pos));
+
+		//if clicking the minimap made the hovered tile change (e.g. because the minimap is in zoomed mode), then set the cursor's position to that of the old tile pos
+		if (tile_pos != UI.Minimap.screen_to_tile_pos(CursorScreenPos)) { 
+			CursorScreenPos = UI.Minimap.tile_to_screen_pos(tile_pos);
+			UI.MouseWarpPos = CursorStartScreenPos = CursorScreenPos;
+		} else {
+			CursorStartScreenPos = CursorScreenPos;
+		}
+
 		return;
 	}
 }
