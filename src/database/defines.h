@@ -32,6 +32,7 @@
 namespace stratagus {
 
 class button_level;
+class civilization;
 class dialogue;
 class player_color;
 class sml_data;
@@ -48,6 +49,7 @@ class defines final : public QObject, public singleton<defines>
 	Q_PROPERTY(QSize icon_size MEMBER icon_size READ get_icon_size)
 	Q_PROPERTY(stratagus::player_color* conversible_player_color MEMBER conversible_player_color READ get_conversible_player_color)
 	Q_PROPERTY(stratagus::player_color* neutral_player_color MEMBER neutral_player_color READ get_neutral_player_color)
+	Q_PROPERTY(stratagus::civilization* neutral_civilization MEMBER neutral_civilization READ get_neutral_civilization)
 	Q_PROPERTY(int minimap_color_index MEMBER minimap_color_index READ get_minimap_color_index)
 	Q_PROPERTY(int minimap_non_land_territory_alpha MEMBER minimap_non_land_territory_alpha READ get_minimap_non_land_territory_alpha)
 	Q_PROPERTY(stratagus::time_of_day* underground_time_of_day MEMBER underground_time_of_day READ get_underground_time_of_day)
@@ -114,6 +116,11 @@ public:
 		return this->neutral_player_color;
 	}
 
+	civilization *get_neutral_civilization() const
+	{
+		return this->neutral_civilization;
+	}
+
 	int get_minimap_color_index() const
 	{
 		return this->minimap_color_index;
@@ -170,6 +177,7 @@ private:
 	int scale_factor = 1;
 	player_color *conversible_player_color = nullptr;
 	player_color *neutral_player_color = nullptr;
+	civilization *neutral_civilization = nullptr;
 	int minimap_color_index = 0;
 	int minimap_non_land_territory_alpha = 64;
 	terrain_type *border_terrain_type = nullptr;
