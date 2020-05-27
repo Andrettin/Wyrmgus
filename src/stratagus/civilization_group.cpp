@@ -25,47 +25,25 @@
 //      02111-1307, USA.
 //
 
-#pragma once
+#include "civilization_group.h"
 
-#include "database/data_type.h"
-#include "database/detailed_data_entry.h"
-
-class CSpeciesGenus;
+#include "civilization_supergroup.h"
 
 namespace stratagus {
 
-class plane;
-class terrain_type;
-class unit_type;
-class world;
-
-class species final : public detailed_data_entry, public data_type<species>
+void civilization_group::initialize()
 {
-	Q_OBJECT
-
-public:
-	static constexpr const char *class_identifier = "species";
-	static constexpr const char *database_folder = "species";
-
-	species(const std::string &identifier) : detailed_data_entry(identifier)
-	{
+	if (this->get_supergroup() == nullptr) {
+		throw std::runtime_error("Civilization group \"" + this->get_identifier() + "\" has no civilization supergroup.");
 	}
 
-	bool CanEvolveToAUnitType(terrain_type *terrain = nullptr, bool sapient_only = false) const;
-	species *GetRandomEvolution(terrain_type *terrain) const;
-	
-	int Era = -1;					/// Era ID
-	bool Sapient = false;			/// Whether the species is sapient
-	bool Prehistoric = false;		/// Whether the species is prehistoric or not
-	CSpeciesGenus *Genus = nullptr;
-	std::string Species;
-	std::string ChildUpgrade;		/// Which individual upgrade the children of this species get
-	plane *home_plane = nullptr;
-	world *homeworld = nullptr;
-	unit_type *Type = nullptr;
-	std::vector<terrain_type *> Terrains;	/// in which terrains does this species live
-	std::vector<species *> EvolvesFrom;	/// from which species this one can evolve
-	std::vector<species *> EvolvesTo;		/// to which species this one can evolve
-};
+	if (this->get_species() == nullptr) {
+		this->set_species(this->get_supergroup()->get_species());
+	}
+
+	this->get_supergroup()->add_names_from(this);
+
+	data_entry::initialize();
+}
 
 }

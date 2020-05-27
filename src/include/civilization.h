@@ -28,8 +28,8 @@
 #pragma once
 
 #include "character.h" //for MaxCharacterTitles
+#include "civilization_base.h"
 #include "database/data_type.h"
-#include "database/detailed_data_entry.h"
 #include "gender.h"
 #include "player.h" //for certain enums
 #include "time/date.h"
@@ -47,18 +47,20 @@ int CclDefineCivilization(lua_State *l);
 namespace stratagus {
 
 class calendar;
+class civilization_group;
+class civilization_supergroup;
 class deity;
 class quest;
 class species;
 class unit_class;
 class upgrade_class;
 
-class civilization final : public detailed_data_entry, public data_type<civilization>
+class civilization final : public civilization_base, public data_type<civilization>
 {
 	Q_OBJECT
 
 	Q_PROPERTY(stratagus::civilization* parent_civilization MEMBER parent_civilization READ get_parent_civilization)
-	Q_PROPERTY(stratagus::species* species MEMBER species READ get_species)
+	Q_PROPERTY(stratagus::civilization_group* group MEMBER group READ get_group)
 	Q_PROPERTY(bool visible MEMBER visible READ is_visible)
 	Q_PROPERTY(bool playable MEMBER playable READ is_playable)
 	Q_PROPERTY(QString interface READ get_interface_qstring)
@@ -78,7 +80,7 @@ public:
 		return civilization;
 	}
 
-	civilization(const std::string &identifier) : detailed_data_entry(identifier)
+	explicit civilization(const std::string &identifier) : civilization_base(identifier)
 	{
 	}
 
@@ -87,6 +89,7 @@ public:
 	virtual void process_sml_property(const sml_property &property) override;
 	virtual void process_sml_scope(const sml_data &scope) override;
 	virtual void initialize() override;
+	virtual void check() const override;
 
 	virtual void reset_history() override
 	{
@@ -98,10 +101,10 @@ public:
 		return this->parent_civilization;
 	}
 	
-	species *get_species() const
+	stratagus::species *get_species() const
 	{
-		if (this->species != nullptr) {
-			return this->species;
+		if (civilization_base::get_species() != nullptr) {
+			return civilization_base::get_species();
 		}
 
 		if (this->get_parent_civilization() != nullptr) {
@@ -111,6 +114,13 @@ public:
 		return nullptr;
 	}
 	
+	civilization_group *get_group() const
+	{
+		return this->group;
+	}
+
+	civilization_supergroup *get_supergroup() const;
+
 	int GetUpgradePriority(const CUpgrade *upgrade) const;
 	int GetForceTypeWeight(const ForceType force_type) const;
 
@@ -188,29 +198,9 @@ public:
 
 	const std::map<gender, std::vector<std::string>> &get_personal_names() const;
 	const std::vector<std::string> &get_personal_names(const gender gender) const;
-
-	void add_personal_name(const gender gender, const std::string &name)
-	{
-		this->personal_names[gender].push_back(name);
-	}
-
 	const std::vector<std::string> &get_surnames() const;
-
-	void add_surname(const std::string &surname)
-	{
-		this->surnames.push_back(surname);
-	}
-
 	const std::vector<std::string> &get_unit_class_names(const unit_class *unit_class) const;
 	const std::vector<std::string> &get_ship_names() const;
-	QStringList get_ship_names_qstring_list() const;
-
-	Q_INVOKABLE void add_ship_name(const std::string &ship_name)
-	{
-		this->ship_names.push_back(ship_name);
-	}
-
-	Q_INVOKABLE void remove_ship_name(const std::string &ship_name);
 
 	unit_type *get_class_unit_type(const unit_class *unit_class) const;
 
@@ -293,8 +283,8 @@ public:
 
 	int ID = -1;
 private:
-	species *species = nullptr; //the civilization's species (e.g. human)
 	civilization *parent_civilization = nullptr;
+	civilization_group *group = nullptr;
 public:
 	std::string Adjective;			/// adjective pertaining to the civilization
 private:
@@ -320,14 +310,9 @@ public:
 	std::map<ForceType, std::vector<CForceTemplate *>> ForceTemplates;	/// Force templates, mapped to each force type
 	std::map<ForceType, int> ForceTypeWeights;	/// Weights for each force type
 	std::vector<CAiBuildingTemplate *> AiBuildingTemplates;	/// AI building templates
-private:
-	std::map<gender, std::vector<std::string>> personal_names; //personal names for the civilization, mapped to the gender they pertain to (use gender::none for names which should be available for both genders)
-	std::vector<std::string> surnames; //surnames for the civilization
-	std::map<const unit_class *, std::vector<std::string>> unit_class_names;	/// Unit class names for the civilization, mapped to the unit class they pertain to, used for mechanical units, and buildings
 public:
 	std::vector<std::string> ProvinceNames;		/// Province names for the civilization
 private:
-	std::vector<std::string> ship_names;			/// Ship names for the civilization
 	std::map<const unit_class *, unit_type *> class_unit_types; //the unit type slot of a particular class for the civilization
 	std::map<const upgrade_class *, CUpgrade *> class_upgrades; //the upgrade slot of a particular class for the civilization
 	std::vector<CFiller> ui_fillers;

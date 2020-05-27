@@ -36,6 +36,7 @@
 #include "ai.h"
 #include "character.h"
 #include "civilization.h"
+#include "civilization_group.h"
 #include "commands.h"
 #include "currency.h"
 //Wyrmgus start
@@ -737,7 +738,9 @@ static int CclDefineCivilization(lua_State *l)
 		} else if (!strcmp(value, "Playable")) {
 			civilization->playable = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "Species")) {
-			civilization->species = stratagus::species::get(LuaToString(l, -1));
+			civilization->set_species(stratagus::species::get(LuaToString(l, -1)));
+		} else if (!strcmp(value, "Group")) {
+			civilization->group = stratagus::civilization_group::get(LuaToString(l, -1));
 		} else if (!strcmp(value, "ParentCivilization")) {
 			civilization->parent_civilization = stratagus::civilization::get(LuaToString(l, -1));
 		} else if (!strcmp(value, "Language")) {
@@ -947,7 +950,7 @@ static int CclDefineCivilization(lua_State *l)
 				const stratagus::unit_class *unit_class = stratagus::unit_class::get(class_name);
 				++j;
 				
-				civilization->unit_class_names[unit_class].push_back(LuaToString(l, -1, j + 1));
+				civilization->add_unit_class_name(unit_class, LuaToString(l, -1, j + 1));
 			}
 		} else if (!strcmp(value, "FamilyNames")) {
 			const int args = lua_rawlen(l, -1);
@@ -962,7 +965,7 @@ static int CclDefineCivilization(lua_State *l)
 		} else if (!strcmp(value, "ShipNames")) {
 			const int args = lua_rawlen(l, -1);
 			for (int j = 0; j < args; ++j) {
-				civilization->ship_names.push_back(LuaToString(l, -1, j + 1));
+				civilization->add_ship_name(LuaToString(l, -1, j + 1));
 			}
 		} else if (!strcmp(value, "MinisterTitles")) {
 			if (!lua_istable(l, -1)) {

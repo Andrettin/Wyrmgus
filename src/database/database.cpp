@@ -32,6 +32,8 @@
 #include "campaign.h"
 #include "character.h"
 #include "civilization.h"
+#include "civilization_group.h"
+#include "civilization_supergroup.h"
 #include "database/data_type_metadata.h"
 #include "database/defines.h"
 #include "database/module.h"
@@ -183,6 +185,10 @@ QVariant database::process_sml_property_value(const sml_property &property, cons
 			new_property_value = QVariant::fromValue(character::get(property.get_value()));
 		} else if (property_class_name == "stratagus::civilization*") {
 			new_property_value = QVariant::fromValue(civilization::get(property.get_value()));
+		} else if (property_class_name == "stratagus::civilization_group*") {
+			new_property_value = QVariant::fromValue(civilization_group::get(property.get_value()));
+		} else if (property_class_name == "stratagus::civilization_supergroup*") {
+			new_property_value = QVariant::fromValue(civilization_supergroup::get(property.get_value()));
 		} else if (property_class_name == "stratagus::cursor*") {
 			new_property_value = QVariant::fromValue(cursor::get(property.get_value()));
 		} else if (property_class_name == "stratagus::cursor_type") {

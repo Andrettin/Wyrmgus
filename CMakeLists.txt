@@ -324,6 +324,8 @@ set(stratagusmain_SRCS
 	src/stratagus/campaign.cpp
 	src/stratagus/character.cpp
 	src/stratagus/civilization.cpp
+	src/stratagus/civilization_base.cpp
+	src/stratagus/civilization_group.cpp
 	src/stratagus/config.cpp
 	src/stratagus/construct.cpp
 	src/stratagus/currency.cpp
@@ -829,6 +831,9 @@ set(stratagus_generic_HDRS
 	src/include/world.h
 	src/include/SetupConsole_win32.h
 	src/stratagus/achievement.h
+	src/stratagus/civilization_base.h
+	src/stratagus/civilization_group.h
+	src/stratagus/civilization_supergroup.h
 	src/stratagus/dialogue_option.h
 	src/stratagus/faction.h
 	src/stratagus/gender.h

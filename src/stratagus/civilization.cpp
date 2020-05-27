@@ -29,6 +29,9 @@
 
 #include "civilization.h"
 
+#include "civilization_group.h"
+#include "civilization_supergroup.h"
+#include "database/defines.h"
 #include "player.h"
 #include "time/calendar.h"
 #include "ui/button.h"
@@ -179,24 +182,6 @@ void civilization::process_sml_scope(const sml_data &scope)
 		std::sort(this->AiBuildingTemplates.begin(), this->AiBuildingTemplates.end(), [](CAiBuildingTemplate *a, CAiBuildingTemplate *b) {
 			return a->get_priority() > b->get_priority();
 		});
-	} else if (tag == "personal_names") {
-		if (!values.empty()) {
-			vector::merge(this->personal_names[gender::none], values);
-		}
-
-		scope.for_each_child([&](const sml_data &child_scope) {
-			const std::string &tag = child_scope.get_tag();
-
-			const stratagus::gender gender = string_to_gender(tag);
-			vector::merge(this->personal_names[gender], child_scope.get_values());
-		});
-	} else if (tag == "unit_class_names") {
-		scope.for_each_child([&](const sml_data &child_scope) {
-			const std::string &tag = child_scope.get_tag();
-
-			const unit_class *unit_class = unit_class::get(tag);
-			vector::merge(this->unit_class_names[unit_class], child_scope.get_values());
-		});
 	} else if (tag == "develops_from") {
 		for (const std::string &value : values) {
 			civilization *other_civilization = civilization::get(value);
@@ -204,12 +189,25 @@ void civilization::process_sml_scope(const sml_data &scope)
 			other_civilization->develops_to.push_back(this);
 		}
 	} else {
-		data_entry::process_sml_scope(scope);
+		civilization_base::process_sml_scope(scope);
 	}
 }
 
 void civilization::initialize()
 {
+	if (this->get_group() != nullptr) {
+		if (!this->get_group()->is_initialized()) {
+			this->get_group()->initialize();
+		}
+
+		if (this->get_species() == nullptr) {
+			this->set_species(this->get_group()->get_species());
+		}
+
+		this->get_group()->add_names_from(this);
+		this->get_supergroup()->add_names_from(this);
+	}
+
 	if (this->get_parent_civilization() != nullptr) {
 		if (!this->get_parent_civilization()->is_initialized()) {
 			this->get_parent_civilization()->initialize();
@@ -368,6 +366,30 @@ void civilization::initialize()
 	data_entry::initialize();
 }
 
+void civilization::check() const
+{
+	if (this != defines::get()->get_neutral_civilization()) {
+		if (this->get_species() == nullptr) {
+			throw std::runtime_error("Civilization \"" + this->get_identifier() + "\" has no species.");
+		}
+
+		if (this->get_group() == nullptr) {
+			throw std::runtime_error("Civilization \"" + this->get_identifier() + "\" has no civilization group.");
+		}
+	}
+
+	data_entry::check();
+}
+
+civilization_supergroup *civilization::get_supergroup() const
+{
+	if (this->get_group() != nullptr) {
+		return this->get_group()->get_supergroup();
+	}
+
+	return nullptr;
+}
+
 int civilization::GetUpgradePriority(const CUpgrade *upgrade) const
 {
 	if (!upgrade) {
@@ -470,83 +492,110 @@ std::vector<CAiBuildingTemplate *> civilization::GetAiBuildingTemplates() const
 
 const std::map<gender, std::vector<std::string>> &civilization::get_personal_names() const
 {
-	if (!this->personal_names.empty()) {
-		return this->personal_names;
+	if (!civilization_base::get_personal_names().empty()) {
+		return civilization_base::get_personal_names();
+	}
+
+	if (this->get_group() != nullptr && !this->get_group()->get_personal_names().empty()) {
+		return this->get_group()->get_personal_names();
+	}
+
+	if (this->get_supergroup() != nullptr && !this->get_supergroup()->get_personal_names().empty()) {
+		return this->get_supergroup()->get_personal_names();
 	}
 
 	if (this->parent_civilization != nullptr) {
 		return this->parent_civilization->get_personal_names();
 	}
 	
-	return this->personal_names;
+	return civilization_base::get_personal_names();
 }
 
 const std::vector<std::string> &civilization::get_personal_names(const gender gender) const
 {
-	static std::vector<std::string> empty_list;
+	const std::vector<std::string> &personal_names = civilization_base::get_personal_names(gender);
+	if (!personal_names.empty()) {
+		return personal_names;
+	}
 
-	auto find_iterator = this->personal_names.find(gender);
-	if (find_iterator != this->personal_names.end()) {
-		return find_iterator->second;
+	if (this->get_group() != nullptr && !this->get_group()->get_personal_names(gender).empty()) {
+		return this->get_group()->get_personal_names(gender);
+	}
+
+	if (this->get_supergroup() != nullptr && !this->get_supergroup()->get_personal_names(gender).empty()) {
+		return this->get_supergroup()->get_personal_names(gender);
 	}
 
 	if (this->parent_civilization != nullptr) {
 		return this->parent_civilization->get_personal_names(gender);
 	}
 	
-	return empty_list;
+	return personal_names;
 }
 
 const std::vector<std::string> &civilization::get_surnames() const
 {
-	if (!this->surnames.empty()) {
-		return this->surnames;
+	if (!civilization_base::get_surnames().empty()) {
+		return civilization_base::get_surnames();
+	}
+
+	if (this->get_group() != nullptr && !this->get_group()->get_surnames().empty()) {
+		return this->get_group()->get_surnames();
+	}
+
+	if (this->get_supergroup() != nullptr && !this->get_supergroup()->get_surnames().empty()) {
+		return this->get_supergroup()->get_surnames();
 	}
 
 	if (this->parent_civilization != nullptr) {
 		return this->parent_civilization->get_surnames();
 	}
 
-	return this->surnames;
+	return civilization_base::get_surnames();
 }
 
 const std::vector<std::string> &civilization::get_unit_class_names(const unit_class *unit_class) const
 {
-	auto find_iterator = this->unit_class_names.find(unit_class);
-	if (find_iterator != this->unit_class_names.end() && !find_iterator->second.empty()) {
-		return find_iterator->second;
+	const std::vector<std::string> &unit_class_names = civilization_base::get_unit_class_names(unit_class);
+	if (!unit_class_names.empty()) {
+		return unit_class_names;
 	}
 	
+	if (this->get_group() != nullptr && !this->get_group()->get_unit_class_names(unit_class).empty()) {
+		return this->get_group()->get_unit_class_names(unit_class);
+	}
+
+	if (this->get_supergroup() != nullptr && !this->get_supergroup()->get_unit_class_names(unit_class).empty()) {
+		return this->get_supergroup()->get_unit_class_names(unit_class);
+	}
+
 	if (this->parent_civilization != nullptr) {
 		return this->parent_civilization->get_unit_class_names(unit_class);
 	}
 	
-	return vector::empty_string_vector;
+	return unit_class_names;
 }
 
 const std::vector<std::string> &civilization::get_ship_names() const
 {
-	if (!this->ship_names.empty()) {
-		return this->ship_names;
+	if (!civilization_base::get_ship_names().empty()) {
+		return civilization_base::get_ship_names();
 	}
 	
+	if (this->get_group() != nullptr && !this->get_group()->get_ship_names().empty()) {
+		return this->get_group()->get_ship_names();
+	}
+
+	if (this->get_supergroup() != nullptr && !this->get_supergroup()->get_ship_names().empty()) {
+		return this->get_supergroup()->get_ship_names();
+	}
+
 	if (this->parent_civilization) {
 		return this->parent_civilization->get_ship_names();
 	}
 	
-	return this->ship_names;
+	return civilization_base::get_ship_names();
 }
-
-QStringList civilization::get_ship_names_qstring_list() const
-{
-	return container::to_qstring_list(this->get_ship_names());
-}
-
-void civilization::remove_ship_name(const std::string &ship_name)
-{
-	vector::remove_one(this->ship_names, ship_name);
-}
-
 
 unit_type *civilization::get_class_unit_type(const unit_class *unit_class) const
 {

@@ -51,9 +51,7 @@ void campaign::initialize_all()
 	data_type::initialize_all();
 
 	campaign::sort_instances([](campaign *a, campaign *b) {
-		if (a->get_species() != b->get_species()) {
-			return a->get_species()->get_identifier() < b->get_species()->get_identifier();
-		} else if (a->get_timeline() != b->get_timeline()) {
+		if (a->get_timeline() != b->get_timeline()) {
 			return a->get_timeline()->get_point_of_divergence() < b->get_timeline()->get_point_of_divergence();
 		} else if (a->get_start_date() != b->get_start_date()) {
 			return a->get_start_date() < b->get_start_date();
