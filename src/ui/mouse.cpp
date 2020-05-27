@@ -2395,13 +2395,17 @@ static void UIHandleButtonDown_OnMap(unsigned button)
 
 static void UIHandleButtonDown_OnMinimap(unsigned button)
 {
-	const Vec2i cursorTilePos = UI.Minimap.screen_to_tile_pos(CursorScreenPos);
+	const Vec2i cursor_tile_pos = UI.Minimap.screen_to_tile_pos(CursorScreenPos);
 
 	if (MouseButtons & LeftButton) { // enter move mini-mode
-		UI.SelectedViewport->Center(CMap::Map.tile_pos_to_scaled_map_pixel_pos_center(cursorTilePos));
+		UI.SelectedViewport->Center(CMap::Map.tile_pos_to_scaled_map_pixel_pos_center(cursor_tile_pos));
+		if (cursor_tile_pos != UI.Minimap.screen_to_tile_pos(CursorScreenPos)) {
+			CursorScreenPos = UI.Minimap.tile_to_screen_pos(cursor_tile_pos);
+			UI.MouseWarpPos = CursorStartScreenPos = CursorScreenPos;
+		}
 	} else if (MouseButtons & RightButton) {
 		if (!GameObserve && !GamePaused && !GameEstablishing) {
-			const PixelPos mapPixelPos = CMap::Map.tile_pos_to_map_pixel_pos_center(cursorTilePos);
+			const PixelPos mapPixelPos = CMap::Map.tile_pos_to_map_pixel_pos_center(cursor_tile_pos);
 			if (!ClickMissile.empty()) {
 				MakeLocalMissile(*stratagus::missile_type::get(ClickMissile), mapPixelPos, mapPixelPos, UI.CurrentMapLayer->ID);
 			}
