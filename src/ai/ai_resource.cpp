@@ -693,28 +693,36 @@ CUnit *AiGetSuitableDepot(const CUnit &worker, const CUnit &oldDepot, CUnit **re
 //Wyrmgus start
 void AiTransportCapacityRequest(int capacity_needed, int landmass)
 {
+	if (AiPlayer->Player->Faction == -1) {
+		return;
+	}
+
 	stratagus::unit_type *best_type = nullptr;
 	int best_cost = 0;
 
 	const int n = AiHelpers.NavalTransporters[0].size();
 
 	for (int i = 0; i < n; ++i) {
-		stratagus::unit_type &type = *AiHelpers.NavalTransporters[0][i];
+		stratagus::unit_type *type = AiHelpers.NavalTransporters[0][i];
 
-		if (!AiRequestedTypeAllowed(*AiPlayer->Player, type, true)) {
+		if (!AiPlayer->Player->get_faction()->is_class_unit_type(type)) {
+			continue;
+		}
+
+		if (!AiRequestedTypeAllowed(*AiPlayer->Player, *type, true)) {
 			continue;
 		}
 
 		int type_costs[MaxCosts];
-		AiPlayer->Player->GetUnitTypeCosts(&type, type_costs);
+		AiPlayer->Player->GetUnitTypeCosts(type, type_costs);
 		int cost = 0;
 		for (int c = 1; c < MaxCosts; ++c) {
 			cost += type_costs[c];
 		}
-		cost /= type.MaxOnBoard;
+		cost /= type->MaxOnBoard;
 
 		if (best_type == nullptr || (cost < best_cost)) {
-			best_type = &type;
+			best_type = type;
 			best_cost = cost;
 			//best_mask = needmask;
 		}
