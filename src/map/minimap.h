@@ -74,6 +74,7 @@ public:
 	void AddEvent(const Vec2i &pos, int z, IntColor color);
 
 	QPoint texture_to_tile_pos(const QPoint &texture_pos) const;
+	QPoint texture_to_screen_pos(const QPoint &texture_pos) const;
 	QPoint screen_to_tile_pos(const QPoint &screen_pos) const;
 	QPoint tile_to_texture_pos(const QPoint &tile_pos) const;
 	QPoint tile_to_screen_pos(const QPoint &tile_pos) const;

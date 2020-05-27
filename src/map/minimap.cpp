@@ -543,9 +543,19 @@ static void DrawEvents()
 	const unsigned char alpha = 192;
 
 	for (int i = 0; i < NumMinimapEvents; ++i) {
-		Video.DrawTransCircleClip(MinimapEvents[i].Color,
-								  MinimapEvents[i].pos.x, MinimapEvents[i].pos.y,
-								  MinimapEvents[i].Size, alpha);
+		QPoint screen_pos = UI.Minimap.texture_to_screen_pos(MinimapEvents[i].pos);
+		if (screen_pos.x() < UI.Minimap.X) {
+			screen_pos.setX(UI.Minimap.X);
+		} else if (screen_pos.x() >= UI.Minimap.X + UI.Minimap.get_width()) {
+			screen_pos.setX(UI.Minimap.X + UI.Minimap.get_width() - 1);
+		}
+		if (screen_pos.y() < UI.Minimap.Y) {
+			screen_pos.setY(UI.Minimap.Y);
+		} else if (screen_pos.y() >= UI.Minimap.Y + UI.Minimap.get_height()) {
+			screen_pos.setY(UI.Minimap.Y + UI.Minimap.get_height() - 1);
+		}
+
+		Video.DrawTransCircleClip(MinimapEvents[i].Color, screen_pos.x(), screen_pos.y(), MinimapEvents[i].Size, alpha);
 		MinimapEvents[i].Size -= 1;
 		if (MinimapEvents[i].Size < 2) {
 			MinimapEvents[i] = MinimapEvents[--NumMinimapEvents];
@@ -630,6 +640,26 @@ QPoint minimap::texture_to_tile_pos(const QPoint &texture_pos) const
 	return tile_pos;
 }
 
+QPoint minimap::texture_to_screen_pos(const QPoint &texture_pos) const
+{
+	const int z = UI.CurrentMapLayer->ID;
+
+	QPoint screen_pos = texture_pos;
+
+	if (this->is_zoomed() && this->can_zoom(z)) {
+		const QRect rect = this->get_texture_draw_rect(z);
+		screen_pos.setX(screen_pos.x() - rect.x());
+		screen_pos.setY(screen_pos.y() - rect.y());
+	} else {
+		screen_pos.setX(screen_pos.x() * this->get_width() / this->get_texture_width(z));
+		screen_pos.setY(screen_pos.y() * this->get_height() / this->get_texture_height(z));
+	}
+
+	screen_pos += QPoint(this->X, this->Y);
+
+	return screen_pos;
+}
+
 QPoint minimap::screen_to_tile_pos(const QPoint &screen_pos) const
 {
 	const int z = UI.CurrentMapLayer->ID;
@@ -658,22 +688,8 @@ QPoint minimap::tile_to_texture_pos(const QPoint &tile_pos) const
 
 QPoint minimap::tile_to_screen_pos(const QPoint &tile_pos) const
 {
-	const int z = UI.CurrentMapLayer->ID;
 	const QPoint texture_pos = this->tile_to_texture_pos(tile_pos);
-	
-	QPoint screen_pos = texture_pos;
-	if (this->is_zoomed() && this->can_zoom(z)) {
-		const QRect rect = this->get_texture_draw_rect(z);
-		screen_pos.setX(screen_pos.x() - rect.x());
-		screen_pos.setY(screen_pos.y() - rect.y());
-	} else {
-		screen_pos.setX(screen_pos.x() * this->get_width() / this->get_texture_width(z));
-		screen_pos.setY(screen_pos.y() * this->get_height() / this->get_texture_height(z));
-	}
-
-	screen_pos += QPoint(this->X, this->Y);
-
-	return screen_pos;
+	return this->texture_to_screen_pos(texture_pos);
 }
 
 /**
@@ -767,18 +783,7 @@ void minimap::AddEvent(const Vec2i &pos, int z, IntColor color)
 		return;
 	}
 	if (z == UI.CurrentMapLayer->ID) {
-		MinimapEvents[NumMinimapEvents].pos = this->tile_to_screen_pos(pos);
-		MinimapEvents[NumMinimapEvents].Size = (W < H) ? W / 3 : H / 3;
-		MinimapEvents[NumMinimapEvents].Color = color;
-		++NumMinimapEvents;
-	} else {
-		CMapLayer *event_map_layer = CMap::Map.MapLayers[z];
-		if (event_map_layer->world != nullptr && CMap::Map.GetCurrentWorld() != event_map_layer->world && UI.WorldButtons[event_map_layer->world->ID].X != -1) {
-			MinimapEvents[NumMinimapEvents].pos.x = UI.WorldButtons[event_map_layer->world->ID].X + (UI.WorldButtons[event_map_layer->world->ID].Style->Width / 2);
-			MinimapEvents[NumMinimapEvents].pos.y = UI.WorldButtons[event_map_layer->world->ID].Y + (UI.WorldButtons[event_map_layer->world->ID].Style->Height / 2);
-		} else {
-			return;
-		}
+		MinimapEvents[NumMinimapEvents].pos = this->tile_to_texture_pos(pos);
 		MinimapEvents[NumMinimapEvents].Size = (W < H) ? W / 3 : H / 3;
 		MinimapEvents[NumMinimapEvents].Color = color;
 		++NumMinimapEvents;
