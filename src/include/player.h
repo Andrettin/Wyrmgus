@@ -385,6 +385,8 @@ public:
 	/// Does the player have units of a given type
 	bool has_unit_type(const stratagus::unit_type *unit_type) const;
 
+	int get_population() const;
+
 	/// Notify player about a problem
 	//Wyrmgus start
 //	void Notify(int type, const Vec2i &pos, const char *fmt, ...) const PRINTF_VAARG_ATTRIBUTE(4, 5); // Don't forget to count this

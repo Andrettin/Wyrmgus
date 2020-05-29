@@ -3773,6 +3773,22 @@ bool CPlayer::has_unit_type(const stratagus::unit_type *unit_type) const
 	return this->GetUnitTypeCount(unit_type) > 0;
 }
 
+int CPlayer::get_population() const
+{
+	int people_count = 0;
+
+	for (const auto &kv_pair : this->UnitTypesCount) {
+		const stratagus::unit_type *unit_type = kv_pair.first;
+		if (!unit_type->BoolFlag[ORGANIC_INDEX].value || unit_type->BoolFlag[FAUNA_INDEX].value) {
+			continue;
+		}
+
+		people_count += kv_pair.second;
+	}
+
+	return static_cast<int>(pow(people_count, 2)) * stratagus::base_population_per_unit;
+}
+
 /**
 **  Initialize the Ai for all players.
 */

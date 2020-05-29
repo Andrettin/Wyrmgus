@@ -1107,7 +1107,14 @@ void DrawPopups()
 	}
 	
 	if (UI.Resources[FoodCost].G && CursorScreenPos.x >= UI.Resources[FoodCost].IconX && CursorScreenPos.x < (UI.Resources[FoodCost].TextX + UI.Resources[FoodCost].Font->Width(UI.Resources[FoodCost].Text)) && CursorScreenPos.y >= UI.Resources[FoodCost].IconY && CursorScreenPos.y < (UI.Resources[FoodCost].IconY + UI.Resources[FoodCost].G->Height)) {
-		DrawGenericPopup(_("Food"), UI.Resources[FoodCost].IconX, UI.Resources[FoodCost].IconY + 16 * stratagus::defines::get()->get_scale_factor() + GameCursor->get_graphic()->getHeight() / 2, "", "", false);
+		//hackish way to make the popup appear correctly
+		stratagus::button *ba = new stratagus::button;
+		ba->Hint = _("Food");
+		ba->Action = ButtonCmd::None;
+		ba->Popup = "popup_food";
+		DrawPopup(*ba, UI.Resources[FoodCost].IconX, UI.Resources[FoodCost].IconY + 16 * stratagus::defines::get()->get_scale_factor() + GameCursor->get_graphic()->getHeight() / 2, false);
+		delete ba;
+		LastDrawnButtonPopup = nullptr;
 	}
 	
 	if (UI.Resources[ScoreCost].G && CursorScreenPos.x >= UI.Resources[ScoreCost].IconX && CursorScreenPos.x < (UI.Resources[ScoreCost].TextX + UI.Resources[ScoreCost].Font->Width(UI.Resources[ScoreCost].Text)) && CursorScreenPos.y >= UI.Resources[ScoreCost].IconY && CursorScreenPos.y < (UI.Resources[ScoreCost].IconY + UI.Resources[ScoreCost].G->Height)) {

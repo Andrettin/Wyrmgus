@@ -33,18 +33,19 @@
 
 namespace stratagus::number {
 
+inline std::string to_formatted_string(const int number)
+{
+	static QLocale english_locale(QLocale::English);
+	return english_locale.toString(number).toStdString();
+}
+
 inline std::string to_signed_string(const int number)
 {
 	std::string number_str;
 	if (number >= 0) {
 		number_str += "+";
 	}
-	if (number >= 10000) {
-		static QLocale english_locale(QLocale::English);
-		number_str += english_locale.toString(number).toStdString();
-	} else {
-		number_str += std::to_string(number);
-	}
+	number_str += number::to_formatted_string(number);
 	return number_str;
 }
 

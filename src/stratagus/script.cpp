@@ -68,6 +68,7 @@
 #include "unit/unit_manager.h" //for checking units of a custom unit type and deleting them if the unit type has been removed
 #include "unit/unit_type.h"
 //Wyrmgus end
+#include "util/number_util.h"
 
 lua_State *Lua;                       /// Structure to work with lua files.
 
@@ -896,6 +897,8 @@ static int GetPlayerData(const int player, const char *prop, const char *arg)
 		return CPlayer::Players[player]->TotalRazings;
 	} else if (!strcmp(prop, "TotalKills")) {
 		return CPlayer::Players[player]->TotalKills;
+	} else if (!strcmp(prop, "Population")) {
+		return CPlayer::Players[player]->get_population();
 	} else {
 		fprintf(stderr, "Invalid field: %s" _C_ prop);
 		Exit(1);
@@ -1094,7 +1097,7 @@ NumberDesc *CclParseNumberDesc(lua_State *l)
 		//Wyrmgus end
 		} else {
 			lua_pop(l, 1);
-			LuaError(l, "unknow condition '%s'" _C_ key);
+			LuaError(l, "unknown condition '%s'" _C_ key);
 		}
 	} else {
 		LuaError(l, "Parse Error in ParseNumber");
@@ -1495,9 +1498,7 @@ std::string EvalString(const StringDesc *s)
 			}
 			return res;
 		case EString_String : {   // 42 -> "42".
-			char buffer[16]; // Should be enough ?
-			sprintf(buffer, "%d", EvalNumber(s->D.Number));
-			return std::string(buffer);
+			return stratagus::number::to_formatted_string(EvalNumber(s->D.Number));
 		}
 		case EString_InverseVideo : // "a" -> "~<a~>"
 			tmp1 = EvalString(s->D.String);
