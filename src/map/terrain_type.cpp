@@ -459,47 +459,36 @@ void terrain_type::calculate_minimap_color(const season *season)
 	}
 
 	const CGraphic *graphic = this->get_graphics(season);
-	const std::vector<int> &solid_tiles = this->get_solid_tiles();
-
-	if (solid_tiles.empty()) {
-		throw std::runtime_error("Terrain type \"" + this->get_identifier() + "\" has no solid tiles with which to calculate its minimap color.");
-	}
 
 	const QImage &image = graphic->get_image();
-	const QSize &frame_size = graphic->get_original_frame_size();
 
 	int pixel_count = 0;
 	int red = 0;
 	int green = 0;
 	int blue = 0;
 
-	for (const int solid_tile : solid_tiles) {
-		const QPoint frame_pos = graphic->get_frame_pos(solid_tile);
-		const QPoint frame_pixel_pos(frame_pos.x() * frame_size.width(), frame_pos.y() * frame_size.height());
+	for (int x = 0; x < image.width(); ++x) {
+		for (int y = 0; y < image.height(); ++y) {
+			const QPoint pixel_pos = QPoint(x, y);
+			const QColor pixel_color = image.pixelColor(pixel_pos);
 
-		for (int x_offset = 0; x_offset < frame_size.width(); ++x_offset) {
-			for (int y_offset = 0; y_offset < frame_size.height(); ++y_offset) {
-				const QPoint pixel_pos = frame_pixel_pos + QPoint(x_offset, y_offset);
-				const QColor pixel_color = image.pixelColor(pixel_pos);
-
-				if (pixel_color.alpha() == 0) { //fully transparent pixel
-					continue;
-				}
-
-				if (vector::contains(defines::get()->get_conversible_player_color()->get_colors(), pixel_color)) {
-					continue;
-				}
-
-				red += pixel_color.red();
-				green += pixel_color.green();
-				blue += pixel_color.blue();
-				pixel_count++;
+			if (pixel_color.alpha() != 255) { //transparent pixel, ignore
+				continue;
 			}
+
+			if (vector::contains(defines::get()->get_conversible_player_color()->get_colors(), pixel_color)) {
+				continue;
+			}
+
+			red += pixel_color.red();
+			green += pixel_color.green();
+			blue += pixel_color.blue();
+			pixel_count++;
 		}
 	}
 
 	if (pixel_count == 0) {
-		throw std::runtime_error("No valid solid tile pixels for calculating the minimap color for terrain type \"" + this->get_identifier() + "\".");
+		throw std::runtime_error("No valid pixels for calculating the minimap color for terrain type \"" + this->get_identifier() + "\".");
 	}
 
 	red /= pixel_count;
