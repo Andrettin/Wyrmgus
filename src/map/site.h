@@ -57,12 +57,13 @@ class site final : public named_data_entry, public data_type<site>, public CData
 	Q_PROPERTY(bool major MEMBER major READ is_major)
 	Q_PROPERTY(stratagus::map_template* map_template MEMBER map_template READ get_map_template)
 	Q_PROPERTY(QPoint pos MEMBER pos READ get_pos)
-	Q_PROPERTY(stratagus::faction* owner_faction MEMBER owner_faction READ get_owner_faction)
-	Q_PROPERTY(QVariantList building_classes READ get_building_classes_qvariant_list)
 	Q_PROPERTY(stratagus::unit_class* pathway_class MEMBER pathway_class READ get_pathway_class)
 	Q_PROPERTY(QVariantList cores READ get_cores_qvariant_list)
 	Q_PROPERTY(QVariantList regions READ get_regions_qvariant_list)
 	Q_PROPERTY(QColor minimap_color MEMBER minimap_color READ get_minimap_color)
+	Q_PROPERTY(stratagus::faction* owner_faction MEMBER owner_faction READ get_owner_faction)
+	Q_PROPERTY(QVariantList building_classes READ get_building_classes_qvariant_list)
+	Q_PROPERTY(int population MEMBER population READ get_population)
 
 public:
 	static constexpr const char *class_identifier = "site";
@@ -73,6 +74,7 @@ public:
 	}
 
 	virtual void process_sml_scope(const sml_data &scope) override;
+	virtual void process_sml_dated_scope(const sml_data &scope, const QDateTime &date) override;
 	virtual void ProcessConfigData(const CConfigData *config_data) override;
 	virtual void initialize() override;
 
@@ -81,6 +83,8 @@ public:
 		this->owner_faction = nullptr;
 		this->building_classes.clear();
 		this->pathway_class = nullptr;
+		this->population = 0;
+		this->population_groups.clear();
 	}
 
 	std::string GetCulturalName(const civilization *civilization) const;
@@ -136,6 +140,16 @@ public:
 	unit_class *get_pathway_class() const
 	{
 		return this->pathway_class;
+	}
+
+	int get_population() const
+	{
+		return this->population;
+	}
+
+	const std::map<int, int> &get_population_groups() const
+	{
+		return this->population_groups;
 	}
 
 	void add_border_tile(const QPoint &tile_pos)
@@ -215,6 +229,8 @@ private:
 	faction *owner_faction = nullptr; //used for the owner history of the site, and after game start is 	set to its player owner's faction
 	std::vector<unit_class *> building_classes; //used by history; applied as buildings at scenario start
 	unit_class *pathway_class = nullptr;
+	int population = 0; //used for creating units at scenario start
+	std::map<int, int> population_groups; //population size for unit classes (represented as indexes)
 public:
 	std::map<CDate, const faction *> HistoricalOwners;			/// Historical owners of the site
 	std::map<CDate, int> HistoricalPopulation;					/// Historical population

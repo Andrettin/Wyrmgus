@@ -65,6 +65,20 @@ void site::process_sml_scope(const sml_data &scope)
 	}
 }
 
+void site::process_sml_dated_scope(const sml_data &scope, const QDateTime &date)
+{
+	const std::string &tag = scope.get_tag();
+
+	if (tag == "population_groups") {
+		scope.for_each_property([&](const sml_property &property) {
+			const unit_class *unit_class = unit_class::get(property.get_key());
+			this->population_groups[unit_class->get_index()] = std::stoi(property.get_value());
+		});
+	} else {
+		data_entry::process_sml_dated_scope(scope, date);
+	}
+}
+
 void site::ProcessConfigData(const CConfigData *config_data)
 {
 	for (size_t i = 0; i < config_data->Properties.size(); ++i) {

@@ -160,7 +160,11 @@ static constexpr int PlayerMajorDeityMax = 1;	/// Maximum major deities per play
 static constexpr int PlayerMinorDeityMax = 1;	/// Maximum minor deities per player/character
 static constexpr int PlayerDeityMax = (PlayerMajorDeityMax + PlayerMinorDeityMax);
 
-static constexpr int PopulationPerUnit = 1000;		/// Number of people a unit represents
+namespace stratagus {
+
+static constexpr int base_population_per_unit = 1000;		/// Number of people a unit represents
+
+}
 
 static constexpr int DEFAULT_HOURS_PER_DAY = 24;
 static constexpr int DEFAULT_DAYS_PER_MONTH = 30;

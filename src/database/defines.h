@@ -60,6 +60,7 @@ class defines final : public QObject, public singleton<defines>
 	Q_PROPERTY(stratagus::button_level* inventory_button_level MEMBER inventory_button_level READ get_inventory_button_level)
 	Q_PROPERTY(stratagus::button_level* cancel_button_level MEMBER cancel_button_level READ get_cancel_button_level)
 	Q_PROPERTY(stratagus::unit_class* town_hall_class MEMBER town_hall_class READ get_town_hall_class)
+	Q_PROPERTY(stratagus::unit_class* default_population_class MEMBER default_population_class READ get_default_population_class)
 
 public:
 	void load(const std::filesystem::path &base_path);
@@ -171,6 +172,11 @@ public:
 		return this->town_hall_class;
 	}
 
+	unit_class *get_default_population_class() const
+	{
+		return this->default_population_class;
+	}
+
 private:
 	QSize tile_size;
 	QSize icon_size;
@@ -188,6 +194,7 @@ private:
 	button_level *inventory_button_level = nullptr;
 	button_level *cancel_button_level = nullptr;
 	unit_class *town_hall_class = nullptr;
+	unit_class *default_population_class = nullptr;
 };
 
 }

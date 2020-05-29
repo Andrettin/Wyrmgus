@@ -32,6 +32,7 @@
 #include "campaign.h"
 #include "civilization.h"
 #include "config.h"
+#include "database/defines.h"
 #include "editor.h"
 #include "faction.h"
 #include "game.h"
@@ -1256,6 +1257,20 @@ void map_template::apply_sites(const QPoint &template_start_pos, const QPoint &m
 				}
 			}
 		}
+
+		int population = site->get_population();
+
+		for (const auto &kv_pair : site->get_population_groups()) {
+			const unit_class *unit_class = unit_class::get_all()[kv_pair.first];
+			const int group_population = kv_pair.second;
+
+			this->apply_population_unit(unit_class, group_population, site_pos, z, player);
+			population -= group_population;
+		}
+
+		if (population != 0) { //remaining population after subtracting the amount of population specified to belong to particular groups
+			this->apply_population_unit(defines::get()->get_default_population_class(), population, site_pos, z, player);
+		}
 		
 		for (size_t j = 0; j < site->HistoricalUnits.size(); ++j) {
 			if (
@@ -1267,7 +1282,7 @@ void map_template::apply_sites(const QPoint &template_start_pos, const QPoint &m
 				if (unit_quantity > 0) {
 					const unit_type *type = std::get<2>(site->HistoricalUnits[j]);
 					if (type->BoolFlag[ORGANIC_INDEX].value) {
-						unit_quantity = std::max(1, unit_quantity / PopulationPerUnit); //each organic unit represents 1,000 people
+						unit_quantity = std::max(1, unit_quantity / base_population_per_unit); //each organic unit represents 1,000 people
 					}
 							
 					CPlayer *unit_player = nullptr;
@@ -1295,6 +1310,23 @@ void map_template::apply_sites(const QPoint &template_start_pos, const QPoint &m
 				}
 			}
 		}
+	}
+}
+
+void map_template::apply_population_unit(const unit_class *unit_class, const int population, const QPoint &unit_pos, const int z, CPlayer *player) const
+{
+	const unit_type *unit_type = player->get_class_unit_type(unit_class);
+
+	if (unit_type == nullptr) {
+		return;
+	}
+
+	const QPoint unit_offset = unit_type->get_tile_center_pos_offset();
+	const QPoint unit_top_left_pos = unit_pos - unit_offset;
+
+	const int unit_quantity = std::max(1, static_cast<int>(cbrt(population / base_population_per_unit)));
+	for (int i = 0; i < unit_quantity; ++i) {
+		CreateUnit(unit_top_left_pos, *unit_type, player, z);
 	}
 }
 
