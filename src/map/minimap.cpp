@@ -353,7 +353,7 @@ void minimap::update_territory_xy(const QPoint &pos, const int z)
 
 void minimap::update_territory_pixel(const int mx, const int my, const int z)
 {
-	static constexpr int stroke_tile_interval = 4;
+	static constexpr int stroke_tile_interval = 8;
 
 	const CMapLayer *map_layer = CMap::Map.MapLayers[z];
 	const int non_land_territory_alpha = defines::get()->get_minimap_non_land_territory_alpha();
@@ -371,15 +371,19 @@ void minimap::update_territory_pixel(const int mx, const int my, const int z)
 		const CPlayer *player = CPlayer::Players[PlayerNumNeutral];
 
 		if (mf.get_owner() != nullptr) {
-			//if this is a tile owned by a player who has an overlord, use the overlord's color if this is a border tile
-			const QPoint tile_pos(Minimap2MapX[z][mx], Minimap2MapY[z][my] / map_layer->get_width());
-			const int tile_pos_sum = tile_pos.x() + tile_pos.y();
-			if (mf.get_owner()->get_overlord() != nullptr && (tile_pos_sum % stroke_tile_interval) == 0) {
-				const int overlord_depth = mf.get_owner()->get_overlord_depth();
-				const int overlord_tier = ((tile_pos_sum / stroke_tile_interval) % overlord_depth) + 1;
-				player = mf.get_owner()->get_tier_overlord(overlord_tier);
-			} else {
-				player = mf.get_owner();
+			player = mf.get_owner();
+
+			if (mf.get_owner()->get_overlord() != nullptr) {
+				//if this is a tile owned by a player who has an overlord, use the overlord's color if this tile should be part of the overlord territory stroke
+				const QPoint tile_pos(Minimap2MapX[z][mx], Minimap2MapY[z][my] / map_layer->get_width());
+				const int tile_pos_sum = tile_pos.x() + tile_pos.y();
+
+				const int stroke_check_result = tile_pos_sum % stroke_tile_interval;
+				if (stroke_check_result == 0 || stroke_check_result == 1) {
+					const int overlord_depth = mf.get_owner()->get_overlord_depth();
+					const int overlord_tier = ((tile_pos_sum / stroke_tile_interval) % overlord_depth) + 1;
+					player = mf.get_owner()->get_tier_overlord(overlord_tier);
+				}
 			}
 		}
 
