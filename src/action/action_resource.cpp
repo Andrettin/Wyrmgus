@@ -1351,15 +1351,9 @@ int COrder_Resource::MoveToDepot(CUnit &unit)
 		}
 	}
 	
-	if (!player.Overlord) {
-		player.change_resource(stratagus::resource::get_all()[rindex], processed_resource_change, true);
-		player.TotalResources[rindex] += processed_resource_change;
-	} else { // if the player has an overlord, give 10% of the resources gathered to them
-		player.change_resource(stratagus::resource::get_all()[rindex], processed_resource_change * 90 / 100, true);
-		player.TotalResources[rindex] += processed_resource_change * 90 / 100;
-		player.Overlord->change_resource(stratagus::resource::get_all()[rindex], processed_resource_change / 10, true);
-		player.Overlord->TotalResources[rindex] += processed_resource_change / 10;
-	}
+	player.change_resource(stratagus::resource::get_all()[rindex], processed_resource_change, true);
+	player.TotalResources[rindex] += processed_resource_change;
+	player.pay_overlord_tax(stratagus::resource::get_all()[rindex], processed_resource_change);
 	
 	//give XP to the worker according to how much was gathered, based on their base price in relation to gold
 	int xp_gained = unit.ResourcesHeld;

@@ -649,8 +649,8 @@ void CPlayer::Save(CFile &file) const
 	file.printf("\",\n  \"start\", {%d, %d},\n", p.StartPos.x, p.StartPos.y);
 	//Wyrmgus start
 	file.printf("  \"start-map-layer\", %d,\n", p.StartMapLayer);
-	if (p.Overlord) {
-		file.printf("  \"overlord\", %d,\n", p.Overlord->Index);
+	if (p.get_overlord() != nullptr) {
+		file.printf("  \"overlord\", %d,\n", p.get_overlord()->Index);
 	}
 	//Wyrmgus end
 
@@ -1009,7 +1009,7 @@ void CPlayer::Init(/* PlayerTypes */ int type)
 	this->Religion = nullptr;
 	this->Dynasty = nullptr;
 	this->age = nullptr;
-	this->Overlord = nullptr;
+	this->overlord = nullptr;
 	this->Team = team;
 	this->Enemy = 0;
 	this->Allied = 0;
@@ -2211,8 +2211,8 @@ void CPlayer::Clear()
 	this->Religion = nullptr;
 	this->Dynasty = nullptr;
 	this->age = nullptr;
-	this->Overlord = nullptr;
-	this->Vassals.clear();
+	this->overlord = nullptr;
+	this->vassals.clear();
 	this->AiName.clear();
 	this->Team = 0;
 	this->Enemy = 0;
@@ -3320,6 +3320,27 @@ int CPlayer::GetTradePotentialWith(const CPlayer &player) const
 }
 //Wyrmgus end
 
+void CPlayer::pay_overlord_tax(const stratagus::resource *resource, const int taxable_quantity)
+{
+	if (this->get_overlord() == nullptr) {
+		return;
+	}
+
+	//if the player has an overlord, give 10% of the resources gathered to them
+	const int quantity = taxable_quantity / 10;
+
+	if (quantity == 0) {
+		return;
+	}
+
+	this->get_overlord()->change_resource(resource, quantity, true);
+	this->get_overlord()->TotalResources[resource->ID] += quantity;
+	this->change_resource(resource, -quantity, true);
+
+	//make the overlord pay tax to their overlord in turn (if they have one)
+	this->get_overlord()->pay_overlord_tax(resource, quantity);
+}
+
 int CPlayer::GetUnitTotalCount(const stratagus::unit_type &type) const
 {
 	int count = this->GetUnitTypeCount(&type);
@@ -4019,26 +4040,21 @@ void CPlayer::SetDiplomacyAlliedWith(const CPlayer &player)
 	//Wyrmgus end
 }
 
-//Wyrmgus start
-//void CPlayer::SetDiplomacyEnemyWith(const CPlayer &player)
 void CPlayer::SetDiplomacyEnemyWith(CPlayer &player)
-//Wyrmgus end
 {
 	this->Enemy |= 1 << player.Index;
 	this->Allied &= ~(1 << player.Index);
 	
-	//Wyrmgus start
 	if (GameCycle > 0 && player.Index == CPlayer::GetThisPlayer()->Index) {
 		CPlayer::GetThisPlayer()->Notify(_("%s changed their diplomatic stance with us to Enemy"), _(this->Name.c_str()));
 	}
 	
 	// if either player is the overlord of another (indirect or otherwise), break the vassalage bond after the declaration of war
-	if (this->IsOverlordOf(player, true)) {
-		player.SetOverlord(nullptr);
-	} else if (player.IsOverlordOf(*this, true)) {
-		this->SetOverlord(nullptr);
+	if (this->is_any_overlord_of(&player)) {
+		player.set_overlord(nullptr);
+	} else if (player.is_any_overlord_of(this)) {
+		this->set_overlord(nullptr);
 	}
-	//Wyrmgus end
 }
 
 void CPlayer::SetDiplomacyCrazyWith(const CPlayer &player)
@@ -4069,28 +4085,30 @@ void CPlayer::UnshareVisionWith(const CPlayer &player)
 	}
 }
 
-//Wyrmgus start
-void CPlayer::SetOverlord(CPlayer *player)
+void CPlayer::set_overlord(CPlayer *player)
 {
-	if (this->Overlord) {
-		this->Overlord->Vassals.erase(std::remove(this->Overlord->Vassals.begin(), this->Overlord->Vassals.end(), this), this->Overlord->Vassals.end());
+	if (player == this->get_overlord()) {
+		return;
 	}
 
-	this->Overlord = player;
+	if (this->get_overlord() != nullptr) {
+		stratagus::vector::remove(get_overlord()->vassals, this);
+	}
+
+	this->overlord = player;
 	
-	if (this->Overlord) {
-		this->Overlord->Vassals.push_back(this);
+	if (player != nullptr) {
+		player->vassals.push_back(this);
 		if (!SaveGameLoading) {
-			this->SetDiplomacyAlliedWith(*this->Overlord);
-			this->Overlord->SetDiplomacyAlliedWith(*this);
-			CommandDiplomacy(this->Index, diplomacy_state::allied, this->Overlord->Index);
-			CommandDiplomacy(this->Overlord->Index, diplomacy_state::allied, this->Index);
-			CommandSharedVision(this->Index, true, this->Overlord->Index);
-			CommandSharedVision(this->Overlord->Index, true, this->Index);
+			this->SetDiplomacyAlliedWith(*player);
+			player->SetDiplomacyAlliedWith(*this);
+			CommandDiplomacy(this->Index, diplomacy_state::allied, player->Index);
+			CommandDiplomacy(player->Index, diplomacy_state::allied, this->Index);
+			CommandSharedVision(this->Index, true, player->Index);
+			CommandSharedVision(player->Index, true, this->Index);
 		}
 	}
 }
-//Wyrmgus end
 
 /**
 **  Check if the player is an enemy
@@ -4206,52 +4224,6 @@ bool CPlayer::IsTeamed(const CUnit &unit) const
 
 //Wyrmgus start
 /**
-**  Check if the player is the overlord of another
-*/
-bool CPlayer::IsOverlordOf(const CPlayer &player, bool include_indirect) const
-{
-	if (!player.Overlord) {
-		return false;
-	}
-	
-	if (this == player.Overlord) {
-		return true;
-	}
-
-	if (include_indirect) { //if include_indirect is true, search this player's other vassals to see if the player is an indirect overlord of the other
-		for (size_t i = 0; i < this->Vassals.size(); ++i) {
-			if (this->Vassals[i]->IsOverlordOf(player, include_indirect)) {
-				return true;
-			}
-		}
-	}
-	
-	return false;
-}
-
-/**
-**  Check if the player is the vassal of another
-*/
-bool CPlayer::IsVassalOf(const CPlayer &player, bool include_indirect) const
-{
-	if (!this->Overlord) {
-		return false;
-	}
-	
-	if (this->Overlord == &player) {
-		return true;
-	}
-
-	if (include_indirect) { //if include_indirect is true, search this player's other vassals to see if the player is an indirect overlord of the other
-		if (this->Overlord->IsVassalOf(player, include_indirect)) {
-			return true;
-		}
-	}
-	
-	return false;
-}
-
-/**
 **  Check if the player has contact with another (used for determining which players show up in the player list and etc.)
 */
 bool CPlayer::HasContactWith(const CPlayer &player) const
@@ -4294,7 +4266,7 @@ bool CPlayer::HasBuildingAccess(const CPlayer &player, const ButtonCmd button_ac
 	
 	if (
 		player.HasNeutralFactionType()
-		&& (player.Overlord == nullptr || this->IsOverlordOf(player, true) || player.Overlord->IsAllied(*this))
+		&& (player.get_overlord() == nullptr || this->is_any_overlord_of(&player) || player.get_overlord()->IsAllied(*this))
 	) {
 		if (stratagus::faction::get_all()[player.Faction]->Type != FactionTypeHolyOrder || (button_action != ButtonCmd::Train && button_action != ButtonCmd::TrainClass && button_action != ButtonCmd::Buy) || stratagus::vector::contains(this->Deities, stratagus::faction::get_all()[player.Faction]->HolyOrderDeity)) { //if the faction is a holy order, the player must have chosen its respective deity
 			return true;

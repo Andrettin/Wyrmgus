@@ -70,6 +70,7 @@ namespace stratagus {
 	class deity;
 	class player_color;
 	class quest;
+	class resource;
 	class site;
 	class unit_class;
 	class unit_type;
@@ -136,11 +137,13 @@ public:
 	Vec2i StartPos = Vec2i(0, 0);  /// map tile start position
 	//Wyrmgus start
 	int StartMapLayer = 0;  /// map tile start map layer
-	
-	CPlayer *Overlord = nullptr;	/// overlord of this player
-	std::vector<CPlayer *> Vassals;	/// vassals of this player
 	//Wyrmgus end
 
+private:
+	CPlayer *overlord = nullptr;	/// overlord of this player
+	std::vector<CPlayer *> vassals;	/// vassals of this player
+
+public:
 	//Wyrmgus start
 //	inline void SetStartView(const Vec2i &pos) { StartPos = pos; }
 	inline void SetStartView(const Vec2i &pos, int z) { StartPos = pos; StartMapLayer = z; }
@@ -336,6 +339,8 @@ public:
 	/// Get the trade potential between this player and another one
 	int GetTradePotentialWith(const CPlayer &player) const;
 	//Wyrmgus end
+
+	void pay_overlord_tax(const stratagus::resource *resource, const int taxable_quantity);
 	
 	/// Returns count of specified unittype
 	int GetUnitTotalCount(const stratagus::unit_type &type) const;
@@ -421,8 +426,45 @@ public:
 	bool has_mutual_shared_vision_with(const CUnit &unit) const;
 	bool IsTeamed(const CPlayer &player) const;
 	bool IsTeamed(const CUnit &unit) const;
-	bool IsOverlordOf(const CPlayer &player, bool include_indirect = false) const;
-	bool IsVassalOf(const CPlayer &player, bool include_indirect = false) const;
+
+	bool is_overlord_of(const CPlayer *player) const
+	{
+		return player->get_overlord() == this;
+	}
+
+	bool is_any_overlord_of(const CPlayer *player) const
+	{
+		if (this->is_overlord_of(player)) {
+			return true;
+		}
+
+		for (const CPlayer *vassal : this->get_vassals()) {
+			if (vassal->is_any_overlord_of(player)) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	bool is_vassal_of(const CPlayer *player) const
+	{
+		return player == this->get_overlord();
+	}
+
+	bool is_any_vassal_of(const CPlayer *player) const
+	{
+		if (this->is_vassal_of(player)) {
+			return true;
+		}
+
+		if (this->get_overlord() != nullptr) {
+			return this->get_overlord()->is_any_vassal_of(player);
+		}
+
+		return false;
+	}
+
 	//Wyrmgus start
 	bool HasContactWith(const CPlayer &player) const;
 	bool HasNeutralFactionType() const;
@@ -441,7 +483,26 @@ public:
 	void ShareVisionWith(const CPlayer &player);
 	void UnshareVisionWith(const CPlayer &player);
 	
-	void SetOverlord(CPlayer *player);
+	CPlayer *get_overlord() const
+	{
+		return this->overlord;
+	}
+
+	CPlayer *get_top_overlord() const
+	{
+		if (this->get_overlord() != nullptr && this->get_overlord()->get_overlord() != nullptr) {
+			return this->get_overlord()->get_top_overlord();
+		}
+
+		return this->get_overlord();
+	}
+
+	void set_overlord(CPlayer *player);
+
+	const std::vector<CPlayer *> &get_vassals() const
+	{
+		return this->vassals;
+	}
 
 	void Init(/* PlayerTypes */ int type);
 	void Save(CFile &file) const;

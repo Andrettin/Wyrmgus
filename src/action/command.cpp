@@ -1344,10 +1344,10 @@ void CommandDiplomacy(const int player, const diplomacy_state state, const int o
 			CPlayer::Players[player]->SetDiplomacyEnemyWith(*CPlayer::Players[opponent]);
 			break;
 		case diplomacy_state::overlord:
-			CPlayer::Players[opponent]->SetOverlord(CPlayer::Players[player]);
+			CPlayer::Players[opponent]->set_overlord(CPlayer::Players[player]);
 			break;
 		case diplomacy_state::vassal:
-			CPlayer::Players[player]->SetOverlord(CPlayer::Players[opponent]);
+			CPlayer::Players[player]->set_overlord(CPlayer::Players[opponent]);
 			break;
 		case diplomacy_state::crazy:
 			CPlayer::Players[player]->SetDiplomacyCrazyWith(*CPlayer::Players[opponent]);

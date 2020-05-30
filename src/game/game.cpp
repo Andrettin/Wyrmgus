@@ -225,11 +225,23 @@ void game::apply_player_history()
 
 				CPlayer *diplomacy_state_player = GetFactionPlayer(other_faction);
 				if (diplomacy_state_player != nullptr) {
-					CommandDiplomacy(player->Index, state, diplomacy_state_player->Index);
-					CommandDiplomacy(diplomacy_state_player->Index, state, player->Index);
-					if (state == diplomacy_state::allied) {
-						CommandSharedVision(player->Index, true, diplomacy_state_player->Index);
-						CommandSharedVision(diplomacy_state_player->Index, true, player->Index);
+					switch (state) {
+						case diplomacy_state::overlord:
+							CommandDiplomacy(player->Index, state, diplomacy_state_player->Index);
+							CommandDiplomacy(diplomacy_state_player->Index, diplomacy_state::vassal, player->Index);
+							break;
+						case diplomacy_state::vassal:
+							CommandDiplomacy(player->Index, state, diplomacy_state_player->Index);
+							CommandDiplomacy(diplomacy_state_player->Index, diplomacy_state::overlord, player->Index);
+							break;
+						case diplomacy_state::allied:
+							CommandSharedVision(player->Index, true, diplomacy_state_player->Index);
+							CommandSharedVision(diplomacy_state_player->Index, true, player->Index);
+						//fallthrough
+						default:
+							CommandDiplomacy(player->Index, state, diplomacy_state_player->Index);
+							CommandDiplomacy(diplomacy_state_player->Index, state, player->Index);
+							break;
 					}
 				}
 			}
