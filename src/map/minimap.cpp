@@ -353,7 +353,9 @@ void minimap::update_territory_xy(const QPoint &pos, const int z)
 
 void minimap::update_territory_pixel(const int mx, const int my, const int z)
 {
-	static constexpr int stroke_tile_interval = 8;
+	static constexpr int base_stroke_tile_interval = 3;
+	static constexpr int stroke_thickness = 2;
+	static constexpr int stroke_tile_interval = base_stroke_tile_interval * stroke_thickness;
 
 	const CMapLayer *map_layer = CMap::Map.MapLayers[z];
 	const int non_land_territory_alpha = defines::get()->get_minimap_non_land_territory_alpha();
@@ -379,7 +381,7 @@ void minimap::update_territory_pixel(const int mx, const int my, const int z)
 				const int tile_pos_sum = tile_pos.x() + tile_pos.y();
 
 				const int stroke_check_result = tile_pos_sum % stroke_tile_interval;
-				if (stroke_check_result == 0 || stroke_check_result == 1) {
+				if (stroke_check_result >= 0 && stroke_check_result <= (stroke_thickness - 1)) {
 					const int overlord_depth = mf.get_owner()->get_overlord_depth();
 					const int overlord_tier = ((tile_pos_sum / stroke_tile_interval) % overlord_depth) + 1;
 					player = mf.get_owner()->get_tier_overlord(overlord_tier);
