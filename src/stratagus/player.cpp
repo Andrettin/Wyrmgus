@@ -1585,6 +1585,11 @@ void CPlayer::update_minimap_territory()
 			town_hall->settlement->update_minimap_territory();
 		}
 	}
+
+	//also update the minimap territory of vassals, as they get strokes of the overlord's colors
+	for (CPlayer *vassal : this->get_vassals()) {
+		vassal->update_minimap_territory();
+	}
 }
 
 stratagus::unit_type *CPlayer::get_class_unit_type(const stratagus::unit_class *unit_class) const
@@ -4048,15 +4053,28 @@ void CPlayer::SetDiplomacyEnemyWith(CPlayer &player)
 	this->Enemy |= 1 << player.Index;
 	this->Allied &= ~(1 << player.Index);
 	
-	if (GameCycle > 0 && player.Index == CPlayer::GetThisPlayer()->Index) {
-		CPlayer::GetThisPlayer()->Notify(_("%s changed their diplomatic stance with us to Enemy"), _(this->Name.c_str()));
+	if (GameCycle > 0) {
+		if (player.Index == CPlayer::GetThisPlayer()->Index) {
+			CPlayer::GetThisPlayer()->Notify(_("%s changed their diplomatic stance with us to Enemy"), _(this->Name.c_str()));
+		} else if (this->Index == CPlayer::GetThisPlayer()->Index) {
+			CPlayer::GetThisPlayer()->Notify(_("We have changed our diplomatic stance with %s to Enemy"), _(player.Name.c_str()));
+		}
 	}
-	
+
+	if (this->has_shared_vision_with(player)) {
+		CommandSharedVision(this->Index, false, player.Index);
+	}
+
 	// if either player is the overlord of another (indirect or otherwise), break the vassalage bond after the declaration of war
-	if (this->is_any_overlord_of(&player)) {
+	if (this->is_overlord_of(&player)) {
 		player.set_overlord(nullptr);
-	} else if (player.is_any_overlord_of(this)) {
+	} else if (player.is_overlord_of(this)) {
 		this->set_overlord(nullptr);
+	}
+
+	//if the other player has an overlord, then we must also go to war with them
+	if (player.get_overlord() != nullptr) {
+		this->SetDiplomacyEnemyWith(*player.get_overlord());
 	}
 }
 
@@ -4094,7 +4112,7 @@ void CPlayer::set_overlord(CPlayer *player)
 		return;
 	}
 
-	if (player->get_overlord() == this) {
+	if (player != nullptr && player->get_overlord() == this) {
 		throw std::runtime_error("Cannot set player \"" + player->Name + "\" as the overlord of \"" + this->Name + "\", as the former is a vassal of the latter, and a vassal can't be the overlord of its own overlord.");
 	}
 

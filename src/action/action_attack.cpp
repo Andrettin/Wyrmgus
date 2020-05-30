@@ -127,32 +127,20 @@ void AnimateActionAttack(CUnit &unit, COrder &order)
 		order->MinRange = attacker.GetModifiedVariable(ATTACKRANGE_INDEX);
 	}
 
-	//Wyrmgus start
 	if (!attacker.Type->BoolFlag[HIDDENOWNERSHIP_INDEX].value && !target.Type->BoolFlag[HIDDENOWNERSHIP_INDEX].value && !target.IsEnemy(attacker) && (target.Player->Type == PlayerComputer) && (attacker.Player->Type == PlayerComputer || attacker.Player->Type == PlayerPerson)) {
-		target.Player->SetDiplomacyEnemyWith(*attacker.Player);
 		attacker.Player->SetDiplomacyEnemyWith(*target.Player);
-		if (target.Player->has_shared_vision_with(*attacker.Player)) {
-			CommandSharedVision(target.Player->Index, false, attacker.Player->Index);
-		}
 	}
-	//Wyrmgus end
 
 	return order;
 }
 
-//Wyrmgus start
-///* static */ COrder *COrder::NewActionAttack(const CUnit &attacker, const Vec2i &dest)
 /* static */ COrder *COrder::NewActionAttack(const CUnit &attacker, const Vec2i &dest, int z)
-//Wyrmgus end
 {
 	Assert(CMap::Map.Info.IsPointOnMap(dest, z));
 
 	COrder_Attack *order = new COrder_Attack(false);
 
-	//Wyrmgus start
-//	if (CMap::Map.WallOnMap(dest) && CMap::Map.Field(dest)->playerInfo.IsExplored(*attacker.Player)) {
 	if (CMap::Map.WallOnMap(dest, z) && CMap::Map.Field(dest, z)->playerInfo.IsTeamExplored(*attacker.Player)) {
-	//Wyrmgus end
 		// FIXME: look into action_attack.cpp about this ugly problem
 		order->goalPos = dest;
 		order->MapLayer = z;
