@@ -3146,9 +3146,9 @@ void CMap::generate_settlement_territories(const int z)
 	}
 
 	seeds = this->expand_settlement_territories(stratagus::container::to_vector(seeds), z, (MapFieldUnpassable | MapFieldCoastAllowed | MapFieldSpace), MapFieldUnderground);
-	seeds = this->expand_settlement_territories(stratagus::container::to_vector(seeds), z, MapFieldCoastAllowed, MapFieldUnderground | MapFieldSpace);
-	this->expand_settlement_territories(stratagus::container::to_vector(seeds), z, MapFieldSpace, MapFieldUnderground);
-	this->expand_settlement_territories(stratagus::container::to_vector(seeds), z, MapFieldSpace);
+	seeds = this->expand_settlement_territories(stratagus::container::to_vector(seeds), z, (MapFieldCoastAllowed | MapFieldSpace), MapFieldUnderground);
+	seeds = this->expand_settlement_territories(stratagus::container::to_vector(seeds), z, MapFieldSpace, MapFieldUnderground);
+	seeds = this->expand_settlement_territories(stratagus::container::to_vector(seeds), z, MapFieldSpace);
 	this->expand_settlement_territories(stratagus::container::to_vector(seeds), z);
 
 	//set the settlement of the remaining tiles without any to their most-neighbored settlement
