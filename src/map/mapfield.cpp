@@ -692,6 +692,16 @@ bool CMapField::is_water() const
 	return this->Flags & (MapFieldWaterAllowed | MapFieldCoastAllowed);
 }
 
+bool CMapField::is_non_coastal_water() const
+{
+	return this->Flags & MapFieldWaterAllowed;
+}
+
+bool CMapField::is_coastal_water() const
+{
+	return this->Flags & MapFieldCoastAllowed;
+}
+
 bool CMapField::is_space() const
 {
 	return this->Flags & MapFieldSpace;

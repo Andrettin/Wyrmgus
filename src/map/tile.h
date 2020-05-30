@@ -236,6 +236,8 @@ public:
 	stratagus::terrain_type *GetTopTerrain(const bool seen = false, const bool ignore_destroyed = false) const;
 
 	bool is_water() const;
+	bool is_non_coastal_water() const;
+	bool is_coastal_water() const;
 	bool is_space() const;
 
 	/// Returns true, if water on the map tile field
