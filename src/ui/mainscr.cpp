@@ -1108,12 +1108,11 @@ void DrawPopups()
 	
 	if (UI.Resources[FoodCost].G && CursorScreenPos.x >= UI.Resources[FoodCost].IconX && CursorScreenPos.x < (UI.Resources[FoodCost].TextX + UI.Resources[FoodCost].Font->Width(UI.Resources[FoodCost].Text)) && CursorScreenPos.y >= UI.Resources[FoodCost].IconY && CursorScreenPos.y < (UI.Resources[FoodCost].IconY + UI.Resources[FoodCost].G->Height)) {
 		//hackish way to make the popup appear correctly
-		stratagus::button *ba = new stratagus::button;
-		ba->Hint = _("Food");
-		ba->Action = ButtonCmd::None;
-		ba->Popup = "popup_food";
-		DrawPopup(*ba, UI.Resources[FoodCost].IconX, UI.Resources[FoodCost].IconY + 16 * stratagus::defines::get()->get_scale_factor() + GameCursor->get_graphic()->getHeight() / 2, false);
-		delete ba;
+		stratagus::button ba;
+		ba.Hint = _("Food");
+		ba.Action = ButtonCmd::None;
+		ba.Popup = "popup_food";
+		DrawPopup(ba, UI.Resources[FoodCost].IconX, UI.Resources[FoodCost].IconY + 16 * stratagus::defines::get()->get_scale_factor() + GameCursor->get_graphic()->getHeight() / 2, false);
 		LastDrawnButtonPopup = nullptr;
 	}
 	
@@ -1169,25 +1168,38 @@ void DrawPopups()
 		const QPoint tile_pos = UI.Minimap.screen_to_tile_pos(CursorScreenPos);
 		if (CMap::Map.Info.IsPointOnMap(tile_pos, UI.CurrentMapLayer->ID)) {
 			const CMapField *tile = UI.CurrentMapLayer->Field(tile_pos);
-			std::string popup_str;
+
+			//hackish way to make the popup appear correctly
+			std::unique_ptr<stratagus::button> button;
 
 			switch (UI.Minimap.get_mode()) {
 				case stratagus::minimap_mode::territories:
 					if (tile->get_owner() != nullptr && !(tile->Flags & (MapFieldWaterAllowed | MapFieldCoastAllowed | MapFieldSpace))) {
-						popup_str = tile->get_owner()->Name;
+						button = std::make_unique<stratagus::button>();
+						button->Hint = tile->get_owner()->Name;
+						button->Action = ButtonCmd::Player;
+						button->Popup = "popup_territory";
+						button->Value = tile->get_owner()->Index;
 					}
 					break;
 				case stratagus::minimap_mode::territories_with_non_land:
 					if (tile->get_owner() != nullptr) {
-						popup_str = tile->get_owner()->Name;
+						button = std::make_unique<stratagus::button>();
+						button->Hint = tile->get_owner()->Name;
+						button->Action = ButtonCmd::Player;
+						button->Popup = "popup_territory";
+						button->Value = tile->get_owner()->Index;
 					}
 					break;
 				case stratagus::minimap_mode::settlements:
 					if (tile->get_settlement() != nullptr && tile->is_water() == tile->get_settlement()->get_site_unit()->get_center_tile()->is_water() && tile->is_space() == tile->get_settlement()->get_site_unit()->get_center_tile()->is_space()) {
+						button = std::make_unique<stratagus::button>();
+						button->Action = ButtonCmd::None;
+						button->Popup = "popup_settlement";
 						if (tile->get_owner() != nullptr) {
-							popup_str = tile->get_settlement()->GetCulturalName(tile->get_owner()->get_civilization());
+							button->Hint = tile->get_settlement()->GetCulturalName(tile->get_owner()->get_civilization());
 						} else {
-							popup_str = tile->get_settlement()->get_name();
+							button->Hint = tile->get_settlement()->get_name();
 						}
 					}
 					break;
@@ -1195,8 +1207,9 @@ void DrawPopups()
 					break;
 			}
 
-			if (!popup_str.empty()) {
-				DrawGenericPopup(popup_str, CursorScreenPos.x, CursorScreenPos.y);
+			if (button != nullptr) {
+				DrawPopup(*button, CursorScreenPos.x, CursorScreenPos.y);
+				LastDrawnButtonPopup = nullptr;
 			}
 		}
 	}

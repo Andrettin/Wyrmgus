@@ -448,6 +448,18 @@ static bool CanShowPopupContent(const PopupConditionPanel *condition,
 	}
 	//Wyrmgus end
 
+	if (condition->Overlord != CONDITION_TRUE) {
+		if ((condition->Overlord == CONDITION_ONLY) ^ (CPlayer::Players[button.Value]->get_overlord() != nullptr)) {
+			return false;
+		}
+	}
+
+	if (condition->TopOverlord != CONDITION_TRUE) {
+		if ((condition->TopOverlord == CONDITION_ONLY) ^ (CPlayer::Players[button.Value]->get_overlord() != nullptr && CPlayer::Players[button.Value]->get_top_overlord() != CPlayer::Players[button.Value]->get_overlord())) {
+			return false;
+		}
+	}
+
 	if (condition->ButtonAction != ButtonCmd::None && button.Action != condition->ButtonAction) {
 		return false;
 	}

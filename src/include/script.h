@@ -48,6 +48,7 @@ extern "C" {
 ----------------------------------------------------------------------------*/
 
 class CDate;
+class CPlayer;
 class CUnit;
 class CUpgrade;
 class CFile;
@@ -124,6 +125,7 @@ enum ENumber {
 	//Wyrmgus start
 	ENumber_TypeTrainQuantity,	/// Unit type's trained quantity
 	//Wyrmgus end
+	ENumber_ButtonPlayer,
 
 	ENumber_NumIf,       /// If cond then Number1 else Number2.
 
@@ -254,6 +256,7 @@ struct NumberDesc {
 		stratagus::faction **Faction;			/// Which faction.
 		int **Resource;				/// Which resource
 		//Wyrmgus end
+		const CPlayer **player;
 		BinOp binOp;   /// For binary operand.
 		struct {
 			UnitDesc *Unit;            /// Which unit.
@@ -412,6 +415,7 @@ extern const CUpgrade **CclParseUpgradeDesc(lua_State *l);   /// Parse an upgrad
 extern int **CclParseResourceDesc(lua_State *l);   /// Parse a resource description.
 extern stratagus::faction **CclParseFactionDesc(lua_State *l);   /// Parse a faction description.
 //Wyrmgus end
+extern const CPlayer **CclParsePlayerDesc(lua_State *l);   /// Parse a faction description.
 StringDesc *CclParseStringDesc(lua_State *l);        /// Parse a string description.
 
 extern int EvalNumber(const NumberDesc *numberdesc); /// Evaluate the number.

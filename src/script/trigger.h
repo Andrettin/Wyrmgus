@@ -31,6 +31,7 @@
 #include "database/data_type.h"
 
 class CFile;
+class CPlayer;
 class CUnit;
 class CUpgrade;
 class LuaCallback;
@@ -144,6 +145,7 @@ struct TriggerDataType {
 	int *Resource;		/// Resource used in trigger
 	stratagus::faction *Faction; /// Faction used in trigger
 	//Wyrmgus end
+	const CPlayer *player = nullptr;
 };
 
 /*----------------------------------------------------------------------------

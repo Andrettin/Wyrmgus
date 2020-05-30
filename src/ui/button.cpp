@@ -425,6 +425,9 @@ void button::SetTriggerData() const
 				TriggerData.Upgrade = CUpgrade::try_get(faction::get_all()[CPlayer::GetThisPlayer()->Faction]->DevelopsTo[this->Value]->FactionUpgrade);
 			}
 			break;
+		case ButtonCmd::Player:
+			TriggerData.player = CPlayer::Players.at(this->Value);
+			break;
 		default:
 			TriggerData.Type = unit_type::get_all()[this->Value];
 			break;
@@ -438,6 +441,7 @@ void button::CleanTriggerData() const
 	TriggerData.Upgrade = nullptr;
 	TriggerData.Resource = nullptr;
 	TriggerData.Faction = nullptr;
+	TriggerData.player = nullptr;
 }
 
 int button::GetLevelID() const

@@ -275,6 +275,7 @@ extern void UiTrackUnit();
 
 //Wyrmgus start
 extern bool IsMouseLeftButtonPressed();
+extern int GetCurrentButtonValue();
 extern std::string GetCurrentButtonValueStr();
 //Wyrmgus end
 

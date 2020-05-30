@@ -590,6 +590,20 @@ static stratagus::faction **Str2FactionRef(lua_State *l, const char *s)
 }
 //Wyrmgus end
 
+static const CPlayer **Str2PlayerRef(lua_State *l, const char *s)
+{
+	const CPlayer **res = nullptr; // Result.
+
+	Assert(l);
+	if (!strcmp(s, "Player")) {
+		res = &TriggerData.player;
+	} else {
+		LuaError(l, "Invalid type reference '%s'\n" _C_ s);
+	}
+	Assert(res); // Must check for error.
+	return res;
+}
+
 /**
 **  Return unit referernce definition.
 **
@@ -694,6 +708,19 @@ stratagus::faction **CclParseFactionDesc(lua_State *l)
 }
 //Wyrmgus end
 
+const CPlayer **CclParsePlayerDesc(lua_State *l)
+{
+	const CPlayer **res = nullptr;
+
+	if (lua_isstring(l, -1)) {
+		res = Str2PlayerRef(l, LuaToString(l, -1));
+		lua_pop(l, 1);
+	} else {
+		LuaError(l, "Parse Error in ParseFaction\n");
+	}
+	return res;
+}
+
 /**
 **  Add a Lua handler
 **
@@ -770,38 +797,40 @@ static std::string CallLuaStringFunction(unsigned int handler)
 **
 **  @return  Returning value (only integer).
 */
-static int GetPlayerData(const int player, const char *prop, const char *arg)
+static int GetPlayerData(const int player_index, const char *prop, const char *arg)
 {
+	const CPlayer *player = CPlayer::Players[player_index];
+
 	if (!strcmp(prop, "RaceName")) {
-		return CPlayer::Players[player]->Race;
+		return player->Race;
 	} else if (!strcmp(prop, "Resources")) {
 		const int resId = GetResourceIdByName(arg);
 		if (resId == -1) {
 			fprintf(stderr, "Invalid resource \"%s\"", arg);
 			Exit(1);
 		}
-		return CPlayer::Players[player]->Resources[resId] + CPlayer::Players[player]->StoredResources[resId];
+		return player->Resources[resId] + player->StoredResources[resId];
 	} else if (!strcmp(prop, "StoredResources")) {
 		const int resId = GetResourceIdByName(arg);
 		if (resId == -1) {
 			fprintf(stderr, "Invalid resource \"%s\"", arg);
 			Exit(1);
 		}
-		return CPlayer::Players[player]->StoredResources[resId];
+		return player->StoredResources[resId];
 	} else if (!strcmp(prop, "MaxResources")) {
 		const int resId = GetResourceIdByName(arg);
 		if (resId == -1) {
 			fprintf(stderr, "Invalid resource \"%s\"", arg);
 			Exit(1);
 		}
-		return CPlayer::Players[player]->MaxResources[resId];
+		return player->MaxResources[resId];
 	} else if (!strcmp(prop, "Incomes")) {
 		const int resId = GetResourceIdByName(arg);
 		if (resId == -1) {
 			fprintf(stderr, "Invalid resource \"%s\"", arg);
 			Exit(1);
 		}
-		return CPlayer::Players[player]->Incomes[resId];
+		return player->Incomes[resId];
 		//Wyrmgus start
 	} else if (!strcmp(prop, "Prices")) {
 		const int resId = GetResourceIdByName(arg);
@@ -809,96 +838,106 @@ static int GetPlayerData(const int player, const char *prop, const char *arg)
 			fprintf(stderr, "Invalid resource \"%s\"", arg);
 			Exit(1);
 		}
-		return CPlayer::Players[player]->GetResourcePrice(resId);
+		return player->GetResourcePrice(resId);
 	} else if (!strcmp(prop, "ResourceDemand")) {
 		const int resId = GetResourceIdByName(arg);
 		if (resId == -1) {
 			fprintf(stderr, "Invalid resource \"%s\"", arg);
 			Exit(1);
 		}
-		return CPlayer::Players[player]->ResourceDemand[resId];
+		return player->ResourceDemand[resId];
 	} else if (!strcmp(prop, "StoredResourceDemand")) {
 		const int resId = GetResourceIdByName(arg);
 		if (resId == -1) {
 			fprintf(stderr, "Invalid resource \"%s\"", arg);
 			Exit(1);
 		}
-		return CPlayer::Players[player]->StoredResourceDemand[resId];
+		return player->StoredResourceDemand[resId];
 	} else if (!strcmp(prop, "EffectiveResourceDemand")) {
 		const int resId = GetResourceIdByName(arg);
 		if (resId == -1) {
 			fprintf(stderr, "Invalid resource \"%s\"", arg);
 			Exit(1);
 		}
-		return CPlayer::Players[player]->GetEffectiveResourceDemand(resId);
+		return player->GetEffectiveResourceDemand(resId);
 	} else if (!strcmp(prop, "EffectiveResourceBuyPrice")) {
 		const int resId = GetResourceIdByName(arg);
 		if (resId == -1) {
 			fprintf(stderr, "Invalid resource \"%s\"", arg);
 			Exit(1);
 		}
-		return CPlayer::Players[player]->GetEffectiveResourceBuyPrice(resId);
+		return player->GetEffectiveResourceBuyPrice(resId);
 	} else if (!strcmp(prop, "EffectiveResourceSellPrice")) {
 		const int resId = GetResourceIdByName(arg);
 		if (resId == -1) {
 			fprintf(stderr, "Invalid resource \"%s\"", arg);
 			Exit(1);
 		}
-		return CPlayer::Players[player]->GetEffectiveResourceSellPrice(resId);
+		return player->GetEffectiveResourceSellPrice(resId);
 	} else if (!strcmp(prop, "TradeCost")) {
-		return CPlayer::Players[player]->TradeCost;
+		return player->TradeCost;
 		//Wyrmgus end
 	} else if (!strcmp(prop, "UnitTypesCount")) {
 		const std::string unit(arg);
 		stratagus::unit_type *type = stratagus::unit_type::get(unit);
-		return CPlayer::Players[player]->GetUnitTypeCount(type);
+		return player->GetUnitTypeCount(type);
 	} else if (!strcmp(prop, "UnitTypesUnderConstructionCount")) {
 		const std::string unit(arg);
 		stratagus::unit_type *type = stratagus::unit_type::get(unit);
-		return CPlayer::Players[player]->GetUnitTypeUnderConstructionCount(type);
+		return player->GetUnitTypeUnderConstructionCount(type);
 	} else if (!strcmp(prop, "UnitTypesAiActiveCount")) {
 		const std::string unit(arg);
 		stratagus::unit_type *type = stratagus::unit_type::get(unit);
-		return CPlayer::Players[player]->GetUnitTypeAiActiveCount(type);
+		return player->GetUnitTypeAiActiveCount(type);
 	} else if (!strcmp(prop, "AiEnabled")) {
-		return CPlayer::Players[player]->AiEnabled;
+		return player->AiEnabled;
 	} else if (!strcmp(prop, "TotalNumUnits")) {
-		return CPlayer::Players[player]->GetUnitCount();
+		return player->GetUnitCount();
 	} else if (!strcmp(prop, "NumBuildings")) {
-		return CPlayer::Players[player]->NumBuildings;
+		return player->NumBuildings;
 		//Wyrmgus start
 	} else if (!strcmp(prop, "NumBuildingsUnderConstruction")) {
-		return CPlayer::Players[player]->NumBuildingsUnderConstruction;
+		return player->NumBuildingsUnderConstruction;
 		//Wyrmgus end
 	} else if (!strcmp(prop, "Supply")) {
-		return CPlayer::Players[player]->Supply;
+		return player->Supply;
 	} else if (!strcmp(prop, "Demand")) {
-		return CPlayer::Players[player]->Demand;
+		return player->Demand;
 	} else if (!strcmp(prop, "UnitLimit")) {
-		return CPlayer::Players[player]->UnitLimit;
+		return player->UnitLimit;
 	} else if (!strcmp(prop, "BuildingLimit")) {
-		return CPlayer::Players[player]->BuildingLimit;
+		return player->BuildingLimit;
 	} else if (!strcmp(prop, "TotalUnitLimit")) {
-		return CPlayer::Players[player]->TotalUnitLimit;
+		return player->TotalUnitLimit;
 	} else if (!strcmp(prop, "Score")) {
-		return CPlayer::Players[player]->Score;
+		return player->Score;
 	} else if (!strcmp(prop, "TotalUnits")) {
-		return CPlayer::Players[player]->TotalUnits;
+		return player->TotalUnits;
 	} else if (!strcmp(prop, "TotalBuildings")) {
-		return CPlayer::Players[player]->TotalBuildings;
+		return player->TotalBuildings;
 	} else if (!strcmp(prop, "TotalResources")) {
 		const int resId = GetResourceIdByName(arg);
 		if (resId == -1) {
 			fprintf(stderr, "Invalid resource \"%s\"", arg);
 			Exit(1);
 		}
-		return CPlayer::Players[player]->TotalResources[resId];
+		return player->TotalResources[resId];
 	} else if (!strcmp(prop, "TotalRazings")) {
-		return CPlayer::Players[player]->TotalRazings;
+		return player->TotalRazings;
 	} else if (!strcmp(prop, "TotalKills")) {
-		return CPlayer::Players[player]->TotalKills;
+		return player->TotalKills;
 	} else if (!strcmp(prop, "Population")) {
-		return CPlayer::Players[player]->get_population();
+		return player->get_population();
+	} else if (!strcmp(prop, "Overlord")) {
+		if (player->get_overlord() != nullptr) {
+			return player->get_overlord()->Index;
+		}
+		return -1;
+	} else if (!strcmp(prop, "TopOverlord")) {
+		if (player->get_overlord() != nullptr) {
+			return player->get_top_overlord()->Index;
+		}
+		return -1;
 	} else {
 		fprintf(stderr, "Invalid field: %s" _C_ prop);
 		Exit(1);
@@ -1095,6 +1134,9 @@ NumberDesc *CclParseNumberDesc(lua_State *l)
 			res->e = ENumber_TypeTrainQuantity;
 			res->D.Type = CclParseTypeDesc(l);
 		//Wyrmgus end
+		} else if (!strcmp(key, "ButtonPlayer")) {
+			res->e = ENumber_ButtonPlayer;
+			res->D.player = CclParsePlayerDesc(l);
 		} else {
 			lua_pop(l, 1);
 			LuaError(l, "unknown condition '%s'" _C_ key);
@@ -1449,6 +1491,12 @@ int EvalNumber(const NumberDesc *number)
 				return 0;
 			}
 		//Wyrmgus end
+		case ENumber_ButtonPlayer: // name of the unit type's class
+			if (number->D.player != nullptr) {
+				return (**number->D.player).Index;
+			} else { // ERROR.
+				return 0;
+			}
 		case ENumber_PlayerData : // getplayerdata(player, data, res);
 			int player = EvalNumber(number->D.PlayerData.Player);
 			std::string data = EvalString(number->D.PlayerData.DataType);
@@ -1914,7 +1962,12 @@ std::string EvalString(const StringDesc *s)
 				return res;
 			}
 		case EString_PlayerName : // player name
-			return std::string(CPlayer::Players[EvalNumber(s->D.PlayerName)]->Name);
+			const int player_index = EvalNumber(s->D.PlayerName);
+			try {
+				return CPlayer::Players.at(player_index)->Name;
+			} catch (...) {
+				std::throw_with_nested(std::runtime_error("Error getting the player name for index " + std::to_string(player_index) + "."));
+			}
 	}
 	return std::string("");
 }
@@ -2004,6 +2057,9 @@ void FreeNumberDesc(NumberDesc *number)
 		//Wyrmgus start
 		case ENumber_TypeTrainQuantity : // Class of the unit type
 			delete *number->D.Type;
+			break;
+		case ENumber_ButtonPlayer: // Class of the unit type
+			delete *number->D.player;
 			break;
 		//Wyrmgus end
 	}
@@ -2890,6 +2946,11 @@ static int CclFactionCoreSettlements(lua_State *l)
 	return Alias(l, "FactionCoreSettlements");
 }
 
+static int CclButtonPlayer(lua_State *l)
+{
+	return Alias(l, "ButtonPlayer");
+}
+
 /**
 **  Return equivalent lua table for ResourceIdent.
 **  {"ResourceIdent", {}}
@@ -3142,6 +3203,7 @@ static void AliasRegister()
 	lua_register(Lua, "FactionCivilization", CclFactionCivilization);
 	lua_register(Lua, "FactionType", CclFactionType);
 	lua_register(Lua, "FactionCoreSettlements", CclFactionCoreSettlements);
+	lua_register(Lua, "ButtonPlayer", CclButtonPlayer);
 	lua_register(Lua, "ResourceIdent", CclResourceIdent);
 	lua_register(Lua, "ResourceName", CclResourceName);
 	lua_register(Lua, "ResourceConversionRates", CclResourceConversionRates);

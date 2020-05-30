@@ -632,6 +632,16 @@ bool IsMouseLeftButtonPressed()
 	return (MouseButtons & LeftButton) ? true : false;
 }
 
+int GetCurrentButtonValue()
+{
+	
+	if (CurrentButtons.empty()) {
+		return 0;
+	}
+	
+	return CurrentButtons[ButtonUnderCursor]->Value;
+}
+
 std::string GetCurrentButtonValueStr()
 {
 	

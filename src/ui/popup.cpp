@@ -739,6 +739,10 @@ static PopupConditionPanel *ParsePopupConditions(lua_State *l)
 		} else if (!strcmp(key, "BuildingRulesString")) {
 			condition->BuildingRulesString = Ccl2Condition(l, LuaToString(l, -1));
 		//Wyrmgus end
+		} else if (!strcmp(key, "Overlord")) {
+			condition->Overlord = Ccl2Condition(l, LuaToString(l, -1));
+		} else if (!strcmp(key, "TopOverlord")) {
+			condition->TopOverlord = Ccl2Condition(l, LuaToString(l, -1));
 		} else {
 			int index = UnitTypeVar.BoolFlagNameLookup[key];
 			if (index != -1) {
