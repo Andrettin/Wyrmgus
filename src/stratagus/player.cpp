@@ -1307,17 +1307,8 @@ void CPlayer::SetFaction(const stratagus::faction *faction)
 
 		this->player_color = player_color;
 
-		//update the borders on the minimap for the new color
-		for (const auto &kv_pair : this->UnitsByType) {
-			const stratagus::unit_type *unit_type = kv_pair.first;
-			if (!unit_type->BoolFlag[TOWNHALL_INDEX].value) {
-				continue;
-			}
-
-			for (const CUnit *town_hall : kv_pair.second) {
-				town_hall->settlement->update_minimap_territory();
-			}
-		}
+		//update the territory on the minimap for the new color
+		this->update_minimap_territory();
 
 		if (!stratagus::faction::get_all()[this->Faction]->FactionUpgrade.empty()) {
 			CUpgrade *faction_upgrade = CUpgrade::try_get(stratagus::faction::get_all()[this->Faction]->FactionUpgrade);
@@ -1580,6 +1571,20 @@ int CPlayer::get_player_color_usage_count(const stratagus::player_color *player_
 	}
 
 	return count;
+}
+
+void CPlayer::update_minimap_territory()
+{
+	for (const auto &kv_pair : this->UnitsByType) {
+		const stratagus::unit_type *unit_type = kv_pair.first;
+		if (!unit_type->BoolFlag[TOWNHALL_INDEX].value) {
+			continue;
+		}
+
+		for (const CUnit *town_hall : kv_pair.second) {
+			town_hall->settlement->update_minimap_territory();
+		}
+	}
 }
 
 stratagus::unit_type *CPlayer::get_class_unit_type(const stratagus::unit_class *unit_class) const
@@ -4091,6 +4096,10 @@ void CPlayer::set_overlord(CPlayer *player)
 		return;
 	}
 
+	if (player->get_overlord() == this) {
+		throw std::runtime_error("Cannot set player \"" + player->Name + "\" as the overlord of \"" + this->Name + "\", as the former is a vassal of the latter, and a vassal can't be the overlord of its own overlord.");
+	}
+
 	if (this->get_overlord() != nullptr) {
 		stratagus::vector::remove(get_overlord()->vassals, this);
 	}
@@ -4108,6 +4117,8 @@ void CPlayer::set_overlord(CPlayer *player)
 			CommandSharedVision(player->Index, true, this->Index);
 		}
 	}
+
+	this->update_minimap_territory();
 }
 
 /**

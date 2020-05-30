@@ -254,6 +254,7 @@ public:
 	CCurrency *GetCurrency() const;
 	void ShareUpgradeProgress(CPlayer &player, CUnit &unit);
 	int get_player_color_usage_count(const stratagus::player_color *player_color) const;
+	void update_minimap_territory();
 
 	stratagus::unit_type *get_class_unit_type(const stratagus::unit_class *unit_class) const;
 	CUpgrade *get_class_upgrade(const stratagus::upgrade_class *upgrade_class) const;
@@ -488,6 +489,8 @@ public:
 		return this->overlord;
 	}
 
+	void set_overlord(CPlayer *player);
+
 	CPlayer *get_top_overlord() const
 	{
 		if (this->get_overlord() != nullptr && this->get_overlord()->get_overlord() != nullptr) {
@@ -497,7 +500,25 @@ public:
 		return this->get_overlord();
 	}
 
-	void set_overlord(CPlayer *player);
+	CPlayer *get_tier_overlord(const int tier) const
+	{
+		if (tier == 0) {
+			return nullptr;
+		} else if (tier == 1) {
+			return this->get_overlord();
+		} else {
+			return this->get_overlord()->get_tier_overlord(tier - 1);
+		}
+	}
+
+	int get_overlord_depth() const
+	{
+		if (this->get_overlord() != nullptr) {
+			return this->get_overlord()->get_overlord_depth() + 1;
+		}
+
+		return 0;
+	}
 
 	const std::vector<CPlayer *> &get_vassals() const
 	{
