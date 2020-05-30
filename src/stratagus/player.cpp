@@ -4038,11 +4038,9 @@ void CPlayer::SetDiplomacyAlliedWith(const CPlayer &player)
 	this->Enemy &= ~(1 << player.Index);
 	this->Allied |= 1 << player.Index;
 	
-	//Wyrmgus start
 	if (GameCycle > 0 && player.Index == CPlayer::GetThisPlayer()->Index) {
 		CPlayer::GetThisPlayer()->Notify(_("%s changed their diplomatic stance with us to Ally"), _(this->Name.c_str()));
 	}
-	//Wyrmgus end
 }
 
 void CPlayer::SetDiplomacyEnemyWith(CPlayer &player)

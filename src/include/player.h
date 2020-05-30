@@ -475,10 +475,7 @@ public:
 
 	void SetDiplomacyNeutralWith(const CPlayer &player);
 	void SetDiplomacyAlliedWith(const CPlayer &player);
-	//Wyrmgus start
-//	void SetDiplomacyEnemyWith(const CPlayer &player);
 	void SetDiplomacyEnemyWith(CPlayer &player);
-	//Wyrmgus end
 	void SetDiplomacyCrazyWith(const CPlayer &player);
 
 	void ShareVisionWith(const CPlayer &player);
