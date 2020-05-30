@@ -61,7 +61,9 @@ void faction::process_sml_property(const sml_property &property)
 	const std::string &key = property.get_key();
 	const std::string &value = property.get_value();
 
-	if (key == "type") {
+	if (key == "adjective") {
+		this->Adjective = value;
+	} else if (key == "type") {
 		const int faction_type = GetFactionTypeIdByName(value);
 		if (faction_type != -1) {
 			this->Type = faction_type;
