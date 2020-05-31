@@ -30,7 +30,8 @@
 #include "faction.h"
 
 #include "civilization.h"
-#include "grand_strategy.h" //for the faction tier string to enum conversion
+#include "diplomacy_state.h"
+#include "faction_tier.h"
 #include "luacallback.h"
 #include "player_color.h"
 #include "unit/unit_type.h"
@@ -38,6 +39,11 @@
 #include "util/vector_util.h"
 
 namespace stratagus {
+
+faction::faction(const std::string &identifier)
+	: detailed_data_entry(identifier), default_tier(faction_tier::barony), tier(faction_tier::barony)
+{
+}
 
 faction::~faction()
 {
@@ -71,7 +77,7 @@ void faction::process_sml_property(const sml_property &property)
 			throw std::runtime_error("Faction type \"" + value + "\" doesn't exist.");
 		}
 	} else if (key == "default_tier") {
-		const faction_tier tier = GetFactionTierIdByName(value);
+		const faction_tier tier = string_to_faction_tier(value);
 		if (tier != faction_tier::none) {
 			this->default_tier = tier;
 		} else {
@@ -133,7 +139,7 @@ void faction::process_sml_dated_scope(const sml_data &scope, const QDateTime &da
 			if (key == "faction") {
 				other_faction = faction::get(value);
 			} else if (key == "state") {
-				state = GetDiplomacyStateIdByName(value);
+				state = string_to_diplomacy_state(value);
 			} else {
 				throw std::runtime_error("Invalid diplomacy state property: \"" + key + "\".");
 			}

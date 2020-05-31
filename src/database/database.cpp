@@ -43,6 +43,7 @@
 #include "database/sml_property.h"
 #include "dialogue.h"
 #include "faction.h"
+#include "faction_tier.h"
 #include "gender.h"
 #include "item_class.h"
 #include "item_slot.h"
@@ -199,6 +200,8 @@ QVariant database::process_sml_property_value(const sml_property &property, cons
 			new_property_value = QVariant::fromValue(dialogue::get(property.get_value()));
 		} else if (property_class_name == "stratagus::faction*") {
 			new_property_value = QVariant::fromValue(faction::get(property.get_value()));
+		} else if (property_class_name == "stratagus::faction_tier") {
+			new_property_value = QVariant::fromValue(string_to_faction_tier(property.get_value()));
 		} else if (property_class_name == "stratagus::gender") {
 			new_property_value = QVariant::fromValue(string_to_gender(property.get_value()));
 		} else if (property_class_name == "stratagus::icon*") {

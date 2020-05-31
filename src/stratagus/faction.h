@@ -30,6 +30,7 @@
 #include "character.h" //for MaxCharacterTitles
 #include "database/data_type.h"
 #include "database/detailed_data_entry.h"
+#include "faction_tier.h"
 #include "gender.h"
 #include "player.h" //for certain enums
 
@@ -52,14 +53,17 @@ class resource;
 class unit_class;
 class unit_type;
 class upgrade_class;
+enum class diplomacy_state;
+enum class faction_tier;
 
-class faction : public detailed_data_entry, public data_type<faction>
+class faction final : public detailed_data_entry, public data_type<faction>
 {
 	Q_OBJECT
 
 	Q_PROPERTY(stratagus::civilization* civilization MEMBER civilization READ get_civilization)
 	Q_PROPERTY(stratagus::icon* icon MEMBER icon READ get_icon)
 	Q_PROPERTY(stratagus::player_color* color MEMBER color READ get_color)
+	Q_PROPERTY(stratagus::faction_tier tier MEMBER tier READ get_tier)
 	Q_PROPERTY(QVariantList acquired_upgrades READ get_acquired_upgrades_qstring_list)
 
 public:
@@ -73,10 +77,7 @@ public:
 		return faction;
 	}
 
-	explicit faction(const std::string &identifier) : detailed_data_entry(identifier)
-	{
-	}
-
+	explicit faction(const std::string &identifier);
 	~faction();
 
 	virtual void process_sml_property(const sml_property &property) override;
@@ -87,6 +88,7 @@ public:
 
 	virtual void reset_history() override
 	{
+		this->tier = this->get_default_tier();
 		this->resources.clear();
 		this->diplomacy_states.clear();
 		this->acquired_upgrades.clear();
@@ -176,6 +178,11 @@ public:
 		this->characters.push_back(character);
 	}
 
+	faction_tier get_tier() const
+	{
+		return this->tier;
+	}
+
 	const std::map<const resource *, int> &get_resources() const
 	{
 		return this->resources;
@@ -209,7 +216,7 @@ private:
 public:
 	int Type = FactionTypeNoFactionType;								/// faction type (i.e. tribe or polity)
 private:
-	faction_tier default_tier = faction_tier::barony;					/// default faction tier
+	faction_tier default_tier;
 public:
 	int DefaultGovernmentType = GovernmentTypeMonarchy;					/// default government type
 	int ParentFaction = -1;												/// parent faction of this faction
@@ -251,6 +258,7 @@ public:
 	std::map<int, faction_tier> HistoricalTiers; /// dates in which this faction's tier changed; faction tier mapped to year
 	std::map<int, int> HistoricalGovernmentTypes;						/// dates in which this faction's government type changed; government type mapped to year
 private:
+	faction_tier tier;
 	std::map<const resource *, int> resources;
 	std::map<const faction *, diplomacy_state> diplomacy_states;
 	std::vector<CUpgrade *> acquired_upgrades;

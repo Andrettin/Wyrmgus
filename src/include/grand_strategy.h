@@ -29,10 +29,7 @@
 
 #pragma once
 
-/*----------------------------------------------------------------------------
---  Includes
-----------------------------------------------------------------------------*/
-
+#include "faction_tier.h"
 #include "map/map.h"
 #include "province.h"
 #include "character.h"
@@ -41,10 +38,6 @@
 #include "player.h"
 #include "upgrade/upgrade_structs.h"
 
-/*----------------------------------------------------------------------------
---  Declarations
-----------------------------------------------------------------------------*/
-
 static constexpr int BasePopulationGrowthPermyriad = 12; /// Base population growth per 10,000
 static constexpr int FoodConsumptionPerWorker = 100;
 
@@ -52,11 +45,11 @@ class CGrandStrategyProvince;
 class CGrandStrategyFaction;
 class CGrandStrategyHero;
 class LuaCallback;
-enum class diplomacy_state;
 
 namespace stratagus {
 	class unit_class;
 	class world;
+	enum class diplomacy_state;
 }
 
 class GrandStrategyWorldMapTile : public WorldMapTile
@@ -154,7 +147,7 @@ class CGrandStrategyFaction
 {
 public:
 	CGrandStrategyFaction() :
-		Faction(-1), civilization(-1), FactionTier(faction_tier::barony), GovernmentType(GovernmentTypeMonarchy), Capital(nullptr)
+		Faction(-1), civilization(-1), FactionTier(stratagus::faction_tier::barony), GovernmentType(GovernmentTypeMonarchy), Capital(nullptr)
 	{
 		memset(Technologies, 0, sizeof(Technologies));
 		memset(Resources, 0, sizeof(Resources));
@@ -177,22 +170,22 @@ public:
 	std::string GetFullName();
 	CGrandStrategyProvince *GetRandomProvinceWeightedByPopulation();
 	
-	int Faction;														/// The faction's ID (-1 = none).
-	int civilization;													/// Civilization of the faction (-1 = none).
-	int GovernmentType;													/// Government type of the faction (-1 = none).
-	faction_tier FactionTier;													/// What is the tier of this faction (barony, etc.).
-	CGrandStrategyProvince *Capital;									/// Capital province of this faction
-	bool Technologies[UpgradeMax];										/// Whether a faction has a particular technology or not
-	std::vector<int> OwnedProvinces;									/// Provinces owned by this faction
-	int Resources[MaxCosts];											/// Amount of each resource stored by the faction.
-	int Income[MaxCosts];												/// Income of each resource for the faction.
-	int ProductionEfficiencyModifier[MaxCosts];							/// Efficiency modifier for each resource.
-	int Trade[MaxCosts];												/// How much of each resource the faction wants to trade; negative values are imports and positive ones exports
+	int Faction;												/// The faction's ID (-1 = none).
+	int civilization;											/// Civilization of the faction (-1 = none).
+	int GovernmentType;											/// Government type of the faction (-1 = none).
+	stratagus::faction_tier FactionTier;						/// What is the tier of this faction (barony, etc.).
+	CGrandStrategyProvince *Capital;							/// Capital province of this faction
+	bool Technologies[UpgradeMax];								/// Whether a faction has a particular technology or not
+	std::vector<int> OwnedProvinces;							/// Provinces owned by this faction
+	int Resources[MaxCosts];									/// Amount of each resource stored by the faction.
+	int Income[MaxCosts];										/// Income of each resource for the faction.
+	int ProductionEfficiencyModifier[MaxCosts];					/// Efficiency modifier for each resource.
+	int Trade[MaxCosts]; /// How much of each resource the faction wants to trade; negative values are imports and positive ones exports
 	int MilitaryScoreBonus[UnitTypeMax];
-	CGrandStrategyHero *Ministers[MaxCharacterTitles];					/// Ministers of the faction
-	std::vector<CGrandStrategyProvince *> Claims;						/// Provinces which this faction claims
-	std::vector<CGrandStrategyHero *> HistoricalMinisters[MaxCharacterTitles];	/// All characters who had a ministerial (or head of state or government) title in this faction
-	std::map<CUpgrade *, int> HistoricalTechnologies;					/// historical technologies of the faction, with the year of discovery
+	CGrandStrategyHero *Ministers[MaxCharacterTitles];			/// Ministers of the faction
+	std::vector<CGrandStrategyProvince *> Claims;				/// Provinces which this faction claims
+	std::vector<CGrandStrategyHero *> HistoricalMinisters[MaxCharacterTitles]; /// All characters who had a ministerial (or head of state or government) title in this faction
+	std::map<CUpgrade *, int> HistoricalTechnologies; /// historical technologies of the faction, with the year of discovery
 };
 
 class CGrandStrategyHero : public stratagus::character
@@ -309,9 +302,6 @@ extern std::map<std::string, CGrandStrategyEvent *> GrandStrategyEventStringToPo
 -- Functions
 ----------------------------------------------------------------------------*/
 
-extern diplomacy_state GetDiplomacyStateIdByName(const std::string &diplomacy_state);
-extern std::string GetFactionTierNameById(const faction_tier tier);
-extern faction_tier GetFactionTierIdByName(const std::string &tier);
 extern int GetProvinceId(std::string province_name);
 extern void SetProvinceOwner(std::string province_name, std::string civilization_name, std::string faction_name);
 extern void SetProvinceSettlementBuilding(std::string province_name, std::string settlement_building_ident, bool has_settlement_building);

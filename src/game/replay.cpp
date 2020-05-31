@@ -26,16 +26,13 @@
 //      02111-1307, USA.
 //
 
-//----------------------------------------------------------------------------
-// Includes
-//----------------------------------------------------------------------------
-
 #include "stratagus.h"
 
 #include "replay.h"
 
 #include "actions.h"
 #include "commands.h"
+#include "diplomacy_state.h"
 #include "game.h"
 #include "iocompat.h"
 #include "iolib.h"
@@ -971,19 +968,19 @@ static void DoNextReplay()
 		SendCommandBuyResource(*unit, arg1, num);
 	//Wyrmgus end
 	} else if (!strcmp(action, "diplomacy")) {
-		diplomacy_state state;
+		stratagus::diplomacy_state state;
 		if (!strcmp(val, "neutral")) {
-			state = diplomacy_state::neutral;
+			state = stratagus::diplomacy_state::neutral;
 		} else if (!strcmp(val, "allied")) {
-			state = diplomacy_state::allied;
+			state = stratagus::diplomacy_state::allied;
 		} else if (!strcmp(val, "enemy")) {
-			state = diplomacy_state::enemy;
+			state = stratagus::diplomacy_state::enemy;
 		} else if (!strcmp(val, "overlord")) {
-			state = diplomacy_state::overlord;
+			state = stratagus::diplomacy_state::overlord;
 		} else if (!strcmp(val, "vassal")) {
-			state = diplomacy_state::vassal;
+			state = stratagus::diplomacy_state::vassal;
 		} else if (!strcmp(val, "crazy")) {
-			state = diplomacy_state::crazy;
+			state = stratagus::diplomacy_state::crazy;
 		} else {
 			throw std::runtime_error("Invalid diplomacy command: " + std::string(val));
 		}

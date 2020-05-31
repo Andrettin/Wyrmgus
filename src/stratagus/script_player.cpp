@@ -39,14 +39,13 @@
 #include "civilization_group.h"
 #include "commands.h"
 #include "currency.h"
-//Wyrmgus start
+#include "diplomacy_state.h"
 #include "editor.h"
 #include "faction.h"
 #include "font.h"
 #include "grand_strategy.h"
 #include "item.h"
 #include "luacallback.h"
-//Wyrmgus end
 #include "map/map.h"
 #include "map/site.h"
 #include "plane.h"
@@ -640,19 +639,17 @@ static int CclSetDiplomacy(lua_State *l)
 	const char *state = LuaToString(l, 2);
 
 	if (!strcmp(state, "allied")) {
-		SendCommandDiplomacy(base, diplomacy_state::allied, plynr);
+		SendCommandDiplomacy(base, stratagus::diplomacy_state::allied, plynr);
 	} else if (!strcmp(state, "neutral")) {
-		SendCommandDiplomacy(base, diplomacy_state::neutral, plynr);
+		SendCommandDiplomacy(base, stratagus::diplomacy_state::neutral, plynr);
 	} else if (!strcmp(state, "crazy")) {
-		SendCommandDiplomacy(base, diplomacy_state::crazy, plynr);
+		SendCommandDiplomacy(base, stratagus::diplomacy_state::crazy, plynr);
 	} else if (!strcmp(state, "enemy")) {
-		SendCommandDiplomacy(base, diplomacy_state::enemy, plynr);
-	//Wyrmgus start
+		SendCommandDiplomacy(base, stratagus::diplomacy_state::enemy, plynr);
 	} else if (!strcmp(state, "overlord")) {
-		SendCommandDiplomacy(base, diplomacy_state::overlord, plynr);
+		SendCommandDiplomacy(base, stratagus::diplomacy_state::overlord, plynr);
 	} else if (!strcmp(state, "vassal")) {
-		SendCommandDiplomacy(base, diplomacy_state::vassal, plynr);
-	//Wyrmgus end
+		SendCommandDiplomacy(base, stratagus::diplomacy_state::vassal, plynr);
 	}
 	return 0;
 }
@@ -979,7 +976,7 @@ static int CclDefineCivilization(lua_State *l)
 				++k;
 				int government_type = GetGovernmentTypeIdByName(LuaToString(l, -1, k + 1));
 				++k;
-				const faction_tier tier = GetFactionTierIdByName(LuaToString(l, -1, k + 1));
+				const stratagus::faction_tier tier = stratagus::string_to_faction_tier(LuaToString(l, -1, k + 1));
 				++k;
 				civilization->MinisterTitles[title][static_cast<int>(gender)][government_type][static_cast<int>(tier)] = LuaToString(l, -1, k + 1);
 			}
@@ -1609,8 +1606,8 @@ static int CclDefineFaction(lua_State *l)
 			faction->color = stratagus::player_color::get(LuaToString(l, -1));
 		} else if (!strcmp(value, "DefaultTier")) {
 			std::string faction_tier_name = LuaToString(l, -1);
-			const faction_tier tier = GetFactionTierIdByName(faction_tier_name);
-			if (tier != faction_tier::none) {
+			const stratagus::faction_tier tier = stratagus::string_to_faction_tier(faction_tier_name);
+			if (tier != stratagus::faction_tier::none) {
 				faction->default_tier = tier;
 			} else {
 				LuaError(l, "Faction tier \"%s\" doesn't exist." _C_ faction_tier_name.c_str());
@@ -1664,7 +1661,7 @@ static int CclDefineFaction(lua_State *l)
 			for (int k = 0; k < subargs; ++k) {
 				int government_type = GetGovernmentTypeIdByName(LuaToString(l, -1, k + 1));
 				++k;
-				const faction_tier tier = GetFactionTierIdByName(LuaToString(l, -1, k + 1));
+				const stratagus::faction_tier tier = stratagus::string_to_faction_tier(LuaToString(l, -1, k + 1));
 				++k;
 				faction->Titles[government_type][static_cast<int>(tier)] = LuaToString(l, -1, k + 1);
 			}
@@ -1680,7 +1677,7 @@ static int CclDefineFaction(lua_State *l)
 				++k;
 				int government_type = GetGovernmentTypeIdByName(LuaToString(l, -1, k + 1));
 				++k;
-				const faction_tier tier = GetFactionTierIdByName(LuaToString(l, -1, k + 1));
+				const stratagus::faction_tier tier = stratagus::string_to_faction_tier(LuaToString(l, -1, k + 1));
 				++k;
 				faction->MinisterTitles[title][static_cast<int>(gender)][government_type][static_cast<int>(tier)] = LuaToString(l, -1, k + 1);
 			}
@@ -1848,8 +1845,8 @@ static int CclDefineFaction(lua_State *l)
 				int year = LuaToNumber(l, -1, j + 1);
 				++j;
 				std::string faction_tier_name = LuaToString(l, -1, j + 1);
-				const faction_tier tier = GetFactionTierIdByName(faction_tier_name);
-				if (tier == faction_tier::none) {
+				const stratagus::faction_tier tier = stratagus::string_to_faction_tier(faction_tier_name);
+				if (tier == stratagus::faction_tier::none) {
 					LuaError(l, "Faction tier \"%s\" doesn't exist." _C_ faction_tier_name.c_str());
 				}
 				faction->HistoricalTiers[year] = tier;
@@ -1886,7 +1883,7 @@ static int CclDefineFaction(lua_State *l)
 				++j;
 
 				std::string diplomacy_state_name = LuaToString(l, -1, j + 1);
-				const diplomacy_state diplomacy_state = GetDiplomacyStateIdByName(diplomacy_state_name);
+				const stratagus::diplomacy_state diplomacy_state = stratagus::string_to_diplomacy_state(diplomacy_state_name);
 				faction->HistoricalDiplomacyStates[std::pair<CDate, stratagus::faction *>(date, diplomacy_state_faction)] = diplomacy_state;
 			}
 		} else if (!strcmp(value, "HistoricalResources")) {

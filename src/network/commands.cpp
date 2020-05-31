@@ -27,15 +27,12 @@
 //      02111-1307, USA.
 //
 
-/*----------------------------------------------------------------------------
---  Includes
-----------------------------------------------------------------------------*/
-
 #include "stratagus.h"
 
 #include "commands.h"
 
 #include "actions.h"
+#include "diplomacy_state.h"
 #include "faction.h"
 //Wyrmgus start
 #include "map/map.h" //it contains map width and height
@@ -720,31 +717,31 @@ void SendCommandAutoSpellCast(CUnit &unit, int spellid, int on)
 ** @param state      New diplomacy state.
 ** @param opponent   Opponent.
 */
-void SendCommandDiplomacy(const int player, const diplomacy_state state, const int opponent)
+void SendCommandDiplomacy(const int player, const stratagus::diplomacy_state state, const int opponent)
 {
 	if (!IsNetworkGame()) {
 		switch (state) {
-			case diplomacy_state::neutral:
+			case stratagus::diplomacy_state::neutral:
 				CommandLog("diplomacy", NoUnitP, 0, player, opponent,
 						   NoUnitP, "neutral", -1);
 				break;
-			case diplomacy_state::allied:
+			case stratagus::diplomacy_state::allied:
 				CommandLog("diplomacy", NoUnitP, 0, player, opponent,
 						   NoUnitP, "allied", -1);
 				break;
-			case diplomacy_state::enemy:
+			case stratagus::diplomacy_state::enemy:
 				CommandLog("diplomacy", NoUnitP, 0, player, opponent,
 						   NoUnitP, "enemy", -1);
 				break;
-			case diplomacy_state::overlord:
+			case stratagus::diplomacy_state::overlord:
 				CommandLog("diplomacy", NoUnitP, 0, player, opponent,
 						   NoUnitP, "overlord", -1);
 				break;
-			case diplomacy_state::vassal:
+			case stratagus::diplomacy_state::vassal:
 				CommandLog("diplomacy", NoUnitP, 0, player, opponent,
 						   NoUnitP, "vassal", -1);
 				break;
-			case diplomacy_state::crazy:
+			case stratagus::diplomacy_state::crazy:
 				CommandLog("diplomacy", NoUnitP, 0, player, opponent,
 						   NoUnitP, "crazy", -1);
 				break;
@@ -1115,7 +1112,7 @@ void ExecCommand(unsigned char msgnr, UnitRef unum,
 	}
 }
 
-static const char *GetDiplomacyName(enum class diplomacy_state e)
+static const char *GetDiplomacyName(stratagus::diplomacy_state e)
 {
 	Assert(static_cast<int>(e) < 4);
 	const char *diplomacyNames[] = {"allied", "neutral", "enemy", "crazy"};
@@ -1141,7 +1138,7 @@ void ExecExtendedCommand(unsigned char type, int status,
 
 	switch (type) {
 		case ExtendedMessageDiplomacy: {
-			const diplomacy_state state = static_cast<diplomacy_state>(arg3);
+			const stratagus::diplomacy_state state = static_cast<stratagus::diplomacy_state>(arg3);
 			const char *diplomacyName = GetDiplomacyName(state);
 			CommandLog("diplomacy", NoUnitP, 0, arg2, arg4, NoUnitP, diplomacyName, -1);
 			CommandDiplomacy(arg2, state, arg4);

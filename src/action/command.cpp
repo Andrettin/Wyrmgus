@@ -27,10 +27,6 @@
 //      02111-1307, USA.
 //
 
-/*----------------------------------------------------------------------------
---  Includes
-----------------------------------------------------------------------------*/
-
 #include "stratagus.h"
 
 #include "actions.h"
@@ -39,6 +35,7 @@
 #include "action/action_train.h"
 #include "action/action_upgradeto.h"
 #include "commands.h"
+#include "diplomacy_state.h"
 #include "map/map.h"
 #include "map/map_layer.h"
 #include "map/tileset.h"
@@ -1331,25 +1328,25 @@ void CommandAutoSpellCast(CUnit &unit, int spellid, int on)
 **  @param state     New diplomacy state.
 **  @param opponent  Opponent.
 */
-void CommandDiplomacy(const int player, const diplomacy_state state, const int opponent)
+void CommandDiplomacy(const int player, const stratagus::diplomacy_state state, const int opponent)
 {
 	switch (state) {
-		case diplomacy_state::neutral:
+		case stratagus::diplomacy_state::neutral:
 			CPlayer::Players[player]->SetDiplomacyNeutralWith(*CPlayer::Players[opponent]);
 			break;
-		case diplomacy_state::allied:
+		case stratagus::diplomacy_state::allied:
 			CPlayer::Players[player]->SetDiplomacyAlliedWith(*CPlayer::Players[opponent]);
 			break;
-		case diplomacy_state::enemy:
+		case stratagus::diplomacy_state::enemy:
 			CPlayer::Players[player]->SetDiplomacyEnemyWith(*CPlayer::Players[opponent]);
 			break;
-		case diplomacy_state::overlord:
+		case stratagus::diplomacy_state::overlord:
 			CPlayer::Players[opponent]->set_overlord(CPlayer::Players[player]);
 			break;
-		case diplomacy_state::vassal:
+		case stratagus::diplomacy_state::vassal:
 			CPlayer::Players[player]->set_overlord(CPlayer::Players[opponent]);
 			break;
-		case diplomacy_state::crazy:
+		case stratagus::diplomacy_state::crazy:
 			CPlayer::Players[player]->SetDiplomacyCrazyWith(*CPlayer::Players[opponent]);
 			break;
 	}

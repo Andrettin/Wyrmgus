@@ -835,7 +835,9 @@ set(stratagus_generic_HDRS
 	src/stratagus/civilization_group.h
 	src/stratagus/civilization_supergroup.h
 	src/stratagus/dialogue_option.h
+	src/stratagus/diplomacy_state.h
 	src/stratagus/faction.h
+	src/stratagus/faction_tier.h
 	src/stratagus/gender.h
 	src/stratagus/item_class.h
 	src/stratagus/item_slot.h

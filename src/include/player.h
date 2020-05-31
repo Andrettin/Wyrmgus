@@ -82,17 +82,6 @@ namespace stratagus {
 --  Player type
 ----------------------------------------------------------------------------*/
 
-enum class diplomacy_state {
-	allied,   /// Ally with opponent
-	neutral,  /// Don't attack be neutral
-	enemy,    /// Attack opponent
-	//Wyrmgus start
-	overlord,	/// Become overlord to other player
-	vassal,	/// Become vassal to other player
-	//Wyrmgus end
-	crazy     /// Ally and attack opponent
-}; /// Diplomacy states for CommandDiplomacy
-
 ///  Player structure
 class CPlayer
 {
@@ -555,18 +544,6 @@ enum FactionTypes {
 	FactionTypeTradingCompany,
 	
 	MaxFactionTypes
-};
-
-enum class faction_tier {
-	none,
-	barony,
-	county,
-	duchy,
-	grand_duchy,
-	kingdom,
-	empire,
-	
-	count
 };
 
 enum class ForceType {

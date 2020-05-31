@@ -30,6 +30,7 @@
 #include "character.h" //for MaxCharacterTitles
 #include "civilization_base.h"
 #include "database/data_type.h"
+#include "faction_tier.h"
 #include "gender.h"
 #include "player.h" //for certain enums
 #include "time/date.h"
