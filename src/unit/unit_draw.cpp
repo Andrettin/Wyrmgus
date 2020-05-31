@@ -1226,7 +1226,7 @@ void CUnit::Draw(const CViewport &vp) const
 	}
 	//Wyrmgus start
 	// Adjust sprite for variations.
-	if (variation) {
+	if (variation && variation->get_unit_type() == type) {
 		if (variation->Sprite) {
 			sprite = variation->Sprite;
 		}

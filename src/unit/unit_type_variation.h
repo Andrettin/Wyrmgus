@@ -113,6 +113,11 @@ public:
 	{
 		return this->index;
 	}
+
+	const stratagus::unit_type *get_unit_type() const
+	{
+		return this->unit_type;
+	}
 	
 	const std::filesystem::path &get_image_file() const
 	{
