@@ -58,6 +58,7 @@ class campaign : public detailed_data_entry, public data_type<campaign>, public 
 	Q_PROPERTY(stratagus::faction* faction MEMBER faction READ get_faction)
 	Q_PROPERTY(stratagus::quest* completion_quest MEMBER completion_quest READ get_completion_quest)
 	Q_PROPERTY(QVariantList map_templates READ get_map_templates_qvariant_list)
+	Q_PROPERTY(bool hidden MEMBER hidden READ is_hidden)
 
 public:
 	static constexpr const char *class_identifier = "campaign";
@@ -95,9 +96,9 @@ public:
 
 	const species *get_species() const;
 
-	bool IsHidden() const
+	bool is_hidden() const
 	{
-		return this->Hidden;
+		return this->hidden;
 	}
 
 	bool IsAvailable() const;
@@ -122,7 +123,7 @@ private:
 	QDateTime start_date; //the starting date for the campaign
 	calendar *start_date_calendar = nullptr; //the calendar for the start date
 	timeline *timeline = nullptr; //the timeline in which the campaign is set
-	bool Hidden = false;			/// Whether the campaign is hidden
+	bool hidden = false; //whether the campaign is hidden
 	bool Sandbox = false;			/// Whether the campaign is a sandbox one
 	std::vector<quest *> RequiredQuests;		/// Quests required by the campaign
 	faction *faction = nullptr;	//which faction the player plays as in the campaign

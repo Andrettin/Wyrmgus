@@ -378,7 +378,7 @@ static int CclDefineCampaign(lua_State *l)
 		} else if (!strcmp(value, "Faction")) {
 			campaign->faction = stratagus::faction::get(LuaToString(l, -1));
 		} else if (!strcmp(value, "Hidden")) {
-			campaign->Hidden = LuaToBoolean(l, -1);
+			campaign->hidden = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "Sandbox")) {
 			campaign->Sandbox = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "StartYear")) {
@@ -481,7 +481,7 @@ static int CclGetCampaignData(lua_State *l)
 		}
 		return 1;
 	} else if (!strcmp(data, "Hidden")) {
-		lua_pushboolean(l, campaign->IsHidden());
+		lua_pushboolean(l, campaign->is_hidden());
 		return 1;
 	} else if (!strcmp(data, "Sandbox")) {
 		lua_pushboolean(l, campaign->Sandbox);

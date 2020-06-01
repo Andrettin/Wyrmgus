@@ -80,7 +80,7 @@ void campaign::ProcessConfigData(const CConfigData *config_data)
 			stratagus::faction *faction = faction::get(value);
 			this->faction = faction;
 		} else if (key == "hidden") {
-			this->Hidden = string::to_bool(value);
+			this->hidden = string::to_bool(value);
 		} else if (key == "sandbox") {
 			this->Sandbox = string::to_bool(value);
 		} else if (key == "start_date") {
@@ -163,7 +163,7 @@ const species *campaign::get_species() const
 
 bool campaign::IsAvailable() const
 {
-	if (this->IsHidden()) {
+	if (this->is_hidden()) {
 		return false;
 	}
 
