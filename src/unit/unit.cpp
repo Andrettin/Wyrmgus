@@ -2971,7 +2971,7 @@ void CUnit::AssignToPlayer(CPlayer &player)
 		
 		this->UpdateSoldUnits();
 
-		if (this->settlement != nullptr && this->settlement->get_site_unit() == this) {
+		if (this->settlement != nullptr && this->settlement->get_site_unit() == this && !this->UnderConstruction) {
 			//update settlement ownership
 			if (player.Index != PlayerNumNeutral) {
 				this->settlement->set_owner(&player);

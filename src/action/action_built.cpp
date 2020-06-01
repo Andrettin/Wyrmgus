@@ -42,6 +42,7 @@
 #include "iolib.h"
 #include "map/map.h"
 #include "map/map_layer.h"
+#include "map/site.h"
 #include "map/terrain_type.h"
 #include "map/tileset.h"
 #include "player.h"
@@ -177,7 +178,7 @@ static void Finish(COrder_Built &order, CUnit &unit)
 		player.ChangeUnitTypeUnderConstructionCount(&type, -1);
 	}
 	//Wyrmgus end
-	
+
 	player.IncreaseCountsForUnit(&unit);
 	
 	for (CPlayerQuestObjective *objective : player.QuestObjectives) {
@@ -197,7 +198,15 @@ static void Finish(COrder_Built &order, CUnit &unit)
 
 		objective->Counter = std::min(objective->Counter + 1, quest_objective->get_quantity());
 	}
-	
+
+	if (unit.settlement != nullptr && unit.settlement->get_site_unit() == &unit) {
+		if (player.Index != PlayerNumNeutral) {
+			unit.settlement->set_owner(&player);
+		} else {
+			unit.settlement->set_owner(nullptr);
+		}
+	}
+
 	unit.UnderConstruction = 0;
 	if (unit.Frame < 0) {
 		unit.Frame = -1;
