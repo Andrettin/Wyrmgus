@@ -117,7 +117,7 @@ public:
 	static constexpr QPoint min_adjacent_template_distance = QPoint(4, 4);
 	static constexpr QPoint max_adjacent_template_distance = QPoint(16, 16);
 
-	map_template(const std::string &identifier) : named_data_entry(identifier), CDataType(identifier)
+	explicit map_template(const std::string &identifier) : named_data_entry(identifier), CDataType(identifier)
 	{
 	}
 	
@@ -524,6 +524,8 @@ public:
 	{
 		this->tile_terrains[tile_pos] = terrain;
 	}
+
+	void save_terrain_image(const std::string &filename, const bool overlay) const;
 	
 private:
 	std::filesystem::path terrain_file;

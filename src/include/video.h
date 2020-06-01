@@ -588,11 +588,6 @@ extern void RealizeVideoMemory();
 /// Save a screenshot to a PNG file
 extern void SaveScreenshotPNG(const char *name);
 
-//Wyrmgus start
-/// Save a map template's terrain to a PNG file
-extern void save_map_template_png(const char *name, const stratagus::map_template *map_template, const bool overlay);
-//Wyrmgus end
-
 /// Set the current callbacks
 extern void SetCallbacks(const EventCallback *callbacks);
 /// Get the current callbacks

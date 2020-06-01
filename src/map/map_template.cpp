@@ -326,8 +326,8 @@ void map_template::initialize()
 		const std::string filename = this->get_identifier() + ".png";
 		const std::string overlay_filename = this->get_identifier() + "_overlay.png";
 
-		save_map_template_png(filename.c_str(), this, false);
-		save_map_template_png(overlay_filename.c_str(), this, true);
+		this->save_terrain_image(filename, false);
+		this->save_terrain_image(overlay_filename, true);
 	}
 
 	data_entry::initialize();
@@ -407,13 +407,6 @@ void map_template::ApplyTerrainFile(bool overlay, Vec2i template_start_pos, Vec2
 		
 		y += 1;
 	}
-
-//	std::string filename = this->Ident;
-//	if (overlay) {
-//		filename += "-overlay";
-//	}
-//	filename += ".png";
-//	save_map_template_png(filename.c_str(), this, overlay);
 }
 
 void map_template::ApplyTerrainImage(bool overlay, Vec2i template_start_pos, Vec2i map_start_pos, int z) const
@@ -1991,6 +1984,84 @@ QPoint map_template::get_location_map_position(const std::unique_ptr<historical_
 
 	return QPoint(-1, -1);
 }
+
+void map_template::save_terrain_image(const std::string &filename, const bool overlay) const
+{
+	bool use_terrain_file = true;
+	std::filesystem::path terrain_file;
+	if (overlay) {
+		terrain_file = this->get_overlay_terrain_file();
+	} else {
+		terrain_file = this->get_terrain_file();
+	}
+
+	if (terrain_file.empty()) {
+		use_terrain_file = false;
+	}
+
+	QImage image(this->get_size(), QImage::Format_RGBA8888);
+
+	if (use_terrain_file) {
+		const std::string terrain_filename = LibraryFileName(terrain_file.string().c_str());
+
+		if (!CanAccessFile(terrain_filename.c_str())) {
+			fprintf(stderr, "File \"%s\" not found.\n", terrain_filename.c_str());
+		}
+
+		std::ifstream is_map(terrain_filename);
+
+		std::string line_str;
+		int y = 0;
+		while (std::getline(is_map, line_str))
+		{
+			int x = 0;
+
+			for (unsigned int i = 0; i < line_str.length(); ++i) {
+				const char terrain_character = line_str.at(i);
+				const stratagus::terrain_type *terrain = stratagus::terrain_type::try_get_by_character(terrain_character);
+
+				QColor color(0, 0, 0);
+				if (terrain != nullptr) {
+					color = terrain->get_color();
+				}
+
+				image.setPixelColor(QPoint(x, y), color);
+
+				x += 1;
+			}
+
+			y += 1;
+		}
+	} else {
+		stratagus::point_map<const stratagus::terrain_type *> terrain_map;
+
+		for (const auto &kv_pair : this->get_tile_terrains()) {
+			const QPoint &tile_pos = kv_pair.first;
+			const stratagus::terrain_type *terrain = kv_pair.second;
+
+			if (terrain->is_overlay() == overlay) {
+				terrain_map[tile_pos] = terrain;
+			}
+		}
+
+		for (int x = 0; x < this->get_width(); ++x) {
+			for (int y = 0; y < this->get_height(); ++y) {
+				const QPoint tile_pos(x, y);
+
+				auto find_iterator = terrain_map.find(tile_pos);
+				if (find_iterator != terrain_map.end()) {
+					const stratagus::terrain_type *terrain = find_iterator->second;
+					image.setPixelColor(tile_pos, terrain->get_color());
+				} else {
+					image.setPixelColor(tile_pos, QColor(0, 0, 0));
+				}
+			}
+		}
+	}
+
+	image.save(QString::fromStdString(filename));
+}
+
 
 void generated_terrain::process_sml_property(const sml_property &property)
 {
