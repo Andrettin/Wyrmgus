@@ -745,6 +745,7 @@ set(stratagus_util_HDRS
 	src/util/container_util.h
 	src/util/date_util.h
 	src/util/exception_util.h
+	src/util/geocoordinate_util.h
 	src/util/image_util.h
 	src/util/number_util.h
 	src/util/point_container.h
@@ -926,6 +927,7 @@ find_package(Qt5 COMPONENTS Core REQUIRED) #licensed under the GPL 2.0 (as well 
 find_package(Qt5 COMPONENTS Gui REQUIRED) #licensed under the GPL 2.0 (as well as the LGPL 3.0)
 find_package(Qt5 COMPONENTS Widgets REQUIRED) #licensed under the GPL 2.0 (as well as the LGPL 3.0)
 find_package(Qt5 COMPONENTS Multimedia REQUIRED) #licensed under the GPL 2.0 (as well as the LGPL 3.0)
+find_package(Qt5 COMPONENTS Location REQUIRED) #licensed under the GPL 2.0 (as well as the LGPL 3.0)
 find_package(Qt5 COMPONENTS Qml REQUIRED) #licensed under the GPL 2.0 (as well as the LGPL 3.0)
 find_package(Qt5 COMPONENTS Quick REQUIRED) #licensed under the GPL 2.0 (as well as the LGPL 3.0)
 
@@ -1029,7 +1031,7 @@ endif()
 
 add_definitions(${PNG_DEFINITIONS} -DUSE_ZLIB -DPIXMAPS=\"${PIXMAPSDIRABS}\")
 include_directories(${LUA_INCLUDE_DIR} ${PNG_INCLUDE_DIR} ${SDL_INCLUDE_DIR} ${TOLUA++_INCLUDE_DIR} ${ZLIB_INCLUDE_DIRS})
-set(QT_LIBRARIES Qt5::Core Qt5::Gui Qt5::Widgets Qt5::Multimedia Qt5::Qml Qt5::Quick)
+set(QT_LIBRARIES Qt5::Core Qt5::Gui Qt5::Widgets Qt5::Multimedia Qt5::Location Qt5::LocationPrivate Qt5::Qml Qt5::Quick)
 set(stratagus_LIBS ${LUA_LIBRARIES} ${PNG_LIBRARIES} ${SDL_LIBRARY} ${TOLUA++_LIBRARY} ${ZLIB_LIBRARIES} ${QT_LIBRARIES})
 
 if(WIN32 AND NOT ENABLE_STDIO_REDIRECT)
@@ -1463,6 +1465,7 @@ target_precompile_headers(stratagus PRIVATE
 	<QAudioFormat>
 	<QColor>
 	<QDateTime>
+	<QGeoCoordinate>
 	<QImage>
 	<QMetaProperty>
 	<QObject>

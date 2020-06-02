@@ -273,6 +273,17 @@ public:
 		return QSize(width, height);
 	}
 
+	QGeoCoordinate to_geocoordinate() const
+	{
+		if (this->get_values().size() != 2) {
+			throw std::runtime_error("Geocoordinate scopes need to contain exactly two values.");
+		}
+
+		const double longitude = std::stod(this->get_values()[0]);
+		const double latitude = std::stod(this->get_values()[1]);
+		return QGeoCoordinate(latitude, longitude);
+	}
+
 	void print_to_dir(const std::filesystem::path &directory) const
 	{
 		std::filesystem::path filepath(directory / (this->get_tag() + ".txt"));
