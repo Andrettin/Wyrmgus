@@ -27,8 +27,8 @@
 
 #pragma once
 
-namespace stratagus::geoshape {
+namespace stratagus::georectangle {
 
-extern void write_to_image(const QGeoShape &geoshape, QImage &image, const QColor &color, const QGeoRectangle &georectangle, const std::string &image_checkpoint_save_filename = "");
+extern QRectF to_unsigned_georectangle(const QGeoRectangle &georectangle);
 
 }

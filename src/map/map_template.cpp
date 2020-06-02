@@ -58,6 +58,7 @@
 #include "unit/unit_class.h"
 #include "unit/unit_find.h"
 #include "unit/unit_type.h"
+#include "util/geocoordinate_util.h"
 #include "util/geojson_util.h"
 #include "util/geoshape_util.h"
 #include "util/point_util.h"
@@ -68,6 +69,13 @@
 #include "world.h"
 
 namespace stratagus {
+
+map_template::map_template(const std::string &identifier)
+	: named_data_entry(identifier), CDataType(identifier),
+	min_longitude(geocoordinate::min_longitude), max_longitude(geocoordinate::max_longitude),
+	min_latitude(geocoordinate::min_latitude), max_latitude(geocoordinate::max_latitude)
+{
+}
 
 map_template::~map_template()
 {
@@ -2054,6 +2062,8 @@ void map_template::save_terrain_image(const std::string &filename, const bool ov
 			y += 1;
 		}
 	} else {
+		const QGeoRectangle georectangle(QGeoCoordinate(this->get_max_latitude(), this->get_min_longitude()), QGeoCoordinate(this->get_min_latitude(), this->get_max_longitude()));
+
 		geojson::process_features(geojson_data_list, [&](const QVariantMap &feature) {
 			const QVariantMap properties = feature.value("properties").toMap();
 			const QString terrain_type_identifier = properties.value("terrain_type").toString();
@@ -2067,7 +2077,7 @@ void map_template::save_terrain_image(const std::string &filename, const bool ov
 			for (const QVariant &subfeature_variant : feature.value("data").toList()) {
 				const QVariantMap subfeature_map = subfeature_variant.toMap();
 				const QGeoPolygon geopolygon = subfeature_map.value("data").value<QGeoPolygon>();
-				geoshape::write_to_image(geopolygon, image, terrain->get_color(), filename);
+				geoshape::write_to_image(geopolygon, image, terrain->get_color(), georectangle, filename);
 			}
 		});
 

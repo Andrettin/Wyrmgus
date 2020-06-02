@@ -25,10 +25,15 @@
 //      02111-1307, USA.
 //
 
-#pragma once
+#include "util/georectangle_util.h"
 
-namespace stratagus::geoshape {
+#include "util/geocoordinate_util.h"
 
-extern void write_to_image(const QGeoShape &geoshape, QImage &image, const QColor &color, const QGeoRectangle &georectangle, const std::string &image_checkpoint_save_filename = "");
+namespace stratagus::georectangle {
+
+QRectF to_unsigned_georectangle(const QGeoRectangle &georectangle)
+{
+	return QRectF(geocoordinate::to_unsigned_geocoordinate(georectangle.topLeft()), geocoordinate::to_unsigned_geocoordinate(georectangle.bottomRight()));
+}
 
 }

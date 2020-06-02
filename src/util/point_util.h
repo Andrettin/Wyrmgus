@@ -64,12 +64,14 @@ inline constexpr QSize to_size(const QPoint &point)
 	return QSize(point.x(), point.y());
 }
 
-inline QGeoCoordinate to_geocoordinate(const QPoint &point, const QSize &area_size)
+inline QPointF to_unsigned_geocoordinate(const QPoint &point, const QSize &area_size, const QRectF &unsigned_georectangle)
 {
-	const double lon = (point.x() - (area_size.width() / 2)) * 180.0 / (area_size.width() / 2);
-	const double lat = (point.y() - (area_size.height() / 2)) * 90.0 / (area_size.height() / 2) * -1;
-	return QGeoCoordinate(lat, lon);
+	const double lon = point.x() * unsigned_georectangle.width() / area_size.width() + unsigned_georectangle.x();
+	const double lat = point.y() * unsigned_georectangle.height() / area_size.height() + unsigned_georectangle.y();
+	return QPointF(lon, lat);
 }
+
+extern QGeoCoordinate to_geocoordinate(const QPoint &point, const QSize &area_size, const QRectF &unsigned_georectangle);
 
 extern constexpr int distance_to(const QPoint &point, const QPoint &other_point);
 

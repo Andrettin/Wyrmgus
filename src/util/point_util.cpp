@@ -27,9 +27,16 @@
 
 #include "util/point_util.h"
 
+#include "util/geocoordinate_util.h"
 #include "util/util.h"
 
 namespace stratagus::point {
+
+QGeoCoordinate to_geocoordinate(const QPoint &point, const QSize &area_size, const QRectF &unsigned_georectangle)
+{
+	const QPointF unsigned_geocoordinate = point::to_unsigned_geocoordinate(point, area_size, unsigned_georectangle);
+	return geocoordinate::from_unsigned_geocoordinate(unsigned_geocoordinate);
+}
 
 constexpr int distance_to(const QPoint &point, const QPoint &other_point)
 {

@@ -37,30 +37,64 @@ static constexpr int min_latitude = latitude_size / 2 * -1;
 static constexpr int max_latitude = latitude_size / 2;
 static const QGeoCoordinate min_geocoordinate(geocoordinate::min_latitude, geocoordinate::min_longitude);
 static const QGeoCoordinate max_geocoordinate(geocoordinate::max_latitude, geocoordinate::max_longitude);
-static const QGeoRectangle default_georect(min_geocoordinate, max_geocoordinate);
+
+inline double longitude_to_unsigned_longitude(const double longitude)
+{
+	return longitude + (geocoordinate::longitude_size / 2);
+}
+
+inline double latitude_to_unsigned_latitude(const double latitude)
+{
+	return latitude * -1 + (geocoordinate::latitude_size / 2);
+}
+
+inline QPointF to_unsigned_geocoordinate(const QGeoCoordinate &geocoordinate)
+{
+	//converts a geocoordinate into a (floating) coordinate point, having x values from 0 to 360, and y values from 0 to 180 (top to bottom, contrary to geocoordinates, which work south to north)
+	const double x = geocoordinate::longitude_to_unsigned_longitude(geocoordinate.longitude());
+	const double y = geocoordinate::latitude_to_unsigned_latitude(geocoordinate.latitude());
+	return QPointF(x, y);
+}
+
+inline QGeoCoordinate from_unsigned_geocoordinate(const QPointF &unsigned_geocoordinate)
+{
+	const double lon = unsigned_geocoordinate.x() - (geocoordinate::longitude_size / 2);
+	const double lat = (unsigned_geocoordinate.y() - (geocoordinate::latitude_size / 2)) * -1;
+	return QGeoCoordinate(lat, lon);
+}
+
+inline int unsigned_longitude_to_x(const double longitude, const double lon_per_pixel)
+{
+	const double x = longitude / lon_per_pixel;
+	return static_cast<int>(std::round(x));
+}
+
+inline int unsigned_latitude_to_y(const double latitude, const double lat_per_pixel)
+{
+	const double y = latitude / lat_per_pixel;
+	return static_cast<int>(std::round(y));
+}
 
 inline int longitude_to_x(const double longitude, const double lon_per_pixel)
 {
-	const double x = (longitude + (geocoordinate::longitude_size / 2)) / lon_per_pixel;
-
-	return static_cast<int>(std::round(x));
+	const double x = geocoordinate::longitude_to_unsigned_longitude(longitude);
+	return geocoordinate::unsigned_longitude_to_x(x, lon_per_pixel);
 }
 
 inline int latitude_to_y(const double latitude, const double lat_per_pixel)
 {
-	const double y = (latitude * -1 + (geocoordinate::latitude_size / 2)) / lat_per_pixel;
-
-	return static_cast<int>(std::round(y));
+	const double y = geocoordinate::latitude_to_unsigned_latitude(latitude);
+	return geocoordinate::unsigned_latitude_to_y(y, lat_per_pixel);
 }
 
-inline double longitude_per_pixel(const QSize &size)
+inline double longitude_per_pixel(const double longitude_size, const QSize &size)
 {
-	return geocoordinate::longitude_size / static_cast<double>(size.width());
+	return longitude_size / static_cast<double>(size.width());
 }
 
-inline double latitude_per_pixel(const QSize &size)
+inline double latitude_per_pixel(const double latitude_size, const QSize &size)
 {
-	return geocoordinate::latitude_size / static_cast<double>(size.height());
+	return latitude_size / static_cast<double>(size.height());
 }
 
 }

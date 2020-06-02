@@ -110,6 +110,10 @@ class map_template final : public named_data_entry, public data_type<map_templat
 	Q_PROPERTY(stratagus::terrain_type* surrounding_terrain_type MEMBER surrounding_terrain_type READ get_surrounding_terrain_type)
 	Q_PROPERTY(stratagus::terrain_type* surrounding_overlay_terrain_type MEMBER surrounding_overlay_terrain_type READ get_surrounding_overlay_terrain_type)
 	Q_PROPERTY(bool output_terrain_image MEMBER output_terrain_image READ outputs_terrain_image)
+	Q_PROPERTY(double min_longitude MEMBER min_longitude READ get_min_longitude)
+	Q_PROPERTY(double max_longitude MEMBER max_longitude READ get_max_longitude)
+	Q_PROPERTY(double min_latitude MEMBER min_latitude READ get_min_latitude)
+	Q_PROPERTY(double max_latitude MEMBER max_latitude READ get_max_latitude)
 
 public:
 	static constexpr const char *class_identifier = "map_template";
@@ -118,10 +122,7 @@ public:
 	static constexpr QPoint max_adjacent_template_distance = QPoint(16, 16);
 	static constexpr const char *terrain_folder = "terrain";
 
-	explicit map_template(const std::string &identifier) : named_data_entry(identifier), CDataType(identifier)
-	{
-	}
-	
+	explicit map_template(const std::string &identifier);
 	~map_template();
 
 	virtual void process_sml_property(const sml_property &property) override;
@@ -526,6 +527,26 @@ public:
 		this->tile_terrains[tile_pos] = terrain;
 	}
 
+	double get_min_longitude() const
+	{
+		return this->min_longitude;
+	}
+
+	double get_max_longitude() const
+	{
+		return this->max_longitude;
+	}
+
+	double get_min_latitude() const
+	{
+		return this->min_latitude;
+	}
+
+	double get_max_latitude() const
+	{
+		return this->max_latitude;
+	}
+
 	void save_terrain_image(const std::string &filename, const bool overlay, const std::vector<QVariantList> &geojson_data_list) const;
 	std::vector<QVariantList> parse_geojson_folder(const std::string_view &folder) const;
 	
@@ -592,6 +613,11 @@ private:
 	point_map<terrain_type *> tile_terrains;
 public:
 	std::vector<std::tuple<Vec2i, terrain_type *, CDate>> HistoricalTerrains; //terrain changes
+private:
+	double min_longitude;
+	double max_longitude;
+	double min_latitude;
+	double max_latitude;
 
 	friend int ::CclDefineMapTemplate(lua_State *l);
 };
