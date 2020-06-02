@@ -64,6 +64,13 @@ inline constexpr QSize to_size(const QPoint &point)
 	return QSize(point.x(), point.y());
 }
 
+inline QGeoCoordinate to_geocoordinate(const QPoint &point, const QSize &area_size)
+{
+	const double lon = (point.x() - (area_size.width() / 2)) * 180.0 / (area_size.width() / 2);
+	const double lat = (point.y() - (area_size.height() / 2)) * 90.0 / (area_size.height() / 2) * -1;
+	return QGeoCoordinate(lat, lon);
+}
+
 extern constexpr int distance_to(const QPoint &point, const QPoint &other_point);
 
 }
