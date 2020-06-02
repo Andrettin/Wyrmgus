@@ -45,13 +45,13 @@ void write_to_image(const QGeoShape &geoshape, QImage &image, const QColor &colo
 
 	const double start_lon = std::max(unsigned_bounding_georectangle.x(), unsigned_georectangle.x());
 	const double end_lon = std::min(unsigned_bounding_georectangle.right(), unsigned_georectangle.right());
-	const int start_x = std::max(geocoordinate::unsigned_longitude_to_x(start_lon, lon_per_pixel) - 1, 0);
-	const int end_x = std::min(geocoordinate::unsigned_longitude_to_x(end_lon, lon_per_pixel) + 1, image.width() - 1);
+	const int start_x = std::max(geocoordinate::unsigned_longitude_to_x(start_lon - unsigned_georectangle.x(), lon_per_pixel) - 1, 0);
+	const int end_x = std::min(geocoordinate::unsigned_longitude_to_x(end_lon - unsigned_georectangle.x(), lon_per_pixel) + 1, image.width() - 1);
 
 	const double start_lat = std::min(unsigned_bounding_georectangle.y(), unsigned_georectangle.y());
 	const double end_lat = std::max(unsigned_bounding_georectangle.bottom(), unsigned_georectangle.bottom());
-	const int start_y = std::max(geocoordinate::unsigned_latitude_to_y(start_lat, lat_per_pixel) - 1, 0);
-	const int end_y = std::min(geocoordinate::unsigned_latitude_to_y(end_lat, lat_per_pixel) + 1, image.height() - 1);
+	const int start_y = std::max(geocoordinate::unsigned_latitude_to_y(start_lat - unsigned_georectangle.y(), lat_per_pixel) - 1, 0);
+	const int end_y = std::min(geocoordinate::unsigned_latitude_to_y(end_lat - unsigned_georectangle.y(), lat_per_pixel) + 1, image.height() - 1);
 
 	int pixel_checkpoint_count = 0;
 	static constexpr int pixel_checkpoint_threshold = 32 * 32;
