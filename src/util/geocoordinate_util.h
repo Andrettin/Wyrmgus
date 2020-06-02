@@ -29,30 +29,38 @@
 
 namespace stratagus::geocoordinate {
 
-inline double longitude_to_pixel_longitude(const double longitude, const double lon_per_pixel)
-{
-	//convert longitude to the longitude of the center point of its pixel
-	return std::round(longitude / lon_per_pixel) * lon_per_pixel;
-}
-
-inline double latitude_to_pixel_latitude(const double latitude, const double lat_per_pixel)
-{
-	//convert latitude to the latitude of the center point of its pixel
-	return std::round(latitude / lat_per_pixel) * lat_per_pixel;
-}
+static constexpr int longitude_size = 360;
+static constexpr int latitude_size = 180;
+static constexpr int min_longitude = longitude_size / 2 * -1;
+static constexpr int max_longitude = longitude_size / 2;
+static constexpr int min_latitude = latitude_size / 2 * -1;
+static constexpr int max_latitude = latitude_size / 2;
+static const QGeoCoordinate min_geocoordinate(geocoordinate::min_latitude, geocoordinate::min_longitude);
+static const QGeoCoordinate max_geocoordinate(geocoordinate::max_latitude, geocoordinate::max_longitude);
+static const QGeoRectangle default_georect(min_geocoordinate, max_geocoordinate);
 
 inline int longitude_to_x(const double longitude, const double lon_per_pixel)
 {
-	const double x = (longitude + 180.0) / lon_per_pixel;
+	const double x = (longitude + (geocoordinate::longitude_size / 2)) / lon_per_pixel;
 
 	return static_cast<int>(std::round(x));
 }
 
 inline int latitude_to_y(const double latitude, const double lat_per_pixel)
 {
-	const double y = (latitude * -1 + 90.0) / lat_per_pixel;
+	const double y = (latitude * -1 + (geocoordinate::latitude_size / 2)) / lat_per_pixel;
 
 	return static_cast<int>(std::round(y));
+}
+
+inline double longitude_per_pixel(const QSize &size)
+{
+	return geocoordinate::longitude_size / static_cast<double>(size.width());
+}
+
+inline double latitude_per_pixel(const QSize &size)
+{
+	return geocoordinate::latitude_size / static_cast<double>(size.height());
 }
 
 }
