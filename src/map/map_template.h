@@ -116,6 +116,7 @@ public:
 	static constexpr const char *database_folder = "map_templates";
 	static constexpr QPoint min_adjacent_template_distance = QPoint(4, 4);
 	static constexpr QPoint max_adjacent_template_distance = QPoint(16, 16);
+	static constexpr const char *terrain_folder = "terrain";
 
 	explicit map_template(const std::string &identifier) : named_data_entry(identifier), CDataType(identifier)
 	{
@@ -525,7 +526,8 @@ public:
 		this->tile_terrains[tile_pos] = terrain;
 	}
 
-	void save_terrain_image(const std::string &filename, const bool overlay) const;
+	void save_terrain_image(const std::string &filename, const bool overlay, const std::vector<QVariantList> &geojson_data_list) const;
+	std::vector<QVariantList> parse_geojson_folder(const std::string_view &folder) const;
 	
 private:
 	std::filesystem::path terrain_file;

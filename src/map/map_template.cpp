@@ -58,6 +58,8 @@
 #include "unit/unit_class.h"
 #include "unit/unit_find.h"
 #include "unit/unit_type.h"
+#include "util/geojson_util.h"
+#include "util/geoshape_util.h"
 #include "util/point_util.h"
 #include "util/size_util.h"
 #include "util/string_util.h"
@@ -323,11 +325,13 @@ void map_template::initialize()
 	}
 
 	if (this->outputs_terrain_image()) {
+		const std::vector<QVariantList> geojson_data_list = this->parse_geojson_folder(map_template::terrain_folder);
+
 		const std::string filename = this->get_identifier() + ".png";
 		const std::string overlay_filename = this->get_identifier() + "_overlay.png";
 
-		this->save_terrain_image(filename, false);
-		this->save_terrain_image(overlay_filename, true);
+		this->save_terrain_image(filename, false, geojson_data_list);
+		this->save_terrain_image(overlay_filename, true, geojson_data_list);
 	}
 
 	data_entry::initialize();
@@ -1985,7 +1989,7 @@ QPoint map_template::get_location_map_position(const std::unique_ptr<historical_
 	return QPoint(-1, -1);
 }
 
-void map_template::save_terrain_image(const std::string &filename, const bool overlay) const
+void map_template::save_terrain_image(const std::string &filename, const bool overlay, const std::vector<QVariantList> &geojson_data_list) const
 {
 	bool use_terrain_file = true;
 	std::filesystem::path terrain_file;
@@ -1999,7 +2003,24 @@ void map_template::save_terrain_image(const std::string &filename, const bool ov
 		use_terrain_file = false;
 	}
 
-	QImage image(this->get_size(), QImage::Format_RGBA8888);
+	std::filesystem::path terrain_image;
+	if (overlay) {
+		terrain_image = this->get_overlay_terrain_image();
+	} else {
+		terrain_image = this->get_terrain_image();
+	}
+
+	QImage image;
+	if (!terrain_image.empty()) {
+		image = QImage(QString::fromStdString(terrain_image.string()));
+
+		if (image.size() != this->get_size()) {
+			throw std::runtime_error("Invalid image size for map template \"" + this->get_identifier() + "\".");
+		}
+	} else {
+		image = QImage(this->get_size(), QImage::Format_RGBA8888);
+		image.fill(Qt::transparent);
+	}
 
 	if (use_terrain_file) {
 		const std::string terrain_filename = LibraryFileName(terrain_file.string().c_str());
@@ -2033,6 +2054,23 @@ void map_template::save_terrain_image(const std::string &filename, const bool ov
 			y += 1;
 		}
 	} else {
+		geojson::process_features(geojson_data_list, [&](const QVariantMap &feature) {
+			const QVariantMap properties = feature.value("properties").toMap();
+			const QString terrain_type_identifier = properties.value("terrain_type").toString();
+
+			const terrain_type *terrain = terrain_type::get(terrain_type_identifier.toStdString());
+
+			if (terrain->is_overlay() != overlay) {
+				return;
+			}
+
+			for (const QVariant &subfeature_variant : feature.value("data").toList()) {
+				const QVariantMap subfeature_map = subfeature_variant.toMap();
+				const QGeoPolygon geopolygon = subfeature_map.value("data").value<QGeoPolygon>();
+				geoshape::write_to_image(geopolygon, image, terrain->get_color(), filename);
+			}
+		});
+
 		stratagus::point_map<const stratagus::terrain_type *> terrain_map;
 
 		for (const auto &kv_pair : this->get_tile_terrains()) {
@@ -2052,8 +2090,6 @@ void map_template::save_terrain_image(const std::string &filename, const bool ov
 				if (find_iterator != terrain_map.end()) {
 					const stratagus::terrain_type *terrain = find_iterator->second;
 					image.setPixelColor(tile_pos, terrain->get_color());
-				} else {
-					image.setPixelColor(tile_pos, QColor(0, 0, 0));
 				}
 			}
 		}
@@ -2062,6 +2098,23 @@ void map_template::save_terrain_image(const std::string &filename, const bool ov
 	image.save(QString::fromStdString(filename));
 }
 
+std::vector<QVariantList> map_template::parse_geojson_folder(const std::string_view &folder) const
+{
+	std::vector<QVariantList> geojson_data_list;
+
+	for (const std::filesystem::path &path : database::get()->get_maps_paths()) {
+		const std::filesystem::path map_path = path / this->get_identifier() / folder;
+
+		if (!std::filesystem::exists(map_path)) {
+			continue;
+		}
+
+		std::vector<QVariantList> folder_geojson_data_list = geojson::parse_folder(map_path);
+		vector::merge(geojson_data_list, std::move(folder_geojson_data_list));
+	}
+
+	return geojson_data_list;
+}
 
 void generated_terrain::process_sml_property(const sml_property &property)
 {

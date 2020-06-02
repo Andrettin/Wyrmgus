@@ -212,6 +212,17 @@ public:
 		return paths;
 	}
 
+	std::vector<std::filesystem::path> get_maps_paths() const
+	{
+		std::vector<std::filesystem::path> paths = this->get_base_paths();
+
+		for (std::filesystem::path &path : paths) {
+			path /= database::maps_folder;
+		}
+
+		return paths;
+	}
+
 private:
 	std::vector<std::unique_ptr<data_type_metadata>> metadata;
 	std::vector<qunique_ptr<module>> modules;

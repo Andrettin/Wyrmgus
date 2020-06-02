@@ -29,6 +29,6 @@
 
 namespace stratagus::geoshape {
 
-extern void write_to_image(const QGeoShape &geoshape, QImage &image, const QColor &color);
+extern void write_to_image(const QGeoShape &geoshape, QImage &image, const QColor &color, const std::string &image_checkpoint_save_filename = "");
 
 }

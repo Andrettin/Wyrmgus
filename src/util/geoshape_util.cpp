@@ -31,7 +31,7 @@
 
 namespace stratagus::geoshape {
 
-void write_to_image(const QGeoShape &geoshape, QImage &image, const QColor &color)
+void write_to_image(const QGeoShape &geoshape, QImage &image, const QColor &color, const std::string &image_checkpoint_save_filename)
 {
 	const double lon_per_pixel = 360.0 / static_cast<double>(image.size().width());
 	const double lat_per_pixel = 180.0 / static_cast<double>(image.size().height());
@@ -59,6 +59,9 @@ void write_to_image(const QGeoShape &geoshape, QImage &image, const QColor &colo
 	const double end_lat = top_right.latitude();
 	const double normalized_start_lat = geocoordinate::latitude_to_pixel_latitude(start_lat, lat_per_pixel);
 
+	int pixel_checkpoint_count = 0;
+	static constexpr int pixel_checkpoint_threshold = 32 * 32;
+
 	for (; lon <= end_lon; lon += lon_per_pixel) {
 		const int x = geocoordinate::longitude_to_x(lon, lon_per_pixel);
 
@@ -67,11 +70,21 @@ void write_to_image(const QGeoShape &geoshape, QImage &image, const QColor &colo
 
 			const int y = geocoordinate::latitude_to_y(lat, lat_per_pixel);
 
+			if (image.pixelColor(x, y).alpha() != 0) {
+				continue; //ignore already-written pixels
+			}
+
 			if (!geoshape.contains(coordinate)) {
 				continue;
 			}
 
 			image.setPixelColor(x, y, color);
+			pixel_checkpoint_count++;
+
+			if (pixel_checkpoint_count >= pixel_checkpoint_threshold) {
+				image.save(QString::fromStdString(image_checkpoint_save_filename));
+				pixel_checkpoint_count = 0;
+			}
 		}
 	}
 }
