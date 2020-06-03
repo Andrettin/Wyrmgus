@@ -1025,6 +1025,9 @@ void map_template::apply_sites(const QPoint &template_start_pos, const QPoint &m
 		Vec2i site_pos(map_start_pos + site_raw_pos - template_start_pos);
 
 		Vec2i unit_offset((settlement_site_unit_type->get_tile_size() - QSize(1, 1)) / 2);
+
+		//it is acceptable sites with geocoordinate to have their positions shifted, e.g. if it was coastal to shift it enough inland to give space for the building to be placed
+		const bool is_position_shift_acceptable = site->get_geocoordinate().isValid();
 			
 		if (random) {
 			if (site_raw_pos.x() != -1 || site_raw_pos.y() != -1) {
@@ -1047,7 +1050,7 @@ void map_template::apply_sites(const QPoint &template_start_pos, const QPoint &m
 		site->load_history();
 
 		if (site->is_major() && settlement_site_unit_type != nullptr) { //add a settlement site for major sites
-			if (!UnitTypeCanBeAt(*settlement_site_unit_type, site_pos - unit_offset, z) && CMap::Map.Info.IsPointOnMap(site_pos - unit_offset, z) && CMap::Map.Info.IsPointOnMap(site_pos - unit_offset + Vec2i(settlement_site_unit_type->get_tile_size() - QSize(1, 1)), z)) {
+			if (!is_position_shift_acceptable && !UnitTypeCanBeAt(*settlement_site_unit_type, site_pos - unit_offset, z) && CMap::Map.Info.IsPointOnMap(site_pos - unit_offset, z) && CMap::Map.Info.IsPointOnMap(site_pos - unit_offset + Vec2i(settlement_site_unit_type->get_tile_size() - QSize(1, 1)), z)) {
 				fprintf(stderr, "The settlement site for \"%s\" should be placed on (%d, %d), but it cannot be there.\n", site->Ident.c_str(), site_raw_pos.x(), site_raw_pos.y());
 			}
 			CUnit *unit = CreateUnit(site_pos - unit_offset, *settlement_site_unit_type, CPlayer::Players[PlayerNumNeutral], z, true);
@@ -1162,7 +1165,7 @@ void map_template::apply_sites(const QPoint &template_start_pos, const QPoint &m
 			}
 
 			const QPoint unit_offset = unit_type->get_tile_center_pos_offset();
-			if (first_building) {
+			if (!is_position_shift_acceptable && first_building) {
 				if (!OnTopDetails(*unit_type, nullptr) && !UnitTypeCanBeAt(*unit_type, site_pos - unit_offset, z) && CMap::Map.Info.IsPointOnMap(site_pos - unit_offset, z) && CMap::Map.Info.IsPointOnMap(site_pos - unit_offset + size::to_point(unit_type->get_tile_size() - QSize(1, 1)), z)) {
 					throw std::runtime_error("The \"" + unit_type->get_identifier() + "\" representing the minor site of \"" + site->get_identifier() + "\" should be placed on (" + std::to_string(site_raw_pos.x()) + ", " + std::to_string(site_raw_pos.y()) + "), but it cannot be there.");
 				}
@@ -1225,7 +1228,7 @@ void map_template::apply_sites(const QPoint &template_start_pos, const QPoint &m
 					continue;
 				}
 				Vec2i unit_offset((unit_type->get_tile_size() - QSize(1, 1)) / 2);
-				if (first_building) {
+				if (!is_position_shift_acceptable && first_building) {
 					if (!OnTopDetails(*unit_type, nullptr) && !UnitTypeCanBeAt(*unit_type, site_pos - unit_offset, z) && CMap::Map.Info.IsPointOnMap(site_pos - unit_offset, z) && CMap::Map.Info.IsPointOnMap(site_pos - unit_offset + Vec2i(unit_type->get_tile_size() - QSize(1, 1)), z)) {
 						fprintf(stderr, "The \"%s\" representing the minor site of \"%s\" should be placed on (%d, %d), but it cannot be there.\n", unit_type->Ident.c_str(), site->Ident.c_str(), site_raw_pos.x(), site_raw_pos.y());
 					}
