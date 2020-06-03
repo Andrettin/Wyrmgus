@@ -57,6 +57,7 @@ class site final : public named_data_entry, public data_type<site>, public CData
 	Q_PROPERTY(bool major MEMBER major READ is_major)
 	Q_PROPERTY(stratagus::map_template* map_template MEMBER map_template READ get_map_template)
 	Q_PROPERTY(QPoint pos MEMBER pos READ get_pos)
+	Q_PROPERTY(QGeoCoordinate geocoordinate MEMBER geocoordinate READ get_geocoordinate)
 	Q_PROPERTY(stratagus::unit_class* pathway_class MEMBER pathway_class READ get_pathway_class)
 	Q_PROPERTY(QVariantList cores READ get_cores_qvariant_list)
 	Q_PROPERTY(QVariantList regions READ get_regions_qvariant_list)
@@ -102,6 +103,11 @@ public:
 	const QPoint &get_pos() const
 	{
 		return this->pos;
+	}
+
+	const QGeoCoordinate &get_geocoordinate() const
+	{
+		return this->geocoordinate;
 	}
 
 	CUnit *get_site_unit() const
@@ -216,6 +222,7 @@ public:
 private:
 	bool major = false; /// Whether the site is a major one; major sites have settlement sites, and as such can have town halls
 	QPoint pos = QPoint(-1, -1); /// Position of the site in its map template
+	QGeoCoordinate geocoordinate; //the site's position as a geocoordinate
 	map_template *map_template = nullptr; /// Map template where this site is located
 	CPlayer *owner = nullptr;
 	CUnit *site_unit = nullptr;									/// Unit which represents this site

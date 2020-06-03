@@ -87,6 +87,13 @@ inline int latitude_to_y(const double latitude, const double lat_per_pixel)
 	return geocoordinate::unsigned_latitude_to_y(y, lat_per_pixel);
 }
 
+inline QPoint to_point(const QGeoCoordinate &geocoordinate, const double lon_per_pixel, const double lat_per_pixel)
+{
+	const int x = geocoordinate::longitude_to_x(geocoordinate.longitude(), lon_per_pixel);
+	const int y = geocoordinate::latitude_to_y(geocoordinate.latitude(), lat_per_pixel);
+	return QPoint(x, y);
+}
+
 inline double longitude_per_pixel(const double longitude_size, const QSize &size)
 {
 	return longitude_size / static_cast<double>(size.width());

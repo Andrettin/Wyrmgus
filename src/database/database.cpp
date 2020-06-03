@@ -335,6 +335,12 @@ QVariant database::process_sml_scope_value(const sml_data &scope, const QMetaPro
 		}
 
 		new_property_value = scope.to_size();
+	} else if (property_class_name == "QGeoCoordinate") {
+		if (scope.get_operator() != sml_operator::assignment) {
+			throw std::runtime_error("Only the assignment operator is available for geocoordinate properties.");
+		}
+
+		new_property_value = QVariant::fromValue(scope.to_geocoordinate());
 	} else {
 		throw std::runtime_error("Invalid type for scope property \"" + std::string(property_name) + "\": \"" + std::string(meta_property.typeName()) + "\".");
 	}

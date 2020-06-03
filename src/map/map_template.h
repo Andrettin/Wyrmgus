@@ -547,6 +547,11 @@ public:
 		return this->max_latitude;
 	}
 
+	QGeoRectangle get_georectangle() const
+	{
+		return QGeoRectangle(QGeoCoordinate(this->get_max_latitude(), this->get_min_longitude()), QGeoCoordinate(this->get_min_latitude(), this->get_max_longitude()));
+	}
+
 	void save_terrain_image(const std::string &filename, const bool overlay, const terrain_geodata_map &terrain_data) const;
 	
 private:
