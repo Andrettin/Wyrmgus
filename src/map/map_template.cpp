@@ -59,7 +59,6 @@
 #include "unit/unit_find.h"
 #include "unit/unit_type.h"
 #include "util/geocoordinate_util.h"
-#include "util/geojson_util.h"
 #include "util/geoshape_util.h"
 #include "util/point_util.h"
 #include "util/size_util.h"
@@ -333,13 +332,17 @@ void map_template::initialize()
 	}
 
 	if (this->outputs_terrain_image()) {
-		const std::vector<QVariantList> geojson_data_list = this->parse_geojson_folder(map_template::terrain_folder);
+		terrain_geodata_map terrain_data;
+
+		if (this->get_world() != nullptr) {
+			terrain_data = this->get_world()->parse_terrain_geojson_folder();
+		}
 
 		const std::string filename = this->get_identifier() + ".png";
 		const std::string overlay_filename = this->get_identifier() + "_overlay.png";
 
-		this->save_terrain_image(filename, false, geojson_data_list);
-		this->save_terrain_image(overlay_filename, true, geojson_data_list);
+		this->save_terrain_image(filename, false, terrain_data);
+		this->save_terrain_image(overlay_filename, true, terrain_data);
 	}
 
 	data_entry::initialize();
@@ -1997,7 +2000,7 @@ QPoint map_template::get_location_map_position(const std::unique_ptr<historical_
 	return QPoint(-1, -1);
 }
 
-void map_template::save_terrain_image(const std::string &filename, const bool overlay, const std::vector<QVariantList> &geojson_data_list) const
+void map_template::save_terrain_image(const std::string &filename, const bool overlay, const terrain_geodata_map &terrain_data) const
 {
 	bool use_terrain_file = true;
 	std::filesystem::path terrain_file;
@@ -2064,22 +2067,17 @@ void map_template::save_terrain_image(const std::string &filename, const bool ov
 	} else {
 		const QGeoRectangle georectangle(QGeoCoordinate(this->get_max_latitude(), this->get_min_longitude()), QGeoCoordinate(this->get_min_latitude(), this->get_max_longitude()));
 
-		geojson::process_features(geojson_data_list, [&](const QVariantMap &feature) {
-			const QVariantMap properties = feature.value("properties").toMap();
-			const QString terrain_type_identifier = properties.value("terrain_type").toString();
-
-			const terrain_type *terrain = terrain_type::get(terrain_type_identifier.toStdString());
+		for (const auto &kv_pair : terrain_data) {
+			const terrain_type *terrain = kv_pair.first;
 
 			if (terrain->is_overlay() != overlay) {
 				return;
 			}
 
-			for (const QVariant &subfeature_variant : feature.value("data").toList()) {
-				const QVariantMap subfeature_map = subfeature_variant.toMap();
-				const QGeoPolygon geopolygon = subfeature_map.value("data").value<QGeoPolygon>();
-				geoshape::write_to_image(geopolygon, image, terrain->get_color(), georectangle, filename);
+			for (const auto &geoshape : kv_pair.second) {
+				geoshape::write_to_image(*geoshape, image, terrain->get_color(), georectangle, filename);
 			}
-		});
+		}
 
 		stratagus::point_map<const stratagus::terrain_type *> terrain_map;
 
@@ -2106,24 +2104,6 @@ void map_template::save_terrain_image(const std::string &filename, const bool ov
 	}
 
 	image.save(QString::fromStdString(filename));
-}
-
-std::vector<QVariantList> map_template::parse_geojson_folder(const std::string_view &folder) const
-{
-	std::vector<QVariantList> geojson_data_list;
-
-	for (const std::filesystem::path &path : database::get()->get_maps_paths()) {
-		const std::filesystem::path map_path = path / this->get_identifier() / folder;
-
-		if (!std::filesystem::exists(map_path)) {
-			continue;
-		}
-
-		std::vector<QVariantList> folder_geojson_data_list = geojson::parse_folder(map_path);
-		vector::merge(geojson_data_list, std::move(folder_geojson_data_list));
-	}
-
-	return geojson_data_list;
 }
 
 void generated_terrain::process_sml_property(const sml_property &property)

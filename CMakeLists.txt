@@ -210,6 +210,7 @@ set(map_SRCS
 	src/map/script_map.cpp
 	src/map/script_tileset.cpp
 	src/map/site.cpp
+	src/map/terrain_geodata_map.cpp
 	src/map/terrain_type.cpp
 	src/map/tileset.cpp
 )
@@ -643,6 +644,7 @@ set(stratagus_map_HDRS
 	src/map/minimap_mode.h
 	src/map/region.h
 	src/map/site.h
+	src/map/terrain_geodata_map.h
 	src/map/terrain_type.h
 	src/map/tile.h
 	src/map/tileset.h

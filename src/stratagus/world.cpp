@@ -30,11 +30,14 @@
 #include "world.h"
 
 #include "config.h"
+#include "map/terrain_type.h"
 #include "plane.h"
 #include "province.h"
 #include "time/season_schedule.h"
 #include "time/time_of_day_schedule.h"
 #include "ui/ui.h"
+#include "util/geojson_util.h"
+#include "util/vector_util.h"
 
 namespace stratagus {
 
@@ -55,11 +58,6 @@ world::~world()
 	}
 }
 
-/**
-**	@brief	Process data provided by a configuration file
-**
-**	@param	config_data	The configuration data
-*/
 void world::ProcessConfigData(const CConfigData *config_data)
 {
 	for (size_t i = 0; i < config_data->Properties.size(); ++i) {
@@ -87,5 +85,46 @@ void world::ProcessConfigData(const CConfigData *config_data)
 		}
 	}
 }
+
+std::vector<QVariantList> world::parse_geojson_folder(const std::string_view &folder) const
+{
+	std::vector<QVariantList> geojson_data_list;
+
+	for (const std::filesystem::path &path : database::get()->get_maps_paths()) {
+		const std::filesystem::path map_path = path / this->get_identifier() / folder;
+
+		if (!std::filesystem::exists(map_path)) {
+			continue;
+		}
+
+		std::vector<QVariantList> folder_geojson_data_list = geojson::parse_folder(map_path);
+		vector::merge(geojson_data_list, std::move(folder_geojson_data_list));
+	}
+
+	return geojson_data_list;
+}
+
+terrain_geodata_map world::parse_terrain_geojson_folder() const
+{
+	terrain_geodata_map terrain_data;
+
+	const std::vector<QVariantList> geojson_data_list = this->parse_geojson_folder(world::terrain_map_folder);
+
+	geojson::process_features(geojson_data_list, [&](const QVariantMap &feature) {
+		const QVariantMap properties = feature.value("properties").toMap();
+		const QString terrain_type_identifier = properties.value("terrain_type").toString();
+
+		const terrain_type *terrain = terrain_type::get(terrain_type_identifier.toStdString());
+
+		for (const QVariant &subfeature_variant : feature.value("data").toList()) {
+			const QVariantMap subfeature_map = subfeature_variant.toMap();
+			const QGeoPolygon geopolygon = subfeature_map.value("data").value<QGeoPolygon>();
+			terrain_data[terrain].push_back(std::make_unique<QGeoPolygon>(geopolygon));
+		}
+	});
+
+	return terrain_data;
+}
+
 
 }

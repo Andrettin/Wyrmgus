@@ -583,4 +583,9 @@ void terrain_type::remove_inner_border_terrain_type(terrain_type *terrain_type)
 	vector::remove(this->inner_border_terrain_types, terrain_type);
 }
 
+bool terrain_type::is_water() const
+{
+	return this->Flags & MapFieldWaterAllowed;
+}
+
 }

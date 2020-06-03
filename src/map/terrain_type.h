@@ -385,6 +385,8 @@ public:
 		return empty_vector;
 	}
 
+	bool is_water() const;
+
 private:
 	char character = 0;
 	QColor color;

@@ -30,6 +30,7 @@
 #include "database/data_type.h"
 #include "database/named_data_entry.h"
 #include "data_type.h"
+#include "map/terrain_geodata_map.h"
 #include "map/tile.h"
 #include "time/date.h"
 #include "util/point_container.h"
@@ -120,7 +121,6 @@ public:
 	static constexpr const char *database_folder = "map_templates";
 	static constexpr QPoint min_adjacent_template_distance = QPoint(4, 4);
 	static constexpr QPoint max_adjacent_template_distance = QPoint(16, 16);
-	static constexpr const char *terrain_folder = "terrain";
 
 	explicit map_template(const std::string &identifier);
 	~map_template();
@@ -547,8 +547,7 @@ public:
 		return this->max_latitude;
 	}
 
-	void save_terrain_image(const std::string &filename, const bool overlay, const std::vector<QVariantList> &geojson_data_list) const;
-	std::vector<QVariantList> parse_geojson_folder(const std::string_view &folder) const;
+	void save_terrain_image(const std::string &filename, const bool overlay, const terrain_geodata_map &terrain_data) const;
 	
 private:
 	std::filesystem::path terrain_file;

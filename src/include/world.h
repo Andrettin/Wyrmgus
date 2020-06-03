@@ -30,10 +30,7 @@
 #include "database/data_type.h"
 #include "database/detailed_data_entry.h"
 #include "data_type.h"
-
-/*----------------------------------------------------------------------------
---  Declarations
-----------------------------------------------------------------------------*/
+#include "map/terrain_geodata_map.h"
 
 class CProvince;
 class CSeasonSchedule;
@@ -44,6 +41,7 @@ namespace stratagus {
 
 class plane;
 class species;
+class terrain_type;
 
 class world final : public detailed_data_entry, public data_type<world>, public CDataType
 {
@@ -52,10 +50,11 @@ class world final : public detailed_data_entry, public data_type<world>, public 
 public:
 	static constexpr const char *class_identifier = "world";
 	static constexpr const char *database_folder = "worlds";
+	static constexpr const char *terrain_map_folder = "terrain";
 
 	static world *add(const std::string &identifier, const stratagus::module *module);
 
-	world(const std::string &identifier) : detailed_data_entry(identifier), CDataType(identifier)
+	explicit world(const std::string &identifier) : detailed_data_entry(identifier), CDataType(identifier)
 	{
 	}
 
@@ -68,7 +67,10 @@ public:
 		return this->plane;
 	}
 
-	int ID = -1;														/// ID of this world
+	std::vector<QVariantList> parse_geojson_folder(const std::string_view &folder) const;
+	terrain_geodata_map parse_terrain_geojson_folder() const;
+
+	int ID = -1;
 private:
 	plane *plane = nullptr;
 public:
