@@ -2071,7 +2071,7 @@ void map_template::save_terrain_image(const std::string &filename, const bool ov
 			const terrain_type *terrain = kv_pair.first;
 
 			if (terrain->is_overlay() != overlay) {
-				return;
+				continue;
 			}
 
 			for (const auto &geoshape : kv_pair.second) {
