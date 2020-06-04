@@ -732,6 +732,15 @@ int VideoValidResolution(int w, int h)
 	return SDL_VideoModeOK(w, h, TheScreen->format->BitsPerPixel, TheScreen->flags);
 }
 
+static void do_mouse_warp()
+{
+	int xw = UI.MouseWarpPos.x;
+	int yw = UI.MouseWarpPos.y;
+	UI.MouseWarpPos.x = -1;
+	UI.MouseWarpPos.y = -1;
+	SDL_WarpMouse(xw, yw);
+}
+
 /**
 **  Handle interactive input event.
 **
@@ -754,10 +763,18 @@ static void SdlDoEvent(const EventCallback &callbacks, SDL_Event &event)
 	switch (event.type) {
 		case SDL_MOUSEBUTTONDOWN:
 			InputMouseButtonPress(callbacks, SDL_GetTicks(), event.button.button);
+			if ((UI.MouseWarpPos.x != -1 || UI.MouseWarpPos.y != -1)
+				&& (event.button.x != UI.MouseWarpPos.x || event.button.y != UI.MouseWarpPos.y)) {
+				do_mouse_warp();
+			}
 			break;
 
 		case SDL_MOUSEBUTTONUP:
 			InputMouseButtonRelease(callbacks, SDL_GetTicks(), event.button.button);
+			if ((UI.MouseWarpPos.x != -1 || UI.MouseWarpPos.y != -1)
+				&& (event.button.x != UI.MouseWarpPos.x || event.button.y != UI.MouseWarpPos.y)) {
+				do_mouse_warp();
+			}
 			break;
 
 		// FIXME: check if this is only useful for the cursor
@@ -767,11 +784,7 @@ static void SdlDoEvent(const EventCallback &callbacks, SDL_Event &event)
 			// FIXME: Same bug fix from X11
 			if ((UI.MouseWarpPos.x != -1 || UI.MouseWarpPos.y != -1)
 				&& (event.motion.x != UI.MouseWarpPos.x || event.motion.y != UI.MouseWarpPos.y)) {
-				int xw = UI.MouseWarpPos.x;
-				int yw = UI.MouseWarpPos.y;
-				UI.MouseWarpPos.x = -1;
-				UI.MouseWarpPos.y = -1;
-				SDL_WarpMouse(xw, yw);
+				do_mouse_warp();
 			}
 			break;
 
