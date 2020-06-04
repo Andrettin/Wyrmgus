@@ -244,7 +244,11 @@ public:
 				continue; //the instance might have been initialized already, e.g. in the initialization function of another instance which needs it to be initialized
 			}
 
-			instance->initialize();
+			try {
+				instance->initialize();
+			} catch (...) {
+				std::throw_with_nested(std::runtime_error("Failed to initialize the " + std::string(T::class_identifier) + " instance \"" + instance->get_identifier() + "\"."));
+			}
 		}
 	}
 
