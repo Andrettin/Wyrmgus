@@ -45,6 +45,7 @@
 #include "unit/unit_class.h"
 #include "unit/unit_type.h"
 #include "util/container_util.h"
+#include "util/geocoordinate_util.h"
 #include "util/random.h"
 #include "util/string_util.h"
 #include "util/vector_util.h"
@@ -181,6 +182,14 @@ void site::ProcessConfigData(const CConfigData *config_data)
 
 void site::initialize()
 {
+	if (this->get_geocoordinate().isValid()) {
+		const QGeoRectangle georectangle = this->get_map_template()->get_georectangle();
+		const double lon_per_pixel = geocoordinate::longitude_per_pixel(georectangle.width(), this->get_map_template()->get_size());
+		const double lat_per_pixel = geocoordinate::latitude_per_pixel(georectangle.height(), this->get_map_template()->get_size());
+		const QPoint geocoordinate_offset = geocoordinate::to_point(georectangle.topLeft(), lon_per_pixel, lat_per_pixel);
+		this->pos = geocoordinate::to_point(this->get_geocoordinate(), lon_per_pixel, lat_per_pixel) - geocoordinate_offset;
+	}
+
 	//if a settlement has no color assigned to it, assign a random one instead
 	if (this->is_major() && !this->get_minimap_color().isValid()) {
 		this->minimap_color = QColor(random::get()->generate(256), random::get()->generate(256), random::get()->generate(256));

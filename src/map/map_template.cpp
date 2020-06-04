@@ -1010,18 +1010,8 @@ void map_template::apply_sites(const QPoint &template_start_pos, const QPoint &m
 		start_date = current_campaign->get_start_date();
 	}
 
-	const QGeoRectangle georectangle = this->get_georectangle();
-	const double lon_per_pixel = geocoordinate::longitude_per_pixel(georectangle.width(), this->get_size());
-	const double lat_per_pixel = geocoordinate::latitude_per_pixel(georectangle.height(), this->get_size());
-	const QPoint geocoordinate_offset = geocoordinate::to_point(georectangle.topLeft(), lon_per_pixel, lat_per_pixel);
-
 	for (site *site : this->sites) {
-		QPoint site_raw_pos;
-		if (site->get_geocoordinate().isValid()) {
-			site_raw_pos = geocoordinate::to_point(site->get_geocoordinate(), lon_per_pixel, lat_per_pixel) - geocoordinate_offset;
-		} else {
-			site_raw_pos = site->get_pos();
-		}
+		const QPoint site_raw_pos = site->get_pos();
 		Vec2i site_pos(map_start_pos + site_raw_pos - template_start_pos);
 
 		Vec2i unit_offset((settlement_site_unit_type->get_tile_size() - QSize(1, 1)) / 2);
