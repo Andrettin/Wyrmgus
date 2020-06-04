@@ -8,8 +8,6 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name include/font.h - The font headerfile. */
-//
 //      (c) Copyright 1998-2020 by Lutz Sammer, Jimmy Salmon and Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
@@ -29,39 +27,9 @@
 
 #pragma once
 
-/*----------------------------------------------------------------------------
---  Documentation
-----------------------------------------------------------------------------*/
-
-/**
-**  @class CFont font.h
-**
-**  \#include "font.h"
-**
-**  Defines the fonts used in the Stratagus engine. We support
-**  proportional multicolor fonts of 9 colors.
-**  (Currently the fonts aren't packed)
-**
-**  CFont::CharWidth[]
-**
-**    The width of each font glyph in pixels. The index 0 is the
-**    width of the SPACE (' ', 0x20).
-**
-**  CFont::G
-**
-**    Contains the graphics of the font, Only 9 colors are supported.
-*/
-
-/*----------------------------------------------------------------------------
---  Includes
-----------------------------------------------------------------------------*/
-
 #include "color.h"
 #include "guichan/font.h"
 
-/*----------------------------------------------------------------------------
---  Declarations
-----------------------------------------------------------------------------*/
 class CGraphic;
 class CFontColor;
 
@@ -135,22 +103,14 @@ public:
 	CColor Colors[MaxFontColors];
 };
 
-/*----------------------------------------------------------------------------
---  Definitions
-----------------------------------------------------------------------------*/
-
 /**
 **  FIXME: should be moved to lua
 */
-#define FontRed "red"
-#define FontGreen "green"
-#define FontYellow "yellow"
-#define FontWhite "white"
-#define FontGrey "grey"
-
-/*----------------------------------------------------------------------------
---  Functions
-----------------------------------------------------------------------------*/
+static constexpr const char *FontRed = "red";
+static constexpr const char *FontGreen = "green";
+static constexpr const char *FontYellow = "yellow";
+static constexpr const char *FontWhite = "white";
+static constexpr const char *FontGrey = "grey";
 
 /**
 **  Font selector for the font functions.
