@@ -1856,7 +1856,7 @@ static void InfoPanel_draw_no_selection()
 		});
 
 		for (const CPlayer *player : listed_players) {
-			if (CPlayer::GetThisPlayer()->IsAllied(*player)) {
+			if (player == CPlayer::GetThisPlayer() || CPlayer::GetThisPlayer()->IsAllied(*player)) {
 				label.SetNormalColor(FontGreen);
 			} else if (CPlayer::GetThisPlayer()->IsEnemy(*player)) {
 				label.SetNormalColor(FontRed);
