@@ -401,6 +401,12 @@ public:
 
 	bool IsEnemy(const CPlayer &player) const;
 	bool IsEnemy(const CUnit &unit) const;
+
+	bool IsAllied(const int index) const
+	{
+		return (this->Index != index && (this->Allied & (1 << index)) != 0);
+	}
+
 	bool IsAllied(const CPlayer &player) const;
 	bool IsAllied(const CUnit &unit) const;
 	bool IsVisionSharing() const;

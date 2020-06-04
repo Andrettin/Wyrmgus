@@ -4183,7 +4183,8 @@ bool CPlayer::IsEnemy(const CUnit &unit) const
 */
 bool CPlayer::IsAllied(const CPlayer &player) const
 {
-	return (Allied & (1 << player.Index)) != 0;
+	//only consider yourself to be the ally of another player if they have the allied stance with you as well
+	return this->IsAllied(player.Index) && player.IsAllied(this->Index);
 }
 
 /**
@@ -4193,7 +4194,6 @@ bool CPlayer::IsAllied(const CUnit &unit) const
 {
 	return IsAllied(*unit.Player);
 }
-
 
 bool CPlayer::IsVisionSharing() const
 {
