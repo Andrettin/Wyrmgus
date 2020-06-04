@@ -76,13 +76,6 @@ void faction::process_sml_property(const sml_property &property)
 		} else {
 			throw std::runtime_error("Faction type \"" + value + "\" doesn't exist.");
 		}
-	} else if (key == "default_tier") {
-		const faction_tier tier = string_to_faction_tier(value);
-		if (tier != faction_tier::none) {
-			this->default_tier = tier;
-		} else {
-			throw std::runtime_error("Faction tier \"" + value + "\" doesn't exist.");
-		}
 	} else if (key == "faction_upgrade") {
 		this->FactionUpgrade = value;
 	} else {

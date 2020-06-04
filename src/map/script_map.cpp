@@ -975,10 +975,7 @@ static int CclCreateMapTemplateTerrainFile(lua_State *l)
 
 void ApplyCampaignMap(const std::string &campaign_ident)
 {
-	//load the history of historical units, so that the map templates being applied can check whether the units should be applied on them
-	for (stratagus::historical_unit *historical_unit : stratagus::historical_unit::get_all()) {
-		historical_unit->load_history();
-	}
+	stratagus::database::load_history();
 
 	const stratagus::campaign *campaign = stratagus::campaign::get(campaign_ident);
 	

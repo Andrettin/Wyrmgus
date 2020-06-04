@@ -141,11 +141,6 @@ void game::apply_player_history()
 {
 	const CDate start_date = current_campaign->get_start_date();
 
-	//load history for all civilizations
-	for (civilization *civilization : civilization::get_all()) {
-		civilization->load_history();
-	}
-
 	for (CPlayer *player : CPlayer::Players) {
 		if (player->Type == PlayerNobody || player->Race == -1 || player->Faction == -1) {
 			continue;
@@ -154,7 +149,6 @@ void game::apply_player_history()
 		if (start_date.Year) {
 			civilization *civilization = civilization::get_all()[player->Race];
 			faction *faction = faction::get_all()[player->Faction];
-			faction->load_history();
 
 			for (std::map<std::string, std::map<CDate, bool>>::iterator iterator = civilization->HistoricalUpgrades.begin(); iterator != civilization->HistoricalUpgrades.end(); ++iterator) {
 				int upgrade_id = UpgradeIdByIdent(iterator->first);

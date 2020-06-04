@@ -237,6 +237,13 @@ public:
 		}
 	}
 
+	static void load_history_database()
+	{
+		for (T *instance : T::get_all()) {
+			instance->load_history();
+		}
+	}
+
 	static void initialize_all()
 	{
 		for (T *instance : T::get_all()) {

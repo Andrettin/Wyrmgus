@@ -1037,8 +1037,6 @@ void map_template::apply_sites(const QPoint &template_start_pos, const QPoint &m
 			continue;
 		}
 
-		site->load_history();
-
 		if (site->is_major() && settlement_site_unit_type != nullptr) { //add a settlement site for major sites
 			if (!is_position_shift_acceptable && !UnitTypeCanBeAt(*settlement_site_unit_type, site_pos - unit_offset, z) && CMap::Map.Info.IsPointOnMap(site_pos - unit_offset, z) && CMap::Map.Info.IsPointOnMap(site_pos - unit_offset + Vec2i(settlement_site_unit_type->get_tile_size() - QSize(1, 1)), z)) {
 				fprintf(stderr, "The settlement site for \"%s\" should be placed on (%d, %d), but it cannot be there.\n", site->Ident.c_str(), site_raw_pos.x(), site_raw_pos.y());
@@ -1102,13 +1100,15 @@ void map_template::apply_sites(const QPoint &template_start_pos, const QPoint &m
 			continue;
 		}
 		
-		bool is_capital = false;
-		for (int i = ((int) site_owner->HistoricalCapitals.size() - 1); i >= 0; --i) {
-			if (start_date.ContainsDate(site_owner->HistoricalCapitals[i].first) || site_owner->HistoricalCapitals[i].first.Year == 0) {
-				if (site_owner->HistoricalCapitals[i].second == site->Ident) {
-					is_capital = true;
+		bool is_capital = site_owner->get_capital() == site;
+		if (!is_capital) {
+			for (int i = ((int) site_owner->HistoricalCapitals.size() - 1); i >= 0; --i) {
+				if (start_date.ContainsDate(site_owner->HistoricalCapitals[i].first) || site_owner->HistoricalCapitals[i].first.Year == 0) {
+					if (site_owner->HistoricalCapitals[i].second == site->Ident) {
+						is_capital = true;
+					}
+					break;
 				}
-				break;
 			}
 		}
 		

@@ -67,6 +67,7 @@
 #include "ui/cursor.h"
 #include "ui/cursor_type.h"
 #include "ui/icon.h"
+#include "unit/historical_unit.h"
 #include "unit/unit_class.h"
 #include "unit/unit_type.h"
 #include "upgrade/upgrade_class.h"
@@ -529,6 +530,14 @@ void database::load_defines()
 			}
 		}
 	}
+}
+
+void database::load_history()
+{
+	civilization::load_history_database();
+	faction::load_history_database();
+	site::load_history_database();
+	historical_unit::load_history_database();
 }
 
 void database::initialize()

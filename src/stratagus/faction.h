@@ -63,7 +63,10 @@ class faction final : public detailed_data_entry, public data_type<faction>
 	Q_PROPERTY(stratagus::civilization* civilization MEMBER civilization READ get_civilization)
 	Q_PROPERTY(stratagus::icon* icon MEMBER icon READ get_icon)
 	Q_PROPERTY(stratagus::player_color* color MEMBER color READ get_color)
+	Q_PROPERTY(stratagus::faction_tier default_tier MEMBER default_tier READ get_default_tier)
+	Q_PROPERTY(stratagus::site* default_capital MEMBER default_capital READ get_default_capital)
 	Q_PROPERTY(stratagus::faction_tier tier MEMBER tier READ get_tier)
+	Q_PROPERTY(stratagus::site* capital MEMBER capital READ get_capital)
 	Q_PROPERTY(QVariantList acquired_upgrades READ get_acquired_upgrades_qstring_list)
 
 public:
@@ -89,6 +92,7 @@ public:
 	virtual void reset_history() override
 	{
 		this->tier = this->get_default_tier();
+		this->capital = this->get_default_capital();
 		this->resources.clear();
 		this->diplomacy_states.clear();
 		this->acquired_upgrades.clear();
@@ -114,6 +118,11 @@ public:
 	player_color *get_color() const
 	{
 		return this->color;
+	}
+
+	site *get_default_capital() const
+	{
+		return this->default_capital;
 	}
 
 	int GetUpgradePriority(const CUpgrade *upgrade) const;
@@ -183,6 +192,11 @@ public:
 		return this->tier;
 	}
 
+	site *get_capital() const
+	{
+		return this->capital;
+	}
+
 	const std::map<const resource *, int> &get_resources() const
 	{
 		return this->resources;
@@ -228,6 +242,7 @@ public:
 	LuaCallback *Conditions = nullptr;
 private:
 	player_color *color = nullptr; /// faction color
+	site *default_capital = nullptr;
 public:
 	std::vector<faction *> DevelopsFrom;								/// from which factions can this faction develop
 	std::vector<faction *> DevelopsTo;									/// to which factions this faction can develop
@@ -259,6 +274,7 @@ public:
 	std::map<int, int> HistoricalGovernmentTypes;						/// dates in which this faction's government type changed; government type mapped to year
 private:
 	faction_tier tier;
+	site *capital = nullptr;
 	std::map<const resource *, int> resources;
 	std::map<const faction *, diplomacy_state> diplomacy_states;
 	std::vector<CUpgrade *> acquired_upgrades;
