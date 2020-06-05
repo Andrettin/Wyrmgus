@@ -544,12 +544,20 @@ void database::initialize()
 {
 	//initialize data entries for each data type
 	for (const std::unique_ptr<data_type_metadata> &metadata : this->metadata) {
-		metadata->get_initialization_function()();
+		try {
+			metadata->get_initialization_function()();
+		} catch (...) {
+			std::throw_with_nested(std::runtime_error("Error initializing the instances of the " + metadata->get_class_identifier() + " class."));
+		}
 	}
 
 	//check if data entries are valid for each data type
 	for (const std::unique_ptr<data_type_metadata> &metadata : this->metadata) {
-		metadata->get_checking_function()();
+		try {
+			metadata->get_checking_function()();
+		} catch (...) {
+			std::throw_with_nested(std::runtime_error("Error when checking the instances of the " + metadata->get_class_identifier() + " class."));
+		}
 	}
 }
 
