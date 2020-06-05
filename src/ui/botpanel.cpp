@@ -702,6 +702,9 @@ static void GetPopupSize(const CPopup &popup, const stratagus::button &button,
 		case ButtonCmd::Buy:
 			unit_type = UnitManager.GetSlotUnit(button.Value).Type;
 			break;
+		case ButtonCmd::Salvage:
+			unit_type = Selected[0]->Type;
+			break;
 		default:
 			unit_type = stratagus::unit_type::get_all()[button.Value];
 			break;
