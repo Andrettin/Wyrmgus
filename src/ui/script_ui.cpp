@@ -704,18 +704,6 @@ static int CclRightButtonMoves(lua_State *l)
 }
 
 /**
-**  Enable/disable the fancy buildings.
-**
-**  @param l  Lua state.
-*/
-static int CclSetFancyBuildings(lua_State *l)
-{
-	LuaCheckArgs(l, 1);
-	FancyBuildings = LuaToBoolean(l, 1);
-	return 0;
-}
-
-/**
 **  Find a button style
 **
 **  @param style  Name of the style to find.
@@ -1337,7 +1325,6 @@ void UserInterfaceCclRegister()
 
 	lua_register(Lua, "RightButtonAttacks", CclRightButtonAttacks);
 	lua_register(Lua, "RightButtonMoves", CclRightButtonMoves);
-	lua_register(Lua, "SetFancyBuildings", CclSetFancyBuildings);
 
 	lua_register(Lua, "DefineButton", CclDefineButton);
 

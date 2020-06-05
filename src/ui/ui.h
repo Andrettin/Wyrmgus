@@ -525,8 +525,6 @@ extern bool RightButtonAttacks;         /// right button attacks
 extern const char DefaultGroupKeys[];         /// Default group keys
 extern std::string UiGroupKeys;               /// Up to 11 keys used for group selection
 
-extern bool FancyBuildings;             /// Mirror buildings 1 yes, 0 now.
-
 /// Initialize the ui
 extern void InitUserInterface();
 /// Save the ui state

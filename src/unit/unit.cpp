@@ -3061,12 +3061,6 @@ CUnit *MakeUnit(const stratagus::unit_type &type, CPlayer *player)
 		unit->Type->OnInit->pushInteger(UnitNumber(*unit));
 		unit->Type->OnInit->run();
 	}
-
-	//  fancy buildings: mirror buildings (but shadows not correct)
-	if (type.BoolFlag[BUILDING_INDEX].value && FancyBuildings
-		&& unit->Type->BoolFlag[NORANDOMPLACING_INDEX].value == false && SyncRand(2) != 0) {
-		unit->Frame = -unit->Frame - 1;
-	}
 	
 	return unit;
 }
@@ -8021,6 +8015,5 @@ void CleanUnits()
 
 	UnitManager.Init();
 
-	FancyBuildings = false;
 	HelpMeLastCycle = 0;
 }

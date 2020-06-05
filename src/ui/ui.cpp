@@ -63,8 +63,6 @@ bool RightButtonAttacks;                   /// right button attacks
 
 static ViewportModeType NewViewportMode = VIEWPORT_SINGLE;
 
-bool FancyBuildings;                       /// Mirror buildings 1 yes, 0 now.
-
 /**
 **  The user interface configuration
 */
