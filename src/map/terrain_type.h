@@ -46,7 +46,7 @@ class season;
 class unit_type;
 enum class tile_transition_type;
 
-class terrain_type : public named_data_entry, public data_type<terrain_type>, public CDataType
+class terrain_type final : public named_data_entry, public data_type<terrain_type>, public CDataType
 {
 	Q_OBJECT
 
@@ -149,7 +149,7 @@ public:
 		terrain_type::terrain_types_by_tile_number.clear();
 	}
 
-	terrain_type(const std::string &identifier) : named_data_entry(identifier), CDataType(identifier)
+	explicit terrain_type(const std::string &identifier) : named_data_entry(identifier), CDataType(identifier)
 	{
 	}
 	

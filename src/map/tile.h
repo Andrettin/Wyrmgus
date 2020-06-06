@@ -138,13 +138,13 @@ class CPlayer;
 class CTileset;
 //Wyrmgus start
 class CGraphic;
-class CTerrainFeature;
 //Wyrmgus end
 struct lua_State;
 
 namespace stratagus {
 	class resource;
 	class site;
+	class terrain_feature;
 	class terrain_type;
 }
 
@@ -256,6 +256,16 @@ public:
 
 	bool IsSeenTileCorrect() const;
 	
+	const stratagus::terrain_feature *get_terrain_feature() const
+	{
+		return this->terrain_feature;
+	}
+
+	void set_terrain_feature(const stratagus::terrain_feature *terrain_feature)
+	{
+		this->terrain_feature = terrain_feature;
+	}
+
 	const stratagus::resource *get_resource() const;
 
 	bool IsDestroyedForestTile() const;
@@ -289,9 +299,11 @@ public:
 	unsigned long Flags;      /// field flags
 	unsigned char AnimationFrame;		/// current frame of the tile's animation
 	unsigned char OverlayAnimationFrame;		/// current frame of the overlay tile's animation
-	stratagus::terrain_type *Terrain;
-	stratagus::terrain_type *OverlayTerrain;
-	CTerrainFeature *TerrainFeature;
+	stratagus::terrain_type *Terrain = nullptr;
+	stratagus::terrain_type *OverlayTerrain = nullptr;
+private:
+	const stratagus::terrain_feature *terrain_feature = nullptr;
+public:
 	short SolidTile;
 	short OverlaySolidTile;
 	bool OverlayTerrainDestroyed;

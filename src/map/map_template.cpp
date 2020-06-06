@@ -42,6 +42,7 @@
 #include "map/map.h"
 #include "map/map_layer.h"
 #include "map/site.h"
+#include "map/terrain_feature.h"
 #include "map/terrain_type.h"
 #include "map/tile.h"
 #include "map/tileset.h"
@@ -474,10 +475,9 @@ void map_template::ApplyTerrainImage(bool overlay, Vec2i template_start_pos, Vec
 			}
 
 			terrain_type *terrain = nullptr;
-			short terrain_feature_id = -1;
-			if (TerrainFeatureColorToIndex.find(std::tuple<int, int, int>(color.red(), color.green(), color.blue())) != TerrainFeatureColorToIndex.end()) {
-				terrain_feature_id = TerrainFeatureColorToIndex.find(std::tuple<int, int, int>(color.red(), color.green(), color.blue()))->second;
-				terrain = TerrainFeatures[terrain_feature_id]->TerrainType;
+			terrain_feature *terrain_feature = terrain_feature::try_get_by_color(color);
+			if (terrain_feature != nullptr) {
+				terrain = terrain_feature->get_terrain_type();
 			} else {
 				terrain = terrain_type::try_get_by_color(color);
 			}
@@ -490,8 +490,8 @@ void map_template::ApplyTerrainImage(bool overlay, Vec2i template_start_pos, Vec
 			if (terrain) {
 				CMap::Map.Field(real_pos, z)->SetTerrain(terrain);
 
-				if (terrain_feature_id != -1) {
-					CMap::Map.Field(real_pos, z)->TerrainFeature = TerrainFeatures[terrain_feature_id];
+				if (terrain_feature != nullptr) {
+					CMap::Map.Field(real_pos, z)->set_terrain_feature(terrain_feature);
 				}
 			} else {
 				if (color.red() != 0 || color.green() != 0 || color.blue() != 0 || !overlay) { //fully black pixels represent areas in overlay terrain files that don't have any overlays
@@ -1165,7 +1165,7 @@ void map_template::apply_sites(const QPoint &template_start_pos, const QPoint &m
 
 			if (first_building) {
 				if (!unit_type->BoolFlag[TOWNHALL_INDEX].value) { //if one building is representing a minor site, make it have the site's name
-					unit->Name = site->GetCulturalName(site_owner->get_civilization());
+					unit->Name = site->get_cultural_name(site_owner->get_civilization());
 				}
 				first_building = false;
 			}
@@ -1241,7 +1241,7 @@ void map_template::apply_sites(const QPoint &template_start_pos, const QPoint &m
 				}
 				if (first_building) {
 					if (!unit_type->BoolFlag[TOWNHALL_INDEX].value && !unit->Unique && (!building_owner || building_owner == site_owner)) { //if one building is representing a minor site, make it have the site's name
-						unit->Name = site->GetCulturalName(site_owner->get_civilization());
+						unit->Name = site->get_cultural_name(site_owner->get_civilization());
 					}
 					first_building = false;
 				}

@@ -31,7 +31,6 @@
 
 class CGraphic;
 class CProvince;
-class CTerrainFeature;
 class CUpgrade;
 class WorldMapTile;
 

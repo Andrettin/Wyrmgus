@@ -2876,7 +2876,7 @@ static int CclGetPlayerData(lua_State *l)
 		LuaCheckArgs(l, 3);
 		std::string site_ident = LuaToString(l, 3);
 		const stratagus::site *site = stratagus::site::get(site_ident);
-		lua_pushstring(l, site->GetCulturalName(p->Race != -1 ? stratagus::civilization::get_all()[p->Race] : nullptr).c_str());
+		lua_pushstring(l, site->get_cultural_name(p->Race != -1 ? stratagus::civilization::get_all()[p->Race] : nullptr).c_str());
 		return 1;
 	//Wyrmgus end
 	} else if (!strcmp(data, "Currency")) {

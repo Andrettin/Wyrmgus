@@ -59,7 +59,7 @@ void site::process_sml_scope(const sml_data &scope)
 	if (tag == "cultural_names") {
 		scope.for_each_property([&](const sml_property &property) {
 			const civilization *civilization = civilization::get(property.get_key());
-			this->CulturalNames[civilization] = property.get_value();
+			this->cultural_names[civilization] = property.get_value();
 		});
 	} else {
 		data_entry::process_sml_scope(scope);
@@ -115,7 +115,7 @@ void site::ProcessConfigData(const CConfigData *config_data)
 				std::string value = child_config_data->Properties[j].second;
 				
 				const civilization *civilization = civilization::get(key);
-				this->CulturalNames[civilization] = value;
+				this->cultural_names[civilization] = value;
 			}
 		} else if (child_config_data->Tag == "historical_owner") {
 			CDate date;
@@ -219,18 +219,11 @@ void site::initialize()
 	}
 }
 
-/**
-**	@brief	Get a site's cultural name
-**
-**	@param	civilization	The civilization for which to get the cultural name
-**
-**	@return	The cultural name if present, or the default name otherwise
-*/
-std::string site::GetCulturalName(const civilization *civilization) const
+const std::string &site::get_cultural_name(const civilization *civilization) const
 {
 	if (civilization != nullptr) {
-		const auto find_iterator = this->CulturalNames.find(civilization);
-		if (find_iterator != this->CulturalNames.end()) {
+		const auto find_iterator = this->cultural_names.find(civilization);
+		if (find_iterator != this->cultural_names.end()) {
 			return find_iterator->second;
 		}
 	}

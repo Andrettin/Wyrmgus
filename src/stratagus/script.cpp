@@ -1617,7 +1617,7 @@ std::string EvalString(const StringDesc *s)
 				if (civilization != nullptr && unit->settlement->get_site_unit()->Player->Faction != -1 && (unit->settlement->get_site_unit()->Player->Race == civilization->ID || unit->settlement->get_site_unit()->Type == stratagus::faction::get_all()[unit->settlement->get_site_unit()->Player->Faction]->get_class_unit_type(unit->settlement->get_site_unit()->Type->get_unit_class()))) {
 					civilization = unit->settlement->get_site_unit()->Player->Race != -1 ? stratagus::civilization::get_all()[unit->settlement->get_site_unit()->Player->Race] : nullptr;
 				}
-				return unit->settlement->GetCulturalName(civilization);
+				return unit->settlement->get_cultural_name(civilization);
 			} else {
 				return std::string("");
 			}
@@ -1827,7 +1827,7 @@ std::string EvalString(const StringDesc *s)
 					if (!has_settlement) {
 						settlements_string += "~<";
 					}
-					settlements_string += (**faction).Cores[i]->GetCulturalName(CPlayer::GetThisPlayer()->Race != -1 ? stratagus::civilization::get_all()[CPlayer::GetThisPlayer()->Race] : nullptr);
+					settlements_string += (**faction).Cores[i]->get_cultural_name(CPlayer::GetThisPlayer()->Race != -1 ? stratagus::civilization::get_all()[CPlayer::GetThisPlayer()->Race] : nullptr);
 					if (!has_settlement) {
 						settlements_string += "~>";
 					}

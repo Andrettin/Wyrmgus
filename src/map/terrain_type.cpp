@@ -32,7 +32,7 @@
 #include "config.h"
 #include "database/defines.h"
 #include "iolib.h"
-#include "map/map.h"
+#include "map/terrain_feature.h"
 #include "map/tileset.h"
 #include "player_color.h"
 #include "time/season.h"
@@ -431,7 +431,7 @@ void terrain_type::set_color(const QColor &color)
 
 	if (terrain_type::try_get_by_color(color) != nullptr) {
 		throw std::runtime_error("Color is already used by another terrain type.");
-	} else if (TerrainFeatureColorToIndex.contains(std::tuple<int, int, int>(color.red(), color.green(), color.blue()))) {
+	} else if (terrain_feature::try_get_by_color(color) != nullptr) {
 		throw std::runtime_error("Color is already used by a terrain feature.");
 	}
 

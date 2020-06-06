@@ -50,6 +50,7 @@
 #include "map/map_template.h"
 #include "map/region.h"
 #include "map/site.h"
+#include "map/terrain_feature.h"
 #include "map/terrain_type.h"
 #include "missile/missile_class.h"
 #include "missile.h"
@@ -235,6 +236,8 @@ QVariant database::process_sml_property_value(const sml_property &property, cons
 			new_property_value = QVariant::fromValue(sound::get(property.get_value()));
 		} else if (property_class_name == "stratagus::species*") {
 			new_property_value = QVariant::fromValue(species::get(property.get_value()));
+		} else if (property_class_name == "stratagus::terrain_feature*") {
+			new_property_value = QVariant::fromValue(terrain_feature::get(property.get_value()));
 		} else if (property_class_name == "stratagus::terrain_type*") {
 			new_property_value = QVariant::fromValue(terrain_type::get(property.get_value()));
 		} else if (property_class_name == "stratagus::time_of_day*") {

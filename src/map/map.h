@@ -112,21 +112,6 @@ namespace stratagus {
 static constexpr int MaxMapWidth = 512; /// max map width supported
 static constexpr int MaxMapHeight = 512; /// max map height supported
 
-//Wyrmgus start
-class CTerrainFeature
-{
-public:
-	int ID = -1;
-	std::string Ident;
-	std::string Name;
-	CColor Color;
-	stratagus::terrain_type *TerrainType = nullptr;
-	stratagus::plane *plane = nullptr;
-	stratagus::world *world = nullptr;
-	std::map<int, std::string> CulturalNames; //names for the terrain feature for each different culture/civilization
-};
-//Wyrmgus end
-
 /*----------------------------------------------------------------------------
 --  Map info structure
 ----------------------------------------------------------------------------*/
@@ -213,7 +198,7 @@ public:
 	void calculate_tile_solid_tile(const QPoint &pos, const bool overlay, const int z);
 	void CalculateTileTransitions(const Vec2i &pos, bool overlay, int z);
 	void CalculateTileLandmass(const Vec2i &pos, int z);
-	void CalculateTileTerrainFeature(const Vec2i &pos, int z);
+	void calculate_tile_terrain_feature(const Vec2i &pos, int z);
 	void CalculateTileOwnershipTransition(const Vec2i &pos, int z);
 	void AdjustMap();
 	void AdjustTileMapIrregularities(const bool overlay, const Vec2i &min_pos, const Vec2i &max_pos, const int z);
@@ -359,17 +344,6 @@ public:
 	CMapInfo Info;             /// descriptive information
 };
 
-
-/*----------------------------------------------------------------------------
---  Variables
-----------------------------------------------------------------------------*/
-
-//Wyrmgus start
-extern std::vector<CTerrainFeature *> TerrainFeatures;
-extern std::map<std::string, CTerrainFeature *> TerrainFeatureIdentToPointer;
-extern std::map<std::tuple<int, int, int>, int> TerrainFeatureColorToIndex;
-//Wyrmgus end
-
 extern char CurrentMapPath[1024]; /// Path to the current map
 
 /// Contrast of fog of war
@@ -382,14 +356,6 @@ extern int ForestRegeneration;
 extern int FlagRevealMap;
 /// Flag must reveal map when in replay
 extern int ReplayRevealMap;
-
-/*----------------------------------------------------------------------------
---  Functions
-----------------------------------------------------------------------------*/
-
-//Wyrmgus start
-extern CTerrainFeature *GetTerrainFeature(const std::string &terrain_feature_ident);
-//Wyrmgus end
 
 #define MARKER_ON_INDEX
 //

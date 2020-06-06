@@ -8,8 +8,6 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name mapfield.cpp - The map field source file. */
-//
 //      (c) Copyright 2013-2020 by Joris Dauphin and Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
@@ -27,10 +25,6 @@
 //      02111-1307, USA.
 //
 
-/*----------------------------------------------------------------------------
---  Includes
-----------------------------------------------------------------------------*/
-
 #include "stratagus.h"
 
 #include "map/tile.h"
@@ -41,6 +35,7 @@
 #include "iolib.h"
 #include "map/map.h"
 #include "map/site.h"
+#include "map/terrain_feature.h"
 #include "map/terrain_type.h"
 #include "map/tileset.h"
 #include "player.h"
@@ -57,8 +52,6 @@ CMapField::CMapField() :
 	OwnershipBorderTile(-1),
 	AnimationFrame(0),
 	OverlayAnimationFrame(0),
-	Terrain(nullptr), OverlayTerrain(nullptr),
-	TerrainFeature(nullptr),
 	SolidTile(0), OverlaySolidTile(0),
 	OverlayTerrainDestroyed(false),
 	OverlayTerrainDamaged(false),
@@ -246,8 +239,8 @@ void CMapField::SetTerrain(stratagus::terrain_type *terrain_type)
 		this->Value = terrain_type->UnitType->MapDefaultStat.Variables[HP_INDEX].Max;
 	}
 	
-	if (this->TerrainFeature) {
-		this->TerrainFeature = nullptr;
+	if (this->get_terrain_feature() != nullptr) {
+		this->terrain_feature = nullptr;
 	}
 }
 
@@ -289,8 +282,8 @@ void CMapField::RemoveOverlayTerrain()
 		this->Flags |= MapFieldNoRail;
 	}
 
-	if (this->TerrainFeature) {
-		this->TerrainFeature = nullptr;
+	if (this->get_terrain_feature() != nullptr) {
+		this->terrain_feature = nullptr;
 	}
 }
 
@@ -374,9 +367,9 @@ void CMapField::UpdateSeenTile()
 
 void CMapField::Save(CFile &file) const
 {
-	//Wyrmgus start
-//	file.printf("  {%3d, %3d, %2d, %2d", tile, playerInfo.SeenTile, Value, cost);
-	file.printf("  {\"%s\", \"%s\", %s, %s, \"%s\", \"%s\", %d, %d, %d, %d, %2d, %2d, %2d, \"%s\"", (TerrainFeature && !TerrainFeature->TerrainType->is_overlay()) ? TerrainFeature->Ident.c_str() : (Terrain ? Terrain->Ident.c_str() : ""), (TerrainFeature && TerrainFeature->TerrainType->is_overlay()) ? TerrainFeature->Ident.c_str() : (OverlayTerrain ? OverlayTerrain->Ident.c_str() : ""), OverlayTerrainDamaged ? "true" : "false", OverlayTerrainDestroyed ? "true" : "false", playerInfo.SeenTerrain ? playerInfo.SeenTerrain->Ident.c_str() : "", playerInfo.SeenOverlayTerrain ? playerInfo.SeenOverlayTerrain->Ident.c_str() : "", SolidTile, OverlaySolidTile, playerInfo.SeenSolidTile, playerInfo.SeenOverlaySolidTile, Value, cost, Landmass, this->get_settlement() != nullptr ? this->get_settlement()->get_identifier().c_str() : "");
+	const stratagus::terrain_feature *terrain_feature = this->get_terrain_feature();
+
+	file.printf("  {\"%s\", \"%s\", %s, %s, \"%s\", \"%s\", %d, %d, %d, %d, %2d, %2d, %2d, \"%s\"", (terrain_feature != nullptr && !terrain_feature->get_terrain_type()->is_overlay()) ? terrain_feature->get_identifier().c_str() : (Terrain ? Terrain->Ident.c_str() : ""), (terrain_feature != nullptr && terrain_feature->get_terrain_type()->is_overlay()) ? terrain_feature->get_identifier().c_str() : (OverlayTerrain ? OverlayTerrain->Ident.c_str() : ""), OverlayTerrainDamaged ? "true" : "false", OverlayTerrainDestroyed ? "true" : "false", playerInfo.SeenTerrain ? playerInfo.SeenTerrain->Ident.c_str() : "", playerInfo.SeenOverlayTerrain ? playerInfo.SeenOverlayTerrain->Ident.c_str() : "", SolidTile, OverlaySolidTile, playerInfo.SeenSolidTile, playerInfo.SeenOverlaySolidTile, Value, cost, Landmass, this->get_settlement() != nullptr ? this->get_settlement()->get_identifier().c_str() : "");
 	
 	for (size_t i = 0; i != TransitionTiles.size(); ++i) {
 		file.printf(", \"transition-tile\", \"%s\", %d", TransitionTiles[i].first->Ident.c_str(), TransitionTiles[i].second);
@@ -472,7 +465,7 @@ void CMapField::Save(CFile &file) const
 	if (Flags & MapFieldStumps) {
 		file.printf(", \"stumps\"");
 	}
-	//Wyrmgus end
+
 #if 1
 	// Not Required for save
 	// These are required for now, UnitType::FieldFlags is 0 until
@@ -524,10 +517,10 @@ void CMapField::parse(lua_State *l)
 	*/
 	std::string terrain_ident = LuaToString(l, -1, 1);
 	if (!terrain_ident.empty()) {
-		CTerrainFeature *terrain_feature = GetTerrainFeature(terrain_ident);
-		if (terrain_feature) {
-			this->Terrain = terrain_feature->TerrainType;
-			this->TerrainFeature = terrain_feature;
+		const stratagus::terrain_feature *terrain_feature = stratagus::terrain_feature::try_get(terrain_ident);
+		if (terrain_feature != nullptr) {
+			this->Terrain = terrain_feature->get_terrain_type();
+			this->terrain_feature = terrain_feature;
 		} else {
 			this->Terrain = stratagus::terrain_type::get(terrain_ident);
 		}
@@ -535,10 +528,10 @@ void CMapField::parse(lua_State *l)
 	
 	std::string overlay_terrain_ident = LuaToString(l, -1, 2);
 	if (!overlay_terrain_ident.empty()) {
-		CTerrainFeature *overlay_terrain_feature = GetTerrainFeature(overlay_terrain_ident);
-		if (overlay_terrain_feature) {
-			this->OverlayTerrain = overlay_terrain_feature->TerrainType;
-			this->TerrainFeature = overlay_terrain_feature;
+		const stratagus::terrain_feature *overlay_terrain_feature = stratagus::terrain_feature::try_get(overlay_terrain_ident);
+		if (overlay_terrain_feature != nullptr) {
+			this->OverlayTerrain = overlay_terrain_feature->get_terrain_type();
+			this->terrain_feature = overlay_terrain_feature;
 		} else {
 			this->OverlayTerrain = stratagus::terrain_type::get(overlay_terrain_ident);
 		}

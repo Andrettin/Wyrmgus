@@ -39,6 +39,7 @@
 #include "map/map_layer.h"
 #include "map/map_template.h"
 #include "map/site.h"
+#include "map/terrain_feature.h"
 #include "map/terrain_type.h"
 #include "map/tileset.h"
 #include "plane.h"
@@ -82,40 +83,11 @@ extern oamlApi *oaml;
 extern bool enableOAML;
 #endif
 
-/*----------------------------------------------------------------------------
---  Variables
-----------------------------------------------------------------------------*/
-
-//Wyrmgus start
-std::vector<CTerrainFeature *> TerrainFeatures;
-std::map<std::string, CTerrainFeature *> TerrainFeatureIdentToPointer;
-std::map<std::tuple<int, int, int>, int> TerrainFeatureColorToIndex;
-//Wyrmgus end
 CMap CMap::Map; //the current map
 int FlagRevealMap; //flag must reveal the map
 int ReplayRevealMap; //reveal Map is replay
 int ForestRegeneration; //forest regeneration
 char CurrentMapPath[1024]; //path of the current map
-
-//Wyrmgus start
-/**
-**  Get a terrain feature
-*/
-CTerrainFeature *GetTerrainFeature(const std::string &terrain_feature_ident)
-{
-	if (terrain_feature_ident.empty()) {
-		return nullptr;
-	}
-	
-	std::map<std::string, CTerrainFeature *>::const_iterator find_iterator = TerrainFeatureIdentToPointer.find(terrain_feature_ident);
-	
-	if (find_iterator != TerrainFeatureIdentToPointer.end()) {
-		return find_iterator->second;
-	}
-	
-	return nullptr;
-}
-//Wyrmgus end
 
 /*----------------------------------------------------------------------------
 --  Visible and explored handling
@@ -1171,7 +1143,7 @@ void PreprocessMap()
 				CMapField &mf = *CMap::Map.Field(tile_pos, z);
 				CMap::Map.CalculateTileLandmass(tile_pos, z);
 				CMap::Map.CalculateTileOwnershipTransition(tile_pos, z);
-				CMap::Map.CalculateTileTerrainFeature(tile_pos, z);
+				CMap::Map.calculate_tile_terrain_feature(tile_pos, z);
 				mf.UpdateSeenTile();
 				UI.Minimap.UpdateXY(tile_pos, z);
 				UI.Minimap.update_territory_xy(tile_pos, z);
@@ -1801,7 +1773,7 @@ void CMap::SetTileTerrain(const Vec2i &pos, stratagus::terrain_type *terrain, in
 	}
 	this->CalculateTileTransitions(pos, false, z); 
 	this->CalculateTileTransitions(pos, true, z);
-	this->CalculateTileTerrainFeature(pos, z);
+	this->calculate_tile_terrain_feature(pos, z);
 	
 	if (mf.playerInfo.IsTeamVisible(*CPlayer::GetThisPlayer())) {
 		MarkSeenTile(mf, z);
@@ -1848,7 +1820,7 @@ void CMap::RemoveTileOverlayTerrain(const Vec2i &pos, int z)
 	mf.RemoveOverlayTerrain();
 	
 	this->CalculateTileTransitions(pos, true, z);
-	this->CalculateTileTerrainFeature(pos, z);
+	this->calculate_tile_terrain_feature(pos, z);
 	
 	if (mf.playerInfo.IsTeamVisible(*CPlayer::GetThisPlayer())) {
 		MarkSeenTile(mf, z);
@@ -2329,7 +2301,7 @@ void CMap::CalculateTileLandmass(const Vec2i &pos, int z)
 	}
 }
 
-void CMap::CalculateTileTerrainFeature(const Vec2i &pos, int z)
+void CMap::calculate_tile_terrain_feature(const Vec2i &pos, int z)
 {
 	if (!this->Info.IsPointOnMap(pos, z)) {
 		return;
@@ -2341,11 +2313,11 @@ void CMap::CalculateTileTerrainFeature(const Vec2i &pos, int z)
 	
 	CMapField &mf = *this->Field(pos, z);
 
-	if (mf.TerrainFeature) {
+	if (mf.get_terrain_feature() != nullptr) {
 		return; //already has a terrain feature
 	}
 
-	//if any adjacent tile the same top terrain as this one, and has a terrain feature, then use that
+	//if any adjacent tile has the same top terrain as this one, and has a terrain feature, then use that
 	for (int x_offset = -1; x_offset <= 1; ++x_offset) {
 		for (int y_offset = -1; y_offset <= 1; ++y_offset) {
 			if ((x_offset != 0 || y_offset != 0) && !(x_offset != 0 && y_offset != 0)) { //only directly adjacent tiles (no diagonal ones, and not the same tile)
@@ -2353,8 +2325,8 @@ void CMap::CalculateTileTerrainFeature(const Vec2i &pos, int z)
 				if (Map.Info.IsPointOnMap(adjacent_pos, z)) {
 					CMapField &adjacent_mf = *this->Field(adjacent_pos, z);
 
-					if (adjacent_mf.TerrainFeature && adjacent_mf.TerrainFeature->TerrainType == GetTileTopTerrain(pos, false, z)) {
-						mf.TerrainFeature = adjacent_mf.TerrainFeature;
+					if (adjacent_mf.get_terrain_feature() != nullptr && adjacent_mf.get_terrain_feature()->get_terrain_type() == GetTileTopTerrain(pos, false, z)) {
+						mf.set_terrain_feature(adjacent_mf.get_terrain_feature());
 						return;
 					}
 				}

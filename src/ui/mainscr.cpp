@@ -46,6 +46,7 @@
 #include "map/map_layer.h"
 #include "map/minimap_mode.h"
 #include "map/site.h"
+#include "map/terrain_feature.h"
 #include "map/tileset.h"
 #include "menus.h"
 #include "network.h"
@@ -980,13 +981,11 @@ void DrawPopups()
 					DrawPopup(*ba, unit_center_pos.x, unit_center_pos.y);
 					delete ba;
 					LastDrawnButtonPopup = nullptr;
-				} else if (mf.TerrainFeature) {
+				} else if (mf.get_terrain_feature() != nullptr) {
 					PixelPos tile_center_pos = CMap::Map.tile_pos_to_scaled_map_pixel_pos_top_left(tilePos);
 					tile_center_pos = vp->scaled_map_to_screen_pixel_pos(tile_center_pos);
-					std::string terrain_feature_name = mf.TerrainFeature->Name;
-					if (mf.get_owner() != nullptr && mf.TerrainFeature->CulturalNames.find(mf.get_owner()->Race) != mf.TerrainFeature->CulturalNames.end()) {
-						terrain_feature_name = mf.TerrainFeature->CulturalNames.find(mf.get_owner()->Race)->second;
-					}
+					const stratagus::civilization *tile_owner_civilization = mf.get_owner() ? mf.get_owner()->get_civilization() : nullptr;
+					const std::string &terrain_feature_name = tile_owner_civilization ? mf.get_terrain_feature()->get_cultural_name(tile_owner_civilization) : mf.get_terrain_feature()->get_name();
 					DrawGenericPopup(terrain_feature_name, tile_center_pos.x, tile_center_pos.y);
 				}
 			}
@@ -1197,7 +1196,7 @@ void DrawPopups()
 						button->Action = ButtonCmd::None;
 						button->Popup = "popup_settlement";
 						if (tile->get_owner() != nullptr) {
-							button->Hint = tile->get_settlement()->GetCulturalName(tile->get_owner()->get_civilization());
+							button->Hint = tile->get_settlement()->get_cultural_name(tile->get_owner()->get_civilization());
 						} else {
 							button->Hint = tile->get_settlement()->get_name();
 						}

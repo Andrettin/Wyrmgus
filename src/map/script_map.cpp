@@ -27,10 +27,6 @@
 //      02111-1307, USA.
 //
 
-/*----------------------------------------------------------------------------
---  Includes
-----------------------------------------------------------------------------*/
-
 #include "stratagus.h"
 
 #include "map/map.h"
@@ -47,6 +43,7 @@
 #include "map/map_template.h"
 #include "map/region.h"
 #include "map/site.h"
+#include "map/terrain_feature.h"
 #include "map/terrain_type.h"
 #include "map/tileset.h"
 //Wyrmgus start
@@ -1648,7 +1645,7 @@ static int CclDefineSite(lua_State *l)
 
 				std::string cultural_name = LuaToString(l, -1, j + 1);
 				
-				site->CulturalNames[civilization] = cultural_name;
+				site->cultural_names[civilization] = cultural_name;
 			}
 		} else if (!strcmp(value, "Cores")) {
 			if (!lua_istable(l, -1)) {
@@ -1830,65 +1827,42 @@ static int CclDefineTerrainFeature(lua_State *l)
 	}
 
 	std::string terrain_feature_ident = LuaToString(l, 1);
-	CTerrainFeature *terrain_feature = GetTerrainFeature(terrain_feature_ident);
-	if (!terrain_feature) {
-		terrain_feature = new CTerrainFeature;
-		terrain_feature->Ident = terrain_feature_ident;
-		terrain_feature->ID = TerrainFeatures.size();
-		TerrainFeatures.push_back(terrain_feature);
-		TerrainFeatureIdentToPointer[terrain_feature_ident] = terrain_feature;
-	}
+	stratagus::terrain_feature *terrain_feature = stratagus::terrain_feature::get_or_add(terrain_feature_ident, nullptr);
 	
 	//  Parse the list:
 	for (lua_pushnil(l); lua_next(l, 2); lua_pop(l, 1)) {
 		const char *value = LuaToString(l, -2);
 		
 		if (!strcmp(value, "Name")) {
-			terrain_feature->Name = LuaToString(l, -1);
+			terrain_feature->set_name(LuaToString(l, -1));
 		} else if (!strcmp(value, "Color")) {
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument");
 			}
-			terrain_feature->Color.R = LuaToNumber(l, -1, 1);
-			terrain_feature->Color.G = LuaToNumber(l, -1, 2);
-			terrain_feature->Color.B = LuaToNumber(l, -1, 3);
-			if (stratagus::terrain_type::try_get_by_color(QColor(terrain_feature->Color.R, terrain_feature->Color.G, terrain_feature->Color.B)) != nullptr) {
-				LuaError(l, "Color is already used by a terrain type.");
-			} else if (TerrainFeatureColorToIndex.find(std::tuple<int, int, int>(terrain_feature->Color.R, terrain_feature->Color.G, terrain_feature->Color.B)) != TerrainFeatureColorToIndex.end()) {
-				LuaError(l, "Color is already used by another terrain feature.");
-			}
-			TerrainFeatureColorToIndex[std::tuple<int, int, int>(terrain_feature->Color.R, terrain_feature->Color.G, terrain_feature->Color.B)] = terrain_feature->ID;
+			QColor color;
+			color.setRed(LuaToNumber(l, -1, 1));
+			color.setGreen(LuaToNumber(l, -1, 2));
+			color.setBlue(LuaToNumber(l, -1, 3));
+			terrain_feature->set_color(color);
 		} else if (!strcmp(value, "TerrainType")) {
 			stratagus::terrain_type *terrain = stratagus::terrain_type::get(LuaToString(l, -1));
-			terrain_feature->TerrainType = terrain;
-		} else if (!strcmp(value, "Plane")) {
-			stratagus::plane *plane = stratagus::plane::get(LuaToString(l, -1));
-			terrain_feature->plane = plane;
-		} else if (!strcmp(value, "World")) {
-			stratagus::world *world = stratagus::world::get(LuaToString(l, -1));
-			terrain_feature->world = world;
-			world->TerrainFeatures.push_back(terrain_feature);
-			terrain_feature->plane = world->get_plane();
+			terrain_feature->terrain_type = terrain;
 		} else if (!strcmp(value, "CulturalNames")) {
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument (expected table)");
 			}
 			const int subargs = lua_rawlen(l, -1);
 			for (int j = 0; j < subargs; ++j) {
-				stratagus::civilization *civilization = stratagus::civilization::get(LuaToString(l, -1, j + 1));
+				const stratagus::civilization *civilization = stratagus::civilization::get(LuaToString(l, -1, j + 1));
 				++j;
 
 				std::string cultural_name = LuaToString(l, -1, j + 1);
 				
-				terrain_feature->CulturalNames[civilization->ID] = cultural_name;
+				terrain_feature->cultural_names[civilization] = cultural_name;
 			}
 		} else {
 			LuaError(l, "Unsupported tag: %s" _C_ value);
 		}
-	}
-	
-	if (terrain_feature->plane == nullptr && terrain_feature->world == nullptr) {
-		LuaError(l, "Terrain feature \"%s\" is not assigned to any world or plane." _C_ terrain_feature->Ident.c_str());
 	}
 	
 	return 0;
@@ -2026,51 +2000,6 @@ static int CclGetSiteData(lua_State *l)
 
 	return 0;
 }
-
-/**
-**  Get terrain feature data.
-**
-**  @param l  Lua state.
-*/
-static int CclGetTerrainFeatureData(lua_State *l)
-{
-	if (lua_gettop(l) < 2) {
-		LuaError(l, "incorrect argument");
-	}
-	std::string terrain_feature_ident = LuaToString(l, 1);
-	CTerrainFeature *terrain_feature = GetTerrainFeature(terrain_feature_ident);
-	if (!terrain_feature) {
-		LuaError(l, "Terrain feature \"%s\" doesn't exist." _C_ terrain_feature_ident.c_str());
-	}
-	const char *data = LuaToString(l, 2);
-
-	if (!strcmp(data, "Name")) {
-		lua_pushstring(l, terrain_feature->Name.c_str());
-		return 1;
-	} else if (!strcmp(data, "World")) {
-		if (terrain_feature->world != nullptr) {
-			lua_pushstring(l, terrain_feature->world->get_identifier().c_str());
-		} else {
-			lua_pushstring(l, "");
-		}
-		return 1;
-	} else {
-		LuaError(l, "Invalid field: %s" _C_ data);
-	}
-
-	return 0;
-}
-
-static int CclGetTerrainFeatures(lua_State *l)
-{
-	lua_createtable(l, TerrainFeatures.size(), 0);
-	for (size_t i = 1; i <= TerrainFeatures.size(); ++i)
-	{
-		lua_pushstring(l, TerrainFeatures[i-1]->Ident.c_str());
-		lua_rawseti(l, -2, i);
-	}
-	return 1;
-}
 //Wyrmgus end
 
 /**
@@ -2116,8 +2045,6 @@ void MapCclRegister()
 	lua_register(Lua, "DefineTerrainFeature", CclDefineTerrainFeature);
 	lua_register(Lua, "GetMapTemplateData", CclGetMapTemplateData);
 	lua_register(Lua, "GetSiteData", CclGetSiteData);
-	lua_register(Lua, "GetTerrainFeatureData", CclGetTerrainFeatureData);
-	lua_register(Lua, "GetTerrainFeatures", CclGetTerrainFeatures);
 	lua_register(Lua, "SetMapTemplateTile", CclSetMapTemplateTile);
 	lua_register(Lua, "SetMapTemplateTileTerrain", CclSetMapTemplateTileTerrain);
 	lua_register(Lua, "SetMapTemplateTileLabel", CclSetMapTemplateTileLabel);

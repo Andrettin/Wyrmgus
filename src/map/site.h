@@ -88,7 +88,7 @@ public:
 		this->population_groups.clear();
 	}
 
-	std::string GetCulturalName(const civilization *civilization) const;
+	const std::string &get_cultural_name(const civilization *civilization) const;
 
 	bool is_major() const
 	{
@@ -228,9 +228,7 @@ private:
 	CUnit *site_unit = nullptr;									/// Unit which represents this site
 	std::vector<region *> regions;								/// Regions where this site is located
 	std::vector<faction *> cores;						/// Factions which have this site as a core
-public:
-	std::map<const civilization *, std::string> CulturalNames;	/// Names for the site for each different culture/civilization
-private:
+	std::map<const civilization *, std::string> cultural_names;	/// Names for the site for each different culture/civilization
 	QColor minimap_color; //color used to represent the site on the minimap
 	std::vector<character *> characters; //characters which can be recruited at this site
 	faction *owner_faction = nullptr; //used for the owner history of the site, and after game start is 	set to its player owner's faction
