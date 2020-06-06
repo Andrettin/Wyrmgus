@@ -48,6 +48,7 @@ class terrain_feature final : public named_data_entry, public data_type<terrain_
 
 	Q_PROPERTY(QColor color READ get_color WRITE set_color)
 	Q_PROPERTY(stratagus::terrain_type* terrain_type MEMBER terrain_type READ get_terrain_type)
+	Q_PROPERTY(bool trade_route MEMBER trade_route READ is_trade_route)
 
 public:
 	static constexpr const char *class_identifier = "terrain_feature";
@@ -91,6 +92,13 @@ public:
 
 	virtual void process_sml_scope(const sml_data &scope) override;
 
+	virtual void check() const override
+	{
+		if (this->get_terrain_type() == nullptr && !this->is_trade_route()) {
+			throw std::runtime_error("Terrain feature \"" + this->get_identifier() + "\" has no terrain type, and isn't a trade route.");
+		}
+	}
+
 	const QColor &get_color() const
 	{
 		return this->color;
@@ -101,6 +109,11 @@ public:
 	terrain_type *get_terrain_type() const
 	{
 		return this->terrain_type;
+	}
+
+	bool is_trade_route() const
+	{
+		return this->trade_route;
 	}
 
 	const std::string &get_cultural_name(const civilization *civilization) const
@@ -118,6 +131,7 @@ public:
 private:
 	QColor color;
 	stratagus::terrain_type *terrain_type = nullptr;
+	bool trade_route = false;
 	std::map<const civilization *, std::string> cultural_names; //names for the terrain feature for each different culture/civilization
 
 	friend int ::CclDefineTerrainFeature(lua_State *l);

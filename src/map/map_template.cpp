@@ -494,9 +494,9 @@ void map_template::ApplyTerrainImage(bool overlay, Vec2i template_start_pos, Vec
 					CMap::Map.Field(real_pos, z)->set_terrain_feature(terrain_feature);
 				}
 			} else {
-				if (color.red() != 0 || color.green() != 0 || color.blue() != 0 || !overlay) { //fully black pixels represent areas in overlay terrain files that don't have any overlays
+				if (terrain_feature == nullptr && (color.red() != 0 || color.green() != 0 || color.blue() != 0 || !overlay)) { //fully black pixels represent areas in overlay terrain files that don't have any overlays
 					throw std::runtime_error("Invalid map terrain: (" + std::to_string(x) + ", " + std::to_string(y) + ") (RGB: " + std::to_string(color.red()) + "/" + std::to_string(color.green()) + "/" + std::to_string(color.blue()) + ").");
-				} else if (overlay && CMap::Map.Field(real_pos, z)->OverlayTerrain) { //fully black pixel in overlay terrain map = no overlay
+				} else if (overlay && CMap::Map.Field(real_pos, z)->OverlayTerrain) { //fully black pixel or trade route on overlay terrain map = no overlay
 					CMap::Map.Field(real_pos, z)->RemoveOverlayTerrain();
 				}
 			}
@@ -2075,18 +2075,26 @@ void map_template::save_terrain_image(const std::string &filename, const bool ov
 			const terrain_type *terrain = nullptr;
 			const terrain_feature *terrain_feature = nullptr;
 
+			QColor color;
 			if (std::holds_alternative<const stratagus::terrain_feature *>(kv_pair.first)) {
 				terrain_feature = std::get<const stratagus::terrain_feature *>(kv_pair.first);
 				terrain = terrain_feature->get_terrain_type();
+				color = terrain_feature->get_color();
 			} else {
 				terrain = std::get<const terrain_type *>(kv_pair.first);
+				color = terrain->get_color();
 			}
 
-			if (terrain->is_overlay() != overlay) {
+			bool terrain_overlay = false;
+			if (terrain_feature != nullptr && terrain_feature->is_trade_route()) {
+				terrain_overlay = true;
+			} else {
+				terrain_overlay = terrain->is_overlay();
+			}
+
+			if (terrain_overlay != overlay) {
 				continue;
 			}
-
-			const QColor &color = terrain_feature ? terrain_feature->get_color() : terrain->get_color();
 
 			for (const auto &geoshape : kv_pair.second) {
 				geoshape::write_to_image(*geoshape, image, color, georectangle, filename);

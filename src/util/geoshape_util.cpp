@@ -28,6 +28,7 @@
 #include "util/geoshape_util.h"
 
 #include "util/geocoordinate_util.h"
+#include "util/geopath_util.h"
 #include "util/georectangle_util.h"
 #include "util/point_util.h"
 
@@ -35,12 +36,22 @@ namespace stratagus::geoshape {
 
 void write_to_image(const QGeoShape &geoshape, QImage &image, const QColor &color, const QGeoRectangle &georectangle, const std::string &image_checkpoint_save_filename)
 {
+	const QGeoRectangle bounding_georectangle = geoshape.boundingGeoRectangle();
+
+	if (!bounding_georectangle.intersects(georectangle)) {
+		return;
+	}
+
+	if (geoshape.type() == QGeoShape::PathType) {
+		geopath::write_to_image(static_cast<const QGeoPath &>(geoshape), image, color, georectangle);
+		return;
+	}
+
 	const double lon_per_pixel = geocoordinate::longitude_per_pixel(georectangle.width(), image.size());
 	const double lat_per_pixel = geocoordinate::latitude_per_pixel(georectangle.height(), image.size());
 
 	const QRectF unsigned_georectangle = georectangle::to_unsigned_georectangle(georectangle);
 
-	const QGeoRectangle bounding_georectangle = geoshape.boundingGeoRectangle();
 	const QRectF unsigned_bounding_georectangle = georectangle::to_unsigned_georectangle(bounding_georectangle);
 
 	const double start_lon = std::max(unsigned_bounding_georectangle.x(), unsigned_georectangle.x());

@@ -183,11 +183,7 @@ void site::ProcessConfigData(const CConfigData *config_data)
 void site::initialize()
 {
 	if (this->get_geocoordinate().isValid()) {
-		const QGeoRectangle georectangle = this->get_map_template()->get_georectangle();
-		const double lon_per_pixel = geocoordinate::longitude_per_pixel(georectangle.width(), this->get_map_template()->get_size());
-		const double lat_per_pixel = geocoordinate::latitude_per_pixel(georectangle.height(), this->get_map_template()->get_size());
-		const QPoint geocoordinate_offset = geocoordinate::to_point(georectangle.topLeft(), lon_per_pixel, lat_per_pixel);
-		this->pos = geocoordinate::to_point(this->get_geocoordinate(), lon_per_pixel, lat_per_pixel) - geocoordinate_offset;
+		this->pos = geocoordinate::to_point(this->get_geocoordinate(), this->get_map_template()->get_georectangle(), this->get_map_template()->get_size());
 	}
 
 	//if a settlement has no color assigned to it, assign a random one instead

@@ -125,14 +125,23 @@ terrain_geodata_map world::parse_terrain_geojson_folder() const
 			terrain = terrain_type::get(terrain_type_identifier.toStdString());
 		}
 
+		const QString type_str = feature.value("type").toString();
 		for (const QVariant &subfeature_variant : feature.value("data").toList()) {
 			const QVariantMap subfeature_map = subfeature_variant.toMap();
-			const QGeoPolygon geopolygon = subfeature_map.value("data").value<QGeoPolygon>();
-			auto geopolygon_copy = std::make_unique<QGeoPolygon>(geopolygon);
+			std::unique_ptr<QGeoShape> geoshape;
+
+			if (type_str == "MultiLineString") {
+				const QGeoPath geopath = subfeature_map.value("data").value<QGeoPath>();
+				geoshape = std::make_unique<QGeoPath>(geopath);
+			} else { //MultiPolygon
+				const QGeoPolygon geopolygon = subfeature_map.value("data").value<QGeoPolygon>();
+				geoshape = std::make_unique<QGeoPolygon>(geopolygon);
+			}
+
 			if (terrain_feature != nullptr) {
-				terrain_data[terrain_feature].push_back(std::move(geopolygon_copy));
+				terrain_data[terrain_feature].push_back(std::move(geoshape));
 			} else {
-				terrain_data[terrain].push_back(std::move(geopolygon_copy));
+				terrain_data[terrain].push_back(std::move(geoshape));
 			}
 		}
 	});

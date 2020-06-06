@@ -52,8 +52,17 @@ bool terrain_geodata_map_compare::operator()(const terrain_geodata_key &terrain_
 		other_terrain = std::get<const terrain_type *>(other_terrain_variant);
 	}
 
-	if (terrain->is_water() != other_terrain->is_water()) {
-		return terrain->is_water(); //give priority to water terrain, so that it is written first
+	const bool is_water = terrain != nullptr && terrain->is_water();
+	const bool is_other_water = other_terrain != nullptr && other_terrain->is_water();
+	if (is_water != is_other_water) {
+		return is_water; //give priority to water terrain, so that it is written first
+	}
+
+	const bool is_trade_route = terrain_feature != nullptr && terrain_feature->is_trade_route();
+	const bool is_other_trade_route = other_terrain_feature != nullptr && other_terrain_feature->is_trade_route();
+	if (is_trade_route != is_other_trade_route) {
+		//give priority to trade routes, so that they can be written before mountains
+		return is_trade_route;
 	}
 
 	if (terrain == other_terrain && terrain_feature != other_terrain_feature) {
@@ -62,6 +71,10 @@ bool terrain_geodata_map_compare::operator()(const terrain_geodata_key &terrain_
 		}
 
 		return terrain_feature->get_identifier() < other_terrain_feature->get_identifier();
+	}
+
+	if (terrain == nullptr || other_terrain == nullptr) {
+		return terrain == nullptr;
 	}
 
 	return terrain->get_identifier() < other_terrain->get_identifier();

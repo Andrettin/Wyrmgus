@@ -87,13 +87,6 @@ inline int latitude_to_y(const double latitude, const double lat_per_pixel)
 	return geocoordinate::unsigned_latitude_to_y(y, lat_per_pixel);
 }
 
-inline QPoint to_point(const QGeoCoordinate &geocoordinate, const double lon_per_pixel, const double lat_per_pixel)
-{
-	const int x = geocoordinate::longitude_to_x(geocoordinate.longitude(), lon_per_pixel);
-	const int y = geocoordinate::latitude_to_y(geocoordinate.latitude(), lat_per_pixel);
-	return QPoint(x, y);
-}
-
 inline double longitude_per_pixel(const double longitude_size, const QSize &size)
 {
 	return longitude_size / static_cast<double>(size.width());
@@ -102,6 +95,21 @@ inline double longitude_per_pixel(const double longitude_size, const QSize &size
 inline double latitude_per_pixel(const double latitude_size, const QSize &size)
 {
 	return latitude_size / static_cast<double>(size.height());
+}
+
+inline QPoint to_point(const QGeoCoordinate &geocoordinate, const double lon_per_pixel, const double lat_per_pixel)
+{
+	const int x = geocoordinate::longitude_to_x(geocoordinate.longitude(), lon_per_pixel);
+	const int y = geocoordinate::latitude_to_y(geocoordinate.latitude(), lat_per_pixel);
+	return QPoint(x, y);
+}
+
+inline QPoint to_point(const QGeoCoordinate &geocoordinate, const QGeoRectangle &georectangle, const QSize &area_size)
+{
+	const double lon_per_pixel = geocoordinate::longitude_per_pixel(georectangle.width(), area_size);
+	const double lat_per_pixel = geocoordinate::latitude_per_pixel(georectangle.height(), area_size);
+	const QPoint geocoordinate_offset = geocoordinate::to_point(georectangle.topLeft(), lon_per_pixel, lat_per_pixel);
+	return geocoordinate::to_point(geocoordinate, lon_per_pixel, lat_per_pixel) - geocoordinate_offset;
 }
 
 }
