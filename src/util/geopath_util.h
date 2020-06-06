@@ -31,4 +31,13 @@ namespace stratagus::geopath {
 
 extern void write_to_image(const QGeoPath &geopath, QImage &image, const QColor &color, const QGeoRectangle &georectangle);
 
+inline void write_pixel_to_image(const QPoint &pixel_pos, const QColor &color, QImage &image)
+{
+	if (image.pixelColor(pixel_pos).alpha() != 0) {
+		return; //ignore already-written pixels
+	}
+
+	image.setPixelColor(pixel_pos, color);
+}
+
 }

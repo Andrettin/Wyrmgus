@@ -75,4 +75,30 @@ extern QGeoCoordinate to_geocoordinate(const QPoint &point, const QSize &area_si
 
 extern constexpr int distance_to(const QPoint &point, const QPoint &other_point);
 
+inline bool is_horizontally_adjacent_to(const QPoint &point, const QPoint &other_point)
+{
+	if (point.y() != other_point.y()) {
+		return false;
+	}
+
+	const int diff = std::abs(point.x() - other_point.x());
+	return diff == 1;
+}
+
+inline bool is_vertically_adjacent_to(const QPoint &point, const QPoint &other_point)
+{
+	if (point.x() != other_point.x()) {
+		return false;
+	}
+
+	const int diff = std::abs(point.y() - other_point.y());
+	return diff == 1;
+}
+
+inline bool is_cardinally_adjacent_to(const QPoint &point, const QPoint &other_point)
+{
+	//returns whether the point is adjacent to the other one in any of the four cardinal directions
+	return point::is_horizontally_adjacent_to(point, other_point) || point::is_vertically_adjacent_to(point, other_point);
+}
+
 }

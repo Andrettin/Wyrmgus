@@ -28,13 +28,13 @@
 #include "util/geopath_util.h"
 
 #include "util/geocoordinate_util.h"
-#include "util/georectangle_util.h"
 #include "util/point_util.h"
 
 namespace stratagus::geopath {
 
 void write_to_image(const QGeoPath &geopath, QImage &image, const QColor &color, const QGeoRectangle &georectangle)
 {
+	QPoint previous_pixel_pos(-1, -1);
 	for (const QGeoCoordinate &geocoordinate : geopath.path()) {
 		if (!georectangle.contains(geocoordinate)) {
 			continue;
@@ -42,11 +42,37 @@ void write_to_image(const QGeoPath &geopath, QImage &image, const QColor &color,
 
 		const QPoint pixel_pos = geocoordinate::to_point(geocoordinate, georectangle, image.size());
 
-		if (image.pixelColor(pixel_pos).alpha() != 0) {
-			continue; //ignore already-written pixels
+		geopath::write_pixel_to_image(pixel_pos, color, image);
+
+		if (previous_pixel_pos != QPoint(-1, -1) && !point::is_cardinally_adjacent_to(pixel_pos, previous_pixel_pos)) {
+			int horizontal_move_count = 0;
+			int vertical_move_count = 0;
+			const int horizontal_diff = std::abs(pixel_pos.x() - previous_pixel_pos.x());
+			const int vertical_diff = std::abs(pixel_pos.y() - previous_pixel_pos.y());
+			while (previous_pixel_pos != pixel_pos) {
+				const int horizontal_progress = horizontal_move_count * 100 / horizontal_diff;
+				const int vertical_progress = vertical_move_count * 100 / vertical_diff;
+				if (previous_pixel_pos.x() != pixel_pos.x() && horizontal_progress <= vertical_progress) {
+					if (pixel_pos.x() < previous_pixel_pos.x()) {
+						previous_pixel_pos.setX(previous_pixel_pos.x() - 1);
+					} else {
+						previous_pixel_pos.setX(previous_pixel_pos.x() + 1);
+					}
+					horizontal_move_count++;
+				} else if (previous_pixel_pos.y() != pixel_pos.y()) {
+					if (pixel_pos.y() < previous_pixel_pos.y()) {
+						previous_pixel_pos.setY(previous_pixel_pos.y() - 1);
+					} else {
+						previous_pixel_pos.setY(previous_pixel_pos.y() + 1);
+					}
+					vertical_move_count++;
+				}
+
+				geopath::write_pixel_to_image(previous_pixel_pos, color, image);
+			}
 		}
 
-		image.setPixelColor(pixel_pos, color);
+		previous_pixel_pos = pixel_pos;
 	}
 }
 
