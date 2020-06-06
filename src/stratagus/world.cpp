@@ -30,6 +30,7 @@
 #include "world.h"
 
 #include "config.h"
+#include "map/terrain_feature.h"
 #include "map/terrain_type.h"
 #include "plane.h"
 #include "province.h"
@@ -112,14 +113,27 @@ terrain_geodata_map world::parse_terrain_geojson_folder() const
 
 	geojson::process_features(geojson_data_list, [&](const QVariantMap &feature) {
 		const QVariantMap properties = feature.value("properties").toMap();
-		const QString terrain_type_identifier = properties.value("terrain_type").toString();
 
-		const terrain_type *terrain = terrain_type::get(terrain_type_identifier.toStdString());
+		const terrain_type *terrain = nullptr;
+		const terrain_feature *terrain_feature = nullptr;
+
+		if (properties.contains("terrain_feature")) {
+			const QString terrain_feature_identifier = properties.value("terrain_feature").toString();
+			terrain_feature = terrain_feature::get(terrain_feature_identifier.toStdString());
+		} else {
+			const QString terrain_type_identifier = properties.value("terrain_type").toString();
+			terrain = terrain_type::get(terrain_type_identifier.toStdString());
+		}
 
 		for (const QVariant &subfeature_variant : feature.value("data").toList()) {
 			const QVariantMap subfeature_map = subfeature_variant.toMap();
 			const QGeoPolygon geopolygon = subfeature_map.value("data").value<QGeoPolygon>();
-			terrain_data[terrain].push_back(std::make_unique<QGeoPolygon>(geopolygon));
+			auto geopolygon_copy = std::make_unique<QGeoPolygon>(geopolygon);
+			if (terrain_feature != nullptr) {
+				terrain_data[terrain_feature].push_back(std::move(geopolygon_copy));
+			} else {
+				terrain_data[terrain].push_back(std::move(geopolygon_copy));
+			}
 		}
 	});
 

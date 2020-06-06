@@ -2072,14 +2072,24 @@ void map_template::save_terrain_image(const std::string &filename, const bool ov
 		const QGeoRectangle georectangle = this->get_georectangle();
 
 		for (const auto &kv_pair : terrain_data) {
-			const terrain_type *terrain = kv_pair.first;
+			const terrain_type *terrain = nullptr;
+			const terrain_feature *terrain_feature = nullptr;
+
+			if (std::holds_alternative<const stratagus::terrain_feature *>(kv_pair.first)) {
+				terrain_feature = std::get<const stratagus::terrain_feature *>(kv_pair.first);
+				terrain = terrain_feature->get_terrain_type();
+			} else {
+				terrain = std::get<const terrain_type *>(kv_pair.first);
+			}
 
 			if (terrain->is_overlay() != overlay) {
 				continue;
 			}
 
+			const QColor &color = terrain_feature ? terrain_feature->get_color() : terrain->get_color();
+
 			for (const auto &geoshape : kv_pair.second) {
-				geoshape::write_to_image(*geoshape, image, terrain->get_color(), georectangle, filename);
+				geoshape::write_to_image(*geoshape, image, color, georectangle, filename);
 			}
 		}
 
