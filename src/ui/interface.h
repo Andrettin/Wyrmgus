@@ -129,10 +129,6 @@ static constexpr int ScrollLeftDown = 6;   /// scroll left + down
 static constexpr int ScrollRightUp = 9;    /// scroll right + up
 static constexpr int ScrollRightDown = 10; /// scroll right + down
 
-/*----------------------------------------------------------------------------
---  Variables
-----------------------------------------------------------------------------*/
-
 /// Flag telling if the game is running
 extern bool GameRunning;
 /// Flag telling if the game is paused
@@ -192,10 +188,6 @@ extern stratagus::button *LastDrawnButtonPopup;
 extern int DoubleClickDelay;
 /// Time to detect hold clicks
 extern int HoldClickDelay;
-
-/*----------------------------------------------------------------------------
---  Functions
-----------------------------------------------------------------------------*/
 
 extern CUnit *GetUnitUnderCursor();
 

@@ -982,11 +982,15 @@ void DrawPopups()
 					delete ba;
 					LastDrawnButtonPopup = nullptr;
 				} else if (mf.get_terrain_feature() != nullptr) {
-					PixelPos tile_center_pos = CMap::Map.tile_pos_to_scaled_map_pixel_pos_top_left(tilePos);
-					tile_center_pos = vp->scaled_map_to_screen_pixel_pos(tile_center_pos);
-					const stratagus::civilization *tile_owner_civilization = mf.get_owner() ? mf.get_owner()->get_civilization() : nullptr;
-					const std::string &terrain_feature_name = tile_owner_civilization ? mf.get_terrain_feature()->get_cultural_name(tile_owner_civilization) : mf.get_terrain_feature()->get_name();
-					DrawGenericPopup(terrain_feature_name, tile_center_pos.x, tile_center_pos.y);
+					if (UI.get_tooltip_cycle_count() >= UI.get_tooltip_cycle_threshold()) {
+						PixelPos tile_center_pos = CMap::Map.tile_pos_to_scaled_map_pixel_pos_top_left(tilePos);
+						tile_center_pos = vp->scaled_map_to_screen_pixel_pos(tile_center_pos);
+						const stratagus::civilization *tile_owner_civilization = mf.get_owner() ? mf.get_owner()->get_civilization() : nullptr;
+						const std::string &terrain_feature_name = mf.get_terrain_feature()->get_cultural_name(tile_owner_civilization);
+						DrawGenericPopup(terrain_feature_name, tile_center_pos.x, tile_center_pos.y);
+					} else {
+						UI.increment_tooltip_cycle_count();
+					}
 				}
 			}
 		}

@@ -94,9 +94,6 @@ bool LeaveStops;                             /// Mouse leaves windows stops scro
 
 cursor_on CursorOn = cursor_on::unknown; /// Cursor on field
 
-/*----------------------------------------------------------------------------
---  Functions
-----------------------------------------------------------------------------*/
 static void HandlePieMenuMouseSelection();
 
 CUnit *GetUnitUnderCursor()
@@ -1353,6 +1350,9 @@ void UIHandleMouseMove(const PixelPos &cursorPos)
 	cursor_on OldCursorOn;
 
 	OldCursorOn = CursorOn;
+
+	UI.reset_tooltip_cycle_count();
+
 	//  Selecting units.
 	if (CurrentCursorState == CursorState::Rectangle) {
 		// Restrict cursor to viewport.

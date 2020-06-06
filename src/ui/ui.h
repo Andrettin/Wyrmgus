@@ -381,6 +381,26 @@ public:
 		throw std::runtime_error("No cursor found for type \"" + std::to_string(static_cast<int>(cursor_type)) + "\".");
 	}
 
+	int get_tooltip_cycle_count() const
+	{
+		return this->tooltip_cycle_count;
+	}
+
+	void increment_tooltip_cycle_count()
+	{
+		this->tooltip_cycle_count++;
+	}
+
+	void reset_tooltip_cycle_count()
+	{
+		this->tooltip_cycle_count = 0;
+	}
+
+	int get_tooltip_cycle_threshold() const
+	{
+		return CYCLES_PER_SECOND;
+	}
+
 	bool MouseScroll;                   /// Enable mouse scrolling
 	bool KeyScroll;                     /// Enable keyboard scrolling
 	/// Key Scroll Speed
@@ -503,6 +523,8 @@ private:
 	/// SoundConfig PlacementError;         /// played on placements errors
 	/// SoundConfig PlacementSuccess;       /// played on placements success
 	/// SoundConfig Click;                  /// click noice used often
+
+	int tooltip_cycle_count = 0;
 
 public:
 	CGraphic *VictoryBackgroundG;       /// Victory background graphic
