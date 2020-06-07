@@ -50,8 +50,8 @@ void write_to_image(const QGeoPath &geopath, QImage &image, const QColor &color,
 			const int horizontal_diff = std::abs(pixel_pos.x() - previous_pixel_pos.x());
 			const int vertical_diff = std::abs(pixel_pos.y() - previous_pixel_pos.y());
 			while (previous_pixel_pos != pixel_pos) {
-				const int horizontal_progress = horizontal_move_count * 100 / horizontal_diff;
-				const int vertical_progress = vertical_move_count * 100 / vertical_diff;
+				const int horizontal_progress = horizontal_diff != 0 ? (horizontal_move_count * 100 / horizontal_diff) : 100;
+				const int vertical_progress = vertical_diff != 0 ? (vertical_move_count * 100 / vertical_diff) : 100;
 				if (previous_pixel_pos.x() != pixel_pos.x() && horizontal_progress <= vertical_progress) {
 					if (pixel_pos.x() < previous_pixel_pos.x()) {
 						previous_pixel_pos.setX(previous_pixel_pos.x() - 1);
