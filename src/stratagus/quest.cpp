@@ -38,6 +38,7 @@
 #include "iolib.h"
 #include "luacallback.h"
 #include "map/site.h"
+#include "objective_type.h"
 #include "parameters.h"
 #include "player.h"
 #include "player_color.h"
@@ -81,69 +82,17 @@ void SaveQuestCompletion()
 	fclose(fd);
 }
 
-std::string GetQuestObjectiveTypeNameById(const ObjectiveType objective_type)
+namespace stratagus {
+
+quest_objective::quest_objective(const stratagus::objective_type objective_type, const stratagus::quest *quest)
+	: objective_type(objective_type), quest(quest), index(quest->get_objectives().size())
 {
-	if (objective_type == ObjectiveType::GatherResource) {
-		return "gather_resource";
-	} else if (objective_type == ObjectiveType::HaveResource) {
-		return "have_resource";
-	} else if (objective_type == ObjectiveType::BuildUnits) {
-		return "build_units";
-	} else if (objective_type == ObjectiveType::DestroyUnits) {
-		return "destroy_units";
-	} else if (objective_type == ObjectiveType::ResearchUpgrade) {
-		return "research-upgrade";
-	} else if (objective_type == ObjectiveType::RecruitHero) {
-		return "recruit_hero";
-	} else if (objective_type == ObjectiveType::DestroyHero) {
-		return "destroy-hero";
-	} else if (objective_type == ObjectiveType::HeroMustSurvive) {
-		return "hero-must-survive";
-	} else if (objective_type == ObjectiveType::DestroyUnique) {
-		return "destroy-unique";
-	} else if (objective_type == ObjectiveType::DestroyFaction) {
-		return "destroy-faction";
-	}
-
-	return "";
-}
-
-ObjectiveType GetQuestObjectiveTypeIdByName(const std::string &objective_type)
-{
-	if (objective_type == "gather_resource") {
-		return ObjectiveType::GatherResource;
-	} else if (objective_type == "have_resource") {
-		return ObjectiveType::HaveResource;
-	} else if (objective_type == "build_units") {
-		return ObjectiveType::BuildUnits;
-	} else if (objective_type == "destroy_units") {
-		return ObjectiveType::DestroyUnits;
-	} else if (objective_type == "research-upgrade") {
-		return ObjectiveType::ResearchUpgrade;
-	} else if (objective_type == "recruit_hero") {
-		return ObjectiveType::RecruitHero;
-	} else if (objective_type == "destroy-hero") {
-		return ObjectiveType::DestroyHero;
-	} else if (objective_type == "hero-must-survive") {
-		return ObjectiveType::HeroMustSurvive;
-	} else if (objective_type == "destroy-unique") {
-		return ObjectiveType::DestroyUnique;
-	} else if (objective_type == "destroy-faction") {
-		return ObjectiveType::DestroyFaction;
-	}
-
-	return ObjectiveType::None;
-}
-
-CQuestObjective::CQuestObjective(const ObjectiveType objective_type, const stratagus::quest *quest)
-	: objective_type(objective_type), quest(quest), index(quest->Objectives.size())
-{
-	if (objective_type == ObjectiveType::HeroMustSurvive) {
+	if (objective_type == objective_type::hero_must_survive) {
 		this->quantity = 0;
 	}
 }
 
-void CQuestObjective::process_sml_property(const stratagus::sml_property &property)
+void quest_objective::process_sml_property(const stratagus::sml_property &property)
 {
 	const std::string &key = property.get_key();
 	const std::string &value = property.get_value();
@@ -163,7 +112,7 @@ void CQuestObjective::process_sml_property(const stratagus::sml_property &proper
 	}
 }
 
-void CQuestObjective::process_sml_scope(const stratagus::sml_data &scope)
+void quest_objective::process_sml_scope(const stratagus::sml_data &scope)
 {
 	const std::string &tag = scope.get_tag();
 	const std::vector<std::string> &values = scope.get_values();
@@ -176,8 +125,6 @@ void CQuestObjective::process_sml_scope(const stratagus::sml_data &scope)
 		throw std::runtime_error("Invalid quest objective scope: \"" + scope.get_tag() + "\".");
 	}
 }
-
-namespace stratagus {
 
 quest::quest(const std::string &identifier) : detailed_data_entry(identifier)
 {
@@ -197,9 +144,6 @@ quest::~quest()
 	if (this->FailEffects) {
 		delete FailEffects;
 	}
-	for (size_t i = 0; i < this->Objectives.size(); ++i) {
-		delete this->Objectives[i];
-	}
 }
 
 void quest::process_sml_scope(const sml_data &scope)
@@ -208,14 +152,10 @@ void quest::process_sml_scope(const sml_data &scope)
 
 	if (tag == "objectives") {
 		scope.for_each_child([&](const sml_data &child_scope) {
-			const ObjectiveType objective_type = GetQuestObjectiveTypeIdByName(child_scope.get_tag());
+			const objective_type objective_type = string_to_objective_type(child_scope.get_tag());
 
-			if (objective_type == ObjectiveType::None) {
-				throw std::runtime_error("Objective type doesn't exist.");
-			}
-
-			CQuestObjective *objective = new CQuestObjective(objective_type, this);
-			this->Objectives.push_back(objective);
+			auto objective = std::make_unique<quest_objective>(objective_type, this);
+			this->objectives.push_back(std::move(objective));
 
 			database::process_sml_data(objective, child_scope);
 		});

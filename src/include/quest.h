@@ -39,41 +39,28 @@ struct lua_State;
 int CclDefineQuest(lua_State *l);
 
 namespace stratagus {
-	class character;
-	class civilization;
-	class dialogue;
-	class effect_list;
-	class faction;
-	class player_color;
-	class quest;
-	class site;
-	class unit_class;
-	class unit_type;
-}
 
-enum class ObjectiveType {
-	None = -1,
-	GatherResource,
-	HaveResource,
-	BuildUnits,
-	DestroyUnits,
-	ResearchUpgrade,
-	RecruitHero,
-	DestroyHero,
-	HeroMustSurvive,
-	DestroyUnique,
-	DestroyFaction
-};
+class character;
+class civilization;
+class dialogue;
+class effect_list;
+class faction;
+class player_color;
+class quest;
+class site;
+class unit_class;
+class unit_type;
+enum class objective_type;
 
-class CQuestObjective
+class quest_objective
 {
 public:
-	CQuestObjective(const ObjectiveType objective_type, const stratagus::quest *quest);
+	explicit quest_objective(const objective_type objective_type, const stratagus::quest *quest);
 
 	void process_sml_property(const stratagus::sml_property &property);
 	void process_sml_scope(const stratagus::sml_data &scope);
 
-	ObjectiveType get_objective_type() const
+	objective_type get_objective_type() const
 	{
 		return this->objective_type;
 	}
@@ -119,7 +106,7 @@ public:
 	}
 
 private:
-	ObjectiveType objective_type = ObjectiveType::None;
+	objective_type objective_type;
 	const stratagus::quest *quest = nullptr;
 	int index = -1;
 	int quantity = 1;
@@ -139,28 +126,26 @@ private:
 	const stratagus::site *settlement = nullptr;
 	const stratagus::faction *faction = nullptr;
 
-	friend int CclDefineQuest(lua_State *l);
+	friend int ::CclDefineQuest(lua_State *l);
 };
 
-class CPlayerQuestObjective
+class player_quest_objective
 {
 public:
-	CPlayerQuestObjective(const CQuestObjective *quest_objective) : quest_objective(quest_objective)
+	player_quest_objective(const quest_objective *quest_objective) : quest_objective(quest_objective)
 	{
 	}
 
-	const CQuestObjective *get_quest_objective() const
+	const quest_objective *get_quest_objective() const
 	{
 		return this->quest_objective;
 	}
 
 private:
-	const CQuestObjective *quest_objective = nullptr;
+	const quest_objective *quest_objective = nullptr;
 public:
 	int Counter = 0;
 };
-
-namespace stratagus {
 
 class quest final : public detailed_data_entry, public data_type<quest>
 {
@@ -224,6 +209,11 @@ public:
 		return this->completion_effects;
 	}
 
+	const std::vector<std::unique_ptr<quest_objective>> &get_objectives() const
+	{
+		return this->objectives;
+	}
+
 	std::string get_rewards_string() const;
 
 	std::string World;				/// Which world the quest belongs to
@@ -266,7 +256,9 @@ public:
 	LuaCallback *CompletionEffects = nullptr;
 	LuaCallback *FailEffects = nullptr;
 	std::unique_ptr<effect_list> completion_effects;
-	std::vector<CQuestObjective *> Objectives;	/// The objectives of this quest
+private:
+	std::vector<std::unique_ptr<quest_objective>> objectives;	/// The objectives of this quest
+public:
 	std::vector<std::string> ObjectiveStrings;	/// The objective strings of this quest
 	std::vector<std::string> BriefingSounds;	/// The briefing sounds of this quest
 	std::vector<character *> HeroesMustSurvive;	/// Which heroes must survive or this quest fails
@@ -279,8 +271,6 @@ public:
 extern stratagus::quest *CurrentQuest;
 
 extern void SaveQuestCompletion();
-std::string GetQuestObjectiveTypeNameById(const ObjectiveType objective_type);
-extern ObjectiveType GetQuestObjectiveTypeIdByName(const std::string &objective_type);
 
 extern void SetCurrentQuest(const std::string &quest_ident);
 extern std::string GetCurrentQuest();

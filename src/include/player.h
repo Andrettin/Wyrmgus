@@ -50,7 +50,6 @@ class CFile;
 class CGraphic;
 class CLanguage;
 class CProvince;
-class CPlayerQuestObjective;
 class CReligion;
 class CUnit;
 class PlayerAi;
@@ -69,6 +68,7 @@ namespace stratagus {
 	class civilization;
 	class deity;
 	class player_color;
+	class player_quest_objective;
 	class quest;
 	class resource;
 	class site;
@@ -102,12 +102,20 @@ private:
 	static inline std::vector<const CPlayer *> revealed_players;
 
 public:
+	CPlayer();
+	~CPlayer();
+
 	const stratagus::player_color *get_player_color() const
 	{
 		return this->player_color;
 	}
 
 	const QColor &get_minimap_color() const;
+
+	const std::vector<std::unique_ptr<stratagus::player_quest_objective>> &get_quest_objectives() const
+	{
+		return this->quest_objectives;
+	}
 
 	int Index = 0;          /// player as number
 	std::string Name;   /// name of non computer
@@ -176,7 +184,9 @@ public:
 	std::vector<stratagus::quest *> AvailableQuests;			/// quests available to this player
 	std::vector<stratagus::quest *> CurrentQuests;				/// quests being pursued by this player
 	std::vector<const stratagus::quest *> CompletedQuests;		/// quests completed by this player
-	std::vector<CPlayerQuestObjective *> QuestObjectives;					/// Objectives of the player's current quests
+private:
+	std::vector<std::unique_ptr<stratagus::player_quest_objective>> quest_objectives; //objectives of the player's current quests
+public:
 	std::vector<std::pair<CUpgrade *, int>> Modifiers;						/// Modifiers affecting the player, and until which cycle it should last
 	std::vector<int> AutosellResources;
 	//Wyrmgus end

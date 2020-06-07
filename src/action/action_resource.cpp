@@ -27,10 +27,6 @@
 //      02111-1307, USA.
 //
 
-/*----------------------------------------------------------------------------
---  Includes
-----------------------------------------------------------------------------*/
-
 #include "stratagus.h"
 
 #include "action/action_resource.h"
@@ -46,6 +42,7 @@
 #include "map/map.h"
 #include "map/map_layer.h"
 #include "map/tileset.h"
+#include "objective_type.h"
 #include "pathfinder.h"
 #include "player.h"
 #include "quest.h"
@@ -1361,9 +1358,9 @@ int COrder_Resource::MoveToDepot(CUnit &unit)
 	unit.ChangeExperience(xp_gained);
 	
 	//update quests
-	for (CPlayerQuestObjective *objective : player.QuestObjectives) {
-		const CQuestObjective *quest_objective = objective->get_quest_objective();
-		if (quest_objective->get_objective_type() == ObjectiveType::GatherResource) {
+	for (const auto &objective : player.get_quest_objectives()) {
+		const stratagus::quest_objective *quest_objective = objective->get_quest_objective();
+		if (quest_objective->get_objective_type() == stratagus::objective_type::gather_resource) {
 			if (quest_objective->Resource == rindex) {
 				objective->Counter = std::min(objective->Counter + processed_resource_change, quest_objective->get_quantity());
 			} else if (quest_objective->Resource == this->CurrentResource) {

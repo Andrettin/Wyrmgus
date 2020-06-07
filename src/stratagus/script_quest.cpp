@@ -41,6 +41,7 @@
 #include "map/map.h"
 #include "map/map_template.h"
 #include "map/site.h"
+#include "objective_type.h"
 #include "player.h"
 #include "player_color.h"
 #include "script.h"
@@ -150,7 +151,7 @@ static int CclDefineQuest(lua_State *l)
 			const int args = lua_rawlen(l, -1);
 			for (int j = 0; j < args; ++j) {
 				lua_rawgeti(l, -1, j + 1);
-				CQuestObjective *objective = nullptr;
+				stratagus::quest_objective *objective = nullptr;
 				if (!lua_istable(l, -1)) {
 					LuaError(l, "incorrect argument (expected table for quest objectives)");
 				}
@@ -159,14 +160,11 @@ static int CclDefineQuest(lua_State *l)
 					value = LuaToString(l, -1, k + 1);
 					++k;
 					if (!strcmp(value, "objective-type")) {
-						const ObjectiveType objective_type = GetQuestObjectiveTypeIdByName(LuaToString(l, -1, k + 1));
+						const stratagus::objective_type objective_type = stratagus::string_to_objective_type(LuaToString(l, -1, k + 1));
 
-						if (objective_type == ObjectiveType::None) {
-							LuaError(l, "Objective type doesn't exist.");
-						}
-
-						objective = new CQuestObjective(objective_type, quest);
-						quest->Objectives.push_back(objective);
+						auto objective_unique_ptr = std::make_unique<stratagus::quest_objective>(objective_type, quest);
+						objective = objective_unique_ptr.get();
+						quest->objectives.push_back(std::move(objective_unique_ptr));
 					} else if (!strcmp(value, "objective-string")) {
 						objective->objective_string = LuaToString(l, -1, k + 1);
 					} else if (!strcmp(value, "quantity")) {

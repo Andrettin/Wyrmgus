@@ -45,6 +45,7 @@
 #include "map/site.h"
 #include "map/terrain_type.h"
 #include "map/tileset.h"
+#include "objective_type.h"
 #include "player.h"
 #include "quest.h"
 #include "script.h"
@@ -181,10 +182,10 @@ static void Finish(COrder_Built &order, CUnit &unit)
 
 	player.IncreaseCountsForUnit(&unit);
 	
-	for (CPlayerQuestObjective *objective : player.QuestObjectives) {
-		const CQuestObjective *quest_objective = objective->get_quest_objective();
+	for (const auto &objective : player.get_quest_objectives()) {
+		const stratagus::quest_objective *quest_objective = objective->get_quest_objective();
 
-		if (quest_objective->get_objective_type() != ObjectiveType::BuildUnits) {
+		if (quest_objective->get_objective_type() != stratagus::objective_type::build_units) {
 			continue;
 		}
 

@@ -424,7 +424,7 @@ void CPlayer::Load(lua_State *l)
 			for (int k = 0; k < subargs; ++k) {
 				lua_rawgeti(l, j + 1, k + 1);
 				const stratagus::quest *quest = nullptr;
-				CPlayerQuestObjective *objective = nullptr;
+				stratagus::player_quest_objective *objective = nullptr;
 				if (!lua_istable(l, -1)) {
 					LuaError(l, "incorrect argument (expected table for quest objectives)");
 				}
@@ -436,8 +436,9 @@ void CPlayer::Load(lua_State *l)
 						quest = stratagus::quest::get(LuaToString(l, -1, n + 1));
 					} else if (!strcmp(value, "objective-index")) {
 						const int objective_index = LuaToNumber(l, -1, n + 1);
-						objective = new CPlayerQuestObjective(quest->Objectives[objective_index]);
-						this->QuestObjectives.push_back(objective);
+						auto objective_unique_ptr = std::make_unique<stratagus::player_quest_objective>(quest->get_objectives()[objective_index].get());
+						objective = objective_unique_ptr.get();
+						this->quest_objectives.push_back(std::move(objective_unique_ptr));
 					} else if (!strcmp(value, "counter")) {
 						objective->Counter = LuaToNumber(l, -1, n + 1);
 					} else {

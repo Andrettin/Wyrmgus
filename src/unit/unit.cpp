@@ -63,6 +63,7 @@
 #include "map/tileset.h"
 #include "missile.h"
 #include "network.h"
+#include "objective_type.h"
 #include "pathfinder.h"
 #include "plane.h"
 #include "player.h"
@@ -2904,10 +2905,10 @@ void CUnit::AssignToPlayer(CPlayer &player)
 			} else {
 				player.TotalUnits++;
 				
-				for (CPlayerQuestObjective *objective : player.QuestObjectives) {
-					const CQuestObjective *quest_objective = objective->get_quest_objective();
+				for (const auto &objective : player.get_quest_objectives()) {
+					const stratagus::quest_objective *quest_objective = objective->get_quest_objective();
 
-					if (quest_objective->get_objective_type() != ObjectiveType::BuildUnits) {
+					if (quest_objective->get_objective_type() != stratagus::objective_type::build_units) {
 						continue;
 					}
 
@@ -7024,21 +7025,21 @@ static void HitUnit_IncreaseScoreForKill(CUnit &attacker, CUnit &target)
 	attacker.Variable[KILL_INDEX].Enable = 1;
 	
 	//Wyrmgus start
-	for (CPlayerQuestObjective *objective : attacker.Player->QuestObjectives) {
-		const CQuestObjective *quest_objective = objective->get_quest_objective();
+	for (const auto &objective : attacker.Player->get_quest_objectives()) {
+		const stratagus::quest_objective *quest_objective = objective->get_quest_objective();
 		if (
 			(
-				quest_objective->get_objective_type() == ObjectiveType::DestroyUnits
+				quest_objective->get_objective_type() == stratagus::objective_type::destroy_units
 				&& (stratagus::vector::contains(quest_objective->UnitTypes, target.Type) || stratagus::vector::contains(quest_objective->get_unit_classes(), target.Type->get_unit_class()))
 				&& (quest_objective->get_settlement() == nullptr || quest_objective->get_settlement() == target.settlement)
 			)
-			|| (quest_objective->get_objective_type() == ObjectiveType::DestroyHero && target.Character && quest_objective->get_character() == target.Character)
-			|| (quest_objective->get_objective_type() == ObjectiveType::DestroyUnique && target.Unique && quest_objective->Unique == target.Unique)
+			|| (quest_objective->get_objective_type() == stratagus::objective_type::destroy_hero && target.Character && quest_objective->get_character() == target.Character)
+			|| (quest_objective->get_objective_type() == stratagus::objective_type::destroy_unique && target.Unique && quest_objective->Unique == target.Unique)
 		) {
 			if (quest_objective->get_faction() == nullptr || quest_objective->get_faction()->ID == target.Player->Faction) {
 				objective->Counter = std::min(objective->Counter + 1, quest_objective->get_quantity());
 			}
-		} else if (quest_objective->get_objective_type() == ObjectiveType::DestroyFaction) {
+		} else if (quest_objective->get_objective_type() == stratagus::objective_type::destroy_faction) {
 			const CPlayer *faction_player = GetFactionPlayer(quest_objective->get_faction());
 			
 			if (faction_player) {

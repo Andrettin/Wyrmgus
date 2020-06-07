@@ -854,6 +854,7 @@ set(stratagus_generic_HDRS
 	src/stratagus/gender.h
 	src/stratagus/item_class.h
 	src/stratagus/item_slot.h
+	src/stratagus/objective_type.h
 	src/stratagus/species.h
 )
 

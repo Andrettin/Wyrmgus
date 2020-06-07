@@ -1418,8 +1418,8 @@ void MessagesDisplay::DrawMessages()
 				
 				++z;
 				
-				for (const CPlayerQuestObjective *objective : CPlayer::GetThisPlayer()->QuestObjectives) {
-					const CQuestObjective *quest_objective = objective->get_quest_objective();
+				for (const auto &objective : CPlayer::GetThisPlayer()->get_quest_objectives()) {
+					const stratagus::quest_objective *quest_objective = objective->get_quest_objective();
 					if (quest_objective->get_quest() != quest) {
 						continue;
 					}
