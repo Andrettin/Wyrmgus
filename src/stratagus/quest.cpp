@@ -155,9 +155,8 @@ void quest::process_sml_scope(const sml_data &scope)
 			const objective_type objective_type = string_to_objective_type(child_scope.get_tag());
 
 			auto objective = std::make_unique<quest_objective>(objective_type, this);
-			this->objectives.push_back(std::move(objective));
-
 			database::process_sml_data(objective, child_scope);
+			this->objectives.push_back(std::move(objective));
 		});
 	} else if (tag == "completion_effects") {
 		this->completion_effects = std::make_unique<effect_list>();
