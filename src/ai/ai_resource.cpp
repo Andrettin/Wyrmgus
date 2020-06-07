@@ -56,7 +56,7 @@
 
 static constexpr int COLLECT_RESOURCES_INTERVAL = 4;
 
-static int AiMakeUnit(stratagus::unit_type &type, const Vec2i &nearPos, int z, int landmass = 0, stratagus::site *settlement = nullptr);
+static int AiMakeUnit(stratagus::unit_type &type, const Vec2i &nearPos, int z, int landmass = 0, const stratagus::site *settlement = nullptr);
 
 /**
 **  Check if the costs are available for the AI.
@@ -296,7 +296,7 @@ static bool IsAlreadyWorking(const CUnit &unit)
 **
 **  @note            We must check if the dependencies are fulfilled.
 */
-static int AiBuildBuilding(const stratagus::unit_type &type, stratagus::unit_type &building, const Vec2i &nearPos, int z, int landmass = 0, stratagus::site *settlement = nullptr)
+static int AiBuildBuilding(const stratagus::unit_type &type, stratagus::unit_type &building, const Vec2i &nearPos, int z, int landmass = 0, const stratagus::site *settlement = nullptr)
 {
 	std::vector<CUnit *> table;
 
@@ -978,7 +978,7 @@ static bool AiRequestSupply()
 **
 **  @note        We must check if the dependencies are fulfilled.
 */
-static bool AiTrainUnit(const stratagus::unit_type &type, stratagus::unit_type &what, int landmass = 0, stratagus::site *settlement = nullptr)
+static bool AiTrainUnit(const stratagus::unit_type &type, stratagus::unit_type &what, int landmass = 0, const stratagus::site *settlement = nullptr)
 {
 	std::vector<CUnit *> table;
 
@@ -1016,7 +1016,7 @@ static bool AiTrainUnit(const stratagus::unit_type &type, stratagus::unit_type &
 **
 **  @note        We must check if the dependencies are fulfilled.
 */
-static int AiMakeUnit(stratagus::unit_type &typeToMake, const Vec2i &nearPos, int z, int landmass, stratagus::site *settlement)
+static int AiMakeUnit(stratagus::unit_type &typeToMake, const Vec2i &nearPos, int z, int landmass, const stratagus::site *settlement)
 {
 	// Find equivalents unittypes.
 	int usableTypes[UnitTypeMax + 1];
@@ -1232,7 +1232,7 @@ static void AiCheckingWork()
 		stratagus::unit_type &type = *queuep->Type;
 		
 		if ( //if has a build request specific to a settlement, but the player doesn't own the settlement, remove the order
-			queuep->settlement
+			queuep->settlement != nullptr
 			&& (
 				(!type.BoolFlag[TOWNHALL_INDEX].value && queuep->settlement->get_site_unit()->Player != AiPlayer->Player)
 				|| (type.BoolFlag[TOWNHALL_INDEX].value && queuep->settlement->get_site_unit()->Player->Index != PlayerNumNeutral)
@@ -2768,7 +2768,7 @@ void AiCheckWorkers()
 **
 **  @todo         FIXME: should store the end of list and not search it.
 */
-void AiAddUnitTypeRequest(stratagus::unit_type &type, const int count, const int landmass, stratagus::site *settlement, const Vec2i pos, int z)
+void AiAddUnitTypeRequest(stratagus::unit_type &type, const int count, const int landmass, const stratagus::site *settlement, const Vec2i pos, int z)
 {
 	AiBuildQueue queue;
 
@@ -2805,6 +2805,8 @@ void AiExplore(const Vec2i &pos, int mask)
 */
 void AiResourceManager()
 {
+	AiPlayer->check_quest_units_to_build();
+
 	// Check if something needs to be build / trained.
 	AiCheckingWork();
 

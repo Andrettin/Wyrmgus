@@ -153,7 +153,7 @@ static bool AiCheckSurrounding(const CUnit &worker, const stratagus::unit_type &
 class BuildingPlaceFinder
 {
 public:
-	BuildingPlaceFinder(const CUnit &worker, const stratagus::unit_type &type, bool checkSurround, Vec2i *resultPos, bool ignore_exploration, int z, int landmass, stratagus::site *settlement) :
+	explicit BuildingPlaceFinder(const CUnit &worker, const stratagus::unit_type &type, bool checkSurround, Vec2i *resultPos, bool ignore_exploration, int z, int landmass, const stratagus::site *settlement) :
 		worker(worker), type(type),
 			movemask(worker.Type->MovementMask 
 			& ~((type.BoolFlag[SHOREBUILDING_INDEX].value ? (MapFieldCoastAllowed | MapFieldLandUnit | MapFieldAirUnit | MapFieldSeaUnit) 
@@ -181,7 +181,7 @@ private:
 	//Wyrmgus start
 	int z;
 	int landmass;
-	stratagus::site *settlement;
+	const stratagus::site *settlement;
 	bool IgnoreExploration;
 	//Wyrmgus end
 };
@@ -196,11 +196,14 @@ VisitResult BuildingPlaceFinder::Visit(TerrainTraversal &terrainTraversal, const
 	}
 #endif
 	*/
-	if (!IgnoreExploration && !CMap::Map.Field(pos, z)->playerInfo.IsTeamExplored(*worker.Player)) {
+
+	const CMapField *tile = CMap::Map.Field(pos, z);
+
+	if (!IgnoreExploration && !tile->playerInfo.IsTeamExplored(*worker.Player)) {
 		return VisitResult::DeadEnd;
 	}
 	
-	if (CMap::Map.Field(pos, z)->get_owner() != nullptr && CMap::Map.Field(pos, z)->get_owner() != worker.Player && !CMap::Map.Field(pos, z)->get_owner()->HasNeutralFactionType() && !worker.Player->HasNeutralFactionType()) { //buildings cannot be built on other players' land; we return dead end instead of ok because we don't want units to go over another player's territory to build structures elsewhere, resulting in a lot of exclaves; the exception are neutral factions, which should be composed largely of enclaves and exclaves
+	if (tile->get_owner() != nullptr && tile->get_owner() != worker.Player && !tile->get_owner()->HasNeutralFactionType() && !worker.Player->HasNeutralFactionType()) { //buildings cannot be built on other players' land; we return dead end instead of ok because we don't want units to go over another player's territory to build structures elsewhere, resulting in a lot of exclaves; the exception are neutral factions, which should be composed largely of enclaves and exclaves
 		return VisitResult::DeadEnd;
 	}
 	
@@ -209,7 +212,7 @@ VisitResult BuildingPlaceFinder::Visit(TerrainTraversal &terrainTraversal, const
 		(!landmass || CMap::Map.GetTileLandmass(pos, z) == landmass)
 		&& CanBuildUnitType(&worker, type, pos, 1, IgnoreExploration, z)
 		&& !AiEnemyUnitsInDistance(*worker.Player, nullptr, pos, 8, z)
-		&& (!settlement || settlement == worker.Player->GetNearestSettlement(pos, z, type.get_tile_size()))
+		&& (!this->settlement || this->settlement == tile->get_settlement())
 	) {
 		//Wyrmgus end
 		bool backupok;
@@ -244,7 +247,7 @@ VisitResult BuildingPlaceFinder::Visit(TerrainTraversal &terrainTraversal, const
 **
 **  @return  True if place found, false if no found.
 */
-static bool AiFindBuildingPlace2(const CUnit &worker, const stratagus::unit_type &type, const Vec2i &startPos, const CUnit *startUnit, bool checkSurround, Vec2i *resultPos, bool ignore_exploration, int z, int landmass = 0, stratagus::site *settlement = nullptr)
+static bool AiFindBuildingPlace2(const CUnit &worker, const stratagus::unit_type &type, const Vec2i &startPos, const CUnit *startUnit, bool checkSurround, Vec2i *resultPos, bool ignore_exploration, int z, int landmass = 0, const stratagus::site *settlement = nullptr)
 {
 	TerrainTraversal terrainTraversal;
 
@@ -466,7 +469,7 @@ static bool AiFindHallPlace(const CUnit &worker,
 class LumberMillPlaceFinder
 {
 public:
-	LumberMillPlaceFinder(const CUnit &worker, const stratagus::unit_type &type, int resource, Vec2i *resultPos, bool ignore_exploration, int z) :
+	LumberMillPlaceFinder(const CUnit &worker, const stratagus::unit_type &type, int resource, Vec2i *resultPos, bool ignore_exploration, int z, const stratagus::site *settlement) :
 		worker(worker), type(type),
 		movemask(worker.Type->MovementMask & ~(MapFieldLandUnit | MapFieldAirUnit | MapFieldSeaUnit)),
 		resource(resource),
@@ -474,7 +477,8 @@ public:
 //		resultPos(resultPos)
 		resultPos(resultPos),
 		IgnoreExploration(ignore_exploration),
-		z(z)
+		z(z),
+		settlement(settlement)
 		//Wyrmgus end
 	{}
 	VisitResult Visit(TerrainTraversal &terrainTraversal, const Vec2i &pos, const Vec2i &from);
@@ -488,6 +492,7 @@ private:
 	bool IgnoreExploration;
 	int z;
 	//Wyrmgus end
+	const stratagus::site *settlement = nullptr;
 };
 
 VisitResult LumberMillPlaceFinder::Visit(TerrainTraversal &terrainTraversal, const Vec2i &pos, const Vec2i &from)
@@ -500,21 +505,25 @@ VisitResult LumberMillPlaceFinder::Visit(TerrainTraversal &terrainTraversal, con
 	}
 #endif
 	*/
-	if (!IgnoreExploration && !CMap::Map.Field(pos, z)->playerInfo.IsTeamExplored(*worker.Player)) {
+
+	const CMapField *tile = CMap::Map.Field(pos, z);
+	if (!IgnoreExploration && !tile->playerInfo.IsTeamExplored(*worker.Player)) {
 		return VisitResult::DeadEnd;
 	}
 	//Wyrmgus end
 	//Wyrmgus start
-	if (CMap::Map.Field(pos, z)->get_owner() != nullptr && CMap::Map.Field(pos, z)->get_owner() != worker.Player && !CMap::Map.Field(pos, z)->get_owner()->HasNeutralFactionType() && !worker.Player->HasNeutralFactionType()) {
+
+
+	if (tile->get_owner() != nullptr && tile->get_owner() != worker.Player && !tile->get_owner()->HasNeutralFactionType() && !worker.Player->HasNeutralFactionType()) {
 		return VisitResult::DeadEnd;
 	}
-	
+
 //	if (CMap::Map.Field(pos)->get_resource() == stratagus::resource::get_all()[resource]) {
-	if (CMap::Map.Field(pos, z)->get_resource() == stratagus::resource::get_all()[resource]) {
+	if (tile->get_resource() == stratagus::resource::get_all()[resource]) {
 	//Wyrmgus end
 		//Wyrmgus start
 //		if (AiFindBuildingPlace2(worker, type, from, nullptr, true, resultPos)) {
-		if (AiFindBuildingPlace2(worker, type, from, nullptr, true, resultPos, IgnoreExploration, z)) {
+		if (AiFindBuildingPlace2(worker, type, from, nullptr, true, resultPos, IgnoreExploration, z, 0, this->settlement)) {
 		//Wyrmgus end
 			return VisitResult::Finished;
 		}
@@ -543,7 +552,7 @@ VisitResult LumberMillPlaceFinder::Visit(TerrainTraversal &terrainTraversal, con
 **
 **  @todo          FIXME: This is slow really slow, using two flood fills, is not a perfect solution.
 */
-static bool AiFindLumberMillPlace(const CUnit &worker, const stratagus::unit_type &type, const Vec2i &startPos, int resource, Vec2i *resultPos, bool ignore_exploration, int z)
+static bool AiFindLumberMillPlace(const CUnit &worker, const stratagus::unit_type &type, const Vec2i &startPos, int resource, Vec2i *resultPos, bool ignore_exploration, int z, const stratagus::site *settlement)
 {
 	TerrainTraversal terrainTraversal;
 
@@ -558,7 +567,7 @@ static bool AiFindLumberMillPlace(const CUnit &worker, const stratagus::unit_typ
 
 	//Wyrmgus start
 //	LumberMillPlaceFinder lumberMillPlaceFinder(worker, type, resource, resultPos);
-	LumberMillPlaceFinder lumberMillPlaceFinder(worker, type, resource, resultPos, ignore_exploration, z);
+	LumberMillPlaceFinder lumberMillPlaceFinder(worker, type, resource, resultPos, ignore_exploration, z, settlement);
 	//Wyrmgus end
 
 	return terrainTraversal.Run(lumberMillPlaceFinder);
@@ -593,7 +602,7 @@ static bool AiFindMiningPlace(const CUnit &worker,
 **  @todo          Better and faster way to find building place of oil
 **                 platforms Special routines for special buildings.
 */
-bool AiFindBuildingPlace(const CUnit &worker, const stratagus::unit_type &type, const Vec2i &nearPos, Vec2i *resultPos, bool ignore_exploration, int z, int landmass, stratagus::site *settlement)
+bool AiFindBuildingPlace(const CUnit &worker, const stratagus::unit_type &type, const Vec2i &nearPos, Vec2i *resultPos, bool ignore_exploration, int z, int landmass, const stratagus::site *settlement)
 {
 	// Find a good place for a new hall
 	//Wyrmgus start
@@ -625,7 +634,7 @@ bool AiFindBuildingPlace(const CUnit &worker, const stratagus::unit_type &type, 
 			//Wyrmgus end
 				//Wyrmgus start
 //				return AiFindLumberMillPlace(worker, type, startPos, i, resultPos);
-				if (AiFindLumberMillPlace(worker, type, startPos, i, resultPos, ignore_exploration, z)) {
+				if (AiFindLumberMillPlace(worker, type, startPos, i, resultPos, ignore_exploration, z, settlement)) {
 					return true;
 				} else {
 					return AiFindBuildingPlace2(worker, type, startPos, nullptr, true, resultPos, ignore_exploration, z, landmass, settlement);

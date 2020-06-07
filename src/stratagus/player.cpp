@@ -2712,10 +2712,10 @@ bool CPlayer::can_accept_quest(const stratagus::quest *quest)
 	int recruit_heroes_quantity = 0;
 	for (const auto &objective : quest->get_objectives()) {
 		if (objective->get_objective_type() == stratagus::objective_type::build_units) {
-			std::vector<const stratagus::unit_type *> unit_types = objective->UnitTypes;
+			std::vector<stratagus::unit_type *> unit_types = objective->UnitTypes;
 
 			for (const stratagus::unit_class *unit_class : objective->get_unit_classes()) {
-				const stratagus::unit_type *unit_type = stratagus::faction::get_all()[this->Faction]->get_class_unit_type(unit_class);
+				stratagus::unit_type *unit_type = stratagus::faction::get_all()[this->Faction]->get_class_unit_type(unit_class);
 				if (unit_type == nullptr) {
 					continue;
 				}
@@ -2754,10 +2754,10 @@ bool CPlayer::can_accept_quest(const stratagus::quest *quest)
 					}
 						
 					if (second_objective->get_objective_type() == stratagus::objective_type::build_units) {
-						std::vector<const stratagus::unit_type *> unit_types = second_objective->UnitTypes;
+						std::vector<stratagus::unit_type *> unit_types = second_objective->UnitTypes;
 
 						for (const stratagus::unit_class *unit_class : second_objective->get_unit_classes()) {
-							const stratagus::unit_type *unit_type = stratagus::faction::get_all()[this->Faction]->get_class_unit_type(unit_class);
+							stratagus::unit_type *unit_type = stratagus::faction::get_all()[this->Faction]->get_class_unit_type(unit_class);
 							if (unit_type == nullptr) {
 								continue;
 							}
@@ -2881,10 +2881,10 @@ std::string CPlayer::has_failed_quest(const stratagus::quest *quest) // returns 
 		}
 		if (quest_objective->get_objective_type() == stratagus::objective_type::build_units) {
 			if (objective->Counter < quest_objective->get_quantity()) {
-				std::vector<const stratagus::unit_type *> unit_types = quest_objective->UnitTypes;
+				std::vector<stratagus::unit_type *> unit_types = quest_objective->UnitTypes;
 
 				for (const stratagus::unit_class *unit_class : quest_objective->get_unit_classes()) {
-					const stratagus::unit_type *unit_type = stratagus::faction::get_all()[this->Faction]->get_class_unit_type(unit_class);
+					stratagus::unit_type *unit_type = stratagus::faction::get_all()[this->Faction]->get_class_unit_type(unit_class);
 					if (unit_type == nullptr) {
 						continue;
 					}
@@ -2929,10 +2929,10 @@ std::string CPlayer::has_failed_quest(const stratagus::quest *quest) // returns 
 						}
 						
 						if (second_quest_objective->get_objective_type() == stratagus::objective_type::build_units) {
-							std::vector<const stratagus::unit_type *> unit_types = second_quest_objective->UnitTypes;
+							std::vector<stratagus::unit_type *> unit_types = second_quest_objective->UnitTypes;
 
 							for (const stratagus::unit_class *unit_class : second_quest_objective->get_unit_classes()) {
-								const stratagus::unit_type *unit_type = stratagus::faction::get_all()[this->Faction]->get_class_unit_type(unit_class);
+								stratagus::unit_type *unit_type = stratagus::faction::get_all()[this->Faction]->get_class_unit_type(unit_class);
 								if (unit_type == nullptr) {
 									continue;
 								}

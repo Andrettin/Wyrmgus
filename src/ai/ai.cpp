@@ -154,6 +154,7 @@
 //Wyrmgus start
 #include "network.h"
 //Wyrmgus end
+#include "objective_type.h"
 #include "pathfinder.h"
 #include "player.h"
 //Wyrmgus start
@@ -170,6 +171,7 @@
 #include "unit/unit_type_type.h"
 #include "upgrade/dependency.h"
 #include "upgrade/upgrade.h"
+#include "util/vector_util.h"
 
 int AiSleepCycles;              /// Ai sleeps # cycles
 
@@ -178,9 +180,44 @@ AiHelper AiHelpers;             /// AI helper variables
 
 PlayerAi *AiPlayer;             /// Current AI player
 
-/*----------------------------------------------------------------------------
--- Lowlevel functions
-----------------------------------------------------------------------------*/
+void PlayerAi::check_quest_units_to_build()
+{
+	for (const auto &objective : this->Player->get_quest_objectives()) {
+		const stratagus::quest_objective *quest_objective = objective->get_quest_objective();
+		if (quest_objective->get_objective_type() != stratagus::objective_type::build_units) {
+			continue;
+		}
+
+		stratagus::unit_type *unit_type_to_build = nullptr;
+		if (!quest_objective->UnitTypes.empty()) {
+			unit_type_to_build = quest_objective->UnitTypes.front();
+		} else {
+			unit_type_to_build = this->Player->get_class_unit_type(quest_objective->get_unit_classes().front());
+		}
+
+		if (unit_type_to_build->BoolFlag[TOWNHALL_INDEX].value) {
+			continue; //town hall construction can't be handled by requests
+		}
+
+		int units_to_build = quest_objective->get_quantity() - objective->Counter;
+
+		for (const AiBuildQueue &queue : this->UnitTypeBuilt) { //count transport capacity under construction to see if should request more
+			if (quest_objective->get_settlement() != nullptr && quest_objective->get_settlement() != queue.settlement) {
+				continue;
+			}
+
+			if (!stratagus::vector::contains(quest_objective->UnitTypes, queue.Type) && !stratagus::vector::contains(quest_objective->get_unit_classes(), queue.Type->get_unit_class())) {
+				continue;
+			}
+
+			units_to_build -= queue.Want - queue.Made;
+		}
+
+		if (units_to_build > 0) {
+			AiAddUnitTypeRequest(*unit_type_to_build, units_to_build, 0, quest_objective->get_settlement());
+		}
+	}
+}
 
 /**
 **  Execute the AI Script.
@@ -750,7 +787,7 @@ void FreeAi()
 **  @param type  Unit-type which is now available.
 **  @return      True, if unit-type was found in list.
 */
-static int AiRemoveFromBuilt2(PlayerAi *pai, const stratagus::unit_type &type, int landmass = 0, const stratagus::site *settlement = nullptr)
+static int AiRemoveFromBuilt2(PlayerAi *pai, const stratagus::unit_type &type, int landmass, const stratagus::site *settlement)
 {
 	std::vector<AiBuildQueue>::iterator i;
 
@@ -822,7 +859,7 @@ static void AiRemoveFromBuilt(PlayerAi *pai, const stratagus::unit_type &type, i
 **  @param type  Unit-type which is now available.
 **  @return      True if the unit-type could be reduced.
 */
-static bool AiReduceMadeInBuilt2(PlayerAi &pai, const stratagus::unit_type &type, int landmass = 0, const stratagus::site *settlement = nullptr)
+static bool AiReduceMadeInBuilt2(PlayerAi &pai, const stratagus::unit_type &type, int landmass, const stratagus::site *settlement)
 {
 	std::vector<AiBuildQueue>::iterator i;
 
@@ -1196,7 +1233,7 @@ void AiWorkComplete(CUnit *unit, CUnit &what)
 **  @param unit  Pointer to unit what builds the building.
 **  @param what  Pointer to unit-type.
 */
-void AiCanNotBuild(const CUnit &unit, const stratagus::unit_type &what, int landmass, stratagus::site *settlement)
+void AiCanNotBuild(const CUnit &unit, const stratagus::unit_type &what, int landmass, const stratagus::site *settlement)
 {
 	DebugPrint("%d: %d(%s) Can't build %s at %d,%d\n" _C_
 			   unit.Player->Index _C_ UnitNumber(unit) _C_ unit.Type->Ident.c_str() _C_
@@ -1215,7 +1252,7 @@ void AiCanNotBuild(const CUnit &unit, const stratagus::unit_type &what, int land
 **  @param unit  Pointer to unit what builds the building.
 **  @param what  Pointer to unit-type.
 */
-void AiCanNotReach(CUnit &unit, const stratagus::unit_type &what, int landmass, stratagus::site *settlement)
+void AiCanNotReach(CUnit &unit, const stratagus::unit_type &what, int landmass, const stratagus::site *settlement)
 {
 	Assert(unit.Player->Type != PlayerPerson);
 	//Wyrmgus start

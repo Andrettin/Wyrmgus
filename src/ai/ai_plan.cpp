@@ -742,7 +742,6 @@ void AiSendExplorers()
 //Wyrmgus start
 void AiCheckTransporters()
 {
-	//Wyrmgus start
 	for (std::map<int, std::vector<CUnit *>>::const_iterator iterator = AiPlayer->Transporters.begin(); iterator != AiPlayer->Transporters.end(); ++iterator) {
 		for (size_t i = 0; i != iterator->second.size(); ++i) {
 			CUnit &ai_transporter = *iterator->second[i];
@@ -759,7 +758,6 @@ void AiCheckTransporters()
 			}
 		}
 	}
-	//Wyrmgus end
 
 	AiPlayer->Transporters.clear();
 	for (int i = 0; i != AiPlayer->Player->GetUnitCount(); ++i) {
@@ -788,7 +786,6 @@ void AiCheckTransporters()
 		
 		AiPlayer->Transporters[landmass].push_back(&unit);
 	}
-	//Wyrmgus end
 }
 
 int AiGetTransportCapacity(int water_landmass)

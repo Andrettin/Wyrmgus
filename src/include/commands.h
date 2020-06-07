@@ -126,7 +126,7 @@ extern void CommandBoard(CUnit &unit, CUnit &dest, int flush);
 extern void CommandUnload(CUnit &unit, const Vec2i &pos, CUnit *what, int flush, int z = 0, int landmass = 0);
 //Wyrmgus end
 /// Prepare command build
-extern void CommandBuildBuilding(CUnit &unit, const Vec2i &pos, stratagus::unit_type &, int flush, int z = 0, stratagus::site *settlement = nullptr);
+extern void CommandBuildBuilding(CUnit &unit, const Vec2i &pos, stratagus::unit_type &, int flush, int z = 0, const stratagus::site *settlement = nullptr);
 /// Prepare command dismiss
 extern void CommandDismiss(CUnit &unit, bool salvage = false);
 /// Prepare command resource location

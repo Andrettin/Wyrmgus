@@ -37,7 +37,7 @@ namespace stratagus {
 
 class COrder_Build : public COrder
 {
-	friend COrder *COrder::NewActionBuild(const CUnit &builder, const Vec2i &pos, stratagus::unit_type &building, int z, stratagus::site *settlement);
+	friend COrder *COrder::NewActionBuild(const CUnit &builder, const Vec2i &pos, stratagus::unit_type &building, int z, const stratagus::site *settlement);
 public:
 	COrder_Build() : COrder(UnitAction::Build), Type(nullptr), State(0), Range(0), MapLayer(0)
 	{
@@ -82,6 +82,6 @@ private:
 	Vec2i goalPos;
 	//Wyrmgus start
 	int MapLayer;
-	stratagus::site *settlement = nullptr;
+	const stratagus::site *settlement = nullptr;
 	//Wyrmgus end
 };

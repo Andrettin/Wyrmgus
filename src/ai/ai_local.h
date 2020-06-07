@@ -293,7 +293,7 @@ public:
 	//Wyrmgus start
 	int MapLayer;
 	int Landmass;
-	stratagus::site *settlement = nullptr;
+	const stratagus::site *settlement = nullptr;
 	//Wyrmgus end
 };
 
@@ -325,6 +325,8 @@ public:
 	}
 
 public:
+	void check_quest_units_to_build();
+
 	CPlayer *Player = nullptr;		/// Engine player structure
 	CAiType *AiType = nullptr;		/// AI type of this player AI
 	// controller
@@ -589,7 +591,7 @@ extern PlayerAi *AiPlayer; /// Current AI player
 //
 extern void AiCheckWorkers();
 /// Add unit-type request to resource manager
-extern void AiAddUnitTypeRequest(stratagus::unit_type &type, const int count, const int landmass = 0, stratagus::site *settlement = nullptr, const Vec2i pos = Vec2i(-1, -1), const int z = 0);
+extern void AiAddUnitTypeRequest(stratagus::unit_type &type, const int count, const int landmass = 0, const stratagus::site *settlement = nullptr, const Vec2i pos = Vec2i(-1, -1), const int z = 0);
 /// Add upgrade-to request to resource manager
 extern void AiAddUpgradeToRequest(stratagus::unit_type &type);
 /// Add research request to resource manager
@@ -624,7 +626,7 @@ extern void AiCheckBuildings();
 // Buildings
 //
 /// Find nice building place
-extern bool AiFindBuildingPlace(const CUnit &worker, const stratagus::unit_type &type, const Vec2i &nearPos, Vec2i *resultPos, bool ignore_exploration, int z, int landmass = 0, stratagus::site *settlement = nullptr);
+extern bool AiFindBuildingPlace(const CUnit &worker, const stratagus::unit_type &type, const Vec2i &nearPos, Vec2i *resultPos, bool ignore_exploration, int z, int landmass = 0, const stratagus::site *settlement = nullptr);
 
 //
 // Forces

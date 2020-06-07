@@ -82,7 +82,7 @@ enum {
 --  Functions
 ----------------------------------------------------------------------------*/
 
-COrder *COrder::NewActionBuild(const CUnit &builder, const Vec2i &pos, stratagus::unit_type &building, int z, stratagus::site *settlement)
+COrder *COrder::NewActionBuild(const CUnit &builder, const Vec2i &pos, stratagus::unit_type &building, int z, const stratagus::site *settlement)
 {
 	Assert(CMap::Map.Info.IsPointOnMap(pos, z));
 
@@ -284,7 +284,7 @@ bool COrder_Build::MoveToLocation(CUnit &unit)
 	}
 }
 
-static bool CheckLimit(const CUnit &unit, const stratagus::unit_type &type, int landmass, stratagus::site *settlement)
+static bool CheckLimit(const CUnit &unit, const stratagus::unit_type &type, int landmass, const stratagus::site *settlement)
 {
 	const CPlayer &player = *unit.Player;
 	bool isOk = true;

@@ -116,7 +116,7 @@ private:
 	std::string objective_string;
 	std::vector<const stratagus::unit_class *> unit_classes;
 public:
-	std::vector<const stratagus::unit_type *> UnitTypes;
+	std::vector<stratagus::unit_type *> UnitTypes;
 	const CUpgrade *Upgrade = nullptr;
 private:
 	const stratagus::character *character = nullptr;
