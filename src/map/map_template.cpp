@@ -333,6 +333,18 @@ void map_template::initialize()
 		});
 	}
 
+	if (!this->sites.empty()) {
+		//sort sites to change their order of application
+		std::sort(this->sites.begin(), this->sites.end(), [](const stratagus::site *site, const stratagus::site *other_site) {
+			if (site->is_major() != other_site->is_major()) {
+				//give priority to major sites
+				return site->is_major();
+			}
+
+			return site->get_identifier() < other_site->get_identifier();
+		});
+	}
+
 	if (this->outputs_terrain_image()) {
 		terrain_geodata_map terrain_data;
 
