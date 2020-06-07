@@ -132,7 +132,13 @@ terrain_geodata_map world::parse_terrain_geojson_folder() const
 
 			if (type_str == "MultiLineString") {
 				const QGeoPath geopath = subfeature_map.value("data").value<QGeoPath>();
-				geoshape = std::make_unique<QGeoPath>(geopath);
+				auto geopath_copy = std::make_unique<QGeoPath>(geopath);
+
+				if (terrain_feature != nullptr && terrain_feature->get_geopath_width() != 0) {
+					geopath_copy->setWidth(terrain_feature->get_geopath_width());
+				}
+
+				geoshape = std::move(geopath_copy);
 			} else { //MultiPolygon
 				const QGeoPolygon geopolygon = subfeature_map.value("data").value<QGeoPolygon>();
 				geoshape = std::make_unique<QGeoPolygon>(geopolygon);

@@ -52,8 +52,11 @@ bool terrain_geodata_map_compare::operator()(const terrain_geodata_key &terrain_
 		other_terrain = std::get<const terrain_type *>(other_terrain_variant);
 	}
 
-	const bool is_water = terrain != nullptr && terrain->is_water();
-	const bool is_other_water = other_terrain != nullptr && other_terrain->is_water();
+	const bool is_river = terrain_feature != nullptr && terrain_feature->is_river();
+	const bool is_other_river = other_terrain_feature != nullptr && other_terrain_feature->is_river();
+
+	const bool is_water = terrain != nullptr && terrain->is_water() && !is_river;
+	const bool is_other_water = other_terrain != nullptr && other_terrain->is_water() && !is_other_river;
 	if (is_water != is_other_water) {
 		return is_water; //give priority to water terrain, so that it is written first
 	}
@@ -61,8 +64,20 @@ bool terrain_geodata_map_compare::operator()(const terrain_geodata_key &terrain_
 	const bool is_trade_route = terrain_feature != nullptr && terrain_feature->is_trade_route();
 	const bool is_other_trade_route = other_terrain_feature != nullptr && other_terrain_feature->is_trade_route();
 	if (is_trade_route != is_other_trade_route) {
-		//give priority to trade routes, so that they can be written before mountains
+		//give priority to trade routes, so that they can be written before overlay terrain, like mountains
 		return is_trade_route;
+	}
+
+	const bool is_major_river = terrain_feature != nullptr && terrain_feature->is_major_river();
+	const bool is_other_major_river = other_terrain_feature != nullptr && other_terrain_feature->is_major_river();
+	if (is_major_river != is_other_major_river) {
+		return is_major_river;
+	}
+
+	const bool is_minor_river = terrain_feature != nullptr && terrain_feature->is_minor_river();
+	const bool is_other_minor_river = other_terrain_feature != nullptr && other_terrain_feature->is_minor_river();
+	if (is_minor_river != is_other_minor_river) {
+		return is_minor_river;
 	}
 
 	if (terrain == other_terrain && terrain_feature != other_terrain_feature) {

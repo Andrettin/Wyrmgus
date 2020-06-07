@@ -49,6 +49,8 @@ class terrain_feature final : public named_data_entry, public data_type<terrain_
 	Q_PROPERTY(QColor color READ get_color WRITE set_color)
 	Q_PROPERTY(stratagus::terrain_type* terrain_type MEMBER terrain_type READ get_terrain_type)
 	Q_PROPERTY(bool trade_route MEMBER trade_route READ is_trade_route)
+	Q_PROPERTY(bool major_river MEMBER major_river READ is_major_river)
+	Q_PROPERTY(bool minor_river MEMBER minor_river READ is_minor_river)
 
 public:
 	static constexpr const char *class_identifier = "terrain_feature";
@@ -116,6 +118,21 @@ public:
 		return this->trade_route;
 	}
 
+	bool is_river() const
+	{
+		return this->is_major_river() || this->is_minor_river();
+	}
+
+	bool is_major_river() const
+	{
+		return this->major_river;
+	}
+
+	bool is_minor_river() const
+	{
+		return this->minor_river;
+	}
+
 	const std::string &get_cultural_name(const civilization *civilization) const
 	{
 		if (civilization != nullptr) {
@@ -128,10 +145,23 @@ public:
 		return this->get_name();
 	}
 
+	int get_geopath_width() const
+	{
+		if (this->is_major_river()) {
+			return 25000;
+		} else if (this->is_minor_river()) {
+			return 10000;
+		}
+
+		return 0;
+	}
+
 private:
 	QColor color;
 	stratagus::terrain_type *terrain_type = nullptr;
 	bool trade_route = false;
+	bool major_river = false;
+	bool minor_river = false;
 	std::map<const civilization *, std::string> cultural_names; //names for the terrain feature for each different culture/civilization
 
 	friend int ::CclDefineTerrainFeature(lua_State *l);

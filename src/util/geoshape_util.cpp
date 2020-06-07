@@ -36,15 +36,30 @@ namespace stratagus::geoshape {
 
 void write_to_image(const QGeoShape &geoshape, QImage &image, const QColor &color, const QGeoRectangle &georectangle, const std::string &image_checkpoint_save_filename)
 {
-	const QGeoRectangle bounding_georectangle = geoshape.boundingGeoRectangle();
+	QGeoRectangle bounding_georectangle = geoshape.boundingGeoRectangle();
 
 	if (!bounding_georectangle.intersects(georectangle)) {
 		return;
 	}
 
 	if (geoshape.type() == QGeoShape::PathType) {
-		geopath::write_to_image(static_cast<const QGeoPath &>(geoshape), image, color, georectangle);
-		return;
+		const QGeoPath &geopath = static_cast<const QGeoPath &>(geoshape);
+		geopath::write_to_image(geopath, image, color, georectangle);
+
+		//if the geopath's width is 0, there is nothing further to do here, but otherwise, use the normal method of geoshape writing as well
+		if (geopath.width() == 0) {
+			return;
+		}
+
+		//increase the bounding rectangle of geopaths slightly, as otherwise a part of the path's width is cut off
+		QGeoCoordinate bottom_left = bounding_georectangle.bottomLeft();
+		QGeoCoordinate top_right = bounding_georectangle.topRight();
+		bottom_left.setLatitude(bottom_left.latitude() - 0.1);
+		bottom_left.setLongitude(bottom_left.longitude() - 0.1);
+		top_right.setLatitude(top_right.latitude() + 0.1);
+		top_right.setLongitude(top_right.longitude() + 0.1);
+		bounding_georectangle.setBottomLeft(bottom_left);
+		bounding_georectangle.setTopRight(top_right);
 	}
 
 	const double lon_per_pixel = geocoordinate::longitude_per_pixel(georectangle.width(), image.size());
