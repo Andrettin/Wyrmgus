@@ -2942,8 +2942,11 @@ void CMap::generate_missing_terrain(const Vec2i &min_pos, const Vec2i &max_pos, 
 		Vec2i seed_pos = seeds[SyncRand(seeds.size())];
 		stratagus::vector::remove(seeds, seed_pos);
 
-		stratagus::terrain_type *terrain_type = this->Field(seed_pos, z)->Terrain;
-		stratagus::terrain_type *overlay_terrain_type = this->Field(seed_pos, z)->OverlayTerrain;
+		const CMapField *seed_tile = this->Field(seed_pos, z);
+
+		stratagus::terrain_type *terrain_type = seed_tile->Terrain;
+		stratagus::terrain_type *overlay_terrain_type = seed_tile->OverlayTerrain;
+		const stratagus::terrain_feature *terrain_feature = seed_tile->get_terrain_feature();
 
 		if (overlay_terrain_type != nullptr) {
 			if (
@@ -3013,18 +3016,27 @@ void CMap::generate_missing_terrain(const Vec2i &min_pos, const Vec2i &max_pos, 
 			if (this->GetTileTopTerrain(adjacent_pos, false, z) == nullptr) {
 				this->Field(adjacent_pos, z)->SetTerrain(terrain_type);
 				this->Field(adjacent_pos, z)->SetTerrain(overlay_terrain_type);
+				if (terrain_feature != nullptr) {
+					this->Field(adjacent_pos, z)->set_terrain_feature(terrain_feature);
+				}
 				seeds.push_back(adjacent_pos);
 			}
 
 			if (this->GetTileTopTerrain(adjacent_pos_horizontal, false, z) == nullptr) {
 				this->Field(adjacent_pos_horizontal, z)->SetTerrain(terrain_type);
 				this->Field(adjacent_pos_horizontal, z)->SetTerrain(overlay_terrain_type);
+				if (terrain_feature != nullptr) {
+					this->Field(adjacent_pos_horizontal, z)->set_terrain_feature(terrain_feature);
+				}
 				seeds.push_back(adjacent_pos_horizontal);
 			}
 
 			if (this->GetTileTopTerrain(adjacent_pos_vertical, false, z) == nullptr) {
 				this->Field(adjacent_pos_vertical, z)->SetTerrain(terrain_type);
 				this->Field(adjacent_pos_vertical, z)->SetTerrain(overlay_terrain_type);
+				if (terrain_feature != nullptr) {
+					this->Field(adjacent_pos_vertical, z)->set_terrain_feature(terrain_feature);
+				}
 				seeds.push_back(adjacent_pos_vertical);
 			}
 		}

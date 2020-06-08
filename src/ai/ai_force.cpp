@@ -27,10 +27,6 @@
 //      02111-1307, USA.
 //
 
-/*----------------------------------------------------------------------------
---  Includes
-----------------------------------------------------------------------------*/
-
 #include "stratagus.h"
 
 #include "ai_local.h"
@@ -50,10 +46,6 @@
 #include "unit/unit_type.h"
 #include "unit/unit_type_type.h"
 #include "upgrade/dependency.h"
-
-/*----------------------------------------------------------------------------
---  Types
-----------------------------------------------------------------------------*/
 
 static constexpr int AIATTACK_RANGE = 0;
 static constexpr int AIATTACK_ALLMAP = 1;
@@ -834,7 +826,6 @@ void AiForce::Attack(const Vec2i &pos, int z)
 		}
 	}
 	if (CMap::Map.Info.IsPointOnMap(goalPos, z) == false) {
-		//Wyrmgus start
 		bool include_neutral = AiPlayer->Player->AtPeace();
 		//Wyrmgus end
 		/* Search in entire map */
@@ -1589,9 +1580,7 @@ void AiForce::Update()
 	const int thresholdDist = std::max(5, (int) Units.size() / 8);
 	//Wyrmgus end
 	Assert(CMap::Map.Info.IsPointOnMap(GoalPos, GoalMapLayer));
-	//Wyrmgus start
 	bool include_neutral = AiPlayer->Player->AtPeace();
-	//Wyrmgus end
 	if (State == AiForceAttackingState::GoingToRallyPoint) {
 		// Check if we are near the goalpos
 		//Wyrmgus start
