@@ -647,6 +647,59 @@ void unit_type::process_sml_property(const sml_property &property)
 		} else {
 			throw std::runtime_error("Invalid unit type type: \"" + value + "\"");
 		}
+	} else if (key == "max_attack_range") {
+		this->DefaultStat.Variables[ATTACKRANGE_INDEX].Value = std::stoi(value);
+		this->DefaultStat.Variables[ATTACKRANGE_INDEX].Max = std::stoi(value);
+		this->DefaultStat.Variables[ATTACKRANGE_INDEX].Enable = 1;
+	} else if (key == "max_on_board") {
+		this->MaxOnBoard = std::stoi(value);
+		this->DefaultStat.Variables[TRANSPORT_INDEX].Max = this->MaxOnBoard;
+		this->DefaultStat.Variables[TRANSPORT_INDEX].Enable = 1;
+	} else if (key == "annoy_computer_factor") {
+		this->AnnoyComputerFactor = std::stoi(value);
+	} else if (key == "can_target_land") {
+		const bool can_target_land = string::to_bool(value);
+		if (can_target_land) {
+			this->CanTarget |= CanTargetLand;
+		} else {
+			this->CanTarget &= ~CanTargetLand;
+		}
+	} else if (key == "can_target_sea") {
+		const bool can_target_sea = string::to_bool(value);
+		if (can_target_sea) {
+			this->CanTarget |= CanTargetSea;
+		} else {
+			this->CanTarget &= ~CanTargetSea;
+		}
+	} else if (key == "can_target_air") {
+		const bool can_target_air = string::to_bool(value);
+		if (can_target_air) {
+			this->CanTarget |= CanTargetAir;
+		} else {
+			this->CanTarget &= ~CanTargetAir;
+		}
+	} else if (key == "right_mouse_action") {
+		if (value == "none") {
+			this->MouseAction = MouseActionNone;
+		} else if (value == "attack") {
+			this->MouseAction = MouseActionAttack;
+		} else if (value == "move") {
+			this->MouseAction = MouseActionMove;
+		} else if (value == "harvest") {
+			this->MouseAction = MouseActionHarvest;
+		} else if (value == "spell_cast") {
+			this->MouseAction = MouseActionSpellCast;
+		} else if (value == "sail") {
+			this->MouseAction = MouseActionSail;
+		} else if (value == "rally_point") {
+			this->MouseAction = MouseActionRallyPoint;
+		} else if (value == "trade") {
+			this->MouseAction = MouseActionTrade;
+		} else {
+			throw std::runtime_error("Invalid right mouse action: \"" + value + "\".");
+		}
+	} else if (key == "requirements_string") {
+		this->RequirementsString = value;
 	} else {
 		const std::string pascal_case_key = string::snake_case_to_pascal_case(key);
 
@@ -714,6 +767,33 @@ void unit_type::process_sml_scope(const sml_data &scope)
 			unit_type *item = unit_type::get(value);
 			this->DefaultEquipment[item_slot] = item;
 		});
+	} else if (tag == "can_transport") {
+		if (this->MaxOnBoard == 0) { // set default value.
+			this->MaxOnBoard = 1;
+			this->DefaultStat.Variables[TRANSPORT_INDEX].Max = this->MaxOnBoard;
+			this->DefaultStat.Variables[TRANSPORT_INDEX].Enable = 1;
+		}
+
+		if (this->BoolFlag.size() < UnitTypeVar.GetNumberBoolFlag()) {
+			this->BoolFlag.resize(UnitTypeVar.GetNumberBoolFlag());
+		}
+
+		scope.for_each_property([&](const sml_property &property) {
+			const std::string &key = property.get_key();
+			const std::string &value = property.get_value();
+
+			const std::string pascal_case_key = string::snake_case_to_pascal_case(key);
+			const int index = UnitTypeVar.BoolFlagNameLookup[pascal_case_key.c_str()];
+			if (index != -1) {
+				this->BoolFlag[index].CanTransport = StringToCondition(value);
+			} else {
+				throw std::runtime_error("Unsupported flag tag for CanTransport: " + key);
+			}
+		});
+	} else if (tag == "affixes") {
+		for (const std::string &value : values) {
+			this->Affixes.push_back(CUpgrade::get(value));
+		}
 	} else if (tag == "resource_gathering") {
 		scope.for_each_child([&](const sml_data &child_scope) {
 			const std::string &tag = child_scope.get_tag();
@@ -1857,6 +1937,16 @@ void resource_info::process_sml_property(const sml_property &property)
 		this->image_file = database::get_graphics_path(this->get_unit_type()->get_module()) / value;
 	} else if (key == "loaded_image_file") {
 		this->loaded_image_file = database::get_graphics_path(this->get_unit_type()->get_module()) / value;
+	} else if (key == "resource_step") {
+		this->ResourceStep = std::stoi(value);
+	} else if (key == "wait_at_resource") {
+		this->WaitAtResource = std::stoi(value);
+	} else if (key == "wait_at_depot") {
+		this->WaitAtDepot = std::stoi(value);
+	} else if (key == "resource_capacity") {
+		this->ResourceCapacity = std::stoi(value);
+	} else if (key == "lose_resources") {
+		this->LoseResources = string::to_bool(value);
 	} else {
 		throw std::runtime_error("Invalid resource gathering info property: \"" + key + "\".");
 	}

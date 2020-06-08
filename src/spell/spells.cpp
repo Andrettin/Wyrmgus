@@ -927,7 +927,7 @@ int SpellCast(CUnit &caster, const CSpell &spell, CUnit *target, const Vec2i &go
 	return 0;
 }
 
-static char StringToCondition(const std::string &str)
+char StringToCondition(const std::string &str)
 {
 	if (str == "true") {
 		return CONDITION_TRUE;
@@ -936,8 +936,7 @@ static char StringToCondition(const std::string &str)
 	} else if (str == "only") {
 		return CONDITION_ONLY;
 	} else {
-		fprintf(stderr, "Bad condition result: \"%s\".\n", str.c_str());
-		return -1;
+		throw std::runtime_error("Bad condition result: \"" + str + "\".");
 	}
 }
 

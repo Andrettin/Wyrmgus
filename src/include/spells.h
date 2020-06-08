@@ -300,6 +300,8 @@ extern bool CanCastSpell(const CUnit &caster, const CSpell &spell,
 extern int SpellCast(CUnit &caster, const CSpell &spell,
 					 CUnit *target, const Vec2i &goalPos, CMapLayer *map_layer);
 
+extern char StringToCondition(const std::string &str);
+
 /// auto cast the spell if possible
 extern int AutoCastSpell(CUnit &caster, const CSpell &spell);
 
