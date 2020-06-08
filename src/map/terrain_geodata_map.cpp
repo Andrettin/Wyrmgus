@@ -82,7 +82,7 @@ bool terrain_geodata_map_compare::operator()(const terrain_geodata_key &terrain_
 
 	if (terrain == other_terrain && terrain_feature != other_terrain_feature) {
 		if (terrain_feature == nullptr || other_terrain_feature == nullptr) {
-			return terrain_feature == nullptr;
+			return terrain_feature != nullptr;
 		}
 
 		return terrain_feature->get_identifier() < other_terrain_feature->get_identifier();
