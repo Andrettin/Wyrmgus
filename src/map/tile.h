@@ -8,8 +8,6 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name tile.h - The map tile header file. */
-//
 //      (c) Copyright 1998-2020 by Vladi Shabanski, Lutz Sammer,
 //                                 Jimmy Salmon, Rafal Bursig and Andrettin
 //
@@ -28,10 +26,6 @@
 //      02111-1307, USA.
 
 #pragma once
-
-/*----------------------------------------------------------------------------
---  Documentation
-----------------------------------------------------------------------------*/
 
 /**
 **  @class CMapField tile.h
@@ -122,16 +116,8 @@
 **    top and right most map coordinate.
 */
 
-/*----------------------------------------------------------------------------
---  Includes
-----------------------------------------------------------------------------*/
-
 #include "unit/unit_cache.h"
 #include "vec2i.h"
-
-/*----------------------------------------------------------------------------
---  Declarations
-----------------------------------------------------------------------------*/
 
 class CFile;
 class CPlayer;
@@ -147,10 +133,6 @@ namespace stratagus {
 	class terrain_feature;
 	class terrain_type;
 }
-
-/*----------------------------------------------------------------------------
---  Map - field
-----------------------------------------------------------------------------*/
 
 class CMapFieldPlayerInfo
 {
@@ -238,6 +220,7 @@ public:
 	bool is_water() const;
 	bool is_non_coastal_water() const;
 	bool is_coastal_water() const;
+	bool is_river() const;
 	bool is_space() const;
 
 	/// Returns true, if water on the map tile field

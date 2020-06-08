@@ -695,6 +695,11 @@ bool CMapField::is_coastal_water() const
 	return this->Flags & MapFieldCoastAllowed;
 }
 
+bool CMapField::is_river() const
+{
+	return this->get_terrain_feature() != nullptr && this->get_terrain_feature()->is_river();
+}
+
 bool CMapField::is_space() const
 {
 	return this->Flags & MapFieldSpace;
