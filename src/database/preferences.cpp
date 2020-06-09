@@ -31,6 +31,7 @@
 #include "database/database.h"
 #include "database/sml_data.h"
 #include "database/sml_parser.h"
+#include "util/exception_util.h"
 
 namespace stratagus {
 
@@ -73,7 +74,18 @@ void preferences::save() const
 
 void preferences::process_sml_property(const sml_property &property)
 {
-	database::process_sml_property_for_object(this, property);
+	const std::string &key = property.get_key();
+
+	if (key == "selected_campaign") {
+		//use a try-catch for the selected campaign, as it could point to a campaign which no longer exists
+		try {
+			database::process_sml_property_for_object(this, property);
+		} catch (const std::runtime_error &exception) {
+			exception::report(exception);
+		}
+	} else {
+		database::process_sml_property_for_object(this, property);
+	}
 }
 
 void preferences::process_sml_scope(const sml_data &scope)
