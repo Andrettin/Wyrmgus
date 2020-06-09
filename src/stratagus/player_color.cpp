@@ -29,9 +29,18 @@
 
 #include "player_color.h"
 
+#include "database/defines.h"
 #include "util/container_util.h"
 
 namespace stratagus {
+
+void player_color::check() const
+{
+	const player_color *conversible_color = defines::get()->get_conversible_player_color();
+	if (this->get_colors().size() != conversible_color->get_colors().size()) {
+		throw std::runtime_error("The \"" + this->get_identifier() + "\" player color has a different amount of shades (" + std::to_string(this->get_colors().size()) + ") than the amount of shades (" + std::to_string(conversible_color->get_colors().size()) + ") for the conversible player color (\"" + conversible_color->get_identifier() + "\").");
+	}
+}
 
 QVariantList player_color::get_colors_qvariant_list() const
 {

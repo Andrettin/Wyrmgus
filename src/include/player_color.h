@@ -42,9 +42,11 @@ public:
 	static constexpr const char *class_identifier = "player_color";
 	static constexpr const char *database_folder = "player_colors";
 
-	player_color(const std::string &identifier) : named_data_entry(identifier)
+	explicit player_color(const std::string &identifier) : named_data_entry(identifier)
 	{
 	}
+
+	virtual void check() const override;
 
 	const std::vector<QColor> &get_colors() const
 	{
