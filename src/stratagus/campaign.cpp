@@ -87,7 +87,7 @@ void campaign::ProcessConfigData(const CConfigData *config_data)
 			this->start_date = string::to_date(value);
 		} else if (key == "required_quest") {
 			quest *quest = quest::get(value);
-			this->RequiredQuests.push_back(quest);
+			this->required_quests.push_back(quest);
 		} else {
 			fprintf(stderr, "Invalid campaign property: \"%s\".\n", key.c_str());
 		}
@@ -138,6 +138,20 @@ void campaign::ProcessConfigData(const CConfigData *config_data)
 	}
 }
 
+void campaign::process_sml_scope(const sml_data &scope)
+{
+	const std::string &tag = scope.get_tag();
+	const std::vector<std::string> &values = scope.get_values();
+
+	if (tag == "required_quests") {
+		for (const std::string &value : values) {
+			this->required_quests.push_back(quest::get(value));
+		}
+	} else {
+		data_entry::process_sml_scope(scope);
+	}
+}
+
 void campaign::initialize()
 {
 	if (this->start_date_calendar != nullptr) {
@@ -167,7 +181,7 @@ bool campaign::IsAvailable() const
 		return false;
 	}
 
-	for (quest *quest : this->RequiredQuests) {
+	for (const quest *quest : this->get_required_quests()) {
 		if (!quest->IsCompleted()) {
 			return false;
 		}

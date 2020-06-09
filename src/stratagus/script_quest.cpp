@@ -386,12 +386,12 @@ static int CclDefineCampaign(lua_State *l)
 			CclGetDate(l, &start_date);
 			campaign->start_date = start_date;
 		} else if (!strcmp(value, "RequiredQuests")) {
-			campaign->RequiredQuests.clear();
+			campaign->required_quests.clear();
 			const int args = lua_rawlen(l, -1);
 			for (int j = 0; j < args; ++j) {
 				std::string quest_ident = LuaToString(l, -1, j + 1);
 				stratagus::quest *required_quest = stratagus::quest::get(quest_ident);
-				campaign->RequiredQuests.push_back(required_quest);
+				campaign->required_quests.push_back(required_quest);
 			}
 		} else if (!strcmp(value, "MapTemplates")) {
 			campaign->map_templates.clear();
@@ -485,10 +485,10 @@ static int CclGetCampaignData(lua_State *l)
 		lua_pushboolean(l, campaign->Sandbox);
 		return 1;
 	} else if (!strcmp(data, "RequiredQuests")) {
-		lua_createtable(l, campaign->RequiredQuests.size(), 0);
-		for (size_t i = 1; i <= campaign->RequiredQuests.size(); ++i)
+		lua_createtable(l, campaign->get_required_quests().size(), 0);
+		for (size_t i = 1; i <= campaign->get_required_quests().size(); ++i)
 		{
-			lua_pushstring(l, campaign->RequiredQuests[i-1]->get_identifier().c_str());
+			lua_pushstring(l, campaign->get_required_quests()[i-1]->get_identifier().c_str());
 			lua_rawseti(l, -2, i);
 		}
 		return 1;

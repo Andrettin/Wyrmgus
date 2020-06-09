@@ -71,6 +71,7 @@ public:
 	{
 	}
 
+	virtual void process_sml_scope(const sml_data &scope) override;
 	virtual void ProcessConfigData(const CConfigData *config_data) override;
 	virtual void initialize() override;
 	
@@ -105,6 +106,11 @@ public:
 
 	bool contains_timeline_date(const timeline *timeline, const QDateTime &date) const;
 
+	const std::vector<quest *> &get_required_quests() const
+	{
+		return this->required_quests;
+	}
+
 	const std::vector<map_template *> &get_map_templates() const
 	{
 		return this->map_templates;
@@ -125,7 +131,7 @@ private:
 	timeline *timeline = nullptr; //the timeline in which the campaign is set
 	bool hidden = false; //whether the campaign is hidden
 	bool Sandbox = false;			/// Whether the campaign is a sandbox one
-	std::vector<quest *> RequiredQuests;		/// Quests required by the campaign
+	std::vector<quest *> required_quests;		/// Quests required by the campaign
 	faction *faction = nullptr;	//which faction the player plays as in the campaign
 	quest *completion_quest = nullptr; //the quest which when completed means that the campaign has been completed as well
 	std::vector<map_template *> map_templates; //map templates used by the campaign
