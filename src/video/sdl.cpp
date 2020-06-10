@@ -771,10 +771,6 @@ static void SdlDoEvent(const EventCallback &callbacks, SDL_Event &event)
 
 		case SDL_MOUSEBUTTONUP:
 			InputMouseButtonRelease(callbacks, SDL_GetTicks(), event.button.button);
-			if ((UI.MouseWarpPos.x != -1 || UI.MouseWarpPos.y != -1)
-				&& (event.button.x != UI.MouseWarpPos.x || event.button.y != UI.MouseWarpPos.y)) {
-				do_mouse_warp();
-			}
 			break;
 
 		// FIXME: check if this is only useful for the cursor
