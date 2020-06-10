@@ -262,6 +262,16 @@ void button::process_sml_scope(const sml_data &scope)
 		for (const std::string &value : values) {
 			this->unit_classes.push_back(unit_class::get(value));
 		}
+	} else if (tag == "allow_arg") {
+		this->AllowStr.clear();
+
+		for (size_t i = 0; i < values.size(); ++i) {
+			const std::string &value = values[i];
+			this->AllowStr += value;
+			if (i != (values.size() - 1)) {
+				this->AllowStr += ",";
+			}
+		}
 	} else {
 		data_entry::process_sml_scope(scope);
 	}
