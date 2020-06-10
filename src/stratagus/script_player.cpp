@@ -639,19 +639,7 @@ static int CclSetDiplomacy(lua_State *l)
 	const int plynr = LuaToNumber(l, 3);
 	const char *state = LuaToString(l, 2);
 
-	if (!strcmp(state, "allied")) {
-		SendCommandDiplomacy(base, stratagus::diplomacy_state::allied, plynr);
-	} else if (!strcmp(state, "neutral")) {
-		SendCommandDiplomacy(base, stratagus::diplomacy_state::neutral, plynr);
-	} else if (!strcmp(state, "crazy")) {
-		SendCommandDiplomacy(base, stratagus::diplomacy_state::crazy, plynr);
-	} else if (!strcmp(state, "enemy")) {
-		SendCommandDiplomacy(base, stratagus::diplomacy_state::enemy, plynr);
-	} else if (!strcmp(state, "overlord")) {
-		SendCommandDiplomacy(base, stratagus::diplomacy_state::overlord, plynr);
-	} else if (!strcmp(state, "vassal")) {
-		SendCommandDiplomacy(base, stratagus::diplomacy_state::vassal, plynr);
-	}
+	SendCommandDiplomacy(base, stratagus::string_to_diplomacy_state(state), plynr);
 	return 0;
 }
 

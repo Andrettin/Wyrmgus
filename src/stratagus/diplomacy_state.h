@@ -33,8 +33,10 @@ enum class diplomacy_state {
 	allied, //ally with opponent
 	neutral, //don't attack be neutral
 	enemy, //attack opponent
-	overlord, //become overlord of other player
-	vassal,	//become vassal of other player
+	overlord, //become overlord of another player
+	vassal,	//become vassal of another player
+	personal_union_overlord,
+	personal_union_vassal,
 	crazy //ally and attack opponent
 };
 
@@ -50,6 +52,10 @@ inline diplomacy_state string_to_diplomacy_state(const std::string &str)
 		return diplomacy_state::overlord;
 	} else if (str == "vassal") {
 		return diplomacy_state::vassal;
+	} else if (str == "personal_union_overlord") {
+		return diplomacy_state::personal_union_overlord;
+	} else if (str == "personal_union_vassal") {
+		return diplomacy_state::personal_union_vassal;
 	} else if (str == "crazy") {
 		return diplomacy_state::crazy;
 	}
@@ -70,6 +76,10 @@ inline std::string diplomacy_state_to_string(const diplomacy_state state)
 			return "overlord";
 		case diplomacy_state::vassal:
 			return "vassal";
+		case diplomacy_state::personal_union_overlord:
+			return "personal_union_overlord";
+		case diplomacy_state::personal_union_vassal:
+			return "personal_union_vassal";
 		case diplomacy_state::crazy:
 			return "crazy";
 		default:

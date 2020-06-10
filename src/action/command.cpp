@@ -1341,9 +1341,11 @@ void CommandDiplomacy(const int player, const stratagus::diplomacy_state state, 
 			CPlayer::Players[player]->SetDiplomacyEnemyWith(*CPlayer::Players[opponent]);
 			break;
 		case stratagus::diplomacy_state::overlord:
+		case stratagus::diplomacy_state::personal_union_overlord:
 			CPlayer::Players[opponent]->set_overlord(CPlayer::Players[player]);
 			break;
 		case stratagus::diplomacy_state::vassal:
+		case stratagus::diplomacy_state::personal_union_vassal:
 			CPlayer::Players[player]->set_overlord(CPlayer::Players[opponent]);
 			break;
 		case stratagus::diplomacy_state::crazy:

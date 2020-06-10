@@ -968,22 +968,7 @@ static void DoNextReplay()
 		SendCommandBuyResource(*unit, arg1, num);
 	//Wyrmgus end
 	} else if (!strcmp(action, "diplomacy")) {
-		stratagus::diplomacy_state state;
-		if (!strcmp(val, "neutral")) {
-			state = stratagus::diplomacy_state::neutral;
-		} else if (!strcmp(val, "allied")) {
-			state = stratagus::diplomacy_state::allied;
-		} else if (!strcmp(val, "enemy")) {
-			state = stratagus::diplomacy_state::enemy;
-		} else if (!strcmp(val, "overlord")) {
-			state = stratagus::diplomacy_state::overlord;
-		} else if (!strcmp(val, "vassal")) {
-			state = stratagus::diplomacy_state::vassal;
-		} else if (!strcmp(val, "crazy")) {
-			state = stratagus::diplomacy_state::crazy;
-		} else {
-			throw std::runtime_error("Invalid diplomacy command: " + std::string(val));
-		}
+		stratagus::diplomacy_state state = stratagus::string_to_diplomacy_state(val);
 		SendCommandDiplomacy(arg1, state, arg2);
 	} else if (!strcmp(action, "shared-vision")) {
 		bool state;

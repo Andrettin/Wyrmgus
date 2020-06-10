@@ -218,10 +218,12 @@ void game::apply_player_history()
 				if (diplomacy_state_player != nullptr) {
 					switch (state) {
 						case diplomacy_state::overlord:
+						case diplomacy_state::personal_union_overlord:
 							CommandDiplomacy(player->Index, state, diplomacy_state_player->Index);
 							CommandDiplomacy(diplomacy_state_player->Index, diplomacy_state::vassal, player->Index);
 							break;
 						case diplomacy_state::vassal:
+						case diplomacy_state::personal_union_vassal:
 							CommandDiplomacy(player->Index, state, diplomacy_state_player->Index);
 							CommandDiplomacy(diplomacy_state_player->Index, diplomacy_state::overlord, player->Index);
 							break;

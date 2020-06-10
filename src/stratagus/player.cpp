@@ -4105,35 +4105,72 @@ void CPlayer::UnshareVisionWith(const CPlayer &player)
 	}
 }
 
-void CPlayer::set_overlord(CPlayer *player)
+void CPlayer::set_overlord(CPlayer *overlord)
 {
-	if (player == this->get_overlord()) {
+	if (overlord == this->get_overlord()) {
 		return;
 	}
 
-	if (player != nullptr && player->get_overlord() == this) {
-		throw std::runtime_error("Cannot set player \"" + player->Name + "\" as the overlord of \"" + this->Name + "\", as the former is a vassal of the latter, and a vassal can't be the overlord of its own overlord.");
+	if (overlord != nullptr && overlord->get_overlord() == this) {
+		throw std::runtime_error("Cannot set player \"" + overlord->Name + "\" as the overlord of \"" + this->Name + "\", as the former is a vassal of the latter, and a vassal can't be the overlord of its own overlord.");
 	}
 
-	if (this->get_overlord() != nullptr) {
-		stratagus::vector::remove(get_overlord()->vassals, this);
-	}
+	CPlayer *old_overlord = this->get_overlord();
+	if (old_overlord != nullptr) {
+		stratagus::vector::remove(old_overlord->vassals, this);
 
-	this->overlord = player;
-	
-	if (player != nullptr) {
-		player->vassals.push_back(this);
+		//remove alliance and shared vision with the old overlord, and any upper overlords
 		if (!SaveGameLoading) {
-			this->SetDiplomacyAlliedWith(*player);
-			player->SetDiplomacyAlliedWith(*this);
-			CommandDiplomacy(this->Index, stratagus::diplomacy_state::allied, player->Index);
-			CommandDiplomacy(player->Index, stratagus::diplomacy_state::allied, this->Index);
-			CommandSharedVision(this->Index, true, player->Index);
-			CommandSharedVision(player->Index, true, this->Index);
+			while (old_overlord != nullptr) {
+				this->break_overlordship_alliance(old_overlord);
+				old_overlord = old_overlord->get_overlord();
+			}
+		}
+	}
+
+	this->overlord = overlord;
+	
+	if (overlord != nullptr) {
+		overlord->vassals.push_back(this);
+
+		//establish alliance and shared vision with the new overlord, and any upper overlords
+		if (!SaveGameLoading) {
+			while (overlord != nullptr) {
+				this->establish_overlordship_alliance(overlord);
+				overlord = overlord->get_overlord();
+			}
 		}
 	}
 
 	this->update_minimap_territory();
+}
+
+void CPlayer::establish_overlordship_alliance(CPlayer *overlord)
+{
+	this->SetDiplomacyAlliedWith(*overlord);
+	overlord->SetDiplomacyAlliedWith(*this);
+	CommandSharedVision(this->Index, true, overlord->Index);
+	CommandSharedVision(overlord->Index, true, this->Index);
+
+	//vassals should also be allied with overlords higher up in the hierarchy
+	for (CPlayer *vassal : this->get_vassals()) {
+		vassal->establish_overlordship_alliance(overlord);
+	}
+}
+
+void CPlayer::break_overlordship_alliance(CPlayer *overlord)
+{
+	if (this->IsAllied(*overlord)) {
+		this->SetDiplomacyNeutralWith(*overlord);
+		overlord->SetDiplomacyNeutralWith(*this);
+	}
+	CommandSharedVision(this->Index, false, overlord->Index);
+	CommandSharedVision(overlord->Index, false, this->Index);
+
+	//vassals should also have their alliances with overlords higher up in the hierarchy broken
+	for (CPlayer *vassal : this->get_vassals()) {
+		vassal->break_overlordship_alliance(overlord);
+	}
 }
 
 /**

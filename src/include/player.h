@@ -491,7 +491,7 @@ public:
 		return this->overlord;
 	}
 
-	void set_overlord(CPlayer *player);
+	void set_overlord(CPlayer *overlord);
 
 	CPlayer *get_top_overlord() const
 	{
@@ -521,6 +521,9 @@ public:
 
 		return 0;
 	}
+
+	void establish_overlordship_alliance(CPlayer *overlord);
+	void break_overlordship_alliance(CPlayer *overlord);
 
 	const std::vector<CPlayer *> &get_vassals() const
 	{

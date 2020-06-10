@@ -720,32 +720,7 @@ void SendCommandAutoSpellCast(CUnit &unit, int spellid, int on)
 void SendCommandDiplomacy(const int player, const stratagus::diplomacy_state state, const int opponent)
 {
 	if (!IsNetworkGame()) {
-		switch (state) {
-			case stratagus::diplomacy_state::neutral:
-				CommandLog("diplomacy", NoUnitP, 0, player, opponent,
-						   NoUnitP, "neutral", -1);
-				break;
-			case stratagus::diplomacy_state::allied:
-				CommandLog("diplomacy", NoUnitP, 0, player, opponent,
-						   NoUnitP, "allied", -1);
-				break;
-			case stratagus::diplomacy_state::enemy:
-				CommandLog("diplomacy", NoUnitP, 0, player, opponent,
-						   NoUnitP, "enemy", -1);
-				break;
-			case stratagus::diplomacy_state::overlord:
-				CommandLog("diplomacy", NoUnitP, 0, player, opponent,
-						   NoUnitP, "overlord", -1);
-				break;
-			case stratagus::diplomacy_state::vassal:
-				CommandLog("diplomacy", NoUnitP, 0, player, opponent,
-						   NoUnitP, "vassal", -1);
-				break;
-			case stratagus::diplomacy_state::crazy:
-				CommandLog("diplomacy", NoUnitP, 0, player, opponent,
-						   NoUnitP, "crazy", -1);
-				break;
-		}
+		CommandLog("diplomacy", NoUnitP, 0, player, opponent, NoUnitP, stratagus::diplomacy_state_to_string(state).c_str(), -1);
 		CommandDiplomacy(player, state, opponent);
 	} else {
 		NetworkSendExtendedCommand(ExtendedMessageDiplomacy,
