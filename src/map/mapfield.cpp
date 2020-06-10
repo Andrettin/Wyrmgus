@@ -49,7 +49,6 @@ CMapField::CMapField() :
 	cost(0),
 	Value(0),
 	Landmass(0),
-	OwnershipBorderTile(-1),
 	AnimationFrame(0),
 	OverlayAnimationFrame(0),
 	SolidTile(0), OverlaySolidTile(0),

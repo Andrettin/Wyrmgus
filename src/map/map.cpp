@@ -71,6 +71,7 @@
 //Wyrmgus end
 #include "util/container_util.h"
 #include "util/size_util.h"
+#include "util/vector_random_util.h"
 #include "util/vector_util.h"
 #include "version.h"
 #include "video.h"
@@ -2347,7 +2348,7 @@ void CMap::CalculateTileOwnershipTransition(const Vec2i &pos, int z)
 	
 	CMapField &mf = *this->Field(pos, z);
 	
-	mf.OwnershipBorderTile = -1;
+	mf.set_ownership_border_tile(-1);
 
 	if (mf.get_owner() == nullptr) {
 		return;
@@ -2370,11 +2371,11 @@ void CMap::CalculateTileOwnershipTransition(const Vec2i &pos, int z)
 	}
 	
 	const stratagus::tile_transition_type transition_type = GetTransitionType(adjacent_directions, true);
-	
+
 	if (transition_type != stratagus::tile_transition_type::none) {
 		const std::vector<int> &transition_tiles = stratagus::defines::get()->get_border_terrain_type()->get_transition_tiles(nullptr, transition_type);
 		if (!transition_tiles.empty()) {
-			mf.OwnershipBorderTile = transition_tiles[SyncRand(transition_tiles.size())];
+			mf.set_ownership_border_tile(stratagus::vector::get_random(transition_tiles));
 		}
 	}
 }

@@ -4129,7 +4129,7 @@ void CPlayer::set_overlord(CPlayer *overlord)
 	}
 
 	this->overlord = overlord;
-	
+
 	if (overlord != nullptr) {
 		overlord->vassals.push_back(this);
 

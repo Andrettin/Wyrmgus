@@ -262,6 +262,21 @@ public:
 
 	CPlayer *get_owner() const;
 
+	bool is_border_tile() const
+	{
+		return this->get_ownership_border_tile() != -1;
+	}
+
+	int get_ownership_border_tile() const
+	{
+		return this->ownership_border_tile;
+	}
+
+	void set_ownership_border_tile(const int tile)
+	{
+		this->ownership_border_tile = tile;
+	}
+
 	stratagus::site *get_settlement() const
 	{
 		return this->settlement;
@@ -301,10 +316,10 @@ public:
 	//Wyrmgus start
 //	unsigned char Value;       /// HP for walls / wood regeneration
 	short Value;       /// HP for walls/ Wood Regeneration
-	int Landmass;			   /// to which "landmass" (can also be water) does this map field belong (if any); a "landmass" is a collection of adjacent land tiles, or a collection of adjacent water tiles; 0 means none has been set yet
-	short OwnershipBorderTile;	/// the transition type of the border between this tile's owner, and other players' tiles, if applicable)
 	//Wyrmgus end
+	int Landmass;			   /// to which "landmass" (can also be water) does this map field belong (if any); a "landmass" is a collection of adjacent land tiles, or a collection of adjacent water tiles; 0 means none has been set yet
 private:
+	short ownership_border_tile = -1; //the transition type of the border between this tile's owner, and other players' tiles, if applicable)
 	stratagus::site *settlement = nullptr;
 public:
 	CUnitCache UnitCache;      /// a unit on the map field.
