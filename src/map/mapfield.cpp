@@ -742,6 +742,15 @@ CPlayer *CMapField::get_owner() const
 	return this->get_settlement()->get_owner();
 }
 
+CPlayer *CMapField::get_realm_owner() const
+{
+	if (this->get_settlement() == nullptr) {
+		return nullptr;
+	}
+
+	return this->get_settlement()->get_realm_owner();
+}
+
 //
 //  CMapFieldPlayerInfo
 //

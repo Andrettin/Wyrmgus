@@ -485,6 +485,15 @@ public:
 
 	void ShareVisionWith(const CPlayer &player);
 	void UnshareVisionWith(const CPlayer &player);
+
+	CPlayer *get_realm_player()
+	{
+		if (this->get_overlord() != nullptr) {
+			return this->get_overlord()->get_realm_player();
+		}
+
+		return this;
+	}
 	
 	CPlayer *get_overlord() const
 	{

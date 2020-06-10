@@ -261,6 +261,7 @@ public:
 	//Wyrmgus end
 
 	CPlayer *get_owner() const;
+	CPlayer *get_realm_owner() const;
 
 	bool is_border_tile() const
 	{

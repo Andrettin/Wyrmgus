@@ -254,6 +254,15 @@ void site::set_owner(CPlayer *player)
 	this->owner_faction = player ? player->get_faction() : nullptr;
 }
 
+CPlayer *site::get_realm_owner() const
+{
+	if (this->get_owner() != nullptr) {
+		return this->get_owner()->get_realm_player();
+	}
+
+	return nullptr;
+}
+
 QVariantList site::get_building_classes_qvariant_list() const
 {
 	return container::to_qvariant_list(this->get_building_classes());

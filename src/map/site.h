@@ -129,6 +129,8 @@ public:
 		return this->owner_faction;
 	}
 
+	CPlayer *get_realm_owner() const;
+
 	const std::vector<unit_class *> &get_building_classes() const
 	{
 		return this->building_classes;
