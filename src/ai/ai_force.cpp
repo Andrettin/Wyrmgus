@@ -36,6 +36,7 @@
 #include "action/action_board.h"
 #include "commands.h"
 #include "faction.h"
+#include "game.h"
 #include "map/map.h"
 #include "map/map_layer.h"
 #include "map/tileset.h"
@@ -826,8 +827,8 @@ void AiForce::Attack(const Vec2i &pos, int z)
 		}
 	}
 	if (CMap::Map.Info.IsPointOnMap(goalPos, z) == false) {
-		bool include_neutral = AiPlayer->Player->AtPeace();
-		//Wyrmgus end
+		const bool include_neutral = AiPlayer->Player->AtPeace() && GameCycle >= PlayerAi::enforced_peace_cycle_count;
+
 		/* Search in entire map */
 		const CUnit *enemy = nullptr;
 		Vec2i enemy_wall_pos(-1, -1);
@@ -1580,7 +1581,7 @@ void AiForce::Update()
 	const int thresholdDist = std::max(5, (int) Units.size() / 8);
 	//Wyrmgus end
 	Assert(CMap::Map.Info.IsPointOnMap(GoalPos, GoalMapLayer));
-	bool include_neutral = AiPlayer->Player->AtPeace();
+	const bool include_neutral = AiPlayer->Player->AtPeace() && GameCycle >= PlayerAi::enforced_peace_cycle_count;
 	if (State == AiForceAttackingState::GoingToRallyPoint) {
 		// Check if we are near the goalpos
 		//Wyrmgus start

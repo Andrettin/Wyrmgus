@@ -316,6 +316,8 @@ public:
 class PlayerAi
 {
 public:
+	static constexpr int enforced_peace_cycle_count = CYCLES_PER_MINUTE * 20;
+
 	PlayerAi()
 	{
 		memset(Reserve, 0, sizeof(Reserve));
@@ -324,7 +326,6 @@ public:
 		memset(Collect, 0, sizeof(Collect));
 	}
 
-public:
 	void check_quest_units_to_build();
 
 	CPlayer *Player = nullptr;		/// Engine player structure
