@@ -353,8 +353,8 @@ void minimap::update_territory_xy(const QPoint &pos, const int z)
 
 void minimap::update_territory_pixel(const int mx, const int my, const int z)
 {
-	static constexpr int base_stroke_tile_interval = 3;
-	static constexpr int stroke_thickness = 2;
+	static constexpr int base_stroke_tile_interval = 2;
+	static constexpr int stroke_thickness = 3;
 	static constexpr int stroke_tile_interval = base_stroke_tile_interval * stroke_thickness;
 
 	const CMapLayer *map_layer = CMap::Map.MapLayers[z];
