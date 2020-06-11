@@ -1184,10 +1184,13 @@ void DrawPopups()
 
 			//hackish way to make the popup appear correctly
 			std::unique_ptr<stratagus::button> button;
+			const bool is_tile_water = tile->is_water() && !tile->is_river();
+			const bool is_tile_space = tile->is_space();
+			const bool is_tile_non_land = is_tile_water || is_tile_space;
 
 			switch (UI.Minimap.get_mode()) {
 				case stratagus::minimap_mode::territories:
-					if (tile->get_owner() != nullptr && !(tile->Flags & (MapFieldWaterAllowed | MapFieldCoastAllowed | MapFieldSpace))) {
+					if (tile->get_owner() != nullptr && !is_tile_non_land) {
 						button = get_territory_tooltip_button(tile->get_owner());
 					}
 					break;
@@ -1197,7 +1200,7 @@ void DrawPopups()
 					}
 					break;
 				case stratagus::minimap_mode::realms:
-					if (tile->get_realm_owner() != nullptr && !(tile->Flags & (MapFieldWaterAllowed | MapFieldCoastAllowed | MapFieldSpace))) {
+					if (tile->get_realm_owner() != nullptr && !is_tile_non_land) {
 						button = get_territory_tooltip_button(tile->get_realm_owner());
 					}
 					break;
