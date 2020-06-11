@@ -78,6 +78,13 @@ void faction::process_sml_property(const sml_property &property)
 		}
 	} else if (key == "faction_upgrade") {
 		this->FactionUpgrade = value;
+	} else if (key == "default_government_type") {
+		const int government_type = GetGovernmentTypeIdByName(value);
+		if (government_type != -1) {
+			this->DefaultGovernmentType = government_type;
+		} else {
+			throw std::runtime_error("Government type \"" + value + "\" doesn't exist.");
+		}
 	} else {
 		data_entry::process_sml_property(property);
 	}
