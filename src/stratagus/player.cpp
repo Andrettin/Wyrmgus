@@ -96,6 +96,7 @@
 #include "upgrade/upgrade_modifier.h"
 #include "util/string_util.h"
 #include "util/vector_util.h"
+#include "vassalage_type.h"
 #include "video.h"
 #include "world.h"
 
@@ -645,10 +646,10 @@ void CPlayer::Save(CFile &file) const
 	file.printf("\",\n  \"start\", {%d, %d},\n", p.StartPos.x, p.StartPos.y);
 	//Wyrmgus start
 	file.printf("  \"start-map-layer\", %d,\n", p.StartMapLayer);
-	if (p.get_overlord() != nullptr) {
-		file.printf("  \"overlord\", %d,\n", p.get_overlord()->Index);
-	}
 	//Wyrmgus end
+	if (p.get_overlord() != nullptr) {
+		file.printf("  \"overlord\", %d, \"%s\",\n", p.get_overlord()->Index, stratagus::vassalage_type_to_string(p.vassalage_type));
+	}
 
 	// Resources
 	file.printf("  \"resources\", {");
@@ -1006,6 +1007,7 @@ void CPlayer::Init(/* PlayerTypes */ int type)
 	this->Dynasty = nullptr;
 	this->age = nullptr;
 	this->overlord = nullptr;
+	this->vassalage_type = stratagus::vassalage_type::none;
 	this->Team = team;
 	this->Enemy = 0;
 	this->Allied = 0;
@@ -2218,6 +2220,7 @@ void CPlayer::Clear()
 	this->Dynasty = nullptr;
 	this->age = nullptr;
 	this->overlord = nullptr;
+	this->vassalage_type = stratagus::vassalage_type::none;
 	this->vassals.clear();
 	this->AiName.clear();
 	this->Team = 0;
@@ -4066,9 +4069,9 @@ void CPlayer::SetDiplomacyEnemyWith(CPlayer &player)
 
 	// if either player is the overlord of another (indirect or otherwise), break the vassalage bond after the declaration of war
 	if (this->is_overlord_of(&player)) {
-		player.set_overlord(nullptr);
+		player.set_overlord(nullptr, stratagus::vassalage_type::none);
 	} else if (player.is_overlord_of(this)) {
-		this->set_overlord(nullptr);
+		this->set_overlord(nullptr, stratagus::vassalage_type::none);
 	}
 
 	//if the other player has an overlord, then we must also go to war with them
@@ -4105,7 +4108,7 @@ void CPlayer::UnshareVisionWith(const CPlayer &player)
 	}
 }
 
-void CPlayer::set_overlord(CPlayer *overlord)
+void CPlayer::set_overlord(CPlayer *overlord, const stratagus::vassalage_type)
 {
 	if (overlord == this->get_overlord()) {
 		return;
@@ -4129,6 +4132,7 @@ void CPlayer::set_overlord(CPlayer *overlord)
 	}
 
 	this->overlord = overlord;
+	this->vassalage_type = vassalage_type;
 
 	if (overlord != nullptr) {
 		overlord->vassals.push_back(this);
@@ -4178,10 +4182,12 @@ void CPlayer::break_overlordship_alliance(CPlayer *overlord)
 */
 bool CPlayer::IsEnemy(const CPlayer &player) const
 {
-	//Wyrmgus start
-//	return IsEnemy(player.Index);
-	return IsEnemy(player.Index) || player.IsEnemy(this->Index); // be hostile to the other player if they are hostile, even if the diplomatic stance hasn't been changed
-	//Wyrmgus end
+	if (this->get_overlord() != nullptr && this->get_overlord()->IsEnemy(player)) {
+		return true;
+	}
+
+	//be hostile to the other player if they are hostile, even if the diplomatic stance hasn't been changed
+	return this->IsEnemy(player.Index) || player.IsEnemy(this->Index);
 }
 
 /**

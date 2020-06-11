@@ -856,6 +856,7 @@ set(stratagus_generic_HDRS
 	src/stratagus/item_slot.h
 	src/stratagus/objective_type.h
 	src/stratagus/species.h
+	src/stratagus/vassalage_type.h
 )
 
 source_group(stratagus FILES ${stratagus_generic_HDRS})

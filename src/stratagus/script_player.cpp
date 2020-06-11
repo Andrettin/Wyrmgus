@@ -71,6 +71,7 @@
 #include "ui/ui.h"
 #include "util/util.h"
 //Wyrmgus end
+#include "vassalage_type.h"
 
 extern CUnit *CclGetUnitFromRef(lua_State *l);
 
@@ -191,8 +192,10 @@ void CPlayer::Load(lua_State *l)
 		} else if (!strcmp(value, "start-map-layer")) {
 			this->StartMapLayer = LuaToNumber(l, j + 1);
 		} else if (!strcmp(value, "overlord")) {
-			int overlord_id = LuaToNumber(l, j + 1);
-			this->set_overlord(CPlayer::Players[overlord_id]);
+			const int overlord_id = LuaToNumber(l, j + 1);
+			++j;
+			const stratagus::vassalage_type vassalage_type = stratagus::string_to_vassalage_type(LuaToString(l, j + 1));
+			this->set_overlord(CPlayer::Players[overlord_id], vassalage_type);
 		//Wyrmgus end
 		} else if (!strcmp(value, "resources")) {
 			if (!lua_istable(l, j + 1)) {

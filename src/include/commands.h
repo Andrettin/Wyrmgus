@@ -161,7 +161,7 @@ extern void CommandSpellCast(CUnit &unit, const Vec2i &pos, CUnit *dest, const C
 /// Prepare command auto spellcast
 extern void CommandAutoSpellCast(CUnit &unit, int spellid, int on);
 /// Prepare diplomacy command
-extern void CommandDiplomacy(const int player, const stratagus::diplomacy_state state, const int opponent);
+extern void CommandDiplomacy(const int player, const stratagus::diplomacy_state state, const int other_player);
 /// Prepare shared vision command
 extern void CommandSharedVision(int player, bool state, int opponent);
 

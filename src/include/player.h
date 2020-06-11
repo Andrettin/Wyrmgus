@@ -76,13 +76,9 @@ namespace stratagus {
 	class unit_type;
 	class upgrade_class;
 	enum class gender;
+	enum class vassalage_type;
 }
 
-/*----------------------------------------------------------------------------
---  Player type
-----------------------------------------------------------------------------*/
-
-///  Player structure
 class CPlayer
 {
 public:
@@ -138,6 +134,8 @@ public:
 
 private:
 	CPlayer *overlord = nullptr;	/// overlord of this player
+	stratagus::vassalage_type vassalage_type;
+
 	std::vector<CPlayer *> vassals;	/// vassals of this player
 
 public:
@@ -500,7 +498,7 @@ public:
 		return this->overlord;
 	}
 
-	void set_overlord(CPlayer *overlord);
+	void set_overlord(CPlayer *overlord, const stratagus::vassalage_type);
 
 	CPlayer *get_top_overlord() const
 	{
