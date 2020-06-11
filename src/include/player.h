@@ -249,6 +249,12 @@ public:
 	void check_age();
 	void set_age(stratagus::age *age);
 	CCurrency *GetCurrency() const;
+
+	bool is_alive() const
+	{
+		return this->GetUnitCount() > 0;
+	}
+
 	void ShareUpgradeProgress(CPlayer &player, CUnit &unit);
 	int get_player_color_usage_count(const stratagus::player_color *player_color) const;
 	void update_minimap_territory();

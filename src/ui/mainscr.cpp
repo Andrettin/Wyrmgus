@@ -939,6 +939,16 @@ void DrawMapLayerButtons()
 	}
 }
 
+static std::unique_ptr<stratagus::button> get_territory_tooltip_button(const CPlayer *player)
+{
+	auto button = std::make_unique<stratagus::button>();
+	button->Hint = player->Name;
+	button->Action = ButtonCmd::Player;
+	button->Popup = "popup_territory";
+	button->Value = player->Index;
+	return button;
+}
+
 //Wyrmgus start
 /**
 **	@brief	Draw certain popups if something is being hovered over
@@ -1178,20 +1188,22 @@ void DrawPopups()
 			switch (UI.Minimap.get_mode()) {
 				case stratagus::minimap_mode::territories:
 					if (tile->get_owner() != nullptr && !(tile->Flags & (MapFieldWaterAllowed | MapFieldCoastAllowed | MapFieldSpace))) {
-						button = std::make_unique<stratagus::button>();
-						button->Hint = tile->get_owner()->Name;
-						button->Action = ButtonCmd::Player;
-						button->Popup = "popup_territory";
-						button->Value = tile->get_owner()->Index;
+						button = get_territory_tooltip_button(tile->get_owner());
 					}
 					break;
 				case stratagus::minimap_mode::territories_with_non_land:
 					if (tile->get_owner() != nullptr) {
-						button = std::make_unique<stratagus::button>();
-						button->Hint = tile->get_owner()->Name;
-						button->Action = ButtonCmd::Player;
-						button->Popup = "popup_territory";
-						button->Value = tile->get_owner()->Index;
+						button = get_territory_tooltip_button(tile->get_owner());
+					}
+					break;
+				case stratagus::minimap_mode::realms:
+					if (tile->get_realm_owner() != nullptr && !(tile->Flags & (MapFieldWaterAllowed | MapFieldCoastAllowed | MapFieldSpace))) {
+						button = get_territory_tooltip_button(tile->get_realm_owner());
+					}
+					break;
+				case stratagus::minimap_mode::realms_with_non_land:
+					if (tile->get_realm_owner() != nullptr) {
+						button = get_territory_tooltip_button(tile->get_realm_owner());
 					}
 					break;
 				case stratagus::minimap_mode::settlements:

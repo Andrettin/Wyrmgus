@@ -124,6 +124,8 @@ public:
 		return this->get_texture_width(z) != this->get_width() || this->get_texture_height(z) != this->get_height();
 	}
 
+	minimap_mode get_next_mode(const minimap_mode mode) const;
+	bool is_mode_valid(const minimap_mode mode) const;
 	void toggle_mode();
 	bool is_terrain_visible() const;
 	bool are_units_visible() const;

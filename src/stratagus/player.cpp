@@ -2796,7 +2796,7 @@ bool CPlayer::can_accept_quest(const stratagus::quest *quest)
 		} else if (objective->get_objective_type() == stratagus::objective_type::destroy_units || objective->get_objective_type() == stratagus::objective_type::destroy_hero || objective->get_objective_type() == stratagus::objective_type::destroy_unique) {
 			if (objective->get_faction() != nullptr) {
 				CPlayer *faction_player = GetFactionPlayer(objective->get_faction());
-				if (faction_player == nullptr || faction_player->GetUnitCount() == 0) {
+				if (faction_player == nullptr || !faction_player->is_alive()) {
 					return false;
 				}
 				
@@ -2816,7 +2816,7 @@ bool CPlayer::can_accept_quest(const stratagus::quest *quest)
 			}
 		} else if (objective->get_objective_type() == stratagus::objective_type::destroy_faction) {
 			CPlayer *faction_player = GetFactionPlayer(objective->get_faction());
-			if (faction_player == nullptr || faction_player->GetUnitCount() == 0) {
+			if (faction_player == nullptr || !faction_player->is_alive()) {
 				return false;
 			}
 		}
@@ -2971,7 +2971,7 @@ std::string CPlayer::has_failed_quest(const stratagus::quest *quest) // returns 
 		} else if (quest_objective->get_objective_type() == stratagus::objective_type::destroy_units || quest_objective->get_objective_type() == stratagus::objective_type::destroy_hero || quest_objective->get_objective_type() == stratagus::objective_type::destroy_unique) {
 			if (quest_objective->get_faction() != nullptr && objective->Counter < quest_objective->get_quantity()) {
 				CPlayer *faction_player = GetFactionPlayer(quest_objective->get_faction());
-				if (faction_player == nullptr || faction_player->GetUnitCount() == 0) {
+				if (faction_player == nullptr || !faction_player->is_alive()) {
 					return "The target no longer exists.";
 				}
 				
@@ -2992,7 +2992,7 @@ std::string CPlayer::has_failed_quest(const stratagus::quest *quest) // returns 
 		} else if (quest_objective->get_objective_type() == stratagus::objective_type::destroy_faction) {
 			if (objective->Counter == 0) {  // if is supposed to destroy a faction, but it is nowhere to be found, fail the quest
 				CPlayer *faction_player = GetFactionPlayer(quest_objective->get_faction());
-				if (faction_player == nullptr || faction_player->GetUnitCount() == 0) {
+				if (faction_player == nullptr || !faction_player->is_alive()) {
 					return "The target no longer exists.";
 				}
 			}
@@ -3034,7 +3034,7 @@ void CPlayer::RemoveModifier(CUpgrade *modifier)
 bool CPlayer::AtPeace() const
 {
 	for (int i = 0; i < PlayerNumNeutral; ++i) {
-		if (this->IsEnemy(*CPlayer::Players[i]) && this->HasContactWith(*CPlayer::Players[i]) && CPlayer::Players[i]->GetUnitCount() > 0) {
+		if (this->IsEnemy(*CPlayer::Players[i]) && this->HasContactWith(*CPlayer::Players[i]) && CPlayer::Players[i]->is_alive()) {
 			return false;
 		}
 	}

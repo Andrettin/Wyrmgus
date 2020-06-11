@@ -363,7 +363,9 @@ void minimap::update_territory_pixel(const int mx, const int my, const int z)
 
 	const int pixel_index = (mx + my * MinimapTextureWidth[z]) * 4;
 	QColor color(Qt::transparent);
-	QColor with_non_land_color = color;
+	QColor with_non_land_color(Qt::transparent);
+	QColor realm_color(Qt::transparent);
+	QColor realm_with_non_land_color(Qt::transparent);
 
 	const CMapField &mf = *map_layer->Field(Minimap2MapX[z][mx] + Minimap2MapY[z][my]);
 	if (mf.get_settlement() != nullptr) {
@@ -371,9 +373,11 @@ void minimap::update_territory_pixel(const int mx, const int my, const int z)
 		const bool is_tile_space = mf.is_space();
 
 		const CPlayer *player = CPlayer::Players[PlayerNumNeutral];
+		const CPlayer *realm_player = CPlayer::Players[PlayerNumNeutral];
 
 		if (mf.get_owner() != nullptr) {
 			player = mf.get_owner();
+			realm_player = mf.get_realm_owner();
 
 			if (mf.get_owner()->get_overlord() != nullptr) {
 				//if this is a tile owned by a player who has an overlord, use the overlord's color if this tile should be part of the overlord territory stroke
@@ -392,9 +396,13 @@ void minimap::update_territory_pixel(const int mx, const int my, const int z)
 		if (!is_tile_water && !is_tile_space) {
 			color = player->get_minimap_color();
 			with_non_land_color = color;
+			realm_color = realm_player->get_minimap_color();
+			realm_with_non_land_color = realm_color;
 		} else {
 			with_non_land_color = player->get_minimap_color();
 			with_non_land_color.setAlpha(non_land_territory_alpha);
+			realm_with_non_land_color = realm_player->get_minimap_color();
+			realm_with_non_land_color.setAlpha(non_land_territory_alpha);
 		}
 
 		const CMapField *settlement_center_tile = mf.get_settlement()->get_site_unit()->get_center_tile();
@@ -411,6 +419,12 @@ void minimap::update_territory_pixel(const int mx, const int my, const int z)
 
 	const uint32_t with_non_land_c = Video.MapRGBA(with_non_land_color);
 	*(uint32_t *) &(this->mode_overlay_texture_data[minimap_mode::territories_with_non_land][z][pixel_index]) = with_non_land_c;
+
+	const uint32_t realm_c = Video.MapRGBA(realm_color);
+	*(uint32_t *) &(this->mode_overlay_texture_data[minimap_mode::realms][z][pixel_index]) = realm_c;
+
+	const uint32_t realm_with_non_land_c = Video.MapRGBA(realm_with_non_land_color);
+	*(uint32_t *) &(this->mode_overlay_texture_data[minimap_mode::realms_with_non_land][z][pixel_index]) = realm_with_non_land_c;
 }
 
 /**
@@ -821,13 +835,42 @@ int minimap::get_texture_height(const size_t z) const
 	return std::max(this->get_height(), CMap::Map.Info.MapHeights[z]);
 }
 
+bool minimap::is_mode_valid(const minimap_mode mode) const
+{
+	switch (mode) {
+		case minimap_mode::realms:
+		case minimap_mode::realms_with_non_land:
+			for (const CPlayer *player : CPlayer::Players) {
+				if (!player->is_alive()) {
+					continue;
+				}
+
+				if (player->get_overlord() != nullptr) {
+					return true;
+				}
+			}
+			return false;
+		default:
+			return true;
+	}
+}
+
+minimap_mode minimap::get_next_mode(const minimap_mode mode) const
+{
+	minimap_mode next_mode = static_cast<minimap_mode>(static_cast<int>(mode) + 1);
+	if (next_mode == minimap_mode::count) {
+		next_mode = static_cast<minimap_mode>(0);
+	}
+	if (!this->is_mode_valid(next_mode)) {
+		return this->get_next_mode(next_mode);
+	}
+	return next_mode;
+}
+
 void minimap::toggle_mode()
 {
-	minimap_mode mode = static_cast<minimap_mode>(static_cast<int>(UI.Minimap.get_mode()) + 1);
-	if (mode == minimap_mode::count) {
-		mode = static_cast<minimap_mode>(0);
-	}
-	UI.Minimap.set_mode(mode);
+	const minimap_mode mode = this->get_next_mode(this->get_mode());
+	this->set_mode(mode);
 }
 
 bool minimap::is_terrain_visible() const
@@ -840,6 +883,8 @@ bool minimap::are_units_visible() const
 	switch (this->get_mode()) {
 		case minimap_mode::territories:
 		case minimap_mode::territories_with_non_land:
+		case minimap_mode::realms:
+		case minimap_mode::realms_with_non_land:
 		case minimap_mode::settlements:
 			return false;
 		default:
@@ -852,6 +897,8 @@ bool minimap::is_fog_of_war_visible() const
 	switch (this->get_mode()) {
 		case minimap_mode::territories:
 		case minimap_mode::territories_with_non_land:
+		case minimap_mode::realms:
+		case minimap_mode::realms_with_non_land:
 		case minimap_mode::settlements:
 			return false;
 		default:

@@ -1531,11 +1531,9 @@ void AiEachSecond(CPlayer &player)
 	//  Advance script
 	AiExecuteScript();
 	
-	//Wyrmgus start
-	if (player.GetUnitCount() == 0) {
+	if (!player.is_alive()) {
 		return;
 	}
-	//Wyrmgus end
 	
 	AiPlayer->NeededMask = 0;
 

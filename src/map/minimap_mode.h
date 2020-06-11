@@ -35,6 +35,8 @@ enum class minimap_mode
 	units, //only units
 	territories, //territories (no units)
 	territories_with_non_land, //territories (with non-land tiles, no units)
+	realms, //realm territories (i.e. vassals being colored the same color as their top overlord) (no units)
+	realms_with_non_land, //realm territories (with non-land tiles, no units)
 	settlements, //settlement territories (no units)
 
 	count
@@ -51,6 +53,10 @@ inline const char *get_minimap_mode_name(const minimap_mode mode)
 			return "Territories Minimap Mode";
 		case minimap_mode::territories_with_non_land:
 			return "Territories (with Non-Land) Minimap Mode";
+		case minimap_mode::realms:
+			return "Realms Minimap Mode";
+		case minimap_mode::realms_with_non_land:
+			return "Realms (with Non-Land) Minimap Mode";
 		case minimap_mode::settlements:
 			return "Settlements Minimap Mode";
 		default:
@@ -65,6 +71,8 @@ inline bool minimap_mode_has_overlay(const minimap_mode mode)
 	switch (mode) {
 		case minimap_mode::territories:
 		case minimap_mode::territories_with_non_land:
+		case minimap_mode::realms:
+		case minimap_mode::realms_with_non_land:
 		case minimap_mode::settlements:
 			return true;
 		default:
