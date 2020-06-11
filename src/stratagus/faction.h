@@ -65,6 +65,7 @@ class faction final : public detailed_data_entry, public data_type<faction>
 	Q_PROPERTY(stratagus::player_color* color MEMBER color READ get_color)
 	Q_PROPERTY(stratagus::faction_tier default_tier MEMBER default_tier READ get_default_tier)
 	Q_PROPERTY(stratagus::site* default_capital MEMBER default_capital READ get_default_capital)
+	Q_PROPERTY(bool simple_name MEMBER simple_name READ uses_simple_name)
 	Q_PROPERTY(bool short_name MEMBER short_name READ uses_short_name)
 	Q_PROPERTY(stratagus::faction_tier tier MEMBER tier READ get_tier)
 	Q_PROPERTY(stratagus::site* capital MEMBER capital READ get_capital)
@@ -125,6 +126,8 @@ public:
 	{
 		return this->default_capital;
 	}
+
+	bool uses_simple_name() const;
 
 	bool uses_short_name() const
 	{
@@ -249,6 +252,7 @@ public:
 private:
 	player_color *color = nullptr; /// faction color
 	site *default_capital = nullptr;
+	bool simple_name = false;
 	bool short_name = false;
 public:
 	std::vector<faction *> DevelopsFrom;								/// from which factions can this faction develop

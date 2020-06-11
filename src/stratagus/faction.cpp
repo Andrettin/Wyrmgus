@@ -237,6 +237,11 @@ CCurrency *faction::GetCurrency() const
 	return this->civilization->GetCurrency();
 }
 
+bool faction::uses_simple_name() const
+{
+	return this->simple_name || this->Type != FactionTypePolity;
+}
+
 std::vector<CForceTemplate *> faction::GetForceTemplates(const ForceType force_type) const
 {
 	if (force_type == ForceType::None) {

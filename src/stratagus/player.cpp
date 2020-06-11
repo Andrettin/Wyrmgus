@@ -1940,7 +1940,7 @@ std::string CPlayer::get_full_name() const
 	if (!IsNetworkGame()) {
 		const stratagus::faction *faction = this->get_faction();
 
-		if (faction != nullptr && faction->Type == FactionTypePolity) {
+		if (faction != nullptr && !faction->uses_simple_name()) {
 			if (faction->uses_short_name()) {
 				return faction->Adjective + " " + this->GetFactionTitleName();
 			} else {
