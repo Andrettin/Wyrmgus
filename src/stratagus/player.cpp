@@ -1935,6 +1935,23 @@ bool CPlayer::UpgradeRemovesExistingUpgrade(const CUpgrade *upgrade, bool ignore
 	return false;
 }
 
+std::string CPlayer::get_full_name() const
+{
+	if (!IsNetworkGame()) {
+		const stratagus::faction *faction = this->get_faction();
+
+		if (faction != nullptr && faction->Type == FactionTypePolity) {
+			if (faction->uses_short_name()) {
+				return faction->Adjective + " " + this->GetFactionTitleName();
+			} else {
+				return this->GetFactionTitleName() + " of " + this->Name;
+			}
+		}
+	}
+
+	return this->Name;
+}
+
 std::string CPlayer::GetFactionTitleName() const
 {
 	if (this->Race == -1 || this->Faction == -1) {
@@ -1942,8 +1959,8 @@ std::string CPlayer::GetFactionTitleName() const
 	}
 	
 	stratagus::faction *faction = stratagus::faction::get_all()[this->Faction];
-	const stratagus::faction_tier tier = faction->get_default_tier();
-	int government_type = faction->DefaultGovernmentType;
+	const stratagus::faction_tier tier = faction->get_tier();
+	const int government_type = faction->DefaultGovernmentType;
 	
 	if (faction->Type == FactionTypePolity) {
 		if (!faction->Titles[government_type][static_cast<int>(tier)].empty()) {

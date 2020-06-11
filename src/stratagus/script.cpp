@@ -1337,6 +1337,9 @@ StringDesc *CclParseStringDesc(lua_State *l)
 		} else if (!strcmp(key, "PlayerName")) {
 			res->e = EString_PlayerName;
 			res->D.PlayerName = CclParseNumberDesc(l);
+		} else if (!strcmp(key, "PlayerFullName")) {
+			res->e = EString_PlayerFullName;
+			res->D.PlayerName = CclParseNumberDesc(l);
 		} else {
 			lua_pop(l, 1);
 			LuaError(l, "unknow condition '%s'" _C_ key);
@@ -1532,6 +1535,7 @@ std::string EvalString(const StringDesc *s)
 	int **resource;		// Temporary resource
 	stratagus::faction **faction;	// Temporary faction
 	//Wyrmgus end
+	int player_index;
 
 	Assert(s);
 	switch (s->e) {
@@ -1961,12 +1965,19 @@ std::string EvalString(const StringDesc *s)
 				res = GetLineFont(line, tmp1, maxlen, font);
 				return res;
 			}
-		case EString_PlayerName : // player name
-			const int player_index = EvalNumber(s->D.PlayerName);
+		case EString_PlayerName: // player name
+			player_index = EvalNumber(s->D.PlayerName);
 			try {
 				return CPlayer::Players.at(player_index)->Name;
 			} catch (...) {
 				std::throw_with_nested(std::runtime_error("Error getting the player name for index " + std::to_string(player_index) + "."));
+			}
+		case EString_PlayerFullName: // player full name
+			player_index = EvalNumber(s->D.PlayerName);
+			try {
+				return CPlayer::Players.at(player_index)->get_full_name();
+			} catch (...) {
+				std::throw_with_nested(std::runtime_error("Error getting the full player name for index " + std::to_string(player_index) + "."));
 			}
 	}
 	return std::string("");
@@ -2187,7 +2198,8 @@ void FreeStringDesc(StringDesc *s)
 			FreeNumberDesc(s->D.Line.MaxLen);
 			delete s->D.Line.MaxLen;
 			break;
-		case EString_PlayerName : // player name
+		case EString_PlayerName: // player name
+		case EString_PlayerFullName: // player full name
 			FreeNumberDesc(s->D.PlayerName);
 			delete s->D.PlayerName;
 			break;
@@ -3139,6 +3151,11 @@ static int CclPlayerName(lua_State *l)
 	return Alias(l, "PlayerName");
 }
 
+static int CclPlayerFullName(lua_State *l)
+{
+	LuaCheckArgs(l, 1);
+	return Alias(l, "PlayerFullName");
+}
 
 static void AliasRegister()
 {
@@ -3213,6 +3230,7 @@ static void AliasRegister()
 	lua_register(Lua, "Line", CclLine);
 	lua_register(Lua, "GameInfo", CclGameInfo);
 	lua_register(Lua, "PlayerName", CclPlayerName);
+	lua_register(Lua, "PlayerFullName", CclPlayerFullName);
 	lua_register(Lua, "PlayerData", CclPlayerData);
 
 	lua_register(Lua, "If", CclIf);

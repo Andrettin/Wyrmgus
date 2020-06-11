@@ -942,7 +942,7 @@ void DrawMapLayerButtons()
 static std::unique_ptr<stratagus::button> get_territory_tooltip_button(const CPlayer *player)
 {
 	auto button = std::make_unique<stratagus::button>();
-	button->Hint = player->Name;
+	button->Hint = player->get_full_name();
 	button->Action = ButtonCmd::Player;
 	button->Popup = "popup_territory";
 	button->Value = player->Index;
@@ -1885,7 +1885,7 @@ static void InfoPanel_draw_no_selection()
 			Video.DrawRectangleClip(ColorWhite, x, y, 12 * scale_factor, 12 * scale_factor);
 			Video.FillRectangleClip(Video.MapRGB(TheScreen->format, player->get_minimap_color()), x + 1, y + 1, 12 * scale_factor - 2, 12 * scale_factor - 2);
 
-			label.Draw(x + 15 * scale_factor, y, _(player->Name.c_str()));
+			label.Draw(x + 15 * scale_factor, y, _(player->get_full_name().c_str()));
 			y += 14 * scale_factor;
 
 			if ((y + 12 * scale_factor) > Video.Height) { // if the square would overflow the screen, don't draw the player

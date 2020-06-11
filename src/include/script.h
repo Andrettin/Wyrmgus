@@ -179,7 +179,8 @@ enum EString {
 	//Wyrmgus end
 	EString_SubString,    /// SubString.
 	EString_Line,         /// line n of the string.
-	EString_PlayerName    /// player name.
+	EString_PlayerName,   /// player name.
+	EString_PlayerFullName //player full name
 	// add more...
 };
 
