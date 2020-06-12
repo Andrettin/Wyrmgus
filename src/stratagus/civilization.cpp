@@ -32,6 +32,7 @@
 #include "civilization_group.h"
 #include "civilization_supergroup.h"
 #include "database/defines.h"
+#include "government_type.h"
 #include "player.h"
 #include "time/calendar.h"
 #include "ui/button.h"
@@ -91,6 +92,21 @@ void civilization::process_sml_scope(const sml_data &scope)
 		});
 	} else if (tag == "unit_sounds") {
 		database::process_sml_data(this->UnitSounds, scope);
+	} else if (tag == "title_names") {
+		scope.for_each_child([&](const sml_data &child_scope) {
+			this->process_title_name_scope(child_scope);
+		});
+
+		scope.for_each_property([&](const sml_property &property) {
+			const std::string &key = property.get_key();
+			const std::string &value = property.get_value();
+			government_type government_type = string_to_government_type(key);
+			this->title_names[government_type][faction_tier::none] = value;
+		});
+	} else if (tag == "character_title_names") {
+		scope.for_each_child([&](const sml_data &child_scope) {
+			this->process_character_title_name_scope(child_scope);
+		});
 	} else if (tag == "ui_fillers") {
 		this->ui_fillers.clear();
 
@@ -458,6 +474,240 @@ cursor *civilization::get_cursor(const cursor_type type) const
 	}
 
 	return cursor::get_cursor_by_type(type);
+}
+
+std::string_view civilization::get_title_name(const government_type government_type, const faction_tier tier) const
+{
+	auto find_iterator = this->title_names.find(government_type);
+	if (find_iterator != this->title_names.end()) {
+		auto sub_find_iterator = find_iterator->second.find(tier);
+		if (sub_find_iterator != find_iterator->second.end()) {
+			return sub_find_iterator->second;
+		}
+	}
+
+	switch (government_type) {
+		case government_type::monarchy:
+			switch (tier) {
+				case faction_tier::barony:
+					return "Barony";
+				case faction_tier::county:
+					return "County";
+				case faction_tier::duchy:
+					return "Duchy";
+				case faction_tier::grand_duchy:
+					return "Grand Duchy";
+				case faction_tier::kingdom:
+					return "Kingdom";
+				case faction_tier::empire:
+					return "Empire";
+				default:
+					break;
+			}
+			break;
+		case government_type::republic:
+			return "Republic";
+		case government_type::theocracy:
+			return "Theocracy";
+		default:
+			break;
+	}
+
+	return string::empty_str;
+}
+
+void civilization::process_title_name_scope(const sml_data &scope)
+{
+	const std::string &tag = scope.get_tag();
+	const government_type government_type = string_to_government_type(tag);
+
+	scope.for_each_property([&](const sml_property &property) {
+		const std::string &key = property.get_key();
+		const std::string &value = property.get_value();
+		const faction_tier tier = string_to_faction_tier(key);
+		this->title_names[government_type][tier] = value;
+	});
+}
+
+std::string_view civilization::get_character_title_name(const int title_type, const int faction_type, stratagus::government_type government_type, const faction_tier tier, const gender gender) const
+{
+	auto find_iterator = this->character_title_names.find(title_type);
+	if (find_iterator != this->character_title_names.end()) {
+		auto secondary_find_iterator = find_iterator->second.find(faction_type);
+		if (secondary_find_iterator == find_iterator->second.end()) {
+			secondary_find_iterator = find_iterator->second.find(FactionTypeNoFactionType);
+		}
+
+		if (secondary_find_iterator != find_iterator->second.end()) {
+			auto tertiary_find_iterator = secondary_find_iterator->second.find(government_type);
+			if (tertiary_find_iterator == secondary_find_iterator->second.end()) {
+				tertiary_find_iterator = secondary_find_iterator->second.find(government_type::none);
+			}
+
+			if (tertiary_find_iterator != secondary_find_iterator->second.end()) {
+				auto quaternary_find_iterator = tertiary_find_iterator->second.find(tier);
+				if (quaternary_find_iterator == tertiary_find_iterator->second.end()) {
+					quaternary_find_iterator = tertiary_find_iterator->second.find(faction_tier::none);
+				}
+
+				if (quaternary_find_iterator != tertiary_find_iterator->second.end()) {
+					auto quinary_find_iterator = quaternary_find_iterator->second.find(gender);
+					if (quinary_find_iterator == quaternary_find_iterator->second.end()) {
+						quinary_find_iterator = quaternary_find_iterator->second.find(gender::none);
+					}
+
+					if (quinary_find_iterator != quaternary_find_iterator->second.end()) {
+						return quinary_find_iterator->second;
+					}
+				}
+			}
+		}
+	}
+
+	switch (title_type) {
+		case CharacterTitleHeadOfState:
+			switch (faction_type) {
+				case FactionTypeTribe:
+					if (gender == gender::female) {
+						return "Chieftess";
+					} else {
+						return "Chieftain";
+					}
+				case FactionTypePolity:
+					switch (government_type) {
+						case government_type::monarchy:
+							switch (tier) {
+								case faction_tier::barony:
+									if (gender == gender::female) {
+										return "Baroness";
+									} else {
+										return "Baron";
+									}
+								case faction_tier::county:
+									if (gender == gender::female) {
+										return "Countess";
+									} else {
+										return "Count";
+									}
+								case faction_tier::duchy:
+									if (gender == gender::female) {
+										return "Duchess";
+									} else {
+										return "Duke";
+									}
+								case faction_tier::grand_duchy:
+									if (gender == gender::female) {
+										return "Grand Duchess";
+									} else {
+										return "Grand Duke";
+									}
+								case faction_tier::kingdom:
+									if (gender == gender::female) {
+										return "Queen";
+									} else {
+										return "King";
+									}
+								case faction_tier::empire:
+									if (gender == gender::female) {
+										return "Empress";
+									} else {
+										return "Emperor";
+									}
+								default:
+									break;
+							}
+							break;
+						case government_type::republic:
+							return "Consul";
+						case government_type::theocracy:
+							if (gender == gender::female) {
+								return "High Priestess";
+							} else {
+								return "High Priest";
+							}
+						default:
+							break;
+					}
+					break;
+				default:
+					break;
+			}
+			break;
+		case CharacterTitleHeadOfGovernment:
+			return "Prime Minister";
+		case CharacterTitleEducationMinister:
+			//return "Education Minister"; //education minister sounds too modern, considering the technology tree we have up to now only goes to the medieval era
+			return "Master Educator";
+		case CharacterTitleFinanceMinister:
+			//return "Finance Minister"; //finance minister sounds too modern, considering the technology tree we have up to now only goes to the medieval era
+			return "Treasurer";
+		case CharacterTitleForeignMinister:
+			//return "Foreign Minister"; //foreign minister sounds too modern, considering the technology tree we have up to now only goes to the medieval era
+			return "Chancellor";
+		case CharacterTitleIntelligenceMinister:
+			//return "Intelligence Minister"; //intelligence minister sounds too modern, considering the technology tree we have up to now only goes to the medieval era
+			return "Spymaster";
+		case CharacterTitleInteriorMinister:
+			//return "Interior Minister"; //interior minister sounds too modern, considering the technology tree we have up to now only goes to the medieval era
+			return "High Constable";
+		case CharacterTitleJusticeMinister:
+			//return "Justice Minister"; //justice minister sounds too modern, considering the technology tree we have up to now only goes to the medieval era
+			return "Master of Laws";
+		case CharacterTitleWarMinister:
+			//return "War Minister"; //war minister sounds too modern, considering the technology tree we have up to now only goes to the medieval era
+			return "Marshal";
+		case CharacterTitleGovernor:
+			return "Governor";
+		case CharacterTitleMayor:
+			return "Mayor";
+		default:
+			break;
+	}
+
+	return string::empty_str;
+}
+
+void civilization::process_character_title_name_scope(const sml_data &scope)
+{
+	const std::string &tag = scope.get_tag();
+	const int title_type = GetCharacterTitleIdByName(tag);
+
+	scope.for_each_child([&](const sml_data &child_scope) {
+		this->process_character_title_name_scope(title_type, child_scope);
+	});
+}
+
+void civilization::process_character_title_name_scope(const int title_type, const sml_data &scope)
+{
+	const std::string &tag = scope.get_tag();
+	const int faction_type = GetFactionTypeIdByName(tag);
+
+	scope.for_each_child([&](const sml_data &child_scope) {
+		this->process_character_title_name_scope(title_type, faction_type, child_scope);
+	});
+}
+
+void civilization::process_character_title_name_scope(const int title_type, const int faction_type, const sml_data &scope)
+{
+	const std::string &tag = scope.get_tag();
+	const government_type government_type = string_to_government_type(tag);
+
+	scope.for_each_child([&](const sml_data &child_scope) {
+		this->process_character_title_name_scope(title_type, faction_type, government_type, child_scope);
+	});
+}
+
+void civilization::process_character_title_name_scope(const int title_type, const int faction_type, const government_type government_type, const sml_data &scope)
+{
+	const std::string &tag = scope.get_tag();
+	const faction_tier faction_tier = string_to_faction_tier(tag);
+
+	scope.for_each_property([&](const sml_property &property) {
+		const std::string &key = property.get_key();
+		const std::string &value = property.get_value();
+		const gender gender = string_to_gender(key);
+		this->character_title_names[title_type][faction_type][government_type][faction_tier][gender] = value;
+	});
 }
 
 std::vector<CForceTemplate *> civilization::GetForceTemplates(const ForceType force_type) const

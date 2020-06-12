@@ -32,16 +32,18 @@
 #include "civilization.h"
 #include "diplomacy_state.h"
 #include "faction_tier.h"
+#include "government_type.h"
 #include "luacallback.h"
 #include "player_color.h"
 #include "unit/unit_type.h"
 #include "util/container_util.h"
+#include "util/string_util.h"
 #include "util/vector_util.h"
 
 namespace stratagus {
 
 faction::faction(const std::string &identifier)
-	: detailed_data_entry(identifier), default_tier(faction_tier::barony), tier(faction_tier::barony)
+	: detailed_data_entry(identifier), default_tier(faction_tier::barony), tier(faction_tier::barony), default_government_type(government_type::monarchy), government_type(government_type::monarchy)
 {
 }
 
@@ -78,13 +80,6 @@ void faction::process_sml_property(const sml_property &property)
 		}
 	} else if (key == "faction_upgrade") {
 		this->FactionUpgrade = value;
-	} else if (key == "default_government_type") {
-		const int government_type = GetGovernmentTypeIdByName(value);
-		if (government_type != -1) {
-			this->DefaultGovernmentType = government_type;
-		} else {
-			throw std::runtime_error("Government type \"" + value + "\" doesn't exist.");
-		}
 	} else {
 		data_entry::process_sml_property(property);
 	}
@@ -194,6 +189,54 @@ void faction::check() const
 	if (this->civilization == nullptr) {
 		throw std::runtime_error("Faction \"" + this->get_identifier() + "\" has no civilization.");
 	}
+}
+
+std::string_view faction::get_title_name(const stratagus::government_type government_type, const faction_tier tier) const
+{
+	if (this->Type != FactionTypePolity) {
+		return string::empty_str;
+	}
+
+	auto find_iterator = this->title_names.find(government_type);
+	if (find_iterator != this->title_names.end()) {
+		auto sub_find_iterator = find_iterator->second.find(tier);
+		if (sub_find_iterator != find_iterator->second.end()) {
+			return sub_find_iterator->second;
+		}
+	}
+
+	return this->get_civilization()->get_title_name(government_type, tier);
+}
+
+std::string_view faction::get_character_title_name(const int title_type, const stratagus::government_type government_type, const faction_tier tier, const gender gender) const
+{
+	auto find_iterator = this->character_title_names.find(title_type);
+	if (find_iterator != this->character_title_names.end()) {
+		auto secondary_find_iterator = find_iterator->second.find(government_type);
+		if (secondary_find_iterator == find_iterator->second.end()) {
+			secondary_find_iterator = find_iterator->second.find(government_type::none);
+		}
+
+		if (secondary_find_iterator != find_iterator->second.end()) {
+			auto tertiary_find_iterator = secondary_find_iterator->second.find(tier);
+			if (tertiary_find_iterator == secondary_find_iterator->second.end()) {
+				tertiary_find_iterator = secondary_find_iterator->second.find(faction_tier::none);
+			}
+
+			if (tertiary_find_iterator != secondary_find_iterator->second.end()) {
+				auto quaternary_find_iterator = tertiary_find_iterator->second.find(gender);
+				if (quaternary_find_iterator == tertiary_find_iterator->second.end()) {
+					quaternary_find_iterator = tertiary_find_iterator->second.find(gender::none);
+				}
+
+				if (quaternary_find_iterator != tertiary_find_iterator->second.end()) {
+					return quaternary_find_iterator->second;
+				}
+			}
+		}
+	}
+
+	return this->get_civilization()->get_character_title_name(title_type, this->Type, government_type, tier, gender);
 }
 
 int faction::GetUpgradePriority(const CUpgrade *upgrade) const

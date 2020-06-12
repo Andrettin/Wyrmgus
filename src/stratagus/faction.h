@@ -55,6 +55,7 @@ class unit_type;
 class upgrade_class;
 enum class diplomacy_state;
 enum class faction_tier;
+enum class government_type;
 
 class faction final : public detailed_data_entry, public data_type<faction>
 {
@@ -64,10 +65,12 @@ class faction final : public detailed_data_entry, public data_type<faction>
 	Q_PROPERTY(stratagus::icon* icon MEMBER icon READ get_icon)
 	Q_PROPERTY(stratagus::player_color* color MEMBER color READ get_color)
 	Q_PROPERTY(stratagus::faction_tier default_tier MEMBER default_tier READ get_default_tier)
+	Q_PROPERTY(stratagus::government_type default_government_type MEMBER default_government_type READ get_default_government_type)
 	Q_PROPERTY(stratagus::site* default_capital MEMBER default_capital READ get_default_capital)
 	Q_PROPERTY(bool simple_name MEMBER simple_name READ uses_simple_name)
 	Q_PROPERTY(bool short_name MEMBER short_name READ uses_short_name)
 	Q_PROPERTY(stratagus::faction_tier tier MEMBER tier READ get_tier)
+	Q_PROPERTY(stratagus::government_type government_type MEMBER government_type READ get_government_type)
 	Q_PROPERTY(stratagus::site* capital MEMBER capital READ get_capital)
 	Q_PROPERTY(QVariantList acquired_upgrades READ get_acquired_upgrades_qstring_list)
 
@@ -94,6 +97,7 @@ public:
 	virtual void reset_history() override
 	{
 		this->tier = this->get_default_tier();
+		this->government_type = this->get_default_government_type();
 		this->capital = this->get_default_capital();
 		this->resources.clear();
 		this->diplomacy_states.clear();
@@ -117,6 +121,11 @@ public:
 		return this->default_tier;
 	}
 
+	government_type get_default_government_type() const
+	{
+		return this->default_government_type;
+	}
+
 	player_color *get_color() const
 	{
 		return this->color;
@@ -133,6 +142,9 @@ public:
 	{
 		return this->short_name;
 	}
+
+	std::string_view get_title_name(const government_type government_type, const faction_tier tier) const;
+	std::string_view get_character_title_name(const int title_type, const government_type government_type, const faction_tier tier, const gender gender) const;
 
 	int GetUpgradePriority(const CUpgrade *upgrade) const;
 	int GetForceTypeWeight(const ForceType force_type) const;
@@ -201,6 +213,11 @@ public:
 		return this->tier;
 	}
 
+	government_type get_government_type() const
+	{
+		return this->government_type;
+	}
+
 	site *get_capital() const
 	{
 		return this->capital;
@@ -240,8 +257,8 @@ public:
 	int Type = FactionTypeNoFactionType;								/// faction type (i.e. tribe or polity)
 private:
 	faction_tier default_tier;
+	government_type default_government_type;
 public:
-	int DefaultGovernmentType = GovernmentTypeMonarchy;					/// default government type
 	int ParentFaction = -1;												/// parent faction of this faction
 	bool Playable = true;												/// faction playability
 	bool DefiniteArticle = false;										/// whether the faction's name should be preceded by a definite article (e.g. "the Netherlands")
@@ -258,8 +275,10 @@ public:
 	std::vector<faction *> DevelopsFrom;								/// from which factions can this faction develop
 	std::vector<faction *> DevelopsTo;									/// to which factions this faction can develop
 	std::vector<CDynasty *> Dynasties;									/// which dynasties are available to this faction
-	std::string Titles[MaxGovernmentTypes][static_cast<int>(faction_tier::count)];			/// this faction's title for each government type and faction tier
-	std::string MinisterTitles[MaxCharacterTitles][static_cast<int>(gender::count)][MaxGovernmentTypes][static_cast<int>(faction_tier::count)]; /// this faction's minister title for each minister type and government type
+private:
+	std::map<government_type, std::map<faction_tier, std::string>> title_names;
+	std::map<int, std::map<government_type, std::map<faction_tier, std::map<gender, std::string>>>> character_title_names;
+public:
 	std::map<const CUpgrade *, int> UpgradePriorities;					/// Priority for each upgrade
 	std::map<ButtonCmd, IconConfig> ButtonIcons;								/// icons for button actions
 private:
@@ -282,9 +301,10 @@ public:
 	std::map<std::tuple<CDate, CDate, int>, character *> HistoricalMinisters;	/// historical ministers of the faction (as well as heads of state and government), mapped to the beginning and end of the rule, and the enum of the title in question
 	std::map<std::string, std::map<CDate, bool>> HistoricalUpgrades;	/// historical upgrades of the faction, with the date of change
 	std::map<int, faction_tier> HistoricalTiers; /// dates in which this faction's tier changed; faction tier mapped to year
-	std::map<int, int> HistoricalGovernmentTypes;						/// dates in which this faction's government type changed; government type mapped to year
+	std::map<int, government_type> HistoricalGovernmentTypes;						/// dates in which this faction's government type changed; government type mapped to year
 private:
 	faction_tier tier;
+	government_type government_type;
 	site *capital = nullptr;
 	std::map<const resource *, int> resources;
 	std::map<const faction *, diplomacy_state> diplomacy_states;

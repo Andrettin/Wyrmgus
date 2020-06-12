@@ -251,7 +251,6 @@ void site::set_owner(CPlayer *player)
 	this->owner = player;
 	this->update_border_tiles();
 	this->update_minimap_territory();
-	this->owner_faction = player ? player->get_faction() : nullptr;
 }
 
 CPlayer *site::get_realm_owner() const

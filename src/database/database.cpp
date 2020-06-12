@@ -45,6 +45,7 @@
 #include "faction.h"
 #include "faction_tier.h"
 #include "gender.h"
+#include "government_type.h"
 #include "item_class.h"
 #include "item_slot.h"
 #include "map/map_template.h"
@@ -206,6 +207,8 @@ QVariant database::process_sml_property_value(const sml_property &property, cons
 			new_property_value = QVariant::fromValue(string_to_faction_tier(property.get_value()));
 		} else if (property_class_name == "stratagus::gender") {
 			new_property_value = QVariant::fromValue(string_to_gender(property.get_value()));
+		} else if (property_class_name == "stratagus::government_type") {
+			new_property_value = QVariant::fromValue(string_to_government_type(property.get_value()));
 		} else if (property_class_name == "stratagus::icon*") {
 			new_property_value = QVariant::fromValue(icon::get(property.get_value()));
 		} else if (property_class_name == "stratagus::item_class") {

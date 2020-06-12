@@ -852,6 +852,7 @@ set(stratagus_generic_HDRS
 	src/stratagus/faction.h
 	src/stratagus/faction_tier.h
 	src/stratagus/gender.h
+	src/stratagus/government_type.h
 	src/stratagus/item_class.h
 	src/stratagus/item_slot.h
 	src/stratagus/objective_type.h

@@ -233,7 +233,7 @@ private:
 	std::map<const civilization *, std::string> cultural_names;	/// Names for the site for each different culture/civilization
 	QColor minimap_color; //color used to represent the site on the minimap
 	std::vector<character *> characters; //characters which can be recruited at this site
-	faction *owner_faction = nullptr; //used for the owner history of the site, and after game start is 	set to its player owner's faction
+	faction *owner_faction = nullptr; //used for the owner history of the site
 	std::vector<unit_class *> building_classes; //used by history; applied as buildings at scenario start
 	unit_class *pathway_class = nullptr;
 	int population = 0; //used for creating units at scenario start

@@ -75,6 +75,8 @@ namespace stratagus {
 	class unit_class;
 	class unit_type;
 	class upgrade_class;
+	enum class faction_tier;
+	enum class government_type;
 	enum class gender;
 	enum class vassalage_type;
 }
@@ -119,6 +121,8 @@ public:
 	int Type = 0; //type of the player (human, computer, ...)
 	int Race = 0; //race of the player (orc, human, ...)
 	int Faction = -1; //faction of the player
+	stratagus::faction_tier faction_tier;
+	stratagus::government_type government_type;
 	CReligion *Religion = nullptr; //religion of the player
 	CDynasty *Dynasty = nullptr; //ruling dynasty of the player
 	stratagus::age *age = nullptr; //the current age the player/faction is in
@@ -244,6 +248,27 @@ public:
 	stratagus::faction *get_faction() const;
 	void SetFaction(const stratagus::faction *faction);
 	void SetRandomFaction();
+
+	stratagus::faction_tier get_faction_tier() const
+	{
+		return this->faction_tier;
+	}
+
+	void set_faction_tier(const stratagus::faction_tier tier)
+	{
+		this->faction_tier = tier;
+	}
+
+	stratagus::government_type get_government_type() const
+	{
+		return this->government_type;
+	}
+
+	void set_government_type(const stratagus::government_type government_type)
+	{
+		this->government_type = government_type;
+	}
+
 	void SetDynasty(CDynasty *dynasty);
 	const std::string &get_interface() const;
 	void check_age();
@@ -274,8 +299,8 @@ public:
 	std::vector<stratagus::character *> get_recruitable_heroes_from_list(const std::vector<stratagus::character *> &heroes);
 	bool UpgradeRemovesExistingUpgrade(const CUpgrade *upgrade, bool ignore_lower_priority = false) const;
 	std::string get_full_name() const;
-	std::string GetFactionTitleName() const;
-	std::string GetCharacterTitleName(const int title_type, const stratagus::gender gender) const;
+	std::string_view get_faction_title_name() const;
+	std::string_view GetCharacterTitleName(const int title_type, const stratagus::gender gender) const;
 	std::set<int> get_builder_landmasses(const stratagus::unit_type *building) const;	/// Builds a vector with builder landmasses; the building is the structure to be built by the builder in question
 	std::vector<const CUpgrade *> GetResearchableUpgrades();
 	//Wyrmgus end
@@ -559,15 +584,6 @@ private:
 };
 
 //Wyrmgus start
-enum GovernmentTypes {
-	GovernmentTypeNoGovernmentType,
-	GovernmentTypeMonarchy,
-	GovernmentTypeRepublic,
-	GovernmentTypeTheocracy,
-	
-	MaxGovernmentTypes
-};
-
 enum FactionTypes {
 	FactionTypeNoFactionType,
 	FactionTypeTribe,
@@ -999,8 +1015,6 @@ inline bool CanSelectMultipleUnits(const CPlayer &player)
 extern void NetworkSetFaction(int player, const std::string &faction_name);
 extern std::string GetFactionTypeNameById(int faction_type);
 extern int GetFactionTypeIdByName(const std::string &faction_type);
-extern std::string GetGovernmentTypeNameById(int government_type);
-extern int GetGovernmentTypeIdByName(const std::string &government_type);
 extern std::string GetForceTypeNameById(const ForceType force_type);
 extern ForceType GetForceTypeIdByName(const std::string &force_type);
 extern std::string GetWordTypeNameById(int word_type);

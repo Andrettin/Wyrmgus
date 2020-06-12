@@ -8,8 +8,6 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name grand_strategy.h - The grand strategy header file. */
-//
 //      (c) Copyright 2015-2020 by Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
@@ -33,6 +31,7 @@
 #include "map/map.h"
 #include "province.h"
 #include "character.h"
+#include "government_type.h"
 #include "vec2i.h"
 #include "video.h"
 #include "player.h"
@@ -147,7 +146,7 @@ class CGrandStrategyFaction
 {
 public:
 	CGrandStrategyFaction() :
-		Faction(-1), civilization(-1), FactionTier(stratagus::faction_tier::barony), GovernmentType(GovernmentTypeMonarchy), Capital(nullptr)
+		Faction(-1), civilization(-1), FactionTier(stratagus::faction_tier::barony), government_type(stratagus::government_type::monarchy), Capital(nullptr)
 	{
 		memset(Technologies, 0, sizeof(Technologies));
 		memset(Resources, 0, sizeof(Resources));
@@ -172,7 +171,7 @@ public:
 	
 	int Faction;												/// The faction's ID (-1 = none).
 	int civilization;											/// Civilization of the faction (-1 = none).
-	int GovernmentType;											/// Government type of the faction (-1 = none).
+	stratagus::government_type government_type;					/// Government type of the faction (-1 = none).
 	stratagus::faction_tier FactionTier;						/// What is the tier of this faction (barony, etc.).
 	CGrandStrategyProvince *Capital;							/// Capital province of this faction
 	bool Technologies[UpgradeMax];								/// Whether a faction has a particular technology or not

@@ -55,6 +55,7 @@ class quest;
 class species;
 class unit_class;
 class upgrade_class;
+enum class government_type;
 
 class civilization final : public civilization_base, public data_type<civilization>
 {
@@ -194,6 +195,14 @@ public:
 		this->cursors[type] = cursor;
 	}
 
+	std::string_view get_title_name(const government_type government_type, const faction_tier tier) const;
+	void process_title_name_scope(const sml_data &scope);
+	std::string_view get_character_title_name(const int title_type, const int faction_type, const government_type government_type, const faction_tier tier, const gender gender) const;
+	void process_character_title_name_scope(const sml_data &scope);
+	void process_character_title_name_scope(const int title_type, const sml_data &scope);
+	void process_character_title_name_scope(const int title_type, const int faction_type, const sml_data &scope);
+	void process_character_title_name_scope(const int title_type, const int faction_type, const government_type government_type, const sml_data &scope);
+
 	std::vector<CForceTemplate *> GetForceTemplates(const ForceType force_type) const;
 	std::vector<CAiBuildingTemplate *> GetAiBuildingTemplates() const;
 
@@ -321,8 +330,9 @@ private:
 public:
 	std::vector<deity *> Deities;
 	std::vector<site *> sites; //sites used for this civilization if a randomly-generated one is required
-	std::string MinisterTitles[MaxCharacterTitles][static_cast<int>(gender::count)][MaxGovernmentTypes][static_cast<int>(faction_tier::count)]; /// this civilization's minister title for each minister type and government type
 private:
+	std::map<government_type, std::map<faction_tier, std::string>> title_names;
+	std::map<int, std::map<int, std::map<government_type, std::map<faction_tier, std::map<gender, std::string>>>>> character_title_names;
 	std::vector<CUpgrade *> acquired_upgrades;
 public:
 	std::map<std::string, std::map<CDate, bool>> HistoricalUpgrades;	/// historical upgrades of the faction, with the date of change

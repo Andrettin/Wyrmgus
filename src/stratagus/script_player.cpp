@@ -43,6 +43,7 @@
 #include "editor.h"
 #include "faction.h"
 #include "font.h"
+#include "government_type.h"
 #include "grand_strategy.h"
 #include "item.h"
 #include "luacallback.h"
@@ -148,6 +149,10 @@ void CPlayer::Load(lua_State *l)
 		//Wyrmgus start
 		} else if (!strcmp(value, "faction")) {
 			this->Faction = LuaToNumber(l, j + 1);
+		} else if (!strcmp(value, "faction-tier")) {
+			this->faction_tier = stratagus::string_to_faction_tier(LuaToString(l, j + 1));
+		} else if (!strcmp(value, "government-type")) {
+			this->government_type = stratagus::string_to_government_type(LuaToString(l, j + 1));
 		} else if (!strcmp(value, "dynasty")) {
 			this->Dynasty = PlayerRaces.GetDynasty(LuaToString(l, j + 1));
 		} else if (!strcmp(value, "age")) {
@@ -966,11 +971,11 @@ static int CclDefineCivilization(lua_State *l)
 				++k;
 				const stratagus::gender gender = stratagus::string_to_gender(LuaToString(l, -1, k + 1));
 				++k;
-				int government_type = GetGovernmentTypeIdByName(LuaToString(l, -1, k + 1));
+				const stratagus::government_type government_type = stratagus::string_to_government_type(LuaToString(l, -1, k + 1));
 				++k;
 				const stratagus::faction_tier tier = stratagus::string_to_faction_tier(LuaToString(l, -1, k + 1));
 				++k;
-				civilization->MinisterTitles[title][static_cast<int>(gender)][government_type][static_cast<int>(tier)] = LuaToString(l, -1, k + 1);
+				civilization->character_title_names[title][FactionTypeNoFactionType][government_type][tier][gender] = LuaToString(l, -1, k + 1);
 			}
 		} else if (!strcmp(value, "HistoricalUpgrades")) {
 			if (!lua_istable(l, -1)) {
@@ -1606,12 +1611,8 @@ static int CclDefineFaction(lua_State *l)
 			}
 		} else if (!strcmp(value, "DefaultGovernmentType")) {
 			std::string government_type_name = LuaToString(l, -1);
-			int government_type = GetGovernmentTypeIdByName(government_type_name);
-			if (government_type != -1) {
-				faction->DefaultGovernmentType = government_type;
-			} else {
-				LuaError(l, "Government type \"%s\" doesn't exist." _C_ government_type_name.c_str());
-			}
+			const stratagus::government_type government_type = stratagus::string_to_government_type(government_type_name);
+			faction->default_government_type = government_type;
 		} else if (!strcmp(value, "DefaultAI")) {
 			faction->DefaultAI = LuaToString(l, -1);
 		} else if (!strcmp(value, "ParentFaction")) {
@@ -1651,11 +1652,11 @@ static int CclDefineFaction(lua_State *l)
 			}
 			const int subargs = lua_rawlen(l, -1);
 			for (int k = 0; k < subargs; ++k) {
-				int government_type = GetGovernmentTypeIdByName(LuaToString(l, -1, k + 1));
+				const stratagus::government_type government_type = stratagus::string_to_government_type(LuaToString(l, -1, k + 1));
 				++k;
 				const stratagus::faction_tier tier = stratagus::string_to_faction_tier(LuaToString(l, -1, k + 1));
 				++k;
-				faction->Titles[government_type][static_cast<int>(tier)] = LuaToString(l, -1, k + 1);
+				faction->title_names[government_type][tier] = LuaToString(l, -1, k + 1);
 			}
 		} else if (!strcmp(value, "MinisterTitles")) {
 			if (!lua_istable(l, -1)) {
@@ -1667,11 +1668,11 @@ static int CclDefineFaction(lua_State *l)
 				++k;
 				const stratagus::gender gender = stratagus::string_to_gender(LuaToString(l, -1, k + 1));
 				++k;
-				int government_type = GetGovernmentTypeIdByName(LuaToString(l, -1, k + 1));
+				const stratagus::government_type government_type = stratagus::string_to_government_type(LuaToString(l, -1, k + 1));
 				++k;
 				const stratagus::faction_tier tier = stratagus::string_to_faction_tier(LuaToString(l, -1, k + 1));
 				++k;
-				faction->MinisterTitles[title][static_cast<int>(gender)][government_type][static_cast<int>(tier)] = LuaToString(l, -1, k + 1);
+				faction->character_title_names[title][government_type][tier][gender] = LuaToString(l, -1, k + 1);
 			}
 		} else if (!strcmp(value, "FactionUpgrade")) {
 			faction->FactionUpgrade = LuaToString(l, -1);
@@ -1852,10 +1853,7 @@ static int CclDefineFaction(lua_State *l)
 				int year = LuaToNumber(l, -1, j + 1);
 				++j;
 				std::string government_type_name = LuaToString(l, -1, j + 1);
-				int government_type = GetGovernmentTypeIdByName(government_type_name);
-				if (government_type == -1) {
-					LuaError(l, "Government type \"%s\" doesn't exist." _C_ government_type_name.c_str());
-				}
+				const stratagus::government_type government_type = stratagus::string_to_government_type(government_type_name);
 				faction->HistoricalGovernmentTypes[year] = government_type;
 			}
 		} else if (!strcmp(value, "HistoricalDiplomacyStates")) {
@@ -2847,7 +2845,7 @@ static int CclGetPlayerData(lua_State *l)
 		}
 		return 1;
 	} else if (!strcmp(data, "FactionTitle")) {
-		lua_pushstring(l, p->GetFactionTitleName().c_str());
+		lua_pushstring(l, p->get_faction_title_name().data());
 		return 1;
 	} else if (!strcmp(data, "CharacterTitle")) {
 		LuaCheckArgs(l, 4);
@@ -2856,7 +2854,7 @@ static int CclGetPlayerData(lua_State *l)
 		int title_type_id = GetCharacterTitleIdByName(title_type_ident);
 		const stratagus::gender gender = stratagus::string_to_gender(gender_ident);
 		
-		lua_pushstring(l, p->GetCharacterTitleName(title_type_id, gender).c_str());
+		lua_pushstring(l, p->GetCharacterTitleName(title_type_id, gender).data());
 		return 1;
 	} else if (!strcmp(data, "HasSettlement")) {
 		LuaCheckArgs(l, 3);

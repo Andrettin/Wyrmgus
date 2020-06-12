@@ -750,7 +750,7 @@ void CGrandStrategyFaction::MinisterSuccession(int title)
 {
 	if (
 		this->Ministers[title] != nullptr
-		&& (stratagus::faction::get_all()[this->Faction]->Type == FactionTypeTribe || this->GovernmentType == GovernmentTypeMonarchy)
+		&& (stratagus::faction::get_all()[this->Faction]->Type == FactionTypeTribe || this->government_type == stratagus::government_type::monarchy)
 		&& title == CharacterTitleHeadOfState
 	) { //if is a tribe or a monarchical polity, try to perform ruler succession by descent
 		for (size_t i = 0; i < this->Ministers[title]->Children.size(); ++i) {
@@ -836,7 +836,7 @@ bool CGrandStrategyFaction::HasTechnologyClass(std::string technology_class_name
 
 bool CGrandStrategyFaction::CanHaveSuccession(int title, bool family_inheritance)
 {
-	if (!this->IsAlive() && (title != CharacterTitleHeadOfState || !family_inheritance || stratagus::faction::get_all()[this->Faction]->Type == FactionTypeTribe || this->GovernmentType != GovernmentTypeMonarchy)) { // head of state titles can be inherited even if their respective factions have no provinces, but if the line dies out then the title becomes extinct; tribal titles cannot be titular-only
+	if (!this->IsAlive() && (title != CharacterTitleHeadOfState || !family_inheritance || stratagus::faction::get_all()[this->Faction]->Type == FactionTypeTribe || this->government_type != stratagus::government_type::monarchy)) { // head of state titles can be inherited even if their respective factions have no provinces, but if the line dies out then the title becomes extinct; tribal titles cannot be titular-only
 		return false;
 	}
 	
@@ -950,9 +950,9 @@ bool CGrandStrategyHero::IsGenerated()
 
 bool CGrandStrategyHero::IsEligibleForTitle(int title)
 {
-	if (this->GetFaction()->GovernmentType == GovernmentTypeMonarchy && title == CharacterTitleHeadOfState && this->get_unit_type()->get_unit_class() != nullptr && this->get_unit_type()->get_unit_class()->get_identifier() == "worker") { // commoners cannot become monarchs
+	if (this->GetFaction()->government_type == stratagus::government_type::monarchy && title == CharacterTitleHeadOfState && this->get_unit_type()->get_unit_class() != nullptr && this->get_unit_type()->get_unit_class()->get_identifier() == "worker") { // commoners cannot become monarchs
 		return false;
-	} else if (this->GetFaction()->GovernmentType == GovernmentTypeTheocracy && title == CharacterTitleHeadOfState && this->get_unit_type()->get_unit_class() != nullptr && this->get_unit_type()->get_unit_class()->get_identifier() != "priest") { // non-priests cannot rule theocracies
+	} else if (this->GetFaction()->government_type == stratagus::government_type::theocracy && title == CharacterTitleHeadOfState && this->get_unit_type()->get_unit_class() != nullptr && this->get_unit_type()->get_unit_class()->get_identifier() != "priest") { // non-priests cannot rule theocracies
 		return false;
 	}
 	
@@ -1403,18 +1403,6 @@ std::string GetProvinceOwner(std::string province_name)
 
 void SetFactionGovernmentType(std::string civilization_name, std::string faction_name, std::string government_type_name)
 {
-	stratagus::civilization *civilization = stratagus::civilization::get(civilization_name);
-	
-	int government_type_id = GetGovernmentTypeIdByName(government_type_name);
-	
-	if (government_type_id == -1) {
-		return;
-	}
-
-	if (civilization) {
-		int faction = stratagus::faction::get(faction_name)->ID;
-		GrandStrategyGame.Factions[civilization->ID][faction]->GovernmentType = government_type_id;
-	}
 }
 
 void SetFactionDiplomacyStateProposal(std::string civilization_name, std::string faction_name, std::string second_civilization_name, std::string second_faction_name, std::string diplomacy_state_name)
