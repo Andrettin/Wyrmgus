@@ -102,6 +102,7 @@ class map_template final : public named_data_entry, public data_type<map_templat
 	Q_PROPERTY(QString overlay_terrain_file READ get_overlay_terrain_file_qstring)
 	Q_PROPERTY(QString terrain_image READ get_terrain_image_qstring)
 	Q_PROPERTY(QString overlay_terrain_image READ get_overlay_terrain_image_qstring)
+	Q_PROPERTY(QString territory_image READ get_territory_image_qstring)
 	Q_PROPERTY(stratagus::terrain_type* base_terrain_type MEMBER base_terrain_type READ get_base_terrain_type)
 	Q_PROPERTY(stratagus::terrain_type* base_overlay_terrain_type MEMBER base_overlay_terrain_type READ get_base_overlay_terrain_type)
 	Q_PROPERTY(stratagus::terrain_type* border_terrain_type MEMBER border_terrain_type READ get_border_terrain_type)
@@ -132,6 +133,7 @@ public:
 
 	void ApplyTerrainFile(bool overlay, Vec2i template_start_pos, Vec2i map_start_pos, int z) const;
 	void ApplyTerrainImage(bool overlay, Vec2i template_start_pos, Vec2i map_start_pos, int z) const;
+	void apply_territory_image(const QPoint &template_start_pos, const QPoint &map_start_pos, const int z) const;
 	void Apply(const QPoint &template_start_pos, const QPoint &map_start_pos, const int z);
 	void apply_subtemplates(const QPoint &template_start_pos, const QPoint &map_start_pos, const QPoint &map_end, const int z, const bool random = false) const;
 	void apply_subtemplate(map_template *subtemplate, const QPoint &template_start_pos, const QPoint &map_start_pos, const QPoint &map_end, const int z, const bool random = false) const;
@@ -432,6 +434,23 @@ public:
 		this->set_overlay_terrain_image(std::filesystem::path(filepath));
 	}
 
+	const std::filesystem::path &get_territory_image() const
+	{
+		return this->territory_image;
+	}
+
+	void set_territory_image(const std::filesystem::path &filepath);
+
+	QString get_territory_image_qstring() const
+	{
+		return QString::fromStdString(this->get_territory_image().string());
+	}
+
+	Q_INVOKABLE void set_territory_image(const std::string &filepath)
+	{
+		this->set_territory_image(std::filesystem::path(filepath));
+	}
+
 	const QPoint &get_subtemplate_top_left_pos() const
 	{
 		return this->subtemplate_top_left_pos;
@@ -559,6 +578,7 @@ private:
 	std::filesystem::path overlay_terrain_file;
 	std::filesystem::path terrain_image;
 	std::filesystem::path overlay_terrain_image;
+	std::filesystem::path territory_image;
 	QSize size = QSize(0, 0);
 public:
 	int Priority = 100; //the priority of this map template, for the order of application of subtemplates

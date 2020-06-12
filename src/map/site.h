@@ -31,6 +31,7 @@
 #include "database/named_data_entry.h"
 #include "data_type.h"
 #include "time/date.h"
+#include "util/color_container.h"
 
 class CPlayer;
 class CUnit;
@@ -61,7 +62,7 @@ class site final : public named_data_entry, public data_type<site>, public CData
 	Q_PROPERTY(stratagus::unit_class* pathway_class MEMBER pathway_class READ get_pathway_class)
 	Q_PROPERTY(QVariantList cores READ get_cores_qvariant_list)
 	Q_PROPERTY(QVariantList regions READ get_regions_qvariant_list)
-	Q_PROPERTY(QColor minimap_color MEMBER minimap_color READ get_minimap_color)
+	Q_PROPERTY(QColor color READ get_color WRITE set_color)
 	Q_PROPERTY(stratagus::faction* owner_faction MEMBER owner_faction READ get_owner_faction)
 	Q_PROPERTY(QVariantList building_classes READ get_building_classes_qvariant_list)
 	Q_PROPERTY(int population MEMBER population READ get_population)
@@ -70,6 +71,37 @@ public:
 	static constexpr const char *class_identifier = "site";
 	static constexpr const char *database_folder = "sites";
 
+	static site *get_by_color(const QColor &color)
+	{
+		site *site = site::try_get_by_color(color);
+
+		if (site == nullptr) {
+			throw std::runtime_error("No site found for color: (" + std::to_string(color.red()) + ", " + std::to_string(color.green()) + ", " + std::to_string(color.blue()) + ").");
+		}
+
+		return site;
+	}
+
+	static site *try_get_by_color(const QColor &color)
+	{
+		auto find_iterator = site::sites_by_color.find(color);
+		if (find_iterator != site::sites_by_color.end()) {
+			return find_iterator->second;
+		}
+
+		return nullptr;
+	}
+
+	static void clear()
+	{
+		data_type::clear();
+		site::sites_by_color.clear();
+	}
+
+private:
+	static inline color_map<site *> sites_by_color;
+
+public:
 	explicit site(const std::string &identifier) : named_data_entry(identifier), CDataType(identifier)
 	{
 	}
@@ -209,7 +241,24 @@ public:
 	Q_INVOKABLE void add_region(region *region);
 	Q_INVOKABLE void remove_region(region *region);
 
-	const QColor &get_minimap_color() const;
+	const QColor &get_color() const
+	{
+		return this->color;
+	}
+
+	void set_color(const QColor &color)
+	{
+		if (color == this->get_color()) {
+			return;
+		}
+
+		if (site::try_get_by_color(color) != nullptr) {
+			throw std::runtime_error("Color is already used by another site.");
+		}
+
+		this->color = color;
+		site::sites_by_color[color] = this;
+	}
 
 	const std::vector<character *> &get_characters() const
 	{
@@ -231,7 +280,7 @@ private:
 	std::vector<region *> regions;								/// Regions where this site is located
 	std::vector<faction *> cores;						/// Factions which have this site as a core
 	std::map<const civilization *, std::string> cultural_names;	/// Names for the site for each different culture/civilization
-	QColor minimap_color; //color used to represent the site on the minimap
+	QColor color; //color used to represent the site on the minimap, and to identify its territory on territory images
 	std::vector<character *> characters; //characters which can be recruited at this site
 	faction *owner_faction = nullptr; //used for the owner history of the site
 	std::vector<unit_class *> building_classes; //used by history; applied as buildings at scenario start

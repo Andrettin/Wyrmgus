@@ -507,6 +507,58 @@ void map_template::ApplyTerrainImage(bool overlay, Vec2i template_start_pos, Vec
 	}
 }
 
+void map_template::apply_territory_image(const QPoint &template_start_pos, const QPoint &map_start_pos, const int z) const
+{
+	const std::filesystem::path territory_file = this->get_territory_image();
+	
+	if (territory_file.empty()) {
+		return;
+	}
+	
+	const std::string territory_filename = LibraryFileName(territory_file.string().c_str());
+		
+	if (!CanAccessFile(territory_filename.c_str())) {
+		fprintf(stderr, "File \"%s\" not found.\n", territory_filename.c_str());
+	}
+	
+	const QImage territory_image(territory_filename.c_str());
+	
+	for (int y = 0; y < territory_image.height(); ++y) {
+		if (y < template_start_pos.y() || y >= (template_start_pos.y() + CMap::Map.Info.MapHeights[z])) {
+			continue;
+		}
+		
+		if (this->get_end_pos().y() != -1 && y > this->get_end_pos().y()) {
+			break;
+		}
+
+		for (int x = 0; x < territory_image.width(); ++x) {
+			if (x < template_start_pos.x() || x >= (template_start_pos.x() + CMap::Map.Info.MapWidths[z])) {
+				continue;
+			}
+
+			if (this->get_end_pos().x() != -1 && x > this->get_end_pos().x()) {
+				break;
+			}
+
+			const QColor color = territory_image.pixelColor(x, y);
+			
+			if (color.alpha() == 0) { //transparent pixels means leaving the tile as it is
+				continue;
+			}
+
+			site *settlement = site::get_by_color(color);
+			const QPoint real_pos(map_start_pos.x() + (x - template_start_pos.x()), map_start_pos.y() + (y - template_start_pos.y()));
+
+			if (!CMap::Map.Info.IsPointOnMap(real_pos, z)) {
+				continue;
+			}
+
+			CMap::Map.Field(real_pos, z)->set_settlement(settlement);
+		}
+	}
+}
+
 void map_template::Apply(const QPoint &template_start_pos, const QPoint &map_start_pos, const int z)
 {
 	if (SaveGameLoading) {
@@ -820,6 +872,10 @@ void map_template::Apply(const QPoint &template_start_pos, const QPoint &map_sta
 	}
 	this->apply_sites(template_start_pos, map_start_pos, map_end, z, true);
 	this->ApplyUnits(template_start_pos, map_start_pos, map_end, z, true);
+
+	if (!this->get_territory_image().empty()) {
+		this->apply_territory_image(template_start_pos, map_start_pos, z);
+	}
 
 	for (int i = 0; i < PlayerMax; ++i) {
 		if (CPlayer::Players[i]->Type != PlayerPerson && CPlayer::Players[i]->Type != PlayerComputer && CPlayer::Players[i]->Type != PlayerRescueActive) {
@@ -1791,6 +1847,15 @@ void map_template::set_overlay_terrain_image(const std::filesystem::path &filepa
 	}
 
 	this->overlay_terrain_image = database::get_maps_path(this->get_module()) / filepath;
+}
+
+void map_template::set_territory_image(const std::filesystem::path &filepath)
+{
+	if (filepath == this->get_territory_image()) {
+		return;
+	}
+
+	this->territory_image = database::get_maps_path(this->get_module()) / filepath;
 }
 
 bool map_template::is_dependent_on(const map_template *other_template) const

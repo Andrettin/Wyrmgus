@@ -409,7 +409,7 @@ void minimap::update_territory_pixel(const int mx, const int my, const int z)
 		const bool is_settlement_water = settlement_center_tile->is_water() && !settlement_center_tile->is_river();
 		const bool is_settlement_space = settlement_center_tile->is_space();
 		if (is_tile_water == is_settlement_water && is_tile_space == is_settlement_space) {
-			const QColor settlement_color = mf.get_settlement()->get_minimap_color();
+			const QColor settlement_color = mf.get_settlement()->get_color();
 			*(uint32_t *) &(this->mode_overlay_texture_data[minimap_mode::settlements][z][pixel_index]) = Video.MapRGBA(settlement_color);
 		}
 	}

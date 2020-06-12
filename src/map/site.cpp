@@ -187,8 +187,8 @@ void site::initialize()
 	}
 
 	//if a settlement has no color assigned to it, assign a random one instead
-	if (this->is_major() && !this->get_minimap_color().isValid()) {
-		this->minimap_color = QColor(random::get()->generate(256), random::get()->generate(256), random::get()->generate(256));
+	if (this->is_major() && !this->get_color().isValid()) {
+		this->color = QColor(random::get()->generate(256), random::get()->generate(256), random::get()->generate(256));
 	}
 
 	for (faction *core_faction : this->get_cores()) {
@@ -357,11 +357,6 @@ void site::remove_region(region *region)
 {
 	vector::remove(this->regions, region);
 	region->remove_site(this);
-}
-
-const QColor &site::get_minimap_color() const
-{
-	return this->minimap_color;
 }
 
 }
