@@ -39,6 +39,7 @@ class CTimeOfDaySchedule;
 namespace stratagus {
 
 class plane;
+class site;
 class species;
 class terrain_type;
 
@@ -50,6 +51,7 @@ public:
 	static constexpr const char *class_identifier = "world";
 	static constexpr const char *database_folder = "worlds";
 	static constexpr const char *terrain_map_folder = "terrain";
+	static constexpr const char *territories_map_folder = "territories";
 
 	static world *add(const std::string &identifier, const stratagus::module *module);
 
@@ -68,6 +70,7 @@ public:
 
 	std::vector<QVariantList> parse_geojson_folder(const std::string_view &folder) const;
 	terrain_geodata_map parse_terrain_geojson_folder() const;
+	std::map<const site *, std::vector<std::unique_ptr<QGeoShape>>> parse_territories_geojson_folder() const;
 
 	int ID = -1;
 private:

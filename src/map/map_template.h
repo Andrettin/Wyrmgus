@@ -112,6 +112,7 @@ class map_template final : public named_data_entry, public data_type<map_templat
 	Q_PROPERTY(stratagus::terrain_type* surrounding_terrain_type MEMBER surrounding_terrain_type READ get_surrounding_terrain_type)
 	Q_PROPERTY(stratagus::terrain_type* surrounding_overlay_terrain_type MEMBER surrounding_overlay_terrain_type READ get_surrounding_overlay_terrain_type)
 	Q_PROPERTY(bool output_terrain_image MEMBER output_terrain_image READ outputs_terrain_image)
+	Q_PROPERTY(bool output_territory_image MEMBER output_territory_image READ outputs_territory_image)
 	Q_PROPERTY(double min_longitude MEMBER min_longitude READ get_min_longitude)
 	Q_PROPERTY(double max_longitude MEMBER max_longitude READ get_max_longitude)
 	Q_PROPERTY(double min_latitude MEMBER min_latitude READ get_min_latitude)
@@ -536,6 +537,11 @@ public:
 		return this->output_terrain_image;
 	}
 
+	bool outputs_territory_image() const
+	{
+		return this->output_territory_image;
+	}
+
 	const point_map<terrain_type *> &get_tile_terrains() const
 	{
 		return this->tile_terrains;
@@ -572,6 +578,7 @@ public:
 	}
 
 	void save_terrain_image(const std::string &filename, const bool overlay, const terrain_geodata_map &terrain_data) const;
+	void save_territory_image(const std::string &filename, const std::map<const site *, std::vector<std::unique_ptr<QGeoShape>>> &territory_data) const;
 	
 private:
 	std::filesystem::path terrain_file;
@@ -586,6 +593,7 @@ private:
 	bool circle = false; //whether the template should be applied as a circle, i.e. it should apply no subtemplates and etc. or generate terrain outside the boundaries of the circle
 	bool optional = false;
 	bool output_terrain_image = false;
+	bool output_territory_image = false;
 private:
 	QPoint subtemplate_top_left_pos = QPoint(-1, -1); //this template's position as a subtemplate in its main template; the position is relative to the subtemplate's top left
 	QPoint subtemplate_center_pos = QPoint(-1, -1); //this template's position as a subtemplate in its main template; the position is relative to the subtemplate's center

@@ -352,6 +352,18 @@ void map_template::initialize()
 		this->save_terrain_image(overlay_filename, true, terrain_data);
 	}
 
+	if (this->outputs_territory_image()) {
+		std::map<const site *, std::vector<std::unique_ptr<QGeoShape>>> territory_data;
+
+		if (this->get_world() != nullptr) {
+			territory_data = this->get_world()->parse_territories_geojson_folder();
+		}
+
+		const std::string filename = this->get_identifier() + "_territories.png";
+
+		this->save_territory_image(filename, territory_data);
+	}
+
 	data_entry::initialize();
 }
 
@@ -2196,6 +2208,39 @@ void map_template::save_terrain_image(const std::string &filename, const bool ov
 					image.setPixelColor(tile_pos, terrain->get_color());
 				}
 			}
+		}
+	}
+
+	image.save(QString::fromStdString(filename));
+}
+
+void map_template::save_territory_image(const std::string &filename, const std::map<const site *, std::vector<std::unique_ptr<QGeoShape>>> &territory_data) const
+{
+	const std::filesystem::path territory_image = this->get_terrain_image();
+
+	QImage image;
+	if (!territory_image.empty()) {
+		image = QImage(QString::fromStdString(territory_image.string()));
+
+		if (image.size() != this->get_size()) {
+			throw std::runtime_error("Invalid territory image size for map template \"" + this->get_identifier() + "\".");
+		}
+	} else {
+		image = QImage(this->get_size(), QImage::Format_RGBA8888);
+		image.fill(Qt::transparent);
+	}
+
+	const QGeoRectangle georectangle = this->get_georectangle();
+
+	for (const auto &kv_pair : territory_data) {
+		const site *settlement = kv_pair.first;
+		const QColor color = settlement->get_color();
+		if (!color.isValid()) {
+			throw std::runtime_error("Settlement \"" + settlement->get_identifier() + "\" has no valid color.");
+		}
+
+		for (const auto &geoshape : kv_pair.second) {
+			geoshape::write_to_image(*geoshape, image, color, georectangle, filename);
 		}
 	}
 

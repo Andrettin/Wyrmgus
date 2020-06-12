@@ -30,6 +30,7 @@
 #include "world.h"
 
 #include "config.h"
+#include "map/site.h"
 #include "map/terrain_feature.h"
 #include "map/terrain_type.h"
 #include "plane.h"
@@ -155,5 +156,30 @@ terrain_geodata_map world::parse_terrain_geojson_folder() const
 	return terrain_data;
 }
 
+std::map<const site *, std::vector<std::unique_ptr<QGeoShape>>> world::parse_territories_geojson_folder() const
+{
+	std::map<const site *, std::vector<std::unique_ptr<QGeoShape>>> territory_data;
+
+	const std::vector<QVariantList> geojson_data_list = this->parse_geojson_folder(world::territories_map_folder);
+
+	geojson::process_features(geojson_data_list, [&](const QVariantMap &feature) {
+		const QVariantMap properties = feature.value("properties").toMap();
+
+		const QString settlement_identifier = properties.value("settlement").toString();
+		const site *settlement = site::get(settlement_identifier.toStdString());
+
+		for (const QVariant &subfeature_variant : feature.value("data").toList()) {
+			const QVariantMap subfeature_map = subfeature_variant.toMap();
+			std::unique_ptr<QGeoShape> geoshape;
+
+			const QGeoPolygon geopolygon = subfeature_map.value("data").value<QGeoPolygon>();
+			geoshape = std::make_unique<QGeoPolygon>(geopolygon);
+
+			territory_data[settlement].push_back(std::move(geoshape));
+		}
+	});
+
+	return territory_data;
+}
 
 }
