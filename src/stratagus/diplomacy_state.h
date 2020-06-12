@@ -89,6 +89,17 @@ inline std::string diplomacy_state_to_string(const diplomacy_state state)
 	throw std::runtime_error("Invalid diplomacy state: \"" + std::to_string(static_cast<int>(state)) + "\".");
 }
 
+inline bool is_vassalage_diplomacy_state(const diplomacy_state state)
+{
+	switch (state) {
+		case diplomacy_state::vassal:
+		case diplomacy_state::personal_union_vassal:
+			return true;
+		default:
+			return false;
+	}
+}
+
 }
 
 Q_DECLARE_METATYPE(stratagus::diplomacy_state)

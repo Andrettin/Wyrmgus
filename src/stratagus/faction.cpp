@@ -37,6 +37,7 @@
 #include "player_color.h"
 #include "unit/unit_type.h"
 #include "util/container_util.h"
+#include "util/map_util.h"
 #include "util/string_util.h"
 #include "util/vector_util.h"
 
@@ -146,6 +147,15 @@ void faction::process_sml_dated_scope(const sml_data &scope, const QDateTime &da
 
 		if (!state.has_value()) {
 			throw std::runtime_error("Diplomacy state has no state.");
+		}
+
+		const bool is_vassalage = is_vassalage_diplomacy_state(state.value());
+
+		if (is_vassalage) {
+			//a faction can only have one overlord, so remove any other vassalage states
+			map::remove_value_if(this->diplomacy_states, [](const diplomacy_state state) {
+				return is_vassalage_diplomacy_state(state);
+			});
 		}
 
 		this->diplomacy_states[other_faction] = state.value();
