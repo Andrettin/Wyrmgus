@@ -3111,22 +3111,19 @@ void CMap::generate_settlement_territories(const int z)
 
 	stratagus::point_set seeds;
 
-	for (const CUnit *site_unit : this->site_units) {
-		if (site_unit->MapLayer->ID != z) {
-			continue;
-		}
+	for (int x = 0; x < this->Info.MapWidths[z]; ++x) {
+		for (int y = 0; y < this->Info.MapHeights[z]; ++y) {
+			QPoint tile_pos(x, y);
 
-		for (int x = site_unit->tilePos.x; x < (site_unit->tilePos.x + site_unit->Type->get_tile_width()); ++x) {
-			for (int y = site_unit->tilePos.y; y < (site_unit->tilePos.y + site_unit->Type->get_tile_height()); ++y) {
-				QPoint tile_pos(x, y);
-				this->Field(tile_pos, z)->set_settlement(site_unit->settlement);
-
-				if (!this->tile_borders_other_settlement_territory(tile_pos, z)) {
-					continue;
-				}
-
-				seeds.insert(std::move(tile_pos));
+			if (this->Field(tile_pos, z)->get_settlement() == nullptr) {
+				continue;
 			}
+
+			if (!this->tile_borders_other_settlement_territory(tile_pos, z)) {
+				continue;
+			}
+
+			seeds.insert(std::move(tile_pos));
 		}
 	}
 

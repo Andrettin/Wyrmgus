@@ -142,11 +142,6 @@ void map_template::process_sml_scope(const sml_data &scope)
 	}
 }
 
-/**
-**	@brief	Process data provided by a configuration file
-**
-**	@param	config_data	The configuration data
-*/
 void map_template::ProcessConfigData(const CConfigData *config_data)
 {
 	for (size_t i = 0; i < config_data->Properties.size(); ++i) {
@@ -233,8 +228,6 @@ void map_template::ProcessConfigData(const CConfigData *config_data)
 		} else if (key == "unusable_area_overlay_terrain_type") {
 			terrain_type *terrain_type = terrain_type::get(value);
 			this->unusable_area_overlay_terrain_type = terrain_type;
-		} else if (key == "output_terrain_image") {
-			this->output_terrain_image = string::to_bool(value);
 		} else {
 			fprintf(stderr, "Invalid map template property: \"%s\".\n", key.c_str());
 		}
@@ -460,8 +453,6 @@ void map_template::ApplyTerrainImage(bool overlay, Vec2i template_start_pos, Vec
 	
 	const QImage terrain_image(terrain_filename.c_str());
 	
-	const int bpp = terrain_image.depth() / 8;
-
 	for (int y = 0; y < terrain_image.height(); ++y) {
 		if (y < template_start_pos.y || y >= (template_start_pos.y + CMap::Map.Info.MapHeights[z])) {
 			continue;
@@ -1057,6 +1048,12 @@ void map_template::apply_sites(const QPoint &template_start_pos, const QPoint &m
 			unit->settlement = site;
 			unit->settlement->set_site_unit(unit);
 			CMap::Map.site_units.push_back(unit);
+			for (int x = unit->tilePos.x; x < (unit->tilePos.x + unit->Type->get_tile_width()); ++x) {
+				for (int y = unit->tilePos.y; y < (unit->tilePos.y + unit->Type->get_tile_height()); ++y) {
+					const QPoint tile_pos(x, y);
+					CMap::Map.Field(tile_pos, z)->set_settlement(unit->settlement);
+				}
+			}
 		}
 		
 		for (size_t j = 0; j < site->HistoricalResources.size(); ++j) {
@@ -2042,7 +2039,7 @@ void map_template::save_terrain_image(const std::string &filename, const bool ov
 		image = QImage(QString::fromStdString(terrain_image.string()));
 
 		if (image.size() != this->get_size()) {
-			throw std::runtime_error("Invalid image size for map template \"" + this->get_identifier() + "\".");
+			throw std::runtime_error("Invalid terrain image size for map template \"" + this->get_identifier() + "\".");
 		}
 	} else {
 		image = QImage(this->get_size(), QImage::Format_RGBA8888);

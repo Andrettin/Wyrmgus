@@ -80,7 +80,6 @@ public:
 	static void clear()
 	{
 		data_type::clear();
-
 		terrain_feature::terrain_features_by_color.clear();
 	}
 
