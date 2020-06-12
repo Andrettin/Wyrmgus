@@ -28,10 +28,6 @@
 
 #pragma once
 
-/*----------------------------------------------------------------------------
---  Documentation
-----------------------------------------------------------------------------*/
-
 /**
 **  @class CMap map.h
 **
@@ -73,19 +69,11 @@
 **    Descriptive information of the map. See ::CMapInfo.
 */
 
-/*----------------------------------------------------------------------------
---  Includes
-----------------------------------------------------------------------------*/
-
 #include "color.h"
 #include "map/tile.h"
 #include "time/date.h"
 #include "util/point_container.h"
 #include "vec2i.h"
-
-/*----------------------------------------------------------------------------
---  Declarations
-----------------------------------------------------------------------------*/
 
 class CGraphic;
 class CPlayer;
@@ -277,6 +265,7 @@ public:
 	CMapLayer *get_subtemplate_map_layer(const stratagus::map_template *subtemplate) const;
 	std::vector<CUnit *> get_map_template_layer_connectors(const stratagus::map_template *map_template) const;
 	bool is_point_adjacent_to_non_subtemplate_area(const Vec2i &pos, const int z) const;
+	bool is_rect_in_settlement(const QRect &rect, const int z, const stratagus::site *settlement);
 	
 	void SetCurrentPlane(stratagus::plane *plane);
 	void SetCurrentWorld(stratagus::world *world);

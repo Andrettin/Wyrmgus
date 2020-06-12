@@ -3818,7 +3818,7 @@ CUnit *MakeUnitAndPlace(const Vec2i &pos, const stratagus::unit_type &type, CPla
 **
 **  @return        Pointer to created unit.
 */
-CUnit *CreateUnit(const Vec2i &pos, const stratagus::unit_type &type, CPlayer *player, int z, bool no_bordering_building)
+CUnit *CreateUnit(const Vec2i &pos, const stratagus::unit_type &type, CPlayer *player, int z, bool no_bordering_building, const stratagus::site *settlement)
 {
 	CUnit *unit = MakeUnit(type, player);
 
@@ -3827,7 +3827,7 @@ CUnit *CreateUnit(const Vec2i &pos, const stratagus::unit_type &type, CPlayer *p
 
 		Vec2i res_pos;
 		const int heading = SyncRand(256);
-		FindNearestDrop(type, pos, res_pos, heading, z, no_bordering_building);
+		FindNearestDrop(type, pos, res_pos, heading, z, no_bordering_building, false, settlement);
 		
 		if (type.BoolFlag[BUILDING_INDEX].value) {
 			CBuildRestrictionOnTop *b = OnTopDetails(type, nullptr);
@@ -3885,7 +3885,7 @@ CUnit *CreateResourceUnit(const Vec2i &pos, const stratagus::unit_type &type, in
 **  @param resPos   Holds the nearest point.
 **  @param heading  preferense side to drop out of.
 */
-void FindNearestDrop(const stratagus::unit_type &type, const Vec2i &goalPos, Vec2i &resPos, int heading, int z, bool no_bordering_building, bool ignore_construction_requirements)
+void FindNearestDrop(const stratagus::unit_type &type, const Vec2i &goalPos, Vec2i &resPos, int heading, int z, bool no_bordering_building, bool ignore_construction_requirements, const stratagus::site *settlement)
 {
 	int addx = 0;
 	int addy = 0;
@@ -3910,6 +3910,7 @@ startw:
 			if (
 				(UnitTypeCanBeAt(type, pos, z) || (type.BoolFlag[BUILDING_INDEX].value && OnTopDetails(type, nullptr) && !ignore_construction_requirements))
 				&& (!type.BoolFlag[BUILDING_INDEX].value || ignore_construction_requirements || CanBuildHere(nullptr, type, pos, z, no_bordering_building) != nullptr)
+				&& (settlement == nullptr || CMap::Map.is_rect_in_settlement(QRect(pos, type.get_tile_size()), z, settlement))
 			) {
 			//Wyrmgus end
 				goto found;
@@ -3923,6 +3924,7 @@ starts:
 			if (
 				(UnitTypeCanBeAt(type, pos, z) || (type.BoolFlag[BUILDING_INDEX].value && OnTopDetails(type, nullptr) && !ignore_construction_requirements))
 				&& (!type.BoolFlag[BUILDING_INDEX].value || ignore_construction_requirements || CanBuildHere(nullptr, type, pos, z, no_bordering_building) != nullptr)
+				&& (settlement == nullptr || CMap::Map.is_rect_in_settlement(QRect(pos, type.get_tile_size()), z, settlement))
 			) {
 			//Wyrmgus end
 				goto found;
@@ -3936,6 +3938,7 @@ starte:
 			if (
 				(UnitTypeCanBeAt(type, pos, z) || (type.BoolFlag[BUILDING_INDEX].value && OnTopDetails(type, nullptr) && !ignore_construction_requirements))
 				&& (!type.BoolFlag[BUILDING_INDEX].value || ignore_construction_requirements || CanBuildHere(nullptr, type, pos, z, no_bordering_building) != nullptr)
+				&& (settlement == nullptr || CMap::Map.is_rect_in_settlement(QRect(pos, type.get_tile_size()), z, settlement))
 			) {
 			//Wyrmgus end
 				goto found;
@@ -3949,6 +3952,7 @@ startn:
 			if (
 				(UnitTypeCanBeAt(type, pos, z) || (type.BoolFlag[BUILDING_INDEX].value && OnTopDetails(type, nullptr) && !ignore_construction_requirements))
 				&& (!type.BoolFlag[BUILDING_INDEX].value || ignore_construction_requirements || CanBuildHere(nullptr, type, pos, z, no_bordering_building) != nullptr)
+				&& (settlement == nullptr || CMap::Map.is_rect_in_settlement(QRect(pos, type.get_tile_size()), z, settlement))
 			) {
 			//Wyrmgus end
 				goto found;

@@ -249,8 +249,10 @@ void site::set_owner(CPlayer *player)
 	}
 
 	this->owner = player;
-	this->update_border_tiles();
-	this->update_minimap_territory();
+	if (GameCycle > 0) {
+		this->update_border_tiles();
+		this->update_minimap_territory();
+	}
 }
 
 CPlayer *site::get_realm_owner() const

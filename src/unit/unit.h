@@ -737,10 +737,10 @@ extern CUnit *MakeUnit(const stratagus::unit_type &type, CPlayer *player);
 /// Create a new unit and place on map
 extern CUnit *MakeUnitAndPlace(const Vec2i &pos, const stratagus::unit_type &type, CPlayer *player, int z);
 /// Create a new unit and place it on the map, and update its player accordingly
-extern CUnit *CreateUnit(const Vec2i &pos, const stratagus::unit_type &type, CPlayer *player, int z, bool no_bordering_building = false);
+extern CUnit *CreateUnit(const Vec2i &pos, const stratagus::unit_type &type, CPlayer *player, int z, bool no_bordering_building = false, const stratagus::site *settlement = nullptr);
 extern CUnit *CreateResourceUnit(const Vec2i &pos, const stratagus::unit_type &type, int z, bool allow_unique = true);
 /// Find the nearest position at which unit can be placed.
-void FindNearestDrop(const stratagus::unit_type &type, const Vec2i &goalPos, Vec2i &resPos, int heading, int z, bool no_bordering_building = false, bool ignore_construction_requirements = false);
+void FindNearestDrop(const stratagus::unit_type &type, const Vec2i &goalPos, Vec2i &resPos, int heading, int z, bool no_bordering_building = false, bool ignore_construction_requirements = false, const stratagus::site *settlement = nullptr);
 /// Handle the loss of a unit (food,...)
 extern void UnitLost(CUnit &unit);
 /// Remove the Orders of a Unit

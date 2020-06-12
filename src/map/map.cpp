@@ -961,6 +961,32 @@ bool CMap::is_point_adjacent_to_non_subtemplate_area(const Vec2i &pos, const int
 	return false;
 }
 
+bool CMap::is_rect_in_settlement(const QRect &rect, const int z, const stratagus::site *settlement)
+{
+	for (int x = rect.x(); x <= rect.right(); ++x) {
+		for (int y = rect.y(); y <= rect.bottom(); ++y) {
+			const QPoint tile_pos(x, y);
+
+			if (!Map.Info.IsPointOnMap(tile_pos, z)) {
+				return false;
+			}
+
+			const CMapField *tile = this->Field(tile_pos, z);
+
+			//doesn't return false for tiles with no settlement
+			if (tile->get_settlement() == nullptr) {
+				continue;
+			}
+
+			if (tile->get_settlement() != settlement) {
+				return false;
+			}
+		}
+	}
+
+	return true;
+}
+
 void CMap::SetCurrentPlane(stratagus::plane *plane)
 {
 	if (UI.CurrentMapLayer->plane == plane) {

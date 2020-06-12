@@ -848,6 +848,10 @@ void map_template::Apply(const QPoint &template_start_pos, const QPoint &map_sta
 		}
 	}
 
+	if (!this->get_territory_image().empty()) {
+		this->apply_territory_image(template_start_pos, map_start_pos, z);
+	}
+
 	if (current_campaign != nullptr) {
 		this->ApplyConnectors(template_start_pos, map_start_pos, map_end, z);
 	}
@@ -884,10 +888,6 @@ void map_template::Apply(const QPoint &template_start_pos, const QPoint &map_sta
 	}
 	this->apply_sites(template_start_pos, map_start_pos, map_end, z, true);
 	this->ApplyUnits(template_start_pos, map_start_pos, map_end, z, true);
-
-	if (!this->get_territory_image().empty()) {
-		this->apply_territory_image(template_start_pos, map_start_pos, z);
-	}
 
 	for (int i = 0; i < PlayerMax; ++i) {
 		if (CPlayer::Players[i]->Type != PlayerPerson && CPlayer::Players[i]->Type != PlayerComputer && CPlayer::Players[i]->Type != PlayerRescueActive) {
@@ -1112,7 +1112,7 @@ void map_template::apply_sites(const QPoint &template_start_pos, const QPoint &m
 			if (!is_position_shift_acceptable && !UnitTypeCanBeAt(*settlement_site_unit_type, site_pos - unit_offset, z) && CMap::Map.Info.IsPointOnMap(site_pos - unit_offset, z) && CMap::Map.Info.IsPointOnMap(site_pos - unit_offset + Vec2i(settlement_site_unit_type->get_tile_size() - QSize(1, 1)), z)) {
 				fprintf(stderr, "The settlement site for \"%s\" should be placed on (%d, %d), but it cannot be there.\n", site->Ident.c_str(), site_raw_pos.x(), site_raw_pos.y());
 			}
-			CUnit *unit = CreateUnit(site_pos - unit_offset, *settlement_site_unit_type, CPlayer::Players[PlayerNumNeutral], z, true);
+			CUnit *unit = CreateUnit(site_pos - unit_offset, *settlement_site_unit_type, CPlayer::Players[PlayerNumNeutral], z, true, site);
 			unit->settlement = site;
 			unit->settlement->set_site_unit(unit);
 			CMap::Map.site_units.push_back(unit);
@@ -1238,7 +1238,7 @@ void map_template::apply_sites(const QPoint &template_start_pos, const QPoint &m
 				}
 			}
 
-			CUnit *unit = CreateUnit(site_pos - unit_offset, *unit_type, player, z, true);
+			CUnit *unit = CreateUnit(site_pos - unit_offset, *unit_type, player, z, true, site->is_major() ? site : nullptr);
 
 			if (first_building) {
 				if (!unit_type->BoolFlag[TOWNHALL_INDEX].value) { //if one building is representing a minor site, make it have the site's name
@@ -1309,9 +1309,9 @@ void map_template::apply_sites(const QPoint &template_start_pos, const QPoint &m
 					if (building_player->StartPos.x == 0 && building_player->StartPos.y == 0) {
 						building_player->SetStartView(site_pos - unit_offset, z);
 					}
-					unit = CreateUnit(site_pos - unit_offset, *unit_type, building_player, z, true);
+					unit = CreateUnit(site_pos - unit_offset, *unit_type, building_player, z, true, site->is_major() ? site : nullptr);
 				} else {
-					unit = CreateUnit(site_pos - unit_offset, *unit_type, player, z, true);
+					unit = CreateUnit(site_pos - unit_offset, *unit_type, player, z, true, site->is_major() ? site : nullptr);
 				}
 				if (std::get<3>(site->HistoricalBuildings[j])) {
 					unit->SetUnique(std::get<3>(site->HistoricalBuildings[j]));
@@ -1353,12 +1353,12 @@ void map_template::apply_sites(const QPoint &template_start_pos, const QPoint &m
 			const unit_class *unit_class = unit_class::get_all()[kv_pair.first];
 			const int group_population = kv_pair.second;
 
-			this->apply_population_unit(unit_class, group_population, site_pos, z, player);
+			this->apply_population_unit(unit_class, group_population, site_pos, z, player, site->is_major() ? site : nullptr);
 			population -= group_population;
 		}
 
 		if (population != 0) { //remaining population after subtracting the amount of population specified to belong to particular groups
-			this->apply_population_unit(defines::get()->get_default_population_class(), population, site_pos, z, player);
+			this->apply_population_unit(defines::get()->get_default_population_class(), population, site_pos, z, player, site->is_major() ? site : nullptr);
 		}
 		
 		for (size_t j = 0; j < site->HistoricalUnits.size(); ++j) {
@@ -1390,7 +1390,7 @@ void map_template::apply_sites(const QPoint &template_start_pos, const QPoint &m
 					Vec2i unit_offset((type->get_tile_size() - QSize(1, 1)) / 2);
 
 					for (int j = 0; j < unit_quantity; ++j) {
-						CUnit *unit = CreateUnit(site_pos - unit_offset, *type, unit_player, z);
+						CUnit *unit = CreateUnit(site_pos - unit_offset, *type, unit_player, z, false, site->is_major() ? site : nullptr);
 						if (!type->BoolFlag[HARVESTER_INDEX].value) { // make non-worker units not have an active AI
 							unit->Active = 0;
 							unit_player->ChangeUnitTypeAiActiveCount(type, -1);
@@ -1402,7 +1402,7 @@ void map_template::apply_sites(const QPoint &template_start_pos, const QPoint &m
 	}
 }
 
-void map_template::apply_population_unit(const unit_class *unit_class, const int population, const QPoint &unit_pos, const int z, CPlayer *player) const
+void map_template::apply_population_unit(const unit_class *unit_class, const int population, const QPoint &unit_pos, const int z, CPlayer *player, const site *settlement) const
 {
 	const unit_type *unit_type = player->get_class_unit_type(unit_class);
 
@@ -1415,7 +1415,7 @@ void map_template::apply_population_unit(const unit_class *unit_class, const int
 
 	const int unit_quantity = std::max(1, static_cast<int>(cbrt(population / base_population_per_unit)));
 	for (int i = 0; i < unit_quantity; ++i) {
-		CreateUnit(unit_top_left_pos, *unit_type, player, z);
+		CreateUnit(unit_top_left_pos, *unit_type, player, z, false, settlement);
 	}
 }
 
