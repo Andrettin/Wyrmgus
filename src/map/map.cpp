@@ -548,9 +548,9 @@ bool CMap::TileBordersFlag(const Vec2i &pos, int z, int flag, bool reverse) cons
 	return false;
 }
 
-bool CMap::tile_borders_other_settlement_territory(const QPoint &pos, const int z) const
+bool CMap::tile_borders_same_settlement_territory(const QPoint &pos, const int z, const bool diagonal_allowed) const
 {
-	stratagus::site *tile_settlement = this->Field(pos, z)->get_settlement();
+	const stratagus::site *tile_settlement = this->Field(pos, z)->get_settlement();
 
 	for (int sub_x = -1; sub_x <= 1; ++sub_x) {
 		for (int sub_y = -1; sub_y <= 1; ++sub_y) {
@@ -559,7 +559,32 @@ bool CMap::tile_borders_other_settlement_territory(const QPoint &pos, const int 
 				continue;
 			}
 
-			stratagus::site *adjacent_tile_settlement = this->Field(adjacent_pos, z)->get_settlement();
+			if (!diagonal_allowed && sub_x != 0 && sub_y != 0) {
+				continue;
+			}
+
+			const stratagus::site *adjacent_tile_settlement = this->Field(adjacent_pos, z)->get_settlement();
+			if (tile_settlement == adjacent_tile_settlement) {
+				return true;
+			}
+		}
+	}
+
+	return false;
+}
+
+bool CMap::tile_borders_other_settlement_territory(const QPoint &pos, const int z) const
+{
+	const stratagus::site *tile_settlement = this->Field(pos, z)->get_settlement();
+
+	for (int sub_x = -1; sub_x <= 1; ++sub_x) {
+		for (int sub_y = -1; sub_y <= 1; ++sub_y) {
+			const QPoint adjacent_pos(pos.x() + sub_x, pos.y() + sub_y);
+			if (!this->Info.IsPointOnMap(adjacent_pos, z) || (sub_x == 0 && sub_y == 0)) {
+				continue;
+			}
+
+			const stratagus::site *adjacent_tile_settlement = this->Field(adjacent_pos, z)->get_settlement();
 			if (tile_settlement != adjacent_tile_settlement) {
 				return true;
 			}
@@ -2569,6 +2594,33 @@ void CMap::AdjustTileMapTransitions(const Vec2i &min_pos, const Vec2i &max_pos, 
 							}
 						}
 					}
+				}
+			}
+		}
+	}
+}
+
+void CMap::adjust_territory_irregularities(const QPoint &min_pos, const QPoint &max_pos, const int z)
+{
+	bool no_irregularities_found = false;
+	int try_count = 0;
+	const int max_try_count = 100;
+	while (!no_irregularities_found && try_count < max_try_count) {
+		no_irregularities_found = true;
+		try_count++;
+
+		for (int x = min_pos.x(); x <= max_pos.x(); ++x) {
+			for (int y = min_pos.y(); y <= max_pos.y(); ++y) {
+				const QPoint tile_pos(x, y);
+				CMapField *tile = this->Field(tile_pos, z);
+
+				if (tile->get_settlement() == nullptr) {
+					continue;
+				}
+
+				if (!this->tile_borders_same_settlement_territory(tile_pos, z, false)) {
+					tile->set_settlement(nullptr);
+					no_irregularities_found = false;
 				}
 			}
 		}

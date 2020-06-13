@@ -191,6 +191,7 @@ public:
 	void AdjustMap();
 	void AdjustTileMapIrregularities(const bool overlay, const Vec2i &min_pos, const Vec2i &max_pos, const int z);
 	void AdjustTileMapTransitions(const Vec2i &min_pos, const Vec2i &max_pos, int z);
+	void adjust_territory_irregularities(const QPoint &min_pos, const QPoint &max_pos, const int z);
 	void GenerateTerrain(const std::unique_ptr<stratagus::generated_terrain> &generated_terrain, const Vec2i &min_pos, const Vec2i &max_pos, const bool preserve_coastline, const int z);
 	bool CanTileBePartOfMissingTerrainGeneration(const CMapField *tile, const stratagus::terrain_type *terrain_type, const stratagus::terrain_type *overlay_terrain_type) const;
 	void generate_missing_terrain(const Vec2i &min_pos, const Vec2i &max_pos, const int z);
@@ -247,6 +248,7 @@ public:
 	bool TileBordersTerrain(const Vec2i &pos, const stratagus::terrain_type *terrain_type, const int z) const;
 	bool TileBordersOnlySameTerrain(const Vec2i &pos, const stratagus::terrain_type *new_terrain, const int z) const;
 	bool TileBordersFlag(const Vec2i &pos, int z, int flag, bool reverse = false) const; // reverse means that it returns true if the tile borders one tile without the flag
+	bool tile_borders_same_settlement_territory(const QPoint &pos, const int z, const bool diagonal_allowed) const;
 	bool tile_borders_other_settlement_territory(const QPoint &pos, const int z) const;
 	bool tile_borders_other_player_territory(const QPoint &pos, const int z, const int range = 0) const;
 	bool TileBordersBuilding(const Vec2i &pos, int z);
