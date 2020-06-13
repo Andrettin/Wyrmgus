@@ -291,6 +291,7 @@ public:
 	bool HasSettlement(const stratagus::site *settlement) const;
 	bool HasSettlementNearWaterZone(int water_zone) const;
 	stratagus::site *GetNearestSettlement(const Vec2i &pos, int z, const Vec2i &size) const;
+	void update_building_settlement_assignment(const stratagus::site *old_settlement, const int z) const;
 	bool HasUnitBuilder(const stratagus::unit_type *type, const stratagus::site *settlement = nullptr) const;
 	bool HasUpgradeResearcher(const CUpgrade *upgrade) const;
 	bool CanFoundFaction(stratagus::faction *faction, bool pre = false);

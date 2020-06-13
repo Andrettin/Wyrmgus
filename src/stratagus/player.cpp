@@ -1731,6 +1731,27 @@ stratagus::site *CPlayer::GetNearestSettlement(const Vec2i &pos, int z, const Ve
 	}
 }
 
+void CPlayer::update_building_settlement_assignment(const stratagus::site *old_settlement, const int z) const
+{
+	for (int i = 0; i < this->GetUnitCount(); ++i) {
+		CUnit *unit = &this->GetUnit(i);
+
+		if (unit == nullptr || !unit->IsAliveOnMap()) {
+			continue;
+		}
+
+		if (!unit->Type->BoolFlag[BUILDING_INDEX].value || unit->Type->BoolFlag[TOWNHALL_INDEX].value || unit->Type == settlement_site_unit_type || unit->MapLayer->ID != z) {
+			continue;
+		}
+
+		if (old_settlement != nullptr && unit->settlement != old_settlement) {
+			continue;
+		}
+
+		unit->UpdateSettlement();
+	}
+}
+
 bool CPlayer::HasUnitBuilder(const stratagus::unit_type *type, const stratagus::site *settlement) const
 {
 	const std::vector<stratagus::unit_type *> *builders = nullptr;

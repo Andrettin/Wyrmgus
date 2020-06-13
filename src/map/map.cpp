@@ -3210,6 +3210,15 @@ void CMap::generate_settlement_territories(const int z)
 	}
 
 	this->calculate_settlement_territory_border_tiles(z);
+
+	//update the settlement of all buildings, as settlement territories have changed
+	for (const CPlayer *player : CPlayer::Players) {
+		if (!player->is_alive() || player->Index == PlayerNumNeutral) {
+			continue;
+		}
+
+		player->update_building_settlement_assignment(nullptr, z);
+	}
 }
 
 stratagus::point_set CMap::expand_settlement_territories(std::vector<QPoint> &&seeds, const int z, const int block_flags, const int same_flags)

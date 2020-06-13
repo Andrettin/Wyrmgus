@@ -163,7 +163,7 @@ public:
 	void UpdatePersonalName(bool update_settlement_name = true);
 	void UpdateExtraName();
 	void UpdateSettlement();
-	void UpdateBuildingSettlementAssignment(stratagus::site *old_settlement = nullptr); //update the settlement assignment of surrounding buildings for this town hall
+	void UpdateBuildingSettlementAssignment(const stratagus::site *old_settlement = nullptr); //update the settlement assignment of surrounding buildings for this town hall
 	void XPChanged();
 	//Wyrmgus end
 	/// Change owner of unit

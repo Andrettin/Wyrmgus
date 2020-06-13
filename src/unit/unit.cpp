@@ -3572,7 +3572,7 @@ void CUnit::UpdateSettlement()
 	}
 }
 
-void CUnit::UpdateBuildingSettlementAssignment(stratagus::site *old_settlement)
+void CUnit::UpdateBuildingSettlementAssignment(const stratagus::site *old_settlement)
 {
 	if (Editor.Running != EditorNotRunning) {
 		return;
@@ -3582,20 +3582,12 @@ void CUnit::UpdateBuildingSettlementAssignment(stratagus::site *old_settlement)
 		return;
 	}
 		
-	for (int p = 0; p < PlayerMax; ++p) {
-		if (!CPlayer::Players[p]->HasNeutralFactionType() && this->Player->Index != CPlayer::Players[p]->Index) {
+	for (const CPlayer *player : CPlayer::Players) {
+		if (!player->HasNeutralFactionType() && this->Player->Index != player->Index) {
 			continue;
 		}
-		for (int i = 0; i < CPlayer::Players[p]->GetUnitCount(); ++i) {
-			CUnit *settlement_unit = &CPlayer::Players[p]->GetUnit(i);
-			if (!settlement_unit || !settlement_unit->IsAliveOnMap() || !settlement_unit->Type->BoolFlag[BUILDING_INDEX].value || settlement_unit->Type->BoolFlag[TOWNHALL_INDEX].value || settlement_unit->Type == settlement_site_unit_type || this->MapLayer != settlement_unit->MapLayer) {
-				continue;
-			}
-			if (old_settlement && settlement_unit->settlement != old_settlement) {
-				continue;
-			}
-			settlement_unit->UpdateSettlement();
-		}
+
+		player->update_building_settlement_assignment(old_settlement, this->MapLayer->ID);
 	}
 }
 
