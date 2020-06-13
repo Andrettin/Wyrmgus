@@ -75,6 +75,9 @@ class faction final : public detailed_data_entry, public data_type<faction>
 	Q_PROPERTY(QVariantList acquired_upgrades READ get_acquired_upgrades_qstring_list)
 
 public:
+	using title_name_map = std::map<government_type, std::map<faction_tier, std::string>>;
+	using character_title_name_map = std::map<int, std::map<government_type, std::map<faction_tier, std::map<gender, std::string>>>>;
+
 	static constexpr const char *class_identifier = "faction";
 	static constexpr const char *database_folder = "factions";
 
@@ -84,6 +87,12 @@ public:
 		faction->ID = faction::get_all().size() - 1;
 		return faction;
 	}
+
+	static void process_title_names(title_name_map &title_names, const sml_data &scope);
+	static void process_title_name_scope(title_name_map &title_names, const sml_data &scope);
+	static void process_character_title_name_scope(character_title_name_map &character_title_names, const sml_data &scope);
+	static void process_character_title_name_scope(std::map<government_type, std::map<faction_tier, std::map<gender, std::string>>> &character_title_names, const sml_data &scope);
+	static void process_character_title_name_scope(std::map<faction_tier, std::map<gender, std::string>> &character_title_names, const sml_data &scope);
 
 	explicit faction(const std::string &identifier);
 	~faction();
@@ -276,8 +285,8 @@ public:
 	std::vector<faction *> DevelopsTo;									/// to which factions this faction can develop
 	std::vector<CDynasty *> Dynasties;									/// which dynasties are available to this faction
 private:
-	std::map<government_type, std::map<faction_tier, std::string>> title_names;
-	std::map<int, std::map<government_type, std::map<faction_tier, std::map<gender, std::string>>>> character_title_names;
+	title_name_map title_names;
+	character_title_name_map character_title_names;
 public:
 	std::map<const CUpgrade *, int> UpgradePriorities;					/// Priority for each upgrade
 	std::map<ButtonCmd, IconConfig> ButtonIcons;								/// icons for button actions

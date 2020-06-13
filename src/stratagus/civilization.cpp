@@ -32,6 +32,7 @@
 #include "civilization_group.h"
 #include "civilization_supergroup.h"
 #include "database/defines.h"
+#include "faction.h"
 #include "government_type.h"
 #include "player.h"
 #include "time/calendar.h"
@@ -93,16 +94,7 @@ void civilization::process_sml_scope(const sml_data &scope)
 	} else if (tag == "unit_sounds") {
 		database::process_sml_data(this->UnitSounds, scope);
 	} else if (tag == "title_names") {
-		scope.for_each_child([&](const sml_data &child_scope) {
-			this->process_title_name_scope(child_scope);
-		});
-
-		scope.for_each_property([&](const sml_property &property) {
-			const std::string &key = property.get_key();
-			const std::string &value = property.get_value();
-			government_type government_type = string_to_government_type(key);
-			this->title_names[government_type][faction_tier::none] = value;
-		});
+		faction::process_title_names(this->title_names, scope);
 	} else if (tag == "character_title_names") {
 		scope.for_each_child([&](const sml_data &child_scope) {
 			this->process_character_title_name_scope(child_scope);
@@ -516,19 +508,6 @@ std::string_view civilization::get_title_name(const government_type government_t
 	return string::empty_str;
 }
 
-void civilization::process_title_name_scope(const sml_data &scope)
-{
-	const std::string &tag = scope.get_tag();
-	const government_type government_type = string_to_government_type(tag);
-
-	scope.for_each_property([&](const sml_property &property) {
-		const std::string &key = property.get_key();
-		const std::string &value = property.get_value();
-		const faction_tier tier = string_to_faction_tier(key);
-		this->title_names[government_type][tier] = value;
-	});
-}
-
 std::string_view civilization::get_character_title_name(const int title_type, const int faction_type, stratagus::government_type government_type, const faction_tier tier, const gender gender) const
 {
 	auto find_iterator = this->character_title_names.find(title_type);
@@ -683,30 +662,7 @@ void civilization::process_character_title_name_scope(const int title_type, cons
 	const int faction_type = GetFactionTypeIdByName(tag);
 
 	scope.for_each_child([&](const sml_data &child_scope) {
-		this->process_character_title_name_scope(title_type, faction_type, child_scope);
-	});
-}
-
-void civilization::process_character_title_name_scope(const int title_type, const int faction_type, const sml_data &scope)
-{
-	const std::string &tag = scope.get_tag();
-	const government_type government_type = string_to_government_type(tag);
-
-	scope.for_each_child([&](const sml_data &child_scope) {
-		this->process_character_title_name_scope(title_type, faction_type, government_type, child_scope);
-	});
-}
-
-void civilization::process_character_title_name_scope(const int title_type, const int faction_type, const government_type government_type, const sml_data &scope)
-{
-	const std::string &tag = scope.get_tag();
-	const faction_tier faction_tier = string_to_faction_tier(tag);
-
-	scope.for_each_property([&](const sml_property &property) {
-		const std::string &key = property.get_key();
-		const std::string &value = property.get_value();
-		const gender gender = string_to_gender(key);
-		this->character_title_names[title_type][faction_type][government_type][faction_tier][gender] = value;
+		faction::process_character_title_name_scope(this->character_title_names[title_type][faction_type], child_scope);
 	});
 }
 

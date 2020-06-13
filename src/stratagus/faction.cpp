@@ -43,6 +43,66 @@
 
 namespace stratagus {
 
+void faction::process_title_names(title_name_map &title_names, const sml_data &scope)
+{
+	scope.for_each_child([&](const sml_data &child_scope) {
+		faction::process_title_name_scope(title_names, child_scope);
+	});
+
+	scope.for_each_property([&](const sml_property &property) {
+		const std::string &key = property.get_key();
+		const std::string &value = property.get_value();
+		stratagus::government_type government_type = string_to_government_type(key);
+		title_names[government_type][faction_tier::none] = value;
+	});
+}
+
+void faction::process_title_name_scope(title_name_map &title_names, const sml_data &scope)
+{
+	const std::string &tag = scope.get_tag();
+	const stratagus::government_type government_type = string_to_government_type(tag);
+
+	scope.for_each_property([&](const sml_property &property) {
+		const std::string &key = property.get_key();
+		const std::string &value = property.get_value();
+		const faction_tier tier = string_to_faction_tier(key);
+		title_names[government_type][tier] = value;
+	});
+}
+
+void faction::process_character_title_name_scope(character_title_name_map &character_title_names, const sml_data &scope)
+{
+	const std::string &tag = scope.get_tag();
+	const int title_type = GetCharacterTitleIdByName(tag);
+
+	scope.for_each_child([&](const sml_data &child_scope) {
+		faction::process_character_title_name_scope(character_title_names[title_type], child_scope);
+	});
+}
+
+void faction::process_character_title_name_scope(std::map<stratagus::government_type, std::map<faction_tier, std::map<gender, std::string>>> &character_title_names, const sml_data &scope)
+{
+	const std::string &tag = scope.get_tag();
+	const stratagus::government_type government_type = string_to_government_type(tag);
+
+	scope.for_each_child([&](const sml_data &child_scope) {
+		faction::process_character_title_name_scope(character_title_names[government_type], child_scope);
+	});
+}
+
+void faction::process_character_title_name_scope(std::map<faction_tier, std::map<gender, std::string>> &character_title_names, const sml_data &scope)
+{
+	const std::string &tag = scope.get_tag();
+	const faction_tier faction_tier = string_to_faction_tier(tag);
+
+	scope.for_each_property([&](const sml_property &property) {
+		const std::string &key = property.get_key();
+		const std::string &value = property.get_value();
+		const gender gender = string_to_gender(key);
+		character_title_names[faction_tier][gender] = value;
+	});
+}
+
 faction::faction(const std::string &identifier)
 	: detailed_data_entry(identifier), default_tier(faction_tier::barony), tier(faction_tier::barony), default_government_type(government_type::monarchy), government_type(government_type::monarchy)
 {
@@ -97,6 +157,12 @@ void faction::process_sml_scope(const sml_data &scope)
 			this->DevelopsFrom.push_back(other_faction);
 			other_faction->DevelopsTo.push_back(this);
 		}
+	} else if (tag == "title_names") {
+		faction::process_title_names(this->title_names, scope);
+	} else if (tag == "character_title_names") {
+		scope.for_each_child([&](const sml_data &child_scope) {
+			faction::process_character_title_name_scope(this->character_title_names, child_scope);
+		});
 	} else {
 		data_entry::process_sml_scope(scope);
 	}

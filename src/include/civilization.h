@@ -196,12 +196,9 @@ public:
 	}
 
 	std::string_view get_title_name(const government_type government_type, const faction_tier tier) const;
-	void process_title_name_scope(const sml_data &scope);
 	std::string_view get_character_title_name(const int title_type, const int faction_type, const government_type government_type, const faction_tier tier, const gender gender) const;
 	void process_character_title_name_scope(const sml_data &scope);
 	void process_character_title_name_scope(const int title_type, const sml_data &scope);
-	void process_character_title_name_scope(const int title_type, const int faction_type, const sml_data &scope);
-	void process_character_title_name_scope(const int title_type, const int faction_type, const government_type government_type, const sml_data &scope);
 
 	std::vector<CForceTemplate *> GetForceTemplates(const ForceType force_type) const;
 	std::vector<CAiBuildingTemplate *> GetAiBuildingTemplates() const;
