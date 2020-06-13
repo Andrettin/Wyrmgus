@@ -654,7 +654,7 @@ void CPlayer::Save(CFile &file) const
 	file.printf("  \"start-map-layer\", %d,\n", p.StartMapLayer);
 	//Wyrmgus end
 	if (p.get_overlord() != nullptr) {
-		file.printf("  \"overlord\", %d, \"%s\",\n", p.get_overlord()->Index, stratagus::vassalage_type_to_string(p.vassalage_type));
+		file.printf("  \"overlord\", %d, \"%s\",\n", p.get_overlord()->Index, stratagus::vassalage_type_to_string(p.vassalage_type).c_str());
 	}
 
 	// Resources
