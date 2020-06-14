@@ -369,7 +369,7 @@ void CMapField::Save(CFile &file) const
 {
 	const stratagus::terrain_feature *terrain_feature = this->get_terrain_feature();
 
-	file.printf("  {\"%s\", \"%s\", %s, %s, \"%s\", \"%s\", %d, %d, %d, %d, %2d, %2d, %2d, \"%s\"", (terrain_feature != nullptr && !terrain_feature->get_terrain_type()->is_overlay()) ? terrain_feature->get_identifier().c_str() : (Terrain ? Terrain->Ident.c_str() : ""), (terrain_feature != nullptr && terrain_feature->get_terrain_type()->is_overlay()) ? terrain_feature->get_identifier().c_str() : (OverlayTerrain ? OverlayTerrain->Ident.c_str() : ""), OverlayTerrainDamaged ? "true" : "false", OverlayTerrainDestroyed ? "true" : "false", playerInfo.SeenTerrain ? playerInfo.SeenTerrain->Ident.c_str() : "", playerInfo.SeenOverlayTerrain ? playerInfo.SeenOverlayTerrain->Ident.c_str() : "", SolidTile, OverlaySolidTile, playerInfo.SeenSolidTile, playerInfo.SeenOverlaySolidTile, Value, cost, Landmass, this->get_settlement() != nullptr ? this->get_settlement()->get_identifier().c_str() : "");
+	file.printf("  {\"%s\", \"%s\", \"%s\", %s, %s, \"%s\", \"%s\", %d, %d, %d, %d, %2d, %2d, %2d, \"%s\"", (Terrain ? Terrain->Ident.c_str() : ""), (OverlayTerrain ? OverlayTerrain->Ident.c_str() : ""), (this->get_terrain_feature() != nullptr ? this->get_terrain_feature()->get_identifier().c_str() : ""), OverlayTerrainDamaged ? "true" : "false", OverlayTerrainDestroyed ? "true" : "false", playerInfo.SeenTerrain ? playerInfo.SeenTerrain->Ident.c_str() : "", playerInfo.SeenOverlayTerrain ? playerInfo.SeenOverlayTerrain->Ident.c_str() : "", SolidTile, OverlaySolidTile, playerInfo.SeenSolidTile, playerInfo.SeenOverlaySolidTile, Value, cost, Landmass, this->get_settlement() != nullptr ? this->get_settlement()->get_identifier().c_str() : "");
 	
 	for (size_t i = 0; i != TransitionTiles.size(); ++i) {
 		file.printf(", \"transition-tile\", \"%s\", %d", TransitionTiles[i].first->Ident.c_str(), TransitionTiles[i].second);
@@ -515,58 +515,48 @@ void CMapField::parse(lua_State *l)
 	this->Value = LuaToNumber(l, -1, 3);
 	this->cost = LuaToNumber(l, -1, 4);
 	*/
-	std::string terrain_ident = LuaToString(l, -1, 1);
+	const std::string terrain_ident = LuaToString(l, -1, 1);
 	if (!terrain_ident.empty()) {
-		const stratagus::terrain_feature *terrain_feature = stratagus::terrain_feature::try_get(terrain_ident);
-		if (terrain_feature != nullptr) {
-			this->Terrain = terrain_feature->get_terrain_type();
-			this->terrain_feature = terrain_feature;
-		} else {
-			this->Terrain = stratagus::terrain_type::get(terrain_ident);
-		}
+		this->Terrain = stratagus::terrain_type::get(terrain_ident);
 	}
 	
-	std::string overlay_terrain_ident = LuaToString(l, -1, 2);
+	const std::string overlay_terrain_ident = LuaToString(l, -1, 2);
 	if (!overlay_terrain_ident.empty()) {
-		const stratagus::terrain_feature *overlay_terrain_feature = stratagus::terrain_feature::try_get(overlay_terrain_ident);
-		if (overlay_terrain_feature != nullptr) {
-			this->OverlayTerrain = overlay_terrain_feature->get_terrain_type();
-			this->terrain_feature = overlay_terrain_feature;
-		} else {
-			this->OverlayTerrain = stratagus::terrain_type::get(overlay_terrain_ident);
-		}
+		this->OverlayTerrain = stratagus::terrain_type::get(overlay_terrain_ident);
 	}
+
+	const std::string terrain_feature_ident = LuaToString(l, -1, 3);
+	if (!terrain_feature_ident.empty()) {
+		this->terrain_feature = stratagus::terrain_feature::get(terrain_feature_ident);
+	}
+
+	this->SetOverlayTerrainDamaged(LuaToBoolean(l, -1, 4));
+	this->SetOverlayTerrainDestroyed(LuaToBoolean(l, -1, 5));
 	
-	this->SetOverlayTerrainDamaged(LuaToBoolean(l, -1, 3));
-	this->SetOverlayTerrainDestroyed(LuaToBoolean(l, -1, 4));
-	
-	std::string seen_terrain_ident = LuaToString(l, -1, 5);
+	std::string seen_terrain_ident = LuaToString(l, -1, 6);
 	if (!seen_terrain_ident.empty()) {
 		this->playerInfo.SeenTerrain = stratagus::terrain_type::get(seen_terrain_ident);
 	}
 	
-	std::string seen_overlay_terrain_ident = LuaToString(l, -1, 6);
+	std::string seen_overlay_terrain_ident = LuaToString(l, -1, 7);
 	if (!seen_overlay_terrain_ident.empty()) {
 		this->playerInfo.SeenOverlayTerrain = stratagus::terrain_type::get(seen_overlay_terrain_ident);
 	}
 	
-	this->SolidTile = LuaToNumber(l, -1, 7);
-	this->OverlaySolidTile = LuaToNumber(l, -1, 8);
-	this->playerInfo.SeenSolidTile = LuaToNumber(l, -1, 9);
-	this->playerInfo.SeenOverlaySolidTile = LuaToNumber(l, -1, 10);
-	this->Value = LuaToNumber(l, -1, 11);
-	this->cost = LuaToNumber(l, -1, 12);
-	this->Landmass = LuaToNumber(l, -1, 13);
-	const std::string settlement_identifier = LuaToString(l, -1, 14);
+	this->SolidTile = LuaToNumber(l, -1, 8);
+	this->OverlaySolidTile = LuaToNumber(l, -1, 9);
+	this->playerInfo.SeenSolidTile = LuaToNumber(l, -1, 10);
+	this->playerInfo.SeenOverlaySolidTile = LuaToNumber(l, -1, 11);
+	this->Value = LuaToNumber(l, -1, 12);
+	this->cost = LuaToNumber(l, -1, 13);
+	this->Landmass = LuaToNumber(l, -1, 14);
+	const std::string settlement_identifier = LuaToString(l, -1, 15);
 	if (!settlement_identifier.empty()) {
 		this->settlement = stratagus::site::get(settlement_identifier);
 	}
 	//Wyrmgus end
 
-	//Wyrmgus start
-//	for (int j = 4; j < len; ++j) {
-	for (int j = 14; j < len; ++j) {
-	//Wyrmgus end
+	for (int j = 15; j < len; ++j) {
 		const char *value = LuaToString(l, -1, j + 1);
 
 		//Wyrmgus start
