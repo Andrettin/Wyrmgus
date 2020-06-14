@@ -57,6 +57,7 @@ class terrain_type final : public named_data_entry, public data_type<terrain_typ
 	Q_PROPERTY(QString elevation_image_file READ get_elevation_image_file_qstring)
 	Q_PROPERTY(bool overlay MEMBER overlay READ is_overlay)
 	Q_PROPERTY(bool buildable MEMBER buildable READ is_buildable)
+	Q_PROPERTY(bool pathway MEMBER pathway READ is_pathway)
 	Q_PROPERTY(bool tiled_background MEMBER tiled_background READ has_tiled_background)
 	Q_PROPERTY(bool transition_mask MEMBER transition_mask READ has_transition_mask)
 	Q_PROPERTY(bool allow_single MEMBER allow_single READ allows_single)
@@ -270,6 +271,11 @@ public:
 		return this->buildable;
 	}
 
+	bool is_pathway() const
+	{
+		return this->pathway;
+	}
+
 	bool has_tiled_background() const
 	{
 		return this->tiled_background;
@@ -402,6 +408,7 @@ public:
 private:
 	bool overlay = false;				/// Whether this terrain type belongs to the overlay layer
 	bool buildable = false;				/// Whether structures can be built upon this terrain type
+	bool pathway = false;
 	bool tiled_background = false;
 	bool transition_mask = false;
 	bool allow_single = false;			/// Whether this terrain type has transitions for single tiles

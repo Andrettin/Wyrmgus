@@ -238,7 +238,8 @@ void CMapField::SetTerrain(stratagus::terrain_type *terrain_type)
 		this->Value = terrain_type->UnitType->MapDefaultStat.Variables[HP_INDEX].Max;
 	}
 	
-	if (this->get_terrain_feature() != nullptr) {
+	//remove the terrain feature, unless it is a trade route and a pathway is being built over it
+	if (this->get_terrain_feature() != nullptr && (!this->get_terrain_feature()->is_trade_route() || !terrain_type->is_pathway())) {
 		this->terrain_feature = nullptr;
 	}
 }
