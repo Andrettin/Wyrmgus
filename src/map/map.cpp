@@ -1789,16 +1789,10 @@ void CMap::SetTileTerrain(const Vec2i &pos, stratagus::terrain_type *terrain, in
 	
 	CMapField &mf = *this->Field(pos, z);
 	
-	stratagus::terrain_type *old_terrain = this->GetTileTerrain(pos, terrain->is_overlay(), z);
+	const stratagus::terrain_type *old_terrain = this->GetTileTerrain(pos, terrain->is_overlay(), z);
 	
-	if (terrain->is_overlay()) {
-		if (mf.OverlayTerrain == terrain) {
-			return;
-		}
-	} else {
-		if (mf.Terrain == terrain) {
-			return;
-		}
+	if (terrain == old_terrain) {
+		return;
 	}
 	
 	mf.SetTerrain(terrain);
@@ -1839,7 +1833,7 @@ void CMap::SetTileTerrain(const Vec2i &pos, stratagus::terrain_type *terrain, in
 				if (Map.Info.IsPointOnMap(adjacent_pos, z)) {
 					CMapField &adjacent_mf = *this->Field(adjacent_pos, z);
 					
-					if (terrain->is_overlay() && adjacent_mf.OverlayTerrain != terrain && Editor.Running == EditorNotRunning) {
+					if (terrain->is_overlay() && adjacent_mf.OverlayTerrain != terrain && adjacent_mf.OverlayTerrain != old_terrain && Editor.Running == EditorNotRunning) {
 						continue;
 					}
 					
@@ -1856,10 +1850,7 @@ void CMap::SetTileTerrain(const Vec2i &pos, stratagus::terrain_type *terrain, in
 	}
 }
 
-//Wyrmgus start
-//void CMap::RemoveTileOverlayTerrain(const Vec2i &pos)
 void CMap::RemoveTileOverlayTerrain(const Vec2i &pos, int z)
-//Wyrmgus end
 {
 	CMapField &mf = *this->Field(pos, z);
 	
