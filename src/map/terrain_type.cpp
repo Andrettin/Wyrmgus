@@ -121,7 +121,7 @@ unsigned long terrain_type::GetTerrainFlagByName(const std::string &flag_name)
 		return MapFieldNoRail;
 	} else if (flag_name == "snow") {
 		return MapFieldSnow;
-	} else if (flag_name == "stone-floor") {
+	} else if (flag_name == "stone_floor") {
 		return MapFieldStoneFloor;
 	} else if (flag_name == "stumps") {
 		return MapFieldStumps;

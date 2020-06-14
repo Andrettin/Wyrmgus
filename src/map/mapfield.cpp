@@ -459,7 +459,7 @@ void CMapField::Save(CFile &file) const
 		file.printf(", \"snow\"");
 	}
 	if (Flags & MapFieldStoneFloor) {
-		file.printf(", \"stone-floor\"");
+		file.printf(", \"stone_floor\"");
 	}
 	if (Flags & MapFieldStumps) {
 		file.printf(", \"stumps\"");
@@ -651,7 +651,7 @@ void CMapField::parse(lua_State *l)
 			this->Flags |= MapFieldNoRail;
 		} else if (!strcmp(value, "snow")) {
 			this->Flags |= MapFieldSnow;
-		} else if (!strcmp(value, "stone-floor")) {
+		} else if (!strcmp(value, "stone_floor")) {
 			this->Flags |= MapFieldStoneFloor;
 		} else if (!strcmp(value, "stumps")) {
 			this->Flags |= MapFieldStumps;
