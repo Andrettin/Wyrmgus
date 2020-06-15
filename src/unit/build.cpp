@@ -36,6 +36,7 @@
 #include "editor.h"
 #include "map/map.h"
 #include "map/map_layer.h"
+#include "map/terrain_feature.h"
 #include "map/terrain_type.h"
 #include "map/tileset.h"
 #include "player.h"
@@ -499,12 +500,22 @@ CUnit *CanBuildHere(const CUnit *unit, const stratagus::unit_type &type, const V
 		}
 	}
 	
-	if (unit) {
-		for (int x = pos.x; x < pos.x + type.get_tile_width(); ++x) {
-			for (int y = pos.y; y < pos.y + type.get_tile_height(); ++y) {
-				if (CMap::Map.Info.IsPointOnMap(x, y, z) && CMap::Map.Field(x, y, z)->get_owner() != nullptr && CMap::Map.Field(x, y, z)->get_owner() != unit->Player) {
-					return nullptr;
-				}
+	for (int x = pos.x; x < pos.x + type.get_tile_width(); ++x) {
+		for (int y = pos.y; y < pos.y + type.get_tile_height(); ++y) {
+			const QPoint tile_pos(x, y);
+
+			if (!CMap::Map.Info.IsPointOnMap(tile_pos, z)) {
+				continue;
+			}
+
+			const CMapField *tile = CMap::Map.Field(tile_pos, z);
+			if (unit != nullptr && tile->get_owner() != nullptr && tile->get_owner() != unit->Player) {
+				return nullptr;
+			}
+
+			//cannot build anything other than pathways on trade routes
+			if (tile->get_terrain_feature() != nullptr && tile->get_terrain_feature()->is_trade_route() && (type.TerrainType == nullptr || !type.TerrainType->is_pathway())) {
+				return nullptr;
 			}
 		}
 	}
