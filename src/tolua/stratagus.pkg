@@ -62,7 +62,7 @@ function GameStarting()
 end
 $]
 
-#define MaxCosts 18
+#define MaxCosts 20
 #define FoodCost MaxCosts
 #define ScoreCost MaxCosts + 1
 #define ManaResCost MaxCosts + 2
