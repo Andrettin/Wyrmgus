@@ -227,12 +227,10 @@ void CMap::Reveal(bool only_person_players)
 		//  Reveal neutral buildings. Gold mines:)
 		if (unit.Player->Type == PlayerNeutral) {
 			for (int p = 0; p < PlayerMax; ++p) {
-				//Wyrmgus start
-//				if (CPlayer::Players[p]->Type != PlayerNobody && (!(unit.Seen.ByPlayer & (1 << p)))) {
-				if (CPlayer::Players[p]->Type != PlayerNobody && (CPlayer::Players[p]->Type == PlayerPerson || !only_person_players) && (!(unit.Seen.ByPlayer & (1 << p)))) {
-				//Wyrmgus end
-					UnitGoesOutOfFog(unit, *CPlayer::Players[p]);
-					UnitGoesUnderFog(unit, *CPlayer::Players[p]);
+				const CPlayer *player = CPlayer::Players[p];
+				if (player->Type != PlayerNobody && (player->Type == PlayerPerson || !only_person_players) && !unit.is_seen_by_player(p)) {
+					UnitGoesOutOfFog(unit, *player);
+					UnitGoesUnderFog(unit, *player);
 				}
 			}
 		}

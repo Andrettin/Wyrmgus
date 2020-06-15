@@ -639,11 +639,11 @@ void CPlayer::Save(CFile &file) const
 
 	file.printf(" \"enemy\", \"");
 	for (int j = 0; j < PlayerMax; ++j) {
-		file.printf("%c", (p.Enemy & (1 << j)) ? 'X' : '_');
+		file.printf("%c", p.enemies.contains(j) ? 'X' : '_');
 	}
 	file.printf("\", \"allied\", \"");
 	for (int j = 0; j < PlayerMax; ++j) {
-		file.printf("%c", (p.Allied & (1 << j)) ? 'X' : '_');
+		file.printf("%c", p.allies.contains(j) ? 'X' : '_');
 	}
 	file.printf("\", \"shared-vision\", \"");
 	for (int j = 0; j < PlayerMax; ++j) {
@@ -1017,12 +1017,13 @@ void CPlayer::Init(/* PlayerTypes */ int type)
 	this->overlord = nullptr;
 	this->vassalage_type = stratagus::vassalage_type::none;
 	this->Team = team;
-	this->Enemy = 0;
-	this->Allied = 0;
+	this->enemies.clear();
+	this->allies.clear();
 	this->AiName = "ai-passive";
 
 	//  Calculate enemy/allied mask.
 	for (int i = 0; i < NumPlayers; ++i) {
+		CPlayer *other_player = CPlayer::Players[i];
 		switch (type) {
 			case PlayerNeutral:
 			case PlayerNobody:
@@ -1030,45 +1031,37 @@ void CPlayer::Init(/* PlayerTypes */ int type)
 				break;
 			case PlayerComputer:
 				// Computer allied with computer and enemy of all persons.
-				//Wyrmgus start
-				/*
-				if (CPlayer::Players[i]->Type == PlayerComputer) {
-					this->Allied |= (1 << i);
-					CPlayer::Players[i]->Allied |= (1 << NumPlayers);
-				} else if (CPlayer::Players[i]->Type == PlayerPerson || CPlayer::Players[i]->Type == PlayerRescueActive) {
-				*/
 				// make computer players be hostile to each other by default
-				if (CPlayer::Players[i]->Type == PlayerComputer || CPlayer::Players[i]->Type == PlayerPerson || CPlayer::Players[i]->Type == PlayerRescueActive) {
-				//Wyrmgus end
-					this->Enemy |= (1 << i);
-					CPlayer::Players[i]->Enemy |= (1 << NumPlayers);
+				if (other_player->Type == PlayerComputer || other_player->Type == PlayerPerson || other_player->Type == PlayerRescueActive) {
+					this->enemies.insert(i);
+					other_player->enemies.insert(NumPlayers);
 				}
 				break;
 			case PlayerPerson:
 				// Humans are enemy of all?
-				if (CPlayer::Players[i]->Type == PlayerComputer || CPlayer::Players[i]->Type == PlayerPerson) {
-					this->Enemy |= (1 << i);
-					CPlayer::Players[i]->Enemy |= (1 << NumPlayers);
-				} else if (CPlayer::Players[i]->Type == PlayerRescueActive || CPlayer::Players[i]->Type == PlayerRescuePassive) {
-					this->Allied |= (1 << i);
-					CPlayer::Players[i]->Allied |= (1 << NumPlayers);
+				if (other_player->Type == PlayerComputer || other_player->Type == PlayerPerson) {
+					this->enemies.insert(i);
+					other_player->enemies.insert(NumPlayers);
+				} else if (other_player->Type == PlayerRescueActive || other_player->Type == PlayerRescuePassive) {
+					this->allies.insert(i);
+					other_player->allies.insert(NumPlayers);
 				}
 				break;
 			case PlayerRescuePassive:
 				// Rescue passive are allied with persons
-				if (CPlayer::Players[i]->Type == PlayerPerson) {
-					this->Allied |= (1 << i);
-					CPlayer::Players[i]->Allied |= (1 << NumPlayers);
+				if (other_player->Type == PlayerPerson) {
+					this->allies.insert(i);
+					other_player->allies.insert(NumPlayers);
 				}
 				break;
 			case PlayerRescueActive:
 				// Rescue active are allied with persons and enemies of computer
-				if (CPlayer::Players[i]->Type == PlayerComputer) {
-					this->Enemy |= (1 << i);
-					CPlayer::Players[i]->Enemy |= (1 << NumPlayers);
-				} else if (CPlayer::Players[i]->Type == PlayerPerson) {
-					this->Allied |= (1 << i);
-					CPlayer::Players[i]->Allied |= (1 << NumPlayers);
+				if (other_player->Type == PlayerComputer) {
+					this->enemies.insert(i);
+					other_player->enemies.insert(NumPlayers);
+				} else if (other_player->Type == PlayerPerson) {
+					this->allies.insert(i);
+					other_player->allies.insert(NumPlayers);
 				}
 				break;
 		}
@@ -2097,8 +2090,8 @@ void CPlayer::Clear()
 	this->vassals.clear();
 	this->AiName.clear();
 	this->Team = 0;
-	this->Enemy = 0;
-	this->Allied = 0;
+	this->enemies.clear();
+	this->allies.clear();
 	this->shared_vision.clear();
 	this->StartPos.x = 0;
 	this->StartPos.y = 0;
@@ -3903,9 +3896,9 @@ void CPlayer::Notify(const char *fmt, ...) const
 
 void CPlayer::SetDiplomacyNeutralWith(const CPlayer &player)
 {
-	this->Enemy &= ~(1 << player.Index);
-	this->Allied &= ~(1 << player.Index);
-	
+	this->enemies.erase(player.Index);
+	this->allies.erase(player.Index);
+
 	//Wyrmgus start
 	if (GameCycle > 0 && player.Index == CPlayer::GetThisPlayer()->Index) {
 		CPlayer::GetThisPlayer()->Notify(_("%s changed their diplomatic stance with us to Neutral"), _(this->Name.c_str()));
@@ -3915,8 +3908,8 @@ void CPlayer::SetDiplomacyNeutralWith(const CPlayer &player)
 
 void CPlayer::SetDiplomacyAlliedWith(const CPlayer &player)
 {
-	this->Enemy &= ~(1 << player.Index);
-	this->Allied |= 1 << player.Index;
+	this->enemies.erase(player.Index);
+	this->allies.insert(player.Index);
 	
 	if (GameCycle > 0 && player.Index == CPlayer::GetThisPlayer()->Index) {
 		CPlayer::GetThisPlayer()->Notify(_("%s changed their diplomatic stance with us to Ally"), _(this->Name.c_str()));
@@ -3925,8 +3918,8 @@ void CPlayer::SetDiplomacyAlliedWith(const CPlayer &player)
 
 void CPlayer::SetDiplomacyEnemyWith(CPlayer &player)
 {
-	this->Enemy |= 1 << player.Index;
-	this->Allied &= ~(1 << player.Index);
+	this->enemies.insert(player.Index);
+	this->allies.erase(player.Index);
 	
 	if (GameCycle > 0) {
 		if (player.Index == CPlayer::GetThisPlayer()->Index) {
@@ -3955,8 +3948,8 @@ void CPlayer::SetDiplomacyEnemyWith(CPlayer &player)
 
 void CPlayer::SetDiplomacyCrazyWith(const CPlayer &player)
 {
-	this->Enemy |= 1 << player.Index;
-	this->Allied |= 1 << player.Index;
+	this->enemies.insert(player.Index);
+	this->allies.insert(player.Index);
 	
 	if (GameCycle > 0 && player.Index == CPlayer::GetThisPlayer()->Index) {
 		CPlayer::GetThisPlayer()->Notify(_("%s changed their diplomatic stance with us to Crazy"), _(this->Name.c_str()));

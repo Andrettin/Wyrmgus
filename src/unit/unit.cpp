@@ -259,11 +259,6 @@
 **              keeping track of dead units under fog. We only keep track of units
 **              that are visible under fog with this.
 **
-**  CUnit::Destroyed
-**
-** @todo docu.
-**  If you need more information, please send me an email or write it self.
-**
 **  CUnit::Removed
 **
 **  This flag means the unit is not active on map. This flag
@@ -496,7 +491,7 @@ void CUnit::Init()
 	Boarded = 0;
 	RescuedFrom = nullptr;
 	memset(VisCount, 0, sizeof(VisCount));
-	memset(&Seen, 0, sizeof(Seen));
+	this->Seen = _seen_stuff_();
 	this->Variable.clear();
 	TTL = 0;
 	Threshold = 0;
@@ -4405,7 +4400,7 @@ void UnitGoesUnderFog(CUnit &unit, const CPlayer &player)
 		// it's sort of the whole point of this tracking.
 		//
 		if (unit.Destroyed) {
-			unit.Seen.Destroyed |= (1 << player.Index);
+			unit.Seen.destroyed.insert(player.Index);
 		}
 		if (&player == CPlayer::GetThisPlayer()) {
 			UnitFillSeenValues(unit);
@@ -4431,12 +4426,12 @@ void UnitGoesOutOfFog(CUnit &unit, const CPlayer &player)
 	if (!unit.Type->BoolFlag[VISIBLEUNDERFOG_INDEX].value) {
 		return;
 	}
-	if (unit.Seen.ByPlayer & (1 << (player.Index))) {
-		if ((player.Type == PlayerPerson) && (!(unit.Seen.Destroyed & (1 << player.Index)))) {
+	if (unit.is_seen_by_player(&player)) {
+		if ((player.Type == PlayerPerson) && !unit.is_seen_destroyed_by_player(&player)) {
 			unit.RefsDecrease();
 		}
 	} else {
-		unit.Seen.ByPlayer |= (1 << (player.Index));
+		unit.Seen.by_player.insert(player.Index);
 	}
 }
 
@@ -4578,8 +4573,8 @@ bool CUnit::IsVisibleOnMinimap() const
 	}
 
 	return this->Type->BoolFlag[VISIBLEUNDERFOG_INDEX].value && Seen.State != 3
-		&& (Seen.ByPlayer & (1 << CPlayer::GetThisPlayer()->Index))
-		&& !(Seen.Destroyed & (1 << CPlayer::GetThisPlayer()->Index))
+		&& this->is_seen_by_player(CPlayer::GetThisPlayer())
+		&& !this->is_seen_destroyed_by_player(CPlayer::GetThisPlayer())
 		&& !Destroyed
 		&& CMap::Map.Info.IsPointOnMap(this->tilePos, this->MapLayer)
 		&& this->MapLayer->Field(this->tilePos)->playerInfo.IsTeamExplored(*CPlayer::GetThisPlayer());
@@ -4643,8 +4638,8 @@ bool CUnit::IsVisibleInViewport(const CViewport &vp) const
 	} else {
 		// Unit has to be 'discovered'
 		// Destroyed units ARE visible under fog of war, if we haven't seen them like that.
-		if (!Destroyed || !(Seen.Destroyed & (1 << CPlayer::GetThisPlayer()->Index))) {
-			return (Type->BoolFlag[VISIBLEUNDERFOG_INDEX].value && (Seen.ByPlayer & (1 << CPlayer::GetThisPlayer()->Index)));
+		if (!Destroyed || !this->is_seen_destroyed_by_player(CPlayer::GetThisPlayer())) {
+			return this->Type->BoolFlag[VISIBLEUNDERFOG_INDEX].value && this->is_seen_by_player(CPlayer::GetThisPlayer());
 		} else {
 			return false;
 		}
@@ -6638,6 +6633,16 @@ const stratagus::time_of_day *CUnit::get_center_tile_time_of_day() const
 
 	//get the time of day for the unit's tile
 	return this->MapLayer->get_tile_time_of_day(this->get_center_tile_pos());
+}
+
+bool CUnit::is_seen_by_player(const CPlayer *player) const
+{
+	return this->is_seen_by_player(player->Index);
+}
+
+bool CUnit::is_seen_destroyed_by_player(const CPlayer *player) const
+{
+	return this->is_seen_destroyed_by_player(player->Index);
 }
 
 /**

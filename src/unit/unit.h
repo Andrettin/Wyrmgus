@@ -29,6 +29,7 @@
 
 #include "item_slot.h"
 #include "player.h"
+#include "player_container.h"
 #include "unit/unit_type.h"
 #include "unit/unit_variable.h"
 #include "vec2i.h"
@@ -301,8 +302,8 @@ public:
 			return IsAliveOnMap();
 		} else {
 			return Type->BoolFlag[VISIBLEUNDERFOG_INDEX].value
-				   && (Seen.ByPlayer & (1 << player.Index))
-				   && !(Seen.Destroyed & (1 << player.Index));
+				   && this->is_seen_by_player(&player)
+				   && !this->is_seen_destroyed_by_player(&player);
 		}
 	}
 
@@ -475,6 +476,20 @@ public:
 
 	const stratagus::time_of_day *get_center_tile_time_of_day() const;
 
+	bool is_seen_by_player(const CPlayer *player) const;
+
+	bool is_seen_by_player(const int index) const
+	{
+		return this->Seen.by_player.contains(index);
+	}
+
+	bool is_seen_destroyed_by_player(const CPlayer *player) const;
+
+	bool is_seen_destroyed_by_player(const int index) const
+	{
+		return this->Seen.destroyed.contains(index);
+	}
+
 public:
 	class CUnitManagerData
 	{
@@ -594,15 +609,15 @@ public:
 	/* Seen stuff. */
 	int VisCount[PlayerMax];     /// Unit visibility counts
 	struct _seen_stuff_ {
-		const CConstructionFrame *CFrame = nullptr;  /// Seen construction frame
-		int         Frame;                  /// last seen frame/stage of buildings
-		const stratagus::unit_type *Type = nullptr;             /// Pointer to last seen unit-type
-		Vec2i       tilePos = Vec2i(-1, -1);                /// Last unit->tilePos Seen
-		QPoint pixel_offset;                /// seen pixel image displacement to map position
-		unsigned    UnderConstruction : 1;        /// Unit seen construction
-		unsigned    State : 3;              /// Unit seen build/upgrade state
-unsigned    Destroyed : PlayerMax;  /// Unit seen destroyed or not
-unsigned    ByPlayer : PlayerMax;   /// Track unit seen by player
+		const CConstructionFrame *CFrame = nullptr; /// Seen construction frame
+		int Frame = 0; /// last seen frame/stage of buildings
+		const stratagus::unit_type *Type = nullptr; /// Pointer to last seen unit-type
+		Vec2i tilePos = Vec2i(-1, -1); /// Last unit->tilePos Seen
+		QPoint pixel_offset = QPoint(0, 0); /// seen pixel image displacement to map position
+		unsigned UnderConstruction : 1 = 0; /// Unit seen construction
+		unsigned State : 3 = 0; /// Unit seen build/upgrade state
+		stratagus::player_index_set destroyed;  /// Unit seen destroyed or not
+		stratagus::player_index_set by_player;   /// Track unit seen by player
 	} Seen;
 
 	std::vector<stratagus::unit_variable> Variable; /// array of User Defined variables.

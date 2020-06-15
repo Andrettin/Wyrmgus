@@ -514,22 +514,22 @@ static int CclUnit(lua_State *l)
 			unit->RescuedFrom = CPlayer::Players[LuaToNumber(l, 2, j + 1)];
 		} else if (!strcmp(value, "seen-by-player")) {
 			const char *s = LuaToString(l, 2, j + 1);
-			unit->Seen.ByPlayer = 0;
+			unit->Seen.by_player.clear();
 			for (int i = 0; i < PlayerMax && *s; ++i, ++s) {
 				if (*s == '-' || *s == '_' || *s == ' ') {
-					unit->Seen.ByPlayer &= ~(1 << i);
+					unit->Seen.by_player.erase(i);
 				} else {
-					unit->Seen.ByPlayer |= (1 << i);
+					unit->Seen.by_player.insert(i);
 				}
 			}
 		} else if (!strcmp(value, "seen-destroyed")) {
 			const char *s = LuaToString(l, 2, j + 1);
-			unit->Seen.Destroyed = 0;
+			unit->Seen.destroyed.clear();
 			for (int i = 0; i < PlayerMax && *s; ++i, ++s) {
 				if (*s == '-' || *s == '_' || *s == ' ') {
-					unit->Seen.Destroyed &= ~(1 << i);
+					unit->Seen.destroyed.erase(i);
 				} else {
-					unit->Seen.Destroyed |= (1 << i);
+					unit->Seen.destroyed.insert(i);
 				}
 			}
 		} else if (!strcmp(value, "under-construction")) {

@@ -844,8 +844,8 @@ static void DrawInformations(const CUnit &unit, const stratagus::unit_type &type
 #if 0 && DEBUG // This is for showing vis counts and refs.
 	char buf[10];
 	sprintf(buf, "%d%c%c%d", unit.VisCount[ThisPlayer->Index],
-			unit.Seen.ByPlayer & (1 << ThisPlayer->Index) ? 'Y' : 'N',
-			unit.Seen.Destroyed & (1 << ThisPlayer->Index) ? 'Y' : 'N',
+			unit.is_seen_by_player(ThisPlayer) ? 'Y' : 'N',
+			unit.is_seen_destroyed_by_player(ThisPlayer) ? 'Y' : 'N',
 			unit.Refs);
 	CLabel(GetSmallFont()).Draw(screenPos.x + 10, screenPos.y + 10, buf);
 #endif

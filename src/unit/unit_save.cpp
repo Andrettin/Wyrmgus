@@ -257,12 +257,12 @@ void SaveUnit(const CUnit &unit, CFile &file)
 	}
 	file.printf(" \"seen-by-player\", \"");
 	for (int i = 0; i < PlayerMax; ++i) {
-		file.printf("%c", (unit.Seen.ByPlayer & (1 << i)) ? 'X' : '_');
+		file.printf("%c", unit.is_seen_by_player(i) ? 'X' : '_');
 	}
 	file.printf("\",\n ");
 	file.printf(" \"seen-destroyed\", \"");
 	for (int i = 0; i < PlayerMax; ++i) {
-		file.printf("%c", (unit.Seen.Destroyed & (1 << i)) ? 'X' : '_');
+		file.printf("%c", unit.is_seen_destroyed_by_player(i) ? 'X' : '_');
 	}
 	file.printf("\",\n ");
 	if (unit.UnderConstruction) {

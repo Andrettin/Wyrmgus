@@ -168,18 +168,18 @@ void CPlayer::Load(lua_State *l)
 			value = LuaToString(l, j + 1);
 			for (int i = 0; i < PlayerMax && *value; ++i, ++value) {
 				if (*value == '-' || *value == '_' || *value == ' ') {
-					this->Enemy &= ~(1 << i);
+					this->enemies.erase(i);
 				} else {
-					this->Enemy |= (1 << i);
+					this->enemies.insert(i);
 				}
 			}
 		} else if (!strcmp(value, "allied")) {
 			value = LuaToString(l, j + 1);
 			for (int i = 0; i < PlayerMax && *value; ++i, ++value) {
 				if (*value == '-' || *value == '_' || *value == ' ') {
-					this->Allied &= ~(1 << i);
+					this->allies.erase(i);
 				} else {
-					this->Allied |= (1 << i);
+					this->allies.insert(i);
 				}
 			}
 		} else if (!strcmp(value, "shared-vision")) {

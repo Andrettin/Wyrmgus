@@ -62,19 +62,13 @@ function GameStarting()
 end
 $]
 
-//Wyrmgus start
-//#define MaxCosts 7
 #define MaxCosts 18
-//Wyrmgus end
 #define FoodCost MaxCosts
 #define ScoreCost MaxCosts + 1
 #define ManaResCost MaxCosts + 2
 #define FreeWorkersCount MaxCosts + 3
 #define MaxResourceInfo MaxCosts + 4
-//Wyrmgus start
-//#define PlayerMax 16
 #define PlayerMax 32
-//Wyrmgus end
 #define PlayerNumNeutral (PlayerMax - 1)
 #define InfiniteRepairRange 0x7FFFFFFF
 

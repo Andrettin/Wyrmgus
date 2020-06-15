@@ -27,6 +27,7 @@
 
 #pragma once
 
+#include "player_container.h"
 #include "ui/button_cmd.h"
 #include "ui/icon.h"
 //Wyrmgus start
@@ -437,7 +438,7 @@ public:
 	*/
 	bool IsEnemy(const int index) const
 	{
-		return (Index != index && (Enemy & (1 << index)) != 0);
+		return this->Index != index && this->enemies.contains(index);
 	}
 
 	bool IsEnemy(const CPlayer &player) const;
@@ -445,14 +446,14 @@ public:
 
 	bool IsAllied(const int index) const
 	{
-		return (this->Index != index && (this->Allied & (1 << index)) != 0);
+		return this->Index != index && this->allies.contains(index);
 	}
 
 	bool IsAllied(const CPlayer &player) const;
 	bool IsAllied(const CUnit &unit) const;
 	bool IsVisionSharing() const;
 
-	const std::set<int> &get_shared_vision() const
+	const stratagus::player_index_set &get_shared_vision() const
 	{
 		return this->shared_vision;
 	}
@@ -576,9 +577,9 @@ public:
 
 private:
 	std::vector<CUnit *> Units; /// units of this player
-	unsigned int Enemy = 0;     /// enemy bit field for this player
-	unsigned int Allied = 0;    /// allied bit field for this player
-	std::set<int> shared_vision; /// set of player indexes that this player has shared vision with
+	stratagus::player_index_set enemies; //enemies for this player
+	stratagus::player_index_set allies; //allies for this player
+	stratagus::player_index_set shared_vision; //set of player indexes that this player has shared vision with
 
 	friend void CleanPlayers();
 	friend void SetPlayersPalette();
