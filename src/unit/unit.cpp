@@ -3901,7 +3901,7 @@ startw:
 //			if (UnitTypeCanBeAt(type, pos)) {
 			if (
 				(UnitTypeCanBeAt(type, pos, z) || (type.BoolFlag[BUILDING_INDEX].value && OnTopDetails(type, nullptr) && !ignore_construction_requirements))
-				&& (!type.BoolFlag[BUILDING_INDEX].value || ignore_construction_requirements || CanBuildHere(nullptr, type, pos, z, no_bordering_building) != nullptr)
+				&& (!type.BoolFlag[BUILDING_INDEX].value || ignore_construction_requirements || CanBuildUnitType(nullptr, type, pos, 1, true, z, no_bordering_building) != nullptr)
 				&& (settlement == nullptr || CMap::Map.is_rect_in_settlement(QRect(pos, type.get_tile_size()), z, settlement))
 			) {
 			//Wyrmgus end
@@ -3915,7 +3915,7 @@ starts:
 //			if (UnitTypeCanBeAt(type, pos)) {
 			if (
 				(UnitTypeCanBeAt(type, pos, z) || (type.BoolFlag[BUILDING_INDEX].value && OnTopDetails(type, nullptr) && !ignore_construction_requirements))
-				&& (!type.BoolFlag[BUILDING_INDEX].value || ignore_construction_requirements || CanBuildHere(nullptr, type, pos, z, no_bordering_building) != nullptr)
+				&& (!type.BoolFlag[BUILDING_INDEX].value || ignore_construction_requirements || CanBuildUnitType(nullptr, type, pos, 1, true, z, no_bordering_building) != nullptr)
 				&& (settlement == nullptr || CMap::Map.is_rect_in_settlement(QRect(pos, type.get_tile_size()), z, settlement))
 			) {
 			//Wyrmgus end
@@ -3929,7 +3929,7 @@ starte:
 //			if (UnitTypeCanBeAt(type, pos)) {
 			if (
 				(UnitTypeCanBeAt(type, pos, z) || (type.BoolFlag[BUILDING_INDEX].value && OnTopDetails(type, nullptr) && !ignore_construction_requirements))
-				&& (!type.BoolFlag[BUILDING_INDEX].value || ignore_construction_requirements || CanBuildHere(nullptr, type, pos, z, no_bordering_building) != nullptr)
+				&& (!type.BoolFlag[BUILDING_INDEX].value || ignore_construction_requirements || CanBuildUnitType(nullptr, type, pos, 1, true, z, no_bordering_building) != nullptr)
 				&& (settlement == nullptr || CMap::Map.is_rect_in_settlement(QRect(pos, type.get_tile_size()), z, settlement))
 			) {
 			//Wyrmgus end
@@ -3943,7 +3943,7 @@ startn:
 //			if (UnitTypeCanBeAt(type, pos)) {
 			if (
 				(UnitTypeCanBeAt(type, pos, z) || (type.BoolFlag[BUILDING_INDEX].value && OnTopDetails(type, nullptr) && !ignore_construction_requirements))
-				&& (!type.BoolFlag[BUILDING_INDEX].value || ignore_construction_requirements || CanBuildHere(nullptr, type, pos, z, no_bordering_building) != nullptr)
+				&& (!type.BoolFlag[BUILDING_INDEX].value || ignore_construction_requirements || CanBuildUnitType(nullptr, type, pos, 1, true, z, no_bordering_building) != nullptr)
 				&& (settlement == nullptr || CMap::Map.is_rect_in_settlement(QRect(pos, type.get_tile_size()), z, settlement))
 			) {
 			//Wyrmgus end

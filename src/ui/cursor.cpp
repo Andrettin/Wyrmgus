@@ -167,6 +167,7 @@ void DrawBuildingCursor()
 	const CViewport &vp = *UI.MouseViewport;
 	const Vec2i mpos = vp.ScreenToTilePos(CursorScreenPos);
 	const PixelPos screenPos = vp.TilePosToScreen_TopLeft(mpos);
+	const int z = UI.CurrentMapLayer->ID;
 
 	CUnit *ontop = nullptr;
 
@@ -262,15 +263,12 @@ void DrawBuildingCursor()
 	if (!Selected.empty()) {
 		f = 1;
 		for (size_t i = 0; f && i < Selected.size(); ++i) {
-			//Wyrmgus start
-//			f = ((ontop = CanBuildHere(Selected[i], *CursorBuilding, mpos)) != nullptr);
-			f = ((ontop = CanBuildHere(Selected[i], *CursorBuilding, mpos, UI.CurrentMapLayer->ID)) != nullptr);
-			//Wyrmgus end
+			f = ((ontop = CanBuildHere(Selected[i], *CursorBuilding, mpos, z)) != nullptr);
 			// Assign ontop or null
 			ontop = (ontop == Selected[i] ? nullptr : ontop);
 		}
 	} else {
-		f = ((ontop = CanBuildHere(NoUnitP, *CursorBuilding, mpos, UI.CurrentMapLayer->ID)) != nullptr);
+		f = ((ontop = CanBuildHere(NoUnitP, *CursorBuilding, mpos, z)) != nullptr);
 		if (!Editor.Running || ontop == (CUnit *)1) {
 			ontop = nullptr;
 		}
@@ -292,10 +290,7 @@ void DrawBuildingCursor()
 			if (f && (ontop ||
 					  CanBuildOn(posIt, MapFogFilterFlags(*CPlayer::GetThisPlayer(), posIt,
 														  mask & ((!Selected.empty() && Selected[0]->tilePos == posIt) ?
-																  //Wyrmgus start
-//																  ~(MapFieldLandUnit | MapFieldSeaUnit) : -1))))
-																  ~(MapFieldLandUnit | MapFieldSeaUnit) : -1), UI.CurrentMapLayer->ID), UI.CurrentMapLayer->ID))
-																  //Wyrmgus end
+																  ~(MapFieldLandUnit | MapFieldSeaUnit) : -1), z), z, CPlayer::GetThisPlayer(), CursorBuilding))
 				&& UI.CurrentMapLayer->Field(posIt)->playerInfo.IsTeamExplored(*CPlayer::GetThisPlayer())) {
 				color = ColorGreen;
 			} else {

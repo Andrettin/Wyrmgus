@@ -489,7 +489,6 @@ CUnit *CanBuildHere(const CUnit *unit, const stratagus::unit_type &type, const V
 		return nullptr;
 	}
 	
-	//Wyrmgus start
 	if (no_bordering_building && !OnTopDetails(type, nullptr)) { // if a game is starting, only place buildings with a certain space from other buildings
 		for (int x = pos.x - 1; x < pos.x + type.get_tile_width() + 1; ++x) {
 			for (int y = pos.y - 1; y < pos.y + type.get_tile_height() + 1; ++y) {
@@ -499,27 +498,6 @@ CUnit *CanBuildHere(const CUnit *unit, const stratagus::unit_type &type, const V
 			}
 		}
 	}
-	
-	for (int x = pos.x; x < pos.x + type.get_tile_width(); ++x) {
-		for (int y = pos.y; y < pos.y + type.get_tile_height(); ++y) {
-			const QPoint tile_pos(x, y);
-
-			if (!CMap::Map.Info.IsPointOnMap(tile_pos, z)) {
-				continue;
-			}
-
-			const CMapField *tile = CMap::Map.Field(tile_pos, z);
-			if (unit != nullptr && tile->get_owner() != nullptr && tile->get_owner() != unit->Player) {
-				return nullptr;
-			}
-
-			//cannot build anything other than pathways on trade routes
-			if (tile->get_terrain_feature() != nullptr && tile->get_terrain_feature()->is_trade_route() && (type.TerrainType == nullptr || !type.TerrainType->is_pathway())) {
-				return nullptr;
-			}
-		}
-	}
-	//Wyrmgus end
 
 	// Must be checked before oil!
 	if (type.BoolFlag[SHOREBUILDING_INDEX].value) {
@@ -611,9 +589,28 @@ CUnit *CanBuildHere(const CUnit *unit, const stratagus::unit_type &type, const V
 **
 **  @return true if we can build on this point.
 */
-bool CanBuildOn(const Vec2i &pos, int mask, int z)
+bool CanBuildOn(const QPoint &pos, const int mask, const int z, const CPlayer *player, const stratagus::unit_type *unit_type)
 {
-	return (CMap::Map.Info.IsPointOnMap(pos, z) && !CMap::Map.Field(pos, z)->CheckMask(mask));
+	if (!CMap::Map.Info.IsPointOnMap(pos, z)) {
+		return false;
+	}
+
+	const CMapField *tile = CMap::Map.Field(pos, z);
+
+	if (tile->CheckMask(mask)) {
+		return false;
+	}
+
+	if (player != nullptr && tile->get_owner() != nullptr && tile->get_owner() != player) {
+		return false;
+	}
+
+	//cannot build anything other than pathways on trade routes
+	if (tile->get_terrain_feature() != nullptr && tile->get_terrain_feature()->is_trade_route() && (unit_type->TerrainType == nullptr || !unit_type->TerrainType->is_pathway())) {
+		return false;
+	}
+
+	return true;
 }
 
 /**

@@ -758,7 +758,7 @@ unsigned char CMapFieldPlayerInfo::TeamVisibilityState(const CPlayer &player) co
 		maxVision = 1;
 	}
 
-	for (int i : player.get_shared_vision()) {
+	for (const int i : player.get_shared_vision()) {
 		if (player.has_mutual_shared_vision_with(*CPlayer::Players[i])) {
 			maxVision = std::max<unsigned char>(maxVision, Visible[i]);
 			if (maxVision >= 2) {

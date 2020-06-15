@@ -789,12 +789,9 @@ extern CBuildRestrictionOnTop *OnTopDetails(const stratagus::unit_type &type, co
 /// @todo more docu
 extern CUnit *CanBuildHere(const CUnit *unit, const stratagus::unit_type &type, const Vec2i &pos, int z, bool no_bordering_building = false);
 /// @todo more docu
-//Wyrmgus start
-//extern bool CanBuildOn(const Vec2i &pos, int mask);
-extern bool CanBuildOn(const Vec2i &pos, int mask, int z);
-//Wyrmgus end
+extern bool CanBuildOn(const QPoint &pos, const int mask, const int z, const CPlayer *player, const stratagus::unit_type *unit_type);
 /// FIXME: more docu
-extern CUnit *CanBuildUnitType(const CUnit *unit, const stratagus::unit_type &type, const Vec2i &pos, int real, bool ignore_exploration, int z);
+extern CUnit *CanBuildUnitType(const CUnit *unit, const stratagus::unit_type &type, const Vec2i &pos, int real, bool ignore_exploration, int z, const bool no_bordering_building = false);
 /// Get the suitable animation frame depends of unit's damaged type.
 extern int ExtraDeathIndex(const char *death);
 
