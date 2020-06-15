@@ -141,7 +141,7 @@ extern const char NameLine[];
 --  Some limits
 ----------------------------------------------------------------------------*/
 
-static constexpr int PlayerMax = 32;                 /// How many players are supported
+static constexpr int PlayerMax = 64;                 /// How many players are supported
 static constexpr int UnitTypeMax = 2048;                /// How many unit types supported
 static constexpr int UpgradeMax = 2048;                /// How many upgrades supported
 //Wyrmgus start
