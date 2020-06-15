@@ -624,13 +624,10 @@ bool CanBuildOn(const QPoint &pos, const int mask, const int z, const CPlayer *p
 **  @return      OnTop, parent unit, builder on true, null false.
 **
 */
-CUnit *CanBuildUnitType(const CUnit *unit, const stratagus::unit_type &type, const Vec2i &pos, int real, bool ignore_exploration, int z)
+CUnit *CanBuildUnitType(const CUnit *unit, const stratagus::unit_type &type, const Vec2i &pos, int real, bool ignore_exploration, int z, const bool no_bordering_building)
 {
 	// Terrain Flags don't matter if building on top of a unit.
-	//Wyrmgus start
-//	CUnit *ontop = CanBuildHere(unit, type, pos);
-	CUnit *ontop = CanBuildHere(unit, type, pos, z);
-	//Wyrmgus end
+	CUnit *ontop = CanBuildHere(unit, type, pos, z, no_bordering_building);
 	if (ontop == nullptr) {
 		return nullptr;
 	}
@@ -652,10 +649,7 @@ CUnit *CanBuildUnitType(const CUnit *unit, const stratagus::unit_type &type, con
 		player = unit->Player;
 	}
 	int testmask;
-	//Wyrmgus start
-//	unsigned int index = pos.y * CMap::Map.Info.MapWidth;
 	unsigned int index = pos.y * CMap::Map.Info.MapWidths[z];
-	//Wyrmgus end
 	for (int h = 0; h < type.get_tile_height(); ++h) {
 		for (int w = type.get_tile_width(); w--;) {
 			/* first part of if (!CanBuildOn(x + w, y + h, testmask)) */
@@ -667,36 +661,40 @@ CUnit *CanBuildUnitType(const CUnit *unit, const stratagus::unit_type &type, con
 			if (player && !real) {
 				//testmask = MapFogFilterFlags(player, x + w, y + h, type.MovementMask);
 				testmask = MapFogFilterFlags(*player,
-											 //Wyrmgus start
-//											 index + pos.x + w, type.MovementMask);
 											 index + pos.x + w, type.MovementMask, z);
-											 //Wyrmgus end
 			} else {
 				testmask = type.MovementMask;
 			}
-			/*secound part of if (!CanBuildOn(x + w, y + h, testmask)) */
-			//Wyrmgus start
-//			const CMapField &mf = *CMap::Map.Field(index + pos.x + w);
-			const CMapField &mf = *CMap::Map.Field(index + pos.x + w, z);
-			//Wyrmgus end
-			if (mf.CheckMask(testmask)) {
+			/*second part of if (!CanBuildOn(x + w, y + h, testmask)) */
+			const CMapField *tile = CMap::Map.Field(index + pos.x + w, z);
+			if (tile->CheckMask(testmask)) {
 				h = type.get_tile_height();
 				ontop = nullptr;
 				break;
 			}
 			//Wyrmgus start
 //			if (player && !mf.playerInfo.IsExplored(*player)) {
-			if (player && !ignore_exploration && !mf.playerInfo.IsTeamExplored(*player)) {
+			if (player && !ignore_exploration && !tile->playerInfo.IsTeamExplored(*player)) {
 			//Wyrmgus end
 				h = type.get_tile_height();
 				ontop = nullptr;
 				break;
 			}
+
+			if (player != nullptr && tile->get_owner() != nullptr && tile->get_owner() != player) {
+				h = type.get_tile_height();
+				ontop = nullptr;
+				break;
+			}
+
+			//cannot build anything other than pathways on trade routes
+			if (tile->get_terrain_feature() != nullptr && tile->get_terrain_feature()->is_trade_route() && (type.TerrainType == nullptr || !type.TerrainType->is_pathway())) {
+				h = type.get_tile_height();
+				ontop = nullptr;
+				break;
+			}
 		}
-		//Wyrmgus start
-//		index += CMap::Map.Info.MapWidth;
 		index += CMap::Map.Info.MapWidths[z];
-		//Wyrmgus end
 	}
 	if (unit) {
 		MarkUnitFieldFlags(*unit);
