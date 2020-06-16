@@ -483,8 +483,12 @@ std::string_view civilization::get_title_name(const government_type government_t
 			switch (tier) {
 				case faction_tier::barony:
 					return "Barony";
+				case faction_tier::viscounty:
+					return "Viscounty";
 				case faction_tier::county:
 					return "County";
+				case faction_tier::marquisate:
+					return "Marquisate";
 				case faction_tier::duchy:
 					return "Duchy";
 				case faction_tier::grand_duchy:
@@ -562,11 +566,23 @@ std::string_view civilization::get_character_title_name(const int title_type, co
 									} else {
 										return "Baron";
 									}
+								case faction_tier::viscounty:
+									if (gender == gender::female) {
+										return "Viscountess";
+									} else {
+										return "Viscount";
+									}
 								case faction_tier::county:
 									if (gender == gender::female) {
 										return "Countess";
 									} else {
 										return "Count";
+									}
+								case faction_tier::marquisate:
+									if (gender == gender::female) {
+										return "Marquise";
+									} else {
+										return "Marquis";
 									}
 								case faction_tier::duchy:
 									if (gender == gender::female) {

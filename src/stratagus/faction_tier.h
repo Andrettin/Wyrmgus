@@ -32,7 +32,9 @@ namespace stratagus {
 enum class faction_tier {
 	none,
 	barony,
+	viscounty,
 	county,
+	marquisate,
 	duchy,
 	grand_duchy,
 	kingdom,
@@ -47,8 +49,12 @@ inline faction_tier string_to_faction_tier(const std::string &str)
 		return faction_tier::none;
 	} else if (str == "barony") {
 		return faction_tier::barony;
+	} else if (str == "viscounty") {
+		return faction_tier::viscounty;
 	} else if (str == "county") {
 		return faction_tier::county;
+	} else if (str == "marquisate") {
+		return faction_tier::marquisate;
 	} else if (str == "duchy") {
 		return faction_tier::duchy;
 	} else if (str == "grand_duchy") {
@@ -69,8 +75,12 @@ inline std::string faction_tier_to_string(const faction_tier tier)
 			return "none";
 		case faction_tier::barony:
 			return "barony";
+		case faction_tier::viscounty:
+			return "viscounty";
 		case faction_tier::county:
 			return "county";
+		case faction_tier::marquisate:
+			return "marquisate";
 		case faction_tier::duchy:
 			return "duchy";
 		case faction_tier::grand_duchy:
