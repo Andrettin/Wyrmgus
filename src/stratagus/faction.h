@@ -71,6 +71,7 @@ class faction final : public detailed_data_entry, public data_type<faction>
 	Q_PROPERTY(stratagus::site* default_capital MEMBER default_capital READ get_default_capital)
 	Q_PROPERTY(bool simple_name MEMBER simple_name READ uses_simple_name)
 	Q_PROPERTY(bool short_name MEMBER short_name READ uses_short_name)
+	Q_PROPERTY(QStringList ship_names READ get_ship_names_qstring_list)
 	Q_PROPERTY(stratagus::faction_tier tier MEMBER tier READ get_tier)
 	Q_PROPERTY(stratagus::government_type government_type MEMBER government_type READ get_government_type)
 	Q_PROPERTY(stratagus::site* capital MEMBER capital READ get_capital)
@@ -172,6 +173,15 @@ public:
 	std::vector<CForceTemplate *> GetForceTemplates(const ForceType force_type) const;
 	std::vector<CAiBuildingTemplate *> GetAiBuildingTemplates() const;
 	const std::vector<std::string> &get_ship_names() const;
+
+	QStringList get_ship_names_qstring_list() const;
+
+	Q_INVOKABLE void add_ship_name(const std::string &ship_name)
+	{
+		this->ship_names.push_back(ship_name);
+	}
+
+	Q_INVOKABLE void remove_ship_name(const std::string &ship_name);
 
 	unit_type *get_class_unit_type(const unit_class *unit_class) const;
 

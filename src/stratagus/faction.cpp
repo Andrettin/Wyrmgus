@@ -419,6 +419,16 @@ const std::vector<std::string> &faction::get_ship_names() const
 	return this->civilization->get_ship_names();
 }
 
+QStringList faction::get_ship_names_qstring_list() const
+{
+	return container::to_qstring_list(this->get_ship_names());
+}
+
+void faction::remove_ship_name(const std::string &ship_name)
+{
+	vector::remove_one(this->ship_names, ship_name);
+}
+
 unit_type *faction::get_class_unit_type(const unit_class *unit_class) const
 {
 	if (unit_class == nullptr) {
