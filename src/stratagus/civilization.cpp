@@ -680,6 +680,13 @@ void civilization::process_character_title_name_scope(const int title_type, cons
 	scope.for_each_child([&](const sml_data &child_scope) {
 		faction::process_character_title_name_scope(this->character_title_names[title_type][faction_type], child_scope);
 	});
+
+	scope.for_each_property([&](const sml_property &property) {
+		const std::string &key = property.get_key();
+		const std::string &value = property.get_value();
+		const stratagus::government_type government_type = string_to_government_type(key);
+		character_title_names[title_type][faction_type][government_type][faction_tier::none][gender::none] = value;
+	});
 }
 
 std::vector<CForceTemplate *> civilization::GetForceTemplates(const ForceType force_type) const
