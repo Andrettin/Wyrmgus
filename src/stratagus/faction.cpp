@@ -257,6 +257,14 @@ void faction::initialize()
 		}
 	}
 
+	if (this->get_min_tier() == faction_tier::none) {
+		this->min_tier = this->get_default_tier();
+	}
+
+	if (this->get_max_tier() == faction_tier::none) {
+		this->max_tier = this->get_default_tier();
+	}
+
 	data_entry::initialize();
 }
 

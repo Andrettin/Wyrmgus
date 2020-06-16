@@ -1604,11 +1604,7 @@ static int CclDefineFaction(lua_State *l)
 		} else if (!strcmp(value, "DefaultTier")) {
 			std::string faction_tier_name = LuaToString(l, -1);
 			const stratagus::faction_tier tier = stratagus::string_to_faction_tier(faction_tier_name);
-			if (tier != stratagus::faction_tier::none) {
-				faction->default_tier = tier;
-			} else {
-				LuaError(l, "Faction tier \"%s\" doesn't exist." _C_ faction_tier_name.c_str());
-			}
+			faction->default_tier = tier;
 		} else if (!strcmp(value, "DefaultGovernmentType")) {
 			std::string government_type_name = LuaToString(l, -1);
 			const stratagus::government_type government_type = stratagus::string_to_government_type(government_type_name);

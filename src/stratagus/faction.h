@@ -65,6 +65,8 @@ class faction final : public detailed_data_entry, public data_type<faction>
 	Q_PROPERTY(stratagus::icon* icon MEMBER icon READ get_icon)
 	Q_PROPERTY(stratagus::player_color* color MEMBER color READ get_color)
 	Q_PROPERTY(stratagus::faction_tier default_tier MEMBER default_tier READ get_default_tier)
+	Q_PROPERTY(stratagus::faction_tier min_tier MEMBER min_tier READ get_min_tier)
+	Q_PROPERTY(stratagus::faction_tier max_tier MEMBER max_tier READ get_max_tier)
 	Q_PROPERTY(stratagus::government_type default_government_type MEMBER default_government_type READ get_default_government_type)
 	Q_PROPERTY(stratagus::site* default_capital MEMBER default_capital READ get_default_capital)
 	Q_PROPERTY(bool simple_name MEMBER simple_name READ uses_simple_name)
@@ -128,6 +130,16 @@ public:
 	faction_tier get_default_tier() const
 	{
 		return this->default_tier;
+	}
+
+	faction_tier get_min_tier() const
+	{
+		return this->min_tier;
+	}
+
+	faction_tier get_max_tier() const
+	{
+		return this->max_tier;
 	}
 
 	government_type get_default_government_type() const
@@ -266,6 +278,8 @@ public:
 	int Type = FactionTypeNoFactionType;								/// faction type (i.e. tribe or polity)
 private:
 	faction_tier default_tier;
+	faction_tier min_tier;
+	faction_tier max_tier;
 	government_type default_government_type;
 public:
 	int ParentFaction = -1;												/// parent faction of this faction
