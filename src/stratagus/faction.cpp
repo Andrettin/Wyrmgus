@@ -104,7 +104,7 @@ void faction::process_character_title_name_scope(std::map<faction_tier, std::map
 }
 
 faction::faction(const std::string &identifier)
-	: detailed_data_entry(identifier), default_tier(faction_tier::barony), tier(faction_tier::barony), default_government_type(government_type::monarchy), government_type(government_type::monarchy)
+	: detailed_data_entry(identifier), default_tier(faction_tier::barony), min_tier(faction_tier::none), max_tier(faction_tier::none), tier(faction_tier::barony), default_government_type(government_type::monarchy), government_type(government_type::monarchy)
 {
 }
 
