@@ -48,6 +48,7 @@
 //Wyrmgus start
 #include "unit/unit_manager.h"
 //Wyrmgus end
+#include "util/queue_util.h"
 #include "util/qunique_ptr.h"
 
 #include "SDL.h"
@@ -619,6 +620,22 @@ std::unique_ptr<stratagus::sample> LoadSample(const std::filesystem::path &filep
 
 namespace stratagus {
 
+void sample::decrement_decoding_loop_counter()
+{
+	sample::decoding_loop_counter--;
+
+	if (sample::decoding_loop_counter < sample::max_concurrent_decoders && !sample::queued_decoders.empty()) {
+		std::unique_ptr<QAudioDecoder> decoder = queue::take(sample::queued_decoders);
+		sample::start_decoder(std::move(decoder));
+		return;
+	}
+
+	if (sample::decoding_loop_counter == 0) {
+		sample::decoding_loop->quit();
+	}
+}
+
+
 sample::sample(const std::filesystem::path &filepath)
 {
 	if (!std::filesystem::exists(filepath)) {
@@ -649,9 +666,7 @@ void sample::decode(const std::filesystem::path &filepath)
 		throw std::runtime_error(decoder_ptr->errorString().toStdString());
 	});
 
-	sample::decoding_loop_counter++;
-	decoder->start();
-	sample::decoders.push_back(std::move(decoder));
+	sample::queue_decoder(std::move(decoder));
 }
 
 void sample::read_audio_buffer(const QAudioBuffer &buffer)

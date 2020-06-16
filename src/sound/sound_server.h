@@ -48,6 +48,8 @@ enum class unit_sound_type;
 class sample final
 {
 public:
+	static constexpr int max_concurrent_decoders = 128;
+
 	static void initialize_decoding_loop()
 	{
 		sample::decoding_loop = std::make_unique<QEventLoop>();
@@ -59,23 +61,34 @@ public:
 		sample::decoding_loop.reset();
 	}
 
-	static void decrement_decoding_loop_counter()
+	static void queue_decoder(std::unique_ptr<QAudioDecoder> &&decoder)
 	{
-		sample::decoding_loop_counter--;
-		if (sample::decoding_loop_counter == 0) {
-			sample::decoding_loop->quit();
+		if (sample::decoding_loop_counter < sample::max_concurrent_decoders) {
+			sample::start_decoder(std::move(decoder));
+		} else {
+			sample::queued_decoders.push(std::move(decoder));
 		}
 	}
 
+	static void start_decoder(std::unique_ptr<QAudioDecoder> &&decoder)
+	{
+		sample::decoding_loop_counter++;
+		decoder->start();
+		sample::active_decoders.push_back(std::move(decoder));
+	}
+
+	static void decrement_decoding_loop_counter();
+
 	static void clear_decoders()
 	{
-		sample::decoders.clear();
+		sample::active_decoders.clear();
 	}
 
 private:
 	static inline std::unique_ptr<QEventLoop> decoding_loop;
 	static inline int decoding_loop_counter = 0;
-	static inline std::vector<std::unique_ptr<QAudioDecoder>> decoders;
+	static inline std::vector<std::unique_ptr<QAudioDecoder>> active_decoders;
+	static inline std::queue<std::unique_ptr<QAudioDecoder>> queued_decoders;
 
 public:
 	explicit sample(const std::filesystem::path &filepath);
