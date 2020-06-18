@@ -4244,7 +4244,7 @@ std::string GetFactionTypeNameById(int faction_type)
 	} else if (faction_type == FactionTypeMercenaryCompany) {
 		return "mercenary-company";
 	} else if (faction_type == FactionTypeHolyOrder) {
-		return "holy-order";
+		return "holy_order";
 	} else if (faction_type == FactionTypeTradingCompany) {
 		return "trading-company";
 	}
@@ -4262,7 +4262,7 @@ int GetFactionTypeIdByName(const std::string &faction_type)
 		return FactionTypePolity;
 	} else if (faction_type == "mercenary-company") {
 		return FactionTypeMercenaryCompany;
-	} else if (faction_type == "holy-order") {
+	} else if (faction_type == "holy_order") {
 		return FactionTypeHolyOrder;
 	} else if (faction_type == "trading-company") {
 		return FactionTypeTradingCompany;
