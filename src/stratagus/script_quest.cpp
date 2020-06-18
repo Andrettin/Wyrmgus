@@ -135,10 +135,10 @@ static int CclDefineQuest(lua_State *l)
 		} else if (!strcmp(value, "FailEffects")) {
 			quest->FailEffects = new LuaCallback(l, -1);
 		} else if (!strcmp(value, "ObjectiveStrings")) {
-			quest->ObjectiveStrings.clear();
+			quest->objective_strings.clear();
 			const int args = lua_rawlen(l, -1);
 			for (int j = 0; j < args; ++j) {
-				quest->ObjectiveStrings.push_back(LuaToString(l, -1, j + 1));
+				quest->objective_strings.push_back(LuaToString(l, -1, j + 1));
 			}
 		} else if (!strcmp(value, "BriefingSounds")) {
 			quest->BriefingSounds.clear();
@@ -328,10 +328,10 @@ static int CclGetQuestData(lua_State *l)
 		}
 		return 1;
 	} else if (!strcmp(data, "Objectives")) {
-		lua_createtable(l, quest->ObjectiveStrings.size(), 0);
-		for (size_t i = 1; i <= quest->ObjectiveStrings.size(); ++i)
+		lua_createtable(l, quest->get_objective_strings().size(), 0);
+		for (size_t i = 1; i <= quest->get_objective_strings().size(); ++i)
 		{
-			lua_pushstring(l, quest->ObjectiveStrings[i-1].c_str());
+			lua_pushstring(l, quest->get_objective_strings()[i-1].c_str());
 			lua_rawseti(l, -2, i);
 		}
 		return 1;

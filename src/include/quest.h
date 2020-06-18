@@ -214,6 +214,11 @@ public:
 		return this->objectives;
 	}
 
+	const std::vector<std::string> &get_objective_strings() const
+	{
+		return this->objective_strings;
+	}
+
 	std::string get_rewards_string() const;
 
 	std::string World;				/// Which world the quest belongs to
@@ -257,9 +262,9 @@ public:
 	LuaCallback *FailEffects = nullptr;
 	std::unique_ptr<effect_list> completion_effects;
 private:
-	std::vector<std::unique_ptr<quest_objective>> objectives;	/// The objectives of this quest
+	std::vector<std::unique_ptr<quest_objective>> objectives;
+	std::vector<std::string> objective_strings; //display-only objective strings for the quest
 public:
-	std::vector<std::string> ObjectiveStrings;	/// The objective strings of this quest
 	std::vector<std::string> BriefingSounds;	/// The briefing sounds of this quest
 	std::vector<character *> HeroesMustSurvive;	/// Which heroes must survive or this quest fails
 

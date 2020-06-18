@@ -149,6 +149,7 @@ quest::~quest()
 void quest::process_sml_scope(const sml_data &scope)
 {
 	const std::string &tag = scope.get_tag();
+	const std::vector<std::string> &values = scope.get_values();
 
 	if (tag == "objectives") {
 		scope.for_each_child([&](const sml_data &child_scope) {
@@ -158,6 +159,10 @@ void quest::process_sml_scope(const sml_data &scope)
 			database::process_sml_data(objective, child_scope);
 			this->objectives.push_back(std::move(objective));
 		});
+	} else if (tag == "objective_strings") {
+		for (const std::string &value : values) {
+			this->objective_strings.push_back(value);
+		}
 	} else if (tag == "completion_effects") {
 		this->completion_effects = std::make_unique<effect_list>();
 		database::process_sml_data(this->completion_effects, scope);

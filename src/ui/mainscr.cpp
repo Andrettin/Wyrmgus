@@ -1445,8 +1445,9 @@ void MessagesDisplay::DrawMessages()
 					label.DrawClip(UI.MapArea.X + 8 * scale_factor, UI.MapArea.Y + 8 * scale_factor + z * (UI.MessageFont->Height() + 1 * scale_factor), objective_string);
 					++z;
 				}
-				for (size_t j = 0; j < quest->ObjectiveStrings.size(); ++j, ++z) {
-					label.DrawClip(UI.MapArea.X + 8 * scale_factor, UI.MapArea.Y + 8 * scale_factor + z * (UI.MessageFont->Height() + 1 * scale_factor), std::string(_(quest->ObjectiveStrings[j].c_str())));
+				for (const std::string &objective_string : quest->get_objective_strings()) {
+					label.DrawClip(UI.MapArea.X + 8 * scale_factor, UI.MapArea.Y + 8 * scale_factor + z * (UI.MessageFont->Height() + 1 * scale_factor), "- " + std::string(_(objective_string.c_str())));
+					++z;
 				}
 			}
 			//Wyrmgus end

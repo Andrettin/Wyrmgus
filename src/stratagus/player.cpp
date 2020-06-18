@@ -2408,8 +2408,8 @@ void CPlayer::available_quests_changed()
 			for (const auto &objective : quest->get_objectives()) {
 				button->Description += "\n- " + objective->get_objective_string();
 			}
-			for (size_t j = 0; j < quest->ObjectiveStrings.size(); ++j) {
-				button->Description += "\n" + quest->ObjectiveStrings[j];
+			for (const std::string &objective_string : quest->get_objective_strings()) {
+				button->Description += "\n" + objective_string;
 			}
 			const std::string rewards_string = quest->get_rewards_string();
 			if (!rewards_string.empty()) {
