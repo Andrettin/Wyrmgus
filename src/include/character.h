@@ -101,10 +101,13 @@ class character : public detailed_data_entry, public data_type<character>, publi
 	Q_PROPERTY(QString surname READ get_surname_qstring)
 	Q_PROPERTY(stratagus::unit_type* unit_type READ get_unit_type WRITE set_unit_type)
 	Q_PROPERTY(stratagus::civilization* civilization MEMBER civilization READ get_civilization)
-	Q_PROPERTY(stratagus::faction* faction MEMBER faction READ get_faction)
+	Q_PROPERTY(stratagus::faction* default_faction MEMBER default_faction READ get_default_faction)
 	Q_PROPERTY(stratagus::gender gender MEMBER gender READ get_gender)
 	Q_PROPERTY(stratagus::site* home_settlement MEMBER home_settlement)
 	Q_PROPERTY(QString variation READ get_variation_qstring)
+	Q_PROPERTY(bool ai_active MEMBER ai_active READ is_ai_active)
+	Q_PROPERTY(bool active MEMBER active READ is_active)
+	Q_PROPERTY(stratagus::faction *faction MEMBER faction READ get_faction)
 
 public:
 	static constexpr const char *class_identifier = "character";
@@ -116,9 +119,11 @@ public:
 	~character();
 	
 	virtual void process_sml_scope(const sml_data &scope) override;
+	virtual void process_sml_dated_scope(const sml_data &scope, const QDateTime &date) override;
 	virtual void ProcessConfigData(const CConfigData *config_data) override;
 	virtual void initialize() override;
 	virtual void check() const override;
+	virtual void reset_history() override;
 
 	const std::string &get_surname() const
 	{
@@ -154,9 +159,9 @@ public:
 		return this->civilization;
 	}
 
-	faction *get_faction() const
+	faction *get_default_faction() const
 	{
-		return this->faction;
+		return this->default_faction;
 	}
 
 	gender get_gender() const
@@ -199,12 +204,32 @@ public:
 	CPersistentItem *GetItem(CUnit &item) const;
 	void UpdateAttributes();
 
+	bool is_ai_active() const
+	{
+		return this->ai_active;
+	}
+
+	bool is_active() const
+	{
+		return this->active;
+	}
+
+	faction *get_faction() const
+	{
+		return this->faction;
+	}
+
+	const std::unique_ptr<historical_location> &get_location() const
+	{
+		return this->location;
+	}
+
 	CDate BirthDate;			/// Date in which the character was born
 	CDate StartDate;			/// Date in which the character historically starts being active
 	CDate DeathDate;			/// Date in which the character historically died
 private:
 	civilization *civilization = nullptr;	/// Culture to which the character belongs
-	faction *faction = nullptr;	/// Faction to which the character belongs
+	faction *default_faction = nullptr;	//the default faction to which the character belongs
 	gender gender;				/// Character's gender
 public:
 	int Level = 0;				/// Character's level
@@ -232,6 +257,7 @@ public:
 	std::vector<character *> Siblings;	/// Siblings of the character
 private:
 	site *home_settlement = nullptr; //the home settlement of this character, where they can preferentially be recruited
+	bool ai_active = true; //whether the character's AI is active
 public:
 	std::vector<deity *> Deities;		/// Deities chosen by this character to worship
 	std::vector<const CUpgrade *> Abilities;
@@ -242,6 +268,11 @@ public:
 	std::vector<CPersistentItem *> Items;
 	int Attributes[MaxAttributes];
 	std::vector<stratagus::unit_type *> ForbiddenUpgrades;	/// which unit types this character is forbidden to upgrade to
+private:
+	bool active = false; //whether the character is active, i.e. should be applied to the map; used for history
+	faction *faction = nullptr; //the character's faction, used for history
+	std::unique_ptr<historical_location> location; //the character's location, used for history
+public:
 	std::vector<std::pair<CDate, stratagus::faction *>> HistoricalFactions;	/// historical locations of the character; the values are: date, faction
 	std::vector<std::unique_ptr<historical_location>> HistoricalLocations;	/// historical locations of the character
 	std::vector<std::tuple<CDate, CDate, stratagus::faction *, int>> HistoricalTitles;	/// historical titles of the character, the first element is the beginning date of the term, the second one the end date, the third the faction it pertains to (if any, if not then it is null), and the fourth is the character title itself (from the character title enums)

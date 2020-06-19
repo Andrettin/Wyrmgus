@@ -106,6 +106,21 @@ void character::process_sml_scope(const sml_data &scope)
 	}
 }
 
+void character::process_sml_dated_scope(const sml_data &scope, const QDateTime &date)
+{
+	const std::string &tag = scope.get_tag();
+
+	if (tag == "location") {
+		auto location = std::make_unique<historical_location>();
+		database::get()->process_sml_data(location, scope);
+		location->initialize();
+		location->check();
+		this->location = std::move(location);
+	} else {
+		data_entry::process_sml_dated_scope(scope, date);
+	}
+}
+
 void character::ProcessConfigData(const CConfigData *config_data)
 {
 	for (size_t i = 0; i < config_data->Properties.size(); ++i) {
@@ -126,11 +141,11 @@ void character::ProcessConfigData(const CConfigData *config_data)
 		} else if (key == "civilization") {
 			this->civilization = civilization::get(value);
 		} else if (key == "faction") {
-			if (this->faction != nullptr) {
+			if (this->default_faction != nullptr) {
 				throw std::runtime_error("Character \"" + this->get_identifier() + "\" already has a faction.");
 			}
 
-			this->faction = faction::get(value);
+			this->default_faction = faction::get(value);
 		} else if (key == "hair_variation") {
 			value = FindAndReplaceString(value, "_", "-");
 			this->variation = value;
@@ -372,6 +387,19 @@ void character::check() const
 	if (this->Mother != nullptr && this->Mother->get_gender() != gender::female) {
 		throw std::runtime_error("Character \"" + this->Mother->get_identifier() + "\" is set to be the biological mother of \"" + this->get_identifier() + "\", but isn't female.");
 	}
+}
+
+void character::reset_history()
+{
+	this->location.reset();
+	if (this->home_settlement != nullptr) {
+		//use the home settlement as the default location
+		this->location = std::make_unique<historical_location>();
+		this->location->site = this->home_settlement;
+		this->location->initialize();
+	}
+	this->active = false;
+	this->faction = this->get_default_faction();
 }
 
 void character::GenerateMissingDates()

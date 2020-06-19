@@ -127,7 +127,7 @@ static int CclDefineCharacter(lua_State *l)
 			character->civilization = stratagus::civilization::get(LuaToString(l, -1));
 		} else if (!strcmp(value, "Faction")) {
 			stratagus::faction *faction = stratagus::faction::get(LuaToString(l, -1));
-			character->faction = faction;
+			character->default_faction = faction;
 		} else if (!strcmp(value, "Father")) {
 			std::string father_ident = LuaToString(l, -1);
 			stratagus::character *father = stratagus::character::get(father_ident);
@@ -779,8 +779,8 @@ static int CclGetCharacterData(lua_State *l)
 		}
 		return 1;
 	} else if (!strcmp(data, "Faction")) {
-		if (character->get_faction() != nullptr) {
-			lua_pushstring(l, character->get_faction()->get_identifier().c_str());
+		if (character->get_default_faction() != nullptr) {
+			lua_pushstring(l, character->get_default_faction()->get_identifier().c_str());
 		} else {
 			lua_pushstring(l, "");
 		}
