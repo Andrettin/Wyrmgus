@@ -4109,33 +4109,21 @@ bool CPlayer::IsVisionSharing() const
 	return !this->shared_vision.empty();
 }
 
-/**
-**  Check if the player shares vision with the player
-*/
 bool CPlayer::has_shared_vision_with(const CPlayer &player) const
 {
-	return this->shared_vision.contains(player.Index);
+	return this->has_shared_vision_with(player.Index);
 }
 
-/**
-**  Check if the player shares vision with the unit
-*/
 bool CPlayer::has_shared_vision_with(const CUnit &unit) const
 {
 	return this->has_shared_vision_with(*unit.Player);
 }
 
-/**
-**  Check if the both players share vision
-*/
 bool CPlayer::has_mutual_shared_vision_with(const CPlayer &player) const
 {
 	return this->shared_vision.contains(player.Index) && player.shared_vision.contains(this->Index);
 }
 
-/**
-**  Check if the player and the unit share vision
-*/
 bool CPlayer::has_mutual_shared_vision_with(const CUnit &unit) const
 {
 	return this->has_mutual_shared_vision_with(*unit.Player);

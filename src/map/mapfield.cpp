@@ -748,19 +748,20 @@ CPlayer *CMapField::get_realm_owner() const
 
 unsigned char CMapFieldPlayerInfo::TeamVisibilityState(const CPlayer &player) const
 {
-	if (IsVisible(player)) {
+	if (this->IsVisible(player)) {
 		return 2;
 	}
 
 	unsigned char maxVision = 0;
 
-	if (IsExplored(player)) {
+	if (this->IsExplored(player)) {
 		maxVision = 1;
 	}
 
+	const int player_index = player.Index;
 	for (const int i : player.get_shared_vision()) {
-		if (player.has_mutual_shared_vision_with(*CPlayer::Players[i])) {
-			maxVision = std::max<unsigned char>(maxVision, Visible[i]);
+		if (CPlayer::Players[i]->has_shared_vision_with(player_index)) { //if the shared vision is mutual
+			maxVision = std::max<unsigned char>(maxVision, this->Visible[i]);
 			if (maxVision >= 2) {
 				return 2;
 			}
@@ -769,7 +770,7 @@ unsigned char CMapFieldPlayerInfo::TeamVisibilityState(const CPlayer &player) co
 
 	for (const CPlayer *other_player : CPlayer::get_revealed_players()) {
 		const int other_player_index = other_player->Index;
-		if (Visible[other_player_index] < 2) { //don't show a revealed player's explored tiles, only the currently visible ones
+		if (this->Visible[other_player_index] < 2) { //don't show a revealed player's explored tiles, only the currently visible ones
 			continue;
 		}
 

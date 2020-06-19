@@ -932,10 +932,10 @@ void CUnit::SetCharacter(const std::string &character_ident, bool custom_hero)
 		fprintf(stderr, "Character \"%s\" has no unit type.\n", character_ident.c_str());
 		return;
 	}
-	
+
 	this->IndividualUpgrades.clear(); //reset the individual upgrades and then apply the character's
 	this->Trait = nullptr;
-	
+
 	if (this->Type->get_civilization() != nullptr) {
 		CUpgrade *civilization_upgrade = this->Type->get_civilization()->get_upgrade();
 		if (civilization_upgrade != nullptr) {
@@ -954,11 +954,11 @@ void CUnit::SetCharacter(const std::string &character_ident, bool custom_hero)
 	} else if (Editor.Running == EditorNotRunning && this->Type->Traits.size() > 0) {
 		TraitAcquire(*this, this->Type->Traits[SyncRand(this->Type->Traits.size())]);
 	}
-	
+
 	if (this->Character->Deity != nullptr && this->Character->Deity->CharacterUpgrade != nullptr) {
 		IndividualUpgradeAcquire(*this, this->Character->Deity->CharacterUpgrade);
 	}
-	
+
 	//load worshipped deities
 	for (size_t i = 0; i < this->Character->Deities.size(); ++i) {
 		CUpgrade *deity_upgrade = this->Character->Deities[i]->DeityUpgrade;
@@ -966,26 +966,26 @@ void CUnit::SetCharacter(const std::string &character_ident, bool custom_hero)
 			IndividualUpgradeAcquire(*this, deity_upgrade);
 		}
 	}
-	
+
 	for (const CUpgrade *ability_upgrade : this->Type->StartingAbilities) {
 		if (CheckDependencies(ability_upgrade, this)) {
 			IndividualUpgradeAcquire(*this, ability_upgrade);
 		}
 	}
-	
+
 	this->Variable[LEVEL_INDEX].Max = 100000; // because the code above sets the max level to the unit type stats' Level variable (which is the same as its value)
 	if (this->Variable[LEVEL_INDEX].Value < this->Character->Level) {
 		this->IncreaseLevel(this->Character->Level - this->Variable[LEVEL_INDEX].Value, false);
 	}
-	
+
 	this->Variable[XP_INDEX].Enable = 1;
 	this->Variable[XP_INDEX].Value = this->Variable[XPREQUIRED_INDEX].Value * this->Character->ExperiencePercent / 100;
 	this->Variable[XP_INDEX].Max = this->Variable[XP_INDEX].Value;
-	
+
 	if (this->Variable[MANA_INDEX].Max > 0) {
 		this->Variable[MANA_INDEX].Value = this->Variable[MANA_INDEX].Max * old_mana_percent / 100;
 	}
-			
+
 	//load learned abilities
 	std::vector<const CUpgrade *> abilities_to_remove;
 	for (size_t i = 0; i < this->Character->Abilities.size(); ++i) {
@@ -995,7 +995,7 @@ void CUnit::SetCharacter(const std::string &character_ident, bool custom_hero)
 			abilities_to_remove.push_back(this->Character->Abilities[i]);
 		}
 	}
-	
+
 	if (!abilities_to_remove.empty()) {
 		for (size_t i = 0; i < abilities_to_remove.size(); ++i) {
 			stratagus::vector::remove(this->Character->Abilities, abilities_to_remove[i]);
@@ -1005,17 +1005,17 @@ void CUnit::SetCharacter(const std::string &character_ident, bool custom_hero)
 			SaveHero(this->Character);
 		}
 	}
-	
+
 	//load read works
 	for (size_t i = 0; i < this->Character->ReadWorks.size(); ++i) {
 		ReadWork(this->Character->ReadWorks[i], false);
 	}
-	
+
 	//load consumed elixirs
 	for (size_t i = 0; i < this->Character->ConsumedElixirs.size(); ++i) {
 		ConsumeElixir(this->Character->ConsumedElixirs[i], false);
 	}
-	
+
 	//load items
 	for (size_t i = 0; i < this->Character->Items.size(); ++i) {
 		CUnit *item = MakeUnitAndPlace(this->tilePos, *this->Character->Items[i]->Type, CPlayer::Players[PlayerNumNeutral], this->MapLayer->ID);
@@ -1045,13 +1045,13 @@ void CUnit::SetCharacter(const std::string &character_ident, bool custom_hero)
 			EquipItem(*item, false);
 		}
 	}
-	
+
 	if (this->Character != nullptr) {
 		this->Player->Heroes.push_back(this);
 	}
 
 	this->Variable[HERO_INDEX].Max = this->Variable[HERO_INDEX].Value = this->Variable[HERO_INDEX].Enable = 1;
-	
+
 	this->ChooseVariation(); //choose a new variation now
 	for (int i = 0; i < MaxImageLayers; ++i) {
 		ChooseVariation(nullptr, false, i);
@@ -4526,20 +4526,21 @@ void UnitCountSeen(CUnit &unit)
 */
 bool CUnit::IsVisible(const CPlayer &player) const
 {
-	if (VisCount[player.Index]) {
+	const int player_index = player.Index;
+	if (this->VisCount[player_index]) {
 		return true;
 	}
 
 	for (const int p : player.get_shared_vision()) {
-		if (player.has_mutual_shared_vision_with(*CPlayer::Players[p])) {
-			if (VisCount[p]) {
+		if (this->VisCount[p]) {
+			if (CPlayer::Players[p]->has_shared_vision_with(player_index)) { //if the shared vision is mutual
 				return true;
 			}
 		}
 	}
 
 	for (const CPlayer *other_player : CPlayer::get_revealed_players()) {
-		if (VisCount[other_player->Index]) {
+		if (this->VisCount[other_player->Index]) {
 			return true;
 		}
 	}

@@ -458,6 +458,11 @@ public:
 		return this->shared_vision;
 	}
 
+	bool has_shared_vision_with(const int player_index) const
+	{
+		return this->shared_vision.contains(player_index);
+	}
+
 	bool has_shared_vision_with(const CPlayer &player) const;
 	bool has_shared_vision_with(const CUnit &unit) const;
 	bool has_mutual_shared_vision_with(const CPlayer &player) const;
