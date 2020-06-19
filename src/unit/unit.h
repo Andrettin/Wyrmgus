@@ -193,7 +193,8 @@ public:
 	void IncreaseLevel(int level_quantity, bool automatic_learning = true);
 	void Retrain();
 	void HealingItemAutoUse();
-	void SetCharacter(const std::string &character_full_name, bool custom_hero = false);
+	void set_character(stratagus::character *character);
+	void SetCharacter(const std::string &character_identifier, const bool custom_hero = false);
 	bool CheckTerrainForVariation(const stratagus::unit_type_variation *variation) const;
 	bool CheckSeasonForVariation(const stratagus::unit_type_variation *variation) const;
 	void ChooseVariation(const stratagus::unit_type *new_type = nullptr, bool ignore_old_variation = false, int image_layer = -1);

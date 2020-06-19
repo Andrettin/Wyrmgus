@@ -558,7 +558,7 @@ void GameMainLoop()
 			Vec2i resPos;
 			FindNearestDrop(*CurrentCustomHero->get_unit_type(), CPlayer::GetThisPlayer()->StartPos, resPos, LookingW, CPlayer::GetThisPlayer()->StartMapLayer);
 			CUnit *custom_hero = MakeUnitAndPlace(resPos, *CurrentCustomHero->get_unit_type(), CPlayer::GetThisPlayer(), CPlayer::GetThisPlayer()->StartMapLayer);
-			custom_hero->SetCharacter(CurrentCustomHero->Ident, true);	
+			custom_hero->set_character(CurrentCustomHero);	
 		}
 		
 		//update the sold units of all units before starting, to make sure they fit the current conditions

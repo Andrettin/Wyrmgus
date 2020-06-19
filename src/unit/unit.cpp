@@ -887,49 +887,37 @@ void CUnit::HealingItemAutoUse()
 	}
 }
 
-void CUnit::SetCharacter(const std::string &character_ident, bool custom_hero)
+void CUnit::set_character(stratagus::character *character)
 {
 	if (this->CurrentAction() == UnitAction::Die) {
 		return;
 	}
-	
+
 	if (this->Character != nullptr) {
-		this->Player->Heroes.erase(std::remove(this->Player->Heroes.begin(), this->Player->Heroes.end(), this), this->Player->Heroes.end());
-		
+		stratagus::vector::remove(this->Player->Heroes, this);
+
 		this->Variable[HERO_INDEX].Max = this->Variable[HERO_INDEX].Value = this->Variable[HERO_INDEX].Enable = 0;
 	}
-	
-	stratagus::character *character = nullptr;
-	if (!custom_hero) {
-		character = stratagus::character::get(character_ident);
-	} else {
-		character = GetCustomHero(character_ident);
-	}
-	
-	if (character) {
-		this->Character = character;
-	} else {
-		fprintf(stderr, "Character \"%s\" doesn't exist.\n", character_ident.c_str());
-		return;
-	}
-		
+
+	this->Character = character;
+
 	int old_mana_percent = 0;
 	if (this->Variable[MANA_INDEX].Max > 0) {
 		old_mana_percent = this->Variable[MANA_INDEX].Value * 100 / this->Variable[MANA_INDEX].Max;
 	}
-	
+
 	this->Name = this->Character->get_name();
 	this->ExtraName = this->Character->ExtraName;
 	this->surname = this->Character->get_surname();
-	
+
 	if (this->Character->get_unit_type() != nullptr) {
 		if (this->Character->get_unit_type() != this->Type) { //set type to that of the character
 			TransformUnitIntoType(*this, *this->Character->get_unit_type());
 		}
-		
+
 		this->Variable = this->Character->get_unit_type()->Stats[this->Player->Index].Variables;
 	} else {
-		fprintf(stderr, "Character \"%s\" has no unit type.\n", character_ident.c_str());
+		fprintf(stderr, "Character \"%s\" has no unit type.\n", character->get_identifier().c_str());
 		return;
 	}
 
@@ -1058,6 +1046,18 @@ void CUnit::SetCharacter(const std::string &character_ident, bool custom_hero)
 	}
 	this->UpdateButtonIcons();
 	this->UpdateXPRequired();
+}
+
+void CUnit::SetCharacter(const std::string &character_ident, bool custom_hero)
+{
+	stratagus::character *character = nullptr;
+	if (!custom_hero) {
+		character = stratagus::character::get(character_ident);
+	} else {
+		character = GetCustomHero(character_ident);
+	}
+
+	this->set_character(character);
 }
 
 bool CUnit::CheckTerrainForVariation(const stratagus::unit_type_variation *variation) const
@@ -2554,8 +2554,8 @@ void CUnit::UpdateSoldUnits()
 		if (!potential_heroes.empty()) {
 			stratagus::character *chosen_hero = potential_heroes[SyncRand(potential_heroes.size())];
 			new_unit = MakeUnitAndPlace(this->tilePos, *chosen_hero->get_unit_type(), CPlayer::Players[PlayerNumNeutral], this->MapLayer->ID);
-			new_unit->SetCharacter(chosen_hero->Ident, chosen_hero->Custom);
-			potential_heroes.erase(std::remove(potential_heroes.begin(), potential_heroes.end(), chosen_hero), potential_heroes.end());
+			new_unit->set_character(chosen_hero);
+			stratagus::vector::remove(potential_heroes, chosen_hero);
 		} else {
 			stratagus::unit_type *chosen_unit_type = potential_items[SyncRand(potential_items.size())];
 			new_unit = MakeUnitAndPlace(this->tilePos, *chosen_unit_type, CPlayer::Players[PlayerNumNeutral], this->MapLayer->ID);

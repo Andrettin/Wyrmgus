@@ -1602,7 +1602,7 @@ void map_template::ApplyUnits(const QPoint &template_start_pos, const QPoint &ma
 				player = CPlayer::Players[PlayerNumNeutral];
 			}
 			CUnit *unit = CreateUnit(unit_pos - unit_offset, *hero->get_unit_type(), player, z);
-			unit->SetCharacter(hero->Ident);
+			unit->set_character(hero);
 			if (!unit->Type->BoolFlag[BUILDING_INDEX].value && !unit->Type->BoolFlag[HARVESTER_INDEX].value) { // make non-building, non-harvester units not have an active AI
 				unit->Active = 0;
 				player->ChangeUnitTypeAiActiveCount(hero->get_unit_type(), -1);
@@ -1682,7 +1682,7 @@ void map_template::ApplyUnits(const QPoint &template_start_pos, const QPoint &ma
 			hero_player = CPlayer::Players[PlayerNumNeutral];
 		}
 		CUnit *unit = CreateUnit(hero_pos - character->get_unit_type()->get_tile_center_pos_offset(), *character->get_unit_type(), hero_player, z);
-		unit->SetCharacter(character->Ident);
+		unit->set_character(character);
 		unit->Active = 0;
 		hero_player->ChangeUnitTypeAiActiveCount(character->get_unit_type(), -1);
 	}
