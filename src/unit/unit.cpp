@@ -4565,12 +4565,12 @@ bool CUnit::IsVisibleOnMinimap() const
 	//Wyrmgus end
 
 	// Invisible units.
-	if (IsInvisibile(*CPlayer::GetThisPlayer())) {
+	if (this->IsInvisibile(*CPlayer::GetThisPlayer())) {
 		return false;
 	}
 
-	if (IsVisible(*CPlayer::GetThisPlayer()) || ReplayRevealMap || IsVisibleOnRadar(*CPlayer::GetThisPlayer())) {
-		return IsAliveOnMap();
+	if (this->IsVisible(*CPlayer::GetThisPlayer()) || ReplayRevealMap || this->IsVisibleOnRadar(*CPlayer::GetThisPlayer())) {
+		return this->IsAliveOnMap();
 	}
 
 	return this->Type->BoolFlag[VISIBLEUNDERFOG_INDEX].value && Seen.State != 3

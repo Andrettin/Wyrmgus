@@ -40,10 +40,6 @@
 #include "unit/unit.h"
 #include "unit/unit_type.h"
 
-/*----------------------------------------------------------------------------
---  Functions
-----------------------------------------------------------------------------*/
-
 static inline unsigned char
 IsTileRadarVisible(const CPlayer &pradar, const CPlayer &punit, const CMapFieldPlayerInfo &mfp)
 {
@@ -51,29 +47,43 @@ IsTileRadarVisible(const CPlayer &pradar, const CPlayer &punit, const CMapFieldP
 		return 0;
 	}
 
-	int p = pradar.Index;
+	const int p = pradar.Index;
 	if (pradar.IsVisionSharing()) {
 		const unsigned char *const radar = mfp.Radar;
 		const unsigned char *const jamming = mfp.RadarJammer;
 		unsigned char radarvision = 0;
+
 		// Check jamming first, if we are jammed, exit
-		for (int i = 0; i < PlayerMax; ++i) {
-			if (i != p) {
-				if (jamming[i] > 0 && punit.has_mutual_shared_vision_with(*CPlayer::Players[i])) {
+		for (const int i : punit.get_shared_vision()) {
+			if (i == p) {
+				continue;
+			}
+
+			if (jamming[i] > 0) {
+				if (CPlayer::Players[i]->has_shared_vision_with(punit.Index)) { //if the shared vision is mutual
 					// We are jammed, return nothing
 					return 0;
 				}
-				if (radar[i] > 0 && pradar.has_mutual_shared_vision_with(*CPlayer::Players[i])) {
+			}
+		}
+
+		for (const int i : pradar.get_shared_vision()) {
+			if (i == p) {
+				continue;
+			}
+
+			if (radar[i] > 0) {
+				if (CPlayer::Players[i]->has_shared_vision_with(p)) { //if the shared vision is mutual
 					radarvision |= radar[i];
 				}
 			}
 		}
+
 		// Can't exit until the end, as we might be jammed
 		return (radarvision | mfp.Radar[p]);
 	}
 	return mfp.Radar[p];
 }
-
 
 bool CUnit::IsVisibleOnRadar(const CPlayer &pradar) const
 {
