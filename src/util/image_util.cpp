@@ -28,6 +28,7 @@
 #include "util/image_util.h"
 
 #include "util/container_util.h"
+#include "util/point_util.h"
 #include "xbrz.h"
 
 namespace stratagus::image {
@@ -156,6 +157,22 @@ color_set get_colors(const QImage &image)
 	}
 
 	return color_set;
+}
+
+int get_frame_index(const QImage &image, const QSize &frame_size, const QPoint &frame_pos)
+{
+	return stratagus::point::to_index(frame_pos, image::get_frames_per_row(image, frame_size.width()));
+}
+
+QPoint get_frame_pos(const QImage &image, const QSize &frame_size, const int frame_index, const frame_order frame_order)
+{
+	if (frame_order == frame_order::top_to_bottom) {
+		const int frames_per_column = image::get_frames_per_column(image, frame_size.height());
+		return QPoint(frame_index / frames_per_column, frame_index % frames_per_column);
+	} else {
+		//left to right
+		return stratagus::point::from_index(frame_index, image::get_frames_per_row(image, frame_size.width()));
+	}
 }
 
 }

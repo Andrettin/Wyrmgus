@@ -668,3 +668,4 @@ extern void SetColorCycleAll(bool value);
 extern int get_scale_factor();
 extern int get_scale_factor_preference();
 extern void set_scale_factor(const int factor);
+extern void pack_image_folder(const std::string &dir_path);

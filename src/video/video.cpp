@@ -74,10 +74,6 @@
 **   @see sprite.cpp
 */
 
-/*----------------------------------------------------------------------------
--- Includes
-----------------------------------------------------------------------------*/
-
 #include "stratagus.h"
 
 #include "video.h"
@@ -90,12 +86,9 @@
 #include "map/map.h"
 #include "ui/cursor.h"
 #include "ui/ui.h"
+#include "util/image_util.h"
 
 #include "SDL.h"
-
-/*----------------------------------------------------------------------------
---  Declarations
-----------------------------------------------------------------------------*/
 
 /**
 **  Structure of pushed clippings.
@@ -144,18 +137,7 @@ private:
 	static CColorCycling *s_instance;
 };
 
-
-
-
-/*----------------------------------------------------------------------------
---  Externals
-----------------------------------------------------------------------------*/
-
 extern void InitVideoSdl();         /// Init SDL video hardware driver
-
-/*----------------------------------------------------------------------------
---  Variables
-----------------------------------------------------------------------------*/
 
 CVideo Video;
 /*static*/ CColorCycling *CColorCycling::s_instance = nullptr;
@@ -195,11 +177,6 @@ Uint32 ColorDarkGray;
 Uint32 ColorRed;
 Uint32 ColorGreen;
 Uint32 ColorYellow;
-
-
-/*----------------------------------------------------------------------------
---  Functions
-----------------------------------------------------------------------------*/
 
 /**
 **  Set clipping for graphic routines.
@@ -438,4 +415,9 @@ int get_scale_factor_preference()
 void set_scale_factor(const int factor)
 {
 	stratagus::preferences::get()->set_scale_factor(factor);
+}
+
+void pack_image_folder(const std::string &dir_path)
+{
+	stratagus::image::pack_folder(dir_path, stratagus::image::frame_order::top_to_bottom);
 }
