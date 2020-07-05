@@ -3221,8 +3221,6 @@ void UpdateUnitSightRange(CUnit &unit)
 #endif
 */
 //Wyrmgus end
-	// FIXME : these values must be configurable.
-	//Wyrmgus start
 	int unit_sight_range = unit.Variable[SIGHTRANGE_INDEX].Max;
 	const stratagus::time_of_day *time_of_day = unit.get_center_tile_time_of_day();
 	if (time_of_day != nullptr) {
@@ -3233,24 +3231,17 @@ void UpdateUnitSightRange(CUnit &unit)
 		}
 	}
 	unit_sight_range = std::max<int>(1, unit_sight_range);
-	//Wyrmgus end
 	if (unit.UnderConstruction) { // Units under construction have no sight range.
 		unit.CurrentSightRange = 1;
 	} else if (!unit.Container) { // proper value.
-		//Wyrmgus start
-//		unit.CurrentSightRange = unit.Stats->Variables[SIGHTRANGE_INDEX].Max;
 		unit.CurrentSightRange = unit_sight_range;
-		//Wyrmgus end
 	} else { // value of it container.
-		//Wyrmgus start
-//		unit.CurrentSightRange = unit.Container->CurrentSightRange;
 		//if a unit is inside a container, then use the sight of the unit or the container, whichever is greater
 		if (unit_sight_range <= unit.Container->CurrentSightRange) {
 			unit.CurrentSightRange = unit.Container->CurrentSightRange;
 		} else {
 			unit.CurrentSightRange = unit_sight_range;
 		}
-		//Wyrmgus end
 	}
 
 	CUnit *unit_inside = unit.UnitInside;
