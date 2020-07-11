@@ -152,7 +152,7 @@ void character::ProcessConfigData(const CConfigData *config_data)
 		} else if (key == "trait") {
 			CUpgrade *upgrade = CUpgrade::try_get(value);
 			if (upgrade) {
-				this->Trait = upgrade;
+				this->trait = upgrade;
 			} else {
 				fprintf(stderr, "Upgrade \"%s\" does not exist.\n", value.c_str());
 			}
@@ -346,9 +346,9 @@ void character::initialize()
 		}
 	}
 
-	if (this->Trait == nullptr) { //if no trait was set, have the character be the same trait as the unit type (if the unit type has a single one predefined)
+	if (this->get_trait() == nullptr) { //if no trait was set, have the character be the same trait as the unit type (if the unit type has a single one predefined)
 		if (this->get_unit_type() != nullptr && this->get_unit_type()->Traits.size() == 1) {
-			this->Trait = this->get_unit_type()->Traits[0];
+			this->trait = this->get_unit_type()->Traits[0];
 		}
 	}
 
@@ -639,7 +639,7 @@ void character::UpdateAttributes()
 		this->Attributes[i] = this->get_unit_type()->DefaultStat.Variables[var].Value;
 		for (const stratagus::upgrade_modifier *modifier : stratagus::upgrade_modifier::UpgradeModifiers) {
 			if (
-				(this->Trait != nullptr && modifier->UpgradeId == this->Trait->ID)
+				(this->get_trait() != nullptr && modifier->UpgradeId == this->get_trait()->ID)
 				|| std::find(this->Abilities.begin(), this->Abilities.end(), CUpgrade::get_all()[modifier->UpgradeId]) != this->Abilities.end()
 			) {
 				if (modifier->Modifier.Variables[var].Value != 0) {
@@ -767,8 +767,8 @@ void SaveHero(stratagus::character *hero)
 		fprintf(fd, "\tType = \"%s\",\n", hero->get_unit_type()->Ident.c_str());
 	}
 	if (hero->Custom) {
-		if (hero->Trait != nullptr) {
-			fprintf(fd, "\tTrait = \"%s\",\n", hero->Trait->Ident.c_str());
+		if (hero->get_trait() != nullptr) {
+			fprintf(fd, "\tTrait = \"%s\",\n", hero->get_trait()->Ident.c_str());
 		}
 		if (!hero->get_variation().empty()) {
 			fprintf(fd, "\tVariation = \"%s\",\n", hero->get_variation().c_str());

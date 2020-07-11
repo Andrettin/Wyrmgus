@@ -106,6 +106,7 @@ class character : public detailed_data_entry, public data_type<character>, publi
 	Q_PROPERTY(stratagus::site* home_settlement MEMBER home_settlement)
 	Q_PROPERTY(QString variation READ get_variation_qstring)
 	Q_PROPERTY(bool ai_active MEMBER ai_active READ is_ai_active)
+	Q_PROPERTY(CUpgrade* trait MEMBER trait READ get_trait)
 	Q_PROPERTY(bool active MEMBER active READ is_active)
 	Q_PROPERTY(stratagus::faction *faction MEMBER faction READ get_faction)
 
@@ -152,6 +153,11 @@ public:
 		}
 
 		this->unit_type = unit_type;
+	}
+
+	CUpgrade *get_trait() const
+	{
+		return this->trait;
 	}
 
 	civilization *get_civilization() const
@@ -244,8 +250,8 @@ public:
 	IconConfig HeroicIcon;				/// Character's heroic icon (level 3 and upper)
 private:
 	stratagus::unit_type *unit_type = nullptr;
+	CUpgrade *trait = nullptr;
 public:
-	CUpgrade *Trait = nullptr;
 	deity *Deity = nullptr;			/// The deity which the character is (if it is a deity)
 	character *Father = nullptr;		/// Character's father
 	character *Mother = nullptr;		/// Character's mother

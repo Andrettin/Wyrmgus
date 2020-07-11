@@ -116,7 +116,7 @@ static int CclDefineCharacter(lua_State *l)
 		} else if (!strcmp(value, "Trait")) {
 			std::string trait_ident = LuaToString(l, -1);
 			CUpgrade *upgrade = CUpgrade::get(trait_ident);
-			character->Trait = upgrade;
+			character->trait = upgrade;
 		} else if (!strcmp(value, "BirthDate")) {
 			CclGetDate(l, &character->BirthDate);
 		} else if (!strcmp(value, "StartDate")) {
@@ -544,7 +544,7 @@ static int CclDefineCustomHero(lua_State *l)
 		} else if (!strcmp(value, "Trait")) {
 			std::string trait_ident = LuaToString(l, -1);
 			CUpgrade *upgrade = CUpgrade::get(trait_ident);
-			hero->Trait = upgrade;
+			hero->trait = upgrade;
 		} else if (!strcmp(value, "Civilization")) {
 			hero->civilization = stratagus::civilization::get(LuaToString(l, -1));
 		} else if (!strcmp(value, "Gender")) {
@@ -829,8 +829,8 @@ static int CclGetCharacterData(lua_State *l)
 		}
 		return 1;
 	} else if (!strcmp(data, "Trait")) {
-		if (character->Trait != nullptr) {
-			lua_pushstring(l, character->Trait->Ident.c_str());
+		if (character->get_trait() != nullptr) {
+			lua_pushstring(l, character->get_trait()->Ident.c_str());
 		} else {
 			lua_pushstring(l, "");
 		}
@@ -954,8 +954,8 @@ static int CclGetCustomHeroData(lua_State *l)
 		}
 		return 1;
 	} else if (!strcmp(data, "Trait")) {
-		if (character->Trait != nullptr) {
-			lua_pushstring(l, character->Trait->Ident.c_str());
+		if (character->get_trait() != nullptr) {
+			lua_pushstring(l, character->get_trait()->Ident.c_str());
 		} else {
 			lua_pushstring(l, "");
 		}

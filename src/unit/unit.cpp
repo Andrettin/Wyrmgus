@@ -937,8 +937,8 @@ void CUnit::set_character(stratagus::character *character)
 		}
 	}
 
-	if (this->Character->Trait != nullptr) { //set trait
-		TraitAcquire(*this, this->Character->Trait);
+	if (this->Character->get_trait() != nullptr) { //set trait
+		TraitAcquire(*this, this->Character->get_trait());
 	} else if (Editor.Running == EditorNotRunning && this->Type->Traits.size() > 0) {
 		TraitAcquire(*this, this->Type->Traits[SyncRand(this->Type->Traits.size())]);
 	}
