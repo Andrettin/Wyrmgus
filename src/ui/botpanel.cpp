@@ -772,6 +772,7 @@ void DrawPopup(const stratagus::button &button, int x, int y, bool above)
 		case ButtonCmd::Build:
 		case ButtonCmd::Train:
 		case ButtonCmd::UpgradeTo:
+		case ButtonCmd::ExperienceUpgradeTo:
 			unit_type = stratagus::unit_type::get_all()[button.Value];
 			break;
 		case ButtonCmd::BuildClass:
