@@ -27,6 +27,10 @@
 
 #pragma once
 
+namespace stratagus {
+	class georectangle_scaling;
+}
+
 namespace stratagus::geocoordinate {
 
 static constexpr int longitude_size = 360;
@@ -96,6 +100,12 @@ inline double latitude_per_pixel(const double latitude_size, const QSize &size)
 {
 	return latitude_size / static_cast<double>(size.height());
 }
+
+extern double longitude_to_scaled_longitude(const double longitude, const std::vector<std::unique_ptr<georectangle_scaling>> &georectangle_scalings);
+extern double latitude_to_scaled_latitude(const double latitude, const std::vector<std::unique_ptr<georectangle_scaling>> &georectangle_scalings);
+
+extern double scaled_longitude_size(const QGeoRectangle &georectangle, const std::vector<std::unique_ptr<georectangle_scaling>> &georectangle_scalings);
+extern double scaled_latitude_size(const QGeoRectangle &georectangle, const std::vector<std::unique_ptr<georectangle_scaling>> &georectangle_scalings);
 
 inline QPoint to_point(const QGeoCoordinate &geocoordinate, const double lon_per_pixel, const double lat_per_pixel)
 {
