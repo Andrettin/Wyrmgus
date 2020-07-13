@@ -53,18 +53,18 @@ public:
 		return point_data;
 	}
 
-	sml_data(std::string &&tag = std::string());
+	explicit sml_data(std::string &&tag = std::string());
 
-	sml_data(std::string &&tag, const sml_operator scope_operator)
+	explicit sml_data(std::string &&tag, const sml_operator scope_operator)
 		: tag(std::move(tag)), scope_operator(scope_operator)
 	{
 	}
 
-	sml_data(const std::string &tag) : sml_data(std::string(tag))
+	explicit sml_data(const std::string &tag) : sml_data(std::string(tag))
 	{
 	}
 
-	sml_data(const std::string &tag, const sml_operator scope_operator)
+	explicit sml_data(const std::string &tag, const sml_operator scope_operator)
 		: sml_data(std::string(tag), scope_operator)
 	{
 	}

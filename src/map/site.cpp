@@ -183,6 +183,28 @@ void site::ProcessConfigData(const CConfigData *config_data)
 void site::initialize()
 {
 	if (this->get_geocoordinate().isValid()) {
+		if (this->geocoordinate_reference_site != nullptr) {
+			if (!this->geocoordinate_reference_site->is_initialized()) {
+				this->geocoordinate_reference_site->initialize();
+			}
+
+			double lon = this->get_geocoordinate().longitude();
+			double lat = this->get_geocoordinate().latitude();
+
+			if (this->geocoordinate_scale != 100) {
+				lon *= this->geocoordinate_scale;
+				lon /= 100;
+
+				lat *= this->geocoordinate_scale;
+				lat /= 100;
+			}
+
+			lon += this->geocoordinate_reference_site->get_geocoordinate().longitude();
+			lat += this->geocoordinate_reference_site->get_geocoordinate().latitude();
+
+			this->geocoordinate = QGeoCoordinate(lat, lon);
+		}
+
 		this->pos = geocoordinate::to_point(this->get_geocoordinate(), this->get_map_template()->get_georectangle(), this->get_map_template()->get_size());
 	}
 
@@ -213,6 +235,8 @@ void site::initialize()
 
 		this->map_template->sites.push_back(this);
 	}
+
+	data_entry::initialize();
 }
 
 const std::string &site::get_cultural_name(const civilization *civilization) const
