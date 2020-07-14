@@ -67,7 +67,7 @@ public:
 	static void initialize_all();
 
 public:
-	campaign(const std::string &identifier) : detailed_data_entry(identifier), CDataType(identifier)
+	explicit campaign(const std::string &identifier) : detailed_data_entry(identifier), CDataType(identifier)
 	{
 	}
 
