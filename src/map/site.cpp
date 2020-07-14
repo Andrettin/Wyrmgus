@@ -191,11 +191,13 @@ void site::initialize()
 			double lon = this->get_geocoordinate().longitude();
 			double lat = this->get_geocoordinate().latitude();
 
-			if (this->geocoordinate_scale != 100) {
-				lon *= this->geocoordinate_scale;
+			if (this->longitude_scale != 100) {
+				lon *= this->longitude_scale;
 				lon /= 100;
+			}
 
-				lat *= this->geocoordinate_scale;
+			if (this->latitude_scale != 100) {
+				lat *= this->latitude_scale;
 				lat /= 100;
 			}
 
