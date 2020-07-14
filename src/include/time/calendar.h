@@ -45,7 +45,7 @@ public:
 	static constexpr const char *class_identifier = "calendar";
 	static constexpr const char *database_folder = "calendars";
 
-	calendar(const std::string &identifier);
+	explicit calendar(const std::string &identifier);
 	~calendar();
 
 	virtual void process_sml_scope(const sml_data &scope) override;

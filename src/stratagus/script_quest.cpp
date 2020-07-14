@@ -48,6 +48,7 @@
 #include "unit/unit_class.h"
 #include "unit/unit_type.h"
 #include "upgrade/upgrade.h"
+#include "util/date_util.h"
 
 /**
 **  Define a quest.
@@ -470,6 +471,9 @@ static int CclGetCampaignData(lua_State *l)
 		return 1;
 	} else if (!strcmp(data, "StartYear")) {
 		lua_pushnumber(l, campaign->get_start_date().date().year());
+		return 1;
+	} else if (!strcmp(data, "StartYearString")) {
+		lua_pushstring(l, stratagus::date::year_to_string(campaign->get_start_date().date().year()).c_str());
 		return 1;
 	} else if (!strcmp(data, "Faction")) {
 		if (campaign->get_faction() != nullptr) {

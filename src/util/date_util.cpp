@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-//      (c) Copyright 2019-2020 by Andrettin
+//      (c) Copyright 2020 by Andrettin
 //
 //      Permission is hereby granted, free of charge, to any person obtaining a
 //      copy of this software and associated documentation files (the
@@ -29,31 +29,15 @@
 //      TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 //      SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#pragma once
+#include "util/date_util.h"
+
+#include "util/number_util.h"
 
 namespace stratagus::date {
 
-extern std::string year_to_string(const int year);
-
-inline std::string to_string(const QDate &date)
+std::string year_to_string(const int year)
 {
-	if (!date.isValid()) {
-		throw std::runtime_error("Date is not valid, and cannot be converted to a string.");
-	}
-
-	return date::year_to_string(date.year()) + '.' + std::to_string(date.month()) + '.' + std::to_string(date.day());
-}
-
-inline std::string to_string(const QDateTime &date_time)
-{
-	if (!date_time.isValid()) {
-		throw std::runtime_error("Date time is not valid, and cannot be converted to a string.");
-	}
-
-	const QDate date = date_time.date();
-	const QTime time = date_time.time();
-
-	return date::to_string(date) + '.' + std::to_string(time.hour());
+	return number::to_formatted_string(std::abs(year));
 }
 
 }

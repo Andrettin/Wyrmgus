@@ -428,6 +428,7 @@ source_group(upgrade FILES ${upgrade_SRCS})
 
 set(util_SRCS
 	src/util/color_container.cpp
+	src/util/date_util.cpp
 	src/util/geocoordinate_util.cpp
 	src/util/geojson_util.cpp
 	src/util/geopath_util.cpp
