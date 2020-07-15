@@ -1694,12 +1694,6 @@ bool CPlayer::HasSettlementNearWaterZone(int water_zone) const
 
 stratagus::site *CPlayer::GetNearestSettlement(const Vec2i &pos, int z, const Vec2i &size) const
 {
-	const CMapField *tile = CMap::Map.Field(pos, z);
-
-	if (tile->get_owner() == this || (this->HasNeutralFactionType() && tile->get_owner() != nullptr)) {
-		return tile->get_settlement();
-	}
-
 	CUnit *best_hall = nullptr;
 	int best_distance = -1;
 	

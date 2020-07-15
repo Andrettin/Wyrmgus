@@ -3553,8 +3553,14 @@ void CUnit::UpdateSettlement()
 		if (this->Player->Index == PlayerNumNeutral) {
 			return;
 		}
-		
-		this->settlement = this->Player->GetNearestSettlement(this->tilePos, this->MapLayer->ID, this->Type->get_tile_size());
+
+		const CMapField *tile = this->get_center_tile();
+
+		if (tile->get_owner() == this->Player || (this->Player->HasNeutralFactionType() && tile->get_owner() != nullptr)) {
+			this->settlement = tile->get_settlement();
+		} else {
+			this->settlement = this->Player->GetNearestSettlement(this->tilePos, this->MapLayer->ID, this->Type->get_tile_size());
+		}
 	}
 }
 
