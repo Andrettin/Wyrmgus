@@ -754,11 +754,11 @@ set(stratagus_util_HDRS
 	src/util/color_container.h
 	src/util/container_util.h
 	src/util/date_util.h
+	src/util/degree_scaling.h
 	src/util/exception_util.h
 	src/util/geocoordinate_util.h
 	src/util/geojson_util.h
 	src/util/geopath_util.h
-	src/util/georectangle_scaling.h
 	src/util/georectangle_util.h
 	src/util/geoshape_util.h
 	src/util/image_util.h

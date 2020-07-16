@@ -33,17 +33,32 @@
 
 namespace stratagus {
 
-class georectangle_scaling
+class degree_scaling
 {
 public:
-	explicit georectangle_scaling(const QGeoRectangle &georectangle, const int scale)
-		: georectangle(georectangle), scale(scale)
+	explicit degree_scaling(const double min_degree, const double max_degree, const int scale)
+		: min_degree(min_degree), max_degree(max_degree), scale(scale)
 	{
 	}
 
-	const QGeoRectangle &get_georectangle() const
+	double get_min_degree() const
 	{
-		return this->georectangle;
+		return this->min_degree;
+	}
+
+	double get_max_degree() const
+	{
+		return this->max_degree;
+	}
+
+	double get_length() const
+	{
+		return this->get_max_degree() - this->get_min_degree();
+	}
+
+	bool contains(const double degree) const
+	{
+		return degree >= this->get_min_degree() && degree <= this->get_max_degree();
 	}
 
 	int get_scale() const
@@ -52,7 +67,8 @@ public:
 	}
 
 private:
-	QGeoRectangle georectangle;
+	double min_degree = 0;
+	double max_degree = 0;
 	int scale = 100; //in percent
 };
 
