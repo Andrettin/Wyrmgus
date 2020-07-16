@@ -109,6 +109,7 @@ public:
 	{
 	}
 
+	virtual void process_sml_property(const sml_property &property) override;
 	virtual void process_sml_scope(const sml_data &scope) override;
 	virtual void process_sml_dated_scope(const sml_data &scope, const QDateTime &date) override;
 	virtual void ProcessConfigData(const CConfigData *config_data) override;
