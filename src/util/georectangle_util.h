@@ -27,6 +27,10 @@
 
 #pragma once
 
+namespace stratagus {
+	class degree_scaling;
+}
+
 namespace stratagus::georectangle {
 
 extern QRectF to_unsigned_georectangle(const QGeoRectangle &georectangle);

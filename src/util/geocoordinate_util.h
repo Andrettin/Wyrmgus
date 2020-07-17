@@ -60,14 +60,6 @@ inline QPointF to_unsigned_geocoordinate(const QGeoCoordinate &geocoordinate)
 	return QPointF(x, y);
 }
 
-inline QPointF to_scaled_geocoordinate(const QGeoCoordinate &geocoordinate, const std::vector<std::unique_ptr<degree_scaling>> &longitude_scalings, const std::vector<std::unique_ptr<degree_scaling>> &latitude_scalings)
-{
-	//converts a geocoordinate into an unsigned scaled geocoordinate
-	const double x = geocoordinate::longitude_to_scaled_longitude(geocoordinate.longitude(), longitude_scalings);
-	const double y = geocoordinate::latitude_to_scaled_latitude(geocoordinate.latitude(), latitude_scalings);
-	return QPointF(x, y);
-}
-
 inline QGeoCoordinate from_unsigned_geocoordinate(const QPointF &unsigned_geocoordinate)
 {
 	const double lon = unsigned_geocoordinate.x() - (geocoordinate::longitude_size / 2);
@@ -111,6 +103,14 @@ inline double latitude_per_pixel(const double latitude_size, const QSize &size)
 
 extern double longitude_to_scaled_longitude(const double longitude, const std::vector<std::unique_ptr<degree_scaling>> &degree_scalings);
 extern double latitude_to_scaled_latitude(const double latitude, const std::vector<std::unique_ptr<degree_scaling>> &degree_scalings);
+
+inline QPointF to_scaled_geocoordinate(const QGeoCoordinate &geocoordinate, const std::vector<std::unique_ptr<degree_scaling>> &longitude_scalings, const std::vector<std::unique_ptr<degree_scaling>> &latitude_scalings)
+{
+	//converts a geocoordinate into an unsigned scaled geocoordinate
+	const double x = geocoordinate::longitude_to_scaled_longitude(geocoordinate.longitude(), longitude_scalings);
+	const double y = geocoordinate::latitude_to_scaled_latitude(geocoordinate.latitude(), latitude_scalings);
+	return QPointF(x, y);
+}
 
 extern double scaled_longitude_size(const QGeoRectangle &georectangle, const std::vector<std::unique_ptr<degree_scaling>> &degree_scalings);
 extern double scaled_latitude_size(const QGeoRectangle &georectangle, const std::vector<std::unique_ptr<degree_scaling>> &degree_scalings);
