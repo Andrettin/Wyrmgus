@@ -3182,7 +3182,10 @@ void CMap::generate_settlement_territories(const int z)
 		for (int y = 0; y < this->Info.MapHeights[z]; ++y) {
 			QPoint tile_pos(x, y);
 
-			if (this->Field(tile_pos, z)->get_settlement() == nullptr) {
+			CMapField *tile = this->Field(tile_pos, z);
+
+			const stratagus::site *settlement = tile->get_settlement();
+			if (settlement == nullptr) {
 				continue;
 			}
 

@@ -364,7 +364,8 @@ void minimap::update_territory_pixel(const int mx, const int my, const int z)
 	QColor realm_with_non_land_color(Qt::transparent);
 
 	const CMapField &mf = *map_layer->Field(Minimap2MapX[z][mx] + Minimap2MapY[z][my]);
-	if (mf.get_settlement() != nullptr) {
+	const site *settlement = mf.get_settlement();
+	if (settlement != nullptr) {
 		const bool is_tile_water = mf.is_water() && !mf.is_river();
 		const bool is_tile_space = mf.is_space();
 
@@ -388,11 +389,16 @@ void minimap::update_territory_pixel(const int mx, const int my, const int z)
 			realm_with_non_land_color.setAlpha(non_land_territory_alpha);
 		}
 
-		const CMapField *settlement_center_tile = mf.get_settlement()->get_site_unit()->get_center_tile();
+		const CUnit *settlement_unit = settlement->get_site_unit();
+		if (settlement_unit == nullptr) {
+			throw std::runtime_error("Settlement \"" + settlement->get_identifier() + "\" has territory, but no settlement unit.");
+		}
+
+		const CMapField *settlement_center_tile = settlement_unit->get_center_tile();
 		const bool is_settlement_water = settlement_center_tile->is_water() && !settlement_center_tile->is_river();
 		const bool is_settlement_space = settlement_center_tile->is_space();
 		if (is_tile_water == is_settlement_water && is_tile_space == is_settlement_space) {
-			const QColor settlement_color = mf.get_settlement()->get_color();
+			const QColor settlement_color = settlement->get_color();
 			*(uint32_t *) &(this->mode_overlay_texture_data[minimap_mode::settlements][z][pixel_index]) = Video.MapRGBA(settlement_color);
 		}
 	}
