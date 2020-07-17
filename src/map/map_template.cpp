@@ -2292,7 +2292,7 @@ void map_template::save_terrain_image(const std::string &filename, const bool ov
 
 void map_template::save_territory_image(const std::string &filename, const std::map<const site *, std::vector<std::unique_ptr<QGeoShape>>> &territory_data) const
 {
-	const std::filesystem::path territory_image = this->get_terrain_image();
+	const std::filesystem::path territory_image = this->get_territory_image();
 
 	QImage image;
 	if (!territory_image.empty()) {
