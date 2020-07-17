@@ -2607,6 +2607,12 @@ void CMap::adjust_territory_irregularities(const QPoint &min_pos, const QPoint &
 					continue;
 				}
 
+				if (tile->get_settlement()->get_site_unit() == nullptr) {
+					tile->set_settlement(nullptr);
+					no_irregularities_found = false;
+					continue;
+				}
+
 				if (!this->tile_borders_same_settlement_territory(tile_pos, z, false)) {
 					tile->set_settlement(nullptr);
 					no_irregularities_found = false;
