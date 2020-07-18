@@ -850,7 +850,9 @@ void map_template::Apply(const QPoint &template_start_pos, const QPoint &map_sta
 
 	if (!this->get_territory_image().empty()) {
 		this->apply_territory_image(template_start_pos, map_start_pos, z);
+	}
 
+	if (!this->IsSubtemplateArea()) {
 		CMap::Map.adjust_territory_irregularities(map_start_pos, map_end - QPoint(1, 1), z);
 	}
 
