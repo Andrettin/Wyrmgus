@@ -35,6 +35,21 @@
 
 namespace stratagus {
 
+void unit_class::set_town_hall(const bool town_hall)
+{
+	if (town_hall == this->is_town_hall()) {
+		return;
+	}
+
+	this->town_hall = town_hall;
+
+	if (town_hall) {
+		unit_class::town_hall_classes.push_back(this);
+	} else {
+		vector::remove(unit_class::town_hall_classes, this);
+	}
+}
+
 bool unit_class::has_unit_type(unit_type *unit_type) const
 {
 	return vector::contains(this->unit_types, unit_type);

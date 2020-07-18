@@ -348,10 +348,6 @@ void CGrandStrategyProvince::SetSettlementBuilding(int building_id, bool has_set
 			this->ProductionEfficiencyModifier[i] += stratagus::unit_type::get_all()[building_id]->GrandStrategyProductionEfficiencyModifier[i] * change;
 		}
 	}
-	
-	if (stratagus::unit_type::get_all()[building_id]->get_unit_class() != nullptr && stratagus::unit_type::get_all()[building_id]->get_unit_class()->get_identifier() == "stronghold") { //increase the military score of the province, if this building is a stronghold
-		this->MilitaryScore += (100 * 2) * change; // two guard towers if has a stronghold
-	}
 }
 
 void CGrandStrategyProvince::SetModifier(CUpgrade *modifier, bool has_modifier)

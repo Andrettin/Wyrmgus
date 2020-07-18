@@ -38,6 +38,8 @@ class unit_class final : public named_data_entry, public data_type<unit_class>
 {
 	Q_OBJECT
 
+	Q_PROPERTY(bool town_hall MEMBER town_hall READ is_town_hall)
+
 public:
 	static constexpr const char *class_identifier = "unit_class";
 	static constexpr const char *database_folder = "unit_classes";
@@ -49,7 +51,16 @@ public:
 		return unit_class;
 	}
 
-	unit_class(const std::string &identifier) : named_data_entry(identifier)
+	static const std::vector<unit_class *> &get_town_hall_classes()
+	{
+		return unit_class::town_hall_classes;
+	}
+
+private:
+	static inline std::vector<unit_class *> town_hall_classes;
+
+public:
+	explicit unit_class(const std::string &identifier) : named_data_entry(identifier)
 	{
 	}
 
@@ -57,6 +68,13 @@ public:
 	{
 		return this->index;
 	}
+
+	bool is_town_hall() const
+	{
+		return this->town_hall;
+	}
+
+	void set_town_hall(const bool town_hall);
 
 	const std::vector<unit_type *> &get_unit_types() const
 	{
@@ -74,6 +92,7 @@ public:
 
 private:
 	int index = -1;
+	bool town_hall = false; //whether the building class is a settlement head building class, e.g. a town hall or fortress
 	std::vector<unit_type *> unit_types;
 };
 
