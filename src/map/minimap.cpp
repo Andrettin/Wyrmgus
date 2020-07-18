@@ -908,8 +908,8 @@ QRect minimap::get_texture_draw_rect(const int z) const
 		const QPoint texture_pos = this->tile_to_texture_pos(tile_pos);
 
 		const QPoint offset(width / 2, height / 2);
-		const int start_x = std::min(std::max(texture_pos.x() - (offset.x() - 1), 0), texture_width / 2);
-		const int start_y = std::min(std::max(texture_pos.y() - (offset.y() - 1), 0), texture_height / 2);
+		const int start_x = std::min(std::max(texture_pos.x() - (offset.x() - 1), 0), texture_width - width);
+		const int start_y = std::min(std::max(texture_pos.y() - (offset.y() - 1), 0), texture_height - height);
 		return QRect(start_x, start_y, width, height);
 	} else {
 		return QRect(0, 0, texture_width, texture_height);
