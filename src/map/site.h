@@ -173,12 +173,7 @@ public:
 	}
 
 	QVariantList get_building_classes_qvariant_list() const;
-
-	Q_INVOKABLE void add_building_class(unit_class *building_class)
-	{
-		this->building_classes.push_back(building_class);
-	}
-
+	Q_INVOKABLE void add_building_class(unit_class *building_class);
 	Q_INVOKABLE void remove_building_class(unit_class *building_class);
 
 	unit_class *get_pathway_class() const
