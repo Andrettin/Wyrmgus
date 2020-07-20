@@ -54,7 +54,6 @@ class defines final : public QObject, public singleton<defines>
 	Q_PROPERTY(int minimap_non_land_territory_alpha MEMBER minimap_non_land_territory_alpha READ get_minimap_non_land_territory_alpha)
 	Q_PROPERTY(stratagus::time_of_day* underground_time_of_day MEMBER underground_time_of_day READ get_underground_time_of_day)
 	Q_PROPERTY(stratagus::terrain_type* border_terrain_type MEMBER border_terrain_type READ get_border_terrain_type)
-	Q_PROPERTY(bool documents_modules_loading_enabled MEMBER documents_modules_loading_enabled READ is_documents_modules_loading_enabled)
 	Q_PROPERTY(stratagus::dialogue* campaign_victory_dialogue MEMBER campaign_victory_dialogue READ get_campaign_victory_dialogue)
 	Q_PROPERTY(stratagus::dialogue* campaign_defeat_dialogue MEMBER campaign_defeat_dialogue READ get_campaign_defeat_dialogue)
 	Q_PROPERTY(stratagus::button_level* inventory_button_level MEMBER inventory_button_level READ get_inventory_button_level)
@@ -66,6 +65,7 @@ public:
 	void load(const std::filesystem::path &base_path);
 	void process_sml_property(const sml_property &property);
 	void process_sml_scope(const sml_data &scope);
+	void initialize();
 
 	const QSize &get_tile_size() const
 	{
@@ -142,11 +142,6 @@ public:
 		return this->border_terrain_type;
 	}
 
-	bool is_documents_modules_loading_enabled() const
-	{
-		return this->documents_modules_loading_enabled;
-	}
-
 	dialogue *get_campaign_victory_dialogue() const
 	{
 		return this->campaign_victory_dialogue;
@@ -188,7 +183,6 @@ private:
 	int minimap_non_land_territory_alpha = 64;
 	terrain_type *border_terrain_type = nullptr;
 	time_of_day *underground_time_of_day = nullptr;
-	bool documents_modules_loading_enabled = true;
 	dialogue *campaign_victory_dialogue = nullptr;
 	dialogue *campaign_defeat_dialogue = nullptr;
 	button_level *inventory_button_level = nullptr;

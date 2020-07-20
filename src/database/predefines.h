@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-//      (c) Copyright 2019-2020 by Andrettin
+//      (c) Copyright 2020 by Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -25,41 +25,33 @@
 //      02111-1307, USA.
 //
 
-#include "database/defines.h"
+#pragma once
 
-#include "database/database.h"
-#include "database/preferences.h"
-#include "database/sml_data.h"
-#include "database/sml_parser.h"
+#include "util/singleton.h"
 
 namespace stratagus {
 
-void defines::load(const std::filesystem::path &data_path)
-{
-	std::filesystem::path defines_path(data_path / "defines.txt");
+class sml_data;
+class sml_property;
 
-	if (!std::filesystem::exists(defines_path)) {
-		return;
+class predefines final : public QObject, public singleton<predefines>
+{
+	Q_OBJECT
+
+	Q_PROPERTY(bool documents_modules_loading_enabled MEMBER documents_modules_loading_enabled READ is_documents_modules_loading_enabled)
+
+public:
+	void load(const std::filesystem::path &base_path);
+	void process_sml_property(const sml_property &property);
+	void process_sml_scope(const sml_data &scope);
+
+	bool is_documents_modules_loading_enabled() const
+	{
+		return this->documents_modules_loading_enabled;
 	}
 
-	sml_parser parser(defines_path);
-	const sml_data data = parser.parse();
-	database::process_sml_data(this, data);
-}
-
-void defines::process_sml_property(const sml_property &property)
-{
-	database::process_sml_property_for_object(this, property);
-}
-
-void defines::process_sml_scope(const sml_data &scope)
-{
-	database::process_sml_scope_for_object(this, scope);
-}
-
-void defines::initialize()
-{
-	this->scale_factor = preferences::get()->get_scale_factor();
-}
+private:
+	bool documents_modules_loading_enabled = true;
+};
 
 }

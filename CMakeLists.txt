@@ -134,6 +134,7 @@ set(database_SRCS
 	src/database/database.cpp
 	src/database/defines.cpp
 	src/database/module.cpp
+	src/database/predefines.cpp
 	src/database/preferences.cpp
 	src/database/sml_data.cpp
 	src/database/sml_parser.cpp
@@ -629,6 +630,7 @@ set(stratagus_database_HDRS
 	src/database/detailed_data_entry.h
 	src/database/module.h
 	src/database/named_data_entry.h
+	src/database/predefines.h
 	src/database/preferences.h
 	src/database/sml_data.h
 	src/database/sml_data_visitor.h

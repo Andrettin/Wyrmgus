@@ -37,6 +37,7 @@
 #include "database/data_type_metadata.h"
 #include "database/defines.h"
 #include "database/module.h"
+#include "database/predefines.h"
 #include "database/sml_data.h"
 #include "database/sml_operator.h"
 #include "database/sml_parser.h"
@@ -506,6 +507,7 @@ void database::load(const bool initial_definition)
 			return a->get_database_dependency_count() < b->get_database_dependency_count();
 		});
 
+		this->load_predefines();
 		this->process_modules();
 		this->parse();
 	}
@@ -520,9 +522,18 @@ void database::load(const bool initial_definition)
 	}
 }
 
+void database::load_predefines()
+{
+	try {
+		predefines::get()->load(this->get_data_path());
+	} catch (...) {
+		std::throw_with_nested(std::runtime_error("Failed to load predefines."));
+	}
+}
+
 void database::load_defines()
 {
-	for (const auto &kv_pair : database::get()->get_data_paths_with_module()) {
+	for (const auto &kv_pair : this->get_data_paths_with_module()) {
 		const std::filesystem::path &path = kv_pair.first;
 		const module *module = kv_pair.second;
 
@@ -536,6 +547,8 @@ void database::load_defines()
 			}
 		}
 	}
+
+	defines::get()->initialize();
 }
 
 void database::load_history()
@@ -587,7 +600,7 @@ void database::process_modules()
 		this->process_modules_at_dir(database::get_modules_path());
 	}
 
-	if (defines::get()->is_documents_modules_loading_enabled() && std::filesystem::exists(database::get_documents_modules_path())) {
+	if (predefines::get()->is_documents_modules_loading_enabled() && std::filesystem::exists(database::get_documents_modules_path())) {
 		this->process_modules_at_dir(database::get_documents_modules_path());
 	}
 

@@ -136,6 +136,7 @@ public:
 
 	void parse();
 	void load(const bool initial_definition);
+	void load_predefines();
 	void load_defines();
 	static void load_history();
 	void initialize();
@@ -177,6 +178,11 @@ public:
 		base_paths.insert(base_paths.end(), module_paths.begin(), module_paths.end());
 
 		return base_paths;
+	}
+
+	std::filesystem::path get_data_path() const
+	{
+		return database::get_root_path() / database::data_folder;
 	}
 
 	std::vector<std::filesystem::path> get_data_paths() const
