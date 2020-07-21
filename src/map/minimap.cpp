@@ -383,10 +383,15 @@ void minimap::update_territory_pixel(const int mx, const int my, const int z)
 			realm_color = realm_player->get_minimap_color();
 			realm_with_non_land_color = realm_color;
 		} else {
-			with_non_land_color = player->get_minimap_color();
-			with_non_land_color.setAlpha(non_land_territory_alpha);
-			realm_with_non_land_color = realm_player->get_minimap_color();
-			realm_with_non_land_color.setAlpha(non_land_territory_alpha);
+			if (player != CPlayer::Players[PlayerNumNeutral]) {
+				with_non_land_color = player->get_minimap_color();
+				with_non_land_color.setAlpha(non_land_territory_alpha);
+			}
+
+			if (realm_player != CPlayer::Players[PlayerNumNeutral]) {
+				realm_with_non_land_color = realm_player->get_minimap_color();
+				realm_with_non_land_color.setAlpha(non_land_territory_alpha);
+			}
 		}
 
 		const CUnit *settlement_unit = settlement->get_site_unit();
