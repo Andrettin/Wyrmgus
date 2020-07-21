@@ -1210,7 +1210,7 @@ void DrawPopups()
 					}
 					break;
 				case stratagus::minimap_mode::settlements:
-					if (tile->get_settlement() != nullptr && tile->is_water() == tile->get_settlement()->get_site_unit()->get_center_tile()->is_water() && tile->is_space() == tile->get_settlement()->get_site_unit()->get_center_tile()->is_space()) {
+					if (tile->get_settlement() != nullptr && is_tile_water == (tile->get_settlement()->get_site_unit()->get_center_tile()->is_water() && !tile->get_settlement()->get_site_unit()->get_center_tile()->is_river()) && is_tile_space == tile->get_settlement()->get_site_unit()->get_center_tile()->is_space()) {
 						button = std::make_unique<stratagus::button>();
 						button->Action = ButtonCmd::None;
 						button->Popup = "popup_settlement";
