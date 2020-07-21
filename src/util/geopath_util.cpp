@@ -36,14 +36,14 @@ void write_to_image(const QGeoPath &geopath, QImage &image, const QColor &color,
 {
 	QPoint previous_pixel_pos(-1, -1);
 	for (const QGeoCoordinate &geocoordinate : geopath.path()) {
-		if (!georectangle.contains(geocoordinate)) {
-			previous_pixel_pos = QPoint(-1, -1);
-			continue;
-		}
-
 		const QPoint pixel_pos = geocoordinate::to_point(geocoordinate, georectangle, image.size());
 
-		geopath::write_pixel_to_image(pixel_pos, color, image);
+		const bool pos_in_image = georectangle.contains(geocoordinate);
+
+		if (pos_in_image) {
+			//only write to the image if the position is actually in it, but take the position into account either way for the purpose of getting the previous pixel pos, so that map templates fit together well
+			geopath::write_pixel_to_image(pixel_pos, color, image);
+		}
 
 		if (previous_pixel_pos != QPoint(-1, -1) && !point::is_cardinally_adjacent_to(pixel_pos, previous_pixel_pos)) {
 			int horizontal_move_count = 0;
@@ -69,7 +69,9 @@ void write_to_image(const QGeoPath &geopath, QImage &image, const QColor &color,
 					vertical_move_count++;
 				}
 
-				geopath::write_pixel_to_image(previous_pixel_pos, color, image);
+				if (previous_pixel_pos.x() >= 0 && previous_pixel_pos.y() >= 0 && previous_pixel_pos.x() < image.width() && previous_pixel_pos.y() < image.height()) {
+					geopath::write_pixel_to_image(previous_pixel_pos, color, image);
+				}
 			}
 		}
 
