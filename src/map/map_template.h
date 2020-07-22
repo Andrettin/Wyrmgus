@@ -55,12 +55,12 @@ class unit_class;
 class unit_type;
 class world;
 
-class generated_terrain
+class generated_terrain final
 {
 public:
 	generated_terrain() {}
 
-	generated_terrain(terrain_type *terrain_type) : TerrainType(terrain_type)
+	explicit generated_terrain(terrain_type *terrain_type) : TerrainType(terrain_type)
 	{
 	}
 
@@ -311,7 +311,15 @@ public:
 			return false;
 		}
 
-		return this->is_pos_usable(pos - this->get_current_map_start_pos());
+		if (!this->is_pos_usable(pos - this->get_current_map_start_pos())) {
+			return false;
+		}
+
+		if (this->get_main_template() != nullptr) {
+			return this->get_main_template()->is_map_pos_usable(pos);
+		}
+
+		return true;
 	}
 
 	//whether a position relative to the map template itself is a usable part of it

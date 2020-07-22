@@ -418,6 +418,11 @@ void map_template::ApplyTerrainFile(bool overlay, Vec2i template_start_pos, Vec2
 				terrain_type *terrain = nullptr;
 
 				const QPoint real_pos(map_start_pos.x + x - template_start_pos.x, map_start_pos.y + y - template_start_pos.y);
+
+				if (!this->is_map_pos_usable(real_pos)) {
+					continue;
+				}
+
 				CMapField *tile = CMap::Map.Field(real_pos, z);
 
 				if (terrain_character != '0' && terrain_character != '=') {
@@ -502,6 +507,10 @@ void map_template::ApplyTerrainImage(bool overlay, Vec2i template_start_pos, Vec
 				continue;
 			}
 
+			if (!this->is_map_pos_usable(real_pos)) {
+				continue;
+			}
+
 			if (terrain) {
 				CMap::Map.Field(real_pos, z)->SetTerrain(terrain);
 
@@ -563,6 +572,10 @@ void map_template::apply_territory_image(const QPoint &template_start_pos, const
 			const QPoint real_pos(map_start_pos.x() + (x - template_start_pos.x()), map_start_pos.y() + (y - template_start_pos.y()));
 
 			if (!CMap::Map.Info.IsPointOnMap(real_pos, z)) {
+				continue;
+			}
+
+			if (!this->is_map_pos_usable(real_pos)) {
 				continue;
 			}
 
@@ -666,6 +679,11 @@ void map_template::Apply(const QPoint &template_start_pos, const QPoint &map_sta
 				}
 
 				Vec2i tile_pos(x, y);
+
+				if (!this->is_map_pos_usable(tile_pos)) {
+					continue;
+				}
+
 				CMap::Map.Field(tile_pos, z)->SetTerrain(terrain);
 				
 				if (overlay_terrain != nullptr) {
@@ -1109,6 +1127,10 @@ void map_template::apply_sites(const QPoint &template_start_pos, const QPoint &m
 		}
 
 		if (!CMap::Map.Info.IsPointOnMap(site_pos, z) || site_pos.x < map_start_pos.x() || site_pos.y < map_start_pos.y()) {
+			continue;
+		}
+
+		if (!this->is_map_pos_usable(site_pos)) {
 			continue;
 		}
 
@@ -1747,6 +1769,10 @@ void map_template::apply_historical_unit(const historical_unit *historical_unit,
 	const QPoint unit_top_left_pos = unit_pos - unit_type->get_tile_center_pos_offset();
 	const QPoint unit_bottom_right_pos = unit_top_left_pos + size::to_point(unit_type->get_tile_size()) - QPoint(1, 1);
 	if (!CMap::Map.Info.IsPointOnMap(unit_top_left_pos, z) || !CMap::Map.Info.IsPointOnMap(unit_bottom_right_pos, z) || !this->contains_map_pos(unit_top_left_pos) || !this->contains_map_pos(unit_bottom_right_pos)) { //units whose faction hasn't been created already and who don't have a valid historical location set won't be created
+		return;
+	}
+
+	if (!this->is_map_pos_usable(unit_pos)) {
 		return;
 	}
 
