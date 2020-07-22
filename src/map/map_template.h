@@ -329,9 +329,9 @@ public:
 			const QPoint start_pos(0, 0);
 			const QPoint end_pos = QPoint(this->get_applied_width() - 1, this->get_applied_height() - 1);
 
-			const double middle_x = (end_pos.x() + start_pos.x()) / 2;
-			const double middle_y = (end_pos.y() + start_pos.y()) / 2;
-			const double radius = ((middle_x - start_pos.x()) + (middle_y - start_pos.y())) / 2;
+			const double middle_x = (end_pos.x() + start_pos.x()) / 2.0;
+			const double middle_y = (end_pos.y() + start_pos.y()) / 2.0;
+			const double radius = ((middle_x - start_pos.x()) + (middle_y - start_pos.y())) / 2.0;
 
 			const double rel_x = pos.x() - middle_x;
 			const double rel_y = pos.y() - middle_y;
