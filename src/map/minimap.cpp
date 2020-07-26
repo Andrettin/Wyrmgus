@@ -67,7 +67,7 @@ static std::vector<int *> Map2MinimapY;     /// fast conversion table
 
 // MinimapScale:
 // 32x32 64x64 96x96 128x128 256x256 512x512 ...
-// *4 *2 *4/3   *1 *1/2 *1/4
+// *4    *2    *4/3  *1      *1/2    *1/4
 static std::vector<int> MinimapScaleX;                  /// Minimap scale to fit into window
 static std::vector<int> MinimapScaleY;                  /// Minimap scale to fit into window
 

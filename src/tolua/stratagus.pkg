@@ -79,6 +79,9 @@ $]
 #define UpButton 16
 #define DownButton 32
 
+#define MaxMapWidth 512
+#define MaxMapHeight 512
+
 enum Difficulties {
 	DifficultyNoDifficulty = 0,
 	DifficultyEasy,
