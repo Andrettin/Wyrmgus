@@ -924,8 +924,8 @@ static int MissileVisibleInViewport(const CViewport &vp, const Missile &missile)
 	for (pos.x = boxmin.x; pos.x <= boxmax.x; ++pos.x) {
 		for (pos.y = boxmin.y; pos.y <= boxmax.y; ++pos.y) {
 			//Wyrmgus start
-//			if (ReplayRevealMap || CMap::Map.Field(pos)->playerInfo.IsTeamVisible(*ThisPlayer)) {
-			if (ReplayRevealMap || CMap::Map.Field(pos, missile.MapLayer)->playerInfo.IsTeamVisible(*CPlayer::GetThisPlayer())) {
+//			if (ReplayRevealMap || CMap::Map.Field(pos)->player_info->IsTeamVisible(*ThisPlayer)) {
+			if (ReplayRevealMap || CMap::Map.Field(pos, missile.MapLayer)->player_info->IsTeamVisible(*CPlayer::GetThisPlayer())) {
 			//Wyrmgus end
 				return 1;
 			}

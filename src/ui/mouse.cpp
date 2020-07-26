@@ -118,7 +118,7 @@ static bool CanBuildOnArea(const CUnit &unit, const Vec2i &pos)
 	for (int j = 0; j < unit.Type->get_tile_height(); ++j) {
 		for (int i = 0; i < unit.Type->get_tile_width(); ++i) {
 			const Vec2i tempPos(i, j);
-			if (!UI.CurrentMapLayer->Field(pos + tempPos)->playerInfo.IsTeamExplored(*CPlayer::GetThisPlayer())) {
+			if (!UI.CurrentMapLayer->Field(pos + tempPos)->player_info->IsTeamExplored(*CPlayer::GetThisPlayer())) {
 				return false;
 			}
 		}
@@ -377,7 +377,7 @@ static bool DoRightButton_Harvest_Unit(CUnit &unit, CUnit &dest, int flush, int 
 
 static bool DoRightButton_Harvest_Pos(CUnit &unit, const Vec2i &pos, int flush, int &acknowledged)
 {
-	if (!UI.CurrentMapLayer->Field(pos)->playerInfo.IsTeamExplored(*unit.Player)) {
+	if (!UI.CurrentMapLayer->Field(pos)->player_info->IsTeamExplored(*unit.Player)) {
 		return false;
 	}
 	const stratagus::unit_type &type = *unit.Type;
@@ -812,7 +812,7 @@ static bool DoRightButton_NewOrder(CUnit &unit, CUnit *dest, const Vec2i &pos, i
 	}
 	// FIXME: support harvesting more types of terrain.
 	const CMapField &mf = *UI.CurrentMapLayer->Field(pos);
-	if (mf.playerInfo.IsTeamExplored(*unit.Player) && mf.get_resource() != nullptr) {
+	if (mf.player_info->IsTeamExplored(*unit.Player) && mf.get_resource() != nullptr) {
 		if (!acknowledged) {
 			PlayUnitSound(unit, stratagus::unit_sound_type::acknowledging);
 			acknowledged = 1;
@@ -1473,7 +1473,7 @@ void UIHandleMouseMove(const PixelPos &cursorPos)
 		if (show == false) {
 			CMapField &mf = *UI.CurrentMapLayer->Field(tilePos);
 			for (int i = 0; i < PlayerMax; ++i) {
-				if (mf.playerInfo.IsTeamExplored(*CPlayer::Players[i])
+				if (mf.player_info->IsTeamExplored(*CPlayer::Players[i])
 					&& (i == CPlayer::GetThisPlayer()->Index || CPlayer::Players[i]->has_mutual_shared_vision_with(*CPlayer::GetThisPlayer()) || CPlayer::Players[i]->is_revealed())) {
 					show = true;
 					break;
@@ -1510,7 +1510,7 @@ void UIHandleMouseMove(const PixelPos &cursorPos)
 		const Vec2i tilePos = UI.Minimap.screen_to_tile_pos(cursorPos);
 
 		if (UI.Minimap.are_units_visible()) {
-			if (UI.CurrentMapLayer->Field(tilePos)->playerInfo.IsTeamExplored(*CPlayer::GetThisPlayer()) || ReplayRevealMap) {
+			if (UI.CurrentMapLayer->Field(tilePos)->player_info->IsTeamExplored(*CPlayer::GetThisPlayer()) || ReplayRevealMap) {
 				UnitUnderCursor = UnitOnMapTile(tilePos, UnitTypeType::None, UI.CurrentMapLayer->ID);
 			}
 		}
@@ -1884,8 +1884,8 @@ static int SendResource(const Vec2i &pos, int flush)
 					if (unit.Type->ResInfo[res]
 						//Wyrmgus start
 //						&& unit.Type->ResInfo[res]->TerrainHarvester
-//						&& mf.playerInfo.IsExplored(*unit.Player)
-						&& mf.playerInfo.IsTeamExplored(*unit.Player)
+//						&& mf.player_info->IsExplored(*unit.Player)
+						&& mf.player_info->IsTeamExplored(*unit.Player)
 						//Wyrmgus end
 						&& mf.get_resource() == stratagus::resource::get_all()[res]
 						&& unit.ResourcesHeld < unit.Type->ResInfo[res]->ResourceCapacity
@@ -1913,10 +1913,7 @@ static int SendResource(const Vec2i &pos, int flush)
 				ret = 1;
 				continue;
 			}
-			//Wyrmgus start
-//			if (mf.playerInfo.IsExplored(*unit.Player) && mf.get_resource() != nullptr) {
-			if (mf.playerInfo.IsTeamExplored(*unit.Player) && mf.get_resource() != nullptr) {
-			//Wyrmgus end
+			if (mf.player_info->IsTeamExplored(*unit.Player) && mf.get_resource() != nullptr) {
 				//Wyrmgus start
 //				SendCommandResourceLoc(unit, pos, flush);
 				SendCommandResourceLoc(unit, pos, flush, UI.CurrentMapLayer->ID);
@@ -2966,7 +2963,7 @@ void UIHandleButtonUp(unsigned button)
 			// FIXME: johns: only complete invisibile units
 			const Vec2i cursorTilePos = UI.MouseViewport->ScreenToTilePos(CursorScreenPos);
 			CUnit *unit = nullptr;
-			if (ReplayRevealMap || UI.CurrentMapLayer->Field(cursorTilePos)->playerInfo.IsTeamVisible(*CPlayer::GetThisPlayer())) {
+			if (ReplayRevealMap || UI.CurrentMapLayer->Field(cursorTilePos)->player_info->IsTeamVisible(*CPlayer::GetThisPlayer())) {
 				const PixelPos cursorMapPos = UI.MouseViewport->screen_to_scaled_map_pixel_pos(CursorScreenPos);
 
 				unit = UnitOnScreen(cursorMapPos.x, cursorMapPos.y);

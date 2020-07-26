@@ -526,7 +526,7 @@ void minimap::Update()
 				visiontype = 2;
 			} else {
 				const Vec2i tilePos(Minimap2MapX[z][mx], Minimap2MapY[z][my] / UI.CurrentMapLayer->get_width());
-				visiontype = CMap::Map.Field(tilePos, z)->playerInfo.TeamVisibilityState(*CPlayer::GetThisPlayer());
+				visiontype = CMap::Map.Field(tilePos, z)->player_info->TeamVisibilityState(*CPlayer::GetThisPlayer());
 			}
 
 			switch (visiontype) {

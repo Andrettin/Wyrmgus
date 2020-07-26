@@ -86,7 +86,7 @@ private:
 
 VisitResult EnemyUnitFinder::Visit(TerrainTraversal &terrainTraversal, const Vec2i &pos, const Vec2i &from)
 {
-	if (!unit.MapLayer->Field(pos)->playerInfo.IsTeamExplored(*unit.Player)) {
+	if (!unit.MapLayer->Field(pos)->player_info->IsTeamExplored(*unit.Player)) {
 		return VisitResult::DeadEnd;
 	}
 	
@@ -181,10 +181,7 @@ public:
 
 	bool found() const { return *enemy != nullptr; }
 
-	//Wyrmgus start
-//	bool operator()(const CUnit *const unit) const
 	bool operator()(const CUnit *const unit)
-	//Wyrmgus end
 	{
 		//Wyrmgus start
 //		if (unit->Type->CanAttack == false) {
@@ -513,7 +510,7 @@ private:
 VisitResult AiForceRallyPointFinder::Visit(TerrainTraversal &terrainTraversal, const Vec2i &pos, const Vec2i &from)
 {
 	//Wyrmgus start
-	if (!CMap::Map.Field(pos, z)->playerInfo.IsTeamExplored(*startUnit.Player)) { // don't pick unexplored positions
+	if (!CMap::Map.Field(pos, z)->player_info->IsTeamExplored(*startUnit.Player)) { // don't pick unexplored positions
 		return VisitResult::DeadEnd;
 	}
 	//Wyrmgus end

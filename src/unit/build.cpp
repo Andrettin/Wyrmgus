@@ -673,8 +673,8 @@ CUnit *CanBuildUnitType(const CUnit *unit, const stratagus::unit_type &type, con
 				break;
 			}
 			//Wyrmgus start
-//			if (player && !mf.playerInfo.IsExplored(*player)) {
-			if (player && !ignore_exploration && !tile->playerInfo.IsTeamExplored(*player)) {
+//			if (player && !mf.player_info->IsExplored(*player)) {
+			if (player && !ignore_exploration && !tile->player_info->IsTeamExplored(*player)) {
 			//Wyrmgus end
 				h = type.get_tile_height();
 				ontop = nullptr;

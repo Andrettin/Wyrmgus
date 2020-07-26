@@ -325,5 +325,5 @@ private:
 public:
 	CUnitCache UnitCache;      /// a unit on the map field.
 
-	CMapFieldPlayerInfo playerInfo;	/// stuff related to player
+	std::unique_ptr<CMapFieldPlayerInfo> player_info;	/// stuff related to player
 };

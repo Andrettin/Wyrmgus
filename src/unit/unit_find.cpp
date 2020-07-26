@@ -74,7 +74,7 @@ CUnit *UnitFinder::FindUnitAtPos(const Vec2i &pos) const
 
 VisitResult UnitFinder::Visit(TerrainTraversal &terrainTraversal, const Vec2i &pos, const Vec2i &from)
 {
-	if (!CMap::Map.Field(pos, z)->playerInfo.IsTeamExplored(player)) {
+	if (!CMap::Map.Field(pos, z)->player_info->IsTeamExplored(player)) {
 		return VisitResult::DeadEnd;
 	}
 	// Look if found what was required.
@@ -122,7 +122,7 @@ private:
 
 VisitResult TerrainFinder::Visit(TerrainTraversal &terrainTraversal, const Vec2i &pos, const Vec2i &from)
 {
-	if (!CMap::Map.Field(pos, z)->playerInfo.IsTeamExplored(player)) {
+	if (!CMap::Map.Field(pos, z)->player_info->IsTeamExplored(player)) {
 		return VisitResult::DeadEnd;
 	}
 	
@@ -597,8 +597,8 @@ void ResourceUnitFinder::ResourceUnitFinder_Cost::SetFrom(const CUnit &mine, con
 VisitResult ResourceUnitFinder::Visit(TerrainTraversal &terrainTraversal, const Vec2i &pos, const Vec2i &from)
 {
 	//Wyrmgus start
-//	if (!worker.Player->AiEnabled && !Map.Field(pos)->playerInfo.IsExplored(*worker.Player)) {
-	if (!worker.MapLayer->Field(pos)->playerInfo.IsTeamExplored(*worker.Player) && !ignore_exploration) {
+//	if (!worker.Player->AiEnabled && !Map.Field(pos)->player_info->IsExplored(*worker.Player)) {
+	if (!worker.MapLayer->Field(pos)->player_info->IsTeamExplored(*worker.Player) && !ignore_exploration) {
 	//Wyrmgus end
 		return VisitResult::DeadEnd;
 	}

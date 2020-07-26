@@ -238,7 +238,7 @@ void CMapLayer::RegenerateForestTile(const Vec2i &pos)
 		DebugPrint("Real place wood\n");
 		topMf.setTileIndex(*Map.Tileset, Map.Tileset->getTopOneTreeTile(), 0);
 		topMf.setGraphicTile(Map.Tileset->getTopOneTreeTile());
-		topMf.playerInfo.SeenTile = topMf.getGraphicTile();
+		topMf.player_info->SeenTile = topMf.getGraphicTile();
 		topMf.Value = 0;
 		topMf.Flags |= MapFieldForest | MapFieldUnpassable;
 		UI.Minimap.UpdateSeenXY(pos + offset);
@@ -246,16 +246,16 @@ void CMapLayer::RegenerateForestTile(const Vec2i &pos)
 		
 		mf.setTileIndex(*Map.Tileset, Map.Tileset->getBottomOneTreeTile(), 0);
 		mf.setGraphicTile(Map.Tileset->getBottomOneTreeTile());
-		mf.playerInfo.SeenTile = mf.getGraphicTile();
+		mf.player_info->SeenTile = mf.getGraphicTile();
 		mf.Value = 0;
 		mf.Flags |= MapFieldForest | MapFieldUnpassable;
 		UI.Minimap.UpdateSeenXY(pos);
 		UI.Minimap.UpdateXY(pos);
 		
-		if (mf.playerInfo.IsTeamVisible(*ThisPlayer)) {
+		if (mf.player_info->IsTeamVisible(*ThisPlayer)) {
 			MarkSeenTile(mf);
 		}
-		if (Map.Field(pos + offset)->playerInfo.IsTeamVisible(*ThisPlayer)) {
+		if (Map.Field(pos + offset)->player_info->IsTeamVisible(*ThisPlayer)) {
 			MarkSeenTile(topMf);
 		}
 		FixNeighbors(MapFieldForest, 0, pos + offset);
@@ -453,8 +453,8 @@ void CMapLayer::SetSeason(CScheduledSeason *season)
 			
 			//check if the tile's terrain graphics have changed due to the new season and if so, update the minimap
 			if (
-				(mf.playerInfo.SeenTerrain && mf.playerInfo.SeenTerrain->get_graphics(old_season) != mf.playerInfo.SeenTerrain->get_graphics(new_season))
-				|| (mf.playerInfo.SeenOverlayTerrain && mf.playerInfo.SeenOverlayTerrain->get_graphics(old_season) != mf.playerInfo.SeenOverlayTerrain->get_graphics(new_season))
+				(mf.player_info->SeenTerrain && mf.player_info->SeenTerrain->get_graphics(old_season) != mf.player_info->SeenTerrain->get_graphics(new_season))
+				|| (mf.player_info->SeenOverlayTerrain && mf.player_info->SeenOverlayTerrain->get_graphics(old_season) != mf.player_info->SeenOverlayTerrain->get_graphics(new_season))
 			) {
 				UI.Minimap.UpdateXY(Vec2i(x, y), this->ID);
 			}

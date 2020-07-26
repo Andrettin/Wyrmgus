@@ -140,7 +140,7 @@ void AnimateActionAttack(CUnit &unit, COrder &order)
 
 	COrder_Attack *order = new COrder_Attack(false);
 
-	if (CMap::Map.WallOnMap(dest, z) && CMap::Map.Field(dest, z)->playerInfo.IsTeamExplored(*attacker.Player)) {
+	if (CMap::Map.WallOnMap(dest, z) && CMap::Map.Field(dest, z)->player_info->IsTeamExplored(*attacker.Player)) {
 		// FIXME: look into action_attack.cpp about this ugly problem
 		order->goalPos = dest;
 		order->MapLayer = z;

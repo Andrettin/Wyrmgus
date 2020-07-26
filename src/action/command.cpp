@@ -1413,16 +1413,16 @@ void CommandSharedVision(int player, bool state, int opponent)
 		for (size_t z = 0; z < CMap::Map.MapLayers.size(); ++z) {
 			for (int i = 0; i != CMap::Map.Info.MapWidths[z] * CMap::Map.Info.MapHeights[z]; ++i) {
 				CMapField &mf = *CMap::Map.Field(i, z);
-				CMapFieldPlayerInfo &mfp = mf.playerInfo;
+				const std::unique_ptr<CMapFieldPlayerInfo> &mfp = mf.player_info;
 
-				if (mfp.Visible[player] && !mfp.Visible[opponent] && !CPlayer::Players[player]->is_revealed()) {
-					mfp.Visible[opponent] = 1;
+				if (mfp->Visible[player] && !mfp->Visible[opponent] && !CPlayer::Players[player]->is_revealed()) {
+					mfp->Visible[opponent] = 1;
 					if (opponent == CPlayer::GetThisPlayer()->Index) {
 						CMap::Map.MarkSeenTile(mf, z);
 					}
 				}
-				if (mfp.Visible[opponent] && !mfp.Visible[player] && !CPlayer::Players[opponent]->is_revealed()) {
-					mfp.Visible[player] = 1;
+				if (mfp->Visible[opponent] && !mfp->Visible[player] && !CPlayer::Players[opponent]->is_revealed()) {
+					mfp->Visible[player] = 1;
 					if (player == CPlayer::GetThisPlayer()->Index) {
 						CMap::Map.MarkSeenTile(mf, z);
 					}

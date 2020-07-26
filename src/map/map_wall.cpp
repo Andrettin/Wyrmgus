@@ -108,7 +108,7 @@ static int GetDirectionFromSurrounding(const Vec2i &pos, bool human, bool seen)
 			dirFlag |= 1 << i;
 		} else {
 			const CMapField &mf = *Map.Field(newpos);
-			const unsigned int tile = seen ? mf.playerInfo.SeenTile : mf.getGraphicTile();
+			const unsigned int tile = seen ? mf.player_info->SeenTile : mf.getGraphicTile();
 
 			if (Map.Tileset->isARaceWallTile(tile, human)) {
 				dirFlag |= 1 << i;
@@ -135,7 +135,7 @@ void MapFixSeenWallTile(const Vec2i &pos)
 	}
 	CMapField &mf = *Map.Field(pos);
 	const CTileset &tileset = *Map.Tileset;
-	const unsigned tile = mf.playerInfo.SeenTile;
+	const unsigned tile = mf.player_info->SeenTile;
 	if (!tileset.isAWallTile(tile)) {
 		return;
 	}
@@ -143,10 +143,10 @@ void MapFixSeenWallTile(const Vec2i &pos)
 	const int dirFlag = GetDirectionFromSurrounding(pos, human, true);
 	const int wallTile = getWallTile(tileset, human, dirFlag, mf.Value, tile);
 
-	if (mf.playerInfo.SeenTile != wallTile) { // Already there!
-		mf.playerInfo.SeenTile = wallTile;
+	if (mf.player_info->SeenTile != wallTile) { // Already there!
+		mf.player_info->SeenTile = wallTile;
 		// FIXME: can this only happen if seen?
-		if (mf.playerInfo.IsTeamVisible(*ThisPlayer)) {
+		if (mf.player_info->IsTeamVisible(*ThisPlayer)) {
 			UI.Minimap.UpdateSeenXY(pos);
 		}
 	}
@@ -199,7 +199,7 @@ void MapFixWallTile(const Vec2i &pos)
 		mf.setGraphicTile(wallTile);
 		UI.Minimap.UpdateXY(pos);
 
-		if (mf.playerInfo.IsTeamVisible(*ThisPlayer)) {
+		if (mf.player_info->IsTeamVisible(*ThisPlayer)) {
 			UI.Minimap.UpdateSeenXY(pos);
 			Map.MarkSeenTile(mf);
 		}
@@ -247,7 +247,7 @@ void CMap::RemoveWall(const Vec2i &pos)
 
 	UI.Minimap.UpdateXY(pos);
 
-	if (mf.playerInfo.IsTeamVisible(*ThisPlayer)) {
+	if (mf.player_info->IsTeamVisible(*ThisPlayer)) {
 		UI.Minimap.UpdateSeenXY(pos);
 		this->MarkSeenTile(mf);
 	}
@@ -281,7 +281,7 @@ void CMap::SetWall(const Vec2i &pos, bool humanwall)
 	MapFixWallTile(pos);
 	MapFixWallNeighbors(pos);
 
-	if (mf.playerInfo.IsTeamVisible(*ThisPlayer)) {
+	if (mf.player_info->IsTeamVisible(*ThisPlayer)) {
 		UI.Minimap.UpdateSeenXY(pos);
 		this->MarkSeenTile(mf);
 	}

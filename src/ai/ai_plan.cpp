@@ -153,7 +153,7 @@ VisitResult WallFinder::Visit(TerrainTraversal &terrainTraversal, const Vec2i &p
 	}
 #endif
 	*/
-	if (!unit.MapLayer->Field(pos)->playerInfo.IsTeamExplored(*unit.Player)) {
+	if (!unit.MapLayer->Field(pos)->player_info->IsTeamExplored(*unit.Player)) {
 		return VisitResult::DeadEnd;
 	}
 	//Wyrmgus end
@@ -254,7 +254,7 @@ private:
 
 VisitResult ReachableTerrainMarker::Visit(TerrainTraversal &terrainTraversal, const Vec2i &pos, const Vec2i &from)
 {
-	if (!unit.MapLayer->Field(pos)->playerInfo.IsTeamExplored(*unit.Player)) {
+	if (!unit.MapLayer->Field(pos)->player_info->IsTeamExplored(*unit.Player)) {
 		return VisitResult::DeadEnd;
 	}
 	//Wyrmgus end
@@ -300,7 +300,7 @@ bool EnemyFinderWithTransporter::IsAccessibleForTransporter(const Vec2i &pos) co
 
 VisitResult EnemyFinderWithTransporter::Visit(TerrainTraversal &terrainTraversal, const Vec2i &pos, const Vec2i &from)
 {
-	if (!unit.MapLayer->Field(pos)->playerInfo.IsTeamExplored(*unit.Player)) {
+	if (!unit.MapLayer->Field(pos)->player_info->IsTeamExplored(*unit.Player)) {
 		return VisitResult::DeadEnd;
 	}
 
@@ -475,7 +475,7 @@ static bool ChooseRandomUnexploredPositionNear(const Vec2i &center, Vec2i *pos)
 		pos->y = center.y + SyncRand(2 * ray + 1) - ray;
 
 		if (Map.Info.IsPointOnMap(*pos)
-			&& Map.Field(*pos)->playerInfo.IsTeamExplored(*AiPlayer->Player) == false) {
+			&& Map.Field(*pos)->player_info->IsTeamExplored(*AiPlayer->Player) == false) {
 			return true;
 		}
 		ray = 3 * ray / 2;

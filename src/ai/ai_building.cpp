@@ -199,7 +199,7 @@ VisitResult BuildingPlaceFinder::Visit(TerrainTraversal &terrainTraversal, const
 
 	const CMapField *tile = CMap::Map.Field(pos, z);
 
-	if (!IgnoreExploration && !tile->playerInfo.IsTeamExplored(*worker.Player)) {
+	if (!IgnoreExploration && !tile->player_info->IsTeamExplored(*worker.Player)) {
 		return VisitResult::DeadEnd;
 	}
 	
@@ -366,8 +366,8 @@ VisitResult HallPlaceFinder::Visit(TerrainTraversal &terrainTraversal, const Vec
 #endif
 	*/
 	//Wyrmgus start
-//	if (!IgnoreExploration && !CMap::Map.Field(pos)->playerInfo.IsTeamExplored(*worker.Player)) {
-	if (!IgnoreExploration && !CMap::Map.Field(pos, z)->playerInfo.IsTeamExplored(*worker.Player)) {
+//	if (!IgnoreExploration && !CMap::Map.Field(pos)->player_info->IsTeamExplored(*worker.Player)) {
+	if (!IgnoreExploration && !CMap::Map.Field(pos, z)->player_info->IsTeamExplored(*worker.Player)) {
 	//Wyrmgus end
 		return VisitResult::DeadEnd;
 	}
@@ -507,7 +507,7 @@ VisitResult LumberMillPlaceFinder::Visit(TerrainTraversal &terrainTraversal, con
 	*/
 
 	const CMapField *tile = CMap::Map.Field(pos, z);
-	if (!IgnoreExploration && !tile->playerInfo.IsTeamExplored(*worker.Player)) {
+	if (!IgnoreExploration && !tile->player_info->IsTeamExplored(*worker.Player)) {
 		return VisitResult::DeadEnd;
 	}
 	//Wyrmgus end

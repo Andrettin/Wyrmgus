@@ -963,7 +963,7 @@ void DrawPopups()
 		if (vp) {
 			const Vec2i tilePos = vp->ScreenToTilePos(CursorScreenPos);
 			CMapField &mf = *UI.CurrentMapLayer->Field(tilePos);
-			const bool isMapFieldVisible = mf.playerInfo.IsTeamVisible(*CPlayer::GetThisPlayer());
+			const bool isMapFieldVisible = mf.player_info->IsTeamVisible(*CPlayer::GetThisPlayer());
 
 			if (UI.MouseViewport && UI.MouseViewport->IsInsideMapArea(CursorScreenPos) && (isMapFieldVisible || ReplayRevealMap) && !(MouseButtons & MiddleButton)) { //don't display if in move map mode
 				if (UnitUnderCursor && !UnitUnderCursor->Type->BoolFlag[ISNOTSELECTABLE_INDEX].value && UnitUnderCursor->IsAliveOnMap()) {

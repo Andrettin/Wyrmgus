@@ -229,7 +229,7 @@ static void EditTile(const Vec2i &pos, stratagus::terrain_type *terrain)
 		mf.RemoveOverlayTerrain();
 	}
 	mf.Value = value;
-//	mf.playerInfo.SeenTile = mf.getGraphicTile();
+//	mf.player_info->SeenTile = mf.getGraphicTile();
 	mf.UpdateSeenTile();
 	//Wyrmgus end
 	

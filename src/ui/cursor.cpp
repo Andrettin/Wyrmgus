@@ -291,7 +291,7 @@ void DrawBuildingCursor()
 					  CanBuildOn(posIt, MapFogFilterFlags(*CPlayer::GetThisPlayer(), posIt,
 														  mask & ((!Selected.empty() && Selected[0]->tilePos == posIt) ?
 																  ~(MapFieldLandUnit | MapFieldSeaUnit) : -1), z), z, CPlayer::GetThisPlayer(), CursorBuilding))
-				&& UI.CurrentMapLayer->Field(posIt)->playerInfo.IsTeamExplored(*CPlayer::GetThisPlayer())) {
+				&& UI.CurrentMapLayer->Field(posIt)->player_info->IsTeamExplored(*CPlayer::GetThisPlayer())) {
 				color = ColorGreen;
 			} else {
 				color = ColorRed;

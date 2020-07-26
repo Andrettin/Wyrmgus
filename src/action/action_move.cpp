@@ -273,8 +273,8 @@ int DoActionMove(CUnit &unit)
 
 		// Remove unit from the current selection
 		//Wyrmgus start
-//		if (unit.Selected && !Map.Field(pos)->playerInfo.IsTeamVisible(*CPlayer::GetThisPlayer())) {
-		if (unit.Selected && !unit.MapLayer->Field(pos)->playerInfo.IsTeamVisible(*CPlayer::GetThisPlayer())) {
+//		if (unit.Selected && !Map.Field(pos)->player_info->IsTeamVisible(*CPlayer::GetThisPlayer())) {
+		if (unit.Selected && !unit.MapLayer->Field(pos)->player_info->IsTeamVisible(*CPlayer::GetThisPlayer())) {
 		//Wyrmgus end
 			if (IsOnlySelected(unit)) { //  Remove building cursor
 				CancelBuildingMode();

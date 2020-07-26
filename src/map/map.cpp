@@ -106,7 +106,7 @@ void CMap::MarkSeenTile(CMapField &mf, int z)
 {
 	//Wyrmgus start
 //	const unsigned int tile = mf.getGraphicTile();
-//	const unsigned int seentile = mf.playerInfo.SeenTile;
+//	const unsigned int seentile = mf.player_info->SeenTile;
 	//Wyrmgus end
 
 	//  Nothing changed? Seeing already the correct tile.
@@ -116,10 +116,7 @@ void CMap::MarkSeenTile(CMapField &mf, int z)
 	//Wyrmgus end
 		return;
 	}
-	//Wyrmgus start
-//	mf.playerInfo.SeenTile = tile;
 	mf.UpdateSeenTile();
-	//Wyrmgus end
 
 #ifdef MINIMAP_UPDATE
 	//rb - GRRRRRRRRRRRR
@@ -211,10 +208,10 @@ void CMap::Reveal(bool only_person_players)
 	for (size_t z = 0; z < this->MapLayers.size(); ++z) {
 		for (int i = 0; i != this->Info.MapWidths[z] * this->Info.MapHeights[z]; ++i) {
 			CMapField &mf = *this->Field(i, z);
-			CMapFieldPlayerInfo &playerInfo = mf.playerInfo;
+			const std::unique_ptr<CMapFieldPlayerInfo> &player_info = mf.player_info;
 			for (int p = 0; p < PlayerMax; ++p) {
 				if (CPlayer::Players[p]->Type == PlayerPerson || !only_person_players) {
-					playerInfo.Visible[p] = std::max<unsigned short>(1, playerInfo.Visible[p]);
+					player_info->Visible[p] = std::max<unsigned short>(1, player_info->Visible[p]);
 				}
 			}
 			MarkSeenTile(mf, z);
@@ -1165,7 +1162,7 @@ void PreprocessMap()
 	for (int ix = 0; ix < Map.Info.MapWidth; ++ix) {
 		for (int iy = 0; iy < Map.Info.MapHeight; ++iy) {
 			CMapField &mf = *Map.Field(ix, iy);
-			mf.playerInfo.SeenTile = mf.getGraphicTile();
+			mf.player_info->SeenTile = mf.getGraphicTile();
 		}
 	}
 	*/
@@ -1197,7 +1194,7 @@ void PreprocessMap()
 				mf.UpdateSeenTile();
 				UI.Minimap.UpdateXY(tile_pos, z);
 				UI.Minimap.update_territory_xy(tile_pos, z);
-				if (mf.playerInfo.IsTeamVisible(*CPlayer::GetThisPlayer())) {
+				if (mf.player_info->IsTeamVisible(*CPlayer::GetThisPlayer())) {
 					CMap::Map.MarkSeenTile(mf, z);
 				}
 			}
@@ -1671,8 +1668,8 @@ void CMap::FixTile(unsigned short type, int seen, const Vec2i &pos)
 	unsigned int index = getIndex(pos);
 	CMapField &mf = *this->Field(index);
 
-	if (!((type == MapFieldForest && Tileset->isAWoodTile(mf.playerInfo.SeenTile))
-		  || (type == MapFieldRocks && Tileset->isARockTile(mf.playerInfo.SeenTile)))) {
+	if (!((type == MapFieldForest && Tileset->isAWoodTile(mf.player_info->SeenTile))
+		  || (type == MapFieldRocks && Tileset->isARockTile(mf.player_info->SeenTile)))) {
 		if (seen) {
 			return;
 		}
@@ -1702,32 +1699,32 @@ void CMap::FixTile(unsigned short type, int seen, const Vec2i &pos)
 		ttup = -1; //Assign trees in all directions
 	} else {
 		const CMapField &new_mf = *(&mf - this->Info.MapWidth);
-		ttup = seen ? new_mf.playerInfo.SeenTile : new_mf.getGraphicTile();
+		ttup = seen ? new_mf.player_info->SeenTile : new_mf.getGraphicTile();
 	}
 	if (pos.x + 1 >= this->Info.MapWidth) {
 		ttright = -1; //Assign trees in all directions
 	} else {
 		const CMapField &new_mf = *(&mf + 1);
-		ttright = seen ? new_mf.playerInfo.SeenTile : new_mf.getGraphicTile();
+		ttright = seen ? new_mf.player_info->SeenTile : new_mf.getGraphicTile();
 	}
 	if (pos.y + 1 >= this->Info.MapHeight) {
 		ttdown = -1; //Assign trees in all directions
 	} else {
 		const CMapField &new_mf = *(&mf + this->Info.MapWidth);
-		ttdown = seen ? new_mf.playerInfo.SeenTile : new_mf.getGraphicTile();
+		ttdown = seen ? new_mf.player_info->SeenTile : new_mf.getGraphicTile();
 	}
 	if (pos.x - 1 < 0) {
 		ttleft = -1; //Assign trees in all directions
 	} else {
 		const CMapField &new_mf = *(&mf - 1);
-		ttleft = seen ? new_mf.playerInfo.SeenTile : new_mf.getGraphicTile();
+		ttleft = seen ? new_mf.player_info->SeenTile : new_mf.getGraphicTile();
 	}
 	int tile = this->Tileset->getTileBySurrounding(type, ttup, ttright, ttdown, ttleft);
 
 	//Update seen tile.
 	if (tile == -1) { // No valid wood remove it.
 		if (seen) {
-			mf.playerInfo.SeenTile = removedtile;
+			mf.player_info->SeenTile = removedtile;
 			this->FixNeighbors(type, seen, pos);
 		} else {
 			mf.setGraphicTile(removedtile);
@@ -1735,18 +1732,18 @@ void CMap::FixTile(unsigned short type, int seen, const Vec2i &pos)
 			mf.Value = 0;
 			UI.Minimap.UpdateXY(pos);
 		}
-	} else if (seen && this->Tileset->isEquivalentTile(tile, mf.playerInfo.SeenTile)) { //Same Type
+	} else if (seen && this->Tileset->isEquivalentTile(tile, mf.player_info->SeenTile)) { //Same Type
 		return;
 	} else {
 		if (seen) {
-			mf.playerInfo.SeenTile = tile;
+			mf.player_info->SeenTile = tile;
 		} else {
 			mf.setGraphicTile(tile);
 		}
 	}
 
 	//maybe isExplored
-	if (mf.playerInfo.IsExplored(*ThisPlayer)) {
+	if (mf.player_info->IsExplored(*ThisPlayer)) {
 		UI.Minimap.UpdateSeenXY(pos);
 		if (!seen) {
 			MarkSeenTile(mf);
@@ -1819,7 +1816,7 @@ void CMap::SetTileTerrain(const Vec2i &pos, stratagus::terrain_type *terrain, in
 	this->CalculateTileTransitions(pos, true, z);
 	this->calculate_tile_terrain_feature(pos, z);
 	
-	if (mf.playerInfo.IsTeamVisible(*CPlayer::GetThisPlayer())) {
+	if (mf.player_info->IsTeamVisible(*CPlayer::GetThisPlayer())) {
 		MarkSeenTile(mf, z);
 	}
 	UI.Minimap.UpdateXY(pos, z);
@@ -1838,7 +1835,7 @@ void CMap::SetTileTerrain(const Vec2i &pos, stratagus::terrain_type *terrain, in
 					this->CalculateTileTransitions(adjacent_pos, false, z);
 					this->CalculateTileTransitions(adjacent_pos, true, z);
 					
-					if (adjacent_mf.playerInfo.IsTeamVisible(*CPlayer::GetThisPlayer())) {
+					if (adjacent_mf.player_info->IsTeamVisible(*CPlayer::GetThisPlayer())) {
 						MarkSeenTile(adjacent_mf, z);
 					}
 					UI.Minimap.UpdateXY(adjacent_pos, z);
@@ -1863,7 +1860,7 @@ void CMap::RemoveTileOverlayTerrain(const Vec2i &pos, int z)
 	this->CalculateTileTransitions(pos, true, z);
 	this->calculate_tile_terrain_feature(pos, z);
 	
-	if (mf.playerInfo.IsTeamVisible(*CPlayer::GetThisPlayer())) {
+	if (mf.player_info->IsTeamVisible(*CPlayer::GetThisPlayer())) {
 		MarkSeenTile(mf, z);
 	}
 	UI.Minimap.UpdateXY(pos, z);
@@ -1877,7 +1874,7 @@ void CMap::RemoveTileOverlayTerrain(const Vec2i &pos, int z)
 					
 					this->CalculateTileTransitions(adjacent_pos, true, z);
 					
-					if (adjacent_mf.playerInfo.IsTeamVisible(*CPlayer::GetThisPlayer())) {
+					if (adjacent_mf.player_info->IsTeamVisible(*CPlayer::GetThisPlayer())) {
 						MarkSeenTile(adjacent_mf, z);
 					}
 					UI.Minimap.UpdateXY(adjacent_pos, z);
@@ -1937,7 +1934,7 @@ void CMap::SetOverlayTerrainDestroyed(const Vec2i &pos, bool destroyed, int z)
 
 	this->CalculateTileTransitions(pos, true, z);
 	
-	if (mf.playerInfo.IsTeamVisible(*CPlayer::GetThisPlayer())) {
+	if (mf.player_info->IsTeamVisible(*CPlayer::GetThisPlayer())) {
 		MarkSeenTile(mf, z);
 	}
 	UI.Minimap.UpdateXY(pos, z);
@@ -1955,7 +1952,7 @@ void CMap::SetOverlayTerrainDestroyed(const Vec2i &pos, bool destroyed, int z)
 					
 					this->CalculateTileTransitions(adjacent_pos, true, z);
 					
-					if (adjacent_mf.playerInfo.IsTeamVisible(*CPlayer::GetThisPlayer())) {
+					if (adjacent_mf.player_info->IsTeamVisible(*CPlayer::GetThisPlayer())) {
 						MarkSeenTile(adjacent_mf, z);
 					}
 					UI.Minimap.UpdateXY(adjacent_pos, z);
@@ -1985,7 +1982,7 @@ void CMap::SetOverlayTerrainDamaged(const Vec2i &pos, bool damaged, int z)
 
 	this->CalculateTileTransitions(pos, true, z);
 	
-	if (mf.playerInfo.IsTeamVisible(*CPlayer::GetThisPlayer())) {
+	if (mf.player_info->IsTeamVisible(*CPlayer::GetThisPlayer())) {
 		MarkSeenTile(mf, z);
 	}
 	UI.Minimap.UpdateXY(pos, z);
@@ -3458,7 +3455,7 @@ void CMap::ClearWoodTile(const Vec2i &pos)
 	FixNeighbors(MapFieldForest, 0, pos);
 
 	//maybe isExplored
-	if (mf.playerInfo.IsExplored(*ThisPlayer)) {
+	if (mf.player_info->IsExplored(*ThisPlayer)) {
 		UI.Minimap.UpdateSeenXY(pos);
 		MarkSeenTile(mf);
 	}
@@ -3477,7 +3474,7 @@ void CMap::ClearRockTile(const Vec2i &pos)
 	FixNeighbors(MapFieldRocks, 0, pos);
 
 	//maybe isExplored
-	if (mf.playerInfo.IsExplored(*ThisPlayer)) {
+	if (mf.player_info->IsExplored(*ThisPlayer)) {
 		UI.Minimap.UpdateSeenXY(pos);
 		MarkSeenTile(mf);
 	}

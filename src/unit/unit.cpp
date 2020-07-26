@@ -4469,17 +4469,17 @@ void UnitCountSeen(CUnit &unit)
 				int x = width;
 				do {
 					if (unit.Type->BoolFlag[PERMANENTCLOAK_INDEX].value && unit.Player != CPlayer::Players[p]) {
-						if (mf->playerInfo.VisCloak[p]) {
+						if (mf->player_info->VisCloak[p]) {
 							newv++;
 						}
 					//Wyrmgus start
 					} else if (unit.Type->BoolFlag[ETHEREAL_INDEX].value && unit.Player != CPlayer::Players[p]) {
-						if (mf->playerInfo.VisEthereal[p]) {
+						if (mf->player_info->VisEthereal[p]) {
 							newv++;
 						}
 					//Wyrmgus end
 					} else {
-						if (mf->playerInfo.IsVisible(*CPlayer::Players[p])) {
+						if (mf->player_info->IsVisible(*CPlayer::Players[p])) {
 							newv++;
 						}
 					}
@@ -4575,7 +4575,7 @@ bool CUnit::IsVisibleOnMinimap() const
 		&& !this->is_seen_destroyed_by_player(CPlayer::GetThisPlayer())
 		&& !Destroyed
 		&& CMap::Map.Info.IsPointOnMap(this->tilePos, this->MapLayer)
-		&& this->MapLayer->Field(this->tilePos)->playerInfo.IsTeamExplored(*CPlayer::GetThisPlayer());
+		&& this->MapLayer->Field(this->tilePos)->player_info->IsTeamExplored(*CPlayer::GetThisPlayer());
 }
 
 /**

@@ -94,7 +94,7 @@ public:
 	 *  @p functor must not modify the order of the cache.
 	 */
 	template<typename _T>
-	void for_each(const _T functor)
+	void for_each(_T &functor)
 	{
 		const size_t size = Units.size();
 
@@ -113,10 +113,7 @@ public:
 	 *  If @p functor return false then loop is exited.
 	 */
 	template<typename _T>
-	//Wyrmgus start
-//	int for_each_if(const _T &functor)
 	int for_each_if(_T &functor)
-	//Wyrmgus end
 	{
 		const size_t size = Units.size();
 

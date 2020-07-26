@@ -66,7 +66,7 @@ void ChangeTile(const Vec2i &pos, int tile)
 
 	CMapField &mf = *Map.Field(pos);
 	mf.setGraphicTile(tile);
-	mf.playerInfo.SeenTile = tile;
+	mf.player_info->SeenTile = tile;
 	mf.UpdateSeenTile();
 }
 */
@@ -130,7 +130,7 @@ void EditorChangeTile(const Vec2i &pos, int tileIndex)
 	}
 	//Wyrmgus start
 	mf.setTileIndex(*CMap::Map.Tileset, tile, 0);
-//	mf.playerInfo.SeenTile = mf.getGraphicTile();
+//	mf.player_info->SeenTile = mf.getGraphicTile();
 	mf.UpdateSeenTile();
 	//Wyrmgus end
 	
