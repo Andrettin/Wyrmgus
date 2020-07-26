@@ -39,28 +39,24 @@ class singleton
 public:
 	static T *get()
 	{
-		std::call_once(singleton<T>::once_flag, [](){
-			T::create();
-		});
+		static std::unique_ptr<T> instance = T::create();
 
-		return singleton<T>::instance.get();
+		return instance.get();
 	}
 
 private:
-	static void create()
+	static std::unique_ptr<T> create()
 	{
-		singleton<T>::instance = std::make_unique<T>();
+		std::unique_ptr<T> instance = std::make_unique<T>();
 
 		if constexpr (std::is_base_of_v<QObject, T>) {
 			if (QApplication::instance()->thread() != QThread::currentThread()) {
-				singleton<T>::instance->moveToThread(QApplication::instance()->thread());
+				instance->moveToThread(QApplication::instance()->thread());
 			}
 		}
-	}
 
-private:
-	static inline std::unique_ptr<T> instance;
-	static inline std::once_flag once_flag;
+		return instance;
+	}
 };
 
 }
