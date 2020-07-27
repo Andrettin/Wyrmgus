@@ -168,7 +168,7 @@ public:
 		return quest;
 	}
 
-	quest(const std::string &identifier);
+	explicit quest(const std::string &identifier);
 	~quest();
 	
 	virtual void process_sml_scope(const sml_data &scope) override;
