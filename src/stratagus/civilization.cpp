@@ -232,7 +232,7 @@ void civilization::initialize()
 			this->upgrade = parent_civilization->get_upgrade();
 		}
 
-		//inherit button icons from the parent civilization, for button actions which none are specified
+		//inherit button icons from the parent civilization, for button actions for which none are specified
 		for (std::map<ButtonCmd, IconConfig>::iterator iterator = PlayerRaces.ButtonIcons[parent_civilization_id].begin(); iterator != PlayerRaces.ButtonIcons[parent_civilization_id].end(); ++iterator) {
 			if (PlayerRaces.ButtonIcons[this->ID].find(iterator->first) == PlayerRaces.ButtonIcons[this->ID].end()) {
 				PlayerRaces.ButtonIcons[this->ID][iterator->first] = iterator->second;
@@ -308,6 +308,9 @@ void civilization::initialize()
 		}
 		if (this->UnitSounds.HelpTown.Name.empty()) {
 			this->UnitSounds.HelpTown = parent_civilization->UnitSounds.HelpTown;
+		}
+		if (this->UnitSounds.Dead[ANIMATIONS_DEATHTYPES].Name.empty()) {
+			this->UnitSounds.Dead[ANIMATIONS_DEATHTYPES] = parent_civilization->UnitSounds.Dead[ANIMATIONS_DEATHTYPES];
 		}
 	}
 
