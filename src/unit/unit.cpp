@@ -5884,8 +5884,15 @@ bool CUnit::CanAttack(bool count_inside) const
 		return false;
 	}
 	
-	if (this->Container && (!this->Type->BoolFlag[ATTACKFROMTRANSPORTER_INDEX].value || !this->Container->Type->BoolFlag[ATTACKFROMTRANSPORTER_INDEX].value)) {
-		return false;
+	if (this->Container) {
+		if (!this->Type->BoolFlag[ATTACKFROMTRANSPORTER_INDEX].value || !this->Container->Type->BoolFlag[ATTACKFROMTRANSPORTER_INDEX].value) {
+			return false;
+		}
+
+		//if a neutral unit is inside a container representing a recruitable hero, then it shouldn't attack from it
+		if (this->Player->Type == PlayerNeutral && this->Container->Type->BoolFlag[RECRUITHEROES_INDEX].value) {
+			return false;
+		}
 	}
 	
 	return this->Type->BoolFlag[CANATTACK_INDEX].value;
