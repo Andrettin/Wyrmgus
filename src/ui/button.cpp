@@ -474,8 +474,11 @@ int button::get_key() const
 	if (key == 0) {
 		const CUnit *unit = this->get_unit();
 		const unit_type *unit_type = this->get_value_unit_type(unit);
+		const CUpgrade *upgrade = this->get_value_upgrade(unit);
 		if (unit_type != nullptr) {
 			key = GetHotKey(unit_type->get_default_button_key(unit->Player));
+		} else if (upgrade != nullptr) {
+			key = GetHotKey(upgrade->get_button_key());
 		}
 	}
 
