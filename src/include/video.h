@@ -669,3 +669,4 @@ extern int get_scale_factor();
 extern int get_scale_factor_preference();
 extern void set_scale_factor(const int factor);
 extern void pack_image_folder(const std::string &dir_path);
+extern void index_image_to_image_palette(const std::string &image_path, const std::string &other_image_path);

@@ -123,4 +123,9 @@ inline void pack_folder(const std::filesystem::path &dir_path, const frame_order
 
 extern void index_to_palette(QImage &image, const color_set &palette);
 
+inline void index_to_image_palette(QImage &image, const QImage &other_image)
+{
+	image::index_to_palette(image, image::get_colors(other_image));
+}
+
 }

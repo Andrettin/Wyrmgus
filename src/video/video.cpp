@@ -421,3 +421,12 @@ void pack_image_folder(const std::string &dir_path)
 {
 	stratagus::image::pack_folder(dir_path, stratagus::image::frame_order::top_to_bottom);
 }
+
+void index_image_to_image_palette(const std::string &image_path, const std::string &other_image_path)
+{
+	const QString image_path_qstring = QString::fromStdString(image_path);
+	QImage image(image_path_qstring);
+	const QImage other_image(QString::fromStdString(other_image_path));
+	stratagus::image::index_to_image_palette(image, other_image);
+	image.save(image_path_qstring);
+}
