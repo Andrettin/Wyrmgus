@@ -121,4 +121,6 @@ inline void pack_folder(const std::filesystem::path &dir_path, const frame_order
 	image.save(QString::fromStdString(dir_path.string() + ".png"));
 }
 
+extern void index_to_palette(QImage &image, const color_set &palette);
+
 }

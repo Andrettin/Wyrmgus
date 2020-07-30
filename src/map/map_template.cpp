@@ -2251,7 +2251,7 @@ void map_template::save_terrain_image(const std::string &filename, const bool ov
 					color = terrain->get_color();
 				}
 
-				image.setPixelColor(QPoint(x, y), color);
+				image.setPixelColor(x, y, color);
 
 				x += 1;
 			}

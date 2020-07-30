@@ -175,4 +175,35 @@ QPoint get_frame_pos(const QImage &image, const QSize &frame_size, const int fra
 	}
 }
 
+void index_to_palette(QImage &image, const color_set &palette)
+{
+	for (int x = 0; x < image.width(); ++x) {
+		for (int y = 0; y < image.height(); ++y) {
+			const QColor pixel_color = image.pixelColor(x, y);
+
+			if (palette.contains(pixel_color)) {
+				continue;
+			}
+
+			//if the pixel's color is not present in the palette, pick the closest color in it, RGB-value-wise
+
+			QColor best_color;
+			int best_rgb_difference = -1;
+			for (const QColor &palette_color : palette) {
+				int rgb_difference = 0;
+				rgb_difference += std::abs(pixel_color.red() - palette_color.red());
+				rgb_difference += std::abs(pixel_color.green() - palette_color.green());
+				rgb_difference += std::abs(pixel_color.blue() - palette_color.blue());
+
+				if (best_rgb_difference == -1 || rgb_difference < best_rgb_difference) {
+					best_rgb_difference = rgb_difference;
+					best_color = palette_color;
+				}
+			}
+
+			image.setPixelColor(x, y, best_color);
+		}
+	}
+}
+
 }
