@@ -631,7 +631,7 @@ std::string GetButtonActionNameById(const ButtonCmd button_action)
 		case ButtonCmd::ResearchClass:
 			return "research_class";
 		case ButtonCmd::LearnAbility:
-			return "learn-ability";
+			return "learn_ability";
 		case ButtonCmd::ExperienceUpgradeTo:
 			return "experience-upgrade-to";
 		case ButtonCmd::UpgradeTo:
@@ -709,7 +709,7 @@ ButtonCmd GetButtonActionIdByName(const std::string &button_action)
 		return ButtonCmd::Research;
 	} else if (button_action == "research_class") {
 		return ButtonCmd::ResearchClass;
-	} else if (button_action == "learn-ability") {
+	} else if (button_action == "learn_ability" || button_action == "learn-ability") {
 		return ButtonCmd::LearnAbility;
 	} else if (button_action == "experience-upgrade-to") {
 		return ButtonCmd::ExperienceUpgradeTo;
