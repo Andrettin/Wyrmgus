@@ -790,6 +790,10 @@ void unit_type::process_sml_scope(const sml_data &scope)
 				throw std::runtime_error("Unsupported flag tag for CanTransport: " + key);
 			}
 		});
+	} else if (tag == "spells") {
+		for (const std::string &value : values) {
+			this->Spells.push_back(spell::get(value));
+		}
 	} else if (tag == "affixes") {
 		for (const std::string &value : values) {
 			this->Affixes.push_back(CUpgrade::get(value));
@@ -994,7 +998,6 @@ void unit_type::ProcessConfigData(const CConfigData *config_data)
 		} else if (key == "random_movement_distance") {
 			this->RandomMovementDistance = std::stoi(value);
 		} else if (key == "can_cast_spell") {
-			value = FindAndReplaceString(value, "_", "-");
 			spell *spell = spell::get(value);
 			this->Spells.push_back(spell);
 		} else if (key == "autocast_active") {
