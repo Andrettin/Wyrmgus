@@ -46,6 +46,7 @@
 #include "script/condition/season_condition.h"
 #include "script/condition/settlement_condition.h"
 #include "script/condition/trigger_condition.h"
+#include "script/condition/unit_class_condition.h"
 #include "script/condition/unit_type_condition.h"
 #include "script/condition/upgrade_condition.h"
 #include "translate.h"
@@ -66,8 +67,12 @@ std::unique_ptr<const condition> condition::from_sml_property(const sml_property
 		return std::make_unique<age_condition>(value);
 	} else if (key == "character") {
 		return std::make_unique<character_condition>(value);
+	} else if (key == "settlement") {
+		return std::make_unique<settlement_condition>(value);
 	} else if (key == "trigger") {
 		return std::make_unique<trigger_condition>(value);
+	} else if (key == "unit_class") {
+		return std::make_unique<unit_class_condition>(value);
 	} else if (key == "unit_type") {
 		return std::make_unique<unit_type_condition>(value);
 	} else if (key == "upgrade") {
@@ -88,6 +93,8 @@ std::unique_ptr<const condition> condition::from_sml_scope(const sml_data &scope
 		condition = std::make_unique<or_condition>();
 	} else if (tag == "not") {
 		condition = std::make_unique<not_condition>();
+	} else if (tag == "unit_class") {
+		condition = std::make_unique<unit_class_condition>();
 	} else if (tag == "unit_type") {
 		condition = std::make_unique<unit_type_condition>();
 	} else if (tag == "season") {
