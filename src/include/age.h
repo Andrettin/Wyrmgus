@@ -54,10 +54,7 @@ public:
 
 	static age *current_age;
 
-	explicit age(const std::string &identifier) : named_data_entry(identifier)
-	{
-	}
-
+	explicit age(const std::string &identifier);
 	virtual ~age() override;
 	
 	virtual void process_sml_scope(const sml_data &scope) override;
@@ -75,12 +72,12 @@ public:
 		return this->graphics;
 	}
 
-	condition *get_preconditions() const
+	const std::unique_ptr<condition> &get_preconditions() const
 	{
 		return this->preconditions;
 	}
 
-	condition *get_conditions() const
+	const std::unique_ptr<condition> &get_conditions() const
 	{
 		return this->conditions;
 	}
@@ -88,8 +85,8 @@ public:
 private:
 	CGraphic *graphics = nullptr;
 	int priority = 0;
-	condition *preconditions = nullptr;
-	condition *conditions = nullptr;
+	std::unique_ptr<condition> preconditions;
+	std::unique_ptr<condition> conditions;
 };
 
 }

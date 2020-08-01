@@ -840,10 +840,10 @@ void unit_type::process_sml_scope(const sml_data &scope)
 	} else if (tag == "sounds") {
 		database::process_sml_data(this->Sound, scope);
 	} else if (tag == "preconditions") {
-		this->preconditions = new and_condition;
+		this->preconditions = std::make_unique<and_condition>();
 		database::process_sml_data(this->preconditions, scope);
 	} else if (tag == "conditions") {
-		this->conditions = new and_condition;
+		this->conditions = std::make_unique<and_condition>();
 		database::process_sml_data(this->conditions, scope);
 	} else {
 		data_entry::process_sml_scope(scope);
@@ -1184,10 +1184,10 @@ void unit_type::ProcessConfigData(const CConfigData *config_data)
 				}
 			}
 		} else if (child_config_data->Tag == "preconditions") {
-			this->preconditions = new and_condition;
+			this->preconditions = std::make_unique<and_condition>();
 			this->preconditions->ProcessConfigData(child_config_data);
 		} else if (child_config_data->Tag == "conditions") {
-			this->conditions = new and_condition;
+			this->conditions = std::make_unique<and_condition>();
 			this->conditions->ProcessConfigData(child_config_data);
 		} else {
 			std::string tag = string::snake_case_to_pascal_case(child_config_data->Tag);

@@ -82,6 +82,11 @@ void age::check_current_age()
 	}
 }
 
+age::age(const std::string &identifier) : named_data_entry(identifier)
+{
+}
+
+
 age::~age()
 {
 	if (this->graphics) {
@@ -126,10 +131,10 @@ void age::process_sml_scope(const sml_data &scope)
 
 		this->graphics = CGraphic::New(filepath.string(), size.x, size.y);
 	} else if (tag == "preconditions") {
-		this->preconditions = new and_condition;
+		this->preconditions = std::make_unique<and_condition>();
 		database::process_sml_data(this->preconditions, scope);
 	} else if (tag == "conditions") {
-		this->conditions = new and_condition;
+		this->conditions = std::make_unique<and_condition>();
 		database::process_sml_data(this->conditions, scope);
 	} else {
 		data_entry::process_sml_scope(scope);

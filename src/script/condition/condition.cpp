@@ -146,30 +146,33 @@ bool condition::check(const CUnit *unit, bool ignore_units) const
 
 void and_condition::ProcessConfigDataSection(const CConfigData *section)
 {
-	condition *condition = nullptr;
+	std::unique_ptr<condition> condition;
+
 	if (section->Tag == "and") {
-		condition = new and_condition;
+		condition = std::make_unique<and_condition>();
 	} else if (section->Tag == "or") {
-		condition = new or_condition;
+		condition = std::make_unique<or_condition>();
 	} else if (section->Tag == "not") {
-		condition = new not_condition;
+		condition = std::make_unique<not_condition>();
 	} else if (section->Tag == "unit_type") {
-		condition = new unit_type_condition;
+		condition = std::make_unique<unit_type_condition>();
 	} else if (section->Tag == "upgrade") {
-		condition = new upgrade_condition;
+		condition = std::make_unique<upgrade_condition>();
 	} else if (section->Tag == "age") {
-		condition = new age_condition;
+		condition = std::make_unique<age_condition>();
 	} else if (section->Tag == "character") {
-		condition = new character_condition;
+		condition = std::make_unique<character_condition>();
 	} else if (section->Tag == "season") {
-		condition = new season_condition;
+		condition = std::make_unique<season_condition>();
 	} else if (section->Tag == "trigger") {
-		condition = new trigger_condition;
+		condition = std::make_unique<trigger_condition>();
 	} else {
 		throw std::runtime_error("Invalid and condition property: \"" + section->Tag + "\".");
 	}
+
 	condition->ProcessConfigData(section);
-	this->conditions.push_back(std::unique_ptr<stratagus::condition>(condition));
+
+	this->conditions.push_back(std::move(condition));
 }
 
 void and_condition::process_sml_property(const sml_property &property)
@@ -788,19 +791,19 @@ static int CclDefineDependency(lua_State *l)
 		conditions.clear();
 	}
 	
-	stratagus::condition *condition = nullptr;
+	std::unique_ptr<stratagus::condition> condition;
 	if (or_flag) {
-		condition = new stratagus::or_condition(std::move(and_conditions));
+		condition = std::make_unique<stratagus::or_condition>(std::move(and_conditions));
 	} else {
-		condition = new stratagus::and_condition(std::move(and_conditions));
+		condition = std::make_unique<stratagus::and_condition>(std::move(and_conditions));
 	}
 	
 	if (!strncmp(target, "unit-", 5)) {
 		stratagus::unit_type *unit_type = stratagus::unit_type::get(target);
-		unit_type->conditions = condition;
+		unit_type->conditions = std::move(condition);
 	} else if (!strncmp(target, "upgrade", 7)) {
 		CUpgrade *upgrade = CUpgrade::get(target);
-		upgrade->conditions = condition;
+		upgrade->conditions = std::move(condition);
 	} else {
 		LuaError(l, "Invalid condition target: \"%s\"" _C_ target);
 	}
@@ -868,19 +871,19 @@ static int CclDefinePredependency(lua_State *l)
 		conditions.clear();
 	}
 	
-	stratagus::condition *condition = nullptr;
+	std::unique_ptr<stratagus::condition> condition;
 	if (or_flag) {
-		condition = new stratagus::or_condition(std::move(and_conditions));
+		condition = std::make_unique<stratagus::or_condition>(std::move(and_conditions));
 	} else {
-		condition = new stratagus::and_condition(std::move(and_conditions));
+		condition = std::make_unique<stratagus::and_condition>(std::move(and_conditions));
 	}
 	
 	if (!strncmp(target, "unit-", 5)) {
 		stratagus::unit_type *unit_type = stratagus::unit_type::get(target);
-		unit_type->preconditions = condition;
+		unit_type->preconditions = std::move(condition);
 	} else if (!strncmp(target, "upgrade", 7)) {
 		CUpgrade *upgrade = CUpgrade::get(target);
-		upgrade->preconditions = condition;
+		upgrade->preconditions = std::move(condition);
 	} else {
 		LuaError(l, "Invalid condition target: \"%s\"" _C_ target);
 	}

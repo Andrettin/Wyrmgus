@@ -215,12 +215,12 @@ public:
 
 	void add_modifier(std::unique_ptr<stratagus::upgrade_modifier> &&modifier);
 
-	stratagus::condition *get_preconditions() const
+	const std::unique_ptr<stratagus::condition> &get_preconditions() const
 	{
 		return this->preconditions;
 	}
 
-	stratagus::condition *get_conditions() const
+	const std::unique_ptr<stratagus::condition> &get_conditions() const
 	{
 		return this->conditions;
 	}
@@ -272,8 +272,8 @@ public:
 	//Wyrmgus end
 	// TODO: not used by buttons
 private:
-	stratagus::condition *preconditions = nullptr;
-	stratagus::condition *conditions = nullptr;
+	std::unique_ptr<stratagus::condition> preconditions;
+	std::unique_ptr<stratagus::condition> conditions;
 
 	friend int CclDefineUpgrade(lua_State *l);
 	friend int CclDefineDependency(lua_State *l);

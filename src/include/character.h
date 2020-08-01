@@ -116,7 +116,7 @@ public:
 
 	static void clear();
 	
-	character(const std::string &identifier);
+	explicit character(const std::string &identifier);
 	~character();
 	
 	virtual void process_sml_scope(const sml_data &scope) override;
@@ -230,6 +230,16 @@ public:
 		return this->location;
 	}
 
+	const std::unique_ptr<condition> &get_preconditions() const
+	{
+		return this->preconditions;
+	}
+
+	const std::unique_ptr<condition> &get_conditions() const
+	{
+		return this->conditions;
+	}
+
 	CDate BirthDate;			/// Date in which the character was born
 	CDate StartDate;			/// Date in which the character historically starts being active
 	CDate DeathDate;			/// Date in which the character historically died
@@ -256,8 +266,10 @@ public:
 	character *Father = nullptr;		/// Character's father
 	character *Mother = nullptr;		/// Character's mother
 	LuaCallback *Conditions = nullptr;
-	condition *preconditions = nullptr;
-	condition *conditions = nullptr;
+private:
+	std::unique_ptr<condition> preconditions;
+	std::unique_ptr<condition> conditions;
+public:
 	std::vector<CPersistentItem *> EquippedItems[static_cast<int>(stratagus::item_slot::count)]; //equipped items of the character, per slot
 	std::vector<character *> Children;	/// Children of the character
 	std::vector<character *> Siblings;	/// Siblings of the character

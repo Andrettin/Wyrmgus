@@ -107,12 +107,12 @@ public:
 		return this->campaign_only;
 	}
 
-	condition *get_preconditions() const
+	const std::unique_ptr<condition> &get_preconditions() const
 	{
 		return this->preconditions;
 	}
 
-	condition *get_conditions() const
+	const std::unique_ptr<condition> &get_conditions() const
 	{
 		return this->conditions;
 	}
@@ -126,8 +126,8 @@ public:
 	LuaCallback *Conditions = nullptr;
 	LuaCallback *Effects = nullptr;
 private:
-	condition *preconditions = nullptr;
-	condition *conditions = nullptr;
+	std::unique_ptr<condition> preconditions;
+	std::unique_ptr<condition> conditions;
 public:
 	std::unique_ptr<effect_list> effects;
 };

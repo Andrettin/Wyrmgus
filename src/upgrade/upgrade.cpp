@@ -271,10 +271,10 @@ void CUpgrade::ProcessConfigData(const CConfigData *config_data)
 				}
 			}
 		} else if (child_config_data->Tag == "preconditions") {
-			this->preconditions = new stratagus::and_condition;
+			this->preconditions = std::make_unique<stratagus::and_condition>();
 			this->preconditions->ProcessConfigData(child_config_data);
 		} else if (child_config_data->Tag == "conditions") {
-			this->conditions = new stratagus::and_condition;
+			this->conditions = std::make_unique<stratagus::and_condition>();
 			this->conditions->ProcessConfigData(child_config_data);
 		} else if (child_config_data->Tag == "modifier") {
 			auto modifier = std::make_unique<stratagus::upgrade_modifier>();
@@ -331,10 +331,10 @@ void CUpgrade::process_sml_scope(const stratagus::sml_data &scope)
 		stratagus::upgrade_modifier::UpgradeModifiers.push_back(modifier.get());
 		this->modifiers.push_back(std::move(modifier));
 	} else if (tag == "preconditions") {
-		this->preconditions = new stratagus::and_condition;
+		this->preconditions = std::make_unique<stratagus::and_condition>();
 		stratagus::database::process_sml_data(this->preconditions, scope);
 	} else if (tag == "conditions") {
-		this->conditions = new stratagus::and_condition;
+		this->conditions = std::make_unique<stratagus::and_condition>();
 		stratagus::database::process_sml_data(this->conditions, scope);
 	}
 }

@@ -757,7 +757,7 @@ void trigger::process_sml_scope(const sml_data &scope)
 		this->effects = std::make_unique<effect_list>();
 		database::process_sml_data(this->effects, scope);
 	} else if (tag == "conditions") {
-		this->conditions = new and_condition;
+		this->conditions = std::make_unique<and_condition>();
 		database::process_sml_data(this->conditions, scope);
 	} else {
 		data_entry::process_sml_scope(scope);

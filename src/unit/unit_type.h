@@ -870,7 +870,7 @@ public:
 		return unit_type;
 	}
 
-	unit_type(const std::string &identifier);
+	explicit unit_type(const std::string &identifier);
 	~unit_type();
 
 	virtual void process_sml_property(const sml_property &property) override;
@@ -1032,12 +1032,12 @@ public:
 		return this->variations;
 	}
 
-	condition *get_preconditions() const
+	const std::unique_ptr<condition> &get_preconditions() const
 	{
 		return this->preconditions;
 	}
 
-	condition *get_conditions() const
+	const std::unique_ptr<condition> &get_conditions() const
 	{
 		return this->conditions;
 	}
@@ -1271,8 +1271,8 @@ public:
 	CPlayerColorGraphic *LayerSprites[MaxImageLayers];	/// Layer sprite images
 	
 private:
-	stratagus::condition *preconditions = nullptr;
-	stratagus::condition *conditions = nullptr;
+	std::unique_ptr<condition> preconditions;
+	std::unique_ptr<condition> conditions;
 	
 public:
 	std::string Mod;							/// To which mod (or map), if any, this unit type belongs
