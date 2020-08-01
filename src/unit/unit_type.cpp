@@ -1378,6 +1378,15 @@ void unit_type::set_unit_class(stratagus::unit_class *unit_class)
 	}
 }
 
+void unit_type::check() const
+{
+	for (const spell *spell : this->get_autocast_spells()) {
+		if (!spell->AutoCast) {
+			throw std::runtime_error("The spell \"" + spell->get_identifier() + "\" is set to be autocast by default for unit type \"" + this->get_identifier() + "\", but has no defined autocast method.");
+		}
+	}
+}
+
 QSize unit_type::get_half_tile_size() const
 {
 	return this->get_tile_size() / 2;
@@ -1419,15 +1428,11 @@ bool unit_type::is_autocast_spell(const spell *spell) const
 
 void unit_type::add_autocast_spell(const spell *spell)
 {
-	if (spell->AutoCast) {
-		if (static_cast<size_t>(spell->Slot) >= this->spell_autocast.size()) {
-			this->spell_autocast.resize(spell->Slot + 1, false);
-		}
-		this->spell_autocast[spell->Slot] = true;
-		this->autocast_spells.push_back(spell);
-	} else {
-		throw std::runtime_error("AutoCastActive : Define autocast method for \"" + spell->get_identifier() + "\".");
+	if (static_cast<size_t>(spell->Slot) >= this->spell_autocast.size()) {
+		this->spell_autocast.resize(spell->Slot + 1, false);
 	}
+	this->spell_autocast[spell->Slot] = true;
+	this->autocast_spells.push_back(spell);
 }
 
 bool unit_type::CheckUserBoolFlags(const char *BoolFlags) const
