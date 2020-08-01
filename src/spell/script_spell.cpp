@@ -318,7 +318,7 @@ static int CclDefineSpell(lua_State *l)
 {
 	const int args = lua_gettop(l);
 	const std::string identname = LuaToString(l, 1);
-	CSpell *spell = CSpell::GetOrAddSpell(identname);
+	stratagus::spell *spell = stratagus::spell::get_or_add(identname, nullptr);
 
 	for (int i = 1; i < args; ++i) {
 		const char *value = LuaToString(l, i + 1);

@@ -93,13 +93,9 @@ static int CclDefineUniqueItem(lua_State *l)
 			item->Set = upgrade;
 			item->Set->UniqueItems.push_back(item);
 		} else if (!strcmp(value, "Spell")) {
-			std::string spell_ident = LuaToString(l, -1);
-			CSpell *spell = CSpell::GetSpell(spell_ident);
-			if (spell != nullptr) {
-				item->Spell = spell;
-			} else {
-				LuaError(l, "Spell \"%s\" doesn't exist." _C_ spell_ident.c_str());
-			}
+			const std::string spell_ident = LuaToString(l, -1);
+			stratagus::spell *spell = stratagus::spell::get(spell_ident);
+			item->Spell = spell;
 		} else if (!strcmp(value, "Work")) {
 			std::string upgrade_ident = LuaToString(l, -1);
 			CUpgrade *upgrade = CUpgrade::get(upgrade_ident);

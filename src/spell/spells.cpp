@@ -8,8 +8,6 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name spells.cpp - The spell cast action. */
-//
 //      (c) Copyright 1998-2020 by Vladi Belperchinov-Shabanski, Lutz Sammer,
 //                                 Jimmy Salmon, Joris Dauphin and Andrettin
 //
@@ -60,21 +58,6 @@
 #include "upgrade/upgrade.h"
 #include "util/string_util.h"
 
-/*----------------------------------------------------------------------------
--- Variables
-----------------------------------------------------------------------------*/
-
-/**
-** Define the names and effects of all available spells in the game
-*/
-std::vector<CSpell *> CSpell::Spells;
-std::map<std::string, CSpell *> CSpell::SpellsByIdent;
-
-
-/*----------------------------------------------------------------------------
--- Functions
-----------------------------------------------------------------------------*/
-
 // ****************************************************************************
 // Target constructor
 // ****************************************************************************
@@ -107,7 +90,7 @@ static Target *NewTargetUnit(CUnit &unit)
 **
 **	@return	True if passed, or false otherwise.
 */
-static bool PassCondition(const CUnit &caster, const CSpell &spell, const CUnit *target,
+static bool PassCondition(const CUnit &caster, const stratagus::spell &spell, const CUnit *target,
 						  const Vec2i &goalPos, const ConditionInfo *condition, const CMapLayer *map_layer)
 {
 	if (caster.Variable[MANA_INDEX].Value < spell.ManaCost) { // Check caster mana.
@@ -287,27 +270,36 @@ private:
 	const bool reverse;
 };
 
-/**
-**	@brief	Spell constructor.
-*/
-CSpell::CSpell(int slot, const std::string &ident) :
-	Slot(slot), Target(), Action(),
-	Range(0), ManaCost(0), RepeatCast(0), Stackable(true), CoolDown(0),
-	DependencyId(-1), Condition(nullptr),
-	AutoCast(nullptr), AICast(nullptr), ForceUseAnimation(false)
-{
-	this->Ident = ident;
+namespace stratagus {
 
+spell *spell::add(const std::string &identifier, const stratagus::module *module)
+{
+	spell *spell = data_type::add(identifier, module);
+	spell->Slot = spell::get_all().size() - 1;
+
+	for (unit_type *unit_type : unit_type::get_all()) { // adjust array for casters which have already been defined
+		if (unit_type->AutoCastActive) {
+			char *newc = new char[(spell->Slot + 1) * sizeof(char)];
+			memcpy(newc, unit_type->AutoCastActive, spell->Slot * sizeof(char));
+			delete[] unit_type->AutoCastActive;
+			unit_type->AutoCastActive = newc;
+			unit_type->AutoCastActive[spell->Slot] = 0;
+		}
+	}
+
+	return spell;
+}
+
+
+spell::spell(const std::string &identifier) : named_data_entry(identifier), CDataType(identifier)
+{
 	memset(Costs, 0, sizeof(Costs));
 	//Wyrmgus start
 	memset(ItemSpell, 0, sizeof(ItemSpell));
 	//Wyrmgus end
 }
 
-/**
-**	@brief	Spell destructor.
-*/
-CSpell::~CSpell()
+spell::~spell()
 {
 	for (std::vector<SpellActionType *>::iterator act = Action.begin(); act != Action.end(); ++act) {
 		delete *act;
@@ -323,79 +315,16 @@ CSpell::~CSpell()
 }
 
 /**
-**	@brief	Get a spell
-**
-**	@param	ident	The spell's string identifier
-**
-**	@return	The spell if found, or null otherwise
-*/
-CSpell *CSpell::GetSpell(const std::string &ident, const bool should_find)
-{
-	std::map<std::string, CSpell *>::const_iterator find_iterator = SpellsByIdent.find(ident);
-	
-	if (find_iterator != SpellsByIdent.end()) {
-		return find_iterator->second;
-	}
-	
-	if (should_find) {
-		fprintf(stderr, "Invalid spell: \"%s\".\n", ident.c_str());
-	}
-	
-	return nullptr;
-}
-
-/**
-**	@brief	Get or add a spell
-**
-**	@param	ident	The spell's string identifier
-**
-**	@return	The spell if found, otherwise a new spell is created and returned
-*/
-CSpell *CSpell::GetOrAddSpell(const std::string &ident)
-{
-	CSpell *spell = GetSpell(ident, false);
-	
-	if (!spell) {
-		spell = new CSpell(Spells.size(), ident);
-		for (stratagus::unit_type *unit_type : stratagus::unit_type::get_all()) { // adjust array for casters that have already been defined
-			if (unit_type->AutoCastActive) {
-				char *newc = new char[(Spells.size() + 1) * sizeof(char)];
-				memcpy(newc, unit_type->AutoCastActive, Spells.size() * sizeof(char));
-				delete[] unit_type->AutoCastActive;
-				unit_type->AutoCastActive = newc;
-				unit_type->AutoCastActive[Spells.size()] = 0;
-			}
-		}
-		Spells.push_back(spell);
-		SpellsByIdent[ident] = spell;
-	}
-	
-	return spell;
-}
-
-/**
-**	@brief	Remove the existing spells
-*/
-void CSpell::ClearSpells()
-{
-	DebugPrint("Cleaning spells.\n");
-	for (size_t i = 0; i < Spells.size(); ++i) {
-		delete Spells[i];
-	}
-	Spells.clear();
-}
-
-/**
 **	@brief	Process data provided by a configuration file
 **
 **	@param	config_data	The configuration data
 */
-void CSpell::ProcessConfigData(const CConfigData *config_data)
+void spell::ProcessConfigData(const CConfigData *config_data)
 {
 	for (size_t i = 0; i < config_data->Properties.size(); ++i) {
 		std::string key = config_data->Properties[i].first;
 		std::string value = config_data->Properties[i].second;
-		
+
 		if (key == "name") {
 			this->Name = value;
 		} else if (key == "description") {
@@ -430,7 +359,7 @@ void CSpell::ProcessConfigData(const CConfigData *config_data)
 			value = FindAndReplaceString(value, "_", "-");
 			this->SoundWhenCast.Name = value;
 			this->SoundWhenCast.MapSound();
-			
+
 			//check the sound
 			if (!this->SoundWhenCast.Sound) {
 				this->SoundWhenCast.Name.clear();
@@ -442,18 +371,18 @@ void CSpell::ProcessConfigData(const CConfigData *config_data)
 				fprintf(stderr, "Invalid upgrade: \"%s\".\n", value.c_str());
 			}
 		} else if (key == "item_spell") {
-			const int item_class = static_cast<int>(stratagus::string_to_item_class(value));
+			const int item_class = static_cast<int>(string_to_item_class(value));
 			this->ItemSpell[item_class] = true;
 		} else {
 			fprintf(stderr, "Invalid spell property: \"%s\".\n", key.c_str());
 		}
 	}
-	
+
 	for (const CConfigData *child_config_data : config_data->Children) {
 		if (child_config_data->Tag == "actions") {
 			for (const CConfigData *grandchild_config_data : child_config_data->Children) {
 				SpellActionType *spell_action = nullptr;
-				
+
 				if (grandchild_config_data->Tag == "adjust_variable") {
 					spell_action = new Spell_AdjustVariable;
 				} else if (grandchild_config_data->Tag == "spawn_missile") {
@@ -461,7 +390,7 @@ void CSpell::ProcessConfigData(const CConfigData *config_data)
 				} else {
 					fprintf(stderr, "Invalid spell action type: \"%s\".\n", grandchild_config_data->Tag.c_str());
 				}
-				
+
 				spell_action->ProcessConfigData(grandchild_config_data);
 				this->Action.push_back(spell_action);
 			}
@@ -483,11 +412,11 @@ void CSpell::ProcessConfigData(const CConfigData *config_data)
 		} else if (child_config_data->Tag == "resource_cost") {
 			int resource = -1;
 			int cost = 0;
-				
+
 			for (size_t j = 0; j < child_config_data->Properties.size(); ++j) {
 				std::string key = child_config_data->Properties[j].first;
 				std::string value = child_config_data->Properties[j].second;
-				
+
 				if (key == "resource") {
 					value = FindAndReplaceString(value, "_", "-");
 					resource = GetResourceIdByName(value.c_str());
@@ -500,17 +429,17 @@ void CSpell::ProcessConfigData(const CConfigData *config_data)
 					fprintf(stderr, "Invalid resource cost property: \"%s\".\n", key.c_str());
 				}
 			}
-			
+
 			if (resource == -1) {
 				fprintf(stderr, "Resource cost has no resource.\n");
 				continue;
 			}
-			
+
 			if (cost == 0) {
 				fprintf(stderr, "Resource cost has no valid cost amount.\n");
 				continue;
 			}
-			
+
 			this->Costs[resource] = cost;
 		} else {
 			fprintf(stderr, "Invalid spell property: \"%s\".\n", child_config_data->Tag.c_str());
@@ -525,7 +454,7 @@ void CSpell::ProcessConfigData(const CConfigData *config_data)
 **
 **	@return	The autocast info for the spell if present, or null otherwise
 */
-const AutoCastInfo *CSpell::GetAutoCastInfo(const bool ai) const
+const AutoCastInfo *spell::GetAutoCastInfo(const bool ai) const
 {
 	if (ai && this->AICast) {
 		return this->AICast;
@@ -542,18 +471,18 @@ const AutoCastInfo *CSpell::GetAutoCastInfo(const bool ai) const
 **
 **	@return	True if the generic conditions to autocast the spell are fulfilled, or false otherwise
 */
-bool CSpell::CheckAutoCastGenericConditions(const CUnit &caster, const AutoCastInfo *autocast, const bool ignore_combat_status) const
+bool spell::CheckAutoCastGenericConditions(const CUnit &caster, const AutoCastInfo *autocast, const bool ignore_combat_status) const
 {
 	if (!autocast) {
 		return false;
 	}
-	
+
 	if (!ignore_combat_status && autocast->Combat != CONDITION_TRUE) {
 		if ((autocast->Combat == CONDITION_ONLY) ^ (caster.IsInCombat())) {
 			return false;
 		}
 	}
-	
+
 	return true;
 }
 
@@ -567,12 +496,12 @@ bool CSpell::CheckAutoCastGenericConditions(const CUnit &caster, const AutoCastI
 **
 **	@return	True if the generic conditions to autocast the spell are fulfilled, or false otherwise
 */
-bool CSpell::IsUnitValidAutoCastTarget(const CUnit *target, const CUnit &caster, const AutoCastInfo *autocast, const int max_path_length) const
+bool spell::IsUnitValidAutoCastTarget(const CUnit *target, const CUnit &caster, const AutoCastInfo *autocast, const int max_path_length) const
 {
 	if (!target || !autocast) {
 		return false;
 	}
-	
+
 	// Check if unit is in battle
 	if (this->Target == TargetType::Unit) {
 		if (autocast->Attacker == CONDITION_ONLY) {
@@ -582,15 +511,15 @@ bool CSpell::IsUnitValidAutoCastTarget(const CUnit *target, const CUnit &caster,
 					target->CurrentAction() != UnitAction::Attack
 					&& target->CurrentAction() != UnitAction::AttackGround
 					&& target->CurrentAction() != UnitAction::SpellCast
-				)
+					)
 				|| target->CurrentOrder()->HasGoal() == false
 				|| target->MapDistanceTo(target->CurrentOrder()->GetGoalPos(), target->CurrentOrder()->GetGoalMapLayer()) > react_range
-			) {
+				) {
 				return false;
 			}
 		}
 	}
-	
+
 	// Check for corpse
 	if (autocast->Corpse == CONDITION_ONLY) {
 		if (target->CurrentAction() != UnitAction::Die) {
@@ -601,7 +530,7 @@ bool CSpell::IsUnitValidAutoCastTarget(const CUnit *target, const CUnit &caster,
 			return false;
 		}
 	}
-	
+
 	//Wyrmgus start
 	if (this->Target == TargetType::Unit) {
 		//if caster is terrified, don't target enemy units
@@ -610,7 +539,7 @@ bool CSpell::IsUnitValidAutoCastTarget(const CUnit *target, const CUnit &caster,
 		}
 	}
 	//Wyrmgus end
-	
+
 	if (!PassCondition(caster, *this, target, caster.tilePos, this->Condition, target->MapLayer) || !PassCondition(caster, *this, target, caster.tilePos, autocast->Condition, target->MapLayer)) {
 		return false;
 	}
@@ -638,24 +567,24 @@ bool CSpell::IsUnitValidAutoCastTarget(const CUnit *target, const CUnit &caster,
 **
 **	@return	True if the generic conditions to autocast the spell are fulfilled, or false otherwise
 */
-std::vector<CUnit *> CSpell::GetPotentialAutoCastTargets(const CUnit &caster, const AutoCastInfo *autocast) const
+std::vector<CUnit *> spell::GetPotentialAutoCastTargets(const CUnit &caster, const AutoCastInfo *autocast) const
 {
 	std::vector<CUnit *> potential_targets;
-	
+
 	if (!autocast) {
 		return potential_targets;
 	}
-	
+
 	int range = autocast->Range;
 	int min_range = autocast->MinRange;
 
 	if (caster.CurrentAction() == UnitAction::StandGround) {
 		range = std::min(range, this->Range);
 	}
-	
+
 	//select all units around the caster
 	SelectAroundUnit(caster, range, potential_targets, OutOfMinRange(min_range, caster.tilePos, caster.MapLayer->ID));
-	
+
 	//check each unit to see if it is a possible target
 	int n = 0;
 	for (size_t i = 0; i != potential_targets.size(); ++i) {
@@ -663,10 +592,29 @@ std::vector<CUnit *> CSpell::GetPotentialAutoCastTargets(const CUnit &caster, co
 			potential_targets[n++] = potential_targets[i];
 		}
 	}
-	
+
 	potential_targets.resize(n);
 
 	return potential_targets;
+}
+
+/**
+**	@brief	Check if a spell is available for a given unit
+**
+**	@param	unit	The unit for whom we want to know if have access to the spell
+**
+**	@return	True if the spell is available for the unit, and false otherwise
+*/
+bool spell::IsAvailableForUnit(const CUnit &unit) const
+{
+	const int dependencyId = this->DependencyId;
+
+	//Wyrmgus start
+//	return dependencyId == -1 || UpgradeIdAllowed(player, dependencyId) == 'R';
+	return dependencyId == -1 || unit.GetIndividualUpgrade(CUpgrade::get_all()[dependencyId]) > 0 || UpgradeIdAllowed(*unit.Player, dependencyId) == 'R';
+	//Wyrmgus end
+}
+
 }
 
 /**
@@ -679,7 +627,7 @@ std::vector<CUnit *> CSpell::GetPotentialAutoCastTargets(const CUnit &caster, co
 **	@todo FIXME: should be global (for AI) ???
 **	@todo FIXME: write for position target.
 */
-static Target *SelectTargetUnitsOfAutoCast(CUnit &caster, const CSpell &spell)
+static Target *SelectTargetUnitsOfAutoCast(CUnit &caster, const stratagus::spell &spell)
 {
 	const AutoCastInfo *autocast = spell.GetAutoCastInfo(caster.Player->AiEnabled);
 	Assert(autocast);
@@ -772,23 +720,6 @@ void InitSpells()
 // ****************************************************************************
 
 /**
-**	@brief	Check if a spell is available for a given unit
-**
-**	@param	unit	The unit for whom we want to know if have access to the spell
-**
-**	@return	True if the spell is available for the unit, and false otherwise
-*/
-bool CSpell::IsAvailableForUnit(const CUnit &unit) const
-{
-	const int dependencyId = this->DependencyId;
-
-	//Wyrmgus start
-//	return dependencyId == -1 || UpgradeIdAllowed(player, dependencyId) == 'R';
-	return dependencyId == -1 || unit.GetIndividualUpgrade(CUpgrade::get_all()[dependencyId]) > 0 || UpgradeIdAllowed(*unit.Player, dependencyId) == 'R';
-	//Wyrmgus end
-}
-
-/**
 **	@brief	Check if unit can cast the spell.
 **
 **	@param	caster	Unit that casts the spell
@@ -800,7 +731,7 @@ bool CSpell::IsAvailableForUnit(const CUnit &unit) const
 **	@return	True if the spell should/can casted, false if not
 **	@note	caster must know the spell, and spell must be researched.
 */
-bool CanCastSpell(const CUnit &caster, const CSpell &spell,
+bool CanCastSpell(const CUnit &caster, const stratagus::spell &spell,
 				  const CUnit *target, const Vec2i &goalPos, const CMapLayer *map_layer)
 {
 	if (spell.Target == TargetType::Unit && target == nullptr) {
@@ -817,7 +748,7 @@ bool CanCastSpell(const CUnit &caster, const CSpell &spell,
 **
 **	@return	1 if spell is casted, 0 if not.
 */
-int AutoCastSpell(CUnit &caster, const CSpell &spell)
+int AutoCastSpell(CUnit &caster, const stratagus::spell &spell)
 {
 	//  Check for mana and cooldown time, trivial optimization.
 	if (!caster.CanAutoCastSpell(&spell)) {
@@ -852,7 +783,7 @@ int AutoCastSpell(CUnit &caster, const CSpell &spell)
 **
 ** @return          !=0 if spell should/can continue or 0 to stop
 */
-int SpellCast(CUnit &caster, const CSpell &spell, CUnit *target, const Vec2i &goalPos, CMapLayer *map_layer)
+int SpellCast(CUnit &caster, const stratagus::spell &spell, CUnit *target, const Vec2i &goalPos, CMapLayer *map_layer)
 {
 	Vec2i pos = goalPos;
 	int z = map_layer ? map_layer->ID : 0;

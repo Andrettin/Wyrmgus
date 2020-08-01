@@ -316,7 +316,7 @@
 	}
 	if (Costs[ManaResCost]) {
 		const CGraphic *G = UI.Resources[ManaResCost].G;
-		const CSpell *spell = CSpell::Spells[button.Value];
+		const stratagus::spell *spell = stratagus::spell::get_all()[button.Value];
 
 		if (spell->ManaCost) {
 			popupWidth = 10;
@@ -376,7 +376,7 @@
 		}
 	}
 	if (Costs[ManaResCost]) {
-		const CSpell &spell = *CSpell::Spells[button.Value];
+		const stratagus::spell &spell = *stratagus::spell::get_all()[button.Value];
 		//Wyrmgus start
 //		const CGraphic *G = UI.Resources[ManaResCost].G;
 		CGraphic *G = UI.Resources[ManaResCost].G;

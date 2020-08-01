@@ -96,7 +96,7 @@
 **
 **  @return             =!0 if spell should be repeated, 0 if not
 */
-/* virtual */ int Spell_Demolish::Cast(CUnit &caster, const CSpell &, CUnit *, const Vec2i &goalPos, int z, int modifier)
+/* virtual */ int Spell_Demolish::Cast(CUnit &caster, const stratagus::spell &, CUnit *, const Vec2i &goalPos, int z, int modifier)
 {
 	// Allow error margins. (Lame, I know)
 	const Vec2i offset(this->Range + 2, this->Range + 2);

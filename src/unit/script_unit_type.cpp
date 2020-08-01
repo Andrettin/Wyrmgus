@@ -1454,10 +1454,7 @@ static int CclDefineUnitType(lua_State *l)
 			}
 			for (int k = 0; k < subargs; ++k) {
 				value = LuaToString(l, -1, k + 1);
-				CSpell *spell = CSpell::GetSpell(value);
-				if (spell == nullptr) {
-					LuaError(l, "Unknown spell type: %s" _C_ value);
-				}
+				stratagus::spell *spell = stratagus::spell::get(value);
 				type->Spells.push_back(spell);
 			}
 		} else if (!strcmp(value, "AutoCastActive")) {
@@ -1469,8 +1466,8 @@ static int CclDefineUnitType(lua_State *l)
 			// have been defined.
 			//
 			if (!type->AutoCastActive) {
-				type->AutoCastActive = new char[CSpell::Spells.size()];
-				memset(type->AutoCastActive, 0, CSpell::Spells.size() * sizeof(char));
+				type->AutoCastActive = new char[stratagus::spell::get_all().size()];
+				memset(type->AutoCastActive, 0, stratagus::spell::get_all().size() * sizeof(char));
 			}
 			const int subargs = lua_rawlen(l, -1);
 			if (subargs == 0) {
@@ -1480,10 +1477,7 @@ static int CclDefineUnitType(lua_State *l)
 			}
 			for (int k = 0; k < subargs; ++k) {
 				value = LuaToString(l, -1, k + 1);
-				const CSpell *spell = CSpell::GetSpell(value);
-				if (spell == nullptr) {
-					LuaError(l, "AutoCastActive : Unknown spell type: %s" _C_ value);
-				}
+				const stratagus::spell *spell = stratagus::spell::get(value);
 				type->AutoCastActive[spell->Slot] = 1;
 			}
 		} else if (!strcmp(value, "CanTargetFlag")) {
@@ -1665,10 +1659,8 @@ static int CclDefineUnitType(lua_State *l)
 			const int args = lua_rawlen(l, -1);
 			for (int j = 0; j < args; ++j) {
 				value = LuaToString(l, -1, j + 1);
-				CSpell *spell = CSpell::GetSpell(value);
-				if (spell != nullptr) {
-					type->DropSpells.push_back(spell);
-				}
+				stratagus::spell *spell = stratagus::spell::get(value);
+				type->DropSpells.push_back(spell);
 			}
 		} else if (!strcmp(value, "Affixes")) {
 			const int args = lua_rawlen(l, -1);

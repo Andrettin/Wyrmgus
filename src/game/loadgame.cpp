@@ -133,7 +133,6 @@ void CleanModules()
 	CSeasonSchedule::ClearSeasonSchedules();
 	CParticleManager::exit();
 	CleanReplayLog();
-	CSpell::ClearSpells();
 	FreePathfinder();
 
 	stratagus::database::get()->clear();

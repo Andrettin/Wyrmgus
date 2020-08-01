@@ -31,10 +31,10 @@
 
 class CConfigData;
 class CUpgrade;
-class CSpell;
 
 namespace stratagus {
 	class character;
+	class spell;
 	class unit_type;
 }
 
@@ -61,7 +61,7 @@ public:
 	CUpgrade *Prefix;
 	CUpgrade *Suffix;
 	CUpgrade *Set;
-	CSpell *Spell;
+	stratagus::spell *Spell;
 	CUpgrade *Work;
 	CUpgrade *Elixir;
 };
@@ -77,7 +77,7 @@ public:
 	stratagus::unit_type *Type = nullptr;	/// Item type of the item
 	CUpgrade *Prefix = nullptr;
 	CUpgrade *Suffix = nullptr;
-	CSpell *Spell = nullptr;
+	stratagus::spell *Spell = nullptr;
 	CUpgrade *Work = nullptr;
 	CUpgrade *Elixir = nullptr;
 	CUniqueItem *Unique = nullptr;

@@ -297,7 +297,7 @@ void CConfigData::ProcessConfigData(const std::vector<CConfigData *> &config_dat
 				site->ProcessConfigData(config_data);
 			}
 		} else if (config_data->Tag == "spell") {
-			CSpell *spell = CSpell::GetOrAddSpell(ident);
+			stratagus::spell *spell = stratagus::spell::get_or_add(ident, nullptr);
 			if (!define_only) {
 				spell->ProcessConfigData(config_data);
 			}

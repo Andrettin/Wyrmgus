@@ -66,11 +66,7 @@
 #include "unit/unit_type_type.h"
 #include "video.h"
 
-/*----------------------------------------------------------------------------
---  Functions
-----------------------------------------------------------------------------*/
-
-/* static */ COrder *COrder::NewActionSpellCast(const CSpell &spell, const Vec2i &pos, CUnit *target, int z, bool isAutocast)
+/* static */ COrder *COrder::NewActionSpellCast(const stratagus::spell &spell, const Vec2i &pos, CUnit *target, int z, bool isAutocast)
 {
 	COrder_SpellCast *order = new COrder_SpellCast(isAutocast);
 
@@ -124,7 +120,7 @@
 {
 	if (!strcmp(value, "spell")) {
 		++j;
-		this->Spell = CSpell::GetSpell(LuaToString(l, -1, j + 1));
+		this->Spell = stratagus::spell::get(LuaToString(l, -1, j + 1));
 	} else if (!strcmp(value, "range")) {
 		++j;
 		this->Range = LuaToNumber(l, -1, j + 1);
@@ -396,7 +392,7 @@ bool COrder_SpellCast::SpellMoveToTarget(CUnit &unit)
 		unit.Anim = unit.WaitBackup;
 		unit.Waiting = 0;
 	}
-	const CSpell &spell = order.GetSpell();
+	const stratagus::spell &spell = order.GetSpell();
 	switch (this->State) {
 		case 0:
 			// Check if we can cast the spell.

@@ -332,12 +332,8 @@ static int CclDefineCharacter(lua_State *l)
 						}
 					} else if (!strcmp(value, "spell")) {
 						std::string spell_ident = LuaToString(l, -1, k + 1);
-						CSpell *spell = CSpell::GetSpell(spell_ident);
-						if (spell != nullptr) {
-							item->Spell = const_cast<CSpell *>(&(*spell));
-						} else {
-							fprintf(stderr, "Spell \"%s\" doesn't exist.", spell_ident.c_str());
-						}
+						stratagus::spell *spell = stratagus::spell::get(spell_ident);
+						item->Spell = spell;
 					} else if (!strcmp(value, "work")) {
 						std::string upgrade_ident = LuaToString(l, -1, k + 1);
 						CUpgrade *upgrade = CUpgrade::try_get(upgrade_ident);
@@ -640,12 +636,8 @@ static int CclDefineCustomHero(lua_State *l)
 						}
 					} else if (!strcmp(value, "spell")) {
 						std::string spell_ident = LuaToString(l, -1, k + 1);
-						CSpell *spell = CSpell::GetSpell(spell_ident);
-						if (spell != nullptr) {
-							item->Spell = const_cast<CSpell *>(&(*spell));
-						} else {
-							fprintf(stderr, "Spell \"%s\" doesn't exist.", spell_ident.c_str());
-						}
+						stratagus::spell *spell = stratagus::spell::get(spell_ident);
+						item->Spell = spell;
 					} else if (!strcmp(value, "work")) {
 						std::string upgrade_ident = LuaToString(l, -1, k + 1);
 						CUpgrade *upgrade = CUpgrade::try_get(upgrade_ident);

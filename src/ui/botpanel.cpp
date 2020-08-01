@@ -528,7 +528,7 @@ static bool CanShowPopupContent(const PopupConditionPanel *condition,
 	//Wyrmgus start
 	if (button.Action == ButtonCmd::SpellCast) {
 		if (condition->AutoCast != CONDITION_TRUE) {
-			if ((condition->AutoCast == CONDITION_ONLY) ^ (CSpell::Spells[button.Value]->AutoCast != nullptr)) {
+			if ((condition->AutoCast == CONDITION_ONLY) ^ (stratagus::spell::get_all()[button.Value]->AutoCast != nullptr)) {
 				return false;
 			}
 		}
@@ -810,8 +810,8 @@ void DrawPopup(const stratagus::button &button, int x, int y, bool above)
 			CPlayer::GetThisPlayer()->GetUpgradeCosts(upgrade, Costs);
 			break;
 		case ButtonCmd::SpellCast:
-			memcpy(Costs, CSpell::Spells[button.Value]->Costs, sizeof(CSpell::Spells[button.Value]->Costs));
-			Costs[ManaResCost] = CSpell::Spells[button.Value]->ManaCost;
+			memcpy(Costs, stratagus::spell::get_all()[button.Value]->Costs, sizeof(stratagus::spell::get_all()[button.Value]->Costs));
+			Costs[ManaResCost] = stratagus::spell::get_all()[button.Value]->ManaCost;
 			break;
 		case ButtonCmd::Build:
 		case ButtonCmd::BuildClass:
@@ -1048,10 +1048,10 @@ void CButtonPanel::Draw()
 				gray = true;
 				break;
 			} else if (button->Action == ButtonCmd::SpellCast
-					   && (*Selected[j]).SpellCoolDownTimers[CSpell::Spells[button->Value]->Slot]) {
-				Assert(CSpell::Spells[button->Value]->CoolDown > 0);
+					   && (*Selected[j]).SpellCoolDownTimers[stratagus::spell::get_all()[button->Value]->Slot]) {
+				Assert(stratagus::spell::get_all()[button->Value]->CoolDown > 0);
 				cooldownSpell = true;
-				maxCooldown = std::max(maxCooldown, (*Selected[j]).SpellCoolDownTimers[CSpell::Spells[button->Value]->Slot]);
+				maxCooldown = std::max(maxCooldown, (*Selected[j]).SpellCoolDownTimers[stratagus::spell::get_all()[button->Value]->Slot]);
 			}
 		}
 		//
@@ -1135,7 +1135,7 @@ void CButtonPanel::Draw()
 //			button->Icon.Icon->DrawCooldownSpellIcon(pos,
 			button_icon->DrawCooldownSpellIcon(pos,
 			//Wyrmgus end
-														maxCooldown * 100 / CSpell::Spells[button->Value]->CoolDown);
+				maxCooldown * 100 / stratagus::spell::get_all()[button->Value]->CoolDown);
 		} else if (gray) {
 			//Wyrmgus start
 //			button->Icon.Icon->DrawGrayscaleIcon(pos);
@@ -1376,7 +1376,7 @@ bool IsButtonAllowed(const CUnit &unit, const stratagus::button &buttonaction)
 			res = unit.CanLearnAbility(upgrade, true);
 			break;
 		case ButtonCmd::SpellCast:
-			res = CSpell::Spells[buttonaction.Value]->IsAvailableForUnit(unit);
+			res = stratagus::spell::get_all()[buttonaction.Value]->IsAvailableForUnit(unit);
 			break;
 		case ButtonCmd::Unload:
 			res = (Selected[0]->Type->CanTransport() && Selected[0]->BoardCount);
@@ -1520,7 +1520,7 @@ bool IsButtonUsable(const CUnit &unit, const stratagus::button &buttonaction)
 			res = unit.CanLearnAbility(upgrade);
 			break;
 		case ButtonCmd::SpellCast:
-			res = CSpell::Spells[buttonaction.Value]->IsAvailableForUnit(unit);
+			res = stratagus::spell::get_all()[buttonaction.Value]->IsAvailableForUnit(unit);
 			break;
 		case ButtonCmd::Faction:
 			res = CPlayer::GetThisPlayer()->CanFoundFaction(stratagus::faction::get_all()[CPlayer::GetThisPlayer()->Faction]->DevelopsTo[buttonaction.Value]);
@@ -1888,7 +1888,7 @@ void CButtonPanel::DoClicked_SpellCast(int button)
 	if (KeyModifiers & ModifierControl) {
 		int autocast = 0;
 
-		if (!CSpell::Spells[spellId]->AutoCast) {
+		if (!stratagus::spell::get_all()[spellId]->AutoCast) {
 			PlayGameSound(GameSounds.PlacementError[CPlayer::GetThisPlayer()->Race].Sound, MaxSampleVolume);
 			return;
 		}
@@ -1909,7 +1909,7 @@ void CButtonPanel::DoClicked_SpellCast(int button)
 		}
 		return;
 	}
-	if (CSpell::Spells[spellId]->IsCasterOnly()) {
+	if (stratagus::spell::get_all()[spellId]->IsCasterOnly()) {
 		const int flush = !(KeyModifiers & ModifierShift);
 
 		for (size_t i = 0; i != Selected.size(); ++i) {

@@ -63,6 +63,7 @@
 #include "resource.h"
 #include "sound/sound.h"
 #include "species.h"
+#include "spells.h"
 #include "time/calendar.h"
 #include "time/time_of_day.h"
 #include "time/timeline.h"
@@ -240,6 +241,8 @@ QVariant database::process_sml_property_value(const sml_property &property, cons
 			new_property_value = QVariant::fromValue(sound::get(property.get_value()));
 		} else if (property_class_name == "stratagus::species*") {
 			new_property_value = QVariant::fromValue(species::get(property.get_value()));
+		} else if (property_class_name == "stratagus::spell*") {
+			new_property_value = QVariant::fromValue(spell::get(property.get_value()));
 		} else if (property_class_name == "stratagus::terrain_feature*") {
 			new_property_value = QVariant::fromValue(terrain_feature::get(property.get_value()));
 		} else if (property_class_name == "stratagus::terrain_type*") {

@@ -175,13 +175,8 @@ void CPersistentItem::ProcessConfigData(const CConfigData *config_data)
 				fprintf(stderr, "Upgrade \"%s\" doesn't exist.\n", value.c_str());
 			}
 		} else if (key == "spell") {
-			value = FindAndReplaceString(value, "_", "-");
-			CSpell *spell = CSpell::GetSpell(value);
-			if (spell) {
-				this->Spell = spell;
-			} else {
-				fprintf(stderr, "Spell \"%s\" doesn't exist.\n", value.c_str());
-			}
+			stratagus::spell *spell = stratagus::spell::get(value);
+			this->Spell = spell;
 		} else if (key == "work") {
 			value = FindAndReplaceString(value, "_", "-");
 			CUpgrade *upgrade = CUpgrade::try_get(value);

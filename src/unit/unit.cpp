@@ -1863,7 +1863,7 @@ void CUnit::SetSuffix(CUpgrade *suffix)
 	this->UpdateItemName();
 }
 
-void CUnit::SetSpell(CSpell *spell)
+void CUnit::SetSpell(stratagus::spell *spell)
 {
 	if (!IsNetworkGame() && Container && Container->Character && Container->Player == CPlayer::GetThisPlayer() && Container->Character->GetItem(*this) != nullptr && Container->Character->GetItem(*this)->Spell != spell) { //update the persistent item, if applicable and if it hasn't been updated yet
 		Container->Character->GetItem(*this)->Spell = spell;
@@ -2281,9 +2281,9 @@ void CUnit::GenerateSuffix(CUnit *dropper, CPlayer *dropper_player)
 
 void CUnit::GenerateSpell(CUnit *dropper, CPlayer *dropper_player)
 {
-	std::vector<CSpell *> potential_spells;
+	std::vector<stratagus::spell *> potential_spells;
 	if (dropper != nullptr) {
-		for (CSpell *spell : dropper->Type->DropSpells) {
+		for (stratagus::spell *spell : dropper->Type->DropSpells) {
 			if (this->Type->get_item_class() != stratagus::item_class::none && spell->ItemSpell[static_cast<int>(Type->get_item_class())]) {
 				potential_spells.push_back(spell);
 			}
@@ -2783,13 +2783,13 @@ void CUnit::Init(const stratagus::unit_type &type)
 //	if (type.CanCastSpell) {
 	//to avoid crashes with spell items for units who cannot ordinarily cast spells
 	//Wyrmgus end
-		AutoCastSpell = new char[CSpell::Spells.size()];
-		SpellCoolDownTimers = new int[CSpell::Spells.size()];
-		memset(SpellCoolDownTimers, 0, CSpell::Spells.size() * sizeof(int));
+		AutoCastSpell = new char[stratagus::spell::get_all().size()];
+		SpellCoolDownTimers = new int[stratagus::spell::get_all().size()];
+		memset(SpellCoolDownTimers, 0, stratagus::spell::get_all().size() * sizeof(int));
 		if (Type->AutoCastActive) {
-			memcpy(AutoCastSpell, Type->AutoCastActive, CSpell::Spells.size());
+			memcpy(AutoCastSpell, Type->AutoCastActive, stratagus::spell::get_all().size());
 		} else {
-			memset(AutoCastSpell, 0, CSpell::Spells.size());
+			memset(AutoCastSpell, 0, stratagus::spell::get_all().size());
 		}
 	//Wyrmgus start
 //	}
@@ -6004,7 +6004,7 @@ bool CUnit::CanReturnGoodsTo(const CUnit *dest, int resource) const
 **
 **	@return	True if the unit can cast the given spell, or false otherwise
 */
-bool CUnit::CanCastSpell(const CSpell *spell, const bool ignore_mana_and_cooldown) const
+bool CUnit::CanCastSpell(const stratagus::spell *spell, const bool ignore_mana_and_cooldown) const
 {
 	if (spell->IsAvailableForUnit(*this)) {
 		if (!ignore_mana_and_cooldown) {
@@ -6046,7 +6046,7 @@ bool CUnit::CanCastAnySpell() const
 **
 **	@return	True if the unit can autocast the spell, false otherwise
 */
-bool CUnit::CanAutoCastSpell(const CSpell *spell) const
+bool CUnit::CanAutoCastSpell(const stratagus::spell *spell) const
 {
 	if (!this->AutoCastSpell || !spell || !this->AutoCastSpell[spell->Slot] || !spell->AutoCast) {
 		return false;
@@ -6423,7 +6423,7 @@ bool CUnit::IsAbilityEmpowered(const CUpgrade *ability) const
 	return false;
 }
 
-bool CUnit::IsSpellEmpowered(const CSpell *spell) const
+bool CUnit::IsSpellEmpowered(const stratagus::spell *spell) const
 {
 	if (spell->DependencyId != -1) {
 		return this->IsAbilityEmpowered(CUpgrade::get_all()[spell->DependencyId]);

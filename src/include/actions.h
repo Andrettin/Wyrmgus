@@ -84,12 +84,12 @@ class CFile;
 class CUnit;
 class CUpgrade;
 class PathFinderInput;
-class CSpell;
 class CViewport;
 struct lua_State;
 
 namespace stratagus {
 	class site;
+	class spell;
 	class unit_type;
 }
 
@@ -165,7 +165,7 @@ public:
 	static COrder *NewActionResource(CUnit &harvester, const Vec2i &pos, int z);
 	static COrder *NewActionResource(CUnit &harvester, CUnit &mine);
 	static COrder *NewActionReturnGoods(CUnit &harvester, CUnit *depot);
-	static COrder *NewActionSpellCast(const CSpell &spell, const Vec2i &pos, CUnit *target, int z, bool isAutocast = false);
+	static COrder *NewActionSpellCast(const stratagus::spell &spell, const Vec2i &pos, CUnit *target, int z, bool isAutocast = false);
 	static COrder *NewActionStandGround();
 	static COrder *NewActionStill();
 	static COrder *NewActionTrain(CUnit &trainer, stratagus::unit_type &type, int player);

@@ -28,6 +28,8 @@
 
 #pragma once
 
+#include "database/data_type.h"
+#include "database/named_data_entry.h"
 #include "data_type.h"
 #include "item_class.h"
 #include "luacallback.h"
@@ -40,19 +42,15 @@
 
 class CMapLayer;
 class CPlayer;
-class CSpell;
 class CUnit;
 struct lua_State;
 
 namespace stratagus {
 	class faction;
 	class missile_type;
+	class spell;
 	class unit_type;
 }
-
-/*----------------------------------------------------------------------------
---  Definitons
-----------------------------------------------------------------------------*/
 
 /**
 **  Generic spell action virtual class.
@@ -65,7 +63,7 @@ public:
 	virtual ~SpellActionType() {};
 
 	virtual void ProcessConfigData(const CConfigData *config_data) = 0;
-	virtual int Cast(CUnit &caster, const CSpell &spell, CUnit *target, const Vec2i &goalPos, int z, int modifier) = 0;
+	virtual int Cast(CUnit &caster, const stratagus::spell &spell, CUnit *target, const Vec2i &goalPos, int z, int modifier) = 0;
 	virtual void Parse(lua_State *l, int startIndex, int endIndex) = 0;
 
 	const int ModifyManaCaster;
@@ -215,23 +213,21 @@ public:
 	LuaCallback *PositionAutoCast = nullptr;
 };
 
-/**
-**  Base structure of a spell type.
-*/
-class CSpell : public CDataType
+namespace stratagus {
+
+class spell final : public named_data_entry, public data_type<spell>, public CDataType
 {
+	Q_OBJECT
+
 public:
-	CSpell(int slot, const std::string &ident);
-	~CSpell();
+	static constexpr const char *class_identifier = "spell";
+	static constexpr const char *database_folder = "spells";
 
-	/// return spell type by ident string
-	static CSpell *GetSpell(const std::string &ident, const bool should_find = true);
-	static CSpell *GetOrAddSpell(const std::string &ident);
-	static void ClearSpells();
+	static spell *add(const std::string &identifier, const stratagus::module *module);
 
-	static std::vector<CSpell *> Spells;
-	static std::map<std::string, CSpell *> SpellsByIdent;
-	
+	spell(const std::string &identifier);
+	~spell();
+
 	virtual void ProcessConfigData(const CConfigData *config_data) override;
 	/// return 1 if spell is available, 0 if not (must upgrade)
 	bool IsAvailableForUnit(const CUnit &unit) const;
@@ -239,7 +235,7 @@ public:
 	bool CheckAutoCastGenericConditions(const CUnit &caster, const AutoCastInfo *autocast, const bool ignore_combat_status = false) const;
 	bool IsUnitValidAutoCastTarget(const CUnit *target, const CUnit &caster, const AutoCastInfo *autocast, const int max_path_length = 0) const;
 	std::vector<CUnit *> GetPotentialAutoCastTargets(const CUnit &caster, const AutoCastInfo *autocast) const;
-	
+
 	// Identification stuff
 	std::string Name;     /// Spell name shown by the engine
 	std::string Description;	/// Spell description
@@ -249,42 +245,37 @@ public:
 	TargetType Target;          /// Targeting information. See TargetType.
 	std::vector<SpellActionType *> Action; /// More arguments for spell (damage, delay, additional sounds...).
 
-	int Range;                  /// Max range of the target.
+	int Range = 0;              /// Max range of the target.
 #define INFINITE_RANGE 0xFFFFFFF
-	int ManaCost;               /// Required mana for each cast.
-	int RepeatCast;             /// If the spell will be cast again until out of targets.
-	bool Stackable;				/// Whether the spell has an effect if cast multiple times at the same target
+	int ManaCost = 0;           /// Required mana for each cast.
+	int RepeatCast = 0;         /// If the spell will be cast again until out of targets.
+	bool Stackable = true;		/// Whether the spell has an effect if cast multiple times at the same target
 	int Costs[MaxCosts];        /// Resource costs of spell.
-	int CoolDown;               /// How much time spell needs to be cast again.
+	int CoolDown = 0;           /// How much time spell needs to be cast again.
 
-	int DependencyId;           /// Id of upgrade, -1 if no upgrade needed for cast the spell.
-	ConditionInfo *Condition;   /// Conditions to cast the spell. (generic (no test for each target))
+	int DependencyId = -1;      /// Id of upgrade, -1 if no upgrade needed for cast the spell.
+	ConditionInfo *Condition = nullptr; /// Conditions to cast the spell. (generic (no test for each target))
 
 	// Autocast information. No AICast means the AI use AutoCast.
-	AutoCastInfo *AutoCast;     /// AutoCast information for your own units
-	AutoCastInfo *AICast;       /// AutoCast information for ai. More detalied.
+	AutoCastInfo *AutoCast = nullptr; /// AutoCast information for your own units
+	AutoCastInfo *AICast = nullptr;   /// AutoCast information for ai. More detalied.
 
 	// Graphics and sounds. Add something else here?
 	SoundConfig SoundWhenCast;  /// Sound played if cast
-	
+
 	//Wyrmgus start
-	bool ItemSpell[static_cast<int>(stratagus::item_class::count)];
+	bool ItemSpell[static_cast<int>(item_class::count)];
 	//Wyrmgus end
 
 	bool IsCasterOnly() const
 	{
 		return !Range && Target == TargetType::Self;
 	}
-	bool ForceUseAnimation;
+
+	bool ForceUseAnimation = false;
 };
 
-/*----------------------------------------------------------------------------
---  Variables
-----------------------------------------------------------------------------*/
-
-/*----------------------------------------------------------------------------
---  Functions
-----------------------------------------------------------------------------*/
+}
 
 /// register fonction.
 extern void SpellCclRegister();
@@ -293,17 +284,17 @@ extern void SpellCclRegister();
 extern void InitSpells();
 
 /// returns true if spell can be casted (enough mana, valid target)
-extern bool CanCastSpell(const CUnit &caster, const CSpell &spell,
+extern bool CanCastSpell(const CUnit &caster, const stratagus::spell &spell,
 						 const CUnit *target, const Vec2i &goalPos, const CMapLayer *map_layer);
 
 /// cast spell on target unit or place at x,y
-extern int SpellCast(CUnit &caster, const CSpell &spell,
+extern int SpellCast(CUnit &caster, const stratagus::spell &spell,
 					 CUnit *target, const Vec2i &goalPos, CMapLayer *map_layer);
 
 extern char StringToCondition(const std::string &str);
 
 /// auto cast the spell if possible
-extern int AutoCastSpell(CUnit &caster, const CSpell &spell);
+extern int AutoCastSpell(CUnit &caster, const stratagus::spell &spell);
 
 /// return 0, 1, 2 for true, only, false.
 extern char Ccl2Condition(lua_State *l, const char *value);

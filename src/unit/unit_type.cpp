@@ -995,14 +995,12 @@ void unit_type::ProcessConfigData(const CConfigData *config_data)
 			this->RandomMovementDistance = std::stoi(value);
 		} else if (key == "can_cast_spell") {
 			value = FindAndReplaceString(value, "_", "-");
-			CSpell *spell = CSpell::GetSpell(value);
-			if (spell != nullptr) {
-				this->Spells.push_back(spell);
-			}
+			spell *spell = spell::get(value);
+			this->Spells.push_back(spell);
 		} else if (key == "autocast_active") {
 			if (!this->AutoCastActive) {
-				this->AutoCastActive = new char[CSpell::Spells.size()];
-				memset(this->AutoCastActive, 0, CSpell::Spells.size() * sizeof(char));
+				this->AutoCastActive = new char[spell::get_all().size()];
+				memset(this->AutoCastActive, 0, spell::get_all().size() * sizeof(char));
 			}
 			
 			if (value == "false") {
@@ -1010,13 +1008,11 @@ void unit_type::ProcessConfigData(const CConfigData *config_data)
 				this->AutoCastActive = nullptr;
 			} else {
 				value = FindAndReplaceString(value, "_", "-");
-				const CSpell *spell = CSpell::GetSpell(value);
-				if (spell != nullptr) {
-					if (spell->AutoCast) {
-						this->AutoCastActive[spell->Slot] = 1;
-					} else {
-						fprintf(stderr, "AutoCastActive : Define autocast method for \"%s\".\n", value.c_str());
-					}
+				const spell *spell = spell::get(value);
+				if (spell->AutoCast) {
+					this->AutoCastActive[spell->Slot] = 1;
+				} else {
+					fprintf(stderr, "AutoCastActive : Define autocast method for \"%s\".\n", value.c_str());
 				}
 			}
 		} else {
@@ -1537,9 +1533,9 @@ void unit_type::set_parent(const unit_type *parent_type)
 		this->Spells.push_back(parent_type->Spells[i]);
 	}
 	if (parent_type->AutoCastActive) {
-		this->AutoCastActive = new char[CSpell::Spells.size()];
-		memset(this->AutoCastActive, 0, CSpell::Spells.size() * sizeof(char));
-		for (unsigned int i = 0; i < CSpell::Spells.size(); ++i) {
+		this->AutoCastActive = new char[spell::get_all().size()];
+		memset(this->AutoCastActive, 0, spell::get_all().size() * sizeof(char));
+		for (unsigned int i = 0; i < spell::get_all().size(); ++i) {
 			this->AutoCastActive[i] = parent_type->AutoCastActive[i];
 		}
 	}

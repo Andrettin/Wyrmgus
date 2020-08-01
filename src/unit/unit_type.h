@@ -45,7 +45,6 @@
 class CConstruction;
 class CFile;
 class CPlayerColorGraphic;
-class CSpell;
 //Wyrmgus start
 class CUniqueItem;
 //Wyrmgus end
@@ -68,6 +67,7 @@ namespace stratagus {
 	class missile_type;
 	class plane;
 	class species;
+	class spell;
 	class terrain_type;
 	class time_of_day;
 	class unit_class;
@@ -1058,7 +1058,7 @@ public:
 	std::vector<unit_type *> SpawnUnits;	/// Units which this unit can spawn.
 	std::vector<unit_type *> Drops;			/// Units which can spawn upon death (i.e. items).
 	std::vector<unit_type *> AiDrops;		/// Units which can spawn upon death (i.e. items), only for AI-controlled units.
-	std::vector<CSpell *> DropSpells;		/// Spells which can be applied to dropped items
+	std::vector<spell *> DropSpells;		/// Spells which can be applied to dropped items
 	std::vector<CUpgrade *> Affixes;		/// Affixes which can be generated for this unit type
 	std::vector<CUpgrade *> Traits;			/// Which traits this unit type can have
 	std::vector<CUpgrade *> StartingAbilities;	/// Abilities which the unit starts out with
@@ -1165,7 +1165,7 @@ public:
 	int BurnDamageRate;             /// HP burn rate per sec
 	int RepairRange;                /// Units repair range.
 #define InfiniteRepairRange INT_MAX
-	std::vector<CSpell *> Spells;	/// Spells the unit is able to cast.
+	std::vector<spell *> Spells;	/// Spells the unit is able to cast.
 	char *AutoCastActive;           /// Default value for autocast.
 	int AutoBuildRate;              /// The rate at which the building builds itself
 	int RandomMovementProbability;  /// Probability to move randomly.

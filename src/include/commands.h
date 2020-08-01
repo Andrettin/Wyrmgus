@@ -37,19 +37,16 @@
 
 class CUnit;
 class CFile;
-class CSpell;
 class CUpgrade;
 
 namespace stratagus {
 	class quest;
 	class site;
+	class spell;
 	class unit_type;
 	enum class diplomacy_state;
 }
 
-/*----------------------------------------------------------------------------
---  Functions
-----------------------------------------------------------------------------*/
 /*----------------------------------------------------------------------------
 --  Commands: in command.c
 ----------------------------------------------------------------------------*/
@@ -157,7 +154,7 @@ extern void CommandCancelResearch(CUnit &unit);
 extern void CommandLearnAbility(CUnit &unit, CUpgrade &what);
 //Wyrmgus end
 /// Prepare command spellcast
-extern void CommandSpellCast(CUnit &unit, const Vec2i &pos, CUnit *dest, const CSpell &spell, int flush, int z = 0, bool isAutocast = false);
+extern void CommandSpellCast(CUnit &unit, const Vec2i &pos, CUnit *dest, const stratagus::spell &spell, int flush, int z = 0, bool isAutocast = false);
 /// Prepare command auto spellcast
 extern void CommandAutoSpellCast(CUnit &unit, int spellid, int on);
 /// Prepare diplomacy command

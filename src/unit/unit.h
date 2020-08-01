@@ -42,7 +42,6 @@ class Missile;
 class CMapField;
 class COrder;
 class CPlayer;
-class CSpell;
 //Wyrmgus start
 class CUniqueItem;
 //Wyrmgus end
@@ -61,6 +60,7 @@ namespace stratagus {
 	class animation_set;
 	class character;
 	class player_color;
+	class spell;
 	class time_of_day;
 	class unit_type;
 	class unit_type_variation;
@@ -211,7 +211,7 @@ public:
 	void ApplyAuraEffect(int aura_index);
 	void SetPrefix(CUpgrade *prefix);
 	void SetSuffix(CUpgrade *suffix);
-	void SetSpell(CSpell *spell);
+	void SetSpell(stratagus::spell *spell);
 	void SetWork(CUpgrade *work);
 	void SetElixir(CUpgrade *elixir);
 	void SetUnique(CUniqueItem *unique);
@@ -437,9 +437,9 @@ public:
 	bool IsInCombat() const;
 	bool CanHarvest(const CUnit *dest, bool only_harvestable = true) const;
 	bool CanReturnGoodsTo(const CUnit *dest, int resource = 0) const;
-	bool CanCastSpell(const CSpell *spell, const bool ignore_mana_and_cooldown) const;
+	bool CanCastSpell(const stratagus::spell *spell, const bool ignore_mana_and_cooldown) const;
 	bool CanCastAnySpell() const;
-	bool CanAutoCastSpell(const CSpell *spell) const;
+	bool CanAutoCastSpell(const stratagus::spell *spell) const;
 	bool IsItemEquipped(const CUnit *item) const;
 	bool is_item_class_equipped(const stratagus::item_class item_class) const;
 	bool IsItemTypeEquipped(const stratagus::unit_type *item_type) const;
@@ -456,7 +456,7 @@ public:
 	bool CanEat(const CUnit &unit) const;
 	bool LevelCheck(const int level) const;
 	bool IsAbilityEmpowered(const CUpgrade *ability) const;
-	bool IsSpellEmpowered(const CSpell *spell) const;
+	bool IsSpellEmpowered(const stratagus::spell *spell) const;
 	bool UpgradeRemovesExistingUpgrade(const CUpgrade *upgrade) const;
 	bool HasAdjacentRailForUnitType(const stratagus::unit_type *type) const;
 	stratagus::animation_set *GetAnimations() const;
@@ -562,7 +562,7 @@ public:
 	int LayerVariation[MaxImageLayers];	/// Which layer variations this unit has
 	CUpgrade *Prefix;	/// Item unit's prefix
 	CUpgrade *Suffix;	/// Item unit's suffix
-	CSpell *Spell;		/// Item unit's spell
+	stratagus::spell *Spell; /// Item unit's spell
 	CUpgrade *Work;		/// Item unit's literary work
 	CUpgrade *Elixir;	/// Item unit's elixir
 	CUniqueItem *Unique;		/// Whether the item is unique

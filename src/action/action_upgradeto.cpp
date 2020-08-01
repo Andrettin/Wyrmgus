@@ -303,10 +303,10 @@ int TransformUnitIntoType(CUnit &unit, const stratagus::unit_type &newtype)
 //	if (newtype.CanCastSpell && !unit.AutoCastSpell) {
 	if (!unit.AutoCastSpell) { //to avoid crashes with spell items for units who cannot ordinarily cast spells
 	//Wyrmgus end
-		unit.AutoCastSpell = new char[CSpell::Spells.size()];
-		unit.SpellCoolDownTimers = new int[CSpell::Spells.size()];
-		memset(unit.AutoCastSpell, 0, CSpell::Spells.size() * sizeof(char));
-		memset(unit.SpellCoolDownTimers, 0, CSpell::Spells.size() * sizeof(int));
+		unit.AutoCastSpell = new char[stratagus::spell::get_all().size()];
+		unit.SpellCoolDownTimers = new int[stratagus::spell::get_all().size()];
+		memset(unit.AutoCastSpell, 0, stratagus::spell::get_all().size() * sizeof(char));
+		memset(unit.SpellCoolDownTimers, 0, stratagus::spell::get_all().size() * sizeof(int));
 	}
 
 	if (!unit.UnderConstruction) {

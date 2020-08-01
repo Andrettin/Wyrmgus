@@ -199,17 +199,13 @@ int ParseAnimInt(const CUnit &unit, const char *parseint)
 	} else if (s[0] == 's') { //spell type detected
 		Assert(goal->CurrentAction() == UnitAction::SpellCast);
 		const COrder_SpellCast &order = *static_cast<COrder_SpellCast *>(goal->CurrentOrder());
-		const CSpell &spell = order.GetSpell();
+		const stratagus::spell &spell = order.GetSpell();
 		if (!strcmp(spell.Ident.c_str(), cur)) {
 			return 1;
 		}
 		return 0;
 	} else if (s[0] == 'S') { // check if autocast for this spell available
-		const CSpell *spell = CSpell::GetSpell(cur);
-		if (!spell) {
-			fprintf(stderr, "Invalid spell: '%s'\n", cur);
-			ExitFatal(1);
-		}
+		const stratagus::spell *spell = stratagus::spell::get(cur);
 		if (unit.AutoCastSpell[spell->Slot]) {
 			return 1;
 		}

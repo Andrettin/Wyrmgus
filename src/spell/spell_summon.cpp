@@ -88,7 +88,7 @@ public:
 **
 **  @return             =!0 if spell should be repeated, 0 if not
 */
-/* virtual */ int Spell_Summon::Cast(CUnit &caster, const CSpell &spell, CUnit *target, const Vec2i &goalPos, int z, int modifier)
+/* virtual */ int Spell_Summon::Cast(CUnit &caster, const stratagus::spell &spell, CUnit *target, const Vec2i &goalPos, int z, int modifier)
 {
 	Vec2i pos = goalPos;
 	bool cansummon;

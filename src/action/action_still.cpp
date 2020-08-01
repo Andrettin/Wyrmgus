@@ -338,10 +338,10 @@ static bool PickUpItem(CUnit &unit)
 bool AutoCast(CUnit &unit)
 {
 	if (unit.AutoCastSpell && !unit.Removed) { // Removed units can't cast any spells, from bunker)
-		for (unsigned int i = 0; i < CSpell::Spells.size(); ++i) {
-			if (unit.AutoCastSpell[i]
-				&& (CSpell::Spells[i]->AutoCast || CSpell::Spells[i]->AICast)
-				&& AutoCastSpell(unit, *CSpell::Spells[i])) {
+		for (const stratagus::spell *spell : stratagus::spell::get_all()) {
+			if (unit.AutoCastSpell[spell->Slot]
+				&& (spell->AutoCast || spell->AICast)
+				&& AutoCastSpell(unit, *spell)) {
 				return true;
 			}
 		}
@@ -457,10 +457,10 @@ bool COrder_Still::AutoAttackStand(CUnit &unit)
 bool COrder_Still::AutoCastStand(CUnit &unit)
 {
 	if (!unit.Removed) { // Removed units can't cast any spells, from bunker)
-		for (unsigned int i = 0; i < CSpell::Spells.size(); ++i) {
-			if (unit.AutoCastSpell[i]
-				&& (CSpell::Spells[i]->AutoCast || CSpell::Spells[i]->AICast)
-				&& AutoCastSpell(unit, *CSpell::Spells[i])) {
+		for (const stratagus::spell *spell : stratagus::spell::get_all()) {
+			if (unit.AutoCastSpell[spell->Slot]
+				&& (spell->AutoCast || spell->AICast)
+				&& AutoCastSpell(unit, *spell)) {
 				return true;
 			}
 		}

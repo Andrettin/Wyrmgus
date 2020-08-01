@@ -284,7 +284,7 @@ void button::initialize()
 	if (!this->ValueStr.empty()) {
 		switch (this->Action) {
 			case ButtonCmd::SpellCast:
-				this->Value = CSpell::GetSpell(this->ValueStr)->Slot;
+				this->Value = spell::get(this->ValueStr)->Slot;
 #ifdef DEBUG
 				if (ba->Value < 0) {
 					DebugPrint("Spell %s does not exist?\n" _C_ value.c_str());
@@ -625,7 +625,7 @@ std::string GetButtonActionNameById(const ButtonCmd button_action)
 		case ButtonCmd::Return:
 			return "return-goods";
 		case ButtonCmd::SpellCast:
-			return "cast-spell";
+			return "cast_spell";
 		case ButtonCmd::Research:
 			return "research";
 		case ButtonCmd::ResearchClass:
@@ -703,7 +703,7 @@ ButtonCmd GetButtonActionIdByName(const std::string &button_action)
 		return ButtonCmd::AttackGround;
 	} else if (button_action == "return-goods" || button_action == "return_goods") {
 		return ButtonCmd::Return;
-	} else if (button_action == "cast-spell") {
+	} else if (button_action == "cast_spell" || button_action == "cast-spell") {
 		return ButtonCmd::SpellCast;
 	} else if (button_action == "research") {
 		return ButtonCmd::Research;

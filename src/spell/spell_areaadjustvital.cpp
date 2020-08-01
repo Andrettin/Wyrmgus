@@ -67,7 +67,7 @@
 **
 **  @return             =!0 if spell should be repeated, 0 if not
 */
-/* virtual */ int Spell_AreaAdjustVital::Cast(CUnit &caster, const CSpell &spell, CUnit *target, const Vec2i &goalPos, int z, int modifier)
+/* virtual */ int Spell_AreaAdjustVital::Cast(CUnit &caster, const stratagus::spell &spell, CUnit *target, const Vec2i &goalPos, int z, int modifier)
 {
 	const Vec2i range(this->Range, this->Range);
 	const Vec2i typeSize(caster.Type->get_tile_size());
