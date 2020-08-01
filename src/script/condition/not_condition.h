@@ -35,21 +35,48 @@ class not_condition final : public condition
 {
 public:
 	not_condition() {}
-	not_condition(std::vector<std::unique_ptr<const condition>> &&conditions)
+
+	explicit not_condition(std::vector<std::unique_ptr<const condition>> &&conditions)
 		: conditions(std::move(conditions))
 	{
 	}
 
-	not_condition(std::unique_ptr<const condition> &&condition)
+	explicit not_condition(std::unique_ptr<const condition> &&condition)
 	{
 		this->conditions.push_back(std::move(condition));
 	}
 
-	virtual void process_sml_property(const sml_property &property) override;
-	virtual void process_sml_scope(const sml_data &scope) override;
-	virtual void ProcessConfigDataSection(const CConfigData *section) override;
-	virtual bool check(const CPlayer *player, bool ignore_units = false) const override;
-	virtual bool check(const CUnit *unit, bool ignore_units = false) const override;
+	virtual void process_sml_property(const sml_property &property) override
+	{
+		this->conditions.push_back(condition::from_sml_property(property));
+	}
+
+	virtual void process_sml_scope(const sml_data &scope) override
+	{
+		this->conditions.push_back(condition::from_sml_scope(scope));
+	}
+
+	virtual bool check(const CPlayer *player, bool ignore_units = false) const override
+	{
+		for (const auto &condition : this->conditions) {
+			if (condition->check(player, ignore_units)) {
+				return false;
+			}
+		}
+
+		return true;
+	}
+
+	virtual bool check(const CUnit *unit, bool ignore_units = false) const override
+	{
+		for (const auto &condition : this->conditions) {
+			if (condition->check(unit, ignore_units)) {
+				return false;
+			}
+		}
+
+		return true;
+	}
 
 	virtual std::string get_string(const std::string &prefix = "") const override
 	{

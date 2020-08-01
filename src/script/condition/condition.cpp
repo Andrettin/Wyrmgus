@@ -30,7 +30,6 @@
 
 #include "script/condition/condition.h"
 
-#include "character.h"
 #include "config.h"
 #include "faction.h"
 #include "map/map.h"
@@ -49,13 +48,9 @@
 #include "script/condition/trigger_condition.h"
 #include "script/condition/unit_type_condition.h"
 #include "script/condition/upgrade_condition.h"
-#include "script/trigger.h"
-#include "time/season.h"
 #include "translate.h"
 #include "ui/button.h"
 #include "ui/interface.h"
-#include "unit/unit_find.h"
-#include "unit/unit_type.h"
 #include "upgrade/upgrade_modifier.h"
 #include "util/string_util.h"
 #include "util/vector_util.h"
@@ -67,7 +62,15 @@ std::unique_ptr<const condition> condition::from_sml_property(const sml_property
 	const std::string &key = property.get_key();
 	const std::string &value = property.get_value();
 
-	if (key == "upgrade") {
+	if (key == "age") {
+		return std::make_unique<age_condition>(value);
+	} else if (key == "character") {
+		return std::make_unique<character_condition>(value);
+	} else if (key == "trigger") {
+		return std::make_unique<trigger_condition>(value);
+	} else if (key == "unit_type") {
+		return std::make_unique<unit_type_condition>(value);
+	} else if (key == "upgrade") {
 		return std::make_unique<upgrade_condition>(value);
 	} else {
 		throw std::runtime_error("Invalid condition property: \"" + key + "\".");
@@ -87,16 +90,10 @@ std::unique_ptr<const condition> condition::from_sml_scope(const sml_data &scope
 		condition = std::make_unique<not_condition>();
 	} else if (tag == "unit_type") {
 		condition = std::make_unique<unit_type_condition>();
-	} else if (tag == "age") {
-		condition = std::make_unique<age_condition>();
-	} else if (tag == "character") {
-		condition = std::make_unique<character_condition>();
 	} else if (tag == "season") {
 		condition = std::make_unique<season_condition>();
 	} else if (tag == "settlement") {
 		condition = std::make_unique<settlement_condition>();
-	} else if (tag == "trigger") {
-		condition = std::make_unique<trigger_condition>();
 	} else {
 		throw std::runtime_error("Invalid condition scope: \"" + tag + "\".");
 	}
@@ -156,20 +153,10 @@ void and_condition::ProcessConfigDataSection(const CConfigData *section)
 		condition = std::make_unique<and_condition>();
 	} else if (section->Tag == "or") {
 		condition = std::make_unique<or_condition>();
-	} else if (section->Tag == "not") {
-		condition = std::make_unique<not_condition>();
-	} else if (section->Tag == "unit_type") {
-		condition = std::make_unique<unit_type_condition>();
 	} else if (section->Tag == "upgrade") {
 		condition = std::make_unique<upgrade_condition>();
-	} else if (section->Tag == "age") {
-		condition = std::make_unique<age_condition>();
-	} else if (section->Tag == "character") {
-		condition = std::make_unique<character_condition>();
 	} else if (section->Tag == "season") {
 		condition = std::make_unique<season_condition>();
-	} else if (section->Tag == "trigger") {
-		condition = std::make_unique<trigger_condition>();
 	} else {
 		throw std::runtime_error("Invalid and condition property: \"" + section->Tag + "\".");
 	}
@@ -213,201 +200,22 @@ bool and_condition::check(const CUnit *unit, bool ignore_units) const
 
 void or_condition::ProcessConfigDataSection(const CConfigData *section)
 {
-	condition *condition = nullptr;
+	std::unique_ptr<condition> condition = nullptr;
+
 	if (section->Tag == "and") {
-		condition = new and_condition;
+		condition = std::make_unique<and_condition>();
 	} else if (section->Tag == "or") {
-		condition = new or_condition;
-	} else if (section->Tag == "not") {
-		condition = new not_condition;
-	} else if (section->Tag == "unit_type") {
-		condition = new unit_type_condition;
+		condition = std::make_unique<or_condition>();
 	} else if (section->Tag == "upgrade") {
-		condition = new upgrade_condition;
-	} else if (section->Tag == "age") {
-		condition = new age_condition;
-	} else if (section->Tag == "character") {
-		condition = new character_condition;
+		condition = std::make_unique<upgrade_condition>();
 	} else if (section->Tag == "season") {
-		condition = new season_condition;
-	} else if (section->Tag == "trigger") {
-		condition = new trigger_condition;
+		condition = std::make_unique<season_condition>();
 	} else {
 		fprintf(stderr, "Invalid or condition property: \"%s\".\n", section->Tag.c_str());
 		return;
 	}
 	condition->ProcessConfigData(section);
-	this->conditions.push_back(std::unique_ptr<stratagus::condition>(condition));
-}
-
-void or_condition::process_sml_property(const sml_property &property)
-{
-	this->conditions.push_back(condition::from_sml_property(property));
-}
-
-void or_condition::process_sml_scope(const sml_data &scope)
-{
-	this->conditions.push_back(condition::from_sml_scope(scope));
-}
-
-bool or_condition::check(const CPlayer *player, bool ignore_units) const
-{
-	for (const auto &condition : this->conditions) {
-		if (condition->check(player, ignore_units)) {
-			return true;
-		}
-	}
-	
-	return false;
-}
-
-bool or_condition::check(const CUnit *unit, bool ignore_units) const
-{
-	for (const auto &condition : this->conditions) {
-		if (condition->check(unit, ignore_units)) {
-			return true;
-		}
-	}
-	
-	return false;
-}
-
-void not_condition::process_sml_property(const sml_property &property)
-{
-	this->conditions.push_back(condition::from_sml_property(property));
-}
-
-void not_condition::process_sml_scope(const sml_data &scope)
-{
-	this->conditions.push_back(condition::from_sml_scope(scope));
-}
-
-void not_condition::ProcessConfigDataSection(const CConfigData *section)
-{
-	condition *condition = nullptr;
-	if (section->Tag == "and") {
-		condition = new and_condition;
-	} else if (section->Tag == "or") {
-		condition = new or_condition;
-	} else if (section->Tag == "not") {
-		condition = new not_condition;
-	} else if (section->Tag == "unit_type") {
-		condition = new unit_type_condition;
-	} else if (section->Tag == "upgrade") {
-		condition = new upgrade_condition;
-	} else if (section->Tag == "age") {
-		condition = new age_condition;
-	} else if (section->Tag == "character") {
-		condition = new character_condition;
-	} else if (section->Tag == "season") {
-		condition = new season_condition;
-	} else if (section->Tag == "trigger") {
-		condition = new trigger_condition;
-	} else {
-		fprintf(stderr, "Invalid not condition property: \"%s\".\n", section->Tag.c_str());
-		return;
-	}
-	condition->ProcessConfigData(section);
-	this->conditions.push_back(std::unique_ptr<stratagus::condition>(condition));
-}
-
-bool not_condition::check(const CPlayer *player, bool ignore_units) const
-{
-	for (const auto &condition : this->conditions) {
-		if (condition->check(player, ignore_units)) {
-			return false;
-		}
-	}
-	
-	return true;
-}
-
-bool not_condition::check(const CUnit *unit, bool ignore_units) const
-{
-	for (const auto &condition : this->conditions) {
-		if (condition->check(unit, ignore_units)) {
-			return false;
-		}
-	}
-	
-	return true;
-}
-
-void unit_type_condition::process_sml_property(const sml_property &property)
-{
-	const std::string &key = property.get_key();
-	const std::string &value = property.get_value();
-
-	if (key == "unit_type") {
-		this->unit_type = unit_type::get(value);
-	} else if (key == "count") {
-		this->count = std::stoi(value);
-	} else if (key == "settlement") {
-		this->settlement = site::get(value);
-	} else {
-		throw std::runtime_error("Invalid unit type condition property: \"" + property.get_key() + "\".");
-	}
-}
-
-void unit_type_condition::ProcessConfigDataProperty(const std::pair<std::string, std::string> &property)
-{
-	const std::string &key = property.first;
-	std::string value = property.second;
-	if (key == "unit_type") {
-		this->unit_type = unit_type::get(value);
-	} else if (key == "count") {
-		this->count = std::stoi(value);
-	} else {
-		fprintf(stderr, "Invalid unit type condition property: \"%s\".\n", key.c_str());
-	}
-}
-
-bool unit_type_condition::check(const CPlayer *player, bool ignore_units) const
-{
-	if (ignore_units) {
-		return true;
-	}
-	
-	if (this->settlement != nullptr) {
-		if (!player->HasSettlement(this->settlement)) {
-			return false;
-		}
-
-		std::vector<CUnit *> units;
-		FindPlayerUnitsByType(*player, *this->unit_type, units);
-
-		int counter = 0;
-		for (const CUnit *unit : units) {
-			if (unit->settlement == this->settlement) {
-				counter++;
-
-				if (counter >= this->count) {
-					return true;
-				}
-			}
-		}
-
-		return false;
-	} else {
-		return player->GetUnitTypeCount(this->unit_type) >= this->count;
-	}
-}
-
-std::string unit_type_condition::get_string(const std::string &prefix) const
-{
-	std::string str = prefix + this->unit_type->get_name();
-	
-	if (this->count > 1) {
-		str += '(' + std::to_string(this->count) + ')';
-	}
-
-	if (this->settlement != nullptr) {
-		str += " in " + settlement->get_name();
-	}
-	
-	str += '\n';
-	
-	return str;
+	this->conditions.push_back(std::move(condition));
 }
 
 void upgrade_condition::ProcessConfigDataProperty(const std::pair<std::string, std::string> &property)
@@ -421,56 +229,6 @@ void upgrade_condition::ProcessConfigDataProperty(const std::pair<std::string, s
 	}
 }
 
-void age_condition::ProcessConfigDataProperty(const std::pair<std::string, std::string> &property)
-{
-	const std::string &key = property.first;
-	std::string value = property.second;
-	if (key == "age") {
-		this->age = age::get(value);
-	} else {
-		fprintf(stderr, "Invalid age condition property: \"%s\".\n", key.c_str());
-	}
-}
-
-void character_condition::process_sml_property(const sml_property &property)
-{
-	const std::string &key = property.get_key();
-	const std::string &value = property.get_value();
-
-	if (key == "character") {
-		this->character = character::get(value);
-	} else {
-		throw std::runtime_error("Invalid character condition property: \"" + property.get_key() + "\".");
-	}
-}
-
-void character_condition::ProcessConfigDataProperty(const std::pair<std::string, std::string> &property)
-{
-	const std::string &key = property.first;
-	std::string value = property.second;
-	if (key == "character") {
-		this->character = character::get(value);
-	} else {
-		fprintf(stderr, "Invalid character condition property: \"%s\".\n", key.c_str());
-	}
-}
-
-bool character_condition::check(const CPlayer *player, bool ignore_units) const
-{
-	return player->HasHero(this->character);
-}
-
-bool character_condition::check(const CUnit *unit, bool ignore_units) const
-{
-	return unit->Character == this->character;
-}
-
-std::string character_condition::get_string(const std::string &prefix) const
-{
-	std::string str = prefix + this->character->GetFullName() + '\n';
-	return str;
-}
-
 void season_condition::ProcessConfigDataProperty(const std::pair<std::string, std::string> &property)
 {
 	const std::string &key = property.first;
@@ -481,87 +239,6 @@ void season_condition::ProcessConfigDataProperty(const std::pair<std::string, st
 	} else {
 		fprintf(stderr, "Invalid season condition property: \"%s\".\n", key.c_str());
 	}
-}
-
-bool season_condition::check(const CPlayer *player, bool ignore_units) const
-{
-	return CMap::Map.MapLayers[player->StartMapLayer]->GetSeason() == this->Season;
-}
-
-bool season_condition::check(const CUnit *unit, bool ignore_units) const
-{
-	return unit->MapLayer->GetSeason() == this->Season;
-}
-
-std::string season_condition::get_string(const std::string &prefix) const
-{
-	std::string str = prefix + this->Season->get_name() + '\n';
-	return str;
-}
-
-void settlement_condition::process_sml_property(const sml_property &property)
-{
-	const std::string &key = property.get_key();
-	const std::string &value = property.get_value();
-
-	if (key == "settlement") {
-		this->settlement = site::get(value);
-	} else if (key == "faction") {
-		this->faction = faction::get(value);
-	} else if (key == "enemy") {
-		this->enemy = string::to_bool(value);
-	} else {
-		throw std::runtime_error("Invalid settlement condition property: \"" + property.get_key() + "\".");
-	}
-}
-
-bool settlement_condition::check(const CPlayer *player, bool ignore_units) const
-{
-	Q_UNUSED(ignore_units)
-
-	if (this->faction != nullptr) {
-		const CPlayer *faction_player = GetFactionPlayer(this->faction);
-		if (faction_player == nullptr) {
-			return false;
-		}
-
-		if (this->enemy && !faction_player->IsEnemy(*player)) {
-			return false;
-		}
-
-		return faction_player->HasSettlement(this->settlement);
-	}
-
-	return player->HasSettlement(this->settlement);
-}
-
-std::string settlement_condition::get_string(const std::string &prefix) const
-{
-	std::string str = prefix + this->settlement->get_name() + '\n';
-	return str;
-}
-
-void trigger_condition::ProcessConfigDataProperty(const std::pair<std::string, std::string> &property)
-{
-	const std::string &key = property.first;
-	std::string value = property.second;
-	if (key == "trigger") {
-		this->trigger = trigger::get(value);
-	} else {
-		fprintf(stderr, "Invalid trigger condition property: \"%s\".\n", key.c_str());
-	}
-}
-
-bool trigger_condition::check(const CPlayer *player, bool ignore_units) const
-{
-	//checks whether a trigger has already fired
-	
-	return vector::contains(trigger::DeactivatedTriggers, this->trigger->get_identifier()); //this works fine for global triggers, but for player triggers perhaps it should check only the player?
-}
-
-std::string trigger_condition::get_string(const std::string &prefix) const
-{
-	return std::string();
 }
 
 }

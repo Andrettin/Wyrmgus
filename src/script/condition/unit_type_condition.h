@@ -27,23 +27,90 @@
 
 #pragma once
 
+#include "map/site.h"
+#include "player.h"
 #include "script/condition/condition.h"
+#include "unit/unit.h"
+#include "unit/unit_find.h"
+#include "unit/unit_type.h"
 
 namespace stratagus {
-
-class site;
-class unit_type;
 
 class unit_type_condition final : public condition
 {
 public:
 	unit_type_condition() {}
-	unit_type_condition(const unit_type *unit_type, const int count) : unit_type(unit_type), count(count) {}
 
-	virtual void process_sml_property(const sml_property &property) override;
-	virtual void ProcessConfigDataProperty(const std::pair<std::string, std::string> &property) override;
-	virtual bool check(const CPlayer *player, bool ignore_units = false) const override;
-	virtual std::string get_string(const std::string &prefix = "") const override;
+	explicit unit_type_condition(const unit_type *unit_type, const int count) : unit_type(unit_type), count(count) {}
+
+	explicit unit_type_condition(const std::string &value)
+	{
+		this->unit_type = unit_type::get(value);
+	}
+
+	virtual void process_sml_property(const sml_property &property) override
+	{
+		const std::string &key = property.get_key();
+		const std::string &value = property.get_value();
+
+		if (key == "unit_type") {
+			this->unit_type = unit_type::get(value);
+		} else if (key == "count") {
+			this->count = std::stoi(value);
+		} else if (key == "settlement") {
+			this->settlement = site::get(value);
+		} else {
+			throw std::runtime_error("Invalid unit type condition property: \"" + property.get_key() + "\".");
+		}
+	}
+
+	virtual bool check(const CPlayer *player, const bool ignore_units = false) const override
+	{
+		if (ignore_units) {
+			return true;
+		}
+
+		if (this->settlement != nullptr) {
+			if (!player->HasSettlement(this->settlement)) {
+				return false;
+			}
+
+			std::vector<CUnit *> units;
+			FindPlayerUnitsByType(*player, *this->unit_type, units);
+
+			int counter = 0;
+			for (const CUnit *unit : units) {
+				if (unit->settlement == this->settlement) {
+					counter++;
+
+					if (counter >= this->count) {
+						return true;
+					}
+				}
+			}
+
+			return false;
+		} else {
+			return player->GetUnitTypeCount(this->unit_type) >= this->count;
+		}
+	}
+
+	virtual std::string get_string(const std::string &prefix = "") const override
+	{
+		std::string str = prefix + this->unit_type->get_name();
+
+		if (this->count > 1) {
+			str += '(' + std::to_string(this->count) + ')';
+		}
+
+		if (this->settlement != nullptr) {
+			str += " in " + settlement->get_name();
+		}
+
+		str += '\n';
+
+		return str;
+	}
 
 private:
 	const unit_type *unit_type = nullptr;

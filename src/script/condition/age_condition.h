@@ -36,7 +36,10 @@ namespace stratagus {
 class age_condition final : public condition
 {
 public:
-	virtual void ProcessConfigDataProperty(const std::pair<std::string, std::string> &property) override;
+	explicit age_condition(const std::string &value)
+	{
+		this->age = age::get(value);
+	}
 
 	virtual bool check(const CPlayer *player, bool ignore_units = false) const override
 	{

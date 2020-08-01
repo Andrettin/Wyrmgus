@@ -27,20 +27,35 @@
 
 #pragma once
 
+#include "character.h"
 #include "script/condition/condition.h"
+#include "unit/unit.h"
 
 namespace stratagus {
-
-class character;
 
 class character_condition final : public condition
 {
 public:
-	virtual void process_sml_property(const sml_property &property) override;
-	virtual void ProcessConfigDataProperty(const std::pair<std::string, std::string> &property) override;
-	virtual bool check(const CPlayer *player, bool ignore_units = false) const override;
-	virtual bool check(const CUnit *unit, bool ignore_units = false) const override;
-	virtual std::string get_string(const std::string &prefix = "") const override;
+	explicit character_condition(const std::string &value)
+	{
+		this->character = character::get(value);
+	}
+
+	virtual bool check(const CPlayer *player, bool ignore_units = false) const override
+	{
+		return player->HasHero(this->character);
+	}
+
+	virtual bool check(const CUnit *unit, bool ignore_units = false) const override
+	{
+		return unit->Character == this->character;
+	}
+
+	virtual std::string get_string(const std::string &prefix = "") const override
+	{
+		std::string str = prefix + this->character->GetFullName() + '\n';
+		return str;
+	}
 
 private:
 	const character *character = nullptr;

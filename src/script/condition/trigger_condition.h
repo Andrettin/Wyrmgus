@@ -28,17 +28,30 @@
 #pragma once
 
 #include "script/condition/condition.h"
+#include "script/trigger.h"
+#include "util/vector_util.h"
 
 namespace stratagus {
-
-class trigger;
 
 class trigger_condition final : public condition
 {
 public:
-	virtual void ProcessConfigDataProperty(const std::pair<std::string, std::string> &property) override;
-	virtual bool check(const CPlayer *player, bool ignore_units = false) const override;
-	virtual std::string get_string(const std::string &prefix = "") const override;
+	explicit trigger_condition(const std::string &value)
+	{
+		this->trigger = trigger::get(value);
+	}
+
+	virtual bool check(const CPlayer *player, bool ignore_units = false) const override
+	{
+		//checks whether a trigger has already fired
+
+		return vector::contains(trigger::DeactivatedTriggers, this->trigger->get_identifier()); //this works fine for global triggers, but for player triggers perhaps it should check only the player?
+	}
+
+	virtual std::string get_string(const std::string &prefix = "") const override
+	{
+		return std::string();
+	}
 
 private:
 	const trigger *trigger = nullptr;

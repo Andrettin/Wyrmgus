@@ -27,6 +27,7 @@
 
 #pragma once
 
+#include "map/site.h"
 #include "script/condition/condition.h"
 #include "unit/unit.h"
 #include "upgrade/upgrade.h"

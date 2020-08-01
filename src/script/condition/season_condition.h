@@ -28,6 +28,8 @@
 #pragma once
 
 #include "script/condition/condition.h"
+#include "time/season.h"
+#include "unit/unit.h"
 
 namespace stratagus {
 
@@ -37,9 +39,22 @@ class season_condition final : public condition
 {
 public:
 	virtual void ProcessConfigDataProperty(const std::pair<std::string, std::string> &property) override;
-	virtual bool check(const CPlayer *player, bool ignore_units = false) const override;
-	virtual bool check(const CUnit *unit, bool ignore_units = false) const override;
-	virtual std::string get_string(const std::string &prefix = "") const override;
+
+	virtual bool check(const CPlayer *player, bool ignore_units = false) const override
+	{
+		return CMap::Map.MapLayers[player->StartMapLayer]->GetSeason() == this->Season;
+	}
+
+	virtual bool check(const CUnit *unit, bool ignore_units = false) const override
+	{
+		return unit->MapLayer->GetSeason() == this->Season;
+	}
+
+	virtual std::string get_string(const std::string &prefix = "") const override
+	{
+		std::string str = prefix + this->Season->get_name() + '\n';
+		return str;
+	}
 
 private:
 	const season *Season = nullptr;

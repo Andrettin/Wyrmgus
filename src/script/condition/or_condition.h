@@ -42,10 +42,38 @@ public:
 	}
 
 	virtual void ProcessConfigDataSection(const CConfigData *section) override;
-	virtual void process_sml_property(const sml_property &property) override;
-	virtual void process_sml_scope(const sml_data &scope) override;
-	virtual bool check(const CPlayer *player, bool ignore_units = false) const override;
-	virtual bool check(const CUnit *unit, bool ignore_units = false) const override;
+
+	virtual void process_sml_property(const sml_property &property) override
+	{
+		this->conditions.push_back(condition::from_sml_property(property));
+	}
+
+	virtual void process_sml_scope(const sml_data &scope) override
+	{
+		this->conditions.push_back(condition::from_sml_scope(scope));
+	}
+
+	virtual bool check(const CPlayer *player, bool ignore_units = false) const override
+	{
+		for (const auto &condition : this->conditions) {
+			if (condition->check(player, ignore_units)) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	virtual bool check(const CUnit *unit, bool ignore_units = false) const override
+	{
+		for (const auto &condition : this->conditions) {
+			if (condition->check(unit, ignore_units)) {
+				return true;
+			}
+		}
+
+		return false;
+	}
 
 	virtual std::string get_string(const std::string &prefix = "") const override
 	{
