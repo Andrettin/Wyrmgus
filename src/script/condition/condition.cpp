@@ -40,6 +40,16 @@
 #include "player.h"
 #include "religion/deity.h"
 #include "script.h"
+#include "script/condition/age_condition.h"
+#include "script/condition/and_condition.h"
+#include "script/condition/character_condition.h"
+#include "script/condition/not_condition.h"
+#include "script/condition/or_condition.h"
+#include "script/condition/season_condition.h"
+#include "script/condition/settlement_condition.h"
+#include "script/condition/trigger_condition.h"
+#include "script/condition/unit_type_condition.h"
+#include "script/condition/upgrade_condition.h"
 #include "script/trigger.h"
 #include "time/season.h"
 #include "translate.h"
@@ -455,17 +465,6 @@ void age_condition::ProcessConfigDataProperty(const std::pair<std::string, std::
 	} else {
 		fprintf(stderr, "Invalid age condition property: \"%s\".\n", key.c_str());
 	}
-}
-
-bool age_condition::check(const CPlayer *player, bool ignore_units) const
-{
-	return player->age == this->age;
-}
-
-std::string age_condition::get_string(const std::string &prefix) const
-{
-	std::string str = prefix + this->age->get_name() + '\n';
-	return str;
 }
 
 void character_condition::process_sml_property(const sml_property &property)

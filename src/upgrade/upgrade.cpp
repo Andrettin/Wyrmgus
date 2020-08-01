@@ -63,7 +63,7 @@
 #include "religion/deity.h"
 #include "religion/deity_domain.h"
 #include "script.h"
-#include "script/condition/condition.h"
+#include "script/condition/and_condition.h"
 //Wyrmgus start
 #include "settings.h"
 #include "translate.h"

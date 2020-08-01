@@ -54,7 +54,7 @@
 #include "mod.h"
 #include "player.h"
 #include "script.h"
-#include "script/condition/condition.h"
+#include "script/condition/and_condition.h"
 #include "sound/sound.h"
 #include "sound/unitsound.h"
 #include "species.h"

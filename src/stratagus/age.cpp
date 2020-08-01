@@ -34,7 +34,7 @@
 #include "game.h"
 #include "mod.h"
 #include "player.h"
-#include "script/condition/condition.h"
+#include "script/condition/and_condition.h"
 #include "time/calendar.h"
 #include "unit/unit_type.h"
 #include "upgrade/upgrade_structs.h"

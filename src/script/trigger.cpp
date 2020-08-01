@@ -43,7 +43,7 @@
 //Wyrmgus end
 #include "results.h"
 #include "script.h"
-#include "script/condition/condition.h"
+#include "script/condition/and_condition.h"
 #include "script/effect/effect.h"
 #include "script/effect/effect_list.h"
 #include "ui/interface.h"

@@ -678,7 +678,17 @@ set(stratagus_script_HDRS
 )
 
 set(stratagus_script_condition_HDRS
+	src/script/condition/age_condition.h
+	src/script/condition/and_condition.h
+	src/script/condition/character_condition.h
 	src/script/condition/condition.h
+	src/script/condition/not_condition.h
+	src/script/condition/or_condition.h
+	src/script/condition/season_condition.h
+	src/script/condition/settlement_condition.h
+	src/script/condition/trigger_condition.h
+	src/script/condition/unit_type_condition.h
+	src/script/condition/upgrade_condition.h
 )
 
 set(stratagus_script_effect_HDRS
