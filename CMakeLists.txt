@@ -284,6 +284,11 @@ set(script_SRCS
 )
 source_group(script FILES ${script_SRCS})
 
+set(script_condition_SRCS
+	src/script/condition/condition.cpp
+)
+source_group(script\\condition FILES ${script_condition_SRCS})
+
 set(script_effect_SRCS
 	src/script/effect/effect.cpp
 	src/script/effect/effect_list.cpp
@@ -420,7 +425,6 @@ set(unit_SRCS
 source_group(unit FILES ${unit_SRCS})
 
 set(upgrade_SRCS
-	src/upgrade/dependency.cpp
 	src/upgrade/upgrade.cpp
 	src/upgrade/upgrade_class.cpp
 	src/upgrade/upgrade_modifier.cpp
@@ -514,6 +518,7 @@ set(stratagus_SRCS
 	${pathfinder_SRCS}
 	${religion_SRCS}
 	${script_SRCS}
+	${script_condition_SRCS}
 	${script_effect_SRCS}
 	${sound_SRCS}
 	${spell_SRCS}
@@ -672,6 +677,10 @@ set(stratagus_script_HDRS
 	src/script/trigger.h
 )
 
+set(stratagus_script_condition_HDRS
+	src/script/condition/condition.h
+)
+
 set(stratagus_script_effect_HDRS
 	src/script/effect/accept_quest_effect.h
 	src/script/effect/call_dialogue_effect.h
@@ -745,7 +754,6 @@ set(stratagus_unit_HDRS
 )
 
 set(stratagus_upgrade_HDRS
-	src/include/upgrade/dependency.h
 	src/include/upgrade/upgrade.h
 	src/upgrade/upgrade_class.h
 	src/include/upgrade/upgrade_modifier.h
@@ -877,6 +885,7 @@ source_group(map FILES ${stratagus_map_HDRS})
 source_group(missile FILES ${stratagus_missile_HDRS})
 source_group(religion FILES ${stratagus_religion_HDRS})
 source_group(script FILES ${stratagus_script_HDRS})
+source_group(script\\condition FILES ${stratagus_script_condition_HDRS})
 source_group(script\\effect FILES ${stratagus_script_effect_HDRS})
 source_group(sound FILES ${stratagus_sound_HDRS})
 source_group(spell FILES ${stratagus_spell_HDRS})
@@ -898,6 +907,7 @@ set(stratagus_HDRS
 	${stratagus_missile_HDRS}
 	${stratagus_religion_HDRS}
 	${stratagus_script_HDRS}
+	${stratagus_script_condition_HDRS}
 	${stratagus_script_effect_HDRS}
 	${stratagus_sound_HDRS}
 	${stratagus_spell_HDRS}
