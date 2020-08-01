@@ -1004,6 +1004,7 @@ void unit_type::ProcessConfigData(const CConfigData *config_data)
 			this->Spells.push_back(spell);
 		} else if (key == "autocast_active") {
 			if (value == "false") {
+				this->autocast_spells.clear();
 				this->spell_autocast.clear();
 			} else {
 				const spell *spell = spell::get(value);
@@ -1407,6 +1408,15 @@ void unit_type::set_image_file(const std::filesystem::path &filepath)
 	this->image_file = database::get_graphics_path(this->get_module()) / filepath;
 }
 
+bool unit_type::is_autocast_spell(const spell *spell) const
+{
+	if (static_cast<size_t>(spell->Slot) < this->spell_autocast.size()) {
+		return this->spell_autocast[spell->Slot];
+	}
+
+	return false;
+}
+
 void unit_type::add_autocast_spell(const spell *spell)
 {
 	if (spell->AutoCast) {
@@ -1414,6 +1424,7 @@ void unit_type::add_autocast_spell(const spell *spell)
 			this->spell_autocast.resize(spell->Slot + 1, false);
 		}
 		this->spell_autocast[spell->Slot] = true;
+		this->autocast_spells.push_back(spell);
 	} else {
 		throw std::runtime_error("AutoCastActive : Define autocast method for \"" + spell->get_identifier() + "\".");
 	}

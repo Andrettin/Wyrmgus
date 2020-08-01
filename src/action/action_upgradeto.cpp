@@ -307,6 +307,20 @@ int TransformUnitIntoType(CUnit &unit, const stratagus::unit_type &newtype)
 		memset(unit.SpellCoolDownTimers, 0, stratagus::spell::get_all().size() * sizeof(int));
 	}
 
+	//remove active autocast spells which are active by default for the old type but not for the new type
+	for (const stratagus::spell *spell : unit.get_autocast_spells()) {
+		if (oldtype.is_autocast_spell(spell) && !newtype.is_autocast_spell(spell)) {
+			unit.remove_autocast_spell(spell);
+		}
+	}
+
+	//add autocast spells that are present in the new type but not in the old type
+	for (const stratagus::spell *spell : newtype.get_autocast_spells()) {
+		if (!oldtype.is_autocast_spell(spell) && !unit.is_autocast_spell(spell)) {
+			unit.add_autocast_spell(spell);
+		}
+	}
+
 	if (!unit.UnderConstruction) {
 		UpdateForNewUnit(unit, 1);
 		player.IncreaseCountsForUnit(&unit, true);
