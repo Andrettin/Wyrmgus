@@ -699,14 +699,13 @@ void SendCommandSpellCast(CUnit &unit, const Vec2i &pos, CUnit *dest, int spelli
 ** @param spellid   Spell type id.
 ** @param on        1 for auto cast on, 0 for off.
 */
-void SendCommandAutoSpellCast(CUnit &unit, int spellid, int on)
+void SendCommandAutoSpellCast(CUnit &unit, const stratagus::spell *spell, const bool on)
 {
 	if (!IsNetworkGame()) {
-		CommandLog("auto-spell-cast", &unit, FlushCommands, on, -1, NoUnitP, nullptr, spellid);
-		CommandAutoSpellCast(unit, spellid, on);
+		CommandLog("auto-spell-cast", &unit, FlushCommands, on, -1, NoUnitP, nullptr, spell->Slot);
+		CommandAutoSpellCast(unit, spell, on);
 	} else {
-		NetworkSendCommand(MessageCommandSpellCast + spellid,
-						   unit, on, -1, NoUnitP, nullptr, FlushCommands);
+		NetworkSendCommand(MessageCommandSpellCast + spell->Slot, unit, on, -1, NoUnitP, nullptr, FlushCommands);
 	}
 }
 
@@ -1080,7 +1079,7 @@ void ExecCommand(unsigned char msgnr, UnitRef unum,
 				CommandSpellCast(unit, pos, dest, *stratagus::spell::get_all()[id], status);
 			} else {
 				CommandLog("auto-spell-cast", &unit, status, arg1, -1, NoUnitP, nullptr, id);
-				CommandAutoSpellCast(unit, id, arg1);
+				CommandAutoSpellCast(unit, stratagus::spell::get_all()[id], arg1);
 			}
 			break;
 		}

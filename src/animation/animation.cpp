@@ -206,7 +206,7 @@ int ParseAnimInt(const CUnit &unit, const char *parseint)
 		return 0;
 	} else if (s[0] == 'S') { // check if autocast for this spell available
 		const stratagus::spell *spell = stratagus::spell::get(cur);
-		if (unit.AutoCastSpell[spell->Slot]) {
+		if (unit.is_autocast_spell(spell)) {
 			return 1;
 		}
 		return 0;

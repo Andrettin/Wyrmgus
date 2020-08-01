@@ -791,6 +791,11 @@ void unit_type::process_sml_scope(const sml_data &scope)
 		for (const std::string &value : values) {
 			this->Spells.push_back(spell::get(value));
 		}
+	} else if (tag == "autocast_spells") {
+		for (const std::string &value : values) {
+			const spell *spell = spell::get(value);
+			this->add_autocast_spell(spell);
+		}
 	} else if (tag == "affixes") {
 		for (const std::string &value : values) {
 			this->Affixes.push_back(CUpgrade::get(value));
@@ -998,20 +1003,11 @@ void unit_type::ProcessConfigData(const CConfigData *config_data)
 			spell *spell = spell::get(value);
 			this->Spells.push_back(spell);
 		} else if (key == "autocast_active") {
-			if (this->AutoCastActive.empty()) {
-				this->AutoCastActive.resize(spell::get_all().size());
-				std::fill(this->AutoCastActive.begin(), this->AutoCastActive.end(), false);
-			}
-			
 			if (value == "false") {
-				this->AutoCastActive.clear();
+				this->spell_autocast.clear();
 			} else {
 				const spell *spell = spell::get(value);
-				if (spell->AutoCast) {
-					this->AutoCastActive[spell->Slot] = 1;
-				} else {
-					fprintf(stderr, "AutoCastActive : Define autocast method for \"%s\".\n", value.c_str());
-				}
+				this->add_autocast_spell(spell);
 			}
 		} else {
 			key = string::snake_case_to_pascal_case(key);
@@ -1411,6 +1407,18 @@ void unit_type::set_image_file(const std::filesystem::path &filepath)
 	this->image_file = database::get_graphics_path(this->get_module()) / filepath;
 }
 
+void unit_type::add_autocast_spell(const spell *spell)
+{
+	if (spell->AutoCast) {
+		if (static_cast<size_t>(spell->Slot) >= this->spell_autocast.size()) {
+			this->spell_autocast.resize(spell->Slot + 1, false);
+		}
+		this->spell_autocast[spell->Slot] = true;
+	} else {
+		throw std::runtime_error("AutoCastActive : Define autocast method for \"" + spell->get_identifier() + "\".");
+	}
+}
+
 bool unit_type::CheckUserBoolFlags(const char *BoolFlags) const
 {
 	for (unsigned int i = 0; i < UnitTypeVar.GetNumberBoolFlag(); ++i) { // User defined flags
@@ -1530,7 +1538,7 @@ void unit_type::set_parent(const unit_type *parent_type)
 	for (size_t i = 0; i < parent_type->Spells.size(); ++i) {
 		this->Spells.push_back(parent_type->Spells[i]);
 	}
-	this->AutoCastActive = parent_type->AutoCastActive;
+	this->spell_autocast = parent_type->spell_autocast;
 	for (unsigned int i = 0; i < MaxCosts; ++i) {
 		this->DefaultStat.Costs[i] = parent_type->DefaultStat.Costs[i];
 		this->RepairCosts[i] = parent_type->RepairCosts[i];

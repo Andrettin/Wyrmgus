@@ -381,12 +381,8 @@ void SaveUnit(const CUnit &unit, CFile &file)
 	if (unit.Goal) {
 		file.printf(",\n  \"goal\", %d", UnitNumber(*unit.Goal));
 	}
-	if (!unit.AutoCastSpell.empty()) {
-		for (const stratagus::spell *spell : stratagus::spell::get_all()) {
-			if (unit.AutoCastSpell[spell->Slot]) {
-				file.printf(",\n  \"auto-cast\", \"%s\"", spell->get_identifier().c_str());
-			}
-		}
+	for (const stratagus::spell *spell : unit.get_autocast_spells()) {
+		file.printf(",\n  \"auto-cast\", \"%s\"", spell->get_identifier().c_str());
 	}
 	if (unit.SpellCoolDownTimers) {
 		file.printf(",\n  \"spell-cooldown\", {");

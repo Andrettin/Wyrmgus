@@ -1310,12 +1310,17 @@ void CommandSpellCast(CUnit &unit, const Vec2i &pos, CUnit *dest, const stratagu
 **  @param spellid  Spell id.
 **  @param on       1 for auto cast on, 0 for off.
 */
-void CommandAutoSpellCast(CUnit &unit, int spellid, int on)
+void CommandAutoSpellCast(CUnit &unit, const stratagus::spell *spell, const bool on)
 {
 	if (IsUnitValidForNetwork(unit) == false) {
 		return ;
 	}
-	unit.AutoCastSpell[spellid] = on;
+
+	if (on) {
+		unit.add_autocast_spell(spell);
+	} else {
+		unit.remove_autocast_spell(spell);
+	}
 }
 
 /**

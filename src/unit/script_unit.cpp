@@ -673,10 +673,7 @@ static int CclUnit(lua_State *l)
 			unit->Goal = &UnitManager.GetSlotUnit(LuaToNumber(l, 2, j + 1));
 		} else if (!strcmp(value, "auto-cast")) {
 			const char *s = LuaToString(l, 2, j + 1);
-			if (unit->AutoCastSpell.empty()) {
-				unit->AutoCastSpell.resize(stratagus::spell::get_all().size(), false);
-			}
-			unit->AutoCastSpell[stratagus::spell::get(s)->Slot] = true;
+			unit->add_autocast_spell(stratagus::spell::get(s));
 		} else if (!strcmp(value, "spell-cooldown")) {
 			lua_rawgeti(l, 2, j + 1);
 			if (!lua_istable(l, -1) || lua_rawlen(l, -1) != stratagus::spell::get_all().size()) {

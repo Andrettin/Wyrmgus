@@ -518,7 +518,8 @@ void CUnit::Init()
 	NewOrder = nullptr;
 	delete CriticalOrder;
 	CriticalOrder = nullptr;
-	this->AutoCastSpell.clear();
+	this->autocast_spells.clear();
+	this->spell_autocast.clear();
 	SpellCoolDownTimers = nullptr;
 	AutoRepair = 0;
 	Goal = nullptr;
@@ -602,7 +603,8 @@ void CUnit::Release(bool final)
 	//Wyrmgus end
 
 	delete pathFinderData;
-	this->AutoCastSpell.clear();
+	this->autocast_spells.clear();
+	this->spell_autocast.clear();
 	delete[] SpellCoolDownTimers;
 	this->Variable.clear();
 	for (std::vector<COrder *>::iterator order = Orders.begin(); order != Orders.end(); ++order) {
@@ -2783,13 +2785,11 @@ void CUnit::Init(const stratagus::unit_type &type)
 //	if (type.CanCastSpell) {
 	//to avoid crashes with spell items for units who cannot ordinarily cast spells
 	//Wyrmgus end
-		this->AutoCastSpell.resize(stratagus::spell::get_all().size());
 		SpellCoolDownTimers = new int[stratagus::spell::get_all().size()];
 		memset(SpellCoolDownTimers, 0, stratagus::spell::get_all().size() * sizeof(int));
-		if (!this->Type->AutoCastActive.empty()) {
-			this->AutoCastSpell = this->Type->AutoCastActive;
-		} else {
-			std::fill(this->AutoCastSpell.begin(), this->AutoCastSpell.end(), false);
+		this->spell_autocast = this->Type->get_spell_autocast();
+		for (size_t i = 0; i < this->spell_autocast.size(); ++i) {
+			this->autocast_spells.push_back(stratagus::spell::get_all()[i]);
 		}
 	//Wyrmgus start
 //	}
@@ -6039,6 +6039,30 @@ bool CUnit::CanCastAnySpell() const
 	return false;
 }
 
+bool CUnit::is_autocast_spell(const stratagus::spell *spell) const
+{
+	if (static_cast<size_t>(spell->Slot) < this->spell_autocast.size()) {
+		return this->spell_autocast[spell->Slot];
+	}
+
+	return false;
+}
+
+void CUnit::add_autocast_spell(const stratagus::spell *spell)
+{
+	if (static_cast<size_t>(spell->Slot) >= this->spell_autocast.size()) {
+		this->spell_autocast.resize(spell->Slot + 1, false);
+	}
+	this->spell_autocast[spell->Slot] = true;
+	this->autocast_spells.push_back(spell);
+}
+
+void CUnit::remove_autocast_spell(const stratagus::spell *spell)
+{
+	this->spell_autocast[spell->Slot] = false;
+	stratagus::vector::remove(this->autocast_spells, spell);
+}
+
 /**
 **	@brief	Get whether the unit can autocast a given spell
 **
@@ -6048,7 +6072,7 @@ bool CUnit::CanCastAnySpell() const
 */
 bool CUnit::CanAutoCastSpell(const stratagus::spell *spell) const
 {
-	if (this->AutoCastSpell.empty() || !spell || !this->AutoCastSpell[spell->Slot] || !spell->AutoCast) {
+	if (!spell || !this->is_autocast_spell(spell) || !spell->AutoCast) {
 		return false;
 	}
 	

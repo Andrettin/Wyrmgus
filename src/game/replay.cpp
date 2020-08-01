@@ -7,7 +7,6 @@
 //  ______________________                           ______________________
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
-/**@name replay.cpp - Replay game. */
 //
 //      (c) Copyright 2000-2020 by Lutz Sammer, Andreas Arens, Jimmy Salmon and Andrettin
 //
@@ -47,6 +46,7 @@
 //Wyrmgus end
 #include "script.h"
 #include "settings.h"
+#include "spells.h"
 #include "sound/sound.h"
 #include "translate.h"
 #include "ui/interface.h"
@@ -952,7 +952,7 @@ static void DoNextReplay()
 	} else if (!strcmp(action, "spell-cast")) {
 		SendCommandSpellCast(*unit, pos, dunit, num, flags);
 	} else if (!strcmp(action, "auto-spell-cast")) {
-		SendCommandAutoSpellCast(*unit, num, arg1);
+		SendCommandAutoSpellCast(*unit, stratagus::spell::get_all()[num], arg1);
 	//Wyrmgus start
 	} else if (!strcmp(action, "rally_point")) {
 		SendCommandRallyPoint(*unit, pos);

@@ -235,31 +235,28 @@ static bool DoRightButton_AutoCast(CUnit &unit, CUnit *dest, const Vec2i &pos, i
 		return false;
 	}
 	
-	if (!unit.AutoCastSpell.empty()) {
-		for (size_t i = 0; i < unit.Type->Spells.size(); ++i) {
-			stratagus::spell *spell = unit.Type->Spells[i];
-			if (unit.CanAutoCastSpell(spell)) {
-				const AutoCastInfo *autocast = spell->GetAutoCastInfo(unit.Player->AiEnabled);
-				
-				if (!spell->CheckAutoCastGenericConditions(unit, autocast, true)) {
-					continue;
+	for (const stratagus::spell *spell : unit.get_autocast_spells()) {
+		if (unit.CanAutoCastSpell(spell)) {
+			const AutoCastInfo *autocast = spell->GetAutoCastInfo(unit.Player->AiEnabled);
+
+			if (!spell->CheckAutoCastGenericConditions(unit, autocast, true)) {
+				continue;
+			}
+
+			if (spell->IsUnitValidAutoCastTarget(dest, unit, autocast)) {
+				dest->Blink = 4;
+				if (!acknowledged) {
+					PlayUnitSound(unit, stratagus::unit_sound_type::attack);
+					acknowledged = 1;
 				}
-				
-				if (spell->IsUnitValidAutoCastTarget(dest, unit, autocast)) {
-					dest->Blink = 4;
-					if (!acknowledged) {
-						PlayUnitSound(unit, stratagus::unit_sound_type::attack);
-						acknowledged = 1;
-					}
-					
-					SendCommandSpellCast(unit, pos, dest, spell->Slot, flush, UI.CurrentMapLayer->ID);
-					
-					return true;
-				}
+
+				SendCommandSpellCast(unit, pos, dest, spell->Slot, flush, UI.CurrentMapLayer->ID);
+
+				return true;
 			}
 		}
 	}
-	
+
 	return false;
 }
 

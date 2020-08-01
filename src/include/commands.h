@@ -156,7 +156,7 @@ extern void CommandLearnAbility(CUnit &unit, CUpgrade &what);
 /// Prepare command spellcast
 extern void CommandSpellCast(CUnit &unit, const Vec2i &pos, CUnit *dest, const stratagus::spell &spell, int flush, int z = 0, bool isAutocast = false);
 /// Prepare command auto spellcast
-extern void CommandAutoSpellCast(CUnit &unit, int spellid, int on);
+extern void CommandAutoSpellCast(CUnit &unit, const stratagus::spell *spell, const bool on);
 /// Prepare diplomacy command
 extern void CommandDiplomacy(const int player, const stratagus::diplomacy_state state, const int other_player);
 /// Prepare shared vision command
@@ -276,7 +276,7 @@ extern void SendCommandLearnAbility(CUnit &unit, CUpgrade &what);
 extern void SendCommandSpellCast(CUnit &unit, const Vec2i &pos, CUnit *dest, int spellid, int flush, int z = 0);
 //Wyrmgus end
 /// Send auto spell cast command
-extern void SendCommandAutoSpellCast(CUnit &unit, int spellid, int on);
+extern void SendCommandAutoSpellCast(CUnit &unit, const stratagus::spell *spell, const bool on);
 /// Send diplomacy command
 extern void SendCommandDiplomacy(const int player, const stratagus::diplomacy_state state, const int opponent);
 /// Send shared vision command

@@ -439,6 +439,15 @@ public:
 	bool CanReturnGoodsTo(const CUnit *dest, int resource = 0) const;
 	bool CanCastSpell(const stratagus::spell *spell, const bool ignore_mana_and_cooldown) const;
 	bool CanCastAnySpell() const;
+
+	const std::vector<const stratagus::spell *> &get_autocast_spells() const
+	{
+		return this->autocast_spells;
+	}
+
+	bool is_autocast_spell(const stratagus::spell *spell) const;
+	void add_autocast_spell(const stratagus::spell *spell);
+	void remove_autocast_spell(const stratagus::spell *spell);
 	bool CanAutoCastSpell(const stratagus::spell *spell) const;
 	bool IsItemEquipped(const CUnit *item) const;
 	bool is_item_class_equipped(const stratagus::item_class item_class) const;
@@ -646,7 +655,11 @@ public:
 	COrder *NewOrder;           /// order for new trained units
 	COrder *CriticalOrder;      /// order to do as possible in breakable animation.
 
-	std::vector<bool> AutoCastSpell; /// spells to auto cast
+private:
+	std::vector<const stratagus::spell *> autocast_spells; //the list of autocast spells
+	std::vector<bool> spell_autocast; //spells to auto cast, mapped to their spell IDs
+
+public:
 	int *SpellCoolDownTimers;   /// how much time unit need to wait before spell will be ready
 
 	CUnit *Goal; /// Generic/Teleporter goal pointer

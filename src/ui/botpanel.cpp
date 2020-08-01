@@ -229,8 +229,7 @@ static int GetButtonStatus(const stratagus::button &button, int UnderCursor)
 
 			// Autocast
 			for (i = 0; i < Selected.size(); ++i) {
-				Assert(!Selected[i]->AutoCastSpell.empty());
-				if (Selected[i]->AutoCastSpell[button.Value] != 1) {
+				if (Selected[i]->is_autocast_spell(stratagus::spell::get_all()[button.Value]) != true) {
 					break;
 				}
 			}
@@ -1884,38 +1883,39 @@ void CButtonPanel::DoClicked_Unload(int button)
 
 void CButtonPanel::DoClicked_SpellCast(int button)
 {
-	const int spellId = CurrentButtons[button]->Value;
+	const int spell_id = CurrentButtons[button]->Value;
+	const stratagus::spell *spell = stratagus::spell::get_all()[spell_id];
 	if (KeyModifiers & ModifierControl) {
-		int autocast = 0;
-
-		if (!stratagus::spell::get_all()[spellId]->AutoCast) {
+		if (!spell->AutoCast) {
 			PlayGameSound(GameSounds.PlacementError[CPlayer::GetThisPlayer()->Race].Sound, MaxSampleVolume);
 			return;
 		}
 
-		//autocast = 0;
+		bool autocast = false;
+
 		// If any selected unit doesn't have autocast on turn it on
 		// for everyone
 		for (size_t i = 0; i != Selected.size(); ++i) {
-			if (Selected[i]->AutoCastSpell[spellId] == 0) {
-				autocast = 1;
+			if (!Selected[i]->is_autocast_spell(spell)) {
+				autocast = true;
 				break;
 			}
 		}
 		for (size_t i = 0; i != Selected.size(); ++i) {
-			if (Selected[i]->AutoCastSpell[spellId] != autocast) {
-				SendCommandAutoSpellCast(*Selected[i], spellId, autocast);
+			if (Selected[i]->is_autocast_spell(spell) != autocast) {
+				SendCommandAutoSpellCast(*Selected[i], spell, autocast);
 			}
 		}
 		return;
 	}
-	if (stratagus::spell::get_all()[spellId]->IsCasterOnly()) {
+
+	if (spell->IsCasterOnly()) {
 		const int flush = !(KeyModifiers & ModifierShift);
 
 		for (size_t i = 0; i != Selected.size(); ++i) {
 			CUnit &unit = *Selected[i];
 			// CursorValue here holds the spell type id
-			SendCommandSpellCast(unit, unit.tilePos, &unit, spellId, flush, unit.MapLayer->ID);
+			SendCommandSpellCast(unit, unit.tilePos, &unit, spell_id, flush, unit.MapLayer->ID);
 		}
 		return;
 	}

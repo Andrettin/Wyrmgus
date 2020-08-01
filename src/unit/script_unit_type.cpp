@@ -1461,23 +1461,16 @@ static int CclDefineUnitType(lua_State *l)
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument");
 			}
-			//
-			// Warning: AutoCastActive should only be used AFTER all spells
-			// have been defined.
-			//
-			if (type->AutoCastActive.empty()) {
-				type->AutoCastActive.resize(stratagus::spell::get_all().size());
-				std::fill(type->AutoCastActive.begin(), type->AutoCastActive.end(), false);
-			}
+
 			const int subargs = lua_rawlen(l, -1);
 			if (subargs == 0) {
-				type->AutoCastActive.clear();
+				type->spell_autocast.clear();
 
 			}
 			for (int k = 0; k < subargs; ++k) {
 				value = LuaToString(l, -1, k + 1);
 				const stratagus::spell *spell = stratagus::spell::get(value);
-				type->AutoCastActive[spell->Slot] = 1;
+				type->add_autocast_spell(spell);
 			}
 		} else if (!strcmp(value, "CanTargetFlag")) {
 			//

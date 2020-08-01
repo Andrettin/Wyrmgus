@@ -277,12 +277,6 @@ spell *spell::add(const std::string &identifier, const stratagus::module *module
 	spell *spell = data_type::add(identifier, module);
 	spell->Slot = spell::get_all().size() - 1;
 
-	for (unit_type *unit_type : unit_type::get_all()) { // adjust array for casters which have already been defined
-		if (!unit_type->AutoCastActive.empty()) {
-			unit_type->AutoCastActive.push_back(false);
-		}
-	}
-
 	return spell;
 }
 

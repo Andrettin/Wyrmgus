@@ -969,6 +969,13 @@ public:
 		return this->get_frame_size().height();
 	}
 
+	const std::vector<bool> &get_spell_autocast() const
+	{
+		return this->spell_autocast;
+	}
+
+	void add_autocast_spell(const spell *spell);
+
 	bool CheckUserBoolFlags(const char *BoolFlags) const;
 	//Wyrmgus start
 //	bool CanTransport() const { return MaxOnBoard > 0 && !GivesResource; }
@@ -1166,7 +1173,9 @@ public:
 	int RepairRange;                /// Units repair range.
 #define InfiniteRepairRange INT_MAX
 	std::vector<spell *> Spells;	/// Spells the unit is able to cast.
-	std::vector<bool> AutoCastActive; /// Default value for autocast.
+private:
+	std::vector<bool> spell_autocast; //the default value for the autocast, mapped to spell indexes
+public:
 	int AutoBuildRate;              /// The rate at which the building builds itself
 	int RandomMovementProbability;  /// Probability to move randomly.
 	int RandomMovementDistance;  	/// Quantity of tiles to move randomly.
