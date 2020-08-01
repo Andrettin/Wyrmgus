@@ -518,7 +518,7 @@ void CUnit::Init()
 	NewOrder = nullptr;
 	delete CriticalOrder;
 	CriticalOrder = nullptr;
-	AutoCastSpell = nullptr;
+	this->AutoCastSpell.clear();
 	SpellCoolDownTimers = nullptr;
 	AutoRepair = 0;
 	Goal = nullptr;
@@ -602,7 +602,7 @@ void CUnit::Release(bool final)
 	//Wyrmgus end
 
 	delete pathFinderData;
-	delete[] AutoCastSpell;
+	this->AutoCastSpell.clear();
 	delete[] SpellCoolDownTimers;
 	this->Variable.clear();
 	for (std::vector<COrder *>::iterator order = Orders.begin(); order != Orders.end(); ++order) {
@@ -2783,13 +2783,13 @@ void CUnit::Init(const stratagus::unit_type &type)
 //	if (type.CanCastSpell) {
 	//to avoid crashes with spell items for units who cannot ordinarily cast spells
 	//Wyrmgus end
-		AutoCastSpell = new char[stratagus::spell::get_all().size()];
+		this->AutoCastSpell.resize(stratagus::spell::get_all().size());
 		SpellCoolDownTimers = new int[stratagus::spell::get_all().size()];
 		memset(SpellCoolDownTimers, 0, stratagus::spell::get_all().size() * sizeof(int));
-		if (Type->AutoCastActive) {
-			memcpy(AutoCastSpell, Type->AutoCastActive, stratagus::spell::get_all().size());
+		if (!this->Type->AutoCastActive.empty()) {
+			this->AutoCastSpell = this->Type->AutoCastActive;
 		} else {
-			memset(AutoCastSpell, 0, stratagus::spell::get_all().size());
+			std::fill(this->AutoCastSpell.begin(), this->AutoCastSpell.end(), false);
 		}
 	//Wyrmgus start
 //	}
@@ -6048,7 +6048,7 @@ bool CUnit::CanCastAnySpell() const
 */
 bool CUnit::CanAutoCastSpell(const stratagus::spell *spell) const
 {
-	if (!this->AutoCastSpell || !spell || !this->AutoCastSpell[spell->Slot] || !spell->AutoCast) {
+	if (this->AutoCastSpell.empty() || !spell || !this->AutoCastSpell[spell->Slot] || !spell->AutoCast) {
 		return false;
 	}
 	

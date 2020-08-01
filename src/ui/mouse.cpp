@@ -235,7 +235,7 @@ static bool DoRightButton_AutoCast(CUnit &unit, CUnit *dest, const Vec2i &pos, i
 		return false;
 	}
 	
-	if (unit.AutoCastSpell) {
+	if (!unit.AutoCastSpell.empty()) {
 		for (size_t i = 0; i < unit.Type->Spells.size(); ++i) {
 			stratagus::spell *spell = unit.Type->Spells[i];
 			if (unit.CanAutoCastSpell(spell)) {

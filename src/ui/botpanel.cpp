@@ -229,7 +229,7 @@ static int GetButtonStatus(const stratagus::button &button, int UnderCursor)
 
 			// Autocast
 			for (i = 0; i < Selected.size(); ++i) {
-				Assert(Selected[i]->AutoCastSpell);
+				Assert(!Selected[i]->AutoCastSpell.empty());
 				if (Selected[i]->AutoCastSpell[button.Value] != 1) {
 					break;
 				}

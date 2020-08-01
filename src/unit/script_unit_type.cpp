@@ -1465,14 +1465,13 @@ static int CclDefineUnitType(lua_State *l)
 			// Warning: AutoCastActive should only be used AFTER all spells
 			// have been defined.
 			//
-			if (!type->AutoCastActive) {
-				type->AutoCastActive = new char[stratagus::spell::get_all().size()];
-				memset(type->AutoCastActive, 0, stratagus::spell::get_all().size() * sizeof(char));
+			if (type->AutoCastActive.empty()) {
+				type->AutoCastActive.resize(stratagus::spell::get_all().size());
+				std::fill(type->AutoCastActive.begin(), type->AutoCastActive.end(), false);
 			}
 			const int subargs = lua_rawlen(l, -1);
 			if (subargs == 0) {
-				delete[] type->AutoCastActive;
-				type->AutoCastActive = nullptr;
+				type->AutoCastActive.clear();
 
 			}
 			for (int k = 0; k < subargs; ++k) {

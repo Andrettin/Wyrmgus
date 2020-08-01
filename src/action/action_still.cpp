@@ -337,7 +337,7 @@ static bool PickUpItem(CUnit &unit)
 */
 bool AutoCast(CUnit &unit)
 {
-	if (unit.AutoCastSpell && !unit.Removed) { // Removed units can't cast any spells, from bunker)
+	if (!unit.AutoCastSpell.empty() && !unit.Removed) { // Removed units can't cast any spells, from bunker)
 		for (const stratagus::spell *spell : stratagus::spell::get_all()) {
 			if (unit.AutoCastSpell[spell->Slot]
 				&& (spell->AutoCast || spell->AICast)
@@ -546,7 +546,7 @@ bool AutoAttack(CUnit &unit)
 	this->State = SUB_STILL_STANDBY;
 	this->Finished = (this->Action == UnitAction::Still);
 	if (this->Action == UnitAction::StandGround || unit.Removed || unit.CanMove() == false) {
-		if (unit.AutoCastSpell) {
+		if (!unit.AutoCastSpell.empty()) {
 			this->AutoCastStand(unit);
 		}
 		if (unit.IsAgressive()) {

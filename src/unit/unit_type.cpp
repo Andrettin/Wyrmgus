@@ -513,7 +513,6 @@ unit_type::unit_type(const std::string &identifier) : detailed_data_entry(identi
 	BoxOffsetX(0), BoxOffsetY(0), NumDirections(0),
 	MinAttackRange(0),
 	BurnPercent(0), BurnDamageRate(0), RepairRange(0),
-	AutoCastActive(nullptr),
 	AutoBuildRate(0), RandomMovementProbability(0), RandomMovementDistance(1), ClicksToExplode(0),
 	//Wyrmgus start
 //	MaxOnBoard(0), BoardSize(1), ButtonLevelForTransporter(0), StartingResources(0),
@@ -569,8 +568,6 @@ unit_type::~unit_type()
 	// Free Building Restrictions if there are any
 	this->BuildingRules.clear();
 	this->AiBuildingRules.clear();
-
-	delete[] AutoCastActive;
 
 	for (int res = 0; res < MaxCosts; ++res) {
 		if (this->ResInfo[res] != nullptr) {
@@ -1001,16 +998,14 @@ void unit_type::ProcessConfigData(const CConfigData *config_data)
 			spell *spell = spell::get(value);
 			this->Spells.push_back(spell);
 		} else if (key == "autocast_active") {
-			if (!this->AutoCastActive) {
-				this->AutoCastActive = new char[spell::get_all().size()];
-				memset(this->AutoCastActive, 0, spell::get_all().size() * sizeof(char));
+			if (this->AutoCastActive.empty()) {
+				this->AutoCastActive.resize(spell::get_all().size());
+				std::fill(this->AutoCastActive.begin(), this->AutoCastActive.end(), false);
 			}
 			
 			if (value == "false") {
-				delete[] this->AutoCastActive;
-				this->AutoCastActive = nullptr;
+				this->AutoCastActive.clear();
 			} else {
-				value = FindAndReplaceString(value, "_", "-");
 				const spell *spell = spell::get(value);
 				if (spell->AutoCast) {
 					this->AutoCastActive[spell->Slot] = 1;
@@ -1535,13 +1530,7 @@ void unit_type::set_parent(const unit_type *parent_type)
 	for (size_t i = 0; i < parent_type->Spells.size(); ++i) {
 		this->Spells.push_back(parent_type->Spells[i]);
 	}
-	if (parent_type->AutoCastActive) {
-		this->AutoCastActive = new char[spell::get_all().size()];
-		memset(this->AutoCastActive, 0, spell::get_all().size() * sizeof(char));
-		for (unsigned int i = 0; i < spell::get_all().size(); ++i) {
-			this->AutoCastActive[i] = parent_type->AutoCastActive[i];
-		}
-	}
+	this->AutoCastActive = parent_type->AutoCastActive;
 	for (unsigned int i = 0; i < MaxCosts; ++i) {
 		this->DefaultStat.Costs[i] = parent_type->DefaultStat.Costs[i];
 		this->RepairCosts[i] = parent_type->RepairCosts[i];
