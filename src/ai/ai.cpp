@@ -161,6 +161,7 @@
 #include "quest.h"
 //Wyrmgus end
 #include "script.h"
+#include "script/condition/condition.h"
 #include "unit/unit.h"
 #include "unit/unit_class.h"
 //Wyrmgus start
@@ -169,7 +170,6 @@
 #include "unit/unit_manager.h"
 #include "unit/unit_type.h"
 #include "unit/unit_type_type.h"
-#include "upgrade/dependency.h"
 #include "upgrade/upgrade.h"
 #include "util/vector_util.h"
 
@@ -362,7 +362,7 @@ static void AiCheckUnits()
 					if (
 						unit_stock > 0
 						&& !mercenary_type->BoolFlag[ITEM_INDEX].value
-						&& CheckDependencies(mercenary_type, CPlayer::Players[i])
+						&& CheckConditions(mercenary_type, CPlayer::Players[i])
 						&& AiPlayer->Player->CheckLimits(*mercenary_type) >= 1
 						&& !AiPlayer->Player->CheckUnitType(*mercenary_type, true)
 					) {

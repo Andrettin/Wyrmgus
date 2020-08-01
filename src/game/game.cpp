@@ -77,6 +77,7 @@
 //Wyrmgus start
 #include "script.h"
 //Wyrmgus end
+#include "script/condition/condition.h"
 #include "script/trigger.h"
 #include "settings.h"
 #include "sound/sound.h"
@@ -93,7 +94,6 @@
 #include "unit/unit_class.h"
 #include "unit/unit_manager.h"
 #include "unit/unit_type.h"
-#include "upgrade/dependency.h"
 #include "upgrade/upgrade.h"
 #include "util/exception_util.h"
 #include "util/random.h"

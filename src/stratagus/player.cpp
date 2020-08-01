@@ -71,6 +71,7 @@
 #include "religion/deity_domain.h"
 #include "religion/religion.h"
 //Wyrmgus end
+#include "script/condition/condition.h"
 #include "script/effect/effect_list.h"
 //Wyrmgus start
 #include "settings.h"
@@ -88,7 +89,6 @@
 #include "unit/unit_type.h"
 //Wyrmgus end
 #include "unit/unit_type_type.h"
-#include "upgrade/dependency.h"
 //Wyrmgus start
 #include "upgrade/upgrade.h"
 //Wyrmgus end
@@ -219,7 +219,7 @@
 **  CPlayer::UnitTypesCount[::UnitTypeMax]
 **
 **    Total count for each different unit type. Used by the AI and
-**    for dependencies checks. The addition of all counts should
+**    for condition checks. The addition of all counts should
 **    be CPlayer::TotalNumUnits.
 **    @note Should not use the maximum number of unit-types here,
 **    only the real number of unit-types used.
@@ -1447,7 +1447,7 @@ void CPlayer::check_age()
 	//pick an age which fits the player, giving priority to the first ones (ages are already sorted by priority)
 	
 	for (stratagus::age *potential_age : stratagus::age::get_all()) {
-		if (!CheckDependencies(potential_age, this)) {
+		if (!CheckConditions(potential_age, this)) {
 			continue;
 		}
 		
@@ -1529,7 +1529,7 @@ void CPlayer::ShareUpgradeProgress(CPlayer &player, CUnit &unit)
 			continue;
 		}
 		
-		if (player.Allow.Upgrades[upgrade->ID] != 'A' || !CheckDependencies(upgrade, &player)) {
+		if (player.Allow.Upgrades[upgrade->ID] != 'A' || !CheckConditions(upgrade, &player)) {
 			continue;
 		}
 	
@@ -1822,7 +1822,7 @@ bool CPlayer::CanFoundFaction(stratagus::faction *faction, bool pre)
 	
 	if (!faction->FactionUpgrade.empty()) {
 		CUpgrade *faction_upgrade = CUpgrade::get(faction->FactionUpgrade);
-		if (!CheckDependencies(faction_upgrade, this, false, pre)) {
+		if (!CheckConditions(faction_upgrade, this, false, pre)) {
 			return false;
 		}
 	}
@@ -1869,7 +1869,7 @@ bool CPlayer::CanChooseDynasty(CDynasty *dynasty, bool pre)
 	}
 	
 	if (dynasty->DynastyUpgrade) {
-		if (!CheckDependencies(dynasty->DynastyUpgrade, this, false, pre)) {
+		if (!CheckConditions(dynasty->DynastyUpgrade, this, false, pre)) {
 			return false;
 		}
 	} else {
@@ -1900,7 +1900,7 @@ bool CPlayer::can_recruit_hero(const stratagus::character *character, bool ignor
 		return false;
 	}
 	
-	if (!CheckDependencies(character->get_unit_type(), this, true)) {
+	if (!CheckConditions(character->get_unit_type(), this, true)) {
 		return false;
 	}
 	
@@ -2595,7 +2595,7 @@ bool CPlayer::can_accept_quest(const stratagus::quest *quest)
 					continue;
 				}
 
-				if (!this->HasUnitBuilder(unit_type, objective->get_settlement()) || !CheckDependencies(unit_type, this)) {
+				if (!this->HasUnitBuilder(unit_type, objective->get_settlement()) || !CheckConditions(unit_type, this)) {
 					continue;
 				}
 
@@ -2645,7 +2645,7 @@ bool CPlayer::can_accept_quest(const stratagus::quest *quest)
 				}
 			}
 				
-			if (!has_researcher || this->Allow.Upgrades[upgrade->ID] != 'A' || !CheckDependencies(upgrade, this)) {
+			if (!has_researcher || this->Allow.Upgrades[upgrade->ID] != 'A' || !CheckConditions(upgrade, this)) {
 				return false;
 			}
 		} else if (objective->get_objective_type() == stratagus::objective_type::recruit_hero) {
@@ -2766,7 +2766,7 @@ std::string CPlayer::has_failed_quest(const stratagus::quest *quest) // returns 
 						continue;
 					}
 
-					if (!this->HasUnitBuilder(unit_type, quest_objective->get_settlement()) || !CheckDependencies(unit_type, this)) {
+					if (!this->HasUnitBuilder(unit_type, quest_objective->get_settlement()) || !CheckConditions(unit_type, this)) {
 						validation_error = "You can no longer produce the required unit.";
 						continue;
 					}
@@ -2820,7 +2820,7 @@ std::string CPlayer::has_failed_quest(const stratagus::quest *quest) // returns 
 					}
 				}
 				
-				if (!has_researcher || this->Allow.Upgrades[upgrade->ID] != 'A' || !CheckDependencies(upgrade, this)) {
+				if (!has_researcher || this->Allow.Upgrades[upgrade->ID] != 'A' || !CheckConditions(upgrade, this)) {
 					return "You can no longer research the required upgrade.";
 				}
 			}

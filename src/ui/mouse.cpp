@@ -53,6 +53,7 @@
 //Wyrmgus start
 #include "province.h"
 //Wyrmgus end
+#include "script/condition/condition.h"
 #include "sound/sound.h"
 #include "sound/unitsound.h"
 #include "sound/unit_sound_type.h"
@@ -67,7 +68,6 @@
 #include "unit/unit_find.h"
 #include "unit/unit_type.h"
 #include "unit/unit_type_type.h"
-#include "upgrade/dependency.h"
 #include "util/vector_util.h"
 #include "video.h"
 #include "widgets.h"
@@ -328,7 +328,7 @@ static bool DoRightButton_Harvest_Unit(CUnit &unit, CUnit &dest, int flush, int 
 			//Wyrmgus end
 				for (stratagus::unit_type *unit_type : stratagus::unit_type::get_all()) {
 					if (unit_type && unit_type->GivesResource == res && unit_type->BoolFlag[CANHARVEST_INDEX].value && CanBuildUnitType(&unit, *unit_type, dest.tilePos, 1, false, dest.MapLayer->ID)) {
-						if (CheckDependencies(unit_type, unit.Player)) {
+						if (CheckConditions(unit_type, unit.Player)) {
 							if (stratagus::vector::contains(AiHelpers.get_builders(unit_type), unit.Type) || stratagus::vector::contains(AiHelpers.get_builder_classes(unit_type->get_unit_class()), unit.Type->get_unit_class())) {
 								dest.Blink = 4;
 								SendCommandBuildBuilding(unit, dest.tilePos, *unit_type, flush, dest.MapLayer->ID);
@@ -338,7 +338,7 @@ static bool DoRightButton_Harvest_Unit(CUnit &unit, CUnit &dest, int flush, int 
 								}
 								break;
 							}
-						} else if (CheckDependencies(unit_type, unit.Player, false, true)) { //passes predependency check, even though didn't pass dependency check before, so give a message about the requirements
+						} else if (CheckConditions(unit_type, unit.Player, false, true)) { //passes predependency check, even though didn't pass dependency check before, so give a message about the requirements
 							CPlayer::GetThisPlayer()->Notify(NotifyYellow, dest.tilePos, dest.MapLayer->ID, "%s", _("The requirements have not been fulfilled"));
 							break;
 						}
@@ -357,10 +357,10 @@ static bool DoRightButton_Harvest_Unit(CUnit &unit, CUnit &dest, int flush, int 
 					//Wyrmgus start
 					for (stratagus::unit_type *unit_type : stratagus::unit_type::get_all()) {
 						if (unit_type && unit_type->GivesResource == res && unit_type->BoolFlag[CANHARVEST_INDEX].value && CanBuildUnitType(&unit, *unit_type, dest.tilePos, 1, false, dest.MapLayer->ID)) {
-							if (CheckDependencies(unit_type, unit.Player)) {
+							if (CheckConditions(unit_type, unit.Player)) {
 								SendCommandBuildBuilding(unit, dest.tilePos, *unit_type, 0, dest.MapLayer->ID);
 								break;
-							} else if (CheckDependencies(unit_type, unit.Player, false, true)) { //passes predependency check, even though didn't pass dependency check before, so give a message about the requirements
+							} else if (CheckConditions(unit_type, unit.Player, false, true)) { //passes predependency check, even though didn't pass dependency check before, so give a message about the requirements
 								CPlayer::GetThisPlayer()->Notify(NotifyYellow, dest.tilePos, dest.MapLayer->ID, "%s", _("The requirements have not been fulfilled"));
 								break;
 							}
@@ -492,7 +492,7 @@ static bool DoRightButton_Worker(CUnit &unit, CUnit *dest, const Vec2i &pos, int
 	//if the clicked unit is a settlement site, build on it
 	if (UnitUnderCursor != nullptr && dest != nullptr && dest != &unit && dest->Type == settlement_site_unit_type && (dest->Player->Index == PlayerNumNeutral || dest->Player->Index == unit.Player->Index)) {
 		stratagus::unit_type *town_hall_type = unit.Player->get_class_unit_type(stratagus::defines::get()->get_town_hall_class());
-		if (town_hall_type != nullptr && CheckDependencies(town_hall_type, unit.Player) && CanBuildUnitType(&unit, *town_hall_type, dest->tilePos, 1, false, dest->MapLayer->ID)) {
+		if (town_hall_type != nullptr && CheckConditions(town_hall_type, unit.Player) && CanBuildUnitType(&unit, *town_hall_type, dest->tilePos, 1, false, dest->MapLayer->ID)) {
 			if (stratagus::vector::contains(AiHelpers.get_builders(town_hall_type), unit.Type) || stratagus::vector::contains(AiHelpers.get_builder_classes(town_hall_type->get_unit_class()), unit.Type->get_unit_class())) {
 				dest->Blink = 4;
 				SendCommandBuildBuilding(unit, dest->tilePos, *town_hall_type, flush, dest->MapLayer->ID);

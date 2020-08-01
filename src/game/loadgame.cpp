@@ -63,6 +63,7 @@
 #include "replay.h"
 #include "school_of_magic.h"
 #include "script.h"
+#include "script/condition/condition.h"
 #include "script/trigger.h"
 #include "sound/sound.h"
 #include "sound/sound_server.h"
@@ -81,22 +82,12 @@
 #include "unit/unit.h"
 #include "unit/unit_manager.h"
 #include "unit/unit_type.h"
-#include "upgrade/dependency.h"
 #include "upgrade/upgrade.h"
 #include "util/random.h"
 #include "video.h"
 #include "world.h"
 
-/*----------------------------------------------------------------------------
---  Variables
-----------------------------------------------------------------------------*/
-
 bool SaveGameLoading;                 /// If a Saved Game is Loading
-
-/*----------------------------------------------------------------------------
---  Functions
-----------------------------------------------------------------------------*/
-
 
 /**
 **  Cleanup modules.

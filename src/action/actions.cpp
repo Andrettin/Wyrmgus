@@ -69,6 +69,7 @@
 #include "pathfinder.h"
 #include "player.h"
 #include "script.h"
+#include "script/condition/condition.h"
 #include "spells.h"
 #include "time/time_of_day.h"
 #include "ui/interface.h"
@@ -76,12 +77,7 @@
 #include "unit/unit_find.h"
 #include "unit/unit_manager.h"
 #include "unit/unit_type.h"
-#include "upgrade/dependency.h"
 #include "util/random.h"
-
-/*----------------------------------------------------------------------------
---  Variables
-----------------------------------------------------------------------------*/
 
 unsigned SyncHash; /// Hash calculated to find sync failures
 
@@ -354,7 +350,7 @@ static void HandleBuffsEachCycle(CUnit &unit)
 		}
 
 		//if the unit still has less stock than its max, re-init the unit stock timer
-		if (unit.GetUnitStockReplenishmentTimer(unit_type) == 0 && unit.GetUnitStock(unit_type) < unit_stock && CheckDependencies(unit_type, unit.Player)) {
+		if (unit.GetUnitStockReplenishmentTimer(unit_type) == 0 && unit.GetUnitStock(unit_type) < unit_stock && CheckConditions(unit_type, unit.Player)) {
 			unit.SetUnitStockReplenishmentTimer(unit_type, unit_type->Stats[unit.Player->Index].Costs[TimeCost] * 50);
 		}
 	}

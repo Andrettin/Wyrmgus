@@ -35,6 +35,7 @@
 #include "faction.h"
 #include "font.h"
 #include "player.h"
+#include "script/condition/condition.h"
 #include "script/trigger.h"
 #include "spells.h"
 //Wyrmgus start
@@ -50,7 +51,6 @@
 #include "unit/unit_manager.h"
 //Wyrmgus end
 #include "unit/unit_type.h"
-#include "upgrade/dependency.h"
 #include "upgrade/upgrade.h"
 #include "upgrade/upgrade_class.h"
 #include "video.h"
@@ -66,8 +66,8 @@
 		case PopupButtonInfo_Description:
 			draw = button.Description;
 			break;
-		case PopupButtonInfo_Dependencies:
-			draw = PrintDependencies(*CPlayer::GetThisPlayer(), button);
+		case PopupButtonInfo_Conditions:
+			draw = PrintConditions(*CPlayer::GetThisPlayer(), button);
 			break;
 	}
 	int width = 0;
@@ -106,8 +106,8 @@
 		case PopupButtonInfo_Description:
 			draw = button.Description;
 			break;
-		case PopupButtonInfo_Dependencies:
-			draw = PrintDependencies(*CPlayer::GetThisPlayer(), button);
+		case PopupButtonInfo_Conditions:
+			draw = PrintConditions(*CPlayer::GetThisPlayer(), button);
 			break;
 	}
 	int height = 0;
@@ -134,8 +134,8 @@
 		case PopupButtonInfo_Description:
 			draw = button.Description;
 			break;
-		case PopupButtonInfo_Dependencies:
-			draw = PrintDependencies(*CPlayer::GetThisPlayer(), button);
+		case PopupButtonInfo_Conditions:
+			draw = PrintConditions(*CPlayer::GetThisPlayer(), button);
 			break;
 	}
 	std::string sub(draw);
@@ -165,8 +165,8 @@
 				this->InfoType = PopupButtonInfo_Hint;
 			} else if (temp == "Description") {
 				this->InfoType = PopupButtonInfo_Description;
-			} else if (temp == "Dependencies") {
-				this->InfoType = PopupButtonInfo_Dependencies;
+			} else if (temp == "Conditions") {
+				this->InfoType = PopupButtonInfo_Conditions;
 			}
 		} else if (!strcmp(key, "MaxWidth")) {
 			this->MaxWidth = LuaToNumber(l, -1);
@@ -619,8 +619,8 @@ static PopupConditionPanel *ParsePopupConditions(lua_State *l)
 			condition->HasHint = LuaToBoolean(l, -1);
 		} else if (!strcmp(key, "HasDescription")) {
 			condition->HasDescription = LuaToBoolean(l, -1);
-		} else if (!strcmp(key, "HasDependencies")) {
-			condition->HasDependencies = LuaToBoolean(l, -1);
+		} else if (!strcmp(key, "HasConditions")) {
+			condition->HasConditions = LuaToBoolean(l, -1);
 		//Wyrmgus start
 		} else if (!strcmp(key, "Class")) {
 			condition->Class = LuaToBoolean(l, -1);

@@ -45,11 +45,11 @@
 #include "map/tileset.h"
 #include "pathfinder.h"
 #include "player.h"
+#include "script/condition/condition.h"
 #include "unit/unit.h"
 #include "unit/unit_class.h"
 #include "unit/unit_find.h"
 #include "unit/unit_type.h"
-#include "upgrade/dependency.h"
 #include "upgrade/upgrade.h"
 #include "upgrade/upgrade_modifier.h"
 #include "util/vector_util.h"
@@ -409,7 +409,7 @@ static int AiBuildBuilding(const stratagus::unit_type &type, stratagus::unit_typ
 
 bool AiRequestedTypeAllowed(const CPlayer &player, const stratagus::unit_type &type, bool allow_can_build_builder, bool include_upgrade)
 {
-	if (!CheckDependencies(&type, &player)) {
+	if (!CheckConditions(&type, &player)) {
 		return false;
 	}
 
@@ -479,14 +479,14 @@ static bool AiRequestedUpgradeAllowed(const CPlayer &player, const CUpgrade *upg
 	}
 
 	for (const stratagus::unit_type *researcher_type : AiHelpers.get_researchers(upgrade)) {
-		if ((player.GetUnitTypeAiActiveCount(researcher_type) > 0 || (allow_can_build_researcher && AiRequestedTypeAllowed(player, *researcher_type))) && CheckDependencies(upgrade, &player)) {
+		if ((player.GetUnitTypeAiActiveCount(researcher_type) > 0 || (allow_can_build_researcher && AiRequestedTypeAllowed(player, *researcher_type))) && CheckConditions(upgrade, &player)) {
 			return true;
 		}
 	}
 
 	for (const stratagus::unit_class *researcher_class : AiHelpers.get_researcher_classes(upgrade->get_upgrade_class())) {
 		const stratagus::unit_type *researcher_type = AiPlayer->Player->get_class_unit_type(researcher_class);
-		if (researcher_type != nullptr && (player.GetUnitTypeAiActiveCount(researcher_type) > 0 || (allow_can_build_researcher && AiRequestedTypeAllowed(player, *researcher_type))) && CheckDependencies(upgrade, &player)) {
+		if (researcher_type != nullptr && (player.GetUnitTypeAiActiveCount(researcher_type) > 0 || (allow_can_build_researcher && AiRequestedTypeAllowed(player, *researcher_type))) && CheckConditions(upgrade, &player)) {
 			return true;
 		}
 	}
@@ -2354,7 +2354,7 @@ void AiCheckSettlementConstruction()
 		return;
 	}
 	
-	if (!CheckDependencies(town_hall_type, AiPlayer->Player)) {
+	if (!CheckConditions(town_hall_type, AiPlayer->Player)) {
 		return;
 	}
 

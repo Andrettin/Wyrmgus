@@ -43,13 +43,13 @@
 //Wyrmgus end
 #include "results.h"
 #include "script.h"
+#include "script/condition/condition.h"
 #include "script/effect/effect.h"
 #include "script/effect/effect_list.h"
 #include "ui/interface.h"
 #include "unit/unit.h"
 #include "unit/unit_find.h"
 #include "unit/unit_type.h"
-#include "upgrade/dependency.h"
 #include "util/string_util.h"
 #include "util/vector_util.h"
 
@@ -614,7 +614,7 @@ void TriggersEachCycle()
 			bool triggered = false;
 			
 			if (current_trigger->Type == stratagus::trigger::TriggerType::GlobalTrigger) {
-				if (CheckDependencies(current_trigger, CPlayer::Players[PlayerNumNeutral])) {
+				if (CheckConditions(current_trigger, CPlayer::Players[PlayerNumNeutral])) {
 					triggered = true;
 					current_trigger->effects->do_effects(CPlayer::Players[PlayerNumNeutral]);
 				}
@@ -624,7 +624,7 @@ void TriggersEachCycle()
 					if (player->Type == PlayerNobody) {
 						continue;
 					}
-					if (!CheckDependencies(current_trigger, player)) {
+					if (!CheckConditions(current_trigger, player)) {
 						continue;
 					}
 					triggered = true;
@@ -756,9 +756,9 @@ void trigger::process_sml_scope(const sml_data &scope)
 	if (tag == "effects") {
 		this->effects = std::make_unique<effect_list>();
 		database::process_sml_data(this->effects, scope);
-	} else if (tag == "dependencies") {
-		this->Dependency = new and_dependency;
-		database::process_sml_data(this->Dependency, scope);
+	} else if (tag == "conditions") {
+		this->conditions = new and_condition;
+		database::process_sml_data(this->conditions, scope);
 	} else {
 		data_entry::process_sml_scope(scope);
 	}

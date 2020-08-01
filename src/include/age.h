@@ -35,7 +35,7 @@ class CUpgrade;
 
 namespace stratagus {
 
-class dependency;
+class condition;
 
 class age final : public named_data_entry, public data_type<age>
 {
@@ -54,7 +54,7 @@ public:
 
 	static age *current_age;
 
-	age(const std::string &identifier) : named_data_entry(identifier)
+	explicit age(const std::string &identifier) : named_data_entry(identifier)
 	{
 	}
 
@@ -75,21 +75,21 @@ public:
 		return this->graphics;
 	}
 
-	dependency *get_predependency() const
+	condition *get_preconditions() const
 	{
-		return this->predependency;
+		return this->preconditions;
 	}
 
-	dependency *get_dependency() const
+	condition *get_conditions() const
 	{
-		return this->dependency;
+		return this->conditions;
 	}
 
 private:
 	CGraphic *graphics = nullptr;
 	int priority = 0;
-	dependency *predependency = nullptr;
-	dependency *dependency = nullptr;
+	condition *preconditions = nullptr;
+	condition *conditions = nullptr;
 };
 
 }

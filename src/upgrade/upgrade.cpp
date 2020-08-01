@@ -63,6 +63,7 @@
 #include "religion/deity.h"
 #include "religion/deity_domain.h"
 #include "script.h"
+#include "script/condition/condition.h"
 //Wyrmgus start
 #include "settings.h"
 #include "translate.h"
@@ -76,7 +77,6 @@
 //Wyrmgus end
 #include "unit/unit_type.h"
 #include "unit/unit_type_variation.h"
-#include "upgrade/dependency.h"
 #include "upgrade/upgrade_class.h"
 #include "upgrade/upgrade_modifier.h"
 #include "util/string_util.h"
@@ -270,12 +270,12 @@ void CUpgrade::ProcessConfigData(const CConfigData *config_data)
 					fprintf(stderr, "Invalid resource: \"%s\".\n", key.c_str());
 				}
 			}
-		} else if (child_config_data->Tag == "predependencies") {
-			this->Predependency = new stratagus::and_dependency;
-			this->Predependency->ProcessConfigData(child_config_data);
-		} else if (child_config_data->Tag == "dependencies") {
-			this->Dependency = new stratagus::and_dependency;
-			this->Dependency->ProcessConfigData(child_config_data);
+		} else if (child_config_data->Tag == "preconditions") {
+			this->preconditions = new stratagus::and_condition;
+			this->preconditions->ProcessConfigData(child_config_data);
+		} else if (child_config_data->Tag == "conditions") {
+			this->conditions = new stratagus::and_condition;
+			this->conditions->ProcessConfigData(child_config_data);
 		} else if (child_config_data->Tag == "modifier") {
 			auto modifier = std::make_unique<stratagus::upgrade_modifier>();
 			modifier->UpgradeId = this->ID;
@@ -330,12 +330,12 @@ void CUpgrade::process_sml_scope(const stratagus::sml_data &scope)
 
 		stratagus::upgrade_modifier::UpgradeModifiers.push_back(modifier.get());
 		this->modifiers.push_back(std::move(modifier));
-	} else if (tag == "predependencies") {
-		this->Predependency = new stratagus::and_dependency;
-		stratagus::database::process_sml_data(this->Predependency, scope);
-	} else if (tag == "dependencies") {
-		this->Dependency = new stratagus::and_dependency;
-		stratagus::database::process_sml_data(this->Dependency, scope);
+	} else if (tag == "preconditions") {
+		this->preconditions = new stratagus::and_condition;
+		stratagus::database::process_sml_data(this->preconditions, scope);
+	} else if (tag == "conditions") {
+		this->conditions = new stratagus::and_condition;
+		stratagus::database::process_sml_data(this->conditions, scope);
 	}
 }
 
@@ -453,7 +453,7 @@ void CUpgrade::add_modifier(std::unique_ptr<stratagus::upgrade_modifier> &&modif
 
 
 /**
-**  Save state of the dependencies to file.
+**  Save state of the upgrade to file.
 **
 **  @param file  Output file.
 */
@@ -1616,9 +1616,9 @@ static void ApplyUpgradeModifier(CPlayer &player, const stratagus::upgrade_modif
 				
 				//add or remove starting abilities from the unit if the upgrade enabled/disabled them
 				for (const CUpgrade *ability_upgrade : unit.Type->StartingAbilities) {
-					if (!unit.GetIndividualUpgrade(ability_upgrade) && CheckDependencies(ability_upgrade, &unit)) {
+					if (!unit.GetIndividualUpgrade(ability_upgrade) && CheckConditions(ability_upgrade, &unit)) {
 						IndividualUpgradeAcquire(unit, ability_upgrade);
-					} else if (unit.GetIndividualUpgrade(ability_upgrade) && !CheckDependencies(ability_upgrade, &unit)) {
+					} else if (unit.GetIndividualUpgrade(ability_upgrade) && !CheckConditions(ability_upgrade, &unit)) {
 						IndividualUpgradeLost(unit, ability_upgrade);
 					}
 				}
@@ -1908,9 +1908,9 @@ static void RemoveUpgradeModifier(CPlayer &player, const stratagus::upgrade_modi
 				
 				//add or remove starting abilities from the unit if the upgrade enabled/disabled them
 				for (const CUpgrade *ability_upgrade : unit.Type->StartingAbilities) {
-					if (!unit.GetIndividualUpgrade(ability_upgrade) && CheckDependencies(ability_upgrade, &unit)) {
+					if (!unit.GetIndividualUpgrade(ability_upgrade) && CheckConditions(ability_upgrade, &unit)) {
 						IndividualUpgradeAcquire(unit, ability_upgrade);
-					} else if (unit.GetIndividualUpgrade(ability_upgrade) && !CheckDependencies(ability_upgrade, &unit)) {
+					} else if (unit.GetIndividualUpgrade(ability_upgrade) && !CheckConditions(ability_upgrade, &unit)) {
 						IndividualUpgradeLost(unit, ability_upgrade);
 					}
 				}

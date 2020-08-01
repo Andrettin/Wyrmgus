@@ -53,8 +53,8 @@ int CclDefineCustomHero(lua_State *l);
 namespace stratagus {
 	class calendar;
 	class civilization;
+	class condition;
 	class deity;
-	class dependency;
 	class faction;
 	class historical_location;
 	class quest;
@@ -256,8 +256,8 @@ public:
 	character *Father = nullptr;		/// Character's father
 	character *Mother = nullptr;		/// Character's mother
 	LuaCallback *Conditions = nullptr;
-	dependency *Predependency = nullptr;
-	dependency *Dependency = nullptr;
+	condition *preconditions = nullptr;
+	condition *conditions = nullptr;
 	std::vector<CPersistentItem *> EquippedItems[static_cast<int>(stratagus::item_slot::count)]; //equipped items of the character, per slot
 	std::vector<character *> Children;	/// Children of the character
 	std::vector<character *> Siblings;	/// Siblings of the character

@@ -38,11 +38,11 @@
 //Wyrmgus end
 #include "network.h"
 #include "player.h"
+#include "script/condition/condition.h"
 #include "ui/button.h"
 #include "ui/interface.h"
 #include "unit/unit.h"
 #include "unit/unit_type.h"
-#include "upgrade/dependency.h"
 #include "upgrade/upgrade.h"
 #include "util/vector_util.h"
 
@@ -397,7 +397,7 @@ bool ButtonCheckUpgradeTo(const CUnit &unit, const stratagus::button &button)
 	if (unit.CurrentAction() != UnitAction::Still) {
 		return false;
 	}
-	return CheckDependencies(stratagus::unit_type::get_all()[button.Value], unit.Player, false, true);
+	return CheckConditions(stratagus::unit_type::get_all()[button.Value], unit.Player, false, true);
 }
 
 /**
@@ -434,7 +434,7 @@ bool ButtonCheckResearch(const CUnit &unit, const stratagus::button &button)
 	const CUpgrade *upgrade = button.get_value_upgrade(&unit);
 
 	// check if allowed
-	if (!CheckDependencies(upgrade, unit.Player, false, true)) {
+	if (!CheckConditions(upgrade, unit.Player, false, true)) {
 		return false;
 	}
 

@@ -54,6 +54,7 @@
 #include "mod.h"
 #include "player.h"
 #include "script.h"
+#include "script/condition/condition.h"
 #include "sound/sound.h"
 #include "sound/unitsound.h"
 #include "species.h"
@@ -65,7 +66,6 @@
 #include "unit/unit_class.h"
 #include "unit/unit_type_type.h"
 #include "unit/unit_type_variation.h"
-#include "upgrade/dependency.h"
 //Wyrmgus start
 #include "upgrade/upgrade.h"
 //Wyrmgus end
@@ -839,12 +839,12 @@ void unit_type::process_sml_scope(const sml_data &scope)
 		});
 	} else if (tag == "sounds") {
 		database::process_sml_data(this->Sound, scope);
-	} else if (tag == "predependencies") {
-		this->Predependency = new and_dependency;
-		database::process_sml_data(this->Predependency, scope);
-	} else if (tag == "dependencies") {
-		this->Dependency = new and_dependency;
-		database::process_sml_data(this->Dependency, scope);
+	} else if (tag == "preconditions") {
+		this->preconditions = new and_condition;
+		database::process_sml_data(this->preconditions, scope);
+	} else if (tag == "conditions") {
+		this->conditions = new and_condition;
+		database::process_sml_data(this->conditions, scope);
 	} else {
 		data_entry::process_sml_scope(scope);
 	}
@@ -1183,12 +1183,12 @@ void unit_type::ProcessConfigData(const CConfigData *config_data)
 					fprintf(stderr, "Invalid sound tag: \"%s\".\n", key.c_str());
 				}
 			}
-		} else if (child_config_data->Tag == "predependencies") {
-			this->Predependency = new and_dependency;
-			this->Predependency->ProcessConfigData(child_config_data);
-		} else if (child_config_data->Tag == "dependencies") {
-			this->Dependency = new and_dependency;
-			this->Dependency->ProcessConfigData(child_config_data);
+		} else if (child_config_data->Tag == "preconditions") {
+			this->preconditions = new and_condition;
+			this->preconditions->ProcessConfigData(child_config_data);
+		} else if (child_config_data->Tag == "conditions") {
+			this->conditions = new and_condition;
+			this->conditions->ProcessConfigData(child_config_data);
 		} else {
 			std::string tag = string::snake_case_to_pascal_case(child_config_data->Tag);
 			

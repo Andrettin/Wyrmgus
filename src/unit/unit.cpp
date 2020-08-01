@@ -72,6 +72,7 @@
 //Wyrmgus end
 #include "religion/deity.h"
 #include "script.h"
+#include "script/condition/condition.h"
 #include "sound/sound.h"
 #include "sound/sound_server.h"
 #include "sound/unitsound.h"
@@ -87,7 +88,6 @@
 #include "unit/unit_type.h"
 #include "unit/unit_type_type.h"
 #include "unit/unit_type_variation.h"
-#include "upgrade/dependency.h"
 #include "upgrade/upgrade.h"
 #include "upgrade/upgrade_modifier.h"
 //Wyrmgus start
@@ -734,7 +734,7 @@ void CUnit::IncreaseLevel(int level_quantity, bool automatic_learning)
 				unsigned int best_gathering_rate = 0;
 				for (size_t i = 0; i != AiHelpers.ExperienceUpgrades[Type->Slot].size(); ++i) {
 					stratagus::unit_type *experience_upgrade_type = AiHelpers.ExperienceUpgrades[Type->Slot][i];
-					if (CheckDependencies(experience_upgrade_type, this, true)) {
+					if (CheckConditions(experience_upgrade_type, this, true)) {
 						if (this->Character == nullptr || std::find(this->Character->ForbiddenUpgrades.begin(), this->Character->ForbiddenUpgrades.end(), experience_upgrade_type) == this->Character->ForbiddenUpgrades.end()) {
 							if (!experience_upgrade_type->ResInfo[this->CurrentResource]) {
 								continue;
@@ -752,7 +752,7 @@ void CUnit::IncreaseLevel(int level_quantity, bool automatic_learning)
 				}
 			} else if (this->Player->AiEnabled || (this->Character == nullptr && AiHelpers.ExperienceUpgrades[Type->Slot].size() == 1)) {
 				for (size_t i = 0; i != AiHelpers.ExperienceUpgrades[Type->Slot].size(); ++i) {
-					if (CheckDependencies(AiHelpers.ExperienceUpgrades[Type->Slot][i], this, true)) {
+					if (CheckConditions(AiHelpers.ExperienceUpgrades[Type->Slot][i], this, true)) {
 						if (this->Character == nullptr || std::find(this->Character->ForbiddenUpgrades.begin(), this->Character->ForbiddenUpgrades.end(), AiHelpers.ExperienceUpgrades[Type->Slot][i]) == this->Character->ForbiddenUpgrades.end()) {
 							potential_upgrades.push_back(AiHelpers.ExperienceUpgrades[Type->Slot][i]);
 						}
@@ -956,7 +956,7 @@ void CUnit::set_character(stratagus::character *character)
 	}
 
 	for (const CUpgrade *ability_upgrade : this->Type->StartingAbilities) {
-		if (CheckDependencies(ability_upgrade, this)) {
+		if (CheckConditions(ability_upgrade, this)) {
 			IndividualUpgradeAcquire(*this, ability_upgrade);
 		}
 	}
@@ -2076,19 +2076,19 @@ void CUnit::GenerateDrop()
 	stratagus::unit_type *chosen_drop = nullptr;
 	std::vector<stratagus::unit_type *> potential_drops;
 	for (size_t i = 0; i < this->Type->Drops.size(); ++i) {
-		if (CheckDependencies(this->Type->Drops[i], this)) {
+		if (CheckConditions(this->Type->Drops[i], this)) {
 			potential_drops.push_back(this->Type->Drops[i]);
 		}
 	}
 	if (this->Player->AiEnabled) {
 		for (size_t i = 0; i < this->Type->AiDrops.size(); ++i) {
-			if (CheckDependencies(this->Type->AiDrops[i], this)) {
+			if (CheckConditions(this->Type->AiDrops[i], this)) {
 				potential_drops.push_back(this->Type->AiDrops[i]);
 			}
 		}
 		for (std::map<std::string, std::vector<stratagus::unit_type *>>::const_iterator iterator = this->Type->ModAiDrops.begin(); iterator != this->Type->ModAiDrops.end(); ++iterator) {
 			for (size_t i = 0; i < iterator->second.size(); ++i) {
-				if (CheckDependencies(iterator->second[i], this)) {
+				if (CheckConditions(iterator->second[i], this)) {
 					potential_drops.push_back(iterator->second[i]);
 				}
 			}
@@ -2220,11 +2220,11 @@ void CUnit::GeneratePrefix(CUnit *dropper, CPlayer *dropper_player)
 			}
 
 			if (dropper != nullptr) {
-				if (!CheckDependencies(upgrade, dropper)) {
+				if (!CheckConditions(upgrade, dropper)) {
 					continue;
 				}
 			} else {
-				if (!CheckDependencies(upgrade, dropper_player)) {
+				if (!CheckConditions(upgrade, dropper_player)) {
 					continue;
 				}
 			}
@@ -2257,11 +2257,11 @@ void CUnit::GenerateSuffix(CUnit *dropper, CPlayer *dropper_player)
 			}
 
 			if (dropper != nullptr) {
-				if (!CheckDependencies(upgrade, dropper)) {
+				if (!CheckConditions(upgrade, dropper)) {
 					continue;
 				}
 			} else {
-				if (!CheckDependencies(upgrade, dropper_player)) {
+				if (!CheckConditions(upgrade, dropper_player)) {
 					continue;
 				}
 			}
@@ -2312,11 +2312,11 @@ void CUnit::GenerateWork(CUnit *dropper, CPlayer *dropper_player)
 			}
 
 			if (dropper != nullptr) {
-				if (!CheckDependencies(upgrade, dropper)) {
+				if (!CheckConditions(upgrade, dropper)) {
 					continue;
 				}
 			} else {
-				if (!CheckDependencies(upgrade, dropper_player)) {
+				if (!CheckConditions(upgrade, dropper_player)) {
 					continue;
 				}
 			}
@@ -2347,11 +2347,11 @@ void CUnit::GenerateUnique(CUnit *dropper, CPlayer *dropper_player)
 				}
 
 				if (dropper != nullptr) {
-					if (!CheckDependencies(unique->Prefix, dropper)) {
+					if (!CheckConditions(unique->Prefix, dropper)) {
 						continue;
 					}
 				} else {
-					if (!CheckDependencies(unique->Prefix, dropper_player)) {
+					if (!CheckConditions(unique->Prefix, dropper_player)) {
 						continue;
 					}
 				}
@@ -2366,11 +2366,11 @@ void CUnit::GenerateUnique(CUnit *dropper, CPlayer *dropper_player)
 				}
 
 				if (dropper != nullptr) {
-					if (!CheckDependencies(unique->Suffix, dropper)) {
+					if (!CheckConditions(unique->Suffix, dropper)) {
 						continue;
 					}
 				} else {
-					if (!CheckDependencies(unique->Suffix, dropper_player)) {
+					if (!CheckConditions(unique->Suffix, dropper_player)) {
 						continue;
 					}
 				}
@@ -2384,11 +2384,11 @@ void CUnit::GenerateUnique(CUnit *dropper, CPlayer *dropper_player)
 			}
 
 			if (dropper != nullptr) {
-				if (!CheckDependencies(unique->Set, dropper)) {
+				if (!CheckConditions(unique->Set, dropper)) {
 					continue;
 				}
 			} else {
-				if (!CheckDependencies(unique->Set, dropper_player)) {
+				if (!CheckConditions(unique->Set, dropper_player)) {
 					continue;
 				}
 			}
@@ -2413,11 +2413,11 @@ void CUnit::GenerateUnique(CUnit *dropper, CPlayer *dropper_player)
 				}
 
 				if (dropper != nullptr) {
-					if (!CheckDependencies(unique->Work, dropper)) {
+					if (!CheckConditions(unique->Work, dropper)) {
 						continue;
 					}
 				} else {
-					if (!CheckDependencies(unique->Work, dropper_player)) {
+					if (!CheckConditions(unique->Work, dropper_player)) {
 						continue;
 					}
 				}
@@ -2432,11 +2432,11 @@ void CUnit::GenerateUnique(CUnit *dropper, CPlayer *dropper_player)
 				}
 
 				if (dropper != nullptr) {
-					if (!CheckDependencies(unique->Elixir, dropper)) {
+					if (!CheckConditions(unique->Elixir, dropper)) {
 						continue;
 					}
 				} else {
-					if (!CheckDependencies(unique->Elixir, dropper_player)) {
+					if (!CheckConditions(unique->Elixir, dropper_player)) {
 						continue;
 					}
 				}
@@ -2526,7 +2526,7 @@ void CUnit::UpdateSoldUnits()
 			for (std::map<std::string, stratagus::character *>::iterator iterator = CustomHeroes.begin(); iterator != CustomHeroes.end(); ++iterator) {
 				if (
 					(iterator->second->get_civilization() && iterator->second->get_civilization() == civilization || iterator->second->get_unit_type() == civilization->get_class_unit_type(iterator->second->get_unit_type()->get_unit_class()))
-					&& CheckDependencies(iterator->second->get_unit_type(), this, true) && iterator->second->CanAppear()
+					&& CheckConditions(iterator->second->get_unit_type(), this, true) && iterator->second->CanAppear()
 				) {
 					potential_heroes.push_back(iterator->second);
 				}
@@ -2534,7 +2534,7 @@ void CUnit::UpdateSoldUnits()
 		}
 	} else {
 		for (size_t i = 0; i < this->Type->SoldUnits.size(); ++i) {
-			if (CheckDependencies(this->Type->SoldUnits[i], this)) {
+			if (CheckConditions(this->Type->SoldUnits[i], this)) {
 				potential_items.push_back(this->Type->SoldUnits[i]);
 			}
 		}
@@ -3040,7 +3040,7 @@ CUnit *MakeUnit(const stratagus::unit_type &type, CPlayer *player)
 	}
 	
 	for (size_t i = 0; i < unit->Type->StartingAbilities.size(); ++i) {
-		if (CheckDependencies(unit->Type->StartingAbilities[i], unit)) {
+		if (CheckConditions(unit->Type->StartingAbilities[i], unit)) {
 			IndividualUpgradeAcquire(*unit, unit->Type->StartingAbilities[i]);
 		}
 	}
@@ -6341,7 +6341,7 @@ bool CUnit::CanLearnAbility(const CUpgrade *ability, bool pre) const
 		return false;
 	}
 	
-	if (!CheckDependencies(ability, this, false, pre)) {
+	if (!CheckConditions(ability, this, false, pre)) {
 		return false;
 	}
 	
@@ -6354,7 +6354,7 @@ bool CUnit::CanHireMercenary(stratagus::unit_type *type, int civilization_id) co
 		civilization_id = type->get_civilization() ? type->get_civilization()->ID : -1;
 	}
 	for (int p = 0; p < PlayerMax; ++p) {
-		if (CPlayer::Players[p]->Type != PlayerNobody && CPlayer::Players[p]->Type != PlayerNeutral && civilization_id == CPlayer::Players[p]->Race && CheckDependencies(type, CPlayer::Players[p], true) && CPlayer::Players[p]->StartMapLayer == this->MapLayer->ID) {
+		if (CPlayer::Players[p]->Type != PlayerNobody && CPlayer::Players[p]->Type != PlayerNeutral && civilization_id == CPlayer::Players[p]->Race && CheckConditions(type, CPlayer::Players[p], true) && CPlayer::Players[p]->StartMapLayer == this->MapLayer->ID) {
 			return true;
 		}
 	}

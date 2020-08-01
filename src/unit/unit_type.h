@@ -56,12 +56,14 @@ class Mng;
 class LuaCallback;
 enum class UnitTypeType;
 
+int CclDefineDependency(lua_State *l);
+int CclDefinePredependency(lua_State *l);
 int CclDefineUnitType(lua_State *l);
 
 namespace stratagus {
 	class animation_set;
 	class button_level;
-	class dependency;
+	class condition;
 	class faction;
 	class missile_type;
 	class plane;
@@ -1030,6 +1032,16 @@ public:
 		return this->variations;
 	}
 
+	condition *get_preconditions() const
+	{
+		return this->preconditions;
+	}
+
+	condition *get_conditions() const
+	{
+		return this->conditions;
+	}
+
 public:
 	const unit_type *Parent = nullptr;				/// Parent unit type
 	//Wyrmgus start
@@ -1258,13 +1270,17 @@ public:
 	CGraphic *LightSprite;						/// Light sprite image
 	CPlayerColorGraphic *LayerSprites[MaxImageLayers];	/// Layer sprite images
 	
-	stratagus::dependency *Predependency = nullptr;
-	stratagus::dependency *Dependency = nullptr;
+private:
+	stratagus::condition *preconditions = nullptr;
+	stratagus::condition *conditions = nullptr;
 	
+public:
 	std::string Mod;							/// To which mod (or map), if any, this unit type belongs
 	//Wyrmgus end
 
 	friend int ::CclDefineUnitType(lua_State *l);
+	friend int ::CclDefineDependency(lua_State *l);
+	friend int ::CclDefinePredependency(lua_State *l);
 };
 
 }
@@ -1406,9 +1422,6 @@ extern std::vector<CSpeciesClass *> SpeciesClasses;
 extern std::vector<CSpeciesPhylum *> SpeciesPhylums;
 //Wyrmgus end
 
-/*----------------------------------------------------------------------------
---  Functions
-----------------------------------------------------------------------------*/
 extern stratagus::unit_type *CclGetUnitType(lua_State *l);  /// Access unit-type object
 extern void UnitTypeCclRegister();               /// Register ccl features
 

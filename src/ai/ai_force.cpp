@@ -41,12 +41,12 @@
 #include "map/map_layer.h"
 #include "map/tileset.h"
 #include "pathfinder.h"
+#include "script/condition/condition.h"
 #include "unit/unit.h"
 #include "unit/unit_class.h"
 #include "unit/unit_find.h"
 #include "unit/unit_type.h"
 #include "unit/unit_type_type.h"
-#include "upgrade/dependency.h"
 
 static constexpr int AIATTACK_RANGE = 0;
 static constexpr int AIATTACK_ALLMAP = 1;
@@ -370,7 +370,7 @@ int AiFindAvailableUnitTypeEquiv(const stratagus::unit_type &unittype, int *usab
 	int usableTypesCount = AiFindUnitTypeEquiv(unittype, usableTypes);
 	// 2 - Remove unavailable unittypes
 	for (int i = 0; i < usableTypesCount;) {
-		if (!CheckDependencies(stratagus::unit_type::get_all()[usableTypes[i]], AiPlayer->Player)) {
+		if (!CheckConditions(stratagus::unit_type::get_all()[usableTypes[i]], AiPlayer->Player)) {
 			// Not available, remove it
 			usableTypes[i] = usableTypes[usableTypesCount - 1];
 			--usableTypesCount;

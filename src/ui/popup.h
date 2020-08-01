@@ -55,7 +55,7 @@ static constexpr int MARGIN_Y = 2;
 class PopupConditionPanel
 {
 public:
-	PopupConditionPanel() :  HasHint(false), HasDescription(false), HasDependencies(false),
+	PopupConditionPanel() :  HasHint(false), HasDescription(false),
 		//Wyrmgus start
 		Class(false), Description(false), Quote(false), Encyclopedia(false), CanActiveHarvest(false),
 		Opponent(0), Neutral(0), AutoCast(0), Equipped(0), Equippable(0), Consumable(0), Affixed(0), Spell(0), CanUse(0), Work(0), ReadWork(0), Elixir(0), ConsumedElixir(0), Unique(0), UniqueSet(0), Bound(0), Identified(0), Weapon(0), Shield(0), Boots(0), Arrows(0), Regeneration(0), FactionUpgrade(0), FactionCoreSettlements(0), Ability(0), ImproveIncomes(0), LuxuryResource(0), RequirementsString(0), ExperienceRequirementsString(0), BuildingRulesString(0),
@@ -71,7 +71,7 @@ public:
 
 	bool HasHint;               /// check if button has hint.
 	bool HasDescription;        /// check if button has description.
-	bool HasDependencies;       /// check if button has dependencies or restrictions.
+	bool HasConditions = false; //check if button has conditions or restrictions.
 	//Wyrmgus start
 	bool Class;					/// check if the button's unit type has a class.
 	bool Description;			/// check if the button's unit type has a description.
@@ -168,7 +168,7 @@ public:
 enum PopupButtonInfo_Types {
 	PopupButtonInfo_Hint,
 	PopupButtonInfo_Description,
-	PopupButtonInfo_Dependencies
+	PopupButtonInfo_Conditions
 };
 
 class CPopupContentTypeButtonInfo : public CPopupContentType

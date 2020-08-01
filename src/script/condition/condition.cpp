@@ -28,7 +28,7 @@
 
 #include "stratagus.h"
 
-#include "upgrade/dependency.h"
+#include "script/condition/condition.h"
 
 #include "age.h"
 #include "character.h"
@@ -56,50 +56,50 @@
 
 namespace stratagus {
 
-std::unique_ptr<const dependency> dependency::from_sml_property(const sml_property &property)
+std::unique_ptr<const condition> condition::from_sml_property(const sml_property &property)
 {
 	const std::string &key = property.get_key();
 	const std::string &value = property.get_value();
 
 	if (key == "upgrade") {
-		return std::make_unique<upgrade_dependency>(CUpgrade::get(value));
+		return std::make_unique<upgrade_condition>(CUpgrade::get(value));
 	} else {
-		throw std::runtime_error("Invalid dependency property: \"" + key + "\".");
+		throw std::runtime_error("Invalid condition property: \"" + key + "\".");
 	}
 }
 
-std::unique_ptr<const dependency> dependency::from_sml_scope(const sml_data &scope)
+std::unique_ptr<const condition> condition::from_sml_scope(const sml_data &scope)
 {
 	const std::string &tag = scope.get_tag();
-	std::unique_ptr<dependency> dependency;
+	std::unique_ptr<condition> condition;
 
 	if (tag == "and") {
-		dependency = std::make_unique<and_dependency>();
+		condition = std::make_unique<and_condition>();
 	} else if (tag == "or") {
-		dependency = std::make_unique<or_dependency>();
+		condition = std::make_unique<or_condition>();
 	} else if (tag == "not") {
-		dependency = std::make_unique<not_dependency>();
+		condition = std::make_unique<not_condition>();
 	} else if (tag == "unit_type") {
-		dependency = std::make_unique<unit_type_dependency>();
+		condition = std::make_unique<unit_type_condition>();
 	} else if (tag == "upgrade") {
-		dependency = std::make_unique<upgrade_dependency>();
+		condition = std::make_unique<upgrade_condition>();
 	} else if (tag == "age") {
-		dependency = std::make_unique<age_dependency>();
+		condition = std::make_unique<age_condition>();
 	} else if (tag == "character") {
-		dependency = std::make_unique<character_dependency>();
+		condition = std::make_unique<character_condition>();
 	} else if (tag == "season") {
-		dependency = std::make_unique<season_dependency>();
+		condition = std::make_unique<season_condition>();
 	} else if (tag == "settlement") {
-		dependency = std::make_unique<settlement_dependency>();
+		condition = std::make_unique<settlement_condition>();
 	} else if (tag == "trigger") {
-		dependency = std::make_unique<trigger_dependency>();
+		condition = std::make_unique<trigger_condition>();
 	} else {
-		throw std::runtime_error("Invalid dependency scope: \"" + tag + "\".");
+		throw std::runtime_error("Invalid condition scope: \"" + tag + "\".");
 	}
 
-	database::process_sml_data(dependency, scope);
+	database::process_sml_data(condition, scope);
 
-	return dependency;
+	return condition;
 }
 
 /**
@@ -107,7 +107,7 @@ std::unique_ptr<const dependency> dependency::from_sml_scope(const sml_data &sco
 **
 **	@param	config_data	The configuration data
 */
-void dependency::ProcessConfigData(const CConfigData *config_data)
+void condition::ProcessConfigData(const CConfigData *config_data)
 {
 	for (size_t i = 0; i < config_data->Properties.size(); ++i) {
 		this->ProcessConfigDataProperty(config_data->Properties[i]);
@@ -118,74 +118,74 @@ void dependency::ProcessConfigData(const CConfigData *config_data)
 	}
 }
 
-void dependency::ProcessConfigDataProperty(const std::pair<std::string, std::string> &property)
+void condition::ProcessConfigDataProperty(const std::pair<std::string, std::string> &property)
 {
-	fprintf(stderr, "Invalid dependency property: \"%s\".\n", property.first.c_str());
+	fprintf(stderr, "Invalid condition property: \"%s\".\n", property.first.c_str());
 }
 
-void dependency::ProcessConfigDataSection(const CConfigData *section)
+void condition::ProcessConfigDataSection(const CConfigData *section)
 {
-	fprintf(stderr, "Invalid dependency property: \"%s\".\n", section->Tag.c_str());
+	fprintf(stderr, "Invalid condition property: \"%s\".\n", section->Tag.c_str());
 }
 
-void dependency::process_sml_property(const sml_property &property)
+void condition::process_sml_property(const sml_property &property)
 {
-	throw std::runtime_error("Invalid dependency property: \"" + property.get_key() + "\".");
+	throw std::runtime_error("Invalid condition property: \"" + property.get_key() + "\".");
 }
 
-void dependency::process_sml_scope(const sml_data &scope)
+void condition::process_sml_scope(const sml_data &scope)
 {
-	throw std::runtime_error("Invalid dependency scope: \"" + scope.get_tag() + "\".");
+	throw std::runtime_error("Invalid condition scope: \"" + scope.get_tag() + "\".");
 }
 
-bool dependency::check(const CUnit *unit, bool ignore_units) const
+bool condition::check(const CUnit *unit, bool ignore_units) const
 {
-	//dependencies check the unit's player by default, but can be overriden in the case of e.g. upgrades (where we want to check individual upgrades for the unit)
+	//conditions check the unit's player by default, but can be overriden in the case of e.g. upgrades (where we want to check individual upgrades for the unit)
 	return this->check(unit->Player, ignore_units);
 }
 
-void and_dependency::ProcessConfigDataSection(const CConfigData *section)
+void and_condition::ProcessConfigDataSection(const CConfigData *section)
 {
-	dependency *dependency = nullptr;
+	condition *condition = nullptr;
 	if (section->Tag == "and") {
-		dependency = new and_dependency;
+		condition = new and_condition;
 	} else if (section->Tag == "or") {
-		dependency = new or_dependency;
+		condition = new or_condition;
 	} else if (section->Tag == "not") {
-		dependency = new not_dependency;
+		condition = new not_condition;
 	} else if (section->Tag == "unit_type") {
-		dependency = new unit_type_dependency;
+		condition = new unit_type_condition;
 	} else if (section->Tag == "upgrade") {
-		dependency = new upgrade_dependency;
+		condition = new upgrade_condition;
 	} else if (section->Tag == "age") {
-		dependency = new age_dependency;
+		condition = new age_condition;
 	} else if (section->Tag == "character") {
-		dependency = new character_dependency;
+		condition = new character_condition;
 	} else if (section->Tag == "season") {
-		dependency = new season_dependency;
+		condition = new season_condition;
 	} else if (section->Tag == "trigger") {
-		dependency = new trigger_dependency;
+		condition = new trigger_condition;
 	} else {
-		throw std::runtime_error("Invalid and dependency property: \"" + section->Tag + "\".");
+		throw std::runtime_error("Invalid and condition property: \"" + section->Tag + "\".");
 	}
-	dependency->ProcessConfigData(section);
-	this->dependencies.push_back(std::unique_ptr<stratagus::dependency>(dependency));
+	condition->ProcessConfigData(section);
+	this->conditions.push_back(std::unique_ptr<stratagus::condition>(condition));
 }
 
-void and_dependency::process_sml_property(const sml_property &property)
+void and_condition::process_sml_property(const sml_property &property)
 {
-	this->dependencies.push_back(dependency::from_sml_property(property));
+	this->conditions.push_back(condition::from_sml_property(property));
 }
 
-void and_dependency::process_sml_scope(const sml_data &scope)
+void and_condition::process_sml_scope(const sml_data &scope)
 {
-	this->dependencies.push_back(dependency::from_sml_scope(scope));
+	this->conditions.push_back(condition::from_sml_scope(scope));
 }
 
-bool and_dependency::check(const CPlayer *player, bool ignore_units) const
+bool and_condition::check(const CPlayer *player, bool ignore_units) const
 {
-	for (const auto &dependency : this->dependencies) {
-		if (!dependency->check(player, ignore_units)) {
+	for (const auto &condition : this->conditions) {
+		if (!condition->check(player, ignore_units)) {
 			return false;
 		}
 	}
@@ -193,10 +193,10 @@ bool and_dependency::check(const CPlayer *player, bool ignore_units) const
 	return true;
 }
 
-bool and_dependency::check(const CUnit *unit, bool ignore_units) const
+bool and_condition::check(const CUnit *unit, bool ignore_units) const
 {
-	for (const auto &dependency : this->dependencies) {
-		if (!dependency->check(unit, ignore_units)) {
+	for (const auto &condition : this->conditions) {
+		if (!condition->check(unit, ignore_units)) {
 			return false;
 		}
 	}
@@ -204,49 +204,49 @@ bool and_dependency::check(const CUnit *unit, bool ignore_units) const
 	return true;
 }
 
-void or_dependency::ProcessConfigDataSection(const CConfigData *section)
+void or_condition::ProcessConfigDataSection(const CConfigData *section)
 {
-	dependency *dependency = nullptr;
+	condition *condition = nullptr;
 	if (section->Tag == "and") {
-		dependency = new and_dependency;
+		condition = new and_condition;
 	} else if (section->Tag == "or") {
-		dependency = new or_dependency;
+		condition = new or_condition;
 	} else if (section->Tag == "not") {
-		dependency = new not_dependency;
+		condition = new not_condition;
 	} else if (section->Tag == "unit_type") {
-		dependency = new unit_type_dependency;
+		condition = new unit_type_condition;
 	} else if (section->Tag == "upgrade") {
-		dependency = new upgrade_dependency;
+		condition = new upgrade_condition;
 	} else if (section->Tag == "age") {
-		dependency = new age_dependency;
+		condition = new age_condition;
 	} else if (section->Tag == "character") {
-		dependency = new character_dependency;
+		condition = new character_condition;
 	} else if (section->Tag == "season") {
-		dependency = new season_dependency;
+		condition = new season_condition;
 	} else if (section->Tag == "trigger") {
-		dependency = new trigger_dependency;
+		condition = new trigger_condition;
 	} else {
-		fprintf(stderr, "Invalid or dependency property: \"%s\".\n", section->Tag.c_str());
+		fprintf(stderr, "Invalid or condition property: \"%s\".\n", section->Tag.c_str());
 		return;
 	}
-	dependency->ProcessConfigData(section);
-	this->dependencies.push_back(std::unique_ptr<stratagus::dependency>(dependency));
+	condition->ProcessConfigData(section);
+	this->conditions.push_back(std::unique_ptr<stratagus::condition>(condition));
 }
 
-void or_dependency::process_sml_property(const sml_property &property)
+void or_condition::process_sml_property(const sml_property &property)
 {
-	this->dependencies.push_back(dependency::from_sml_property(property));
+	this->conditions.push_back(condition::from_sml_property(property));
 }
 
-void or_dependency::process_sml_scope(const sml_data &scope)
+void or_condition::process_sml_scope(const sml_data &scope)
 {
-	this->dependencies.push_back(dependency::from_sml_scope(scope));
+	this->conditions.push_back(condition::from_sml_scope(scope));
 }
 
-bool or_dependency::check(const CPlayer *player, bool ignore_units) const
+bool or_condition::check(const CPlayer *player, bool ignore_units) const
 {
-	for (const auto &dependency : this->dependencies) {
-		if (dependency->check(player, ignore_units)) {
+	for (const auto &condition : this->conditions) {
+		if (condition->check(player, ignore_units)) {
 			return true;
 		}
 	}
@@ -254,10 +254,10 @@ bool or_dependency::check(const CPlayer *player, bool ignore_units) const
 	return false;
 }
 
-bool or_dependency::check(const CUnit *unit, bool ignore_units) const
+bool or_condition::check(const CUnit *unit, bool ignore_units) const
 {
-	for (const auto &dependency : this->dependencies) {
-		if (dependency->check(unit, ignore_units)) {
+	for (const auto &condition : this->conditions) {
+		if (condition->check(unit, ignore_units)) {
 			return true;
 		}
 	}
@@ -265,49 +265,49 @@ bool or_dependency::check(const CUnit *unit, bool ignore_units) const
 	return false;
 }
 
-void not_dependency::process_sml_property(const sml_property &property)
+void not_condition::process_sml_property(const sml_property &property)
 {
-	this->dependencies.push_back(dependency::from_sml_property(property));
+	this->conditions.push_back(condition::from_sml_property(property));
 }
 
-void not_dependency::process_sml_scope(const sml_data &scope)
+void not_condition::process_sml_scope(const sml_data &scope)
 {
-	this->dependencies.push_back(dependency::from_sml_scope(scope));
+	this->conditions.push_back(condition::from_sml_scope(scope));
 }
 
-void not_dependency::ProcessConfigDataSection(const CConfigData *section)
+void not_condition::ProcessConfigDataSection(const CConfigData *section)
 {
-	dependency *dependency = nullptr;
+	condition *condition = nullptr;
 	if (section->Tag == "and") {
-		dependency = new and_dependency;
+		condition = new and_condition;
 	} else if (section->Tag == "or") {
-		dependency = new or_dependency;
+		condition = new or_condition;
 	} else if (section->Tag == "not") {
-		dependency = new not_dependency;
+		condition = new not_condition;
 	} else if (section->Tag == "unit_type") {
-		dependency = new unit_type_dependency;
+		condition = new unit_type_condition;
 	} else if (section->Tag == "upgrade") {
-		dependency = new upgrade_dependency;
+		condition = new upgrade_condition;
 	} else if (section->Tag == "age") {
-		dependency = new age_dependency;
+		condition = new age_condition;
 	} else if (section->Tag == "character") {
-		dependency = new character_dependency;
+		condition = new character_condition;
 	} else if (section->Tag == "season") {
-		dependency = new season_dependency;
+		condition = new season_condition;
 	} else if (section->Tag == "trigger") {
-		dependency = new trigger_dependency;
+		condition = new trigger_condition;
 	} else {
-		fprintf(stderr, "Invalid not dependency property: \"%s\".\n", section->Tag.c_str());
+		fprintf(stderr, "Invalid not condition property: \"%s\".\n", section->Tag.c_str());
 		return;
 	}
-	dependency->ProcessConfigData(section);
-	this->dependencies.push_back(std::unique_ptr<stratagus::dependency>(dependency));
+	condition->ProcessConfigData(section);
+	this->conditions.push_back(std::unique_ptr<stratagus::condition>(condition));
 }
 
-bool not_dependency::check(const CPlayer *player, bool ignore_units) const
+bool not_condition::check(const CPlayer *player, bool ignore_units) const
 {
-	for (const auto &dependency : this->dependencies) {
-		if (dependency->check(player, ignore_units)) {
+	for (const auto &condition : this->conditions) {
+		if (condition->check(player, ignore_units)) {
 			return false;
 		}
 	}
@@ -315,10 +315,10 @@ bool not_dependency::check(const CPlayer *player, bool ignore_units) const
 	return true;
 }
 
-bool not_dependency::check(const CUnit *unit, bool ignore_units) const
+bool not_condition::check(const CUnit *unit, bool ignore_units) const
 {
-	for (const auto &dependency : this->dependencies) {
-		if (dependency->check(unit, ignore_units)) {
+	for (const auto &condition : this->conditions) {
+		if (condition->check(unit, ignore_units)) {
 			return false;
 		}
 	}
@@ -326,7 +326,7 @@ bool not_dependency::check(const CUnit *unit, bool ignore_units) const
 	return true;
 }
 
-void unit_type_dependency::process_sml_property(const sml_property &property)
+void unit_type_condition::process_sml_property(const sml_property &property)
 {
 	const std::string &key = property.get_key();
 	const std::string &value = property.get_value();
@@ -338,11 +338,11 @@ void unit_type_dependency::process_sml_property(const sml_property &property)
 	} else if (key == "settlement") {
 		this->settlement = site::get(value);
 	} else {
-		throw std::runtime_error("Invalid unit type dependency property: \"" + property.get_key() + "\".");
+		throw std::runtime_error("Invalid unit type condition property: \"" + property.get_key() + "\".");
 	}
 }
 
-void unit_type_dependency::ProcessConfigDataProperty(const std::pair<std::string, std::string> &property)
+void unit_type_condition::ProcessConfigDataProperty(const std::pair<std::string, std::string> &property)
 {
 	const std::string &key = property.first;
 	std::string value = property.second;
@@ -351,11 +351,11 @@ void unit_type_dependency::ProcessConfigDataProperty(const std::pair<std::string
 	} else if (key == "count") {
 		this->count = std::stoi(value);
 	} else {
-		fprintf(stderr, "Invalid unit type dependency property: \"%s\".\n", key.c_str());
+		fprintf(stderr, "Invalid unit type condition property: \"%s\".\n", key.c_str());
 	}
 }
 
-bool unit_type_dependency::check(const CPlayer *player, bool ignore_units) const
+bool unit_type_condition::check(const CPlayer *player, bool ignore_units) const
 {
 	if (ignore_units) {
 		return true;
@@ -386,7 +386,7 @@ bool unit_type_dependency::check(const CPlayer *player, bool ignore_units) const
 	}
 }
 
-std::string unit_type_dependency::get_string(const std::string &prefix) const
+std::string unit_type_condition::get_string(const std::string &prefix) const
 {
 	std::string str = prefix + this->unit_type->get_name();
 	
@@ -403,7 +403,7 @@ std::string unit_type_dependency::get_string(const std::string &prefix) const
 	return str;
 }
 
-void upgrade_dependency::process_sml_property(const sml_property &property)
+void upgrade_condition::process_sml_property(const sml_property &property)
 {
 	const std::string &key = property.get_key();
 	const std::string &value = property.get_value();
@@ -411,11 +411,11 @@ void upgrade_dependency::process_sml_property(const sml_property &property)
 	if (key == "upgrade") {
 		this->Upgrade = CUpgrade::get(value);
 	} else {
-		throw std::runtime_error("Invalid upgrade dependency property: \"" + property.get_key() + "\".");
+		throw std::runtime_error("Invalid upgrade condition property: \"" + property.get_key() + "\".");
 	}
 }
 
-void upgrade_dependency::ProcessConfigDataProperty(const std::pair<std::string, std::string> &property)
+void upgrade_condition::ProcessConfigDataProperty(const std::pair<std::string, std::string> &property)
 {
 	const std::string &key = property.first;
 	std::string value = property.second;
@@ -423,49 +423,49 @@ void upgrade_dependency::ProcessConfigDataProperty(const std::pair<std::string, 
 		value = FindAndReplaceString(value, "_", "-");
 		this->Upgrade = CUpgrade::get(value);
 	} else {
-		fprintf(stderr, "Invalid upgrade dependency property: \"%s\".\n", key.c_str());
+		fprintf(stderr, "Invalid upgrade condition property: \"%s\".\n", key.c_str());
 	}
 }
 
-bool upgrade_dependency::check(const CPlayer *player, bool ignore_units) const
+bool upgrade_condition::check(const CPlayer *player, bool ignore_units) const
 {
 	return UpgradeIdAllowed(*player, this->Upgrade->ID) == 'R';
 }
 
-bool upgrade_dependency::check(const CUnit *unit, bool ignore_units) const
+bool upgrade_condition::check(const CUnit *unit, bool ignore_units) const
 {
 	return this->check(unit->Player, ignore_units) || unit->GetIndividualUpgrade(this->Upgrade);
 }
 
-std::string upgrade_dependency::get_string(const std::string &prefix) const
+std::string upgrade_condition::get_string(const std::string &prefix) const
 {
 	std::string str = prefix + this->Upgrade->get_name() + '\n';
 	return str;
 }
 
-void age_dependency::ProcessConfigDataProperty(const std::pair<std::string, std::string> &property)
+void age_condition::ProcessConfigDataProperty(const std::pair<std::string, std::string> &property)
 {
 	const std::string &key = property.first;
 	std::string value = property.second;
 	if (key == "age") {
 		this->age = age::get(value);
 	} else {
-		fprintf(stderr, "Invalid age dependency property: \"%s\".\n", key.c_str());
+		fprintf(stderr, "Invalid age condition property: \"%s\".\n", key.c_str());
 	}
 }
 
-bool age_dependency::check(const CPlayer *player, bool ignore_units) const
+bool age_condition::check(const CPlayer *player, bool ignore_units) const
 {
 	return player->age == this->age;
 }
 
-std::string age_dependency::get_string(const std::string &prefix) const
+std::string age_condition::get_string(const std::string &prefix) const
 {
 	std::string str = prefix + this->age->get_name() + '\n';
 	return str;
 }
 
-void character_dependency::process_sml_property(const sml_property &property)
+void character_condition::process_sml_property(const sml_property &property)
 {
 	const std::string &key = property.get_key();
 	const std::string &value = property.get_value();
@@ -473,38 +473,38 @@ void character_dependency::process_sml_property(const sml_property &property)
 	if (key == "character") {
 		this->character = character::get(value);
 	} else {
-		throw std::runtime_error("Invalid character dependency property: \"" + property.get_key() + "\".");
+		throw std::runtime_error("Invalid character condition property: \"" + property.get_key() + "\".");
 	}
 }
 
-void character_dependency::ProcessConfigDataProperty(const std::pair<std::string, std::string> &property)
+void character_condition::ProcessConfigDataProperty(const std::pair<std::string, std::string> &property)
 {
 	const std::string &key = property.first;
 	std::string value = property.second;
 	if (key == "character") {
 		this->character = character::get(value);
 	} else {
-		fprintf(stderr, "Invalid character dependency property: \"%s\".\n", key.c_str());
+		fprintf(stderr, "Invalid character condition property: \"%s\".\n", key.c_str());
 	}
 }
 
-bool character_dependency::check(const CPlayer *player, bool ignore_units) const
+bool character_condition::check(const CPlayer *player, bool ignore_units) const
 {
 	return player->HasHero(this->character);
 }
 
-bool character_dependency::check(const CUnit *unit, bool ignore_units) const
+bool character_condition::check(const CUnit *unit, bool ignore_units) const
 {
 	return unit->Character == this->character;
 }
 
-std::string character_dependency::get_string(const std::string &prefix) const
+std::string character_condition::get_string(const std::string &prefix) const
 {
 	std::string str = prefix + this->character->GetFullName() + '\n';
 	return str;
 }
 
-void season_dependency::ProcessConfigDataProperty(const std::pair<std::string, std::string> &property)
+void season_condition::ProcessConfigDataProperty(const std::pair<std::string, std::string> &property)
 {
 	const std::string &key = property.first;
 	const std::string &value = property.second;
@@ -512,27 +512,27 @@ void season_dependency::ProcessConfigDataProperty(const std::pair<std::string, s
 	if (key == "season") {
 		this->Season = season::get(value);
 	} else {
-		fprintf(stderr, "Invalid season dependency property: \"%s\".\n", key.c_str());
+		fprintf(stderr, "Invalid season condition property: \"%s\".\n", key.c_str());
 	}
 }
 
-bool season_dependency::check(const CPlayer *player, bool ignore_units) const
+bool season_condition::check(const CPlayer *player, bool ignore_units) const
 {
 	return CMap::Map.MapLayers[player->StartMapLayer]->GetSeason() == this->Season;
 }
 
-bool season_dependency::check(const CUnit *unit, bool ignore_units) const
+bool season_condition::check(const CUnit *unit, bool ignore_units) const
 {
 	return unit->MapLayer->GetSeason() == this->Season;
 }
 
-std::string season_dependency::get_string(const std::string &prefix) const
+std::string season_condition::get_string(const std::string &prefix) const
 {
 	std::string str = prefix + this->Season->get_name() + '\n';
 	return str;
 }
 
-void settlement_dependency::process_sml_property(const sml_property &property)
+void settlement_condition::process_sml_property(const sml_property &property)
 {
 	const std::string &key = property.get_key();
 	const std::string &value = property.get_value();
@@ -544,11 +544,11 @@ void settlement_dependency::process_sml_property(const sml_property &property)
 	} else if (key == "enemy") {
 		this->enemy = string::to_bool(value);
 	} else {
-		throw std::runtime_error("Invalid settlement dependency property: \"" + property.get_key() + "\".");
+		throw std::runtime_error("Invalid settlement condition property: \"" + property.get_key() + "\".");
 	}
 }
 
-bool settlement_dependency::check(const CPlayer *player, bool ignore_units) const
+bool settlement_condition::check(const CPlayer *player, bool ignore_units) const
 {
 	Q_UNUSED(ignore_units)
 
@@ -568,31 +568,31 @@ bool settlement_dependency::check(const CPlayer *player, bool ignore_units) cons
 	return player->HasSettlement(this->settlement);
 }
 
-std::string settlement_dependency::get_string(const std::string &prefix) const
+std::string settlement_condition::get_string(const std::string &prefix) const
 {
 	std::string str = prefix + this->settlement->get_name() + '\n';
 	return str;
 }
 
-void trigger_dependency::ProcessConfigDataProperty(const std::pair<std::string, std::string> &property)
+void trigger_condition::ProcessConfigDataProperty(const std::pair<std::string, std::string> &property)
 {
 	const std::string &key = property.first;
 	std::string value = property.second;
 	if (key == "trigger") {
 		this->trigger = trigger::get(value);
 	} else {
-		fprintf(stderr, "Invalid trigger dependency property: \"%s\".\n", key.c_str());
+		fprintf(stderr, "Invalid trigger condition property: \"%s\".\n", key.c_str());
 	}
 }
 
-bool trigger_dependency::check(const CPlayer *player, bool ignore_units) const
+bool trigger_condition::check(const CPlayer *player, bool ignore_units) const
 {
 	//checks whether a trigger has already fired
 	
 	return vector::contains(trigger::DeactivatedTriggers, this->trigger->get_identifier()); //this works fine for global triggers, but for player triggers perhaps it should check only the player?
 }
 
-std::string trigger_dependency::get_string(const std::string &prefix) const
+std::string trigger_condition::get_string(const std::string &prefix) const
 {
 	return std::string();
 }
@@ -607,7 +607,7 @@ std::string trigger_dependency::get_string(const std::string &prefix) const
 **
 **  @return        True if available, false otherwise.
 */
-std::string PrintDependencies(const CPlayer &player, const stratagus::button &button)
+std::string PrintConditions(const CPlayer &player, const stratagus::button &button)
 {
 	std::string rules;
 
@@ -617,19 +617,19 @@ std::string PrintDependencies(const CPlayer &player, const stratagus::button &bu
 	if (!strncmp(button.ValueStr.c_str(), "unit-", 5)) {
 		// target string refers to unit-XXX
 		const stratagus::unit_type *unit_type = stratagus::unit_type::get(button.ValueStr);
-		rules = unit_type->Dependency->get_string();
+		rules = unit_type->get_conditions()->get_string();
 	} else if (!strncmp(button.ValueStr.c_str(), "upgrade", 7)) {
 		// target string refers to upgrade-XXX
 		const CUpgrade *upgrade = CUpgrade::get(button.ValueStr);
-		if (upgrade->Dependency) {
-			rules = upgrade->Dependency->get_string();
+		if (upgrade->get_conditions()) {
+			rules = upgrade->get_conditions()->get_string();
 		}
 	} else {
 		DebugPrint("target '%s' should be unit-type or upgrade\n" _C_ button.ValueStr.c_str());
 		return rules;
 	}
 
-	if (rules.empty()) {  //no dependencies found
+	if (rules.empty()) {  //no conditions found
 		return rules;
 	}
 
@@ -638,9 +638,9 @@ std::string PrintDependencies(const CPlayer &player, const stratagus::button &bu
 	return rules;
 }
 
-bool CheckDependencies(const stratagus::unit_type *target, const CPlayer *player, bool ignore_units, bool is_predependency, bool is_neutral_use)
+bool CheckConditions(const stratagus::unit_type *target, const CPlayer *player, bool ignore_units, bool is_precondition, bool is_neutral_use)
 {
-	if (!is_predependency && !CheckDependencies(target, player, ignore_units, true, is_neutral_use)) {
+	if (!is_precondition && !CheckConditions(target, player, ignore_units, true, is_neutral_use)) {
 		return false;
 	}
 	
@@ -648,20 +648,20 @@ bool CheckDependencies(const stratagus::unit_type *target, const CPlayer *player
 		return false;
 	}
 	
-	if (is_predependency) {
-		return !target->Predependency || target->Predependency->check(player, ignore_units);
+	if (is_precondition) {
+		return target->get_preconditions() == nullptr || target->get_preconditions()->check(player, ignore_units);
 	} else {
-		return !target->Dependency || target->Dependency->check(player, ignore_units);
+		return target->get_conditions() == nullptr || target->get_conditions()->check(player, ignore_units);
 	}
 }
 
-bool CheckDependencies(const CUpgrade *target, const CPlayer *player, bool ignore_units, bool is_predependency, bool is_neutral_use)
+bool CheckConditions(const CUpgrade *target, const CPlayer *player, bool ignore_units, bool is_precondition, bool is_neutral_use)
 {
-	if (!is_predependency && !CheckDependencies(target, player, ignore_units, true, is_neutral_use)) {
+	if (!is_precondition && !CheckConditions(target, player, ignore_units, true, is_neutral_use)) {
 		return false;
 	}
 	
-	if (UpgradeIdAllowed(*player, target->ID) != 'A' && !((is_predependency || is_neutral_use) && UpgradeIdAllowed(*player, target->ID) == 'R')) {
+	if (UpgradeIdAllowed(*player, target->ID) != 'A' && !((is_precondition || is_neutral_use) && UpgradeIdAllowed(*player, target->ID) == 'R')) {
 		return false;
 	}
 
@@ -683,16 +683,16 @@ bool CheckDependencies(const CUpgrade *target, const CPlayer *player, bool ignor
 		}
 	}
 	
-	if (is_predependency) {
-		return !target->Predependency || target->Predependency->check(player, ignore_units);
+	if (is_precondition) {
+		return !target->get_preconditions() || target->get_preconditions()->check(player, ignore_units);
 	} else {
-		return !target->Dependency || target->Dependency->check(player, ignore_units);
+		return !target->get_conditions() || target->get_conditions()->check(player, ignore_units);
 	}
 }
 
-bool CheckDependencies(const stratagus::unit_type *target, const CUnit *unit, bool ignore_units, bool is_predependency)
+bool CheckConditions(const stratagus::unit_type *target, const CUnit *unit, bool ignore_units, bool is_precondition)
 {
-	if (!is_predependency && !CheckDependencies(target, unit, ignore_units, true)) {
+	if (!is_precondition && !CheckConditions(target, unit, ignore_units, true)) {
 		return false;
 	}
 	
@@ -700,16 +700,16 @@ bool CheckDependencies(const stratagus::unit_type *target, const CUnit *unit, bo
 		return false;
 	}
 	
-	if (is_predependency) {
-		return !target->Predependency || target->Predependency->check(unit, ignore_units);
+	if (is_precondition) {
+		return target->get_preconditions() == nullptr || target->get_preconditions()->check(unit, ignore_units);
 	} else {
-		return !target->Dependency || target->Dependency->check(unit, ignore_units);
+		return target->get_conditions() == nullptr || target->get_conditions()->check(unit, ignore_units);
 	}
 }
 
-bool CheckDependencies(const CUpgrade *target, const CUnit *unit, bool ignore_units, bool is_predependency)
+bool CheckConditions(const CUpgrade *target, const CUnit *unit, bool ignore_units, bool is_precondition)
 {
-	if (!is_predependency && !CheckDependencies(target, unit, ignore_units, true)) {
+	if (!is_precondition && !CheckConditions(target, unit, ignore_units, true)) {
 		return false;
 	}
 	
@@ -717,28 +717,23 @@ bool CheckDependencies(const CUpgrade *target, const CUnit *unit, bool ignore_un
 		return false;
 	}
 
-	if (is_predependency) {
-		return !target->Predependency || target->Predependency->check(unit, ignore_units);
+	if (is_precondition) {
+		return target->get_preconditions() == nullptr || target->get_preconditions()->check(unit, ignore_units);
 	} else {
-		return !target->Dependency || target->Dependency->check(unit, ignore_units);
+		return target->get_conditions() || target->get_conditions()->check(unit, ignore_units);
 	}
 }
 
 /*----------------------------------------------------------------------------
---  Ccl part of dependencies
+--  Ccl part of conditions
 ----------------------------------------------------------------------------*/
 
-/**
-**  Define a new dependency.
-**
-**  @param l  Lua state.
-*/
 static int CclDefineDependency(lua_State *l)
 {
 	const int args = lua_gettop(l);
 	const char *target = LuaToString(l, 1);
 
-	std::vector<std::unique_ptr<const stratagus::dependency>> and_dependencies;
+	std::vector<std::unique_ptr<const stratagus::condition>> and_conditions;
 	
 	//  All or rules.
 	bool or_flag = false;
@@ -748,7 +743,7 @@ static int CclDefineDependency(lua_State *l)
 		}
 		const int subargs = lua_rawlen(l, j + 1);
 
-		std::vector<std::unique_ptr<const stratagus::dependency>> dependencies;
+		std::vector<std::unique_ptr<const stratagus::condition>> conditions;
 	
 		for (int k = 0; k < subargs; ++k) {
 			const char *required = LuaToString(l, j + 1, k + 1);
@@ -761,23 +756,23 @@ static int CclDefineDependency(lua_State *l)
 				}
 				lua_pop(l, 1);
 			}
-			stratagus::dependency *dependency = nullptr;
+			stratagus::condition *condition = nullptr;
 			
 			if (!strncmp(required, "unit-", 5)) {
 				const stratagus::unit_type *unit_type = stratagus::unit_type::get(required);
-				dependency = new stratagus::unit_type_dependency(unit_type, count > 0 ? count : 1);
+				condition = new stratagus::unit_type_condition(unit_type, count > 0 ? count : 1);
 			} else if (!strncmp(required, "upgrade", 7)) {
 				const CUpgrade *upgrade = CUpgrade::get(required);
-				dependency = new stratagus::upgrade_dependency(upgrade);
+				condition = new stratagus::upgrade_condition(upgrade);
 			} else {
-				LuaError(l, "Invalid required type for dependency: \"%s\"" _C_ required);
+				LuaError(l, "Invalid required type for condition: \"%s\"" _C_ required);
 			}
 			
 			if (count == 0) {
-				dependency = new stratagus::not_dependency(std::unique_ptr<stratagus::dependency>(dependency));
+				condition = new stratagus::not_condition(std::unique_ptr<stratagus::condition>(condition));
 			}
 			
-			dependencies.push_back(std::unique_ptr<stratagus::dependency>(dependency));
+			conditions.push_back(std::unique_ptr<stratagus::condition>(condition));
 		}
 		if (j + 1 < args) {
 			++j;
@@ -789,25 +784,25 @@ static int CclDefineDependency(lua_State *l)
 			or_flag = true;
 		}
 		
-		and_dependencies.push_back(std::make_unique<stratagus::and_dependency>(std::move(dependencies)));
-		dependencies.clear();
+		and_conditions.push_back(std::make_unique<stratagus::and_condition>(std::move(conditions)));
+		conditions.clear();
 	}
 	
-	stratagus::dependency *dependency = nullptr;
+	stratagus::condition *condition = nullptr;
 	if (or_flag) {
-		dependency = new stratagus::or_dependency(std::move(and_dependencies));
+		condition = new stratagus::or_condition(std::move(and_conditions));
 	} else {
-		dependency = new stratagus::and_dependency(std::move(and_dependencies));
+		condition = new stratagus::and_condition(std::move(and_conditions));
 	}
 	
 	if (!strncmp(target, "unit-", 5)) {
 		stratagus::unit_type *unit_type = stratagus::unit_type::get(target);
-		unit_type->Dependency = dependency;
+		unit_type->conditions = condition;
 	} else if (!strncmp(target, "upgrade", 7)) {
 		CUpgrade *upgrade = CUpgrade::get(target);
-		upgrade->Dependency = dependency;
+		upgrade->conditions = condition;
 	} else {
-		LuaError(l, "Invalid dependency target: \"%s\"" _C_ target);
+		LuaError(l, "Invalid condition target: \"%s\"" _C_ target);
 	}
 	
 	return 0;
@@ -818,7 +813,7 @@ static int CclDefinePredependency(lua_State *l)
 	const int args = lua_gettop(l);
 	const char *target = LuaToString(l, 1);
 
-	std::vector<std::unique_ptr<const stratagus::dependency>> and_dependencies;
+	std::vector<std::unique_ptr<const stratagus::condition>> and_conditions;
 	
 	//  All or rules.
 	bool or_flag = false;
@@ -828,7 +823,7 @@ static int CclDefinePredependency(lua_State *l)
 		}
 		const int subargs = lua_rawlen(l, j + 1);
 
-		std::vector<std::unique_ptr<const stratagus::dependency>> dependencies;
+		std::vector<std::unique_ptr<const stratagus::condition>> conditions;
 	
 		for (int k = 0; k < subargs; ++k) {
 			const char *required = LuaToString(l, j + 1, k + 1);
@@ -841,23 +836,23 @@ static int CclDefinePredependency(lua_State *l)
 				}
 				lua_pop(l, 1);
 			}
-			stratagus::dependency *dependency = nullptr;
+			stratagus::condition *condition = nullptr;
 			
 			if (!strncmp(required, "unit-", 5)) {
 				const stratagus::unit_type *unit_type = stratagus::unit_type::get(required);
-				dependency = new stratagus::unit_type_dependency(unit_type, count > 0 ? count : 1);
+				condition = new stratagus::unit_type_condition(unit_type, count > 0 ? count : 1);
 			} else if (!strncmp(required, "upgrade", 7)) {
 				const CUpgrade *upgrade = CUpgrade::get(required);
-				dependency = new stratagus::upgrade_dependency(upgrade);
+				condition = new stratagus::upgrade_condition(upgrade);
 			} else {
-				LuaError(l, "Invalid required type for dependency: \"%s\"" _C_ required);
+				LuaError(l, "Invalid required type for condition: \"%s\"" _C_ required);
 			}
 			
 			if (count == 0) {
-				dependency = new stratagus::not_dependency(std::unique_ptr<stratagus::dependency>(dependency));
+				condition = new stratagus::not_condition(std::unique_ptr<stratagus::condition>(condition));
 			}
 			
-			dependencies.push_back(std::unique_ptr<stratagus::dependency>(dependency));
+			conditions.push_back(std::unique_ptr<stratagus::condition>(condition));
 		}
 		if (j + 1 < args) {
 			++j;
@@ -869,38 +864,38 @@ static int CclDefinePredependency(lua_State *l)
 			or_flag = true;
 		}
 		
-		and_dependencies.push_back(std::make_unique<stratagus::and_dependency>(std::move(dependencies)));
-		dependencies.clear();
+		and_conditions.push_back(std::make_unique<stratagus::and_condition>(std::move(conditions)));
+		conditions.clear();
 	}
 	
-	stratagus::dependency *dependency = nullptr;
+	stratagus::condition *condition = nullptr;
 	if (or_flag) {
-		dependency = new stratagus::or_dependency(std::move(and_dependencies));
+		condition = new stratagus::or_condition(std::move(and_conditions));
 	} else {
-		dependency = new stratagus::and_dependency(std::move(and_dependencies));
+		condition = new stratagus::and_condition(std::move(and_conditions));
 	}
 	
 	if (!strncmp(target, "unit-", 5)) {
 		stratagus::unit_type *unit_type = stratagus::unit_type::get(target);
-		unit_type->Predependency = dependency;
+		unit_type->preconditions = condition;
 	} else if (!strncmp(target, "upgrade", 7)) {
 		CUpgrade *upgrade = CUpgrade::get(target);
-		upgrade->Predependency = dependency;
+		upgrade->preconditions = condition;
 	} else {
-		LuaError(l, "Invalid dependency target: \"%s\"" _C_ target);
+		LuaError(l, "Invalid condition target: \"%s\"" _C_ target);
 	}
 	
 	return 0;
 }
 
 /**
-**  Checks if dependencies are met.
+**  Checks if conditions are met.
 **
-**  @return true if the dependencies are met.
+**  @return true if the conditions are met.
 **
 **  @param l  Lua state.
 **  Argument 1: player
-**  Argument 2: object which we want to check the dependencies of
+**  Argument 2: object which we want to check the conditions of
 */
 static int CclCheckDependency(lua_State *l)
 {
@@ -915,12 +910,12 @@ static int CclCheckDependency(lua_State *l)
 	
 	if (!strncmp(object, "unit-", 5)) {
 		const stratagus::unit_type *unit_type = stratagus::unit_type::get(object);
-		lua_pushboolean(l, CheckDependencies(unit_type, player));
+		lua_pushboolean(l, CheckConditions(unit_type, player));
 	} else if (!strncmp(object, "upgrade", 7)) {
 		const CUpgrade *upgrade = CUpgrade::get(object);
-		lua_pushboolean(l, CheckDependencies(upgrade, player));
+		lua_pushboolean(l, CheckConditions(upgrade, player));
 	} else {
-		LuaError(l, "Invalid target of dependency check: \"%s\"" _C_ object);
+		LuaError(l, "Invalid target of condition check: \"%s\"" _C_ object);
 	}
 
 	return 1;

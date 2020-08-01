@@ -43,10 +43,13 @@ class CSchoolOfMagic;
 class CUniqueItem;
 struct lua_State;
 
+int CclDefineDependency(lua_State *l);
+int CclDefinePredependency(lua_State *l);
+
 namespace stratagus {
 	class character;
 	class civilization;
-	class dependency;
+	class condition;
 	class icon;
 	class unit_type;
 	class upgrade_class;
@@ -212,6 +215,16 @@ public:
 
 	void add_modifier(std::unique_ptr<stratagus::upgrade_modifier> &&modifier);
 
+	stratagus::condition *get_preconditions() const
+	{
+		return this->preconditions;
+	}
+
+	stratagus::condition *get_conditions() const
+	{
+		return this->conditions;
+	}
+
 private:
 	stratagus::upgrade_class *upgrade_class = nullptr; //upgrade class (e.g. siege weapon projectile I)
 	stratagus::civilization *civilization = nullptr; //which civilization this upgrade belongs to, if any
@@ -258,10 +271,13 @@ public:
 	std::vector<stratagus::character *> Characters;	/// Characters who appear in this literary work (if it is one)
 	//Wyrmgus end
 	// TODO: not used by buttons
-	stratagus::dependency *Predependency = nullptr;
-	stratagus::dependency *Dependency = nullptr;
+private:
+	stratagus::condition *preconditions = nullptr;
+	stratagus::condition *conditions = nullptr;
 
 	friend int CclDefineUpgrade(lua_State *l);
+	friend int CclDefineDependency(lua_State *l);
+	friend int CclDefinePredependency(lua_State *l);
 };
 
 /**

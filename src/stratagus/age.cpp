@@ -34,9 +34,9 @@
 #include "game.h"
 #include "mod.h"
 #include "player.h"
+#include "script/condition/condition.h"
 #include "time/calendar.h"
 #include "unit/unit_type.h"
-#include "upgrade/dependency.h"
 #include "upgrade/upgrade_structs.h"
 #include "video.h"
 
@@ -125,12 +125,12 @@ void age::process_sml_scope(const sml_data &scope)
 		}
 
 		this->graphics = CGraphic::New(filepath.string(), size.x, size.y);
-	} else if (tag == "predependencies") {
-		this->predependency = new and_dependency;
-		database::process_sml_data(this->predependency, scope);
-	} else if (tag == "dependencies") {
-		this->dependency = new and_dependency;
-		database::process_sml_data(this->dependency, scope);
+	} else if (tag == "preconditions") {
+		this->preconditions = new and_condition;
+		database::process_sml_data(this->preconditions, scope);
+	} else if (tag == "conditions") {
+		this->conditions = new and_condition;
+		database::process_sml_data(this->conditions, scope);
 	} else {
 		data_entry::process_sml_scope(scope);
 	}

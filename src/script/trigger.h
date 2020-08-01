@@ -38,16 +38,13 @@ class LuaCallback;
 struct lua_State;
 
 namespace stratagus {
-	class dependency;
+	class condition;
 	class effect;
 	class effect_list;
 	class faction;
 	class unit_type;
 }
 
-/**
-**  Timer structure
-*/
 class CTimer
 {
 public:
@@ -94,7 +91,7 @@ public:
 	static std::vector<std::string> DeactivatedTriggers;
 	static unsigned int CurrentTriggerId;
 
-	trigger(const std::string &identifier);
+	explicit trigger(const std::string &identifier);
 	~trigger();
 	
 	virtual void process_sml_property(const sml_property &property) override;
@@ -110,6 +107,16 @@ public:
 		return this->campaign_only;
 	}
 
+	condition *get_preconditions() const
+	{
+		return this->preconditions;
+	}
+
+	condition *get_conditions() const
+	{
+		return this->conditions;
+	}
+
 	TriggerType Type = TriggerType::GlobalTrigger;
 	bool Local = false;
 private:
@@ -118,8 +125,10 @@ private:
 public:
 	LuaCallback *Conditions = nullptr;
 	LuaCallback *Effects = nullptr;
-	dependency *Predependency = nullptr;
-	dependency *Dependency = nullptr;
+private:
+	condition *preconditions = nullptr;
+	condition *conditions = nullptr;
+public:
 	std::unique_ptr<effect_list> effects;
 };
 

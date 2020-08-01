@@ -27,58 +27,6 @@
 
 #pragma once
 
-/**
-**  @struct DependRule dependency.h
-**
-**  \#include "upgrade/dependency.h"
-**
-**  This structure is used define the requirements of upgrades or
-**  unit-types. The structure is used to define the base (the wanted)
-**  upgrade or unit-type and the requirements upgrades or unit-types.
-**  The requirements could be combination of and-rules and or-rules.
-**
-**  This structure is very complex because nearly everything has two
-**  meanings.
-**
-**  The depend-rule structure members:
-**
-**  DependRule::Next
-**
-**    Next rule in hash chain for the base upgrade/unit-type.
-**    Next and-rule for the requirements.
-**
-**  DependRule::Count
-**
-**    If DependRule::Type is DependRuleUnitType, the counter is
-**    how many units of the unit-type are required, if zero no unit
-**    of this unit-type is allowed. if DependRule::Type is
-**    DependRuleUpgrade, for a non-zero counter the upgrade must be
-**    researched, for a zero counter the upgrade must be unresearched.
-**
-**  DependRule::Type
-**
-**    Type of the rule, DependRuleUnitType for an unit-type,
-**    DependRuleUpgrade for an upgrade.
-**
-**  DependRule::Kind
-**
-**    Contains the element of rule. Depending on DependRule::Type.
-**
-**  DependRule::Kind::UnitType
-**
-**    An unit-type pointer.
-**
-**  DependRule::Kind::Upgrade
-**
-**    An upgrade pointer.
-**
-**  DependRule::Rule
-**
-**    For the base upgrade/unit-type the rules which must be meet.
-**    For the requirements alternative or-rules.
-**
-*/
-
 class CConfigData;
 class CPlayer;
 class CUnit;
@@ -97,14 +45,13 @@ class sml_property;
 class trigger;
 class unit_type;
 
-/// Dependency rule
-class dependency
+class condition
 {
 public:
-	static std::unique_ptr<const dependency> from_sml_property(const sml_property &property);
-	static std::unique_ptr<const dependency> from_sml_scope(const sml_data &scope);
+	static std::unique_ptr<const condition> from_sml_property(const sml_property &property);
+	static std::unique_ptr<const condition> from_sml_scope(const sml_data &scope);
 
-	virtual ~dependency() {}
+	virtual ~condition() {}
 
 	void ProcessConfigData(const CConfigData *config_data);
 	virtual void ProcessConfigDataProperty(const std::pair<std::string, std::string> &property);
@@ -114,15 +61,19 @@ public:
 	virtual bool check(const CPlayer *player, bool ignore_units = false) const = 0;
 	virtual bool check(const CUnit *unit, bool ignore_units = false) const;
 
-	//get the dependency as a string
+	//get the condition as a string
 	virtual std::string get_string(const std::string &prefix = "") const = 0;
 };
 
-class and_dependency : public dependency
+class and_condition final : public condition
 {
 public:
-	and_dependency() {}
-	and_dependency(std::vector<std::unique_ptr<const dependency>> &&dependencies) : dependencies(std::move(dependencies)) {}
+	and_condition() {}
+
+	explicit and_condition(std::vector<std::unique_ptr<const condition>> &&conditions)
+		: conditions(std::move(conditions))
+	{
+	}
 
 	virtual void ProcessConfigDataSection(const CConfigData *section) override;
 	virtual void process_sml_property(const sml_property &property) override;
@@ -134,8 +85,8 @@ public:
 	{
 		int element_count = 0;
 		
-		for (const auto &dependency : this->dependencies) {
-			if (!dependency->get_string(prefix + '\t').empty()) {
+		for (const auto &condition : this->conditions) {
+			if (!condition->get_string(prefix + '\t').empty()) {
 				element_count++;
 			}
 		}
@@ -146,8 +97,8 @@ public:
 				str += prefix + "AND:\n";
 			}
 		
-			for (const auto &dependency : this->dependencies) {
-				str += dependency->get_string((element_count > 1) ? prefix + '\t' : prefix);
+			for (const auto &condition : this->conditions) {
+				str += condition->get_string((element_count > 1) ? prefix + '\t' : prefix);
 			}
 
 			return str;
@@ -157,14 +108,16 @@ public:
 	}
 
 private:
-	std::vector<std::unique_ptr<const dependency>> dependencies; //the dependencies of which all should be true
+	std::vector<std::unique_ptr<const condition>> conditions; //the conditions of which all should be true
 };
 
-class or_dependency : public dependency
+class or_condition final : public condition
 {
 public:
-	or_dependency() {}
-	or_dependency(std::vector<std::unique_ptr<const dependency>> &&dependencies) : dependencies(std::move(dependencies))
+	or_condition() {}
+
+	explicit or_condition(std::vector<std::unique_ptr<const condition>> &&conditions)
+		: conditions(std::move(conditions))
 	{
 	}
 	
@@ -178,8 +131,8 @@ public:
 	{
 		int element_count = 0;
 		
-		for (const auto &dependency : this->dependencies) {
-			if (!dependency->get_string(prefix + '\t').empty()) {
+		for (const auto &condition : this->conditions) {
+			if (!condition->get_string(prefix + '\t').empty()) {
 				element_count++;
 			}
 		}
@@ -190,8 +143,8 @@ public:
 				str += prefix + "OR:\n";
 			}
 		
-			for (const auto &dependency : this->dependencies) {
-				str += dependency->get_string((element_count > 1) ? prefix + '\t' : prefix);
+			for (const auto &condition : this->conditions) {
+				str += condition->get_string((element_count > 1) ? prefix + '\t' : prefix);
 			}
 
 			return str;
@@ -201,21 +154,21 @@ public:
 	}
 
 private:
-	std::vector<std::unique_ptr<const dependency>> dependencies;	/// The dependencies of which one should be true
+	std::vector<std::unique_ptr<const condition>> conditions; //the condition of which one should be true
 };
 
-class not_dependency : public dependency
+class not_condition final : public condition
 {
 public:
-	not_dependency() {}
-	not_dependency(std::vector<std::unique_ptr<const dependency>> &&dependencies)
-		: dependencies(std::move(dependencies))
+	not_condition() {}
+	not_condition(std::vector<std::unique_ptr<const condition>> &&conditions)
+		: conditions(std::move(conditions))
 	{
 	}
 
-	not_dependency(std::unique_ptr<const dependency> &&dependency)
+	not_condition(std::unique_ptr<const condition> &&condition)
 	{
-		this->dependencies.push_back(std::move(dependency));
+		this->conditions.push_back(std::move(condition));
 	}
 	
 	virtual void process_sml_property(const sml_property &property) override;
@@ -228,8 +181,8 @@ public:
 	{
 		int element_count = 0;
 		
-		for (const auto &dependency : this->dependencies) {
-			if (!dependency->get_string(prefix + '\t').empty()) {
+		for (const auto &condition : this->conditions) {
+			if (!condition->get_string(prefix + '\t').empty()) {
 				element_count++;
 			}
 		}
@@ -237,8 +190,8 @@ public:
 		if (element_count >= 1) {
 			std::string str = prefix + "NOT:\n";
 		
-			for (const auto &dependency : this->dependencies) {
-				str += dependency->get_string(prefix + '\t');
+			for (const auto &condition : this->conditions) {
+				str += condition->get_string(prefix + '\t');
 			}
 
 			return str;
@@ -248,14 +201,14 @@ public:
 	}
 
 private:
-	std::vector<std::unique_ptr<const dependency>> dependencies;	/// The dependencies of which none should be true
+	std::vector<std::unique_ptr<const condition>> conditions; //the conditions of which none should be true
 };
 
-class unit_type_dependency : public dependency
+class unit_type_condition final : public condition
 {
 public:
-	unit_type_dependency() {}
-	unit_type_dependency(const unit_type *unit_type, const int count) : unit_type(unit_type), count(count) {}
+	unit_type_condition() {}
+	unit_type_condition(const unit_type *unit_type, const int count) : unit_type(unit_type), count(count) {}
 	
 	virtual void process_sml_property(const sml_property &property) override;
 	virtual void ProcessConfigDataProperty(const std::pair<std::string, std::string> &property) override;
@@ -268,11 +221,11 @@ private:
 	const site *settlement = nullptr; //in which settlement the unit should be located
 };
 
-class upgrade_dependency : public dependency
+class upgrade_condition : public condition
 {
 public:
-	upgrade_dependency() {}
-	upgrade_dependency(const CUpgrade *upgrade) : Upgrade(upgrade) {}
+	upgrade_condition() {}
+	upgrade_condition(const CUpgrade *upgrade) : Upgrade(upgrade) {}
 	
 	virtual void process_sml_property(const sml_property &property) override;
 	virtual void ProcessConfigDataProperty(const std::pair<std::string, std::string> &property) override;
@@ -284,7 +237,7 @@ private:
 	const CUpgrade *Upgrade = nullptr;
 };
 
-class age_dependency : public dependency
+class age_condition : public condition
 {
 public:
 	virtual void ProcessConfigDataProperty(const std::pair<std::string, std::string> &property) override;
@@ -295,7 +248,7 @@ private:
 	const age *age = nullptr;
 };
 
-class character_dependency : public dependency
+class character_condition : public condition
 {
 public:
 	virtual void process_sml_property(const sml_property &property) override;
@@ -308,7 +261,7 @@ private:
 	const character *character = nullptr;
 };
 
-class season_dependency : public dependency
+class season_condition : public condition
 {
 public:
 	virtual void ProcessConfigDataProperty(const std::pair<std::string, std::string> &property) override;
@@ -320,7 +273,7 @@ private:
 	const season *Season = nullptr;
 };
 
-class settlement_dependency : public dependency
+class settlement_condition : public condition
 {
 	virtual void process_sml_property(const sml_property &property) override;
 	virtual bool check(const CPlayer *player, bool ignore_units = false) const override;
@@ -332,7 +285,7 @@ private:
 	bool enemy = false;
 };
 
-class trigger_dependency : public dependency
+class trigger_condition : public condition
 {
 public:
 	virtual void ProcessConfigDataProperty(const std::pair<std::string, std::string> &property) override;
@@ -344,57 +297,45 @@ private:
 };
 
 }
-/*----------------------------------------------------------------------------
---  Functions
-----------------------------------------------------------------------------*/
 
 /// Register CCL features for dependencies
 extern void DependenciesCclRegister();
 
-/// Print all unit dependencies into string
-extern std::string PrintDependencies(const CPlayer &player, const stratagus::button &button);
-extern void AddDependency(const int rule_type, const std::string &target, const int required_rule_type, const std::string &required, const int count, const int or_flag, const bool is_predependency);
+/// Print all unit conditions into string
+extern std::string PrintConditions(const CPlayer &player, const stratagus::button &button);
 
-/// Check dependencies for player
-extern bool CheckDependencies(const stratagus::unit_type *target, const CPlayer *player, bool ignore_units = false, bool is_predependency = false, bool is_neutral_use = false);
-extern bool CheckDependencies(const CUpgrade *target, const CPlayer *player, bool ignore_units = false, bool is_predependency = false, bool is_neutral_use = false);
+/// Check conditions for player
+extern bool CheckConditions(const stratagus::unit_type *target, const CPlayer *player, bool ignore_units = false, bool is_precondition = false, bool is_neutral_use = false);
+extern bool CheckConditions(const CUpgrade *target, const CPlayer *player, bool ignore_units = false, bool is_precondition = false, bool is_neutral_use = false);
 
 template <typename T>
-extern bool CheckDependencies(const T *target, const CPlayer *player, bool ignore_units = false, bool is_predependency = false, bool is_neutral_use = false)
+extern bool CheckConditions(const T *target, const CPlayer *player, bool ignore_units = false, bool is_precondition = false, bool is_neutral_use = false)
 {
-	if (!is_predependency && !CheckDependencies(target, player, ignore_units, true, is_neutral_use)) {
+	if (!is_precondition && !CheckConditions(target, player, ignore_units, true, is_neutral_use)) {
 		return false;
 	}
 	
-	if constexpr (std::is_same_v<stratagus::age, T>) {
-		if (is_predependency) {
-			return !target->get_predependency() || target->get_predependency()->check(player, ignore_units);
-		} else {
-			return !target->get_dependency() || target->get_dependency()->check(player, ignore_units);
-		}
+	if (is_precondition) {
+		return target->get_preconditions() == nullptr || target->get_preconditions()->check(player, ignore_units);
 	} else {
-		if (is_predependency) {
-			return !target->Predependency || target->Predependency->check(player, ignore_units);
-		} else {
-			return !target->Dependency || target->Dependency->check(player, ignore_units);
-		}
+		return target->get_conditions() == nullptr || target->get_conditions()->check(player, ignore_units);
 	}
 }
 
-/// Check dependencies for unit
-extern bool CheckDependencies(const stratagus::unit_type *target, const CUnit *unit, bool ignore_units = false, bool is_predependency = false);
-extern bool CheckDependencies(const CUpgrade *target, const CUnit *unit, bool ignore_units = false, bool is_predependency = false);
+/// Check conditions for unit
+extern bool CheckConditions(const stratagus::unit_type *target, const CUnit *unit, bool ignore_units = false, bool is_precondition = false);
+extern bool CheckConditions(const CUpgrade *target, const CUnit *unit, bool ignore_units = false, bool is_precondition = false);
 
 template <typename T>
-extern bool CheckDependencies(const T *target, const CUnit *unit, bool ignore_units = false, bool is_predependency = false)
+extern bool CheckConditions(const T *target, const CUnit *unit, bool ignore_units = false, bool is_precondition = false)
 {
-	if (!is_predependency && !CheckDependencies(target, unit, ignore_units, true)) {
+	if (!is_precondition && !CheckConditions(target, unit, ignore_units, true)) {
 		return false;
 	}
 	
-	if (is_predependency) {
-		return !target->Predependency || target->Predependency->Check(unit, ignore_units);
+	if (is_precondition) {
+		return target->get_preconditions() == nullptr || target->get_preconditions()->Check(unit, ignore_units);
 	} else {
-		return !target->Dependency || target->Dependency->Check(unit, ignore_units);
+		return target->get_conditions() == nullptr || target->get_conditions()->Check(unit, ignore_units);
 	}
 }

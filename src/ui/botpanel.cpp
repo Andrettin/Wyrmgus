@@ -65,6 +65,7 @@
 //Wyrmgus start
 #include "quest.h"
 //Wyrmgus end
+#include "script/condition/condition.h"
 #include "script/trigger.h"
 #include "sound/sound.h"
 #include "sound/unit_sound_type.h"
@@ -83,7 +84,6 @@
 //Wyrmgus end
 #include "unit/unit_type.h"
 #include "unit/unit_type_variation.h"
-#include "upgrade/dependency.h"
 #include "upgrade/upgrade.h"
 #include "upgrade/upgrade_class.h"
 #include "util/vector_util.h"
@@ -293,7 +293,7 @@ static bool CanShowPopupContent(const PopupConditionPanel *condition,
 		return false;
 	}
 
-	if (condition->HasDependencies && PrintDependencies(*CPlayer::GetThisPlayer(), button).empty()) {
+	if (condition->HasConditions && PrintConditions(*CPlayer::GetThisPlayer(), button).empty()) {
 		return false;
 	}
 	
@@ -1356,18 +1356,18 @@ bool IsButtonAllowed(const CUnit &unit, const stratagus::button &buttonaction)
 				break;
 			}
 
-			res = CheckDependencies(unit_type, unit.Player, false, true, !CPlayer::GetThisPlayer()->IsTeamed(unit));
+			res = CheckConditions(unit_type, unit.Player, false, true, !CPlayer::GetThisPlayer()->IsTeamed(unit));
 			break;
 		case ButtonCmd::Research:
 		case ButtonCmd::ResearchClass:
-			res = CheckDependencies(upgrade, unit.Player, false, true, !CPlayer::GetThisPlayer()->IsTeamed(unit));
+			res = CheckConditions(upgrade, unit.Player, false, true, !CPlayer::GetThisPlayer()->IsTeamed(unit));
 			if (res) {
-				res = (UpgradeIdAllowed(*CPlayer::GetThisPlayer(), upgrade->ID) == 'A' || UpgradeIdAllowed(*CPlayer::GetThisPlayer(), upgrade->ID) == 'R') && CheckDependencies(upgrade, CPlayer::GetThisPlayer(), false, true); //also check for the dependencies for this player (rather than the unit) as an extra for researches, so that the player doesn't research too advanced technologies at neutral buildings
+				res = (UpgradeIdAllowed(*CPlayer::GetThisPlayer(), upgrade->ID) == 'A' || UpgradeIdAllowed(*CPlayer::GetThisPlayer(), upgrade->ID) == 'R') && CheckConditions(upgrade, CPlayer::GetThisPlayer(), false, true); //also check for the conditions for this player (rather than the unit) as an extra for researches, so that the player doesn't research too advanced technologies at neutral buildings
 				res = res && (!unit.Player->UpgradeTimers.Upgrades[upgrade->ID] || unit.Player->UpgradeTimers.Upgrades[upgrade->ID] == upgrade->Costs[TimeCost]); //don't show if is being researched elsewhere
 			}
 			break;
 		case ButtonCmd::ExperienceUpgradeTo:
-			res = CheckDependencies(unit_type, &unit, true, true);
+			res = CheckConditions(unit_type, &unit, true, true);
 			if (res && unit.Character != nullptr) {
 				res = !stratagus::vector::contains(unit.Character->ForbiddenUpgrades, unit_type);
 			}
@@ -1504,17 +1504,17 @@ bool IsButtonUsable(const CUnit &unit, const stratagus::button &buttonaction)
 		case ButtonCmd::UpgradeTo:
 		case ButtonCmd::Build:
 		case ButtonCmd::BuildClass:
-			res = CheckDependencies(unit_type, unit.Player, false, false, !CPlayer::GetThisPlayer()->IsTeamed(unit));
+			res = CheckConditions(unit_type, unit.Player, false, false, !CPlayer::GetThisPlayer()->IsTeamed(unit));
 			break;
 		case ButtonCmd::Research:
 		case ButtonCmd::ResearchClass:
-			res = CheckDependencies(upgrade, unit.Player, false, false, !CPlayer::GetThisPlayer()->IsTeamed(unit));
+			res = CheckConditions(upgrade, unit.Player, false, false, !CPlayer::GetThisPlayer()->IsTeamed(unit));
 			if (res) {
-				res = UpgradeIdAllowed(*CPlayer::GetThisPlayer(), upgrade->ID) == 'A' && CheckDependencies(upgrade, CPlayer::GetThisPlayer(), false, false); //also check for the dependencies of this player extra for researches, so that the player doesn't research too advanced technologies at neutral buildings
+				res = UpgradeIdAllowed(*CPlayer::GetThisPlayer(), upgrade->ID) == 'A' && CheckConditions(upgrade, CPlayer::GetThisPlayer(), false, false); //also check for the conditions of this player extra for researches, so that the player doesn't research too advanced technologies at neutral buildings
 			}
 			break;
 		case ButtonCmd::ExperienceUpgradeTo:
-			res = CheckDependencies(unit_type, &unit, true, false) && unit.Variable[LEVELUP_INDEX].Value >= 1;
+			res = CheckConditions(unit_type, &unit, true, false) && unit.Variable[LEVELUP_INDEX].Value >= 1;
 			break;
 		case ButtonCmd::LearnAbility:
 			res = unit.CanLearnAbility(upgrade);
