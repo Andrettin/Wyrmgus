@@ -371,7 +371,7 @@ bool CheckConditions(const CUpgrade *target, const CUnit *unit, bool ignore_unit
 	if (is_precondition) {
 		return target->get_preconditions() == nullptr || target->get_preconditions()->check(unit, ignore_units);
 	} else {
-		return target->get_conditions() || target->get_conditions()->check(unit, ignore_units);
+		return target->get_conditions() == nullptr || target->get_conditions()->check(unit, ignore_units);
 	}
 }
 
