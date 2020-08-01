@@ -28,8 +28,9 @@
 #pragma once
 
 #include "script/condition/condition.h"
-
-class CUpgrade;
+#include "unit/unit.h"
+#include "upgrade/upgrade.h"
+#include "upgrade/upgrade_structs.h"
 
 namespace stratagus {
 
@@ -37,16 +38,32 @@ class upgrade_condition final : public condition
 {
 public:
 	upgrade_condition() {}
-	upgrade_condition(const CUpgrade *upgrade) : Upgrade(upgrade) {}
 
-	virtual void process_sml_property(const sml_property &property) override;
+	explicit upgrade_condition(const std::string &value)
+	{
+		this->upgrade = CUpgrade::get(value);
+	}
+
 	virtual void ProcessConfigDataProperty(const std::pair<std::string, std::string> &property) override;
-	virtual bool check(const CPlayer *player, bool ignore_units = false) const override;
-	virtual bool check(const CUnit *unit, bool ignore_units = false) const override;
-	virtual std::string get_string(const std::string &prefix = "") const override;
+
+	virtual bool check(const CPlayer *player, bool ignore_units = false) const override
+	{
+		return UpgradeIdAllowed(*player, this->upgrade->ID) == 'R';
+	}
+
+	virtual bool check(const CUnit *unit, bool ignore_units = false) const override
+	{
+		return this->check(unit->Player, ignore_units) || unit->GetIndividualUpgrade(this->upgrade);
+	}
+
+	virtual std::string get_string(const std::string &prefix = "") const override
+	{
+		std::string str = prefix + this->upgrade->get_name() + '\n';
+		return str;
+	}
 
 private:
-	const CUpgrade *Upgrade = nullptr;
+	const CUpgrade *upgrade = nullptr;
 };
 
 }

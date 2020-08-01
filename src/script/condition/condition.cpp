@@ -30,7 +30,6 @@
 
 #include "script/condition/condition.h"
 
-#include "age.h"
 #include "character.h"
 #include "config.h"
 #include "faction.h"
@@ -55,12 +54,9 @@
 #include "translate.h"
 #include "ui/button.h"
 #include "ui/interface.h"
-#include "unit/unit.h"
 #include "unit/unit_find.h"
 #include "unit/unit_type.h"
-#include "upgrade/upgrade.h"
 #include "upgrade/upgrade_modifier.h"
-#include "upgrade/upgrade_structs.h"
 #include "util/string_util.h"
 #include "util/vector_util.h"
 
@@ -72,7 +68,7 @@ std::unique_ptr<const condition> condition::from_sml_property(const sml_property
 	const std::string &value = property.get_value();
 
 	if (key == "upgrade") {
-		return std::make_unique<upgrade_condition>(CUpgrade::get(value));
+		return std::make_unique<upgrade_condition>(value);
 	} else {
 		throw std::runtime_error("Invalid condition property: \"" + key + "\".");
 	}
@@ -91,8 +87,6 @@ std::unique_ptr<const condition> condition::from_sml_scope(const sml_data &scope
 		condition = std::make_unique<not_condition>();
 	} else if (tag == "unit_type") {
 		condition = std::make_unique<unit_type_condition>();
-	} else if (tag == "upgrade") {
-		condition = std::make_unique<upgrade_condition>();
 	} else if (tag == "age") {
 		condition = std::make_unique<age_condition>();
 	} else if (tag == "character") {
@@ -416,44 +410,15 @@ std::string unit_type_condition::get_string(const std::string &prefix) const
 	return str;
 }
 
-void upgrade_condition::process_sml_property(const sml_property &property)
-{
-	const std::string &key = property.get_key();
-	const std::string &value = property.get_value();
-
-	if (key == "upgrade") {
-		this->Upgrade = CUpgrade::get(value);
-	} else {
-		throw std::runtime_error("Invalid upgrade condition property: \"" + property.get_key() + "\".");
-	}
-}
-
 void upgrade_condition::ProcessConfigDataProperty(const std::pair<std::string, std::string> &property)
 {
 	const std::string &key = property.first;
 	std::string value = property.second;
 	if (key == "upgrade") {
-		value = FindAndReplaceString(value, "_", "-");
-		this->Upgrade = CUpgrade::get(value);
+		this->upgrade = CUpgrade::get(value);
 	} else {
 		fprintf(stderr, "Invalid upgrade condition property: \"%s\".\n", key.c_str());
 	}
-}
-
-bool upgrade_condition::check(const CPlayer *player, bool ignore_units) const
-{
-	return UpgradeIdAllowed(*player, this->Upgrade->ID) == 'R';
-}
-
-bool upgrade_condition::check(const CUnit *unit, bool ignore_units) const
-{
-	return this->check(unit->Player, ignore_units) || unit->GetIndividualUpgrade(this->Upgrade);
-}
-
-std::string upgrade_condition::get_string(const std::string &prefix) const
-{
-	std::string str = prefix + this->Upgrade->get_name() + '\n';
-	return str;
 }
 
 void age_condition::ProcessConfigDataProperty(const std::pair<std::string, std::string> &property)
@@ -764,8 +729,7 @@ static int CclDefineDependency(lua_State *l)
 				const stratagus::unit_type *unit_type = stratagus::unit_type::get(required);
 				condition = new stratagus::unit_type_condition(unit_type, count > 0 ? count : 1);
 			} else if (!strncmp(required, "upgrade", 7)) {
-				const CUpgrade *upgrade = CUpgrade::get(required);
-				condition = new stratagus::upgrade_condition(upgrade);
+				condition = new stratagus::upgrade_condition(required);
 			} else {
 				LuaError(l, "Invalid required type for condition: \"%s\"" _C_ required);
 			}
@@ -844,8 +808,7 @@ static int CclDefinePredependency(lua_State *l)
 				const stratagus::unit_type *unit_type = stratagus::unit_type::get(required);
 				condition = new stratagus::unit_type_condition(unit_type, count > 0 ? count : 1);
 			} else if (!strncmp(required, "upgrade", 7)) {
-				const CUpgrade *upgrade = CUpgrade::get(required);
-				condition = new stratagus::upgrade_condition(upgrade);
+				condition = new stratagus::upgrade_condition(required);
 			} else {
 				LuaError(l, "Invalid required type for condition: \"%s\"" _C_ required);
 			}
