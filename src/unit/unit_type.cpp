@@ -852,6 +852,31 @@ void unit_type::process_sml_scope(const sml_data &scope)
 		this->conditions = std::make_unique<and_condition>();
 		database::process_sml_data(this->conditions, scope);
 	} else {
+		const std::string pascal_case_tag = string::snake_case_to_pascal_case(tag);
+
+		const int index = UnitTypeVar.VariableNameLookup[pascal_case_tag.c_str()]; // variable index
+
+		if (index != -1) { // valid index
+			scope.for_each_property([&](const sml_property &property) {
+				const std::string &key = property.get_key();
+				const std::string &value = property.get_value();
+
+				if (key == "enable") {
+					this->DefaultStat.Variables[index].Enable = string::to_bool(value);
+				} else if (key == "value") {
+					this->DefaultStat.Variables[index].Value = std::stoi(value);
+				} else if (key == "max") {
+					this->DefaultStat.Variables[index].Max = std::stoi(value);
+				} else if (key == "increase") {
+					this->DefaultStat.Variables[index].Increase = std::stoi(value);
+				} else {
+					throw std::runtime_error("Invalid variable property: \"" + key + "\".");
+				}
+			});
+
+			return;
+		}
+
 		data_entry::process_sml_scope(scope);
 	}
 }
