@@ -8,8 +8,6 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name depend.cpp - The dependencies source file */
-//
 //      (c) Copyright 2000-2020 by Vladi Belperchinov-Shabanski, Lutz Sammer,
 //                                 Jimmy Salmon, Pali Rohár and Andrettin
 //
@@ -58,33 +56,49 @@
 
 namespace stratagus {
 
+std::unique_ptr<const dependency> dependency::from_sml_property(const sml_property &property)
+{
+	const std::string &key = property.get_key();
+	const std::string &value = property.get_value();
+
+	if (key == "upgrade") {
+		return std::make_unique<upgrade_dependency>(CUpgrade::get(value));
+	} else {
+		throw std::runtime_error("Invalid dependency property: \"" + key + "\".");
+	}
+}
+
 std::unique_ptr<const dependency> dependency::from_sml_scope(const sml_data &scope)
 {
+	const std::string &tag = scope.get_tag();
 	std::unique_ptr<dependency> dependency;
-	if (scope.get_tag() == "and") {
+
+	if (tag == "and") {
 		dependency = std::make_unique<and_dependency>();
-	} else if (scope.get_tag() == "or") {
+	} else if (tag == "or") {
 		dependency = std::make_unique<or_dependency>();
-	} else if (scope.get_tag() == "not") {
+	} else if (tag == "not") {
 		dependency = std::make_unique<not_dependency>();
-	} else if (scope.get_tag() == "unit_type") {
+	} else if (tag == "unit_type") {
 		dependency = std::make_unique<unit_type_dependency>();
-	} else if (scope.get_tag() == "upgrade") {
+	} else if (tag == "upgrade") {
 		dependency = std::make_unique<upgrade_dependency>();
-	} else if (scope.get_tag() == "age") {
+	} else if (tag == "age") {
 		dependency = std::make_unique<age_dependency>();
-	} else if (scope.get_tag() == "character") {
+	} else if (tag == "character") {
 		dependency = std::make_unique<character_dependency>();
-	} else if (scope.get_tag() == "season") {
+	} else if (tag == "season") {
 		dependency = std::make_unique<season_dependency>();
-	} else if (scope.get_tag() == "settlement") {
+	} else if (tag == "settlement") {
 		dependency = std::make_unique<settlement_dependency>();
-	} else if (scope.get_tag() == "trigger") {
+	} else if (tag == "trigger") {
 		dependency = std::make_unique<trigger_dependency>();
 	} else {
-		throw std::runtime_error("Invalid or dependency property: \"" + scope.get_tag() + "\".");
+		throw std::runtime_error("Invalid dependency scope: \"" + tag + "\".");
 	}
+
 	database::process_sml_data(dependency, scope);
+
 	return dependency;
 }
 
@@ -158,6 +172,11 @@ void and_dependency::ProcessConfigDataSection(const CConfigData *section)
 	this->dependencies.push_back(std::unique_ptr<stratagus::dependency>(dependency));
 }
 
+void and_dependency::process_sml_property(const sml_property &property)
+{
+	this->dependencies.push_back(dependency::from_sml_property(property));
+}
+
 void and_dependency::process_sml_scope(const sml_data &scope)
 {
 	this->dependencies.push_back(dependency::from_sml_scope(scope));
@@ -214,6 +233,11 @@ void or_dependency::ProcessConfigDataSection(const CConfigData *section)
 	this->dependencies.push_back(std::unique_ptr<stratagus::dependency>(dependency));
 }
 
+void or_dependency::process_sml_property(const sml_property &property)
+{
+	this->dependencies.push_back(dependency::from_sml_property(property));
+}
+
 void or_dependency::process_sml_scope(const sml_data &scope)
 {
 	this->dependencies.push_back(dependency::from_sml_scope(scope));
@@ -239,6 +263,11 @@ bool or_dependency::check(const CUnit *unit, bool ignore_units) const
 	}
 	
 	return false;
+}
+
+void not_dependency::process_sml_property(const sml_property &property)
+{
+	this->dependencies.push_back(dependency::from_sml_property(property));
 }
 
 void not_dependency::process_sml_scope(const sml_data &scope)

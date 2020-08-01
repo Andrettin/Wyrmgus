@@ -8,8 +8,6 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name dependency.h - The dependencies header file. */
-//
 //      (c) Copyright 2000-2020 by Vladi Belperchinov-Shabanski and Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
@@ -28,10 +26,6 @@
 //
 
 #pragma once
-
-/*----------------------------------------------------------------------------
---  Documentation
-----------------------------------------------------------------------------*/
 
 /**
 **  @struct DependRule dependency.h
@@ -107,6 +101,7 @@ class unit_type;
 class dependency
 {
 public:
+	static std::unique_ptr<const dependency> from_sml_property(const sml_property &property);
 	static std::unique_ptr<const dependency> from_sml_scope(const sml_data &scope);
 
 	virtual ~dependency() {}
@@ -130,6 +125,7 @@ public:
 	and_dependency(std::vector<std::unique_ptr<const dependency>> &&dependencies) : dependencies(std::move(dependencies)) {}
 
 	virtual void ProcessConfigDataSection(const CConfigData *section) override;
+	virtual void process_sml_property(const sml_property &property) override;
 	virtual void process_sml_scope(const sml_data &scope) override;
 	virtual bool check(const CPlayer *player, bool ignore_units = false) const override;
 	virtual bool check(const CUnit *unit, bool ignore_units = false) const override;
@@ -173,6 +169,7 @@ public:
 	}
 	
 	virtual void ProcessConfigDataSection(const CConfigData *section) override;
+	virtual void process_sml_property(const sml_property &property) override;
 	virtual void process_sml_scope(const sml_data &scope) override;
 	virtual bool check(const CPlayer *player, bool ignore_units = false) const override;
 	virtual bool check(const CUnit *unit, bool ignore_units = false) const override;
@@ -221,6 +218,7 @@ public:
 		this->dependencies.push_back(std::move(dependency));
 	}
 	
+	virtual void process_sml_property(const sml_property &property) override;
 	virtual void process_sml_scope(const sml_data &scope) override;
 	virtual void ProcessConfigDataSection(const CConfigData *section) override;
 	virtual bool check(const CPlayer *player, bool ignore_units = false) const override;
