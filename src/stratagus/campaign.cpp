@@ -86,7 +86,7 @@ void campaign::ProcessConfigData(const CConfigData *config_data)
 		} else if (key == "start_date") {
 			this->start_date = string::to_date(value);
 		} else if (key == "required_quest") {
-			quest *quest = quest::get(value);
+			stratagus::quest *quest = quest::get(value);
 			this->required_quests.push_back(quest);
 		} else {
 			fprintf(stderr, "Invalid campaign property: \"%s\".\n", key.c_str());
@@ -181,7 +181,7 @@ bool campaign::IsAvailable() const
 		return false;
 	}
 
-	for (const quest *quest : this->get_required_quests()) {
+	for (const stratagus::quest *quest : this->get_required_quests()) {
 		if (!quest->IsCompleted()) {
 			return false;
 		}

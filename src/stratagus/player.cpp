@@ -2521,7 +2521,8 @@ void CPlayer::complete_quest(stratagus::quest *quest)
 		SetQuestCompleted(quest->get_identifier(), GameSettings.Difficulty);
 		SaveQuestCompletion();
 
-		if (stratagus::game::get()->get_current_campaign() != nullptr && stratagus::game::get()->get_current_campaign()->get_completion_quest() == quest) {
+		const stratagus::campaign *current_campaign = stratagus::game::get()->get_current_campaign();
+		if (current_campaign != nullptr && current_campaign->get_quest() == quest) {
 			stratagus::defines::get()->get_campaign_victory_dialogue()->call(this);
 		}
 
@@ -2547,7 +2548,8 @@ void CPlayer::fail_quest(stratagus::quest *quest, const std::string &fail_reason
 	}
 	
 	if (this == CPlayer::GetThisPlayer()) {
-		if (stratagus::game::get()->get_current_campaign() != nullptr && stratagus::game::get()->get_current_campaign()->get_completion_quest() == quest) {
+		const stratagus::campaign *current_campaign = stratagus::game::get()->get_current_campaign();
+		if (current_campaign != nullptr && current_campaign->get_quest() == quest) {
 			stratagus::defines::get()->get_campaign_defeat_dialogue()->call(this);
 		}
 

@@ -573,6 +573,10 @@ void GameMainLoop()
 		if (CurrentQuest != nullptr && CurrentQuest->IntroductionDialogue != nullptr) {
 			CurrentQuest->IntroductionDialogue->call(CPlayer::GetThisPlayer());
 		}
+
+		if (current_campaign != nullptr && current_campaign->get_quest() != nullptr) {
+			CPlayer::GetThisPlayer()->accept_quest(current_campaign->get_quest());
+		}
 	}
 	//Wyrmgus end
 
