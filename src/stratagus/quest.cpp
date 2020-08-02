@@ -163,6 +163,9 @@ void quest::process_sml_scope(const sml_data &scope)
 		for (const std::string &value : values) {
 			this->objective_strings.push_back(value);
 		}
+	} else if (tag == "accept_effects") {
+		this->accept_effects = std::make_unique<effect_list>();
+		database::process_sml_data(this->accept_effects, scope);
 	} else if (tag == "completion_effects") {
 		this->completion_effects = std::make_unique<effect_list>();
 		database::process_sml_data(this->completion_effects, scope);

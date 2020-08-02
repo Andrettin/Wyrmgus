@@ -2484,6 +2484,10 @@ void CPlayer::accept_quest(stratagus::quest *quest)
 		quest->AcceptEffects->run();
 	}
 
+	if (quest->get_accept_effects() != nullptr) {
+		quest->get_accept_effects()->do_effects(this);
+	}
+
 	this->available_quests_changed();
 	
 	this->update_current_quests();

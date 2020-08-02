@@ -204,6 +204,11 @@ public:
 		return this->Completed;
 	}
 
+	const std::unique_ptr<effect_list> &get_accept_effects() const
+	{
+		return this->accept_effects;
+	}
+
 	const std::unique_ptr<effect_list> &get_completion_effects() const
 	{
 		return this->completion_effects;
@@ -260,8 +265,9 @@ public:
 	LuaCallback *AcceptEffects = nullptr;
 	LuaCallback *CompletionEffects = nullptr;
 	LuaCallback *FailEffects = nullptr;
-	std::unique_ptr<effect_list> completion_effects;
 private:
+	std::unique_ptr<effect_list> accept_effects;
+	std::unique_ptr<effect_list> completion_effects;
 	std::vector<std::unique_ptr<quest_objective>> objectives;
 	std::vector<std::string> objective_strings; //display-only objective strings for the quest
 public:
