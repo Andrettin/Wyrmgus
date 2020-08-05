@@ -31,7 +31,6 @@
 #include "upgrade/upgrade_structs.h" //for CUnitStats
 
 class CConfigData;
-class CDynasty;
 class CUpgrade;
 struct lua_State;
 
@@ -108,7 +107,6 @@ public:
 	//Wyrmgus start
 	int change_civilization_to = -1;		/// changes the player's civilization to this one
 	faction *ChangeFactionTo = nullptr;	/// changes the player's faction to this one
-	CDynasty *ChangeDynastyTo = nullptr;	/// changes the player's dynasty to this one
 	
 	std::vector<CUpgrade *> RemoveUpgrades;	/// Upgrades to be removed when this upgrade modifier is implented
 	//Wyrmgus end

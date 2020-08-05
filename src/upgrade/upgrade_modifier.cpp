@@ -68,7 +68,6 @@ std::unique_ptr<upgrade_modifier> upgrade_modifier::duplicate() const
 	modifier->ConvertTo = this->ConvertTo;
 	modifier->change_civilization_to = this->change_civilization_to;
 	modifier->ChangeFactionTo = this->ChangeFactionTo;
-	modifier->ChangeDynastyTo = this->ChangeDynastyTo;
 	modifier->RemoveUpgrades = this->RemoveUpgrades;
 
 	return modifier;

@@ -167,6 +167,7 @@ void deity::add_civilization(civilization *civilization)
 void deity::remove_civilization(civilization *civilization)
 {
 	vector::remove(this->civilizations, civilization);
+	vector::remove(civilization->Deities, this);
 }
 
 QVariantList deity::get_religions_qvariant_list() const

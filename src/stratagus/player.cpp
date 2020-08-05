@@ -42,6 +42,7 @@
 #include "database/defines.h"
 #include "dialogue.h"
 #include "diplomacy_state.h"
+#include "dynasty.h"
 #include "editor.h"
 #include "faction.h"
 //Wyrmgus start
@@ -346,7 +347,6 @@ PlayerRace PlayerRaces; //player races
 bool NoRescueCheck; //disable rescue check
 
 //Wyrmgus start
-std::map<std::string, int> DynastyStringToIndex;
 std::map<std::string, CLanguage *> LanguageIdentToPointer;
 
 bool LanguageCacheOutdated = false;
@@ -373,27 +373,6 @@ void PlayerRace::Clean()
 		}
 	}
 	//Wyrmgus end
-
-	//Wyrmgus start
-	for (size_t i = 0; i < PlayerRaces.Dynasties.size(); ++i) {
-		delete this->Dynasties[i];
-	}
-	this->Dynasties.clear();
-	//Wyrmgus end
-}
-
-//Wyrmgus start
-CDynasty *PlayerRace::GetDynasty(const std::string &dynasty_ident) const
-{
-	if (dynasty_ident.empty()) {
-		return nullptr;
-	}
-	
-	if (DynastyStringToIndex.find(dynasty_ident) != DynastyStringToIndex.end()) {
-		return PlayerRaces.Dynasties[DynastyStringToIndex[dynasty_ident]];
-	} else {
-		return nullptr;
-	}
 }
 
 CLanguage *PlayerRace::GetLanguage(const std::string &language_ident) const
@@ -481,13 +460,6 @@ std::string PlayerRace::TranslateName(const std::string &name, CLanguage *langua
 	}
 	
 	return new_name;
-}
-
-CDynasty::~CDynasty()
-{
-	if (this->Conditions) {
-		delete Conditions;
-	}
 }
 //Wyrmgus end
 
@@ -610,8 +582,8 @@ void CPlayer::Save(CFile &file) const
 	if (p.get_government_type() != stratagus::government_type::none) {
 		file.printf(" \"government-type\", \"%s\",", stratagus::government_type_to_string(this->get_government_type()).c_str());
 	}
-	if (p.Dynasty) {
-		file.printf(" \"dynasty\", \"%s\",", p.Dynasty->Ident.c_str());
+	if (p.get_dynasty() != nullptr) {
+		file.printf(" \"dynasty\", \"%s\",", p.get_dynasty()->get_identifier().c_str());
 	}
 	if (p.age) {
 		file.printf(" \"age\", \"%s\",", p.age->get_identifier().c_str());
@@ -1012,7 +984,7 @@ void CPlayer::Init(/* PlayerTypes */ int type)
 	this->faction_tier = stratagus::faction_tier::none;
 	this->government_type = stratagus::government_type::none;
 	this->religion = nullptr;
-	this->Dynasty = nullptr;
+	this->dynasty = nullptr;
 	this->age = nullptr;
 	this->overlord = nullptr;
 	this->vassalage_type = stratagus::vassalage_type::none;
@@ -1392,40 +1364,35 @@ void CPlayer::SetRandomFaction()
 	}
 }
 
-/**
-**	@brief	Change player dynasty.
-**
-**	@param	dynasty	New dynasty.
-*/
-void CPlayer::SetDynasty(CDynasty *dynasty)
+void CPlayer::set_dynasty(const stratagus::dynasty *dynasty)
 {
-	CDynasty *old_dynasty = this->Dynasty;
+	const stratagus::dynasty *old_dynasty = this->dynasty;
 	
-	if (this->Dynasty) {
-		if (this->Dynasty->DynastyUpgrade && this->Allow.Upgrades[this->Dynasty->DynastyUpgrade->ID] == 'R') {
-			UpgradeLost(*this, this->Dynasty->DynastyUpgrade->ID);
+	if (old_dynasty != nullptr) {
+		if (old_dynasty->get_upgrade() != nullptr && this->Allow.Upgrades[old_dynasty->get_upgrade()->ID] == 'R') {
+			UpgradeLost(*this, old_dynasty->get_upgrade()->ID);
 		}
 	}
 
-	this->Dynasty = dynasty;
+	this->dynasty = dynasty;
 
-	if (!this->Dynasty) {
+	if (dynasty == nullptr) {
 		return;
 	}
 	
-	if (this->Dynasty->DynastyUpgrade) {
-		if (this->Allow.Upgrades[this->Dynasty->DynastyUpgrade->ID] != 'R') {
+	if (dynasty->get_upgrade() != nullptr) {
+		if (this->Allow.Upgrades[dynasty->get_upgrade()->ID] != 'R') {
 			if (GameEstablishing) {
-				AllowUpgradeId(*this, this->Dynasty->DynastyUpgrade->ID, 'R');
+				AllowUpgradeId(*this, dynasty->get_upgrade()->ID, 'R');
 			} else {
-				UpgradeAcquire(*this, this->Dynasty->DynastyUpgrade);
+				UpgradeAcquire(*this, dynasty->get_upgrade());
 			}
 		}
 	}
 
 	for (int i = 0; i < this->GetUnitCount(); ++i) {
 		CUnit &unit = this->GetUnit(i);
-		unit.UpdateSoldUnits(); //in case conditions changed (i.e. some heroes may require a certain dynasty)
+		unit.UpdateSoldUnits(); //in case conditions changed (e.g. some heroes may require a certain dynasty)
 	}
 }
 
@@ -1857,37 +1824,21 @@ bool CPlayer::CanFoundFaction(stratagus::faction *faction, bool pre)
 	return true;
 }
 
-/**
-**  Check if the player can choose a particular dynasty.
-**
-**  @param dynasty    New dynasty.
-*/
-bool CPlayer::CanChooseDynasty(CDynasty *dynasty, bool pre)
+bool CPlayer::can_choose_dynasty(const stratagus::dynasty *dynasty, const bool pre) const
 {
 	if (CurrentQuest != nullptr) {
 		return false;
 	}
 	
-	if (dynasty->DynastyUpgrade) {
-		if (!CheckConditions(dynasty->DynastyUpgrade, this, false, pre)) {
+	if (dynasty->get_upgrade() != nullptr) {
+		if (!CheckConditions(dynasty->get_upgrade(), this, false, pre)) {
 			return false;
 		}
 	} else {
 		return false;
 	}
 
-	if (!pre) {
-		if (dynasty->Conditions) {
-			CclCommand("trigger_player = " + std::to_string((long long) this->Index) + ";");
-			dynasty->Conditions->pushPreamble();
-			dynasty->Conditions->run(1);
-			if (dynasty->Conditions->popBoolean() == false) {
-				return false;
-			}
-		}
-	}
-	
-	return true;
+	return CheckConditions(dynasty, this, false, pre);
 }
 
 bool CPlayer::can_recruit_hero(const stratagus::character *character, bool ignore_neutral) const
@@ -2077,7 +2028,7 @@ void CPlayer::Clear()
 	this->faction_tier = stratagus::faction_tier::none;
 	this->government_type = stratagus::government_type::none;
 	this->religion = nullptr;
-	this->Dynasty = nullptr;
+	this->dynasty = nullptr;
 	this->age = nullptr;
 	this->overlord = nullptr;
 	this->vassalage_type = stratagus::vassalage_type::none;

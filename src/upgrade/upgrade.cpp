@@ -808,13 +808,6 @@ static int CclDefineModifier(lua_State *l)
 		} else if (!strcmp(key, "change-faction-to")) {
 			std::string faction_ident = LuaToString(l, j + 1, 2);
 			um->ChangeFactionTo = stratagus::faction::get(faction_ident);
-		} else if (!strcmp(key, "change-dynasty-to")) {
-			std::string dynasty_ident = LuaToString(l, j + 1, 2);
-			um->ChangeDynastyTo = PlayerRaces.GetDynasty(dynasty_ident);
-			
-			if (um->ChangeDynastyTo == nullptr) {
-				LuaError(l, "Dynasty \"%s\" doesn't exist.'" _C_ dynasty_ident.c_str());
-			}
 		//Wyrmgus end
 		} else {
 			int index = UnitTypeVar.VariableNameLookup[key]; // variable index;
@@ -1381,9 +1374,6 @@ static void ApplyUpgradeModifier(CPlayer &player, const stratagus::upgrade_modif
 			player.set_civilization(um->ChangeFactionTo->get_civilization()->ID);
 		}
 		player.SetFaction(um->ChangeFactionTo);
-	}
-	if (um->ChangeDynastyTo != nullptr && um->ChangeDynastyTo != player.Dynasty) {
-		player.SetDynasty(um->ChangeDynastyTo);
 	}
 	//Wyrmgus end
 

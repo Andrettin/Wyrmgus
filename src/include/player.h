@@ -45,7 +45,6 @@ static constexpr int SPEEDUP_FACTOR = 100;
 static constexpr int DefaultTradeCost = 30;
 
 class CCurrency;
-class CDynasty;
 class CFile;
 class CGraphic;
 class CLanguage;
@@ -66,6 +65,7 @@ namespace stratagus {
 	class character;
 	class civilization;
 	class deity;
+	class dynasty;
 	class player_color;
 	class player_quest_objective;
 	class quest;
@@ -138,7 +138,13 @@ public:
 		return this->religion;
 	}
 
-	void SetDynasty(CDynasty *dynasty);
+	const stratagus::dynasty *get_dynasty() const
+	{
+		return this->dynasty;
+	}
+
+	void set_dynasty(const stratagus::dynasty *dynasty);
+
 	const std::string &get_interface() const;
 
 	const stratagus::age *get_age() const
@@ -190,7 +196,7 @@ public:
 	bool HasUnitBuilder(const stratagus::unit_type *type, const stratagus::site *settlement = nullptr) const;
 	bool HasUpgradeResearcher(const CUpgrade *upgrade) const;
 	bool CanFoundFaction(stratagus::faction *faction, bool pre = false);
-	bool CanChooseDynasty(CDynasty *dynasty, bool pre = false);
+	bool can_choose_dynasty(const stratagus::dynasty *dynasty, const bool pre = false) const;
 	bool can_recruit_hero(const stratagus::character *character, bool ignore_neutral = false) const;
 	std::vector<stratagus::character *> get_recruitable_heroes_from_list(const std::vector<stratagus::character *> &heroes);
 	bool UpgradeRemovesExistingUpgrade(const CUpgrade *upgrade, bool ignore_lower_priority = false) const;
@@ -237,9 +243,7 @@ private:
 	stratagus::faction_tier faction_tier;
 	stratagus::government_type government_type;
 	stratagus::religion *religion = nullptr; //religion of the player
-public:
-	CDynasty *Dynasty = nullptr; //ruling dynasty of the player
-private:
+	const stratagus::dynasty *dynasty = nullptr; //ruling dynasty of the player
 	const stratagus::age *age = nullptr; //the current age the player/faction is in
 public:
 	std::string AiName; //AI for computer
@@ -782,30 +786,6 @@ private:
 	bool per_settlement = false;	/// Whether the building should be constructed for each settlement
 };
 
-class CDynasty
-{
-public:
-	CDynasty() : 
-		ID(-1), civilization(-1),
-		DynastyUpgrade(nullptr), Conditions(nullptr)
-	{
-	}
-	
-	~CDynasty();
-	
-	std::string Ident;													/// dynasty name
-	std::string Name;
-	std::string Description;											/// dynasty description
-	std::string Quote;													/// dynasty quote
-	std::string Background;												/// dynasty background
-	CUpgrade *DynastyUpgrade;											/// dynasty upgrade applied when the dynasty is set
-	int ID;																/// dynasty ID
-	int civilization;													/// dynasty civilization
-	IconConfig Icon;													/// Dynasty's icon
-	LuaCallback *Conditions;
-	std::vector<stratagus::faction *> Factions;									/// to which factions is this dynasty available
-};
-
 class LanguageWord
 {
 public:
@@ -897,7 +877,6 @@ class PlayerRace
 public:
 	void Clean();
 	//Wyrmgus start
-	CDynasty *GetDynasty(const std::string &dynasty_ident) const;
 	CLanguage *GetLanguage(const std::string &language_ident) const;
 	CLanguage *get_civilization_language(int civilization);
 	std::string TranslateName(const std::string &name, CLanguage *language);
@@ -907,7 +886,6 @@ public:
 	//Wyrmgus start
 	std::map<ButtonCmd, IconConfig> ButtonIcons[MAX_RACES];					/// icons for button actions
 	std::vector<CLanguage *> Languages;									/// languages
-	std::vector<CDynasty *> Dynasties;    								/// dynasties
 	//Wyrmgus end
 };
 
@@ -982,7 +960,6 @@ enum NotifyType {
 extern int NumPlayers; //how many player slots used
 extern bool NoRescueCheck; //disable rescue check
 //Wyrmgus start
-extern std::map<std::string, int> DynastyStringToIndex;
 
 extern bool LanguageCacheOutdated;
 //Wyrmgus end

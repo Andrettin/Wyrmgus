@@ -8,8 +8,6 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name ai.cpp - The computer player AI main file. */
-//
 //      (c) Copyright 2000-2020 by Lutz Sammer, Ludovic Pollet,
 //      Jimmy Salmon and Andrettin
 //
@@ -171,6 +169,7 @@
 #include "unit/unit_type.h"
 #include "unit/unit_type_type.h"
 #include "upgrade/upgrade.h"
+#include "util/vector_random_util.h"
 #include "util/vector_util.h"
 
 int AiSleepCycles;              /// Ai sleeps # cycles
@@ -409,20 +408,18 @@ static void AiCheckUnits()
 			AiPlayer->Player->SetFaction(potential_factions[SyncRand(potential_factions.size())]);
 		}
 		
-		if (!AiPlayer->Player->Dynasty) { //if the AI player has no dynasty, pick one if available
-			std::vector<CDynasty *> potential_dynasties;
-			for (size_t i = 0; i < stratagus::faction::get_all()[AiPlayer->Player->Faction]->Dynasties.size(); ++i) {
-				CDynasty *possible_dynasty = stratagus::faction::get_all()[AiPlayer->Player->Faction]->Dynasties[i];
-				
-				if (!AiPlayer->Player->CanChooseDynasty(possible_dynasty)) {
+		if (AiPlayer->Player->get_dynasty() == nullptr) { //if the AI player has no dynasty, pick one if available
+			std::vector<const stratagus::dynasty *> potential_dynasties;
+			for (const stratagus::dynasty *dynasty : AiPlayer->Player->get_faction()->get_dynasties()) {
+				if (!AiPlayer->Player->can_choose_dynasty(dynasty)) {
 					continue;
 				}
 					
-				potential_dynasties.push_back(possible_dynasty);
+				potential_dynasties.push_back(dynasty);
 			}
 			
 			if (potential_dynasties.size() > 0) {
-				AiPlayer->Player->SetDynasty(potential_dynasties[SyncRand(potential_dynasties.size())]);
+				AiPlayer->Player->set_dynasty(stratagus::vector::get_random(potential_dynasties));
 			}
 		}
 	}

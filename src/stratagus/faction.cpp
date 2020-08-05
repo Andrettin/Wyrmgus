@@ -490,6 +490,11 @@ const std::vector<CFiller> &faction::get_ui_fillers() const
 	return this->get_civilization()->get_ui_fillers();
 }
 
+void faction::remove_dynasty(const dynasty *dynasty)
+{
+	vector::remove(this->dynasties, dynasty);
+}
+
 QVariantList faction::get_acquired_upgrades_qstring_list() const
 {
 	return container::to_qvariant_list(this->get_acquired_upgrades());

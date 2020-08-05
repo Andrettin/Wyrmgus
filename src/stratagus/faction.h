@@ -36,7 +36,6 @@
 
 class CAiBuildingTemplate;
 class CCurrency;
-class CDynasty;
 class CForceTemplate;
 class CUpgrade;
 class LuaCallback;
@@ -48,6 +47,7 @@ namespace stratagus {
 class character;
 class civilization;
 class deity;
+class dynasty;
 class icon;
 class resource;
 class unit_class;
@@ -229,6 +229,18 @@ public:
 
 	const std::vector<CFiller> &get_ui_fillers() const;
 
+	const std::vector<const dynasty *> &get_dynasties() const
+	{
+		return this->dynasties;
+	}
+
+	void add_dynasty(const dynasty *dynasty)
+	{
+		this->dynasties.push_back(dynasty);
+	}
+
+	void remove_dynasty(const dynasty *dynasty);
+
 	const std::vector<character *> &get_characters() const
 	{
 		return this->characters;
@@ -307,7 +319,6 @@ private:
 public:
 	std::vector<faction *> DevelopsFrom;								/// from which factions can this faction develop
 	std::vector<faction *> DevelopsTo;									/// to which factions this faction can develop
-	std::vector<CDynasty *> Dynasties;									/// which dynasties are available to this faction
 private:
 	title_name_map title_names;
 	character_title_name_map character_title_names;
@@ -326,6 +337,7 @@ public:
 	std::vector<site *> Cores; /// Core sites of this faction (required to found it)
 	std::vector<site *> sites; /// Sites used for this faction if it needs a randomly-generated settlement
 private:
+	std::vector<const dynasty *> dynasties; //which dynasties are available to this faction
 	std::vector<character *> characters;
 public:
 	std::map<ForceType, std::vector<CForceTemplate *>> ForceTemplates;		/// Force templates, mapped to each force type
