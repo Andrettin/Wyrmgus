@@ -31,7 +31,6 @@
 #include "script/condition/condition.h"
 
 #include "config.h"
-#include "faction.h"
 #include "map/map.h"
 #include "map/map_layer.h"
 #include "player.h"
@@ -40,6 +39,7 @@
 #include "script/condition/age_condition.h"
 #include "script/condition/and_condition.h"
 #include "script/condition/character_condition.h"
+#include "script/condition/faction_condition.h"
 #include "script/condition/not_condition.h"
 #include "script/condition/or_condition.h"
 #include "script/condition/season_condition.h"
@@ -66,6 +66,8 @@ std::unique_ptr<const condition> condition::from_sml_property(const sml_property
 		return std::make_unique<age_condition>(value);
 	} else if (key == "character") {
 		return std::make_unique<character_condition>(value);
+	} else if (key == "faction") {
+		return std::make_unique<faction_condition>(value);
 	} else if (key == "settlement") {
 		return std::make_unique<settlement_condition>(value);
 	} else if (key == "trigger") {
