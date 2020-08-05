@@ -27,12 +27,11 @@
 
 #pragma once
 
+#include "map/site.h"
 #include "script/condition/condition.h"
 #include "util/string_util.h"
 
 namespace stratagus {
-
-class site;
 
 class settlement_condition final : public condition
 {
@@ -64,18 +63,18 @@ public:
 	{
 		Q_UNUSED(ignore_units)
 
-			if (this->faction != nullptr) {
-				const CPlayer *faction_player = GetFactionPlayer(this->faction);
-				if (faction_player == nullptr) {
-					return false;
-				}
-
-				if (this->enemy && !faction_player->IsEnemy(*player)) {
-					return false;
-				}
-
-				return faction_player->HasSettlement(this->settlement);
+		if (this->faction != nullptr) {
+			const CPlayer *faction_player = GetFactionPlayer(this->faction);
+			if (faction_player == nullptr) {
+				return false;
 			}
+
+			if (this->enemy && !faction_player->IsEnemy(*player)) {
+				return false;
+			}
+
+			return faction_player->HasSettlement(this->settlement);
+		}
 
 		return player->HasSettlement(this->settlement);
 	}

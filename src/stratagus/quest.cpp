@@ -42,6 +42,7 @@
 #include "parameters.h"
 #include "player.h"
 #include "player_color.h"
+#include "script/condition/and_condition.h"
 #include "script/effect/effect_list.h"
 #include "script.h"
 #include "unit/unit_class.h"
@@ -163,6 +164,9 @@ void quest::process_sml_scope(const sml_data &scope)
 		for (const std::string &value : values) {
 			this->objective_strings.push_back(value);
 		}
+	} else if (tag == "conditions") {
+		this->conditions = std::make_unique<and_condition>();
+		database::process_sml_data(this->conditions, scope);
 	} else if (tag == "accept_effects") {
 		this->accept_effects = std::make_unique<effect_list>();
 		database::process_sml_data(this->accept_effects, scope);

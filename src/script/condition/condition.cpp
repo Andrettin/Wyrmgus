@@ -34,7 +34,6 @@
 #include "faction.h"
 #include "map/map.h"
 #include "map/map_layer.h"
-#include "map/site.h"
 #include "player.h"
 #include "religion/deity.h"
 #include "script.h"

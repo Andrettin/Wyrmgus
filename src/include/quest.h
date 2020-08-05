@@ -42,6 +42,7 @@ namespace stratagus {
 
 class character;
 class civilization;
+class condition;
 class dialogue;
 class effect_list;
 class faction;
@@ -204,6 +205,11 @@ public:
 		return this->Completed;
 	}
 
+	const std::unique_ptr<condition> &get_conditions() const
+	{
+		return this->conditions;
+	}
+
 	const std::unique_ptr<effect_list> &get_accept_effects() const
 	{
 		return this->accept_effects;
@@ -266,6 +272,7 @@ public:
 	LuaCallback *CompletionEffects = nullptr;
 	LuaCallback *FailEffects = nullptr;
 private:
+	std::unique_ptr<condition> conditions;
 	std::unique_ptr<effect_list> accept_effects;
 	std::unique_ptr<effect_list> completion_effects;
 	std::vector<std::unique_ptr<quest_objective>> objectives;

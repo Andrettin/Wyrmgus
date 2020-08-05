@@ -2574,7 +2574,11 @@ bool CPlayer::can_accept_quest(const stratagus::quest *quest)
 		return false;
 	}
 	
-	if (std::find(this->CurrentQuests.begin(), this->CurrentQuests.end(), quest) != this->CurrentQuests.end() || std::find(this->CompletedQuests.begin(), this->CompletedQuests.end(), quest) != this->CompletedQuests.end()) {
+	if (stratagus::vector::contains(this->CurrentQuests, quest) || stratagus::vector::contains(this->CompletedQuests, quest)) {
+		return false;
+	}
+
+	if (quest->get_conditions() != nullptr && !quest->get_conditions()->check(this)) {
 		return false;
 	}
 	
