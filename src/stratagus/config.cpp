@@ -252,7 +252,7 @@ void CConfigData::ProcessConfigData(const std::vector<CConfigData *> &config_dat
 				deity->ProcessConfigData(config_data);
 			}
 		} else if (config_data->Tag == "deity_domain") {
-			CDeityDomain *deity_domain = CDeityDomain::GetOrAddDeityDomain(ident);
+			stratagus::deity_domain *deity_domain = stratagus::deity_domain::get_or_add(ident, nullptr);
 			if (!define_only) {
 				deity_domain->ProcessConfigData(config_data);
 			}

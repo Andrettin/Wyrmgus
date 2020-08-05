@@ -45,7 +45,6 @@ static constexpr int SPEEDUP_FACTOR = 100;
 static constexpr int DefaultTradeCost = 30;
 
 class CCurrency;
-class CDeityDomain;
 class CDynasty;
 class CFile;
 class CGraphic;

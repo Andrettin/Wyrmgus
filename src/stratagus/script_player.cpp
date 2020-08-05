@@ -2022,10 +2022,8 @@ static int CclDefineReligion(lua_State *l)
 			}
 			const int subargs = lua_rawlen(l, -1);
 			for (int j = 0; j < subargs; ++j) {
-				CDeityDomain *deity_domain = CDeityDomain::GetDeityDomain(LuaToString(l, -1, j + 1));
-				if (deity_domain) {
-					religion->Domains.push_back(deity_domain);
-				}
+				stratagus::deity_domain *domain = stratagus::deity_domain::get(LuaToString(l, -1, j + 1));
+				religion->Domains.push_back(domain);
 			}
 		} else {
 			LuaError(l, "Unsupported tag: %s" _C_ value);
@@ -2109,10 +2107,8 @@ static int CclDefineDeity(lua_State *l)
 			}
 			const int subargs = lua_rawlen(l, -1);
 			for (int j = 0; j < subargs; ++j) {
-				CDeityDomain *deity_domain = CDeityDomain::GetDeityDomain(LuaToString(l, -1, j + 1));
-				if (deity_domain) {
-					deity->Domains.push_back(deity_domain);
-				}
+				stratagus::deity_domain *domain = stratagus::deity_domain::get(LuaToString(l, -1, j + 1));
+				deity->Domains.push_back(domain);
 			}
 		} else if (!strcmp(value, "HolyOrders")) {
 			if (!lua_istable(l, -1)) {
@@ -3192,10 +3188,10 @@ static int CclGetReligions(lua_State *l)
 
 static int CclGetDeityDomains(lua_State *l)
 {
-	lua_createtable(l, CDeityDomain::DeityDomains.size(), 0);
-	for (size_t i = 1; i <= CDeityDomain::DeityDomains.size(); ++i)
+	lua_createtable(l, stratagus::deity_domain::get_all().size(), 0);
+	for (size_t i = 1; i <= stratagus::deity_domain::get_all().size(); ++i)
 	{
-		lua_pushstring(l, CDeityDomain::DeityDomains[i-1]->Ident.c_str());
+		lua_pushstring(l, stratagus::deity_domain::get_all()[i-1]->get_identifier().c_str());
 		lua_rawseti(l, -2, i);
 	}
 	return 1;
@@ -3251,25 +3247,18 @@ static int CclGetReligionData(lua_State *l)
 	return 0;
 }
 
-/**
-**  Get deity domain data.
-**
-**  @param l  Lua state.
-*/
 static int CclGetDeityDomainData(lua_State *l)
 {
 	if (lua_gettop(l) < 2) {
 		LuaError(l, "incorrect argument");
 	}
 	std::string deity_domain_ident = LuaToString(l, 1);
-	const CDeityDomain *deity_domain = CDeityDomain::GetDeityDomain(deity_domain_ident);
-	if (!deity_domain) {
-		return 0;
-	}
+	const stratagus::deity_domain *deity_domain = stratagus::deity_domain::get(deity_domain_ident);
+
 	const char *data = LuaToString(l, 2);
 
 	if (!strcmp(data, "Name")) {
-		lua_pushstring(l, deity_domain->Name.c_str());
+		lua_pushstring(l, deity_domain->get_name().c_str());
 		return 1;
 	} else if (!strcmp(data, "Abilities")) {
 		lua_createtable(l, deity_domain->Abilities.size(), 0);
@@ -3286,11 +3275,6 @@ static int CclGetDeityDomainData(lua_State *l)
 	return 0;
 }
 
-/**
-**  Get deity data.
-**
-**  @param l  Lua state.
-*/
 static int CclGetDeityData(lua_State *l)
 {
 	if (lua_gettop(l) < 2) {

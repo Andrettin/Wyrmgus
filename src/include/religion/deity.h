@@ -32,7 +32,6 @@
 #include "data_type.h"
 #include "ui/icon.h"
 
-class CDeityDomain;
 class CPantheon;
 class CReligion;
 class CUpgrade;
@@ -41,16 +40,12 @@ struct lua_State;
 int CclDefineDeity(lua_State *l);
 
 namespace stratagus {
-	class civilization;
-	class faction;
-	class plane;
-	enum class gender;
-}
 
-static constexpr int MAJOR_DEITY_DOMAIN_MAX = 3; //major deities can only have up to three domains
-static constexpr int MINOR_DEITY_DOMAIN_MAX = 1; //minor deities can only have one domain
-
-namespace stratagus {
+class civilization;
+class deity_domain;
+class faction;
+class plane;
+enum class gender;
 
 class deity final : public detailed_data_entry, public data_type<deity>, public CDataType
 {
@@ -64,6 +59,8 @@ class deity final : public detailed_data_entry, public data_type<deity>, public 
 public:
 	static constexpr const char *class_identifier = "deity";
 	static constexpr const char *database_folder = "deities";
+	static constexpr int major_deity_domain_max = 3; //major deities can only have up to three domains
+	static constexpr int minor_deity_domain_max = 1; //minor deities can only have one domain
 
 	static deity *get_by_upgrade(const CUpgrade *upgrade)
 	{
@@ -74,7 +71,13 @@ public:
 
 		return nullptr;
 	}
-	
+
+	static void clear()
+	{
+		data_type::clear();
+		deity::deities_by_upgrade.clear();
+	}
+
 private:
 	static inline std::map<const CUpgrade *, deity *> deities_by_upgrade;
 
@@ -131,7 +134,7 @@ private:
 public:
 	std::vector<CReligion *> Religions;			//religions for which this deity is available
 	std::vector<std::string> Feasts;
-	std::vector<CDeityDomain *> Domains;
+	std::vector<deity_domain *> Domains;
 	std::vector<faction *> HolyOrders;			//holy orders of this deity
 	std::vector<CUpgrade *> Abilities;			//abilities linked to this deity
 private:

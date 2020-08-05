@@ -108,7 +108,6 @@ void CleanModules()
 	CCurrency::ClearCurrencies();
 	CleanDecorations();
 	//Wyrmgus start
-	CDeityDomain::ClearDeityDomains();
 	CleanGrandStrategyEvents();
 	//Wyrmgus end
 	CleanMissiles();

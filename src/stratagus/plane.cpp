@@ -59,11 +59,8 @@ void plane::ProcessConfigData(const CConfigData *config_data)
 			value = FindAndReplaceString(value, "_", "-");
 			this->SeasonSchedule = CSeasonSchedule::GetSeasonSchedule(value);
 		} else if (key == "empowered_deity_domain") {
-			value = FindAndReplaceString(value, "_", "-");
-			CDeityDomain *deity_domain = CDeityDomain::GetDeityDomain(value);
-			if (deity_domain) {
-				this->EmpoweredDeityDomains.push_back(deity_domain);
-			}
+			deity_domain *domain = deity_domain::get(value);
+			this->EmpoweredDeityDomains.push_back(domain);
 		} else if (key == "empowered_school_of_magic") {
 			value = FindAndReplaceString(value, "_", "-");
 			CSchoolOfMagic *school_of_magic = CSchoolOfMagic::GetSchoolOfMagic(value);

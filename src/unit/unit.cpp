@@ -6428,8 +6428,8 @@ bool CUnit::IsAbilityEmpowered(const CUpgrade *ability) const
 
 	if (plane != nullptr) {
 		if (!plane->EmpoweredDeityDomains.empty()) {
-			for (const CDeityDomain *deity_domain : ability->DeityDomains) {
-				if (std::find(plane->EmpoweredDeityDomains.begin(), plane->EmpoweredDeityDomains.end(), deity_domain) != plane->EmpoweredDeityDomains.end()) {
+			for (const stratagus::deity_domain *deity_domain : ability->DeityDomains) {
+				if (stratagus::vector::contains(plane->EmpoweredDeityDomains, deity_domain)) {
 					return true;
 				}
 			}

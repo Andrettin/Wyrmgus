@@ -8,8 +8,6 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name deity_domain.h - The deity domain header file. */
-//
 //      (c) Copyright 2018-2020 by Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
@@ -29,36 +27,42 @@
 
 #pragma once
 
-/*----------------------------------------------------------------------------
---  Includes
-----------------------------------------------------------------------------*/
-
+#include "database/data_type.h"
+#include "database/detailed_data_entry.h"
 #include "data_type.h"
-
-/*----------------------------------------------------------------------------
---  Declarations
-----------------------------------------------------------------------------*/
 
 class CUpgrade;
 
-class CDeityDomain : public CDataType
+namespace stratagus {
+
+class deity_domain : public detailed_data_entry, public data_type<deity_domain>, public CDataType
 {
+	Q_OBJECT
+
 public:
-	static CDeityDomain *GetDeityDomain(const std::string &ident, bool should_find = true);
-	static CDeityDomain *GetOrAddDeityDomain(const std::string &ident);
-	static CDeityDomain *GetDeityDomainByUpgrade(const CUpgrade *upgrade, const bool should_find = true);
-	static void ClearDeityDomains();
-	
-	static std::vector<CDeityDomain *> DeityDomains;	/// Deity domains
-	static std::map<std::string, CDeityDomain *> DeityDomainsByIdent;
-	static std::map<const CUpgrade *, CDeityDomain *> DeityDomainsByUpgrade;
+	static constexpr const char *class_identifier = "deity_domain";
+	static constexpr const char *database_folder = "deity_domains";
+
+	static deity_domain *get_by_upgrade(const CUpgrade *upgrade);
+
+	static void clear()
+	{
+		data_type::clear();
+		deity_domain::domains_by_upgrade.clear();
+	}
+
+private:
+	static inline std::map<const CUpgrade *, deity_domain *> domains_by_upgrade;
+
+public:
+	explicit deity_domain(const std::string &identifier) : detailed_data_entry(identifier), CDataType(identifier)
+	{
+	}
 
 	virtual void ProcessConfigData(const CConfigData *config_data) override;
-	
-	std::string Name;									/// Name of the domain
-	std::string Description;							/// Description of the deity domain from an in-game universe perspective
-	std::string Background;								/// Description of the deity domain from a perspective outside of the game's universe
-	std::string Quote;									/// A quote relating to the deity domain
+
 	CUpgrade *Upgrade = nullptr;						/// Upgrade corresponding to the domain
 	std::vector<CUpgrade *> Abilities;					/// Abilities linked to this domain
 };
+
+}

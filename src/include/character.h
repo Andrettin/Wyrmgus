@@ -34,7 +34,6 @@
 #include "time/date.h"
 #include "ui/icon.h"
 
-class CDeityDomain;
 class CFile;
 class CLanguage;
 class CPersistentItem;

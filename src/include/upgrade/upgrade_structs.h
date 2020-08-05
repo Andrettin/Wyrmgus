@@ -38,7 +38,6 @@
 #include "stratagus.h"
 #include "unit/unit_variable.h"
 
-class CDeityDomain;
 class CSchoolOfMagic;
 class CUniqueItem;
 struct lua_State;
@@ -50,6 +49,7 @@ namespace stratagus {
 	class character;
 	class civilization;
 	class condition;
+	class deity_domain;
 	class icon;
 	class unit_type;
 	class upgrade_class;
@@ -266,7 +266,7 @@ private:
 public:
 	std::vector<CUniqueItem *> UniqueItems;	/// Unique items who form a part of this set upgrade
 	std::vector<stratagus::unit_type *> ScaledCostUnits;	/// Units for which the upgrade's costs are scaled
-	std::vector<CDeityDomain *> DeityDomains;	/// Deity domains to which this ability belongs
+	std::vector<stratagus::deity_domain *> DeityDomains;	/// Deity domains to which this ability belongs
 	std::vector<CSchoolOfMagic *> SchoolsOfMagic;	/// Schools of magic to which this ability belongs
 	std::vector<stratagus::character *> Characters;	/// Characters who appear in this literary work (if it is one)
 	//Wyrmgus end

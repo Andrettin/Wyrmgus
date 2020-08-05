@@ -77,11 +77,8 @@ void deity::ProcessConfigData(const CConfigData *config_data)
 				this->Religions.push_back(religion);
 			}
 		} else if (key == "domain") {
-			value = FindAndReplaceString(value, "_", "-");
-			CDeityDomain *deity_domain = CDeityDomain::GetDeityDomain(value.c_str());
-			if (deity_domain) {
-				this->Domains.push_back(deity_domain);
-			}
+			deity_domain *domain = deity_domain::get(value);
+			this->Domains.push_back(domain);
 		} else if (key == "description") {
 			this->set_description(value);
 		} else if (key == "background") {
@@ -132,13 +129,13 @@ void deity::ProcessConfigData(const CConfigData *config_data)
 void deity::initialize()
 {
 
-	if (this->is_major() && this->Domains.size() > MAJOR_DEITY_DOMAIN_MAX) { // major deities can only have up to three domains
-		this->Domains.resize(MAJOR_DEITY_DOMAIN_MAX);
-	} else if (!this->is_major() && this->Domains.size() > MINOR_DEITY_DOMAIN_MAX) { // minor deities can only have one domain
-		this->Domains.resize(MINOR_DEITY_DOMAIN_MAX);
+	if (this->is_major() && this->Domains.size() > deity::major_deity_domain_max) { // major deities can only have up to three domains
+		this->Domains.resize(deity::major_deity_domain_max);
+	} else if (!this->is_major() && this->Domains.size() > deity::minor_deity_domain_max) { // minor deities can only have one domain
+		this->Domains.resize(deity::minor_deity_domain_max);
 	}
 
-	for (CDeityDomain *domain : this->Domains) {
+	for (deity_domain *domain : this->Domains) {
 		for (CUpgrade *ability : domain->Abilities) {
 			if (!vector::contains(this->Abilities, ability)) {
 				this->Abilities.push_back(ability);
