@@ -2087,8 +2087,7 @@ static int CclDefineDeity(lua_State *l)
 			const int subargs = lua_rawlen(l, -1);
 			for (int j = 0; j < subargs; ++j) {
 				stratagus::civilization *civilization = stratagus::civilization::get(LuaToString(l, -1, j + 1));
-				deity->civilizations.push_back(civilization);
-				civilization->Deities.push_back(deity);
+				deity->add_civilization(civilization);
 			}
 		} else if (!strcmp(value, "Religions")) {
 			if (!lua_istable(l, -1)) {
@@ -2097,7 +2096,7 @@ static int CclDefineDeity(lua_State *l)
 			const int subargs = lua_rawlen(l, -1);
 			for (int j = 0; j < subargs; ++j) {
 				stratagus::religion *religion = stratagus::religion::get(LuaToString(l, -1, j + 1));
-				deity->Religions.push_back(religion);
+				deity->religions.push_back(religion);
 			}
 		} else if (!strcmp(value, "Domains")) {
 			if (!lua_istable(l, -1)) {
@@ -2106,7 +2105,7 @@ static int CclDefineDeity(lua_State *l)
 			const int subargs = lua_rawlen(l, -1);
 			for (int j = 0; j < subargs; ++j) {
 				stratagus::deity_domain *domain = stratagus::deity_domain::get(LuaToString(l, -1, j + 1));
-				deity->Domains.push_back(domain);
+				deity->domains.push_back(domain);
 			}
 		} else if (!strcmp(value, "HolyOrders")) {
 			if (!lua_istable(l, -1)) {
@@ -3321,18 +3320,18 @@ static int CclGetDeityData(lua_State *l)
 		}
 		return 1;
 	} else if (!strcmp(data, "Religions")) {
-		lua_createtable(l, deity->Religions.size(), 0);
-		for (size_t i = 1; i <= deity->Religions.size(); ++i)
+		lua_createtable(l, deity->get_religions().size(), 0);
+		for (size_t i = 1; i <= deity->get_religions().size(); ++i)
 		{
-			lua_pushstring(l, deity->Religions[i-1]->get_identifier().c_str());
+			lua_pushstring(l, deity->get_religions()[i-1]->get_identifier().c_str());
 			lua_rawseti(l, -2, i);
 		}
 		return 1;
 	} else if (!strcmp(data, "Domains")) {
-		lua_createtable(l, deity->Domains.size(), 0);
-		for (size_t i = 1; i <= deity->Domains.size(); ++i)
+		lua_createtable(l, deity->get_domains().size(), 0);
+		for (size_t i = 1; i <= deity->get_domains().size(); ++i)
 		{
-			lua_pushstring(l, deity->Domains[i-1]->Ident.c_str());
+			lua_pushstring(l, deity->get_domains()[i-1]->get_identifier().c_str());
 			lua_rawseti(l, -2, i);
 		}
 		return 1;

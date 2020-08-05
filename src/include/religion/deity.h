@@ -55,6 +55,8 @@ class deity final : public detailed_data_entry, public data_type<deity>, public 
 	Q_PROPERTY(bool major MEMBER major READ is_major)
 	Q_PROPERTY(stratagus::plane* home_plane MEMBER home_plane READ get_home_plane)
 	Q_PROPERTY(QVariantList civilizations READ get_civilizations_qvariant_list)
+	Q_PROPERTY(QVariantList religions READ get_religions_qvariant_list)
+	Q_PROPERTY(QVariantList domains READ get_domains_qvariant_list)
 
 public:
 	static constexpr const char *class_identifier = "deity";
@@ -111,12 +113,36 @@ public:
 
 	QVariantList get_civilizations_qvariant_list() const;
 
-	Q_INVOKABLE void add_civilization(civilization *civilization)
+	Q_INVOKABLE void add_civilization(civilization *civilization);
+	Q_INVOKABLE void remove_civilization(civilization *civilization);
+
+	const std::vector<religion *> &get_religions() const
 	{
-		this->civilizations.push_back(civilization);
+		return this->religions;
 	}
 
-	Q_INVOKABLE void remove_civilization(civilization *civilization);
+	QVariantList get_religions_qvariant_list() const;
+
+	Q_INVOKABLE void add_religion(religion *religion)
+	{
+		this->religions.push_back(religion);
+	}
+
+	Q_INVOKABLE void remove_religion(religion *religion);
+
+	const std::vector<deity_domain *> &get_domains() const
+	{
+		return this->domains;
+	}
+
+	QVariantList get_domains_qvariant_list() const;
+
+	Q_INVOKABLE void add_domain(deity_domain *domain)
+	{
+		this->domains.push_back(domain);
+	}
+
+	Q_INVOKABLE void remove_domain(deity_domain *domain);
 
 private:
 	stratagus::gender gender;
@@ -131,10 +157,12 @@ public:
 	IconConfig Icon;							//deity's icon
 private:
 	std::vector<civilization *> civilizations;	//civilizations which may worship the deity
+	std::vector<religion *> religions;			//religions for which this deity is available
 public:
-	std::vector<religion *> Religions;			//religions for which this deity is available
 	std::vector<std::string> Feasts;
-	std::vector<deity_domain *> Domains;
+private:
+	std::vector<deity_domain *> domains;
+public:
 	std::vector<faction *> HolyOrders;			//holy orders of this deity
 	std::vector<CUpgrade *> Abilities;			//abilities linked to this deity
 private:

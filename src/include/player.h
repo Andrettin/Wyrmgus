@@ -147,7 +147,7 @@ public:
 	}
 
 	void check_age();
-	void set_age(stratagus::age *age);
+	void set_age(const stratagus::age *age);
 	CCurrency *GetCurrency() const;
 
 	bool is_alive() const
@@ -240,7 +240,7 @@ private:
 public:
 	CDynasty *Dynasty = nullptr; //ruling dynasty of the player
 private:
-	stratagus::age *age = nullptr; //the current age the player/faction is in
+	const stratagus::age *age = nullptr; //the current age the player/faction is in
 public:
 	std::string AiName; //AI for computer
 

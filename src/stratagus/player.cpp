@@ -1463,7 +1463,7 @@ void CPlayer::check_age()
 **
 **	@param	age	The age to be set for the player
 */
-void CPlayer::set_age(stratagus::age *age)
+void CPlayer::set_age(const stratagus::age *age)
 {
 	if (this->age == age) {
 		return;

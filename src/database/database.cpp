@@ -60,6 +60,8 @@
 #include "player_color.h"
 #include "quest.h"
 #include "religion/deity.h"
+#include "religion/deity_domain.h"
+#include "religion/religion.h"
 #include "resource.h"
 #include "sound/sound.h"
 #include "species.h"
@@ -382,9 +384,15 @@ void database::modify_list_property_for_object(QObject *object, const std::strin
 
 	bool success = false;
 
-	if (property_name == "dependencies") {
+	if (property_name == "civilizations") {
+		civilization *civilization_value = civilization::get(value);
+		success = QMetaObject::invokeMethod(object, method_name.c_str(), Qt::ConnectionType::DirectConnection, Q_ARG(civilization *, civilization_value));
+	} else if (property_name == "dependencies") {
 		module *module_value = database::get()->get_module(value);
 		success = QMetaObject::invokeMethod(object, method_name.c_str(), Qt::ConnectionType::DirectConnection, Q_ARG(module *, module_value));
+	} else if (property_name == "domains") {
+		deity_domain *domain_value = deity_domain::get(value);
+		success = QMetaObject::invokeMethod(object, method_name.c_str(), Qt::ConnectionType::DirectConnection, Q_ARG(deity_domain *, domain_value));
 	} else if (property_name == "factions" || property_name == "cores") {
 		faction *faction_value = faction::get(value);
 		success = QMetaObject::invokeMethod(object, method_name.c_str(), Qt::ConnectionType::DirectConnection, Q_ARG(faction *, faction_value));
@@ -397,6 +405,9 @@ void database::modify_list_property_for_object(QObject *object, const std::strin
 	} else if (property_name == "regions" || property_name == "superregions") {
 		region *region_value = region::get(value);
 		success = QMetaObject::invokeMethod(object, method_name.c_str(), Qt::ConnectionType::DirectConnection, Q_ARG(region *, region_value));
+	} else if (property_name == "religions") {
+		religion *religion_value = religion::get(value);
+		success = QMetaObject::invokeMethod(object, method_name.c_str(), Qt::ConnectionType::DirectConnection, Q_ARG(religion *, religion_value));
 	} else if (property_name == "terrain_types" || property_name == "base_terrain_types" || property_name == "outer_border_terrain_types" || property_name == "inner_border_terrain_types") {
 		terrain_type *terrain_type_value = terrain_type::get(value);
 		success = QMetaObject::invokeMethod(object, method_name.c_str(), Qt::ConnectionType::DirectConnection, Q_ARG(terrain_type *, terrain_type_value));

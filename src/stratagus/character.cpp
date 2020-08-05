@@ -461,9 +461,9 @@ religion *character::get_religion() const
 {
 	//get the first religion of the character's first deity, since at present we don't set the religion directly for the character
 	
-	for (size_t i = 0; i < this->Deities.size(); ++i) {
-		if (!this->Deities[i]->Religions.empty()) {
-			return this->Deities[i]->Religions.front();
+	for (const deity *deity : this->Deities) {
+		if (!deity->get_religions().empty()) {
+			return deity->get_religions().front();
 		}
 	}
 	

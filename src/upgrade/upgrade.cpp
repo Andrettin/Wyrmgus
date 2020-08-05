@@ -2171,8 +2171,8 @@ void UpgradeAcquire(CPlayer &player, const CUpgrade *upgrade)
 	if (!strncmp(upgrade->Ident.c_str(), "upgrade-deity-", 14) && strncmp(upgrade->Ident.c_str(), "upgrade-deity-domain-", 21)) { // if is a deity upgrade, but isn't a deity domain upgrade
 		stratagus::deity *upgrade_deity = stratagus::deity::get_by_upgrade(upgrade);
 		if (upgrade_deity) {
-			for (size_t i = 0; i < upgrade_deity->Domains.size(); ++i) {
-				CUpgrade *domain_upgrade = upgrade_deity->Domains[i]->Upgrade;
+			for (stratagus::deity_domain *domain : upgrade_deity->get_domains()) {
+				CUpgrade *domain_upgrade = domain->Upgrade;
 				if (player.Allow.Upgrades[domain_upgrade->ID] != 'R') {
 					UpgradeAcquire(player, domain_upgrade);
 				}
@@ -2220,8 +2220,8 @@ void UpgradeLost(CPlayer &player, int id)
 	if (!strncmp(upgrade->Ident.c_str(), "upgrade-deity-", 14) && strncmp(upgrade->Ident.c_str(), "upgrade-deity-domain-", 21)) { // if is a deity upgrade, but isn't a deity domain upgrade
 		stratagus::deity *upgrade_deity = stratagus::deity::get_by_upgrade(upgrade);
 		if (upgrade_deity) {
-			for (size_t i = 0; i < upgrade_deity->Domains.size(); ++i) {
-				CUpgrade *domain_upgrade = upgrade_deity->Domains[i]->Upgrade;
+			for (stratagus::deity_domain *domain : upgrade_deity->get_domains()) {
+				CUpgrade *domain_upgrade = domain->Upgrade;
 				if (player.Allow.Upgrades[domain_upgrade->ID] == 'R') {
 					UpgradeLost(player, domain_upgrade->ID);
 				}
@@ -2354,9 +2354,9 @@ void IndividualUpgradeAcquire(CUnit &unit, const CUpgrade *upgrade)
 	if (!strncmp(upgrade->Ident.c_str(), "upgrade-deity-", 14) && strncmp(upgrade->Ident.c_str(), "upgrade-deity-domain-", 21)) { // if is a deity upgrade, but isn't a deity domain upgrade
 		stratagus::deity *upgrade_deity = stratagus::deity::get_by_upgrade(upgrade);
 		if (upgrade_deity) {
-			for (size_t i = 0; i < upgrade_deity->Domains.size(); ++i) {
-				CUpgrade *domain_upgrade = upgrade_deity->Domains[i]->Upgrade;
-				if (!unit.GetIndividualUpgrade(domain_upgrade)) {
+			for (stratagus::deity_domain *domain : upgrade_deity->get_domains()) {
+				CUpgrade *domain_upgrade = domain->Upgrade;
+				if (unit.GetIndividualUpgrade(domain_upgrade) == 0) {
 					IndividualUpgradeAcquire(unit, domain_upgrade);
 				}
 			}
@@ -2406,9 +2406,9 @@ void IndividualUpgradeLost(CUnit &unit, const CUpgrade *upgrade, bool lose_all)
 	if (!strncmp(upgrade->Ident.c_str(), "upgrade-deity-", 14) && strncmp(upgrade->Ident.c_str(), "upgrade-deity-domain-", 21)) { // if is a deity upgrade, but isn't a deity domain upgrade
 		stratagus::deity *upgrade_deity = stratagus::deity::get_by_upgrade(upgrade);
 		if (upgrade_deity) {
-			for (size_t i = 0; i < upgrade_deity->Domains.size(); ++i) {
-				CUpgrade *domain_upgrade = upgrade_deity->Domains[i]->Upgrade;
-				if (unit.GetIndividualUpgrade(domain_upgrade)) {
+			for (stratagus::deity_domain *domain : upgrade_deity->get_domains()) {
+				CUpgrade *domain_upgrade = domain->Upgrade;
+				if (unit.GetIndividualUpgrade(domain_upgrade) > 0) {
 					IndividualUpgradeLost(unit, domain_upgrade);
 				}
 			}

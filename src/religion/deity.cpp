@@ -68,14 +68,13 @@ void deity::ProcessConfigData(const CConfigData *config_data)
 			this->major = string::to_bool(value);
 		} else if (key == "civilization") {
 			civilization *civilization = civilization::get(value);
-			this->civilizations.push_back(civilization);
-			civilization->Deities.push_back(this);
+			this->add_civilization(civilization);
 		} else if (key == "religion") {
 			religion *religion = religion::get(value);
-			this->Religions.push_back(religion);
+			this->religions.push_back(religion);
 		} else if (key == "domain") {
 			deity_domain *domain = deity_domain::get(value);
-			this->Domains.push_back(domain);
+			this->domains.push_back(domain);
 		} else if (key == "description") {
 			this->set_description(value);
 		} else if (key == "background") {
@@ -126,13 +125,13 @@ void deity::ProcessConfigData(const CConfigData *config_data)
 void deity::initialize()
 {
 
-	if (this->is_major() && this->Domains.size() > deity::major_deity_domain_max) { // major deities can only have up to three domains
-		this->Domains.resize(deity::major_deity_domain_max);
-	} else if (!this->is_major() && this->Domains.size() > deity::minor_deity_domain_max) { // minor deities can only have one domain
-		this->Domains.resize(deity::minor_deity_domain_max);
+	if (this->is_major() && this->domains.size() > deity::major_deity_domain_max) { // major deities can only have up to three domains
+		this->domains.resize(deity::major_deity_domain_max);
+	} else if (!this->is_major() && this->domains.size() > deity::minor_deity_domain_max) { // minor deities can only have one domain
+		this->domains.resize(deity::minor_deity_domain_max);
 	}
 
-	for (deity_domain *domain : this->Domains) {
+	for (deity_domain *domain : this->get_domains()) {
 		for (CUpgrade *ability : domain->Abilities) {
 			if (!vector::contains(this->Abilities, ability)) {
 				this->Abilities.push_back(ability);
@@ -159,9 +158,35 @@ QVariantList deity::get_civilizations_qvariant_list() const
 	return container::to_qvariant_list(this->get_civilizations());
 }
 
+void deity::add_civilization(civilization *civilization)
+{
+	this->civilizations.push_back(civilization);
+	civilization->Deities.push_back(this);
+}
+
 void deity::remove_civilization(civilization *civilization)
 {
 	vector::remove(this->civilizations, civilization);
+}
+
+QVariantList deity::get_religions_qvariant_list() const
+{
+	return container::to_qvariant_list(this->get_religions());
+}
+
+void deity::remove_religion(religion *religion)
+{
+	vector::remove(this->religions, religion);
+}
+
+QVariantList deity::get_domains_qvariant_list() const
+{
+	return container::to_qvariant_list(this->get_domains());
+}
+
+void deity::remove_domain(deity_domain *domain)
+{
+	vector::remove(this->domains, domain);
 }
 
 }
