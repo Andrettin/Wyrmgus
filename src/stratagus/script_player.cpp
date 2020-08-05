@@ -2000,20 +2000,20 @@ static int CclDefineReligion(lua_State *l)
 	}
 
 	std::string religion_ident = LuaToString(l, 1);
-	CReligion *religion = CReligion::GetOrAddReligion(religion_ident);
+	stratagus::religion *religion = stratagus::religion::get_or_add(religion_ident, nullptr);
 	
 	//  Parse the list:
 	for (lua_pushnil(l); lua_next(l, 2); lua_pop(l, 1)) {
 		const char *value = LuaToString(l, -2);
 		
 		if (!strcmp(value, "Name")) {
-			religion->Name = LuaToString(l, -1);
+			religion->set_name(LuaToString(l, -1));
 		} else if (!strcmp(value, "Description")) {
-			religion->Description = LuaToString(l, -1);
+			religion->set_description(LuaToString(l, -1));
 		} else if (!strcmp(value, "Background")) {
-			religion->Background = LuaToString(l, -1);
+			religion->set_background(LuaToString(l, -1));
 		} else if (!strcmp(value, "Quote")) {
-			religion->Quote = LuaToString(l, -1);
+			religion->set_quote(LuaToString(l, -1));
 		} else if (!strcmp(value, "CulturalDeities")) {
 			religion->CulturalDeities = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "Domains")) {
@@ -2096,10 +2096,8 @@ static int CclDefineDeity(lua_State *l)
 			}
 			const int subargs = lua_rawlen(l, -1);
 			for (int j = 0; j < subargs; ++j) {
-				CReligion *religion = CReligion::GetReligion(LuaToString(l, -1, j + 1));
-				if (religion) {
-					deity->Religions.push_back(religion);
-				}
+				stratagus::religion *religion = stratagus::religion::get(LuaToString(l, -1, j + 1));
+				deity->Religions.push_back(religion);
 			}
 		} else if (!strcmp(value, "Domains")) {
 			if (!lua_istable(l, -1)) {
@@ -3177,10 +3175,10 @@ static int CclGetLanguageWordData(lua_State *l)
 
 static int CclGetReligions(lua_State *l)
 {
-	lua_createtable(l, CReligion::Religions.size(), 0);
-	for (size_t i = 1; i <= CReligion::Religions.size(); ++i)
+	lua_createtable(l, stratagus::religion::get_all().size(), 0);
+	for (size_t i = 1; i <= stratagus::religion::get_all().size(); ++i)
 	{
-		lua_pushstring(l, CReligion::Religions[i-1]->Ident.c_str());
+		lua_pushstring(l, stratagus::religion::get_all()[i-1]->get_identifier().c_str());
 		lua_rawseti(l, -2, i);
 	}
 	return 1;
@@ -3219,23 +3217,21 @@ static int CclGetReligionData(lua_State *l)
 		LuaError(l, "incorrect argument");
 	}
 	std::string religion_ident = LuaToString(l, 1);
-	const CReligion *religion = CReligion::GetReligion(religion_ident);
-	if (!religion) {
-		return 0;
-	}
+	const stratagus::religion *religion = stratagus::religion::get(religion_ident);
+
 	const char *data = LuaToString(l, 2);
 
 	if (!strcmp(data, "Name")) {
-		lua_pushstring(l, religion->Name.c_str());
+		lua_pushstring(l, religion->get_name().c_str());
 		return 1;
 	} else if (!strcmp(data, "Description")) {
-		lua_pushstring(l, religion->Description.c_str());
+		lua_pushstring(l, religion->get_description().c_str());
 		return 1;
 	} else if (!strcmp(data, "Background")) {
-		lua_pushstring(l, religion->Background.c_str());
+		lua_pushstring(l, religion->get_background().c_str());
 		return 1;
 	} else if (!strcmp(data, "Quote")) {
-		lua_pushstring(l, religion->Quote.c_str());
+		lua_pushstring(l, religion->get_quote().c_str());
 		return 1;
 	} else if (!strcmp(data, "CulturalDeities")) {
 		lua_pushboolean(l, religion->CulturalDeities);
@@ -3328,7 +3324,7 @@ static int CclGetDeityData(lua_State *l)
 		lua_createtable(l, deity->Religions.size(), 0);
 		for (size_t i = 1; i <= deity->Religions.size(); ++i)
 		{
-			lua_pushstring(l, deity->Religions[i-1]->Ident.c_str());
+			lua_pushstring(l, deity->Religions[i-1]->get_identifier().c_str());
 			lua_rawseti(l, -2, i);
 		}
 		return 1;

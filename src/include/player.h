@@ -50,7 +50,6 @@ class CFile;
 class CGraphic;
 class CLanguage;
 class CProvince;
-class CReligion;
 class CUnit;
 class PlayerAi;
 //Wyrmgus start
@@ -70,6 +69,7 @@ namespace stratagus {
 	class player_color;
 	class player_quest_objective;
 	class quest;
+	class religion;
 	class resource;
 	class site;
 	class unit_class;
@@ -103,6 +103,66 @@ public:
 	CPlayer();
 	~CPlayer();
 
+	/// Change player name
+	void SetName(const std::string &name);
+
+	//Wyrmgus start
+	const stratagus::civilization *get_civilization() const;
+	void set_civilization(int civilization);
+	stratagus::faction *get_faction() const;
+	void SetFaction(const stratagus::faction *faction);
+	void SetRandomFaction();
+
+	stratagus::faction_tier get_faction_tier() const
+	{
+		return this->faction_tier;
+	}
+
+	void set_faction_tier(const stratagus::faction_tier tier)
+	{
+		this->faction_tier = tier;
+	}
+
+	stratagus::government_type get_government_type() const
+	{
+		return this->government_type;
+	}
+
+	void set_government_type(const stratagus::government_type government_type)
+	{
+		this->government_type = government_type;
+	}
+
+	const stratagus::religion *get_religion() const
+	{
+		return this->religion;
+	}
+
+	void SetDynasty(CDynasty *dynasty);
+	const std::string &get_interface() const;
+
+	const stratagus::age *get_age() const
+	{
+		return this->age;
+	}
+
+	void check_age();
+	void set_age(stratagus::age *age);
+	CCurrency *GetCurrency() const;
+
+	bool is_alive() const
+	{
+		return this->GetUnitCount() > 0;
+	}
+
+	/// Clear turn related player data
+	void Clear();
+
+	std::vector<CUnit *>::const_iterator UnitBegin() const;
+	std::vector<CUnit *>::iterator UnitBegin();
+	std::vector<CUnit *>::const_iterator UnitEnd() const;
+	std::vector<CUnit *>::iterator UnitEnd();
+
 	const stratagus::player_color *get_player_color() const
 	{
 		return this->player_color;
@@ -115,17 +175,73 @@ public:
 		return this->quest_objectives;
 	}
 
+	void ShareUpgradeProgress(CPlayer &player, CUnit &unit);
+	int get_player_color_usage_count(const stratagus::player_color *player_color) const;
+	void update_minimap_territory();
+
+	stratagus::unit_type *get_class_unit_type(const stratagus::unit_class *unit_class) const;
+	CUpgrade *get_class_upgrade(const stratagus::upgrade_class *upgrade_class) const;
+	bool has_upgrade_class(const stratagus::upgrade_class *upgrade_class) const;
+
+	bool HasSettlement(const stratagus::site *settlement) const;
+	bool HasSettlementNearWaterZone(int water_zone) const;
+	stratagus::site *GetNearestSettlement(const Vec2i &pos, int z, const Vec2i &size) const;
+	void update_building_settlement_assignment(const stratagus::site *old_settlement, const int z) const;
+	bool HasUnitBuilder(const stratagus::unit_type *type, const stratagus::site *settlement = nullptr) const;
+	bool HasUpgradeResearcher(const CUpgrade *upgrade) const;
+	bool CanFoundFaction(stratagus::faction *faction, bool pre = false);
+	bool CanChooseDynasty(CDynasty *dynasty, bool pre = false);
+	bool can_recruit_hero(const stratagus::character *character, bool ignore_neutral = false) const;
+	std::vector<stratagus::character *> get_recruitable_heroes_from_list(const std::vector<stratagus::character *> &heroes);
+	bool UpgradeRemovesExistingUpgrade(const CUpgrade *upgrade, bool ignore_lower_priority = false) const;
+	std::string get_full_name() const;
+	std::string_view get_faction_title_name() const;
+	std::string_view GetCharacterTitleName(const int title_type, const stratagus::gender gender) const;
+	std::set<int> get_builder_landmasses(const stratagus::unit_type *building) const;	/// Builds a vector with builder landmasses; the building is the structure to be built by the builder in question
+	std::vector<const CUpgrade *> GetResearchableUpgrades();
+
+	CUnit &GetUnit(int index) const;
+	int GetUnitCount() const;
+
+	void AddUnit(CUnit &unit);
+	void RemoveUnit(CUnit &unit);
+	void UpdateFreeWorkers();
+	//Wyrmgus start
+	void PerformResourceTrade();
+	bool HasMarketUnit() const;
+	CUnit *GetMarketUnit() const;
+	std::vector<int> GetAutosellResources() const;
+	void AutosellResource(const int resource);
+	void UpdateLevelUpUnits();
+	void update_quest_pool();
+	void available_quests_changed();
+	void update_current_quests();
+	void accept_quest(stratagus::quest *quest);
+	void complete_quest(stratagus::quest *quest);
+	void fail_quest(stratagus::quest *quest, const std::string &fail_reason = "");
+	void remove_current_quest(stratagus::quest *quest);
+	bool can_accept_quest(const stratagus::quest *quest);
+	bool has_completed_quest(const stratagus::quest *quest);
+	std::string has_failed_quest(const stratagus::quest *quest);
+	void AddModifier(CUpgrade *modifier, int cycles);
+	void RemoveModifier(CUpgrade *modifier);
+	bool AtPeace() const;
+
 	int Index = 0;          /// player as number
 	std::string Name;   /// name of non computer
 
 	int Type = 0; //type of the player (human, computer, ...)
 	int Race = 0; //race of the player (orc, human, ...)
 	int Faction = -1; //faction of the player
+private:
 	stratagus::faction_tier faction_tier;
 	stratagus::government_type government_type;
-	CReligion *Religion = nullptr; //religion of the player
+	stratagus::religion *religion = nullptr; //religion of the player
+public:
 	CDynasty *Dynasty = nullptr; //ruling dynasty of the player
+private:
 	stratagus::age *age = nullptr; //the current age the player/faction is in
+public:
 	std::string AiName; //AI for computer
 
 	// friend enemy detection
@@ -238,109 +354,6 @@ public:
 	// Upgrades/Allows:
 	CAllow Allow;                 /// Allowed for player
 	CUpgradeTimers UpgradeTimers; /// Timer for the upgrades
-
-	/// Change player name
-	void SetName(const std::string &name);
-	
-	//Wyrmgus start
-	const stratagus::civilization *get_civilization() const;
-	void set_civilization(int civilization);
-	stratagus::faction *get_faction() const;
-	void SetFaction(const stratagus::faction *faction);
-	void SetRandomFaction();
-
-	stratagus::faction_tier get_faction_tier() const
-	{
-		return this->faction_tier;
-	}
-
-	void set_faction_tier(const stratagus::faction_tier tier)
-	{
-		this->faction_tier = tier;
-	}
-
-	stratagus::government_type get_government_type() const
-	{
-		return this->government_type;
-	}
-
-	void set_government_type(const stratagus::government_type government_type)
-	{
-		this->government_type = government_type;
-	}
-
-	void SetDynasty(CDynasty *dynasty);
-	const std::string &get_interface() const;
-	void check_age();
-	void set_age(stratagus::age *age);
-	CCurrency *GetCurrency() const;
-
-	bool is_alive() const
-	{
-		return this->GetUnitCount() > 0;
-	}
-
-	void ShareUpgradeProgress(CPlayer &player, CUnit &unit);
-	int get_player_color_usage_count(const stratagus::player_color *player_color) const;
-	void update_minimap_territory();
-
-	stratagus::unit_type *get_class_unit_type(const stratagus::unit_class *unit_class) const;
-	CUpgrade *get_class_upgrade(const stratagus::upgrade_class *upgrade_class) const;
-	bool has_upgrade_class(const stratagus::upgrade_class *upgrade_class) const;
-
-	bool HasSettlement(const stratagus::site *settlement) const;
-	bool HasSettlementNearWaterZone(int water_zone) const;
-	stratagus::site *GetNearestSettlement(const Vec2i &pos, int z, const Vec2i &size) const;
-	void update_building_settlement_assignment(const stratagus::site *old_settlement, const int z) const;
-	bool HasUnitBuilder(const stratagus::unit_type *type, const stratagus::site *settlement = nullptr) const;
-	bool HasUpgradeResearcher(const CUpgrade *upgrade) const;
-	bool CanFoundFaction(stratagus::faction *faction, bool pre = false);
-	bool CanChooseDynasty(CDynasty *dynasty, bool pre = false);
-	bool can_recruit_hero(const stratagus::character *character, bool ignore_neutral = false) const;
-	std::vector<stratagus::character *> get_recruitable_heroes_from_list(const std::vector<stratagus::character *> &heroes);
-	bool UpgradeRemovesExistingUpgrade(const CUpgrade *upgrade, bool ignore_lower_priority = false) const;
-	std::string get_full_name() const;
-	std::string_view get_faction_title_name() const;
-	std::string_view GetCharacterTitleName(const int title_type, const stratagus::gender gender) const;
-	std::set<int> get_builder_landmasses(const stratagus::unit_type *building) const;	/// Builds a vector with builder landmasses; the building is the structure to be built by the builder in question
-	std::vector<const CUpgrade *> GetResearchableUpgrades();
-	//Wyrmgus end
-
-	/// Clear turn related player data
-	void Clear();
-
-	std::vector<CUnit *>::const_iterator UnitBegin() const;
-	std::vector<CUnit *>::iterator UnitBegin();
-	std::vector<CUnit *>::const_iterator UnitEnd() const;
-	std::vector<CUnit *>::iterator UnitEnd();
-
-	CUnit &GetUnit(int index) const;
-	int GetUnitCount() const;
-
-	void AddUnit(CUnit &unit);
-	void RemoveUnit(CUnit &unit);
-	void UpdateFreeWorkers();
-	//Wyrmgus start
-	void PerformResourceTrade();
-	bool HasMarketUnit() const;
-	CUnit *GetMarketUnit() const;
-	std::vector<int> GetAutosellResources() const;
-	void AutosellResource(const int resource);
-	void UpdateLevelUpUnits();
-	void update_quest_pool();
-	void available_quests_changed();
-	void update_current_quests();
-	void accept_quest(stratagus::quest *quest);
-	void complete_quest(stratagus::quest *quest);
-	void fail_quest(stratagus::quest *quest, const std::string &fail_reason = "");
-	void remove_current_quest(stratagus::quest *quest);
-	bool can_accept_quest(const stratagus::quest *quest);
-	bool has_completed_quest(const stratagus::quest *quest);
-	std::string has_failed_quest(const stratagus::quest *quest);
-	void AddModifier(CUpgrade *modifier, int cycles);
-	void RemoveModifier(CUpgrade *modifier);
-	bool AtPeace() const;
-	//Wyrmgus end
 
 	/// Get a resource of the player
 	int get_resource(const stratagus::resource *resource, const int type);

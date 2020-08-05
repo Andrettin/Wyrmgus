@@ -8,8 +8,6 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name religion.h - The religion header file. */
-//
 //      (c) Copyright 2018-2020 by Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
@@ -29,27 +27,27 @@
 
 #pragma once
 
-class CConfigData;
+#include "database/data_type.h"
+#include "database/detailed_data_entry.h"
 
 namespace stratagus {
-	class deity_domain;
-}
 
-class CReligion
+class deity_domain;
+
+class religion : public detailed_data_entry, public data_type<religion>
 {
+	Q_OBJECT
+
 public:
-	static CReligion *GetReligion(const std::string &ident, const bool should_find = true);
-	static CReligion *GetOrAddReligion(const std::string &ident);
-	static void ClearReligions();
-	
-	static std::vector<CReligion *> Religions;	/// Religions
-	static std::map<std::string, CReligion *> ReligionsByIdent;
-	
-	std::string Ident;							/// Ident of the religion
-	std::string Name;							/// Name of the religion
-	std::string Description;
-	std::string Background;
-	std::string Quote;
+	static constexpr const char *class_identifier = "religion";
+	static constexpr const char *database_folder = "religions";
+
+	explicit religion(const std::string &identifier) : detailed_data_entry(identifier)
+	{
+	}
+
 	bool CulturalDeities = false;				/// Whether the religion's deities (or equivalent) must belong to the civilization that has the religion; for instance: the deities under paganism must belong to the civilization of the player, but under hinduism they musn't (meaning that a Teuton player which has hinduism as a religion can select Hindu deities, but an Indian pagan cannot select Teuton pagan deities)
-	std::vector<stratagus::deity_domain *> Domains;
+	std::vector<deity_domain *> Domains;
 };
+
+}

@@ -71,11 +71,8 @@ void deity::ProcessConfigData(const CConfigData *config_data)
 			this->civilizations.push_back(civilization);
 			civilization->Deities.push_back(this);
 		} else if (key == "religion") {
-			value = FindAndReplaceString(value, "_", "-");
-			CReligion *religion = CReligion::GetReligion(value.c_str());
-			if (religion) {
-				this->Religions.push_back(religion);
-			}
+			religion *religion = religion::get(value);
+			this->Religions.push_back(religion);
 		} else if (key == "domain") {
 			deity_domain *domain = deity_domain::get(value);
 			this->Domains.push_back(domain);

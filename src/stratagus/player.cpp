@@ -1011,7 +1011,7 @@ void CPlayer::Init(/* PlayerTypes */ int type)
 	this->Faction = -1;
 	this->faction_tier = stratagus::faction_tier::none;
 	this->government_type = stratagus::government_type::none;
-	this->Religion = nullptr;
+	this->religion = nullptr;
 	this->Dynasty = nullptr;
 	this->age = nullptr;
 	this->overlord = nullptr;
@@ -2076,7 +2076,7 @@ void CPlayer::Clear()
 	this->Faction = -1;
 	this->faction_tier = stratagus::faction_tier::none;
 	this->government_type = stratagus::government_type::none;
-	this->Religion = nullptr;
+	this->religion = nullptr;
 	this->Dynasty = nullptr;
 	this->age = nullptr;
 	this->overlord = nullptr;

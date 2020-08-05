@@ -38,7 +38,6 @@ class CFile;
 class CLanguage;
 class CPersistentItem;
 class CProvince;
-class CReligion;
 class CUnit;
 class CUpgrade;
 class LuaCallback;
@@ -57,6 +56,7 @@ namespace stratagus {
 	class faction;
 	class historical_location;
 	class quest;
+	class religion;
 	class site;
 	class unit_type;
 	enum class gender;
@@ -177,7 +177,7 @@ public:
 	void GenerateMissingDates();
 	int GetMartialAttribute() const;
 	int GetAttributeModifier(int attribute) const;
-	CReligion *GetReligion() const;
+	religion *get_religion() const;
 	CLanguage *GetLanguage() const;
 	calendar *get_calendar() const;
 	bool IsParentOf(const std::string &child_full_name) const;

@@ -49,10 +49,10 @@ public:
 
 	static void initialize_all();
 
-	static void set_current_age(age *age);
+	static void set_current_age(const age *age);
 	static void check_current_age();
 
-	static age *current_age;
+	static const age *current_age;
 
 	explicit age(const std::string &identifier);
 	virtual ~age() override;

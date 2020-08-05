@@ -43,7 +43,7 @@ public:
 
 	virtual bool check(const CPlayer *player, bool ignore_units = false) const override
 	{
-		return player->age == this->age;
+		return player->get_age() == this->age;
 	}
 
 	virtual std::string get_string(const std::string &prefix = "") const override

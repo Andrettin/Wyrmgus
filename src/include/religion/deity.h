@@ -33,7 +33,6 @@
 #include "ui/icon.h"
 
 class CPantheon;
-class CReligion;
 class CUpgrade;
 struct lua_State;
 
@@ -45,6 +44,7 @@ class civilization;
 class deity_domain;
 class faction;
 class plane;
+class religion;
 enum class gender;
 
 class deity final : public detailed_data_entry, public data_type<deity>, public CDataType
@@ -132,7 +132,7 @@ public:
 private:
 	std::vector<civilization *> civilizations;	//civilizations which may worship the deity
 public:
-	std::vector<CReligion *> Religions;			//religions for which this deity is available
+	std::vector<religion *> Religions;			//religions for which this deity is available
 	std::vector<std::string> Feasts;
 	std::vector<deity_domain *> Domains;
 	std::vector<faction *> HolyOrders;			//holy orders of this deity

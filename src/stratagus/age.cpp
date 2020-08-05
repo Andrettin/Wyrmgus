@@ -42,7 +42,7 @@
 
 namespace stratagus {
 
-age *age::current_age = nullptr;
+const age *age::current_age = nullptr;
 
 void age::initialize_all()
 {
@@ -57,7 +57,7 @@ void age::initialize_all()
 	});
 }
 
-void age::set_current_age(age *age)
+void age::set_current_age(const age *age)
 {
 	if (age == age::current_age) {
 		return;
@@ -69,11 +69,17 @@ void age::set_current_age(age *age)
 //check which age fits the current overall situation best, out of the ages each player is in
 void age::check_current_age()
 {
-	age *best_age = age::current_age;
+	const age *best_age = age::current_age;
 
 	for (int p = 0; p < PlayerMax; ++p) {
-		if (CPlayer::Players[p]->age && (!best_age || CPlayer::Players[p]->age->priority > best_age->priority)) {
-			best_age = CPlayer::Players[p]->age;
+		const age *age = CPlayer::Players[p]->get_age();
+
+		if (age == nullptr) {
+			continue;
+		}
+
+		if (!best_age || age->priority > best_age->priority) {
+			best_age = age;
 		}
 	}
 
