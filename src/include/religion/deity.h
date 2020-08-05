@@ -52,8 +52,15 @@ static constexpr int MINOR_DEITY_DOMAIN_MAX = 1; //minor deities can only have o
 
 namespace stratagus {
 
-class deity : public detailed_data_entry, public data_type<deity>, public CDataType
+class deity final : public detailed_data_entry, public data_type<deity>, public CDataType
 {
+	Q_OBJECT
+
+	Q_PROPERTY(stratagus::gender gender MEMBER gender READ get_gender)
+	Q_PROPERTY(bool major MEMBER major READ is_major)
+	Q_PROPERTY(stratagus::plane* home_plane MEMBER home_plane READ get_home_plane)
+	Q_PROPERTY(QVariantList civilizations READ get_civilizations_qvariant_list)
+
 public:
 	static constexpr const char *class_identifier = "deity";
 	static constexpr const char *database_folder = "deities";
@@ -75,16 +82,43 @@ public:
 	explicit deity(const std::string &identifier);
 	
 	virtual void ProcessConfigData(const CConfigData *config_data) override;
-	
-	std::string GetCulturalName(const civilization *civilization) const;
+	virtual void initialize() override;
+
+	const std::string &get_cultural_name(const civilization *civilization) const;
+
+	gender get_gender() const
+	{
+		return this->gender;
+	}
+
+	bool is_major() const
+	{
+		return this->major;
+	}
 
 	plane *get_home_plane() const
 	{
 		return this->home_plane;
 	}
-	
-	stratagus::gender gender;					//deity's gender
-	bool Major = false;							//whether the deity is a major one or not
+
+	const std::vector<civilization *> &get_civilizations() const
+	{
+		return this->civilizations;
+	}
+
+	QVariantList get_civilizations_qvariant_list() const;
+
+	Q_INVOKABLE void add_civilization(civilization *civilization)
+	{
+		this->civilizations.push_back(civilization);
+	}
+
+	Q_INVOKABLE void remove_civilization(civilization *civilization);
+
+private:
+	stratagus::gender gender;
+	bool major = false;							//whether the deity is a major one or not
+public:
 	CPantheon *Pantheon = nullptr;				//pantheon to which the deity belongs
 private:
 	plane *home_plane = nullptr;				//the home plane of the deity
@@ -92,13 +126,16 @@ public:
 	CUpgrade *DeityUpgrade = nullptr;			//the deity's upgrade applied to a player that worships it
 	CUpgrade *CharacterUpgrade = nullptr;		//the deity's upgrade applied to its character as an individual upgrade
 	IconConfig Icon;							//deity's icon
+private:
 	std::vector<civilization *> civilizations;	//civilizations which may worship the deity
+public:
 	std::vector<CReligion *> Religions;			//religions for which this deity is available
 	std::vector<std::string> Feasts;
 	std::vector<CDeityDomain *> Domains;
 	std::vector<faction *> HolyOrders;			//holy orders of this deity
 	std::vector<CUpgrade *> Abilities;			//abilities linked to this deity
-	std::map<const civilization *, std::string> CulturalNames;	//names of the deity in different cultures (for example, Odin is known as Hroptatyr by the dwarves)
+private:
+	std::map<const civilization *, std::string> cultural_names;	//names of the deity in different cultures (for example, Odin is known as Hroptatyr by the dwarves)
 
 	friend int ::CclDefineDeity(lua_State *l);
 };

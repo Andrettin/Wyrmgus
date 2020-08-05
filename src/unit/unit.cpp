@@ -6594,7 +6594,7 @@ std::string CUnit::GetName() const
 {
 	if (GameRunning && this->Character && this->Character->Deity) {
 		if (CPlayer::GetThisPlayer()->Race >= 0) {
-			std::string cultural_name = this->Character->Deity->GetCulturalName(stratagus::civilization::get_all()[CPlayer::GetThisPlayer()->Race]);
+			const std::string &cultural_name = this->Character->Deity->get_cultural_name(stratagus::civilization::get_all()[CPlayer::GetThisPlayer()->Race]);
 			
 			if (!cultural_name.empty()) {
 				return cultural_name;

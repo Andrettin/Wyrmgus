@@ -76,7 +76,8 @@ void character::clear()
 	CustomHeroes.clear();
 }
 
-character::character(const std::string &identifier) : detailed_data_entry(identifier), CDataType(identifier), gender(gender::none)
+character::character(const std::string &identifier)
+	: detailed_data_entry(identifier), CDataType(identifier), gender(gender::none)
 {
 	memset(Attributes, 0, sizeof(Attributes));
 }
@@ -576,15 +577,10 @@ bool character::CanWorship() const
 	return true;
 }
 
-/**
-**	@brief	Get whether the character has a major deity in its worshipped deities list
-**
-**	@return True if the character has a major deity, false otherwise
-*/
 bool character::HasMajorDeity() const
 {
-	for (size_t i = 0; i < this->Deities.size(); ++i) {
-		if (this->Deities[i]->Major) {
+	for (deity *deity : this->Deities) {
+		if (deity->is_major()) {
 			return true;
 		}
 	}

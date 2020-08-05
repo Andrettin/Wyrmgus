@@ -8,8 +8,6 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name script_player.cpp - The player ccl functions. */
-//
 //      (c) Copyright 2001-2020 by Lutz Sammer, Jimmy Salmon and Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
@@ -2063,7 +2061,7 @@ static int CclDefineDeity(lua_State *l)
 		} else if (!strcmp(value, "Gender")) {
 			deity->gender = stratagus::string_to_gender(LuaToString(l, -1));
 		} else if (!strcmp(value, "Major")) {
-			deity->Major = LuaToBoolean(l, -1);
+			deity->major = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "Description")) {
 			deity->set_description(LuaToString(l, -1));
 		} else if (!strcmp(value, "Background")) {
@@ -2161,24 +2159,10 @@ static int CclDefineDeity(lua_State *l)
 				++j;
 
 				std::string cultural_name = LuaToString(l, -1, j + 1);
-				deity->CulturalNames[civilization] = cultural_name;
+				deity->cultural_names[civilization] = cultural_name;
 			}
 		} else {
 			LuaError(l, "Unsupported tag: %s" _C_ value);
-		}
-	}
-	
-	if (deity->Major && deity->Domains.size() > MAJOR_DEITY_DOMAIN_MAX) {
-		deity->Domains.resize(MAJOR_DEITY_DOMAIN_MAX);
-	} else if (!deity->Major && deity->Domains.size() > MINOR_DEITY_DOMAIN_MAX) {
-		deity->Domains.resize(MINOR_DEITY_DOMAIN_MAX);
-	}
-	
-	for (CDeityDomain *domain : deity->Domains) {
-		for (CUpgrade *ability : domain->Abilities) {
-			if (std::find(deity->Abilities.begin(), deity->Abilities.end(), ability) == deity->Abilities.end()) {
-				deity->Abilities.push_back(ability);
-			}
 		}
 	}
 	
@@ -3336,11 +3320,11 @@ static int CclGetDeityData(lua_State *l)
 		lua_pushstring(l, deity->get_quote().c_str());
 		return 1;
 	} else if (!strcmp(data, "Major")) {
-		lua_pushboolean(l, deity->Major);
+		lua_pushboolean(l, deity->is_major());
 		return 1;
 	} else if (!strcmp(data, "HomePlane")) {
 		if (deity->get_home_plane()) {
-			lua_pushstring(l, deity->get_home_plane()->Ident.c_str());
+			lua_pushstring(l, deity->get_home_plane()->get_identifier().c_str());
 		} else {
 			lua_pushstring(l, "");
 		}
@@ -3349,10 +3333,10 @@ static int CclGetDeityData(lua_State *l)
 		lua_pushstring(l, deity->Icon.Name.c_str());
 		return 1;
 	} else if (!strcmp(data, "Civilizations")) {
-		lua_createtable(l, deity->civilizations.size(), 0);
-		for (size_t i = 1; i <= deity->civilizations.size(); ++i)
+		lua_createtable(l, deity->get_civilizations().size(), 0);
+		for (size_t i = 1; i <= deity->get_civilizations().size(); ++i)
 		{
-			lua_pushstring(l, deity->civilizations[i-1]->get_identifier().c_str());
+			lua_pushstring(l, deity->get_civilizations()[i-1]->get_identifier().c_str());
 			lua_rawseti(l, -2, i);
 		}
 		return 1;
@@ -3386,11 +3370,11 @@ static int CclGetDeityData(lua_State *l)
 		}
 		
 		const stratagus::civilization *civilization = stratagus::civilization::get(LuaToString(l, 3));
-		lua_pushstring(l, deity->GetCulturalName(civilization).c_str());
+		lua_pushstring(l, deity->get_cultural_name(civilization).c_str());
 		
 		return 1;
 	} else if (!strcmp(data, "Gender")) {
-		lua_pushstring(l, stratagus::gender_to_string(deity->gender).c_str());
+		lua_pushstring(l, stratagus::gender_to_string(deity->get_gender()).c_str());
 		return 1;
 	} else {
 		LuaError(l, "Invalid field: %s" _C_ data);

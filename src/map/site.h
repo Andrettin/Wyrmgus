@@ -280,7 +280,7 @@ private:
 	CPlayer *owner = nullptr;
 	CUnit *site_unit = nullptr;									/// Unit which represents this site
 	std::vector<region *> regions;								/// Regions where this site is located
-	std::vector<faction *> cores;						/// Factions which have this site as a core
+	std::vector<faction *> cores; //factions which have this site as a core
 	std::map<const civilization *, std::string> cultural_names;	/// Names for the site for each different culture/civilization
 	QColor color; //color used to represent the site on the minimap, and to identify its territory on territory images
 	std::vector<character *> characters; //characters which can be recruited at this site

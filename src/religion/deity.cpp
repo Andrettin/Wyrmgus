@@ -40,7 +40,9 @@
 #include "religion/pantheon.h"
 #include "religion/religion.h"
 #include "upgrade/upgrade.h"
+#include "util/container_util.h"
 #include "util/string_util.h"
+#include "util/vector_util.h"
 
 namespace stratagus {
 
@@ -49,11 +51,6 @@ deity::deity(const std::string &identifier)
 {
 }
 
-/**
-**	@brief	Process data provided by a configuration file
-**
-**	@param	config_data	The configuration data
-*/
 void deity::ProcessConfigData(const CConfigData *config_data)
 {
 	for (size_t i = 0; i < config_data->Properties.size(); ++i) {
@@ -68,7 +65,7 @@ void deity::ProcessConfigData(const CConfigData *config_data)
 		} else if (key == "gender") {
 			this->gender = string_to_gender(value);
 		} else if (key == "major") {
-			this->Major = string::to_bool(value);
+			this->major = string::to_bool(value);
 		} else if (key == "civilization") {
 			civilization *civilization = civilization::get(value);
 			this->civilizations.push_back(civilization);
@@ -124,44 +121,53 @@ void deity::ProcessConfigData(const CConfigData *config_data)
 				std::string value = child_config_data->Properties[j].second;
 				
 				const civilization *civilization = civilization::get(key);
-				this->CulturalNames[civilization] = value;
+				this->cultural_names[civilization] = value;
 			}
 		} else {
 			fprintf(stderr, "Invalid deity property: \"%s\".\n", child_config_data->Tag.c_str());
 		}
 	}
-	
-	if (this->Major && this->Domains.size() > MAJOR_DEITY_DOMAIN_MAX) { // major deities can only have up to three domains
+}
+
+void deity::initialize()
+{
+
+	if (this->is_major() && this->Domains.size() > MAJOR_DEITY_DOMAIN_MAX) { // major deities can only have up to three domains
 		this->Domains.resize(MAJOR_DEITY_DOMAIN_MAX);
-	} else if (!this->Major && this->Domains.size() > MINOR_DEITY_DOMAIN_MAX) { // minor deities can only have one domain
+	} else if (!this->is_major() && this->Domains.size() > MINOR_DEITY_DOMAIN_MAX) { // minor deities can only have one domain
 		this->Domains.resize(MINOR_DEITY_DOMAIN_MAX);
 	}
-	
+
 	for (CDeityDomain *domain : this->Domains) {
 		for (CUpgrade *ability : domain->Abilities) {
-			if (std::find(this->Abilities.begin(), this->Abilities.end(), ability) == this->Abilities.end()) {
+			if (!vector::contains(this->Abilities, ability)) {
 				this->Abilities.push_back(ability);
 			}
 		}
 	}
+
+	data_entry::initialize();
 }
 
-/**
-**	@brief	Get the cultural name for a given civilization
-**
-**	@param	civilization	The civilization
-**
-**	@return	The name if present, or an empty string otherwise
-*/
-std::string deity::GetCulturalName(const civilization *civilization) const
+const std::string &deity::get_cultural_name(const civilization *civilization) const
 {
-	const auto find_iterator = this->CulturalNames.find(civilization);
+	const auto find_iterator = this->cultural_names.find(civilization);
 	
-	if (find_iterator != this->CulturalNames.end()) {
+	if (find_iterator != this->cultural_names.end()) {
 		return find_iterator->second;
 	}
 	
-	return std::string();
+	return string::empty_str;
+}
+
+QVariantList deity::get_civilizations_qvariant_list() const
+{
+	return container::to_qvariant_list(this->get_civilizations());
+}
+
+void deity::remove_civilization(civilization *civilization)
+{
+	vector::remove(this->civilizations, civilization);
 }
 
 }

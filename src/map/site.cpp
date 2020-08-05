@@ -399,7 +399,6 @@ void site::add_core(faction *faction)
 	faction->sites.push_back(this);
 }
 
-
 void site::remove_core(faction *faction)
 {
 	vector::remove(this->cores, faction);
