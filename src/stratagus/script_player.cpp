@@ -71,6 +71,7 @@
 #include "ui/ui.h"
 #include "util/util.h"
 //Wyrmgus end
+#include "util/vector_util.h"
 #include "vassalage_type.h"
 
 extern CUnit *CclGetUnitFromRef(lua_State *l);
@@ -409,7 +410,7 @@ void CPlayer::Load(lua_State *l)
 			const int subargs = lua_rawlen(l, j + 1);
 			for (int k = 0; k < subargs; ++k) {
 				stratagus::quest *quest = stratagus::quest::get(LuaToString(l, j + 1, k + 1));
-				this->CurrentQuests.push_back(quest);
+				this->current_quests.push_back(quest);
 			}
 		} else if (!strcmp(value, "completed-quests")) {
 			if (!lua_istable(l, j + 1)) {
@@ -418,7 +419,7 @@ void CPlayer::Load(lua_State *l)
 			const int subargs = lua_rawlen(l, j + 1);
 			for (int k = 0; k < subargs; ++k) {
 				stratagus::quest *quest = stratagus::quest::get(LuaToString(l, j + 1, k + 1));
-				this->CompletedQuests.push_back(quest);
+				this->completed_quests.push_back(quest);
 				if (quest->Competitive) {
 					quest->CurrentCompleted = true;
 				}
@@ -2674,21 +2675,13 @@ static int CclGetPlayerData(lua_State *l)
 		return 1;
 	} else if (!strcmp(data, "HasQuest")) {
 		LuaCheckArgs(l, 3);
-		stratagus::quest *quest = stratagus::quest::get(LuaToString(l, 3));
-		if (std::find(p->CurrentQuests.begin(), p->CurrentQuests.end(), quest) != p->CurrentQuests.end()) {
-			lua_pushboolean(l, true);
-		} else {
-			lua_pushboolean(l, false);
-		}
+		const stratagus::quest *quest = stratagus::quest::get(LuaToString(l, 3));
+		lua_pushboolean(l, p->has_quest(quest));
 		return 1;
 	} else if (!strcmp(data, "CompletedQuest")) {
 		LuaCheckArgs(l, 3);
-		stratagus::quest *quest = stratagus::quest::get(LuaToString(l, 3));
-		if (std::find(p->CompletedQuests.begin(), p->CompletedQuests.end(), quest) != p->CompletedQuests.end()) {
-			lua_pushboolean(l, true);
-		} else {
-			lua_pushboolean(l, false);
-		}
+		const stratagus::quest *quest = stratagus::quest::get(LuaToString(l, 3));
+		lua_pushboolean(l, p->is_quest_completed(quest));
 		return 1;
 	} else if (!strcmp(data, "FactionTitle")) {
 		lua_pushstring(l, p->get_faction_title_name().data());

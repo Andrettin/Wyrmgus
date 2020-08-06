@@ -84,6 +84,8 @@ namespace stratagus {
 class CPlayer
 {
 public:
+	static constexpr int max_quest_pool = 15;
+
 	static void SetThisPlayer(CPlayer *player);
 	static CPlayer *GetThisPlayer();
 	static CPlayer *GetPlayer(const int index);
@@ -219,16 +221,29 @@ public:
 	std::vector<int> GetAutosellResources() const;
 	void AutosellResource(const int resource);
 	void UpdateLevelUpUnits();
+
+	const std::vector<stratagus::quest *> &get_available_quests() const
+	{
+		return this->available_quests;
+	}
+
+	const std::vector<stratagus::quest *> &get_current_quests() const
+	{
+		return this->current_quests;
+	}
+
 	void update_quest_pool();
-	void available_quests_changed();
+	void on_available_quests_changed();
 	void update_current_quests();
 	void accept_quest(stratagus::quest *quest);
 	void complete_quest(stratagus::quest *quest);
 	void fail_quest(stratagus::quest *quest, const std::string &fail_reason = "");
 	void remove_current_quest(stratagus::quest *quest);
-	bool can_accept_quest(const stratagus::quest *quest);
-	bool has_completed_quest(const stratagus::quest *quest);
-	std::string has_failed_quest(const stratagus::quest *quest);
+	bool can_accept_quest(const stratagus::quest *quest) const;
+	bool check_quest_completion(const stratagus::quest *quest) const;
+	std::string check_quest_failure(const stratagus::quest *quest) const;
+	bool has_quest(const stratagus::quest *quest) const;
+	bool is_quest_completed(const stratagus::quest *quest) const;
 	void AddModifier(CUpgrade *modifier, int cycles);
 	void RemoveModifier(CUpgrade *modifier);
 	bool AtPeace() const;
@@ -303,10 +318,10 @@ public:
 	std::map<const stratagus::unit_type *, std::vector<CUnit *>> AiActiveUnitsByType;	/// AI active units owned by this player for each type
 	std::vector<CUnit *> Heroes;											/// hero units owned by this player
 	std::vector<stratagus::deity *> Deities;								/// deities chosen by this player
-	std::vector<stratagus::quest *> AvailableQuests;			/// quests available to this player
-	std::vector<stratagus::quest *> CurrentQuests;				/// quests being pursued by this player
-	std::vector<const stratagus::quest *> CompletedQuests;		/// quests completed by this player
 private:
+	std::vector<stratagus::quest *> available_quests;			/// quests available to this player
+	std::vector<stratagus::quest *> current_quests;				/// quests being pursued by this player
+	std::vector<const stratagus::quest *> completed_quests;		/// quests completed by this player
 	std::vector<std::unique_ptr<stratagus::player_quest_objective>> quest_objectives; //objectives of the player's current quests
 public:
 	std::vector<std::pair<CUpgrade *, int>> Modifiers;						/// Modifiers affecting the player, and until which cycle it should last

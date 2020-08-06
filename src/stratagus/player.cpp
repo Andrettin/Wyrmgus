@@ -97,6 +97,7 @@
 #include "upgrade/upgrade_modifier.h"
 #include "util/string_util.h"
 #include "util/vector_util.h"
+#include "util/vector_random_util.h"
 #include "vassalage_type.h"
 #include "video.h"
 #include "world.h"
@@ -784,20 +785,20 @@ void CPlayer::Save(CFile &file) const
 
 	//Wyrmgus start
 	file.printf("\n  \"current-quests\", {");
-	for (size_t j = 0; j < p.CurrentQuests.size(); ++j) {
+	for (size_t j = 0; j < p.current_quests.size(); ++j) {
 		if (j) {
 			file.printf(" ");
 		}
-		file.printf("\"%s\",", p.CurrentQuests[j]->get_identifier().c_str());
+		file.printf("\"%s\",", p.current_quests[j]->get_identifier().c_str());
 	}
 	file.printf("},");
 	
 	file.printf("\n  \"completed-quests\", {");
-	for (size_t j = 0; j < p.CompletedQuests.size(); ++j) {
+	for (size_t j = 0; j < p.completed_quests.size(); ++j) {
 		if (j) {
 			file.printf(" ");
 		}
-		file.printf("\"%s\",", p.CompletedQuests[j]->get_identifier().c_str());
+		file.printf("\"%s\",", p.completed_quests[j]->get_identifier().c_str());
 	}
 	file.printf("},");
 	
@@ -2061,9 +2062,9 @@ void CPlayer::Clear()
 	this->Deities.clear();
 	this->UnitsByType.clear();
 	this->AiActiveUnitsByType.clear();
-	this->AvailableQuests.clear();
-	this->CurrentQuests.clear();
-	this->CompletedQuests.clear();
+	this->available_quests.clear();
+	this->current_quests.clear();
+	this->completed_quests.clear();
 	this->AutosellResources.clear();
 	this->quest_objectives.clear();
 	this->Modifiers.clear();
@@ -2301,9 +2302,9 @@ void CPlayer::update_quest_pool()
 		return;
 	}
 	
-	bool exausted_available_quests = (this->AvailableQuests.size() == 0);
+	const bool exausted_available_quests = this->available_quests.empty();
 	
-	this->AvailableQuests.clear();
+	this->available_quests.clear();
 	
 	std::vector<stratagus::quest *> potential_quests;
 	for (stratagus::quest *quest : stratagus::quest::get_all()) {
@@ -2312,42 +2313,41 @@ void CPlayer::update_quest_pool()
 		}
 	}
 	
-	int max_quest_pool_size = 3 - ((int) this->CurrentQuests.size());
-	for (int i = 0; i < max_quest_pool_size; ++i) { // fill the quest pool with up to three quests
+	for (int i = 0; i < CPlayer::max_quest_pool; ++i) { // fill the quest pool with up to three quests
 		if (potential_quests.size() == 0) {
 			break;
 		}
-		this->AvailableQuests.push_back(potential_quests[SyncRand(potential_quests.size())]);
-		int available_quest_quantity = this->AvailableQuests.size();
-		potential_quests.erase(std::remove(potential_quests.begin(), potential_quests.end(), this->AvailableQuests[available_quest_quantity - 1]), potential_quests.end());
+		stratagus::quest *quest = stratagus::vector::get_random(potential_quests);
+		this->available_quests.push_back(quest);
+		stratagus::vector::remove(potential_quests, quest);
 	}
 	
-	this->available_quests_changed();
+	this->on_available_quests_changed();
 
 	// notify the player when new quests are available (but only if the player has already exausted the quests available to him, so that they aren't bothered if they choose not to engage with the quest system)
-	if (this == CPlayer::GetThisPlayer() && GameCycle >= CYCLES_PER_MINUTE && this->AvailableQuests.size() > 0 && exausted_available_quests && this->NumTownHalls > 0) {
+	if (this == CPlayer::GetThisPlayer() && GameCycle >= CYCLES_PER_MINUTE && this->available_quests.size() > 0 && exausted_available_quests && this->NumTownHalls > 0) {
 		CPlayer::GetThisPlayer()->Notify("%s", _("New quests available"));
 	}
 	
 	if (this->AiEnabled) { // if is an AI player, accept all quests that it can
-		int available_quest_quantity = this->AvailableQuests.size();
+		int available_quest_quantity = this->available_quests.size();
 		for (int i = (available_quest_quantity  - 1); i >= 0; --i) {
-			if (this->can_accept_quest(this->AvailableQuests[i])) { // something may have changed, so recheck if the player is able to accept the quest
-				this->accept_quest(this->AvailableQuests[i]);
+			if (this->can_accept_quest(this->available_quests[i])) { // something may have changed, so recheck if the player is able to accept the quest
+				this->accept_quest(this->available_quests[i]);
 			}
 		}
 	}
 }
 
-void CPlayer::available_quests_changed()
+void CPlayer::on_available_quests_changed()
 {
 	if (this == CPlayer::GetThisPlayer()) {
 		for (stratagus::button *button : stratagus::button::get_all()) {
-			if (button->Action != ButtonCmd::Quest || button->Value >= (int) this->AvailableQuests.size()) {
+			if (button->Action != ButtonCmd::Quest || button->Value >= static_cast<int>(this->available_quests.size())) {
 				continue;
 			}
 			
-			const stratagus::quest *quest = this->AvailableQuests[button->Value];
+			const stratagus::quest *quest = this->available_quests[button->Value];
 			button->Hint = "Quest: " + quest->get_name();
 			button->Description = quest->get_description() + "\n \nObjectives:";
 			for (const auto &objective : quest->get_objectives()) {
@@ -2404,12 +2404,13 @@ void CPlayer::update_current_quests()
 		}
 	}
 	
-	for (int i = (this->CurrentQuests.size()  - 1); i >= 0; --i) {
-		std::string failed_quest = this->has_failed_quest(this->CurrentQuests[i]);
-		if (!failed_quest.empty()) {
-			this->fail_quest(this->CurrentQuests[i], failed_quest);
-		} else if (this->has_completed_quest(this->CurrentQuests[i])) {
-			this->complete_quest(this->CurrentQuests[i]);
+	for (int i = (this->current_quests.size()  - 1); i >= 0; --i) {
+		stratagus::quest *quest = this->current_quests[i];
+		const std::string quest_failure_text = this->check_quest_failure(quest);
+		if (!quest_failure_text.empty()) {
+			this->fail_quest(quest, quest_failure_text);
+		} else if (this->check_quest_completion(quest)) {
+			this->complete_quest(quest);
 		}
 	}
 }
@@ -2420,8 +2421,8 @@ void CPlayer::accept_quest(stratagus::quest *quest)
 		return;
 	}
 	
-	stratagus::vector::remove(this->AvailableQuests, quest);
-	this->CurrentQuests.push_back(quest);
+	stratagus::vector::remove(this->available_quests, quest);
+	this->current_quests.push_back(quest);
 	
 	for (const auto &quest_objective : quest->get_objectives()) {
 		auto objective = std::make_unique<stratagus::player_quest_objective>(quest_objective.get());
@@ -2439,20 +2440,20 @@ void CPlayer::accept_quest(stratagus::quest *quest)
 		quest->get_accept_effects()->do_effects(this);
 	}
 
-	this->available_quests_changed();
+	this->on_available_quests_changed();
 	
 	this->update_current_quests();
 }
 
 void CPlayer::complete_quest(stratagus::quest *quest)
 {
-	if (stratagus::vector::contains(this->CompletedQuests, quest)) {
+	if (stratagus::vector::contains(this->completed_quests, quest)) {
 		return;
 	}
 	
 	this->remove_current_quest(quest);
 	
-	this->CompletedQuests.push_back(quest);
+	this->completed_quests.push_back(quest);
 	if (quest->Competitive) {
 		quest->CurrentCompleted = true;
 	}
@@ -2510,7 +2511,7 @@ void CPlayer::fail_quest(stratagus::quest *quest, const std::string &fail_reason
 
 void CPlayer::remove_current_quest(stratagus::quest *quest)
 {
-	stratagus::vector::remove(this->CurrentQuests, quest);
+	stratagus::vector::remove(this->current_quests, quest);
 	
 	for (int i = (this->quest_objectives.size()  - 1); i >= 0; --i) {
 		if (this->quest_objectives[i]->get_quest_objective()->get_quest() == quest) {
@@ -2519,13 +2520,13 @@ void CPlayer::remove_current_quest(stratagus::quest *quest)
 	}
 }
 
-bool CPlayer::can_accept_quest(const stratagus::quest *quest)
+bool CPlayer::can_accept_quest(const stratagus::quest *quest) const
 {
 	if (quest->Hidden || quest->CurrentCompleted || quest->is_unobtainable()) {
 		return false;
 	}
 	
-	if (stratagus::vector::contains(this->CurrentQuests, quest) || stratagus::vector::contains(this->CompletedQuests, quest)) {
+	if (stratagus::vector::contains(this->current_quests, quest) || stratagus::vector::contains(this->completed_quests, quest)) {
 		return false;
 	}
 
@@ -2663,7 +2664,7 @@ bool CPlayer::can_accept_quest(const stratagus::quest *quest)
 	}
 }
 
-bool CPlayer::has_completed_quest(const stratagus::quest *quest)
+bool CPlayer::check_quest_completion(const stratagus::quest *quest) const
 {
 	if (quest->is_uncompleteable()) {
 		return false;
@@ -2682,7 +2683,8 @@ bool CPlayer::has_completed_quest(const stratagus::quest *quest)
 	return true;
 }
 
-std::string CPlayer::has_failed_quest(const stratagus::quest *quest) // returns the reason for failure (empty if none)
+//returns the reason for failure (empty if none)
+std::string CPlayer::check_quest_failure(const stratagus::quest *quest) const
 {
 	for (size_t i = 0; i < quest->HeroesMustSurvive.size(); ++i) { // put it here, because "unfailable" quests should also fail when a hero which should survive dies
 		if (!this->HasHero(quest->HeroesMustSurvive[i])) {
@@ -2821,6 +2823,16 @@ std::string CPlayer::has_failed_quest(const stratagus::quest *quest) // returns 
 	}
 	
 	return "";
+}
+
+bool CPlayer::has_quest(const stratagus::quest *quest) const
+{
+	return stratagus::vector::contains(this->current_quests, quest);
+}
+
+bool CPlayer::is_quest_completed(const stratagus::quest *quest) const
+{
+	return stratagus::vector::contains(this->completed_quests, quest);
 }
 
 void CPlayer::AddModifier(CUpgrade *modifier, int cycles)

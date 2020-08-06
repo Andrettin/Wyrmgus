@@ -1419,9 +1419,7 @@ void MessagesDisplay::DrawMessages()
 				}
 			}
 			
-			for (size_t i = 0; i < CPlayer::GetThisPlayer()->CurrentQuests.size(); ++i) {
-				const stratagus::quest *quest = CPlayer::GetThisPlayer()->CurrentQuests[i];
-
+			for (const stratagus::quest *quest : CPlayer::GetThisPlayer()->get_current_quests()) {
 				if (z == 0) {
 					PushClipping();
 					SetClipping(UI.MapArea.X + 8 * scale_factor, UI.MapArea.Y + 8 * scale_factor, Video.Width - 1, Video.Height - 1);

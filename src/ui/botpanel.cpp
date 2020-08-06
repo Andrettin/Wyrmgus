@@ -1406,7 +1406,7 @@ bool IsButtonAllowed(const CUnit &unit, const stratagus::button &buttonaction)
 			res = CPlayer::GetThisPlayer()->Faction != -1 && buttonaction.Value != -1 && buttonaction.Value < (int) stratagus::faction::get_all()[CPlayer::GetThisPlayer()->Faction]->DevelopsTo.size() && CPlayer::GetThisPlayer()->CanFoundFaction(stratagus::faction::get_all()[CPlayer::GetThisPlayer()->Faction]->DevelopsTo[buttonaction.Value], true);
 			break;
 		case ButtonCmd::Quest:
-			res = buttonaction.Value < (int) unit.Player->AvailableQuests.size() && unit.Player->can_accept_quest(unit.Player->AvailableQuests[buttonaction.Value]);
+			res = buttonaction.Value < static_cast<int>(unit.Player->get_available_quests().size()) && unit.Player->can_accept_quest(unit.Player->get_available_quests().at(buttonaction.Value));
 			break;
 		case ButtonCmd::Buy:
 			res = (buttonaction.Value != -1) && (&UnitManager.GetSlotUnit(buttonaction.Value) != nullptr);
@@ -2217,7 +2217,7 @@ void CButtonPanel::DoClicked_Faction(int button)
 void CButtonPanel::DoClicked_Quest(int button)
 {
 	const int index = CurrentButtons[button]->Value;
-	SendCommandQuest(*Selected[0], Selected[0]->Player->AvailableQuests[index]);
+	SendCommandQuest(*Selected[0], Selected[0]->Player->get_available_quests().at(index));
 	ButtonUnderCursor = -1;
 	OldButtonUnderCursor = -1;
 	LastDrawnButtonPopup = nullptr;
