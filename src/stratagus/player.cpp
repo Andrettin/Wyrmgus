@@ -2648,8 +2648,8 @@ bool CPlayer::can_accept_quest(const stratagus::quest *quest) const
 		return false;
 	}
 	
-	for (size_t i = 0; i < quest->HeroesMustSurvive.size(); ++i) {
-		if (!this->HasHero(quest->HeroesMustSurvive[i])) {
+	for (const stratagus::character *hero : quest->HeroesMustSurvive) {
+		if (!this->HasHero(hero)) {
 			return false;
 		}
 	}
