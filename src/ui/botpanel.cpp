@@ -1711,6 +1711,9 @@ static void UpdateButtonPanelSingleUnit(const CUnit &unit, const std::vector<std
 		// Trick 17 to get the cancel-upgrade button
 		strcpy_s(unit_ident, sizeof(unit_ident), ",cancel-upgrade,");
 	} else if (unit.CurrentAction() == UnitAction::Research) {
+		if (CurrentButtonLevel != nullptr) {
+			CurrentButtonLevel = nullptr;
+		}
 		// Trick 17 to get the cancel-upgrade button
 		strcpy_s(unit_ident, sizeof(unit_ident), ",cancel-upgrade,");
 	} else {
