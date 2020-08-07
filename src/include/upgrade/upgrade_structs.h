@@ -50,6 +50,7 @@ namespace stratagus {
 	class civilization;
 	class condition;
 	class deity_domain;
+	class dynasty;
 	class icon;
 	class unit_type;
 	class upgrade_class;
@@ -225,6 +226,13 @@ public:
 		return this->conditions;
 	}
 
+	const stratagus::dynasty *get_dynasty() const
+	{
+		return this->dynasty;
+	}
+
+	void set_dynasty(const stratagus::dynasty *dynasty);
+
 private:
 	stratagus::upgrade_class *upgrade_class = nullptr; //upgrade class (e.g. siege weapon projectile I)
 	stratagus::civilization *civilization = nullptr; //which civilization this upgrade belongs to, if any
@@ -274,6 +282,7 @@ public:
 private:
 	std::unique_ptr<stratagus::condition> preconditions;
 	std::unique_ptr<stratagus::condition> conditions;
+	const stratagus::dynasty *dynasty = nullptr; //the dynasty to which the upgrade pertains, if this is a dynasty upgrade
 
 	friend int CclDefineUpgrade(lua_State *l);
 	friend int CclDefineDependency(lua_State *l);

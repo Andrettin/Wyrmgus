@@ -61,6 +61,7 @@ public:
 	~dynasty();
 
 	virtual void process_sml_scope(const sml_data &scope) override;
+	virtual void initialize() override;
 
 	int get_index() const
 	{

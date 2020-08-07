@@ -277,7 +277,6 @@ private:
 	void DoClicked_CallbackAction(int button);
 	void DoClicked_LearnAbility(int button);
 	void DoClicked_Faction(int button);
-	void DoClicked_Dynasty(int button);
 	void DoClicked_Quest(int button);
 	void DoClicked_Buy(int button);
 	void DoClicked_ProduceResource(int button);

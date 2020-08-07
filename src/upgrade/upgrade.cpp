@@ -41,6 +41,7 @@
 #include "civilization.h"
 #include "commands.h"
 #include "config.h"
+#include "dynasty.h"
 //Wyrmgus start
 #include "editor.h"
 //Wyrmgus end
@@ -451,6 +452,11 @@ void CUpgrade::add_modifier(std::unique_ptr<stratagus::upgrade_modifier> &&modif
 	this->modifiers.push_back(std::move(modifier));
 }
 
+void CUpgrade::set_dynasty(const stratagus::dynasty *dynasty)
+{
+	this->dynasty = dynasty;
+	this->icon = dynasty->get_icon();
+}
 
 /**
 **  Save state of the upgrade to file.
@@ -2171,6 +2177,10 @@ void UpgradeAcquire(CPlayer &player, const CUpgrade *upgrade)
 		}
 	}
 	//Wyrmgus end
+
+	if (upgrade->get_dynasty() != nullptr && player.get_dynasty() != upgrade->get_dynasty()) {
+		player.set_dynasty(upgrade->get_dynasty());
+	}
 	
 	for (const auto &modifier : upgrade->get_modifiers()) {
 		ApplyUpgradeModifier(player, modifier.get());

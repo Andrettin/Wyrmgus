@@ -60,6 +60,13 @@ void dynasty::process_sml_scope(const sml_data &scope)
 	}
 }
 
+void dynasty::initialize()
+{
+	if (this->get_upgrade() != nullptr) {
+		this->get_upgrade()->set_dynasty(this);
+	}
+}
+
 QVariantList dynasty::get_factions_qvariant_list() const
 {
 	return container::to_qvariant_list(this->get_factions());

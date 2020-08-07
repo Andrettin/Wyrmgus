@@ -27,10 +27,6 @@
 //      02111-1307, USA.
 //
 
-/*----------------------------------------------------------------------------
---  Includes
-----------------------------------------------------------------------------*/
-
 #include "stratagus.h"
 
 #include "action/action_research.h"
@@ -51,10 +47,6 @@
 
 /// How many resources the player gets back if canceling research
 static constexpr int CancelResearchCostsFactor = 100;
-
-/*----------------------------------------------------------------------------
---  Functions
-----------------------------------------------------------------------------*/
 
 COrder *COrder::NewActionResearch(CUnit &unit, const CUpgrade &upgrade, int player)
 {

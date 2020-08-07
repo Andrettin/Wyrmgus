@@ -806,6 +806,9 @@ void DrawPopup(const stratagus::button &button, int x, int y, bool above)
 				upgrade = Selected[0]->Player->get_faction()->get_class_upgrade(upgrade_class);
 			}
 			break;
+		case ButtonCmd::Dynasty:
+			upgrade = CPlayer::GetThisPlayer()->get_faction()->get_dynasties()[button.Value]->get_upgrade();
+			break;
 		default:
 			break;
 	}
@@ -815,6 +818,7 @@ void DrawPopup(const stratagus::button &button, int x, int y, bool above)
 	switch (button.Action) {
 		case ButtonCmd::Research:
 		case ButtonCmd::ResearchClass:
+		case ButtonCmd::Dynasty:
 			CPlayer::GetThisPlayer()->GetUpgradeCosts(upgrade, Costs);
 			break;
 		case ButtonCmd::SpellCast:
@@ -1420,6 +1424,10 @@ bool IsButtonAllowed(const CUnit &unit, const stratagus::button &buttonaction)
 			break;
 		case ButtonCmd::Dynasty:
 			res = CPlayer::GetThisPlayer()->get_faction() != nullptr && buttonaction.Value != -1 && buttonaction.Value < static_cast<int>(CPlayer::GetThisPlayer()->get_faction()->get_dynasties().size()) && CPlayer::GetThisPlayer()->can_choose_dynasty(CPlayer::GetThisPlayer()->get_faction()->get_dynasties()[buttonaction.Value], true) && CPlayer::GetThisPlayer()->get_faction()->get_dynasties()[buttonaction.Value]->get_icon() != nullptr;
+			if (res) {
+				upgrade = CPlayer::GetThisPlayer()->get_faction()->get_dynasties()[buttonaction.Value]->get_upgrade();
+				res = (!unit.Player->UpgradeTimers.Upgrades[upgrade->ID] || unit.Player->UpgradeTimers.Upgrades[upgrade->ID] == upgrade->Costs[TimeCost]);
+			}
 			break;
 		case ButtonCmd::Quest:
 			res = buttonaction.Value < static_cast<int>(unit.Player->get_available_quests().size()) && unit.Player->can_accept_quest(unit.Player->get_available_quests().at(buttonaction.Value));
@@ -1738,7 +1746,7 @@ static void UpdateButtonPanelSingleUnit(const CUnit &unit, const std::vector<std
 
 		// Special case for researches
 		int researchCheck = true;
-		if (button->is_always_shown() && !allow && (button->Action == ButtonCmd::Research || button->Action == ButtonCmd::ResearchClass)) {
+		if (button->is_always_shown() && !allow && (button->Action == ButtonCmd::Research || button->Action == ButtonCmd::ResearchClass || button->Action == ButtonCmd::Dynasty)) {
 			const CUpgrade *upgrade = nullptr;
 
 			switch (button->Action) {
@@ -1749,6 +1757,9 @@ static void UpdateButtonPanelSingleUnit(const CUnit &unit, const std::vector<std
 					if (Selected[0]->Player->get_faction() != nullptr) {
 						upgrade = Selected[0]->Player->get_faction()->get_class_upgrade(stratagus::upgrade_class::get_all()[button->Value]);
 					}
+					break;
+				case ButtonCmd::Dynasty:
+					upgrade = CPlayer::GetThisPlayer()->get_faction()->get_dynasties()[button->Value]->get_upgrade();
 					break;
 			}
 
@@ -2207,7 +2218,7 @@ void CButtonPanel::DoClicked_ExperienceUpgradeTo(int button)
 void CButtonPanel::DoClicked_Research(const std::unique_ptr<stratagus::button> &button)
 {
 	const CUpgrade *button_upgrade = button->get_value_upgrade(Selected[0]);
-	//Wyrmgus start
+
 	int upgrade_costs[MaxCosts];
 	CPlayer::GetThisPlayer()->GetUpgradeCosts(button_upgrade, upgrade_costs);
 	if (!CPlayer::GetThisPlayer()->CheckCosts(upgrade_costs)) {
@@ -2240,18 +2251,6 @@ void CButtonPanel::DoClicked_Faction(int button)
 {
 	const int index = CurrentButtons[button]->Value;
 	SendCommandSetFaction(CPlayer::GetThisPlayer()->Index, stratagus::faction::get_all()[CPlayer::GetThisPlayer()->Faction]->DevelopsTo[index]->ID);
-	ButtonUnderCursor = -1;
-	OldButtonUnderCursor = -1;
-	LastDrawnButtonPopup = nullptr;
-	if (Selected[0]->Player == CPlayer::GetThisPlayer()) {
-		SelectedUnitChanged();
-	}
-}
-
-void CButtonPanel::DoClicked_Dynasty(int button)
-{
-	const int index = CurrentButtons[button]->Value;
-	SendCommandSetDynasty(CPlayer::GetThisPlayer(), CPlayer::GetThisPlayer()->get_faction()->get_dynasties()[index]);
 	ButtonUnderCursor = -1;
 	OldButtonUnderCursor = -1;
 	LastDrawnButtonPopup = nullptr;
@@ -2458,6 +2457,7 @@ void CButtonPanel::DoClicked(int button)
 		case ButtonCmd::UpgradeTo: { DoClicked_UpgradeTo(button); break; }
 		case ButtonCmd::Research:
 		case ButtonCmd::ResearchClass:
+		case ButtonCmd::Dynasty:
 			DoClicked_Research(CurrentButtons[button]);
 			break;
 		case ButtonCmd::CallbackAction: { DoClicked_CallbackAction(button); break; }
@@ -2465,7 +2465,6 @@ void CButtonPanel::DoClicked(int button)
 		case ButtonCmd::LearnAbility: { DoClicked_LearnAbility(button); break; }
 		case ButtonCmd::ExperienceUpgradeTo: { DoClicked_ExperienceUpgradeTo(button); break; }
 		case ButtonCmd::Faction: { DoClicked_Faction(button); break; }
-		case ButtonCmd::Dynasty: { DoClicked_Dynasty(button); break; }
 		case ButtonCmd::Quest: { DoClicked_Quest(button); break; }
 		case ButtonCmd::Buy: { DoClicked_Buy(button); break; }
 		case ButtonCmd::ProduceResource: { DoClicked_ProduceResource(button); break; }
