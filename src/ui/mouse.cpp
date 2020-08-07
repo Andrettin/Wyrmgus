@@ -2399,11 +2399,12 @@ static void UIHandleButtonDown_OnMinimap(unsigned button)
 		}
 	} else if (MouseButtons & RightButton) {
 		if (!GameObserve && !GamePaused && !GameEstablishing) {
-			const PixelPos mapPixelPos = CMap::Map.tile_pos_to_map_pixel_pos_center(cursor_tile_pos);
 			if (!ClickMissile.empty()) {
-				MakeLocalMissile(*stratagus::missile_type::get(ClickMissile), mapPixelPos, mapPixelPos, UI.CurrentMapLayer->ID);
+				const PixelPos map_pixel_pos = CMap::Map.tile_pos_to_map_pixel_pos_center(cursor_tile_pos);
+				MakeLocalMissile(*stratagus::missile_type::get(ClickMissile), map_pixel_pos, map_pixel_pos, UI.CurrentMapLayer->ID);
 			}
-			DoRightButton(mapPixelPos);
+			const PixelPos scaled_map_pixel_pos = CMap::Map.tile_pos_to_scaled_map_pixel_pos_center(cursor_tile_pos);
+			DoRightButton(scaled_map_pixel_pos);
 		}
 	}
 }
