@@ -30,6 +30,7 @@
 #include "ui/button.h"
 
 #include "config.h"
+#include "dynasty.h"
 #include "faction.h"
 #include "script/trigger.h"
 #include "spells.h"
@@ -389,19 +390,19 @@ const unit_type *button::get_value_unit_type(const CUnit *unit) const
 
 const CUpgrade *button::get_value_upgrade(const CUnit *unit) const
 {
-	const upgrade_class *upgrade_class = nullptr;
-	const CUpgrade *upgrade = nullptr;
-
 	switch (this->Action) {
 		case ButtonCmd::Research:
 		case ButtonCmd::LearnAbility:
 			return CUpgrade::get_all()[this->Value];
-		case ButtonCmd::ResearchClass:
-			upgrade_class = upgrade_class::get_all()[this->Value];
+		case ButtonCmd::ResearchClass: {
+			const upgrade_class *upgrade_class = upgrade_class::get_all()[this->Value];
 			if (unit->Player->get_faction() != nullptr) {
 				return unit->Player->get_faction()->get_class_upgrade(upgrade_class);
 			}
 			break;
+		}
+		case ButtonCmd::Dynasty:
+			return CPlayer::GetThisPlayer()->get_faction()->get_dynasties()[this->Value]->get_upgrade();
 	}
 
 	return nullptr;
@@ -430,10 +431,14 @@ void button::SetTriggerData() const
 			TriggerData.Unit = &UnitManager.GetSlotUnit(this->Value);
 			break;
 		case ButtonCmd::Faction:
-			TriggerData.Faction = faction::get_all()[CPlayer::GetThisPlayer()->Faction]->DevelopsTo[this->Value];
-			if (!faction::get_all()[CPlayer::GetThisPlayer()->Faction]->DevelopsTo[this->Value]->FactionUpgrade.empty()) {
+			TriggerData.faction = CPlayer::GetThisPlayer()->get_faction()->DevelopsTo[this->Value];
+			if (!TriggerData.faction->FactionUpgrade.empty()) {
 				TriggerData.Upgrade = CUpgrade::try_get(faction::get_all()[CPlayer::GetThisPlayer()->Faction]->DevelopsTo[this->Value]->FactionUpgrade);
 			}
+			break;
+		case ButtonCmd::Dynasty:
+			TriggerData.dynasty = CPlayer::GetThisPlayer()->get_faction()->get_dynasties()[this->Value];
+			TriggerData.Upgrade = TriggerData.dynasty->get_upgrade();
 			break;
 		case ButtonCmd::Player:
 			TriggerData.player = CPlayer::Players.at(this->Value);
@@ -450,7 +455,8 @@ void button::CleanTriggerData() const
 	TriggerData.Unit = nullptr;
 	TriggerData.Upgrade = nullptr;
 	TriggerData.Resource = nullptr;
-	TriggerData.Faction = nullptr;
+	TriggerData.faction = nullptr;
+	TriggerData.dynasty = nullptr;
 	TriggerData.player = nullptr;
 }
 
@@ -642,6 +648,8 @@ std::string GetButtonActionNameById(const ButtonCmd button_action)
 			return "rally_point";
 		case ButtonCmd::Faction:
 			return "faction";
+		case ButtonCmd::Dynasty:
+			return "dynasty";
 		case ButtonCmd::Quest:
 			return "quest";
 		case ButtonCmd::Buy:
@@ -721,6 +729,8 @@ ButtonCmd GetButtonActionIdByName(const std::string &button_action)
 		return ButtonCmd::RallyPoint;
 	} else if (button_action == "faction") {
 		return ButtonCmd::Faction;
+	} else if (button_action == "dynasty") {
+		return ButtonCmd::Dynasty;
 	} else if (button_action == "quest") {
 		return ButtonCmd::Quest;
 	} else if (button_action == "buy") {

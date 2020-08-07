@@ -575,13 +575,13 @@ static int **Str2ResourceRef(lua_State *l, const char *s)
 **
 **  @todo better check for error (restrict param).
 */
-static stratagus::faction **Str2FactionRef(lua_State *l, const char *s)
+static const stratagus::faction **Str2FactionRef(lua_State *l, const char *s)
 {
-	stratagus::faction **res = nullptr; // Result.
+	const stratagus::faction **res = nullptr; // Result.
 
 	Assert(l);
 	if (!strcmp(s, "Faction")) {
-		res = &TriggerData.Faction;
+		res = &TriggerData.faction;
 	} else {
 		LuaError(l, "Invalid type reference '%s'\n" _C_ s);
 	}
@@ -694,9 +694,9 @@ int **CclParseResourceDesc(lua_State *l)
 **
 **  @return   faction reference definition.
 */
-stratagus::faction **CclParseFactionDesc(lua_State *l)
+const stratagus::faction **CclParseFactionDesc(lua_State *l)
 {
-	stratagus::faction **res = nullptr;
+	const stratagus::faction **res = nullptr;
 
 	if (lua_isstring(l, -1)) {
 		res = Str2FactionRef(l, LuaToString(l, -1));
@@ -1533,7 +1533,7 @@ std::string EvalString(const StringDesc *s)
 	const stratagus::unit_type **type;	// Temporary unit type
 	const CUpgrade **upgrade;	// Temporary upgrade
 	int **resource;		// Temporary resource
-	stratagus::faction **faction;	// Temporary faction
+	const stratagus::faction **faction;	// Temporary faction
 	//Wyrmgus end
 	int player_index;
 

@@ -8,9 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name commands.h - The commands header file. */
-//
-//      (c) Copyright 1998-2006 by Lutz Sammer and Jimmy Salmon
+//      (c) Copyright 1998-2020 by Lutz Sammer, Jimmy Salmon and Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -31,15 +29,13 @@
 
 #include "vec2i.h"
 
-/*----------------------------------------------------------------------------
---  Declarations
-----------------------------------------------------------------------------*/
-
-class CUnit;
 class CFile;
+class CPlayer;
+class CUnit;
 class CUpgrade;
 
 namespace stratagus {
+	class dynasty;
 	class quest;
 	class site;
 	class spell;
@@ -281,9 +277,8 @@ extern void SendCommandAutoSpellCast(CUnit &unit, const stratagus::spell *spell,
 extern void SendCommandDiplomacy(const int player, const stratagus::diplomacy_state state, const int opponent);
 /// Send shared vision command
 extern void SendCommandSharedVision(int player, bool state, int opponent);
-//Wyrmgus start
 extern void SendCommandSetFaction(int player, int faction);
-//Wyrmgus end
+extern void SendCommandSetDynasty(CPlayer *player, const stratagus::dynasty *dynasty);
 extern void SendCommandAutosellResource(int player, int resource);
 
 /// Execute a command (from network).

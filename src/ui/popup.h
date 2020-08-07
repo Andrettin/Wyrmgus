@@ -58,7 +58,7 @@ public:
 	PopupConditionPanel() :  HasHint(false), HasDescription(false),
 		//Wyrmgus start
 		Class(false), Description(false), Quote(false), Encyclopedia(false), CanActiveHarvest(false),
-		Opponent(0), Neutral(0), AutoCast(0), Equipped(0), Equippable(0), Consumable(0), Affixed(0), Spell(0), CanUse(0), Work(0), ReadWork(0), Elixir(0), ConsumedElixir(0), Unique(0), UniqueSet(0), Bound(0), Identified(0), Weapon(0), Shield(0), Boots(0), Arrows(0), Regeneration(0), FactionUpgrade(0), FactionCoreSettlements(0), Ability(0), ImproveIncomes(0), LuxuryResource(0), RequirementsString(0), ExperienceRequirementsString(0), BuildingRulesString(0),
+		Opponent(0), Neutral(0), AutoCast(0), Equipped(0), Equippable(0), Consumable(0), Affixed(0), Spell(0), CanUse(0), Work(0), ReadWork(0), Elixir(0), ConsumedElixir(0), Unique(0), UniqueSet(0), Bound(0), Identified(0), Weapon(0), Shield(0), Boots(0), Arrows(0), Regeneration(0), FactionCoreSettlements(0), Ability(0), ImproveIncomes(0), LuxuryResource(0), RequirementsString(0), ExperienceRequirementsString(0), BuildingRulesString(0),
 //		BoolFlags(nullptr), Variables(nullptr) {}
 		item_class(stratagus::item_class::none), CanStore(-1), ImproveIncome(-1), BoolFlags(nullptr), Variables(nullptr) {}
 		//Wyrmgus end
@@ -115,9 +115,10 @@ public:
 	char Boots;					/// check if button's item are boots
 	char Arrows;				/// check if button's item are arrows
 	char Regeneration;			/// check if button's item has regeneration
-	char FactionUpgrade;		/// check if the button's upgrade is a faction upgrade
-	char FactionCoreSettlements;	/// check if the button's faction has core settlements
-	char UpgradeResearched = 0;		/// check if the button's upgrade has already been researched
+	char FactionUpgrade = 0;	/// check if the button's upgrade is a faction upgrade
+	char FactionCoreSettlements; /// check if the button's faction has core settlements
+	char DynastyUpgrade = 0;	/// check if the button's upgrade is a dynasty upgrade
+	char UpgradeResearched = 0;	/// check if the button's upgrade has already been researched
 	char Ability;				/// check if the button's upgrade is an ability
 	char ChildResources = 0;	/// check if the button's resource has child resources
 	char ImproveIncomes;		/// check if the button's unit type has processing bonuses for any resource

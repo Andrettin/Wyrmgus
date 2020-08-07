@@ -716,6 +716,8 @@ static PopupConditionPanel *ParsePopupConditions(lua_State *l)
 			condition->Regeneration = Ccl2Condition(l, LuaToString(l, -1));
 		} else if (!strcmp(key, "FactionUpgrade")) {
 			condition->FactionUpgrade = Ccl2Condition(l, LuaToString(l, -1));
+		} else if (!strcmp(key, "DynastyUpgrade")) {
+			condition->DynastyUpgrade = Ccl2Condition(l, LuaToString(l, -1));
 		} else if (!strcmp(key, "FactionCoreSettlements")) {
 			condition->FactionCoreSettlements = Ccl2Condition(l, LuaToString(l, -1));
 		} else if (!strcmp(key, "ResearchedUpgrade")) {

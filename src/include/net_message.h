@@ -333,12 +333,10 @@ enum _message_type_ {
 */
 enum _extended_message_type_ {
 	ExtendedMessageDiplomacy,     /// Change diplomacy
-	//Wyrmgus start
-//	ExtendedMessageSharedVision   /// Change shared vision
 	ExtendedMessageSharedVision,  /// Change shared vision
 	ExtendedMessageSetFaction,	  /// Change faction
+	ExtendedMessageSetDynasty,	  /// Change dynasty
 	ExtendedMessageAutosellResource	  /// Autosell resource
-	//Wyrmgus end
 };
 
 /**

@@ -320,7 +320,7 @@ struct StringDesc {
 		//Wyrmgus start
 		const stratagus::unit_type **Type;     /// Which unit type.
 		const CUpgrade **Upgrade;         /// Which upgrade.
-		stratagus::faction **Faction;			/// Which faction.
+		const stratagus::faction **Faction;			/// Which faction.
 		int **Resource;				/// Which resource
 		//Wyrmgus end
 		struct {
@@ -414,7 +414,7 @@ extern const stratagus::unit_type **CclParseTypeDesc(lua_State *l);   /// Parse 
 //Wyrmgus start
 extern const CUpgrade **CclParseUpgradeDesc(lua_State *l);   /// Parse an upgrade description.
 extern int **CclParseResourceDesc(lua_State *l);   /// Parse a resource description.
-extern stratagus::faction **CclParseFactionDesc(lua_State *l);   /// Parse a faction description.
+extern const stratagus::faction **CclParseFactionDesc(lua_State *l);   /// Parse a faction description.
 //Wyrmgus end
 extern const CPlayer **CclParsePlayerDesc(lua_State *l);   /// Parse a faction description.
 StringDesc *CclParseStringDesc(lua_State *l);        /// Parse a string description.

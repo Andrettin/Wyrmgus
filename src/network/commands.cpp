@@ -33,6 +33,7 @@
 
 #include "actions.h"
 #include "diplomacy_state.h"
+#include "dynasty.h"
 #include "faction.h"
 //Wyrmgus start
 #include "map/map.h" //it contains map width and height
@@ -751,13 +752,6 @@ void SendCommandSharedVision(int player, bool state, int opponent)
 	}
 }
 
-//Wyrmgus start
-/**
-** Send command: Faction changed.
-**
-** @param player     Player which changes his faction.
-** @param faction    New faction.
-*/
 void SendCommandSetFaction(int player, int faction)
 {
 	if (!IsNetworkGame()) {
@@ -771,7 +765,16 @@ void SendCommandSetFaction(int player, int faction)
 		NetworkSendExtendedCommand(ExtendedMessageSetFaction, -1, player, faction, 0, 0);
 	}
 }
-//Wyrmgus end
+
+void SendCommandSetDynasty(CPlayer *player, const stratagus::dynasty *dynasty)
+{
+	if (!IsNetworkGame()) {
+		//FIXME: should add log of dynasty change here
+		player->set_dynasty(dynasty);
+	} else {
+		NetworkSendExtendedCommand(ExtendedMessageSetDynasty, -1, player->Index, dynasty ? dynasty->get_index() : -1, 0, 0);
+	}
+}
 
 /**
 ** Send command: Toggle resource autosell.
@@ -1126,17 +1129,24 @@ void ExecExtendedCommand(unsigned char type, int status,
 			}
 			CommandSharedVision(arg2, arg3 ? true : false, arg4);
 			break;
-		//Wyrmgus start
 		case ExtendedMessageSetFaction: {
 			//FIXME: should add log for faction change here
 			CPlayer::Players[arg2]->SetFaction(stratagus::faction::get_all()[arg3]);
+			break;
+		}
+		case ExtendedMessageSetDynasty: {
+			//FIXME: should add log for faction change here
+			const stratagus::dynasty *dynasty = nullptr;
+			if (arg3 != -1) {
+				dynasty = stratagus::dynasty::get_all()[arg3];
+			}
+			CPlayer::Players[arg2]->set_dynasty(dynasty);
 			break;
 		}
 		case ExtendedMessageAutosellResource: {
 			CPlayer::Players[arg2]->AutosellResource(arg3);
 			break;
 		}
-		//Wyrmgus end
 		default:
 			DebugPrint("Unknown extended message %u/%s %u %u %u %u\n" _C_
 					   type _C_ status ? "flush" : "-" _C_

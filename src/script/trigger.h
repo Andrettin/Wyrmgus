@@ -39,6 +39,7 @@ struct lua_State;
 
 namespace stratagus {
 	class condition;
+	class dynasty;
 	class effect;
 	class effect_list;
 	class faction;
@@ -149,17 +150,12 @@ struct TriggerDataType {
 	CUnit *Unit;	  /// Unit used in trigger
 	//Wyrmgus end
 	const stratagus::unit_type *Type;  /// Type used in trigger;
-	//Wyrmgus start
 	const CUpgrade *Upgrade; /// Upgrade used in trigger
 	int *Resource;		/// Resource used in trigger
-	stratagus::faction *Faction; /// Faction used in trigger
-	//Wyrmgus end
+	const stratagus::faction *faction; /// Faction used in trigger
+	const stratagus::dynasty *dynasty; /// Dynasty used in trigger
 	const CPlayer *player = nullptr;
 };
-
-/*----------------------------------------------------------------------------
---  Variables
-----------------------------------------------------------------------------*/
 
 extern CTimer GameTimer; /// the game timer
 

@@ -46,6 +46,7 @@
 #include "civilization.h"
 #include "commands.h"
 #include "database/defines.h"
+#include "dynasty.h"
 #include "faction.h"
 #include "font.h"
 #include "game.h"
@@ -385,6 +386,12 @@ static bool CanShowPopupContent(const PopupConditionPanel *condition,
 		}
 	}
 	
+	if (condition->DynastyUpgrade != CONDITION_TRUE) {
+		if ((condition->DynastyUpgrade == CONDITION_ONLY) ^ (button.Action == ButtonCmd::Dynasty)) {
+			return false;
+		}
+	}
+	
 	if (condition->FactionCoreSettlements != CONDITION_TRUE) {
 		if ((condition->FactionCoreSettlements == CONDITION_ONLY) ^ (stratagus::game::get()->get_current_campaign() != nullptr && button.Action == ButtonCmd::Faction && button.Value != -1 && stratagus::faction::get_all()[CPlayer::GetThisPlayer()->Faction]->DevelopsTo[button.Value]->Cores.size() > 0)) {
 			return false;
@@ -394,12 +401,14 @@ static bool CanShowPopupContent(const PopupConditionPanel *condition,
 	const CUpgrade *upgrade = nullptr;
 	if (button.Action == ButtonCmd::Research || button.Action == ButtonCmd::ResearchClass || button.Action == ButtonCmd::LearnAbility) {
 		upgrade = button.get_value_upgrade(Selected[0]);
-	} else if (button.Action == ButtonCmd::Faction && !stratagus::faction::get_all()[CPlayer::GetThisPlayer()->Faction]->DevelopsTo[button.Value]->FactionUpgrade.empty()) {
-		upgrade = CUpgrade::get(stratagus::faction::get_all()[CPlayer::GetThisPlayer()->Faction]->DevelopsTo[button.Value]->FactionUpgrade);
+	} else if (button.Action == ButtonCmd::Faction && !CPlayer::GetThisPlayer()->get_faction()->DevelopsTo[button.Value]->FactionUpgrade.empty()) {
+		upgrade = CUpgrade::get(CPlayer::GetThisPlayer()->get_faction()->DevelopsTo[button.Value]->FactionUpgrade);
+	} else if (button.Action == ButtonCmd::Dynasty && CPlayer::GetThisPlayer()->get_faction()->get_dynasties()[button.Value]->get_upgrade() != nullptr) {
+		upgrade = CPlayer::GetThisPlayer()->get_faction()->get_dynasties()[button.Value]->get_upgrade();
 	}
 	
 	if (condition->UpgradeResearched != CONDITION_TRUE) {
-		if ((condition->UpgradeResearched == CONDITION_ONLY) ^ ((((button.Action == ButtonCmd::Research || button.Action == ButtonCmd::ResearchClass || button.Action == ButtonCmd::Faction) && UpgradeIdAllowed(*CPlayer::GetThisPlayer(), upgrade->ID) == 'R') || (button.Action == ButtonCmd::LearnAbility && Selected[0]->GetIndividualUpgrade(upgrade) >= upgrade->MaxLimit)))) {
+		if ((condition->UpgradeResearched == CONDITION_ONLY) ^ ((((button.Action == ButtonCmd::Research || button.Action == ButtonCmd::ResearchClass || button.Action == ButtonCmd::Faction || button.Action == ButtonCmd::Dynasty) && UpgradeIdAllowed(*CPlayer::GetThisPlayer(), upgrade->ID) == 'R') || (button.Action == ButtonCmd::LearnAbility && Selected[0]->GetIndividualUpgrade(upgrade) >= upgrade->MaxLimit)))) {
 			return false;
 		}
 	}
@@ -429,7 +438,7 @@ static bool CanShowPopupContent(const PopupConditionPanel *condition,
 	}
 	
 	if (condition->RequirementsString != CONDITION_TRUE) {
-		if ((condition->RequirementsString == CONDITION_ONLY) ^ ((button.Action == ButtonCmd::Research || button.Action == ButtonCmd::ResearchClass || button.Action == ButtonCmd::LearnAbility || button.Action == ButtonCmd::Faction || button.Action == ButtonCmd::Train || button.Action == ButtonCmd::TrainClass || button.Action == ButtonCmd::Build || button.Action == ButtonCmd::BuildClass || button.Action == ButtonCmd::UpgradeTo || button.Action == ButtonCmd::Buy) && !IsButtonUsable(*Selected[0], button) && Selected[0]->Player == CPlayer::GetThisPlayer() && ((type && !type->RequirementsString.empty()) ||  ((button.Action == ButtonCmd::Research || button.Action == ButtonCmd::ResearchClass || button.Action == ButtonCmd::LearnAbility || button.Action == ButtonCmd::Faction) && !upgrade->get_requirements_string().empty())))) {
+		if ((condition->RequirementsString == CONDITION_ONLY) ^ ((button.Action == ButtonCmd::Research || button.Action == ButtonCmd::ResearchClass || button.Action == ButtonCmd::LearnAbility || button.Action == ButtonCmd::Faction || button.Action == ButtonCmd::Dynasty || button.Action == ButtonCmd::Train || button.Action == ButtonCmd::TrainClass || button.Action == ButtonCmd::Build || button.Action == ButtonCmd::BuildClass || button.Action == ButtonCmd::UpgradeTo || button.Action == ButtonCmd::Buy) && !IsButtonUsable(*Selected[0], button) && Selected[0]->Player == CPlayer::GetThisPlayer() && ((type && !type->RequirementsString.empty()) ||  ((button.Action == ButtonCmd::Research || button.Action == ButtonCmd::ResearchClass || button.Action == ButtonCmd::LearnAbility || button.Action == ButtonCmd::Faction || button.Action == ButtonCmd::Dynasty) && !upgrade->get_requirements_string().empty())))) {
 			return false;
 		}
 	}
@@ -1107,6 +1116,9 @@ void CButtonPanel::Draw()
 					button_upgrade = player_faction->get_class_upgrade(stratagus::upgrade_class::get_all()[button->Value]);
 				}
 				break;
+			case ButtonCmd::Dynasty:
+				button_upgrade = CPlayer::GetThisPlayer()->get_faction()->get_dynasties()[button->Value]->get_upgrade();
+				break;
 		}
 			
 		// if there is a single unit selected, show the icon of its weapon/shield/boots/arrows equipped for the appropriate buttons
@@ -1126,6 +1138,8 @@ void CButtonPanel::Draw()
 			button_icon = button_upgrade->get_icon();
 		} else if (button->Action == ButtonCmd::Faction && button->Icon.Name.empty() && stratagus::faction::get_all()[CPlayer::GetThisPlayer()->Faction]->DevelopsTo[button->Value]->get_icon() != nullptr) {
 			button_icon = stratagus::faction::get_all()[CPlayer::GetThisPlayer()->Faction]->DevelopsTo[button->Value]->get_icon();
+		} else if (button->Action == ButtonCmd::Dynasty && button->Icon.Name.empty() && CPlayer::GetThisPlayer()->get_faction()->get_dynasties()[button->Value]->get_icon() != nullptr) {
+			button_icon = CPlayer::GetThisPlayer()->get_faction()->get_dynasties()[button->Value]->get_icon();
 		}
 		//Wyrmgus end
 		
@@ -1178,7 +1192,7 @@ void CButtonPanel::Draw()
 					label.Draw(pos.x + 46 - GetGameFont().Width(number_string), pos.y + 0, number_string);
 				}
 			} else if ( //draw researched technologies (or acquired abilities) grayed
-				((button->Action == ButtonCmd::Research || button->Action == ButtonCmd::ResearchClass) && UpgradeIdAllowed(*CPlayer::GetThisPlayer(), button_upgrade->ID) == 'R')
+				((button->Action == ButtonCmd::Research || button->Action == ButtonCmd::ResearchClass || button->Action == ButtonCmd::Dynasty) && UpgradeIdAllowed(*CPlayer::GetThisPlayer(), button_upgrade->ID) == 'R')
 				|| (button->Action == ButtonCmd::LearnAbility && Selected[0]->GetIndividualUpgrade(CUpgrade::get(button->ValueStr)) == CUpgrade::get(button->ValueStr)->MaxLimit)
 			) {
 				button_icon->DrawUnitIcon(*UI.ButtonPanel.Buttons[i].Style,
@@ -1401,9 +1415,11 @@ bool IsButtonAllowed(const CUnit &unit, const stratagus::button &buttonaction)
 		case ButtonCmd::CancelBuild:
 			res = unit.CurrentAction() == UnitAction::Built;
 			break;
-		//Wyrmgus start
 		case ButtonCmd::Faction:
 			res = CPlayer::GetThisPlayer()->Faction != -1 && buttonaction.Value != -1 && buttonaction.Value < (int) stratagus::faction::get_all()[CPlayer::GetThisPlayer()->Faction]->DevelopsTo.size() && CPlayer::GetThisPlayer()->CanFoundFaction(stratagus::faction::get_all()[CPlayer::GetThisPlayer()->Faction]->DevelopsTo[buttonaction.Value], true);
+			break;
+		case ButtonCmd::Dynasty:
+			res = CPlayer::GetThisPlayer()->get_faction() != nullptr && buttonaction.Value != -1 && buttonaction.Value < static_cast<int>(CPlayer::GetThisPlayer()->get_faction()->get_dynasties().size()) && CPlayer::GetThisPlayer()->can_choose_dynasty(CPlayer::GetThisPlayer()->get_faction()->get_dynasties()[buttonaction.Value], true) && CPlayer::GetThisPlayer()->get_faction()->get_dynasties()[buttonaction.Value]->get_icon() != nullptr;
 			break;
 		case ButtonCmd::Quest:
 			res = buttonaction.Value < static_cast<int>(unit.Player->get_available_quests().size()) && unit.Player->can_accept_quest(unit.Player->get_available_quests().at(buttonaction.Value));
@@ -1411,7 +1427,6 @@ bool IsButtonAllowed(const CUnit &unit, const stratagus::button &buttonaction)
 		case ButtonCmd::Buy:
 			res = (buttonaction.Value != -1) && (&UnitManager.GetSlotUnit(buttonaction.Value) != nullptr);
 			break;
-		//Wyrmgus end
 	}
 #if 0
 	// there is a additional check function -- call it
@@ -1523,6 +1538,9 @@ bool IsButtonUsable(const CUnit &unit, const stratagus::button &buttonaction)
 			break;
 		case ButtonCmd::Faction:
 			res = CPlayer::GetThisPlayer()->CanFoundFaction(stratagus::faction::get_all()[CPlayer::GetThisPlayer()->Faction]->DevelopsTo[buttonaction.Value]);
+			break;
+		case ButtonCmd::Dynasty:
+			res = CPlayer::GetThisPlayer()->can_choose_dynasty(CPlayer::GetThisPlayer()->get_faction()->get_dynasties()[buttonaction.Value]);
 			break;
 		case ButtonCmd::Buy:
 			res = true;
@@ -1777,8 +1795,9 @@ void CButtonPanel::Update()
 	if (GameRunning || GameEstablishing) {
 		unsigned int sold_unit_count = 0;
 		unsigned int potential_faction_count = 0;
+		unsigned int potential_dynasty_count = 0;
 		for (stratagus::button *button : stratagus::button::get_all()) {
-			if (button->Action != ButtonCmd::Faction && button->Action != ButtonCmd::Buy) {
+			if (button->Action != ButtonCmd::Faction && button->Action != ButtonCmd::Dynasty && button->Action != ButtonCmd::Buy) {
 				continue;
 			}
 			char unit_ident[128];
@@ -1788,22 +1807,37 @@ void CButtonPanel::Update()
 			}
 
 			if (button->Action == ButtonCmd::Faction) {
-				if (CPlayer::GetThisPlayer()->Faction == -1 || potential_faction_count >= stratagus::faction::get_all()[CPlayer::GetThisPlayer()->Faction]->DevelopsTo.size()) {
+				if (CPlayer::GetThisPlayer()->get_faction() == nullptr || potential_faction_count >= CPlayer::GetThisPlayer()->get_faction()->DevelopsTo.size()) {
 					button->Value = -1;
 				} else {
+					const stratagus::faction *faction = CPlayer::GetThisPlayer()->get_faction()->DevelopsTo[potential_faction_count];
 					button->Value = potential_faction_count;
 					button->Hint = "Found ";
-					if (stratagus::faction::get_all()[CPlayer::GetThisPlayer()->Faction]->DevelopsTo[potential_faction_count]->DefiniteArticle) {
+					if (faction->DefiniteArticle) {
 						button->Hint += "the ";
 					}
-					button->Hint += stratagus::faction::get_all()[CPlayer::GetThisPlayer()->Faction]->DevelopsTo[potential_faction_count]->get_name();
+					button->Hint += faction->get_name();
 					button->Description = "Changes your faction to ";
-					if (stratagus::faction::get_all()[CPlayer::GetThisPlayer()->Faction]->DevelopsTo[potential_faction_count]->DefiniteArticle) {
+					if (faction->DefiniteArticle) {
 						button->Description += "the ";
 					}
-					button->Description += stratagus::faction::get_all()[CPlayer::GetThisPlayer()->Faction]->DevelopsTo[potential_faction_count]->get_name();
+					button->Description += faction->get_name();
 				}
 				potential_faction_count += 1;
+			} else if (button->Action == ButtonCmd::Dynasty) {
+				if (CPlayer::GetThisPlayer()->get_faction() == nullptr || potential_dynasty_count >= CPlayer::GetThisPlayer()->get_faction()->get_dynasties().size()) {
+					button->Value = -1;
+				} else {
+					const stratagus::dynasty *dynasty = CPlayer::GetThisPlayer()->get_faction()->get_dynasties()[potential_dynasty_count];
+					button->Value = potential_dynasty_count;
+					button->Hint = "Choose the ";
+					button->Hint += dynasty->get_name();
+					button->Hint += " Dynasty";
+					button->Description = "Changes your dynasty to the ";
+					button->Description += dynasty->get_name();
+					button->Description += " dynasty";
+				}
+				potential_dynasty_count += 1;
 			} else if (button->Action == ButtonCmd::Buy) {
 				if (sold_unit_count >= unit.SoldUnits.size()) {
 					button->Value = -1;
@@ -2214,6 +2248,18 @@ void CButtonPanel::DoClicked_Faction(int button)
 	}
 }
 
+void CButtonPanel::DoClicked_Dynasty(int button)
+{
+	const int index = CurrentButtons[button]->Value;
+	SendCommandSetDynasty(CPlayer::GetThisPlayer(), CPlayer::GetThisPlayer()->get_faction()->get_dynasties()[index]);
+	ButtonUnderCursor = -1;
+	OldButtonUnderCursor = -1;
+	LastDrawnButtonPopup = nullptr;
+	if (Selected[0]->Player == CPlayer::GetThisPlayer()) {
+		SelectedUnitChanged();
+	}
+}
+
 void CButtonPanel::DoClicked_Quest(int button)
 {
 	const int index = CurrentButtons[button]->Value;
@@ -2353,7 +2399,7 @@ void CButtonPanel::DoClicked(int button)
 		const CUpgrade *button_upgrade = CurrentButtons[button]->get_value_upgrade(Selected[0]);
 
 		if (
-			((CurrentButtons[button]->Action == ButtonCmd::Research || CurrentButtons[button]->Action == ButtonCmd::ResearchClass) && UpgradeIdAllowed(*CPlayer::GetThisPlayer(), button_upgrade->ID) == 'R')
+			((CurrentButtons[button]->Action == ButtonCmd::Research || CurrentButtons[button]->Action == ButtonCmd::ResearchClass || CurrentButtons[button]->Action == ButtonCmd::Dynasty) && UpgradeIdAllowed(*CPlayer::GetThisPlayer(), button_upgrade->ID) == 'R')
 			|| (CurrentButtons[button]->Action == ButtonCmd::LearnAbility && Selected[0]->GetIndividualUpgrade(button_upgrade) == button_upgrade->MaxLimit)
 		) {
 			CPlayer::GetThisPlayer()->Notify(NotifyYellow, Selected[0]->tilePos, Selected[0]->MapLayer->ID, "%s", _("The upgrade has already been acquired"));
@@ -2419,6 +2465,7 @@ void CButtonPanel::DoClicked(int button)
 		case ButtonCmd::LearnAbility: { DoClicked_LearnAbility(button); break; }
 		case ButtonCmd::ExperienceUpgradeTo: { DoClicked_ExperienceUpgradeTo(button); break; }
 		case ButtonCmd::Faction: { DoClicked_Faction(button); break; }
+		case ButtonCmd::Dynasty: { DoClicked_Dynasty(button); break; }
 		case ButtonCmd::Quest: { DoClicked_Quest(button); break; }
 		case ButtonCmd::Buy: { DoClicked_Buy(button); break; }
 		case ButtonCmd::ProduceResource: { DoClicked_ProduceResource(button); break; }

@@ -54,7 +54,8 @@ enum class ButtonCmd {
 	ExperienceUpgradeTo,   /// order upgrade (experience)
 	UpgradeTo,      /// order upgrade
 	RallyPoint,		/// set rally point
-	Faction,			/// change faction
+	Faction,		/// change faction
+	Dynasty,		/// change dynasty
 	Quest,			/// receive quest
 	Buy,				/// buy item
 	ProduceResource,	/// produce a resource

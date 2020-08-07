@@ -50,10 +50,22 @@ public:
 	static constexpr const char *class_identifier = "dynasty";
 	static constexpr const char *database_folder = "dynasties";
 
+	static dynasty *add(const std::string &identifier, const stratagus::module *module)
+	{
+		dynasty *dynasty = data_type::add(identifier, module);
+		dynasty->index = dynasty::get_all().size() - 1;
+		return dynasty;
+	}
+
 	explicit dynasty(const std::string &identifier);
 	~dynasty();
 
 	virtual void process_sml_scope(const sml_data &scope) override;
+
+	int get_index() const
+	{
+		return this->index;
+	}
 
 	CUpgrade *get_upgrade() const
 	{
@@ -86,6 +98,7 @@ public:
 	}
 
 private:
+	int index = -1;
 	CUpgrade *upgrade = nullptr; //dynasty upgrade applied when the dynasty is set
 	icon *icon = nullptr;
 	std::vector<faction *> factions; //to which factions is this dynasty available

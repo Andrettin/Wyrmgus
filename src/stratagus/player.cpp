@@ -1831,11 +1831,11 @@ bool CPlayer::can_choose_dynasty(const stratagus::dynasty *dynasty, const bool p
 		return false;
 	}
 	
-	if (dynasty->get_upgrade() != nullptr) {
-		if (!CheckConditions(dynasty->get_upgrade(), this, false, pre)) {
-			return false;
-		}
-	} else {
+	if (dynasty->get_upgrade() == nullptr) {
+		return false;
+	}
+
+	if (!CheckConditions(dynasty->get_upgrade(), this, false, pre)) {
 		return false;
 	}
 
