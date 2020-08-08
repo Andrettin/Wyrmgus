@@ -49,7 +49,7 @@
 #include "quest.h"
 #include "religion/deity.h"
 #include "religion/deity_domain.h"
-#include "script/condition/condition.h"
+#include "script/condition/and_condition.h"
 #include "spells.h"
 #include "time/calendar.h"
 #include "unit/unit.h"
@@ -98,7 +98,10 @@ void character::process_sml_scope(const sml_data &scope)
 	const std::string &tag = scope.get_tag();
 	const std::vector<std::string> &values = scope.get_values();
 
-	if (tag == "deities") {
+	if (tag == "conditions") {
+		this->conditions = std::make_unique<and_condition>();
+		database::process_sml_data(this->conditions, scope);
+	} else if (tag == "deities") {
 		for (const std::string &value : values) {
 			deity *deity = deity::get(value);
 			this->Deities.push_back(deity);
