@@ -1852,7 +1852,7 @@ bool CPlayer::can_recruit_hero(const stratagus::character *character, bool ignor
 		return false;
 	}
 	
-	if (!CheckConditions(character, this)) {
+	if (character->get_conditions() != nullptr && !character->get_conditions()->check(this)) {
 		return false;
 	}
 	

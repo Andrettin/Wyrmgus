@@ -225,11 +225,6 @@ public:
 		return this->location;
 	}
 
-	const std::unique_ptr<condition> &get_preconditions() const
-	{
-		return this->preconditions;
-	}
-
 	const std::unique_ptr<condition> &get_conditions() const
 	{
 		return this->conditions;
@@ -262,7 +257,6 @@ public:
 	character *Mother = nullptr;		/// Character's mother
 	LuaCallback *Conditions = nullptr;
 private:
-	std::unique_ptr<condition> preconditions;
 	std::unique_ptr<condition> conditions;
 public:
 	std::vector<CPersistentItem *> EquippedItems[static_cast<int>(stratagus::item_slot::count)]; //equipped items of the character, per slot
