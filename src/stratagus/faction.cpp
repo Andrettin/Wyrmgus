@@ -491,7 +491,7 @@ const std::vector<CFiller> &faction::get_ui_fillers() const
 	return this->get_civilization()->get_ui_fillers();
 }
 
-void faction::remove_dynasty(const dynasty *dynasty)
+void faction::remove_dynasty(const stratagus::dynasty *dynasty)
 {
 	vector::remove(this->dynasties, dynasty);
 }

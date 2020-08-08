@@ -53,6 +53,7 @@ namespace stratagus {
 	class civilization;
 	class condition;
 	class deity;
+	class dynasty;
 	class faction;
 	class historical_location;
 	class quest;
@@ -93,6 +94,7 @@ class character : public detailed_data_entry, public data_type<character>, publi
 {
 	Q_OBJECT
 
+	Q_PROPERTY(stratagus::dynasty* dynasty MEMBER dynasty READ get_dynasty)
 	Q_PROPERTY(QString surname READ get_surname_qstring)
 	Q_PROPERTY(stratagus::unit_type* unit_type READ get_unit_type WRITE set_unit_type)
 	Q_PROPERTY(stratagus::civilization* civilization MEMBER civilization READ get_civilization)
@@ -120,6 +122,11 @@ public:
 	virtual void initialize() override;
 	virtual void check() const override;
 	virtual void reset_history() override;
+
+	dynasty *get_dynasty() const
+	{
+		return this->dynasty;
+	}
 
 	const std::string &get_surname() const
 	{
@@ -234,6 +241,7 @@ public:
 	CDate StartDate;			/// Date in which the character historically starts being active
 	CDate DeathDate;			/// Date in which the character historically died
 private:
+	stratagus::dynasty *dynasty = nullptr;
 	civilization *civilization = nullptr;	/// Culture to which the character belongs
 	faction *default_faction = nullptr;	//the default faction to which the character belongs
 	gender gender;				/// Character's gender
