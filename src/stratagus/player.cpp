@@ -1842,7 +1842,7 @@ bool CPlayer::can_choose_dynasty(const stratagus::dynasty *dynasty, const bool p
 	return CheckConditions(dynasty, this, false, pre);
 }
 
-bool CPlayer::can_recruit_hero(const stratagus::character *character, bool ignore_neutral) const
+bool CPlayer::is_character_available_for_recruitment(const stratagus::character *character, bool ignore_neutral) const
 {
 	if (character->Deity != nullptr) { //character is a deity
 		return false;
@@ -1882,7 +1882,7 @@ std::vector<stratagus::character *> CPlayer::get_recruitable_heroes_from_list(co
 	std::vector<stratagus::character *> recruitable_heroes;
 
 	for (stratagus::character *hero : heroes) {
-		if (this->can_recruit_hero(hero)) {
+		if (this->is_character_available_for_recruitment(hero)) {
 			recruitable_heroes.push_back(hero);
 		}
 	}
@@ -2616,7 +2616,7 @@ bool CPlayer::can_accept_quest(const stratagus::quest *quest) const
 				return false;
 			}
 		} else if (objective->get_objective_type() == stratagus::objective_type::recruit_hero) {
-			if (!this->can_recruit_hero(objective->get_character(), true)) {
+			if (!this->is_character_available_for_recruitment(objective->get_character(), true)) {
 				return false;
 			}
 			recruit_heroes_quantity++;
@@ -2793,7 +2793,7 @@ std::string CPlayer::check_quest_failure(const stratagus::quest *quest) const
 				}
 			}
 		} else if (quest_objective->get_objective_type() == stratagus::objective_type::recruit_hero) {
-			if (!this->HasHero(quest_objective->get_character()) && !this->can_recruit_hero(quest_objective->get_character(), true)) {
+			if (!this->HasHero(quest_objective->get_character()) && !this->is_character_available_for_recruitment(quest_objective->get_character(), true)) {
 				return "The hero can no longer be recruited.";
 			}
 		} else if (quest_objective->get_objective_type() == stratagus::objective_type::destroy_units || quest_objective->get_objective_type() == stratagus::objective_type::destroy_hero || quest_objective->get_objective_type() == stratagus::objective_type::destroy_unique) {

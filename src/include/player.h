@@ -200,7 +200,7 @@ public:
 	bool HasUpgradeResearcher(const CUpgrade *upgrade) const;
 	bool CanFoundFaction(stratagus::faction *faction, bool pre = false);
 	bool can_choose_dynasty(const stratagus::dynasty *dynasty, const bool pre = false) const;
-	bool can_recruit_hero(const stratagus::character *character, bool ignore_neutral = false) const;
+	bool is_character_available_for_recruitment(const stratagus::character *character, bool ignore_neutral = false) const;
 	std::vector<stratagus::character *> get_recruitable_heroes_from_list(const std::vector<stratagus::character *> &heroes);
 	bool UpgradeRemovesExistingUpgrade(const CUpgrade *upgrade, bool ignore_lower_priority = false) const;
 	std::string get_full_name() const;
