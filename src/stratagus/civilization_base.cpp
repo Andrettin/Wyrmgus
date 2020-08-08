@@ -59,6 +59,8 @@ void civilization_base::process_sml_scope(const sml_data &scope)
 			const unit_class *unit_class = unit_class::get(tag);
 			vector::merge(this->unit_class_names[unit_class], child_scope.get_values());
 		});
+	} else if (tag == "surnames") {
+		vector::merge(this->surnames, values);
 	} else {
 		data_entry::process_sml_scope(scope);
 	}
