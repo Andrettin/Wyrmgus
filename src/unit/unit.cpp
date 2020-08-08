@@ -93,6 +93,7 @@
 //Wyrmgus start
 #include "util/util.h"
 //Wyrmgus end
+#include "util/vector_random_util.h"
 #include "util/vector_util.h"
 #include "video.h"
 
@@ -3450,11 +3451,11 @@ void CUnit::UpdatePersonalName(bool update_settlement_name)
 	}
 
 	if constexpr (surname_generation_enabled) {
-		if (civilization != nullptr) {
+		if (civilization != nullptr && this->Type->BoolFlag[ORGANIC_INDEX].value) {
 			const std::vector<std::string> &surnames = civilization->get_surnames();
 
 			if (!surnames.empty() && (this->get_surname().empty() || !stratagus::vector::contains(surnames, this->get_surname()))) {
-				this->surname = surnames[SyncRand(surnames.size())];
+				this->surname = stratagus::vector::get_random(surnames);
 			}
 		}
 	}
