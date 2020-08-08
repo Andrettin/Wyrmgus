@@ -32,6 +32,7 @@
 #include "map/map.h"
 
 #include "campaign.h"
+#include "character.h"
 #include "civilization.h"
 #include "database/defines.h"
 #include "editor.h"

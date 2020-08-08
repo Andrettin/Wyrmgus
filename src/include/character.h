@@ -71,27 +71,23 @@ enum Attributes {
 	MaxAttributes
 };
 
-/**
-**  Indexes into character title array.
-*/
-enum CharacterTitles {
-	CharacterTitleHeadOfState, // also used for titulars to aristocratic titles which were formal only; for example: the French duke of Orléans did not rule over Orléans, but here we consider the "head of state" title to also encompass such cases
-	CharacterTitleHeadOfGovernment,
-	CharacterTitleEducationMinister,
-	CharacterTitleFinanceMinister,
-	CharacterTitleForeignMinister,
-	CharacterTitleIntelligenceMinister,
-	CharacterTitleInteriorMinister,
-	CharacterTitleJusticeMinister,
-	CharacterTitleWarMinister,
-	
-	CharacterTitleGovernor,
-	CharacterTitleMayor,
-
-	MaxCharacterTitles
-};
-
 namespace stratagus {
+
+enum class character_title {
+	none = -1,
+	head_of_state, // also used for titulars to aristocratic titles which were formal only; for example: the French duke of Orléans did not rule over Orléans, but here we consider the "head of state" title to also encompass such cases
+	head_of_government,
+	education_minister,
+	finance_minister,
+	foreign_minister,
+	intelligence_minister,
+	interior_minister,
+	justice_minister,
+	war_minister,
+	
+	governor,
+	mayor
+};
 
 class character : public detailed_data_entry, public data_type<character>, public CDataType
 {
@@ -292,7 +288,7 @@ private:
 public:
 	std::vector<std::pair<CDate, stratagus::faction *>> HistoricalFactions;	/// historical locations of the character; the values are: date, faction
 	std::vector<std::unique_ptr<historical_location>> HistoricalLocations;	/// historical locations of the character
-	std::vector<std::tuple<CDate, CDate, stratagus::faction *, int>> HistoricalTitles;	/// historical titles of the character, the first element is the beginning date of the term, the second one the end date, the third the faction it pertains to (if any, if not then it is null), and the fourth is the character title itself (from the character title enums)
+	std::vector<std::tuple<CDate, CDate, stratagus::faction *, character_title>> HistoricalTitles;	/// historical titles of the character, the first element is the beginning date of the term, the second one the end date, the third the faction it pertains to (if any, if not then it is null), and the fourth is the character title itself (from the character title enums)
 	std::vector<std::tuple<int, int, CProvince *, int>> HistoricalProvinceTitles;
 
 	friend ::Spell_Polymorph;
@@ -317,7 +313,7 @@ extern void SetCurrentCustomHero(const std::string &hero_ident);
 extern std::string GetCurrentCustomHero();
 extern void ChangeCustomHeroCivilization(const std::string &hero_name, const std::string &civilization_ident, const std::string &new_hero_name, const std::string &new_hero_family_name);
 extern bool IsNameValidForCustomHero(const std::string &hero_name, const std::string &hero_family_name);
-extern std::string GetCharacterTitleNameById(int title);
-extern int GetCharacterTitleIdByName(const std::string &title);
-extern bool IsMinisterialTitle(int title);
+extern std::string GetCharacterTitleNameById(const stratagus::character_title title);
+extern stratagus::character_title GetCharacterTitleIdByName(const std::string &title);
+extern bool IsMinisterialTitle(const stratagus::character_title title);
 extern void CharacterCclRegister();

@@ -1937,9 +1937,9 @@ std::string_view CPlayer::get_faction_title_name() const
 	return faction->get_title_name(government_type, tier);
 }
 
-std::string_view CPlayer::GetCharacterTitleName(const int title_type, const stratagus::gender gender) const
+std::string_view CPlayer::GetCharacterTitleName(const stratagus::character_title title_type, const stratagus::gender gender) const
 {
-	if (this->Race == -1 || this->Faction == -1 || title_type == -1 || gender == stratagus::gender::none) {
+	if (this->Race == -1 || this->Faction == -1 || title_type == stratagus::character_title::none || gender == stratagus::gender::none) {
 		return string::empty_str;
 	}
 	

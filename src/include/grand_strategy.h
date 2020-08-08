@@ -27,10 +27,10 @@
 
 #pragma once
 
+#include "character.h"
 #include "faction_tier.h"
 #include "map/map.h"
 #include "province.h"
-#include "character.h"
 #include "government_type.h"
 #include "vec2i.h"
 #include "video.h"
@@ -48,6 +48,7 @@ class LuaCallback;
 namespace stratagus {
 	class unit_class;
 	class world;
+	enum class character_title;
 	enum class diplomacy_state;
 }
 
@@ -154,16 +155,15 @@ public:
 		memset(ProductionEfficiencyModifier, 0, sizeof(ProductionEfficiencyModifier));
 		memset(Trade, 0, sizeof(Trade));
 		memset(MilitaryScoreBonus, 0, sizeof(MilitaryScoreBonus));
-		memset(Ministers, 0, sizeof(Ministers));
 	}
 	
 	void SetTechnology(int upgrade_id, bool has_technology, bool secondary_setting = false);
 	void SetCapital(CGrandStrategyProvince *province);
-	void SetMinister(int title, std::string hero_full_name);
-	void MinisterSuccession(int title);
+	void SetMinister(const stratagus::character_title title, std::string hero_full_name);
+	void MinisterSuccession(const stratagus::character_title title);
 	bool IsAlive();
 	bool HasTechnologyClass(std::string technology_class_name);
-	bool CanHaveSuccession(int title, bool family_inheritance);
+	bool CanHaveSuccession(const stratagus::character_title title, bool family_inheritance);
 	bool IsConquestDesirable(CGrandStrategyProvince *province);
 	int GetTroopCostModifier();
 	std::string GetFullName();
@@ -181,9 +181,9 @@ public:
 	int ProductionEfficiencyModifier[MaxCosts];					/// Efficiency modifier for each resource.
 	int Trade[MaxCosts]; /// How much of each resource the faction wants to trade; negative values are imports and positive ones exports
 	int MilitaryScoreBonus[UnitTypeMax];
-	CGrandStrategyHero *Ministers[MaxCharacterTitles];			/// Ministers of the faction
+	std::map<stratagus::character_title, CGrandStrategyHero *> Ministers;			/// Ministers of the faction
 	std::vector<CGrandStrategyProvince *> Claims;				/// Provinces which this faction claims
-	std::vector<CGrandStrategyHero *> HistoricalMinisters[MaxCharacterTitles]; /// All characters who had a ministerial (or head of state or government) title in this faction
+	std::map<stratagus::character_title, std::vector<CGrandStrategyHero *>> HistoricalMinisters; /// All characters who had a ministerial (or head of state or government) title in this faction
 	std::map<CUpgrade *, int> HistoricalTechnologies; /// historical technologies of the faction, with the year of discovery
 };
 
@@ -201,10 +201,10 @@ public:
 	bool IsAlive();
 	bool IsVisible();
 	bool IsGenerated();
-	bool IsEligibleForTitle(int title);
+	bool IsEligibleForTitle(const stratagus::character_title title);
 	int GetTroopCostModifier();
-	int GetTitleScore(int title, CGrandStrategyProvince *province = nullptr);
-	std::string GetMinisterEffectsString(int title);
+	int GetTitleScore(const stratagus::character_title title, CGrandStrategyProvince *province = nullptr);
+	std::string GetMinisterEffectsString(const stratagus::character_title title);
 	std::string GetBestDisplayTitle();
 	CGrandStrategyFaction *GetFaction();
 	
@@ -216,8 +216,8 @@ public:
 	CGrandStrategyHero *Mother;					/// Character's mother
 	std::vector<CGrandStrategyHero *> Children;	/// Children of the character
 	std::vector<CGrandStrategyHero *> Siblings;	/// Siblings of the character
-	std::vector<std::pair<int, CGrandStrategyFaction *>> Titles;	/// Titles of the character (first value is the title type, and the second one is the faction
-	std::vector<std::pair<int, CGrandStrategyProvince *>> ProvinceTitles;	/// Provincial titles of the character (first value is the title type, and the second one is the province
+	std::vector<std::pair<stratagus::character_title, CGrandStrategyFaction *>> Titles;	/// Titles of the character (first value is the title type, and the second one is the faction
+	std::vector<std::pair<stratagus::character_title, CGrandStrategyProvince *>> ProvinceTitles;	/// Provincial titles of the character (first value is the title type, and the second one is the province
 };
 
 class CGrandStrategyEvent

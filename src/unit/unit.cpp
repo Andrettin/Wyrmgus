@@ -366,10 +366,6 @@
 **
 */
 
-/*----------------------------------------------------------------------------
---  Variables
-----------------------------------------------------------------------------*/
-
 bool EnableTrainingQueue;                 /// Config: training queues enabled
 bool EnableBuildingCapture = false;               /// Config: capture buildings enabled
 bool RevealAttacker;                      /// Config: reveal attacker enabled
@@ -378,10 +374,6 @@ int ResourcesMultiBuildersMultiplier = 0; /// Config: spend resources for buildi
 static unsigned long HelpMeLastCycle;     /// Last cycle HelpMe sound played
 static int HelpMeLastX;                   /// Last X coordinate HelpMe sound played
 static int HelpMeLastY;                   /// Last Y coordinate HelpMe sound played
-
-/*----------------------------------------------------------------------------
---  Functions
-----------------------------------------------------------------------------*/
 
 static void RemoveUnitFromContainer(CUnit &unit);
 

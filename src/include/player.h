@@ -75,6 +75,7 @@ namespace stratagus {
 	class unit_class;
 	class unit_type;
 	class upgrade_class;
+	enum class character_title;
 	enum class faction_tier;
 	enum class government_type;
 	enum class gender;
@@ -204,7 +205,7 @@ public:
 	bool UpgradeRemovesExistingUpgrade(const CUpgrade *upgrade, bool ignore_lower_priority = false) const;
 	std::string get_full_name() const;
 	std::string_view get_faction_title_name() const;
-	std::string_view GetCharacterTitleName(const int title_type, const stratagus::gender gender) const;
+	std::string_view GetCharacterTitleName(const stratagus::character_title title_type, const stratagus::gender gender) const;
 	std::set<int> get_builder_landmasses(const stratagus::unit_type *building) const;	/// Builds a vector with builder landmasses; the building is the structure to be built by the builder in question
 	std::vector<const CUpgrade *> GetResearchableUpgrades();
 

@@ -607,8 +607,8 @@ std::string CGrandStrategyProvince::GenerateWorkName()
 	std::string work_name;
 	
 	std::vector<CGrandStrategyHero *> potential_heroes;
-	for (size_t i = 0; i < this->Owner->HistoricalMinisters[CharacterTitleHeadOfState].size(); ++i) {
-		potential_heroes.push_back(this->Owner->HistoricalMinisters[CharacterTitleHeadOfState][i]);
+	for (size_t i = 0; i < this->Owner->HistoricalMinisters[stratagus::character_title::head_of_state].size(); ++i) {
+		potential_heroes.push_back(this->Owner->HistoricalMinisters[stratagus::character_title::head_of_state][i]);
 	}
 	
 	if (potential_heroes.size() > 0 && SyncRand(10) != 0) { // 9 chances out of 10 that a literary work will use a hero's name as a basis
@@ -686,10 +686,10 @@ void CGrandStrategyFaction::SetCapital(CGrandStrategyProvince *province)
 	this->Capital = province;
 }
 
-void CGrandStrategyFaction::SetMinister(int title, std::string hero_full_name)
+void CGrandStrategyFaction::SetMinister(const stratagus::character_title title, std::string hero_full_name)
 {
-	if (this->Ministers[title] != nullptr && std::find(this->Ministers[title]->Titles.begin(), this->Ministers[title]->Titles.end(), std::pair<int, CGrandStrategyFaction *>(title, this)) != this->Ministers[title]->Titles.end()) { // remove from the old minister's array
-		this->Ministers[title]->Titles.erase(std::remove(this->Ministers[title]->Titles.begin(), this->Ministers[title]->Titles.end(), std::pair<int, CGrandStrategyFaction *>(title, this)), this->Ministers[title]->Titles.end());
+	if (this->Ministers[title] != nullptr && std::find(this->Ministers[title]->Titles.begin(), this->Ministers[title]->Titles.end(), std::make_pair(title, this)) != this->Ministers[title]->Titles.end()) { // remove from the old minister's array
+		this->Ministers[title]->Titles.erase(std::remove(this->Ministers[title]->Titles.begin(), this->Ministers[title]->Titles.end(), std::make_pair(title, this)), this->Ministers[title]->Titles.end());
 	}
 			
 	if (hero_full_name.empty()) {
@@ -702,12 +702,12 @@ void CGrandStrategyFaction::SetMinister(int title, std::string hero_full_name)
 		CGrandStrategyHero *hero = GrandStrategyGame.GetHero(hero_full_name);
 		if (hero) {
 			this->Ministers[title] = const_cast<CGrandStrategyHero *>(&(*hero));
-			hero->Titles.push_back(std::pair<int, CGrandStrategyFaction *>(title, this));
+			hero->Titles.push_back(std::make_pair(title, this));
 			
 			if (this->IsAlive()) {
 				int titles_size = hero->Titles.size();
 				for (int i = (titles_size - 1); i >= 0; --i) {
-					if (!(hero->Titles[i].first == title && hero->Titles[i].second == this) && hero->Titles[i].first != CharacterTitleHeadOfState) { // a character can only have multiple head of state titles, but not others
+					if (!(hero->Titles[i].first == title && hero->Titles[i].second == this) && hero->Titles[i].first != stratagus::character_title::head_of_state) { // a character can only have multiple head of state titles, but not others
 						hero->Titles[i].second->SetMinister(hero->Titles[i].first, "");
 					}
 				}
@@ -721,7 +721,7 @@ void CGrandStrategyFaction::SetMinister(int title, std::string hero_full_name)
 //			new_minister_message += this->GetCharacterTitle(title, this->Ministers[title]->Gender) + " " + this->Ministers[title]->GetFullName();
 			new_minister_message += "\", \"";
 //			new_minister_message += "A new " + FullyDecapitalizeString(this->GetCharacterTitle(title, this->Ministers[title]->Gender));
-			if (title == CharacterTitleHeadOfState) {
+			if (title == stratagus::character_title::head_of_state) {
 				new_minister_message += " has come to power in our realm, ";
 			} else {
 				new_minister_message += " has been appointed, ";
@@ -742,12 +742,12 @@ void CGrandStrategyFaction::SetMinister(int title, std::string hero_full_name)
 	}
 }
 
-void CGrandStrategyFaction::MinisterSuccession(int title)
+void CGrandStrategyFaction::MinisterSuccession(const stratagus::character_title title)
 {
 	if (
 		this->Ministers[title] != nullptr
 		&& (stratagus::faction::get_all()[this->Faction]->Type == FactionTypeTribe || this->government_type == stratagus::government_type::monarchy)
-		&& title == CharacterTitleHeadOfState
+		&& title == stratagus::character_title::head_of_state
 	) { //if is a tribe or a monarchical polity, try to perform ruler succession by descent
 		for (size_t i = 0; i < this->Ministers[title]->Children.size(); ++i) {
 			if (this->Ministers[title]->Children[i]->IsAlive() && this->Ministers[title]->Children[i]->IsVisible() && this->Ministers[title]->Children[i]->get_gender() == stratagus::gender::male) { //historically males have generally been given priority in throne inheritance (if not exclusivity), specially in the cultures currently playable in the game
@@ -775,7 +775,7 @@ void CGrandStrategyFaction::MinisterSuccession(int title)
 		}
 		
 		// if no family successor was found, the title becomes extinct if it is only a titular one (an aristocratic title whose corresponding faction does not actually hold territory)
-		if (!this->CanHaveSuccession(title, false) || title != CharacterTitleHeadOfState) {
+		if (!this->CanHaveSuccession(title, false) || title != stratagus::character_title::head_of_state) {
 			this->Ministers[title] = nullptr;
 			return;
 		}
@@ -830,9 +830,9 @@ bool CGrandStrategyFaction::HasTechnologyClass(std::string technology_class_name
 	return false;
 }
 
-bool CGrandStrategyFaction::CanHaveSuccession(int title, bool family_inheritance)
+bool CGrandStrategyFaction::CanHaveSuccession(const stratagus::character_title title, bool family_inheritance)
 {
-	if (!this->IsAlive() && (title != CharacterTitleHeadOfState || !family_inheritance || stratagus::faction::get_all()[this->Faction]->Type == FactionTypeTribe || this->government_type != stratagus::government_type::monarchy)) { // head of state titles can be inherited even if their respective factions have no provinces, but if the line dies out then the title becomes extinct; tribal titles cannot be titular-only
+	if (!this->IsAlive() && (title != stratagus::character_title::head_of_state || !family_inheritance || stratagus::faction::get_all()[this->Faction]->Type == FactionTypeTribe || this->government_type != stratagus::government_type::monarchy)) { // head of state titles can be inherited even if their respective factions have no provinces, but if the line dies out then the title becomes extinct; tribal titles cannot be titular-only
 		return false;
 	}
 	
@@ -854,12 +854,12 @@ int CGrandStrategyFaction::GetTroopCostModifier()
 {
 	int modifier = 0;
 	
-	if (this->Ministers[CharacterTitleHeadOfState] != nullptr) {
-		modifier += this->Ministers[CharacterTitleHeadOfState]->GetTroopCostModifier();
+	if (this->Ministers[stratagus::character_title::head_of_state] != nullptr) {
+		modifier += this->Ministers[stratagus::character_title::head_of_state]->GetTroopCostModifier();
 	}
 	
-	if (this->Ministers[CharacterTitleWarMinister] != nullptr) {
-		modifier += this->Ministers[CharacterTitleWarMinister]->GetTroopCostModifier();
+	if (this->Ministers[stratagus::character_title::war_minister] != nullptr) {
+		modifier += this->Ministers[stratagus::character_title::war_minister]->GetTroopCostModifier();
 	}
 	
 	return modifier;
@@ -898,12 +898,12 @@ void CGrandStrategyHero::Die()
 	//show message that the hero has died
 	/*
 	if (this->IsVisible()) {
-		if (GrandStrategyGame.PlayerFaction != nullptr && GrandStrategyGame.PlayerFaction->Ministers[CharacterTitleHeadOfState] == this) {
+		if (GrandStrategyGame.PlayerFaction != nullptr && GrandStrategyGame.PlayerFaction->Ministers[stratagus::character_title::head_of_state] == this) {
 			char buf[256];
 			snprintf(
 				buf, sizeof(buf), "if (GenericDialog ~= nil) then GenericDialog(\"%s\", \"%s\") end;",
-				(GrandStrategyGame.PlayerFaction->GetCharacterTitle(CharacterTitleHeadOfState, this->Gender) + " " + this->GetFullName() + " Dies").c_str(),
-				("Tragic news spread throughout our realm. Our " + FullyDecapitalizeString(GrandStrategyGame.PlayerFaction->GetCharacterTitle(CharacterTitleHeadOfState, this->Gender)) + ", " + this->GetFullName() + ", has died! May his soul rest in peace.").c_str()
+				(GrandStrategyGame.PlayerFaction->GetCharacterTitle(stratagus::character_title::head_of_state, this->Gender) + " " + this->GetFullName() + " Dies").c_str(),
+				("Tragic news spread throughout our realm. Our " + FullyDecapitalizeString(GrandStrategyGame.PlayerFaction->GetCharacterTitle(stratagus::character_title::head_of_state, this->Gender)) + ", " + this->GetFullName() + ", has died! May his soul rest in peace.").c_str()
 			);
 			CclCommand(buf);	
 		} else if (this->GetFaction() == GrandStrategyGame.PlayerFaction) {
@@ -944,26 +944,26 @@ bool CGrandStrategyHero::IsGenerated()
 	return !this->Custom && stratagus::character::get(this->GetFullName()) == nullptr;
 }
 
-bool CGrandStrategyHero::IsEligibleForTitle(int title)
+bool CGrandStrategyHero::IsEligibleForTitle(const stratagus::character_title title)
 {
-	if (this->GetFaction()->government_type == stratagus::government_type::monarchy && title == CharacterTitleHeadOfState && this->get_unit_type()->get_unit_class() != nullptr && this->get_unit_type()->get_unit_class()->get_identifier() == "worker") { // commoners cannot become monarchs
+	if (this->GetFaction()->government_type == stratagus::government_type::monarchy && title == stratagus::character_title::head_of_state && this->get_unit_type()->get_unit_class() != nullptr && this->get_unit_type()->get_unit_class()->get_identifier() == "worker") { // commoners cannot become monarchs
 		return false;
-	} else if (this->GetFaction()->government_type == stratagus::government_type::theocracy && title == CharacterTitleHeadOfState && this->get_unit_type()->get_unit_class() != nullptr && this->get_unit_type()->get_unit_class()->get_identifier() != "priest") { // non-priests cannot rule theocracies
+	} else if (this->GetFaction()->government_type == stratagus::government_type::theocracy && title == stratagus::character_title::head_of_state && this->get_unit_type()->get_unit_class() != nullptr && this->get_unit_type()->get_unit_class()->get_identifier() != "priest") { // non-priests cannot rule theocracies
 		return false;
 	}
 	
 	for (size_t i = 0; i < this->Titles.size(); ++i) {
-		if (this->Titles[i].first == CharacterTitleHeadOfState && this->Titles[i].second->IsAlive() && title != CharacterTitleHeadOfState) { // if it is not a head of state title, and this character is already the head of state of a living faction, return false
+		if (this->Titles[i].first == stratagus::character_title::head_of_state && this->Titles[i].second->IsAlive() && title != stratagus::character_title::head_of_state) { // if it is not a head of state title, and this character is already the head of state of a living faction, return false
 			return false;
-		} else if (this->Titles[i].first == CharacterTitleHeadOfGovernment && title != CharacterTitleHeadOfState) { // if is already a head of government, don't accept ministerial titles of lower rank (that is, any but the title of head of state)
+		} else if (this->Titles[i].first == stratagus::character_title::head_of_government && title != stratagus::character_title::head_of_state) { // if is already a head of government, don't accept ministerial titles of lower rank (that is, any but the title of head of state)
 			return false;
-		} else if (this->Titles[i].first != CharacterTitleHeadOfState && this->Titles[i].first != CharacterTitleHeadOfGovernment && title != CharacterTitleHeadOfState && title != CharacterTitleHeadOfGovernment) { // if is already a minister, don't accept another ministerial title of equal rank
+		} else if (this->Titles[i].first != stratagus::character_title::head_of_state && this->Titles[i].first != stratagus::character_title::head_of_government && title != stratagus::character_title::head_of_state && title != stratagus::character_title::head_of_government) { // if is already a minister, don't accept another ministerial title of equal rank
 			return false;
 		}
 	}
 	
 	for (size_t i = 0; i < this->ProvinceTitles.size(); ++i) {
-		if (this->ProvinceTitles[i].first != CharacterTitleHeadOfState && this->ProvinceTitles[i].first != CharacterTitleHeadOfGovernment && title != CharacterTitleHeadOfState && title != CharacterTitleHeadOfGovernment) { // if already has a government position, don't accept another ministerial title of equal rank
+		if (this->ProvinceTitles[i].first != stratagus::character_title::head_of_state && this->ProvinceTitles[i].first != stratagus::character_title::head_of_government && title != stratagus::character_title::head_of_state && title != stratagus::character_title::head_of_government) { // if already has a government position, don't accept another ministerial title of equal rank
 			return false;
 		}
 	}
@@ -980,26 +980,26 @@ int CGrandStrategyHero::GetTroopCostModifier()
 	return modifier;
 }
 
-int CGrandStrategyHero::GetTitleScore(int title, CGrandStrategyProvince *province)
+int CGrandStrategyHero::GetTitleScore(const stratagus::character_title title, CGrandStrategyProvince *province)
 {
 	int score = 0;
-	if (title == CharacterTitleHeadOfState) {
+	if (title == stratagus::character_title::head_of_state) {
 		score = ((this->Attributes[IntelligenceAttribute] + ((this->Attributes[this->GetMartialAttribute()] + this->Attributes[IntelligenceAttribute]) / 2) + this->Attributes[CharismaAttribute]) / 3) + 1;
-	} else if (title == CharacterTitleHeadOfGovernment) {
+	} else if (title == stratagus::character_title::head_of_government) {
 		score = ((this->Attributes[IntelligenceAttribute] + ((this->Attributes[this->GetMartialAttribute()] + this->Attributes[IntelligenceAttribute]) / 2) + this->Attributes[CharismaAttribute]) / 3) + 1;
-	} else if (title == CharacterTitleEducationMinister) {
+	} else if (title == stratagus::character_title::education_minister) {
 		score = this->Attributes[IntelligenceAttribute];
-	} else if (title == CharacterTitleFinanceMinister) {
+	} else if (title == stratagus::character_title::finance_minister) {
 		score = this->Attributes[IntelligenceAttribute];
-	} else if (title == CharacterTitleWarMinister) {
+	} else if (title == stratagus::character_title::war_minister) {
 		score = (this->Attributes[this->GetMartialAttribute()] + this->Attributes[IntelligenceAttribute]) / 2;
-	} else if (title == CharacterTitleInteriorMinister) {
+	} else if (title == stratagus::character_title::interior_minister) {
 		score = this->Attributes[IntelligenceAttribute];
-	} else if (title == CharacterTitleJusticeMinister) {
+	} else if (title == stratagus::character_title::justice_minister) {
 		score = this->Attributes[IntelligenceAttribute];
-	} else if (title == CharacterTitleForeignMinister) {
+	} else if (title == stratagus::character_title::foreign_minister) {
 		score = (this->Attributes[CharismaAttribute] + this->Attributes[IntelligenceAttribute]) / 2;
-	} else if (title == CharacterTitleGovernor) {
+	} else if (title == stratagus::character_title::governor) {
 		score = ((this->Attributes[IntelligenceAttribute] + ((this->Attributes[this->GetMartialAttribute()] + this->Attributes[IntelligenceAttribute]) / 2) + this->Attributes[CharismaAttribute]) / 3);
 		if (province != nullptr && (province == this->Province || province == this->ProvinceOfOrigin)) {
 			score += 1;
@@ -1013,13 +1013,13 @@ int CGrandStrategyHero::GetTitleScore(int title, CGrandStrategyProvince *provinc
 	return score;
 }
 
-std::string CGrandStrategyHero::GetMinisterEffectsString(int title)
+std::string CGrandStrategyHero::GetMinisterEffectsString(const stratagus::character_title title)
 {
 	std::string minister_effects_string;
 	
 	bool first = true;
 	
-	if (title == CharacterTitleHeadOfState || title == CharacterTitleWarMinister) {
+	if (title == stratagus::character_title::head_of_state || title == stratagus::character_title::war_minister) {
 		int modifier = this->GetTroopCostModifier();
 		if (modifier != 0) {
 			if (!first) {
@@ -1040,7 +1040,7 @@ std::string CGrandStrategyHero::GetMinisterEffectsString(int title)
 std::string CGrandStrategyHero::GetBestDisplayTitle()
 {
 	std::string best_title = this->get_unit_type()->get_name();
-	int best_title_type = MaxCharacterTitles;
+	int best_title_type = -1;
 	/*
 	for (size_t i = 0; i < this->Titles.size(); ++i) {
 		if (this->Titles[i].second != this->GetFaction()) {
@@ -1433,9 +1433,9 @@ void SetFactionMinister(std::string civilization_name, std::string faction_name,
 	if (civilization) {
 		faction = stratagus::faction::get(faction_name)->ID;
 	}
-	int title = GetCharacterTitleIdByName(title_name);
+	const stratagus::character_title title = GetCharacterTitleIdByName(title_name);
 	
-	if (faction == -1 || title == -1) {
+	if (faction == -1 || title == stratagus::character_title::none) {
 		return;
 	}
 	
@@ -1449,9 +1449,9 @@ std::string GetFactionMinister(std::string civilization_name, std::string factio
 	if (civilization) {
 		faction = stratagus::faction::get(faction_name)->ID;
 	}
-	int title = GetCharacterTitleIdByName(title_name);
+	const stratagus::character_title title = GetCharacterTitleIdByName(title_name);
 	
-	if (faction == -1 || title == -1) {
+	if (faction == -1 || title == stratagus::character_title::none) {
 		return "";
 	}
 	

@@ -29,6 +29,7 @@
 
 #include "civilization.h"
 
+#include "character.h"
 #include "civilization_group.h"
 #include "civilization_supergroup.h"
 #include "database/defines.h"
@@ -515,7 +516,7 @@ std::string_view civilization::get_title_name(const government_type government_t
 	return string::empty_str;
 }
 
-std::string_view civilization::get_character_title_name(const int title_type, const int faction_type, stratagus::government_type government_type, const faction_tier tier, const gender gender) const
+std::string_view civilization::get_character_title_name(const character_title title_type, const int faction_type, stratagus::government_type government_type, const faction_tier tier, const gender gender) const
 {
 	auto find_iterator = this->character_title_names.find(title_type);
 	if (find_iterator != this->character_title_names.end()) {
@@ -551,7 +552,7 @@ std::string_view civilization::get_character_title_name(const int title_type, co
 	}
 
 	switch (title_type) {
-		case CharacterTitleHeadOfState:
+		case character_title::head_of_state:
 			switch (faction_type) {
 				case FactionTypeTribe:
 					if (gender == gender::female) {
@@ -631,32 +632,32 @@ std::string_view civilization::get_character_title_name(const int title_type, co
 					break;
 			}
 			break;
-		case CharacterTitleHeadOfGovernment:
+		case character_title::head_of_government:
 			return "Prime Minister";
-		case CharacterTitleEducationMinister:
+		case character_title::education_minister:
 			//return "Education Minister"; //education minister sounds too modern, considering the technology tree we have up to now only goes to the medieval era
 			return "Master Educator";
-		case CharacterTitleFinanceMinister:
+		case character_title::finance_minister:
 			//return "Finance Minister"; //finance minister sounds too modern, considering the technology tree we have up to now only goes to the medieval era
 			return "Treasurer";
-		case CharacterTitleForeignMinister:
+		case character_title::foreign_minister:
 			//return "Foreign Minister"; //foreign minister sounds too modern, considering the technology tree we have up to now only goes to the medieval era
 			return "Chancellor";
-		case CharacterTitleIntelligenceMinister:
+		case character_title::intelligence_minister:
 			//return "Intelligence Minister"; //intelligence minister sounds too modern, considering the technology tree we have up to now only goes to the medieval era
 			return "Spymaster";
-		case CharacterTitleInteriorMinister:
+		case character_title::interior_minister:
 			//return "Interior Minister"; //interior minister sounds too modern, considering the technology tree we have up to now only goes to the medieval era
 			return "High Constable";
-		case CharacterTitleJusticeMinister:
+		case character_title::justice_minister:
 			//return "Justice Minister"; //justice minister sounds too modern, considering the technology tree we have up to now only goes to the medieval era
 			return "Master of Laws";
-		case CharacterTitleWarMinister:
+		case character_title::war_minister:
 			//return "War Minister"; //war minister sounds too modern, considering the technology tree we have up to now only goes to the medieval era
 			return "Marshal";
-		case CharacterTitleGovernor:
+		case stratagus::character_title::governor:
 			return "Governor";
-		case CharacterTitleMayor:
+		case character_title::mayor:
 			return "Mayor";
 		default:
 			break;
@@ -668,14 +669,14 @@ std::string_view civilization::get_character_title_name(const int title_type, co
 void civilization::process_character_title_name_scope(const sml_data &scope)
 {
 	const std::string &tag = scope.get_tag();
-	const int title_type = GetCharacterTitleIdByName(tag);
+	const stratagus::character_title title_type = GetCharacterTitleIdByName(tag);
 
 	scope.for_each_child([&](const sml_data &child_scope) {
 		this->process_character_title_name_scope(title_type, child_scope);
 	});
 }
 
-void civilization::process_character_title_name_scope(const int title_type, const sml_data &scope)
+void civilization::process_character_title_name_scope(const character_title title_type, const sml_data &scope)
 {
 	const std::string &tag = scope.get_tag();
 	const int faction_type = GetFactionTypeIdByName(tag);

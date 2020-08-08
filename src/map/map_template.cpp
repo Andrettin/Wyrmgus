@@ -30,6 +30,7 @@
 #include "map/map_template.h"
 
 #include "campaign.h"
+#include "character.h"
 #include "civilization.h"
 #include "config.h"
 #include "database/defines.h"

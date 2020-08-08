@@ -260,7 +260,7 @@ void character::ProcessConfigData(const CConfigData *config_data)
 			location->ProcessConfigData(child_config_data);
 			this->HistoricalLocations.push_back(std::move(location));
 		} else if (child_config_data->Tag == "historical_title") {
-			int title = -1;
+			character_title title = character_title::none;
 			CDate start_date;
 			CDate end_date;
 			stratagus::faction *title_faction = nullptr;
@@ -272,7 +272,7 @@ void character::ProcessConfigData(const CConfigData *config_data)
 				if (key == "title") {
 					value = FindAndReplaceString(value, "_", "-");
 					title = GetCharacterTitleIdByName(value);
-					if (title == -1) {
+					if (title == character_title::none) {
 						fprintf(stderr, "Character title \"%s\" does not exist.\n", value.c_str());
 					}
 				} else if (key == "start_date") {
@@ -288,7 +288,7 @@ void character::ProcessConfigData(const CConfigData *config_data)
 				}
 			}
 			
-			if (title == -1) {
+			if (title == character_title::none) {
 				fprintf(stderr, "Historical title has no title.\n");
 				continue;
 			}
@@ -299,10 +299,10 @@ void character::ProcessConfigData(const CConfigData *config_data)
 			}
 			
 			if (start_date.Year != 0 && end_date.Year != 0 && IsMinisterialTitle(title)) { // don't put in the faction's historical data if a blank year was given
-				title_faction->HistoricalMinisters[std::tuple<CDate, CDate, int>(start_date, end_date, title)] = this;
+				title_faction->HistoricalMinisters[std::make_tuple(start_date, end_date, title)] = this;
 			}
 				
-			this->HistoricalTitles.push_back(std::tuple<CDate, CDate, stratagus::faction *, int>(start_date, end_date, title_faction, title));
+			this->HistoricalTitles.push_back(std::make_tuple(start_date, end_date, title_faction, title));
 		} else if (child_config_data->Tag == "item") {
 			CPersistentItem *item = new CPersistentItem;
 			item->Owner = this;
@@ -1013,65 +1013,65 @@ bool IsNameValidForCustomHero(const std::string &hero_name, const std::string &h
 	return true;
 }
 
-std::string GetCharacterTitleNameById(int title)
+std::string GetCharacterTitleNameById(const stratagus::character_title title)
 {
-	if (title == CharacterTitleHeadOfState) {
+	if (title == stratagus::character_title::head_of_state) {
 		return "head-of-state";
-	} else if (title == CharacterTitleHeadOfGovernment) {
+	} else if (title == stratagus::character_title::head_of_government) {
 		return "head-of-government";
-	} else if (title == CharacterTitleEducationMinister) {
+	} else if (title == stratagus::character_title::education_minister) {
 		return "education-minister";
-	} else if (title == CharacterTitleFinanceMinister) {
+	} else if (title == stratagus::character_title::finance_minister) {
 		return "finance-minister";
-	} else if (title == CharacterTitleForeignMinister) {
+	} else if (title == stratagus::character_title::foreign_minister) {
 		return "foreign-minister";
-	} else if (title == CharacterTitleIntelligenceMinister) {
+	} else if (title == stratagus::character_title::intelligence_minister) {
 		return "intelligence-minister";
-	} else if (title == CharacterTitleInteriorMinister) {
+	} else if (title == stratagus::character_title::interior_minister) {
 		return "interior-minister";
-	} else if (title == CharacterTitleJusticeMinister) {
+	} else if (title == stratagus::character_title::justice_minister) {
 		return "justice-minister";
-	} else if (title == CharacterTitleWarMinister) {
+	} else if (title == stratagus::character_title::war_minister) {
 		return "war-minister";
-	} else if (title == CharacterTitleGovernor) {
+	} else if (title == stratagus::character_title::governor) {
 		return "governor";
-	} else if (title == CharacterTitleMayor) {
+	} else if (title == stratagus::character_title::mayor) {
 		return "mayor";
 	}
 
 	return "";
 }
 
-int GetCharacterTitleIdByName(const std::string &title)
+stratagus::character_title GetCharacterTitleIdByName(const std::string &title)
 {
 	if (title == "head-of-state") {
-		return CharacterTitleHeadOfState;
+		return stratagus::character_title::head_of_state;
 	} else if (title == "head-of-government") {
-		return CharacterTitleHeadOfGovernment;
+		return stratagus::character_title::head_of_government;
 	} else if (title == "education-minister") {
-		return CharacterTitleEducationMinister;
+		return stratagus::character_title::education_minister;
 	} else if (title == "finance-minister") {
-		return CharacterTitleFinanceMinister;
+		return stratagus::character_title::finance_minister;
 	} else if (title == "foreign-minister") {
-		return CharacterTitleForeignMinister;
+		return stratagus::character_title::foreign_minister;
 	} else if (title == "intelligence-minister") {
-		return CharacterTitleIntelligenceMinister;
+		return stratagus::character_title::intelligence_minister;
 	} else if (title == "interior-minister") {
-		return CharacterTitleInteriorMinister;
+		return stratagus::character_title::interior_minister;
 	} else if (title == "justice-minister") {
-		return CharacterTitleJusticeMinister;
+		return stratagus::character_title::justice_minister;
 	} else if (title == "war-minister") {
-		return CharacterTitleWarMinister;
+		return stratagus::character_title::war_minister;
 	} else if (title == "governor") {
-		return CharacterTitleGovernor;
+		return stratagus::character_title::governor;
 	} else if (title == "mayor") {
-		return CharacterTitleMayor;
+		return stratagus::character_title::mayor;
 	}
 
-	return -1;
+	return stratagus::character_title::none;
 }
 
-bool IsMinisterialTitle(int title)
+bool IsMinisterialTitle(const stratagus::character_title title)
 {
-	return (title == CharacterTitleHeadOfState || title == CharacterTitleHeadOfGovernment || title == CharacterTitleEducationMinister || title == CharacterTitleFinanceMinister || title == CharacterTitleForeignMinister || title == CharacterTitleIntelligenceMinister || title == CharacterTitleInteriorMinister || title == CharacterTitleJusticeMinister || title == CharacterTitleWarMinister);
+	return (title == stratagus::character_title::head_of_state || title == stratagus::character_title::head_of_government || title == stratagus::character_title::education_minister || title == stratagus::character_title::finance_minister || title == stratagus::character_title::foreign_minister || title == stratagus::character_title::intelligence_minister || title == stratagus::character_title::interior_minister || title == stratagus::character_title::justice_minister || title == stratagus::character_title::war_minister);
 }

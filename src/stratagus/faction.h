@@ -27,7 +27,6 @@
 
 #pragma once
 
-#include "character.h" //for MaxCharacterTitles
 #include "database/data_type.h"
 #include "database/detailed_data_entry.h"
 #include "faction_tier.h"
@@ -53,6 +52,7 @@ class resource;
 class unit_class;
 class unit_type;
 class upgrade_class;
+enum class character_title;
 enum class diplomacy_state;
 enum class faction_tier;
 enum class government_type;
@@ -79,7 +79,7 @@ class faction final : public detailed_data_entry, public data_type<faction>
 
 public:
 	using title_name_map = std::map<government_type, std::map<faction_tier, std::string>>;
-	using character_title_name_map = std::map<int, std::map<government_type, std::map<faction_tier, std::map<gender, std::string>>>>;
+	using character_title_name_map = std::map<character_title, std::map<government_type, std::map<faction_tier, std::map<gender, std::string>>>>;
 
 	static constexpr const char *class_identifier = "faction";
 	static constexpr const char *database_folder = "factions";
@@ -166,7 +166,7 @@ public:
 	}
 
 	std::string_view get_title_name(const government_type government_type, const faction_tier tier) const;
-	std::string_view get_character_title_name(const int title_type, const government_type government_type, const faction_tier tier, const gender gender) const;
+	std::string_view get_character_title_name(const character_title title_type, const government_type government_type, const faction_tier tier, const gender gender) const;
 
 	int GetUpgradePriority(const CUpgrade *upgrade) const;
 	int GetForceTypeWeight(const ForceType force_type) const;
@@ -343,7 +343,7 @@ public:
 	std::map<ForceType, std::vector<CForceTemplate *>> ForceTemplates;		/// Force templates, mapped to each force type
 	std::map<ForceType, int> ForceTypeWeights;								/// Weights for each force type
 	std::vector<CAiBuildingTemplate *> AiBuildingTemplates;				/// AI building templates
-	std::map<std::tuple<CDate, CDate, int>, character *> HistoricalMinisters;	/// historical ministers of the faction (as well as heads of state and government), mapped to the beginning and end of the rule, and the enum of the title in question
+	std::map<std::tuple<CDate, CDate, character_title>, character *> HistoricalMinisters;	/// historical ministers of the faction (as well as heads of state and government), mapped to the beginning and end of the rule, and the enum of the title in question
 	std::map<std::string, std::map<CDate, bool>> HistoricalUpgrades;	/// historical upgrades of the faction, with the date of change
 	std::map<int, faction_tier> HistoricalTiers; /// dates in which this faction's tier changed; faction tier mapped to year
 	std::map<int, government_type> HistoricalGovernmentTypes;						/// dates in which this faction's government type changed; government type mapped to year

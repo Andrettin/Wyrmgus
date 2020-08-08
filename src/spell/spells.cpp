@@ -34,15 +34,12 @@
 ** Don't ever go breaking this spell
 */
 
-/*----------------------------------------------------------------------------
--- Includes
-----------------------------------------------------------------------------*/
-
 #include "stratagus.h"
 
 #include "spells.h"
 
 #include "actions.h"
+#include "character.h"
 #include "civilization.h"
 #include "commands.h"
 #include "config.h"

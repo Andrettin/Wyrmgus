@@ -446,8 +446,8 @@ static int CclDefineCharacter(lua_State *l)
 			}
 			const int subargs = lua_rawlen(l, -1);
 			for (int j = 0; j < subargs; ++j) {
-				int title = GetCharacterTitleIdByName(LuaToString(l, -1, j + 1));
-				if (title == -1) {
+				const stratagus::character_title title = GetCharacterTitleIdByName(LuaToString(l, -1, j + 1));
+				if (title == stratagus::character_title::none) {
 					LuaError(l, "Character title doesn't exist.");
 				}
 				++j;
@@ -466,9 +466,9 @@ static int CclDefineCharacter(lua_State *l)
 				stratagus::faction *title_faction = stratagus::faction::get(title_faction_name);
 
 				if (start_date.Year != 0 && end_date.Year != 0 && IsMinisterialTitle(title)) { // don't put in the faction's historical data if a blank year was given
-					title_faction->HistoricalMinisters[std::tuple<CDate, CDate, int>(start_date, end_date, title)] = character;
+					title_faction->HistoricalMinisters[std::make_tuple(start_date, end_date, title)] = character;
 				}
-				character->HistoricalTitles.push_back(std::tuple<CDate, CDate, stratagus::faction *, int>(start_date, end_date, title_faction, title));
+				character->HistoricalTitles.push_back(std::make_tuple(start_date, end_date, title_faction, title));
 			}
 		} else {
 			LuaError(l, "Unsupported tag: %s" _C_ value);

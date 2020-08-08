@@ -967,7 +967,7 @@ static int CclDefineCivilization(lua_State *l)
 			}
 			const int subargs = lua_rawlen(l, -1);
 			for (int k = 0; k < subargs; ++k) {
-				int title = GetCharacterTitleIdByName(LuaToString(l, -1, k + 1));
+				const stratagus::character_title title = GetCharacterTitleIdByName(LuaToString(l, -1, k + 1));
 				++k;
 				const stratagus::gender gender = stratagus::string_to_gender(LuaToString(l, -1, k + 1));
 				++k;
@@ -1660,7 +1660,7 @@ static int CclDefineFaction(lua_State *l)
 			}
 			const int subargs = lua_rawlen(l, -1);
 			for (int k = 0; k < subargs; ++k) {
-				int title = GetCharacterTitleIdByName(LuaToString(l, -1, k + 1));
+				const stratagus::character_title title = GetCharacterTitleIdByName(LuaToString(l, -1, k + 1));
 				++k;
 				const stratagus::gender gender = stratagus::string_to_gender(LuaToString(l, -1, k + 1));
 				++k;
@@ -2690,7 +2690,7 @@ static int CclGetPlayerData(lua_State *l)
 		LuaCheckArgs(l, 4);
 		std::string title_type_ident = LuaToString(l, 3);
 		std::string gender_ident = LuaToString(l, 4);
-		int title_type_id = GetCharacterTitleIdByName(title_type_ident);
+		const stratagus::character_title title_type_id = GetCharacterTitleIdByName(title_type_ident);
 		const stratagus::gender gender = stratagus::string_to_gender(gender_ident);
 		
 		lua_pushstring(l, p->GetCharacterTitleName(title_type_id, gender).data());
