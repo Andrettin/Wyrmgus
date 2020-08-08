@@ -683,6 +683,7 @@ set(stratagus_script_condition_HDRS
 	src/script/condition/and_condition.h
 	src/script/condition/character_condition.h
 	src/script/condition/condition.h
+	src/script/condition/dynasty_condition.h
 	src/script/condition/faction_condition.h
 	src/script/condition/not_condition.h
 	src/script/condition/or_condition.h
