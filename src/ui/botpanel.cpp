@@ -1434,6 +1434,10 @@ bool IsButtonAllowed(const CUnit &unit, const stratagus::button &buttonaction)
 			break;
 		case ButtonCmd::Buy:
 			res = (buttonaction.Value != -1) && (&UnitManager.GetSlotUnit(buttonaction.Value) != nullptr);
+			if (UnitManager.GetSlotUnit(buttonaction.Value).Character != nullptr) {
+				//check whether the character's conditions are still valid
+				res = res && Selected[0]->Player->can_recruit_hero(UnitManager.GetSlotUnit(buttonaction.Value).Character);
+			}
 			break;
 	}
 #if 0

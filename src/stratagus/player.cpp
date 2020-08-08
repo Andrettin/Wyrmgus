@@ -1852,6 +1852,11 @@ bool CPlayer::can_recruit_hero(const stratagus::character *character, bool ignor
 		return false;
 	}
 	
+	if (!CheckConditions(character, this)) {
+		return false;
+	}
+	
+	//the preconditions for the character's unit type must be fulfilled
 	if (!CheckConditions(character->get_unit_type(), this, true)) {
 		return false;
 	}

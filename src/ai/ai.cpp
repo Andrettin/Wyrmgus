@@ -316,12 +316,16 @@ static void AiCheckUnits()
 					continue;
 				}
 				
-				for (size_t j = 0; j < hero_recruiter->SoldUnits.size(); ++j) {
+				for (CUnit *hero : hero_recruiter->SoldUnits) {
+					if (!hero_recruiter->Player->can_recruit_hero(hero->Character)) {
+						continue;
+					}
+
 					int buy_costs[MaxCosts];
 					memset(buy_costs, 0, sizeof(buy_costs));
-					buy_costs[CopperCost] = hero_recruiter->SoldUnits[j]->GetPrice();
-					if (!AiPlayer->Player->CheckCosts(buy_costs) && AiPlayer->Player->CheckLimits(*hero_recruiter->SoldUnits[j]->Type) >= 1) {
-						CommandBuy(*hero_recruiter, hero_recruiter->SoldUnits[j], AiPlayer->Player->Index);
+					buy_costs[CopperCost] = hero->GetPrice();
+					if (!AiPlayer->Player->CheckCosts(buy_costs) && AiPlayer->Player->CheckLimits(*hero->Type) >= 1) {
+						CommandBuy(*hero_recruiter, hero, AiPlayer->Player->Index);
 						break;
 					}
 				}
@@ -343,12 +347,16 @@ static void AiCheckUnits()
 				}
 
 				if (AiPlayer->Player->Heroes.size() < PlayerHeroMax && AiPlayer->Player->HeroCooldownTimer == 0 && mercenary_building->Type->BoolFlag[RECRUITHEROES_INDEX].value && !IsNetworkGame() && CurrentQuest == nullptr) { //check if can hire any heroes at the mercenary camp
-					for (size_t k = 0; k < mercenary_building->SoldUnits.size(); ++k) {
+					for (CUnit *mercenary_hero : mercenary_building->SoldUnits) {
+						if (!mercenary_building->Player->can_recruit_hero(mercenary_hero->Character)) {
+							continue;
+						}
+
 						int buy_costs[MaxCosts];
 						memset(buy_costs, 0, sizeof(buy_costs));
-						buy_costs[CopperCost] = mercenary_building->SoldUnits[k]->GetPrice();
-						if (!AiPlayer->Player->CheckCosts(buy_costs) && AiPlayer->Player->CheckLimits(*mercenary_building->SoldUnits[k]->Type) >= 1) {
-							CommandBuy(*mercenary_building, mercenary_building->SoldUnits[k], AiPlayer->Player->Index);
+						buy_costs[CopperCost] = mercenary_hero->GetPrice();
+						if (!AiPlayer->Player->CheckCosts(buy_costs) && AiPlayer->Player->CheckLimits(*mercenary_hero->Type) >= 1) {
+							CommandBuy(*mercenary_building, mercenary_hero, AiPlayer->Player->Index);
 							break;
 						}
 					}
