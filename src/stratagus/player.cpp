@@ -1367,6 +1367,10 @@ void CPlayer::SetRandomFaction()
 
 void CPlayer::set_dynasty(const stratagus::dynasty *dynasty)
 {
+	if (dynasty == this->get_dynasty()) {
+		return;
+	}
+
 	const stratagus::dynasty *old_dynasty = this->dynasty;
 	
 	if (old_dynasty != nullptr) {

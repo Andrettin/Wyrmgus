@@ -155,6 +155,7 @@ void game::apply_player_history()
 
 		player->set_faction_tier(faction->get_tier());
 		player->set_government_type(faction->get_government_type());
+		player->set_dynasty(faction->get_dynasty());
 
 		for (std::map<std::string, std::map<CDate, bool>>::iterator iterator = civilization->HistoricalUpgrades.begin(); iterator != civilization->HistoricalUpgrades.end(); ++iterator) {
 			int upgrade_id = UpgradeIdByIdent(iterator->first);

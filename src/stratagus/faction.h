@@ -75,6 +75,7 @@ class faction final : public detailed_data_entry, public data_type<faction>
 	Q_PROPERTY(stratagus::faction_tier tier MEMBER tier READ get_tier)
 	Q_PROPERTY(stratagus::government_type government_type MEMBER government_type READ get_government_type)
 	Q_PROPERTY(stratagus::site* capital MEMBER capital READ get_capital)
+	Q_PROPERTY(stratagus::dynasty* dynasty MEMBER dynasty READ get_dynasty)
 	Q_PROPERTY(QVariantList acquired_upgrades READ get_acquired_upgrades_qstring_list)
 
 public:
@@ -111,6 +112,7 @@ public:
 		this->tier = this->get_default_tier();
 		this->government_type = this->get_default_government_type();
 		this->capital = this->get_default_capital();
+		this->dynasty = nullptr;
 		this->resources.clear();
 		this->diplomacy_states.clear();
 		this->acquired_upgrades.clear();
@@ -266,6 +268,11 @@ public:
 		return this->capital;
 	}
 
+	dynasty *get_dynasty() const
+	{
+		return this->dynasty;
+	}
+
 	const std::map<const resource *, int> &get_resources() const
 	{
 		return this->resources;
@@ -351,6 +358,7 @@ private:
 	faction_tier tier;
 	government_type government_type;
 	site *capital = nullptr;
+	stratagus::dynasty *dynasty = nullptr;
 	std::map<const resource *, int> resources;
 	std::map<const faction *, diplomacy_state> diplomacy_states;
 	std::vector<CUpgrade *> acquired_upgrades;
