@@ -125,6 +125,11 @@ public:
 	virtual void process_sml_scope(const stratagus::sml_data &scope) override;
 	virtual void initialize() override;
 
+	int get_index() const
+	{
+		return this->ID;
+	}
+
 	void set_parent(const CUpgrade *parent_upgrade);
 
 	stratagus::icon *get_icon() const

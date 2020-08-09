@@ -428,6 +428,7 @@ source_group(unit FILES ${unit_SRCS})
 set(upgrade_SRCS
 	src/upgrade/upgrade.cpp
 	src/upgrade/upgrade_class.cpp
+	src/upgrade/upgrade_container.cpp
 	src/upgrade/upgrade_modifier.cpp
 )
 source_group(upgrade FILES ${upgrade_SRCS})
@@ -770,6 +771,7 @@ set(stratagus_unit_HDRS
 set(stratagus_upgrade_HDRS
 	src/include/upgrade/upgrade.h
 	src/upgrade/upgrade_class.h
+	src/upgrade/upgrade_container.h
 	src/include/upgrade/upgrade_modifier.h
 	src/include/upgrade/upgrade_structs.h
 )
