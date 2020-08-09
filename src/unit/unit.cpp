@@ -976,17 +976,17 @@ void CUnit::set_character(stratagus::character *character)
 
 	//load learned abilities
 	std::vector<const CUpgrade *> abilities_to_remove;
-	for (size_t i = 0; i < this->Character->Abilities.size(); ++i) {
-		if (CanLearnAbility(this->Character->Abilities[i])) {
-			AbilityAcquire(*this, this->Character->Abilities[i], false);
+	for (size_t i = 0; i < this->Character->get_abilities().size(); ++i) {
+		if (CanLearnAbility(this->Character->get_abilities()[i])) {
+			AbilityAcquire(*this, this->Character->get_abilities()[i], false);
 		} else { //can't learn the ability? something changed in the game's code, remove it from persistent data and allow the hero to repick the ability
-			abilities_to_remove.push_back(this->Character->Abilities[i]);
+			abilities_to_remove.push_back(this->Character->get_abilities()[i]);
 		}
 	}
 
 	if (!abilities_to_remove.empty()) {
 		for (size_t i = 0; i < abilities_to_remove.size(); ++i) {
-			stratagus::vector::remove(this->Character->Abilities, abilities_to_remove[i]);
+			this->Character->remove_ability(abilities_to_remove[i]);
 		}
 
 		if (this->Player == CPlayer::GetThisPlayer()) {

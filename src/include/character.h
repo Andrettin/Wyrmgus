@@ -243,6 +243,18 @@ public:
 		this->level = level;
 	}
 
+	const std::vector<const CUpgrade *> &get_abilities() const
+	{
+		return this->abilities;
+	}
+
+	void add_ability(const CUpgrade *ability)
+	{
+		this->abilities.push_back(ability);
+	}
+
+	void remove_ability(const CUpgrade *ability);
+
 	const std::unique_ptr<historical_location> &get_location() const
 	{
 		return this->location;
@@ -292,7 +304,9 @@ private:
 	bool ai_active = true; //whether the character's AI is active
 public:
 	std::vector<deity *> Deities;		/// Deities chosen by this character to worship
-	std::vector<const CUpgrade *> Abilities;
+private:
+	std::vector<const CUpgrade *> abilities;
+public:
 	std::vector<CUpgrade *> ReadWorks;
 	std::vector<CUpgrade *> ConsumedElixirs;
 	std::vector<CUpgrade *> AuthoredWorks;	/// Literary works of which this character is the author

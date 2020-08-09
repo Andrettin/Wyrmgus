@@ -111,6 +111,11 @@ void character::process_sml_scope(const sml_data &scope)
 			stratagus::unit_type *unit_type = unit_type::get(value);
 			this->ForbiddenUpgrades.push_back(unit_type);
 		}
+	} else if (tag == "abilities") {
+		for (const std::string &value : values) {
+			CUpgrade *ability = CUpgrade::get(value);
+			this->abilities.push_back(ability);
+		}
 	} else {
 		data_entry::process_sml_scope(scope);
 	}
@@ -234,10 +239,9 @@ void character::ProcessConfigData(const CConfigData *config_data)
 			stratagus::unit_type *unit_type = unit_type::get(value);
 			this->ForbiddenUpgrades.push_back(unit_type);
 		} else if (key == "ability") {
-			value = FindAndReplaceString(value, "_", "-");
 			CUpgrade *ability_upgrade = CUpgrade::try_get(value);
 			if (ability_upgrade) {
-				this->Abilities.push_back(ability_upgrade);
+				this->abilities.push_back(ability_upgrade);
 			} else {
 				fprintf(stderr, "Upgrade \"%s\" does not exist.\n", value.c_str());
 			}
@@ -366,12 +370,18 @@ void character::initialize()
 		}
 	}
 
+	for (const CUpgrade *ability : this->get_base_abilities()) {
+		if (!vector::contains(this->get_abilities(), ability)) {
+			this->abilities.push_back(ability);
+		}
+	}
+
 	//check if the abilities are correct for this character's unit type
-	if (this->get_unit_type() != nullptr && this->Abilities.size() > 0 && ((int) AiHelpers.LearnableAbilities.size()) > this->get_unit_type()->Slot) {
-		int ability_count = (int) this->Abilities.size();
+	if (this->get_unit_type() != nullptr && this->get_abilities().size() > 0 && static_cast<int>(AiHelpers.LearnableAbilities.size()) > this->get_unit_type()->Slot) {
+		int ability_count = static_cast<int>(this->get_abilities().size());
 		for (int i = (ability_count - 1); i >= 0; --i) {
-			if (!vector::contains(AiHelpers.LearnableAbilities[this->get_unit_type()->Slot], this->Abilities[i])) {
-				vector::remove(this->Abilities, this->Abilities[i]);
+			if (!vector::contains(AiHelpers.LearnableAbilities[this->get_unit_type()->Slot], this->abilities[i])) {
+				vector::remove(this->abilities, this->abilities[i]);
 			}
 		}
 	}
@@ -646,7 +656,7 @@ void character::UpdateAttributes()
 		for (const stratagus::upgrade_modifier *modifier : stratagus::upgrade_modifier::UpgradeModifiers) {
 			if (
 				(this->get_trait() != nullptr && modifier->UpgradeId == this->get_trait()->ID)
-				|| std::find(this->Abilities.begin(), this->Abilities.end(), CUpgrade::get_all()[modifier->UpgradeId]) != this->Abilities.end()
+				|| vector::contains(this->abilities, CUpgrade::get_all()[modifier->UpgradeId])
 			) {
 				if (modifier->Modifier.Variables[var].Value != 0) {
 					this->Attributes[i] += modifier->Modifier.Variables[var].Value;
@@ -654,6 +664,11 @@ void character::UpdateAttributes()
 			}
 		}
 	}
+}
+
+void character::remove_ability(const CUpgrade *ability)
+{
+	vector::remove(this->abilities, ability);
 }
 
 }
@@ -783,11 +798,11 @@ void SaveHero(stratagus::character *hero)
 	if (hero->ExperiencePercent != 0) {
 		fprintf(fd, "\tExperiencePercent = %d,\n", hero->ExperiencePercent);
 	}
-	if (hero->Abilities.size() > 0) {
+	if (hero->get_abilities().size() > 0) {
 		fprintf(fd, "\tAbilities = {");
-		for (size_t j = 0; j < hero->Abilities.size(); ++j) {
-			fprintf(fd, "\"%s\"", hero->Abilities[j]->Ident.c_str());
-			if (j < (hero->Abilities.size() - 1)) {
+		for (size_t j = 0; j < hero->get_abilities().size(); ++j) {
+			fprintf(fd, "\"%s\"", hero->get_abilities()[j]->Ident.c_str());
+			if (j < (hero->get_abilities().size() - 1)) {
 				fprintf(fd, ", ");
 			}
 		}

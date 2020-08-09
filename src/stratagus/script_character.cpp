@@ -219,13 +219,13 @@ static int CclDefineCharacter(lua_State *l)
 		} else if (!strcmp(value, "Conditions")) {
 			character->Conditions = new LuaCallback(l, -1);
 		} else if (!strcmp(value, "Abilities")) {
-			character->Abilities.clear();
+			character->abilities.clear();
 			const int args = lua_rawlen(l, -1);
 			for (int j = 0; j < args; ++j) {
 				std::string ability_ident = LuaToString(l, -1, j + 1);
 				CUpgrade *ability = CUpgrade::try_get(ability_ident);
 				if (ability != nullptr) {
-					character->Abilities.push_back(ability);
+					character->abilities.push_back(ability);
 				} else {
 					fprintf(stderr, "Ability \"%s\" doesn't exist.", ability_ident.c_str());
 				}
@@ -550,13 +550,13 @@ static int CclDefineCustomHero(lua_State *l)
 		} else if (!strcmp(value, "ExperiencePercent")) {
 			hero->ExperiencePercent = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "Abilities")) {
-			hero->Abilities.clear();
+			hero->abilities.clear();
 			const int args = lua_rawlen(l, -1);
 			for (int j = 0; j < args; ++j) {
 				std::string ability_ident = LuaToString(l, -1, j + 1);
 				CUpgrade *ability = CUpgrade::try_get(ability_ident);
 				if (ability != nullptr) {
-					hero->Abilities.push_back(ability);
+					hero->abilities.push_back(ability);
 				} else {
 					fprintf(stderr, "Ability \"%s\" doesn't exist.", ability_ident.c_str());
 				}
@@ -719,11 +719,11 @@ static int CclDefineCustomHero(lua_State *l)
 	}
 	
 	//check if the abilities are correct for this hero's unit type
-	if (hero->Abilities.size() > 0 && ((int) AiHelpers.LearnableAbilities.size()) > hero->get_unit_type()->Slot) {
-		int ability_count = (int) hero->Abilities.size();
+	if (hero->abilities.size() > 0 && ((int) AiHelpers.LearnableAbilities.size()) > hero->get_unit_type()->Slot) {
+		int ability_count = (int) hero->abilities.size();
 		for (int i = (ability_count - 1); i >= 0; --i) {
-			if (std::find(AiHelpers.LearnableAbilities[hero->get_unit_type()->Slot].begin(), AiHelpers.LearnableAbilities[hero->get_unit_type()->Slot].end(), hero->Abilities[i]) == AiHelpers.LearnableAbilities[hero->get_unit_type()->Slot].end()) {
-				hero->Abilities.erase(std::remove(hero->Abilities.begin(), hero->Abilities.end(), hero->Abilities[i]), hero->Abilities.end());
+			if (std::find(AiHelpers.LearnableAbilities[hero->get_unit_type()->Slot].begin(), AiHelpers.LearnableAbilities[hero->get_unit_type()->Slot].end(), hero->abilities[i]) == AiHelpers.LearnableAbilities[hero->get_unit_type()->Slot].end()) {
+				hero->abilities.erase(std::remove(hero->abilities.begin(), hero->abilities.end(), hero->abilities[i]), hero->abilities.end());
 			}
 		}
 	}
@@ -885,10 +885,10 @@ static int CclGetCharacterData(lua_State *l)
 		lua_pushboolean(l, character->IsUsable());
 		return 1;
 	} else if (!strcmp(data, "Abilities")) {
-		lua_createtable(l, character->Abilities.size(), 0);
-		for (size_t i = 1; i <= character->Abilities.size(); ++i)
+		lua_createtable(l, character->get_abilities().size(), 0);
+		for (size_t i = 1; i <= character->get_abilities().size(); ++i)
 		{
-			lua_pushstring(l, character->Abilities[i-1]->Ident.c_str());
+			lua_pushstring(l, character->get_abilities()[i-1]->Ident.c_str());
 			lua_rawseti(l, -2, i);
 		}
 		return 1;

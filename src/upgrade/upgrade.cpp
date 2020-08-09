@@ -2269,20 +2269,13 @@ void ApplyUpgrades()
 	}
 }
 
-//Wyrmgus start
-/**
-**  Handle that an ability was acquired.
-**
-**  @param unit     Unit learning the upgrade.
-**  @param upgrade  Upgrade learned.
-*/
 void AbilityAcquire(CUnit &unit, const CUpgrade *upgrade, bool save)
 {
 	unit.Variable[LEVELUP_INDEX].Value -= 1;
 	unit.Variable[LEVELUP_INDEX].Max = unit.Variable[LEVELUP_INDEX].Value;
 	if (!IsNetworkGame() && unit.Character != nullptr && save) {
 		if (unit.Player == CPlayer::GetThisPlayer()) { //save ability learning, if unit has a character and it is persistent, and the character doesn't have the ability yet
-			unit.Character->Abilities.push_back(upgrade);
+			unit.Character->add_ability(upgrade);
 			SaveHero(unit.Character);
 		}
 	}
@@ -2290,21 +2283,15 @@ void AbilityAcquire(CUnit &unit, const CUpgrade *upgrade, bool save)
 	unit.Player->UpdateLevelUpUnits();
 }
 
-/**
-**  Handle that an ability was lost.
-**
-**  @param unit     Unit losing the upgrade.
-**  @param upgrade  Upgrade lost.
-*/
 void AbilityLost(CUnit &unit, CUpgrade *upgrade, bool lose_all)
 {
 	unit.Variable[LEVELUP_INDEX].Value += 1;
 	unit.Variable[LEVELUP_INDEX].Max = unit.Variable[LEVELUP_INDEX].Value;
 	unit.Variable[LEVELUP_INDEX].Enable = 1;
 	if (!IsNetworkGame() && unit.Character != nullptr) {
-		if (std::find(unit.Character->Abilities.begin(), unit.Character->Abilities.end(), upgrade) != unit.Character->Abilities.end()) {
+		if (stratagus::vector::contains(unit.Character->get_abilities(), upgrade)) {
 			if (unit.Player == CPlayer::GetThisPlayer()) { //save ability learning, if unit has a character and it is persistent, and the character doesn't have the ability yet
-				stratagus::vector::remove(unit.Character->Abilities, upgrade);
+				unit.Character->remove_ability(upgrade);
 				SaveHero(unit.Character);
 			}
 		}
