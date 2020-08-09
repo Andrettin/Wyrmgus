@@ -189,38 +189,10 @@ void character::ProcessConfigData(const CConfigData *config_data)
 			this->DeathDate = CDate::FromString(value);
 		} else if (key == "father") {
 			character *father = character::get(value);
-			this->Father = father;
-			if (!father->IsParentOf(this->Ident)) { //check whether the character has already been set as a child of the father
-				father->Children.push_back(this);
-			}
-			// see if the father's other children aren't already included in the character's siblings, and if they aren't, add them (and add the character to the siblings' sibling list, of course)
-			for (character *sibling : father->Children) {
-				if (sibling != this) {
-					if (!this->IsSiblingOf(sibling->Ident)) {
-						this->Siblings.push_back(sibling);
-					}
-					if (!sibling->IsSiblingOf(this->Ident)) {
-						sibling->Siblings.push_back(this);
-					}
-				}
-			}
+			this->father = father;
 		} else if (key == "mother") {
 			character *mother = character::get(value);
-			this->Mother = mother;
-			if (!mother->IsParentOf(this->Ident)) { //check whether the character has already been set as a child of the mother
-				mother->Children.push_back(this);
-			}
-			// see if the mother's other children aren't already included in the character's siblings, and if they aren't, add them (and add the character to the siblings' sibling list, of course)
-			for (character *sibling : mother->Children) {
-				if (sibling != this) {
-					if (!this->IsSiblingOf(sibling->Ident)) {
-						this->Siblings.push_back(sibling);
-					}
-					if (!sibling->IsSiblingOf(this->Ident)) {
-						sibling->Siblings.push_back(this);
-					}
-				}
-			}
+			this->mother = mother;
 		} else if (key == "deity") {
 			deity *deity = deity::get(value);
 			this->Deities.push_back(deity);
@@ -347,6 +319,22 @@ void character::initialize()
 		}
 	}
 
+	if (this->get_father() != nullptr) {
+		this->get_father()->add_child(this);
+	}
+
+	if (this->get_mother() != nullptr) {
+		this->get_mother()->add_child(this);
+	}
+
+	for (character *child : this->get_children()) {
+		if (this->get_gender() == gender::male) {
+			child->father = this;
+		} else {
+			child->mother = this;
+		}
+	}
+
 	//use the character's name for name generation (do this only after setting all properties so that the type, civilization and gender will have been parsed if given
 	if (this->get_unit_type() != nullptr && this->get_unit_type()->BoolFlag[FAUNA_INDEX].value) {
 		if (!this->get_name().empty()) {
@@ -411,12 +399,12 @@ void character::initialize()
 
 void character::check() const
 {
-	if (this->Father != nullptr && this->Father->get_gender() != gender::male) {
-		throw std::runtime_error("Character \"" + this->Father->get_identifier() + "\" is set to be the biological father of \"" + this->get_identifier() + "\", but isn't male.");
+	if (this->get_father() != nullptr && this->get_father()->get_gender() != gender::male) {
+		throw std::runtime_error("Character \"" + this->get_father()->get_identifier() + "\" is set to be the biological father of \"" + this->get_identifier() + "\", but isn't male.");
 	}
 
-	if (this->Mother != nullptr && this->Mother->get_gender() != gender::female) {
-		throw std::runtime_error("Character \"" + this->Mother->get_identifier() + "\" is set to be the biological mother of \"" + this->get_identifier() + "\", but isn't female.");
+	if (this->get_mother() != nullptr && this->get_mother()->get_gender() != gender::female) {
+		throw std::runtime_error("Character \"" + this->get_mother()->get_identifier() + "\" is set to be the biological mother of \"" + this->get_identifier() + "\", but isn't female.");
 	}
 }
 
@@ -511,34 +499,6 @@ calendar *character::get_calendar() const
 	}
 	
 	return nullptr;
-}
-
-bool character::IsParentOf(const std::string &child_ident) const
-{
-	for (size_t i = 0; i < this->Children.size(); ++i) {
-		if (this->Children[i]->Ident == child_ident) {
-			return true;
-		}
-	}
-	return false;
-}
-
-bool character::IsChildOf(const std::string &parent_ident) const
-{
-	if ((this->Father != nullptr && this->Father->Ident == parent_ident) || (this->Mother != nullptr && this->Mother->Ident == parent_ident)) {
-		return true;
-	}
-	return false;
-}
-
-bool character::IsSiblingOf(const std::string &sibling_ident) const
-{
-	for (size_t i = 0; i < this->Siblings.size(); ++i) {
-		if (this->Siblings[i]->Ident == sibling_ident) {
-			return true;
-		}
-	}
-	return false;
 }
 
 bool character::IsItemEquipped(const CPersistentItem *item) const
@@ -647,6 +607,15 @@ CPersistentItem *character::GetItem(CUnit &item) const
 		}
 	}
 	return nullptr;
+}
+
+void character::add_child(character *child)
+{
+	if (vector::contains(this->get_children(), child)) {
+		return;
+	}
+
+	this->children.push_back(child);
 }
 
 void character::UpdateAttributes()

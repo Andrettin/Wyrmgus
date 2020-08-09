@@ -101,6 +101,8 @@ class character : public detailed_data_entry, public data_type<character>, publi
 	Q_PROPERTY(stratagus::faction* default_faction MEMBER default_faction READ get_default_faction)
 	Q_PROPERTY(stratagus::gender gender MEMBER gender READ get_gender)
 	Q_PROPERTY(stratagus::site* home_settlement MEMBER home_settlement)
+	Q_PROPERTY(stratagus::character* father MEMBER father READ get_father)
+	Q_PROPERTY(stratagus::character* mother MEMBER mother READ get_mother)
 	Q_PROPERTY(QString variation READ get_variation_qstring)
 	Q_PROPERTY(bool ai_active MEMBER ai_active READ is_ai_active)
 	Q_PROPERTY(CUpgrade* trait MEMBER trait READ get_trait)
@@ -184,9 +186,6 @@ public:
 	religion *get_religion() const;
 	CLanguage *GetLanguage() const;
 	calendar *get_calendar() const;
-	bool IsParentOf(const std::string &child_full_name) const;
-	bool IsChildOf(const std::string &parent_full_name) const;
-	bool IsSiblingOf(const std::string &sibling_full_name) const;
 	bool IsItemEquipped(const CPersistentItem *item) const;
 	bool IsUsable() const;
 	bool CanAppear(bool ignore_neutral = false) const;
@@ -227,6 +226,23 @@ public:
 	{
 		return this->faction;
 	}
+
+	character *get_father() const
+	{
+		return this->father;
+	}
+
+	character *get_mother() const
+	{
+		return this->mother;
+	}
+
+	const std::vector<character *> &get_children() const
+	{
+		return this->children;
+	}
+
+	void add_child(character *child);
 
 	int get_base_level() const
 	{
@@ -295,15 +311,16 @@ private:
 	CUpgrade *trait = nullptr;
 public:
 	deity *Deity = nullptr;			/// The deity which the character is (if it is a deity)
-	character *Father = nullptr;		/// Character's father
-	character *Mother = nullptr;		/// Character's mother
+private:
+	character *father = nullptr;
+	character *mother = nullptr;
+	std::vector<character *> children;
+public:
 	LuaCallback *Conditions = nullptr;
 private:
 	std::unique_ptr<condition> conditions;
 public:
 	std::vector<CPersistentItem *> EquippedItems[static_cast<int>(stratagus::item_slot::count)]; //equipped items of the character, per slot
-	std::vector<character *> Children;	/// Children of the character
-	std::vector<character *> Siblings;	/// Siblings of the character
 private:
 	site *home_settlement = nullptr; //the home settlement of this character, where they can preferentially be recruited
 	bool ai_active = true; //whether the character's AI is active

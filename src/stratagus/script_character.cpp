@@ -129,70 +129,19 @@ static int CclDefineCharacter(lua_State *l)
 			stratagus::faction *faction = stratagus::faction::get(LuaToString(l, -1));
 			character->default_faction = faction;
 		} else if (!strcmp(value, "Father")) {
-			std::string father_ident = LuaToString(l, -1);
+			const std::string father_ident = LuaToString(l, -1);
 			stratagus::character *father = stratagus::character::get(father_ident);
-			character->Father = father;
-			if (!father->IsParentOf(character_ident)) { //check whether the character has already been set as a child of the father
-				father->Children.push_back(character);
-			}
-			// see if the father's other children aren't already included in the character's siblings, and if they aren't, add them (and add the character to the siblings' sibling list, of course)
-			for (size_t i = 0; i < father->Children.size(); ++i) {
-				if (father->Children[i]->Ident != character_ident) {
-					if (!character->IsSiblingOf(father->Children[i]->Ident)) {
-						character->Siblings.push_back(father->Children[i]);
-					}
-					if (!father->Children[i]->IsSiblingOf(character_ident)) {
-						father->Children[i]->Siblings.push_back(character);
-					}
-				}
-			}
+			character->father = father;
 		} else if (!strcmp(value, "Mother")) {
-			std::string mother_ident = LuaToString(l, -1);
+			const std::string mother_ident = LuaToString(l, -1);
 			stratagus::character *mother = stratagus::character::get(mother_ident);
-
-			character->Mother = mother;
-			if (!mother->IsParentOf(character_ident)) { //check whether the character has already been set as a child of the mother
-				mother->Children.push_back(character);
-			}
-			// see if the mother's other children aren't already included in the character's siblings, and if they aren't, add them (and add the character to the siblings' sibling list, of course)
-			for (size_t i = 0; i < mother->Children.size(); ++i) {
-				if (mother->Children[i]->Ident != character_ident) {
-					if (!character->IsSiblingOf(mother->Children[i]->Ident)) {
-						character->Siblings.push_back(mother->Children[i]);
-					}
-					if (!mother->Children[i]->IsSiblingOf(character_ident)) {
-						mother->Children[i]->Siblings.push_back(character);
-					}
-				}
-			}
+			character->mother = mother;
 		} else if (!strcmp(value, "Children")) {
 			const int args = lua_rawlen(l, -1);
 			for (int j = 0; j < args; ++j) {
 				std::string child_ident = LuaToString(l, -1, j + 1);
 				stratagus::character *child = stratagus::character::get(child_ident);
-				if (child) {
-					if (character->get_gender() == stratagus::gender::male) {
-						child->Father = character;
-					} else {
-						child->Mother = character;
-					}
-					if (!character->IsParentOf(child_ident)) { //check whether the character has already been set as a parent of the child
-						character->Children.push_back(child);
-					}
-					// see if the character's other children aren't already included in the child's siblings, and if they aren't, add them (and add the character to the siblings' sibling list too)
-					for (size_t i = 0; i < character->Children.size(); ++i) {
-						if (character->Children[i] != child) {
-							if (!child->IsSiblingOf(character->Children[i]->Ident)) {
-								child->Siblings.push_back(character->Children[i]);
-							}
-							if (!character->Children[i]->IsSiblingOf(child_ident)) {
-								character->Children[i]->Siblings.push_back(child);
-							}
-						}
-					}
-				} else {
-					LuaError(l, "Character \"%s\" doesn't exist." _C_ child_ident.c_str());
-				}
+				character->add_child(child);
 			}
 		} else if (!strcmp(value, "Gender")) {
 			character->gender = stratagus::string_to_gender(LuaToString(l, -1));
@@ -843,32 +792,24 @@ static int CclGetCharacterData(lua_State *l)
 		}
 		return 1;
 	} else if (!strcmp(data, "Father")) {
-		if (character->Father != nullptr) {
-			lua_pushstring(l, character->Father->Ident.c_str());
+		if (character->get_father() != nullptr) {
+			lua_pushstring(l, character->get_father()->get_identifier().c_str());
 		} else {
 			lua_pushstring(l, "");
 		}
 		return 1;
 	} else if (!strcmp(data, "Mother")) {
-		if (character->Mother != nullptr) {
-			lua_pushstring(l, character->Mother->Ident.c_str());
+		if (character->get_mother() != nullptr) {
+			lua_pushstring(l, character->get_mother()->get_identifier().c_str());
 		} else {
 			lua_pushstring(l, "");
 		}
 		return 1;
 	} else if (!strcmp(data, "Children")) {
-		lua_createtable(l, character->Children.size(), 0);
-		for (size_t i = 1; i <= character->Children.size(); ++i)
+		lua_createtable(l, character->get_children().size(), 0);
+		for (size_t i = 1; i <= character->get_children().size(); ++i)
 		{
-			lua_pushstring(l, character->Children[i-1]->Ident.c_str());
-			lua_rawseti(l, -2, i);
-		}
-		return 1;
-	} else if (!strcmp(data, "Siblings")) {
-		lua_createtable(l, character->Siblings.size(), 0);
-		for (size_t i = 1; i <= character->Siblings.size(); ++i)
-		{
-			lua_pushstring(l, character->Siblings[i-1]->Ident.c_str());
+			lua_pushstring(l, character->get_children()[i-1]->get_identifier().c_str());
 			lua_rawseti(l, -2, i);
 		}
 		return 1;
