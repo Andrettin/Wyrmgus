@@ -106,6 +106,11 @@ void character::process_sml_scope(const sml_data &scope)
 			deity *deity = deity::get(value);
 			this->Deities.push_back(deity);
 		}
+	} else if (tag == "forbidden_upgrades") {
+		for (const std::string &value : values) {
+			stratagus::unit_type *unit_type = unit_type::get(value);
+			this->ForbiddenUpgrades.push_back(unit_type);
+		}
 	} else {
 		data_entry::process_sml_scope(scope);
 	}
