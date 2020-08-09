@@ -28,7 +28,12 @@
 #pragma once
 
 class CConfigData;
+class CUnit;
 class CUpgrade;
+struct lua_State;
+
+int CclDefineCharacter(lua_State *l);
+int CclDefineCustomHero(lua_State *l);
 
 namespace stratagus {
 
@@ -38,23 +43,71 @@ class sml_property;
 class spell;
 class unique_item;
 class unit_type;
+enum class item_class;
+enum class item_slot;
 
 class persistent_item final
 {
 public:
+	explicit persistent_item(const unit_type *unit_type, character *owner) : unit_type(unit_type), owner(owner)
+	{
+		if (unit_type == nullptr) {
+			throw std::runtime_error("Cannot create a persistent item with a null type.");
+		}
+
+		if (owner == nullptr) {
+			throw std::runtime_error("Cannot create a persistent item with a null owner.");
+		}
+	}
+
+	explicit persistent_item(const CUnit *item_unit, character *owner);
+
+	explicit persistent_item(character *owner) : owner(owner)
+	{
+		if (owner == nullptr) {
+			throw std::runtime_error("Cannot create a persistent item with a null owner.");
+		}
+	}
+
+	void process_sml_property(const sml_property &property);
+	void process_sml_scope(const sml_data &scope);
 	void ProcessConfigData(const CConfigData *config_data);
 
+	const unit_type *get_unit_type() const
+	{
+		return this->unit_type;
+	}
+
+	item_class get_item_class() const;
+	item_slot get_item_slot() const;
+
+	unique_item *get_unique() const
+	{
+		return this->unique;
+	}
+
+	character *get_owner() const
+	{
+		return this->owner;
+	}
+
+private:
+	const unit_type *unit_type = nullptr; //the item type of the item
+	unique_item *unique = nullptr;
+public:
 	std::string Name;
 	bool Bound = false; //whether the item is bound to its owner and can't be dropped
 	bool Identified = true; //whether the item has been identified
-	unit_type *Type = nullptr; //the item type of the item
 	CUpgrade *Prefix = nullptr;
 	CUpgrade *Suffix = nullptr;
 	spell *Spell = nullptr;
 	CUpgrade *Work = nullptr;
 	CUpgrade *Elixir = nullptr;
-	unique_item *Unique = nullptr;
-	character *Owner = nullptr;
+private:
+	character *owner = nullptr;
+
+	friend int ::CclDefineCharacter(lua_State *l);
+	friend int ::CclDefineCustomHero(lua_State *l);
 };
 
 }

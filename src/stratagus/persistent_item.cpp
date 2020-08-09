@@ -34,6 +34,7 @@
 #include "item_slot.h"
 #include "spells.h"
 #include "unique_item.h"
+#include "unit/unit.h"
 #include "unit/unit_type.h"
 #include "upgrade/upgrade.h"
 #include "upgrade/upgrade_modifier.h"
@@ -41,10 +42,113 @@
 
 namespace stratagus {
 
+persistent_item::persistent_item(const CUnit *item_unit, character *owner) : persistent_item(item_unit->Type, owner)
+{
+	if (item_unit->Prefix != nullptr) {
+		this->Prefix = item_unit->Prefix;
+	}
+	if (item_unit->Suffix != nullptr) {
+		this->Suffix = item_unit->Suffix;
+	}
+	if (item_unit->Spell != nullptr) {
+		this->Spell = item_unit->Spell;
+	}
+	if (item_unit->Work != nullptr) {
+		this->Work = item_unit->Work;
+	}
+	if (item_unit->Elixir != nullptr) {
+		this->Elixir = item_unit->Elixir;
+	}
+	if (item_unit->Unique) {
+		this->Name = item_unit->Name;
+		this->unique = item_unit->Unique;
+	}
+	this->Bound = item_unit->Bound;
+	this->Identified = item_unit->Identified;
+}
+
+void persistent_item::process_sml_property(const sml_property &property)
+{
+	const std::string &key = property.get_key();
+	const std::string &value = property.get_value();
+
+	if (key == "name") {
+		this->Name = value;
+	} else if (key == "prefix") {
+		CUpgrade *upgrade = CUpgrade::try_get(value);
+		if (upgrade != nullptr) {
+			this->Prefix = upgrade;
+		} else {
+			fprintf(stderr, "Upgrade \"%s\" doesn't exist.\n", value.c_str());
+		}
+	} else if (key == "suffix") {
+		CUpgrade *upgrade = CUpgrade::try_get(value);
+		if (upgrade != nullptr) {
+			this->Suffix = upgrade;
+		} else {
+			fprintf(stderr, "Upgrade \"%s\" doesn't exist.\n", value.c_str());
+		}
+	} else if (key == "spell") {
+		spell *spell = spell::try_get(value);
+		if (spell != nullptr) {
+			this->Spell = spell;
+		} else {
+			fprintf(stderr, "Spell \"%s\" doesn't exist.\n", value.c_str());
+		}
+	} else if (key == "work") {
+		CUpgrade *upgrade = CUpgrade::try_get(value);
+		if (upgrade != nullptr) {
+			this->Work = upgrade;
+		} else {
+			fprintf(stderr, "Upgrade \"%s\" doesn't exist.\n", value.c_str());
+		}
+	} else if (key == "elixir") {
+		CUpgrade *upgrade = CUpgrade::try_get(value);
+		if (upgrade != nullptr) {
+			this->Elixir = upgrade;
+		} else {
+			fprintf(stderr, "Upgrade \"%s\" doesn't exist.\n", value.c_str());
+		}
+	} else if (key == "unique") {
+		unique_item *unique_item = unique_item::try_get(value);
+		if (unique_item != nullptr) {
+			this->unique = unique_item;
+			this->Name = unique_item->get_name();
+			if (unique_item->Type != nullptr) {
+				this->unit_type = unique_item->Type;
+			} else {
+				fprintf(stderr, "Unique item \"%s\" has no type.\n", unique_item->get_identifier().c_str());
+			}
+			this->Prefix = unique_item->Prefix;
+			this->Suffix = unique_item->Suffix;
+			this->Spell = unique_item->Spell;
+			this->Work = unique_item->Work;
+			this->Elixir = unique_item->Elixir;
+		} else {
+			fprintf(stderr, "Unique item \"%s\" doesn't exist.\n", value.c_str());
+		}
+	} else if (key == "bound") {
+		this->Bound = string::to_bool(value);
+	} else if (key == "identified") {
+		this->Identified = string::to_bool(value);
+	} else if (key == "equipped") {
+		if (this->get_item_slot() != item_slot::none) {
+			this->get_owner()->EquippedItems[static_cast<int>(this->get_item_slot())].push_back(this);
+		} else {
+			fprintf(stderr, "Item \"%s\" cannot be equipped, as it belongs to no item slot.\n", this->get_unit_type()->get_identifier().c_str());
+		}
+	} else {
+		throw std::runtime_error("Invalid persistent item property: \"" + key + "\".");
+	}
+}
+
+void persistent_item::process_sml_scope(const sml_data &scope)
+{
+	throw std::runtime_error("Invalid persistent item scope: \"" + scope.get_tag() + "\".");
+}
+
 void persistent_item::ProcessConfigData(const CConfigData *config_data)
 {
-	bool is_equipped = false;
-	
 	for (size_t i = 0; i < config_data->Properties.size(); ++i) {
 		std::string key = config_data->Properties[i].first;
 		std::string value = config_data->Properties[i].second;
@@ -52,8 +156,8 @@ void persistent_item::ProcessConfigData(const CConfigData *config_data)
 		if (key == "name") {
 			this->Name = value;
 		} else if (key == "type") {
-			unit_type *unit_type = unit_type::get(value);
-			this->Type = unit_type;
+			stratagus::unit_type *unit_type = unit_type::get(value);
+			this->unit_type = unit_type;
 		} else if (key == "prefix") {
 			CUpgrade *upgrade = CUpgrade::try_get(value);
 			if (upgrade) {
@@ -62,7 +166,6 @@ void persistent_item::ProcessConfigData(const CConfigData *config_data)
 				fprintf(stderr, "Upgrade \"%s\" doesn't exist.\n", value.c_str());
 			}
 		} else if (key == "suffix") {
-			value = FindAndReplaceString(value, "_", "-");
 			CUpgrade *upgrade = CUpgrade::try_get(value);
 			if (upgrade) {
 				this->Suffix = upgrade;
@@ -81,7 +184,6 @@ void persistent_item::ProcessConfigData(const CConfigData *config_data)
 				fprintf(stderr, "Upgrade \"%s\" doesn't exist.\n", value.c_str());
 			}
 		} else if (key == "elixir") {
-			value = FindAndReplaceString(value, "_", "-");
 			CUpgrade *upgrade = CUpgrade::try_get(value);
 			if (upgrade) {
 				this->Elixir = upgrade;
@@ -91,10 +193,10 @@ void persistent_item::ProcessConfigData(const CConfigData *config_data)
 		} else if (key == "unique") {
 			unique_item *unique_item = unique_item::try_get(value);
 			if (unique_item != nullptr) {
-				this->Unique = unique_item;
+				this->unique = unique_item;
 				this->Name = unique_item->get_name();
 				if (unique_item->Type != nullptr) {
-					this->Type = unique_item->Type;
+					this->unit_type = unique_item->Type;
 				} else {
 					fprintf(stderr, "Unique item \"%s\" has no type.\n", unique_item->get_identifier().c_str());
 				}
@@ -111,15 +213,24 @@ void persistent_item::ProcessConfigData(const CConfigData *config_data)
 		} else if (key == "identified") {
 			this->Identified = string::to_bool(value);
 		} else if (key == "equipped") {
-			is_equipped = string::to_bool(value);
+			if (this->get_owner() != nullptr && this->get_item_slot() != item_slot::none) {
+				this->get_owner()->EquippedItems[static_cast<int>(this->get_item_slot())].push_back(this);
+			}
 		} else {
 			fprintf(stderr, "Invalid item property: \"%s\".\n", key.c_str());
 		}
 	}
 	
-	if (is_equipped && this->Owner && get_item_class_slot(this->Type->get_item_class()) != item_slot::none) {
-		this->Owner->EquippedItems[static_cast<int>(get_item_class_slot(this->Type->get_item_class()))].push_back(this);
-	}
+}
+
+item_class persistent_item::get_item_class() const
+{
+	return this->get_unit_type()->get_item_class();
+}
+
+item_slot persistent_item::get_item_slot() const
+{
+	return get_item_class_slot(this->get_item_class());
 }
 
 }

@@ -46,7 +46,7 @@ bool unique_item::CanDrop() const
 	if (!IsNetworkGame()) {
 		for (character *character : character::get_all()) {
 			for (const auto &item : character->get_items()) {
-				if (item->Unique == this && !item->Bound) {
+				if (item->get_unique() == this && !item->Bound) {
 					return false;
 				}
 			}
@@ -54,7 +54,7 @@ bool unique_item::CanDrop() const
 		
 		for (std::map<std::string, character *>::iterator iterator = CustomHeroes.begin(); iterator != CustomHeroes.end(); ++iterator) {
 			for (const auto &item : iterator->second->get_items()) {
-				if (item->Unique == this && !item->Bound) {
+				if (item->get_unique() == this && !item->Bound) {
 					return false;
 				}
 			}

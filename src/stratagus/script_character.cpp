@@ -52,11 +52,6 @@
 #include "upgrade/upgrade.h"
 #include "util/vector_util.h"
 
-/**
-**  Define a character.
-**
-**  @param l  Lua state.
-*/
 static int CclDefineCharacter(lua_State *l)
 {
 	LuaCheckArgs(l, 2);
@@ -243,8 +238,7 @@ static int CclDefineCharacter(lua_State *l)
 			const int args = lua_rawlen(l, -1);
 			for (int j = 0; j < args; ++j) {
 				lua_rawgeti(l, -1, j + 1);
-				auto item = std::make_unique<stratagus::persistent_item>();;
-				item->Owner = character;
+				std::unique_ptr<stratagus::persistent_item> item;
 				if (!lua_istable(l, -1)) {
 					LuaError(l, "incorrect argument (expected table for items)");
 				}
@@ -253,13 +247,12 @@ static int CclDefineCharacter(lua_State *l)
 					value = LuaToString(l, -1, k + 1);
 					++k;
 					if (!strcmp(value, "type")) {
-						std::string item_ident = LuaToString(l, -1, k + 1);
+						const std::string item_ident = LuaToString(l, -1, k + 1);
 						stratagus::unit_type *item_type = stratagus::unit_type::try_get(item_ident);
 						if (item_type != nullptr) {
-							item->Type = item_type;
+							item = std::make_unique<stratagus::persistent_item>(item_type, character);
 						} else {
 							fprintf(stderr, "Item type \"%s\" doesn't exist.\n", item_ident.c_str());
-							item.reset();
 							break;
 						}
 					} else if (!strcmp(value, "prefix")) {
@@ -303,11 +296,11 @@ static int CclDefineCharacter(lua_State *l)
 					} else if (!strcmp(value, "unique")) {
 						std::string unique_ident = LuaToString(l, -1, k + 1);
 						stratagus::unique_item *unique_item = stratagus::unique_item::try_get(unique_ident);
-						item->Unique = unique_item;
+						item->unique = unique_item;
 						if (unique_item != nullptr) {
 							item->Name = unique_item->get_name();
 							if (unique_item->Type != nullptr) {
-								item->Type = unique_item->Type;
+								item->unit_type = unique_item->Type;
 							} else {
 								fprintf(stderr, "Unique item \"%s\" has no type.\n", unique_item->get_identifier().c_str());
 							}
@@ -324,9 +317,9 @@ static int CclDefineCharacter(lua_State *l)
 					} else if (!strcmp(value, "identified")) {
 						item->Identified = LuaToBoolean(l, -1, k + 1);
 					} else if (!strcmp(value, "equipped")) {
-						bool is_equipped = LuaToBoolean(l, -1, k + 1);
-						if (is_equipped && stratagus::get_item_class_slot(item->Type->get_item_class()) != stratagus::item_slot::none) {
-							character->EquippedItems[static_cast<int>(stratagus::get_item_class_slot(item->Type->get_item_class()))].push_back(item.get());
+						const bool equipped = LuaToBoolean(l, -1, k + 1);
+						if (equipped && item->get_item_slot() != stratagus::item_slot::none) {
+							character->EquippedItems[static_cast<int>(item->get_item_slot())].push_back(item.get());
 						}
 					} else {
 						printf("\n%s\n", character->Ident.c_str());
@@ -442,11 +435,6 @@ static int CclDefineCharacter(lua_State *l)
 	return 0;
 }
 
-/**
-**  Define a custom hero.
-**
-**  @param l  Lua state.
-*/
 static int CclDefineCustomHero(lua_State *l)
 {
 	LuaCheckArgs(l, 2);
@@ -549,8 +537,7 @@ static int CclDefineCustomHero(lua_State *l)
 			const int args = lua_rawlen(l, -1);
 			for (int j = 0; j < args; ++j) {
 				lua_rawgeti(l, -1, j + 1);
-				auto item = std::make_unique<stratagus::persistent_item>();
-				item->Owner = hero;
+				std::unique_ptr<stratagus::persistent_item> item;
 				if (!lua_istable(l, -1)) {
 					LuaError(l, "incorrect argument (expected table for items)");
 				}
@@ -559,10 +546,10 @@ static int CclDefineCustomHero(lua_State *l)
 					value = LuaToString(l, -1, k + 1);
 					++k;
 					if (!strcmp(value, "type")) {
-						std::string item_ident = LuaToString(l, -1, k + 1);
-						stratagus::unit_type *item_type = stratagus::unit_type::try_get(item_ident);
+						const std::string item_ident = LuaToString(l, -1, k + 1);
+						const stratagus::unit_type *item_type = stratagus::unit_type::try_get(item_ident);
 						if (item_type != nullptr) {
-							item->Type = item_type;
+							item = std::make_unique<stratagus::persistent_item>(item_type, hero);
 						} else {
 							fprintf(stderr, "Item type \"%s\" doesn't exist.\n", item_ident.c_str());
 							item.reset();
@@ -609,11 +596,11 @@ static int CclDefineCustomHero(lua_State *l)
 					} else if (!strcmp(value, "unique")) {
 						std::string unique_ident = LuaToString(l, -1, k + 1);
 						stratagus::unique_item *unique_item = stratagus::unique_item::try_get(unique_ident);
-						item->Unique = unique_item;
+						item->unique = unique_item;
 						if (unique_item != nullptr) {
 							item->Name = unique_item->get_name();
 							if (unique_item->Type != nullptr) {
-								item->Type = unique_item->Type;
+								item->unit_type = unique_item->Type;
 							} else {
 								fprintf(stderr, "Unique item \"%s\" has no type.\n", item->Name.c_str());
 							}
@@ -630,9 +617,9 @@ static int CclDefineCustomHero(lua_State *l)
 					} else if (!strcmp(value, "identified")) {
 						item->Identified = LuaToBoolean(l, -1, k + 1);
 					} else if (!strcmp(value, "equipped")) {
-						bool is_equipped = LuaToBoolean(l, -1, k + 1);
-						if (is_equipped && stratagus::get_item_class_slot(item->Type->get_item_class()) != stratagus::item_slot::none) {
-							hero->EquippedItems[static_cast<int>(stratagus::get_item_class_slot(item->Type->get_item_class()))].push_back(item.get());
+						const bool equipped = LuaToBoolean(l, -1, k + 1);
+						if (equipped && item->get_item_slot() != stratagus::item_slot::none) {
+							hero->EquippedItems[static_cast<int>(item->get_item_slot())].push_back(item.get());
 						}
 					} else {
 						printf("\n%s\n", hero->Ident.c_str());

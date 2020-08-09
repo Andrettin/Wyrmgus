@@ -1028,7 +1028,7 @@ void CUnit::set_character(stratagus::character *character)
 
 	//load items
 	for (const auto &persistent_item : this->Character->get_items()) {
-		CUnit *item = MakeUnitAndPlace(this->tilePos, *persistent_item->Type, CPlayer::Players[PlayerNumNeutral], this->MapLayer->ID);
+		CUnit *item = MakeUnitAndPlace(this->tilePos, *persistent_item->get_unit_type(), CPlayer::Players[PlayerNumNeutral], this->MapLayer->ID);
 		if (persistent_item->Prefix != nullptr) {
 			item->SetPrefix(persistent_item->Prefix);
 		}
@@ -1044,7 +1044,7 @@ void CUnit::set_character(stratagus::character *character)
 		if (persistent_item->Elixir != nullptr) {
 			item->SetElixir(persistent_item->Elixir);
 		}
-		item->Unique = persistent_item->Unique;
+		item->Unique = persistent_item->get_unique();
 		if (!persistent_item->Name.empty()) {
 			item->Name = persistent_item->Name;
 		}

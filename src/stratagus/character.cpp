@@ -118,6 +118,18 @@ void character::process_sml_scope(const sml_data &scope)
 			CUpgrade *ability = CUpgrade::get(value);
 			this->abilities.push_back(ability);
 		}
+	} else if (tag == "items") {
+		scope.for_each_child([&](const sml_data &child_scope) {
+			stratagus::unit_type *unit_type = unit_type::try_get(child_scope.get_tag());
+
+			if (unit_type == nullptr) {
+				fprintf(stderr, "Unit type \"%s\" doesn't exist.\n", child_scope.get_tag().c_str());
+			}
+
+			auto item = std::make_unique<persistent_item>(unit_type, this);
+			database::process_sml_data(item, child_scope);
+			this->add_item(std::move(item));
+		});
 	} else {
 		data_entry::process_sml_scope(scope);
 	}
@@ -290,8 +302,7 @@ void character::ProcessConfigData(const CConfigData *config_data)
 				
 			this->HistoricalTitles.push_back(std::make_tuple(start_date, end_date, title_faction, title));
 		} else if (child_config_data->Tag == "item") {
-			auto item = std::make_unique<persistent_item>();
-			item->Owner = this;
+			auto item = std::make_unique<persistent_item>(this);
 			item->ProcessConfigData(child_config_data);
 			this->add_item(std::move(item));
 		} else {
@@ -520,7 +531,7 @@ void character::remove_item(const persistent_item *item)
 persistent_item *character::get_item(const CUnit &item_unit) const
 {
 	for (const auto &item : this->items) {
-		if (item->Type == item_unit.Type && item->Prefix == item_unit.Prefix && item->Suffix == item_unit.Suffix && item->Spell == item_unit.Spell && item->Work == item_unit.Work && item->Elixir == item_unit.Elixir && item->Unique == item_unit.Unique && item->Bound == item_unit.Bound && item->Identified == item_unit.Identified && this->is_item_equipped(item.get()) == item_unit.Container->IsItemEquipped(&item_unit)) {
+		if (item->get_unit_type() == item_unit.Type && item->Prefix == item_unit.Prefix && item->Suffix == item_unit.Suffix && item->Spell == item_unit.Spell && item->Work == item_unit.Work && item->Elixir == item_unit.Elixir && item->get_unique() == item_unit.Unique && item->Bound == item_unit.Bound && item->Identified == item_unit.Identified && this->is_item_equipped(item.get()) == item_unit.Container->IsItemEquipped(&item_unit)) {
 			if (item->Name.empty() || item->Name == item_unit.Name) {
 				return item.get();
 			}
@@ -532,7 +543,7 @@ persistent_item *character::get_item(const CUnit &item_unit) const
 
 bool character::is_item_equipped(const persistent_item *item) const
 {
-	const item_slot item_slot = get_item_class_slot(item->Type->get_item_class());
+	const item_slot item_slot = item->get_item_slot();
 	
 	if (item_slot == item_slot::none) {
 		return false;
@@ -834,7 +845,7 @@ void SaveHero(stratagus::character *hero)
 		for (size_t j = 0; j < hero->get_items().size(); ++j) {
 			const auto &item = hero->get_items()[j];
 			fprintf(fd, "\n\t\t{");
-			fprintf(fd, "\n\t\t\t\"type\", \"%s\",", item->Type->Ident.c_str());
+			fprintf(fd, "\n\t\t\t\"type\", \"%s\",", item->get_unit_type()->Ident.c_str());
 			if (item->Prefix != nullptr) {
 				fprintf(fd, "\n\t\t\t\"prefix\", \"%s\",", item->Prefix->Ident.c_str());
 			}
@@ -853,8 +864,8 @@ void SaveHero(stratagus::character *hero)
 			if (!item->Name.empty()) {
 				fprintf(fd, "\n\t\t\t\"name\", \"%s\",", item->Name.c_str());
 			}
-			if (item->Unique != nullptr) { // affixes, name and etc. will be inherited from the unique item, but we set those previous characteristics for unique items anyway, so that if a unique item no longer exists in the game's code (i.e. if it is from a mod that has been deactivated) the character retains an item with the same affixes, name and etc., even though it will no longer be unique
-				fprintf(fd, "\n\t\t\t\"unique\", \"%s\",", item->Unique->get_identifier().c_str());
+			if (item->get_unique() != nullptr) { // affixes, name and etc. will be inherited from the unique item, but we set those previous characteristics for unique items anyway, so that if a unique item no longer exists in the game's code (i.e. if it is from a mod that has been deactivated) the character retains an item with the same affixes, name and etc., even though it will no longer be unique
+				fprintf(fd, "\n\t\t\t\"unique\", \"%s\",", item->get_unique()->get_identifier().c_str());
 			}
 			if (item->Bound) {
 				fprintf(fd, "\n\t\t\t\"bound\", true,");

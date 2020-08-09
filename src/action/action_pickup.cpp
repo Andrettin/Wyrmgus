@@ -209,30 +209,7 @@ enum {
 			
 			goal->Remove(&unit);
 			if (!IsNetworkGame() && unit.Character && unit.Player == CPlayer::GetThisPlayer()) { //if the unit has a persistent character, store the item for it
-				auto item = std::make_unique<stratagus::persistent_item>();
-				item->Owner = unit.Character;
-				item->Type = const_cast<stratagus::unit_type *>(goal->Type);
-				if (goal->Prefix != nullptr) {
-					item->Prefix = goal->Prefix;
-				}
-				if (goal->Suffix != nullptr) {
-					item->Suffix = goal->Suffix;
-				}
-				if (goal->Spell != nullptr) {
-					item->Spell = goal->Spell;
-				}
-				if (goal->Work != nullptr) {
-					item->Work = goal->Work;
-				}
-				if (goal->Elixir != nullptr) {
-					item->Elixir = goal->Elixir;
-				}
-				if (goal->Unique) {
-					item->Name = goal->Name;
-					item->Unique = goal->Unique;
-				}
-				item->Bound = goal->Bound;
-				item->Identified = goal->Identified;
+				auto item = std::make_unique<stratagus::persistent_item>(goal, unit.Character);
 				unit.Character->add_item(std::move(item));
 				SaveHero(unit.Character);
 			}
