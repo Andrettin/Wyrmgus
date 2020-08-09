@@ -43,6 +43,7 @@
 #include "database/sml_parser.h"
 #include "database/sml_property.h"
 #include "dialogue.h"
+#include "dynasty.h"
 #include "faction.h"
 #include "faction_tier.h"
 #include "gender.h"
@@ -205,6 +206,8 @@ QVariant database::process_sml_property_value(const sml_property &property, cons
 			new_property_value = QVariant::fromValue(deity::get(property.get_value()));
 		} else if (property_class_name == "stratagus::dialogue*") {
 			new_property_value = QVariant::fromValue(dialogue::get(property.get_value()));
+		} else if (property_class_name == "stratagus::dynasty*") {
+			new_property_value = QVariant::fromValue(dynasty::get(property.get_value()));
 		} else if (property_class_name == "stratagus::faction*") {
 			new_property_value = QVariant::fromValue(faction::get(property.get_value()));
 		} else if (property_class_name == "stratagus::faction_tier") {
