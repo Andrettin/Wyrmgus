@@ -798,12 +798,22 @@ void CUnit::Retrain()
 {
 	//lose all abilities (the AbilityLost function also returns the level-ups to the unit)
 	for (CUpgrade *upgrade : CUpgrade::get_all()) {
-		if (this->GetIndividualUpgrade(upgrade)) {
-			if (upgrade->is_ability() && std::find(this->Type->StartingAbilities.begin(), this->Type->StartingAbilities.end(), upgrade) == this->Type->StartingAbilities.end()) {
-				AbilityLost(*this, upgrade, true);
-			} else if (!strncmp(upgrade->Ident.c_str(), "upgrade-deity-", 14) && strncmp(upgrade->Ident.c_str(), "upgrade-deity-domain-", 21) && this->Character && this->Character->Custom) { //allow changing the deity for custom heroes
-				IndividualUpgradeLost(*this, upgrade, true);
+		if (this->GetIndividualUpgrade(upgrade) == 0) {
+			continue;
+		}
+
+		if (upgrade->is_ability()) {
+			if (stratagus::vector::contains(this->Type->StartingAbilities, upgrade)) {
+				continue;
 			}
+
+			if (this->Character != nullptr && stratagus::vector::contains(this->Character->get_base_abilities(), upgrade)) {
+				continue;
+			}
+
+			AbilityLost(*this, upgrade, true);
+		} else if (!strncmp(upgrade->Ident.c_str(), "upgrade-deity-", 14) && strncmp(upgrade->Ident.c_str(), "upgrade-deity-domain-", 21) && this->Character && this->Character->Custom) { //allow changing the deity for custom heroes
+			IndividualUpgradeLost(*this, upgrade, true);
 		}
 	}
 	
@@ -832,7 +842,6 @@ void CUnit::Retrain()
 							if (Character->get_unit_type() != unit_type) {
 								if (this->Player == CPlayer::GetThisPlayer()) {
 									Character->set_unit_type(unit_type);
-									SaveHero(Character);
 									CAchievement::CheckAchievements();
 								}
 							}
@@ -850,7 +859,12 @@ void CUnit::Retrain()
 			break;
 		}
 	}
-	
+
+	//save the retraining for persistent characters
+	if (!IsNetworkGame() && this->Character != nullptr && this->Player == CPlayer::GetThisPlayer()) {
+		SaveHero(this->Character);
+	}
+
 	if (this->Player == CPlayer::GetThisPlayer()) {
 		this->Player->Notify(NotifyGreen, this->tilePos, this->MapLayer->ID, _("%s's level-up choices have been reset."), unit_name.c_str());
 	}

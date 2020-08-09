@@ -111,6 +111,11 @@ void character::process_sml_scope(const sml_data &scope)
 			stratagus::unit_type *unit_type = unit_type::get(value);
 			this->ForbiddenUpgrades.push_back(unit_type);
 		}
+	} else if (tag == "base_abilities") {
+		for (const std::string &value : values) {
+			CUpgrade *ability = CUpgrade::get(value);
+			this->base_abilities.push_back(ability);
+		}
 	} else if (tag == "abilities") {
 		for (const std::string &value : values) {
 			CUpgrade *ability = CUpgrade::get(value);

@@ -243,6 +243,11 @@ public:
 		this->level = level;
 	}
 
+	const std::vector<const CUpgrade *> &get_base_abilities() const
+	{
+		return this->base_abilities;
+	}
+
 	const std::vector<const CUpgrade *> &get_abilities() const
 	{
 		return this->abilities;
@@ -305,6 +310,7 @@ private:
 public:
 	std::vector<deity *> Deities;		/// Deities chosen by this character to worship
 private:
+	std::vector<const CUpgrade *> base_abilities; //the character's base abilities; these will not be lost after retraining
 	std::vector<const CUpgrade *> abilities;
 public:
 	std::vector<CUpgrade *> ReadWorks;
