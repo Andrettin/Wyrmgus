@@ -42,7 +42,6 @@
 //Wyrmgus start
 #include "grand_strategy.h"
 //Wyrmgus end
-#include "item.h"
 #include "map/map.h"
 #include "map/map_layer.h"
 #include "map/map_template.h"
@@ -116,7 +115,6 @@ void CleanModules()
 	CleanProvinces();
 	CSchoolOfMagic::ClearSchoolsOfMagic();
 	CleanTexts();
-	CleanUniqueItems();
 	//Wyrmgus end
 	CleanUnits();
 	CleanUnitTypeVariables();

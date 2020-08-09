@@ -80,7 +80,6 @@ class CPlayer;
 class CFile;
 class CMapLayer;
 class CTileset;
-class CUniqueItem;
 class CUnit;
 
 namespace stratagus {

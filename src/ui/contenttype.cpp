@@ -270,8 +270,8 @@ static const CUnit *GetUnitRef(const CUnit &unit, EnumUnit e)
 {
 	const CUnit *unitToDraw = GetUnitRef(unit, this->UnitRef);
 
-	if (unitToDraw && unitToDraw->GetIcon().Icon) {
-		unitToDraw->GetIcon().Icon->DrawUnitIcon(*UI.SingleSelectedButton->Style, 0, this->Pos, "",
+	if (unitToDraw && unitToDraw->get_icon() != nullptr) {
+		unitToDraw->get_icon()->DrawUnitIcon(*UI.SingleSelectedButton->Style, 0, this->Pos, "",
 			unitToDraw->get_player_color());
 	}
 }

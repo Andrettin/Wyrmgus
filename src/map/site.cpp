@@ -33,7 +33,6 @@
 #include "config.h"
 #include "database/defines.h"
 #include "faction.h"
-#include "item.h"
 #include "map/map.h"
 #include "map/map_layer.h"
 #include "map/map_template.h"
@@ -41,6 +40,7 @@
 #include "player.h" //for factions
 #include "player_color.h"
 #include "province.h" //for regions
+#include "unique_item.h"
 #include "unit/unit.h"
 #include "unit/unit_class.h"
 #include "unit/unit_type.h"
@@ -154,7 +154,7 @@ void site::ProcessConfigData(const CConfigData *config_data)
 			CDate start_date;
 			CDate end_date;
 			const unit_class *building_class = nullptr;
-			CUniqueItem *unique = nullptr;
+			unique_item *unique = nullptr;
 			faction *building_owner_faction = nullptr;
 				
 			for (size_t j = 0; j < child_config_data->Properties.size(); ++j) {
@@ -170,11 +170,7 @@ void site::ProcessConfigData(const CConfigData *config_data)
 				} else if (key == "building_class") {
 					building_class = unit_class::get(value);
 				} else if (key == "unique") {
-					value = FindAndReplaceString(value, "_", "-");
-					unique = GetUniqueItem(value);
-					if (!unique) {
-						fprintf(stderr, "Invalid unique: \"%s\".\n", value.c_str());
-					}
+					unique = unique_item::get(value);
 				} else if (key == "faction") {
 					building_owner_faction = faction::get(value);
 				} else {
@@ -187,7 +183,7 @@ void site::ProcessConfigData(const CConfigData *config_data)
 				continue;
 			}
 			
-			this->HistoricalBuildings.push_back(std::tuple<CDate, CDate, const unit_class *, CUniqueItem *, faction *>(start_date, end_date, building_class, unique, building_owner_faction));
+			this->HistoricalBuildings.push_back(std::make_tuple(start_date, end_date, building_class, unique, building_owner_faction));
 		} else {
 			fprintf(stderr, "Invalid site property: \"%s\".\n", child_config_data->Tag.c_str());
 		}

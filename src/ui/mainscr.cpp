@@ -601,7 +601,7 @@ static void DrawUnitInfo_portrait(const CUnit &unit)
 		}
 		 //Wyrmgus end
 
-		unit.GetIcon().Icon->DrawUnitIcon(*UI.SingleSelectedButton->Style, flag, pos, "", unit.get_player_color());
+		unit.get_icon()->DrawUnitIcon(*UI.SingleSelectedButton->Style, flag, pos, "", unit.get_player_color());
 	}
 }
 
@@ -675,18 +675,14 @@ static void DrawUnitInfo_transporter(CUnit &unit)
 		//Wyrmgus end
 			continue;
 		}
-		//Wyrmgus start
-//		stratagus::icon &icon = *uins->Type->Icon.Icon;
-		stratagus::icon &icon = *uins->GetIcon().Icon;
-		//Wyrmgus end
-		
+
 		int flag = (ButtonAreaUnderCursor == ButtonAreaTransporting && static_cast<size_t>(ButtonUnderCursor) == j) ?
 				   (IconActive | (MouseButtons & LeftButton)) : 0;
 		//Wyrmgus start
 		flag |= IconCommandButton;
 		//Wyrmgus end
 		const PixelPos pos(UI.TransportingButtons[j].X, UI.TransportingButtons[j].Y);
-		uins->GetIcon().Icon->DrawUnitIcon(*UI.TransportingButtons[j].Style, flag, pos, "", uins->get_player_color());
+		uins->get_icon()->DrawUnitIcon(*UI.TransportingButtons[j].Style, flag, pos, "", uins->get_player_color());
 		//Wyrmgus start
 //		UiDrawLifeBar(*uins, pos.x, pos.y);
 //		if (uins->Type->CanCastSpell && uins->Variable[MANA_INDEX].Max) {
@@ -711,7 +707,6 @@ static void DrawUnitInfo_inventory(CUnit &unit)
 		if (!uins->Type->BoolFlag[ITEM_INDEX].value || j >= UI.InventoryButtons.size()) {
 			continue;
 		}
-		stratagus::icon &icon = *uins->GetIcon().Icon;
 		
 		int flag = (ButtonAreaUnderCursor == ButtonAreaInventory && static_cast<size_t>(ButtonUnderCursor) == j) ?
 				   IconActive : 0;
@@ -723,7 +718,7 @@ static void DrawUnitInfo_inventory(CUnit &unit)
 			flag |= IconSelected;
 		}
 		const PixelPos pos(UI.InventoryButtons[j].X, UI.InventoryButtons[j].Y);
-		uins->GetIcon().Icon->DrawUnitIcon(*UI.InventoryButtons[j].Style, flag, pos, "", unit.get_player_color());
+		uins->get_icon()->DrawUnitIcon(*UI.InventoryButtons[j].Style, flag, pos, "", unit.get_player_color());
 		++j;
 	}
 }
@@ -1026,7 +1021,6 @@ void DrawPopups()
 				if (!uins->Type->BoolFlag[ITEM_INDEX].value || j >= UI.InventoryButtons.size()) {
 					continue;
 				}
-				stratagus::icon &icon = *uins->GetIcon().Icon;
 				
 				int flag = (ButtonAreaUnderCursor == ButtonAreaInventory && static_cast<size_t>(ButtonUnderCursor) == j) ?
 						   IconActive : 0;
@@ -1038,7 +1032,7 @@ void DrawPopups()
 					flag |= IconSelected;
 				}
 				const PixelPos pos(UI.InventoryButtons[j].X, UI.InventoryButtons[j].Y);
-				uins->GetIcon().Icon->DrawUnitIcon(*UI.InventoryButtons[j].Style, flag, pos, "", Selected[0]->get_player_color());
+				uins->get_icon()->DrawUnitIcon(*UI.InventoryButtons[j].Style, flag, pos, "", Selected[0]->get_player_color());
 				if (ButtonAreaUnderCursor == ButtonAreaInventory
 					&& static_cast<size_t>(ButtonUnderCursor) == j) {
 					//hackish way to make the popup appear correctly for the inventory item
@@ -1968,7 +1962,7 @@ static void InfoPanel_draw_multiple_selection()
 		const PixelPos pos(UI.SelectedButtons[i].X, UI.SelectedButtons[i].Y);
 		//Wyrmgus start
 //		icon.DrawUnitIcon(*UI.SelectedButtons[i].Style,
-		Selected[i]->GetIcon().Icon->DrawUnitIcon(*UI.SelectedButtons[i].Style,
+		Selected[i]->get_icon()->DrawUnitIcon(*UI.SelectedButtons[i].Style,
 		//Wyrmgus end
 						  (ButtonAreaUnderCursor == ButtonAreaSelected && ButtonUnderCursor == (int)i) ?
 						  (IconActive | (MouseButtons & LeftButton)) : 0,

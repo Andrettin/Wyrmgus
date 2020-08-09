@@ -51,9 +51,6 @@
 #include "grand_strategy.h"
 //Wyrmgus end
 #include "iolib.h"
-//Wyrmgus start
-#include "item.h"
-//Wyrmgus end
 #include "item_class.h"
 #include "map/map.h"
 #include "map/tileset.h"

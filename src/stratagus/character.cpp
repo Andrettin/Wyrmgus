@@ -39,11 +39,11 @@
 #include "gender.h"
 #include "iocompat.h"
 #include "iolib.h"
-#include "item.h"
 #include "map/historical_location.h"
 #include "map/map_template.h"
 #include "map/site.h"
 #include "parameters.h"
+#include "persistent_item.h"
 #include "player.h"
 #include "province.h"
 #include "quest.h"
@@ -52,6 +52,7 @@
 #include "script/condition/and_condition.h"
 #include "spells.h"
 #include "time/calendar.h"
+#include "unique_item.h"
 #include "unit/unit.h"
 #include "unit/unit_class.h"
 #include "unit/unit_type_variation.h"
@@ -86,10 +87,6 @@ character::~character()
 {
 	if (this->Conditions) {
 		delete Conditions;
-	}
-	
-	for (CPersistentItem *item : this->Items) {
-		delete item;
 	}
 }
 
@@ -293,10 +290,10 @@ void character::ProcessConfigData(const CConfigData *config_data)
 				
 			this->HistoricalTitles.push_back(std::make_tuple(start_date, end_date, title_faction, title));
 		} else if (child_config_data->Tag == "item") {
-			CPersistentItem *item = new CPersistentItem;
+			auto item = std::make_unique<persistent_item>();
 			item->Owner = this;
-			this->Items.push_back(item);
 			item->ProcessConfigData(child_config_data);
+			this->add_item(std::move(item));
 		} else {
 			fprintf(stderr, "Invalid character property: \"%s\".\n", child_config_data->Tag.c_str());
 		}
@@ -510,7 +507,30 @@ calendar *character::get_calendar() const
 	return nullptr;
 }
 
-bool character::IsItemEquipped(const CPersistentItem *item) const
+void character::add_item(std::unique_ptr<persistent_item> &&item)
+{
+	this->items.push_back(std::move(item));
+}
+
+void character::remove_item(const persistent_item *item)
+{
+	vector::remove(this->items, item);
+}
+
+persistent_item *character::get_item(const CUnit &item_unit) const
+{
+	for (const auto &item : this->items) {
+		if (item->Type == item_unit.Type && item->Prefix == item_unit.Prefix && item->Suffix == item_unit.Suffix && item->Spell == item_unit.Spell && item->Work == item_unit.Work && item->Elixir == item_unit.Elixir && item->Unique == item_unit.Unique && item->Bound == item_unit.Bound && item->Identified == item_unit.Identified && this->is_item_equipped(item.get()) == item_unit.Container->IsItemEquipped(&item_unit)) {
+			if (item->Name.empty() || item->Name == item_unit.Name) {
+				return item.get();
+			}
+		}
+	}
+
+	return nullptr;
+}
+
+bool character::is_item_equipped(const persistent_item *item) const
 {
 	const item_slot item_slot = get_item_class_slot(item->Type->get_item_class());
 	
@@ -604,18 +624,6 @@ IconConfig character::GetIcon() const
 	} else {
 		return this->get_unit_type()->Icon;
 	}
-}
-
-CPersistentItem *character::GetItem(CUnit &item) const
-{
-	for (size_t i = 0; i < this->Items.size(); ++i) {
-		if (this->Items[i]->Type == item.Type && this->Items[i]->Prefix == item.Prefix && this->Items[i]->Suffix == item.Suffix && this->Items[i]->Spell == item.Spell && this->Items[i]->Work == item.Work && this->Items[i]->Elixir == item.Elixir && this->Items[i]->Unique == item.Unique && this->Items[i]->Bound == item.Bound && this->Items[i]->Identified == item.Identified && this->IsItemEquipped(this->Items[i]) == item.Container->IsItemEquipped(&item)) {
-			if (this->Items[i]->Name.empty() || this->Items[i]->Name == item.Name) {
-				return this->Items[i];
-			}
-		}
-	}
-	return nullptr;
 }
 
 void character::add_child(character *child)
@@ -821,43 +829,44 @@ void SaveHero(stratagus::character *hero)
 		}
 		fprintf(fd, "},\n");
 	}
-	if (hero->Items.size() > 0) {
+	if (!hero->get_items().empty()) {
 		fprintf(fd, "\tItems = {");
-		for (size_t j = 0; j < hero->Items.size(); ++j) {
+		for (size_t j = 0; j < hero->get_items().size(); ++j) {
+			const auto &item = hero->get_items()[j];
 			fprintf(fd, "\n\t\t{");
-			fprintf(fd, "\n\t\t\t\"type\", \"%s\",", hero->Items[j]->Type->Ident.c_str());
-			if (hero->Items[j]->Prefix != nullptr) {
-				fprintf(fd, "\n\t\t\t\"prefix\", \"%s\",", hero->Items[j]->Prefix->Ident.c_str());
+			fprintf(fd, "\n\t\t\t\"type\", \"%s\",", item->Type->Ident.c_str());
+			if (item->Prefix != nullptr) {
+				fprintf(fd, "\n\t\t\t\"prefix\", \"%s\",", item->Prefix->Ident.c_str());
 			}
-			if (hero->Items[j]->Suffix != nullptr) {
-				fprintf(fd, "\n\t\t\t\"suffix\", \"%s\",", hero->Items[j]->Suffix->Ident.c_str());
+			if (item->Suffix != nullptr) {
+				fprintf(fd, "\n\t\t\t\"suffix\", \"%s\",", item->Suffix->Ident.c_str());
 			}
-			if (hero->Items[j]->Spell != nullptr) {
-				fprintf(fd, "\n\t\t\t\"spell\", \"%s\",", hero->Items[j]->Spell->Ident.c_str());
+			if (item->Spell != nullptr) {
+				fprintf(fd, "\n\t\t\t\"spell\", \"%s\",", item->Spell->Ident.c_str());
 			}
-			if (hero->Items[j]->Work != nullptr) {
-				fprintf(fd, "\n\t\t\t\"work\", \"%s\",", hero->Items[j]->Work->Ident.c_str());
+			if (item->Work != nullptr) {
+				fprintf(fd, "\n\t\t\t\"work\", \"%s\",", item->Work->Ident.c_str());
 			}
-			if (hero->Items[j]->Elixir != nullptr) {
-				fprintf(fd, "\n\t\t\t\"elixir\", \"%s\",", hero->Items[j]->Elixir->Ident.c_str());
+			if (item->Elixir != nullptr) {
+				fprintf(fd, "\n\t\t\t\"elixir\", \"%s\",", item->Elixir->Ident.c_str());
 			}
-			if (!hero->Items[j]->Name.empty()) {
-				fprintf(fd, "\n\t\t\t\"name\", \"%s\",", hero->Items[j]->Name.c_str());
+			if (!item->Name.empty()) {
+				fprintf(fd, "\n\t\t\t\"name\", \"%s\",", item->Name.c_str());
 			}
-			if (hero->Items[j]->Unique) { // affixes, name and etc. will be inherited from the unique item, but we set those previous characteristics for unique items anyway, so that if a unique item no longer exists in the game's code (i.e. if it is from a mod that has been deactivated) the character retains an item with the same affixes, name and etc., even though it will no longer be unique
-				fprintf(fd, "\n\t\t\t\"unique\", \"%s\",", hero->Items[j]->Unique->Ident.c_str());
+			if (item->Unique != nullptr) { // affixes, name and etc. will be inherited from the unique item, but we set those previous characteristics for unique items anyway, so that if a unique item no longer exists in the game's code (i.e. if it is from a mod that has been deactivated) the character retains an item with the same affixes, name and etc., even though it will no longer be unique
+				fprintf(fd, "\n\t\t\t\"unique\", \"%s\",", item->Unique->get_identifier().c_str());
 			}
-			if (hero->Items[j]->Bound) {
+			if (item->Bound) {
 				fprintf(fd, "\n\t\t\t\"bound\", true,");
 			}
-			if (!hero->Items[j]->Identified) {
+			if (!item->Identified) {
 				fprintf(fd, "\n\t\t\t\"identified\", false,");
 			}
-			if (hero->IsItemEquipped(hero->Items[j])) {
+			if (hero->is_item_equipped(item.get())) {
 				fprintf(fd, "\n\t\t\t\"equipped\", true");
 			}
 			fprintf(fd, "\n\t\t}");
-			if (j < (hero->Items.size() - 1)) {
+			if (j < (hero->get_items().size() - 1)) {
 				fprintf(fd, ",");
 			}
 		}

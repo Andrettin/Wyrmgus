@@ -27,10 +27,6 @@
 //      02111-1307, USA.
 //
 
-/*----------------------------------------------------------------------------
---  Includes
-----------------------------------------------------------------------------*/
-
 #include "stratagus.h"
 
 #include "unit/unit.h"
@@ -45,7 +41,6 @@
 //Wyrmgus start
 #include "grand_strategy.h"
 //Wyrmgus end
-#include "item.h"
 #include "map/map.h"
 #include "map/map_layer.h"
 #include "map/site.h"
@@ -62,6 +57,7 @@
 //Wyrmgus end
 #include "ui/interface.h"
 #include "ui/ui.h"
+#include "unique_item.h"
 #include "unit/unit_find.h"
 #include "unit/unit_manager.h"
 #include "unit/unit_type.h"
@@ -359,12 +355,9 @@ static int CclUnit(lua_State *l)
 		} else if (!strcmp(value, "elixir")) {
 			unit->Elixir = CUpgrade::get(LuaToString(l, 2, j + 1));
 		} else if (!strcmp(value, "unique")) {
-			CUniqueItem *unique_item = GetUniqueItem(LuaToString(l, 2, j + 1));
+			stratagus::unique_item *unique_item = stratagus::unique_item::get(LuaToString(l, 2, j + 1));
 			unit->Unique = unique_item;
-			if (unit->Unique && unique_item->Type->BoolFlag[ITEM_INDEX].value) { //apply the unique item's prefix and suffix here, because it may have changed in the database in relation to when the game was last played
-				if (unique_item == nullptr) {
-					LuaError(l, "Unique item \"%s\" doesn't exist." _C_ unit->Name.c_str());
-				}
+			if (unique_item->Type->BoolFlag[ITEM_INDEX].value) { //apply the unique item's prefix and suffix here, because it may have changed in the database in relation to when the game was last played
 				unit->Type = unique_item->Type;
 				type = unique_item->Type;
 				if (unique_item->Prefix != nullptr) {
@@ -1746,7 +1739,7 @@ static int CclGetUnitVariable(lua_State *l)
 		}
 	} else if (!strcmp(value, "Unique")) {
 		if (unit->Unique) {
-			lua_pushstring(l, unit->Unique->Ident.c_str());
+			lua_pushstring(l, unit->Unique->get_identifier().c_str());
 		} else {
 			lua_pushstring(l, "");
 		}
@@ -1763,7 +1756,11 @@ static int CclGetUnitVariable(lua_State *l)
 			lua_pushstring(l, "");
 		}
 	} else if (!strcmp(value, "Icon")) {
-		lua_pushstring(l, unit->GetIcon().Name.c_str());
+		if (unit->get_icon() != nullptr) {
+			lua_pushstring(l, unit->get_icon()->get_identifier().c_str());
+		} else {
+			lua_pushstring(l, "");
+		}
 		return 1;
 	//Wyrmgus end
 	} else if (!strcmp(value, "PlayerType")) {
@@ -1980,10 +1977,8 @@ static int CclSetUnitVariable(lua_State *l)
 		std::string unique_name = LuaToString(l, 3);
 		if (unique_name.empty()) {
 			unit->SetUnique(nullptr);
-		} else if (GetUniqueItem(unique_name) != nullptr) {
-			unit->SetUnique(GetUniqueItem(unique_name));
 		} else {
-			LuaError(l, "Unique \"%s\" doesn't exist." _C_ unique_name.c_str());
+			unit->SetUnique(stratagus::unique_item::get(unique_name));
 		}
 	} else if (!strcmp(name, "GenerateSpecialProperties")) {
 		CPlayer *dropper_player = nullptr;

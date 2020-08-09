@@ -42,9 +42,6 @@ class Missile;
 class CMapField;
 class COrder;
 class CPlayer;
-//Wyrmgus start
-class CUniqueItem;
-//Wyrmgus end
 class CUnit;
 class CUnitPtr;
 class CUnitStats;
@@ -62,6 +59,7 @@ namespace stratagus {
 	class player_color;
 	class spell;
 	class time_of_day;
+	class unique_item;
 	class unit_type;
 	class unit_type_variation;
 	enum class item_class;
@@ -214,7 +212,7 @@ public:
 	void SetSpell(stratagus::spell *spell);
 	void SetWork(CUpgrade *work);
 	void SetElixir(CUpgrade *elixir);
-	void SetUnique(CUniqueItem *unique);
+	void SetUnique(stratagus::unique_item *unique);
 	void Identify();
 	void CheckIdentification();
 	void CheckKnowledgeChange(int variable, int change);
@@ -452,7 +450,7 @@ public:
 	bool IsItemEquipped(const CUnit *item) const;
 	bool is_item_class_equipped(const stratagus::item_class item_class) const;
 	bool IsItemTypeEquipped(const stratagus::unit_type *item_type) const;
-	bool IsUniqueItemEquipped(const CUniqueItem *unique) const;
+	bool IsUniqueItemEquipped(const stratagus::unique_item *unique) const;
 	bool CanEquipItem(CUnit *item) const;
 	bool can_equip_item_class(const stratagus::item_class item_class) const;
 	bool CanUseItem(CUnit *item) const;
@@ -470,8 +468,8 @@ public:
 	bool HasAdjacentRailForUnitType(const stratagus::unit_type *type) const;
 	stratagus::animation_set *GetAnimations() const;
 	CConstruction *GetConstruction() const;
-	IconConfig GetIcon() const;
-	stratagus::icon *GetButtonIcon(const ButtonCmd button_action) const;
+	const stratagus::icon *get_icon() const;
+	const stratagus::icon *GetButtonIcon(const ButtonCmd button_action) const;
 	MissileConfig GetMissile() const;
 	CPlayerColorGraphic *GetLayerSprite(int image_layer) const;
 	std::string GetName() const;
@@ -574,11 +572,11 @@ public:
 	stratagus::spell *Spell; /// Item unit's spell
 	CUpgrade *Work;		/// Item unit's literary work
 	CUpgrade *Elixir;	/// Item unit's elixir
-	CUniqueItem *Unique;		/// Whether the item is unique
+	stratagus::unique_item *Unique;		/// Whether the item is unique
 	bool Bound;			/// Whether the item is bound to its owner
 	bool Identified;	/// Whether the item has been identified
 	CUnit *ConnectingDestination;	/// Which connector this unit connects to (if any)
-	std::map<ButtonCmd, stratagus::icon *> ButtonIcons;				/// icons for button actions
+	std::map<ButtonCmd, const stratagus::icon *> ButtonIcons;				/// icons for button actions
 	//Wyrmgus end
 	std::map<int, int> IndividualUpgrades;      /// individual upgrades which the unit has (and how many of it the unit has)
 

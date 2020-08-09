@@ -31,7 +31,6 @@
 #include "database/detailed_data_entry.h"
 #include "ui/icon.h"
 
-class CUniqueItem;
 class CUpgrade;
 class LuaCallback;
 struct lua_State;
@@ -49,6 +48,7 @@ class faction;
 class player_color;
 class quest;
 class site;
+class unique_item;
 class unit_class;
 class unit_type;
 enum class objective_type;
@@ -122,7 +122,7 @@ public:
 private:
 	const stratagus::character *character = nullptr;
 public:
-	const CUniqueItem *Unique = nullptr;
+	const unique_item *Unique = nullptr;
 private:
 	const stratagus::site *settlement = nullptr;
 	const stratagus::faction *faction = nullptr;

@@ -54,7 +54,6 @@
 //Wyrmgus end
 #include "iocompat.h"
 #include "iolib.h"
-#include "item.h"
 #include "map/map.h"
 #include "map/map_layer.h"
 #include "map/minimap.h"
@@ -65,6 +64,7 @@
 #include "network.h"
 #include "parameters.h"
 #include "pathfinder.h"
+#include "persistent_item.h"
 #include "player.h"
 #include "player_color.h"
 //Wyrmgus start
@@ -2344,9 +2344,7 @@ void LuaRegisterModules()
 	GrandStrategyCclRegister();
 	//Wyrmgus end
 	GroupCclRegister();
-	//Wyrmgus start
 	ItemCclRegister();
-	//Wyrmgus end
 	MapCclRegister();
 	MissileCclRegister();
 	NetworkCclRegister();

@@ -36,7 +36,6 @@
 #include "dialogue.h"
 #include "dialogue_option.h"
 #include "faction.h"
-#include "item.h"
 #include "luacallback.h"
 #include "map/map.h"
 #include "map/map_template.h"
@@ -45,16 +44,12 @@
 #include "player.h"
 #include "player_color.h"
 #include "script.h"
+#include "unique_item.h"
 #include "unit/unit_class.h"
 #include "unit/unit_type.h"
 #include "upgrade/upgrade.h"
 #include "util/date_util.h"
 
-/**
-**  Define a quest.
-**
-**  @param l  Lua state.
-*/
 static int CclDefineQuest(lua_State *l)
 {
 	LuaCheckArgs(l, 2);
@@ -189,7 +184,7 @@ static int CclDefineQuest(lua_State *l)
 						stratagus::character *character = stratagus::character::get(LuaToString(l, -1, k + 1));
 						objective->character = character;
 					} else if (!strcmp(value, "unique")) {
-						CUniqueItem *unique = GetUniqueItem(LuaToString(l, -1, k + 1));
+						stratagus::unique_item *unique = stratagus::unique_item::get(LuaToString(l, -1, k + 1));
 						if (!unique) {
 							LuaError(l, "Unique doesn't exist.");
 						}

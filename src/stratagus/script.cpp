@@ -49,9 +49,6 @@
 //Wyrmgus end
 #include "iocompat.h"
 #include "iolib.h"
-//Wyrmgus start
-#include "item.h"
-//Wyrmgus end
 #include "map/map.h"
 #include "map/site.h"
 #include "parameters.h"
@@ -62,6 +59,7 @@
 #include "translate.h"
 #include "ui/button.h"
 #include "ui/ui.h"
+#include "unique_item.h"
 #include "unit/unit.h"
 #include "unit/unit_class.h"
 //Wyrmgus start
@@ -1609,7 +1607,7 @@ std::string EvalString(const StringDesc *s)
 						return unit->Type->get_quote();
 					}
 				} else {
-					return unit->Unique->Quote;
+					return unit->Unique->get_quote();
 				}
 			} else {
 				return std::string("");
@@ -1647,7 +1645,7 @@ std::string EvalString(const StringDesc *s)
 					if (!item_equipped) {
 						set_items_string += "~<";
 					}
-					set_items_string += unit->Unique->Set->UniqueItems[i]->Name;
+					set_items_string += unit->Unique->Set->UniqueItems[i]->get_name();
 					if (!item_equipped) {
 						set_items_string += "~>";
 					}

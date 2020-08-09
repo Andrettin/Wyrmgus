@@ -58,13 +58,26 @@ void merge(std::vector<T> &vector, U &&other_container)
 }
 
 template <typename T>
-inline void remove(T &vector, const typename T::value_type &element)
+inline void remove(std::vector<T> &vector, const typename std::vector<T>::value_type &element )
 {
 	vector.erase(std::remove(vector.begin(), vector.end(), element), vector.end());
 }
 
 template <typename T>
-inline void remove_one(T &vector, const typename T::value_type &element)
+inline void remove(std::vector<std::unique_ptr<T>> &vector, const T *element)
+{
+	for (size_t i = 0; i < vector.size();) {
+		if (vector[i].get() == element) {
+			vector.erase(vector.begin() + i);
+			return; //since we are using unique pointers, the element is necessarily unique, so there is nothing further to do
+		} else {
+			++i;
+		}
+	}
+}
+
+template <typename T>
+inline void remove_one(std::vector<T> &vector, const T &element)
 {
 	vector.erase(std::find(vector.begin(), vector.end(), element));
 }

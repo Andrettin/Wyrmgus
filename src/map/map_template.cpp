@@ -838,7 +838,7 @@ void map_template::Apply(const QPoint &template_start_pos, const QPoint &map_sta
 	
 	ShowLoadProgress(_("Applying \"%s\" Map Template Units"), this->get_name().c_str());
 
-	for (std::map<std::pair<int, int>, std::tuple<unit_type *, int, CUniqueItem *>>::const_iterator iterator = this->Resources.begin(); iterator != this->Resources.end(); ++iterator) {
+	for (std::map<std::pair<int, int>, std::tuple<unit_type *, int, unique_item *>>::const_iterator iterator = this->Resources.begin(); iterator != this->Resources.end(); ++iterator) {
 		Vec2i unit_raw_pos(iterator->first.first, iterator->first.second);
 		Vec2i unit_pos(map_start_pos.x() + unit_raw_pos.x - template_start_pos.x(), map_start_pos.y() + unit_raw_pos.y - template_start_pos.y());
 		if (!CMap::Map.Info.IsPointOnMap(unit_pos, z)) {

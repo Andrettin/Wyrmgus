@@ -39,7 +39,6 @@
 #include "commands.h"
 #include "database/defines.h"
 #include "font.h"
-#include "item.h"
 #include "map/map.h"
 #include "map/map_layer.h"
 #include "map/minimap.h"
@@ -64,6 +63,7 @@
 #include "ui/cursor.h"
 #include "ui/cursor_type.h"
 #include "ui/interface.h"
+#include "unique_item.h"
 #include "unit/unit.h"
 #include "unit/unit_find.h"
 #include "unit/unit_type.h"
@@ -2511,7 +2511,7 @@ static void UIHandleButtonUp_OnButton(unsigned button)
 						encyclopedia_ident = Selected[0]->Character->Ident;
 						encyclopedia_state = "heroes";
 					} else if (Selected[0]->Unique != nullptr) {
-						encyclopedia_ident = Selected[0]->Unique->Ident;
+						encyclopedia_ident = Selected[0]->Unique->get_identifier();
 						encyclopedia_state = "unique_items";
 					}
 					CclCommand("if (OpenEncyclopediaUnitEntry ~= nil) then OpenEncyclopediaUnitEntry(\"" + encyclopedia_ident + "\", \"" + encyclopedia_state + "\") end;");

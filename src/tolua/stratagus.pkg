@@ -13,14 +13,12 @@ $#include "game.h"
 $#include "grand_strategy.h"
 //Wyrmgus end
 $#include "iolib.h"
-//Wyrmgus start
-$#include "item.h"
-//Wyrmgus end
 $#include "map/map.h"
 $#include "map/minimap.h"
 $#include "mod.h"
 $#include "movie.h"
 $#include "netconnect.h"
+$#include "persistent_item.h"
 $#include "player.h"
 //Wyrmgus start
 $#include "province.h"
@@ -31,6 +29,7 @@ $#include "sound/sound.h"
 $#include "sound/sound_server.h"
 $#include "ui/cursor.h"
 $#include "ui/ui.h"
+$#include "unique_item.h"
 $#include "unit/unit.h"
 $#include "unit/unit_manager.h"
 $#include "unit/unit_type.h"

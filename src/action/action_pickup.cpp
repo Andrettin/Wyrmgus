@@ -8,8 +8,6 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name action_pickup.cpp - The item pick up action. */
-//
 //      (c) Copyright 2015-2020 by Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
@@ -27,10 +25,6 @@
 //      02111-1307, USA.
 //
 
-/*----------------------------------------------------------------------------
---  Includes
-----------------------------------------------------------------------------*/
-
 #include "stratagus.h"
 
 #include "action/action_pickup.h"
@@ -41,13 +35,13 @@
 #include "commands.h"
 //Wyrmgus end
 #include "iolib.h"
-#include "item.h"
 #include "luacallback.h"
 #include "map/map_layer.h"
 #include "map/tileset.h"
 #include "missile.h"
 #include "network.h"
 #include "pathfinder.h"
+#include "persistent_item.h"
 #include "script.h"
 #include "ui/ui.h"
 #include "unit/unit.h"
@@ -215,9 +209,8 @@ enum {
 			
 			goal->Remove(&unit);
 			if (!IsNetworkGame() && unit.Character && unit.Player == CPlayer::GetThisPlayer()) { //if the unit has a persistent character, store the item for it
-				CPersistentItem *item = new CPersistentItem;
+				auto item = std::make_unique<stratagus::persistent_item>();
 				item->Owner = unit.Character;
-				unit.Character->Items.push_back(item);
 				item->Type = const_cast<stratagus::unit_type *>(goal->Type);
 				if (goal->Prefix != nullptr) {
 					item->Prefix = goal->Prefix;
@@ -240,6 +233,7 @@ enum {
 				}
 				item->Bound = goal->Bound;
 				item->Identified = goal->Identified;
+				unit.Character->add_item(std::move(item));
 				SaveHero(unit.Character);
 			}
 			

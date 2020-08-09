@@ -36,10 +36,10 @@
 #include "faction.h"
 #include "gender.h"
 #include "grand_strategy.h"
-#include "item.h"
 #include "map/historical_location.h"
 #include "map/map_template.h"
 #include "map/site.h"
+#include "persistent_item.h"
 #include "player.h"
 #include "province.h"
 #include "quest.h"
@@ -47,6 +47,7 @@
 #include "script.h"
 #include "spells.h"
 #include "time/timeline.h"
+#include "unique_item.h"
 #include "unit/unit_type.h"
 #include "upgrade/upgrade.h"
 #include "util/vector_util.h"
@@ -238,13 +239,12 @@ static int CclDefineCharacter(lua_State *l)
 				}
 			}
 		} else if (!strcmp(value, "Items")) {
-			character->Items.clear();
+			character->items.clear();
 			const int args = lua_rawlen(l, -1);
 			for (int j = 0; j < args; ++j) {
 				lua_rawgeti(l, -1, j + 1);
-				CPersistentItem *item = new CPersistentItem;
+				auto item = std::make_unique<stratagus::persistent_item>();;
 				item->Owner = character;
-				character->Items.push_back(item);
 				if (!lua_istable(l, -1)) {
 					LuaError(l, "incorrect argument (expected table for items)");
 				}
@@ -259,8 +259,7 @@ static int CclDefineCharacter(lua_State *l)
 							item->Type = item_type;
 						} else {
 							fprintf(stderr, "Item type \"%s\" doesn't exist.\n", item_ident.c_str());
-							character->Items.erase(std::remove(character->Items.begin(), character->Items.end(), item), character->Items.end());
-							delete item;
+							item.reset();
 							break;
 						}
 					} else if (!strcmp(value, "prefix")) {
@@ -303,14 +302,14 @@ static int CclDefineCharacter(lua_State *l)
 						item->Name = LuaToString(l, -1, k + 1);
 					} else if (!strcmp(value, "unique")) {
 						std::string unique_ident = LuaToString(l, -1, k + 1);
-						CUniqueItem *unique_item = GetUniqueItem(unique_ident);
+						stratagus::unique_item *unique_item = stratagus::unique_item::try_get(unique_ident);
 						item->Unique = unique_item;
 						if (unique_item != nullptr) {
-							item->Name = unique_item->Name;
+							item->Name = unique_item->get_name();
 							if (unique_item->Type != nullptr) {
 								item->Type = unique_item->Type;
 							} else {
-								fprintf(stderr, "Unique item \"%s\" has no type.\n", unique_item->Ident.c_str());
+								fprintf(stderr, "Unique item \"%s\" has no type.\n", unique_item->get_identifier().c_str());
 							}
 							item->Prefix = unique_item->Prefix;
 							item->Suffix = unique_item->Suffix;
@@ -327,7 +326,7 @@ static int CclDefineCharacter(lua_State *l)
 					} else if (!strcmp(value, "equipped")) {
 						bool is_equipped = LuaToBoolean(l, -1, k + 1);
 						if (is_equipped && stratagus::get_item_class_slot(item->Type->get_item_class()) != stratagus::item_slot::none) {
-							character->EquippedItems[static_cast<int>(stratagus::get_item_class_slot(item->Type->get_item_class()))].push_back(item);
+							character->EquippedItems[static_cast<int>(stratagus::get_item_class_slot(item->Type->get_item_class()))].push_back(item.get());
 						}
 					} else {
 						printf("\n%s\n", character->Ident.c_str());
@@ -335,6 +334,10 @@ static int CclDefineCharacter(lua_State *l)
 					}
 				}
 				lua_pop(l, 1);
+
+				if (item != nullptr) {
+					character->add_item(std::move(item));
+				}
 			}
 		} else if (!strcmp(value, "ForbiddenUpgrades")) {
 			character->ForbiddenUpgrades.clear();
@@ -546,9 +549,8 @@ static int CclDefineCustomHero(lua_State *l)
 			const int args = lua_rawlen(l, -1);
 			for (int j = 0; j < args; ++j) {
 				lua_rawgeti(l, -1, j + 1);
-				CPersistentItem *item = new CPersistentItem;
+				auto item = std::make_unique<stratagus::persistent_item>();
 				item->Owner = hero;
-				hero->Items.push_back(item);
 				if (!lua_istable(l, -1)) {
 					LuaError(l, "incorrect argument (expected table for items)");
 				}
@@ -563,8 +565,7 @@ static int CclDefineCustomHero(lua_State *l)
 							item->Type = item_type;
 						} else {
 							fprintf(stderr, "Item type \"%s\" doesn't exist.\n", item_ident.c_str());
-							hero->Items.erase(std::remove(hero->Items.begin(), hero->Items.end(), item), hero->Items.end());
-							delete item;
+							item.reset();
 							break;
 						}
 					} else if (!strcmp(value, "prefix")) {
@@ -607,10 +608,10 @@ static int CclDefineCustomHero(lua_State *l)
 						item->Name = LuaToString(l, -1, k + 1);
 					} else if (!strcmp(value, "unique")) {
 						std::string unique_ident = LuaToString(l, -1, k + 1);
-						CUniqueItem *unique_item = GetUniqueItem(unique_ident);
+						stratagus::unique_item *unique_item = stratagus::unique_item::try_get(unique_ident);
 						item->Unique = unique_item;
 						if (unique_item != nullptr) {
-							item->Name = unique_item->Name;
+							item->Name = unique_item->get_name();
 							if (unique_item->Type != nullptr) {
 								item->Type = unique_item->Type;
 							} else {
@@ -631,7 +632,7 @@ static int CclDefineCustomHero(lua_State *l)
 					} else if (!strcmp(value, "equipped")) {
 						bool is_equipped = LuaToBoolean(l, -1, k + 1);
 						if (is_equipped && stratagus::get_item_class_slot(item->Type->get_item_class()) != stratagus::item_slot::none) {
-							hero->EquippedItems[static_cast<int>(stratagus::get_item_class_slot(item->Type->get_item_class()))].push_back(item);
+							hero->EquippedItems[static_cast<int>(stratagus::get_item_class_slot(item->Type->get_item_class()))].push_back(item.get());
 						}
 					} else {
 						printf("\n%s\n", hero->Ident.c_str());
@@ -639,6 +640,10 @@ static int CclDefineCustomHero(lua_State *l)
 					}
 				}
 				lua_pop(l, 1);
+
+				if (item != nullptr) {
+					hero->add_item(std::move(item));
+				}
 			}
 		} else if (!strcmp(value, "ForbiddenUpgrades")) {
 			hero->ForbiddenUpgrades.clear();

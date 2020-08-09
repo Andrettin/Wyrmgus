@@ -8,8 +8,6 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name action_unload.cpp - The unload action. */
-//
 //      (c) Copyright 1998-2020 by Lutz Sammer, Jimmy Salmon and Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
@@ -37,7 +35,6 @@
 #include "commands.h"
 //Wyrmgus end
 #include "iolib.h"
-#include "item.h"
 #include "map/map.h"
 #include "map/map_layer.h"
 //Wyrmgus start
@@ -252,9 +249,8 @@ static int UnloadUnit(CUnit &transporter, CUnit &unit, int landmass)
 	}
 	
 	if (!IsNetworkGame() && transporter.Character && transporter.Player == CPlayer::GetThisPlayer() && unit.Type->BoolFlag[ITEM_INDEX].value) { //if the transporter has a character and the unit is an item, remove it from the character's item list
-		CPersistentItem *item = transporter.Character->GetItem(unit);
-		transporter.Character->Items.erase(std::remove(transporter.Character->Items.begin(), transporter.Character->Items.end(), item), transporter.Character->Items.end());
-		delete item;
+		const stratagus::persistent_item *item = transporter.Character->get_item(unit);
+		transporter.Character->remove_item(item);
 		SaveHero(transporter.Character);
 	}
 	

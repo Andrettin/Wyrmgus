@@ -38,13 +38,13 @@
 #include "character.h"
 #include "construct.h"
 #include "iolib.h"
-#include "item.h"
 #include "map/map.h"
 #include "map/map_layer.h"
 #include "map/site.h"
 #include "pathfinder.h"
 #include "player.h"
 #include "spells.h"
+#include "unique_item.h"
 #include "unit/unit_type.h"
 
 /**
@@ -189,7 +189,7 @@ void SaveUnit(const CUnit &unit, CFile &file)
 		file.printf("\"elixir\", \"%s\", ", unit.Elixir->Ident.c_str());
 	}
 	if (unit.Unique) {
-		file.printf("\"unique\", \"%s\", ", unit.Unique->Ident.c_str());
+		file.printf("\"unique\", \"%s\", ", unit.Unique->get_identifier().c_str());
 	}
 	if (unit.Bound) {
 		file.printf("\"bound\", true, ");

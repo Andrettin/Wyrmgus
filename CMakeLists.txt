@@ -345,12 +345,12 @@ set(stratagusmain_SRCS
 	src/stratagus/groups.cpp
 	src/stratagus/iolib.cpp
 	src/stratagus/luacallback.cpp
-	src/stratagus/item.cpp
 	src/stratagus/item_class.cpp
 	src/stratagus/main.cpp
 	src/stratagus/mainloop.cpp
 	src/stratagus/mod.cpp
 	src/stratagus/parameters.cpp
+	src/stratagus/persistent_item.cpp
 	src/stratagus/plane.cpp
 	src/stratagus/player.cpp
 	src/stratagus/player_color.cpp
@@ -372,6 +372,7 @@ set(stratagusmain_SRCS
 	src/stratagus/text.cpp
 	src/stratagus/title.cpp
 	src/stratagus/translate.cpp
+	src/stratagus/unique_item.cpp
 	src/stratagus/world.cpp
 )
 source_group(stratagus FILES ${stratagusmain_SRCS})
@@ -833,7 +834,6 @@ set(stratagus_generic_HDRS
 	src/include/grand_strategy.h
 	src/include/iocompat.h
 	src/include/iolib.h
-	src/include/item.h
 	src/include/luacallback.h
 	src/include/master.h
 	src/include/menus.h
@@ -888,8 +888,10 @@ set(stratagus_generic_HDRS
 	src/stratagus/item_class.h
 	src/stratagus/item_slot.h
 	src/stratagus/objective_type.h
+	src/stratagus/persistent_item.h
 	src/stratagus/player_container.h
 	src/stratagus/species.h
+	src/stratagus/unique_item.h
 	src/stratagus/vassalage_type.h
 )
 

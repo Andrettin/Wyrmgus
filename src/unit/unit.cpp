@@ -52,9 +52,6 @@
 //Wyrmgus start
 #include "grand_strategy.h"
 //Wyrmgus end
-//Wyrmgus start
-#include "item.h"
-//Wyrmgus end
 #include "item_slot.h"
 #include "luacallback.h"
 #include "map/map.h"
@@ -65,6 +62,7 @@
 #include "network.h"
 #include "objective_type.h"
 #include "pathfinder.h"
+#include "persistent_item.h"
 #include "plane.h"
 #include "player.h"
 //Wyrmgus start
@@ -83,6 +81,7 @@
 #include "ui/button.h"
 #include "ui/interface.h"
 #include "ui/ui.h"
+#include "unique_item.h"
 #include "unit/unit_find.h"
 #include "unit/unit_manager.h"
 #include "unit/unit_type.h"
@@ -1028,31 +1027,31 @@ void CUnit::set_character(stratagus::character *character)
 	}
 
 	//load items
-	for (size_t i = 0; i < this->Character->Items.size(); ++i) {
-		CUnit *item = MakeUnitAndPlace(this->tilePos, *this->Character->Items[i]->Type, CPlayer::Players[PlayerNumNeutral], this->MapLayer->ID);
-		if (this->Character->Items[i]->Prefix != nullptr) {
-			item->SetPrefix(this->Character->Items[i]->Prefix);
+	for (const auto &persistent_item : this->Character->get_items()) {
+		CUnit *item = MakeUnitAndPlace(this->tilePos, *persistent_item->Type, CPlayer::Players[PlayerNumNeutral], this->MapLayer->ID);
+		if (persistent_item->Prefix != nullptr) {
+			item->SetPrefix(persistent_item->Prefix);
 		}
-		if (this->Character->Items[i]->Suffix != nullptr) {
-			item->SetSuffix(this->Character->Items[i]->Suffix);
+		if (persistent_item->Suffix != nullptr) {
+			item->SetSuffix(persistent_item->Suffix);
 		}
-		if (this->Character->Items[i]->Spell != nullptr) {
-			item->SetSpell(this->Character->Items[i]->Spell);
+		if (persistent_item->Spell != nullptr) {
+			item->SetSpell(persistent_item->Spell);
 		}
-		if (this->Character->Items[i]->Work != nullptr) {
-			item->SetWork(this->Character->Items[i]->Work);
+		if (persistent_item->Work != nullptr) {
+			item->SetWork(persistent_item->Work);
 		}
-		if (this->Character->Items[i]->Elixir != nullptr) {
-			item->SetElixir(this->Character->Items[i]->Elixir);
+		if (persistent_item->Elixir != nullptr) {
+			item->SetElixir(persistent_item->Elixir);
 		}
-		item->Unique = this->Character->Items[i]->Unique;
-		if (!this->Character->Items[i]->Name.empty()) {
-			item->Name = this->Character->Items[i]->Name;
+		item->Unique = persistent_item->Unique;
+		if (!persistent_item->Name.empty()) {
+			item->Name = persistent_item->Name;
 		}
-		item->Bound = this->Character->Items[i]->Bound;
-		item->Identified = this->Character->Items[i]->Identified;
+		item->Bound = persistent_item->Bound;
+		item->Identified = persistent_item->Identified;
 		item->Remove(this);
-		if (this->Character->IsItemEquipped(this->Character->Items[i])) {
+		if (this->Character->is_item_equipped(persistent_item.get())) {
 			EquipItem(*item, false);
 		}
 	}
@@ -1320,23 +1319,23 @@ void CUnit::UpdateButtonIcons()
 void CUnit::ChooseButtonIcon(const ButtonCmd button_action)
 {
 	if (button_action == ButtonCmd::Attack) {
-		if (this->EquippedItems[static_cast<int>(stratagus::item_slot::arrows)].size() > 0 && this->EquippedItems[static_cast<int>(stratagus::item_slot::arrows)][0]->GetIcon().Icon != nullptr) {
-			this->ButtonIcons[button_action] = this->EquippedItems[static_cast<int>(stratagus::item_slot::arrows)][0]->GetIcon().Icon;
+		if (this->EquippedItems[static_cast<int>(stratagus::item_slot::arrows)].size() > 0 && this->EquippedItems[static_cast<int>(stratagus::item_slot::arrows)][0]->get_icon() != nullptr) {
+			this->ButtonIcons[button_action] = this->EquippedItems[static_cast<int>(stratagus::item_slot::arrows)][0]->get_icon();
 			return;
 		}
 		
-		if (this->EquippedItems[static_cast<int>(stratagus::item_slot::weapon)].size() > 0 && this->EquippedItems[static_cast<int>(stratagus::item_slot::weapon)][0]->Type->get_item_class() != stratagus::item_class::bow && this->EquippedItems[static_cast<int>(stratagus::item_slot::weapon)][0]->GetIcon().Icon != nullptr) {
-			this->ButtonIcons[button_action] = this->EquippedItems[static_cast<int>(stratagus::item_slot::weapon)][0]->GetIcon().Icon;
+		if (this->EquippedItems[static_cast<int>(stratagus::item_slot::weapon)].size() > 0 && this->EquippedItems[static_cast<int>(stratagus::item_slot::weapon)][0]->Type->get_item_class() != stratagus::item_class::bow && this->EquippedItems[static_cast<int>(stratagus::item_slot::weapon)][0]->get_icon() != nullptr) {
+			this->ButtonIcons[button_action] = this->EquippedItems[static_cast<int>(stratagus::item_slot::weapon)][0]->get_icon();
 			return;
 		}
 	} else if (button_action == ButtonCmd::Stop) {
-		if (this->EquippedItems[static_cast<int>(stratagus::item_slot::shield)].size() > 0 && this->EquippedItems[static_cast<int>(stratagus::item_slot::shield)][0]->Type->get_item_class() == stratagus::item_class::shield && this->EquippedItems[static_cast<int>(stratagus::item_slot::shield)][0]->GetIcon().Icon != nullptr) {
-			this->ButtonIcons[button_action] = this->EquippedItems[static_cast<int>(stratagus::item_slot::shield)][0]->GetIcon().Icon;
+		if (this->EquippedItems[static_cast<int>(stratagus::item_slot::shield)].size() > 0 && this->EquippedItems[static_cast<int>(stratagus::item_slot::shield)][0]->Type->get_item_class() == stratagus::item_class::shield && this->EquippedItems[static_cast<int>(stratagus::item_slot::shield)][0]->get_icon() != nullptr) {
+			this->ButtonIcons[button_action] = this->EquippedItems[static_cast<int>(stratagus::item_slot::shield)][0]->get_icon();
 			return;
 		}
 	} else if (button_action == ButtonCmd::Move) {
-		if (this->EquippedItems[static_cast<int>(stratagus::item_slot::boots)].size() > 0 && this->EquippedItems[static_cast<int>(stratagus::item_slot::boots)][0]->GetIcon().Icon != nullptr) {
-			this->ButtonIcons[button_action] = this->EquippedItems[static_cast<int>(stratagus::item_slot::boots)][0]->GetIcon().Icon;
+		if (this->EquippedItems[static_cast<int>(stratagus::item_slot::boots)].size() > 0 && this->EquippedItems[static_cast<int>(stratagus::item_slot::boots)][0]->get_icon() != nullptr) {
+			this->ButtonIcons[button_action] = this->EquippedItems[static_cast<int>(stratagus::item_slot::boots)][0]->get_icon();
 			return;
 		}
 	} else if (button_action == ButtonCmd::StandGround) {
@@ -1518,9 +1517,10 @@ void CUnit::EquipItem(CUnit &item, bool affect_character)
 	}
 
 	if (!IsNetworkGame() && Character && this->Player == CPlayer::GetThisPlayer() && affect_character) {
-		if (Character->GetItem(item) != nullptr) {
-			if (!Character->IsItemEquipped(Character->GetItem(item))) {
-				Character->EquippedItems[static_cast<int>(item_slot)].push_back(Character->GetItem(item));
+		stratagus::persistent_item *persistent_item = this->Character->get_item(item);
+		if (persistent_item != nullptr) {
+			if (!Character->is_item_equipped(persistent_item)) {
+				Character->EquippedItems[static_cast<int>(item_slot)].push_back(persistent_item);
 				SaveHero(Character);
 			} else {
 				fprintf(stderr, "Item is not equipped by character \"%s\"'s unit, but is equipped by the character itself.\n", Character->Ident.c_str());
@@ -1647,9 +1647,10 @@ void CUnit::DeequipItem(CUnit &item, bool affect_character)
 	}
 	
 	if (!IsNetworkGame() && Character && this->Player == CPlayer::GetThisPlayer() && affect_character) {
-		if (Character->GetItem(item) != nullptr) {
-			if (Character->IsItemEquipped(Character->GetItem(item))) {
-				stratagus::vector::remove(this->Character->EquippedItems[static_cast<int>(item_slot)], this->Character->GetItem(item));
+		stratagus::persistent_item *persistent_item = this->Character->get_item(item);
+		if (persistent_item != nullptr) {
+			if (Character->is_item_equipped(persistent_item)) {
+				stratagus::vector::remove(this->Character->EquippedItems[static_cast<int>(item_slot)], persistent_item);
 				SaveHero(Character);
 			} else {
 				fprintf(stderr, "Item is equipped by character \"%s\"'s unit, but not by the character itself.\n", Character->Ident.c_str());
@@ -1845,8 +1846,8 @@ void CUnit::SetPrefix(CUpgrade *prefix)
 		this->Variable[MAGICLEVEL_INDEX].Value -= Prefix->MagicLevel;
 		this->Variable[MAGICLEVEL_INDEX].Max -= Prefix->MagicLevel;
 	}
-	if (!IsNetworkGame() && Container && Container->Character && Container->Player == CPlayer::GetThisPlayer() && Container->Character->GetItem(*this) != nullptr && Container->Character->GetItem(*this)->Prefix != prefix) { //update the persistent item, if applicable and if it hasn't been updated yet
-		Container->Character->GetItem(*this)->Prefix = prefix;
+	if (!IsNetworkGame() && Container && Container->Character && Container->Player == CPlayer::GetThisPlayer() && Container->Character->get_item(*this) != nullptr && Container->Character->get_item(*this)->Prefix != prefix) { //update the persistent item, if applicable and if it hasn't been updated yet
+		Container->Character->get_item(*this)->Prefix = prefix;
 		SaveHero(Container->Character);
 	}
 	Prefix = prefix;
@@ -1870,8 +1871,8 @@ void CUnit::SetSuffix(CUpgrade *suffix)
 		this->Variable[MAGICLEVEL_INDEX].Value -= Suffix->MagicLevel;
 		this->Variable[MAGICLEVEL_INDEX].Max -= Suffix->MagicLevel;
 	}
-	if (!IsNetworkGame() && Container && Container->Character && Container->Player == CPlayer::GetThisPlayer() && Container->Character->GetItem(*this) != nullptr && Container->Character->GetItem(*this)->Suffix != suffix) { //update the persistent item, if applicable and if it hasn't been updated yet
-		Container->Character->GetItem(*this)->Suffix = suffix;
+	if (!IsNetworkGame() && Container && Container->Character && Container->Player == CPlayer::GetThisPlayer() && Container->Character->get_item(*this) != nullptr && Container->Character->get_item(*this)->Suffix != suffix) { //update the persistent item, if applicable and if it hasn't been updated yet
+		Container->Character->get_item(*this)->Suffix = suffix;
 		SaveHero(Container->Character);
 	}
 	Suffix = suffix;
@@ -1888,8 +1889,8 @@ void CUnit::SetSuffix(CUpgrade *suffix)
 
 void CUnit::SetSpell(stratagus::spell *spell)
 {
-	if (!IsNetworkGame() && Container && Container->Character && Container->Player == CPlayer::GetThisPlayer() && Container->Character->GetItem(*this) != nullptr && Container->Character->GetItem(*this)->Spell != spell) { //update the persistent item, if applicable and if it hasn't been updated yet
-		Container->Character->GetItem(*this)->Spell = spell;
+	if (!IsNetworkGame() && Container && Container->Character && Container->Player == CPlayer::GetThisPlayer() && Container->Character->get_item(*this) != nullptr && Container->Character->get_item(*this)->Spell != spell) { //update the persistent item, if applicable and if it hasn't been updated yet
+		Container->Character->get_item(*this)->Spell = spell;
 		SaveHero(Container->Character);
 	}
 	Spell = spell;
@@ -1904,8 +1905,8 @@ void CUnit::SetWork(CUpgrade *work)
 		this->Variable[MAGICLEVEL_INDEX].Max -= this->Work->MagicLevel;
 	}
 	
-	if (!IsNetworkGame() && Container && Container->Character && Container->Player == CPlayer::GetThisPlayer() && Container->Character->GetItem(*this) != nullptr && Container->Character->GetItem(*this)->Work != work) { //update the persistent item, if applicable and if it hasn't been updated yet
-		Container->Character->GetItem(*this)->Work = work;
+	if (!IsNetworkGame() && Container && Container->Character && Container->Player == CPlayer::GetThisPlayer() && Container->Character->get_item(*this) != nullptr && Container->Character->get_item(*this)->Work != work) { //update the persistent item, if applicable and if it hasn't been updated yet
+		Container->Character->get_item(*this)->Work = work;
 		SaveHero(Container->Character);
 	}
 	
@@ -1926,8 +1927,8 @@ void CUnit::SetElixir(CUpgrade *elixir)
 		this->Variable[MAGICLEVEL_INDEX].Max -= this->Elixir->MagicLevel;
 	}
 	
-	if (!IsNetworkGame() && Container && Container->Character && Container->Player == CPlayer::GetThisPlayer() && Container->Character->GetItem(*this) != nullptr && Container->Character->GetItem(*this)->Elixir != elixir) { //update the persistent item, if applicable and if it hasn't been updated yet
-		Container->Character->GetItem(*this)->Elixir = elixir;
+	if (!IsNetworkGame() && Container && Container->Character && Container->Player == CPlayer::GetThisPlayer() && Container->Character->get_item(*this) != nullptr && Container->Character->get_item(*this)->Elixir != elixir) { //update the persistent item, if applicable and if it hasn't been updated yet
+		Container->Character->get_item(*this)->Elixir = elixir;
 		SaveHero(Container->Character);
 	}
 	
@@ -1941,7 +1942,7 @@ void CUnit::SetElixir(CUpgrade *elixir)
 	this->UpdateItemName();
 }
 
-void CUnit::SetUnique(CUniqueItem *unique)
+void CUnit::SetUnique(stratagus::unique_item *unique)
 {
 	if (this->Unique && this->Unique->Set) {
 		this->Variable[MAGICLEVEL_INDEX].Value -= this->Unique->Set->MagicLevel;
@@ -1964,7 +1965,7 @@ void CUnit::SetUnique(CUniqueItem *unique)
 			this->Variable[MAGICLEVEL_INDEX].Value += unique->Set->MagicLevel;
 			this->Variable[MAGICLEVEL_INDEX].Max += unique->Set->MagicLevel;
 		}
-		Name = unique->Name;
+		Name = unique->get_name();
 		Unique = unique;
 	} else {
 		Name.clear();
@@ -1979,8 +1980,8 @@ void CUnit::SetUnique(CUniqueItem *unique)
 
 void CUnit::Identify()
 {
-	if (!IsNetworkGame() && Container && Container->Character && Container->Player == CPlayer::GetThisPlayer() && Container->Character->GetItem(*this) != nullptr && Container->Character->GetItem(*this)->Identified != true) { //update the persistent item, if applicable and if it hasn't been updated yet
-		Container->Character->GetItem(*this)->Identified = true;
+	if (!IsNetworkGame() && Container && Container->Character && Container->Player == CPlayer::GetThisPlayer() && Container->Character->get_item(*this) != nullptr && Container->Character->get_item(*this)->Identified != true) { //update the persistent item, if applicable and if it hasn't been updated yet
+		Container->Character->get_item(*this)->Identified = true;
 		SaveHero(Container->Character);
 	}
 	
@@ -2050,7 +2051,7 @@ void CUnit::CheckKnowledgeChange(int variable, int change) // this happens after
 void CUnit::UpdateItemName()
 {
 	if (this->Unique) {
-		Name = _(this->Unique->Name.c_str());
+		Name = _(this->Unique->get_name().c_str());
 		return;
 	}
 	
@@ -2355,9 +2356,9 @@ void CUnit::GenerateWork(CUnit *dropper, CPlayer *dropper_player)
 
 void CUnit::GenerateUnique(CUnit *dropper, CPlayer *dropper_player)
 {
-	std::vector<CUniqueItem *> potential_uniques;
+	std::vector<stratagus::unique_item *> potential_uniques;
 
-	for (CUniqueItem *unique : UniqueItems) {
+	for (stratagus::unique_item *unique : stratagus::unique_item::get_all()) {
 		if (this->Type != unique->Type) {
 			continue;
 		}
@@ -2474,7 +2475,7 @@ void CUnit::GenerateUnique(CUnit *dropper, CPlayer *dropper_player)
 	}
 	
 	if (potential_uniques.size() > 0) {
-		CUniqueItem *chosen_unique = potential_uniques[SyncRand(potential_uniques.size())];
+		stratagus::unique_item *chosen_unique = potential_uniques[SyncRand(potential_uniques.size())];
 		this->SetUnique(chosen_unique);
 	}
 }
@@ -6157,7 +6158,7 @@ bool CUnit::IsItemTypeEquipped(const stratagus::unit_type *item_type) const
 	return false;
 }
 
-bool CUnit::IsUniqueItemEquipped(const CUniqueItem *unique) const
+bool CUnit::IsUniqueItemEquipped(const stratagus::unique_item *unique) const
 {
 	const stratagus::item_slot item_slot = stratagus::get_item_class_slot(unique->Type->get_item_class());
 		
@@ -6558,25 +6559,25 @@ CConstruction *CUnit::GetConstruction() const
 	}
 }
 
-IconConfig CUnit::GetIcon() const
+const stratagus::icon *CUnit::get_icon() const
 {
 	if (this->Character != nullptr && this->Character->get_level() >= 3 && this->Character->HeroicIcon.Icon) {
-		return this->Character->HeroicIcon;
+		return this->Character->HeroicIcon.Icon;
 	} else if (this->Character != nullptr && this->Character->Icon.Icon) {
-		return this->Character->Icon;
-	} else if (this->Unique != nullptr && this->Unique->Icon.Icon) {
-		return this->Unique->Icon;
+		return this->Character->Icon.Icon;
+	} else if (this->Unique != nullptr && this->Unique->get_icon() != nullptr) {
+		return this->Unique->get_icon();
 	}
 	
 	const stratagus::unit_type_variation *variation = this->GetVariation();
 	if (variation && variation->Icon.Icon) {
-		return variation->Icon;
+		return variation->Icon.Icon;
 	} else {
-		return this->Type->Icon;
+		return this->Type->Icon.Icon;
 	}
 }
 
-stratagus::icon *CUnit::GetButtonIcon(const ButtonCmd button_action) const
+const stratagus::icon *CUnit::GetButtonIcon(const ButtonCmd button_action) const
 {
 	if (this->ButtonIcons.find(button_action) != this->ButtonIcons.end()) {
 		return this->ButtonIcons.find(button_action)->second;

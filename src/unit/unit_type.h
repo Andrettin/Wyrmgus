@@ -45,9 +45,6 @@
 class CConstruction;
 class CFile;
 class CPlayerColorGraphic;
-//Wyrmgus start
-class CUniqueItem;
-//Wyrmgus end
 struct lua_State;
 #ifdef USE_MNG
 class Mng;

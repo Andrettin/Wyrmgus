@@ -8,8 +8,6 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name action_trade.cpp - The trade action. */
-//
 //      (c) Copyright 2017-2020 by Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
@@ -35,7 +33,6 @@
 #include "character.h"
 #include "commands.h"
 #include "iolib.h"
-#include "item.h"
 #include "luacallback.h"
 #include "map/map_layer.h"
 #include "map/tileset.h"
@@ -273,9 +270,8 @@ COrder *COrder::NewActionTrade(CUnit &dest, CUnit &home_market)
 					LetUnitDie(*goal);
 				} else {
 					if (!IsNetworkGame() && goal->Container->Character && goal->Container->Player == CPlayer::GetThisPlayer() && goal->Type->BoolFlag[ITEM_INDEX].value && goal->Container->HasInventory()) {
-						CPersistentItem *item = goal->Container->Character->GetItem(*goal);
-						goal->Container->Character->Items.erase(std::remove(goal->Container->Character->Items.begin(), goal->Container->Character->Items.end(), item), goal->Container->Character->Items.end());
-						delete item;
+						const stratagus::persistent_item *item = goal->Container->Character->get_item(*goal);
+						goal->Container->Character->remove_item(item);
 						SaveHero(goal->Container->Character);
 					}
 					UnitLost(*goal);

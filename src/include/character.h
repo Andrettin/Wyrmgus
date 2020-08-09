@@ -36,7 +36,6 @@
 
 class CFile;
 class CLanguage;
-class CPersistentItem;
 class CProvince;
 class CUnit;
 class CUpgrade;
@@ -56,6 +55,7 @@ namespace stratagus {
 	class dynasty;
 	class faction;
 	class historical_location;
+	class persistent_item;
 	class quest;
 	class religion;
 	class site;
@@ -186,7 +186,17 @@ public:
 	religion *get_religion() const;
 	CLanguage *GetLanguage() const;
 	calendar *get_calendar() const;
-	bool IsItemEquipped(const CPersistentItem *item) const;
+
+	const std::vector<std::unique_ptr<persistent_item>> &get_items() const
+	{
+		return this->items;
+	}
+
+	void add_item(std::unique_ptr<persistent_item> &&item);
+	void remove_item(const persistent_item *item);
+	persistent_item *get_item(const CUnit &item_unit) const;
+	bool is_item_equipped(const persistent_item *item) const;
+
 	bool IsUsable() const;
 	bool CanAppear(bool ignore_neutral = false) const;
 	bool CanWorship() const;
@@ -209,7 +219,6 @@ public:
 	}
 
 	IconConfig GetIcon() const;
-	CPersistentItem *GetItem(CUnit &item) const;
 	void UpdateAttributes();
 
 	bool is_ai_active() const
@@ -320,7 +329,7 @@ public:
 private:
 	std::unique_ptr<condition> conditions;
 public:
-	std::vector<CPersistentItem *> EquippedItems[static_cast<int>(stratagus::item_slot::count)]; //equipped items of the character, per slot
+	std::vector<persistent_item *> EquippedItems[static_cast<int>(stratagus::item_slot::count)]; //equipped items of the character, per slot
 private:
 	site *home_settlement = nullptr; //the home settlement of this character, where they can preferentially be recruited
 	bool ai_active = true; //whether the character's AI is active
@@ -334,7 +343,9 @@ public:
 	std::vector<CUpgrade *> ConsumedElixirs;
 	std::vector<CUpgrade *> AuthoredWorks;	/// Literary works of which this character is the author
 	std::vector<CUpgrade *> LiteraryAppearances;	/// Literary works in which this character appears
-	std::vector<CPersistentItem *> Items;
+private:
+	std::vector<std::unique_ptr<persistent_item>> items;
+public:
 	int Attributes[MaxAttributes];
 	std::vector<stratagus::unit_type *> ForbiddenUpgrades;	/// which unit types this character is forbidden to upgrade to
 private:

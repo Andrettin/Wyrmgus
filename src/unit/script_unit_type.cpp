@@ -40,7 +40,6 @@
 #include "editor.h"
 #include "faction.h"
 #include "font.h"
-#include "item.h"
 #include "item_slot.h"
 #include "luacallback.h"
 #include "map/map.h"
@@ -65,6 +64,7 @@
 #include "ui/button.h"
 #include "ui/button_level.h"
 #include "ui/ui.h"
+#include "unique_item.h"
 #include "unit/unit.h"
 #include "unit/unit_class.h"
 #include "unit/unit_manager.h"
@@ -2540,18 +2540,18 @@ static int CclGetUnitTypeData(lua_State *l)
 		}
 		return 1;
 	} else if (!strcmp(data, "Uniques")) {
-		std::vector<CUniqueItem *> uniques;
-		for (size_t i = 0; i < UniqueItems.size(); ++i)
+		std::vector<const stratagus::unique_item *> uniques;
+		for (const stratagus::unique_item *unique : stratagus::unique_item::get_all())
 		{
-			if (UniqueItems[i]->Type == type) {
-				uniques.push_back(UniqueItems[i]);
+			if (unique->Type == type) {
+				uniques.push_back(unique);
 			}
 		}
 		
 		lua_createtable(l, uniques.size(), 0);
 		for (size_t i = 1; i <= uniques.size(); ++i)
 		{
-			lua_pushstring(l, uniques[i-1]->Ident.c_str());
+			lua_pushstring(l, uniques[i-1]->get_identifier().c_str());
 			lua_rawseti(l, -2, i);
 		}
 		return 1;

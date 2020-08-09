@@ -27,75 +27,37 @@
 
 #pragma once
 
-#include "ui/icon.h"
-
 class CConfigData;
 class CUpgrade;
 
 namespace stratagus {
-	class character;
-	class spell;
-	class unit_type;
-}
 
-class CUniqueItem
-{
-public:
-	CUniqueItem() :
-		ResourcesHeld(0), Type(nullptr), Prefix(nullptr), Suffix(nullptr), Set(nullptr), Spell(nullptr), Work(nullptr), Elixir(nullptr)
-	{
-	}
-	
-	bool CanDrop() const;				/// Check whether this unique item can drop
-	int GetMagicLevel() const;			/// Get this unique item's magic level
-	IconConfig GetIcon() const;
+class character;
+class sml_data;
+class sml_property;
+class spell;
+class unique_item;
+class unit_type;
 
-	int ResourcesHeld;
-	std::string Ident;
-	std::string Name;
-	std::string Description;
-	std::string Background;
-	std::string Quote;
-	IconConfig Icon;			/// Unique item's icon (if it differs from that of its type)
-	stratagus::unit_type *Type;			/// Item type of the item
-	CUpgrade *Prefix;
-	CUpgrade *Suffix;
-	CUpgrade *Set;
-	stratagus::spell *Spell;
-	CUpgrade *Work;
-	CUpgrade *Elixir;
-};
-
-class CPersistentItem
+class persistent_item final
 {
 public:
 	void ProcessConfigData(const CConfigData *config_data);
-	
+
 	std::string Name;
-	bool Bound = false;			/// Whether the item is bound to its owner and can't be dropped
-	bool Identified = true;		/// Whether the item has been identified
-	stratagus::unit_type *Type = nullptr;	/// Item type of the item
+	bool Bound = false; //whether the item is bound to its owner and can't be dropped
+	bool Identified = true; //whether the item has been identified
+	unit_type *Type = nullptr; //the item type of the item
 	CUpgrade *Prefix = nullptr;
 	CUpgrade *Suffix = nullptr;
-	stratagus::spell *Spell = nullptr;
+	spell *Spell = nullptr;
 	CUpgrade *Work = nullptr;
 	CUpgrade *Elixir = nullptr;
-	CUniqueItem *Unique = nullptr;
-	stratagus::character *Owner = nullptr;
+	unique_item *Unique = nullptr;
+	character *Owner = nullptr;
 };
 
-/*----------------------------------------------------------------------------
--- Variables
-----------------------------------------------------------------------------*/
+}
 
-extern std::vector<CUniqueItem *> UniqueItems;
-
-/*----------------------------------------------------------------------------
--- Functions
-----------------------------------------------------------------------------*/
-
-extern void CleanUniqueItems();
-extern CUniqueItem *GetUniqueItem(const std::string &item_ident);
 extern std::string GetItemEffectsString(const std::string &item_ident);
-extern std::string GetUniqueItemEffectsString(const std::string &item_ident);
 extern void ItemCclRegister();

@@ -44,7 +44,6 @@
 #include "font.h"
 #include "government_type.h"
 #include "grand_strategy.h"
-#include "item.h"
 #include "luacallback.h"
 #include "map/map.h"
 #include "map/site.h"

@@ -39,7 +39,6 @@
 #include "faction.h"
 #include "game.h"
 #include "iolib.h"
-#include "item.h"
 #include "map/map_layer.h"
 #include "map/map_template.h"
 #include "map/region.h"
@@ -61,16 +60,13 @@
 #include "time/time_of_day_schedule.h"
 #include "translate.h"
 #include "ui/ui.h"
+#include "unique_item.h"
 #include "unit/historical_unit.h"
 #include "unit/unit.h"
 #include "unit/unit_class.h"
 #include "version.h"
 #include "video.h"
 #include "world.h"
-
-/*----------------------------------------------------------------------------
---  Functions
-----------------------------------------------------------------------------*/
 
 /**
 **  Parse a map.
@@ -781,20 +777,17 @@ static int CclSetMapTemplateResource(lua_State *l)
 	CclGetPos(l, &ipos.x, &ipos.y, 3);
 
 	int resources_held = 0;
-	CUniqueItem *unique = nullptr;
+	stratagus::unique_item *unique = nullptr;
 	
 	const int nargs = lua_gettop(l);
 	if (nargs >= 4) {
 		resources_held = LuaToNumber(l, 4);
 	}
 	if (nargs >= 5) {
-		unique = GetUniqueItem(LuaToString(l, 5));
-		if (!unique) {
-			LuaError(l, "Unique item doesn't exist.\n");
-		}
+		unique = stratagus::unique_item::get(LuaToString(l, 5));
 	}
 	
-	map_template->Resources[std::pair<int, int>(ipos.x, ipos.y)] = std::tuple<stratagus::unit_type *, int, CUniqueItem *>(unittype, resources_held, unique);
+	map_template->Resources[std::pair<int, int>(ipos.x, ipos.y)] = std::make_tuple(unittype, resources_held, unique);
 	
 	return 1;
 }
@@ -819,7 +812,7 @@ static int CclSetMapTemplateUnit(lua_State *l)
 	CDate start_date;
 	CDate end_date;
 
-	CUniqueItem *unique = nullptr;
+	stratagus::unique_item *unique = nullptr;
 
 	const int nargs = lua_gettop(l);
 	if (nargs >= 5) {
@@ -829,13 +822,10 @@ static int CclSetMapTemplateUnit(lua_State *l)
 		CclGetDate(l, &end_date, 6);
 	}
 	if (nargs >= 7) {
-		unique = GetUniqueItem(LuaToString(l, 7));
-		if (!unique) {
-			LuaError(l, "Unique item doesn't exist.\n");
-		}
+		unique = stratagus::unique_item::get(LuaToString(l, 7));
 	}
 	
-	map_template->Units.push_back(std::tuple<Vec2i, stratagus::unit_type *, stratagus::faction *, CDate, CDate, CUniqueItem *>(ipos, unittype, faction, start_date, end_date, unique));
+	map_template->Units.push_back(std::make_tuple(ipos, unittype, faction, start_date, end_date, unique));
 	
 	return 1;
 }
@@ -885,22 +875,19 @@ static int CclSetMapTemplateLayerConnector(lua_State *l)
 	Vec2i ipos;
 	CclGetPos(l, &ipos.x, &ipos.y, 3);
 
-	CUniqueItem *unique = nullptr;
+	stratagus::unique_item *unique = nullptr;
 	
 	const int nargs = lua_gettop(l);
 	if (nargs >= 5) {
-		unique = GetUniqueItem(LuaToString(l, 5));
-		if (!unique) {
-			LuaError(l, "Unique item doesn't exist.\n");
-		}
+		unique = stratagus::unique_item::get(LuaToString(l, 5));
 	}
 	
 	if (lua_isstring(l, 4)) {
 		std::string realm = LuaToString(l, 4);
 		if (stratagus::world::try_get(realm)) {
-			map_template->WorldConnectors.push_back(std::tuple<Vec2i, stratagus::unit_type *, stratagus::world *, CUniqueItem *>(ipos, unittype, stratagus::world::get(realm), unique));
+			map_template->WorldConnectors.push_back(std::make_tuple(ipos, unittype, stratagus::world::get(realm), unique));
 		} else if (stratagus::plane::try_get(realm)) {
-			map_template->PlaneConnectors.push_back(std::tuple<Vec2i, stratagus::unit_type *, stratagus::plane *, CUniqueItem *>(ipos, unittype, stratagus::plane::try_get(realm), unique));
+			map_template->PlaneConnectors.push_back(std::make_tuple(ipos, unittype, stratagus::plane::try_get(realm), unique));
 		} else {
 			LuaError(l, "incorrect argument");
 		}
@@ -1743,10 +1730,10 @@ static int CclDefineSite(lua_State *l)
 				const stratagus::unit_class *building_class = stratagus::unit_class::get(LuaToString(l, -1, j + 1));
 				++j;
 				
-				CUniqueItem *unique = nullptr;
+				stratagus::unique_item *unique = nullptr;
 				lua_rawgeti(l, -1, j + 1);
-				if (lua_isstring(l, -1) && !lua_isnumber(l, -1) && GetUniqueItem(LuaToString(l, -1)) != nullptr) {
-					unique = GetUniqueItem(LuaToString(l, -1));
+				if (lua_isstring(l, -1) && !lua_isnumber(l, -1) && stratagus::unique_item::get(LuaToString(l, -1)) != nullptr) {
+					unique = stratagus::unique_item::get(LuaToString(l, -1));
 				} else {
 					--j;
 				}
@@ -1762,7 +1749,7 @@ static int CclDefineSite(lua_State *l)
 				}
 				lua_pop(l, 1);
 
-				site->HistoricalBuildings.push_back(std::tuple<CDate, CDate, const stratagus::unit_class *, CUniqueItem *, stratagus::faction *>(start_date, end_date, building_class, unique, building_owner));
+				site->HistoricalBuildings.push_back(std::make_tuple(start_date, end_date, building_class, unique, building_owner));
 			}
 		} else if (!strcmp(value, "HistoricalResources")) {
 			if (!lua_istable(l, -1)) {
@@ -1783,10 +1770,10 @@ static int CclDefineSite(lua_State *l)
 				stratagus::unit_type *unit_type = stratagus::unit_type::get(LuaToString(l, -1, j + 1));
 				++j;
 				
-				CUniqueItem *unique = nullptr;
+				stratagus::unique_item *unique = nullptr;
 				lua_rawgeti(l, -1, j + 1);
-				if (lua_isstring(l, -1) && !lua_isnumber(l, -1) && GetUniqueItem(LuaToString(l, -1)) != nullptr) {
-					unique = GetUniqueItem(LuaToString(l, -1));
+				if (lua_isstring(l, -1) && !lua_isnumber(l, -1) && stratagus::unique_item::get(LuaToString(l, -1)) != nullptr) {
+					unique = stratagus::unique_item::get(LuaToString(l, -1));
 				} else {
 					--j;
 				}
@@ -1795,7 +1782,7 @@ static int CclDefineSite(lua_State *l)
 				
 				int quantity = LuaToNumber(l, -1, j + 1);
 
-				site->HistoricalResources.push_back(std::tuple<CDate, CDate, stratagus::unit_type *, CUniqueItem *, int>(start_date, end_date, unit_type, unique, quantity));
+				site->HistoricalResources.push_back(std::make_tuple(start_date, end_date, unit_type, unique, quantity));
 			}
 		} else if (!strcmp(value, "Regions")) {
 			if (!lua_istable(l, -1)) {

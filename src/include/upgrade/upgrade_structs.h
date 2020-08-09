@@ -39,7 +39,6 @@
 #include "unit/unit_variable.h"
 
 class CSchoolOfMagic;
-class CUniqueItem;
 struct lua_State;
 
 int CclDefineDependency(lua_State *l);
@@ -52,6 +51,7 @@ namespace stratagus {
 	class deity_domain;
 	class dynasty;
 	class icon;
+	class unique_item;
 	class unit_type;
 	class upgrade_class;
 	class upgrade_modifier;
@@ -277,7 +277,7 @@ public:
 private:
 	std::vector<std::unique_ptr<stratagus::upgrade_modifier>> modifiers; //upgrade modifiers for this upgrade
 public:
-	std::vector<CUniqueItem *> UniqueItems;	/// Unique items who form a part of this set upgrade
+	std::vector<stratagus::unique_item *> UniqueItems;	/// Unique items who form a part of this set upgrade
 	std::vector<stratagus::unit_type *> ScaledCostUnits;	/// Units for which the upgrade's costs are scaled
 	std::vector<stratagus::deity_domain *> DeityDomains;	/// Deity domains to which this ability belongs
 	std::vector<CSchoolOfMagic *> SchoolsOfMagic;	/// Schools of magic to which this ability belongs

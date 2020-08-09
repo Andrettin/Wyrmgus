@@ -27,29 +27,15 @@
 //      02111-1307, USA.
 //
 
-/*----------------------------------------------------------------------------
---  Includes
-----------------------------------------------------------------------------*/
-
 #include "stratagus.h"
-
-#include "item.h"
 
 #include "player.h"
 #include "script.h"
 #include "spells.h"
+#include "unique_item.h"
 #include "unit/unit_type.h"
 #include "upgrade/upgrade.h"
 
-/*----------------------------------------------------------------------------
---  Functions
-----------------------------------------------------------------------------*/
-
-/**
-**  Define a unique item.
-**
-**  @param l  Lua state.
-*/
 static int CclDefineUniqueItem(lua_State *l)
 {
 	LuaCheckArgs(l, 2);
@@ -58,27 +44,20 @@ static int CclDefineUniqueItem(lua_State *l)
 	}
 
 	std::string item_ident = LuaToString(l, 1);
-	CUniqueItem *item = GetUniqueItem(item_ident);
-	if (!item) {
-		item = new CUniqueItem;
-		UniqueItems.push_back(item);
-		item->Ident = item_ident;
-	}
+	stratagus::unique_item *item = stratagus::unique_item::get_or_add(item_ident, nullptr);
 	
 	//  Parse the list:
 	for (lua_pushnil(l); lua_next(l, 2); lua_pop(l, 1)) {
 		const char *value = LuaToString(l, -2);
 		
 		if (!strcmp(value, "Name")) {
-			item->Name = LuaToString(l, -1);
+			item->set_name(LuaToString(l, -1));
 		} else if (!strcmp(value, "Type")) {
 			std::string unit_type_ident = LuaToString(l, -1);
 			stratagus::unit_type *unit_type = stratagus::unit_type::get(unit_type_ident);
 			item->Type = unit_type;
 		} else if (!strcmp(value, "Icon")) {
-			item->Icon.Name = LuaToString(l, -1);
-			item->Icon.Icon = nullptr;
-			item->Icon.Load();
+			item->icon = stratagus::icon::get(LuaToString(l, -1));
 		} else if (!strcmp(value, "Prefix")) {
 			std::string affix_ident = LuaToString(l, -1);
 			CUpgrade *upgrade = CUpgrade::get(affix_ident);
@@ -105,11 +84,11 @@ static int CclDefineUniqueItem(lua_State *l)
 			CUpgrade *upgrade = CUpgrade::get(upgrade_ident);
 			item->Elixir = upgrade;
 		} else if (!strcmp(value, "Description")) {
-			item->Description = LuaToString(l, -1);
+			item->set_description(LuaToString(l, -1));
 		} else if (!strcmp(value, "Background")) {
-			item->Background = LuaToString(l, -1);
+			item->set_background(LuaToString(l, -1));
 		} else if (!strcmp(value, "Quote")) {
-			item->Quote = LuaToString(l, -1);
+			item->set_quote(LuaToString(l, -1));
 		} else if (!strcmp(value, "ResourcesHeld")) {
 			item->ResourcesHeld = LuaToNumber(l, -1);
 		} else {
@@ -140,10 +119,10 @@ static int CclGetItems(lua_State *l)
 
 static int CclGetUniqueItems(lua_State *l)
 {
-	lua_createtable(l, UniqueItems.size(), 0);
-	for (size_t i = 1; i <= UniqueItems.size(); ++i)
+	lua_createtable(l, stratagus::unique_item::get_all().size(), 0);
+	for (size_t i = 1; i <= stratagus::unique_item::get_all().size(); ++i)
 	{
-		lua_pushstring(l, UniqueItems[i-1]->Ident.c_str());
+		lua_pushstring(l, stratagus::unique_item::get_all()[i-1]->get_identifier().c_str());
 		lua_rawseti(l, -2, i);
 	}
 	return 1;
@@ -160,23 +139,21 @@ static int CclGetUniqueItemData(lua_State *l)
 		LuaError(l, "incorrect argument");
 	}
 	std::string item_ident = LuaToString(l, 1);
-	const CUniqueItem *item = GetUniqueItem(item_ident);
-	if (!item) {
-		LuaError(l, "Unique item \"%s\" doesn't exist." _C_ item_ident.c_str());
-	}
+	const stratagus::unique_item *item = stratagus::unique_item::get(item_ident);
+
 	const char *data = LuaToString(l, 2);
 
 	if (!strcmp(data, "Name")) {
-		lua_pushstring(l, item->Name.c_str());
+		lua_pushstring(l, item->get_name().c_str());
 		return 1;
 	} else if (!strcmp(data, "Description")) {
-		lua_pushstring(l, item->Description.c_str());
+		lua_pushstring(l, item->get_description().c_str());
 		return 1;
 	} else if (!strcmp(data, "Background")) {
-		lua_pushstring(l, item->Background.c_str());
+		lua_pushstring(l, item->get_background().c_str());
 		return 1;
 	} else if (!strcmp(data, "Quote")) {
-		lua_pushstring(l, item->Quote.c_str());
+		lua_pushstring(l, item->get_quote().c_str());
 		return 1;
 	} else if (!strcmp(data, "ResourcesHeld")) {
 		lua_pushnumber(l, item->ResourcesHeld);
@@ -237,7 +214,11 @@ static int CclGetUniqueItemData(lua_State *l)
 		lua_pushboolean(l, item->CanDrop());
 		return 1;
 	} else if (!strcmp(data, "Icon")) {
-		lua_pushstring(l, item->GetIcon().Name.c_str());
+		if (item->get_icon() != nullptr) {
+			lua_pushstring(l, item->get_icon()->get_identifier().c_str());
+		} else {
+			lua_pushstring(l, "");
+		}
 		return 1;
 	} else {
 		LuaError(l, "Invalid field: %s" _C_ data);
