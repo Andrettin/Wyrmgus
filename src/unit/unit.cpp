@@ -808,9 +808,14 @@ void CUnit::Retrain()
 	}
 	
 	std::string unit_name = GetMessageName();
+
+	int base_level = 1;
+	if (this->Character != nullptr) {
+		base_level = this->Character->get_base_level();
+	}
 	
-	//now, revert the unit's type to the level 1 one
-	while (this->Type->Stats[this->Player->Index].Variables[LEVEL_INDEX].Value > 1) {
+	//now, revert the unit's type to the base level one
+	while (this->Type->Stats[this->Player->Index].Variables[LEVEL_INDEX].Value > base_level) {
 		bool found_previous_unit_type = false;
 		for (stratagus::unit_type *unit_type : stratagus::unit_type::get_all()) {
 			if (this->Character != nullptr && std::find(this->Character->ForbiddenUpgrades.begin(), this->Character->ForbiddenUpgrades.end(), unit_type) != this->Character->ForbiddenUpgrades.end()) {
@@ -957,8 +962,8 @@ void CUnit::set_character(stratagus::character *character)
 	}
 
 	this->Variable[LEVEL_INDEX].Max = 100000; // because the code above sets the max level to the unit type stats' Level variable (which is the same as its value)
-	if (this->Variable[LEVEL_INDEX].Value < this->Character->Level) {
-		this->IncreaseLevel(this->Character->Level - this->Variable[LEVEL_INDEX].Value, false);
+	if (this->Variable[LEVEL_INDEX].Value < this->Character->get_level()) {
+		this->IncreaseLevel(this->Character->get_level() - this->Variable[LEVEL_INDEX].Value, false);
 	}
 
 	this->Variable[XP_INDEX].Enable = 1;
@@ -2127,8 +2132,8 @@ void CUnit::GenerateSpecialProperties(CUnit *dropper, CPlayer *dropper_player, b
 	int unique_chance = 5; //0.5% chance of the unit being unique
 	if (dropper != nullptr) {
 		if (dropper->Character) { //if the dropper is a character, multiply the chances of the item being magic or unique by the character's level
-			magic_affix_chance *= dropper->Character->Level;
-			unique_chance *= dropper->Character->Level;
+			magic_affix_chance *= dropper->Character->get_level();
+			unique_chance *= dropper->Character->get_level();
 		} else if (dropper->Type->BoolFlag[BUILDING_INDEX].value) { //if the dropper is a building, multiply the chances of the drop being magic or unique by a factor according to whether the building itself is magic/unique
 			int chance_multiplier = 2;
 			if (dropper->Unique) {
@@ -3596,8 +3601,12 @@ void CUnit::XPChanged()
 	}
 	
 	if (!IsNetworkGame() && this->Character != nullptr && this->Player == CPlayer::GetThisPlayer()) {
+		if (this->Variable[LEVEL_INDEX].Value > this->Character->get_level()) { //save level, if the unit has a persistent character
+			this->Character->set_level(this->Variable[LEVEL_INDEX].Value);
+		}
 		this->Character->ExperiencePercent = (this->Variable[XP_INDEX].Value * 100) / this->Variable[XPREQUIRED_INDEX].Value;
 		SaveHero(this->Character);
+		CAchievement::CheckAchievements(); // check achievements to see if any hero now has a high enough level for a particular achievement to be obtained
 	}
 }
 //Wyrmgus end
@@ -6528,7 +6537,7 @@ CConstruction *CUnit::GetConstruction() const
 
 IconConfig CUnit::GetIcon() const
 {
-	if (this->Character != nullptr && this->Character->Level >= 3 && this->Character->HeroicIcon.Icon) {
+	if (this->Character != nullptr && this->Character->get_level() >= 3 && this->Character->HeroicIcon.Icon) {
 		return this->Character->HeroicIcon;
 	} else if (this->Character != nullptr && this->Character->Icon.Icon) {
 		return this->Character->Icon;

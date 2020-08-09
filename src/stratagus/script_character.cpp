@@ -205,7 +205,7 @@ static int CclDefineCharacter(lua_State *l)
 			character->HeroicIcon.Icon = nullptr;
 			character->HeroicIcon.Load();
 		} else if (!strcmp(value, "Level")) {
-			character->Level = LuaToNumber(l, -1);
+			character->level = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "ExperiencePercent")) {
 			character->ExperiencePercent = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "Deity")) {
@@ -534,8 +534,8 @@ static int CclDefineCustomHero(lua_State *l)
 			std::string unit_type_ident = LuaToString(l, -1);
 			stratagus::unit_type *unit_type = stratagus::unit_type::get(unit_type_ident);
 			hero->unit_type = unit_type;
-			if (hero->Level < hero->get_unit_type()->DefaultStat.Variables[LEVEL_INDEX].Value) {
-				hero->Level = hero->get_unit_type()->DefaultStat.Variables[LEVEL_INDEX].Value;
+			if (hero->level < hero->get_unit_type()->DefaultStat.Variables[LEVEL_INDEX].Value) {
+				hero->level = hero->get_unit_type()->DefaultStat.Variables[LEVEL_INDEX].Value;
 			}
 		} else if (!strcmp(value, "Trait")) {
 			std::string trait_ident = LuaToString(l, -1);
@@ -546,7 +546,7 @@ static int CclDefineCustomHero(lua_State *l)
 		} else if (!strcmp(value, "Gender")) {
 			hero->gender = stratagus::string_to_gender(LuaToString(l, -1));
 		} else if (!strcmp(value, "Level")) {
-			hero->Level = LuaToNumber(l, -1);
+			hero->level = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "ExperiencePercent")) {
 			hero->ExperiencePercent = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "Abilities")) {
@@ -811,7 +811,7 @@ static int CclGetCharacterData(lua_State *l)
 		lua_pushstring(l, stratagus::gender_to_string(character->get_gender()).c_str());
 		return 1;
 	} else if (!strcmp(data, "Level")) {
-		lua_pushnumber(l, character->Level);
+		lua_pushnumber(l, character->get_level());
 		return 1;
 	} else if (!strcmp(data, "Type")) {
 		if (character->get_unit_type() != nullptr) {
@@ -936,7 +936,7 @@ static int CclGetCustomHeroData(lua_State *l)
 		lua_pushstring(l, stratagus::gender_to_string(character->get_gender()).c_str());
 		return 1;
 	} else if (!strcmp(data, "Level")) {
-		lua_pushnumber(l, character->Level);
+		lua_pushnumber(l, character->get_level());
 		return 1;
 	} else if (!strcmp(data, "Type")) {
 		if (character->get_unit_type() != nullptr) {

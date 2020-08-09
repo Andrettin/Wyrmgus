@@ -104,6 +104,7 @@ class character : public detailed_data_entry, public data_type<character>, publi
 	Q_PROPERTY(QString variation READ get_variation_qstring)
 	Q_PROPERTY(bool ai_active MEMBER ai_active READ is_ai_active)
 	Q_PROPERTY(CUpgrade* trait MEMBER trait READ get_trait)
+	Q_PROPERTY(int base_level MEMBER base_level READ get_base_level)
 	Q_PROPERTY(bool active MEMBER active READ is_active)
 	Q_PROPERTY(stratagus::faction *faction MEMBER faction READ get_faction)
 
@@ -227,6 +228,21 @@ public:
 		return this->faction;
 	}
 
+	int get_base_level() const
+	{
+		return this->base_level;
+	}
+
+	int get_level() const
+	{
+		return this->level;
+	}
+
+	void set_level(const int level)
+	{
+		this->level = level;
+	}
+
 	const std::unique_ptr<historical_location> &get_location() const
 	{
 		return this->location;
@@ -245,8 +261,9 @@ private:
 	civilization *civilization = nullptr;	/// Culture to which the character belongs
 	faction *default_faction = nullptr;	//the default faction to which the character belongs
 	gender gender;				/// Character's gender
+	int base_level = 1; //the level that the character starts with
+	int level = 0; //the character's current level
 public:
-	int Level = 0;				/// Character's level
 	int ExperiencePercent = 0;	/// Character's experience, as a percentage of the experience required to level up
 	bool Custom = false;		/// Whether this character is a custom hero
 	std::string ExtraName;		/// Extra given names of the character (used if necessary to differentiate from existing heroes)

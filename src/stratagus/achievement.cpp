@@ -167,7 +167,7 @@ bool CAchievement::CanObtain() const
 		if (this->CharacterType && this->Character->get_unit_type() != this->CharacterType) {
 			return false;
 		}
-		if (this->CharacterLevel && this->Character->Level < this->CharacterLevel) {
+		if (this->CharacterLevel && this->Character->get_level() < this->CharacterLevel) {
 			return false;
 		}
 	} else if (this->CharacterType || this->CharacterLevel) {
@@ -176,7 +176,7 @@ bool CAchievement::CanObtain() const
 			if (this->CharacterType && iterator->second->get_unit_type() != this->CharacterType) {
 				continue;
 			}
-			if (this->CharacterLevel && iterator->second->Level < this->CharacterLevel) {
+			if (this->CharacterLevel && iterator->second->get_level() < this->CharacterLevel) {
 				continue;
 			}
 			found_hero = true;
@@ -223,12 +223,12 @@ int CAchievement::GetProgress() const
 
 	if (this->Character) {
 		if (this->CharacterLevel) {
-			progress += std::min(this->Character->Level, this->CharacterLevel);
+			progress += std::min(this->Character->get_level(), this->CharacterLevel);
 		}
 	} else if (this->CharacterLevel) {
 		int highest_level = 0;
 		for (std::map<std::string, stratagus::character *>::iterator iterator = CustomHeroes.begin(); iterator != CustomHeroes.end(); ++iterator) {
-			highest_level = std::max(highest_level, iterator->second->Level);
+			highest_level = std::max(highest_level, iterator->second->get_level());
 			if (highest_level >= this->CharacterLevel) {
 				highest_level = this->CharacterLevel;
 				break;

@@ -162,7 +162,7 @@ void character::ProcessConfigData(const CConfigData *config_data)
 				fprintf(stderr, "Upgrade \"%s\" does not exist.\n", value.c_str());
 			}
 		} else if (key == "level") {
-			this->Level = std::stoi(value);
+			this->level = std::stoi(value);
 		} else if (key == "birth_date") {
 			value = FindAndReplaceString(value, "_", "-");
 			this->BirthDate = CDate::FromString(value);
@@ -319,8 +319,12 @@ void character::ProcessConfigData(const CConfigData *config_data)
 
 void character::initialize()
 {
-	if (this->Level < this->get_unit_type()->DefaultStat.Variables[LEVEL_INDEX].Value) {
-		this->Level = this->get_unit_type()->DefaultStat.Variables[LEVEL_INDEX].Value;
+	if (this->level < this->get_unit_type()->DefaultStat.Variables[LEVEL_INDEX].Value) {
+		this->level = this->get_unit_type()->DefaultStat.Variables[LEVEL_INDEX].Value;
+	}
+
+	if (this->level < this->get_base_level()) {
+		this->level = this->get_base_level();
 	}
 
 	if (this->get_gender() == gender::none) { //if no gender was set so far, have the character be the same gender as the unit type (if the unit type has it predefined)
@@ -381,6 +385,8 @@ void character::initialize()
 	for (const std::unique_ptr<historical_location> &location : this->HistoricalLocations) {
 		location->initialize();
 	}
+
+	data_entry::initialize();
 }
 
 void character::check() const
@@ -600,7 +606,7 @@ std::string character::GetFullName() const
 
 IconConfig character::GetIcon() const
 {
-	if (this->Level >= 3 && this->HeroicIcon.Icon) {
+	if (this->get_level() >= 3 && this->HeroicIcon.Icon) {
 		return this->HeroicIcon;
 	} else if (this->Icon.Icon) {
 		return this->Icon;
@@ -677,9 +683,6 @@ stratagus::character *GetCustomHero(const std::string &hero_ident)
 	return nullptr;
 }
 
-/**
-**  Save heroes
-*/
 void SaveHeroes()
 {
 	for (stratagus::character *character : stratagus::character::get_all()) { //save characters
@@ -769,8 +772,8 @@ void SaveHero(stratagus::character *hero)
 			fprintf(fd, "\tVariation = \"%s\",\n", hero->get_variation().c_str());
 		}
 	}
-	if (hero->Level != 0) {
-		fprintf(fd, "\tLevel = %d,\n", hero->Level);
+	if (hero->get_level() != 0) {
+		fprintf(fd, "\tLevel = %d,\n", hero->get_level());
 	}
 	if (hero->ExperiencePercent != 0) {
 		fprintf(fd, "\tExperiencePercent = %d,\n", hero->ExperiencePercent);
