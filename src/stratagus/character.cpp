@@ -363,8 +363,17 @@ void character::initialize()
 		}
 	}
 
+	std::map<const CUpgrade *, int> ability_count;
+	for (const CUpgrade *ability : this->get_abilities()) {
+		ability_count[ability]++;
+	}
+
+	//add base abilities if not already present in the saved abilities
 	for (const CUpgrade *ability : this->get_base_abilities()) {
-		if (!vector::contains(this->get_abilities(), ability)) {
+		int &count = ability_count[ability];
+		if (count > 0) {
+			count--;
+		} else {
 			this->abilities.push_back(ability);
 		}
 	}

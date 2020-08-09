@@ -798,7 +798,8 @@ void CUnit::Retrain()
 {
 	//lose all abilities (the AbilityLost function also returns the level-ups to the unit)
 	for (CUpgrade *upgrade : CUpgrade::get_all()) {
-		if (this->GetIndividualUpgrade(upgrade) == 0) {
+		const int upgrade_count = this->GetIndividualUpgrade(upgrade);
+		if (upgrade_count == 0) {
 			continue;
 		}
 
@@ -807,17 +808,25 @@ void CUnit::Retrain()
 				continue;
 			}
 
-			if (this->Character != nullptr && stratagus::vector::contains(this->Character->get_base_abilities(), upgrade)) {
-				continue;
+			int remove_count = upgrade_count;
+
+			if (this->Character != nullptr) {
+				for (const CUpgrade *base_ability : this->Character->get_base_abilities()) {
+					if (base_ability == upgrade) {
+						remove_count--;
+					}
+				}
 			}
 
-			AbilityLost(*this, upgrade, true);
+			for (int i = 0; i < remove_count; ++i) {
+				AbilityLost(*this, upgrade);
+			}
 		} else if (!strncmp(upgrade->Ident.c_str(), "upgrade-deity-", 14) && strncmp(upgrade->Ident.c_str(), "upgrade-deity-domain-", 21) && this->Character && this->Character->Custom) { //allow changing the deity for custom heroes
 			IndividualUpgradeLost(*this, upgrade, true);
 		}
 	}
 	
-	std::string unit_name = GetMessageName();
+	const std::string unit_name = GetMessageName();
 
 	int base_level = 1;
 	if (this->Character != nullptr) {
