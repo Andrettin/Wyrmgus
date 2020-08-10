@@ -533,7 +533,7 @@ CPopupContentTypeLine::CPopupContentTypeLine() : Color(ColorWhite), Width(0), He
 					unit_type->BoolFlag[ITEM_INDEX].value
 					&& this->Index != HITPOINTHEALING_INDEX
 					&& UnitManager.GetSlotUnit(button.Value).Container
-					&& (UnitManager.GetSlotUnit(button.Value).Container->CanEquipItem(&UnitManager.GetSlotUnit(button.Value)) || UnitManager.GetSlotUnit(button.Value).Work != nullptr || UnitManager.GetSlotUnit(button.Value).Elixir != nullptr)
+					&& (UnitManager.GetSlotUnit(button.Value).Container->can_equip_item(&UnitManager.GetSlotUnit(button.Value)) || UnitManager.GetSlotUnit(button.Value).Work != nullptr || UnitManager.GetSlotUnit(button.Value).Elixir != nullptr)
 					) {
 					value = UnitManager.GetSlotUnit(button.Value).Container->GetItemVariableChange(&UnitManager.GetSlotUnit(button.Value), this->Index);
 					if (value >= 0) {

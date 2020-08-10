@@ -1051,8 +1051,8 @@ void CUnit::set_character(stratagus::character *character)
 		item->Bound = persistent_item->Bound;
 		item->Identified = persistent_item->Identified;
 		item->Remove(this);
-		if (this->Character->is_item_equipped(persistent_item.get())) {
-			EquipItem(*item, false);
+		if (this->Character->is_item_equipped(persistent_item.get()) && this->can_equip_item(item)) {
+			this->EquipItem(*item, false);
 		}
 	}
 
@@ -6176,7 +6176,7 @@ bool CUnit::IsUniqueItemEquipped(const stratagus::unique_item *unique) const
 	return false;
 }
 
-bool CUnit::CanEquipItem(CUnit *item) const
+bool CUnit::can_equip_item(const CUnit *item) const
 {
 	if (item->Container != this) {
 		return false;

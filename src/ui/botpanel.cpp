@@ -551,7 +551,7 @@ static bool CanShowPopupContent(const PopupConditionPanel *condition,
 				}
 			}
 			if (condition->Equippable != CONDITION_TRUE) {
-				if ((condition->Equippable == CONDITION_ONLY) ^ (unit.Container != nullptr && unit.Container->HasInventory() && unit.Container->CanEquipItem(&unit))) {
+				if ((condition->Equippable == CONDITION_ONLY) ^ (unit.Container != nullptr && unit.Container->HasInventory() && unit.Container->can_equip_item(&unit))) {
 					return false;
 				}
 			}

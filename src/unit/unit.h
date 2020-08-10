@@ -451,7 +451,7 @@ public:
 	bool is_item_class_equipped(const stratagus::item_class item_class) const;
 	bool IsItemTypeEquipped(const stratagus::unit_type *item_type) const;
 	bool IsUniqueItemEquipped(const stratagus::unique_item *unique) const;
-	bool CanEquipItem(CUnit *item) const;
+	bool can_equip_item(const CUnit *item) const;
 	bool can_equip_item_class(const stratagus::item_class item_class) const;
 	bool CanUseItem(CUnit *item) const;
 	bool IsItemSetComplete(const CUnit *item) const;
