@@ -69,6 +69,11 @@ public:
 		}
 	}
 
+	std::unique_ptr<persistent_item> duplicate() const
+	{
+		return std::make_unique<persistent_item>(*this);
+	}
+
 	void process_sml_property(const sml_property &property);
 	void process_sml_scope(const sml_data &scope);
 	void ProcessConfigData(const CConfigData *config_data);
@@ -91,6 +96,11 @@ public:
 		return this->owner;
 	}
 
+	bool is_equipped() const
+	{
+		return this->equipped;
+	}
+
 private:
 	const unit_type *unit_type = nullptr; //the item type of the item
 	unique_item *unique = nullptr;
@@ -105,6 +115,7 @@ public:
 	CUpgrade *Elixir = nullptr;
 private:
 	character *owner = nullptr;
+	bool equipped = false; //used for initialization only
 
 	friend int ::CclDefineCharacter(lua_State *l);
 	friend int ::CclDefineCustomHero(lua_State *l);

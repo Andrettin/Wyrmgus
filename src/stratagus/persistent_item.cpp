@@ -132,11 +132,7 @@ void persistent_item::process_sml_property(const sml_property &property)
 	} else if (key == "identified") {
 		this->Identified = string::to_bool(value);
 	} else if (key == "equipped") {
-		if (this->get_item_slot() != item_slot::none) {
-			this->get_owner()->EquippedItems[static_cast<int>(this->get_item_slot())].push_back(this);
-		} else {
-			fprintf(stderr, "Item \"%s\" cannot be equipped, as it belongs to no item slot.\n", this->get_unit_type()->get_identifier().c_str());
-		}
+		this->equipped = true;
 	} else {
 		throw std::runtime_error("Invalid persistent item property: \"" + key + "\".");
 	}
@@ -176,7 +172,6 @@ void persistent_item::ProcessConfigData(const CConfigData *config_data)
 			spell *spell = spell::get(value);
 			this->Spell = spell;
 		} else if (key == "work") {
-			value = FindAndReplaceString(value, "_", "-");
 			CUpgrade *upgrade = CUpgrade::try_get(value);
 			if (upgrade) {
 				this->Work = upgrade;
@@ -213,9 +208,7 @@ void persistent_item::ProcessConfigData(const CConfigData *config_data)
 		} else if (key == "identified") {
 			this->Identified = string::to_bool(value);
 		} else if (key == "equipped") {
-			if (this->get_owner() != nullptr && this->get_item_slot() != item_slot::none) {
-				this->get_owner()->EquippedItems[static_cast<int>(this->get_item_slot())].push_back(this);
-			}
+			this->equipped = true;
 		} else {
 			fprintf(stderr, "Invalid item property: \"%s\".\n", key.c_str());
 		}

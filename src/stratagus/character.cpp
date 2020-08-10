@@ -118,6 +118,14 @@ void character::process_sml_scope(const sml_data &scope)
 			CUpgrade *ability = CUpgrade::get(value);
 			this->abilities.push_back(ability);
 		}
+	} else if (tag == "default_items") {
+		scope.for_each_child([&](const sml_data &child_scope) {
+			const stratagus::unit_type *unit_type = unit_type::get(child_scope.get_tag());
+
+			auto item = std::make_unique<persistent_item>(unit_type, this);
+			database::process_sml_data(item, child_scope);
+			this->default_items.push_back(std::move(item));
+		});
 	} else if (tag == "items") {
 		scope.for_each_child([&](const sml_data &child_scope) {
 			stratagus::unit_type *unit_type = unit_type::try_get(child_scope.get_tag());
@@ -402,6 +410,24 @@ void character::initialize()
 
 	if (this->get_civilization() != nullptr) {
 		this->get_civilization()->add_character(this);
+	}
+
+	if (this->items.empty() && !this->default_items.empty()) {
+		for (const auto &default_item : this->default_items) {
+			this->add_item(default_item->duplicate());
+		}
+	}
+
+	for (const auto &item : this->get_items()) {
+		if (!item->is_equipped()) {
+			continue;
+		}
+
+		if (item->get_item_slot() != item_slot::none) {
+			this->EquippedItems[static_cast<int>(item->get_item_slot())].push_back(item.get());
+		} else {
+			fprintf(stderr, "Item \"%s\" cannot be equipped, as it belongs to no item slot.\n", item->get_unit_type()->get_identifier().c_str());
+		}
 	}
 
 	this->GenerateMissingDates();

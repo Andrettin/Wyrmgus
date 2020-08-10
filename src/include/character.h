@@ -344,6 +344,7 @@ public:
 	std::vector<CUpgrade *> AuthoredWorks;	/// Literary works of which this character is the author
 	std::vector<CUpgrade *> LiteraryAppearances;	/// Literary works in which this character appears
 private:
+	std::vector<std::unique_ptr<persistent_item>> default_items;
 	std::vector<std::unique_ptr<persistent_item>> items;
 public:
 	int Attributes[MaxAttributes];

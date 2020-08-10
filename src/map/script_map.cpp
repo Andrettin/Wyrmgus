@@ -1732,7 +1732,7 @@ static int CclDefineSite(lua_State *l)
 				
 				stratagus::unique_item *unique = nullptr;
 				lua_rawgeti(l, -1, j + 1);
-				if (lua_isstring(l, -1) && !lua_isnumber(l, -1) && stratagus::unique_item::get(LuaToString(l, -1)) != nullptr) {
+				if (lua_isstring(l, -1) && !lua_isnumber(l, -1) && stratagus::unique_item::try_get(LuaToString(l, -1)) != nullptr) {
 					unique = stratagus::unique_item::get(LuaToString(l, -1));
 				} else {
 					--j;
@@ -1772,7 +1772,7 @@ static int CclDefineSite(lua_State *l)
 				
 				stratagus::unique_item *unique = nullptr;
 				lua_rawgeti(l, -1, j + 1);
-				if (lua_isstring(l, -1) && !lua_isnumber(l, -1) && stratagus::unique_item::get(LuaToString(l, -1)) != nullptr) {
+				if (lua_isstring(l, -1) && !lua_isnumber(l, -1) && stratagus::unique_item::try_get(LuaToString(l, -1)) != nullptr) {
 					unique = stratagus::unique_item::get(LuaToString(l, -1));
 				} else {
 					--j;

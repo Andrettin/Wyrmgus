@@ -317,10 +317,7 @@ static int CclDefineCharacter(lua_State *l)
 					} else if (!strcmp(value, "identified")) {
 						item->Identified = LuaToBoolean(l, -1, k + 1);
 					} else if (!strcmp(value, "equipped")) {
-						const bool equipped = LuaToBoolean(l, -1, k + 1);
-						if (equipped && item->get_item_slot() != stratagus::item_slot::none) {
-							character->EquippedItems[static_cast<int>(item->get_item_slot())].push_back(item.get());
-						}
+						item->equipped = LuaToBoolean(l, -1, k + 1);
 					} else {
 						printf("\n%s\n", character->Ident.c_str());
 						LuaError(l, "Unsupported tag: %s" _C_ value);
@@ -617,10 +614,7 @@ static int CclDefineCustomHero(lua_State *l)
 					} else if (!strcmp(value, "identified")) {
 						item->Identified = LuaToBoolean(l, -1, k + 1);
 					} else if (!strcmp(value, "equipped")) {
-						const bool equipped = LuaToBoolean(l, -1, k + 1);
-						if (equipped && item->get_item_slot() != stratagus::item_slot::none) {
-							hero->EquippedItems[static_cast<int>(item->get_item_slot())].push_back(item.get());
-						}
+						item->equipped = LuaToBoolean(l, -1, k + 1);
 					} else {
 						printf("\n%s\n", hero->Ident.c_str());
 						LuaError(l, "Unsupported tag: %s" _C_ value);
