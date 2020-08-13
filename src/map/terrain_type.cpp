@@ -333,7 +333,7 @@ void terrain_type::ProcessConfigData(const CConfigData *config_data)
 				continue;
 			}
 			
-			this->season_graphics[season] = CPlayerColorGraphic::New(season_graphics_file, defines::get()->get_tile_size());
+			this->season_graphics[season] = CPlayerColorGraphic::New(season_graphics_file, defines::get()->get_tile_size(), nullptr);
 		} else if (child_config_data->Tag == "transition_tile" || child_config_data->Tag == "adjacent_transition_tile") {
 			const terrain_type *transition_terrain = nullptr; //any terrain, by default
 			tile_transition_type transition_type = tile_transition_type::none;
@@ -373,7 +373,7 @@ void terrain_type::ProcessConfigData(const CConfigData *config_data)
 	}
 	
 	if (!graphics_file.empty()) {
-		this->graphics = CPlayerColorGraphic::New(graphics_file, defines::get()->get_tile_size());
+		this->graphics = CPlayerColorGraphic::New(graphics_file, defines::get()->get_tile_size(), nullptr);
 	}
 	if (!elevation_graphics_file.empty()) {
 		this->elevation_graphics = CGraphic::New(elevation_graphics_file, defines::get()->get_tile_size());
@@ -383,11 +383,11 @@ void terrain_type::ProcessConfigData(const CConfigData *config_data)
 void terrain_type::initialize()
 {
 	if (!this->get_image_file().empty() && this->graphics == nullptr) {
-		this->graphics = CPlayerColorGraphic::New(this->get_image_file().string(), defines::get()->get_tile_size());
+		this->graphics = CPlayerColorGraphic::New(this->get_image_file().string(), defines::get()->get_tile_size(), nullptr);
 	}
 
 	if (!this->get_transition_image_file().empty() && this->transition_graphics == nullptr) {
-		this->transition_graphics = CPlayerColorGraphic::New(this->get_transition_image_file().string(), defines::get()->get_tile_size());
+		this->transition_graphics = CPlayerColorGraphic::New(this->get_transition_image_file().string(), defines::get()->get_tile_size(), nullptr);
 	}
 
 	if (!this->get_elevation_image_file().empty() && this->elevation_graphics == nullptr) {
@@ -399,7 +399,7 @@ void terrain_type::initialize()
 		const std::filesystem::path &filepath = kv_pair.second;
 
 		if (!this->season_graphics.contains(season)) {
-			this->season_graphics[season] = CPlayerColorGraphic::New(filepath.string(), defines::get()->get_tile_size());
+			this->season_graphics[season] = CPlayerColorGraphic::New(filepath.string(), defines::get()->get_tile_size(), nullptr);
 		}
 	}
 }
@@ -461,6 +461,7 @@ void terrain_type::calculate_minimap_color(const season *season)
 	const CGraphic *graphic = this->get_graphics(season);
 
 	const QImage &image = graphic->get_image();
+	const player_color *conversible_player_color = graphic->get_conversible_player_color();
 
 	int pixel_count = 0;
 	int red = 0;
@@ -476,7 +477,7 @@ void terrain_type::calculate_minimap_color(const season *season)
 				continue;
 			}
 
-			if (vector::contains(defines::get()->get_conversible_player_color()->get_colors(), pixel_color)) {
+			if (vector::contains(conversible_player_color->get_colors(), pixel_color)) {
 				continue;
 			}
 

@@ -517,7 +517,7 @@ CGraphic *CGraphic::New(const std::string &filepath, const int w, const int h)
 **
 **  @return      New graphic object
 */
-CPlayerColorGraphic *CPlayerColorGraphic::New(const std::string &filepath, const int w, const int h)
+CPlayerColorGraphic *CPlayerColorGraphic::New(const std::string &filepath, const QSize &size, const stratagus::player_color *conversible_player_color)
 {
 	std::unique_lock<std::shared_mutex> lock(CGraphic::mutex);
 
@@ -528,20 +528,20 @@ CPlayerColorGraphic *CPlayerColorGraphic::New(const std::string &filepath, const
 	const std::string file = LibraryFileName(filepath.c_str());
 	CPlayerColorGraphic *g = dynamic_cast<CPlayerColorGraphic *>(CGraphic::graphics_by_filepath[file]);
 	if (g == nullptr) {
-		g = new CPlayerColorGraphic(file);
+		g = new CPlayerColorGraphic(file, conversible_player_color);
 		if (!g) {
 			fprintf(stderr, "Out of memory\n");
 			ExitFatal(-1);
 		}
 		// FIXME: use a constructor for this
 		g->HashFile = file;
-		g->Width = w;
-		g->Height = h;
-		g->original_frame_size = QSize(w, h);
+		g->Width = size.width();
+		g->Height = size.height();
+		g->original_frame_size = size;
 		CGraphic::graphics_by_filepath[g->HashFile] = g;
 	} else {
 		++g->refs;
-		Assert((w == 0 || g->Width == w) && (g->Height == h || h == 0));
+		Assert((size.width() == 0 || g->Width == size.width()) && (g->Height == size.height() || size.height() == 0));
 	}
 
 	return g;
@@ -549,7 +549,7 @@ CPlayerColorGraphic *CPlayerColorGraphic::New(const std::string &filepath, const
 
 const GLuint *CPlayerColorGraphic::get_textures(const stratagus::player_color *player_color) const
 {
-	if (!this->has_player_color() || player_color == nullptr || player_color == stratagus::defines::get()->get_conversible_player_color()) {
+	if (!this->has_player_color() || player_color == nullptr || player_color == this->get_conversible_player_color()) {
 		return CGraphic::get_textures();
 	}
 
@@ -563,7 +563,7 @@ const GLuint *CPlayerColorGraphic::get_textures(const stratagus::player_color *p
 
 const GLuint *CPlayerColorGraphic::get_textures(const stratagus::player_color *player_color, const CColor &color_modification) const
 {
-	if (!this->has_player_color() || player_color == nullptr || player_color == stratagus::defines::get()->get_conversible_player_color()) {
+	if (!this->has_player_color() || player_color == nullptr || player_color == this->get_conversible_player_color()) {
 		return CGraphic::get_textures(color_modification);
 	}
 
@@ -845,14 +845,18 @@ void CGraphic::Load(const bool create_grayscale_textures, const int scale_factor
 
 	this->player_color = false;
 	const stratagus::color_set color_set = stratagus::image::get_colors(this->get_image());
+	const stratagus::player_color *conversible_player_color = this->get_conversible_player_color();
 	for (const QColor &color : color_set) {
 		if (!this->player_color) {
-			const stratagus::player_color *conversible_player_color = stratagus::defines::get()->get_conversible_player_color();
 			for (const QColor &player_color : conversible_player_color->get_colors()) {
 				if (color.red() == player_color.red() && color.green() == player_color.green() && color.blue() == player_color.blue()) {
 					this->player_color = true;
 					break;
 				}
+			}
+
+			if (this->player_color) {
+				break;
 			}
 		}
 
@@ -1177,7 +1181,7 @@ static void MakeTextures(CGraphic *g, const bool grayscale, const stratagus::pla
 	} else if (player_color != nullptr && g->has_player_color()) {
 		const int bpp = image.depth() / 8;
 		unsigned char *image_data = image.bits();
-		const stratagus::player_color *conversible_player_color = stratagus::defines::get()->get_conversible_player_color();
+		const stratagus::player_color *conversible_player_color = g->get_conversible_player_color();
 		const std::vector<QColor> &conversible_colors = conversible_player_color->get_colors();
 		const std::vector<QColor> &colors = player_color->get_colors();
 
@@ -1250,7 +1254,7 @@ void MakePlayerColorTexture(CPlayerColorGraphic *g, const stratagus::player_colo
 			return;
 		}
 
-		if (!g->has_player_color() || player_color == nullptr || player_color == stratagus::defines::get()->get_conversible_player_color()) {
+		if (!g->has_player_color() || player_color == nullptr || player_color == g->get_conversible_player_color()) {
 			MakeTextures(g, false, nullptr, time_of_day);
 			return;
 		}
@@ -1361,6 +1365,15 @@ int CGraphic::get_frame_index(const QPoint &frame_pos) const
 QPoint CGraphic::get_frame_pos(const int frame_index) const
 {
 	return stratagus::point::from_index(frame_index, this->get_frames_per_row());
+}
+
+const stratagus::player_color *CGraphic::get_conversible_player_color() const
+{
+	if (this->conversible_player_color != nullptr) {
+		return this->conversible_player_color;
+	}
+
+	return stratagus::defines::get()->get_conversible_player_color();
 }
 
 void FreeGraphics()

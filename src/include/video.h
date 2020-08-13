@@ -75,7 +75,8 @@ protected:
 	static inline std::shared_mutex mutex;
 
 public:
-	CGraphic(const std::filesystem::path &filepath) : filepath(filepath)
+	explicit CGraphic(const std::filesystem::path &filepath, const stratagus::player_color *conversible_player_color = nullptr)
+		: filepath(filepath), conversible_player_color(conversible_player_color)
 	{
 		if (filepath.empty()) {
 			throw std::runtime_error("Tried to create a CGraphic instance with an empty filepath.");
@@ -203,6 +204,8 @@ public:
 		return this->image;
 	}
 
+	const stratagus::player_color *get_conversible_player_color() const;
+
 	bool has_player_color() const
 	{
 		return this->player_color;
@@ -228,7 +231,6 @@ public:
 		return this->grayscale_textures;
 	}
 
-
 private:
 	std::filesystem::path filepath;
 public:
@@ -246,6 +248,8 @@ public:
 	int NumFrames = 1;				/// Number of frames
 	int GraphicWidth = 0;			/// Original graphic width
 	int GraphicHeight = 0;			/// Original graphic height
+private:
+	const stratagus::player_color *conversible_player_color = nullptr;
 protected:
 	int refs = 1;					/// Uses of this graphic
 public:
@@ -266,10 +270,11 @@ private:
 	friend void FreeGraphics();
 };
 
-class CPlayerColorGraphic : public CGraphic
+class CPlayerColorGraphic final : public CGraphic
 {
 protected:
-	CPlayerColorGraphic(const std::filesystem::path &filepath) : CGraphic(filepath)
+	explicit CPlayerColorGraphic(const std::filesystem::path &filepath, const stratagus::player_color *conversible_player_color)
+		: CGraphic(filepath, conversible_player_color)
 	{
 	}
 
@@ -283,12 +288,7 @@ public:
 	void DrawPlayerColorFrameClipTransX(const stratagus::player_color *player_color, unsigned frame, int x, int y, int alpha, const stratagus::time_of_day *time_of_day = nullptr);
 	void DrawPlayerColorFrameClipTrans(const stratagus::player_color *player_color, unsigned frame, int x, int y, int alpha, const stratagus::time_of_day *time_of_day = nullptr, int show_percent = 100);
 
-	static CPlayerColorGraphic *New(const std::string &filepath, const int w = 0, const int h = 0);
-
-	static CPlayerColorGraphic *New(const std::string &filepath, const QSize &size)
-	{
-		return CPlayerColorGraphic::New(filepath, size.width(), size.height());
-	}
+	static CPlayerColorGraphic *New(const std::string &filepath, const QSize &size, const stratagus::player_color *conversible_player_color);
 
 	static CPlayerColorGraphic *Get(const std::string &file);
 

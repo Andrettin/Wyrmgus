@@ -76,8 +76,9 @@ class icon final : public data_entry, public data_type<icon>
 {
 	Q_OBJECT
 
-	Q_PROPERTY(int frame MEMBER frame READ get_frame)
 	Q_PROPERTY(QString file READ get_file_qstring)
+	Q_PROPERTY(int frame MEMBER frame READ get_frame)
+	Q_PROPERTY(stratagus::player_color* conversible_player_color MEMBER conversible_player_color READ get_conversible_player_color)
 
 public:
 	static constexpr const char *class_identifier = "icon";
@@ -89,7 +90,7 @@ public:
 		return icon::get(ident);
 	}
 
-	icon(const std::string &identifier);
+	explicit icon(const std::string &identifier);
 	~icon();
 
 	virtual void initialize() override;
@@ -123,6 +124,11 @@ public:
 		return this->frame;
 	}
 
+	player_color *get_conversible_player_color() const
+	{
+		return this->conversible_player_color;
+	}
+
 	/// Draw icon
 	void DrawIcon(const PixelPos &pos, const player_color *player_color = nullptr) const;
 	/// Draw grayscale icon
@@ -141,6 +147,7 @@ public:
 private:
 	std::filesystem::path file;
 	int frame = 0; //frame number in the icon's image
+	player_color *conversible_player_color = nullptr;
 
 	friend int ::CclDefineIcon(lua_State *l);
 };

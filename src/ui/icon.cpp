@@ -53,7 +53,7 @@ void icon::initialize()
 {
 	if (!this->get_file().empty() && this->G == nullptr) {
 		const QSize &icon_size = defines::get()->get_icon_size();
-		this->G = CPlayerColorGraphic::New(this->get_file().string(), icon_size.width(), icon_size.height());
+		this->G = CPlayerColorGraphic::New(this->get_file().string(), icon_size, this->get_conversible_player_color());
 	}
 
 	this->load();

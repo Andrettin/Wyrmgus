@@ -63,6 +63,7 @@ namespace stratagus {
 	class faction;
 	class missile_type;
 	class plane;
+	class player_color;
 	class species;
 	class spell;
 	class terrain_type;
@@ -853,6 +854,7 @@ class unit_type final : public detailed_data_entry, public data_type<unit_type>,
 	Q_PROPERTY(QString image_file READ get_image_file_qstring)
 	Q_PROPERTY(QSize frame_size MEMBER frame_size READ get_frame_size)
 	Q_PROPERTY(QPoint offset MEMBER offset READ get_offset)
+	Q_PROPERTY(stratagus::player_color* conversible_player_color MEMBER conversible_player_color READ get_conversible_player_color)
 	Q_PROPERTY(int draw_level MEMBER draw_level READ get_draw_level)
 	Q_PROPERTY(stratagus::item_class item_class MEMBER item_class READ get_item_class)
 	Q_PROPERTY(stratagus::unit_type* corpse_type MEMBER corpse_type READ get_corpse_type)
@@ -971,6 +973,11 @@ public:
 	const QPoint &get_offset() const
 	{
 		return this->offset;
+	}
+
+	player_color *get_conversible_player_color() const
+	{
+		return this->conversible_player_color;
 	}
 
 	const std::vector<const spell *> &get_autocast_spells() const
@@ -1099,6 +1106,7 @@ public:
 private:
 	QSize frame_size = QSize(0, 0); //sprite frame size
 	QPoint offset = QPoint(0, 0); //sprite horizontal offset
+	player_color *conversible_player_color = nullptr; //the conversible player color for the unit graphics
 	int draw_level = 0;                                   /// Level to Draw UnitType at
 public:
 	int ShadowWidth;                                      /// Shadow sprite width

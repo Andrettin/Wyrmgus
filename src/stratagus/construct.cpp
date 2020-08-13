@@ -93,7 +93,7 @@ void CConstruction::Load()
 	this->Height = this->File.Height;
 	if (!file.empty()) {
 		UpdateLoadProgress();
-		this->Sprite = CPlayerColorGraphic::New(file, this->Width, this->Height);
+		this->Sprite = CPlayerColorGraphic::New(file, QSize(this->Width, this->Height), nullptr);
 		this->Sprite->Load(false, stratagus::defines::get()->get_scale_factor());
 		IncItemsLoaded();
 	}

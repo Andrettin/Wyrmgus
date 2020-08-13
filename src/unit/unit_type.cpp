@@ -2654,20 +2654,19 @@ void LoadUnitTypeSprite(stratagus::unit_type &type)
 			}
 
 			if (!resinfo->get_image_file().empty()) {
-				resinfo->SpriteWhenEmpty = CPlayerColorGraphic::New(resinfo->get_image_file().string(),
-					type.get_frame_size());
+				resinfo->SpriteWhenEmpty = CPlayerColorGraphic::New(resinfo->get_image_file().string(), type.get_frame_size(), type.get_conversible_player_color());
 				resinfo->SpriteWhenEmpty->Load(false, stratagus::defines::get()->get_scale_factor());
 			}
 
 			if (!resinfo->get_loaded_image_file().empty()) {
-				resinfo->SpriteWhenLoaded = CPlayerColorGraphic::New(resinfo->get_loaded_image_file().string(), type.get_frame_size());
+				resinfo->SpriteWhenLoaded = CPlayerColorGraphic::New(resinfo->get_loaded_image_file().string(), type.get_frame_size(), type.get_conversible_player_color());
 				resinfo->SpriteWhenLoaded->Load(false, stratagus::defines::get()->get_scale_factor());
 			}
 		}
 	}
 
 	if (!type.get_image_file().empty()) {
-		type.Sprite = CPlayerColorGraphic::New(type.get_image_file().string(), type.get_frame_size());
+		type.Sprite = CPlayerColorGraphic::New(type.get_image_file().string(), type.get_frame_size(), type.get_conversible_player_color());
 		type.Sprite->Load(false, stratagus::defines::get()->get_scale_factor());
 	}
 
@@ -2690,7 +2689,7 @@ void LoadUnitTypeSprite(stratagus::unit_type &type)
 	}
 	for (int i = 0; i < MaxImageLayers; ++i) {
 		if (!type.LayerFiles[i].empty()) {
-			type.LayerSprites[i] = CPlayerColorGraphic::New(type.LayerFiles[i], type.get_frame_size());
+			type.LayerSprites[i] = CPlayerColorGraphic::New(type.LayerFiles[i], type.get_frame_size(), type.get_conversible_player_color());
 			type.LayerSprites[i]->Load(false, stratagus::defines::get()->get_scale_factor());
 		}
 	}
@@ -2705,7 +2704,7 @@ void LoadUnitTypeSprite(stratagus::unit_type &type)
 			frame_height = variation->FrameHeight;
 		}
 		if (!variation->get_image_file().empty()) {
-			variation->Sprite = CPlayerColorGraphic::New(variation->get_image_file().string(), frame_width, frame_height);
+			variation->Sprite = CPlayerColorGraphic::New(variation->get_image_file().string(), QSize(frame_width, frame_height), type.get_conversible_player_color());
 			variation->Sprite->Load(false, stratagus::defines::get()->get_scale_factor());
 		}
 		if (!variation->ShadowFile.empty()) {
@@ -2718,18 +2717,18 @@ void LoadUnitTypeSprite(stratagus::unit_type &type)
 		}
 		for (int j = 0; j < MaxImageLayers; ++j) {
 			if (!variation->LayerFiles[j].empty()) {
-				variation->LayerSprites[j] = CPlayerColorGraphic::New(variation->LayerFiles[j], frame_width, frame_height);
+				variation->LayerSprites[j] = CPlayerColorGraphic::New(variation->LayerFiles[j], QSize(frame_width, frame_height), type.get_conversible_player_color());
 				variation->LayerSprites[j]->Load(false, stratagus::defines::get()->get_scale_factor());
 			}
 		}
 	
 		for (int j = 0; j < MaxCosts; ++j) {
 			if (!variation->FileWhenLoaded[j].empty()) {
-				variation->SpriteWhenLoaded[j] = CPlayerColorGraphic::New(variation->FileWhenLoaded[j], frame_width, frame_height);
+				variation->SpriteWhenLoaded[j] = CPlayerColorGraphic::New(variation->FileWhenLoaded[j], QSize(frame_width, frame_height), type.get_conversible_player_color());
 				variation->SpriteWhenLoaded[j]->Load(false, stratagus::defines::get()->get_scale_factor());
 			}
 			if (!variation->FileWhenEmpty[j].empty()) {
-				variation->SpriteWhenEmpty[j] = CPlayerColorGraphic::New(variation->FileWhenEmpty[j], frame_width, frame_height);
+				variation->SpriteWhenEmpty[j] = CPlayerColorGraphic::New(variation->FileWhenEmpty[j], QSize(frame_width, frame_height), type.get_conversible_player_color());
 				variation->SpriteWhenEmpty[j]->Load(false, stratagus::defines::get()->get_scale_factor());
 			}
 		}
@@ -2738,7 +2737,7 @@ void LoadUnitTypeSprite(stratagus::unit_type &type)
 	for (int i = 0; i < MaxImageLayers; ++i) {
 		for (const auto &layer_variation : type.LayerVariations[i]) {
 			if (!layer_variation->get_image_file().empty()) {
-				layer_variation->Sprite = CPlayerColorGraphic::New(layer_variation->get_image_file().string(), type.get_frame_size());
+				layer_variation->Sprite = CPlayerColorGraphic::New(layer_variation->get_image_file().string(), type.get_frame_size(), type.get_conversible_player_color());
 				layer_variation->Sprite->Load(false, stratagus::defines::get()->get_scale_factor());
 			}
 		}

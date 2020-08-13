@@ -1243,7 +1243,7 @@ static int CclDefineIcon(lua_State *l)
 	stratagus::icon *icon = stratagus::icon::add(ident, nullptr);
 	icon->file = file;
 	icon->frame = frame;
-	icon->G = CPlayerColorGraphic::New(icon->get_file().string(), size.x, size.y);
+	icon->G = CPlayerColorGraphic::New(icon->get_file().string(), size, nullptr);
 
 	return 0;
 }
