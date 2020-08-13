@@ -537,7 +537,7 @@ std::string button::get_hint() const
 	std::string hint = this->Hint;
 
 	bool show_key = true;
-	if ((this->Action == ButtonCmd::Build || this->Action == ButtonCmd::BuildClass || this->Action == ButtonCmd::Train || this->Action == ButtonCmd::TrainClass || this->Action == ButtonCmd::Research || this->Action == ButtonCmd::ResearchClass || this->Action == ButtonCmd::LearnAbility || this->Action == ButtonCmd::ExperienceUpgradeTo || this->Action == ButtonCmd::UpgradeTo) && !IsButtonUsable(*Selected[0], *this) && this->Key != 0) {
+	if ((this->Action == ButtonCmd::Build || this->Action == ButtonCmd::BuildClass || this->Action == ButtonCmd::Train || this->Action == ButtonCmd::TrainClass || this->Action == ButtonCmd::Research || this->Action == ButtonCmd::ResearchClass || this->Action == ButtonCmd::LearnAbility || this->Action == ButtonCmd::ExperienceUpgradeTo || this->Action == ButtonCmd::UpgradeTo) && !IsButtonUsable(*Selected[0], *this)) {
 		if (!hint.empty()) {
 			string::replace(hint, "~!", "");
 			return hint;
