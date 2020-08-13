@@ -852,6 +852,7 @@ class unit_type final : public detailed_data_entry, public data_type<unit_type>,
 	Q_PROPERTY(QSize box_size MEMBER box_size READ get_box_size)
 	Q_PROPERTY(QString image_file READ get_image_file_qstring)
 	Q_PROPERTY(QSize frame_size MEMBER frame_size READ get_frame_size)
+	Q_PROPERTY(QPoint offset MEMBER offset READ get_offset)
 	Q_PROPERTY(int draw_level MEMBER draw_level READ get_draw_level)
 	Q_PROPERTY(stratagus::item_class item_class MEMBER item_class READ get_item_class)
 	Q_PROPERTY(stratagus::unit_type* corpse_type MEMBER corpse_type READ get_corpse_type)
@@ -965,6 +966,11 @@ public:
 	int get_frame_height() const
 	{
 		return this->get_frame_size().height();
+	}
+
+	const QPoint &get_offset() const
+	{
+		return this->offset;
 	}
 
 	const std::vector<const spell *> &get_autocast_spells() const
@@ -1092,10 +1098,7 @@ public:
 	//Wyrmgus end
 private:
 	QSize frame_size = QSize(0, 0); //sprite frame size
-public:
-	int OffsetX;                                          /// Sprite horizontal offset
-	int OffsetY;                                          /// Sprite vertical offset
-private:
+	QPoint offset = QPoint(0, 0); //sprite horizontal offset
 	int draw_level = 0;                                   /// Level to Draw UnitType at
 public:
 	int ShadowWidth;                                      /// Shadow sprite width

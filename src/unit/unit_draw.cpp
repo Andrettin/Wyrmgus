@@ -668,8 +668,8 @@ void DrawShadow(const stratagus::unit_type &type, CGraphic *sprite, int frame, c
 	}
 	PixelPos pos = screenPos;
 	pos -= PixelPos((sprite->get_frame_size() - type.get_tile_size() * stratagus::defines::get()->get_scaled_tile_size()) / 2);
-	pos.x += (type.OffsetX + type.ShadowOffsetX) * stratagus::defines::get()->get_scale_factor();
-	pos.y += (type.OffsetY + type.ShadowOffsetY) * stratagus::defines::get()->get_scale_factor();
+	pos.x += (type.get_offset().x() + type.ShadowOffsetX) * stratagus::defines::get()->get_scale_factor();
+	pos.y += (type.get_offset().y() + type.ShadowOffsetY) * stratagus::defines::get()->get_scale_factor();
 
 	if (type.Flip) {
 		if (frame < 0) {
@@ -709,8 +709,8 @@ void DrawPlayerColorOverlay(const stratagus::unit_type &type, CPlayerColorGraphi
 	PixelPos pos = screenPos;
 	// FIXME: move this calculation to high level.
 	pos -= PixelPos((sprite->get_frame_size() - type.get_tile_size() * stratagus::defines::get()->get_scaled_tile_size()) / 2);
-	pos.x += type.OffsetX * stratagus::defines::get()->get_scale_factor();
-	pos.y += type.OffsetY * stratagus::defines::get()->get_scale_factor();
+	pos.x += type.get_offset().x() * stratagus::defines::get()->get_scale_factor();
+	pos.y += type.get_offset().y() * stratagus::defines::get()->get_scale_factor();
 
 	if (type.Flip) {
 		if (frame < 0) {
@@ -750,8 +750,8 @@ void DrawOverlay(const stratagus::unit_type &type, CGraphic *sprite, int player,
 	PixelPos pos = screenPos;
 	// FIXME: move this calculation to high level.
 	pos -= PixelPos((sprite->get_frame_size() - type.get_tile_size() * stratagus::defines::get()->get_scaled_tile_size()) / 2);
-	pos.x += type.OffsetX * stratagus::defines::get()->get_scale_factor();
-	pos.y += type.OffsetY * stratagus::defines::get()->get_scale_factor();
+	pos.x += type.get_offset().x() * stratagus::defines::get()->get_scale_factor();
+	pos.y += type.get_offset().y() * stratagus::defines::get()->get_scale_factor();
 
 	if (type.Flip) {
 		if (frame < 0) {
@@ -936,8 +936,8 @@ static void DrawConstructionShadow(const CUnit &unit, const stratagus::unit_type
 		if (variation && variation->Construction) {
 			if (variation->Construction->ShadowSprite) {
 				pos -= PixelPos((variation->Construction->ShadowSprite->get_frame_size() - type.get_tile_size() * stratagus::defines::get()->get_scaled_tile_size()) / 2);
-				pos.x += type.OffsetX * scale_factor;
-				pos.y += type.OffsetY * scale_factor;
+				pos.x += type.get_offset().x() * scale_factor;
+				pos.y += type.get_offset().y() * scale_factor;
 				if (frame < 0) {
 					variation->Construction->ShadowSprite->DrawFrameClipX(-frame - 1, pos.x, pos.y);
 				} else {
@@ -947,8 +947,8 @@ static void DrawConstructionShadow(const CUnit &unit, const stratagus::unit_type
 		} else {
 			if (type.Construction->ShadowSprite) {
 				pos -= PixelPos((type.Construction->ShadowSprite->get_frame_size() - type.get_tile_size() * stratagus::defines::get()->get_scaled_tile_size()) / 2);
-				pos.x += type.OffsetX * scale_factor;
-				pos.y += type.OffsetY * scale_factor;
+				pos.x += type.get_offset().x() * scale_factor;
+				pos.y += type.get_offset().y() * scale_factor;
 				if (frame < 0) {
 					type.Construction->ShadowSprite->DrawFrameClipX(-frame - 1, pos.x, pos.y);
 				} else {
@@ -959,8 +959,8 @@ static void DrawConstructionShadow(const CUnit &unit, const stratagus::unit_type
 	} else {
 		if (variation && variation->ShadowSprite) {
 			pos -= PixelPos((variation->ShadowSprite->get_frame_size() - type.get_tile_size() * stratagus::defines::get()->get_scaled_tile_size()) / 2);
-			pos.x += (type.ShadowOffsetX + type.OffsetX) * scale_factor;
-			pos.y += (type.ShadowOffsetY + type.OffsetY) * scale_factor;
+			pos.x += (type.ShadowOffsetX + type.get_offset().x()) * scale_factor;
+			pos.y += (type.ShadowOffsetY + type.get_offset().y()) * scale_factor;
 			if (frame < 0) {
 				variation->ShadowSprite->DrawFrameClipX(-frame - 1, pos.x, pos.y);
 			} else {
@@ -968,8 +968,8 @@ static void DrawConstructionShadow(const CUnit &unit, const stratagus::unit_type
 			}
 		} else if (type.ShadowSprite) {
 			pos -= PixelPos((type.ShadowSprite->get_frame_size() - type.get_tile_size() * stratagus::defines::get()->get_scaled_tile_size()) / 2);
-			pos.x += (type.ShadowOffsetX + type.OffsetX) * scale_factor;
-			pos.y += (type.ShadowOffsetY + type.OffsetY) * scale_factor;
+			pos.x += (type.ShadowOffsetX + type.get_offset().x()) * scale_factor;
+			pos.y += (type.ShadowOffsetY + type.get_offset().y()) * scale_factor;
 			if (frame < 0) {
 				type.ShadowSprite->DrawFrameClipX(-frame - 1, pos.x, pos.y);
 			} else {
@@ -1018,8 +1018,8 @@ static void DrawConstruction(const int player, const CConstructionFrame *cframe,
 		//Wyrmgus end
 	} else {
 		//Wyrmgus start
-//		pos.x += type.OffsetX - type.Width / 2;
-//		pos.y += type.OffsetY - type.Height / 2;
+//		pos.x += type.get_offset().x() - type.Width / 2;
+//		pos.y += type.get_offset().y() - type.Height / 2;
 		int frame_width = type.get_frame_width();
 		int frame_height = type.get_frame_height();
 		const stratagus::unit_type_variation *variation = unit.GetVariation();
@@ -1029,8 +1029,8 @@ static void DrawConstruction(const int player, const CConstructionFrame *cframe,
 		}
 		frame_width *= scale_factor;
 		frame_height *= scale_factor;
-		pos.x += type.OffsetX * scale_factor - frame_width / 2;
-		pos.y += type.OffsetY * scale_factor - frame_height / 2;
+		pos.x += type.get_offset().x() * scale_factor - frame_width / 2;
+		pos.y += type.get_offset().y() * scale_factor - frame_height / 2;
 		//Wyrmgus end
 		if (frame < 0) {
 			frame = -frame - 1;

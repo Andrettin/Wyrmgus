@@ -953,7 +953,9 @@ static int CclDefineUnitType(lua_State *l)
 			}
 		//Wyrmgus end
 		} else if (!strcmp(value, "Offset")) {
-			CclGetPos(l, &type->OffsetX, &type->OffsetY);
+			Vec2i offset;
+			CclGetPos(l, &offset.x, &offset.y);
+			type->offset = offset;
 		} else if (!strcmp(value, "Flip")) {
 			type->Flip = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "Animations")) {

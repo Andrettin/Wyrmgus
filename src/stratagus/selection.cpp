@@ -741,8 +741,8 @@ static void SelectSpritesInsideRectangle(const PixelPos &corner_topleft, const P
 		const stratagus::unit_type &type = *unit.Type;
 		PixelPos spritePos = unit.get_scaled_map_pixel_pos_center();
 
-		spritePos.x += type.OffsetX * scale_factor - (type.get_box_width() * scale_factor + type.BoxOffsetX * scale_factor) / 2;
-		spritePos.y += type.OffsetY * scale_factor - (type.get_box_height() * scale_factor + type.BoxOffsetY * scale_factor) / 2;
+		spritePos.x += type.get_offset().x() * scale_factor - (type.get_box_width() * scale_factor + type.BoxOffsetX * scale_factor) / 2;
+		spritePos.y += type.get_offset().y() * scale_factor - (type.get_box_height() * scale_factor + type.BoxOffsetY * scale_factor) / 2;
 		if (spritePos.x + type.get_box_width() * scale_factor + type.BoxOffsetX * scale_factor < corner_topleft.x
 			|| spritePos.x > corner_bottomright.x
 			|| spritePos.y + type.get_box_height() * scale_factor + type.BoxOffsetY * scale_factor < corner_topleft.y

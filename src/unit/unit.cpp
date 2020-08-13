@@ -4629,8 +4629,8 @@ bool CUnit::IsVisibleInViewport(const CViewport &vp) const
 	frame_width *= scale_factor;
 	frame_height *= scale_factor;
 
-	int x = tilePos.x * stratagus::defines::get()->get_scaled_tile_width() + this->get_scaled_pixel_offset().x() - (frame_width - Type->get_tile_width() * stratagus::defines::get()->get_scaled_tile_width()) / 2 + Type->OffsetX * scale_factor;
-	int y = tilePos.y * stratagus::defines::get()->get_scaled_tile_height() + this->get_scaled_pixel_offset().y() - (frame_height - Type->get_tile_height() * stratagus::defines::get()->get_scaled_tile_height()) / 2 + Type->OffsetY * scale_factor;
+	int x = tilePos.x * stratagus::defines::get()->get_scaled_tile_width() + this->get_scaled_pixel_offset().x() - (frame_width - Type->get_tile_width() * stratagus::defines::get()->get_scaled_tile_width()) / 2 + this->Type->get_offset().x() * scale_factor;
+	int y = tilePos.y * stratagus::defines::get()->get_scaled_tile_height() + this->get_scaled_pixel_offset().y() - (frame_height - Type->get_tile_height() * stratagus::defines::get()->get_scaled_tile_height()) / 2 + this->Type->get_offset().y() * scale_factor;
 	const PixelSize vpSize = vp.GetPixelSize();
 	const PixelPos vpTopLeftMapPos = CMap::Map.tile_pos_to_scaled_map_pixel_pos_top_left(vp.MapPos) + vp.Offset;
 	const PixelPos vpBottomRightMapPos = vpTopLeftMapPos + vpSize;

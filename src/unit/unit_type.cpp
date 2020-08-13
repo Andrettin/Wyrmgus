@@ -501,7 +501,7 @@ std::string GetResourceNameById(int resource_id)
 namespace stratagus {
 
 unit_type::unit_type(const std::string &identifier) : detailed_data_entry(identifier), CDataType(identifier),
-	Slot(0), OffsetX(0), OffsetY(0),
+	Slot(0),
 	ShadowWidth(0), ShadowHeight(0), ShadowOffsetX(0), ShadowOffsetY(0),
 	//Wyrmgus start
 	TrainQuantity(0), CostModifier(0), item_class(item_class::none),
@@ -1509,8 +1509,7 @@ void unit_type::set_parent(const unit_type *parent_type)
 	this->draw_level = parent_type->draw_level;
 	this->image_file = parent_type->image_file;
 	this->frame_size = parent_type->frame_size;
-	this->OffsetX = parent_type->OffsetX;
-	this->OffsetY = parent_type->OffsetY;
+	this->offset = parent_type->offset;
 	this->ShadowFile = parent_type->ShadowFile;
 	this->ShadowWidth = parent_type->ShadowWidth;
 	this->ShadowHeight = parent_type->ShadowHeight;
@@ -2502,8 +2501,8 @@ void DrawUnitType(const stratagus::unit_type &type, CPlayerColorGraphic *sprite,
 	PixelPos pos = screenPos;
 	// FIXME: move this calculation to high level.
 	pos -= PixelPos((sprite->get_frame_size() - type.get_tile_size() * stratagus::defines::get()->get_scaled_tile_size()) / 2);
-	pos.x += type.OffsetX * stratagus::defines::get()->get_scale_factor();
-	pos.y += type.OffsetY * stratagus::defines::get()->get_scale_factor();
+	pos.x += type.get_offset().x() * stratagus::defines::get()->get_scale_factor();
+	pos.y += type.get_offset().y() * stratagus::defines::get()->get_scale_factor();
 
 	//Wyrmgus start
 	/*
