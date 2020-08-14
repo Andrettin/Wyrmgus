@@ -58,7 +58,7 @@ void site::process_sml_property(const sml_property &property)
 	const std::string &value = property.get_value();
 
 	if (key == "geocoordinate_scale") {
-		const double scale = std::stod(value);
+		const int scale = std::stoi(value);
 		this->longitude_scale = scale;
 		this->latitude_scale = scale;
 	} else {
