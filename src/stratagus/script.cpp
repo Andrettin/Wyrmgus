@@ -1819,17 +1819,17 @@ std::string EvalString(const StringDesc *s)
 			if (faction != nullptr) {
 				std::string settlements_string;
 				bool first = true;
-				for (size_t i = 0; i < (**faction).Cores.size(); ++i) {
+				for (const wyrmgus::site *core_settlement : (**faction).get_core_settlements()) {
 					if (!first) {
 						settlements_string += "\n";
 					} else {
 						first = false;
 					}
-					bool has_settlement = (**faction).Cores[i]->get_site_unit() && (**faction).Cores[i]->get_site_unit()->Player == CPlayer::GetThisPlayer() && (**faction).Cores[i]->get_site_unit()->CurrentAction() != UnitAction::Built;
+					bool has_settlement = core_settlement->get_site_unit() && core_settlement->get_site_unit()->Player == CPlayer::GetThisPlayer() && core_settlement->get_site_unit()->CurrentAction() != UnitAction::Built;
 					if (!has_settlement) {
 						settlements_string += "~<";
 					}
-					settlements_string += (**faction).Cores[i]->get_cultural_name(CPlayer::GetThisPlayer()->Race != -1 ? wyrmgus::civilization::get_all()[CPlayer::GetThisPlayer()->Race] : nullptr);
+					settlements_string += core_settlement->get_cultural_name(CPlayer::GetThisPlayer()->Race != -1 ? wyrmgus::civilization::get_all()[CPlayer::GetThisPlayer()->Race] : nullptr);
 					if (!has_settlement) {
 						settlements_string += "~>";
 					}

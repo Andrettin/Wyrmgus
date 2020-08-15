@@ -1785,7 +1785,7 @@ bool CPlayer::HasUpgradeResearcher(const CUpgrade *upgrade) const
 **
 **  @param faction    New faction.
 */
-bool CPlayer::CanFoundFaction(wyrmgus::faction *faction, bool pre)
+bool CPlayer::CanFoundFaction(const wyrmgus::faction *faction, const bool pre) const
 {
 	if (CurrentQuest != nullptr) {
 		return false;
@@ -1808,8 +1808,8 @@ bool CPlayer::CanFoundFaction(wyrmgus::faction *faction, bool pre)
 	if (!pre) {
 		//check if the required core settlements are owned by the player
 		if (wyrmgus::game::get()->get_current_campaign() != nullptr) { //only check for settlements in the Scenario mode
-			for (size_t i = 0; i < faction->Cores.size(); ++i) {
-				if (!faction->Cores[i]->get_site_unit() || faction->Cores[i]->get_site_unit()->Player != this || faction->Cores[i]->get_site_unit()->CurrentAction() == UnitAction::Built) {
+			for (const wyrmgus::site *core_settlement : faction->get_core_settlements()) {
+				if (!core_settlement->get_site_unit() || core_settlement->get_site_unit()->Player != this || core_settlement->get_site_unit()->CurrentAction() == UnitAction::Built) {
 					return false;
 				}
 			}

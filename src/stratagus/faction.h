@@ -253,6 +253,16 @@ public:
 		this->characters.push_back(character);
 	}
 
+	const std::vector<const site *> &get_core_settlements() const
+	{
+		return this->core_settlements;
+	}
+
+	void add_core_settlement(const site *settlement)
+	{
+		this->core_settlements.push_back(settlement);
+	}
+
 	faction_tier get_tier() const
 	{
 		return this->tier;
@@ -340,8 +350,8 @@ public:
 private:
 	std::vector<std::string> ship_names;								/// Ship names for the faction
 	std::vector<CFiller> ui_fillers;
+	std::vector<const site *> core_settlements; //the core settlements of this faction (required to found it)
 public:
-	std::vector<site *> Cores; /// Core sites of this faction (required to found it)
 	std::vector<site *> sites; /// Sites used for this faction if it needs a randomly-generated settlement
 private:
 	std::vector<const dynasty *> dynasties; //which dynasties are available to this faction

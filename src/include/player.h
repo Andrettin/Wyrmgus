@@ -198,7 +198,7 @@ public:
 	void update_building_settlement_assignment(const wyrmgus::site *old_settlement, const int z) const;
 	bool HasUnitBuilder(const wyrmgus::unit_type *type, const wyrmgus::site *settlement = nullptr) const;
 	bool HasUpgradeResearcher(const CUpgrade *upgrade) const;
-	bool CanFoundFaction(wyrmgus::faction *faction, bool pre = false);
+	bool CanFoundFaction(const wyrmgus::faction *faction, const bool pre = false) const;
 	bool can_choose_dynasty(const wyrmgus::dynasty *dynasty, const bool pre = false) const;
 	bool is_character_available_for_recruitment(const wyrmgus::character *character, bool ignore_neutral = false) const;
 	std::vector<wyrmgus::character *> get_recruitable_heroes_from_list(const std::vector<wyrmgus::character *> &heroes);

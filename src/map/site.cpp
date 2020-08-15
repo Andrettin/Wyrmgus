@@ -229,10 +229,12 @@ void site::initialize()
 		core_faction->get_civilization()->sites.push_back(this);
 	}
 
-	if (!this->is_major() && !this->get_cores().empty()) { //if the site is a minor one, but has faction cores, remove them
+	if (this->is_major()) { 
 		for (faction *core_faction : this->get_cores()) {
-			vector::remove(core_faction->Cores, this);
+			core_faction->add_core_settlement(this);
 		}
+	} else {
+		//if the site is a minor one, but has faction cores, remove them
 		this->cores.clear();
 	}
 
