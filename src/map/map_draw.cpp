@@ -394,7 +394,7 @@ static void ShowUnitName(const CViewport &vp, PixelPos pos, CUnit *unit, bool hi
 	const wyrmgus::font *font = wyrmgus::defines::get()->get_small_font();
 	int width;
 	int height = font->Height() + 6;
-	CLabel label(font, wyrmgus::font_color::get("white"), wyrmgus::font_color::get("red"));
+	CLabel label(font, wyrmgus::defines::get()->get_default_font_color(), wyrmgus::defines::get()->get_default_highlight_font_color());
 	int x;
 	int y = std::min<int>(GameCursor->get_graphic()->Height + pos.y + 10, vp.BottomRightPos.y - 1 - height);
 	const CPlayer *tplayer = CPlayer::GetThisPlayer();
