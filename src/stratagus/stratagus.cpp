@@ -150,10 +150,6 @@
 ** @see editor.h @see editor.cpp
 */
 
-/*----------------------------------------------------------------------------
---  Includes
-----------------------------------------------------------------------------*/
-
 #ifdef USE_BEOS
 #include <fcntl.h>
 #include <sys/types.h>
@@ -203,6 +199,8 @@ extern void beos_init(int argc, char **argv);
 #include "ui/ui.h"
 #include "unit/unit_manager.h"
 #include "version.h"
+#include "video/font.h"
+#include "video/font_color.h"
 #include "video/video.h"
 #include "widgets.h"
 #include "util/exception_util.h"

@@ -107,10 +107,6 @@
 
 extern void CleanGame();
 
-/*----------------------------------------------------------------------------
---  Variables
-----------------------------------------------------------------------------*/
-
 Settings GameSettings;					/// Game Settings
 static int LcmPreventRecurse;			/// prevent recursion through LoadGameMap
 GameResults GameResult;					/// Outcome of the game
@@ -127,10 +123,6 @@ unsigned long FastForwardCycle;			/// Cycle to fastforward to in a replay
 bool UseHPForXp = false;				/// true if gain XP by dealing damage, false if by killing.
 
 bool DefiningData = false;
-
-/*----------------------------------------------------------------------------
---  Functions
-----------------------------------------------------------------------------*/
 
 extern gcn::Gui *Gui;
 static std::vector<gcn::Container *> Containers;

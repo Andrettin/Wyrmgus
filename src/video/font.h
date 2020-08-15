@@ -31,17 +31,16 @@
 #include "guichan/font.h"
 
 class CGraphic;
-class CFontColor;
+
+namespace stratagus {
+	class font_color;
+}
 
 /// Font definition
 class CFont : public gcn::Font
 {
 private:
-	explicit CFont(const std::string &ident) :
-		Ident(ident),
-		CharWidth(nullptr),
-		G(nullptr)
-	{}
+	explicit CFont(const std::string &ident);
 
 public:
 	virtual ~CFont();
@@ -62,22 +61,22 @@ public:
 	//Wyrmgus end
 
 	void Load();
-	void Reload() const;
+	void Reload();
 #if defined(USE_OPENGL) || defined(USE_GLES)
 	void FreeOpenGL();
 #endif
 	void Clean();
 
-	CGraphic *GetFontColorGraphic(const CFontColor &fontColor) const;
+	CGraphic *GetFontColorGraphic(const stratagus::font_color &fontColor) const;
 
 	template<bool CLIP>
-	unsigned int DrawChar(CGraphic &g, int utf8, int x, int y, const CFontColor &fc) const;
+	unsigned int DrawChar(CGraphic &g, int utf8, int x, int y, const stratagus::font_color &fc) const;
 
 	void DynamicLoad() const;
 
 private:
 #if defined(USE_OPENGL) || defined(USE_GLES)
-	void MakeFontColorTextures() const;
+	void make_font_color_textures();
 #endif
 	void MeasureWidths();
 
@@ -85,32 +84,8 @@ private:
 	std::string Ident;    /// Ident of the font.
 	char *CharWidth;      /// Real font width (starting with ' ')
 	CGraphic *G;          /// Graphic object used to draw
+	std::map<const stratagus::font_color *, std::unique_ptr<CGraphic>> font_color_graphics;
 };
-
-static constexpr int MaxFontColors = 9;
-
-/// Font color definition
-class CFontColor
-{
-public:
-	explicit CFontColor(const std::string &ident);
-	~CFontColor();
-
-	static CFontColor *New(const std::string &ident);
-	static CFontColor *Get(const std::string &ident);
-
-	std::string Ident;
-	CColor Colors[MaxFontColors];
-};
-
-/**
-**  FIXME: should be moved to lua
-*/
-static constexpr const char *FontRed = "red";
-static constexpr const char *FontGreen = "green";
-static constexpr const char *FontYellow = "yellow";
-static constexpr const char *FontWhite = "white";
-static constexpr const char *FontGrey = "grey";
 
 /**
 **  Font selector for the font functions.
@@ -119,7 +94,6 @@ static constexpr const char *FontGrey = "grey";
 extern CFont &GetSmallFont();  /// Small font used in stats
 extern CFont &GetGameFont();   /// Normal font used in game
 extern bool IsGameFontReady(); /// true when GameFont is provided
-
 
 /// Set the default text colors for normal and reverse text
 extern void SetDefaultTextColors(const std::string &normal, const std::string &reverse);
@@ -147,18 +121,14 @@ extern void CleanFonts();
 class CLabel
 {
 public:
-	CLabel(const CFont &f, const std::string &nc, const std::string &rc): font(&f)
-	{
-		normal = CFontColor::Get(nc);
-		reverse = CFontColor::Get(rc);
-	}
+	explicit CLabel(const CFont &f, const std::string &nc, const std::string &rc);
 	explicit CLabel(const CFont &f);
 
 	int Height() const { return font->Height(); }
 
 	void SetFont(const CFont &f) { font = &f; }
 
-	void SetNormalColor(const std::string &nc) { normal = CFontColor::Get(nc); }
+	void SetNormalColor(const std::string &nc);
 
 	/// Draw text/number unclipped
 	int Draw(int x, int y, const char *const text) const;
@@ -185,9 +155,9 @@ public:
 private:
 	template <const bool CLIP>
 	int DoDrawText(int x, int y, const char *const text,
-				   const size_t len, const CFontColor *fc) const;
+				   const size_t len, const stratagus::font_color *fc) const;
 private:
-	const CFontColor *normal;
-	const CFontColor *reverse;
+	const stratagus::font_color *normal;
+	const stratagus::font_color *reverse;
 	const CFont *font;
 };

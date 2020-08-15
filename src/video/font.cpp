@@ -8,9 +8,8 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name font.cpp - The color fonts. */
-//
-//      (c) Copyright 1998-2007 by Lutz Sammer, Jimmy Salmon, Nehal Mistry
+//      (c) Copyright 1998-2020 by Lutz Sammer, Jimmy Salmon, Nehal Mistry
+//                                 and Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -35,28 +34,19 @@
 #include "intern_video.h"
 #include "util/image_util.h"
 #include "util/util.h"
+#include "video/font_color.h"
 #include "video/video.h"
 
 typedef std::map<std::string, CFont *> FontMap;
 static FontMap Fonts;  /// Font mappings
 
-typedef std::map<std::string, CFontColor *> FontColorMap;
-static FontColorMap FontColors;  /// Map of ident to font color.
+static stratagus::font_color *FontColor;                /// Current font color
 
-static CFontColor *FontColor;                /// Current font color
-
-static const CFontColor *LastTextColor;      /// Last text color
-static CFontColor *DefaultTextColor;         /// Default text color
-static CFontColor *ReverseTextColor;         /// Reverse text color
+static const stratagus::font_color *LastTextColor;      /// Last text color
+static stratagus::font_color *DefaultTextColor;         /// Default text color
+static stratagus::font_color *ReverseTextColor;         /// Reverse text color
 static std::string DefaultNormalColorIndex;  /// Default normal color index
 static std::string DefaultReverseColorIndex; /// Default reverse color index
-
-/**
-**  Font color graphics
-**  Usage: FontColorGraphics[CFont *font][CFontColor *color]
-*/
-using FontColorGraphicMap = std::map<const CFontColor *, std::unique_ptr<CGraphic>>;
-static std::map<const CFont *, FontColorGraphicMap> FontColorGraphics;
 
 // FIXME: remove these
 static CFont *SmallFont;  /// Small font used in stats
@@ -129,7 +119,7 @@ CFont &GetGameFont()
 **  @param y   Y screen position
 */
 static void VideoDrawChar(const CGraphic &g,
-						  int gx, int gy, int w, int h, int x, int y, const CFontColor &fc)
+						  int gx, int gy, int w, int h, int x, int y, const stratagus::font_color &fc)
 {
 #if defined(USE_OPENGL) || defined(USE_GLES)
 	g.DrawSub(gx, gy, w, h, x, y);
@@ -146,8 +136,8 @@ void SetDefaultTextColors(const std::string &normal, const std::string &reverse)
 {
 	DefaultNormalColorIndex = normal;
 	DefaultReverseColorIndex = reverse;
-	LastTextColor = DefaultTextColor = FontColor = CFontColor::Get(normal);
-	ReverseTextColor = CFontColor::Get(reverse);
+	LastTextColor = DefaultTextColor = FontColor = stratagus::font_color::get(normal);
+	ReverseTextColor = stratagus::font_color::get(reverse);
 }
 
 /**
@@ -365,6 +355,13 @@ int GetHotKey(const std::string &text)
 	return hotkey;
 }
 
+CFont::CFont(const std::string &ident)
+	: Ident(ident),
+	CharWidth(nullptr),
+	G(nullptr)
+{
+}
+
 CFont::~CFont()
 {
 	if (G) {
@@ -385,7 +382,7 @@ CFont::~CFont()
 **  @param y   Y screen position
 */
 static void VideoDrawCharClip(const CGraphic &g, int gx, int gy, int w, int h,
-							  int x, int y, const CFontColor &fc)
+							  int x, int y, const stratagus::font_color &fc)
 {
 	int ox;
 	int oy;
@@ -397,7 +394,7 @@ static void VideoDrawCharClip(const CGraphic &g, int gx, int gy, int w, int h,
 
 
 template<bool CLIP>
-unsigned int CFont::DrawChar(CGraphic &g, int utf8, int x, int y, const CFontColor &fc) const
+unsigned int CFont::DrawChar(CGraphic &g, int utf8, int x, int y, const stratagus::font_color &fc) const
 {
 	int c = utf8 - 32;
 	Assert(c >= 0);
@@ -418,11 +415,11 @@ unsigned int CFont::DrawChar(CGraphic &g, int utf8, int x, int y, const CFontCol
 	return w + 1;
 }
 
-CGraphic *CFont::GetFontColorGraphic(const CFontColor &fontColor) const
+CGraphic *CFont::GetFontColorGraphic(const stratagus::font_color &fontColor) const
 {
-	auto find_iterator = FontColorGraphics[this].find(&fontColor);
+	auto find_iterator = this->font_color_graphics.find(&fontColor);
 
-	if (find_iterator != FontColorGraphics[this].end()) {
+	if (find_iterator != this->font_color_graphics.end()) {
 		return find_iterator->second.get();
 	}
 
@@ -451,14 +448,14 @@ CGraphic *CFont::GetFontColorGraphic(const CFontColor &fontColor) const
 */
 template <const bool CLIP>
 int CLabel::DoDrawText(int x, int y,
-					   const char *const text, const size_t len, const CFontColor *fc) const
+					   const char *const text, const size_t len, const stratagus::font_color *fc) const
 {
 	int widths = 0;
 	int utf8;
 	bool tab;
 	const int tabSize = 4; // FIXME: will be removed when text system will be rewritten
 	size_t pos = 0;
-	const CFontColor *backup = fc;
+	const stratagus::font_color *backup = fc;
 	bool isColor = false;
 	font->DynamicLoad();
 	//Wyrmgus start
@@ -520,7 +517,7 @@ int CLabel::DoDrawText(int x, int y,
 					color.insert(0, text + pos, p - (text + pos));
 					pos = p - text + 1;
 					LastTextColor = fc;
-					const CFontColor *fc_tmp = CFontColor::Get(color);
+					const stratagus::font_color *fc_tmp = stratagus::font_color::get(color);
 					if (fc_tmp) {
 						isColor = true;
 						fc = fc_tmp;
@@ -546,12 +543,22 @@ int CLabel::DoDrawText(int x, int y,
 	return widths;
 }
 
+CLabel::CLabel(const CFont &f, const std::string &nc, const std::string &rc) : font(&f)
+{
+	normal = stratagus::font_color::get(nc);
+	reverse = stratagus::font_color::get(rc);
+}
 
 CLabel::CLabel(const CFont &f) :
 	normal(DefaultTextColor),
 	reverse(ReverseTextColor),
 	font(&f)
 {
+}
+
+void CLabel::SetNormalColor(const std::string &nc)
+{
+	this->normal = stratagus::font_color::get(nc);
 }
 
 /// Draw text/number unclipped
@@ -771,19 +778,17 @@ void CFont::MeasureWidths()
 }
 
 #if defined(USE_OPENGL) || defined(USE_GLES)
-/**
-**  Make font bitmap.
-*/
-void CFont::MakeFontColorTextures() const
+
+void CFont::make_font_color_textures()
 {
-	if (!FontColorGraphics[this].empty()) {
+	if (!this->font_color_graphics.empty()) {
 		// already loaded
 		return;
 	}
+
 	const CGraphic &g = *this->G;
 
-	for (FontColorMap::iterator it = FontColors.begin(); it != FontColors.end(); ++it) {
-		CFontColor *fc = it->second;
+	for (const stratagus::font_color *fc : stratagus::font_color::get_all()) {
 		auto newg = std::make_unique<CGraphic>(g.get_filepath());
 
 		newg->Width = g.Width;
@@ -796,19 +801,12 @@ void CFont::MakeFontColorTextures() const
 		newg->original_frame_size = g.get_original_frame_size();
 
 		for (int j = 0; j < newg->image.colorCount(); ++j) {
-			newg->image.setColor(j, qRgba(fc->Colors[j].R, fc->Colors[j].G, fc->Colors[j].B, j == 0 ? 0 : 255));
-		}
-
-		QImage image = newg->get_image().convertToFormat(QImage::Format_RGBA8888);
-
-		const int scale_factor = stratagus::defines::get()->get_scale_factor();
-		if (scale_factor != 1) {
-			image = stratagus::image::scale(image, scale_factor, g.get_original_frame_size());
+			newg->image.setColor(j, qRgba(fc->get_colors()[j].red(), fc->get_colors()[j].green(), fc->get_colors()[j].blue(), j == 0 ? 0 : 255));
 		}
 
 		MakeTexture(newg.get(), false, nullptr);
 
-		FontColorGraphics[this][fc] = std::move(newg);
+		this->font_color_graphics[fc] = std::move(newg);
 	}
 }
 #endif
@@ -824,7 +822,7 @@ void CFont::Load()
 		this->G->Load(false, stratagus::defines::get()->get_scale_factor());
 		this->MeasureWidths();
 
-		this->MakeFontColorTextures();
+		this->make_font_color_textures();
 	}
 }
 
@@ -835,7 +833,6 @@ void CFont::DynamicLoad() const
 		const_cast<CFont *>(this)->MeasureWidths();
 	}
 }
-
 
 /**
 **  Load all fonts.
@@ -856,9 +853,8 @@ void LoadFonts()
 void CFont::FreeOpenGL()
 {
 	if (this->G) {
-		for (FontColorGraphicMap::iterator it = FontColorGraphics[this].begin();
-			 it != FontColorGraphics[this].end(); ++it) {
-			CGraphic &g = *it->second;
+		for (const auto &kv_pair : this->font_color_graphics) {
+			CGraphic &g = *kv_pair.second;
 			if (g.textures != nullptr) {
 				glDeleteTextures(g.NumTextures, g.textures);
 				delete[] g.textures;
@@ -868,9 +864,6 @@ void CFont::FreeOpenGL()
 	}
 }
 
-/**
-**  Free OpenGL fonts
-*/
 void FreeOpenGLFonts()
 {
 	for (FontMap::iterator it = Fonts.begin(); it != Fonts.end(); ++it) {
@@ -881,13 +874,12 @@ void FreeOpenGLFonts()
 }
 #endif
 
-void CFont::Reload() const
+void CFont::Reload()
 {
 	if (this->G) {
-		FontColorGraphicMap &fontColorGraphicMap = FontColorGraphics[this];
-		fontColorGraphicMap.clear();
+		this->font_color_graphics.clear();
 
-		this->MakeFontColorTextures();
+		this->make_font_color_textures();
 	}
 }
 
@@ -948,54 +940,9 @@ void ReloadFonts()
 	return font;
 }
 
-CFontColor::CFontColor(const std::string &ident)
-{
-	Ident = ident;
-}
-
-CFontColor::~CFontColor()
-{
-}
-
-/**
-**  Create a new font color
-**
-**  @param ident  Font color identifier
-**
-**  @return       New font color
-*/
-/* static */ CFontColor *CFontColor::New(const std::string &ident)
-{
-	CFontColor *&fc = FontColors[ident];
-
-	if (fc == nullptr) {
-		fc = new CFontColor(ident);
-	}
-	return fc;
-}
-
-/**
-**  Get a font color
-**
-**  @param ident  Font color identifier
-**
-**  @return       The font color
-*/
-/* static */ CFontColor *CFontColor::Get(const std::string &ident)
-{
-	CFontColor *fc = FontColors[ident];
-	if (!fc) {
-		DebugPrint("font color not found: %s\n" _C_ ident.c_str());
-	}
-	return fc;
-}
-
 void CFont::Clean()
 {
-	CFont *font = this;
-
-	FontColorGraphicMap &fontColorGraphicMap = FontColorGraphics[font];
-	fontColorGraphicMap.clear();
+	this->font_color_graphics.clear();
 }
 
 /**
@@ -1009,13 +956,7 @@ void CleanFonts()
 		font->Clean();
 		delete font;
 	}
-	FontColorGraphics.clear();
 	Fonts.clear();
-
-	for (FontColorMap::iterator it = FontColors.begin(); it != FontColors.end(); ++it) {
-		delete it->second;
-	}
-	FontColors.clear();
 
 	SmallFont = nullptr;
 	GameFont = nullptr;

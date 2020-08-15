@@ -78,6 +78,7 @@
 #include "upgrade/upgrade.h"
 #include "version.h"
 #include "video/font.h"
+#include "video/font_color.h"
 #include "video/video.h"
 #include "world.h"
 

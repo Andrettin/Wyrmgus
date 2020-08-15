@@ -8,8 +8,6 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name widgets.cpp - The stratagus ui widgets. */
-//
 //      (c) Copyright 2005-2006 by Francois Beerten and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
@@ -29,7 +27,8 @@
 
 #include "stratagus.h"
 
-#include "video/video.h"
+#include "widgets.h"
+
 //Wyrmgus start
 #include "grand_strategy.h"
 //Wyrmgus end
@@ -37,7 +36,7 @@
 #include "ui/cursor_type.h"
 #include "ui/ui.h"
 #include "video/font.h"
-#include "widgets.h"
+#include "video/video.h"
 #include "network.h"
 #include "netconnect.h"
 #include "editor.h"
@@ -345,14 +344,16 @@ void PlayerColorImageWidget::draw(gcn::Graphics* graphics)
 }
 //Wyrmgus end
 
-/*----------------------------------------------------------------------------
---  ImageButton
-----------------------------------------------------------------------------*/
+ButtonWidget::ButtonWidget(const std::string &caption) : Button(caption)
+{
+	//Wyrmgus start
+//		this->setHotKey(GetHotKey(caption));
+	if (!caption.empty()) {
+		this->setHotKey(GetHotKey(caption));
+	}
+	//Wyrmgus end
+}
 
-
-/**
-**  ImageButton constructor
-*/
 ImageButton::ImageButton() :
 	Button(), normalImage(nullptr), pressedImage(nullptr),
 	//Wyrmgus start
@@ -2009,7 +2010,14 @@ void ImageListBoxWidget::addActionListener(gcn::ActionListener *actionListener)
 	listbox.addActionListener(actionListener);
 }
 
-
+void ImageListBoxWidget::setHBarImage(CGraphic *image) {
+	hBarButtonImage = image;
+	mScrollbarWidth = std::min<int>(image->getWidth(), image->getHeight());
+}
+void ImageListBoxWidget::setVBarImage(CGraphic *image) {
+	vBarButtonImage = image;
+	mScrollbarWidth = std::min<int>(image->getWidth(), image->getHeight());
+}
 
 /**
 **  Draw the list box  

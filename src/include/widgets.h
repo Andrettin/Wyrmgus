@@ -29,10 +29,10 @@
 
 #include <guichan.h>
 #include <guichan/gsdl.h>
-#include "video/font.h"
 
 #include "luacallback.h"
 
+class CGraphic;
 
 extern bool GuichanActive;
 
@@ -110,15 +110,7 @@ public:
 class ButtonWidget : public gcn::Button
 {
 public:
-	explicit ButtonWidget(const std::string &caption) : Button(caption)
-	{
-		//Wyrmgus start
-//		this->setHotKey(GetHotKey(caption));
-		if (!caption.empty()) {
-			this->setHotKey(GetHotKey(caption));
-		}
-		//Wyrmgus end
-	}
+	explicit ButtonWidget(const std::string &caption);
 };
 
 class ImageButton : public gcn::Button
@@ -420,14 +412,8 @@ public:
 	void setLeftPressedButtonImage(CGraphic *image) { leftPressedButtonImage = image; }
 	void setRightButtonImage(CGraphic *image) { rightButtonImage = image; }
 	void setRightPressedButtonImage(CGraphic *image) { rightPressedButtonImage = image; }
-	void setHBarImage(CGraphic *image) {
-		hBarButtonImage = image;
-		mScrollbarWidth = std::min<int>(image->getWidth(), image->getHeight());
-	}
-	void setVBarImage(CGraphic *image) {
-		vBarButtonImage = image;
-		mScrollbarWidth = std::min<int>(image->getWidth(), image->getHeight());
-	}
+	void setHBarImage(CGraphic *image);
+	void setVBarImage(CGraphic *image);
 	void setMarkerImage(CGraphic *image) { markerImage = image; }
 
 	virtual void draw(gcn::Graphics *graphics);
