@@ -64,9 +64,3 @@ private:
 };
 
 }
-
-static constexpr const char *FontRed = "red";
-static constexpr const char *FontGreen = "green";
-static constexpr const char *FontYellow = "yellow";
-static constexpr const char *FontWhite = "white";
-static constexpr const char *FontGray = "gray";

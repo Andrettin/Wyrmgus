@@ -1129,7 +1129,6 @@ void CPlayer::set_civilization(int civilization)
 		CclCommand(buf);
 		
 		UI.Load();
-		SetDefaultTextColors(UI.NormalFontColor, UI.ReverseFontColor);
 	}
 	
 	if (this->Race != -1) {

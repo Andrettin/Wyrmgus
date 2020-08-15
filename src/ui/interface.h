@@ -40,6 +40,7 @@ struct EventCallback;
 namespace wyrmgus {
 	class button;
 	class button_level;
+	class font_color;
 }
 
 /// Button area under cursor
@@ -334,7 +335,7 @@ extern void DrawPieMenu();
 /// Draw the button popup
 extern void DrawPopup(const wyrmgus::button &button, int x = 0, int y = 0, bool above = true);
 //Wyrmgus start
-extern void DrawGenericPopup(const std::string &popup_text, int x = 0, int y = 0, std::string text_color = "", std::string highlight_color = "", bool above = true);
+extern void DrawGenericPopup(const std::string &popup_text, int x = 0, int y = 0, const wyrmgus::font_color *text_color = nullptr, const wyrmgus::font_color *highlight_color = nullptr, bool above = true);
 //Wyrmgus end
 
 /// Handle the mouse in scroll area

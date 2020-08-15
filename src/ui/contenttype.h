@@ -37,6 +37,7 @@ class ConditionPanel;
 
 namespace wyrmgus {
 	class font;
+	class font_color;
 }
 
 /**
@@ -45,7 +46,6 @@ namespace wyrmgus {
 class CContentType
 {
 public:
-	CContentType() : Pos(0, 0), Condition(nullptr) {}
 	virtual ~CContentType();
 
 	/// Tell how show the variable Index.
@@ -54,12 +54,10 @@ public:
 	virtual void Parse(lua_State *l) = 0;
 
 public:
-	PixelPos Pos;             /// Coordinate where to display.
-	ConditionPanel *Condition; /// Condition to show the content; if null, no condition.
-//Wyrmgus start
-	std::string TextColor;      /// Color used for plain text in content.
-	std::string HighlightColor; /// Color used for highlighted letters.
-//Wyrmgus end
+	PixelPos Pos = PixelPos(0, 0); /// Coordinate where to display.
+	ConditionPanel *Condition = nullptr; /// Condition to show the content; if null, no condition.
+	const wyrmgus::font_color *TextColor = nullptr;      /// Color used for plain text in content.
+	const wyrmgus::font_color *HighlightColor = nullptr; /// Color used for highlighted letters.
 };
 
 /**

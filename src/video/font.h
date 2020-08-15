@@ -96,10 +96,6 @@ private:
 
 }
 
-/// Set the default text colors for normal and reverse text
-extern void SetDefaultTextColors(const std::string &normal, const std::string &reverse);
-/// Get the default text colors for normal and reverse text
-extern void GetDefaultTextColors(std::string &normalp, std::string &reversep);
 ///  Return the 'line' line of the string 's'.
 extern std::string GetLineFont(unsigned int line, const std::string &s, unsigned int maxlen, const wyrmgus::font *font);
 
@@ -116,14 +112,14 @@ extern void ReloadFonts();
 class CLabel
 {
 public:
-	explicit CLabel(const wyrmgus::font *f, const std::string &nc, const std::string &rc);
+	explicit CLabel(const wyrmgus::font *f, const wyrmgus::font_color *nc, const wyrmgus::font_color *rc);
 	explicit CLabel(const wyrmgus::font *f);
 
 	int Height() const { return font->Height(); }
 
 	void SetFont(const wyrmgus::font *f) { font = f; }
 
-	void SetNormalColor(const std::string &nc);
+	void SetNormalColor(const wyrmgus::font_color *nc);
 
 	/// Draw text/number unclipped
 	int Draw(int x, int y, const char *const text) const;

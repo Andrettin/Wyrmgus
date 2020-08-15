@@ -37,17 +37,7 @@
 #include "video/font_color.h"
 #include "video/video.h"
 
-static wyrmgus::font_color *FontColor;                /// Current font color
-
 static const wyrmgus::font_color *LastTextColor;      /// Last text color
-static wyrmgus::font_color *DefaultTextColor;         /// Default text color
-static wyrmgus::font_color *ReverseTextColor;         /// Reverse text color
-static std::string DefaultNormalColorIndex;  /// Default normal color index
-static std::string DefaultReverseColorIndex; /// Default reverse color index
-
-/*----------------------------------------------------------------------------
---  Guichan Functions
-----------------------------------------------------------------------------*/
 
 namespace wyrmgus {
 
@@ -92,32 +82,6 @@ static void VideoDrawChar(const CGraphic &g,
 #if defined(USE_OPENGL) || defined(USE_GLES)
 	g.DrawSub(gx, gy, w, h, x, y);
 #endif
-}
-
-/**
-**  Set the default text colors.
-**
-**  @param normal   Normal text color.
-**  @param reverse  Reverse text color.
-*/
-void SetDefaultTextColors(const std::string &normal, const std::string &reverse)
-{
-	DefaultNormalColorIndex = normal;
-	DefaultReverseColorIndex = reverse;
-	LastTextColor = DefaultTextColor = FontColor = wyrmgus::font_color::get(normal);
-	ReverseTextColor = wyrmgus::font_color::get(reverse);
-}
-
-/**
-**  Get the default text colors.
-**
-**  @param normalp   Normal text color pointer.
-**  @param reversep  Reverse text color pointer.
-*/
-void GetDefaultTextColors(std::string &normalp, std::string &reversep)
-{
-	normalp = DefaultNormalColorIndex;
-	reversep = DefaultReverseColorIndex;
 }
 
 /**
@@ -509,22 +473,21 @@ int CLabel::DoDrawText(int x, int y,
 	return widths;
 }
 
-CLabel::CLabel(const wyrmgus::font *f, const std::string &nc, const std::string &rc) : font(f)
+CLabel::CLabel(const wyrmgus::font *f, const wyrmgus::font_color *nc, const wyrmgus::font_color *rc) : font(f)
 {
-	normal = wyrmgus::font_color::get(nc);
-	reverse = wyrmgus::font_color::get(rc);
+	normal = nc;
+	reverse = rc;
 }
 
 CLabel::CLabel(const wyrmgus::font *f)
-	: normal(DefaultTextColor),
-	reverse(ReverseTextColor),
-	font(f)
+	: normal(wyrmgus::defines::get()->get_default_font_color()),
+	reverse(wyrmgus::defines::get()->get_default_highlight_font_color()), font(f)
 {
 }
 
-void CLabel::SetNormalColor(const std::string &nc)
+void CLabel::SetNormalColor(const wyrmgus::font_color *nc)
 {
-	this->normal = wyrmgus::font_color::get(nc);
+	this->normal = nc;
 }
 
 /// Draw text/number unclipped

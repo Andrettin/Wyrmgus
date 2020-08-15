@@ -196,8 +196,6 @@ void LoadModules()
 	SetPlayersPalette();
 	UI.Minimap.Create();
 
-	SetDefaultTextColors(UI.NormalFontColor, UI.ReverseFontColor);
-	
 	//Wyrmgus start
 	ResetItemsToLoad();
 	//Wyrmgus end
@@ -239,11 +237,6 @@ void LoadGame(const std::string &filename)
 	CommandLogDisabled = true;
 	SaveGameLoading = true;
 
-	//Wyrmgus start
-//	SetDefaultTextColors(FontYellow, FontWhite);
-	SetDefaultTextColors(UI.NormalFontColor, UI.ReverseFontColor);
-	//Wyrmgus end
-	
 	//Wyrmgus start
 	InitPlayers();
 	//Wyrmgus end

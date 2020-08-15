@@ -50,6 +50,7 @@ class LuaActionListener;
 namespace wyrmgus {
 	class cursor;
 	class font;
+	class font_color;
 	class minimap;
 	enum class cursor_type;
 }
@@ -64,36 +65,28 @@ enum class TextAlignment {
 class ButtonStyleProperties
 {
 public:
-	ButtonStyleProperties() : Sprite(nullptr), Frame(0), BorderColor(0),
-		BorderSize(0), TextAlign(TextAlignment::Undefined),
-		TextPos(0, 0)
-	{}
-
-	CGraphic *Sprite;
-	int Frame;
+	CGraphic *Sprite = nullptr;
+	int Frame = 0;
 	CColor BorderColorRGB;
-	IntColor BorderColor;
-	int BorderSize;
-	TextAlignment TextAlign;        /// Text alignment
-	PixelPos TextPos;               /// Text location
-	std::string TextNormalColor;    /// Normal text color
-	std::string TextReverseColor;   /// Reverse text color
+	IntColor BorderColor = 0;
+	int BorderSize = 0;
+	TextAlignment TextAlign = TextAlignment::Undefined; /// Text alignment
+	PixelPos TextPos = PixelPos(0, 0); /// Text location
+	const wyrmgus::font_color *TextNormalColor = nullptr; /// Normal text color
+	const wyrmgus::font_color *TextReverseColor = nullptr; /// Reverse text color
 };
 
 class ButtonStyle
 {
 public:
-	ButtonStyle() : Width(0), Height(0),
-		TextAlign(TextAlignment::Undefined), TextX(0), TextY(0) {}
-
-	int Width;                      /// Button width
-	int Height;                     /// Button height
+	int Width = 0;                  /// Button width
+	int Height = 0;                 /// Button height
 	const wyrmgus::font *Font = nullptr; /// Font
-	std::string TextNormalColor;    /// Normal text color
-	std::string TextReverseColor;   /// Reverse text color
-	TextAlignment TextAlign;        /// Text alignment
-	int TextX;                      /// Text X location
-	int TextY;                      /// Text Y location
+	const wyrmgus::font_color *TextNormalColor = nullptr; /// Normal text color
+	const wyrmgus::font_color *TextReverseColor = nullptr; /// Reverse text color
+	TextAlignment TextAlign = TextAlignment::Undefined; /// Text alignment
+	int TextX = 0;                  /// Text X location
+	int TextY = 0;                  /// Text Y location
 	ButtonStyleProperties Default;  /// Default button properties
 	ButtonStyleProperties Hover;    /// Hover button properties
 	ButtonStyleProperties Clicked;  /// Clicked button properties
@@ -413,9 +406,6 @@ public:
 	int MouseScrollSpeedControl;
 
 	PixelPos MouseWarpPos;				/// Cursor warp screen position
-
-	std::string NormalFontColor;		/// Color for normal text displayed
-	std::string ReverseFontColor;		/// Color for reverse text displayed
 
 	std::vector<CFiller> Fillers;		/// Filler graphics
 

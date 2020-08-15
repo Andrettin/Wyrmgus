@@ -316,7 +316,6 @@ void StartMap(const std::string &filename, bool clean)
 		if (clean) {
 			CleanPlayers();
 		}
-		GetDefaultTextColors(nc, rc);
 
 		//Wyrmgus start
 		GameEstablishing = true;
@@ -344,7 +343,6 @@ void StartMap(const std::string &filename, bool clean)
 
 		CleanGame();
 		current_interface_state = interface_state::menu;
-		SetDefaultTextColors(nc, rc);
 
 		Gui->setTop(oldTop);
 		Containers.erase(std::find(Containers.begin(), Containers.end(), container));
@@ -1800,8 +1798,6 @@ void CreateGame(const std::string &filename, CMap *map, bool is_mod)
 	//
 	wyrmgus::trigger::InitActiveTriggers();
 	
-	SetDefaultTextColors(UI.NormalFontColor, UI.ReverseFontColor);
-
 #if 0
 	if (!UI.SelectedViewport) {
 		UI.SelectedViewport = UI.Viewports;

@@ -35,6 +35,7 @@ class button_level;
 class civilization;
 class dialogue;
 class font;
+class font_color;
 class player_color;
 class sml_data;
 class sml_property;
@@ -48,6 +49,12 @@ class defines final : public QObject, public singleton<defines>
 
 	Q_PROPERTY(wyrmgus::font* small_font MEMBER small_font READ get_small_font)
 	Q_PROPERTY(wyrmgus::font* game_font MEMBER game_font READ get_game_font)
+	Q_PROPERTY(wyrmgus::font_color* default_font_color MEMBER default_font_color READ get_default_font_color)
+	Q_PROPERTY(wyrmgus::font_color* default_highlight_font_color MEMBER default_highlight_font_color READ get_default_highlight_font_color)
+	Q_PROPERTY(wyrmgus::font_color* ally_font_color MEMBER ally_font_color READ get_ally_font_color)
+	Q_PROPERTY(wyrmgus::font_color* enemy_font_color MEMBER enemy_font_color READ get_enemy_font_color)
+	Q_PROPERTY(wyrmgus::font_color* magic_font_color MEMBER magic_font_color READ get_magic_font_color)
+	Q_PROPERTY(wyrmgus::font_color* unique_font_color MEMBER unique_font_color READ get_unique_font_color)
 	Q_PROPERTY(QSize tile_size MEMBER tile_size READ get_tile_size)
 	Q_PROPERTY(QSize icon_size MEMBER icon_size READ get_icon_size)
 	Q_PROPERTY(wyrmgus::player_color* conversible_player_color MEMBER conversible_player_color READ get_conversible_player_color)
@@ -78,6 +85,36 @@ public:
 	font *get_game_font() const
 	{
 		return this->game_font;
+	}
+
+	font_color *get_default_font_color() const
+	{
+		return this->default_font_color;
+	}
+
+	font_color *get_default_highlight_font_color() const
+	{
+		return this->default_highlight_font_color;
+	}
+
+	font_color *get_ally_font_color() const
+	{
+		return this->ally_font_color;
+	}
+
+	font_color *get_enemy_font_color() const
+	{
+		return this->enemy_font_color;
+	}
+
+	font_color *get_magic_font_color() const
+	{
+		return this->magic_font_color;
+	}
+
+	font_color *get_unique_font_color() const
+	{
+		return this->unique_font_color;
 	}
 
 	const QSize &get_tile_size() const
@@ -188,6 +225,12 @@ public:
 private:
 	font *small_font = nullptr;
 	font *game_font = nullptr;
+	font_color *default_font_color = nullptr;
+	font_color *default_highlight_font_color = nullptr;
+	font_color *ally_font_color = nullptr; //the font color for the names of allies
+	font_color *enemy_font_color = nullptr; //the font color for the names of enemies
+	font_color *magic_font_color = nullptr; //the font color for the names of magic items
+	font_color *unique_font_color = nullptr; //the font color for the names of unique items and characters
 	QSize tile_size;
 	QSize icon_size;
 	int scale_factor = 1;

@@ -830,13 +830,10 @@ extern void DrawPopupUnitInfo(const wyrmgus::unit_type *type,
 static void DrawPopup()
 {
 	if (Editor.State == EditorEditUnit && Editor.CursorUnitIndex != -1) {
-		std::string nc, rc;
-		GetDefaultTextColors(nc, rc);
 		DrawPopupUnitInfo(Editor.ShownUnitTypes[Editor.CursorUnitIndex],
 						  Editor.SelectedPlayer, GetSmallFont(),
 						  Video.MapRGB(TheScreen->format, 38, 38, 78),
 						  Editor.PopUpX, Editor.PopUpY);
-		SetDefaultTextColors(nc, rc);
 	}
 }
 #endif
@@ -2721,7 +2718,6 @@ void StartEditor(const char *filename, bool is_mod)
 {
 	std::string nc, rc;
 
-	GetDefaultTextColors(nc, rc);
 	if (filename) {
 		if (strcpy_s(CurrentMapPath, sizeof(CurrentMapPath), filename) != 0) {
 			filename = nullptr;
@@ -2758,6 +2754,4 @@ void StartEditor(const char *filename, bool is_mod)
 	Editor.ShownTileTypes.clear();
 	CleanGame();
 	CleanPlayers();
-
-	SetDefaultTextColors(nc, rc);
 }

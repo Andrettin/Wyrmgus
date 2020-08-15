@@ -41,6 +41,7 @@ class CPopup;
 namespace wyrmgus {
 	class button;
 	class font;
+	class font_color;
 	class unit_class;
 	class upgrade_class;
 }
@@ -132,9 +133,6 @@ public:
 class CPopupContentType
 {
 public:
-	CPopupContentType() : pos(0, 0),
-		MarginX(MARGIN_X), MarginY(MARGIN_Y), minSize(0, 0),
-		Wrap(true), Condition(nullptr) {}
 	virtual ~CPopupContentType() { delete Condition; }
 
 	/// Tell how show the variable Index.
@@ -149,17 +147,17 @@ public:
 	static CPopupContentType *ParsePopupContent(lua_State *l);
 
 public:
-	PixelPos pos;               /// position to draw.
+	PixelPos pos = PixelPos(0, 0); /// position to draw.
 
-	int MarginX;                /// Left and right margin width.
-	int MarginY;                /// Upper and lower margin height.
-	PixelSize minSize;          /// Minimal size covered by content type.
-	bool Wrap;                  /// If true, the next content will be placed on the next "line".
+	int MarginX = MARGIN_X; /// Left and right margin width.
+	int MarginY = MARGIN_Y; /// Upper and lower margin height.
+	PixelSize minSize = PixelSize(0, 0); /// Minimal size covered by content type.
+	bool Wrap = true; /// If true, the next content will be placed on the next "line".
 protected:
-	std::string TextColor;      /// Color used for plain text in content.
-	std::string HighlightColor; /// Color used for highlighted letters.
+	const wyrmgus::font_color *TextColor = nullptr;      /// Color used for plain text in content.
+	const wyrmgus::font_color *HighlightColor = nullptr; /// Color used for highlighted letters.
 public:
-	PopupConditionPanel *Condition; /// Condition to show the content; if null, no condition.
+	PopupConditionPanel *Condition = nullptr; /// Condition to show the content; if null, no condition.
 };
 
 enum PopupButtonInfo_Types {

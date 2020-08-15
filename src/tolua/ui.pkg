@@ -147,9 +147,6 @@ class CUITimer
 
 class CUserInterface
 {
-	string NormalFontColor;
-	string ReverseFontColor;
-
 	CResourceInfo Resources[MaxResourceInfo];
 	CInfoPanel InfoPanel;
 	CResourceInfo TimeOfDayPanel;
@@ -705,8 +702,6 @@ void UiFindHeroUnit(int hero_index);
 void CycleViewportMode(int step);
 void UiTrackUnit();
 void SetNewViewportMode(ViewportModeType new_mode);
-
-void SetDefaultTextColors(const std::string &normal, const std::string &reverse);
 
 extern bool IsMouseLeftButtonPressed();
 extern int GetCurrentButtonValue();

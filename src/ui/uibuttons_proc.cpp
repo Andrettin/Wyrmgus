@@ -98,14 +98,11 @@ void DrawUIButton(ButtonStyle *style, unsigned flags, int x, int y,
 	//  Text
 	//
 	if (!text.empty()) {
-		std::string oldnc;
-		std::string oldrc;
-		GetDefaultTextColors(oldnc, oldrc);
 		CLabel label(style->Font,
-					 (!p->TextNormalColor.empty() ? p->TextNormalColor :
-					  !style->TextNormalColor.empty() ? style->TextNormalColor : oldnc),
-					 (!p->TextReverseColor.empty() ? p->TextReverseColor :
-					  !style->TextReverseColor.empty() ? style->TextReverseColor : oldrc));
+					 (p->TextNormalColor != nullptr ? p->TextNormalColor :
+					  style->TextNormalColor != nullptr ? style->TextNormalColor : wyrmgus::defines::get()->get_default_font_color()),
+					 (p->TextReverseColor != nullptr ? p->TextReverseColor :
+					  style->TextReverseColor != nullptr ? style->TextReverseColor : wyrmgus::defines::get()->get_default_highlight_font_color()));
 
 		if (p->TextAlign == TextAlignment::Center || p->TextAlign == TextAlignment::Undefined) {
 			label.DrawCentered(x + p->TextPos.x, y + p->TextPos.y, text);

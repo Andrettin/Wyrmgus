@@ -555,10 +555,7 @@ static void DrawUnitInfo_Training(const CUnit &unit)
 			for (size_t i = 0; i < train_counter.size(); ++i) {
 				if (train_counter[i] > 1) {
 					std::string number_string = std::to_string((long long) train_counter[i]);
-					std::string oldnc;
-					std::string oldrc;
-					GetDefaultTextColors(oldnc, oldrc);
-					CLabel label(wyrmgus::defines::get()->get_game_font(), oldnc, oldrc);
+					CLabel label(wyrmgus::defines::get()->get_game_font());
 
 					const PixelPos pos(UI.TrainingButtons[i].X, UI.TrainingButtons[i].Y);
 					label.Draw(pos.x + 46 * wyrmgus::defines::get()->get_scale_factor() - wyrmgus::defines::get()->get_game_font()->Width(number_string), pos.y + 0, number_string);
@@ -1125,7 +1122,7 @@ void DrawPopups()
 	}
 	
 	if (UI.Resources[ScoreCost].G && CursorScreenPos.x >= UI.Resources[ScoreCost].IconX && CursorScreenPos.x < (UI.Resources[ScoreCost].TextX + UI.Resources[ScoreCost].Font->Width(UI.Resources[ScoreCost].Text)) && CursorScreenPos.y >= UI.Resources[ScoreCost].IconY && CursorScreenPos.y < (UI.Resources[ScoreCost].IconY + UI.Resources[ScoreCost].G->Height)) {
-		DrawGenericPopup(_("Score"), UI.Resources[ScoreCost].IconX, UI.Resources[ScoreCost].IconY + 16 * wyrmgus::defines::get()->get_scale_factor() + GameCursor->get_graphic()->getHeight() / 2, "", "", false);
+		DrawGenericPopup(_("Score"), UI.Resources[ScoreCost].IconX, UI.Resources[ScoreCost].IconY + 16 * wyrmgus::defines::get()->get_scale_factor() + GameCursor->get_graphic()->getHeight() / 2, nullptr, nullptr, false);
 	}
 	
 	if (
@@ -1139,7 +1136,7 @@ void DrawPopups()
 	) {
 		const QPoint tile_pos = UI.SelectedViewport->screen_center_to_tile_pos();
 		const wyrmgus::time_of_day *time_of_day = UI.CurrentMapLayer->get_tile_time_of_day(tile_pos);
-		DrawGenericPopup(_(time_of_day->get_name().c_str()), UI.TimeOfDayPanel.IconX, UI.TimeOfDayPanel.IconY + 16 * wyrmgus::defines::get()->get_scale_factor() + GameCursor->get_graphic()->getHeight() / 2, "", "", false);
+		DrawGenericPopup(_(time_of_day->get_name().c_str()), UI.TimeOfDayPanel.IconX, UI.TimeOfDayPanel.IconY + 16 * wyrmgus::defines::get()->get_scale_factor() + GameCursor->get_graphic()->getHeight() / 2, nullptr, nullptr, false);
 	}
 	
 	if (
@@ -1151,7 +1148,7 @@ void DrawPopups()
 		&& CursorScreenPos.y >= UI.SeasonPanel.IconY
 		&& CursorScreenPos.y < (UI.SeasonPanel.IconY + UI.SeasonPanel.G->getHeight())
 	) {
-		DrawGenericPopup(_(UI.CurrentMapLayer->GetSeason()->get_name().c_str()), UI.SeasonPanel.IconX, UI.SeasonPanel.IconY + 16 * wyrmgus::defines::get()->get_scale_factor() + GameCursor->get_graphic()->getHeight() / 2, "", "", false);
+		DrawGenericPopup(_(UI.CurrentMapLayer->GetSeason()->get_name().c_str()), UI.SeasonPanel.IconX, UI.SeasonPanel.IconY + 16 * wyrmgus::defines::get()->get_scale_factor() + GameCursor->get_graphic()->getHeight() / 2, nullptr, nullptr, false);
 	}
 	
 	//commented out as right now the popup is a bit pointless, as it only shows the same text as what's already written in the HUD; the popup should be restored when they are able to show more text
@@ -1848,11 +1845,6 @@ static void InfoPanel_draw_no_selection()
 		//Wyrmgus end
 		y += 20 * scale_factor;
 
-		std::string nc;
-		std::string rc;
-
-		GetDefaultTextColors(nc, rc);
-
 		std::vector<const CPlayer *> listed_players;
 
 		for (int i = 0; i < PlayerMax - 1; ++i) {
@@ -1869,11 +1861,11 @@ static void InfoPanel_draw_no_selection()
 
 		for (const CPlayer *player : listed_players) {
 			if (player == CPlayer::GetThisPlayer() || CPlayer::GetThisPlayer()->IsAllied(*player)) {
-				label.SetNormalColor(FontGreen);
+				label.SetNormalColor(wyrmgus::defines::get()->get_ally_font_color());
 			} else if (CPlayer::GetThisPlayer()->IsEnemy(*player)) {
-				label.SetNormalColor(FontRed);
+				label.SetNormalColor(wyrmgus::defines::get()->get_enemy_font_color());
 			} else {
-				label.SetNormalColor(nc);
+				label.SetNormalColor(wyrmgus::defines::get()->get_default_font_color());
 			}
 
 			Video.DrawRectangleClip(ColorWhite, x, y, 12 * scale_factor, 12 * scale_factor);
@@ -1972,12 +1964,11 @@ static void InfoPanel_draw_multiple_selection()
 		UiDrawLifeBar(*Selected[i], UI.SelectedButtons[i].X, UI.SelectedButtons[i].Y);
 
 		if (ButtonAreaUnderCursor == ButtonAreaSelected && ButtonUnderCursor == (int) i) {
-			//Wyrmgus start
-			std::string text_color;
+			const wyrmgus::font_color *text_color = nullptr;
 			if (Selected[i]->Unique || Selected[i]->Character != nullptr) {
-				text_color = "fire";
+				text_color = wyrmgus::defines::get()->get_unique_font_color();
 			} else if (Selected[i]->Prefix != nullptr || Selected[i]->Suffix != nullptr) {
-				text_color = "light-blue";
+				text_color = wyrmgus::defines::get()->get_magic_font_color();
 			}
 			DrawGenericPopup(Selected[i]->GetMessageName(), UI.SelectedButtons[i].X, UI.SelectedButtons[i].Y, text_color);
 			//Wyrmgus end

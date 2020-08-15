@@ -48,6 +48,7 @@
 #include "util/size_util.h"
 #include "util/vector_util.h"
 #include "video/font.h"
+#include "video/font_color.h"
 #include "video/video.h"
 
 CViewport::CViewport() : MapWidth(0), MapHeight(0), Unit(nullptr)
@@ -393,7 +394,7 @@ static void ShowUnitName(const CViewport &vp, PixelPos pos, CUnit *unit, bool hi
 	const wyrmgus::font *font = wyrmgus::defines::get()->get_small_font();
 	int width;
 	int height = font->Height() + 6;
-	CLabel label(font, "white", "red");
+	CLabel label(font, wyrmgus::font_color::get("white"), wyrmgus::font_color::get("red"));
 	int x;
 	int y = std::min<int>(GameCursor->get_graphic()->Height + pos.y + 10, vp.BottomRightPos.y - 1 - height);
 	const CPlayer *tplayer = CPlayer::GetThisPlayer();

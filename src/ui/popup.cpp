@@ -53,6 +53,7 @@
 #include "upgrade/upgrade.h"
 #include "upgrade/upgrade_class.h"
 #include "video/font.h"
+#include "video/font_color.h"
 #include "video/video.h"
 
 /* virtual */ int CPopupContentTypeButtonInfo::GetWidth(const wyrmgus::button &button, int *) const
@@ -832,8 +833,8 @@ static PopupConditionPanel *ParsePopupConditions(lua_State *l)
 	content->minSize.x = minWidth;
 	content->minSize.y = minHeight;
 	content->Condition = condition;
-	content->TextColor = textColor;
-	content->HighlightColor = highColor;
+	content->TextColor = wyrmgus::font_color::get(textColor);
+	content->HighlightColor = wyrmgus::font_color::get(highColor);
 	return content;
 }
 

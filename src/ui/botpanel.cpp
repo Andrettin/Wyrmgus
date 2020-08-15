@@ -878,7 +878,7 @@ void DrawPopup(const wyrmgus::button &button, int x, int y, bool above)
 /**
 **  Draw popup
 */
-void DrawGenericPopup(const std::string &popup_text, int x, int y, std::string text_color, std::string highlight_color, bool above)
+void DrawGenericPopup(const std::string &popup_text, int x, int y, const wyrmgus::font_color *text_color, const wyrmgus::font_color *highlight_color, bool above)
 {
 	const wyrmgus::font *font = wyrmgus::defines::get()->get_game_font();
 	
@@ -962,11 +962,11 @@ void DrawGenericPopup(const std::string &popup_text, int x, int y, std::string t
 	Video.FillTransRectangle(BackgroundColor, x, y, popupWidth, popupHeight, BackgroundColor >> ASHIFT);
 	Video.DrawRectangle(BorderColor, x, y, popupWidth, popupHeight);
 
-	if (text_color.empty()) {
-		text_color = "white";
+	if (text_color == nullptr) {
+		text_color = wyrmgus::defines::get()->get_default_font_color();
 	}
-	if (highlight_color.empty()) {
-		highlight_color = "yellow";
+	if (highlight_color == nullptr) {
+		highlight_color = wyrmgus::defines::get()->get_default_highlight_font_color();
 	}
 	
 	// Contents
@@ -1185,10 +1185,7 @@ void CButtonPanel::Draw()
 					} else if (button->Action == ButtonCmd::BuyResource) {
 						number_string = std::to_string(Selected[0]->Player->GetEffectiveResourceBuyPrice(button->Value));
 					}
-					std::string oldnc;
-					std::string oldrc;
-					GetDefaultTextColors(oldnc, oldrc);
-					CLabel label(wyrmgus::defines::get()->get_game_font(), oldnc, oldrc);
+					CLabel label(wyrmgus::defines::get()->get_game_font());
 
 					label.Draw(pos.x + 46 - wyrmgus::defines::get()->get_game_font()->Width(number_string), pos.y + 0, number_string);
 				}
@@ -1217,11 +1214,11 @@ void CButtonPanel::Draw()
 				continue;
 			}
 			if (static_cast<size_t>(ButtonUnderCursor) == j) {
-				std::string text_color;
+				const wyrmgus::font_color *text_color = nullptr;
 				if (uins->Unique || uins->Character != nullptr) {
-					text_color = "fire";
+					text_color = wyrmgus::defines::get()->get_unique_font_color();
 				} else if (uins->Prefix != nullptr || uins->Suffix != nullptr) {
-					text_color = "light-blue";
+					text_color = wyrmgus::defines::get()->get_magic_font_color();
 				}
 				DrawGenericPopup(uins->GetMessageName(), UI.TransportingButtons[j].X, UI.TransportingButtons[j].Y, text_color);
 			}

@@ -254,11 +254,6 @@ bool EnableUnitDebug;				/// if enabled, a unit info dump will be created
 
 void PreMenuSetup()
 {
-	//
-	//  Initial menus require some gfx.
-	//
-	SetDefaultTextColors(FontWhite, FontYellow);
-
 	InitSettings();
 
 	InitUserInterface();
@@ -754,7 +749,6 @@ int stratagusMain(int argc, char **argv)
 #endif
 
 	//  Show title screens.
-	SetDefaultTextColors(FontYellow, FontWhite);
 	SetClipping(0, 0, Video.Width - 1, Video.Height - 1);
 	Video.ClearScreen();
 	ShowTitleScreens();

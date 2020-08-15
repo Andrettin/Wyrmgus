@@ -51,6 +51,7 @@
 #include "unit/unit_manager.h"
 #include "unit/unit_type.h"
 #include "video/font.h"
+#include "video/font_color.h"
 #include "video/video.h"
 
 #include <QUuid>
@@ -528,10 +529,8 @@ static CContentType *CclParseContent(lua_State *l)
 	}
 	content->Pos = pos;
 	content->Condition = condition;
-	//Wyrmgus start
-	content->TextColor = textColor;
-	content->HighlightColor = highColor;
-	//Wyrmgus end
+	content->TextColor = wyrmgus::font_color::get(textColor);
+	content->HighlightColor = wyrmgus::font_color::get(highColor);
 	return content;
 }
 
@@ -769,9 +768,9 @@ static void ParseButtonStyleProperties(lua_State *l, ButtonStyleProperties *p)
 				LuaError(l, "Invalid text alignment: %s" _C_ value);
 			}
 		} else if (!strcmp(value, "TextNormalColor")) {
-			p->TextNormalColor = LuaToString(l, -1);
+			p->TextNormalColor = wyrmgus::font_color::get(LuaToString(l, -1));
 		} else if (!strcmp(value, "TextReverseColor")) {
-			p->TextReverseColor = LuaToString(l, -1);
+			p->TextReverseColor = wyrmgus::font_color::get(LuaToString(l, -1));
 		} else {
 			LuaError(l, "Unsupported tag: %s" _C_ value);
 		}
@@ -811,9 +810,9 @@ static int CclDefineButtonStyle(lua_State *l)
 		} else if (!strcmp(value, "Font")) {
 			b->Font = wyrmgus::font::get(LuaToString(l, -1));
 		} else if (!strcmp(value, "TextNormalColor")) {
-			b->TextNormalColor = LuaToString(l, -1);
+			b->TextNormalColor = wyrmgus::font_color::get(LuaToString(l, -1));
 		} else if (!strcmp(value, "TextReverseColor")) {
-			b->TextReverseColor = LuaToString(l, -1);
+			b->TextReverseColor = wyrmgus::font_color::get(LuaToString(l, -1));
 		} else if (!strcmp(value, "TextPos")) {
 			CclGetPos(l, &b->TextX, &b->TextY);
 		} else if (!strcmp(value, "TextAlign")) {

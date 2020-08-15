@@ -223,5 +223,4 @@ void StartSavedGame(const std::string &filename)
 	LoadGame(path);
 
 	StartMap(filename, false);
-	//SetDefaultTextColors(nc, rc);
 }
