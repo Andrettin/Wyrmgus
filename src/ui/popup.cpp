@@ -307,8 +307,14 @@
 			if (UI.Resources[i].IconWidth != -1)	{
 				popupWidth += (UI.Resources[i].IconWidth + 5 * scale_factor);
 			} else {
-				const wyrmgus::resource *resource = wyrmgus::resource::get_all()[i];
-				const CGraphic *icon_graphics = resource->get_icon_graphics();
+				const CGraphic *icon_graphics = nullptr;
+				if (i >= MaxCosts) {
+					icon_graphics = UI.Resources[i].G;
+				} else {
+					const wyrmgus::resource *resource = wyrmgus::resource::get_all()[i];
+					icon_graphics = resource->get_icon_graphics();
+				}
+
 				if (icon_graphics != nullptr) {
 					popupWidth += (icon_graphics->Width + 5 * scale_factor);
 				}
@@ -345,8 +351,14 @@
 	const wyrmgus::font *font = this->Font ? this->Font : wyrmgus::defines::get()->get_small_font();
 
 	for (unsigned int i = 1; i <= ManaResCost; ++i) {
-		const wyrmgus::resource *resource = wyrmgus::resource::get_all()[i];
-		const CGraphic *icon_graphics = resource->get_icon_graphics();
+		const CGraphic *icon_graphics = nullptr;
+		if (i >= MaxCosts) {
+			icon_graphics = UI.Resources[i].G;
+		} else {
+			const wyrmgus::resource *resource = wyrmgus::resource::get_all()[i];
+			icon_graphics = resource->get_icon_graphics();
+		}
+
 		if (Costs[i] && icon_graphics != nullptr) {
 			popupHeight = std::max(icon_graphics->Height, popupHeight);
 		}
@@ -363,8 +375,15 @@
 	for (unsigned int i = 1; i <= MaxCosts; ++i) {
 		if (Costs[i]) {
 			int y_offset = 0;
-			const wyrmgus::resource *resource = wyrmgus::resource::get_all()[i];
-			CGraphic *icon_graphics = resource->get_icon_graphics();
+
+			CGraphic *icon_graphics = nullptr;
+			if (i >= MaxCosts) {
+				icon_graphics = UI.Resources[i].G;
+			} else {
+				const wyrmgus::resource *resource = wyrmgus::resource::get_all()[i];
+				icon_graphics = resource->get_icon_graphics();
+			}
+
 			if (icon_graphics != nullptr) {
 				int x_offset = UI.Resources[i].IconWidth;
 				icon_graphics->DrawFrameClip(UI.Resources[i].IconFrame,	x , y);
