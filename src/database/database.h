@@ -139,7 +139,14 @@ public:
 	void load_predefines();
 	void load_defines();
 	static void load_history();
+
+	bool is_initialized() const
+	{
+		return this->initialized;
+	}
+
 	void initialize();
+
 	void clear();
 	void register_metadata(std::unique_ptr<data_type_metadata> &&metadata);
 
@@ -234,6 +241,7 @@ private:
 	std::vector<std::unique_ptr<data_type_metadata>> metadata;
 	std::vector<qunique_ptr<module>> modules;
 	std::map<std::string, module *> modules_by_identifier;
+	bool initialized = false;
 };
 
 }

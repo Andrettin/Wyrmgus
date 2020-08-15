@@ -44,5 +44,5 @@ void CUITimer::Draw(int second) const
 	} else {
 		snprintf(buf, sizeof(buf), "%d:%02d", min, sec);
 	}
-	CLabel(*this->Font).Draw(this->X, this->Y, buf);
+	CLabel(this->Font).Draw(this->X, this->Y, buf);
 }

@@ -1072,7 +1072,7 @@ NumberDesc *CclParseNumberDesc(lua_State *l)
 					res->D.VideoTextLength.String = CclParseStringDesc(l);
 					lua_pushnil(l);
 				} else if (!strcmp(key, "Font")) {
-					res->D.VideoTextLength.Font = CFont::Get(LuaToString(l, -1));
+					res->D.VideoTextLength.Font = wyrmgus::font::get(LuaToString(l, -1));
 					if (!res->D.VideoTextLength.Font) {
 						LuaError(l, "Bad Font name :'%s'" _C_ LuaToString(l, -1));
 					}
@@ -1325,7 +1325,7 @@ StringDesc *CclParseStringDesc(lua_State *l)
 			res->D.Line.Font = nullptr;
 			if (lua_rawlen(l, -1) >= 4) {
 				lua_rawgeti(l, -1, 4); // Font.
-				res->D.Line.Font = CFont::Get(LuaToString(l, -1));
+				res->D.Line.Font = wyrmgus::font::get(LuaToString(l, -1));
 				if (!res->D.Line.Font) {
 					LuaError(l, "Bad Font name :'%s'" _C_ LuaToString(l, -1));
 				}
@@ -1947,7 +1947,7 @@ std::string EvalString(const StringDesc *s)
 			} else {
 				int line;
 				int maxlen;
-				CFont *font;
+				wyrmgus::font *font;
 
 				line = EvalNumber(s->D.Line.Line);
 				if (line <= 0) {

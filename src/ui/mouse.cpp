@@ -3101,7 +3101,7 @@ void DrawPieMenu()
 		return;
 	}
 	const std::vector<std::unique_ptr<wyrmgus::button>> &buttons(CurrentButtons);
-	CLabel label(GetGameFont());
+	CLabel label(wyrmgus::defines::get()->get_game_font());
 	CViewport *vp = UI.SelectedViewport;
 	PushClipping();
 	vp->SetClipping();

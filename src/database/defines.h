@@ -34,6 +34,7 @@ namespace wyrmgus {
 class button_level;
 class civilization;
 class dialogue;
+class font;
 class player_color;
 class sml_data;
 class sml_property;
@@ -45,6 +46,8 @@ class defines final : public QObject, public singleton<defines>
 {
 	Q_OBJECT
 
+	Q_PROPERTY(wyrmgus::font* small_font MEMBER small_font READ get_small_font)
+	Q_PROPERTY(wyrmgus::font* game_font MEMBER game_font READ get_game_font)
 	Q_PROPERTY(QSize tile_size MEMBER tile_size READ get_tile_size)
 	Q_PROPERTY(QSize icon_size MEMBER icon_size READ get_icon_size)
 	Q_PROPERTY(wyrmgus::player_color* conversible_player_color MEMBER conversible_player_color READ get_conversible_player_color)
@@ -66,6 +69,16 @@ public:
 	void process_sml_property(const sml_property &property);
 	void process_sml_scope(const sml_data &scope);
 	void initialize();
+
+	font *get_small_font() const
+	{
+		return this->small_font;
+	}
+
+	font *get_game_font() const
+	{
+		return this->game_font;
+	}
 
 	const QSize &get_tile_size() const
 	{
@@ -173,6 +186,8 @@ public:
 	}
 
 private:
+	font *small_font = nullptr;
+	font *game_font = nullptr;
 	QSize tile_size;
 	QSize icon_size;
 	int scale_factor = 1;

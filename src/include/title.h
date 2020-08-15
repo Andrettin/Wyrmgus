@@ -28,7 +28,9 @@
 
 #pragma once
 
-class CFont;
+namespace wyrmgus {
+	class font;
+}
 
 enum {
 	TitleFlagCenter = 1 << 0   /// Center Text
@@ -40,7 +42,7 @@ public:
 	TitleScreenLabel() : Font(0), Xofs(0), Yofs(0), Flags(0) {}
 
 	std::string Text;
-	CFont *Font;
+	wyrmgus::font *Font;
 	int Xofs;
 	int Yofs;
 	int Flags;

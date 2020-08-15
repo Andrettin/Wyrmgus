@@ -880,7 +880,7 @@ void DrawPopup(const wyrmgus::button &button, int x, int y, bool above)
 */
 void DrawGenericPopup(const std::string &popup_text, int x, int y, std::string text_color, std::string highlight_color, bool above)
 {
-	const CFont &font = GetGameFont();
+	const wyrmgus::font *font = wyrmgus::defines::get()->get_game_font();
 	
 	const int scale_factor = wyrmgus::defines::get()->get_scale_factor();
 	int MaxWidth = std::max(512 * scale_factor, Video.Width / 5);
@@ -891,12 +891,12 @@ void DrawGenericPopup(const std::string &popup_text, int x, int y, std::string t
 	int content_width = 0;
 	std::string content_width_sub;
 	i = 1;
-	while (!(content_width_sub = GetLineFont(i++, popup_text, 0, &font)).empty()) {
-		int line_width = font.getWidth(content_width_sub);
+	while (!(content_width_sub = GetLineFont(i++, popup_text, 0, font)).empty()) {
+		int line_width = font->getWidth(content_width_sub);
 		int cost_symbol_pos = content_width_sub.find("COST_", 0);
 		if (cost_symbol_pos != std::string::npos) {
 			int res = std::stoi(content_width_sub.substr(cost_symbol_pos + 5, content_width_sub.find(" ", cost_symbol_pos) - (cost_symbol_pos + 5) + 1));
-			line_width -= font.getWidth("COST_" + std::to_string(res));
+			line_width -= font->getWidth("COST_" + std::to_string(res));
 			line_width += UI.Resources[res].G->Width;
 		}
 		content_width = std::max(content_width, line_width);
@@ -909,8 +909,8 @@ void DrawGenericPopup(const std::string &popup_text, int x, int y, std::string t
 	//calculate content height
 	int content_height = 0;
 	i = 1;
-	while ((GetLineFont(i++, popup_text, MaxWidth, &font)).length()) {
-		content_height += font.Height() + 2 * scale_factor;
+	while ((GetLineFont(i++, popup_text, MaxWidth, font)).length()) {
+		content_height += font->Height() + 2 * scale_factor;
 	}
 	
 	int popupWidth, popupHeight;
@@ -979,7 +979,7 @@ void DrawGenericPopup(const std::string &popup_text, int x, int y, std::string t
 	unsigned int width = MaxWidth
 						 ? std::min(MaxWidth, popupWidth - 2 * MARGIN_X * scale_factor)
 						 : 0;
-	while ((sub = GetLineFont(++i, popup_text, width, &font)).length()) {
+	while ((sub = GetLineFont(++i, popup_text, width, font)).length()) {
 		if (sub.find("LINE", 0) != std::string::npos) {
 			Video.FillRectangle(BorderColor, x + (-MARGIN_X + 1 - MARGIN_X) * scale_factor,
 								y_off, popupWidth - 2 * scale_factor, 1);
@@ -992,14 +992,14 @@ void DrawGenericPopup(const std::string &popup_text, int x, int y, std::string t
 			std::string sub_first = sub.substr(0, cost_symbol_pos);
 			std::string sub_second = sub.substr(cost_symbol_pos + 5 + std::to_string((long long) res).length(), sub.length() - cost_symbol_pos - (5 + std::to_string((long long) res).length()));
 			label.Draw(x, y_off, sub_first);
-			x_offset += font.getWidth(sub_first);
-			UI.Resources[res].G->DrawFrameClip(UI.Resources[res].IconFrame, x + x_offset, y + ((font.getHeight() - UI.Resources[res].G->Height) / 2), nullptr);
+			x_offset += font->getWidth(sub_first);
+			UI.Resources[res].G->DrawFrameClip(UI.Resources[res].IconFrame, x + x_offset, y + ((font->getHeight() - UI.Resources[res].G->Height) / 2), nullptr);
 			x_offset += UI.Resources[res].G->Width;
 			label.Draw(x + x_offset, y_off, sub_second);
 		} else {
 			label.Draw(x, y_off, sub);
 		}
-		y_off += font.Height() + 2 * scale_factor;
+		y_off += font->Height() + 2 * scale_factor;
 	}
 }
 //Wyrmgus end
@@ -1188,9 +1188,9 @@ void CButtonPanel::Draw()
 					std::string oldnc;
 					std::string oldrc;
 					GetDefaultTextColors(oldnc, oldrc);
-					CLabel label(GetGameFont(), oldnc, oldrc);
+					CLabel label(wyrmgus::defines::get()->get_game_font(), oldnc, oldrc);
 
-					label.Draw(pos.x + 46 - GetGameFont().Width(number_string), pos.y + 0, number_string);
+					label.Draw(pos.x + 46 - wyrmgus::defines::get()->get_game_font()->Width(number_string), pos.y + 0, number_string);
 				}
 			} else if ( //draw researched technologies (or acquired abilities) grayed
 				((button->Action == ButtonCmd::Research || button->Action == ButtonCmd::ResearchClass || button->Action == ButtonCmd::Dynasty) && UpgradeIdAllowed(*CPlayer::GetThisPlayer(), button_upgrade->ID) == 'R')

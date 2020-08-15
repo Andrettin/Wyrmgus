@@ -31,12 +31,15 @@
 
 #include "upgrade/upgrade_structs.h"
 
-class CFont;
+namespace wyrmgus {
+	class font;
+}
 
 class CStatusLine
 {
 public:
-	CStatusLine() : Width(0), TextX(0), TextY(0), Font(0) {
+	CStatusLine()
+	{
 		memset(Costs, 0, (ManaResCost + 1) * sizeof(int));
 	}
 
@@ -49,10 +52,10 @@ public:
 	void ClearCosts();
 
 public:
-	int Width;
-	int TextX;
-	int TextY;
-	CFont *Font;
+	int Width = 0;
+	int TextX = 0;
+	int TextY = 0;
+	const wyrmgus::font *Font = nullptr;
 	int Costs[ManaResCost + 1];
 
 private:

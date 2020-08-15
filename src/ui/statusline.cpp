@@ -31,6 +31,7 @@
 
 #include "ui/statusline.h"
 
+#include "database/defines.h"
 #include "ui/interface.h"
 #include "ui/ui.h"
 #include "video/font.h"
@@ -42,7 +43,7 @@ void CStatusLine::Draw()
 		PushClipping();
 		SetClipping(this->TextX, this->TextY,
 					this->TextX + this->Width - 1, Video.Height - 1);
-		CLabel(*this->Font).DrawClip(this->TextX, this->TextY, this->StatusLine);
+		CLabel(this->Font).DrawClip(this->TextX, this->TextY, this->StatusLine);
 		PopClipping();
 	}
 }
@@ -96,7 +97,7 @@ void CStatusLine::ClearCosts()
 void CStatusLine::DrawCosts()
 {
 	int x = UI.StatusLine.TextX + 268;
-	CLabel label(GetGameFont());
+	CLabel label(wyrmgus::defines::get()->get_game_font());
 	if (this->Costs[ManaResCost]) {
 		UI.Resources[ManaResCost].G->DrawFrameClip(UI.Resources[ManaResCost].IconFrame, x, UI.StatusLine.TextY);
 

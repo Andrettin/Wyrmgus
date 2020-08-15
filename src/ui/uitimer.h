@@ -29,17 +29,17 @@
 
 #pragma once
 
-class CFont;
+namespace wyrmgus {
+	class font;
+}
 
 class CUITimer
 {
 public:
-	CUITimer() : X(0), Y(0), Font(nullptr) {}
-
 	void Draw(int second) const;
 
 public:
-	int X;
-	int Y;
-	CFont *Font;
+	int X = 0;
+	int Y = 0;
+	const wyrmgus::font *Font = nullptr;
 };

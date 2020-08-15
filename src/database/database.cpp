@@ -81,6 +81,8 @@
 #include "upgrade/upgrade_structs.h"
 #include "util/qunique_ptr.h"
 #include "util/string_util.h"
+#include "video/font.h"
+#include "video/font_color.h"
 #include "world.h"
 
 namespace wyrmgus {
@@ -212,6 +214,10 @@ QVariant database::process_sml_property_value(const sml_property &property, cons
 			new_property_value = QVariant::fromValue(faction::get(property.get_value()));
 		} else if (property_class_name == "wyrmgus::faction_tier") {
 			new_property_value = QVariant::fromValue(string_to_faction_tier(property.get_value()));
+		} else if (property_class_name == "wyrmgus::font*") {
+			new_property_value = QVariant::fromValue(font::get(property.get_value()));
+		} else if (property_class_name == "wyrmgus::font_color*") {
+			new_property_value = QVariant::fromValue(font_color::get(property.get_value()));
 		} else if (property_class_name == "wyrmgus::gender") {
 			new_property_value = QVariant::fromValue(string_to_gender(property.get_value()));
 		} else if (property_class_name == "wyrmgus::government_type") {
@@ -588,6 +594,8 @@ void database::initialize()
 		}
 	}
 
+	this->initialized = true;
+
 	//check if data entries are valid for each data type
 	for (const std::unique_ptr<data_type_metadata> &metadata : this->metadata) {
 		try {
@@ -604,6 +612,8 @@ void database::clear()
 	for (const std::unique_ptr<data_type_metadata> &metadata : this->metadata) {
 		metadata->get_clearing_function()();
 	}
+
+	this->initialized = false;
 }
 
 void database::register_metadata(std::unique_ptr<data_type_metadata> &&metadata)

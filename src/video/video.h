@@ -49,9 +49,8 @@
 #include "color.h"
 #include "vec2i.h"
 
-class CFont;
-
 namespace wyrmgus {
+	class font;
 	class map_template;
 	class player_color;
 	class time_of_day;
@@ -116,6 +115,11 @@ public:
 	static CGraphic *New(const std::string &filepath, const QSize &size)
 	{
 		return CGraphic::New(filepath, size.width(), size.height());
+	}
+
+	static CGraphic *New(const std::filesystem::path &filepath, const QSize &size)
+	{
+		return CGraphic::New(filepath.string(), size);
 	}
 
 	static CGraphic *Get(const std::string &file);
@@ -265,7 +269,7 @@ private:
 	int custom_scale_factor = 1; //the scale factor of the loaded image, if it is a custom scaled image
 	bool player_color = false;
 
-	friend class CFont;
+	friend wyrmgus::font;
 	friend int LoadGraphicPNG(CGraphic *g, const int scale_factor);
 	friend void FreeGraphics();
 };

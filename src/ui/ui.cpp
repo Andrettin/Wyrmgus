@@ -92,7 +92,7 @@ void ShowLoadProgress(const char *fmt, ...)
 	temp[sizeof(temp) - 1] = '\0';
 	va_end(va);
 
-	if (Video.Depth && IsGameFontReady() && GetGameFont().IsLoaded()) {
+	if (Video.Depth && wyrmgus::defines::get()->get_game_font() != nullptr && wyrmgus::defines::get()->get_game_font()->is_initialized()) {
 		// Remove non printable chars
 		for (unsigned char *s = (unsigned char *)temp; *s; ++s) {
 			if (*s < 32) {
@@ -105,7 +105,7 @@ void ShowLoadProgress(const char *fmt, ...)
 			Video.FillRectangle(ColorBlack, 0, Video.Height - 18 * wyrmgus::defines::get()->get_scale_factor(), Video.Width, 18 * wyrmgus::defines::get()->get_scale_factor());
 		}
 		//Wyrmgus end
-		CLabel(GetGameFont()).DrawCentered(Video.Width / 2, Video.Height - 16 * wyrmgus::defines::get()->get_scale_factor(), temp);
+		CLabel(wyrmgus::defines::get()->get_game_font()).DrawCentered(Video.Width / 2, Video.Height - 16 * wyrmgus::defines::get()->get_scale_factor(), temp);
 		//Wyrmgus end
 
 		RealizeVideoMemory();
@@ -121,7 +121,7 @@ void ShowLoadProgress(const char *fmt, ...)
 */
 void UpdateLoadProgress()
 {
-	if (Video.Depth && IsGameFontReady() && GetGameFont().IsLoaded()) {
+	if (Video.Depth && wyrmgus::defines::get()->get_game_font() != nullptr && wyrmgus::defines::get()->get_game_font()->is_initialized()) {
 		UpdateLoadingBar();
 	}
 	

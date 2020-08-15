@@ -25,16 +25,13 @@
 //      02111-1307, USA.
 //
 
-/*----------------------------------------------------------------------------
---  Includes
-----------------------------------------------------------------------------*/
-
 #include "stratagus.h"
 
 #include "grand_strategy.h"
 
 #include "character.h"
 #include "civilization.h"
+#include "database/defines.h"
 #include "faction.h"
 #include "game.h"	// for loading screen elements
 #include "iolib.h"
@@ -106,9 +103,9 @@ void CGrandStrategyGame::DrawInterface()
 			std::string resource_stored_string = std::to_string((long long) quantity_stored) + income_string;
 			
 			if (resource_stored_string.size() <= 9) {
-				CLabel(GetGameFont()).Draw(x + 18, y + 1, resource_stored_string);
+				CLabel(wyrmgus::defines::get()->get_game_font()).Draw(x + 18, y + 1, resource_stored_string);
 			} else {
-				CLabel(GetSmallFont()).Draw(x + 18, y + 1 + 2, resource_stored_string);
+				CLabel(wyrmgus::defines::get()->get_small_font()).Draw(x + 18, y + 1 + 2, resource_stored_string);
 			}
 			
 			if (CursorScreenPos.x >= x && CursorScreenPos.x <= (x + UI.Resources[stored_resources[i]].G->get_width()) && CursorScreenPos.y >= y && CursorScreenPos.y <= (y + UI.Resources[stored_resources[i]].G->get_height())) {

@@ -259,8 +259,6 @@ void PreMenuSetup()
 	//
 	SetDefaultTextColors(FontWhite, FontYellow);
 
-	LoadFonts();
-
 	InitSettings();
 
 	InitUserInterface();
@@ -757,7 +755,6 @@ int stratagusMain(int argc, char **argv)
 
 	//  Show title screens.
 	SetDefaultTextColors(FontYellow, FontWhite);
-	LoadFonts();
 	SetClipping(0, 0, Video.Width - 1, Video.Height - 1);
 	Video.ClearScreen();
 	ShowTitleScreens();

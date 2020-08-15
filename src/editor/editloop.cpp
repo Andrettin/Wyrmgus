@@ -748,7 +748,7 @@ void RecalculateShownUnits()
 static void DrawPlayers()
 {
 	char buf[256];
-	CLabel label(GetSmallFont());
+	CLabel label(wyrmgus::defines::get()->get_small_font());
 
 	//Wyrmgus start
 //	int x = UI.InfoPanel.X + 8;
@@ -817,14 +817,14 @@ static void DrawPlayers()
 				strcat_s(buf, sizeof(buf), "Computer");
 				break;
 		}
-		label.SetFont(GetGameFont());
+		label.SetFont(wyrmgus::defines::get()->get_game_font());
 		label.Draw(x, y, buf);
 	}
 }
 
 #if 0
 extern void DrawPopupUnitInfo(const wyrmgus::unit_type *type,
-							  int player_index, CFont *font,
+							  int player_index, wyrmgus::font *font,
 							  Uint32 backgroundColor, int buttonX, int buttonY);
 
 static void DrawPopup()
@@ -997,7 +997,7 @@ static void DrawTileIcon(unsigned tilenum, unsigned x, unsigned y, unsigned flag
 */
 static void DrawTileIcons()
 {
-	CLabel label(GetGameFont());
+	CLabel label(wyrmgus::defines::get()->get_game_font());
 	int x = UI.InfoPanel.X + 46;
 	int y = UI.InfoPanel.Y + 4 + IconHeight + 11;
 
@@ -1383,7 +1383,7 @@ static void DrawEditorInfo()
 
 	char buf[256];
 	snprintf(buf, sizeof(buf), _("Editor (%d %d)"), pos.x, pos.y);
-	CLabel(GetGameFont()).Draw(UI.StatusLine.TextX + 2, UI.StatusLine.TextY - 12, buf);
+	CLabel(wyrmgus::defines::get()->get_game_font()).Draw(UI.StatusLine.TextX + 2, UI.StatusLine.TextY - 12, buf);
 	const CMapField &mf = *UI.CurrentMapLayer->Field(pos);
 	//
 	// Flags info
@@ -1409,7 +1409,7 @@ static void DrawEditorInfo()
 			flag & MapFieldGravel       ? 'g' : '-',
 			flag & MapFieldBridge       ? 'B' : '-');
 
-	CLabel(GetGameFont()).Draw(UI.StatusLine.TextX + 118, UI.StatusLine.TextY - 12, buf);
+	CLabel(wyrmgus::defines::get()->get_game_font()).Draw(UI.StatusLine.TextX + 118, UI.StatusLine.TextY - 12, buf);
 
 	// Tile info
 	const CTileset &tileset = *CMap::Map.Tileset;
@@ -1436,8 +1436,8 @@ static void DrawEditorInfo()
 	snprintf(buf, sizeof(buf), "%s", terrain_name.c_str());
 	//Wyrmgus end
 	//Wyrmgus start
-//	CLabel(GetGameFont()).Draw(UI.StatusLine.TextX + 250, UI.StatusLine.TextY - 16, buf);
-	CLabel(GetGameFont()).Draw(UI.StatusLine.TextX + 298, UI.StatusLine.TextY - 12, buf);
+//	CLabel(wyrmgus::defines::get()->get_game_font()).Draw(UI.StatusLine.TextX + 250, UI.StatusLine.TextY - 16, buf);
+	CLabel(wyrmgus::defines::get()->get_game_font()).Draw(UI.StatusLine.TextX + 298, UI.StatusLine.TextY - 12, buf);
 	//Wyrmgus end
 #endif
 }

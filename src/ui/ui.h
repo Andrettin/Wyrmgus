@@ -42,7 +42,6 @@
 
 class CContentType;
 class CFile;
-class CFont;
 class CMapLayer;
 class CPopup;
 class CUnit;
@@ -50,6 +49,7 @@ class LuaActionListener;
 
 namespace wyrmgus {
 	class cursor;
+	class font;
 	class minimap;
 	enum class cursor_type;
 }
@@ -83,12 +83,12 @@ public:
 class ButtonStyle
 {
 public:
-	ButtonStyle() : Width(0), Height(0), Font(nullptr),
+	ButtonStyle() : Width(0), Height(0),
 		TextAlign(TextAlignment::Undefined), TextX(0), TextY(0) {}
 
 	int Width;                      /// Button width
 	int Height;                     /// Button height
-	CFont *Font;                    /// Font
+	const wyrmgus::font *Font = nullptr; /// Font
 	std::string TextNormalColor;    /// Normal text color
 	std::string TextReverseColor;   /// Reverse text color
 	TextAlignment TextAlign;        /// Text alignment
@@ -201,7 +201,7 @@ public:
 	std::string Name;      /// Ident of the panel.
 	int PosX;              /// X coordinate of the panel.
 	int PosY;              /// Y coordinate of the panel.
-	CFont *DefaultFont;    /// Default font for content.
+	const wyrmgus::font *DefaultFont; /// Default font for content.
 
 	std::vector<CContentType *>Contents; /// Array of contents to display.
 
@@ -331,7 +331,7 @@ public:
 	int IconX;		/// icon X position
 	int IconY;		/// icon Y position
 	int IconWidth;	/// icon W size
-	CFont *Font;	/// Font
+	const wyrmgus::font *Font; /// Font
 	std::string Text;	/// text
 	int TextX;	/// text X position
 	int TextY;	/// text Y position
@@ -433,19 +433,19 @@ public:
 	CUIButton *SingleSelectedButton;	/// Button for single selected unit
 
 	std::vector<CUIButton> SelectedButtons;	/// Selected buttons
-	CFont *MaxSelectedFont;				/// Font type to use
+	const wyrmgus::font *MaxSelectedFont; /// Font type to use
 	int MaxSelectedTextX;				/// position to place '+#' text
 	int MaxSelectedTextY;				/// if > maximum units selected
 
 	CUIButton *SingleTrainingButton;	/// Button for single training
 	std::string SingleTrainingText;		/// Text for single training
-	CFont *SingleTrainingFont;			/// Font for single traning
+	const wyrmgus::font *SingleTrainingFont; /// Font for single traning
 	int SingleTrainingTextX;			/// X text position single training
 	int SingleTrainingTextY;			/// Y text position single training
 
 	std::vector<CUIButton> TrainingButtons;/// Training buttons
 	std::string TrainingText;           /// Multiple Training Text
-	CFont *TrainingFont;                /// Multiple Training Font
+	const wyrmgus::font *TrainingFont; /// Multiple Training Font
 	int TrainingTextX;                  /// Multiple Training X Text position
 	int TrainingTextY;                  /// Multiple Training Y Text position
 
@@ -478,7 +478,7 @@ public:
 	int NumViewports;                   /// # Viewports currently used
 	CViewport Viewports[MAX_NUM_VIEWPORTS]; /// Parameters of all viewports
 	CMapArea MapArea;                   /// geometry of the whole map area
-	CFont *MessageFont;                 /// Font used for messages
+	const wyrmgus::font *MessageFont; /// Font used for messages
 	int MessageScrollSpeed;             /// Scroll speed in seconds for messages
 	
 	CMapLayer *CurrentMapLayer;

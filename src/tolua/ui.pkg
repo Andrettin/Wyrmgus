@@ -1,4 +1,5 @@
 $using namespace gcn;
+$using namespace wyrmgus;
 
 #include "video/font.h"
 
@@ -134,14 +135,14 @@ class CStatusLine
 	int Width;
 	int TextX;
 	int TextY;
-	CFont *Font;
+	font *Font;
 };
 
 class CUITimer
 {
 	int X;
 	int Y;
-	CFont *Font;
+	font *Font;
 };
 
 class CUserInterface
@@ -158,7 +159,7 @@ class CUserInterface
 	CUIButton *SingleSelectedButton;
 
 	vector<CUIButton> SelectedButtons;
-	CFont *MaxSelectedFont;
+	font *MaxSelectedFont;
 	int MaxSelectedTextX;
 	int MaxSelectedTextY;
 
@@ -185,7 +186,7 @@ class CUserInterface
 	CViewport *MouseViewport;
 	CMapArea MapArea;
 
-	CFont *MessageFont;
+	font *MessageFont;
 	int MessageScrollSpeed;
 
 	CUIButton MenuButton;
@@ -274,13 +275,13 @@ class Widget
 	virtual void setDisabledColor(const Color color);
 	virtual const Color &getDisabledColor() const;
 
-	static void setGlobalFont(CFont *font);
+	static void setGlobalFont(font *fnt);
 	virtual void setForegroundColor(const Color color);
 	virtual void setBackgroundColor(const Color color);
 	virtual void setBaseColor(const Color color);
 	virtual void setSize(int width, int height);
 	virtual void setBorderSize(int width);
-	virtual void setFont(CFont *font);
+	virtual void setFont(font *fnt);
 
 	virtual int getHotKey() const;
 	virtual void setHotKey(const int key);

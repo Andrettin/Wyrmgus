@@ -44,8 +44,10 @@ $#ifdef _MSC_VER
 $#pragma warning(disable:4800)
 $#endif
 
+$using namespace wyrmgus;
+
 $[
-mt = { __index = function(t, key) return CFont:Get(key) end }
+mt = { __index = function(t, key) return font:Get(key) end }
 Fonts = {}
 setmetatable(Fonts, mt)
 

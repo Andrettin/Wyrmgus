@@ -347,7 +347,7 @@ static int CclSetTitleScreens(lua_State *l)
 						if (!strcmp(value, "Text")) {
 							TitleScreens[j]->Labels[k]->Text = LuaToString(l, -1);
 						} else if (!strcmp(value, "Font")) {
-							TitleScreens[j]->Labels[k]->Font = CFont::Get(LuaToString(l, -1));
+							TitleScreens[j]->Labels[k]->Font = wyrmgus::font::get(LuaToString(l, -1));
 						} else if (!strcmp(value, "Pos")) {
 							CclGetPos(l, &TitleScreens[j]->Labels[k]->Xofs, &TitleScreens[j]->Labels[k]->Yofs);
 						} else if (!strcmp(value, "Flags")) {
@@ -559,7 +559,7 @@ static int CclDefinePanelContents(lua_State *l)
 			} else if (!strcmp(key, "Pos")) {
 				CclGetPos(l, &infopanel->PosX, &infopanel->PosY);
 			} else if (!strcmp(key, "DefaultFont")) {
-				infopanel->DefaultFont = CFont::Get(LuaToString(l, -1));
+				infopanel->DefaultFont = wyrmgus::font::get(LuaToString(l, -1));
 			} else if (!strcmp(key, "Condition")) {
 				infopanel->Condition = ParseConditionPanel(l);
 			} else if (!strcmp(key, "Contents")) {
@@ -612,7 +612,7 @@ static int CclDefinePopup(lua_State *l)
 		if (!strcmp(key, "Ident")) {
 			popup->Ident = LuaToString(l, -1);
 		} else if (!strcmp(key, "DefaultFont")) {
-			popup->DefaultFont = CFont::Get(LuaToString(l, -1));
+			popup->DefaultFont = wyrmgus::font::get(LuaToString(l, -1));
 		} else if (!strcmp(key, "BackgroundColor")) {
 			popup->BackgroundColor = LuaToUnsignedNumber(l, -1);
 		} else if (!strcmp(key, "BorderColor")) {
@@ -809,7 +809,7 @@ static int CclDefineButtonStyle(lua_State *l)
 		if (!strcmp(value, "Size")) {
 			CclGetPos(l, &b->Width, &b->Height);
 		} else if (!strcmp(value, "Font")) {
-			b->Font = CFont::Get(LuaToString(l, -1));
+			b->Font = wyrmgus::font::get(LuaToString(l, -1));
 		} else if (!strcmp(value, "TextNormalColor")) {
 			b->TextNormalColor = LuaToString(l, -1);
 		} else if (!strcmp(value, "TextReverseColor")) {

@@ -37,9 +37,6 @@
 #include "video/font_color.h"
 #include "video/video.h"
 
-typedef std::map<std::string, CFont *> FontMap;
-static FontMap Fonts;  /// Font mappings
-
 static wyrmgus::font_color *FontColor;                /// Current font color
 
 static const wyrmgus::font_color *LastTextColor;      /// Last text color
@@ -48,44 +45,17 @@ static wyrmgus::font_color *ReverseTextColor;         /// Reverse text color
 static std::string DefaultNormalColorIndex;  /// Default normal color index
 static std::string DefaultReverseColorIndex; /// Default reverse color index
 
-// FIXME: remove these
-static CFont *SmallFont;  /// Small font used in stats
-static CFont *GameFont;   /// Normal font used in game
-
-CFont &GetSmallFont()
-{
-	if (!SmallFont) {
-		SmallFont = CFont::Get("small");
-	}
-	Assert(SmallFont);
-	return *SmallFont;
-}
-
-bool IsGameFontReady()
-{
-	return GameFont != nullptr || CFont::Get("game") != nullptr;
-}
-
-CFont &GetGameFont()
-{
-	if (!GameFont) {
-		GameFont = CFont::Get("game");
-	}
-	Assert(GameFont);
-	return *GameFont;
-}
-
-
 /*----------------------------------------------------------------------------
 --  Guichan Functions
 ----------------------------------------------------------------------------*/
 
+namespace wyrmgus {
+
 //Wyrmgus start
-// /* virtual */ void CFont::drawString(gcn::Graphics *graphics, const std::string &txt, int x, int y)
-/* virtual */ void CFont::drawString(gcn::Graphics *graphics, const std::string &txt, int x, int y, bool is_normal)
+//void font::drawString(gcn::Graphics *graphics, const std::string &txt, int x, int y)
+void font::drawString(gcn::Graphics *graphics, const std::string &txt, int x, int y, bool is_normal)
 //Wyrmgus end
 {
-	DynamicLoad();
 	const gcn::ClipRectangle &r = graphics->getCurrentClipArea();
 	int right = std::min<int>(r.x + r.width - 1, Video.Width - 1);
 	int bottom = std::min<int>(r.y + r.height - 1, Video.Height - 1);
@@ -97,15 +67,13 @@ CFont &GetGameFont()
 	PushClipping();
 	SetClipping(r.x, r.y, right, bottom);
 	//Wyrmgus start
-//	CLabel(*this).DrawClip(x + r.xOffset, y + r.yOffset, txt);
-	CLabel(*this).DrawClip(x + r.xOffset, y + r.yOffset, txt, is_normal);
+//	CLabel(this).DrawClip(x + r.xOffset, y + r.yOffset, txt);
+	CLabel(this).DrawClip(x + r.xOffset, y + r.yOffset, txt, is_normal);
 	//Wyrmgus end
 	PopClipping();
 }
 
-/*----------------------------------------------------------------------------
---  Functions
-----------------------------------------------------------------------------*/
+}
 
 /**
 **  Draw character with current color.
@@ -254,16 +222,11 @@ static bool GetUTF8(const char text[], const size_t len, size_t &pos, int &utf8)
 	return true;
 }
 
+namespace wyrmgus {
 
-int CFont::Height() const
+int font::Height() const
 {
-	DynamicLoad();
 	return G->Height;
-}
-
-bool CFont::IsLoaded() const
-{
-	return G && G->IsLoaded();
 }
 
 /**
@@ -273,7 +236,7 @@ bool CFont::IsLoaded() const
 **
 **  @return      The width in pixels of the text.
 */
-int CFont::Width(const int number) const
+int font::Width(const int number) const
 {
 	int width = 0;
 #if 0
@@ -284,7 +247,6 @@ int CFont::Width(const int number) const
 	std::string text = FormatNumber(number);
 	const int len = text.length();
 
-	DynamicLoad();
 	while (GetUTF8(text.c_str(), len, pos, utf8)) {
 		width += this->CharWidth[utf8 - 32] + 1;
 	}
@@ -298,14 +260,13 @@ int CFont::Width(const int number) const
 **
 **  @return      The width in pixels of the text.
 */
-int CFont::Width(const std::string &text) const
+int font::Width(const std::string &text) const
 {
 	int width = 0;
 	bool isformat = false;
 	int utf8;
 	size_t pos = 0;
 
-	DynamicLoad();
 	while (GetUTF8(text, pos, utf8)) {
 		if (utf8 == '~') {
 			if (text[pos] == '|') {
@@ -336,6 +297,8 @@ int CFont::Width(const std::string &text) const
 	return width;
 }
 
+}
+
 extern int convertKey(const char *key);
 
 /**
@@ -355,19 +318,20 @@ int GetHotKey(const std::string &text)
 	return hotkey;
 }
 
-CFont::CFont(const std::string &ident)
-	: Ident(ident),
-	CharWidth(nullptr),
-	G(nullptr)
+namespace wyrmgus {
+
+font::font(const std::string &identifier) : data_entry(identifier)
 {
 }
 
-CFont::~CFont()
+font::~font()
 {
-	if (G) {
-		CGraphic::Free(G);
+	if (this->G != nullptr) {
+		CGraphic::Free(this->G);
 	}
 	delete[] CharWidth;
+}
+
 }
 
 /**
@@ -392,9 +356,10 @@ static void VideoDrawCharClip(const CGraphic &g, int gx, int gy, int w, int h,
 	VideoDrawChar(g, gx + ox, gy + oy, w, h, x, y, fc);
 }
 
+namespace wyrmgus {
 
 template<bool CLIP>
-unsigned int CFont::DrawChar(CGraphic &g, int utf8, int x, int y, const wyrmgus::font_color &fc) const
+unsigned int font::DrawChar(CGraphic &g, int utf8, int x, int y, const wyrmgus::font_color &fc) const
 {
 	int c = utf8 - 32;
 	Assert(c >= 0);
@@ -415,7 +380,7 @@ unsigned int CFont::DrawChar(CGraphic &g, int utf8, int x, int y, const wyrmgus:
 	return w + 1;
 }
 
-CGraphic *CFont::GetFontColorGraphic(const wyrmgus::font_color &fontColor) const
+CGraphic *font::GetFontColorGraphic(const wyrmgus::font_color &fontColor) const
 {
 	auto find_iterator = this->font_color_graphics.find(&fontColor);
 
@@ -427,6 +392,8 @@ CGraphic *CFont::GetFontColorGraphic(const wyrmgus::font_color &fontColor) const
 	fprintf(stderr, "Could not load font color %s for font %s\n", fontColor.Ident.c_str(), this->Ident.c_str());
 #endif
 	return this->G;
+}
+
 }
 
 /**
@@ -457,7 +424,6 @@ int CLabel::DoDrawText(int x, int y,
 	size_t pos = 0;
 	const wyrmgus::font_color *backup = fc;
 	bool isColor = false;
-	font->DynamicLoad();
 	//Wyrmgus start
 //	CGraphic *g = font->GetFontColorGraphic(*FontColor);
 	CGraphic *g = font->GetFontColorGraphic(*fc);
@@ -543,16 +509,16 @@ int CLabel::DoDrawText(int x, int y,
 	return widths;
 }
 
-CLabel::CLabel(const CFont &f, const std::string &nc, const std::string &rc) : font(&f)
+CLabel::CLabel(const wyrmgus::font *f, const std::string &nc, const std::string &rc) : font(f)
 {
 	normal = wyrmgus::font_color::get(nc);
 	reverse = wyrmgus::font_color::get(rc);
 }
 
-CLabel::CLabel(const CFont &f) :
-	normal(DefaultTextColor),
+CLabel::CLabel(const wyrmgus::font *f)
+	: normal(DefaultTextColor),
 	reverse(ReverseTextColor),
-	font(&f)
+	font(f)
 {
 }
 
@@ -664,7 +630,7 @@ int CLabel::DrawReverseCentered(int x, int y, const std::string &text) const
 **
 **  @return computed value.
 */
-static int strchrlen(const std::string &s, char c, unsigned int maxlen, const CFont *font)
+static int strchrlen(const std::string &s, char c, unsigned int maxlen, const wyrmgus::font *font)
 {
 	if (s.empty()) {
 		return 0;
@@ -711,7 +677,7 @@ static int strchrlen(const std::string &s, char c, unsigned int maxlen, const CF
 **
 **  @return computed value.
 */
-std::string GetLineFont(unsigned int line, const std::string &s, unsigned int maxlen, const CFont *font)
+std::string GetLineFont(unsigned int line, const std::string &s, unsigned int maxlen, const wyrmgus::font *font)
 {
 	unsigned int res;
 	std::string s1 = s;
@@ -736,11 +702,12 @@ std::string GetLineFont(unsigned int line, const std::string &s, unsigned int ma
 	return s1.substr(0, res);
 }
 
+namespace wyrmgus {
 
 /**
 **  Calculate the width of each character
 */
-void CFont::MeasureWidths()
+void font::MeasureWidths()
 {
 	const QImage image(QString::fromStdString(this->G->get_filepath().string()));
 	const QSize &frame_size = G->get_original_frame_size();
@@ -779,7 +746,7 @@ void CFont::MeasureWidths()
 
 #if defined(USE_OPENGL) || defined(USE_GLES)
 
-void CFont::make_font_color_textures()
+void font::make_font_color_textures()
 {
 	if (!this->font_color_graphics.empty()) {
 		// already loaded
@@ -811,46 +778,30 @@ void CFont::make_font_color_textures()
 }
 #endif
 
-void CFont::Load()
+void font::process_sml_property(const sml_property &property)
 {
-	if (this->IsLoaded()) {
-		return;
-	}
+	const std::string &key = property.get_key();
+	const std::string &value = property.get_value();
 
-	if (this->G) {
-		//ShowLoadProgress("Loading Font \"%s\"", this->G->File.c_str());
-		this->G->Load(false, wyrmgus::defines::get()->get_scale_factor());
-		this->MeasureWidths();
-
-		this->make_font_color_textures();
+	if (key == "file") {
+		this->filepath = database::get_graphics_path(this->get_module()) / value;
+	} else {
+		data_entry::process_sml_property(property);
 	}
 }
 
-void CFont::DynamicLoad() const
+void font::initialize()
 {
-	const_cast<CFont *>(this)->Load();
-	if (this->CharWidth == 0) {
-		const_cast<CFont *>(this)->MeasureWidths();
-	}
-}
+	this->G = CGraphic::New(this->filepath, this->size);
+	this->G->Load(false, wyrmgus::defines::get()->get_scale_factor());
+	this->MeasureWidths();
+	this->make_font_color_textures();
 
-/**
-**  Load all fonts.
-*/
-void LoadFonts()
-{
-	for (FontMap::iterator it = Fonts.begin(); it != Fonts.end(); ++it) {
-		CFont &font = *it->second;
-		font.Load();
-	}
-
-	// TODO: remove this
-	SmallFont = CFont::Get("small");
-	GameFont = CFont::Get("game");
+	data_entry::initialize();
 }
 
 #if defined(USE_OPENGL) || defined(USE_GLES)
-void CFont::FreeOpenGL()
+void font::FreeOpenGL()
 {
 	if (this->G) {
 		for (const auto &kv_pair : this->font_color_graphics) {
@@ -864,100 +815,30 @@ void CFont::FreeOpenGL()
 	}
 }
 
-void FreeOpenGLFonts()
+void font::Reload()
 {
-	for (FontMap::iterator it = Fonts.begin(); it != Fonts.end(); ++it) {
-		CFont &font = *it->second;
-
-		font.FreeOpenGL();
-	}
-}
-#endif
-
-void CFont::Reload()
-{
-	if (this->G) {
+	if (this->G != nullptr) {
 		this->font_color_graphics.clear();
-
 		this->make_font_color_textures();
 	}
 }
 
+}
+
+void FreeOpenGLFonts()
+{
+	for (wyrmgus::font *font : wyrmgus::font::get_all()) {
+		font->FreeOpenGL();
+	}
+}
+#endif
 
 /**
 **  Reload OpenGL fonts
 */
 void ReloadFonts()
 {
-	for (FontMap::iterator it = Fonts.begin(); it != Fonts.end(); ++it) {
-		CFont &font = *it->second;
-
-		font.Reload();
+	for (wyrmgus::font *font : wyrmgus::font::get_all()) {
+		font->Reload();
 	}
-}
-
-/**
-**  Create a new font
-**
-**  @param ident  Font identifier
-**  @param g      Graphic
-**
-**  @return       New font
-*/
-/* static */ CFont *CFont::New(const std::string &ident, CGraphic *g)
-{
-	CFont *&font = Fonts[ident];
-	if (font) {
-		if (font->G != g) {
-			CGraphic::Free(font->G);
-		}
-	} else {
-		font = new CFont(ident);
-	}
-	font->G = g;
-	return font;
-}
-
-/**
-**  Get a font
-**
-**  @param ident  Font identifier
-**
-**  @return       The font
-*/
-/* static */ CFont *CFont::Get(const std::string &ident)
-{
-	std::map<std::string, CFont *>::iterator it = Fonts.find(ident);
-	if (it == Fonts.end()) {
-		DebugPrint("font not found: %s\n" _C_ ident.c_str());
-		return nullptr;
-	}
-	CFont *font = it->second;
-	if (font == nullptr) {
-		DebugPrint("font not found: %s\n" _C_ ident.c_str());
-		return nullptr;
-	}
-	return font;
-}
-
-void CFont::Clean()
-{
-	this->font_color_graphics.clear();
-}
-
-/**
-**  Clean up the font module.
-*/
-void CleanFonts()
-{
-	for (FontMap::iterator it = Fonts.begin(); it != Fonts.end(); ++it) {
-		CFont *font = it->second;
-
-		font->Clean();
-		delete font;
-	}
-	Fonts.clear();
-
-	SmallFont = nullptr;
-	GameFont = nullptr;
 }

@@ -493,7 +493,7 @@ static void DrawUnitInfo_Training(const CUnit &unit)
 {
 	if (unit.Orders.size() == 1 || unit.Orders[1]->Action != UnitAction::Train) {
 		if (!UI.SingleTrainingText.empty()) {
-			CLabel label(*UI.SingleTrainingFont);
+			CLabel label(UI.SingleTrainingFont);
 			label.Draw(UI.SingleTrainingTextX, UI.SingleTrainingTextY, UI.SingleTrainingText);
 		}
 		if (UI.SingleTrainingButton) {
@@ -516,7 +516,7 @@ static void DrawUnitInfo_Training(const CUnit &unit)
 		}
 	} else {
 		if (!UI.TrainingText.empty()) {
-			CLabel label(*UI.TrainingFont);
+			CLabel label(UI.TrainingFont);
 			label.Draw(UI.TrainingTextX, UI.TrainingTextY, UI.TrainingText);
 		}
 		if (!UI.TrainingButtons.empty()) {
@@ -558,10 +558,10 @@ static void DrawUnitInfo_Training(const CUnit &unit)
 					std::string oldnc;
 					std::string oldrc;
 					GetDefaultTextColors(oldnc, oldrc);
-					CLabel label(GetGameFont(), oldnc, oldrc);
+					CLabel label(wyrmgus::defines::get()->get_game_font(), oldnc, oldrc);
 
 					const PixelPos pos(UI.TrainingButtons[i].X, UI.TrainingButtons[i].Y);
-					label.Draw(pos.x + 46 * wyrmgus::defines::get()->get_scale_factor() - GetGameFont().Width(number_string), pos.y + 0, number_string);
+					label.Draw(pos.x + 46 * wyrmgus::defines::get()->get_scale_factor() - wyrmgus::defines::get()->get_game_font()->Width(number_string), pos.y + 0, number_string);
 				}
 			}
 		}
@@ -790,7 +790,7 @@ static void DrawUnitInfo(CUnit &unit)
 */
 void DrawResources()
 {
-	CLabel label(GetGameFont());
+	CLabel label(wyrmgus::defines::get()->get_game_font());
 
 	// Draw all icons of resource.
 	for (int i = 0; i <= FreeWorkersCount; ++i) {
@@ -809,14 +809,14 @@ void DrawResources()
 				snprintf(tmp, sizeof(tmp), "%d (%d)", resAmount, CPlayer::GetThisPlayer()->MaxResources[i] - CPlayer::GetThisPlayer()->StoredResources[i]);
 				
 				UI.Resources[i].Text = tmp;
-				UI.Resources[i].Font = &GetSmallFont();
-				label.SetFont(*UI.Resources[i].Font);
+				UI.Resources[i].Font = wyrmgus::defines::get()->get_small_font();
+				label.SetFont(UI.Resources[i].Font);
 
 				label.Draw(UI.Resources[i].TextX, UI.Resources[i].TextY + 3 * wyrmgus::defines::get()->get_scale_factor(), tmp);
 			} else {
 				UI.Resources[i].Text = FormatNumber(resourceAmount);
-				UI.Resources[i].Font = resourceAmount > 99999 ? &GetSmallFont() : &GetGameFont();
-				label.SetFont(*UI.Resources[i].Font);
+				UI.Resources[i].Font = resourceAmount > 99999 ? wyrmgus::defines::get()->get_small_font() : wyrmgus::defines::get()->get_game_font();
+				label.SetFont(UI.Resources[i].Font);
 
 				label.Draw(UI.Resources[i].TextX, UI.Resources[i].TextY + (resourceAmount > 99999) * 3, UI.Resources[i].Text);
 			}
@@ -826,8 +826,8 @@ void DrawResources()
 		char tmp[256];
 		snprintf(tmp, sizeof(tmp), "%d/%d", CPlayer::GetThisPlayer()->Demand, CPlayer::GetThisPlayer()->Supply);
 		UI.Resources[FoodCost].Text = tmp;
-		UI.Resources[FoodCost].Font = &GetGameFont();
-		label.SetFont(*UI.Resources[FoodCost].Font);
+		UI.Resources[FoodCost].Font = wyrmgus::defines::get()->get_game_font();
+		label.SetFont(UI.Resources[FoodCost].Font);
 		if (CPlayer::GetThisPlayer()->Supply < CPlayer::GetThisPlayer()->Demand) {
 			label.DrawReverse(UI.Resources[FoodCost].TextX, UI.Resources[FoodCost].TextY, UI.Resources[FoodCost].Text);
 		} else {
@@ -838,15 +838,15 @@ void DrawResources()
 		const int score = CPlayer::GetThisPlayer()->Score;
 
 		UI.Resources[ScoreCost].Text = FormatNumber(score);
-		UI.Resources[ScoreCost].Font = score > 99999 ? &GetSmallFont() : &GetGameFont();
+		UI.Resources[ScoreCost].Font = score > 99999 ? wyrmgus::defines::get()->get_small_font() : wyrmgus::defines::get()->get_game_font();
 		
-		label.SetFont(*UI.Resources[ScoreCost].Font);
+		label.SetFont(UI.Resources[ScoreCost].Font);
 		label.Draw(UI.Resources[ScoreCost].TextX, UI.Resources[ScoreCost].TextY + (score > 99999) * 3, UI.Resources[ScoreCost].Text);
 	}
 	if (UI.Resources[FreeWorkersCount].TextX != -1) {
 		const int workers = CPlayer::GetThisPlayer()->FreeWorkers.size();
 
-		label.SetFont(GetGameFont());
+		label.SetFont(wyrmgus::defines::get()->get_game_font());
 		label.Draw(UI.Resources[FreeWorkersCount].TextX, UI.Resources[FreeWorkersCount].TextY, workers);
 	}
 }
@@ -891,7 +891,7 @@ void DrawTime()
 		if (UI.DatePanel.TextX != -1) {
 			std::string date_string = CDate(wyrmgus::game::get()->get_current_date()).ToDisplayString(calendar, true);
 
-			CLabel label(GetGameFont());
+			CLabel label(wyrmgus::defines::get()->get_game_font());
 			label.Draw(UI.DatePanel.TextX, UI.DatePanel.TextY, date_string);
 		}
 	}
@@ -907,9 +907,9 @@ void DrawAge()
 	}
 	
 	if (UI.AgePanel.TextX != -1 && !UI.AgePanel.Text.empty()) {
-		UI.AgePanel.Font = &GetGameFont();
+		UI.AgePanel.Font = wyrmgus::defines::get()->get_game_font();
 		
-		CLabel label(*UI.AgePanel.Font);
+		CLabel label(UI.AgePanel.Font);
 		label.Draw(UI.AgePanel.TextX, UI.AgePanel.TextY, UI.AgePanel.Text);
 	}
 }
@@ -1337,7 +1337,7 @@ void MessagesDisplay::UpdateMessages()
 void MessagesDisplay::DrawMessages()
 {
 	if (show && Preference.ShowMessages) {
-		CLabel label(*UI.MessageFont);
+		CLabel label(UI.MessageFont);
 			const int scale_factor = wyrmgus::defines::get()->get_scale_factor();
 			// background so the text is easier to read
 			if (MessagesCount) {
@@ -1836,7 +1836,7 @@ static void InfoPanel_draw_no_selection()
 		int x = UI.InfoPanel.X + 16 * scale_factor;
 		int y = UI.InfoPanel.Y + 8 * scale_factor;
 
-		CLabel label(GetGameFont());
+		CLabel label(wyrmgus::defines::get()->get_game_font());
 		label.Draw(x, y, NAME);
 		y += 16 * scale_factor;
 		label.Draw(x, y,  _("Cycle:"));
@@ -1986,7 +1986,7 @@ static void InfoPanel_draw_multiple_selection()
 
 	if (Selected.size() > UI.SelectedButtons.size()) {
 		const std::string number_str = "+" + std::to_string(Selected.size() - UI.SelectedButtons.size());
-		CLabel(*UI.MaxSelectedFont).Draw(UI.MaxSelectedTextX, UI.MaxSelectedTextY, number_str.c_str());
+		CLabel(UI.MaxSelectedFont).Draw(UI.MaxSelectedTextX, UI.MaxSelectedTextY, number_str.c_str());
 	}
 }
 

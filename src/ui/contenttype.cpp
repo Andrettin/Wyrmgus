@@ -66,14 +66,14 @@ extern UStrInt GetComponent(const wyrmgus::unit_type &type, int index, EnumVaria
 **  @param unit         unit with variable to show.
 **  @param defaultfont  default font if no specific font in extra data.
 */
-/* virtual */ void CContentTypeText::Draw(const CUnit &unit, CFont *defaultfont) const
+/* virtual */ void CContentTypeText::Draw(const CUnit &unit, const wyrmgus::font *defaultfont) const
 {
 	std::string text;       // Optional text to display.
 	int x = this->Pos.x;
 	int y = this->Pos.y;
-	CFont &font = this->Font ? *this->Font : *defaultfont;
+	const wyrmgus::font *font = this->Font ? this->Font : defaultfont;
 
-	Assert(&font);
+	Assert(font);
 	Assert(this->Index == -1 || ((unsigned int) this->Index < UnitTypeVar.GetNumberVariable()));
 
 	//Wyrmgus start
@@ -85,7 +85,7 @@ extern UStrInt GetComponent(const wyrmgus::unit_type &type, int index, EnumVaria
 		text = EvalString(this->Text);
 		std::string::size_type pos;
 		if ((pos = text.find("~|")) != std::string::npos) {
-			x += (label.Draw(x - font.getWidth(text.substr(0, pos)), y, text) - font.getWidth(text.substr(0, pos)));
+			x += (label.Draw(x - font->getWidth(text.substr(0, pos)), y, text) - font->getWidth(text.substr(0, pos)));
 		} else if (this->Centered) {
 			x += (label.DrawCentered(x, y, text) * 2);
 		} else {
@@ -143,13 +143,13 @@ extern UStrInt GetComponent(const wyrmgus::unit_type &type, int index, EnumVaria
 **  @note text must have exactly 1 %d.
 **  @bug if text format is incorrect.
 */
-/* virtual */ void CContentTypeFormattedText::Draw(const CUnit &unit, CFont *defaultfont) const
+/* virtual */ void CContentTypeFormattedText::Draw(const CUnit &unit, const wyrmgus::font *defaultfont) const
 {
 	char buf[256];
 	UStrInt usi1;
 
-	CFont &font = this->Font ? *this->Font : *defaultfont;
-	Assert(&font);
+	const wyrmgus::font *font = this->Font ? this->Font : defaultfont;
+	Assert(font);
 
 	//Wyrmgus start
 //	CLabel label(font);
@@ -167,7 +167,7 @@ extern UStrInt GetComponent(const wyrmgus::unit_type &type, int index, EnumVaria
 	char *pos;
 	if ((pos = strstr(buf, "~|")) != nullptr) {
 		std::string buf2(buf);
-		label.Draw(this->Pos.x - font.getWidth(buf2.substr(0, pos - buf)), this->Pos.y, buf);
+		label.Draw(this->Pos.x - font->getWidth(buf2.substr(0, pos - buf)), this->Pos.y, buf);
 	} else if (this->Centered) {
 		label.DrawCentered(this->Pos.x, this->Pos.y, buf);
 	} else {
@@ -185,13 +185,13 @@ extern UStrInt GetComponent(const wyrmgus::unit_type &type, int index, EnumVaria
 **  @note text must have exactly 2 %d.
 **  @bug if text format is incorrect.
 */
-/* virtual */ void CContentTypeFormattedText2::Draw(const CUnit &unit, CFont *defaultfont) const
+/* virtual */ void CContentTypeFormattedText2::Draw(const CUnit &unit, const wyrmgus::font *defaultfont) const
 {
 	char buf[256];
 	UStrInt usi1, usi2;
 
-	CFont &font = this->Font ? *this->Font : *defaultfont;
-	Assert(&font);
+	const wyrmgus::font *font = this->Font ? this->Font : defaultfont;
+	Assert(font);
 	//Wyrmgus start
 //	CLabel label(font);
 	CLabel label(font, this->TextColor, this->HighlightColor);
@@ -215,7 +215,7 @@ extern UStrInt GetComponent(const wyrmgus::unit_type &type, int index, EnumVaria
 	char *pos;
 	if ((pos = strstr(buf, "~|")) != nullptr) {
 		std::string buf2(buf);
-		label.Draw(this->Pos.x - font.getWidth(buf2.substr(0, pos - buf)), this->Pos.y, buf);
+		label.Draw(this->Pos.x - font->getWidth(buf2.substr(0, pos - buf)), this->Pos.y, buf);
 	} else if (this->Centered) {
 		label.DrawCentered(this->Pos.x, this->Pos.y, buf);
 	} else {
@@ -266,7 +266,7 @@ static const CUnit *GetUnitRef(const CUnit &unit, EnumUnit e)
 **  @param unit         unit with icon to show.
 **  @param defaultfont  unused.
 */
-/* virtual */ void CContentTypeIcon::Draw(const CUnit &unit, CFont *) const
+/* virtual */ void CContentTypeIcon::Draw(const CUnit &unit, const wyrmgus::font *) const
 {
 	const CUnit *unitToDraw = GetUnitRef(unit, this->UnitRef);
 
@@ -285,7 +285,7 @@ static const CUnit *GetUnitRef(const CUnit &unit, EnumUnit e)
 **
 **  @todo Color and percent value Parametrisation.
 */
-/* virtual */ void CContentTypeLifeBar::Draw(const CUnit &unit, CFont *) const
+/* virtual */ void CContentTypeLifeBar::Draw(const CUnit &unit, const wyrmgus::font *) const
 {
 	Assert((unsigned int) this->Index < UnitTypeVar.GetNumberVariable());
 	//Wyrmgus start
@@ -400,7 +400,7 @@ static const CUnit *GetUnitRef(const CUnit &unit, EnumUnit e)
 **
 **  @todo Color and percent value Parametrisation.
 */
-/* virtual */ void CContentTypeCompleteBar::Draw(const CUnit &unit, CFont *) const
+/* virtual */ void CContentTypeCompleteBar::Draw(const CUnit &unit, const wyrmgus::font *) const
 {
 	Assert((unsigned int) this->varIndex < UnitTypeVar.GetNumberVariable());
 	//Wyrmgus start
@@ -465,7 +465,7 @@ static const CUnit *GetUnitRef(const CUnit &unit, EnumUnit e)
 				this->Text = CclParseStringDesc(l);
 				lua_pushnil(l); // ParseStringDesc eat token
 			} else if (!strcmp(key, "Font")) {
-				this->Font = CFont::Get(LuaToString(l, -1));
+				this->Font = wyrmgus::font::get(LuaToString(l, -1));
 			} else if (!strcmp(key, "Centered")) {
 				this->Centered = LuaToBoolean(l, -1);
 			} else if (!strcmp(key, "Variable")) {
@@ -496,7 +496,7 @@ static const CUnit *GetUnitRef(const CUnit &unit, EnumUnit e)
 		if (!strcmp(key, "Format")) {
 			this->Format = LuaToString(l, -1);
 		} else if (!strcmp(key, "Font")) {
-			this->Font = CFont::Get(LuaToString(l, -1));
+			this->Font = wyrmgus::font::get(LuaToString(l, -1));
 		} else if (!strcmp(key, "Variable")) {
 			const char *const name = LuaToString(l, -1);
 			this->Index = UnitTypeVar.VariableNameLookup[name];
@@ -521,7 +521,7 @@ static const CUnit *GetUnitRef(const CUnit &unit, EnumUnit e)
 		if (!strcmp(key, "Format")) {
 			this->Format = LuaToString(l, -1);
 		} else if (!strcmp(key, "Font")) {
-			this->Font = CFont::Get(LuaToString(l, -1));
+			this->Font = wyrmgus::font::get(LuaToString(l, -1));
 		} else if (!strcmp(key, "Variable")) {
 			const char *const name = LuaToString(l, -1);
 			this->Index1 = UnitTypeVar.VariableNameLookup[name];

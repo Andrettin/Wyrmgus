@@ -1019,7 +1019,7 @@ void Missile::DrawMissile(const CViewport &vp) const
 
 	switch (this->Type->get_missile_class()) {
 		case wyrmgus::missile_class::hit:
-			CLabel(GetGameFont()).DrawClip(screenPixelPos.x, screenPixelPos.y, this->Damage);
+			CLabel(wyrmgus::defines::get()->get_game_font()).DrawClip(screenPixelPos.x, screenPixelPos.y, this->Damage);
 			break;
 		default:
 			if (Type->G) {

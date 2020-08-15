@@ -61,6 +61,7 @@ namespace wyrmgus {
 	class button_level;
 	class condition;
 	class faction;
+	class font;
 	class missile_type;
 	class plane;
 	class player_color;
@@ -408,7 +409,6 @@ enum {
 };
 
 class CUnit;
-class CFont;
 
 /**
 **  Decoration for user defined variable.
@@ -479,11 +479,10 @@ public:
 class CDecoVarText : public CDecoVar
 {
 public:
-	CDecoVarText() : Font(nullptr) {};
 	/// function to draw the decorations.
-	virtual void Draw(int x, int y, const wyrmgus::unit_type &type, const wyrmgus::unit_variable &var) const;
+	virtual void Draw(int x, int y, const wyrmgus::unit_type &type, const wyrmgus::unit_variable &var) const override;
 
-	CFont *Font;  /// Font to use to display value.
+	const wyrmgus::font *Font = nullptr;  /// Font to use to display value.
 	// FIXME : Add Color, format
 };
 

@@ -99,7 +99,6 @@ void CleanModules()
 	CleanMessages();
 
 	CleanUserInterface();
-	CleanFonts();
 	FreeAi();
 	PlayerRaces.Clean();
 	CAchievement::ClearAchievements();
@@ -176,7 +175,6 @@ void InitModules()
 */
 void LoadModules()
 {
-	LoadFonts();
 	UI.Load();
 	//Wyrmgus start
 	wyrmgus::terrain_type::LoadTerrainTypeGraphics();
@@ -245,7 +243,6 @@ void LoadGame(const std::string &filename)
 //	SetDefaultTextColors(FontYellow, FontWhite);
 	SetDefaultTextColors(UI.NormalFontColor, UI.ReverseFontColor);
 	//Wyrmgus end
-	LoadFonts();
 	
 	//Wyrmgus start
 	InitPlayers();

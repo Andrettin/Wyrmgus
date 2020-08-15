@@ -500,12 +500,12 @@ void CDecoVarBar::Draw(int x, int y,
 void CDecoVarText::Draw(int x, int y, const wyrmgus::unit_type &/*type*/, const wyrmgus::unit_variable &var) const
 {
 	if (this->IsCenteredInX) {
-		x -= 2; // GetGameFont()->Width(buf) / 2, with buf = str(Value)
+		x -= 2; // wyrmgus::defines::get()->get_game_font()->Width(buf) / 2, with buf = str(Value)
 	}
 	if (this->IsCenteredInY) {
 		y -= this->Font->Height() / 2;
 	}
-	CLabel(*this->Font).DrawClip(x, y, var.Value);
+	CLabel(this->Font).DrawClip(x, y, var.Value);
 }
 
 /**
@@ -587,7 +587,7 @@ static void DrawDecoration(const CUnit &unit, const wyrmgus::unit_type &type, co
 	int y = screenPos.y;
 #ifdef DEBUG
 	// Show the number of references.
-	CLabel(GetGameFont()).DrawClip(x + 1, y + 1, unit.Refs);
+	CLabel(wyrmgus::defines::get()->get_game_font()).DrawClip(x + 1, y + 1, unit.Refs);
 #endif
 
 	UpdateUnitVariables(const_cast<CUnit &>(unit));
@@ -640,11 +640,11 @@ static void DrawDecoration(const CUnit &unit, const wyrmgus::unit_type &type, co
 			for (groupId = 0; !(unit.GroupId & (1 << groupId)); ++groupId) {
 			}
 		}
-		const int width = GetGameFont().Width(groupId);
+		const int width = wyrmgus::defines::get()->get_game_font()->Width(groupId);
 		x += (unit.Type->get_tile_width() * wyrmgus::defines::get()->get_scaled_tile_width() + unit.Type->get_box_width() * wyrmgus::defines::get()->get_scale_factor()) / 2 - width;
-		const int height = GetGameFont().Height();
+		const int height = wyrmgus::defines::get()->get_game_font()->Height();
 		y += (unit.Type->get_tile_height() * wyrmgus::defines::get()->get_scaled_tile_height() + unit.Type->get_box_height() * wyrmgus::defines::get()->get_scale_factor()) / 2 - height;
-		CLabel(GetGameFont()).DrawClip(x, y, groupId);
+		CLabel(wyrmgus::defines::get()->get_game_font()).DrawClip(x, y, groupId);
 	}
 }
 

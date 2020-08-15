@@ -36,15 +36,11 @@
 #include "unit/unit_type_type.h"
 #include "vec2i.h"
 
-/*----------------------------------------------------------------------------
---  Declarations
-----------------------------------------------------------------------------*/
-
-class CFont;
 class CPopup;
 
 namespace wyrmgus {
 	class button;
+	class font;
 	class unit_class;
 	class upgrade_class;
 }
@@ -188,7 +184,7 @@ public:
 private:
 	int InfoType;                /// Type of information to show.
 	unsigned int MaxWidth;       /// Maximum width of multilined information.
-	CFont *Font;                 /// Font to use.
+	const wyrmgus::font *Font;                 /// Font to use.
 };
 
 class CPopupContentTypeText : public CPopupContentType
@@ -219,7 +215,7 @@ private:
 	StringDesc *Text;            /// Text to display.
 	//Wyrmgus end
 	unsigned int MaxWidth;       /// Maximum width of multilined text.
-	CFont *Font;                 /// Font to use.
+	const wyrmgus::font *Font;                 /// Font to use.
 };
 
 class CPopupContentTypeCosts : public CPopupContentType
@@ -236,7 +232,7 @@ public:
 	virtual void Parse(lua_State *l);
 
 private:
-	CFont *Font;                 /// Font to use.
+	const wyrmgus::font *Font;                 /// Font to use.
 	char Centered;               /// if true, center the display.
 };
 
@@ -278,7 +274,7 @@ public:
 
 private:
 	StringDesc *Text;            /// Text to display.
-	CFont *Font;                 /// Font to use.
+	const wyrmgus::font *Font;                 /// Font to use.
 	char Centered;               /// if true, center the display.
 	int Index;                   /// Index of the variable to show, -1 if not.
 };
@@ -295,7 +291,7 @@ public:
 	int MarginY;                               /// Upper and lower margin height.
 	int MinWidth;                              /// Minimal width covered by popup.
 	int MinHeight;                             /// Minimal height covered by popup.
-	CFont *DefaultFont;                        /// Default font for content.
+	const wyrmgus::font *DefaultFont;          /// Default font for content.
 	IntColor BackgroundColor;                  /// Color used for popup's background.
 	IntColor BorderColor;                      /// Color used for popup's borders.
 };

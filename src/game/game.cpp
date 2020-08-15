@@ -45,6 +45,7 @@
 #include "civilization.h"
 #include "commands.h"
 #include "construct.h"
+#include "database/defines.h"
 #include "diplomacy_state.h"
 #include "editor.h"
 #include "faction.h"
@@ -1410,7 +1411,7 @@ static CGraphic *loadingEmpty = nullptr;
 static CGraphic *loadingFull = nullptr;
 static std::vector<std::string> loadingBackgrounds;
 CGraphic *loadingBackground = nullptr;
-static CFont *loadingFont = nullptr;
+static wyrmgus::font *loadingFont = nullptr;
 static std::vector<std::string> loadingTips;
 static std::vector<std::string> loadingTip;
 
@@ -1494,7 +1495,7 @@ void CalculateItemsToLoad()
 		std::string base_loadingTip = _(loadingTips[rand()%loadingTips.size()].c_str());
 		
 		int str_width_per_total_width = 1;
-		str_width_per_total_width += GetGameFont().Width(base_loadingTip) / Video.Width;
+		str_width_per_total_width += wyrmgus::defines::get()->get_game_font()->Width(base_loadingTip) / Video.Width;
 		
 	//	int line_length = Video.Width / GetGameFont().Width(1);
 		int line_length = base_loadingTip.size() / str_width_per_total_width;
@@ -1535,13 +1536,13 @@ void UpdateLoadingBar()
 	}
 
 	if (loadingFont == nullptr) {
-		loadingFont = CFont::Get("game");
+		loadingFont = wyrmgus::font::get("game");
 	}
 
 	if (loadingFont != nullptr) {
-		CLabel label(*loadingFont);
+		CLabel label(loadingFont);
 		for (size_t i = 0; i < loadingTip.size(); ++i) {
-			label.DrawCentered(Video.Width/2, y + 10 + (GetGameFont().Height() * i), loadingTip[i]);
+			label.DrawCentered(Video.Width/2, y + 10 + (wyrmgus::defines::get()->get_game_font()->Height() * i), loadingTip[i]);
 		}
 	}
 }

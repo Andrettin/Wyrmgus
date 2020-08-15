@@ -390,9 +390,9 @@ void CViewport::DrawMapBackgroundInViewport() const
 */
 static void ShowUnitName(const CViewport &vp, PixelPos pos, CUnit *unit, bool hidden = false)
 {
-	CFont &font = GetSmallFont();
+	const wyrmgus::font *font = wyrmgus::defines::get()->get_small_font();
 	int width;
-	int height = font.Height() + 6;
+	int height = font->Height() + 6;
 	CLabel label(font, "white", "red");
 	int x;
 	int y = std::min<int>(GameCursor->get_graphic()->Height + pos.y + 10, vp.BottomRightPos.y - 1 - height);
@@ -410,8 +410,8 @@ static void ShowUnitName(const CViewport &vp, PixelPos pos, CUnit *unit, bool hi
 			backgroundColor = Video.MapRGB(TheScreen->format, 176, 176, 176);
 		}
 		//Wyrmgus start
-//		width = font.getWidth(unit->Type->Name) + 10;
-		width = font.getWidth(unit->GetTypeName()) + 10;
+//		width = font->getWidth(unit->Type->Name) + 10;
+		width = font->getWidth(unit->GetTypeName()) + 10;
 		//Wyrmgus end
 		x = std::min<int>(GameCursor->get_graphic()->Width + pos.x, vp.BottomRightPos.x - 1 - width);
 		Video.FillTransRectangle(backgroundColor, x, y, width, height, 128);
@@ -422,7 +422,7 @@ static void ShowUnitName(const CViewport &vp, PixelPos pos, CUnit *unit, bool hi
 		//Wyrmgus end
 	} else if (hidden) {
 		const std::string str("Unrevealed terrain");
-		width = font.getWidth(str) + 10;
+		width = font->getWidth(str) + 10;
 		x = std::min<int>(GameCursor->get_graphic()->Width + pos.x, vp.BottomRightPos.x - 1 - width);
 		Video.FillTransRectangle(ColorBlue, x, y, width, height, 128);
 		Video.DrawRectangle(ColorWhite, x, y, width, height);

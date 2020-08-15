@@ -28,51 +28,57 @@
 #pragma once
 
 #include "color.h"
+#include "database/data_entry.h"
+#include "database/data_type.h"
 #include "guichan/font.h"
 
 class CGraphic;
 
 namespace wyrmgus {
-	class font_color;
-}
 
-/// Font definition
-class CFont : public gcn::Font
+class font_color;
+
+class font final : public data_entry, public gcn::Font, public data_type<font>
 {
-private:
-	explicit CFont(const std::string &ident);
+	Q_OBJECT
+
+	Q_PROPERTY(QSize size MEMBER size)
 
 public:
-	virtual ~CFont();
+	static constexpr const char *class_identifier = "font";
+	static constexpr const char *database_folder = "fonts";
 
-	static CFont *New(const std::string &ident, CGraphic *g);
-	static CFont *Get(const std::string &ident);
+	explicit font(const std::string &ident);
+	virtual ~font();
+
+	virtual void process_sml_property(const sml_property &property) override;
+	virtual void initialize() override;
+
+	static font *Get(const std::string &identifier)
+	{
+		return font::get(identifier);
+	}
 
 	int Height() const;
 	int Width(const std::string &text) const;
 	int Width(const int number) const;
-	bool IsLoaded() const;
 
-	virtual int getHeight() const { return Height(); }
-	virtual int getWidth(const std::string &text) const { return Width(text); }
+	virtual int getHeight() const override { return Height(); }
+	virtual int getWidth(const std::string &text) const override { return Width(text); }
 	//Wyrmgus start
 //	virtual void drawString(gcn::Graphics *graphics, const std::string &text, int x, int y);
-	virtual void drawString(gcn::Graphics *graphics, const std::string &text, int x, int y, bool is_normal = true);
+	virtual void drawString(gcn::Graphics *graphics, const std::string &text, int x, int y, bool is_normal = true) override;
 	//Wyrmgus end
 
-	void Load();
 	void Reload();
 #if defined(USE_OPENGL) || defined(USE_GLES)
 	void FreeOpenGL();
 #endif
-	void Clean();
 
 	CGraphic *GetFontColorGraphic(const wyrmgus::font_color &fontColor) const;
 
 	template<bool CLIP>
 	unsigned int DrawChar(CGraphic &g, int utf8, int x, int y, const wyrmgus::font_color &fc) const;
-
-	void DynamicLoad() const;
 
 private:
 #if defined(USE_OPENGL) || defined(USE_GLES)
@@ -81,32 +87,24 @@ private:
 	void MeasureWidths();
 
 private:
-	std::string Ident;    /// Ident of the font.
-	char *CharWidth;      /// Real font width (starting with ' ')
-	CGraphic *G;          /// Graphic object used to draw
+	std::filesystem::path filepath;
+	QSize size;
+	char *CharWidth = nullptr; /// Real font width (starting with ' ')
+	CGraphic *G = nullptr; /// Graphic object used to draw
 	std::map<const wyrmgus::font_color *, std::unique_ptr<CGraphic>> font_color_graphics;
 };
 
-/**
-**  Font selector for the font functions.
-**  FIXME: should be moved to lua
-*/
-extern CFont &GetSmallFont();  /// Small font used in stats
-extern CFont &GetGameFont();   /// Normal font used in game
-extern bool IsGameFontReady(); /// true when GameFont is provided
+}
 
 /// Set the default text colors for normal and reverse text
 extern void SetDefaultTextColors(const std::string &normal, const std::string &reverse);
 /// Get the default text colors for normal and reverse text
 extern void GetDefaultTextColors(std::string &normalp, std::string &reversep);
 ///  Return the 'line' line of the string 's'.
-extern std::string GetLineFont(unsigned int line, const std::string &s, unsigned int maxlen, const CFont *font);
+extern std::string GetLineFont(unsigned int line, const std::string &s, unsigned int maxlen, const wyrmgus::font *font);
 
 /// Get the hot key from a string
 extern int GetHotKey(const std::string &text);
-
-/// Load and initialize the fonts
-extern void LoadFonts();
 
 #if defined(USE_OPENGL) || defined(USE_GLES)
 /// Free OpenGL fonts
@@ -115,18 +113,15 @@ extern void FreeOpenGLFonts();
 extern void ReloadFonts();
 #endif
 
-/// Cleanup the font module
-extern void CleanFonts();
-
 class CLabel
 {
 public:
-	explicit CLabel(const CFont &f, const std::string &nc, const std::string &rc);
-	explicit CLabel(const CFont &f);
+	explicit CLabel(const wyrmgus::font *f, const std::string &nc, const std::string &rc);
+	explicit CLabel(const wyrmgus::font *f);
 
 	int Height() const { return font->Height(); }
 
-	void SetFont(const CFont &f) { font = &f; }
+	void SetFont(const wyrmgus::font *f) { font = f; }
 
 	void SetNormalColor(const std::string &nc);
 
@@ -159,5 +154,5 @@ private:
 private:
 	const wyrmgus::font_color *normal;
 	const wyrmgus::font_color *reverse;
-	const CFont *font;
+	const wyrmgus::font *font;
 };

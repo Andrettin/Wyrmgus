@@ -33,8 +33,11 @@
 #include "vec2i.h"
 
 class CUnit;
-class CFont;
 class ConditionPanel;
+
+namespace wyrmgus {
+	class font;
+}
 
 /**
 **  Infos to display the contents of panel.
@@ -46,7 +49,7 @@ public:
 	virtual ~CContentType();
 
 	/// Tell how show the variable Index.
-	virtual void Draw(const CUnit &unit, CFont *defaultfont) const = 0;
+	virtual void Draw(const CUnit &unit, const wyrmgus::font *defaultfont) const = 0;
 
 	virtual void Parse(lua_State *l) = 0;
 
@@ -65,7 +68,7 @@ public:
 class CContentTypeText : public CContentType
 {
 public:
-	CContentTypeText() : Text(nullptr), Font(nullptr), Centered(0), Index(-1),
+	CContentTypeText() : Text(nullptr), Centered(0), Index(-1),
 		Component(VariableValue), ShowName(0), Stat(0) {}
 	virtual ~CContentTypeText()
 	{
@@ -73,12 +76,12 @@ public:
 		delete Text;
 	}
 
-	virtual void Draw(const CUnit &unit, CFont *defaultfont) const;
-	virtual void Parse(lua_State *l);
+	virtual void Draw(const CUnit &unit, const wyrmgus::font *defaultfont) const override;
+	virtual void Parse(lua_State *l) override;
 
 private:
 	StringDesc *Text;            /// Text to display.
-	CFont *Font;                 /// Font to use.
+	const wyrmgus::font *Font = nullptr; /// Font to use.
 	char Centered;               /// if true, center the display.
 	int Index;                   /// Index of the variable to show, -1 if not.
 	EnumVariable Component;      /// Component of the variable.
@@ -92,16 +95,16 @@ private:
 class CContentTypeFormattedText : public CContentType
 {
 public:
-	CContentTypeFormattedText() : Font(nullptr), Centered(false),
+	CContentTypeFormattedText() : Centered(false),
 		Index(-1), Component(VariableValue) {}
 	virtual ~CContentTypeFormattedText() {}
 
-	virtual void Draw(const CUnit &unit, CFont *defaultfont) const;
-	virtual void Parse(lua_State *l);
+	virtual void Draw(const CUnit &unit, const wyrmgus::font *defaultfont) const override;
+	virtual void Parse(lua_State *l) override;
 
 private:
 	std::string Format;          /// Text to display
-	CFont *Font;                 /// Font to use.
+	const wyrmgus::font *Font = nullptr; /// Font to use.
 	bool Centered;               /// if true, center the display.
 	int Index;                   /// Index of the variable to show.
 	EnumVariable Component;      /// Component of the variable.
@@ -113,16 +116,16 @@ private:
 class CContentTypeFormattedText2 : public CContentType
 {
 public:
-	CContentTypeFormattedText2() : Font(nullptr), Centered(false),
+	CContentTypeFormattedText2() : Centered(false),
 		Index1(-1), Component1(VariableValue), Index2(-1), Component2(VariableValue) {}
 	virtual ~CContentTypeFormattedText2() {}
 
-	virtual void Draw(const CUnit &unit, CFont *defaultfont) const;
-	virtual void Parse(lua_State *l);
+	virtual void Draw(const CUnit &unit, const wyrmgus::font *defaultfont) const override;
+	virtual void Parse(lua_State *l) override;
 
 private:
 	std::string Format;          /// Text to display
-	CFont *Font;                 /// Font to use.
+	const wyrmgus::font *Font = nullptr; /// Font to use.
 	bool Centered;               /// if true, center the display.
 	int Index1;                  /// Index of the variable1 to show.
 	EnumVariable Component1;     /// Component of the variable1.
@@ -136,8 +139,8 @@ private:
 class CContentTypeIcon : public CContentType
 {
 public:
-	virtual void Draw(const CUnit &unit, CFont *defaultfont) const;
-	virtual void Parse(lua_State *l);
+	virtual void Draw(const CUnit &unit, const wyrmgus::font *defaultfont) const override;
+	virtual void Parse(lua_State *l) override;
 
 private:
 	EnumUnit UnitRef;           /// Which unit icon to display.(itself, container, ...)
@@ -151,8 +154,8 @@ class CContentTypeLifeBar : public CContentType
 public:
 	CContentTypeLifeBar() : Index(-1), Width(0), Height(0) {}
 
-	virtual void Draw(const CUnit &unit, CFont *defaultfont) const;
-	virtual void Parse(lua_State *l);
+	virtual void Draw(const CUnit &unit, const wyrmgus::font *defaultfont) const override;
+	virtual void Parse(lua_State *l) override;
 
 private:
 	int Index;           /// Index of the variable to show, -1 if not.
@@ -172,8 +175,8 @@ class CContentTypeCompleteBar : public CContentType
 public:
 	CContentTypeCompleteBar() : varIndex(-1), width(0), height(0), hasBorder(false), colorIndex(-1) {}
 
-	virtual void Draw(const CUnit &unit, CFont *defaultfont) const;
-	virtual void Parse(lua_State *l);
+	virtual void Draw(const CUnit &unit, const wyrmgus::font *defaultfont) const override;
+	virtual void Parse(lua_State *l) override;
 
 private:
 	int varIndex;    /// Index of the variable to show, -1 if not.

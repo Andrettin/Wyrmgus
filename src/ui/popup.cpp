@@ -57,7 +57,7 @@
 
 /* virtual */ int CPopupContentTypeButtonInfo::GetWidth(const wyrmgus::button &button, int *) const
 {
-	const CFont &font = this->Font ? *this->Font : GetSmallFont();
+	const wyrmgus::font *font = this->Font ? this->Font : wyrmgus::defines::get()->get_small_font();
 	std::string draw("");
 	switch (this->InfoType) {
 		case PopupButtonInfo_Hint:
@@ -81,8 +81,8 @@
 		*/
 		//Wyrmgus end
 		int i = 1;
-		while (!(sub = GetLineFont(i++, draw, 0, &font)).empty()) {
-			width = std::max(width, font.getWidth(sub));
+		while (!(sub = GetLineFont(i++, draw, 0, font)).empty()) {
+			width = std::max(width, font->getWidth(sub));
 		}
 		//Wyrmgus start
 		if (this->MaxWidth) {
@@ -95,7 +95,7 @@
 
 /* virtual */ int CPopupContentTypeButtonInfo::GetHeight(const wyrmgus::button &button, int *) const
 {
-	const CFont &font = this->Font ? *this->Font : GetSmallFont();
+	const wyrmgus::font *font = this->Font ? this->Font : wyrmgus::defines::get()->get_small_font();
 	std::string draw;
 	const int scale_factor = wyrmgus::defines::get()->get_scale_factor();
 
@@ -113,8 +113,8 @@
 	int height = 0;
 	if (draw.length()) {
 		int i = 1;
-		while ((GetLineFont(i++, draw, this->MaxWidth, &font)).length()) {
-			height += font.Height() + 2 * scale_factor;
+		while ((GetLineFont(i++, draw, this->MaxWidth, font)).length()) {
+			height += font->Height() + 2 * scale_factor;
 		}
 	}
 	return height;
@@ -122,7 +122,7 @@
 
 /* virtual */ void CPopupContentTypeButtonInfo::Draw(int x, int y, const CPopup &popup, const unsigned int popupWidth, const wyrmgus::button &button, int *) const
 {
-	const CFont &font = this->Font ? *this->Font : GetSmallFont();
+	const wyrmgus::font *font = this->Font ? this->Font : wyrmgus::defines::get()->get_small_font();
 	CLabel label(font, this->TextColor, this->HighlightColor);
 	std::string draw("");
 	const int scale_factor = wyrmgus::defines::get()->get_scale_factor();
@@ -145,9 +145,9 @@
 		unsigned int width = this->MaxWidth
 							 ? std::min(this->MaxWidth, popupWidth - 2 * popup.MarginX)
 							 : 0;
-		while ((sub = GetLineFont(++i, draw, width, &font)).length()) {
+		while ((sub = GetLineFont(++i, draw, width, font)).length()) {
 			label.Draw(x, y_off, sub);
-			y_off += font.Height() + 2 * scale_factor;
+			y_off += font->Height() + 2 * scale_factor;
 		}
 		return;
 	}
@@ -171,7 +171,7 @@
 		} else if (!strcmp(key, "MaxWidth")) {
 			this->MaxWidth = LuaToNumber(l, -1);
 		} else if (!strcmp(key, "Font")) {
-			this->Font = CFont::Get(LuaToString(l, -1));
+			this->Font = wyrmgus::font::get(LuaToString(l, -1));
 		} else {
 			LuaError(l, "'%s' invalid for method 'Name' in DefinePopups" _C_ key);
 		}
@@ -180,7 +180,7 @@
 
 /* virtual */ int CPopupContentTypeText::GetWidth(const wyrmgus::button &button, int *) const
 {
-	const CFont &font = this->Font ? *this->Font : GetSmallFont();
+	const wyrmgus::font *font = this->Font ? this->Font : wyrmgus::defines::get()->get_small_font();
 	//Wyrmgus start
 	button.SetTriggerData();
 	int resource = button.Value;
@@ -206,9 +206,9 @@
 	int i = 1;
 	//Wyrmgus start
 //	while (!(sub = GetLineFont(i++, this->Text, 0, &font)).empty()) {
-	while (!(sub = GetLineFont(i++, text, 0, &font)).empty()) {
+	while (!(sub = GetLineFont(i++, text, 0, font)).empty()) {
 	//Wyrmgus end
-		width = std::max(width, font.getWidth(sub));
+		width = std::max(width, font->getWidth(sub));
 	}
 	//Wyrmgus start
 	if (this->MaxWidth) {
@@ -220,7 +220,7 @@
 
 /* virtual */ int CPopupContentTypeText::GetHeight(const wyrmgus::button &button, int *) const
 {
-	CFont &font = this->Font ? *this->Font : GetSmallFont();
+	const wyrmgus::font *font = this->Font ? this->Font : wyrmgus::defines::get()->get_small_font();
 	const int scale_factor = wyrmgus::defines::get()->get_scale_factor();
 
 	//Wyrmgus start
@@ -236,16 +236,16 @@
 	int i = 1;
 	//Wyrmgus start
 //	while ((GetLineFont(i++, this->Text, this->MaxWidth, &font)).length()) {
-	while ((GetLineFont(i++, text, this->MaxWidth, &font)).length()) {
+	while ((GetLineFont(i++, text, this->MaxWidth, font)).length()) {
 	//Wyrmgus end
-		height += font.Height() + 2 * scale_factor;
+		height += font->Height() + 2 * scale_factor;
 	}
 	return height;
 }
 
 /* virtual */ void CPopupContentTypeText::Draw(int x, int y, const CPopup &popup, const unsigned int popupWidth, const wyrmgus::button &button, int *) const
 {
-	const CFont &font = this->Font ? *this->Font : GetSmallFont();
+	const wyrmgus::font *font = this->Font ? this->Font : wyrmgus::defines::get()->get_small_font();
 	const int scale_factor = wyrmgus::defines::get()->get_scale_factor();
 
 	//Wyrmgus start
@@ -266,10 +266,10 @@
 						 : 0;
 	//Wyrmgus start
 //	while ((sub = GetLineFont(++i, this->Text, width, &font)).length()) {
-	while ((sub = GetLineFont(++i, text, width, &font)).length()) {
+	while ((sub = GetLineFont(++i, text, width, font)).length()) {
 	//Wyrmgus end
 		label.Draw(x, y_off, sub);
-		y_off += font.Height() + 2 * scale_factor;
+		y_off += font->Height() + 2 * scale_factor;
 	}
 }
 
@@ -288,7 +288,7 @@
 		} else if (!strcmp(key, "MaxWidth")) {
 			this->MaxWidth = LuaToNumber(l, -1);
 		} else if (!strcmp(key, "Font")) {
-			this->Font = CFont::Get(LuaToString(l, -1));
+			this->Font = wyrmgus::font::get(LuaToString(l, -1));
 		} else {
 			LuaError(l, "'%s' invalid for method 'Text' in DefinePopups" _C_ key);
 		}
@@ -298,7 +298,7 @@
 /* virtual */ int CPopupContentTypeCosts::GetWidth(const wyrmgus::button &button, int *Costs) const
 {
 	int popupWidth = 0;
-	const CFont &font = this->Font ? *this->Font : GetSmallFont();
+	const wyrmgus::font *font = this->Font ? this->Font : wyrmgus::defines::get()->get_small_font();
 	const int scale_factor = wyrmgus::defines::get()->get_scale_factor();
 
 	for (unsigned int i = 1; i <= MaxCosts; ++i) {
@@ -311,7 +311,7 @@
 					popupWidth += (G->Width + 5 * scale_factor);
 				}
 			}
-			popupWidth += (font.Width(Costs[i]) + 5 * scale_factor);
+			popupWidth += (font->Width(Costs[i]) + 5 * scale_factor);
 		}
 	}
 	if (Costs[ManaResCost]) {
@@ -327,10 +327,10 @@
 					popupWidth += (G->Width + 5 * scale_factor);
 				}
 			}
-			popupWidth += font.Width(spell->ManaCost);
-			popupWidth = std::max<int>(popupWidth, font.Width(spell->Name) + 10 * scale_factor);
+			popupWidth += font->Width(spell->ManaCost);
+			popupWidth = std::max<int>(popupWidth, font->Width(spell->Name) + 10 * scale_factor);
 		} else {
-			popupWidth = font.Width(button.get_hint()) + 10 * scale_factor;
+			popupWidth = font->Width(button.get_hint()) + 10 * scale_factor;
 		}
 		popupWidth = std::max<int>(popupWidth, 100 * scale_factor);
 	}
@@ -340,19 +340,19 @@
 /* virtual */ int CPopupContentTypeCosts::GetHeight(const wyrmgus::button &button, int *Costs) const
 {
 	int popupHeight = 0;
-	const CFont &font = this->Font ? *this->Font : GetSmallFont();
+	const wyrmgus::font *font = this->Font ? this->Font : wyrmgus::defines::get()->get_small_font();
 
 	for (unsigned int i = 1; i <= ManaResCost; ++i) {
 		if (Costs[i] && UI.Resources[i].G) {
 			popupHeight = std::max(UI.Resources[i].G->Height, popupHeight);
 		}
 	}
-	return std::max(popupHeight, font.Height());
+	return std::max(popupHeight, font->Height());
 }
 
 /* virtual */ void CPopupContentTypeCosts::Draw(int x, int y, const CPopup &, const unsigned int, const wyrmgus::button &button, int *Costs) const
 {
-	const CFont &font = this->Font ? *this->Font : GetSmallFont();
+	const wyrmgus::font *font = this->Font ? this->Font : wyrmgus::defines::get()->get_small_font();
 	CLabel label(font, this->TextColor, this->HighlightColor);
 	const int scale_factor = wyrmgus::defines::get()->get_scale_factor();
 
@@ -389,7 +389,7 @@
 				G->DrawFrameClip(UI.Resources[ManaResCost].IconFrame, x, y);
 				x += ((x_offset != -1 ? x_offset : G->Width) + 5 * scale_factor);
 				y_offset = G->Height;
-				y_offset -= font.Height();
+				y_offset -= font->Height();
 				y_offset /= 2;
 			}
 			label.Draw(x, y + y_offset, spell.ManaCost);
@@ -405,7 +405,7 @@
 		for (lua_pushnil(l); lua_next(l, -2); lua_pop(l, 1)) {
 			const char *key = LuaToString(l, -2);
 			if (!strcmp(key, "Font")) {
-				this->Font = CFont::Get(LuaToString(l, -1));
+				this->Font = wyrmgus::font::get(LuaToString(l, -1));
 			} else if (!strcmp(key, "Centered")) {
 				this->Centered = LuaToBoolean(l, -1);
 			} else {
@@ -457,7 +457,7 @@ CPopupContentTypeLine::CPopupContentTypeLine() : Color(ColorWhite), Width(0), He
 
 /* virtual */ int CPopupContentTypeVariable::GetWidth(const wyrmgus::button &button, int *) const
 {
-	CFont &font = this->Font ? *this->Font : GetSmallFont();
+	const wyrmgus::font *font = this->Font ? this->Font : wyrmgus::defines::get()->get_small_font();
 	//Wyrmgus start
 //	TriggerData.Type = UnitTypes[button.Value];
 	button.SetTriggerData();
@@ -471,19 +471,19 @@ CPopupContentTypeLine::CPopupContentTypeLine() : Color(ColorWhite), Width(0), He
 //	TriggerData.Type = nullptr;
 	button.CleanTriggerData();
 	//Wyrmgus end
-	return font.getWidth(text);
+	return font->getWidth(text);
 }
 
 /* virtual */ int CPopupContentTypeVariable::GetHeight(const wyrmgus::button &, int *) const
 {
-	CFont &font = this->Font ? *this->Font : GetSmallFont();
-	return font.Height();
+	const wyrmgus::font *font = this->Font ? this->Font : wyrmgus::defines::get()->get_small_font();
+	return font->Height();
 }
 
 /* virtual */ void CPopupContentTypeVariable::Draw(int x, int y, const CPopup &, const unsigned int, const wyrmgus::button &button, int *) const
 {
 	std::string text;										// Optional text to display.
-	CFont &font = this->Font ? *this->Font : GetSmallFont(); // Font to use.
+	const wyrmgus::font *font = this->Font ? this->Font : wyrmgus::defines::get()->get_small_font(); // Font to use.
 
 	Assert(this->Index == -1 || ((unsigned int) this->Index < UnitTypeVar.GetNumberVariable()));
 
@@ -586,7 +586,7 @@ CPopupContentTypeLine::CPopupContentTypeLine() : Color(ColorWhite), Width(0), He
 				this->Text = CclParseStringDesc(l);
 				lua_pushnil(l); // ParseStringDesc eat token
 			} else if (!strcmp(key, "Font")) {
-				this->Font = CFont::Get(LuaToString(l, -1));
+				this->Font = wyrmgus::font::get(LuaToString(l, -1));
 			} else if (!strcmp(key, "Centered")) {
 				this->Centered = LuaToBoolean(l, -1);
 			} else if (!strcmp(key, "Variable")) {

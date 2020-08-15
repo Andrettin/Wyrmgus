@@ -29,10 +29,6 @@
 
 #pragma once
 
-/*----------------------------------------------------------------------------
---  Includes
-----------------------------------------------------------------------------*/
-
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -43,19 +39,15 @@ extern "C" {
 }
 #endif
 
-/*----------------------------------------------------------------------------
---  Declarations
-----------------------------------------------------------------------------*/
-
 class CDate;
 class CPlayer;
 class CUnit;
 class CUpgrade;
 class CFile;
-class CFont;
 
 namespace wyrmgus {
 	class faction;
+	class font;
 	class unit_type;
 }
 
@@ -273,7 +265,7 @@ struct NumberDesc {
 		} TypeStat;
 		struct {
 			StringDesc *String; /// String.
-			CFont *Font;        /// Font.
+			wyrmgus::font *Font;        /// Font.
 		} VideoTextLength;
 		struct {
 			StringDesc *String; /// String.
@@ -337,7 +329,7 @@ struct StringDesc {
 			StringDesc *String;  /// Original string.
 			NumberDesc *Line;    /// Line number.
 			NumberDesc *MaxLen;  /// Max length of line.
-			CFont *Font;         /// Font to consider (else (-1) consider just char).
+			wyrmgus::font *Font;         /// Font to consider (else (-1) consider just char).
 		} Line; /// For specific line.
 		ES_GameInfo GameInfoType;
 		NumberDesc *PlayerName;  /// Player name.
