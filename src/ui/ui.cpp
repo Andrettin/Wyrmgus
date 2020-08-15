@@ -233,9 +233,9 @@ void CUserInterface::Load()
 		this->Fillers.at(i).Load();
 	}
 
-	for (int i = FoodCost; i <= FreeWorkersCount; ++i) {
-		if (Resources[i].G) {
-			Resources[i].G->Load(false, wyrmgus::defines::get()->get_scale_factor());
+	for (int i = 0; i <= FreeWorkersCount; ++i) {
+		if (this->Resources[i].G != nullptr) {
+			this->Resources[i].G->Load(false, wyrmgus::defines::get()->get_scale_factor());
 		}
 	}
 

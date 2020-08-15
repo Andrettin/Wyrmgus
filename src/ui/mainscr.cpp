@@ -799,9 +799,15 @@ void DrawResources()
 
 	// Draw all icons of resource.
 	for (int i = FoodCost; i <= FreeWorkersCount; ++i) {
-		if (UI.Resources[i].G) {
-			UI.Resources[i].G->DrawFrameClip(UI.Resources[i].IconFrame, UI.Resources[i].IconX, UI.Resources[i].IconY);
+		if (UI.Resources[i].G == nullptr) {
+			continue;
 		}
+
+		if (UI.Resources[i].IconX == -1) {
+			continue;
+		}
+
+		UI.Resources[i].G->DrawFrameClip(UI.Resources[i].IconFrame, UI.Resources[i].IconX, UI.Resources[i].IconY);
 	}
 	for (int i = 0; i < MaxCosts; ++i) {
 		if (UI.Resources[i].TextX != -1) {

@@ -291,14 +291,14 @@ public:
 class CPieMenu
 {
 public:
-	CPieMenu() : G(nullptr), MouseButton(NoButton)
+	CPieMenu()
 	{
 		memset(this->X, 0, sizeof(this->X));
 		memset(this->Y, 0, sizeof(this->Y));
 	}
 
-	CGraphic *G;         /// Optional background image
-	int MouseButton;     /// Which mouse button pops up the piemenu, deactivate with NoButton
+	CGraphic *G = nullptr; /// Optional background image
+	int MouseButton = NoButton; /// Which mouse button pops up the piemenu, deactivate with NoButton
 	int X[9];            /// X position of the pies
 	int Y[9];            /// Y position of the pies
 
@@ -332,13 +332,11 @@ static constexpr int MaxResourceInfo = MaxCosts + 4; /// +4 for food and score a
 class CInfoPanel
 {
 public:
-	CInfoPanel() : G(nullptr), X(0), Y(0) {}
-
 	void Draw();
 
-	CGraphic *G;
-	int X;
-	int Y;
+	CGraphic *G = nullptr;
+	int X = 0;
+	int Y = 0;
 };
 
 class CUIUserButton
