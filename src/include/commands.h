@@ -34,7 +34,7 @@ class CPlayer;
 class CUnit;
 class CUpgrade;
 
-namespace stratagus {
+namespace wyrmgus {
 	class dynasty;
 	class quest;
 	class site;
@@ -73,7 +73,7 @@ extern void CommandRallyPoint(CUnit &unit, const Vec2i &pos, int z = 0);
 /// Prepare command pick up
 extern void CommandPickUp(CUnit &unit, CUnit &dest, int flush);
 /// Prepare command quest
-extern void CommandQuest(CUnit &unit, stratagus::quest *quest);
+extern void CommandQuest(CUnit &unit, wyrmgus::quest *quest);
 /// Prepare command buy
 extern void CommandBuy(CUnit &unit, CUnit *sold_unit, int player);
 /// Prepare command produce resource
@@ -119,7 +119,7 @@ extern void CommandBoard(CUnit &unit, CUnit &dest, int flush);
 extern void CommandUnload(CUnit &unit, const Vec2i &pos, CUnit *what, int flush, int z = 0, int landmass = 0);
 //Wyrmgus end
 /// Prepare command build
-extern void CommandBuildBuilding(CUnit &unit, const Vec2i &pos, stratagus::unit_type &, int flush, int z = 0, const stratagus::site *settlement = nullptr);
+extern void CommandBuildBuilding(CUnit &unit, const Vec2i &pos, wyrmgus::unit_type &, int flush, int z = 0, const wyrmgus::site *settlement = nullptr);
 /// Prepare command dismiss
 extern void CommandDismiss(CUnit &unit, bool salvage = false);
 /// Prepare command resource location
@@ -132,13 +132,13 @@ extern void CommandResource(CUnit &unit, CUnit &dest, int flush);
 /// Prepare command return
 extern void CommandReturnGoods(CUnit &unit, CUnit *depot, int flush);
 /// Prepare command train
-extern void CommandTrainUnit(CUnit &unit, stratagus::unit_type &what, int player, int flush);
+extern void CommandTrainUnit(CUnit &unit, wyrmgus::unit_type &what, int player, int flush);
 /// Prepare command cancel training
-extern void CommandCancelTraining(CUnit &unit, int slot, const stratagus::unit_type *type);
+extern void CommandCancelTraining(CUnit &unit, int slot, const wyrmgus::unit_type *type);
 /// Prepare command upgrade to
-extern void CommandUpgradeTo(CUnit &unit, stratagus::unit_type &what, int flush);
+extern void CommandUpgradeTo(CUnit &unit, wyrmgus::unit_type &what, int flush);
 /// immediate transforming into type.
-extern void CommandTransformIntoType(CUnit &unit, stratagus::unit_type &type);
+extern void CommandTransformIntoType(CUnit &unit, wyrmgus::unit_type &type);
 /// Prepare command cancel upgrade to
 extern void CommandCancelUpgradeTo(CUnit &unit);
 /// Prepare command research
@@ -150,11 +150,11 @@ extern void CommandCancelResearch(CUnit &unit);
 extern void CommandLearnAbility(CUnit &unit, CUpgrade &what);
 //Wyrmgus end
 /// Prepare command spellcast
-extern void CommandSpellCast(CUnit &unit, const Vec2i &pos, CUnit *dest, const stratagus::spell &spell, int flush, int z = 0, bool isAutocast = false);
+extern void CommandSpellCast(CUnit &unit, const Vec2i &pos, CUnit *dest, const wyrmgus::spell &spell, int flush, int z = 0, bool isAutocast = false);
 /// Prepare command auto spellcast
-extern void CommandAutoSpellCast(CUnit &unit, const stratagus::spell *spell, const bool on);
+extern void CommandAutoSpellCast(CUnit &unit, const wyrmgus::spell *spell, const bool on);
 /// Prepare diplomacy command
-extern void CommandDiplomacy(const int player, const stratagus::diplomacy_state state, const int other_player);
+extern void CommandDiplomacy(const int player, const wyrmgus::diplomacy_state state, const int other_player);
 /// Prepare shared vision command
 extern void CommandSharedVision(int player, bool state, int opponent);
 
@@ -186,7 +186,7 @@ extern void SendCommandMove(CUnit &unit, const Vec2i &pos, int flush, int z = 0)
 /// Send rally point command
 extern void SendCommandRallyPoint(CUnit &unit, const Vec2i &pos, int z = 0);
 /// Send quest command
-extern void SendCommandQuest(CUnit &unit, stratagus::quest *quest);
+extern void SendCommandQuest(CUnit &unit, wyrmgus::quest *quest);
 /// Send buy command
 extern void SendCommandBuy(CUnit &unit, CUnit *sold_unit, int player);
 /// Send produce resource command
@@ -234,7 +234,7 @@ extern void SendCommandBoard(CUnit &unit, CUnit &dest, int flush);
 extern void SendCommandUnload(CUnit &unit, const Vec2i &pos, CUnit *what, int flush, int z = 0);
 //Wyrmgus end
 /// Send build building command
-extern void SendCommandBuildBuilding(CUnit &unit, const Vec2i &pos, stratagus::unit_type &what, int flush, int z = 0);
+extern void SendCommandBuildBuilding(CUnit &unit, const Vec2i &pos, wyrmgus::unit_type &what, int flush, int z = 0);
 /// Send cancel building command
 extern void SendCommandDismiss(CUnit &unit, bool salvage = false);
 /// Send harvest location command
@@ -247,16 +247,16 @@ extern void SendCommandResource(CUnit &unit, CUnit &dest, int flush);
 /// Send return goods command
 extern void SendCommandReturnGoods(CUnit &unit, CUnit *dest, int flush);
 /// Send train command
-extern void SendCommandTrainUnit(CUnit &unit, stratagus::unit_type &what, int player, int flush);
+extern void SendCommandTrainUnit(CUnit &unit, wyrmgus::unit_type &what, int player, int flush);
 /// Send cancel training command
-extern void SendCommandCancelTraining(CUnit &unit, int slot, const stratagus::unit_type *type);
+extern void SendCommandCancelTraining(CUnit &unit, int slot, const wyrmgus::unit_type *type);
 /// Send upgrade to command
-extern void SendCommandUpgradeTo(CUnit &unit, stratagus::unit_type &what, int flush);
+extern void SendCommandUpgradeTo(CUnit &unit, wyrmgus::unit_type &what, int flush);
 /// Send cancel upgrade to command
 extern void SendCommandCancelUpgradeTo(CUnit &unit);
 //Wyrmgus start
 /// Send transform into command
-extern void SendCommandTransformInto(CUnit &unit, stratagus::unit_type &what, int flush);
+extern void SendCommandTransformInto(CUnit &unit, wyrmgus::unit_type &what, int flush);
 //Wyrmgus end
 /// Send research command
 extern void SendCommandResearch(CUnit &unit, const CUpgrade &what, int player, int flush);
@@ -272,13 +272,13 @@ extern void SendCommandLearnAbility(CUnit &unit, CUpgrade &what);
 extern void SendCommandSpellCast(CUnit &unit, const Vec2i &pos, CUnit *dest, int spellid, int flush, int z = 0);
 //Wyrmgus end
 /// Send auto spell cast command
-extern void SendCommandAutoSpellCast(CUnit &unit, const stratagus::spell *spell, const bool on);
+extern void SendCommandAutoSpellCast(CUnit &unit, const wyrmgus::spell *spell, const bool on);
 /// Send diplomacy command
-extern void SendCommandDiplomacy(const int player, const stratagus::diplomacy_state state, const int opponent);
+extern void SendCommandDiplomacy(const int player, const wyrmgus::diplomacy_state state, const int opponent);
 /// Send shared vision command
 extern void SendCommandSharedVision(int player, bool state, int opponent);
 extern void SendCommandSetFaction(int player, int faction);
-extern void SendCommandSetDynasty(CPlayer *player, const stratagus::dynasty *dynasty);
+extern void SendCommandSetDynasty(CPlayer *player, const wyrmgus::dynasty *dynasty);
 extern void SendCommandAutosellResource(int player, int resource);
 
 /// Execute a command (from network).

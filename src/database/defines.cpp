@@ -32,7 +32,7 @@
 #include "database/sml_data.h"
 #include "database/sml_parser.h"
 
-namespace stratagus {
+namespace wyrmgus {
 
 void defines::load(const std::filesystem::path &data_path)
 {

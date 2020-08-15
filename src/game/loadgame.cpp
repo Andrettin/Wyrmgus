@@ -131,7 +131,7 @@ void CleanModules()
 	CleanReplayLog();
 	FreePathfinder();
 
-	stratagus::database::get()->clear();
+	wyrmgus::database::get()->clear();
 
 	UnitTypeVar.Init(); // internal script. should be to a better place, don't find for restart.
 }
@@ -162,7 +162,7 @@ void InitModules()
 	InitUpgrades();
 
 	InitButtons();
-	stratagus::trigger::InitActiveTriggers();
+	wyrmgus::trigger::InitActiveTriggers();
 
 	InitAiModule();
 
@@ -179,7 +179,7 @@ void LoadModules()
 	LoadFonts();
 	UI.Load();
 	//Wyrmgus start
-	stratagus::terrain_type::LoadTerrainTypeGraphics();
+	wyrmgus::terrain_type::LoadTerrainTypeGraphics();
 	//Wyrmgus end
 #ifndef DYNAMIC_LOAD
 	LoadMissileSprites();
@@ -263,7 +263,7 @@ void LoadGame(const std::string &filename)
 
 	const unsigned long game_cycle = GameCycle;
 	const unsigned long long current_total_hours = CDate::CurrentTotalHours;
-	const unsigned syncrand = stratagus::random::get()->get_seed();
+	const unsigned syncrand = wyrmgus::random::get()->get_seed();
 	const unsigned synchash = SyncHash;
 
 	InitModules();
@@ -271,7 +271,7 @@ void LoadGame(const std::string &filename)
 
 	GameCycle = game_cycle;
 	CDate::CurrentTotalHours = current_total_hours;
-	stratagus::random::get()->set_seed(syncrand);
+	wyrmgus::random::get()->set_seed(syncrand);
 	SyncHash = synchash;
 	SelectionChanged();
 }

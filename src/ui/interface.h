@@ -37,7 +37,7 @@ class CUIButton;
 class CUnit;
 struct EventCallback;
 
-namespace stratagus {
+namespace wyrmgus {
 	class button;
 	class button_level;
 }
@@ -180,9 +180,9 @@ extern bool LeaveStops;
 extern cursor_on CursorOn;
 
 /// vladi: used for unit buttons sub-menus etc
-extern stratagus::button_level *CurrentButtonLevel;
+extern wyrmgus::button_level *CurrentButtonLevel;
 /// Last drawn popup : used to speed up drawing
-extern stratagus::button *LastDrawnButtonPopup;
+extern wyrmgus::button *LastDrawnButtonPopup;
 
 /// Time to detect double clicks
 extern int DoubleClickDelay;
@@ -332,7 +332,7 @@ extern void UpdateTimer();
 /// Draw the Pie Menu
 extern void DrawPieMenu();
 /// Draw the button popup
-extern void DrawPopup(const stratagus::button &button, int x = 0, int y = 0, bool above = true);
+extern void DrawPopup(const wyrmgus::button &button, int x = 0, int y = 0, bool above = true);
 //Wyrmgus start
 extern void DrawGenericPopup(const std::string &popup_text, int x = 0, int y = 0, std::string text_color = "", std::string highlight_color = "", bool above = true);
 //Wyrmgus end
@@ -344,48 +344,48 @@ extern bool HandleMouseScrollArea(const PixelPos &mousePos);
 // in button_checks.cpp
 //
 /// Check is always true
-extern bool ButtonCheckTrue(const CUnit &unit, const stratagus::button &button);
+extern bool ButtonCheckTrue(const CUnit &unit, const wyrmgus::button &button);
 /// Check is always false
-extern bool ButtonCheckFalse(const CUnit &unit, const stratagus::button &button);
+extern bool ButtonCheckFalse(const CUnit &unit, const wyrmgus::button &button);
 /// Check if allowed upgrade is ready
-extern bool ButtonCheckUpgrade(const CUnit &unit, const stratagus::button &button);
+extern bool ButtonCheckUpgrade(const CUnit &unit, const wyrmgus::button &button);
 /// Check if the upgrade has not been acquired
-extern bool ButtonCheckUpgradeNot(const CUnit &unit, const stratagus::button &button);
+extern bool ButtonCheckUpgradeNot(const CUnit &unit, const wyrmgus::button &button);
 /// Check if any of the allowed upgrade list are ready
-extern bool ButtonCheckUpgradeOr(const CUnit &unit, const stratagus::button &button);
+extern bool ButtonCheckUpgradeOr(const CUnit &unit, const wyrmgus::button &button);
 /// Check if unit has an individual upgrade
-extern bool ButtonCheckIndividualUpgrade(const CUnit &unit, const stratagus::button &button);
+extern bool ButtonCheckIndividualUpgrade(const CUnit &unit, const wyrmgus::button &button);
 /// Check if unit has any of the individual upgrades in the list
-extern bool ButtonCheckIndividualUpgradeOr(const CUnit &unit, const stratagus::button &button);
+extern bool ButtonCheckIndividualUpgradeOr(const CUnit &unit, const wyrmgus::button &button);
 /// Check if unit's variables pass the condition check
-extern bool ButtonCheckUnitVariable(const CUnit &unit, const stratagus::button &button);
+extern bool ButtonCheckUnitVariable(const CUnit &unit, const wyrmgus::button &button);
 /// Check if allowed units exists
-extern bool ButtonCheckUnitsOr(const CUnit &unit, const stratagus::button &button);
+extern bool ButtonCheckUnitsOr(const CUnit &unit, const wyrmgus::button &button);
 /// Check if allowed units exists
-extern bool ButtonCheckUnitsAnd(const CUnit &unit, const stratagus::button &button);
+extern bool ButtonCheckUnitsAnd(const CUnit &unit, const wyrmgus::button &button);
 /// Check if units don't exist
-extern bool ButtonCheckUnitsNot(const CUnit &unit, const stratagus::button &button);
+extern bool ButtonCheckUnitsNot(const CUnit &unit, const wyrmgus::button &button);
 /// Check if have network play
-extern bool ButtonCheckNetwork(const CUnit &unit, const stratagus::button &button);
+extern bool ButtonCheckNetwork(const CUnit &unit, const wyrmgus::button &button);
 /// Check if don't have network play
-extern bool ButtonCheckNoNetwork(const CUnit &unit, const stratagus::button &button);
+extern bool ButtonCheckNoNetwork(const CUnit &unit, const wyrmgus::button &button);
 /// Check if unit isn't working (train,upgrade,research)
-extern bool ButtonCheckNoWork(const CUnit &unit, const stratagus::button &button);
+extern bool ButtonCheckNoWork(const CUnit &unit, const wyrmgus::button &button);
 /// Check if unit isn't researching or upgrading
-extern bool ButtonCheckNoResearch(const CUnit &unit, const stratagus::button &button);
+extern bool ButtonCheckNoResearch(const CUnit &unit, const wyrmgus::button &button);
 /// Check if all requirements for an attack to are meet
-extern bool ButtonCheckAttack(const CUnit &unit, const stratagus::button &button);
+extern bool ButtonCheckAttack(const CUnit &unit, const wyrmgus::button &button);
 /// Check if all requirements for an upgrade to are meet
-extern bool ButtonCheckUpgradeTo(const CUnit &unit, const stratagus::button &button);
+extern bool ButtonCheckUpgradeTo(const CUnit &unit, const wyrmgus::button &button);
 /// Check if all requirements for a research are meet
-extern bool ButtonCheckResearch(const CUnit &unit, const stratagus::button &button);
+extern bool ButtonCheckResearch(const CUnit &unit, const wyrmgus::button &button);
 /// Check if all requirements for a single research are meet
-extern bool ButtonCheckSingleResearch(const CUnit &unit, const stratagus::button &button);
+extern bool ButtonCheckSingleResearch(const CUnit &unit, const wyrmgus::button &button);
 //Wyrmgus start
 /// Check if the unit has an inventory
-extern bool ButtonCheckHasInventory(const CUnit &unit, const stratagus::button &button);
+extern bool ButtonCheckHasInventory(const CUnit &unit, const wyrmgus::button &button);
 /// Check if the unit has buttons for the desired level
-extern bool ButtonCheckHasSubButtons(const CUnit &unit, const stratagus::button &button);
+extern bool ButtonCheckHasSubButtons(const CUnit &unit, const wyrmgus::button &button);
 //Wyrmgus end
 
 //

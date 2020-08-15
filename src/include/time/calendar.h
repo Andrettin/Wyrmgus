@@ -30,13 +30,13 @@
 #include "database/data_type.h"
 #include "database/named_data_entry.h"
 
-namespace stratagus {
+namespace wyrmgus {
 
 class calendar : public named_data_entry, public data_type<calendar>
 {
 	Q_OBJECT
 
-	Q_PROPERTY(stratagus::calendar* base_calendar MEMBER base_calendar)
+	Q_PROPERTY(wyrmgus::calendar* base_calendar MEMBER base_calendar)
 	Q_PROPERTY(int year_offset MEMBER year_offset READ get_year_offset)
 	Q_PROPERTY(QString year_label READ get_year_label_qstring)
 	Q_PROPERTY(QString negative_year_label READ get_negative_year_label_qstring)

@@ -40,12 +40,12 @@ class Spell_SpawnPortal : public SpellActionType
 public:
 	Spell_SpawnPortal() : PortalType(0), TTL(0), CurrentPlayer(false) {};
 	virtual void ProcessConfigData(const CConfigData *config_data) override {}
-	virtual int Cast(CUnit &caster, const stratagus::spell &spell,
+	virtual int Cast(CUnit &caster, const wyrmgus::spell &spell,
 					 CUnit *target, const Vec2i &goalPos, int z, int modifier);
 	virtual void Parse(lua_State *l, int startIndex, int endIndex);
 
 private:
-	stratagus::unit_type *PortalType;   /// The unit type spawned
+	wyrmgus::unit_type *PortalType;   /// The unit type spawned
 	int TTL;                 /// Time to live for summoned portal. 0 means infinite
 	bool CurrentPlayer;      /// If true, summon portal for caster's player rather than neutral
 };

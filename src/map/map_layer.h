@@ -44,7 +44,7 @@ class CSeasonSchedule;
 class CTimeOfDaySchedule;
 class CUnit;
 
-namespace stratagus {
+namespace wyrmgus {
 	class map_template;
 	class plane;
 	class season;
@@ -131,15 +131,15 @@ private:
 public:
 	void SetTimeOfDayByHours(const unsigned long long hours);
 	void SetTimeOfDay(CScheduledTimeOfDay *time_of_day);
-	stratagus::time_of_day *GetTimeOfDay() const;
-	stratagus::time_of_day *get_tile_time_of_day(const QPoint &tile_pos) const;
+	wyrmgus::time_of_day *GetTimeOfDay() const;
+	wyrmgus::time_of_day *get_tile_time_of_day(const QPoint &tile_pos) const;
 private:
 	void DecrementRemainingSeasonHours();
 	void IncrementSeason();
 public:
 	void SetSeasonByHours(const unsigned long long hours);
 	void SetSeason(CScheduledSeason *season);
-	stratagus::season *GetSeason() const;
+	wyrmgus::season *GetSeason() const;
 	
 	int ID = -1;
 private:
@@ -152,9 +152,9 @@ public:
 	CScheduledSeason *Season = nullptr;			/// the current season for the map layer
 	CSeasonSchedule *SeasonSchedule = nullptr;	/// the season schedule for the map layer
 	int RemainingSeasonHours = 0;				/// the quantity of hours remaining for the current season to end
-	stratagus::plane *plane = nullptr;			/// the plane pointer (if any) for the map layer
-	stratagus::world *world = nullptr;			/// the world pointer (if any) for the map layer
+	wyrmgus::plane *plane = nullptr;			/// the plane pointer (if any) for the map layer
+	wyrmgus::world *world = nullptr;			/// the world pointer (if any) for the map layer
 	std::vector<CUnit *> LayerConnectors;		/// connectors in the map layer which lead to other map layers
-	std::vector<std::tuple<Vec2i, Vec2i, stratagus::map_template *>> subtemplate_areas;
+	std::vector<std::tuple<Vec2i, Vec2i, wyrmgus::map_template *>> subtemplate_areas;
 	std::vector<Vec2i> DestroyedForestTiles;	/// destroyed forest tiles; this list is used for forest regeneration
 };

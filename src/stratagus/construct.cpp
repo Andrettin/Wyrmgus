@@ -83,7 +83,7 @@ void CConstruction::Load()
 	if (!file.empty()) {
 		UpdateLoadProgress();
 		this->Sprite = CPlayerColorGraphic::New(file, QSize(this->Width, this->Height), nullptr);
-		this->Sprite->Load(false, stratagus::defines::get()->get_scale_factor());
+		this->Sprite->Load(false, wyrmgus::defines::get()->get_scale_factor());
 		IncItemsLoaded();
 	}
 	file = this->ShadowFile.File;
@@ -92,7 +92,7 @@ void CConstruction::Load()
 	if (!file.empty()) {
 		UpdateLoadProgress();
 		this->ShadowSprite = CGraphic::New(file, this->ShadowWidth, this->ShadowHeight);
-		this->ShadowSprite->Load(false, stratagus::defines::get()->get_scale_factor());
+		this->ShadowSprite->Load(false, wyrmgus::defines::get()->get_scale_factor());
 		IncItemsLoaded();
 	}
 }

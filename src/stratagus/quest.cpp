@@ -47,7 +47,7 @@
 #include "script.h"
 #include "unit/unit_class.h"
 
-stratagus::quest *CurrentQuest = nullptr;
+wyrmgus::quest *CurrentQuest = nullptr;
 
 void SaveQuestCompletion()
 {
@@ -74,7 +74,7 @@ void SaveQuestCompletion()
 	
 	fprintf(fd, "\n");
 	
-	for (const stratagus::quest *quest : stratagus::quest::get_all()) {
+	for (const wyrmgus::quest *quest : wyrmgus::quest::get_all()) {
 		if (quest->Completed) {
 			fprintf(fd, "SetQuestCompleted(\"%s\", %d, false)\n", quest->get_identifier().c_str(), quest->HighestCompletedDifficulty);
 		}
@@ -83,9 +83,9 @@ void SaveQuestCompletion()
 	fclose(fd);
 }
 
-namespace stratagus {
+namespace wyrmgus {
 
-quest_objective::quest_objective(const stratagus::objective_type objective_type, const stratagus::quest *quest)
+quest_objective::quest_objective(const wyrmgus::objective_type objective_type, const wyrmgus::quest *quest)
 	: objective_type(objective_type), quest(quest), index(quest->get_objectives().size())
 {
 	if (objective_type == objective_type::hero_must_survive) {
@@ -93,7 +93,7 @@ quest_objective::quest_objective(const stratagus::objective_type objective_type,
 	}
 }
 
-void quest_objective::process_sml_property(const stratagus::sml_property &property)
+void quest_objective::process_sml_property(const wyrmgus::sml_property &property)
 {
 	const std::string &key = property.get_key();
 	const std::string &value = property.get_value();
@@ -103,24 +103,24 @@ void quest_objective::process_sml_property(const stratagus::sml_property &proper
 	} else if (key == "objective_string") {
 		this->objective_string = value;
 	} else if (key == "settlement") {
-		this->settlement = stratagus::site::get(value);
+		this->settlement = wyrmgus::site::get(value);
 	} else if (key == "faction") {
-		this->faction = stratagus::faction::get(value);
+		this->faction = wyrmgus::faction::get(value);
 	} else if (key == "character") {
-		this->character = stratagus::character::get(value);
+		this->character = wyrmgus::character::get(value);
 	} else {
 		throw std::runtime_error("Invalid quest objective property: \"" + key + "\".");
 	}
 }
 
-void quest_objective::process_sml_scope(const stratagus::sml_data &scope)
+void quest_objective::process_sml_scope(const wyrmgus::sml_data &scope)
 {
 	const std::string &tag = scope.get_tag();
 	const std::vector<std::string> &values = scope.get_values();
 
 	if (tag == "unit_classes") {
 		for (const std::string &value : values) {
-			this->unit_classes.push_back(stratagus::unit_class::get(value));
+			this->unit_classes.push_back(wyrmgus::unit_class::get(value));
 		}
 	} else {
 		throw std::runtime_error("Invalid quest objective scope: \"" + scope.get_tag() + "\".");
@@ -205,7 +205,7 @@ void SetCurrentQuest(const std::string &quest_ident)
 	if (quest_ident.empty()) {
 		CurrentQuest = nullptr;
 	} else {
-		CurrentQuest = stratagus::quest::get(quest_ident);
+		CurrentQuest = wyrmgus::quest::get(quest_ident);
 	}
 }
 
@@ -220,7 +220,7 @@ std::string GetCurrentQuest()
 
 void SetQuestCompleted(const std::string &quest_ident, int difficulty, bool save)
 {
-	stratagus::quest *quest = stratagus::quest::try_get(quest_ident);
+	wyrmgus::quest *quest = wyrmgus::quest::try_get(quest_ident);
 	if (!quest) {
 		return;
 	}

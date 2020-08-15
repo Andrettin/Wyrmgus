@@ -1,4 +1,4 @@
-$using namespace stratagus;
+$using namespace wyrmgus;
 
 class minimap
 {
@@ -9,4 +9,3 @@ class minimap
 	bool ShowSelected;
 	bool Transparent;
 };
-

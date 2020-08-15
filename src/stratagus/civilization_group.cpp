@@ -29,7 +29,7 @@
 
 #include "civilization_supergroup.h"
 
-namespace stratagus {
+namespace wyrmgus {
 
 void civilization_group::initialize()
 {

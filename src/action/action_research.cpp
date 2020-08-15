@@ -124,7 +124,7 @@ COrder *COrder::NewActionResearch(CUnit &unit, const CUpgrade &upgrade, int play
 /* virtual */ void COrder_Research::Execute(CUnit &unit)
 {
 	const CUpgrade &upgrade = this->GetUpgrade();
-	const stratagus::unit_type &type = *unit.Type;
+	const wyrmgus::unit_type &type = *unit.Type;
 
 	UnitShowAnimation(unit, unit.GetAnimations()->Research ? unit.GetAnimations()->Research.get() : unit.GetAnimations()->Still.get());
 	if (unit.Wait) {
@@ -153,8 +153,8 @@ COrder *COrder::NewActionResearch(CUnit &unit, const CUpgrade &upgrade, int play
 		}
 		if (&player == CPlayer::GetThisPlayer()) {
 			//Wyrmgus start
-//			stratagus::sound *sound = GameSounds.ResearchComplete[player.Race].Sound;
-			stratagus::sound *sound = GameSounds.ResearchComplete[unit.Player->Race].Sound;
+//			wyrmgus::sound *sound = GameSounds.ResearchComplete[player.Race].Sound;
+			wyrmgus::sound *sound = GameSounds.ResearchComplete[unit.Player->Race].Sound;
 			if (sound == nullptr) {
 				sound = GameSounds.WorkComplete[unit.Player->Race].Sound;
 			}

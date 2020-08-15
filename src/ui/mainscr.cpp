@@ -162,7 +162,7 @@ static void UiDrawLifeBar(const CUnit &unit, int x, int y)
 {
 	// FIXME: add icon borders
 	int hBar, hAll;
-	const int scale_factor = stratagus::defines::get()->get_scale_factor();
+	const int scale_factor = wyrmgus::defines::get()->get_scale_factor();
 	//Wyrmgus start
 	if (Preference.IconsShift && Preference.IconFrameG && Preference.PressedIconFrameG) {
 //	if (Preference.IconsShift) {
@@ -336,7 +336,7 @@ struct UStrInt {
 UStrInt GetComponent(const CUnit &unit, int index, EnumVariable e, int t)
 {
 	UStrInt val;
-	const stratagus::unit_variable *var;
+	const wyrmgus::unit_variable *var;
 
 	Assert((unsigned int) index < UnitTypeVar.GetNumberVariable());
 	
@@ -423,10 +423,10 @@ UStrInt GetComponent(const CUnit &unit, int index, EnumVariable e, int t)
 	return val;
 }
 
-UStrInt GetComponent(const stratagus::unit_type &type, int index, EnumVariable e, int t)
+UStrInt GetComponent(const wyrmgus::unit_type &type, int index, EnumVariable e, int t)
 {
 	UStrInt val;
-	const stratagus::unit_variable *var;
+	const wyrmgus::unit_variable *var;
 
 	Assert((unsigned int) index < UnitTypeVar.GetNumberVariable());
 
@@ -499,9 +499,9 @@ static void DrawUnitInfo_Training(const CUnit &unit)
 		if (UI.SingleTrainingButton) {
 			const COrder_Train &order = *static_cast<COrder_Train *>(unit.CurrentOrder());
 			//Wyrmgus sta
-			const stratagus::unit_type_variation *variation = order.GetUnitType().GetDefaultVariation(CPlayer::GetThisPlayer());
-//			stratagus::icon &icon = *order.GetUnitType().Icon.Icon;
-			stratagus::icon &icon = (variation && variation->Icon.Icon) ? *variation->Icon.Icon : *order.GetUnitType().Icon.Icon;
+			const wyrmgus::unit_type_variation *variation = order.GetUnitType().GetDefaultVariation(CPlayer::GetThisPlayer());
+//			wyrmgus::icon &icon = *order.GetUnitType().Icon.Icon;
+			wyrmgus::icon &icon = (variation && variation->Icon.Icon) ? *variation->Icon.Icon : *order.GetUnitType().Icon.Icon;
 			//Wyrmgus end
 			//Wyrmgus start
 //			const unsigned int flags = (ButtonAreaUnderCursor == ButtonAreaTraining && ButtonUnderCursor == 0) ?
@@ -535,8 +535,8 @@ static void DrawUnitInfo_Training(const CUnit &unit)
 					if (j >= UI.TrainingButtons.size()) {
 						break;
 					}
-					const stratagus::unit_type_variation *variation = order.GetUnitType().GetDefaultVariation(CPlayer::GetThisPlayer());
-					stratagus::icon &icon = (variation && variation->Icon.Icon) ? *variation->Icon.Icon : *order.GetUnitType().Icon.Icon;
+					const wyrmgus::unit_type_variation *variation = order.GetUnitType().GetDefaultVariation(CPlayer::GetThisPlayer());
+					wyrmgus::icon &icon = (variation && variation->Icon.Icon) ? *variation->Icon.Icon : *order.GetUnitType().Icon.Icon;
 					//Wyrmgus start
 //					const int flag = (ButtonAreaUnderCursor == ButtonAreaTraining
 					int flag = (ButtonAreaUnderCursor == ButtonAreaTraining
@@ -561,7 +561,7 @@ static void DrawUnitInfo_Training(const CUnit &unit)
 					CLabel label(GetGameFont(), oldnc, oldrc);
 
 					const PixelPos pos(UI.TrainingButtons[i].X, UI.TrainingButtons[i].Y);
-					label.Draw(pos.x + 46 * stratagus::defines::get()->get_scale_factor() - GetGameFont().Width(number_string), pos.y + 0, number_string);
+					label.Draw(pos.x + 46 * wyrmgus::defines::get()->get_scale_factor() - GetGameFont().Width(number_string), pos.y + 0, number_string);
 				}
 			}
 		}
@@ -570,7 +570,7 @@ static void DrawUnitInfo_Training(const CUnit &unit)
 
 static void DrawUnitInfo_portrait(const CUnit &unit)
 {
-	const stratagus::unit_type &type = *unit.Type;
+	const wyrmgus::unit_type &type = *unit.Type;
 #ifdef USE_MNG
 	if (type.Portrait.Num) {
 		type.Portrait.Mngs[type.Portrait.CurrMng]->Draw(
@@ -629,7 +629,7 @@ static bool DrawUnitInfo_single_selection(const CUnit &unit)
 				}
 				//Wyrmgus end
 
-				stratagus::icon &icon = *order.GetUnitType().Icon.Icon;
+				wyrmgus::icon &icon = *order.GetUnitType().Icon.Icon;
 				unsigned int flag = (ButtonAreaUnderCursor == ButtonAreaUpgrading
 									 && ButtonUnderCursor == 0) ?
 									(IconActive | (MouseButtons & LeftButton)) : 0;
@@ -649,7 +649,7 @@ static bool DrawUnitInfo_single_selection(const CUnit &unit)
 				}
 				//Wyrmgus end
 				
-				stratagus::icon &icon = *order.GetUpgrade().get_icon();
+				wyrmgus::icon &icon = *order.GetUpgrade().get_icon();
 				int flag = (ButtonAreaUnderCursor == ButtonAreaResearching
 							&& ButtonUnderCursor == 0) ?
 						   (IconActive | (MouseButtons & LeftButton)) : 0;
@@ -745,7 +745,7 @@ static void DrawUnitInfo(CUnit &unit)
 		}
 	}
 
-	const stratagus::unit_type &type = *unit.Type;
+	const wyrmgus::unit_type &type = *unit.Type;
 	Assert(&type);
 
 	// Draw IconUnit
@@ -772,7 +772,7 @@ static void DrawUnitInfo(CUnit &unit)
 	}
 	
 	//Wyrmgus start
-	if (unit.HasInventory() && unit.InsideCount && CurrentButtonLevel == stratagus::defines::get()->get_inventory_button_level()) {
+	if (unit.HasInventory() && unit.InsideCount && CurrentButtonLevel == wyrmgus::defines::get()->get_inventory_button_level()) {
 		DrawUnitInfo_inventory(unit);
 		return;
 	}
@@ -812,7 +812,7 @@ void DrawResources()
 				UI.Resources[i].Font = &GetSmallFont();
 				label.SetFont(*UI.Resources[i].Font);
 
-				label.Draw(UI.Resources[i].TextX, UI.Resources[i].TextY + 3 * stratagus::defines::get()->get_scale_factor(), tmp);
+				label.Draw(UI.Resources[i].TextX, UI.Resources[i].TextY + 3 * wyrmgus::defines::get()->get_scale_factor(), tmp);
 			} else {
 				UI.Resources[i].Text = FormatNumber(resourceAmount);
 				UI.Resources[i].Font = resourceAmount > 99999 ? &GetSmallFont() : &GetGameFont();
@@ -862,14 +862,14 @@ void DrawTime()
 {
 	if (UI.CurrentMapLayer != nullptr) {
 		const QPoint tile_pos = UI.SelectedViewport->screen_center_to_tile_pos();
-		const stratagus::time_of_day *time_of_day = UI.CurrentMapLayer->get_tile_time_of_day(tile_pos);
+		const wyrmgus::time_of_day *time_of_day = UI.CurrentMapLayer->get_tile_time_of_day(tile_pos);
 		if (time_of_day != nullptr) {
 			UI.TimeOfDayPanel.G = time_of_day->G;
 		} else {
 			UI.TimeOfDayPanel.G = nullptr;
 		}
 
-		const stratagus::season *season = UI.CurrentMapLayer->GetSeason();
+		const wyrmgus::season *season = UI.CurrentMapLayer->GetSeason();
 		if (season) {
 			UI.SeasonPanel.G = season->G;
 		} else {
@@ -886,10 +886,10 @@ void DrawTime()
 	}
 	
 	if (CPlayer::GetThisPlayer()) {
-		stratagus::calendar *calendar = stratagus::civilization::get_all()[CPlayer::GetThisPlayer()->Race]->get_calendar();
+		wyrmgus::calendar *calendar = wyrmgus::civilization::get_all()[CPlayer::GetThisPlayer()->Race]->get_calendar();
 		
 		if (UI.DatePanel.TextX != -1) {
-			std::string date_string = CDate(stratagus::game::get()->get_current_date()).ToDisplayString(calendar, true);
+			std::string date_string = CDate(wyrmgus::game::get()->get_current_date()).ToDisplayString(calendar, true);
 
 			CLabel label(GetGameFont());
 			label.Draw(UI.DatePanel.TextX, UI.DatePanel.TextY, date_string);
@@ -927,7 +927,7 @@ void DrawMapLayerButtons()
 		if (UI.WorldButtons[i].X != -1) {
 			DrawUIButton(UI.WorldButtons[i].Style,
 				(ButtonAreaUnderCursor == ButtonAreaMapLayerWorld && ButtonUnderCursor == i ? MI_FLAGS_ACTIVE : 0)
-				| ((UI.WorldButtons[i].Clicked || CMap::Map.GetCurrentWorld() == stratagus::world::get_all()[i]) ? MI_FLAGS_CLICKED : 0),
+				| ((UI.WorldButtons[i].Clicked || CMap::Map.GetCurrentWorld() == wyrmgus::world::get_all()[i]) ? MI_FLAGS_CLICKED : 0),
 				UI.WorldButtons[i].X, UI.WorldButtons[i].Y,
 				UI.WorldButtons[i].Text
 			);
@@ -935,9 +935,9 @@ void DrawMapLayerButtons()
 	}
 }
 
-static std::unique_ptr<stratagus::button> get_territory_tooltip_button(const CPlayer *player)
+static std::unique_ptr<wyrmgus::button> get_territory_tooltip_button(const CPlayer *player)
 {
-	auto button = std::make_unique<stratagus::button>();
+	auto button = std::make_unique<wyrmgus::button>();
 	button->Hint = player->get_full_name();
 	button->Action = ButtonCmd::Player;
 	button->Popup = "popup_territory";
@@ -979,7 +979,7 @@ void DrawPopups()
 						unit_name += " (" + UnitUnderCursor->Player->Name + ")";
 					}
 					//hackish way to make the popup appear correctly for the unit under cursor
-					stratagus::button *ba = new stratagus::button;
+					wyrmgus::button *ba = new wyrmgus::button;
 					ba->Hint = unit_name;
 					ba->Action = ButtonCmd::Unit;
 					ba->Value = UnitNumber(*UnitUnderCursor);
@@ -991,7 +991,7 @@ void DrawPopups()
 					if (UI.get_tooltip_cycle_count() >= UI.get_tooltip_cycle_threshold()) {
 						PixelPos tile_center_pos = CMap::Map.tile_pos_to_scaled_map_pixel_pos_top_left(tilePos);
 						tile_center_pos = vp->scaled_map_to_screen_pixel_pos(tile_center_pos);
-						const stratagus::civilization *tile_owner_civilization = mf.get_owner() ? mf.get_owner()->get_civilization() : nullptr;
+						const wyrmgus::civilization *tile_owner_civilization = mf.get_owner() ? mf.get_owner()->get_civilization() : nullptr;
 						const std::string &terrain_feature_name = mf.get_terrain_feature()->get_cultural_name(tile_owner_civilization);
 						DrawGenericPopup(terrain_feature_name, tile_center_pos.x, tile_center_pos.y);
 					} else {
@@ -1005,7 +1005,7 @@ void DrawPopups()
 	if (Selected.size() == 1) {
 		if (ButtonAreaUnderCursor == ButtonAreaSelected && ButtonUnderCursor == 0) {
 			//hackish way to make the popup appear correctly for the single selected unit
-			stratagus::button ba;
+			wyrmgus::button ba;
 			ba.Hint = Selected[0]->GetMessageName();
 			ba.Action = ButtonCmd::Unit;
 			ba.Value = UnitNumber(*Selected[0]);
@@ -1014,7 +1014,7 @@ void DrawPopups()
 			LastDrawnButtonPopup = nullptr;
 		}
 		
-		if (!(Selected[0]->Player != CPlayer::GetThisPlayer() && !CPlayer::GetThisPlayer()->IsAllied(*Selected[0]->Player) && !CPlayer::GetThisPlayer()->HasBuildingAccess(*Selected[0]->Player)) && Selected[0]->HasInventory() && Selected[0]->InsideCount && CurrentButtonLevel == stratagus::defines::get()->get_inventory_button_level()) {
+		if (!(Selected[0]->Player != CPlayer::GetThisPlayer() && !CPlayer::GetThisPlayer()->IsAllied(*Selected[0]->Player) && !CPlayer::GetThisPlayer()->HasBuildingAccess(*Selected[0]->Player)) && Selected[0]->HasInventory() && Selected[0]->InsideCount && CurrentButtonLevel == wyrmgus::defines::get()->get_inventory_button_level()) {
 		CUnit *uins = Selected[0]->UnitInside;
 		size_t j = 0;
 
@@ -1037,7 +1037,7 @@ void DrawPopups()
 				if (ButtonAreaUnderCursor == ButtonAreaInventory
 					&& static_cast<size_t>(ButtonUnderCursor) == j) {
 					//hackish way to make the popup appear correctly for the inventory item
-					stratagus::button *ba = new stratagus::button;
+					wyrmgus::button *ba = new wyrmgus::button;
 					if (!uins->Name.empty() && uins->Identified) {
 						ba->Hint = uins->Name;
 					} else {
@@ -1047,7 +1047,7 @@ void DrawPopups()
 						}
 					}
 					ba->pos = j;
-					ba->level = stratagus::defines::get()->get_inventory_button_level();
+					ba->level = wyrmgus::defines::get()->get_inventory_button_level();
 					ba->Action = ButtonCmd::Unit;
 					ba->Value = UnitNumber(*uins);
 					ba->Popup = "popup_item_inventory";
@@ -1102,13 +1102,13 @@ void DrawPopups()
 	for (int i = 0; i < MaxCosts; ++i) {
 		if (UI.Resources[i].G && CursorScreenPos.x >= UI.Resources[i].IconX && CursorScreenPos.x < (UI.Resources[i].TextX + UI.Resources[i].Font->Width(UI.Resources[i].Text)) && CursorScreenPos.y >= UI.Resources[i].IconY && CursorScreenPos.y < (UI.Resources[i].IconY + UI.Resources[i].G->Height)) {
 			//hackish way to make the popup appear correctly for the resource
-			stratagus::button *ba = new stratagus::button;
+			wyrmgus::button *ba = new wyrmgus::button;
 			ba->Hint = CapitalizeString(DefaultResourceNames[i]);
 			ba->Action = ButtonCmd::ProduceResource;
 			ba->Value = i;
 			ba->ValueStr = DefaultResourceNames[i];
 			ba->Popup = "popup_resource";
-			DrawPopup(*ba, UI.Resources[i].IconX, UI.Resources[i].IconY + 16 * stratagus::defines::get()->get_scale_factor() + GameCursor->get_graphic()->getHeight() / 2, false);
+			DrawPopup(*ba, UI.Resources[i].IconX, UI.Resources[i].IconY + 16 * wyrmgus::defines::get()->get_scale_factor() + GameCursor->get_graphic()->getHeight() / 2, false);
 			delete ba;
 			LastDrawnButtonPopup = nullptr;
 		}
@@ -1116,16 +1116,16 @@ void DrawPopups()
 	
 	if (UI.Resources[FoodCost].G && CursorScreenPos.x >= UI.Resources[FoodCost].IconX && CursorScreenPos.x < (UI.Resources[FoodCost].TextX + UI.Resources[FoodCost].Font->Width(UI.Resources[FoodCost].Text)) && CursorScreenPos.y >= UI.Resources[FoodCost].IconY && CursorScreenPos.y < (UI.Resources[FoodCost].IconY + UI.Resources[FoodCost].G->Height)) {
 		//hackish way to make the popup appear correctly
-		stratagus::button ba;
+		wyrmgus::button ba;
 		ba.Hint = _("Food");
 		ba.Action = ButtonCmd::None;
 		ba.Popup = "popup_food";
-		DrawPopup(ba, UI.Resources[FoodCost].IconX, UI.Resources[FoodCost].IconY + 16 * stratagus::defines::get()->get_scale_factor() + GameCursor->get_graphic()->getHeight() / 2, false);
+		DrawPopup(ba, UI.Resources[FoodCost].IconX, UI.Resources[FoodCost].IconY + 16 * wyrmgus::defines::get()->get_scale_factor() + GameCursor->get_graphic()->getHeight() / 2, false);
 		LastDrawnButtonPopup = nullptr;
 	}
 	
 	if (UI.Resources[ScoreCost].G && CursorScreenPos.x >= UI.Resources[ScoreCost].IconX && CursorScreenPos.x < (UI.Resources[ScoreCost].TextX + UI.Resources[ScoreCost].Font->Width(UI.Resources[ScoreCost].Text)) && CursorScreenPos.y >= UI.Resources[ScoreCost].IconY && CursorScreenPos.y < (UI.Resources[ScoreCost].IconY + UI.Resources[ScoreCost].G->Height)) {
-		DrawGenericPopup(_("Score"), UI.Resources[ScoreCost].IconX, UI.Resources[ScoreCost].IconY + 16 * stratagus::defines::get()->get_scale_factor() + GameCursor->get_graphic()->getHeight() / 2, "", "", false);
+		DrawGenericPopup(_("Score"), UI.Resources[ScoreCost].IconX, UI.Resources[ScoreCost].IconY + 16 * wyrmgus::defines::get()->get_scale_factor() + GameCursor->get_graphic()->getHeight() / 2, "", "", false);
 	}
 	
 	if (
@@ -1138,8 +1138,8 @@ void DrawPopups()
 		&& CursorScreenPos.y < (UI.TimeOfDayPanel.IconY + UI.TimeOfDayPanel.G->getHeight())
 	) {
 		const QPoint tile_pos = UI.SelectedViewport->screen_center_to_tile_pos();
-		const stratagus::time_of_day *time_of_day = UI.CurrentMapLayer->get_tile_time_of_day(tile_pos);
-		DrawGenericPopup(_(time_of_day->get_name().c_str()), UI.TimeOfDayPanel.IconX, UI.TimeOfDayPanel.IconY + 16 * stratagus::defines::get()->get_scale_factor() + GameCursor->get_graphic()->getHeight() / 2, "", "", false);
+		const wyrmgus::time_of_day *time_of_day = UI.CurrentMapLayer->get_tile_time_of_day(tile_pos);
+		DrawGenericPopup(_(time_of_day->get_name().c_str()), UI.TimeOfDayPanel.IconX, UI.TimeOfDayPanel.IconY + 16 * wyrmgus::defines::get()->get_scale_factor() + GameCursor->get_graphic()->getHeight() / 2, "", "", false);
 	}
 	
 	if (
@@ -1151,7 +1151,7 @@ void DrawPopups()
 		&& CursorScreenPos.y >= UI.SeasonPanel.IconY
 		&& CursorScreenPos.y < (UI.SeasonPanel.IconY + UI.SeasonPanel.G->getHeight())
 	) {
-		DrawGenericPopup(_(UI.CurrentMapLayer->GetSeason()->get_name().c_str()), UI.SeasonPanel.IconX, UI.SeasonPanel.IconY + 16 * stratagus::defines::get()->get_scale_factor() + GameCursor->get_graphic()->getHeight() / 2, "", "", false);
+		DrawGenericPopup(_(UI.CurrentMapLayer->GetSeason()->get_name().c_str()), UI.SeasonPanel.IconX, UI.SeasonPanel.IconY + 16 * wyrmgus::defines::get()->get_scale_factor() + GameCursor->get_graphic()->getHeight() / 2, "", "", false);
 	}
 	
 	//commented out as right now the popup is a bit pointless, as it only shows the same text as what's already written in the HUD; the popup should be restored when they are able to show more text
@@ -1164,12 +1164,12 @@ void DrawPopups()
 		&& CursorScreenPos.y >= UI.AgePanel.TextY
 		&& CursorScreenPos.y < (UI.AgePanel.TextY + UI.AgePanel.Font->Height())
 	) {
-		DrawGenericPopup(_(UI.AgePanel.Text.c_str()), UI.AgePanel.TextX, UI.AgePanel.TextY + 16 * stratagus::defines::get()->get_scale_factor() + GameCursor->G->getHeight() / 2, "", "", false);
+		DrawGenericPopup(_(UI.AgePanel.Text.c_str()), UI.AgePanel.TextX, UI.AgePanel.TextY + 16 * wyrmgus::defines::get()->get_scale_factor() + GameCursor->G->getHeight() / 2, "", "", false);
 	}
 	*/
 	
 	if (ButtonAreaUnderCursor == ButtonAreaMapLayerWorld) {
-		DrawGenericPopup(stratagus::world::get_all()[ButtonUnderCursor]->get_name(), UI.WorldButtons[ButtonUnderCursor].X, UI.WorldButtons[ButtonUnderCursor].Y);
+		DrawGenericPopup(wyrmgus::world::get_all()[ButtonUnderCursor]->get_name(), UI.WorldButtons[ButtonUnderCursor].X, UI.WorldButtons[ButtonUnderCursor].Y);
 	}
 
 	if (CursorOn == cursor_on::minimap) {
@@ -1178,35 +1178,35 @@ void DrawPopups()
 			const CMapField *tile = UI.CurrentMapLayer->Field(tile_pos);
 
 			//hackish way to make the popup appear correctly
-			std::unique_ptr<stratagus::button> button;
+			std::unique_ptr<wyrmgus::button> button;
 			const bool is_tile_water = tile->is_water() && !tile->is_river();
 			const bool is_tile_space = tile->is_space();
 			const bool is_tile_non_land = is_tile_water || is_tile_space;
 
 			switch (UI.Minimap.get_mode()) {
-				case stratagus::minimap_mode::territories:
+				case wyrmgus::minimap_mode::territories:
 					if (tile->get_owner() != nullptr && !is_tile_non_land) {
 						button = get_territory_tooltip_button(tile->get_owner());
 					}
 					break;
-				case stratagus::minimap_mode::territories_with_non_land:
+				case wyrmgus::minimap_mode::territories_with_non_land:
 					if (tile->get_owner() != nullptr) {
 						button = get_territory_tooltip_button(tile->get_owner());
 					}
 					break;
-				case stratagus::minimap_mode::realms:
+				case wyrmgus::minimap_mode::realms:
 					if (tile->get_realm_owner() != nullptr && !is_tile_non_land) {
 						button = get_territory_tooltip_button(tile->get_realm_owner());
 					}
 					break;
-				case stratagus::minimap_mode::realms_with_non_land:
+				case wyrmgus::minimap_mode::realms_with_non_land:
 					if (tile->get_realm_owner() != nullptr) {
 						button = get_territory_tooltip_button(tile->get_realm_owner());
 					}
 					break;
-				case stratagus::minimap_mode::settlements:
+				case wyrmgus::minimap_mode::settlements:
 					if (tile->get_settlement() != nullptr && is_tile_water == (tile->get_settlement()->get_site_unit()->get_center_tile()->is_water() && !tile->get_settlement()->get_site_unit()->get_center_tile()->is_river()) && is_tile_space == tile->get_settlement()->get_site_unit()->get_center_tile()->is_space()) {
-						button = std::make_unique<stratagus::button>();
+						button = std::make_unique<wyrmgus::button>();
 						button->Action = ButtonCmd::None;
 						button->Popup = "popup_settlement";
 						if (tile->get_owner() != nullptr) {
@@ -1321,7 +1321,7 @@ void MessagesDisplay::UpdateMessages()
 	const unsigned long ticks = GetTicks();
 	if (MessagesFrameTimeout < ticks) {
 		++MessagesScrollY;
-		if (MessagesScrollY == UI.MessageFont->Height() + 1 * stratagus::defines::get()->get_scale_factor()) {
+		if (MessagesScrollY == UI.MessageFont->Height() + 1 * wyrmgus::defines::get()->get_scale_factor()) {
 			MessagesFrameTimeout = ticks + UI.MessageScrollSpeed * 1000;
 			MessagesScrollY = 0;
 			ShiftMessages();
@@ -1338,7 +1338,7 @@ void MessagesDisplay::DrawMessages()
 {
 	if (show && Preference.ShowMessages) {
 		CLabel label(*UI.MessageFont);
-			const int scale_factor = stratagus::defines::get()->get_scale_factor();
+			const int scale_factor = wyrmgus::defines::get()->get_scale_factor();
 			// background so the text is easier to read
 			if (MessagesCount) {
 				int textHeight = MessagesCount * (UI.MessageFont->Height() + 1 * scale_factor);
@@ -1414,7 +1414,7 @@ void MessagesDisplay::DrawMessages()
 				}
 			}
 			
-			for (const stratagus::quest *quest : CPlayer::GetThisPlayer()->get_current_quests()) {
+			for (const wyrmgus::quest *quest : CPlayer::GetThisPlayer()->get_current_quests()) {
 				if (z == 0) {
 					PushClipping();
 					SetClipping(UI.MapArea.X + 8 * scale_factor, UI.MapArea.Y + 8 * scale_factor, Video.Width - 1, Video.Height - 1);
@@ -1427,7 +1427,7 @@ void MessagesDisplay::DrawMessages()
 				++z;
 				
 				for (const auto &objective : CPlayer::GetThisPlayer()->get_quest_objectives()) {
-					const stratagus::quest_objective *quest_objective = objective->get_quest_objective();
+					const wyrmgus::quest_objective *quest_objective = objective->get_quest_objective();
 					if (quest_objective->get_quest() != quest) {
 						continue;
 					}
@@ -1824,7 +1824,7 @@ static void DrawInfoPanelBackground(unsigned frame)
 
 static void InfoPanel_draw_no_selection()
 {
-	const int scale_factor = stratagus::defines::get()->get_scale_factor();
+	const int scale_factor = wyrmgus::defines::get()->get_scale_factor();
 
 	DrawInfoPanelBackground(0);
 	if (UnitUnderCursor && UnitUnderCursor->IsVisible(*CPlayer::GetThisPlayer())
@@ -1864,7 +1864,7 @@ static void InfoPanel_draw_no_selection()
 
 		//sort players by order of distance of their start position to the main player's
 		std::sort(listed_players.begin(), listed_players.end(), [](const CPlayer *a, const CPlayer *b) {
-			return stratagus::point::distance_to(CPlayer::GetThisPlayer()->StartPos, a->StartPos) < stratagus::point::distance_to(CPlayer::GetThisPlayer()->StartPos, b->StartPos);
+			return wyrmgus::point::distance_to(CPlayer::GetThisPlayer()->StartPos, a->StartPos) < wyrmgus::point::distance_to(CPlayer::GetThisPlayer()->StartPos, b->StartPos);
 		});
 
 		for (const CPlayer *player : listed_players) {
@@ -1927,7 +1927,7 @@ static void InfoPanel_draw_single_selection(CUnit *selUnit)
 		&& !unit.IsEnemy(*CPlayer::GetThisPlayer())
 		&& (unit.Player->Type != PlayerNeutral || unit.Type->GivesResource)
 	) {
-		Preference.InfoPanelFrameG->DrawClip(UI.InfoPanel.X - 4 * stratagus::defines::get()->get_scale_factor(), UI.InfoPanel.Y + 93 * stratagus::defines::get()->get_scale_factor());
+		Preference.InfoPanelFrameG->DrawClip(UI.InfoPanel.X - 4 * wyrmgus::defines::get()->get_scale_factor(), UI.InfoPanel.Y + 93 * wyrmgus::defines::get()->get_scale_factor());
 	}
 	//Wyrmgus end	
 	DrawUnitInfo(unit);
@@ -1938,7 +1938,7 @@ static void InfoPanel_draw_single_selection(CUnit *selUnit)
 //		UI.StatusLine.Set(unit.Type->Name);
 		
 		//hackish way to make the popup appear correctly for the single selected unit
-		stratagus::button *ba = new stratagus::button;
+		wyrmgus::button *ba = new wyrmgus::button;
 		ba->Hint = unit.GetMessageName();
 		ba->Action = ButtonUnit;
 		ba->Value = UnitNumber(unit);
@@ -1958,7 +1958,7 @@ static void InfoPanel_draw_multiple_selection()
 	DrawInfoPanelBackground(0);
 	for (size_t i = 0; i != std::min(Selected.size(), UI.SelectedButtons.size()); ++i) {
 		//Wyrmgus start
-//		const stratagus::icon &icon = *Selected[i]->Type->Icon.Icon;
+//		const wyrmgus::icon &icon = *Selected[i]->Type->Icon.Icon;
 		//Wyrmgus end
 		const PixelPos pos(UI.SelectedButtons[i].X, UI.SelectedButtons[i].Y);
 		//Wyrmgus start

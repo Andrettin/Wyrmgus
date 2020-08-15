@@ -34,7 +34,7 @@
 #include "map/map_template.h"
 #include "map/site.h"
 
-namespace stratagus {
+namespace wyrmgus {
 	
 void historical_location::process_sml_property(const sml_property &property)
 {

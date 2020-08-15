@@ -55,7 +55,7 @@
 **
 **  @return        True if enabled.
 */
-bool ButtonCheckTrue(const CUnit &, const stratagus::button &)
+bool ButtonCheckTrue(const CUnit &, const wyrmgus::button &)
 {
 	return true;
 }
@@ -69,7 +69,7 @@ bool ButtonCheckTrue(const CUnit &, const stratagus::button &)
 **
 **  @return        True if enabled.
 */
-bool ButtonCheckFalse(const CUnit &, const stratagus::button &)
+bool ButtonCheckFalse(const CUnit &, const wyrmgus::button &)
 {
 	return false;
 }
@@ -82,7 +82,7 @@ bool ButtonCheckFalse(const CUnit &, const stratagus::button &)
 **
 **  @return        True if enabled.
 */
-bool ButtonCheckUpgrade(const CUnit &unit, const stratagus::button &button)
+bool ButtonCheckUpgrade(const CUnit &unit, const wyrmgus::button &button)
 {
 	CPlayer *player = unit.Player;
 	char *buf = new_strdup(button.AllowStr.c_str());
@@ -105,7 +105,7 @@ bool ButtonCheckUpgrade(const CUnit &unit, const stratagus::button &button)
 **
 **  @return        True if enabled.
 */
-bool ButtonCheckUpgradeNot(const CUnit &unit, const stratagus::button &button)
+bool ButtonCheckUpgradeNot(const CUnit &unit, const wyrmgus::button &button)
 {
 	return !ButtonCheckUpgrade(unit, button);
 }
@@ -118,7 +118,7 @@ bool ButtonCheckUpgradeNot(const CUnit &unit, const stratagus::button &button)
 **
 **  @return        True if enabled.
 */
-bool ButtonCheckUpgradeOr(const CUnit &unit, const stratagus::button &button)
+bool ButtonCheckUpgradeOr(const CUnit &unit, const wyrmgus::button &button)
 {
 	CPlayer *player = unit.Player;
 	char *buf = new_strdup(button.AllowStr.c_str());
@@ -141,7 +141,7 @@ bool ButtonCheckUpgradeOr(const CUnit &unit, const stratagus::button &button)
 **
 **  @return        True if enabled.
 */
-bool ButtonCheckIndividualUpgrade(const CUnit &unit, const stratagus::button &button)
+bool ButtonCheckIndividualUpgrade(const CUnit &unit, const wyrmgus::button &button)
 {
 	char *buf = new_strdup(button.AllowStr.c_str());
 
@@ -163,7 +163,7 @@ bool ButtonCheckIndividualUpgrade(const CUnit &unit, const stratagus::button &bu
 **
 **  @return        True if enabled.
 */
-bool ButtonCheckIndividualUpgradeOr(const CUnit &unit, const stratagus::button &button)
+bool ButtonCheckIndividualUpgradeOr(const CUnit &unit, const wyrmgus::button &button)
 {
 	char *buf = new_strdup(button.AllowStr.c_str());
 
@@ -185,7 +185,7 @@ bool ButtonCheckIndividualUpgradeOr(const CUnit &unit, const stratagus::button &
 **
 **  @return        True if enabled.
 */
-bool ButtonCheckUnitVariable(const CUnit &unit, const stratagus::button &button)
+bool ButtonCheckUnitVariable(const CUnit &unit, const wyrmgus::button &button)
 {
 	char *buf = new_strdup(button.AllowStr.c_str());
 
@@ -263,13 +263,13 @@ bool ButtonCheckUnitVariable(const CUnit &unit, const stratagus::button &button)
 **
 **  @return        True if enabled.
 */
-bool ButtonCheckUnitsOr(const CUnit &unit, const stratagus::button &button)
+bool ButtonCheckUnitsOr(const CUnit &unit, const wyrmgus::button &button)
 {
 	CPlayer *player = unit.Player;
 	char *buf = new_strdup(button.AllowStr.c_str());
 
 	for (const char *s = strtok(buf, ","); s; s = strtok(nullptr, ",")) {
-		const stratagus::unit_type *unit_type = stratagus::unit_type::try_get(s);
+		const wyrmgus::unit_type *unit_type = wyrmgus::unit_type::try_get(s);
 		if (unit_type != nullptr && player->has_unit_type(unit_type)) {
 			delete[] buf;
 			return true;
@@ -287,13 +287,13 @@ bool ButtonCheckUnitsOr(const CUnit &unit, const stratagus::button &button)
 **
 **  @return        True if enabled.
 */
-bool ButtonCheckUnitsAnd(const CUnit &unit, const stratagus::button &button)
+bool ButtonCheckUnitsAnd(const CUnit &unit, const wyrmgus::button &button)
 {
 	CPlayer *player = unit.Player;
 	char *buf = new_strdup(button.AllowStr.c_str());
 
 	for (const char *s = strtok(buf, ","); s; s = strtok(nullptr, ",")) {
-		const stratagus::unit_type *unit_type = stratagus::unit_type::try_get(s);
+		const wyrmgus::unit_type *unit_type = wyrmgus::unit_type::try_get(s);
 		if (unit_type != nullptr && player->has_unit_type(unit_type)) {
 			delete[] buf;
 			return false;
@@ -311,7 +311,7 @@ bool ButtonCheckUnitsAnd(const CUnit &unit, const stratagus::button &button)
 **
 **  @return        True if enabled.
 */
-bool ButtonCheckUnitsNot(const CUnit &unit, const stratagus::button &button)
+bool ButtonCheckUnitsNot(const CUnit &unit, const wyrmgus::button &button)
 {
 	return !ButtonCheckUnitsAnd(unit, button);
 }
@@ -326,7 +326,7 @@ bool ButtonCheckUnitsNot(const CUnit &unit, const stratagus::button &button)
 **
 **  @note: this check could also be moved into intialisation.
 */
-bool ButtonCheckNetwork(const CUnit &, const stratagus::button &)
+bool ButtonCheckNetwork(const CUnit &, const wyrmgus::button &)
 {
 	return IsNetworkGame();
 }
@@ -341,7 +341,7 @@ bool ButtonCheckNetwork(const CUnit &, const stratagus::button &)
 **
 **  @note: this check could also be moved into intialisation.
 */
-bool ButtonCheckNoNetwork(const CUnit &, const stratagus::button &)
+bool ButtonCheckNoNetwork(const CUnit &, const wyrmgus::button &)
 {
 	return !IsNetworkGame();
 }
@@ -355,7 +355,7 @@ bool ButtonCheckNoNetwork(const CUnit &, const stratagus::button &)
 **
 **  @return        True if enabled.
 */
-bool ButtonCheckNoWork(const CUnit &unit, const stratagus::button &)
+bool ButtonCheckNoWork(const CUnit &unit, const wyrmgus::button &)
 {
 	const UnitAction action = unit.CurrentAction();
 	//Wyrmgus start
@@ -377,7 +377,7 @@ bool ButtonCheckNoWork(const CUnit &unit, const stratagus::button &)
 **
 **  @return        True if enabled.
 */
-bool ButtonCheckNoResearch(const CUnit &unit, const stratagus::button &)
+bool ButtonCheckNoResearch(const CUnit &unit, const wyrmgus::button &)
 {
 	const UnitAction action = unit.CurrentAction();
 	return action != UnitAction::UpgradeTo && action != UnitAction::Research;
@@ -392,12 +392,12 @@ bool ButtonCheckNoResearch(const CUnit &unit, const stratagus::button &)
 **
 **  @return        True if enabled.
 */
-bool ButtonCheckUpgradeTo(const CUnit &unit, const stratagus::button &button)
+bool ButtonCheckUpgradeTo(const CUnit &unit, const wyrmgus::button &button)
 {
 	if (unit.CurrentAction() != UnitAction::Still) {
 		return false;
 	}
-	return CheckConditions(stratagus::unit_type::get_all()[button.Value], unit.Player, false, true);
+	return CheckConditions(wyrmgus::unit_type::get_all()[button.Value], unit.Player, false, true);
 }
 
 /**
@@ -408,7 +408,7 @@ bool ButtonCheckUpgradeTo(const CUnit &unit, const stratagus::button &button)
 **
 **  @return        True if enabled.
 */
-bool ButtonCheckAttack(const CUnit &unit, const stratagus::button &)
+bool ButtonCheckAttack(const CUnit &unit, const wyrmgus::button &)
 {
 	//Wyrmgus start
 //	return unit.Type->CanAttack;
@@ -424,7 +424,7 @@ bool ButtonCheckAttack(const CUnit &unit, const stratagus::button &)
 **
 **  @return        True if enabled.
 */
-bool ButtonCheckResearch(const CUnit &unit, const stratagus::button &button)
+bool ButtonCheckResearch(const CUnit &unit, const wyrmgus::button &button)
 {
 	// don't show any if working
 	if (!ButtonCheckNoWork(unit, button)) {
@@ -454,7 +454,7 @@ bool ButtonCheckResearch(const CUnit &unit, const stratagus::button &button)
 **
 **  @return        True if enabled.
 */
-bool ButtonCheckSingleResearch(const CUnit &unit, const stratagus::button &button)
+bool ButtonCheckSingleResearch(const CUnit &unit, const wyrmgus::button &button)
 {
 	if (ButtonCheckResearch(unit, button)
 		//Wyrmgus start
@@ -475,7 +475,7 @@ bool ButtonCheckSingleResearch(const CUnit &unit, const stratagus::button &butto
 **
 **  @return        True if enabled.
 */
-bool ButtonCheckHasInventory(const CUnit &unit, const stratagus::button &button)
+bool ButtonCheckHasInventory(const CUnit &unit, const wyrmgus::button &button)
 {
 	return Selected.size() == 1 && unit.HasInventory();
 }
@@ -488,9 +488,9 @@ bool ButtonCheckHasInventory(const CUnit &unit, const stratagus::button &button)
 **
 **  @return        True if enabled.
 */
-bool ButtonCheckHasSubButtons(const CUnit &unit, const stratagus::button &button)
+bool ButtonCheckHasSubButtons(const CUnit &unit, const wyrmgus::button &button)
 {
-	for (const stratagus::button *other_button : stratagus::button::get_all()) {
+	for (const wyrmgus::button *other_button : wyrmgus::button::get_all()) {
 		if (other_button->GetLevelID() != button.Value) {
 			continue;
 		}
@@ -501,7 +501,7 @@ bool ButtonCheckHasSubButtons(const CUnit &unit, const stratagus::button &button
 
 		char unit_ident[128];
 		sprintf(unit_ident, ",%s,", unit.Type->Ident.c_str());
-		if (other_button->UnitMask[0] != '*' && !strstr(other_button->UnitMask.c_str(), unit_ident) && !stratagus::vector::contains(other_button->get_unit_classes(), unit.Type->get_unit_class())) {
+		if (other_button->UnitMask[0] != '*' && !strstr(other_button->UnitMask.c_str(), unit_ident) && !wyrmgus::vector::contains(other_button->get_unit_classes(), unit.Type->get_unit_class())) {
 			continue;
 		}
 		

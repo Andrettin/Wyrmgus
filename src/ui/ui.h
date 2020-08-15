@@ -48,7 +48,7 @@ class CPopup;
 class CUnit;
 class LuaActionListener;
 
-namespace stratagus {
+namespace wyrmgus {
 	class cursor;
 	class minimap;
 	enum class cursor_type;
@@ -269,11 +269,11 @@ private:
 	void DoClicked_CancelUpgrade();
 	void DoClicked_CancelTrain();
 	void DoClicked_CancelBuild();
-	void DoClicked_Build(const std::unique_ptr<stratagus::button> &button);
-	void DoClicked_Train(const std::unique_ptr<stratagus::button> &button);
+	void DoClicked_Build(const std::unique_ptr<wyrmgus::button> &button);
+	void DoClicked_Train(const std::unique_ptr<wyrmgus::button> &button);
 	void DoClicked_UpgradeTo(int button);
 	void DoClicked_ExperienceUpgradeTo(int button);
-	void DoClicked_Research(const std::unique_ptr<stratagus::button> &button);
+	void DoClicked_Research(const std::unique_ptr<wyrmgus::button> &button);
 	void DoClicked_CallbackAction(int button);
 	void DoClicked_LearnAbility(int button);
 	void DoClicked_Faction(int button);
@@ -370,7 +370,7 @@ public:
 
 	void Load();
 
-	stratagus::cursor *get_cursor(const stratagus::cursor_type cursor_type) const
+	wyrmgus::cursor *get_cursor(const wyrmgus::cursor_type cursor_type) const
 	{
 		auto find_iterator = this->cursors.find(cursor_type);
 
@@ -499,7 +499,7 @@ public:
 	std::vector<CUIUserButton> UserButtons; /// User buttons
 
 	// The minimap
-	stratagus::minimap Minimap;
+	wyrmgus::minimap Minimap;
 	IntColor ViewportCursorColor;       /// minimap cursor color
 
 	// The status line
@@ -516,7 +516,7 @@ public:
 	//  Cursors used.
 	//
 private:
-	std::map<stratagus::cursor_type, stratagus::cursor *> cursors;
+	std::map<wyrmgus::cursor_type, wyrmgus::cursor *> cursors;
 
 	/// @todo could use different sounds/speech for the errors
 	/// Is in gamesounds?
@@ -531,7 +531,7 @@ public:
 	CGraphic *DefeatBackgroundG;        /// Defeat background graphic
 };
 
-extern std::vector<std::unique_ptr<stratagus::button>> CurrentButtons;  /// Current Selected Buttons
+extern std::vector<std::unique_ptr<wyrmgus::button>> CurrentButtons;  /// Current Selected Buttons
 
 extern CUserInterface UI;                           /// The user interface
 

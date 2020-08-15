@@ -32,7 +32,7 @@
 
 struct lua_State;
 
-namespace stratagus {
+namespace wyrmgus {
 	class character;
 	class player_color;
 	class quest;
@@ -85,7 +85,7 @@ private:
 	std::string name;				/// Name of the achievement
 	std::string description;		/// Description of the achievement
 public:
-	const stratagus::player_color *PlayerColor = nullptr; //player color used for the achievement's icon
+	const wyrmgus::player_color *PlayerColor = nullptr; //player color used for the achievement's icon
 	int CharacterLevel = 0;			/// Character level required for the achievement
 	int Difficulty = -1;			/// Which difficulty the achievement's requirements need to be done in
 private:
@@ -94,9 +94,9 @@ private:
 public:
 	bool Unobtainable = false;		/// Whether this achievement can be obtained by checking for it or not
 	IconConfig Icon;				/// Achievement's icon
-	const stratagus::character *Character = nullptr;	/// Character related to the achievement's requirements
-	const stratagus::unit_type *CharacterType = nullptr;	/// Unit type required for a character to have for the achievement
-	std::vector<const stratagus::quest *> RequiredQuests;	/// Quests required for obtaining this achievement
+	const wyrmgus::character *Character = nullptr;	/// Character related to the achievement's requirements
+	const wyrmgus::unit_type *CharacterType = nullptr;	/// Unit type required for a character to have for the achievement
+	std::vector<const wyrmgus::quest *> RequiredQuests;	/// Quests required for obtaining this achievement
 
 	friend int CclDefineAchievement(lua_State *l);
 };

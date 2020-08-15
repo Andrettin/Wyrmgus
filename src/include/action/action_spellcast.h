@@ -33,7 +33,7 @@
 
 class COrder_SpellCast : public COrder
 {
-	friend COrder *COrder::NewActionSpellCast(const stratagus::spell &spell, const Vec2i &pos, CUnit *target, int z, bool isAutocast);
+	friend COrder *COrder::NewActionSpellCast(const wyrmgus::spell &spell, const Vec2i &pos, CUnit *target, int z, bool isAutocast);
 public:
 	COrder_SpellCast(bool autocast = false) : COrder(UnitAction::SpellCast), Spell(nullptr), State(0), Range(0), MapLayer(0), isAutocast(autocast)
 	{
@@ -58,13 +58,13 @@ public:
 	//Wyrmgus start
 	virtual const int GetGoalMapLayer() const;
 	//Wyrmgus end
-	const stratagus::spell &GetSpell() const { return *Spell; }
-	void SetSpell(const stratagus::spell &spell) { Spell = &spell; }
+	const wyrmgus::spell &GetSpell() const { return *Spell; }
+	void SetSpell(const wyrmgus::spell &spell) { Spell = &spell; }
 private:
 	bool CheckForDeadGoal(CUnit &unit);
 	bool SpellMoveToTarget(CUnit &unit);
 private:
-	const stratagus::spell *Spell;
+	const wyrmgus::spell *Spell;
 	int State;
 	int Range;
 	Vec2i goalPos;

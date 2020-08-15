@@ -30,7 +30,7 @@
 #include "civilization_base.h"
 #include "database/data_type.h"
 
-namespace stratagus {
+namespace wyrmgus {
 
 class civilization_supergroup final : public civilization_base, public data_type<civilization_supergroup>
 {

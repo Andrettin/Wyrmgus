@@ -33,7 +33,7 @@
 
 class CGraphic;
 
-namespace stratagus {
+namespace wyrmgus {
 
 class season : public named_data_entry, public data_type<season>, public CDataType
 {

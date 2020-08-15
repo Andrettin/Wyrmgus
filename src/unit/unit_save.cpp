@@ -309,7 +309,7 @@ void SaveUnit(const CUnit &unit, CFile &file)
 	unit.pathFinderData->output.Save(file);
 
 	file.printf("\"wait\", %d, ", unit.Wait);
-	stratagus::animation_set::SaveUnitAnim(file, unit);
+	wyrmgus::animation_set::SaveUnitAnim(file, unit);
 	file.printf(",\n  \"blink\", %d,", unit.Blink);
 	if (unit.Moving) {
 		file.printf(" \"moving\",");
@@ -381,12 +381,12 @@ void SaveUnit(const CUnit &unit, CFile &file)
 	if (unit.Goal) {
 		file.printf(",\n  \"goal\", %d", UnitNumber(*unit.Goal));
 	}
-	for (const stratagus::spell *spell : unit.get_autocast_spells()) {
+	for (const wyrmgus::spell *spell : unit.get_autocast_spells()) {
 		file.printf(",\n  \"auto-cast\", \"%s\"", spell->get_identifier().c_str());
 	}
 	if (unit.SpellCoolDownTimers) {
 		file.printf(",\n  \"spell-cooldown\", {");
-		for (size_t i = 0; i < stratagus::spell::get_all().size(); ++i) {
+		for (size_t i = 0; i < wyrmgus::spell::get_all().size(); ++i) {
 			if (i) {
 				file.printf(" ,");
 			}
@@ -403,7 +403,7 @@ void SaveUnit(const CUnit &unit, CFile &file)
 	}
 
 	for (const auto &kv_pair : unit.Type->Stats[unit.Player->Index].UnitStock) {
-		const stratagus::unit_type *unit_type = stratagus::unit_type::get_all()[kv_pair.first];
+		const wyrmgus::unit_type *unit_type = wyrmgus::unit_type::get_all()[kv_pair.first];
 
 		if (unit.GetUnitStock(unit_type) != 0) {
 			file.printf(",\n  \"unit-stock\", \"%s\", %d", unit_type->Ident.c_str(), unit.GetUnitStock(unit_type));

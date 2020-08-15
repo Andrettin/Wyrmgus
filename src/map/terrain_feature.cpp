@@ -32,7 +32,7 @@
 #include "civilization.h"
 #include "map/terrain_type.h"
 
-namespace stratagus {
+namespace wyrmgus {
 
 void terrain_feature::process_sml_scope(const sml_data &scope)
 {

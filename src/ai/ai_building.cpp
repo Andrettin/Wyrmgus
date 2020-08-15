@@ -80,7 +80,7 @@ static bool IsPosFree(const Vec2i &pos, const CUnit &exceptionUnit, int z)
 **
 **  @note            Can be faster written.
 */
-static bool AiCheckSurrounding(const CUnit &worker, const stratagus::unit_type &type, const Vec2i &pos, bool &backupok, int z)
+static bool AiCheckSurrounding(const CUnit &worker, const wyrmgus::unit_type &type, const Vec2i &pos, bool &backupok, int z)
 {
 	const int surroundRange = type.AiAdjacentRange != -1 ? type.AiAdjacentRange : 1;
 	const Vec2i pos_topLeft(pos.x - surroundRange, pos.y - surroundRange);
@@ -153,7 +153,7 @@ static bool AiCheckSurrounding(const CUnit &worker, const stratagus::unit_type &
 class BuildingPlaceFinder
 {
 public:
-	explicit BuildingPlaceFinder(const CUnit &worker, const stratagus::unit_type &type, bool checkSurround, Vec2i *resultPos, bool ignore_exploration, int z, int landmass, const stratagus::site *settlement) :
+	explicit BuildingPlaceFinder(const CUnit &worker, const wyrmgus::unit_type &type, bool checkSurround, Vec2i *resultPos, bool ignore_exploration, int z, int landmass, const wyrmgus::site *settlement) :
 		worker(worker), type(type),
 			movemask(worker.Type->MovementMask 
 			& ~((type.BoolFlag[SHOREBUILDING_INDEX].value ? (MapFieldCoastAllowed | MapFieldLandUnit | MapFieldAirUnit | MapFieldSeaUnit) 
@@ -174,14 +174,14 @@ public:
 	VisitResult Visit(TerrainTraversal &terrainTraversal, const Vec2i &pos, const Vec2i &from);
 private:
 	const CUnit &worker;
-	const stratagus::unit_type &type;
+	const wyrmgus::unit_type &type;
 	unsigned int movemask;
 	bool checkSurround;
 	Vec2i *resultPos;
 	//Wyrmgus start
 	int z;
 	int landmass;
-	const stratagus::site *settlement;
+	const wyrmgus::site *settlement;
 	bool IgnoreExploration;
 	//Wyrmgus end
 };
@@ -247,7 +247,7 @@ VisitResult BuildingPlaceFinder::Visit(TerrainTraversal &terrainTraversal, const
 **
 **  @return  True if place found, false if no found.
 */
-static bool AiFindBuildingPlace2(const CUnit &worker, const stratagus::unit_type &type, const Vec2i &startPos, const CUnit *startUnit, bool checkSurround, Vec2i *resultPos, bool ignore_exploration, int z, int landmass = 0, const stratagus::site *settlement = nullptr)
+static bool AiFindBuildingPlace2(const CUnit &worker, const wyrmgus::unit_type &type, const Vec2i &startPos, const CUnit *startUnit, bool checkSurround, Vec2i *resultPos, bool ignore_exploration, int z, int landmass = 0, const wyrmgus::site *settlement = nullptr)
 {
 	TerrainTraversal terrainTraversal;
 
@@ -276,7 +276,7 @@ static bool AiFindBuildingPlace2(const CUnit &worker, const stratagus::unit_type
 class HallPlaceFinder
 {
 public:
-	HallPlaceFinder(const CUnit &worker, const stratagus::unit_type &type, int resource, Vec2i *resultPos, bool ignore_exploration, int z) :
+	HallPlaceFinder(const CUnit &worker, const wyrmgus::unit_type &type, int resource, Vec2i *resultPos, bool ignore_exploration, int z) :
 		worker(worker), type(type),
 		movemask(worker.Type->MovementMask
 			& ~((type.BoolFlag[SHOREBUILDING_INDEX].value ? (MapFieldCoastAllowed | MapFieldLandUnit | MapFieldAirUnit | MapFieldSeaUnit) 
@@ -294,7 +294,7 @@ private:
 	bool IsAUsableMine(const CUnit &mine) const;
 private:
 	const CUnit &worker;
-	const stratagus::unit_type &type;
+	const wyrmgus::unit_type &type;
 	const unsigned int movemask;
 	const int resource;
 	Vec2i *resultPos;
@@ -433,7 +433,7 @@ VisitResult HallPlaceFinder::Visit(TerrainTraversal &terrainTraversal, const Vec
 **                 two flood fills, is not a perfect solution.
 */
 static bool AiFindHallPlace(const CUnit &worker,
-							const stratagus::unit_type &type,
+							const wyrmgus::unit_type &type,
 							const Vec2i &startPos,
 							int resource,
 							//Wyrmgus start
@@ -469,7 +469,7 @@ static bool AiFindHallPlace(const CUnit &worker,
 class LumberMillPlaceFinder
 {
 public:
-	LumberMillPlaceFinder(const CUnit &worker, const stratagus::unit_type &type, int resource, Vec2i *resultPos, bool ignore_exploration, int z, const stratagus::site *settlement) :
+	LumberMillPlaceFinder(const CUnit &worker, const wyrmgus::unit_type &type, int resource, Vec2i *resultPos, bool ignore_exploration, int z, const wyrmgus::site *settlement) :
 		worker(worker), type(type),
 		movemask(worker.Type->MovementMask & ~(MapFieldLandUnit | MapFieldAirUnit | MapFieldSeaUnit)),
 		resource(resource),
@@ -484,7 +484,7 @@ public:
 	VisitResult Visit(TerrainTraversal &terrainTraversal, const Vec2i &pos, const Vec2i &from);
 private:
 	const CUnit &worker;
-	const stratagus::unit_type &type;
+	const wyrmgus::unit_type &type;
 	unsigned int movemask;
 	int resource;
 	Vec2i *resultPos;
@@ -492,7 +492,7 @@ private:
 	bool IgnoreExploration;
 	int z;
 	//Wyrmgus end
-	const stratagus::site *settlement = nullptr;
+	const wyrmgus::site *settlement = nullptr;
 };
 
 VisitResult LumberMillPlaceFinder::Visit(TerrainTraversal &terrainTraversal, const Vec2i &pos, const Vec2i &from)
@@ -518,8 +518,8 @@ VisitResult LumberMillPlaceFinder::Visit(TerrainTraversal &terrainTraversal, con
 		return VisitResult::DeadEnd;
 	}
 
-//	if (CMap::Map.Field(pos)->get_resource() == stratagus::resource::get_all()[resource]) {
-	if (tile->get_resource() == stratagus::resource::get_all()[resource]) {
+//	if (CMap::Map.Field(pos)->get_resource() == wyrmgus::resource::get_all()[resource]) {
+	if (tile->get_resource() == wyrmgus::resource::get_all()[resource]) {
 	//Wyrmgus end
 		//Wyrmgus start
 //		if (AiFindBuildingPlace2(worker, type, from, nullptr, true, resultPos)) {
@@ -552,7 +552,7 @@ VisitResult LumberMillPlaceFinder::Visit(TerrainTraversal &terrainTraversal, con
 **
 **  @todo          FIXME: This is slow really slow, using two flood fills, is not a perfect solution.
 */
-static bool AiFindLumberMillPlace(const CUnit &worker, const stratagus::unit_type &type, const Vec2i &startPos, int resource, Vec2i *resultPos, bool ignore_exploration, int z, const stratagus::site *settlement)
+static bool AiFindLumberMillPlace(const CUnit &worker, const wyrmgus::unit_type &type, const Vec2i &startPos, int resource, Vec2i *resultPos, bool ignore_exploration, int z, const wyrmgus::site *settlement)
 {
 	TerrainTraversal terrainTraversal;
 
@@ -574,7 +574,7 @@ static bool AiFindLumberMillPlace(const CUnit &worker, const stratagus::unit_typ
 }
 
 static bool AiFindMiningPlace(const CUnit &worker,
-							  const stratagus::unit_type &type,
+							  const wyrmgus::unit_type &type,
 							  const Vec2i &startPos,
 							  int resource,
 							  //Wyrmgus start
@@ -602,7 +602,7 @@ static bool AiFindMiningPlace(const CUnit &worker,
 **  @todo          Better and faster way to find building place of oil
 **                 platforms Special routines for special buildings.
 */
-bool AiFindBuildingPlace(const CUnit &worker, const stratagus::unit_type &type, const Vec2i &nearPos, Vec2i *resultPos, bool ignore_exploration, int z, int landmass, const stratagus::site *settlement)
+bool AiFindBuildingPlace(const CUnit &worker, const wyrmgus::unit_type &type, const Vec2i &nearPos, Vec2i *resultPos, bool ignore_exploration, int z, int landmass, const wyrmgus::site *settlement)
 {
 	// Find a good place for a new hall
 	//Wyrmgus start
@@ -625,7 +625,7 @@ bool AiFindBuildingPlace(const CUnit &worker, const stratagus::unit_type &type, 
 	
 	//Mines and Depots
 	for (int i = 1; i < MaxCosts; ++i) {
-		const std::unique_ptr<stratagus::resource_info> &resinfo = worker.Type->ResInfo[i];
+		const std::unique_ptr<wyrmgus::resource_info> &resinfo = worker.Type->ResInfo[i];
 		//Depots
 		if (type.CanStore[i]) {
 			//Wyrmgus start

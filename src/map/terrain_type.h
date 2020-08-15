@@ -39,7 +39,7 @@ struct lua_State;
 
 int CclDefineTerrainType(lua_State *l);
 
-namespace stratagus {
+namespace wyrmgus {
 
 class resource;
 class season;
@@ -62,7 +62,7 @@ class terrain_type final : public named_data_entry, public data_type<terrain_typ
 	Q_PROPERTY(bool transition_mask MEMBER transition_mask READ has_transition_mask)
 	Q_PROPERTY(bool allow_single MEMBER allow_single READ allows_single)
 	Q_PROPERTY(bool hidden MEMBER hidden READ is_hidden)
-	Q_PROPERTY(stratagus::resource* resource MEMBER resource READ get_resource)
+	Q_PROPERTY(wyrmgus::resource* resource MEMBER resource READ get_resource)
 	Q_PROPERTY(QVariantList base_terrain_types READ get_base_terrain_types_qvariant_list)
 	Q_PROPERTY(QVariantList outer_border_terrain_types READ get_outer_border_terrain_types_qvariant_list)
 	Q_PROPERTY(QVariantList inner_border_terrain_types READ get_inner_border_terrain_types_qvariant_list)
@@ -134,7 +134,7 @@ public:
 		return nullptr;
 	}
 
-	static terrain_type *add(const std::string &identifier, const stratagus::module *module)
+	static terrain_type *add(const std::string &identifier, const wyrmgus::module *module)
 	{
 		terrain_type *terrain_type = data_type::add(identifier, module);
 		terrain_type->ID = terrain_type::get_all().size() - 1;

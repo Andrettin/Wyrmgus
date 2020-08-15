@@ -27,7 +27,7 @@
 
 #pragma once
 
-namespace stratagus {
+namespace wyrmgus {
 
 enum class cursor_type {
 	point,
@@ -88,4 +88,4 @@ inline cursor_type string_to_cursor_type(const std::string &str)
 
 }
 
-Q_DECLARE_METATYPE(stratagus::cursor_type)
+Q_DECLARE_METATYPE(wyrmgus::cursor_type)

@@ -31,7 +31,7 @@
 #include "script/trigger.h"
 #include "util/vector_util.h"
 
-namespace stratagus {
+namespace wyrmgus {
 
 class trigger_condition final : public condition
 {

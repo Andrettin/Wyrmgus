@@ -31,7 +31,7 @@
 
 #pragma once
 
-namespace stratagus {
+namespace wyrmgus {
 
 class module;
 class sml_data;

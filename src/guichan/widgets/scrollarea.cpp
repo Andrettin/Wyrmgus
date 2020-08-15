@@ -67,7 +67,7 @@ namespace gcn
         mHScroll = 0;
         mHPolicy = SHOW_AUTO;
         mVPolicy = SHOW_AUTO;
-        mScrollbarWidth = 12 * stratagus::defines::get()->get_scale_factor();
+        mScrollbarWidth = 12 * wyrmgus::defines::get()->get_scale_factor();
         mContent = nullptr;
         mUpButtonPressed = false;
         mDownButtonPressed = false;
@@ -87,7 +87,7 @@ namespace gcn
         mHScroll = 0;
         mHPolicy = SHOW_AUTO;
         mVPolicy = SHOW_AUTO;
-        mScrollbarWidth = 12 * stratagus::defines::get()->get_scale_factor();
+        mScrollbarWidth = 12 * wyrmgus::defines::get()->get_scale_factor();
         mContent = nullptr;
         mUpButtonPressed = false;
         mDownButtonPressed = false;
@@ -108,7 +108,7 @@ namespace gcn
         mHScroll = 0;
         mHPolicy = hPolicy;
         mVPolicy = vPolicy;
-        mScrollbarWidth = 12 * stratagus::defines::get()->get_scale_factor();
+        mScrollbarWidth = 12 * wyrmgus::defines::get()->get_scale_factor();
         mContent = nullptr;
         mUpButtonPressed = false;
         mDownButtonPressed = false;

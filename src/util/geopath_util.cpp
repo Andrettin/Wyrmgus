@@ -30,7 +30,7 @@
 #include "util/geocoordinate_util.h"
 #include "util/point_util.h"
 
-namespace stratagus::geopath {
+namespace wyrmgus::geopath {
 
 void write_to_image(const QGeoPath &geopath, QImage &image, const QColor &color, const QGeoRectangle &georectangle)
 {

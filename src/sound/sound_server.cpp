@@ -68,12 +68,12 @@ static bool EffectsEnabled = true;
 
 /// Channels for sound effects and unit speech
 struct SoundChannel {
-	stratagus::sample *Sample;       /// sample to play
+	wyrmgus::sample *Sample;       /// sample to play
 	Origin *Unit;          /// pointer to unit, who plays the sound, if any
 	unsigned char Volume;  /// Volume of this channel
 	signed char Stereo;    /// stereo location of sound (-128 left, 0 center, 127 right)
 	//Wyrmgus start
-	stratagus::unit_sound_type Voice;  /// Voice group of this channel (for identifying voice types)
+	wyrmgus::unit_sound_type Voice;  /// Voice group of this channel (for identifying voice types)
 	//Wyrmgus end
 
 	bool Playing;          /// channel is currently playing
@@ -88,7 +88,7 @@ static SoundChannel Channels[MaxChannels];
 static int NextFreeChannel;
 
 static struct {
-	stratagus::sample *Sample;       /// Music sample
+	wyrmgus::sample *Sample;       /// Music sample
 	void (*FinishedCallback)(); /// Callback for when music finishes playing
 } MusicChannel;
 
@@ -214,7 +214,7 @@ static void MixMusicToStereo32(int *buffer, int size)
 **
 **  @todo          Can mix faster if signed 8 bit buffers are used.
 */
-static int MixSampleToStereo32(stratagus::sample *sample, int index, unsigned char volume,
+static int MixSampleToStereo32(wyrmgus::sample *sample, int index, unsigned char volume,
 							   char stereo, int *buffer, int size)
 {
 	static int buf[SOUND_BUFFER_SIZE / 2];
@@ -387,7 +387,7 @@ static int FillThread(void *)
 /**
 **  Check if this sound is already playing
 */
-bool SampleIsPlaying(stratagus::sample *sample)
+bool SampleIsPlaying(wyrmgus::sample *sample)
 {
 	for (int i = 0; i < MaxChannels; ++i) {
 		if (Channels[i].Sample == sample && Channels[i].Playing) {
@@ -405,8 +405,8 @@ bool UnitSoundIsPlaying(Origin *origin)
 //			&& origin->Id == Channels[i].Unit->Id && Channels[i].Playing) {
 		if (
 			origin && Channels[i].Playing
-			&& Channels[i].Voice != stratagus::unit_sound_type::none
-			&& stratagus::is_voice_unit_sound_type(Channels[i].Voice)
+			&& Channels[i].Voice != wyrmgus::unit_sound_type::none
+			&& wyrmgus::is_voice_unit_sound_type(Channels[i].Voice)
 			&& Channels[i].Unit && origin->Id && Channels[i].Unit->Id
 			&& origin->Id == Channels[i].Unit->Id
 		) {
@@ -435,7 +435,7 @@ static void ChannelFinished(int channel)
 	Channels[channel].Unit = nullptr;
 	
 	//Wyrmgus start
-	Channels[channel].Voice = stratagus::unit_sound_type::none;
+	Channels[channel].Voice = wyrmgus::unit_sound_type::none;
 	//Wyrmgus end
 	Channels[channel].Playing = false;
 	Channels[channel].Point = NextFreeChannel;
@@ -445,7 +445,7 @@ static void ChannelFinished(int channel)
 /**
 **  Put a sound request in the next free channel.
 */
-static int FillChannel(stratagus::sample *sample, unsigned char volume, char stereo, Origin *origin)
+static int FillChannel(wyrmgus::sample *sample, unsigned char volume, char stereo, Origin *origin)
 {
 	Assert(NextFreeChannel < MaxChannels);
 
@@ -455,7 +455,7 @@ static int FillChannel(stratagus::sample *sample, unsigned char volume, char ste
 	Channels[NextFreeChannel].Volume = volume;
 	Channels[NextFreeChannel].Point = 0;
 	//Wyrmgus start
-	Channels[NextFreeChannel].Voice = stratagus::unit_sound_type::none;
+	Channels[NextFreeChannel].Voice = wyrmgus::unit_sound_type::none;
 	//Wyrmgus end
 	Channels[NextFreeChannel].Playing = true;
 	Channels[NextFreeChannel].Sample = sample;
@@ -535,7 +535,7 @@ int SetChannelStereo(int channel, int stereo)
 **
 **  @param channel  Channel to set
 */
-void SetChannelVoiceGroup(int channel, const stratagus::unit_sound_type voice)
+void SetChannelVoiceGroup(int channel, const wyrmgus::unit_sound_type voice)
 {
 	if (channel < 0 || channel >= MaxChannels) {
 		return;
@@ -564,7 +564,7 @@ void SetChannelFinishedCallback(int channel, void (*callback)(int channel))
 /**
 **  Get the sample playing on a channel
 */
-stratagus::sample *GetChannelSample(int channel)
+wyrmgus::sample *GetChannelSample(int channel)
 {
 	if (channel < 0 || channel >= MaxChannels) {
 		return nullptr;
@@ -611,14 +611,14 @@ void StopAllChannels()
 **
 **  @todo  Add streaming, caching support.
 */
-std::unique_ptr<stratagus::sample> LoadSample(const std::filesystem::path &filepath)
+std::unique_ptr<wyrmgus::sample> LoadSample(const std::filesystem::path &filepath)
 {
 	const std::string filename = LibraryFileName(filepath.string().c_str());
-	auto sample = std::make_unique<stratagus::sample>(filename);
+	auto sample = std::make_unique<wyrmgus::sample>(filename);
 	return sample;
 }
 
-namespace stratagus {
+namespace wyrmgus {
 
 void sample::decrement_decoding_loop_counter()
 {
@@ -689,7 +689,7 @@ void sample::read_audio_buffer(const QAudioBuffer &buffer)
 **
 **  @return        Channel number, -1 for error
 */
-int PlaySample(stratagus::sample *sample, Origin *origin)
+int PlaySample(wyrmgus::sample *sample, Origin *origin)
 {
 	int channel = -1;
 
@@ -755,7 +755,7 @@ void SetMusicFinishedCallback(void (*callback)())
 **
 **  @return        0 if music is playing, -1 if not.
 */
-int PlayMusic(stratagus::sample *sample)
+int PlayMusic(wyrmgus::sample *sample)
 {
 	if (sample) {
 		StopMusic();
@@ -782,7 +782,7 @@ int PlayMusic(const std::string &file)
 	}
 	const std::string name = LibraryFileName(file.c_str());
 	DebugPrint("play music %s\n" _C_ name.c_str());
-	stratagus::sample *sample = LoadSample(name).release();
+	wyrmgus::sample *sample = LoadSample(name).release();
 
 	if (sample) {
 		StopMusic();
@@ -853,8 +853,8 @@ void PlayMusicByGroupAndFactionRandom(const std::string &group, const std::strin
 
 	SDL_LockMutex(Audio.Lock);
 	if (oaml->PlayTrackByGroupAndSubgroupRandom(group.c_str(), faction_name.c_str()) != OAML_OK) {
-		const stratagus::civilization *civilization = stratagus::civilization::try_get(civilization_name);
-		const stratagus::faction *faction = stratagus::faction::try_get(faction_name);
+		const wyrmgus::civilization *civilization = wyrmgus::civilization::try_get(civilization_name);
+		const wyrmgus::faction *faction = wyrmgus::faction::try_get(faction_name);
 		int parent_faction = -1;
 		bool found_music = false;
 		if (faction != nullptr) {
@@ -863,7 +863,7 @@ void PlayMusicByGroupAndFactionRandom(const std::string &group, const std::strin
 				if (parent_faction == -1) {
 					break;
 				}
-				faction = stratagus::faction::get_all()[parent_faction];
+				faction = wyrmgus::faction::get_all()[parent_faction];
 				
 				if (oaml->PlayTrackByGroupAndSubgroupRandom(group.c_str(), faction->get_identifier().c_str()) == OAML_OK) {
 					found_music = true;
@@ -872,7 +872,7 @@ void PlayMusicByGroupAndFactionRandom(const std::string &group, const std::strin
 			}
 		}
 		if (!found_music && oaml->PlayTrackByGroupAndSubgroupRandom(group.c_str(), civilization_name.c_str()) != OAML_OK) {
-			const stratagus::civilization *parent_civilization = nullptr;
+			const wyrmgus::civilization *parent_civilization = nullptr;
 			if (civilization) {
 				while (true) {
 					parent_civilization = civilization->get_parent_civilization();
@@ -1093,7 +1093,7 @@ int InitSound()
 		Channels[i].Unit = nullptr;
 		Channels[i].Volume = 0;
 		Channels[i].Stereo = 0;
-		Channels[i].Voice = stratagus::unit_sound_type::none;
+		Channels[i].Voice = wyrmgus::unit_sound_type::none;
 		Channels[i].Playing = false;
 		//Wyrmgus end
 	}

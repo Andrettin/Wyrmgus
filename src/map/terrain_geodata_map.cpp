@@ -30,23 +30,23 @@
 #include "map/terrain_feature.h"
 #include "map/terrain_type.h"
 
-namespace stratagus {
+namespace wyrmgus {
 
 bool terrain_geodata_map_compare::operator()(const terrain_geodata_key &terrain_variant, const terrain_geodata_key  &other_terrain_variant) const
 {
 	const terrain_type *terrain = nullptr;
 	const terrain_feature *terrain_feature = nullptr;
-	if (std::holds_alternative<const stratagus::terrain_feature *>(terrain_variant)) {
-		terrain_feature = std::get<const stratagus::terrain_feature *>(terrain_variant);
+	if (std::holds_alternative<const wyrmgus::terrain_feature *>(terrain_variant)) {
+		terrain_feature = std::get<const wyrmgus::terrain_feature *>(terrain_variant);
 		terrain = terrain_feature->get_terrain_type();
 	} else {
 		terrain = std::get<const terrain_type *>(terrain_variant);
 	}
 
 	const terrain_type *other_terrain = nullptr;
-	const stratagus::terrain_feature *other_terrain_feature = nullptr;
-	if (std::holds_alternative<const stratagus::terrain_feature *>(other_terrain_variant)) {
-		other_terrain_feature = std::get<const stratagus::terrain_feature *>(other_terrain_variant);
+	const wyrmgus::terrain_feature *other_terrain_feature = nullptr;
+	if (std::holds_alternative<const wyrmgus::terrain_feature *>(other_terrain_variant)) {
+		other_terrain_feature = std::get<const wyrmgus::terrain_feature *>(other_terrain_variant);
 		other_terrain = other_terrain_feature->get_terrain_type();
 	} else {
 		other_terrain = std::get<const terrain_type *>(other_terrain_variant);

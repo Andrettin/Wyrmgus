@@ -38,7 +38,7 @@
 #include "upgrade/upgrade.h"
 #include "upgrade/upgrade_modifier.h"
 
-namespace stratagus {
+namespace wyrmgus {
 
 bool unique_item::CanDrop() const
 {
@@ -113,7 +113,7 @@ int unique_item::GetMagicLevel() const
 
 std::string GetUniqueItemEffectsString(const std::string &item_ident)
 {
-	const stratagus::unique_item *item = stratagus::unique_item::try_get(item_ident);
+	const wyrmgus::unique_item *item = wyrmgus::unique_item::try_get(item_ident);
 
 	if (item) {
 		std::string item_effects_string;
@@ -151,7 +151,7 @@ std::string GetUniqueItemEffectsString(const std::string &item_ident)
 				variable_value = item->ResourcesHeld;
 			}
 
-			for (const stratagus::upgrade_modifier *modifier : stratagus::upgrade_modifier::UpgradeModifiers) {
+			for (const wyrmgus::upgrade_modifier *modifier : wyrmgus::upgrade_modifier::UpgradeModifiers) {
 				if (
 					(item->Prefix != nullptr && modifier->UpgradeId == item->Prefix->ID)
 					|| (item->Suffix != nullptr && modifier->UpgradeId == item->Suffix->ID)

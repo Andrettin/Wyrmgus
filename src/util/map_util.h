@@ -31,7 +31,7 @@
 
 #pragma once
 
-namespace stratagus::map {
+namespace wyrmgus::map {
 
 template <typename T>
 inline void remove_value(T &map, const typename T::value_type &value)

@@ -29,29 +29,17 @@
 
 #pragma once
 
-/*----------------------------------------------------------------------------
---  Declarations
-----------------------------------------------------------------------------*/
-
 class CPlayer;
 class CFile;
 class CUnit;
 class CUpgrade;
 
-namespace stratagus {
+namespace wyrmgus {
 	class site;
 	class unit_type;
 }
 
-/*----------------------------------------------------------------------------
---  Variables
-----------------------------------------------------------------------------*/
-
 extern int AiSleepCycles;  /// Ai sleeps # cycles
-
-/*----------------------------------------------------------------------------
---  Functions
-----------------------------------------------------------------------------*/
 
 extern void AiEachCycle(CPlayer &player);   /// Called each game cycle
 extern void AiEachSecond(CPlayer &player);  /// Called each second
@@ -89,14 +77,14 @@ extern void AiNeedMoreSupply(const CPlayer &player);
 /// Called if AI unit has completed work
 extern void AiWorkComplete(CUnit *unit, CUnit &what);
 /// Called if AI unit can't build
-extern void AiCanNotBuild(const CUnit &unit, const stratagus::unit_type &what, int landmass = 0, const stratagus::site *settlement = nullptr);
+extern void AiCanNotBuild(const CUnit &unit, const wyrmgus::unit_type &what, int landmass = 0, const wyrmgus::site *settlement = nullptr);
 /// Called if AI unit can't reach building place
-extern void AiCanNotReach(CUnit &unit, const stratagus::unit_type &what, int landmass, const stratagus::site *settlement);
+extern void AiCanNotReach(CUnit &unit, const wyrmgus::unit_type &what, int landmass, const wyrmgus::site *settlement);
 /// Called if an AI unit can't move
 extern void AiCanNotMove(CUnit &unit);
 /// Called if AI unit has completed training
 extern void AiTrainingComplete(CUnit &unit, CUnit &what);
 /// Called if AI unit has completed upgrade to
-extern void AiUpgradeToComplete(CUnit &unit, const stratagus::unit_type &what);
+extern void AiUpgradeToComplete(CUnit &unit, const wyrmgus::unit_type &what);
 /// Called if AI unit has completed research
 extern void AiResearchComplete(CUnit &unit, const CUpgrade *what);

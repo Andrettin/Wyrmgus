@@ -32,7 +32,7 @@
 
 class CUpgrade;
 
-namespace stratagus {
+namespace wyrmgus {
 
 class condition;
 class faction;
@@ -43,14 +43,14 @@ class dynasty final : public detailed_data_entry, public data_type<dynasty>
 	Q_OBJECT
 
 	Q_PROPERTY(CUpgrade* upgrade MEMBER upgrade READ get_upgrade)
-	Q_PROPERTY(stratagus::icon* icon MEMBER icon READ get_icon)
+	Q_PROPERTY(wyrmgus::icon* icon MEMBER icon READ get_icon)
 	Q_PROPERTY(QVariantList factions READ get_factions_qvariant_list)
 
 public:
 	static constexpr const char *class_identifier = "dynasty";
 	static constexpr const char *database_folder = "dynasties";
 
-	static dynasty *add(const std::string &identifier, const stratagus::module *module)
+	static dynasty *add(const std::string &identifier, const wyrmgus::module *module)
 	{
 		dynasty *dynasty = data_type::add(identifier, module);
 		dynasty->index = dynasty::get_all().size() - 1;

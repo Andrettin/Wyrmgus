@@ -50,7 +50,7 @@
 #include "util/string_util.h"
 #include "util/vector_util.h"
 
-namespace stratagus {
+namespace wyrmgus {
 
 void site::process_sml_property(const sml_property &property)
 {

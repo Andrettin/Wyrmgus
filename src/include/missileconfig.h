@@ -29,7 +29,7 @@
 
 #pragma once
 
-namespace stratagus {
+namespace wyrmgus {
 	class missile_type;
 }
 
@@ -49,5 +49,5 @@ public:
 
 public:
 	std::string Name;        /// Config missile name
-	stratagus::missile_type *Missile;    /// Identifier to use to run time
+	wyrmgus::missile_type *Missile;    /// Identifier to use to run time
 };

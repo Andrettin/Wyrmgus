@@ -29,7 +29,7 @@
 
 #include "resource.h"
 
-namespace stratagus {
+namespace wyrmgus {
 
 bool resource::IsMineResource() const
 {

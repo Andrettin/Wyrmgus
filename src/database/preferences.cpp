@@ -33,7 +33,7 @@
 #include "database/sml_parser.h"
 #include "util/exception_util.h"
 
-namespace stratagus {
+namespace wyrmgus {
 
 std::filesystem::path preferences::get_path() const
 {

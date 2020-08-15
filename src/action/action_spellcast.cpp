@@ -66,7 +66,7 @@
 #include "unit/unit_type_type.h"
 #include "video/video.h"
 
-/* static */ COrder *COrder::NewActionSpellCast(const stratagus::spell &spell, const Vec2i &pos, CUnit *target, int z, bool isAutocast)
+/* static */ COrder *COrder::NewActionSpellCast(const wyrmgus::spell &spell, const Vec2i &pos, CUnit *target, int z, bool isAutocast)
 {
 	COrder_SpellCast *order = new COrder_SpellCast(isAutocast);
 
@@ -120,7 +120,7 @@
 {
 	if (!strcmp(value, "spell")) {
 		++j;
-		this->Spell = stratagus::spell::get(LuaToString(l, -1, j + 1));
+		this->Spell = wyrmgus::spell::get(LuaToString(l, -1, j + 1));
 	} else if (!strcmp(value, "range")) {
 		++j;
 		this->Range = LuaToNumber(l, -1, j + 1);
@@ -259,7 +259,7 @@
 */
 static void AnimateActionSpellCast(CUnit &unit, COrder_SpellCast &order)
 {
-	const stratagus::animation_set *animations = unit.GetAnimations();
+	const wyrmgus::animation_set *animations = unit.GetAnimations();
 
 	if (!animations || (!animations->Attack && !animations->SpellCast)) {
 		// if don't have animations just cast spell
@@ -339,7 +339,7 @@ bool COrder_SpellCast::SpellMoveToTarget(CUnit &unit)
 		// there is goal and it is in range
 		//Wyrmgus start
 //		UnitHeadingFromDeltaXY(unit, goal->tilePos + goal->Type->GetHalfTileSize() - unit.tilePos);
-		UnitHeadingFromDeltaXY(unit, PixelSize(PixelSize(goal->tilePos) * stratagus::defines::get()->get_tile_size()) + goal->get_half_tile_pixel_size() - PixelSize(PixelSize(unit.tilePos) * stratagus::defines::get()->get_tile_size()) - unit.get_half_tile_pixel_size());
+		UnitHeadingFromDeltaXY(unit, PixelSize(PixelSize(goal->tilePos) * wyrmgus::defines::get()->get_tile_size()) + goal->get_half_tile_pixel_size() - PixelSize(PixelSize(unit.tilePos) * wyrmgus::defines::get()->get_tile_size()) - unit.get_half_tile_pixel_size());
 		//Wyrmgus end
 		this->State++; // cast the spell
 		return false;
@@ -392,7 +392,7 @@ bool COrder_SpellCast::SpellMoveToTarget(CUnit &unit)
 		unit.Anim = unit.WaitBackup;
 		unit.Waiting = 0;
 	}
-	const stratagus::spell &spell = order.GetSpell();
+	const wyrmgus::spell &spell = order.GetSpell();
 	switch (this->State) {
 		case 0:
 			// Check if we can cast the spell.

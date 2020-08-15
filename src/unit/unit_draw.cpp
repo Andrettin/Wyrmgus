@@ -128,14 +128,14 @@ void DrawUnitSelection(const CViewport &vp, const CUnit &unit)
 	IntColor color;
 
 	//Wyrmgus start
-	const stratagus::unit_type &type = *unit.Type;
+	const wyrmgus::unit_type &type = *unit.Type;
 	const PixelPos screenPos = vp.scaled_map_to_screen_pixel_pos(unit.get_scaled_map_pixel_pos_center());
-	const int scale_factor = stratagus::defines::get()->get_scale_factor();
+	const int scale_factor = wyrmgus::defines::get()->get_scale_factor();
 	int frame_width = type.get_frame_width() * scale_factor;
 	int frame_height = type.get_frame_height() * scale_factor;
 	int sprite_width = (type.Sprite ? type.Sprite->Width : 0);
 	int sprite_height = (type.Sprite ? type.Sprite->Height : 0);
-	const stratagus::unit_type_variation *variation = unit.GetVariation();
+	const wyrmgus::unit_type_variation *variation = unit.GetVariation();
 	if (variation && variation->FrameWidth && variation->FrameHeight) {
 		frame_width = variation->FrameWidth * scale_factor;
 		frame_height = variation->FrameHeight * scale_factor;
@@ -184,7 +184,7 @@ void DrawUnitSelection(const CViewport &vp, const CUnit &unit)
 
 	//Wyrmgus start
 	/*
-//	const stratagus::unit_type &type = *unit.Type;
+//	const wyrmgus::unit_type &type = *unit.Type;
 //	const PixelPos screenPos = vp.scaled_map_to_screen_pixel_pos(unit.get_scaled_map_pixel_pos_center());
 //	const int x = screenPos.x - type.BoxWidth / 2 - (type.Width - (type.Sprite ? type.Sprite->Width : 0)) / 2;
 //	const int y = screenPos.y - type.BoxHeight / 2 - (type.Height - (type.Sprite ? type.Sprite->Height : 0)) / 2;
@@ -410,7 +410,7 @@ void LoadDecorations()
 		}
 		UpdateLoadProgress();
 		(*i).Sprite = CGraphic::New((*i).File, (*i).Width, (*i).Height);
-		(*i).Sprite->Load(false, stratagus::defines::get()->get_scale_factor());
+		(*i).Sprite->Load(false, wyrmgus::defines::get()->get_scale_factor());
 	}
 }
 
@@ -436,7 +436,7 @@ void CleanDecorations()
 **  @todo fix color configuration.
 */
 void CDecoVarBar::Draw(int x, int y,
-					   const stratagus::unit_type &type, const stratagus::unit_variable &var) const
+					   const wyrmgus::unit_type &type, const wyrmgus::unit_variable &var) const
 {
 	Assert(var.Max);
 
@@ -497,7 +497,7 @@ void CDecoVarBar::Draw(int x, int y,
 **  @param unit    Unit pointer
 **  @todo fix font/color configuration.
 */
-void CDecoVarText::Draw(int x, int y, const stratagus::unit_type &/*type*/, const stratagus::unit_variable &var) const
+void CDecoVarText::Draw(int x, int y, const wyrmgus::unit_type &/*type*/, const wyrmgus::unit_variable &var) const
 {
 	if (this->IsCenteredInX) {
 		x -= 2; // GetGameFont()->Width(buf) / 2, with buf = str(Value)
@@ -516,7 +516,7 @@ void CDecoVarText::Draw(int x, int y, const stratagus::unit_type &/*type*/, cons
 **  @param unit    Unit pointer
 **  @todo fix sprite configuration.
 */
-void CDecoVarSpriteBar::Draw(int x, int y, const stratagus::unit_type &/*type*/, const stratagus::unit_variable &var) const
+void CDecoVarSpriteBar::Draw(int x, int y, const wyrmgus::unit_type &/*type*/, const wyrmgus::unit_variable &var) const
 {
 	Assert(var.Max);
 	Assert(this->NSprite != -1);
@@ -553,7 +553,7 @@ void CDecoVarSpriteBar::Draw(int x, int y, const stratagus::unit_type &/*type*/,
 **
 **  @todo fix sprite configuration configuration.
 */
-void CDecoVarStaticSprite::Draw(int x, int y, const stratagus::unit_type &/*type*/, const stratagus::unit_variable &var) const
+void CDecoVarStaticSprite::Draw(int x, int y, const wyrmgus::unit_type &/*type*/, const wyrmgus::unit_variable &var) const
 {
 	Decoration &decosprite = DecoSprite.SpriteArray[(int)this->NSprite];
 	CGraphic &sprite = *decosprite.Sprite;
@@ -581,7 +581,7 @@ void CDecoVarStaticSprite::Draw(int x, int y, const stratagus::unit_type &/*type
 **  @param type       Type of the unit.
 **  @param screenPos  Screen position of the unit.
 */
-static void DrawDecoration(const CUnit &unit, const stratagus::unit_type &type, const PixelPos &screenPos)
+static void DrawDecoration(const CUnit &unit, const wyrmgus::unit_type &type, const PixelPos &screenPos)
 {
 	int x = screenPos.x;
 	int y = screenPos.y;
@@ -620,8 +620,8 @@ static void DrawDecoration(const CUnit &unit, const stratagus::unit_type &type, 
 			  || max == 0 || max < var.MinValue)) {
 			  //Wyrmgus end
 			var.Draw(
-				x + var.OffsetX + var.OffsetXPercent * unit.Type->get_tile_width() * stratagus::defines::get()->get_scaled_tile_width() / 100,
-				y + var.OffsetY + var.OffsetYPercent * unit.Type->get_tile_height() * stratagus::defines::get()->get_scaled_tile_height() / 100,
+				x + var.OffsetX + var.OffsetXPercent * unit.Type->get_tile_width() * wyrmgus::defines::get()->get_scaled_tile_width() / 100,
+				y + var.OffsetY + var.OffsetYPercent * unit.Type->get_tile_height() * wyrmgus::defines::get()->get_scaled_tile_height() / 100,
 				type, unit.Variable[var.Index]);
 		}
 	}
@@ -641,9 +641,9 @@ static void DrawDecoration(const CUnit &unit, const stratagus::unit_type &type, 
 			}
 		}
 		const int width = GetGameFont().Width(groupId);
-		x += (unit.Type->get_tile_width() * stratagus::defines::get()->get_scaled_tile_width() + unit.Type->get_box_width() * stratagus::defines::get()->get_scale_factor()) / 2 - width;
+		x += (unit.Type->get_tile_width() * wyrmgus::defines::get()->get_scaled_tile_width() + unit.Type->get_box_width() * wyrmgus::defines::get()->get_scale_factor()) / 2 - width;
 		const int height = GetGameFont().Height();
-		y += (unit.Type->get_tile_height() * stratagus::defines::get()->get_scaled_tile_height() + unit.Type->get_box_height() * stratagus::defines::get()->get_scale_factor()) / 2 - height;
+		y += (unit.Type->get_tile_height() * wyrmgus::defines::get()->get_scaled_tile_height() + unit.Type->get_box_height() * wyrmgus::defines::get()->get_scale_factor()) / 2 - height;
 		CLabel(GetGameFont()).DrawClip(x, y, groupId);
 	}
 }
@@ -657,7 +657,7 @@ static void DrawDecoration(const CUnit &unit, const stratagus::unit_type &type, 
 **
 **  @todo FIXME: combine new shadow code with old shadow code.
 */
-void DrawShadow(const stratagus::unit_type &type, CGraphic *sprite, int frame, const PixelPos &screenPos)
+void DrawShadow(const wyrmgus::unit_type &type, CGraphic *sprite, int frame, const PixelPos &screenPos)
 {
 	// Draw normal shadow sprite if available
 	//Wyrmgus start
@@ -667,9 +667,9 @@ void DrawShadow(const stratagus::unit_type &type, CGraphic *sprite, int frame, c
 		return;
 	}
 	PixelPos pos = screenPos;
-	pos -= PixelPos((sprite->get_frame_size() - type.get_tile_size() * stratagus::defines::get()->get_scaled_tile_size()) / 2);
-	pos.x += (type.get_offset().x() + type.ShadowOffsetX) * stratagus::defines::get()->get_scale_factor();
-	pos.y += (type.get_offset().y() + type.ShadowOffsetY) * stratagus::defines::get()->get_scale_factor();
+	pos -= PixelPos((sprite->get_frame_size() - type.get_tile_size() * wyrmgus::defines::get()->get_scaled_tile_size()) / 2);
+	pos.x += (type.get_offset().x() + type.ShadowOffsetX) * wyrmgus::defines::get()->get_scale_factor();
+	pos.y += (type.get_offset().y() + type.ShadowOffsetY) * wyrmgus::defines::get()->get_scale_factor();
 
 	if (type.Flip) {
 		if (frame < 0) {
@@ -698,19 +698,19 @@ void DrawShadow(const stratagus::unit_type &type, CGraphic *sprite, int frame, c
 }
 
 //Wyrmgus start
-void DrawPlayerColorOverlay(const stratagus::unit_type &type, CPlayerColorGraphic *sprite, const int player, int frame, const PixelPos &screenPos, const stratagus::time_of_day *time_of_day)
+void DrawPlayerColorOverlay(const wyrmgus::unit_type &type, CPlayerColorGraphic *sprite, const int player, int frame, const PixelPos &screenPos, const wyrmgus::time_of_day *time_of_day)
 {
 	if (!sprite) {
 		return;
 	}
 
-	const stratagus::player_color *player_color = CPlayer::Players[player]->get_player_color();
+	const wyrmgus::player_color *player_color = CPlayer::Players[player]->get_player_color();
 
 	PixelPos pos = screenPos;
 	// FIXME: move this calculation to high level.
-	pos -= PixelPos((sprite->get_frame_size() - type.get_tile_size() * stratagus::defines::get()->get_scaled_tile_size()) / 2);
-	pos.x += type.get_offset().x() * stratagus::defines::get()->get_scale_factor();
-	pos.y += type.get_offset().y() * stratagus::defines::get()->get_scale_factor();
+	pos -= PixelPos((sprite->get_frame_size() - type.get_tile_size() * wyrmgus::defines::get()->get_scaled_tile_size()) / 2);
+	pos.x += type.get_offset().x() * wyrmgus::defines::get()->get_scale_factor();
+	pos.y += type.get_offset().y() * wyrmgus::defines::get()->get_scale_factor();
 
 	if (type.Flip) {
 		if (frame < 0) {
@@ -742,16 +742,16 @@ void DrawPlayerColorOverlay(const stratagus::unit_type &type, CPlayerColorGraphi
 	}
 }
 
-void DrawOverlay(const stratagus::unit_type &type, CGraphic *sprite, int player, int frame, const PixelPos &screenPos, const stratagus::time_of_day *time_of_day)
+void DrawOverlay(const wyrmgus::unit_type &type, CGraphic *sprite, int player, int frame, const PixelPos &screenPos, const wyrmgus::time_of_day *time_of_day)
 {
 	if (!sprite) {
 		return;
 	}
 	PixelPos pos = screenPos;
 	// FIXME: move this calculation to high level.
-	pos -= PixelPos((sprite->get_frame_size() - type.get_tile_size() * stratagus::defines::get()->get_scaled_tile_size()) / 2);
-	pos.x += type.get_offset().x() * stratagus::defines::get()->get_scale_factor();
-	pos.y += type.get_offset().y() * stratagus::defines::get()->get_scale_factor();
+	pos -= PixelPos((sprite->get_frame_size() - type.get_tile_size() * wyrmgus::defines::get()->get_scaled_tile_size()) / 2);
+	pos.x += type.get_offset().x() * wyrmgus::defines::get()->get_scale_factor();
+	pos.y += type.get_offset().y() * wyrmgus::defines::get()->get_scale_factor();
 
 	if (type.Flip) {
 		if (frame < 0) {
@@ -839,7 +839,7 @@ void ShowOrder(const CUnit &unit)
 **
 **  @todo FIXME: The different styles should become a function call.
 */
-static void DrawInformations(const CUnit &unit, const stratagus::unit_type &type, const PixelPos &screenPos)
+static void DrawInformations(const CUnit &unit, const wyrmgus::unit_type &type, const PixelPos &screenPos)
 {
 #if 0 && DEBUG // This is for showing vis counts and refs.
 	char buf[10];
@@ -861,7 +861,7 @@ static void DrawInformations(const CUnit &unit, const stratagus::unit_type &type
 //			const int value = stats.Variables[SIGHTRANGE_INDEX].Max;
 			const int value = unit.CurrentSightRange;
 			//Wyrmgus end
-			const int radius = value * stratagus::defines::get()->get_scaled_tile_width() + (type.get_tile_width() - 1) * stratagus::defines::get()->get_scaled_tile_width() / 2;
+			const int radius = value * wyrmgus::defines::get()->get_scaled_tile_width() + (type.get_tile_width() - 1) * wyrmgus::defines::get()->get_scaled_tile_width() / 2;
 
 			if (value) {
 				// Radius -1 so you can see all ranges
@@ -877,7 +877,7 @@ static void DrawInformations(const CUnit &unit, const stratagus::unit_type &type
 //				const int value = (unit.Player->Type == PlayerPerson) ? type.ReactRangePerson : type.ReactRangeComputer;
 				const int value = unit.GetReactionRange();
 				//Wyrmgus end
-				const int radius = value * stratagus::defines::get()->get_scaled_tile_width() + (type.get_tile_width() - 1) * stratagus::defines::get()->get_scaled_tile_width() / 2;
+				const int radius = value * wyrmgus::defines::get()->get_scaled_tile_width() + (type.get_tile_width() - 1) * wyrmgus::defines::get()->get_scaled_tile_width() / 2;
 
 				if (value) {
 					Video.DrawCircleClip(ColorBlue, center.x, center.y, radius);
@@ -889,7 +889,7 @@ static void DrawInformations(const CUnit &unit, const stratagus::unit_type &type
 				const int value = unit.GetModifiedVariable(ATTACKRANGE_INDEX);
 				
 				//Wyrmgus end
-				const int radius = value * stratagus::defines::get()->get_scaled_tile_width() + (type.get_tile_width() - 1) * stratagus::defines::get()->get_scaled_tile_width() / 2;
+				const int radius = value * wyrmgus::defines::get()->get_scaled_tile_width() + (type.get_tile_width() - 1) * wyrmgus::defines::get()->get_scaled_tile_width() / 2;
 
 				if (value) {
 					// Radius +1 so you can see all ranges
@@ -903,7 +903,7 @@ static void DrawInformations(const CUnit &unit, const stratagus::unit_type &type
 			//show aura range if the unit has an aura
 			if (unit.Variable[LEADERSHIPAURA_INDEX].Value > 0 || unit.Variable[REGENERATIONAURA_INDEX].Value > 0 || unit.Variable[HYDRATINGAURA_INDEX].Value > 0) {
 				const int value = AuraRange - (unit.Type->get_tile_width() - 1);
-				const int radius = value * stratagus::defines::get()->get_scaled_tile_width() + (type.get_tile_width() - 1) * stratagus::defines::get()->get_scaled_tile_width() / 2;
+				const int radius = value * wyrmgus::defines::get()->get_scaled_tile_width() + (type.get_tile_width() - 1) * wyrmgus::defines::get()->get_scaled_tile_width() / 2;
 
 				if (value) {
 					Video.DrawCircleClip(ColorBlue, center.x, center.y, radius);
@@ -927,15 +927,15 @@ static void DrawInformations(const CUnit &unit, const stratagus::unit_type &type
 **  @param frame   Frame number to draw.
 **  @param screenPos  screen (top left) position of the unit.
 */
-static void DrawConstructionShadow(const CUnit &unit, const stratagus::unit_type &type, const CConstructionFrame *cframe, int frame, const PixelPos &screenPos)
+static void DrawConstructionShadow(const CUnit &unit, const wyrmgus::unit_type &type, const CConstructionFrame *cframe, int frame, const PixelPos &screenPos)
 {
 	PixelPos pos = screenPos;
-	const int scale_factor = stratagus::defines::get()->get_scale_factor();
-	const stratagus::unit_type_variation *variation = unit.GetVariation();
+	const int scale_factor = wyrmgus::defines::get()->get_scale_factor();
+	const wyrmgus::unit_type_variation *variation = unit.GetVariation();
 	if (cframe->File == ConstructionFileConstruction) {
 		if (variation && variation->Construction) {
 			if (variation->Construction->ShadowSprite) {
-				pos -= PixelPos((variation->Construction->ShadowSprite->get_frame_size() - type.get_tile_size() * stratagus::defines::get()->get_scaled_tile_size()) / 2);
+				pos -= PixelPos((variation->Construction->ShadowSprite->get_frame_size() - type.get_tile_size() * wyrmgus::defines::get()->get_scaled_tile_size()) / 2);
 				pos.x += type.get_offset().x() * scale_factor;
 				pos.y += type.get_offset().y() * scale_factor;
 				if (frame < 0) {
@@ -946,7 +946,7 @@ static void DrawConstructionShadow(const CUnit &unit, const stratagus::unit_type
 			}
 		} else {
 			if (type.Construction->ShadowSprite) {
-				pos -= PixelPos((type.Construction->ShadowSprite->get_frame_size() - type.get_tile_size() * stratagus::defines::get()->get_scaled_tile_size()) / 2);
+				pos -= PixelPos((type.Construction->ShadowSprite->get_frame_size() - type.get_tile_size() * wyrmgus::defines::get()->get_scaled_tile_size()) / 2);
 				pos.x += type.get_offset().x() * scale_factor;
 				pos.y += type.get_offset().y() * scale_factor;
 				if (frame < 0) {
@@ -958,7 +958,7 @@ static void DrawConstructionShadow(const CUnit &unit, const stratagus::unit_type
 		}
 	} else {
 		if (variation && variation->ShadowSprite) {
-			pos -= PixelPos((variation->ShadowSprite->get_frame_size() - type.get_tile_size() * stratagus::defines::get()->get_scaled_tile_size()) / 2);
+			pos -= PixelPos((variation->ShadowSprite->get_frame_size() - type.get_tile_size() * wyrmgus::defines::get()->get_scaled_tile_size()) / 2);
 			pos.x += (type.ShadowOffsetX + type.get_offset().x()) * scale_factor;
 			pos.y += (type.ShadowOffsetY + type.get_offset().y()) * scale_factor;
 			if (frame < 0) {
@@ -967,7 +967,7 @@ static void DrawConstructionShadow(const CUnit &unit, const stratagus::unit_type
 				variation->ShadowSprite->DrawFrameClip(frame, pos.x, pos.y);
 			}
 		} else if (type.ShadowSprite) {
-			pos -= PixelPos((type.ShadowSprite->get_frame_size() - type.get_tile_size() * stratagus::defines::get()->get_scaled_tile_size()) / 2);
+			pos -= PixelPos((type.ShadowSprite->get_frame_size() - type.get_tile_size() * wyrmgus::defines::get()->get_scaled_tile_size()) / 2);
 			pos.x += (type.ShadowOffsetX + type.get_offset().x()) * scale_factor;
 			pos.y += (type.ShadowOffsetY + type.get_offset().y()) * scale_factor;
 			if (frame < 0) {
@@ -989,13 +989,13 @@ static void DrawConstructionShadow(const CUnit &unit, const stratagus::unit_type
 **  @param screenPos  screen (top left) position of the unit.
 */
 static void DrawConstruction(const int player, const CConstructionFrame *cframe,
-							 const CUnit &unit, const stratagus::unit_type &type, int frame, const PixelPos &screenPos, const stratagus::time_of_day *time_of_day)
+							 const CUnit &unit, const wyrmgus::unit_type &type, int frame, const PixelPos &screenPos, const wyrmgus::time_of_day *time_of_day)
 {
 	PixelPos pos = screenPos;
-	const int scale_factor = stratagus::defines::get()->get_scale_factor();
-	const stratagus::player_color *player_color = CPlayer::Players[player]->get_player_color();
+	const int scale_factor = wyrmgus::defines::get()->get_scale_factor();
+	const wyrmgus::player_color *player_color = CPlayer::Players[player]->get_player_color();
 	if (cframe->File == ConstructionFileConstruction) {
-		const stratagus::unit_type_variation *variation = unit.GetVariation();
+		const wyrmgus::unit_type_variation *variation = unit.GetVariation();
 		if (variation && variation->Construction) {
 			const CConstruction &construction = *variation->Construction;
 			pos.x -= construction.Width * scale_factor / 2;
@@ -1022,7 +1022,7 @@ static void DrawConstruction(const int player, const CConstructionFrame *cframe,
 //		pos.y += type.get_offset().y() - type.Height / 2;
 		int frame_width = type.get_frame_width();
 		int frame_height = type.get_frame_height();
-		const stratagus::unit_type_variation *variation = unit.GetVariation();
+		const wyrmgus::unit_type_variation *variation = unit.GetVariation();
 		if (variation && variation->FrameWidth && variation->FrameHeight) {
 			frame_width = variation->FrameWidth;
 			frame_height = variation->FrameHeight;
@@ -1059,7 +1059,7 @@ void CUnit::Draw(const CViewport &vp) const
 	int state;
 	int under_construction;
 	const CConstructionFrame *cframe;
-	const stratagus::unit_type *type;
+	const wyrmgus::unit_type *type;
 
 	if (this->Destroyed || this->Container || this->Type->BoolFlag[REVEALER_INDEX].value) { // Revealers are not drawn
 		return;
@@ -1099,8 +1099,8 @@ void CUnit::Draw(const CViewport &vp) const
 	} else {
 		screenPos = vp.TilePosToScreen_TopLeft(this->Seen.tilePos);
 
-		screenPos.x += this->Seen.pixel_offset.x() * stratagus::defines::get()->get_scale_factor();
-		screenPos.y += this->Seen.pixel_offset.y() * stratagus::defines::get()->get_scale_factor();
+		screenPos.x += this->Seen.pixel_offset.x() * wyrmgus::defines::get()->get_scale_factor();
+		screenPos.y += this->Seen.pixel_offset.y() * wyrmgus::defines::get()->get_scale_factor();
 		frame = this->Seen.Frame;
 		type = this->Seen.Type;
 		under_construction = this->Seen.UnderConstruction;
@@ -1128,7 +1128,7 @@ void CUnit::Draw(const CViewport &vp) const
 	DrawUnitSelection(vp, *this);
 	//Wyrmgus end
 
-	const stratagus::unit_type_variation *variation = this->GetVariation();
+	const wyrmgus::unit_type_variation *variation = this->GetVariation();
 
 	if (state == 1 && under_construction && cframe) {
 		//Wyrmgus start
@@ -1159,7 +1159,7 @@ void CUnit::Draw(const CViewport &vp) const
 //	DrawUnitSelection(vp, *this);
 	//Wyrmgus end
 
-	const stratagus::time_of_day *time_of_day = this->get_center_tile_time_of_day();
+	const wyrmgus::time_of_day *time_of_day = this->get_center_tile_time_of_day();
 	
 	//Wyrmgus start
 	DrawPlayerColorOverlay(*type, this->GetLayerSprite(MountImageLayer), player, frame, screenPos, time_of_day); // draw the mount just before the body
@@ -1377,8 +1377,8 @@ static inline bool DrawLevelCompare(const CUnit *c1, const CUnit *c2)
 	if (drawlevel1 == drawlevel2) {
 		// diffpos compares unit's Y positions (bottom of sprite) on the map
 		// and uses X position in case Y positions are equal.
-		const int pos1 = (c1->tilePos.y + c1->Type->get_tile_height() - 1) * stratagus::defines::get()->get_tile_height() + c1->get_pixel_offset().y();
-		const int pos2 = (c2->tilePos.y + c2->Type->get_tile_height() - 1) * stratagus::defines::get()->get_tile_height() + c2->get_pixel_offset().y();
+		const int pos1 = (c1->tilePos.y + c1->Type->get_tile_height() - 1) * wyrmgus::defines::get()->get_tile_height() + c1->get_pixel_offset().y();
+		const int pos2 = (c2->tilePos.y + c2->Type->get_tile_height() - 1) * wyrmgus::defines::get()->get_tile_height() + c2->get_pixel_offset().y();
 		return pos1 == pos2 ?
 			   (c1->tilePos.x != c2->tilePos.x ? c1->tilePos.x < c2->tilePos.x : UnitNumber(*c1) < UnitNumber(*c2)) : pos1 < pos2;
 	} else {

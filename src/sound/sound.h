@@ -79,9 +79,9 @@ static constexpr int INFINITE_SOUND_RANGE = 255;
 static constexpr int MAX_SOUND_RANGE = 254;
 
 /// Register a sound (can be a simple sound or a group)
-extern stratagus::sound *RegisterSound(const std::string &identifier, const std::vector<std::filesystem::path> &files);
+extern wyrmgus::sound *RegisterSound(const std::string &identifier, const std::vector<std::filesystem::path> &files);
 
-namespace stratagus {
+namespace wyrmgus {
 
 class sample;
 enum class unit_sound_type;
@@ -92,8 +92,8 @@ class sound final : public data_entry, public data_type<sound>
 
 	Q_PROPERTY(QVariantList files READ get_files_qvariant_list)
 	Q_PROPERTY(int range MEMBER range)
-	Q_PROPERTY(stratagus::sound* first_sound MEMBER first_sound READ get_first_sound)
-	Q_PROPERTY(stratagus::sound* second_sound MEMBER second_sound READ get_second_sound)
+	Q_PROPERTY(wyrmgus::sound* first_sound MEMBER first_sound READ get_first_sound)
+	Q_PROPERTY(wyrmgus::sound* second_sound MEMBER second_sound READ get_second_sound)
 
 public:
 	static constexpr const char *class_identifier = "sound";
@@ -202,24 +202,24 @@ extern int DistanceSilent;
 /// Calculates volume level
 extern unsigned char CalculateVolume(bool isVolume, int power, unsigned char range);
 /// Play a unit sound
-extern void PlayUnitSound(const CUnit &unit, const stratagus::unit_sound_type unit_sound_type);
+extern void PlayUnitSound(const CUnit &unit, const wyrmgus::unit_sound_type unit_sound_type);
 /// Play a unit sound
-extern void PlayUnitSound(const CUnit &unit, stratagus::sound *sound);
+extern void PlayUnitSound(const CUnit &unit, wyrmgus::sound *sound);
 /// Play a missile sound
-extern void PlayMissileSound(const Missile &missile, stratagus::sound *sound);
+extern void PlayMissileSound(const Missile &missile, wyrmgus::sound *sound);
 /// Play a game sound
-extern void PlayGameSound(stratagus::sound *sound, unsigned char volume, bool always = false);
+extern void PlayGameSound(wyrmgus::sound *sound, unsigned char volume, bool always = false);
 
 /// Modify the range of a given sound.
-extern void SetSoundRange(stratagus::sound *sound, unsigned char range);
+extern void SetSoundRange(wyrmgus::sound *sound, unsigned char range);
 
 //Wyrmgus start
 /// Modify the volume percent of a given sound.
-extern void SetSoundVolumePercent(stratagus::sound *sound, int volume_percent);
+extern void SetSoundVolumePercent(wyrmgus::sound *sound, int volume_percent);
 //Wyrmgus end
 
 ///  Create a special sound group with two sounds
-extern stratagus::sound *RegisterTwoGroups(const std::string &identifier, stratagus::sound *first, stratagus::sound *second);
+extern wyrmgus::sound *RegisterTwoGroups(const std::string &identifier, wyrmgus::sound *first, wyrmgus::sound *second);
 
 /// Initialize client side of the sound layer.
 extern void InitSoundClient();
@@ -253,11 +253,11 @@ extern void ShutdownMusicOAML();
 // sound_id.cpp
 
 /// Map sound to identifier
-extern void MapSound(const std::string &sound_name, stratagus::sound *id);
+extern void MapSound(const std::string &sound_name, wyrmgus::sound *id);
 /// Make a sound bound to identifier
-extern stratagus::sound *MakeSound(const std::string &sound_name, const std::vector<std::filesystem::path> &files);
+extern wyrmgus::sound *MakeSound(const std::string &sound_name, const std::vector<std::filesystem::path> &files);
 /// Make a sound group bound to identifier
-extern stratagus::sound *MakeSoundGroup(const std::string &name, stratagus::sound *first, stratagus::sound *second);
+extern wyrmgus::sound *MakeSoundGroup(const std::string &name, wyrmgus::sound *first, wyrmgus::sound *second);
 
 // script_sound.cpp
 

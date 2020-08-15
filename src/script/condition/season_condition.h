@@ -31,7 +31,7 @@
 #include "time/season.h"
 #include "unit/unit.h"
 
-namespace stratagus {
+namespace wyrmgus {
 
 class season;
 

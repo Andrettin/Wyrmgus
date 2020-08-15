@@ -57,7 +57,7 @@ public:
 	virtual void _endDraw();
 
 	virtual void drawImage(gcn::Image *image, int srcX, int srcY,
-						   int dstX, int dstY, int width, int height, const stratagus::player_color *player_color = nullptr, unsigned int transparency = 0, bool grayscale = false);
+						   int dstX, int dstY, int width, int height, const wyrmgus::player_color *player_color = nullptr, unsigned int transparency = 0, bool grayscale = false);
 
 	virtual void drawPoint(int x, int y);
 	virtual void drawLine(int x1, int y1, int x2, int y2);

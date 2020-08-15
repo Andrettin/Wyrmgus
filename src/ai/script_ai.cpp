@@ -57,74 +57,74 @@
 **  @param n      Index to insert new into table
 **  @param base   Base type to insert into table.
 */
-static void AiHelperInsert(std::vector<std::vector<stratagus::unit_type *> > &table,
-						   unsigned int n, stratagus::unit_type &base)
+static void AiHelperInsert(std::vector<std::vector<wyrmgus::unit_type *> > &table,
+						   unsigned int n, wyrmgus::unit_type &base)
 {
 	if (n >= table.size()) {
 		table.resize(n + 1);
 	}
 	// Look if already known
-	std::vector<stratagus::unit_type *>::const_iterator it = std::find(table[n].begin(), table[n].end(), &base);
+	std::vector<wyrmgus::unit_type *>::const_iterator it = std::find(table[n].begin(), table[n].end(), &base);
 	if (it != table[n].end()) {
 		return;
 	}
 	table[n].push_back(&base);
 }
 
-static void AiHelperInsert(std::map<const stratagus::unit_type *, std::vector<stratagus::unit_type *>> &table,
-	const stratagus::unit_type *key, stratagus::unit_type *target)
+static void AiHelperInsert(std::map<const wyrmgus::unit_type *, std::vector<wyrmgus::unit_type *>> &table,
+	const wyrmgus::unit_type *key, wyrmgus::unit_type *target)
 {
-	if (table.contains(key) && stratagus::vector::contains(table[key], target)) {
+	if (table.contains(key) && wyrmgus::vector::contains(table[key], target)) {
 		return;
 	}
 
 	table[key].push_back(target);
 }
 
-static void AiHelperInsert(std::map<const stratagus::unit_class *, std::vector<const stratagus::unit_class *>> &table,
-	const stratagus::unit_class *key, const stratagus::unit_class *target)
+static void AiHelperInsert(std::map<const wyrmgus::unit_class *, std::vector<const wyrmgus::unit_class *>> &table,
+	const wyrmgus::unit_class *key, const wyrmgus::unit_class *target)
 {
-	if (table.contains(key) && stratagus::vector::contains(table[key], target)) {
+	if (table.contains(key) && wyrmgus::vector::contains(table[key], target)) {
 		return;
 	}
 
 	table[key].push_back(target);
 }
 
-static void AiHelperInsert(std::map<const CUpgrade *, std::vector<stratagus::unit_type *>> &table,
-	const CUpgrade *key, stratagus::unit_type *target)
+static void AiHelperInsert(std::map<const CUpgrade *, std::vector<wyrmgus::unit_type *>> &table,
+	const CUpgrade *key, wyrmgus::unit_type *target)
 {
-	if (table.contains(key) && stratagus::vector::contains(table[key], target)) {
+	if (table.contains(key) && wyrmgus::vector::contains(table[key], target)) {
 		return;
 	}
 
 	table[key].push_back(target);
 }
 
-static void AiHelperInsert(std::map<const stratagus::upgrade_class *, std::vector<const stratagus::unit_class *>> &table,
-	const stratagus::upgrade_class *key, const stratagus::unit_class *target)
+static void AiHelperInsert(std::map<const wyrmgus::upgrade_class *, std::vector<const wyrmgus::unit_class *>> &table,
+	const wyrmgus::upgrade_class *key, const wyrmgus::unit_class *target)
 {
-	if (table.contains(key) && stratagus::vector::contains(table[key], target)) {
+	if (table.contains(key) && wyrmgus::vector::contains(table[key], target)) {
 		return;
 	}
 
 	table[key].push_back(target);
 }
 
-static void AiHelperInsert(std::map<const stratagus::unit_type *, std::vector<const CUpgrade *>> &table,
-	const stratagus::unit_type *key, const CUpgrade *target)
+static void AiHelperInsert(std::map<const wyrmgus::unit_type *, std::vector<const CUpgrade *>> &table,
+	const wyrmgus::unit_type *key, const CUpgrade *target)
 {
-	if (table.contains(key) && stratagus::vector::contains(table[key], target)) {
+	if (table.contains(key) && wyrmgus::vector::contains(table[key], target)) {
 		return;
 	}
 
 	table[key].push_back(target);
 }
 
-static void AiHelperInsert(std::map<const stratagus::unit_class *, std::vector<const stratagus::upgrade_class *>> &table,
-	const stratagus::unit_class *key, const stratagus::upgrade_class *target)
+static void AiHelperInsert(std::map<const wyrmgus::unit_class *, std::vector<const wyrmgus::upgrade_class *>> &table,
+	const wyrmgus::unit_class *key, const wyrmgus::upgrade_class *target)
 {
-	if (table.contains(key) && stratagus::vector::contains(table[key], target)) {
+	if (table.contains(key) && wyrmgus::vector::contains(table[key], target)) {
 		return;
 	}
 
@@ -178,12 +178,12 @@ static void AiHelperInsert(std::vector<std::vector<int> > &table,
 /**
 **  Transform list of unit separed with coma to a true list.
 */
-static std::vector<stratagus::unit_type *> getUnitTypeFromString(const std::string &list)
+static std::vector<wyrmgus::unit_type *> getUnitTypeFromString(const std::string &list)
 {
-	std::vector<stratagus::unit_type *> res;
+	std::vector<wyrmgus::unit_type *> res;
 
 	if (list == "*") {
-		return stratagus::unit_type::get_all();
+		return wyrmgus::unit_type::get_all();
 	}
 	size_t begin = 1;
 	size_t end = list.find(",", begin);
@@ -193,7 +193,7 @@ static std::vector<stratagus::unit_type *> getUnitTypeFromString(const std::stri
 		end = list.find(",", begin);
 		if (!unitName.empty()) {
 			Assert(unitName[0] != ',');
-			stratagus::unit_type *unit_type = stratagus::unit_type::try_get(unitName);
+			wyrmgus::unit_type *unit_type = wyrmgus::unit_type::try_get(unitName);
 			if (unit_type != nullptr) {
 				res.push_back(unit_type);
 			}
@@ -205,11 +205,11 @@ static std::vector<stratagus::unit_type *> getUnitTypeFromString(const std::stri
 /**
 **  Get list of unittype which can be repared.
 */
-static std::vector<stratagus::unit_type *> getReparableUnits()
+static std::vector<wyrmgus::unit_type *> getReparableUnits()
 {
-	std::vector<stratagus::unit_type *> res;
+	std::vector<wyrmgus::unit_type *> res;
 
-	for (stratagus::unit_type *unit_type : stratagus::unit_type::get_all()) {
+	for (wyrmgus::unit_type *unit_type : wyrmgus::unit_type::get_all()) {
 		if (unit_type->RepairHP > 0) {
 			res.push_back(unit_type);
 		}
@@ -222,12 +222,12 @@ static std::vector<stratagus::unit_type *> getReparableUnits()
 **
 **  @note Better (supply / cost) first.
 */
-static std::vector<stratagus::unit_type *> getSupplyUnits()
+static std::vector<wyrmgus::unit_type *> getSupplyUnits()
 {
-	std::vector<stratagus::unit_type *> res;
-	std::vector<stratagus::unit_type *> sorted_res;
+	std::vector<wyrmgus::unit_type *> res;
+	std::vector<wyrmgus::unit_type *> sorted_res;
 
-	for (stratagus::unit_type *unit_type : stratagus::unit_type::get_all()) {
+	for (wyrmgus::unit_type *unit_type : wyrmgus::unit_type::get_all()) {
 		if (unit_type->BoolFlag[TOWNHALL_INDEX].value) {
 			continue;
 		}
@@ -239,13 +239,13 @@ static std::vector<stratagus::unit_type *> getSupplyUnits()
 	// Now, sort them, best first.
 	while (!res.empty()) {
 		float bestscore = 0;
-		stratagus::unit_type *besttype = nullptr;
+		wyrmgus::unit_type *besttype = nullptr;
 
-		for (std::vector<stratagus::unit_type *>::const_iterator i = res.begin(); i != res.end(); ++i) {
-			stratagus::unit_type &type = **i;
+		for (std::vector<wyrmgus::unit_type *>::const_iterator i = res.begin(); i != res.end(); ++i) {
+			wyrmgus::unit_type &type = **i;
 			unsigned int cost = 0;
 
-			for (size_t j = 0; j < stratagus::resource::get_all().size(); ++j) {
+			for (size_t j = 0; j < wyrmgus::resource::get_all().size(); ++j) {
 				cost += type.DefaultStat.Costs[j]; //this cannot be MapDefaultStat because this function is called when the AiHelper is defined, rather than when a game is started
 			}
 			const float score = ((float) type.DefaultStat.Variables[SUPPLY_INDEX].Value) / cost;
@@ -255,7 +255,7 @@ static std::vector<stratagus::unit_type *> getSupplyUnits()
 			}
 		}
 		sorted_res.push_back(besttype);
-		for (std::vector<stratagus::unit_type *>::iterator i = res.begin(); i != res.end(); ++i) {
+		for (std::vector<wyrmgus::unit_type *>::iterator i = res.begin(); i != res.end(); ++i) {
 			if (*i == besttype) {
 				i = res.erase(i);
 				break;
@@ -270,29 +270,29 @@ static std::vector<stratagus::unit_type *> getSupplyUnits()
 **
 **  @note Better (MaxOnBoard / cost) first.
 */
-static std::vector<stratagus::unit_type *> getMineUnits()
+static std::vector<wyrmgus::unit_type *> getMineUnits()
 {
-	std::vector<stratagus::unit_type *> res;
+	std::vector<wyrmgus::unit_type *> res;
 
-	for (stratagus::unit_type *unit_type : stratagus::unit_type::get_all()) {
+	for (wyrmgus::unit_type *unit_type : wyrmgus::unit_type::get_all()) {
 		if (unit_type->GivesResource > 0 && unit_type->BoolFlag[CANHARVEST_INDEX].value) {
 			res.push_back(unit_type);
 		}
 	}
 #if 0
-	std::vector<stratagus::unit_type *> sorted_res;
+	std::vector<wyrmgus::unit_type *> sorted_res;
 	// Now, sort them, best first.
 	while (!res.empty()) {
 		float bestscore;
-		stratagus::unit_type *besttype;
+		wyrmgus::unit_type *besttype;
 
 		bestscore = 0;
-		for (std::vector<stratagus::unit_type *>::const_iterator i = res.begin(); i != res.end(); ++i) {
-			stratagus::unit_type *type = *i;
+		for (std::vector<wyrmgus::unit_type *>::const_iterator i = res.begin(); i != res.end(); ++i) {
+			wyrmgus::unit_type *type = *i;
 			float score;
 			unsigned int cost = 0;
 
-			for (size_t j = 0; j < stratagus::resource::get_all().size(); ++j) {
+			for (size_t j = 0; j < wyrmgus::resource::get_all().size(); ++j) {
 				cost += type->_Costs[j];
 			}
 			score = ((float) type->MaxOnBoard) / cost;
@@ -302,7 +302,7 @@ static std::vector<stratagus::unit_type *> getMineUnits()
 			}
 		}
 		sorted_res.push_back(besttype);
-		for (std::vector<stratagus::unit_type *>::iterator i = res.begin(); i != res.end(); ++i) {
+		for (std::vector<wyrmgus::unit_type *>::iterator i = res.begin(); i != res.end(); ++i) {
 			if (*i == besttype) {
 				i = res.erase(i);
 				break;
@@ -320,11 +320,11 @@ static std::vector<stratagus::unit_type *> getMineUnits()
 /**
 **  Get list of unit types which are markets.
 */
-static std::vector<stratagus::unit_type *> GetMarketUnits()
+static std::vector<wyrmgus::unit_type *> GetMarketUnits()
 {
-	std::vector<stratagus::unit_type *> res;
+	std::vector<wyrmgus::unit_type *> res;
 
-	for (stratagus::unit_type *unit_type : stratagus::unit_type::get_all()) {
+	for (wyrmgus::unit_type *unit_type : wyrmgus::unit_type::get_all()) {
 
 		if (unit_type->BoolFlag[MARKET_INDEX].value) {
 			res.push_back(unit_type);
@@ -336,11 +336,11 @@ static std::vector<stratagus::unit_type *> GetMarketUnits()
 /**
 **  Get list of unit types which are transporters.
 */
-static std::vector<stratagus::unit_type *> GetNavalTransporterUnits()
+static std::vector<wyrmgus::unit_type *> GetNavalTransporterUnits()
 {
-	std::vector<stratagus::unit_type *> res;
+	std::vector<wyrmgus::unit_type *> res;
 
-	for (stratagus::unit_type *unit_type : stratagus::unit_type::get_all()) {
+	for (wyrmgus::unit_type *unit_type : wyrmgus::unit_type::get_all()) {
 		if (unit_type->CanTransport() && (unit_type->UnitType == UnitTypeType::Naval || unit_type->UnitType == UnitTypeType::Fly || unit_type->UnitType == UnitTypeType::FlyLow || unit_type->UnitType == UnitTypeType::Space)) { //if the unit is a transporter that can travel through water (not necessarily a ship, can also fly)
 			res.push_back(unit_type);
 		}
@@ -382,93 +382,93 @@ static void InitAiHelper(AiHelper &aiHelper)
 	AiHelpers.NavalTransporters.clear();
 	//Wyrmgus end
 	
-	std::vector<stratagus::unit_type *> reparableUnits = getReparableUnits();
-	std::vector<stratagus::unit_type *> supplyUnits = getSupplyUnits();
-	std::vector<stratagus::unit_type *> mineUnits = getMineUnits();
+	std::vector<wyrmgus::unit_type *> reparableUnits = getReparableUnits();
+	std::vector<wyrmgus::unit_type *> supplyUnits = getSupplyUnits();
+	std::vector<wyrmgus::unit_type *> mineUnits = getMineUnits();
 	//Wyrmgus start
-	std::vector<stratagus::unit_type *> market_units = GetMarketUnits();
-	std::vector<stratagus::unit_type *> naval_transporter_units = GetNavalTransporterUnits();
+	std::vector<wyrmgus::unit_type *> market_units = GetMarketUnits();
+	std::vector<wyrmgus::unit_type *> naval_transporter_units = GetNavalTransporterUnits();
 	//Wyrmgus end
 
-	for (std::vector<stratagus::unit_type *>::const_iterator i = supplyUnits.begin(); i != supplyUnits.end(); ++i) {
+	for (std::vector<wyrmgus::unit_type *>::const_iterator i = supplyUnits.begin(); i != supplyUnits.end(); ++i) {
 		AiHelperInsert(aiHelper.UnitLimit, 0, **i);
 	}
 	//Wyrmgus start
-	for (std::vector<stratagus::unit_type *>::const_iterator i = market_units.begin(); i != market_units.end(); ++i) {
+	for (std::vector<wyrmgus::unit_type *>::const_iterator i = market_units.begin(); i != market_units.end(); ++i) {
 		AiHelperInsert(aiHelper.SellMarkets, 0, **i);
 	}
-	for (std::vector<stratagus::unit_type *>::const_iterator i = naval_transporter_units.begin(); i != naval_transporter_units.end(); ++i) {
+	for (std::vector<wyrmgus::unit_type *>::const_iterator i = naval_transporter_units.begin(); i != naval_transporter_units.end(); ++i) {
 		AiHelperInsert(aiHelper.NavalTransporters, 0, **i);
 	}
 	//Wyrmgus end
 
 	for (int i = 1; i < MaxCosts; ++i) {
-		for (std::vector<stratagus::unit_type *>::const_iterator j = mineUnits.begin(); j != mineUnits.end(); ++j) {
+		for (std::vector<wyrmgus::unit_type *>::const_iterator j = mineUnits.begin(); j != mineUnits.end(); ++j) {
 			if ((*j)->GivesResource == i) {
 				AiHelperInsert(aiHelper.Mines, i, **j);
 			}
 		}
-		for (stratagus::unit_type *unit_type : stratagus::unit_type::get_all()) {
+		for (wyrmgus::unit_type *unit_type : wyrmgus::unit_type::get_all()) {
 			if (unit_type->CanStore[i] > 0) {
 				AiHelperInsert(aiHelper.Depots, i, *unit_type);
 			}
 		}
 	}
 
-	for (const stratagus::button *button : stratagus::button::get_all()) {
-		std::vector<stratagus::unit_type *> unitmask = getUnitTypeFromString(button->UnitMask);
-		for (const stratagus::unit_class *unit_class : button->get_unit_classes()) {
-			stratagus::vector::merge(unitmask, unit_class->get_unit_types());
+	for (const wyrmgus::button *button : wyrmgus::button::get_all()) {
+		std::vector<wyrmgus::unit_type *> unitmask = getUnitTypeFromString(button->UnitMask);
+		for (const wyrmgus::unit_class *unit_class : button->get_unit_classes()) {
+			wyrmgus::vector::merge(unitmask, unit_class->get_unit_types());
 		}
 
 		switch (button->Action) {
 			case ButtonCmd::Repair :
-				for (std::vector<stratagus::unit_type *>::const_iterator j = unitmask.begin(); j != unitmask.end(); ++j) {
-					for (std::vector<stratagus::unit_type *>::const_iterator k = reparableUnits.begin(); k != reparableUnits.end(); ++k) {
+				for (std::vector<wyrmgus::unit_type *>::const_iterator j = unitmask.begin(); j != unitmask.end(); ++j) {
+					for (std::vector<wyrmgus::unit_type *>::const_iterator k = reparableUnits.begin(); k != reparableUnits.end(); ++k) {
 						AiHelperInsert(aiHelper.Repair, (*k)->Slot, **j);
 					}
 				}
 				break;
 			case ButtonCmd::Build: {
-				stratagus::unit_type *buildingType = stratagus::unit_type::get(button->ValueStr);
+				wyrmgus::unit_type *buildingType = wyrmgus::unit_type::get(button->ValueStr);
 
-				for (stratagus::unit_type *builder : unitmask) {
+				for (wyrmgus::unit_type *builder : unitmask) {
 					AiHelperInsert(aiHelper.builders, buildingType, builder);
 				}
 				break;
 			}
 			case ButtonCmd::BuildClass: {
-				const stratagus::unit_class *built_class = stratagus::unit_class::get(button->ValueStr);
+				const wyrmgus::unit_class *built_class = wyrmgus::unit_class::get(button->ValueStr);
 
-				for (const stratagus::unit_class *builder : button->get_unit_classes()) {
+				for (const wyrmgus::unit_class *builder : button->get_unit_classes()) {
 					AiHelperInsert(aiHelper.builder_classes, built_class, builder);
 				}
 				break;
 			}
 			case ButtonCmd::Train : {
-				const stratagus::unit_type *trained_type = stratagus::unit_type::get(button->ValueStr);
+				const wyrmgus::unit_type *trained_type = wyrmgus::unit_type::get(button->ValueStr);
 
-				for (stratagus::unit_type *trainer : unitmask) {
+				for (wyrmgus::unit_type *trainer : unitmask) {
 					AiHelperInsert(aiHelper.trainers, trained_type, trainer);
 				}
 				break;
 			}
 			case ButtonCmd::TrainClass : {
-				const stratagus::unit_class *trained_class = stratagus::unit_class::get(button->ValueStr);
+				const wyrmgus::unit_class *trained_class = wyrmgus::unit_class::get(button->ValueStr);
 
-				for (const stratagus::unit_class *trainer : button->get_unit_classes()) {
+				for (const wyrmgus::unit_class *trainer : button->get_unit_classes()) {
 					AiHelperInsert(aiHelper.trainer_classes, trained_class, trainer);
 				}
 				break;
 			}
 			case ButtonCmd::UpgradeTo : {
-				stratagus::unit_type *upgradeToType = stratagus::unit_type::get(button->ValueStr);
+				wyrmgus::unit_type *upgradeToType = wyrmgus::unit_type::get(button->ValueStr);
 
-				for (std::vector<stratagus::unit_type *>::const_iterator j = unitmask.begin(); j != unitmask.end(); ++j) {
+				for (std::vector<wyrmgus::unit_type *>::const_iterator j = unitmask.begin(); j != unitmask.end(); ++j) {
 					AiHelperInsert(aiHelper.Upgrade, upgradeToType->Slot, **j);
 				}
 				
-				for (std::vector<stratagus::unit_type *>::const_iterator j = unitmask.begin(); j != unitmask.end(); ++j) {
+				for (std::vector<wyrmgus::unit_type *>::const_iterator j = unitmask.begin(); j != unitmask.end(); ++j) {
 					AiHelperInsert(aiHelper.UpgradesTo, (**j).Slot, *upgradeToType);
 				}
 				break;
@@ -476,16 +476,16 @@ static void InitAiHelper(AiHelper &aiHelper)
 			case ButtonCmd::Research : {
 				const CUpgrade *upgrade = CUpgrade::get(button->ValueStr);
 
-				for (stratagus::unit_type *researcher : unitmask) {
+				for (wyrmgus::unit_type *researcher : unitmask) {
 					AiHelperInsert(aiHelper.researchers, upgrade, researcher);
 					AiHelperInsert(aiHelper.researched_upgrades, researcher, upgrade);
 				}
 				break;
 			}
 			case ButtonCmd::ResearchClass: {
-				const stratagus::upgrade_class *upgrade_class = stratagus::upgrade_class::get(button->ValueStr);
+				const wyrmgus::upgrade_class *upgrade_class = wyrmgus::upgrade_class::get(button->ValueStr);
 
-				for (const stratagus::unit_class *researcher : button->get_unit_classes()) {
+				for (const wyrmgus::unit_class *researcher : button->get_unit_classes()) {
 					AiHelperInsert(aiHelper.researcher_classes, upgrade_class, researcher);
 					AiHelperInsert(aiHelper.researched_upgrade_classes, researcher, upgrade_class);
 				}
@@ -494,7 +494,7 @@ static void InitAiHelper(AiHelper &aiHelper)
 			case ButtonCmd::SellResource : {
 				int resource = GetResourceIdByName(button->ValueStr.c_str());
 
-				for (std::vector<stratagus::unit_type *>::const_iterator j = unitmask.begin(); j != unitmask.end(); ++j) {
+				for (std::vector<wyrmgus::unit_type *>::const_iterator j = unitmask.begin(); j != unitmask.end(); ++j) {
 					AiHelperInsert(aiHelper.SellMarkets, resource - 1, **j);
 				}
 				break;
@@ -502,7 +502,7 @@ static void InitAiHelper(AiHelper &aiHelper)
 			case ButtonCmd::BuyResource : {
 				int resource = GetResourceIdByName(button->ValueStr.c_str());
 
-				for (std::vector<stratagus::unit_type *>::const_iterator j = unitmask.begin(); j != unitmask.end(); ++j) {
+				for (std::vector<wyrmgus::unit_type *>::const_iterator j = unitmask.begin(); j != unitmask.end(); ++j) {
 					AiHelperInsert(aiHelper.BuyMarkets, resource - 1, **j);
 				}
 				break;
@@ -510,15 +510,15 @@ static void InitAiHelper(AiHelper &aiHelper)
 			case ButtonCmd::ProduceResource : {
 				int resource = GetResourceIdByName(button->ValueStr.c_str());
 
-				for (std::vector<stratagus::unit_type *>::const_iterator j = unitmask.begin(); j != unitmask.end(); ++j) {
+				for (std::vector<wyrmgus::unit_type *>::const_iterator j = unitmask.begin(); j != unitmask.end(); ++j) {
 					AiHelperInsert(aiHelper.ProducedResources, (**j).Slot, resource);
 				}
 				break;
 			}
 			case ButtonCmd::ExperienceUpgradeTo : {
-				stratagus::unit_type *upgradeToType = stratagus::unit_type::get(button->ValueStr);
+				wyrmgus::unit_type *upgradeToType = wyrmgus::unit_type::get(button->ValueStr);
 
-				for (std::vector<stratagus::unit_type *>::const_iterator j = unitmask.begin(); j != unitmask.end(); ++j) {
+				for (std::vector<wyrmgus::unit_type *>::const_iterator j = unitmask.begin(); j != unitmask.end(); ++j) {
 					AiHelperInsert(aiHelper.ExperienceUpgrades, (**j).Slot, *upgradeToType);
 				}
 				break;
@@ -527,7 +527,7 @@ static void InitAiHelper(AiHelper &aiHelper)
 				CUpgrade *ability = CUpgrade::get(button->ValueStr);
 
 				if (ability->is_ability()) {
-					for (std::vector<stratagus::unit_type *>::const_iterator j = unitmask.begin(); j != unitmask.end(); ++j) {
+					for (std::vector<wyrmgus::unit_type *>::const_iterator j = unitmask.begin(); j != unitmask.end(); ++j) {
 						AiHelperInsert(aiHelper.LearnableAbilities, (**j).Slot, *ability);
 					}
 				}
@@ -579,12 +579,12 @@ static int CclDefineAiHelper(lua_State *l)
 		}
 		// Get the base unit type, which could handle the action.
 		const char *baseTypeName = LuaToString(l, j + 1, 2);
-		const stratagus::unit_type *base = stratagus::unit_type::get(baseTypeName);
+		const wyrmgus::unit_type *base = wyrmgus::unit_type::get(baseTypeName);
 
 		// Get the unit types, which could be produced
 		for (int k = 2; k < subargs; ++k) {
 			const char *equivTypeName = LuaToString(l, j + 1, k + 1);
-			stratagus::unit_type *type = stratagus::unit_type::get(equivTypeName);
+			wyrmgus::unit_type *type = wyrmgus::unit_type::get(equivTypeName);
 			AiHelperInsert(AiHelpers.Equiv, base->Slot, *type);
 			AiNewUnitTypeEquiv(*base, *type);
 		}
@@ -668,7 +668,7 @@ static int CclDefineAi(lua_State *l)
 **  @param type   Unit-type to be appended.
 **  @param count  How many unit-types to build.
 */
-static void InsertUnitTypeRequests(stratagus::unit_type *type, int count)
+static void InsertUnitTypeRequests(wyrmgus::unit_type *type, int count)
 {
 	AiRequestType ait;
 
@@ -683,7 +683,7 @@ static void InsertUnitTypeRequests(stratagus::unit_type *type, int count)
 **
 **  @param type  Unit-type to be found.
 */
-static AiRequestType *FindInUnitTypeRequests(const stratagus::unit_type *type)
+static AiRequestType *FindInUnitTypeRequests(const wyrmgus::unit_type *type)
 {
 	const size_t n = AiPlayer->UnitTypeRequests.size();
 
@@ -701,7 +701,7 @@ static AiRequestType *FindInUnitTypeRequests(const stratagus::unit_type *type)
 **
 **  @param type  Unit-type to be removed.
 */
-static void RemoveFromUnitTypeRequests(const stratagus::unit_type *type)
+static void RemoveFromUnitTypeRequests(const wyrmgus::unit_type *type)
 {
 	std::vector<AiRequestType>::iterator i;
 
@@ -719,7 +719,7 @@ static void RemoveFromUnitTypeRequests(const stratagus::unit_type *type)
 **
 **  @param type  Unit-type to be found.
 */
-static int FindInUpgradeToRequests(const stratagus::unit_type *type)
+static int FindInUpgradeToRequests(const wyrmgus::unit_type *type)
 {
 	const size_t n = AiPlayer->UpgradeToRequests.size();
 	for (size_t i = 0; i < n; ++i) {
@@ -735,7 +735,7 @@ static int FindInUpgradeToRequests(const stratagus::unit_type *type)
 **
 **  @param type  Unit-type to be appended.
 */
-static void InsertUpgradeToRequests(stratagus::unit_type *type)
+static void InsertUpgradeToRequests(wyrmgus::unit_type *type)
 {
 	AiPlayer->UpgradeToRequests.push_back(type);
 }
@@ -760,7 +760,7 @@ static void InsertResearchRequests(CUpgrade *upgrade)
 static int CclAiGetRace(lua_State *l)
 {
 	LuaCheckArgs(l, 0);
-	lua_pushstring(l, stratagus::civilization::get_all()[AiPlayer->Player->Race]->get_identifier().c_str());
+	lua_pushstring(l, wyrmgus::civilization::get_all()[AiPlayer->Player->Race]->get_identifier().c_str());
 	return 1;
 }
 
@@ -882,7 +882,7 @@ static int CclAiSet(lua_State *l)
 	}
 	//Wyrmgus end
 	lua_pushvalue(l, 1);
-	stratagus::unit_type *type = CclGetUnitType(l);
+	wyrmgus::unit_type *type = CclGetUnitType(l);
 	lua_pop(l, 1);
 
 	AiRequestType *autt = FindInUnitTypeRequests(type);
@@ -923,7 +923,7 @@ static int CclAiWait(lua_State *l)
 
 	const char *ident = LuaToString(l, 1);
 	if (!strncmp(ident, "unit-", 5)) {
-		const stratagus::unit_type *type = stratagus::unit_type::get(ident);
+		const wyrmgus::unit_type *type = wyrmgus::unit_type::get(ident);
 		const AiRequestType *autt = FindInUnitTypeRequests(type);
 		if (!autt) {
 			// Look if we have this unit-type.
@@ -1005,7 +1005,7 @@ static int CclAiForce(lua_State *l)
 	int args = lua_rawlen(l, 2);
 	for (int j = 0; j < args; ++j) {
 		lua_rawgeti(l, 2, j + 1);
-		stratagus::unit_type *type = CclGetUnitType(l);
+		wyrmgus::unit_type *type = CclGetUnitType(l);
 		lua_pop(l, 1);
 		++j;
 		int count = LuaToNumber(l, 2, j + 1);
@@ -1015,7 +1015,7 @@ static int CclAiForce(lua_State *l)
 		}
 
 		// Use the equivalent unittype.
-		type = stratagus::unit_type::get_all()[UnitTypeEquivs[type->Slot]];
+		type = wyrmgus::unit_type::get_all()[UnitTypeEquivs[type->Slot]];
 
 		if (resetForce) {
 			// Append it.
@@ -1292,7 +1292,7 @@ static int CclAiUpgradeTo(lua_State *l)
 		return 1;
 	}
 	//Wyrmgus end
-	stratagus::unit_type *type = CclGetUnitType(l);
+	wyrmgus::unit_type *type = CclGetUnitType(l);
 	InsertUpgradeToRequests(type);
 
 	lua_pushboolean(l, 0);
@@ -1327,11 +1327,11 @@ static int CclAiSetReserve(lua_State *l)
 		LuaError(l, "incorrect argument");
 	}
 	lua_newtable(l);
-	for (size_t i = 0; i < stratagus::resource::get_all().size(); ++i) {
+	for (size_t i = 0; i < wyrmgus::resource::get_all().size(); ++i) {
 		lua_pushnumber(l, AiPlayer->Reserve[i]);
 		lua_rawseti(l, -2, i + 1);
 	}
-	for (size_t i = 0; i < stratagus::resource::get_all().size(); ++i) {
+	for (size_t i = 0; i < wyrmgus::resource::get_all().size(); ++i) {
 		AiPlayer->Reserve[i] = LuaToNumber(l, 1, i + 1);
 	}
 	return 1;
@@ -1401,7 +1401,7 @@ static int CclAiDump(lua_State *l)
 			//
 
 			printf("------\n");
-			for (size_t i = 0; i < stratagus::resource::get_all().size(); ++i) {
+			for (size_t i = 0; i < wyrmgus::resource::get_all().size(); ++i) {
 				printf("%s(%4d, %4d/%4d) ", DefaultResourceNames[i].c_str(),
 					   aip.Resources[i], aip.StoredResources[i], aip.MaxResources[i]);
 			}
@@ -1474,7 +1474,7 @@ static void CclParseBuildQueue(lua_State *l, PlayerAi *ai, int offset)
 	//Wyrmgus start
 	int z = -1;
 	int landmass = 0;
-	stratagus::site *settlement = nullptr;
+	wyrmgus::site *settlement = nullptr;
 	//Wyrmgus end
 
 	const int args = lua_rawlen(l, offset);
@@ -1492,7 +1492,7 @@ static void CclParseBuildQueue(lua_State *l, PlayerAi *ai, int offset)
 		} else if (!strcmp(value, "landmass")) {
 			landmass = LuaToNumber(l, offset, k + 1);
 		} else if (!strcmp(value, "settlement")) {
-			settlement = stratagus::site::get(LuaToString(l, offset, k + 1));
+			settlement = wyrmgus::site::get(LuaToString(l, offset, k + 1));
 		//Wyrmgus end
 		} else {
 			//ident = LuaToString(l, j + 1, k + 1);
@@ -1502,7 +1502,7 @@ static void CclParseBuildQueue(lua_State *l, PlayerAi *ai, int offset)
 			const int want = LuaToNumber(l, offset, k + 1);
 
 			AiBuildQueue queue;
-			queue.Type = stratagus::unit_type::get(value);
+			queue.Type = wyrmgus::unit_type::get(value);
 			queue.Want = want;
 			queue.Made = made;
 			queue.Pos = pos;
@@ -1612,7 +1612,7 @@ static int CclDefineAiPlayer(lua_State *l)
 						AiUnitType queue;
 
 						queue.Want = num;
-						queue.Type = stratagus::unit_type::get(ident);
+						queue.Type = wyrmgus::unit_type::get(ident);
 						ai->Force[forceIdx].UnitTypes.push_back(queue);
 					}
 					lua_pop(l, 1);
@@ -1748,7 +1748,7 @@ static int CclDefineAiPlayer(lua_State *l)
 				++k;
 				const int landmass = LuaToNumber(l, j + 1, k + 1);
 				//Wyrmgus end
-				ai->UnitTypeRequests[i].Type = stratagus::unit_type::get(ident);
+				ai->UnitTypeRequests[i].Type = wyrmgus::unit_type::get(ident);
 				ai->UnitTypeRequests[i].Count = count;
 				//Wyrmgus start
 				ai->UnitTypeRequests[i].Landmass = landmass;
@@ -1762,7 +1762,7 @@ static int CclDefineAiPlayer(lua_State *l)
 			const int subargs = lua_rawlen(l, j + 1);
 			for (int k = 0; k < subargs; ++k) {
 				const char *ident = LuaToString(l, j + 1, k + 1);
-				ai->UpgradeToRequests.push_back(stratagus::unit_type::get(ident));
+				ai->UpgradeToRequests.push_back(wyrmgus::unit_type::get(ident));
 			}
 		} else if (!strcmp(value, "research")) {
 			if (!lua_istable(l, j + 1)) {

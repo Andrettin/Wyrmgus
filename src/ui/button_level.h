@@ -30,7 +30,7 @@
 #include "database/data_entry.h"
 #include "database/data_type.h"
 
-namespace stratagus {
+namespace wyrmgus {
 
 class button_level final : public data_entry, public data_type<button_level>
 {
@@ -40,7 +40,7 @@ public:
 	static constexpr const char *class_identifier = "button_level";
 	static constexpr const char *database_folder = "button_levels";
 
-	static button_level *add(const std::string &identifier, const stratagus::module *module)
+	static button_level *add(const std::string &identifier, const wyrmgus::module *module)
 	{
 		button_level *button_level = data_type::add(identifier, module);
 		button_level->index = button_level::get_all().size() - 1;

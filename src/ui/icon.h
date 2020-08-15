@@ -67,7 +67,7 @@ struct lua_State;
 
 int CclDefineIcon(lua_State *l);;
 
-namespace stratagus {
+namespace wyrmgus {
 
 class player_color;
 
@@ -78,7 +78,7 @@ class icon final : public data_entry, public data_type<icon>
 
 	Q_PROPERTY(QString file READ get_file_qstring)
 	Q_PROPERTY(int frame MEMBER frame READ get_frame)
-	Q_PROPERTY(stratagus::player_color* conversible_player_color MEMBER conversible_player_color READ get_conversible_player_color)
+	Q_PROPERTY(wyrmgus::player_color* conversible_player_color MEMBER conversible_player_color READ get_conversible_player_color)
 
 public:
 	static constexpr const char *class_identifier = "icon";
@@ -164,5 +164,5 @@ public:
 	bool Load();
 public:
 	std::string Name; //config icon name
-	stratagus::icon *Icon = nullptr; //icon pointer to use to run time
+	wyrmgus::icon *Icon = nullptr; //icon pointer to use to run time
 };

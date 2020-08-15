@@ -59,7 +59,7 @@ GameSound GameSounds;
 */
 struct SelectionHandling {
 	Origin Source;         /// origin of the sound
-	stratagus::sound *sound;         /// last sound played by this unit
+	wyrmgus::sound *sound;         /// last sound played by this unit
 	unsigned char HowMany; /// number of sound played in this group
 };
 
@@ -72,7 +72,7 @@ int DistanceSilent;              /// silent distance
 /**
 **  "Randomly" choose a sample from a sound group.
 */
-static stratagus::sample *SimpleChooseSample(const stratagus::sound &sound)
+static wyrmgus::sample *SimpleChooseSample(const wyrmgus::sound &sound)
 {
 	if (sound.Number == ONE_SOUND) {
 		return sound.get_samples().front().get();
@@ -86,9 +86,9 @@ static stratagus::sample *SimpleChooseSample(const stratagus::sound &sound)
 /**
 **  Choose the sample to play
 */
-static stratagus::sample *ChooseSample(stratagus::sound *sound, bool selection, Origin &source)
+static wyrmgus::sample *ChooseSample(wyrmgus::sound *sound, bool selection, Origin &source)
 {
-	stratagus::sample *result = nullptr;
+	wyrmgus::sample *result = nullptr;
 
 	if (!sound || !SoundEnabled()) {
 		return nullptr;
@@ -152,17 +152,17 @@ static stratagus::sample *ChooseSample(stratagus::sound *sound, bool selection, 
 **
 **  @return        Sound identifier
 */
-static stratagus::sound *ChooseUnitVoiceSound(const CUnit &unit, const stratagus::unit_sound_type unit_sound_type)
+static wyrmgus::sound *ChooseUnitVoiceSound(const CUnit &unit, const wyrmgus::unit_sound_type unit_sound_type)
 {
 	const CMapField &mf = *unit.MapLayer->Field(unit.tilePos);
 
-	const stratagus::civilization *civilization = unit.Type->get_civilization();
-	if (civilization != nullptr && unit.Player->Race != -1 && unit.Player->Race != civilization->ID && unit.Player->Faction != -1 && unit.Type == stratagus::faction::get_all()[unit.Player->Faction]->get_class_unit_type(unit.Type->get_unit_class())) {
-		civilization = stratagus::civilization::get_all()[unit.Player->Race];
+	const wyrmgus::civilization *civilization = unit.Type->get_civilization();
+	if (civilization != nullptr && unit.Player->Race != -1 && unit.Player->Race != civilization->ID && unit.Player->Faction != -1 && unit.Type == wyrmgus::faction::get_all()[unit.Player->Faction]->get_class_unit_type(unit.Type->get_unit_class())) {
+		civilization = wyrmgus::civilization::get_all()[unit.Player->Race];
 	}
 
 	switch (unit_sound_type) {
-		case stratagus::unit_sound_type::acknowledging:
+		case wyrmgus::unit_sound_type::acknowledging:
 			if (unit.Type->MapSound.Acknowledgement.Sound) {
 				return unit.Type->MapSound.Acknowledgement.Sound;
 			} else if (unit.Type->BoolFlag[ORGANIC_INDEX].value && civilization != nullptr) {
@@ -170,7 +170,7 @@ static stratagus::sound *ChooseUnitVoiceSound(const CUnit &unit, const stratagus
 			} else {
 				return nullptr;
 			}
-		case stratagus::unit_sound_type::attack:
+		case wyrmgus::unit_sound_type::attack:
 			if (unit.Type->MapSound.Attack.Sound) {
 				return unit.Type->MapSound.Attack.Sound;
 			} else if (unit.Type->BoolFlag[ORGANIC_INDEX].value && civilization != nullptr) {
@@ -179,20 +179,20 @@ static stratagus::sound *ChooseUnitVoiceSound(const CUnit &unit, const stratagus
 				}
 			}
 
-			return ChooseUnitVoiceSound(unit, stratagus::unit_sound_type::acknowledging);
-		case stratagus::unit_sound_type::idle:
+			return ChooseUnitVoiceSound(unit, wyrmgus::unit_sound_type::acknowledging);
+		case wyrmgus::unit_sound_type::idle:
 			return unit.Type->MapSound.Idle.Sound;
-		case stratagus::unit_sound_type::hit:
+		case wyrmgus::unit_sound_type::hit:
 			return unit.Type->MapSound.Hit.Sound;
-		case stratagus::unit_sound_type::miss:
+		case wyrmgus::unit_sound_type::miss:
 			if (unit.Type->MapSound.Miss.Sound) {
 				return unit.Type->MapSound.Miss.Sound;
 			} else {
 				return unit.Type->MapSound.Hit.Sound;
 			}
-		case stratagus::unit_sound_type::fire_missile:
+		case wyrmgus::unit_sound_type::fire_missile:
 			return unit.Type->MapSound.FireMissile.Sound;
-		case stratagus::unit_sound_type::step:
+		case wyrmgus::unit_sound_type::step:
 			if (unit.Type->MapSound.StepMud.Sound && ((mf.getFlag() & MapFieldMud) || (mf.getFlag() & MapFieldSnow))) {
 				return unit.Type->MapSound.StepMud.Sound;
 			} else if (unit.Type->MapSound.StepDirt.Sound && ((mf.getFlag() & MapFieldDirt) || (mf.getFlag() & MapFieldIce))) {
@@ -206,9 +206,9 @@ static stratagus::sound *ChooseUnitVoiceSound(const CUnit &unit, const stratagus
 			} else {
 				return unit.Type->MapSound.Step.Sound;
 			}
-		case stratagus::unit_sound_type::used:
+		case wyrmgus::unit_sound_type::used:
 			return unit.Type->MapSound.Used.Sound;
-		case stratagus::unit_sound_type::build:
+		case wyrmgus::unit_sound_type::build:
 			if (unit.Type->MapSound.Build.Sound) {
 				return unit.Type->MapSound.Build.Sound;
 			} else if (unit.Type->BoolFlag[ORGANIC_INDEX].value && civilization != nullptr) {
@@ -217,8 +217,8 @@ static stratagus::sound *ChooseUnitVoiceSound(const CUnit &unit, const stratagus
 				}
 			}
 			
-			return ChooseUnitVoiceSound(unit, stratagus::unit_sound_type::acknowledging);
-		case stratagus::unit_sound_type::ready:
+			return ChooseUnitVoiceSound(unit, wyrmgus::unit_sound_type::acknowledging);
+		case wyrmgus::unit_sound_type::ready:
 			if (unit.Type->MapSound.Ready.Sound) {
 				return unit.Type->MapSound.Ready.Sound;
 			} else if (unit.Type->BoolFlag[ORGANIC_INDEX].value && civilization != nullptr) {
@@ -226,7 +226,7 @@ static stratagus::sound *ChooseUnitVoiceSound(const CUnit &unit, const stratagus
 			} else {
 				return nullptr;
 			}
-		case stratagus::unit_sound_type::selected:
+		case wyrmgus::unit_sound_type::selected:
 			if (unit.Type->MapSound.Selected.Sound) {
 				return unit.Type->MapSound.Selected.Sound;
 			} else if (unit.Type->BoolFlag[ORGANIC_INDEX].value && civilization != nullptr) {
@@ -234,7 +234,7 @@ static stratagus::sound *ChooseUnitVoiceSound(const CUnit &unit, const stratagus
 			} else {
 				return nullptr;
 			}
-		case stratagus::unit_sound_type::help:
+		case wyrmgus::unit_sound_type::help:
 			if (unit.Type->MapSound.Help.Sound) {
 				return unit.Type->MapSound.Help.Sound;
 			} else if (civilization != nullptr) {
@@ -246,7 +246,7 @@ static stratagus::sound *ChooseUnitVoiceSound(const CUnit &unit, const stratagus
 			} else {
 				return nullptr;
 			}
-		case stratagus::unit_sound_type::dying:
+		case wyrmgus::unit_sound_type::dying:
 			if (unit.Type->MapSound.Dead[unit.DamagedType].Sound) {
 				return unit.Type->MapSound.Dead[unit.DamagedType].Sound;
 			} else if (unit.Type->MapSound.Dead[ANIMATIONS_DEATHTYPES].Sound) {
@@ -260,13 +260,13 @@ static stratagus::sound *ChooseUnitVoiceSound(const CUnit &unit, const stratagus
 			} else {
 				return nullptr;
 			}
-		case stratagus::unit_sound_type::work_completed:
+		case wyrmgus::unit_sound_type::work_completed:
 			return GameSounds.WorkComplete[CPlayer::GetThisPlayer()->Race].Sound;
-		case stratagus::unit_sound_type::construction:
+		case wyrmgus::unit_sound_type::construction:
 			return GameSounds.BuildingConstruction[CPlayer::GetThisPlayer()->Race].Sound;
-		case stratagus::unit_sound_type::docking:
+		case wyrmgus::unit_sound_type::docking:
 			return GameSounds.Docking.Sound;
-		case stratagus::unit_sound_type::repairing:
+		case wyrmgus::unit_sound_type::repairing:
 			if (unit.Type->MapSound.Repair.Sound) {
 				return unit.Type->MapSound.Repair.Sound;
 			} else if (unit.Type->BoolFlag[ORGANIC_INDEX].value && civilization != nullptr) {
@@ -275,8 +275,8 @@ static stratagus::sound *ChooseUnitVoiceSound(const CUnit &unit, const stratagus
 				}
 			}
 			
-			return ChooseUnitVoiceSound(unit, stratagus::unit_sound_type::acknowledging);
-		case stratagus::unit_sound_type::harvesting:
+			return ChooseUnitVoiceSound(unit, wyrmgus::unit_sound_type::acknowledging);
+		case wyrmgus::unit_sound_type::harvesting:
 			for (size_t i = 0; i != unit.Orders.size(); ++i) {
 				if (unit.Orders[i]->Action == UnitAction::Resource) {
 					COrder_Resource &order = dynamic_cast<COrder_Resource &>(*unit.Orders[i]);
@@ -288,7 +288,7 @@ static stratagus::sound *ChooseUnitVoiceSound(const CUnit &unit, const stratagus
 						}
 					}
 
-					return ChooseUnitVoiceSound(unit, stratagus::unit_sound_type::acknowledging);
+					return ChooseUnitVoiceSound(unit, wyrmgus::unit_sound_type::acknowledging);
 				}
 			}
 			break;
@@ -346,9 +346,9 @@ unsigned char CalculateVolume(bool isVolume, int power, unsigned char range)
 */
 static char CalculateStereo(const CUnit &unit)
 {
-	int stereo = ((unit.tilePos.x * stratagus::defines::get()->get_scaled_tile_width() + unit.Type->get_tile_width() * stratagus::defines::get()->get_scaled_tile_width() / 2 +
-				   unit.get_scaled_pixel_offset().x() - UI.SelectedViewport->MapPos.x * stratagus::defines::get()->get_scaled_tile_width()) * 256 /
-				  ((UI.SelectedViewport->MapWidth - 1) * stratagus::defines::get()->get_scaled_tile_width())) - 128;
+	int stereo = ((unit.tilePos.x * wyrmgus::defines::get()->get_scaled_tile_width() + unit.Type->get_tile_width() * wyrmgus::defines::get()->get_scaled_tile_width() / 2 +
+				   unit.get_scaled_pixel_offset().x() - UI.SelectedViewport->MapPos.x * wyrmgus::defines::get()->get_scaled_tile_width()) * 256 /
+				  ((UI.SelectedViewport->MapWidth - 1) * wyrmgus::defines::get()->get_scaled_tile_width())) - 128;
 	clamp(&stereo, -128, 127);
 	return stereo;
 }
@@ -361,30 +361,30 @@ static char CalculateStereo(const CUnit &unit)
 **  @param unit   Sound initiator, unit speaking
 **  @param voice  Type of sound wanted (Ready,Die,Yes,...)
 */
-void PlayUnitSound(const CUnit &unit, const stratagus::unit_sound_type unit_sound_type)
+void PlayUnitSound(const CUnit &unit, const wyrmgus::unit_sound_type unit_sound_type)
 {
 	if (!UI.CurrentMapLayer || unit.MapLayer != UI.CurrentMapLayer) {
 		return;
 	}
 	
-	if (unit.Variable[STUN_INDEX].Value > 0 && stratagus::is_voice_unit_sound_type(unit_sound_type)) { //don't speak if stunned
+	if (unit.Variable[STUN_INDEX].Value > 0 && wyrmgus::is_voice_unit_sound_type(unit_sound_type)) { //don't speak if stunned
 		return;
 	}
 	
-	stratagus::sound *sound = ChooseUnitVoiceSound(unit, unit_sound_type);
+	wyrmgus::sound *sound = ChooseUnitVoiceSound(unit, unit_sound_type);
 	if (!sound) {
 		return;
 	}
 
-	bool selection = (unit_sound_type == stratagus::unit_sound_type::selected || unit_sound_type == stratagus::unit_sound_type::construction);
+	bool selection = (unit_sound_type == wyrmgus::unit_sound_type::selected || unit_sound_type == wyrmgus::unit_sound_type::construction);
 	Origin source = {&unit, unsigned(UnitNumber(unit))};
 	
 	//don't speak if already speaking
-	if (stratagus::is_voice_unit_sound_type(unit_sound_type) && UnitSoundIsPlaying(&source)) {
+	if (wyrmgus::is_voice_unit_sound_type(unit_sound_type) && UnitSoundIsPlaying(&source)) {
 		return;
 	}
 
-	const int volume = CalculateVolume(false, ViewPointDistanceToUnit(unit), stratagus::get_unit_sound_type_range(unit_sound_type)) * sound->VolumePercent / 100;
+	const int volume = CalculateVolume(false, ViewPointDistanceToUnit(unit), wyrmgus::get_unit_sound_type_range(unit_sound_type)) * sound->VolumePercent / 100;
 
 	if (volume == 0) {
 		return;
@@ -407,7 +407,7 @@ void PlayUnitSound(const CUnit &unit, const stratagus::unit_sound_type unit_soun
 **  @param unit   Sound initiator, unit speaking
 **  @param sound  Sound to be generated
 */
-void PlayUnitSound(const CUnit &unit, stratagus::sound *sound)
+void PlayUnitSound(const CUnit &unit, wyrmgus::sound *sound)
 {
 	//Wyrmgus start
 	if (!&unit) {
@@ -445,14 +445,14 @@ void PlayUnitSound(const CUnit &unit, stratagus::sound *sound)
 **  @param missile  Sound initiator, missile exploding
 **  @param sound    Sound to be generated
 */
-void PlayMissileSound(const Missile &missile, stratagus::sound *sound)
+void PlayMissileSound(const Missile &missile, wyrmgus::sound *sound)
 {
 	if (!sound) {
 		return;
 	}
 	int stereo = ((missile.position.x + (missile.Type->G ? missile.Type->G->Width / 2 : 0) +
-				   UI.SelectedViewport->MapPos.x * stratagus::defines::get()->get_tile_width()) * 256 /
-				  ((UI.SelectedViewport->MapWidth - 1) * stratagus::defines::get()->get_tile_width())) - 128;
+				   UI.SelectedViewport->MapPos.x * wyrmgus::defines::get()->get_tile_width()) * 256 /
+				  ((UI.SelectedViewport->MapWidth - 1) * wyrmgus::defines::get()->get_tile_width())) - 128;
 	clamp(&stereo, -128, 127);
 
 	Origin source = {nullptr, 0};
@@ -476,14 +476,14 @@ void PlayMissileSound(const Missile &missile, stratagus::sound *sound)
 **  @param sound   Sound to play
 **  @param volume  Volume level to play the sound
 */
-void PlayGameSound(stratagus::sound *sound, unsigned char volume, bool always)
+void PlayGameSound(wyrmgus::sound *sound, unsigned char volume, bool always)
 {
 	if (!sound) {
 		return;
 	}
 	Origin source = {nullptr, 0};
 
-	stratagus::sample *sample = ChooseSample(sound, false, source);
+	wyrmgus::sample *sample = ChooseSample(sound, false, source);
 
 	if (!always && SampleIsPlaying(sample)) {
 		return;
@@ -523,7 +523,7 @@ static void PlaySoundFileCallback(int channel)
 **  @param sound  the id of the sound to modify.
 **  @param range  the new range for this sound.
 */
-void SetSoundRange(stratagus::sound *sound, unsigned char range)
+void SetSoundRange(wyrmgus::sound *sound, unsigned char range)
 {
 	if (sound != nullptr) {
 		sound->range = range;
@@ -537,7 +537,7 @@ void SetSoundRange(stratagus::sound *sound, unsigned char range)
 **  @param sound  the id of the sound to modify.
 **  @param volume_percent  the new volume percent for this sound.
 */
-void SetSoundVolumePercent(stratagus::sound *sound, int volume_percent)
+void SetSoundVolumePercent(wyrmgus::sound *sound, int volume_percent)
 {
 	if (sound != nullptr) {
 		sound->VolumePercent = volume_percent;
@@ -557,9 +557,9 @@ void SetSoundVolumePercent(stratagus::sound *sound, int volume_percent)
 **
 **  @todo FIXME: Must handle the errors better.
 */
-stratagus::sound *RegisterSound(const std::string &identifier, const std::vector<std::filesystem::path> &files)
+wyrmgus::sound *RegisterSound(const std::string &identifier, const std::vector<std::filesystem::path> &files)
 {
-	stratagus::sound *id = stratagus::sound::add(identifier, nullptr);
+	wyrmgus::sound *id = wyrmgus::sound::add(identifier, nullptr);
 	size_t number = files.size();
 
 	id->files = files;
@@ -576,12 +576,12 @@ stratagus::sound *RegisterSound(const std::string &identifier, const std::vector
 **
 **  @return        the special sound unique identifier
 */
-stratagus::sound *RegisterTwoGroups(const std::string &identifier, stratagus::sound *first, stratagus::sound *second)
+wyrmgus::sound *RegisterTwoGroups(const std::string &identifier, wyrmgus::sound *first, wyrmgus::sound *second)
 {
 	if (first == nullptr || second == nullptr) {
 		return nullptr;
 	}
-	stratagus::sound *id = stratagus::sound::add(identifier, nullptr);
+	wyrmgus::sound *id = wyrmgus::sound::add(identifier, nullptr);
 	id->Number = TWO_GROUPS;
 	id->set_first_sound(first);
 	id->set_second_sound(second);
@@ -603,13 +603,13 @@ void InitSoundClient()
 	}
 	// let's map game sounds, look if already setup in ccl.
 
-	for (size_t i = 0; i < stratagus::civilization::get_all().size(); ++i) {
+	for (size_t i = 0; i < wyrmgus::civilization::get_all().size(); ++i) {
 		if (!GameSounds.PlacementError[i].Sound) {
 			GameSounds.PlacementError[i].MapSound();
 		}
 	}
 
-	for (size_t i = 0; i < stratagus::civilization::get_all().size(); ++i) {
+	for (size_t i = 0; i < wyrmgus::civilization::get_all().size(); ++i) {
 		if (!GameSounds.PlacementSuccess[i].Sound) {
 			GameSounds.PlacementSuccess[i].MapSound();
 		}
@@ -622,34 +622,34 @@ void InitSoundClient()
 		GameSounds.Docking.MapSound();
 	}
 
-	for (size_t i = 0; i < stratagus::civilization::get_all().size(); ++i) {
+	for (size_t i = 0; i < wyrmgus::civilization::get_all().size(); ++i) {
 		if (!GameSounds.BuildingConstruction[i].Sound) {
 			GameSounds.BuildingConstruction[i].MapSound();
 		}
 	}
-	for (size_t i = 0; i < stratagus::civilization::get_all().size(); ++i) {
+	for (size_t i = 0; i < wyrmgus::civilization::get_all().size(); ++i) {
 		if (!GameSounds.WorkComplete[i].Sound) {
 			GameSounds.WorkComplete[i].MapSound();
 		}
 	}
-	for (size_t i = 0; i < stratagus::civilization::get_all().size(); ++i) {
+	for (size_t i = 0; i < wyrmgus::civilization::get_all().size(); ++i) {
 		if (!GameSounds.ResearchComplete[i].Sound) {
 			GameSounds.ResearchComplete[i].MapSound();
 		}
 	}
-	for (size_t i = 0; i < stratagus::civilization::get_all().size(); ++i) {
+	for (size_t i = 0; i < wyrmgus::civilization::get_all().size(); ++i) {
 		for (unsigned int j = 0; j < MaxCosts; ++j) {
 			if (!GameSounds.NotEnoughRes[i][j].Sound) {
 				GameSounds.NotEnoughRes[i][j].MapSound();
 			}
 		}
 	}
-	for (size_t i = 0; i < stratagus::civilization::get_all().size(); ++i) {
+	for (size_t i = 0; i < wyrmgus::civilization::get_all().size(); ++i) {
 		if (!GameSounds.NotEnoughFood[i].Sound) {
 			GameSounds.NotEnoughFood[i].MapSound();
 		}
 	}
-	for (size_t i = 0; i < stratagus::civilization::get_all().size(); ++i) {
+	for (size_t i = 0; i < wyrmgus::civilization::get_all().size(); ++i) {
 		if (!GameSounds.Rescue[i].Sound) {
 			GameSounds.Rescue[i].MapSound();
 		}
@@ -658,13 +658,13 @@ void InitSoundClient()
 		GameSounds.ChatMessage.MapSound();
 	}
 
-	int MapWidth = (UI.MapArea.EndX - UI.MapArea.X + stratagus::defines::get()->get_scaled_tile_width()) / stratagus::defines::get()->get_scaled_tile_width();
-	int MapHeight = (UI.MapArea.EndY - UI.MapArea.Y + stratagus::defines::get()->get_scaled_tile_height()) / stratagus::defines::get()->get_scaled_tile_height();
+	int MapWidth = (UI.MapArea.EndX - UI.MapArea.X + wyrmgus::defines::get()->get_scaled_tile_width()) / wyrmgus::defines::get()->get_scaled_tile_width();
+	int MapHeight = (UI.MapArea.EndY - UI.MapArea.Y + wyrmgus::defines::get()->get_scaled_tile_height()) / wyrmgus::defines::get()->get_scaled_tile_height();
 	DistanceSilent = 3 * std::max<int>(MapWidth, MapHeight);
 	ViewPointOffset = std::max<int>(MapWidth / 2, MapHeight / 2);
 }
 
-namespace stratagus {
+namespace wyrmgus {
 
 void sound::initialize_all()
 {

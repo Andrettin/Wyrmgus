@@ -40,7 +40,7 @@ class CFile;
 class CUnit;
 struct lua_State;
 
-namespace stratagus {
+namespace wyrmgus {
 	class animation_set;
 }
 
@@ -126,7 +126,7 @@ private:
 	CAnimation *next_ptr = nullptr; //non-owning next pointer, needed to circle back to the beginning
 };
 
-namespace stratagus {
+namespace wyrmgus {
 
 class animation_set : public data_entry, public data_type<animation_set>
 {

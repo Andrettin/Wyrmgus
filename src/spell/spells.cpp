@@ -87,7 +87,7 @@ static Target *NewTargetUnit(CUnit &unit)
 **
 **	@return	True if passed, or false otherwise.
 */
-static bool PassCondition(const CUnit &caster, const stratagus::spell &spell, const CUnit *target,
+static bool PassCondition(const CUnit &caster, const wyrmgus::spell &spell, const CUnit *target,
 						  const Vec2i &goalPos, const ConditionInfo *condition, const CMapLayer *map_layer)
 {
 	if (caster.Variable[MANA_INDEX].Value < spell.ManaCost) { // Check caster mana.
@@ -217,7 +217,7 @@ static bool PassCondition(const CUnit &caster, const stratagus::spell &spell, co
 	}
 	//Wyrmgus start
 	if (condition->ThrustingWeapon != CONDITION_TRUE) {
-		if ((condition->ThrustingWeapon == CONDITION_ONLY) ^ stratagus::is_thrusting_weapon_item_class(caster.GetCurrentWeaponClass())) {
+		if ((condition->ThrustingWeapon == CONDITION_ONLY) ^ wyrmgus::is_thrusting_weapon_item_class(caster.GetCurrentWeaponClass())) {
 			return false;
 		}
 	}
@@ -267,9 +267,9 @@ private:
 	const bool reverse;
 };
 
-namespace stratagus {
+namespace wyrmgus {
 
-spell *spell::add(const std::string &identifier, const stratagus::module *module)
+spell *spell::add(const std::string &identifier, const wyrmgus::module *module)
 {
 	spell *spell = data_type::add(identifier, module);
 	spell->Slot = spell::get_all().size() - 1;
@@ -614,7 +614,7 @@ bool spell::IsAvailableForUnit(const CUnit &unit) const
 **	@todo FIXME: should be global (for AI) ???
 **	@todo FIXME: write for position target.
 */
-static Target *SelectTargetUnitsOfAutoCast(CUnit &caster, const stratagus::spell &spell)
+static Target *SelectTargetUnitsOfAutoCast(CUnit &caster, const wyrmgus::spell &spell)
 {
 	const AutoCastInfo *autocast = spell.GetAutoCastInfo(caster.Player->AiEnabled);
 	Assert(autocast);
@@ -718,7 +718,7 @@ void InitSpells()
 **	@return	True if the spell should/can casted, false if not
 **	@note	caster must know the spell, and spell must be researched.
 */
-bool CanCastSpell(const CUnit &caster, const stratagus::spell &spell,
+bool CanCastSpell(const CUnit &caster, const wyrmgus::spell &spell,
 				  const CUnit *target, const Vec2i &goalPos, const CMapLayer *map_layer)
 {
 	if (spell.Target == TargetType::Unit && target == nullptr) {
@@ -735,7 +735,7 @@ bool CanCastSpell(const CUnit &caster, const stratagus::spell &spell,
 **
 **	@return	1 if spell is casted, 0 if not.
 */
-int AutoCastSpell(CUnit &caster, const stratagus::spell &spell)
+int AutoCastSpell(CUnit &caster, const wyrmgus::spell &spell)
 {
 	//  Check for mana and cooldown time, trivial optimization.
 	if (!caster.CanAutoCastSpell(&spell)) {
@@ -770,7 +770,7 @@ int AutoCastSpell(CUnit &caster, const stratagus::spell &spell)
 **
 ** @return          !=0 if spell should/can continue or 0 to stop
 */
-int SpellCast(CUnit &caster, const stratagus::spell &spell, CUnit *target, const Vec2i &goalPos, CMapLayer *map_layer)
+int SpellCast(CUnit &caster, const wyrmgus::spell &spell, CUnit *target, const Vec2i &goalPos, CMapLayer *map_layer)
 {
 	Vec2i pos = goalPos;
 	int z = map_layer ? map_layer->ID : 0;
@@ -899,10 +899,10 @@ void ConditionInfo::ProcessConfigData(const CConfigData *config_data)
 		} else if (key == "faction_unit") {
 			this->FactionUnit = StringToCondition(value);
 		} else if (key == "civilization_equivalent") {
-			const stratagus::civilization *civilization = stratagus::civilization::get(value);
+			const wyrmgus::civilization *civilization = wyrmgus::civilization::get(value);
 			this->civilization_equivalent = civilization;
 		} else if (key == "faction_equivalent") {
-			stratagus::faction *faction = stratagus::faction::get(value);
+			wyrmgus::faction *faction = wyrmgus::faction::get(value);
 			this->FactionEquivalent = faction;
 		} else {
 			key = string::snake_case_to_pascal_case(key);

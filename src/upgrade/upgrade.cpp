@@ -148,7 +148,7 @@ int CUnitStats::GetPrice() const
 			if (i == CopperCost) {
 				cost += this->Costs[i];
 			} else {
-				cost += this->Costs[i] * stratagus::resource::get_all()[i]->BasePrice / 100;
+				cost += this->Costs[i] * wyrmgus::resource::get_all()[i]->BasePrice / 100;
 			}
 		}
 	}
@@ -156,7 +156,7 @@ int CUnitStats::GetPrice() const
 	return cost;
 }
 
-int CUnitStats::GetUnitStock(const stratagus::unit_type *unit_type) const
+int CUnitStats::GetUnitStock(const wyrmgus::unit_type *unit_type) const
 {
 	if (!unit_type) {
 		return 0;
@@ -170,7 +170,7 @@ int CUnitStats::GetUnitStock(const stratagus::unit_type *unit_type) const
 	}
 }
 
-void CUnitStats::SetUnitStock(const stratagus::unit_type *unit_type, int quantity)
+void CUnitStats::SetUnitStock(const wyrmgus::unit_type *unit_type, int quantity)
 {
 	if (!unit_type) {
 		return;
@@ -185,12 +185,12 @@ void CUnitStats::SetUnitStock(const stratagus::unit_type *unit_type, int quantit
 	}
 }
 
-void CUnitStats::ChangeUnitStock(const stratagus::unit_type *unit_type, int quantity)
+void CUnitStats::ChangeUnitStock(const wyrmgus::unit_type *unit_type, int quantity)
 {
 	this->SetUnitStock(unit_type, this->GetUnitStock(unit_type) + quantity);
 }
 
-CUpgrade::CUpgrade(const std::string &identifier) : CDataType(identifier), detailed_data_entry(identifier), Work(stratagus::item_class::none)
+CUpgrade::CUpgrade(const std::string &identifier) : CDataType(identifier), detailed_data_entry(identifier), Work(wyrmgus::item_class::none)
 {
 	memset(this->Costs, 0, sizeof(this->Costs));
 	//Wyrmgus start
@@ -215,15 +215,15 @@ void CUpgrade::ProcessConfigData(const CConfigData *config_data)
 		if (key == "name") {
 			this->set_name(value);
 		} else if (key == "icon") {
-			stratagus::icon *icon = stratagus::icon::get(value);
+			wyrmgus::icon *icon = wyrmgus::icon::get(value);
 			this->icon = icon;
 		} else if (key == "class") {
-			this->set_upgrade_class(stratagus::upgrade_class::get(value));
+			this->set_upgrade_class(wyrmgus::upgrade_class::get(value));
 		} else if (key == "civilization") {
-			stratagus::civilization *civilization = stratagus::civilization::get(value);
+			wyrmgus::civilization *civilization = wyrmgus::civilization::get(value);
 			this->civilization = civilization;
 		} else if (key == "faction") {
-			const stratagus::faction *faction = stratagus::faction::get(value);
+			const wyrmgus::faction *faction = wyrmgus::faction::get(value);
 			this->faction = faction->ID;
 		} else if (key == "ability") {
 			this->ability = string::to_bool(value);
@@ -236,7 +236,7 @@ void CUpgrade::ProcessConfigData(const CConfigData *config_data)
 		} else if (key == "arrows") {
 			this->arrows = string::to_bool(value);
 		} else if (key == "item") {
-			stratagus::unit_type *item = stratagus::unit_type::get(value);
+			wyrmgus::unit_type *item = wyrmgus::unit_type::get(value);
 			this->Item = item;
 		} else if (key == "description") {
 			this->set_description(value);
@@ -269,18 +269,18 @@ void CUpgrade::ProcessConfigData(const CConfigData *config_data)
 				}
 			}
 		} else if (child_config_data->Tag == "preconditions") {
-			this->preconditions = std::make_unique<stratagus::and_condition>();
+			this->preconditions = std::make_unique<wyrmgus::and_condition>();
 			this->preconditions->ProcessConfigData(child_config_data);
 		} else if (child_config_data->Tag == "conditions") {
-			this->conditions = std::make_unique<stratagus::and_condition>();
+			this->conditions = std::make_unique<wyrmgus::and_condition>();
 			this->conditions->ProcessConfigData(child_config_data);
 		} else if (child_config_data->Tag == "modifier") {
-			auto modifier = std::make_unique<stratagus::upgrade_modifier>();
+			auto modifier = std::make_unique<wyrmgus::upgrade_modifier>();
 			modifier->UpgradeId = this->ID;
 			
 			modifier->ProcessConfigData(child_config_data);
 			
-			stratagus::upgrade_modifier::UpgradeModifiers.push_back(modifier.get());
+			wyrmgus::upgrade_modifier::UpgradeModifiers.push_back(modifier.get());
 			this->modifiers.push_back(std::move(modifier));
 		} else {
 			fprintf(stderr, "Invalid upgrade property: \"%s\".\n", child_config_data->Tag.c_str());
@@ -290,7 +290,7 @@ void CUpgrade::ProcessConfigData(const CConfigData *config_data)
 	this->set_defined(true);
 }
 
-void CUpgrade::process_sml_property(const stratagus::sml_property &property)
+void CUpgrade::process_sml_property(const wyrmgus::sml_property &property)
 {
 	const std::string &key = property.get_key();
 	const std::string &value = property.get_value();
@@ -299,7 +299,7 @@ void CUpgrade::process_sml_property(const stratagus::sml_property &property)
 		CUpgrade *parent_upgrade = CUpgrade::get(value);
 		this->set_parent(parent_upgrade);
 	} else if (key == "faction") {
-		const stratagus::faction *faction = stratagus::faction::get(value);
+		const wyrmgus::faction *faction = wyrmgus::faction::get(value);
 		this->faction = faction->ID;
 	} else if (key == "button_key") {
 		this->button_key = value;
@@ -308,32 +308,32 @@ void CUpgrade::process_sml_property(const stratagus::sml_property &property)
 	}
 }
 
-void CUpgrade::process_sml_scope(const stratagus::sml_data &scope)
+void CUpgrade::process_sml_scope(const wyrmgus::sml_data &scope)
 {
 	const std::string &tag = scope.get_tag();
 
 	if (tag == "costs") {
-		scope.for_each_property([&](const stratagus::sml_property &property) {
+		scope.for_each_property([&](const wyrmgus::sml_property &property) {
 			const std::string &key = property.get_key();
 			const std::string &value = property.get_value();
 
-			const stratagus::resource *resource = stratagus::resource::get(key);
+			const wyrmgus::resource *resource = wyrmgus::resource::get(key);
 			this->Costs[resource->ID] = std::stoi(value);
 		});
 	} else if (tag == "modifier") {
-		auto modifier = std::make_unique<stratagus::upgrade_modifier>();
+		auto modifier = std::make_unique<wyrmgus::upgrade_modifier>();
 		modifier->UpgradeId = this->ID;
 
-		stratagus::database::process_sml_data(modifier, scope);
+		wyrmgus::database::process_sml_data(modifier, scope);
 
-		stratagus::upgrade_modifier::UpgradeModifiers.push_back(modifier.get());
+		wyrmgus::upgrade_modifier::UpgradeModifiers.push_back(modifier.get());
 		this->modifiers.push_back(std::move(modifier));
 	} else if (tag == "preconditions") {
-		this->preconditions = std::make_unique<stratagus::and_condition>();
-		stratagus::database::process_sml_data(this->preconditions, scope);
+		this->preconditions = std::make_unique<wyrmgus::and_condition>();
+		wyrmgus::database::process_sml_data(this->preconditions, scope);
 	} else if (tag == "conditions") {
-		this->conditions = std::make_unique<stratagus::and_condition>();
-		stratagus::database::process_sml_data(this->conditions, scope);
+		this->conditions = std::make_unique<wyrmgus::and_condition>();
+		wyrmgus::database::process_sml_data(this->conditions, scope);
 	}
 }
 
@@ -346,11 +346,11 @@ void CUpgrade::initialize()
 	}
 
 	if (this->get_upgrade_class() != nullptr) { //if class is defined, then use this upgrade to help build the classes table, and add this upgrade to the civilization class table (if the civilization is defined)
-		const stratagus::upgrade_class *upgrade_class = this->get_upgrade_class();
+		const wyrmgus::upgrade_class *upgrade_class = this->get_upgrade_class();
 		if (this->get_faction() != -1) {
 			const int faction_id = this->get_faction();
 			if (faction_id != -1) {
-				stratagus::faction::get_all()[faction_id]->set_class_upgrade(upgrade_class, this);
+				wyrmgus::faction::get_all()[faction_id]->set_class_upgrade(upgrade_class, this);
 			}
 		} else if (this->get_civilization() != nullptr) {
 			this->get_civilization()->set_class_upgrade(upgrade_class, this);
@@ -383,7 +383,7 @@ void CUpgrade::set_parent(const CUpgrade *parent_upgrade)
 		this->ScaledCosts[i] = parent_upgrade->ScaledCosts[i];
 		this->GrandStrategyProductionEfficiencyModifier[i] = parent_upgrade->GrandStrategyProductionEfficiencyModifier[i];
 	}
-	for (int i = 0; i < static_cast<int>(stratagus::item_class::count); ++i) {
+	for (int i = 0; i < static_cast<int>(wyrmgus::item_class::count); ++i) {
 		this->ItemPrefix[i] = parent_upgrade->ItemPrefix[i];
 		this->ItemSuffix[i] = parent_upgrade->ItemSuffix[i];
 	}
@@ -405,9 +405,9 @@ void CUpgrade::set_parent(const CUpgrade *parent_upgrade)
 	}
 
 	for (const auto &modifier : parent_upgrade->get_modifiers()) {
-		std::unique_ptr<stratagus::upgrade_modifier> duplicated_modifier = modifier->duplicate();
+		std::unique_ptr<wyrmgus::upgrade_modifier> duplicated_modifier = modifier->duplicate();
 		duplicated_modifier->UpgradeId = this->ID;
-		stratagus::upgrade_modifier::UpgradeModifiers.push_back(duplicated_modifier.get());
+		wyrmgus::upgrade_modifier::UpgradeModifiers.push_back(duplicated_modifier.get());
 		this->modifiers.push_back(std::move(duplicated_modifier));
 	}
 }
@@ -424,10 +424,10 @@ void InitUpgrades()
 */
 void CleanUpgradeModifiers()
 {
-	stratagus::upgrade_modifier::UpgradeModifiers.clear();
+	wyrmgus::upgrade_modifier::UpgradeModifiers.clear();
 }
 
-void CUpgrade::set_upgrade_class(stratagus::upgrade_class *upgrade_class)
+void CUpgrade::set_upgrade_class(wyrmgus::upgrade_class *upgrade_class)
 {
 	if (upgrade_class == this->get_upgrade_class()) {
 		return;
@@ -444,12 +444,12 @@ void CUpgrade::set_upgrade_class(stratagus::upgrade_class *upgrade_class)
 	}
 }
 
-void CUpgrade::add_modifier(std::unique_ptr<stratagus::upgrade_modifier> &&modifier)
+void CUpgrade::add_modifier(std::unique_ptr<wyrmgus::upgrade_modifier> &&modifier)
 {
 	this->modifiers.push_back(std::move(modifier));
 }
 
-void CUpgrade::set_dynasty(const stratagus::dynasty *dynasty)
+void CUpgrade::set_dynasty(const wyrmgus::dynasty *dynasty)
 {
 	this->dynasty = dynasty;
 	this->icon = dynasty->get_icon();
@@ -468,7 +468,7 @@ void SaveUpgrades(CFile &file)
 	//
 	//  Save the allow
 	//
-	for (const stratagus::unit_type *unit_type : stratagus::unit_type::get_all()) {
+	for (const wyrmgus::unit_type *unit_type : wyrmgus::unit_type::get_all()) {
 		file.printf("DefineUnitAllow(\"%s\", ", unit_type->Ident.c_str());
 		for (int p = 0; p < PlayerMax; ++p) {
 			if (p) {
@@ -522,17 +522,17 @@ static int CclDefineUpgrade(lua_State *l)
 		} else if (!strcmp(value, "Name")) {
 			upgrade->set_name(LuaToString(l, -1));
 		} else if (!strcmp(value, "Icon")) {
-			stratagus::icon *icon = stratagus::icon::get(LuaToString(l, -1));
+			wyrmgus::icon *icon = wyrmgus::icon::get(LuaToString(l, -1));
 			upgrade->icon = icon;
 		} else if (!strcmp(value, "Class")) {
-			upgrade->set_upgrade_class(stratagus::upgrade_class::get(LuaToString(l, -1)));
+			upgrade->set_upgrade_class(wyrmgus::upgrade_class::get(LuaToString(l, -1)));
 		} else if (!strcmp(value, "Civilization")) {
 			std::string civilization_name = LuaToString(l, -1);
-			stratagus::civilization *civilization = stratagus::civilization::get(civilization_name);
+			wyrmgus::civilization *civilization = wyrmgus::civilization::get(civilization_name);
 			upgrade->civilization = civilization;
 		} else if (!strcmp(value, "Faction")) {
 			std::string faction_name = LuaToString(l, -1);
-			stratagus::faction *faction = stratagus::faction::get(faction_name);
+			wyrmgus::faction *faction = wyrmgus::faction::get(faction_name);
 			upgrade->faction = faction->ID;
 		} else if (!strcmp(value, "Description")) {
 			upgrade->set_description(LuaToString(l, -1));
@@ -569,9 +569,9 @@ static int CclDefineUpgrade(lua_State *l)
 		} else if (!strcmp(value, "UniqueOnly")) {
 			upgrade->UniqueOnly = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "Work")) {
-			upgrade->Work = stratagus::string_to_item_class(LuaToString(l, -1));
+			upgrade->Work = wyrmgus::string_to_item_class(LuaToString(l, -1));
 		} else if (!strcmp(value, "Item")) {
-			stratagus::unit_type *item = stratagus::unit_type::get(LuaToString(l, -1));
+			wyrmgus::unit_type *item = wyrmgus::unit_type::get(LuaToString(l, -1));
 			upgrade->Item = item;
 		} else if (!strcmp(value, "Costs")) {
 			if (!lua_istable(l, -1)) {
@@ -622,7 +622,7 @@ static int CclDefineUpgrade(lua_State *l)
 			const int subargs = lua_rawlen(l, -1);
 			for (int j = 0; j < subargs; ++j) {
 				std::string civilization_ident = LuaToString(l, -1, j + 1);
-				stratagus::civilization *priority_civilization = stratagus::civilization::get(civilization_ident);
+				wyrmgus::civilization *priority_civilization = wyrmgus::civilization::get(civilization_ident);
 				++j;
 
 				int priority = LuaToNumber(l, -1, j + 1);
@@ -636,7 +636,7 @@ static int CclDefineUpgrade(lua_State *l)
 			const int subargs = lua_rawlen(l, -1);
 			for (int j = 0; j < subargs; ++j) {
 				std::string faction_ident = LuaToString(l, -1, j + 1);
-				stratagus::faction *priority_faction = stratagus::faction::get(faction_ident);
+				wyrmgus::faction *priority_faction = wyrmgus::faction::get(faction_ident);
 				++j;
 				
 				int priority = LuaToNumber(l, -1, j + 1);
@@ -649,7 +649,7 @@ static int CclDefineUpgrade(lua_State *l)
 			}
 			const int subargs = lua_rawlen(l, -1);
 			for (int j = 0; j < subargs; ++j) {
-				const int item_class = static_cast<int>(stratagus::string_to_item_class(LuaToString(l, -1, j + 1)));
+				const int item_class = static_cast<int>(wyrmgus::string_to_item_class(LuaToString(l, -1, j + 1)));
 				
 				upgrade->ItemPrefix[item_class] = true;
 			}
@@ -659,7 +659,7 @@ static int CclDefineUpgrade(lua_State *l)
 			}
 			const int subargs = lua_rawlen(l, -1);
 			for (int j = 0; j < subargs; ++j) {
-				const int item_class = static_cast<int>(stratagus::string_to_item_class(LuaToString(l, -1, j + 1)));
+				const int item_class = static_cast<int>(wyrmgus::string_to_item_class(LuaToString(l, -1, j + 1)));
 
 				upgrade->ItemSuffix[item_class] = true;
 			}
@@ -682,7 +682,7 @@ static int CclDefineUpgrade(lua_State *l)
 			}
 			const int subargs = lua_rawlen(l, -1);
 			for (int j = 0; j < subargs; ++j) {
-				stratagus::unit_type *scaled_cost_unit = stratagus::unit_type::get(LuaToString(l, -1, j + 1));
+				wyrmgus::unit_type *scaled_cost_unit = wyrmgus::unit_type::get(LuaToString(l, -1, j + 1));
 				upgrade->ScaledCostUnits.push_back(scaled_cost_unit);
 			}
 		} else if (!strcmp(value, "WeaponClasses")) {
@@ -691,7 +691,7 @@ static int CclDefineUpgrade(lua_State *l)
 			}
 			const int subargs = lua_rawlen(l, -1);
 			for (int j = 0; j < subargs; ++j) {
-				upgrade->WeaponClasses.insert(stratagus::string_to_item_class(LuaToString(l, -1, j + 1)));
+				upgrade->WeaponClasses.insert(wyrmgus::string_to_item_class(LuaToString(l, -1, j + 1)));
 			}
 		} else if (!strcmp(value, "Epithets")) {
 			if (!lua_istable(l, -1)) {
@@ -723,7 +723,7 @@ static int CclDefineModifier(lua_State *l)
 {
 	const int args = lua_gettop(l);
 
-	auto um = std::make_unique<stratagus::upgrade_modifier>();
+	auto um = std::make_unique<wyrmgus::upgrade_modifier>();
 
 	std::string upgrade_ident = LuaToString(l, 1);
 	um->UpgradeId = UpgradeIdByIdent(upgrade_ident);
@@ -772,7 +772,7 @@ static int CclDefineModifier(lua_State *l)
 			um->Modifier.ResourceDemand[resId] = LuaToNumber(l, j + 1, 3);
 		} else if (!strcmp(key, "unit-stock")) {
 			std::string value = LuaToString(l, j + 1, 2);
-			stratagus::unit_type *unit_type = stratagus::unit_type::get(value);
+			wyrmgus::unit_type *unit_type = wyrmgus::unit_type::get(value);
 			um->Modifier.SetUnitStock(unit_type, LuaToNumber(l, j + 1, 3));
 		//Wyrmgus end
 		} else if (!strcmp(key, "allow-unit")) {
@@ -797,20 +797,20 @@ static int CclDefineModifier(lua_State *l)
 		//Wyrmgus end
 		} else if (!strcmp(key, "apply-to")) {
 			const char *value = LuaToString(l, j + 1, 2);
-			um->unit_types.push_back(stratagus::unit_type::get(value));
+			um->unit_types.push_back(wyrmgus::unit_type::get(value));
 		} else if (!strcmp(key, "convert-to")) {
 			const char *value = LuaToString(l, j + 1, 2);
-			um->ConvertTo = stratagus::unit_type::get(value);
+			um->ConvertTo = wyrmgus::unit_type::get(value);
 		//Wyrmgus start
 		} else if (!strcmp(key, "research-speed")) {
 			um->SpeedResearch = LuaToNumber(l, j + 1, 2);
 		} else if (!strcmp(key, "change-civilization-to")) {
 			const char *civilization_ident = LuaToString(l, j + 1, 2);
-			stratagus::civilization *civilization = stratagus::civilization::get(civilization_ident);
+			wyrmgus::civilization *civilization = wyrmgus::civilization::get(civilization_ident);
 			um->change_civilization_to = civilization->ID;
 		} else if (!strcmp(key, "change-faction-to")) {
 			std::string faction_ident = LuaToString(l, j + 1, 2);
-			um->ChangeFactionTo = stratagus::faction::get(faction_ident);
+			um->ChangeFactionTo = wyrmgus::faction::get(faction_ident);
 		//Wyrmgus end
 		} else {
 			int index = UnitTypeVar.VariableNameLookup[key]; // variable index;
@@ -843,7 +843,7 @@ static int CclDefineModifier(lua_State *l)
 		}
 	}
 
-	stratagus::upgrade_modifier::UpgradeModifiers.push_back(um.get());
+	wyrmgus::upgrade_modifier::UpgradeModifiers.push_back(um.get());
 	CUpgrade::get_all()[um->UpgradeId]->add_modifier(std::move(um));
 
 	return 0;
@@ -1029,7 +1029,7 @@ static int CclGetLiteraryWorks(lua_State *l)
 {
 	std::vector<const CUpgrade *> literary_works;
 	for (const CUpgrade *upgrade : CUpgrade::get_all()) {
-		if (upgrade->Work != stratagus::item_class::none) {
+		if (upgrade->Work != wyrmgus::item_class::none) {
 			literary_works.push_back(upgrade);
 		}
 	}
@@ -1077,7 +1077,7 @@ static int CclGetUpgradeData(lua_State *l)
 		return 1;
 	} else if (!strcmp(data, "Faction")) {
 		if (upgrade->get_faction() != -1) {
-			lua_pushstring(l, stratagus::faction::get_all()[upgrade->get_faction()]->get_identifier().c_str());
+			lua_pushstring(l, wyrmgus::faction::get_all()[upgrade->get_faction()]->get_identifier().c_str());
 		} else {
 			lua_pushstring(l, "");
 		}
@@ -1119,7 +1119,7 @@ static int CclGetUpgradeData(lua_State *l)
 		} else {
 			LuaCheckArgs(l, 3);
 			const std::string item_class_name = LuaToString(l, 3);
-			const int item_class = static_cast<int>(stratagus::string_to_item_class(item_class_name));
+			const int item_class = static_cast<int>(wyrmgus::string_to_item_class(item_class_name));
 			lua_pushboolean(l, upgrade->ItemPrefix[item_class]);
 			return 1;
 		}
@@ -1135,30 +1135,30 @@ static int CclGetUpgradeData(lua_State *l)
 		} else {
 			LuaCheckArgs(l, 3);
 			const std::string item_class_name = LuaToString(l, 3);
-			const int item_class = static_cast<int>(stratagus::string_to_item_class(item_class_name));
+			const int item_class = static_cast<int>(wyrmgus::string_to_item_class(item_class_name));
 			lua_pushboolean(l, upgrade->ItemSuffix[item_class]);
 			return 1;
 		}
 	} else if (!strcmp(data, "AppliesTo")) { //to which unit types or item classes this upgrade applies
 		std::vector<std::string> applies_to;
-		for (int i = 0; i < static_cast<int>(stratagus::item_class::count); ++i) {
+		for (int i = 0; i < static_cast<int>(wyrmgus::item_class::count); ++i) {
 			if (upgrade->ItemPrefix[i] || upgrade->ItemSuffix[i]) {
-				applies_to.push_back(stratagus::item_class_to_string(static_cast<stratagus::item_class>(i)));
+				applies_to.push_back(wyrmgus::item_class_to_string(static_cast<wyrmgus::item_class>(i)));
 			}
 		}
 
 		for (const auto &upgrade_modifier : upgrade->get_modifiers()) {
-			for (const stratagus::unit_type *unit_type : upgrade_modifier->get_unit_types()) {
+			for (const wyrmgus::unit_type *unit_type : upgrade_modifier->get_unit_types()) {
 				applies_to.push_back(unit_type->get_identifier());
 			}
 		}
 
-		for (const stratagus::unit_type *unit_type : stratagus::unit_type::get_all()) {
+		for (const wyrmgus::unit_type *unit_type : wyrmgus::unit_type::get_all()) {
 			if (unit_type->get_identifier().find("template") != std::string::npos) { //if is a template, continue
 				continue;
 			}
 
-			if (stratagus::vector::contains(unit_type->Affixes, upgrade)) {
+			if (wyrmgus::vector::contains(unit_type->Affixes, upgrade)) {
 				applies_to.push_back(unit_type->get_identifier());
 			}
 		}
@@ -1216,7 +1216,7 @@ void UpgradesCclRegister()
 */
 int UnitTypeIdByIdent(const std::string &ident)
 {
-	const stratagus::unit_type *type = stratagus::unit_type::try_get(ident);
+	const wyrmgus::unit_type *type = wyrmgus::unit_type::try_get(ident);
 
 	if (type) {
 		return type->Slot;
@@ -1254,7 +1254,7 @@ int UpgradeIdByIdent(const std::string &ident)
 **  @param src     From this unit-type.
 **  @param dst     To this unit-type.
 */
-static void ConvertUnitTypeTo(CPlayer &player, const stratagus::unit_type &src, stratagus::unit_type &dst)
+static void ConvertUnitTypeTo(CPlayer &player, const wyrmgus::unit_type &src, wyrmgus::unit_type &dst)
 {
 	//Wyrmgus start
 	if (player.AiEnabled && GameCycle > 0) {
@@ -1359,7 +1359,7 @@ static void ConvertUnitTypeTo(CPlayer &player, const stratagus::unit_type &src, 
 **  @param player  Player that get all the upgrades.
 **  @param um      Upgrade modifier that do the effects
 */
-static void ApplyUpgradeModifier(CPlayer &player, const stratagus::upgrade_modifier *um)
+static void ApplyUpgradeModifier(CPlayer &player, const wyrmgus::upgrade_modifier *um)
 {
 	Assert(um);
 
@@ -1407,7 +1407,7 @@ static void ApplyUpgradeModifier(CPlayer &player, const stratagus::upgrade_modif
 	}
 	//Wyrmgus end
 
-	for (stratagus::unit_type *unit_type : stratagus::unit_type::get_all()) {
+	for (wyrmgus::unit_type *unit_type : wyrmgus::unit_type::get_all()) {
 		CUnitStats &stat = unit_type->Stats[pn];
 		// add/remove allowed units
 
@@ -1456,7 +1456,7 @@ static void ApplyUpgradeModifier(CPlayer &player, const stratagus::upgrade_modif
 				stat.Storing[j] += um->Modifier.Storing[j];
 				if (um->Modifier.ImproveIncomes[j]) {
 					if (!stat.ImproveIncomes[j]) {
-						stat.ImproveIncomes[j] += stratagus::resource::get_all()[j]->DefaultIncome + um->Modifier.ImproveIncomes[j];
+						stat.ImproveIncomes[j] += wyrmgus::resource::get_all()[j]->DefaultIncome + um->Modifier.ImproveIncomes[j];
 					} else {
 						stat.ImproveIncomes[j] += um->Modifier.ImproveIncomes[j];
 					}
@@ -1472,7 +1472,7 @@ static void ApplyUpgradeModifier(CPlayer &player, const stratagus::upgrade_modif
 			}
 			
 			for (const auto &kv_pair : um->Modifier.UnitStock) {
-				const stratagus::unit_type *unit_type = stratagus::unit_type::get_all()[kv_pair.first];
+				const wyrmgus::unit_type *unit_type = wyrmgus::unit_type::get_all()[kv_pair.first];
 				const int unit_stock = kv_pair.second;
 				if (unit_stock != 0) {
 					stat.ChangeUnitStock(unit_type, unit_stock);
@@ -1540,10 +1540,10 @@ static void ApplyUpgradeModifier(CPlayer &player, const stratagus::upgrade_modif
 					
 					//Wyrmgus start
 					if (
-						(CUpgrade::get_all()[um->UpgradeId]->is_weapon() && unit.EquippedItems[static_cast<int>(stratagus::item_slot::weapon)].size() > 0)
-						|| (CUpgrade::get_all()[um->UpgradeId]->is_shield() && unit.EquippedItems[static_cast<int>(stratagus::item_slot::shield)].size() > 0)
-						|| (CUpgrade::get_all()[um->UpgradeId]->is_boots() && unit.EquippedItems[static_cast<int>(stratagus::item_slot::boots)].size() > 0)
-						|| (CUpgrade::get_all()[um->UpgradeId]->is_arrows() && unit.EquippedItems[static_cast<int>(stratagus::item_slot::arrows)].size() > 0)
+						(CUpgrade::get_all()[um->UpgradeId]->is_weapon() && unit.EquippedItems[static_cast<int>(wyrmgus::item_slot::weapon)].size() > 0)
+						|| (CUpgrade::get_all()[um->UpgradeId]->is_shield() && unit.EquippedItems[static_cast<int>(wyrmgus::item_slot::shield)].size() > 0)
+						|| (CUpgrade::get_all()[um->UpgradeId]->is_boots() && unit.EquippedItems[static_cast<int>(wyrmgus::item_slot::boots)].size() > 0)
+						|| (CUpgrade::get_all()[um->UpgradeId]->is_arrows() && unit.EquippedItems[static_cast<int>(wyrmgus::item_slot::arrows)].size() > 0)
 					) { //if the unit already has an item equipped of the same equipment type as this upgrade, don't apply the modifier to it
 						continue;
 					}
@@ -1590,7 +1590,7 @@ static void ApplyUpgradeModifier(CPlayer &player, const stratagus::upgrade_modif
 					}
 					
 					for (const auto &kv_pair : um->Modifier.UnitStock) {
-						const stratagus::unit_type *unit_type = stratagus::unit_type::get_all()[kv_pair.first];
+						const wyrmgus::unit_type *unit_type = wyrmgus::unit_type::get_all()[kv_pair.first];
 						const int unit_stock = kv_pair.second;
 						if (unit_stock < 0) {
 							unit.ChangeUnitStock(unit_type, unit_stock);
@@ -1617,7 +1617,7 @@ static void ApplyUpgradeModifier(CPlayer &player, const stratagus::upgrade_modif
 				}
 				
 				//change variation if current one becomes forbidden
-				const stratagus::unit_type_variation *current_variation = unit.GetVariation();
+				const wyrmgus::unit_type_variation *current_variation = unit.GetVariation();
 				if (current_variation) {
 					bool upgrade_forbidden = false;
 					for (const CUpgrade *forbidden_upgrade : current_variation->UpgradesForbidden) {
@@ -1631,7 +1631,7 @@ static void ApplyUpgradeModifier(CPlayer &player, const stratagus::upgrade_modif
 					}
 				}
 				for (int i = 0; i < MaxImageLayers; ++i) {
-					const stratagus::unit_type_variation *current_layer_variation = unit.GetLayerVariation(i);
+					const wyrmgus::unit_type_variation *current_layer_variation = unit.GetLayerVariation(i);
 					if (current_layer_variation) {
 						bool upgrade_forbidden = false;
 						for (const CUpgrade *forbidden_upgrade : current_layer_variation->UpgradesForbidden) {
@@ -1666,7 +1666,7 @@ static void ApplyUpgradeModifier(CPlayer &player, const stratagus::upgrade_modif
 **  @param player  Player that get all the upgrades.
 **  @param um      Upgrade modifier that do the effects
 */
-static void RemoveUpgradeModifier(CPlayer &player, const stratagus::upgrade_modifier *um)
+static void RemoveUpgradeModifier(CPlayer &player, const wyrmgus::upgrade_modifier *um)
 {
 	Assert(um);
 
@@ -1695,7 +1695,7 @@ static void RemoveUpgradeModifier(CPlayer &player, const stratagus::upgrade_modi
 		}
 	}
 
-	for (stratagus::unit_type *unit_type : stratagus::unit_type::get_all()) {
+	for (wyrmgus::unit_type *unit_type : wyrmgus::unit_type::get_all()) {
 		CUnitStats &stat = unit_type->Stats[pn];
 		// add/remove allowed units
 
@@ -1744,7 +1744,7 @@ static void RemoveUpgradeModifier(CPlayer &player, const stratagus::upgrade_modi
 				stat.ImproveIncomes[j] -= um->Modifier.ImproveIncomes[j];
 				//if this was the highest improve income, search for another
 				if (player.Incomes[j] && (stat.ImproveIncomes[j] + um->Modifier.ImproveIncomes[j]) == player.Incomes[j]) {
-					int m = stratagus::resource::get_all()[j]->DefaultIncome;
+					int m = wyrmgus::resource::get_all()[j]->DefaultIncome;
 
 					for (int k = 0; k < player.GetUnitCount(); ++k) {
 						//Wyrmgus start
@@ -1762,7 +1762,7 @@ static void RemoveUpgradeModifier(CPlayer &player, const stratagus::upgrade_modi
 			}
 
 			for (const auto &kv_pair : um->Modifier.UnitStock) {
-				const stratagus::unit_type *unit_type = stratagus::unit_type::get_all()[kv_pair.first];
+				const wyrmgus::unit_type *unit_type = wyrmgus::unit_type::get_all()[kv_pair.first];
 				const int unit_stock = kv_pair.second;
 				if (unit_stock != 0) {
 					stat.ChangeUnitStock(unit_type, -unit_stock);
@@ -1834,10 +1834,10 @@ static void RemoveUpgradeModifier(CPlayer &player, const stratagus::upgrade_modi
 					
 					//Wyrmgus start
 					if (
-						(CUpgrade::get_all()[um->UpgradeId]->is_weapon() && unit.EquippedItems[static_cast<int>(stratagus::item_slot::weapon)].size() > 0)
-						|| (CUpgrade::get_all()[um->UpgradeId]->is_shield() && unit.EquippedItems[static_cast<int>(stratagus::item_slot::shield)].size() > 0)
-						|| (CUpgrade::get_all()[um->UpgradeId]->is_boots() && unit.EquippedItems[static_cast<int>(stratagus::item_slot::boots)].size() > 0)
-						|| (CUpgrade::get_all()[um->UpgradeId]->is_arrows() && unit.EquippedItems[static_cast<int>(stratagus::item_slot::arrows)].size() > 0)
+						(CUpgrade::get_all()[um->UpgradeId]->is_weapon() && unit.EquippedItems[static_cast<int>(wyrmgus::item_slot::weapon)].size() > 0)
+						|| (CUpgrade::get_all()[um->UpgradeId]->is_shield() && unit.EquippedItems[static_cast<int>(wyrmgus::item_slot::shield)].size() > 0)
+						|| (CUpgrade::get_all()[um->UpgradeId]->is_boots() && unit.EquippedItems[static_cast<int>(wyrmgus::item_slot::boots)].size() > 0)
+						|| (CUpgrade::get_all()[um->UpgradeId]->is_arrows() && unit.EquippedItems[static_cast<int>(wyrmgus::item_slot::arrows)].size() > 0)
 					) { //if the unit already has an item equipped of the same equipment type as this upgrade, don't remove the modifier from it (it already doesn't have it)
 						continue;
 					}
@@ -1882,7 +1882,7 @@ static void RemoveUpgradeModifier(CPlayer &player, const stratagus::upgrade_modi
 					}
 					
 					for (const auto &kv_pair : um->Modifier.UnitStock) {
-						const stratagus::unit_type *unit_type = stratagus::unit_type::get_all()[kv_pair.first];
+						const wyrmgus::unit_type *unit_type = wyrmgus::unit_type::get_all()[kv_pair.first];
 						const int unit_stock = kv_pair.second;
 						if (unit_stock > 0) {
 							unit.ChangeUnitStock(unit_type, -unit_stock);
@@ -1909,7 +1909,7 @@ static void RemoveUpgradeModifier(CPlayer &player, const stratagus::upgrade_modi
 				}
 				
 				//change variation if current one becomes forbidden
-				const stratagus::unit_type_variation *current_variation = unit.GetVariation();
+				const wyrmgus::unit_type_variation *current_variation = unit.GetVariation();
 				if (current_variation) {
 					bool upgrade_required = false;
 					for (const CUpgrade *required_upgrade : current_variation->UpgradesRequired) {
@@ -1923,7 +1923,7 @@ static void RemoveUpgradeModifier(CPlayer &player, const stratagus::upgrade_modi
 					}
 				}
 				for (int i = 0; i < MaxImageLayers; ++i) {
-					const stratagus::unit_type_variation *current_layer_variation = unit.GetLayerVariation(i);
+					const wyrmgus::unit_type_variation *current_layer_variation = unit.GetLayerVariation(i);
 					if (current_layer_variation) {
 						bool upgrade_required = false;
 						for (const CUpgrade *required_upgrade : current_layer_variation->UpgradesRequired) {
@@ -1954,7 +1954,7 @@ static void RemoveUpgradeModifier(CPlayer &player, const stratagus::upgrade_modi
 **  @param unit    Unit that will get the modifier applied
 **  @param um      Upgrade modifier that does the effects
 */
-void ApplyIndividualUpgradeModifier(CUnit &unit, const stratagus::upgrade_modifier *um)
+void ApplyIndividualUpgradeModifier(CUnit &unit, const wyrmgus::upgrade_modifier *um)
 {
 	Assert(um);
 
@@ -2006,7 +2006,7 @@ void ApplyIndividualUpgradeModifier(CUnit &unit, const stratagus::upgrade_modifi
 	}
 	
 	for (const auto &kv_pair : um->Modifier.UnitStock) {
-		const stratagus::unit_type *unit_type = stratagus::unit_type::get_all()[kv_pair.first];
+		const wyrmgus::unit_type *unit_type = wyrmgus::unit_type::get_all()[kv_pair.first];
 		const int unit_stock = kv_pair.second;
 		if (unit_stock < 0) {
 			unit.ChangeUnitStock(unit_type, unit_stock);
@@ -2015,7 +2015,7 @@ void ApplyIndividualUpgradeModifier(CUnit &unit, const stratagus::upgrade_modifi
 	
 	//Wyrmgus start
 	//change variation if current one becomes forbidden
-	const stratagus::unit_type_variation *current_variation = unit.GetVariation();
+	const wyrmgus::unit_type_variation *current_variation = unit.GetVariation();
 	if (current_variation) {
 		bool upgrade_forbidden = false;
 		for (const CUpgrade *forbidden_upgrade : current_variation->UpgradesForbidden) {
@@ -2029,7 +2029,7 @@ void ApplyIndividualUpgradeModifier(CUnit &unit, const stratagus::upgrade_modifi
 		}
 	}
 	for (int i = 0; i < MaxImageLayers; ++i) {
-		const stratagus::unit_type_variation *current_layer_variation = unit.GetLayerVariation(i);
+		const wyrmgus::unit_type_variation *current_layer_variation = unit.GetLayerVariation(i);
 		if (current_layer_variation) {
 			bool upgrade_forbidden = false;
 			for (const CUpgrade *forbidden_upgrade : current_layer_variation->UpgradesForbidden) {
@@ -2056,7 +2056,7 @@ void ApplyIndividualUpgradeModifier(CUnit &unit, const stratagus::upgrade_modifi
 	}
 }
 
-void RemoveIndividualUpgradeModifier(CUnit &unit, const stratagus::upgrade_modifier *um)
+void RemoveIndividualUpgradeModifier(CUnit &unit, const wyrmgus::upgrade_modifier *um)
 {
 	Assert(um);
 
@@ -2102,7 +2102,7 @@ void RemoveIndividualUpgradeModifier(CUnit &unit, const stratagus::upgrade_modif
 	}
 
 	for (const auto &kv_pair : um->Modifier.UnitStock) {
-		const stratagus::unit_type *unit_type = stratagus::unit_type::get_all()[kv_pair.first];
+		const wyrmgus::unit_type *unit_type = wyrmgus::unit_type::get_all()[kv_pair.first];
 		const int unit_stock = kv_pair.second;
 		if (unit_stock > 0) {
 			unit.ChangeUnitStock(unit_type, -unit_stock);
@@ -2111,7 +2111,7 @@ void RemoveIndividualUpgradeModifier(CUnit &unit, const stratagus::upgrade_modif
 	
 	//Wyrmgus start
 	//change variation if current one becomes forbidden
-	const stratagus::unit_type_variation *current_variation = unit.GetVariation();
+	const wyrmgus::unit_type_variation *current_variation = unit.GetVariation();
 	if (current_variation) {
 		bool upgrade_required = false;
 		for (const CUpgrade *required_upgrade : current_variation->UpgradesRequired) {
@@ -2125,7 +2125,7 @@ void RemoveIndividualUpgradeModifier(CUnit &unit, const stratagus::upgrade_modif
 		}
 	}
 	for (int i = 0; i < MaxImageLayers; ++i) {
-		const stratagus::unit_type_variation *current_layer_variation = unit.GetLayerVariation(i);
+		const wyrmgus::unit_type_variation *current_layer_variation = unit.GetLayerVariation(i);
 		if (current_layer_variation) {
 			bool upgrade_required = false;
 			for (const CUpgrade *required_upgrade : current_layer_variation->UpgradesRequired) {
@@ -2162,9 +2162,9 @@ void UpgradeAcquire(CPlayer &player, const CUpgrade *upgrade)
 
 	//Wyrmgus start
 	if (!strncmp(upgrade->Ident.c_str(), "upgrade-deity-", 14) && strncmp(upgrade->Ident.c_str(), "upgrade-deity-domain-", 21)) { // if is a deity upgrade, but isn't a deity domain upgrade
-		stratagus::deity *upgrade_deity = stratagus::deity::get_by_upgrade(upgrade);
+		wyrmgus::deity *upgrade_deity = wyrmgus::deity::get_by_upgrade(upgrade);
 		if (upgrade_deity) {
-			for (stratagus::deity_domain *domain : upgrade_deity->get_domains()) {
+			for (wyrmgus::deity_domain *domain : upgrade_deity->get_domains()) {
 				CUpgrade *domain_upgrade = domain->Upgrade;
 				if (player.Allow.Upgrades[domain_upgrade->ID] != 'R') {
 					UpgradeAcquire(player, domain_upgrade);
@@ -2215,9 +2215,9 @@ void UpgradeLost(CPlayer &player, int id)
 	//Wyrmgus start
 	CUpgrade *upgrade = CUpgrade::get_all()[id];
 	if (!strncmp(upgrade->Ident.c_str(), "upgrade-deity-", 14) && strncmp(upgrade->Ident.c_str(), "upgrade-deity-domain-", 21)) { // if is a deity upgrade, but isn't a deity domain upgrade
-		stratagus::deity *upgrade_deity = stratagus::deity::get_by_upgrade(upgrade);
+		wyrmgus::deity *upgrade_deity = wyrmgus::deity::get_by_upgrade(upgrade);
 		if (upgrade_deity) {
-			for (stratagus::deity_domain *domain : upgrade_deity->get_domains()) {
+			for (wyrmgus::deity_domain *domain : upgrade_deity->get_domains()) {
 				CUpgrade *domain_upgrade = domain->Upgrade;
 				if (player.Allow.Upgrades[domain_upgrade->ID] == 'R') {
 					UpgradeLost(player, domain_upgrade->ID);
@@ -2286,7 +2286,7 @@ void AbilityLost(CUnit &unit, CUpgrade *upgrade, bool lose_all)
 	unit.Variable[LEVELUP_INDEX].Max = unit.Variable[LEVELUP_INDEX].Value;
 	unit.Variable[LEVELUP_INDEX].Enable = 1;
 	if (!IsNetworkGame() && unit.Character != nullptr) {
-		if (stratagus::vector::contains(unit.Character->get_abilities(), upgrade)) {
+		if (wyrmgus::vector::contains(unit.Character->get_abilities(), upgrade)) {
 			if (unit.Player == CPlayer::GetThisPlayer()) { //save ability learning, if unit has a character and it is persistent, and the character doesn't have the ability yet
 				unit.Character->remove_ability(upgrade);
 				SaveHero(unit.Character);
@@ -2336,9 +2336,9 @@ void IndividualUpgradeAcquire(CUnit &unit, const CUpgrade *upgrade)
 	unit.SetIndividualUpgrade(upgrade, unit.GetIndividualUpgrade(upgrade) + 1);
 	
 	if (!strncmp(upgrade->Ident.c_str(), "upgrade-deity-", 14) && strncmp(upgrade->Ident.c_str(), "upgrade-deity-domain-", 21)) { // if is a deity upgrade, but isn't a deity domain upgrade
-		stratagus::deity *upgrade_deity = stratagus::deity::get_by_upgrade(upgrade);
+		wyrmgus::deity *upgrade_deity = wyrmgus::deity::get_by_upgrade(upgrade);
 		if (upgrade_deity) {
-			for (stratagus::deity_domain *domain : upgrade_deity->get_domains()) {
+			for (wyrmgus::deity_domain *domain : upgrade_deity->get_domains()) {
 				CUpgrade *domain_upgrade = domain->Upgrade;
 				if (unit.GetIndividualUpgrade(domain_upgrade) == 0) {
 					IndividualUpgradeAcquire(unit, domain_upgrade);
@@ -2355,7 +2355,7 @@ void IndividualUpgradeAcquire(CUnit &unit, const CUpgrade *upgrade)
 		for (const auto &modifier : upgrade->get_modifiers()) {
 			bool applies_to_this = false;
 			bool applies_to_any_unit_types = false;
-			for (const stratagus::unit_type *unit_type : stratagus::unit_type::get_all()) {
+			for (const wyrmgus::unit_type *unit_type : wyrmgus::unit_type::get_all()) {
 				if (modifier->applies_to(unit_type)) {
 					applies_to_any_unit_types = true;
 					if (unit_type == unit.Type) {
@@ -2388,9 +2388,9 @@ void IndividualUpgradeLost(CUnit &unit, const CUpgrade *upgrade, bool lose_all)
 	unit.SetIndividualUpgrade(upgrade, unit.GetIndividualUpgrade(upgrade) - 1);
 
 	if (!strncmp(upgrade->Ident.c_str(), "upgrade-deity-", 14) && strncmp(upgrade->Ident.c_str(), "upgrade-deity-domain-", 21)) { // if is a deity upgrade, but isn't a deity domain upgrade
-		stratagus::deity *upgrade_deity = stratagus::deity::get_by_upgrade(upgrade);
+		wyrmgus::deity *upgrade_deity = wyrmgus::deity::get_by_upgrade(upgrade);
 		if (upgrade_deity) {
-			for (stratagus::deity_domain *domain : upgrade_deity->get_domains()) {
+			for (wyrmgus::deity_domain *domain : upgrade_deity->get_domains()) {
 				CUpgrade *domain_upgrade = domain->Upgrade;
 				if (unit.GetIndividualUpgrade(domain_upgrade) > 0) {
 					IndividualUpgradeLost(unit, domain_upgrade);
@@ -2408,7 +2408,7 @@ void IndividualUpgradeLost(CUnit &unit, const CUpgrade *upgrade, bool lose_all)
 		for (const auto &modifier : upgrade->get_modifiers()) {
 			bool applies_to_this = false;
 			bool applies_to_any_unit_types = false;
-			for (const stratagus::unit_type *unit_type : stratagus::unit_type::get_all()) {
+			for (const wyrmgus::unit_type *unit_type : wyrmgus::unit_type::get_all()) {
 				if (modifier->applies_to(unit_type)) {
 					applies_to_any_unit_types = true;
 					if (unit_type == unit.Type) {
@@ -2588,7 +2588,7 @@ std::string GetUpgradeEffectsString(const std::string &upgrade_ident, bool grand
 					upgrade_effects_string += GetVariableDisplayName(var);
 						
 					bool first_unit_type = true;
-					for (const stratagus::unit_type *unit_type : stratagus::unit_type::get_all()) {
+					for (const wyrmgus::unit_type *unit_type : wyrmgus::unit_type::get_all()) {
 						if (modifier->applies_to(unit_type)) {
 							if (!first_unit_type) {
 								upgrade_effects_string += ", ";
@@ -2639,7 +2639,7 @@ std::string GetUpgradeEffectsString(const std::string &upgrade_ident, bool grand
 						upgrade_effects_string += " Processing";
 							
 						bool first_unit_type = true;
-						for (const stratagus::unit_type *unit_type : stratagus::unit_type::get_all()) {
+						for (const wyrmgus::unit_type *unit_type : wyrmgus::unit_type::get_all()) {
 							if (modifier->applies_to(unit_type)) {
 								if (!first_unit_type) {
 									upgrade_effects_string += ", ";

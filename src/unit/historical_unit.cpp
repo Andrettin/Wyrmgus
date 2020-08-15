@@ -34,7 +34,7 @@
 #include "unit/unit_class.h"
 #include "unit/unit_type.h"
 
-namespace stratagus {
+namespace wyrmgus {
 
 historical_unit::historical_unit(const std::string &identifier) : named_data_entry(identifier)
 {

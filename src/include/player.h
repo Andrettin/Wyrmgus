@@ -59,7 +59,7 @@ enum class DiplomacyState;
 enum class ForceType;
 struct lua_State;
 
-namespace stratagus {
+namespace wyrmgus {
 	class age;
 	class calendar;
 	class character;
@@ -110,53 +110,53 @@ public:
 	void SetName(const std::string &name);
 
 	//Wyrmgus start
-	const stratagus::civilization *get_civilization() const;
+	const wyrmgus::civilization *get_civilization() const;
 	void set_civilization(int civilization);
-	stratagus::faction *get_faction() const;
-	void SetFaction(const stratagus::faction *faction);
+	wyrmgus::faction *get_faction() const;
+	void SetFaction(const wyrmgus::faction *faction);
 	void SetRandomFaction();
 
-	stratagus::faction_tier get_faction_tier() const
+	wyrmgus::faction_tier get_faction_tier() const
 	{
 		return this->faction_tier;
 	}
 
-	void set_faction_tier(const stratagus::faction_tier tier)
+	void set_faction_tier(const wyrmgus::faction_tier tier)
 	{
 		this->faction_tier = tier;
 	}
 
-	stratagus::government_type get_government_type() const
+	wyrmgus::government_type get_government_type() const
 	{
 		return this->government_type;
 	}
 
-	void set_government_type(const stratagus::government_type government_type)
+	void set_government_type(const wyrmgus::government_type government_type)
 	{
 		this->government_type = government_type;
 	}
 
-	const stratagus::religion *get_religion() const
+	const wyrmgus::religion *get_religion() const
 	{
 		return this->religion;
 	}
 
-	const stratagus::dynasty *get_dynasty() const
+	const wyrmgus::dynasty *get_dynasty() const
 	{
 		return this->dynasty;
 	}
 
-	void set_dynasty(const stratagus::dynasty *dynasty);
+	void set_dynasty(const wyrmgus::dynasty *dynasty);
 
 	const std::string &get_interface() const;
 
-	const stratagus::age *get_age() const
+	const wyrmgus::age *get_age() const
 	{
 		return this->age;
 	}
 
 	void check_age();
-	void set_age(const stratagus::age *age);
+	void set_age(const wyrmgus::age *age);
 	CCurrency *GetCurrency() const;
 
 	bool is_alive() const
@@ -172,41 +172,41 @@ public:
 	std::vector<CUnit *>::const_iterator UnitEnd() const;
 	std::vector<CUnit *>::iterator UnitEnd();
 
-	const stratagus::player_color *get_player_color() const
+	const wyrmgus::player_color *get_player_color() const
 	{
 		return this->player_color;
 	}
 
 	const QColor &get_minimap_color() const;
 
-	const std::vector<std::unique_ptr<stratagus::player_quest_objective>> &get_quest_objectives() const
+	const std::vector<std::unique_ptr<wyrmgus::player_quest_objective>> &get_quest_objectives() const
 	{
 		return this->quest_objectives;
 	}
 
 	void ShareUpgradeProgress(CPlayer &player, CUnit &unit);
-	int get_player_color_usage_count(const stratagus::player_color *player_color) const;
+	int get_player_color_usage_count(const wyrmgus::player_color *player_color) const;
 	void update_minimap_territory();
 
-	stratagus::unit_type *get_class_unit_type(const stratagus::unit_class *unit_class) const;
-	CUpgrade *get_class_upgrade(const stratagus::upgrade_class *upgrade_class) const;
-	bool has_upgrade_class(const stratagus::upgrade_class *upgrade_class) const;
+	wyrmgus::unit_type *get_class_unit_type(const wyrmgus::unit_class *unit_class) const;
+	CUpgrade *get_class_upgrade(const wyrmgus::upgrade_class *upgrade_class) const;
+	bool has_upgrade_class(const wyrmgus::upgrade_class *upgrade_class) const;
 
-	bool HasSettlement(const stratagus::site *settlement) const;
+	bool HasSettlement(const wyrmgus::site *settlement) const;
 	bool HasSettlementNearWaterZone(int water_zone) const;
-	stratagus::site *GetNearestSettlement(const Vec2i &pos, int z, const Vec2i &size) const;
-	void update_building_settlement_assignment(const stratagus::site *old_settlement, const int z) const;
-	bool HasUnitBuilder(const stratagus::unit_type *type, const stratagus::site *settlement = nullptr) const;
+	wyrmgus::site *GetNearestSettlement(const Vec2i &pos, int z, const Vec2i &size) const;
+	void update_building_settlement_assignment(const wyrmgus::site *old_settlement, const int z) const;
+	bool HasUnitBuilder(const wyrmgus::unit_type *type, const wyrmgus::site *settlement = nullptr) const;
 	bool HasUpgradeResearcher(const CUpgrade *upgrade) const;
-	bool CanFoundFaction(stratagus::faction *faction, bool pre = false);
-	bool can_choose_dynasty(const stratagus::dynasty *dynasty, const bool pre = false) const;
-	bool is_character_available_for_recruitment(const stratagus::character *character, bool ignore_neutral = false) const;
-	std::vector<stratagus::character *> get_recruitable_heroes_from_list(const std::vector<stratagus::character *> &heroes);
+	bool CanFoundFaction(wyrmgus::faction *faction, bool pre = false);
+	bool can_choose_dynasty(const wyrmgus::dynasty *dynasty, const bool pre = false) const;
+	bool is_character_available_for_recruitment(const wyrmgus::character *character, bool ignore_neutral = false) const;
+	std::vector<wyrmgus::character *> get_recruitable_heroes_from_list(const std::vector<wyrmgus::character *> &heroes);
 	bool UpgradeRemovesExistingUpgrade(const CUpgrade *upgrade, bool ignore_lower_priority = false) const;
 	std::string get_full_name() const;
 	std::string_view get_faction_title_name() const;
-	std::string_view GetCharacterTitleName(const stratagus::character_title title_type, const stratagus::gender gender) const;
-	std::set<int> get_builder_landmasses(const stratagus::unit_type *building) const;	/// Builds a vector with builder landmasses; the building is the structure to be built by the builder in question
+	std::string_view GetCharacterTitleName(const wyrmgus::character_title title_type, const wyrmgus::gender gender) const;
+	std::set<int> get_builder_landmasses(const wyrmgus::unit_type *building) const;	/// Builds a vector with builder landmasses; the building is the structure to be built by the builder in question
 	std::vector<const CUpgrade *> GetResearchableUpgrades();
 
 	CUnit &GetUnit(int index) const;
@@ -223,12 +223,12 @@ public:
 	void AutosellResource(const int resource);
 	void UpdateLevelUpUnits();
 
-	const std::vector<stratagus::quest *> &get_available_quests() const
+	const std::vector<wyrmgus::quest *> &get_available_quests() const
 	{
 		return this->available_quests;
 	}
 
-	const std::vector<stratagus::quest *> &get_current_quests() const
+	const std::vector<wyrmgus::quest *> &get_current_quests() const
 	{
 		return this->current_quests;
 	}
@@ -236,15 +236,15 @@ public:
 	void update_quest_pool();
 	void on_available_quests_changed();
 	void update_current_quests();
-	void accept_quest(stratagus::quest *quest);
-	void complete_quest(stratagus::quest *quest);
-	void fail_quest(stratagus::quest *quest, const std::string &fail_reason = "");
-	void remove_current_quest(stratagus::quest *quest);
-	bool can_accept_quest(const stratagus::quest *quest) const;
-	bool check_quest_completion(const stratagus::quest *quest) const;
-	std::string check_quest_failure(const stratagus::quest *quest) const;
-	bool has_quest(const stratagus::quest *quest) const;
-	bool is_quest_completed(const stratagus::quest *quest) const;
+	void accept_quest(wyrmgus::quest *quest);
+	void complete_quest(wyrmgus::quest *quest);
+	void fail_quest(wyrmgus::quest *quest, const std::string &fail_reason = "");
+	void remove_current_quest(wyrmgus::quest *quest);
+	bool can_accept_quest(const wyrmgus::quest *quest) const;
+	bool check_quest_completion(const wyrmgus::quest *quest) const;
+	std::string check_quest_failure(const wyrmgus::quest *quest) const;
+	bool has_quest(const wyrmgus::quest *quest) const;
+	bool is_quest_completed(const wyrmgus::quest *quest) const;
 	void AddModifier(CUpgrade *modifier, int cycles);
 	void RemoveModifier(CUpgrade *modifier);
 	bool AtPeace() const;
@@ -256,11 +256,11 @@ public:
 	int Race = 0; //race of the player (orc, human, ...)
 	int Faction = -1; //faction of the player
 private:
-	stratagus::faction_tier faction_tier;
-	stratagus::government_type government_type;
-	stratagus::religion *religion = nullptr; //religion of the player
-	const stratagus::dynasty *dynasty = nullptr; //ruling dynasty of the player
-	const stratagus::age *age = nullptr; //the current age the player/faction is in
+	wyrmgus::faction_tier faction_tier;
+	wyrmgus::government_type government_type;
+	wyrmgus::religion *religion = nullptr; //religion of the player
+	const wyrmgus::dynasty *dynasty = nullptr; //ruling dynasty of the player
+	const wyrmgus::age *age = nullptr; //the current age the player/faction is in
 public:
 	std::string AiName; //AI for computer
 
@@ -274,7 +274,7 @@ public:
 
 private:
 	CPlayer *overlord = nullptr;	/// overlord of this player
-	stratagus::vassalage_type vassalage_type;
+	wyrmgus::vassalage_type vassalage_type;
 
 	std::vector<CPlayer *> vassals;	/// vassals of this player
 
@@ -312,18 +312,18 @@ public:
 	int SpeedUpgrade;                /// speed factor for upgrading
 	int SpeedResearch;               /// speed factor for researching
 
-	std::map<const stratagus::unit_type *, int> UnitTypesCount;  						/// total units of unit-type
-	std::map<const stratagus::unit_type *, int> UnitTypesUnderConstructionCount;  		/// total under construction units of unit-type
-	std::map<const stratagus::unit_type *, int> UnitTypesAiActiveCount;  				/// total units of unit-type that have their AI set to active
-	std::map<const stratagus::unit_type *, std::vector<CUnit *>> UnitsByType;			/// units owned by this player for each type
-	std::map<const stratagus::unit_type *, std::vector<CUnit *>> AiActiveUnitsByType;	/// AI active units owned by this player for each type
+	std::map<const wyrmgus::unit_type *, int> UnitTypesCount;  						/// total units of unit-type
+	std::map<const wyrmgus::unit_type *, int> UnitTypesUnderConstructionCount;  		/// total under construction units of unit-type
+	std::map<const wyrmgus::unit_type *, int> UnitTypesAiActiveCount;  				/// total units of unit-type that have their AI set to active
+	std::map<const wyrmgus::unit_type *, std::vector<CUnit *>> UnitsByType;			/// units owned by this player for each type
+	std::map<const wyrmgus::unit_type *, std::vector<CUnit *>> AiActiveUnitsByType;	/// AI active units owned by this player for each type
 	std::vector<CUnit *> Heroes;											/// hero units owned by this player
-	std::vector<stratagus::deity *> Deities;								/// deities chosen by this player
+	std::vector<wyrmgus::deity *> Deities;								/// deities chosen by this player
 private:
-	std::vector<stratagus::quest *> available_quests;			/// quests available to this player
-	std::vector<stratagus::quest *> current_quests;				/// quests being pursued by this player
-	std::vector<const stratagus::quest *> completed_quests;		/// quests completed by this player
-	std::vector<std::unique_ptr<stratagus::player_quest_objective>> quest_objectives; //objectives of the player's current quests
+	std::vector<wyrmgus::quest *> available_quests;			/// quests available to this player
+	std::vector<wyrmgus::quest *> current_quests;				/// quests being pursued by this player
+	std::vector<const wyrmgus::quest *> completed_quests;		/// quests completed by this player
+	std::vector<std::unique_ptr<wyrmgus::player_quest_objective>> quest_objectives; //objectives of the player's current quests
 public:
 	std::vector<std::pair<CUpgrade *, int>> Modifiers;						/// Modifiers affecting the player, and until which cycle it should last
 	std::vector<int> AutosellResources;
@@ -363,7 +363,7 @@ public:
 	//Wyrmgus end
 	
 private:
-	const stratagus::player_color *player_color = nullptr; /// player color for units and portraits
+	const wyrmgus::player_color *player_color = nullptr; /// player color for units and portraits
 
 public:
 	std::vector<CUnit *> FreeWorkers;	/// Container for free workers
@@ -376,11 +376,11 @@ public:
 	CUpgradeTimers UpgradeTimers; /// Timer for the upgrades
 
 	/// Get a resource of the player
-	int get_resource(const stratagus::resource *resource, const int type);
+	int get_resource(const wyrmgus::resource *resource, const int type);
 	/// Adds/subtracts some resources to/from the player store
-	void change_resource(const stratagus::resource *resource, const int value, const bool store = false);
+	void change_resource(const wyrmgus::resource *resource, const int value, const bool store = false);
 	/// Set a resource of the player
-	void set_resource(const stratagus::resource *resource, const int value, const int type = STORE_OVERALL);
+	void set_resource(const wyrmgus::resource *resource, const int value, const int type = STORE_OVERALL);
 	/// Check, if there enough resources for action.
 	bool CheckResource(const int resource, const int value);
 	//Wyrmgus start
@@ -404,55 +404,55 @@ public:
 	int GetTradePotentialWith(const CPlayer &player) const;
 	//Wyrmgus end
 
-	void pay_overlord_tax(const stratagus::resource *resource, const int taxable_quantity);
+	void pay_overlord_tax(const wyrmgus::resource *resource, const int taxable_quantity);
 	
 	/// Returns count of specified unittype
-	int GetUnitTotalCount(const stratagus::unit_type &type) const;
+	int GetUnitTotalCount(const wyrmgus::unit_type &type) const;
 	/// Check if the unit-type didn't break any unit limits and supply/demand
-	int CheckLimits(const stratagus::unit_type &type) const;
+	int CheckLimits(const wyrmgus::unit_type &type) const;
 
 	/// Check if enough resources are available for costs
 	int CheckCosts(const int *costs, bool notify = true) const;
 	/// Check if enough resources are available for a new unit-type
-	int CheckUnitType(const stratagus::unit_type &type, bool hire = false) const;
+	int CheckUnitType(const wyrmgus::unit_type &type, bool hire = false) const;
 
 	/// Add costs to the resources
 	void AddCosts(const int *costs);
 	/// Add costs for an unit-type to the resources
-	void AddUnitType(const stratagus::unit_type &type, bool hire = false);
+	void AddUnitType(const wyrmgus::unit_type &type, bool hire = false);
 	/// Add a factor of costs to the resources
 	void AddCostsFactor(const int *costs, int factor);
 	/// Remove costs from the resources
 	void SubCosts(const int *costs);
 	/// Remove costs for an unit-type from the resources
-	void SubUnitType(const stratagus::unit_type &type, bool hire = false);
+	void SubUnitType(const wyrmgus::unit_type &type, bool hire = false);
 	/// Remove a factor of costs from the resources
 	void SubCostsFactor(const int *costs, int factor);
 	
 	//Wyrmgus start
-	void GetUnitTypeCosts(const stratagus::unit_type *type, int *type_costs, bool hire = false, bool ignore_one = false) const;
-	int GetUnitTypeCostsMask(const stratagus::unit_type *type, bool hire = false) const;
+	void GetUnitTypeCosts(const wyrmgus::unit_type *type, int *type_costs, bool hire = false, bool ignore_one = false) const;
+	int GetUnitTypeCostsMask(const wyrmgus::unit_type *type, bool hire = false) const;
 	void GetUpgradeCosts(const CUpgrade *upgrade, int *upgrade_costs);
 	int GetUpgradeCostsMask(const CUpgrade *upgrade) const;
 	
-	void SetUnitTypeCount(const stratagus::unit_type *type, int quantity);
-	void ChangeUnitTypeCount(const stratagus::unit_type *type, int quantity);
-	int GetUnitTypeCount(const stratagus::unit_type *type) const;
+	void SetUnitTypeCount(const wyrmgus::unit_type *type, int quantity);
+	void ChangeUnitTypeCount(const wyrmgus::unit_type *type, int quantity);
+	int GetUnitTypeCount(const wyrmgus::unit_type *type) const;
 	
-	void SetUnitTypeUnderConstructionCount(const stratagus::unit_type *type, int quantity);
-	void ChangeUnitTypeUnderConstructionCount(const stratagus::unit_type *type, int quantity);
-	int GetUnitTypeUnderConstructionCount(const stratagus::unit_type *type) const;
+	void SetUnitTypeUnderConstructionCount(const wyrmgus::unit_type *type, int quantity);
+	void ChangeUnitTypeUnderConstructionCount(const wyrmgus::unit_type *type, int quantity);
+	int GetUnitTypeUnderConstructionCount(const wyrmgus::unit_type *type) const;
 	
-	void SetUnitTypeAiActiveCount(const stratagus::unit_type *type, int quantity);
-	void ChangeUnitTypeAiActiveCount(const stratagus::unit_type *type, int quantity);
-	int GetUnitTypeAiActiveCount(const stratagus::unit_type *type) const;
+	void SetUnitTypeAiActiveCount(const wyrmgus::unit_type *type, int quantity);
+	void ChangeUnitTypeAiActiveCount(const wyrmgus::unit_type *type, int quantity);
+	int GetUnitTypeAiActiveCount(const wyrmgus::unit_type *type) const;
 	
 	void IncreaseCountsForUnit(CUnit *unit, bool type_change = false);
 	void DecreaseCountsForUnit(CUnit *unit, bool type_change = false);
 	//Wyrmgus end
 
 	/// Does the player have units of a given type
-	bool has_unit_type(const stratagus::unit_type *unit_type) const;
+	bool has_unit_type(const wyrmgus::unit_type *unit_type) const;
 
 	int get_population() const;
 
@@ -485,7 +485,7 @@ public:
 	bool IsAllied(const CUnit &unit) const;
 	bool IsVisionSharing() const;
 
-	const stratagus::player_index_set &get_shared_vision() const
+	const wyrmgus::player_index_set &get_shared_vision() const
 	{
 		return this->shared_vision;
 	}
@@ -544,7 +544,7 @@ public:
 	bool HasContactWith(const CPlayer &player) const;
 	bool HasNeutralFactionType() const;
 	bool HasBuildingAccess(const CPlayer &player, const ButtonCmd button_action = ButtonCmd::None) const;
-	bool HasHero(const stratagus::character *hero) const;
+	bool HasHero(const wyrmgus::character *hero) const;
 	//Wyrmgus end
 
 	void SetDiplomacyNeutralWith(const CPlayer &player);
@@ -569,7 +569,7 @@ public:
 		return this->overlord;
 	}
 
-	void set_overlord(CPlayer *overlord, const stratagus::vassalage_type);
+	void set_overlord(CPlayer *overlord, const wyrmgus::vassalage_type);
 
 	CPlayer *get_top_overlord() const
 	{
@@ -614,9 +614,9 @@ public:
 
 private:
 	std::vector<CUnit *> Units; /// units of this player
-	stratagus::player_index_set enemies; //enemies for this player
-	stratagus::player_index_set allies; //allies for this player
-	stratagus::player_index_set shared_vision; //set of player indexes that this player has shared vision with
+	wyrmgus::player_index_set enemies; //enemies for this player
+	wyrmgus::player_index_set allies; //allies for this player
+	wyrmgus::player_index_set shared_vision; //set of player indexes that this player has shared vision with
 
 	friend void CleanPlayers();
 	friend void SetPlayersPalette();
@@ -745,14 +745,14 @@ enum WordJunctionTypes {
 class CForceTemplate
 {
 public:
-	const std::vector<std::pair<const stratagus::unit_class *, int>> &get_units() const
+	const std::vector<std::pair<const wyrmgus::unit_class *, int>> &get_units() const
 	{
 		return this->units;
 	}
 
-	void add_unit(const stratagus::unit_class *unit_class, const int quantity)
+	void add_unit(const wyrmgus::unit_class *unit_class, const int quantity)
 	{
-		this->units.push_back(std::pair<const stratagus::unit_class *, int>(unit_class, quantity));
+		this->units.push_back(std::pair<const wyrmgus::unit_class *, int>(unit_class, quantity));
 	}
 
 	ForceType ForceType = ForceType::None;
@@ -760,18 +760,18 @@ public:
 	int Weight = 1;
 
 private:
-	std::vector<std::pair<const stratagus::unit_class *, int>> units;	/// vector containing each unit class belonging to the force template, and the respective quantity
+	std::vector<std::pair<const wyrmgus::unit_class *, int>> units;	/// vector containing each unit class belonging to the force template, and the respective quantity
 };
 
 class CAiBuildingTemplate
 {
 public:
-	const stratagus::unit_class *get_unit_class() const
+	const wyrmgus::unit_class *get_unit_class() const
 	{
 		return this->unit_class;
 	}
 
-	void set_unit_class(const stratagus::unit_class *unit_class)
+	void set_unit_class(const wyrmgus::unit_class *unit_class)
 	{
 		this->unit_class = unit_class;
 	}
@@ -797,7 +797,7 @@ public:
 	}
 
 private:
-	const stratagus::unit_class *unit_class = nullptr; /// Building's unit class
+	const wyrmgus::unit_class *unit_class = nullptr; /// Building's unit class
 	int priority = 100;
 	bool per_settlement = false;	/// Whether the building should be constructed for each settlement
 };
@@ -997,8 +997,8 @@ extern void SavePlayers(CFile &file);
 extern void CreatePlayer(int type);
 
 //Wyrmgus start
-extern CPlayer *GetFactionPlayer(const stratagus::faction *faction);
-extern CPlayer *GetOrAddFactionPlayer(const stratagus::faction *faction);
+extern CPlayer *GetFactionPlayer(const wyrmgus::faction *faction);
+extern CPlayer *GetOrAddFactionPlayer(const wyrmgus::faction *faction);
 //Wyrmgus end
 
 /// Initialize the computer opponent AI

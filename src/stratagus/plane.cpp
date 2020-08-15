@@ -36,7 +36,7 @@
 #include "time/time_of_day_schedule.h"
 #include "ui/ui.h"
 
-namespace stratagus {
+namespace wyrmgus {
 
 void plane::ProcessConfigData(const CConfigData *config_data)
 {

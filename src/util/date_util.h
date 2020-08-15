@@ -31,7 +31,7 @@
 
 #pragma once
 
-namespace stratagus::date {
+namespace wyrmgus::date {
 
 extern std::string year_to_string(const int year);
 

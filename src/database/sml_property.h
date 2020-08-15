@@ -31,7 +31,7 @@
 
 #pragma once
 
-namespace stratagus {
+namespace wyrmgus {
 
 enum class sml_operator;
 

@@ -60,14 +60,14 @@ static int CclDefineCharacter(lua_State *l)
 	}
 
 	std::string character_ident = LuaToString(l, 1);
-	stratagus::character *character = stratagus::character::try_get(character_ident);
+	wyrmgus::character *character = wyrmgus::character::try_get(character_ident);
 	bool redefinition = false;
 	if (!character) {
 		if (LoadingPersistentHeroes) {
 			fprintf(stderr, "Character \"%s\" has persistent data, but doesn't exist.\n", character_ident.c_str());
 			return 0;
 		}
-		character = stratagus::character::get_or_add(character_ident, nullptr);
+		character = wyrmgus::character::get_or_add(character_ident, nullptr);
 	} else {
 		redefinition = true;
 		if (!LoadingPersistentHeroes) {
@@ -105,7 +105,7 @@ static int CclDefineCharacter(lua_State *l)
 			character->variation = LuaToString(l, -1);
 		} else if (!strcmp(value, "Type")) {
 			std::string unit_type_ident = LuaToString(l, -1);
-			stratagus::unit_type *unit_type = stratagus::unit_type::get(unit_type_ident);
+			wyrmgus::unit_type *unit_type = wyrmgus::unit_type::get(unit_type_ident);
 			if (character->get_unit_type() == nullptr || character->get_unit_type() == unit_type || character->get_unit_type()->CanExperienceUpgradeTo(unit_type)) {
 				character->unit_type = unit_type;
 			}
@@ -120,27 +120,27 @@ static int CclDefineCharacter(lua_State *l)
 		} else if (!strcmp(value, "DeathDate")) {
 			CclGetDate(l, &character->DeathDate);
 		} else if (!strcmp(value, "Civilization")) {
-			character->civilization = stratagus::civilization::get(LuaToString(l, -1));
+			character->civilization = wyrmgus::civilization::get(LuaToString(l, -1));
 		} else if (!strcmp(value, "Faction")) {
-			stratagus::faction *faction = stratagus::faction::get(LuaToString(l, -1));
+			wyrmgus::faction *faction = wyrmgus::faction::get(LuaToString(l, -1));
 			character->default_faction = faction;
 		} else if (!strcmp(value, "Father")) {
 			const std::string father_ident = LuaToString(l, -1);
-			stratagus::character *father = stratagus::character::get(father_ident);
+			wyrmgus::character *father = wyrmgus::character::get(father_ident);
 			character->father = father;
 		} else if (!strcmp(value, "Mother")) {
 			const std::string mother_ident = LuaToString(l, -1);
-			stratagus::character *mother = stratagus::character::get(mother_ident);
+			wyrmgus::character *mother = wyrmgus::character::get(mother_ident);
 			character->mother = mother;
 		} else if (!strcmp(value, "Children")) {
 			const int args = lua_rawlen(l, -1);
 			for (int j = 0; j < args; ++j) {
 				std::string child_ident = LuaToString(l, -1, j + 1);
-				stratagus::character *child = stratagus::character::get(child_ident);
+				wyrmgus::character *child = wyrmgus::character::get(child_ident);
 				character->add_child(child);
 			}
 		} else if (!strcmp(value, "Gender")) {
-			character->gender = stratagus::string_to_gender(LuaToString(l, -1));
+			character->gender = wyrmgus::string_to_gender(LuaToString(l, -1));
 		} else if (!strcmp(value, "Icon")) {
 			character->Icon.Name = LuaToString(l, -1);
 			character->Icon.Icon = nullptr;
@@ -154,7 +154,7 @@ static int CclDefineCharacter(lua_State *l)
 		} else if (!strcmp(value, "ExperiencePercent")) {
 			character->ExperiencePercent = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "Deity")) {
-			stratagus::deity *deity = stratagus::deity::get(LuaToString(l, -1));
+			wyrmgus::deity *deity = wyrmgus::deity::get(LuaToString(l, -1));
 			character->Deity = deity;
 			if (character->Icon.Name.empty() && !deity->Icon.Name.empty()) {
 				character->Icon.Name = deity->Icon.Name;
@@ -180,7 +180,7 @@ static int CclDefineCharacter(lua_State *l)
 			const int args = lua_rawlen(l, -1);
 			for (int j = 0; j < args; ++j) {
 				std::string deity_ident = LuaToString(l, -1, j + 1);
-				stratagus::deity *deity = stratagus::deity::get(deity_ident);
+				wyrmgus::deity *deity = wyrmgus::deity::get(deity_ident);
 				character->Deities.push_back(deity);
 			}
 		} else if (!strcmp(value, "ReadWorks")) {
@@ -238,7 +238,7 @@ static int CclDefineCharacter(lua_State *l)
 			const int args = lua_rawlen(l, -1);
 			for (int j = 0; j < args; ++j) {
 				lua_rawgeti(l, -1, j + 1);
-				std::unique_ptr<stratagus::persistent_item> item;
+				std::unique_ptr<wyrmgus::persistent_item> item;
 				if (!lua_istable(l, -1)) {
 					LuaError(l, "incorrect argument (expected table for items)");
 				}
@@ -248,9 +248,9 @@ static int CclDefineCharacter(lua_State *l)
 					++k;
 					if (!strcmp(value, "type")) {
 						const std::string item_ident = LuaToString(l, -1, k + 1);
-						stratagus::unit_type *item_type = stratagus::unit_type::try_get(item_ident);
+						wyrmgus::unit_type *item_type = wyrmgus::unit_type::try_get(item_ident);
 						if (item_type != nullptr) {
-							item = std::make_unique<stratagus::persistent_item>(item_type, character);
+							item = std::make_unique<wyrmgus::persistent_item>(item_type, character);
 						} else {
 							fprintf(stderr, "Item type \"%s\" doesn't exist.\n", item_ident.c_str());
 							break;
@@ -273,7 +273,7 @@ static int CclDefineCharacter(lua_State *l)
 						}
 					} else if (!strcmp(value, "spell")) {
 						std::string spell_ident = LuaToString(l, -1, k + 1);
-						stratagus::spell *spell = stratagus::spell::get(spell_ident);
+						wyrmgus::spell *spell = wyrmgus::spell::get(spell_ident);
 						item->Spell = spell;
 					} else if (!strcmp(value, "work")) {
 						std::string upgrade_ident = LuaToString(l, -1, k + 1);
@@ -295,7 +295,7 @@ static int CclDefineCharacter(lua_State *l)
 						item->Name = LuaToString(l, -1, k + 1);
 					} else if (!strcmp(value, "unique")) {
 						std::string unique_ident = LuaToString(l, -1, k + 1);
-						stratagus::unique_item *unique_item = stratagus::unique_item::try_get(unique_ident);
+						wyrmgus::unique_item *unique_item = wyrmgus::unique_item::try_get(unique_ident);
 						item->unique = unique_item;
 						if (unique_item != nullptr) {
 							item->Name = unique_item->get_name();
@@ -334,7 +334,7 @@ static int CclDefineCharacter(lua_State *l)
 			const int args = lua_rawlen(l, -1);
 			for (int j = 0; j < args; ++j) {
 				std::string unit_type_ident = LuaToString(l, -1, j + 1);
-				stratagus::unit_type *unit_type = stratagus::unit_type::get(unit_type_ident);
+				wyrmgus::unit_type *unit_type = wyrmgus::unit_type::get(unit_type_ident);
 				character->ForbiddenUpgrades.push_back(unit_type);
 			}
 		} else if (!strcmp(value, "HistoricalFactions")) {
@@ -350,9 +350,9 @@ static int CclDefineCharacter(lua_State *l)
 				++j;
 				
 				std::string historical_faction_name = LuaToString(l, -1, j + 1);
-				stratagus::faction *historical_faction = stratagus::faction::get(historical_faction_name);
+				wyrmgus::faction *historical_faction = wyrmgus::faction::get(historical_faction_name);
 
-				character->HistoricalFactions.push_back(std::pair<CDate, stratagus::faction *>(date, historical_faction));
+				character->HistoricalFactions.push_back(std::pair<CDate, wyrmgus::faction *>(date, historical_faction));
 			}
 		} else if (!strcmp(value, "HistoricalLocations")) {
 			if (!lua_istable(l, -1)) {
@@ -360,13 +360,13 @@ static int CclDefineCharacter(lua_State *l)
 			}
 			const int subargs = lua_rawlen(l, -1);
 			for (int j = 0; j < subargs; ++j) {
-				auto location = std::make_unique<stratagus::historical_location>();
+				auto location = std::make_unique<wyrmgus::historical_location>();
 				lua_rawgeti(l, -1, j + 1);
 				CclGetDate(l, &location->Date);
 				lua_pop(l, 1);
 				++j;
 				
-				location->map_template = stratagus::map_template::get(LuaToString(l, -1, j + 1));
+				location->map_template = wyrmgus::map_template::get(LuaToString(l, -1, j + 1));
 				++j;
 				
 				lua_rawgeti(l, -1, j + 1);
@@ -374,7 +374,7 @@ static int CclDefineCharacter(lua_State *l)
 					CclGetPos(l, &location->Position.x, &location->Position.y);
 				} else { //site ident
 					std::string site_ident = LuaToString(l, -1);
-					location->site = stratagus::site::get(site_ident);
+					location->site = wyrmgus::site::get(site_ident);
 					location->map_template = location->site->get_map_template();
 					location->Position = location->site->get_pos();
 				}
@@ -388,8 +388,8 @@ static int CclDefineCharacter(lua_State *l)
 			}
 			const int subargs = lua_rawlen(l, -1);
 			for (int j = 0; j < subargs; ++j) {
-				const stratagus::character_title title = GetCharacterTitleIdByName(LuaToString(l, -1, j + 1));
-				if (title == stratagus::character_title::none) {
+				const wyrmgus::character_title title = GetCharacterTitleIdByName(LuaToString(l, -1, j + 1));
+				if (title == wyrmgus::character_title::none) {
 					LuaError(l, "Character title doesn't exist.");
 				}
 				++j;
@@ -405,7 +405,7 @@ static int CclDefineCharacter(lua_State *l)
 				++j;
 				
 				std::string title_faction_name = LuaToString(l, -1, j + 1);
-				stratagus::faction *title_faction = stratagus::faction::get(title_faction_name);
+				wyrmgus::faction *title_faction = wyrmgus::faction::get(title_faction_name);
 
 				if (start_date.Year != 0 && end_date.Year != 0 && IsMinisterialTitle(title)) { // don't put in the faction's historical data if a blank year was given
 					title_faction->HistoricalMinisters[std::make_tuple(start_date, end_date, title)] = character;
@@ -440,9 +440,9 @@ static int CclDefineCustomHero(lua_State *l)
 	}
 
 	std::string hero_ident = LuaToString(l, 1);
-	stratagus::character *hero = GetCustomHero(hero_ident);
+	wyrmgus::character *hero = GetCustomHero(hero_ident);
 	if (!hero) {
-		hero = new stratagus::character(hero_ident);
+		hero = new wyrmgus::character(hero_ident);
 		CustomHeroes[hero_ident] = hero;
 	} else {
 		fprintf(stderr, "Custom hero \"%s\" is being redefined.\n", hero_ident.c_str());
@@ -469,7 +469,7 @@ static int CclDefineCustomHero(lua_State *l)
 			hero->variation = LuaToString(l, -1);
 		} else if (!strcmp(value, "Type")) {
 			std::string unit_type_ident = LuaToString(l, -1);
-			stratagus::unit_type *unit_type = stratagus::unit_type::get(unit_type_ident);
+			wyrmgus::unit_type *unit_type = wyrmgus::unit_type::get(unit_type_ident);
 			hero->unit_type = unit_type;
 			if (hero->level < hero->get_unit_type()->DefaultStat.Variables[LEVEL_INDEX].Value) {
 				hero->level = hero->get_unit_type()->DefaultStat.Variables[LEVEL_INDEX].Value;
@@ -479,9 +479,9 @@ static int CclDefineCustomHero(lua_State *l)
 			CUpgrade *upgrade = CUpgrade::get(trait_ident);
 			hero->trait = upgrade;
 		} else if (!strcmp(value, "Civilization")) {
-			hero->civilization = stratagus::civilization::get(LuaToString(l, -1));
+			hero->civilization = wyrmgus::civilization::get(LuaToString(l, -1));
 		} else if (!strcmp(value, "Gender")) {
-			hero->gender = stratagus::string_to_gender(LuaToString(l, -1));
+			hero->gender = wyrmgus::string_to_gender(LuaToString(l, -1));
 		} else if (!strcmp(value, "Level")) {
 			hero->level = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "ExperiencePercent")) {
@@ -503,7 +503,7 @@ static int CclDefineCustomHero(lua_State *l)
 			const int args = lua_rawlen(l, -1);
 			for (int j = 0; j < args; ++j) {
 				std::string deity_ident = LuaToString(l, -1, j + 1);
-				stratagus::deity *deity = stratagus::deity::get(deity_ident);
+				wyrmgus::deity *deity = wyrmgus::deity::get(deity_ident);
 				hero->Deities.push_back(deity);
 			}
 		} else if (!strcmp(value, "ReadWorks")) {
@@ -534,7 +534,7 @@ static int CclDefineCustomHero(lua_State *l)
 			const int args = lua_rawlen(l, -1);
 			for (int j = 0; j < args; ++j) {
 				lua_rawgeti(l, -1, j + 1);
-				std::unique_ptr<stratagus::persistent_item> item;
+				std::unique_ptr<wyrmgus::persistent_item> item;
 				if (!lua_istable(l, -1)) {
 					LuaError(l, "incorrect argument (expected table for items)");
 				}
@@ -544,9 +544,9 @@ static int CclDefineCustomHero(lua_State *l)
 					++k;
 					if (!strcmp(value, "type")) {
 						const std::string item_ident = LuaToString(l, -1, k + 1);
-						const stratagus::unit_type *item_type = stratagus::unit_type::try_get(item_ident);
+						const wyrmgus::unit_type *item_type = wyrmgus::unit_type::try_get(item_ident);
 						if (item_type != nullptr) {
-							item = std::make_unique<stratagus::persistent_item>(item_type, hero);
+							item = std::make_unique<wyrmgus::persistent_item>(item_type, hero);
 						} else {
 							fprintf(stderr, "Item type \"%s\" doesn't exist.\n", item_ident.c_str());
 							item.reset();
@@ -570,7 +570,7 @@ static int CclDefineCustomHero(lua_State *l)
 						}
 					} else if (!strcmp(value, "spell")) {
 						std::string spell_ident = LuaToString(l, -1, k + 1);
-						stratagus::spell *spell = stratagus::spell::get(spell_ident);
+						wyrmgus::spell *spell = wyrmgus::spell::get(spell_ident);
 						item->Spell = spell;
 					} else if (!strcmp(value, "work")) {
 						std::string upgrade_ident = LuaToString(l, -1, k + 1);
@@ -592,7 +592,7 @@ static int CclDefineCustomHero(lua_State *l)
 						item->Name = LuaToString(l, -1, k + 1);
 					} else if (!strcmp(value, "unique")) {
 						std::string unique_ident = LuaToString(l, -1, k + 1);
-						stratagus::unique_item *unique_item = stratagus::unique_item::try_get(unique_ident);
+						wyrmgus::unique_item *unique_item = wyrmgus::unique_item::try_get(unique_ident);
 						item->unique = unique_item;
 						if (unique_item != nullptr) {
 							item->Name = unique_item->get_name();
@@ -631,7 +631,7 @@ static int CclDefineCustomHero(lua_State *l)
 			const int args = lua_rawlen(l, -1);
 			for (int j = 0; j < args; ++j) {
 				std::string unit_type_ident = LuaToString(l, -1, j + 1);
-				stratagus::unit_type *unit_type = stratagus::unit_type::get(unit_type_ident);
+				wyrmgus::unit_type *unit_type = wyrmgus::unit_type::get(unit_type_ident);
 				hero->ForbiddenUpgrades.push_back(unit_type);
 			}
 		} else if (!strcmp(value, "Icon")) {
@@ -647,9 +647,9 @@ static int CclDefineCustomHero(lua_State *l)
 		}
 	}
 	
-	if (hero->get_gender() == stratagus::gender::none) { //if no gender was set, have the hero be the same gender as the unit type (if the unit type has it predefined)
+	if (hero->get_gender() == wyrmgus::gender::none) { //if no gender was set, have the hero be the same gender as the unit type (if the unit type has it predefined)
 		if (hero->get_unit_type() != nullptr && hero->get_unit_type()->DefaultStat.Variables[GENDER_INDEX].Value != 0) {
-			hero->gender = static_cast<stratagus::gender>(hero->get_unit_type()->DefaultStat.Variables[GENDER_INDEX].Value);
+			hero->gender = static_cast<wyrmgus::gender>(hero->get_unit_type()->DefaultStat.Variables[GENDER_INDEX].Value);
 		}
 	}
 	
@@ -677,7 +677,7 @@ static int CclGetCharacterData(lua_State *l)
 		LuaError(l, "incorrect argument");
 	}
 	std::string character_name = LuaToString(l, 1);
-	stratagus::character *character = stratagus::character::get(character_name);
+	wyrmgus::character *character = wyrmgus::character::get(character_name);
 	const char *data = LuaToString(l, 2);
 
 	if (!strcmp(data, "Name")) {
@@ -743,7 +743,7 @@ static int CclGetCharacterData(lua_State *l)
 		lua_pushnumber(l, character->DeathDate.Year);
 		return 1;
 	} else if (!strcmp(data, "Gender")) {
-		lua_pushstring(l, stratagus::gender_to_string(character->get_gender()).c_str());
+		lua_pushstring(l, wyrmgus::gender_to_string(character->get_gender()).c_str());
 		return 1;
 	} else if (!strcmp(data, "Level")) {
 		lua_pushnumber(l, character->get_level());
@@ -837,7 +837,7 @@ static int CclGetCustomHeroData(lua_State *l)
 		LuaError(l, "incorrect argument");
 	}
 	std::string character_name = LuaToString(l, 1);
-	stratagus::character *character = GetCustomHero(character_name);
+	wyrmgus::character *character = GetCustomHero(character_name);
 	if (!character) {
 		LuaError(l, "Custom hero \"%s\" doesn't exist." _C_ character_name.c_str());
 	}
@@ -860,7 +860,7 @@ static int CclGetCustomHeroData(lua_State *l)
 		}
 		return 1;
 	} else if (!strcmp(data, "Gender")) {
-		lua_pushstring(l, stratagus::gender_to_string(character->get_gender()).c_str());
+		lua_pushstring(l, wyrmgus::gender_to_string(character->get_gender()).c_str());
 		return 1;
 	} else if (!strcmp(data, "Level")) {
 		lua_pushnumber(l, character->get_level());
@@ -892,7 +892,7 @@ static int CclGetCustomHeroData(lua_State *l)
 static int CclGetCharacters(lua_State *l)
 {
 	std::vector<std::string> character_names;
-	for (const stratagus::character *character : stratagus::character::get_all()) {
+	for (const wyrmgus::character *character : wyrmgus::character::get_all()) {
 		character_names.push_back(character->Ident);
 	}
 	
@@ -908,7 +908,7 @@ static int CclGetCharacters(lua_State *l)
 static int CclGetCustomHeroes(lua_State *l)
 {
 	std::vector<std::string> character_names;
-	for (std::map<std::string, stratagus::character *>::iterator iterator = CustomHeroes.begin(); iterator != CustomHeroes.end(); ++iterator) {
+	for (std::map<std::string, wyrmgus::character *>::iterator iterator = CustomHeroes.begin(); iterator != CustomHeroes.end(); ++iterator) {
 		character_names.push_back(iterator->first);
 	}
 	
@@ -945,7 +945,7 @@ static int CclCharacter(lua_State *l)
 		LuaError(l, "incorrect argument");
 	}
 
-	stratagus::character *character = stratagus::character::try_get(ident);
+	wyrmgus::character *character = wyrmgus::character::try_get(ident);
 	if (!character) {
 		return 0;
 	}
@@ -957,7 +957,7 @@ static int CclCharacter(lua_State *l)
 		++j;
 
 		if (!strcmp(value, "deity")) {
-			stratagus::deity *deity = stratagus::deity::get(LuaToString(l, 2, j + 1));
+			wyrmgus::deity *deity = wyrmgus::deity::get(LuaToString(l, 2, j + 1));
 			character->Deities.push_back(deity);
 		} else {
 			fprintf(stderr, "Character: Unsupported tag: %s\n", value);

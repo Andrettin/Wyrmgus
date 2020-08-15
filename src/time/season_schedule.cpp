@@ -141,7 +141,7 @@ void CSeasonSchedule::ProcessConfigData(const CConfigData *config_data)
 	
 	for (const CConfigData *child_config_data : config_data->Children) {
 		if (child_config_data->Tag == "scheduled_season") {
-			stratagus::season *season = nullptr;
+			wyrmgus::season *season = nullptr;
 			unsigned hours = 0;
 				
 			for (size_t j = 0; j < child_config_data->Properties.size(); ++j) {
@@ -149,7 +149,7 @@ void CSeasonSchedule::ProcessConfigData(const CConfigData *config_data)
 				std::string value = child_config_data->Properties[j].second;
 				
 				if (key == "season") {
-					season = stratagus::season::get(value);
+					season = wyrmgus::season::get(value);
 				} else if (key == "days") {
 					hours = std::stoi(value) * this->HoursPerDay;
 				} else if (key == "hours") {

@@ -51,7 +51,7 @@
 **  @param text   text to print on button
 */
 void DrawUIButton(ButtonStyle *style, unsigned flags, int x, int y,
-				  const std::string &text, const bool grayscale, const stratagus::player_color *player_color, bool transparent, int show_percent)
+				  const std::string &text, const bool grayscale, const wyrmgus::player_color *player_color, bool transparent, int show_percent)
 {
 	ButtonStyleProperties *p;
 
@@ -76,7 +76,7 @@ void DrawUIButton(ButtonStyle *style, unsigned flags, int x, int y,
 		}
 	}
 	if (pimage->Sprite) {
-		pimage->Sprite->Load(false, stratagus::defines::get()->get_scale_factor());
+		pimage->Sprite->Load(false, wyrmgus::defines::get()->get_scale_factor());
 	}
 	if (pimage->Sprite) {
 		CPlayerColorGraphic *colorGraphic = dynamic_cast<CPlayerColorGraphic *>(pimage->Sprite);

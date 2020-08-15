@@ -3,7 +3,7 @@
 #include "database/database.h"
 #include "util/container_util.h"
 
-namespace stratagus {
+namespace wyrmgus {
 
 void module::process_sml_property(const sml_property &property)
 {

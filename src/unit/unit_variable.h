@@ -27,7 +27,7 @@
 
 #pragma once
 
-namespace stratagus {
+namespace wyrmgus {
 
 /**
 **  User defined variable type.

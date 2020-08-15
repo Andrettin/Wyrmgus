@@ -38,7 +38,7 @@ struct lua_State;
 
 int CclDefineDeity(lua_State *l);
 
-namespace stratagus {
+namespace wyrmgus {
 
 class civilization;
 class deity_domain;
@@ -51,9 +51,9 @@ class deity final : public detailed_data_entry, public data_type<deity>, public 
 {
 	Q_OBJECT
 
-	Q_PROPERTY(stratagus::gender gender MEMBER gender READ get_gender)
+	Q_PROPERTY(wyrmgus::gender gender MEMBER gender READ get_gender)
 	Q_PROPERTY(bool major MEMBER major READ is_major)
-	Q_PROPERTY(stratagus::plane* home_plane MEMBER home_plane READ get_home_plane)
+	Q_PROPERTY(wyrmgus::plane* home_plane MEMBER home_plane READ get_home_plane)
 	Q_PROPERTY(QVariantList civilizations READ get_civilizations_qvariant_list)
 	Q_PROPERTY(QVariantList religions READ get_religions_qvariant_list)
 	Q_PROPERTY(QVariantList domains READ get_domains_qvariant_list)
@@ -145,7 +145,7 @@ public:
 	Q_INVOKABLE void remove_domain(deity_domain *domain);
 
 private:
-	stratagus::gender gender;
+	wyrmgus::gender gender;
 	bool major = false;							//whether the deity is a major one or not
 public:
 	CPantheon *Pantheon = nullptr;				//pantheon to which the deity belongs

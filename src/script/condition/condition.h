@@ -32,7 +32,7 @@ class CPlayer;
 class CUnit;
 class CUpgrade;
 
-namespace stratagus {
+namespace wyrmgus {
 
 class button;
 class season;
@@ -68,10 +68,10 @@ public:
 extern void DependenciesCclRegister();
 
 /// Print all unit conditions into string
-extern std::string PrintConditions(const CPlayer &player, const stratagus::button &button);
+extern std::string PrintConditions(const CPlayer &player, const wyrmgus::button &button);
 
 /// Check conditions for player
-extern bool CheckConditions(const stratagus::unit_type *target, const CPlayer *player, bool ignore_units = false, bool is_precondition = false, bool is_neutral_use = false);
+extern bool CheckConditions(const wyrmgus::unit_type *target, const CPlayer *player, bool ignore_units = false, bool is_precondition = false, bool is_neutral_use = false);
 extern bool CheckConditions(const CUpgrade *target, const CPlayer *player, bool ignore_units = false, bool is_precondition = false, bool is_neutral_use = false);
 
 template <typename T>
@@ -89,7 +89,7 @@ extern bool CheckConditions(const T *target, const CPlayer *player, bool ignore_
 }
 
 /// Check conditions for unit
-extern bool CheckConditions(const stratagus::unit_type *target, const CUnit *unit, bool ignore_units = false, bool is_precondition = false);
+extern bool CheckConditions(const wyrmgus::unit_type *target, const CUnit *unit, bool ignore_units = false, bool is_precondition = false);
 extern bool CheckConditions(const CUpgrade *target, const CUnit *unit, bool ignore_units = false, bool is_precondition = false);
 
 template <typename T>

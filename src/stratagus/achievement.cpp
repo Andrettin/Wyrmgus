@@ -122,7 +122,7 @@ void CAchievement::ProcessConfigData(const CConfigData *config_data)
 		} else if (key == "description") {
 			this->description = value;
 		} else if (key == "player_color") {
-			this->PlayerColor = stratagus::player_color::get(value);
+			this->PlayerColor = wyrmgus::player_color::get(value);
 		} else if (key == "character_level") {
 			this->CharacterLevel = std::stoi(value);
 		} else if (key == "difficulty") {
@@ -137,13 +137,13 @@ void CAchievement::ProcessConfigData(const CConfigData *config_data)
 			this->Icon.Icon = nullptr;
 			this->Icon.Load();
 		} else if (key == "character") {
-			const stratagus::character *character = stratagus::character::get(value);
+			const wyrmgus::character *character = wyrmgus::character::get(value);
 			this->Character = character;
 		} else if (key == "character_type") {
-			const stratagus::unit_type *unit_type = stratagus::unit_type::get(value);
+			const wyrmgus::unit_type *unit_type = wyrmgus::unit_type::get(value);
 			this->CharacterType = unit_type;
 		} else if (key == "required_quest") {
-			const stratagus::quest *required_quest = stratagus::quest::get(value);
+			const wyrmgus::quest *required_quest = wyrmgus::quest::get(value);
 			this->RequiredQuests.push_back(required_quest);
 		} else {
 			fprintf(stderr, "Invalid achievement property: \"%s\".\n", key.c_str());
@@ -157,7 +157,7 @@ bool CAchievement::CanObtain() const
 		return false;
 	}
 
-	for (const stratagus::quest *required_quest : this->RequiredQuests) {
+	for (const wyrmgus::quest *required_quest : this->RequiredQuests) {
 		if (!required_quest->Completed || (this->Difficulty != -1 && required_quest->HighestCompletedDifficulty < this->Difficulty)) {
 			return false;
 		}
@@ -172,7 +172,7 @@ bool CAchievement::CanObtain() const
 		}
 	} else if (this->CharacterType || this->CharacterLevel) {
 		bool found_hero = false;
-		for (std::map<std::string, stratagus::character *>::iterator iterator = CustomHeroes.begin(); iterator != CustomHeroes.end(); ++iterator) {
+		for (std::map<std::string, wyrmgus::character *>::iterator iterator = CustomHeroes.begin(); iterator != CustomHeroes.end(); ++iterator) {
 			if (this->CharacterType && iterator->second->get_unit_type() != this->CharacterType) {
 				continue;
 			}
@@ -215,7 +215,7 @@ int CAchievement::GetProgress() const
 
 	int progress = 0;
 
-	for (const stratagus::quest *required_quest : this->RequiredQuests) {
+	for (const wyrmgus::quest *required_quest : this->RequiredQuests) {
 		if (required_quest->Completed && (this->Difficulty == -1 || required_quest->HighestCompletedDifficulty >= this->Difficulty)) {
 			progress++;
 		}
@@ -227,7 +227,7 @@ int CAchievement::GetProgress() const
 		}
 	} else if (this->CharacterLevel) {
 		int highest_level = 0;
-		for (std::map<std::string, stratagus::character *>::iterator iterator = CustomHeroes.begin(); iterator != CustomHeroes.end(); ++iterator) {
+		for (std::map<std::string, wyrmgus::character *>::iterator iterator = CustomHeroes.begin(); iterator != CustomHeroes.end(); ++iterator) {
 			highest_level = std::max(highest_level, iterator->second->get_level());
 			if (highest_level >= this->CharacterLevel) {
 				highest_level = this->CharacterLevel;

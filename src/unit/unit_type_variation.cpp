@@ -39,7 +39,7 @@
 #include "ui/button.h"
 #include "video/video.h"
 
-namespace stratagus {
+namespace wyrmgus {
 
 unit_type_variation::~unit_type_variation()
 {
@@ -149,10 +149,10 @@ void unit_type_variation::ProcessConfigData(const CConfigData *config_data)
 		} else if (key == "item_class_not_equipped") {
 			this->item_classes_not_equipped.insert(string_to_item_class(value));
 		} else if (key == "item_equipped") {
-			const stratagus::unit_type *unit_type = unit_type::get(value);
+			const wyrmgus::unit_type *unit_type = unit_type::get(value);
 			this->ItemsEquipped.push_back(unit_type);
 		} else if (key == "item_not_equipped") {
-			const stratagus::unit_type *unit_type = unit_type::get(value);
+			const wyrmgus::unit_type *unit_type = unit_type::get(value);
 			this->ItemsNotEquipped.push_back(unit_type);
 		} else if (key == "terrain") {
 			const terrain_type *terrain_type = terrain_type::get(value);

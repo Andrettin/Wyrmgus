@@ -69,7 +69,7 @@ public:
 	Spell_SpawnMissile() : 
 		StartPoint(LocBaseCaster), EndPoint(LocBaseTarget) {}
 	virtual void ProcessConfigData(const CConfigData *config_data) override;
-	virtual int Cast(CUnit &caster, const stratagus::spell &spell,
+	virtual int Cast(CUnit &caster, const wyrmgus::spell &spell,
 					 CUnit *target, const Vec2i &goalPos, int z, int modifier);
 	virtual void Parse(lua_State *lua, int startIndex, int endIndex);
 
@@ -85,5 +85,5 @@ private:
 	//Wyrmgus end
 	SpellActionMissileLocation StartPoint;	/// Start point description.
 	SpellActionMissileLocation EndPoint;	/// Start point description.
-	stratagus::missile_type *Missile = nullptr;			/// Missile fired on cast
+	wyrmgus::missile_type *Missile = nullptr;			/// Missile fired on cast
 };

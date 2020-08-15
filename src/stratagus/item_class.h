@@ -27,7 +27,7 @@
 
 #pragma once
 
-namespace stratagus {
+namespace wyrmgus {
 
 enum class item_slot;
 
@@ -227,4 +227,4 @@ inline bool is_consumable_item_class(const item_class item_class)
 
 }
 
-Q_DECLARE_METATYPE(stratagus::item_class)
+Q_DECLARE_METATYPE(wyrmgus::item_class)

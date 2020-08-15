@@ -33,7 +33,7 @@ struct lua_State;
 
 int CclDefineDialogue(lua_State *l);
 
-namespace stratagus {
+namespace wyrmgus {
 
 class dialogue_node;
 class effect_list;

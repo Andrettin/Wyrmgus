@@ -199,13 +199,13 @@ int ParseAnimInt(const CUnit &unit, const char *parseint)
 	} else if (s[0] == 's') { //spell type detected
 		Assert(goal->CurrentAction() == UnitAction::SpellCast);
 		const COrder_SpellCast &order = *static_cast<COrder_SpellCast *>(goal->CurrentOrder());
-		const stratagus::spell &spell = order.GetSpell();
+		const wyrmgus::spell &spell = order.GetSpell();
 		if (!strcmp(spell.Ident.c_str(), cur)) {
 			return 1;
 		}
 		return 0;
 	} else if (s[0] == 'S') { // check if autocast for this spell available
-		const stratagus::spell *spell = stratagus::spell::get(cur);
+		const wyrmgus::spell *spell = wyrmgus::spell::get(cur);
 		if (unit.is_autocast_spell(spell)) {
 			return 1;
 		}
@@ -349,7 +349,7 @@ static int GetAdvanceIndex(const CAnimation *base, const CAnimation *anim)
 	return -1;
 }
 
-namespace stratagus {
+namespace wyrmgus {
 
 void animation_set::SaveUnitAnim(CFile &file, const CUnit &unit)
 {
@@ -392,7 +392,7 @@ static const CAnimation *Advance(const CAnimation *anim, int n)
 	return anim;
 }
 
-namespace stratagus {
+namespace wyrmgus {
 
 void animation_set::LoadUnitAnim(lua_State *l, CUnit &unit, int luaIndex)
 {
@@ -748,7 +748,7 @@ static std::unique_ptr<CAnimation> ParseAnimation(lua_State *l, int idx)
 	return firstAnim;
 }
 
-namespace stratagus {
+namespace wyrmgus {
 
 void animation_set::AddAnimationToArray(CAnimation *anim)
 {
@@ -774,7 +774,7 @@ static int CclDefineAnimations(lua_State *l)
 	}
 
 	const char *name = LuaToString(l, 1);
-	stratagus::animation_set *anims = stratagus::animation_set::get_or_add(name, nullptr);
+	wyrmgus::animation_set *anims = wyrmgus::animation_set::get_or_add(name, nullptr);
 
 	lua_pushnil(l);
 	while (lua_next(l, 2)) {

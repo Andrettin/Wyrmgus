@@ -29,7 +29,7 @@
 
 class CUpgrade;
 
-namespace stratagus {
+namespace wyrmgus {
 
 struct upgrade_compare
 {

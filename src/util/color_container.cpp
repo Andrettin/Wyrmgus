@@ -31,7 +31,7 @@
 
 #include "util/color_container.h"
 
-namespace stratagus {
+namespace wyrmgus {
 
 bool color_compare::operator()(const QColor &color, const QColor &other_color) const
 {

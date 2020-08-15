@@ -29,7 +29,7 @@
 
 #include "item_slot.h"
 
-namespace stratagus {
+namespace wyrmgus {
 
 item_slot get_item_class_slot(const item_class item_class)
 {

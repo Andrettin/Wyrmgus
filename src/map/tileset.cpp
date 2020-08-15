@@ -780,199 +780,199 @@ unsigned CTileset::getOrcWallTileIndex_destroyed(int dirFlag) const
 	return tileIndex;
 }
 
-std::string GetTransitionTypeNameById(const stratagus::tile_transition_type transition_type)
+std::string GetTransitionTypeNameById(const wyrmgus::tile_transition_type transition_type)
 {
-	if (transition_type == stratagus::tile_transition_type::north) {
+	if (transition_type == wyrmgus::tile_transition_type::north) {
 		return "north";
-	} else if (transition_type == stratagus::tile_transition_type::south) {
+	} else if (transition_type == wyrmgus::tile_transition_type::south) {
 		return "south";
-	} else if (transition_type == stratagus::tile_transition_type::west) {
+	} else if (transition_type == wyrmgus::tile_transition_type::west) {
 		return "west";
-	} else if (transition_type == stratagus::tile_transition_type::east) {
+	} else if (transition_type == wyrmgus::tile_transition_type::east) {
 		return "east";
-	} else if (transition_type == stratagus::tile_transition_type::northwest_outer) {
+	} else if (transition_type == wyrmgus::tile_transition_type::northwest_outer) {
 		return "northwest-outer";
-	} else if (transition_type == stratagus::tile_transition_type::northeast_outer) {
+	} else if (transition_type == wyrmgus::tile_transition_type::northeast_outer) {
 		return "northeast-outer";
-	} else if (transition_type == stratagus::tile_transition_type::southwest_outer) {
+	} else if (transition_type == wyrmgus::tile_transition_type::southwest_outer) {
 		return "southwest-outer";
-	} else if (transition_type == stratagus::tile_transition_type::southeast_outer) {
+	} else if (transition_type == wyrmgus::tile_transition_type::southeast_outer) {
 		return "southeast-outer";
-	} else if (transition_type == stratagus::tile_transition_type::northwest_inner) {
+	} else if (transition_type == wyrmgus::tile_transition_type::northwest_inner) {
 		return "northwest-inner";
-	} else if (transition_type == stratagus::tile_transition_type::northeast_inner) {
+	} else if (transition_type == wyrmgus::tile_transition_type::northeast_inner) {
 		return "northeast-inner";
-	} else if (transition_type == stratagus::tile_transition_type::southwest_inner) {
+	} else if (transition_type == wyrmgus::tile_transition_type::southwest_inner) {
 		return "southwest-inner";
-	} else if (transition_type == stratagus::tile_transition_type::southeast_inner) {
+	} else if (transition_type == wyrmgus::tile_transition_type::southeast_inner) {
 		return "southeast-inner";
-	} else if (transition_type == stratagus::tile_transition_type::northwest_southeast_inner) {
+	} else if (transition_type == wyrmgus::tile_transition_type::northwest_southeast_inner) {
 		return "northwest-southeast-inner";
-	} else if (transition_type == stratagus::tile_transition_type::northeast_southwest_inner) {
+	} else if (transition_type == wyrmgus::tile_transition_type::northeast_southwest_inner) {
 		return "northeast-southwest-inner";
-	} else if (transition_type == stratagus::tile_transition_type::single) {
+	} else if (transition_type == wyrmgus::tile_transition_type::single) {
 		return "single";
-	} else if (transition_type == stratagus::tile_transition_type::north_single) {
+	} else if (transition_type == wyrmgus::tile_transition_type::north_single) {
 		return "north-single";
-	} else if (transition_type == stratagus::tile_transition_type::south_single) {
+	} else if (transition_type == wyrmgus::tile_transition_type::south_single) {
 		return "south-single";
-	} else if (transition_type == stratagus::tile_transition_type::west_single) {
+	} else if (transition_type == wyrmgus::tile_transition_type::west_single) {
 		return "west-single";
-	} else if (transition_type == stratagus::tile_transition_type::east_single) {
+	} else if (transition_type == wyrmgus::tile_transition_type::east_single) {
 		return "east-single";
-	} else if (transition_type == stratagus::tile_transition_type::north_south) {
+	} else if (transition_type == wyrmgus::tile_transition_type::north_south) {
 		return "north-south";
-	} else if (transition_type == stratagus::tile_transition_type::west_east) {
+	} else if (transition_type == wyrmgus::tile_transition_type::west_east) {
 		return "west-east";
-	} else if (transition_type == stratagus::tile_transition_type::northwest_northeast_southwest_southeast_inner) {
+	} else if (transition_type == wyrmgus::tile_transition_type::northwest_northeast_southwest_southeast_inner) {
 		return "northwest-northeast-southwest-southeast-inner";
-	} else if (transition_type == stratagus::tile_transition_type::northwest_northeast_inner) {
+	} else if (transition_type == wyrmgus::tile_transition_type::northwest_northeast_inner) {
 		return "northwest-northeast-inner";
-	} else if (transition_type == stratagus::tile_transition_type::southwest_southeast_inner) {
+	} else if (transition_type == wyrmgus::tile_transition_type::southwest_southeast_inner) {
 		return "southwest-southeast-inner";
-	} else if (transition_type == stratagus::tile_transition_type::northwest_southwest_inner) {
+	} else if (transition_type == wyrmgus::tile_transition_type::northwest_southwest_inner) {
 		return "northwest-southwest-inner";
-	} else if (transition_type == stratagus::tile_transition_type::northeast_southeast_inner) {
+	} else if (transition_type == wyrmgus::tile_transition_type::northeast_southeast_inner) {
 		return "northeast-southeast-inner";
-	} else if (transition_type == stratagus::tile_transition_type::northwest_northeast_southwest_inner) {
+	} else if (transition_type == wyrmgus::tile_transition_type::northwest_northeast_southwest_inner) {
 		return "northwest-northeast-southwest-inner";
-	} else if (transition_type == stratagus::tile_transition_type::northwest_northeast_southeast_inner) {
+	} else if (transition_type == wyrmgus::tile_transition_type::northwest_northeast_southeast_inner) {
 		return "northwest-northeast-southeast-inner";
-	} else if (transition_type == stratagus::tile_transition_type::northwest_southwest_southeast_inner) {
+	} else if (transition_type == wyrmgus::tile_transition_type::northwest_southwest_southeast_inner) {
 		return "northwest-southwest-southeast-inner";
-	} else if (transition_type == stratagus::tile_transition_type::northeast_southwest_southeast_inner) {
+	} else if (transition_type == wyrmgus::tile_transition_type::northeast_southwest_southeast_inner) {
 		return "northeast-southwest-southeast-inner";
-	} else if (transition_type == stratagus::tile_transition_type::north_southwest_inner_southeast_inner) {
+	} else if (transition_type == wyrmgus::tile_transition_type::north_southwest_inner_southeast_inner) {
 		return "north-southwest-inner-southeast-inner";
-	} else if (transition_type == stratagus::tile_transition_type::north_southwest_inner) {
+	} else if (transition_type == wyrmgus::tile_transition_type::north_southwest_inner) {
 		return "north-southwest-inner";
-	} else if (transition_type == stratagus::tile_transition_type::north_southeast_inner) {
+	} else if (transition_type == wyrmgus::tile_transition_type::north_southeast_inner) {
 		return "north-southeast-inner";
-	} else if (transition_type == stratagus::tile_transition_type::south_northwest_inner_northeast_inner) {
+	} else if (transition_type == wyrmgus::tile_transition_type::south_northwest_inner_northeast_inner) {
 		return "south-northwest-inner-northeast-inner";
-	} else if (transition_type == stratagus::tile_transition_type::south_northwest_inner) {
+	} else if (transition_type == wyrmgus::tile_transition_type::south_northwest_inner) {
 		return "south-northwest-inner";
-	} else if (transition_type == stratagus::tile_transition_type::south_northeast_inner) {
+	} else if (transition_type == wyrmgus::tile_transition_type::south_northeast_inner) {
 		return "south-northeast-inner";
-	} else if (transition_type == stratagus::tile_transition_type::west_northeast_inner_southeast_inner) {
+	} else if (transition_type == wyrmgus::tile_transition_type::west_northeast_inner_southeast_inner) {
 		return "west-northeast-inner-southeast-inner";
-	} else if (transition_type == stratagus::tile_transition_type::west_northeast_inner) {
+	} else if (transition_type == wyrmgus::tile_transition_type::west_northeast_inner) {
 		return "west-northeast-inner";
-	} else if (transition_type == stratagus::tile_transition_type::west_southeast_inner) {
+	} else if (transition_type == wyrmgus::tile_transition_type::west_southeast_inner) {
 		return "west-southeast-inner";
-	} else if (transition_type == stratagus::tile_transition_type::east_northwest_inner_southwest_inner) {
+	} else if (transition_type == wyrmgus::tile_transition_type::east_northwest_inner_southwest_inner) {
 		return "east-northwest-inner-southwest-inner";
-	} else if (transition_type == stratagus::tile_transition_type::east_northwest_inner) {
+	} else if (transition_type == wyrmgus::tile_transition_type::east_northwest_inner) {
 		return "east-northwest-inner";
-	} else if (transition_type == stratagus::tile_transition_type::east_southwest_inner) {
+	} else if (transition_type == wyrmgus::tile_transition_type::east_southwest_inner) {
 		return "east-southwest-inner";
-	} else if (transition_type == stratagus::tile_transition_type::northwest_outer_southeast_inner) {
+	} else if (transition_type == wyrmgus::tile_transition_type::northwest_outer_southeast_inner) {
 		return "northwest-outer-southeast-inner";
-	} else if (transition_type == stratagus::tile_transition_type::northeast_outer_southwest_inner) {
+	} else if (transition_type == wyrmgus::tile_transition_type::northeast_outer_southwest_inner) {
 		return "northeast-outer-southwest-inner";
-	} else if (transition_type == stratagus::tile_transition_type::southwest_outer_northeast_inner) {
+	} else if (transition_type == wyrmgus::tile_transition_type::southwest_outer_northeast_inner) {
 		return "southwest-outer-northeast-inner";
-	} else if (transition_type == stratagus::tile_transition_type::southeast_outer_northwest_inner) {
+	} else if (transition_type == wyrmgus::tile_transition_type::southeast_outer_northwest_inner) {
 		return "southeast-outer-northwest-inner";
 	}
 
 	throw std::runtime_error("Invalid tile transition type: \"" + std::to_string(static_cast<int>(transition_type)) + "\".");
 }
 
-stratagus::tile_transition_type GetTransitionTypeIdByName(const std::string &transition_type)
+wyrmgus::tile_transition_type GetTransitionTypeIdByName(const std::string &transition_type)
 {
 	if (transition_type == "north") {
-		return stratagus::tile_transition_type::north;
+		return wyrmgus::tile_transition_type::north;
 	} else if (transition_type == "south") {
-		return stratagus::tile_transition_type::south;
+		return wyrmgus::tile_transition_type::south;
 	} else if (transition_type == "west") {
-		return stratagus::tile_transition_type::west;
+		return wyrmgus::tile_transition_type::west;
 	} else if (transition_type == "east") {
-		return stratagus::tile_transition_type::east;
+		return wyrmgus::tile_transition_type::east;
 	} else if (transition_type == "northwest-outer") {
-		return stratagus::tile_transition_type::northwest_outer;
+		return wyrmgus::tile_transition_type::northwest_outer;
 	} else if (transition_type == "northeast-outer") {
-		return stratagus::tile_transition_type::northeast_outer;
+		return wyrmgus::tile_transition_type::northeast_outer;
 	} else if (transition_type == "southwest-outer") {
-		return stratagus::tile_transition_type::southwest_outer;
+		return wyrmgus::tile_transition_type::southwest_outer;
 	} else if (transition_type == "southeast-outer") {
-		return stratagus::tile_transition_type::southeast_outer;
+		return wyrmgus::tile_transition_type::southeast_outer;
 	} else if (transition_type == "northwest-inner") {
-		return stratagus::tile_transition_type::northwest_inner;
+		return wyrmgus::tile_transition_type::northwest_inner;
 	} else if (transition_type == "northeast-inner") {
-		return stratagus::tile_transition_type::northeast_inner;
+		return wyrmgus::tile_transition_type::northeast_inner;
 	} else if (transition_type == "southwest-inner") {
-		return stratagus::tile_transition_type::southwest_inner;
+		return wyrmgus::tile_transition_type::southwest_inner;
 	} else if (transition_type == "southeast-inner") {
-		return stratagus::tile_transition_type::southeast_inner;
+		return wyrmgus::tile_transition_type::southeast_inner;
 	} else if (transition_type == "northwest-southeast-inner") {
-		return stratagus::tile_transition_type::northwest_southeast_inner;
+		return wyrmgus::tile_transition_type::northwest_southeast_inner;
 	} else if (transition_type == "northeast-southwest-inner") {
-		return stratagus::tile_transition_type::northeast_southwest_inner;
+		return wyrmgus::tile_transition_type::northeast_southwest_inner;
 	} else if (transition_type == "single") {
-		return stratagus::tile_transition_type::single;
+		return wyrmgus::tile_transition_type::single;
 	} else if (transition_type == "north-single") {
-		return stratagus::tile_transition_type::north_single;
+		return wyrmgus::tile_transition_type::north_single;
 	} else if (transition_type == "south-single") {
-		return stratagus::tile_transition_type::south_single;
+		return wyrmgus::tile_transition_type::south_single;
 	} else if (transition_type == "west-single") {
-		return stratagus::tile_transition_type::west_single;
+		return wyrmgus::tile_transition_type::west_single;
 	} else if (transition_type == "east-single") {
-		return stratagus::tile_transition_type::east_single;
+		return wyrmgus::tile_transition_type::east_single;
 	} else if (transition_type == "north-south") {
-		return stratagus::tile_transition_type::north_south;
+		return wyrmgus::tile_transition_type::north_south;
 	} else if (transition_type == "west-east") {
-		return stratagus::tile_transition_type::west_east;
+		return wyrmgus::tile_transition_type::west_east;
 	} else if (transition_type == "northwest-northeast-southwest-southeast-inner") {
-		return stratagus::tile_transition_type::northwest_northeast_southwest_southeast_inner;
+		return wyrmgus::tile_transition_type::northwest_northeast_southwest_southeast_inner;
 	} else if (transition_type == "northwest-northeast-inner") {
-		return stratagus::tile_transition_type::northwest_northeast_inner;
+		return wyrmgus::tile_transition_type::northwest_northeast_inner;
 	} else if (transition_type == "southwest-southeast-inner") {
-		return stratagus::tile_transition_type::southwest_southeast_inner;
+		return wyrmgus::tile_transition_type::southwest_southeast_inner;
 	} else if (transition_type == "northwest-southwest-inner") {
-		return stratagus::tile_transition_type::northwest_southwest_inner;
+		return wyrmgus::tile_transition_type::northwest_southwest_inner;
 	} else if (transition_type == "northeast-southeast-inner") {
-		return stratagus::tile_transition_type::northeast_southeast_inner;
+		return wyrmgus::tile_transition_type::northeast_southeast_inner;
 	} else if (transition_type == "northwest-northeast-southwest-inner") {
-		return stratagus::tile_transition_type::northwest_northeast_southwest_inner;
+		return wyrmgus::tile_transition_type::northwest_northeast_southwest_inner;
 	} else if (transition_type == "northwest-northeast-southeast-inner") {
-		return stratagus::tile_transition_type::northwest_northeast_southeast_inner;
+		return wyrmgus::tile_transition_type::northwest_northeast_southeast_inner;
 	} else if (transition_type == "northwest-southwest-southeast-inner") {
-		return stratagus::tile_transition_type::northwest_southwest_southeast_inner;
+		return wyrmgus::tile_transition_type::northwest_southwest_southeast_inner;
 	} else if (transition_type == "northeast-southwest-southeast-inner") {
-		return stratagus::tile_transition_type::northeast_southwest_southeast_inner;
+		return wyrmgus::tile_transition_type::northeast_southwest_southeast_inner;
 	} else if (transition_type == "north-southwest-inner-southeast-inner") {
-		return stratagus::tile_transition_type::north_southwest_inner_southeast_inner;
+		return wyrmgus::tile_transition_type::north_southwest_inner_southeast_inner;
 	} else if (transition_type == "north-southwest-inner") {
-		return stratagus::tile_transition_type::north_southwest_inner;
+		return wyrmgus::tile_transition_type::north_southwest_inner;
 	} else if (transition_type == "north-southeast-inner") {
-		return stratagus::tile_transition_type::north_southeast_inner;
+		return wyrmgus::tile_transition_type::north_southeast_inner;
 	} else if (transition_type == "south-northwest-inner-northeast-inner") {
-		return stratagus::tile_transition_type::south_northwest_inner_northeast_inner;
+		return wyrmgus::tile_transition_type::south_northwest_inner_northeast_inner;
 	} else if (transition_type == "south-northwest-inner") {
-		return stratagus::tile_transition_type::south_northwest_inner;
+		return wyrmgus::tile_transition_type::south_northwest_inner;
 	} else if (transition_type == "south-northeast-inner") {
-		return stratagus::tile_transition_type::south_northeast_inner;
+		return wyrmgus::tile_transition_type::south_northeast_inner;
 	} else if (transition_type == "west-northeast-inner-southeast-inner") {
-		return stratagus::tile_transition_type::west_northeast_inner_southeast_inner;
+		return wyrmgus::tile_transition_type::west_northeast_inner_southeast_inner;
 	} else if (transition_type == "west-northeast-inner") {
-		return stratagus::tile_transition_type::west_northeast_inner;
+		return wyrmgus::tile_transition_type::west_northeast_inner;
 	} else if (transition_type == "west-southeast-inner") {
-		return stratagus::tile_transition_type::west_southeast_inner;
+		return wyrmgus::tile_transition_type::west_southeast_inner;
 	} else if (transition_type == "east-northwest-inner-southwest-inner") {
-		return stratagus::tile_transition_type::east_northwest_inner_southwest_inner;
+		return wyrmgus::tile_transition_type::east_northwest_inner_southwest_inner;
 	} else if (transition_type == "east-northwest-inner") {
-		return stratagus::tile_transition_type::east_northwest_inner;
+		return wyrmgus::tile_transition_type::east_northwest_inner;
 	} else if (transition_type == "east-southwest-inner") {
-		return stratagus::tile_transition_type::east_southwest_inner;
+		return wyrmgus::tile_transition_type::east_southwest_inner;
 	} else if (transition_type == "northwest-outer-southeast-inner") {
-		return stratagus::tile_transition_type::northwest_outer_southeast_inner;
+		return wyrmgus::tile_transition_type::northwest_outer_southeast_inner;
 	} else if (transition_type == "northeast-outer-southwest-inner") {
-		return stratagus::tile_transition_type::northeast_outer_southwest_inner;
+		return wyrmgus::tile_transition_type::northeast_outer_southwest_inner;
 	} else if (transition_type == "southwest-outer-northeast-inner") {
-		return stratagus::tile_transition_type::southwest_outer_northeast_inner;
+		return wyrmgus::tile_transition_type::southwest_outer_northeast_inner;
 	} else if (transition_type == "southeast-outer-northwest-inner") {
-		return stratagus::tile_transition_type::southeast_outer_northwest_inner;
+		return wyrmgus::tile_transition_type::southeast_outer_northwest_inner;
 	}
 
 	throw std::runtime_error("Invalid tile transition type: \"" + transition_type + "\".");

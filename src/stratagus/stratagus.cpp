@@ -236,10 +236,6 @@ unsigned long __stack = 1000000;
 __attribute__ ((section(".text"))) UBYTE VString[] = "$VER: Wyrmsun " VERSION "\r\n";
 #endif
 
-/*----------------------------------------------------------------------------
---  Variables
-----------------------------------------------------------------------------*/
-
 std::string StratagusLibPath;		/// Path for data directory
 
 /// Name, Version, Copyright
@@ -256,9 +252,6 @@ bool EnableUnitDebug;				/// if enabled, a unit info dump will be created
 ==  MAIN
 ============================================================================*/
 
-/**
-**  Pre menu setup.
-*/
 void PreMenuSetup()
 {
 	//
@@ -908,7 +901,7 @@ Vec2i GetDirectionOffset(int direction)
 void load_database(const bool initial_definition)
 {
 	try {
-		stratagus::database::get()->load(initial_definition);
+		wyrmgus::database::get()->load(initial_definition);
 	} catch (...) {
 		std::throw_with_nested(std::runtime_error("Error loading database."));
 	}
@@ -918,8 +911,8 @@ void load_defines()
 {
 	try {
 		//load the preferences before the defines, as the latter depend on the preferences
-		stratagus::preferences::get()->load();
-		stratagus::database::get()->load_defines();
+		wyrmgus::preferences::get()->load();
+		wyrmgus::database::get()->load_defines();
 	} catch (...) {
 		std::throw_with_nested(std::runtime_error("Error loading defines."));
 	}
@@ -928,7 +921,7 @@ void load_defines()
 void initialize_database()
 {
 	try {
-		stratagus::database::get()->initialize();
+		wyrmgus::database::get()->initialize();
 	} catch (...) {
 		std::throw_with_nested(std::runtime_error("Error initializing database."));
 	}
@@ -936,5 +929,5 @@ void initialize_database()
 
 void save_preferences()
 {
-	stratagus::preferences::get()->save();
+	wyrmgus::preferences::get()->save();
 }

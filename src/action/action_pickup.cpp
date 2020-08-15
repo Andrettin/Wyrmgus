@@ -209,7 +209,7 @@ enum {
 			
 			goal->Remove(&unit);
 			if (!IsNetworkGame() && unit.Character && unit.Player == CPlayer::GetThisPlayer()) { //if the unit has a persistent character, store the item for it
-				auto item = std::make_unique<stratagus::persistent_item>(goal, unit.Character);
+				auto item = std::make_unique<wyrmgus::persistent_item>(goal, unit.Character);
 				unit.Character->add_item(std::move(item));
 				SaveHero(unit.Character);
 			}
@@ -225,7 +225,7 @@ enum {
 			goal
 			&& (
 				goal->Type->BoolFlag[POWERUP_INDEX].value
-				|| (!unit.HasInventory() && goal->Type->BoolFlag[ITEM_INDEX].value && stratagus::is_consumable_item_class(goal->Type->get_item_class()))
+				|| (!unit.HasInventory() && goal->Type->BoolFlag[ITEM_INDEX].value && wyrmgus::is_consumable_item_class(goal->Type->get_item_class()))
 			)
 		) {
 			if (!unit.CriticalOrder) {

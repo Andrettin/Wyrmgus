@@ -34,7 +34,7 @@ class CProvince;
 class CUpgrade;
 class WorldMapTile;
 
-namespace stratagus {
+namespace wyrmgus {
 	class character;
 	class faction;
 	class region;
@@ -91,21 +91,21 @@ public:
 	}
 	
 	std::string Name;
-	stratagus::world *world = nullptr;
+	wyrmgus::world *world = nullptr;
 	int ID;																/// ID of this province
 	bool Water;															/// Whether the province is a water province or not
 	bool Coastal;														/// Whether the province is a coastal province or not
 	std::map<int, std::string> CulturalNames;							/// Names for the province for each different culture/civilization
-	std::map<stratagus::faction *, std::string> FactionCulturalNames;				/// Names for the province for each different faction
-	std::vector<stratagus::faction *> FactionClaims;								/// Factions which have a claim to this province
-	std::vector<stratagus::region *> Regions;										/// Regions to which this province belongs
-	std::map<int, stratagus::faction *> HistoricalOwners;							/// Historical owners of the province, mapped to the year
-	std::map<int, stratagus::faction *> HistoricalClaims;							/// Historical claims over the province, mapped to the year
+	std::map<wyrmgus::faction *, std::string> FactionCulturalNames;				/// Names for the province for each different faction
+	std::vector<wyrmgus::faction *> FactionClaims;								/// Factions which have a claim to this province
+	std::vector<wyrmgus::region *> Regions;										/// Regions to which this province belongs
+	std::map<int, wyrmgus::faction *> HistoricalOwners;							/// Historical owners of the province, mapped to the year
+	std::map<int, wyrmgus::faction *> HistoricalClaims;							/// Historical claims over the province, mapped to the year
 	std::map<int, int> HistoricalCultures;								/// Historical cultures which were predominant in the province, mapped to the year
 	std::map<int, int> HistoricalPopulation;							/// Historical population, mapped to the year
 	std::map<int, std::map<int, bool>> HistoricalSettlementBuildings;	/// Historical settlement buildings, mapped to building unit type id and year
 	std::map<CUpgrade *, std::map<int, bool>> HistoricalModifiers;		/// Historical province modifiers, mapped to the modifier's upgrade and year
-	std::map<std::tuple<int, int>, stratagus::character *> HistoricalGovernors;	/// Historical governors of the province, mapped to the beginning and end of the term
+	std::map<std::tuple<int, int>, wyrmgus::character *> HistoricalGovernors;	/// Historical governors of the province, mapped to the beginning and end of the term
 };
 
 class WorldMapTile
@@ -122,16 +122,16 @@ public:
 	int Resource;								/// The tile's resource, if any
 	bool Capital;								/// Whether the tile is its province's capital
 	Vec2i Position;								/// Position of the tile
-	stratagus::world *world = nullptr;
+	wyrmgus::world *world = nullptr;
 	std::map<std::pair<int,int>, std::vector<std::string>> CulturalTerrainNames;			/// Names for the tile (if it has a certain terrain) for each culture/civilization
-	std::map<std::pair<int, stratagus::faction *>, std::vector<std::string>> FactionCulturalTerrainNames;	/// Names for the tile (if it has a certain terrain) for each faction
+	std::map<std::pair<int, wyrmgus::faction *>, std::vector<std::string>> FactionCulturalTerrainNames;	/// Names for the tile (if it has a certain terrain) for each faction
 	std::map<std::pair<int,int>, std::vector<std::string>> CulturalResourceNames;		/// Names for the tile (if it has a certain resource) for each culture/civilization
-	std::map<std::pair<int, stratagus::faction *>, std::vector<std::string>> FactionCulturalResourceNames;	/// Names for the tile (if it has a certain resource) for each faction
+	std::map<std::pair<int, wyrmgus::faction *>, std::vector<std::string>> FactionCulturalResourceNames;	/// Names for the tile (if it has a certain resource) for each faction
 	std::map<int, std::vector<std::string>> CulturalSettlementNames;	/// Names for the tile's settlement for each faction
-	std::map<stratagus::faction *, std::vector<std::string>> FactionCulturalSettlementNames;	/// Names for the tile's settlement for each faction
-	std::vector<stratagus::faction *> FactionClaims;								/// Factions which have a claim to this tile
-	std::map<int, stratagus::faction *> HistoricalOwners;							/// Historical owners of the tile, mapped to the year
-	std::map<int, stratagus::faction *> HistoricalClaims;							/// Historical claims over the tile, mapped to the year
+	std::map<wyrmgus::faction *, std::vector<std::string>> FactionCulturalSettlementNames;	/// Names for the tile's settlement for each faction
+	std::vector<wyrmgus::faction *> FactionClaims;								/// Factions which have a claim to this tile
+	std::map<int, wyrmgus::faction *> HistoricalOwners;							/// Historical owners of the tile, mapped to the year
+	std::map<int, wyrmgus::faction *> HistoricalClaims;							/// Historical claims over the tile, mapped to the year
 };
 
 /*----------------------------------------------------------------------------

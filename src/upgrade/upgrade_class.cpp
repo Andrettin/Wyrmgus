@@ -33,7 +33,7 @@
 
 #include "util/vector_util.h"
 
-namespace stratagus {
+namespace wyrmgus {
 
 bool upgrade_class::has_upgrade(CUpgrade *upgrade) const
 {

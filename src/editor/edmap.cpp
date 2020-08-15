@@ -190,7 +190,7 @@ static void EditorChangeSurrounding(const Vec2i &pos, int tile)
 	
 	//Wyrmgus start
 	//see if the tile's terrain can be here as is, or if it is needed to change surrounding tiles
-	stratagus::terrain_type *terrain = CMap::Map.GetTileTopTerrain(pos, false, UI.CurrentMapLayer->ID);
+	wyrmgus::terrain_type *terrain = CMap::Map.GetTileTopTerrain(pos, false, UI.CurrentMapLayer->ID);
 	bool overlay = mf.OverlayTerrain ? true : false;
 	if (!terrain->allows_single()) {
 		std::vector<int> transition_directions;
@@ -202,7 +202,7 @@ static void EditorChangeSurrounding(const Vec2i &pos, int tile)
 					if (CMap::Map.Info.IsPointOnMap(adjacent_pos, UI.CurrentMapLayer)) {
 						CMapField &adjacent_mf = *UI.CurrentMapLayer->Field(adjacent_pos);
 							
-						stratagus::terrain_type *adjacent_terrain = CMap::Map.GetTileTerrain(adjacent_pos, overlay, UI.CurrentMapLayer->ID);
+						wyrmgus::terrain_type *adjacent_terrain = CMap::Map.GetTileTerrain(adjacent_pos, overlay, UI.CurrentMapLayer->ID);
 						if (overlay && adjacent_terrain && UI.CurrentMapLayer->Field(adjacent_pos)->OverlayTerrainDestroyed) {
 							adjacent_terrain = nullptr;
 						}
@@ -382,9 +382,9 @@ static void EditorRandomizeTile(int tile, int count, int max_size)
 static void EditorRandomizeUnit(const char *unit_type, int count, int value)
 {
 	const Vec2i mpos(UI.CurrentMapLayer->get_width(), UI.CurrentMapLayer->get_height());
-	stratagus::unit_type *typeptr = stratagus::unit_type::get(unit_type);
+	wyrmgus::unit_type *typeptr = wyrmgus::unit_type::get(unit_type);
 
-	stratagus::unit_type &type = *typeptr;
+	wyrmgus::unit_type &type = *typeptr;
 	const Vec2i tpos(type.get_tile_size());
 
 	for (int i = 0; i < count; ++i) {

@@ -137,15 +137,15 @@ void DoScrollArea(int state, bool fast, bool isKeyboard)
 
 	if (fast) {
 		//Wyrmgus start
-//		stepx = (int)(speed * vp->MapWidth / 2 * stratagus::defines::get()->get_tile_width() * FRAMES_PER_SECOND / 4);
-//		stepy = (int)(speed * vp->MapHeight / 2 * stratagus::defines::get()->get_tile_height() * FRAMES_PER_SECOND / 4);
-		stepx = (int)(speed * stratagus::defines::get()->get_scaled_tile_width() * FRAMES_PER_SECOND / 4 * 4);
-		stepy = (int)(speed * stratagus::defines::get()->get_scaled_tile_height() * FRAMES_PER_SECOND / 4 * 4);
+//		stepx = (int)(speed * vp->MapWidth / 2 * wyrmgus::defines::get()->get_tile_width() * FRAMES_PER_SECOND / 4);
+//		stepy = (int)(speed * vp->MapHeight / 2 * wyrmgus::defines::get()->get_tile_height() * FRAMES_PER_SECOND / 4);
+		stepx = (int)(speed * wyrmgus::defines::get()->get_scaled_tile_width() * FRAMES_PER_SECOND / 4 * 4);
+		stepy = (int)(speed * wyrmgus::defines::get()->get_scaled_tile_height() * FRAMES_PER_SECOND / 4 * 4);
 		//Wyrmgus end
 	} else {// dynamic: let these variables increase up to fast..
 		// FIXME: pixels per second should be configurable
-		stepx = (int)(speed * stratagus::defines::get()->get_scaled_tile_width() * FRAMES_PER_SECOND / 4);
-		stepy = (int)(speed * stratagus::defines::get()->get_scaled_tile_height() * FRAMES_PER_SECOND / 4);
+		stepx = (int)(speed * wyrmgus::defines::get()->get_scaled_tile_width() * FRAMES_PER_SECOND / 4);
+		stepy = (int)(speed * wyrmgus::defines::get()->get_scaled_tile_height() * FRAMES_PER_SECOND / 4);
 	}
 	if ((state & (ScrollLeft | ScrollRight)) && (state & (ScrollLeft | ScrollRight)) != (ScrollLeft | ScrollRight)) {
 		stepx = stepx * 100 * 100 / VideoSyncSpeed / FRAMES_PER_SECOND / (SkipFrames + 1);
@@ -416,7 +416,7 @@ static void GameLogicLoop()
 		//Wyrmgus end
 		
 		if (GameCycle > 0) {
-			stratagus::game::get()->do_cycle();
+			wyrmgus::game::get()->do_cycle();
 		}
 		
 		if (Preference.AutosaveMinutes != 0 && !IsNetworkGame() && GameCycle > 0 && (GameCycle % (CYCLES_PER_MINUTE * Preference.AutosaveMinutes)) == 0) { // autosave every X minutes, if the option is enabled
@@ -522,7 +522,7 @@ void GameMainLoop()
 	SetCallbacks(&GameCallbacks);
 
 	SetVideoSync();
-	GameCursor = UI.get_cursor(stratagus::cursor_type::point);
+	GameCursor = UI.get_cursor(wyrmgus::cursor_type::point);
 	//Wyrmgus start
 	GameEstablishing = false;
 	//Wyrmgus end
@@ -540,15 +540,15 @@ void GameMainLoop()
 	
 	//Wyrmgus start
 	if (GameCycle == 0) { // so that these don't trigger when loading a saved game
-		const stratagus::campaign *current_campaign = stratagus::game::get()->get_current_campaign();
+		const wyrmgus::campaign *current_campaign = wyrmgus::game::get()->get_current_campaign();
 		if (current_campaign != nullptr) {
-			stratagus::game::get()->apply_player_history();
+			wyrmgus::game::get()->apply_player_history();
 		}
 		
 		//if the person player has no faction, bring up the faction choice interface
 		if (CPlayer::GetThisPlayer() && CPlayer::GetThisPlayer()->Faction == -1) {
 			char buf[256];
-			snprintf(buf, sizeof(buf), "if (ChooseFaction ~= nil) then ChooseFaction(\"%s\", \"%s\") end", CPlayer::GetThisPlayer()->Race != -1 ? stratagus::civilization::get_all()[CPlayer::GetThisPlayer()->Race]->get_identifier().c_str() : "", "");
+			snprintf(buf, sizeof(buf), "if (ChooseFaction ~= nil) then ChooseFaction(\"%s\", \"%s\") end", CPlayer::GetThisPlayer()->Race != -1 ? wyrmgus::civilization::get_all()[CPlayer::GetThisPlayer()->Race]->get_identifier().c_str() : "", "");
 			CclCommand(buf);
 		}
 		

@@ -27,7 +27,7 @@
 
 #pragma once
 
-namespace stratagus {
+namespace wyrmgus {
 
 enum class diplomacy_state {
 	allied, //ally with opponent
@@ -102,4 +102,4 @@ inline bool is_vassalage_diplomacy_state(const diplomacy_state state)
 
 }
 
-Q_DECLARE_METATYPE(stratagus::diplomacy_state)
+Q_DECLARE_METATYPE(wyrmgus::diplomacy_state)

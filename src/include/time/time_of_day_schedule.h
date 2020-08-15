@@ -33,7 +33,7 @@
 class CConfigData;
 class CTimeOfDaySchedule;
 
-namespace stratagus {
+namespace wyrmgus {
 	class season;
 	class time_of_day;
 }
@@ -42,15 +42,15 @@ class CScheduledTimeOfDay
 {
 public:
 	void ProcessConfigData(const CConfigData *config_data);
-	int GetHours(const stratagus::season *season = nullptr) const;
+	int GetHours(const wyrmgus::season *season = nullptr) const;
 	
 	unsigned ID = 0;							/// the scheduled time of day's ID within the time of day schedule
-	stratagus::time_of_day *TimeOfDay = nullptr;	/// the time of day that is scheduled
+	wyrmgus::time_of_day *TimeOfDay = nullptr;	/// the time of day that is scheduled
 private:
 	int Hours = 0;								/// the amount of hours the scheduled time of day lasts
 public:
 	CTimeOfDaySchedule *Schedule = nullptr;		/// the schedule to which this time of day belongs
-	std::map<const stratagus::season *, int> SeasonHours;	/// the amount of hours the scheduled time of day lasts in a given season
+	std::map<const wyrmgus::season *, int> SeasonHours;	/// the amount of hours the scheduled time of day lasts in a given season
 };
 
 class CTimeOfDaySchedule : public CTimePeriodSchedule

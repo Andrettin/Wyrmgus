@@ -31,7 +31,7 @@
 
 #pragma once
 
-namespace stratagus {
+namespace wyrmgus {
 
 struct qobject_deleter
 {

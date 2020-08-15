@@ -42,7 +42,7 @@ class CUpgrade;
 class CPlayer;
 enum class ForceType;
 
-namespace stratagus {
+namespace wyrmgus {
 	class site;
 	class unit_class;
 	class unit_type;
@@ -70,7 +70,7 @@ class AiRequestType
 {
 public:
 	unsigned int Count = 0;  /// elements in table
-	stratagus::unit_type *Type = nullptr;     /// the type
+	wyrmgus::unit_type *Type = nullptr;     /// the type
 	int Landmass = 0;		 /// in which landmass the unit should be created
 };
 
@@ -83,7 +83,7 @@ public:
 	AiUnitType() : Want(0), Type(nullptr) {}
 
 	unsigned int Want; /// number of this unit-type wanted
-	stratagus::unit_type *Type;   /// unit-type self
+	wyrmgus::unit_type *Type;   /// unit-type self
 };
 
 /**
@@ -185,7 +185,7 @@ public:
 
 private:
 	void CountTypes(unsigned int *counter, const size_t len);
-	bool IsBelongsTo(const stratagus::unit_type &type);
+	bool IsBelongsTo(const wyrmgus::unit_type &type);
 
 	void Update();
 
@@ -287,13 +287,13 @@ public:
 public:
 	unsigned int Want;  /// requested number
 	unsigned int Made;  /// built number
-	stratagus::unit_type *Type;    /// unit-type
+	wyrmgus::unit_type *Type;    /// unit-type
 	unsigned long Wait; /// wait until this cycle
 	Vec2i Pos;          /// build near pos on map
 	//Wyrmgus start
 	int MapLayer;
 	int Landmass;
-	const stratagus::site *settlement = nullptr;
+	const wyrmgus::site *settlement = nullptr;
 	//Wyrmgus end
 };
 
@@ -353,7 +353,7 @@ public:
 	unsigned long LastExplorationGameCycle = 0;	/// When did the last explore occur?
 	unsigned long LastCanNotMoveGameCycle = 0;	/// Last can not move cycle
 	std::vector<AiRequestType> UnitTypeRequests;	/// unit-types to build/train request,priority list
-	std::vector<stratagus::unit_type *> UpgradeToRequests;		/// Upgrade to unit-type requested and priority list
+	std::vector<wyrmgus::unit_type *> UpgradeToRequests;		/// Upgrade to unit-type requested and priority list
 	std::vector<const CUpgrade *> ResearchRequests;		/// Upgrades requested and priority list
 	std::vector<AiBuildQueue> UnitTypeBuilt;		/// What the resource manager should build
 	int LastRepairBuilding = 0;						/// Last building checked for repair in this turn
@@ -374,9 +374,9 @@ public:
 class AiHelper
 {
 public:
-	const std::vector<stratagus::unit_type *> &get_trainers(const stratagus::unit_type *unit_type) const
+	const std::vector<wyrmgus::unit_type *> &get_trainers(const wyrmgus::unit_type *unit_type) const
 	{
-		static std::vector<stratagus::unit_type *> empty_vector;
+		static std::vector<wyrmgus::unit_type *> empty_vector;
 
 		auto find_iterator = this->trainers.find(unit_type);
 		if (find_iterator != this->trainers.end()) {
@@ -386,9 +386,9 @@ public:
 		return empty_vector;
 	}
 
-	const std::vector<const stratagus::unit_class *> &get_trainer_classes(const stratagus::unit_class *unit_class) const
+	const std::vector<const wyrmgus::unit_class *> &get_trainer_classes(const wyrmgus::unit_class *unit_class) const
 	{
-		static std::vector<const stratagus::unit_class *> empty_vector;
+		static std::vector<const wyrmgus::unit_class *> empty_vector;
 
 		auto find_iterator = this->trainer_classes.find(unit_class);
 		if (find_iterator != this->trainer_classes.end()) {
@@ -398,9 +398,9 @@ public:
 		return empty_vector;
 	}
 
-	const std::vector<stratagus::unit_type *> &get_builders(const stratagus::unit_type *unit_type) const
+	const std::vector<wyrmgus::unit_type *> &get_builders(const wyrmgus::unit_type *unit_type) const
 	{
-		static std::vector<stratagus::unit_type *> empty_vector;
+		static std::vector<wyrmgus::unit_type *> empty_vector;
 
 		auto find_iterator = this->builders.find(unit_type);
 		if (find_iterator != this->builders.end()) {
@@ -410,9 +410,9 @@ public:
 		return empty_vector;
 	}
 
-	const std::vector<const stratagus::unit_class *> &get_builder_classes(const stratagus::unit_class *unit_class) const
+	const std::vector<const wyrmgus::unit_class *> &get_builder_classes(const wyrmgus::unit_class *unit_class) const
 	{
-		static std::vector<const stratagus::unit_class *> empty_vector;
+		static std::vector<const wyrmgus::unit_class *> empty_vector;
 
 		auto find_iterator = this->builder_classes.find(unit_class);
 		if (find_iterator != this->builder_classes.end()) {
@@ -422,9 +422,9 @@ public:
 		return empty_vector;
 	}
 
-	const std::vector<stratagus::unit_type *> &get_researchers(const CUpgrade *upgrade) const
+	const std::vector<wyrmgus::unit_type *> &get_researchers(const CUpgrade *upgrade) const
 	{
-		static std::vector<stratagus::unit_type *> empty_vector;
+		static std::vector<wyrmgus::unit_type *> empty_vector;
 
 		auto find_iterator = this->researchers.find(upgrade);
 		if (find_iterator != this->researchers.end()) {
@@ -434,9 +434,9 @@ public:
 		return empty_vector;
 	}
 
-	const std::vector<const stratagus::unit_class *> &get_researcher_classes(const stratagus::upgrade_class *upgrade_class) const
+	const std::vector<const wyrmgus::unit_class *> &get_researcher_classes(const wyrmgus::upgrade_class *upgrade_class) const
 	{
-		static std::vector<const stratagus::unit_class *> empty_vector;
+		static std::vector<const wyrmgus::unit_class *> empty_vector;
 
 		auto find_iterator = this->researcher_classes.find(upgrade_class);
 		if (find_iterator != this->researcher_classes.end()) {
@@ -446,7 +446,7 @@ public:
 		return empty_vector;
 	}
 
-	const std::vector<const CUpgrade *> &get_researched_upgrades(const stratagus::unit_type *unit_type) const
+	const std::vector<const CUpgrade *> &get_researched_upgrades(const wyrmgus::unit_type *unit_type) const
 	{
 		static std::vector<const CUpgrade *> empty_vector;
 
@@ -458,9 +458,9 @@ public:
 		return empty_vector;
 	}
 
-	const std::vector<const stratagus::upgrade_class *> &get_researched_upgrade_classes(const stratagus::unit_class *unit_class) const
+	const std::vector<const wyrmgus::upgrade_class *> &get_researched_upgrade_classes(const wyrmgus::unit_class *unit_class) const
 	{
-		static std::vector<const stratagus::upgrade_class *> empty_vector;
+		static std::vector<const wyrmgus::upgrade_class *> empty_vector;
 
 		auto find_iterator = this->researched_upgrade_classes.find(unit_class);
 		if (find_iterator != this->researched_upgrade_classes.end()) {
@@ -471,69 +471,69 @@ public:
 	}
 
 	//unit types associated with lists of other unit types which can train them
-	std::map<const stratagus::unit_type *, std::vector<stratagus::unit_type *>> trainers;
+	std::map<const wyrmgus::unit_type *, std::vector<wyrmgus::unit_type *>> trainers;
 
 	//unit classes associated with lists of other unit classes which can train them
-	std::map<const stratagus::unit_class *, std::vector<const stratagus::unit_class *>> trainer_classes;
+	std::map<const wyrmgus::unit_class *, std::vector<const wyrmgus::unit_class *>> trainer_classes;
 
 	//(building) unit types associated with lists of other unit types which can build them
-	std::map<const stratagus::unit_type *, std::vector<stratagus::unit_type *>> builders;
+	std::map<const wyrmgus::unit_type *, std::vector<wyrmgus::unit_type *>> builders;
 
 	//(building) unit classes associated with lists of other unit classes which can build them
-	std::map<const stratagus::unit_class *, std::vector<const stratagus::unit_class *>> builder_classes;
+	std::map<const wyrmgus::unit_class *, std::vector<const wyrmgus::unit_class *>> builder_classes;
 
 	/**
 	** The index is the upgrade that should be made, giving a table of all
 	** units/buildings which could do the upgrade.
 	*/
-	std::vector<std::vector<stratagus::unit_type *> > Upgrade;
+	std::vector<std::vector<wyrmgus::unit_type *> > Upgrade;
 
 	//upgrades associated with lists of unit types which can research them
-	std::map<const CUpgrade *, std::vector<stratagus::unit_type *>> researchers;
+	std::map<const CUpgrade *, std::vector<wyrmgus::unit_type *>> researchers;
 
 	//upgrade classes associated with lists of unit classes which can research them
-	std::map<const stratagus::upgrade_class *, std::vector<const stratagus::unit_class *>> researcher_classes;
+	std::map<const wyrmgus::upgrade_class *, std::vector<const wyrmgus::unit_class *>> researcher_classes;
 
 	/**
 	** The index is the unit that should be repaired, giving a table of all
 	** units/buildings which could repair this unit.
 	*/
-	std::vector<std::vector<stratagus::unit_type *> > Repair;
+	std::vector<std::vector<wyrmgus::unit_type *> > Repair;
 	/**
 	** The index is the unit-limit that should be solved, giving a table of all
 	** units/buildings which could reduce this unit-limit.
 	*/
-	std::vector<std::vector<stratagus::unit_type *> > UnitLimit;
+	std::vector<std::vector<wyrmgus::unit_type *> > UnitLimit;
 	/**
 	** The index is the unit that should be made, giving a table of all
 	** units/buildings which are equivalent.
 	*/
-	std::vector<std::vector<stratagus::unit_type *> > Equiv;
+	std::vector<std::vector<wyrmgus::unit_type *> > Equiv;
 
 	/**
 	** The index is the resource id - 1 (we can't mine TIME), giving a table of all
 	** units/buildings/mines which can harvest this resource.
 	*/
-	std::vector<std::vector<stratagus::unit_type *> > Mines;
+	std::vector<std::vector<wyrmgus::unit_type *> > Mines;
 
 	/**
 	** The index is the resource id - 1 (we can't store TIME), giving a table of all
 	** units/buildings/mines which can store this resource.
 	*/
-	std::vector<std::vector<stratagus::unit_type *> > Depots;
+	std::vector<std::vector<wyrmgus::unit_type *> > Depots;
 	
 	//Wyrmgus start
 	/**
 	** The index is the resource id - 1 (we can't trade TIME), giving a table of all
 	** units/buildings/mines which can sell this resource. In index 0 (respective to CopperCost) we store all units with the "Market" tag instead.
 	*/
-	std::vector<std::vector<stratagus::unit_type *> > SellMarkets;
+	std::vector<std::vector<wyrmgus::unit_type *> > SellMarkets;
 	
 	/**
 	** The index is the resource id - 1 (we can't trade TIME), giving a table of all
 	** units/buildings/mines which can buy this resource.
 	*/
-	std::vector<std::vector<stratagus::unit_type *> > BuyMarkets;
+	std::vector<std::vector<wyrmgus::unit_type *> > BuyMarkets;
 
 	/**
 	** The index is the unit type id, giving a table of all
@@ -542,22 +542,22 @@ public:
 	std::vector<std::vector<int> > ProducedResources;
 
 	//unit types associated with lists of upgrades which they can research
-	std::map<const stratagus::unit_type *, std::vector<const CUpgrade *>> researched_upgrades;
+	std::map<const wyrmgus::unit_type *, std::vector<const CUpgrade *>> researched_upgrades;
 
 	//unit classes associated with lists of upgrade classes which they can research
-	std::map<const stratagus::unit_class *, std::vector<const stratagus::upgrade_class *>> researched_upgrade_classes;
+	std::map<const wyrmgus::unit_class *, std::vector<const wyrmgus::upgrade_class *>> researched_upgrade_classes;
 
 	/**
 	** The index is the unit that should perform an upgrade, giving a table of all
 	** possible (non-experience) upgrades for it.
 	*/
-	std::vector<std::vector<stratagus::unit_type *> > UpgradesTo;
+	std::vector<std::vector<wyrmgus::unit_type *> > UpgradesTo;
 	
 	/**
 	** The index is the unit that should acquire an experience upgrade, giving a table of all
 	** possible upgrades for it.
 	*/
-	std::vector<std::vector<stratagus::unit_type *> > ExperienceUpgrades;
+	std::vector<std::vector<wyrmgus::unit_type *> > ExperienceUpgrades;
 	
 	/**
 	** The index is the unit type that should acquire a learnable ability, giving a table of all
@@ -569,7 +569,7 @@ public:
 	** The sole index is 0, giving a table of all
 	** naval transporter units.
 	*/
-	std::vector<std::vector<stratagus::unit_type *> > NavalTransporters;
+	std::vector<std::vector<wyrmgus::unit_type *> > NavalTransporters;
 	//Wyrmgus end
 };
 
@@ -592,9 +592,9 @@ extern PlayerAi *AiPlayer; /// Current AI player
 //
 extern void AiCheckWorkers();
 /// Add unit-type request to resource manager
-extern void AiAddUnitTypeRequest(stratagus::unit_type &type, const int count, const int landmass = 0, const stratagus::site *settlement = nullptr, const Vec2i pos = Vec2i(-1, -1), const int z = 0);
+extern void AiAddUnitTypeRequest(wyrmgus::unit_type &type, const int count, const int landmass = 0, const wyrmgus::site *settlement = nullptr, const Vec2i pos = Vec2i(-1, -1), const int z = 0);
 /// Add upgrade-to request to resource manager
-extern void AiAddUpgradeToRequest(stratagus::unit_type &type);
+extern void AiAddUpgradeToRequest(wyrmgus::unit_type &type);
 /// Add research request to resource manager
 extern void AiAddResearchRequest(const CUpgrade *upgrade);
 /// Periodic called resource manager handler
@@ -602,14 +602,14 @@ extern void AiResourceManager();
 /// Ask the ai to explore around pos
 extern void AiExplore(const Vec2i &pos, int exploreMask);
 /// Make two unittypes be considered equals
-extern void AiNewUnitTypeEquiv(const stratagus::unit_type &a, const stratagus::unit_type &b);
+extern void AiNewUnitTypeEquiv(const wyrmgus::unit_type &a, const wyrmgus::unit_type &b);
 /// Remove any equivalence between unittypes
 extern void AiResetUnitTypeEquiv();
 /// Finds all equivalents units to a given one
-extern int AiFindUnitTypeEquiv(const stratagus::unit_type &type, int *result);
+extern int AiFindUnitTypeEquiv(const wyrmgus::unit_type &type, int *result);
 /// Finds all available equivalents units to a given one, in the preferred order
-extern int AiFindAvailableUnitTypeEquiv(const stratagus::unit_type &type, int *result);
-extern bool AiRequestedTypeAllowed(const CPlayer &player, const stratagus::unit_type &type, bool allow_can_build_builder = false, bool include_upgrade = false);
+extern int AiFindAvailableUnitTypeEquiv(const wyrmgus::unit_type &type, int *result);
+extern bool AiRequestedTypeAllowed(const CPlayer &player, const wyrmgus::unit_type &type, bool allow_can_build_builder = false, bool include_upgrade = false);
 extern int AiGetBuildRequestsCount(const PlayerAi &pai, int (&counter)[UnitTypeMax]);
 
 extern void AiNewDepotRequest(CUnit &worker);
@@ -627,7 +627,7 @@ extern void AiCheckBuildings();
 // Buildings
 //
 /// Find nice building place
-extern bool AiFindBuildingPlace(const CUnit &worker, const stratagus::unit_type &type, const Vec2i &nearPos, Vec2i *resultPos, bool ignore_exploration, int z, int landmass = 0, const stratagus::site *settlement = nullptr);
+extern bool AiFindBuildingPlace(const CUnit &worker, const wyrmgus::unit_type &type, const Vec2i &nearPos, Vec2i *resultPos, bool ignore_exploration, int z, int landmass = 0, const wyrmgus::site *settlement = nullptr);
 
 //
 // Forces
@@ -669,16 +669,16 @@ extern int AiGetTransportCapacity(int water_landmass);
 /// Get the current requested transport capacity of the AI for a given water zone
 extern int AiGetRequestedTransportCapacity(int water_landmass);
 /// Get the quantity of units belonging to a particular type, possibly including requests
-extern int AiGetUnitTypeCount(const PlayerAi &pai, const stratagus::unit_type *type, const int landmass, const bool include_requests, const bool include_upgrades);
+extern int AiGetUnitTypeCount(const PlayerAi &pai, const wyrmgus::unit_type *type, const int landmass, const bool include_requests, const bool include_upgrades);
 /// Get whether the AI has a particular upgrade, possibly including requests and currently under research upgrades
-extern int AiGetUnitTypeRequestedCount(const PlayerAi &pai, const stratagus::unit_type *type, const int landmass = 0, const stratagus::site *settlement = nullptr);
+extern int AiGetUnitTypeRequestedCount(const PlayerAi &pai, const wyrmgus::unit_type *type, const int landmass = 0, const wyrmgus::site *settlement = nullptr);
 /// Get whether the AI has a particular upgrade, possibly including requests and currently under research upgrades
 extern bool AiHasUpgrade(const PlayerAi &pai, const CUpgrade *upgrade, bool include_requests);
 //Wyrmgus end
 /// Check if the costs for an unit-type are available for the AI
-extern int AiCheckUnitTypeCosts(const stratagus::unit_type &type);
+extern int AiCheckUnitTypeCosts(const wyrmgus::unit_type &type);
 /// Enemy units in distance
-extern int AiEnemyUnitsInDistance(const CPlayer &player, const stratagus::unit_type *type,
+extern int AiEnemyUnitsInDistance(const CPlayer &player, const wyrmgus::unit_type *type,
 								  //Wyrmgus start
 //								  const Vec2i &pos, unsigned range);
 								  const Vec2i &pos, unsigned range, int z);

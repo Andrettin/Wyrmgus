@@ -36,7 +36,7 @@ struct lua_State;
 
 int CclDefineDialogue(lua_State *l);
 
-namespace stratagus {
+namespace wyrmgus {
 
 class character;
 class dialogue_node;
@@ -87,7 +87,7 @@ private:
 	const faction *speaker_faction = nullptr; //faction of the player to whom the speaker belongs
 	std::string text;
 public:
-	stratagus::dialogue *Dialogue = nullptr;
+	wyrmgus::dialogue *Dialogue = nullptr;
 	LuaCallback *Conditions = nullptr;
 	LuaCallback *ImmediateEffects = nullptr;
 	std::vector<std::unique_ptr<dialogue_option>> options;

@@ -3,7 +3,7 @@
 #include "resource.h"
 #include "script/effect/effect.h"
 
-namespace stratagus {
+namespace wyrmgus {
 
 class resource;
 

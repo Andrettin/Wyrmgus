@@ -27,7 +27,7 @@
 
 #pragma once
 
-namespace stratagus::geojson {
+namespace wyrmgus::geojson {
 
 extern std::vector<QVariantList> parse_folder(const std::filesystem::path &path);
 

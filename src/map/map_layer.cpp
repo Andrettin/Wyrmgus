@@ -364,7 +364,7 @@ void CMapLayer::SetTimeOfDay(CScheduledTimeOfDay *time_of_day)
 **
 **	@return	The map layer's current time of day
 */
-stratagus::time_of_day *CMapLayer::GetTimeOfDay() const
+wyrmgus::time_of_day *CMapLayer::GetTimeOfDay() const
 {
 	if (!this->TimeOfDay) {
 		return nullptr;
@@ -373,11 +373,11 @@ stratagus::time_of_day *CMapLayer::GetTimeOfDay() const
 	return this->TimeOfDay->TimeOfDay;
 }
 
-stratagus::time_of_day *CMapLayer::get_tile_time_of_day(const QPoint &tile_pos) const
+wyrmgus::time_of_day *CMapLayer::get_tile_time_of_day(const QPoint &tile_pos) const
 {
 	const CMapField *tile = this->Field(tile_pos);
 	if (tile->Flags & MapFieldUnderground) {
-		return stratagus::defines::get()->get_underground_time_of_day();
+		return wyrmgus::defines::get()->get_underground_time_of_day();
 	}
 
 	return this->GetTimeOfDay();
@@ -441,8 +441,8 @@ void CMapLayer::SetSeason(CScheduledSeason *season)
 		return;
 	}
 	
-	stratagus::season *old_season = this->Season ? this->Season->Season : nullptr;
-	stratagus::season *new_season = season ? season->Season : nullptr;
+	wyrmgus::season *old_season = this->Season ? this->Season->Season : nullptr;
+	wyrmgus::season *new_season = season ? season->Season : nullptr;
 	
 	this->Season = season;
 	
@@ -467,7 +467,7 @@ void CMapLayer::SetSeason(CScheduledSeason *season)
 		if (
 			unit && unit->IsAlive() && unit->MapLayer == this
 		) {
-			const stratagus::unit_type_variation *variation = unit->GetVariation();
+			const wyrmgus::unit_type_variation *variation = unit->GetVariation();
 			if (variation && !unit->CheckSeasonForVariation(variation)) {
 				unit->ChooseVariation(); //choose a new variation, as the old one has become invalid due to the season change
 			}
@@ -480,7 +480,7 @@ void CMapLayer::SetSeason(CScheduledSeason *season)
 **
 **	@return	The map layer's current season
 */
-stratagus::season *CMapLayer::GetSeason() const
+wyrmgus::season *CMapLayer::GetSeason() const
 {
 	if (!this->Season) {
 		return nullptr;

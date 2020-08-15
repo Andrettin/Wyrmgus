@@ -35,7 +35,7 @@
 #include "unit/unit_class.h"
 #include "unit/unit_type.h"
 
-namespace stratagus {
+namespace wyrmgus {
 
 class unit_class_condition final : public condition
 {

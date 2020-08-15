@@ -182,12 +182,12 @@ PlayerAi *AiPlayer;             /// Current AI player
 void PlayerAi::check_quest_units_to_build()
 {
 	for (const auto &objective : this->Player->get_quest_objectives()) {
-		const stratagus::quest_objective *quest_objective = objective->get_quest_objective();
-		if (quest_objective->get_objective_type() != stratagus::objective_type::build_units) {
+		const wyrmgus::quest_objective *quest_objective = objective->get_quest_objective();
+		if (quest_objective->get_objective_type() != wyrmgus::objective_type::build_units) {
 			continue;
 		}
 
-		stratagus::unit_type *unit_type_to_build = nullptr;
+		wyrmgus::unit_type *unit_type_to_build = nullptr;
 		if (!quest_objective->UnitTypes.empty()) {
 			unit_type_to_build = quest_objective->UnitTypes.front();
 		} else {
@@ -205,7 +205,7 @@ void PlayerAi::check_quest_units_to_build()
 				continue;
 			}
 
-			if (!stratagus::vector::contains(quest_objective->UnitTypes, queue.Type) && !stratagus::vector::contains(quest_objective->get_unit_classes(), queue.Type->get_unit_class())) {
+			if (!wyrmgus::vector::contains(quest_objective->UnitTypes, queue.Type) && !wyrmgus::vector::contains(quest_objective->get_unit_classes(), queue.Type->get_unit_class())) {
 				continue;
 			}
 
@@ -247,7 +247,7 @@ static void AiCheckUnits()
 	for (int i = 0; i < n; ++i) {
 		const unsigned int t = AiPlayer->UnitTypeRequests[i].Type->Slot;
 		const int x = AiPlayer->UnitTypeRequests[i].Count;
-		const stratagus::unit_class *unit_class = AiPlayer->UnitTypeRequests[i].Type->get_unit_class();
+		const wyrmgus::unit_class *unit_class = AiPlayer->UnitTypeRequests[i].Type->get_unit_class();
 
 		// Add equivalent units
 		int e = AiPlayer->Player->GetUnitTypeAiActiveCount(AiPlayer->UnitTypeRequests[i].Type);
@@ -257,7 +257,7 @@ static void AiCheckUnits()
 			}
 		}
 		if (unit_class != nullptr) {
-			for (const stratagus::unit_type *class_unit_type : unit_class->get_unit_types()) {
+			for (const wyrmgus::unit_type *class_unit_type : unit_class->get_unit_types()) {
 				if (class_unit_type != AiPlayer->UnitTypeRequests[i].Type) {
 					e += AiPlayer->Player->GetUnitTypeAiActiveCount(class_unit_type);
 				}
@@ -364,7 +364,7 @@ static void AiCheckUnits()
 
 				bool mercenary_recruited = false;
 				for (const auto &kv_pair : mercenary_building->UnitStock) {
-					stratagus::unit_type *mercenary_type = stratagus::unit_type::get_all()[kv_pair.first];
+					wyrmgus::unit_type *mercenary_type = wyrmgus::unit_type::get_all()[kv_pair.first];
 					const int unit_stock = kv_pair.second;
 					if (
 						unit_stock > 0
@@ -401,9 +401,9 @@ static void AiCheckUnits()
 	//Wyrmgus start
 	//check if any factions can be founded, and if so, pick one randomly
 	if (AiPlayer->Player->Faction != -1 && AiPlayer->Player->NumTownHalls > 0) {
-		std::vector<stratagus::faction *> potential_factions;
-		for (size_t i = 0; i < stratagus::faction::get_all()[AiPlayer->Player->Faction]->DevelopsTo.size(); ++i) {
-			stratagus::faction *possible_faction = stratagus::faction::get_all()[AiPlayer->Player->Faction]->DevelopsTo[i];
+		std::vector<wyrmgus::faction *> potential_factions;
+		for (size_t i = 0; i < wyrmgus::faction::get_all()[AiPlayer->Player->Faction]->DevelopsTo.size(); ++i) {
+			wyrmgus::faction *possible_faction = wyrmgus::faction::get_all()[AiPlayer->Player->Faction]->DevelopsTo[i];
 			
 			if (!AiPlayer->Player->CanFoundFaction(possible_faction)) {
 				continue;
@@ -417,8 +417,8 @@ static void AiCheckUnits()
 		}
 		
 		if (AiPlayer->Player->get_dynasty() == nullptr) { //if the AI player has no dynasty, pick one if available
-			std::vector<const stratagus::dynasty *> potential_dynasties;
-			for (const stratagus::dynasty *dynasty : AiPlayer->Player->get_faction()->get_dynasties()) {
+			std::vector<const wyrmgus::dynasty *> potential_dynasties;
+			for (const wyrmgus::dynasty *dynasty : AiPlayer->Player->get_faction()->get_dynasties()) {
 				if (!AiPlayer->Player->can_choose_dynasty(dynasty)) {
 					continue;
 				}
@@ -427,7 +427,7 @@ static void AiCheckUnits()
 			}
 			
 			if (potential_dynasties.size() > 0) {
-				AiPlayer->Player->set_dynasty(stratagus::vector::get_random(potential_dynasties));
+				AiPlayer->Player->set_dynasty(wyrmgus::vector::get_random(potential_dynasties));
 			}
 		}
 	}
@@ -499,31 +499,31 @@ static void SaveAiPlayer(CFile &file, int plynr, const PlayerAi &ai)
 	}
 
 	file.printf("  \"reserve\", {");
-	for (const stratagus::resource *resource : stratagus::resource::get_all()) {
+	for (const wyrmgus::resource *resource : wyrmgus::resource::get_all()) {
 		file.printf("\"%s\", %d, ", resource->get_identifier().c_str(), ai.Reserve[resource->ID]);
 	}
 	file.printf("},\n");
 
 	file.printf("  \"used\", {");
-	for (const stratagus::resource *resource : stratagus::resource::get_all()) {
+	for (const wyrmgus::resource *resource : wyrmgus::resource::get_all()) {
 		file.printf("\"%s\", %d, ", resource->get_identifier().c_str(), ai.Used[resource->ID]);
 	}
 	file.printf("},\n");
 
 	file.printf("  \"needed\", {");
-	for (const stratagus::resource *resource : stratagus::resource::get_all()) {
+	for (const wyrmgus::resource *resource : wyrmgus::resource::get_all()) {
 		file.printf("\"%s\", %d, ", resource->get_identifier().c_str(), ai.Needed[resource->ID]);
 	}
 	file.printf("},\n");
 
 	file.printf("  \"collect\", {");
-	for (const stratagus::resource *resource : stratagus::resource::get_all()) {
+	for (const wyrmgus::resource *resource : wyrmgus::resource::get_all()) {
 		file.printf("\"%s\", %d, ", resource->get_identifier().c_str(), ai.Collect[resource->ID]);
 	}
 	file.printf("},\n");
 
 	file.printf("  \"need-mask\", {");
-	for (size_t i = 0; i < stratagus::resource::get_all().size(); ++i) {
+	for (size_t i = 0; i < wyrmgus::resource::get_all().size(); ++i) {
 		if (ai.NeededMask & ((long long int) 1 << i)) {
 			file.printf("\"%s\", ", DefaultResourceNames[i].c_str());
 		}
@@ -682,7 +682,7 @@ void AiInit(CPlayer &player)
 
 	for (i = 0; i < AiTypes.size(); ++i) {
 		ait = AiTypes[i];
-		if (!ait->Race.empty() && ait->Race != stratagus::civilization::get_all()[player.Race]->get_identifier()) {
+		if (!ait->Race.empty() && ait->Race != wyrmgus::civilization::get_all()[player.Race]->get_identifier()) {
 			continue;
 		}
 		if (!player.AiName.empty() && ait->Name != player.AiName) {
@@ -699,7 +699,7 @@ void AiInit(CPlayer &player)
 		DebugPrint("AI: not found!!!!!!!!!!\n");
 		DebugPrint("AI: Using fallback:\n");
 	}
-	DebugPrint("AI: %s:%s with %s:%s\n" _C_ stratagus::civilization::get_all()[player.Race]->get_identifier().c_str() _C_
+	DebugPrint("AI: %s:%s with %s:%s\n" _C_ wyrmgus::civilization::get_all()[player.Race]->get_identifier().c_str() _C_
 			   !ait->Race.empty() ? ait->Race.c_str() : "All" _C_ player.AiName.c_str() _C_ ait->Class.c_str());
 
 	pai->AiType = ait;
@@ -792,7 +792,7 @@ void FreeAi()
 **  @param type  Unit-type which is now available.
 **  @return      True, if unit-type was found in list.
 */
-static int AiRemoveFromBuilt2(PlayerAi *pai, const stratagus::unit_type &type, int landmass, const stratagus::site *settlement)
+static int AiRemoveFromBuilt2(PlayerAi *pai, const wyrmgus::unit_type &type, int landmass, const wyrmgus::site *settlement)
 {
 	std::vector<AiBuildQueue>::iterator i;
 
@@ -823,7 +823,7 @@ static int AiRemoveFromBuilt2(PlayerAi *pai, const stratagus::unit_type &type, i
 **  @param pai   Computer AI player.
 **  @param type  Unit-type which is now available.
 */
-static void AiRemoveFromBuilt(PlayerAi *pai, const stratagus::unit_type &type, int landmass, const stratagus::site *settlement)
+static void AiRemoveFromBuilt(PlayerAi *pai, const wyrmgus::unit_type &type, int landmass, const wyrmgus::site *settlement)
 {
 	//Wyrmgus start
 	if (
@@ -846,7 +846,7 @@ static void AiRemoveFromBuilt(PlayerAi *pai, const stratagus::unit_type &type, i
 	int equivalents[UnitTypeMax + 1];
 	const int equivalentsCount = AiFindUnitTypeEquiv(type, equivalents);
 	for (int i = 0; i < equivalentsCount; ++i) {
-		if (AiRemoveFromBuilt2(pai, *stratagus::unit_type::get_all()[equivalents[i]], landmass, settlement)) {
+		if (AiRemoveFromBuilt2(pai, *wyrmgus::unit_type::get_all()[equivalents[i]], landmass, settlement)) {
 			return;
 		}
 	}
@@ -864,7 +864,7 @@ static void AiRemoveFromBuilt(PlayerAi *pai, const stratagus::unit_type &type, i
 **  @param type  Unit-type which is now available.
 **  @return      True if the unit-type could be reduced.
 */
-static bool AiReduceMadeInBuilt2(PlayerAi &pai, const stratagus::unit_type &type, int landmass, const stratagus::site *settlement)
+static bool AiReduceMadeInBuilt2(PlayerAi &pai, const wyrmgus::unit_type &type, int landmass, const wyrmgus::site *settlement)
 {
 	std::vector<AiBuildQueue>::iterator i;
 
@@ -891,7 +891,7 @@ static bool AiReduceMadeInBuilt2(PlayerAi &pai, const stratagus::unit_type &type
 **  @param pai   Computer AI player.
 **  @param type  Unit-type which is now available.
 */
-void AiReduceMadeInBuilt(PlayerAi &pai, const stratagus::unit_type &type, int landmass, const stratagus::site *settlement)
+void AiReduceMadeInBuilt(PlayerAi &pai, const wyrmgus::unit_type &type, int landmass, const wyrmgus::site *settlement)
 {
 	//Wyrmgus start
 	if (
@@ -914,7 +914,7 @@ void AiReduceMadeInBuilt(PlayerAi &pai, const stratagus::unit_type &type, int la
 	const unsigned int equivnb = AiFindUnitTypeEquiv(type, equivs);
 
 	for (unsigned int i = 0; i < equivnb; ++i) {
-		if (AiReduceMadeInBuilt2(pai, *stratagus::unit_type::get_all()[equivs[i]], landmass, settlement)) {
+		if (AiReduceMadeInBuilt2(pai, *wyrmgus::unit_type::get_all()[equivs[i]], landmass, settlement)) {
 			return;
 		}
 	}
@@ -1238,7 +1238,7 @@ void AiWorkComplete(CUnit *unit, CUnit &what)
 **  @param unit  Pointer to unit what builds the building.
 **  @param what  Pointer to unit-type.
 */
-void AiCanNotBuild(const CUnit &unit, const stratagus::unit_type &what, int landmass, const stratagus::site *settlement)
+void AiCanNotBuild(const CUnit &unit, const wyrmgus::unit_type &what, int landmass, const wyrmgus::site *settlement)
 {
 	DebugPrint("%d: %d(%s) Can't build %s at %d,%d\n" _C_
 			   unit.Player->Index _C_ UnitNumber(unit) _C_ unit.Type->Ident.c_str() _C_
@@ -1257,7 +1257,7 @@ void AiCanNotBuild(const CUnit &unit, const stratagus::unit_type &what, int land
 **  @param unit  Pointer to unit what builds the building.
 **  @param what  Pointer to unit-type.
 */
-void AiCanNotReach(CUnit &unit, const stratagus::unit_type &what, int landmass, const stratagus::site *settlement)
+void AiCanNotReach(CUnit &unit, const wyrmgus::unit_type &what, int landmass, const wyrmgus::site *settlement)
 {
 	Assert(unit.Player->Type != PlayerPerson);
 	//Wyrmgus start
@@ -1283,7 +1283,7 @@ static void AiMoveUnitInTheWay(CUnit &unit)
 		return;
 	}
 
-	const stratagus::unit_type &unittype = *unit.Type;
+	const wyrmgus::unit_type &unittype = *unit.Type;
 	const Vec2i u0 = unit.tilePos;
 	const Vec2i u1(u0 + unittype.get_tile_size() - QSize(1, 1));
 
@@ -1327,7 +1327,7 @@ static void AiMoveUnitInTheWay(CUnit &unit)
 			}
 		}
 		//Wyrmgus end
-		const stratagus::unit_type &blockertype = *blocker.Type;
+		const wyrmgus::unit_type &blockertype = *blocker.Type;
 
 		if (blockertype.UnitType != unittype.UnitType) {
 			continue;
@@ -1449,7 +1449,7 @@ void AiTrainingComplete(CUnit &unit, CUnit &what)
 	if (unit.Player == what.Player) {
 		AiRemoveFromBuilt(what.Player->Ai, *what.Type, CMap::Map.GetTileLandmass(what.tilePos, what.MapLayer->ID), what.settlement);
 	} else { //remove the request of the unit the mercenary is substituting
-		stratagus::unit_type *requested_unit_type = stratagus::faction::get_all()[what.Player->Faction]->get_class_unit_type(what.Type->get_unit_class());
+		wyrmgus::unit_type *requested_unit_type = wyrmgus::faction::get_all()[what.Player->Faction]->get_class_unit_type(what.Type->get_unit_class());
 		if (requested_unit_type != nullptr) {
 			AiRemoveFromBuilt(what.Player->Ai, *requested_unit_type, CMap::Map.GetTileLandmass(what.tilePos, what.MapLayer->ID), what.settlement);
 		}
@@ -1476,7 +1476,7 @@ void AiTrainingComplete(CUnit &unit, CUnit &what)
 **  @param unit Pointer to unit working.
 **  @param what Pointer to the new unit-type.
 */
-void AiUpgradeToComplete(CUnit &unit, const stratagus::unit_type &what)
+void AiUpgradeToComplete(CUnit &unit, const wyrmgus::unit_type &what)
 {
 	DebugPrint("%d: %d(%s) upgrade-to %s at %d,%d completed\n" _C_
 			   unit.Player->Index _C_ UnitNumber(unit) _C_ unit.Type->Ident.c_str() _C_
@@ -1606,7 +1606,7 @@ void AiEachMinute(CPlayer &player)
 	AiForceManagerEachMinute();
 }
 
-int AiGetUnitTypeCount(const PlayerAi &pai, const stratagus::unit_type *type, const int landmass, const bool include_requests, const bool include_upgrades)
+int AiGetUnitTypeCount(const PlayerAi &pai, const wyrmgus::unit_type *type, const int landmass, const bool include_requests, const bool include_upgrades)
 {
 	int count = 0;
 	
@@ -1641,7 +1641,7 @@ int AiGetUnitTypeCount(const PlayerAi &pai, const stratagus::unit_type *type, co
 	return count;
 }
 
-int AiGetUnitTypeRequestedCount(const PlayerAi &pai, const stratagus::unit_type *type, const int landmass, const stratagus::site *settlement)
+int AiGetUnitTypeRequestedCount(const PlayerAi &pai, const wyrmgus::unit_type *type, const int landmass, const wyrmgus::site *settlement)
 {
 	int count = 0;
 	

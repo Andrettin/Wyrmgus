@@ -38,7 +38,7 @@
 static constexpr int MaxVolume = 255;
 static constexpr int SOUND_BUFFER_SIZE = 65536;
 
-namespace stratagus {
+namespace wyrmgus {
 
 enum class unit_sound_type;
 
@@ -128,12 +128,12 @@ extern int SetChannelVolume(int channel, int volume);
 extern int SetChannelStereo(int channel, int stereo);
 //Wyrmgus start
 /// Set the channel voice group
-extern void SetChannelVoiceGroup(int channel, const stratagus::unit_sound_type unit_sound_type);
+extern void SetChannelVoiceGroup(int channel, const wyrmgus::unit_sound_type unit_sound_type);
 //Wyrmgus end
 /// Set the channel's callback for when a sound finishes playing
 extern void SetChannelFinishedCallback(int channel, void (*callback)(int channel));
 /// Get the sample playing on a channel
-extern stratagus::sample *GetChannelSample(int channel);
+extern wyrmgus::sample *GetChannelSample(int channel);
 /// Stop a channel
 extern void StopChannel(int channel);
 /// Stop all channels
@@ -142,11 +142,11 @@ extern void StopAllChannels();
 /// Check if this unit plays some sound
 extern bool UnitSoundIsPlaying(Origin *origin);
 /// Check, if this sample is already playing
-extern bool SampleIsPlaying(stratagus::sample *sample);
+extern bool SampleIsPlaying(wyrmgus::sample *sample);
 /// Load a sample
-extern std::unique_ptr<stratagus::sample> LoadSample(const std::filesystem::path &filepath);
+extern std::unique_ptr<wyrmgus::sample> LoadSample(const std::filesystem::path &filepath);
 /// Play a sample
-extern int PlaySample(stratagus::sample *sample, Origin *origin = nullptr);
+extern int PlaySample(wyrmgus::sample *sample, Origin *origin = nullptr);
 
 /// Set effects volume
 extern void SetEffectsVolume(int volume);
@@ -160,7 +160,7 @@ extern bool IsEffectsEnabled();
 /// Set the music finished callback
 void SetMusicFinishedCallback(void (*callback)());
 /// Play a music file
-extern int PlayMusic(stratagus::sample *sample);
+extern int PlayMusic(wyrmgus::sample *sample);
 /// Play a music file
 extern int PlayMusic(const std::string &file);
 /// Play a music track

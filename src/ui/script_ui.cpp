@@ -490,8 +490,8 @@ static CContentType *CclParseContent(lua_State *l)
 		const char *key = LuaToString(l, -2);
 		if (!strcmp(key, "Pos")) {
 			CclGetPos(l, &pos.x, &pos.y);
-			pos.x *= stratagus::defines::get()->get_scale_factor();;
-			pos.y *= stratagus::defines::get()->get_scale_factor();;
+			pos.x *= wyrmgus::defines::get()->get_scale_factor();;
+			pos.y *= wyrmgus::defines::get()->get_scale_factor();;
 		//Wyrmgus start
 		} else if (!strcmp(key, "TextColor")) {
 			textColor = LuaToString(l, -1);
@@ -912,7 +912,7 @@ static int CclDefineButton(lua_State *l)
 	const QUuid uuid = QUuid::createUuid();
 	const std::string identifier = uuid.toString(QUuid::WithoutBraces).toStdString();
 
-	stratagus::button *button = stratagus::button::add(identifier, nullptr);
+	wyrmgus::button *button = wyrmgus::button::add(identifier, nullptr);
 
 	//
 	// Parse the arguments
@@ -923,7 +923,7 @@ static int CclDefineButton(lua_State *l)
 		if (!strcmp(value, "Pos")) {
 			button->pos = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "Level")) {
-			button->level = stratagus::button_level::get(LuaToString(l, -1));
+			button->level = wyrmgus::button_level::get(LuaToString(l, -1));
 		} else if (!strcmp(value, "AlwaysShow")) {
 			button->always_show = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "Icon")) {
@@ -1069,7 +1069,7 @@ void SelectionChanged()
 	LastDrawnButtonPopup = nullptr;
 
 	UI.ButtonPanel.Update();
-	GameCursor = UI.get_cursor(stratagus::cursor_type::point);
+	GameCursor = UI.get_cursor(wyrmgus::cursor_type::point);
 	CursorBuilding = nullptr;
 	CurrentCursorState = CursorState::Point;
 	UI.ButtonPanel.Update();
@@ -1240,7 +1240,7 @@ static int CclDefineIcon(lua_State *l)
 		}
 	}
 
-	stratagus::icon *icon = stratagus::icon::add(ident, nullptr);
+	wyrmgus::icon *icon = wyrmgus::icon::add(ident, nullptr);
 	icon->file = file;
 	icon->frame = frame;
 	icon->G = CPlayerColorGraphic::New(icon->get_file().string(), size, nullptr);
@@ -1254,7 +1254,7 @@ static int CclGetIconData(lua_State *l)
 		LuaError(l, "incorrect argument");
 	}
 	std::string icon_ident = LuaToString(l, 1);
-	const stratagus::icon *icon = stratagus::icon::get(icon_ident);
+	const wyrmgus::icon *icon = wyrmgus::icon::get(icon_ident);
 	const char *data = LuaToString(l, 2);
 
 	if (!strcmp(data, "File")) {
@@ -1273,7 +1273,7 @@ static int CclGetIconData(lua_State *l)
 static int CclGetIcons(lua_State *l)
 {
 	std::vector<std::string> icons;
-	for (const stratagus::icon *icon : stratagus::icon::get_all()) {
+	for (const wyrmgus::icon *icon : wyrmgus::icon::get_all()) {
 		icons.push_back(icon->get_identifier());
 	}
 		

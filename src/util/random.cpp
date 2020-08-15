@@ -31,7 +31,7 @@
 
 #include <boost/random.hpp>
 
-namespace stratagus {
+namespace wyrmgus {
 
 int random::generate_in_range(const int min_value, const int max_value)
 {

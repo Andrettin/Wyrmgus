@@ -37,7 +37,7 @@ struct lua_State;
 
 int CclDefineQuest(lua_State *l);
 
-namespace stratagus {
+namespace wyrmgus {
 
 class character;
 class civilization;
@@ -56,17 +56,17 @@ enum class objective_type;
 class quest_objective
 {
 public:
-	explicit quest_objective(const objective_type objective_type, const stratagus::quest *quest);
+	explicit quest_objective(const objective_type objective_type, const wyrmgus::quest *quest);
 
-	void process_sml_property(const stratagus::sml_property &property);
-	void process_sml_scope(const stratagus::sml_data &scope);
+	void process_sml_property(const wyrmgus::sml_property &property);
+	void process_sml_scope(const wyrmgus::sml_data &scope);
 
 	objective_type get_objective_type() const
 	{
 		return this->objective_type;
 	}
 
-	const stratagus::quest *get_quest() const
+	const wyrmgus::quest *get_quest() const
 	{
 		return this->quest;
 	}
@@ -86,46 +86,46 @@ public:
 		return this->objective_string;
 	}
 
-	const std::vector<const stratagus::unit_class *> &get_unit_classes() const
+	const std::vector<const wyrmgus::unit_class *> &get_unit_classes() const
 	{
 		return this->unit_classes;
 	}
 
-	const stratagus::site *get_settlement() const
+	const wyrmgus::site *get_settlement() const
 	{
 		return this->settlement;
 	}
 
-	const stratagus::faction *get_faction() const
+	const wyrmgus::faction *get_faction() const
 	{
 		return this->faction;
 	}
 
-	const stratagus::character *get_character() const
+	const wyrmgus::character *get_character() const
 	{
 		return this->character;
 	}
 
 private:
 	objective_type objective_type;
-	const stratagus::quest *quest = nullptr;
+	const wyrmgus::quest *quest = nullptr;
 	int index = -1;
 	int quantity = 1;
 public:
 	int Resource = -1;
 private:
 	std::string objective_string;
-	std::vector<const stratagus::unit_class *> unit_classes;
+	std::vector<const wyrmgus::unit_class *> unit_classes;
 public:
-	std::vector<stratagus::unit_type *> UnitTypes;
+	std::vector<wyrmgus::unit_type *> UnitTypes;
 	const CUpgrade *Upgrade = nullptr;
 private:
-	const stratagus::character *character = nullptr;
+	const wyrmgus::character *character = nullptr;
 public:
 	const unique_item *Unique = nullptr;
 private:
-	const stratagus::site *settlement = nullptr;
-	const stratagus::faction *faction = nullptr;
+	const wyrmgus::site *settlement = nullptr;
+	const wyrmgus::faction *faction = nullptr;
 
 	friend int ::CclDefineQuest(lua_State *l);
 };
@@ -152,8 +152,8 @@ class quest final : public detailed_data_entry, public data_type<quest>
 {
 	Q_OBJECT
 
-	Q_PROPERTY(stratagus::icon* icon MEMBER icon READ get_icon)
-	Q_PROPERTY(stratagus::player_color* player_color MEMBER player_color READ get_player_color)
+	Q_PROPERTY(wyrmgus::icon* icon MEMBER icon READ get_icon)
+	Q_PROPERTY(wyrmgus::player_color* player_color MEMBER player_color READ get_player_color)
 	Q_PROPERTY(bool unobtainable MEMBER unobtainable READ is_unobtainable)
 	Q_PROPERTY(bool uncompleteable MEMBER uncompleteable READ is_uncompleteable)
 	Q_PROPERTY(bool unfailable MEMBER unfailable READ is_unfailable)
@@ -162,7 +162,7 @@ public:
 	static constexpr const char *class_identifier = "quest";
 	static constexpr const char *database_folder = "quests";
 
-	static quest *add(const std::string &identifier, const stratagus::module *module)
+	static quest *add(const std::string &identifier, const wyrmgus::module *module)
 	{
 		quest *quest = data_type::add(identifier, module);
 		quest->ID = quest::get_all().size() - 1;
@@ -266,7 +266,7 @@ private:
 public:
 	bool Completed = false;				/// Whether the quest has been completed
 	bool CurrentCompleted = false;		/// Whether the quest has been completed in the current game
-	stratagus::dialogue *IntroductionDialogue = nullptr;
+	wyrmgus::dialogue *IntroductionDialogue = nullptr;
 	LuaCallback *Conditions = nullptr;
 	LuaCallback *AcceptEffects = nullptr;
 	LuaCallback *CompletionEffects = nullptr;
@@ -286,7 +286,7 @@ public:
 
 }
 
-extern stratagus::quest *CurrentQuest;
+extern wyrmgus::quest *CurrentQuest;
 
 extern void SaveQuestCompletion();
 

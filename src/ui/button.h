@@ -38,7 +38,7 @@ struct lua_State;
 
 int CclDefineButton(lua_State *l);
 
-namespace stratagus {
+namespace wyrmgus {
 
 class button;
 class button_level;
@@ -51,7 +51,7 @@ class button : public data_entry, public data_type<button>
 	Q_OBJECT
 
 	Q_PROPERTY(int pos MEMBER pos READ get_pos)
-	Q_PROPERTY(stratagus::button_level* level MEMBER level READ get_level)
+	Q_PROPERTY(wyrmgus::button_level* level MEMBER level READ get_level)
 	Q_PROPERTY(bool always_show MEMBER always_show READ is_always_shown)
 
 public:
@@ -161,16 +161,16 @@ extern void InitButtons();
 /// Free memory for buttons
 extern void CleanButtons();
 // Check if the button is allowed for the unit.
-extern bool IsButtonAllowed(const CUnit &unit, const stratagus::button &buttonaction);
+extern bool IsButtonAllowed(const CUnit &unit, const wyrmgus::button &buttonaction);
 
 // Check if the button is usable for the unit.
-extern bool IsButtonUsable(const CUnit &unit, const stratagus::button &buttonaction);
+extern bool IsButtonUsable(const CUnit &unit, const wyrmgus::button &buttonaction);
 
 // Get the cooldown for the button for the unit.
-extern int GetButtonCooldown(const CUnit &unit, const stratagus::button &buttonaction);
+extern int GetButtonCooldown(const CUnit &unit, const wyrmgus::button &buttonaction);
 
 // Get the cooldown percent for the button for the unit.
-extern int GetButtonCooldownPercent(const CUnit &unit, const stratagus::button &buttonaction);
+extern int GetButtonCooldownPercent(const CUnit &unit, const wyrmgus::button &buttonaction);
 
 extern std::string GetButtonActionNameById(const ButtonCmd button_action);
 extern ButtonCmd GetButtonActionIdByName(const std::string &button_action);

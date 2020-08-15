@@ -45,7 +45,7 @@ class CGrandStrategyFaction;
 class CGrandStrategyHero;
 class LuaCallback;
 
-namespace stratagus {
+namespace wyrmgus {
 	class unit_class;
 	class world;
 	enum class character_title;
@@ -112,7 +112,7 @@ public:
 	bool HasSecondaryBorderThroughWaterWith(CGrandStrategyProvince *province);
 	bool BordersFaction(int faction_civilization, int faction, bool check_through_water = false);
 	int GetPopulation();
-	int GetClassUnitType(const stratagus::unit_class *unit_class);
+	int GetClassUnitType(const wyrmgus::unit_class *unit_class);
 	int GetDesirabilityRating();
 	std::string GenerateWorkName();
 	CGrandStrategyHero *GetRandomAuthor();
@@ -147,7 +147,7 @@ class CGrandStrategyFaction
 {
 public:
 	CGrandStrategyFaction() :
-		Faction(-1), civilization(-1), FactionTier(stratagus::faction_tier::barony), government_type(stratagus::government_type::monarchy), Capital(nullptr)
+		Faction(-1), civilization(-1), FactionTier(wyrmgus::faction_tier::barony), government_type(wyrmgus::government_type::monarchy), Capital(nullptr)
 	{
 		memset(Technologies, 0, sizeof(Technologies));
 		memset(Resources, 0, sizeof(Resources));
@@ -159,11 +159,11 @@ public:
 	
 	void SetTechnology(int upgrade_id, bool has_technology, bool secondary_setting = false);
 	void SetCapital(CGrandStrategyProvince *province);
-	void SetMinister(const stratagus::character_title title, std::string hero_full_name);
-	void MinisterSuccession(const stratagus::character_title title);
+	void SetMinister(const wyrmgus::character_title title, std::string hero_full_name);
+	void MinisterSuccession(const wyrmgus::character_title title);
 	bool IsAlive();
 	bool HasTechnologyClass(std::string technology_class_name);
-	bool CanHaveSuccession(const stratagus::character_title title, bool family_inheritance);
+	bool CanHaveSuccession(const wyrmgus::character_title title, bool family_inheritance);
 	bool IsConquestDesirable(CGrandStrategyProvince *province);
 	int GetTroopCostModifier();
 	std::string GetFullName();
@@ -171,8 +171,8 @@ public:
 	
 	int Faction;												/// The faction's ID (-1 = none).
 	int civilization;											/// Civilization of the faction (-1 = none).
-	stratagus::government_type government_type;					/// Government type of the faction (-1 = none).
-	stratagus::faction_tier FactionTier;						/// What is the tier of this faction (barony, etc.).
+	wyrmgus::government_type government_type;					/// Government type of the faction (-1 = none).
+	wyrmgus::faction_tier FactionTier;						/// What is the tier of this faction (barony, etc.).
 	CGrandStrategyProvince *Capital;							/// Capital province of this faction
 	bool Technologies[UpgradeMax];								/// Whether a faction has a particular technology or not
 	std::vector<int> OwnedProvinces;							/// Provinces owned by this faction
@@ -181,16 +181,16 @@ public:
 	int ProductionEfficiencyModifier[MaxCosts];					/// Efficiency modifier for each resource.
 	int Trade[MaxCosts]; /// How much of each resource the faction wants to trade; negative values are imports and positive ones exports
 	int MilitaryScoreBonus[UnitTypeMax];
-	std::map<stratagus::character_title, CGrandStrategyHero *> Ministers;			/// Ministers of the faction
+	std::map<wyrmgus::character_title, CGrandStrategyHero *> Ministers;			/// Ministers of the faction
 	std::vector<CGrandStrategyProvince *> Claims;				/// Provinces which this faction claims
-	std::map<stratagus::character_title, std::vector<CGrandStrategyHero *>> HistoricalMinisters; /// All characters who had a ministerial (or head of state or government) title in this faction
+	std::map<wyrmgus::character_title, std::vector<CGrandStrategyHero *>> HistoricalMinisters; /// All characters who had a ministerial (or head of state or government) title in this faction
 	std::map<CUpgrade *, int> HistoricalTechnologies; /// historical technologies of the faction, with the year of discovery
 };
 
-class CGrandStrategyHero : public stratagus::character
+class CGrandStrategyHero : public wyrmgus::character
 {
 public:
-	CGrandStrategyHero() : stratagus::character(""),
+	CGrandStrategyHero() : wyrmgus::character(""),
 		State(0), Existed(false),
 		Province(nullptr), ProvinceOfOrigin(nullptr),
 		Father(nullptr), Mother(nullptr)
@@ -201,10 +201,10 @@ public:
 	bool IsAlive();
 	bool IsVisible();
 	bool IsGenerated();
-	bool IsEligibleForTitle(const stratagus::character_title title);
+	bool IsEligibleForTitle(const wyrmgus::character_title title);
 	int GetTroopCostModifier();
-	int GetTitleScore(const stratagus::character_title title, CGrandStrategyProvince *province = nullptr);
-	std::string GetMinisterEffectsString(const stratagus::character_title title);
+	int GetTitleScore(const wyrmgus::character_title title, CGrandStrategyProvince *province = nullptr);
+	std::string GetMinisterEffectsString(const wyrmgus::character_title title);
 	std::string GetBestDisplayTitle();
 	CGrandStrategyFaction *GetFaction();
 	
@@ -216,8 +216,8 @@ public:
 	CGrandStrategyHero *Mother;					/// Character's mother
 	std::vector<CGrandStrategyHero *> Children;	/// Children of the character
 	std::vector<CGrandStrategyHero *> Siblings;	/// Siblings of the character
-	std::vector<std::pair<stratagus::character_title, CGrandStrategyFaction *>> Titles;	/// Titles of the character (first value is the title type, and the second one is the faction
-	std::vector<std::pair<stratagus::character_title, CGrandStrategyProvince *>> ProvinceTitles;	/// Provincial titles of the character (first value is the title type, and the second one is the province
+	std::vector<std::pair<wyrmgus::character_title, CGrandStrategyFaction *>> Titles;	/// Titles of the character (first value is the title type, and the second one is the faction
+	std::vector<std::pair<wyrmgus::character_title, CGrandStrategyProvince *>> ProvinceTitles;	/// Provincial titles of the character (first value is the title type, and the second one is the province
 };
 
 class CGrandStrategyEvent
@@ -242,7 +242,7 @@ public:
 	int MinYear;
 	int MaxYear;
 	int HistoricalYear;
-	stratagus::world *World;
+	wyrmgus::world *World;
 	LuaCallback *Conditions;
 	std::vector<std::string> Options;
 	std::vector<LuaCallback *> OptionConditions;
@@ -327,8 +327,8 @@ extern std::string GetProvinceOwner(std::string province_name);
 extern void SetFactionGovernmentType(std::string civilization_name, std::string faction_name, std::string government_type_name);
 extern void SetFactionDiplomacyStateProposal(std::string civilization_name, std::string faction_name, std::string second_civilization_name, std::string second_faction_name, std::string diplomacy_state_name);
 extern std::string GetFactionDiplomacyStateProposal(std::string civilization_name, std::string faction_name, std::string second_civilization_name, std::string second_faction_name);
-extern bool IsGrandStrategyUnit(const stratagus::unit_type &type);
-extern bool IsMilitaryUnit(const stratagus::unit_type &type);
+extern bool IsGrandStrategyUnit(const wyrmgus::unit_type &type);
+extern bool IsMilitaryUnit(const wyrmgus::unit_type &type);
 extern void SetFactionMinister(std::string civilization_name, std::string faction_name, std::string title_name, std::string hero_full_name);
 extern std::string GetFactionMinister(std::string civilization_name, std::string faction_name, std::string title_name);
 extern void KillGrandStrategyHero(std::string hero_full_name);

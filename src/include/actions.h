@@ -87,7 +87,7 @@ class PathFinderInput;
 class CViewport;
 struct lua_State;
 
-namespace stratagus {
+namespace wyrmgus {
 	class site;
 	class spell;
 	class unit_type;
@@ -142,7 +142,7 @@ public:
 	static COrder *NewActionAttackGround(const CUnit &attacker, const Vec2i &dest, int z);
 	//Wyrmgus end
 	static COrder *NewActionBoard(CUnit &unit);
-	static COrder *NewActionBuild(const CUnit &builder, const Vec2i &pos, stratagus::unit_type &building, int z, const stratagus::site *settlement);
+	static COrder *NewActionBuild(const CUnit &builder, const Vec2i &pos, wyrmgus::unit_type &building, int z, const wyrmgus::site *settlement);
 	static COrder *NewActionBuilt(CUnit &builder, CUnit &unit);
 	static COrder *NewActionDefend(CUnit &dest);
 	static COrder *NewActionDie();
@@ -165,13 +165,13 @@ public:
 	static COrder *NewActionResource(CUnit &harvester, const Vec2i &pos, int z);
 	static COrder *NewActionResource(CUnit &harvester, CUnit &mine);
 	static COrder *NewActionReturnGoods(CUnit &harvester, CUnit *depot);
-	static COrder *NewActionSpellCast(const stratagus::spell &spell, const Vec2i &pos, CUnit *target, int z, bool isAutocast = false);
+	static COrder *NewActionSpellCast(const wyrmgus::spell &spell, const Vec2i &pos, CUnit *target, int z, bool isAutocast = false);
 	static COrder *NewActionStandGround();
 	static COrder *NewActionStill();
-	static COrder *NewActionTrain(CUnit &trainer, stratagus::unit_type &type, int player);
-	static COrder *NewActionTransformInto(stratagus::unit_type &type);
+	static COrder *NewActionTrain(CUnit &trainer, wyrmgus::unit_type &type, int player);
+	static COrder *NewActionTransformInto(wyrmgus::unit_type &type);
 	static COrder *NewActionUnload(const Vec2i &pos, CUnit *what, int z, int landmass);
-	static COrder *NewActionUpgradeTo(CUnit &unit, stratagus::unit_type &type);
+	static COrder *NewActionUpgradeTo(CUnit &unit, wyrmgus::unit_type &type);
 	//Wyrmgus start
 	static COrder *NewActionUse(CUnit &dest);
 	static COrder *NewActionTrade(CUnit &dest, CUnit &home_market);

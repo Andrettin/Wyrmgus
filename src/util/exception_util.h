@@ -31,7 +31,7 @@
 
 #pragma once
 
-namespace stratagus::exception {
+namespace wyrmgus::exception {
 
 inline void report(const std::exception &exception)
 {

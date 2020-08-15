@@ -56,7 +56,7 @@
 		++j;
 		if (!strcmp(value, "new-form")) {
 			value = LuaToString(l, -1, j + 1);
-			this->NewForm = stratagus::unit_type::get(value);
+			this->NewForm = wyrmgus::unit_type::get(value);
 			// FIXME: temp polymorphs? hard to do.
 		} else if (!strcmp(value, "player-neutral")) {
 			this->PlayerNeutral = 1;
@@ -67,11 +67,11 @@
 		//Wyrmgus start
 		} else if (!strcmp(value, "civilization")) {
 			value = LuaToString(l, -1, j + 1);
-			stratagus::civilization *civilization = stratagus::civilization::get(value);
+			wyrmgus::civilization *civilization = wyrmgus::civilization::get(value);
 			this->civilization = civilization;
 		} else if (!strcmp(value, "faction")) {
 			value = LuaToString(l, -1, j + 1);
-			this->Faction = stratagus::faction::get(value)->ID;
+			this->Faction = wyrmgus::faction::get(value)->ID;
 		} else if (!strcmp(value, "detachment")) {
 			this->Detachment = true;
 			--j;
@@ -99,17 +99,17 @@
 **
 **  @return             =!0 if spell should be repeated, 0 if not
 */
-/* virtual */ int Spell_Polymorph::Cast(CUnit &caster, const stratagus::spell &spell, CUnit *target, const Vec2i &goalPos, int z, int modifier)
+/* virtual */ int Spell_Polymorph::Cast(CUnit &caster, const wyrmgus::spell &spell, CUnit *target, const Vec2i &goalPos, int z, int modifier)
 {
 	if (!target) {
 		return 0;
 	}
-	stratagus::unit_type *type = this->NewForm;
+	wyrmgus::unit_type *type = this->NewForm;
 	//Wyrmgus start
 	if (this->NewForm == nullptr) {
-		stratagus::unit_type *new_unit_type = nullptr;
+		wyrmgus::unit_type *new_unit_type = nullptr;
 		if (this->civilization != nullptr && this->Faction != -1 && this->civilization == target->Type->get_civilization()) { //get faction equivalent, if is of the same civilization
-			new_unit_type = stratagus::faction::get_all()[this->Faction]->get_class_unit_type(target->Type->get_unit_class());
+			new_unit_type = wyrmgus::faction::get_all()[this->Faction]->get_class_unit_type(target->Type->get_unit_class());
 		} else if (this->civilization != nullptr && this->civilization != target->Type->get_civilization()) {
 			new_unit_type = this->civilization->get_class_unit_type(target->Type->get_unit_class());
 		}

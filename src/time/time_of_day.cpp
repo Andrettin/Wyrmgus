@@ -33,7 +33,7 @@
 #include "util/string_util.h"
 #include "video/video.h"
 
-namespace stratagus {
+namespace wyrmgus {
 
 void time_of_day::process_sml_scope(const sml_data &scope)
 {

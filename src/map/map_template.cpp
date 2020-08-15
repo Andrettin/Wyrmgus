@@ -70,7 +70,7 @@
 #include "video/video.h"
 #include "world.h"
 
-namespace stratagus {
+namespace wyrmgus {
 
 map_template::map_template(const std::string &identifier)
 	: named_data_entry(identifier), CDataType(identifier),
@@ -122,7 +122,7 @@ void map_template::process_sml_scope(const sml_data &scope)
 		scope.for_each_child([&](const sml_data &child_scope) {
 			terrain_type *terrain_type = terrain_type::get(child_scope.get_tag());
 
-			auto generated_terrain = std::make_unique<stratagus::generated_terrain>(terrain_type);
+			auto generated_terrain = std::make_unique<wyrmgus::generated_terrain>(terrain_type);
 			database::process_sml_data(generated_terrain, child_scope);
 
 			this->generated_terrains.push_back(std::move(generated_terrain));
@@ -133,9 +133,9 @@ void map_template::process_sml_scope(const sml_data &scope)
 			const int quantity = std::stoi(property.get_value());
 
 			if (tag == "generated_neutral_units") {
-				this->GeneratedNeutralUnits.push_back(std::pair<stratagus::unit_type *, int>(unit_type, quantity));
+				this->GeneratedNeutralUnits.push_back(std::pair<wyrmgus::unit_type *, int>(unit_type, quantity));
 			} else if (tag == "player_location_generated_neutral_units") {
-				this->PlayerLocationGeneratedNeutralUnits.push_back(std::pair<stratagus::unit_type *, int>(unit_type, quantity));
+				this->PlayerLocationGeneratedNeutralUnits.push_back(std::pair<wyrmgus::unit_type *, int>(unit_type, quantity));
 			}
 		});
 	} else {
@@ -154,10 +154,10 @@ void map_template::ProcessConfigData(const CConfigData *config_data)
 		} else if (key == "circle") {
 			this->circle = string::to_bool(value);
 		} else if (key == "plane") {
-			stratagus::plane *plane = plane::get(value);
+			wyrmgus::plane *plane = plane::get(value);
 			this->plane = plane;
 		} else if (key == "world") {
-			stratagus::world *world = world::get(value);
+			wyrmgus::world *world = world::get(value);
 			this->set_world(world);
 		} else if (key == "terrain_file") {
 			this->terrain_file = value;
@@ -258,12 +258,12 @@ void map_template::ProcessConfigData(const CConfigData *config_data)
 			}
 			
 			if (child_config_data->Tag == "generated_neutral_unit") {
-				this->GeneratedNeutralUnits.push_back(std::pair<stratagus::unit_type *, int>(unit_type, quantity));
+				this->GeneratedNeutralUnits.push_back(std::pair<wyrmgus::unit_type *, int>(unit_type, quantity));
 			} else if (child_config_data->Tag == "player_location_generated_neutral_unit") {
-				this->PlayerLocationGeneratedNeutralUnits.push_back(std::pair<stratagus::unit_type *, int>(unit_type, quantity));
+				this->PlayerLocationGeneratedNeutralUnits.push_back(std::pair<wyrmgus::unit_type *, int>(unit_type, quantity));
 			}
 		} else if (child_config_data->Tag == "generated_terrain") {
-			auto generated_terrain = std::make_unique<stratagus::generated_terrain>();
+			auto generated_terrain = std::make_unique<wyrmgus::generated_terrain>();
 			
 			generated_terrain->ProcessConfigData(child_config_data);
 				
@@ -329,7 +329,7 @@ void map_template::initialize()
 
 	if (!this->sites.empty()) {
 		//sort sites to change their order of application
-		std::sort(this->sites.begin(), this->sites.end(), [](const stratagus::site *site, const stratagus::site *other_site) {
+		std::sort(this->sites.begin(), this->sites.end(), [](const wyrmgus::site *site, const wyrmgus::site *other_site) {
 			if (site->is_major() != other_site->is_major()) {
 				//give priority to major sites
 				return site->is_major();
@@ -1920,7 +1920,7 @@ QSize map_template::get_applied_size() const
 	return applied_size;
 }
 
-void map_template::set_world(stratagus::world *world)
+void map_template::set_world(wyrmgus::world *world)
 {
 	if (world == this->get_world()) {
 		return;
@@ -2245,7 +2245,7 @@ void map_template::save_terrain_image(const std::string &filename, const bool ov
 
 			for (unsigned int i = 0; i < line_str.length(); ++i) {
 				const char terrain_character = line_str.at(i);
-				const stratagus::terrain_type *terrain = stratagus::terrain_type::try_get_by_character(terrain_character);
+				const wyrmgus::terrain_type *terrain = wyrmgus::terrain_type::try_get_by_character(terrain_character);
 
 				QColor color(0, 0, 0);
 				if (terrain != nullptr) {
@@ -2267,8 +2267,8 @@ void map_template::save_terrain_image(const std::string &filename, const bool ov
 			const terrain_feature *terrain_feature = nullptr;
 
 			QColor color;
-			if (std::holds_alternative<const stratagus::terrain_feature *>(kv_pair.first)) {
-				terrain_feature = std::get<const stratagus::terrain_feature *>(kv_pair.first);
+			if (std::holds_alternative<const wyrmgus::terrain_feature *>(kv_pair.first)) {
+				terrain_feature = std::get<const wyrmgus::terrain_feature *>(kv_pair.first);
 				terrain = terrain_feature->get_terrain_type();
 				color = terrain_feature->get_color();
 			} else {
@@ -2292,11 +2292,11 @@ void map_template::save_terrain_image(const std::string &filename, const bool ov
 			}
 		}
 
-		stratagus::point_map<const stratagus::terrain_type *> terrain_map;
+		wyrmgus::point_map<const wyrmgus::terrain_type *> terrain_map;
 
 		for (const auto &kv_pair : this->get_tile_terrains()) {
 			const QPoint &tile_pos = kv_pair.first;
-			const stratagus::terrain_type *terrain = kv_pair.second;
+			const wyrmgus::terrain_type *terrain = kv_pair.second;
 
 			if (terrain->is_overlay() == overlay) {
 				terrain_map[tile_pos] = terrain;
@@ -2309,7 +2309,7 @@ void map_template::save_terrain_image(const std::string &filename, const bool ov
 
 				auto find_iterator = terrain_map.find(tile_pos);
 				if (find_iterator != terrain_map.end()) {
-					const stratagus::terrain_type *terrain = find_iterator->second;
+					const wyrmgus::terrain_type *terrain = find_iterator->second;
 					image.setPixelColor(tile_pos, terrain->get_color());
 				}
 			}

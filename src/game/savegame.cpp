@@ -133,7 +133,7 @@ int SaveGame(const std::string &filename)
 	//Wyrmgus start
 //	file.printf("function SetTile() end\n");
 	file.printf("function SetTileTerrain() end\n");
-	stratagus::campaign *current_campaign = stratagus::game::get()->get_current_campaign();
+	wyrmgus::campaign *current_campaign = wyrmgus::game::get()->get_current_campaign();
 	if (current_campaign != nullptr) {
 		file.printf("SetCurrentCampaign(\"%s\")\n", current_campaign->GetIdent().c_str());
 	}
@@ -155,7 +155,7 @@ int SaveGame(const std::string &filename)
 	file.printf("---  \"engine\",  {%d, %d, %d},\n",
 				StratagusMajorVersion, StratagusMinorVersion, StratagusPatchLevel);
 	file.printf("  SyncHash = %d, \n", SyncHash);
-	file.printf("  SyncRandSeed = %d, \n", stratagus::random::get()->get_seed());
+	file.printf("  SyncRandSeed = %d, \n", wyrmgus::random::get()->get_seed());
 	file.printf("  SaveFile = \"%s\"\n", CurrentMapPath);
 	file.printf("\n---  \"preview\", \"%s.pam\",\n", filename.c_str());
 	file.printf("} )\n\n");
@@ -163,12 +163,12 @@ int SaveGame(const std::string &filename)
 	// FIXME: probably not the right place for this
 	file.printf("GameCycle = %lu\n", GameCycle);
 	file.printf("SetCurrentTotalHours(%llu)\n", CDate::CurrentTotalHours);
-	const QDateTime &current_date = stratagus::game::get()->get_current_date();
+	const QDateTime &current_date = wyrmgus::game::get()->get_current_date();
 	if (current_date.isValid()) {
-		file.printf("SetCurrentDate(\"%s\")\n", stratagus::date::to_string(current_date).c_str());
+		file.printf("SetCurrentDate(\"%s\")\n", wyrmgus::date::to_string(current_date).c_str());
 	}
-	if (stratagus::age::current_age) {
-		file.printf("SetCurrentAge(\"%s\")\n", stratagus::age::current_age->get_identifier().c_str());
+	if (wyrmgus::age::current_age) {
+		file.printf("SetCurrentAge(\"%s\")\n", wyrmgus::age::current_age->get_identifier().c_str());
 	}
 
 	file.printf("SetGodMode(%s)\n", GodMode ? "true" : "false");

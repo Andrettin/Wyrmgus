@@ -32,7 +32,7 @@
 
 class CGraphic;
 
-namespace stratagus {
+namespace wyrmgus {
 	class font_color;
 }
 
@@ -67,10 +67,10 @@ public:
 #endif
 	void Clean();
 
-	CGraphic *GetFontColorGraphic(const stratagus::font_color &fontColor) const;
+	CGraphic *GetFontColorGraphic(const wyrmgus::font_color &fontColor) const;
 
 	template<bool CLIP>
-	unsigned int DrawChar(CGraphic &g, int utf8, int x, int y, const stratagus::font_color &fc) const;
+	unsigned int DrawChar(CGraphic &g, int utf8, int x, int y, const wyrmgus::font_color &fc) const;
 
 	void DynamicLoad() const;
 
@@ -84,7 +84,7 @@ private:
 	std::string Ident;    /// Ident of the font.
 	char *CharWidth;      /// Real font width (starting with ' ')
 	CGraphic *G;          /// Graphic object used to draw
-	std::map<const stratagus::font_color *, std::unique_ptr<CGraphic>> font_color_graphics;
+	std::map<const wyrmgus::font_color *, std::unique_ptr<CGraphic>> font_color_graphics;
 };
 
 /**
@@ -155,9 +155,9 @@ public:
 private:
 	template <const bool CLIP>
 	int DoDrawText(int x, int y, const char *const text,
-				   const size_t len, const stratagus::font_color *fc) const;
+				   const size_t len, const wyrmgus::font_color *fc) const;
 private:
-	const stratagus::font_color *normal;
-	const stratagus::font_color *reverse;
+	const wyrmgus::font_color *normal;
+	const wyrmgus::font_color *reverse;
 	const CFont *font;
 };

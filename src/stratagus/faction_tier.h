@@ -27,7 +27,7 @@
 
 #pragma once
 
-namespace stratagus {
+namespace wyrmgus {
 
 enum class faction_tier {
 	none,
@@ -98,4 +98,4 @@ inline std::string faction_tier_to_string(const faction_tier tier)
 
 }
 
-Q_DECLARE_METATYPE(stratagus::faction_tier)
+Q_DECLARE_METATYPE(wyrmgus::faction_tier)

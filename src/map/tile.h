@@ -127,7 +127,7 @@ class CGraphic;
 //Wyrmgus end
 struct lua_State;
 
-namespace stratagus {
+namespace wyrmgus {
 	class resource;
 	class site;
 	class terrain_feature;
@@ -168,12 +168,12 @@ public:
 public:
 	//Wyrmgus start
 //	unsigned short SeenTile = 0;              /// last seen tile (FOW)
-	stratagus::terrain_type *SeenTerrain = nullptr;	/// last seen tile (FOW)
-	stratagus::terrain_type *SeenOverlayTerrain = nullptr;
+	wyrmgus::terrain_type *SeenTerrain = nullptr;	/// last seen tile (FOW)
+	wyrmgus::terrain_type *SeenOverlayTerrain = nullptr;
 	short SeenSolidTile = 0;
 	short SeenOverlaySolidTile = 0;
-	std::vector<std::pair<stratagus::terrain_type *, short>> SeenTransitionTiles;			/// Transition tiles; the pair contains the terrain type and the tile index
-	std::vector<std::pair<stratagus::terrain_type *, short>> SeenOverlayTransitionTiles;		/// Overlay transition tiles; the pair contains the terrain type and the tile index
+	std::vector<std::pair<wyrmgus::terrain_type *, short>> SeenTransitionTiles;			/// Transition tiles; the pair contains the terrain type and the tile index
+	std::vector<std::pair<wyrmgus::terrain_type *, short>> SeenOverlayTransitionTiles;		/// Overlay transition tiles; the pair contains the terrain type and the tile index
 	//Wyrmgus end
 	unsigned short Visible[PlayerMax];    /// Seen counter 0 unexplored
 	unsigned char VisCloak[PlayerMax];    /// Visiblity for cloaking.
@@ -192,7 +192,7 @@ public:
 	void parse(lua_State *l);
 
 	//Wyrmgus start
-	void SetTerrain(stratagus::terrain_type *terrain_type);
+	void SetTerrain(wyrmgus::terrain_type *terrain_type);
 	void RemoveOverlayTerrain();
 	void SetOverlayTerrainDestroyed(bool destroyed);
 	void SetOverlayTerrainDamaged(bool damaged);
@@ -213,9 +213,9 @@ public:
 	/// Check if a field flags.
 	bool CheckMask(int mask) const;
 	
-	stratagus::terrain_type *GetTerrain(const bool overlay) const;
+	wyrmgus::terrain_type *GetTerrain(const bool overlay) const;
 
-	stratagus::terrain_type *GetTopTerrain(const bool seen = false, const bool ignore_destroyed = false) const;
+	wyrmgus::terrain_type *GetTopTerrain(const bool seen = false, const bool ignore_destroyed = false) const;
 
 	bool is_water() const;
 	bool is_non_coastal_water() const;
@@ -239,17 +239,17 @@ public:
 
 	bool IsSeenTileCorrect() const;
 	
-	const stratagus::terrain_feature *get_terrain_feature() const
+	const wyrmgus::terrain_feature *get_terrain_feature() const
 	{
 		return this->terrain_feature;
 	}
 
-	void set_terrain_feature(const stratagus::terrain_feature *terrain_feature)
+	void set_terrain_feature(const wyrmgus::terrain_feature *terrain_feature)
 	{
 		this->terrain_feature = terrain_feature;
 	}
 
-	const stratagus::resource *get_resource() const;
+	const wyrmgus::resource *get_resource() const;
 
 	bool IsDestroyedForestTile() const;
 	
@@ -278,12 +278,12 @@ public:
 		this->ownership_border_tile = tile;
 	}
 
-	stratagus::site *get_settlement() const
+	wyrmgus::site *get_settlement() const
 	{
 		return this->settlement;
 	}
 
-	void set_settlement(stratagus::site *settlement)
+	void set_settlement(wyrmgus::site *settlement)
 	{
 		if (settlement == this->get_settlement()) {
 			return;
@@ -298,17 +298,17 @@ public:
 	unsigned long Flags;      /// field flags
 	unsigned char AnimationFrame;		/// current frame of the tile's animation
 	unsigned char OverlayAnimationFrame;		/// current frame of the overlay tile's animation
-	stratagus::terrain_type *Terrain = nullptr;
-	stratagus::terrain_type *OverlayTerrain = nullptr;
+	wyrmgus::terrain_type *Terrain = nullptr;
+	wyrmgus::terrain_type *OverlayTerrain = nullptr;
 private:
-	const stratagus::terrain_feature *terrain_feature = nullptr;
+	const wyrmgus::terrain_feature *terrain_feature = nullptr;
 public:
 	short SolidTile;
 	short OverlaySolidTile;
 	bool OverlayTerrainDestroyed;
 	bool OverlayTerrainDamaged;
-	std::vector<std::pair<stratagus::terrain_type *, short>> TransitionTiles;			/// Transition tiles; the pair contains the terrain type and the tile index
-	std::vector<std::pair<stratagus::terrain_type *, short>> OverlayTransitionTiles;		/// Overlay transition tiles; the pair contains the terrain type and the tile index
+	std::vector<std::pair<wyrmgus::terrain_type *, short>> TransitionTiles;			/// Transition tiles; the pair contains the terrain type and the tile index
+	std::vector<std::pair<wyrmgus::terrain_type *, short>> OverlayTransitionTiles;		/// Overlay transition tiles; the pair contains the terrain type and the tile index
 	//Wyrmgus end
 private:
 	unsigned char cost;        /// unit cost to move in this tile
@@ -321,7 +321,7 @@ public:
 	int Landmass;			   /// to which "landmass" (can also be water) does this map field belong (if any); a "landmass" is a collection of adjacent land tiles, or a collection of adjacent water tiles; 0 means none has been set yet
 private:
 	short ownership_border_tile = -1; //the transition type of the border between this tile's owner, and other players' tiles, if applicable)
-	stratagus::site *settlement = nullptr;
+	wyrmgus::site *settlement = nullptr;
 public:
 	CUnitCache UnitCache;      /// a unit on the map field.
 

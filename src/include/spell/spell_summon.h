@@ -41,12 +41,12 @@ public:
 	Spell_Summon() : SpellActionType(1), UnitType(nullptr), TTL(0),
 		RequireCorpse(false), JoinToAiForce(false) {};
 	virtual void ProcessConfigData(const CConfigData *config_data) override {}
-	virtual int Cast(CUnit &caster, const stratagus::spell &spell,
+	virtual int Cast(CUnit &caster, const wyrmgus::spell &spell,
 					 CUnit *target, const Vec2i &goalPos, int z, int modifier);
 	virtual void Parse(lua_State *l, int startIndex, int endIndex);
 
 private:
-	stratagus::unit_type *UnitType;    /// Type of unit to be summoned.
+	wyrmgus::unit_type *UnitType;    /// Type of unit to be summoned.
 	int TTL;                /// Time to live for summoned unit. 0 means infinite
 	int RequireCorpse;      /// Corpse consumed while summoning.
 	bool JoinToAiForce;     /// if true, captured unit is joined into caster's AI force, if available

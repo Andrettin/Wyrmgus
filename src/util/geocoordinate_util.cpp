@@ -29,7 +29,7 @@
 
 #include "util/degree_scaling.h"
 
-namespace stratagus::geocoordinate {
+namespace wyrmgus::geocoordinate {
 
 double longitude_to_scaled_longitude(const double longitude, const std::vector<std::unique_ptr<degree_scaling>> &degree_scalings)
 {

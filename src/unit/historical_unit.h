@@ -32,7 +32,7 @@
 #include "data_type.h"
 #include "time/date.h"
 
-namespace stratagus {
+namespace wyrmgus {
 
 class faction;
 class historical_location;
@@ -43,15 +43,15 @@ class historical_unit : public named_data_entry, public data_type<historical_uni
 {
 	Q_OBJECT
 
-	Q_PROPERTY(stratagus::unit_class* unit_class READ get_unit_class WRITE set_unit_class)
-	Q_PROPERTY(stratagus::unit_type* unit_type READ get_unit_type WRITE set_unit_type)
+	Q_PROPERTY(wyrmgus::unit_class* unit_class READ get_unit_class WRITE set_unit_class)
+	Q_PROPERTY(wyrmgus::unit_type* unit_type READ get_unit_type WRITE set_unit_type)
 	Q_PROPERTY(int repeat_count MEMBER repeat_count READ get_repeat_count)
 	Q_PROPERTY(int quantity MEMBER quantity READ get_quantity)
 	Q_PROPERTY(int resources_held MEMBER resources_held READ get_resources_held)
 	Q_PROPERTY(bool ai_active MEMBER ai_active READ is_ai_active)
 	Q_PROPERTY(int ttl MEMBER ttl READ get_ttl)
 	Q_PROPERTY(bool active MEMBER active READ is_active)
-	Q_PROPERTY(stratagus::faction* faction MEMBER faction READ get_faction)
+	Q_PROPERTY(wyrmgus::faction* faction MEMBER faction READ get_faction)
 
 public:
 	static constexpr const char *class_identifier = "historical_unit";

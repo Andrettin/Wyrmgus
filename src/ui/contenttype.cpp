@@ -53,7 +53,7 @@ struct UStrInt {
 };
 
 extern UStrInt GetComponent(const CUnit &unit, int index, EnumVariable e, int t);
-extern UStrInt GetComponent(const stratagus::unit_type &type, int index, EnumVariable e);
+extern UStrInt GetComponent(const wyrmgus::unit_type &type, int index, EnumVariable e);
 
 /* virtual */ CContentType::~CContentType()
 {
@@ -367,7 +367,7 @@ static const CUnit *GetUnitRef(const CUnit &unit, EnumUnit e)
 	}
 	//Wyrmgus end
 
-	const int scale_factor = stratagus::defines::get()->get_scale_factor();
+	const int scale_factor = wyrmgus::defines::get()->get_scale_factor();
 
 	// Border
 	//Wyrmgus start
@@ -410,7 +410,7 @@ static const CUnit *GetUnitRef(const CUnit &unit, EnumUnit e)
 		return;
 	}
 
-	const int scale_factor = stratagus::defines::get()->get_scale_factor();
+	const int scale_factor = wyrmgus::defines::get()->get_scale_factor();
 
 	int x = this->Pos.x;
 	int y = this->Pos.y;

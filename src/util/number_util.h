@@ -31,7 +31,7 @@
 
 #pragma once
 
-namespace stratagus::number {
+namespace wyrmgus::number {
 
 inline std::string to_formatted_string(const int number)
 {

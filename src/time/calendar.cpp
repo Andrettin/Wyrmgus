@@ -36,7 +36,7 @@
 #include "config.h"
 #include "util/string_util.h"
 
-namespace stratagus {
+namespace wyrmgus {
 
 calendar::calendar(const std::string &identifier) : named_data_entry(identifier)
 {

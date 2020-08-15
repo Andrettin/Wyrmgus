@@ -30,7 +30,7 @@
 #include "database/data_entry.h"
 #include "database/data_type.h"
 
-namespace stratagus {
+namespace wyrmgus {
 
 class font_color final : public data_entry, public data_type<font_color>
 {
@@ -60,7 +60,7 @@ public:
 	}
 
 private:
-	std::vector<QColor> colors; //the color shades of the player color
+	std::vector<QColor> colors; //the color shades of the font color
 };
 
 }

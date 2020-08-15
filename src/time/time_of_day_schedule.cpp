@@ -186,7 +186,7 @@ void CScheduledTimeOfDay::ProcessConfigData(const CConfigData *config_data)
 		std::string value = config_data->Properties[i].second;
 		
 		if (key == "time_of_day") {
-			this->TimeOfDay = stratagus::time_of_day::get(value);
+			this->TimeOfDay = wyrmgus::time_of_day::get(value);
 		} else if (key == "hours") {
 			this->Schedule->TotalHours -= this->Hours; //remove old amount of hours from the schedule, if it has already been defined before
 			this->Hours = std::stoi(value);
@@ -198,7 +198,7 @@ void CScheduledTimeOfDay::ProcessConfigData(const CConfigData *config_data)
 	
 	for (const CConfigData *child_config_data : config_data->Children) {
 		if (child_config_data->Tag == "season_hours") {
-			stratagus::season *season = nullptr;
+			wyrmgus::season *season = nullptr;
 			int season_hours = 0;
 			
 			for (size_t j = 0; j < child_config_data->Properties.size(); ++j) {
@@ -207,7 +207,7 @@ void CScheduledTimeOfDay::ProcessConfigData(const CConfigData *config_data)
 				
 				if (key == "season") {
 					value = FindAndReplaceString(value, "_", "-");
-					season = stratagus::season::get(value);
+					season = wyrmgus::season::get(value);
 				} else if (key == "hours") {
 					season_hours = std::stoi(value);
 				} else {
@@ -247,7 +247,7 @@ void CScheduledTimeOfDay::ProcessConfigData(const CConfigData *config_data)
 **
 **	@return	The amount of hours
 */
-int CScheduledTimeOfDay::GetHours(const stratagus::season *season) const
+int CScheduledTimeOfDay::GetHours(const wyrmgus::season *season) const
 {
 	if (season) {
 		auto find_iterator = this->SeasonHours.find(season);

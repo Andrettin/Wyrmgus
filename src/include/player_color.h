@@ -30,7 +30,7 @@
 #include "database/data_type.h"
 #include "database/named_data_entry.h"
 
-namespace stratagus {
+namespace wyrmgus {
 
 class player_color final : public named_data_entry, public data_type<player_color>
 {

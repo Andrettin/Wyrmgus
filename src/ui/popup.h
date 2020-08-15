@@ -43,7 +43,7 @@
 class CFont;
 class CPopup;
 
-namespace stratagus {
+namespace wyrmgus {
 	class button;
 	class unit_class;
 	class upgrade_class;
@@ -60,7 +60,7 @@ public:
 		Class(false), Description(false), Quote(false), Encyclopedia(false), CanActiveHarvest(false),
 		Opponent(0), Neutral(0), AutoCast(0), Equipped(0), Equippable(0), Consumable(0), Affixed(0), Spell(0), CanUse(0), Work(0), ReadWork(0), Elixir(0), ConsumedElixir(0), Unique(0), UniqueSet(0), Bound(0), Identified(0), Weapon(0), Shield(0), Boots(0), Arrows(0), Regeneration(0), FactionCoreSettlements(0), Ability(0), ImproveIncomes(0), LuxuryResource(0), RequirementsString(0), ExperienceRequirementsString(0), BuildingRulesString(0),
 //		BoolFlags(nullptr), Variables(nullptr) {}
-		item_class(stratagus::item_class::none), CanStore(-1), ImproveIncome(-1), BoolFlags(nullptr), Variables(nullptr) {}
+		item_class(wyrmgus::item_class::none), CanStore(-1), ImproveIncome(-1), BoolFlags(nullptr), Variables(nullptr) {}
 		//Wyrmgus end
 
 	~PopupConditionPanel()
@@ -83,12 +83,12 @@ public:
 	ButtonCmd ButtonAction = ButtonCmd::None;	/// action type of button
 	//Wyrmgus start
 	UnitTypeType UnitTypeType = UnitTypeType::None;	/// unit type type (i.e. land, fly, etc.) of the button's unit type
-	const stratagus::unit_class *unit_class = nullptr; /// unit type class of the button's unit type
-	stratagus::item_class item_class;				/// item class of the button's item
+	const wyrmgus::unit_class *unit_class = nullptr; /// unit type class of the button's unit type
+	wyrmgus::item_class item_class;				/// item class of the button's item
 	int CanStore;				/// whether the button's unit type can store a particular resource
 	int ImproveIncome;			/// whether the button's unit type improves the processing of a particular resource
 	CUpgrade *ResearchedUpgrade = nullptr;	/// whether the button's player has researched a particular upgrade
-	const stratagus::upgrade_class *researched_upgrade_class = nullptr; //whether the button's player has researched a particular upgrade class
+	const wyrmgus::upgrade_class *researched_upgrade_class = nullptr; //whether the button's player has researched a particular upgrade class
 	//Wyrmgus end
 	std::string ButtonValue;    /// value used in ValueStr field of button
 
@@ -142,11 +142,11 @@ public:
 	virtual ~CPopupContentType() { delete Condition; }
 
 	/// Tell how show the variable Index.
-	virtual void Draw(int x, int y, const CPopup &popup, const unsigned int popupWidth, const stratagus::button &button, int *Costs) const = 0;
+	virtual void Draw(int x, int y, const CPopup &popup, const unsigned int popupWidth, const wyrmgus::button &button, int *Costs) const = 0;
 	/// Get the content's width
-	virtual int GetWidth(const stratagus::button &button, int *Costs) const = 0;
+	virtual int GetWidth(const wyrmgus::button &button, int *Costs) const = 0;
 	/// Get the content's height
-	virtual int GetHeight(const stratagus::button &button, int *Costs) const = 0;
+	virtual int GetHeight(const wyrmgus::button &button, int *Costs) const = 0;
 
 	virtual void Parse(lua_State *l) = 0;
 
@@ -178,10 +178,10 @@ public:
 	CPopupContentTypeButtonInfo() : InfoType(0), MaxWidth(0), Font(nullptr) {}
 	virtual ~CPopupContentTypeButtonInfo() {}
 
-	virtual void Draw(int x, int y, const CPopup &popup, const unsigned int popupWidth, const stratagus::button &button, int *Costs) const;
+	virtual void Draw(int x, int y, const CPopup &popup, const unsigned int popupWidth, const wyrmgus::button &button, int *Costs) const;
 
-	virtual int GetWidth(const stratagus::button &button, int *Costs) const;
-	virtual int GetHeight(const stratagus::button &button, int *Costs) const;
+	virtual int GetWidth(const wyrmgus::button &button, int *Costs) const;
+	virtual int GetHeight(const wyrmgus::button &button, int *Costs) const;
 
 	virtual void Parse(lua_State *l);
 
@@ -206,10 +206,10 @@ public:
 	}
 	//Wyrmgus end
 
-	virtual void Draw(int x, int y, const CPopup &popup, const unsigned int popupWidth, const stratagus::button &button, int *Costs) const;
+	virtual void Draw(int x, int y, const CPopup &popup, const unsigned int popupWidth, const wyrmgus::button &button, int *Costs) const;
 
-	virtual int GetWidth(const stratagus::button &button, int *Costs) const;
-	virtual int GetHeight(const stratagus::button &button, int *Costs) const;
+	virtual int GetWidth(const wyrmgus::button &button, int *Costs) const;
+	virtual int GetHeight(const wyrmgus::button &button, int *Costs) const;
 
 	virtual void Parse(lua_State *l);
 
@@ -228,10 +228,10 @@ public:
 	CPopupContentTypeCosts() : Font(nullptr), Centered(0) {}
 	virtual ~CPopupContentTypeCosts() {}
 
-	virtual void Draw(int x, int y, const CPopup &popup, const unsigned int popupWidth, const stratagus::button &button, int *Costs) const;
+	virtual void Draw(int x, int y, const CPopup &popup, const unsigned int popupWidth, const wyrmgus::button &button, int *Costs) const;
 
-	virtual int GetWidth(const stratagus::button &button, int *Costs) const;
-	virtual int GetHeight(const stratagus::button &button, int *Costs) const;
+	virtual int GetWidth(const wyrmgus::button &button, int *Costs) const;
+	virtual int GetHeight(const wyrmgus::button &button, int *Costs) const;
 
 	virtual void Parse(lua_State *l);
 
@@ -246,10 +246,10 @@ public:
 	CPopupContentTypeLine();
 	virtual ~CPopupContentTypeLine() {}
 
-	virtual void Draw(int x, int y, const CPopup &popup, const unsigned int popupWidth, const stratagus::button &button, int *Costs) const;
+	virtual void Draw(int x, int y, const CPopup &popup, const unsigned int popupWidth, const wyrmgus::button &button, int *Costs) const;
 
-	virtual int GetWidth(const stratagus::button &button, int *Costs) const;
-	virtual int GetHeight(const stratagus::button &button, int *Costs) const;
+	virtual int GetWidth(const wyrmgus::button &button, int *Costs) const;
+	virtual int GetHeight(const wyrmgus::button &button, int *Costs) const;
 
 	virtual void Parse(lua_State *l);
 
@@ -269,10 +269,10 @@ public:
 		delete Text;
 	}
 
-	virtual void Draw(int x, int y, const CPopup &popup, const unsigned int popupWidth, const stratagus::button &button, int *Costs) const;
+	virtual void Draw(int x, int y, const CPopup &popup, const unsigned int popupWidth, const wyrmgus::button &button, int *Costs) const;
 
-	virtual int GetWidth(const stratagus::button &button, int *Costs) const;
-	virtual int GetHeight(const stratagus::button &button, int *Costs) const;
+	virtual int GetWidth(const wyrmgus::button &button, int *Costs) const;
+	virtual int GetHeight(const wyrmgus::button &button, int *Costs) const;
 
 	virtual void Parse(lua_State *l);
 

@@ -36,7 +36,7 @@ struct lua_State;
 
 int CclDefineModifier(lua_State *l);
 
-namespace stratagus {
+namespace wyrmgus {
 
 class faction;
 class sml_data;

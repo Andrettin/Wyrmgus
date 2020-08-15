@@ -35,7 +35,7 @@ class CPlayer;
 class CUpgrade;
 class CUnit;
 
-namespace stratagus {
+namespace wyrmgus {
 	class upgrade_modifier;
 }
 
@@ -71,9 +71,9 @@ extern void UpgradeLost(CPlayer &player, int id);
 /// Apply researched upgrades when map is loading
 extern void ApplyUpgrades();
 
-extern void ApplyIndividualUpgradeModifier(CUnit &unit, const stratagus::upgrade_modifier *um); /// Apply upgrade modifier of an individual upgrade
+extern void ApplyIndividualUpgradeModifier(CUnit &unit, const wyrmgus::upgrade_modifier *um); /// Apply upgrade modifier of an individual upgrade
 //Wyrmgus start
-extern void RemoveIndividualUpgradeModifier(CUnit &unit, const stratagus::upgrade_modifier *um);
+extern void RemoveIndividualUpgradeModifier(CUnit &unit, const wyrmgus::upgrade_modifier *um);
 extern void AbilityAcquire(CUnit &unit, const CUpgrade *upgrade, bool save = true);
 extern void AbilityLost(CUnit &unit, CUpgrade *upgrade, bool lose_all = false);
 extern void TraitAcquire(CUnit &unit, CUpgrade *upgrade);

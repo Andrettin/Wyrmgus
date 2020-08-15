@@ -297,7 +297,7 @@ void CGrandStrategyProvince::SetOwner(int civilization_id, int faction_id)
 		this->Owner->OwnedProvinces.erase(std::remove(this->Owner->OwnedProvinces.begin(), this->Owner->OwnedProvinces.end(), this->ID), this->Owner->OwnedProvinces.end());
 	}
 	
-	for (const stratagus::unit_type *unit_type : stratagus::unit_type::get_all()) { //change the province's military score to be appropriate for the new faction's technologies
+	for (const wyrmgus::unit_type *unit_type : wyrmgus::unit_type::get_all()) { //change the province's military score to be appropriate for the new faction's technologies
 		if (IsMilitaryUnit(*unit_type)) {
 			int old_owner_military_score_bonus = (this->Owner != nullptr ? this->Owner->MilitaryScoreBonus[unit_type->Slot] : 0);
 			int new_owner_military_score_bonus = (faction_id != -1 ? GrandStrategyGame.Factions[civilization_id][faction_id]->MilitaryScoreBonus[unit_type->Slot] : 0);
@@ -306,7 +306,7 @@ void CGrandStrategyProvince::SetOwner(int civilization_id, int faction_id)
 				this->OffensiveMilitaryScore += this->Units[unit_type->Slot] * new_owner_military_score_bonus - old_owner_military_score_bonus;
 			}
 		} else if (unit_type->get_unit_class() != nullptr && unit_type->get_unit_class()->get_identifier() == "worker") {
-			const stratagus::unit_type *militia_unit_type = unit_type->get_civilization()->get_class_unit_type(stratagus::unit_class::get("militia"));
+			const wyrmgus::unit_type *militia_unit_type = unit_type->get_civilization()->get_class_unit_type(wyrmgus::unit_class::get("militia"));
 			if (militia_unit_type != nullptr) {
 				int old_owner_military_score_bonus = (this->Owner != nullptr ? this->Owner->MilitaryScoreBonus[militia_unit_type->Slot] : 0);
 				int new_owner_military_score_bonus = (faction_id != -1 ? GrandStrategyGame.Factions[civilization_id][faction_id]->MilitaryScoreBonus[militia_unit_type->Slot] : 0);
@@ -340,8 +340,8 @@ void CGrandStrategyProvince::SetSettlementBuilding(int building_id, bool has_set
 	
 	int change = has_settlement_building ? 1 : -1;
 	for (int i = 0; i < MaxCosts; ++i) {
-		if (stratagus::unit_type::get_all()[building_id]->GrandStrategyProductionEfficiencyModifier[i] != 0) {
-			this->ProductionEfficiencyModifier[i] += stratagus::unit_type::get_all()[building_id]->GrandStrategyProductionEfficiencyModifier[i] * change;
+		if (wyrmgus::unit_type::get_all()[building_id]->GrandStrategyProductionEfficiencyModifier[i] != 0) {
+			this->ProductionEfficiencyModifier[i] += wyrmgus::unit_type::get_all()[building_id]->GrandStrategyProductionEfficiencyModifier[i] * change;
 		}
 	}
 }
@@ -381,16 +381,16 @@ void CGrandStrategyProvince::SetUnitQuantity(int unit_type_id, int quantity)
 	
 	this->TotalUnits += change;
 	
-	if (IsMilitaryUnit(*stratagus::unit_type::get_all()[unit_type_id])) {
-		this->MilitaryScore += change * (stratagus::unit_type::get_all()[unit_type_id]->DefaultStat.Variables[POINTS_INDEX].Value + (this->Owner != nullptr ? this->Owner->MilitaryScoreBonus[unit_type_id] : 0));
-		this->OffensiveMilitaryScore += change * (stratagus::unit_type::get_all()[unit_type_id]->DefaultStat.Variables[POINTS_INDEX].Value + (this->Owner != nullptr ? this->Owner->MilitaryScoreBonus[unit_type_id] : 0));
+	if (IsMilitaryUnit(*wyrmgus::unit_type::get_all()[unit_type_id])) {
+		this->MilitaryScore += change * (wyrmgus::unit_type::get_all()[unit_type_id]->DefaultStat.Variables[POINTS_INDEX].Value + (this->Owner != nullptr ? this->Owner->MilitaryScoreBonus[unit_type_id] : 0));
+		this->OffensiveMilitaryScore += change * (wyrmgus::unit_type::get_all()[unit_type_id]->DefaultStat.Variables[POINTS_INDEX].Value + (this->Owner != nullptr ? this->Owner->MilitaryScoreBonus[unit_type_id] : 0));
 	}
 	
-	if (stratagus::unit_type::get_all()[unit_type_id]->get_unit_class() != nullptr && stratagus::unit_type::get_all()[unit_type_id]->get_unit_class()->get_identifier() == "worker") {
+	if (wyrmgus::unit_type::get_all()[unit_type_id]->get_unit_class() != nullptr && wyrmgus::unit_type::get_all()[unit_type_id]->get_unit_class()->get_identifier() == "worker") {
 		this->TotalWorkers += change;
 		
 		//if this unit's civilization can change workers into militia, add half of the militia's points to the military score (one in every two workers becomes a militia when the province is attacked)
-		const stratagus::unit_type *militia_unit_type = stratagus::unit_type::get_all()[unit_type_id]->get_civilization()->get_class_unit_type(stratagus::unit_class::get("militia"));
+		const wyrmgus::unit_type *militia_unit_type = wyrmgus::unit_type::get_all()[unit_type_id]->get_civilization()->get_class_unit_type(wyrmgus::unit_class::get("militia"));
 		if (militia_unit_type != nullptr) {
 			this->MilitaryScore += change * ((militia_unit_type->DefaultStat.Variables[POINTS_INDEX].Value + (this->Owner != nullptr ? this->Owner->MilitaryScoreBonus[militia_unit_type->Slot] : 0)) / 2);
 		}
@@ -410,7 +410,7 @@ void CGrandStrategyProvince::SetPopulation(int quantity)
 		return;
 	}
 
-	int worker_unit_type = this->GetClassUnitType(stratagus::unit_class::get("worker"));
+	int worker_unit_type = this->GetClassUnitType(wyrmgus::unit_class::get("worker"));
 	
 	if (quantity > 0) {
 		quantity /= 10000; // each population unit represents 10,000 people
@@ -464,7 +464,7 @@ bool CGrandStrategyProvince::HasBuildingClass(std::string building_class_name)
 		return false;
 	}
 	
-	int building_type = this->GetClassUnitType(stratagus::unit_class::get(building_class_name));
+	int building_type = this->GetClassUnitType(wyrmgus::unit_class::get(building_class_name));
 	
 	if (building_type == -1 && building_class_name == "mercenary-camp") { //special case for mercenary camps, which are a neutral building
 		building_type = UnitTypeIdByIdent("unit-mercenary-camp");
@@ -561,9 +561,9 @@ int CGrandStrategyProvince::GetPopulation()
 	return (this->TotalWorkers * 10000) * 2;
 }
 
-int CGrandStrategyProvince::GetClassUnitType(const stratagus::unit_class *unit_class)
+int CGrandStrategyProvince::GetClassUnitType(const wyrmgus::unit_class *unit_class)
 {
-	const stratagus::unit_type *unit_type = stratagus::civilization::get_all()[this->civilization]->get_class_unit_type(unit_class);
+	const wyrmgus::unit_type *unit_type = wyrmgus::civilization::get_all()[this->civilization]->get_class_unit_type(unit_class);
 
 	if (unit_type != nullptr) {
 		return unit_type->Slot;
@@ -603,8 +603,8 @@ std::string CGrandStrategyProvince::GenerateWorkName()
 	std::string work_name;
 	
 	std::vector<CGrandStrategyHero *> potential_heroes;
-	for (size_t i = 0; i < this->Owner->HistoricalMinisters[stratagus::character_title::head_of_state].size(); ++i) {
-		potential_heroes.push_back(this->Owner->HistoricalMinisters[stratagus::character_title::head_of_state][i]);
+	for (size_t i = 0; i < this->Owner->HistoricalMinisters[wyrmgus::character_title::head_of_state].size(); ++i) {
+		potential_heroes.push_back(this->Owner->HistoricalMinisters[wyrmgus::character_title::head_of_state][i]);
 	}
 	
 	if (potential_heroes.size() > 0 && SyncRand(10) != 0) { // 9 chances out of 10 that a literary work will use a hero's name as a basis
@@ -654,7 +654,7 @@ void CGrandStrategyFaction::SetTechnology(int upgrade_id, bool has_technology, b
 		
 	//add military score bonuses
 	for (const auto &modifier : CUpgrade::get_all()[upgrade_id]->get_modifiers()) {
-		for (const stratagus::unit_type *unit_type : stratagus::unit_type::get_all()) {
+		for (const wyrmgus::unit_type *unit_type : wyrmgus::unit_type::get_all()) {
 				
 			if (modifier->applies_to(unit_type)) {
 				if (modifier->Modifier.Variables[POINTS_INDEX].Value) {
@@ -682,7 +682,7 @@ void CGrandStrategyFaction::SetCapital(CGrandStrategyProvince *province)
 	this->Capital = province;
 }
 
-void CGrandStrategyFaction::SetMinister(const stratagus::character_title title, std::string hero_full_name)
+void CGrandStrategyFaction::SetMinister(const wyrmgus::character_title title, std::string hero_full_name)
 {
 	if (this->Ministers[title] != nullptr && std::find(this->Ministers[title]->Titles.begin(), this->Ministers[title]->Titles.end(), std::make_pair(title, this)) != this->Ministers[title]->Titles.end()) { // remove from the old minister's array
 		this->Ministers[title]->Titles.erase(std::remove(this->Ministers[title]->Titles.begin(), this->Ministers[title]->Titles.end(), std::make_pair(title, this)), this->Ministers[title]->Titles.end());
@@ -703,7 +703,7 @@ void CGrandStrategyFaction::SetMinister(const stratagus::character_title title, 
 			if (this->IsAlive()) {
 				int titles_size = hero->Titles.size();
 				for (int i = (titles_size - 1); i >= 0; --i) {
-					if (!(hero->Titles[i].first == title && hero->Titles[i].second == this) && hero->Titles[i].first != stratagus::character_title::head_of_state) { // a character can only have multiple head of state titles, but not others
+					if (!(hero->Titles[i].first == title && hero->Titles[i].second == this) && hero->Titles[i].first != wyrmgus::character_title::head_of_state) { // a character can only have multiple head of state titles, but not others
 						hero->Titles[i].second->SetMinister(hero->Titles[i].first, "");
 					}
 				}
@@ -717,7 +717,7 @@ void CGrandStrategyFaction::SetMinister(const stratagus::character_title title, 
 //			new_minister_message += this->GetCharacterTitle(title, this->Ministers[title]->Gender) + " " + this->Ministers[title]->GetFullName();
 			new_minister_message += "\", \"";
 //			new_minister_message += "A new " + FullyDecapitalizeString(this->GetCharacterTitle(title, this->Ministers[title]->Gender));
-			if (title == stratagus::character_title::head_of_state) {
+			if (title == wyrmgus::character_title::head_of_state) {
 				new_minister_message += " has come to power in our realm, ";
 			} else {
 				new_minister_message += " has been appointed, ";
@@ -738,21 +738,21 @@ void CGrandStrategyFaction::SetMinister(const stratagus::character_title title, 
 	}
 }
 
-void CGrandStrategyFaction::MinisterSuccession(const stratagus::character_title title)
+void CGrandStrategyFaction::MinisterSuccession(const wyrmgus::character_title title)
 {
 	if (
 		this->Ministers[title] != nullptr
-		&& (stratagus::faction::get_all()[this->Faction]->Type == FactionTypeTribe || this->government_type == stratagus::government_type::monarchy)
-		&& title == stratagus::character_title::head_of_state
+		&& (wyrmgus::faction::get_all()[this->Faction]->Type == FactionTypeTribe || this->government_type == wyrmgus::government_type::monarchy)
+		&& title == wyrmgus::character_title::head_of_state
 	) { //if is a tribe or a monarchical polity, try to perform ruler succession by descent
 		for (size_t i = 0; i < this->Ministers[title]->Children.size(); ++i) {
-			if (this->Ministers[title]->Children[i]->IsAlive() && this->Ministers[title]->Children[i]->IsVisible() && this->Ministers[title]->Children[i]->get_gender() == stratagus::gender::male) { //historically males have generally been given priority in throne inheritance (if not exclusivity), specially in the cultures currently playable in the game
+			if (this->Ministers[title]->Children[i]->IsAlive() && this->Ministers[title]->Children[i]->IsVisible() && this->Ministers[title]->Children[i]->get_gender() == wyrmgus::gender::male) { //historically males have generally been given priority in throne inheritance (if not exclusivity), specially in the cultures currently playable in the game
 				this->SetMinister(title, this->Ministers[title]->Children[i]->GetFullName());
 				return;
 			}
 		}
 		for (size_t i = 0; i < this->Ministers[title]->Siblings.size(); ++i) { // now check for male siblings of the current ruler
-			if (this->Ministers[title]->Siblings[i]->IsAlive() && this->Ministers[title]->Siblings[i]->IsVisible() && this->Ministers[title]->Siblings[i]->get_gender() == stratagus::gender::male) {
+			if (this->Ministers[title]->Siblings[i]->IsAlive() && this->Ministers[title]->Siblings[i]->IsVisible() && this->Ministers[title]->Siblings[i]->get_gender() == wyrmgus::gender::male) {
 				this->SetMinister(title, this->Ministers[title]->Siblings[i]->GetFullName());
 				return;
 			}
@@ -771,7 +771,7 @@ void CGrandStrategyFaction::MinisterSuccession(const stratagus::character_title 
 		}
 		
 		// if no family successor was found, the title becomes extinct if it is only a titular one (an aristocratic title whose corresponding faction does not actually hold territory)
-		if (!this->CanHaveSuccession(title, false) || title != stratagus::character_title::head_of_state) {
+		if (!this->CanHaveSuccession(title, false) || title != wyrmgus::character_title::head_of_state) {
 			this->Ministers[title] = nullptr;
 			return;
 		}
@@ -817,7 +817,7 @@ bool CGrandStrategyFaction::HasTechnologyClass(std::string technology_class_name
 		return false;
 	}
 	
-	int technology_id = stratagus::faction::get_all()[this->Faction]->get_class_upgrade(stratagus::upgrade_class::get(technology_class_name))->ID;
+	int technology_id = wyrmgus::faction::get_all()[this->Faction]->get_class_upgrade(wyrmgus::upgrade_class::get(technology_class_name))->ID;
 	
 	if (technology_id != -1 && this->Technologies[technology_id] == true) {
 		return true;
@@ -826,9 +826,9 @@ bool CGrandStrategyFaction::HasTechnologyClass(std::string technology_class_name
 	return false;
 }
 
-bool CGrandStrategyFaction::CanHaveSuccession(const stratagus::character_title title, bool family_inheritance)
+bool CGrandStrategyFaction::CanHaveSuccession(const wyrmgus::character_title title, bool family_inheritance)
 {
-	if (!this->IsAlive() && (title != stratagus::character_title::head_of_state || !family_inheritance || stratagus::faction::get_all()[this->Faction]->Type == FactionTypeTribe || this->government_type != stratagus::government_type::monarchy)) { // head of state titles can be inherited even if their respective factions have no provinces, but if the line dies out then the title becomes extinct; tribal titles cannot be titular-only
+	if (!this->IsAlive() && (title != wyrmgus::character_title::head_of_state || !family_inheritance || wyrmgus::faction::get_all()[this->Faction]->Type == FactionTypeTribe || this->government_type != wyrmgus::government_type::monarchy)) { // head of state titles can be inherited even if their respective factions have no provinces, but if the line dies out then the title becomes extinct; tribal titles cannot be titular-only
 		return false;
 	}
 	
@@ -837,7 +837,7 @@ bool CGrandStrategyFaction::CanHaveSuccession(const stratagus::character_title t
 
 bool CGrandStrategyFaction::IsConquestDesirable(CGrandStrategyProvince *province)
 {
-	if (this->OwnedProvinces.size() == 1 && province->Owner == nullptr && stratagus::faction::get_all()[this->Faction]->Type == FactionTypeTribe) {
+	if (this->OwnedProvinces.size() == 1 && province->Owner == nullptr && wyrmgus::faction::get_all()[this->Faction]->Type == FactionTypeTribe) {
 		if (province->GetDesirabilityRating() <= GrandStrategyGame.Provinces[this->OwnedProvinces[0]]->GetDesirabilityRating()) { // if conquering the province would trigger a migration, the conquest is only desirable if the province is worth more
 			return false;
 		}
@@ -850,12 +850,12 @@ int CGrandStrategyFaction::GetTroopCostModifier()
 {
 	int modifier = 0;
 	
-	if (this->Ministers[stratagus::character_title::head_of_state] != nullptr) {
-		modifier += this->Ministers[stratagus::character_title::head_of_state]->GetTroopCostModifier();
+	if (this->Ministers[wyrmgus::character_title::head_of_state] != nullptr) {
+		modifier += this->Ministers[wyrmgus::character_title::head_of_state]->GetTroopCostModifier();
 	}
 	
-	if (this->Ministers[stratagus::character_title::war_minister] != nullptr) {
-		modifier += this->Ministers[stratagus::character_title::war_minister]->GetTroopCostModifier();
+	if (this->Ministers[wyrmgus::character_title::war_minister] != nullptr) {
+		modifier += this->Ministers[wyrmgus::character_title::war_minister]->GetTroopCostModifier();
 	}
 	
 	return modifier;
@@ -863,10 +863,10 @@ int CGrandStrategyFaction::GetTroopCostModifier()
 
 std::string CGrandStrategyFaction::GetFullName()
 {
-	if (stratagus::faction::get_all()[this->Faction]->Type == FactionTypeTribe) {
-		return stratagus::faction::get_all()[this->Faction]->get_name();
-	} else if (stratagus::faction::get_all()[this->Faction]->Type == FactionTypePolity) {
-//		return this->GetTitle() + " of " + stratagus::faction::get_all()[this->Faction]->Name;
+	if (wyrmgus::faction::get_all()[this->Faction]->Type == FactionTypeTribe) {
+		return wyrmgus::faction::get_all()[this->Faction]->get_name();
+	} else if (wyrmgus::faction::get_all()[this->Faction]->Type == FactionTypePolity) {
+//		return this->GetTitle() + " of " + wyrmgus::faction::get_all()[this->Faction]->Name;
 	}
 	
 	return "";
@@ -894,12 +894,12 @@ void CGrandStrategyHero::Die()
 	//show message that the hero has died
 	/*
 	if (this->IsVisible()) {
-		if (GrandStrategyGame.PlayerFaction != nullptr && GrandStrategyGame.PlayerFaction->Ministers[stratagus::character_title::head_of_state] == this) {
+		if (GrandStrategyGame.PlayerFaction != nullptr && GrandStrategyGame.PlayerFaction->Ministers[wyrmgus::character_title::head_of_state] == this) {
 			char buf[256];
 			snprintf(
 				buf, sizeof(buf), "if (GenericDialog ~= nil) then GenericDialog(\"%s\", \"%s\") end;",
-				(GrandStrategyGame.PlayerFaction->GetCharacterTitle(stratagus::character_title::head_of_state, this->Gender) + " " + this->GetFullName() + " Dies").c_str(),
-				("Tragic news spread throughout our realm. Our " + FullyDecapitalizeString(GrandStrategyGame.PlayerFaction->GetCharacterTitle(stratagus::character_title::head_of_state, this->Gender)) + ", " + this->GetFullName() + ", has died! May his soul rest in peace.").c_str()
+				(GrandStrategyGame.PlayerFaction->GetCharacterTitle(wyrmgus::character_title::head_of_state, this->Gender) + " " + this->GetFullName() + " Dies").c_str(),
+				("Tragic news spread throughout our realm. Our " + FullyDecapitalizeString(GrandStrategyGame.PlayerFaction->GetCharacterTitle(wyrmgus::character_title::head_of_state, this->Gender)) + ", " + this->GetFullName() + ", has died! May his soul rest in peace.").c_str()
 			);
 			CclCommand(buf);	
 		} else if (this->GetFaction() == GrandStrategyGame.PlayerFaction) {
@@ -932,34 +932,34 @@ bool CGrandStrategyHero::IsAlive()
 
 bool CGrandStrategyHero::IsVisible()
 {
-	return this->get_unit_type()->DefaultStat.Variables[GENDER_INDEX].Value == 0 || this->get_gender() == static_cast<stratagus::gender>(this->get_unit_type()->DefaultStat.Variables[GENDER_INDEX].Value); // hero not visible if their unit type has a set gender which is different from the hero's (this is because of instances where i.e. females have a unit type that only has male portraits)
+	return this->get_unit_type()->DefaultStat.Variables[GENDER_INDEX].Value == 0 || this->get_gender() == static_cast<wyrmgus::gender>(this->get_unit_type()->DefaultStat.Variables[GENDER_INDEX].Value); // hero not visible if their unit type has a set gender which is different from the hero's (this is because of instances where i.e. females have a unit type that only has male portraits)
 }
 
 bool CGrandStrategyHero::IsGenerated()
 {
-	return !this->Custom && stratagus::character::get(this->GetFullName()) == nullptr;
+	return !this->Custom && wyrmgus::character::get(this->GetFullName()) == nullptr;
 }
 
-bool CGrandStrategyHero::IsEligibleForTitle(const stratagus::character_title title)
+bool CGrandStrategyHero::IsEligibleForTitle(const wyrmgus::character_title title)
 {
-	if (this->GetFaction()->government_type == stratagus::government_type::monarchy && title == stratagus::character_title::head_of_state && this->get_unit_type()->get_unit_class() != nullptr && this->get_unit_type()->get_unit_class()->get_identifier() == "worker") { // commoners cannot become monarchs
+	if (this->GetFaction()->government_type == wyrmgus::government_type::monarchy && title == wyrmgus::character_title::head_of_state && this->get_unit_type()->get_unit_class() != nullptr && this->get_unit_type()->get_unit_class()->get_identifier() == "worker") { // commoners cannot become monarchs
 		return false;
-	} else if (this->GetFaction()->government_type == stratagus::government_type::theocracy && title == stratagus::character_title::head_of_state && this->get_unit_type()->get_unit_class() != nullptr && this->get_unit_type()->get_unit_class()->get_identifier() != "priest") { // non-priests cannot rule theocracies
+	} else if (this->GetFaction()->government_type == wyrmgus::government_type::theocracy && title == wyrmgus::character_title::head_of_state && this->get_unit_type()->get_unit_class() != nullptr && this->get_unit_type()->get_unit_class()->get_identifier() != "priest") { // non-priests cannot rule theocracies
 		return false;
 	}
 	
 	for (size_t i = 0; i < this->Titles.size(); ++i) {
-		if (this->Titles[i].first == stratagus::character_title::head_of_state && this->Titles[i].second->IsAlive() && title != stratagus::character_title::head_of_state) { // if it is not a head of state title, and this character is already the head of state of a living faction, return false
+		if (this->Titles[i].first == wyrmgus::character_title::head_of_state && this->Titles[i].second->IsAlive() && title != wyrmgus::character_title::head_of_state) { // if it is not a head of state title, and this character is already the head of state of a living faction, return false
 			return false;
-		} else if (this->Titles[i].first == stratagus::character_title::head_of_government && title != stratagus::character_title::head_of_state) { // if is already a head of government, don't accept ministerial titles of lower rank (that is, any but the title of head of state)
+		} else if (this->Titles[i].first == wyrmgus::character_title::head_of_government && title != wyrmgus::character_title::head_of_state) { // if is already a head of government, don't accept ministerial titles of lower rank (that is, any but the title of head of state)
 			return false;
-		} else if (this->Titles[i].first != stratagus::character_title::head_of_state && this->Titles[i].first != stratagus::character_title::head_of_government && title != stratagus::character_title::head_of_state && title != stratagus::character_title::head_of_government) { // if is already a minister, don't accept another ministerial title of equal rank
+		} else if (this->Titles[i].first != wyrmgus::character_title::head_of_state && this->Titles[i].first != wyrmgus::character_title::head_of_government && title != wyrmgus::character_title::head_of_state && title != wyrmgus::character_title::head_of_government) { // if is already a minister, don't accept another ministerial title of equal rank
 			return false;
 		}
 	}
 	
 	for (size_t i = 0; i < this->ProvinceTitles.size(); ++i) {
-		if (this->ProvinceTitles[i].first != stratagus::character_title::head_of_state && this->ProvinceTitles[i].first != stratagus::character_title::head_of_government && title != stratagus::character_title::head_of_state && title != stratagus::character_title::head_of_government) { // if already has a government position, don't accept another ministerial title of equal rank
+		if (this->ProvinceTitles[i].first != wyrmgus::character_title::head_of_state && this->ProvinceTitles[i].first != wyrmgus::character_title::head_of_government && title != wyrmgus::character_title::head_of_state && title != wyrmgus::character_title::head_of_government) { // if already has a government position, don't accept another ministerial title of equal rank
 			return false;
 		}
 	}
@@ -976,26 +976,26 @@ int CGrandStrategyHero::GetTroopCostModifier()
 	return modifier;
 }
 
-int CGrandStrategyHero::GetTitleScore(const stratagus::character_title title, CGrandStrategyProvince *province)
+int CGrandStrategyHero::GetTitleScore(const wyrmgus::character_title title, CGrandStrategyProvince *province)
 {
 	int score = 0;
-	if (title == stratagus::character_title::head_of_state) {
+	if (title == wyrmgus::character_title::head_of_state) {
 		score = ((this->Attributes[IntelligenceAttribute] + ((this->Attributes[this->GetMartialAttribute()] + this->Attributes[IntelligenceAttribute]) / 2) + this->Attributes[CharismaAttribute]) / 3) + 1;
-	} else if (title == stratagus::character_title::head_of_government) {
+	} else if (title == wyrmgus::character_title::head_of_government) {
 		score = ((this->Attributes[IntelligenceAttribute] + ((this->Attributes[this->GetMartialAttribute()] + this->Attributes[IntelligenceAttribute]) / 2) + this->Attributes[CharismaAttribute]) / 3) + 1;
-	} else if (title == stratagus::character_title::education_minister) {
+	} else if (title == wyrmgus::character_title::education_minister) {
 		score = this->Attributes[IntelligenceAttribute];
-	} else if (title == stratagus::character_title::finance_minister) {
+	} else if (title == wyrmgus::character_title::finance_minister) {
 		score = this->Attributes[IntelligenceAttribute];
-	} else if (title == stratagus::character_title::war_minister) {
+	} else if (title == wyrmgus::character_title::war_minister) {
 		score = (this->Attributes[this->GetMartialAttribute()] + this->Attributes[IntelligenceAttribute]) / 2;
-	} else if (title == stratagus::character_title::interior_minister) {
+	} else if (title == wyrmgus::character_title::interior_minister) {
 		score = this->Attributes[IntelligenceAttribute];
-	} else if (title == stratagus::character_title::justice_minister) {
+	} else if (title == wyrmgus::character_title::justice_minister) {
 		score = this->Attributes[IntelligenceAttribute];
-	} else if (title == stratagus::character_title::foreign_minister) {
+	} else if (title == wyrmgus::character_title::foreign_minister) {
 		score = (this->Attributes[CharismaAttribute] + this->Attributes[IntelligenceAttribute]) / 2;
-	} else if (title == stratagus::character_title::governor) {
+	} else if (title == wyrmgus::character_title::governor) {
 		score = ((this->Attributes[IntelligenceAttribute] + ((this->Attributes[this->GetMartialAttribute()] + this->Attributes[IntelligenceAttribute]) / 2) + this->Attributes[CharismaAttribute]) / 3);
 		if (province != nullptr && (province == this->Province || province == this->ProvinceOfOrigin)) {
 			score += 1;
@@ -1009,13 +1009,13 @@ int CGrandStrategyHero::GetTitleScore(const stratagus::character_title title, CG
 	return score;
 }
 
-std::string CGrandStrategyHero::GetMinisterEffectsString(const stratagus::character_title title)
+std::string CGrandStrategyHero::GetMinisterEffectsString(const wyrmgus::character_title title)
 {
 	std::string minister_effects_string;
 	
 	bool first = true;
 	
-	if (title == stratagus::character_title::head_of_state || title == stratagus::character_title::war_minister) {
+	if (title == wyrmgus::character_title::head_of_state || title == wyrmgus::character_title::war_minister) {
 		int modifier = this->GetTroopCostModifier();
 		if (modifier != 0) {
 			if (!first) {
@@ -1083,9 +1083,9 @@ CGrandStrategyEvent::~CGrandStrategyEvent()
 
 void CGrandStrategyEvent::Trigger(CGrandStrategyFaction *faction)
 {
-//	fprintf(stderr, "Triggering event \"%s\" for faction %s.\n", this->Name.c_str(), stratagus::faction::get_all()[faction->Faction]->Name.c_str());	
+//	fprintf(stderr, "Triggering event \"%s\" for faction %s.\n", this->Name.c_str(), wyrmgus::faction::get_all()[faction->Faction]->Name.c_str());	
 	
-	CclCommand("EventFaction = GetFactionFromName(\"" + stratagus::faction::get_all()[faction->Faction]->get_identifier() + "\");");
+	CclCommand("EventFaction = GetFactionFromName(\"" + wyrmgus::faction::get_all()[faction->Faction]->get_identifier() + "\");");
 	CclCommand("GrandStrategyEvent(EventFaction, \"" + this->Name + "\");");
 	CclCommand("EventFaction = nil;");
 	CclCommand("EventProvince = nil;");
@@ -1098,7 +1098,7 @@ void CGrandStrategyEvent::Trigger(CGrandStrategyFaction *faction)
 
 bool CGrandStrategyEvent::CanTrigger(CGrandStrategyFaction *faction)
 {
-//	fprintf(stderr, "Checking for triggers for event \"%s\" for faction %s.\n", this->Name.c_str(), stratagus::faction::get_all()[faction->Faction]->Name.c_str());	
+//	fprintf(stderr, "Checking for triggers for event \"%s\" for faction %s.\n", this->Name.c_str(), wyrmgus::faction::get_all()[faction->Faction]->Name.c_str());	
 	
 	if (this->MinYear && GrandStrategyYear < this->MinYear) {
 		return false;
@@ -1138,8 +1138,8 @@ int GetProvinceId(std::string province_name)
 void SetProvinceOwner(std::string province_name, std::string civilization_name, std::string faction_name)
 {
 	int province_id = GetProvinceId(province_name);
-	stratagus::civilization *civilization = stratagus::civilization::get(civilization_name);
-	int faction_id = stratagus::faction::get(faction_name)->ID;
+	wyrmgus::civilization *civilization = wyrmgus::civilization::get(civilization_name);
+	int faction_id = wyrmgus::faction::get(faction_name)->ID;
 	
 	if (!civilization || province_id == -1 || !GrandStrategyGame.Provinces[province_id]) {
 		return;
@@ -1211,8 +1211,8 @@ void AddProvinceClaim(std::string province_name, std::string civilization_name, 
 	int province_id = GetProvinceId(province_name);
 	
 	if (province_id != -1 && GrandStrategyGame.Provinces[province_id]) {
-		stratagus::civilization *civilization = stratagus::civilization::get(civilization_name);
-		int faction = stratagus::faction::get(faction_name)->ID;
+		wyrmgus::civilization *civilization = wyrmgus::civilization::get(civilization_name);
+		int faction = wyrmgus::faction::get(faction_name)->ID;
 		if (faction != -1) {
 			GrandStrategyGame.Provinces[province_id]->AddFactionClaim(civilization->ID, faction);
 		} else {
@@ -1228,8 +1228,8 @@ void RemoveProvinceClaim(std::string province_name, std::string civilization_nam
 	int province_id = GetProvinceId(province_name);
 	
 	if (province_id != -1 && GrandStrategyGame.Provinces[province_id]) {
-		stratagus::civilization *civilization = stratagus::civilization::get(civilization_name);
-		int faction = stratagus::faction::get(faction_name)->ID;
+		wyrmgus::civilization *civilization = wyrmgus::civilization::get(civilization_name);
+		int faction = wyrmgus::faction::get(faction_name)->ID;
 		GrandStrategyGame.Provinces[province_id]->RemoveFactionClaim(civilization->ID, faction);
 	}
 }
@@ -1238,7 +1238,7 @@ void InitializeGrandStrategyGame(bool show_loading)
 {
 	//initialize literary works
 	for (CUpgrade *upgrade : CUpgrade::get_all()) {
-		if (upgrade->Work == stratagus::item_class::none || upgrade->UniqueOnly) { // literary works that can only appear in unique items wouldn't be publishable
+		if (upgrade->Work == wyrmgus::item_class::none || upgrade->UniqueOnly) { // literary works that can only appear in unique items wouldn't be publishable
 			continue;
 		}
 		
@@ -1299,8 +1299,8 @@ bool ProvinceBordersProvince(std::string province_name, std::string second_provi
 bool ProvinceBordersFaction(std::string province_name, std::string faction_civilization_name, std::string faction_name)
 {
 	int province = GetProvinceId(province_name);
-	stratagus::civilization *civilization = stratagus::civilization::get(faction_civilization_name);
-	int faction = stratagus::faction::get(faction_name)->ID;
+	wyrmgus::civilization *civilization = wyrmgus::civilization::get(faction_civilization_name);
+	int faction = wyrmgus::faction::get(faction_name)->ID;
 	
 	if (!civilization || faction == -1) {
 		return false;
@@ -1321,7 +1321,7 @@ std::string GetProvinceCivilization(std::string province_name)
 	int province_id = GetProvinceId(province_name);
 	
 	if (GrandStrategyGame.Provinces[province_id]->civilization != -1) {
-		return stratagus::civilization::get_all()[GrandStrategyGame.Provinces[province_id]->civilization]->get_identifier();
+		return wyrmgus::civilization::get_all()[GrandStrategyGame.Provinces[province_id]->civilization]->get_identifier();
 	} else {
 		return "";
 	}
@@ -1390,7 +1390,7 @@ std::string GetProvinceOwner(std::string province_name)
 		return "";
 	}
 	
-	return stratagus::faction::get_all()[GrandStrategyGame.Provinces[province_id]->Owner->Faction]->get_identifier();
+	return wyrmgus::faction::get_all()[GrandStrategyGame.Provinces[province_id]->Owner->Faction]->get_identifier();
 }
 
 void SetFactionGovernmentType(std::string civilization_name, std::string faction_name, std::string government_type_name)
@@ -1406,7 +1406,7 @@ std::string GetFactionDiplomacyStateProposal(std::string civilization_name, std:
 	return "";
 }
 
-bool IsGrandStrategyUnit(const stratagus::unit_type &type)
+bool IsGrandStrategyUnit(const wyrmgus::unit_type &type)
 {
 	if (!type.BoolFlag[BUILDING_INDEX].value && type.DefaultStat.Variables[DEMAND_INDEX].Value > 0 && type.get_unit_class() != nullptr && type.get_unit_class()->get_identifier() != "caravan") {
 		return true;
@@ -1414,7 +1414,7 @@ bool IsGrandStrategyUnit(const stratagus::unit_type &type)
 	return false;
 }
 
-bool IsMilitaryUnit(const stratagus::unit_type &type)
+bool IsMilitaryUnit(const wyrmgus::unit_type &type)
 {
 	if (IsGrandStrategyUnit(type) && type.get_unit_class() != nullptr && type.get_unit_class()->get_identifier() != "worker") {
 		return true;
@@ -1424,14 +1424,14 @@ bool IsMilitaryUnit(const stratagus::unit_type &type)
 
 void SetFactionMinister(std::string civilization_name, std::string faction_name, std::string title_name, std::string hero_full_name)
 {
-	stratagus::civilization *civilization = stratagus::civilization::get(civilization_name);
+	wyrmgus::civilization *civilization = wyrmgus::civilization::get(civilization_name);
 	int faction = -1;
 	if (civilization) {
-		faction = stratagus::faction::get(faction_name)->ID;
+		faction = wyrmgus::faction::get(faction_name)->ID;
 	}
-	const stratagus::character_title title = GetCharacterTitleIdByName(title_name);
+	const wyrmgus::character_title title = GetCharacterTitleIdByName(title_name);
 	
-	if (faction == -1 || title == stratagus::character_title::none) {
+	if (faction == -1 || title == wyrmgus::character_title::none) {
 		return;
 	}
 	
@@ -1440,14 +1440,14 @@ void SetFactionMinister(std::string civilization_name, std::string faction_name,
 
 std::string GetFactionMinister(std::string civilization_name, std::string faction_name, std::string title_name)
 {
-	stratagus::civilization *civilization = stratagus::civilization::get(civilization_name);
+	wyrmgus::civilization *civilization = wyrmgus::civilization::get(civilization_name);
 	int faction = -1;
 	if (civilization) {
-		faction = stratagus::faction::get(faction_name)->ID;
+		faction = wyrmgus::faction::get(faction_name)->ID;
 	}
-	const stratagus::character_title title = GetCharacterTitleIdByName(title_name);
+	const wyrmgus::character_title title = GetCharacterTitleIdByName(title_name);
 	
-	if (faction == -1 || title == stratagus::character_title::none) {
+	if (faction == -1 || title == wyrmgus::character_title::none) {
 		return "";
 	}
 	

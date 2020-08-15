@@ -30,7 +30,7 @@
 #include "database/data_type.h"
 #include "database/detailed_data_entry.h"
 
-namespace stratagus {
+namespace wyrmgus {
 
 class deity_domain;
 

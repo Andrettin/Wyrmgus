@@ -29,7 +29,7 @@
 
 #include "util/singleton.h"
 
-namespace stratagus {
+namespace wyrmgus {
 
 class random : public singleton<random>
 {

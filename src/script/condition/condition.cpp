@@ -56,7 +56,7 @@
 #include "util/string_util.h"
 #include "util/vector_util.h"
 
-namespace stratagus {
+namespace wyrmgus {
 
 std::unique_ptr<const condition> condition::from_sml_property(const sml_property &property)
 {
@@ -262,7 +262,7 @@ void season_condition::ProcessConfigDataProperty(const std::pair<std::string, st
 **
 **  @return        True if available, false otherwise.
 */
-std::string PrintConditions(const CPlayer &player, const stratagus::button &button)
+std::string PrintConditions(const CPlayer &player, const wyrmgus::button &button)
 {
 	std::string rules;
 
@@ -271,7 +271,7 @@ std::string PrintConditions(const CPlayer &player, const stratagus::button &butt
 	//
 	if (!strncmp(button.ValueStr.c_str(), "unit-", 5)) {
 		// target string refers to unit-XXX
-		const stratagus::unit_type *unit_type = stratagus::unit_type::get(button.ValueStr);
+		const wyrmgus::unit_type *unit_type = wyrmgus::unit_type::get(button.ValueStr);
 		rules = unit_type->get_conditions()->get_string();
 	} else if (!strncmp(button.ValueStr.c_str(), "upgrade", 7)) {
 		// target string refers to upgrade-XXX
@@ -293,7 +293,7 @@ std::string PrintConditions(const CPlayer &player, const stratagus::button &butt
 	return rules;
 }
 
-bool CheckConditions(const stratagus::unit_type *target, const CPlayer *player, bool ignore_units, bool is_precondition, bool is_neutral_use)
+bool CheckConditions(const wyrmgus::unit_type *target, const CPlayer *player, bool ignore_units, bool is_precondition, bool is_neutral_use)
 {
 	if (!is_precondition && !CheckConditions(target, player, ignore_units, true, is_neutral_use)) {
 		return false;
@@ -320,17 +320,17 @@ bool CheckConditions(const CUpgrade *target, const CPlayer *player, bool ignore_
 		return false;
 	}
 
-	if (player->Faction != -1 && stratagus::faction::get_all()[player->Faction]->Type == FactionTypeHolyOrder) { // if the player is a holy order, and the upgrade is incompatible with its deity, don't allow it
-		if (stratagus::faction::get_all()[player->Faction]->HolyOrderDeity) {
-			CUpgrade *deity_upgrade = stratagus::faction::get_all()[player->Faction]->HolyOrderDeity->DeityUpgrade;
+	if (player->Faction != -1 && wyrmgus::faction::get_all()[player->Faction]->Type == FactionTypeHolyOrder) { // if the player is a holy order, and the upgrade is incompatible with its deity, don't allow it
+		if (wyrmgus::faction::get_all()[player->Faction]->HolyOrderDeity) {
+			CUpgrade *deity_upgrade = wyrmgus::faction::get_all()[player->Faction]->HolyOrderDeity->DeityUpgrade;
 			if (deity_upgrade) {
 				for (const auto &modifier : target->get_modifiers()) {
-					if (stratagus::vector::contains(modifier->RemoveUpgrades, deity_upgrade)) {
+					if (wyrmgus::vector::contains(modifier->RemoveUpgrades, deity_upgrade)) {
 						return false;
 					}
 				}
 				for (const auto &modifier : deity_upgrade->get_modifiers()) {
-					if (stratagus::vector::contains(modifier->RemoveUpgrades, target)) {
+					if (wyrmgus::vector::contains(modifier->RemoveUpgrades, target)) {
 						return false;
 					}
 				}
@@ -345,7 +345,7 @@ bool CheckConditions(const CUpgrade *target, const CPlayer *player, bool ignore_
 	}
 }
 
-bool CheckConditions(const stratagus::unit_type *target, const CUnit *unit, bool ignore_units, bool is_precondition)
+bool CheckConditions(const wyrmgus::unit_type *target, const CUnit *unit, bool ignore_units, bool is_precondition)
 {
 	if (!is_precondition && !CheckConditions(target, unit, ignore_units, true)) {
 		return false;
@@ -388,7 +388,7 @@ static int CclDefineDependency(lua_State *l)
 	const int args = lua_gettop(l);
 	const char *target = LuaToString(l, 1);
 
-	std::vector<std::unique_ptr<const stratagus::condition>> and_conditions;
+	std::vector<std::unique_ptr<const wyrmgus::condition>> and_conditions;
 	
 	//  All or rules.
 	bool or_flag = false;
@@ -398,7 +398,7 @@ static int CclDefineDependency(lua_State *l)
 		}
 		const int subargs = lua_rawlen(l, j + 1);
 
-		std::vector<std::unique_ptr<const stratagus::condition>> conditions;
+		std::vector<std::unique_ptr<const wyrmgus::condition>> conditions;
 	
 		for (int k = 0; k < subargs; ++k) {
 			const char *required = LuaToString(l, j + 1, k + 1);
@@ -411,22 +411,22 @@ static int CclDefineDependency(lua_State *l)
 				}
 				lua_pop(l, 1);
 			}
-			stratagus::condition *condition = nullptr;
+			wyrmgus::condition *condition = nullptr;
 			
 			if (!strncmp(required, "unit-", 5)) {
-				const stratagus::unit_type *unit_type = stratagus::unit_type::get(required);
-				condition = new stratagus::unit_type_condition(unit_type, count > 0 ? count : 1);
+				const wyrmgus::unit_type *unit_type = wyrmgus::unit_type::get(required);
+				condition = new wyrmgus::unit_type_condition(unit_type, count > 0 ? count : 1);
 			} else if (!strncmp(required, "upgrade", 7)) {
-				condition = new stratagus::upgrade_condition(required);
+				condition = new wyrmgus::upgrade_condition(required);
 			} else {
 				LuaError(l, "Invalid required type for condition: \"%s\"" _C_ required);
 			}
 			
 			if (count == 0) {
-				condition = new stratagus::not_condition(std::unique_ptr<stratagus::condition>(condition));
+				condition = new wyrmgus::not_condition(std::unique_ptr<wyrmgus::condition>(condition));
 			}
 			
-			conditions.push_back(std::unique_ptr<stratagus::condition>(condition));
+			conditions.push_back(std::unique_ptr<wyrmgus::condition>(condition));
 		}
 		if (j + 1 < args) {
 			++j;
@@ -438,19 +438,19 @@ static int CclDefineDependency(lua_State *l)
 			or_flag = true;
 		}
 		
-		and_conditions.push_back(std::make_unique<stratagus::and_condition>(std::move(conditions)));
+		and_conditions.push_back(std::make_unique<wyrmgus::and_condition>(std::move(conditions)));
 		conditions.clear();
 	}
 	
-	std::unique_ptr<stratagus::condition> condition;
+	std::unique_ptr<wyrmgus::condition> condition;
 	if (or_flag) {
-		condition = std::make_unique<stratagus::or_condition>(std::move(and_conditions));
+		condition = std::make_unique<wyrmgus::or_condition>(std::move(and_conditions));
 	} else {
-		condition = std::make_unique<stratagus::and_condition>(std::move(and_conditions));
+		condition = std::make_unique<wyrmgus::and_condition>(std::move(and_conditions));
 	}
 	
 	if (!strncmp(target, "unit-", 5)) {
-		stratagus::unit_type *unit_type = stratagus::unit_type::get(target);
+		wyrmgus::unit_type *unit_type = wyrmgus::unit_type::get(target);
 		unit_type->conditions = std::move(condition);
 	} else if (!strncmp(target, "upgrade", 7)) {
 		CUpgrade *upgrade = CUpgrade::get(target);
@@ -467,7 +467,7 @@ static int CclDefinePredependency(lua_State *l)
 	const int args = lua_gettop(l);
 	const char *target = LuaToString(l, 1);
 
-	std::vector<std::unique_ptr<const stratagus::condition>> and_conditions;
+	std::vector<std::unique_ptr<const wyrmgus::condition>> and_conditions;
 	
 	//  All or rules.
 	bool or_flag = false;
@@ -477,7 +477,7 @@ static int CclDefinePredependency(lua_State *l)
 		}
 		const int subargs = lua_rawlen(l, j + 1);
 
-		std::vector<std::unique_ptr<const stratagus::condition>> conditions;
+		std::vector<std::unique_ptr<const wyrmgus::condition>> conditions;
 	
 		for (int k = 0; k < subargs; ++k) {
 			const char *required = LuaToString(l, j + 1, k + 1);
@@ -490,22 +490,22 @@ static int CclDefinePredependency(lua_State *l)
 				}
 				lua_pop(l, 1);
 			}
-			stratagus::condition *condition = nullptr;
+			wyrmgus::condition *condition = nullptr;
 			
 			if (!strncmp(required, "unit-", 5)) {
-				const stratagus::unit_type *unit_type = stratagus::unit_type::get(required);
-				condition = new stratagus::unit_type_condition(unit_type, count > 0 ? count : 1);
+				const wyrmgus::unit_type *unit_type = wyrmgus::unit_type::get(required);
+				condition = new wyrmgus::unit_type_condition(unit_type, count > 0 ? count : 1);
 			} else if (!strncmp(required, "upgrade", 7)) {
-				condition = new stratagus::upgrade_condition(required);
+				condition = new wyrmgus::upgrade_condition(required);
 			} else {
 				LuaError(l, "Invalid required type for condition: \"%s\"" _C_ required);
 			}
 			
 			if (count == 0) {
-				condition = new stratagus::not_condition(std::unique_ptr<stratagus::condition>(condition));
+				condition = new wyrmgus::not_condition(std::unique_ptr<wyrmgus::condition>(condition));
 			}
 			
-			conditions.push_back(std::unique_ptr<stratagus::condition>(condition));
+			conditions.push_back(std::unique_ptr<wyrmgus::condition>(condition));
 		}
 		if (j + 1 < args) {
 			++j;
@@ -517,19 +517,19 @@ static int CclDefinePredependency(lua_State *l)
 			or_flag = true;
 		}
 		
-		and_conditions.push_back(std::make_unique<stratagus::and_condition>(std::move(conditions)));
+		and_conditions.push_back(std::make_unique<wyrmgus::and_condition>(std::move(conditions)));
 		conditions.clear();
 	}
 	
-	std::unique_ptr<stratagus::condition> condition;
+	std::unique_ptr<wyrmgus::condition> condition;
 	if (or_flag) {
-		condition = std::make_unique<stratagus::or_condition>(std::move(and_conditions));
+		condition = std::make_unique<wyrmgus::or_condition>(std::move(and_conditions));
 	} else {
-		condition = std::make_unique<stratagus::and_condition>(std::move(and_conditions));
+		condition = std::make_unique<wyrmgus::and_condition>(std::move(and_conditions));
 	}
 	
 	if (!strncmp(target, "unit-", 5)) {
-		stratagus::unit_type *unit_type = stratagus::unit_type::get(target);
+		wyrmgus::unit_type *unit_type = wyrmgus::unit_type::get(target);
 		unit_type->preconditions = std::move(condition);
 	} else if (!strncmp(target, "upgrade", 7)) {
 		CUpgrade *upgrade = CUpgrade::get(target);
@@ -562,7 +562,7 @@ static int CclCheckDependency(lua_State *l)
 	const CPlayer *player = CPlayer::Players[plynr];
 	
 	if (!strncmp(object, "unit-", 5)) {
-		const stratagus::unit_type *unit_type = stratagus::unit_type::get(object);
+		const wyrmgus::unit_type *unit_type = wyrmgus::unit_type::get(object);
 		lua_pushboolean(l, CheckConditions(unit_type, player));
 	} else if (!strncmp(object, "upgrade", 7)) {
 		const CUpgrade *upgrade = CUpgrade::get(object);

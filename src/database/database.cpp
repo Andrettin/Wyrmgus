@@ -83,7 +83,7 @@
 #include "util/string_util.h"
 #include "world.h"
 
-namespace stratagus {
+namespace wyrmgus {
 
 /**
 **	@brief	Process a SML property for an instance of a QObject-derived class
@@ -180,89 +180,89 @@ QVariant database::process_sml_property_value(const sml_property &property, cons
 			throw std::runtime_error("Only the assignment operator is available for object reference properties.");
 		}
 
-		if (property_class_name == "stratagus::age*") {
+		if (property_class_name == "wyrmgus::age*") {
 			new_property_value = QVariant::fromValue(age::get(property.get_value()));
-		} else if (property_class_name == "stratagus::animation_set*") {
+		} else if (property_class_name == "wyrmgus::animation_set*") {
 			new_property_value = QVariant::fromValue(animation_set::get(property.get_value()));
-		} else if (property_class_name == "stratagus::button_level*") {
+		} else if (property_class_name == "wyrmgus::button_level*") {
 			new_property_value = QVariant::fromValue(button_level::get(property.get_value()));
-		} else if (property_class_name == "stratagus::calendar*") {
+		} else if (property_class_name == "wyrmgus::calendar*") {
 			new_property_value = QVariant::fromValue(calendar::get(property.get_value()));
-		} else if (property_class_name == "stratagus::campaign*") {
+		} else if (property_class_name == "wyrmgus::campaign*") {
 			new_property_value = QVariant::fromValue(campaign::get(property.get_value()));
-		} else if (property_class_name == "stratagus::character*") {
+		} else if (property_class_name == "wyrmgus::character*") {
 			new_property_value = QVariant::fromValue(character::get(property.get_value()));
-		} else if (property_class_name == "stratagus::civilization*") {
+		} else if (property_class_name == "wyrmgus::civilization*") {
 			new_property_value = QVariant::fromValue(civilization::get(property.get_value()));
-		} else if (property_class_name == "stratagus::civilization_group*") {
+		} else if (property_class_name == "wyrmgus::civilization_group*") {
 			new_property_value = QVariant::fromValue(civilization_group::get(property.get_value()));
-		} else if (property_class_name == "stratagus::civilization_supergroup*") {
+		} else if (property_class_name == "wyrmgus::civilization_supergroup*") {
 			new_property_value = QVariant::fromValue(civilization_supergroup::get(property.get_value()));
-		} else if (property_class_name == "stratagus::cursor*") {
+		} else if (property_class_name == "wyrmgus::cursor*") {
 			new_property_value = QVariant::fromValue(cursor::get(property.get_value()));
-		} else if (property_class_name == "stratagus::cursor_type") {
+		} else if (property_class_name == "wyrmgus::cursor_type") {
 			new_property_value = QVariant::fromValue(string_to_cursor_type(property.get_value()));
-		} else if (property_class_name == "stratagus::deity*") {
+		} else if (property_class_name == "wyrmgus::deity*") {
 			new_property_value = QVariant::fromValue(deity::get(property.get_value()));
-		} else if (property_class_name == "stratagus::dialogue*") {
+		} else if (property_class_name == "wyrmgus::dialogue*") {
 			new_property_value = QVariant::fromValue(dialogue::get(property.get_value()));
-		} else if (property_class_name == "stratagus::dynasty*") {
+		} else if (property_class_name == "wyrmgus::dynasty*") {
 			new_property_value = QVariant::fromValue(dynasty::get(property.get_value()));
-		} else if (property_class_name == "stratagus::faction*") {
+		} else if (property_class_name == "wyrmgus::faction*") {
 			new_property_value = QVariant::fromValue(faction::get(property.get_value()));
-		} else if (property_class_name == "stratagus::faction_tier") {
+		} else if (property_class_name == "wyrmgus::faction_tier") {
 			new_property_value = QVariant::fromValue(string_to_faction_tier(property.get_value()));
-		} else if (property_class_name == "stratagus::gender") {
+		} else if (property_class_name == "wyrmgus::gender") {
 			new_property_value = QVariant::fromValue(string_to_gender(property.get_value()));
-		} else if (property_class_name == "stratagus::government_type") {
+		} else if (property_class_name == "wyrmgus::government_type") {
 			new_property_value = QVariant::fromValue(string_to_government_type(property.get_value()));
-		} else if (property_class_name == "stratagus::icon*") {
+		} else if (property_class_name == "wyrmgus::icon*") {
 			new_property_value = QVariant::fromValue(icon::get(property.get_value()));
-		} else if (property_class_name == "stratagus::item_class") {
+		} else if (property_class_name == "wyrmgus::item_class") {
 			new_property_value = QVariant::fromValue(string_to_item_class(property.get_value()));
-		} else if (property_class_name == "stratagus::item_slot") {
+		} else if (property_class_name == "wyrmgus::item_slot") {
 			new_property_value = QVariant::fromValue(string_to_item_slot(property.get_value()));
-		} else if (property_class_name == "stratagus::map_template*") {
+		} else if (property_class_name == "wyrmgus::map_template*") {
 			new_property_value = QVariant::fromValue(map_template::get(property.get_value()));
-		} else if (property_class_name == "stratagus::missile_class") {
+		} else if (property_class_name == "wyrmgus::missile_class") {
 			new_property_value = QVariant::fromValue(string_to_missile_class(property.get_value()));
-		} else if (property_class_name == "stratagus::missile_type*") {
+		} else if (property_class_name == "wyrmgus::missile_type*") {
 			new_property_value = QVariant::fromValue(missile_type::get(property.get_value()));
-		} else if (property_class_name == "stratagus::module*") {
+		} else if (property_class_name == "wyrmgus::module*") {
 			new_property_value = QVariant::fromValue(database::get()->get_module(property.get_value()));
-		} else if (property_class_name == "stratagus::plane*") {
+		} else if (property_class_name == "wyrmgus::plane*") {
 			new_property_value = QVariant::fromValue(plane::get(property.get_value()));
-		} else if (property_class_name == "stratagus::player_color*") {
+		} else if (property_class_name == "wyrmgus::player_color*") {
 			new_property_value = QVariant::fromValue(player_color::get(property.get_value()));
-		} else if (property_class_name == "stratagus::quest*") {
+		} else if (property_class_name == "wyrmgus::quest*") {
 			new_property_value = QVariant::fromValue(quest::get(property.get_value()));
-		} else if (property_class_name == "stratagus::region*") {
+		} else if (property_class_name == "wyrmgus::region*") {
 			new_property_value = QVariant::fromValue(region::get(property.get_value()));
-		} else if (property_class_name == "stratagus::resource*") {
+		} else if (property_class_name == "wyrmgus::resource*") {
 			new_property_value = QVariant::fromValue(resource::get(property.get_value()));
-		} else if (property_class_name == "stratagus::site*") {
+		} else if (property_class_name == "wyrmgus::site*") {
 			new_property_value = QVariant::fromValue(site::get(property.get_value()));
-		} else if (property_class_name == "stratagus::sound*") {
+		} else if (property_class_name == "wyrmgus::sound*") {
 			new_property_value = QVariant::fromValue(sound::get(property.get_value()));
-		} else if (property_class_name == "stratagus::species*") {
+		} else if (property_class_name == "wyrmgus::species*") {
 			new_property_value = QVariant::fromValue(species::get(property.get_value()));
-		} else if (property_class_name == "stratagus::spell*") {
+		} else if (property_class_name == "wyrmgus::spell*") {
 			new_property_value = QVariant::fromValue(spell::get(property.get_value()));
-		} else if (property_class_name == "stratagus::terrain_feature*") {
+		} else if (property_class_name == "wyrmgus::terrain_feature*") {
 			new_property_value = QVariant::fromValue(terrain_feature::get(property.get_value()));
-		} else if (property_class_name == "stratagus::terrain_type*") {
+		} else if (property_class_name == "wyrmgus::terrain_type*") {
 			new_property_value = QVariant::fromValue(terrain_type::get(property.get_value()));
-		} else if (property_class_name == "stratagus::time_of_day*") {
+		} else if (property_class_name == "wyrmgus::time_of_day*") {
 			new_property_value = QVariant::fromValue(time_of_day::get(property.get_value()));
-		} else if (property_class_name == "stratagus::unit_class*") {
+		} else if (property_class_name == "wyrmgus::unit_class*") {
 			new_property_value = QVariant::fromValue(unit_class::get(property.get_value()));
-		} else if (property_class_name == "stratagus::unit_type*") {
+		} else if (property_class_name == "wyrmgus::unit_type*") {
 			new_property_value = QVariant::fromValue(unit_type::get(property.get_value()));
 		} else if (property_class_name == "CUpgrade*") {
 			new_property_value = QVariant::fromValue(CUpgrade::get(property.get_value()));
-		} else if (property_class_name == "stratagus::upgrade_class*") {
+		} else if (property_class_name == "wyrmgus::upgrade_class*") {
 			new_property_value = QVariant::fromValue(upgrade_class::get(property.get_value()));
-		} else if (property_class_name == "stratagus::world*") {
+		} else if (property_class_name == "wyrmgus::world*") {
 			new_property_value = QVariant::fromValue(world::get(property.get_value()));
 		} else {
 			throw std::runtime_error("Unknown type (\"" + property_class_name + "\") for object reference property \"" + std::string(property_name) + "\" (\"" + property_class_name + "\").");
@@ -655,7 +655,7 @@ void database::process_modules_at_dir(const std::filesystem::path &path, module 
 		}
 
 		const std::string module_identifier = dir_entry.path().stem().string();
-		auto module = make_qunique<stratagus::module>(module_identifier, dir_entry.path(), parent_module);
+		auto module = make_qunique<wyrmgus::module>(module_identifier, dir_entry.path(), parent_module);
 
 		std::filesystem::path submodules_path = dir_entry.path() / "modules";
 		if (std::filesystem::exists(submodules_path)) {

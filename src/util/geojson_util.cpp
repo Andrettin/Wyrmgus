@@ -29,7 +29,7 @@
 
 #include <QtLocation/private/qgeojson_p.h>
 
-namespace stratagus::geojson {
+namespace wyrmgus::geojson {
 
 std::vector<QVariantList> parse_folder(const std::filesystem::path &path)
 {

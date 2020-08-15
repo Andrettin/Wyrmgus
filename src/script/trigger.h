@@ -37,7 +37,7 @@ class CUpgrade;
 class LuaCallback;
 struct lua_State;
 
-namespace stratagus {
+namespace wyrmgus {
 	class condition;
 	class dynasty;
 	class effect;
@@ -65,7 +65,7 @@ public:
 	unsigned long LastUpdate = 0;	/// GameCycle of last update
 };
 
-namespace stratagus {
+namespace wyrmgus {
 
 class trigger final : public data_entry, public data_type<trigger>
 {
@@ -135,9 +135,9 @@ public:
 
 }
 
-#define ANY_UNIT ((const stratagus::unit_type *)0)
-#define ALL_FOODUNITS ((const stratagus::unit_type *)-1)
-#define ALL_BUILDINGS ((const stratagus::unit_type *)-2)
+#define ANY_UNIT ((const wyrmgus::unit_type *)0)
+#define ALL_FOODUNITS ((const wyrmgus::unit_type *)-1)
+#define ALL_BUILDINGS ((const wyrmgus::unit_type *)-2)
 
 /**
 **  Data to referer game info when game running.
@@ -149,11 +149,11 @@ struct TriggerDataType {
 	//Wyrmgus start
 	CUnit *Unit;	  /// Unit used in trigger
 	//Wyrmgus end
-	const stratagus::unit_type *Type;  /// Type used in trigger;
+	const wyrmgus::unit_type *Type;  /// Type used in trigger;
 	const CUpgrade *Upgrade; /// Upgrade used in trigger
 	int *Resource;		/// Resource used in trigger
-	const stratagus::faction *faction; /// Faction used in trigger
-	const stratagus::dynasty *dynasty; /// Dynasty used in trigger
+	const wyrmgus::faction *faction; /// Faction used in trigger
+	const wyrmgus::dynasty *dynasty; /// Dynasty used in trigger
 	const CPlayer *player = nullptr;
 };
 
@@ -167,7 +167,7 @@ extern TriggerDataType TriggerData;
 ----------------------------------------------------------------------------*/
 
 extern int TriggerGetPlayer(lua_State *l);/// get player number.
-extern const stratagus::unit_type *TriggerGetUnitType(lua_State *l); /// get the unit-type
+extern const wyrmgus::unit_type *TriggerGetUnitType(lua_State *l); /// get the unit-type
 extern void TriggersEachCycle();    /// test triggers
 
 extern void TriggerCclRegister();   /// Register ccl features

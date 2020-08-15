@@ -32,7 +32,7 @@
 #include "config.h"
 #include "upgrade/upgrade_structs.h"
 
-namespace stratagus {
+namespace wyrmgus {
 
 deity_domain *deity_domain::get_by_upgrade(const CUpgrade *upgrade)
 {

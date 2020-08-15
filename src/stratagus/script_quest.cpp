@@ -58,7 +58,7 @@ static int CclDefineQuest(lua_State *l)
 	}
 
 	std::string quest_ident = LuaToString(l, 1);
-	stratagus::quest *quest = stratagus::quest::get_or_add(quest_ident, nullptr);
+	wyrmgus::quest *quest = wyrmgus::quest::get_or_add(quest_ident, nullptr);
 	
 	//  Parse the list:
 	for (lua_pushnil(l); lua_next(l, 2); lua_pop(l, 1)) {
@@ -101,11 +101,11 @@ static int CclDefineQuest(lua_State *l)
 		} else if (!strcmp(value, "Hint")) {
 			quest->Hint = LuaToString(l, -1);
 		} else if (!strcmp(value, "Civilization")) {
-			stratagus::civilization *civilization = stratagus::civilization::get(LuaToString(l, -1));
+			wyrmgus::civilization *civilization = wyrmgus::civilization::get(LuaToString(l, -1));
 			quest->civilization = civilization;
 		} else if (!strcmp(value, "PlayerColor")) {
 			const std::string color_name = LuaToString(l, -1);
-			quest->player_color = stratagus::player_color::get(color_name);
+			quest->player_color = wyrmgus::player_color::get(color_name);
 		} else if (!strcmp(value, "Hidden")) {
 			quest->Hidden = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "Competitive")) {
@@ -117,10 +117,10 @@ static int CclDefineQuest(lua_State *l)
 		} else if (!strcmp(value, "Unfailable")) {
 			quest->unfailable = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "Icon")) {
-			quest->icon = stratagus::icon::get(LuaToString(l, -1));
+			quest->icon = wyrmgus::icon::get(LuaToString(l, -1));
 		} else if (!strcmp(value, "IntroductionDialogue")) {
 			std::string dialogue_ident = LuaToString(l, -1);
-			stratagus::dialogue *dialogue = stratagus::dialogue::get(dialogue_ident);
+			wyrmgus::dialogue *dialogue = wyrmgus::dialogue::get(dialogue_ident);
 			quest->IntroductionDialogue = dialogue;
 		} else if (!strcmp(value, "Conditions")) {
 			quest->Conditions = new LuaCallback(l, -1);
@@ -147,7 +147,7 @@ static int CclDefineQuest(lua_State *l)
 			const int args = lua_rawlen(l, -1);
 			for (int j = 0; j < args; ++j) {
 				lua_rawgeti(l, -1, j + 1);
-				stratagus::quest_objective *objective = nullptr;
+				wyrmgus::quest_objective *objective = nullptr;
 				if (!lua_istable(l, -1)) {
 					LuaError(l, "incorrect argument (expected table for quest objectives)");
 				}
@@ -156,9 +156,9 @@ static int CclDefineQuest(lua_State *l)
 					value = LuaToString(l, -1, k + 1);
 					++k;
 					if (!strcmp(value, "objective-type")) {
-						const stratagus::objective_type objective_type = stratagus::string_to_objective_type(LuaToString(l, -1, k + 1));
+						const wyrmgus::objective_type objective_type = wyrmgus::string_to_objective_type(LuaToString(l, -1, k + 1));
 
-						auto objective_unique_ptr = std::make_unique<stratagus::quest_objective>(objective_type, quest);
+						auto objective_unique_ptr = std::make_unique<wyrmgus::quest_objective>(objective_type, quest);
 						objective = objective_unique_ptr.get();
 						quest->objectives.push_back(std::move(objective_unique_ptr));
 					} else if (!strcmp(value, "objective-string")) {
@@ -172,28 +172,28 @@ static int CclDefineQuest(lua_State *l)
 						}
 						objective->Resource = resource;
 					} else if (!strcmp(value, "unit-class")) {
-						const stratagus::unit_class *unit_class = stratagus::unit_class::get(LuaToString(l, -1, k + 1));
+						const wyrmgus::unit_class *unit_class = wyrmgus::unit_class::get(LuaToString(l, -1, k + 1));
 						objective->unit_classes.push_back(unit_class);
 					} else if (!strcmp(value, "unit-type")) {
-						stratagus::unit_type *unit_type = stratagus::unit_type::get(LuaToString(l, -1, k + 1));
+						wyrmgus::unit_type *unit_type = wyrmgus::unit_type::get(LuaToString(l, -1, k + 1));
 						objective->UnitTypes.push_back(unit_type);
 					} else if (!strcmp(value, "upgrade")) {
 						CUpgrade *upgrade = CUpgrade::get(LuaToString(l, -1, k + 1));
 						objective->Upgrade = upgrade;
 					} else if (!strcmp(value, "character")) {
-						stratagus::character *character = stratagus::character::get(LuaToString(l, -1, k + 1));
+						wyrmgus::character *character = wyrmgus::character::get(LuaToString(l, -1, k + 1));
 						objective->character = character;
 					} else if (!strcmp(value, "unique")) {
-						stratagus::unique_item *unique = stratagus::unique_item::get(LuaToString(l, -1, k + 1));
+						wyrmgus::unique_item *unique = wyrmgus::unique_item::get(LuaToString(l, -1, k + 1));
 						if (!unique) {
 							LuaError(l, "Unique doesn't exist.");
 						}
 						objective->Unique = unique;
 					} else if (!strcmp(value, "settlement")) {
-						stratagus::site *site = stratagus::site::get(LuaToString(l, -1, k + 1));
+						wyrmgus::site *site = wyrmgus::site::get(LuaToString(l, -1, k + 1));
 						objective->settlement = site;
 					} else if (!strcmp(value, "faction")) {
-						stratagus::faction *faction = stratagus::faction::get(LuaToString(l, -1, k + 1));
+						wyrmgus::faction *faction = wyrmgus::faction::get(LuaToString(l, -1, k + 1));
 						objective->faction = faction;
 					} else {
 						printf("\n%s\n", quest->get_identifier().c_str());
@@ -206,7 +206,7 @@ static int CclDefineQuest(lua_State *l)
 			quest->HeroesMustSurvive.clear();
 			const int args = lua_rawlen(l, -1);
 			for (int j = 0; j < args; ++j) {
-				stratagus::character *hero = stratagus::character::get(LuaToString(l, -1, j + 1));
+				wyrmgus::character *hero = wyrmgus::character::get(LuaToString(l, -1, j + 1));
 				quest->HeroesMustSurvive.push_back(hero);
 			}
 		} else {
@@ -219,10 +219,10 @@ static int CclDefineQuest(lua_State *l)
 
 static int CclGetQuests(lua_State *l)
 {
-	lua_createtable(l, stratagus::quest::get_all().size(), 0);
-	for (size_t i = 1; i <= stratagus::quest::get_all().size(); ++i)
+	lua_createtable(l, wyrmgus::quest::get_all().size(), 0);
+	for (size_t i = 1; i <= wyrmgus::quest::get_all().size(); ++i)
 	{
-		lua_pushstring(l, stratagus::quest::get_all()[i-1]->get_identifier().c_str());
+		lua_pushstring(l, wyrmgus::quest::get_all()[i-1]->get_identifier().c_str());
 		lua_rawseti(l, -2, i);
 	}
 	return 1;
@@ -239,7 +239,7 @@ static int CclGetQuestData(lua_State *l)
 		LuaError(l, "incorrect argument");
 	}
 	std::string quest_ident = LuaToString(l, 1);
-	const stratagus::quest *quest = stratagus::quest::get(quest_ident);
+	const wyrmgus::quest *quest = wyrmgus::quest::get(quest_ident);
 	const char *data = LuaToString(l, 2);
 
 	if (!strcmp(data, "Name")) {
@@ -359,7 +359,7 @@ static int CclDefineCampaign(lua_State *l)
 	}
 
 	std::string campaign_ident = LuaToString(l, 1);
-	stratagus::campaign *campaign = stratagus::campaign::get_or_add(campaign_ident, nullptr);
+	wyrmgus::campaign *campaign = wyrmgus::campaign::get_or_add(campaign_ident, nullptr);
 	
 	//  Parse the list:
 	for (lua_pushnil(l); lua_next(l, 2); lua_pop(l, 1)) {
@@ -370,7 +370,7 @@ static int CclDefineCampaign(lua_State *l)
 		} else if (!strcmp(value, "Description")) {
 			campaign->set_description(LuaToString(l, -1));
 		} else if (!strcmp(value, "Faction")) {
-			campaign->faction = stratagus::faction::get(LuaToString(l, -1));
+			campaign->faction = wyrmgus::faction::get(LuaToString(l, -1));
 		} else if (!strcmp(value, "Hidden")) {
 			campaign->hidden = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "Sandbox")) {
@@ -386,7 +386,7 @@ static int CclDefineCampaign(lua_State *l)
 			const int args = lua_rawlen(l, -1);
 			for (int j = 0; j < args; ++j) {
 				std::string quest_ident = LuaToString(l, -1, j + 1);
-				stratagus::quest *required_quest = stratagus::quest::get(quest_ident);
+				wyrmgus::quest *required_quest = wyrmgus::quest::get(quest_ident);
 				campaign->required_quests.push_back(required_quest);
 			}
 		} else if (!strcmp(value, "MapTemplates")) {
@@ -396,7 +396,7 @@ static int CclDefineCampaign(lua_State *l)
 			const int args = lua_rawlen(l, -1);
 			for (int j = 0; j < args; ++j) {
 				std::string map_template_ident = LuaToString(l, -1, j + 1);
-				stratagus::map_template *map_template = stratagus::map_template::get_or_add(map_template_ident, nullptr);
+				wyrmgus::map_template *map_template = wyrmgus::map_template::get_or_add(map_template_ident, nullptr);
 				campaign->map_templates.push_back(map_template);
 				++j;
 				
@@ -415,7 +415,7 @@ static int CclDefineCampaign(lua_State *l)
 			}
 		} else if (!strcmp(value, "MapTemplate")) {
 			std::string map_template_ident = LuaToString(l, -1);
-			stratagus::map_template *map_template = stratagus::map_template::get_or_add(map_template_ident, nullptr);
+			wyrmgus::map_template *map_template = wyrmgus::map_template::get_or_add(map_template_ident, nullptr);
 			campaign->map_templates.push_back(map_template);
 		} else if (!strcmp(value, "MapTemplateStartPos")) {
 			Vec2i map_template_start_pos;
@@ -435,10 +435,10 @@ static int CclDefineCampaign(lua_State *l)
 
 static int CclGetCampaigns(lua_State *l)
 {
-	lua_createtable(l, stratagus::campaign::get_all().size(), 0);
-	for (size_t i = 1; i <= stratagus::campaign::get_all().size(); ++i)
+	lua_createtable(l, wyrmgus::campaign::get_all().size(), 0);
+	for (size_t i = 1; i <= wyrmgus::campaign::get_all().size(); ++i)
 	{
-		lua_pushstring(l, stratagus::campaign::get_all()[i - 1]->get_identifier().c_str());
+		lua_pushstring(l, wyrmgus::campaign::get_all()[i - 1]->get_identifier().c_str());
 		lua_rawseti(l, -2, i);
 	}
 	return 1;
@@ -455,7 +455,7 @@ static int CclGetCampaignData(lua_State *l)
 		LuaError(l, "incorrect argument");
 	}
 	std::string campaign_ident = LuaToString(l, 1);
-	const stratagus::campaign *campaign = stratagus::campaign::get(campaign_ident);
+	const wyrmgus::campaign *campaign = wyrmgus::campaign::get(campaign_ident);
 	const char *data = LuaToString(l, 2);
 
 	if (!strcmp(data, "Name")) {
@@ -468,7 +468,7 @@ static int CclGetCampaignData(lua_State *l)
 		lua_pushnumber(l, campaign->get_start_date().date().year());
 		return 1;
 	} else if (!strcmp(data, "StartYearString")) {
-		lua_pushstring(l, stratagus::date::year_to_string(campaign->get_start_date().date().year()).c_str());
+		lua_pushstring(l, wyrmgus::date::year_to_string(campaign->get_start_date().date().year()).c_str());
 		return 1;
 	} else if (!strcmp(data, "Faction")) {
 		if (campaign->get_faction() != nullptr) {
@@ -558,7 +558,7 @@ static int CclDefineAchievement(lua_State *l)
 			achievement->description = LuaToString(l, -1);
 		} else if (!strcmp(value, "PlayerColor")) {
 			const std::string color_name = LuaToString(l, -1);
-			achievement->PlayerColor = stratagus::player_color::get(color_name);
+			achievement->PlayerColor = wyrmgus::player_color::get(color_name);
 		} else if (!strcmp(value, "CharacterLevel")) {
 			achievement->CharacterLevel = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "Difficulty")) {
@@ -573,18 +573,18 @@ static int CclDefineAchievement(lua_State *l)
 			achievement->Icon.Load();
 		} else if (!strcmp(value, "Character")) {
 			std::string character_name = LuaToString(l, -1);
-			stratagus::character *character = stratagus::character::get(character_name);
+			wyrmgus::character *character = wyrmgus::character::get(character_name);
 			achievement->Character = character;
 		} else if (!strcmp(value, "CharacterType")) {
 			const std::string unit_type_ident = LuaToString(l, -1);
-			stratagus::unit_type *unit_type = stratagus::unit_type::get(unit_type_ident);
+			wyrmgus::unit_type *unit_type = wyrmgus::unit_type::get(unit_type_ident);
 			achievement->CharacterType = unit_type;
 		} else if (!strcmp(value, "RequiredQuests")) {
 			achievement->RequiredQuests.clear();
 			const int args = lua_rawlen(l, -1);
 			for (int j = 0; j < args; ++j) {
 				std::string quest_ident = LuaToString(l, -1, j + 1);
-				stratagus::quest *required_quest = stratagus::quest::get(quest_ident);
+				wyrmgus::quest *required_quest = wyrmgus::quest::get(quest_ident);
 				achievement->RequiredQuests.push_back(required_quest);
 			}
 		} else {
@@ -694,7 +694,7 @@ static int CclDefineDialogue(lua_State *l)
 	}
 
 	std::string dialogue_ident = LuaToString(l, 1);
-	stratagus::dialogue *dialogue = stratagus::dialogue::get_or_add(dialogue_ident, nullptr);
+	wyrmgus::dialogue *dialogue = wyrmgus::dialogue::get_or_add(dialogue_ident, nullptr);
 	
 	//  Parse the list:
 	for (lua_pushnil(l); lua_next(l, 2); lua_pop(l, 1)) {
@@ -704,7 +704,7 @@ static int CclDefineDialogue(lua_State *l)
 			const int args = lua_rawlen(l, -1);
 			for (int j = 0; j < args; ++j) {
 				lua_rawgeti(l, -1, j + 1);
-				auto node = std::make_unique<stratagus::dialogue_node>();
+				auto node = std::make_unique<wyrmgus::dialogue_node>();
 				node->ID = dialogue->nodes.size();
 				node->Dialogue = dialogue;
 				if (!lua_istable(l, -1)) {
@@ -719,14 +719,14 @@ static int CclDefineDialogue(lua_State *l)
 						++k;
 						const std::string speaker = LuaToString(l, -1, k + 1);
 						if (speaker_type == "character") {
-							node->speaker = stratagus::character::get(speaker);
+							node->speaker = wyrmgus::character::get(speaker);
 						} else if (speaker_type == "unit") {
-							node->speaker_unit_type = stratagus::unit_type::get(speaker);
+							node->speaker_unit_type = wyrmgus::unit_type::get(speaker);
 						} else {
 							node->speaker_name = speaker;
 						}
 					} else if (!strcmp(value, "speaker-player")) {
-						node->speaker_faction = stratagus::faction::get(LuaToString(l, -1, k + 1));
+						node->speaker_faction = wyrmgus::faction::get(LuaToString(l, -1, k + 1));
 					} else if (!strcmp(value, "text")) {
 						node->text = LuaToString(l, -1, k + 1);
 					} else if (!strcmp(value, "conditions")) {
@@ -742,7 +742,7 @@ static int CclDefineDialogue(lua_State *l)
 						const int subsubargs = lua_rawlen(l, -1);
 						for (int n = 0; n < subsubargs; ++n) {
 							if (n >= static_cast<int>(node->options.size())) {
-								auto option = std::make_unique<stratagus::dialogue_option>();
+								auto option = std::make_unique<wyrmgus::dialogue_option>();
 								node->options.push_back(std::move(option));
 							}
 							node->options.at(n)->name = LuaToString(l, -1, n + 1);
@@ -754,7 +754,7 @@ static int CclDefineDialogue(lua_State *l)
 						for (int n = 0; n < subsubargs; ++n) {
 							lua_rawgeti(l, -1, n + 1);
 							if (n >= static_cast<int>(node->options.size())) {
-								auto option = std::make_unique<stratagus::dialogue_option>();
+								auto option = std::make_unique<wyrmgus::dialogue_option>();
 								node->options.push_back(std::move(option));
 							}
 							node->options.at(n)->lua_effects = std::make_unique<LuaCallback>(l, -1);
@@ -766,7 +766,7 @@ static int CclDefineDialogue(lua_State *l)
 						const int subsubargs = lua_rawlen(l, -1);
 						for (int n = 0; n < subsubargs; ++n) {
 							if (n >= static_cast<int>(node->options.size())) {
-								auto option = std::make_unique<stratagus::dialogue_option>();
+								auto option = std::make_unique<wyrmgus::dialogue_option>();
 								node->options.push_back(std::move(option));
 							}
 							node->options.at(n)->tooltip = LuaToString(l, -1, n + 1);

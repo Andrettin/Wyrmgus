@@ -226,15 +226,15 @@ void CConfigData::ProcessConfigData(const std::vector<CConfigData *> &config_dat
 		
 		if (config_data->Tag == "button") {
 			if (!define_only) {
-				stratagus::button::ProcessConfigData(config_data);
+				wyrmgus::button::ProcessConfigData(config_data);
 			}
 		} else if (config_data->Tag == "campaign") {
-			stratagus::campaign *campaign = stratagus::campaign::get_or_add(ident, nullptr);
+			wyrmgus::campaign *campaign = wyrmgus::campaign::get_or_add(ident, nullptr);
 			if (!define_only) {
 				campaign->ProcessConfigData(config_data);
 			}
 		} else if (config_data->Tag == "character") {
-			stratagus::character *character = stratagus::character::get_or_add(ident, nullptr);
+			wyrmgus::character *character = wyrmgus::character::get_or_add(ident, nullptr);
 			if (!character) {
 				continue;
 			}
@@ -247,22 +247,22 @@ void CConfigData::ProcessConfigData(const std::vector<CConfigData *> &config_dat
 				currency->ProcessConfigData(config_data);
 			}
 		} else if (config_data->Tag == "deity") {
-			stratagus::deity *deity = stratagus::deity::get_or_add(ident, nullptr);
+			wyrmgus::deity *deity = wyrmgus::deity::get_or_add(ident, nullptr);
 			if (!define_only) {
 				deity->ProcessConfigData(config_data);
 			}
 		} else if (config_data->Tag == "deity_domain") {
-			stratagus::deity_domain *deity_domain = stratagus::deity_domain::get_or_add(ident, nullptr);
+			wyrmgus::deity_domain *deity_domain = wyrmgus::deity_domain::get_or_add(ident, nullptr);
 			if (!define_only) {
 				deity_domain->ProcessConfigData(config_data);
 			}
 		} else if (config_data->Tag == "map_template") {
-			stratagus::map_template *map_template = stratagus::map_template::get_or_add(ident, nullptr);
+			wyrmgus::map_template *map_template = wyrmgus::map_template::get_or_add(ident, nullptr);
 			if (!define_only) {
 				map_template->ProcessConfigData(config_data);
 			}
 		} else if (config_data->Tag == "missile_type") {
-			stratagus::missile_type *missile_type = stratagus::missile_type::get_or_add(ident, nullptr);
+			wyrmgus::missile_type *missile_type = wyrmgus::missile_type::get_or_add(ident, nullptr);
 			if (!define_only) {
 				missile_type->ProcessConfigData(config_data);
 			}
@@ -272,7 +272,7 @@ void CConfigData::ProcessConfigData(const std::vector<CConfigData *> &config_dat
 				pantheon->ProcessConfigData(config_data);
 			}
 		} else if (config_data->Tag == "plane") {
-			stratagus::plane *plane = stratagus::plane::get_or_add(ident, nullptr);
+			wyrmgus::plane *plane = wyrmgus::plane::get_or_add(ident, nullptr);
 			if (!define_only) {
 				plane->ProcessConfigData(config_data);
 			}
@@ -282,7 +282,7 @@ void CConfigData::ProcessConfigData(const std::vector<CConfigData *> &config_dat
 				school_of_magic->ProcessConfigData(config_data);
 			}
 		} else if (config_data->Tag == "season") {
-			stratagus::season *season = stratagus::season::get_or_add(ident, nullptr);
+			wyrmgus::season *season = wyrmgus::season::get_or_add(ident, nullptr);
 			if (!define_only) {
 				season->ProcessConfigData(config_data);
 			}
@@ -292,17 +292,17 @@ void CConfigData::ProcessConfigData(const std::vector<CConfigData *> &config_dat
 				season_schedule->ProcessConfigData(config_data);
 			}
 		} else if (config_data->Tag == "site") {
-			stratagus::site *site = stratagus::site::get_or_add(ident, nullptr);
+			wyrmgus::site *site = wyrmgus::site::get_or_add(ident, nullptr);
 			if (!define_only) {
 				site->ProcessConfigData(config_data);
 			}
 		} else if (config_data->Tag == "spell") {
-			stratagus::spell *spell = stratagus::spell::get_or_add(ident, nullptr);
+			wyrmgus::spell *spell = wyrmgus::spell::get_or_add(ident, nullptr);
 			if (!define_only) {
 				spell->ProcessConfigData(config_data);
 			}
 		} else if (config_data->Tag == "terrain_type") {
-			stratagus::terrain_type *terrain_type = stratagus::terrain_type::get_or_add(ident, nullptr);
+			wyrmgus::terrain_type *terrain_type = wyrmgus::terrain_type::get_or_add(ident, nullptr);
 			if (!define_only) {
 				terrain_type->ProcessConfigData(config_data);
 			}
@@ -312,7 +312,7 @@ void CConfigData::ProcessConfigData(const std::vector<CConfigData *> &config_dat
 				time_of_day_schedule->ProcessConfigData(config_data);
 			}
 		} else if (config_data->Tag == "unit_type") {
-			stratagus::unit_type *unit_type = stratagus::unit_type::get_or_add(ident, nullptr);
+			wyrmgus::unit_type *unit_type = wyrmgus::unit_type::get_or_add(ident, nullptr);
 			if (!define_only) {
 				unit_type->ProcessConfigData(config_data);
 			}
@@ -322,7 +322,7 @@ void CConfigData::ProcessConfigData(const std::vector<CConfigData *> &config_dat
 				upgrade->ProcessConfigData(config_data);
 			}
 		} else if (config_data->Tag == "world") {
-			stratagus::world *world = stratagus::world::get_or_add(ident, nullptr);
+			wyrmgus::world *world = wyrmgus::world::get_or_add(ident, nullptr);
 			if (!define_only) {
 				world->ProcessConfigData(config_data);
 			}

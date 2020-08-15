@@ -73,7 +73,7 @@ std::vector<BurningBuildingFrame *> BurningBuildingFrames; /// Burning building 
 
 extern NumberDesc *Damage;                   /// Damage calculation for missile.
 
-namespace stratagus {
+namespace wyrmgus {
 
 void missile_type::ProcessConfigData(const CConfigData *config_data)
 {
@@ -176,7 +176,7 @@ void missile_type::LoadMissileSprite()
 int GetMissileSpritesCount()
 {
 #ifndef DYNAMIC_LOAD
-	return stratagus::missile_type::get_all().size();
+	return wyrmgus::missile_type::get_all().size();
 #else
 	return 0;
 #endif
@@ -188,7 +188,7 @@ int GetMissileSpritesCount()
 void LoadMissileSprites()
 {
 #ifndef DYNAMIC_LOAD
-	for (stratagus::missile_type *missile_type : stratagus::missile_type::get_all()) {
+	for (wyrmgus::missile_type *missile_type : wyrmgus::missile_type::get_all()) {
 		missile_type->LoadMissileSprite();
 	}
 #endif
@@ -226,63 +226,63 @@ Missile::Missile() :
 **
 **  @return       created missile.
 */
-Missile *Missile::Init(const stratagus::missile_type &mtype, const PixelPos &startPos, const PixelPos &destPos, int z)
+Missile *Missile::Init(const wyrmgus::missile_type &mtype, const PixelPos &startPos, const PixelPos &destPos, int z)
 {
 	Missile *missile = nullptr;
 
 	switch (mtype.get_missile_class()) {
-		case stratagus::missile_class::none:
+		case wyrmgus::missile_class::none:
 			missile = new MissileNone;
 			break;
-		case stratagus::missile_class::point_to_point:
+		case wyrmgus::missile_class::point_to_point:
 			missile = new MissilePointToPoint;
 			break;
-		case stratagus::missile_class::point_to_point_with_hit:
+		case wyrmgus::missile_class::point_to_point_with_hit:
 			missile = new MissilePointToPointWithHit;
 			break;
-		case stratagus::missile_class::point_to_point_cycle_once:
+		case wyrmgus::missile_class::point_to_point_cycle_once:
 			missile = new MissilePointToPointCycleOnce;
 			break;
-		case stratagus::missile_class::point_to_point_bounce:
+		case wyrmgus::missile_class::point_to_point_bounce:
 			missile = new MissilePointToPointBounce;
 			break;
-		case stratagus::missile_class::stay:
+		case wyrmgus::missile_class::stay:
 			missile = new MissileStay;
 			break;
-		case stratagus::missile_class::cycle_once:
+		case wyrmgus::missile_class::cycle_once:
 			missile = new MissileCycleOnce;
 			break;
-		case stratagus::missile_class::fire:
+		case wyrmgus::missile_class::fire:
 			missile = new MissileFire;
 			break;
-		case stratagus::missile_class::hit:
+		case wyrmgus::missile_class::hit:
 			missile = new ::MissileHit;
 			break;
-		case stratagus::missile_class::parabolic:
+		case wyrmgus::missile_class::parabolic:
 			missile = new MissileParabolic;
 			break;
-		case stratagus::missile_class::land_mine:
+		case wyrmgus::missile_class::land_mine:
 			missile = new MissileLandMine;
 			break;
-		case stratagus::missile_class::whirlwind:
+		case wyrmgus::missile_class::whirlwind:
 			missile = new MissileWhirlwind;
 			break;
-		case stratagus::missile_class::flame_shield:
+		case wyrmgus::missile_class::flame_shield:
 			missile = new MissileFlameShield;
 			break;
-		case stratagus::missile_class::death_coil:
+		case wyrmgus::missile_class::death_coil:
 			missile = new MissileDeathCoil;
 			break;
-		case stratagus::missile_class::tracer:
+		case wyrmgus::missile_class::tracer:
 			missile = new MissileTracer;
 			break;
-		case stratagus::missile_class::clip_to_target:
+		case wyrmgus::missile_class::clip_to_target:
 			missile = new MissileClipToTarget;
 			break;
-		case stratagus::missile_class::continuous:
+		case wyrmgus::missile_class::continuous:
 			missile = new MissileContinious;
 			break;
-		case stratagus::missile_class::straight_fly:
+		case wyrmgus::missile_class::straight_fly:
 			missile = new MissileStraightFly;
 			break;
 	}
@@ -316,7 +316,7 @@ Missile *Missile::Init(const stratagus::missile_type &mtype, const PixelPos &sta
 **
 **  @return       created missile.
 */
-Missile *MakeMissile(const stratagus::missile_type &mtype, const PixelPos &startPos, const PixelPos &destPos, int z)
+Missile *MakeMissile(const wyrmgus::missile_type &mtype, const PixelPos &startPos, const PixelPos &destPos, int z)
 {
 	Missile *missile = Missile::Init(mtype, startPos, destPos, z);
 
@@ -333,7 +333,7 @@ Missile *MakeMissile(const stratagus::missile_type &mtype, const PixelPos &start
 **
 **  @return       created missile.
 */
-Missile *MakeLocalMissile(const stratagus::missile_type &mtype, const PixelPos &startPos, const PixelPos &destPos, int z)
+Missile *MakeLocalMissile(const wyrmgus::missile_type &mtype, const PixelPos &startPos, const PixelPos &destPos, int z)
 {
 	Missile *missile = Missile::Init(mtype, startPos, destPos, z);
 
@@ -756,7 +756,7 @@ void FireMissile(CUnit &unit, CUnit *goal, const Vec2i &goalPos, int z)
 
 	// No missile hits immediately!
 	if (
-		unit.GetMissile().Missile->get_missile_class() == stratagus::missile_class::none
+		unit.GetMissile().Missile->get_missile_class() == wyrmgus::missile_class::none
 		//Wyrmgus start
 //		|| (unit.Type->Animations && unit.Type->Animations->Attack && unit.Type->Animations->RangedAttack && !unit.IsAttackRanged(goal, goalPos)) // treat melee attacks from units that have both attack and ranged attack animations as having missile class none
 		|| (unit.GetAnimations() && unit.GetAnimations()->Attack && unit.GetAnimations()->RangedAttack && !unit.IsAttackRanged(goal, goalPos, z)) // treat melee attacks from units that have both attack and ranged attack animations as having missile class none
@@ -773,7 +773,7 @@ void FireMissile(CUnit &unit, CUnit *goal, const Vec2i &goalPos, int z)
 				if (CMap::Map.Field(goalPos, z)->OverlayTerrain->UnitType && CalculateHit(unit, *CMap::Map.Field(goalPos, z)->OverlayTerrain->UnitType->Stats, nullptr) == true) {
 				//Wyrmgus end
 					//Wyrmgus start
-					PlayUnitSound(unit, stratagus::unit_sound_type::hit);
+					PlayUnitSound(unit, wyrmgus::unit_sound_type::hit);
 					damage = CalculateDamageStats(unit, *CMap::Map.Field(goalPos, z)->OverlayTerrain->UnitType->Stats, nullptr);
 					//Wyrmgus end
 					CMap::Map.HitWall(goalPos,
@@ -804,7 +804,7 @@ void FireMissile(CUnit &unit, CUnit *goal, const Vec2i &goalPos, int z)
 			if (goal->IsAlive()) {
 				HitUnit_NormalHitSpecialDamageEffects(unit, *goal);
 			}
-			PlayUnitSound(unit, stratagus::unit_sound_type::hit);
+			PlayUnitSound(unit, wyrmgus::unit_sound_type::hit);
 			
 			//apply Thorns damage if attacker is at melee range
 			if (goal && goal->Variable[THORNSDAMAGE_INDEX].Value && unit.MapDistanceTo(*goal) <= 1) {
@@ -817,7 +817,7 @@ void FireMissile(CUnit &unit, CUnit *goal, const Vec2i &goalPos, int z)
 				HitUnit(goal, unit, thorns_damage);
 			}
 		} else {
-			PlayUnitSound(unit, stratagus::unit_sound_type::miss);
+			PlayUnitSound(unit, wyrmgus::unit_sound_type::miss);
 		}
 		//Wyrmgus end
 		return;
@@ -873,11 +873,11 @@ void FireMissile(CUnit &unit, CUnit *goal, const Vec2i &goalPos, int z)
 	if (missile->Type->Pierce) {
 		for (int i = 0; i < (unit.GetModifiedVariable(ATTACKRANGE_INDEX) - unit.MapDistanceTo(dpos, z)); ++i) {
 			const PixelPos diff(missile->destination - missile->source);
-			missile->destination += diff * ((stratagus::defines::get()->get_tile_width() + stratagus::defines::get()->get_tile_height()) * 3) / 4 / Distance(missile->source, missile->destination);
+			missile->destination += diff * ((wyrmgus::defines::get()->get_tile_width() + wyrmgus::defines::get()->get_tile_height()) * 3) / 4 / Distance(missile->source, missile->destination);
 		}
 	}
 	
-	PlayUnitSound(unit, stratagus::unit_sound_type::fire_missile);
+	PlayUnitSound(unit, wyrmgus::unit_sound_type::fire_missile);
 }
 
 /**
@@ -892,7 +892,7 @@ void FireMissile(CUnit &unit, CUnit *goal, const Vec2i &goalPos, int z)
 static void GetMissileMapArea(const Missile &missile, Vec2i &boxMin, Vec2i &boxMax)
 {
 	PixelSize missileSize(missile.Type->get_frame_size());
-	PixelDiff margin(stratagus::defines::get()->get_tile_width() - 1, stratagus::defines::get()->get_tile_height() - 1);
+	PixelDiff margin(wyrmgus::defines::get()->get_tile_width() - 1, wyrmgus::defines::get()->get_tile_height() - 1);
 	boxMin = CMap::Map.map_pixel_pos_to_tile_pos(missile.position);
 	boxMax = CMap::Map.map_pixel_pos_to_tile_pos(missile.position + missileSize + margin);
 	//Wyrmgus start
@@ -934,7 +934,7 @@ static int MissileVisibleInViewport(const CViewport &vp, const Missile &missile)
 	return 0;
 }
 
-namespace stratagus {
+namespace wyrmgus {
 
 /**
 **  Draw missile.
@@ -1018,7 +1018,7 @@ void Missile::DrawMissile(const CViewport &vp) const
 	const PixelPos screenPixelPos = vp.map_to_screen_pixel_pos(this->position);
 
 	switch (this->Type->get_missile_class()) {
-		case stratagus::missile_class::hit:
+		case wyrmgus::missile_class::hit:
 			CLabel(GetGameFont()).DrawClip(screenPixelPos.x, screenPixelPos.y, this->Damage);
 			break;
 		default:
@@ -1167,7 +1167,7 @@ void MissileHandlePierce(Missile &missile, const Vec2i &pos)
 
 bool MissileHandleBlocking(Missile &missile, const PixelPos &position)
 {
-	const stratagus::missile_type &mtype = *missile.Type;
+	const wyrmgus::missile_type &mtype = *missile.Type;
 	if (missile.SourceUnit) {
 		bool shouldHit = false;
 		if (missile.TargetUnit && missile.SourceUnit->Type->UnitType == missile.TargetUnit->Type->UnitType) {
@@ -1461,7 +1461,7 @@ bool IsPiercedUnit(const Missile &missile, const CUnit &unit)
 */
 void Missile::MissileHit(CUnit *unit)
 {
-	const stratagus::missile_type &mtype = *this->Type;
+	const wyrmgus::missile_type &mtype = *this->Type;
 
 	if (mtype.get_impact_sound() != nullptr) {
 		PlayMissileSound(*this, mtype.get_impact_sound());
@@ -1517,7 +1517,7 @@ void Missile::MissileHit(CUnit *unit)
 			}
 		}
 		MissileHitsGoal(*this, *unit, 1);
-		if (mtype.get_missile_class() == stratagus::missile_class::point_to_point_bounce && (unit->Type->get_tile_width() > mtype.MaxBounceSize || unit->Type->get_tile_height() > mtype.MaxBounceSize)) {
+		if (mtype.get_missile_class() == wyrmgus::missile_class::point_to_point_bounce && (unit->Type->get_tile_width() > mtype.MaxBounceSize || unit->Type->get_tile_height() > mtype.MaxBounceSize)) {
 			this->TTL = 0;
 		}
 		return;
@@ -1547,11 +1547,11 @@ void Missile::MissileHit(CUnit *unit)
 				return;
 			}
 			int splash = 1;
-			if (mtype.get_missile_class() == stratagus::missile_class::point_to_point_bounce && this->State > 3) {
+			if (mtype.get_missile_class() == wyrmgus::missile_class::point_to_point_bounce && this->State > 3) {
 				splash = mtype.SplashFactor;
 			}
 			MissileHitsGoal(*this, goal, splash);
-			if (mtype.get_missile_class() == stratagus::missile_class::point_to_point_bounce && (goal.Type->get_tile_width() > mtype.MaxBounceSize || goal.Type->get_tile_height() > mtype.MaxBounceSize)) {
+			if (mtype.get_missile_class() == wyrmgus::missile_class::point_to_point_bounce && (goal.Type->get_tile_width() > mtype.MaxBounceSize || goal.Type->get_tile_height() > mtype.MaxBounceSize)) {
 				this->TTL = 0;
 			}
 			return;
@@ -1630,12 +1630,12 @@ void Missile::MissileHit(CUnit *unit)
 						//Wyrmgus end
 					} else {
 						splash = 1;
-						if (mtype.get_missile_class() == stratagus::missile_class::point_to_point_bounce && this->State > 3) {
+						if (mtype.get_missile_class() == wyrmgus::missile_class::point_to_point_bounce && this->State > 3) {
 							splash = mtype.SplashFactor;
 						}
 					}
 					MissileHitsGoal(*this, goal, splash);
-					if (mtype.get_missile_class() == stratagus::missile_class::point_to_point_bounce && (goal.Type->get_tile_width() > mtype.MaxBounceSize || goal.Type->get_tile_height() > mtype.MaxBounceSize)) {
+					if (mtype.get_missile_class() == wyrmgus::missile_class::point_to_point_bounce && (goal.Type->get_tile_width() > mtype.MaxBounceSize || goal.Type->get_tile_height() > mtype.MaxBounceSize)) {
 						this->TTL = 0;
 					}
 				}
@@ -1814,7 +1814,7 @@ int ViewPointDistanceToMissile(const Missile &missile)
 **
 **  @return  the missile used for burning.
 */
-stratagus::missile_type *MissileBurningBuilding(int percent)
+wyrmgus::missile_type *MissileBurningBuilding(int percent)
 {
 	for (std::vector<BurningBuildingFrame *>::iterator i = BurningBuildingFrames.begin();
 		 i != BurningBuildingFrames.end(); ++i) {
@@ -1892,7 +1892,7 @@ void SaveMissiles(CFile &file)
 	}
 }
 
-namespace stratagus {
+namespace wyrmgus {
 
 void missile_type::Init()
 {
@@ -1912,12 +1912,12 @@ void missile_type::Init()
 */
 void InitMissileTypes()
 {
-	for (stratagus::missile_type *missile_type : stratagus::missile_type::get_all()) {
+	for (wyrmgus::missile_type *missile_type : wyrmgus::missile_type::get_all()) {
 		missile_type->Init();
 	}
 }
 
-namespace stratagus {
+namespace wyrmgus {
 
 missile_type::missile_type(const std::string &identifier) : data_entry(identifier), CDataType(identifier),
 	Transparency(0),

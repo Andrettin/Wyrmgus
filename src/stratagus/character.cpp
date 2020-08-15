@@ -61,11 +61,11 @@
 #include "util/string_util.h"
 #include "util/vector_util.h"
 
-std::map<std::string, stratagus::character *> CustomHeroes;
-stratagus::character *CurrentCustomHero = nullptr;
+std::map<std::string, wyrmgus::character *> CustomHeroes;
+wyrmgus::character *CurrentCustomHero = nullptr;
 bool LoadingPersistentHeroes = false;
 
-namespace stratagus {
+namespace wyrmgus {
 
 void character::clear()
 {
@@ -105,7 +105,7 @@ void character::process_sml_scope(const sml_data &scope)
 		}
 	} else if (tag == "forbidden_upgrades") {
 		for (const std::string &value : values) {
-			stratagus::unit_type *unit_type = unit_type::get(value);
+			wyrmgus::unit_type *unit_type = unit_type::get(value);
 			this->ForbiddenUpgrades.push_back(unit_type);
 		}
 	} else if (tag == "base_abilities") {
@@ -120,7 +120,7 @@ void character::process_sml_scope(const sml_data &scope)
 		}
 	} else if (tag == "default_items") {
 		scope.for_each_child([&](const sml_data &child_scope) {
-			const stratagus::unit_type *unit_type = unit_type::get(child_scope.get_tag());
+			const wyrmgus::unit_type *unit_type = unit_type::get(child_scope.get_tag());
 
 			auto item = std::make_unique<persistent_item>(unit_type, this);
 			database::process_sml_data(item, child_scope);
@@ -128,7 +128,7 @@ void character::process_sml_scope(const sml_data &scope)
 		});
 	} else if (tag == "items") {
 		scope.for_each_child([&](const sml_data &child_scope) {
-			stratagus::unit_type *unit_type = unit_type::try_get(child_scope.get_tag());
+			wyrmgus::unit_type *unit_type = unit_type::try_get(child_scope.get_tag());
 
 			if (unit_type == nullptr) {
 				fprintf(stderr, "Unit type \"%s\" doesn't exist.\n", child_scope.get_tag().c_str());
@@ -169,12 +169,12 @@ void character::ProcessConfigData(const CConfigData *config_data)
 		} else if (key == "family_name") {
 			this->surname = value;
 		} else if (key == "unit_type") {
-			stratagus::unit_type *unit_type = unit_type::get(value);
+			wyrmgus::unit_type *unit_type = unit_type::get(value);
 			if (this->get_unit_type() == nullptr || this->get_unit_type() == unit_type || this->get_unit_type()->CanExperienceUpgradeTo(unit_type)) {
 				this->unit_type = unit_type;
 			}
 		} else if (key == "gender") {
-			this->gender = stratagus::string_to_gender(value);
+			this->gender = wyrmgus::string_to_gender(value);
 		} else if (key == "civilization") {
 			this->civilization = civilization::get(value);
 		} else if (key == "faction") {
@@ -230,7 +230,7 @@ void character::ProcessConfigData(const CConfigData *config_data)
 			this->HeroicIcon.Icon = nullptr;
 			this->HeroicIcon.Load();
 		} else if (key == "forbidden_upgrade") {
-			stratagus::unit_type *unit_type = unit_type::get(value);
+			wyrmgus::unit_type *unit_type = unit_type::get(value);
 			this->ForbiddenUpgrades.push_back(unit_type);
 		} else if (key == "ability") {
 			CUpgrade *ability_upgrade = CUpgrade::try_get(value);
@@ -269,7 +269,7 @@ void character::ProcessConfigData(const CConfigData *config_data)
 			character_title title = character_title::none;
 			CDate start_date;
 			CDate end_date;
-			stratagus::faction *title_faction = nullptr;
+			wyrmgus::faction *title_faction = nullptr;
 				
 			for (size_t j = 0; j < child_config_data->Properties.size(); ++j) {
 				std::string key = child_config_data->Properties[j].first;
@@ -331,7 +331,7 @@ void character::initialize()
 
 	if (this->get_gender() == gender::none) { //if no gender was set so far, have the character be the same gender as the unit type (if the unit type has it predefined)
 		if (this->get_unit_type()->DefaultStat.Variables[GENDER_INDEX].Value != 0) {
-			this->gender = static_cast<stratagus::gender>(this->get_unit_type()->DefaultStat.Variables[GENDER_INDEX].Value);
+			this->gender = static_cast<wyrmgus::gender>(this->get_unit_type()->DefaultStat.Variables[GENDER_INDEX].Value);
 		}
 	}
 
@@ -584,7 +584,7 @@ bool character::is_item_equipped(const persistent_item *item) const
 
 bool character::IsUsable() const
 {
-	if (this->get_unit_type()->DefaultStat.Variables[GENDER_INDEX].Value != 0 && this->get_gender() != static_cast<stratagus::gender>(this->get_unit_type()->DefaultStat.Variables[GENDER_INDEX].Value)) {
+	if (this->get_unit_type()->DefaultStat.Variables[GENDER_INDEX].Value != 0 && this->get_gender() != static_cast<wyrmgus::gender>(this->get_unit_type()->DefaultStat.Variables[GENDER_INDEX].Value)) {
 		return false; // hero not usable if their unit type has a set gender which is different from the hero's (this is because this means that the unit type lacks appropriate graphics for that gender)
 	}
 	
@@ -681,7 +681,7 @@ void character::UpdateAttributes()
 	for (int i = 0; i < MaxAttributes; ++i) {
 		int var = GetAttributeVariableIndex(i);
 		this->Attributes[i] = this->get_unit_type()->DefaultStat.Variables[var].Value;
-		for (const stratagus::upgrade_modifier *modifier : stratagus::upgrade_modifier::UpgradeModifiers) {
+		for (const wyrmgus::upgrade_modifier *modifier : wyrmgus::upgrade_modifier::UpgradeModifiers) {
 			if (
 				(this->get_trait() != nullptr && modifier->UpgradeId == this->get_trait()->ID)
 				|| vector::contains(this->abilities, CUpgrade::get_all()[modifier->UpgradeId])
@@ -716,13 +716,13 @@ int GetAttributeVariableIndex(int attribute)
 	}
 }
 
-stratagus::character *GetCustomHero(const std::string &hero_ident)
+wyrmgus::character *GetCustomHero(const std::string &hero_ident)
 {
 	if (CustomHeroes.find(hero_ident) != CustomHeroes.end()) {
 		return CustomHeroes[hero_ident];
 	}
 	
-	for (std::map<std::string, stratagus::character *>::iterator iterator = CustomHeroes.begin(); iterator != CustomHeroes.end(); ++iterator) { // for backwards compatibility
+	for (std::map<std::string, wyrmgus::character *>::iterator iterator = CustomHeroes.begin(); iterator != CustomHeroes.end(); ++iterator) { // for backwards compatibility
 		if (iterator->second->GetFullName() == hero_ident) {
 			return iterator->second;
 		}
@@ -733,11 +733,11 @@ stratagus::character *GetCustomHero(const std::string &hero_ident)
 
 void SaveHeroes()
 {
-	for (stratagus::character *character : stratagus::character::get_all()) { //save characters
+	for (wyrmgus::character *character : wyrmgus::character::get_all()) { //save characters
 		SaveHero(character);
 	}
 
-	for (std::map<std::string, stratagus::character *>::iterator iterator = CustomHeroes.begin(); iterator != CustomHeroes.end(); ++iterator) { //save custom heroes
+	for (std::map<std::string, wyrmgus::character *>::iterator iterator = CustomHeroes.begin(); iterator != CustomHeroes.end(); ++iterator) { //save custom heroes
 		SaveHero(iterator->second);
 	}
 			
@@ -756,7 +756,7 @@ void SaveHeroes()
 	}
 }
 
-void SaveHero(stratagus::character *hero)
+void SaveHero(wyrmgus::character *hero)
 {
 	struct stat tmp;
 	std::string path = Parameters::Instance.GetUserDirectory();
@@ -802,8 +802,8 @@ void SaveHero(stratagus::character *hero)
 		if (!hero->get_surname().empty()) {
 			fprintf(fd, "\tFamilyName = \"%s\",\n", hero->get_surname().c_str());
 		}
-		if (hero->get_gender() != stratagus::gender::none) {
-			fprintf(fd, "\tGender = \"%s\",\n", stratagus::gender_to_string(hero->get_gender()).c_str());
+		if (hero->get_gender() != wyrmgus::gender::none) {
+			fprintf(fd, "\tGender = \"%s\",\n", wyrmgus::gender_to_string(hero->get_gender()).c_str());
 		}
 		if (hero->get_civilization()) {
 			fprintf(fd, "\tCivilization = \"%s\",\n", hero->get_civilization()->get_identifier().c_str());
@@ -917,7 +917,7 @@ void SaveHero(stratagus::character *hero)
 
 void SaveCustomHero(const std::string &hero_full_name)
 {
-	stratagus::character *hero = GetCustomHero(hero_full_name);
+	wyrmgus::character *hero = GetCustomHero(hero_full_name);
 	if (!hero) {
 		fprintf(stderr, "Custom hero \"%s\" does not exist.\n", hero_full_name.c_str());
 	}
@@ -927,7 +927,7 @@ void SaveCustomHero(const std::string &hero_full_name)
 
 void DeleteCustomHero(const std::string &hero_full_name)
 {
-	stratagus::character *hero = GetCustomHero(hero_full_name);
+	wyrmgus::character *hero = GetCustomHero(hero_full_name);
 	if (!hero) {
 		fprintf(stderr, "Custom hero \"%s\" does not exist.\n", hero_full_name.c_str());
 	}
@@ -960,7 +960,7 @@ void DeleteCustomHero(const std::string &hero_full_name)
 void SetCurrentCustomHero(const std::string &hero_full_name)
 {
 	if (!hero_full_name.empty()) {
-		stratagus::character *hero = GetCustomHero(hero_full_name);
+		wyrmgus::character *hero = GetCustomHero(hero_full_name);
 		if (!hero) {
 			fprintf(stderr, "Custom hero \"%s\" does not exist.\n", hero_full_name.c_str());
 		}
@@ -983,12 +983,12 @@ std::string GetCurrentCustomHero()
 void ChangeCustomHeroCivilization(const std::string &hero_full_name, const std::string &civilization_name, const std::string &new_hero_name, const std::string &new_hero_family_name)
 {
 	if (!hero_full_name.empty()) {
-		stratagus::character *hero = GetCustomHero(hero_full_name);
+		wyrmgus::character *hero = GetCustomHero(hero_full_name);
 		if (!hero) {
 			fprintf(stderr, "Custom hero \"%s\" does not exist.\n", hero_full_name.c_str());
 		}
 
-		stratagus::civilization *civilization = stratagus::civilization::get(civilization_name);
+		wyrmgus::civilization *civilization = wyrmgus::civilization::get(civilization_name);
 		//delete old hero save file
 		std::string path = Parameters::Instance.GetUserDirectory();
 		if (!GameName.empty()) {
@@ -1008,7 +1008,7 @@ void ChangeCustomHeroCivilization(const std::string &hero_full_name, const std::
 
 		//now, update the hero
 		hero->civilization = civilization;
-		stratagus::unit_type *new_unit_type = hero->civilization->get_class_unit_type(hero->get_unit_type()->get_unit_class());
+		wyrmgus::unit_type *new_unit_type = hero->civilization->get_class_unit_type(hero->get_unit_type()->get_unit_class());
 		if (new_unit_type != nullptr) {
 			hero->unit_type = new_unit_type;
 			hero->set_name(new_hero_name);
@@ -1068,65 +1068,65 @@ bool IsNameValidForCustomHero(const std::string &hero_name, const std::string &h
 	return true;
 }
 
-std::string GetCharacterTitleNameById(const stratagus::character_title title)
+std::string GetCharacterTitleNameById(const wyrmgus::character_title title)
 {
-	if (title == stratagus::character_title::head_of_state) {
+	if (title == wyrmgus::character_title::head_of_state) {
 		return "head-of-state";
-	} else if (title == stratagus::character_title::head_of_government) {
+	} else if (title == wyrmgus::character_title::head_of_government) {
 		return "head-of-government";
-	} else if (title == stratagus::character_title::education_minister) {
+	} else if (title == wyrmgus::character_title::education_minister) {
 		return "education-minister";
-	} else if (title == stratagus::character_title::finance_minister) {
+	} else if (title == wyrmgus::character_title::finance_minister) {
 		return "finance-minister";
-	} else if (title == stratagus::character_title::foreign_minister) {
+	} else if (title == wyrmgus::character_title::foreign_minister) {
 		return "foreign-minister";
-	} else if (title == stratagus::character_title::intelligence_minister) {
+	} else if (title == wyrmgus::character_title::intelligence_minister) {
 		return "intelligence-minister";
-	} else if (title == stratagus::character_title::interior_minister) {
+	} else if (title == wyrmgus::character_title::interior_minister) {
 		return "interior-minister";
-	} else if (title == stratagus::character_title::justice_minister) {
+	} else if (title == wyrmgus::character_title::justice_minister) {
 		return "justice-minister";
-	} else if (title == stratagus::character_title::war_minister) {
+	} else if (title == wyrmgus::character_title::war_minister) {
 		return "war-minister";
-	} else if (title == stratagus::character_title::governor) {
+	} else if (title == wyrmgus::character_title::governor) {
 		return "governor";
-	} else if (title == stratagus::character_title::mayor) {
+	} else if (title == wyrmgus::character_title::mayor) {
 		return "mayor";
 	}
 
 	return "";
 }
 
-stratagus::character_title GetCharacterTitleIdByName(const std::string &title)
+wyrmgus::character_title GetCharacterTitleIdByName(const std::string &title)
 {
 	if (title == "head-of-state") {
-		return stratagus::character_title::head_of_state;
+		return wyrmgus::character_title::head_of_state;
 	} else if (title == "head-of-government") {
-		return stratagus::character_title::head_of_government;
+		return wyrmgus::character_title::head_of_government;
 	} else if (title == "education-minister") {
-		return stratagus::character_title::education_minister;
+		return wyrmgus::character_title::education_minister;
 	} else if (title == "finance-minister") {
-		return stratagus::character_title::finance_minister;
+		return wyrmgus::character_title::finance_minister;
 	} else if (title == "foreign-minister") {
-		return stratagus::character_title::foreign_minister;
+		return wyrmgus::character_title::foreign_minister;
 	} else if (title == "intelligence-minister") {
-		return stratagus::character_title::intelligence_minister;
+		return wyrmgus::character_title::intelligence_minister;
 	} else if (title == "interior-minister") {
-		return stratagus::character_title::interior_minister;
+		return wyrmgus::character_title::interior_minister;
 	} else if (title == "justice-minister") {
-		return stratagus::character_title::justice_minister;
+		return wyrmgus::character_title::justice_minister;
 	} else if (title == "war-minister") {
-		return stratagus::character_title::war_minister;
+		return wyrmgus::character_title::war_minister;
 	} else if (title == "governor") {
-		return stratagus::character_title::governor;
+		return wyrmgus::character_title::governor;
 	} else if (title == "mayor") {
-		return stratagus::character_title::mayor;
+		return wyrmgus::character_title::mayor;
 	}
 
-	return stratagus::character_title::none;
+	return wyrmgus::character_title::none;
 }
 
-bool IsMinisterialTitle(const stratagus::character_title title)
+bool IsMinisterialTitle(const wyrmgus::character_title title)
 {
-	return (title == stratagus::character_title::head_of_state || title == stratagus::character_title::head_of_government || title == stratagus::character_title::education_minister || title == stratagus::character_title::finance_minister || title == stratagus::character_title::foreign_minister || title == stratagus::character_title::intelligence_minister || title == stratagus::character_title::interior_minister || title == stratagus::character_title::justice_minister || title == stratagus::character_title::war_minister);
+	return (title == wyrmgus::character_title::head_of_state || title == wyrmgus::character_title::head_of_government || title == wyrmgus::character_title::education_minister || title == wyrmgus::character_title::finance_minister || title == wyrmgus::character_title::foreign_minister || title == wyrmgus::character_title::intelligence_minister || title == wyrmgus::character_title::interior_minister || title == wyrmgus::character_title::justice_minister || title == wyrmgus::character_title::war_minister);
 }

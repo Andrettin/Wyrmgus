@@ -237,9 +237,9 @@ int DoActionMove(CUnit &unit)
 			//Wyrmgus end
 
 			if (mf_cur.WaterOnMap() && mf_next.CoastOnMap()) {
-				PlayUnitSound(unit, stratagus::unit_sound_type::docking);
+				PlayUnitSound(unit, wyrmgus::unit_sound_type::docking);
 			} else if (mf_cur.CoastOnMap() && mf_next.WaterOnMap()) {
-				PlayUnitSound(unit, stratagus::unit_sound_type::docking); // undocking
+				PlayUnitSound(unit, wyrmgus::unit_sound_type::docking); // undocking
 			}
 		}
 		Vec2i pos = unit.tilePos + posd;
@@ -250,8 +250,8 @@ int DoActionMove(CUnit &unit)
 			for (size_t i = 0; i != table.size(); ++i) {
 				if (!table[i]->Removed && !table[i]->Type->BoolFlag[BRIDGE_INDEX].value && table[i]->Type->UnitType == UnitTypeType::Land) {
 					table[i]->MoveToXY(pos, table[i]->MapLayer->ID);
-					table[i]->pixel_offset.setX(-posd.x * stratagus::defines::get()->get_tile_width());
-					table[i]->pixel_offset.setY(-posd.y * stratagus::defines::get()->get_tile_height());
+					table[i]->pixel_offset.setX(-posd.x * wyrmgus::defines::get()->get_tile_width());
+					table[i]->pixel_offset.setY(-posd.y * wyrmgus::defines::get()->get_tile_height());
 					UnitHeadingFromDeltaXY(*table[i], posd);
 				}
 			}
@@ -264,7 +264,7 @@ int DoActionMove(CUnit &unit)
 		unit.StepCount = std::min(unit.StepCount, (unsigned char) 10);
 		//Wyrmgus end
 		//Wyrmgus start
-		PlayUnitSound(unit, stratagus::unit_sound_type::step);
+		PlayUnitSound(unit, wyrmgus::unit_sound_type::step);
 		//Wyrmgus end
 
 		// Remove unit from the current selection
@@ -281,8 +281,8 @@ int DoActionMove(CUnit &unit)
 			}
 		}
 
-		unit.pixel_offset.setX(-posd.x * stratagus::defines::get()->get_tile_width());
-		unit.pixel_offset.setY(-posd.y * stratagus::defines::get()->get_tile_height());
+		unit.pixel_offset.setX(-posd.x * wyrmgus::defines::get()->get_tile_width());
+		unit.pixel_offset.setY(-posd.y * wyrmgus::defines::get()->get_tile_height());
 		unit.Frame = unit.Type->StillFrame;
 		UnitHeadingFromDeltaXY(unit, posd);
 	} else {
@@ -309,7 +309,7 @@ int DoActionMove(CUnit &unit)
 	//Wyrmgus end
 	
 	//Wyrmgus start
-	if (abs(unit.get_pixel_offset().x()) > (stratagus::defines::get()->get_tile_width() * 2) || abs(unit.get_pixel_offset().y()) > (stratagus::defines::get()->get_tile_height() * 2)) {
+	if (abs(unit.get_pixel_offset().x()) > (wyrmgus::defines::get()->get_tile_width() * 2) || abs(unit.get_pixel_offset().y()) > (wyrmgus::defines::get()->get_tile_height() * 2)) {
 		unit.pixel_offset = QPoint(0, 0);
 #ifdef DEBUG
 		fprintf(stderr, "Error in DoActionMove: unit's pixel movement was too big.\n");

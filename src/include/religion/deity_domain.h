@@ -33,7 +33,7 @@
 
 class CUpgrade;
 
-namespace stratagus {
+namespace wyrmgus {
 
 class deity_domain : public detailed_data_entry, public data_type<deity_domain>, public CDataType
 {

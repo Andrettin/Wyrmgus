@@ -33,7 +33,7 @@
 
 class COrder_TransformInto : public COrder
 {
-	friend COrder *COrder::NewActionTransformInto(stratagus::unit_type &type);
+	friend COrder *COrder::NewActionTransformInto(wyrmgus::unit_type &type);
 public:
 	COrder_TransformInto() : COrder(UnitAction::TransformInto), Type(nullptr) {}
 
@@ -49,17 +49,17 @@ public:
 	virtual void UpdatePathFinderData(PathFinderInput &input) { UpdatePathFinderData_NotCalled(input); }
 
 	//Wyrmgus start
-	void ConvertUnitType(const CUnit &unit, stratagus::unit_type &newType);
-	const stratagus::unit_type &GetUnitType() const { return *Type; }
+	void ConvertUnitType(const CUnit &unit, wyrmgus::unit_type &newType);
+	const wyrmgus::unit_type &GetUnitType() const { return *Type; }
 	//Wyrmgus end
 
 private:
-	stratagus::unit_type *Type; /// Transform unit into this unit-type
+	wyrmgus::unit_type *Type; /// Transform unit into this unit-type
 };
 
 class COrder_UpgradeTo : public COrder
 {
-	friend COrder *COrder::NewActionUpgradeTo(CUnit &unit, stratagus::unit_type &type);
+	friend COrder *COrder::NewActionUpgradeTo(CUnit &unit, wyrmgus::unit_type &type);
 public:
 	COrder_UpgradeTo() : COrder(UnitAction::UpgradeTo), Type(nullptr), Ticks(0) {}
 
@@ -78,13 +78,13 @@ public:
 	virtual void UpdateUnitVariables(CUnit &unit) const;
 	
 	//Wyrmgus start
-	void ConvertUnitType(const CUnit &unit, stratagus::unit_type &newType);
+	void ConvertUnitType(const CUnit &unit, wyrmgus::unit_type &newType);
 	//Wyrmgus end
 	
-	const stratagus::unit_type &GetUnitType() const { return *Type; }
+	const wyrmgus::unit_type &GetUnitType() const { return *Type; }
 private:
-	stratagus::unit_type *Type; /// upgrade to this unit-type
+	wyrmgus::unit_type *Type; /// upgrade to this unit-type
 	int Ticks;       /// Ticks to complete
 };
 
-extern int TransformUnitIntoType(CUnit &unit, const stratagus::unit_type &newtype);
+extern int TransformUnitIntoType(CUnit &unit, const wyrmgus::unit_type &newtype);

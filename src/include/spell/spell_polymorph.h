@@ -40,15 +40,15 @@ class Spell_Polymorph : public SpellActionType
 public:
 	Spell_Polymorph() : SpellActionType(1) {};
 	virtual void ProcessConfigData(const CConfigData *config_data) override {}
-	virtual int Cast(CUnit &caster, const stratagus::spell &spell,
+	virtual int Cast(CUnit &caster, const wyrmgus::spell &spell,
 					 CUnit *target, const Vec2i &goalPos, int z, int modifier);
 	virtual void Parse(lua_State *l, int startIndex, int endIndex);
 
 private:
-	stratagus::unit_type *NewForm = nullptr;	/// The new form
+	wyrmgus::unit_type *NewForm = nullptr;	/// The new form
 	int PlayerNeutral = 0;			/// Convert the unit to the neutral player, or to the caster's player.
 	//Wyrmgus start
-	stratagus::civilization *civilization = nullptr;			/// For using with the Faction value.
+	wyrmgus::civilization *civilization = nullptr;			/// For using with the Faction value.
 	int Faction = -1;				/// If the unit should be transformed in its faction equivalent.
 	bool Detachment = false;		/// If the unit should be transformed from its faction-specific type to the generic civilization equivalent.
 	//Wyrmgus end

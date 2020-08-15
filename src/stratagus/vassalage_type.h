@@ -27,7 +27,7 @@
 
 #pragma once
 
-namespace stratagus {
+namespace wyrmgus {
 
 enum class vassalage_type {
 	none,
@@ -66,4 +66,4 @@ inline std::string vassalage_type_to_string(const vassalage_type vassalage_type)
 
 }
 
-Q_DECLARE_METATYPE(stratagus::vassalage_type)
+Q_DECLARE_METATYPE(wyrmgus::vassalage_type)

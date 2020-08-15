@@ -27,7 +27,7 @@
 
 #pragma once
 
-namespace stratagus {
+namespace wyrmgus {
 
 enum class gender {
 	none,
@@ -88,4 +88,4 @@ inline std::string gender_to_string(const gender gender)
 
 }
 
-Q_DECLARE_METATYPE(stratagus::gender)
+Q_DECLARE_METATYPE(wyrmgus::gender)

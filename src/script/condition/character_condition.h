@@ -31,7 +31,7 @@
 #include "script/condition/condition.h"
 #include "unit/unit.h"
 
-namespace stratagus {
+namespace wyrmgus {
 
 class character_condition final : public condition
 {

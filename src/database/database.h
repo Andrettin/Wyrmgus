@@ -32,7 +32,7 @@
 #include "util/singleton.h"
 #include "util/type_traits.h"
 
-namespace stratagus {
+namespace wyrmgus {
 
 class data_entry;
 class data_type_metadata;

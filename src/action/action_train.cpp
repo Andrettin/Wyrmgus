@@ -54,7 +54,7 @@
 /// How many resources the player gets back if canceling training
 static constexpr int CancelTrainingCostsFactor = 100;
 
-COrder *COrder::NewActionTrain(CUnit &trainer, stratagus::unit_type &type, int player)
+COrder *COrder::NewActionTrain(CUnit &trainer, wyrmgus::unit_type &type, int player)
 {
 	COrder_Train *order = new COrder_Train;
 
@@ -87,7 +87,7 @@ COrder *COrder::NewActionTrain(CUnit &trainer, stratagus::unit_type &type, int p
 {
 	if (!strcmp(value, "type")) {
 		++j;
-		this->Type = stratagus::unit_type::get(LuaToString(l, -1, j + 1));
+		this->Type = wyrmgus::unit_type::get(LuaToString(l, -1, j + 1));
 	//Wyrmgus start
 	} else if (!strcmp(value, "player")) {
 		++j;
@@ -140,7 +140,7 @@ COrder *COrder::NewActionTrain(CUnit &trainer, stratagus::unit_type &type, int p
 	//Wyrmgus end
 }
 
-void COrder_Train::ConvertUnitType(const CUnit &unit, stratagus::unit_type &newType)
+void COrder_Train::ConvertUnitType(const CUnit &unit, wyrmgus::unit_type &newType)
 {
 	//Wyrmgus start
 //	const CPlayer &player = *unit.Player;
@@ -226,7 +226,7 @@ static void AnimateActionTrain(CUnit &unit)
 //	CPlayer &player = *unit.Player;
 	CPlayer &player = *CPlayer::Players[this->Player];
 	//Wyrmgus end
-	stratagus::unit_type &nType = *this->Type;
+	wyrmgus::unit_type &nType = *this->Type;
 	const int cost = nType.Stats[player.Index].Costs[TimeCost];
 	
 	//Wyrmgus start
@@ -393,7 +393,7 @@ static void AnimateActionTrain(CUnit &unit)
 
 		//Wyrmgus start
 		if (this->Player != unit.Player->Index && unit.Player->Type != PlayerNeutral && CPlayer::Players[this->Player]->HasBuildingAccess(*unit.Player)) { //if the player who gave the order is different from the owner of the building, and the latter is non-neutral (i.e. if the owner of the building is a mercenary company), provide the owner of the building with appropriate recompensation
-			unit.Player->change_resource(stratagus::resource::get_all()[CopperCost], newUnit->GetPrice(), true);
+			unit.Player->change_resource(wyrmgus::resource::get_all()[CopperCost], newUnit->GetPrice(), true);
 		}
 		//Wyrmgus end
 		
@@ -401,7 +401,7 @@ static void AnimateActionTrain(CUnit &unit)
 		//player.Notify(NotifyGreen, newUnit->tilePos, _("New %s ready"), nType.Name.c_str());
 
 		if (&player == CPlayer::GetThisPlayer()) {
-			PlayUnitSound(*newUnit, stratagus::unit_sound_type::ready);
+			PlayUnitSound(*newUnit, wyrmgus::unit_sound_type::ready);
 		}
 		if (newUnit->Player->AiEnabled) {
 			AiTrainingComplete(unit, *newUnit);
@@ -439,7 +439,7 @@ static void AnimateActionTrain(CUnit &unit)
 					CommandResource(*newUnit, *table[j], FlushCommands);
 					command_found = true;
 				} else if (newUnit->Type->BoolFlag[HARVESTER_INDEX].value && table[j]->Type->GivesResource && newUnit->Type->ResInfo[table[j]->Type->GivesResource] && !table[j]->Type->BoolFlag[CANHARVEST_INDEX].value && (table[j]->Player == newUnit->Player || table[j]->Player->Index == PlayerNumNeutral)) { // see if can build mine on top of deposit
-					for (stratagus::unit_type *other_unit_type : stratagus::unit_type::get_all()) {
+					for (wyrmgus::unit_type *other_unit_type : wyrmgus::unit_type::get_all()) {
 						if (other_unit_type->GivesResource == table[j]->Type->GivesResource && other_unit_type->BoolFlag[CANHARVEST_INDEX].value && CanBuildUnitType(newUnit, *other_unit_type, table[j]->tilePos, 1, false, table[j]->MapLayer->ID)) {
 							CommandBuildBuilding(*newUnit, table[j]->tilePos, *other_unit_type, FlushCommands, table[j]->MapLayer->ID);
 							command_found = true;
@@ -454,7 +454,7 @@ static void AnimateActionTrain(CUnit &unit)
 			}
 			
 			if (!command_found && unit.RallyPointMapLayer->Field(unit.RallyPointPos)->player_info->IsTeamExplored(*newUnit->Player)) { // see if can harvest terrain
-				for (const stratagus::resource *resource : stratagus::resource::get_all()) {
+				for (const wyrmgus::resource *resource : wyrmgus::resource::get_all()) {
 					if (newUnit->Type->ResInfo[resource->ID] && CMap::Map.Field(unit.RallyPointPos, unit.RallyPointMapLayer->ID)->get_resource() == resource) {
 						CommandResourceLoc(*newUnit, unit.RallyPointPos, FlushCommands, unit.RallyPointMapLayer->ID);
 						command_found = true;

@@ -359,7 +359,7 @@ bool LanguageCacheOutdated = false;
 void PlayerRace::Clean()
 {
 	//Wyrmgus start
-	if (!stratagus::civilization::get_all().empty()) { //don't clean the languages if first defining the civilizations
+	if (!wyrmgus::civilization::get_all().empty()) { //don't clean the languages if first defining the civilizations
 		for (size_t i = 0; i < this->Languages.size(); ++i) {
 			for (size_t j = 0; j < this->Languages[i]->LanguageWords.size(); ++j) {
 				for (size_t k = 0; k < this->Languages[i]->Dialects.size(); ++k) { //remove word from dialects, so that they don't try to delete it too
@@ -390,12 +390,12 @@ CLanguage *PlayerRace::get_civilization_language(int civilization)
 		return nullptr;
 	}
 	
-	if (stratagus::civilization::get_all()[civilization]->Language) {
-		return stratagus::civilization::get_all()[civilization]->Language;
+	if (wyrmgus::civilization::get_all()[civilization]->Language) {
+		return wyrmgus::civilization::get_all()[civilization]->Language;
 	}
 	
-	if (stratagus::civilization::get_all()[civilization]->get_parent_civilization()) {
-		return get_civilization_language(stratagus::civilization::get_all()[civilization]->get_parent_civilization()->ID);
+	if (wyrmgus::civilization::get_all()[civilization]->get_parent_civilization()) {
+		return get_civilization_language(wyrmgus::civilization::get_all()[civilization]->get_parent_civilization()->ID);
 	}
 	
 	return nullptr;
@@ -550,7 +550,7 @@ CPlayer *CPlayer::GetPlayer(const int index)
 
 const QColor &CPlayer::get_minimap_color() const
 {
-	return this->get_player_color()->get_colors().at(stratagus::defines::get()->get_minimap_color_index());
+	return this->get_player_color()->get_colors().at(wyrmgus::defines::get()->get_minimap_color_index());
 }
 
 void CPlayer::set_revealed(const bool revealed)
@@ -564,7 +564,7 @@ void CPlayer::set_revealed(const bool revealed)
 	if (revealed) {
 		CPlayer::revealed_players.push_back(this);
 	} else {
-		stratagus::vector::remove(CPlayer::revealed_players, this);
+		wyrmgus::vector::remove(CPlayer::revealed_players, this);
 	}
 }
 
@@ -573,15 +573,15 @@ void CPlayer::Save(CFile &file) const
 	const CPlayer &p = *this;
 	file.printf("Player(%d,\n", this->Index);
 	//Wyrmgus start
-	file.printf(" \"race\", \"%s\",", stratagus::civilization::get_all()[p.Race]->get_identifier().c_str());
+	file.printf(" \"race\", \"%s\",", wyrmgus::civilization::get_all()[p.Race]->get_identifier().c_str());
 	if (p.Faction != -1) {
 		file.printf(" \"faction\", %d,", p.Faction);
 	}
-	if (p.get_faction_tier() != stratagus::faction_tier::none) {
-		file.printf(" \"faction-tier\", \"%s\",", stratagus::faction_tier_to_string(this->get_faction_tier()).c_str());
+	if (p.get_faction_tier() != wyrmgus::faction_tier::none) {
+		file.printf(" \"faction-tier\", \"%s\",", wyrmgus::faction_tier_to_string(this->get_faction_tier()).c_str());
 	}
-	if (p.get_government_type() != stratagus::government_type::none) {
-		file.printf(" \"government-type\", \"%s\",", stratagus::government_type_to_string(this->get_government_type()).c_str());
+	if (p.get_government_type() != wyrmgus::government_type::none) {
+		file.printf(" \"government-type\", \"%s\",", wyrmgus::government_type_to_string(this->get_government_type()).c_str());
 	}
 	if (p.get_dynasty() != nullptr) {
 		file.printf(" \"dynasty\", \"%s\",", p.get_dynasty()->get_identifier().c_str());
@@ -627,7 +627,7 @@ void CPlayer::Save(CFile &file) const
 	file.printf("  \"start-map-layer\", %d,\n", p.StartMapLayer);
 	//Wyrmgus end
 	if (p.get_overlord() != nullptr) {
-		file.printf("  \"overlord\", %d, \"%s\",\n", p.get_overlord()->Index, stratagus::vassalage_type_to_string(p.vassalage_type).c_str());
+		file.printf("  \"overlord\", %d, \"%s\",\n", p.get_overlord()->Index, wyrmgus::vassalage_type_to_string(p.vassalage_type).c_str());
 	}
 
 	// Resources
@@ -738,7 +738,7 @@ void CPlayer::Save(CFile &file) const
 	file.printf("\n  \"total-kills\", %d,", p.TotalKills);
 	//Wyrmgus start
 	file.printf("\n  \"unit-type-kills\", {");
-	for (const stratagus::unit_type *unit_type : stratagus::unit_type::get_all()) {
+	for (const wyrmgus::unit_type *unit_type : wyrmgus::unit_type::get_all()) {
 		if (p.UnitTypeKills[unit_type->Slot] != 0) {
 			file.printf("\"%s\", %d, ", unit_type->Ident.c_str(), p.UnitTypeKills[unit_type->Slot]);
 		}
@@ -880,7 +880,7 @@ void CreatePlayer(int type)
 	player->Init(type);
 }
 
-CPlayer *GetFactionPlayer(const stratagus::faction *faction)
+CPlayer *GetFactionPlayer(const wyrmgus::faction *faction)
 {
 	if (!faction) {
 		return nullptr;
@@ -895,7 +895,7 @@ CPlayer *GetFactionPlayer(const stratagus::faction *faction)
 	return nullptr;
 }
 
-CPlayer *GetOrAddFactionPlayer(const stratagus::faction *faction)
+CPlayer *GetOrAddFactionPlayer(const wyrmgus::faction *faction)
 {
 	CPlayer *faction_player = GetFactionPlayer(faction);
 	if (faction_player != nullptr) {
@@ -982,13 +982,13 @@ void CPlayer::Init(/* PlayerTypes */ int type)
 	this->Type = type;
 	this->Race = 0;
 	this->Faction = -1;
-	this->faction_tier = stratagus::faction_tier::none;
-	this->government_type = stratagus::government_type::none;
+	this->faction_tier = wyrmgus::faction_tier::none;
+	this->government_type = wyrmgus::government_type::none;
 	this->religion = nullptr;
 	this->dynasty = nullptr;
 	this->age = nullptr;
 	this->overlord = nullptr;
-	this->vassalage_type = stratagus::vassalage_type::none;
+	this->vassalage_type = wyrmgus::vassalage_type::none;
 	this->Team = team;
 	this->enemies.clear();
 	this->allies.clear();
@@ -1042,14 +1042,14 @@ void CPlayer::Init(/* PlayerTypes */ int type)
 
 	//  Initial default incomes.
 	for (int i = 0; i < MaxCosts; ++i) {
-		this->Incomes[i] = stratagus::resource::get_all()[i]->DefaultIncome;
+		this->Incomes[i] = wyrmgus::resource::get_all()[i]->DefaultIncome;
 	}
 	
 	this->TradeCost = DefaultTradeCost;
 
 	//  Initial max resource amounts.
 	for (int i = 0; i < MaxCosts; ++i) {
-		this->MaxResources[i] = stratagus::resource::get_all()[i]->DefaultMaxAmount;
+		this->MaxResources[i] = wyrmgus::resource::get_all()[i]->DefaultMaxAmount;
 	}
 
 	//Wyrmgus start
@@ -1094,10 +1094,10 @@ void CPlayer::SetName(const std::string &name)
 	Name = name;
 }
 
-const stratagus::civilization *CPlayer::get_civilization() const
+const wyrmgus::civilization *CPlayer::get_civilization() const
 {
 	if (this->Race != -1) {
-		return stratagus::civilization::get_all()[this->Race];
+		return wyrmgus::civilization::get_all()[this->Race];
 	}
 
 	return nullptr;
@@ -1107,7 +1107,7 @@ const stratagus::civilization *CPlayer::get_civilization() const
 void CPlayer::set_civilization(int civilization)
 {
 	if (this->Race != -1 && (GameRunning || GameEstablishing)) {
-		const stratagus::civilization *old_civilization = stratagus::civilization::get_all()[this->Race];
+		const wyrmgus::civilization *old_civilization = wyrmgus::civilization::get_all()[this->Race];
 		if (old_civilization->get_upgrade() != nullptr && this->Allow.Upgrades[old_civilization->get_upgrade()->ID] == 'R') {
 			UpgradeLost(*this, old_civilization->get_upgrade()->ID);
 		}
@@ -1125,7 +1125,7 @@ void CPlayer::set_civilization(int civilization)
 	if ((CPlayer::GetThisPlayer() && CPlayer::GetThisPlayer()->Index == this->Index) || (!CPlayer::GetThisPlayer() && this->Index == 0)) {
 		//load proper UI
 		char buf[256];
-		snprintf(buf, sizeof(buf), "if (LoadCivilizationUI ~= nil) then LoadCivilizationUI(\"%s\") end;", stratagus::civilization::get_all()[this->Race]->get_identifier().c_str());
+		snprintf(buf, sizeof(buf), "if (LoadCivilizationUI ~= nil) then LoadCivilizationUI(\"%s\") end;", wyrmgus::civilization::get_all()[this->Race]->get_identifier().c_str());
 		CclCommand(buf);
 		
 		UI.Load();
@@ -1133,7 +1133,7 @@ void CPlayer::set_civilization(int civilization)
 	}
 	
 	if (this->Race != -1) {
-		const stratagus::civilization *new_civilization = stratagus::civilization::get_all()[this->Race];
+		const wyrmgus::civilization *new_civilization = wyrmgus::civilization::get_all()[this->Race];
 		CUpgrade *civilization_upgrade = new_civilization->get_upgrade();
 		if (civilization_upgrade != nullptr && this->Allow.Upgrades[civilization_upgrade->ID] != 'R') {
 			UpgradeAcquire(*this, civilization_upgrade);
@@ -1141,10 +1141,10 @@ void CPlayer::set_civilization(int civilization)
 	}
 }
 
-stratagus::faction *CPlayer::get_faction() const
+wyrmgus::faction *CPlayer::get_faction() const
 {
 	if (this->Faction != -1) {
-		return stratagus::faction::get_all()[this->Faction];
+		return wyrmgus::faction::get_all()[this->Faction];
 	}
 
 	return nullptr;
@@ -1155,7 +1155,7 @@ stratagus::faction *CPlayer::get_faction() const
 **
 **  @param faction    New faction.
 */
-void CPlayer::SetFaction(const stratagus::faction *faction)
+void CPlayer::SetFaction(const wyrmgus::faction *faction)
 {
 	int old_faction_id = this->Faction;
 	
@@ -1164,11 +1164,11 @@ void CPlayer::SetFaction(const stratagus::faction *faction)
 	}
 
 	if (this->Faction != -1) {
-		if (!stratagus::faction::get_all()[this->Faction]->FactionUpgrade.empty() && this->Allow.Upgrades[CUpgrade::get(stratagus::faction::get_all()[this->Faction]->FactionUpgrade)->ID] == 'R') {
-			UpgradeLost(*this, CUpgrade::get(stratagus::faction::get_all()[this->Faction]->FactionUpgrade)->ID);
+		if (!wyrmgus::faction::get_all()[this->Faction]->FactionUpgrade.empty() && this->Allow.Upgrades[CUpgrade::get(wyrmgus::faction::get_all()[this->Faction]->FactionUpgrade)->ID] == 'R') {
+			UpgradeLost(*this, CUpgrade::get(wyrmgus::faction::get_all()[this->Faction]->FactionUpgrade)->ID);
 		}
 
-		int faction_type_upgrade_id = UpgradeIdByIdent("upgrade-" + GetFactionTypeNameById(stratagus::faction::get_all()[this->Faction]->Type));
+		int faction_type_upgrade_id = UpgradeIdByIdent("upgrade-" + GetFactionTypeNameById(wyrmgus::faction::get_all()[this->Faction]->Type));
 		if (faction_type_upgrade_id != -1 && this->Allow.Upgrades[faction_type_upgrade_id] == 'R') {
 			UpgradeLost(*this, faction_type_upgrade_id);
 		}
@@ -1177,8 +1177,8 @@ void CPlayer::SetFaction(const stratagus::faction *faction)
 	int faction_id = faction ? faction->ID : -1;
 	
 	if (old_faction_id != -1 && faction_id != -1) {
-		for (const stratagus::upgrade_class *upgrade_class : stratagus::upgrade_class::get_all()) {
-			const CUpgrade *old_faction_class_upgrade = stratagus::faction::get_all()[old_faction_id]->get_class_upgrade(upgrade_class);
+		for (const wyrmgus::upgrade_class *upgrade_class : wyrmgus::upgrade_class::get_all()) {
+			const CUpgrade *old_faction_class_upgrade = wyrmgus::faction::get_all()[old_faction_id]->get_class_upgrade(upgrade_class);
 			const CUpgrade *new_faction_class_upgrade = faction->get_class_upgrade(upgrade_class);
 			if (old_faction_class_upgrade != new_faction_class_upgrade) { //if the upgrade for a certain class is different for the new faction than the old faction (and it has been acquired), remove the modifiers of the old upgrade and apply the modifiers of the new
 				if (old_faction_class_upgrade != nullptr && this->Allow.Upgrades[old_faction_class_upgrade->ID] == 'R') {
@@ -1195,7 +1195,7 @@ void CPlayer::SetFaction(const stratagus::faction *faction)
 	bool personal_names_changed = true;
 	bool ship_names_changed = true;
 	if (this->Faction != -1 && faction_id != -1) {
-		ship_names_changed = stratagus::faction::get_all()[this->Faction]->get_ship_names() != stratagus::faction::get_all()[faction_id]->get_ship_names();
+		ship_names_changed = wyrmgus::faction::get_all()[this->Faction]->get_ship_names() != wyrmgus::faction::get_all()[faction_id]->get_ship_names();
 		personal_names_changed = false; // setting to a faction of the same civilization
 	}
 	
@@ -1210,16 +1210,16 @@ void CPlayer::SetFaction(const stratagus::faction *faction)
 	}
 	
 	if (!IsNetworkGame()) { //only set the faction's name as the player's name if this is a single player game
-		this->SetName(stratagus::faction::get_all()[this->Faction]->get_name());
+		this->SetName(wyrmgus::faction::get_all()[this->Faction]->get_name());
 	}
 	if (this->Faction != -1) {
-		const stratagus::player_color *player_color = nullptr;
-		const stratagus::faction *faction = stratagus::faction::get_all()[faction_id];
+		const wyrmgus::player_color *player_color = nullptr;
+		const wyrmgus::faction *faction = wyrmgus::faction::get_all()[faction_id];
 
 		this->set_faction_tier(faction->get_default_tier());
 		this->set_government_type(faction->get_default_government_type());
 
-		const stratagus::player_color *faction_color = faction->get_color();
+		const wyrmgus::player_color *faction_color = faction->get_color();
 		if (faction_color != nullptr) {
 			if (this->get_player_color_usage_count(faction_color) == 0) {
 				player_color = faction_color;
@@ -1231,9 +1231,9 @@ void CPlayer::SetFaction(const stratagus::faction *faction)
 			//out of those colors, give priority to the one closest (in RGB values) to the faction's color
 			int best_usage_count = -1;
 			int best_rgb_difference = -1;
-			std::vector<const stratagus::player_color *> available_colors;
-			for (const stratagus::player_color *pc : stratagus::player_color::get_all()) {
-				if (pc == stratagus::defines::get()->get_neutral_player_color()) {
+			std::vector<const wyrmgus::player_color *> available_colors;
+			for (const wyrmgus::player_color *pc : wyrmgus::player_color::get_all()) {
+				if (pc == wyrmgus::defines::get()->get_neutral_player_color()) {
 					continue;
 				}
 
@@ -1286,8 +1286,8 @@ void CPlayer::SetFaction(const stratagus::faction *faction)
 		//update the territory on the minimap for the new color
 		this->update_minimap_territory();
 
-		if (!stratagus::faction::get_all()[this->Faction]->FactionUpgrade.empty()) {
-			CUpgrade *faction_upgrade = CUpgrade::try_get(stratagus::faction::get_all()[this->Faction]->FactionUpgrade);
+		if (!wyrmgus::faction::get_all()[this->Faction]->FactionUpgrade.empty()) {
+			CUpgrade *faction_upgrade = CUpgrade::try_get(wyrmgus::faction::get_all()[this->Faction]->FactionUpgrade);
 			if (faction_upgrade && this->Allow.Upgrades[faction_upgrade->ID] != 'R') {
 				if (GameEstablishing) {
 					AllowUpgradeId(*this, faction_upgrade->ID, 'R');
@@ -1297,7 +1297,7 @@ void CPlayer::SetFaction(const stratagus::faction *faction)
 			}
 		}
 		
-		int faction_type_upgrade_id = UpgradeIdByIdent("upgrade-" + GetFactionTypeNameById(stratagus::faction::get_all()[this->Faction]->Type));
+		int faction_type_upgrade_id = UpgradeIdByIdent("upgrade-" + GetFactionTypeNameById(wyrmgus::faction::get_all()[this->Faction]->Type));
 		if (faction_type_upgrade_id != -1 && this->Allow.Upgrades[faction_type_upgrade_id] != 'R') {
 			if (GameEstablishing) {
 				AllowUpgradeId(*this, faction_type_upgrade_id, 'R');
@@ -1306,7 +1306,7 @@ void CPlayer::SetFaction(const stratagus::faction *faction)
 			}
 		}
 	} else {
-		fprintf(stderr, "Invalid faction \"%s\" tried to be set for player %d of civilization \"%s\".\n", faction->get_name().c_str(), this->Index, stratagus::civilization::get_all()[this->Race]->get_identifier().c_str());
+		fprintf(stderr, "Invalid faction \"%s\" tried to be set for player %d of civilization \"%s\".\n", faction->get_name().c_str(), this->Index, wyrmgus::civilization::get_all()[this->Race]->get_identifier().c_str());
 	}
 	
 	for (int i = 0; i < this->GetUnitCount(); ++i) {
@@ -1332,9 +1332,9 @@ void CPlayer::SetFaction(const stratagus::faction *faction)
 void CPlayer::SetRandomFaction()
 {
 	// set random one from the civilization's factions
-	std::vector<stratagus::faction *> local_factions;
+	std::vector<wyrmgus::faction *> local_factions;
 	
-	for (stratagus::faction *faction : stratagus::faction::get_all()) {
+	for (wyrmgus::faction *faction : wyrmgus::faction::get_all()) {
 		if (faction->get_civilization()->ID != this->Race) {
 			continue;
 		}
@@ -1346,7 +1346,7 @@ void CPlayer::SetRandomFaction()
 		}
 
 		int faction_type = faction->Type;
-		const bool has_writing = this->has_upgrade_class(stratagus::upgrade_class::get("writing"));
+		const bool has_writing = this->has_upgrade_class(wyrmgus::upgrade_class::get("writing"));
 		if (
 			!(faction_type == FactionTypeTribe && !has_writing)
 			&& !(faction_type == FactionTypePolity && has_writing)
@@ -1358,20 +1358,20 @@ void CPlayer::SetRandomFaction()
 	}
 	
 	if (local_factions.size() > 0) {
-		stratagus::faction *chosen_faction = local_factions[SyncRand(local_factions.size())];
+		wyrmgus::faction *chosen_faction = local_factions[SyncRand(local_factions.size())];
 		this->SetFaction(chosen_faction);
 	} else {
 		this->SetFaction(nullptr);
 	}
 }
 
-void CPlayer::set_dynasty(const stratagus::dynasty *dynasty)
+void CPlayer::set_dynasty(const wyrmgus::dynasty *dynasty)
 {
 	if (dynasty == this->get_dynasty()) {
 		return;
 	}
 
-	const stratagus::dynasty *old_dynasty = this->dynasty;
+	const wyrmgus::dynasty *old_dynasty = this->dynasty;
 	
 	if (old_dynasty != nullptr) {
 		if (old_dynasty->get_upgrade() != nullptr && this->Allow.Upgrades[old_dynasty->get_upgrade()->ID] == 'R') {
@@ -1403,7 +1403,7 @@ void CPlayer::set_dynasty(const stratagus::dynasty *dynasty)
 
 const std::string &CPlayer::get_interface() const
 {
-	const stratagus::civilization *civilization = this->get_civilization();
+	const wyrmgus::civilization *civilization = this->get_civilization();
 	if (civilization != nullptr) {
 		return civilization->get_interface();
 	}
@@ -1418,7 +1418,7 @@ void CPlayer::check_age()
 {
 	//pick an age which fits the player, giving priority to the first ones (ages are already sorted by priority)
 	
-	for (stratagus::age *potential_age : stratagus::age::get_all()) {
+	for (wyrmgus::age *potential_age : wyrmgus::age::get_all()) {
 		if (!CheckConditions(potential_age, this)) {
 			continue;
 		}
@@ -1435,7 +1435,7 @@ void CPlayer::check_age()
 **
 **	@param	age	The age to be set for the player
 */
-void CPlayer::set_age(const stratagus::age *age)
+void CPlayer::set_age(const wyrmgus::age *age)
 {
 	if (this->age == age) {
 		return;
@@ -1457,7 +1457,7 @@ void CPlayer::set_age(const stratagus::age *age)
 		}
 	}
 	
-	stratagus::age::check_current_age();
+	wyrmgus::age::check_current_age();
 }
 
 /**
@@ -1468,11 +1468,11 @@ void CPlayer::set_age(const stratagus::age *age)
 CCurrency *CPlayer::GetCurrency() const
 {
 	if (this->Faction != -1) {
-		return stratagus::faction::get_all()[this->Faction]->GetCurrency();
+		return wyrmgus::faction::get_all()[this->Faction]->GetCurrency();
 	}
 	
 	if (this->Race != -1) {
-		return stratagus::civilization::get_all()[this->Race]->GetCurrency();
+		return wyrmgus::civilization::get_all()[this->Race]->GetCurrency();
 	}
 	
 	return nullptr;
@@ -1496,7 +1496,7 @@ void CPlayer::ShareUpgradeProgress(CPlayer &player, CUnit &unit)
 			continue;
 		}
 		
-		CUpgrade *upgrade = stratagus::faction::get_all()[player.Faction]->get_class_upgrade(upgrade_list[i]->get_upgrade_class());
+		CUpgrade *upgrade = wyrmgus::faction::get_all()[player.Faction]->get_class_upgrade(upgrade_list[i]->get_upgrade_class());
 		if (upgrade == nullptr) {
 			continue;
 		}
@@ -1519,7 +1519,7 @@ void CPlayer::ShareUpgradeProgress(CPlayer &player, CUnit &unit)
 			player.Notify(NotifyGreen, unit.tilePos, unit.MapLayer->ID, _("%s acquired through contact with %s"), chosen_upgrade->get_name().c_str(), this->Name.c_str());
 		}
 		if (&player == CPlayer::GetThisPlayer()) {
-			stratagus::sound *sound = GameSounds.ResearchComplete[player.Race].Sound;
+			wyrmgus::sound *sound = GameSounds.ResearchComplete[player.Race].Sound;
 			if (sound == nullptr) {
 				sound = GameSounds.WorkComplete[player.Race].Sound;
 			}
@@ -1535,7 +1535,7 @@ void CPlayer::ShareUpgradeProgress(CPlayer &player, CUnit &unit)
 	}
 }
 
-int CPlayer::get_player_color_usage_count(const stratagus::player_color *player_color) const
+int CPlayer::get_player_color_usage_count(const wyrmgus::player_color *player_color) const
 {
 	int count = 0;
 
@@ -1551,7 +1551,7 @@ int CPlayer::get_player_color_usage_count(const stratagus::player_color *player_
 void CPlayer::update_minimap_territory()
 {
 	for (const auto &kv_pair : this->UnitsByType) {
-		const stratagus::unit_type *unit_type = kv_pair.first;
+		const wyrmgus::unit_type *unit_type = kv_pair.first;
 		if (!unit_type->BoolFlag[TOWNHALL_INDEX].value) {
 			continue;
 		}
@@ -1567,9 +1567,9 @@ void CPlayer::update_minimap_territory()
 	}
 }
 
-stratagus::unit_type *CPlayer::get_class_unit_type(const stratagus::unit_class *unit_class) const
+wyrmgus::unit_type *CPlayer::get_class_unit_type(const wyrmgus::unit_class *unit_class) const
 {
-	const stratagus::faction *faction = this->get_faction();
+	const wyrmgus::faction *faction = this->get_faction();
 	if (faction == nullptr) {
 		return nullptr;
 	}
@@ -1577,9 +1577,9 @@ stratagus::unit_type *CPlayer::get_class_unit_type(const stratagus::unit_class *
 	return faction->get_class_unit_type(unit_class);
 }
 
-CUpgrade *CPlayer::get_class_upgrade(const stratagus::upgrade_class *upgrade_class) const
+CUpgrade *CPlayer::get_class_upgrade(const wyrmgus::upgrade_class *upgrade_class) const
 {
-	const stratagus::faction *faction = this->get_faction();
+	const wyrmgus::faction *faction = this->get_faction();
 	if (faction == nullptr) {
 		return nullptr;
 	}
@@ -1587,7 +1587,7 @@ CUpgrade *CPlayer::get_class_upgrade(const stratagus::upgrade_class *upgrade_cla
 	return faction->get_class_upgrade(upgrade_class);
 }
 
-bool CPlayer::has_upgrade_class(const stratagus::upgrade_class *upgrade_class) const
+bool CPlayer::has_upgrade_class(const wyrmgus::upgrade_class *upgrade_class) const
 {
 	if (this->Race == -1 || upgrade_class == nullptr) {
 		return false;
@@ -1596,9 +1596,9 @@ bool CPlayer::has_upgrade_class(const stratagus::upgrade_class *upgrade_class) c
 	const CUpgrade *upgrade = nullptr;
 	
 	if (this->Faction != -1) {
-		upgrade = stratagus::faction::get_all()[this->Faction]->get_class_upgrade(upgrade_class);
+		upgrade = wyrmgus::faction::get_all()[this->Faction]->get_class_upgrade(upgrade_class);
 	} else {
-		upgrade = stratagus::civilization::get_all()[this->Race]->get_class_upgrade(upgrade_class);
+		upgrade = wyrmgus::civilization::get_all()[this->Race]->get_class_upgrade(upgrade_class);
 	}
 	
 	if (upgrade != nullptr && this->Allow.Upgrades[upgrade->ID] == 'R') {
@@ -1608,7 +1608,7 @@ bool CPlayer::has_upgrade_class(const stratagus::upgrade_class *upgrade_class) c
 	return false;
 }
 
-bool CPlayer::HasSettlement(const stratagus::site *settlement) const
+bool CPlayer::HasSettlement(const wyrmgus::site *settlement) const
 {
 	if (!settlement) {
 		return false;
@@ -1625,17 +1625,17 @@ bool CPlayer::HasSettlementNearWaterZone(int water_zone) const
 {
 	std::vector<CUnit *> settlement_unit_table;
 	
-	const stratagus::unit_type *town_hall_type = stratagus::faction::get_all()[this->Faction]->get_class_unit_type(stratagus::defines::get()->get_town_hall_class());
+	const wyrmgus::unit_type *town_hall_type = wyrmgus::faction::get_all()[this->Faction]->get_class_unit_type(wyrmgus::defines::get()->get_town_hall_class());
 	if (town_hall_type == nullptr) {
 		return false;
 	}
 	
 	FindPlayerUnitsByType(*this, *town_hall_type, settlement_unit_table, true);
 
-	std::vector<const stratagus::unit_type *> additional_town_hall_types;
+	std::vector<const wyrmgus::unit_type *> additional_town_hall_types;
 
-	for (const stratagus::unit_class *additional_town_hall_class : stratagus::unit_class::get_town_hall_classes()) {
-		const stratagus::unit_type *additional_town_hall_type = stratagus::faction::get_all()[this->Faction]->get_class_unit_type(additional_town_hall_class);
+	for (const wyrmgus::unit_class *additional_town_hall_class : wyrmgus::unit_class::get_town_hall_classes()) {
+		const wyrmgus::unit_type *additional_town_hall_type = wyrmgus::faction::get_all()[this->Faction]->get_class_unit_type(additional_town_hall_class);
 
 		if (additional_town_hall_type == nullptr) {
 			continue;
@@ -1664,7 +1664,7 @@ bool CPlayer::HasSettlementNearWaterZone(int water_zone) const
 	return false;
 }
 
-stratagus::site *CPlayer::GetNearestSettlement(const Vec2i &pos, int z, const Vec2i &size) const
+wyrmgus::site *CPlayer::GetNearestSettlement(const Vec2i &pos, int z, const Vec2i &size) const
 {
 	CUnit *best_hall = nullptr;
 	int best_distance = -1;
@@ -1690,7 +1690,7 @@ stratagus::site *CPlayer::GetNearestSettlement(const Vec2i &pos, int z, const Ve
 	}
 }
 
-void CPlayer::update_building_settlement_assignment(const stratagus::site *old_settlement, const int z) const
+void CPlayer::update_building_settlement_assignment(const wyrmgus::site *old_settlement, const int z) const
 {
 	for (int i = 0; i < this->GetUnitCount(); ++i) {
 		CUnit *unit = &this->GetUnit(i);
@@ -1711,10 +1711,10 @@ void CPlayer::update_building_settlement_assignment(const stratagus::site *old_s
 	}
 }
 
-bool CPlayer::HasUnitBuilder(const stratagus::unit_type *type, const stratagus::site *settlement) const
+bool CPlayer::HasUnitBuilder(const wyrmgus::unit_type *type, const wyrmgus::site *settlement) const
 {
-	const std::vector<stratagus::unit_type *> *builders = nullptr;
-	const std::vector<const stratagus::unit_class *> *builder_classes = nullptr;
+	const std::vector<wyrmgus::unit_type *> *builders = nullptr;
+	const std::vector<const wyrmgus::unit_class *> *builder_classes = nullptr;
 
 	if (type->BoolFlag[BUILDING_INDEX].value) {
 		builders = &AiHelpers.get_builders(type);
@@ -1724,15 +1724,15 @@ bool CPlayer::HasUnitBuilder(const stratagus::unit_type *type, const stratagus::
 		builder_classes = &AiHelpers.get_trainer_classes(type->get_unit_class());
 	}
 
-	for (const stratagus::unit_type *builder : *builders) {
+	for (const wyrmgus::unit_type *builder : *builders) {
 		if (this->GetUnitTypeCount(builder) > 0) {
 			return true;
 		}
 	}
 
 	if (this->Faction != -1) {
-		for (const stratagus::unit_class *builder_class : *builder_classes) {
-			const stratagus::unit_type *builder = stratagus::faction::get_all()[this->Faction]->get_class_unit_type(builder_class);
+		for (const wyrmgus::unit_class *builder_class : *builder_classes) {
+			const wyrmgus::unit_type *builder = wyrmgus::faction::get_all()[this->Faction]->get_class_unit_type(builder_class);
 
 			if (builder == nullptr) {
 				continue;
@@ -1765,14 +1765,14 @@ bool CPlayer::HasUnitBuilder(const stratagus::unit_type *type, const stratagus::
 
 bool CPlayer::HasUpgradeResearcher(const CUpgrade *upgrade) const
 {
-	for (const stratagus::unit_type *researcher_type : AiHelpers.get_researchers(upgrade)) {
+	for (const wyrmgus::unit_type *researcher_type : AiHelpers.get_researchers(upgrade)) {
 		if (this->GetUnitTypeCount(researcher_type) > 0 || HasUnitBuilder(researcher_type)) {
 			return true;
 		}
 	}
 
-	for (const stratagus::unit_class *researcher_class : AiHelpers.get_researcher_classes(upgrade->get_upgrade_class())) {
-		const stratagus::unit_type *researcher_type = this->get_class_unit_type(researcher_class);
+	for (const wyrmgus::unit_class *researcher_class : AiHelpers.get_researcher_classes(upgrade->get_upgrade_class())) {
+		const wyrmgus::unit_type *researcher_type = this->get_class_unit_type(researcher_class);
 		if (researcher_type != nullptr && (this->GetUnitTypeCount(researcher_type) > 0 || this->HasUnitBuilder(researcher_type))) {
 			return true;
 		}
@@ -1786,7 +1786,7 @@ bool CPlayer::HasUpgradeResearcher(const CUpgrade *upgrade) const
 **
 **  @param faction    New faction.
 */
-bool CPlayer::CanFoundFaction(stratagus::faction *faction, bool pre)
+bool CPlayer::CanFoundFaction(wyrmgus::faction *faction, bool pre)
 {
 	if (CurrentQuest != nullptr) {
 		return false;
@@ -1808,7 +1808,7 @@ bool CPlayer::CanFoundFaction(stratagus::faction *faction, bool pre)
 	
 	if (!pre) {
 		//check if the required core settlements are owned by the player
-		if (stratagus::game::get()->get_current_campaign() != nullptr) { //only check for settlements in the Scenario mode
+		if (wyrmgus::game::get()->get_current_campaign() != nullptr) { //only check for settlements in the Scenario mode
 			for (size_t i = 0; i < faction->Cores.size(); ++i) {
 				if (!faction->Cores[i]->get_site_unit() || faction->Cores[i]->get_site_unit()->Player != this || faction->Cores[i]->get_site_unit()->CurrentAction() == UnitAction::Built) {
 					return false;
@@ -1829,7 +1829,7 @@ bool CPlayer::CanFoundFaction(stratagus::faction *faction, bool pre)
 	return true;
 }
 
-bool CPlayer::can_choose_dynasty(const stratagus::dynasty *dynasty, const bool pre) const
+bool CPlayer::can_choose_dynasty(const wyrmgus::dynasty *dynasty, const bool pre) const
 {
 	if (CurrentQuest != nullptr) {
 		return false;
@@ -1846,7 +1846,7 @@ bool CPlayer::can_choose_dynasty(const stratagus::dynasty *dynasty, const bool p
 	return CheckConditions(dynasty, this, false, pre);
 }
 
-bool CPlayer::is_character_available_for_recruitment(const stratagus::character *character, bool ignore_neutral) const
+bool CPlayer::is_character_available_for_recruitment(const wyrmgus::character *character, bool ignore_neutral) const
 {
 	if (character->Deity != nullptr) { //character is a deity
 		return false;
@@ -1881,11 +1881,11 @@ bool CPlayer::is_character_available_for_recruitment(const stratagus::character 
 	return true;
 }
 
-std::vector<stratagus::character *> CPlayer::get_recruitable_heroes_from_list(const std::vector<stratagus::character *> &heroes)
+std::vector<wyrmgus::character *> CPlayer::get_recruitable_heroes_from_list(const std::vector<wyrmgus::character *> &heroes)
 {
-	std::vector<stratagus::character *> recruitable_heroes;
+	std::vector<wyrmgus::character *> recruitable_heroes;
 
-	for (stratagus::character *hero : heroes) {
+	for (wyrmgus::character *hero : heroes) {
 		if (this->is_character_available_for_recruitment(hero)) {
 			recruitable_heroes.push_back(hero);
 		}
@@ -1905,7 +1905,7 @@ bool CPlayer::UpgradeRemovesExistingUpgrade(const CUpgrade *upgrade, bool ignore
 			const CUpgrade *removed_upgrade = modifier->RemoveUpgrades[j];
 			bool has_upgrade = this->AiEnabled ? AiHasUpgrade(*this->Ai, removed_upgrade, true) : (UpgradeIdAllowed(*this, removed_upgrade->ID) == 'R');
 			if (has_upgrade) {
-				if (ignore_lower_priority && this->Faction != -1 && stratagus::faction::get_all()[this->Faction]->GetUpgradePriority(removed_upgrade) < stratagus::faction::get_all()[this->Faction]->GetUpgradePriority(upgrade)) {
+				if (ignore_lower_priority && this->Faction != -1 && wyrmgus::faction::get_all()[this->Faction]->GetUpgradePriority(removed_upgrade) < wyrmgus::faction::get_all()[this->Faction]->GetUpgradePriority(upgrade)) {
 					continue;
 				}
 				return true;
@@ -1919,7 +1919,7 @@ bool CPlayer::UpgradeRemovesExistingUpgrade(const CUpgrade *upgrade, bool ignore
 std::string CPlayer::get_full_name() const
 {
 	if (!IsNetworkGame()) {
-		const stratagus::faction *faction = this->get_faction();
+		const wyrmgus::faction *faction = this->get_faction();
 
 		if (faction != nullptr && !faction->uses_simple_name()) {
 			if (faction->uses_short_name()) {
@@ -1939,32 +1939,32 @@ std::string_view CPlayer::get_faction_title_name() const
 		return string::empty_str;
 	}
 	
-	const stratagus::faction *faction = this->get_faction();
-	const stratagus::government_type government_type = this->get_government_type();
-	const stratagus::faction_tier tier = this->get_faction_tier();
+	const wyrmgus::faction *faction = this->get_faction();
+	const wyrmgus::government_type government_type = this->get_government_type();
+	const wyrmgus::faction_tier tier = this->get_faction_tier();
 
 	return faction->get_title_name(government_type, tier);
 }
 
-std::string_view CPlayer::GetCharacterTitleName(const stratagus::character_title title_type, const stratagus::gender gender) const
+std::string_view CPlayer::GetCharacterTitleName(const wyrmgus::character_title title_type, const wyrmgus::gender gender) const
 {
-	if (this->Race == -1 || this->Faction == -1 || title_type == stratagus::character_title::none || gender == stratagus::gender::none) {
+	if (this->Race == -1 || this->Faction == -1 || title_type == wyrmgus::character_title::none || gender == wyrmgus::gender::none) {
 		return string::empty_str;
 	}
 	
-	stratagus::civilization *civilization = stratagus::civilization::get_all()[this->Race];
-	stratagus::faction *faction = stratagus::faction::get_all()[this->Faction];
-	const stratagus::government_type government_type = this->get_government_type();
-	const stratagus::faction_tier tier = this->get_faction_tier();
+	wyrmgus::civilization *civilization = wyrmgus::civilization::get_all()[this->Race];
+	wyrmgus::faction *faction = wyrmgus::faction::get_all()[this->Faction];
+	const wyrmgus::government_type government_type = this->get_government_type();
+	const wyrmgus::faction_tier tier = this->get_faction_tier();
 
 	return faction->get_character_title_name(title_type, government_type, tier, gender);
 }
 
-std::set<int> CPlayer::get_builder_landmasses(const stratagus::unit_type *building) const
+std::set<int> CPlayer::get_builder_landmasses(const wyrmgus::unit_type *building) const
 {
 	std::set<int> builder_landmasses;
 
-	for (const stratagus::unit_type *builder_type : AiHelpers.get_builders(building)) {
+	for (const wyrmgus::unit_type *builder_type : AiHelpers.get_builders(building)) {
 		if (this->GetUnitTypeAiActiveCount(builder_type) > 0) {
 			std::vector<CUnit *> builder_table;
 
@@ -1978,8 +1978,8 @@ std::set<int> CPlayer::get_builder_landmasses(const stratagus::unit_type *buildi
 	}
 
 	if (this->Faction != -1) {
-		for (const stratagus::unit_class *builder_class : AiHelpers.get_builder_classes(building->get_unit_class())) {
-			const stratagus::unit_type *builder_type = stratagus::faction::get_all()[this->Faction]->get_class_unit_type(builder_class);
+		for (const wyrmgus::unit_class *builder_class : AiHelpers.get_builder_classes(building->get_unit_class())) {
+			const wyrmgus::unit_type *builder_type = wyrmgus::faction::get_all()[this->Faction]->get_class_unit_type(builder_class);
 
 			if (this->GetUnitTypeAiActiveCount(builder_type) > 0) {
 				std::vector<CUnit *> builder_table;
@@ -2002,17 +2002,17 @@ std::vector<const CUpgrade *> CPlayer::GetResearchableUpgrades()
 	std::vector<const CUpgrade *> researchable_upgrades;
 
 	for (const auto &kv_pair : this->UnitTypesAiActiveCount) {
-		const stratagus::unit_type *type = kv_pair.first;
+		const wyrmgus::unit_type *type = kv_pair.first;
 
 		for (const CUpgrade *upgrade : AiHelpers.get_researched_upgrades(type)) {
-			if (!stratagus::vector::contains(researchable_upgrades, upgrade)) {
+			if (!wyrmgus::vector::contains(researchable_upgrades, upgrade)) {
 				researchable_upgrades.push_back(upgrade);
 			}
 		}
 
-		for (const stratagus::upgrade_class *upgrade_class : AiHelpers.get_researched_upgrade_classes(type->get_unit_class())) {
+		for (const wyrmgus::upgrade_class *upgrade_class : AiHelpers.get_researched_upgrade_classes(type->get_unit_class())) {
 			const CUpgrade *upgrade = this->get_class_upgrade(upgrade_class);
-			if (upgrade != nullptr && !stratagus::vector::contains(researchable_upgrades, upgrade)) {
+			if (upgrade != nullptr && !wyrmgus::vector::contains(researchable_upgrades, upgrade)) {
 				researchable_upgrades.push_back(upgrade);
 			}
 		}
@@ -2035,13 +2035,13 @@ void CPlayer::Clear()
 	this->Type = 0;
 	this->Race = 0;
 	this->Faction = -1;
-	this->faction_tier = stratagus::faction_tier::none;
-	this->government_type = stratagus::government_type::none;
+	this->faction_tier = wyrmgus::faction_tier::none;
+	this->government_type = wyrmgus::government_type::none;
 	this->religion = nullptr;
 	this->dynasty = nullptr;
 	this->age = nullptr;
 	this->overlord = nullptr;
-	this->vassalage_type = stratagus::vassalage_type::none;
+	this->vassalage_type = wyrmgus::vassalage_type::none;
 	this->vassals.clear();
 	this->AiName.clear();
 	this->Team = 0;
@@ -2113,8 +2113,8 @@ void CPlayer::Clear()
 	for (size_t i = 0; i < MaxCosts; ++i) {
 		this->SpeedResourcesHarvest[i] = SPEEDUP_FACTOR;
 		this->SpeedResourcesReturn[i] = SPEEDUP_FACTOR;
-		if (i < stratagus::resource::get_all().size()) {
-			this->Prices[i] = stratagus::resource::get_all()[i]->BasePrice;
+		if (i < wyrmgus::resource::get_all().size()) {
+			this->Prices[i] = wyrmgus::resource::get_all()[i]->BasePrice;
 		} else {
 			this->Prices[i] = 0;
 		}
@@ -2231,7 +2231,7 @@ bool CPlayer::HasMarketUnit() const
 	const int n_m = AiHelpers.SellMarkets[0].size();
 
 	for (int i = 0; i < n_m; ++i) {
-		stratagus::unit_type &market_type = *AiHelpers.SellMarkets[0][i];
+		wyrmgus::unit_type &market_type = *AiHelpers.SellMarkets[0][i];
 
 		if (this->GetUnitTypeCount(&market_type)) {
 			return true;
@@ -2253,7 +2253,7 @@ CUnit *CPlayer::GetMarketUnit() const
 	const int n_m = AiHelpers.SellMarkets[0].size();
 
 	for (int i = 0; i < n_m; ++i) {
-		stratagus::unit_type &market_type = *AiHelpers.SellMarkets[0][i];
+		wyrmgus::unit_type &market_type = *AiHelpers.SellMarkets[0][i];
 
 		if (this->GetUnitTypeCount(&market_type)) {
 			std::vector<CUnit *> market_table;
@@ -2303,7 +2303,7 @@ void CPlayer::UpdateLevelUpUnits()
 
 void CPlayer::update_quest_pool()
 {
-	if (stratagus::game::get()->get_current_campaign() == nullptr) { // in-game quests only while playing the campaign mode
+	if (wyrmgus::game::get()->get_current_campaign() == nullptr) { // in-game quests only while playing the campaign mode
 		return;
 	}
 
@@ -2315,8 +2315,8 @@ void CPlayer::update_quest_pool()
 	
 	this->available_quests.clear();
 	
-	std::vector<stratagus::quest *> potential_quests;
-	for (stratagus::quest *quest : stratagus::quest::get_all()) {
+	std::vector<wyrmgus::quest *> potential_quests;
+	for (wyrmgus::quest *quest : wyrmgus::quest::get_all()) {
 		if (this->can_accept_quest(quest)) {
 			potential_quests.push_back(quest);
 		}
@@ -2326,9 +2326,9 @@ void CPlayer::update_quest_pool()
 		if (potential_quests.size() == 0) {
 			break;
 		}
-		stratagus::quest *quest = stratagus::vector::get_random(potential_quests);
+		wyrmgus::quest *quest = wyrmgus::vector::get_random(potential_quests);
 		this->available_quests.push_back(quest);
-		stratagus::vector::remove(potential_quests, quest);
+		wyrmgus::vector::remove(potential_quests, quest);
 	}
 	
 	this->on_available_quests_changed();
@@ -2351,12 +2351,12 @@ void CPlayer::update_quest_pool()
 void CPlayer::on_available_quests_changed()
 {
 	if (this == CPlayer::GetThisPlayer()) {
-		for (stratagus::button *button : stratagus::button::get_all()) {
+		for (wyrmgus::button *button : wyrmgus::button::get_all()) {
 			if (button->Action != ButtonCmd::Quest || button->Value >= static_cast<int>(this->available_quests.size())) {
 				continue;
 			}
 			
-			const stratagus::quest *quest = this->available_quests[button->Value];
+			const wyrmgus::quest *quest = this->available_quests[button->Value];
 			button->Hint = "Quest: " + quest->get_name();
 			button->Description = quest->get_description() + "\n \nObjectives:";
 			for (const auto &objective : quest->get_objectives()) {
@@ -2397,15 +2397,15 @@ void CPlayer::on_available_quests_changed()
 void CPlayer::update_current_quests()
 {
 	for (const auto &objective : this->get_quest_objectives()) {
-		const stratagus::quest_objective *quest_objective = objective->get_quest_objective();
+		const wyrmgus::quest_objective *quest_objective = objective->get_quest_objective();
 		switch (quest_objective->get_objective_type()) {
-			case stratagus::objective_type::have_resource:
-				objective->Counter = std::min(this->get_resource(stratagus::resource::get_all()[quest_objective->Resource], STORE_BOTH), quest_objective->get_quantity());
+			case wyrmgus::objective_type::have_resource:
+				objective->Counter = std::min(this->get_resource(wyrmgus::resource::get_all()[quest_objective->Resource], STORE_BOTH), quest_objective->get_quantity());
 				break;
-			case stratagus::objective_type::research_upgrade:
+			case wyrmgus::objective_type::research_upgrade:
 				objective->Counter = UpgradeIdAllowed(*this, quest_objective->Upgrade->ID) == 'R' ? 1 : 0;
 				break;
-			case stratagus::objective_type::recruit_hero:
+			case wyrmgus::objective_type::recruit_hero:
 				objective->Counter = this->HasHero(quest_objective->get_character()) ? 1 : 0;
 				break;
 			default:
@@ -2414,7 +2414,7 @@ void CPlayer::update_current_quests()
 	}
 	
 	for (int i = (this->current_quests.size()  - 1); i >= 0; --i) {
-		stratagus::quest *quest = this->current_quests[i];
+		wyrmgus::quest *quest = this->current_quests[i];
 		const std::string quest_failure_text = this->check_quest_failure(quest);
 		if (!quest_failure_text.empty()) {
 			this->fail_quest(quest, quest_failure_text);
@@ -2424,17 +2424,17 @@ void CPlayer::update_current_quests()
 	}
 }
 
-void CPlayer::accept_quest(stratagus::quest *quest)
+void CPlayer::accept_quest(wyrmgus::quest *quest)
 {
 	if (!quest) {
 		return;
 	}
 	
-	stratagus::vector::remove(this->available_quests, quest);
+	wyrmgus::vector::remove(this->available_quests, quest);
 	this->current_quests.push_back(quest);
 	
 	for (const auto &quest_objective : quest->get_objectives()) {
-		auto objective = std::make_unique<stratagus::player_quest_objective>(quest_objective.get());
+		auto objective = std::make_unique<wyrmgus::player_quest_objective>(quest_objective.get());
 		this->quest_objectives.push_back(std::move(objective));
 	}
 	
@@ -2454,9 +2454,9 @@ void CPlayer::accept_quest(stratagus::quest *quest)
 	this->update_current_quests();
 }
 
-void CPlayer::complete_quest(stratagus::quest *quest)
+void CPlayer::complete_quest(wyrmgus::quest *quest)
 {
-	if (stratagus::vector::contains(this->completed_quests, quest)) {
+	if (wyrmgus::vector::contains(this->completed_quests, quest)) {
 		return;
 	}
 	
@@ -2482,9 +2482,9 @@ void CPlayer::complete_quest(stratagus::quest *quest)
 		SetQuestCompleted(quest->get_identifier(), GameSettings.Difficulty);
 		SaveQuestCompletion();
 
-		const stratagus::campaign *current_campaign = stratagus::game::get()->get_current_campaign();
+		const wyrmgus::campaign *current_campaign = wyrmgus::game::get()->get_current_campaign();
 		if (current_campaign != nullptr && current_campaign->get_quest() == quest) {
-			stratagus::defines::get()->get_campaign_victory_dialogue()->call(this);
+			wyrmgus::defines::get()->get_campaign_victory_dialogue()->call(this);
 		}
 
 		std::string rewards_string = quest->get_rewards_string();
@@ -2497,7 +2497,7 @@ void CPlayer::complete_quest(stratagus::quest *quest)
 	}
 }
 
-void CPlayer::fail_quest(stratagus::quest *quest, const std::string &fail_reason)
+void CPlayer::fail_quest(wyrmgus::quest *quest, const std::string &fail_reason)
 {
 	this->remove_current_quest(quest);
 	
@@ -2509,33 +2509,33 @@ void CPlayer::fail_quest(stratagus::quest *quest, const std::string &fail_reason
 	}
 	
 	if (this == CPlayer::GetThisPlayer()) {
-		const stratagus::campaign *current_campaign = stratagus::game::get()->get_current_campaign();
+		const wyrmgus::campaign *current_campaign = wyrmgus::game::get()->get_current_campaign();
 		if (current_campaign != nullptr && current_campaign->get_quest() == quest) {
-			stratagus::defines::get()->get_campaign_defeat_dialogue()->call(this);
+			wyrmgus::defines::get()->get_campaign_defeat_dialogue()->call(this);
 		}
 
 		CclCommand("if (GenericDialog ~= nil) then GenericDialog(\"Quest Failed\", \"You have failed the " + quest->get_name() + " quest! " + fail_reason + "\", nil, \"" + (quest->get_icon() ? quest->get_icon()->get_identifier() : "") + "\", \"" + (quest->get_player_color() ? quest->get_player_color()->get_identifier() : "") + "\") end;");
 	}
 }
 
-void CPlayer::remove_current_quest(stratagus::quest *quest)
+void CPlayer::remove_current_quest(wyrmgus::quest *quest)
 {
-	stratagus::vector::remove(this->current_quests, quest);
+	wyrmgus::vector::remove(this->current_quests, quest);
 	
 	for (int i = (this->quest_objectives.size()  - 1); i >= 0; --i) {
 		if (this->quest_objectives[i]->get_quest_objective()->get_quest() == quest) {
-			stratagus::vector::remove(this->quest_objectives, this->quest_objectives[i]);
+			wyrmgus::vector::remove(this->quest_objectives, this->quest_objectives[i]);
 		}
 	}
 }
 
-bool CPlayer::can_accept_quest(const stratagus::quest *quest) const
+bool CPlayer::can_accept_quest(const wyrmgus::quest *quest) const
 {
 	if (quest->Hidden || quest->CurrentCompleted || quest->is_unobtainable()) {
 		return false;
 	}
 	
-	if (stratagus::vector::contains(this->current_quests, quest) || stratagus::vector::contains(this->completed_quests, quest)) {
+	if (wyrmgus::vector::contains(this->current_quests, quest) || wyrmgus::vector::contains(this->completed_quests, quest)) {
 		return false;
 	}
 
@@ -2545,11 +2545,11 @@ bool CPlayer::can_accept_quest(const stratagus::quest *quest) const
 	
 	int recruit_heroes_quantity = 0;
 	for (const auto &objective : quest->get_objectives()) {
-		if (objective->get_objective_type() == stratagus::objective_type::build_units) {
-			std::vector<stratagus::unit_type *> unit_types = objective->UnitTypes;
+		if (objective->get_objective_type() == wyrmgus::objective_type::build_units) {
+			std::vector<wyrmgus::unit_type *> unit_types = objective->UnitTypes;
 
-			for (const stratagus::unit_class *unit_class : objective->get_unit_classes()) {
-				stratagus::unit_type *unit_type = stratagus::faction::get_all()[this->Faction]->get_class_unit_type(unit_class);
+			for (const wyrmgus::unit_class *unit_class : objective->get_unit_classes()) {
+				wyrmgus::unit_type *unit_type = wyrmgus::faction::get_all()[this->Faction]->get_class_unit_type(unit_class);
 				if (unit_type == nullptr) {
 					continue;
 				}
@@ -2561,7 +2561,7 @@ bool CPlayer::can_accept_quest(const stratagus::quest *quest) const
 			}
 
 			bool validated = false;
-			for (const stratagus::unit_type *unit_type : unit_types) {
+			for (const wyrmgus::unit_type *unit_type : unit_types) {
 				if (objective->get_settlement() != nullptr && !this->HasSettlement(objective->get_settlement()) && !unit_type->BoolFlag[TOWNHALL_INDEX].value) {
 					continue;
 				}
@@ -2576,7 +2576,7 @@ bool CPlayer::can_accept_quest(const stratagus::quest *quest) const
 			if (!validated) {
 				return false;
 			}
-		} else if (objective->get_objective_type() == stratagus::objective_type::research_upgrade) {
+		} else if (objective->get_objective_type() == wyrmgus::objective_type::research_upgrade) {
 			const CUpgrade *upgrade = objective->Upgrade;
 			
 			bool has_researcher = this->HasUpgradeResearcher(upgrade);
@@ -2587,11 +2587,11 @@ bool CPlayer::can_accept_quest(const stratagus::quest *quest) const
 						continue;
 					}
 						
-					if (second_objective->get_objective_type() == stratagus::objective_type::build_units) {
-						std::vector<stratagus::unit_type *> unit_types = second_objective->UnitTypes;
+					if (second_objective->get_objective_type() == wyrmgus::objective_type::build_units) {
+						std::vector<wyrmgus::unit_type *> unit_types = second_objective->UnitTypes;
 
-						for (const stratagus::unit_class *unit_class : second_objective->get_unit_classes()) {
-							stratagus::unit_type *unit_type = stratagus::faction::get_all()[this->Faction]->get_class_unit_type(unit_class);
+						for (const wyrmgus::unit_class *unit_class : second_objective->get_unit_classes()) {
+							wyrmgus::unit_type *unit_type = wyrmgus::faction::get_all()[this->Faction]->get_class_unit_type(unit_class);
 							if (unit_type == nullptr) {
 								continue;
 							}
@@ -2602,8 +2602,8 @@ bool CPlayer::can_accept_quest(const stratagus::quest *quest) const
 							continue;
 						}
 
-						for (const stratagus::unit_type *unit_type : unit_types) {
-							if (stratagus::vector::contains(AiHelpers.get_researchers(upgrade), unit_type) || stratagus::vector::contains(AiHelpers.get_researcher_classes(upgrade->get_upgrade_class()), unit_type->get_unit_class())) { //if the unit type of the other objective is a researcher of this upgrade
+						for (const wyrmgus::unit_type *unit_type : unit_types) {
+							if (wyrmgus::vector::contains(AiHelpers.get_researchers(upgrade), unit_type) || wyrmgus::vector::contains(AiHelpers.get_researcher_classes(upgrade->get_upgrade_class()), unit_type->get_unit_class())) { //if the unit type of the other objective is a researcher of this upgrade
 								has_researcher = true;
 								break;
 							}
@@ -2619,12 +2619,12 @@ bool CPlayer::can_accept_quest(const stratagus::quest *quest) const
 			if (!has_researcher || this->Allow.Upgrades[upgrade->ID] != 'A' || !CheckConditions(upgrade, this)) {
 				return false;
 			}
-		} else if (objective->get_objective_type() == stratagus::objective_type::recruit_hero) {
+		} else if (objective->get_objective_type() == wyrmgus::objective_type::recruit_hero) {
 			if (!this->is_character_available_for_recruitment(objective->get_character(), true)) {
 				return false;
 			}
 			recruit_heroes_quantity++;
-		} else if (objective->get_objective_type() == stratagus::objective_type::destroy_units || objective->get_objective_type() == stratagus::objective_type::destroy_hero || objective->get_objective_type() == stratagus::objective_type::destroy_unique) {
+		} else if (objective->get_objective_type() == wyrmgus::objective_type::destroy_units || objective->get_objective_type() == wyrmgus::objective_type::destroy_hero || objective->get_objective_type() == wyrmgus::objective_type::destroy_unique) {
 			if (objective->get_faction() != nullptr) {
 				CPlayer *faction_player = GetFactionPlayer(objective->get_faction());
 				if (faction_player == nullptr || !faction_player->is_alive()) {
@@ -2636,16 +2636,16 @@ bool CPlayer::can_accept_quest(const stratagus::quest *quest) const
 				}
 			}
 			
-			if (objective->get_objective_type() == stratagus::objective_type::destroy_hero) {
+			if (objective->get_objective_type() == wyrmgus::objective_type::destroy_hero) {
 				if (objective->get_character()->CanAppear()) { //if the character "can appear" it doesn't already exist, and thus can't be destroyed
 					return false;
 				}
-			} else if (objective->get_objective_type() == stratagus::objective_type::destroy_unique) {
+			} else if (objective->get_objective_type() == wyrmgus::objective_type::destroy_unique) {
 				if (objective->Unique->CanDrop()) { //if the unique "can drop" it doesn't already exist, and thus can't be destroyed
 					return false;
 				}
 			}
-		} else if (objective->get_objective_type() == stratagus::objective_type::destroy_faction) {
+		} else if (objective->get_objective_type() == wyrmgus::objective_type::destroy_faction) {
 			CPlayer *faction_player = GetFactionPlayer(objective->get_faction());
 			if (faction_player == nullptr || !faction_player->is_alive()) {
 				return false;
@@ -2657,7 +2657,7 @@ bool CPlayer::can_accept_quest(const stratagus::quest *quest) const
 		return false;
 	}
 	
-	for (const stratagus::character *hero : quest->HeroesMustSurvive) {
+	for (const wyrmgus::character *hero : quest->HeroesMustSurvive) {
 		if (!this->HasHero(hero)) {
 			return false;
 		}
@@ -2673,14 +2673,14 @@ bool CPlayer::can_accept_quest(const stratagus::quest *quest) const
 	}
 }
 
-bool CPlayer::check_quest_completion(const stratagus::quest *quest) const
+bool CPlayer::check_quest_completion(const wyrmgus::quest *quest) const
 {
 	if (quest->is_uncompleteable()) {
 		return false;
 	}
 	
 	for (const auto &objective : this->get_quest_objectives()) {
-		const stratagus::quest_objective *quest_objective = objective->get_quest_objective();
+		const wyrmgus::quest_objective *quest_objective = objective->get_quest_objective();
 		if (quest_objective->get_quest() != quest) {
 			continue;
 		}
@@ -2693,7 +2693,7 @@ bool CPlayer::check_quest_completion(const stratagus::quest *quest) const
 }
 
 //returns the reason for failure (empty if none)
-std::string CPlayer::check_quest_failure(const stratagus::quest *quest) const
+std::string CPlayer::check_quest_failure(const wyrmgus::quest *quest) const
 {
 	for (size_t i = 0; i < quest->HeroesMustSurvive.size(); ++i) { // put it here, because "unfailable" quests should also fail when a hero which should survive dies
 		if (!this->HasHero(quest->HeroesMustSurvive[i])) {
@@ -2710,16 +2710,16 @@ std::string CPlayer::check_quest_failure(const stratagus::quest *quest) const
 	}
 
 	for (const auto &objective : this->get_quest_objectives()) {
-		const stratagus::quest_objective *quest_objective = objective->get_quest_objective();
+		const wyrmgus::quest_objective *quest_objective = objective->get_quest_objective();
 		if (quest_objective->get_quest() != quest) {
 			continue;
 		}
-		if (quest_objective->get_objective_type() == stratagus::objective_type::build_units) {
+		if (quest_objective->get_objective_type() == wyrmgus::objective_type::build_units) {
 			if (objective->Counter < quest_objective->get_quantity()) {
-				std::vector<stratagus::unit_type *> unit_types = quest_objective->UnitTypes;
+				std::vector<wyrmgus::unit_type *> unit_types = quest_objective->UnitTypes;
 
-				for (const stratagus::unit_class *unit_class : quest_objective->get_unit_classes()) {
-					stratagus::unit_type *unit_type = stratagus::faction::get_all()[this->Faction]->get_class_unit_type(unit_class);
+				for (const wyrmgus::unit_class *unit_class : quest_objective->get_unit_classes()) {
+					wyrmgus::unit_type *unit_type = wyrmgus::faction::get_all()[this->Faction]->get_class_unit_type(unit_class);
 					if (unit_type == nullptr) {
 						continue;
 					}
@@ -2732,7 +2732,7 @@ std::string CPlayer::check_quest_failure(const stratagus::quest *quest) const
 
 				bool validated = false;
 				std::string validation_error;
-				for (const stratagus::unit_type *unit_type : unit_types) {
+				for (const wyrmgus::unit_type *unit_type : unit_types) {
 					if (quest_objective->get_settlement() != nullptr && !this->HasSettlement(quest_objective->get_settlement()) && !unit_type->BoolFlag[TOWNHALL_INDEX].value) {
 						validation_error = "You no longer hold the required settlement.";
 						continue;
@@ -2750,7 +2750,7 @@ std::string CPlayer::check_quest_failure(const stratagus::quest *quest) const
 					return validation_error;
 				}
 			}
-		} else if (quest_objective->get_objective_type() == stratagus::objective_type::research_upgrade) {
+		} else if (quest_objective->get_objective_type() == wyrmgus::objective_type::research_upgrade) {
 			const CUpgrade *upgrade = quest_objective->Upgrade;
 			
 			if (this->Allow.Upgrades[upgrade->ID] != 'R') {
@@ -2758,16 +2758,16 @@ std::string CPlayer::check_quest_failure(const stratagus::quest *quest) const
 				
 				if (!has_researcher) { //check if the quest includes an objective to build a researcher of the upgrade
 					for (const auto &second_objective : this->get_quest_objectives()) {
-						const stratagus::quest_objective *second_quest_objective = second_objective->get_quest_objective();
+						const wyrmgus::quest_objective *second_quest_objective = second_objective->get_quest_objective();
 						if (second_quest_objective->get_quest() != quest || second_objective == objective || second_objective->Counter >= second_quest_objective->get_quantity()) { //if the objective has been fulfilled, then there should be a researcher, if there isn't it is due to i.e. the researcher having been destroyed later on, or upgraded to another type, and then the quest should fail if the upgrade can no longer be researched
 							continue;
 						}
 						
-						if (second_quest_objective->get_objective_type() == stratagus::objective_type::build_units) {
-							std::vector<stratagus::unit_type *> unit_types = second_quest_objective->UnitTypes;
+						if (second_quest_objective->get_objective_type() == wyrmgus::objective_type::build_units) {
+							std::vector<wyrmgus::unit_type *> unit_types = second_quest_objective->UnitTypes;
 
-							for (const stratagus::unit_class *unit_class : second_quest_objective->get_unit_classes()) {
-								stratagus::unit_type *unit_type = stratagus::faction::get_all()[this->Faction]->get_class_unit_type(unit_class);
+							for (const wyrmgus::unit_class *unit_class : second_quest_objective->get_unit_classes()) {
+								wyrmgus::unit_type *unit_type = wyrmgus::faction::get_all()[this->Faction]->get_class_unit_type(unit_class);
 								if (unit_type == nullptr) {
 									continue;
 								}
@@ -2778,8 +2778,8 @@ std::string CPlayer::check_quest_failure(const stratagus::quest *quest) const
 								continue;
 							}
 
-							for (const stratagus::unit_type *unit_type : unit_types) {
-								if (stratagus::vector::contains(AiHelpers.get_researchers(upgrade), unit_type) || stratagus::vector::contains(AiHelpers.get_researcher_classes(upgrade->get_upgrade_class()), unit_type->get_unit_class())) { //if the unit type of the other objective is a researcher of this upgrade
+							for (const wyrmgus::unit_type *unit_type : unit_types) {
+								if (wyrmgus::vector::contains(AiHelpers.get_researchers(upgrade), unit_type) || wyrmgus::vector::contains(AiHelpers.get_researcher_classes(upgrade->get_upgrade_class()), unit_type->get_unit_class())) { //if the unit type of the other objective is a researcher of this upgrade
 									has_researcher = true;
 									break;
 								}
@@ -2796,11 +2796,11 @@ std::string CPlayer::check_quest_failure(const stratagus::quest *quest) const
 					return "You can no longer research the required upgrade.";
 				}
 			}
-		} else if (quest_objective->get_objective_type() == stratagus::objective_type::recruit_hero) {
+		} else if (quest_objective->get_objective_type() == wyrmgus::objective_type::recruit_hero) {
 			if (!this->HasHero(quest_objective->get_character()) && !this->is_character_available_for_recruitment(quest_objective->get_character(), true)) {
 				return "The hero can no longer be recruited.";
 			}
-		} else if (quest_objective->get_objective_type() == stratagus::objective_type::destroy_units || quest_objective->get_objective_type() == stratagus::objective_type::destroy_hero || quest_objective->get_objective_type() == stratagus::objective_type::destroy_unique) {
+		} else if (quest_objective->get_objective_type() == wyrmgus::objective_type::destroy_units || quest_objective->get_objective_type() == wyrmgus::objective_type::destroy_hero || quest_objective->get_objective_type() == wyrmgus::objective_type::destroy_unique) {
 			if (quest_objective->get_faction() != nullptr && objective->Counter < quest_objective->get_quantity()) {
 				CPlayer *faction_player = GetFactionPlayer(quest_objective->get_faction());
 				if (faction_player == nullptr || !faction_player->is_alive()) {
@@ -2812,16 +2812,16 @@ std::string CPlayer::check_quest_failure(const stratagus::quest *quest) const
 				}
 			}
 			
-			if (quest_objective->get_objective_type() == stratagus::objective_type::destroy_hero) {
+			if (quest_objective->get_objective_type() == wyrmgus::objective_type::destroy_hero) {
 				if (objective->Counter == 0 && quest_objective->get_character()->CanAppear()) {  // if is supposed to destroy a character, but it is nowhere to be found, fail the quest
 					return "The target no longer exists.";
 				}
-			} else if (quest_objective->get_objective_type() == stratagus::objective_type::destroy_unique) {
+			} else if (quest_objective->get_objective_type() == wyrmgus::objective_type::destroy_unique) {
 				if (objective->Counter == 0 && quest_objective->Unique->CanDrop()) {  // if is supposed to destroy a unique, but it is nowhere to be found, fail the quest
 					return "The target no longer exists.";
 				}
 			}
-		} else if (quest_objective->get_objective_type() == stratagus::objective_type::destroy_faction) {
+		} else if (quest_objective->get_objective_type() == wyrmgus::objective_type::destroy_faction) {
 			if (objective->Counter == 0) {  // if is supposed to destroy a faction, but it is nowhere to be found, fail the quest
 				CPlayer *faction_player = GetFactionPlayer(quest_objective->get_faction());
 				if (faction_player == nullptr || !faction_player->is_alive()) {
@@ -2834,14 +2834,14 @@ std::string CPlayer::check_quest_failure(const stratagus::quest *quest) const
 	return "";
 }
 
-bool CPlayer::has_quest(const stratagus::quest *quest) const
+bool CPlayer::has_quest(const wyrmgus::quest *quest) const
 {
-	return stratagus::vector::contains(this->current_quests, quest);
+	return wyrmgus::vector::contains(this->current_quests, quest);
 }
 
-bool CPlayer::is_quest_completed(const stratagus::quest *quest) const
+bool CPlayer::is_quest_completed(const wyrmgus::quest *quest) const
 {
-	return stratagus::vector::contains(this->completed_quests, quest);
+	return wyrmgus::vector::contains(this->completed_quests, quest);
 }
 
 void CPlayer::AddModifier(CUpgrade *modifier, int cycles)
@@ -2929,7 +2929,7 @@ int CPlayer::GetUnitCount() const
 **
 **  @note Storing types: 0 - overall store, 1 - store buildings, 2 - both
 */
-int CPlayer::get_resource(const stratagus::resource *resource, const int type)
+int CPlayer::get_resource(const wyrmgus::resource *resource, const int type)
 {
 	switch (type) {
 		case STORE_OVERALL:
@@ -2951,7 +2951,7 @@ int CPlayer::get_resource(const stratagus::resource *resource, const int type)
 **  @param value     How many of this resource (can be negative).
 **  @param store     If true, sets the building store resources, else the overall resources.
 */
-void CPlayer::change_resource(const stratagus::resource *resource, const int value, const bool store)
+void CPlayer::change_resource(const wyrmgus::resource *resource, const int value, const bool store)
 {
 	if (value < 0) {
 		const int fromStore = std::min(this->StoredResources[resource->ID], abs(value));
@@ -2974,7 +2974,7 @@ void CPlayer::change_resource(const stratagus::resource *resource, const int val
 **  @param value     How many of this resource.
 **  @param type      Resource types: 0 - overall store, 1 - store buildings, 2 - both
 */
-void CPlayer::set_resource(const stratagus::resource *resource, const int value, const int type)
+void CPlayer::set_resource(const wyrmgus::resource *resource, const int value, const int type)
 {
 	if (type == STORE_BOTH) {
 		if (this->MaxResources[resource->ID] != -1) {
@@ -3014,7 +3014,7 @@ bool CPlayer::CheckResource(const int resource, const int value)
 */
 void CPlayer::IncreaseResourcePrice(const int resource)
 {
-	int price_change = stratagus::resource::get_all()[resource]->BasePrice / std::max(this->Prices[resource], 100);
+	int price_change = wyrmgus::resource::get_all()[resource]->BasePrice / std::max(this->Prices[resource], 100);
 	price_change = std::max(1, price_change);
 	this->Prices[resource] += price_change;
 }
@@ -3026,7 +3026,7 @@ void CPlayer::IncreaseResourcePrice(const int resource)
 */
 void CPlayer::DecreaseResourcePrice(const int resource)
 {
-	int price_change = this->Prices[resource] / stratagus::resource::get_all()[resource]->BasePrice;
+	int price_change = this->Prices[resource] / wyrmgus::resource::get_all()[resource]->BasePrice;
 	price_change = std::max(1, price_change);
 	this->Prices[resource] -= price_change;
 	this->Prices[resource] = std::max(1, this->Prices[resource]);
@@ -3044,7 +3044,7 @@ int CPlayer::ConvergePricesWith(CPlayer &player, int max_convergences)
 		converged = false;
 
 		for (int i = 1; i < MaxCosts; ++i) {
-			if (!stratagus::resource::get_all()[i]->BasePrice) {
+			if (!wyrmgus::resource::get_all()[i]->BasePrice) {
 				continue;
 			}
 			
@@ -3101,12 +3101,12 @@ int CPlayer::GetEffectiveResourceDemand(const int resource) const
 	int resource_demand = this->ResourceDemand[resource];
 	
 	if (this->Prices[resource]) {
-		resource_demand *= stratagus::resource::get_all()[resource]->BasePrice;
+		resource_demand *= wyrmgus::resource::get_all()[resource]->BasePrice;
 		resource_demand /= this->Prices[resource];
 	}
 	
-	if (stratagus::resource::get_all()[resource]->DemandElasticity != 100) {
-		resource_demand = this->ResourceDemand[resource] + ((resource_demand - this->ResourceDemand[resource]) * stratagus::resource::get_all()[resource]->DemandElasticity / 100);
+	if (wyrmgus::resource::get_all()[resource]->DemandElasticity != 100) {
+		resource_demand = this->ResourceDemand[resource] + ((resource_demand - this->ResourceDemand[resource]) * wyrmgus::resource::get_all()[resource]->DemandElasticity / 100);
 	}
 	
 	resource_demand = std::max(resource_demand, 0);
@@ -3145,7 +3145,7 @@ int CPlayer::GetTotalPriceDifferenceWith(const CPlayer &player) const
 {
 	int difference = 0;
 	for (int i = 1; i < MaxCosts; ++i) {
-		if (!stratagus::resource::get_all()[i]->BasePrice) {
+		if (!wyrmgus::resource::get_all()[i]->BasePrice) {
 			continue;
 		}
 		difference += abs(this->Prices[i] - player.Prices[i]);
@@ -3161,7 +3161,7 @@ int CPlayer::GetTradePotentialWith(const CPlayer &player) const
 {
 	int trade_potential = 0;
 	for (int i = 1; i < MaxCosts; ++i) {
-		if (!stratagus::resource::get_all()[i]->BasePrice) {
+		if (!wyrmgus::resource::get_all()[i]->BasePrice) {
 			continue;
 		}
 		int price_difference = abs(this->Prices[i] - player.Prices[i]);
@@ -3174,7 +3174,7 @@ int CPlayer::GetTradePotentialWith(const CPlayer &player) const
 }
 //Wyrmgus end
 
-void CPlayer::pay_overlord_tax(const stratagus::resource *resource, const int taxable_quantity)
+void CPlayer::pay_overlord_tax(const wyrmgus::resource *resource, const int taxable_quantity)
 {
 	if (this->get_overlord() == nullptr) {
 		return;
@@ -3195,7 +3195,7 @@ void CPlayer::pay_overlord_tax(const stratagus::resource *resource, const int ta
 	this->get_overlord()->pay_overlord_tax(resource, quantity);
 }
 
-int CPlayer::GetUnitTotalCount(const stratagus::unit_type &type) const
+int CPlayer::GetUnitTotalCount(const wyrmgus::unit_type &type) const
 {
 	int count = this->GetUnitTypeCount(&type);
 	for (std::vector<CUnit *>::const_iterator it = this->UnitBegin(); it != this->UnitEnd(); ++it) {
@@ -3226,7 +3226,7 @@ int CPlayer::GetUnitTotalCount(const stratagus::unit_type &type) const
 **
 **  @note The return values of the PlayerCheck functions are inconsistent.
 */
-int CPlayer::CheckLimits(const stratagus::unit_type &type) const
+int CPlayer::CheckLimits(const wyrmgus::unit_type &type) const
 {
 	//  Check game limits.
 	if (type.BoolFlag[BUILDING_INDEX].value && NumBuildings >= BuildingLimit) {
@@ -3279,7 +3279,7 @@ int CPlayer::CheckCosts(const int *costs, bool notify) const
 		}
 		if (notify) {
 			const char *name = DefaultResourceNames[i].c_str();
-			const char *actionName = stratagus::resource::get_all()[i]->ActionName.c_str();
+			const char *actionName = wyrmgus::resource::get_all()[i]->ActionName.c_str();
 
 			Notify(_("Not enough %s... %s more %s."), _(name), _(actionName), _(name));
 
@@ -3303,7 +3303,7 @@ int CPlayer::CheckCosts(const int *costs, bool notify) const
 **
 **  @return        False if all enough, otherwise a bit mask.
 */
-int CPlayer::CheckUnitType(const stratagus::unit_type &type, bool hire) const
+int CPlayer::CheckUnitType(const wyrmgus::unit_type &type, bool hire) const
 {
 	//Wyrmgus start
 //	return this->CheckCosts(type.Stats[this->Index].Costs);
@@ -3321,7 +3321,7 @@ int CPlayer::CheckUnitType(const stratagus::unit_type &type, bool hire) const
 void CPlayer::AddCosts(const int *costs)
 {
 	for (int i = 1; i < MaxCosts; ++i) {
-		change_resource(stratagus::resource::get_all()[i], costs[i], false);
+		change_resource(wyrmgus::resource::get_all()[i], costs[i], false);
 	}
 }
 
@@ -3330,7 +3330,7 @@ void CPlayer::AddCosts(const int *costs)
 **
 **  @param type    Type of unit.
 */
-void CPlayer::AddUnitType(const stratagus::unit_type &type, bool hire)
+void CPlayer::AddUnitType(const wyrmgus::unit_type &type, bool hire)
 {
 	//Wyrmgus start
 //	AddCosts(type.Stats[this->Index].Costs);
@@ -3353,7 +3353,7 @@ void CPlayer::AddCostsFactor(const int *costs, int factor)
 	}
 	
 	for (int i = 1; i < MaxCosts; ++i) {
-		change_resource(stratagus::resource::get_all()[i], costs[i] * factor / 100, true);
+		change_resource(wyrmgus::resource::get_all()[i], costs[i] * factor / 100, true);
 	}
 }
 
@@ -3365,7 +3365,7 @@ void CPlayer::AddCostsFactor(const int *costs, int factor)
 void CPlayer::SubCosts(const int *costs)
 {
 	for (int i = 1; i < MaxCosts; ++i) {
-		this->change_resource(stratagus::resource::get_all()[i], -costs[i], true);
+		this->change_resource(wyrmgus::resource::get_all()[i], -costs[i], true);
 	}
 }
 
@@ -3374,7 +3374,7 @@ void CPlayer::SubCosts(const int *costs)
 **
 **  @param type    Type of unit.
 */
-void CPlayer::SubUnitType(const stratagus::unit_type &type, bool hire)
+void CPlayer::SubUnitType(const wyrmgus::unit_type &type, bool hire)
 {
 	//Wyrmgus start
 //	this->SubCosts(type.Stats[this->Index].Costs);
@@ -3393,7 +3393,7 @@ void CPlayer::SubUnitType(const stratagus::unit_type &type, bool hire)
 void CPlayer::SubCostsFactor(const int *costs, int factor)
 {
 	for (int i = 1; i < MaxCosts; ++i) {
-		this->change_resource(stratagus::resource::get_all()[i], -costs[i] * 100 / factor);
+		this->change_resource(wyrmgus::resource::get_all()[i], -costs[i] * 100 / factor);
 	}
 }
 
@@ -3401,7 +3401,7 @@ void CPlayer::SubCostsFactor(const int *costs, int factor)
 /**
 **  Gives the cost of a unit type for the player
 */
-void CPlayer::GetUnitTypeCosts(const stratagus::unit_type *type, int *type_costs, bool hire, bool ignore_one) const
+void CPlayer::GetUnitTypeCosts(const wyrmgus::unit_type *type, int *type_costs, bool hire, bool ignore_one) const
 {
 	for (int i = 0; i < MaxCosts; ++i) {
 		type_costs[i] = 0;
@@ -3430,7 +3430,7 @@ void CPlayer::GetUnitTypeCosts(const stratagus::unit_type *type, int *type_costs
 	}
 }
 
-int CPlayer::GetUnitTypeCostsMask(const stratagus::unit_type *type, bool hire) const
+int CPlayer::GetUnitTypeCostsMask(const wyrmgus::unit_type *type, bool hire) const
 {
 	int costs_mask = 0;
 	
@@ -3477,7 +3477,7 @@ int CPlayer::GetUpgradeCostsMask(const CUpgrade *upgrade) const
 
 //Wyrmgus end
 
-void CPlayer::SetUnitTypeCount(const stratagus::unit_type *type, int quantity)
+void CPlayer::SetUnitTypeCount(const wyrmgus::unit_type *type, int quantity)
 {
 	if (!type) {
 		return;
@@ -3492,12 +3492,12 @@ void CPlayer::SetUnitTypeCount(const stratagus::unit_type *type, int quantity)
 	}
 }
 
-void CPlayer::ChangeUnitTypeCount(const stratagus::unit_type *type, int quantity)
+void CPlayer::ChangeUnitTypeCount(const wyrmgus::unit_type *type, int quantity)
 {
 	this->SetUnitTypeCount(type, this->GetUnitTypeCount(type) + quantity);
 }
 
-int CPlayer::GetUnitTypeCount(const stratagus::unit_type *type) const
+int CPlayer::GetUnitTypeCount(const wyrmgus::unit_type *type) const
 {
 	if (type && this->UnitTypesCount.find(type) != this->UnitTypesCount.end()) {
 		return this->UnitTypesCount.find(type)->second;
@@ -3506,7 +3506,7 @@ int CPlayer::GetUnitTypeCount(const stratagus::unit_type *type) const
 	}
 }
 
-void CPlayer::SetUnitTypeUnderConstructionCount(const stratagus::unit_type *type, int quantity)
+void CPlayer::SetUnitTypeUnderConstructionCount(const wyrmgus::unit_type *type, int quantity)
 {
 	if (!type) {
 		return;
@@ -3521,12 +3521,12 @@ void CPlayer::SetUnitTypeUnderConstructionCount(const stratagus::unit_type *type
 	}
 }
 
-void CPlayer::ChangeUnitTypeUnderConstructionCount(const stratagus::unit_type *type, int quantity)
+void CPlayer::ChangeUnitTypeUnderConstructionCount(const wyrmgus::unit_type *type, int quantity)
 {
 	this->SetUnitTypeUnderConstructionCount(type, this->GetUnitTypeUnderConstructionCount(type) + quantity);
 }
 
-int CPlayer::GetUnitTypeUnderConstructionCount(const stratagus::unit_type *type) const
+int CPlayer::GetUnitTypeUnderConstructionCount(const wyrmgus::unit_type *type) const
 {
 	if (type && this->UnitTypesUnderConstructionCount.find(type) != this->UnitTypesUnderConstructionCount.end()) {
 		return this->UnitTypesUnderConstructionCount.find(type)->second;
@@ -3535,7 +3535,7 @@ int CPlayer::GetUnitTypeUnderConstructionCount(const stratagus::unit_type *type)
 	}
 }
 
-void CPlayer::SetUnitTypeAiActiveCount(const stratagus::unit_type *type, int quantity)
+void CPlayer::SetUnitTypeAiActiveCount(const wyrmgus::unit_type *type, int quantity)
 {
 	if (!type) {
 		return;
@@ -3550,12 +3550,12 @@ void CPlayer::SetUnitTypeAiActiveCount(const stratagus::unit_type *type, int qua
 	}
 }
 
-void CPlayer::ChangeUnitTypeAiActiveCount(const stratagus::unit_type *type, int quantity)
+void CPlayer::ChangeUnitTypeAiActiveCount(const wyrmgus::unit_type *type, int quantity)
 {
 	this->SetUnitTypeAiActiveCount(type, this->GetUnitTypeAiActiveCount(type) + quantity);
 }
 
-int CPlayer::GetUnitTypeAiActiveCount(const stratagus::unit_type *type) const
+int CPlayer::GetUnitTypeAiActiveCount(const wyrmgus::unit_type *type) const
 {
 	if (type && this->UnitTypesAiActiveCount.find(type) != this->UnitTypesAiActiveCount.end()) {
 		return this->UnitTypesAiActiveCount.find(type)->second;
@@ -3566,7 +3566,7 @@ int CPlayer::GetUnitTypeAiActiveCount(const stratagus::unit_type *type) const
 
 void CPlayer::IncreaseCountsForUnit(CUnit *unit, bool type_change)
 {
-	const stratagus::unit_type *type = unit->Type;
+	const wyrmgus::unit_type *type = unit->Type;
 
 	this->ChangeUnitTypeCount(type, 1);
 	this->UnitsByType[type].push_back(unit);
@@ -3597,11 +3597,11 @@ void CPlayer::IncreaseCountsForUnit(CUnit *unit, bool type_change)
 
 void CPlayer::DecreaseCountsForUnit(CUnit *unit, bool type_change)
 {
-	const stratagus::unit_type *type = unit->Type;
+	const wyrmgus::unit_type *type = unit->Type;
 
 	this->ChangeUnitTypeCount(type, -1);
 	
-	stratagus::vector::remove(this->UnitsByType[type], unit);
+	wyrmgus::vector::remove(this->UnitsByType[type], unit);
 			
 	if (this->UnitsByType[type].empty()) {
 		this->UnitsByType.erase(type);
@@ -3610,7 +3610,7 @@ void CPlayer::DecreaseCountsForUnit(CUnit *unit, bool type_change)
 	if (unit->Active) {
 		this->ChangeUnitTypeAiActiveCount(type, -1);
 		
-		stratagus::vector::remove(this->AiActiveUnitsByType[type], unit);
+		wyrmgus::vector::remove(this->AiActiveUnitsByType[type], unit);
 		
 		if (this->AiActiveUnitsByType[type].empty()) {
 			this->AiActiveUnitsByType.erase(type);
@@ -3643,7 +3643,7 @@ void CPlayer::DecreaseCountsForUnit(CUnit *unit, bool type_change)
 **
 **  @return        How many exists, false otherwise.
 */
-bool CPlayer::has_unit_type(const stratagus::unit_type *unit_type) const
+bool CPlayer::has_unit_type(const wyrmgus::unit_type *unit_type) const
 {
 	return this->GetUnitTypeCount(unit_type) > 0;
 }
@@ -3653,7 +3653,7 @@ int CPlayer::get_population() const
 	int people_count = 0;
 
 	for (const auto &kv_pair : this->UnitTypesCount) {
-		const stratagus::unit_type *unit_type = kv_pair.first;
+		const wyrmgus::unit_type *unit_type = kv_pair.first;
 		if (!unit_type->BoolFlag[ORGANIC_INDEX].value || unit_type->BoolFlag[FAUNA_INDEX].value) {
 			continue;
 		}
@@ -3661,7 +3661,7 @@ int CPlayer::get_population() const
 		people_count += kv_pair.second;
 	}
 
-	return static_cast<int>(pow(people_count, 2)) * stratagus::base_population_per_unit;
+	return static_cast<int>(pow(people_count, 2)) * wyrmgus::base_population_per_unit;
 }
 
 /**
@@ -3779,11 +3779,11 @@ void SetPlayersPalette()
 {
 	for (int i = 0; i < PlayerMax - 1; ++i) {
 		if (CPlayer::Players[i]->Faction == -1) {
-			CPlayer::Players[i]->player_color = stratagus::player_color::get_all()[SyncRand(stratagus::player_color::get_all().size())];
+			CPlayer::Players[i]->player_color = wyrmgus::player_color::get_all()[SyncRand(wyrmgus::player_color::get_all().size())];
 		}
 	}
 
-	CPlayer::Players[PlayerNumNeutral]->player_color = stratagus::defines::get()->get_neutral_player_color();
+	CPlayer::Players[PlayerNumNeutral]->player_color = wyrmgus::defines::get()->get_neutral_player_color();
 }
 
 /**
@@ -3911,9 +3911,9 @@ void CPlayer::SetDiplomacyEnemyWith(CPlayer &player)
 
 	// if either player is the overlord of another (indirect or otherwise), break the vassalage bond after the declaration of war
 	if (this->is_overlord_of(&player)) {
-		player.set_overlord(nullptr, stratagus::vassalage_type::none);
+		player.set_overlord(nullptr, wyrmgus::vassalage_type::none);
 	} else if (player.is_overlord_of(this)) {
-		this->set_overlord(nullptr, stratagus::vassalage_type::none);
+		this->set_overlord(nullptr, wyrmgus::vassalage_type::none);
 	}
 
 	//if the other player has an overlord, then we must also go to war with them
@@ -3950,7 +3950,7 @@ void CPlayer::UnshareVisionWith(const CPlayer &player)
 	}
 }
 
-void CPlayer::set_overlord(CPlayer *overlord, const stratagus::vassalage_type)
+void CPlayer::set_overlord(CPlayer *overlord, const wyrmgus::vassalage_type)
 {
 	if (overlord == this->get_overlord()) {
 		return;
@@ -3962,7 +3962,7 @@ void CPlayer::set_overlord(CPlayer *overlord, const stratagus::vassalage_type)
 
 	CPlayer *old_overlord = this->get_overlord();
 	if (old_overlord != nullptr) {
-		stratagus::vector::remove(old_overlord->vassals, this);
+		wyrmgus::vector::remove(old_overlord->vassals, this);
 
 		//remove alliance and shared vision with the old overlord, and any upper overlords
 		if (!SaveGameLoading) {
@@ -4138,7 +4138,7 @@ bool CPlayer::HasNeutralFactionType() const
 	if (
 		this->Race != -1
 		&& this->Faction != -1
-		&& (stratagus::faction::get_all()[this->Faction]->Type == FactionTypeMercenaryCompany || stratagus::faction::get_all()[this->Faction]->Type == FactionTypeHolyOrder || stratagus::faction::get_all()[this->Faction]->Type == FactionTypeTradingCompany)
+		&& (wyrmgus::faction::get_all()[this->Faction]->Type == FactionTypeMercenaryCompany || wyrmgus::faction::get_all()[this->Faction]->Type == FactionTypeHolyOrder || wyrmgus::faction::get_all()[this->Faction]->Type == FactionTypeTradingCompany)
 	) {
 		return true;
 	}
@@ -4167,7 +4167,7 @@ bool CPlayer::HasBuildingAccess(const CPlayer &player, const ButtonCmd button_ac
 		player.HasNeutralFactionType()
 		&& (player.get_overlord() == nullptr || this->is_any_overlord_of(&player) || player.get_overlord()->IsAllied(*this))
 	) {
-		if (stratagus::faction::get_all()[player.Faction]->Type != FactionTypeHolyOrder || (button_action != ButtonCmd::Train && button_action != ButtonCmd::TrainClass && button_action != ButtonCmd::Buy) || stratagus::vector::contains(this->Deities, stratagus::faction::get_all()[player.Faction]->HolyOrderDeity)) { //if the faction is a holy order, the player must have chosen its respective deity
+		if (wyrmgus::faction::get_all()[player.Faction]->Type != FactionTypeHolyOrder || (button_action != ButtonCmd::Train && button_action != ButtonCmd::TrainClass && button_action != ButtonCmd::Buy) || wyrmgus::vector::contains(this->Deities, wyrmgus::faction::get_all()[player.Faction]->HolyOrderDeity)) { //if the faction is a holy order, the player must have chosen its respective deity
 			return true;
 		}
 	}
@@ -4175,7 +4175,7 @@ bool CPlayer::HasBuildingAccess(const CPlayer &player, const ButtonCmd button_ac
 	return false;
 }
 
-bool CPlayer::HasHero(const stratagus::character *hero) const
+bool CPlayer::HasHero(const wyrmgus::character *hero) const
 {
 	if (!hero) {
 		return false;
@@ -4192,7 +4192,7 @@ bool CPlayer::HasHero(const stratagus::character *hero) const
 
 void NetworkSetFaction(int player, const std::string &faction_name)
 {
-	const stratagus::faction *faction = stratagus::faction::try_get(faction_name);
+	const wyrmgus::faction *faction = wyrmgus::faction::try_get(faction_name);
 	int faction_id = faction ? faction->ID : -1;
 	SendCommandSetFaction(player, faction_id);
 }

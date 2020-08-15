@@ -35,7 +35,7 @@ struct lua_State;
 
 int CclDefineTerrainFeature(lua_State *l);
 
-namespace stratagus {
+namespace wyrmgus {
 
 class civilization;
 class plane;
@@ -47,7 +47,7 @@ class terrain_feature final : public named_data_entry, public data_type<terrain_
 	Q_OBJECT
 
 	Q_PROPERTY(QColor color READ get_color WRITE set_color)
-	Q_PROPERTY(stratagus::terrain_type* terrain_type MEMBER terrain_type READ get_terrain_type)
+	Q_PROPERTY(wyrmgus::terrain_type* terrain_type MEMBER terrain_type READ get_terrain_type)
 	Q_PROPERTY(bool trade_route MEMBER trade_route READ is_trade_route)
 	Q_PROPERTY(bool major_river MEMBER major_river READ is_major_river)
 	Q_PROPERTY(bool minor_river MEMBER minor_river READ is_minor_river)
@@ -157,7 +157,7 @@ public:
 
 private:
 	QColor color;
-	stratagus::terrain_type *terrain_type = nullptr;
+	wyrmgus::terrain_type *terrain_type = nullptr;
 	bool trade_route = false;
 	bool major_river = false;
 	bool minor_river = false;

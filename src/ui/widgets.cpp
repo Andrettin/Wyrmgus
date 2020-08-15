@@ -230,7 +230,7 @@ void MyOpenGLGraphics::_endDraw()
 }
 
 void MyOpenGLGraphics::drawImage(gcn::Image *image, int srcX, int srcY,
-								 int dstX, int dstY, int width, int height, const stratagus::player_color *player_color, unsigned int transparency, bool grayscale)
+								 int dstX, int dstY, int width, int height, const wyrmgus::player_color *player_color, unsigned int transparency, bool grayscale)
 {
 	const gcn::ClipRectangle &r = this->getCurrentClipArea();
 	int right = std::min<int>(r.x + r.width - 1, Video.Width - 1);
@@ -335,9 +335,9 @@ void MyOpenGLGraphics::fillRectangle(const gcn::Rectangle &rectangle)
 
 void PlayerColorImageWidget::draw(gcn::Graphics* graphics)
 {
-	const stratagus::player_color *player_color = nullptr;
+	const wyrmgus::player_color *player_color = nullptr;
 	if (!this->WidgetPlayerColor.empty()) {
-		player_color = stratagus::player_color::get(WidgetPlayerColor);
+		player_color = wyrmgus::player_color::get(WidgetPlayerColor);
 	}
 	
 	graphics->drawImage(mImage, ImageOrigin.x, ImageOrigin.y, 0, 0, mImage->getWidth(), mImage->getHeight(), player_color, 0, this->grayscale);
@@ -618,9 +618,9 @@ void PlayerColorImageButton::draw(gcn::Graphics *graphics)
 		img = normalImage;
 	}
 
-	const stratagus::player_color *player_color = nullptr;
+	const wyrmgus::player_color *player_color = nullptr;
 	if (!this->ButtonPlayerColor.empty()) {
-		player_color = stratagus::player_color::get(ButtonPlayerColor);
+		player_color = wyrmgus::player_color::get(ButtonPlayerColor);
 	}
 		
 	if (frameImage) {
@@ -2773,7 +2773,7 @@ int MenuScreen::run(bool loop)
 	running = true;
 
 	CurrentCursorState = CursorState::Point;
-	GameCursor = UI.get_cursor(stratagus::cursor_type::point);
+	GameCursor = UI.get_cursor(wyrmgus::cursor_type::point);
 	CursorOn = cursor_on::unknown;
 
 	CallbackMusicOn();

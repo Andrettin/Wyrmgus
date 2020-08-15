@@ -33,7 +33,7 @@
 
 #include "database/sml_operator.h"
 
-namespace stratagus {
+namespace wyrmgus {
 
 void sml_property::print(std::ofstream &ofstream, const size_t indentation) const
 {

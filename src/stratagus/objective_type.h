@@ -27,7 +27,7 @@
 
 #pragma once
 
-namespace stratagus {
+namespace wyrmgus {
 
 enum class objective_type {
 	gather_resource,
@@ -101,4 +101,4 @@ inline std::string objective_type_to_string(const objective_type objective_type)
 
 }
 
-Q_DECLARE_METATYPE(stratagus::objective_type)
+Q_DECLARE_METATYPE(wyrmgus::objective_type)

@@ -120,7 +120,7 @@ VisitResult NearReachableTerrainFinder::Visit(TerrainTraversal &terrainTraversal
 	}
 	//Wyrmgus start
 //	if (CMap::Map.Field(pos)->CheckMask(resmask)) { // reachable
-	if (CMap::Map.Field(pos, z)->get_resource() == stratagus::resource::get_all()[resource]) { // reachable
+	if (CMap::Map.Field(pos, z)->get_resource() == wyrmgus::resource::get_all()[resource]) { // reachable
 	//Wyrmgus end
 		if (terrainTraversal.Get(pos) <= maxDist) {
 			return VisitResult::Ok;
@@ -151,7 +151,7 @@ static bool FindNearestReachableTerrainType(int movemask, int resource, int rang
 
 	//Wyrmgus start
 //	Assert(CMap::Map.Field(startPos)->CheckMask(resmask));
-	Assert(CMap::Map.Field(startPos, z)->get_resource() == stratagus::resource::get_all()[resource]);
+	Assert(CMap::Map.Field(startPos, z)->get_resource() == wyrmgus::resource::get_all()[resource]);
 	//Wyrmgus end
 	terrainTraversal.PushPos(startPos);
 
@@ -468,11 +468,11 @@ int COrder_Resource::MoveToResource_Terrain(CUnit &unit)
 	//Wyrmgus end
 
 	// Wood gone, look somewhere else.
-	if ((CMap::Map.Info.IsPointOnMap(pos, z) == false || CMap::Map.Field(pos, z)->get_resource() != stratagus::resource::get_all()[this->CurrentResource])
+	if ((CMap::Map.Info.IsPointOnMap(pos, z) == false || CMap::Map.Field(pos, z)->get_resource() != wyrmgus::resource::get_all()[this->CurrentResource])
 		&& (!unit.get_pixel_offset().x()) && (!unit.get_pixel_offset().y())) {
 		//Wyrmgus start
 //		if (!FindTerrainType(unit.Type->MovementMask, MapFieldForest, 16, *unit.Player, this->goalPos, &pos)) {
-		if (!FindTerrainType(unit.Type->MovementMask, stratagus::resource::get_all()[this->CurrentResource], 16, *unit.Player, this->goalPos, &pos, this->MapLayer)) {
+		if (!FindTerrainType(unit.Type->MovementMask, wyrmgus::resource::get_all()[this->CurrentResource], 16, *unit.Player, this->goalPos, &pos, this->MapLayer)) {
 		//Wyrmgus end
 			// no wood in range
 			return -1;
@@ -508,7 +508,7 @@ int COrder_Resource::MoveToResource_Terrain(CUnit &unit)
 			}
 			//Wyrmgus start
 //			if (FindTerrainType(unit.Type->MovementMask, MapFieldForest, 9999, *unit.Player, unit.tilePos, &pos)) {
-			if (FindTerrainType(unit.Type->MovementMask, stratagus::resource::get_all()[this->CurrentResource], 9999, *unit.Player, unit.tilePos, &pos, z)) {
+			if (FindTerrainType(unit.Type->MovementMask, wyrmgus::resource::get_all()[this->CurrentResource], 9999, *unit.Player, unit.tilePos, &pos, z)) {
 			//Wyrmgus end
 				this->goalPos = pos;
 				DebugPrint("Found a better place to harvest %d,%d\n" _C_ pos.x _C_ pos.y);
@@ -622,15 +622,15 @@ void COrder_Resource::UnitGotoGoal(CUnit &unit, CUnit *const goal, int state)
 int COrder_Resource::StartGathering(CUnit &unit)
 {
 	CUnit *goal;
-	const std::unique_ptr<stratagus::resource_info> &resinfo = unit.Type->ResInfo[this->CurrentResource];
+	const std::unique_ptr<wyrmgus::resource_info> &resinfo = unit.Type->ResInfo[this->CurrentResource];
 	Assert(!unit.get_pixel_offset().x());
 	Assert(!unit.get_pixel_offset().y());
 
 	//Wyrmgus start
-	const int input_resource = stratagus::resource::get_all()[this->CurrentResource]->InputResource;
+	const int input_resource = wyrmgus::resource::get_all()[this->CurrentResource]->InputResource;
 	if (input_resource && (unit.Player->Resources[input_resource] + unit.Player->StoredResources[input_resource]) == 0) { //if the resource requires an input, but there's none in store, don't gather
 		const char *input_name = DefaultResourceNames[input_resource].c_str();
-		const char *input_actionName = stratagus::resource::get_all()[input_resource]->ActionName.c_str();
+		const char *input_actionName = wyrmgus::resource::get_all()[input_resource]->ActionName.c_str();
 		unit.Player->Notify(_("Not enough %s... %s more %s."), _(input_name), _(input_actionName), _(input_name)); //added extra space to look better
 		if (unit.Player == CPlayer::GetThisPlayer() && GameSounds.NotEnoughRes[unit.Player->Race][input_resource].Sound) {
 			PlayGameSound(GameSounds.NotEnoughRes[unit.Player->Race][input_resource].Sound, MaxSampleVolume);
@@ -695,7 +695,7 @@ int COrder_Resource::StartGathering(CUnit &unit)
 	// Update the heading of a harvesting unit to looks straight at the resource.
 	//Wyrmgus start
 //	UnitHeadingFromDeltaXY(unit, goal->tilePos - unit.tilePos + goal->Type->GetHalfTileSize());
-	UnitHeadingFromDeltaXY(unit, PixelSize(PixelSize(goal->tilePos) * stratagus::defines::get()->get_tile_size()) - PixelSize(PixelSize(unit.tilePos) * stratagus::defines::get()->get_tile_size()) + goal->get_half_tile_pixel_size() - unit.get_half_tile_pixel_size());
+	UnitHeadingFromDeltaXY(unit, PixelSize(PixelSize(goal->tilePos) * wyrmgus::defines::get()->get_tile_size()) - PixelSize(PixelSize(unit.tilePos) * wyrmgus::defines::get()->get_tile_size()) + goal->get_half_tile_pixel_size() - unit.get_half_tile_pixel_size());
 	//Wyrmgus end
 
 	// If resource is still under construction, wait!
@@ -782,10 +782,10 @@ static void AnimateActionHarvest(CUnit &unit)
 void COrder_Resource::LoseResource(CUnit &unit, CUnit &source)
 {
 	CUnit *depot;
-	const std::unique_ptr<stratagus::resource_info> &resinfo = unit.Type->ResInfo[this->CurrentResource];
+	const std::unique_ptr<wyrmgus::resource_info> &resinfo = unit.Type->ResInfo[this->CurrentResource];
 
 	//Wyrmgus start
-	const stratagus::unit_type &source_type = *source.Type;
+	const wyrmgus::unit_type &source_type = *source.Type;
 	
 //	Assert((unit.Container == &source && !resinfo.HarvestFromOutside)
 //		   || (!unit.Container && resinfo.HarvestFromOutside));
@@ -875,7 +875,7 @@ void COrder_Resource::LoseResource(CUnit &unit, CUnit &source)
 int COrder_Resource::GatherResource(CUnit &unit)
 {
 	CUnit *source = nullptr;
-	const std::unique_ptr<stratagus::resource_info> &resinfo = unit.Type->ResInfo[this->CurrentResource];
+	const std::unique_ptr<wyrmgus::resource_info> &resinfo = unit.Type->ResInfo[this->CurrentResource];
 	int addload;
 
 	//Wyrmgus start
@@ -901,7 +901,7 @@ int COrder_Resource::GatherResource(CUnit &unit)
 	// Target gone?
 	//Wyrmgus start
 //	if (resinfo.TerrainHarvester && !CMap::Map.Field(this->goalPos)->IsTerrainResourceOnMap(this->CurrentResource)) {
-	if (CMap::Map.Info.IsPointOnMap(this->goalPos, this->MapLayer) && CMap::Map.Field(this->goalPos, this->MapLayer)->get_resource() != stratagus::resource::get_all()[this->CurrentResource]) {
+	if (CMap::Map.Info.IsPointOnMap(this->goalPos, this->MapLayer) && CMap::Map.Field(this->goalPos, this->MapLayer)->get_resource() != wyrmgus::resource::get_all()[this->CurrentResource]) {
 	//Wyrmgus end
 		if (!unit.Anim.Unbreakable) {
 			// Action now breakable, move to resource again.
@@ -1000,13 +1000,13 @@ int COrder_Resource::GatherResource(CUnit &unit)
 				//Wyrmgus start
 //				unit.ResourcesHeld += addload;
 //				source->ResourcesHeld -= addload;
-				const int input_resource = stratagus::resource::get_all()[this->CurrentResource]->InputResource;
+				const int input_resource = wyrmgus::resource::get_all()[this->CurrentResource]->InputResource;
 				if (input_resource) {
 					addload = std::min(unit.Player->Resources[input_resource] + unit.Player->StoredResources[input_resource], addload);
 					
 					if (!addload) {
 						const char *input_name = DefaultResourceNames[input_resource].c_str();
-						const char *input_actionName = stratagus::resource::get_all()[input_resource]->ActionName.c_str();
+						const char *input_actionName = wyrmgus::resource::get_all()[input_resource]->ActionName.c_str();
 						unit.Player->Notify(_("Not enough %s... %s more %s."), _(input_name), _(input_actionName), _(input_name)); //added extra space to look better
 						if (unit.Player == CPlayer::GetThisPlayer() && GameSounds.NotEnoughRes[unit.Player->Race][input_resource].Sound) {
 							PlayGameSound(GameSounds.NotEnoughRes[unit.Player->Race][input_resource].Sound, MaxSampleVolume);
@@ -1019,7 +1019,7 @@ int COrder_Resource::GatherResource(CUnit &unit)
 						return 0;
 					}
 					
-					unit.Player->change_resource(stratagus::resource::get_all()[input_resource], -addload, true);
+					unit.Player->change_resource(wyrmgus::resource::get_all()[input_resource], -addload, true);
 				}
 				unit.ChangeResourcesHeld(addload);
 				if (!source->Type->BoolFlag[INEXHAUSTIBLE_INDEX].value) {
@@ -1053,7 +1053,7 @@ int COrder_Resource::GatherResource(CUnit &unit)
 				if (!dead) {
 					if (Preference.MineNotifications
 						&& unit.Player->Index == CPlayer::GetThisPlayer()->Index
-						&& source->Variable[GIVERESOURCE_INDEX].Max > (stratagus::resource::get_all()[this->CurrentResource]->DefaultIncome * 10)) {
+						&& source->Variable[GIVERESOURCE_INDEX].Max > (wyrmgus::resource::get_all()[this->CurrentResource]->DefaultIncome * 10)) {
 							unit.Player->Notify(NotifyYellow, source->tilePos, source->MapLayer->ID, _("Our %s has been depleted!"), source->Type->get_name().c_str());
 					}
 					LetUnitDie(*source);
@@ -1117,7 +1117,7 @@ int GetNumWaitingWorkers(const CUnit &mine)
 int COrder_Resource::StopGathering(CUnit &unit)
 {
 	CUnit *source = nullptr;
-	const std::unique_ptr<stratagus::resource_info> &resinfo = unit.Type->ResInfo[this->CurrentResource];
+	const std::unique_ptr<wyrmgus::resource_info> &resinfo = unit.Type->ResInfo[this->CurrentResource];
 
 	//Wyrmgus start
 //	if (!resinfo.TerrainHarvester) {
@@ -1141,7 +1141,7 @@ int COrder_Resource::StopGathering(CUnit &unit)
 			&& source->IsAlive()
 			&& !source->MineLow
 			&& source->ResourcesHeld * 100 / source->Variable[GIVERESOURCE_INDEX].Max <= 10
-			&& source->Variable[GIVERESOURCE_INDEX].Max > (stratagus::resource::get_all()[this->CurrentResource]->DefaultIncome * 10)) {
+			&& source->Variable[GIVERESOURCE_INDEX].Max > (wyrmgus::resource::get_all()[this->CurrentResource]->DefaultIncome * 10)) {
 				//Wyrmgus start
 //				unit.Player->Notify(NotifyYellow, source->tilePos, _("%s is running low!"), source->Type->Name.c_str());
 				unit.Player->Notify(NotifyYellow, source->tilePos, source->MapLayer->ID, _("Our %s is nearing depletion!"), source->Type->get_name().c_str());
@@ -1242,7 +1242,7 @@ int COrder_Resource::StopGathering(CUnit &unit)
 */
 int COrder_Resource::MoveToDepot(CUnit &unit)
 {
-	const std::unique_ptr<stratagus::resource_info> &resinfo = unit.Type->ResInfo[this->CurrentResource];
+	const std::unique_ptr<wyrmgus::resource_info> &resinfo = unit.Type->ResInfo[this->CurrentResource];
 	CUnit &goal = *this->GetGoal();
 	CPlayer &player = *unit.Player;
 	Assert(&goal);
@@ -1329,8 +1329,8 @@ int COrder_Resource::MoveToDepot(CUnit &unit)
 	}
 
 	// Update resource.
-	const int rindex = stratagus::resource::get_all()[this->CurrentResource]->FinalResource;
-	int resource_change = unit.ResourcesHeld * stratagus::resource::get_all()[this->CurrentResource]->FinalResourceConversionRate / 100;
+	const int rindex = wyrmgus::resource::get_all()[this->CurrentResource]->FinalResource;
+	int resource_change = unit.ResourcesHeld * wyrmgus::resource::get_all()[this->CurrentResource]->FinalResourceConversionRate / 100;
 	int processed_resource_change = (resource_change * player.Incomes[this->CurrentResource]) / 100;
 	
 	if (player.AiEnabled) {
@@ -1344,9 +1344,9 @@ int COrder_Resource::MoveToDepot(CUnit &unit)
 		}
 	}
 	
-	player.change_resource(stratagus::resource::get_all()[rindex], processed_resource_change, true);
+	player.change_resource(wyrmgus::resource::get_all()[rindex], processed_resource_change, true);
 	player.TotalResources[rindex] += processed_resource_change;
-	player.pay_overlord_tax(stratagus::resource::get_all()[rindex], processed_resource_change);
+	player.pay_overlord_tax(wyrmgus::resource::get_all()[rindex], processed_resource_change);
 	
 	//give XP to the worker according to how much was gathered, based on their base price in relation to gold
 	int xp_gained = unit.ResourcesHeld;
@@ -1355,8 +1355,8 @@ int COrder_Resource::MoveToDepot(CUnit &unit)
 	
 	//update quests
 	for (const auto &objective : player.get_quest_objectives()) {
-		const stratagus::quest_objective *quest_objective = objective->get_quest_objective();
-		if (quest_objective->get_objective_type() == stratagus::objective_type::gather_resource) {
+		const wyrmgus::quest_objective *quest_objective = objective->get_quest_objective();
+		if (quest_objective->get_objective_type() == wyrmgus::objective_type::gather_resource) {
 			if (quest_objective->Resource == rindex) {
 				objective->Counter = std::min(objective->Counter + processed_resource_change, quest_objective->get_quantity());
 			} else if (quest_objective->Resource == this->CurrentResource) {
@@ -1392,7 +1392,7 @@ int COrder_Resource::MoveToDepot(CUnit &unit)
 */
 bool COrder_Resource::WaitInDepot(CUnit &unit)
 {
-	const std::unique_ptr<stratagus::resource_info> &resinfo = unit.Type->ResInfo[this->CurrentResource];
+	const std::unique_ptr<wyrmgus::resource_info> &resinfo = unit.Type->ResInfo[this->CurrentResource];
 	const CUnit *depot = ResourceDepositOnMap(unit.tilePos, resinfo->get_resource()->ID, unit.MapLayer->ID);
 
 	//Assert(depot);
@@ -1407,7 +1407,7 @@ bool COrder_Resource::WaitInDepot(CUnit &unit)
 
 		//Wyrmgus start
 //		if (FindTerrainType(unit.Type->MovementMask, MapFieldForest, 10, *unit.Player, pos, &pos)) {
-		if (FindTerrainType(unit.Type->MovementMask, stratagus::resource::get_all()[this->CurrentResource], 10, *unit.Player, pos, &pos, z)) {
+		if (FindTerrainType(unit.Type->MovementMask, wyrmgus::resource::get_all()[this->CurrentResource], 10, *unit.Player, pos, &pos, z)) {
 		//Wyrmgus end
 			if (depot) {
 				DropOutNearest(unit, pos, depot);
@@ -1498,7 +1498,7 @@ bool COrder_Resource::WaitInDepot(CUnit &unit)
 void COrder_Resource::DropResource(CUnit &unit)
 {
 	if (unit.CurrentResource) {
-		const std::unique_ptr<stratagus::resource_info> &resinfo = unit.Type->ResInfo[unit.CurrentResource];
+		const std::unique_ptr<wyrmgus::resource_info> &resinfo = unit.Type->ResInfo[unit.CurrentResource];
 
 		//Wyrmgus start
 //		if (!resinfo.TerrainHarvester) {
@@ -1543,7 +1543,7 @@ void COrder_Resource::ResourceGiveUp(CUnit &unit)
 bool COrder_Resource::FindAnotherResource(CUnit &unit)
 {
 	if (this->CurrentResource) {
-		const std::unique_ptr<stratagus::resource_info> &resinfo = unit.Type->ResInfo[this->CurrentResource];
+		const std::unique_ptr<wyrmgus::resource_info> &resinfo = unit.Type->ResInfo[this->CurrentResource];
 		if (resinfo) {
 			//Wyrmgus start
 	//		if (!resinfo.TerrainHarvester) {
@@ -1571,7 +1571,7 @@ bool COrder_Resource::FindAnotherResource(CUnit &unit)
 				Vec2i resPos;
 				//Wyrmgus start
 //				if (FindTerrainType(unit.Type->MovementMask, MapFieldForest, 8, *unit.Player, unit.tilePos, &resPos)) {
-				if (FindTerrainType(unit.Type->MovementMask, stratagus::resource::get_all()[this->CurrentResource], 8, *unit.Player, unit.tilePos, &resPos, unit.MapLayer->ID)) {
+				if (FindTerrainType(unit.Type->MovementMask, wyrmgus::resource::get_all()[this->CurrentResource], 8, *unit.Player, unit.tilePos, &resPos, unit.MapLayer->ID)) {
 				//Wyrmgus end
 					this->goalPos = resPos;
 					this->MapLayer = unit.MapLayer->ID;

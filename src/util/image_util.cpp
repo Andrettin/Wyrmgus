@@ -31,7 +31,7 @@
 #include "util/point_util.h"
 #include "xbrz.h"
 
-namespace stratagus::image {
+namespace wyrmgus::image {
 
 QImage scale(const QImage &src_image, const int scale_factor)
 {
@@ -161,7 +161,7 @@ color_set get_colors(const QImage &image)
 
 int get_frame_index(const QImage &image, const QSize &frame_size, const QPoint &frame_pos)
 {
-	return stratagus::point::to_index(frame_pos, image::get_frames_per_row(image, frame_size.width()));
+	return wyrmgus::point::to_index(frame_pos, image::get_frames_per_row(image, frame_size.width()));
 }
 
 QPoint get_frame_pos(const QImage &image, const QSize &frame_size, const int frame_index, const frame_order frame_order)
@@ -171,7 +171,7 @@ QPoint get_frame_pos(const QImage &image, const QSize &frame_size, const int fra
 		return QPoint(frame_index / frames_per_column, frame_index % frames_per_column);
 	} else {
 		//left to right
-		return stratagus::point::from_index(frame_index, image::get_frames_per_row(image, frame_size.width()));
+		return wyrmgus::point::from_index(frame_index, image::get_frames_per_row(image, frame_size.width()));
 	}
 }
 

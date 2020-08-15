@@ -66,7 +66,7 @@ CMapField::CMapField() :
 **
 **	@return	The terrain of the tile for the given overlay parameter
 */
-stratagus::terrain_type *CMapField::GetTerrain(const bool overlay) const
+wyrmgus::terrain_type *CMapField::GetTerrain(const bool overlay) const
 {
 	if (overlay) {
 		return this->OverlayTerrain;
@@ -83,7 +83,7 @@ stratagus::terrain_type *CMapField::GetTerrain(const bool overlay) const
 **
 **	@return	The topmost terrain of the tile
 */
-stratagus::terrain_type *CMapField::GetTopTerrain(const bool seen, const bool ignore_destroyed) const
+wyrmgus::terrain_type *CMapField::GetTopTerrain(const bool seen, const bool ignore_destroyed) const
 {
 	if (!seen) {
 		if (this->OverlayTerrain && (!ignore_destroyed || !this->OverlayTerrainDestroyed)) {
@@ -105,7 +105,7 @@ bool CMapField::IsSeenTileCorrect() const
 	return this->Terrain == this->player_info->SeenTerrain && this->OverlayTerrain == this->player_info->SeenOverlayTerrain && this->SolidTile == this->player_info->SeenSolidTile && this->OverlaySolidTile == this->player_info->SeenOverlaySolidTile && this->TransitionTiles == this->player_info->SeenTransitionTiles && this->OverlayTransitionTiles == this->player_info->SeenOverlayTransitionTiles;
 }
 
-const stratagus::resource *CMapField::get_resource() const
+const wyrmgus::resource *CMapField::get_resource() const
 {
 	if (this->OverlayTerrain && !this->OverlayTerrainDestroyed) {
 		return this->OverlayTerrain->get_resource();
@@ -125,7 +125,7 @@ bool CMapField::IsDestroyedForestTile() const
 **
 **	@param	terrain_type	The new terrain type for the tile
 */
-void CMapField::SetTerrain(stratagus::terrain_type *terrain_type)
+void CMapField::SetTerrain(wyrmgus::terrain_type *terrain_type)
 {
 	if (!terrain_type) {
 		return;
@@ -160,7 +160,7 @@ void CMapField::SetTerrain(stratagus::terrain_type *terrain_type)
 	}
 	
 	if (terrain_type->is_overlay()) {
-		if (!this->Terrain || !stratagus::vector::contains(terrain_type->get_base_terrain_types(), this->Terrain)) {
+		if (!this->Terrain || !wyrmgus::vector::contains(terrain_type->get_base_terrain_types(), this->Terrain)) {
 			this->SetTerrain(terrain_type->get_base_terrain_types().front());
 		}
 		if ((terrain_type->Flags & MapFieldWaterAllowed) || terrain_type->Flags & MapFieldSpace) {
@@ -174,7 +174,7 @@ void CMapField::SetTerrain(stratagus::terrain_type *terrain_type)
 		this->OverlayTerrainDamaged = false;
 	} else {
 		this->Terrain = terrain_type;
-		if (this->OverlayTerrain && !stratagus::vector::contains(this->OverlayTerrain->get_base_terrain_types(), terrain_type)) { //if the overlay terrain is incompatible with the new base terrain, remove the overlay
+		if (this->OverlayTerrain && !wyrmgus::vector::contains(this->OverlayTerrain->get_base_terrain_types(), terrain_type)) { //if the overlay terrain is incompatible with the new base terrain, remove the overlay
 			this->Flags &= ~(this->OverlayTerrain->Flags);
 			this->Flags &= ~(MapFieldCoastAllowed); // need to do this manually, since MapFieldCoast is added dynamically
 			this->OverlayTerrain = nullptr;
@@ -206,7 +206,7 @@ void CMapField::SetTerrain(stratagus::terrain_type *terrain_type)
 				this->Flags |= MapFieldUnpassable;
 				this->Flags |= MapFieldAirUnpassable;
 			}
-			const stratagus::unit_type_variation *variation = unit.GetVariation();
+			const wyrmgus::unit_type_variation *variation = unit.GetVariation();
 			if (variation && !unit.CheckTerrainForVariation(variation)) { // if a unit that is on the tile has a terrain-dependent variation that is not compatible with the current variation, repick the unit's variation
 				unit.ChooseVariation();
 			}
@@ -337,12 +337,12 @@ void CMapField::setTileIndex(const CTileset &tileset, unsigned int tileIndex, in
 	//Wyrmgus end
 	
 	//Wyrmgus start
-	stratagus::terrain_type *terrain = stratagus::terrain_type::get(tileset.getTerrainName(tile.tileinfo.BaseTerrain));
+	wyrmgus::terrain_type *terrain = wyrmgus::terrain_type::get(tileset.getTerrainName(tile.tileinfo.BaseTerrain));
 	if (terrain->is_overlay()) {
 		if (terrain->Flags & MapFieldForest) {
-			this->SetTerrain(stratagus::terrain_type::get(tileset.solidTerrainTypes[3].TerrainName));
+			this->SetTerrain(wyrmgus::terrain_type::get(tileset.solidTerrainTypes[3].TerrainName));
 		} else if (terrain->Flags & MapFieldRocks || terrain->Flags & MapFieldWaterAllowed) {
-			this->SetTerrain(stratagus::terrain_type::get(tileset.solidTerrainTypes[2].TerrainName));
+			this->SetTerrain(wyrmgus::terrain_type::get(tileset.solidTerrainTypes[2].TerrainName));
 		}
 	}
 	this->SetTerrain(terrain);
@@ -368,7 +368,7 @@ void CMapField::UpdateSeenTile()
 
 void CMapField::Save(CFile &file) const
 {
-	const stratagus::terrain_feature *terrain_feature = this->get_terrain_feature();
+	const wyrmgus::terrain_feature *terrain_feature = this->get_terrain_feature();
 
 	file.printf("  {\"%s\", \"%s\", \"%s\", %s, %s, \"%s\", \"%s\", %d, %d, %d, %d, %2d, %2d, %2d, \"%s\"", (Terrain ? Terrain->Ident.c_str() : ""), (OverlayTerrain ? OverlayTerrain->Ident.c_str() : ""), (this->get_terrain_feature() != nullptr ? this->get_terrain_feature()->get_identifier().c_str() : ""), OverlayTerrainDamaged ? "true" : "false", OverlayTerrainDestroyed ? "true" : "false", player_info->SeenTerrain ? player_info->SeenTerrain->Ident.c_str() : "", player_info->SeenOverlayTerrain ? player_info->SeenOverlayTerrain->Ident.c_str() : "", SolidTile, OverlaySolidTile, player_info->SeenSolidTile, player_info->SeenOverlaySolidTile, Value, cost, Landmass, this->get_settlement() != nullptr ? this->get_settlement()->get_identifier().c_str() : "");
 	
@@ -518,17 +518,17 @@ void CMapField::parse(lua_State *l)
 	*/
 	const std::string terrain_ident = LuaToString(l, -1, 1);
 	if (!terrain_ident.empty()) {
-		this->Terrain = stratagus::terrain_type::get(terrain_ident);
+		this->Terrain = wyrmgus::terrain_type::get(terrain_ident);
 	}
 	
 	const std::string overlay_terrain_ident = LuaToString(l, -1, 2);
 	if (!overlay_terrain_ident.empty()) {
-		this->OverlayTerrain = stratagus::terrain_type::get(overlay_terrain_ident);
+		this->OverlayTerrain = wyrmgus::terrain_type::get(overlay_terrain_ident);
 	}
 
 	const std::string terrain_feature_ident = LuaToString(l, -1, 3);
 	if (!terrain_feature_ident.empty()) {
-		this->terrain_feature = stratagus::terrain_feature::get(terrain_feature_ident);
+		this->terrain_feature = wyrmgus::terrain_feature::get(terrain_feature_ident);
 	}
 
 	this->SetOverlayTerrainDamaged(LuaToBoolean(l, -1, 4));
@@ -536,12 +536,12 @@ void CMapField::parse(lua_State *l)
 	
 	std::string seen_terrain_ident = LuaToString(l, -1, 6);
 	if (!seen_terrain_ident.empty()) {
-		this->player_info->SeenTerrain = stratagus::terrain_type::get(seen_terrain_ident);
+		this->player_info->SeenTerrain = wyrmgus::terrain_type::get(seen_terrain_ident);
 	}
 	
 	std::string seen_overlay_terrain_ident = LuaToString(l, -1, 7);
 	if (!seen_overlay_terrain_ident.empty()) {
-		this->player_info->SeenOverlayTerrain = stratagus::terrain_type::get(seen_overlay_terrain_ident);
+		this->player_info->SeenOverlayTerrain = wyrmgus::terrain_type::get(seen_overlay_terrain_ident);
 	}
 	
 	this->SolidTile = LuaToNumber(l, -1, 8);
@@ -553,7 +553,7 @@ void CMapField::parse(lua_State *l)
 	this->Landmass = LuaToNumber(l, -1, 14);
 	const std::string settlement_identifier = LuaToString(l, -1, 15);
 	if (!settlement_identifier.empty()) {
-		this->settlement = stratagus::site::get(settlement_identifier);
+		this->settlement = wyrmgus::site::get(settlement_identifier);
 	}
 	//Wyrmgus end
 
@@ -564,28 +564,28 @@ void CMapField::parse(lua_State *l)
 //		if (!strcmp(value, "explored")) {
 		if (!strcmp(value, "transition-tile")) {
 			++j;
-			stratagus::terrain_type *terrain = stratagus::terrain_type::get(LuaToString(l, -1, j + 1));
+			wyrmgus::terrain_type *terrain = wyrmgus::terrain_type::get(LuaToString(l, -1, j + 1));
 			++j;
 			int tile_number = LuaToNumber(l, -1, j + 1);
-			this->TransitionTiles.push_back(std::pair<stratagus::terrain_type *, int>(terrain, tile_number));
+			this->TransitionTiles.push_back(std::pair<wyrmgus::terrain_type *, int>(terrain, tile_number));
 		} else if (!strcmp(value, "overlay-transition-tile")) {
 			++j;
-			stratagus::terrain_type *terrain = stratagus::terrain_type::get(LuaToString(l, -1, j + 1));
+			wyrmgus::terrain_type *terrain = wyrmgus::terrain_type::get(LuaToString(l, -1, j + 1));
 			++j;
 			int tile_number = LuaToNumber(l, -1, j + 1);
-			this->OverlayTransitionTiles.push_back(std::pair<stratagus::terrain_type *, int>(terrain, tile_number));
+			this->OverlayTransitionTiles.push_back(std::pair<wyrmgus::terrain_type *, int>(terrain, tile_number));
 		} else if (!strcmp(value, "seen-transition-tile")) {
 			++j;
-			stratagus::terrain_type *terrain = stratagus::terrain_type::get(LuaToString(l, -1, j + 1));
+			wyrmgus::terrain_type *terrain = wyrmgus::terrain_type::get(LuaToString(l, -1, j + 1));
 			++j;
 			int tile_number = LuaToNumber(l, -1, j + 1);
-			this->player_info->SeenTransitionTiles.push_back(std::pair<stratagus::terrain_type *, int>(terrain, tile_number));
+			this->player_info->SeenTransitionTiles.push_back(std::pair<wyrmgus::terrain_type *, int>(terrain, tile_number));
 		} else if (!strcmp(value, "seen-overlay-transition-tile")) {
 			++j;
-			stratagus::terrain_type *terrain = stratagus::terrain_type::get(LuaToString(l, -1, j + 1));
+			wyrmgus::terrain_type *terrain = wyrmgus::terrain_type::get(LuaToString(l, -1, j + 1));
 			++j;
 			int tile_number = LuaToNumber(l, -1, j + 1);
-			this->player_info->SeenOverlayTransitionTiles.push_back(std::pair<stratagus::terrain_type *, int>(terrain, tile_number));
+			this->player_info->SeenOverlayTransitionTiles.push_back(std::pair<wyrmgus::terrain_type *, int>(terrain, tile_number));
 		} else if (!strcmp(value, "explored")) {
 		//Wyrmgus end
 			++j;

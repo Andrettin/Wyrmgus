@@ -33,7 +33,7 @@
 
 #include "database/named_data_entry.h"
 
-namespace stratagus {
+namespace wyrmgus {
 
 //a data entry with description, quote and background, i.e. a data entry that can be shown in the encyclopedia
 class detailed_data_entry : public named_data_entry

@@ -32,7 +32,7 @@
 #include "util/georectangle_util.h"
 #include "util/point_util.h"
 
-namespace stratagus::geoshape {
+namespace wyrmgus::geoshape {
 
 void write_to_image(const QGeoShape &geoshape, QImage &image, const QColor &color, const QGeoRectangle &georectangle, const std::string &image_checkpoint_save_filename)
 {

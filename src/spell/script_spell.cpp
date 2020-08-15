@@ -192,11 +192,11 @@ static void CclSpellCondition(lua_State *l, ConditionInfo *condition)
 			condition->FactionUnit = Ccl2Condition(l, LuaToString(l, -1, j + 1));
 		} else if (!strcmp(value, "civilization-equivalent")) {
 			value = LuaToString(l, -1, j + 1);
-			const stratagus::civilization *civilization = stratagus::civilization::get(value);
+			const wyrmgus::civilization *civilization = wyrmgus::civilization::get(value);
 			condition->civilization_equivalent = civilization;
 		} else if (!strcmp(value, "faction-equivalent")) {
 			value = LuaToString(l, -1, j + 1);
-			stratagus::faction *faction = stratagus::faction::get(value);
+			wyrmgus::faction *faction = wyrmgus::faction::get(value);
 			condition->FactionEquivalent = faction;
 		//Wyrmgus end
 		} else {
@@ -318,7 +318,7 @@ static int CclDefineSpell(lua_State *l)
 {
 	const int args = lua_gettop(l);
 	const std::string identname = LuaToString(l, 1);
-	stratagus::spell *spell = stratagus::spell::get_or_add(identname, nullptr);
+	wyrmgus::spell *spell = wyrmgus::spell::get_or_add(identname, nullptr);
 
 	for (int i = 1; i < args; ++i) {
 		const char *value = LuaToString(l, i + 1);
@@ -423,7 +423,7 @@ static int CclDefineSpell(lua_State *l)
 			}
 		//Wyrmgus start
 		} else if (!strcmp(value, "item-spell")) {
-			const int item_class = static_cast<int>(stratagus::string_to_item_class(LuaToString(l, i + 1)));
+			const int item_class = static_cast<int>(wyrmgus::string_to_item_class(LuaToString(l, i + 1)));
 			spell->ItemSpell[item_class] = true;
 		//Wyrmgus end
 		} else {

@@ -39,7 +39,7 @@ struct lua_State;
 
 int CclDefineSite(lua_State *l);
 
-namespace stratagus {
+namespace wyrmgus {
 
 class character;
 class civilization;
@@ -56,17 +56,17 @@ class site final : public named_data_entry, public data_type<site>, public CData
 	Q_OBJECT
 
 	Q_PROPERTY(bool major MEMBER major READ is_major)
-	Q_PROPERTY(stratagus::map_template* map_template MEMBER map_template READ get_map_template)
+	Q_PROPERTY(wyrmgus::map_template* map_template MEMBER map_template READ get_map_template)
 	Q_PROPERTY(QPoint pos MEMBER pos READ get_pos)
 	Q_PROPERTY(QGeoCoordinate geocoordinate MEMBER geocoordinate READ get_geocoordinate)
-	Q_PROPERTY(stratagus::site* geocoordinate_reference_site MEMBER geocoordinate_reference_site)
+	Q_PROPERTY(wyrmgus::site* geocoordinate_reference_site MEMBER geocoordinate_reference_site)
 	Q_PROPERTY(int longitude_scale MEMBER longitude_scale)
 	Q_PROPERTY(int latitude_scale MEMBER latitude_scale)
-	Q_PROPERTY(stratagus::unit_class* pathway_class MEMBER pathway_class READ get_pathway_class)
+	Q_PROPERTY(wyrmgus::unit_class* pathway_class MEMBER pathway_class READ get_pathway_class)
 	Q_PROPERTY(QVariantList cores READ get_cores_qvariant_list)
 	Q_PROPERTY(QVariantList regions READ get_regions_qvariant_list)
 	Q_PROPERTY(QColor color READ get_color WRITE set_color)
-	Q_PROPERTY(stratagus::faction* owner_faction MEMBER owner_faction READ get_owner_faction)
+	Q_PROPERTY(wyrmgus::faction* owner_faction MEMBER owner_faction READ get_owner_faction)
 	Q_PROPERTY(QVariantList building_classes READ get_building_classes_qvariant_list)
 	Q_PROPERTY(int population MEMBER population READ get_population)
 

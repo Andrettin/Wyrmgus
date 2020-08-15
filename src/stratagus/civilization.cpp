@@ -46,7 +46,7 @@
 #include "util/vector_util.h"
 #include "video/video.h"
 
-namespace stratagus {
+namespace wyrmgus {
 
 civilization::~civilization()
 {
@@ -516,7 +516,7 @@ std::string_view civilization::get_title_name(const government_type government_t
 	return string::empty_str;
 }
 
-std::string_view civilization::get_character_title_name(const character_title title_type, const int faction_type, stratagus::government_type government_type, const faction_tier tier, const gender gender) const
+std::string_view civilization::get_character_title_name(const character_title title_type, const int faction_type, wyrmgus::government_type government_type, const faction_tier tier, const gender gender) const
 {
 	auto find_iterator = this->character_title_names.find(title_type);
 	if (find_iterator != this->character_title_names.end()) {
@@ -655,7 +655,7 @@ std::string_view civilization::get_character_title_name(const character_title ti
 		case character_title::war_minister:
 			//return "War Minister"; //war minister sounds too modern, considering the technology tree we have up to now only goes to the medieval era
 			return "Marshal";
-		case stratagus::character_title::governor:
+		case wyrmgus::character_title::governor:
 			return "Governor";
 		case character_title::mayor:
 			return "Mayor";
@@ -669,7 +669,7 @@ std::string_view civilization::get_character_title_name(const character_title ti
 void civilization::process_character_title_name_scope(const sml_data &scope)
 {
 	const std::string &tag = scope.get_tag();
-	const stratagus::character_title title_type = GetCharacterTitleIdByName(tag);
+	const wyrmgus::character_title title_type = GetCharacterTitleIdByName(tag);
 
 	scope.for_each_child([&](const sml_data &child_scope) {
 		this->process_character_title_name_scope(title_type, child_scope);
@@ -688,7 +688,7 @@ void civilization::process_character_title_name_scope(const character_title titl
 	scope.for_each_property([&](const sml_property &property) {
 		const std::string &key = property.get_key();
 		const std::string &value = property.get_value();
-		const stratagus::government_type government_type = string_to_government_type(key);
+		const wyrmgus::government_type government_type = string_to_government_type(key);
 		character_title_names[title_type][faction_type][government_type][faction_tier::none][gender::none] = value;
 	});
 }

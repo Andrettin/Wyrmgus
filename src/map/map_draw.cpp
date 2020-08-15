@@ -116,7 +116,7 @@ bool CViewport::IsInsideMapArea(const PixelPos &screenPixelPos) const
 // Convert viewport coordinates into map pixel coordinates
 PixelPos CViewport::screen_to_map_pixel_pos(const PixelPos &screenPixelPos) const
 {
-	return this->screen_to_scaled_map_pixel_pos(screenPixelPos) / stratagus::defines::get()->get_scale_factor();
+	return this->screen_to_scaled_map_pixel_pos(screenPixelPos) / wyrmgus::defines::get()->get_scale_factor();
 }
 
 PixelPos CViewport::screen_to_scaled_map_pixel_pos(const PixelPos &screenPixelPos) const
@@ -130,7 +130,7 @@ PixelPos CViewport::screen_to_scaled_map_pixel_pos(const PixelPos &screenPixelPo
 // Convert map pixel coordinates into viewport coordinates
 PixelPos CViewport::map_to_screen_pixel_pos(const PixelPos &mapPixelPos) const
 {
-	return this->scaled_map_to_screen_pixel_pos(mapPixelPos * stratagus::defines::get()->get_scale_factor());
+	return this->scaled_map_to_screen_pixel_pos(mapPixelPos * wyrmgus::defines::get()->get_scale_factor());
 }
 
 PixelPos CViewport::scaled_map_to_screen_pixel_pos(const PixelPos &mapPixelPos) const
@@ -162,7 +162,7 @@ PixelPos CViewport::TilePosToScreen_Center(const Vec2i &tilePos) const
 {
 	const PixelPos topLeft = TilePosToScreen_TopLeft(tilePos);
 
-	return topLeft + stratagus::size::to_point(stratagus::defines::get()->get_scaled_tile_size()) / 2;
+	return topLeft + wyrmgus::size::to_point(wyrmgus::defines::get()->get_scaled_tile_size()) / 2;
 }
 
 /// convert tilepos coordonates into screen (take the center of the tile)
@@ -187,27 +187,27 @@ void CViewport::Set(const PixelPos &mapPos)
 
 	const PixelSize pixelSize = this->GetPixelSize();
 
-	x = std::min(x, (CMap::Map.Info.MapWidths.size() && UI.CurrentMapLayer ? UI.CurrentMapLayer->get_width() : CMap::Map.Info.MapWidth) * stratagus::defines::get()->get_scaled_tile_width() - (pixelSize.x) - 1 + UI.MapArea.ScrollPaddingRight);
-	y = std::min(y, (CMap::Map.Info.MapHeights.size() && UI.CurrentMapLayer ? UI.CurrentMapLayer->get_height() : CMap::Map.Info.MapHeight) * stratagus::defines::get()->get_scaled_tile_height() - (pixelSize.y) - 1 + UI.MapArea.ScrollPaddingBottom);
+	x = std::min(x, (CMap::Map.Info.MapWidths.size() && UI.CurrentMapLayer ? UI.CurrentMapLayer->get_width() : CMap::Map.Info.MapWidth) * wyrmgus::defines::get()->get_scaled_tile_width() - (pixelSize.x) - 1 + UI.MapArea.ScrollPaddingRight);
+	y = std::min(y, (CMap::Map.Info.MapHeights.size() && UI.CurrentMapLayer ? UI.CurrentMapLayer->get_height() : CMap::Map.Info.MapHeight) * wyrmgus::defines::get()->get_scaled_tile_height() - (pixelSize.y) - 1 + UI.MapArea.ScrollPaddingBottom);
 
-	this->MapPos.x = x / stratagus::defines::get()->get_scaled_tile_width();
-	if (x < 0 && x % stratagus::defines::get()->get_scaled_tile_width()) {
+	this->MapPos.x = x / wyrmgus::defines::get()->get_scaled_tile_width();
+	if (x < 0 && x % wyrmgus::defines::get()->get_scaled_tile_width()) {
 		this->MapPos.x--;
 	}
-	this->MapPos.y = y / stratagus::defines::get()->get_scaled_tile_height();
-	if (y < 0 && y % stratagus::defines::get()->get_scaled_tile_height()) {
+	this->MapPos.y = y / wyrmgus::defines::get()->get_scaled_tile_height();
+	if (y < 0 && y % wyrmgus::defines::get()->get_scaled_tile_height()) {
 		this->MapPos.y--;
 	}
-	this->Offset.x = x % stratagus::defines::get()->get_scaled_tile_width();
+	this->Offset.x = x % wyrmgus::defines::get()->get_scaled_tile_width();
 	if (this->Offset.x < 0) {
-		this->Offset.x += stratagus::defines::get()->get_scaled_tile_width();
+		this->Offset.x += wyrmgus::defines::get()->get_scaled_tile_width();
 	}
-	this->Offset.y = y % stratagus::defines::get()->get_scaled_tile_height();
+	this->Offset.y = y % wyrmgus::defines::get()->get_scaled_tile_height();
 	if (this->Offset.y < 0) {
-		this->Offset.y += stratagus::defines::get()->get_scaled_tile_height();
+		this->Offset.y += wyrmgus::defines::get()->get_scaled_tile_height();
 	}
-	this->MapWidth = (pixelSize.x + this->Offset.x - 1) / stratagus::defines::get()->get_scaled_tile_width() + 1;
-	this->MapHeight = (pixelSize.y + this->Offset.y - 1) / stratagus::defines::get()->get_scaled_tile_height() + 1;
+	this->MapWidth = (pixelSize.x + this->Offset.x - 1) / wyrmgus::defines::get()->get_scaled_tile_width() + 1;
+	this->MapHeight = (pixelSize.y + this->Offset.y - 1) / wyrmgus::defines::get()->get_scaled_tile_height() + 1;
 }
 
 /**
@@ -265,11 +265,11 @@ void CViewport::DrawMapBackgroundInViewport() const
 	int sy = this->MapPos.y;
 	int dy = this->TopLeftPos.y - this->Offset.y;
 	const int map_max = UI.CurrentMapLayer->get_width() * UI.CurrentMapLayer->get_height();
-	const stratagus::season *season = CMap::Map.MapLayers[UI.CurrentMapLayer->ID]->GetSeason();
+	const wyrmgus::season *season = CMap::Map.MapLayers[UI.CurrentMapLayer->ID]->GetSeason();
 
 	while (sy  < 0) {
 		sy++;
-		dy += stratagus::defines::get()->get_scaled_tile_height();
+		dy += wyrmgus::defines::get()->get_scaled_tile_height();
 	}
 	sy *=  UI.CurrentMapLayer->get_width();
 
@@ -279,13 +279,13 @@ void CViewport::DrawMapBackgroundInViewport() const
 		while (dx <= ex && (sx - sy < UI.CurrentMapLayer->get_width())) {
 			if (sx - sy < 0) {
 				++sx;
-				dx += stratagus::defines::get()->get_scaled_tile_width();
+				dx += wyrmgus::defines::get()->get_scaled_tile_width();
 				continue;
 			}
 			const CMapField &mf = *UI.CurrentMapLayer->Field(sx);
 
-			const stratagus::terrain_type *terrain = nullptr;
-			const stratagus::terrain_type *overlay_terrain = nullptr;
+			const wyrmgus::terrain_type *terrain = nullptr;
+			const wyrmgus::terrain_type *overlay_terrain = nullptr;
 			int solid_tile = 0;
 			int overlay_solid_tile = 0;
 
@@ -301,38 +301,38 @@ void CViewport::DrawMapBackgroundInViewport() const
 				overlay_solid_tile = mf.player_info->SeenOverlaySolidTile;
 			}
 
-			const std::vector<std::pair<stratagus::terrain_type *, short>> &transition_tiles = ReplayRevealMap ? mf.TransitionTiles : mf.player_info->SeenTransitionTiles;
-			const std::vector<std::pair<stratagus::terrain_type *, short>> &overlay_transition_tiles = ReplayRevealMap ? mf.OverlayTransitionTiles : mf.player_info->SeenOverlayTransitionTiles;
+			const std::vector<std::pair<wyrmgus::terrain_type *, short>> &transition_tiles = ReplayRevealMap ? mf.TransitionTiles : mf.player_info->SeenTransitionTiles;
+			const std::vector<std::pair<wyrmgus::terrain_type *, short>> &overlay_transition_tiles = ReplayRevealMap ? mf.OverlayTransitionTiles : mf.player_info->SeenOverlayTransitionTiles;
 
-			bool is_unpassable = overlay_terrain && (overlay_terrain->Flags & MapFieldUnpassable) && !stratagus::vector::contains(overlay_terrain->get_destroyed_tiles(), overlay_solid_tile);
+			bool is_unpassable = overlay_terrain && (overlay_terrain->Flags & MapFieldUnpassable) && !wyrmgus::vector::contains(overlay_terrain->get_destroyed_tiles(), overlay_solid_tile);
 			const bool is_space = terrain && terrain->Flags & MapFieldSpace;
-			const stratagus::time_of_day *time_of_day = nullptr;
+			const wyrmgus::time_of_day *time_of_day = nullptr;
 			if (!is_space) {
 				const bool is_underground = terrain && terrain->Flags & MapFieldUnderground;
-				time_of_day = is_underground ? stratagus::defines::get()->get_underground_time_of_day() : UI.CurrentMapLayer->GetTimeOfDay();
+				time_of_day = is_underground ? wyrmgus::defines::get()->get_underground_time_of_day() : UI.CurrentMapLayer->GetTimeOfDay();
 			}
-			const stratagus::player_color *player_color = (mf.get_owner() != nullptr) ? mf.get_owner()->get_player_color() : CPlayer::Players[PlayerNumNeutral]->get_player_color();
+			const wyrmgus::player_color *player_color = (mf.get_owner() != nullptr) ? mf.get_owner()->get_player_color() : CPlayer::Players[PlayerNumNeutral]->get_player_color();
 
 			if (terrain && terrain->get_graphics(season)) {
 				terrain->get_graphics(season)->DrawFrameClip(solid_tile + (terrain == mf.Terrain ? mf.AnimationFrame : 0), dx, dy, time_of_day);
 			}
 
 			for (size_t i = 0; i != transition_tiles.size(); ++i) {
-				const stratagus::terrain_type *transition_terrain = transition_tiles[i].first;
+				const wyrmgus::terrain_type *transition_terrain = transition_tiles[i].first;
 
 				if (transition_terrain->get_graphics(season)) {
 					const bool is_transition_space = transition_terrain && transition_terrain->Flags & MapFieldSpace;
-					const stratagus::time_of_day *transition_time_of_day = nullptr;
+					const wyrmgus::time_of_day *transition_time_of_day = nullptr;
 					if (!is_transition_space) {
 						const bool is_transition_underground = transition_terrain->Flags & MapFieldUnderground;
-						transition_time_of_day = is_transition_underground ? stratagus::defines::get()->get_underground_time_of_day() : UI.CurrentMapLayer->GetTimeOfDay();
+						transition_time_of_day = is_transition_underground ? wyrmgus::defines::get()->get_underground_time_of_day() : UI.CurrentMapLayer->GetTimeOfDay();
 					}
 					transition_terrain->get_graphics(season)->DrawFrameClip(transition_tiles[i].second, dx, dy, transition_time_of_day);
 				}
 			}
 
-			if (mf.get_owner() != nullptr && mf.get_ownership_border_tile() != -1 && stratagus::defines::get()->get_border_terrain_type() && is_unpassable) { //if the tile is not passable, draw the border under its overlay, but otherwise, draw the border over it
-				CPlayerColorGraphic *border_graphics = stratagus::defines::get()->get_border_terrain_type()->get_graphics(season);
+			if (mf.get_owner() != nullptr && mf.get_ownership_border_tile() != -1 && wyrmgus::defines::get()->get_border_terrain_type() && is_unpassable) { //if the tile is not passable, draw the border under its overlay, but otherwise, draw the border over it
+				CPlayerColorGraphic *border_graphics = wyrmgus::defines::get()->get_border_terrain_type()->get_graphics(season);
 				if (border_graphics != nullptr) {
 					border_graphics->DrawPlayerColorFrameClip(player_color, mf.get_ownership_border_tile(), dx, dy, nullptr);
 				}
@@ -346,7 +346,7 @@ void CViewport::DrawMapBackgroundInViewport() const
 			}
 
 			for (size_t i = 0; i != overlay_transition_tiles.size(); ++i) {
-				const stratagus::terrain_type *overlay_transition_terrain = overlay_transition_tiles[i].first;
+				const wyrmgus::terrain_type *overlay_transition_terrain = overlay_transition_tiles[i].first;
 				if (overlay_transition_terrain->has_transition_mask()) {
 					continue;
 				}
@@ -358,25 +358,25 @@ void CViewport::DrawMapBackgroundInViewport() const
 			}
 
 			//if the tile is not passable, draw the border under its overlay, but otherwise, draw the border over it
-			if (mf.get_owner() != nullptr && mf.get_ownership_border_tile() != -1 && stratagus::defines::get()->get_border_terrain_type() && !is_unpassable) {
-				CPlayerColorGraphic *border_graphics = stratagus::defines::get()->get_border_terrain_type()->get_graphics(season);
+			if (mf.get_owner() != nullptr && mf.get_ownership_border_tile() != -1 && wyrmgus::defines::get()->get_border_terrain_type() && !is_unpassable) {
+				CPlayerColorGraphic *border_graphics = wyrmgus::defines::get()->get_border_terrain_type()->get_graphics(season);
 				if (border_graphics != nullptr) {
 					border_graphics->DrawPlayerColorFrameClip(player_color, mf.get_ownership_border_tile(), dx, dy, nullptr);
 				}
 			}
 
 			for (size_t i = 0; i != overlay_transition_tiles.size(); ++i) {
-				const stratagus::terrain_type *overlay_transition_terrain = overlay_transition_tiles[i].first;
+				const wyrmgus::terrain_type *overlay_transition_terrain = overlay_transition_tiles[i].first;
 				if (overlay_transition_terrain->get_elevation_graphics()) {
 					overlay_transition_terrain->get_elevation_graphics()->DrawFrameClip(overlay_transition_tiles[i].second, dx, dy, time_of_day);
 				}
 			}
 
 			++sx;
-			dx += stratagus::defines::get()->get_scaled_tile_width();
+			dx += wyrmgus::defines::get()->get_scaled_tile_width();
 		}
 		sy += UI.CurrentMapLayer->get_width();
-		dy += stratagus::defines::get()->get_scaled_tile_height();
+		dy += wyrmgus::defines::get()->get_scaled_tile_height();
 	}
 }
 

@@ -27,11 +27,11 @@
 
 #pragma once
 
-namespace stratagus {
+namespace wyrmgus {
 	class degree_scaling;
 }
 
-namespace stratagus::geocoordinate {
+namespace wyrmgus::geocoordinate {
 
 static constexpr int longitude_size = 360;
 static constexpr int latitude_size = 180;

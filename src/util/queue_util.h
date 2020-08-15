@@ -31,7 +31,7 @@
 
 #pragma once
 
-namespace stratagus::queue {
+namespace wyrmgus::queue {
 
 template <typename T>
 T take(std::queue<T> &queue)

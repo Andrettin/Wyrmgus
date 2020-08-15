@@ -40,7 +40,7 @@
 #include "upgrade/upgrade_structs.h"
 #include "video/video.h"
 
-namespace stratagus {
+namespace wyrmgus {
 
 const age *age::current_age = nullptr;
 
@@ -165,11 +165,11 @@ void age::initialize()
 */
 void SetCurrentAge(const std::string &age_ident)
 {
-	stratagus::age *age = stratagus::age::get(age_ident);
+	wyrmgus::age *age = wyrmgus::age::get(age_ident);
 	
 	if (!age) {
 		return;
 	}
 	
-	stratagus::age::current_age = age;
+	wyrmgus::age::current_age = age;
 }

@@ -45,7 +45,7 @@ class CPlayer;
 class CUnit;
 struct lua_State;
 
-namespace stratagus {
+namespace wyrmgus {
 	class faction;
 	class missile_type;
 	class spell;
@@ -63,7 +63,7 @@ public:
 	virtual ~SpellActionType() {};
 
 	virtual void ProcessConfigData(const CConfigData *config_data) = 0;
-	virtual int Cast(CUnit &caster, const stratagus::spell &spell, CUnit *target, const Vec2i &goalPos, int z, int modifier) = 0;
+	virtual int Cast(CUnit &caster, const wyrmgus::spell &spell, CUnit *target, const Vec2i &goalPos, int z, int modifier) = 0;
 	virtual void Parse(lua_State *l, int startIndex, int endIndex) = 0;
 
 	const int ModifyManaCaster;
@@ -159,8 +159,8 @@ public:
 	//Wyrmgus start
 	char ThrustingWeapon;	/// Caster has a thrusting weapon as the current weapon.
 	char FactionUnit;		/// Caster is a faction-specific unit.
-	const stratagus::civilization *civilization_equivalent = nullptr;
-	const stratagus::faction *FactionEquivalent = nullptr;	/// Caster is of the same civilization as this faction, and the faction has its own unit of the caster's class.
+	const wyrmgus::civilization *civilization_equivalent = nullptr;
+	const wyrmgus::faction *FactionEquivalent = nullptr;	/// Caster is of the same civilization as this faction, and the faction has its own unit of the caster's class.
 	//Wyrmgus end
 
 	char *BoolFlag;         /// User defined boolean flag.
@@ -213,7 +213,7 @@ public:
 	LuaCallback *PositionAutoCast = nullptr;
 };
 
-namespace stratagus {
+namespace wyrmgus {
 
 class spell final : public named_data_entry, public data_type<spell>, public CDataType
 {
@@ -223,7 +223,7 @@ public:
 	static constexpr const char *class_identifier = "spell";
 	static constexpr const char *database_folder = "spells";
 
-	static spell *add(const std::string &identifier, const stratagus::module *module);
+	static spell *add(const std::string &identifier, const wyrmgus::module *module);
 
 	spell(const std::string &identifier);
 	~spell();
@@ -284,17 +284,17 @@ extern void SpellCclRegister();
 extern void InitSpells();
 
 /// returns true if spell can be casted (enough mana, valid target)
-extern bool CanCastSpell(const CUnit &caster, const stratagus::spell &spell,
+extern bool CanCastSpell(const CUnit &caster, const wyrmgus::spell &spell,
 						 const CUnit *target, const Vec2i &goalPos, const CMapLayer *map_layer);
 
 /// cast spell on target unit or place at x,y
-extern int SpellCast(CUnit &caster, const stratagus::spell &spell,
+extern int SpellCast(CUnit &caster, const wyrmgus::spell &spell,
 					 CUnit *target, const Vec2i &goalPos, CMapLayer *map_layer);
 
 extern char StringToCondition(const std::string &str);
 
 /// auto cast the spell if possible
-extern int AutoCastSpell(CUnit &caster, const stratagus::spell &spell);
+extern int AutoCastSpell(CUnit &caster, const wyrmgus::spell &spell);
 
 /// return 0, 1, 2 for true, only, false.
 extern char Ccl2Condition(lua_State *l, const char *value);

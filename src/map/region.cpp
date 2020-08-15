@@ -30,7 +30,7 @@
 #include "util/container_util.h"
 #include "util/vector_util.h"
 
-namespace stratagus {
+namespace wyrmgus {
 
 region::region(const std::string &identifier) : data_entry(identifier)
 {

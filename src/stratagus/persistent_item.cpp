@@ -40,7 +40,7 @@
 #include "upgrade/upgrade_modifier.h"
 #include "util/string_util.h"
 
-namespace stratagus {
+namespace wyrmgus {
 
 persistent_item::persistent_item(const CUnit *item_unit, character *owner) : persistent_item(item_unit->Type, owner)
 {
@@ -152,7 +152,7 @@ void persistent_item::ProcessConfigData(const CConfigData *config_data)
 		if (key == "name") {
 			this->Name = value;
 		} else if (key == "type") {
-			stratagus::unit_type *unit_type = unit_type::get(value);
+			wyrmgus::unit_type *unit_type = unit_type::get(value);
 			this->unit_type = unit_type;
 		} else if (key == "prefix") {
 			CUpgrade *upgrade = CUpgrade::try_get(value);
@@ -230,7 +230,7 @@ item_slot persistent_item::get_item_slot() const
 
 std::string GetItemEffectsString(const std::string &item_ident)
 {
-	const stratagus::unit_type *item = stratagus::unit_type::get(item_ident);
+	const wyrmgus::unit_type *item = wyrmgus::unit_type::get(item_ident);
 
 	std::string item_effects_string;
 	

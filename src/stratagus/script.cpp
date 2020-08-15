@@ -89,7 +89,7 @@ struct UStrInt {
 /// Get component for unit variable.
 extern UStrInt GetComponent(const CUnit &unit, int index, EnumVariable e, int t);
 /// Get component for unit type variable.
-extern UStrInt GetComponent(const stratagus::unit_type &type, int index, EnumVariable e, int t);
+extern UStrInt GetComponent(const wyrmgus::unit_type &type, int index, EnumVariable e, int t);
 
 //Wyrmgus start
 std::map<std::string, std::string> DLCFileEquivalency;
@@ -500,9 +500,9 @@ static CUnit **Str2UnitRef(lua_State *l, const char *s)
 **
 **  @todo better check for error (restrict param).
 */
-static const stratagus::unit_type **Str2TypeRef(lua_State *l, const char *s)
+static const wyrmgus::unit_type **Str2TypeRef(lua_State *l, const char *s)
 {
-	const stratagus::unit_type **res = nullptr; // Result.
+	const wyrmgus::unit_type **res = nullptr; // Result.
 
 	Assert(l);
 	if (!strcmp(s, "Type")) {
@@ -573,9 +573,9 @@ static int **Str2ResourceRef(lua_State *l, const char *s)
 **
 **  @todo better check for error (restrict param).
 */
-static const stratagus::faction **Str2FactionRef(lua_State *l, const char *s)
+static const wyrmgus::faction **Str2FactionRef(lua_State *l, const char *s)
 {
-	const stratagus::faction **res = nullptr; // Result.
+	const wyrmgus::faction **res = nullptr; // Result.
 
 	Assert(l);
 	if (!strcmp(s, "Faction")) {
@@ -631,9 +631,9 @@ UnitDesc *CclParseUnitDesc(lua_State *l)
 **
 **  @return   unit type referernce definition.
 */
-const stratagus::unit_type **CclParseTypeDesc(lua_State *l)
+const wyrmgus::unit_type **CclParseTypeDesc(lua_State *l)
 {
-	const stratagus::unit_type **res = nullptr;
+	const wyrmgus::unit_type **res = nullptr;
 
 	if (lua_isstring(l, -1)) {
 		res = Str2TypeRef(l, LuaToString(l, -1));
@@ -692,9 +692,9 @@ int **CclParseResourceDesc(lua_State *l)
 **
 **  @return   faction reference definition.
 */
-const stratagus::faction **CclParseFactionDesc(lua_State *l)
+const wyrmgus::faction **CclParseFactionDesc(lua_State *l)
 {
-	const stratagus::faction **res = nullptr;
+	const wyrmgus::faction **res = nullptr;
 
 	if (lua_isstring(l, -1)) {
 		res = Str2FactionRef(l, LuaToString(l, -1));
@@ -877,15 +877,15 @@ static int GetPlayerData(const int player_index, const char *prop, const char *a
 		//Wyrmgus end
 	} else if (!strcmp(prop, "UnitTypesCount")) {
 		const std::string unit(arg);
-		stratagus::unit_type *type = stratagus::unit_type::get(unit);
+		wyrmgus::unit_type *type = wyrmgus::unit_type::get(unit);
 		return player->GetUnitTypeCount(type);
 	} else if (!strcmp(prop, "UnitTypesUnderConstructionCount")) {
 		const std::string unit(arg);
-		stratagus::unit_type *type = stratagus::unit_type::get(unit);
+		wyrmgus::unit_type *type = wyrmgus::unit_type::get(unit);
 		return player->GetUnitTypeUnderConstructionCount(type);
 	} else if (!strcmp(prop, "UnitTypesAiActiveCount")) {
 		const std::string unit(arg);
-		stratagus::unit_type *type = stratagus::unit_type::get(unit);
+		wyrmgus::unit_type *type = wyrmgus::unit_type::get(unit);
 		return player->GetUnitTypeAiActiveCount(type);
 	} else if (!strcmp(prop, "AiEnabled")) {
 		return player->AiEnabled;
@@ -1384,7 +1384,7 @@ CUnit *EvalUnit(const UnitDesc *unitdesc)
 int EvalNumber(const NumberDesc *number)
 {
 	CUnit *unit;
-	const stratagus::unit_type **type;
+	const wyrmgus::unit_type **type;
 	std::string s;
 	int a;
 	int b;
@@ -1528,10 +1528,10 @@ std::string EvalString(const StringDesc *s)
 	std::string tmp1;   // Temporary string.
 	const CUnit *unit;  // Temporary unit
 	//Wyrmgus start
-	const stratagus::unit_type **type;	// Temporary unit type
+	const wyrmgus::unit_type **type;	// Temporary unit type
 	const CUpgrade **upgrade;	// Temporary upgrade
 	int **resource;		// Temporary resource
-	const stratagus::faction **faction;	// Temporary faction
+	const wyrmgus::faction **faction;	// Temporary faction
 	//Wyrmgus end
 	int player_index;
 
@@ -1548,7 +1548,7 @@ std::string EvalString(const StringDesc *s)
 			}
 			return res;
 		case EString_String : {   // 42 -> "42".
-			return stratagus::number::to_formatted_string(EvalNumber(s->D.Number));
+			return wyrmgus::number::to_formatted_string(EvalNumber(s->D.Number));
 		}
 		case EString_InverseVideo : // "a" -> "~<a~>"
 			tmp1 = EvalString(s->D.String);
@@ -1615,9 +1615,9 @@ std::string EvalString(const StringDesc *s)
 		case EString_UnitSettlementName : // name of the unit's settlement
 			unit = EvalUnit(s->D.Unit);
 			if (unit != nullptr && unit->settlement != nullptr && unit->settlement->get_site_unit() != nullptr) {
-				const stratagus::civilization *civilization = unit->settlement->get_site_unit()->Type->get_civilization();
-				if (civilization != nullptr && unit->settlement->get_site_unit()->Player->Faction != -1 && (unit->settlement->get_site_unit()->Player->Race == civilization->ID || unit->settlement->get_site_unit()->Type == stratagus::faction::get_all()[unit->settlement->get_site_unit()->Player->Faction]->get_class_unit_type(unit->settlement->get_site_unit()->Type->get_unit_class()))) {
-					civilization = unit->settlement->get_site_unit()->Player->Race != -1 ? stratagus::civilization::get_all()[unit->settlement->get_site_unit()->Player->Race] : nullptr;
+				const wyrmgus::civilization *civilization = unit->settlement->get_site_unit()->Type->get_civilization();
+				if (civilization != nullptr && unit->settlement->get_site_unit()->Player->Faction != -1 && (unit->settlement->get_site_unit()->Player->Race == civilization->ID || unit->settlement->get_site_unit()->Type == wyrmgus::faction::get_all()[unit->settlement->get_site_unit()->Player->Faction]->get_class_unit_type(unit->settlement->get_site_unit()->Type->get_unit_class()))) {
+					civilization = unit->settlement->get_site_unit()->Player->Race != -1 ? wyrmgus::civilization::get_all()[unit->settlement->get_site_unit()->Player->Race] : nullptr;
 				}
 				return unit->settlement->get_cultural_name(civilization);
 			} else {
@@ -1673,7 +1673,7 @@ std::string EvalString(const StringDesc *s)
 			if (type != nullptr) {
 				std::string str;
 				if ((**type).BoolFlag[ITEM_INDEX].value) {
-					str = stratagus::item_class_to_string((**type).get_item_class());
+					str = wyrmgus::item_class_to_string((**type).get_item_class());
 					str[0] = toupper(str[0]);
 					size_t loc;
 					while ((loc = str.find("_")) != std::string::npos) {
@@ -1728,7 +1728,7 @@ std::string EvalString(const StringDesc *s)
 				std::string improve_incomes;
 				bool first = true;
 				for (int res = 1; res < MaxCosts; ++res) {
-					if ((**type).Stats[CPlayer::GetThisPlayer()->Index].ImproveIncomes[res] > stratagus::resource::get_all()[res]->DefaultIncome) {
+					if ((**type).Stats[CPlayer::GetThisPlayer()->Index].ImproveIncomes[res] > wyrmgus::resource::get_all()[res]->DefaultIncome) {
 						if (!first) {
 							improve_incomes += "\n";
 						} else {
@@ -1736,7 +1736,7 @@ std::string EvalString(const StringDesc *s)
 						}
 						improve_incomes += IdentToName(DefaultResourceNames[res]);
 						improve_incomes += " Processing Bonus: +";
-						improve_incomes += std::to_string((long long) (**type).Stats[CPlayer::GetThisPlayer()->Index].ImproveIncomes[res] - stratagus::resource::get_all()[res]->DefaultIncome);
+						improve_incomes += std::to_string((long long) (**type).Stats[CPlayer::GetThisPlayer()->Index].ImproveIncomes[res] - wyrmgus::resource::get_all()[res]->DefaultIncome);
 						improve_incomes += "%";
 					}
 				}
@@ -1829,7 +1829,7 @@ std::string EvalString(const StringDesc *s)
 					if (!has_settlement) {
 						settlements_string += "~<";
 					}
-					settlements_string += (**faction).Cores[i]->get_cultural_name(CPlayer::GetThisPlayer()->Race != -1 ? stratagus::civilization::get_all()[CPlayer::GetThisPlayer()->Race] : nullptr);
+					settlements_string += (**faction).Cores[i]->get_cultural_name(CPlayer::GetThisPlayer()->Race != -1 ? wyrmgus::civilization::get_all()[CPlayer::GetThisPlayer()->Race] : nullptr);
 					if (!has_settlement) {
 						settlements_string += "~>";
 					}
@@ -1857,7 +1857,7 @@ std::string EvalString(const StringDesc *s)
 			if (resource != nullptr) {
 				std::string conversion_rates;
 				bool first = true;
-				for (const stratagus::resource *child_resource : stratagus::resource::get_all()[(**resource)]->ChildResources) {
+				for (const wyrmgus::resource *child_resource : wyrmgus::resource::get_all()[(**resource)]->ChildResources) {
 					if (child_resource->ID == TradeCost || child_resource->Hidden) {
 						continue;
 					}
@@ -1868,7 +1868,7 @@ std::string EvalString(const StringDesc *s)
 					}
 					conversion_rates += child_resource->get_name();
 					conversion_rates += " to ";
-					conversion_rates += stratagus::resource::get_all()[(**resource)]->get_name();
+					conversion_rates += wyrmgus::resource::get_all()[(**resource)]->get_name();
 					conversion_rates += " Conversion Rate: ";
 					conversion_rates += std::to_string((long long) child_resource->FinalResourceConversionRate);
 					conversion_rates += "%";
@@ -1882,14 +1882,14 @@ std::string EvalString(const StringDesc *s)
 			if (resource != nullptr) {
 				std::string improve_incomes;
 				bool first = true;
-				if (CPlayer::GetThisPlayer()->Incomes[(**resource)] > stratagus::resource::get_all()[(**resource)]->DefaultIncome) {
+				if (CPlayer::GetThisPlayer()->Incomes[(**resource)] > wyrmgus::resource::get_all()[(**resource)]->DefaultIncome) {
 					first = false;
-					improve_incomes += stratagus::resource::get_all()[(**resource)]->get_name();
+					improve_incomes += wyrmgus::resource::get_all()[(**resource)]->get_name();
 					improve_incomes += " Processing Bonus: +";
-					improve_incomes += std::to_string((long long) CPlayer::GetThisPlayer()->Incomes[(**resource)] - stratagus::resource::get_all()[(**resource)]->DefaultIncome);
+					improve_incomes += std::to_string((long long) CPlayer::GetThisPlayer()->Incomes[(**resource)] - wyrmgus::resource::get_all()[(**resource)]->DefaultIncome);
 					improve_incomes += "%";
 				}
-				for (const stratagus::resource *child_resource : stratagus::resource::get_all()[(**resource)]->ChildResources) {
+				for (const wyrmgus::resource *child_resource : wyrmgus::resource::get_all()[(**resource)]->ChildResources) {
 					if (child_resource->ID == TradeCost || child_resource->Hidden) {
 						continue;
 					}
@@ -3740,12 +3740,12 @@ void SavePreferences()
 //Wyrmgus start
 void DeleteModFaction(const std::string &faction_name)
 {
-	stratagus::faction::remove(faction_name);
+	wyrmgus::faction::remove(faction_name);
 }
 
 void DeleteModUnitType(const std::string &unit_type_ident)
 {
-	stratagus::unit_type *unit_type = stratagus::unit_type::get(unit_type_ident);
+	wyrmgus::unit_type *unit_type = wyrmgus::unit_type::get(unit_type_ident);
 	
 	if (Editor.Running == EditorEditing) {
 		std::vector<CUnit *> units_to_remove;
@@ -3764,13 +3764,13 @@ void DeleteModUnitType(const std::string &unit_type_ident)
 		Editor.UnitTypes.erase(std::remove(Editor.UnitTypes.begin(), Editor.UnitTypes.end(), unit_type->Ident), Editor.UnitTypes.end());
 		RecalculateShownUnits();
 	}
-	for (stratagus::civilization *civilization : stratagus::civilization::get_all()) {
+	for (wyrmgus::civilization *civilization : wyrmgus::civilization::get_all()) {
 		civilization->remove_class_unit_type(unit_type);
 	}
-	for (stratagus::faction *faction : stratagus::faction::get_all()) {
+	for (wyrmgus::faction *faction : wyrmgus::faction::get_all()) {
 		faction->remove_class_unit_type(unit_type);
 	}
-	for (stratagus::unit_type *other_unit_type : stratagus::unit_type::get_all()) { //remove this unit from the "Trains", "TrainedBy", "Drops" and "AiDrops" vectors of other unit types
+	for (wyrmgus::unit_type *other_unit_type : wyrmgus::unit_type::get_all()) { //remove this unit from the "Trains", "TrainedBy", "Drops" and "AiDrops" vectors of other unit types
 		if (std::find(other_unit_type->Trains.begin(), other_unit_type->Trains.end(), unit_type) != other_unit_type->Trains.end()) {
 			other_unit_type->Trains.erase(std::remove(other_unit_type->Trains.begin(), other_unit_type->Trains.end(), unit_type), other_unit_type->Trains.end());
 		}
@@ -3784,29 +3784,29 @@ void DeleteModUnitType(const std::string &unit_type_ident)
 			other_unit_type->AiDrops.erase(std::remove(other_unit_type->AiDrops.begin(), other_unit_type->AiDrops.end(), unit_type), other_unit_type->AiDrops.end());
 		}
 	}
-	const int buttons_size = stratagus::button::get_all().size();
+	const int buttons_size = wyrmgus::button::get_all().size();
 	for (int j = (buttons_size - 1); j >= 0; --j) {
-		if (stratagus::button::get_all()[j]->UnitMask.find(unit_type->Ident) != std::string::npos) { //remove this unit from the "ForUnit" array of buttons
-			stratagus::button::get_all()[j]->UnitMask = FindAndReplaceString(stratagus::button::get_all()[j]->UnitMask, unit_type->Ident + ",", "");
+		if (wyrmgus::button::get_all()[j]->UnitMask.find(unit_type->Ident) != std::string::npos) { //remove this unit from the "ForUnit" array of buttons
+			wyrmgus::button::get_all()[j]->UnitMask = FindAndReplaceString(wyrmgus::button::get_all()[j]->UnitMask, unit_type->Ident + ",", "");
 		}
-		if (stratagus::button::get_all()[j]->Value == unit_type->Slot && stratagus::button::get_all()[j]->ValueStr == unit_type->Ident) {
-			stratagus::button::remove(stratagus::button::get_all()[j]);
+		if (wyrmgus::button::get_all()[j]->Value == unit_type->Slot && wyrmgus::button::get_all()[j]->ValueStr == unit_type->Ident) {
+			wyrmgus::button::remove(wyrmgus::button::get_all()[j]);
 		}
 	}
-	stratagus::unit_type::remove(unit_type);
+	wyrmgus::unit_type::remove(unit_type);
 }
 
 void DisableMod(const std::string &mod_file)
 {
-	const int unit_types_size = stratagus::unit_type::get_all().size();
+	const int unit_types_size = wyrmgus::unit_type::get_all().size();
 	for (int i = (unit_types_size - 1); i >= 0; --i) {
 		
-		if (stratagus::unit_type::get_all()[i]->Mod == mod_file) {
-			DeleteModUnitType(stratagus::unit_type::get_all()[i]->Ident);
+		if (wyrmgus::unit_type::get_all()[i]->Mod == mod_file) {
+			DeleteModUnitType(wyrmgus::unit_type::get_all()[i]->Ident);
 		}
 	}
 		
-	for (stratagus::unit_type *unit_type : stratagus::unit_type::get_all()) {
+	for (wyrmgus::unit_type *unit_type : wyrmgus::unit_type::get_all()) {
 		if (unit_type->ModTrains.find(mod_file) != unit_type->ModTrains.end()) {
 			unit_type->ModTrains.erase(mod_file);
 			unit_type->RemoveButtons(ButtonCmd::None, mod_file);
@@ -3823,15 +3823,15 @@ void DisableMod(const std::string &mod_file)
 		}
 	}
 	
-	std::vector<stratagus::faction *> factions_to_remove;
-	for (stratagus::faction *faction : stratagus::faction::get_all()) {
+	std::vector<wyrmgus::faction *> factions_to_remove;
+	for (wyrmgus::faction *faction : wyrmgus::faction::get_all()) {
 		if (faction->Mod == mod_file) {
 			factions_to_remove.push_back(faction);
 		}
 	}
 
-	for (stratagus::faction *faction : factions_to_remove) {
-		stratagus::faction::remove(faction);
+	for (wyrmgus::faction *faction : factions_to_remove) {
+		wyrmgus::faction::remove(faction);
 	}
 }
 

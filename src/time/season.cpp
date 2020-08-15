@@ -34,7 +34,7 @@
 #include "mod.h"
 #include "video/video.h"
 
-namespace stratagus {
+namespace wyrmgus {
 
 void season::ProcessConfigData(const CConfigData *config_data)
 {
@@ -85,7 +85,7 @@ void season::ProcessConfigData(const CConfigData *config_data)
 			}
 			
 			this->G = CGraphic::New(file, size.x, size.y);
-			this->G->Load(false, stratagus::defines::get()->get_scale_factor());
+			this->G->Load(false, wyrmgus::defines::get()->get_scale_factor());
 		} else {
 			fprintf(stderr, "Invalid season property: \"%s\".\n", child_config_data->Tag.c_str());
 		}

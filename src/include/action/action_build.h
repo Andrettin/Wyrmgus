@@ -31,13 +31,13 @@
 
 #include "actions.h"
 
-namespace stratagus {
+namespace wyrmgus {
 	class site;
 }
 
 class COrder_Build : public COrder
 {
-	friend COrder *COrder::NewActionBuild(const CUnit &builder, const Vec2i &pos, stratagus::unit_type &building, int z, const stratagus::site *settlement);
+	friend COrder *COrder::NewActionBuild(const CUnit &builder, const Vec2i &pos, wyrmgus::unit_type &building, int z, const wyrmgus::site *settlement);
 public:
 	COrder_Build() : COrder(UnitAction::Build), Type(nullptr), State(0), Range(0), MapLayer(0)
 	{
@@ -57,12 +57,12 @@ public:
 	virtual void UpdatePathFinderData(PathFinderInput &input);
 	
 	//Wyrmgus start
-	void ConvertUnitType(const CUnit &unit, stratagus::unit_type &newType);
+	void ConvertUnitType(const CUnit &unit, wyrmgus::unit_type &newType);
 	//Wyrmgus end
 
 	virtual void AiUnitKilled(CUnit &unit);
 
-	const stratagus::unit_type &GetUnitType() const { return *Type; }
+	const wyrmgus::unit_type &GetUnitType() const { return *Type; }
 	virtual const Vec2i GetGoalPos() const { return goalPos; }
 	//Wyrmgus start
 	virtual const int GetGoalMapLayer() const { return MapLayer; }
@@ -75,13 +75,13 @@ private:
 	bool BuildFromOutside(CUnit &unit) const;
 	void HelpBuild(CUnit &unit, CUnit &building);
 private:
-	stratagus::unit_type *Type;        /// build a unit of this unit-type
+	wyrmgus::unit_type *Type;        /// build a unit of this unit-type
 	CUnitPtr BuildingUnit;  /// unit builded.
 	int State;
 	int Range;
 	Vec2i goalPos;
 	//Wyrmgus start
 	int MapLayer;
-	const stratagus::site *settlement = nullptr;
+	const wyrmgus::site *settlement = nullptr;
 	//Wyrmgus end
 };

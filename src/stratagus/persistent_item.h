@@ -35,7 +35,7 @@ struct lua_State;
 int CclDefineCharacter(lua_State *l);
 int CclDefineCustomHero(lua_State *l);
 
-namespace stratagus {
+namespace wyrmgus {
 
 class character;
 class sml_data;

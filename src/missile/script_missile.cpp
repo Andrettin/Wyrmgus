@@ -40,7 +40,7 @@
 #include "unit/unit_type.h"
 #include "video/video.h"
 
-namespace stratagus {
+namespace wyrmgus {
 
 void missile_type::Load(lua_State *l)
 {
@@ -181,7 +181,7 @@ static int CclDefineMissileType(lua_State *l)
 
 	// Slot identifier
 	const char *str = LuaToString(l, 1);
-	stratagus::missile_type *mtype = stratagus::missile_type::get_or_add(str, nullptr);
+	wyrmgus::missile_type *mtype = wyrmgus::missile_type::get_or_add(str, nullptr);
 	mtype->Load(l);
 	return 0;
 }
@@ -193,7 +193,7 @@ static int CclDefineMissileType(lua_State *l)
 */
 static int CclMissile(lua_State *l)
 {
-	stratagus::missile_type *type = nullptr;
+	wyrmgus::missile_type *type = nullptr;
 	PixelPos position(-1, -1);
 	PixelPos destination(-1, -1);
 	PixelPos source(-1, -1);
@@ -208,7 +208,7 @@ static int CclMissile(lua_State *l)
 		++j;
 
 		if (!strcmp(value, "type")) {
-			type = stratagus::missile_type::try_get(LuaToString(l, j + 1));
+			type = wyrmgus::missile_type::try_get(LuaToString(l, j + 1));
 		} else if (!strcmp(value, "pos")) {
 			CclGetPos(l, &position.x, &position.y, j + 1);
 		} else if (!strcmp(value, "origin-pos")) {
@@ -330,7 +330,7 @@ static int CclDefineBurningBuilding(lua_State *l)
 			if (!strcmp(value, "percent")) {
 				ptr->Percent = LuaToNumber(l, j + 1, k + 1);
 			} else if (!strcmp(value, "missile")) {
-				ptr->Missile = stratagus::missile_type::get(LuaToString(l, j + 1, k + 1));
+				ptr->Missile = wyrmgus::missile_type::get(LuaToString(l, j + 1, k + 1));
 			}
 		}
 		BurningBuildingFrames.insert(BurningBuildingFrames.begin(), ptr);
@@ -352,7 +352,7 @@ static int CclCreateMissile(lua_State *l)
 	}
 
 	const std::string name = LuaToString(l, 1);
-	const stratagus::missile_type *mtype = stratagus::missile_type::get(name);
+	const wyrmgus::missile_type *mtype = wyrmgus::missile_type::get(name);
 
 	PixelPos startpos, endpos;
 	CclGetPos(l, &startpos.x, &startpos.y, 2);

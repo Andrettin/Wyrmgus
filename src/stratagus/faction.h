@@ -41,7 +41,7 @@ class LuaCallback;
 
 int CclDefineFaction(lua_State *l);
 
-namespace stratagus {
+namespace wyrmgus {
 
 class character;
 class civilization;
@@ -61,21 +61,21 @@ class faction final : public detailed_data_entry, public data_type<faction>
 {
 	Q_OBJECT
 
-	Q_PROPERTY(stratagus::civilization* civilization MEMBER civilization READ get_civilization)
-	Q_PROPERTY(stratagus::icon* icon MEMBER icon READ get_icon)
-	Q_PROPERTY(stratagus::player_color* color MEMBER color READ get_color)
-	Q_PROPERTY(stratagus::faction_tier default_tier MEMBER default_tier READ get_default_tier)
-	Q_PROPERTY(stratagus::faction_tier min_tier MEMBER min_tier READ get_min_tier)
-	Q_PROPERTY(stratagus::faction_tier max_tier MEMBER max_tier READ get_max_tier)
-	Q_PROPERTY(stratagus::government_type default_government_type MEMBER default_government_type READ get_default_government_type)
-	Q_PROPERTY(stratagus::site* default_capital MEMBER default_capital READ get_default_capital)
+	Q_PROPERTY(wyrmgus::civilization* civilization MEMBER civilization READ get_civilization)
+	Q_PROPERTY(wyrmgus::icon* icon MEMBER icon READ get_icon)
+	Q_PROPERTY(wyrmgus::player_color* color MEMBER color READ get_color)
+	Q_PROPERTY(wyrmgus::faction_tier default_tier MEMBER default_tier READ get_default_tier)
+	Q_PROPERTY(wyrmgus::faction_tier min_tier MEMBER min_tier READ get_min_tier)
+	Q_PROPERTY(wyrmgus::faction_tier max_tier MEMBER max_tier READ get_max_tier)
+	Q_PROPERTY(wyrmgus::government_type default_government_type MEMBER default_government_type READ get_default_government_type)
+	Q_PROPERTY(wyrmgus::site* default_capital MEMBER default_capital READ get_default_capital)
 	Q_PROPERTY(bool simple_name MEMBER simple_name READ uses_simple_name)
 	Q_PROPERTY(bool short_name MEMBER short_name READ uses_short_name)
 	Q_PROPERTY(QStringList ship_names READ get_ship_names_qstring_list)
-	Q_PROPERTY(stratagus::faction_tier tier MEMBER tier READ get_tier)
-	Q_PROPERTY(stratagus::government_type government_type MEMBER government_type READ get_government_type)
-	Q_PROPERTY(stratagus::site* capital MEMBER capital READ get_capital)
-	Q_PROPERTY(stratagus::dynasty* dynasty MEMBER dynasty READ get_dynasty)
+	Q_PROPERTY(wyrmgus::faction_tier tier MEMBER tier READ get_tier)
+	Q_PROPERTY(wyrmgus::government_type government_type MEMBER government_type READ get_government_type)
+	Q_PROPERTY(wyrmgus::site* capital MEMBER capital READ get_capital)
+	Q_PROPERTY(wyrmgus::dynasty* dynasty MEMBER dynasty READ get_dynasty)
 	Q_PROPERTY(QVariantList acquired_upgrades READ get_acquired_upgrades_qstring_list)
 
 public:
@@ -85,7 +85,7 @@ public:
 	static constexpr const char *class_identifier = "faction";
 	static constexpr const char *database_folder = "factions";
 
-	static faction *add(const std::string &identifier, const stratagus::module *module)
+	static faction *add(const std::string &identifier, const wyrmgus::module *module)
 	{
 		faction *faction = data_type::add(identifier, module);
 		faction->ID = faction::get_all().size() - 1;
@@ -199,7 +199,7 @@ public:
 
 	void remove_class_unit_type(unit_type *unit_type)
 	{
-		for (std::map<const unit_class *, stratagus::unit_type *>::reverse_iterator iterator = this->class_unit_types.rbegin(); iterator != this->class_unit_types.rend(); ++iterator) {
+		for (std::map<const unit_class *, wyrmgus::unit_type *>::reverse_iterator iterator = this->class_unit_types.rbegin(); iterator != this->class_unit_types.rend(); ++iterator) {
 			if (iterator->second == unit_type) {
 				this->class_unit_types.erase(iterator->first);
 			}
@@ -302,7 +302,7 @@ public:
 	std::string DefaultAI = "land-attack";
 	int ID = -1;														/// faction ID
 private:
-	stratagus::civilization *civilization = nullptr; //faction civilization
+	wyrmgus::civilization *civilization = nullptr; //faction civilization
 public:
 	int Type = FactionTypeNoFactionType;								/// faction type (i.e. tribe or polity)
 private:
@@ -358,7 +358,7 @@ private:
 	faction_tier tier;
 	government_type government_type;
 	site *capital = nullptr;
-	stratagus::dynasty *dynasty = nullptr;
+	wyrmgus::dynasty *dynasty = nullptr;
 	std::map<const resource *, int> resources;
 	std::map<const faction *, diplomacy_state> diplomacy_states;
 	std::vector<CUpgrade *> acquired_upgrades;

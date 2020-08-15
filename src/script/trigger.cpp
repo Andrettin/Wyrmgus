@@ -58,7 +58,7 @@ CTimer GameTimer;               /// The game timer
 /// Some data accessible for script during the game.
 TriggerDataType TriggerData;
 
-namespace stratagus {
+namespace wyrmgus {
 
 std::vector<trigger *> trigger::ActiveTriggers;
 std::vector<std::string> trigger::DeactivatedTriggers;
@@ -100,7 +100,7 @@ int TriggerGetPlayer(lua_State *l)
 **
 **  @return   The unit-type pointer.
 */
-const stratagus::unit_type *TriggerGetUnitType(lua_State *l)
+const wyrmgus::unit_type *TriggerGetUnitType(lua_State *l)
 {
 	const char *unit = LuaToString(l, -1);
 
@@ -169,7 +169,7 @@ static int CclGetNumUnitsAt(lua_State *l)
 
 	int plynr = LuaToNumber(l, 1);
 	lua_pushvalue(l, 2);
-	const stratagus::unit_type *unittype = TriggerGetUnitType(l);
+	const wyrmgus::unit_type *unittype = TriggerGetUnitType(l);
 	lua_pop(l, 1);
 
 	Vec2i minPos;
@@ -249,10 +249,10 @@ static int CclIfNearUnit(lua_State *l)
 	const char *op = LuaToString(l, 2);
 	const int q = LuaToNumber(l, 3);
 	lua_pushvalue(l, 4);
-	const stratagus::unit_type *unittype = TriggerGetUnitType(l);
+	const wyrmgus::unit_type *unittype = TriggerGetUnitType(l);
 	lua_pop(l, 1);
 	lua_pushvalue(l, 5);
-	const stratagus::unit_type *ut2 = CclGetUnitType(l);
+	const wyrmgus::unit_type *ut2 = CclGetUnitType(l);
 	lua_pop(l, 1);
 	if (!unittype || !ut2) {
 		LuaError(l, "CclIfNearUnit: not a unit-type valid");
@@ -325,9 +325,9 @@ static int CclIfRescuedNearUnit(lua_State *l)
 	const char *op = LuaToString(l, 2);
 	const int q = LuaToNumber(l, 3);
 	lua_pushvalue(l, 4);
-	const stratagus::unit_type *unittype = TriggerGetUnitType(l);
+	const wyrmgus::unit_type *unittype = TriggerGetUnitType(l);
 	lua_pop(l, 1);
-	const stratagus::unit_type *ut2 = CclGetUnitType(l);
+	const wyrmgus::unit_type *ut2 = CclGetUnitType(l);
 	if (!unittype || !ut2) {
 		LuaError(l, "CclIfRescuedNearUnit: not a unit-type valid");
 	}
@@ -489,15 +489,15 @@ static int CclAddTrigger(lua_State *l)
 
 	std::string trigger_ident = LuaToString(l, 1);
 	
-	if (stratagus::vector::contains(stratagus::trigger::DeactivatedTriggers, trigger_ident)) {
+	if (wyrmgus::vector::contains(wyrmgus::trigger::DeactivatedTriggers, trigger_ident)) {
 		return 0;
 	}
 	
 	//this function only adds temporary triggers, that is, ones that will only last for the current game
 	
-	stratagus::trigger *trigger = new stratagus::trigger(trigger_ident);
+	wyrmgus::trigger *trigger = new wyrmgus::trigger(trigger_ident);
 	trigger->Local = true;
-	stratagus::trigger::ActiveTriggers.push_back(trigger);
+	wyrmgus::trigger::ActiveTriggers.push_back(trigger);
 	
 	trigger->Conditions = new LuaCallback(l, 2);
 	trigger->Effects = new LuaCallback(l, 3);
@@ -514,7 +514,7 @@ static int CclAddTrigger(lua_State *l)
 */
 void SetCurrentTriggerId(unsigned int trigger_id)
 {
-	stratagus::trigger::CurrentTriggerId = trigger_id;
+	wyrmgus::trigger::CurrentTriggerId = trigger_id;
 }
 
 /**
@@ -525,7 +525,7 @@ static int CclSetDeactivatedTriggers(lua_State *l)
 	const int args = lua_gettop(l);
 
 	for (int j = 0; j < args; ++j) {
-		stratagus::trigger::DeactivatedTriggers.push_back(LuaToString(l, j + 1));
+		wyrmgus::trigger::DeactivatedTriggers.push_back(LuaToString(l, j + 1));
 	}
 	return 0;
 }
@@ -578,8 +578,8 @@ static void TriggerRemoveTrigger(int trig)
 */
 void TriggersEachCycle()
 {
-	if (stratagus::trigger::CurrentTriggerId >= stratagus::trigger::ActiveTriggers.size()) {
-		stratagus::trigger::CurrentTriggerId = 0;
+	if (wyrmgus::trigger::CurrentTriggerId >= wyrmgus::trigger::ActiveTriggers.size()) {
+		wyrmgus::trigger::CurrentTriggerId = 0;
 	}
 
 	if (GamePaused) {
@@ -587,8 +587,8 @@ void TriggersEachCycle()
 	}
 
 	// go to the next trigger
-	if (stratagus::trigger::CurrentTriggerId < stratagus::trigger::ActiveTriggers.size()) {
-		stratagus::trigger *current_trigger = stratagus::trigger::ActiveTriggers[stratagus::trigger::CurrentTriggerId];
+	if (wyrmgus::trigger::CurrentTriggerId < wyrmgus::trigger::ActiveTriggers.size()) {
+		wyrmgus::trigger *current_trigger = wyrmgus::trigger::ActiveTriggers[wyrmgus::trigger::CurrentTriggerId];
 
 		bool removed_trigger = false;
 		
@@ -600,8 +600,8 @@ void TriggersEachCycle()
 				current_trigger->Effects->pushPreamble();
 				current_trigger->Effects->run(1);
 				if (current_trigger->Effects->popBoolean() == false) {
-					stratagus::trigger::DeactivatedTriggers.push_back(current_trigger->get_identifier());
-					stratagus::trigger::ActiveTriggers.erase(stratagus::trigger::ActiveTriggers.begin() + stratagus::trigger::CurrentTriggerId);
+					wyrmgus::trigger::DeactivatedTriggers.push_back(current_trigger->get_identifier());
+					wyrmgus::trigger::ActiveTriggers.erase(wyrmgus::trigger::ActiveTriggers.begin() + wyrmgus::trigger::CurrentTriggerId);
 					removed_trigger = true;
 					if (current_trigger->Local) {
 						delete current_trigger;
@@ -613,12 +613,12 @@ void TriggersEachCycle()
 		if (current_trigger->effects != nullptr) {
 			bool triggered = false;
 			
-			if (current_trigger->Type == stratagus::trigger::TriggerType::GlobalTrigger) {
+			if (current_trigger->Type == wyrmgus::trigger::TriggerType::GlobalTrigger) {
 				if (CheckConditions(current_trigger, CPlayer::Players[PlayerNumNeutral])) {
 					triggered = true;
 					current_trigger->effects->do_effects(CPlayer::Players[PlayerNumNeutral]);
 				}
-			} else if (current_trigger->Type == stratagus::trigger::TriggerType::PlayerTrigger) {
+			} else if (current_trigger->Type == wyrmgus::trigger::TriggerType::PlayerTrigger) {
 				for (int i = 0; i < PlayerNumNeutral; ++i) {
 					CPlayer *player = CPlayer::Players[i];
 					if (player->Type == PlayerNobody) {
@@ -636,8 +636,8 @@ void TriggersEachCycle()
 			}
 			
 			if (triggered && current_trigger->fires_only_once()) {
-				stratagus::trigger::DeactivatedTriggers.push_back(current_trigger->get_identifier());
-				stratagus::trigger::ActiveTriggers.erase(stratagus::trigger::ActiveTriggers.begin() + stratagus::trigger::CurrentTriggerId);
+				wyrmgus::trigger::DeactivatedTriggers.push_back(current_trigger->get_identifier());
+				wyrmgus::trigger::ActiveTriggers.erase(wyrmgus::trigger::ActiveTriggers.begin() + wyrmgus::trigger::CurrentTriggerId);
 				removed_trigger = true;
 				if (current_trigger->Local) {
 					delete current_trigger;
@@ -646,14 +646,14 @@ void TriggersEachCycle()
 		}
 		
 		if (!removed_trigger) {
-			stratagus::trigger::CurrentTriggerId++;
+			wyrmgus::trigger::CurrentTriggerId++;
 		}
 	} else {
-		stratagus::trigger::CurrentTriggerId = 0;
+		wyrmgus::trigger::CurrentTriggerId = 0;
 	}
 }
 
-namespace stratagus {
+namespace wyrmgus {
 
 void trigger::clear()
 {
@@ -793,15 +793,15 @@ void SaveTriggers(CFile &file)
 	file.printf("\n");
 
 	file.printf("SetDeactivatedTriggers(");
-	for (size_t i = 0; i < stratagus::trigger::DeactivatedTriggers.size(); ++i) {
+	for (size_t i = 0; i < wyrmgus::trigger::DeactivatedTriggers.size(); ++i) {
 		if (i) {
 			file.printf(", ");
 		}
-		file.printf("\"%s\"", stratagus::trigger::DeactivatedTriggers[i].c_str());
+		file.printf("\"%s\"", wyrmgus::trigger::DeactivatedTriggers[i].c_str());
 	}
 	file.printf(")\n");
 
-	file.printf("SetCurrentTriggerId(%d)\n", stratagus::trigger::CurrentTriggerId);
+	file.printf("SetCurrentTriggerId(%d)\n", wyrmgus::trigger::CurrentTriggerId);
 
 	if (GameTimer.Init) {
 		file.printf("ActionSetTimer(%ld, %s)\n",

@@ -91,16 +91,16 @@
 #include "video/video.h"
 
 /// Last drawn popup : used to speed up drawing
-stratagus::button *LastDrawnButtonPopup;
+wyrmgus::button *LastDrawnButtonPopup;
 /// for unit buttons sub-menus etc.
-stratagus::button_level *CurrentButtonLevel = nullptr;
+wyrmgus::button_level *CurrentButtonLevel = nullptr;
 /// Pointer to current buttons
-std::vector<std::unique_ptr<stratagus::button>> CurrentButtons;
+std::vector<std::unique_ptr<wyrmgus::button>> CurrentButtons;
 
 void InitButtons()
 {
 	// Resolve the icon names.
-	for (stratagus::button *button : stratagus::button::get_all()) {
+	for (wyrmgus::button *button : wyrmgus::button::get_all()) {
 		if (!button->Icon.Name.empty()) {
 			button->Icon.Load();
 		}
@@ -134,7 +134,7 @@ void CleanButtons()
 **  @todo FIXME : add IconDisabled when needed.
 **  @todo FIXME : Should show the rally action for training unit ? (NewOrder)
 */
-static int GetButtonStatus(const stratagus::button &button, int UnderCursor)
+static int GetButtonStatus(const wyrmgus::button &button, int UnderCursor)
 {
 	unsigned int res = 0;
 
@@ -227,7 +227,7 @@ static int GetButtonStatus(const stratagus::button &button, int UnderCursor)
 
 			// Autocast
 			for (i = 0; i < Selected.size(); ++i) {
-				if (Selected[i]->is_autocast_spell(stratagus::spell::get_all()[button.Value]) != true) {
+				if (Selected[i]->is_autocast_spell(wyrmgus::spell::get_all()[button.Value]) != true) {
 					break;
 				}
 			}
@@ -275,8 +275,8 @@ static int GetButtonStatus(const stratagus::button &button, int UnderCursor)
 **  @return            0 if we can't show the content, else 1.
 */
 static bool CanShowPopupContent(const PopupConditionPanel *condition,
-								const stratagus::button &button,
-								const stratagus::unit_type *type)
+								const wyrmgus::button &button,
+								const wyrmgus::unit_type *type)
 {
 	if (!condition) {
 		return true;
@@ -295,7 +295,7 @@ static bool CanShowPopupContent(const PopupConditionPanel *condition,
 	}
 	
 	//Wyrmgus start
-	if (condition->Class && type && type->get_unit_class() == nullptr && !(type->BoolFlag[ITEM_INDEX].value && type->get_item_class() != stratagus::item_class::none)) {
+	if (condition->Class && type && type->get_unit_class() == nullptr && !(type->BoolFlag[ITEM_INDEX].value && type->get_item_class() != wyrmgus::item_class::none)) {
 		return false;
 	}
 	
@@ -318,13 +318,13 @@ static bool CanShowPopupContent(const PopupConditionPanel *condition,
 	}
 
 	if (condition->ImproveIncome != -1) {
-		if (!type || type->Stats[CPlayer::GetThisPlayer()->Index].ImproveIncomes[condition->ImproveIncome] <= stratagus::resource::get_all()[condition->ImproveIncome]->DefaultIncome) {
+		if (!type || type->Stats[CPlayer::GetThisPlayer()->Index].ImproveIncomes[condition->ImproveIncome] <= wyrmgus::resource::get_all()[condition->ImproveIncome]->DefaultIncome) {
 			return false;
 		}
 	}
 
 	if (condition->ChildResources != CONDITION_TRUE) {
-		if ((condition->ChildResources == CONDITION_ONLY) ^ (stratagus::resource::get_all()[button.Value]->ChildResources.size() > 0)) {
+		if ((condition->ChildResources == CONDITION_ONLY) ^ (wyrmgus::resource::get_all()[button.Value]->ChildResources.size() > 0)) {
 			return false;
 		}
 	}
@@ -332,10 +332,10 @@ static bool CanShowPopupContent(const PopupConditionPanel *condition,
 	if (condition->ImproveIncomes != CONDITION_TRUE) {
 		bool improve_incomes = false;
 		if (button.Action == ButtonCmd::ProduceResource) {
-			if (CPlayer::GetThisPlayer()->Incomes[button.Value] > stratagus::resource::get_all()[button.Value]->DefaultIncome) {
+			if (CPlayer::GetThisPlayer()->Incomes[button.Value] > wyrmgus::resource::get_all()[button.Value]->DefaultIncome) {
 				improve_incomes = true;
 			}
-			for (const stratagus::resource *child_resource : stratagus::resource::get_all()[button.Value]->ChildResources) {
+			for (const wyrmgus::resource *child_resource : wyrmgus::resource::get_all()[button.Value]->ChildResources) {
 				if (CPlayer::GetThisPlayer()->Incomes[child_resource->ID] > child_resource->DefaultIncome) {
 					improve_incomes = true;
 					break;
@@ -346,7 +346,7 @@ static bool CanShowPopupContent(const PopupConditionPanel *condition,
 				return false;
 			}
 			for (int i = 1; i < MaxCosts; ++i) {
-				if (type->Stats[CPlayer::GetThisPlayer()->Index].ImproveIncomes[i] > stratagus::resource::get_all()[i]->DefaultIncome) {
+				if (type->Stats[CPlayer::GetThisPlayer()->Index].ImproveIncomes[i] > wyrmgus::resource::get_all()[i]->DefaultIncome) {
 					improve_incomes = true;
 					break;
 				}
@@ -365,7 +365,7 @@ static bool CanShowPopupContent(const PopupConditionPanel *condition,
 		return false;
 	}
 	
-	if (condition->Encyclopedia && type && type->get_description().empty() && type->get_background().empty() && type->get_quote().empty() && (!type->BoolFlag[ITEM_INDEX].value || type->get_item_class() == stratagus::item_class::none)) {
+	if (condition->Encyclopedia && type && type->get_description().empty() && type->get_background().empty() && type->get_quote().empty() && (!type->BoolFlag[ITEM_INDEX].value || type->get_item_class() == wyrmgus::item_class::none)) {
 		return false;
 	}
 	
@@ -390,7 +390,7 @@ static bool CanShowPopupContent(const PopupConditionPanel *condition,
 	}
 	
 	if (condition->FactionCoreSettlements != CONDITION_TRUE) {
-		if ((condition->FactionCoreSettlements == CONDITION_ONLY) ^ (stratagus::game::get()->get_current_campaign() != nullptr && button.Action == ButtonCmd::Faction && button.Value != -1 && stratagus::faction::get_all()[CPlayer::GetThisPlayer()->Faction]->DevelopsTo[button.Value]->Cores.size() > 0)) {
+		if ((condition->FactionCoreSettlements == CONDITION_ONLY) ^ (wyrmgus::game::get()->get_current_campaign() != nullptr && button.Action == ButtonCmd::Faction && button.Value != -1 && wyrmgus::faction::get_all()[CPlayer::GetThisPlayer()->Faction]->DevelopsTo[button.Value]->Cores.size() > 0)) {
 			return false;
 		}
 	}
@@ -429,7 +429,7 @@ static bool CanShowPopupContent(const PopupConditionPanel *condition,
 	}
 	
 	if (condition->LuxuryResource != CONDITION_TRUE) {
-		if ((condition->LuxuryResource == CONDITION_ONLY) ^ (button.Action == ButtonCmd::ProduceResource && stratagus::resource::get_all()[button.Value]->LuxuryResource)) {
+		if ((condition->LuxuryResource == CONDITION_ONLY) ^ (button.Action == ButtonCmd::ProduceResource && wyrmgus::resource::get_all()[button.Value]->LuxuryResource)) {
 			return false;
 		}
 	}
@@ -533,7 +533,7 @@ static bool CanShowPopupContent(const PopupConditionPanel *condition,
 	//Wyrmgus start
 	if (button.Action == ButtonCmd::SpellCast) {
 		if (condition->AutoCast != CONDITION_TRUE) {
-			if ((condition->AutoCast == CONDITION_ONLY) ^ (stratagus::spell::get_all()[button.Value]->AutoCast != nullptr)) {
+			if ((condition->AutoCast == CONDITION_ONLY) ^ (wyrmgus::spell::get_all()[button.Value]->AutoCast != nullptr)) {
 				return false;
 			}
 		}
@@ -553,7 +553,7 @@ static bool CanShowPopupContent(const PopupConditionPanel *condition,
 				}
 			}
 			if (condition->Consumable != CONDITION_TRUE) {
-				if ((condition->Consumable == CONDITION_ONLY) ^ stratagus::is_consumable_item_class(unit.Type->get_item_class())) {
+				if ((condition->Consumable == CONDITION_ONLY) ^ wyrmgus::is_consumable_item_class(unit.Type->get_item_class())) {
 					return false;
 				}
 			}
@@ -598,26 +598,26 @@ static bool CanShowPopupContent(const PopupConditionPanel *condition,
 				}
 			}
 			if (condition->Weapon != CONDITION_TRUE) {
-				if ((condition->Weapon == CONDITION_ONLY) ^ (stratagus::get_item_class_slot(unit.Type->get_item_class()) == stratagus::item_slot::weapon)) {
+				if ((condition->Weapon == CONDITION_ONLY) ^ (wyrmgus::get_item_class_slot(unit.Type->get_item_class()) == wyrmgus::item_slot::weapon)) {
 					return false;
 				}
 			}
 			if (condition->Shield != CONDITION_TRUE) {
-				if ((condition->Shield == CONDITION_ONLY) ^ (stratagus::get_item_class_slot(unit.Type->get_item_class()) == stratagus::item_slot::shield)) {
+				if ((condition->Shield == CONDITION_ONLY) ^ (wyrmgus::get_item_class_slot(unit.Type->get_item_class()) == wyrmgus::item_slot::shield)) {
 					return false;
 				}
 			}
 			if (condition->Boots != CONDITION_TRUE) {
-				if ((condition->Boots == CONDITION_ONLY) ^ (stratagus::get_item_class_slot(unit.Type->get_item_class()) == stratagus::item_slot::boots)) {
+				if ((condition->Boots == CONDITION_ONLY) ^ (wyrmgus::get_item_class_slot(unit.Type->get_item_class()) == wyrmgus::item_slot::boots)) {
 					return false;
 				}
 			}
 			if (condition->Arrows != CONDITION_TRUE) {
-				if ((condition->Arrows == CONDITION_ONLY) ^ (stratagus::get_item_class_slot(unit.Type->get_item_class()) == stratagus::item_slot::arrows)) {
+				if ((condition->Arrows == CONDITION_ONLY) ^ (wyrmgus::get_item_class_slot(unit.Type->get_item_class()) == wyrmgus::item_slot::arrows)) {
 					return false;
 				}
 			}
-			if (condition->item_class != stratagus::item_class::none) {
+			if (condition->item_class != wyrmgus::item_class::none) {
 				if (condition->item_class != unit.Type->get_item_class()) {
 					return false;
 				}
@@ -682,7 +682,7 @@ static bool CanShowPopupContent(const PopupConditionPanel *condition,
 	return true;
 }
 
-static void GetPopupSize(const CPopup &popup, const stratagus::button &button,
+static void GetPopupSize(const CPopup &popup, const wyrmgus::button &button,
 						 int &popupWidth, int &popupHeight, int *Costs)
 {
 	int contentWidth = popup.MarginX;
@@ -692,15 +692,15 @@ static void GetPopupSize(const CPopup &popup, const stratagus::button &button,
 	popupWidth = popup.MarginX;
 	popupHeight = popup.MarginY;
 
-	const stratagus::unit_class *unit_class = nullptr;
-	const stratagus::unit_type *unit_type = nullptr;
+	const wyrmgus::unit_class *unit_class = nullptr;
+	const wyrmgus::unit_type *unit_type = nullptr;
 
 	switch (button.Action) {
 		case ButtonCmd::BuildClass:
 		case ButtonCmd::TrainClass:
-			unit_class = stratagus::unit_class::get_all()[button.Value];
+			unit_class = wyrmgus::unit_class::get_all()[button.Value];
 			if (Selected[0]->Player->Faction != -1) {
-				unit_type = stratagus::faction::get_all()[Selected[0]->Player->Faction]->get_class_unit_type(unit_class);
+				unit_type = wyrmgus::faction::get_all()[Selected[0]->Player->Faction]->get_class_unit_type(unit_class);
 			}
 			break;
 		case ButtonCmd::Unit:
@@ -711,7 +711,7 @@ static void GetPopupSize(const CPopup &popup, const stratagus::button &button,
 			unit_type = Selected[0]->Type;
 			break;
 		default:
-			unit_type = stratagus::unit_type::get_all()[button.Value];
+			unit_type = wyrmgus::unit_type::get_all()[button.Value];
 			break;
 	}
 
@@ -750,27 +750,27 @@ static struct PopupDrawCache {
 /**
 **  Draw popup
 */
-void DrawPopup(const stratagus::button &button, int x, int y, bool above)
+void DrawPopup(const wyrmgus::button &button, int x, int y, bool above)
 {
 	CPopup *popup = PopupByIdent(button.Popup);
 	bool useCache = false;
-	const int scale_factor = stratagus::defines::get()->get_scale_factor();
+	const int scale_factor = wyrmgus::defines::get()->get_scale_factor();
 
 	if (!popup) {
 		return;
 	} else if (&button == LastDrawnButtonPopup) {
 		useCache = true;
 	} else {
-		LastDrawnButtonPopup = const_cast<stratagus::button *>(&button);
+		LastDrawnButtonPopup = const_cast<wyrmgus::button *>(&button);
 	}
 
 	int popupWidth, popupHeight;
 	int Costs[ManaResCost + 1];
 	memset(Costs, 0, sizeof(Costs));
 
-	const stratagus::unit_class *unit_class = nullptr;
-	const stratagus::unit_type *unit_type = nullptr;
-	const stratagus::upgrade_class *upgrade_class = nullptr;
+	const wyrmgus::unit_class *unit_class = nullptr;
+	const wyrmgus::unit_type *unit_type = nullptr;
+	const wyrmgus::upgrade_class *upgrade_class = nullptr;
 	const CUpgrade *upgrade = nullptr;
 
 	switch (button.Action) {
@@ -778,13 +778,13 @@ void DrawPopup(const stratagus::button &button, int x, int y, bool above)
 		case ButtonCmd::Train:
 		case ButtonCmd::UpgradeTo:
 		case ButtonCmd::ExperienceUpgradeTo:
-			unit_type = stratagus::unit_type::get_all()[button.Value];
+			unit_type = wyrmgus::unit_type::get_all()[button.Value];
 			break;
 		case ButtonCmd::BuildClass:
 		case ButtonCmd::TrainClass:
-			unit_class = stratagus::unit_class::get_all()[button.Value];
+			unit_class = wyrmgus::unit_class::get_all()[button.Value];
 			if (Selected[0]->Player->Faction != -1) {
-				unit_type = stratagus::faction::get_all()[Selected[0]->Player->Faction]->get_class_unit_type(unit_class);
+				unit_type = wyrmgus::faction::get_all()[Selected[0]->Player->Faction]->get_class_unit_type(unit_class);
 			}
 			break;
 		case ButtonCmd::Salvage:
@@ -798,7 +798,7 @@ void DrawPopup(const stratagus::button &button, int x, int y, bool above)
 			upgrade = CUpgrade::get_all()[button.Value];
 			break;
 		case ButtonCmd::ResearchClass:
-			upgrade_class = stratagus::upgrade_class::get_all()[button.Value];
+			upgrade_class = wyrmgus::upgrade_class::get_all()[button.Value];
 			if (Selected[0]->Player->get_faction() != nullptr) {
 				upgrade = Selected[0]->Player->get_faction()->get_class_upgrade(upgrade_class);
 			}
@@ -819,8 +819,8 @@ void DrawPopup(const stratagus::button &button, int x, int y, bool above)
 			CPlayer::GetThisPlayer()->GetUpgradeCosts(upgrade, Costs);
 			break;
 		case ButtonCmd::SpellCast:
-			memcpy(Costs, stratagus::spell::get_all()[button.Value]->Costs, sizeof(stratagus::spell::get_all()[button.Value]->Costs));
-			Costs[ManaResCost] = stratagus::spell::get_all()[button.Value]->ManaCost;
+			memcpy(Costs, wyrmgus::spell::get_all()[button.Value]->Costs, sizeof(wyrmgus::spell::get_all()[button.Value]->Costs));
+			Costs[ManaResCost] = wyrmgus::spell::get_all()[button.Value]->ManaCost;
 			break;
 		case ButtonCmd::Build:
 		case ButtonCmd::BuildClass:
@@ -882,7 +882,7 @@ void DrawGenericPopup(const std::string &popup_text, int x, int y, std::string t
 {
 	const CFont &font = GetGameFont();
 	
-	const int scale_factor = stratagus::defines::get()->get_scale_factor();
+	const int scale_factor = wyrmgus::defines::get()->get_scale_factor();
 	int MaxWidth = std::max(512 * scale_factor, Video.Width / 5);
 
 	int i;
@@ -1022,14 +1022,14 @@ void CButtonPanel::Draw()
 	if (CurrentButtons.empty()) {
 		return;
 	}
-	const std::vector<std::unique_ptr<stratagus::button>> &buttons(CurrentButtons);
+	const std::vector<std::unique_ptr<wyrmgus::button>> &buttons(CurrentButtons);
 
 	Assert(!Selected.empty());
 	char buf[8];
 
 	//  Draw all buttons.
 	for (size_t i = 0; i < buttons.size(); ++i) {
-		const std::unique_ptr<stratagus::button> &button = buttons[i];
+		const std::unique_ptr<wyrmgus::button> &button = buttons[i];
 
 		if (button->get_pos() == -1) {
 			continue;
@@ -1057,10 +1057,10 @@ void CButtonPanel::Draw()
 				gray = true;
 				break;
 			} else if (button->Action == ButtonCmd::SpellCast
-					   && (*Selected[j]).SpellCoolDownTimers[stratagus::spell::get_all()[button->Value]->Slot]) {
-				Assert(stratagus::spell::get_all()[button->Value]->CoolDown > 0);
+					   && (*Selected[j]).SpellCoolDownTimers[wyrmgus::spell::get_all()[button->Value]->Slot]) {
+				Assert(wyrmgus::spell::get_all()[button->Value]->CoolDown > 0);
 				cooldownSpell = true;
-				maxCooldown = std::max(maxCooldown, (*Selected[j]).SpellCoolDownTimers[stratagus::spell::get_all()[button->Value]->Slot]);
+				maxCooldown = std::max(maxCooldown, (*Selected[j]).SpellCoolDownTimers[wyrmgus::spell::get_all()[button->Value]->Slot]);
 			}
 		}
 		//
@@ -1090,23 +1090,23 @@ void CButtonPanel::Draw()
 		const PixelPos pos(UI.ButtonPanel.Buttons[i].X, UI.ButtonPanel.Buttons[i].Y);
 
 		//Wyrmgus start
-		const stratagus::icon *button_icon = button->Icon.Icon;
+		const wyrmgus::icon *button_icon = button->Icon.Icon;
 		const CPlayer *player = Selected[0]->Player;
-		const stratagus::faction *player_faction = player->Faction != -1 ? stratagus::faction::get_all()[player->Faction] : nullptr;
+		const wyrmgus::faction *player_faction = player->Faction != -1 ? wyrmgus::faction::get_all()[player->Faction] : nullptr;
 
-		const stratagus::unit_type *button_unit_type = nullptr;
+		const wyrmgus::unit_type *button_unit_type = nullptr;
 		const CUpgrade *button_upgrade = nullptr;
 		switch (button->Action) {
 			case ButtonCmd::Train:
 			case ButtonCmd::Build:
 			case ButtonCmd::UpgradeTo:
 			case ButtonCmd::ExperienceUpgradeTo:
-				button_unit_type = stratagus::unit_type::get_all()[button->Value];
+				button_unit_type = wyrmgus::unit_type::get_all()[button->Value];
 				break;
 			case ButtonCmd::BuildClass:
 			case ButtonCmd::TrainClass:
 				if (player_faction != nullptr) {
-					button_unit_type = player_faction->get_class_unit_type(stratagus::unit_class::get_all()[button->Value]);
+					button_unit_type = player_faction->get_class_unit_type(wyrmgus::unit_class::get_all()[button->Value]);
 				}
 				break;
 			case ButtonCmd::Research:
@@ -1114,7 +1114,7 @@ void CButtonPanel::Draw()
 				break;
 			case ButtonCmd::ResearchClass:
 				if (player_faction != nullptr) {
-					button_upgrade = player_faction->get_class_upgrade(stratagus::upgrade_class::get_all()[button->Value]);
+					button_upgrade = player_faction->get_class_upgrade(wyrmgus::upgrade_class::get_all()[button->Value]);
 				}
 				break;
 			case ButtonCmd::Dynasty:
@@ -1137,8 +1137,8 @@ void CButtonPanel::Draw()
 			button_icon = UnitManager.GetSlotUnit(button->Value).get_icon();
 		} else if ((button->Action == ButtonCmd::Research || button->Action == ButtonCmd::ResearchClass) && button->Icon.Name.empty() && button_upgrade->get_icon()) {
 			button_icon = button_upgrade->get_icon();
-		} else if (button->Action == ButtonCmd::Faction && button->Icon.Name.empty() && stratagus::faction::get_all()[CPlayer::GetThisPlayer()->Faction]->DevelopsTo[button->Value]->get_icon() != nullptr) {
-			button_icon = stratagus::faction::get_all()[CPlayer::GetThisPlayer()->Faction]->DevelopsTo[button->Value]->get_icon();
+		} else if (button->Action == ButtonCmd::Faction && button->Icon.Name.empty() && wyrmgus::faction::get_all()[CPlayer::GetThisPlayer()->Faction]->DevelopsTo[button->Value]->get_icon() != nullptr) {
+			button_icon = wyrmgus::faction::get_all()[CPlayer::GetThisPlayer()->Faction]->DevelopsTo[button->Value]->get_icon();
 		} else if (button->Action == ButtonCmd::Dynasty && button->Icon.Name.empty() && CPlayer::GetThisPlayer()->get_faction()->get_dynasties()[button->Value]->get_icon() != nullptr) {
 			button_icon = CPlayer::GetThisPlayer()->get_faction()->get_dynasties()[button->Value]->get_icon();
 		}
@@ -1149,14 +1149,14 @@ void CButtonPanel::Draw()
 //			button->Icon.Icon->DrawCooldownSpellIcon(pos,
 			button_icon->DrawCooldownSpellIcon(pos,
 			//Wyrmgus end
-				maxCooldown * 100 / stratagus::spell::get_all()[button->Value]->CoolDown);
+				maxCooldown * 100 / wyrmgus::spell::get_all()[button->Value]->CoolDown);
 		} else if (gray) {
 			//Wyrmgus start
 //			button->Icon.Icon->DrawGrayscaleIcon(pos);
 //			button_icon->DrawGrayscaleIcon(pos); //better to not show it
 			//Wyrmgus end
 		} else {
-			const stratagus::player_color *player_color = nullptr;
+			const wyrmgus::player_color *player_color = nullptr;
 			if (Selected.empty() == false && Selected[0]->IsAlive()) {
 				player_color = Selected[0]->get_player_color();
 
@@ -1242,7 +1242,7 @@ void CButtonPanel::Draw()
 **  @todo FIXME: better check. (dependency, resource, ...)
 **  @todo FIXME: make difference with impossible and not yet researched.
 */
-bool IsButtonAllowed(const CUnit &unit, const stratagus::button &buttonaction)
+bool IsButtonAllowed(const CUnit &unit, const wyrmgus::button &buttonaction)
 {
 	if (buttonaction.is_always_shown()) {
 		return true;
@@ -1264,9 +1264,9 @@ bool IsButtonAllowed(const CUnit &unit, const stratagus::button &buttonaction)
 	}
 	//Wyrmgus end
 
-	const stratagus::unit_class *unit_class = nullptr;
-	stratagus::unit_type *unit_type = nullptr;
-	const stratagus::upgrade_class *upgrade_class = nullptr;
+	const wyrmgus::unit_class *unit_class = nullptr;
+	wyrmgus::unit_type *unit_type = nullptr;
+	const wyrmgus::upgrade_class *upgrade_class = nullptr;
 	const CUpgrade *upgrade = nullptr;
 
 	switch (buttonaction.Action) {
@@ -1274,11 +1274,11 @@ bool IsButtonAllowed(const CUnit &unit, const stratagus::button &buttonaction)
 		case ButtonCmd::Build:
 		case ButtonCmd::UpgradeTo:
 		case ButtonCmd::ExperienceUpgradeTo:
-			unit_type = stratagus::unit_type::get_all()[buttonaction.Value];
+			unit_type = wyrmgus::unit_type::get_all()[buttonaction.Value];
 			break;
 		case ButtonCmd::TrainClass:
 		case ButtonCmd::BuildClass:
-			unit_class = stratagus::unit_class::get_all()[buttonaction.Value];
+			unit_class = wyrmgus::unit_class::get_all()[buttonaction.Value];
 			if (unit.Player->get_faction() != nullptr) {
 				unit_type = unit.Player->get_faction()->get_class_unit_type(unit_class);
 			}
@@ -1288,7 +1288,7 @@ bool IsButtonAllowed(const CUnit &unit, const stratagus::button &buttonaction)
 			upgrade = CUpgrade::get_all()[buttonaction.Value];
 			break;
 		case ButtonCmd::ResearchClass:
-			upgrade_class = stratagus::upgrade_class::get_all()[buttonaction.Value];
+			upgrade_class = wyrmgus::upgrade_class::get_all()[buttonaction.Value];
 			if (unit.Player->get_faction() != nullptr) {
 				upgrade = unit.Player->get_faction()->get_class_upgrade(upgrade_class);
 			}
@@ -1383,14 +1383,14 @@ bool IsButtonAllowed(const CUnit &unit, const stratagus::button &buttonaction)
 		case ButtonCmd::ExperienceUpgradeTo:
 			res = CheckConditions(unit_type, &unit, true, true);
 			if (res && unit.Character != nullptr) {
-				res = !stratagus::vector::contains(unit.Character->ForbiddenUpgrades, unit_type);
+				res = !wyrmgus::vector::contains(unit.Character->ForbiddenUpgrades, unit_type);
 			}
 			break;
 		case ButtonCmd::LearnAbility:
 			res = unit.CanLearnAbility(upgrade, true);
 			break;
 		case ButtonCmd::SpellCast:
-			res = stratagus::spell::get_all()[buttonaction.Value]->IsAvailableForUnit(unit);
+			res = wyrmgus::spell::get_all()[buttonaction.Value]->IsAvailableForUnit(unit);
 			break;
 		case ButtonCmd::Unload:
 			res = (Selected[0]->Type->CanTransport() && Selected[0]->BoardCount);
@@ -1417,7 +1417,7 @@ bool IsButtonAllowed(const CUnit &unit, const stratagus::button &buttonaction)
 			res = unit.CurrentAction() == UnitAction::Built;
 			break;
 		case ButtonCmd::Faction:
-			res = CPlayer::GetThisPlayer()->Faction != -1 && buttonaction.Value != -1 && buttonaction.Value < (int) stratagus::faction::get_all()[CPlayer::GetThisPlayer()->Faction]->DevelopsTo.size() && CPlayer::GetThisPlayer()->CanFoundFaction(stratagus::faction::get_all()[CPlayer::GetThisPlayer()->Faction]->DevelopsTo[buttonaction.Value], true);
+			res = CPlayer::GetThisPlayer()->Faction != -1 && buttonaction.Value != -1 && buttonaction.Value < (int) wyrmgus::faction::get_all()[CPlayer::GetThisPlayer()->Faction]->DevelopsTo.size() && CPlayer::GetThisPlayer()->CanFoundFaction(wyrmgus::faction::get_all()[CPlayer::GetThisPlayer()->Faction]->DevelopsTo[buttonaction.Value], true);
 			break;
 		case ButtonCmd::Dynasty:
 			res = CPlayer::GetThisPlayer()->get_faction() != nullptr && buttonaction.Value != -1 && buttonaction.Value < static_cast<int>(CPlayer::GetThisPlayer()->get_faction()->get_dynasties().size()) && CPlayer::GetThisPlayer()->can_choose_dynasty(CPlayer::GetThisPlayer()->get_faction()->get_dynasties()[buttonaction.Value], true) && CPlayer::GetThisPlayer()->get_faction()->get_dynasties()[buttonaction.Value]->get_icon() != nullptr;
@@ -1455,7 +1455,7 @@ bool IsButtonAllowed(const CUnit &unit, const stratagus::button &buttonaction)
 **
 **  @return 1 if button is usable, 0 else.
 */
-bool IsButtonUsable(const CUnit &unit, const stratagus::button &buttonaction)
+bool IsButtonUsable(const CUnit &unit, const wyrmgus::button &buttonaction)
 {
 	if (!IsButtonAllowed(unit, buttonaction)) {
 		return false;
@@ -1471,9 +1471,9 @@ bool IsButtonUsable(const CUnit &unit, const stratagus::button &buttonaction)
 		}
 	}
 
-	const stratagus::unit_class *unit_class = nullptr;
-	stratagus::unit_type *unit_type = nullptr;
-	const stratagus::upgrade_class *upgrade_class = nullptr;
+	const wyrmgus::unit_class *unit_class = nullptr;
+	wyrmgus::unit_type *unit_type = nullptr;
+	const wyrmgus::upgrade_class *upgrade_class = nullptr;
 	const CUpgrade *upgrade = nullptr;
 
 	switch (buttonaction.Action) {
@@ -1481,11 +1481,11 @@ bool IsButtonUsable(const CUnit &unit, const stratagus::button &buttonaction)
 		case ButtonCmd::Build:
 		case ButtonCmd::UpgradeTo:
 		case ButtonCmd::ExperienceUpgradeTo:
-			unit_type = stratagus::unit_type::get_all()[buttonaction.Value];
+			unit_type = wyrmgus::unit_type::get_all()[buttonaction.Value];
 			break;
 		case ButtonCmd::TrainClass:
 		case ButtonCmd::BuildClass:
-			unit_class = stratagus::unit_class::get_all()[buttonaction.Value];
+			unit_class = wyrmgus::unit_class::get_all()[buttonaction.Value];
 			if (unit.Player->get_faction() != nullptr) {
 				unit_type = unit.Player->get_faction()->get_class_unit_type(unit_class);
 			}
@@ -1495,7 +1495,7 @@ bool IsButtonUsable(const CUnit &unit, const stratagus::button &buttonaction)
 			upgrade = CUpgrade::get_all()[buttonaction.Value];
 			break;
 		case ButtonCmd::ResearchClass:
-			upgrade_class = stratagus::upgrade_class::get_all()[buttonaction.Value];
+			upgrade_class = wyrmgus::upgrade_class::get_all()[buttonaction.Value];
 			if (unit.Player->get_faction() != nullptr) {
 				upgrade = unit.Player->get_faction()->get_class_upgrade(upgrade_class);
 			}
@@ -1543,10 +1543,10 @@ bool IsButtonUsable(const CUnit &unit, const stratagus::button &buttonaction)
 			res = unit.CanLearnAbility(upgrade);
 			break;
 		case ButtonCmd::SpellCast:
-			res = stratagus::spell::get_all()[buttonaction.Value]->IsAvailableForUnit(unit);
+			res = wyrmgus::spell::get_all()[buttonaction.Value]->IsAvailableForUnit(unit);
 			break;
 		case ButtonCmd::Faction:
-			res = CPlayer::GetThisPlayer()->CanFoundFaction(stratagus::faction::get_all()[CPlayer::GetThisPlayer()->Faction]->DevelopsTo[buttonaction.Value]);
+			res = CPlayer::GetThisPlayer()->CanFoundFaction(wyrmgus::faction::get_all()[CPlayer::GetThisPlayer()->Faction]->DevelopsTo[buttonaction.Value]);
 			break;
 		case ButtonCmd::Dynasty:
 			res = CPlayer::GetThisPlayer()->can_choose_dynasty(CPlayer::GetThisPlayer()->get_faction()->get_dynasties()[buttonaction.Value]);
@@ -1581,7 +1581,7 @@ bool IsButtonUsable(const CUnit &unit, const stratagus::button &buttonaction)
 **
 **  @return the cooldown for using the button.
 */
-int GetButtonCooldown(const CUnit &unit, const stratagus::button &buttonaction)
+int GetButtonCooldown(const CUnit &unit, const wyrmgus::button &buttonaction)
 {
 	int cooldown = 0;
 
@@ -1605,7 +1605,7 @@ int GetButtonCooldown(const CUnit &unit, const stratagus::button &buttonaction)
 **
 **  @return the cooldown for using the button.
 */
-int GetButtonCooldownPercent(const CUnit &unit, const stratagus::button &buttonaction)
+int GetButtonCooldownPercent(const CUnit &unit, const wyrmgus::button &buttonaction)
 {
 	int cooldown = 0;
 
@@ -1630,14 +1630,14 @@ int GetButtonCooldownPercent(const CUnit &unit, const stratagus::button &buttona
 **  @todo FIXME : make UpdateButtonPanelMultipleUnits more configurable.
 **  @todo show all possible buttons or just same button...
 */
-static void UpdateButtonPanelMultipleUnits(const std::vector<std::unique_ptr<stratagus::button>> &buttonActions)
+static void UpdateButtonPanelMultipleUnits(const std::vector<std::unique_ptr<wyrmgus::button>> &buttonActions)
 {
 	char unit_ident[128];
 	//Wyrmgus start
 	char individual_unit_ident[200][128]; // the 200 there is the max selectable quantity; not nice to hardcode it like this, should be changed in the future
 	//Wyrmgus end
 
-	sprintf(unit_ident, ",%s-group,", stratagus::civilization::get_all()[CPlayer::GetThisPlayer()->Race]->get_identifier().c_str());
+	sprintf(unit_ident, ",%s-group,", wyrmgus::civilization::get_all()[CPlayer::GetThisPlayer()->Race]->get_identifier().c_str());
 	
 	//Wyrmgus start
 	for (size_t i = 0; i != Selected.size(); ++i) {
@@ -1645,7 +1645,7 @@ static void UpdateButtonPanelMultipleUnits(const std::vector<std::unique_ptr<str
 	}
 	//Wyrmgus end
 
-	for (const stratagus::button *button : stratagus::button::get_all()) {
+	for (const wyrmgus::button *button : wyrmgus::button::get_all()) {
 		if (button->get_level() != CurrentButtonLevel) {
 			continue;
 		}
@@ -1653,7 +1653,7 @@ static void UpdateButtonPanelMultipleUnits(const std::vector<std::unique_ptr<str
 		//Wyrmgus start
 		bool used_by_all = true;
 		for (size_t i = 0; i != Selected.size(); ++i) {
-			if (!strstr(button->UnitMask.c_str(), individual_unit_ident[i]) && !stratagus::vector::contains(button->get_unit_classes(), Selected[i]->Type->get_unit_class())) {
+			if (!strstr(button->UnitMask.c_str(), individual_unit_ident[i]) && !wyrmgus::vector::contains(button->get_unit_classes(), Selected[i]->Type->get_unit_class())) {
 				used_by_all = false;
 				break;
 			}
@@ -1697,7 +1697,7 @@ static void UpdateButtonPanelMultipleUnits(const std::vector<std::unique_ptr<str
 **
 **  @todo FIXME : Remove Hack for cancel button.
 */
-static void UpdateButtonPanelSingleUnit(const CUnit &unit, const std::vector<std::unique_ptr<stratagus::button>> &buttonActions)
+static void UpdateButtonPanelSingleUnit(const CUnit &unit, const std::vector<std::unique_ptr<wyrmgus::button>> &buttonActions)
 {
 	char unit_ident[128];
 
@@ -1721,7 +1721,7 @@ static void UpdateButtonPanelSingleUnit(const CUnit &unit, const std::vector<std
 		sprintf(unit_ident, ",%s,", unit.Type->Ident.c_str());
 		only_cancel_allowed = false;
 	}
-	for (const stratagus::button *button : stratagus::button::get_all()) {
+	for (const wyrmgus::button *button : wyrmgus::button::get_all()) {
 		Assert(0 < button->get_pos() && button->get_pos() <= (int)UI.ButtonPanel.Buttons.size());
 
 		// Same level
@@ -1731,7 +1731,7 @@ static void UpdateButtonPanelSingleUnit(const CUnit &unit, const std::vector<std
 
 		// any unit or unit in list
 		if (button->UnitMask[0] != '*'
-			&& !strstr(button->UnitMask.c_str(), unit_ident) && (only_cancel_allowed || !stratagus::vector::contains(button->get_unit_classes(), unit.Type->get_unit_class()))) {
+			&& !strstr(button->UnitMask.c_str(), unit_ident) && (only_cancel_allowed || !wyrmgus::vector::contains(button->get_unit_classes(), unit.Type->get_unit_class()))) {
 			continue;
 		}
 		//Wyrmgus start
@@ -1759,7 +1759,7 @@ static void UpdateButtonPanelSingleUnit(const CUnit &unit, const std::vector<std
 					break;
 				case ButtonCmd::ResearchClass:
 					if (Selected[0]->Player->get_faction() != nullptr) {
-						upgrade = Selected[0]->Player->get_faction()->get_class_upgrade(stratagus::upgrade_class::get_all()[button->Value]);
+						upgrade = Selected[0]->Player->get_faction()->get_class_upgrade(wyrmgus::upgrade_class::get_all()[button->Value]);
 					}
 					break;
 				case ButtonCmd::Dynasty:
@@ -1811,13 +1811,13 @@ void CButtonPanel::Update()
 		unsigned int sold_unit_count = 0;
 		unsigned int potential_faction_count = 0;
 		unsigned int potential_dynasty_count = 0;
-		for (stratagus::button *button : stratagus::button::get_all()) {
+		for (wyrmgus::button *button : wyrmgus::button::get_all()) {
 			if (button->Action != ButtonCmd::Faction && button->Action != ButtonCmd::Dynasty && button->Action != ButtonCmd::Buy) {
 				continue;
 			}
 			char unit_ident[128];
 			sprintf(unit_ident, ",%s,", unit.Type->Ident.c_str());
-			if (button->UnitMask[0] != '*' && !strstr(button->UnitMask.c_str(), unit_ident) && !stratagus::vector::contains(button->get_unit_classes(), unit.Type->get_unit_class())) {
+			if (button->UnitMask[0] != '*' && !strstr(button->UnitMask.c_str(), unit_ident) && !wyrmgus::vector::contains(button->get_unit_classes(), unit.Type->get_unit_class())) {
 				continue;
 			}
 
@@ -1825,7 +1825,7 @@ void CButtonPanel::Update()
 				if (CPlayer::GetThisPlayer()->get_faction() == nullptr || potential_faction_count >= CPlayer::GetThisPlayer()->get_faction()->DevelopsTo.size()) {
 					button->Value = -1;
 				} else {
-					const stratagus::faction *faction = CPlayer::GetThisPlayer()->get_faction()->DevelopsTo[potential_faction_count];
+					const wyrmgus::faction *faction = CPlayer::GetThisPlayer()->get_faction()->DevelopsTo[potential_faction_count];
 					button->Value = potential_faction_count;
 					button->Hint = "Found ";
 					if (faction->DefiniteArticle) {
@@ -1843,7 +1843,7 @@ void CButtonPanel::Update()
 				if (CPlayer::GetThisPlayer()->get_faction() == nullptr || potential_dynasty_count >= CPlayer::GetThisPlayer()->get_faction()->get_dynasties().size()) {
 					button->Value = -1;
 				} else {
-					const stratagus::dynasty *dynasty = CPlayer::GetThisPlayer()->get_faction()->get_dynasties()[potential_dynasty_count];
+					const wyrmgus::dynasty *dynasty = CPlayer::GetThisPlayer()->get_faction()->get_dynasties()[potential_dynasty_count];
 					button->Value = potential_dynasty_count;
 					button->Hint = "Choose the ";
 					button->Hint += dynasty->get_name();
@@ -1884,10 +1884,10 @@ void CButtonPanel::Update()
 	}
 
 	for (size_t i = CurrentButtons.size(); i != UI.ButtonPanel.Buttons.size(); ++i) {
-		CurrentButtons.push_back(std::make_unique<stratagus::button>());
+		CurrentButtons.push_back(std::make_unique<wyrmgus::button>());
 	}
 
-	for (const std::unique_ptr<stratagus::button> &button : CurrentButtons) {
+	for (const std::unique_ptr<wyrmgus::button> &button : CurrentButtons) {
 		button->pos = -1;
 	}
 
@@ -1905,10 +1905,10 @@ void CButtonPanel::DoClicked_SelectTarget(int button)
 {
 	// Select target.
 	CurrentCursorState = CursorState::Select;
-	GameCursor = UI.get_cursor(stratagus::cursor_type::yellow_hair);
+	GameCursor = UI.get_cursor(wyrmgus::cursor_type::yellow_hair);
 	CursorAction = CurrentButtons[button]->Action;
 	CursorValue = CurrentButtons[button]->Value;
-	CurrentButtonLevel = stratagus::defines::get()->get_cancel_button_level(); // the cancel-only button level
+	CurrentButtonLevel = wyrmgus::defines::get()->get_cancel_button_level(); // the cancel-only button level
 	UI.ButtonPanel.Update();
 	UI.StatusLine.Set(_("Select Target"));
 }
@@ -1933,7 +1933,7 @@ void CButtonPanel::DoClicked_Unload(int button)
 void CButtonPanel::DoClicked_SpellCast(int button)
 {
 	const int spell_id = CurrentButtons[button]->Value;
-	const stratagus::spell *spell = stratagus::spell::get_all()[spell_id];
+	const wyrmgus::spell *spell = wyrmgus::spell::get_all()[spell_id];
 	if (KeyModifiers & ModifierControl) {
 		if (!spell->AutoCast) {
 			PlayGameSound(GameSounds.PlacementError[CPlayer::GetThisPlayer()->Race].Sound, MaxSampleVolume);
@@ -2016,7 +2016,7 @@ void CButtonPanel::DoClicked_StandGround()
 
 void CButtonPanel::DoClicked_Button(int button)
 {
-	CurrentButtonLevel = stratagus::button_level::try_get(CurrentButtons[button]->ValueStr);
+	CurrentButtonLevel = wyrmgus::button_level::try_get(CurrentButtons[button]->ValueStr);
 	LastDrawnButtonPopup = nullptr;
 	UI.ButtonPanel.Update();
 }
@@ -2039,7 +2039,7 @@ void CButtonPanel::DoClicked_CancelUpgrade()
 	UI.StatusLine.ClearCosts();
 	CurrentButtonLevel = nullptr;
 	UI.ButtonPanel.Update();
-	GameCursor = UI.get_cursor(stratagus::cursor_type::point);
+	GameCursor = UI.get_cursor(wyrmgus::cursor_type::point);
 	CursorBuilding = nullptr;
 	CurrentCursorState = CursorState::Point;
 }
@@ -2063,20 +2063,20 @@ void CButtonPanel::DoClicked_CancelBuild()
 	UI.StatusLine.ClearCosts();
 }
 
-void CButtonPanel::DoClicked_Build(const std::unique_ptr<stratagus::button> &button)
+void CButtonPanel::DoClicked_Build(const std::unique_ptr<wyrmgus::button> &button)
 {
-	const stratagus::unit_class *unit_class = nullptr;
-	stratagus::unit_type *unit_type = nullptr;
+	const wyrmgus::unit_class *unit_class = nullptr;
+	wyrmgus::unit_type *unit_type = nullptr;
 
 	switch (button->Action) {
 		case ButtonCmd::Build:
 			// FIXME: store pointer in button table!
-			unit_type = stratagus::unit_type::get_all()[button->Value];
+			unit_type = wyrmgus::unit_type::get_all()[button->Value];
 			break;
 		case ButtonCmd::BuildClass:
-			unit_class = stratagus::unit_class::get_all()[button->Value];
+			unit_class = wyrmgus::unit_class::get_all()[button->Value];
 			if (Selected[0]->Player->Faction != -1) {
-				unit_type = stratagus::faction::get_all()[Selected[0]->Player->Faction]->get_class_unit_type(unit_class);
+				unit_type = wyrmgus::faction::get_all()[Selected[0]->Player->Faction]->get_class_unit_type(unit_class);
 			}
 			break;
 		default:
@@ -2088,25 +2088,25 @@ void CButtonPanel::DoClicked_Build(const std::unique_ptr<stratagus::button> &but
 		UI.StatusLine.ClearCosts();
 		CursorBuilding = unit_type;
 		// FIXME: check is this check necessary?
-		CurrentButtonLevel = stratagus::defines::get()->get_cancel_button_level(); // the cancel-only button level
+		CurrentButtonLevel = wyrmgus::defines::get()->get_cancel_button_level(); // the cancel-only button level
 		UI.ButtonPanel.Update();
 	}
 }
 
-void CButtonPanel::DoClicked_Train(const std::unique_ptr<stratagus::button> &button)
+void CButtonPanel::DoClicked_Train(const std::unique_ptr<wyrmgus::button> &button)
 {
-	const stratagus::unit_class *unit_class = nullptr;
-	stratagus::unit_type *unit_type = nullptr;
+	const wyrmgus::unit_class *unit_class = nullptr;
+	wyrmgus::unit_type *unit_type = nullptr;
 
 	switch (button->Action) {
 		case ButtonCmd::Train:
 			// FIXME: store pointer in button table!
-			unit_type = stratagus::unit_type::get_all()[button->Value];
+			unit_type = wyrmgus::unit_type::get_all()[button->Value];
 			break;
 		case ButtonCmd::TrainClass:
-			unit_class = stratagus::unit_class::get_all()[button->Value];
+			unit_class = wyrmgus::unit_class::get_all()[button->Value];
 			if (Selected[0]->Player->Faction != -1) {
-				unit_type = stratagus::faction::get_all()[Selected[0]->Player->Faction]->get_class_unit_type(unit_class);
+				unit_type = wyrmgus::faction::get_all()[Selected[0]->Player->Faction]->get_class_unit_type(unit_class);
 			}
 			break;
 		default:
@@ -2169,7 +2169,7 @@ void CButtonPanel::DoClicked_Train(const std::unique_ptr<stratagus::button> &but
 void CButtonPanel::DoClicked_UpgradeTo(int button)
 {
 	// FIXME: store pointer in button table!
-	stratagus::unit_type &type = *stratagus::unit_type::get_all()[CurrentButtons[button]->Value];
+	wyrmgus::unit_type &type = *wyrmgus::unit_type::get_all()[CurrentButtons[button]->Value];
 	for (size_t i = 0; i != Selected.size(); ++i) {
 		if (Selected[i]->Player->CheckLimits(type) != -6 && !Selected[i]->Player->CheckUnitType(type)) {
 			if (Selected[i]->CurrentAction() != UnitAction::UpgradeTo) {
@@ -2186,7 +2186,7 @@ void CButtonPanel::DoClicked_UpgradeTo(int button)
 void CButtonPanel::DoClicked_ExperienceUpgradeTo(int button)
 {
 	// FIXME: store pointer in button table!
-	stratagus::unit_type &type = *stratagus::unit_type::get_all()[CurrentButtons[button]->Value];
+	wyrmgus::unit_type &type = *wyrmgus::unit_type::get_all()[CurrentButtons[button]->Value];
 	for (size_t i = 0; i != Selected.size(); ++i) {
 		if (Selected[0]->Player->GetUnitTotalCount(type) < Selected[0]->Player->Allow.Units[type.Slot] || Selected[0]->Player->CheckLimits(type) != -6) { //ugly way to make the checklimits message only appear when it should
 			if (Selected[i]->CurrentAction() != UnitAction::UpgradeTo) {
@@ -2195,7 +2195,7 @@ void CButtonPanel::DoClicked_ExperienceUpgradeTo(int button)
 				if (!IsNetworkGame() && Selected[i]->Character != nullptr) {	//save the unit-type experience upgrade for persistent characters
 					if (Selected[i]->Character->get_unit_type()->Slot != type.Slot) {
 						if (Selected[i]->Player == CPlayer::GetThisPlayer()) {
-							Selected[i]->Character->set_unit_type(stratagus::unit_type::get_all()[CurrentButtons[button]->Value]);
+							Selected[i]->Character->set_unit_type(wyrmgus::unit_type::get_all()[CurrentButtons[button]->Value]);
 							SaveHero(Selected[i]->Character);
 							CAchievement::CheckAchievements();
 						}
@@ -2219,7 +2219,7 @@ void CButtonPanel::DoClicked_ExperienceUpgradeTo(int button)
 	}
 }
 
-void CButtonPanel::DoClicked_Research(const std::unique_ptr<stratagus::button> &button)
+void CButtonPanel::DoClicked_Research(const std::unique_ptr<wyrmgus::button> &button)
 {
 	const CUpgrade *button_upgrade = button->get_value_upgrade(Selected[0]);
 
@@ -2254,7 +2254,7 @@ void CButtonPanel::DoClicked_LearnAbility(int button)
 void CButtonPanel::DoClicked_Faction(int button)
 {
 	const int index = CurrentButtons[button]->Value;
-	SendCommandSetFaction(CPlayer::GetThisPlayer()->Index, stratagus::faction::get_all()[CPlayer::GetThisPlayer()->Faction]->DevelopsTo[index]->ID);
+	SendCommandSetFaction(CPlayer::GetThisPlayer()->Index, wyrmgus::faction::get_all()[CPlayer::GetThisPlayer()->Faction]->DevelopsTo[index]->ID);
 	ButtonUnderCursor = -1;
 	OldButtonUnderCursor = -1;
 	LastDrawnButtonPopup = nullptr;
@@ -2348,7 +2348,7 @@ void CButtonPanel::DoClicked_EnterMapLayer()
 	for (size_t i = 0; i < Selected.size(); ++i) {
 		CUnit *connection_destination = Selected[i]->ConnectingDestination;
 		if (connection_destination != nullptr) {
-			PlayUnitSound(*connection_destination, stratagus::unit_sound_type::used);
+			PlayUnitSound(*connection_destination, wyrmgus::unit_sound_type::used);
 			Selected[i]->Blink = 4;
 			connection_destination->Blink = 4;
 			UnSelectUnit(*Selected[i]);

@@ -44,7 +44,7 @@
 #include "util/string_util.h"
 #include "util/vector_util.h"
 
-namespace stratagus {
+namespace wyrmgus {
 
 deity::deity(const std::string &identifier)
 	: detailed_data_entry(identifier), CDataType(identifier), gender(gender::none)

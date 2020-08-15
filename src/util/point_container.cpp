@@ -31,7 +31,7 @@
 
 #include "util/point_container.h"
 
-namespace stratagus {
+namespace wyrmgus {
 
 bool point_compare::operator()(const QPoint &point, const QPoint &other_point) const
 {

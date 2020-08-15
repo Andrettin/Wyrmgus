@@ -61,7 +61,7 @@ public:
 
 	void operator()(CUnit *const unit) const
 	{
-		const stratagus::unit_type &type = *unit->Type;
+		const wyrmgus::unit_type &type = *unit->Type;
 		// unusable unit ?
 		// if (unit->IsUnusable()) can't attack constructions
 		// FIXME: did SelectUnitsOnTile already filter this?
@@ -513,7 +513,7 @@ static CUnit *GetBestExplorer(const AiExplorationRequest &request, Vec2i *pos)
 			continue; //only explore with AI active units
 		}
 		//Wyrmgus end
-		const stratagus::unit_type &type = *unit.Type;
+		const wyrmgus::unit_type &type = *unit.Type;
 
 		if (type.UnitType != UnitTypeType::Fly) {
 			if (flyeronly) {
@@ -581,7 +581,7 @@ static CUnit *GetBestScout(const UnitTypeType unit_type)
 			continue;
 		}
 		
-		const stratagus::unit_type &type = *unit.Type;
+		const wyrmgus::unit_type &type = *unit.Type;
 		
 		if (type.BoolFlag[HARVESTER_INDEX].value) { //don't choose harvesters as scouts (they are already told to explore when they can't find a basic resource)
 			continue;

@@ -30,7 +30,7 @@
 #include "util/geocoordinate_util.h"
 #include "util/util.h"
 
-namespace stratagus::point {
+namespace wyrmgus::point {
 
 QGeoCoordinate to_geocoordinate(const QPoint &point, const QSize &area_size, const QRectF &unsigned_georectangle)
 {

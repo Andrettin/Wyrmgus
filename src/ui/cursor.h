@@ -34,7 +34,7 @@
 class CGraphic;
 enum class ButtonCmd;
 
-namespace stratagus {
+namespace wyrmgus {
 
 class civilization;
 class unit_type;
@@ -45,8 +45,8 @@ class cursor final : public data_entry, public data_type<cursor>
 {
 	Q_OBJECT
 
-	Q_PROPERTY(stratagus::cursor_type type MEMBER type READ get_type)
-	Q_PROPERTY(stratagus::civilization* civilization MEMBER civilization READ get_civilization)
+	Q_PROPERTY(wyrmgus::cursor_type type MEMBER type READ get_type)
+	Q_PROPERTY(wyrmgus::civilization* civilization MEMBER civilization READ get_civilization)
 	Q_PROPERTY(QString file READ get_file_qstring)
 	Q_PROPERTY(QPoint hot_pos MEMBER hot_pos READ get_hot_pos)
 	Q_PROPERTY(QSize frame_size MEMBER frame_size READ get_frame_size)
@@ -150,7 +150,7 @@ public:
 
 private:
 	cursor_type type;
-	stratagus::civilization *civilization = nullptr;
+	wyrmgus::civilization *civilization = nullptr;
 	std::filesystem::path file;
 	CGraphic *graphic = nullptr; /// Cursor sprite image
 	QPoint hot_pos = QPoint(0, 0);     /// Hot point
@@ -172,10 +172,10 @@ enum class CursorState {
 extern CursorState CurrentCursorState;  /// current cursor state (point,...)
 extern ButtonCmd CursorAction;          /// action for selection
 extern int CursorValue;           /// value for action (spell type f.e.)
-extern stratagus::unit_type *CursorBuilding; /// building cursor
+extern wyrmgus::unit_type *CursorBuilding; /// building cursor
 extern std::string CustomCursor;  /// custom cursor for button
 
-extern stratagus::cursor *GameCursor;     /// cursor-type
+extern wyrmgus::cursor *GameCursor;     /// cursor-type
 extern PixelPos CursorScreenPos; /// cursor position on screen
 extern PixelPos CursorStartScreenPos; /// rectangle started on screen
 extern PixelPos CursorStartMapPos; /// the same in screen map coordinate system

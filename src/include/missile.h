@@ -32,7 +32,7 @@
 ----------------------------------------------------------------------------*/
 
 /**
-**  @class stratagus::missile_type missile.h
+**  @class wyrmgus::missile_type missile.h
 **
 **  \#include "missile.h"
 **
@@ -298,7 +298,7 @@ class LuaCallback;
 --  Missile-type
 ----------------------------------------------------------------------------*/
 
-namespace stratagus {
+namespace wyrmgus {
 
 class sound;
 enum class missile_class;
@@ -308,7 +308,7 @@ class missile_type final : public data_entry, public data_type<missile_type>, pu
 {
 	Q_OBJECT
 
-	Q_PROPERTY(stratagus::missile_class missile_class MEMBER missile_class READ get_missile_class)
+	Q_PROPERTY(wyrmgus::missile_class missile_class MEMBER missile_class READ get_missile_class)
 	Q_PROPERTY(QString image_file READ get_image_file_qstring)
 	Q_PROPERTY(QSize frame_size MEMBER frame_size READ get_frame_size)
 	Q_PROPERTY(int draw_level MEMBER draw_level READ get_draw_level)
@@ -317,8 +317,8 @@ class missile_type final : public data_entry, public data_type<missile_type>, pu
 	Q_PROPERTY(int sleep MEMBER sleep READ get_sleep)
 	Q_PROPERTY(int speed MEMBER speed READ get_speed)
 	Q_PROPERTY(int range MEMBER range READ get_range)
-	Q_PROPERTY(stratagus::sound* fired_sound MEMBER fired_sound READ get_fired_sound)
-	Q_PROPERTY(stratagus::sound* impact_sound MEMBER impact_sound READ get_impact_sound)
+	Q_PROPERTY(wyrmgus::sound* fired_sound MEMBER fired_sound READ get_fired_sound)
+	Q_PROPERTY(wyrmgus::sound* impact_sound MEMBER impact_sound READ get_impact_sound)
 
 public:
 	static constexpr const char *class_identifier = "missile_type";
@@ -495,7 +495,7 @@ protected:
 public:
 	virtual ~Missile();
 
-	static Missile *Init(const stratagus::missile_type &mtype, const PixelPos &startPos, const PixelPos &destPos, int z);
+	static Missile *Init(const wyrmgus::missile_type &mtype, const PixelPos &startPos, const PixelPos &destPos, int z);
 
 	virtual void Action() = 0;
 
@@ -511,7 +511,7 @@ public:
 	PixelPos source; /// Missile source position
 	PixelPos position;   /// missile pixel position
 	PixelPos destination;  /// missile pixel destination
-	const stratagus::missile_type *Type;  /// missile-type pointer
+	const wyrmgus::missile_type *Type;  /// missile-type pointer
 	int SpriteFrame;  /// sprite frame counter
 	int State;        /// state
 	int AnimWait;     /// Animation wait.
@@ -656,7 +656,7 @@ public:
 	BurningBuildingFrame() : Percent(0), Missile(nullptr) {};
 
 	int          Percent;  /// HP percent
-	stratagus::missile_type *Missile;  /// Missile to draw
+	wyrmgus::missile_type *Missile;  /// Missile to draw
 } ;
 
 extern std::vector<BurningBuildingFrame *> BurningBuildingFrames;  /// Burning building frames
@@ -673,9 +673,9 @@ extern void LoadMissileSprites();
 /// count missile sprites
 extern int GetMissileSpritesCount();
 /// create a missile
-extern Missile *MakeMissile(const stratagus::missile_type &mtype, const PixelPos &startPos, const PixelPos &destPos, int z);
+extern Missile *MakeMissile(const wyrmgus::missile_type &mtype, const PixelPos &startPos, const PixelPos &destPos, int z);
 /// create a local missile
-extern Missile *MakeLocalMissile(const stratagus::missile_type &mtype, const PixelPos &startPos, const PixelPos &destPos, int z);
+extern Missile *MakeLocalMissile(const wyrmgus::missile_type &mtype, const PixelPos &startPos, const PixelPos &destPos, int z);
 
 /// Calculates damage done to goal by attacker using formula
 //Wyrmgus start
@@ -696,7 +696,7 @@ extern void MissileActions();
 extern int ViewPointDistanceToMissile(const Missile &missile);
 
 /// Get the burning building missile based on hp percent
-extern stratagus::missile_type *MissileBurningBuilding(int percent);
+extern wyrmgus::missile_type *MissileBurningBuilding(int percent);
 
 /// Save missiles
 extern void SaveMissiles(CFile &file);

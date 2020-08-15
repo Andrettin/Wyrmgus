@@ -27,7 +27,7 @@
 
 #pragma once
 
-namespace stratagus::point {
+namespace wyrmgus::point {
 
 inline constexpr int to_index(const int x, const int y, const int width)
 {

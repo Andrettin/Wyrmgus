@@ -216,7 +216,7 @@ COrder *COrder::NewActionTrade(CUnit &dest, CUnit &home_market)
 						ChangeCurrentMapLayer(unit.MapLayer->ID);
 						UI.SelectedViewport->Center(unit.get_scaled_map_pixel_pos_center());
 					}
-					PlayUnitSound(*goal->ConnectingDestination, stratagus::unit_sound_type::used);
+					PlayUnitSound(*goal->ConnectingDestination, wyrmgus::unit_sound_type::used);
 				} else if (goal->Spell != nullptr) {
 					CommandSpellCast(unit, unit.tilePos, nullptr, *goal->Spell, FlushCommands, unit.MapLayer->ID);
 				} else if (goal->Work != nullptr) {
@@ -233,7 +233,7 @@ COrder *COrder::NewActionTrade(CUnit &dest, CUnit &home_market)
 					if (unit.Player == CPlayer::GetThisPlayer()) {
 						unit.Player->Notify(NotifyGreen, unit.tilePos, unit.MapLayer->ID, _("Gained %d %s"), goal->ResourcesHeld, DefaultResourceNames[goal->Type->GivesResource].c_str());
 					}
-					unit.Player->change_resource(stratagus::resource::get_all()[goal->Type->GivesResource], goal->ResourcesHeld);
+					unit.Player->change_resource(wyrmgus::resource::get_all()[goal->Type->GivesResource], goal->ResourcesHeld);
 					unit.Player->TotalResources[goal->Type->GivesResource] += (goal->ResourcesHeld * unit.Player->Incomes[goal->Type->GivesResource]) / 100;
 				} else if (goal->Variable[HITPOINTHEALING_INDEX].Value > 0) {
 					int hp_healed = std::min(goal->Variable[HITPOINTHEALING_INDEX].Value, (unit.GetModifiedVariable(HP_INDEX, VariableMax) - unit.Variable[HP_INDEX].Value));
@@ -263,14 +263,14 @@ COrder *COrder::NewActionTrade(CUnit &dest, CUnit &home_market)
 				this->Finished = true;
 				return;
 			}
-			PlayUnitSound(*goal, stratagus::unit_sound_type::used);
-			if (goal->Type->BoolFlag[POWERUP_INDEX].value || stratagus::is_consumable_item_class(goal->Type->get_item_class())) { //only destroy item if it is consumable
+			PlayUnitSound(*goal, wyrmgus::unit_sound_type::used);
+			if (goal->Type->BoolFlag[POWERUP_INDEX].value || wyrmgus::is_consumable_item_class(goal->Type->get_item_class())) { //only destroy item if it is consumable
 				if (goal->Container == nullptr) {
 					goal->Remove(nullptr);
 					LetUnitDie(*goal);
 				} else {
 					if (!IsNetworkGame() && goal->Container->Character && goal->Container->Player == CPlayer::GetThisPlayer() && goal->Type->BoolFlag[ITEM_INDEX].value && goal->Container->HasInventory()) {
-						const stratagus::persistent_item *item = goal->Container->Character->get_item(*goal);
+						const wyrmgus::persistent_item *item = goal->Container->Character->get_item(*goal);
 						goal->Container->Character->remove_item(item);
 						SaveHero(goal->Container->Character);
 					}

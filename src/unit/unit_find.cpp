@@ -103,7 +103,7 @@ public:
 	//Wyrmgus start
 //	TerrainFinder(const CPlayer &player, int maxDist, int movemask, int resmask, Vec2i *resPos) :
 //		player(player), maxDist(maxDist), movemask(movemask), resmask(resmask), resPos(resPos) {}
-	TerrainFinder(const CPlayer &player, int maxDist, int movemask, const stratagus::resource *resource, Vec2i *resPos, int z, int landmass) :
+	TerrainFinder(const CPlayer &player, int maxDist, int movemask, const wyrmgus::resource *resource, Vec2i *resPos, int z, int landmass) :
 		player(player), maxDist(maxDist), movemask(movemask), resource(resource), resPos(resPos), z(z), landmass(landmass) {}
 	//Wyrmgus end
 	VisitResult Visit(TerrainTraversal &terrainTraversal, const Vec2i &pos, const Vec2i &from);
@@ -113,7 +113,7 @@ private:
 	int movemask;
 	//Wyrmgus start
 //	int resmask;
-	const stratagus::resource *resource = nullptr;
+	const wyrmgus::resource *resource = nullptr;
 	int z;
 	int landmass;
 	//Wyrmgus end
@@ -171,7 +171,7 @@ VisitResult TerrainFinder::Visit(TerrainTraversal &terrainTraversal, const Vec2i
 **
 **  @return            True if wood was found.
 */
-bool FindTerrainType(int movemask, const stratagus::resource *resource, int range,
+bool FindTerrainType(int movemask, const wyrmgus::resource *resource, int range,
 					 //Wyrmgus start
 //					 const CPlayer &player, const Vec2i &startPos, Vec2i *terrainPos)
 					 const CPlayer &player, const Vec2i &startPos, Vec2i *terrainPos, int z, int landmass)
@@ -408,18 +408,18 @@ CUnit *FindDepositNearLoc(CPlayer &p, const Vec2i &pos, int range, int resource,
 	BestDepotFinder<true> finder(pos, resource, range, z);
 	std::vector<CUnit *> table;
 	for (const auto &kv_pair : p.UnitsByType) {
-		const stratagus::unit_type *unit_type = kv_pair.first;
+		const wyrmgus::unit_type *unit_type = kv_pair.first;
 		if (unit_type->CanStore[resource]) {
-			stratagus::vector::merge(table, kv_pair.second);
+			wyrmgus::vector::merge(table, kv_pair.second);
 		}
 	}
 	for (int i = 0; i < PlayerMax - 1; ++i) {
 		const CPlayer *other_player = CPlayer::Players[i];
 		if (other_player->IsAllied(p) && p.IsAllied(*other_player)) {
 			for (const auto &kv_pair : other_player->UnitsByType) {
-				const stratagus::unit_type *unit_type = kv_pair.first;
+				const wyrmgus::unit_type *unit_type = kv_pair.first;
 				if (unit_type->CanStore[resource]) {
-					stratagus::vector::merge(table, kv_pair.second);
+					wyrmgus::vector::merge(table, kv_pair.second);
 				}
 			}
 		}
@@ -436,10 +436,10 @@ public:
 	//Wyrmgus end
 	bool operator()(const CUnit *const unit) const
 	{
-		const stratagus::unit_type &type = *unit->Type;
+		const wyrmgus::unit_type &type = *unit->Type;
 		//Wyrmgus start
 //		return (type.GivesResource == resource
-		return ((unit->GivesResource == resource || (!only_same && unit->GivesResource != TradeCost && stratagus::resource::get_all()[unit->GivesResource]->FinalResource == resource) || (include_luxury && stratagus::resource::get_all()[unit->GivesResource]->LuxuryResource))
+		return ((unit->GivesResource == resource || (!only_same && unit->GivesResource != TradeCost && wyrmgus::resource::get_all()[unit->GivesResource]->FinalResource == resource) || (include_luxury && wyrmgus::resource::get_all()[unit->GivesResource]->LuxuryResource))
 		//Wyrmgus end
 				&& unit->ResourcesHeld != 0
 				//Wyrmgus start
@@ -519,7 +519,7 @@ private:
 
 private:
 	const CUnit &worker;
-	const stratagus::resource_info &resinfo;
+	const wyrmgus::resource_info &resinfo;
 	const CUnit *deposit;
 	unsigned int movemask;
 	int maxRange;
@@ -567,7 +567,7 @@ bool ResourceUnitFinder::MineIsUsable(const CUnit &mine) const
 void ResourceUnitFinder::ResourceUnitFinder_Cost::SetFrom(const CUnit &mine, const CUnit *deposit, const CUnit &worker, bool check_usage)
 //Wyrmgus end
 {
-	const stratagus::resource *resource = stratagus::resource::get_all()[mine.GivesResource];
+	const wyrmgus::resource *resource = wyrmgus::resource::get_all()[mine.GivesResource];
 
 	distance = deposit ? mine.MapDistanceTo(*deposit) : 0;
 	//Wyrmgus start
@@ -708,18 +708,18 @@ CUnit *FindDeposit(const CUnit &unit, int range, int resource)
 	BestDepotFinder<false> finder(unit, resource, range);
 	std::vector<CUnit *> table;
 	for (const auto &kv_pair : unit.Player->UnitsByType) {
-		const stratagus::unit_type *unit_type = kv_pair.first;
+		const wyrmgus::unit_type *unit_type = kv_pair.first;
 		if (unit_type->CanStore[resource]) {
-			stratagus::vector::merge(table, kv_pair.second);
+			wyrmgus::vector::merge(table, kv_pair.second);
 		}
 	}
 	for (int i = 0; i < PlayerMax - 1; ++i) {
 		const CPlayer *other_player = CPlayer::Players[i];
 		if (other_player->IsAllied(*unit.Player) && unit.Player->IsAllied(*other_player)) {
 			for (const auto &kv_pair : other_player->UnitsByType) {
-				const stratagus::unit_type *unit_type = kv_pair.first;
+				const wyrmgus::unit_type *unit_type = kv_pair.first;
 				if (unit_type->CanStore[resource]) {
-					stratagus::vector::merge(table, kv_pair.second);
+					wyrmgus::vector::merge(table, kv_pair.second);
 				}
 			}
 		}
@@ -792,7 +792,7 @@ CUnit *FindIdleWorker(const CPlayer &player, const CUnit *last)
 **  @param units      array in which we have to store the units
 **  @param everybody  if true, include all units
 */
-void FindUnitsByType(const stratagus::unit_type &type, std::vector<CUnit *> &units, bool everybody)
+void FindUnitsByType(const wyrmgus::unit_type &type, std::vector<CUnit *> &units, bool everybody)
 {
 	for (CUnitManager::Iterator it = UnitManager.begin(); it != UnitManager.end(); ++it) {
 		CUnit &unit = **it;
@@ -813,7 +813,7 @@ void FindUnitsByType(const stratagus::unit_type &type, std::vector<CUnit *> &uni
 **  @param type    type of unit requested
 **  @param table   table in which we have to store the units
 */
-void FindPlayerUnitsByType(const CPlayer &player, const stratagus::unit_type &type, std::vector<CUnit *> &table, bool ai_active)
+void FindPlayerUnitsByType(const CPlayer &player, const wyrmgus::unit_type &type, std::vector<CUnit *> &table, bool ai_active)
 {
 	std::vector<CUnit *> type_units;
 
@@ -1011,8 +1011,8 @@ private:
 	int ComputeCost(CUnit *const dest) const
 	{
 		const CPlayer &player = *attacker->Player;
-		const stratagus::unit_type &type = *attacker->Type;
-		const stratagus::unit_type &dtype = *dest->Type;
+		const wyrmgus::unit_type &type = *attacker->Type;
+		const wyrmgus::unit_type &dtype = *dest->Type;
 		int attackrange = attacker->GetModifiedVariable(ATTACKRANGE_INDEX);
 
 		//Wyrmgus start
@@ -1176,8 +1176,8 @@ public:
 				return;
 			}
 
-			const stratagus::unit_type &type =  *attacker->Type;
-			const stratagus::unit_type &dtype = *dest->Type;
+			const wyrmgus::unit_type &type =  *attacker->Type;
+			const wyrmgus::unit_type &dtype = *dest->Type;
 			// won't be a target...
 			if (!CanTarget(type, dtype)) { // can't be attacked.
 				dest->CacheLock = 1;
@@ -1364,8 +1364,8 @@ private:
 			dest->CacheLock = 0;
 			return;
 		}
-		const stratagus::unit_type &type = *attacker->Type;
-		const stratagus::unit_type &dtype = *dest->Type;
+		const wyrmgus::unit_type &type = *attacker->Type;
+		const wyrmgus::unit_type &dtype = *dest->Type;
 		const int missile_range = attacker->GetMissile().Missile->get_range() + range - 1;
 		int x = attacker->tilePos.x;
 		int y = attacker->tilePos.y;

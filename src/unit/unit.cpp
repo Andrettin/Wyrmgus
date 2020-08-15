@@ -425,7 +425,7 @@ void CUnit::Init()
 	Resource.Assigned = 0;
 	Resource.Active = 0;
 	
-	for (int i = 0; i < static_cast<int>(stratagus::item_slot::count); ++i) {
+	for (int i = 0; i < static_cast<int>(wyrmgus::item_slot::count); ++i) {
 		this->EquippedItems[i].clear();
 	}
 	this->SoldUnits.clear();
@@ -588,7 +588,7 @@ void CUnit::Release(bool final)
 	Identified = true;
 	ConnectingDestination = nullptr;
 	
-	for (int i = 0; i < static_cast<int>(stratagus::item_slot::count); ++i) {
+	for (int i = 0; i < static_cast<int>(wyrmgus::item_slot::count); ++i) {
 		this->EquippedItems[i].clear();
 	}
 	this->SoldUnits.clear();
@@ -613,7 +613,7 @@ void CUnit::SetResourcesHeld(int quantity)
 {
 	this->ResourcesHeld = quantity;
 	
-	const stratagus::unit_type_variation *variation = this->GetVariation();
+	const wyrmgus::unit_type_variation *variation = this->GetVariation();
 	if (
 		variation
 		&& (
@@ -721,13 +721,13 @@ void CUnit::IncreaseLevel(int level_quantity, bool automatic_learning)
 		upgrade_found = false;
 
 		if (((int) AiHelpers.ExperienceUpgrades.size()) > Type->Slot) {
-			std::vector<stratagus::unit_type *> potential_upgrades;
+			std::vector<wyrmgus::unit_type *> potential_upgrades;
 			
 			if ((this->Player->AiEnabled || this->Character == nullptr) && this->Type->BoolFlag[HARVESTER_INDEX].value && this->CurrentResource && AiHelpers.ExperienceUpgrades[Type->Slot].size() > 1) {
 				//if is a harvester who is currently gathering, try to upgrade to a unit type which is best for harvesting the current resource
 				unsigned int best_gathering_rate = 0;
 				for (size_t i = 0; i != AiHelpers.ExperienceUpgrades[Type->Slot].size(); ++i) {
-					stratagus::unit_type *experience_upgrade_type = AiHelpers.ExperienceUpgrades[Type->Slot][i];
+					wyrmgus::unit_type *experience_upgrade_type = AiHelpers.ExperienceUpgrades[Type->Slot][i];
 					if (CheckConditions(experience_upgrade_type, this, true)) {
 						if (this->Character == nullptr || std::find(this->Character->ForbiddenUpgrades.begin(), this->Character->ForbiddenUpgrades.end(), experience_upgrade_type) == this->Character->ForbiddenUpgrades.end()) {
 							if (!experience_upgrade_type->ResInfo[this->CurrentResource]) {
@@ -757,7 +757,7 @@ void CUnit::IncreaseLevel(int level_quantity, bool automatic_learning)
 			if (potential_upgrades.size() > 0) {
 				this->Variable[LEVELUP_INDEX].Value -= 1;
 				this->Variable[LEVELUP_INDEX].Max = this->Variable[LEVELUP_INDEX].Value;
-				stratagus::unit_type *chosen_unit_type = potential_upgrades[SyncRand(potential_upgrades.size())];
+				wyrmgus::unit_type *chosen_unit_type = potential_upgrades[SyncRand(potential_upgrades.size())];
 				if (this->Player == CPlayer::GetThisPlayer()) {
 					this->Player->Notify(NotifyGreen, this->tilePos, this->MapLayer->ID, _("%s has upgraded to %s!"), this->GetMessageName().c_str(), chosen_unit_type->get_name().c_str());
 				}
@@ -803,7 +803,7 @@ void CUnit::Retrain()
 		}
 
 		if (upgrade->is_ability()) {
-			if (stratagus::vector::contains(this->Type->StartingAbilities, upgrade)) {
+			if (wyrmgus::vector::contains(this->Type->StartingAbilities, upgrade)) {
 				continue;
 			}
 
@@ -835,7 +835,7 @@ void CUnit::Retrain()
 	//now, revert the unit's type to the base level one
 	while (this->Type->Stats[this->Player->Index].Variables[LEVEL_INDEX].Value > base_level) {
 		bool found_previous_unit_type = false;
-		for (stratagus::unit_type *unit_type : stratagus::unit_type::get_all()) {
+		for (wyrmgus::unit_type *unit_type : wyrmgus::unit_type::get_all()) {
 			if (this->Character != nullptr && std::find(this->Character->ForbiddenUpgrades.begin(), this->Character->ForbiddenUpgrades.end(), unit_type) != this->Character->ForbiddenUpgrades.end()) {
 				continue;
 			}
@@ -891,7 +891,7 @@ void CUnit::HealingItemAutoUse()
 			continue;
 		}
 		
-		if (!stratagus::is_consumable_item_class(uins->Type->get_item_class())) {
+		if (!wyrmgus::is_consumable_item_class(uins->Type->get_item_class())) {
 			continue;
 		}
 		
@@ -909,14 +909,14 @@ void CUnit::HealingItemAutoUse()
 	}
 }
 
-void CUnit::set_character(stratagus::character *character)
+void CUnit::set_character(wyrmgus::character *character)
 {
 	if (this->CurrentAction() == UnitAction::Die) {
 		return;
 	}
 
 	if (this->Character != nullptr) {
-		stratagus::vector::remove(this->Player->Heroes, this);
+		wyrmgus::vector::remove(this->Player->Heroes, this);
 
 		this->Variable[HERO_INDEX].Max = this->Variable[HERO_INDEX].Value = this->Variable[HERO_INDEX].Enable = 0;
 	}
@@ -952,8 +952,8 @@ void CUnit::set_character(stratagus::character *character)
 			this->SetIndividualUpgrade(civilization_upgrade, 1);
 		}
 	}
-	if (this->Type->Faction != -1 && !stratagus::faction::get_all()[this->Type->Faction]->FactionUpgrade.empty()) {
-		CUpgrade *faction_upgrade = CUpgrade::try_get(stratagus::faction::get_all()[this->Type->Faction]->FactionUpgrade);
+	if (this->Type->Faction != -1 && !wyrmgus::faction::get_all()[this->Type->Faction]->FactionUpgrade.empty()) {
+		CUpgrade *faction_upgrade = CUpgrade::try_get(wyrmgus::faction::get_all()[this->Type->Faction]->FactionUpgrade);
 		if (faction_upgrade) {
 			this->SetIndividualUpgrade(faction_upgrade, 1);
 		}
@@ -1072,9 +1072,9 @@ void CUnit::set_character(stratagus::character *character)
 
 void CUnit::SetCharacter(const std::string &character_ident, bool custom_hero)
 {
-	stratagus::character *character = nullptr;
+	wyrmgus::character *character = nullptr;
 	if (!custom_hero) {
-		character = stratagus::character::get(character_ident);
+		character = wyrmgus::character::get(character_ident);
 	} else {
 		character = GetCustomHero(character_ident);
 	}
@@ -1082,7 +1082,7 @@ void CUnit::SetCharacter(const std::string &character_ident, bool custom_hero)
 	this->set_character(character);
 }
 
-bool CUnit::CheckTerrainForVariation(const stratagus::unit_type_variation *variation) const
+bool CUnit::CheckTerrainForVariation(const wyrmgus::unit_type_variation *variation) const
 {
 	//if the variation has one or more terrain set as a precondition, then all tiles underneath the unit must match at least one of those terrains
 	if (variation->Terrains.size() > 0) {
@@ -1094,7 +1094,7 @@ bool CUnit::CheckTerrainForVariation(const stratagus::unit_type_variation *varia
 		for (int x = 0; x < this->Type->get_tile_width(); ++x) {
 			for (int y = 0; y < this->Type->get_tile_height(); ++y) {
 				if (CMap::Map.Info.IsPointOnMap(this->tilePos + Vec2i(x, y), this->MapLayer)) {
-					if (!stratagus::vector::contains(variation->Terrains, CMap::Map.GetTileTopTerrain(this->tilePos + Vec2i(x, y), false, this->MapLayer->ID, true))) {
+					if (!wyrmgus::vector::contains(variation->Terrains, CMap::Map.GetTileTopTerrain(this->tilePos + Vec2i(x, y), false, this->MapLayer->ID, true))) {
 						return false;
 					}
 				}
@@ -1108,7 +1108,7 @@ bool CUnit::CheckTerrainForVariation(const stratagus::unit_type_variation *varia
 			for (int x = 0; x < this->Type->get_tile_width(); ++x) {
 				for (int y = 0; y < this->Type->get_tile_height(); ++y) {
 					if (CMap::Map.Info.IsPointOnMap(this->tilePos + Vec2i(x, y), this->MapLayer)) {
-						if (stratagus::vector::contains(variation->TerrainsForbidden, CMap::Map.GetTileTopTerrain(this->tilePos + Vec2i(x, y), false, this->MapLayer->ID, true))) {
+						if (wyrmgus::vector::contains(variation->TerrainsForbidden, CMap::Map.GetTileTopTerrain(this->tilePos + Vec2i(x, y), false, this->MapLayer->ID, true))) {
 							return false;
 						}
 					}
@@ -1120,7 +1120,7 @@ bool CUnit::CheckTerrainForVariation(const stratagus::unit_type_variation *varia
 	return true;
 }
 
-bool CUnit::CheckSeasonForVariation(const stratagus::unit_type_variation *variation) const
+bool CUnit::CheckSeasonForVariation(const wyrmgus::unit_type_variation *variation) const
 {
 	if (
 		!variation->Seasons.empty()
@@ -1140,7 +1140,7 @@ bool CUnit::CheckSeasonForVariation(const stratagus::unit_type_variation *variat
 	return true;
 }
 
-void CUnit::ChooseVariation(const stratagus::unit_type *new_type, bool ignore_old_variation, int image_layer)
+void CUnit::ChooseVariation(const wyrmgus::unit_type *new_type, bool ignore_old_variation, int image_layer)
 {
 	std::string priority_variation;
 	if (image_layer == -1) {
@@ -1157,8 +1157,8 @@ void CUnit::ChooseVariation(const stratagus::unit_type *new_type, bool ignore_ol
 		}
 	}
 	
-	std::vector<stratagus::unit_type_variation *> type_variations;
-	const std::vector<std::unique_ptr<stratagus::unit_type_variation>> &variation_list = image_layer == -1 ? (new_type != nullptr ? new_type->get_variations() : this->Type->get_variations()) : (new_type != nullptr ? new_type->LayerVariations[image_layer] : this->Type->LayerVariations[image_layer]);
+	std::vector<wyrmgus::unit_type_variation *> type_variations;
+	const std::vector<std::unique_ptr<wyrmgus::unit_type_variation>> &variation_list = image_layer == -1 ? (new_type != nullptr ? new_type->get_variations() : this->Type->get_variations()) : (new_type != nullptr ? new_type->LayerVariations[image_layer] : this->Type->LayerVariations[image_layer]);
 	
 	bool found_similar = false;
 	for (const auto &variation : variation_list) {
@@ -1208,7 +1208,7 @@ void CUnit::ChooseVariation(const stratagus::unit_type *new_type, bool ignore_ol
 			}
 		}
 		
-		for (const stratagus::item_class item_class_not_equipped : variation->item_classes_not_equipped) {
+		for (const wyrmgus::item_class item_class_not_equipped : variation->item_classes_not_equipped) {
 			if (this->is_item_class_equipped(item_class_not_equipped)) {
 				upgrades_check = false;
 				break;
@@ -1223,13 +1223,13 @@ void CUnit::ChooseVariation(const stratagus::unit_type *new_type, bool ignore_ol
 		if (upgrades_check == false) {
 			continue;
 		}
-		for (const stratagus::item_class item_class_equipped : variation->item_classes_equipped) {
-			if (stratagus::get_item_class_slot(item_class_equipped) == stratagus::item_slot::weapon) {
+		for (const wyrmgus::item_class item_class_equipped : variation->item_classes_equipped) {
+			if (wyrmgus::get_item_class_slot(item_class_equipped) == wyrmgus::item_slot::weapon) {
 				requires_weapon = true;
 				if (is_item_class_equipped(item_class_equipped)) {
 					found_weapon = true;
 				}
-			} else if (stratagus::get_item_class_slot(item_class_equipped) == stratagus::item_slot::shield) {
+			} else if (wyrmgus::get_item_class_slot(item_class_equipped) == wyrmgus::item_slot::shield) {
 				requires_shield = true;
 				if (is_item_class_equipped(item_class_equipped)) {
 					found_shield = true;
@@ -1237,12 +1237,12 @@ void CUnit::ChooseVariation(const stratagus::unit_type *new_type, bool ignore_ol
 			}
 		}
 		for (size_t j = 0; j < variation->ItemsEquipped.size(); ++j) {
-			if (stratagus::get_item_class_slot(variation->ItemsEquipped[j]->get_item_class()) == stratagus::item_slot::weapon) {
+			if (wyrmgus::get_item_class_slot(variation->ItemsEquipped[j]->get_item_class()) == wyrmgus::item_slot::weapon) {
 				requires_weapon = true;
 				if (this->IsItemTypeEquipped(variation->ItemsEquipped[j])) {
 					found_weapon = true;
 				}
-			} else if (stratagus::get_item_class_slot(variation->ItemsEquipped[j]->get_item_class()) == stratagus::item_slot::shield) {
+			} else if (wyrmgus::get_item_class_slot(variation->ItemsEquipped[j]->get_item_class()) == wyrmgus::item_slot::shield) {
 				requires_shield = true;
 				if (this->IsItemTypeEquipped(variation->ItemsEquipped[j])) {
 					found_shield = true;
@@ -1271,7 +1271,7 @@ void CUnit::ChooseVariation(const stratagus::unit_type *new_type, bool ignore_ol
 	}
 }
 
-void CUnit::SetVariation(stratagus::unit_type_variation *new_variation, const stratagus::unit_type *new_type, int image_layer)
+void CUnit::SetVariation(wyrmgus::unit_type_variation *new_variation, const wyrmgus::unit_type *new_type, int image_layer)
 {
 	if (image_layer == -1) {
 		if (
@@ -1286,7 +1286,7 @@ void CUnit::SetVariation(stratagus::unit_type_variation *new_variation, const st
 	}
 }
 
-const stratagus::unit_type_variation *CUnit::GetVariation() const
+const wyrmgus::unit_type_variation *CUnit::GetVariation() const
 {
 	if (this->Variation < static_cast<int>(this->Type->get_variations().size())) {
 		return this->Type->get_variations()[this->Variation].get();
@@ -1295,7 +1295,7 @@ const stratagus::unit_type_variation *CUnit::GetVariation() const
 	return nullptr;
 }
 
-const stratagus::unit_type_variation *CUnit::GetLayerVariation(const unsigned int image_layer) const
+const wyrmgus::unit_type_variation *CUnit::GetLayerVariation(const unsigned int image_layer) const
 {
 	if (this->LayerVariation[image_layer] >= 0 && this->LayerVariation[image_layer] < (int) this->Type->LayerVariations[image_layer].size()) {
 		return this->Type->LayerVariations[image_layer][this->LayerVariation[image_layer]].get();
@@ -1319,57 +1319,57 @@ void CUnit::UpdateButtonIcons()
 void CUnit::ChooseButtonIcon(const ButtonCmd button_action)
 {
 	if (button_action == ButtonCmd::Attack) {
-		if (this->EquippedItems[static_cast<int>(stratagus::item_slot::arrows)].size() > 0 && this->EquippedItems[static_cast<int>(stratagus::item_slot::arrows)][0]->get_icon() != nullptr) {
-			this->ButtonIcons[button_action] = this->EquippedItems[static_cast<int>(stratagus::item_slot::arrows)][0]->get_icon();
+		if (this->EquippedItems[static_cast<int>(wyrmgus::item_slot::arrows)].size() > 0 && this->EquippedItems[static_cast<int>(wyrmgus::item_slot::arrows)][0]->get_icon() != nullptr) {
+			this->ButtonIcons[button_action] = this->EquippedItems[static_cast<int>(wyrmgus::item_slot::arrows)][0]->get_icon();
 			return;
 		}
 		
-		if (this->EquippedItems[static_cast<int>(stratagus::item_slot::weapon)].size() > 0 && this->EquippedItems[static_cast<int>(stratagus::item_slot::weapon)][0]->Type->get_item_class() != stratagus::item_class::bow && this->EquippedItems[static_cast<int>(stratagus::item_slot::weapon)][0]->get_icon() != nullptr) {
-			this->ButtonIcons[button_action] = this->EquippedItems[static_cast<int>(stratagus::item_slot::weapon)][0]->get_icon();
+		if (this->EquippedItems[static_cast<int>(wyrmgus::item_slot::weapon)].size() > 0 && this->EquippedItems[static_cast<int>(wyrmgus::item_slot::weapon)][0]->Type->get_item_class() != wyrmgus::item_class::bow && this->EquippedItems[static_cast<int>(wyrmgus::item_slot::weapon)][0]->get_icon() != nullptr) {
+			this->ButtonIcons[button_action] = this->EquippedItems[static_cast<int>(wyrmgus::item_slot::weapon)][0]->get_icon();
 			return;
 		}
 	} else if (button_action == ButtonCmd::Stop) {
-		if (this->EquippedItems[static_cast<int>(stratagus::item_slot::shield)].size() > 0 && this->EquippedItems[static_cast<int>(stratagus::item_slot::shield)][0]->Type->get_item_class() == stratagus::item_class::shield && this->EquippedItems[static_cast<int>(stratagus::item_slot::shield)][0]->get_icon() != nullptr) {
-			this->ButtonIcons[button_action] = this->EquippedItems[static_cast<int>(stratagus::item_slot::shield)][0]->get_icon();
+		if (this->EquippedItems[static_cast<int>(wyrmgus::item_slot::shield)].size() > 0 && this->EquippedItems[static_cast<int>(wyrmgus::item_slot::shield)][0]->Type->get_item_class() == wyrmgus::item_class::shield && this->EquippedItems[static_cast<int>(wyrmgus::item_slot::shield)][0]->get_icon() != nullptr) {
+			this->ButtonIcons[button_action] = this->EquippedItems[static_cast<int>(wyrmgus::item_slot::shield)][0]->get_icon();
 			return;
 		}
 	} else if (button_action == ButtonCmd::Move) {
-		if (this->EquippedItems[static_cast<int>(stratagus::item_slot::boots)].size() > 0 && this->EquippedItems[static_cast<int>(stratagus::item_slot::boots)][0]->get_icon() != nullptr) {
-			this->ButtonIcons[button_action] = this->EquippedItems[static_cast<int>(stratagus::item_slot::boots)][0]->get_icon();
+		if (this->EquippedItems[static_cast<int>(wyrmgus::item_slot::boots)].size() > 0 && this->EquippedItems[static_cast<int>(wyrmgus::item_slot::boots)][0]->get_icon() != nullptr) {
+			this->ButtonIcons[button_action] = this->EquippedItems[static_cast<int>(wyrmgus::item_slot::boots)][0]->get_icon();
 			return;
 		}
 	} else if (button_action == ButtonCmd::StandGround) {
-		if (this->EquippedItems[static_cast<int>(stratagus::item_slot::arrows)].size() > 0 && this->EquippedItems[static_cast<int>(stratagus::item_slot::arrows)][0]->Type->ButtonIcons.find(button_action) != this->EquippedItems[static_cast<int>(stratagus::item_slot::arrows)][0]->Type->ButtonIcons.end()) {
-			this->ButtonIcons[button_action] = this->EquippedItems[static_cast<int>(stratagus::item_slot::arrows)][0]->Type->ButtonIcons.find(button_action)->second.Icon;
+		if (this->EquippedItems[static_cast<int>(wyrmgus::item_slot::arrows)].size() > 0 && this->EquippedItems[static_cast<int>(wyrmgus::item_slot::arrows)][0]->Type->ButtonIcons.find(button_action) != this->EquippedItems[static_cast<int>(wyrmgus::item_slot::arrows)][0]->Type->ButtonIcons.end()) {
+			this->ButtonIcons[button_action] = this->EquippedItems[static_cast<int>(wyrmgus::item_slot::arrows)][0]->Type->ButtonIcons.find(button_action)->second.Icon;
 			return;
 		}
 
-		if (this->EquippedItems[static_cast<int>(stratagus::item_slot::weapon)].size() > 0 && this->EquippedItems[static_cast<int>(stratagus::item_slot::weapon)][0]->Type->ButtonIcons.find(button_action) != this->EquippedItems[static_cast<int>(stratagus::item_slot::weapon)][0]->Type->ButtonIcons.end()) {
-			this->ButtonIcons[button_action] = this->EquippedItems[static_cast<int>(stratagus::item_slot::weapon)][0]->Type->ButtonIcons.find(button_action)->second.Icon;
+		if (this->EquippedItems[static_cast<int>(wyrmgus::item_slot::weapon)].size() > 0 && this->EquippedItems[static_cast<int>(wyrmgus::item_slot::weapon)][0]->Type->ButtonIcons.find(button_action) != this->EquippedItems[static_cast<int>(wyrmgus::item_slot::weapon)][0]->Type->ButtonIcons.end()) {
+			this->ButtonIcons[button_action] = this->EquippedItems[static_cast<int>(wyrmgus::item_slot::weapon)][0]->Type->ButtonIcons.find(button_action)->second.Icon;
 			return;
 		}
 	}
 	
-	const stratagus::unit_type_variation *variation = this->GetVariation();
+	const wyrmgus::unit_type_variation *variation = this->GetVariation();
 	if (variation && variation->ButtonIcons.find(button_action) != variation->ButtonIcons.end()) {
 		this->ButtonIcons[button_action] = variation->ButtonIcons.find(button_action)->second.Icon;
 		return;
 	}
 	for (int i = 0; i < MaxImageLayers; ++i) {
-		const stratagus::unit_type_variation *layer_variation = this->GetLayerVariation(i);
+		const wyrmgus::unit_type_variation *layer_variation = this->GetLayerVariation(i);
 		if (layer_variation && layer_variation->ButtonIcons.find(button_action) != layer_variation->ButtonIcons.end()) {
 			this->ButtonIcons[button_action] = layer_variation->ButtonIcons.find(button_action)->second.Icon;
 			return;
 		}
 	}
 
-	for (int i = (stratagus::upgrade_modifier::UpgradeModifiers.size() - 1); i >= 0; --i) {
-		const stratagus::upgrade_modifier *modifier = stratagus::upgrade_modifier::UpgradeModifiers[i];
+	for (int i = (wyrmgus::upgrade_modifier::UpgradeModifiers.size() - 1); i >= 0; --i) {
+		const wyrmgus::upgrade_modifier *modifier = wyrmgus::upgrade_modifier::UpgradeModifiers[i];
 		const CUpgrade *upgrade = CUpgrade::get_all()[modifier->UpgradeId];
 		if (this->Player->Allow.Upgrades[upgrade->ID] == 'R' && modifier->applies_to(this->Type)) {
 			if (
 				(
-					(button_action == ButtonCmd::Attack && ((upgrade->is_weapon() && upgrade->Item->get_item_class() != stratagus::item_class::bow) || upgrade->is_arrows()))
+					(button_action == ButtonCmd::Attack && ((upgrade->is_weapon() && upgrade->Item->get_item_class() != wyrmgus::item_class::bow) || upgrade->is_arrows()))
 					|| (button_action == ButtonCmd::Stop && upgrade->is_shield())
 					|| (button_action == ButtonCmd::Move && upgrade->is_boots())
 				)
@@ -1385,33 +1385,33 @@ void CUnit::ChooseButtonIcon(const ButtonCmd button_action)
 	}
 	
 	if (button_action == ButtonCmd::Attack) {
-		if (this->Type->DefaultEquipment.find(stratagus::item_slot::arrows) != this->Type->DefaultEquipment.end() && this->Type->DefaultEquipment.find(stratagus::item_slot::arrows)->second->Icon.Icon != nullptr) {
-			this->ButtonIcons[button_action] = this->Type->DefaultEquipment.find(stratagus::item_slot::arrows)->second->Icon.Icon;
+		if (this->Type->DefaultEquipment.find(wyrmgus::item_slot::arrows) != this->Type->DefaultEquipment.end() && this->Type->DefaultEquipment.find(wyrmgus::item_slot::arrows)->second->Icon.Icon != nullptr) {
+			this->ButtonIcons[button_action] = this->Type->DefaultEquipment.find(wyrmgus::item_slot::arrows)->second->Icon.Icon;
 			return;
 		}
 		
-		if (this->Type->DefaultEquipment.find(stratagus::item_slot::weapon) != this->Type->DefaultEquipment.end() && this->Type->DefaultEquipment.find(stratagus::item_slot::weapon)->second->Icon.Icon != nullptr) {
-			this->ButtonIcons[button_action] = this->Type->DefaultEquipment.find(stratagus::item_slot::weapon)->second->Icon.Icon;
+		if (this->Type->DefaultEquipment.find(wyrmgus::item_slot::weapon) != this->Type->DefaultEquipment.end() && this->Type->DefaultEquipment.find(wyrmgus::item_slot::weapon)->second->Icon.Icon != nullptr) {
+			this->ButtonIcons[button_action] = this->Type->DefaultEquipment.find(wyrmgus::item_slot::weapon)->second->Icon.Icon;
 			return;
 		}
 	} else if (button_action == ButtonCmd::Stop) {
-		if (this->Type->DefaultEquipment.find(stratagus::item_slot::shield) != this->Type->DefaultEquipment.end() && this->Type->DefaultEquipment.find(stratagus::item_slot::shield)->second->get_item_class() == stratagus::item_class::shield && this->Type->DefaultEquipment.find(stratagus::item_slot::shield)->second->Icon.Icon != nullptr) {
-			this->ButtonIcons[button_action] = this->Type->DefaultEquipment.find(stratagus::item_slot::shield)->second->Icon.Icon;
+		if (this->Type->DefaultEquipment.find(wyrmgus::item_slot::shield) != this->Type->DefaultEquipment.end() && this->Type->DefaultEquipment.find(wyrmgus::item_slot::shield)->second->get_item_class() == wyrmgus::item_class::shield && this->Type->DefaultEquipment.find(wyrmgus::item_slot::shield)->second->Icon.Icon != nullptr) {
+			this->ButtonIcons[button_action] = this->Type->DefaultEquipment.find(wyrmgus::item_slot::shield)->second->Icon.Icon;
 			return;
 		}
 	} else if (button_action == ButtonCmd::Move) {
-		if (this->Type->DefaultEquipment.find(stratagus::item_slot::boots) != this->Type->DefaultEquipment.end() && this->Type->DefaultEquipment.find(stratagus::item_slot::boots)->second->Icon.Icon != nullptr) {
-			this->ButtonIcons[button_action] = this->Type->DefaultEquipment.find(stratagus::item_slot::boots)->second->Icon.Icon;
+		if (this->Type->DefaultEquipment.find(wyrmgus::item_slot::boots) != this->Type->DefaultEquipment.end() && this->Type->DefaultEquipment.find(wyrmgus::item_slot::boots)->second->Icon.Icon != nullptr) {
+			this->ButtonIcons[button_action] = this->Type->DefaultEquipment.find(wyrmgus::item_slot::boots)->second->Icon.Icon;
 			return;
 		}
 	} else if (button_action == ButtonCmd::StandGround) {
-		if (this->Type->DefaultEquipment.find(stratagus::item_slot::arrows) != this->Type->DefaultEquipment.end() && this->Type->DefaultEquipment.find(stratagus::item_slot::arrows)->second->ButtonIcons.find(button_action) != this->Type->DefaultEquipment.find(stratagus::item_slot::arrows)->second->ButtonIcons.end()) {
-			this->ButtonIcons[button_action] = this->Type->DefaultEquipment.find(stratagus::item_slot::arrows)->second->ButtonIcons.find(button_action)->second.Icon;
+		if (this->Type->DefaultEquipment.find(wyrmgus::item_slot::arrows) != this->Type->DefaultEquipment.end() && this->Type->DefaultEquipment.find(wyrmgus::item_slot::arrows)->second->ButtonIcons.find(button_action) != this->Type->DefaultEquipment.find(wyrmgus::item_slot::arrows)->second->ButtonIcons.end()) {
+			this->ButtonIcons[button_action] = this->Type->DefaultEquipment.find(wyrmgus::item_slot::arrows)->second->ButtonIcons.find(button_action)->second.Icon;
 			return;
 		}
 		
-		if (this->Type->DefaultEquipment.find(stratagus::item_slot::weapon) != this->Type->DefaultEquipment.end() && this->Type->DefaultEquipment.find(stratagus::item_slot::weapon)->second->ButtonIcons.find(button_action) != this->Type->DefaultEquipment.find(stratagus::item_slot::weapon)->second->ButtonIcons.end()) {
-			this->ButtonIcons[button_action] = this->Type->DefaultEquipment.find(stratagus::item_slot::weapon)->second->ButtonIcons.find(button_action)->second.Icon;
+		if (this->Type->DefaultEquipment.find(wyrmgus::item_slot::weapon) != this->Type->DefaultEquipment.end() && this->Type->DefaultEquipment.find(wyrmgus::item_slot::weapon)->second->ButtonIcons.find(button_action) != this->Type->DefaultEquipment.find(wyrmgus::item_slot::weapon)->second->ButtonIcons.end()) {
+			this->ButtonIcons[button_action] = this->Type->DefaultEquipment.find(wyrmgus::item_slot::weapon)->second->ButtonIcons.find(button_action)->second.Icon;
 			return;
 		}
 	}
@@ -1422,15 +1422,15 @@ void CUnit::ChooseButtonIcon(const ButtonCmd button_action)
 	}
 	
 	if (this->Type->get_civilization() != nullptr) {
-		const stratagus::civilization *civilization = this->Type->get_civilization();
+		const wyrmgus::civilization *civilization = this->Type->get_civilization();
 		int faction = this->Type->Faction;
 		
 		if (faction == -1 && this->Player->Race == civilization->ID) {
 			faction = this->Player->Faction;
 		}
 		
-		if (faction != -1 && stratagus::faction::get_all()[faction]->ButtonIcons.find(button_action) != stratagus::faction::get_all()[faction]->ButtonIcons.end()) {
-			this->ButtonIcons[button_action] = stratagus::faction::get_all()[faction]->ButtonIcons[button_action].Icon;
+		if (faction != -1 && wyrmgus::faction::get_all()[faction]->ButtonIcons.find(button_action) != wyrmgus::faction::get_all()[faction]->ButtonIcons.end()) {
+			this->ButtonIcons[button_action] = wyrmgus::faction::get_all()[faction]->ButtonIcons[button_action].Icon;
 			return;
 		} else if (PlayerRaces.ButtonIcons[civilization->ID].find(button_action) != PlayerRaces.ButtonIcons[civilization->ID].end()) {
 			this->ButtonIcons[button_action] = PlayerRaces.ButtonIcons[civilization->ID][button_action].Icon;
@@ -1445,10 +1445,10 @@ void CUnit::ChooseButtonIcon(const ButtonCmd button_action)
 
 void CUnit::EquipItem(CUnit &item, bool affect_character)
 {
-	const stratagus::item_class item_class = item.Type->get_item_class();
-	const stratagus::item_slot item_slot = stratagus::get_item_class_slot(item_class);
+	const wyrmgus::item_class item_class = item.Type->get_item_class();
+	const wyrmgus::item_slot item_slot = wyrmgus::get_item_class_slot(item_class);
 	
-	if (item_slot == stratagus::item_slot::none) {
+	if (item_slot == wyrmgus::item_slot::none) {
 		fprintf(stderr, "Trying to equip item of type \"%s\", which has no item slot.\n", item.GetTypeName().c_str());
 		return;
 	}
@@ -1457,9 +1457,9 @@ void CUnit::EquipItem(CUnit &item, bool affect_character)
 		DeequipItem(*EquippedItems[static_cast<int>(item_slot)][EquippedItems[static_cast<int>(item_slot)].size() - 1]);
 	}
 	
-	if (item_slot == stratagus::item_slot::weapon && EquippedItems[static_cast<int>(item_slot)].size() == 0) {
+	if (item_slot == wyrmgus::item_slot::weapon && EquippedItems[static_cast<int>(item_slot)].size() == 0) {
 		// remove the upgrade modifiers from weapon technologies or from abilities which require the base weapon class but aren't compatible with this weapon's class; and apply upgrade modifiers from abilities which require this weapon's class
-		for (const stratagus::upgrade_modifier *modifier : stratagus::upgrade_modifier::UpgradeModifiers) {
+		for (const wyrmgus::upgrade_modifier *modifier : wyrmgus::upgrade_modifier::UpgradeModifiers) {
 			const CUpgrade *modifier_upgrade = CUpgrade::get_all()[modifier->UpgradeId];
 			if (
 				(modifier_upgrade->is_weapon() && Player->Allow.Upgrades[modifier_upgrade->ID] == 'R' && modifier->applies_to(this->Type))
@@ -1484,25 +1484,25 @@ void CUnit::EquipItem(CUnit &item, bool affect_character)
 				}
 			}
 		}
-	} else if (item_slot == stratagus::item_slot::shield && EquippedItems[static_cast<int>(item_slot)].size() == 0) {
+	} else if (item_slot == wyrmgus::item_slot::shield && EquippedItems[static_cast<int>(item_slot)].size() == 0) {
 		// remove the upgrade modifiers from shield technologies
-		for (const stratagus::upgrade_modifier *modifier : stratagus::upgrade_modifier::UpgradeModifiers) {
+		for (const wyrmgus::upgrade_modifier *modifier : wyrmgus::upgrade_modifier::UpgradeModifiers) {
 			const CUpgrade *modifier_upgrade = CUpgrade::get_all()[modifier->UpgradeId];
 			if (modifier_upgrade->is_shield() && Player->Allow.Upgrades[modifier_upgrade->ID] == 'R' && modifier->applies_to(this->Type)) {
 				RemoveIndividualUpgradeModifier(*this, modifier);
 			}
 		}
-	} else if (item_slot == stratagus::item_slot::boots && EquippedItems[static_cast<int>(item_slot)].size() == 0) {
+	} else if (item_slot == wyrmgus::item_slot::boots && EquippedItems[static_cast<int>(item_slot)].size() == 0) {
 		// remove the upgrade modifiers from boots technologies
-		for (const stratagus::upgrade_modifier *modifier : stratagus::upgrade_modifier::UpgradeModifiers) {
+		for (const wyrmgus::upgrade_modifier *modifier : wyrmgus::upgrade_modifier::UpgradeModifiers) {
 			const CUpgrade *modifier_upgrade = CUpgrade::get_all()[modifier->UpgradeId];
 			if (modifier_upgrade->is_boots() && Player->Allow.Upgrades[modifier_upgrade->ID] == 'R' && modifier->applies_to(this->Type)) {
 				RemoveIndividualUpgradeModifier(*this, modifier);
 			}
 		}
-	} else if (item_slot == stratagus::item_slot::arrows && EquippedItems[static_cast<int>(item_slot)].size() == 0) {
+	} else if (item_slot == wyrmgus::item_slot::arrows && EquippedItems[static_cast<int>(item_slot)].size() == 0) {
 		// remove the upgrade modifiers from arrows technologies
-		for (const stratagus::upgrade_modifier *modifier : stratagus::upgrade_modifier::UpgradeModifiers) {
+		for (const wyrmgus::upgrade_modifier *modifier : wyrmgus::upgrade_modifier::UpgradeModifiers) {
 			const CUpgrade *modifier_upgrade = CUpgrade::get_all()[modifier->UpgradeId];
 			if (modifier_upgrade->is_arrows() && Player->Allow.Upgrades[modifier_upgrade->ID] == 'R' && modifier->applies_to(this->Type)) {
 				RemoveIndividualUpgradeModifier(*this, modifier);
@@ -1517,7 +1517,7 @@ void CUnit::EquipItem(CUnit &item, bool affect_character)
 	}
 
 	if (!IsNetworkGame() && Character && this->Player == CPlayer::GetThisPlayer() && affect_character) {
-		stratagus::persistent_item *persistent_item = this->Character->get_item(item);
+		wyrmgus::persistent_item *persistent_item = this->Character->get_item(item);
 		if (persistent_item != nullptr) {
 			if (!Character->is_item_equipped(persistent_item)) {
 				Character->EquippedItems[static_cast<int>(item_slot)].push_back(persistent_item);
@@ -1532,7 +1532,7 @@ void CUnit::EquipItem(CUnit &item, bool affect_character)
 	EquippedItems[static_cast<int>(item_slot)].push_back(&item);
 	
 	//change variation, if the current one has become forbidden
-	const stratagus::unit_type_variation *variation = this->GetVariation();
+	const wyrmgus::unit_type_variation *variation = this->GetVariation();
 	if (
 		variation
 		&& (
@@ -1543,7 +1543,7 @@ void CUnit::EquipItem(CUnit &item, bool affect_character)
 		ChooseVariation(); //choose a new variation now
 	}
 	for (int i = 0; i < MaxImageLayers; ++i) {
-		const stratagus::unit_type_variation *layer_variation = this->GetLayerVariation(i);
+		const wyrmgus::unit_type_variation *layer_variation = this->GetLayerVariation(i);
 		if (
 			layer_variation
 			&& (
@@ -1555,12 +1555,12 @@ void CUnit::EquipItem(CUnit &item, bool affect_character)
 		}
 	}
 	
-	if (item_slot == stratagus::item_slot::weapon || item_slot == stratagus::item_slot::arrows) {
+	if (item_slot == wyrmgus::item_slot::weapon || item_slot == wyrmgus::item_slot::arrows) {
 		this->ChooseButtonIcon(ButtonCmd::Attack);
 		this->ChooseButtonIcon(ButtonCmd::StandGround);
-	} else if (item_slot == stratagus::item_slot::shield) {
+	} else if (item_slot == wyrmgus::item_slot::shield) {
 		this->ChooseButtonIcon(ButtonCmd::Stop);
-	} else if (item_slot == stratagus::item_slot::boots) {
+	} else if (item_slot == wyrmgus::item_slot::boots) {
 		this->ChooseButtonIcon(ButtonCmd::Move);
 	}
 	this->ChooseButtonIcon(ButtonCmd::Patrol);
@@ -1638,19 +1638,19 @@ void CUnit::DeequipItem(CUnit &item, bool affect_character)
 		}
 	}
 
-	const stratagus::item_class item_class = item.Type->get_item_class();
-	const stratagus::item_slot item_slot = stratagus::get_item_class_slot(item_class);
+	const wyrmgus::item_class item_class = item.Type->get_item_class();
+	const wyrmgus::item_slot item_slot = wyrmgus::get_item_class_slot(item_class);
 	
-	if (item_slot == stratagus::item_slot::none) {
+	if (item_slot == wyrmgus::item_slot::none) {
 		fprintf(stderr, "Trying to de-equip item of type \"%s\", which has no item slot.\n", item.GetTypeName().c_str());
 		return;
 	}
 	
 	if (!IsNetworkGame() && Character && this->Player == CPlayer::GetThisPlayer() && affect_character) {
-		stratagus::persistent_item *persistent_item = this->Character->get_item(item);
+		wyrmgus::persistent_item *persistent_item = this->Character->get_item(item);
 		if (persistent_item != nullptr) {
 			if (Character->is_item_equipped(persistent_item)) {
-				stratagus::vector::remove(this->Character->EquippedItems[static_cast<int>(item_slot)], persistent_item);
+				wyrmgus::vector::remove(this->Character->EquippedItems[static_cast<int>(item_slot)], persistent_item);
 				SaveHero(Character);
 			} else {
 				fprintf(stderr, "Item is equipped by character \"%s\"'s unit, but not by the character itself.\n", Character->Ident.c_str());
@@ -1659,11 +1659,11 @@ void CUnit::DeequipItem(CUnit &item, bool affect_character)
 			fprintf(stderr, "Item is present in the inventory of the character \"%s\"'s unit, but not in the character's inventory itself.\n", Character->Ident.c_str());
 		}
 	}
-	stratagus::vector::remove(this->EquippedItems[static_cast<int>(item_slot)], &item);
+	wyrmgus::vector::remove(this->EquippedItems[static_cast<int>(item_slot)], &item);
 	
-	if (item_slot == stratagus::item_slot::weapon && EquippedItems[static_cast<int>(item_slot)].size() == 0) {
+	if (item_slot == wyrmgus::item_slot::weapon && EquippedItems[static_cast<int>(item_slot)].size() == 0) {
 		// restore the upgrade modifiers from weapon technologies, and apply ability effects that are weapon class-specific accordingly
-		for (const stratagus::upgrade_modifier *modifier : stratagus::upgrade_modifier::UpgradeModifiers) {
+		for (const wyrmgus::upgrade_modifier *modifier : wyrmgus::upgrade_modifier::UpgradeModifiers) {
 			const CUpgrade *modifier_upgrade = CUpgrade::get_all()[modifier->UpgradeId];
 			if (
 				(modifier_upgrade->is_weapon() && Player->Allow.Upgrades[modifier->UpgradeId] == 'R' && modifier->applies_to(this->Type))
@@ -1688,25 +1688,25 @@ void CUnit::DeequipItem(CUnit &item, bool affect_character)
 				}
 			}
 		}
-	} else if (item_slot == stratagus::item_slot::shield && EquippedItems[static_cast<int>(item_slot)].size() == 0) {
+	} else if (item_slot == wyrmgus::item_slot::shield && EquippedItems[static_cast<int>(item_slot)].size() == 0) {
 		// restore the upgrade modifiers from shield technologies
-		for (const stratagus::upgrade_modifier *modifier : stratagus::upgrade_modifier::UpgradeModifiers) {
+		for (const wyrmgus::upgrade_modifier *modifier : wyrmgus::upgrade_modifier::UpgradeModifiers) {
 			const CUpgrade *modifier_upgrade = CUpgrade::get_all()[modifier->UpgradeId];
 			if (modifier_upgrade->is_shield() && Player->Allow.Upgrades[modifier_upgrade->ID] == 'R' && modifier->applies_to(this->Type)) {
 				ApplyIndividualUpgradeModifier(*this, modifier);
 			}
 		}
-	} else if (item_slot == stratagus::item_slot::boots && EquippedItems[static_cast<int>(item_slot)].size() == 0) {
+	} else if (item_slot == wyrmgus::item_slot::boots && EquippedItems[static_cast<int>(item_slot)].size() == 0) {
 		// restore the upgrade modifiers from boots technologies
-		for (const stratagus::upgrade_modifier *modifier : stratagus::upgrade_modifier::UpgradeModifiers) {
+		for (const wyrmgus::upgrade_modifier *modifier : wyrmgus::upgrade_modifier::UpgradeModifiers) {
 			const CUpgrade *modifier_upgrade = CUpgrade::get_all()[modifier->UpgradeId];
 			if (modifier_upgrade->is_boots() && Player->Allow.Upgrades[modifier_upgrade->ID] == 'R' && modifier->applies_to(this->Type)) {
 				ApplyIndividualUpgradeModifier(*this, modifier);
 			}
 		}
-	} else if (item_slot == stratagus::item_slot::arrows && EquippedItems[static_cast<int>(item_slot)].size() == 0) {
+	} else if (item_slot == wyrmgus::item_slot::arrows && EquippedItems[static_cast<int>(item_slot)].size() == 0) {
 		// restore the upgrade modifiers from arrows technologies
-		for (const stratagus::upgrade_modifier *modifier : stratagus::upgrade_modifier::UpgradeModifiers) {
+		for (const wyrmgus::upgrade_modifier *modifier : wyrmgus::upgrade_modifier::UpgradeModifiers) {
 			const CUpgrade *modifier_upgrade = CUpgrade::get_all()[modifier->UpgradeId];
 			if (modifier_upgrade->is_arrows() && Player->Allow.Upgrades[modifier_upgrade->ID] == 'R' && modifier->applies_to(this->Type)) {
 				ApplyIndividualUpgradeModifier(*this, modifier);
@@ -1715,7 +1715,7 @@ void CUnit::DeequipItem(CUnit &item, bool affect_character)
 	}
 	
 	//change variation, if the current one has become forbidden
-	const stratagus::unit_type_variation *variation = this->GetVariation();
+	const wyrmgus::unit_type_variation *variation = this->GetVariation();
 	if (
 		variation
 		&& (
@@ -1726,7 +1726,7 @@ void CUnit::DeequipItem(CUnit &item, bool affect_character)
 		ChooseVariation(); //choose a new variation now
 	}
 	for (int i = 0; i < MaxImageLayers; ++i) {
-		const stratagus::unit_type_variation *layer_variation = this->GetLayerVariation(i);
+		const wyrmgus::unit_type_variation *layer_variation = this->GetLayerVariation(i);
 
 		if (
 			layer_variation
@@ -1739,12 +1739,12 @@ void CUnit::DeequipItem(CUnit &item, bool affect_character)
 		}
 	}
 	
-	if (item_slot == stratagus::item_slot::weapon || item_slot == stratagus::item_slot::arrows) {
+	if (item_slot == wyrmgus::item_slot::weapon || item_slot == wyrmgus::item_slot::arrows) {
 		this->ChooseButtonIcon(ButtonCmd::Attack);
 		this->ChooseButtonIcon(ButtonCmd::StandGround);
-	} else if (item_slot == stratagus::item_slot::shield) {
+	} else if (item_slot == wyrmgus::item_slot::shield) {
 		this->ChooseButtonIcon(ButtonCmd::Stop);
-	} else if (item_slot == stratagus::item_slot::boots) {
+	} else if (item_slot == wyrmgus::item_slot::boots) {
 		this->ChooseButtonIcon(ButtonCmd::Move);
 	}
 	this->ChooseButtonIcon(ButtonCmd::Patrol);
@@ -1887,7 +1887,7 @@ void CUnit::SetSuffix(CUpgrade *suffix)
 	this->UpdateItemName();
 }
 
-void CUnit::SetSpell(stratagus::spell *spell)
+void CUnit::SetSpell(wyrmgus::spell *spell)
 {
 	if (!IsNetworkGame() && Container && Container->Character && Container->Player == CPlayer::GetThisPlayer() && Container->Character->get_item(*this) != nullptr && Container->Character->get_item(*this)->Spell != spell) { //update the persistent item, if applicable and if it hasn't been updated yet
 		Container->Character->get_item(*this)->Spell = spell;
@@ -1942,7 +1942,7 @@ void CUnit::SetElixir(CUpgrade *elixir)
 	this->UpdateItemName();
 }
 
-void CUnit::SetUnique(stratagus::unique_item *unique)
+void CUnit::SetUnique(wyrmgus::unique_item *unique)
 {
 	if (this->Unique && this->Unique->Set) {
 		this->Variable[MAGICLEVEL_INDEX].Value -= this->Unique->Set->MagicLevel;
@@ -2097,8 +2097,8 @@ void CUnit::GenerateDrop()
 	drop_pos.x += SyncRand(this->Type->get_tile_width());
 	drop_pos.y += SyncRand(this->Type->get_tile_height());
 	CUnit *droppedUnit = nullptr;
-	stratagus::unit_type *chosen_drop = nullptr;
-	std::vector<stratagus::unit_type *> potential_drops;
+	wyrmgus::unit_type *chosen_drop = nullptr;
+	std::vector<wyrmgus::unit_type *> potential_drops;
 	for (size_t i = 0; i < this->Type->Drops.size(); ++i) {
 		if (CheckConditions(this->Type->Drops[i], this)) {
 			potential_drops.push_back(this->Type->Drops[i]);
@@ -2110,7 +2110,7 @@ void CUnit::GenerateDrop()
 				potential_drops.push_back(this->Type->AiDrops[i]);
 			}
 		}
-		for (std::map<std::string, std::vector<stratagus::unit_type *>>::const_iterator iterator = this->Type->ModAiDrops.begin(); iterator != this->Type->ModAiDrops.end(); ++iterator) {
+		for (std::map<std::string, std::vector<wyrmgus::unit_type *>>::const_iterator iterator = this->Type->ModAiDrops.begin(); iterator != this->Type->ModAiDrops.end(); ++iterator) {
 			for (size_t i = 0; i < iterator->second.size(); ++i) {
 				if (CheckConditions(iterator->second[i], this)) {
 					potential_drops.push_back(iterator->second[i]);
@@ -2134,7 +2134,7 @@ void CUnit::GenerateDrop()
 			
 		if (droppedUnit != nullptr) {
 			if (droppedUnit->Type->BoolFlag[FAUNA_INDEX].value) {
-				droppedUnit->Name = droppedUnit->Type->GeneratePersonalName(nullptr, static_cast<stratagus::gender>(droppedUnit->Variable[GENDER_INDEX].Value));
+				droppedUnit->Name = droppedUnit->Type->GeneratePersonalName(nullptr, static_cast<wyrmgus::gender>(droppedUnit->Variable[GENDER_INDEX].Value));
 			}
 			
 			droppedUnit->GenerateSpecialProperties(this, this->Player);
@@ -2188,7 +2188,7 @@ void CUnit::GenerateSpecialProperties(CUnit *dropper, CPlayer *dropper_player, b
 	}
 
 	if (this->Unique == nullptr) {
-		if (this->Type->get_item_class() == stratagus::item_class::scroll || this->Type->get_item_class() == stratagus::item_class::book || this->Type->get_item_class() == stratagus::item_class::ring || this->Type->get_item_class() == stratagus::item_class::amulet || this->Type->get_item_class() == stratagus::item_class::horn || always_magic) { //scrolls, books, jewelry and horns must always have a property
+		if (this->Type->get_item_class() == wyrmgus::item_class::scroll || this->Type->get_item_class() == wyrmgus::item_class::book || this->Type->get_item_class() == wyrmgus::item_class::ring || this->Type->get_item_class() == wyrmgus::item_class::amulet || this->Type->get_item_class() == wyrmgus::item_class::horn || always_magic) { //scrolls, books, jewelry and horns must always have a property
 			magic_affix_chance = 100;
 		}
 
@@ -2198,7 +2198,7 @@ void CUnit::GenerateSpecialProperties(CUnit *dropper, CPlayer *dropper_player, b
 
 			while (!magic_types.empty()) {
 				const int magic_type = magic_types[SyncRand(magic_types.size())];
-				stratagus::vector::remove(magic_types, magic_type);
+				wyrmgus::vector::remove(magic_types, magic_type);
 
 				switch (magic_type) {
 					case 0:
@@ -2232,14 +2232,14 @@ void CUnit::GeneratePrefix(CUnit *dropper, CPlayer *dropper_player)
 	std::vector<CUpgrade *> potential_prefixes;
 
 	for (CUpgrade *affix : this->Type->Affixes) {
-		if ((this->Type->get_item_class() == stratagus::item_class::none && affix->MagicPrefix) || (this->Type->get_item_class() != stratagus::item_class::none && affix->ItemPrefix[static_cast<int>(Type->get_item_class())])) {
+		if ((this->Type->get_item_class() == wyrmgus::item_class::none && affix->MagicPrefix) || (this->Type->get_item_class() != wyrmgus::item_class::none && affix->ItemPrefix[static_cast<int>(Type->get_item_class())])) {
 			potential_prefixes.push_back(affix);
 		}
 	}
 
 	if (dropper_player != nullptr) {
 		for (CUpgrade *upgrade : CUpgrade::get_all()) {
-			if (this->Type->get_item_class() == stratagus::item_class::none || !upgrade->ItemPrefix[static_cast<int>(Type->get_item_class())]) {
+			if (this->Type->get_item_class() == wyrmgus::item_class::none || !upgrade->ItemPrefix[static_cast<int>(Type->get_item_class())]) {
 				continue;
 			}
 
@@ -2267,7 +2267,7 @@ void CUnit::GenerateSuffix(CUnit *dropper, CPlayer *dropper_player)
 	std::vector<CUpgrade *> potential_suffixes;
 
 	for (CUpgrade *affix : this->Type->Affixes) {
-		if ((this->Type->get_item_class() == stratagus::item_class::none && affix->MagicSuffix) || (this->Type->get_item_class() != stratagus::item_class::none && affix->ItemSuffix[static_cast<int>(Type->get_item_class())])) {
+		if ((this->Type->get_item_class() == wyrmgus::item_class::none && affix->MagicSuffix) || (this->Type->get_item_class() != wyrmgus::item_class::none && affix->ItemSuffix[static_cast<int>(Type->get_item_class())])) {
 			if (Prefix == nullptr || !affix->IncompatibleAffixes[Prefix->ID]) { //don't allow a suffix incompatible with the prefix to appear
 				potential_suffixes.push_back(affix);
 			}
@@ -2276,7 +2276,7 @@ void CUnit::GenerateSuffix(CUnit *dropper, CPlayer *dropper_player)
 
 	if (dropper_player != nullptr) {
 		for (CUpgrade *upgrade : CUpgrade::get_all()) {
-			if (this->Type->get_item_class() == stratagus::item_class::none || !upgrade->ItemSuffix[static_cast<int>(Type->get_item_class())]) {
+			if (this->Type->get_item_class() == wyrmgus::item_class::none || !upgrade->ItemSuffix[static_cast<int>(Type->get_item_class())]) {
 				continue;
 			}
 
@@ -2305,10 +2305,10 @@ void CUnit::GenerateSuffix(CUnit *dropper, CPlayer *dropper_player)
 
 void CUnit::GenerateSpell(CUnit *dropper, CPlayer *dropper_player)
 {
-	std::vector<stratagus::spell *> potential_spells;
+	std::vector<wyrmgus::spell *> potential_spells;
 	if (dropper != nullptr) {
-		for (stratagus::spell *spell : dropper->Type->DropSpells) {
-			if (this->Type->get_item_class() != stratagus::item_class::none && spell->ItemSpell[static_cast<int>(Type->get_item_class())]) {
+		for (wyrmgus::spell *spell : dropper->Type->DropSpells) {
+			if (this->Type->get_item_class() != wyrmgus::item_class::none && spell->ItemSpell[static_cast<int>(Type->get_item_class())]) {
 				potential_spells.push_back(spell);
 			}
 		}
@@ -2324,14 +2324,14 @@ void CUnit::GenerateWork(CUnit *dropper, CPlayer *dropper_player)
 	std::vector<CUpgrade *> potential_works;
 
 	for (CUpgrade *affix : this->Type->Affixes) {
-		if (this->Type->get_item_class() != stratagus::item_class::none && affix->Work == this->Type->get_item_class() && !affix->UniqueOnly) {
+		if (this->Type->get_item_class() != wyrmgus::item_class::none && affix->Work == this->Type->get_item_class() && !affix->UniqueOnly) {
 			potential_works.push_back(affix);
 		}
 	}
 
 	if (dropper_player != nullptr) {
 		for (CUpgrade *upgrade : CUpgrade::get_all()) {
-			if (this->Type->get_item_class() == stratagus::item_class::none || upgrade->Work != this->Type->get_item_class() || upgrade->UniqueOnly) {
+			if (this->Type->get_item_class() == wyrmgus::item_class::none || upgrade->Work != this->Type->get_item_class() || upgrade->UniqueOnly) {
 				continue;
 			}
 
@@ -2356,9 +2356,9 @@ void CUnit::GenerateWork(CUnit *dropper, CPlayer *dropper_player)
 
 void CUnit::GenerateUnique(CUnit *dropper, CPlayer *dropper_player)
 {
-	std::vector<stratagus::unique_item *> potential_uniques;
+	std::vector<wyrmgus::unique_item *> potential_uniques;
 
-	for (stratagus::unique_item *unique : stratagus::unique_item::get_all()) {
+	for (wyrmgus::unique_item *unique : wyrmgus::unique_item::get_all()) {
 		if (this->Type != unique->Type) {
 			continue;
 		}
@@ -2475,7 +2475,7 @@ void CUnit::GenerateUnique(CUnit *dropper, CPlayer *dropper_player)
 	}
 	
 	if (potential_uniques.size() > 0) {
-		stratagus::unique_item *chosen_unique = potential_uniques[SyncRand(potential_uniques.size())];
+		wyrmgus::unique_item *chosen_unique = potential_uniques[SyncRand(potential_uniques.size())];
 		this->SetUnique(chosen_unique);
 	}
 }
@@ -2498,14 +2498,14 @@ void CUnit::UpdateSoldUnits()
 	}
 	this->SoldUnits.clear();
 	
-	std::vector<stratagus::unit_type *> potential_items;
-	std::vector<stratagus::character *> potential_heroes;
+	std::vector<wyrmgus::unit_type *> potential_items;
+	std::vector<wyrmgus::character *> potential_heroes;
 	if (this->Type->BoolFlag[RECRUITHEROES_INDEX].value && !IsNetworkGame()) { // allow heroes to be recruited at town halls
-		const stratagus::civilization *civilization = this->Type->get_civilization();
-		if (civilization != nullptr && civilization->ID != this->Player->Race && this->Player->Race != -1 && this->Player->Faction != -1 && this->Type == stratagus::faction::get_all()[this->Player->Faction]->get_class_unit_type(this->Type->get_unit_class())) {
-			civilization = stratagus::civilization::get_all()[this->Player->Race];
+		const wyrmgus::civilization *civilization = this->Type->get_civilization();
+		if (civilization != nullptr && civilization->ID != this->Player->Race && this->Player->Race != -1 && this->Player->Faction != -1 && this->Type == wyrmgus::faction::get_all()[this->Player->Faction]->get_class_unit_type(this->Type->get_unit_class())) {
+			civilization = wyrmgus::civilization::get_all()[this->Player->Race];
 		}
-		const stratagus::faction *faction = this->Player->Faction != -1 ? stratagus::faction::get_all()[this->Player->Faction] : nullptr;
+		const wyrmgus::faction *faction = this->Player->Faction != -1 ? wyrmgus::faction::get_all()[this->Player->Faction] : nullptr;
 		
 		if (CurrentQuest == nullptr) {
 			//give priority to heroes with the building's settlement as their home settlement
@@ -2515,13 +2515,13 @@ void CUnit::UpdateSoldUnits()
 
 			//then give priority to heroes belonging to the building's player's faction
 			if (faction != nullptr && static_cast<int>(potential_heroes.size()) < recruitable_hero_max) {
-				std::vector<stratagus::character *> potential_faction_heroes = this->Player->get_recruitable_heroes_from_list(faction->get_characters());
+				std::vector<wyrmgus::character *> potential_faction_heroes = this->Player->get_recruitable_heroes_from_list(faction->get_characters());
 
 				while (!potential_faction_heroes.empty() && static_cast<int>(potential_heroes.size()) < recruitable_hero_max) {
-					stratagus::character *hero = potential_faction_heroes[SyncRand(potential_faction_heroes.size())];
-					stratagus::vector::remove(potential_faction_heroes, hero);
+					wyrmgus::character *hero = potential_faction_heroes[SyncRand(potential_faction_heroes.size())];
+					wyrmgus::vector::remove(potential_faction_heroes, hero);
 
-					if (stratagus::vector::contains(potential_heroes, hero)) {
+					if (wyrmgus::vector::contains(potential_heroes, hero)) {
 						continue;
 					}
 
@@ -2531,13 +2531,13 @@ void CUnit::UpdateSoldUnits()
 
 			//if there are still recruitable hero slots available, then try to place characters belonging to the civilization in them
 			if (civilization != nullptr && static_cast<int>(potential_heroes.size()) < recruitable_hero_max) {
-				std::vector<stratagus::character *> potential_civilization_heroes = this->Player->get_recruitable_heroes_from_list(civilization->get_characters());
+				std::vector<wyrmgus::character *> potential_civilization_heroes = this->Player->get_recruitable_heroes_from_list(civilization->get_characters());
 
 				while (!potential_civilization_heroes.empty() && static_cast<int>(potential_heroes.size()) < recruitable_hero_max) {
-					stratagus::character *hero = potential_civilization_heroes[SyncRand(potential_civilization_heroes.size())];
-					stratagus::vector::remove(potential_civilization_heroes, hero);
+					wyrmgus::character *hero = potential_civilization_heroes[SyncRand(potential_civilization_heroes.size())];
+					wyrmgus::vector::remove(potential_civilization_heroes, hero);
 
-					if (stratagus::vector::contains(potential_heroes, hero)) {
+					if (wyrmgus::vector::contains(potential_heroes, hero)) {
 						continue;
 					}
 
@@ -2547,7 +2547,7 @@ void CUnit::UpdateSoldUnits()
 		}
 
 		if (this->Player == CPlayer::GetThisPlayer()) {
-			for (std::map<std::string, stratagus::character *>::iterator iterator = CustomHeroes.begin(); iterator != CustomHeroes.end(); ++iterator) {
+			for (std::map<std::string, wyrmgus::character *>::iterator iterator = CustomHeroes.begin(); iterator != CustomHeroes.end(); ++iterator) {
 				if (
 					(iterator->second->get_civilization() && iterator->second->get_civilization() == civilization || iterator->second->get_unit_type() == civilization->get_class_unit_type(iterator->second->get_unit_type()->get_unit_class()))
 					&& CheckConditions(iterator->second->get_unit_type(), this, true) && iterator->second->CanAppear()
@@ -2576,12 +2576,12 @@ void CUnit::UpdateSoldUnits()
 	for (int i = 0; i < sold_unit_max; ++i) {
 		CUnit *new_unit = nullptr;
 		if (!potential_heroes.empty()) {
-			stratagus::character *chosen_hero = potential_heroes[SyncRand(potential_heroes.size())];
+			wyrmgus::character *chosen_hero = potential_heroes[SyncRand(potential_heroes.size())];
 			new_unit = MakeUnitAndPlace(this->tilePos, *chosen_hero->get_unit_type(), CPlayer::Players[PlayerNumNeutral], this->MapLayer->ID);
 			new_unit->set_character(chosen_hero);
-			stratagus::vector::remove(potential_heroes, chosen_hero);
+			wyrmgus::vector::remove(potential_heroes, chosen_hero);
 		} else {
-			stratagus::unit_type *chosen_unit_type = potential_items[SyncRand(potential_items.size())];
+			wyrmgus::unit_type *chosen_unit_type = potential_items[SyncRand(potential_items.size())];
 			new_unit = MakeUnitAndPlace(this->tilePos, *chosen_unit_type, CPlayer::Players[PlayerNumNeutral], this->MapLayer->ID);
 			new_unit->GenerateSpecialProperties(this, this->Player, true, true);
 			new_unit->Identified = true;
@@ -2607,7 +2607,7 @@ void CUnit::SellUnit(CUnit *sold_unit, int player)
 	if (!sold_unit->Type->BoolFlag[ITEM_INDEX].value) {
 		sold_unit->ChangeOwner(*CPlayer::Players[player]);
 	}
-	CPlayer::Players[player]->change_resource(stratagus::resource::get_all()[CopperCost], -sold_unit->GetPrice(), true);
+	CPlayer::Players[player]->change_resource(wyrmgus::resource::get_all()[CopperCost], -sold_unit->GetPrice(), true);
 	if (CPlayer::Players[player]->AiEnabled && !sold_unit->Type->BoolFlag[ITEM_INDEX].value && !sold_unit->Type->BoolFlag[HARVESTER_INDEX].value) { //add the hero to an AI force, if the hero isn't a harvester
 		CPlayer::Players[player]->Ai->Force.RemoveDeadUnit();
 		CPlayer::Players[player]->Ai->Force.Assign(*sold_unit, -1, true);
@@ -2666,8 +2666,8 @@ void CUnit::SellResource(const int resource, const int player)
 		return;
 	}
 
-	CPlayer::Players[player]->change_resource(stratagus::resource::get_all()[resource], -100, true);
-	CPlayer::Players[player]->change_resource(stratagus::resource::get_all()[CopperCost], this->Player->GetEffectiveResourceSellPrice(resource), true);
+	CPlayer::Players[player]->change_resource(wyrmgus::resource::get_all()[resource], -100, true);
+	CPlayer::Players[player]->change_resource(wyrmgus::resource::get_all()[CopperCost], this->Player->GetEffectiveResourceSellPrice(resource), true);
 	
 	this->Player->DecreaseResourcePrice(resource);
 }
@@ -2683,8 +2683,8 @@ void CUnit::BuyResource(const int resource, const int player)
 		return;
 	}
 
-	CPlayer::Players[player]->change_resource(stratagus::resource::get_all()[resource], 100, true);
-	CPlayer::Players[player]->change_resource(stratagus::resource::get_all()[CopperCost], -this->Player->GetEffectiveResourceBuyPrice(resource), true);
+	CPlayer::Players[player]->change_resource(wyrmgus::resource::get_all()[resource], 100, true);
+	CPlayer::Players[player]->change_resource(wyrmgus::resource::get_all()[CopperCost], -this->Player->GetEffectiveResourceBuyPrice(resource), true);
 	
 	this->Player->IncreaseResourcePrice(resource);
 }
@@ -2770,7 +2770,7 @@ int CUnit::GetDrawLevel() const
 **
 **  @param type    Unit-type
 */
-void CUnit::Init(const stratagus::unit_type &type)
+void CUnit::Init(const wyrmgus::unit_type &type)
 {
 	//  Set refs to 1. This is the "I am alive ref", lost in ReleaseUnit.
 	Refs = 1;
@@ -2807,11 +2807,11 @@ void CUnit::Init(const stratagus::unit_type &type)
 //	if (type.CanCastSpell) {
 	//to avoid crashes with spell items for units who cannot ordinarily cast spells
 	//Wyrmgus end
-		SpellCoolDownTimers = new int[stratagus::spell::get_all().size()];
-		memset(SpellCoolDownTimers, 0, stratagus::spell::get_all().size() * sizeof(int));
+		SpellCoolDownTimers = new int[wyrmgus::spell::get_all().size()];
+		memset(SpellCoolDownTimers, 0, wyrmgus::spell::get_all().size() * sizeof(int));
 		this->spell_autocast = this->Type->get_spell_autocast();
 		for (size_t i = 0; i < this->spell_autocast.size(); ++i) {
-			this->autocast_spells.push_back(stratagus::spell::get_all()[i]);
+			this->autocast_spells.push_back(wyrmgus::spell::get_all()[i]);
 		}
 	//Wyrmgus start
 //	}
@@ -2899,7 +2899,7 @@ bool CUnit::CanStoreOrder(COrder *order)
 */
 void CUnit::AssignToPlayer(CPlayer &player)
 {
-	const stratagus::unit_type &type = *Type;
+	const wyrmgus::unit_type &type = *Type;
 
 	// Build player unit table
 	//Wyrmgus start
@@ -2923,13 +2923,13 @@ void CUnit::AssignToPlayer(CPlayer &player)
 				player.TotalUnits++;
 				
 				for (const auto &objective : player.get_quest_objectives()) {
-					const stratagus::quest_objective *quest_objective = objective->get_quest_objective();
+					const wyrmgus::quest_objective *quest_objective = objective->get_quest_objective();
 
-					if (quest_objective->get_objective_type() != stratagus::objective_type::build_units) {
+					if (quest_objective->get_objective_type() != wyrmgus::objective_type::build_units) {
 						continue;
 					}
 
-					if (!stratagus::vector::contains(quest_objective->UnitTypes, &type) && !stratagus::vector::contains(quest_objective->get_unit_classes(), type.get_unit_class())) {
+					if (!wyrmgus::vector::contains(quest_objective->UnitTypes, &type) && !wyrmgus::vector::contains(quest_objective->get_unit_classes(), type.get_unit_class())) {
 						continue;
 					}
 
@@ -2976,9 +2976,9 @@ void CUnit::AssignToPlayer(CPlayer &player)
 	//Wyrmgus start
 	if (!SaveGameLoading) {
 		//assign a gender to the unit
-		if (static_cast<stratagus::gender>(this->Variable[GENDER_INDEX].Value) == stratagus::gender::none && this->Type->BoolFlag[ORGANIC_INDEX].value) { // Gender: 0 = Not Set, 1 = Male, 2 = Female, 3 = Asexual
+		if (static_cast<wyrmgus::gender>(this->Variable[GENDER_INDEX].Value) == wyrmgus::gender::none && this->Type->BoolFlag[ORGANIC_INDEX].value) { // Gender: 0 = Not Set, 1 = Male, 2 = Female, 3 = Asexual
 			this->Variable[GENDER_INDEX].Value = SyncRand(2) + 1;
-			this->Variable[GENDER_INDEX].Max = static_cast<int>(stratagus::gender::count);
+			this->Variable[GENDER_INDEX].Max = static_cast<int>(wyrmgus::gender::count);
 			this->Variable[GENDER_INDEX].Enable = 1;
 		}
 		
@@ -3001,7 +3001,7 @@ void CUnit::AssignToPlayer(CPlayer &player)
 	//Wyrmgus end
 }
 
-const stratagus::player_color *CUnit::get_player_color() const
+const wyrmgus::player_color *CUnit::get_player_color() const
 {
 	if (this->RescuedFrom != nullptr) {
 		return this->RescuedFrom->get_player_color();
@@ -3020,7 +3020,7 @@ const stratagus::player_color *CUnit::get_player_color() const
 **
 **  @return          Pointer to created unit.
 */
-CUnit *MakeUnit(const stratagus::unit_type &type, CPlayer *player)
+CUnit *MakeUnit(const wyrmgus::unit_type &type, CPlayer *player)
 {
 	CUnit *unit = UnitManager.AllocUnit();
 	if (unit == nullptr) {
@@ -3049,8 +3049,8 @@ CUnit *MakeUnit(const stratagus::unit_type &type, CPlayer *player)
 			unit->SetIndividualUpgrade(civilization_upgrade, 1);
 		}
 	}
-	if (unit->Type->Faction != -1 && !stratagus::faction::get_all()[unit->Type->Faction]->FactionUpgrade.empty()) {
-		CUpgrade *faction_upgrade = CUpgrade::try_get(stratagus::faction::get_all()[unit->Type->Faction]->FactionUpgrade);
+	if (unit->Type->Faction != -1 && !wyrmgus::faction::get_all()[unit->Type->Faction]->FactionUpgrade.empty()) {
+		CUpgrade *faction_upgrade = CUpgrade::try_get(wyrmgus::faction::get_all()[unit->Type->Faction]->FactionUpgrade);
 		if (faction_upgrade) {
 			unit->SetIndividualUpgrade(faction_upgrade, 1);
 		}
@@ -3244,7 +3244,7 @@ void UpdateUnitSightRange(CUnit &unit)
 */
 //Wyrmgus end
 	int unit_sight_range = unit.Variable[SIGHTRANGE_INDEX].Max;
-	const stratagus::time_of_day *time_of_day = unit.get_center_tile_time_of_day();
+	const wyrmgus::time_of_day *time_of_day = unit.get_center_tile_time_of_day();
 	if (time_of_day != nullptr) {
 		if (time_of_day->is_day()) {
 			unit_sight_range += unit.Variable[DAYSIGHTRANGEBONUS_INDEX].Value;
@@ -3451,10 +3451,10 @@ void CUnit::UpdatePersonalName(bool update_settlement_name)
 		return;
 	}
 	
-	const stratagus::civilization *civilization = this->Type->get_civilization();
-	stratagus::faction *faction = nullptr;
+	const wyrmgus::civilization *civilization = this->Type->get_civilization();
+	wyrmgus::faction *faction = nullptr;
 	if (this->Player->Faction != -1) {
-		faction = stratagus::faction::get_all()[this->Player->Faction];
+		faction = wyrmgus::faction::get_all()[this->Player->Faction];
 		
 		if (civilization != nullptr && civilization != faction->get_civilization() && civilization->get_species() == faction->get_civilization()->get_species() && this->Type == faction->get_class_unit_type(this->Type->get_unit_class())) {
 			civilization = faction->get_civilization();
@@ -3469,13 +3469,13 @@ void CUnit::UpdatePersonalName(bool update_settlement_name)
 		}
 	}
 	
-	if (!this->Type->IsPersonalNameValid(this->Name, faction, static_cast<stratagus::gender>(this->Variable[GENDER_INDEX].Value))) {
+	if (!this->Type->IsPersonalNameValid(this->Name, faction, static_cast<wyrmgus::gender>(this->Variable[GENDER_INDEX].Value))) {
 		// first see if can translate the current personal name
 		std::string new_personal_name = PlayerRaces.TranslateName(this->Name, language);
 		if (!new_personal_name.empty()) {
 			this->Name = new_personal_name;
 		} else {
-			this->Name = this->Type->GeneratePersonalName(faction, static_cast<stratagus::gender>(this->Variable[GENDER_INDEX].Value));
+			this->Name = this->Type->GeneratePersonalName(faction, static_cast<wyrmgus::gender>(this->Variable[GENDER_INDEX].Value));
 		}
 	}
 
@@ -3483,8 +3483,8 @@ void CUnit::UpdatePersonalName(bool update_settlement_name)
 		if (civilization != nullptr && this->Type->BoolFlag[ORGANIC_INDEX].value) {
 			const std::vector<std::string> &surnames = civilization->get_surnames();
 
-			if (!surnames.empty() && (this->get_surname().empty() || !stratagus::vector::contains(surnames, this->get_surname()))) {
-				this->surname = stratagus::vector::get_random(surnames);
+			if (!surnames.empty() && (this->get_surname().empty() || !wyrmgus::vector::contains(surnames, this->get_surname()))) {
+				this->surname = wyrmgus::vector::get_random(surnames);
 			}
 		}
 	}
@@ -3523,23 +3523,23 @@ void CUnit::UpdateSettlement()
 	
 	if (this->Type->BoolFlag[TOWNHALL_INDEX].value || this->Type == settlement_site_unit_type) {
 		if (!this->settlement) {
-			const stratagus::civilization *civilization = this->Type->get_civilization();
-			if (civilization != nullptr && this->Player->Faction != -1 && (this->Player->Race == civilization->ID || this->Type == stratagus::faction::get_all()[this->Player->Faction]->get_class_unit_type(this->Type->get_unit_class()))) {
-				civilization = stratagus::civilization::get_all()[this->Player->Race];
+			const wyrmgus::civilization *civilization = this->Type->get_civilization();
+			if (civilization != nullptr && this->Player->Faction != -1 && (this->Player->Race == civilization->ID || this->Type == wyrmgus::faction::get_all()[this->Player->Faction]->get_class_unit_type(this->Type->get_unit_class()))) {
+				civilization = wyrmgus::civilization::get_all()[this->Player->Race];
 			}
 			
 			int faction_id = this->Type->Faction;
-			if (this->Player->Faction != -1 && this->Player->Race == (civilization ? civilization->ID : -1) && this->Type == stratagus::faction::get_all()[this->Player->Faction]->get_class_unit_type(this->Type->get_unit_class())) {
+			if (this->Player->Faction != -1 && this->Player->Race == (civilization ? civilization->ID : -1) && this->Type == wyrmgus::faction::get_all()[this->Player->Faction]->get_class_unit_type(this->Type->get_unit_class())) {
 				faction_id = this->Player->Faction;
 			}
-			const stratagus::faction *faction = nullptr;
+			const wyrmgus::faction *faction = nullptr;
 			if (faction_id != -1) {
-				faction = stratagus::faction::get_all()[faction_id];
+				faction = wyrmgus::faction::get_all()[faction_id];
 			}
 
-			std::vector<stratagus::site *> potential_settlements;
+			std::vector<wyrmgus::site *> potential_settlements;
 			if (civilization) {
-				for (stratagus::site *site : civilization->sites) {
+				for (wyrmgus::site *site : civilization->sites) {
 					if (!site->get_site_unit()) {
 						potential_settlements.push_back(site);
 					}
@@ -3547,7 +3547,7 @@ void CUnit::UpdateSettlement()
 			}
 			
 			if (potential_settlements.empty() && faction) {
-				for (stratagus::site *site : faction->sites) {
+				for (wyrmgus::site *site : faction->sites) {
 					if (!site->get_site_unit()) {
 						potential_settlements.push_back(site);
 					}
@@ -3555,7 +3555,7 @@ void CUnit::UpdateSettlement()
 			}
 			
 			if (potential_settlements.empty()) {
-				for (stratagus::site *site : stratagus::site::get_all()) {
+				for (wyrmgus::site *site : wyrmgus::site::get_all()) {
 					if (!site->get_site_unit()) {
 						potential_settlements.push_back(site);
 					}
@@ -3586,7 +3586,7 @@ void CUnit::UpdateSettlement()
 	}
 }
 
-void CUnit::UpdateBuildingSettlementAssignment(const stratagus::site *old_settlement)
+void CUnit::UpdateBuildingSettlementAssignment(const wyrmgus::site *old_settlement)
 {
 	if (Editor.Running != EditorNotRunning) {
 		return;
@@ -3647,7 +3647,7 @@ void CUnit::XPChanged()
 */
 static void UnitInXY(CUnit &unit, const Vec2i &pos, const int z)
 {
-	const stratagus::time_of_day *old_time_of_day = unit.get_center_tile_time_of_day();
+	const wyrmgus::time_of_day *old_time_of_day = unit.get_center_tile_time_of_day();
 	
 	CUnit *unit_inside = unit.UnitInside;
 
@@ -3655,7 +3655,7 @@ static void UnitInXY(CUnit &unit, const Vec2i &pos, const int z)
 	unit.Offset = CMap::Map.getIndex(pos, z);
 	unit.MapLayer = CMap::Map.MapLayers[z];
 
-	const stratagus::time_of_day *new_time_of_day = unit.get_center_tile_time_of_day();
+	const wyrmgus::time_of_day *new_time_of_day = unit.get_center_tile_time_of_day();
 
 	//Wyrmgus start
 	if (!SaveGameLoading && old_time_of_day != new_time_of_day) {
@@ -3788,7 +3788,7 @@ void CUnit::Place(const Vec2i &pos, int z)
 			}
 		}
 		
-		const stratagus::unit_type_variation *variation = this->GetVariation();
+		const wyrmgus::unit_type_variation *variation = this->GetVariation();
 		if (variation) {
 			// if a unit that is on the tile has a terrain-dependent or season-dependent variation that is not compatible with the new tile, or if this is the first position the unit is being placed in, repick the unit's variation
 			if (!old_map_layer || !this->CheckTerrainForVariation(variation) || !this->CheckSeasonForVariation(variation)) {
@@ -3808,7 +3808,7 @@ void CUnit::Place(const Vec2i &pos, int z)
 **
 **  @return        Pointer to created unit.
 */
-CUnit *MakeUnitAndPlace(const Vec2i &pos, const stratagus::unit_type &type, CPlayer *player, int z)
+CUnit *MakeUnitAndPlace(const Vec2i &pos, const wyrmgus::unit_type &type, CPlayer *player, int z)
 {
 	CUnit *unit = MakeUnit(type, player);
 
@@ -3828,7 +3828,7 @@ CUnit *MakeUnitAndPlace(const Vec2i &pos, const stratagus::unit_type &type, CPla
 **
 **  @return        Pointer to created unit.
 */
-CUnit *CreateUnit(const Vec2i &pos, const stratagus::unit_type &type, CPlayer *player, int z, bool no_bordering_building, const stratagus::site *settlement)
+CUnit *CreateUnit(const Vec2i &pos, const wyrmgus::unit_type &type, CPlayer *player, int z, bool no_bordering_building, const wyrmgus::site *settlement)
 {
 	CUnit *unit = MakeUnit(type, player);
 
@@ -3858,23 +3858,23 @@ CUnit *CreateUnit(const Vec2i &pos, const stratagus::unit_type &type, CPlayer *p
 	return unit;
 }
 
-CUnit *CreateResourceUnit(const Vec2i &pos, const stratagus::unit_type &type, int z, bool allow_unique)
+CUnit *CreateResourceUnit(const Vec2i &pos, const wyrmgus::unit_type &type, int z, bool allow_unique)
 {
 	CUnit *unit = CreateUnit(pos, type, CPlayer::Players[PlayerNumNeutral], z, true);
 	unit->GenerateSpecialProperties(nullptr, nullptr, allow_unique);
 			
 	// create metal rocks near metal resources
-	stratagus::unit_type *metal_rock_type = nullptr;
+	wyrmgus::unit_type *metal_rock_type = nullptr;
 	if (type.Ident == "unit-gold-deposit") {
-		metal_rock_type = stratagus::unit_type::get("unit-gold-rock");
+		metal_rock_type = wyrmgus::unit_type::get("unit-gold-rock");
 	} else if (type.Ident == "unit-silver-deposit") {
-		metal_rock_type = stratagus::unit_type::get("unit-silver-rock");
+		metal_rock_type = wyrmgus::unit_type::get("unit-silver-rock");
 	} else if (type.Ident == "unit-copper-deposit") {
-		metal_rock_type = stratagus::unit_type::get("unit-copper-rock");
+		metal_rock_type = wyrmgus::unit_type::get("unit-copper-rock");
 	} else if (type.Ident == "unit-diamond-deposit") {
-		metal_rock_type = stratagus::unit_type::get("unit-diamond-rock");
+		metal_rock_type = wyrmgus::unit_type::get("unit-diamond-rock");
 	} else if (type.Ident == "unit-emerald-deposit") {
-		metal_rock_type = stratagus::unit_type::get("unit-emerald-rock");
+		metal_rock_type = wyrmgus::unit_type::get("unit-emerald-rock");
 	}
 	if (metal_rock_type) {
 		Vec2i metal_rock_offset((type.get_tile_size() - QSize(1, 1)) / 2);
@@ -3895,7 +3895,7 @@ CUnit *CreateResourceUnit(const Vec2i &pos, const stratagus::unit_type &type, in
 **  @param resPos   Holds the nearest point.
 **  @param heading  preferense side to drop out of.
 */
-void FindNearestDrop(const stratagus::unit_type &type, const Vec2i &goalPos, Vec2i &resPos, int heading, int z, bool no_bordering_building, bool ignore_construction_requirements, const stratagus::site *settlement)
+void FindNearestDrop(const wyrmgus::unit_type &type, const Vec2i &goalPos, Vec2i &resPos, int heading, int z, bool no_bordering_building, bool ignore_construction_requirements, const wyrmgus::site *settlement)
 {
 	int addx = 0;
 	int addy = 0;
@@ -4059,7 +4059,7 @@ void UnitLost(CUnit &unit)
 
 	//  Remove the unit from the player's units table.
 
-	const stratagus::unit_type &type = *unit.Type;
+	const wyrmgus::unit_type &type = *unit.Type;
 	if (!type.BoolFlag[VANISHES_INDEX].value) {
 		player.RemoveUnit(unit);
 
@@ -4114,7 +4114,7 @@ void UnitLost(CUnit &unit)
 				const int newMaxValue = player.MaxResources[i] - type.Stats[player.Index].Storing[i];
 
 				player.MaxResources[i] = std::max(0, newMaxValue);
-				player.set_resource(stratagus::resource::get_all()[i], player.StoredResources[i], STORE_BUILDING);
+				player.set_resource(wyrmgus::resource::get_all()[i], player.StoredResources[i], STORE_BUILDING);
 			}
 		}
 		//  Handle income improvements, look if a player loses a building
@@ -4122,7 +4122,7 @@ void UnitLost(CUnit &unit)
 		//  income.
 		for (int i = 1; i < MaxCosts; ++i) {
 			if (player.Incomes[i] && type.Stats[player.Index].ImproveIncomes[i] == player.Incomes[i]) {
-				int m = stratagus::resource::get_all()[i]->DefaultIncome;
+				int m = wyrmgus::resource::get_all()[i]->DefaultIncome;
 
 				for (int j = 0; j < player.GetUnitCount(); ++j) {
 					m = std::max(m, player.GetUnit(j).Type->Stats[player.Index].ImproveIncomes[i]);
@@ -4249,7 +4249,7 @@ void UnitClearOrders(CUnit &unit)
 */
 void UpdateForNewUnit(const CUnit &unit, int upgrade)
 {
-	const stratagus::unit_type &type = *unit.Type;
+	const wyrmgus::unit_type &type = *unit.Type;
 	CPlayer &player = *unit.Player;
 
 	// Handle unit supply and max resources.
@@ -4617,11 +4617,11 @@ bool CUnit::IsVisibleInViewport(const CViewport &vp) const
 {
 	// Check if the graphic is inside the viewport.
 
-	const int scale_factor = stratagus::defines::get()->get_scale_factor();
+	const int scale_factor = wyrmgus::defines::get()->get_scale_factor();
 
 	int frame_width = this->Type->get_frame_width();
 	int frame_height = this->Type->get_frame_height();
-	const stratagus::unit_type_variation *variation = this->GetVariation();
+	const wyrmgus::unit_type_variation *variation = this->GetVariation();
 	if (variation && variation->FrameWidth && variation->FrameHeight) {
 		frame_width = variation->FrameWidth;
 		frame_height = variation->FrameHeight;
@@ -4629,8 +4629,8 @@ bool CUnit::IsVisibleInViewport(const CViewport &vp) const
 	frame_width *= scale_factor;
 	frame_height *= scale_factor;
 
-	int x = tilePos.x * stratagus::defines::get()->get_scaled_tile_width() + this->get_scaled_pixel_offset().x() - (frame_width - Type->get_tile_width() * stratagus::defines::get()->get_scaled_tile_width()) / 2 + this->Type->get_offset().x() * scale_factor;
-	int y = tilePos.y * stratagus::defines::get()->get_scaled_tile_height() + this->get_scaled_pixel_offset().y() - (frame_height - Type->get_tile_height() * stratagus::defines::get()->get_scaled_tile_height()) / 2 + this->Type->get_offset().y() * scale_factor;
+	int x = tilePos.x * wyrmgus::defines::get()->get_scaled_tile_width() + this->get_scaled_pixel_offset().x() - (frame_width - Type->get_tile_width() * wyrmgus::defines::get()->get_scaled_tile_width()) / 2 + this->Type->get_offset().x() * scale_factor;
+	int y = tilePos.y * wyrmgus::defines::get()->get_scaled_tile_height() + this->get_scaled_pixel_offset().y() - (frame_height - Type->get_tile_height() * wyrmgus::defines::get()->get_scaled_tile_height()) / 2 + this->Type->get_offset().y() * scale_factor;
 	const PixelSize vpSize = vp.GetPixelSize();
 	const PixelPos vpTopLeftMapPos = CMap::Map.tile_pos_to_scaled_map_pixel_pos_top_left(vp.MapPos) + vp.Offset;
 	const PixelPos vpBottomRightMapPos = vpTopLeftMapPos + vpSize;
@@ -4759,18 +4759,18 @@ void CUnit::ChangeOwner(CPlayer &newplayer, bool show_change)
 	//Wyrmgus end
 
 	//apply upgrades of the new player, if the old one doesn't have that upgrade
-	for (const stratagus::upgrade_modifier *modifier : stratagus::upgrade_modifier::UpgradeModifiers) {
+	for (const wyrmgus::upgrade_modifier *modifier : wyrmgus::upgrade_modifier::UpgradeModifiers) {
 		const CUpgrade *modifier_upgrade = CUpgrade::get_all()[modifier->UpgradeId];
 		if (oldplayer->Allow.Upgrades[modifier_upgrade->ID] != 'R' && newplayer.Allow.Upgrades[modifier_upgrade->ID] == 'R' && modifier->applies_to(this->Type)) { //if the old player doesn't have the modifier's upgrade (but the new one does), and the upgrade is applicable to the unit
 			//Wyrmgus start
 //			ApplyIndividualUpgradeModifier(*this, modifier);
 			if ( // don't apply equipment-related upgrades if the unit has an item of that equipment type equipped
-				(!modifier_upgrade->is_weapon() || EquippedItems[static_cast<int>(stratagus::item_slot::weapon)].size() == 0)
-				&& (!modifier_upgrade->is_shield() || EquippedItems[static_cast<int>(stratagus::item_slot::shield)].size() == 0)
-				&& (!modifier_upgrade->is_boots() || EquippedItems[static_cast<int>(stratagus::item_slot::boots)].size() == 0)
-				&& (!modifier_upgrade->is_arrows() || EquippedItems[static_cast<int>(stratagus::item_slot::arrows)].size() == 0)
-				&& !(newplayer.Race != -1 && modifier_upgrade == stratagus::civilization::get_all()[newplayer.Race]->get_upgrade())
-				&& !(newplayer.Race != -1 && newplayer.Faction != -1 && modifier_upgrade->Ident == stratagus::faction::get_all()[newplayer.Faction]->FactionUpgrade)
+				(!modifier_upgrade->is_weapon() || EquippedItems[static_cast<int>(wyrmgus::item_slot::weapon)].size() == 0)
+				&& (!modifier_upgrade->is_shield() || EquippedItems[static_cast<int>(wyrmgus::item_slot::shield)].size() == 0)
+				&& (!modifier_upgrade->is_boots() || EquippedItems[static_cast<int>(wyrmgus::item_slot::boots)].size() == 0)
+				&& (!modifier_upgrade->is_arrows() || EquippedItems[static_cast<int>(wyrmgus::item_slot::arrows)].size() == 0)
+				&& !(newplayer.Race != -1 && modifier_upgrade == wyrmgus::civilization::get_all()[newplayer.Race]->get_upgrade())
+				&& !(newplayer.Race != -1 && newplayer.Faction != -1 && modifier_upgrade->Ident == wyrmgus::faction::get_all()[newplayer.Faction]->FactionUpgrade)
 			) {
 				ApplyIndividualUpgradeModifier(*this, modifier);
 			}
@@ -5343,7 +5343,7 @@ CUnit *UnitOnScreen(int x, int y)
 		if (!ReplayRevealMap && !unit.IsVisibleAsGoal(*CPlayer::GetThisPlayer())) {
 			continue;
 		}
-		const stratagus::unit_type &type = *unit.Type;
+		const wyrmgus::unit_type &type = *unit.Type;
 		if (!type.Sprite) {
 			continue;
 		}
@@ -5352,13 +5352,13 @@ CUnit *UnitOnScreen(int x, int y)
 		// Check if mouse is over the unit.
 		//
 		PixelPos unitSpritePos = unit.get_scaled_map_pixel_pos_center();
-		const int scale_factor = stratagus::defines::get()->get_scale_factor();
+		const int scale_factor = wyrmgus::defines::get()->get_scale_factor();
 		//Wyrmgus start
 //		unitSpritePos.x = unitSpritePos.x - type.BoxWidth / 2 -
 //						  (type.Width - type.Sprite->Width) / 2 + type.BoxOffsetX;
 //		unitSpritePos.y = unitSpritePos.y - type.BoxHeight / 2 -
 //						  (type.Height - type.Sprite->Height) / 2 + type.BoxOffsetY;
-		const stratagus::unit_type_variation *variation = unit.GetVariation();
+		const wyrmgus::unit_type_variation *variation = unit.GetVariation();
 		if (variation && variation->FrameWidth && variation->FrameHeight && !variation->get_image_file().empty()) {
 			unitSpritePos.x = unitSpritePos.x - type.get_box_width() * scale_factor / 2 -
 							  (variation->FrameWidth * scale_factor - variation->Sprite->Width) / 2 + type.BoxOffsetX * scale_factor;
@@ -5394,13 +5394,13 @@ CUnit *UnitOnScreen(int x, int y)
 
 PixelPos CUnit::get_map_pixel_pos_top_left() const
 {
-	const PixelPos pos(tilePos.x * stratagus::defines::get()->get_tile_width() + this->get_pixel_offset().x(), tilePos.y * stratagus::defines::get()->get_tile_height() + this->get_pixel_offset().y());
+	const PixelPos pos(tilePos.x * wyrmgus::defines::get()->get_tile_width() + this->get_pixel_offset().x(), tilePos.y * wyrmgus::defines::get()->get_tile_height() + this->get_pixel_offset().y());
 	return pos;
 }
 
 PixelPos CUnit::get_scaled_map_pixel_pos_top_left() const
 {
-	return this->get_map_pixel_pos_top_left() * stratagus::defines::get()->get_scale_factor();
+	return this->get_map_pixel_pos_top_left() * wyrmgus::defines::get()->get_scale_factor();
 }
 
 PixelPos CUnit::get_map_pixel_pos_center() const
@@ -5426,12 +5426,12 @@ Vec2i CUnit::GetHalfTileSize() const
 
 PixelSize CUnit::get_tile_pixel_size() const
 {
-	return PixelSize(this->GetTileSize()) * stratagus::defines::get()->get_tile_size();
+	return PixelSize(this->GetTileSize()) * wyrmgus::defines::get()->get_tile_size();
 }
 
 PixelSize CUnit::get_scaled_tile_pixel_size() const
 {
-	return this->get_tile_pixel_size() * stratagus::defines::get()->get_scale_factor();
+	return this->get_tile_pixel_size() * wyrmgus::defines::get()->get_scale_factor();
 }
 
 PixelSize CUnit::get_half_tile_pixel_size() const
@@ -5441,7 +5441,7 @@ PixelSize CUnit::get_half_tile_pixel_size() const
 
 PixelSize CUnit::get_scaled_half_tile_pixel_size() const
 {
-	return this->get_half_tile_pixel_size() * stratagus::defines::get()->get_scale_factor();
+	return this->get_half_tile_pixel_size() * wyrmgus::defines::get()->get_scale_factor();
 }
 
 QPoint CUnit::get_center_tile_pos() const
@@ -5457,7 +5457,7 @@ const CMapField *CUnit::get_center_tile() const
 
 QPoint CUnit::get_scaled_pixel_offset() const
 {
-	return this->get_pixel_offset() * stratagus::defines::get()->get_scale_factor();
+	return this->get_pixel_offset() * wyrmgus::defines::get()->get_scale_factor();
 }
 
 void CUnit::SetIndividualUpgrade(const CUpgrade *upgrade, int quantity)
@@ -5552,30 +5552,30 @@ int CUnit::GetReactionRange() const
 	return reaction_range;
 }
 
-int CUnit::get_item_slot_quantity(const stratagus::item_slot item_slot) const
+int CUnit::get_item_slot_quantity(const wyrmgus::item_slot item_slot) const
 {
 	if (!this->HasInventory()) {
 		return 0;
 	}
 	
 	if ( //if the item are arrows and the weapon of this unit's type is not a bow, return false
-		item_slot == stratagus::item_slot::arrows
-		&& Type->WeaponClasses[0] != stratagus::item_class::bow
+		item_slot == wyrmgus::item_slot::arrows
+		&& Type->WeaponClasses[0] != wyrmgus::item_class::bow
 	) {
 		return 0;
 	}
 	
-	if (item_slot == stratagus::item_slot::ring) {
+	if (item_slot == wyrmgus::item_slot::ring) {
 		return 2;
 	}
 	
 	return 1;
 }
 
-stratagus::item_class CUnit::GetCurrentWeaponClass() const
+wyrmgus::item_class CUnit::GetCurrentWeaponClass() const
 {
-	if (HasInventory() && EquippedItems[static_cast<int>(stratagus::item_slot::weapon)].size() > 0) {
-		return EquippedItems[static_cast<int>(stratagus::item_slot::weapon)][0]->Type->get_item_class();
+	if (HasInventory() && EquippedItems[static_cast<int>(wyrmgus::item_slot::weapon)].size() > 0) {
+		return EquippedItems[static_cast<int>(wyrmgus::item_slot::weapon)][0]->Type->get_item_class();
 	}
 	
 	return Type->WeaponClasses[0];
@@ -5583,12 +5583,12 @@ stratagus::item_class CUnit::GetCurrentWeaponClass() const
 
 int CUnit::GetItemVariableChange(const CUnit *item, int variable_index, bool increase) const
 {
-	if (item->Type->get_item_class() == stratagus::item_class::none) {
+	if (item->Type->get_item_class() == wyrmgus::item_class::none) {
 		return 0;
 	}
 	
-	const stratagus::item_slot item_slot = stratagus::get_item_class_slot(item->Type->get_item_class());
-	if (item->Work == nullptr && item->Elixir == nullptr && (item_slot == stratagus::item_slot::none || this->get_item_slot_quantity(item_slot) == 0 || !this->can_equip_item_class(item->Type->get_item_class()))) {
+	const wyrmgus::item_slot item_slot = wyrmgus::get_item_class_slot(item->Type->get_item_class());
+	if (item->Work == nullptr && item->Elixir == nullptr && (item_slot == wyrmgus::item_slot::none || this->get_item_slot_quantity(item_slot) == 0 || !this->can_equip_item_class(item->Type->get_item_class()))) {
 		return 0;
 	}
 	
@@ -5621,7 +5621,7 @@ int CUnit::GetItemVariableChange(const CUnit *item, int variable_index, bool inc
 		}
 		
 		if (!item->Identified) { //if the item is unidentified, don't show the effects of its affixes
-			for (const stratagus::upgrade_modifier *modifier : stratagus::upgrade_modifier::UpgradeModifiers) {
+			for (const wyrmgus::upgrade_modifier *modifier : wyrmgus::upgrade_modifier::UpgradeModifiers) {
 				if (
 					(item->Prefix != nullptr && modifier->UpgradeId == item->Prefix->ID)
 					|| (item->Suffix != nullptr && modifier->UpgradeId == item->Suffix->ID)
@@ -5672,20 +5672,20 @@ int CUnit::GetItemVariableChange(const CUnit *item, int variable_index, bool inc
 					}
 				}
 			}
-		} else if (EquippedItems[static_cast<int>(item_slot)].size() == 0 && (item_slot == stratagus::item_slot::weapon || item_slot == stratagus::item_slot::shield || item_slot == stratagus::item_slot::boots || item_slot == stratagus::item_slot::arrows)) {
-			for (const stratagus::upgrade_modifier *modifier : stratagus::upgrade_modifier::UpgradeModifiers) {
+		} else if (EquippedItems[static_cast<int>(item_slot)].size() == 0 && (item_slot == wyrmgus::item_slot::weapon || item_slot == wyrmgus::item_slot::shield || item_slot == wyrmgus::item_slot::boots || item_slot == wyrmgus::item_slot::arrows)) {
+			for (const wyrmgus::upgrade_modifier *modifier : wyrmgus::upgrade_modifier::UpgradeModifiers) {
 				const CUpgrade *modifier_upgrade = CUpgrade::get_all()[modifier->UpgradeId];
 				if (
 					(
 						(
-							(modifier_upgrade->is_weapon() && item_slot == stratagus::item_slot::weapon)
-							|| (modifier_upgrade->is_shield() && item_slot == stratagus::item_slot::shield)
-							|| (modifier_upgrade->is_boots() && item_slot == stratagus::item_slot::boots)
-							|| (modifier_upgrade->is_arrows() && item_slot == stratagus::item_slot::arrows)
+							(modifier_upgrade->is_weapon() && item_slot == wyrmgus::item_slot::weapon)
+							|| (modifier_upgrade->is_shield() && item_slot == wyrmgus::item_slot::shield)
+							|| (modifier_upgrade->is_boots() && item_slot == wyrmgus::item_slot::boots)
+							|| (modifier_upgrade->is_arrows() && item_slot == wyrmgus::item_slot::arrows)
 						)
 						&& Player->Allow.Upgrades[modifier_upgrade->ID] == 'R' && modifier->applies_to(this->Type)
 					)
-					|| (item_slot == stratagus::item_slot::weapon && modifier_upgrade->is_ability() && this->GetIndividualUpgrade(modifier_upgrade) && modifier_upgrade->WeaponClasses.size() > 0 && modifier_upgrade->WeaponClasses.contains(this->GetCurrentWeaponClass()) && !modifier_upgrade->WeaponClasses.contains(item->Type->get_item_class()))
+					|| (item_slot == wyrmgus::item_slot::weapon && modifier_upgrade->is_ability() && this->GetIndividualUpgrade(modifier_upgrade) && modifier_upgrade->WeaponClasses.size() > 0 && modifier_upgrade->WeaponClasses.contains(this->GetCurrentWeaponClass()) && !modifier_upgrade->WeaponClasses.contains(item->Type->get_item_class()))
 				) {
 					if (this->GetIndividualUpgrade(modifier_upgrade)) {
 						for (int i = 0; i < this->GetIndividualUpgrade(modifier_upgrade); ++i) {
@@ -5751,7 +5751,7 @@ int CUnit::GetPrice() const
 		cost += 1000;
 	}
 	if (this->Work != nullptr) {
-		if (this->Type->get_item_class() == stratagus::item_class::book) {
+		if (this->Type->get_item_class() == wyrmgus::item_class::book) {
 			cost += 5000;
 		} else {
 			cost += 1000;
@@ -5767,7 +5767,7 @@ int CUnit::GetPrice() const
 	return cost;
 }
 
-int CUnit::GetUnitStock(const stratagus::unit_type *unit_type) const
+int CUnit::GetUnitStock(const wyrmgus::unit_type *unit_type) const
 {
 	if (unit_type == nullptr) {
 		return 0;
@@ -5781,7 +5781,7 @@ int CUnit::GetUnitStock(const stratagus::unit_type *unit_type) const
 	}
 }
 
-void CUnit::SetUnitStock(const stratagus::unit_type *unit_type, const int quantity)
+void CUnit::SetUnitStock(const wyrmgus::unit_type *unit_type, const int quantity)
 {
 	if (!unit_type) {
 		return;
@@ -5796,12 +5796,12 @@ void CUnit::SetUnitStock(const stratagus::unit_type *unit_type, const int quanti
 	}
 }
 
-void CUnit::ChangeUnitStock(const stratagus::unit_type *unit_type, const int quantity)
+void CUnit::ChangeUnitStock(const wyrmgus::unit_type *unit_type, const int quantity)
 {
 	this->SetUnitStock(unit_type, this->GetUnitStock(unit_type) + quantity);
 }
 
-int CUnit::GetUnitStockReplenishmentTimer(const stratagus::unit_type *unit_type) const
+int CUnit::GetUnitStockReplenishmentTimer(const wyrmgus::unit_type *unit_type) const
 {
 	if (this->UnitStockReplenishmentTimers.find(unit_type) != this->UnitStockReplenishmentTimers.end()) {
 		return this->UnitStockReplenishmentTimers.find(unit_type)->second;
@@ -5810,7 +5810,7 @@ int CUnit::GetUnitStockReplenishmentTimer(const stratagus::unit_type *unit_type)
 	}
 }
 
-void CUnit::SetUnitStockReplenishmentTimer(const stratagus::unit_type *unit_type, int quantity)
+void CUnit::SetUnitStockReplenishmentTimer(const wyrmgus::unit_type *unit_type, int quantity)
 {
 	if (!unit_type) {
 		return;
@@ -5825,7 +5825,7 @@ void CUnit::SetUnitStockReplenishmentTimer(const stratagus::unit_type *unit_type
 	}
 }
 
-void CUnit::ChangeUnitStockReplenishmentTimer(const stratagus::unit_type *unit_type, int quantity)
+void CUnit::ChangeUnitStockReplenishmentTimer(const wyrmgus::unit_type *unit_type, int quantity)
 {
 	this->SetUnitStockReplenishmentTimer(unit_type, this->GetUnitStockReplenishmentTimer(unit_type) + quantity);
 }
@@ -5869,7 +5869,7 @@ int CUnit::GetResourceStep(const int resource) const
 	return resource_step;
 }
 
-int CUnit::GetTotalInsideCount(const CPlayer *player, const bool ignore_items, const bool ignore_saved_cargo, const stratagus::unit_type *type) const
+int CUnit::GetTotalInsideCount(const CPlayer *player, const bool ignore_items, const bool ignore_saved_cargo, const wyrmgus::unit_type *type) const
 {
 	if (!this->UnitInside) {
 		return 0;
@@ -6030,7 +6030,7 @@ bool CUnit::CanReturnGoodsTo(const CUnit *dest, int resource) const
 **
 **	@return	True if the unit can cast the given spell, or false otherwise
 */
-bool CUnit::CanCastSpell(const stratagus::spell *spell, const bool ignore_mana_and_cooldown) const
+bool CUnit::CanCastSpell(const wyrmgus::spell *spell, const bool ignore_mana_and_cooldown) const
 {
 	if (spell->IsAvailableForUnit(*this)) {
 		if (!ignore_mana_and_cooldown) {
@@ -6065,7 +6065,7 @@ bool CUnit::CanCastAnySpell() const
 	return false;
 }
 
-bool CUnit::is_autocast_spell(const stratagus::spell *spell) const
+bool CUnit::is_autocast_spell(const wyrmgus::spell *spell) const
 {
 	if (static_cast<size_t>(spell->Slot) < this->spell_autocast.size()) {
 		return this->spell_autocast[spell->Slot];
@@ -6074,7 +6074,7 @@ bool CUnit::is_autocast_spell(const stratagus::spell *spell) const
 	return false;
 }
 
-void CUnit::add_autocast_spell(const stratagus::spell *spell)
+void CUnit::add_autocast_spell(const wyrmgus::spell *spell)
 {
 	if (static_cast<size_t>(spell->Slot) >= this->spell_autocast.size()) {
 		this->spell_autocast.resize(spell->Slot + 1, false);
@@ -6083,10 +6083,10 @@ void CUnit::add_autocast_spell(const stratagus::spell *spell)
 	this->autocast_spells.push_back(spell);
 }
 
-void CUnit::remove_autocast_spell(const stratagus::spell *spell)
+void CUnit::remove_autocast_spell(const wyrmgus::spell *spell)
 {
 	this->spell_autocast[spell->Slot] = false;
-	stratagus::vector::remove(this->autocast_spells, spell);
+	wyrmgus::vector::remove(this->autocast_spells, spell);
 }
 
 /**
@@ -6096,7 +6096,7 @@ void CUnit::remove_autocast_spell(const stratagus::spell *spell)
 **
 **	@return	True if the unit can autocast the spell, false otherwise
 */
-bool CUnit::CanAutoCastSpell(const stratagus::spell *spell) const
+bool CUnit::CanAutoCastSpell(const wyrmgus::spell *spell) const
 {
 	if (!spell || !this->is_autocast_spell(spell) || !spell->AutoCast) {
 		return false;
@@ -6111,24 +6111,24 @@ bool CUnit::CanAutoCastSpell(const stratagus::spell *spell) const
 
 bool CUnit::IsItemEquipped(const CUnit *item) const
 {
-	const stratagus::item_slot item_slot = stratagus::get_item_class_slot(item->Type->get_item_class());
+	const wyrmgus::item_slot item_slot = wyrmgus::get_item_class_slot(item->Type->get_item_class());
 	
-	if (item_slot == stratagus::item_slot::none) {
+	if (item_slot == wyrmgus::item_slot::none) {
 		return false;
 	}
 	
-	if (stratagus::vector::contains(this->EquippedItems[static_cast<int>(item_slot)], item)) {
+	if (wyrmgus::vector::contains(this->EquippedItems[static_cast<int>(item_slot)], item)) {
 		return true;
 	}
 	
 	return false;
 }
 
-bool CUnit::is_item_class_equipped(const stratagus::item_class item_class) const
+bool CUnit::is_item_class_equipped(const wyrmgus::item_class item_class) const
 {
-	const stratagus::item_slot item_slot = stratagus::get_item_class_slot(item_class);
+	const wyrmgus::item_slot item_slot = wyrmgus::get_item_class_slot(item_class);
 	
-	if (item_slot == stratagus::item_slot::none) {
+	if (item_slot == wyrmgus::item_slot::none) {
 		return false;
 	}
 	
@@ -6141,11 +6141,11 @@ bool CUnit::is_item_class_equipped(const stratagus::item_class item_class) const
 	return false;
 }
 
-bool CUnit::IsItemTypeEquipped(const stratagus::unit_type *item_type) const
+bool CUnit::IsItemTypeEquipped(const wyrmgus::unit_type *item_type) const
 {
-	const stratagus::item_slot item_slot = stratagus::get_item_class_slot(item_type->get_item_class());
+	const wyrmgus::item_slot item_slot = wyrmgus::get_item_class_slot(item_type->get_item_class());
 	
-	if (item_slot == stratagus::item_slot::none) {
+	if (item_slot == wyrmgus::item_slot::none) {
 		return false;
 	}
 	
@@ -6158,11 +6158,11 @@ bool CUnit::IsItemTypeEquipped(const stratagus::unit_type *item_type) const
 	return false;
 }
 
-bool CUnit::IsUniqueItemEquipped(const stratagus::unique_item *unique) const
+bool CUnit::IsUniqueItemEquipped(const wyrmgus::unique_item *unique) const
 {
-	const stratagus::item_slot item_slot = stratagus::get_item_class_slot(unique->Type->get_item_class());
+	const wyrmgus::item_slot item_slot = wyrmgus::get_item_class_slot(unique->Type->get_item_class());
 		
-	if (item_slot == stratagus::item_slot::none) {
+	if (item_slot == wyrmgus::item_slot::none) {
 		return false;
 	}
 		
@@ -6193,25 +6193,25 @@ bool CUnit::can_equip_item(const CUnit *item) const
 	return true;
 }
 
-bool CUnit::can_equip_item_class(const stratagus::item_class item_class) const
+bool CUnit::can_equip_item_class(const wyrmgus::item_class item_class) const
 {
-	if (item_class == stratagus::item_class::none) {
+	if (item_class == wyrmgus::item_class::none) {
 		return false;
 	}
 	
-	if (stratagus::get_item_class_slot(item_class) == stratagus::item_slot::none) { //can't equip items that don't correspond to an equippable slot
+	if (wyrmgus::get_item_class_slot(item_class) == wyrmgus::item_slot::none) { //can't equip items that don't correspond to an equippable slot
 		return false;
 	}
 	
-	if (stratagus::get_item_class_slot(item_class) == stratagus::item_slot::weapon && !stratagus::vector::contains(this->Type->WeaponClasses, item_class)) { //if the item is a weapon and its item class isn't a weapon class used by this unit's type, return false
+	if (wyrmgus::get_item_class_slot(item_class) == wyrmgus::item_slot::weapon && !wyrmgus::vector::contains(this->Type->WeaponClasses, item_class)) { //if the item is a weapon and its item class isn't a weapon class used by this unit's type, return false
 		return false;
 	}
 	
 	if ( //if the item uses the shield (off-hand) slot, but that slot is unavailable for the weapon (because it is two-handed), return false
-		stratagus::get_item_class_slot(item_class) == stratagus::item_slot::shield
+		wyrmgus::get_item_class_slot(item_class) == wyrmgus::item_slot::shield
 		&& this->Type->WeaponClasses.size() > 0
 		&& (
-			this->Type->WeaponClasses[0] == stratagus::item_class::bow
+			this->Type->WeaponClasses[0] == wyrmgus::item_class::bow
 			// add other two-handed weapons here as necessary
 		)
 	) {
@@ -6219,17 +6219,17 @@ bool CUnit::can_equip_item_class(const stratagus::item_class item_class) const
 	}
 	
 	if ( //if the item is a shield and the weapon of this unit's type is incompatible with shields, return false
-		item_class == stratagus::item_class::shield
+		item_class == wyrmgus::item_class::shield
 		&& (
 			Type->WeaponClasses.size() == 0
-			|| stratagus::is_shield_incompatible_weapon_item_class(this->Type->WeaponClasses[0])
+			|| wyrmgus::is_shield_incompatible_weapon_item_class(this->Type->WeaponClasses[0])
 			|| Type->BoolFlag[HARVESTER_INDEX].value //workers can't use shields
 		)
 	) {
 		return false;
 	}
 	
-	if (this->get_item_slot_quantity(stratagus::get_item_class_slot(item_class)) == 0) {
+	if (this->get_item_slot_quantity(wyrmgus::get_item_class_slot(item_class)) == 0) {
 		return false;
 	}
 	
@@ -6256,7 +6256,7 @@ bool CUnit::CanUseItem(CUnit *item) const
 		return false;
 	}
 	
-	if (item->Type->BoolFlag[ITEM_INDEX].value && !stratagus::is_consumable_item_class(item->Type->get_item_class())) {
+	if (item->Type->BoolFlag[ITEM_INDEX].value && !wyrmgus::is_consumable_item_class(item->Type->get_item_class())) {
 		return false;
 	}
 	
@@ -6299,9 +6299,9 @@ bool CUnit::IsItemSetComplete(const CUnit *item) const
 bool CUnit::EquippingItemCompletesSet(const CUnit *item) const
 {
 	for (size_t i = 0; i < item->Unique->Set->UniqueItems.size(); ++i) {
-		const stratagus::item_slot item_slot = stratagus::get_item_class_slot(item->Unique->Set->UniqueItems[i]->Type->get_item_class());
+		const wyrmgus::item_slot item_slot = wyrmgus::get_item_class_slot(item->Unique->Set->UniqueItems[i]->Type->get_item_class());
 		
-		if (item_slot == stratagus::item_slot::none) {
+		if (item_slot == wyrmgus::item_slot::none) {
 			return false;
 		}
 		
@@ -6330,9 +6330,9 @@ bool CUnit::DeequippingItemBreaksSet(const CUnit *item) const
 		return false;
 	}
 	
-	const stratagus::item_slot item_slot = stratagus::get_item_class_slot(item->Type->get_item_class());
+	const wyrmgus::item_slot item_slot = wyrmgus::get_item_class_slot(item->Type->get_item_class());
 		
-	if (item_slot == stratagus::item_slot::none) {
+	if (item_slot == wyrmgus::item_slot::none) {
 		return false;
 	}
 		
@@ -6398,7 +6398,7 @@ bool CUnit::CanLearnAbility(const CUpgrade *ability, bool pre) const
 	return true;
 }
 
-bool CUnit::CanHireMercenary(stratagus::unit_type *type, int civilization_id) const
+bool CUnit::CanHireMercenary(wyrmgus::unit_type *type, int civilization_id) const
 {
 	if (civilization_id == -1) {
 		civilization_id = type->get_civilization() ? type->get_civilization()->ID : -1;
@@ -6450,12 +6450,12 @@ bool CUnit::LevelCheck(const int level) const
 
 bool CUnit::IsAbilityEmpowered(const CUpgrade *ability) const
 {
-	const stratagus::plane *plane = this->MapLayer->plane;
+	const wyrmgus::plane *plane = this->MapLayer->plane;
 
 	if (plane != nullptr) {
 		if (!plane->EmpoweredDeityDomains.empty()) {
-			for (const stratagus::deity_domain *deity_domain : ability->DeityDomains) {
-				if (stratagus::vector::contains(plane->EmpoweredDeityDomains, deity_domain)) {
+			for (const wyrmgus::deity_domain *deity_domain : ability->DeityDomains) {
+				if (wyrmgus::vector::contains(plane->EmpoweredDeityDomains, deity_domain)) {
 					return true;
 				}
 			}
@@ -6473,7 +6473,7 @@ bool CUnit::IsAbilityEmpowered(const CUpgrade *ability) const
 	return false;
 }
 
-bool CUnit::IsSpellEmpowered(const stratagus::spell *spell) const
+bool CUnit::IsSpellEmpowered(const wyrmgus::spell *spell) const
 {
 	if (spell->DependencyId != -1) {
 		return this->IsAbilityEmpowered(CUpgrade::get_all()[spell->DependencyId]);
@@ -6500,7 +6500,7 @@ bool CUnit::UpgradeRemovesExistingUpgrade(const CUpgrade *upgrade) const
 	return false;
 }
 
-bool CUnit::HasAdjacentRailForUnitType(const stratagus::unit_type *type) const
+bool CUnit::HasAdjacentRailForUnitType(const wyrmgus::unit_type *type) const
 {
 	bool has_adjacent_rail = false;
 	Vec2i top_left_pos(this->tilePos - Vec2i(1, 1));
@@ -6539,9 +6539,9 @@ bool CUnit::HasAdjacentRailForUnitType(const stratagus::unit_type *type) const
 	return has_adjacent_rail;
 }
 
-stratagus::animation_set *CUnit::GetAnimations() const
+wyrmgus::animation_set *CUnit::GetAnimations() const
 {
-	const stratagus::unit_type_variation *variation = this->GetVariation();
+	const wyrmgus::unit_type_variation *variation = this->GetVariation();
 	if (variation && variation->Animations) {
 		return variation->Animations;
 	} else {
@@ -6551,7 +6551,7 @@ stratagus::animation_set *CUnit::GetAnimations() const
 
 CConstruction *CUnit::GetConstruction() const
 {
-	const stratagus::unit_type_variation *variation = this->GetVariation();
+	const wyrmgus::unit_type_variation *variation = this->GetVariation();
 	if (variation && variation->Construction) {
 		return variation->Construction;
 	} else {
@@ -6559,7 +6559,7 @@ CConstruction *CUnit::GetConstruction() const
 	}
 }
 
-const stratagus::icon *CUnit::get_icon() const
+const wyrmgus::icon *CUnit::get_icon() const
 {
 	if (this->Character != nullptr && this->Character->get_level() >= 3 && this->Character->HeroicIcon.Icon) {
 		return this->Character->HeroicIcon.Icon;
@@ -6569,7 +6569,7 @@ const stratagus::icon *CUnit::get_icon() const
 		return this->Unique->get_icon();
 	}
 	
-	const stratagus::unit_type_variation *variation = this->GetVariation();
+	const wyrmgus::unit_type_variation *variation = this->GetVariation();
 	if (variation && variation->Icon.Icon) {
 		return variation->Icon.Icon;
 	} else {
@@ -6577,12 +6577,12 @@ const stratagus::icon *CUnit::get_icon() const
 	}
 }
 
-const stratagus::icon *CUnit::GetButtonIcon(const ButtonCmd button_action) const
+const wyrmgus::icon *CUnit::GetButtonIcon(const ButtonCmd button_action) const
 {
 	if (this->ButtonIcons.find(button_action) != this->ButtonIcons.end()) {
 		return this->ButtonIcons.find(button_action)->second;
-	} else if (this->Player == CPlayer::GetThisPlayer() && CPlayer::GetThisPlayer()->Faction != -1 && stratagus::faction::get_all()[CPlayer::GetThisPlayer()->Faction]->ButtonIcons.find(button_action) != stratagus::faction::get_all()[CPlayer::GetThisPlayer()->Faction]->ButtonIcons.end()) {
-		return stratagus::faction::get_all()[CPlayer::GetThisPlayer()->Faction]->ButtonIcons[button_action].Icon;
+	} else if (this->Player == CPlayer::GetThisPlayer() && CPlayer::GetThisPlayer()->Faction != -1 && wyrmgus::faction::get_all()[CPlayer::GetThisPlayer()->Faction]->ButtonIcons.find(button_action) != wyrmgus::faction::get_all()[CPlayer::GetThisPlayer()->Faction]->ButtonIcons.end()) {
+		return wyrmgus::faction::get_all()[CPlayer::GetThisPlayer()->Faction]->ButtonIcons[button_action].Icon;
 	} else if (this->Player == CPlayer::GetThisPlayer() && PlayerRaces.ButtonIcons[CPlayer::GetThisPlayer()->Race].find(button_action) != PlayerRaces.ButtonIcons[CPlayer::GetThisPlayer()->Race].end()) {
 		return PlayerRaces.ButtonIcons[CPlayer::GetThisPlayer()->Race][button_action].Icon;
 	}
@@ -6601,12 +6601,12 @@ MissileConfig CUnit::GetMissile() const
 
 CPlayerColorGraphic *CUnit::GetLayerSprite(int image_layer) const
 {
-	const stratagus::unit_type_variation *layer_variation = this->GetLayerVariation(image_layer);
+	const wyrmgus::unit_type_variation *layer_variation = this->GetLayerVariation(image_layer);
 	if (layer_variation && layer_variation->Sprite) {
 		return layer_variation->Sprite;
 	}
 	
-	const stratagus::unit_type_variation *variation = this->GetVariation();
+	const wyrmgus::unit_type_variation *variation = this->GetVariation();
 	if (variation && variation->LayerSprites[image_layer]) {
 		return variation->LayerSprites[image_layer];
 	} else if (this->Type->LayerSprites[image_layer])  {
@@ -6620,7 +6620,7 @@ std::string CUnit::GetName() const
 {
 	if (GameRunning && this->Character && this->Character->Deity) {
 		if (CPlayer::GetThisPlayer()->Race >= 0) {
-			const std::string &cultural_name = this->Character->Deity->get_cultural_name(stratagus::civilization::get_all()[CPlayer::GetThisPlayer()->Race]);
+			const std::string &cultural_name = this->Character->Deity->get_cultural_name(wyrmgus::civilization::get_all()[CPlayer::GetThisPlayer()->Race]);
 			
 			if (!cultural_name.empty()) {
 				return cultural_name;
@@ -6653,7 +6653,7 @@ std::string CUnit::GetTypeName() const
 		return _("Deity");
 	}
 	
-	const stratagus::unit_type_variation *variation = this->GetVariation();
+	const wyrmgus::unit_type_variation *variation = this->GetVariation();
 	if (variation && !variation->TypeName.empty()) {
 		return _(variation->TypeName.c_str());
 	} else {
@@ -6680,7 +6680,7 @@ std::string CUnit::GetMessageName() const
 }
 //Wyrmgus end
 
-const stratagus::time_of_day *CUnit::get_center_tile_time_of_day() const
+const wyrmgus::time_of_day *CUnit::get_center_tile_time_of_day() const
 {
 	if (this->MapLayer == nullptr) {
 		return nullptr;
@@ -6712,7 +6712,7 @@ void LetUnitDie(CUnit &unit, bool suicide)
 	unit.TTL = 0;
 	unit.Anim.Unbreakable = 0;
 
-	const stratagus::unit_type *type = unit.Type;
+	const wyrmgus::unit_type *type = unit.Type;
 
 	while (unit.Resource.Workers) {
 		unit.Resource.Workers->DeAssignWorkerFromMine(unit);
@@ -6730,7 +6730,7 @@ void LetUnitDie(CUnit &unit, bool suicide)
 		return;
 	}
 
-	PlayUnitSound(unit, stratagus::unit_sound_type::dying);
+	PlayUnitSound(unit, wyrmgus::unit_sound_type::dying);
 
 	//
 	// Catapults,... explodes.
@@ -6802,7 +6802,7 @@ void LetUnitDie(CUnit &unit, bool suicide)
 				table[i]->Moving = 0;
 				table[i]->TTL = 0;
 				table[i]->Anim.Unbreakable = 0;
-				PlayUnitSound(*table[i], stratagus::unit_sound_type::dying);
+				PlayUnitSound(*table[i], wyrmgus::unit_sound_type::dying);
 				table[i]->Remove(nullptr);
 				UnitLost(*table[i]);
 				UnitClearOrders(*table[i]);
@@ -6910,8 +6910,8 @@ void DestroyAllInside(CUnit &source)
 
 int ThreatCalculate(const CUnit &unit, const CUnit &dest)
 {
-	const stratagus::unit_type &type = *unit.Type;
-	const stratagus::unit_type &dtype = *dest.Type;
+	const wyrmgus::unit_type &type = *unit.Type;
+	const wyrmgus::unit_type &dtype = *dest.Type;
 	int cost = 0;
 
 	// Buildings, non-aggressive and invincible units have the lowest priority
@@ -6985,7 +6985,7 @@ static void HitUnit_LastAttack(const CUnit *attacker, CUnit &target)
 				HelpMeLastCycle = GameCycle + CYCLES_PER_SECOND * 2;
 				HelpMeLastX = target.tilePos.x;
 				HelpMeLastY = target.tilePos.y;
-				PlayUnitSound(target, stratagus::unit_sound_type::help);
+				PlayUnitSound(target, wyrmgus::unit_sound_type::help);
 				target.Player->Notify(NotifyRed, target.tilePos, target.MapLayer->ID, _("%s attacked"), target.GetMessageName().c_str());
 			}
 		}
@@ -7040,10 +7040,10 @@ static void HitUnit_Raid(CUnit *attacker, CUnit &target, int damage)
 	for (int i = 0; i < MaxCosts; ++i) {
 		if (target.Type->Stats[target.Player->Index].Costs[i] > 0) {
 			int resource_change = target.Type->Stats[target.Player->Index].Costs[i] * damage * attacker->Variable[var_index].Value / target.GetModifiedVariable(HP_INDEX, VariableMax) / 100;
-			resource_change = std::min(resource_change, target.Player->get_resource(stratagus::resource::get_all()[i], STORE_BOTH));
-			attacker->Player->change_resource(stratagus::resource::get_all()[i], resource_change);
+			resource_change = std::min(resource_change, target.Player->get_resource(wyrmgus::resource::get_all()[i], STORE_BOTH));
+			attacker->Player->change_resource(wyrmgus::resource::get_all()[i], resource_change);
 			attacker->Player->TotalResources[i] += resource_change;
-			target.Player->change_resource(stratagus::resource::get_all()[i], -resource_change);
+			target.Player->change_resource(wyrmgus::resource::get_all()[i], -resource_change);
 		}
 	}
 }
@@ -7082,20 +7082,20 @@ static void HitUnit_IncreaseScoreForKill(CUnit &attacker, CUnit &target)
 	
 	//Wyrmgus start
 	for (const auto &objective : attacker.Player->get_quest_objectives()) {
-		const stratagus::quest_objective *quest_objective = objective->get_quest_objective();
+		const wyrmgus::quest_objective *quest_objective = objective->get_quest_objective();
 		if (
 			(
-				quest_objective->get_objective_type() == stratagus::objective_type::destroy_units
-				&& (stratagus::vector::contains(quest_objective->UnitTypes, target.Type) || stratagus::vector::contains(quest_objective->get_unit_classes(), target.Type->get_unit_class()))
+				quest_objective->get_objective_type() == wyrmgus::objective_type::destroy_units
+				&& (wyrmgus::vector::contains(quest_objective->UnitTypes, target.Type) || wyrmgus::vector::contains(quest_objective->get_unit_classes(), target.Type->get_unit_class()))
 				&& (quest_objective->get_settlement() == nullptr || quest_objective->get_settlement() == target.settlement)
 			)
-			|| (quest_objective->get_objective_type() == stratagus::objective_type::destroy_hero && target.Character && quest_objective->get_character() == target.Character)
-			|| (quest_objective->get_objective_type() == stratagus::objective_type::destroy_unique && target.Unique && quest_objective->Unique == target.Unique)
+			|| (quest_objective->get_objective_type() == wyrmgus::objective_type::destroy_hero && target.Character && quest_objective->get_character() == target.Character)
+			|| (quest_objective->get_objective_type() == wyrmgus::objective_type::destroy_unique && target.Unique && quest_objective->Unique == target.Unique)
 		) {
 			if (quest_objective->get_faction() == nullptr || quest_objective->get_faction()->ID == target.Player->Faction) {
 				objective->Counter = std::min(objective->Counter + 1, quest_objective->get_quantity());
 			}
-		} else if (quest_objective->get_objective_type() == stratagus::objective_type::destroy_faction) {
+		} else if (quest_objective->get_objective_type() == wyrmgus::objective_type::destroy_faction) {
 			const CPlayer *faction_player = GetFactionPlayer(quest_objective->get_faction());
 			
 			if (faction_player) {
@@ -7176,7 +7176,7 @@ static void HitUnit_ShowDamageMissile(const CUnit &target, int damage)
 	const PixelPos targetPixelCenter = target.get_map_pixel_pos_center();
 
 	if ((target.IsVisibleOnMap(*CPlayer::GetThisPlayer()) || ReplayRevealMap) && !DamageMissile.empty()) {
-		const stratagus::missile_type *mtype = stratagus::missile_type::get(DamageMissile);
+		const wyrmgus::missile_type *mtype = wyrmgus::missile_type::get(DamageMissile);
 		const PixelDiff offset(3, -mtype->get_range());
 
 		MakeLocalMissile(*mtype, targetPixelCenter, targetPixelCenter + offset, target.MapLayer->ID)->Damage = -damage;
@@ -7186,7 +7186,7 @@ static void HitUnit_ShowDamageMissile(const CUnit &target, int damage)
 static void HitUnit_ShowImpactMissile(const CUnit &target)
 {
 	const PixelPos targetPixelCenter = target.get_map_pixel_pos_center();
-	const stratagus::unit_type &type = *target.Type;
+	const wyrmgus::unit_type &type = *target.Type;
 
 	if (target.Variable[SHIELD_INDEX].Value > 0
 		&& !type.Impact[ANIMATIONS_DEATHTYPES + 1].Name.empty()) { // shield impact
@@ -7240,11 +7240,11 @@ static void HitUnit_Burning(CUnit &target)
 //	const int f = (100 * target.Variable[HP_INDEX].Value) / target.Variable[HP_INDEX].Max;
 	const int f = (100 * target.Variable[HP_INDEX].Value) / target.GetModifiedVariable(HP_INDEX, VariableMax);
 	//Wyrmgus end
-	stratagus::missile_type *fire = MissileBurningBuilding(f);
+	wyrmgus::missile_type *fire = MissileBurningBuilding(f);
 
 	if (fire) {
 		const PixelPos targetPixelCenter = target.get_map_pixel_pos_center();
-		const PixelDiff offset(0, -stratagus::defines::get()->get_tile_height());
+		const PixelDiff offset(0, -wyrmgus::defines::get()->get_tile_height());
 		Missile *missile = MakeMissile(*fire, targetPixelCenter + offset, targetPixelCenter + offset, target.MapLayer->ID);
 
 		missile->SourceUnit = &target;
@@ -7377,7 +7377,7 @@ static void HitUnit_AttackBack(CUnit &attacker, CUnit &target)
 void HitUnit(CUnit *attacker, CUnit &target, int damage, const Missile *missile, bool show_damage)
 //Wyrmgus end
 {
-	const stratagus::unit_type *type = target.Type;
+	const wyrmgus::unit_type *type = target.Type;
 	if (!damage) {
 		// Can now happen by splash damage
 		// Multiple places send x/y as damage, which may be zero
@@ -7621,7 +7621,7 @@ int CUnit::MapDistanceTo(const Vec2i &pos, int z) const
 **
 **	@return	The distance between the types
 */
-int MapDistanceBetweenTypes(const stratagus::unit_type &src, const Vec2i &pos1, int src_z, const stratagus::unit_type &dst, const Vec2i &pos2, int dst_z)
+int MapDistanceBetweenTypes(const wyrmgus::unit_type &src, const Vec2i &pos1, int src_z, const wyrmgus::unit_type &dst, const Vec2i &pos2, int dst_z)
 {
 	return MapDistance(src.get_tile_size(), pos1, src_z, dst.get_tile_size(), pos2, dst_z);
 }
@@ -7691,7 +7691,7 @@ int ViewPointDistanceToUnit(const CUnit &dest)
 **
 **  @return        0 if attacker can't target the unit, else a positive number.
 */
-int CanTarget(const stratagus::unit_type &source, const stratagus::unit_type &dest)
+int CanTarget(const wyrmgus::unit_type &source, const wyrmgus::unit_type &dest)
 {
 	for (unsigned int i = 0; i < UnitTypeVar.GetNumberBoolFlag(); i++) {
 		if (source.BoolFlag[i].CanTargetFlag != CONDITION_TRUE) {
@@ -7791,7 +7791,7 @@ bool CanPickUp(const CUnit &picker, const CUnit &unit)
 	if (!unit.Type->BoolFlag[ITEM_INDEX].value && !unit.Type->BoolFlag[POWERUP_INDEX].value) { //only item and powerup units can be picked up
 		return false;
 	}
-	if (!unit.Type->BoolFlag[POWERUP_INDEX].value && !picker.HasInventory() && !stratagus::is_consumable_item_class(unit.Type->get_item_class())) { //only consumable items can be picked up as if they were power-ups for units with no inventory
+	if (!unit.Type->BoolFlag[POWERUP_INDEX].value && !picker.HasInventory() && !wyrmgus::is_consumable_item_class(unit.Type->get_item_class())) { //only consumable items can be picked up as if they were power-ups for units with no inventory
 		return false;
 	}
 	if (picker.CurrentAction() == UnitAction::Built) { // Under construction

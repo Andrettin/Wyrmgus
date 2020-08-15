@@ -77,7 +77,7 @@ bool GraphicAnimation::isVisible(const CViewport &vp, const CPosition &pos, int 
 	}
 
 	PixelSize graphicSize(g->Width, g->Height);
-	PixelDiff margin(stratagus::defines::get()->get_tile_width() - 1, stratagus::defines::get()->get_tile_height() - 1);
+	PixelDiff margin(wyrmgus::defines::get()->get_tile_width() - 1, wyrmgus::defines::get()->get_tile_height() - 1);
 	PixelPos position(pos.x, pos.y);
 	Vec2i minPos = CMap::Map.map_pixel_pos_to_tile_pos(position);
 	Vec2i maxPos = CMap::Map.map_pixel_pos_to_tile_pos(position + graphicSize + margin);

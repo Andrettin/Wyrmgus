@@ -30,7 +30,7 @@
 
 #include "sound/sound.h"
 
-namespace stratagus {
+namespace wyrmgus {
 
 int get_unit_sound_type_range(const unit_sound_type unit_sound_type)
 {

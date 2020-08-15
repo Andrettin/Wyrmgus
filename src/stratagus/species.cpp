@@ -31,7 +31,7 @@
 
 #include "util/vector_util.h"
 
-namespace stratagus {
+namespace wyrmgus {
 
 bool species::CanEvolveToAUnitType(terrain_type *terrain, bool sapient_only) const
 {

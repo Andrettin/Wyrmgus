@@ -31,7 +31,7 @@
 
 #pragma once
 
-namespace stratagus::size {
+namespace wyrmgus::size {
 
 inline constexpr QPoint to_point(const QSize &size)
 {

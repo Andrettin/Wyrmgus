@@ -44,7 +44,7 @@ struct lua_State;
 int CclDefineDependency(lua_State *l);
 int CclDefinePredependency(lua_State *l);
 
-namespace stratagus {
+namespace wyrmgus {
 	class character;
 	class civilization;
 	class condition;
@@ -79,11 +79,11 @@ public:
 	bool operator != (const CUnitStats &rhs) const;
 	
  	int GetPrice() const;
-	int GetUnitStock(const stratagus::unit_type *unit_type) const;
-	void SetUnitStock(const stratagus::unit_type *unit_type, int quantity);
-	void ChangeUnitStock(const stratagus::unit_type *unit_type, int quantity);
+	int GetUnitStock(const wyrmgus::unit_type *unit_type) const;
+	void SetUnitStock(const wyrmgus::unit_type *unit_type, int quantity);
+	void ChangeUnitStock(const wyrmgus::unit_type *unit_type, int quantity);
 public:
-	std::vector<stratagus::unit_variable> Variables;           /// user defined variable.
+	std::vector<wyrmgus::unit_variable> Variables;           /// user defined variable.
 	int Costs[MaxCosts];            /// current costs of the unit
 	int Storing[MaxCosts];          /// storage increasing
 	int ImproveIncomes[MaxCosts];   /// Gives player an improved income
@@ -91,13 +91,13 @@ public:
 	std::map<int, int> UnitStock;	/// Units in stock
 };
 
-class CUpgrade final : public stratagus::detailed_data_entry, public stratagus::data_type<CUpgrade>, public CDataType
+class CUpgrade final : public wyrmgus::detailed_data_entry, public wyrmgus::data_type<CUpgrade>, public CDataType
 {
 	Q_OBJECT
 
-	Q_PROPERTY(stratagus::civilization* civilization MEMBER civilization READ get_civilization)
-	Q_PROPERTY(stratagus::icon* icon MEMBER icon READ get_icon)
-	Q_PROPERTY(stratagus::upgrade_class* upgrade_class READ get_upgrade_class WRITE set_upgrade_class)
+	Q_PROPERTY(wyrmgus::civilization* civilization MEMBER civilization READ get_civilization)
+	Q_PROPERTY(wyrmgus::icon* icon MEMBER icon READ get_icon)
+	Q_PROPERTY(wyrmgus::upgrade_class* upgrade_class READ get_upgrade_class WRITE set_upgrade_class)
 	Q_PROPERTY(QString requirements_string READ get_requirements_string_qstring)
 	Q_PROPERTY(QString effects_string READ get_effects_string_qstring)
 	Q_PROPERTY(bool ability MEMBER ability READ is_ability)
@@ -110,7 +110,7 @@ public:
 	static constexpr const char *class_identifier = "upgrade";
 	static constexpr const char *database_folder = "upgrades";
 
-	static CUpgrade *add(const std::string &identifier, const stratagus::module *module)
+	static CUpgrade *add(const std::string &identifier, const wyrmgus::module *module)
 	{
 		CUpgrade *upgrade = data_type::add(identifier, module);
 		upgrade->ID = CUpgrade::get_all().size() - 1;
@@ -121,8 +121,8 @@ public:
 	~CUpgrade();
 
 	virtual void ProcessConfigData(const CConfigData *config_data) override;
-	virtual void process_sml_property(const stratagus::sml_property &property) override;
-	virtual void process_sml_scope(const stratagus::sml_data &scope) override;
+	virtual void process_sml_property(const wyrmgus::sml_property &property) override;
+	virtual void process_sml_scope(const wyrmgus::sml_data &scope) override;
 	virtual void initialize() override;
 
 	int get_index() const
@@ -132,19 +132,19 @@ public:
 
 	void set_parent(const CUpgrade *parent_upgrade);
 
-	stratagus::icon *get_icon() const
+	wyrmgus::icon *get_icon() const
 	{
 		return this->icon;
 	}
 
-	stratagus::upgrade_class *get_upgrade_class() const
+	wyrmgus::upgrade_class *get_upgrade_class() const
 	{
 		return this->upgrade_class;
 	}
 
-	void set_upgrade_class(stratagus::upgrade_class *upgrade_class);
+	void set_upgrade_class(wyrmgus::upgrade_class *upgrade_class);
 
-	stratagus::civilization *get_civilization() const
+	wyrmgus::civilization *get_civilization() const
 	{
 		return this->civilization;
 	}
@@ -214,37 +214,37 @@ public:
 		return this->arrows;
 	}
 
-	const std::vector<std::unique_ptr<stratagus::upgrade_modifier>> &get_modifiers() const
+	const std::vector<std::unique_ptr<wyrmgus::upgrade_modifier>> &get_modifiers() const
 	{
 		return this->modifiers;
 	}
 
-	void add_modifier(std::unique_ptr<stratagus::upgrade_modifier> &&modifier);
+	void add_modifier(std::unique_ptr<wyrmgus::upgrade_modifier> &&modifier);
 
-	const std::unique_ptr<stratagus::condition> &get_preconditions() const
+	const std::unique_ptr<wyrmgus::condition> &get_preconditions() const
 	{
 		return this->preconditions;
 	}
 
-	const std::unique_ptr<stratagus::condition> &get_conditions() const
+	const std::unique_ptr<wyrmgus::condition> &get_conditions() const
 	{
 		return this->conditions;
 	}
 
-	const stratagus::dynasty *get_dynasty() const
+	const wyrmgus::dynasty *get_dynasty() const
 	{
 		return this->dynasty;
 	}
 
-	void set_dynasty(const stratagus::dynasty *dynasty);
+	void set_dynasty(const wyrmgus::dynasty *dynasty);
 
 private:
-	stratagus::upgrade_class *upgrade_class = nullptr; //upgrade class (e.g. siege weapon projectile I)
-	stratagus::civilization *civilization = nullptr; //which civilization this upgrade belongs to, if any
+	wyrmgus::upgrade_class *upgrade_class = nullptr; //upgrade class (e.g. siege weapon projectile I)
+	wyrmgus::civilization *civilization = nullptr; //which civilization this upgrade belongs to, if any
 	int faction = -1;				/// which faction this upgrade belongs to, if any
 	std::string effects_string; //effects string of the upgrade
 	std::string requirements_string; //requirements string of the upgrade
-	stratagus::icon *icon = nullptr; //icon to display to the user
+	wyrmgus::icon *icon = nullptr; //icon to display to the user
 	std::string button_key;
 	bool ability = false;
 	bool weapon = false;
@@ -256,13 +256,13 @@ public:
 	bool MagicSuffix = false;
 	bool RunicAffix = false;
 	bool UniqueOnly = false;		/// whether (if this is a literary work) this should appear only on unique items (used, for instance, if a book has no copies of its text)
-	bool ItemPrefix[static_cast<int>(stratagus::item_class::count)];
-	bool ItemSuffix[static_cast<int>(stratagus::item_class::count)];
+	bool ItemPrefix[static_cast<int>(wyrmgus::item_class::count)];
+	bool ItemSuffix[static_cast<int>(wyrmgus::item_class::count)];
 	bool IncompatibleAffixes[UpgradeMax];
-	std::set<stratagus::item_class> WeaponClasses; //if isn't empty, one of these weapon classes will need to be equipped for the upgrade to be applied
+	std::set<wyrmgus::item_class> WeaponClasses; //if isn't empty, one of these weapon classes will need to be equipped for the upgrade to be applied
 	//Wyrmgus start
 	std::vector<std::string> Epithets;	/// epithets when a character has a certain trait
-	stratagus::unit_type *Item = nullptr;
+	wyrmgus::unit_type *Item = nullptr;
 	//Wyrmgus end
 	int   ID = 0;						/// numerical id
 	int   Costs[MaxCosts];				/// costs for the upgrade
@@ -271,23 +271,23 @@ public:
 	int GrandStrategyProductionEfficiencyModifier[MaxCosts];	/// Production modifier for a particular resource for grand strategy mode
 	int MaxLimit = 1;					/// Maximum amount of times this upgrade can be acquired as an individual upgrade
 	int MagicLevel = 0;					/// Magic level of an affix
-	stratagus::item_class Work;			/// Form in which was inscribed (i.e. scroll or book), if is a literary work
+	wyrmgus::item_class Work;			/// Form in which was inscribed (i.e. scroll or book), if is a literary work
 	int Year = 0;						/// Year of publication, if is a literary work
-	stratagus::character *Author = nullptr;		/// Author of this literary work (if it is one)
+	wyrmgus::character *Author = nullptr;		/// Author of this literary work (if it is one)
 private:
-	std::vector<std::unique_ptr<stratagus::upgrade_modifier>> modifiers; //upgrade modifiers for this upgrade
+	std::vector<std::unique_ptr<wyrmgus::upgrade_modifier>> modifiers; //upgrade modifiers for this upgrade
 public:
-	std::vector<stratagus::unique_item *> UniqueItems;	/// Unique items who form a part of this set upgrade
-	std::vector<stratagus::unit_type *> ScaledCostUnits;	/// Units for which the upgrade's costs are scaled
-	std::vector<stratagus::deity_domain *> DeityDomains;	/// Deity domains to which this ability belongs
+	std::vector<wyrmgus::unique_item *> UniqueItems;	/// Unique items who form a part of this set upgrade
+	std::vector<wyrmgus::unit_type *> ScaledCostUnits;	/// Units for which the upgrade's costs are scaled
+	std::vector<wyrmgus::deity_domain *> DeityDomains;	/// Deity domains to which this ability belongs
 	std::vector<CSchoolOfMagic *> SchoolsOfMagic;	/// Schools of magic to which this ability belongs
-	std::vector<stratagus::character *> Characters;	/// Characters who appear in this literary work (if it is one)
+	std::vector<wyrmgus::character *> Characters;	/// Characters who appear in this literary work (if it is one)
 	//Wyrmgus end
 	// TODO: not used by buttons
 private:
-	std::unique_ptr<stratagus::condition> preconditions;
-	std::unique_ptr<stratagus::condition> conditions;
-	const stratagus::dynasty *dynasty = nullptr; //the dynasty to which the upgrade pertains, if this is a dynasty upgrade
+	std::unique_ptr<wyrmgus::condition> preconditions;
+	std::unique_ptr<wyrmgus::condition> conditions;
+	const wyrmgus::dynasty *dynasty = nullptr; //the dynasty to which the upgrade pertains, if this is a dynasty upgrade
 
 	friend int CclDefineUpgrade(lua_State *l);
 	friend int CclDefineDependency(lua_State *l);

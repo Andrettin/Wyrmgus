@@ -31,7 +31,7 @@
 
 class CSeasonSchedule;
 
-namespace stratagus {
+namespace wyrmgus {
 	class season;
 }
 
@@ -39,7 +39,7 @@ class CScheduledSeason
 {
 public:
 	unsigned ID = 0;						/// the scheduled season's ID within the season schedule
-	stratagus::season *Season = nullptr;				/// the season that is scheduled
+	wyrmgus::season *Season = nullptr;				/// the season that is scheduled
 	unsigned Hours = 0;						/// the amount of hours the scheduled season lasts
 	CSeasonSchedule *Schedule = nullptr;	/// the schedule to which this season belongs
 };

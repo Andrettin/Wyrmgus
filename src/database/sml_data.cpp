@@ -34,7 +34,7 @@
 #include "database/sml_operator.h"
 #include "database/sml_property_visitor.h"
 
-namespace stratagus {
+namespace wyrmgus {
 
 sml_data::sml_data(std::string &&tag)
 	: tag(std::move(tag)), scope_operator(sml_operator::assignment)

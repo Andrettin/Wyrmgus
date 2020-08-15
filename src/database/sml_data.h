@@ -36,7 +36,7 @@
 #include "database/sml_property.h"
 #include "database/sml_property_visitor.h"
 
-namespace stratagus {
+namespace wyrmgus {
 
 class sml_parser;
 

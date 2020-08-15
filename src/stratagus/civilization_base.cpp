@@ -34,7 +34,7 @@
 #include "util/container_util.h"
 #include "util/vector_util.h"
 
-namespace stratagus {
+namespace wyrmgus {
 
 void civilization_base::process_sml_scope(const sml_data &scope)
 {
@@ -49,7 +49,7 @@ void civilization_base::process_sml_scope(const sml_data &scope)
 		scope.for_each_child([&](const sml_data &child_scope) {
 			const std::string &tag = child_scope.get_tag();
 
-			const stratagus::gender gender = string_to_gender(tag);
+			const wyrmgus::gender gender = string_to_gender(tag);
 			vector::merge(this->personal_names[gender], child_scope.get_values());
 		});
 	} else if (tag == "unit_class_names") {

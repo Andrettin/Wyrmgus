@@ -27,7 +27,7 @@
 
 #pragma once
 
-namespace stratagus {
+namespace wyrmgus {
 
 /**
 **  Missile-class this defines how a missile-type reacts.
@@ -144,4 +144,4 @@ inline std::string missile_class_to_string(const missile_class missile_class)
 
 }
 
-Q_DECLARE_METATYPE(stratagus::missile_class)
+Q_DECLARE_METATYPE(wyrmgus::missile_class)

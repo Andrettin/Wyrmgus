@@ -157,7 +157,7 @@ static constexpr int PlayerMajorDeityMax = 1;	/// Maximum major deities per play
 static constexpr int PlayerMinorDeityMax = 1;	/// Maximum minor deities per player/character
 static constexpr int PlayerDeityMax = (PlayerMajorDeityMax + PlayerMinorDeityMax);
 
-namespace stratagus {
+namespace wyrmgus {
 
 static constexpr int base_population_per_unit = 1000;		/// Number of people a unit represents
 

@@ -102,10 +102,10 @@ void ShowLoadProgress(const char *fmt, ...)
 		//Wyrmgus start
 //		Video.FillRectangle(ColorBlack, 5, Video.Height - 18, Video.Width - 10, 18);
 		if (loadingBackground == nullptr) {
-			Video.FillRectangle(ColorBlack, 0, Video.Height - 18 * stratagus::defines::get()->get_scale_factor(), Video.Width, 18 * stratagus::defines::get()->get_scale_factor());
+			Video.FillRectangle(ColorBlack, 0, Video.Height - 18 * wyrmgus::defines::get()->get_scale_factor(), Video.Width, 18 * wyrmgus::defines::get()->get_scale_factor());
 		}
 		//Wyrmgus end
-		CLabel(GetGameFont()).DrawCentered(Video.Width / 2, Video.Height - 16 * stratagus::defines::get()->get_scale_factor(), temp);
+		CLabel(GetGameFont()).DrawCentered(Video.Width / 2, Video.Height - 16 * wyrmgus::defines::get()->get_scale_factor(), temp);
 		//Wyrmgus end
 
 		RealizeVideoMemory();
@@ -193,8 +193,8 @@ void InitUserInterface()
 	// Calculations
 	//
 	if (CMap::Map.Info.MapWidth) {
-		UI.MapArea.EndX = std::min<int>(UI.MapArea.EndX, UI.MapArea.X + CMap::Map.Info.MapWidth * stratagus::defines::get()->get_scaled_tile_width() - 1);
-		UI.MapArea.EndY = std::min<int>(UI.MapArea.EndY, UI.MapArea.Y + CMap::Map.Info.MapHeight * stratagus::defines::get()->get_scaled_tile_height() - 1);
+		UI.MapArea.EndX = std::min<int>(UI.MapArea.EndX, UI.MapArea.X + CMap::Map.Info.MapWidth * wyrmgus::defines::get()->get_scaled_tile_width() - 1);
+		UI.MapArea.EndY = std::min<int>(UI.MapArea.EndY, UI.MapArea.Y + CMap::Map.Info.MapHeight * wyrmgus::defines::get()->get_scaled_tile_height() - 1);
 	}
 
 	UI.SelectedViewport = UI.Viewports;
@@ -213,16 +213,16 @@ void CUserInterface::Load()
 	// set the correct UI
 	this->Fillers.clear();
 
-	const stratagus::civilization *civilization = nullptr;
-	const stratagus::faction *faction = nullptr;
+	const wyrmgus::civilization *civilization = nullptr;
+	const wyrmgus::faction *faction = nullptr;
 
 	if (CPlayer::GetThisPlayer() != nullptr) {
 		if (CPlayer::GetThisPlayer()->Faction != -1) {
-			faction = stratagus::faction::get_all()[CPlayer::GetThisPlayer()->Faction];
+			faction = wyrmgus::faction::get_all()[CPlayer::GetThisPlayer()->Faction];
 		}
 		
 		if (CPlayer::GetThisPlayer()->Race != -1) {
-			civilization = stratagus::civilization::get_all()[CPlayer::GetThisPlayer()->Race];
+			civilization = wyrmgus::civilization::get_all()[CPlayer::GetThisPlayer()->Race];
 		}
 	}
 	
@@ -239,50 +239,50 @@ void CUserInterface::Load()
 
 	for (int i = 0; i <= FreeWorkersCount; ++i) {
 		if (Resources[i].G) {
-			Resources[i].G->Load(false, stratagus::defines::get()->get_scale_factor());
+			Resources[i].G->Load(false, wyrmgus::defines::get()->get_scale_factor());
 		}
 	}
 
 	if (InfoPanel.G) {
-		InfoPanel.G->Load(false, stratagus::defines::get()->get_scale_factor());
+		InfoPanel.G->Load(false, wyrmgus::defines::get()->get_scale_factor());
 	}
 	if (ButtonPanel.G) {
-		ButtonPanel.G->Load(false, stratagus::defines::get()->get_scale_factor());
+		ButtonPanel.G->Load(false, wyrmgus::defines::get()->get_scale_factor());
 	}
 	if (PieMenu.G) {
-		PieMenu.G->Load(false, stratagus::defines::get()->get_scale_factor());
+		PieMenu.G->Load(false, wyrmgus::defines::get()->get_scale_factor());
 	}
 
 	//Wyrmgus start
 	if (Preference.IconFrameG) {
-		Preference.IconFrameG->Load(false, stratagus::defines::get()->get_scale_factor());
+		Preference.IconFrameG->Load(false, wyrmgus::defines::get()->get_scale_factor());
 	}
 	if (Preference.PressedIconFrameG) {
-		Preference.PressedIconFrameG->Load(false, stratagus::defines::get()->get_scale_factor());
+		Preference.PressedIconFrameG->Load(false, wyrmgus::defines::get()->get_scale_factor());
 	}
 	if (Preference.CommandButtonFrameG) {
-		Preference.CommandButtonFrameG->Load(false, stratagus::defines::get()->get_scale_factor());
+		Preference.CommandButtonFrameG->Load(false, wyrmgus::defines::get()->get_scale_factor());
 	}
 	if (Preference.BarFrameG) {
-		Preference.BarFrameG->Load(false, stratagus::defines::get()->get_scale_factor());
+		Preference.BarFrameG->Load(false, wyrmgus::defines::get()->get_scale_factor());
 	}
 	if (Preference.InfoPanelFrameG) {
-		Preference.InfoPanelFrameG->Load(false, stratagus::defines::get()->get_scale_factor());
+		Preference.InfoPanelFrameG->Load(false, wyrmgus::defines::get()->get_scale_factor());
 	}
 	if (Preference.ProgressBarG) {
-		Preference.ProgressBarG->Load(false, stratagus::defines::get()->get_scale_factor());
+		Preference.ProgressBarG->Load(false, wyrmgus::defines::get()->get_scale_factor());
 	}
 	//Wyrmgus end
 	
 	//  Resolve cursors
-	for (int i = 0; i < static_cast<int>(stratagus::cursor_type::count); ++i) {
-		auto cursor_type = static_cast<stratagus::cursor_type>(i);
-		stratagus::cursor *cursor = nullptr;
+	for (int i = 0; i < static_cast<int>(wyrmgus::cursor_type::count); ++i) {
+		auto cursor_type = static_cast<wyrmgus::cursor_type>(i);
+		wyrmgus::cursor *cursor = nullptr;
 
 		if (civilization != nullptr) {
 			cursor = civilization->get_cursor(cursor_type);
 		} else {
-			cursor = stratagus::cursor::get_cursor_by_type(cursor_type);
+			cursor = wyrmgus::cursor::get_cursor_by_type(cursor_type);
 		}
 
 		if (cursor != nullptr) {
@@ -503,10 +503,10 @@ static void ClipViewport(CViewport &vp, int ClipX, int ClipY)
 {
 	// begin with maximum possible viewport size
 	//Wyrmgus start
-//	vp.BottomRightPos.x = vp.TopLeftPos.x + Map.Info.MapWidth * stratagus::defines::get()->get_scaled_tile_width() - 1;
-//	vp.BottomRightPos.y = vp.TopLeftPos.y + Map.Info.MapHeight * stratagus::defines::get()->get_scaled_tile_height() - 1;
-	vp.BottomRightPos.x = vp.TopLeftPos.x + (CMap::Map.Info.MapWidths.size() && UI.CurrentMapLayer ? UI.CurrentMapLayer->get_width() : CMap::Map.Info.MapWidth) * stratagus::defines::get()->get_scaled_tile_width() - 1;
-	vp.BottomRightPos.y = vp.TopLeftPos.y + (CMap::Map.Info.MapHeights.size() && UI.CurrentMapLayer ? UI.CurrentMapLayer->get_height() : CMap::Map.Info.MapHeight) * stratagus::defines::get()->get_scaled_tile_height() - 1;
+//	vp.BottomRightPos.x = vp.TopLeftPos.x + Map.Info.MapWidth * wyrmgus::defines::get()->get_scaled_tile_width() - 1;
+//	vp.BottomRightPos.y = vp.TopLeftPos.y + Map.Info.MapHeight * wyrmgus::defines::get()->get_scaled_tile_height() - 1;
+	vp.BottomRightPos.x = vp.TopLeftPos.x + (CMap::Map.Info.MapWidths.size() && UI.CurrentMapLayer ? UI.CurrentMapLayer->get_width() : CMap::Map.Info.MapWidth) * wyrmgus::defines::get()->get_scaled_tile_width() - 1;
+	vp.BottomRightPos.y = vp.TopLeftPos.y + (CMap::Map.Info.MapHeights.size() && UI.CurrentMapLayer ? UI.CurrentMapLayer->get_height() : CMap::Map.Info.MapHeight) * wyrmgus::defines::get()->get_scaled_tile_height() - 1;
 	//Wyrmgus end
 
 	// first clip it to MapArea size if necessary

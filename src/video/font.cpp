@@ -40,11 +40,11 @@
 typedef std::map<std::string, CFont *> FontMap;
 static FontMap Fonts;  /// Font mappings
 
-static stratagus::font_color *FontColor;                /// Current font color
+static wyrmgus::font_color *FontColor;                /// Current font color
 
-static const stratagus::font_color *LastTextColor;      /// Last text color
-static stratagus::font_color *DefaultTextColor;         /// Default text color
-static stratagus::font_color *ReverseTextColor;         /// Reverse text color
+static const wyrmgus::font_color *LastTextColor;      /// Last text color
+static wyrmgus::font_color *DefaultTextColor;         /// Default text color
+static wyrmgus::font_color *ReverseTextColor;         /// Reverse text color
 static std::string DefaultNormalColorIndex;  /// Default normal color index
 static std::string DefaultReverseColorIndex; /// Default reverse color index
 
@@ -119,7 +119,7 @@ CFont &GetGameFont()
 **  @param y   Y screen position
 */
 static void VideoDrawChar(const CGraphic &g,
-						  int gx, int gy, int w, int h, int x, int y, const stratagus::font_color &fc)
+						  int gx, int gy, int w, int h, int x, int y, const wyrmgus::font_color &fc)
 {
 #if defined(USE_OPENGL) || defined(USE_GLES)
 	g.DrawSub(gx, gy, w, h, x, y);
@@ -136,8 +136,8 @@ void SetDefaultTextColors(const std::string &normal, const std::string &reverse)
 {
 	DefaultNormalColorIndex = normal;
 	DefaultReverseColorIndex = reverse;
-	LastTextColor = DefaultTextColor = FontColor = stratagus::font_color::get(normal);
-	ReverseTextColor = stratagus::font_color::get(reverse);
+	LastTextColor = DefaultTextColor = FontColor = wyrmgus::font_color::get(normal);
+	ReverseTextColor = wyrmgus::font_color::get(reverse);
 }
 
 /**
@@ -382,7 +382,7 @@ CFont::~CFont()
 **  @param y   Y screen position
 */
 static void VideoDrawCharClip(const CGraphic &g, int gx, int gy, int w, int h,
-							  int x, int y, const stratagus::font_color &fc)
+							  int x, int y, const wyrmgus::font_color &fc)
 {
 	int ox;
 	int oy;
@@ -394,7 +394,7 @@ static void VideoDrawCharClip(const CGraphic &g, int gx, int gy, int w, int h,
 
 
 template<bool CLIP>
-unsigned int CFont::DrawChar(CGraphic &g, int utf8, int x, int y, const stratagus::font_color &fc) const
+unsigned int CFont::DrawChar(CGraphic &g, int utf8, int x, int y, const wyrmgus::font_color &fc) const
 {
 	int c = utf8 - 32;
 	Assert(c >= 0);
@@ -415,7 +415,7 @@ unsigned int CFont::DrawChar(CGraphic &g, int utf8, int x, int y, const stratagu
 	return w + 1;
 }
 
-CGraphic *CFont::GetFontColorGraphic(const stratagus::font_color &fontColor) const
+CGraphic *CFont::GetFontColorGraphic(const wyrmgus::font_color &fontColor) const
 {
 	auto find_iterator = this->font_color_graphics.find(&fontColor);
 
@@ -448,14 +448,14 @@ CGraphic *CFont::GetFontColorGraphic(const stratagus::font_color &fontColor) con
 */
 template <const bool CLIP>
 int CLabel::DoDrawText(int x, int y,
-					   const char *const text, const size_t len, const stratagus::font_color *fc) const
+					   const char *const text, const size_t len, const wyrmgus::font_color *fc) const
 {
 	int widths = 0;
 	int utf8;
 	bool tab;
 	const int tabSize = 4; // FIXME: will be removed when text system will be rewritten
 	size_t pos = 0;
-	const stratagus::font_color *backup = fc;
+	const wyrmgus::font_color *backup = fc;
 	bool isColor = false;
 	font->DynamicLoad();
 	//Wyrmgus start
@@ -517,7 +517,7 @@ int CLabel::DoDrawText(int x, int y,
 					color.insert(0, text + pos, p - (text + pos));
 					pos = p - text + 1;
 					LastTextColor = fc;
-					const stratagus::font_color *fc_tmp = stratagus::font_color::get(color);
+					const wyrmgus::font_color *fc_tmp = wyrmgus::font_color::get(color);
 					if (fc_tmp) {
 						isColor = true;
 						fc = fc_tmp;
@@ -545,8 +545,8 @@ int CLabel::DoDrawText(int x, int y,
 
 CLabel::CLabel(const CFont &f, const std::string &nc, const std::string &rc) : font(&f)
 {
-	normal = stratagus::font_color::get(nc);
-	reverse = stratagus::font_color::get(rc);
+	normal = wyrmgus::font_color::get(nc);
+	reverse = wyrmgus::font_color::get(rc);
 }
 
 CLabel::CLabel(const CFont &f) :
@@ -558,7 +558,7 @@ CLabel::CLabel(const CFont &f) :
 
 void CLabel::SetNormalColor(const std::string &nc)
 {
-	this->normal = stratagus::font_color::get(nc);
+	this->normal = wyrmgus::font_color::get(nc);
 }
 
 /// Draw text/number unclipped
@@ -744,7 +744,7 @@ void CFont::MeasureWidths()
 {
 	const QImage image(QString::fromStdString(this->G->get_filepath().string()));
 	const QSize &frame_size = G->get_original_frame_size();
-	const int scale_factor = stratagus::defines::get()->get_scale_factor();
+	const int scale_factor = wyrmgus::defines::get()->get_scale_factor();
 
 	const int maxy = image.width() / frame_size.width() * image.height() / frame_size.height();
 
@@ -788,7 +788,7 @@ void CFont::make_font_color_textures()
 
 	const CGraphic &g = *this->G;
 
-	for (const stratagus::font_color *fc : stratagus::font_color::get_all()) {
+	for (const wyrmgus::font_color *fc : wyrmgus::font_color::get_all()) {
 		auto newg = std::make_unique<CGraphic>(g.get_filepath());
 
 		newg->Width = g.Width;
@@ -819,7 +819,7 @@ void CFont::Load()
 
 	if (this->G) {
 		//ShowLoadProgress("Loading Font \"%s\"", this->G->File.c_str());
-		this->G->Load(false, stratagus::defines::get()->get_scale_factor());
+		this->G->Load(false, wyrmgus::defines::get()->get_scale_factor());
 		this->MeasureWidths();
 
 		this->make_font_color_textures();

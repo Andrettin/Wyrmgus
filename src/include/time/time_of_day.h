@@ -34,7 +34,7 @@
 
 class CGraphic;
 
-namespace stratagus {
+namespace wyrmgus {
 
 class time_of_day : public named_data_entry, public data_type<time_of_day>
 {
@@ -49,7 +49,7 @@ public:
 	static constexpr const char *class_identifier = "time_of_day";
 	static constexpr const char *database_folder = "times_of_day";
 
-	static time_of_day *add(const std::string &identifier, const stratagus::module *module)
+	static time_of_day *add(const std::string &identifier, const wyrmgus::module *module)
 	{
 		time_of_day *time_of_day = data_type::add(identifier, module);
 		time_of_day->ID = time_of_day::get_all().size() - 1;

@@ -74,8 +74,8 @@ void MissileFlameShield::Action()
 	const int iy = unit->get_pixel_offset().y();
 	const int uw = unit->Type->get_tile_width();
 	const int uh = unit->Type->get_tile_height();
-	this->position.x = upos.x * stratagus::defines::get()->get_tile_width() + ix + uw * stratagus::defines::get()->get_tile_width() / 2 + dx - 16;
-	this->position.y = upos.y * stratagus::defines::get()->get_tile_height() + iy + uh * stratagus::defines::get()->get_tile_height() / 2 + dy - 32;
+	this->position.x = upos.x * wyrmgus::defines::get()->get_tile_width() + ix + uw * wyrmgus::defines::get()->get_tile_width() / 2 + dx - 16;
+	this->position.y = upos.y * wyrmgus::defines::get()->get_tile_height() + iy + uh * wyrmgus::defines::get()->get_tile_height() / 2 + dy - 32;
 	if (unit->CurrentAction() == UnitAction::Die) {
 		this->TTL = index;
 	}

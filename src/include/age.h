@@ -33,7 +33,7 @@
 class CGraphic;
 class CUpgrade;
 
-namespace stratagus {
+namespace wyrmgus {
 
 class condition;
 

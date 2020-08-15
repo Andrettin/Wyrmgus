@@ -55,7 +55,7 @@
 #include "video/font.h"
 #include "video/video.h"
 
-/* virtual */ int CPopupContentTypeButtonInfo::GetWidth(const stratagus::button &button, int *) const
+/* virtual */ int CPopupContentTypeButtonInfo::GetWidth(const wyrmgus::button &button, int *) const
 {
 	const CFont &font = this->Font ? *this->Font : GetSmallFont();
 	std::string draw("");
@@ -93,11 +93,11 @@
 	return width;
 }
 
-/* virtual */ int CPopupContentTypeButtonInfo::GetHeight(const stratagus::button &button, int *) const
+/* virtual */ int CPopupContentTypeButtonInfo::GetHeight(const wyrmgus::button &button, int *) const
 {
 	const CFont &font = this->Font ? *this->Font : GetSmallFont();
 	std::string draw;
-	const int scale_factor = stratagus::defines::get()->get_scale_factor();
+	const int scale_factor = wyrmgus::defines::get()->get_scale_factor();
 
 	switch (this->InfoType) {
 		case PopupButtonInfo_Hint:
@@ -120,12 +120,12 @@
 	return height;
 }
 
-/* virtual */ void CPopupContentTypeButtonInfo::Draw(int x, int y, const CPopup &popup, const unsigned int popupWidth, const stratagus::button &button, int *) const
+/* virtual */ void CPopupContentTypeButtonInfo::Draw(int x, int y, const CPopup &popup, const unsigned int popupWidth, const wyrmgus::button &button, int *) const
 {
 	const CFont &font = this->Font ? *this->Font : GetSmallFont();
 	CLabel label(font, this->TextColor, this->HighlightColor);
 	std::string draw("");
-	const int scale_factor = stratagus::defines::get()->get_scale_factor();
+	const int scale_factor = wyrmgus::defines::get()->get_scale_factor();
 
 	switch (this->InfoType) {
 		case PopupButtonInfo_Hint:
@@ -178,7 +178,7 @@
 	}
 }
 
-/* virtual */ int CPopupContentTypeText::GetWidth(const stratagus::button &button, int *) const
+/* virtual */ int CPopupContentTypeText::GetWidth(const wyrmgus::button &button, int *) const
 {
 	const CFont &font = this->Font ? *this->Font : GetSmallFont();
 	//Wyrmgus start
@@ -218,10 +218,10 @@
 	return width;
 }
 
-/* virtual */ int CPopupContentTypeText::GetHeight(const stratagus::button &button, int *) const
+/* virtual */ int CPopupContentTypeText::GetHeight(const wyrmgus::button &button, int *) const
 {
 	CFont &font = this->Font ? *this->Font : GetSmallFont();
-	const int scale_factor = stratagus::defines::get()->get_scale_factor();
+	const int scale_factor = wyrmgus::defines::get()->get_scale_factor();
 
 	//Wyrmgus start
 	button.SetTriggerData();
@@ -243,10 +243,10 @@
 	return height;
 }
 
-/* virtual */ void CPopupContentTypeText::Draw(int x, int y, const CPopup &popup, const unsigned int popupWidth, const stratagus::button &button, int *) const
+/* virtual */ void CPopupContentTypeText::Draw(int x, int y, const CPopup &popup, const unsigned int popupWidth, const wyrmgus::button &button, int *) const
 {
 	const CFont &font = this->Font ? *this->Font : GetSmallFont();
-	const int scale_factor = stratagus::defines::get()->get_scale_factor();
+	const int scale_factor = wyrmgus::defines::get()->get_scale_factor();
 
 	//Wyrmgus start
 	button.SetTriggerData();
@@ -295,11 +295,11 @@
 	}
 }
 
-/* virtual */ int CPopupContentTypeCosts::GetWidth(const stratagus::button &button, int *Costs) const
+/* virtual */ int CPopupContentTypeCosts::GetWidth(const wyrmgus::button &button, int *Costs) const
 {
 	int popupWidth = 0;
 	const CFont &font = this->Font ? *this->Font : GetSmallFont();
-	const int scale_factor = stratagus::defines::get()->get_scale_factor();
+	const int scale_factor = wyrmgus::defines::get()->get_scale_factor();
 
 	for (unsigned int i = 1; i <= MaxCosts; ++i) {
 		if (Costs[i]) {
@@ -316,7 +316,7 @@
 	}
 	if (Costs[ManaResCost]) {
 		const CGraphic *G = UI.Resources[ManaResCost].G;
-		const stratagus::spell *spell = stratagus::spell::get_all()[button.Value];
+		const wyrmgus::spell *spell = wyrmgus::spell::get_all()[button.Value];
 
 		if (spell->ManaCost) {
 			popupWidth = 10;
@@ -337,7 +337,7 @@
 	return popupWidth;
 }
 
-/* virtual */ int CPopupContentTypeCosts::GetHeight(const stratagus::button &button, int *Costs) const
+/* virtual */ int CPopupContentTypeCosts::GetHeight(const wyrmgus::button &button, int *Costs) const
 {
 	int popupHeight = 0;
 	const CFont &font = this->Font ? *this->Font : GetSmallFont();
@@ -350,11 +350,11 @@
 	return std::max(popupHeight, font.Height());
 }
 
-/* virtual */ void CPopupContentTypeCosts::Draw(int x, int y, const CPopup &, const unsigned int, const stratagus::button &button, int *Costs) const
+/* virtual */ void CPopupContentTypeCosts::Draw(int x, int y, const CPopup &, const unsigned int, const wyrmgus::button &button, int *Costs) const
 {
 	const CFont &font = this->Font ? *this->Font : GetSmallFont();
 	CLabel label(font, this->TextColor, this->HighlightColor);
-	const int scale_factor = stratagus::defines::get()->get_scale_factor();
+	const int scale_factor = wyrmgus::defines::get()->get_scale_factor();
 
 	for (unsigned int i = 1; i <= MaxCosts; ++i) {
 		if (Costs[i]) {
@@ -376,7 +376,7 @@
 		}
 	}
 	if (Costs[ManaResCost]) {
-		const stratagus::spell &spell = *stratagus::spell::get_all()[button.Value];
+		const wyrmgus::spell &spell = *wyrmgus::spell::get_all()[button.Value];
 		//Wyrmgus start
 //		const CGraphic *G = UI.Resources[ManaResCost].G;
 		CGraphic *G = UI.Resources[ManaResCost].G;
@@ -419,17 +419,17 @@ CPopupContentTypeLine::CPopupContentTypeLine() : Color(ColorWhite), Width(0), He
 {
 }
 
-/* virtual */ int CPopupContentTypeLine::GetWidth(const stratagus::button &button, int *Costs) const
+/* virtual */ int CPopupContentTypeLine::GetWidth(const wyrmgus::button &button, int *Costs) const
 {
 	return this->Width;
 }
 
-/* virtual */ int CPopupContentTypeLine::GetHeight(const stratagus::button &button, int *Costs) const
+/* virtual */ int CPopupContentTypeLine::GetHeight(const wyrmgus::button &button, int *Costs) const
 {
 	return this->Height;
 }
 
-/* virtual */ void CPopupContentTypeLine::Draw(int x, int y, const CPopup &popup, const unsigned int popupWidth, const stratagus::button &button, int *Costs) const
+/* virtual */ void CPopupContentTypeLine::Draw(int x, int y, const CPopup &popup, const unsigned int popupWidth, const wyrmgus::button &button, int *Costs) const
 {
 	Video.FillRectangle(this->Color, x - popup.MarginX - this->MarginX + 1,
 						y, this->Width && Width < popupWidth ? Width : popupWidth - 2, Height);
@@ -455,7 +455,7 @@ CPopupContentTypeLine::CPopupContentTypeLine() : Color(ColorWhite), Width(0), He
 	}
 }
 
-/* virtual */ int CPopupContentTypeVariable::GetWidth(const stratagus::button &button, int *) const
+/* virtual */ int CPopupContentTypeVariable::GetWidth(const wyrmgus::button &button, int *) const
 {
 	CFont &font = this->Font ? *this->Font : GetSmallFont();
 	//Wyrmgus start
@@ -474,13 +474,13 @@ CPopupContentTypeLine::CPopupContentTypeLine() : Color(ColorWhite), Width(0), He
 	return font.getWidth(text);
 }
 
-/* virtual */ int CPopupContentTypeVariable::GetHeight(const stratagus::button &, int *) const
+/* virtual */ int CPopupContentTypeVariable::GetHeight(const wyrmgus::button &, int *) const
 {
 	CFont &font = this->Font ? *this->Font : GetSmallFont();
 	return font.Height();
 }
 
-/* virtual */ void CPopupContentTypeVariable::Draw(int x, int y, const CPopup &, const unsigned int, const stratagus::button &button, int *) const
+/* virtual */ void CPopupContentTypeVariable::Draw(int x, int y, const CPopup &, const unsigned int, const wyrmgus::button &button, int *) const
 {
 	std::string text;										// Optional text to display.
 	CFont &font = this->Font ? *this->Font : GetSmallFont(); // Font to use.
@@ -507,14 +507,14 @@ CPopupContentTypeLine::CPopupContentTypeLine() : Color(ColorWhite), Width(0), He
 	if (this->Index != -1) {
 		int value;
 
-		const stratagus::unit_class *unit_class = nullptr;
-		const stratagus::unit_type *unit_type = nullptr;
+		const wyrmgus::unit_class *unit_class = nullptr;
+		const wyrmgus::unit_type *unit_type = nullptr;
 		switch (button.Action) {
 			case ButtonCmd::TrainClass:
 			case ButtonCmd::BuildClass:
-				unit_class = stratagus::unit_class::get_all()[button.Value];
+				unit_class = wyrmgus::unit_class::get_all()[button.Value];
 				if (Selected[0]->Player->Faction != -1) {
-					unit_type = stratagus::faction::get_all()[Selected[0]->Player->Faction]->get_class_unit_type(unit_class);
+					unit_type = wyrmgus::faction::get_all()[Selected[0]->Player->Faction]->get_class_unit_type(unit_class);
 				}
 				break;
 			case ButtonCmd::Unit:
@@ -522,7 +522,7 @@ CPopupContentTypeLine::CPopupContentTypeLine() : Color(ColorWhite), Width(0), He
 				unit_type = UnitManager.GetSlotUnit(button.Value).Type;
 				break;
 			default:
-				unit_type = stratagus::unit_type::get_all()[button.Value];
+				unit_type = wyrmgus::unit_type::get_all()[button.Value];
 				break;
 		}
 
@@ -697,9 +697,9 @@ static PopupConditionPanel *ParsePopupConditions(lua_State *l)
 				LuaError(l, "Unsupported Type: %s" _C_ unit_type_type);
 			}
 		} else if (!strcmp(key, "UnitTypeClass")) {
-			condition->unit_class = stratagus::unit_class::get(LuaToString(l, -1));
+			condition->unit_class = wyrmgus::unit_class::get(LuaToString(l, -1));
 		} else if (!strcmp(key, "ItemClass")) {
-			condition->item_class = stratagus::string_to_item_class(LuaToString(l, -1));
+			condition->item_class = wyrmgus::string_to_item_class(LuaToString(l, -1));
 		} else if (!strcmp(key, "CanStore")) {
 			condition->CanStore = GetResourceIdByName(LuaToString(l, -1));
 		} else if (!strcmp(key, "ImproveIncome")) {
@@ -723,7 +723,7 @@ static PopupConditionPanel *ParsePopupConditions(lua_State *l)
 		} else if (!strcmp(key, "ResearchedUpgrade")) {
 			condition->ResearchedUpgrade = CUpgrade::get(LuaToString(l, -1));
 		} else if (!strcmp(key, "ResearchedUpgradeClass")) {
-			condition->researched_upgrade_class = stratagus::upgrade_class::get(LuaToString(l, -1));
+			condition->researched_upgrade_class = wyrmgus::upgrade_class::get(LuaToString(l, -1));
 		} else if (!strcmp(key, "UpgradeResearched")) {
 			condition->UpgradeResearched = Ccl2Condition(l, LuaToString(l, -1));
 		} else if (!strcmp(key, "Ability")) {
@@ -777,8 +777,8 @@ static PopupConditionPanel *ParsePopupConditions(lua_State *l)
 	Assert(lua_istable(l, -1));
 
 	bool wrap = true;
-	int marginX = MARGIN_X * stratagus::defines::get()->get_scale_factor();
-	int marginY = MARGIN_Y * stratagus::defines::get()->get_scale_factor();
+	int marginX = MARGIN_X * wyrmgus::defines::get()->get_scale_factor();
+	int marginY = MARGIN_Y * wyrmgus::defines::get()->get_scale_factor();
 	int minWidth = 0;
 	int minHeight = 0;
 	std::string textColor("white");
@@ -838,7 +838,7 @@ static PopupConditionPanel *ParsePopupConditions(lua_State *l)
 }
 
 CPopup::CPopup() :
-	Contents(), MarginX(MARGIN_X *stratagus::defines::get()->get_scale_factor()), MarginY(MARGIN_Y *stratagus::defines::get()->get_scale_factor()), MinWidth(0), MinHeight(0),
+	Contents(), MarginX(MARGIN_X *wyrmgus::defines::get()->get_scale_factor()), MarginY(MARGIN_Y *wyrmgus::defines::get()->get_scale_factor()), MinWidth(0), MinHeight(0),
 	DefaultFont(nullptr), BackgroundColor(ColorBlue), BorderColor(ColorWhite)
 {}
 

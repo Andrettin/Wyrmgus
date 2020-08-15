@@ -160,7 +160,7 @@ void Spell_SpawnMissile::ProcessConfigData(const CConfigData *config_data)
 			this->TTL = std::stoi(value);
 		} else if (key == "missile") {
 			value = FindAndReplaceString(value, "_", "-");
-			this->Missile = stratagus::missile_type::get(value);
+			this->Missile = wyrmgus::missile_type::get(value);
 		} else {
 			fprintf(stderr, "Invalid spawn missile spell action property: \"%s\".\n", key.c_str());
 		}
@@ -215,7 +215,7 @@ void Spell_SpawnMissile::ProcessConfigData(const CConfigData *config_data)
 			lua_pop(l, 1);
 		} else if (!strcmp(value, "missile")) {
 			value = LuaToString(l, -1, j + 1);
-			this->Missile = stratagus::missile_type::get(value);
+			this->Missile = wyrmgus::missile_type::get(value);
 		} else {
 			LuaError(l, "Unsupported spawn-missile tag: %s" _C_ value);
 		}
@@ -267,7 +267,7 @@ static void EvaluateMissileLocation(const SpellActionMissileLocation &location,
 **
 **  @return             =!0 if spell should be repeated, 0 if not
 */
-/* virtual */ int Spell_SpawnMissile::Cast(CUnit &caster, const stratagus::spell &, CUnit *target, const Vec2i &goalPos, int z, int modifier)
+/* virtual */ int Spell_SpawnMissile::Cast(CUnit &caster, const wyrmgus::spell &, CUnit *target, const Vec2i &goalPos, int z, int modifier)
 {
 	PixelPos startPos;
 	PixelPos endPos;
@@ -275,7 +275,7 @@ static void EvaluateMissileLocation(const SpellActionMissileLocation &location,
 	/*
 		hardcoded, will be done with Lua when it's possible
 	*/
-	if (this->Missile->get_missile_class() == stratagus::missile_class::death_coil) {
+	if (this->Missile->get_missile_class() == wyrmgus::missile_class::death_coil) {
 		const Vec2i offset(2, 2);
 		std::vector<CUnit *> table;
 		//Wyrmgus start
@@ -324,8 +324,8 @@ static void EvaluateMissileLocation(const SpellActionMissileLocation &location,
 
 		//Wyrmgus start
 //		::Missile *missile = MakeMissile(*this->Missile, startPos, endPos);
-		stratagus::missile_type *mtype = this->Missile;
-		if (mtype->get_missile_class() == stratagus::missile_class::none && this->UseUnitVar) {
+		wyrmgus::missile_type *mtype = this->Missile;
+		if (mtype->get_missile_class() == wyrmgus::missile_class::none && this->UseUnitVar) {
 			mtype = caster.GetMissile().Missile;
 		}
 		::Missile *missile = MakeMissile(*mtype, startPos, endPos, z);

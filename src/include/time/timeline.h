@@ -30,13 +30,13 @@
 #include "database/data_type.h"
 #include "database/named_data_entry.h"
 
-namespace stratagus {
+namespace wyrmgus {
 
 class timeline : public named_data_entry, public data_type<timeline>
 {
 	Q_OBJECT
 
-	Q_PROPERTY(stratagus::timeline* parent_timeline MEMBER parent_timeline READ get_parent_timeline)
+	Q_PROPERTY(wyrmgus::timeline* parent_timeline MEMBER parent_timeline READ get_parent_timeline)
 	Q_PROPERTY(QDateTime point_of_divergence MEMBER point_of_divergence READ get_point_of_divergence)
 
 public:

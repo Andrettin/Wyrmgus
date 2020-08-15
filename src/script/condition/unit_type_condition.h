@@ -34,7 +34,7 @@
 #include "unit/unit_find.h"
 #include "unit/unit_type.h"
 
-namespace stratagus {
+namespace wyrmgus {
 
 class unit_type_condition final : public condition
 {

@@ -335,7 +335,7 @@ static void HandleBuffsEachCycle(CUnit &unit)
 	}
 
 	for (const auto &kv_pair : unit.Type->Stats[unit.Player->Index].UnitStock) {
-		stratagus::unit_type *unit_type = stratagus::unit_type::get_all()[kv_pair.first];
+		wyrmgus::unit_type *unit_type = wyrmgus::unit_type::get_all()[kv_pair.first];
 		const int unit_stock = kv_pair.second;
 
 		if (unit_stock <= 0) {
@@ -620,7 +620,7 @@ static void DumpUnitInfo(CUnit &unit)
 	fprintf(logf, "%d %s %d P%d Refs %d: %X %d,%d %d,%d\n",
 			UnitNumber(unit), unit.Type ? unit.Type->Ident.c_str() : "unit-killed",
 			!unit.Orders.empty() ? static_cast<int>(unit.CurrentAction()) : -1,
-			unit.Player ? unit.Player->Index : -1, unit.Refs, stratagus::random::get()->get_seed(),
+			unit.Player ? unit.Player->Index : -1, unit.Refs, wyrmgus::random::get()->get_seed(),
 			unit.tilePos.x, unit.tilePos.y, unit.get_pixel_offset().x(), unit.get_pixel_offset().y());
 #if 0
 	SaveUnit(unit, logf);
@@ -687,7 +687,7 @@ static void UnitActionsEachMinute(UNITP_ITERATOR begin, UNITP_ITERATOR end)
 		unit.UpdateSoldUnits();
 		
 		for (size_t i = 0; i < unit.Type->SpawnUnits.size(); ++i) {
-			stratagus::unit_type *spawned_type = unit.Type->SpawnUnits[i];
+			wyrmgus::unit_type *spawned_type = unit.Type->SpawnUnits[i];
 			int spawned_type_demand = spawned_type->Stats[unit.Player->Index].Variables[DEMAND_INDEX].Value;
 			if ((GameCycle % (CYCLES_PER_MINUTE * spawned_type_demand)) == 0) { //the quantity of minutes it takes to spawn the unit depends on the unit's supply demand
 				if ((unit.Player->GetUnitTypeCount(spawned_type) * spawned_type_demand) >= (unit.Player->GetUnitTypeCount(unit.Type) * 5)) { //max limit reached

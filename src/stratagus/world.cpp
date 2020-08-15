@@ -41,9 +41,9 @@
 #include "util/geojson_util.h"
 #include "util/vector_util.h"
 
-namespace stratagus {
+namespace wyrmgus {
 
-world *world::add(const std::string &identifier, const stratagus::module *module)
+world *world::add(const std::string &identifier, const wyrmgus::module *module)
 {
 	world *world = data_type::add(identifier, module);
 	world->ID = world::get_all().size() - 1;

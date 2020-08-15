@@ -404,22 +404,22 @@ static void ColorCycleSurface_Reverse(SDL_Surface &surface, unsigned int count)
 
 int get_scale_factor()
 {
-	return stratagus::defines::get()->get_scale_factor();
+	return wyrmgus::defines::get()->get_scale_factor();
 }
 
 int get_scale_factor_preference()
 {
-	return stratagus::preferences::get()->get_scale_factor();
+	return wyrmgus::preferences::get()->get_scale_factor();
 }
 
 void set_scale_factor(const int factor)
 {
-	stratagus::preferences::get()->set_scale_factor(factor);
+	wyrmgus::preferences::get()->set_scale_factor(factor);
 }
 
 void pack_image_folder(const std::string &dir_path)
 {
-	stratagus::image::pack_folder(dir_path, stratagus::image::frame_order::top_to_bottom);
+	wyrmgus::image::pack_folder(dir_path, wyrmgus::image::frame_order::top_to_bottom);
 }
 
 void index_image_to_image_palette(const std::string &image_path, const std::string &other_image_path)
@@ -427,6 +427,6 @@ void index_image_to_image_palette(const std::string &image_path, const std::stri
 	const QString image_path_qstring = QString::fromStdString(image_path);
 	QImage image(image_path_qstring);
 	const QImage other_image(QString::fromStdString(other_image_path));
-	stratagus::image::index_to_image_palette(image, other_image);
+	wyrmgus::image::index_to_image_palette(image, other_image);
 	image.save(image_path_qstring);
 }

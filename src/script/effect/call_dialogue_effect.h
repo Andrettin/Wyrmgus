@@ -32,7 +32,7 @@
 #include "script/effect/effect.h"
 #include "util/string_util.h"
 
-namespace stratagus {
+namespace wyrmgus {
 
 class call_dialogue_effect final : public effect
 {

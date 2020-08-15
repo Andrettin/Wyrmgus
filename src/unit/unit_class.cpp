@@ -33,7 +33,7 @@
 
 #include "util/vector_util.h"
 
-namespace stratagus {
+namespace wyrmgus {
 
 void unit_class::set_town_hall(const bool town_hall)
 {

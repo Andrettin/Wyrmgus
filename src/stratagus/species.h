@@ -32,7 +32,7 @@
 
 class CSpeciesGenus;
 
-namespace stratagus {
+namespace wyrmgus {
 
 class plane;
 class terrain_type;

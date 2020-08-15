@@ -47,7 +47,7 @@ void ChangeCustomHeroCivilization(const std::string &hero_full_name, const std::
 int CclDefineCharacter(lua_State *l);
 int CclDefineCustomHero(lua_State *l);
 
-namespace stratagus {
+namespace wyrmgus {
 	class calendar;
 	class civilization;
 	class condition;
@@ -72,7 +72,7 @@ enum Attributes {
 	MaxAttributes
 };
 
-namespace stratagus {
+namespace wyrmgus {
 
 enum class character_title {
 	none = -1,
@@ -94,21 +94,21 @@ class character : public detailed_data_entry, public data_type<character>, publi
 {
 	Q_OBJECT
 
-	Q_PROPERTY(stratagus::dynasty* dynasty MEMBER dynasty READ get_dynasty)
+	Q_PROPERTY(wyrmgus::dynasty* dynasty MEMBER dynasty READ get_dynasty)
 	Q_PROPERTY(QString surname READ get_surname_qstring)
-	Q_PROPERTY(stratagus::unit_type* unit_type READ get_unit_type WRITE set_unit_type)
-	Q_PROPERTY(stratagus::civilization* civilization MEMBER civilization READ get_civilization)
-	Q_PROPERTY(stratagus::faction* default_faction MEMBER default_faction READ get_default_faction)
-	Q_PROPERTY(stratagus::gender gender MEMBER gender READ get_gender)
-	Q_PROPERTY(stratagus::site* home_settlement MEMBER home_settlement)
-	Q_PROPERTY(stratagus::character* father MEMBER father READ get_father)
-	Q_PROPERTY(stratagus::character* mother MEMBER mother READ get_mother)
+	Q_PROPERTY(wyrmgus::unit_type* unit_type READ get_unit_type WRITE set_unit_type)
+	Q_PROPERTY(wyrmgus::civilization* civilization MEMBER civilization READ get_civilization)
+	Q_PROPERTY(wyrmgus::faction* default_faction MEMBER default_faction READ get_default_faction)
+	Q_PROPERTY(wyrmgus::gender gender MEMBER gender READ get_gender)
+	Q_PROPERTY(wyrmgus::site* home_settlement MEMBER home_settlement)
+	Q_PROPERTY(wyrmgus::character* father MEMBER father READ get_father)
+	Q_PROPERTY(wyrmgus::character* mother MEMBER mother READ get_mother)
 	Q_PROPERTY(QString variation READ get_variation_qstring)
 	Q_PROPERTY(bool ai_active MEMBER ai_active READ is_ai_active)
 	Q_PROPERTY(CUpgrade* trait MEMBER trait READ get_trait)
 	Q_PROPERTY(int base_level MEMBER base_level READ get_base_level)
 	Q_PROPERTY(bool active MEMBER active READ is_active)
-	Q_PROPERTY(stratagus::faction *faction MEMBER faction READ get_faction)
+	Q_PROPERTY(wyrmgus::faction *faction MEMBER faction READ get_faction)
 
 public:
 	static constexpr const char *class_identifier = "character";
@@ -299,7 +299,7 @@ public:
 	CDate StartDate;			/// Date in which the character historically starts being active
 	CDate DeathDate;			/// Date in which the character historically died
 private:
-	stratagus::dynasty *dynasty = nullptr;
+	wyrmgus::dynasty *dynasty = nullptr;
 	civilization *civilization = nullptr;	/// Culture to which the character belongs
 	faction *default_faction = nullptr;	//the default faction to which the character belongs
 	gender gender;				/// Character's gender
@@ -316,7 +316,7 @@ public:
 	IconConfig Icon;					/// Character's icon
 	IconConfig HeroicIcon;				/// Character's heroic icon (level 3 and upper)
 private:
-	stratagus::unit_type *unit_type = nullptr;
+	wyrmgus::unit_type *unit_type = nullptr;
 	CUpgrade *trait = nullptr;
 public:
 	deity *Deity = nullptr;			/// The deity which the character is (if it is a deity)
@@ -329,7 +329,7 @@ public:
 private:
 	std::unique_ptr<condition> conditions;
 public:
-	std::vector<persistent_item *> EquippedItems[static_cast<int>(stratagus::item_slot::count)]; //equipped items of the character, per slot
+	std::vector<persistent_item *> EquippedItems[static_cast<int>(wyrmgus::item_slot::count)]; //equipped items of the character, per slot
 private:
 	site *home_settlement = nullptr; //the home settlement of this character, where they can preferentially be recruited
 	bool ai_active = true; //whether the character's AI is active
@@ -348,15 +348,15 @@ private:
 	std::vector<std::unique_ptr<persistent_item>> items;
 public:
 	int Attributes[MaxAttributes];
-	std::vector<stratagus::unit_type *> ForbiddenUpgrades;	/// which unit types this character is forbidden to upgrade to
+	std::vector<wyrmgus::unit_type *> ForbiddenUpgrades;	/// which unit types this character is forbidden to upgrade to
 private:
 	bool active = false; //whether the character is active, i.e. should be applied to the map; used for history
 	faction *faction = nullptr; //the character's faction, used for history
 	std::unique_ptr<historical_location> location; //the character's location, used for history
 public:
-	std::vector<std::pair<CDate, stratagus::faction *>> HistoricalFactions;	/// historical locations of the character; the values are: date, faction
+	std::vector<std::pair<CDate, wyrmgus::faction *>> HistoricalFactions;	/// historical locations of the character; the values are: date, faction
 	std::vector<std::unique_ptr<historical_location>> HistoricalLocations;	/// historical locations of the character
-	std::vector<std::tuple<CDate, CDate, stratagus::faction *, character_title>> HistoricalTitles;	/// historical titles of the character, the first element is the beginning date of the term, the second one the end date, the third the faction it pertains to (if any, if not then it is null), and the fourth is the character title itself (from the character title enums)
+	std::vector<std::tuple<CDate, CDate, wyrmgus::faction *, character_title>> HistoricalTitles;	/// historical titles of the character, the first element is the beginning date of the term, the second one the end date, the third the faction it pertains to (if any, if not then it is null), and the fourth is the character title itself (from the character title enums)
 	std::vector<std::tuple<int, int, CProvince *, int>> HistoricalProvinceTitles;
 
 	friend ::Spell_Polymorph;
@@ -367,13 +367,13 @@ public:
 
 }
 
-extern std::map<std::string, stratagus::character *> CustomHeroes;
-extern stratagus::character *CurrentCustomHero;
+extern std::map<std::string, wyrmgus::character *> CustomHeroes;
+extern wyrmgus::character *CurrentCustomHero;
 extern bool LoadingPersistentHeroes;
 
 extern int GetAttributeVariableIndex(int attribute);
-extern stratagus::character *GetCustomHero(const std::string &hero_ident);
-extern void SaveHero(stratagus::character *hero);
+extern wyrmgus::character *GetCustomHero(const std::string &hero_ident);
+extern void SaveHero(wyrmgus::character *hero);
 extern void SaveHeroes();
 extern void SaveCustomHero(const std::string &hero_ident);
 extern void DeleteCustomHero(const std::string &hero_ident);
@@ -381,7 +381,7 @@ extern void SetCurrentCustomHero(const std::string &hero_ident);
 extern std::string GetCurrentCustomHero();
 extern void ChangeCustomHeroCivilization(const std::string &hero_name, const std::string &civilization_ident, const std::string &new_hero_name, const std::string &new_hero_family_name);
 extern bool IsNameValidForCustomHero(const std::string &hero_name, const std::string &hero_family_name);
-extern std::string GetCharacterTitleNameById(const stratagus::character_title title);
-extern stratagus::character_title GetCharacterTitleIdByName(const std::string &title);
-extern bool IsMinisterialTitle(const stratagus::character_title title);
+extern std::string GetCharacterTitleNameById(const wyrmgus::character_title title);
+extern wyrmgus::character_title GetCharacterTitleIdByName(const std::string &title);
+extern bool IsMinisterialTitle(const wyrmgus::character_title title);
 extern void CharacterCclRegister();

@@ -35,7 +35,7 @@
 #include "luacallback.h"
 #include "script/effect/effect_list.h"
 
-namespace stratagus {
+namespace wyrmgus {
 
 dialogue_option::dialogue_option()
 {

@@ -31,7 +31,7 @@
 #include "script/condition/condition.h"
 #include "util/string_util.h"
 
-namespace stratagus {
+namespace wyrmgus {
 
 class settlement_condition final : public condition
 {

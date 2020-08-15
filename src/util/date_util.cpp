@@ -33,7 +33,7 @@
 
 #include "util/number_util.h"
 
-namespace stratagus::date {
+namespace wyrmgus::date {
 
 std::string year_to_string(const int year)
 {

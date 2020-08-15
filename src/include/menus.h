@@ -38,7 +38,7 @@ static constexpr int MI_FLAGS_CLICKED = 2; /// mouse button pressed down on item
 
 class ButtonStyle;
 
-namespace stratagus {
+namespace wyrmgus {
 	class player_color;
 }
 
@@ -48,7 +48,7 @@ namespace stratagus {
 
 /// Draw menu button
 extern void DrawUIButton(ButtonStyle *style, unsigned flags,
-						 int x, int y, const std::string &text, const bool grayscale = false, const stratagus::player_color *player_color = nullptr, bool transparent = false, int show_percent = 100);
+						 int x, int y, const std::string &text, const bool grayscale = false, const wyrmgus::player_color *player_color = nullptr, bool transparent = false, int show_percent = 100);
 
 /// Pre menu setup
 extern void PreMenuSetup();

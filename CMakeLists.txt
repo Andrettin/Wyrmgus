@@ -748,6 +748,7 @@ set(stratagus_ui_HDRS
 	src/ui/button_level.h
 	src/ui/contenttype.h
 	src/ui/cursor.h
+	src/ui/cursor_type.h
 	src/ui/icon.h
 	src/ui/interface.h
 	src/ui/popup.h

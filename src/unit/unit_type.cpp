@@ -459,7 +459,7 @@ std::vector<int> LuxuryResources;
 std::string ExtraDeathTypes[ANIMATIONS_DEATHTYPES];
 
 //Wyrmgus start
-stratagus::unit_type *settlement_site_unit_type;
+wyrmgus::unit_type *settlement_site_unit_type;
 
 std::vector<CSpeciesGenus *> SpeciesGenuses;
 std::vector<CSpeciesFamily *> SpeciesFamilies;
@@ -498,7 +498,7 @@ std::string GetResourceNameById(int resource_id)
 }
 //Wyrmgus end
 
-namespace stratagus {
+namespace wyrmgus {
 
 unit_type::unit_type(const std::string &identifier) : detailed_data_entry(identifier), CDataType(identifier),
 	Slot(0),
@@ -740,11 +740,11 @@ void unit_type::process_sml_scope(const sml_data &scope)
 	const std::vector<std::string> &values = scope.get_values();
 
 	if (tag == "costs") {
-		scope.for_each_property([&](const stratagus::sml_property &property) {
+		scope.for_each_property([&](const wyrmgus::sml_property &property) {
 			const std::string &key = property.get_key();
 			const std::string &value = property.get_value();
 
-			const stratagus::resource *resource = resource::get(key);
+			const wyrmgus::resource *resource = resource::get(key);
 			this->DefaultStat.Costs[resource->ID] = std::stoi(value);
 		});
 	} else if (tag == "weapon_classes") {
@@ -806,7 +806,7 @@ void unit_type::process_sml_scope(const sml_data &scope)
 			const resource *resource = resource::get(tag);
 
 			if (this->ResInfo[resource->ID] == nullptr) {
-				auto resource_info = std::make_unique<stratagus::resource_info>(this, resource);
+				auto resource_info = std::make_unique<wyrmgus::resource_info>(this, resource);
 				this->ResInfo[resource->ID] = std::move(resource_info);
 			}
 
@@ -900,10 +900,10 @@ void unit_type::ProcessConfigData(const CConfigData *config_data)
 			unit_type *parent_type = unit_type::get(value);
 			this->set_parent(parent_type);
 		} else if (key == "civilization") {
-			stratagus::civilization *civilization = civilization::get(value);
+			wyrmgus::civilization *civilization = civilization::get(value);
 			this->civilization = civilization;
 		} else if (key == "faction") {
-			stratagus::faction *faction = faction::get(value);
+			wyrmgus::faction *faction = faction::get(value);
 			this->Faction = faction->ID;
 		} else if (key == "animations") {
 			this->animation_set = animation_set::get(value);
@@ -1240,15 +1240,15 @@ void unit_type::initialize()
 {
 	if (this->get_unit_class() != nullptr) { //if class is defined, then use this unit type to help build the classes table, and add this unit to the civilization class table (if the civilization is defined)
 		//see if this unit type is set as the civilization class unit type or the faction class unit type of any civilization/class (or faction/class) combination, and remove it from there (to not create problems with redefinitions)
-		for (stratagus::civilization *civilization : civilization::get_all()) {
+		for (wyrmgus::civilization *civilization : civilization::get_all()) {
 			civilization->remove_class_unit_type(this);
 		}
 
-		for (stratagus::faction *faction : faction::get_all()) {
+		for (wyrmgus::faction *faction : faction::get_all()) {
 			faction->remove_class_unit_type(this);
 		}
 
-		const stratagus::unit_class *unit_class = this->get_unit_class();
+		const wyrmgus::unit_class *unit_class = this->get_unit_class();
 		if (unit_class != nullptr) {
 			if (this->Faction != -1) {
 				faction::get_all()[this->Faction]->set_class_unit_type(unit_class, this);
@@ -1386,7 +1386,7 @@ void unit_type::initialize()
 	data_entry::initialize();
 }
 
-void unit_type::set_unit_class(stratagus::unit_class *unit_class)
+void unit_type::set_unit_class(wyrmgus::unit_class *unit_class)
 {
 	if (unit_class == this->get_unit_class()) {
 		return;
@@ -1876,7 +1876,7 @@ std::string unit_type::GetNamePlural() const
 	return GetPluralForm(this->get_name());
 }
 
-std::string unit_type::GeneratePersonalName(stratagus::faction *faction, const gender gender) const
+std::string unit_type::GeneratePersonalName(wyrmgus::faction *faction, const gender gender) const
 {
 	if (Editor.Running == EditorEditing) { // don't set the personal name if in the editor
 		return "";
@@ -1891,7 +1891,7 @@ std::string unit_type::GeneratePersonalName(stratagus::faction *faction, const g
 	return "";
 }
 
-bool unit_type::IsPersonalNameValid(const std::string &name, stratagus::faction *faction, const gender gender) const
+bool unit_type::IsPersonalNameValid(const std::string &name, wyrmgus::faction *faction, const gender gender) const
 {
 	if (name.empty()) {
 		return false;
@@ -1906,7 +1906,7 @@ bool unit_type::IsPersonalNameValid(const std::string &name, stratagus::faction 
 	return false;
 }
 
-std::vector<std::string> unit_type::GetPotentialPersonalNames(stratagus::faction *faction, const gender gender) const
+std::vector<std::string> unit_type::GetPotentialPersonalNames(wyrmgus::faction *faction, const gender gender) const
 {
 	std::vector<std::string> potential_names;
 	
@@ -1922,7 +1922,7 @@ std::vector<std::string> unit_type::GetPotentialPersonalNames(stratagus::faction
 	}
 	
 	if (potential_names.size() == 0 && this->get_civilization() != nullptr) {
-		const stratagus::civilization *civilization = this->get_civilization();
+		const wyrmgus::civilization *civilization = this->get_civilization();
 		if (faction && civilization != faction->get_civilization() && civilization->get_species() == faction->get_civilization()->get_species() && this == faction->get_class_unit_type(this->get_unit_class())) {
 			civilization = faction->get_civilization();
 		}
@@ -1995,7 +1995,7 @@ void resource_info::process_sml_scope(const sml_data &scope)
 
 }
 
-void UpdateUnitStats(stratagus::unit_type &type, int reset)
+void UpdateUnitStats(wyrmgus::unit_type &type, int reset)
 {
 	if (reset) {
 		type.MapDefaultStat = type.DefaultStat;
@@ -2010,7 +2010,7 @@ void UpdateUnitStats(stratagus::unit_type &type, int reset)
 			}
 
 			for (const auto &unit_stock_kv_pair : iterator->second.UnitStock) {
-				const stratagus::unit_type *unit_type = stratagus::unit_type::get_all()[unit_stock_kv_pair.first];
+				const wyrmgus::unit_type *unit_type = wyrmgus::unit_type::get_all()[unit_stock_kv_pair.first];
 				const int unit_stock = unit_stock_kv_pair.second;
 
 				type.MapDefaultStat.ChangeUnitStock(unit_type, unit_stock);
@@ -2027,7 +2027,7 @@ void UpdateUnitStats(stratagus::unit_type &type, int reset)
 		}
 		
 		type.MapSound = type.Sound;
-		for (std::map<std::string, stratagus::unit_sound_set>::iterator iterator = type.ModSounds.begin(); iterator != type.ModSounds.end(); ++iterator) {
+		for (std::map<std::string, wyrmgus::unit_sound_set>::iterator iterator = type.ModSounds.begin(); iterator != type.ModSounds.end(); ++iterator) {
 			if (!iterator->second.Selected.Name.empty()) {
 				type.MapSound.Selected = iterator->second.Selected;
 			}
@@ -2379,7 +2379,7 @@ void UpdateUnitStats(stratagus::unit_type &type, int reset)
 void UpdateStats(int reset)
 {
 	// Update players stats
-	for (stratagus::unit_type *unit_type : stratagus::unit_type::get_all()) {
+	for (wyrmgus::unit_type *unit_type : wyrmgus::unit_type::get_all()) {
 		UpdateUnitStats(*unit_type, reset);
 	}
 }
@@ -2392,7 +2392,7 @@ void UpdateStats(int reset)
 **  @param plynr  Player number.
 **  @param file   Output file.
 */
-static bool SaveUnitStats(const CUnitStats &stats, const stratagus::unit_type &type, int plynr,
+static bool SaveUnitStats(const CUnitStats &stats, const wyrmgus::unit_type &type, int plynr,
 						  CFile &file)
 {
 	Assert(plynr < PlayerMax);
@@ -2437,7 +2437,7 @@ static bool SaveUnitStats(const CUnitStats &stats, const stratagus::unit_type &t
 		file.printf("\"%s\", %d,", DefaultResourceNames[i].c_str(), stats.ResourceDemand[i]);
 	}
 	file.printf("},\n\"unit-stock\", {");
-	for (stratagus::unit_type *unit_type : stratagus::unit_type::get_all()) {
+	for (wyrmgus::unit_type *unit_type : wyrmgus::unit_type::get_all()) {
 		if (stats.GetUnitStock(unit_type) == type.DefaultStat.GetUnitStock(unit_type)) {
 			continue;
 		}
@@ -2462,7 +2462,7 @@ void SaveUnitTypes(CFile &file)
 	file.printf("--- MODULE: unittypes\n\n");
 
 	// Save all stats
-	for (const stratagus::unit_type *unit_type : stratagus::unit_type::get_all()) {
+	for (const wyrmgus::unit_type *unit_type : wyrmgus::unit_type::get_all()) {
 		bool somethingSaved = false;
 
 		for (int j = 0; j < PlayerMax; ++j) {
@@ -2488,7 +2488,7 @@ void SaveUnitTypes(CFile &file)
 **  @todo  Do screen position caculation in high level.
 **         Better way to handle in x mirrored sprites.
 */
-void DrawUnitType(const stratagus::unit_type &type, CPlayerColorGraphic *sprite, int player, int frame, const PixelPos &screenPos, const stratagus::time_of_day *time_of_day)
+void DrawUnitType(const wyrmgus::unit_type &type, CPlayerColorGraphic *sprite, int player, int frame, const PixelPos &screenPos, const wyrmgus::time_of_day *time_of_day)
 {
 	//Wyrmgus start
 	if (sprite == nullptr) {
@@ -2496,13 +2496,13 @@ void DrawUnitType(const stratagus::unit_type &type, CPlayerColorGraphic *sprite,
 	}
 	//Wyrmgus end
 	
-	const stratagus::player_color *player_color = CPlayer::Players[player]->get_player_color();
+	const wyrmgus::player_color *player_color = CPlayer::Players[player]->get_player_color();
 
 	PixelPos pos = screenPos;
 	// FIXME: move this calculation to high level.
-	pos -= PixelPos((sprite->get_frame_size() - type.get_tile_size() * stratagus::defines::get()->get_scaled_tile_size()) / 2);
-	pos.x += type.get_offset().x() * stratagus::defines::get()->get_scale_factor();
-	pos.y += type.get_offset().y() * stratagus::defines::get()->get_scale_factor();
+	pos -= PixelPos((sprite->get_frame_size() - type.get_tile_size() * wyrmgus::defines::get()->get_scaled_tile_size()) / 2);
+	pos.x += type.get_offset().x() * wyrmgus::defines::get()->get_scale_factor();
+	pos.y += type.get_offset().y() * wyrmgus::defines::get()->get_scale_factor();
 
 	//Wyrmgus start
 	/*
@@ -2557,7 +2557,7 @@ void DrawUnitType(const stratagus::unit_type &type, CPlayerColorGraphic *sprite,
 /**
 **  Get the still animation frame
 */
-static int GetStillFrame(const stratagus::unit_type &type)
+static int GetStillFrame(const wyrmgus::unit_type &type)
 {
 	if (type.get_animation_set() == nullptr) {
 		return 0;
@@ -2585,7 +2585,7 @@ static int GetStillFrame(const stratagus::unit_type &type)
 */
 void InitUnitTypes(int reset_player_stats)
 {
-	for (stratagus::unit_type *unit_type : stratagus::unit_type::get_all()) {
+	for (wyrmgus::unit_type *unit_type : wyrmgus::unit_type::get_all()) {
 		if (unit_type->get_animation_set() == nullptr) {
 			DebugPrint(_("unit-type '%s' without animations, ignored.\n") _C_ unit_type->Ident.c_str());
 			continue;
@@ -2617,7 +2617,7 @@ void InitUnitTypes(int reset_player_stats)
 }
 
 //Wyrmgus start
-void InitUnitType(stratagus::unit_type &type)
+void InitUnitType(wyrmgus::unit_type &type)
 {
 	// Determine still frame
 	type.StillFrame = GetStillFrame(type);
@@ -2639,35 +2639,35 @@ void InitUnitType(stratagus::unit_type &type)
 **
 **  @param type  type of unit to load
 */
-void LoadUnitTypeSprite(stratagus::unit_type &type)
+void LoadUnitTypeSprite(wyrmgus::unit_type &type)
 {
 	if (!type.ShadowFile.empty()) {
 		type.ShadowSprite = CGraphic::New(type.ShadowFile, type.ShadowWidth, type.ShadowHeight);
-		type.ShadowSprite->Load(false, stratagus::defines::get()->get_scale_factor());
+		type.ShadowSprite->Load(false, wyrmgus::defines::get()->get_scale_factor());
 	}
 
 	if (type.BoolFlag[HARVESTER_INDEX].value) {
 		for (int i = 0; i < MaxCosts; ++i) {
-			const std::unique_ptr<stratagus::resource_info> &resinfo = type.ResInfo[i];
+			const std::unique_ptr<wyrmgus::resource_info> &resinfo = type.ResInfo[i];
 			if (!resinfo) {
 				continue;
 			}
 
 			if (!resinfo->get_image_file().empty()) {
 				resinfo->SpriteWhenEmpty = CPlayerColorGraphic::New(resinfo->get_image_file().string(), type.get_frame_size(), type.get_conversible_player_color());
-				resinfo->SpriteWhenEmpty->Load(false, stratagus::defines::get()->get_scale_factor());
+				resinfo->SpriteWhenEmpty->Load(false, wyrmgus::defines::get()->get_scale_factor());
 			}
 
 			if (!resinfo->get_loaded_image_file().empty()) {
 				resinfo->SpriteWhenLoaded = CPlayerColorGraphic::New(resinfo->get_loaded_image_file().string(), type.get_frame_size(), type.get_conversible_player_color());
-				resinfo->SpriteWhenLoaded->Load(false, stratagus::defines::get()->get_scale_factor());
+				resinfo->SpriteWhenLoaded->Load(false, wyrmgus::defines::get()->get_scale_factor());
 			}
 		}
 	}
 
 	if (!type.get_image_file().empty()) {
 		type.Sprite = CPlayerColorGraphic::New(type.get_image_file().string(), type.get_frame_size(), type.get_conversible_player_color());
-		type.Sprite->Load(false, stratagus::defines::get()->get_scale_factor());
+		type.Sprite->Load(false, wyrmgus::defines::get()->get_scale_factor());
 	}
 
 #ifdef USE_MNG
@@ -2685,12 +2685,12 @@ void LoadUnitTypeSprite(stratagus::unit_type &type)
 	//Wyrmgus start
 	if (!type.LightFile.empty()) {
 		type.LightSprite = CGraphic::New(type.LightFile, type.get_frame_size());
-		type.LightSprite->Load(false, stratagus::defines::get()->get_scale_factor());
+		type.LightSprite->Load(false, wyrmgus::defines::get()->get_scale_factor());
 	}
 	for (int i = 0; i < MaxImageLayers; ++i) {
 		if (!type.LayerFiles[i].empty()) {
 			type.LayerSprites[i] = CPlayerColorGraphic::New(type.LayerFiles[i], type.get_frame_size(), type.get_conversible_player_color());
-			type.LayerSprites[i]->Load(false, stratagus::defines::get()->get_scale_factor());
+			type.LayerSprites[i]->Load(false, wyrmgus::defines::get()->get_scale_factor());
 		}
 	}
 	//Wyrmgus end
@@ -2705,31 +2705,31 @@ void LoadUnitTypeSprite(stratagus::unit_type &type)
 		}
 		if (!variation->get_image_file().empty()) {
 			variation->Sprite = CPlayerColorGraphic::New(variation->get_image_file().string(), QSize(frame_width, frame_height), type.get_conversible_player_color());
-			variation->Sprite->Load(false, stratagus::defines::get()->get_scale_factor());
+			variation->Sprite->Load(false, wyrmgus::defines::get()->get_scale_factor());
 		}
 		if (!variation->ShadowFile.empty()) {
 			variation->ShadowSprite = CGraphic::New(variation->ShadowFile, type.ShadowWidth, type.ShadowHeight);
-			variation->ShadowSprite->Load(false, stratagus::defines::get()->get_scale_factor());
+			variation->ShadowSprite->Load(false, wyrmgus::defines::get()->get_scale_factor());
 		}
 		if (!variation->LightFile.empty()) {
 			variation->LightSprite = CGraphic::New(variation->LightFile, frame_width, frame_height);
-			variation->LightSprite->Load(false, stratagus::defines::get()->get_scale_factor());
+			variation->LightSprite->Load(false, wyrmgus::defines::get()->get_scale_factor());
 		}
 		for (int j = 0; j < MaxImageLayers; ++j) {
 			if (!variation->LayerFiles[j].empty()) {
 				variation->LayerSprites[j] = CPlayerColorGraphic::New(variation->LayerFiles[j], QSize(frame_width, frame_height), type.get_conversible_player_color());
-				variation->LayerSprites[j]->Load(false, stratagus::defines::get()->get_scale_factor());
+				variation->LayerSprites[j]->Load(false, wyrmgus::defines::get()->get_scale_factor());
 			}
 		}
 	
 		for (int j = 0; j < MaxCosts; ++j) {
 			if (!variation->FileWhenLoaded[j].empty()) {
 				variation->SpriteWhenLoaded[j] = CPlayerColorGraphic::New(variation->FileWhenLoaded[j], QSize(frame_width, frame_height), type.get_conversible_player_color());
-				variation->SpriteWhenLoaded[j]->Load(false, stratagus::defines::get()->get_scale_factor());
+				variation->SpriteWhenLoaded[j]->Load(false, wyrmgus::defines::get()->get_scale_factor());
 			}
 			if (!variation->FileWhenEmpty[j].empty()) {
 				variation->SpriteWhenEmpty[j] = CPlayerColorGraphic::New(variation->FileWhenEmpty[j], QSize(frame_width, frame_height), type.get_conversible_player_color());
-				variation->SpriteWhenEmpty[j]->Load(false, stratagus::defines::get()->get_scale_factor());
+				variation->SpriteWhenEmpty[j]->Load(false, wyrmgus::defines::get()->get_scale_factor());
 			}
 		}
 	}
@@ -2738,7 +2738,7 @@ void LoadUnitTypeSprite(stratagus::unit_type &type)
 		for (const auto &layer_variation : type.LayerVariations[i]) {
 			if (!layer_variation->get_image_file().empty()) {
 				layer_variation->Sprite = CPlayerColorGraphic::New(layer_variation->get_image_file().string(), type.get_frame_size(), type.get_conversible_player_color());
-				layer_variation->Sprite->Load(false, stratagus::defines::get()->get_scale_factor());
+				layer_variation->Sprite->Load(false, wyrmgus::defines::get()->get_scale_factor());
 			}
 		}
 	}
@@ -2751,7 +2751,7 @@ void LoadUnitTypeSprite(stratagus::unit_type &type)
 int GetUnitTypesCount()
 {
 	int count = 0;
-	for (stratagus::unit_type *unit_type : stratagus::unit_type::get_all()) {
+	for (wyrmgus::unit_type *unit_type : wyrmgus::unit_type::get_all()) {
 		if (unit_type->Missile.IsEmpty() == false) count++;
 		if (unit_type->FireMissile.IsEmpty() == false) count++;
 		if (unit_type->Explosion.IsEmpty() == false) count++;
@@ -2769,14 +2769,14 @@ int GetUnitTypesCount()
 */
 void LoadUnitTypes()
 {
-	for (stratagus::unit_type *unit_type : stratagus::unit_type::get_all()) {
-		ShowLoadProgress(_("Loading Unit Types (%d%%)"), (unit_type->Slot + 1) * 100 / stratagus::unit_type::get_all().size());
+	for (wyrmgus::unit_type *unit_type : wyrmgus::unit_type::get_all()) {
+		ShowLoadProgress(_("Loading Unit Types (%d%%)"), (unit_type->Slot + 1) * 100 / wyrmgus::unit_type::get_all().size());
 		LoadUnitType(*unit_type);
 	}
 }
 
 //Wyrmgus start
-void LoadUnitType(stratagus::unit_type &type)
+void LoadUnitType(wyrmgus::unit_type &type)
 {
 	// Lookup icons.
 	if (!type.Icon.Name.empty()) {
@@ -2818,7 +2818,7 @@ void CUnitTypeVar::Init()
 	// Variables.
 	Variable.resize(GetNumberVariable());
 	size_t new_size = UnitTypeVar.GetNumberBoolFlag();
-	for (stratagus::unit_type *unit_type : stratagus::unit_type::get_all()) { // adjust array for unit already defined
+	for (wyrmgus::unit_type *unit_type : wyrmgus::unit_type::get_all()) { // adjust array for unit already defined
 		unit_type->BoolFlag.resize(new_size);
 	}
 }
@@ -2873,7 +2873,7 @@ void CleanUnitTypeVariables()
 //Wyrmgus start
 std::string GetUnitTypeStatsString(const std::string &unit_type_ident)
 {
-	const stratagus::unit_type *unit_type = stratagus::unit_type::get(unit_type_ident);
+	const wyrmgus::unit_type *unit_type = wyrmgus::unit_type::get(unit_type_ident);
 
 	if (unit_type) {
 		std::string unit_type_stats_string;

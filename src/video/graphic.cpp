@@ -132,7 +132,7 @@ CPlayerColorGraphic::~CPlayerColorGraphic()
 	}
 }
 
-void CPlayerColorGraphic::DrawPlayerColorSub(const stratagus::player_color *player_color, int gx, int gy, int w, int h, int x, int y)
+void CPlayerColorGraphic::DrawPlayerColorSub(const wyrmgus::player_color *player_color, int gx, int gy, int w, int h, int x, int y)
 {
 	if (this->get_textures(player_color) == nullptr) {
 		MakePlayerColorTexture(this, player_color, nullptr);
@@ -156,7 +156,7 @@ void CGraphic::DrawGrayscaleSubClip(int gx, int gy, int w, int h, int x, int y) 
 	DrawGrayscaleSub(gx + x - oldx, gy + y - oldy, w, h, x, y);
 }
 
-void CPlayerColorGraphic::DrawPlayerColorSubClip(const stratagus::player_color *player_color, int gx, int gy, int w, int h, int x, int y)
+void CPlayerColorGraphic::DrawPlayerColorSubClip(const wyrmgus::player_color *player_color, int gx, int gy, int w, int h, int x, int y)
 {
 	int oldx = x;
 	int oldy = y;
@@ -254,7 +254,7 @@ void CGraphic::DoDrawFrameClip(const GLuint *textures,
 **  @param x       x coordinate on the screen
 **  @param y       y coordinate on the screen
 */
-void CGraphic::DrawFrameClip(unsigned frame, int x, int y, const stratagus::time_of_day *time_of_day, SDL_Surface *surface, int show_percent)
+void CGraphic::DrawFrameClip(unsigned frame, int x, int y, const wyrmgus::time_of_day *time_of_day, SDL_Surface *surface, int show_percent)
 {
 	if (time_of_day == nullptr || !time_of_day->HasColorModification()) {
 		DoDrawFrameClip(this->textures, frame, x, y, show_percent);
@@ -274,7 +274,7 @@ void CGraphic::DrawFrameTrans(unsigned frame, int x, int y, int alpha) const
 	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
 }
 
-void CGraphic::DrawFrameClipTrans(unsigned frame, int x, int y, int alpha, const stratagus::time_of_day *time_of_day, SDL_Surface *surface, int show_percent)
+void CGraphic::DrawFrameClipTrans(unsigned frame, int x, int y, int alpha, const wyrmgus::time_of_day *time_of_day, SDL_Surface *surface, int show_percent)
 {
 #if defined(USE_OPENGL) || defined(USE_GLES)
 	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
@@ -289,7 +289,7 @@ void CGraphic::DrawGrayscaleFrameClip(unsigned frame, int x, int y, int show_per
 	DoDrawFrameClip(this->grayscale_textures, frame, x, y, show_percent);
 }
 
-void CPlayerColorGraphic::DrawPlayerColorFrameClip(const stratagus::player_color *player_color, unsigned frame, int x, int y, const stratagus::time_of_day *time_of_day, int show_percent)
+void CPlayerColorGraphic::DrawPlayerColorFrameClip(const wyrmgus::player_color *player_color, unsigned frame, int x, int y, const wyrmgus::time_of_day *time_of_day, int show_percent)
 {
 	if (time_of_day == nullptr || !time_of_day->HasColorModification()) {
 		if (this->get_textures(player_color) == nullptr) {
@@ -305,7 +305,7 @@ void CPlayerColorGraphic::DrawPlayerColorFrameClip(const stratagus::player_color
 }
 
 //Wyrmgus start
-void CPlayerColorGraphic::DrawPlayerColorFrameClipTrans(const stratagus::player_color *player_color, unsigned frame, int x, int y, int alpha, const stratagus::time_of_day *time_of_day, int show_percent)
+void CPlayerColorGraphic::DrawPlayerColorFrameClipTrans(const wyrmgus::player_color *player_color, unsigned frame, int x, int y, int alpha, const wyrmgus::time_of_day *time_of_day, int show_percent)
 {
 #if defined(USE_OPENGL) || defined(USE_GLES)
 	if (time_of_day == nullptr || !time_of_day->HasColorModification()) {
@@ -329,7 +329,7 @@ void CPlayerColorGraphic::DrawPlayerColorFrameClipTrans(const stratagus::player_
 #endif
 }
 
-void CPlayerColorGraphic::DrawPlayerColorFrameClipTransX(const stratagus::player_color *player_color, unsigned frame, int x, int y, int alpha, const stratagus::time_of_day *time_of_day)
+void CPlayerColorGraphic::DrawPlayerColorFrameClipTransX(const wyrmgus::player_color *player_color, unsigned frame, int x, int y, int alpha, const wyrmgus::time_of_day *time_of_day)
 {
 	if (time_of_day == nullptr || !time_of_day->HasColorModification()) {
 		if (this->get_textures(player_color) == nullptr) {
@@ -401,7 +401,7 @@ void CGraphic::DoDrawFrameClipX(const GLuint *textures, unsigned frame,
 */
 //Wyrmgus start
 //void CGraphic::DrawFrameClipX(unsigned frame, int x, int y) const
-void CGraphic::DrawFrameClipX(unsigned frame, int x, int y, const stratagus::time_of_day *time_of_day, SDL_Surface *surface)
+void CGraphic::DrawFrameClipX(unsigned frame, int x, int y, const wyrmgus::time_of_day *time_of_day, SDL_Surface *surface)
 //Wyrmgus end
 {
 	if (time_of_day == nullptr || !time_of_day->HasColorModification()) {
@@ -426,7 +426,7 @@ void CGraphic::DrawFrameTransX(unsigned frame, int x, int y, int alpha) const
 
 //Wyrmgus start
 //void CGraphic::DrawFrameClipTransX(unsigned frame, int x, int y, int alpha) const
-void CGraphic::DrawFrameClipTransX(unsigned frame, int x, int y, int alpha, const stratagus::time_of_day *time_of_day, SDL_Surface *surface)
+void CGraphic::DrawFrameClipTransX(unsigned frame, int x, int y, int alpha, const wyrmgus::time_of_day *time_of_day, SDL_Surface *surface)
 //Wyrmgus end
 {
 #if defined(USE_OPENGL) || defined(USE_GLES)
@@ -448,7 +448,7 @@ void CGraphic::DrawFrameClipTransX(unsigned frame, int x, int y, int alpha, cons
 **  @param x       x coordinate on the screen
 **  @param y       y coordinate on the screen
 */
-void CPlayerColorGraphic::DrawPlayerColorFrameClipX(const stratagus::player_color *player_color, unsigned frame, int x, int y, const stratagus::time_of_day *time_of_day)
+void CPlayerColorGraphic::DrawPlayerColorFrameClipX(const wyrmgus::player_color *player_color, unsigned frame, int x, int y, const wyrmgus::time_of_day *time_of_day)
 {
 #if defined(USE_OPENGL) || defined(USE_GLES)
 	if (time_of_day == nullptr || !time_of_day->HasColorModification()) {
@@ -517,7 +517,7 @@ CGraphic *CGraphic::New(const std::string &filepath, const int w, const int h)
 **
 **  @return      New graphic object
 */
-CPlayerColorGraphic *CPlayerColorGraphic::New(const std::string &filepath, const QSize &size, const stratagus::player_color *conversible_player_color)
+CPlayerColorGraphic *CPlayerColorGraphic::New(const std::string &filepath, const QSize &size, const wyrmgus::player_color *conversible_player_color)
 {
 	std::unique_lock<std::shared_mutex> lock(CGraphic::mutex);
 
@@ -547,7 +547,7 @@ CPlayerColorGraphic *CPlayerColorGraphic::New(const std::string &filepath, const
 	return g;
 }
 
-const GLuint *CPlayerColorGraphic::get_textures(const stratagus::player_color *player_color) const
+const GLuint *CPlayerColorGraphic::get_textures(const wyrmgus::player_color *player_color) const
 {
 	if (!this->has_player_color() || player_color == nullptr || player_color == this->get_conversible_player_color()) {
 		return CGraphic::get_textures();
@@ -561,7 +561,7 @@ const GLuint *CPlayerColorGraphic::get_textures(const stratagus::player_color *p
 	return nullptr;
 }
 
-const GLuint *CPlayerColorGraphic::get_textures(const stratagus::player_color *player_color, const CColor &color_modification) const
+const GLuint *CPlayerColorGraphic::get_textures(const wyrmgus::player_color *player_color, const CColor &color_modification) const
 {
 	if (!this->has_player_color() || player_color == nullptr || player_color == this->get_conversible_player_color()) {
 		return CGraphic::get_textures(color_modification);
@@ -844,8 +844,8 @@ void CGraphic::Load(const bool create_grayscale_textures, const int scale_factor
 	NumFrames = GraphicWidth / Width * GraphicHeight / Height;
 
 	this->player_color = false;
-	const stratagus::color_set color_set = stratagus::image::get_colors(this->get_image());
-	const stratagus::player_color *conversible_player_color = this->get_conversible_player_color();
+	const wyrmgus::color_set color_set = wyrmgus::image::get_colors(this->get_image());
+	const wyrmgus::player_color *conversible_player_color = this->get_conversible_player_color();
 	for (const QColor &color : color_set) {
 		if (!this->player_color) {
 			for (const QColor &player_color : conversible_player_color->get_colors()) {
@@ -1012,7 +1012,7 @@ void ReloadGraphics()
 			}
 			cg->player_color_textures.clear();
 
-			for (const stratagus::player_color *player_color : stratagus::player_color::get_all()) {
+			for (const wyrmgus::player_color *player_color : wyrmgus::player_color::get_all()) {
 				MakePlayerColorTexture(cg, player_color, nullptr);
 			}
 		}
@@ -1042,7 +1042,7 @@ static int PowerOf2(int x)
 **  @param ow       Offset width.
 **  @param oh       Offset height.
 */
-void MakeTextures2(const CGraphic *g, const QImage &image, GLuint texture, const int ow, const int oh, const stratagus::time_of_day *time_of_day)
+void MakeTextures2(const CGraphic *g, const QImage &image, GLuint texture, const int ow, const int oh, const wyrmgus::time_of_day *time_of_day)
 {
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 	int maxw = std::min<int>(image.width() - ow, GLMaxTextureSize);
@@ -1127,7 +1127,7 @@ void MakeTextures2(const CGraphic *g, const QImage &image, GLuint texture, const
 	}
 }
 
-static void MakeTextures(CGraphic *g, const bool grayscale, const stratagus::player_color *player_color, const stratagus::time_of_day *time_of_day)
+static void MakeTextures(CGraphic *g, const bool grayscale, const wyrmgus::player_color *player_color, const wyrmgus::time_of_day *time_of_day)
 {
 	int tw = (g->get_width() - 1) / GLMaxTextureSize + 1;
 	const int th = (g->get_height() - 1) / GLMaxTextureSize + 1;
@@ -1181,7 +1181,7 @@ static void MakeTextures(CGraphic *g, const bool grayscale, const stratagus::pla
 	} else if (player_color != nullptr && g->has_player_color()) {
 		const int bpp = image.depth() / 8;
 		unsigned char *image_data = image.bits();
-		const stratagus::player_color *conversible_player_color = g->get_conversible_player_color();
+		const wyrmgus::player_color *conversible_player_color = g->get_conversible_player_color();
 		const std::vector<QColor> &conversible_colors = conversible_player_color->get_colors();
 		const std::vector<QColor> &colors = player_color->get_colors();
 
@@ -1206,7 +1206,7 @@ static void MakeTextures(CGraphic *g, const bool grayscale, const stratagus::pla
 		if (g->get_width() > image.width() && g->get_height() > image.height() && (g->get_width() % image.width()) == 0 && (g->get_height() % image.height()) == 0 && (g->get_width() / image.width()) == (g->get_height() / image.height())) {
 			//if a simple scale factor is being used for the resizing, then use xBRZ for the rescaling
 			const int scale_factor = g->get_width() / image.width();
-			image = stratagus::image::scale(image, scale_factor, g->get_original_frame_size());
+			image = wyrmgus::image::scale(image, scale_factor, g->get_original_frame_size());
 		} else {
 			image = image.scaled(g->get_size(), Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
 			if (image.format() != QImage::Format_RGBA8888) {
@@ -1228,7 +1228,7 @@ static void MakeTextures(CGraphic *g, const bool grayscale, const stratagus::pla
 **
 **  @param g  The graphic object.
 */
-void MakeTexture(CGraphic *g, const bool grayscale, const stratagus::time_of_day *time_of_day)
+void MakeTexture(CGraphic *g, const bool grayscale, const wyrmgus::time_of_day *time_of_day)
 {
 	if (time_of_day && time_of_day->HasColorModification()) {
 		if (g->get_textures(time_of_day->ColorModification) != nullptr) {
@@ -1247,7 +1247,7 @@ void MakeTexture(CGraphic *g, const bool grayscale, const stratagus::time_of_day
 	MakeTextures(g, grayscale, nullptr, time_of_day);
 }
 
-void MakePlayerColorTexture(CPlayerColorGraphic *g, const stratagus::player_color *player_color, const stratagus::time_of_day *time_of_day)
+void MakePlayerColorTexture(CPlayerColorGraphic *g, const wyrmgus::player_color *player_color, const wyrmgus::time_of_day *time_of_day)
 {
 	if (time_of_day && time_of_day->HasColorModification()) {
 		if (g->get_textures(player_color, time_of_day->ColorModification) != nullptr) {
@@ -1359,21 +1359,21 @@ void CGraphic::SetOriginalSize()
 
 int CGraphic::get_frame_index(const QPoint &frame_pos) const
 {
-	return stratagus::point::to_index(frame_pos, this->get_frames_per_row());
+	return wyrmgus::point::to_index(frame_pos, this->get_frames_per_row());
 }
 
 QPoint CGraphic::get_frame_pos(const int frame_index) const
 {
-	return stratagus::point::from_index(frame_index, this->get_frames_per_row());
+	return wyrmgus::point::from_index(frame_index, this->get_frames_per_row());
 }
 
-const stratagus::player_color *CGraphic::get_conversible_player_color() const
+const wyrmgus::player_color *CGraphic::get_conversible_player_color() const
 {
 	if (this->conversible_player_color != nullptr) {
 		return this->conversible_player_color;
 	}
 
-	return stratagus::defines::get()->get_conversible_player_color();
+	return wyrmgus::defines::get()->get_conversible_player_color();
 }
 
 void FreeGraphics()
@@ -1412,11 +1412,11 @@ CFiller::~CFiller()
 void CFiller::Load()
 {
 	if (this->G != nullptr) {
-		this->G->Load(false, stratagus::defines::get()->get_scale_factor());
+		this->G->Load(false, wyrmgus::defines::get()->get_scale_factor());
 	}
 
-	this->X *= stratagus::defines::get()->get_scale_factor();
-	this->Y *= stratagus::defines::get()->get_scale_factor();
+	this->X *= wyrmgus::defines::get()->get_scale_factor();
+	this->Y *= wyrmgus::defines::get()->get_scale_factor();
 
 	if (this->X < 0) {
 		this->X = Video.Width + this->X;
@@ -1433,7 +1433,7 @@ bool CFiller::OnGraphic(int x, int y) const
 {
 	x -= X;
 	y -= Y;
-	const int scale_factor = stratagus::defines::get()->get_scale_factor();
+	const int scale_factor = wyrmgus::defines::get()->get_scale_factor();
 	if (x >= 0 && y >= 0 && x < this->G->get_width() && y < this->G->get_height()) {
 		return this->G->get_image().pixelColor(x / scale_factor, y / scale_factor).alpha() != 0;
 	}

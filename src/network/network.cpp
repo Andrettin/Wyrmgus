@@ -520,7 +520,7 @@ void NetworkOnStartGame()
 **  @warning  Destination and unit-type shares the same network slot.
 */
 void NetworkSendCommand(int command, const CUnit &unit, int x, int y,
-						const CUnit *dest, const stratagus::unit_type *type, int status)
+						const CUnit *dest, const wyrmgus::unit_type *type, int status)
 {
 	CNetworkCommandQueue ncq;
 
@@ -1011,7 +1011,7 @@ static void NetworkSendCommands(unsigned long gameNetCycle)
 		CNetworkCommandSync nc;
 		ncq[0].Type = MessageSync;
 		nc.syncHash = SyncHash;
-		nc.syncSeed = stratagus::random::get()->get_seed();
+		nc.syncSeed = wyrmgus::random::get()->get_seed();
 		ncq[0].Data.resize(nc.Size());
 		nc.Serialize(&ncq[0].Data[0]);
 		ncq[0].Time = gameNetCycle;
@@ -1047,7 +1047,7 @@ static void NetworkSendCommands(unsigned long gameNetCycle)
 	if (numcommands != MaxNetworkCommands) {
 		ncq[numcommands].Type = MessageNone;
 	}
-	NetworkSyncSeeds[gameNetCycle & 0xFF] = stratagus::random::get()->get_seed();
+	NetworkSyncSeeds[gameNetCycle & 0xFF] = wyrmgus::random::get()->get_seed();
 	NetworkSyncHashs[gameNetCycle & 0xFF] = SyncHash;
 	NetworkSendPacket(ncq);
 }

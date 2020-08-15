@@ -29,7 +29,7 @@
 
 #include "util/color_container.h"
 
-namespace stratagus::image {
+namespace wyrmgus::image {
 
 enum class frame_order {
 	left_to_right,

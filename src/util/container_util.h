@@ -31,7 +31,7 @@
 
 #pragma once
 
-namespace stratagus::container {
+namespace wyrmgus::container {
 
 template <typename T>
 inline QVariantList to_qvariant_list(const T &container)

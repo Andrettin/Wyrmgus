@@ -29,7 +29,7 @@
 
 #include "upgrade/upgrade_structs.h"
 
-namespace stratagus {
+namespace wyrmgus {
 
 bool upgrade_compare::operator()(const CUpgrade *upgrade, const CUpgrade *other_upgrade) const
 {

@@ -29,7 +29,7 @@
 
 class CPlayer;
 
-namespace stratagus {
+namespace wyrmgus {
 
 class dialogue;
 class sml_data;

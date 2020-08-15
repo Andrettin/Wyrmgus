@@ -127,7 +127,7 @@ static int CclDefineProvince(lua_State *l)
 		const char *value = LuaToString(l, -2);
 		
 		if (!strcmp(value, "World")) {
-			stratagus::world *world = stratagus::world::get(LuaToString(l, -1));
+			wyrmgus::world *world = wyrmgus::world::get(LuaToString(l, -1));
 			province->world = world;
 			world->Provinces.push_back(province);
 		} else if (!strcmp(value, "Water")) {
@@ -140,7 +140,7 @@ static int CclDefineProvince(lua_State *l)
 			}
 			const int subargs = lua_rawlen(l, -1);
 			for (int j = 0; j < subargs; ++j) {
-				stratagus::civilization *civilization = stratagus::civilization::get(LuaToString(l, -1, j + 1));
+				wyrmgus::civilization *civilization = wyrmgus::civilization::get(LuaToString(l, -1, j + 1));
 				++j;
 
 				std::string cultural_name = LuaToString(l, -1, j + 1);
@@ -155,7 +155,7 @@ static int CclDefineProvince(lua_State *l)
 			for (int j = 0; j < subargs; ++j) {
 				++j;
 
-				stratagus::faction *faction = stratagus::faction::get(LuaToString(l, -1, j + 1));
+				wyrmgus::faction *faction = wyrmgus::faction::get(LuaToString(l, -1, j + 1));
 				++j;
 				
 				std::string cultural_name = LuaToString(l, -1, j + 1);
@@ -170,7 +170,7 @@ static int CclDefineProvince(lua_State *l)
 			for (int j = 0; j < subargs; ++j) {
 				++j;
 				
-				stratagus::faction *faction = stratagus::faction::get(LuaToString(l, -1, j + 1));
+				wyrmgus::faction *faction = wyrmgus::faction::get(LuaToString(l, -1, j + 1));
 				province->FactionClaims.push_back(faction);
 			}
 		} else if (!strcmp(value, "Regions")) {
@@ -179,7 +179,7 @@ static int CclDefineProvince(lua_State *l)
 			}
 			const int subargs = lua_rawlen(l, -1);
 			for (int j = 0; j < subargs; ++j) {
-				stratagus::region *region = stratagus::region::get(LuaToString(l, -1, j + 1));
+				wyrmgus::region *region = wyrmgus::region::get(LuaToString(l, -1, j + 1));
 				province->Regions.push_back(region);
 			}
 		} else if (!strcmp(value, "HistoricalOwners")) {
@@ -193,7 +193,7 @@ static int CclDefineProvince(lua_State *l)
 				++j;
 				std::string owner_faction_name = LuaToString(l, -1, j + 1);
 				if (!owner_faction_name.empty()) {
-					stratagus::faction *owner_faction = stratagus::faction::get(owner_faction_name);
+					wyrmgus::faction *owner_faction = wyrmgus::faction::get(owner_faction_name);
 					province->HistoricalOwners[year] = owner_faction;
 				} else {
 					province->HistoricalOwners[year] = nullptr;
@@ -209,7 +209,7 @@ static int CclDefineProvince(lua_State *l)
 				++j;
 				++j;
 				std::string claimant_faction_name = LuaToString(l, -1, j + 1);
-				stratagus::faction *claimant_faction = stratagus::faction::get(claimant_faction_name);
+				wyrmgus::faction *claimant_faction = wyrmgus::faction::get(claimant_faction_name);
 				province->HistoricalClaims[year] = claimant_faction;
 			}
 		} else if (!strcmp(value, "HistoricalCultures")) {
@@ -222,7 +222,7 @@ static int CclDefineProvince(lua_State *l)
 				++j;
 				std::string historical_civilization_name = LuaToString(l, -1, j + 1);
 				if (!historical_civilization_name.empty()) {
-					stratagus::civilization *historical_civilization = stratagus::civilization::get(historical_civilization_name);
+					wyrmgus::civilization *historical_civilization = wyrmgus::civilization::get(historical_civilization_name);
 					province->HistoricalCultures[year] = historical_civilization->ID;
 				}
 			}
@@ -302,7 +302,7 @@ static int CclDefineWorldMapTile(lua_State *l)
 		const char *value = LuaToString(l, -2);
 		
 		if (!strcmp(value, "World")) {
-			stratagus::world *world = stratagus::world::get(LuaToString(l, -1));
+			wyrmgus::world *world = wyrmgus::world::get(LuaToString(l, -1));
 			tile->world = world;
 		} else if (!strcmp(value, "Terrain")) {
 			int terrain = GetWorldMapTerrainTypeId(LuaToString(l, -1));
@@ -334,7 +334,7 @@ static int CclDefineWorldMapTile(lua_State *l)
 				
 				std::string name_type = "terrain-" + NameToIdent(WorldMapTerrainTypes[terrain]->Name);
 
-				stratagus::civilization *civilization = stratagus::civilization::get(LuaToString(l, -1, j + 1));
+				wyrmgus::civilization *civilization = wyrmgus::civilization::get(LuaToString(l, -1, j + 1));
 				++j;
 
 				std::string cultural_name = LuaToString(l, -1, j + 1);
@@ -357,12 +357,12 @@ static int CclDefineWorldMapTile(lua_State *l)
 
 				++j;
 
-				stratagus::faction *faction = stratagus::faction::get(LuaToString(l, -1, j + 1));
+				wyrmgus::faction *faction = wyrmgus::faction::get(LuaToString(l, -1, j + 1));
 				++j;
 				
 				std::string cultural_name = LuaToString(l, -1, j + 1);
 				
-				tile->FactionCulturalTerrainNames[std::pair<int, stratagus::faction *>(terrain, faction)].push_back(TransliterateText(cultural_name));
+				tile->FactionCulturalTerrainNames[std::pair<int, wyrmgus::faction *>(terrain, faction)].push_back(TransliterateText(cultural_name));
 			}
 		} else if (!strcmp(value, "CulturalResourceNames")) {
 			if (!lua_istable(l, -1)) {
@@ -378,7 +378,7 @@ static int CclDefineWorldMapTile(lua_State *l)
 				
 				std::string name_type = "resource-tile-" + DefaultResourceNames[resource];
 
-				stratagus::civilization *civilization = stratagus::civilization::get(LuaToString(l, -1, j + 1));
+				wyrmgus::civilization *civilization = wyrmgus::civilization::get(LuaToString(l, -1, j + 1));
 				++j;
 
 				std::string cultural_name = LuaToString(l, -1, j + 1);
@@ -401,12 +401,12 @@ static int CclDefineWorldMapTile(lua_State *l)
 
 				++j;
 				
-				stratagus::faction *faction = stratagus::faction::get(LuaToString(l, -1, j + 1));
+				wyrmgus::faction *faction = wyrmgus::faction::get(LuaToString(l, -1, j + 1));
 				++j;
 				
 				std::string cultural_name = LuaToString(l, -1, j + 1);
 				
-				tile->FactionCulturalResourceNames[std::pair<int, stratagus::faction *>(resource, faction)].push_back(TransliterateText(cultural_name));
+				tile->FactionCulturalResourceNames[std::pair<int, wyrmgus::faction *>(resource, faction)].push_back(TransliterateText(cultural_name));
 			}
 		} else if (!strcmp(value, "CulturalSettlementNames")) {
 			if (!lua_istable(l, -1)) {
@@ -415,7 +415,7 @@ static int CclDefineWorldMapTile(lua_State *l)
 			const int subargs = lua_rawlen(l, -1);
 			for (int j = 0; j < subargs; ++j) {
 
-				stratagus::civilization *civilization = stratagus::civilization::get(LuaToString(l, -1, j + 1));
+				wyrmgus::civilization *civilization = wyrmgus::civilization::get(LuaToString(l, -1, j + 1));
 				++j;
 
 				std::string cultural_name = LuaToString(l, -1, j + 1);
@@ -430,7 +430,7 @@ static int CclDefineWorldMapTile(lua_State *l)
 			for (int j = 0; j < subargs; ++j) {
 				++j;
 				
-				stratagus::faction *faction = stratagus::faction::get(LuaToString(l, -1, j + 1));
+				wyrmgus::faction *faction = wyrmgus::faction::get(LuaToString(l, -1, j + 1));
 				++j;
 				
 				std::string cultural_name = LuaToString(l, -1, j + 1);
@@ -445,7 +445,7 @@ static int CclDefineWorldMapTile(lua_State *l)
 			for (int j = 0; j < subargs; ++j) {
 				++j;
 				
-				stratagus::faction *faction = stratagus::faction::get(LuaToString(l, -1, j + 1));
+				wyrmgus::faction *faction = wyrmgus::faction::get(LuaToString(l, -1, j + 1));
 				tile->FactionClaims.push_back(faction);
 			}
 		} else if (!strcmp(value, "HistoricalOwners")) {
@@ -459,7 +459,7 @@ static int CclDefineWorldMapTile(lua_State *l)
 				++j;
 				std::string owner_faction_name = LuaToString(l, -1, j + 1);
 				if (!owner_faction_name.empty()) {
-					stratagus::faction *owner_faction = stratagus::faction::get(owner_faction_name);
+					wyrmgus::faction *owner_faction = wyrmgus::faction::get(owner_faction_name);
 					tile->HistoricalOwners[year] = owner_faction;
 				} else {
 					tile->HistoricalOwners[year] = nullptr;
@@ -475,7 +475,7 @@ static int CclDefineWorldMapTile(lua_State *l)
 				++j;
 				++j;
 				std::string claimant_faction_name = LuaToString(l, -1, j + 1);
-				stratagus::faction *claimant_faction = stratagus::faction::get(claimant_faction_name);
+				wyrmgus::faction *claimant_faction = wyrmgus::faction::get(claimant_faction_name);
 				tile->HistoricalClaims[year] = claimant_faction;
 			}
 		} else {
@@ -501,7 +501,7 @@ static int CclGetPlaneData(lua_State *l)
 		LuaError(l, "incorrect argument");
 	}
 	std::string plane_ident = LuaToString(l, 1);
-	stratagus::plane *plane = stratagus::plane::get(plane_ident);
+	wyrmgus::plane *plane = wyrmgus::plane::get(plane_ident);
 	const char *data = LuaToString(l, 2);
 
 	if (!strcmp(data, "Name")) {
@@ -542,7 +542,7 @@ static int CclGetWorldData(lua_State *l)
 		LuaError(l, "incorrect argument");
 	}
 	std::string world_ident = LuaToString(l, 1);
-	stratagus::world *world = stratagus::world::get(world_ident);
+	wyrmgus::world *world = wyrmgus::world::get(world_ident);
 	const char *data = LuaToString(l, 2);
 
 	if (!strcmp(data, "Name")) {
@@ -632,10 +632,10 @@ static int CclGetProvinceData(lua_State *l)
 
 static int CclGetPlanes(lua_State *l)
 {
-	lua_createtable(l, stratagus::plane::get_all().size(), 0);
-	for (size_t i = 1; i <= stratagus::plane::get_all().size(); ++i)
+	lua_createtable(l, wyrmgus::plane::get_all().size(), 0);
+	for (size_t i = 1; i <= wyrmgus::plane::get_all().size(); ++i)
 	{
-		lua_pushstring(l, stratagus::plane::get_all()[i-1]->Ident.c_str());
+		lua_pushstring(l, wyrmgus::plane::get_all()[i-1]->Ident.c_str());
 		lua_rawseti(l, -2, i);
 	}
 	return 1;
@@ -643,10 +643,10 @@ static int CclGetPlanes(lua_State *l)
 
 static int CclGetWorlds(lua_State *l)
 {
-	lua_createtable(l, stratagus::world::get_all().size(), 0);
-	for (size_t i = 1; i <= stratagus::world::get_all().size(); ++i)
+	lua_createtable(l, wyrmgus::world::get_all().size(), 0);
+	for (size_t i = 1; i <= wyrmgus::world::get_all().size(); ++i)
 	{
-		lua_pushstring(l, stratagus::world::get_all()[i-1]->Ident.c_str());
+		lua_pushstring(l, wyrmgus::world::get_all()[i-1]->Ident.c_str());
 		lua_rawseti(l, -2, i);
 	}
 	return 1;

@@ -28,7 +28,7 @@
 
 #pragma once
 
-namespace stratagus {
+namespace wyrmgus {
 
 enum class unit_sound_type {
 	none = -1,
@@ -115,4 +115,4 @@ extern int get_unit_sound_type_range(const unit_sound_type unit_sound_type);
 
 }
 
-Q_DECLARE_METATYPE(stratagus::unit_sound_type)
+Q_DECLARE_METATYPE(wyrmgus::unit_sound_type)

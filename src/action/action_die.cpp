@@ -77,7 +77,7 @@
 
 static bool AnimateActionDie(CUnit &unit)
 {
-	const stratagus::animation_set *animations = unit.GetAnimations();
+	const wyrmgus::animation_set *animations = unit.GetAnimations();
 
 	if (animations == nullptr) {
 		return false;
@@ -103,7 +103,7 @@ static bool AnimateActionDie(CUnit &unit)
 	if (unit.Anim.Unbreakable) {
 		return ;
 	}
-	const stratagus::unit_type &type = *unit.Type;
+	const wyrmgus::unit_type &type = *unit.Type;
 
 	// Die sequence terminated, generate corpse.
 	if (type.get_corpse_type() == nullptr) {
@@ -115,7 +115,7 @@ static bool AnimateActionDie(CUnit &unit)
 		return ;
 	}
 
-	const stratagus::unit_type *corpse_type = type.get_corpse_type();
+	const wyrmgus::unit_type *corpse_type = type.get_corpse_type();
 	Assert(type.get_tile_width() >= corpse_type->get_tile_width() && type.get_tile_height() >= corpse_type->get_tile_height());
 
 	// Update sight for new corpse

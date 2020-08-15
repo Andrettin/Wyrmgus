@@ -32,7 +32,7 @@
 
 class CUpgrade;
 
-namespace stratagus {
+namespace wyrmgus {
 
 class upgrade_class final : public named_data_entry, public data_type<upgrade_class>
 {
@@ -42,7 +42,7 @@ public:
 	static constexpr const char *class_identifier = "upgrade_class";
 	static constexpr const char *database_folder = "upgrade_classes";
 
-	static upgrade_class *add(const std::string &identifier, const stratagus::module *module)
+	static upgrade_class *add(const std::string &identifier, const wyrmgus::module *module)
 	{
 		upgrade_class *upgrade_class = data_type::add(identifier, module);
 		upgrade_class->index = upgrade_class::get_all().size() - 1;

@@ -7,7 +7,7 @@
 #include "time/timeline.h"
 #include "util/string_util.h"
 
-namespace stratagus {
+namespace wyrmgus {
 
 void data_entry::process_sml_property(const sml_property &property)
 {

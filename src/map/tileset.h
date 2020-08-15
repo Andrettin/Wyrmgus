@@ -44,7 +44,7 @@ class CGraphic;
 class CPlayerColorGraphic;
 //Wyrmgus end
 
-namespace stratagus {
+namespace wyrmgus {
 	class unit_type;
 }
 
@@ -104,7 +104,7 @@ enum TileType {
 	TileTypeWater		/// Any water tile
 };
 
-namespace stratagus {
+namespace wyrmgus {
 
 enum class tile_transition_type {
 	none = -1,
@@ -331,6 +331,6 @@ private:
 
 extern void ParseTilesetTileFlags(lua_State *l, int *back, int *j);
 //Wyrmgus start
-extern std::string GetTransitionTypeNameById(const stratagus::tile_transition_type transition_type);
-extern stratagus::tile_transition_type GetTransitionTypeIdByName(const std::string &transition_type);
+extern std::string GetTransitionTypeNameById(const wyrmgus::tile_transition_type transition_type);
+extern wyrmgus::tile_transition_type GetTransitionTypeIdByName(const std::string &transition_type);
 //Wyrmgus end

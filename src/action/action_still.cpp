@@ -212,8 +212,8 @@ static bool MoveRandomly(CUnit &unit)
 			MarkUnitFieldFlags(unit);
 			//Wyrmgus start
 			//prefer terrains which this unit's species is native to; only go to other ones if is already in a non-native terrain type
-			if (unit.Type->get_species() != nullptr && stratagus::vector::contains(unit.Type->get_species()->Terrains, CMap::Map.GetTileTopTerrain(unit.tilePos, false, unit.MapLayer->ID))) {
-				if (!stratagus::vector::contains(unit.Type->get_species()->Terrains, CMap::Map.GetTileTopTerrain(pos, false, unit.MapLayer->ID))) {
+			if (unit.Type->get_species() != nullptr && wyrmgus::vector::contains(unit.Type->get_species()->Terrains, CMap::Map.GetTileTopTerrain(unit.tilePos, false, unit.MapLayer->ID))) {
+				if (!wyrmgus::vector::contains(unit.Type->get_species()->Terrains, CMap::Map.GetTileTopTerrain(pos, false, unit.MapLayer->ID))) {
 					return false;
 				}
 			}
@@ -338,7 +338,7 @@ static bool PickUpItem(CUnit &unit)
 bool AutoCast(CUnit &unit)
 {
 	if (!unit.Removed) { // Removed units can't cast any spells, from bunker)
-		for (const stratagus::spell *spell : unit.get_autocast_spells()) {
+		for (const wyrmgus::spell *spell : unit.get_autocast_spells()) {
 			if ((spell->AutoCast || spell->AICast) && AutoCastSpell(unit, *spell)) {
 				return true;
 			}
@@ -447,7 +447,7 @@ bool COrder_Still::AutoAttackStand(CUnit &unit)
 	this->SetGoal(autoAttackUnit);
 	//Wyrmgus start
 //	UnitHeadingFromDeltaXY(unit, autoAttackUnit->tilePos + autoAttackUnit->Type->GetHalfTileSize() - unit.tilePos);
-	UnitHeadingFromDeltaXY(unit, PixelSize(PixelSize(autoAttackUnit->tilePos) * stratagus::defines::get()->get_tile_size()) + autoAttackUnit->get_half_tile_pixel_size() - PixelSize(PixelSize(unit.tilePos) * stratagus::defines::get()->get_tile_size()) - unit.get_half_tile_pixel_size());
+	UnitHeadingFromDeltaXY(unit, PixelSize(PixelSize(autoAttackUnit->tilePos) * wyrmgus::defines::get()->get_tile_size()) + autoAttackUnit->get_half_tile_pixel_size() - PixelSize(PixelSize(unit.tilePos) * wyrmgus::defines::get()->get_tile_size()) - unit.get_half_tile_pixel_size());
 	//Wyrmgus end
 	return true;
 }
@@ -455,7 +455,7 @@ bool COrder_Still::AutoAttackStand(CUnit &unit)
 bool COrder_Still::AutoCastStand(CUnit &unit)
 {
 	if (!unit.Removed) { // Removed units can't cast any spells, from bunker)
-		for (const stratagus::spell *spell : unit.get_autocast_spells()) {
+		for (const wyrmgus::spell *spell : unit.get_autocast_spells()) {
 			if ((spell->AutoCast || spell->AICast) && AutoCastSpell(unit, *spell)) {
 				return true;
 			}
@@ -523,7 +523,7 @@ bool AutoAttack(CUnit &unit)
 				UnitShowAnimation(unit, unit.GetAnimations()->Still.get());
 			}
 			if (SyncRand(100000) == 0) {
-				PlayUnitSound(unit, stratagus::unit_sound_type::idle);
+				PlayUnitSound(unit, wyrmgus::unit_sound_type::idle);
 			}
 			unit.StepCount = 0;
 			break;

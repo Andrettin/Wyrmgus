@@ -59,7 +59,7 @@
 #include "guichan/image.h"
 #include "guichan/platform.h"
 
-namespace stratagus {
+namespace wyrmgus {
     class player_color;
 }
 
@@ -181,7 +181,7 @@ namespace gcn
                                int dstX, int dstY, int width,
 							   //Wyrmgus start
 //                               int height) = 0;
-                               int height, const stratagus::player_color *player_color = nullptr, unsigned int transparency = 0, bool grayscale = false) = 0;
+                               int height, const wyrmgus::player_color *player_color = nullptr, unsigned int transparency = 0, bool grayscale = false) = 0;
 							   //Wyrmgus end
         /**
          * Draws an image. A simplified version of the other drawImage.
@@ -191,7 +191,7 @@ namespace gcn
          */
 		//Wyrmgus start
 //        virtual void drawImage(const Image* image, int dstX, int dstY);
-        virtual void drawImage(Image* image, int dstX, int dstY, const stratagus::player_color *player_color = nullptr, unsigned int transparency = 0);
+        virtual void drawImage(Image* image, int dstX, int dstY, const wyrmgus::player_color *player_color = nullptr, unsigned int transparency = 0);
 		//Wyrmgus end
 
         /**

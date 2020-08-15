@@ -380,7 +380,7 @@ int ToggleSelectUnit(CUnit &unit)
 */
 int SelectUnitsByType(CUnit &base, bool only_visible)
 {
-	const stratagus::unit_type &type = *base.Type;
+	const wyrmgus::unit_type &type = *base.Type;
 	const CViewport *vp = UI.MouseViewport;
 
 	Assert(UI.MouseViewport);
@@ -496,7 +496,7 @@ int SelectUnitsByType(CUnit &base, bool only_visible)
 */
 int ToggleUnitsByType(CUnit &base)
 {
-	const stratagus::unit_type &type = *base.Type;
+	const wyrmgus::unit_type &type = *base.Type;
 
 	// if unit is a cadaver or hidden (not on map)
 	// no unit can be selected.
@@ -591,7 +591,7 @@ int SelectGroup(int group_number, GroupSelectionMode mode)
 	std::vector<CUnit *> table;
 
 	for (size_t i = 0; i != units.size(); ++i) {
-		const stratagus::unit_type *type = units[i]->Type;
+		const wyrmgus::unit_type *type = units[i]->Type;
 		if (type && type->CanSelect(mode)) {
 			table.push_back(units[i]);
 		}
@@ -734,11 +734,11 @@ static void SelectSpritesInsideRectangle(const PixelPos &corner_topleft, const P
 										 std::vector<CUnit *> &table)
 {
 	int n = 0;
-	const int scale_factor = stratagus::defines::get()->get_scale_factor();
+	const int scale_factor = wyrmgus::defines::get()->get_scale_factor();
 
 	for (size_t i = 0; i != table.size(); ++i) {
 		CUnit &unit = *table[i];
-		const stratagus::unit_type &type = *unit.Type;
+		const wyrmgus::unit_type &type = *unit.Type;
 		PixelPos spritePos = unit.get_scaled_map_pixel_pos_center();
 
 		spritePos.x += type.get_offset().x() * scale_factor - (type.get_box_width() * scale_factor + type.BoxOffsetX * scale_factor) / 2;
@@ -811,7 +811,7 @@ int SelectUnitsInRectangle(const PixelPos &corner_topleft, const PixelPos &corne
 		if (!unit.IsVisibleInViewport(*UI.SelectedViewport)) {
 			continue;
 		}
-		const stratagus::unit_type &type = *unit.Type;
+		const wyrmgus::unit_type &type = *unit.Type;
 		// Buildings are visible but not selectable
 		if (type.BoolFlag[BUILDING_INDEX].value && !unit.IsVisibleOnMap(*CPlayer::GetThisPlayer())) {
 			continue;

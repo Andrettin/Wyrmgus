@@ -546,7 +546,7 @@ void CommandLog(const char *action, const CUnit *unit, int flush,
 	//
 	log->Num = num;
 
-	log->SyncRandSeed = stratagus::random::get()->get_seed();
+	log->SyncRandSeed = wyrmgus::random::get()->get_seed();
 
 	// Append it to ReplayLog list
 	AppendLog(log, *LogFile);
@@ -862,7 +862,7 @@ static void DoNextReplay()
 
 	Assert(unitSlot == -1 || ReplayStep->UnitIdent == unit->Type->Ident);
 
-	if (stratagus::random::get()->get_seed() != ReplayStep->SyncRandSeed) {
+	if (wyrmgus::random::get()->get_seed() != ReplayStep->SyncRandSeed) {
 #ifdef DEBUG
 		if (!ReplayStep->SyncRandSeed) {
 			// Replay without the 'sync info
@@ -919,7 +919,7 @@ static void DoNextReplay()
 	} else if (!strcmp(action, "unload")) {
 		SendCommandUnload(*unit, pos, dunit, flags);
 	} else if (!strcmp(action, "build")) {
-		SendCommandBuildBuilding(*unit, pos, *stratagus::unit_type::get(val), flags);
+		SendCommandBuildBuilding(*unit, pos, *wyrmgus::unit_type::get(val), flags);
 	} else if (!strcmp(action, "dismiss")) {
 		SendCommandDismiss(*unit, arg1 > 0);
 	} else if (!strcmp(action, "resource-loc")) {
@@ -929,15 +929,15 @@ static void DoNextReplay()
 	} else if (!strcmp(action, "return")) {
 		SendCommandReturnGoods(*unit, dunit, flags);
 	} else if (!strcmp(action, "train")) {
-		SendCommandTrainUnit(*unit, *stratagus::unit_type::get(val), num, flags);
+		SendCommandTrainUnit(*unit, *wyrmgus::unit_type::get(val), num, flags);
 	} else if (!strcmp(action, "cancel-train")) {
-		SendCommandCancelTraining(*unit, num, (val && *val) ? stratagus::unit_type::get(val) : nullptr);
+		SendCommandCancelTraining(*unit, num, (val && *val) ? wyrmgus::unit_type::get(val) : nullptr);
 	} else if (!strcmp(action, "upgrade-to")) {
-		SendCommandUpgradeTo(*unit, *stratagus::unit_type::get(val), flags);
+		SendCommandUpgradeTo(*unit, *wyrmgus::unit_type::get(val), flags);
 	} else if (!strcmp(action, "cancel-upgrade-to")) {
 		SendCommandCancelUpgradeTo(*unit);
 	} else if (!strcmp(action, "transform-into")) {
-		SendCommandTransformInto(*unit, *stratagus::unit_type::get(val), flags);
+		SendCommandTransformInto(*unit, *wyrmgus::unit_type::get(val), flags);
 	} else if (!strcmp(action, "research")) {
 		//Wyrmgus start
 //		SendCommandResearch(*unit, *CUpgrade::get(val), flags);
@@ -952,12 +952,12 @@ static void DoNextReplay()
 	} else if (!strcmp(action, "spell-cast")) {
 		SendCommandSpellCast(*unit, pos, dunit, num, flags);
 	} else if (!strcmp(action, "auto-spell-cast")) {
-		SendCommandAutoSpellCast(*unit, stratagus::spell::get_all()[num], arg1);
+		SendCommandAutoSpellCast(*unit, wyrmgus::spell::get_all()[num], arg1);
 	//Wyrmgus start
 	} else if (!strcmp(action, "rally_point")) {
 		SendCommandRallyPoint(*unit, pos);
 	} else if (!strcmp(action, "quest")) {
-		SendCommandQuest(*unit, stratagus::quest::get(val));
+		SendCommandQuest(*unit, wyrmgus::quest::get(val));
 	} else if (!strcmp(action, "buy")) {
 		SendCommandBuy(*unit, dunit, num);
 	} else if (!strcmp(action, "produce-resource")) {
@@ -968,7 +968,7 @@ static void DoNextReplay()
 		SendCommandBuyResource(*unit, arg1, num);
 	//Wyrmgus end
 	} else if (!strcmp(action, "diplomacy")) {
-		stratagus::diplomacy_state state = stratagus::string_to_diplomacy_state(val);
+		wyrmgus::diplomacy_state state = wyrmgus::string_to_diplomacy_state(val);
 		SendCommandDiplomacy(arg1, state, arg2);
 	} else if (!strcmp(action, "shared-vision")) {
 		bool state;

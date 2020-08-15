@@ -41,7 +41,7 @@
 --  Declarations
 ----------------------------------------------------------------------------*/
 
-namespace stratagus {
+namespace wyrmgus {
 	class sound;
 }
 
@@ -59,10 +59,10 @@ public:
 
 public:
 	std::string Name;     /// config sound name
-	stratagus::sound *Sound;        /// identifier send to sound server
+	wyrmgus::sound *Sound;        /// identifier send to sound server
 };
 
-namespace stratagus {
+namespace wyrmgus {
 
 /**
 **  The sounds of the units.

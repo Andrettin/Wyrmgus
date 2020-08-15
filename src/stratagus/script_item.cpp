@@ -44,7 +44,7 @@ static int CclDefineUniqueItem(lua_State *l)
 	}
 
 	std::string item_ident = LuaToString(l, 1);
-	stratagus::unique_item *item = stratagus::unique_item::get_or_add(item_ident, nullptr);
+	wyrmgus::unique_item *item = wyrmgus::unique_item::get_or_add(item_ident, nullptr);
 	
 	//  Parse the list:
 	for (lua_pushnil(l); lua_next(l, 2); lua_pop(l, 1)) {
@@ -54,10 +54,10 @@ static int CclDefineUniqueItem(lua_State *l)
 			item->set_name(LuaToString(l, -1));
 		} else if (!strcmp(value, "Type")) {
 			std::string unit_type_ident = LuaToString(l, -1);
-			stratagus::unit_type *unit_type = stratagus::unit_type::get(unit_type_ident);
+			wyrmgus::unit_type *unit_type = wyrmgus::unit_type::get(unit_type_ident);
 			item->Type = unit_type;
 		} else if (!strcmp(value, "Icon")) {
-			item->icon = stratagus::icon::get(LuaToString(l, -1));
+			item->icon = wyrmgus::icon::get(LuaToString(l, -1));
 		} else if (!strcmp(value, "Prefix")) {
 			std::string affix_ident = LuaToString(l, -1);
 			CUpgrade *upgrade = CUpgrade::get(affix_ident);
@@ -73,7 +73,7 @@ static int CclDefineUniqueItem(lua_State *l)
 			item->Set->UniqueItems.push_back(item);
 		} else if (!strcmp(value, "Spell")) {
 			const std::string spell_ident = LuaToString(l, -1);
-			stratagus::spell *spell = stratagus::spell::get(spell_ident);
+			wyrmgus::spell *spell = wyrmgus::spell::get(spell_ident);
 			item->Spell = spell;
 		} else if (!strcmp(value, "Work")) {
 			std::string upgrade_ident = LuaToString(l, -1);
@@ -101,8 +101,8 @@ static int CclDefineUniqueItem(lua_State *l)
 
 static int CclGetItems(lua_State *l)
 {
-	std::vector<const stratagus::unit_type *> items;
-	for (const stratagus::unit_type *unit_type : stratagus::unit_type::get_all()) {
+	std::vector<const wyrmgus::unit_type *> items;
+	for (const wyrmgus::unit_type *unit_type : wyrmgus::unit_type::get_all()) {
 		if (unit_type->BoolFlag[ITEM_INDEX].value) {
 			items.push_back(unit_type);
 		}
@@ -119,10 +119,10 @@ static int CclGetItems(lua_State *l)
 
 static int CclGetUniqueItems(lua_State *l)
 {
-	lua_createtable(l, stratagus::unique_item::get_all().size(), 0);
-	for (size_t i = 1; i <= stratagus::unique_item::get_all().size(); ++i)
+	lua_createtable(l, wyrmgus::unique_item::get_all().size(), 0);
+	for (size_t i = 1; i <= wyrmgus::unique_item::get_all().size(); ++i)
 	{
-		lua_pushstring(l, stratagus::unique_item::get_all()[i-1]->get_identifier().c_str());
+		lua_pushstring(l, wyrmgus::unique_item::get_all()[i-1]->get_identifier().c_str());
 		lua_rawseti(l, -2, i);
 	}
 	return 1;
@@ -139,7 +139,7 @@ static int CclGetUniqueItemData(lua_State *l)
 		LuaError(l, "incorrect argument");
 	}
 	std::string item_ident = LuaToString(l, 1);
-	const stratagus::unique_item *item = stratagus::unique_item::get(item_ident);
+	const wyrmgus::unique_item *item = wyrmgus::unique_item::get(item_ident);
 
 	const char *data = LuaToString(l, 2);
 

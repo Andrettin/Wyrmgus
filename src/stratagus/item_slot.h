@@ -27,7 +27,7 @@
 
 #pragma once
 
-namespace stratagus {
+namespace wyrmgus {
 
 enum class item_slot {
 	none = -1,
@@ -104,4 +104,4 @@ inline std::string item_slot_to_string(const item_slot item_slot)
 
 }
 
-Q_DECLARE_METATYPE(stratagus::item_slot)
+Q_DECLARE_METATYPE(wyrmgus::item_slot)

@@ -31,7 +31,7 @@
 
 #pragma once
 
-namespace stratagus::vector {
+namespace wyrmgus::vector {
 
 static inline const std::vector<std::string> empty_string_vector;
 

@@ -295,8 +295,8 @@ static int CclUnit(lua_State *l)
 	}
 
 	CUnit *unit = nullptr;
-	stratagus::unit_type *type = nullptr;
-	stratagus::unit_type *seentype = nullptr;
+	wyrmgus::unit_type *type = nullptr;
+	wyrmgus::unit_type *seentype = nullptr;
 	CPlayer *player = nullptr;
 
 	// Parse the list:
@@ -306,9 +306,9 @@ static int CclUnit(lua_State *l)
 		++j;
 
 		if (!strcmp(value, "type")) {
-			type = stratagus::unit_type::get(LuaToString(l, 2, j + 1));
+			type = wyrmgus::unit_type::get(LuaToString(l, 2, j + 1));
 		} else if (!strcmp(value, "seen-type")) {
-			seentype = stratagus::unit_type::get(LuaToString(l, 2, j + 1));
+			seentype = wyrmgus::unit_type::get(LuaToString(l, 2, j + 1));
 		} else if (!strcmp(value, "player")) {
 			player = CPlayer::Players[LuaToNumber(l, 2, j + 1)];
 
@@ -337,7 +337,7 @@ static int CclUnit(lua_State *l)
 		} else if (!strcmp(value, "surname")) {
 			unit->surname = LuaToString(l, 2, j + 1);
 		} else if (!strcmp(value, "settlement")) {
-			unit->settlement = stratagus::site::get(LuaToString(l, 2, j + 1));
+			unit->settlement = wyrmgus::site::get(LuaToString(l, 2, j + 1));
 			if (type->BoolFlag[TOWNHALL_INDEX].value || settlement_site_unit_type == type) {
 				unit->settlement->set_site_unit(unit);
 				CMap::Map.site_units.push_back(unit);
@@ -349,13 +349,13 @@ static int CclUnit(lua_State *l)
 		} else if (!strcmp(value, "suffix")) {
 			unit->Suffix = CUpgrade::get(LuaToString(l, 2, j + 1));
 		} else if (!strcmp(value, "spell")) {
-			unit->Spell = stratagus::spell::get(LuaToString(l, 2, j + 1));
+			unit->Spell = wyrmgus::spell::get(LuaToString(l, 2, j + 1));
 		} else if (!strcmp(value, "work")) {
 			unit->Work = CUpgrade::get(LuaToString(l, 2, j + 1));
 		} else if (!strcmp(value, "elixir")) {
 			unit->Elixir = CUpgrade::get(LuaToString(l, 2, j + 1));
 		} else if (!strcmp(value, "unique")) {
-			stratagus::unique_item *unique_item = stratagus::unique_item::get(LuaToString(l, 2, j + 1));
+			wyrmgus::unique_item *unique_item = wyrmgus::unique_item::get(LuaToString(l, 2, j + 1));
 			unit->Unique = unique_item;
 			if (unique_item->Type->BoolFlag[ITEM_INDEX].value) { //apply the unique item's prefix and suffix here, because it may have changed in the database in relation to when the game was last played
 				unit->Type = unique_item->Type;
@@ -383,7 +383,7 @@ static int CclUnit(lua_State *l)
 		} else if (!strcmp(value, "equipped")) {
 			bool is_equipped = LuaToBoolean(l, 2, j + 1);
 			if (is_equipped && unit->Container != nullptr) {
-				unit->Container->EquippedItems[static_cast<int>(stratagus::get_item_class_slot(unit->Type->get_item_class()))].push_back(unit);
+				unit->Container->EquippedItems[static_cast<int>(wyrmgus::get_item_class_slot(unit->Type->get_item_class()))].push_back(unit);
 			}
 		} else if (!strcmp(value, "sold-unit")) {
 			bool is_sold = LuaToBoolean(l, 2, j + 1);
@@ -576,11 +576,11 @@ static int CclUnit(lua_State *l)
 			unit->Wait = LuaToNumber(l, 2, j + 1);
 		} else if (!strcmp(value, "anim-data")) {
 			lua_rawgeti(l, 2, j + 1);
-			stratagus::animation_set::LoadUnitAnim(l, *unit, -1);
+			wyrmgus::animation_set::LoadUnitAnim(l, *unit, -1);
 			lua_pop(l, 1);
 		} else if (!strcmp(value, "wait-anim-data")) {
 			lua_rawgeti(l, 2, j + 1);
-			stratagus::animation_set::LoadWaitUnitAnim(l, *unit, -1);
+			wyrmgus::animation_set::LoadWaitUnitAnim(l, *unit, -1);
 			lua_pop(l, 1);
 		} else if (!strcmp(value, "blink")) {
 			unit->Blink = LuaToNumber(l, 2, j + 1);
@@ -666,17 +666,17 @@ static int CclUnit(lua_State *l)
 			unit->Goal = &UnitManager.GetSlotUnit(LuaToNumber(l, 2, j + 1));
 		} else if (!strcmp(value, "auto-cast")) {
 			const char *s = LuaToString(l, 2, j + 1);
-			unit->add_autocast_spell(stratagus::spell::get(s));
+			unit->add_autocast_spell(wyrmgus::spell::get(s));
 		} else if (!strcmp(value, "spell-cooldown")) {
 			lua_rawgeti(l, 2, j + 1);
-			if (!lua_istable(l, -1) || lua_rawlen(l, -1) != stratagus::spell::get_all().size()) {
+			if (!lua_istable(l, -1) || lua_rawlen(l, -1) != wyrmgus::spell::get_all().size()) {
 				LuaError(l, "incorrect argument");
 			}
 			if (!unit->SpellCoolDownTimers) {
-				unit->SpellCoolDownTimers = new int[stratagus::spell::get_all().size()];
-				memset(unit->SpellCoolDownTimers, 0, stratagus::spell::get_all().size() * sizeof(int));
+				unit->SpellCoolDownTimers = new int[wyrmgus::spell::get_all().size()];
+				memset(unit->SpellCoolDownTimers, 0, wyrmgus::spell::get_all().size() * sizeof(int));
 			}
-			for (size_t k = 0; k < stratagus::spell::get_all().size(); ++k) {
+			for (size_t k = 0; k < wyrmgus::spell::get_all().size(); ++k) {
 				unit->SpellCoolDownTimers[k] = LuaToNumber(l, -1, k + 1);
 			}
 			lua_pop(l, 1);
@@ -693,11 +693,11 @@ static int CclUnit(lua_State *l)
 				LuaError(l, "Image layer \"%s\" doesn't exist." _C_ image_layer_name.c_str());
 			}
 		} else if (!strcmp(value, "unit-stock")) {
-			stratagus::unit_type *stocked_unit_type = stratagus::unit_type::get(LuaToString(l, 2, j + 1));
+			wyrmgus::unit_type *stocked_unit_type = wyrmgus::unit_type::get(LuaToString(l, 2, j + 1));
 			++j;
 			unit->SetUnitStock(stocked_unit_type, LuaToNumber(l, 2, j + 1));
 		} else if (!strcmp(value, "unit-stock-replenishment-timer")) {
-			stratagus::unit_type *stocked_unit_type = stratagus::unit_type::get(LuaToString(l, 2, j + 1));
+			wyrmgus::unit_type *stocked_unit_type = wyrmgus::unit_type::get(LuaToString(l, 2, j + 1));
 			++j;
 			unit->SetUnitStockReplenishmentTimer(stocked_unit_type, LuaToNumber(l, 2, j + 1));
 		} else if (!strcmp(value, "character")) {
@@ -828,7 +828,7 @@ static int CclCreateUnit(lua_State *l)
 	//Wyrmgus end
 
 	lua_pushvalue(l, 1);
-	stratagus::unit_type *unittype = CclGetUnitType(l);
+	wyrmgus::unit_type *unittype = CclGetUnitType(l);
 	if (unittype == nullptr) {
 		LuaError(l, "Bad unittype");
 	}
@@ -903,7 +903,7 @@ static int CclCreateUnitInTransporter(lua_State *l)
 	}
 
 	lua_pushvalue(l, 1);
-	stratagus::unit_type *unittype = CclGetUnitType(l);
+	wyrmgus::unit_type *unittype = CclGetUnitType(l);
 	if (unittype == nullptr) {
 		LuaError(l, "Bad unittype");
 	}
@@ -976,7 +976,7 @@ static int CclCreateUnitOnTop(lua_State *l)
 	}
 
 	lua_pushvalue(l, 1);
-	stratagus::unit_type *unittype = CclGetUnitType(l);
+	wyrmgus::unit_type *unittype = CclGetUnitType(l);
 	if (unittype == nullptr) {
 		LuaError(l, "Bad unittype");
 	}
@@ -1032,7 +1032,7 @@ static int CclCreateBuildingAtRandomLocationNear(lua_State *l)
 	LuaCheckArgs(l, 4);
 
 	lua_pushvalue(l, 1);
-	stratagus::unit_type *unittype = CclGetUnitType(l);
+	wyrmgus::unit_type *unittype = CclGetUnitType(l);
 	if (unittype == nullptr) {
 		LuaError(l, "Bad unittype");
 	}
@@ -1106,9 +1106,9 @@ static int CclTransformUnit(lua_State *l)
 	CUnit *targetUnit = CclGetUnit(l);
 	lua_pop(l, 1);
 	lua_pushvalue(l, 2);
-	const stratagus::unit_type *unittype = TriggerGetUnitType(l);
+	const wyrmgus::unit_type *unittype = TriggerGetUnitType(l);
 	lua_pop(l, 1);
-	CommandUpgradeTo(*targetUnit, *(stratagus::unit_type *)unittype, 1);
+	CommandUpgradeTo(*targetUnit, *(wyrmgus::unit_type *)unittype, 1);
 	lua_pushvalue(l, 1);
 	return 1;
 }
@@ -1206,7 +1206,7 @@ static int CclOrderUnit(lua_State *l)
 	const int plynr = TriggerGetPlayer(l);
 	lua_pop(l, 1);
 	lua_pushvalue(l, 2);
-	const stratagus::unit_type *unittype = TriggerGetUnitType(l);
+	const wyrmgus::unit_type *unittype = TriggerGetUnitType(l);
 	lua_pop(l, 1);
 	if (!lua_istable(l, 3)) {
 		LuaError(l, "incorrect argument");
@@ -1288,7 +1288,7 @@ static int CclOrderUnit(lua_State *l)
 class HasSameUnitTypeAs
 {
 public:
-	explicit HasSameUnitTypeAs(const stratagus::unit_type *_type) : type(_type) {}
+	explicit HasSameUnitTypeAs(const wyrmgus::unit_type *_type) : type(_type) {}
 	bool operator()(const CUnit *unit) const
 	{
 		return (type == ANY_UNIT || type == unit->Type
@@ -1296,7 +1296,7 @@ public:
 				|| (type == ALL_BUILDINGS && unit->Type->BoolFlag[BUILDING_INDEX].value));
 	}
 private:
-	const stratagus::unit_type *type;
+	const wyrmgus::unit_type *type;
 };
 
 
@@ -1344,7 +1344,7 @@ static int CclKillUnitAt(lua_State *l)
 	LuaCheckArgs(l, 5);
 
 	lua_pushvalue(l, 1);
-	const stratagus::unit_type *unittype = TriggerGetUnitType(l);
+	const wyrmgus::unit_type *unittype = TriggerGetUnitType(l);
 	lua_pop(l, 1);
 	lua_pushvalue(l, 2);
 	int plynr = TriggerGetPlayer(l);
@@ -1425,7 +1425,7 @@ static int CclConvertUnit(lua_State *l)
 	lua_pop(l, 1);
 
 	lua_pushvalue(l, 2);
-	stratagus::unit_type *unittype = CclGetUnitType(l);
+	wyrmgus::unit_type *unittype = CclGetUnitType(l);
 	if (unittype == nullptr) {
 		LuaError(l, "Bad unittype");
 	}
@@ -1954,7 +1954,7 @@ static int CclSetUnitVariable(lua_State *l)
 		if (spell_ident.empty()) {
 			unit->SetSpell(nullptr);
 		} else {
-			unit->SetSpell(stratagus::spell::get(spell_ident));
+			unit->SetSpell(wyrmgus::spell::get(spell_ident));
 		}
 	} else if (!strcmp(name, "Work")) { //add a literary work property to the unit
 		LuaCheckArgs(l, 3);
@@ -1978,7 +1978,7 @@ static int CclSetUnitVariable(lua_State *l)
 		if (unique_name.empty()) {
 			unit->SetUnique(nullptr);
 		} else {
-			unit->SetUnique(stratagus::unique_item::get(unique_name));
+			unit->SetUnique(wyrmgus::unique_item::get(unique_name));
 		}
 	} else if (!strcmp(name, "GenerateSpecialProperties")) {
 		CPlayer *dropper_player = nullptr;

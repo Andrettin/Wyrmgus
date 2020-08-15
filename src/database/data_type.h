@@ -37,7 +37,7 @@
 #include "database/sml_operator.h"
 #include "util/qunique_ptr.h"
 
-namespace stratagus {
+namespace wyrmgus {
 
 class module;
 

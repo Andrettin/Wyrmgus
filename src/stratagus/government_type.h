@@ -27,7 +27,7 @@
 
 #pragma once
 
-namespace stratagus {
+namespace wyrmgus {
 
 enum class government_type {
 	none,
@@ -71,4 +71,4 @@ inline std::string government_type_to_string(const government_type government_ty
 
 }
 
-Q_DECLARE_METATYPE(stratagus::government_type)
+Q_DECLARE_METATYPE(wyrmgus::government_type)

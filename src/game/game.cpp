@@ -127,7 +127,7 @@ bool DefiningData = false;
 extern gcn::Gui *Gui;
 static std::vector<gcn::Container *> Containers;
 
-namespace stratagus {
+namespace wyrmgus {
 
 void game::apply_player_history()
 {
@@ -195,7 +195,7 @@ void game::apply_player_history()
 			}
 		}
 
-		for (std::map<std::pair<CDate, stratagus::faction *>, diplomacy_state>::iterator iterator = faction->HistoricalDiplomacyStates.begin(); iterator != faction->HistoricalDiplomacyStates.end(); ++iterator) { //set the appropriate historical diplomacy states to other factions
+		for (std::map<std::pair<CDate, wyrmgus::faction *>, diplomacy_state>::iterator iterator = faction->HistoricalDiplomacyStates.begin(); iterator != faction->HistoricalDiplomacyStates.end(); ++iterator) { //set the appropriate historical diplomacy states to other factions
 			if (iterator->first.first.Year == 0 || start_date.ContainsDate(iterator->first.first)) {
 				CPlayer *diplomacy_state_player = GetFactionPlayer(iterator->first.second);
 				if (diplomacy_state_player) {
@@ -210,7 +210,7 @@ void game::apply_player_history()
 		}
 
 		for (const auto &kv_pair : faction->get_diplomacy_states()) {
-			const stratagus::faction *other_faction = kv_pair.first;
+			const wyrmgus::faction *other_faction = kv_pair.first;
 			const diplomacy_state state = kv_pair.second;
 
 			CPlayer *diplomacy_state_player = GetFactionPlayer(other_faction);
@@ -546,7 +546,7 @@ int WriteMapSetup(const char *mapSetup, CMap &map, int writeTerrain, bool is_mod
 		std::string mod_file(mapSetup);
 		mod_file = FindAndReplaceStringBeginning(mod_file, StratagusLibPath + "/", "");
 		
-		for (const stratagus::faction *faction : stratagus::faction::get_all()) {
+		for (const wyrmgus::faction *faction : wyrmgus::faction::get_all()) {
 			if (faction->Mod != CMap::Map.Info.Filename) {
 				continue;
 			}
@@ -558,7 +558,7 @@ int WriteMapSetup(const char *mapSetup, CMap &map, int writeTerrain, bool is_mod
 				f->printf("\tType = \"%s\",\n", GetFactionTypeNameById(faction->Type).c_str());
 			}
 			if (faction->ParentFaction != -1) {
-				f->printf("\tParentFaction = \"%s\",\n", stratagus::faction::get_all()[faction->ParentFaction]->get_identifier().c_str());
+				f->printf("\tParentFaction = \"%s\",\n", wyrmgus::faction::get_all()[faction->ParentFaction]->get_identifier().c_str());
 			}
 			if (faction->get_color() != nullptr) {
 				f->printf("\tColor = \"%s\",\n", faction->get_color()->get_identifier().c_str());
@@ -570,7 +570,7 @@ int WriteMapSetup(const char *mapSetup, CMap &map, int writeTerrain, bool is_mod
 			f->printf("})\n\n");
 		}
 		
-		for (const stratagus::unit_type *unit_type : stratagus::unit_type::get_all()) {
+		for (const wyrmgus::unit_type *unit_type : wyrmgus::unit_type::get_all()) {
 			if (unit_type->Mod != CMap::Map.Info.Filename) {
 				continue;
 			}
@@ -586,7 +586,7 @@ int WriteMapSetup(const char *mapSetup, CMap &map, int writeTerrain, bool is_mod
 				f->printf("\tCivilization = \"%s\",\n", unit_type->get_civilization()->get_identifier().c_str());
 			}
 			if (unit_type->Faction != -1) {
-				f->printf("\tFaction = \"%s\",\n", stratagus::faction::get_all()[unit_type->Faction]->get_identifier().c_str());
+				f->printf("\tFaction = \"%s\",\n", wyrmgus::faction::get_all()[unit_type->Faction]->get_identifier().c_str());
 			}
 			if (unit_type->get_unit_class() != nullptr) {
 				f->printf("\tClass = \"%s\",\n", unit_type->get_unit_class()->get_identifier().c_str());
@@ -619,7 +619,7 @@ int WriteMapSetup(const char *mapSetup, CMap &map, int writeTerrain, bool is_mod
 			f->printf("},\n");
 			f->printf("\tUnitStock = {");
 			for (const auto &kv_pair : unit_type->DefaultStat.UnitStock) {
-				const stratagus::unit_type *unit_type = stratagus::unit_type::get_all()[kv_pair.first];
+				const wyrmgus::unit_type *unit_type = wyrmgus::unit_type::get_all()[kv_pair.first];
 				const int unit_stock = kv_pair.second;
 
 				if (unit_stock != 0 && (!unit_type->Parent || unit_stock != unit_type->Parent->DefaultStat.GetUnitStock(unit_type))) {
@@ -730,7 +730,7 @@ int WriteMapSetup(const char *mapSetup, CMap &map, int writeTerrain, bool is_mod
 		}
 		
 		//save the definition of trained unit types separately, to avoid issues like a trained unit being defined after the unit that trains it
-		for (const stratagus::unit_type *unit_type : stratagus::unit_type::get_all()) {
+		for (const wyrmgus::unit_type *unit_type : wyrmgus::unit_type::get_all()) {
 			if (unit_type->Mod != CMap::Map.Info.Filename) {
 				continue;
 			}
@@ -748,7 +748,7 @@ int WriteMapSetup(const char *mapSetup, CMap &map, int writeTerrain, bool is_mod
 			}
 		}		
 
-		for (stratagus::unit_type *unit_type : stratagus::unit_type::get_all()) {
+		for (wyrmgus::unit_type *unit_type : wyrmgus::unit_type::get_all()) {
 			if (unit_type->ModTrains.find(CMap::Map.Info.Filename) != unit_type->ModTrains.end()) {
 				f->printf("SetModTrains(\"%s\", \"%s\", {", mod_file.c_str(), unit_type->Ident.c_str());
 				for (size_t j = 0; j < unit_type->ModTrains[CMap::Map.Info.Filename].size(); ++j) {
@@ -816,10 +816,10 @@ int WriteMapSetup(const char *mapSetup, CMap &map, int writeTerrain, bool is_mod
 						  i, DefaultResourceNames[StoneCost].c_str(),
 						  CPlayer::Players[i]->Resources[StoneCost]);
 				f->printf("SetPlayerData(%d, \"RaceName\", \"%s\")\n",
-						  i, stratagus::civilization::get_all()[CPlayer::Players[i]->Race]->get_identifier().c_str());
+						  i, wyrmgus::civilization::get_all()[CPlayer::Players[i]->Race]->get_identifier().c_str());
 				if (CPlayer::Players[i]->Faction != -1) {
 					f->printf("SetPlayerData(%d, \"Faction\", \"%s\")\n",
-							  i, stratagus::faction::get_all()[CPlayer::Players[i]->Faction]->get_identifier().c_str());
+							  i, wyrmgus::faction::get_all()[CPlayer::Players[i]->Faction]->get_identifier().c_str());
 				}
 				f->printf("SetAiType(%d, \"%s\")\n",
 						  i, CPlayer::Players[i]->AiName.c_str());
@@ -857,7 +857,7 @@ int WriteMapSetup(const char *mapSetup, CMap &map, int writeTerrain, bool is_mod
 		}
 			
 		f->printf("\n-- set map default stat and map sound for unit types\n");
-		for (stratagus::unit_type *unit_type : stratagus::unit_type::get_all()) {
+		for (wyrmgus::unit_type *unit_type : wyrmgus::unit_type::get_all()) {
 			if (unit_type->ModDefaultStats.find(CMap::Map.Info.Filename) != unit_type->ModDefaultStats.end()) {
 				for (unsigned int j = 0; j < MaxCosts; ++j) {
 					if (unit_type->ModDefaultStats[CMap::Map.Info.Filename].Costs[j] != 0) {
@@ -871,7 +871,7 @@ int WriteMapSetup(const char *mapSetup, CMap &map, int writeTerrain, bool is_mod
 				}
 
 				for (const auto &kv_pair : unit_type->ModDefaultStats[CMap::Map.Info.Filename].UnitStock) {
-					const stratagus::unit_type *unit_type = stratagus::unit_type::get_all()[kv_pair.first];
+					const wyrmgus::unit_type *unit_type = wyrmgus::unit_type::get_all()[kv_pair.first];
 					const int unit_stock = kv_pair.second;
 
 					if (unit_stock != 0) {
@@ -1229,13 +1229,13 @@ static void GameTypeMelee()
 			}
 
 			if (CPlayer::Players[i]->Type == PlayerComputer && CPlayer::Players[j]->Type == PlayerComputer) {
-				CommandDiplomacy(i, stratagus::diplomacy_state::allied, j);
+				CommandDiplomacy(i, wyrmgus::diplomacy_state::allied, j);
 				CPlayer::Players[i]->ShareVisionWith(*CPlayer::Players[j]);
-				CommandDiplomacy(j, stratagus::diplomacy_state::allied, i);
+				CommandDiplomacy(j, wyrmgus::diplomacy_state::allied, i);
 				CPlayer::Players[j]->ShareVisionWith(*CPlayer::Players[i]);
 			} else {
-				CommandDiplomacy(i, stratagus::diplomacy_state::enemy, j);
-				CommandDiplomacy(j, stratagus::diplomacy_state::enemy, i);
+				CommandDiplomacy(i, wyrmgus::diplomacy_state::enemy, j);
+				CommandDiplomacy(j, wyrmgus::diplomacy_state::enemy, i);
 			}
 		}
 	}
@@ -1257,8 +1257,8 @@ static void GameTypeFreeForAll()
 				continue;
 			}
 			
-			CommandDiplomacy(i, stratagus::diplomacy_state::enemy, j);
-			CommandDiplomacy(j, stratagus::diplomacy_state::enemy, i);
+			CommandDiplomacy(i, wyrmgus::diplomacy_state::enemy, j);
+			CommandDiplomacy(j, wyrmgus::diplomacy_state::enemy, i);
 		}
 	}
 }
@@ -1285,13 +1285,13 @@ static void GameTypeTopVsBottom()
 			const bool top_j = CPlayer::Players[j]->StartPos.y <= middle;
 
 			if (top_i == top_j) {
-				CommandDiplomacy(i, stratagus::diplomacy_state::allied, j);
+				CommandDiplomacy(i, wyrmgus::diplomacy_state::allied, j);
 				CPlayer::Players[i]->ShareVisionWith(*CPlayer::Players[j]);
-				CommandDiplomacy(j, stratagus::diplomacy_state::allied, i);
+				CommandDiplomacy(j, wyrmgus::diplomacy_state::allied, i);
 				CPlayer::Players[j]->ShareVisionWith(*CPlayer::Players[i]);
 			} else {
-				CommandDiplomacy(i, stratagus::diplomacy_state::enemy, j);
-				CommandDiplomacy(j, stratagus::diplomacy_state::enemy, i);
+				CommandDiplomacy(i, wyrmgus::diplomacy_state::enemy, j);
+				CommandDiplomacy(j, wyrmgus::diplomacy_state::enemy, i);
 			}
 		}
 	}
@@ -1319,13 +1319,13 @@ static void GameTypeLeftVsRight()
 			const bool left_j = CPlayer::Players[j]->StartPos.x <= middle;
 
 			if (left_i == left_j) {
-				CommandDiplomacy(i, stratagus::diplomacy_state::allied, j);
+				CommandDiplomacy(i, wyrmgus::diplomacy_state::allied, j);
 				CPlayer::Players[i]->ShareVisionWith(*CPlayer::Players[j]);
-				CommandDiplomacy(j, stratagus::diplomacy_state::allied, i);
+				CommandDiplomacy(j, wyrmgus::diplomacy_state::allied, i);
 				CPlayer::Players[j]->ShareVisionWith(*CPlayer::Players[i]);
 			} else {
-				CommandDiplomacy(i, stratagus::diplomacy_state::enemy, j);
-				CommandDiplomacy(j, stratagus::diplomacy_state::enemy, i);
+				CommandDiplomacy(i, wyrmgus::diplomacy_state::enemy, j);
+				CommandDiplomacy(j, wyrmgus::diplomacy_state::enemy, i);
 			}
 		}
 	}
@@ -1353,13 +1353,13 @@ static void GameTypeManVsMachine()
 			}
 
 			if (CPlayer::Players[i]->Type == CPlayer::Players[j]->Type) {
-				CommandDiplomacy(i, stratagus::diplomacy_state::allied, j);
+				CommandDiplomacy(i, wyrmgus::diplomacy_state::allied, j);
 				CPlayer::Players[i]->ShareVisionWith(*CPlayer::Players[j]);
-				CommandDiplomacy(j, stratagus::diplomacy_state::allied, i);
+				CommandDiplomacy(j, wyrmgus::diplomacy_state::allied, i);
 				CPlayer::Players[j]->ShareVisionWith(*CPlayer::Players[i]);
 			} else {
-				CommandDiplomacy(i, stratagus::diplomacy_state::enemy, j);
-				CommandDiplomacy(j, stratagus::diplomacy_state::enemy, i);
+				CommandDiplomacy(i, wyrmgus::diplomacy_state::enemy, j);
+				CommandDiplomacy(j, wyrmgus::diplomacy_state::enemy, i);
 			}
 		}
 	}
@@ -1385,10 +1385,10 @@ static void GameTypeManTeamVsMachine()
 
 			if (i != j) {
 				if (CPlayer::Players[i]->Type == CPlayer::Players[j]->Type) {
-					CommandDiplomacy(i, stratagus::diplomacy_state::allied, j);
+					CommandDiplomacy(i, wyrmgus::diplomacy_state::allied, j);
 					CPlayer::Players[i]->ShareVisionWith(*CPlayer::Players[j]);
 				} else {
-					CommandDiplomacy(i, stratagus::diplomacy_state::enemy, j);
+					CommandDiplomacy(i, wyrmgus::diplomacy_state::enemy, j);
 				}
 			}
 		}
@@ -1594,12 +1594,12 @@ void CreateGame(const std::string &filename, CMap *map, bool is_mod)
 	//Wyrmgus start
 	if (IsNetworkGame()) { // if is a network game, it is necessary to reinitialize the syncrand variables before beginning to load the map, due to random map generation
 		SyncHash = 0;
-		stratagus::random::get()->reset_seed(true);
+		wyrmgus::random::get()->reset_seed(true);
 	}
 	
-	const stratagus::campaign *current_campaign = stratagus::game::get()->get_current_campaign();
+	const wyrmgus::campaign *current_campaign = wyrmgus::game::get()->get_current_campaign();
 	if (current_campaign) {
-		stratagus::game::get()->set_current_date(current_campaign->get_start_date());
+		wyrmgus::game::get()->set_current_date(current_campaign->get_start_date());
 	} else {
 		const int year = 1;
 		const int month = SyncRand(CDate::months_per_year) + 1;
@@ -1607,12 +1607,12 @@ void CreateGame(const std::string &filename, CMap *map, bool is_mod)
 		const int hour = SyncRand(CDate::hours_per_day);
 		QDate date(year, month, day);;
 		QDateTime date_time(date, QTime(hour, 0));
-		stratagus::game::get()->set_current_date(date_time);
+		wyrmgus::game::get()->set_current_date(date_time);
 	}
 	
-	CDate::CurrentTotalHours = CDate(stratagus::game::get()->get_current_date()).GetTotalHours();
+	CDate::CurrentTotalHours = CDate(wyrmgus::game::get()->get_current_date()).GetTotalHours();
 
-	stratagus::age::current_age = nullptr;
+	wyrmgus::age::current_age = nullptr;
 	//Wyrmgus end
 
 	if (CMap::Map.Info.Filename.empty() && !filename.empty()) {
@@ -1659,7 +1659,7 @@ void CreateGame(const std::string &filename, CMap *map, bool is_mod)
 	GameCycle = 0;
 	FastForwardCycle = 0;
 	SyncHash = 0;
-	stratagus::random::get()->reset_seed(IsNetworkGame());
+	wyrmgus::random::get()->reset_seed(IsNetworkGame());
 
 	if (IsNetworkGame()) { // Prepare network play
 		NetworkOnStartGame();
@@ -1736,7 +1736,7 @@ void CreateGame(const std::string &filename, CMap *map, bool is_mod)
 	UnitUnderCursor = NoUnitP;
 
 	//Wyrmgus start
-	stratagus::terrain_type::LoadTerrainTypeGraphics();
+	wyrmgus::terrain_type::LoadTerrainTypeGraphics();
 	//Wyrmgus end
 	InitMissileTypes();
 #ifndef DYNAMIC_LOAD
@@ -1797,7 +1797,7 @@ void CreateGame(const std::string &filename, CMap *map, bool is_mod)
 	//
 	// Triggers
 	//
-	stratagus::trigger::InitActiveTriggers();
+	wyrmgus::trigger::InitActiveTriggers();
 	
 	SetDefaultTextColors(UI.NormalFontColor, UI.ReverseFontColor);
 
@@ -1873,7 +1873,7 @@ void CleanGame()
 	CleanMessages();
 
 	CleanGame_Lua();
-	stratagus::trigger::ClearActiveTriggers();
+	wyrmgus::trigger::ClearActiveTriggers();
 	CleanAi();
 	CleanGroups();
 	CleanMissiles();
@@ -2110,7 +2110,7 @@ static int CclDefineResource(lua_State *l)
 	if (resource_id == -1) {
 		LuaError(l, "Resource \"%s\" doesn't exist." _C_ resource_ident.c_str());
 	}
-	stratagus::resource *resource = stratagus::resource::get_all()[resource_id];
+	wyrmgus::resource *resource = wyrmgus::resource::get_all()[resource_id];
 	resource->FinalResource = resource_id;
 	
 	//  Parse the list:
@@ -2134,7 +2134,7 @@ static int CclDefineResource(lua_State *l)
 				LuaError(l, "Resource \"%s\" doesn't exist." _C_ final_resource_ident.c_str());
 			}
 			resource->FinalResource = final_resource_id;
-			stratagus::resource::get_all()[final_resource_id]->ChildResources.push_back(resource);
+			wyrmgus::resource::get_all()[final_resource_id]->ChildResources.push_back(resource);
 		} else if (!strcmp(value, "FinalResourceConversionRate")) {
 			resource->FinalResourceConversionRate = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "LuxuryResource")) {
@@ -2172,13 +2172,13 @@ static int CclDefineDefaultResourceNames(lua_State *l)
 		DefaultResourceNames[i].clear();
 	}
 
-	stratagus::resource::clear();
+	wyrmgus::resource::clear();
 	
 	const unsigned int args = lua_gettop(l);
 	for (unsigned int i = 0; i < MaxCosts && i < args; ++i) {
 		DefaultResourceNames[i] = LuaToString(l, i + 1);
 		
-		stratagus::resource *resource = stratagus::resource::add(DefaultResourceNames[i], nullptr);
+		wyrmgus::resource *resource = wyrmgus::resource::add(DefaultResourceNames[i], nullptr);
 		resource->ID = i;
 	}
 	
@@ -2278,7 +2278,7 @@ static int CclSavedGameInfo(lua_State *l)
 		} else if (!strcmp(value, "SyncHash")) {
 			SyncHash = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "SyncRandSeed")) {
-			stratagus::random::get()->set_seed(LuaToNumber(l, -1));
+			wyrmgus::random::get()->set_seed(LuaToNumber(l, -1));
 		} else {
 			LuaError(l, "Unsupported tag: %s" _C_ value);
 		}

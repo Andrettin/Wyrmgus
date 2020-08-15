@@ -82,7 +82,7 @@ class CMapLayer;
 class CTileset;
 class CUnit;
 
-namespace stratagus {
+namespace wyrmgus {
 	class faction;
 	class generated_terrain;
 	class map_template;
@@ -178,7 +178,7 @@ public:
 	void ClearMapLayers();
 	
 	//Wyrmgus start
-	void SetTileTerrain(const Vec2i &pos, stratagus::terrain_type *terrain, int z);
+	void SetTileTerrain(const Vec2i &pos, wyrmgus::terrain_type *terrain, int z);
 	void RemoveTileOverlayTerrain(const Vec2i &pos, int z);
 	void SetOverlayTerrainDestroyed(const Vec2i &pos, bool destroyed, int z);
 	void SetOverlayTerrainDamaged(const Vec2i &pos, bool damaged, int z);
@@ -191,13 +191,13 @@ public:
 	void AdjustTileMapIrregularities(const bool overlay, const Vec2i &min_pos, const Vec2i &max_pos, const int z);
 	void AdjustTileMapTransitions(const Vec2i &min_pos, const Vec2i &max_pos, int z);
 	void adjust_territory_irregularities(const QPoint &min_pos, const QPoint &max_pos, const int z);
-	void GenerateTerrain(const std::unique_ptr<stratagus::generated_terrain> &generated_terrain, const Vec2i &min_pos, const Vec2i &max_pos, const bool preserve_coastline, const int z);
-	bool CanTileBePartOfMissingTerrainGeneration(const CMapField *tile, const stratagus::terrain_type *terrain_type, const stratagus::terrain_type *overlay_terrain_type) const;
+	void GenerateTerrain(const std::unique_ptr<wyrmgus::generated_terrain> &generated_terrain, const Vec2i &min_pos, const Vec2i &max_pos, const bool preserve_coastline, const int z);
+	bool CanTileBePartOfMissingTerrainGeneration(const CMapField *tile, const wyrmgus::terrain_type *terrain_type, const wyrmgus::terrain_type *overlay_terrain_type) const;
 	void generate_missing_terrain(const Vec2i &min_pos, const Vec2i &max_pos, const int z);
 	void generate_settlement_territories(const int z);
-	stratagus::point_set expand_settlement_territories(std::vector<QPoint> &&seeds, const int z, const int block_flags = 0, const int same_flags = 0);
+	wyrmgus::point_set expand_settlement_territories(std::vector<QPoint> &&seeds, const int z, const int block_flags = 0, const int same_flags = 0);
 	void calculate_settlement_territory_border_tiles(const int z);
-	void GenerateNeutralUnits(stratagus::unit_type *unit_type, int quantity, const Vec2i &min_pos, const Vec2i &max_pos, bool grouped, int z);
+	void GenerateNeutralUnits(wyrmgus::unit_type *unit_type, int quantity, const Vec2i &min_pos, const Vec2i &max_pos, bool grouped, int z);
 	//Wyrmgus end
 
 	void ClearOverlayTile(const Vec2i &pos, int z);
@@ -213,10 +213,10 @@ public:
 	PixelPos tile_pos_to_scaled_map_pixel_pos_center(const Vec2i &tilePos) const;
 	
 	//Wyrmgus start
-	stratagus::terrain_type *GetTileTerrain(const Vec2i &pos, const bool overlay, const int z) const;
-	stratagus::terrain_type *GetTileTopTerrain(const Vec2i &pos, const bool seen, const int z, const bool ignore_destroyed = false) const;
+	wyrmgus::terrain_type *GetTileTerrain(const Vec2i &pos, const bool overlay, const int z) const;
+	wyrmgus::terrain_type *GetTileTopTerrain(const Vec2i &pos, const bool seen, const int z, const bool ignore_destroyed = false) const;
 	int GetTileLandmass(const Vec2i &pos, int z) const;
-	Vec2i GenerateUnitLocation(const stratagus::unit_type *unit_type, const stratagus::faction *faction, const Vec2i &min_pos, const Vec2i &max_pos, const int z) const;
+	Vec2i GenerateUnitLocation(const wyrmgus::unit_type *unit_type, const wyrmgus::faction *faction, const Vec2i &min_pos, const Vec2i &max_pos, const int z) const;
 	//Wyrmgus end
 
 	/// Mark a tile as seen by the player.
@@ -244,8 +244,8 @@ public:
 	
 	//Wyrmgus start
 	bool CurrentTerrainCanBeAt(const Vec2i &pos, bool overlay, int z);
-	bool TileBordersTerrain(const Vec2i &pos, const stratagus::terrain_type *terrain_type, const int z) const;
-	bool TileBordersOnlySameTerrain(const Vec2i &pos, const stratagus::terrain_type *new_terrain, const int z) const;
+	bool TileBordersTerrain(const Vec2i &pos, const wyrmgus::terrain_type *terrain_type, const int z) const;
+	bool TileBordersOnlySameTerrain(const Vec2i &pos, const wyrmgus::terrain_type *new_terrain, const int z) const;
 	bool TileBordersFlag(const Vec2i &pos, int z, int flag, bool reverse = false) const; // reverse means that it returns true if the tile borders one tile without the flag
 	bool tile_borders_same_settlement_territory(const QPoint &pos, const int z, const bool diagonal_allowed) const;
 	bool tile_borders_other_settlement_territory(const QPoint &pos, const int z) const;
@@ -253,25 +253,25 @@ public:
 	bool TileBordersBuilding(const Vec2i &pos, int z);
 	bool TileBordersPathway(const Vec2i &pos, int z, bool only_railroad);
 	bool TileBordersUnit(const Vec2i &pos, int z);
-	bool TileBordersTerrainIncompatibleWithTerrain(const Vec2i &pos, const stratagus::terrain_type *terrain_type, const int z) const;
-	bool TileHasInnerBorderTerrainsIncompatibleWithOverlayTerrain(const Vec2i &pos, const stratagus::terrain_type *overlay_terrain, const int z);
-	bool TileBordersTerrainIncompatibleWithTerrainPair(const Vec2i &pos, const stratagus::terrain_type *terrain_type, const stratagus::terrain_type *overlay_terrain_type, const int z) const;
-	bool TileHasUnitsIncompatibleWithTerrain(const Vec2i &pos, const stratagus::terrain_type *terrain, const int z);
-	bool is_point_in_a_subtemplate_area(const Vec2i &pos, const int z, const stratagus::map_template *subtemplate = nullptr) const;
-	bool is_subtemplate_on_map(const stratagus::map_template *subtemplate) const;
-	std::pair<Vec2i, Vec2i> get_subtemplate_rect(const stratagus::map_template *subtemplate) const;
-	Vec2i get_subtemplate_pos(const stratagus::map_template *subtemplate) const;
-	Vec2i get_subtemplate_center_pos(const stratagus::map_template *subtemplate) const;
-	Vec2i get_subtemplate_end_pos(const stratagus::map_template *subtemplate) const;
-	CMapLayer *get_subtemplate_map_layer(const stratagus::map_template *subtemplate) const;
-	std::vector<CUnit *> get_map_template_layer_connectors(const stratagus::map_template *map_template) const;
+	bool TileBordersTerrainIncompatibleWithTerrain(const Vec2i &pos, const wyrmgus::terrain_type *terrain_type, const int z) const;
+	bool TileHasInnerBorderTerrainsIncompatibleWithOverlayTerrain(const Vec2i &pos, const wyrmgus::terrain_type *overlay_terrain, const int z);
+	bool TileBordersTerrainIncompatibleWithTerrainPair(const Vec2i &pos, const wyrmgus::terrain_type *terrain_type, const wyrmgus::terrain_type *overlay_terrain_type, const int z) const;
+	bool TileHasUnitsIncompatibleWithTerrain(const Vec2i &pos, const wyrmgus::terrain_type *terrain, const int z);
+	bool is_point_in_a_subtemplate_area(const Vec2i &pos, const int z, const wyrmgus::map_template *subtemplate = nullptr) const;
+	bool is_subtemplate_on_map(const wyrmgus::map_template *subtemplate) const;
+	std::pair<Vec2i, Vec2i> get_subtemplate_rect(const wyrmgus::map_template *subtemplate) const;
+	Vec2i get_subtemplate_pos(const wyrmgus::map_template *subtemplate) const;
+	Vec2i get_subtemplate_center_pos(const wyrmgus::map_template *subtemplate) const;
+	Vec2i get_subtemplate_end_pos(const wyrmgus::map_template *subtemplate) const;
+	CMapLayer *get_subtemplate_map_layer(const wyrmgus::map_template *subtemplate) const;
+	std::vector<CUnit *> get_map_template_layer_connectors(const wyrmgus::map_template *map_template) const;
 	bool is_point_adjacent_to_non_subtemplate_area(const Vec2i &pos, const int z) const;
-	bool is_rect_in_settlement(const QRect &rect, const int z, const stratagus::site *settlement);
+	bool is_rect_in_settlement(const QRect &rect, const int z, const wyrmgus::site *settlement);
 	
-	void SetCurrentPlane(stratagus::plane *plane);
-	void SetCurrentWorld(stratagus::world *world);
-	stratagus::plane *GetCurrentPlane() const;
-	stratagus::world *GetCurrentWorld() const;
+	void SetCurrentPlane(wyrmgus::plane *plane);
+	void SetCurrentWorld(wyrmgus::world *world);
+	wyrmgus::plane *GetCurrentPlane() const;
+	wyrmgus::world *GetCurrentWorld() const;
 	//Wyrmgus end
 
 	//UnitCache
@@ -452,7 +452,7 @@ extern void LoadStratagusMapInfo(const std::string &mapname);
 /// Returns true, if the unit-type(mask can enter field with bounds check
 extern bool CheckedCanMoveToMask(const Vec2i &pos, int mask, int z);
 /// Returns true, if the unit-type can enter the field
-extern bool UnitTypeCanBeAt(const stratagus::unit_type &type, const Vec2i &pos, int z);
+extern bool UnitTypeCanBeAt(const wyrmgus::unit_type &type, const Vec2i &pos, int z);
 /// Returns true, if the unit can enter the field
 extern bool UnitCanBeAt(const CUnit &unit, const Vec2i &pos, int z);
 

@@ -44,7 +44,7 @@
 #include "util/string_util.h"
 #include "util/vector_util.h"
 
-namespace stratagus {
+namespace wyrmgus {
 
 void campaign::initialize_all()
 {
@@ -77,7 +77,7 @@ void campaign::ProcessConfigData(const CConfigData *config_data)
 		} else if (key == "description") {
 			this->set_description(value);
 		} else if (key == "faction") {
-			stratagus::faction *faction = faction::get(value);
+			wyrmgus::faction *faction = faction::get(value);
 			this->faction = faction;
 		} else if (key == "hidden") {
 			this->hidden = string::to_bool(value);
@@ -86,7 +86,7 @@ void campaign::ProcessConfigData(const CConfigData *config_data)
 		} else if (key == "start_date") {
 			this->start_date = string::to_date(value);
 		} else if (key == "required_quest") {
-			stratagus::quest *quest = quest::get(value);
+			wyrmgus::quest *quest = quest::get(value);
 			this->required_quests.push_back(quest);
 		} else {
 			fprintf(stderr, "Invalid campaign property: \"%s\".\n", key.c_str());
@@ -181,7 +181,7 @@ bool campaign::IsAvailable() const
 		return false;
 	}
 
-	for (const stratagus::quest *quest : this->get_required_quests()) {
+	for (const wyrmgus::quest *quest : this->get_required_quests()) {
 		if (!quest->IsCompleted()) {
 			return false;
 		}
@@ -190,7 +190,7 @@ bool campaign::IsAvailable() const
 	return true;
 }
 
-bool campaign::contains_timeline_date(const stratagus::timeline *timeline, const QDateTime &date) const
+bool campaign::contains_timeline_date(const wyrmgus::timeline *timeline, const QDateTime &date) const
 {
 	if (this->get_timeline() == timeline) {
 		return date <= this->get_start_date();
@@ -221,12 +221,12 @@ void campaign::remove_map_template(map_template *map_template)
 void SetCurrentCampaign(const std::string &campaign_ident)
 {
 	if (campaign_ident.empty()) {
-		stratagus::game::get()->set_current_campaign(nullptr);
+		wyrmgus::game::get()->set_current_campaign(nullptr);
 		return;
 	}
 	
-	stratagus::campaign *campaign = stratagus::campaign::get(campaign_ident);
-	stratagus::game::get()->set_current_campaign(campaign);
+	wyrmgus::campaign *campaign = wyrmgus::campaign::get(campaign_ident);
+	wyrmgus::game::get()->set_current_campaign(campaign);
 }
 
 /**
@@ -236,7 +236,7 @@ void SetCurrentCampaign(const std::string &campaign_ident)
 */
 std::string GetCurrentCampaign()
 {
-	const stratagus::campaign *current_campaign = stratagus::game::get()->get_current_campaign();
+	const wyrmgus::campaign *current_campaign = wyrmgus::game::get()->get_current_campaign();
 	
 	if (!current_campaign) {
 		return "";
@@ -247,8 +247,8 @@ std::string GetCurrentCampaign()
 
 std::string get_selected_campaign()
 {
-	if (stratagus::preferences::get()->get_selected_campaign() != nullptr) {
-		return stratagus::preferences::get()->get_selected_campaign()->get_identifier();
+	if (wyrmgus::preferences::get()->get_selected_campaign() != nullptr) {
+		return wyrmgus::preferences::get()->get_selected_campaign()->get_identifier();
 	}
 
 	return std::string();
@@ -257,8 +257,8 @@ std::string get_selected_campaign()
 void set_selected_campaign(const std::string campaign_identifier)
 {
 	if (!campaign_identifier.empty()) {
-		stratagus::preferences::get()->set_selected_campaign(stratagus::campaign::get(campaign_identifier));
+		wyrmgus::preferences::get()->set_selected_campaign(wyrmgus::campaign::get(campaign_identifier));
 	} else {
-		stratagus::preferences::get()->set_selected_campaign(nullptr);
+		wyrmgus::preferences::get()->set_selected_campaign(nullptr);
 	}
 }

@@ -35,7 +35,7 @@ class CSchoolOfMagic;
 class CSeasonSchedule;
 class CTimeOfDaySchedule;
 
-namespace stratagus {
+namespace wyrmgus {
 
 class deity_domain;
 class species;

@@ -33,7 +33,7 @@
 
 int main(int argc, char **argv)
 {
-	using namespace stratagus;
+	using namespace wyrmgus;
 
 	try {
 		QApplication app(argc, argv);

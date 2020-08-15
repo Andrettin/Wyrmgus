@@ -70,7 +70,7 @@ static constexpr int ScoreCost = MaxCosts + 1;
 static constexpr int ManaResCost = MaxCosts + 2;
 static constexpr int FreeWorkersCount = MaxCosts + 3;
 
-namespace stratagus {
+namespace wyrmgus {
 
 class resource : public named_data_entry, public data_type<resource>
 {

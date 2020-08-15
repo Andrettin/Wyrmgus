@@ -38,7 +38,7 @@
 #include "unit/unit_type.h"
 #include "util/string_util.h"
 
-namespace stratagus {
+namespace wyrmgus {
 
 dialogue::dialogue(const std::string &identifier) : data_entry(identifier)
 {
@@ -249,18 +249,18 @@ void dialogue_node::option_effect(const int option_index, CPlayer *player) const
 
 void CallDialogue(const std::string &dialogue_ident, int player)
 {
-	stratagus::dialogue *dialogue = stratagus::dialogue::get(dialogue_ident);
+	wyrmgus::dialogue *dialogue = wyrmgus::dialogue::get(dialogue_ident);
 	dialogue->call(CPlayer::Players.at(player));
 }
 
 void CallDialogueNode(const std::string &dialogue_ident, int node, int player)
 {
-	stratagus::dialogue *dialogue = stratagus::dialogue::get(dialogue_ident);
+	wyrmgus::dialogue *dialogue = wyrmgus::dialogue::get(dialogue_ident);
 	dialogue->call_node(node, CPlayer::Players.at(player));
 }
 
 void CallDialogueNodeOptionEffect(const std::string &dialogue_ident, int node, int option, int player)
 {
-	stratagus::dialogue *dialogue = stratagus::dialogue::get(dialogue_ident);
+	wyrmgus::dialogue *dialogue = wyrmgus::dialogue::get(dialogue_ident);
 	dialogue->call_node_option_effect(node, option, CPlayer::Players.at(player));
 }

@@ -143,21 +143,21 @@ void CPlayer::Load(lua_State *l)
 			}
 		} else if (!strcmp(value, "race")) {
 			const char *civilization_ident = LuaToString(l, j + 1);
-			stratagus::civilization *civilization = stratagus::civilization::get(civilization_ident);
+			wyrmgus::civilization *civilization = wyrmgus::civilization::get(civilization_ident);
 			this->Race = civilization->ID;
 		//Wyrmgus start
 		} else if (!strcmp(value, "faction")) {
 			this->Faction = LuaToNumber(l, j + 1);
 		} else if (!strcmp(value, "faction-tier")) {
-			this->faction_tier = stratagus::string_to_faction_tier(LuaToString(l, j + 1));
+			this->faction_tier = wyrmgus::string_to_faction_tier(LuaToString(l, j + 1));
 		} else if (!strcmp(value, "government-type")) {
-			this->government_type = stratagus::string_to_government_type(LuaToString(l, j + 1));
+			this->government_type = wyrmgus::string_to_government_type(LuaToString(l, j + 1));
 		} else if (!strcmp(value, "dynasty")) {
-			this->dynasty = stratagus::dynasty::get(LuaToString(l, j + 1));
+			this->dynasty = wyrmgus::dynasty::get(LuaToString(l, j + 1));
 		} else if (!strcmp(value, "age")) {
-			this->age = stratagus::age::get(LuaToString(l, j + 1));
+			this->age = wyrmgus::age::get(LuaToString(l, j + 1));
 		} else if (!strcmp(value, "player-color")) {
-			this->player_color = stratagus::player_color::get(LuaToString(l, j + 1));
+			this->player_color = wyrmgus::player_color::get(LuaToString(l, j + 1));
 		//Wyrmgus end
 		} else if (!strcmp(value, "ai-name")) {
 			this->AiName = LuaToString(l, j + 1);
@@ -198,7 +198,7 @@ void CPlayer::Load(lua_State *l)
 		} else if (!strcmp(value, "overlord")) {
 			const int overlord_id = LuaToNumber(l, j + 1);
 			++j;
-			const stratagus::vassalage_type vassalage_type = stratagus::string_to_vassalage_type(LuaToString(l, j + 1));
+			const wyrmgus::vassalage_type vassalage_type = wyrmgus::string_to_vassalage_type(LuaToString(l, j + 1));
 			this->set_overlord(CPlayer::Players[overlord_id], vassalage_type);
 		//Wyrmgus end
 		} else if (!strcmp(value, "resources")) {
@@ -324,7 +324,7 @@ void CPlayer::Load(lua_State *l)
 			}
 			const int subargs = lua_rawlen(l, j + 1);
 			for (int k = 0; k < subargs; ++k) {
-				stratagus::unit_type *unit_type = stratagus::unit_type::get(LuaToString(l, j + 1, k + 1));
+				wyrmgus::unit_type *unit_type = wyrmgus::unit_type::get(LuaToString(l, j + 1, k + 1));
 				++k;
 				this->UnitTypeKills[unit_type->Slot] = LuaToNumber(l, j + 1, k + 1);
 			}
@@ -408,7 +408,7 @@ void CPlayer::Load(lua_State *l)
 			}
 			const int subargs = lua_rawlen(l, j + 1);
 			for (int k = 0; k < subargs; ++k) {
-				stratagus::quest *quest = stratagus::quest::get(LuaToString(l, j + 1, k + 1));
+				wyrmgus::quest *quest = wyrmgus::quest::get(LuaToString(l, j + 1, k + 1));
 				this->current_quests.push_back(quest);
 			}
 		} else if (!strcmp(value, "completed-quests")) {
@@ -417,7 +417,7 @@ void CPlayer::Load(lua_State *l)
 			}
 			const int subargs = lua_rawlen(l, j + 1);
 			for (int k = 0; k < subargs; ++k) {
-				stratagus::quest *quest = stratagus::quest::get(LuaToString(l, j + 1, k + 1));
+				wyrmgus::quest *quest = wyrmgus::quest::get(LuaToString(l, j + 1, k + 1));
 				this->completed_quests.push_back(quest);
 				if (quest->Competitive) {
 					quest->CurrentCompleted = true;
@@ -430,8 +430,8 @@ void CPlayer::Load(lua_State *l)
 			const int subargs = lua_rawlen(l, j + 1);
 			for (int k = 0; k < subargs; ++k) {
 				lua_rawgeti(l, j + 1, k + 1);
-				const stratagus::quest *quest = nullptr;
-				stratagus::player_quest_objective *objective = nullptr;
+				const wyrmgus::quest *quest = nullptr;
+				wyrmgus::player_quest_objective *objective = nullptr;
 				if (!lua_istable(l, -1)) {
 					LuaError(l, "incorrect argument (expected table for quest objectives)");
 				}
@@ -440,10 +440,10 @@ void CPlayer::Load(lua_State *l)
 					value = LuaToString(l, -1, n + 1);
 					++n;
 					if (!strcmp(value, "quest")) {
-						quest = stratagus::quest::get(LuaToString(l, -1, n + 1));
+						quest = wyrmgus::quest::get(LuaToString(l, -1, n + 1));
 					} else if (!strcmp(value, "objective-index")) {
 						const int objective_index = LuaToNumber(l, -1, n + 1);
-						auto objective_unique_ptr = std::make_unique<stratagus::player_quest_objective>(quest->get_objectives()[objective_index].get());
+						auto objective_unique_ptr = std::make_unique<wyrmgus::player_quest_objective>(quest->get_objectives()[objective_index].get());
 						objective = objective_unique_ptr.get();
 						this->quest_objectives.push_back(std::move(objective_unique_ptr));
 					} else if (!strcmp(value, "counter")) {
@@ -502,7 +502,7 @@ void CPlayer::Load(lua_State *l)
 	// Manage max
 	for (int i = 0; i < MaxCosts; ++i) {
 		if (this->MaxResources[i] != -1) {
-			this->set_resource(stratagus::resource::get_all()[i], this->Resources[i] + this->StoredResources[i], STORE_BOTH);
+			this->set_resource(wyrmgus::resource::get_all()[i], this->Resources[i] + this->StoredResources[i], STORE_BOTH);
 		}
 	}
 }
@@ -646,7 +646,7 @@ static int CclSetDiplomacy(lua_State *l)
 	const int plynr = LuaToNumber(l, 3);
 	const char *state = LuaToString(l, 2);
 
-	SendCommandDiplomacy(base, stratagus::string_to_diplomacy_state(state), plynr);
+	SendCommandDiplomacy(base, wyrmgus::string_to_diplomacy_state(state), plynr);
 	return 0;
 }
 
@@ -708,7 +708,7 @@ static int CclDefineCivilization(lua_State *l)
 	}
 
 	std::string civilization_name = LuaToString(l, 1);
-	stratagus::civilization *civilization = stratagus::civilization::get_or_add(civilization_name, nullptr);
+	wyrmgus::civilization *civilization = wyrmgus::civilization::get_or_add(civilization_name, nullptr);
 	int civilization_id = civilization->ID;
 	
 	//  Parse the list:
@@ -731,11 +731,11 @@ static int CclDefineCivilization(lua_State *l)
 		} else if (!strcmp(value, "Playable")) {
 			civilization->playable = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "Species")) {
-			civilization->set_species(stratagus::species::get(LuaToString(l, -1)));
+			civilization->set_species(wyrmgus::species::get(LuaToString(l, -1)));
 		} else if (!strcmp(value, "Group")) {
-			civilization->group = stratagus::civilization_group::get(LuaToString(l, -1));
+			civilization->group = wyrmgus::civilization_group::get(LuaToString(l, -1));
 		} else if (!strcmp(value, "ParentCivilization")) {
-			civilization->parent_civilization = stratagus::civilization::get(LuaToString(l, -1));
+			civilization->parent_civilization = wyrmgus::civilization::get(LuaToString(l, -1));
 		} else if (!strcmp(value, "Language")) {
 			CLanguage *language = PlayerRaces.GetLanguage(LuaToString(l, -1));
 			if (language) {
@@ -745,7 +745,7 @@ static int CclDefineCivilization(lua_State *l)
 				LuaError(l, "Language not found.");
 			}
 		} else if (!strcmp(value, "Calendar")) {
-			stratagus::calendar *calendar = stratagus::calendar::get(LuaToString(l, -1));
+			wyrmgus::calendar *calendar = wyrmgus::calendar::get(LuaToString(l, -1));
 			civilization->calendar = calendar;
 		} else if (!strcmp(value, "Currency")) {
 			CCurrency *currency = CCurrency::GetCurrency(LuaToString(l, -1));
@@ -762,7 +762,7 @@ static int CclDefineCivilization(lua_State *l)
 			const int subargs = lua_rawlen(l, -1);
 			for (int j = 0; j < subargs; ++j) {
 				std::string originary_civilization_name = LuaToString(l, -1, j + 1);
-				stratagus::civilization *originary_civilization = stratagus::civilization::get(originary_civilization_name);
+				wyrmgus::civilization *originary_civilization = wyrmgus::civilization::get(originary_civilization_name);
 				civilization->develops_from.push_back(originary_civilization);
 				originary_civilization->develops_to.push_back(civilization);
 			}
@@ -819,7 +819,7 @@ static int CclDefineCivilization(lua_State *l)
 					} else if (!strcmp(value, "weight")) {
 						force->Weight = LuaToNumber(l, -1, k + 1);
 					} else if (!strcmp(value, "unit-class")) {
-						const stratagus::unit_class *unit_class = stratagus::unit_class::get(LuaToString(l, -1, k + 1));
+						const wyrmgus::unit_class *unit_class = wyrmgus::unit_class::get(LuaToString(l, -1, k + 1));
 						++k;
 						int unit_quantity = LuaToNumber(l, -1, k + 1);
 						force->add_unit(unit_class, unit_quantity);
@@ -848,7 +848,7 @@ static int CclDefineCivilization(lua_State *l)
 					value = LuaToString(l, -1, k + 1);
 					++k;
 					if (!strcmp(value, "unit-class")) {
-						const stratagus::unit_class *unit_class = stratagus::unit_class::get(LuaToString(l, -1, k + 1));
+						const wyrmgus::unit_class *unit_class = wyrmgus::unit_class::get(LuaToString(l, -1, k + 1));
 						building_template->set_unit_class(unit_class);
 						civilization->AiBuildingTemplates.push_back(building_template);
 					} else if (!strcmp(value, "priority")) {
@@ -925,9 +925,9 @@ static int CclDefineCivilization(lua_State *l)
 		} else if (!strcmp(value, "PersonalNames")) {
 			const int args = lua_rawlen(l, -1);
 			for (int j = 0; j < args; ++j) {
-				stratagus::gender gender = stratagus::gender::none;
-				gender = stratagus::try_string_to_gender(LuaToString(l, -1, j + 1));
-				if (gender != stratagus::gender::none) {
+				wyrmgus::gender gender = wyrmgus::gender::none;
+				gender = wyrmgus::try_string_to_gender(LuaToString(l, -1, j + 1));
+				if (gender != wyrmgus::gender::none) {
 					++j;
 				}
 				
@@ -940,7 +940,7 @@ static int CclDefineCivilization(lua_State *l)
 				if (class_name.empty()) {
 					LuaError(l, "Class is given as a blank string.");
 				}
-				const stratagus::unit_class *unit_class = stratagus::unit_class::get(class_name);
+				const wyrmgus::unit_class *unit_class = wyrmgus::unit_class::get(class_name);
 				++j;
 				
 				civilization->add_unit_class_name(unit_class, LuaToString(l, -1, j + 1));
@@ -966,13 +966,13 @@ static int CclDefineCivilization(lua_State *l)
 			}
 			const int subargs = lua_rawlen(l, -1);
 			for (int k = 0; k < subargs; ++k) {
-				const stratagus::character_title title = GetCharacterTitleIdByName(LuaToString(l, -1, k + 1));
+				const wyrmgus::character_title title = GetCharacterTitleIdByName(LuaToString(l, -1, k + 1));
 				++k;
-				const stratagus::gender gender = stratagus::string_to_gender(LuaToString(l, -1, k + 1));
+				const wyrmgus::gender gender = wyrmgus::string_to_gender(LuaToString(l, -1, k + 1));
 				++k;
-				const stratagus::government_type government_type = stratagus::string_to_government_type(LuaToString(l, -1, k + 1));
+				const wyrmgus::government_type government_type = wyrmgus::string_to_government_type(LuaToString(l, -1, k + 1));
 				++k;
-				const stratagus::faction_tier tier = stratagus::string_to_faction_tier(LuaToString(l, -1, k + 1));
+				const wyrmgus::faction_tier tier = wyrmgus::string_to_faction_tier(LuaToString(l, -1, k + 1));
 				++k;
 				civilization->character_title_names[title][FactionTypeNoFactionType][government_type][tier][gender] = LuaToString(l, -1, k + 1);
 			}
@@ -1338,7 +1338,7 @@ static int CclGetCivilizationData(lua_State *l)
 		LuaError(l, "incorrect argument");
 	}
 	std::string civilization_name = LuaToString(l, 1);
-	stratagus::civilization *civilization = stratagus::civilization::get(civilization_name);
+	wyrmgus::civilization *civilization = wyrmgus::civilization::get(civilization_name);
 	if (!civilization) {
 		return 0;
 	}
@@ -1432,7 +1432,7 @@ static int CclGetCivilizationData(lua_State *l)
 		}
 		
 		std::vector<std::string> factions;
-		for (stratagus::faction *faction : stratagus::faction::get_all())
+		for (wyrmgus::faction *faction : wyrmgus::faction::get_all())
 		{
 			if (faction->get_civilization() != civilization) {
 				continue;
@@ -1474,18 +1474,18 @@ static int CclGetCivilizationClassUnitType(lua_State *l)
 {
 	LuaCheckArgs(l, 2);
 	std::string class_name = LuaToString(l, 1);
-	const stratagus::unit_class *unit_class = stratagus::unit_class::try_get(class_name);
-	stratagus::civilization *civilization = stratagus::civilization::get(LuaToString(l, 2));
+	const wyrmgus::unit_class *unit_class = wyrmgus::unit_class::try_get(class_name);
+	wyrmgus::civilization *civilization = wyrmgus::civilization::get(LuaToString(l, 2));
 	std::string unit_type_ident;
 	if (civilization && unit_class != nullptr) {
-		const stratagus::unit_type *unit_type = civilization->get_class_unit_type(unit_class);
+		const wyrmgus::unit_type *unit_type = civilization->get_class_unit_type(unit_class);
 		if (unit_type != nullptr) {
 			unit_type_ident = unit_type->get_identifier();
 		}
 	}
 		
 	if (unit_type_ident.empty()) { //if wasn't found, see if it is an upgrade class instead
-		const stratagus::upgrade_class *upgrade_class = stratagus::upgrade_class::try_get(class_name);
+		const wyrmgus::upgrade_class *upgrade_class = wyrmgus::upgrade_class::try_get(class_name);
 		if (civilization && upgrade_class != nullptr) {
 			const CUpgrade *upgrade = civilization->get_class_upgrade(upgrade_class);
 			if (upgrade != nullptr) {
@@ -1512,28 +1512,28 @@ static int CclGetCivilizationClassUnitType(lua_State *l)
 static int CclGetFactionClassUnitType(lua_State *l)
 {
 	std::string class_name = LuaToString(l, 1);
-	const stratagus::unit_class *unit_class = stratagus::unit_class::try_get(class_name);
+	const wyrmgus::unit_class *unit_class = wyrmgus::unit_class::try_get(class_name);
 	int faction_id = -1;
-	stratagus::faction *faction = nullptr;
+	wyrmgus::faction *faction = nullptr;
 	const int nargs = lua_gettop(l);
 	if (nargs == 2) {
-		faction = stratagus::faction::get(LuaToString(l, 2));
+		faction = wyrmgus::faction::get(LuaToString(l, 2));
 		faction_id = faction->ID;
 	} else if (nargs == 3) {
 		//the civilization was the second argument, but it isn't needed anymore
-		faction = stratagus::faction::get(LuaToString(l, 3));
+		faction = wyrmgus::faction::get(LuaToString(l, 3));
 		faction_id = faction->ID;
 	}
 	std::string unit_type_ident;
 	if (unit_class != nullptr) {
-		const stratagus::unit_type *unit_type = faction->get_class_unit_type(unit_class);
+		const wyrmgus::unit_type *unit_type = faction->get_class_unit_type(unit_class);
 		if (unit_type != nullptr) {
 			unit_type_ident = unit_type->get_identifier();
 		}
 	}
 		
 	if (unit_type_ident.empty()) { //if wasn't found, see if it is an upgrade class instead
-		const stratagus::upgrade_class *upgrade_class = stratagus::upgrade_class::try_get(class_name);
+		const wyrmgus::upgrade_class *upgrade_class = wyrmgus::upgrade_class::try_get(class_name);
 		if (upgrade_class != nullptr) {
 			const CUpgrade *upgrade = faction->get_class_upgrade(upgrade_class);
 			if (upgrade != nullptr) {
@@ -1566,10 +1566,10 @@ static int CclDefineFaction(lua_State *l)
 	std::string faction_name = LuaToString(l, 1);
 	std::string parent_faction;
 	
-	stratagus::faction *faction = stratagus::faction::get_or_add(faction_name, nullptr);
+	wyrmgus::faction *faction = wyrmgus::faction::get_or_add(faction_name, nullptr);
 	if (faction) { // redefinition
 		if (faction->ParentFaction != -1) {
-			parent_faction = stratagus::faction::get_all()[faction->ParentFaction]->get_identifier();
+			parent_faction = wyrmgus::faction::get_all()[faction->ParentFaction]->get_identifier();
 		}
 	}
 	
@@ -1578,7 +1578,7 @@ static int CclDefineFaction(lua_State *l)
 		const char *value = LuaToString(l, -2);
 		
 		if (!strcmp(value, "Civilization")) {
-			stratagus::civilization *civilization = stratagus::civilization::get(LuaToString(l, -1));
+			wyrmgus::civilization *civilization = wyrmgus::civilization::get(LuaToString(l, -1));
 			faction->civilization = civilization;
 		} else if (!strcmp(value, "Name")) {
 			faction->set_name(LuaToString(l, -1));
@@ -1599,14 +1599,14 @@ static int CclDefineFaction(lua_State *l)
 				LuaError(l, "Faction type \"%s\" doesn't exist." _C_ faction_type_name.c_str());
 			}
 		} else if (!strcmp(value, "Color")) {
-			faction->color = stratagus::player_color::get(LuaToString(l, -1));
+			faction->color = wyrmgus::player_color::get(LuaToString(l, -1));
 		} else if (!strcmp(value, "DefaultTier")) {
 			std::string faction_tier_name = LuaToString(l, -1);
-			const stratagus::faction_tier tier = stratagus::string_to_faction_tier(faction_tier_name);
+			const wyrmgus::faction_tier tier = wyrmgus::string_to_faction_tier(faction_tier_name);
 			faction->default_tier = tier;
 		} else if (!strcmp(value, "DefaultGovernmentType")) {
 			std::string government_type_name = LuaToString(l, -1);
-			const stratagus::government_type government_type = stratagus::string_to_government_type(government_type_name);
+			const wyrmgus::government_type government_type = wyrmgus::string_to_government_type(government_type_name);
 			faction->default_government_type = government_type;
 		} else if (!strcmp(value, "DefaultAI")) {
 			faction->DefaultAI = LuaToString(l, -1);
@@ -1617,7 +1617,7 @@ static int CclDefineFaction(lua_State *l)
 		} else if (!strcmp(value, "DefiniteArticle")) {
 			faction->DefiniteArticle = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "Icon")) {
-			faction->icon = stratagus::icon::get(LuaToString(l, -1));
+			faction->icon = wyrmgus::icon::get(LuaToString(l, -1));
 		} else if (!strcmp(value, "Currency")) {
 			CCurrency *currency = CCurrency::GetCurrency(LuaToString(l, -1));
 			faction->Currency = currency;
@@ -1627,7 +1627,7 @@ static int CclDefineFaction(lua_State *l)
 			}
 			const int subargs = lua_rawlen(l, -1);
 			for (int k = 0; k < subargs; ++k) {
-				stratagus::faction *second_faction = stratagus::faction::get(LuaToString(l, -1, k + 1));
+				wyrmgus::faction *second_faction = wyrmgus::faction::get(LuaToString(l, -1, k + 1));
 				faction->DevelopsFrom.push_back(second_faction);
 				second_faction->DevelopsTo.push_back(faction);
 			}
@@ -1637,7 +1637,7 @@ static int CclDefineFaction(lua_State *l)
 			}
 			const int subargs = lua_rawlen(l, -1);
 			for (int k = 0; k < subargs; ++k) {
-				stratagus::faction *second_faction = stratagus::faction::get(LuaToString(l, -1, k + 1));
+				wyrmgus::faction *second_faction = wyrmgus::faction::get(LuaToString(l, -1, k + 1));
 				faction->DevelopsTo.push_back(second_faction);
 				second_faction->DevelopsFrom.push_back(faction);
 			}
@@ -1647,9 +1647,9 @@ static int CclDefineFaction(lua_State *l)
 			}
 			const int subargs = lua_rawlen(l, -1);
 			for (int k = 0; k < subargs; ++k) {
-				const stratagus::government_type government_type = stratagus::string_to_government_type(LuaToString(l, -1, k + 1));
+				const wyrmgus::government_type government_type = wyrmgus::string_to_government_type(LuaToString(l, -1, k + 1));
 				++k;
-				const stratagus::faction_tier tier = stratagus::string_to_faction_tier(LuaToString(l, -1, k + 1));
+				const wyrmgus::faction_tier tier = wyrmgus::string_to_faction_tier(LuaToString(l, -1, k + 1));
 				++k;
 				faction->title_names[government_type][tier] = LuaToString(l, -1, k + 1);
 			}
@@ -1659,13 +1659,13 @@ static int CclDefineFaction(lua_State *l)
 			}
 			const int subargs = lua_rawlen(l, -1);
 			for (int k = 0; k < subargs; ++k) {
-				const stratagus::character_title title = GetCharacterTitleIdByName(LuaToString(l, -1, k + 1));
+				const wyrmgus::character_title title = GetCharacterTitleIdByName(LuaToString(l, -1, k + 1));
 				++k;
-				const stratagus::gender gender = stratagus::string_to_gender(LuaToString(l, -1, k + 1));
+				const wyrmgus::gender gender = wyrmgus::string_to_gender(LuaToString(l, -1, k + 1));
 				++k;
-				const stratagus::government_type government_type = stratagus::string_to_government_type(LuaToString(l, -1, k + 1));
+				const wyrmgus::government_type government_type = wyrmgus::string_to_government_type(LuaToString(l, -1, k + 1));
 				++k;
-				const stratagus::faction_tier tier = stratagus::string_to_faction_tier(LuaToString(l, -1, k + 1));
+				const wyrmgus::faction_tier tier = wyrmgus::string_to_faction_tier(LuaToString(l, -1, k + 1));
 				++k;
 				faction->character_title_names[title][government_type][tier][gender] = LuaToString(l, -1, k + 1);
 			}
@@ -1724,7 +1724,7 @@ static int CclDefineFaction(lua_State *l)
 					} else if (!strcmp(value, "weight")) {
 						force->Weight = LuaToNumber(l, -1, k + 1);
 					} else if (!strcmp(value, "unit-class")) {
-						const stratagus::unit_class *unit_class = stratagus::unit_class::get(LuaToString(l, -1, k + 1));
+						const wyrmgus::unit_class *unit_class = wyrmgus::unit_class::get(LuaToString(l, -1, k + 1));
 						++k;
 						const int unit_quantity = LuaToNumber(l, -1, k + 1);
 						force->add_unit(unit_class, unit_quantity);
@@ -1753,7 +1753,7 @@ static int CclDefineFaction(lua_State *l)
 					value = LuaToString(l, -1, k + 1);
 					++k;
 					if (!strcmp(value, "unit-class")) {
-						const stratagus::unit_class *unit_class = stratagus::unit_class::get(LuaToString(l, -1, k + 1));
+						const wyrmgus::unit_class *unit_class = wyrmgus::unit_class::get(LuaToString(l, -1, k + 1));
 						building_template->set_unit_class(unit_class);
 						faction->AiBuildingTemplates.push_back(building_template);
 					} else if (!strcmp(value, "priority")) {
@@ -1833,8 +1833,8 @@ static int CclDefineFaction(lua_State *l)
 				int year = LuaToNumber(l, -1, j + 1);
 				++j;
 				std::string faction_tier_name = LuaToString(l, -1, j + 1);
-				const stratagus::faction_tier tier = stratagus::string_to_faction_tier(faction_tier_name);
-				if (tier == stratagus::faction_tier::none) {
+				const wyrmgus::faction_tier tier = wyrmgus::string_to_faction_tier(faction_tier_name);
+				if (tier == wyrmgus::faction_tier::none) {
 					LuaError(l, "Faction tier \"%s\" doesn't exist." _C_ faction_tier_name.c_str());
 				}
 				faction->HistoricalTiers[year] = tier;
@@ -1848,7 +1848,7 @@ static int CclDefineFaction(lua_State *l)
 				int year = LuaToNumber(l, -1, j + 1);
 				++j;
 				std::string government_type_name = LuaToString(l, -1, j + 1);
-				const stratagus::government_type government_type = stratagus::string_to_government_type(government_type_name);
+				const wyrmgus::government_type government_type = wyrmgus::string_to_government_type(government_type_name);
 				faction->HistoricalGovernmentTypes[year] = government_type;
 			}
 		} else if (!strcmp(value, "HistoricalDiplomacyStates")) {
@@ -1864,12 +1864,12 @@ static int CclDefineFaction(lua_State *l)
 				++j;
 				
 				std::string diplomacy_state_faction_ident = LuaToString(l, -1, j + 1);
-				stratagus::faction *diplomacy_state_faction = stratagus::faction::get(diplomacy_state_faction_ident);
+				wyrmgus::faction *diplomacy_state_faction = wyrmgus::faction::get(diplomacy_state_faction_ident);
 				++j;
 
 				std::string diplomacy_state_name = LuaToString(l, -1, j + 1);
-				const stratagus::diplomacy_state diplomacy_state = stratagus::string_to_diplomacy_state(diplomacy_state_name);
-				faction->HistoricalDiplomacyStates[std::pair<CDate, stratagus::faction *>(date, diplomacy_state_faction)] = diplomacy_state;
+				const wyrmgus::diplomacy_state diplomacy_state = wyrmgus::string_to_diplomacy_state(diplomacy_state_name);
+				faction->HistoricalDiplomacyStates[std::pair<CDate, wyrmgus::faction *>(date, diplomacy_state_faction)] = diplomacy_state;
 			}
 		} else if (!strcmp(value, "HistoricalResources")) {
 			if (!lua_istable(l, -1)) {
@@ -1916,7 +1916,7 @@ static int CclDefineFaction(lua_State *l)
 	}
 		
 	if (!parent_faction.empty()) { //process this here
-		faction->ParentFaction = stratagus::faction::get(parent_faction)->ID;
+		faction->ParentFaction = wyrmgus::faction::get(parent_faction)->ID;
 	} else if (parent_faction.empty()) {
 		faction->ParentFaction = -1; // to allow redefinitions to remove the parent faction setting
 	}
@@ -1937,7 +1937,7 @@ static int CclDefineReligion(lua_State *l)
 	}
 
 	std::string religion_ident = LuaToString(l, 1);
-	stratagus::religion *religion = stratagus::religion::get_or_add(religion_ident, nullptr);
+	wyrmgus::religion *religion = wyrmgus::religion::get_or_add(religion_ident, nullptr);
 	
 	//  Parse the list:
 	for (lua_pushnil(l); lua_next(l, 2); lua_pop(l, 1)) {
@@ -1959,7 +1959,7 @@ static int CclDefineReligion(lua_State *l)
 			}
 			const int subargs = lua_rawlen(l, -1);
 			for (int j = 0; j < subargs; ++j) {
-				stratagus::deity_domain *domain = stratagus::deity_domain::get(LuaToString(l, -1, j + 1));
+				wyrmgus::deity_domain *domain = wyrmgus::deity_domain::get(LuaToString(l, -1, j + 1));
 				religion->Domains.push_back(domain);
 			}
 		} else {
@@ -1983,7 +1983,7 @@ static int CclDefineDeity(lua_State *l)
 	}
 
 	std::string deity_ident = LuaToString(l, 1);
-	stratagus::deity *deity = stratagus::deity::get_or_add(deity_ident, nullptr);
+	wyrmgus::deity *deity = wyrmgus::deity::get_or_add(deity_ident, nullptr);
 	
 	//  Parse the list:
 	for (lua_pushnil(l); lua_next(l, 2); lua_pop(l, 1)) {
@@ -1994,7 +1994,7 @@ static int CclDefineDeity(lua_State *l)
 		} else if (!strcmp(value, "Pantheon")) {
 			deity->Pantheon = CPantheon::GetPantheon(LuaToString(l, -1));
 		} else if (!strcmp(value, "Gender")) {
-			deity->gender = stratagus::string_to_gender(LuaToString(l, -1));
+			deity->gender = wyrmgus::string_to_gender(LuaToString(l, -1));
 		} else if (!strcmp(value, "Major")) {
 			deity->major = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "Description")) {
@@ -2004,12 +2004,12 @@ static int CclDefineDeity(lua_State *l)
 		} else if (!strcmp(value, "Quote")) {
 			deity->set_quote(LuaToString(l, -1));
 		} else if (!strcmp(value, "HomePlane")) {
-			stratagus::plane *plane = stratagus::plane::get(LuaToString(l, -1));
+			wyrmgus::plane *plane = wyrmgus::plane::get(LuaToString(l, -1));
 			deity->home_plane = plane;
 		} else if (!strcmp(value, "DeityUpgrade")) {
 			CUpgrade *upgrade = CUpgrade::get(LuaToString(l, -1));
 			deity->DeityUpgrade = upgrade;
-			stratagus::deity::deities_by_upgrade[upgrade] = deity;
+			wyrmgus::deity::deities_by_upgrade[upgrade] = deity;
 		} else if (!strcmp(value, "CharacterUpgrade")) {
 			CUpgrade *upgrade = CUpgrade::get(LuaToString(l, -1));
 			deity->CharacterUpgrade = upgrade;
@@ -2023,7 +2023,7 @@ static int CclDefineDeity(lua_State *l)
 			}
 			const int subargs = lua_rawlen(l, -1);
 			for (int j = 0; j < subargs; ++j) {
-				stratagus::civilization *civilization = stratagus::civilization::get(LuaToString(l, -1, j + 1));
+				wyrmgus::civilization *civilization = wyrmgus::civilization::get(LuaToString(l, -1, j + 1));
 				deity->add_civilization(civilization);
 			}
 		} else if (!strcmp(value, "Religions")) {
@@ -2032,7 +2032,7 @@ static int CclDefineDeity(lua_State *l)
 			}
 			const int subargs = lua_rawlen(l, -1);
 			for (int j = 0; j < subargs; ++j) {
-				stratagus::religion *religion = stratagus::religion::get(LuaToString(l, -1, j + 1));
+				wyrmgus::religion *religion = wyrmgus::religion::get(LuaToString(l, -1, j + 1));
 				deity->religions.push_back(religion);
 			}
 		} else if (!strcmp(value, "Domains")) {
@@ -2041,7 +2041,7 @@ static int CclDefineDeity(lua_State *l)
 			}
 			const int subargs = lua_rawlen(l, -1);
 			for (int j = 0; j < subargs; ++j) {
-				stratagus::deity_domain *domain = stratagus::deity_domain::get(LuaToString(l, -1, j + 1));
+				wyrmgus::deity_domain *domain = wyrmgus::deity_domain::get(LuaToString(l, -1, j + 1));
 				deity->domains.push_back(domain);
 			}
 		} else if (!strcmp(value, "HolyOrders")) {
@@ -2050,7 +2050,7 @@ static int CclDefineDeity(lua_State *l)
 			}
 			const int subargs = lua_rawlen(l, -1);
 			for (int j = 0; j < subargs; ++j) {
-				stratagus::faction *holy_order = stratagus::faction::get(LuaToString(l, -1, j + 1));
+				wyrmgus::faction *holy_order = wyrmgus::faction::get(LuaToString(l, -1, j + 1));
 				deity->HolyOrders.push_back(holy_order);
 				holy_order->HolyOrderDeity = deity;
 			}
@@ -2085,7 +2085,7 @@ static int CclDefineDeity(lua_State *l)
 			}
 			const int subargs = lua_rawlen(l, -1);
 			for (int j = 0; j < subargs; ++j) {
-				const stratagus::civilization *civilization = stratagus::civilization::get(LuaToString(l, -1, j + 1));
+				const wyrmgus::civilization *civilization = wyrmgus::civilization::get(LuaToString(l, -1, j + 1));
 				++j;
 
 				std::string cultural_name = LuaToString(l, -1, j + 1);
@@ -2239,7 +2239,7 @@ static int CclGetCivilizations(lua_State *l)
 	}
 
 	std::vector<std::string> civilization_idents;
-	for (const stratagus::civilization *civilization : stratagus::civilization::get_all()) {
+	for (const wyrmgus::civilization *civilization : wyrmgus::civilization::get_all()) {
 		if (!only_visible || civilization->is_visible()) {
 			civilization_idents.push_back(civilization->get_identifier());
 		}
@@ -2262,9 +2262,9 @@ static int CclGetCivilizations(lua_State *l)
 */
 static int CclGetFactions(lua_State *l)
 {
-	stratagus::civilization *civilization = nullptr;
+	wyrmgus::civilization *civilization = nullptr;
 	if (lua_gettop(l) >= 1) {
-		civilization = stratagus::civilization::try_get(LuaToString(l, 1));
+		civilization = wyrmgus::civilization::try_get(LuaToString(l, 1));
 	}
 	
 	int faction_type = -1;
@@ -2274,7 +2274,7 @@ static int CclGetFactions(lua_State *l)
 	
 	std::vector<std::string> factions;
 	if (civilization != nullptr) {
-		for (stratagus::faction *faction : stratagus::faction::get_all()) {
+		for (wyrmgus::faction *faction : wyrmgus::faction::get_all()) {
 			if (faction_type != -1 && faction->Type != faction_type) {
 				continue;
 			}
@@ -2283,7 +2283,7 @@ static int CclGetFactions(lua_State *l)
 			}
 		}
 	} else {
-		for (stratagus::faction *faction : stratagus::faction::get_all()) {
+		for (wyrmgus::faction *faction : wyrmgus::faction::get_all()) {
 			if (faction_type != -1 && faction->Type != faction_type) {
 				continue;
 			}
@@ -2308,10 +2308,10 @@ static int CclGetFactions(lua_State *l)
 */
 static int CclGetPlayerColors(lua_State *l)
 {
-	lua_createtable(l, stratagus::player_color::get_all().size(), 0);
-	for (size_t i = 1; i <= stratagus::player_color::get_all().size(); ++i)
+	lua_createtable(l, wyrmgus::player_color::get_all().size(), 0);
+	for (size_t i = 1; i <= wyrmgus::player_color::get_all().size(); ++i)
 	{
-		lua_pushstring(l, stratagus::player_color::get_all()[i-1]->get_identifier().c_str());
+		lua_pushstring(l, wyrmgus::player_color::get_all()[i-1]->get_identifier().c_str());
 		lua_rawseti(l, -2, i);
 	}
 	
@@ -2327,7 +2327,7 @@ static int CclGetFactionData(lua_State *l)
 {
 	LuaCheckArgs(l, 2);
 	std::string faction_name = LuaToString(l, 1);
-	stratagus::faction *faction = stratagus::faction::get(faction_name);
+	wyrmgus::faction *faction = wyrmgus::faction::get(faction_name);
 	
 	const char *data = LuaToString(l, 2);
 
@@ -2375,7 +2375,7 @@ static int CclGetFactionData(lua_State *l)
 		return 1;
 	} else if (!strcmp(data, "ParentFaction")) {
 		if (faction->ParentFaction != -1) {
-			lua_pushstring(l, stratagus::faction::get_all()[faction->ParentFaction]->get_identifier().c_str());
+			lua_pushstring(l, wyrmgus::faction::get_all()[faction->ParentFaction]->get_identifier().c_str());
 		} else {
 			lua_pushstring(l, "");
 		}
@@ -2414,14 +2414,14 @@ static int CclGetPlayerData(lua_State *l)
 	//Wyrmgus start
 	} else if (!strcmp(data, "Faction")) {
 		if (p->Race != -1 && p->Faction != -1) {
-			lua_pushstring(l, stratagus::faction::get_all()[p->Faction]->get_identifier().c_str());
+			lua_pushstring(l, wyrmgus::faction::get_all()[p->Faction]->get_identifier().c_str());
 		} else {
 			lua_pushstring(l, "");
 		}
 		return 1;
 	//Wyrmgus end
 	} else if (!strcmp(data, "RaceName")) {
-		lua_pushstring(l, stratagus::civilization::get_all()[p->Race]->get_identifier().c_str());
+		lua_pushstring(l, wyrmgus::civilization::get_all()[p->Race]->get_identifier().c_str());
 		return 1;
 	//Wyrmgus start
 	} else if (!strcmp(data, "Color")) {
@@ -2512,26 +2512,26 @@ static int CclGetPlayerData(lua_State *l)
 	} else if (!strcmp(data, "HasHero")) {
 		LuaCheckArgs(l, 3);
 		
-		stratagus::character *hero = stratagus::character::get(LuaToString(l, 3));
+		wyrmgus::character *hero = wyrmgus::character::get(LuaToString(l, 3));
 
 		lua_pushboolean(l, p->HasHero(hero));
 		return 1;
 	//Wyrmgus end
 	} else if (!strcmp(data, "UnitTypesCount")) {
 		LuaCheckArgs(l, 3);
-		stratagus::unit_type *type = CclGetUnitType(l);
+		wyrmgus::unit_type *type = CclGetUnitType(l);
 		Assert(type);
 		lua_pushnumber(l, p->GetUnitTypeCount(type));
 		return 1;
 	} else if (!strcmp(data, "UnitTypesUnderConstructionCount")) {
 		LuaCheckArgs(l, 3);
-		stratagus::unit_type *type = CclGetUnitType(l);
+		wyrmgus::unit_type *type = CclGetUnitType(l);
 		Assert(type);
 		lua_pushnumber(l, p->GetUnitTypeUnderConstructionCount(type));
 		return 1;
 	} else if (!strcmp(data, "UnitTypesAiActiveCount")) {
 		LuaCheckArgs(l, 3);
-		stratagus::unit_type *type = CclGetUnitType(l);
+		wyrmgus::unit_type *type = CclGetUnitType(l);
 		Assert(type);
 		lua_pushnumber(l, p->GetUnitTypeAiActiveCount(type));
 		return 1;
@@ -2613,7 +2613,7 @@ static int CclGetPlayerData(lua_State *l)
 	//Wyrmgus start
 	} else if (!strcmp(data, "UnitTypeKills")) {
 		LuaCheckArgs(l, 3);
-		stratagus::unit_type *type = CclGetUnitType(l);
+		wyrmgus::unit_type *type = CclGetUnitType(l);
 		Assert(type);
 		lua_pushnumber(l, p->UnitTypeKills[type->Slot]);
 		return 1;
@@ -2674,12 +2674,12 @@ static int CclGetPlayerData(lua_State *l)
 		return 1;
 	} else if (!strcmp(data, "HasQuest")) {
 		LuaCheckArgs(l, 3);
-		const stratagus::quest *quest = stratagus::quest::get(LuaToString(l, 3));
+		const wyrmgus::quest *quest = wyrmgus::quest::get(LuaToString(l, 3));
 		lua_pushboolean(l, p->has_quest(quest));
 		return 1;
 	} else if (!strcmp(data, "CompletedQuest")) {
 		LuaCheckArgs(l, 3);
-		const stratagus::quest *quest = stratagus::quest::get(LuaToString(l, 3));
+		const wyrmgus::quest *quest = wyrmgus::quest::get(LuaToString(l, 3));
 		lua_pushboolean(l, p->is_quest_completed(quest));
 		return 1;
 	} else if (!strcmp(data, "FactionTitle")) {
@@ -2689,22 +2689,22 @@ static int CclGetPlayerData(lua_State *l)
 		LuaCheckArgs(l, 4);
 		std::string title_type_ident = LuaToString(l, 3);
 		std::string gender_ident = LuaToString(l, 4);
-		const stratagus::character_title title_type_id = GetCharacterTitleIdByName(title_type_ident);
-		const stratagus::gender gender = stratagus::string_to_gender(gender_ident);
+		const wyrmgus::character_title title_type_id = GetCharacterTitleIdByName(title_type_ident);
+		const wyrmgus::gender gender = wyrmgus::string_to_gender(gender_ident);
 		
 		lua_pushstring(l, p->GetCharacterTitleName(title_type_id, gender).data());
 		return 1;
 	} else if (!strcmp(data, "HasSettlement")) {
 		LuaCheckArgs(l, 3);
 		std::string site_ident = LuaToString(l, 3);
-		const stratagus::site *site = stratagus::site::get(site_ident);
+		const wyrmgus::site *site = wyrmgus::site::get(site_ident);
 		lua_pushboolean(l, p->HasSettlement(site));
 		return 1;
 	} else if (!strcmp(data, "SettlementName")) {
 		LuaCheckArgs(l, 3);
 		std::string site_ident = LuaToString(l, 3);
-		const stratagus::site *site = stratagus::site::get(site_ident);
-		lua_pushstring(l, site->get_cultural_name(p->Race != -1 ? stratagus::civilization::get_all()[p->Race] : nullptr).c_str());
+		const wyrmgus::site *site = wyrmgus::site::get(site_ident);
+		lua_pushstring(l, site->get_cultural_name(p->Race != -1 ? wyrmgus::civilization::get_all()[p->Race] : nullptr).c_str());
 		return 1;
 	//Wyrmgus end
 	} else if (!strcmp(data, "Currency")) {
@@ -2752,7 +2752,7 @@ static int CclSetPlayerData(lua_State *l)
 		}
 
 		const char *civilization_ident = LuaToString(l, 3);
-		stratagus::civilization *civilization = stratagus::civilization::get(civilization_ident);
+		wyrmgus::civilization *civilization = wyrmgus::civilization::get(civilization_ident);
 		p->set_civilization(civilization->ID);
 	//Wyrmgus start
 	} else if (!strcmp(data, "Faction")) {
@@ -2760,24 +2760,24 @@ static int CclSetPlayerData(lua_State *l)
 		if (faction_name == "random") {
 			p->SetRandomFaction();
 		} else {
-			p->SetFaction(stratagus::faction::try_get(faction_name));
+			p->SetFaction(wyrmgus::faction::try_get(faction_name));
 		}
 	} else if (!strcmp(data, "Dynasty")) {
 		const std::string dynasty_ident = LuaToString(l, 3);
-		p->set_dynasty(stratagus::dynasty::get(dynasty_ident));
+		p->set_dynasty(wyrmgus::dynasty::get(dynasty_ident));
 	//Wyrmgus end
 	} else if (!strcmp(data, "Resources")) {
 		LuaCheckArgs(l, 4);
 
 		const std::string res = LuaToString(l, 3);
 		const int resId = GetResourceIdByName(l, res.c_str());
-		p->set_resource(stratagus::resource::get_all()[resId], LuaToNumber(l, 4));
+		p->set_resource(wyrmgus::resource::get_all()[resId], LuaToNumber(l, 4));
 	} else if (!strcmp(data, "StoredResources")) {
 		LuaCheckArgs(l, 4);
 
 		const std::string res = LuaToString(l, 3);
 		const int resId = GetResourceIdByName(l, res.c_str());
-		p->set_resource(stratagus::resource::get_all()[resId], LuaToNumber(l, 4), STORE_BUILDING);
+		p->set_resource(wyrmgus::resource::get_all()[resId], LuaToNumber(l, 4), STORE_BUILDING);
 		// } else if (!strcmp(data, "UnitTypesCount")) {
 		// } else if (!strcmp(data, "AiEnabled")) {
 		// } else if (!strcmp(data, "TotalNumUnits")) {
@@ -2859,13 +2859,13 @@ static int CclSetPlayerData(lua_State *l)
 	} else if (!strcmp(data, "Team")) {
 		p->Team = LuaToNumber(l, 3);
 	} else if (!strcmp(data, "AcceptQuest")) {
-		stratagus::quest *quest = stratagus::quest::get(LuaToString(l, 3));
+		wyrmgus::quest *quest = wyrmgus::quest::get(LuaToString(l, 3));
 		p->accept_quest(quest);
 	} else if (!strcmp(data, "CompleteQuest")) {
-		stratagus::quest *quest = stratagus::quest::get(LuaToString(l, 3));
+		wyrmgus::quest *quest = wyrmgus::quest::get(LuaToString(l, 3));
 		p->complete_quest(quest);
 	} else if (!strcmp(data, "FailQuest")) {
-		stratagus::quest *quest = stratagus::quest::get(LuaToString(l, 3));
+		wyrmgus::quest *quest = wyrmgus::quest::get(LuaToString(l, 3));
 		p->fail_quest(quest);
 	} else if (!strcmp(data, "AddModifier")) {
 		LuaCheckArgs(l, 4);
@@ -3039,10 +3039,10 @@ static int CclGetLanguageWordData(lua_State *l)
 
 static int CclGetReligions(lua_State *l)
 {
-	lua_createtable(l, stratagus::religion::get_all().size(), 0);
-	for (size_t i = 1; i <= stratagus::religion::get_all().size(); ++i)
+	lua_createtable(l, wyrmgus::religion::get_all().size(), 0);
+	for (size_t i = 1; i <= wyrmgus::religion::get_all().size(); ++i)
 	{
-		lua_pushstring(l, stratagus::religion::get_all()[i-1]->get_identifier().c_str());
+		lua_pushstring(l, wyrmgus::religion::get_all()[i-1]->get_identifier().c_str());
 		lua_rawseti(l, -2, i);
 	}
 	return 1;
@@ -3050,10 +3050,10 @@ static int CclGetReligions(lua_State *l)
 
 static int CclGetDeityDomains(lua_State *l)
 {
-	lua_createtable(l, stratagus::deity_domain::get_all().size(), 0);
-	for (size_t i = 1; i <= stratagus::deity_domain::get_all().size(); ++i)
+	lua_createtable(l, wyrmgus::deity_domain::get_all().size(), 0);
+	for (size_t i = 1; i <= wyrmgus::deity_domain::get_all().size(); ++i)
 	{
-		lua_pushstring(l, stratagus::deity_domain::get_all()[i-1]->get_identifier().c_str());
+		lua_pushstring(l, wyrmgus::deity_domain::get_all()[i-1]->get_identifier().c_str());
 		lua_rawseti(l, -2, i);
 	}
 	return 1;
@@ -3061,10 +3061,10 @@ static int CclGetDeityDomains(lua_State *l)
 
 static int CclGetDeities(lua_State *l)
 {
-	lua_createtable(l, stratagus::deity::get_all().size(), 0);
-	for (size_t i = 1; i <= stratagus::deity::get_all().size(); ++i)
+	lua_createtable(l, wyrmgus::deity::get_all().size(), 0);
+	for (size_t i = 1; i <= wyrmgus::deity::get_all().size(); ++i)
 	{
-		lua_pushstring(l, stratagus::deity::get_all()[i-1]->Ident.c_str());
+		lua_pushstring(l, wyrmgus::deity::get_all()[i-1]->Ident.c_str());
 		lua_rawseti(l, -2, i);
 	}
 	return 1;
@@ -3081,7 +3081,7 @@ static int CclGetReligionData(lua_State *l)
 		LuaError(l, "incorrect argument");
 	}
 	std::string religion_ident = LuaToString(l, 1);
-	const stratagus::religion *religion = stratagus::religion::get(religion_ident);
+	const wyrmgus::religion *religion = wyrmgus::religion::get(religion_ident);
 
 	const char *data = LuaToString(l, 2);
 
@@ -3113,7 +3113,7 @@ static int CclGetDeityDomainData(lua_State *l)
 		LuaError(l, "incorrect argument");
 	}
 	std::string deity_domain_ident = LuaToString(l, 1);
-	const stratagus::deity_domain *deity_domain = stratagus::deity_domain::get(deity_domain_ident);
+	const wyrmgus::deity_domain *deity_domain = wyrmgus::deity_domain::get(deity_domain_ident);
 
 	const char *data = LuaToString(l, 2);
 
@@ -3141,7 +3141,7 @@ static int CclGetDeityData(lua_State *l)
 		LuaError(l, "incorrect argument");
 	}
 	std::string deity_ident = LuaToString(l, 1);
-	const stratagus::deity *deity = stratagus::deity::get(deity_ident);
+	const wyrmgus::deity *deity = wyrmgus::deity::get(deity_ident);
 	const char *data = LuaToString(l, 2);
 
 	if (!strcmp(data, "Name")) {
@@ -3213,12 +3213,12 @@ static int CclGetDeityData(lua_State *l)
 			LuaError(l, "incorrect argument");
 		}
 		
-		const stratagus::civilization *civilization = stratagus::civilization::get(LuaToString(l, 3));
+		const wyrmgus::civilization *civilization = wyrmgus::civilization::get(LuaToString(l, 3));
 		lua_pushstring(l, deity->get_cultural_name(civilization).c_str());
 		
 		return 1;
 	} else if (!strcmp(data, "Gender")) {
-		lua_pushstring(l, stratagus::gender_to_string(deity->get_gender()).c_str());
+		lua_pushstring(l, wyrmgus::gender_to_string(deity->get_gender()).c_str());
 		return 1;
 	} else {
 		LuaError(l, "Invalid field: %s" _C_ data);

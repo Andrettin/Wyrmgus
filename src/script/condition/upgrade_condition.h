@@ -33,7 +33,7 @@
 #include "upgrade/upgrade.h"
 #include "upgrade/upgrade_structs.h"
 
-namespace stratagus {
+namespace wyrmgus {
 
 class upgrade_condition final : public condition
 {

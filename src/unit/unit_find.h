@@ -40,7 +40,7 @@ class CPlayer;
 class CUnit;
 enum class UnitTypeType;
 
-namespace stratagus {
+namespace wyrmgus {
 	class resource;
 }
 
@@ -69,13 +69,13 @@ public:
 class HasSameTypeAs : public CUnitFilter
 {
 public:
-	explicit HasSameTypeAs(const stratagus::unit_type &_type) : type(&_type) {}
+	explicit HasSameTypeAs(const wyrmgus::unit_type &_type) : type(&_type) {}
 	bool operator()(const CUnit *unit) const
 	{
 		return unit->Type == type;
 	}	
 private:
-	const stratagus::unit_type *type;
+	const wyrmgus::unit_type *type;
 };
 
 class HasSamePlayerAs : public CUnitFilter
@@ -133,7 +133,7 @@ public:
 		player(unit.Player), type(unit.Type)
 	{}
 	
-	HasSamePlayerAndTypeAs(const CPlayer &_player, const stratagus::unit_type &_type) :
+	HasSamePlayerAndTypeAs(const CPlayer &_player, const wyrmgus::unit_type &_type) :
 		player(&_player), type(&_type)
 	{}
 
@@ -144,7 +144,7 @@ public:
 
 private:
 	const CPlayer *player;
-	const stratagus::unit_type *type;
+	const wyrmgus::unit_type *type;
 };
 
 class IsNotTheSameUnitAs : public CUnitFilter
@@ -275,7 +275,7 @@ public:
 			return false;
 		}
 
-		const stratagus::unit_type &type = *unit->Type;
+		const wyrmgus::unit_type &type = *unit->Type;
 		if (type.BoolFlag[VANISHES_INDEX].value || (unitTypeType != static_cast<UnitTypeType>(-1) && type.UnitType != unitTypeType)) {
 			return false;
 		}
@@ -463,13 +463,13 @@ extern CUnit *FindHomeMarket(const CUnit &unit, int range);
 extern CUnit *FindIdleWorker(const CPlayer &player, const CUnit *last);
 
 /// Find the neareast piece of terrain with specific flags.
-extern bool FindTerrainType(int movemask, const stratagus::resource *resource, int range,
+extern bool FindTerrainType(int movemask, const wyrmgus::resource *resource, int range,
 							const CPlayer &player, const Vec2i &startPos, Vec2i *pos, int z, int landmass = 0);
 
-extern void FindUnitsByType(const stratagus::unit_type &type, std::vector<CUnit *> &units, bool everybody = false);
+extern void FindUnitsByType(const wyrmgus::unit_type &type, std::vector<CUnit *> &units, bool everybody = false);
 
 /// Find all units of this type of the player
-extern void FindPlayerUnitsByType(const CPlayer &player, const stratagus::unit_type &type, std::vector<CUnit *> &units, bool ai_active = false);
+extern void FindPlayerUnitsByType(const CPlayer &player, const wyrmgus::unit_type &type, std::vector<CUnit *> &units, bool ai_active = false);
 /// Return any unit on that map tile
 //Wyrmgus start
 //extern CUnit *UnitOnMapTile(const Vec2i &pos, const UnitTypeType type);// = -1);

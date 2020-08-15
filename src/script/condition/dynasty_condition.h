@@ -30,7 +30,7 @@
 #include "dynasty.h"
 #include "script/condition/condition.h"
 
-namespace stratagus {
+namespace wyrmgus {
 
 class dynasty_condition final : public condition
 {

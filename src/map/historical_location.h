@@ -31,7 +31,7 @@
 
 class CConfigData;
 
-namespace stratagus {
+namespace wyrmgus {
 
 class map_template;
 class site;
@@ -49,9 +49,9 @@ public:
 	
 public:
 	CDate Date; //the historical location's date
-	stratagus::map_template *map_template = nullptr; //the historical location's map template (overwritten by the site's map template if the site is given)
+	wyrmgus::map_template *map_template = nullptr; //the historical location's map template (overwritten by the site's map template if the site is given)
 	Vec2i Position = Vec2i(-1, -1); //the historical location's position in its map layer (overwritten by the site position if the site is given and has a valid position)
-	stratagus::site *site = nullptr; //the historical location's site (if any)
+	wyrmgus::site *site = nullptr; //the historical location's site (if any)
 };
 
 }

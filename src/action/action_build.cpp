@@ -65,7 +65,7 @@
 #include "unit/unit_type_type.h"
 #include "video/video.h"
 
-extern void AiReduceMadeInBuilt(PlayerAi &pai, const stratagus::unit_type &type, int landmass, const stratagus::site *settlement);
+extern void AiReduceMadeInBuilt(PlayerAi &pai, const wyrmgus::unit_type &type, int landmass, const wyrmgus::site *settlement);
 
 enum {
 	State_Start = 0,
@@ -82,7 +82,7 @@ enum {
 --  Functions
 ----------------------------------------------------------------------------*/
 
-COrder *COrder::NewActionBuild(const CUnit &builder, const Vec2i &pos, stratagus::unit_type &building, int z, const stratagus::site *settlement)
+COrder *COrder::NewActionBuild(const CUnit &builder, const Vec2i &pos, wyrmgus::unit_type &building, int z, const wyrmgus::site *settlement)
 {
 	Assert(CMap::Map.Info.IsPointOnMap(pos, z));
 
@@ -151,14 +151,14 @@ COrder *COrder::NewActionBuild(const CUnit &builder, const Vec2i &pos, stratagus
 		lua_pop(l, 1);
 	} else if (!strcmp(value, "type")) {
 		++j;
-		this->Type = stratagus::unit_type::get(LuaToString(l, -1, j + 1));
+		this->Type = wyrmgus::unit_type::get(LuaToString(l, -1, j + 1));
 	//Wyrmgus start
 	} else if (!strcmp(value, "map-layer")) {
 		++j;
 		this->MapLayer = LuaToNumber(l, -1, j + 1);
 	} else if (!strcmp(value, "settlement")) {
 		++j;
-		this->settlement = stratagus::site::get(LuaToString(l, -1, j + 1));
+		this->settlement = wyrmgus::site::get(LuaToString(l, -1, j + 1));
 	//Wyrmgus end
 	} else {
 		return false;
@@ -180,19 +180,19 @@ COrder *COrder::NewActionBuild(const CUnit &builder, const Vec2i &pos, stratagus
 	//Wyrmgus end
 
 	PixelPos targetPos = vp.TilePosToScreen_Center(this->goalPos);
-	targetPos += PixelPos(this->GetUnitType().get_tile_size() - QSize(1, 1)) * stratagus::defines::get()->get_scaled_tile_size() / 2;
+	targetPos += PixelPos(this->GetUnitType().get_tile_size() - QSize(1, 1)) * wyrmgus::defines::get()->get_scaled_tile_size() / 2;
 
-	const int w = this->GetUnitType().get_box_width() * stratagus::defines::get()->get_scale_factor();
-	const int h = this->GetUnitType().get_box_height() * stratagus::defines::get()->get_scale_factor();
+	const int w = this->GetUnitType().get_box_width() * wyrmgus::defines::get()->get_scale_factor();
+	const int h = this->GetUnitType().get_box_height() * wyrmgus::defines::get()->get_scale_factor();
 	DrawSelection(ColorGray, targetPos.x - w / 2, targetPos.y - h / 2, targetPos.x + w / 2, targetPos.y + h / 2);
 	//Wyrmgus start
 //	Video.FillCircleClip(ColorGreen, lastScreenPos, 2);
 //	Video.DrawLineClip(ColorGreen, lastScreenPos, targetPos);
 //	Video.FillCircleClip(ColorGreen, targetPos, 3);
 	if (Preference.ShowPathlines) {
-		Video.FillCircleClip(ColorGreen, lastScreenPos, 2 * stratagus::defines::get()->get_scale_factor());
+		Video.FillCircleClip(ColorGreen, lastScreenPos, 2 * wyrmgus::defines::get()->get_scale_factor());
 		Video.DrawLineClip(ColorGreen, lastScreenPos, targetPos);
-		Video.FillCircleClip(ColorGreen, targetPos, 3 * stratagus::defines::get()->get_scale_factor());
+		Video.FillCircleClip(ColorGreen, targetPos, 3 * wyrmgus::defines::get()->get_scale_factor());
 	}
 	//Wyrmgus end
 	return targetPos;
@@ -284,7 +284,7 @@ bool COrder_Build::MoveToLocation(CUnit &unit)
 	}
 }
 
-static bool CheckLimit(const CUnit &unit, const stratagus::unit_type &type, int landmass, const stratagus::site *settlement)
+static bool CheckLimit(const CUnit &unit, const wyrmgus::unit_type &type, int landmass, const wyrmgus::site *settlement)
 {
 	const CPlayer &player = *unit.Player;
 	bool isOk = true;
@@ -322,7 +322,7 @@ static bool CheckLimit(const CUnit &unit, const stratagus::unit_type &type, int 
 class AlreadyBuildingFinder
 {
 public:
-	AlreadyBuildingFinder(const CUnit &unit, const stratagus::unit_type &t) :
+	AlreadyBuildingFinder(const CUnit &unit, const wyrmgus::unit_type &t) :
 		worker(&unit), type(&t) {}
 	bool operator()(const CUnit *const unit) const
 	{
@@ -335,7 +335,7 @@ public:
 	}
 private:
 	const CUnit *worker;
-	const stratagus::unit_type *type;
+	const wyrmgus::unit_type *type;
 };
 
 /**
@@ -348,7 +348,7 @@ private:
 CUnit *COrder_Build::CheckCanBuild(CUnit &unit) const
 {
 	const Vec2i pos = this->goalPos;
-	const stratagus::unit_type &type = this->GetUnitType();
+	const wyrmgus::unit_type &type = this->GetUnitType();
 
 	// Check if the building could be built there.
 
@@ -403,11 +403,11 @@ void COrder_Build::HelpBuild(CUnit &unit, CUnit &building)
 
 bool COrder_Build::StartBuilding(CUnit &unit, CUnit &ontop)
 {
-	const stratagus::unit_type &type = this->GetUnitType();
+	const wyrmgus::unit_type &type = this->GetUnitType();
 
 	unit.Player->SubUnitType(type);
 
-	CUnit *build = MakeUnit(const_cast<stratagus::unit_type &>(type), unit.Player);
+	CUnit *build = MakeUnit(const_cast<wyrmgus::unit_type &>(type), unit.Player);
 	
 	//Wyrmgus start
 	build->Name.clear(); // under construction buildings should have no proper name
@@ -478,21 +478,21 @@ bool COrder_Build::StartBuilding(CUnit &unit, CUnit &ontop)
 		//Wyrmgus start
 //		unit.Direction = DirectionToHeading(build->tilePos - unit.tilePos);
 //		UnitUpdateHeading(unit);
-		const Vec2i dir = PixelSize(PixelSize(build->tilePos) * stratagus::defines::get()->get_tile_size()) + build->get_half_tile_pixel_size() - PixelSize(PixelSize(unit.tilePos) * stratagus::defines::get()->get_tile_size()) - unit.get_half_tile_pixel_size();
+		const Vec2i dir = PixelSize(PixelSize(build->tilePos) * wyrmgus::defines::get()->get_tile_size()) + build->get_half_tile_pixel_size() - PixelSize(PixelSize(unit.tilePos) * wyrmgus::defines::get()->get_tile_size()) - unit.get_half_tile_pixel_size();
 		UnitHeadingFromDeltaXY(unit, dir);
 		//Wyrmgus end
 	}
 	return true;
 }
 
-void COrder_Build::ConvertUnitType(const CUnit &unit, stratagus::unit_type &newType)
+void COrder_Build::ConvertUnitType(const CUnit &unit, wyrmgus::unit_type &newType)
 {
 	this->Type = &newType;
 }
 
 static void AnimateActionBuild(CUnit &unit)
 {
-	stratagus::animation_set *animations = unit.GetAnimations();
+	wyrmgus::animation_set *animations = unit.GetAnimations();
 
 	if (animations == nullptr) {
 		return ;
@@ -553,7 +553,7 @@ bool COrder_Build::BuildFromOutside(CUnit &unit) const
 			return ;
 		}
 	}
-	const stratagus::unit_type &type = this->GetUnitType();
+	const wyrmgus::unit_type &type = this->GetUnitType();
 
 	if (State_NearOfLocation <= this->State && this->State < State_StartBuilding_Failed) {
 		//Wyrmgus start
@@ -578,7 +578,7 @@ bool COrder_Build::BuildFromOutside(CUnit &unit) const
 		else { /* can't be built */
 			// Check if already building
 			const Vec2i pos = this->goalPos;
-			const stratagus::unit_type &type = this->GetUnitType();
+			const wyrmgus::unit_type &type = this->GetUnitType();
 
 			CUnit *building = AlreadyBuildingFinder(unit, type).Find(CMap::Map.Field(pos, this->MapLayer));
 

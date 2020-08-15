@@ -44,7 +44,7 @@ struct lua_State;
 
 int CclDefineCivilization(lua_State *l);
 
-namespace stratagus {
+namespace wyrmgus {
 
 class calendar;
 class civilization_group;
@@ -61,8 +61,8 @@ class civilization final : public civilization_base, public data_type<civilizati
 {
 	Q_OBJECT
 
-	Q_PROPERTY(stratagus::civilization* parent_civilization MEMBER parent_civilization READ get_parent_civilization)
-	Q_PROPERTY(stratagus::civilization_group* group MEMBER group READ get_group)
+	Q_PROPERTY(wyrmgus::civilization* parent_civilization MEMBER parent_civilization READ get_parent_civilization)
+	Q_PROPERTY(wyrmgus::civilization_group* group MEMBER group READ get_group)
 	Q_PROPERTY(bool visible MEMBER visible READ is_visible)
 	Q_PROPERTY(bool playable MEMBER playable READ is_playable)
 	Q_PROPERTY(QString interface READ get_interface_qstring)
@@ -75,7 +75,7 @@ public:
 	static constexpr const char *class_identifier = "civilization";
 	static constexpr const char *database_folder = "civilizations";
 
-	static civilization *add(const std::string &identifier, const stratagus::module *module)
+	static civilization *add(const std::string &identifier, const wyrmgus::module *module)
 	{
 		civilization *civilization = data_type::add(identifier, module);
 		civilization->ID = civilization::get_all().size() - 1;
@@ -103,7 +103,7 @@ public:
 		return this->parent_civilization;
 	}
 	
-	stratagus::species *get_species() const
+	wyrmgus::species *get_species() const
 	{
 		if (civilization_base::get_species() != nullptr) {
 			return civilization_base::get_species();
@@ -223,7 +223,7 @@ public:
 
 	void remove_class_unit_type(unit_type *unit_type)
 	{
-		for (std::map<const unit_class *, stratagus::unit_type *>::reverse_iterator iterator = this->class_unit_types.rbegin(); iterator != this->class_unit_types.rend(); ++iterator) {
+		for (std::map<const unit_class *, wyrmgus::unit_type *>::reverse_iterator iterator = this->class_unit_types.rbegin(); iterator != this->class_unit_types.rend(); ++iterator) {
 			if (iterator->second == unit_type) {
 				this->class_unit_types.erase(iterator->first);
 			}

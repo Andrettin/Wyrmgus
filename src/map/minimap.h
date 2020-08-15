@@ -40,7 +40,7 @@
 class CUnit;
 class CViewport;
 
-namespace stratagus {
+namespace wyrmgus {
 
 enum class minimap_mode;
 

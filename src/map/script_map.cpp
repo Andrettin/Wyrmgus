@@ -212,8 +212,8 @@ static int CclStratagusMap(lua_State *l)
 							LuaError(l, "incorrect argument for \"layer-references\"");
 						}
 						lua_rawgeti(l, -1, z + 1);
-						CMap::Map.MapLayers[z]->plane = stratagus::plane::try_get(LuaToString(l, -1, 1));
-						CMap::Map.MapLayers[z]->world = stratagus::world::try_get(LuaToString(l, -1, 2));
+						CMap::Map.MapLayers[z]->plane = wyrmgus::plane::try_get(LuaToString(l, -1, 1));
+						CMap::Map.MapLayers[z]->world = wyrmgus::world::try_get(LuaToString(l, -1, 2));
 						lua_pop(l, 1);
 					}
 					lua_pop(l, 1);
@@ -396,7 +396,7 @@ static int CclShowMapLocation(lua_State *l)
 
 	LuaCheckArgs(l, 4);
 	const char *unitname = LuaToString(l, 5);
-	stratagus::unit_type *unitType = stratagus::unit_type::get(unitname);
+	wyrmgus::unit_type *unitType = wyrmgus::unit_type::get(unitname);
 	CUnit *target = MakeUnit(*unitType, CPlayer::GetThisPlayer());
 	if (target != nullptr) {
 		target->Variable[HP_INDEX].Value = 0;
@@ -536,7 +536,7 @@ static int CclSetFogOfWarGraphics(lua_State *l)
 		CMap::FogGraphics = nullptr;
 	}
 	
-	CMap::FogGraphics = CGraphic::New(FogGraphicFile, stratagus::defines::get()->get_tile_size());
+	CMap::FogGraphics = CGraphic::New(FogGraphicFile, wyrmgus::defines::get()->get_tile_size());
 
 	return 0;
 }
@@ -597,7 +597,7 @@ void SetTileTerrain(const std::string &terrain_ident, const Vec2i &pos, int valu
 		return;
 	}
 	
-	stratagus::terrain_type *terrain = stratagus::terrain_type::get(terrain_ident);
+	wyrmgus::terrain_type *terrain = wyrmgus::terrain_type::get(terrain_ident);
 	
 	if (value < 0) {
 		fprintf(stderr, "Invalid tile value: %d\n", value);
@@ -615,14 +615,14 @@ void SetTileTerrain(const std::string &terrain_ident, const Vec2i &pos, int valu
 static int CclSetMapTemplateTile(lua_State *l)
 {
 	const std::string map_template_ident = LuaToString(l, 1);
-	stratagus::map_template *map_template = stratagus::map_template::get(map_template_ident);
+	wyrmgus::map_template *map_template = wyrmgus::map_template::get(map_template_ident);
 
 	const int x = LuaToNumber(l, 3);
 	const int y = LuaToNumber(l, 4);
 
 	try {
 		const int tile_number = LuaToNumber(l, 2);
-		stratagus::terrain_type *terrain = stratagus::terrain_type::get_by_tile_number(tile_number);
+		wyrmgus::terrain_type *terrain = wyrmgus::terrain_type::get_by_tile_number(tile_number);
 
 		map_template->set_tile_terrain(QPoint(x, y), terrain);
 	} catch (...) {
@@ -635,12 +635,12 @@ static int CclSetMapTemplateTile(lua_State *l)
 static int CclSetMapTemplateTileTerrain(lua_State *l)
 {
 	std::string map_template_ident = LuaToString(l, 1);
-	stratagus::map_template *map_template = stratagus::map_template::get_or_add(map_template_ident, nullptr);
+	wyrmgus::map_template *map_template = wyrmgus::map_template::get_or_add(map_template_ident, nullptr);
 
 	std::string terrain_ident = LuaToString(l, 2);
-	stratagus::terrain_type *terrain = nullptr;
+	wyrmgus::terrain_type *terrain = nullptr;
 	if (!terrain_ident.empty()) {
-		terrain = stratagus::terrain_type::get(terrain_ident);
+		terrain = wyrmgus::terrain_type::get(terrain_ident);
 	}
 
 	Vec2i pos;
@@ -652,7 +652,7 @@ static int CclSetMapTemplateTileTerrain(lua_State *l)
 		CclGetDate(l, &date, 4);
 	}
 	
-	map_template->HistoricalTerrains.push_back(std::tuple<Vec2i, stratagus::terrain_type *, CDate>(pos, terrain, date));
+	map_template->HistoricalTerrains.push_back(std::tuple<Vec2i, wyrmgus::terrain_type *, CDate>(pos, terrain, date));
 
 	if (nargs >= 5) {
 		map_template->TileLabels[std::pair<int, int>(pos.x, pos.y)] = LuaToString(l, 5);
@@ -664,7 +664,7 @@ static int CclSetMapTemplateTileTerrain(lua_State *l)
 static int CclSetMapTemplateTileLabel(lua_State *l)
 {
 	std::string map_template_ident = LuaToString(l, 1);
-	stratagus::map_template *map_template = stratagus::map_template::get_or_add(map_template_ident, nullptr);
+	wyrmgus::map_template *map_template = wyrmgus::map_template::get_or_add(map_template_ident, nullptr);
 
 	std::string label_string = LuaToString(l, 2);
 	
@@ -679,12 +679,12 @@ static int CclSetMapTemplateTileLabel(lua_State *l)
 static int CclSetMapTemplatePathway(lua_State *l)
 {
 	std::string map_template_ident = LuaToString(l, 1);
-	stratagus::map_template *map_template = stratagus::map_template::get_or_add(map_template_ident, nullptr);
+	wyrmgus::map_template *map_template = wyrmgus::map_template::get_or_add(map_template_ident, nullptr);
 
 	std::string terrain_ident = LuaToString(l, 2);
-	stratagus::terrain_type *terrain = nullptr;
+	wyrmgus::terrain_type *terrain = nullptr;
 	if (!terrain_ident.empty()) {
-		terrain = stratagus::terrain_type::get(terrain_ident);
+		terrain = wyrmgus::terrain_type::get(terrain_ident);
 	}
 
 	Vec2i start_pos;
@@ -692,7 +692,7 @@ static int CclSetMapTemplatePathway(lua_State *l)
 		CclGetPos(l, &start_pos.x, &start_pos.y, 3);
 	} else { //site ident
 		std::string site_ident = LuaToString(l, 3);
-		stratagus::site *site = stratagus::site::get(site_ident);
+		wyrmgus::site *site = wyrmgus::site::get(site_ident);
 		start_pos.x = site->get_pos().x();
 		start_pos.y = site->get_pos().y();
 	}
@@ -702,7 +702,7 @@ static int CclSetMapTemplatePathway(lua_State *l)
 		CclGetPos(l, &end_pos.x, &end_pos.y, 4);
 	} else { //site ident
 		std::string site_ident = LuaToString(l, 4);
-		stratagus::site *site = stratagus::site::get(site_ident);
+		wyrmgus::site *site = wyrmgus::site::get(site_ident);
 		end_pos.x = site->get_pos().x();
 		end_pos.y = site->get_pos().y();
 	}
@@ -731,7 +731,7 @@ static int CclSetMapTemplatePathway(lua_State *l)
 				if (pathway_length.x % pathway_length.y != 0 && current_length.x % (pathway_length.x / (pathway_length.x % pathway_length.y)) == 0) {
 					offset += 1;
 				} else if ((current_length.x - offset) % (std::max(1, pathway_length.x / pathway_length.y)) == 0) {
-					map_template->HistoricalTerrains.push_back(std::tuple<Vec2i, stratagus::terrain_type *, CDate>(Vec2i(pos), terrain, date));
+					map_template->HistoricalTerrains.push_back(std::tuple<Vec2i, wyrmgus::terrain_type *, CDate>(Vec2i(pos), terrain, date));
 					pos.y += pathway_change.y;
 				}
 			}
@@ -741,7 +741,7 @@ static int CclSetMapTemplatePathway(lua_State *l)
 				if (pathway_length.y % pathway_length.x != 0 && current_length.y % (pathway_length.y / (pathway_length.y % pathway_length.x)) == 0) {
 					offset += 1;
 				} else if ((current_length.y - offset) % (std::max(1, pathway_length.y / pathway_length.x)) == 0) {
-					map_template->HistoricalTerrains.push_back(std::tuple<Vec2i, stratagus::terrain_type *, CDate>(Vec2i(pos), terrain, date));
+					map_template->HistoricalTerrains.push_back(std::tuple<Vec2i, wyrmgus::terrain_type *, CDate>(Vec2i(pos), terrain, date));
 					pos.x += pathway_change.x;
 				}
 			}
@@ -756,7 +756,7 @@ static int CclSetMapTemplatePathway(lua_State *l)
 			break;
 		}
 
-		map_template->HistoricalTerrains.push_back(std::tuple<Vec2i, stratagus::terrain_type *, CDate>(Vec2i(pos), terrain, date));
+		map_template->HistoricalTerrains.push_back(std::tuple<Vec2i, wyrmgus::terrain_type *, CDate>(Vec2i(pos), terrain, date));
 	}
 
 	return 1;
@@ -765,10 +765,10 @@ static int CclSetMapTemplatePathway(lua_State *l)
 static int CclSetMapTemplateResource(lua_State *l)
 {
 	std::string map_template_ident = LuaToString(l, 1);
-	stratagus::map_template *map_template = stratagus::map_template::get_or_add(map_template_ident, nullptr);
+	wyrmgus::map_template *map_template = wyrmgus::map_template::get_or_add(map_template_ident, nullptr);
 
 	lua_pushvalue(l, 2);
-	stratagus::unit_type *unittype = CclGetUnitType(l);
+	wyrmgus::unit_type *unittype = CclGetUnitType(l);
 	if (unittype == nullptr) {
 		LuaError(l, "Bad unittype");
 	}
@@ -777,14 +777,14 @@ static int CclSetMapTemplateResource(lua_State *l)
 	CclGetPos(l, &ipos.x, &ipos.y, 3);
 
 	int resources_held = 0;
-	stratagus::unique_item *unique = nullptr;
+	wyrmgus::unique_item *unique = nullptr;
 	
 	const int nargs = lua_gettop(l);
 	if (nargs >= 4) {
 		resources_held = LuaToNumber(l, 4);
 	}
 	if (nargs >= 5) {
-		unique = stratagus::unique_item::get(LuaToString(l, 5));
+		unique = wyrmgus::unique_item::get(LuaToString(l, 5));
 	}
 	
 	map_template->Resources[std::pair<int, int>(ipos.x, ipos.y)] = std::make_tuple(unittype, resources_held, unique);
@@ -795,10 +795,10 @@ static int CclSetMapTemplateResource(lua_State *l)
 static int CclSetMapTemplateUnit(lua_State *l)
 {
 	std::string map_template_ident = LuaToString(l, 1);
-	stratagus::map_template *map_template = stratagus::map_template::get_or_add(map_template_ident, nullptr);
+	wyrmgus::map_template *map_template = wyrmgus::map_template::get_or_add(map_template_ident, nullptr);
 
 	lua_pushvalue(l, 2);
-	stratagus::unit_type *unittype = CclGetUnitType(l);
+	wyrmgus::unit_type *unittype = CclGetUnitType(l);
 	if (unittype == nullptr) {
 		LuaError(l, "Bad unittype");
 	}
@@ -807,12 +807,12 @@ static int CclSetMapTemplateUnit(lua_State *l)
 	CclGetPos(l, &ipos.x, &ipos.y, 4);
 
 	std::string faction_name = LuaToString(l, 3);
-	stratagus::faction *faction = stratagus::faction::try_get(faction_name);
+	wyrmgus::faction *faction = wyrmgus::faction::try_get(faction_name);
 
 	CDate start_date;
 	CDate end_date;
 
-	stratagus::unique_item *unique = nullptr;
+	wyrmgus::unique_item *unique = nullptr;
 
 	const int nargs = lua_gettop(l);
 	if (nargs >= 5) {
@@ -822,7 +822,7 @@ static int CclSetMapTemplateUnit(lua_State *l)
 		CclGetDate(l, &end_date, 6);
 	}
 	if (nargs >= 7) {
-		unique = stratagus::unique_item::get(LuaToString(l, 7));
+		unique = wyrmgus::unique_item::get(LuaToString(l, 7));
 	}
 	
 	map_template->Units.push_back(std::make_tuple(ipos, unittype, faction, start_date, end_date, unique));
@@ -833,15 +833,15 @@ static int CclSetMapTemplateUnit(lua_State *l)
 static int CclSetMapTemplateHero(lua_State *l)
 {
 	std::string map_template_ident = LuaToString(l, 1);
-	stratagus::map_template *map_template = stratagus::map_template::get_or_add(map_template_ident, nullptr);
+	wyrmgus::map_template *map_template = wyrmgus::map_template::get_or_add(map_template_ident, nullptr);
 
-	stratagus::character *hero = stratagus::character::get(LuaToString(l, 2));
+	wyrmgus::character *hero = wyrmgus::character::get(LuaToString(l, 2));
 
 	Vec2i ipos;
 	CclGetPos(l, &ipos.x, &ipos.y, 4);
 
 	std::string faction_name = LuaToString(l, 3);
-	stratagus::faction *faction = stratagus::faction::try_get(faction_name);
+	wyrmgus::faction *faction = wyrmgus::faction::try_get(faction_name);
 	if (!faction_name.empty() && !faction) {
 		LuaError(l, "Faction \"%s\" doesn't exist.\n" _C_ faction_name.c_str());
 	}
@@ -856,7 +856,7 @@ static int CclSetMapTemplateHero(lua_State *l)
 		CclGetDate(l, &end_date, 6);
 	}
 	
-	map_template->Heroes.push_back(std::tuple<Vec2i, stratagus::character *, stratagus::faction *, CDate, CDate>(ipos, hero, faction, start_date, end_date));
+	map_template->Heroes.push_back(std::tuple<Vec2i, wyrmgus::character *, wyrmgus::faction *, CDate, CDate>(ipos, hero, faction, start_date, end_date));
 	
 	return 1;
 }
@@ -864,10 +864,10 @@ static int CclSetMapTemplateHero(lua_State *l)
 static int CclSetMapTemplateLayerConnector(lua_State *l)
 {
 	std::string map_template_ident = LuaToString(l, 1);
-	stratagus::map_template *map_template = stratagus::map_template::get_or_add(map_template_ident, nullptr);
+	wyrmgus::map_template *map_template = wyrmgus::map_template::get_or_add(map_template_ident, nullptr);
 
 	lua_pushvalue(l, 2);
-	stratagus::unit_type *unittype = CclGetUnitType(l);
+	wyrmgus::unit_type *unittype = CclGetUnitType(l);
 	if (unittype == nullptr) {
 		LuaError(l, "Bad unittype");
 	}
@@ -875,19 +875,19 @@ static int CclSetMapTemplateLayerConnector(lua_State *l)
 	Vec2i ipos;
 	CclGetPos(l, &ipos.x, &ipos.y, 3);
 
-	stratagus::unique_item *unique = nullptr;
+	wyrmgus::unique_item *unique = nullptr;
 	
 	const int nargs = lua_gettop(l);
 	if (nargs >= 5) {
-		unique = stratagus::unique_item::get(LuaToString(l, 5));
+		unique = wyrmgus::unique_item::get(LuaToString(l, 5));
 	}
 	
 	if (lua_isstring(l, 4)) {
 		std::string realm = LuaToString(l, 4);
-		if (stratagus::world::try_get(realm)) {
-			map_template->WorldConnectors.push_back(std::make_tuple(ipos, unittype, stratagus::world::get(realm), unique));
-		} else if (stratagus::plane::try_get(realm)) {
-			map_template->PlaneConnectors.push_back(std::make_tuple(ipos, unittype, stratagus::plane::try_get(realm), unique));
+		if (wyrmgus::world::try_get(realm)) {
+			map_template->WorldConnectors.push_back(std::make_tuple(ipos, unittype, wyrmgus::world::get(realm), unique));
+		} else if (wyrmgus::plane::try_get(realm)) {
+			map_template->PlaneConnectors.push_back(std::make_tuple(ipos, unittype, wyrmgus::plane::try_get(realm), unique));
 		} else {
 			LuaError(l, "incorrect argument");
 		}
@@ -904,7 +904,7 @@ static std::string map_terrains[64][64];
 static int CclCreateMapTemplateTerrainFile(lua_State *l)
 {
 	std::string map_template_ident = LuaToString(l, 1);
-	stratagus::map_template *map_template = stratagus::map_template::GetMapTemplate(map_template_ident);
+	wyrmgus::map_template *map_template = wyrmgus::map_template::GetMapTemplate(map_template_ident);
 	if (!map_template) {
 		LuaError(l, "Map template doesn't exist.\n");
 	}
@@ -921,7 +921,7 @@ static int CclCreateMapTemplateTerrainFile(lua_State *l)
 	for (int x = 0; x < map_template->Width; ++x) {
 		for (int y = 0; y < map_template->Height; ++y) {
 			unsigned int index = x + y * map_template->Width;
-			stratagus::terrain_type *terrain = nullptr;
+			wyrmgus::terrain_type *terrain = nullptr;
 			if (!overlay && index < map_template->TileTerrains.size() && map_template->TileTerrains[index] != -1) {
 				terrain = TerrainTypes[map_template->TileTerrains[index]];
 			} else if (overlay && index < map_template->TileOverlayTerrains.size() && map_template->TileOverlayTerrains[index] != -1) {
@@ -960,12 +960,12 @@ static int CclCreateMapTemplateTerrainFile(lua_State *l)
 
 void ApplyCampaignMap(const std::string &campaign_ident)
 {
-	stratagus::database::load_history();
+	wyrmgus::database::load_history();
 
-	const stratagus::campaign *campaign = stratagus::campaign::get(campaign_ident);
+	const wyrmgus::campaign *campaign = wyrmgus::campaign::get(campaign_ident);
 	
 	for (size_t i = 0; i < campaign->get_map_templates().size(); ++i) {
-		stratagus::map_template *map_template = campaign->get_map_templates()[i];
+		wyrmgus::map_template *map_template = campaign->get_map_templates()[i];
 		QPoint start_pos(0, 0);
 		if (i < campaign->MapTemplateStartPos.size()) {
 			start_pos = campaign->MapTemplateStartPos[i];
@@ -1046,8 +1046,8 @@ static int CclDefineTileset(lua_State *l)
 	CMap::Map.Tileset->parse(l);
 
 	ShowLoadProgress(_("Loading Tileset \"%s\""), CMap::Map.Tileset->ImageFile.c_str());
-	CMap::Map.TileGraphic = CGraphic::New(CMap::Map.Tileset->ImageFile, stratagus::defines::get()->get_tile_size());
-	CMap::Map.TileGraphic->Load(false, stratagus::defines::get()->get_scale_factor());
+	CMap::Map.TileGraphic = CGraphic::New(CMap::Map.Tileset->ImageFile, wyrmgus::defines::get()->get_tile_size());
+	CMap::Map.TileGraphic->Load(false, wyrmgus::defines::get()->get_scale_factor());
 	return 0;
 }
 /**
@@ -1276,7 +1276,7 @@ static int CclDefineTerrainType(lua_State *l)
 	}
 
 	std::string terrain_ident = LuaToString(l, 1);
-	stratagus::terrain_type *terrain = stratagus::terrain_type::get_or_add(terrain_ident, nullptr);
+	wyrmgus::terrain_type *terrain = wyrmgus::terrain_type::get_or_add(terrain_ident, nullptr);
 	
 	std::string graphics_file;
 	std::string elevation_graphics_file;
@@ -1316,14 +1316,14 @@ static int CclDefineTerrainType(lua_State *l)
 		} else if (!strcmp(value, "SolidAnimationFrames")) {
 			terrain->SolidAnimationFrames = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "Resource")) {
-			terrain->resource = stratagus::resource::get(LuaToString(l, -1));
+			terrain->resource = wyrmgus::resource::get(LuaToString(l, -1));
 		} else if (!strcmp(value, "BaseTerrainTypes")) {
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument");
 			}
 			const int subargs = lua_rawlen(l, -1);
 			for (int j = 0; j < subargs; ++j) {
-				stratagus::terrain_type *base_terrain = stratagus::terrain_type::get_or_add(LuaToString(l, -1, j + 1), nullptr);
+				wyrmgus::terrain_type *base_terrain = wyrmgus::terrain_type::get_or_add(LuaToString(l, -1, j + 1), nullptr);
 				terrain->add_base_terrain_type(base_terrain);
 			}
 		} else if (!strcmp(value, "InnerBorderTerrains")) {
@@ -1332,7 +1332,7 @@ static int CclDefineTerrainType(lua_State *l)
 			}
 			const int subargs = lua_rawlen(l, -1);
 			for (int j = 0; j < subargs; ++j) {
-				stratagus::terrain_type *border_terrain = stratagus::terrain_type::get(LuaToString(l, -1, j + 1));
+				wyrmgus::terrain_type *border_terrain = wyrmgus::terrain_type::get(LuaToString(l, -1, j + 1));
 				terrain->add_inner_border_terrain_type(border_terrain);
 			}
 		} else if (!strcmp(value, "OuterBorderTerrains")) {
@@ -1341,7 +1341,7 @@ static int CclDefineTerrainType(lua_State *l)
 			}
 			const int subargs = lua_rawlen(l, -1);
 			for (int j = 0; j < subargs; ++j) {
-				stratagus::terrain_type *border_terrain = stratagus::terrain_type::get(LuaToString(l, -1, j + 1));
+				wyrmgus::terrain_type *border_terrain = wyrmgus::terrain_type::get(LuaToString(l, -1, j + 1));
 				terrain->add_outer_border_terrain_type(border_terrain);
 			}
 		} else if (!strcmp(value, "OverlayTerrains")) {
@@ -1350,7 +1350,7 @@ static int CclDefineTerrainType(lua_State *l)
 			}
 			const int subargs = lua_rawlen(l, -1);
 			for (int j = 0; j < subargs; ++j) {
-				stratagus::terrain_type *overlay_terrain = stratagus::terrain_type::get(LuaToString(l, -1, j + 1));
+				wyrmgus::terrain_type *overlay_terrain = wyrmgus::terrain_type::get(LuaToString(l, -1, j + 1));
 				overlay_terrain->add_base_terrain_type(terrain);
 			}
 		} else if (!strcmp(value, "Flags")) {
@@ -1452,13 +1452,13 @@ static int CclDefineTerrainType(lua_State *l)
 			const int subargs = lua_rawlen(l, -1);
 			for (int j = 0; j < subargs; ++j) {
 				std::string transition_terrain_name = LuaToString(l, -1, j + 1);
-				stratagus::terrain_type *transition_terrain = nullptr;
+				wyrmgus::terrain_type *transition_terrain = nullptr;
 				if (transition_terrain_name != "any") {
-					transition_terrain = stratagus::terrain_type::get(transition_terrain_name);
+					transition_terrain = wyrmgus::terrain_type::get(transition_terrain_name);
 				}
 				++j;
 				
-				const stratagus::tile_transition_type transition_type = GetTransitionTypeIdByName(LuaToString(l, -1, j + 1));
+				const wyrmgus::tile_transition_type transition_type = GetTransitionTypeIdByName(LuaToString(l, -1, j + 1));
 				++j;
 				
 				terrain->transition_tiles[transition_terrain][transition_type].push_back(LuaToNumber(l, -1, j + 1));
@@ -1470,13 +1470,13 @@ static int CclDefineTerrainType(lua_State *l)
 			const int subargs = lua_rawlen(l, -1);
 			for (int j = 0; j < subargs; ++j) {
 				std::string transition_terrain_name = LuaToString(l, -1, j + 1);
-				stratagus::terrain_type *transition_terrain = nullptr;
+				wyrmgus::terrain_type *transition_terrain = nullptr;
 				if (transition_terrain_name != "any") {
-					transition_terrain = stratagus::terrain_type::get(transition_terrain_name);
+					transition_terrain = wyrmgus::terrain_type::get(transition_terrain_name);
 				}
 				++j;
 				
-				const stratagus::tile_transition_type transition_type = GetTransitionTypeIdByName(LuaToString(l, -1, j + 1));
+				const wyrmgus::tile_transition_type transition_type = GetTransitionTypeIdByName(LuaToString(l, -1, j + 1));
 				++j;
 				
 				terrain->adjacent_transition_tiles[transition_terrain][transition_type].push_back(LuaToNumber(l, -1, j + 1));
@@ -1487,10 +1487,10 @@ static int CclDefineTerrainType(lua_State *l)
 	}
 	
 	if (!graphics_file.empty()) {
-		terrain->graphics = CPlayerColorGraphic::New(graphics_file, stratagus::defines::get()->get_tile_size(), nullptr);
+		terrain->graphics = CPlayerColorGraphic::New(graphics_file, wyrmgus::defines::get()->get_tile_size(), nullptr);
 	}
 	if (!elevation_graphics_file.empty()) {
-		terrain->elevation_graphics = CGraphic::New(elevation_graphics_file, stratagus::defines::get()->get_tile_size());
+		terrain->elevation_graphics = CGraphic::New(elevation_graphics_file, wyrmgus::defines::get()->get_tile_size());
 	}
 	
 	return 0;
@@ -1509,7 +1509,7 @@ static int CclDefineMapTemplate(lua_State *l)
 	}
 
 	std::string map_template_ident = LuaToString(l, 1);
-	stratagus::map_template *map_template = stratagus::map_template::get_or_add(map_template_ident, nullptr);
+	wyrmgus::map_template *map_template = wyrmgus::map_template::get_or_add(map_template_ident, nullptr);
 	
 	//  Parse the list:
 	for (lua_pushnil(l); lua_next(l, 2); lua_pop(l, 1)) {
@@ -1518,10 +1518,10 @@ static int CclDefineMapTemplate(lua_State *l)
 		if (!strcmp(value, "Name")) {
 			map_template->set_name(LuaToString(l, -1));
 		} else if (!strcmp(value, "Plane")) {
-			stratagus::plane *plane = stratagus::plane::get(LuaToString(l, -1));
+			wyrmgus::plane *plane = wyrmgus::plane::get(LuaToString(l, -1));
 			map_template->plane = plane;
 		} else if (!strcmp(value, "World")) {
-			stratagus::world *world = stratagus::world::get(LuaToString(l, -1));
+			wyrmgus::world *world = wyrmgus::world::get(LuaToString(l, -1));
 			map_template->world = world;
 			map_template->plane = world->get_plane();
 		} else if (!strcmp(value, "TerrainFile")) {
@@ -1547,16 +1547,16 @@ static int CclDefineMapTemplate(lua_State *l)
 			CclGetPos(l, &subtemplate_pos.x, &subtemplate_pos.y);
 			map_template->subtemplate_top_left_pos = subtemplate_pos;
 		} else if (!strcmp(value, "MainTemplate")) {
-			stratagus::map_template *main_template = stratagus::map_template::get(LuaToString(l, -1));
+			wyrmgus::map_template *main_template = wyrmgus::map_template::get(LuaToString(l, -1));
 			map_template->set_main_template(main_template);
 		} else if (!strcmp(value, "BaseTerrainType")) {
-			stratagus::terrain_type *terrain_type = stratagus::terrain_type::get(LuaToString(l, -1));
+			wyrmgus::terrain_type *terrain_type = wyrmgus::terrain_type::get(LuaToString(l, -1));
 			map_template->base_terrain_type = terrain_type;
 		} else if (!strcmp(value, "BaseOverlayTerrainType")) {
-			stratagus::terrain_type *terrain_type = stratagus::terrain_type::get(LuaToString(l, -1));
+			wyrmgus::terrain_type *terrain_type = wyrmgus::terrain_type::get(LuaToString(l, -1));
 			map_template->base_overlay_terrain_type = terrain_type;
 		} else if (!strcmp(value, "SurroundingTerrainType")) {
-			stratagus::terrain_type *terrain_type = stratagus::terrain_type::get(LuaToString(l, -1));
+			wyrmgus::terrain_type *terrain_type = wyrmgus::terrain_type::get(LuaToString(l, -1));
 			map_template->surrounding_terrain_type = terrain_type;
 		} else if (!strcmp(value, "GeneratedNeutralUnits")) {
 			if (!lua_istable(l, -1)) {
@@ -1564,12 +1564,12 @@ static int CclDefineMapTemplate(lua_State *l)
 			}
 			const int subargs = lua_rawlen(l, -1);
 			for (int j = 0; j < subargs; ++j) {
-				stratagus::unit_type *unit_type = stratagus::unit_type::get(LuaToString(l, -1, j + 1));
+				wyrmgus::unit_type *unit_type = wyrmgus::unit_type::get(LuaToString(l, -1, j + 1));
 				++j;
 				
 				int quantity = LuaToNumber(l, -1, j + 1);
 				
-				map_template->GeneratedNeutralUnits.push_back(std::pair<stratagus::unit_type *, int>(unit_type, quantity));
+				map_template->GeneratedNeutralUnits.push_back(std::pair<wyrmgus::unit_type *, int>(unit_type, quantity));
 			}
 		} else if (!strcmp(value, "PlayerLocationGeneratedNeutralUnits")) {
 			if (!lua_istable(l, -1)) {
@@ -1577,12 +1577,12 @@ static int CclDefineMapTemplate(lua_State *l)
 			}
 			const int subargs = lua_rawlen(l, -1);
 			for (int j = 0; j < subargs; ++j) {
-				stratagus::unit_type *unit_type = stratagus::unit_type::get(LuaToString(l, -1, j + 1));
+				wyrmgus::unit_type *unit_type = wyrmgus::unit_type::get(LuaToString(l, -1, j + 1));
 				++j;
 				
 				int quantity = LuaToNumber(l, -1, j + 1);
 				
-				map_template->PlayerLocationGeneratedNeutralUnits.push_back(std::pair<stratagus::unit_type *, int>(unit_type, quantity));
+				map_template->PlayerLocationGeneratedNeutralUnits.push_back(std::pair<wyrmgus::unit_type *, int>(unit_type, quantity));
 			}
 		} else {
 			LuaError(l, "Unsupported tag: %s" _C_ value);
@@ -1605,7 +1605,7 @@ static int CclDefineSite(lua_State *l)
 	}
 
 	std::string site_ident = LuaToString(l, 1);
-	stratagus::site *site = stratagus::site::get_or_add(site_ident, nullptr);
+	wyrmgus::site *site = wyrmgus::site::get_or_add(site_ident, nullptr);
 	
 	//  Parse the list:
 	for (lua_pushnil(l); lua_next(l, 2); lua_pop(l, 1)) {
@@ -1620,7 +1620,7 @@ static int CclDefineSite(lua_State *l)
 			CclGetPos(l, &pos.x, &pos.y);
 			site->pos = pos;
 		} else if (!strcmp(value, "MapTemplate")) {
-			stratagus::map_template *map_template = stratagus::map_template::get(LuaToString(l, -1));
+			wyrmgus::map_template *map_template = wyrmgus::map_template::get(LuaToString(l, -1));
 			site->map_template = map_template;
 		} else if (!strcmp(value, "CulturalNames")) {
 			if (!lua_istable(l, -1)) {
@@ -1628,7 +1628,7 @@ static int CclDefineSite(lua_State *l)
 			}
 			const int subargs = lua_rawlen(l, -1);
 			for (int j = 0; j < subargs; ++j) {
-				stratagus::civilization *civilization = stratagus::civilization::get(LuaToString(l, -1, j + 1));
+				wyrmgus::civilization *civilization = wyrmgus::civilization::get(LuaToString(l, -1, j + 1));
 				++j;
 
 				std::string cultural_name = LuaToString(l, -1, j + 1);
@@ -1641,7 +1641,7 @@ static int CclDefineSite(lua_State *l)
 			}
 			const int subargs = lua_rawlen(l, -1);
 			for (int j = 0; j < subargs; ++j) {
-				stratagus::faction *faction = stratagus::faction::get(LuaToString(l, -1, j + 1));
+				wyrmgus::faction *faction = wyrmgus::faction::get(LuaToString(l, -1, j + 1));
 				
 				site->add_core(faction);
 			}
@@ -1658,7 +1658,7 @@ static int CclDefineSite(lua_State *l)
 				++j;
 				std::string owner_ident = LuaToString(l, -1, j + 1);
 				if (!owner_ident.empty()) {
-					stratagus::faction *owner_faction = stratagus::faction::get(owner_ident);
+					wyrmgus::faction *owner_faction = wyrmgus::faction::get(owner_ident);
 					site->HistoricalOwners[date] = owner_faction;
 				} else {
 					site->HistoricalOwners[date] = nullptr;
@@ -1694,22 +1694,22 @@ static int CclDefineSite(lua_State *l)
 				lua_pop(l, 1);
 				++j;
 				
-				stratagus::unit_type *unit_type = stratagus::unit_type::get(LuaToString(l, -1, j + 1));
+				wyrmgus::unit_type *unit_type = wyrmgus::unit_type::get(LuaToString(l, -1, j + 1));
 				++j;
 				
 				int unit_quantity = LuaToNumber(l, -1, j + 1);
 				++j;
 				
-				stratagus::faction *unit_owner = nullptr;
+				wyrmgus::faction *unit_owner = nullptr;
 				lua_rawgeti(l, -1, j + 1);
 				if (lua_isstring(l, -1) && !lua_isnumber(l, -1)) {
-					unit_owner = stratagus::faction::get(LuaToString(l, -1));
+					unit_owner = wyrmgus::faction::get(LuaToString(l, -1));
 				} else {
 					--j;
 				}
 				lua_pop(l, 1);
 
-				site->HistoricalUnits.push_back(std::tuple<CDate, CDate, stratagus::unit_type *, int, stratagus::faction *>(start_date, end_date, unit_type, unit_quantity, unit_owner));
+				site->HistoricalUnits.push_back(std::tuple<CDate, CDate, wyrmgus::unit_type *, int, wyrmgus::faction *>(start_date, end_date, unit_type, unit_quantity, unit_owner));
 			}
 		} else if (!strcmp(value, "HistoricalBuildings")) {
 			if (!lua_istable(l, -1)) {
@@ -1727,23 +1727,23 @@ static int CclDefineSite(lua_State *l)
 				CclGetDate(l, &end_date);
 				lua_pop(l, 1);
 				++j;
-				const stratagus::unit_class *building_class = stratagus::unit_class::get(LuaToString(l, -1, j + 1));
+				const wyrmgus::unit_class *building_class = wyrmgus::unit_class::get(LuaToString(l, -1, j + 1));
 				++j;
 				
-				stratagus::unique_item *unique = nullptr;
+				wyrmgus::unique_item *unique = nullptr;
 				lua_rawgeti(l, -1, j + 1);
-				if (lua_isstring(l, -1) && !lua_isnumber(l, -1) && stratagus::unique_item::try_get(LuaToString(l, -1)) != nullptr) {
-					unique = stratagus::unique_item::get(LuaToString(l, -1));
+				if (lua_isstring(l, -1) && !lua_isnumber(l, -1) && wyrmgus::unique_item::try_get(LuaToString(l, -1)) != nullptr) {
+					unique = wyrmgus::unique_item::get(LuaToString(l, -1));
 				} else {
 					--j;
 				}
 				lua_pop(l, 1);
 				++j;
 				
-				stratagus::faction *building_owner = nullptr;
+				wyrmgus::faction *building_owner = nullptr;
 				lua_rawgeti(l, -1, j + 1);
 				if (lua_isstring(l, -1) && !lua_isnumber(l, -1)) {
-					building_owner = stratagus::faction::get(LuaToString(l, -1));
+					building_owner = wyrmgus::faction::get(LuaToString(l, -1));
 				} else {
 					--j;
 				}
@@ -1767,13 +1767,13 @@ static int CclDefineSite(lua_State *l)
 				CclGetDate(l, &end_date);
 				lua_pop(l, 1);
 				++j;
-				stratagus::unit_type *unit_type = stratagus::unit_type::get(LuaToString(l, -1, j + 1));
+				wyrmgus::unit_type *unit_type = wyrmgus::unit_type::get(LuaToString(l, -1, j + 1));
 				++j;
 				
-				stratagus::unique_item *unique = nullptr;
+				wyrmgus::unique_item *unique = nullptr;
 				lua_rawgeti(l, -1, j + 1);
-				if (lua_isstring(l, -1) && !lua_isnumber(l, -1) && stratagus::unique_item::try_get(LuaToString(l, -1)) != nullptr) {
-					unique = stratagus::unique_item::get(LuaToString(l, -1));
+				if (lua_isstring(l, -1) && !lua_isnumber(l, -1) && wyrmgus::unique_item::try_get(LuaToString(l, -1)) != nullptr) {
+					unique = wyrmgus::unique_item::get(LuaToString(l, -1));
 				} else {
 					--j;
 				}
@@ -1790,7 +1790,7 @@ static int CclDefineSite(lua_State *l)
 			}
 			const int subargs = lua_rawlen(l, -1);
 			for (int j = 0; j < subargs; ++j) {
-				stratagus::region *region = stratagus::region::get(LuaToString(l, -1, j + 1));
+				wyrmgus::region *region = wyrmgus::region::get(LuaToString(l, -1, j + 1));
 				site->regions.push_back(region);
 				region->add_site(site);
 			}
@@ -1815,7 +1815,7 @@ static int CclDefineTerrainFeature(lua_State *l)
 	}
 
 	std::string terrain_feature_ident = LuaToString(l, 1);
-	stratagus::terrain_feature *terrain_feature = stratagus::terrain_feature::get_or_add(terrain_feature_ident, nullptr);
+	wyrmgus::terrain_feature *terrain_feature = wyrmgus::terrain_feature::get_or_add(terrain_feature_ident, nullptr);
 	
 	//  Parse the list:
 	for (lua_pushnil(l); lua_next(l, 2); lua_pop(l, 1)) {
@@ -1833,7 +1833,7 @@ static int CclDefineTerrainFeature(lua_State *l)
 			color.setBlue(LuaToNumber(l, -1, 3));
 			terrain_feature->set_color(color);
 		} else if (!strcmp(value, "TerrainType")) {
-			stratagus::terrain_type *terrain = stratagus::terrain_type::get(LuaToString(l, -1));
+			wyrmgus::terrain_type *terrain = wyrmgus::terrain_type::get(LuaToString(l, -1));
 			terrain_feature->terrain_type = terrain;
 		} else if (!strcmp(value, "CulturalNames")) {
 			if (!lua_istable(l, -1)) {
@@ -1841,7 +1841,7 @@ static int CclDefineTerrainFeature(lua_State *l)
 			}
 			const int subargs = lua_rawlen(l, -1);
 			for (int j = 0; j < subargs; ++j) {
-				const stratagus::civilization *civilization = stratagus::civilization::get(LuaToString(l, -1, j + 1));
+				const wyrmgus::civilization *civilization = wyrmgus::civilization::get(LuaToString(l, -1, j + 1));
 				++j;
 
 				std::string cultural_name = LuaToString(l, -1, j + 1);
@@ -1867,7 +1867,7 @@ static int CclGetMapTemplateData(lua_State *l)
 		LuaError(l, "incorrect argument");
 	}
 	std::string map_template_ident = LuaToString(l, 1);
-	stratagus::map_template *map_template = stratagus::map_template::get(map_template_ident);
+	wyrmgus::map_template *map_template = wyrmgus::map_template::get(map_template_ident);
 	const char *data = LuaToString(l, 2);
 
 	if (!strcmp(data, "Name")) {
@@ -1928,7 +1928,7 @@ static int CclGetSiteData(lua_State *l)
 		LuaError(l, "incorrect argument");
 	}
 	const std::string site_ident = LuaToString(l, 1);
-	const stratagus::site *site = stratagus::site::get(site_ident);
+	const wyrmgus::site *site = wyrmgus::site::get(site_ident);
 	const char *data = LuaToString(l, 2);
 
 	if (!strcmp(data, "Name")) {

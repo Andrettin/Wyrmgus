@@ -31,7 +31,7 @@
 #include "player.h"
 #include "script/condition/condition.h"
 
-namespace stratagus {
+namespace wyrmgus {
 
 class age_condition final : public condition
 {

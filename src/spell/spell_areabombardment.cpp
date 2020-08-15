@@ -56,7 +56,7 @@
 			this->StartOffsetY = LuaToNumber(l, -1, j + 1);
 		} else if (!strcmp(value, "missile")) {
 			value = LuaToString(l, -1, j + 1);
-			this->Missile = stratagus::missile_type::get(value);
+			this->Missile = wyrmgus::missile_type::get(value);
 		} else {
 			LuaError(l, "Unsupported area-bombardment tag: %s" _C_ value);
 		}
@@ -80,13 +80,13 @@
 **  @internal: vladi: blizzard differs than original in this way:
 **   original: launches 50 shards at 5 random spots x 10 for 25 mana.
 */
-/* virtual */ int Spell_AreaBombardment::Cast(CUnit &caster, const stratagus::spell &, CUnit *, const Vec2i &goalPos, int z, int modifier)
+/* virtual */ int Spell_AreaBombardment::Cast(CUnit &caster, const wyrmgus::spell &, CUnit *, const Vec2i &goalPos, int z, int modifier)
 {
 	int fields = this->Fields;
 	const int shards = this->Shards;
 	const int damage = this->Damage * modifier / 100;
 	const PixelDiff offset(this->StartOffsetX, this->StartOffsetY);
-	const stratagus::missile_type *missile = this->Missile;
+	const wyrmgus::missile_type *missile = this->Missile;
 
 	while (fields--) {
 		Vec2i dpos;
@@ -103,9 +103,9 @@
 		for (int i = 0; i < shards; ++i) {
 			::Missile *mis = MakeMissile(*missile, start, dest, z);
 			if (mis->Type->BlizzardSpeed) {
-				mis->Delay = i * mis->Type->get_sleep() * 2 * stratagus::defines::get()->get_tile_width() / mis->Type->BlizzardSpeed;
+				mis->Delay = i * mis->Type->get_sleep() * 2 * wyrmgus::defines::get()->get_tile_width() / mis->Type->BlizzardSpeed;
 			} else if (mis->Type->get_speed()) {
-				mis->Delay = i * mis->Type->get_sleep() * 2 * stratagus::defines::get()->get_tile_width() / mis->Type->get_speed();
+				mis->Delay = i * mis->Type->get_sleep() * 2 * wyrmgus::defines::get()->get_tile_width() / mis->Type->get_speed();
 			} else {
 				mis->Delay = i * mis->Type->get_sleep() * mis->Type->G->NumFrames;
 			}

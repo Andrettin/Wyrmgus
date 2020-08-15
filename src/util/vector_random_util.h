@@ -29,7 +29,7 @@
 
 #include "util/random.h"
 
-namespace stratagus::vector {
+namespace wyrmgus::vector {
 
 template <typename T>
 inline const typename T::value_type &get_random(const T &vector)

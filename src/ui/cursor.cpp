@@ -61,14 +61,14 @@ PixelPos CursorStartMapPos;/// position of starting point of selection rectangle
 
 
 /*--- DRAW BUILDING  CURSOR ------------------------------------------------*/
-stratagus::unit_type *CursorBuilding;           /// building cursor
+wyrmgus::unit_type *CursorBuilding;           /// building cursor
 
 /*--- DRAW SPRITE CURSOR ---------------------------------------------------*/
-stratagus::cursor *GameCursor = nullptr;                 /// current shown cursor-type
+wyrmgus::cursor *GameCursor = nullptr;                 /// current shown cursor-type
 
 static SDL_Surface *HiddenSurface;
 
-namespace stratagus {
+namespace wyrmgus {
 
 void cursor::clear()
 {
@@ -92,7 +92,7 @@ cursor::~cursor()
 void cursor::initialize()
 {
 	this->graphic = CGraphic::New(this->get_file().string(), this->get_frame_size());
-	this->graphic->Load(false, stratagus::defines::get()->get_scale_factor());
+	this->graphic->Load(false, wyrmgus::defines::get()->get_scale_factor());
 
 	if (this->get_civilization() != nullptr) {
 		this->get_civilization()->set_cursor(this->get_type(), this);
@@ -120,7 +120,7 @@ void cursor::set_file(const std::filesystem::path &filepath)
 int GetCursorsCount()
 {
 	int count = 0;
-	for (const stratagus::cursor *cursor : stratagus::cursor::get_all()) {
+	for (const wyrmgus::cursor *cursor : wyrmgus::cursor::get_all()) {
 		if (cursor->get_graphic() != nullptr && !cursor->get_graphic()->IsLoaded()) {
 			count++;
 		}
@@ -184,7 +184,7 @@ void DrawBuildingCursor()
 
 	const QPoint center_tile_pos = mpos + CursorBuilding->get_tile_center_pos_offset();
 	const bool is_underground = UI.CurrentMapLayer->Field(center_tile_pos)->Flags & MapFieldUnderground;
-	const stratagus::time_of_day *time_of_day = is_underground ? stratagus::defines::get()->get_underground_time_of_day() : UI.CurrentMapLayer->GetTimeOfDay();
+	const wyrmgus::time_of_day *time_of_day = is_underground ? wyrmgus::defines::get()->get_underground_time_of_day() : UI.CurrentMapLayer->GetTimeOfDay();
 
 //	DrawShadow(*CursorBuilding, CursorBuilding->StillFrame, screenPos);
 	if (CursorBuilding->GetDefaultVariation(CPlayer::GetThisPlayer()) && CursorBuilding->GetDefaultVariation(CPlayer::GetThisPlayer())->ShadowSprite) {
@@ -252,7 +252,7 @@ void DrawBuildingCursor()
 	
 	if (CursorBuilding->CanAttack && CursorBuilding->Stats->Variables[ATTACKRANGE_INDEX].Value > 0) {
 		const PixelPos center(screenPos + CursorBuilding->get_scaled_half_tile_pixel_size());
-		const int radius = (CursorBuilding->Stats->Variables[ATTACKRANGE_INDEX].Max + (CursorBuilding->get_tile_width() - 1)) * stratagus::defines::get()->get_scaled_tile_width() + 1;
+		const int radius = (CursorBuilding->Stats->Variables[ATTACKRANGE_INDEX].Max + (CursorBuilding->get_tile_width() - 1)) * wyrmgus::defines::get()->get_scaled_tile_width() + 1;
 		Video.DrawCircleClip(ColorRed, center.x, center.y, radius);
 	}
 
@@ -296,8 +296,8 @@ void DrawBuildingCursor()
 			} else {
 				color = ColorRed;
 			}
-			Video.FillTransRectangleClip(color, screenPos.x + w * stratagus::defines::get()->get_scaled_tile_width(),
-										 screenPos.y + h * stratagus::defines::get()->get_scaled_tile_height(), stratagus::defines::get()->get_scaled_tile_width(), stratagus::defines::get()->get_scaled_tile_height(), 95);
+			Video.FillTransRectangleClip(color, screenPos.x + w * wyrmgus::defines::get()->get_scaled_tile_width(),
+										 screenPos.y + h * wyrmgus::defines::get()->get_scaled_tile_height(), wyrmgus::defines::get()->get_scaled_tile_width(), wyrmgus::defines::get()->get_scaled_tile_height(), 95);
 		}
 	}
 	PopClipping();
@@ -320,7 +320,7 @@ void DrawCursor()
 	if (GameCursor == nullptr) {
 		return;
 	}
-	const PixelPos pos = CursorScreenPos - GameCursor->get_hot_pos() * stratagus::defines::get()->get_scale_factor();
+	const PixelPos pos = CursorScreenPos - GameCursor->get_hot_pos() * wyrmgus::defines::get()->get_scale_factor();
 
 	//  Last, Normal cursor.
 	if (!GameCursor->get_graphic()->IsLoaded()) {

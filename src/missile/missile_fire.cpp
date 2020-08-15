@@ -52,7 +52,7 @@ void MissileFire::Action()
 //		const int f = (100 * unit.Variable[HP_INDEX].Value) / unit.Variable[HP_INDEX].Max;
 		const int f = (100 * unit.get_variable_value(HP_INDEX)) / unit.GetModifiedVariable(HP_INDEX, VariableMax);
 		//Wyrmgus end
-		stratagus::missile_type *fire = MissileBurningBuilding(f);
+		wyrmgus::missile_type *fire = MissileBurningBuilding(f);
 
 		if (!fire) {
 			this->TTL = 0;

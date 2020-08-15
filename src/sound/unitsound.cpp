@@ -47,7 +47,7 @@
 bool SoundConfig::MapSound()
 {
 	if (!this->Name.empty()) {
-		this->Sound = stratagus::sound::get(this->Name);
+		this->Sound = wyrmgus::sound::get(this->Name);
 	}
 	return this->Sound != nullptr;
 }
@@ -59,7 +59,7 @@ void SoundConfig::SetSoundRange(unsigned char range)
 	}
 }
 
-namespace stratagus {
+namespace wyrmgus {
 
 void unit_sound_set::process_sml_property(const sml_property &property)
 {
@@ -194,7 +194,7 @@ static void MapAnimSounds2(CAnimation *anim)
 /**
 **  Map animation sounds for a unit type
 */
-static void MapAnimSounds(stratagus::unit_type &type)
+static void MapAnimSounds(wyrmgus::unit_type &type)
 {
 	if (!type.get_animation_set()) {
 		return;
@@ -256,12 +256,12 @@ void MapUnitSounds()
 		return;
 	}
 
-	for (stratagus::civilization *civilization : stratagus::civilization::get_all()) {
+	for (wyrmgus::civilization *civilization : wyrmgus::civilization::get_all()) {
 		civilization->UnitSounds.map_sounds();
 	}
 
 	// Parse all units sounds.
-	for (stratagus::unit_type *unit_type : stratagus::unit_type::get_all()) {
+	for (wyrmgus::unit_type *unit_type : wyrmgus::unit_type::get_all()) {
 		MapAnimSounds(*unit_type);
 
 		unit_type->MapSound.map_sounds();

@@ -29,7 +29,7 @@
 
 #include "util/geocoordinate_util.h"
 
-namespace stratagus::georectangle {
+namespace wyrmgus::georectangle {
 
 QRectF to_unsigned_georectangle(const QGeoRectangle &georectangle)
 {

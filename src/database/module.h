@@ -31,7 +31,7 @@
 
 #pragma once
 
-namespace stratagus {
+namespace wyrmgus {
 
 class sml_data;
 class sml_property;
@@ -103,7 +103,7 @@ public:
 			return true;
 		}
 
-		for (const stratagus::module *dependency : this->dependencies) {
+		for (const wyrmgus::module *dependency : this->dependencies) {
 			if (dependency->depends_on(module)) {
 				return true;
 			}
@@ -120,7 +120,7 @@ public:
 	{
 		size_t count = this->dependencies.size();
 
-		for (const stratagus::module *dependency : this->dependencies) {
+		for (const wyrmgus::module *dependency : this->dependencies) {
 			count += dependency->get_dependency_count();
 		}
 

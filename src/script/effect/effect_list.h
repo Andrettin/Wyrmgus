@@ -29,7 +29,7 @@
 
 class CPlayer;
 
-namespace stratagus {
+namespace wyrmgus {
 
 class effect;
 class sml_data;

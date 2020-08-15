@@ -41,7 +41,7 @@ struct lua_State;
 
 int CclDefineMapTemplate(lua_State *l);
 
-namespace stratagus {
+namespace wyrmgus {
 
 class character;
 class faction;
@@ -95,22 +95,22 @@ class map_template final : public named_data_entry, public data_type<map_templat
 	Q_PROPERTY(QPoint subtemplate_center_pos MEMBER subtemplate_center_pos READ get_subtemplate_center_pos)
 	Q_PROPERTY(QPoint min_subtemplate_pos MEMBER min_subtemplate_pos READ get_min_subtemplate_pos)
 	Q_PROPERTY(QPoint max_subtemplate_pos MEMBER max_subtemplate_pos READ get_max_subtemplate_pos)
-	Q_PROPERTY(stratagus::plane* plane MEMBER plane READ get_plane)
-	Q_PROPERTY(stratagus::world* world READ get_world WRITE set_world)
-	Q_PROPERTY(stratagus::map_template* main_template READ get_main_template WRITE set_main_template)
+	Q_PROPERTY(wyrmgus::plane* plane MEMBER plane READ get_plane)
+	Q_PROPERTY(wyrmgus::world* world READ get_world WRITE set_world)
+	Q_PROPERTY(wyrmgus::map_template* main_template READ get_main_template WRITE set_main_template)
 	Q_PROPERTY(QString terrain_file READ get_terrain_file_qstring)
 	Q_PROPERTY(QString overlay_terrain_file READ get_overlay_terrain_file_qstring)
 	Q_PROPERTY(QString terrain_image READ get_terrain_image_qstring)
 	Q_PROPERTY(QString overlay_terrain_image READ get_overlay_terrain_image_qstring)
 	Q_PROPERTY(QString territory_image READ get_territory_image_qstring)
-	Q_PROPERTY(stratagus::terrain_type* base_terrain_type MEMBER base_terrain_type READ get_base_terrain_type)
-	Q_PROPERTY(stratagus::terrain_type* base_overlay_terrain_type MEMBER base_overlay_terrain_type READ get_base_overlay_terrain_type)
-	Q_PROPERTY(stratagus::terrain_type* border_terrain_type MEMBER border_terrain_type READ get_border_terrain_type)
-	Q_PROPERTY(stratagus::terrain_type* border_overlay_terrain_type MEMBER border_overlay_terrain_type READ get_border_overlay_terrain_type)
-	Q_PROPERTY(stratagus::terrain_type* unusable_area_terrain_type MEMBER unusable_area_terrain_type READ get_unusable_area_terrain_type)
-	Q_PROPERTY(stratagus::terrain_type* unusable_area_overlay_terrain_type MEMBER unusable_area_overlay_terrain_type READ get_unusable_area_overlay_terrain_type)
-	Q_PROPERTY(stratagus::terrain_type* surrounding_terrain_type MEMBER surrounding_terrain_type READ get_surrounding_terrain_type)
-	Q_PROPERTY(stratagus::terrain_type* surrounding_overlay_terrain_type MEMBER surrounding_overlay_terrain_type READ get_surrounding_overlay_terrain_type)
+	Q_PROPERTY(wyrmgus::terrain_type* base_terrain_type MEMBER base_terrain_type READ get_base_terrain_type)
+	Q_PROPERTY(wyrmgus::terrain_type* base_overlay_terrain_type MEMBER base_overlay_terrain_type READ get_base_overlay_terrain_type)
+	Q_PROPERTY(wyrmgus::terrain_type* border_terrain_type MEMBER border_terrain_type READ get_border_terrain_type)
+	Q_PROPERTY(wyrmgus::terrain_type* border_overlay_terrain_type MEMBER border_overlay_terrain_type READ get_border_overlay_terrain_type)
+	Q_PROPERTY(wyrmgus::terrain_type* unusable_area_terrain_type MEMBER unusable_area_terrain_type READ get_unusable_area_terrain_type)
+	Q_PROPERTY(wyrmgus::terrain_type* unusable_area_overlay_terrain_type MEMBER unusable_area_overlay_terrain_type READ get_unusable_area_overlay_terrain_type)
+	Q_PROPERTY(wyrmgus::terrain_type* surrounding_terrain_type MEMBER surrounding_terrain_type READ get_surrounding_terrain_type)
+	Q_PROPERTY(wyrmgus::terrain_type* surrounding_overlay_terrain_type MEMBER surrounding_overlay_terrain_type READ get_surrounding_overlay_terrain_type)
 	Q_PROPERTY(bool output_terrain_image MEMBER output_terrain_image READ outputs_terrain_image)
 	Q_PROPERTY(bool output_territory_image MEMBER output_territory_image READ outputs_territory_image)
 	Q_PROPERTY(double min_longitude MEMBER min_longitude READ get_min_longitude)
@@ -645,8 +645,8 @@ public:
 	std::map<std::pair<int, int>, std::tuple<unit_type *, int, unique_item *>> Resources; /// Resources (with unit type, resources held, and unique item pointer), mapped to the tile position
 	std::vector<std::tuple<Vec2i, unit_type *, faction *, CDate, CDate, unique_item *>> Units; /// Units; first value is the tile position, and the last ones are start date and end date
 	std::vector<std::tuple<Vec2i, character *, faction *, CDate, CDate>> Heroes; /// Heroes; first value is the tile position, and the last ones are start year and end year
-	std::vector<std::tuple<Vec2i, unit_type *, stratagus::plane *, unique_item *>> PlaneConnectors; /// Layer connectors (with unit type, plane pointer, and unique item pointer), mapped to the tile position
-	std::vector<std::tuple<Vec2i, unit_type *, stratagus::world *, unique_item *>> WorldConnectors; /// Layer connectors (with unit type, world pointer, and unique item pointer), mapped to the tile position
+	std::vector<std::tuple<Vec2i, unit_type *, wyrmgus::plane *, unique_item *>> PlaneConnectors; /// Layer connectors (with unit type, plane pointer, and unique item pointer), mapped to the tile position
+	std::vector<std::tuple<Vec2i, unit_type *, wyrmgus::world *, unique_item *>> WorldConnectors; /// Layer connectors (with unit type, world pointer, and unique item pointer), mapped to the tile position
 	std::map<std::pair<int, int>, std::string> TileLabels; /// labels to appear for certain tiles
 	std::vector<site *> sites;
 	point_map<site *> sites_by_position;

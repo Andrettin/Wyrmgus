@@ -38,7 +38,7 @@
 #include "unit/unit.h"
 #include "video/video.h"
 
-namespace stratagus {
+namespace wyrmgus {
 
 icon::icon(const std::string &identifier) : data_entry(identifier)
 {
@@ -258,7 +258,7 @@ bool IconConfig::LoadNoLog()
 {
 	Assert(!this->Name.empty());
 
-	Icon = stratagus::icon::try_get(this->Name);
+	Icon = wyrmgus::icon::try_get(this->Name);
 	return Icon != nullptr;
 }
 

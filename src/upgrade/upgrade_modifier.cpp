@@ -37,7 +37,7 @@
 #include "util/string_util.h"
 #include "util/vector_util.h"
 
-namespace stratagus {
+namespace wyrmgus {
 
 /// Upgrades modifiers
 std::vector<upgrade_modifier *> upgrade_modifier::UpgradeModifiers;

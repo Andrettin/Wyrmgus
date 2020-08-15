@@ -61,7 +61,7 @@
 	const PixelPos moff = goal->Type->MissileOffsets[dir][!offsetnum ? 0 : offsetnum - 1];
 	PixelPos start;
 	PixelPos dest;
-	stratagus::missile_type *mtype = stratagus::missile_type::try_get(this->missileTypeStr);
+	wyrmgus::missile_type *mtype = wyrmgus::missile_type::try_get(this->missileTypeStr);
 	if (mtype == nullptr) {
 		return;
 	}
@@ -70,11 +70,11 @@
 		return;
 	}
 	if ((flags & SM_Pixel)) {
-		start.x = goal->tilePos.x * stratagus::defines::get()->get_tile_width() + goal->get_pixel_offset().x() + moff.x + startx;
-		start.y = goal->tilePos.y * stratagus::defines::get()->get_tile_height() + goal->get_pixel_offset().y() + moff.y + starty;
+		start.x = goal->tilePos.x * wyrmgus::defines::get()->get_tile_width() + goal->get_pixel_offset().x() + moff.x + startx;
+		start.y = goal->tilePos.y * wyrmgus::defines::get()->get_tile_height() + goal->get_pixel_offset().y() + moff.y + starty;
 	} else {
-		start.x = (goal->tilePos.x + startx) * stratagus::defines::get()->get_tile_width() + stratagus::defines::get()->get_tile_width() / 2 + moff.x;
-		start.y = (goal->tilePos.y + starty) * stratagus::defines::get()->get_tile_height() + stratagus::defines::get()->get_tile_height() / 2 + moff.y;
+		start.x = (goal->tilePos.x + startx) * wyrmgus::defines::get()->get_tile_width() + wyrmgus::defines::get()->get_tile_width() / 2 + moff.x;
+		start.y = (goal->tilePos.y + starty) * wyrmgus::defines::get()->get_tile_height() + wyrmgus::defines::get()->get_tile_height() / 2 + moff.y;
 	}
 	if ((flags & SM_ToTarget)) {
 		CUnit *target = goal->CurrentOrder()->GetGoal();
@@ -98,15 +98,15 @@
 				dest.x += destx;
 				dest.y += desty;
 			} else {
-				dest.x += destx * stratagus::defines::get()->get_tile_width();
-				dest.y += desty * stratagus::defines::get()->get_tile_height();
+				dest.x += destx * wyrmgus::defines::get()->get_tile_width();
+				dest.y += desty * wyrmgus::defines::get()->get_tile_height();
 			}
 		} else if (flags & SM_Pixel) {
 			dest.x = target->get_map_pixel_pos_center().x + destx;
 			dest.y = target->get_map_pixel_pos_center().y + desty;
 		} else {
-			dest.x = (target->tilePos.x + destx) * stratagus::defines::get()->get_tile_width();
-			dest.y = (target->tilePos.y + desty) * stratagus::defines::get()->get_tile_height();
+			dest.x = (target->tilePos.x + destx) * wyrmgus::defines::get()->get_tile_width();
+			dest.y = (target->tilePos.y + desty) * wyrmgus::defines::get()->get_tile_height();
 			dest += target->get_tile_pixel_size() / 2;
 		}
 	} else {
@@ -114,8 +114,8 @@
 			dest.x = goal->get_map_pixel_pos_center().x + destx;
 			dest.y = goal->get_map_pixel_pos_center().y + desty;
 		} else {
-			dest.x = (goal->tilePos.x + destx) * stratagus::defines::get()->get_tile_width();
-			dest.y = (goal->tilePos.y + desty) * stratagus::defines::get()->get_tile_height();
+			dest.x = (goal->tilePos.x + destx) * wyrmgus::defines::get()->get_tile_width();
+			dest.y = (goal->tilePos.y + desty) * wyrmgus::defines::get()->get_tile_height();
 			dest += goal->get_tile_pixel_size() / 2;
 		}
 	}

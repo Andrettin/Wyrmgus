@@ -33,7 +33,7 @@
 #include "database/sml_property.h"
 #include "script/effect/effect.h"
 
-namespace stratagus {
+namespace wyrmgus {
 
 effect_list::effect_list()
 {

@@ -164,7 +164,7 @@ void SendCommandRallyPoint(CUnit &unit, const Vec2i &pos, int z)
 ** @param unit    pointer to unit.
 ** @param pos     map tile position to move to.
 */
-void SendCommandQuest(CUnit &unit, stratagus::quest *quest)
+void SendCommandQuest(CUnit &unit, wyrmgus::quest *quest)
 {
 	if (!IsNetworkGame()) {
 		CommandLog("quest", &unit, 0, 0, 0, NoUnitP, quest->get_identifier().c_str(), -1);
@@ -442,7 +442,7 @@ void SendCommandUnload(CUnit &unit, const Vec2i &pos, CUnit *what, int flush, in
 ** @param what    pointer to unit-type of the building.
 ** @param flush   Flag flush all pending commands.
 */
-void SendCommandBuildBuilding(CUnit &unit, const Vec2i &pos, stratagus::unit_type &what, int flush, int z)
+void SendCommandBuildBuilding(CUnit &unit, const Vec2i &pos, wyrmgus::unit_type &what, int flush, int z)
 {
 	if (!IsNetworkGame()) {
 		CommandLog("build", &unit, flush, pos.x, pos.y, NoUnitP, what.Ident.c_str(), -1);
@@ -532,7 +532,7 @@ void SendCommandReturnGoods(CUnit &unit, CUnit *goal, int flush)
 ** @param what    pointer to unit-type of the unit to be trained.
 ** @param flush   Flag flush all pending commands.
 */
-void SendCommandTrainUnit(CUnit &unit, stratagus::unit_type &what, int player, int flush)
+void SendCommandTrainUnit(CUnit &unit, wyrmgus::unit_type &what, int player, int flush)
 {
 	if (!IsNetworkGame()) {
 		//Wyrmgus start
@@ -556,7 +556,7 @@ void SendCommandTrainUnit(CUnit &unit, stratagus::unit_type &what, int player, i
 ** @param slot    Slot of training queue to cancel.
 ** @param type    Unit-type of unit to cancel.
 */
-void SendCommandCancelTraining(CUnit &unit, int slot, const stratagus::unit_type *type)
+void SendCommandCancelTraining(CUnit &unit, int slot, const wyrmgus::unit_type *type)
 {
 	if (!IsNetworkGame()) {
 		CommandLog("cancel-train", &unit, FlushCommands, -1, -1, NoUnitP,
@@ -575,7 +575,7 @@ void SendCommandCancelTraining(CUnit &unit, int slot, const stratagus::unit_type
 ** @param what     pointer to unit-type of the unit upgrade.
 ** @param flush    Flag flush all pending commands.
 */
-void SendCommandUpgradeTo(CUnit &unit, stratagus::unit_type &what, int flush)
+void SendCommandUpgradeTo(CUnit &unit, wyrmgus::unit_type &what, int flush)
 {
 	if (!IsNetworkGame()) {
 		CommandLog("upgrade-to", &unit, flush, -1, -1, NoUnitP, what.Ident.c_str(), -1);
@@ -609,7 +609,7 @@ void SendCommandCancelUpgradeTo(CUnit &unit)
 ** @param what     pointer to unit-type of the unit upgrade.
 ** @param flush    Flag flush all pending commands.
 */
-void SendCommandTransformInto(CUnit &unit, stratagus::unit_type &what, int flush)
+void SendCommandTransformInto(CUnit &unit, wyrmgus::unit_type &what, int flush)
 {
 	if (!IsNetworkGame()) {
 		CommandLog("transform-into", &unit, flush, -1, -1, NoUnitP, what.Ident.c_str(), -1);
@@ -686,7 +686,7 @@ void SendCommandSpellCast(CUnit &unit, const Vec2i &pos, CUnit *dest, int spelli
 {
 	if (!IsNetworkGame()) {
 		CommandLog("spell-cast", &unit, flush, pos.x, pos.y, dest, nullptr, spellid);
-		CommandSpellCast(unit, pos, dest, *stratagus::spell::get_all()[spellid], flush, z);
+		CommandSpellCast(unit, pos, dest, *wyrmgus::spell::get_all()[spellid], flush, z);
 	} else {
 		NetworkSendCommand(MessageCommandSpellCast + spellid,
 						   unit, pos.x, pos.y, dest, nullptr, flush);
@@ -700,7 +700,7 @@ void SendCommandSpellCast(CUnit &unit, const Vec2i &pos, CUnit *dest, int spelli
 ** @param spellid   Spell type id.
 ** @param on        1 for auto cast on, 0 for off.
 */
-void SendCommandAutoSpellCast(CUnit &unit, const stratagus::spell *spell, const bool on)
+void SendCommandAutoSpellCast(CUnit &unit, const wyrmgus::spell *spell, const bool on)
 {
 	if (!IsNetworkGame()) {
 		CommandLog("auto-spell-cast", &unit, FlushCommands, on, -1, NoUnitP, nullptr, spell->Slot);
@@ -717,10 +717,10 @@ void SendCommandAutoSpellCast(CUnit &unit, const stratagus::spell *spell, const 
 ** @param state      New diplomacy state.
 ** @param opponent   Opponent.
 */
-void SendCommandDiplomacy(const int player, const stratagus::diplomacy_state state, const int opponent)
+void SendCommandDiplomacy(const int player, const wyrmgus::diplomacy_state state, const int opponent)
 {
 	if (!IsNetworkGame()) {
-		CommandLog("diplomacy", NoUnitP, 0, player, opponent, NoUnitP, stratagus::diplomacy_state_to_string(state).c_str(), -1);
+		CommandLog("diplomacy", NoUnitP, 0, player, opponent, NoUnitP, wyrmgus::diplomacy_state_to_string(state).c_str(), -1);
 		CommandDiplomacy(player, state, opponent);
 	} else {
 		NetworkSendExtendedCommand(ExtendedMessageDiplomacy,
@@ -757,7 +757,7 @@ void SendCommandSetFaction(int player, int faction)
 	if (!IsNetworkGame()) {
 		//FIXME: should add log of faction change here
 		if (faction != -1) {
-			CPlayer::Players[player]->SetFaction(stratagus::faction::get_all()[faction]);
+			CPlayer::Players[player]->SetFaction(wyrmgus::faction::get_all()[faction]);
 		} else {
 			CPlayer::Players[player]->SetFaction(nullptr);
 		}
@@ -766,7 +766,7 @@ void SendCommandSetFaction(int player, int faction)
 	}
 }
 
-void SendCommandSetDynasty(CPlayer *player, const stratagus::dynasty *dynasty)
+void SendCommandSetDynasty(CPlayer *player, const wyrmgus::dynasty *dynasty)
 {
 	if (!IsNetworkGame()) {
 		//FIXME: should add log of dynasty change here
@@ -955,8 +955,8 @@ void ExecCommand(unsigned char msgnr, UnitRef unum,
 			break;
 		}
 		case MessageCommandBuild:
-			CommandLog("build", &unit, status, pos.x, pos.y, NoUnitP, stratagus::unit_type::get_all()[dstnr]->Ident.c_str(), -1);
-			CommandBuildBuilding(unit, pos, *stratagus::unit_type::get_all()[dstnr], status);
+			CommandLog("build", &unit, status, pos.x, pos.y, NoUnitP, wyrmgus::unit_type::get_all()[dstnr]->Ident.c_str(), -1);
+			CommandBuildBuilding(unit, pos, *wyrmgus::unit_type::get_all()[dstnr], status);
 			break;
 		case MessageCommandDismiss:
 			CommandLog("dismiss", &unit, FlushCommands, arg1, -1, nullptr, nullptr, -1);
@@ -982,15 +982,15 @@ void ExecCommand(unsigned char msgnr, UnitRef unum,
 			break;
 		}
 		case MessageCommandTrain:
-			CommandLog("train", &unit, status, -1, -1, NoUnitP, stratagus::unit_type::get_all()[dstnr]->Ident.c_str(), arg1); // use X as a way to mark the player
-			CommandTrainUnit(unit, *stratagus::unit_type::get_all()[dstnr], arg1, status);
+			CommandLog("train", &unit, status, -1, -1, NoUnitP, wyrmgus::unit_type::get_all()[dstnr]->Ident.c_str(), arg1); // use X as a way to mark the player
+			CommandTrainUnit(unit, *wyrmgus::unit_type::get_all()[dstnr], arg1, status);
 			break;
 		case MessageCommandCancelTrain:
 			// We need (short)x for the last slot -1
 			if (dstnr != (unsigned short)0xFFFF) {
 				CommandLog("cancel-train", &unit, FlushCommands, -1, -1, NoUnitP,
-					stratagus::unit_type::get_all()[dstnr]->Ident.c_str(), (short)x);
-				CommandCancelTraining(unit, (short)x, stratagus::unit_type::get_all()[dstnr]);
+					wyrmgus::unit_type::get_all()[dstnr]->Ident.c_str(), (short)x);
+				CommandCancelTraining(unit, (short)x, wyrmgus::unit_type::get_all()[dstnr]);
 			} else {
 				CommandLog("cancel-train", &unit, FlushCommands, -1, -1, NoUnitP, nullptr, (short)x);
 				CommandCancelTraining(unit, (short)x, nullptr);
@@ -1006,12 +1006,12 @@ void ExecCommand(unsigned char msgnr, UnitRef unum,
 			*/
 			if (arg1 == 2) { //use X as a way to mark whether this is an upgrade or a transformation
 				CommandLog("transform-into", &unit, status, -1, -1, NoUnitP,
-					stratagus::unit_type::get_all()[dstnr]->Ident.c_str(), -1);
-				CommandTransformIntoType(unit, *stratagus::unit_type::get_all()[dstnr]);
+					wyrmgus::unit_type::get_all()[dstnr]->Ident.c_str(), -1);
+				CommandTransformIntoType(unit, *wyrmgus::unit_type::get_all()[dstnr]);
 			} else {
 				CommandLog("upgrade-to", &unit, status, -1, -1, NoUnitP,
-					stratagus::unit_type::get_all()[dstnr]->Ident.c_str(), -1);
-				CommandUpgradeTo(unit, *stratagus::unit_type::get_all()[dstnr], status);
+					wyrmgus::unit_type::get_all()[dstnr]->Ident.c_str(), -1);
+				CommandUpgradeTo(unit, *wyrmgus::unit_type::get_all()[dstnr], status);
 			}
 			break;
 			//Wyrmgus end
@@ -1041,8 +1041,8 @@ void ExecCommand(unsigned char msgnr, UnitRef unum,
 			CommandLearnAbility(unit, *CUpgrade::get_all()[arg1]);
 			break;
 		case MessageCommandQuest: {
-			CommandLog("quest", &unit, 0, 0, 0, NoUnitP, stratagus::quest::get_all()[arg1]->get_identifier().c_str(), -1);
-			CommandQuest(unit, stratagus::quest::get_all()[arg1]);
+			CommandLog("quest", &unit, 0, 0, 0, NoUnitP, wyrmgus::quest::get_all()[arg1]->get_identifier().c_str(), -1);
+			CommandQuest(unit, wyrmgus::quest::get_all()[arg1]);
 			break;
 		}
 		case MessageCommandBuy: {
@@ -1079,17 +1079,17 @@ void ExecCommand(unsigned char msgnr, UnitRef unum,
 					Assert(dest && dest->Type);
 				}
 				CommandLog("spell-cast", &unit, status, pos.x, pos.y, dest, nullptr, id);
-				CommandSpellCast(unit, pos, dest, *stratagus::spell::get_all()[id], status);
+				CommandSpellCast(unit, pos, dest, *wyrmgus::spell::get_all()[id], status);
 			} else {
 				CommandLog("auto-spell-cast", &unit, status, arg1, -1, NoUnitP, nullptr, id);
-				CommandAutoSpellCast(unit, stratagus::spell::get_all()[id], arg1);
+				CommandAutoSpellCast(unit, wyrmgus::spell::get_all()[id], arg1);
 			}
 			break;
 		}
 	}
 }
 
-static const char *GetDiplomacyName(stratagus::diplomacy_state e)
+static const char *GetDiplomacyName(wyrmgus::diplomacy_state e)
 {
 	Assert(static_cast<int>(e) < 4);
 	const char *diplomacyNames[] = {"allied", "neutral", "enemy", "crazy"};
@@ -1115,7 +1115,7 @@ void ExecExtendedCommand(unsigned char type, int status,
 
 	switch (type) {
 		case ExtendedMessageDiplomacy: {
-			const stratagus::diplomacy_state state = static_cast<stratagus::diplomacy_state>(arg3);
+			const wyrmgus::diplomacy_state state = static_cast<wyrmgus::diplomacy_state>(arg3);
 			const char *diplomacyName = GetDiplomacyName(state);
 			CommandLog("diplomacy", NoUnitP, 0, arg2, arg4, NoUnitP, diplomacyName, -1);
 			CommandDiplomacy(arg2, state, arg4);
@@ -1131,14 +1131,14 @@ void ExecExtendedCommand(unsigned char type, int status,
 			break;
 		case ExtendedMessageSetFaction: {
 			//FIXME: should add log for faction change here
-			CPlayer::Players[arg2]->SetFaction(stratagus::faction::get_all()[arg3]);
+			CPlayer::Players[arg2]->SetFaction(wyrmgus::faction::get_all()[arg3]);
 			break;
 		}
 		case ExtendedMessageSetDynasty: {
 			//FIXME: should add log for faction change here
-			const stratagus::dynasty *dynasty = nullptr;
+			const wyrmgus::dynasty *dynasty = nullptr;
 			if (arg3 != -1) {
-				dynasty = stratagus::dynasty::get_all()[arg3];
+				dynasty = wyrmgus::dynasty::get_all()[arg3];
 			}
 			CPlayer::Players[arg2]->set_dynasty(dynasty);
 			break;

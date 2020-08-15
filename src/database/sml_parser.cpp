@@ -34,7 +34,7 @@
 #include "database/sml_data.h"
 #include "database/sml_operator.h"
 
-namespace stratagus {
+namespace wyrmgus {
 
 sml_parser::sml_parser(const std::filesystem::path &filepath)
 	: filepath(filepath), current_property_operator(sml_operator::none)

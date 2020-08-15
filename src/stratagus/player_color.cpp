@@ -32,7 +32,7 @@
 #include "database/defines.h"
 #include "util/container_util.h"
 
-namespace stratagus {
+namespace wyrmgus {
 
 void player_color::check() const
 {

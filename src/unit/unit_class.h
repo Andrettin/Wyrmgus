@@ -30,7 +30,7 @@
 #include "database/data_type.h"
 #include "database/named_data_entry.h"
 
-namespace stratagus {
+namespace wyrmgus {
 
 class unit_type;
 
@@ -44,7 +44,7 @@ public:
 	static constexpr const char *class_identifier = "unit_class";
 	static constexpr const char *database_folder = "unit_classes";
 
-	static unit_class *add(const std::string &identifier, const stratagus::module *module)
+	static unit_class *add(const std::string &identifier, const wyrmgus::module *module)
 	{
 		unit_class *unit_class = data_type::add(identifier, module);
 		unit_class->index = unit_class::get_all().size() - 1;

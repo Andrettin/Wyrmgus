@@ -63,7 +63,7 @@
 */
 int SyncRand(int max)
 {
-	return stratagus::random::get()->generate(max);
+	return wyrmgus::random::get()->generate(max);
 }
 
 int MyRand()
@@ -1144,7 +1144,7 @@ std::string SeparateCapitalizedStringElements(const std::string &text)
 
 std::string GeneratePersonalName(const std::string &unit_type_ident)
 {
-	const stratagus::unit_type *unit_type = stratagus::unit_type::get(unit_type_ident);
-	return unit_type->GeneratePersonalName(nullptr, static_cast<stratagus::gender>(unit_type->DefaultStat.Variables[GENDER_INDEX].Value));
+	const wyrmgus::unit_type *unit_type = wyrmgus::unit_type::get(unit_type_ident);
+	return unit_type->GeneratePersonalName(nullptr, static_cast<wyrmgus::gender>(unit_type->DefaultStat.Variables[GENDER_INDEX].Value));
 }
 //Wyrmgus end

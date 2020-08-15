@@ -37,7 +37,7 @@ class CPlayerColorGraphic;
 
 int CclDefineUnitType(lua_State *l);
 
-namespace stratagus {
+namespace wyrmgus {
 
 class animation_set;
 class season;
@@ -114,7 +114,7 @@ public:
 		return this->index;
 	}
 
-	const stratagus::unit_type *get_unit_type() const
+	const wyrmgus::unit_type *get_unit_type() const
 	{
 		return this->unit_type;
 	}
@@ -132,7 +132,7 @@ public:
 private:
 	std::string identifier;
 	int index = -1;					//the variation's index within the appropriate variation vector of its unit type
-	const stratagus::unit_type *unit_type = nullptr; //the unit type to which the variation belongs
+	const wyrmgus::unit_type *unit_type = nullptr; //the unit type to which the variation belongs
 public:
 	int ImageLayer = -1;			/// The image layer to which the variation belongs (if any)
 private:
@@ -160,8 +160,8 @@ public:
 	std::vector<const CUpgrade *> UpgradesForbidden;	/// If the player has one of these upgrades, the unit can't have this variation
 	std::set<item_class> item_classes_equipped;
 	std::set<item_class> item_classes_not_equipped;
-	std::vector<const stratagus::unit_type *> ItemsEquipped;
-	std::vector<const stratagus::unit_type *> ItemsNotEquipped;
+	std::vector<const wyrmgus::unit_type *> ItemsEquipped;
+	std::vector<const wyrmgus::unit_type *> ItemsNotEquipped;
 	std::vector<const terrain_type *> Terrains;
 	std::vector<const terrain_type *> TerrainsForbidden;
 	std::vector<const season *> Seasons;

@@ -482,13 +482,13 @@ static void UiSaveMapPosition(unsigned position)
 */
 static void UiRecallMapPosition(unsigned position)
 {
-	UI.SelectedViewport->Set(SavedMapPosition[position], stratagus::defines::get()->get_scaled_tile_size() / 2);
+	UI.SelectedViewport->Set(SavedMapPosition[position], wyrmgus::defines::get()->get_scaled_tile_size() / 2);
 }
 
 void UiToggleMinimapMode()
 {
 	UI.Minimap.toggle_mode();
-	UI.StatusLine.Set(_(stratagus::get_minimap_mode_name(UI.Minimap.get_mode())));
+	UI.StatusLine.Set(_(wyrmgus::get_minimap_mode_name(UI.Minimap.get_mode())));
 }
 
 void UiToggleMinimapZoom()
@@ -530,7 +530,7 @@ void UiFindIdleWorker()
 		UI.StatusLine.Clear();
 		UI.StatusLine.ClearCosts();
 		CurrentButtonLevel = nullptr;
-		PlayUnitSound(*Selected[0], stratagus::unit_sound_type::selected);
+		PlayUnitSound(*Selected[0], wyrmgus::unit_sound_type::selected);
 		SelectionChanged();
 		if (unit->MapLayer != UI.CurrentMapLayer) {
 			ChangeCurrentMapLayer(unit->MapLayer->ID);
@@ -567,7 +567,7 @@ void UiFindLevelUpUnit()
 		UI.StatusLine.Clear();
 		UI.StatusLine.ClearCosts();
 		CurrentButtonLevel = nullptr;
-		PlayUnitSound(*Selected[0], stratagus::unit_sound_type::selected);
+		PlayUnitSound(*Selected[0], wyrmgus::unit_sound_type::selected);
 		SelectionChanged();
 		if (unit->MapLayer != UI.CurrentMapLayer) {
 			ChangeCurrentMapLayer(unit->MapLayer->ID);
@@ -590,7 +590,7 @@ void UiFindHeroUnit(int hero_index)
 	UI.StatusLine.Clear();
 	UI.StatusLine.ClearCosts();
 	CurrentButtonLevel = nullptr;
-	PlayUnitSound(*Selected[0], stratagus::unit_sound_type::selected);
+	PlayUnitSound(*Selected[0], wyrmgus::unit_sound_type::selected);
 	SelectionChanged();
 	if (unit->MapLayer != UI.CurrentMapLayer) {
 		ChangeCurrentMapLayer(unit->MapLayer->ID);
@@ -1440,22 +1440,22 @@ bool HandleMouseScrollArea(const PixelPos &mousePos)
 		//Wyrmgus end
 			CursorOn = cursor_on::scroll_left_up;
 			MouseScrollState = ScrollLeftUp;
-			GameCursor = UI.get_cursor(stratagus::cursor_type::arrow_northwest);
+			GameCursor = UI.get_cursor(wyrmgus::cursor_type::arrow_northwest);
 		//Wyrmgus start
 //		} else if (mousePos.y > SCROLL_DOWN) {
-		} else if (mousePos.y > SCROLL_DOWN && bottom_right_map_pos.y < (UI.CurrentMapLayer->get_height() * stratagus::defines::get()->get_scaled_tile_height()) - 1) {
+		} else if (mousePos.y > SCROLL_DOWN && bottom_right_map_pos.y < (UI.CurrentMapLayer->get_height() * wyrmgus::defines::get()->get_scaled_tile_height()) - 1) {
 		//Wyrmgus end
 			CursorOn = cursor_on::scroll_left_down;
 			MouseScrollState = ScrollLeftDown;
-			GameCursor = UI.get_cursor(stratagus::cursor_type::arrow_southwest);
+			GameCursor = UI.get_cursor(wyrmgus::cursor_type::arrow_southwest);
 		} else {
 			CursorOn = cursor_on::scroll_left;
 			MouseScrollState = ScrollLeft;
-			GameCursor = UI.get_cursor(stratagus::cursor_type::arrow_west);
+			GameCursor = UI.get_cursor(wyrmgus::cursor_type::arrow_west);
 		}
 	//Wyrmgus start
 //	} else if (mousePos.x > SCROLL_RIGHT) {
-	} else if (mousePos.x > SCROLL_RIGHT && bottom_right_map_pos.x < (UI.CurrentMapLayer->get_width() * stratagus::defines::get()->get_scaled_tile_width()) - 1) {
+	} else if (mousePos.x > SCROLL_RIGHT && bottom_right_map_pos.x < (UI.CurrentMapLayer->get_width() * wyrmgus::defines::get()->get_scaled_tile_width()) - 1) {
 	//Wyrmgus end
 		//Wyrmgus start
 //		if (mousePos.y < SCROLL_UP) {
@@ -1463,18 +1463,18 @@ bool HandleMouseScrollArea(const PixelPos &mousePos)
 		//Wyrmgus end
 			CursorOn = cursor_on::scroll_right_up;
 			MouseScrollState = ScrollRightUp;
-			GameCursor = UI.get_cursor(stratagus::cursor_type::arrow_northeast);
+			GameCursor = UI.get_cursor(wyrmgus::cursor_type::arrow_northeast);
 		//Wyrmgus start
 //		} else if (mousePos.y > SCROLL_DOWN) {
-		} else if (mousePos.y > SCROLL_DOWN && bottom_right_map_pos.y < (UI.CurrentMapLayer->get_height() * stratagus::defines::get()->get_scaled_tile_height()) - 1) {
+		} else if (mousePos.y > SCROLL_DOWN && bottom_right_map_pos.y < (UI.CurrentMapLayer->get_height() * wyrmgus::defines::get()->get_scaled_tile_height()) - 1) {
 		//Wyrmgus end
 			CursorOn = cursor_on::scroll_right_down;
 			MouseScrollState = ScrollRightDown;
-			GameCursor = UI.get_cursor(stratagus::cursor_type::arrow_southeast);
+			GameCursor = UI.get_cursor(wyrmgus::cursor_type::arrow_southeast);
 		} else {
 			CursorOn = cursor_on::scroll_right;
 			MouseScrollState = ScrollRight;
-			GameCursor = UI.get_cursor(stratagus::cursor_type::arrow_east);
+			GameCursor = UI.get_cursor(wyrmgus::cursor_type::arrow_east);
 		}
 	} else {
 		//Wyrmgus start
@@ -1483,14 +1483,14 @@ bool HandleMouseScrollArea(const PixelPos &mousePos)
 		//Wyrmgus end
 			CursorOn = cursor_on::scroll_up;
 			MouseScrollState = ScrollUp;
-			GameCursor = UI.get_cursor(stratagus::cursor_type::arrow_north);
+			GameCursor = UI.get_cursor(wyrmgus::cursor_type::arrow_north);
 			//Wyrmgus start
 //		} else if (mousePos.y > SCROLL_DOWN) {
-		} else if (mousePos.y > SCROLL_DOWN && bottom_right_map_pos.y < (UI.CurrentMapLayer->get_height() * stratagus::defines::get()->get_scaled_tile_height()) - 1) {
+		} else if (mousePos.y > SCROLL_DOWN && bottom_right_map_pos.y < (UI.CurrentMapLayer->get_height() * wyrmgus::defines::get()->get_scaled_tile_height()) - 1) {
 		//Wyrmgus end
 			CursorOn = cursor_on::scroll_down;
 			MouseScrollState = ScrollDown;
-			GameCursor = UI.get_cursor(stratagus::cursor_type::arrow_south);
+			GameCursor = UI.get_cursor(wyrmgus::cursor_type::arrow_south);
 		} else {
 			return false;
 		}

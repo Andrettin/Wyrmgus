@@ -32,7 +32,7 @@
 
 #include "util/container_util.h"
 
-namespace stratagus {
+namespace wyrmgus {
 
 QVariantList font_color::get_colors_qvariant_list() const
 {

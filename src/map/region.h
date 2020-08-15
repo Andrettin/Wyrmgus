@@ -30,7 +30,7 @@
 #include "database/data_entry.h"
 #include "database/data_type.h"
 
-namespace stratagus {
+namespace wyrmgus {
 
 class site;
 

@@ -36,7 +36,7 @@
 #include "script/effect/create_unit_effect.h"
 #include "script/effect/resource_effect.h"
 
-namespace stratagus {
+namespace wyrmgus {
 
 std::unique_ptr<effect> effect::from_sml_property(const sml_property &property)
 {

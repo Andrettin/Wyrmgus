@@ -42,7 +42,7 @@
 #include "util/string_util.h"
 #include "util/vector_util.h"
 
-namespace stratagus {
+namespace wyrmgus {
 
 void faction::process_title_names(title_name_map &title_names, const sml_data &scope)
 {
@@ -53,7 +53,7 @@ void faction::process_title_names(title_name_map &title_names, const sml_data &s
 	scope.for_each_property([&](const sml_property &property) {
 		const std::string &key = property.get_key();
 		const std::string &value = property.get_value();
-		stratagus::government_type government_type = string_to_government_type(key);
+		wyrmgus::government_type government_type = string_to_government_type(key);
 		title_names[government_type][faction_tier::none] = value;
 	});
 }
@@ -61,7 +61,7 @@ void faction::process_title_names(title_name_map &title_names, const sml_data &s
 void faction::process_title_name_scope(title_name_map &title_names, const sml_data &scope)
 {
 	const std::string &tag = scope.get_tag();
-	const stratagus::government_type government_type = string_to_government_type(tag);
+	const wyrmgus::government_type government_type = string_to_government_type(tag);
 
 	scope.for_each_property([&](const sml_property &property) {
 		const std::string &key = property.get_key();
@@ -83,15 +83,15 @@ void faction::process_character_title_name_scope(character_title_name_map &chara
 	scope.for_each_property([&](const sml_property &property) {
 		const std::string &key = property.get_key();
 		const std::string &value = property.get_value();
-		const stratagus::government_type government_type = string_to_government_type(key);
+		const wyrmgus::government_type government_type = string_to_government_type(key);
 		character_title_names[title_type][government_type][faction_tier::none][gender::none] = value;
 	});
 }
 
-void faction::process_character_title_name_scope(std::map<stratagus::government_type, std::map<faction_tier, std::map<gender, std::string>>> &character_title_names, const sml_data &scope)
+void faction::process_character_title_name_scope(std::map<wyrmgus::government_type, std::map<faction_tier, std::map<gender, std::string>>> &character_title_names, const sml_data &scope)
 {
 	const std::string &tag = scope.get_tag();
-	const stratagus::government_type government_type = string_to_government_type(tag);
+	const wyrmgus::government_type government_type = string_to_government_type(tag);
 
 	scope.for_each_child([&](const sml_data &child_scope) {
 		faction::process_character_title_name_scope(character_title_names[government_type], child_scope);
@@ -283,7 +283,7 @@ void faction::check() const
 	}
 }
 
-std::string_view faction::get_title_name(const stratagus::government_type government_type, const faction_tier tier) const
+std::string_view faction::get_title_name(const wyrmgus::government_type government_type, const faction_tier tier) const
 {
 	if (this->Type != FactionTypePolity) {
 		return string::empty_str;
@@ -300,7 +300,7 @@ std::string_view faction::get_title_name(const stratagus::government_type govern
 	return this->get_civilization()->get_title_name(government_type, tier);
 }
 
-std::string_view faction::get_character_title_name(const character_title title_type, const stratagus::government_type government_type, const faction_tier tier, const gender gender) const
+std::string_view faction::get_character_title_name(const character_title title_type, const wyrmgus::government_type government_type, const faction_tier tier, const gender gender) const
 {
 	auto find_iterator = this->character_title_names.find(title_type);
 	if (find_iterator != this->character_title_names.end()) {
@@ -472,7 +472,7 @@ CUpgrade *faction::get_class_upgrade(const upgrade_class *upgrade_class) const
 	}
 
 	if (this->ParentFaction != -1) {
-		return stratagus::faction::get_all()[ParentFaction]->get_class_upgrade(upgrade_class);
+		return wyrmgus::faction::get_all()[ParentFaction]->get_class_upgrade(upgrade_class);
 	}
 
 	return this->get_civilization()->get_class_upgrade(upgrade_class);
@@ -491,7 +491,7 @@ const std::vector<CFiller> &faction::get_ui_fillers() const
 	return this->get_civilization()->get_ui_fillers();
 }
 
-void faction::remove_dynasty(const stratagus::dynasty *dynasty)
+void faction::remove_dynasty(const wyrmgus::dynasty *dynasty)
 {
 	vector::remove(this->dynasties, dynasty);
 }

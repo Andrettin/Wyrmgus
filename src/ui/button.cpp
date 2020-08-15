@@ -48,7 +48,7 @@
 
 #include <QUuid>
 
-namespace stratagus {
+namespace wyrmgus {
 
 void button::ProcessConfigData(const CConfigData *config_data)
 {

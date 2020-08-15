@@ -33,7 +33,7 @@
 
 #include "database/data_entry.h"
 
-namespace stratagus {
+namespace wyrmgus {
 
 class named_data_entry : public data_entry
 {

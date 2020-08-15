@@ -50,20 +50,20 @@ CDate CDate::FromString(const std::string &date_str)
 	
 	std::vector<std::string> date_vector = SplitString(date_str, ".");
 	
-	stratagus::calendar *calendar = nullptr;
+	wyrmgus::calendar *calendar = nullptr;
 	size_t offset = 0;
 	
 	if (date_vector.size() >= 1 && !string::is_number(date_vector[0])) {
-		calendar = stratagus::calendar::try_get(date_vector[0]);
+		calendar = wyrmgus::calendar::try_get(date_vector[0]);
 		if (calendar) {
 			offset += 1;
-		} else if (stratagus::timeline::try_get(date_vector[0]) == nullptr) { //is neither a calendar nor a timeline
+		} else if (wyrmgus::timeline::try_get(date_vector[0]) == nullptr) { //is neither a calendar nor a timeline
 			fprintf(stderr, "Calendar \"%s\" does not exist.\n", date_vector[0].c_str());
 		}
 	}
 	
 	if (date_vector.size() >= (1 + offset) && !string::is_number(date_vector[0 + offset])) {
-		stratagus::timeline *timeline = stratagus::timeline::get(date_vector[0 + offset]);
+		wyrmgus::timeline *timeline = wyrmgus::timeline::get(date_vector[0 + offset]);
 		offset += 1;
 	}
 	
@@ -182,7 +182,7 @@ void CDate::AddHours(const long long int hours, const int day_multiplier)
 	}
 }
 
-CDate CDate::ToCalendar(stratagus::calendar *current_calendar, stratagus::calendar *new_calendar) const
+CDate CDate::ToCalendar(wyrmgus::calendar *current_calendar, wyrmgus::calendar *new_calendar) const
 {
 	if (current_calendar == new_calendar) {
 		return *this;
@@ -200,7 +200,7 @@ CDate CDate::ToCalendar(stratagus::calendar *current_calendar, stratagus::calend
 	return date;
 }
 
-CDate CDate::ToBaseCalendar(stratagus::calendar *current_calendar) const
+CDate CDate::ToBaseCalendar(wyrmgus::calendar *current_calendar) const
 {
 	CDate date;
 	date.Year = this->Year - current_calendar->get_year_offset();
@@ -211,7 +211,7 @@ CDate CDate::ToBaseCalendar(stratagus::calendar *current_calendar) const
 	return date;
 }
 
-std::string CDate::ToString(const stratagus::calendar *calendar) const
+std::string CDate::ToString(const wyrmgus::calendar *calendar) const
 {
 	std::string date_string;
 	
@@ -223,7 +223,7 @@ std::string CDate::ToString(const stratagus::calendar *calendar) const
 	return date_string;
 }
 
-std::string CDate::ToDisplayString(const stratagus::calendar *calendar, const bool year_only) const
+std::string CDate::ToDisplayString(const wyrmgus::calendar *calendar, const bool year_only) const
 {
 	std::string display_string;
 	
@@ -294,7 +294,7 @@ unsigned long long CDate::GetTotalHours() const
 */
 void SetCurrentDate(const std::string &date_string)
 {
-	stratagus::game::get()->set_current_date(string::to_date(date_string));
+	wyrmgus::game::get()->set_current_date(string::to_date(date_string));
 }
 
 /**

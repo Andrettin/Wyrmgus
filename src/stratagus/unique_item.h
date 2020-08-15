@@ -35,7 +35,7 @@ struct lua_State;
 
 int CclDefineUniqueItem(lua_State *l);
 
-namespace stratagus {
+namespace wyrmgus {
 
 class icon;
 class spell;
@@ -55,11 +55,11 @@ public:
 
 	bool CanDrop() const;				/// Check whether this unique item can drop
 	int GetMagicLevel() const;			/// Get this unique item's magic level
-	stratagus::icon *get_icon() const;
+	wyrmgus::icon *get_icon() const;
 
 	int ResourcesHeld = 0;
 private:
-	stratagus::icon *icon = nullptr; //the unique item's icon (if it differs from that of its type)
+	wyrmgus::icon *icon = nullptr; //the unique item's icon (if it differs from that of its type)
 public:
 	unit_type *Type = nullptr;			/// Item type of the item
 	CUpgrade *Prefix = nullptr;

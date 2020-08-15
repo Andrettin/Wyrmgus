@@ -430,7 +430,7 @@ void CommandPickUp(CUnit &unit, CUnit &dest, int flush)
 **  @param unit   pointer to unit.
 **  @param quest  quest.
 */
-void CommandQuest(CUnit &unit, stratagus::quest *quest)
+void CommandQuest(CUnit &unit, wyrmgus::quest *quest)
 {
 	if (IsUnitValidForNetwork(unit) == false) {
 		return ;
@@ -835,7 +835,7 @@ void CommandUnload(CUnit &unit, const Vec2i &pos, CUnit *what, int flush, int z,
 **  @param what   Unit type to build.
 **  @param flush  if true, flush command queue.
 */
-void CommandBuildBuilding(CUnit &unit, const Vec2i &pos, stratagus::unit_type &what, int flush, int z, const stratagus::site *settlement)
+void CommandBuildBuilding(CUnit &unit, const Vec2i &pos, wyrmgus::unit_type &what, int flush, int z, const wyrmgus::site *settlement)
 {
 	if (IsUnitValidForNetwork(unit) == false) {
 		return ;
@@ -1026,7 +1026,7 @@ void CommandReturnGoods(CUnit &unit, CUnit *depot, int flush)
 **  @param type   unit type to train.
 **  @param flush  if true, flush command queue.
 */
-void CommandTrainUnit(CUnit &unit, stratagus::unit_type &type, int player, int)
+void CommandTrainUnit(CUnit &unit, wyrmgus::unit_type &type, int player, int)
 {
 	if (IsUnitValidForNetwork(unit) == false) {
 		return ;
@@ -1090,7 +1090,7 @@ void CommandTrainUnit(CUnit &unit, stratagus::unit_type &type, int player, int)
 **  @param slot  slot number to cancel.
 **  @param type  Unit-type to cancel.
 */
-void CommandCancelTraining(CUnit &unit, int slot, const stratagus::unit_type *type)
+void CommandCancelTraining(CUnit &unit, int slot, const wyrmgus::unit_type *type)
 {
 	DebugPrint("Cancel %d type: %s\n" _C_ slot _C_
 			   type ? type->Ident.c_str() : "-any-");
@@ -1137,7 +1137,7 @@ void CommandCancelTraining(CUnit &unit, int slot, const stratagus::unit_type *ty
 **  @param type   upgrade to type
 **  @param flush  if true, flush command queue.
 */
-void CommandUpgradeTo(CUnit &unit, stratagus::unit_type &type, int flush)
+void CommandUpgradeTo(CUnit &unit, wyrmgus::unit_type &type, int flush)
 {
 	if (IsUnitValidForNetwork(unit) == false) {
 		return ;
@@ -1163,7 +1163,7 @@ void CommandUpgradeTo(CUnit &unit, stratagus::unit_type &type, int flush)
 **  @param unit   pointer to unit.
 **  @param type   upgrade to type
 */
-void CommandTransformIntoType(CUnit &unit, stratagus::unit_type &type)
+void CommandTransformIntoType(CUnit &unit, wyrmgus::unit_type &type)
 {
 	if (unit.CriticalOrder && unit.CriticalOrder->Action == UnitAction::TransformInto) {
 		return;
@@ -1277,7 +1277,7 @@ void CommandLearnAbility(CUnit &unit, CUpgrade &what)
 **  @param spell  Spell type pointer.
 **  @param flush  If true, flush command queue.
 */
-void CommandSpellCast(CUnit &unit, const Vec2i &pos, CUnit *dest, const stratagus::spell &spell, int flush, int z, bool isAutocast)
+void CommandSpellCast(CUnit &unit, const Vec2i &pos, CUnit *dest, const wyrmgus::spell &spell, int flush, int z, bool isAutocast)
 {
 	DebugPrint(": %d casts %s at %d %d on %d\n" _C_
 			   UnitNumber(unit) _C_ spell.Ident.c_str() _C_ pos.x _C_ pos.y _C_ dest ? UnitNumber(*dest) : 0);
@@ -1310,7 +1310,7 @@ void CommandSpellCast(CUnit &unit, const Vec2i &pos, CUnit *dest, const stratagu
 **  @param spellid  Spell id.
 **  @param on       1 for auto cast on, 0 for off.
 */
-void CommandAutoSpellCast(CUnit &unit, const stratagus::spell *spell, const bool on)
+void CommandAutoSpellCast(CUnit &unit, const wyrmgus::spell *spell, const bool on)
 {
 	if (IsUnitValidForNetwork(unit) == false) {
 		return ;
@@ -1330,31 +1330,31 @@ void CommandAutoSpellCast(CUnit &unit, const stratagus::spell *spell, const bool
 **  @param state     New diplomacy state.
 **  @param opponent  Opponent.
 */
-void CommandDiplomacy(const int player, const stratagus::diplomacy_state state, const int other_player)
+void CommandDiplomacy(const int player, const wyrmgus::diplomacy_state state, const int other_player)
 {
 	switch (state) {
-		case stratagus::diplomacy_state::neutral:
+		case wyrmgus::diplomacy_state::neutral:
 			CPlayer::Players[player]->SetDiplomacyNeutralWith(*CPlayer::Players[other_player]);
 			break;
-		case stratagus::diplomacy_state::allied:
+		case wyrmgus::diplomacy_state::allied:
 			CPlayer::Players[player]->SetDiplomacyAlliedWith(*CPlayer::Players[other_player]);
 			break;
-		case stratagus::diplomacy_state::enemy:
+		case wyrmgus::diplomacy_state::enemy:
 			CPlayer::Players[player]->SetDiplomacyEnemyWith(*CPlayer::Players[other_player]);
 			break;
-		case stratagus::diplomacy_state::overlord:
-			CPlayer::Players[other_player]->set_overlord(CPlayer::Players[player], stratagus::vassalage_type::vassalage);
+		case wyrmgus::diplomacy_state::overlord:
+			CPlayer::Players[other_player]->set_overlord(CPlayer::Players[player], wyrmgus::vassalage_type::vassalage);
 			break;
-		case stratagus::diplomacy_state::personal_union_overlord:
-			CPlayer::Players[other_player]->set_overlord(CPlayer::Players[player], stratagus::vassalage_type::personal_union);
+		case wyrmgus::diplomacy_state::personal_union_overlord:
+			CPlayer::Players[other_player]->set_overlord(CPlayer::Players[player], wyrmgus::vassalage_type::personal_union);
 			break;
-		case stratagus::diplomacy_state::vassal:
-			CPlayer::Players[player]->set_overlord(CPlayer::Players[other_player], stratagus::vassalage_type::vassalage);
+		case wyrmgus::diplomacy_state::vassal:
+			CPlayer::Players[player]->set_overlord(CPlayer::Players[other_player], wyrmgus::vassalage_type::vassalage);
 			break;
-		case stratagus::diplomacy_state::personal_union_vassal:
-			CPlayer::Players[player]->set_overlord(CPlayer::Players[other_player], stratagus::vassalage_type::personal_union);
+		case wyrmgus::diplomacy_state::personal_union_vassal:
+			CPlayer::Players[player]->set_overlord(CPlayer::Players[other_player], wyrmgus::vassalage_type::personal_union);
 			break;
-		case stratagus::diplomacy_state::crazy:
+		case wyrmgus::diplomacy_state::crazy:
 			CPlayer::Players[player]->SetDiplomacyCrazyWith(*CPlayer::Players[other_player]);
 			break;
 	}

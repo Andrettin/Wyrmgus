@@ -60,7 +60,7 @@
 /// How many resources the player gets back if canceling building
 static constexpr int CancelBuildingCostsFactor = 75;
 
-extern void AiReduceMadeInBuilt(PlayerAi &pai, const stratagus::unit_type &type, int landmass, const stratagus::site *settlement);
+extern void AiReduceMadeInBuilt(PlayerAi &pai, const wyrmgus::unit_type &type, int landmass, const wyrmgus::site *settlement);
 
 /* static */ COrder *COrder::NewActionBuilt(CUnit &builder, CUnit &unit)
 {
@@ -167,7 +167,7 @@ static void CancelBuilt(COrder_Built &order, CUnit &unit)
 
 static void Finish(COrder_Built &order, CUnit &unit)
 {
-	const stratagus::unit_type &type = *unit.Type;
+	const wyrmgus::unit_type &type = *unit.Type;
 	CPlayer &player = *unit.Player;
 
 	DebugPrint("%d: Building %s(%s) ready.\n" _C_ player.Index _C_ type.Ident.c_str() _C_ type.GetDefaultName(&player).c_str());
@@ -183,13 +183,13 @@ static void Finish(COrder_Built &order, CUnit &unit)
 	player.IncreaseCountsForUnit(&unit);
 	
 	for (const auto &objective : player.get_quest_objectives()) {
-		const stratagus::quest_objective *quest_objective = objective->get_quest_objective();
+		const wyrmgus::quest_objective *quest_objective = objective->get_quest_objective();
 
-		if (quest_objective->get_objective_type() != stratagus::objective_type::build_units) {
+		if (quest_objective->get_objective_type() != wyrmgus::objective_type::build_units) {
 			continue;
 		}
 
-		if (!stratagus::vector::contains(quest_objective->UnitTypes, &type) && !stratagus::vector::contains(quest_objective->get_unit_classes(), type.get_unit_class())) {
+		if (!wyrmgus::vector::contains(quest_objective->UnitTypes, &type) && !wyrmgus::vector::contains(quest_objective->get_unit_classes(), type.get_unit_class())) {
 			continue;
 		}
 
@@ -301,20 +301,20 @@ static void Finish(COrder_Built &order, CUnit &unit)
 	//Wyrmgus end
 	if (&player == CPlayer::GetThisPlayer()) {
 		if (type.MapSound.Ready.Sound) {
-			PlayUnitSound(unit, stratagus::unit_sound_type::ready);
+			PlayUnitSound(unit, wyrmgus::unit_sound_type::ready);
 		}
 		if (worker) {
 			if (!type.TerrainType || worker->Orders.size() == 1 || worker->Orders[1]->Action != UnitAction::Build) {
-				PlayUnitSound(*worker, stratagus::unit_sound_type::work_completed);
+				PlayUnitSound(*worker, wyrmgus::unit_sound_type::work_completed);
 			}
 		} else {
 			//Wyrmgus start
 			// why play the under-construction sound if the building has just been completed?
-//			PlayUnitSound(unit, stratagus::unit_sound_type::construction);
+//			PlayUnitSound(unit, wyrmgus::unit_sound_type::construction);
 			for (size_t i = 0; i != table.size(); ++i) { // see if there is a builder/repairer available to give the work completed voice, if the "worker" pointer is null
 				if (table[i]->CurrentAction() == UnitAction::Repair && table[i]->CurrentOrder()->GetGoal() == &unit) {
 					if (!type.TerrainType || table[i]->Orders.size() == 1 || table[i]->Orders[1]->Action != UnitAction::Build) { //don't play the work complete sound if building a tile unit and the worker has further build orders, to prevent the voice from repetitively being played after each tile in a series is constructed
-						PlayUnitSound(*table[i], stratagus::unit_sound_type::work_completed);
+						PlayUnitSound(*table[i], wyrmgus::unit_sound_type::work_completed);
 						break;
 					}
 				}
@@ -381,7 +381,7 @@ static void Finish(COrder_Built &order, CUnit &unit)
 
 /* virtual */ void COrder_Built::Execute(CUnit &unit)
 {
-	const stratagus::unit_type &type = *unit.Type;
+	const wyrmgus::unit_type &type = *unit.Type;
 
 	int amount;
 	if (type.BoolFlag[BUILDEROUTSIDE_INDEX].value) {
@@ -475,7 +475,7 @@ static const CConstructionFrame *FindCFramePercent(const CConstructionFrame &cfr
 */
 void COrder_Built::UpdateConstructionFrame(CUnit &unit)
 {
-	const stratagus::unit_type &type = *unit.Type;
+	const wyrmgus::unit_type &type = *unit.Type;
 	const int percent = this->ProgressCounter / (type.Stats[unit.Player->Index].Costs[TimeCost] * 6);
 	//Wyrmgus start
 //	const CConstructionFrame *cframe = FindCFramePercent(*type.Construction->Frames, percent);

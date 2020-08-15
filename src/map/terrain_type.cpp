@@ -42,7 +42,7 @@
 #include "util/vector_util.h"
 #include "video/video.h"
 
-namespace stratagus {
+namespace wyrmgus {
 
 void terrain_type::LoadTerrainTypeGraphics()
 {

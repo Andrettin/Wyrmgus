@@ -66,7 +66,7 @@ static constexpr int CancelUpgradeCostsFactor = 100;
 --  Functions
 ----------------------------------------------------------------------------*/
 
-COrder *COrder::NewActionTransformInto(stratagus::unit_type &type)
+COrder *COrder::NewActionTransformInto(wyrmgus::unit_type &type)
 {
 	COrder_TransformInto *order = new COrder_TransformInto;
 
@@ -74,7 +74,7 @@ COrder *COrder::NewActionTransformInto(stratagus::unit_type &type)
 	return order;
 }
 
-/* static */ COrder *COrder::NewActionUpgradeTo(CUnit &unit, stratagus::unit_type &type)
+/* static */ COrder *COrder::NewActionUpgradeTo(CUnit &unit, wyrmgus::unit_type &type)
 {
 	COrder_UpgradeTo *order = new COrder_UpgradeTo;
 
@@ -92,9 +92,9 @@ COrder *COrder::NewActionTransformInto(stratagus::unit_type &type)
 **
 **  @return 0 on error, 1 if nothing happens, 2 else.
 */
-int TransformUnitIntoType(CUnit &unit, const stratagus::unit_type &newtype)
+int TransformUnitIntoType(CUnit &unit, const wyrmgus::unit_type &newtype)
 {
-	const stratagus::unit_type &oldtype = *unit.Type;
+	const wyrmgus::unit_type &oldtype = *unit.Type;
 	if (&oldtype == &newtype) { // nothing to do
 		return 1;
 	}
@@ -144,10 +144,10 @@ int TransformUnitIntoType(CUnit &unit, const stratagus::unit_type &newtype)
 		player.Supply += newtype.Stats[player.Index].Variables[SUPPLY_INDEX].Value - oldtype.Stats[player.Index].Variables[SUPPLY_INDEX].Value;
 
 		// Change resource limit
-		for (size_t i = 0; i < stratagus::resource::get_all().size(); ++i) {
+		for (size_t i = 0; i < wyrmgus::resource::get_all().size(); ++i) {
 			if (player.MaxResources[i] != -1) {
 				player.MaxResources[i] += newtype.Stats[player.Index].Storing[i] - oldtype.Stats[player.Index].Storing[i];
-				player.set_resource(stratagus::resource::get_all()[i], player.StoredResources[i], STORE_BUILDING);
+				player.set_resource(wyrmgus::resource::get_all()[i], player.StoredResources[i], STORE_BUILDING);
 			}
 		}
 	}
@@ -210,7 +210,7 @@ int TransformUnitIntoType(CUnit &unit, const stratagus::unit_type &newtype)
 	}
 
 	for (const auto &kv_pair : unit.UnitStock) {
-		const stratagus::unit_type *unit_type = stratagus::unit_type::get_all()[kv_pair.first];
+		const wyrmgus::unit_type *unit_type = wyrmgus::unit_type::get_all()[kv_pair.first];
 
 		const int unit_stock_change = newstats.GetUnitStock(unit_type) - oldstats.GetUnitStock(unit_type);
 		if (unit_stock_change < 0) {
@@ -238,7 +238,7 @@ int TransformUnitIntoType(CUnit &unit, const stratagus::unit_type &newtype)
 	}
 	//Wyrmgus end
 	
-	unit.Type = const_cast<stratagus::unit_type *>(&newtype);
+	unit.Type = const_cast<wyrmgus::unit_type *>(&newtype);
 	unit.Stats = &unit.Type->Stats[player.Index];
 	
 	//Wyrmgus start
@@ -249,8 +249,8 @@ int TransformUnitIntoType(CUnit &unit, const stratagus::unit_type &newtype)
 			unit.SetIndividualUpgrade(civilization_upgrade, 0);
 		}
 	}
-	if (oldtype.get_civilization() != nullptr && oldtype.Faction != -1 && !stratagus::faction::get_all()[oldtype.Faction]->FactionUpgrade.empty()) {
-		CUpgrade *faction_upgrade = CUpgrade::try_get(stratagus::faction::get_all()[oldtype.Faction]->FactionUpgrade);
+	if (oldtype.get_civilization() != nullptr && oldtype.Faction != -1 && !wyrmgus::faction::get_all()[oldtype.Faction]->FactionUpgrade.empty()) {
+		CUpgrade *faction_upgrade = CUpgrade::try_get(wyrmgus::faction::get_all()[oldtype.Faction]->FactionUpgrade);
 		if (faction_upgrade) {
 			unit.SetIndividualUpgrade(faction_upgrade, 0);
 		}
@@ -261,15 +261,15 @@ int TransformUnitIntoType(CUnit &unit, const stratagus::unit_type &newtype)
 			unit.SetIndividualUpgrade(civilization_upgrade, 1);
 		}
 	}
-	if (newtype.get_civilization() != nullptr && newtype.Faction != -1 && !stratagus::faction::get_all()[newtype.Faction]->FactionUpgrade.empty()) {
-		CUpgrade *faction_upgrade = CUpgrade::try_get(stratagus::faction::get_all()[newtype.Faction]->FactionUpgrade);
+	if (newtype.get_civilization() != nullptr && newtype.Faction != -1 && !wyrmgus::faction::get_all()[newtype.Faction]->FactionUpgrade.empty()) {
+		CUpgrade *faction_upgrade = CUpgrade::try_get(wyrmgus::faction::get_all()[newtype.Faction]->FactionUpgrade);
 		if (faction_upgrade) {
 			unit.SetIndividualUpgrade(faction_upgrade, 1);
 		}
 	}
 	
 	//deequip the current equipment if they are incompatible with the new unit type
-	for (int i = 0; i < static_cast<int>(stratagus::item_slot::count); ++i) {
+	for (int i = 0; i < static_cast<int>(wyrmgus::item_slot::count); ++i) {
 		for (size_t j = 0; j < unit.EquippedItems[i].size(); ++j) {
 			if (!unit.can_equip_item_class(unit.EquippedItems[i][j]->Type->get_item_class())) {
 				unit.DeequipItem(*unit.EquippedItems[i][j]);
@@ -290,7 +290,7 @@ int TransformUnitIntoType(CUnit &unit, const stratagus::unit_type &newtype)
 					newtype.BoolFlag[ORGANIC_INDEX].value
 					|| (newtype.PersonalNames.size() == 0 && !newtype.BoolFlag[ORGANIC_INDEX].value && newtype.UnitType == UnitTypeType::Naval)
 					|| (oldtype.get_civilization()->get_unit_class_names(oldtype.get_unit_class()) != newtype.get_civilization()->get_unit_class_names(newtype.get_unit_class()))
-					|| (oldtype.get_civilization()->get_unit_class_names(oldtype.get_unit_class()) != stratagus::civilization::get_all()[player.Race]->get_unit_class_names(newtype.get_unit_class()))
+					|| (oldtype.get_civilization()->get_unit_class_names(oldtype.get_unit_class()) != wyrmgus::civilization::get_all()[player.Race]->get_unit_class_names(newtype.get_unit_class()))
 				)
 			)
 		)
@@ -303,19 +303,19 @@ int TransformUnitIntoType(CUnit &unit, const stratagus::unit_type &newtype)
 //	if (newtype.CanCastSpell && unit.AutoCastSpell.empty()) {
 	if (unit.SpellCoolDownTimers == nullptr) { //to avoid crashes with spell items for units who cannot ordinarily cast spells
 	//Wyrmgus end
-		unit.SpellCoolDownTimers = new int[stratagus::spell::get_all().size()];
-		memset(unit.SpellCoolDownTimers, 0, stratagus::spell::get_all().size() * sizeof(int));
+		unit.SpellCoolDownTimers = new int[wyrmgus::spell::get_all().size()];
+		memset(unit.SpellCoolDownTimers, 0, wyrmgus::spell::get_all().size() * sizeof(int));
 	}
 
 	//remove active autocast spells which are active by default for the old type but not for the new type
-	for (const stratagus::spell *spell : unit.get_autocast_spells()) {
+	for (const wyrmgus::spell *spell : unit.get_autocast_spells()) {
 		if (oldtype.is_autocast_spell(spell) && !newtype.is_autocast_spell(spell)) {
 			unit.remove_autocast_spell(spell);
 		}
 	}
 
 	//add autocast spells that are present in the new type but not in the old type
-	for (const stratagus::spell *spell : newtype.get_autocast_spells()) {
+	for (const wyrmgus::spell *spell : newtype.get_autocast_spells()) {
 		if (!oldtype.is_autocast_spell(spell) && !unit.is_autocast_spell(spell)) {
 			unit.add_autocast_spell(spell);
 		}
@@ -384,13 +384,13 @@ int TransformUnitIntoType(CUnit &unit, const stratagus::unit_type &newtype)
 		
 		if (!unit.UnderConstruction) {
 			for (const auto &objective : player.get_quest_objectives()) {
-				const stratagus::quest_objective *quest_objective = objective->get_quest_objective();
+				const wyrmgus::quest_objective *quest_objective = objective->get_quest_objective();
 
-				if (quest_objective->get_objective_type() != stratagus::objective_type::build_units) {
+				if (quest_objective->get_objective_type() != wyrmgus::objective_type::build_units) {
 					continue;
 				}
 
-				if (!stratagus::vector::contains(quest_objective->UnitTypes, &newtype) && !stratagus::vector::contains(quest_objective->get_unit_classes(), newtype.get_unit_class())) {
+				if (!wyrmgus::vector::contains(quest_objective->UnitTypes, &newtype) && !wyrmgus::vector::contains(quest_objective->get_unit_classes(), newtype.get_unit_class())) {
 					continue;
 				}
 
@@ -423,7 +423,7 @@ int TransformUnitIntoType(CUnit &unit, const stratagus::unit_type &newtype)
 {
 	if (!strcmp(value, "type")) {
 		++j;
-		this->Type = stratagus::unit_type::get(LuaToString(l, -1, j + 1));
+		this->Type = wyrmgus::unit_type::get(LuaToString(l, -1, j + 1));
 	} else {
 		return false;
 	}
@@ -448,7 +448,7 @@ int TransformUnitIntoType(CUnit &unit, const stratagus::unit_type &newtype)
 	this->Finished = true;
 }
 
-void COrder_TransformInto::ConvertUnitType(const CUnit &unit, stratagus::unit_type &newType)
+void COrder_TransformInto::ConvertUnitType(const CUnit &unit, wyrmgus::unit_type &newType)
 {
 	const CPlayer &player = *unit.Player;
 	this->Type = &newType;
@@ -473,7 +473,7 @@ void COrder_TransformInto::ConvertUnitType(const CUnit &unit, stratagus::unit_ty
 {
 	if (!strcmp(value, "type")) {
 		++j;
-		this->Type = stratagus::unit_type::get(LuaToString(l, -1, j + 1));
+		this->Type = wyrmgus::unit_type::get(LuaToString(l, -1, j + 1));
 	} else if (!strcmp(value, "ticks")) {
 		++j;
 		this->Ticks = LuaToNumber(l, -1, j + 1);
@@ -496,7 +496,7 @@ void COrder_TransformInto::ConvertUnitType(const CUnit &unit, stratagus::unit_ty
 
 static void AnimateActionUpgradeTo(CUnit &unit)
 {
-	const stratagus::animation_set *animations = unit.GetAnimations();
+	const wyrmgus::animation_set *animations = unit.GetAnimations();
 	UnitShowAnimation(unit, animations->Upgrade.get() ? animations->Upgrade.get() : animations->Still.get());
 }
 
@@ -508,7 +508,7 @@ static void AnimateActionUpgradeTo(CUnit &unit)
 		return ;
 	}
 	CPlayer &player = *unit.Player;
-	const stratagus::unit_type &newtype = *this->Type;
+	const wyrmgus::unit_type &newtype = *this->Type;
 	const CUnitStats &newstats = newtype.Stats[player.Index];
 
 	//Wyrmgus start
@@ -571,7 +571,7 @@ static void AnimateActionUpgradeTo(CUnit &unit)
 	unit.Variable[UPGRADINGTO_INDEX].Max = this->Type->Stats[unit.Player->Index].Costs[TimeCost];
 }
 
-void COrder_UpgradeTo::ConvertUnitType(const CUnit &unit, stratagus::unit_type &newType)
+void COrder_UpgradeTo::ConvertUnitType(const CUnit &unit, wyrmgus::unit_type &newType)
 {
 	const CPlayer &player = *unit.Player;
 	const int oldCost = this->Type->Stats[player.Index].Costs[TimeCost];

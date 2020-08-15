@@ -249,7 +249,7 @@ static int UnloadUnit(CUnit &transporter, CUnit &unit, int landmass)
 	}
 	
 	if (!IsNetworkGame() && transporter.Character && transporter.Player == CPlayer::GetThisPlayer() && unit.Type->BoolFlag[ITEM_INDEX].value) { //if the transporter has a character and the unit is an item, remove it from the character's item list
-		const stratagus::persistent_item *item = transporter.Character->get_item(unit);
+		const wyrmgus::persistent_item *item = transporter.Character->get_item(unit);
 		transporter.Character->remove_item(item);
 		SaveHero(transporter.Character);
 	}

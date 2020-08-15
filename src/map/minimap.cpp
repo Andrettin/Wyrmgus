@@ -80,7 +80,7 @@ struct MinimapEvent {
 } MinimapEvents[MAX_MINIMAP_EVENTS];
 int NumMinimapEvents;
 
-namespace stratagus {
+namespace wyrmgus {
 
 minimap::minimap() : mode(minimap_mode::terrain)
 {

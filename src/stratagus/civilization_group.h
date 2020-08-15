@@ -30,7 +30,7 @@
 #include "civilization_base.h"
 #include "database/data_type.h"
 
-namespace stratagus {
+namespace wyrmgus {
 
 class civilization_supergroup;
 
@@ -38,7 +38,7 @@ class civilization_group final : public civilization_base, public data_type<civi
 {
 	Q_OBJECT
 
-	Q_PROPERTY(stratagus::civilization_supergroup* supergroup MEMBER supergroup READ get_supergroup)
+	Q_PROPERTY(wyrmgus::civilization_supergroup* supergroup MEMBER supergroup READ get_supergroup)
 
 public:
 	static constexpr const char *class_identifier = "civilization_group";

@@ -51,7 +51,7 @@
 
 class CFont;
 
-namespace stratagus {
+namespace wyrmgus {
 	class map_template;
 	class player_color;
 	class time_of_day;
@@ -75,7 +75,7 @@ protected:
 	static inline std::shared_mutex mutex;
 
 public:
-	explicit CGraphic(const std::filesystem::path &filepath, const stratagus::player_color *conversible_player_color = nullptr)
+	explicit CGraphic(const std::filesystem::path &filepath, const wyrmgus::player_color *conversible_player_color = nullptr)
 		: filepath(filepath), conversible_player_color(conversible_player_color)
 	{
 		if (filepath.empty()) {
@@ -99,17 +99,17 @@ public:
 	// Draw frame
 	void DrawFrame(unsigned frame, int x, int y) const;
 	void DoDrawFrameClip(const GLuint *textures, unsigned frame, int x, int y, int show_percent = 100) const;
-	void DrawFrameClip(unsigned frame, int x, int y, const stratagus::time_of_day *time_of_day = nullptr, SDL_Surface *surface = nullptr, int show_percent = 100);
+	void DrawFrameClip(unsigned frame, int x, int y, const wyrmgus::time_of_day *time_of_day = nullptr, SDL_Surface *surface = nullptr, int show_percent = 100);
 	void DrawFrameTrans(unsigned frame, int x, int y, int alpha) const;
-	void DrawFrameClipTrans(unsigned frame, int x, int y, int alpha, const stratagus::time_of_day *time_of_day = nullptr, SDL_Surface *surface = nullptr, int show_percent = 100);
+	void DrawFrameClipTrans(unsigned frame, int x, int y, int alpha, const wyrmgus::time_of_day *time_of_day = nullptr, SDL_Surface *surface = nullptr, int show_percent = 100);
 	void DrawGrayscaleFrameClip(unsigned frame, int x, int y, int show_percent = 100);
 
 	// Draw frame flipped horizontally
 	void DrawFrameX(unsigned frame, int x, int y) const;
 	void DoDrawFrameClipX(const GLuint *textures, unsigned frame, int x, int y) const;
-	void DrawFrameClipX(unsigned frame, int x, int y, const stratagus::time_of_day *time_of_day = nullptr, SDL_Surface *surface = nullptr);
+	void DrawFrameClipX(unsigned frame, int x, int y, const wyrmgus::time_of_day *time_of_day = nullptr, SDL_Surface *surface = nullptr);
 	void DrawFrameTransX(unsigned frame, int x, int y, int alpha) const;
-	void DrawFrameClipTransX(unsigned frame, int x, int y, int alpha, const stratagus::time_of_day *time_of_day = nullptr, SDL_Surface *surface = nullptr);
+	void DrawFrameClipTransX(unsigned frame, int x, int y, int alpha, const wyrmgus::time_of_day *time_of_day = nullptr, SDL_Surface *surface = nullptr);
 
 	static CGraphic *New(const std::string &filepath, const int w = 0, const int h = 0);
 
@@ -204,7 +204,7 @@ public:
 		return this->image;
 	}
 
-	const stratagus::player_color *get_conversible_player_color() const;
+	const wyrmgus::player_color *get_conversible_player_color() const;
 
 	bool has_player_color() const
 	{
@@ -249,7 +249,7 @@ public:
 	int GraphicWidth = 0;			/// Original graphic width
 	int GraphicHeight = 0;			/// Original graphic height
 private:
-	const stratagus::player_color *conversible_player_color = nullptr;
+	const wyrmgus::player_color *conversible_player_color = nullptr;
 protected:
 	int refs = 1;					/// Uses of this graphic
 public:
@@ -273,7 +273,7 @@ private:
 class CPlayerColorGraphic final : public CGraphic
 {
 protected:
-	explicit CPlayerColorGraphic(const std::filesystem::path &filepath, const stratagus::player_color *conversible_player_color)
+	explicit CPlayerColorGraphic(const std::filesystem::path &filepath, const wyrmgus::player_color *conversible_player_color)
 		: CGraphic(filepath, conversible_player_color)
 	{
 	}
@@ -281,22 +281,22 @@ protected:
 	virtual ~CPlayerColorGraphic() override;
 
 public:
-	void DrawPlayerColorSub(const stratagus::player_color *player_color, int gx, int gy, int w, int h, int x, int y);
-	void DrawPlayerColorSubClip(const stratagus::player_color *player_color, int gx, int gy, int w, int h, int x, int y);
-	void DrawPlayerColorFrameClipX(const stratagus::player_color *player_color, unsigned frame, int x, int y, const stratagus::time_of_day *time_of_day = nullptr);
-	void DrawPlayerColorFrameClip(const stratagus::player_color *player_color, unsigned frame, int x, int y, const stratagus::time_of_day *time_of_day = nullptr, int show_percent = 100);
-	void DrawPlayerColorFrameClipTransX(const stratagus::player_color *player_color, unsigned frame, int x, int y, int alpha, const stratagus::time_of_day *time_of_day = nullptr);
-	void DrawPlayerColorFrameClipTrans(const stratagus::player_color *player_color, unsigned frame, int x, int y, int alpha, const stratagus::time_of_day *time_of_day = nullptr, int show_percent = 100);
+	void DrawPlayerColorSub(const wyrmgus::player_color *player_color, int gx, int gy, int w, int h, int x, int y);
+	void DrawPlayerColorSubClip(const wyrmgus::player_color *player_color, int gx, int gy, int w, int h, int x, int y);
+	void DrawPlayerColorFrameClipX(const wyrmgus::player_color *player_color, unsigned frame, int x, int y, const wyrmgus::time_of_day *time_of_day = nullptr);
+	void DrawPlayerColorFrameClip(const wyrmgus::player_color *player_color, unsigned frame, int x, int y, const wyrmgus::time_of_day *time_of_day = nullptr, int show_percent = 100);
+	void DrawPlayerColorFrameClipTransX(const wyrmgus::player_color *player_color, unsigned frame, int x, int y, int alpha, const wyrmgus::time_of_day *time_of_day = nullptr);
+	void DrawPlayerColorFrameClipTrans(const wyrmgus::player_color *player_color, unsigned frame, int x, int y, int alpha, const wyrmgus::time_of_day *time_of_day = nullptr, int show_percent = 100);
 
-	static CPlayerColorGraphic *New(const std::string &filepath, const QSize &size, const stratagus::player_color *conversible_player_color);
+	static CPlayerColorGraphic *New(const std::string &filepath, const QSize &size, const wyrmgus::player_color *conversible_player_color);
 
 	static CPlayerColorGraphic *Get(const std::string &file);
 
-	const GLuint *get_textures(const stratagus::player_color *player_color) const;
-	const GLuint *get_textures(const stratagus::player_color *player_color, const CColor &color_modification) const;
+	const GLuint *get_textures(const wyrmgus::player_color *player_color) const;
+	const GLuint *get_textures(const wyrmgus::player_color *player_color, const CColor &color_modification) const;
 
-	std::map<const stratagus::player_color *, GLuint *> player_color_textures;
-	std::map<const stratagus::player_color *, std::map<CColor, GLuint *>> player_color_texture_color_modifications; //player color textures with a color modification applied to them
+	std::map<const wyrmgus::player_color *, GLuint *> player_color_textures;
+	std::map<const wyrmgus::player_color *, std::map<CColor, GLuint *>> player_color_texture_color_modifications; //player color textures with a color modification applied to them
 };
 
 #ifdef USE_MNG
@@ -554,11 +554,11 @@ extern int LoadGraphicPNG(CGraphic *g, const int scale_factor);
 #if defined(USE_OPENGL) || defined(USE_GLES)
 
 /// Make an OpenGL texture
-extern void MakeTexture(CGraphic *graphic, const bool grayscale, const stratagus::time_of_day *time_of_day);
+extern void MakeTexture(CGraphic *graphic, const bool grayscale, const wyrmgus::time_of_day *time_of_day);
 //Wyrmgus start
-extern void MakeTextures2(const CGraphic *g, const QImage &image, GLuint texture, const int ow, const int oh, const stratagus::time_of_day *time_of_day = nullptr);
+extern void MakeTextures2(const CGraphic *g, const QImage &image, GLuint texture, const int ow, const int oh, const wyrmgus::time_of_day *time_of_day = nullptr);
 //Wyrmgus end
-extern void MakePlayerColorTexture(CPlayerColorGraphic *graphic, const stratagus::player_color *player_color, const stratagus::time_of_day *time_of_day = nullptr);
+extern void MakePlayerColorTexture(CPlayerColorGraphic *graphic, const wyrmgus::player_color *player_color, const wyrmgus::time_of_day *time_of_day = nullptr);
 
 /// Regenerate Window screen if needed
 extern void ValidateOpenGLScreen();

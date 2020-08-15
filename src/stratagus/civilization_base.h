@@ -29,7 +29,7 @@
 
 #include "database/detailed_data_entry.h"
 
-namespace stratagus {
+namespace wyrmgus {
 
 class species;
 class unit_class;
@@ -39,7 +39,7 @@ class civilization_base : public detailed_data_entry
 {
 	Q_OBJECT
 
-	Q_PROPERTY(stratagus::species* species MEMBER species READ get_species)
+	Q_PROPERTY(wyrmgus::species* species MEMBER species READ get_species)
 
 public:
 	explicit civilization_base(const std::string &identifier) : detailed_data_entry(identifier) {}

@@ -27,7 +27,7 @@
 
 #pragma once
 
-namespace stratagus::geopath {
+namespace wyrmgus::geopath {
 
 extern void write_to_image(const QGeoPath &geopath, QImage &image, const QColor &color, const QGeoRectangle &georectangle);
 

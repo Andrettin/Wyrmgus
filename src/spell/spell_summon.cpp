@@ -49,7 +49,7 @@
 		++j;
 		if (!strcmp(value, "unit-type")) {
 			value = LuaToString(l, -1, j + 1);
-			this->UnitType = stratagus::unit_type::get(value);
+			this->UnitType = wyrmgus::unit_type::get(value);
 		} else if (!strcmp(value, "time-to-live")) {
 			this->TTL = LuaToNumber(l, -1, j + 1);
 		} else if (!strcmp(value, "require-corpse")) {
@@ -88,11 +88,11 @@ public:
 **
 **  @return             =!0 if spell should be repeated, 0 if not
 */
-/* virtual */ int Spell_Summon::Cast(CUnit &caster, const stratagus::spell &spell, CUnit *target, const Vec2i &goalPos, int z, int modifier)
+/* virtual */ int Spell_Summon::Cast(CUnit &caster, const wyrmgus::spell &spell, CUnit *target, const Vec2i &goalPos, int z, int modifier)
 {
 	Vec2i pos = goalPos;
 	bool cansummon;
-	stratagus::unit_type &unittype = *this->UnitType;
+	wyrmgus::unit_type &unittype = *this->UnitType;
 	int ttl = this->TTL;
 
 	if (this->RequireCorpse) {

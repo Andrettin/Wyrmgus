@@ -30,7 +30,7 @@
 
 #include "util/singleton.h"
 
-namespace stratagus {
+namespace wyrmgus {
 
 class campaign;
 
