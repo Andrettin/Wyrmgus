@@ -64,7 +64,7 @@
 #include "upgrade/upgrade.h"
 //Wyrmgus end
 #include "util/vector_util.h"
-#include "video.h"
+#include "video/video.h"
 
 enum {
 	SUB_STILL_STANDBY = 0,

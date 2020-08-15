@@ -48,7 +48,6 @@
 #include "diplomacy_state.h"
 #include "editor.h"
 #include "faction.h"
-#include "font.h"
 //Wyrmgus start
 #include "grand_strategy.h"
 //Wyrmgus end
@@ -101,7 +100,8 @@
 #include "util/util.h"
 //Wyrmgus end
 #include "version.h"
-#include "video.h"
+#include "video/font.h"
+#include "video/video.h"
 
 #include <QCalendar>
 

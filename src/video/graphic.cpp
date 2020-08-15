@@ -50,7 +50,7 @@
 //Wyrmgus end
 #include "util/image_util.h"
 #include "util/point_util.h"
-#include "video.h"
+#include "video/video.h"
 #include "xbrz.h"
 
 std::map<std::string, CGraphic *> CGraphic::graphics_by_filepath;

@@ -48,7 +48,6 @@
 #include "database/defines.h"
 #include "dynasty.h"
 #include "faction.h"
-#include "font.h"
 #include "game.h"
 //Wyrmgus start
 #include "grand_strategy.h"
@@ -88,7 +87,8 @@
 #include "upgrade/upgrade.h"
 #include "upgrade/upgrade_class.h"
 #include "util/vector_util.h"
-#include "video.h"
+#include "video/font.h"
+#include "video/video.h"
 
 /// Last drawn popup : used to speed up drawing
 stratagus::button *LastDrawnButtonPopup;
@@ -97,9 +97,6 @@ stratagus::button_level *CurrentButtonLevel = nullptr;
 /// Pointer to current buttons
 std::vector<std::unique_ptr<stratagus::button>> CurrentButtons;
 
-/**
-**  Initialize the buttons.
-*/
 void InitButtons()
 {
 	// Resolve the icon names.

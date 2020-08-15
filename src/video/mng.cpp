@@ -35,7 +35,7 @@
 
 #ifdef USE_MNG
 
-#include "video.h"
+#include "video/video.h"
 #include "iolib.h"
 #include "iocompat.h"
 

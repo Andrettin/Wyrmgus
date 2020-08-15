@@ -33,7 +33,7 @@
 #include "province.h"
 #include "government_type.h"
 #include "vec2i.h"
-#include "video.h"
+#include "video/video.h"
 #include "player.h"
 #include "upgrade/upgrade_structs.h"
 

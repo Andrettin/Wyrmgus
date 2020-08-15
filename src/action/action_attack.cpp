@@ -61,11 +61,7 @@
 #include "unit/unit_find.h"
 #include "unit/unit_type.h"
 #include "unit/unit_type_type.h"
-#include "video.h"
-
-/*----------------------------------------------------------------------------
---  Defines
-----------------------------------------------------------------------------*/
+#include "video/video.h"
 
 static constexpr int WEAK_TARGET = 2; //weak target, could be changed
 static constexpr int MOVE_TO_TARGET = 4; ///move to target state

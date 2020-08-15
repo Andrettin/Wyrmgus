@@ -1,6 +1,6 @@
 $using namespace gcn;
 
-#include "font.h"
+#include "video/font.h"
 
 enum ViewportModeType {
 	VIEWPORT_SINGLE = 0,

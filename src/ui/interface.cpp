@@ -34,7 +34,6 @@
 #include "ai.h"
 #include "commands.h"
 #include "database/defines.h"
-#include "font.h"
 //Wyrmgus start
 #include "game.h"
 //Wyrmgus end
@@ -57,7 +56,8 @@
 #include "unit/unit.h"
 #include "unit/unit_find.h"
 #include "unit/unit_type.h"
-#include "video.h"
+#include "video/font.h"
+#include "video/video.h"
 #include "widgets.h"
 
 /// Scrolling area (<= 15 y)

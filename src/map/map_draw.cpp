@@ -32,7 +32,6 @@
 #include "viewport.h"
 
 #include "database/defines.h"
-#include "font.h"
 #include "map/map.h"
 #include "map/map_layer.h"
 #include "map/terrain_type.h"
@@ -48,7 +47,8 @@
 #include "unit/unit_type.h"
 #include "util/size_util.h"
 #include "util/vector_util.h"
-#include "video.h"
+#include "video/font.h"
+#include "video/video.h"
 
 CViewport::CViewport() : MapWidth(0), MapHeight(0), Unit(nullptr)
 {

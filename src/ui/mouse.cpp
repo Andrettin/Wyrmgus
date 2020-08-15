@@ -38,7 +38,6 @@
 //Wyrmgus end
 #include "commands.h"
 #include "database/defines.h"
-#include "font.h"
 #include "map/map.h"
 #include "map/map_layer.h"
 #include "map/minimap.h"
@@ -69,7 +68,8 @@
 #include "unit/unit_type.h"
 #include "unit/unit_type_type.h"
 #include "util/vector_util.h"
-#include "video.h"
+#include "video/font.h"
+#include "video/video.h"
 #include "widgets.h"
 #include "world.h"
 

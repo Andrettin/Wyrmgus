@@ -8,8 +8,6 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name widgets.h - The widgets headerfile. */
-//
 //      (c) Copyright 2005-2006 by Fran�ois Beerten and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
@@ -31,7 +29,7 @@
 
 #include <guichan.h>
 #include <guichan/gsdl.h>
-#include "font.h"
+#include "video/font.h"
 
 #include "luacallback.h"
 

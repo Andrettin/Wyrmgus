@@ -50,7 +50,7 @@
 #include "unit/unit_type.h"
 #include "unit/unit_type_type.h"
 #include "upgrade/upgrade.h"
-#include "video.h"
+#include "video/video.h"
 
 enum {
 	State_Init = 0,

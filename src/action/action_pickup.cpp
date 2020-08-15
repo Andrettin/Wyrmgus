@@ -48,7 +48,7 @@
 #include "unit/unit_find.h"
 #include "unit/unit_type.h"
 #include "unit/unit_type_type.h"
-#include "video.h"
+#include "video/video.h"
 
 enum {
 	State_Init = 0,

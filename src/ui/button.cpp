@@ -42,7 +42,7 @@
 #include "upgrade/upgrade.h"
 #include "upgrade/upgrade_class.h"
 #include "util/string_util.h"
-#include "video.h"
+#include "video/video.h"
 #include "widgets.h"
 
 #include <QUuid>

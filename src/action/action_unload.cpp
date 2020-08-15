@@ -47,7 +47,7 @@
 #include "unit/unit.h"
 #include "unit/unit_type.h"
 #include "unit/unit_type_type.h"
-#include "video.h"
+#include "video/video.h"
 
 COrder *COrder::NewActionUnload(const Vec2i &pos, CUnit *what, int z, int landmass)
 {

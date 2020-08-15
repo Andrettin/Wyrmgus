@@ -33,7 +33,6 @@
 
 #include "database/defines.h"
 #include "faction.h"
-#include "font.h"
 #include "player.h"
 #include "script/condition/condition.h"
 #include "script/trigger.h"
@@ -53,7 +52,8 @@
 #include "unit/unit_type.h"
 #include "upgrade/upgrade.h"
 #include "upgrade/upgrade_class.h"
-#include "video.h"
+#include "video/font.h"
+#include "video/video.h"
 
 /* virtual */ int CPopupContentTypeButtonInfo::GetWidth(const stratagus::button &button, int *) const
 {

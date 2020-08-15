@@ -30,7 +30,7 @@
 #include "stratagus.h"
 
 #include "ui/uitimer.h"
-#include "font.h"
+#include "video/font.h"
 
 void CUITimer::Draw(int second) const
 {

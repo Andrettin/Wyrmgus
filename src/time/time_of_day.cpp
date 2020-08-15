@@ -31,7 +31,7 @@
 #include "database/defines.h"
 #include "mod.h"
 #include "util/string_util.h"
-#include "video.h"
+#include "video/video.h"
 
 namespace stratagus {
 

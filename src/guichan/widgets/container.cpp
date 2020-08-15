@@ -62,7 +62,7 @@
 #include "font.h"
 #include "ui/interface.h"
 #include "unit/unit.h"
-#include "video.h"
+#include "video/video.h"
 //Wyrmgus end
 
 namespace gcn

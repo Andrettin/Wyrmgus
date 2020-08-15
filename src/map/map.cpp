@@ -74,7 +74,7 @@
 #include "util/vector_random_util.h"
 #include "util/vector_util.h"
 #include "version.h"
-#include "video.h"
+#include "video/video.h"
 #include "world.h"
 
 #ifdef USE_OAML

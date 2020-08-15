@@ -36,7 +36,7 @@
 #include "translate.h"
 #include "ui/ui.h"
 #include "unit/unit.h"
-#include "video.h"
+#include "video/video.h"
 
 namespace stratagus {
 

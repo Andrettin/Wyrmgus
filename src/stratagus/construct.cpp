@@ -39,20 +39,9 @@
 #include "script.h"
 #include "translate.h"
 #include "ui/ui.h"
-#include "video.h"
+#include "video/video.h"
 
-/*----------------------------------------------------------------------------
---  Variables
-----------------------------------------------------------------------------*/
-
-/**
-**  Constructions.
-*/
 static std::vector<CConstruction *> Constructions;
-
-/*----------------------------------------------------------------------------
---  Functions
-----------------------------------------------------------------------------*/
 
 CConstruction::~CConstruction()
 {

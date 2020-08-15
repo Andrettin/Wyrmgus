@@ -46,7 +46,7 @@
 #include "unit/unit.h"
 #include "util/container_util.h"
 #include "util/vector_util.h"
-#include "video.h"
+#include "video/video.h"
 #include "widgets.h"
 
 /**

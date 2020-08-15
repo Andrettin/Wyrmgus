@@ -41,7 +41,6 @@
 #include "dynasty.h"
 #include "editor.h"
 #include "faction.h"
-#include "font.h"
 #include "government_type.h"
 #include "grand_strategy.h"
 #include "luacallback.h"
@@ -63,7 +62,6 @@
 #include "unit/unit_class.h"
 #include "unit/unit_find.h"
 #include "unit/unit_type.h"
-#include "video.h"
 #include "upgrade/upgrade.h"
 #include "upgrade/upgrade_class.h"
 //Wyrmgus start
@@ -72,6 +70,8 @@
 //Wyrmgus end
 #include "util/vector_util.h"
 #include "vassalage_type.h"
+#include "video/font.h"
+#include "video/video.h"
 
 extern CUnit *CclGetUnitFromRef(lua_State *l);
 

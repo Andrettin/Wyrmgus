@@ -32,7 +32,7 @@
 #include "config.h"
 #include "database/defines.h"
 #include "mod.h"
-#include "video.h"
+#include "video/video.h"
 
 namespace stratagus {
 

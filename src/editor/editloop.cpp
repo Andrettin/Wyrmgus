@@ -35,7 +35,6 @@
 #include "civilization.h"
 #include "commands.h"
 #include "database/defines.h"
-#include "font.h"
 #include "game.h"
 #include "guichan.h"
 #include "iocompat.h"
@@ -64,7 +63,8 @@
 #include "unit/unit_find.h"
 #include "unit/unit_type.h"
 #include "util/vector_util.h"
-#include "video.h"
+#include "video/font.h"
+#include "video/video.h"
 #include "widgets.h"
 
 extern void DoScrollArea(int state, bool fast, bool isKeyboard);

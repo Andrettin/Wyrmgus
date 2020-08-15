@@ -37,7 +37,7 @@
 #include "mod.h"
 #include "time/season.h"
 #include "ui/button.h"
-#include "video.h"
+#include "video/video.h"
 
 namespace stratagus {
 

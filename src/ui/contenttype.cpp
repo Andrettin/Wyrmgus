@@ -38,11 +38,11 @@
 #include "actions.h"
 #include "action/action_built.h"
 #include "database/defines.h"
-#include "font.h"
 #include "translate.h"
 #include "ui/ui.h"
 #include "unit/unit.h"
-#include "video.h"
+#include "video/font.h"
+#include "video/video.h"
 
 enum UStrIntType {
 	USTRINT_STR, USTRINT_INT

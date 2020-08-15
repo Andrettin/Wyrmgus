@@ -63,7 +63,7 @@
 //Wyrmgus end
 #include "unit/unit_type.h"
 #include "unit/unit_type_type.h"
-#include "video.h"
+#include "video/video.h"
 
 extern void AiReduceMadeInBuilt(PlayerAi &pai, const stratagus::unit_type &type, int landmass, const stratagus::site *settlement);
 

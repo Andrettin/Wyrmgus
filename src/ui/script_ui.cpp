@@ -33,7 +33,6 @@
 #include "ui/ui.h"
 
 #include "database/defines.h"
-#include "font.h"
 #include "map/map.h"
 #include "menus.h"
 #include "script.h"
@@ -51,7 +50,8 @@
 #include "unit/unit.h"
 #include "unit/unit_manager.h"
 #include "unit/unit_type.h"
-#include "video.h"
+#include "video/font.h"
+#include "video/video.h"
 
 #include <QUuid>
 

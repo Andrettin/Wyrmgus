@@ -36,7 +36,7 @@
 #include "map/map_layer.h"
 #include "player.h"
 #include "ui/ui.h"
-#include "video.h"
+#include "video/video.h"
 
 GraphicAnimation::GraphicAnimation(CGraphic *g, int ticksPerFrame) :
 	g(g), ticksPerFrame(ticksPerFrame), currentFrame(0), currTicks(0)

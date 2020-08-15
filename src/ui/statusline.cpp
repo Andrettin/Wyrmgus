@@ -27,22 +27,15 @@
 //      02111-1307, USA.
 //
 
-/*----------------------------------------------------------------------------
---  Includes
-----------------------------------------------------------------------------*/
-
 #include "stratagus.h"
 
 #include "ui/statusline.h"
 
-#include "font.h"
 #include "ui/interface.h"
 #include "ui/ui.h"
-#include "video.h"
+#include "video/font.h"
+#include "video/video.h"
 
-/**
-**  Draw status line.
-*/
 void CStatusLine::Draw()
 {
 	if (!this->StatusLine.empty()) {

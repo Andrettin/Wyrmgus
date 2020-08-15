@@ -40,7 +40,6 @@
 #include "construct.h"
 #include "database/defines.h"
 #include "editor.h"
-#include "font.h"
 #include "map/map.h"
 #include "map/map_layer.h"
 #include "map/tileset.h"
@@ -58,7 +57,8 @@
 #include "unit/unit_type_type.h"
 #include "unit/unit_type_variation.h"
 #include "util/size_util.h"
-#include "video.h"
+#include "video/font.h"
+#include "video/video.h"
 
 /**
 **  Decoration: health, mana.

@@ -40,7 +40,7 @@
 #include "util/container_util.h"
 #include "util/string_util.h"
 #include "util/vector_util.h"
-#include "video.h"
+#include "video/video.h"
 
 namespace stratagus {
 

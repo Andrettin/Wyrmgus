@@ -37,7 +37,6 @@
 #include "civilization.h"
 #include "faction.h"
 #include "game.h"	// for loading screen elements
-#include "font.h"	// for grand strategy mode tooltip drawing
 #include "iolib.h"
 #include "luacallback.h"
 #include "menus.h"
@@ -54,11 +53,8 @@
 #include "upgrade/upgrade_class.h"
 #include "upgrade/upgrade_modifier.h"
 #include "util/util.h"
-#include "video.h"
-
-/*----------------------------------------------------------------------------
---  Variables
-----------------------------------------------------------------------------*/
+#include "video/font.h"	// for grand strategy mode tooltip drawing
+#include "video/video.h"
 
 bool GrandStrategy = false;				///if the game is in grand strategy mode
 bool GrandStrategyGameLoading = false;

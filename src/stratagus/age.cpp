@@ -38,7 +38,7 @@
 #include "time/calendar.h"
 #include "unit/unit_type.h"
 #include "upgrade/upgrade_structs.h"
-#include "video.h"
+#include "video/video.h"
 
 namespace stratagus {
 

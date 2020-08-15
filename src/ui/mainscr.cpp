@@ -40,7 +40,6 @@
 #endif
 #include "civilization.h"
 #include "database/defines.h"
-#include "font.h"
 #include "game.h"
 #include "map/map.h"
 #include "map/map_layer.h"
@@ -78,7 +77,8 @@
 #include "util/util.h"
 #include "upgrade/upgrade.h"
 #include "version.h"
-#include "video.h"
+#include "video/font.h"
+#include "video/video.h"
 #include "world.h"
 
 /*----------------------------------------------------------------------------

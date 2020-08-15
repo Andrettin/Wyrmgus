@@ -94,7 +94,7 @@
 //Wyrmgus end
 #include "util/vector_random_util.h"
 #include "util/vector_util.h"
-#include "video.h"
+#include "video/video.h"
 
 /**
 **  @class CUnit unit.h

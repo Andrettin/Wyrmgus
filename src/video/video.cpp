@@ -76,17 +76,17 @@
 
 #include "stratagus.h"
 
-#include "video.h"
+#include "video/video.h"
 #include "intern_video.h"
 
 #include "database/defines.h"
 #include "database/preferences.h"
-#include "font.h"
 #include "iolib.h"
 #include "map/map.h"
 #include "ui/cursor.h"
 #include "ui/ui.h"
 #include "util/image_util.h"
+#include "video/font.h"
 
 #include "SDL.h"
 

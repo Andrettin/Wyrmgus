@@ -57,11 +57,7 @@
 //Wyrmgus end
 #include "unit/unit_type.h"
 #include "unit/unit_type_type.h"
-#include "video.h"
-
-/*----------------------------------------------------------------------------
---  Functions
-----------------------------------------------------------------------------*/
+#include "video/video.h"
 
 /* static */ COrder *COrder::NewActionRepair(CUnit &unit, CUnit &target)
 {

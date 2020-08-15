@@ -42,7 +42,6 @@
 #include "editor.h"
 //Wyrmgus end
 #include "faction.h"
-#include "font.h"
 #include "game.h"
 //Wyrmgus start
 #include "grand_strategy.h"
@@ -67,6 +66,7 @@
 #include "unit/unit_type.h"
 //Wyrmgus end
 #include "util/number_util.h"
+#include "video/font.h"
 
 lua_State *Lua;                       /// Structure to work with lua files.
 

@@ -64,7 +64,7 @@
 //Wyrmgus end
 #include "unit/unit_type.h"
 #include "unit/unit_type_type.h"
-#include "video.h"
+#include "video/video.h"
 
 /* static */ COrder *COrder::NewActionSpellCast(const stratagus::spell &spell, const Vec2i &pos, CUnit *target, int z, bool isAutocast)
 {

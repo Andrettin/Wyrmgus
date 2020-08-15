@@ -65,7 +65,7 @@
 #include "unit/unit.h"
 #include "unit/unit_class.h"
 #include "version.h"
-#include "video.h"
+#include "video/video.h"
 #include "world.h"
 
 /**

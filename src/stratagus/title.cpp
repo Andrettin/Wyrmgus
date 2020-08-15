@@ -28,13 +28,14 @@
 //
 
 #include "stratagus.h"
+
 #include "title.h"
-#include "video.h"
+
 #include "movie.h"
-#include "font.h"
 #include "sound/sound_server.h"
 #include "editor.h"
-
+#include "video/font.h"
+#include "video/video.h"
 
 TitleScreen **TitleScreens;			/// Title screens to show at startup
 static bool WaitNoEvent;			/// Flag got an event

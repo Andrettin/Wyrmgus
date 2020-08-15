@@ -29,13 +29,13 @@
 
 #include "stratagus.h"
 
-#include "font.h"
+#include "video/font.h"
 
 #include "database/defines.h"
 #include "intern_video.h"
 #include "util/image_util.h"
 #include "util/util.h"
-#include "video.h"
+#include "video/video.h"
 
 typedef std::map<std::string, CFont *> FontMap;
 static FontMap Fonts;  /// Font mappings

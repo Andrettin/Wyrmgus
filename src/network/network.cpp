@@ -239,11 +239,7 @@
 #include "unit/unit_manager.h"
 #include "unit/unit_type.h"
 #include "util/random.h"
-#include "video.h"
-
-//----------------------------------------------------------------------------
-//  Declaration
-//----------------------------------------------------------------------------
+#include "video/video.h"
 
 /**
 **  Network command input/output queue.

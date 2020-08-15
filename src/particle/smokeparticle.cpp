@@ -31,7 +31,7 @@
 
 #include "particle.h"
 
-#include "video.h"
+#include "video/video.h"
 
 //Wyrmgus start
 //CSmokeParticle::CSmokeParticle(CPosition position, GraphicAnimation *smoke,

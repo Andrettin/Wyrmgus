@@ -809,6 +809,7 @@ set(stratagus_video_HDRS
 	src/video/font.h
 	src/video/intern_video.h
 	src/video/renderer.h
+	src/video/video.h
 )
 
 set(stratagus_xbrz_HDRS
@@ -872,7 +873,6 @@ set(stratagus_generic_HDRS
 	src/include/translate.h
 	src/include/vec2i.h
 	src/include/version.h
-	src/include/video.h
 	src/include/viewport.h
 	src/include/widgets.h
 	src/include/world.h

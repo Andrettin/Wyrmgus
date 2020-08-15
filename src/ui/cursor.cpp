@@ -47,7 +47,7 @@
 //Wyrmgus start
 #include "upgrade/upgrade.h"
 //Wyrmgus end
-#include "video.h"
+#include "video/video.h"
 
 CursorState CurrentCursorState;    /// current cursor state (point,...)
 ButtonCmd CursorAction;            /// action for selection

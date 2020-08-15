@@ -46,7 +46,6 @@
 #include "editor.h"
 #include "faction.h"
 //Wyrmgus start
-#include "font.h"
 #include "game.h"
 #include "grand_strategy.h"
 #include "iocompat.h"
@@ -99,7 +98,8 @@
 #include "util/vector_util.h"
 #include "util/vector_random_util.h"
 #include "vassalage_type.h"
-#include "video.h"
+#include "video/font.h"
+#include "video/video.h"
 #include "world.h"
 
 /**

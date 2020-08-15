@@ -52,11 +52,7 @@
 #include "unit/unit_find.h"
 #include "unit/unit_type.h"
 #include "unit/unit_type_type.h"
-#include "video.h"
-
-/*----------------------------------------------------------------------------
---  Functions
-----------------------------------------------------------------------------*/
+#include "video/video.h"
 
 //Wyrmgus start
 ///* static */ COrder *COrder::NewActionMove(const Vec2i &pos)

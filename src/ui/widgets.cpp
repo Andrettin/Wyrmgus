@@ -27,19 +27,16 @@
 //      02111-1307, USA.
 //
 
-/*----------------------------------------------------------------------------
---  Includes
-----------------------------------------------------------------------------*/
-
 #include "stratagus.h"
-#include "video.h"
-#include "font.h"
+
+#include "video/video.h"
 //Wyrmgus start
 #include "grand_strategy.h"
 //Wyrmgus end
 #include "ui/cursor.h"
 #include "ui/cursor_type.h"
 #include "ui/ui.h"
+#include "video/font.h"
 #include "widgets.h"
 #include "network.h"
 #include "netconnect.h"
@@ -50,10 +47,6 @@
 #include "results.h"
 //Wyrmgus end
 
-/*----------------------------------------------------------------------------
--- Variables
-----------------------------------------------------------------------------*/
-
 // Guichan stuff we need
 gcn::Gui *Gui;         /// A Gui object - binds it all together
 gcn::SDLInput *Input;  /// Input driver
@@ -61,11 +54,6 @@ gcn::SDLInput *Input;  /// Input driver
 static EventCallback GuichanCallbacks;
 
 static std::stack<MenuScreen *> MenuStack;
-
-/*----------------------------------------------------------------------------
---  Functions
-----------------------------------------------------------------------------*/
-
 
 //Wyrmgus start
 //static void MenuHandleButtonDown(unsigned)

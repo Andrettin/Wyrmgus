@@ -59,11 +59,7 @@
 #include "unit/unit_find.h"
 #include "unit/unit_type.h"
 #include "unit/unit_type_type.h"
-#include "video.h"
-
-/*----------------------------------------------------------------------------
---  Declarations
-----------------------------------------------------------------------------*/
+#include "video/video.h"
 
 static constexpr int SUB_START_RESOURCE = 0;
 static constexpr int SUB_MOVE_TO_RESOURCE = 5;

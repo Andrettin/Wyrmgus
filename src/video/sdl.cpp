@@ -68,7 +68,6 @@
 #endif
 
 #include "editor.h"
-#include "font.h"
 #include "game.h"
 //Wyrmgus start
 #include "grand_strategy.h"
@@ -84,16 +83,9 @@
 #include "ui/ui.h"
 #include "unit/unit.h"
 #include "version.h"
-#include "video.h"
+#include "video/font.h"
+#include "video/video.h"
 #include "widgets.h"
-
-/*----------------------------------------------------------------------------
---  Declarations
-----------------------------------------------------------------------------*/
-
-/*----------------------------------------------------------------------------
---  Variables
-----------------------------------------------------------------------------*/
 
 #ifdef USE_GLES_EGL
 static EGLDisplay eglDisplay;

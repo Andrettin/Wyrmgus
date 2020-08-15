@@ -44,11 +44,7 @@
 #include "settings.h"
 #include "ui/interface.h"
 #include "version.h"
-#include "video.h"
-
-//----------------------------------------------------------------------------
-// Declaration
-//----------------------------------------------------------------------------
+#include "video/video.h"
 
 // received nothing from client for xx frames?
 static constexpr int CLIENT_LIVE_BEAT = 60;

@@ -30,7 +30,7 @@
 #include "stratagus.h"
 #include "particle.h"
 #include "ui/ui.h"
-#include "video.h"
+#include "video/video.h"
 
 CParticleManager ParticleManager;
 
