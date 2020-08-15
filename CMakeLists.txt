@@ -805,6 +805,12 @@ set(stratagus_util_HDRS
 	src/util/vector_util.h
 )
 
+set(stratagus_video_HDRS
+	src/video/font.h
+	src/video/intern_video.h
+	src/video/renderer.h
+)
+
 set(stratagus_xbrz_HDRS
 	src/xbrz/include/config.h
 	src/xbrz/include/xbrz.h
@@ -812,8 +818,6 @@ set(stratagus_xbrz_HDRS
 
 set(stratagus_generic_HDRS
 	src/ai/ai_local.h
-	src/video/intern_video.h
-	src/video/renderer.h
 	src/include/actions.h
 	src/include/age.h
 	src/include/ai.h
@@ -829,7 +833,6 @@ set(stratagus_generic_HDRS
 	src/include/data_type.h
 	src/include/dialogue.h
 	src/include/editor.h
-	src/include/font.h
 	src/include/game.h
 	src/include/grand_strategy.h
 	src/include/iocompat.h
@@ -913,6 +916,7 @@ source_group(ui FILES ${stratagus_ui_HDRS})
 source_group(unit FILES ${stratagus_unit_HDRS})
 source_group(upgrade FILES ${stratagus_upgrade_HDRS})
 source_group(util FILES ${stratagus_util_HDRS})
+source_group(video FILES ${stratagus_video_HDRS})
 source_group(xbrz FILES ${stratagus_xbrz_HDRS})
 
 
@@ -935,6 +939,7 @@ set(stratagus_HDRS
 	${stratagus_unit_HDRS}
 	${stratagus_upgrade_HDRS}
 	${stratagus_util_HDRS}
+	${stratagus_video_HDRS}
 	${stratagus_xbrz_HDRS}
 )
 
