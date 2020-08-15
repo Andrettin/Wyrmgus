@@ -1042,7 +1042,7 @@ void CPlayer::Init(/* PlayerTypes */ int type)
 
 	//  Initial default incomes.
 	for (int i = 0; i < MaxCosts; ++i) {
-		this->Incomes[i] = wyrmgus::resource::get_all()[i]->DefaultIncome;
+		this->Incomes[i] = wyrmgus::resource::get_all()[i]->get_default_income();
 	}
 	
 	this->TradeCost = DefaultTradeCost;
@@ -1816,7 +1816,7 @@ bool CPlayer::CanFoundFaction(const wyrmgus::faction *faction, const bool pre) c
 		}
 		
 		if (faction->Conditions) {
-			CclCommand("trigger_player = " + std::to_string((long long) this->Index) + ";");
+			CclCommand("trigger_player = " + std::to_string(this->Index) + ";");
 			faction->Conditions->pushPreamble();
 			faction->Conditions->run(1);
 			if (faction->Conditions->popBoolean() == false) {
@@ -1865,7 +1865,7 @@ bool CPlayer::is_character_available_for_recruitment(const wyrmgus::character *c
 	}
 	
 	if (character->Conditions) {
-		CclCommand("trigger_player = " + std::to_string((long long) this->Index) + ";");
+		CclCommand("trigger_player = " + std::to_string(this->Index) + ";");
 		character->Conditions->pushPreamble();
 		character->Conditions->run(1);
 		if (character->Conditions->popBoolean() == false) {
@@ -2113,7 +2113,7 @@ void CPlayer::Clear()
 		this->SpeedResourcesHarvest[i] = SPEEDUP_FACTOR;
 		this->SpeedResourcesReturn[i] = SPEEDUP_FACTOR;
 		if (i < wyrmgus::resource::get_all().size()) {
-			this->Prices[i] = wyrmgus::resource::get_all()[i]->BasePrice;
+			this->Prices[i] = wyrmgus::resource::get_all()[i]->get_base_price();
 		} else {
 			this->Prices[i] = 0;
 		}
@@ -2437,7 +2437,7 @@ void CPlayer::accept_quest(wyrmgus::quest *quest)
 		this->quest_objectives.push_back(std::move(objective));
 	}
 	
-	CclCommand("trigger_player = " + std::to_string((long long) this->Index) + ";");
+	CclCommand("trigger_player = " + std::to_string(this->Index) + ";");
 	
 	if (quest->AcceptEffects) {
 		quest->AcceptEffects->pushPreamble();
@@ -2466,7 +2466,7 @@ void CPlayer::complete_quest(wyrmgus::quest *quest)
 		quest->CurrentCompleted = true;
 	}
 	
-	CclCommand("trigger_player = " + std::to_string((long long) this->Index) + ";");
+	CclCommand("trigger_player = " + std::to_string(this->Index) + ";");
 	
 	if (quest->CompletionEffects) {
 		quest->CompletionEffects->pushPreamble();
@@ -2500,7 +2500,7 @@ void CPlayer::fail_quest(wyrmgus::quest *quest, const std::string &fail_reason)
 {
 	this->remove_current_quest(quest);
 	
-	CclCommand("trigger_player = " + std::to_string((long long) this->Index) + ";");
+	CclCommand("trigger_player = " + std::to_string(this->Index) + ";");
 	
 	if (quest->FailEffects) {
 		quest->FailEffects->pushPreamble();
@@ -2663,7 +2663,7 @@ bool CPlayer::can_accept_quest(const wyrmgus::quest *quest) const
 	}
 
 	if (quest->Conditions) {
-		CclCommand("trigger_player = " + std::to_string((long long) this->Index) + ";");
+		CclCommand("trigger_player = " + std::to_string(this->Index) + ";");
 		quest->Conditions->pushPreamble();
 		quest->Conditions->run(1);
 		return quest->Conditions->popBoolean();
@@ -2932,11 +2932,11 @@ int CPlayer::get_resource(const wyrmgus::resource *resource, const int type)
 {
 	switch (type) {
 		case STORE_OVERALL:
-			return this->Resources[resource->ID];
+			return this->Resources[resource->get_index()];
 		case STORE_BUILDING:
-			return this->StoredResources[resource->ID];
+			return this->StoredResources[resource->get_index()];
 		case STORE_BOTH:
-			return this->Resources[resource->ID] + this->StoredResources[resource->ID];
+			return this->Resources[resource->get_index()] + this->StoredResources[resource->get_index()];
 		default:
 			DebugPrint("Wrong resource type\n");
 			return -1;
@@ -2953,15 +2953,15 @@ int CPlayer::get_resource(const wyrmgus::resource *resource, const int type)
 void CPlayer::change_resource(const wyrmgus::resource *resource, const int value, const bool store)
 {
 	if (value < 0) {
-		const int fromStore = std::min(this->StoredResources[resource->ID], abs(value));
-		this->StoredResources[resource->ID] -= fromStore;
-		this->Resources[resource->ID] -= abs(value) - fromStore;
-		this->Resources[resource->ID] = std::max(this->Resources[resource->ID], 0);
+		const int fromStore = std::min(this->StoredResources[resource->get_index()], abs(value));
+		this->StoredResources[resource->get_index()] -= fromStore;
+		this->Resources[resource->get_index()] -= abs(value) - fromStore;
+		this->Resources[resource->get_index()] = std::max(this->Resources[resource->get_index()], 0);
 	} else {
-		if (store && this->MaxResources[resource->ID] != -1) {
-			this->StoredResources[resource->ID] += std::min(value, this->MaxResources[resource->ID] - this->StoredResources[resource->ID]);
+		if (store && this->MaxResources[resource->get_index()] != -1) {
+			this->StoredResources[resource->get_index()] += std::min(value, this->MaxResources[resource->get_index()] - this->StoredResources[resource->get_index()]);
 		} else {
-			this->Resources[resource->ID] += value;
+			this->Resources[resource->get_index()] += value;
 		}
 	}
 }
@@ -2976,17 +2976,17 @@ void CPlayer::change_resource(const wyrmgus::resource *resource, const int value
 void CPlayer::set_resource(const wyrmgus::resource *resource, const int value, const int type)
 {
 	if (type == STORE_BOTH) {
-		if (this->MaxResources[resource->ID] != -1) {
-			const int toRes = std::max(0, value - this->StoredResources[resource->ID]);
-			this->Resources[resource->ID] = std::max(0, toRes);
-			this->StoredResources[resource->ID] = std::min(value - toRes, this->MaxResources[resource->ID]);
+		if (this->MaxResources[resource->get_index()] != -1) {
+			const int toRes = std::max(0, value - this->StoredResources[resource->get_index()]);
+			this->Resources[resource->get_index()] = std::max(0, toRes);
+			this->StoredResources[resource->get_index()] = std::min(value - toRes, this->MaxResources[resource->get_index()]);
 		} else {
-			this->Resources[resource->ID] = value;
+			this->Resources[resource->get_index()] = value;
 		}
-	} else if (type == STORE_BUILDING && this->MaxResources[resource->ID] != -1) {
-		this->StoredResources[resource->ID] = std::min(value, this->MaxResources[resource->ID]);
+	} else if (type == STORE_BUILDING && this->MaxResources[resource->get_index()] != -1) {
+		this->StoredResources[resource->get_index()] = std::min(value, this->MaxResources[resource->get_index()]);
 	} else if (type == STORE_OVERALL) {
-		this->Resources[resource->ID] = value;
+		this->Resources[resource->get_index()] = value;
 	}
 }
 
@@ -3013,7 +3013,7 @@ bool CPlayer::CheckResource(const int resource, const int value)
 */
 void CPlayer::IncreaseResourcePrice(const int resource)
 {
-	int price_change = wyrmgus::resource::get_all()[resource]->BasePrice / std::max(this->Prices[resource], 100);
+	int price_change = wyrmgus::resource::get_all()[resource]->get_base_price() / std::max(this->Prices[resource], 100);
 	price_change = std::max(1, price_change);
 	this->Prices[resource] += price_change;
 }
@@ -3025,7 +3025,7 @@ void CPlayer::IncreaseResourcePrice(const int resource)
 */
 void CPlayer::DecreaseResourcePrice(const int resource)
 {
-	int price_change = this->Prices[resource] / wyrmgus::resource::get_all()[resource]->BasePrice;
+	int price_change = this->Prices[resource] / wyrmgus::resource::get_all()[resource]->get_base_price();
 	price_change = std::max(1, price_change);
 	this->Prices[resource] -= price_change;
 	this->Prices[resource] = std::max(1, this->Prices[resource]);
@@ -3043,7 +3043,7 @@ int CPlayer::ConvergePricesWith(CPlayer &player, int max_convergences)
 		converged = false;
 
 		for (int i = 1; i < MaxCosts; ++i) {
-			if (!wyrmgus::resource::get_all()[i]->BasePrice) {
+			if (!wyrmgus::resource::get_all()[i]->get_base_price()) {
 				continue;
 			}
 			
@@ -3100,7 +3100,7 @@ int CPlayer::GetEffectiveResourceDemand(const int resource) const
 	int resource_demand = this->ResourceDemand[resource];
 	
 	if (this->Prices[resource]) {
-		resource_demand *= wyrmgus::resource::get_all()[resource]->BasePrice;
+		resource_demand *= wyrmgus::resource::get_all()[resource]->get_base_price();
 		resource_demand /= this->Prices[resource];
 	}
 	
@@ -3144,7 +3144,7 @@ int CPlayer::GetTotalPriceDifferenceWith(const CPlayer &player) const
 {
 	int difference = 0;
 	for (int i = 1; i < MaxCosts; ++i) {
-		if (!wyrmgus::resource::get_all()[i]->BasePrice) {
+		if (!wyrmgus::resource::get_all()[i]->get_base_price()) {
 			continue;
 		}
 		difference += abs(this->Prices[i] - player.Prices[i]);
@@ -3160,7 +3160,7 @@ int CPlayer::GetTradePotentialWith(const CPlayer &player) const
 {
 	int trade_potential = 0;
 	for (int i = 1; i < MaxCosts; ++i) {
-		if (!wyrmgus::resource::get_all()[i]->BasePrice) {
+		if (!wyrmgus::resource::get_all()[i]->get_base_price()) {
 			continue;
 		}
 		int price_difference = abs(this->Prices[i] - player.Prices[i]);
@@ -3187,7 +3187,7 @@ void CPlayer::pay_overlord_tax(const wyrmgus::resource *resource, const int taxa
 	}
 
 	this->get_overlord()->change_resource(resource, quantity, true);
-	this->get_overlord()->TotalResources[resource->ID] += quantity;
+	this->get_overlord()->TotalResources[resource->get_index()] += quantity;
 	this->change_resource(resource, -quantity, true);
 
 	//make the overlord pay tax to their overlord in turn (if they have one)
@@ -3278,9 +3278,9 @@ int CPlayer::CheckCosts(const int *costs, bool notify) const
 		}
 		if (notify) {
 			const char *name = DefaultResourceNames[i].c_str();
-			const char *actionName = wyrmgus::resource::get_all()[i]->ActionName.c_str();
+			const char *action_name = wyrmgus::resource::get_all()[i]->get_action_name().c_str();
 
-			Notify(_("Not enough %s... %s more %s."), _(name), _(actionName), _(name));
+			Notify(_("Not enough %s... %s more %s."), _(name), _(action_name), _(name));
 
 			//Wyrmgus start
 //			if (this == CPlayer::GetThisPlayer() && GameSounds.NotEnoughRes[this->Race][i].Sound) {

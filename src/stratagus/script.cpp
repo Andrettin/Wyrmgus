@@ -1728,7 +1728,7 @@ std::string EvalString(const StringDesc *s)
 				std::string improve_incomes;
 				bool first = true;
 				for (int res = 1; res < MaxCosts; ++res) {
-					if ((**type).Stats[CPlayer::GetThisPlayer()->Index].ImproveIncomes[res] > wyrmgus::resource::get_all()[res]->DefaultIncome) {
+					if ((**type).Stats[CPlayer::GetThisPlayer()->Index].ImproveIncomes[res] > wyrmgus::resource::get_all()[res]->get_default_income()) {
 						if (!first) {
 							improve_incomes += "\n";
 						} else {
@@ -1736,7 +1736,7 @@ std::string EvalString(const StringDesc *s)
 						}
 						improve_incomes += IdentToName(DefaultResourceNames[res]);
 						improve_incomes += " Processing Bonus: +";
-						improve_incomes += std::to_string((long long) (**type).Stats[CPlayer::GetThisPlayer()->Index].ImproveIncomes[res] - wyrmgus::resource::get_all()[res]->DefaultIncome);
+						improve_incomes += std::to_string((**type).Stats[CPlayer::GetThisPlayer()->Index].ImproveIncomes[res] - wyrmgus::resource::get_all()[res]->get_default_income());
 						improve_incomes += "%";
 					}
 				}
@@ -1758,7 +1758,7 @@ std::string EvalString(const StringDesc *s)
 						}
 						luxury_demand += IdentToName(DefaultResourceNames[res]);
 						luxury_demand += " Demand: ";
-						luxury_demand += std::to_string((long long) (**type).Stats[CPlayer::GetThisPlayer()->Index].ResourceDemand[res]);
+						luxury_demand += std::to_string((**type).Stats[CPlayer::GetThisPlayer()->Index].ResourceDemand[res]);
 					}
 				}
 				return luxury_demand;
@@ -1793,7 +1793,7 @@ std::string EvalString(const StringDesc *s)
 		case EString_UpgradeMaxLimit : // upgrade's max limit
 			upgrade = s->D.Upgrade;
 			if (upgrade != nullptr) {
-				return std::to_string((long long) (**upgrade).MaxLimit);
+				return std::to_string((**upgrade).MaxLimit);
 			} else { // ERROR.
 				return std::string("");
 			}
@@ -1858,7 +1858,7 @@ std::string EvalString(const StringDesc *s)
 				std::string conversion_rates;
 				bool first = true;
 				for (const wyrmgus::resource *child_resource : wyrmgus::resource::get_all()[(**resource)]->ChildResources) {
-					if (child_resource->ID == TradeCost || child_resource->Hidden) {
+					if (child_resource->get_index() == TradeCost || child_resource->Hidden) {
 						continue;
 					}
 					if (!first) {
@@ -1870,7 +1870,7 @@ std::string EvalString(const StringDesc *s)
 					conversion_rates += " to ";
 					conversion_rates += wyrmgus::resource::get_all()[(**resource)]->get_name();
 					conversion_rates += " Conversion Rate: ";
-					conversion_rates += std::to_string((long long) child_resource->FinalResourceConversionRate);
+					conversion_rates += std::to_string(child_resource->FinalResourceConversionRate);
 					conversion_rates += "%";
 				}
 				return conversion_rates;
@@ -1882,18 +1882,18 @@ std::string EvalString(const StringDesc *s)
 			if (resource != nullptr) {
 				std::string improve_incomes;
 				bool first = true;
-				if (CPlayer::GetThisPlayer()->Incomes[(**resource)] > wyrmgus::resource::get_all()[(**resource)]->DefaultIncome) {
+				if (CPlayer::GetThisPlayer()->Incomes[(**resource)] > wyrmgus::resource::get_all()[(**resource)]->get_default_income()) {
 					first = false;
 					improve_incomes += wyrmgus::resource::get_all()[(**resource)]->get_name();
 					improve_incomes += " Processing Bonus: +";
-					improve_incomes += std::to_string((long long) CPlayer::GetThisPlayer()->Incomes[(**resource)] - wyrmgus::resource::get_all()[(**resource)]->DefaultIncome);
+					improve_incomes += std::to_string(CPlayer::GetThisPlayer()->Incomes[(**resource)] - wyrmgus::resource::get_all()[(**resource)]->get_default_income());
 					improve_incomes += "%";
 				}
 				for (const wyrmgus::resource *child_resource : wyrmgus::resource::get_all()[(**resource)]->ChildResources) {
-					if (child_resource->ID == TradeCost || child_resource->Hidden) {
+					if (child_resource->get_index() == TradeCost || child_resource->Hidden) {
 						continue;
 					}
-					if (CPlayer::GetThisPlayer()->Incomes[child_resource->ID] > child_resource->DefaultIncome) {
+					if (CPlayer::GetThisPlayer()->Incomes[child_resource->get_index()] > child_resource->get_default_income()) {
 						if (!first) {
 							improve_incomes += "\n";
 						} else {
@@ -1901,7 +1901,7 @@ std::string EvalString(const StringDesc *s)
 						}
 						improve_incomes += child_resource->get_name();
 						improve_incomes += " Processing Bonus: +";
-						improve_incomes += std::to_string((long long) CPlayer::GetThisPlayer()->Incomes[child_resource->ID] - child_resource->DefaultIncome);
+						improve_incomes += std::to_string(CPlayer::GetThisPlayer()->Incomes[child_resource->get_index()] - child_resource->get_default_income());
 						improve_incomes += "%";
 					}
 				}

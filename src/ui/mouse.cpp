@@ -380,7 +380,7 @@ static bool DoRightButton_Harvest_Pos(CUnit &unit, const Vec2i &pos, int flush, 
 	const wyrmgus::unit_type &type = *unit.Type;
 	// FIXME: support harvesting more types of terrain.
 	for (const wyrmgus::resource *resource : wyrmgus::resource::get_all()) {
-		if (type.ResInfo[resource->ID]
+		if (type.ResInfo[resource->get_index()]
 			//Wyrmgus start
 //			&& type.ResInfo[res]->TerrainHarvester
 			&& UI.CurrentMapLayer->Field(pos)->get_resource() == resource
@@ -398,7 +398,7 @@ static bool DoRightButton_Harvest_Pos(CUnit &unit, const Vec2i &pos, int flush, 
 				acknowledged = 1;
 			}
 			*/
-			if (unit.CurrentResource != resource->ID || unit.ResourcesHeld < type.ResInfo[resource->ID]->ResourceCapacity) {
+			if (unit.CurrentResource != resource->get_index() || unit.ResourcesHeld < type.ResInfo[resource->get_index()]->ResourceCapacity) {
 				SendCommandResourceLoc(unit, pos, flush, UI.CurrentMapLayer->ID);
 				if (!acknowledged) {
 					PlayUnitSound(unit, wyrmgus::unit_sound_type::harvesting);
@@ -1489,7 +1489,7 @@ void UIHandleMouseMove(const PixelPos &cursorPos)
 			const CViewport &vp = *UI.MouseViewport;
 			const Vec2i tilePos = vp.ScreenToTilePos(cursorPos);
 			for (const wyrmgus::resource *resource : wyrmgus::resource::get_all()) {
-				if (Selected[0]->Type->ResInfo[resource->ID]
+				if (Selected[0]->Type->ResInfo[resource->get_index()]
 					//Wyrmgus start
 //					&& Selected[0]->Type->ResInfo[res]->TerrainHarvester
 					//Wyrmgus end

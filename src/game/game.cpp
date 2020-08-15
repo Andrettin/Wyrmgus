@@ -2108,7 +2108,6 @@ static int CclDefineResource(lua_State *l)
 		LuaError(l, "Resource \"%s\" doesn't exist." _C_ resource_ident.c_str());
 	}
 	wyrmgus::resource *resource = wyrmgus::resource::get_all()[resource_id];
-	resource->FinalResource = resource_id;
 	
 	//  Parse the list:
 	for (lua_pushnil(l); lua_next(l, 2); lua_pop(l, 1)) {
@@ -2117,13 +2116,13 @@ static int CclDefineResource(lua_State *l)
 		if (!strcmp(value, "Name")) {
 			resource->set_name(LuaToString(l, -1));
 		} else if (!strcmp(value, "DefaultIncome")) {
-			resource->DefaultIncome = LuaToNumber(l, -1);
+			resource->default_income = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "DefaultAmount")) {
-			resource->DefaultAmount = LuaToNumber(l, -1);
+			resource->default_amount = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "DefaultMaxAmount")) {
 			resource->DefaultMaxAmount = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "ActionName")) {
-			resource->ActionName = LuaToString(l, -1);
+			resource->action_name = LuaToString(l, -1);
 		} else if (!strcmp(value, "FinalResource")) {
 			std::string final_resource_ident = LuaToString(l, -1);
 			int final_resource_id = GetResourceIdByName(final_resource_ident.c_str());
@@ -2138,7 +2137,7 @@ static int CclDefineResource(lua_State *l)
 			resource->LuxuryResource = LuaToBoolean(l, -1);
 			LuxuryResources.push_back(resource_id);
 		} else if (!strcmp(value, "BasePrice")) {
-			resource->BasePrice = LuaToNumber(l, -1);
+			resource->base_price = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "DemandElasticity")) {
 			resource->DemandElasticity = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "InputResource")) {
@@ -2169,16 +2168,18 @@ static int CclDefineDefaultResourceNames(lua_State *l)
 		DefaultResourceNames[i].clear();
 	}
 
-	wyrmgus::resource::clear();
-	
 	const unsigned int args = lua_gettop(l);
 	for (unsigned int i = 0; i < MaxCosts && i < args; ++i) {
 		DefaultResourceNames[i] = LuaToString(l, i + 1);
 		
-		wyrmgus::resource *resource = wyrmgus::resource::add(DefaultResourceNames[i], nullptr);
-		resource->ID = i;
+		wyrmgus::resource *resource = wyrmgus::resource::get_or_add(DefaultResourceNames[i], nullptr);
+		resource->index = i;
 	}
-	
+
+	wyrmgus::resource::sort_instances([](const wyrmgus::resource *a, const wyrmgus::resource *b) {
+		return a->get_index() < b->get_index();
+	});
+
 	return 0;
 }
 

@@ -104,7 +104,7 @@ void unit_sound_set::process_sml_property(const sml_property &property)
 		std::string resource_identifier = key;
 		string::replace(resource_identifier, "harvest_", "");
 		const resource *resource = resource::get(resource_identifier);
-		this->Harvest[resource->ID].Name = value;
+		this->Harvest[resource->get_index()].Name = value;
 	} else if (key == "help") {
 		this->Help.Name = value;
 	} else if (key == "help_town") {

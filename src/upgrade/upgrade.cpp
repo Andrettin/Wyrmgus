@@ -148,7 +148,7 @@ int CUnitStats::GetPrice() const
 			if (i == CopperCost) {
 				cost += this->Costs[i];
 			} else {
-				cost += this->Costs[i] * wyrmgus::resource::get_all()[i]->BasePrice / 100;
+				cost += this->Costs[i] * wyrmgus::resource::get_all()[i]->get_base_price() / 100;
 			}
 		}
 	}
@@ -318,7 +318,7 @@ void CUpgrade::process_sml_scope(const wyrmgus::sml_data &scope)
 			const std::string &value = property.get_value();
 
 			const wyrmgus::resource *resource = wyrmgus::resource::get(key);
-			this->Costs[resource->ID] = std::stoi(value);
+			this->Costs[resource->get_index()] = std::stoi(value);
 		});
 	} else if (tag == "modifier") {
 		auto modifier = std::make_unique<wyrmgus::upgrade_modifier>();
@@ -1456,7 +1456,7 @@ static void ApplyUpgradeModifier(CPlayer &player, const wyrmgus::upgrade_modifie
 				stat.Storing[j] += um->Modifier.Storing[j];
 				if (um->Modifier.ImproveIncomes[j]) {
 					if (!stat.ImproveIncomes[j]) {
-						stat.ImproveIncomes[j] += wyrmgus::resource::get_all()[j]->DefaultIncome + um->Modifier.ImproveIncomes[j];
+						stat.ImproveIncomes[j] += wyrmgus::resource::get_all()[j]->get_default_income() + um->Modifier.ImproveIncomes[j];
 					} else {
 						stat.ImproveIncomes[j] += um->Modifier.ImproveIncomes[j];
 					}
@@ -1744,7 +1744,7 @@ static void RemoveUpgradeModifier(CPlayer &player, const wyrmgus::upgrade_modifi
 				stat.ImproveIncomes[j] -= um->Modifier.ImproveIncomes[j];
 				//if this was the highest improve income, search for another
 				if (player.Incomes[j] && (stat.ImproveIncomes[j] + um->Modifier.ImproveIncomes[j]) == player.Incomes[j]) {
-					int m = wyrmgus::resource::get_all()[j]->DefaultIncome;
+					int m = wyrmgus::resource::get_all()[j]->get_default_income();
 
 					for (int k = 0; k < player.GetUnitCount(); ++k) {
 						//Wyrmgus start

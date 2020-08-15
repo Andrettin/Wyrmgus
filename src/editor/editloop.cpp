@@ -221,7 +221,7 @@ static void EditTile(const Vec2i &pos, wyrmgus::terrain_type *terrain)
 	//Wyrmgus start
 	int value = 0;
 	if ((terrain->Flags & MapFieldForest) || (terrain->Flags & MapFieldRocks)) {
-		value = terrain->get_resource()->DefaultAmount;
+		value = terrain->get_resource()->get_default_amount();
 	}
 //	mf.setTileIndex(tileset, tileIndex, 0);
 	mf.SetTerrain(terrain);
@@ -540,9 +540,9 @@ static void EditorActionPlaceUnit(const Vec2i &pos, const wyrmgus::unit_type &ty
 				unit->Variable[GIVERESOURCE_INDEX].Max = unit->ResourcesHeld;
 				//Wyrmgus end
 			} else {
-				unit->SetResourcesHeld(wyrmgus::resource::get_all()[type.GivesResource]->DefaultAmount);
-				unit->Variable[GIVERESOURCE_INDEX].Value = wyrmgus::resource::get_all()[type.GivesResource]->DefaultAmount;
-				unit->Variable[GIVERESOURCE_INDEX].Max = wyrmgus::resource::get_all()[type.GivesResource]->DefaultAmount;
+				unit->SetResourcesHeld(wyrmgus::resource::get_all()[type.GivesResource]->get_default_amount());
+				unit->Variable[GIVERESOURCE_INDEX].Value = wyrmgus::resource::get_all()[type.GivesResource]->get_default_amount();
+				unit->Variable[GIVERESOURCE_INDEX].Max = wyrmgus::resource::get_all()[type.GivesResource]->get_default_amount();
 			}
 			unit->Variable[GIVERESOURCE_INDEX].Enable = 1;
 		}

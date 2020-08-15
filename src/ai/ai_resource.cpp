@@ -1333,12 +1333,12 @@ static int AiAssignHarvesterFromUnit(CUnit &unit, const wyrmgus::resource *resou
 //Wyrmgus end
 {
 	// Try to find the nearest depot first.
-	CUnit *depot = FindDeposit(unit, 1000, resource->ID);
+	CUnit *depot = FindDeposit(unit, 1000, resource->get_index());
 	
 	// Find a resource to harvest from.
 	//Wyrmgus start
 //	CUnit *mine = UnitFindResource(unit, depot ? *depot : unit, 1000, resource, true);
-	CUnit *mine = UnitFindResource(unit, depot ? *depot : unit, resource_range, resource->ID, true, nullptr, false, false, false, resource->ID == CopperCost && AiPlayer->Player->HasMarketUnit());
+	CUnit *mine = UnitFindResource(unit, depot ? *depot : unit, resource_range, resource->get_index(), true, nullptr, false, false, false, resource->get_index() == CopperCost && AiPlayer->Player->HasMarketUnit());
 	//Wyrmgus end
 
 	if (mine) {

@@ -215,10 +215,10 @@ std::string CDate::ToString(const wyrmgus::calendar *calendar) const
 {
 	std::string date_string;
 	
-	date_string += std::to_string((long long) this->Year);
-	date_string += "." + std::to_string((long long) this->Month);
-	date_string += "." + std::to_string((long long) this->Day);
-	date_string += "." + std::to_string((long long) this->Hour);
+	date_string += std::to_string(this->Year);
+	date_string += "." + std::to_string(this->Month);
+	date_string += "." + std::to_string(this->Day);
+	date_string += "." + std::to_string(this->Hour);
 	
 	return date_string;
 }
@@ -228,10 +228,10 @@ std::string CDate::ToDisplayString(const wyrmgus::calendar *calendar, const bool
 	std::string display_string;
 	
 	if (!year_only) {
-		display_string += std::to_string((long long) this->Day) + "." + std::to_string((long long) this->Month) + ".";
+		display_string += std::to_string(this->Day) + "." + std::to_string(this->Month) + ".";
 	}
 	
-	display_string += std::to_string((long long) abs(this->Year));
+	display_string += std::to_string(abs(this->Year));
 	
 	display_string += " ";
 	if (this->Year < 0) {

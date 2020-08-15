@@ -82,7 +82,9 @@ void CGrandStrategyGame::DrawInterface()
 		for (size_t i = 0; i < stored_resources.size(); ++i) {
 			int x = 154 + (100 * i);
 			int y = 0;
-			UI.Resources[stored_resources[i]].G->DrawFrameClip(0, x, y, nullptr);
+			const wyrmgus::resource *resource = wyrmgus::resource::get_all()[stored_resources[i]];
+			CGraphic *icon_graphics = resource->get_icon_graphics();
+			icon_graphics->DrawFrameClip(0, x, y, nullptr);
 			
 			int quantity_stored = this->PlayerFaction->Resources[stored_resources[i]];
 			int income = 0;
@@ -98,9 +100,9 @@ void CGrandStrategyGame::DrawInterface()
 				if (income > 0) {
 					income_string += "+";
 				}
-				income_string += std::to_string((long long) income);
+				income_string += std::to_string(income);
 			}
-			std::string resource_stored_string = std::to_string((long long) quantity_stored) + income_string;
+			std::string resource_stored_string = std::to_string(quantity_stored) + income_string;
 			
 			if (resource_stored_string.size() <= 9) {
 				CLabel(wyrmgus::defines::get()->get_game_font()).Draw(x + 18, y + 1, resource_stored_string);
@@ -108,7 +110,7 @@ void CGrandStrategyGame::DrawInterface()
 				CLabel(wyrmgus::defines::get()->get_small_font()).Draw(x + 18, y + 1 + 2, resource_stored_string);
 			}
 			
-			if (CursorScreenPos.x >= x && CursorScreenPos.x <= (x + UI.Resources[stored_resources[i]].G->get_width()) && CursorScreenPos.y >= y && CursorScreenPos.y <= (y + UI.Resources[stored_resources[i]].G->get_height())) {
+			if (CursorScreenPos.x >= x && CursorScreenPos.x <= (x + icon_graphics->get_width()) && CursorScreenPos.y >= y && CursorScreenPos.y <= (y + icon_graphics->get_height())) {
 				if (stored_resources[i] == ResearchCost) {
 					hovered_research_icon.x = x;
 					hovered_research_icon.y = y;
@@ -1023,7 +1025,7 @@ std::string CGrandStrategyHero::GetMinisterEffectsString(const wyrmgus::characte
 			if (modifier > 0) {
 				minister_effects_string += "+";
 			}
-			minister_effects_string += std::to_string((long long) modifier) + "% Troop Cost";
+			minister_effects_string += std::to_string(modifier) + "% Troop Cost";
 		}
 	}
 	

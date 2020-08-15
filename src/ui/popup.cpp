@@ -307,9 +307,10 @@
 			if (UI.Resources[i].IconWidth != -1)	{
 				popupWidth += (UI.Resources[i].IconWidth + 5 * scale_factor);
 			} else {
-				const CGraphic *G = UI.Resources[i].G;
-				if (G) {
-					popupWidth += (G->Width + 5 * scale_factor);
+				const wyrmgus::resource *resource = wyrmgus::resource::get_all()[i];
+				const CGraphic *icon_graphics = resource->get_icon_graphics();
+				if (icon_graphics != nullptr) {
+					popupWidth += (icon_graphics->Width + 5 * scale_factor);
 				}
 			}
 			popupWidth += (font->Width(Costs[i]) + 5 * scale_factor);
@@ -344,8 +345,10 @@
 	const wyrmgus::font *font = this->Font ? this->Font : wyrmgus::defines::get()->get_small_font();
 
 	for (unsigned int i = 1; i <= ManaResCost; ++i) {
-		if (Costs[i] && UI.Resources[i].G) {
-			popupHeight = std::max(UI.Resources[i].G->Height, popupHeight);
+		const wyrmgus::resource *resource = wyrmgus::resource::get_all()[i];
+		const CGraphic *icon_graphics = resource->get_icon_graphics();
+		if (Costs[i] && icon_graphics != nullptr) {
+			popupHeight = std::max(icon_graphics->Height, popupHeight);
 		}
 	}
 	return std::max(popupHeight, font->Height());
@@ -360,15 +363,13 @@
 	for (unsigned int i = 1; i <= MaxCosts; ++i) {
 		if (Costs[i]) {
 			int y_offset = 0;
-			//Wyrmgus start
-//			const CGraphic *G = UI.Resources[i].G;
-			CGraphic *G = UI.Resources[i].G;
-			//Wyrmgus end
-			if (G) {
+			const wyrmgus::resource *resource = wyrmgus::resource::get_all()[i];
+			CGraphic *icon_graphics = resource->get_icon_graphics();
+			if (icon_graphics != nullptr) {
 				int x_offset = UI.Resources[i].IconWidth;
-				G->DrawFrameClip(UI.Resources[i].IconFrame,	x , y);
-				x += ((x_offset != -1 ? x_offset : G->Width) + 5 * scale_factor);
-				y_offset = G->Height;
+				icon_graphics->DrawFrameClip(UI.Resources[i].IconFrame,	x , y);
+				x += ((x_offset != -1 ? x_offset : icon_graphics->Width) + 5 * scale_factor);
+				y_offset = icon_graphics->Height;
 				y_offset -= label.Height();
 				y_offset /= 2;
 			}
@@ -378,10 +379,7 @@
 	}
 	if (Costs[ManaResCost]) {
 		const wyrmgus::spell &spell = *wyrmgus::spell::get_all()[button.Value];
-		//Wyrmgus start
-//		const CGraphic *G = UI.Resources[ManaResCost].G;
 		CGraphic *G = UI.Resources[ManaResCost].G;
-		//Wyrmgus end
 		if (spell.ManaCost) {
 			int y_offset = 0;
 			if (G) {

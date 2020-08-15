@@ -4122,7 +4122,7 @@ void UnitLost(CUnit &unit)
 		//  income.
 		for (int i = 1; i < MaxCosts; ++i) {
 			if (player.Incomes[i] && type.Stats[player.Index].ImproveIncomes[i] == player.Incomes[i]) {
-				int m = wyrmgus::resource::get_all()[i]->DefaultIncome;
+				int m = wyrmgus::resource::get_all()[i]->get_default_income();
 
 				for (int j = 0; j < player.GetUnitCount(); ++j) {
 					m = std::max(m, player.GetUnit(j).Type->Stats[player.Index].ImproveIncomes[i]);

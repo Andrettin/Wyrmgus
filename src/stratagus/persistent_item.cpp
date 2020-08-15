@@ -266,7 +266,7 @@ std::string GetItemEffectsString(const std::string &item_ident)
 					if (item->DefaultStat.Variables[var].Value >= 0 && var != HITPOINTHEALING_INDEX) {
 						item_effects_string += "+";
 					}
-					item_effects_string += std::to_string((long long) item->DefaultStat.Variables[var].Value);
+					item_effects_string += std::to_string(item->DefaultStat.Variables[var].Value);
 					if (IsPercentageVariable(var)) {
 						item_effects_string += "%";
 					}
@@ -286,7 +286,7 @@ std::string GetItemEffectsString(const std::string &item_ident)
 				if (item->DefaultStat.Variables[var].Increase > 0) {
 					item_effects_string += "+";
 				}
-				item_effects_string += std::to_string((long long) item->DefaultStat.Variables[var].Increase);
+				item_effects_string += std::to_string(item->DefaultStat.Variables[var].Increase);
 				item_effects_string += " ";
 											
 				item_effects_string += GetVariableDisplayName(var, true);

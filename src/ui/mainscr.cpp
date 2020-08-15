@@ -554,7 +554,7 @@ static void DrawUnitInfo_Training(const CUnit &unit)
 			
 			for (size_t i = 0; i < train_counter.size(); ++i) {
 				if (train_counter[i] > 1) {
-					std::string number_string = std::to_string((long long) train_counter[i]);
+					std::string number_string = std::to_string(train_counter[i]);
 					CLabel label(wyrmgus::defines::get()->get_game_font());
 
 					const PixelPos pos(UI.TrainingButtons[i].X, UI.TrainingButtons[i].Y);
@@ -789,11 +789,18 @@ void DrawResources()
 {
 	CLabel label(wyrmgus::defines::get()->get_game_font());
 
+	for (const wyrmgus::resource *resource : wyrmgus::resource::get_all()) {
+		CGraphic *icon_graphics = resource->get_icon_graphics();
+		const int index = resource->get_index();
+		if (icon_graphics != nullptr && UI.Resources[index].IconX != -1) {
+			icon_graphics->DrawFrameClip(UI.Resources[index].IconFrame, UI.Resources[index].IconX, UI.Resources[index].IconY);
+		}
+	}
+
 	// Draw all icons of resource.
-	for (int i = 0; i <= FreeWorkersCount; ++i) {
+	for (int i = FoodCost; i <= FreeWorkersCount; ++i) {
 		if (UI.Resources[i].G) {
-			UI.Resources[i].G->DrawFrameClip(UI.Resources[i].IconFrame,
-											 UI.Resources[i].IconX, UI.Resources[i].IconY);
+			UI.Resources[i].G->DrawFrameClip(UI.Resources[i].IconFrame, UI.Resources[i].IconX, UI.Resources[i].IconY);
 		}
 	}
 	for (int i = 0; i < MaxCosts; ++i) {
@@ -1096,17 +1103,26 @@ void DrawPopups()
 	}
 		
 	//draw a popup when hovering over a resource icon
-	for (int i = 0; i < MaxCosts; ++i) {
-		if (UI.Resources[i].G && CursorScreenPos.x >= UI.Resources[i].IconX && CursorScreenPos.x < (UI.Resources[i].TextX + UI.Resources[i].Font->Width(UI.Resources[i].Text)) && CursorScreenPos.y >= UI.Resources[i].IconY && CursorScreenPos.y < (UI.Resources[i].IconY + UI.Resources[i].G->Height)) {
+	for (const wyrmgus::resource *resource : wyrmgus::resource::get_all()) {
+		const CGraphic *icon_graphics = resource->get_icon_graphics();
+		if (icon_graphics == nullptr) {
+			continue;
+		}
+
+		const int index = resource->get_index();
+		if (UI.Resources[index].IconX == -1) {
+			continue;
+		}
+
+		if (CursorScreenPos.x >= UI.Resources[index].IconX && CursorScreenPos.x < (UI.Resources[index].TextX + UI.Resources[index].Font->Width(UI.Resources[index].Text)) && CursorScreenPos.y >= UI.Resources[index].IconY && CursorScreenPos.y < (UI.Resources[index].IconY + icon_graphics->Height)) {
 			//hackish way to make the popup appear correctly for the resource
-			wyrmgus::button *ba = new wyrmgus::button;
-			ba->Hint = CapitalizeString(DefaultResourceNames[i]);
+			auto ba = std::make_unique<wyrmgus::button>();
+			ba->Hint = resource->get_name();;
 			ba->Action = ButtonCmd::ProduceResource;
-			ba->Value = i;
-			ba->ValueStr = DefaultResourceNames[i];
+			ba->Value = index;
+			ba->ValueStr = resource->get_identifier();
 			ba->Popup = "popup_resource";
-			DrawPopup(*ba, UI.Resources[i].IconX, UI.Resources[i].IconY + 16 * wyrmgus::defines::get()->get_scale_factor() + GameCursor->get_graphic()->getHeight() / 2, false);
-			delete ba;
+			DrawPopup(*ba, UI.Resources[index].IconX, UI.Resources[index].IconY + 16 * wyrmgus::defines::get()->get_scale_factor() + GameCursor->get_graphic()->getHeight() / 2, false);
 			LastDrawnButtonPopup = nullptr;
 		}
 	}

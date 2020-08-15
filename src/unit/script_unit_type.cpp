@@ -1014,7 +1014,7 @@ static int CclDefineUnitType(lua_State *l)
 				const int res = CclGetResourceByName(l);
 				lua_pop(l, 1);
 				++k;
-				type->DefaultStat.ImproveIncomes[res] = wyrmgus::resource::get_all()[res]->DefaultIncome + LuaToNumber(l, -1, k + 1);
+				type->DefaultStat.ImproveIncomes[res] = wyrmgus::resource::get_all()[res]->get_default_income() + LuaToNumber(l, -1, k + 1);
 			}
 		//Wyrmgus start
 		} else if (!strcmp(value, "ResourceDemand")) {
@@ -4030,7 +4030,7 @@ static int CclSetModTrains(lua_State *l)
 	
 	for (size_t i = 0; i < type->ModTrains[mod_file].size(); ++i) {
 		std::string button_definition = "DefineButton({\n";
-		button_definition += "\tPos = " + std::to_string((long long) type->ModTrains[mod_file][i]->ButtonPos) + ",\n";
+		button_definition += "\tPos = " + std::to_string(type->ModTrains[mod_file][i]->ButtonPos) + ",\n";
 		if (type->ModTrains[mod_file][i]->ButtonLevel) {
 			button_definition += "\tLevel = " + type->ModTrains[mod_file][i]->ButtonLevel->get_identifier() + ",\n";
 		}

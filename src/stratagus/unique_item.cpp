@@ -178,7 +178,7 @@ std::string GetUniqueItemEffectsString(const std::string &item_ident)
 					if (variable_value >= 0 && var != HITPOINTHEALING_INDEX && var != GIVERESOURCE_INDEX) {
 						item_effects_string += "+";
 					}
-					item_effects_string += std::to_string((long long) variable_value);
+					item_effects_string += std::to_string(variable_value);
 					if (IsPercentageVariable(var)) {
 						item_effects_string += "%";
 					}
@@ -198,7 +198,7 @@ std::string GetUniqueItemEffectsString(const std::string &item_ident)
 				if (variable_increase > 0) {
 					item_effects_string += "+";
 				}
-				item_effects_string += std::to_string((long long) variable_increase);
+				item_effects_string += std::to_string(variable_increase);
 				item_effects_string += " ";
 
 				item_effects_string += GetVariableDisplayName(var, true);
@@ -249,7 +249,7 @@ std::string GetUniqueItemEffectsString(const std::string &item_ident)
 						if (variable_value >= 0 && var != HITPOINTHEALING_INDEX && var != GIVERESOURCE_INDEX) {
 							item_effects_string += "+";
 						}
-						item_effects_string += std::to_string((long long) variable_value);
+						item_effects_string += std::to_string(variable_value);
 						if (IsPercentageVariable(var)) {
 							item_effects_string += "%";
 						}
@@ -270,7 +270,7 @@ std::string GetUniqueItemEffectsString(const std::string &item_ident)
 					if (variable_increase > 0) {
 						item_effects_string += "+";
 					}
-					item_effects_string += std::to_string((long long) variable_increase);
+					item_effects_string += std::to_string(variable_increase);
 					item_effects_string += " ";
 
 					item_effects_string += GetVariableDisplayName(var, true);

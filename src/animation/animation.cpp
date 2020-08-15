@@ -576,7 +576,7 @@ void animation_set::process_sml_scope(const sml_data &scope)
 		} else if (tag == "build") {
 			this->Build = std::move(first_anim);
 		} else if (tag == "harvest") {
-			this->Harvest[resource->ID] = std::move(first_anim);
+			this->Harvest[resource->get_index()] = std::move(first_anim);
 		}
 	}
 }

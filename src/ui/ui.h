@@ -316,19 +316,17 @@ public:
 class CResourceInfo
 {
 public:
-	CResourceInfo() : G(nullptr), IconFrame(0), IconX(0), IconY(0), IconWidth(-1),
-		Font(nullptr), TextX(-1), TextY(-1) {}
-
-	CGraphic *G;	/// icon graphic
-	int IconFrame;	/// icon frame
-	int IconX;		/// icon X position
-	int IconY;		/// icon Y position
-	int IconWidth;	/// icon W size
-	const wyrmgus::font *Font; /// Font
+	CGraphic *G = nullptr;	/// icon graphic
+	int IconFrame = 0;	/// icon frame
+	int IconX = -1;		/// icon X position
+	int IconY = -1;		/// icon Y position
+	int IconWidth = -1;	/// icon W size
+	const wyrmgus::font *Font = nullptr; /// Font
 	std::string Text;	/// text
-	int TextX;	/// text X position
-	int TextY;	/// text Y position
+	int TextX = -1;	/// text X position
+	int TextY = -1;	/// text Y position
 };
+
 static constexpr int MaxResourceInfo = MaxCosts + 4; /// +4 for food and score and mana and free workers count
 
 class CInfoPanel

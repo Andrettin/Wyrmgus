@@ -745,7 +745,7 @@ void unit_type::process_sml_scope(const sml_data &scope)
 			const std::string &value = property.get_value();
 
 			const wyrmgus::resource *resource = resource::get(key);
-			this->DefaultStat.Costs[resource->ID] = std::stoi(value);
+			this->DefaultStat.Costs[resource->get_index()] = std::stoi(value);
 		});
 	} else if (tag == "weapon_classes") {
 		for (const std::string &value : values) {
@@ -805,12 +805,12 @@ void unit_type::process_sml_scope(const sml_data &scope)
 			const std::string &tag = child_scope.get_tag();
 			const resource *resource = resource::get(tag);
 
-			if (this->ResInfo[resource->ID] == nullptr) {
+			if (this->ResInfo[resource->get_index()] == nullptr) {
 				auto resource_info = std::make_unique<wyrmgus::resource_info>(this, resource);
-				this->ResInfo[resource->ID] = std::move(resource_info);
+				this->ResInfo[resource->get_index()] = std::move(resource_info);
 			}
 
-			resource_info *res_info_ptr = this->ResInfo[resource->ID].get();
+			resource_info *res_info_ptr = this->ResInfo[resource->get_index()].get();
 			database::process_sml_data(res_info_ptr, child_scope);
 		});
 	} else if (tag == "variations") {
@@ -1294,7 +1294,7 @@ void unit_type::initialize()
 
 	for (size_t i = 0; i < this->Trains.size(); ++i) {
 		std::string button_definition = "DefineButton({\n";
-		button_definition += "\tPos = " + std::to_string((long long) this->Trains[i]->ButtonPos) + ",\n";
+		button_definition += "\tPos = " + std::to_string(this->Trains[i]->ButtonPos) + ",\n";
 		if (this->Trains[i]->ButtonLevel) {
 			button_definition += "\tLevel = " + this->Trains[i]->ButtonLevel->get_identifier() + ",\n";
 		}
@@ -2907,7 +2907,7 @@ std::string GetUnitTypeStatsString(const std::string &unit_type_ident)
 				}
 
 				if (!IsBooleanVariable(var)) {
-					unit_type_stats_string += std::to_string((long long) unit_type->DefaultStat.Variables[var].Value);
+					unit_type_stats_string += std::to_string(unit_type->DefaultStat.Variables[var].Value);
 					if (IsPercentageVariable(var)) {
 						unit_type_stats_string += "%";
 					}

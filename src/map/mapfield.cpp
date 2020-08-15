@@ -234,7 +234,7 @@ void CMapField::SetTerrain(wyrmgus::terrain_type *terrain_type)
 
 	//wood and rock tiles must always begin with the default value for their respective resource types
 	if (terrain_type->is_overlay() && terrain_type->get_resource() != nullptr) {
-		this->Value = terrain_type->get_resource()->DefaultAmount;
+		this->Value = terrain_type->get_resource()->get_default_amount();
 	} else if ((terrain_type->Flags & MapFieldWall) && terrain_type->UnitType) {
 		this->Value = terrain_type->UnitType->MapDefaultStat.Variables[HP_INDEX].Max;
 	}

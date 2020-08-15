@@ -31,7 +31,11 @@
 #include "database/data_type.h"
 #include "database/named_data_entry.h"
 
+class CGraphic;
 struct lua_State;
+
+int CclDefineDefaultResourceNames(lua_State *l);
+int CclDefineResource(lua_State *l);
 
 /**
 **  Indices into costs/resource/income array.
@@ -72,33 +76,81 @@ static constexpr int FreeWorkersCount = MaxCosts + 3;
 
 namespace wyrmgus {
 
-class resource : public named_data_entry, public data_type<resource>
+class resource final : public named_data_entry, public data_type<resource>
 {
 	Q_OBJECT
+
+	Q_PROPERTY(int default_income MEMBER default_income READ get_default_income)
+	Q_PROPERTY(int default_amount MEMBER default_amount READ get_default_amount)
+	Q_PROPERTY(int base_price MEMBER base_price READ get_base_price)
 
 public:
 	static constexpr const char *class_identifier = "resource";
 	static constexpr const char *database_folder = "resources";
 
-	resource(const std::string &identifier) : named_data_entry(identifier)
+	explicit resource(const std::string &identifier) : named_data_entry(identifier)
 	{
+	}
+
+	~resource();
+
+	virtual void process_sml_property(const sml_property &property) override;
+	virtual void initialize() override;
+
+	int get_index() const
+	{
+		return this->index;
+	}
+
+	CGraphic *get_icon_graphics() const
+	{
+		return this->icon_graphics;
+	}
+
+	const std::string &get_action_name() const
+	{
+		return this->action_name;
+	}
+
+	int get_default_income() const
+	{
+		return this->default_income;
+	}
+
+	int get_default_amount() const
+	{
+		return this->default_amount;
+	}
+
+	int get_base_price() const
+	{
+		return this->base_price;
 	}
 
 	bool IsMineResource() const;
 
-	std::string ActionName;
-	int ID = -1;
-	int DefaultIncome = 100;
-	int DefaultAmount = 1000;
+private:
+	int index = -1;
+	CGraphic *icon_graphics = nullptr;
+	std::filesystem::path icon_filepath;
+	std::string action_name;
+	int default_income = 100;
+	int default_amount = 1000;
+public:
 	int DefaultMaxAmount = -1;
 	int FinalResource = -1;
 	int FinalResourceConversionRate = 100;
-	int BasePrice = 0;
+private:
+	int base_price = 0;
+public:
 	int DemandElasticity = 100;
 	int InputResource = 0;
 	bool LuxuryResource = false;
 	bool Hidden = false;
 	std::vector<resource *> ChildResources; //resources (other than this one) that have this resource as their final resource
+
+	friend int ::CclDefineDefaultResourceNames(lua_State *l);
+	friend int ::CclDefineResource(lua_State *l);
 };
 
 }

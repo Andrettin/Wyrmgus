@@ -233,7 +233,7 @@ void CUserInterface::Load()
 		this->Fillers.at(i).Load();
 	}
 
-	for (int i = 0; i <= FreeWorkersCount; ++i) {
+	for (int i = FoodCost; i <= FreeWorkersCount; ++i) {
 		if (Resources[i].G) {
 			Resources[i].G->Load(false, wyrmgus::defines::get()->get_scale_factor());
 		}
@@ -338,7 +338,7 @@ void CleanUserInterface()
 	UI.Fillers.clear();
 
 	// Resource Icons
-	for (int i = 0; i <= FreeWorkersCount; ++i) {
+	for (int i = FoodCost; i <= FreeWorkersCount; ++i) {
 		CGraphic::Free(UI.Resources[i].G);
 	}
 

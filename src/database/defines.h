@@ -57,6 +57,7 @@ class defines final : public QObject, public singleton<defines>
 	Q_PROPERTY(wyrmgus::font_color* unique_font_color MEMBER unique_font_color READ get_unique_font_color)
 	Q_PROPERTY(QSize tile_size MEMBER tile_size READ get_tile_size)
 	Q_PROPERTY(QSize icon_size MEMBER icon_size READ get_icon_size)
+	Q_PROPERTY(QSize resource_icon_size MEMBER resource_icon_size READ get_resource_icon_size)
 	Q_PROPERTY(wyrmgus::player_color* conversible_player_color MEMBER conversible_player_color READ get_conversible_player_color)
 	Q_PROPERTY(wyrmgus::player_color* neutral_player_color MEMBER neutral_player_color READ get_neutral_player_color)
 	Q_PROPERTY(wyrmgus::civilization* neutral_civilization MEMBER neutral_civilization READ get_neutral_civilization)
@@ -135,6 +136,11 @@ public:
 	const QSize &get_icon_size() const
 	{
 		return this->icon_size;
+	}
+
+	const QSize &get_resource_icon_size() const
+	{
+		return this->resource_icon_size;
 	}
 
 	int get_scale_factor() const
@@ -233,6 +239,7 @@ private:
 	font_color *unique_font_color = nullptr; //the font color for the names of unique items and characters
 	QSize tile_size;
 	QSize icon_size;
+	QSize resource_icon_size;
 	int scale_factor = 1;
 	player_color *conversible_player_color = nullptr;
 	player_color *neutral_player_color = nullptr;

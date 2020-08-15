@@ -108,9 +108,10 @@ void CStatusLine::DrawCosts()
 	for (unsigned int i = 1; i <= MaxCosts; ++i) {
 		if (this->Costs[i]) {
 			x += 5;
-			if (UI.Resources[i].G) {
-				UI.Resources[i].G->DrawFrameClip(UI.Resources[i].IconFrame,
-					x, UI.StatusLine.TextY);
+			const wyrmgus::resource *resource = wyrmgus::resource::get_all()[i];
+			CGraphic *icon_graphics = resource->get_icon_graphics();
+			if (icon_graphics != nullptr) {
+				icon_graphics->DrawFrameClip(UI.Resources[i].IconFrame, x, UI.StatusLine.TextY);
 				x += 20;
 			}
 			x += label.Draw(x, UI.StatusLine.TextY, this->Costs[i]);

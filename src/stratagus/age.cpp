@@ -48,7 +48,7 @@ void age::initialize_all()
 {
 	data_type::initialize_all();
 
-	age::sort_instances([](age *a, age *b) {
+	age::sort_instances([](const age *a, const age *b) {
 		if (a->priority != b->priority) {
 			return a->priority > b->priority;
 		} else {

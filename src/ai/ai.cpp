@@ -500,25 +500,25 @@ static void SaveAiPlayer(CFile &file, int plynr, const PlayerAi &ai)
 
 	file.printf("  \"reserve\", {");
 	for (const wyrmgus::resource *resource : wyrmgus::resource::get_all()) {
-		file.printf("\"%s\", %d, ", resource->get_identifier().c_str(), ai.Reserve[resource->ID]);
+		file.printf("\"%s\", %d, ", resource->get_identifier().c_str(), ai.Reserve[resource->get_index()]);
 	}
 	file.printf("},\n");
 
 	file.printf("  \"used\", {");
 	for (const wyrmgus::resource *resource : wyrmgus::resource::get_all()) {
-		file.printf("\"%s\", %d, ", resource->get_identifier().c_str(), ai.Used[resource->ID]);
+		file.printf("\"%s\", %d, ", resource->get_identifier().c_str(), ai.Used[resource->get_index()]);
 	}
 	file.printf("},\n");
 
 	file.printf("  \"needed\", {");
 	for (const wyrmgus::resource *resource : wyrmgus::resource::get_all()) {
-		file.printf("\"%s\", %d, ", resource->get_identifier().c_str(), ai.Needed[resource->ID]);
+		file.printf("\"%s\", %d, ", resource->get_identifier().c_str(), ai.Needed[resource->get_index()]);
 	}
 	file.printf("},\n");
 
 	file.printf("  \"collect\", {");
 	for (const wyrmgus::resource *resource : wyrmgus::resource::get_all()) {
-		file.printf("\"%s\", %d, ", resource->get_identifier().c_str(), ai.Collect[resource->ID]);
+		file.printf("\"%s\", %d, ", resource->get_identifier().c_str(), ai.Collect[resource->get_index()]);
 	}
 	file.printf("},\n");
 

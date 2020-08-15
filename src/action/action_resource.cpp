@@ -174,9 +174,9 @@ static bool FindNearestReachableTerrainType(int movemask, int resource, int rang
 	Vec2i ressourceLoc;
 
 	if (CMap::Map.Info.IsPointOnMap(pos, z) && CMap::Map.Field(pos, z)->get_resource() != nullptr) {
-		order->CurrentResource = CMap::Map.Field(pos, z)->get_resource()->ID;
+		order->CurrentResource = CMap::Map.Field(pos, z)->get_resource()->get_index();
 		//  Find the closest resource tile next to a tile where the unit can move
-		if (!FindNearestReachableTerrainType(harvester.Type->MovementMask, CMap::Map.Field(pos, z)->get_resource()->ID, 20, *harvester.Player, pos, &ressourceLoc, z)) {
+		if (!FindNearestReachableTerrainType(harvester.Type->MovementMask, CMap::Map.Field(pos, z)->get_resource()->get_index(), 20, *harvester.Player, pos, &ressourceLoc, z)) {
 			DebugPrint("FIXME: Give up???\n");
 			ressourceLoc = pos;
 		}
@@ -630,8 +630,8 @@ int COrder_Resource::StartGathering(CUnit &unit)
 	const int input_resource = wyrmgus::resource::get_all()[this->CurrentResource]->InputResource;
 	if (input_resource && (unit.Player->Resources[input_resource] + unit.Player->StoredResources[input_resource]) == 0) { //if the resource requires an input, but there's none in store, don't gather
 		const char *input_name = DefaultResourceNames[input_resource].c_str();
-		const char *input_actionName = wyrmgus::resource::get_all()[input_resource]->ActionName.c_str();
-		unit.Player->Notify(_("Not enough %s... %s more %s."), _(input_name), _(input_actionName), _(input_name)); //added extra space to look better
+		const char *input_action_name = wyrmgus::resource::get_all()[input_resource]->get_action_name().c_str();
+		unit.Player->Notify(_("Not enough %s... %s more %s."), _(input_name), _(input_action_name), _(input_name)); //added extra space to look better
 		if (unit.Player == CPlayer::GetThisPlayer() && GameSounds.NotEnoughRes[unit.Player->Race][input_resource].Sound) {
 			PlayGameSound(GameSounds.NotEnoughRes[unit.Player->Race][input_resource].Sound, MaxSampleVolume);
 		}
@@ -752,7 +752,7 @@ int COrder_Resource::StartGathering(CUnit &unit)
 		if (!goal->Type->BoolFlag[HARVESTFROMOUTSIDE_INDEX].value) {
 			wait_at_resource = resinfo->WaitAtResource * 100 / unit.GetResourceStep(this->CurrentResource);
 		}
-		this->TimeToHarvest = std::max<int>(1, wait_at_resource * SPEEDUP_FACTOR / (unit.Player->SpeedResourcesHarvest[resinfo->get_resource()->ID] + goal->Variable[TIMEEFFICIENCYBONUS_INDEX].Value));
+		this->TimeToHarvest = std::max<int>(1, wait_at_resource * SPEEDUP_FACTOR / (unit.Player->SpeedResourcesHarvest[resinfo->get_resource()->get_index()] + goal->Variable[TIMEEFFICIENCYBONUS_INDEX].Value));
 		//Wyrmgus end
 	} else {
 		this->TimeToHarvest = 1;
@@ -920,7 +920,7 @@ int COrder_Resource::GatherResource(CUnit &unit)
 			// Wyrmgus start
 //			this->TimeToHarvest += std::max<int>(1, resinfo.WaitAtResource * SPEEDUP_FACTOR / unit.Player->SpeedResourcesHarvest[resinfo.ResourceId]);
 			int wait_at_resource = resinfo->WaitAtResource;
-			int resource_harvest_speed = unit.Player->SpeedResourcesHarvest[resinfo->get_resource()->ID];
+			int resource_harvest_speed = unit.Player->SpeedResourcesHarvest[resinfo->get_resource()->get_index()];
 			if (!CMap::Map.Info.IsPointOnMap(this->goalPos, this->MapLayer) && !harvest_from_outside) {
 				wait_at_resource = resinfo->WaitAtResource * 100 / unit.GetResourceStep(this->CurrentResource);
 			}
@@ -1006,8 +1006,8 @@ int COrder_Resource::GatherResource(CUnit &unit)
 					
 					if (!addload) {
 						const char *input_name = DefaultResourceNames[input_resource].c_str();
-						const char *input_actionName = wyrmgus::resource::get_all()[input_resource]->ActionName.c_str();
-						unit.Player->Notify(_("Not enough %s... %s more %s."), _(input_name), _(input_actionName), _(input_name)); //added extra space to look better
+						const char *input_action_name = wyrmgus::resource::get_all()[input_resource]->get_action_name().c_str();
+						unit.Player->Notify(_("Not enough %s... %s more %s."), _(input_name), _(input_action_name), _(input_name)); //added extra space to look better
 						if (unit.Player == CPlayer::GetThisPlayer() && GameSounds.NotEnoughRes[unit.Player->Race][input_resource].Sound) {
 							PlayGameSound(GameSounds.NotEnoughRes[unit.Player->Race][input_resource].Sound, MaxSampleVolume);
 						}
@@ -1053,7 +1053,7 @@ int COrder_Resource::GatherResource(CUnit &unit)
 				if (!dead) {
 					if (Preference.MineNotifications
 						&& unit.Player->Index == CPlayer::GetThisPlayer()->Index
-						&& source->Variable[GIVERESOURCE_INDEX].Max > (wyrmgus::resource::get_all()[this->CurrentResource]->DefaultIncome * 10)) {
+						&& source->Variable[GIVERESOURCE_INDEX].Max > (wyrmgus::resource::get_all()[this->CurrentResource]->get_default_income() * 10)) {
 							unit.Player->Notify(NotifyYellow, source->tilePos, source->MapLayer->ID, _("Our %s has been depleted!"), source->Type->get_name().c_str());
 					}
 					LetUnitDie(*source);
@@ -1141,7 +1141,7 @@ int COrder_Resource::StopGathering(CUnit &unit)
 			&& source->IsAlive()
 			&& !source->MineLow
 			&& source->ResourcesHeld * 100 / source->Variable[GIVERESOURCE_INDEX].Max <= 10
-			&& source->Variable[GIVERESOURCE_INDEX].Max > (wyrmgus::resource::get_all()[this->CurrentResource]->DefaultIncome * 10)) {
+			&& source->Variable[GIVERESOURCE_INDEX].Max > (wyrmgus::resource::get_all()[this->CurrentResource]->get_default_income() * 10)) {
 				//Wyrmgus start
 //				unit.Player->Notify(NotifyYellow, source->tilePos, _("%s is running low!"), source->Type->Name.c_str());
 				unit.Player->Notify(NotifyYellow, source->tilePos, source->MapLayer->ID, _("Our %s is nearing depletion!"), source->Type->get_name().c_str());
@@ -1374,7 +1374,7 @@ int COrder_Resource::MoveToDepot(CUnit &unit)
 	if (unit.Wait) {
 		//Wyrmgus start
 //		unit.Wait /= std::max(1, unit.Player->SpeedResourcesReturn[resinfo->ResourceId] / SPEEDUP_FACTOR);
-		unit.Wait /= std::max(1, (unit.Player->SpeedResourcesReturn[resinfo->get_resource()->ID] + goal.Variable[TIMEEFFICIENCYBONUS_INDEX].Value) / SPEEDUP_FACTOR);
+		unit.Wait /= std::max(1, (unit.Player->SpeedResourcesReturn[resinfo->get_resource()->get_index()] + goal.Variable[TIMEEFFICIENCYBONUS_INDEX].Value) / SPEEDUP_FACTOR);
 		//Wyrmgus end
 		if (unit.Wait) {
 			unit.Wait--;
@@ -1393,7 +1393,7 @@ int COrder_Resource::MoveToDepot(CUnit &unit)
 bool COrder_Resource::WaitInDepot(CUnit &unit)
 {
 	const std::unique_ptr<wyrmgus::resource_info> &resinfo = unit.Type->ResInfo[this->CurrentResource];
-	const CUnit *depot = ResourceDepositOnMap(unit.tilePos, resinfo->get_resource()->ID, unit.MapLayer->ID);
+	const CUnit *depot = ResourceDepositOnMap(unit.tilePos, resinfo->get_resource()->get_index(), unit.MapLayer->ID);
 
 	//Assert(depot);
 

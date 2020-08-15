@@ -455,7 +455,7 @@ static void AnimateActionTrain(CUnit &unit)
 			
 			if (!command_found && unit.RallyPointMapLayer->Field(unit.RallyPointPos)->player_info->IsTeamExplored(*newUnit->Player)) { // see if can harvest terrain
 				for (const wyrmgus::resource *resource : wyrmgus::resource::get_all()) {
-					if (newUnit->Type->ResInfo[resource->ID] && CMap::Map.Field(unit.RallyPointPos, unit.RallyPointMapLayer->ID)->get_resource() == resource) {
+					if (newUnit->Type->ResInfo[resource->get_index()] && CMap::Map.Field(unit.RallyPointPos, unit.RallyPointMapLayer->ID)->get_resource() == resource) {
 						CommandResourceLoc(*newUnit, unit.RallyPointPos, FlushCommands, unit.RallyPointMapLayer->ID);
 						command_found = true;
 						break;
