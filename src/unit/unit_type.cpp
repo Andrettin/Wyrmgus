@@ -747,6 +747,14 @@ void unit_type::process_sml_scope(const sml_data &scope)
 			const wyrmgus::resource *resource = resource::get(key);
 			this->DefaultStat.Costs[resource->get_index()] = std::stoi(value);
 		});
+	} else if (tag == "repair_costs") {
+		scope.for_each_property([&](const wyrmgus::sml_property &property) {
+			const std::string &key = property.get_key();
+			const std::string &value = property.get_value();
+
+			const wyrmgus::resource *resource = resource::get(key);
+			this->RepairCosts[resource->get_index()] = std::stoi(value);
+		});
 	} else if (tag == "weapon_classes") {
 		for (const std::string &value : values) {
 			this->WeaponClasses.push_back(string_to_item_class(value));
