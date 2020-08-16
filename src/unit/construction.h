@@ -34,32 +34,6 @@
 **    frames. This construction frames are currently not animated,
 **    this is planned for the future. What construction frames a
 **    building has, is handled by UnitType::Construction.
-**
-**  The construction structure members:
-**
-**  CConstruction::File
-**
-**    Path file name of the sprite file.
-**
-**  CConstruction::Frames
-**
-**    Frames of the construction sequence.
-**
-**  CConstruction::Sprite
-**
-**    Sprite image.
-**
-**  CConstruction::Width CConstruction::Height
-**
-**    Size of a sprite frame in pixels. All frames of a sprite have
-**    the same size. Also all sprites (tilesets) must have the same
-**    size.
-**
-**    @todo
-**      Need ::TilesetByName, ...
-**      Only fixed number of constructions supported, more than
-**      a single construction frame is not supported, animated
-**      constructions aren't supported.
 */
 
 #include "database/data_entry.h"
@@ -71,22 +45,46 @@ struct lua_State;
 
 static int CclDefineConstruction(lua_State *l);
 
-enum class ConstructionFileType {
-	Construction,
-	Main
-};
-
-/// Construction frame
-class CConstructionFrame
-{
-public:
-	int Percent = 0;                    /// Percent complete
-	ConstructionFileType File = ConstructionFileType::Construction; /// Graphic to use
-	int Frame = 0;                      /// Frame number
-	CConstructionFrame *Next = nullptr; /// Next pointer
-};
+#undef main
 
 namespace wyrmgus {
+
+enum class construction_image_type {
+	construction,
+	main
+};
+
+class construction_frame final
+{
+public:
+	int get_percent() const
+	{
+		return this->percent;
+	}
+
+	construction_image_type get_image_type() const
+	{
+		return this->image_type;
+	}
+
+	int get_frame() const
+	{
+		return this->frame;
+	}
+
+	const construction_frame *get_next() const
+	{
+		return this->next;
+	}
+
+private:
+	int percent = 0;                    /// Percent complete
+	construction_image_type image_type = construction_image_type::construction; /// Graphic to use
+	int frame = 0;                      /// Frame number
+	const construction_frame *next = nullptr; /// Next pointer
+
+	friend int ::CclDefineConstruction(lua_State *l);
+};
 
 /// Construction shown during construction of a building
 class construction final : public data_entry, public data_type<construction>
@@ -105,8 +103,14 @@ public:
 
 	virtual void process_sml_property(const sml_property &property) override;
 
-	void Clean();
-	void Load();
+	virtual void check() const
+	{
+		if (this->frames.empty()) {
+			throw std::runtime_error("Construction \"" + this->get_identifier() + "\" has no frames.");
+		}
+	}
+
+	void load();
 
 	const std::filesystem::path &get_image_file() const
 	{
@@ -128,13 +132,21 @@ public:
 		return this->get_frame_size().height();
 	}
 
+	CPlayerColorGraphic *get_graphics() const
+	{
+		return this->graphics;
+	}
+
+	const construction_frame *get_initial_frame() const
+	{
+		return this->frames.front().get();
+	}
+
 private:
 	std::filesystem::path image_file;
 	QSize frame_size = QSize(0, 0); //sprite frame size
-
-public:
-	CConstructionFrame *Frames = nullptr;  /// construction frames
-	CPlayerColorGraphic *Sprite = nullptr; /// construction sprite image
+	std::vector<std::unique_ptr<construction_frame>> frames;  /// construction frames
+	CPlayerColorGraphic *graphics = nullptr; /// construction sprite image
 
 	friend int ::CclDefineConstruction(lua_State *l);
 };

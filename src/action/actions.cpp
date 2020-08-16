@@ -117,7 +117,7 @@ void COrder::UpdatePathFinderData_NotCalled(PathFinderInput &input)
 	if (unit.CurrentAction() == UnitAction::Die) {
 		unit.Seen.State = 3;
 	}
-	unit.Seen.CFrame = nullptr;
+	unit.Seen.cframe = nullptr;
 }
 
 /* virtual */ bool COrder::OnAiHitUnit(CUnit &unit, CUnit *attacker, int /*damage*/)

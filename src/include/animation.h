@@ -128,7 +128,7 @@ private:
 
 namespace wyrmgus {
 
-class animation_set : public data_entry, public data_type<animation_set>
+class animation_set final : public data_entry, public data_type<animation_set>
 {
 	Q_OBJECT
 
@@ -142,7 +142,7 @@ public:
 		data_type::clear();
 	}
 
-	animation_set(const std::string &identifier) : data_entry(identifier)
+	explicit animation_set(const std::string &identifier) : data_entry(identifier)
 	{
 	}
 

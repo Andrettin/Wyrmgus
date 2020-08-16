@@ -88,11 +88,11 @@ extern void AiReduceMadeInBuilt(PlayerAi &pai, const wyrmgus::unit_type &type, i
 		file.printf(" \"finished\", ");
 	}
 
-	const CConstructionFrame *cframe = unit.get_construction()->Frames;
+	const wyrmgus::construction_frame *cframe = unit.get_construction()->get_initial_frame();
 
 	int frame = 0;
-	while (cframe != this->Frame) {
-		cframe = cframe->Next;
+	while (cframe != this->get_frame()) {
+		cframe = cframe->get_next();
 		++frame;
 	}
 	if (this->Worker != nullptr) {
@@ -121,12 +121,12 @@ extern void AiReduceMadeInBuilt(PlayerAi &pai, const wyrmgus::unit_type &type, i
 		++j;
 		int frame = LuaToNumber(l, -1, j + 1);
 
-		const CConstructionFrame *cframe = unit.get_construction()->Frames;
+		const wyrmgus::construction_frame *cframe = unit.get_construction()->get_initial_frame();
 		
-		while (frame-- && cframe->Next != nullptr) {
-			cframe = cframe->Next;
+		while (frame-- && cframe->get_next() != nullptr) {
+			cframe = cframe->get_next();
 		}
-		this->Frame = cframe;
+		this->frame = cframe;
 	} else {
 		return false;
 	}
@@ -436,7 +436,7 @@ static void Finish(COrder_Built &order, CUnit &unit)
 /* virtual */ void COrder_Built::FillSeenValues(CUnit &unit) const
 {
 	unit.Seen.State = 1;
-	unit.Seen.CFrame = this->Frame;
+	unit.Seen.cframe = this->get_frame();
 }
 
 /** Called when unit is killed.
@@ -452,12 +452,12 @@ void COrder_Built::AiUnitKilled(CUnit &unit)
 	//Wyrmgus end
 }
 
-static const CConstructionFrame *FindCFramePercent(const CConstructionFrame *cframe, int percent)
+static const wyrmgus::construction_frame *FindCFramePercent(const wyrmgus::construction_frame *cframe, int percent)
 {
-	const CConstructionFrame *prev = cframe;
+	const wyrmgus::construction_frame *prev = cframe;
 
-	for (const CConstructionFrame *it = cframe->Next; it; it = it->Next) {
-		if (percent < it->Percent) {
+	for (const wyrmgus::construction_frame *it = cframe->get_next(); it; it = it->get_next()) {
+		if (percent < it->get_percent()) {
 			return prev;
 		}
 		prev = it;
@@ -475,16 +475,16 @@ void COrder_Built::UpdateConstructionFrame(CUnit &unit)
 	const wyrmgus::unit_type &type = *unit.Type;
 	const int percent = this->ProgressCounter / (type.Stats[unit.Player->Index].Costs[TimeCost] * 6);
 
-	const CConstructionFrame *cframe = FindCFramePercent(unit.get_construction()->Frames, percent);
+	const wyrmgus::construction_frame *cframe = FindCFramePercent(unit.get_construction()->get_initial_frame(), percent);
 
 	Assert(cframe != nullptr);
 
-	if (cframe != this->Frame) {
-		this->Frame = cframe;
+	if (cframe != this->get_frame()) {
+		this->frame = cframe;
 		if (unit.Frame < 0) {
-			unit.Frame = -cframe->Frame - 1;
+			unit.Frame = -cframe->get_frame() - 1;
 		} else {
-			unit.Frame = cframe->Frame;
+			unit.Frame = cframe->get_frame();
 		}
 	}
 }

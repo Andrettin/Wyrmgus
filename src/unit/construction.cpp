@@ -39,7 +39,7 @@ namespace wyrmgus {
 
 construction::~construction()
 {
-	Clean();
+	CGraphic::Free(this->graphics);
 }
 
 void construction::process_sml_property(const sml_property &property)
@@ -54,25 +54,12 @@ void construction::process_sml_property(const sml_property &property)
 	}
 }
 
-void construction::Clean()
-{
-	CGraphic::Free(this->Sprite);
-	this->Sprite = nullptr;
-	CConstructionFrame *cframe = this->Frames;
-	this->Frames = nullptr;
-	while (cframe) {
-		CConstructionFrame *next = cframe->Next;
-		delete cframe;
-		cframe = next;
-	}
-}
-
-void construction::Load()
+void construction::load()
 {
 	if (!this->image_file.empty()) {
 		UpdateLoadProgress();
-		this->Sprite = CPlayerColorGraphic::New(this->image_file, this->get_frame_size(), nullptr);
-		this->Sprite->Load(false, wyrmgus::defines::get()->get_scale_factor());
+		this->graphics = CPlayerColorGraphic::New(this->image_file, this->get_frame_size(), nullptr);
+		this->graphics->Load(false, wyrmgus::defines::get()->get_scale_factor());
 		IncItemsLoaded();
 	}
 }
@@ -102,7 +89,7 @@ void LoadConstructions()
 	ShowLoadProgress("%s", _("Loading Construction Graphics"));
 		
 	for (wyrmgus::construction *construction : wyrmgus::construction::get_all()) {
-		construction->Load();
+		construction->load();
 	}
 }
 
@@ -159,7 +146,7 @@ static int CclDefineConstruction(lua_State *l)
 
 			for (unsigned int k = 0; k < subargs; ++k) {
 				int percent = 0;
-				ConstructionFileType file = ConstructionFileType::Construction;
+				wyrmgus::construction_image_type image_type = wyrmgus::construction_image_type::construction;
 				int frame = 0;
 
 				lua_rawgeti(l, -1, k + 1);
@@ -176,9 +163,9 @@ static int CclDefineConstruction(lua_State *l)
 						const char *value = LuaToString(l, -1);
 
 						if (!strcmp(value, "construction")) {
-							file = ConstructionFileType::Construction;
+							image_type = wyrmgus::construction_image_type::construction;
 						} else if (!strcmp(value, "main")) {
-							file = ConstructionFileType::Main;
+							image_type = wyrmgus::construction_image_type::main;
 						} else {
 							LuaError(l, "Unsupported tag: %s" _C_ value);
 						}
@@ -190,15 +177,13 @@ static int CclDefineConstruction(lua_State *l)
 					lua_pop(l, 1);
 				}
 				lua_pop(l, 1);
-				CConstructionFrame **cframe = &construction->Frames;
-				while (*cframe) {
-					cframe = &((*cframe)->Next);
-				}
-				(*cframe) = new CConstructionFrame;
-				(*cframe)->Percent = percent;
-				(*cframe)->File = file;
-				(*cframe)->Frame = frame;
-				(*cframe)->Next = nullptr;
+				auto cframe = std::make_unique<wyrmgus::construction_frame>();
+				cframe->percent = percent;
+				cframe->image_type = image_type;
+				cframe->frame = frame;
+				cframe->next = nullptr;
+				construction->frames.back()->next = cframe.get();
+				construction->frames.push_back(std::move(cframe));
 			}
 		} else {
 			LuaError(l, "Unsupported tag: %s" _C_ value);

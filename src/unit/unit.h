@@ -36,7 +36,6 @@
 
 class CAnimation;
 class CBuildRestrictionOnTop;
-class CConstructionFrame;
 class CFile;
 class Missile;
 class CMapField;
@@ -57,6 +56,7 @@ namespace wyrmgus {
 	class animation_set;
 	class character;
 	class construction;
+	class construction_frame;
 	class player_color;
 	class spell;
 	class time_of_day;
@@ -620,7 +620,7 @@ public:
 	/* Seen stuff. */
 	int VisCount[PlayerMax];     /// Unit visibility counts
 	struct _seen_stuff_ {
-		const CConstructionFrame *CFrame = nullptr; /// Seen construction frame
+		const wyrmgus::construction_frame *cframe = nullptr; /// Seen construction frame
 		int Frame = 0; /// last seen frame/stage of buildings
 		const wyrmgus::unit_type *Type = nullptr; /// Pointer to last seen unit-type
 		Vec2i tilePos = Vec2i(-1, -1); /// Last unit->tilePos Seen

@@ -35,7 +35,7 @@ class COrder_Built : public COrder
 {
 	friend COrder *COrder::NewActionBuilt(CUnit &builder, CUnit &unit);
 public:
-	COrder_Built() : COrder(UnitAction::Built), ProgressCounter(0), IsCancelled(false), Frame(nullptr) {}
+	COrder_Built() : COrder(UnitAction::Built) {}
 
 	virtual COrder_Built *Clone() const { return new COrder_Built(*this); }
 
@@ -56,7 +56,7 @@ public:
 	void Progress(CUnit &unit, int amount);
 	void ProgressHp(CUnit &unit, int amount);
 
-	const CConstructionFrame &GetFrame() const { return *Frame; }
+	const wyrmgus::construction_frame *get_frame() const { return this->frame; }
 	const CUnitPtr &GetWorker() const { return Worker; }
 	CUnit *GetWorkerPtr() { return Worker; }
 
@@ -66,7 +66,7 @@ private:
 
 private:
 	CUnitPtr Worker;                  /// Worker building this unit
-	int ProgressCounter;              /// Progress counter, in 1/100 cycles.
-	bool IsCancelled;                  /// Cancel construction
-	const CConstructionFrame *Frame;  /// Construction frame
+	int ProgressCounter = 0;          /// Progress counter, in 1/100 cycles.
+	bool IsCancelled = false;         /// Cancel construction
+	const wyrmgus::construction_frame *frame = nullptr; /// Construction frame
 };

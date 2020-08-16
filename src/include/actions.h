@@ -79,7 +79,6 @@ enum class UnitAction : char {
 };
 
 class CAnimation;
-class CConstructionFrame;
 class CFile;
 class CUnit;
 class CUpgrade;
@@ -88,6 +87,7 @@ class CViewport;
 struct lua_State;
 
 namespace wyrmgus {
+	class construction_frame;
 	class site;
 	class spell;
 	class unit_type;

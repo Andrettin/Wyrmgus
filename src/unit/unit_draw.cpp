@@ -927,12 +927,12 @@ static void DrawInformations(const CUnit &unit, const wyrmgus::unit_type &type, 
 **  @param frame   Frame number to draw.
 **  @param screenPos  screen (top left) position of the unit.
 */
-static void DrawConstructionShadow(const CUnit &unit, const wyrmgus::unit_type &type, const CConstructionFrame *cframe, int frame, const PixelPos &screenPos)
+static void DrawConstructionShadow(const CUnit &unit, const wyrmgus::unit_type &type, const wyrmgus::construction_frame *cframe, int frame, const PixelPos &screenPos)
 {
 	PixelPos pos = screenPos;
 	const int scale_factor = wyrmgus::defines::get()->get_scale_factor();
 	const wyrmgus::unit_type_variation *variation = unit.GetVariation();
-	if (cframe->File != ConstructionFileType::Construction) {
+	if (cframe->get_image_type() != wyrmgus::construction_image_type::construction) {
 		if (variation && variation->ShadowSprite) {
 			pos -= PixelPos((variation->ShadowSprite->get_frame_size() - type.get_tile_size() * wyrmgus::defines::get()->get_scaled_tile_size()) / 2);
 			pos.x += (type.ShadowOffsetX + type.get_offset().x()) * scale_factor;
@@ -964,31 +964,31 @@ static void DrawConstructionShadow(const CUnit &unit, const wyrmgus::unit_type &
 **  @param frame   Frame number.
 **  @param screenPos  screen (top left) position of the unit.
 */
-static void DrawConstruction(const int player, const CConstructionFrame *cframe,
+static void DrawConstruction(const int player, const wyrmgus::construction_frame *cframe,
 							 const CUnit &unit, const wyrmgus::unit_type &type, int frame, const PixelPos &screenPos, const wyrmgus::time_of_day *time_of_day)
 {
 	PixelPos pos = screenPos;
 	const int scale_factor = wyrmgus::defines::get()->get_scale_factor();
 	const wyrmgus::player_color *player_color = CPlayer::Players[player]->get_player_color();
-	if (cframe->File == ConstructionFileType::Construction) {
+	if (cframe->get_image_type() == wyrmgus::construction_image_type::construction) {
 		const wyrmgus::unit_type_variation *variation = unit.GetVariation();
 		if (variation != nullptr && variation->get_construction() != nullptr) {
 			const wyrmgus::construction *construction = variation->get_construction();
 			pos.x -= construction->get_frame_width() * scale_factor / 2;
 			pos.y -= construction->get_frame_height() * scale_factor / 2;
 			if (frame < 0) {
-				construction->Sprite->DrawPlayerColorFrameClipX(player_color, -frame - 1, pos.x, pos.y, time_of_day);
+				construction->get_graphics()->DrawPlayerColorFrameClipX(player_color, -frame - 1, pos.x, pos.y, time_of_day);
 			} else {
-				construction->Sprite->DrawPlayerColorFrameClip(player_color, frame, pos.x, pos.y, time_of_day);
+				construction->get_graphics()->DrawPlayerColorFrameClip(player_color, frame, pos.x, pos.y, time_of_day);
 			}
 		} else {
 			const wyrmgus::construction *construction = type.get_construction();
 			pos.x -= construction->get_frame_width() * scale_factor / 2;
 			pos.y -= construction->get_frame_height() * scale_factor / 2;
 			if (frame < 0) {
-				construction->Sprite->DrawPlayerColorFrameClipX(player_color, -frame - 1, pos.x, pos.y, time_of_day);
+				construction->get_graphics()->DrawPlayerColorFrameClipX(player_color, -frame - 1, pos.x, pos.y, time_of_day);
 			} else {
-				construction->Sprite->DrawPlayerColorFrameClip(player_color, frame, pos.x, pos.y, time_of_day);
+				construction->get_graphics()->DrawPlayerColorFrameClip(player_color, frame, pos.x, pos.y, time_of_day);
 			}
 		}
 		//Wyrmgus end
@@ -1034,8 +1034,8 @@ void CUnit::Draw(const CViewport &vp) const
 	int frame;
 	int state;
 	int under_construction;
-	const CConstructionFrame *cframe;
-	const wyrmgus::unit_type *type;
+	const wyrmgus::construction_frame *cframe = nullptr;
+	const wyrmgus::unit_type *type = nullptr;
 
 	if (this->Destroyed || this->Container || this->Type->BoolFlag[REVEALER_INDEX].value) { // Revealers are not drawn
 		return;
@@ -1068,7 +1068,7 @@ void CUnit::Draw(const CViewport &vp) const
 		if (this->CurrentAction() == UnitAction::Built) {
 			COrder_Built &order = *static_cast<COrder_Built *>(this->CurrentOrder());
 
-			cframe = &order.GetFrame();
+			cframe = order.get_frame();
 		} else {
 			cframe = nullptr;
 		}
@@ -1081,7 +1081,7 @@ void CUnit::Draw(const CViewport &vp) const
 		type = this->Seen.Type;
 		under_construction = this->Seen.UnderConstruction;
 		state = this->Seen.State;
-		cframe = this->Seen.CFrame;
+		cframe = this->Seen.cframe;
 	}
 
 #ifdef DYNAMIC_LOAD
