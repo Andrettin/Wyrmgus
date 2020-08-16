@@ -143,22 +143,22 @@ void game::apply_player_history()
 			continue;
 		}
 
-		civilization *civilization = civilization::get_all()[player->Race];
-		faction *faction = faction::get_all()[player->Faction];
+		const civilization *civilization = player->get_civilization();
+		const faction *faction = player->get_faction();
 
 		player->set_faction_tier(faction->get_tier());
 		player->set_government_type(faction->get_government_type());
 		player->set_dynasty(faction->get_dynasty());
 
-		for (std::map<std::string, std::map<CDate, bool>>::iterator iterator = civilization->HistoricalUpgrades.begin(); iterator != civilization->HistoricalUpgrades.end(); ++iterator) {
-			int upgrade_id = UpgradeIdByIdent(iterator->first);
+		for (const auto &kv_pair : civilization->HistoricalUpgrades) {
+			int upgrade_id = UpgradeIdByIdent(kv_pair.first);
 			if (upgrade_id == -1) {
-				fprintf(stderr, "Upgrade \"%s\" doesn't exist.\n", iterator->first.c_str());
+				fprintf(stderr, "Upgrade \"%s\" doesn't exist.\n", kv_pair.first.c_str());
 				continue;
 			}
-			for (std::map<CDate, bool>::reverse_iterator second_iterator = iterator->second.rbegin(); second_iterator != iterator->second.rend(); ++second_iterator) {
+			for (std::map<CDate, bool>::const_reverse_iterator second_iterator = kv_pair.second.rbegin(); second_iterator != kv_pair.second.rend(); ++second_iterator) {
 				if (second_iterator->first.Year == 0 || start_date.ContainsDate(second_iterator->first)) {
-					if (second_iterator->second && UpgradeIdentAllowed(*player, iterator->first.c_str()) != 'R') {
+					if (second_iterator->second && UpgradeIdentAllowed(*player, kv_pair.first.c_str()) != 'R') {
 						UpgradeAcquire(*player, CUpgrade::get_all()[upgrade_id]);
 					} else if (!second_iterator->second) {
 						break;
@@ -167,15 +167,15 @@ void game::apply_player_history()
 			}
 		}
 
-		for (std::map<std::string, std::map<CDate, bool>>::iterator iterator = faction->HistoricalUpgrades.begin(); iterator != faction->HistoricalUpgrades.end(); ++iterator) {
-			int upgrade_id = UpgradeIdByIdent(iterator->first);
+		for (const auto &kv_pair : faction->HistoricalUpgrades) {
+			int upgrade_id = UpgradeIdByIdent(kv_pair.first);
 			if (upgrade_id == -1) {
-				fprintf(stderr, "Upgrade \"%s\" doesn't exist.\n", iterator->first.c_str());
+				fprintf(stderr, "Upgrade \"%s\" doesn't exist.\n", kv_pair.first.c_str());
 				continue;
 			}
-			for (std::map<CDate, bool>::reverse_iterator second_iterator = iterator->second.rbegin(); second_iterator != iterator->second.rend(); ++second_iterator) {
+			for (std::map<CDate, bool>::const_reverse_iterator second_iterator = kv_pair.second.rbegin(); second_iterator != kv_pair.second.rend(); ++second_iterator) {
 				if (second_iterator->first.Year == 0 || start_date.ContainsDate(second_iterator->first)) {
-					if (second_iterator->second && UpgradeIdentAllowed(*player, iterator->first.c_str()) != 'R') {
+					if (second_iterator->second && UpgradeIdentAllowed(*player, kv_pair.first.c_str()) != 'R') {
 						UpgradeAcquire(*player, CUpgrade::get_all()[upgrade_id]);
 					} else if (!second_iterator->second) {
 						break;
@@ -196,13 +196,13 @@ void game::apply_player_history()
 			}
 		}
 
-		for (std::map<std::pair<CDate, wyrmgus::faction *>, diplomacy_state>::iterator iterator = faction->HistoricalDiplomacyStates.begin(); iterator != faction->HistoricalDiplomacyStates.end(); ++iterator) { //set the appropriate historical diplomacy states to other factions
-			if (iterator->first.first.Year == 0 || start_date.ContainsDate(iterator->first.first)) {
-				CPlayer *diplomacy_state_player = GetFactionPlayer(iterator->first.second);
+		for (const auto &kv_pair : faction->HistoricalDiplomacyStates) { //set the appropriate historical diplomacy states to other factions
+			if (kv_pair.first.first.Year == 0 || start_date.ContainsDate(kv_pair.first.first)) {
+				CPlayer *diplomacy_state_player = GetFactionPlayer(kv_pair.first.second);
 				if (diplomacy_state_player) {
-					CommandDiplomacy(player->Index, iterator->second, diplomacy_state_player->Index);
-					CommandDiplomacy(diplomacy_state_player->Index, iterator->second, player->Index);
-					if (iterator->second == diplomacy_state::allied) {
+					CommandDiplomacy(player->Index, kv_pair.second, diplomacy_state_player->Index);
+					CommandDiplomacy(diplomacy_state_player->Index, kv_pair.second, player->Index);
+					if (kv_pair.second == diplomacy_state::allied) {
 						CommandSharedVision(player->Index, true, diplomacy_state_player->Index);
 						CommandSharedVision(diplomacy_state_player->Index, true, player->Index);
 					}
@@ -235,9 +235,9 @@ void game::apply_player_history()
 			}
 		}
 
-		for (std::map<std::pair<CDate, int>, int>::iterator iterator = faction->HistoricalResources.begin(); iterator != faction->HistoricalResources.end(); ++iterator) { //set the appropriate historical resource quantities
-			if (iterator->first.first.Year == 0 || start_date.ContainsDate(iterator->first.first)) {
-				player->set_resource(resource::get_all()[iterator->first.second], iterator->second);
+		for (const auto &kv_pair : faction->HistoricalResources) { //set the appropriate historical resource quantities
+			if (kv_pair.first.first.Year == 0 || start_date.ContainsDate(kv_pair.first.first)) {
+				player->set_resource(resource::get_all()[kv_pair.first.second], kv_pair.second);
 			}
 		}
 

@@ -2501,11 +2501,8 @@ void CUnit::UpdateSoldUnits()
 	std::vector<wyrmgus::unit_type *> potential_items;
 	std::vector<wyrmgus::character *> potential_heroes;
 	if (this->Type->BoolFlag[RECRUITHEROES_INDEX].value && !IsNetworkGame()) { // allow heroes to be recruited at town halls
-		const wyrmgus::civilization *civilization = this->Type->get_civilization();
-		if (civilization != nullptr && civilization->ID != this->Player->Race && this->Player->Race != -1 && this->Player->Faction != -1 && this->Type == wyrmgus::faction::get_all()[this->Player->Faction]->get_class_unit_type(this->Type->get_unit_class())) {
-			civilization = wyrmgus::civilization::get_all()[this->Player->Race];
-		}
-		const wyrmgus::faction *faction = this->Player->Faction != -1 ? wyrmgus::faction::get_all()[this->Player->Faction] : nullptr;
+		const wyrmgus::civilization *civilization = this->get_civilization();
+		const wyrmgus::faction *faction = this->Player->get_faction();
 		
 		if (CurrentQuest == nullptr) {
 			//give priority to heroes with the building's settlement as their home settlement
@@ -3014,13 +3011,7 @@ const wyrmgus::player_color *CUnit::get_player_color() const
 
 const wyrmgus::civilization *CUnit::get_civilization() const
 {
-	const wyrmgus::civilization *type_civilization = this->Type->get_civilization();
-
-	if (type_civilization != nullptr && this->Player->get_civilization() != nullptr && this->Player->get_civilization() != type_civilization && this->Player->get_faction() != nullptr && this->Type == this->Player->get_faction()->get_class_unit_type(this->Type->get_unit_class())) {
-		return wyrmgus::civilization::get_all()[this->Player->Race];
-	}
-
-	return type_civilization;
+	return this->Type->get_player_civilization(this->Player);
 }
 
 /**
@@ -3462,15 +3453,8 @@ void CUnit::UpdatePersonalName(bool update_settlement_name)
 		return;
 	}
 	
-	const wyrmgus::civilization *civilization = this->Type->get_civilization();
-	wyrmgus::faction *faction = nullptr;
-	if (this->Player->Faction != -1) {
-		faction = wyrmgus::faction::get_all()[this->Player->Faction];
-		
-		if (civilization != nullptr && civilization != faction->get_civilization() && civilization->get_species() == faction->get_civilization()->get_species() && this->Type == faction->get_class_unit_type(this->Type->get_unit_class())) {
-			civilization = faction->get_civilization();
-		}
-	}
+	const wyrmgus::civilization *civilization = this->get_civilization();
+	const wyrmgus::faction *faction = this->Player->get_faction();
 	
 	CLanguage *language = PlayerRaces.get_civilization_language(civilization ? civilization->ID : -1);
 	
@@ -3534,13 +3518,10 @@ void CUnit::UpdateSettlement()
 	
 	if (this->Type->BoolFlag[TOWNHALL_INDEX].value || this->Type == settlement_site_unit_type) {
 		if (!this->settlement) {
-			const wyrmgus::civilization *civilization = this->Type->get_civilization();
-			if (civilization != nullptr && this->Player->Faction != -1 && (this->Player->Race == civilization->ID || this->Type == wyrmgus::faction::get_all()[this->Player->Faction]->get_class_unit_type(this->Type->get_unit_class()))) {
-				civilization = wyrmgus::civilization::get_all()[this->Player->Race];
-			}
+			const wyrmgus::civilization *civilization = this->get_civilization();
 			
 			int faction_id = this->Type->Faction;
-			if (this->Player->Faction != -1 && this->Player->Race == (civilization ? civilization->ID : -1) && this->Type == wyrmgus::faction::get_all()[this->Player->Faction]->get_class_unit_type(this->Type->get_unit_class())) {
+			if (this->Player->get_faction() != nullptr && this->Player->get_civilization() == civilization && this->Type == this->Player->get_faction()->get_class_unit_type(this->Type->get_unit_class())) {
 				faction_id = this->Player->Faction;
 			}
 			const wyrmgus::faction *faction = nullptr;

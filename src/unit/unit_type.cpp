@@ -1394,6 +1394,15 @@ void unit_type::initialize()
 	data_entry::initialize();
 }
 
+void unit_type::check() const
+{
+	for (const spell *spell : this->get_autocast_spells()) {
+		if (!spell->AutoCast) {
+			throw std::runtime_error("The spell \"" + spell->get_identifier() + "\" is set to be autocast by default for unit type \"" + this->get_identifier() + "\", but has no defined autocast method.");
+		}
+	}
+}
+
 void unit_type::set_unit_class(wyrmgus::unit_class *unit_class)
 {
 	if (unit_class == this->get_unit_class()) {
@@ -1411,13 +1420,33 @@ void unit_type::set_unit_class(wyrmgus::unit_class *unit_class)
 	}
 }
 
-void unit_type::check() const
+const civilization *unit_type::get_faction_civilization(const wyrmgus::faction *faction) const
 {
-	for (const spell *spell : this->get_autocast_spells()) {
-		if (!spell->AutoCast) {
-			throw std::runtime_error("The spell \"" + spell->get_identifier() + "\" is set to be autocast by default for unit type \"" + this->get_identifier() + "\", but has no defined autocast method.");
-		}
+	//get the civilization the unit type would have for a given faction
+	const wyrmgus::civilization *civilization = this->get_civilization();
+
+	if (faction == nullptr) {
+		return civilization;
 	}
+
+	const wyrmgus::civilization *faction_civilization = faction->get_civilization();
+
+	if (civilization != nullptr && faction_civilization != nullptr && faction_civilization != civilization && this == faction->get_class_unit_type(this->get_unit_class()) && (!this->BoolFlag[ORGANIC_INDEX].value || civilization->get_species() == faction_civilization->get_species())) {
+		return faction_civilization;
+	}
+
+	return civilization;
+}
+
+const civilization *unit_type::get_player_civilization(const CPlayer *player) const
+{
+	//get the civilization the unit type would have for a given player
+	const wyrmgus::faction *player_faction = player->get_faction();
+	if (player_faction != nullptr) {
+		return this->get_faction_civilization(player_faction);
+	}
+
+	return this->get_civilization();
 }
 
 QSize unit_type::get_half_tile_size() const
@@ -1884,7 +1913,7 @@ std::string unit_type::GetNamePlural() const
 	return GetPluralForm(this->get_name());
 }
 
-std::string unit_type::GeneratePersonalName(wyrmgus::faction *faction, const gender gender) const
+std::string unit_type::GeneratePersonalName(const wyrmgus::faction *faction, const gender gender) const
 {
 	if (Editor.Running == EditorEditing) { // don't set the personal name if in the editor
 		return "";
@@ -1899,7 +1928,7 @@ std::string unit_type::GeneratePersonalName(wyrmgus::faction *faction, const gen
 	return "";
 }
 
-bool unit_type::IsPersonalNameValid(const std::string &name, wyrmgus::faction *faction, const gender gender) const
+bool unit_type::IsPersonalNameValid(const std::string &name, const wyrmgus::faction *faction, const gender gender) const
 {
 	if (name.empty()) {
 		return false;
@@ -1914,7 +1943,7 @@ bool unit_type::IsPersonalNameValid(const std::string &name, wyrmgus::faction *f
 	return false;
 }
 
-std::vector<std::string> unit_type::GetPotentialPersonalNames(wyrmgus::faction *faction, const gender gender) const
+std::vector<std::string> unit_type::GetPotentialPersonalNames(const wyrmgus::faction *faction, const gender gender) const
 {
 	std::vector<std::string> potential_names;
 	
@@ -1930,11 +1959,8 @@ std::vector<std::string> unit_type::GetPotentialPersonalNames(wyrmgus::faction *
 	}
 	
 	if (potential_names.size() == 0 && this->get_civilization() != nullptr) {
-		const wyrmgus::civilization *civilization = this->get_civilization();
-		if (faction && civilization != faction->get_civilization() && civilization->get_species() == faction->get_civilization()->get_species() && this == faction->get_class_unit_type(this->get_unit_class())) {
-			civilization = faction->get_civilization();
-		}
-		if (faction && faction->get_civilization() != civilization) {
+		const wyrmgus::civilization *civilization = this->get_faction_civilization(faction);
+		if (faction != nullptr && faction->get_civilization() != civilization) {
 			faction = nullptr;
 		}
 		if (this->Faction != -1 && !faction) {

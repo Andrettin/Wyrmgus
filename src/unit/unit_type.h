@@ -890,6 +890,9 @@ public:
 		return this->civilization;
 	}
 
+	const civilization *get_faction_civilization(const wyrmgus::faction *faction) const;
+	const civilization *get_player_civilization(const CPlayer *player) const;
+
 	const QSize &get_tile_size() const
 	{
 		return this->tile_size;
@@ -1015,9 +1018,9 @@ public:
 	const std::string &get_default_button_key(const CPlayer *player) const;
 	bool CanExperienceUpgradeTo(const unit_type *type) const;
 	std::string GetNamePlural() const;
-	std::string GeneratePersonalName(faction *faction, const gender gender) const;
-	bool IsPersonalNameValid(const std::string &name, faction *faction, const gender gender) const;
-	std::vector<std::string> GetPotentialPersonalNames(faction *faction, const gender gender) const;
+	std::string GeneratePersonalName(const faction *faction, const gender gender) const;
+	bool IsPersonalNameValid(const std::string &name, const faction *faction, const gender gender) const;
+	std::vector<std::string> GetPotentialPersonalNames(const faction *faction, const gender gender) const;
 	//Wyrmgus end
 
 	item_class get_item_class() const

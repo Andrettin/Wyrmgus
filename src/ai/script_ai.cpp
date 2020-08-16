@@ -760,7 +760,7 @@ static void InsertResearchRequests(CUpgrade *upgrade)
 static int CclAiGetRace(lua_State *l)
 {
 	LuaCheckArgs(l, 0);
-	lua_pushstring(l, wyrmgus::civilization::get_all()[AiPlayer->Player->Race]->get_identifier().c_str());
+	lua_pushstring(l, AiPlayer->Player->get_civilization()->get_identifier().c_str());
 	return 1;
 }
 
