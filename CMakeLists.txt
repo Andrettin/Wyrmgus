@@ -335,7 +335,6 @@ set(stratagusmain_SRCS
 	src/stratagus/civilization_base.cpp
 	src/stratagus/civilization_group.cpp
 	src/stratagus/config.cpp
-	src/stratagus/construct.cpp
 	src/stratagus/currency.cpp
 	src/stratagus/dialogue.cpp
 	src/stratagus/dialogue_option.cpp
@@ -410,6 +409,7 @@ source_group(ui FILES ${ui_SRCS})
 
 set(unit_SRCS
 	src/unit/build.cpp
+	src/unit/construction.cpp
 	src/unit/historical_unit.cpp
 	src/unit/script_unit.cpp
 	src/unit/script_unit_type.cpp
@@ -758,6 +758,7 @@ set(stratagus_ui_HDRS
 )
 
 set(stratagus_unit_HDRS
+	src/unit/construction.h
 	src/unit/historical_unit.h
 	src/unit/unit.h
 	src/unit/unit_cache.h
@@ -832,7 +833,6 @@ set(stratagus_generic_HDRS
 	src/include/color.h
 	src/include/commands.h
 	src/include/config.h
-	src/include/construct.h
 	src/include/currency.h
 	src/include/data_type.h
 	src/include/dialogue.h
