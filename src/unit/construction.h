@@ -57,6 +57,13 @@ enum class construction_image_type {
 class construction_frame final
 {
 public:
+	void process_sml_property(const sml_property &property);
+
+	void process_sml_scope(const sml_data &scope)
+	{
+		throw std::runtime_error("Invalid construction frame scope: \"" + scope.get_tag() + "\".");
+	}
+
 	int get_percent() const
 	{
 		return this->percent;
@@ -83,6 +90,7 @@ private:
 	int frame = 0;                      /// Frame number
 	const construction_frame *next = nullptr; /// Next pointer
 
+	friend class construction;
 	friend int ::CclDefineConstruction(lua_State *l);
 };
 
@@ -90,6 +98,8 @@ private:
 class construction final : public data_entry, public data_type<construction>
 {
 	Q_OBJECT
+
+	Q_PROPERTY(QSize frame_size MEMBER frame_size READ get_frame_size)
 
 public:
 	static constexpr const char *class_identifier = "construction";
@@ -102,6 +112,7 @@ public:
 	~construction();
 
 	virtual void process_sml_property(const sml_property &property) override;
+	virtual void process_sml_scope(const sml_data &scope) override;
 
 	virtual void check() const
 	{

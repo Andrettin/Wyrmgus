@@ -37,6 +37,28 @@
 
 namespace wyrmgus {
 
+void construction_frame::process_sml_property(const sml_property &property)
+{
+	const std::string &key = property.get_key();
+	const std::string &value = property.get_value();
+
+	if (key == "percent") {
+		this->percent = std::stoi(value);
+	} else if (key == "image_type") {
+		if (value == "construction") {
+			this->image_type = construction_image_type::construction;
+		} else if (value == "main") {
+			this->image_type = construction_image_type::main;
+		} else {
+			throw std::runtime_error("Invalid construction image type: \"" + value + "\".");
+		}
+	} else if (key == "frame") {
+		this->frame = std::stoi(value);
+	} else {
+		throw std::runtime_error("Invalid construction frame property: \"" + key + "\".");
+	}
+}
+
 construction::~construction()
 {
 	CGraphic::Free(this->graphics);
@@ -51,6 +73,25 @@ void construction::process_sml_property(const sml_property &property)
 		this->image_file = database::get_graphics_path(this->get_module()) / value;
 	} else {
 		data_entry::process_sml_property(property);
+	}
+}
+
+void construction::process_sml_scope(const sml_data &scope)
+{
+	const std::string &tag = scope.get_tag();
+	const std::vector<std::string> &values = scope.get_values();
+
+	if (tag == "frames") {
+		scope.for_each_child([&](const sml_data &child_scope) {
+			auto cframe = std::make_unique<construction_frame>();
+			database::get()->process_sml_data(cframe, child_scope);
+			if (!this->frames.empty()) {
+				this->frames.back()->next = cframe.get();
+			}
+			this->frames.push_back(std::move(cframe));
+		});
+	} else {
+		data_entry::process_sml_scope(scope);
 	}
 }
 
@@ -181,8 +222,9 @@ static int CclDefineConstruction(lua_State *l)
 				cframe->percent = percent;
 				cframe->image_type = image_type;
 				cframe->frame = frame;
-				cframe->next = nullptr;
-				construction->frames.back()->next = cframe.get();
+				if (!construction->frames.empty()) {
+					construction->frames.back()->next = cframe.get();
+				}
 				construction->frames.push_back(std::move(cframe));
 			}
 		} else {
