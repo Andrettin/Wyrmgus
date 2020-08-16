@@ -2322,10 +2322,7 @@ void LuaRegisterModules()
 
 	AiCclRegister();
 	AnimationCclRegister();
-	//Wyrmgus start
 	CharacterCclRegister();
-	//Wyrmgus end
-	ConstructionCclRegister();
 	DecorationCclRegister();
 	DependenciesCclRegister();
 	EditorCclRegister();

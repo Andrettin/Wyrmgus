@@ -43,8 +43,6 @@ class CGraphic;
 class CPlayerColorGraphic;
 struct lua_State;
 
-static int CclDefineConstruction(lua_State *l);
-
 #undef main
 
 namespace wyrmgus {
@@ -91,7 +89,6 @@ private:
 	const construction_frame *next = nullptr; /// Next pointer
 
 	friend class construction;
-	friend int ::CclDefineConstruction(lua_State *l);
 };
 
 /// Construction shown during construction of a building
@@ -158,8 +155,6 @@ private:
 	QSize frame_size = QSize(0, 0); //sprite frame size
 	std::vector<std::unique_ptr<construction_frame>> frames;  /// construction frames
 	CPlayerColorGraphic *graphics = nullptr; /// construction sprite image
-
-	friend int ::CclDefineConstruction(lua_State *l);
 };
 
 }
@@ -168,6 +163,3 @@ private:
 extern void LoadConstructions();
 /// Count the amount of constructions to load
 extern int GetConstructionsCount();
-
-/// Register ccl features
-extern void ConstructionCclRegister();
