@@ -36,7 +36,6 @@
 #include "character.h" //for updating levels
 //Wyrmgus end
 #include "civilization.h"
-#include "construct.h"
 #include "editor.h"
 #include "faction.h"
 #include "item_slot.h"
@@ -64,6 +63,7 @@
 #include "ui/button_level.h"
 #include "ui/ui.h"
 #include "unique_item.h"
+#include "unit/construction.h"
 #include "unit/unit.h"
 #include "unit/unit_class.h"
 #include "unit/unit_manager.h"
@@ -744,7 +744,7 @@ static int CclDefineUnitType(lua_State *l)
 					} else if (!strcmp(value, "animations")) {
 						variation->Animations = wyrmgus::animation_set::get(LuaToString(l, -1, k + 1));
 					} else if (!strcmp(value, "construction")) {
-						variation->Construction = ConstructionByIdent(LuaToString(l, -1, k + 1));
+						variation->construction = wyrmgus::construction::get(LuaToString(l, -1, k + 1));
 					} else if (!strcmp(value, "upgrade-required")) {
 						const std::string upgrade_ident = LuaToString(l, -1, k + 1);
 						const CUpgrade *upgrade = CUpgrade::try_get(upgrade_ident);
@@ -1041,8 +1041,7 @@ static int CclDefineUnitType(lua_State *l)
 			}
 		//Wyrmgus end
 		} else if (!strcmp(value, "Construction")) {
-			// FIXME: What if constructions aren't yet loaded?
-			type->Construction = ConstructionByIdent(LuaToString(l, -1));
+			type->construction = wyrmgus::construction::get(LuaToString(l, -1));
 		} else if (!strcmp(value, "DrawLevel")) {
 			type->draw_level = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "MaxOnBoard")) {

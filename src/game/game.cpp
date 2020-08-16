@@ -44,7 +44,6 @@
 //Wyrmgus end
 #include "civilization.h"
 #include "commands.h"
-#include "construct.h"
 #include "database/defines.h"
 #include "diplomacy_state.h"
 #include "editor.h"
@@ -90,6 +89,7 @@
 #include "ui/cursor.h"
 #include "ui/interface.h"
 #include "ui/ui.h"
+#include "unit/construction.h"
 #include "unit/unit.h"
 #include "unit/unit_class.h"
 #include "unit/unit_manager.h"
@@ -1478,10 +1478,10 @@ void CalculateItemsToLoad()
 		if (CPlayer::GetThisPlayer()) {
 			itemsToLoad+= GetCursorsCount();
 		}
-		itemsToLoad+= GetUnitTypesCount();
-		itemsToLoad+= GetDecorationsCount();
-		itemsToLoad+= GetConstructionsCount();
-		itemsToLoad+= GetMissileSpritesCount();
+		itemsToLoad += GetUnitTypesCount();
+		itemsToLoad += GetDecorationsCount();
+		itemsToLoad += GetConstructionsCount();
+		itemsToLoad += GetMissileSpritesCount();
 		
 		loadingEmpty = CGraphic::New("ui/loadingEmpty.png");
 		loadingEmpty->Load();
@@ -1741,7 +1741,6 @@ void CreateGame(const std::string &filename, CMap *map, bool is_mod)
 #ifndef DYNAMIC_LOAD
 	LoadMissileSprites();
 #endif
-	InitConstructions();
 	LoadConstructions();
 	LoadUnitTypes();
 	LoadDecorations();

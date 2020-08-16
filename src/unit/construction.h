@@ -8,9 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name construct.h - The constructions headerfile. */
-//
-//      (c) Copyright 1998-2006 by Lutz Sammer and Jimmy Salmon
+//      (c) Copyright 1998-2020 by Lutz Sammer, Jimmy Salmon and Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -29,14 +27,8 @@
 
 #pragma once
 
-/*----------------------------------------------------------------------------
---  Documentation
-----------------------------------------------------------------------------*/
-
 /**
-**  @class CConstruction construct.h
-**
-**  \#include "construct.h"
+**  @class construction construction.h
 **
 **  Each building perhaps also units can have its own construction
 **    frames. This construction frames are currently not animated,
@@ -45,21 +37,9 @@
 **
 **  The construction structure members:
 **
-**  CConstruction::Ident
-**
-**    Unique identifier of the construction, used to reference it in
-**    the config files and during startup. As convention they start
-**    with "construction-" fe. "construction-land".
-**    @note Don't use this member in game, use instead the pointer
-**      to this structure. See ConstructionByIdent().
-**
 **  CConstruction::File
 **
 **    Path file name of the sprite file.
-**
-**  CConstruction::ShadowFile
-**
-**    Path file name of shadow sprite file.
 **
 **  CConstruction::Frames
 **
@@ -75,16 +55,6 @@
 **    the same size. Also all sprites (tilesets) must have the same
 **    size.
 **
-**  CConstruction::ShadowSprite
-**
-**    Shadow sprite image.
-**
-**  CConstruction::ShadowWidth CConstruction::ShadowHeight
-**
-**    Size of a shadow sprite frame in pixels. All frames of a sprite
-**    have the same size. Also all sprites (tilesets) must have the
-**    same size.
-**
 **    @todo
 **      Need ::TilesetByName, ...
 **      Only fixed number of constructions supported, more than
@@ -92,89 +62,89 @@
 **      constructions aren't supported.
 */
 
-/*----------------------------------------------------------------------------
---  Declarations
-----------------------------------------------------------------------------*/
+#include "database/data_entry.h"
+#include "database/data_type.h"
 
 class CGraphic;
 class CPlayerColorGraphic;
+struct lua_State;
 
+static int CclDefineConstruction(lua_State *l);
 
-enum ConstructionFileType {
-	ConstructionFileConstruction,
-	ConstructionFileMain
+enum class ConstructionFileType {
+	Construction,
+	Main
 };
 
 /// Construction frame
 class CConstructionFrame
 {
 public:
-	CConstructionFrame() : Percent(0), File(ConstructionFileConstruction),
-		Frame(0), Next(nullptr) {}
-
-	int Percent;                    /// Percent complete
-	ConstructionFileType File;      /// Graphic to use
-	int Frame;                      /// Frame number
-	CConstructionFrame *Next;       /// Next pointer
+	int Percent = 0;                    /// Percent complete
+	ConstructionFileType File = ConstructionFileType::Construction; /// Graphic to use
+	int Frame = 0;                      /// Frame number
+	CConstructionFrame *Next = nullptr; /// Next pointer
 };
 
+namespace wyrmgus {
+
 /// Construction shown during construction of a building
-class CConstruction
+class construction final : public data_entry, public data_type<construction>
 {
+	Q_OBJECT
+
 public:
-	CConstruction() : Frames(nullptr), Sprite(nullptr), Width(0),
-		Height(0), ShadowSprite(nullptr), ShadowWidth(0), ShadowHeight(0)
+	static constexpr const char *class_identifier = "construction";
+	static constexpr const char *database_folder = "constructions";
+
+	explicit construction(const std::string &identifier) : data_entry(identifier)
 	{
-		File.Width = 0;
-		File.Height = 0;
-		ShadowFile.Width = 0;
-		ShadowFile.Height = 0;
 	}
-	~CConstruction();
+
+	~construction();
+
+	virtual void process_sml_property(const sml_property &property) override;
+
 	void Clean();
 	void Load();
 
+	const std::filesystem::path &get_image_file() const
+	{
+		return this->image_file;
+	}
+
+	const QSize &get_frame_size() const
+	{
+		return this->frame_size;
+	}
+	
+	int get_frame_width() const
+	{
+		return this->get_frame_size().width();
+	}
+	
+	int get_frame_height() const
+	{
+		return this->get_frame_size().height();
+	}
+
+private:
+	std::filesystem::path image_file;
+	QSize frame_size = QSize(0, 0); //sprite frame size
+
 public:
-	std::string Ident;   /// construction identifier
-	struct {
-		std::string File;/// sprite file
-		int Width;       /// sprite width
-		int Height;      /// sprite height
-	} File, ShadowFile;
-	CConstructionFrame *Frames;  /// construction frames
+	CConstructionFrame *Frames = nullptr;  /// construction frames
+	CPlayerColorGraphic *Sprite = nullptr; /// construction sprite image
 
-	// --- FILLED UP ---
-
-	CPlayerColorGraphic *Sprite;/// construction sprite image
-	int      Width;         /// sprite width
-	int      Height;        /// sprite height
-	CGraphic *ShadowSprite; /// construction shadow sprite image
-	int      ShadowWidth;   /// shadow sprite width
-	int      ShadowHeight;  /// shadow sprite height
+	friend int ::CclDefineConstruction(lua_State *l);
 };
 
-/*----------------------------------------------------------------------------
---  Macros
-----------------------------------------------------------------------------*/
+}
 
-/*----------------------------------------------------------------------------
---  Variables
-----------------------------------------------------------------------------*/
-
-/*----------------------------------------------------------------------------
---  Functions
-----------------------------------------------------------------------------*/
-
-/// Initialize the constructions module
-extern void InitConstructions();
 /// Load the graphics for constructions
 extern void LoadConstructions();
 /// Count the amount of constructions to load
 extern int GetConstructionsCount();
-/// Clean up the constructions module
-extern void CleanConstructions();
-/// Get construction by identifier
-extern CConstruction *ConstructionByIdent(const std::string &ident);
 
 /// Register ccl features
 extern void ConstructionCclRegister();

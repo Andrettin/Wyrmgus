@@ -8,9 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name construct.cpp - The constructions. */
-//
-//      (c) Copyright 1998-2007 by Lutz Sammer and Jimmy Salmon
+//      (c) Copyright 1998-2020 by Lutz Sammer, Jimmy Salmon and Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -27,13 +25,9 @@
 //      02111-1307, USA.
 //
 
-/*----------------------------------------------------------------------------
---  Includes
-----------------------------------------------------------------------------*/
-
 #include "stratagus.h"
 
-#include "construct.h"
+#include "unit/construction.h"
 
 #include "database/defines.h"
 #include "script.h"
@@ -41,19 +35,29 @@
 #include "ui/ui.h"
 #include "video/video.h"
 
-static std::vector<CConstruction *> Constructions;
+namespace wyrmgus {
 
-CConstruction::~CConstruction()
+construction::~construction()
 {
 	Clean();
 }
 
-void CConstruction::Clean()
+void construction::process_sml_property(const sml_property &property)
+{
+	const std::string &key = property.get_key();
+	const std::string &value = property.get_value();
+
+	if (key == "image_file") {
+		this->image_file = database::get_graphics_path(this->get_module()) / value;
+	} else {
+		data_entry::process_sml_property(property);
+	}
+}
+
+void construction::Clean()
 {
 	CGraphic::Free(this->Sprite);
 	this->Sprite = nullptr;
-	CGraphic::Free(this->ShadowSprite);
-	this->ShadowSprite = nullptr;
 	CConstructionFrame *cframe = this->Frames;
 	this->Frames = nullptr;
 	while (cframe) {
@@ -61,50 +65,19 @@ void CConstruction::Clean()
 		delete cframe;
 		cframe = next;
 	}
-	this->Width = 0;
-	this->Height = 0;
-	this->ShadowWidth = 0;
-	this->ShadowHeight = 0;
-	this->File.Width = 0;
-	this->File.Height = 0;
-	this->ShadowFile.Width = 0;
-	this->ShadowFile.Height = 0;
 }
 
-void CConstruction::Load()
+void construction::Load()
 {
-	if (this->Ident.empty()) {
-		return;
-	}
-	std::string file = this->File.File;
-
-	this->Width = this->File.Width;
-	this->Height = this->File.Height;
-	if (!file.empty()) {
+	if (!this->image_file.empty()) {
 		UpdateLoadProgress();
-		this->Sprite = CPlayerColorGraphic::New(file, QSize(this->Width, this->Height), nullptr);
+		this->Sprite = CPlayerColorGraphic::New(this->image_file, this->get_frame_size(), nullptr);
 		this->Sprite->Load(false, wyrmgus::defines::get()->get_scale_factor());
 		IncItemsLoaded();
 	}
-	file = this->ShadowFile.File;
-	this->ShadowWidth = this->ShadowFile.Width;
-	this->ShadowHeight = this->ShadowFile.Height;
-	if (!file.empty()) {
-		UpdateLoadProgress();
-		this->ShadowSprite = CGraphic::New(file, this->ShadowWidth, this->ShadowHeight);
-		this->ShadowSprite->Load(false, wyrmgus::defines::get()->get_scale_factor());
-		IncItemsLoaded();
-	}
 }
 
-
-/**
-**  Initialize  the constructions.
-*/
-void InitConstructions()
-{
 }
-
 
 /**
 **  Return the amount of constructions.
@@ -112,20 +85,8 @@ void InitConstructions()
 int GetConstructionsCount()
 {
 	int count = 0;
-	for (std::vector<CConstruction *>::iterator it = Constructions.begin();
-		 it != Constructions.end();
-		 ++it) {
-		 CConstruction *c = *it;
-		if (c->Ident.empty()) {
-			continue;
-		}
-
-		std::string file = c->File.File;
-		if (!file.empty()) count++;
-
-		file = c->ShadowFile.File;
-		if (!file.empty()) count++;
-
+	for (const wyrmgus::construction *construction : wyrmgus::construction::get_all()) {
+		if (!construction->get_image_file().empty()) count++;
 	}
 	return count;
 }
@@ -140,44 +101,9 @@ void LoadConstructions()
 {
 	ShowLoadProgress("%s", _("Loading Construction Graphics"));
 		
-	for (std::vector<CConstruction *>::iterator it = Constructions.begin();
-		 it != Constructions.end();
-		 ++it) {
-		(*it)->Load();
+	for (wyrmgus::construction *construction : wyrmgus::construction::get_all()) {
+		construction->Load();
 	}
-}
-
-/**
-**  Cleanup the constructions.
-*/
-void CleanConstructions()
-{
-	//  Free the construction table.
-	for (std::vector<CConstruction *>::iterator it = Constructions.begin();
-		 it != Constructions.end();
-		 ++it) {
-		delete *it;
-	}
-	Constructions.clear();
-}
-
-/**
-**  Get construction by identifier.
-**
-**  @param ident  Identfier of the construction
-**
-**  @return       Construction structure pointer
-*/
-CConstruction *ConstructionByIdent(const std::string &name)
-{
-	for (std::vector<CConstruction *>::const_iterator it = Constructions.begin();
-		 it != Constructions.end();
-		 ++it) {
-		if ((*it)->Ident == name) {
-			return *it;
-		}
-	}
-	return nullptr;
 }
 
 /**
@@ -196,16 +122,7 @@ static int CclDefineConstruction(lua_State *l)
 
 	// Slot identifier
 	const std::string str = LuaToString(l, 1);
-	CConstruction *construction = ConstructionByIdent(str);
-	std::vector<CConstruction *>::iterator i;
-
-	if (construction == nullptr) {
-		construction = new CConstruction;
-		Constructions.push_back(construction);
-	} else { // redefine completely.
-		construction->Clean();
-	}
-	construction->Ident = str;
+	wyrmgus::construction *construction = wyrmgus::construction::get_or_add(str, nullptr);
 
 	//  Parse the arguments, in tagged format.
 	lua_pushnil(l);
@@ -213,7 +130,7 @@ static int CclDefineConstruction(lua_State *l)
 		const char *value = LuaToString(l, -2);
 		bool files = !strcmp(value, "Files");
 
-		if (files || !strcmp(value, "ShadowFiles")) {
+		if (files) {
 			std::string file;
 			int w = 0;
 			int h = 0;
@@ -234,21 +151,15 @@ static int CclDefineConstruction(lua_State *l)
 				}
 				lua_pop(l, 1);
 			}
-			if (files) {
-				construction->File.File = file;
-				construction->File.Width = w;
-				construction->File.Height = h;
-			} else {
-				construction->ShadowFile.File = file;
-				construction->ShadowFile.Width = w;
-				construction->ShadowFile.Height = h;
-			}
+
+			construction->image_file = file;
+			construction->frame_size = QSize(w, h);
 		} else if (!strcmp(value, "Constructions")) {
 			const unsigned int subargs = lua_rawlen(l, -1);
 
 			for (unsigned int k = 0; k < subargs; ++k) {
 				int percent = 0;
-				ConstructionFileType file = ConstructionFileConstruction;
+				ConstructionFileType file = ConstructionFileType::Construction;
 				int frame = 0;
 
 				lua_rawgeti(l, -1, k + 1);
@@ -265,9 +176,9 @@ static int CclDefineConstruction(lua_State *l)
 						const char *value = LuaToString(l, -1);
 
 						if (!strcmp(value, "construction")) {
-							file = ConstructionFileConstruction;
+							file = ConstructionFileType::Construction;
 						} else if (!strcmp(value, "main")) {
-							file = ConstructionFileMain;
+							file = ConstructionFileType::Main;
 						} else {
 							LuaError(l, "Unsupported tag: %s" _C_ value);
 						}

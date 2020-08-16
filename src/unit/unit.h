@@ -56,6 +56,7 @@ typedef COrder *COrderPtr;
 namespace wyrmgus {
 	class animation_set;
 	class character;
+	class construction;
 	class player_color;
 	class spell;
 	class time_of_day;
@@ -468,8 +469,8 @@ public:
 	bool IsSpellEmpowered(const wyrmgus::spell *spell) const;
 	bool UpgradeRemovesExistingUpgrade(const CUpgrade *upgrade) const;
 	bool HasAdjacentRailForUnitType(const wyrmgus::unit_type *type) const;
-	wyrmgus::animation_set *GetAnimations() const;
-	CConstruction *GetConstruction() const;
+	const wyrmgus::animation_set *get_animation_set() const;
+	const wyrmgus::construction *get_construction() const;
 	const wyrmgus::icon *get_icon() const;
 	const wyrmgus::icon *GetButtonIcon(const ButtonCmd button_action) const;
 	MissileConfig GetMissile() const;

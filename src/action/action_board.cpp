@@ -288,7 +288,7 @@ static void EnterTransporter(CUnit &unit, COrder_Board &order)
 			if (this->WaitForTransporter(unit)) {
 				this->State = State_EnterTransporter;
 			} else {
-				UnitShowAnimation(unit, unit.GetAnimations()->Still.get());
+				UnitShowAnimation(unit, unit.get_animation_set()->Still.get());
 			}
 			break;
 

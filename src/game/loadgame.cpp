@@ -34,7 +34,6 @@
 #include "character.h"
 #include "civilization.h"
 #include "commands.h"
-#include "construct.h"
 #include "currency.h"
 #include "database/database.h"
 #include "dialogue.h"
@@ -77,6 +76,7 @@
 #include "ui/button_level.h"
 #include "ui/cursor.h"
 #include "ui/ui.h"
+#include "unit/construction.h"
 #include "unit/unit.h"
 #include "unit/unit_manager.h"
 #include "unit/unit_type.h"
@@ -102,7 +102,6 @@ void CleanModules()
 	FreeAi();
 	PlayerRaces.Clean();
 	CAchievement::ClearAchievements();
-	CleanConstructions();
 	CCurrency::ClearCurrencies();
 	CleanDecorations();
 	//Wyrmgus start
@@ -151,7 +150,6 @@ void InitModules()
 	InitUserInterface();
 	InitPlayers();
 	InitMissileTypes();
-	InitConstructions();
 
 	// LUDO : 0 = don't reset player stats ( units level , upgrades, ... ) !
 	InitUnitTypes(0);

@@ -768,8 +768,8 @@ int COrder_Resource::StartGathering(CUnit &unit)
 */
 static void AnimateActionHarvest(CUnit &unit)
 {
-	Assert(unit.GetAnimations()->Harvest[unit.CurrentResource]);
-	UnitShowAnimation(unit, unit.GetAnimations()->Harvest[unit.CurrentResource].get());
+	Assert(unit.get_animation_set()->Harvest[unit.CurrentResource]);
+	UnitShowAnimation(unit, unit.get_animation_set()->Harvest[unit.CurrentResource].get());
 }
 
 /**
@@ -1632,7 +1632,7 @@ void COrder_Resource::Execute(CUnit &unit)
 			unit.Waiting = 1;
 			unit.WaitBackup = unit.Anim;
 		}
-		UnitShowAnimation(unit, unit.GetAnimations()->Still.get());
+		UnitShowAnimation(unit, unit.get_animation_set()->Still.get());
 		unit.Wait--;
 		return;
 	}

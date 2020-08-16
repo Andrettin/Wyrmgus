@@ -259,7 +259,7 @@
 */
 static void AnimateActionSpellCast(CUnit &unit, COrder_SpellCast &order)
 {
-	const wyrmgus::animation_set *animations = unit.GetAnimations();
+	const wyrmgus::animation_set *animations = unit.get_animation_set();
 
 	if (!animations || (!animations->Attack && !animations->SpellCast)) {
 		// if don't have animations just cast spell
@@ -384,7 +384,7 @@ bool COrder_SpellCast::SpellMoveToTarget(CUnit &unit)
 			unit.Waiting = 1;
 			unit.WaitBackup = unit.Anim;
 		}
-		UnitShowAnimation(unit, unit.GetAnimations()->Still.get());
+		UnitShowAnimation(unit, unit.get_animation_set()->Still.get());
 		unit.Wait--;
 		return;
 	}

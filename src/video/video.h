@@ -294,6 +294,11 @@ public:
 
 	static CPlayerColorGraphic *New(const std::string &filepath, const QSize &size, const wyrmgus::player_color *conversible_player_color);
 
+	static CPlayerColorGraphic *New(const std::filesystem::path &filepath, const QSize &size, const wyrmgus::player_color *conversible_player_color)
+	{
+		return CPlayerColorGraphic::New(filepath.string(), size, conversible_player_color);
+	}
+
 	static CPlayerColorGraphic *Get(const std::string &file);
 
 	const GLuint *get_textures(const wyrmgus::player_color *player_color) const;

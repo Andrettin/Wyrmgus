@@ -466,7 +466,7 @@ bool COrder_Build::StartBuilding(CUnit &unit, CUnit &ontop)
 
 	// We need somebody to work on it.
 	if (!type.BoolFlag[BUILDEROUTSIDE_INDEX].value) {
-		UnitShowAnimation(unit, unit.GetAnimations()->Still.get());
+		UnitShowAnimation(unit, unit.get_animation_set()->Still.get());
 		unit.Remove(build);
 		this->State = State_BuildFromInside;
 		if (unit.Selected) {
@@ -492,7 +492,7 @@ void COrder_Build::ConvertUnitType(const CUnit &unit, wyrmgus::unit_type &newTyp
 
 static void AnimateActionBuild(CUnit &unit)
 {
-	wyrmgus::animation_set *animations = unit.GetAnimations();
+	const wyrmgus::animation_set *animations = unit.get_animation_set();
 
 	if (animations == nullptr) {
 		return ;
@@ -539,7 +539,7 @@ bool COrder_Build::BuildFromOutside(CUnit &unit) const
 			unit.Waiting = 1;
 			unit.WaitBackup = unit.Anim;
 		}
-		UnitShowAnimation(unit, unit.GetAnimations()->Still.get());
+		UnitShowAnimation(unit, unit.get_animation_set()->Still.get());
 		unit.Wait--;
 		return;
 	}

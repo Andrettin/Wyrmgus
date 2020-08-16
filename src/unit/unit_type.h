@@ -42,7 +42,6 @@
 #undef Enable
 #endif
 
-class CConstruction;
 class CFile;
 class CPlayerColorGraphic;
 struct lua_State;
@@ -60,6 +59,7 @@ namespace wyrmgus {
 	class animation_set;
 	class button_level;
 	class condition;
+	class construction;
 	class faction;
 	class font;
 	class missile_type;
@@ -857,6 +857,7 @@ class unit_type final : public detailed_data_entry, public data_type<unit_type>,
 	Q_PROPERTY(int draw_level MEMBER draw_level READ get_draw_level)
 	Q_PROPERTY(wyrmgus::item_class item_class MEMBER item_class READ get_item_class)
 	Q_PROPERTY(wyrmgus::unit_type* corpse_type MEMBER corpse_type READ get_corpse_type)
+	Q_PROPERTY(wyrmgus::construction* construction MEMBER construction READ get_construction)
 
 public:
 	static constexpr const char *class_identifier = "unit_type";
@@ -1048,6 +1049,11 @@ public:
 		return this->corpse_type;
 	}
 
+	wyrmgus::construction *get_construction() const
+	{
+		return this->construction;
+	}
+
 	const std::string &get_button_key() const
 	{
 		return this->button_key;
@@ -1165,9 +1171,9 @@ public:
 private:
 	unit_type *corpse_type = nullptr; //corpse unit-type
 
-public:
-	CConstruction *Construction;    /// What is shown in construction phase
+	wyrmgus::construction *construction = nullptr;    /// What is shown in the construction phase
 
+public:
 	int RepairHP;                   /// Amount of HP per repair
 	int RepairCosts[MaxCosts];      /// How much it costs to repair
 

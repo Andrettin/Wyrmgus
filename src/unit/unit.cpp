@@ -44,7 +44,6 @@
 #include "character.h"
 #include "civilization.h"
 #include "commands.h"
-#include "construct.h"
 #include "database/defines.h"
 #include "faction.h"
 #include "game.h"
@@ -6531,23 +6530,23 @@ bool CUnit::HasAdjacentRailForUnitType(const wyrmgus::unit_type *type) const
 	return has_adjacent_rail;
 }
 
-wyrmgus::animation_set *CUnit::GetAnimations() const
+const wyrmgus::animation_set *CUnit::get_animation_set() const
 {
 	const wyrmgus::unit_type_variation *variation = this->GetVariation();
-	if (variation && variation->Animations) {
+	if (variation != nullptr && variation->Animations != nullptr) {
 		return variation->Animations;
 	} else {
 		return this->Type->get_animation_set();
 	}
 }
 
-CConstruction *CUnit::GetConstruction() const
+const wyrmgus::construction *CUnit::get_construction() const
 {
 	const wyrmgus::unit_type_variation *variation = this->GetVariation();
-	if (variation && variation->Construction) {
-		return variation->Construction;
+	if (variation != nullptr && variation->get_construction() != nullptr) {
+		return variation->get_construction();
 	} else {
-		return this->Type->Construction;
+		return this->Type->get_construction();
 	}
 }
 
@@ -6847,7 +6846,7 @@ void LetUnitDie(CUnit &unit, bool suicide)
 
 	// If we have a corpse, or a death animation, we are put back on the map
 	// This enables us to be tracked.  Possibly for spells (eg raise dead)
-	if (type->get_corpse_type() != nullptr || (unit.GetAnimations() && unit.GetAnimations()->Death)) {
+	if (type->get_corpse_type() != nullptr || (unit.get_animation_set() && unit.get_animation_set()->Death)) {
 		unit.Removed = 0;
 		CMap::Map.Insert(unit);
 

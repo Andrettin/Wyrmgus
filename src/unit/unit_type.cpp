@@ -37,7 +37,6 @@
 #include "animation/animation_frame.h"
 #include "civilization.h"
 #include "config.h"
-#include "construct.h"
 #include "database/defines.h"
 //Wyrmgus start
 #include "editor.h" //for personal name generation
@@ -509,7 +508,7 @@ unit_type::unit_type(const std::string &identifier) : detailed_data_entry(identi
 	//Wyrmgus end
 	StillFrame(0),
 	TeleportCost(0),
-	Construction(nullptr), RepairHP(0),
+	RepairHP(0),
 	BoxOffsetX(0), BoxOffsetY(0), NumDirections(0),
 	MinAttackRange(0),
 	BurnPercent(0), BurnDamageRate(0), RepairRange(0),
@@ -1557,7 +1556,7 @@ void unit_type::set_parent(const unit_type *parent_type)
 	this->box_size = parent_type->box_size;
 	this->BoxOffsetX = parent_type->BoxOffsetX;
 	this->BoxOffsetY = parent_type->BoxOffsetY;
-	this->Construction = parent_type->Construction;
+	this->construction = parent_type->construction;
 	this->UnitType = parent_type->UnitType;
 	this->Missile.Name = parent_type->Missile.Name;
 	this->Missile.Missile = nullptr;

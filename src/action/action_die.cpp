@@ -77,7 +77,7 @@
 
 static bool AnimateActionDie(CUnit &unit)
 {
-	const wyrmgus::animation_set *animations = unit.GetAnimations();
+	const wyrmgus::animation_set *animations = unit.get_animation_set();
 
 	if (animations == nullptr) {
 		return false;

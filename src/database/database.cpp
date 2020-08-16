@@ -74,6 +74,7 @@
 #include "ui/cursor.h"
 #include "ui/cursor_type.h"
 #include "ui/icon.h"
+#include "unit/construction.h"
 #include "unit/historical_unit.h"
 #include "unit/unit_class.h"
 #include "unit/unit_type.h"
@@ -200,6 +201,8 @@ QVariant database::process_sml_property_value(const sml_property &property, cons
 			new_property_value = QVariant::fromValue(civilization_group::get(property.get_value()));
 		} else if (property_class_name == "wyrmgus::civilization_supergroup*") {
 			new_property_value = QVariant::fromValue(civilization_supergroup::get(property.get_value()));
+		} else if (property_class_name == "wyrmgus::construction*") {
+			new_property_value = QVariant::fromValue(construction::get(property.get_value()));
 		} else if (property_class_name == "wyrmgus::cursor*") {
 			new_property_value = QVariant::fromValue(cursor::get(property.get_value()));
 		} else if (property_class_name == "wyrmgus::cursor_type") {

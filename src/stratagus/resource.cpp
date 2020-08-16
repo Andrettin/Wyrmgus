@@ -44,7 +44,7 @@ void resource::process_sml_property(const sml_property &property)
 	const std::string &value = property.get_value();
 
 	if (key == "icon_file") {
-		this->icon_filepath = database::get_graphics_path(this->get_module()) / value;
+		this->icon_file = database::get_graphics_path(this->get_module()) / value;
 	} else if (key == "action_name") {
 		this->action_name = value;
 	} else {
@@ -58,8 +58,8 @@ void resource::initialize()
 		this->FinalResource = this->get_index();
 	}
 
-	if (!this->icon_filepath.empty()) {
-		this->icon_graphics = CGraphic::New(this->icon_filepath, defines::get()->get_resource_icon_size());
+	if (!this->icon_file.empty()) {
+		this->icon_graphics = CGraphic::New(this->icon_file, defines::get()->get_resource_icon_size());
 		this->icon_graphics->Load(false, wyrmgus::defines::get()->get_scale_factor());
 	}
 

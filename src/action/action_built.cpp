@@ -38,7 +38,6 @@
 //Wyrmgus end
 #include "character.h"
 #include "commands.h"
-#include "construct.h"
 #include "iolib.h"
 #include "map/map.h"
 #include "map/map_layer.h"
@@ -52,6 +51,7 @@
 #include "sound/sound.h"
 #include "sound/unit_sound_type.h"
 #include "translate.h"
+#include "unit/construction.h"
 #include "unit/unit.h"
 #include "unit/unit_find.h"
 #include "unit/unit_type.h"
@@ -87,10 +87,9 @@ extern void AiReduceMadeInBuilt(PlayerAi &pai, const wyrmgus::unit_type &type, i
 	if (this->Finished) {
 		file.printf(" \"finished\", ");
 	}
-	//Wyrmgus start
-//	CConstructionFrame *cframe = unit.Type->Construction->Frames;
-	CConstructionFrame *cframe = unit.GetConstruction()->Frames;
-	//Wyrmgus end
+
+	const CConstructionFrame *cframe = unit.get_construction()->Frames;
+
 	int frame = 0;
 	while (cframe != this->Frame) {
 		cframe = cframe->Next;
@@ -121,10 +120,9 @@ extern void AiReduceMadeInBuilt(PlayerAi &pai, const wyrmgus::unit_type &type, i
 	} else if (!strcmp(value, "frame")) {
 		++j;
 		int frame = LuaToNumber(l, -1, j + 1);
-		//Wyrmgus start
-//		CConstructionFrame *cframe = unit.Type->Construction->Frames;
-		CConstructionFrame *cframe = unit.GetConstruction()->Frames;
-		//Wyrmgus end
+
+		const CConstructionFrame *cframe = unit.get_construction()->Frames;
+		
 		while (frame-- && cframe->Next != nullptr) {
 			cframe = cframe->Next;
 		}
@@ -454,12 +452,11 @@ void COrder_Built::AiUnitKilled(CUnit &unit)
 	//Wyrmgus end
 }
 
-
-static const CConstructionFrame *FindCFramePercent(const CConstructionFrame &cframe, int percent)
+static const CConstructionFrame *FindCFramePercent(const CConstructionFrame *cframe, int percent)
 {
-	const CConstructionFrame *prev = &cframe;
+	const CConstructionFrame *prev = cframe;
 
-	for (const CConstructionFrame *it = cframe.Next; it; it = it->Next) {
+	for (const CConstructionFrame *it = cframe->Next; it; it = it->Next) {
 		if (percent < it->Percent) {
 			return prev;
 		}
@@ -477,10 +474,8 @@ void COrder_Built::UpdateConstructionFrame(CUnit &unit)
 {
 	const wyrmgus::unit_type &type = *unit.Type;
 	const int percent = this->ProgressCounter / (type.Stats[unit.Player->Index].Costs[TimeCost] * 6);
-	//Wyrmgus start
-//	const CConstructionFrame *cframe = FindCFramePercent(*type.Construction->Frames, percent);
-	const CConstructionFrame *cframe = FindCFramePercent(*unit.GetConstruction()->Frames, percent);
-	//Wyrmgus end
+
+	const CConstructionFrame *cframe = FindCFramePercent(unit.get_construction()->Frames, percent);
 
 	Assert(cframe != nullptr);
 

@@ -37,7 +37,6 @@
 //Wyrmgus end
 #include "animation.h"
 #include "commands.h"
-#include "construct.h"
 //Wyrmgus start
 #include "grand_strategy.h"
 //Wyrmgus end

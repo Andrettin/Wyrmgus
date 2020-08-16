@@ -552,7 +552,7 @@ bool COrder_Unload::LeaveTransporter(CUnit &transporter)
 			unit.Waiting = 1;
 			unit.WaitBackup = unit.Anim;
 		}
-		UnitShowAnimation(unit, unit.GetAnimations()->Still.get());
+		UnitShowAnimation(unit, unit.get_animation_set()->Still.get());
 		unit.Wait--;
 		return;
 	}

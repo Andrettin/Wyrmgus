@@ -520,7 +520,7 @@ bool AutoAttack(CUnit &unit)
 	switch (this->State) {
 		case SUB_STILL_STANDBY:
 			if (unit.Variable[STUN_INDEX].Value == 0) { //only show the idle animation when still if the unit is not stunned
-				UnitShowAnimation(unit, unit.GetAnimations()->Still.get());
+				UnitShowAnimation(unit, unit.get_animation_set()->Still.get());
 			}
 			if (SyncRand(100000) == 0) {
 				PlayUnitSound(unit, wyrmgus::unit_sound_type::idle);

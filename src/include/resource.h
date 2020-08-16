@@ -132,7 +132,7 @@ public:
 private:
 	int index = -1;
 	CGraphic *icon_graphics = nullptr;
-	std::filesystem::path icon_filepath;
+	std::filesystem::path icon_file;
 	std::string action_name;
 	int default_income = 100;
 	int default_amount = 1000;

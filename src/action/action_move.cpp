@@ -186,7 +186,7 @@ int DoActionMove(CUnit &unit)
 
 	Assert(unit.CanMove());
 
-	if (!unit.Moving && (unit.GetAnimations()->Move.get() != unit.Anim.CurrAnim || !unit.Anim.Wait)) {
+	if (!unit.Moving && (unit.get_animation_set()->Move.get() != unit.Anim.CurrAnim || !unit.Anim.Wait)) {
 		Assert(!unit.Anim.Unbreakable);
 
 		// FIXME: So units flying up and down are not affected.
@@ -292,7 +292,7 @@ int DoActionMove(CUnit &unit)
 	}
 
 	unit.pathFinderData->output.Cycles++;// reset have to be manualy controlled by caller.
-	int move = UnitShowAnimationScaled(unit, unit.GetAnimations()->Move.get(), DefaultTileMovementCost);
+	int move = UnitShowAnimationScaled(unit, unit.get_animation_set()->Move.get(), DefaultTileMovementCost);
 
 	unit.pixel_offset += QPoint(posd.x * move, posd.y * move);
 	
@@ -347,7 +347,7 @@ int DoActionMove(CUnit &unit)
 			unit.Waiting = 1;
 			unit.WaitBackup = unit.Anim;
 		}
-		UnitShowAnimation(unit, unit.GetAnimations()->Still.get());
+		UnitShowAnimation(unit, unit.get_animation_set()->Still.get());
 		unit.Wait--;
 		return;
 	}

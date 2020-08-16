@@ -31,12 +31,12 @@
 
 #include "animation.h"
 #include "config.h"
-#include "construct.h"
 #include "item_class.h"
 #include "map/terrain_type.h"
 #include "mod.h"
 #include "time/season.h"
 #include "ui/button.h"
+#include "unit/construction.h"
 #include "video/video.h"
 
 namespace wyrmgus {
@@ -133,11 +133,7 @@ void unit_type_variation::ProcessConfigData(const CConfigData *config_data)
 		} else if (key == "animations") {
 			this->Animations = animation_set::get(value);
 		} else if (key == "construction") {
-			value = FindAndReplaceString(value, "_", "-");
-			this->Construction = ConstructionByIdent(value);
-			if (!this->Construction) {
-				fprintf(stderr, "Invalid construction: \"%s\".\n", value.c_str());
-			}
+			this->construction = construction::get(value);
 		} else if (key == "required_upgrade") {
 			const CUpgrade *upgrade = CUpgrade::get(value);
 			this->UpgradesRequired.push_back(upgrade);

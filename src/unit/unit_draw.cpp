@@ -37,7 +37,6 @@
 //Wyrmgus start
 #include "animation.h"
 //Wyrmgus end
-#include "construct.h"
 #include "database/defines.h"
 #include "editor.h"
 #include "map/map.h"
@@ -51,6 +50,7 @@
 #include "ui/cursor.h"
 #include "ui/interface.h"
 #include "ui/ui.h"
+#include "unit/construction.h"
 #include "unit/unit.h"
 #include "unit/unit_find.h"
 #include "unit/unit_type.h"
@@ -932,31 +932,7 @@ static void DrawConstructionShadow(const CUnit &unit, const wyrmgus::unit_type &
 	PixelPos pos = screenPos;
 	const int scale_factor = wyrmgus::defines::get()->get_scale_factor();
 	const wyrmgus::unit_type_variation *variation = unit.GetVariation();
-	if (cframe->File == ConstructionFileConstruction) {
-		if (variation && variation->Construction) {
-			if (variation->Construction->ShadowSprite) {
-				pos -= PixelPos((variation->Construction->ShadowSprite->get_frame_size() - type.get_tile_size() * wyrmgus::defines::get()->get_scaled_tile_size()) / 2);
-				pos.x += type.get_offset().x() * scale_factor;
-				pos.y += type.get_offset().y() * scale_factor;
-				if (frame < 0) {
-					variation->Construction->ShadowSprite->DrawFrameClipX(-frame - 1, pos.x, pos.y);
-				} else {
-					variation->Construction->ShadowSprite->DrawFrameClip(frame, pos.x, pos.y);
-				}
-			}
-		} else {
-			if (type.Construction->ShadowSprite) {
-				pos -= PixelPos((type.Construction->ShadowSprite->get_frame_size() - type.get_tile_size() * wyrmgus::defines::get()->get_scaled_tile_size()) / 2);
-				pos.x += type.get_offset().x() * scale_factor;
-				pos.y += type.get_offset().y() * scale_factor;
-				if (frame < 0) {
-					type.Construction->ShadowSprite->DrawFrameClipX(-frame - 1, pos.x, pos.y);
-				} else {
-					type.Construction->ShadowSprite->DrawFrameClip(frame, pos.x, pos.y);
-				}
-			}
-		}
-	} else {
+	if (cframe->File != ConstructionFileType::Construction) {
 		if (variation && variation->ShadowSprite) {
 			pos -= PixelPos((variation->ShadowSprite->get_frame_size() - type.get_tile_size() * wyrmgus::defines::get()->get_scaled_tile_size()) / 2);
 			pos.x += (type.ShadowOffsetX + type.get_offset().x()) * scale_factor;
@@ -994,25 +970,25 @@ static void DrawConstruction(const int player, const CConstructionFrame *cframe,
 	PixelPos pos = screenPos;
 	const int scale_factor = wyrmgus::defines::get()->get_scale_factor();
 	const wyrmgus::player_color *player_color = CPlayer::Players[player]->get_player_color();
-	if (cframe->File == ConstructionFileConstruction) {
+	if (cframe->File == ConstructionFileType::Construction) {
 		const wyrmgus::unit_type_variation *variation = unit.GetVariation();
-		if (variation && variation->Construction) {
-			const CConstruction &construction = *variation->Construction;
-			pos.x -= construction.Width * scale_factor / 2;
-			pos.y -= construction.Height * scale_factor / 2;
+		if (variation != nullptr && variation->get_construction() != nullptr) {
+			const wyrmgus::construction *construction = variation->get_construction();
+			pos.x -= construction->get_frame_width() * scale_factor / 2;
+			pos.y -= construction->get_frame_height() * scale_factor / 2;
 			if (frame < 0) {
-				construction.Sprite->DrawPlayerColorFrameClipX(player_color, -frame - 1, pos.x, pos.y, time_of_day);
+				construction->Sprite->DrawPlayerColorFrameClipX(player_color, -frame - 1, pos.x, pos.y, time_of_day);
 			} else {
-				construction.Sprite->DrawPlayerColorFrameClip(player_color, frame, pos.x, pos.y, time_of_day);
+				construction->Sprite->DrawPlayerColorFrameClip(player_color, frame, pos.x, pos.y, time_of_day);
 			}
 		} else {
-			const CConstruction &construction = *type.Construction;
-			pos.x -= construction.Width * scale_factor / 2;
-			pos.y -= construction.Height * scale_factor / 2;
+			const wyrmgus::construction *construction = type.get_construction();
+			pos.x -= construction->get_frame_width() * scale_factor / 2;
+			pos.y -= construction->get_frame_height() * scale_factor / 2;
 			if (frame < 0) {
-				construction.Sprite->DrawPlayerColorFrameClipX(player_color, -frame - 1, pos.x, pos.y, time_of_day);
+				construction->Sprite->DrawPlayerColorFrameClipX(player_color, -frame - 1, pos.x, pos.y, time_of_day);
 			} else {
-				construction.Sprite->DrawPlayerColorFrameClip(player_color, frame, pos.x, pos.y, time_of_day);
+				construction->Sprite->DrawPlayerColorFrameClip(player_color, frame, pos.x, pos.y, time_of_day);
 			}
 		}
 		//Wyrmgus end

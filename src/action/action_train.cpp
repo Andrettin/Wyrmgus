@@ -197,10 +197,10 @@ static bool CanHandleOrder(const CUnit &unit, COrder *order)
 
 static void AnimateActionTrain(CUnit &unit)
 {
-	if (unit.GetAnimations()->Train) {
-		UnitShowAnimation(unit, unit.GetAnimations()->Train.get());
+	if (unit.get_animation_set()->Train) {
+		UnitShowAnimation(unit, unit.get_animation_set()->Train.get());
 	} else {
-		UnitShowAnimation(unit, unit.GetAnimations()->Still.get());
+		UnitShowAnimation(unit, unit.get_animation_set()->Still.get());
 	}
 }
 

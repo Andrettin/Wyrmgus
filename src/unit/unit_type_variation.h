@@ -31,7 +31,6 @@
 #include "unit/unit_type.h" //for the image layers enum
 #include "upgrade/upgrade_structs.h" //for the costs enum
 
-class CConstruction;
 class CGraphic;
 class CPlayerColorGraphic;
 
@@ -40,6 +39,7 @@ int CclDefineUnitType(lua_State *l);
 namespace wyrmgus {
 
 class animation_set;
+class construction;
 class season;
 class terrain_type;
 class unit_type;
@@ -84,7 +84,7 @@ public:
 		variation->Weight = this->Weight;
 		variation->Icon = this->Icon;
 		variation->Animations = this->Animations;
-		variation->Construction = this->Construction;
+		variation->construction = this->construction;
 		variation->UpgradesRequired = this->UpgradesRequired;
 		variation->UpgradesForbidden = this->UpgradesForbidden;
 		variation->item_classes_equipped = this->item_classes_equipped;
@@ -129,6 +129,11 @@ public:
 		return this->button_key;
 	}
 	
+	const construction *get_construction() const
+	{
+		return this->construction;
+	}
+	
 private:
 	std::string identifier;
 	int index = -1;					//the variation's index within the appropriate variation vector of its unit type
@@ -154,8 +159,10 @@ public:
 	CGraphic *ShadowSprite = nullptr;		/// The graphic corresponding to ShadowFile.
 	CGraphic *LightSprite = nullptr;		/// The graphic corresponding to LightFile.
 	animation_set *Animations = nullptr;		/// Animation scripts
-	CConstruction *Construction = nullptr;	/// What is shown in construction phase
+private:
+	wyrmgus::construction *construction = nullptr;	/// What is shown in construction phase
 
+public:
 	std::vector<const CUpgrade *> UpgradesRequired;		/// Upgrades required by variation
 	std::vector<const CUpgrade *> UpgradesForbidden;	/// If the player has one of these upgrades, the unit can't have this variation
 	std::set<item_class> item_classes_equipped;
