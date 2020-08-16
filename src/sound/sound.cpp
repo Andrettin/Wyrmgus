@@ -156,10 +156,7 @@ static wyrmgus::sound *ChooseUnitVoiceSound(const CUnit &unit, const wyrmgus::un
 {
 	const CMapField &mf = *unit.MapLayer->Field(unit.tilePos);
 
-	const wyrmgus::civilization *civilization = unit.Type->get_civilization();
-	if (civilization != nullptr && unit.Player->Race != -1 && unit.Player->Race != civilization->ID && unit.Player->Faction != -1 && unit.Type == wyrmgus::faction::get_all()[unit.Player->Faction]->get_class_unit_type(unit.Type->get_unit_class())) {
-		civilization = wyrmgus::civilization::get_all()[unit.Player->Race];
-	}
+	const wyrmgus::civilization *civilization = unit.get_civilization();
 
 	switch (unit_sound_type) {
 		case wyrmgus::unit_sound_type::acknowledging:

@@ -141,6 +141,8 @@ public:
 
 	const wyrmgus::player_color *get_player_color() const;
 
+	const wyrmgus::civilization *get_civilization() const;
+
 	/// Draw a single unit
 	void Draw(const CViewport &vp) const;
 	/// Place a unit on map

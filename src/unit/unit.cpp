@@ -3012,6 +3012,17 @@ const wyrmgus::player_color *CUnit::get_player_color() const
 	return nullptr;
 }
 
+const wyrmgus::civilization *CUnit::get_civilization() const
+{
+	const wyrmgus::civilization *type_civilization = this->Type->get_civilization();
+
+	if (type_civilization != nullptr && this->Player->get_civilization() != nullptr && this->Player->get_civilization() != type_civilization && this->Player->get_faction() != nullptr && this->Type == this->Player->get_faction()->get_class_unit_type(this->Type->get_unit_class())) {
+		return wyrmgus::civilization::get_all()[this->Player->Race];
+	}
+
+	return type_civilization;
+}
+
 /**
 **  Create a new unit.
 **
