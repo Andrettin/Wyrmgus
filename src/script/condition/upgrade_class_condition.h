@@ -30,40 +30,49 @@
 #include "script/condition/condition.h"
 #include "unit/unit.h"
 #include "upgrade/upgrade.h"
+#include "upgrade/upgrade_class.h"
 #include "upgrade/upgrade_structs.h"
 
 namespace wyrmgus {
 
-class upgrade_condition final : public condition
+class upgrade_class_condition final : public condition
 {
 public:
-	upgrade_condition() {}
-
-	explicit upgrade_condition(const std::string &value)
+	explicit upgrade_class_condition(const std::string &value)
 	{
-		this->upgrade = CUpgrade::get(value);
+		this->upgrade_class = upgrade_class::get(value);
 	}
-
-	virtual void ProcessConfigDataProperty(const std::pair<std::string, std::string> &property) override;
 
 	virtual bool check(const CPlayer *player, bool ignore_units = false) const override
 	{
-		return UpgradeIdAllowed(*player, this->upgrade->ID) == 'R';
+		const CUpgrade *upgrade = player->get_class_upgrade(this->upgrade_class);
+
+		if (upgrade == nullptr) {
+			return false;
+		}
+
+		return UpgradeIdAllowed(*player, upgrade->ID) == 'R';
 	}
 
 	virtual bool check(const CUnit *unit, bool ignore_units = false) const override
 	{
-		return this->check(unit->Player, ignore_units) || unit->GetIndividualUpgrade(this->upgrade);
+		const CUpgrade *upgrade = unit->Player->get_class_upgrade(this->upgrade_class);
+
+		if (upgrade == nullptr) {
+			return false;
+		}
+
+		return this->check(unit->Player, ignore_units) || unit->GetIndividualUpgrade(upgrade);
 	}
 
 	virtual std::string get_string(const std::string &prefix = "") const override
 	{
-		std::string str = prefix + this->upgrade->get_name() + '\n';
+		std::string str = prefix + this->upgrade_class->get_name() + '\n';
 		return str;
 	}
 
 private:
-	const CUpgrade *upgrade = nullptr;
+	const upgrade_class *upgrade_class = nullptr;
 };
 
 }

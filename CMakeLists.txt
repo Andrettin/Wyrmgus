@@ -695,6 +695,7 @@ set(stratagus_script_condition_HDRS
 	src/script/condition/trigger_condition.h
 	src/script/condition/unit_class_condition.h
 	src/script/condition/unit_type_condition.h
+	src/script/condition/upgrade_class_condition.h
 	src/script/condition/upgrade_condition.h
 )
 

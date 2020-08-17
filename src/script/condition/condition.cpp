@@ -49,10 +49,10 @@
 #include "script/condition/unit_class_condition.h"
 #include "script/condition/unit_type_condition.h"
 #include "script/condition/upgrade_condition.h"
+#include "script/condition/upgrade_class_condition.h"
 #include "translate.h"
 #include "ui/button.h"
 #include "ui/interface.h"
-#include "upgrade/upgrade_class.h"
 #include "upgrade/upgrade_modifier.h"
 #include "util/string_util.h"
 #include "util/vector_util.h"
@@ -82,6 +82,8 @@ std::unique_ptr<const condition> condition::from_sml_property(const sml_property
 		return std::make_unique<unit_type_condition>(value);
 	} else if (key == "upgrade") {
 		return std::make_unique<upgrade_condition>(value);
+	} else if (key == "upgrade_class") {
+		return std::make_unique<upgrade_class_condition>(value);
 	} else {
 		throw std::runtime_error("Invalid condition property: \"" + key + "\".");
 	}
