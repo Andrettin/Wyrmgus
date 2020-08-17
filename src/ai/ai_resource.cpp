@@ -409,7 +409,7 @@ static int AiBuildBuilding(const wyrmgus::unit_type &type, wyrmgus::unit_type &b
 
 bool AiRequestedTypeAllowed(const CPlayer &player, const wyrmgus::unit_type &type, bool allow_can_build_builder, bool include_upgrade)
 {
-	if (!CheckConditions(&type, &player)) {
+	if (!check_conditions(&type, &player)) {
 		return false;
 	}
 
@@ -479,14 +479,14 @@ static bool AiRequestedUpgradeAllowed(const CPlayer &player, const CUpgrade *upg
 	}
 
 	for (const wyrmgus::unit_type *researcher_type : AiHelpers.get_researchers(upgrade)) {
-		if ((player.GetUnitTypeAiActiveCount(researcher_type) > 0 || (allow_can_build_researcher && AiRequestedTypeAllowed(player, *researcher_type))) && CheckConditions(upgrade, &player)) {
+		if ((player.GetUnitTypeAiActiveCount(researcher_type) > 0 || (allow_can_build_researcher && AiRequestedTypeAllowed(player, *researcher_type))) && check_conditions(upgrade, &player)) {
 			return true;
 		}
 	}
 
 	for (const wyrmgus::unit_class *researcher_class : AiHelpers.get_researcher_classes(upgrade->get_upgrade_class())) {
 		const wyrmgus::unit_type *researcher_type = AiPlayer->Player->get_class_unit_type(researcher_class);
-		if (researcher_type != nullptr && (player.GetUnitTypeAiActiveCount(researcher_type) > 0 || (allow_can_build_researcher && AiRequestedTypeAllowed(player, *researcher_type))) && CheckConditions(upgrade, &player)) {
+		if (researcher_type != nullptr && (player.GetUnitTypeAiActiveCount(researcher_type) > 0 || (allow_can_build_researcher && AiRequestedTypeAllowed(player, *researcher_type))) && check_conditions(upgrade, &player)) {
 			return true;
 		}
 	}
@@ -2354,7 +2354,7 @@ void AiCheckSettlementConstruction()
 		return;
 	}
 	
-	if (!CheckConditions(town_hall_type, AiPlayer->Player)) {
+	if (!check_conditions(town_hall_type, AiPlayer->Player)) {
 		return;
 	}
 

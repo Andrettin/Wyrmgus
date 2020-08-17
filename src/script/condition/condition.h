@@ -62,6 +62,67 @@ public:
 	virtual std::string get_string(const std::string &prefix = "") const = 0;
 };
 
+extern bool check_special_conditions(const unit_type *target, const CPlayer *player);
+
+template <bool precondition>
+extern bool check_special_conditions(const CUpgrade *target, const CPlayer *player, const bool is_neutral_use);
+
+//check conditions for player
+template <bool precondition = false, typename T>
+extern bool check_conditions(const T *target, const CPlayer *player, const bool ignore_units = false, const bool is_neutral_use = false)
+{
+	if constexpr (!precondition) {
+		if (!check_conditions<true>(target, player, ignore_units, is_neutral_use)) {
+			return false;
+		}
+	}
+
+	if constexpr (std::is_same_v<T, unit_type>) {
+		if (!check_special_conditions(target, player)) {
+			return false;
+		}
+	} else if constexpr (std::is_same_v<T, CUpgrade>) {
+		if (!check_special_conditions<precondition>(target, player, is_neutral_use)) {
+			return false;
+		}
+	}
+
+	if constexpr (precondition) {
+		return target->get_preconditions() == nullptr || target->get_preconditions()->check(player, ignore_units);
+	} else {
+		return target->get_conditions() == nullptr || target->get_conditions()->check(player, ignore_units);
+	}
+}
+
+extern bool check_special_conditions(const CUpgrade *target, const CUnit *unit);
+
+//check conditions for unit
+template <bool precondition = false, typename T>
+extern bool check_conditions(const T *target, const CUnit *unit, const bool ignore_units = false)
+{
+	if constexpr (!precondition) {
+		if (!check_conditions<true>(target, unit, ignore_units)) {
+			return false;
+		}
+	}
+
+	if constexpr (std::is_same_v<T, unit_type>) {
+		if (!check_special_conditions(target, unit->Player)) {
+			return false;
+		}
+	} else if constexpr (std::is_same_v<T, CUpgrade>) {
+		if (!check_special_conditions(target, unit)) {
+			return false;
+		}
+	}
+
+	if constexpr (precondition) {
+		return target->get_preconditions() == nullptr || target->get_preconditions()->check(unit, ignore_units);
+	} else {
+		return target->get_conditions() == nullptr || target->get_conditions()->check(unit, ignore_units);
+	}
+}
+
 }
 
 /// Register CCL features for dependencies
@@ -69,39 +130,3 @@ extern void DependenciesCclRegister();
 
 /// Print all unit conditions into string
 extern std::string PrintConditions(const CPlayer &player, const wyrmgus::button &button);
-
-/// Check conditions for player
-extern bool CheckConditions(const wyrmgus::unit_type *target, const CPlayer *player, bool ignore_units = false, bool is_precondition = false, bool is_neutral_use = false);
-extern bool CheckConditions(const CUpgrade *target, const CPlayer *player, bool ignore_units = false, bool is_precondition = false, bool is_neutral_use = false);
-
-template <typename T>
-extern bool CheckConditions(const T *target, const CPlayer *player, bool ignore_units = false, bool is_precondition = false, bool is_neutral_use = false)
-{
-	if (!is_precondition && !CheckConditions(target, player, ignore_units, true, is_neutral_use)) {
-		return false;
-	}
-	
-	if (is_precondition) {
-		return target->get_preconditions() == nullptr || target->get_preconditions()->check(player, ignore_units);
-	} else {
-		return target->get_conditions() == nullptr || target->get_conditions()->check(player, ignore_units);
-	}
-}
-
-/// Check conditions for unit
-extern bool CheckConditions(const wyrmgus::unit_type *target, const CUnit *unit, bool ignore_units = false, bool is_precondition = false);
-extern bool CheckConditions(const CUpgrade *target, const CUnit *unit, bool ignore_units = false, bool is_precondition = false);
-
-template <typename T>
-extern bool CheckConditions(const T *target, const CUnit *unit, bool ignore_units = false, bool is_precondition = false)
-{
-	if (!is_precondition && !CheckConditions(target, unit, ignore_units, true)) {
-		return false;
-	}
-	
-	if (is_precondition) {
-		return target->get_preconditions() == nullptr || target->get_preconditions()->Check(unit, ignore_units);
-	} else {
-		return target->get_conditions() == nullptr || target->get_conditions()->Check(unit, ignore_units);
-	}
-}

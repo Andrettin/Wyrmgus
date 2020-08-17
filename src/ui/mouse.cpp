@@ -325,7 +325,7 @@ static bool DoRightButton_Harvest_Unit(CUnit &unit, CUnit &dest, int flush, int 
 			//Wyrmgus end
 				for (wyrmgus::unit_type *unit_type : wyrmgus::unit_type::get_all()) {
 					if (unit_type && unit_type->GivesResource == res && unit_type->BoolFlag[CANHARVEST_INDEX].value && CanBuildUnitType(&unit, *unit_type, dest.tilePos, 1, false, dest.MapLayer->ID)) {
-						if (CheckConditions(unit_type, unit.Player)) {
+						if (check_conditions(unit_type, unit.Player)) {
 							if (wyrmgus::vector::contains(AiHelpers.get_builders(unit_type), unit.Type) || wyrmgus::vector::contains(AiHelpers.get_builder_classes(unit_type->get_unit_class()), unit.Type->get_unit_class())) {
 								dest.Blink = 4;
 								SendCommandBuildBuilding(unit, dest.tilePos, *unit_type, flush, dest.MapLayer->ID);
@@ -335,7 +335,7 @@ static bool DoRightButton_Harvest_Unit(CUnit &unit, CUnit &dest, int flush, int 
 								}
 								break;
 							}
-						} else if (CheckConditions(unit_type, unit.Player, false, true)) { //passes predependency check, even though didn't pass dependency check before, so give a message about the requirements
+						} else if (check_conditions<true>(unit_type, unit.Player, false)) { //passes predependency check, even though didn't pass dependency check before, so give a message about the requirements
 							CPlayer::GetThisPlayer()->Notify(NotifyYellow, dest.tilePos, dest.MapLayer->ID, "%s", _("The requirements have not been fulfilled"));
 							break;
 						}
@@ -354,10 +354,10 @@ static bool DoRightButton_Harvest_Unit(CUnit &unit, CUnit &dest, int flush, int 
 					//Wyrmgus start
 					for (wyrmgus::unit_type *unit_type : wyrmgus::unit_type::get_all()) {
 						if (unit_type && unit_type->GivesResource == res && unit_type->BoolFlag[CANHARVEST_INDEX].value && CanBuildUnitType(&unit, *unit_type, dest.tilePos, 1, false, dest.MapLayer->ID)) {
-							if (CheckConditions(unit_type, unit.Player)) {
+							if (check_conditions(unit_type, unit.Player)) {
 								SendCommandBuildBuilding(unit, dest.tilePos, *unit_type, 0, dest.MapLayer->ID);
 								break;
-							} else if (CheckConditions(unit_type, unit.Player, false, true)) { //passes predependency check, even though didn't pass dependency check before, so give a message about the requirements
+							} else if (check_conditions<true>(unit_type, unit.Player, false)) { //passes predependency check, even though didn't pass dependency check before, so give a message about the requirements
 								CPlayer::GetThisPlayer()->Notify(NotifyYellow, dest.tilePos, dest.MapLayer->ID, "%s", _("The requirements have not been fulfilled"));
 								break;
 							}
@@ -489,7 +489,7 @@ static bool DoRightButton_Worker(CUnit &unit, CUnit *dest, const Vec2i &pos, int
 	//if the clicked unit is a settlement site, build on it
 	if (UnitUnderCursor != nullptr && dest != nullptr && dest != &unit && dest->Type == settlement_site_unit_type && (dest->Player->Index == PlayerNumNeutral || dest->Player->Index == unit.Player->Index)) {
 		wyrmgus::unit_type *town_hall_type = unit.Player->get_class_unit_type(wyrmgus::defines::get()->get_town_hall_class());
-		if (town_hall_type != nullptr && CheckConditions(town_hall_type, unit.Player) && CanBuildUnitType(&unit, *town_hall_type, dest->tilePos, 1, false, dest->MapLayer->ID)) {
+		if (town_hall_type != nullptr && check_conditions(town_hall_type, unit.Player) && CanBuildUnitType(&unit, *town_hall_type, dest->tilePos, 1, false, dest->MapLayer->ID)) {
 			if (wyrmgus::vector::contains(AiHelpers.get_builders(town_hall_type), unit.Type) || wyrmgus::vector::contains(AiHelpers.get_builder_classes(town_hall_type->get_unit_class()), unit.Type->get_unit_class())) {
 				dest->Blink = 4;
 				SendCommandBuildBuilding(unit, dest->tilePos, *town_hall_type, flush, dest->MapLayer->ID);

@@ -252,6 +252,56 @@ void season_condition::ProcessConfigDataProperty(const std::pair<std::string, st
 	}
 }
 
+bool check_special_conditions(const unit_type *target, const CPlayer *player)
+{
+	if (UnitIdAllowed(*player, target->Slot) == 0) {
+		return false;
+	}
+
+	return true;
+}
+
+template <bool precondition>
+bool check_special_conditions(const CUpgrade *target, const CPlayer *player, const bool is_neutral_use)
+{
+	if (UpgradeIdAllowed(*player, target->ID) != 'A' && !((precondition || is_neutral_use) && UpgradeIdAllowed(*player, target->ID) == 'R')) {
+		return false;
+	}
+
+	const faction *player_faction = player->get_faction();
+	if (player_faction != nullptr && player_faction->Type == FactionTypeHolyOrder) { // if the player is a holy order, and the upgrade is incompatible with its deity, don't allow it
+		if (player_faction->HolyOrderDeity) {
+			CUpgrade *deity_upgrade = player_faction->HolyOrderDeity->DeityUpgrade;
+			if (deity_upgrade) {
+				for (const auto &modifier : target->get_modifiers()) {
+					if (vector::contains(modifier->RemoveUpgrades, deity_upgrade)) {
+						return false;
+					}
+				}
+				for (const auto &modifier : deity_upgrade->get_modifiers()) {
+					if (vector::contains(modifier->RemoveUpgrades, target)) {
+						return false;
+					}
+				}
+			}
+		}
+	}
+
+	return true;
+}
+
+template bool check_special_conditions<false>(const CUpgrade *target, const CPlayer *player, const bool is_neutral_use);
+template bool check_special_conditions<true>(const CUpgrade *target, const CPlayer *player, const bool is_neutral_use);
+
+bool check_special_conditions(const CUpgrade *target, const CUnit *unit)
+{
+	if (UpgradeIdAllowed(*unit->Player, target->ID) == 'F') {
+		return false;
+	}
+
+	return true;
+}
+
 }
 
 /**
@@ -291,92 +341,6 @@ std::string PrintConditions(const CPlayer &player, const wyrmgus::button &button
 	rules.insert(0, _("Requirements:\n"));
 	
 	return rules;
-}
-
-bool CheckConditions(const wyrmgus::unit_type *target, const CPlayer *player, bool ignore_units, bool is_precondition, bool is_neutral_use)
-{
-	if (!is_precondition && !CheckConditions(target, player, ignore_units, true, is_neutral_use)) {
-		return false;
-	}
-	
-	if (UnitIdAllowed(*player, target->Slot) == 0) {
-		return false;
-	}
-	
-	if (is_precondition) {
-		return target->get_preconditions() == nullptr || target->get_preconditions()->check(player, ignore_units);
-	} else {
-		return target->get_conditions() == nullptr || target->get_conditions()->check(player, ignore_units);
-	}
-}
-
-bool CheckConditions(const CUpgrade *target, const CPlayer *player, bool ignore_units, bool is_precondition, bool is_neutral_use)
-{
-	if (!is_precondition && !CheckConditions(target, player, ignore_units, true, is_neutral_use)) {
-		return false;
-	}
-	
-	if (UpgradeIdAllowed(*player, target->ID) != 'A' && !((is_precondition || is_neutral_use) && UpgradeIdAllowed(*player, target->ID) == 'R')) {
-		return false;
-	}
-
-	if (player->Faction != -1 && wyrmgus::faction::get_all()[player->Faction]->Type == FactionTypeHolyOrder) { // if the player is a holy order, and the upgrade is incompatible with its deity, don't allow it
-		if (wyrmgus::faction::get_all()[player->Faction]->HolyOrderDeity) {
-			CUpgrade *deity_upgrade = wyrmgus::faction::get_all()[player->Faction]->HolyOrderDeity->DeityUpgrade;
-			if (deity_upgrade) {
-				for (const auto &modifier : target->get_modifiers()) {
-					if (wyrmgus::vector::contains(modifier->RemoveUpgrades, deity_upgrade)) {
-						return false;
-					}
-				}
-				for (const auto &modifier : deity_upgrade->get_modifiers()) {
-					if (wyrmgus::vector::contains(modifier->RemoveUpgrades, target)) {
-						return false;
-					}
-				}
-			}
-		}
-	}
-	
-	if (is_precondition) {
-		return !target->get_preconditions() || target->get_preconditions()->check(player, ignore_units);
-	} else {
-		return !target->get_conditions() || target->get_conditions()->check(player, ignore_units);
-	}
-}
-
-bool CheckConditions(const wyrmgus::unit_type *target, const CUnit *unit, bool ignore_units, bool is_precondition)
-{
-	if (!is_precondition && !CheckConditions(target, unit, ignore_units, true)) {
-		return false;
-	}
-	
-	if (UnitIdAllowed(*unit->Player, target->Slot) == 0) {
-		return false;
-	}
-	
-	if (is_precondition) {
-		return target->get_preconditions() == nullptr || target->get_preconditions()->check(unit, ignore_units);
-	} else {
-		return target->get_conditions() == nullptr || target->get_conditions()->check(unit, ignore_units);
-	}
-}
-
-bool CheckConditions(const CUpgrade *target, const CUnit *unit, bool ignore_units, bool is_precondition)
-{
-	if (!is_precondition && !CheckConditions(target, unit, ignore_units, true)) {
-		return false;
-	}
-	
-	if (UpgradeIdAllowed(*unit->Player, target->ID) == 'F') {
-		return false;
-	}
-
-	if (is_precondition) {
-		return target->get_preconditions() == nullptr || target->get_preconditions()->check(unit, ignore_units);
-	} else {
-		return target->get_conditions() == nullptr || target->get_conditions()->check(unit, ignore_units);
-	}
 }
 
 /*----------------------------------------------------------------------------
@@ -563,10 +527,10 @@ static int CclCheckDependency(lua_State *l)
 	
 	if (!strncmp(object, "unit-", 5)) {
 		const wyrmgus::unit_type *unit_type = wyrmgus::unit_type::get(object);
-		lua_pushboolean(l, CheckConditions(unit_type, player));
+		lua_pushboolean(l, check_conditions(unit_type, player));
 	} else if (!strncmp(object, "upgrade", 7)) {
 		const CUpgrade *upgrade = CUpgrade::get(object);
-		lua_pushboolean(l, CheckConditions(upgrade, player));
+		lua_pushboolean(l, check_conditions(upgrade, player));
 	} else {
 		LuaError(l, "Invalid target of condition check: \"%s\"" _C_ object);
 	}

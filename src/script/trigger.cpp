@@ -614,7 +614,7 @@ void TriggersEachCycle()
 			bool triggered = false;
 			
 			if (current_trigger->Type == wyrmgus::trigger::TriggerType::GlobalTrigger) {
-				if (CheckConditions(current_trigger, CPlayer::Players[PlayerNumNeutral])) {
+				if (check_conditions(current_trigger, CPlayer::Players[PlayerNumNeutral])) {
 					triggered = true;
 					current_trigger->effects->do_effects(CPlayer::Players[PlayerNumNeutral]);
 				}
@@ -624,7 +624,7 @@ void TriggersEachCycle()
 					if (player->Type == PlayerNobody) {
 						continue;
 					}
-					if (!CheckConditions(current_trigger, player)) {
+					if (!check_conditions(current_trigger, player)) {
 						continue;
 					}
 					triggered = true;

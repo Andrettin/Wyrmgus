@@ -1340,7 +1340,7 @@ void CPlayer::SetRandomFaction()
 		if (!faction->Playable) {
 			continue;
 		}
-		if (!this->CanFoundFaction(faction)) {
+		if (!this->can_found_faction(faction)) {
 			continue;
 		}
 
@@ -1418,7 +1418,7 @@ void CPlayer::check_age()
 	//pick an age which fits the player, giving priority to the first ones (ages are already sorted by priority)
 	
 	for (wyrmgus::age *potential_age : wyrmgus::age::get_all()) {
-		if (!CheckConditions(potential_age, this)) {
+		if (!check_conditions(potential_age, this)) {
 			continue;
 		}
 		
@@ -1500,7 +1500,7 @@ void CPlayer::ShareUpgradeProgress(CPlayer &player, CUnit &unit)
 			continue;
 		}
 		
-		if (player.Allow.Upgrades[upgrade->ID] != 'A' || !CheckConditions(upgrade, &player)) {
+		if (player.Allow.Upgrades[upgrade->ID] != 'A' || !check_conditions(upgrade, &player)) {
 			continue;
 		}
 	
@@ -1780,12 +1780,8 @@ bool CPlayer::HasUpgradeResearcher(const CUpgrade *upgrade) const
 	return false;
 }
 
-/**
-**  Check if the player can found a particular faction.
-**
-**  @param faction    New faction.
-*/
-bool CPlayer::CanFoundFaction(const wyrmgus::faction *faction, const bool pre) const
+template <bool precondition>
+bool CPlayer::can_found_faction(const wyrmgus::faction *faction) const
 {
 	if (CurrentQuest != nullptr) {
 		return false;
@@ -1793,7 +1789,7 @@ bool CPlayer::CanFoundFaction(const wyrmgus::faction *faction, const bool pre) c
 	
 	if (!faction->FactionUpgrade.empty()) {
 		CUpgrade *faction_upgrade = CUpgrade::get(faction->FactionUpgrade);
-		if (!CheckConditions(faction_upgrade, this, false, pre)) {
+		if (!check_conditions<precondition>(faction_upgrade, this, false)) {
 			return false;
 		}
 	}
@@ -1805,7 +1801,7 @@ bool CPlayer::CanFoundFaction(const wyrmgus::faction *faction, const bool pre) c
 		}
 	}
 	
-	if (!pre) {
+	if constexpr (!precondition) {
 		//check if the required core settlements are owned by the player
 		if (wyrmgus::game::get()->get_current_campaign() != nullptr) { //only check for settlements in the Scenario mode
 			for (const wyrmgus::site *core_settlement : faction->get_core_settlements()) {
@@ -1828,7 +1824,11 @@ bool CPlayer::CanFoundFaction(const wyrmgus::faction *faction, const bool pre) c
 	return true;
 }
 
-bool CPlayer::can_choose_dynasty(const wyrmgus::dynasty *dynasty, const bool pre) const
+template bool CPlayer::can_found_faction<false>(const wyrmgus::faction *faction) const;
+template bool CPlayer::can_found_faction<true>(const wyrmgus::faction *faction) const;
+
+template <bool precondition>
+bool CPlayer::can_choose_dynasty(const wyrmgus::dynasty *dynasty) const
 {
 	if (CurrentQuest != nullptr) {
 		return false;
@@ -1838,12 +1838,16 @@ bool CPlayer::can_choose_dynasty(const wyrmgus::dynasty *dynasty, const bool pre
 		return false;
 	}
 
-	if (!CheckConditions(dynasty->get_upgrade(), this, false, pre)) {
+	if (!check_conditions<precondition>(dynasty->get_upgrade(), this, false)) {
 		return false;
 	}
 
-	return CheckConditions(dynasty, this, false, pre);
+	return check_conditions<precondition>(dynasty, this, false);
 }
+
+template bool CPlayer::can_choose_dynasty<false>(const wyrmgus::dynasty *dynasty) const;
+template bool CPlayer::can_choose_dynasty<true>(const wyrmgus::dynasty *dynasty) const;
+
 
 bool CPlayer::is_character_available_for_recruitment(const wyrmgus::character *character, bool ignore_neutral) const
 {
@@ -1859,8 +1863,8 @@ bool CPlayer::is_character_available_for_recruitment(const wyrmgus::character *c
 		return false;
 	}
 	
-	//the preconditions for the character's unit type must be fulfilled
-	if (!CheckConditions(character->get_unit_type(), this, true)) {
+	//the conditions for the character's unit type must be fulfilled
+	if (!check_conditions(character->get_unit_type(), this, true)) {
 		return false;
 	}
 	
@@ -2565,7 +2569,7 @@ bool CPlayer::can_accept_quest(const wyrmgus::quest *quest) const
 					continue;
 				}
 
-				if (!this->HasUnitBuilder(unit_type, objective->get_settlement()) || !CheckConditions(unit_type, this)) {
+				if (!this->HasUnitBuilder(unit_type, objective->get_settlement()) || !check_conditions(unit_type, this)) {
 					continue;
 				}
 
@@ -2615,7 +2619,7 @@ bool CPlayer::can_accept_quest(const wyrmgus::quest *quest) const
 				}
 			}
 				
-			if (!has_researcher || this->Allow.Upgrades[upgrade->ID] != 'A' || !CheckConditions(upgrade, this)) {
+			if (!has_researcher || this->Allow.Upgrades[upgrade->ID] != 'A' || !check_conditions(upgrade, this)) {
 				return false;
 			}
 		} else if (objective->get_objective_type() == wyrmgus::objective_type::recruit_hero) {
@@ -2737,7 +2741,7 @@ std::string CPlayer::check_quest_failure(const wyrmgus::quest *quest) const
 						continue;
 					}
 
-					if (!this->HasUnitBuilder(unit_type, quest_objective->get_settlement()) || !CheckConditions(unit_type, this)) {
+					if (!this->HasUnitBuilder(unit_type, quest_objective->get_settlement()) || !check_conditions(unit_type, this)) {
 						validation_error = "You can no longer produce the required unit.";
 						continue;
 					}
@@ -2791,7 +2795,7 @@ std::string CPlayer::check_quest_failure(const wyrmgus::quest *quest) const
 					}
 				}
 				
-				if (!has_researcher || this->Allow.Upgrades[upgrade->ID] != 'A' || !CheckConditions(upgrade, this)) {
+				if (!has_researcher || this->Allow.Upgrades[upgrade->ID] != 'A' || !check_conditions(upgrade, this)) {
 					return "You can no longer research the required upgrade.";
 				}
 			}

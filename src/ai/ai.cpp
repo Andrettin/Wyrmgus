@@ -369,7 +369,7 @@ static void AiCheckUnits()
 					if (
 						unit_stock > 0
 						&& !mercenary_type->BoolFlag[ITEM_INDEX].value
-						&& CheckConditions(mercenary_type, CPlayer::Players[i])
+						&& check_conditions(mercenary_type, CPlayer::Players[i])
 						&& AiPlayer->Player->CheckLimits(*mercenary_type) >= 1
 						&& !AiPlayer->Player->CheckUnitType(*mercenary_type, true)
 					) {
@@ -405,7 +405,7 @@ static void AiCheckUnits()
 		for (size_t i = 0; i < wyrmgus::faction::get_all()[AiPlayer->Player->Faction]->DevelopsTo.size(); ++i) {
 			wyrmgus::faction *possible_faction = wyrmgus::faction::get_all()[AiPlayer->Player->Faction]->DevelopsTo[i];
 			
-			if (!AiPlayer->Player->CanFoundFaction(possible_faction)) {
+			if (!AiPlayer->Player->can_found_faction(possible_faction)) {
 				continue;
 			}
 				

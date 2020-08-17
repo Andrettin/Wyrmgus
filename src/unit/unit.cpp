@@ -727,7 +727,7 @@ void CUnit::IncreaseLevel(int level_quantity, bool automatic_learning)
 				unsigned int best_gathering_rate = 0;
 				for (size_t i = 0; i != AiHelpers.ExperienceUpgrades[Type->Slot].size(); ++i) {
 					wyrmgus::unit_type *experience_upgrade_type = AiHelpers.ExperienceUpgrades[Type->Slot][i];
-					if (CheckConditions(experience_upgrade_type, this, true)) {
+					if (check_conditions(experience_upgrade_type, this, true)) {
 						if (this->Character == nullptr || std::find(this->Character->ForbiddenUpgrades.begin(), this->Character->ForbiddenUpgrades.end(), experience_upgrade_type) == this->Character->ForbiddenUpgrades.end()) {
 							if (!experience_upgrade_type->ResInfo[this->CurrentResource]) {
 								continue;
@@ -745,7 +745,7 @@ void CUnit::IncreaseLevel(int level_quantity, bool automatic_learning)
 				}
 			} else if (this->Player->AiEnabled || (this->Character == nullptr && AiHelpers.ExperienceUpgrades[Type->Slot].size() == 1)) {
 				for (size_t i = 0; i != AiHelpers.ExperienceUpgrades[Type->Slot].size(); ++i) {
-					if (CheckConditions(AiHelpers.ExperienceUpgrades[Type->Slot][i], this, true)) {
+					if (check_conditions(AiHelpers.ExperienceUpgrades[Type->Slot][i], this, true)) {
 						if (this->Character == nullptr || std::find(this->Character->ForbiddenUpgrades.begin(), this->Character->ForbiddenUpgrades.end(), AiHelpers.ExperienceUpgrades[Type->Slot][i]) == this->Character->ForbiddenUpgrades.end()) {
 							potential_upgrades.push_back(AiHelpers.ExperienceUpgrades[Type->Slot][i]);
 						}
@@ -769,7 +769,7 @@ void CUnit::IncreaseLevel(int level_quantity, bool automatic_learning)
 			if (((int) AiHelpers.LearnableAbilities.size()) > Type->Slot) {
 				std::vector<CUpgrade *> potential_abilities;
 				for (size_t i = 0; i != AiHelpers.LearnableAbilities[Type->Slot].size(); ++i) {
-					if (CanLearnAbility(AiHelpers.LearnableAbilities[Type->Slot][i])) {
+					if (can_learn_ability(AiHelpers.LearnableAbilities[Type->Slot][i])) {
 						potential_abilities.push_back(AiHelpers.LearnableAbilities[Type->Slot][i]);
 					}
 				}
@@ -977,7 +977,7 @@ void CUnit::set_character(wyrmgus::character *character)
 	}
 
 	for (const CUpgrade *ability_upgrade : this->Type->StartingAbilities) {
-		if (CheckConditions(ability_upgrade, this)) {
+		if (check_conditions(ability_upgrade, this)) {
 			IndividualUpgradeAcquire(*this, ability_upgrade);
 		}
 	}
@@ -998,7 +998,7 @@ void CUnit::set_character(wyrmgus::character *character)
 	//load learned abilities
 	std::vector<const CUpgrade *> abilities_to_remove;
 	for (size_t i = 0; i < this->Character->get_abilities().size(); ++i) {
-		if (CanLearnAbility(this->Character->get_abilities()[i])) {
+		if (can_learn_ability(this->Character->get_abilities()[i])) {
 			AbilityAcquire(*this, this->Character->get_abilities()[i], false);
 		} else { //can't learn the ability? something changed in the game's code, remove it from persistent data and allow the hero to repick the ability
 			abilities_to_remove.push_back(this->Character->get_abilities()[i]);
@@ -2099,19 +2099,19 @@ void CUnit::GenerateDrop()
 	wyrmgus::unit_type *chosen_drop = nullptr;
 	std::vector<wyrmgus::unit_type *> potential_drops;
 	for (size_t i = 0; i < this->Type->Drops.size(); ++i) {
-		if (CheckConditions(this->Type->Drops[i], this)) {
+		if (check_conditions(this->Type->Drops[i], this)) {
 			potential_drops.push_back(this->Type->Drops[i]);
 		}
 	}
 	if (this->Player->AiEnabled) {
 		for (size_t i = 0; i < this->Type->AiDrops.size(); ++i) {
-			if (CheckConditions(this->Type->AiDrops[i], this)) {
+			if (check_conditions(this->Type->AiDrops[i], this)) {
 				potential_drops.push_back(this->Type->AiDrops[i]);
 			}
 		}
 		for (std::map<std::string, std::vector<wyrmgus::unit_type *>>::const_iterator iterator = this->Type->ModAiDrops.begin(); iterator != this->Type->ModAiDrops.end(); ++iterator) {
 			for (size_t i = 0; i < iterator->second.size(); ++i) {
-				if (CheckConditions(iterator->second[i], this)) {
+				if (check_conditions(iterator->second[i], this)) {
 					potential_drops.push_back(iterator->second[i]);
 				}
 			}
@@ -2243,11 +2243,11 @@ void CUnit::GeneratePrefix(CUnit *dropper, CPlayer *dropper_player)
 			}
 
 			if (dropper != nullptr) {
-				if (!CheckConditions(upgrade, dropper)) {
+				if (!check_conditions(upgrade, dropper)) {
 					continue;
 				}
 			} else {
-				if (!CheckConditions(upgrade, dropper_player)) {
+				if (!check_conditions(upgrade, dropper_player)) {
 					continue;
 				}
 			}
@@ -2280,11 +2280,11 @@ void CUnit::GenerateSuffix(CUnit *dropper, CPlayer *dropper_player)
 			}
 
 			if (dropper != nullptr) {
-				if (!CheckConditions(upgrade, dropper)) {
+				if (!check_conditions(upgrade, dropper)) {
 					continue;
 				}
 			} else {
-				if (!CheckConditions(upgrade, dropper_player)) {
+				if (!check_conditions(upgrade, dropper_player)) {
 					continue;
 				}
 			}
@@ -2335,11 +2335,11 @@ void CUnit::GenerateWork(CUnit *dropper, CPlayer *dropper_player)
 			}
 
 			if (dropper != nullptr) {
-				if (!CheckConditions(upgrade, dropper)) {
+				if (!check_conditions(upgrade, dropper)) {
 					continue;
 				}
 			} else {
-				if (!CheckConditions(upgrade, dropper_player)) {
+				if (!check_conditions(upgrade, dropper_player)) {
 					continue;
 				}
 			}
@@ -2370,11 +2370,11 @@ void CUnit::GenerateUnique(CUnit *dropper, CPlayer *dropper_player)
 				}
 
 				if (dropper != nullptr) {
-					if (!CheckConditions(unique->Prefix, dropper)) {
+					if (!check_conditions(unique->Prefix, dropper)) {
 						continue;
 					}
 				} else {
-					if (!CheckConditions(unique->Prefix, dropper_player)) {
+					if (!check_conditions(unique->Prefix, dropper_player)) {
 						continue;
 					}
 				}
@@ -2389,11 +2389,11 @@ void CUnit::GenerateUnique(CUnit *dropper, CPlayer *dropper_player)
 				}
 
 				if (dropper != nullptr) {
-					if (!CheckConditions(unique->Suffix, dropper)) {
+					if (!check_conditions(unique->Suffix, dropper)) {
 						continue;
 					}
 				} else {
-					if (!CheckConditions(unique->Suffix, dropper_player)) {
+					if (!check_conditions(unique->Suffix, dropper_player)) {
 						continue;
 					}
 				}
@@ -2407,11 +2407,11 @@ void CUnit::GenerateUnique(CUnit *dropper, CPlayer *dropper_player)
 			}
 
 			if (dropper != nullptr) {
-				if (!CheckConditions(unique->Set, dropper)) {
+				if (!check_conditions(unique->Set, dropper)) {
 					continue;
 				}
 			} else {
-				if (!CheckConditions(unique->Set, dropper_player)) {
+				if (!check_conditions(unique->Set, dropper_player)) {
 					continue;
 				}
 			}
@@ -2436,11 +2436,11 @@ void CUnit::GenerateUnique(CUnit *dropper, CPlayer *dropper_player)
 				}
 
 				if (dropper != nullptr) {
-					if (!CheckConditions(unique->Work, dropper)) {
+					if (!check_conditions(unique->Work, dropper)) {
 						continue;
 					}
 				} else {
-					if (!CheckConditions(unique->Work, dropper_player)) {
+					if (!check_conditions(unique->Work, dropper_player)) {
 						continue;
 					}
 				}
@@ -2455,11 +2455,11 @@ void CUnit::GenerateUnique(CUnit *dropper, CPlayer *dropper_player)
 				}
 
 				if (dropper != nullptr) {
-					if (!CheckConditions(unique->Elixir, dropper)) {
+					if (!check_conditions(unique->Elixir, dropper)) {
 						continue;
 					}
 				} else {
-					if (!CheckConditions(unique->Elixir, dropper_player)) {
+					if (!check_conditions(unique->Elixir, dropper_player)) {
 						continue;
 					}
 				}
@@ -2546,7 +2546,7 @@ void CUnit::UpdateSoldUnits()
 			for (std::map<std::string, wyrmgus::character *>::iterator iterator = CustomHeroes.begin(); iterator != CustomHeroes.end(); ++iterator) {
 				if (
 					(iterator->second->get_civilization() && iterator->second->get_civilization() == civilization || iterator->second->get_unit_type() == civilization->get_class_unit_type(iterator->second->get_unit_type()->get_unit_class()))
-					&& CheckConditions(iterator->second->get_unit_type(), this, true) && iterator->second->CanAppear()
+					&& check_conditions(iterator->second->get_unit_type(), this, true) && iterator->second->CanAppear()
 				) {
 					potential_heroes.push_back(iterator->second);
 				}
@@ -2554,7 +2554,7 @@ void CUnit::UpdateSoldUnits()
 		}
 	} else {
 		for (size_t i = 0; i < this->Type->SoldUnits.size(); ++i) {
-			if (CheckConditions(this->Type->SoldUnits[i], this)) {
+			if (check_conditions(this->Type->SoldUnits[i], this)) {
 				potential_items.push_back(this->Type->SoldUnits[i]);
 			}
 		}
@@ -3063,7 +3063,7 @@ CUnit *MakeUnit(const wyrmgus::unit_type &type, CPlayer *player)
 	}
 	
 	for (size_t i = 0; i < unit->Type->StartingAbilities.size(); ++i) {
-		if (CheckConditions(unit->Type->StartingAbilities[i], unit)) {
+		if (check_conditions(unit->Type->StartingAbilities[i], unit)) {
 			IndividualUpgradeAcquire(*unit, unit->Type->StartingAbilities[i]);
 		}
 	}
@@ -6360,7 +6360,8 @@ bool CUnit::HasInventory() const
 	return false;
 }
 
-bool CUnit::CanLearnAbility(const CUpgrade *ability, bool pre) const
+template <bool precondition>
+bool CUnit::can_learn_ability(const CUpgrade *ability) const
 {
 	if (!strncmp(ability->Ident.c_str(), "upgrade-deity-", 14)) { //if is a deity choice "ability", only allow for custom heroes (but display the icon for already-acquired deities for all heroes)
 		if (!this->Character) {
@@ -6369,25 +6370,33 @@ bool CUnit::CanLearnAbility(const CUpgrade *ability, bool pre) const
 		if (!this->Character->Custom && this->GetIndividualUpgrade(ability) == 0) {
 			return false;
 		}
-		if (!pre && this->UpgradeRemovesExistingUpgrade(ability)) {
+
+		if constexpr (!precondition) {
+			if (this->UpgradeRemovesExistingUpgrade(ability)) {
+				return false;
+			}
+		}
+	}
+	
+	if constexpr (!precondition) {
+		if (this->GetIndividualUpgrade(ability) >= ability->MaxLimit) { // already learned
+			return false;
+		}
+
+		if (this->Variable[LEVELUP_INDEX].Value < 1 && ability->is_ability()) {
 			return false;
 		}
 	}
 	
-	if (!pre && this->GetIndividualUpgrade(ability) >= ability->MaxLimit) { // already learned
-		return false;
-	}
-	
-	if (!pre && this->Variable[LEVELUP_INDEX].Value < 1 && ability->is_ability()) {
-		return false;
-	}
-	
-	if (!CheckConditions(ability, this, false, pre)) {
+	if (!check_conditions<precondition>(ability, this, false)) {
 		return false;
 	}
 	
 	return true;
 }
+
+template bool CUnit::can_learn_ability<false>(const CUpgrade *ability) const;
+template bool CUnit::can_learn_ability<true>(const CUpgrade *ability) const;
 
 bool CUnit::CanHireMercenary(wyrmgus::unit_type *type, int civilization_id) const
 {
@@ -6395,7 +6404,7 @@ bool CUnit::CanHireMercenary(wyrmgus::unit_type *type, int civilization_id) cons
 		civilization_id = type->get_civilization() ? type->get_civilization()->ID : -1;
 	}
 	for (int p = 0; p < PlayerMax; ++p) {
-		if (CPlayer::Players[p]->Type != PlayerNobody && CPlayer::Players[p]->Type != PlayerNeutral && civilization_id == CPlayer::Players[p]->Race && CheckConditions(type, CPlayer::Players[p], true) && CPlayer::Players[p]->StartMapLayer == this->MapLayer->ID) {
+		if (CPlayer::Players[p]->Type != PlayerNobody && CPlayer::Players[p]->Type != PlayerNeutral && civilization_id == CPlayer::Players[p]->Race && check_conditions(type, CPlayer::Players[p], true) && CPlayer::Players[p]->StartMapLayer == this->MapLayer->ID) {
 			return true;
 		}
 	}

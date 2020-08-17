@@ -1609,9 +1609,9 @@ static void ApplyUpgradeModifier(CPlayer &player, const wyrmgus::upgrade_modifie
 				
 				//add or remove starting abilities from the unit if the upgrade enabled/disabled them
 				for (const CUpgrade *ability_upgrade : unit.Type->StartingAbilities) {
-					if (!unit.GetIndividualUpgrade(ability_upgrade) && CheckConditions(ability_upgrade, &unit)) {
+					if (!unit.GetIndividualUpgrade(ability_upgrade) && check_conditions(ability_upgrade, &unit)) {
 						IndividualUpgradeAcquire(unit, ability_upgrade);
-					} else if (unit.GetIndividualUpgrade(ability_upgrade) && !CheckConditions(ability_upgrade, &unit)) {
+					} else if (unit.GetIndividualUpgrade(ability_upgrade) && !check_conditions(ability_upgrade, &unit)) {
 						IndividualUpgradeLost(unit, ability_upgrade);
 					}
 				}
@@ -1901,9 +1901,9 @@ static void RemoveUpgradeModifier(CPlayer &player, const wyrmgus::upgrade_modifi
 				
 				//add or remove starting abilities from the unit if the upgrade enabled/disabled them
 				for (const CUpgrade *ability_upgrade : unit.Type->StartingAbilities) {
-					if (!unit.GetIndividualUpgrade(ability_upgrade) && CheckConditions(ability_upgrade, &unit)) {
+					if (!unit.GetIndividualUpgrade(ability_upgrade) && check_conditions(ability_upgrade, &unit)) {
 						IndividualUpgradeAcquire(unit, ability_upgrade);
-					} else if (unit.GetIndividualUpgrade(ability_upgrade) && !CheckConditions(ability_upgrade, &unit)) {
+					} else if (unit.GetIndividualUpgrade(ability_upgrade) && !check_conditions(ability_upgrade, &unit)) {
 						IndividualUpgradeLost(unit, ability_upgrade);
 					}
 				}

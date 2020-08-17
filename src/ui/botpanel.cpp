@@ -1370,24 +1370,24 @@ bool IsButtonAllowed(const CUnit &unit, const wyrmgus::button &buttonaction)
 				break;
 			}
 
-			res = CheckConditions(unit_type, unit.Player, false, true, !CPlayer::GetThisPlayer()->IsTeamed(unit));
+			res = check_conditions<true>(unit_type, unit.Player, false, !CPlayer::GetThisPlayer()->IsTeamed(unit));
 			break;
 		case ButtonCmd::Research:
 		case ButtonCmd::ResearchClass:
-			res = CheckConditions(upgrade, unit.Player, false, true, !CPlayer::GetThisPlayer()->IsTeamed(unit));
+			res = check_conditions<true>(upgrade, unit.Player, false, !CPlayer::GetThisPlayer()->IsTeamed(unit));
 			if (res) {
-				res = (UpgradeIdAllowed(*CPlayer::GetThisPlayer(), upgrade->ID) == 'A' || UpgradeIdAllowed(*CPlayer::GetThisPlayer(), upgrade->ID) == 'R') && CheckConditions(upgrade, CPlayer::GetThisPlayer(), false, true); //also check for the conditions for this player (rather than the unit) as an extra for researches, so that the player doesn't research too advanced technologies at neutral buildings
+				res = (UpgradeIdAllowed(*CPlayer::GetThisPlayer(), upgrade->ID) == 'A' || UpgradeIdAllowed(*CPlayer::GetThisPlayer(), upgrade->ID) == 'R') && check_conditions<true>(upgrade, CPlayer::GetThisPlayer(), false); //also check for the conditions for this player (rather than the unit) as an extra for researches, so that the player doesn't research too advanced technologies at neutral buildings
 				res = res && (!unit.Player->UpgradeTimers.Upgrades[upgrade->ID] || unit.Player->UpgradeTimers.Upgrades[upgrade->ID] == upgrade->Costs[TimeCost]); //don't show if is being researched elsewhere
 			}
 			break;
 		case ButtonCmd::ExperienceUpgradeTo:
-			res = CheckConditions(unit_type, &unit, true, true);
+			res = check_conditions<true>(unit_type, &unit, true);
 			if (res && unit.Character != nullptr) {
 				res = !wyrmgus::vector::contains(unit.Character->ForbiddenUpgrades, unit_type);
 			}
 			break;
 		case ButtonCmd::LearnAbility:
-			res = unit.CanLearnAbility(upgrade, true);
+			res = unit.can_learn_ability<true>(upgrade);
 			break;
 		case ButtonCmd::SpellCast:
 			res = wyrmgus::spell::get_all()[buttonaction.Value]->IsAvailableForUnit(unit);
@@ -1417,10 +1417,10 @@ bool IsButtonAllowed(const CUnit &unit, const wyrmgus::button &buttonaction)
 			res = unit.CurrentAction() == UnitAction::Built;
 			break;
 		case ButtonCmd::Faction:
-			res = CPlayer::GetThisPlayer()->Faction != -1 && buttonaction.Value != -1 && buttonaction.Value < (int) wyrmgus::faction::get_all()[CPlayer::GetThisPlayer()->Faction]->DevelopsTo.size() && CPlayer::GetThisPlayer()->CanFoundFaction(wyrmgus::faction::get_all()[CPlayer::GetThisPlayer()->Faction]->DevelopsTo[buttonaction.Value], true);
+			res = CPlayer::GetThisPlayer()->get_faction() != nullptr && buttonaction.Value != -1 && buttonaction.Value < (int) CPlayer::GetThisPlayer()->get_faction()->DevelopsTo.size() && CPlayer::GetThisPlayer()->can_found_faction<true>(CPlayer::GetThisPlayer()->get_faction()->DevelopsTo[buttonaction.Value]);
 			break;
 		case ButtonCmd::Dynasty:
-			res = CPlayer::GetThisPlayer()->get_faction() != nullptr && buttonaction.Value != -1 && buttonaction.Value < static_cast<int>(CPlayer::GetThisPlayer()->get_faction()->get_dynasties().size()) && CPlayer::GetThisPlayer()->can_choose_dynasty(CPlayer::GetThisPlayer()->get_faction()->get_dynasties()[buttonaction.Value], true) && CPlayer::GetThisPlayer()->get_faction()->get_dynasties()[buttonaction.Value]->get_icon() != nullptr;
+			res = CPlayer::GetThisPlayer()->get_faction() != nullptr && buttonaction.Value != -1 && buttonaction.Value < static_cast<int>(CPlayer::GetThisPlayer()->get_faction()->get_dynasties().size()) && CPlayer::GetThisPlayer()->can_choose_dynasty<true>(CPlayer::GetThisPlayer()->get_faction()->get_dynasties()[buttonaction.Value]) && CPlayer::GetThisPlayer()->get_faction()->get_dynasties()[buttonaction.Value]->get_icon() != nullptr;
 			if (res) {
 				upgrade = CPlayer::GetThisPlayer()->get_faction()->get_dynasties()[buttonaction.Value]->get_upgrade();
 				res = (!unit.Player->UpgradeTimers.Upgrades[upgrade->ID] || unit.Player->UpgradeTimers.Upgrades[upgrade->ID] == upgrade->Costs[TimeCost]);
@@ -1527,26 +1527,26 @@ bool IsButtonUsable(const CUnit &unit, const wyrmgus::button &buttonaction)
 		case ButtonCmd::UpgradeTo:
 		case ButtonCmd::Build:
 		case ButtonCmd::BuildClass:
-			res = CheckConditions(unit_type, unit.Player, false, false, !CPlayer::GetThisPlayer()->IsTeamed(unit));
+			res = check_conditions<false>(unit_type, unit.Player, false, !CPlayer::GetThisPlayer()->IsTeamed(unit));
 			break;
 		case ButtonCmd::Research:
 		case ButtonCmd::ResearchClass:
-			res = CheckConditions(upgrade, unit.Player, false, false, !CPlayer::GetThisPlayer()->IsTeamed(unit));
+			res = check_conditions<false>(upgrade, unit.Player, false, !CPlayer::GetThisPlayer()->IsTeamed(unit));
 			if (res) {
-				res = UpgradeIdAllowed(*CPlayer::GetThisPlayer(), upgrade->ID) == 'A' && CheckConditions(upgrade, CPlayer::GetThisPlayer(), false, false); //also check for the conditions of this player extra for researches, so that the player doesn't research too advanced technologies at neutral buildings
+				res = UpgradeIdAllowed(*CPlayer::GetThisPlayer(), upgrade->ID) == 'A' && check_conditions<false>(upgrade, CPlayer::GetThisPlayer(), false); //also check for the conditions of this player extra for researches, so that the player doesn't research too advanced technologies at neutral buildings
 			}
 			break;
 		case ButtonCmd::ExperienceUpgradeTo:
-			res = CheckConditions(unit_type, &unit, true, false) && unit.Variable[LEVELUP_INDEX].Value >= 1;
+			res = check_conditions<false>(unit_type, &unit, true) && unit.Variable[LEVELUP_INDEX].Value >= 1;
 			break;
 		case ButtonCmd::LearnAbility:
-			res = unit.CanLearnAbility(upgrade);
+			res = unit.can_learn_ability(upgrade);
 			break;
 		case ButtonCmd::SpellCast:
 			res = wyrmgus::spell::get_all()[buttonaction.Value]->IsAvailableForUnit(unit);
 			break;
 		case ButtonCmd::Faction:
-			res = CPlayer::GetThisPlayer()->CanFoundFaction(wyrmgus::faction::get_all()[CPlayer::GetThisPlayer()->Faction]->DevelopsTo[buttonaction.Value]);
+			res = CPlayer::GetThisPlayer()->can_found_faction(CPlayer::GetThisPlayer()->get_faction()->DevelopsTo[buttonaction.Value]);
 			break;
 		case ButtonCmd::Dynasty:
 			res = CPlayer::GetThisPlayer()->can_choose_dynasty(CPlayer::GetThisPlayer()->get_faction()->get_dynasties()[buttonaction.Value]);

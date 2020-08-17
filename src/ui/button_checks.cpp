@@ -397,7 +397,7 @@ bool ButtonCheckUpgradeTo(const CUnit &unit, const wyrmgus::button &button)
 	if (unit.CurrentAction() != UnitAction::Still) {
 		return false;
 	}
-	return CheckConditions(wyrmgus::unit_type::get_all()[button.Value], unit.Player, false, true);
+	return check_conditions<true>(wyrmgus::unit_type::get_all()[button.Value], unit.Player, false);
 }
 
 /**
@@ -434,7 +434,7 @@ bool ButtonCheckResearch(const CUnit &unit, const wyrmgus::button &button)
 	const CUpgrade *upgrade = button.get_value_upgrade(&unit);
 
 	// check if allowed
-	if (!CheckConditions(upgrade, unit.Player, false, true)) {
+	if (!check_conditions<true>(upgrade, unit.Player, false)) {
 		return false;
 	}
 

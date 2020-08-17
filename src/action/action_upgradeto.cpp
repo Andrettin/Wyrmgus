@@ -163,7 +163,7 @@ int TransformUnitIntoType(CUnit &unit, const wyrmgus::unit_type &newtype)
 		if (upgrade->is_ability()) {
 			if (unit.GetIndividualUpgrade(upgrade) && std::find(oldtype.StartingAbilities.begin(), oldtype.StartingAbilities.end(), upgrade) != oldtype.StartingAbilities.end() && std::find(newtype.StartingAbilities.begin(), newtype.StartingAbilities.end(), upgrade) == newtype.StartingAbilities.end()) {
 				IndividualUpgradeLost(unit, upgrade);
-			} else if (!unit.GetIndividualUpgrade(upgrade) && std::find(newtype.StartingAbilities.begin(), newtype.StartingAbilities.end(), upgrade) != newtype.StartingAbilities.end() && CheckConditions(upgrade, &unit)) {
+			} else if (!unit.GetIndividualUpgrade(upgrade) && std::find(newtype.StartingAbilities.begin(), newtype.StartingAbilities.end(), upgrade) != newtype.StartingAbilities.end() && check_conditions(upgrade, &unit)) {
 				IndividualUpgradeAcquire(unit, upgrade);
 			}
 		}

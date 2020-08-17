@@ -370,7 +370,7 @@ int AiFindAvailableUnitTypeEquiv(const wyrmgus::unit_type &unittype, int *usable
 	int usableTypesCount = AiFindUnitTypeEquiv(unittype, usableTypes);
 	// 2 - Remove unavailable unittypes
 	for (int i = 0; i < usableTypesCount;) {
-		if (!CheckConditions(wyrmgus::unit_type::get_all()[usableTypes[i]], AiPlayer->Player)) {
+		if (!check_conditions(wyrmgus::unit_type::get_all()[usableTypes[i]], AiPlayer->Player)) {
 			// Not available, remove it
 			usableTypes[i] = usableTypes[usableTypesCount - 1];
 			--usableTypesCount;
