@@ -31,9 +31,34 @@
 
 #include "unit/unit_class.h"
 
+#include "script/condition/and_condition.h"
 #include "util/vector_util.h"
 
 namespace wyrmgus {
+
+unit_class::unit_class(const std::string &identifier) : named_data_entry(identifier)
+{
+}
+
+unit_class::~unit_class()
+{
+}
+
+void unit_class::process_sml_scope(const sml_data &scope)
+{
+	const std::string &tag = scope.get_tag();
+	const std::vector<std::string> &values = scope.get_values();
+
+	if (tag == "preconditions") {
+		this->preconditions = std::make_unique<and_condition>();
+		database::process_sml_data(this->preconditions, scope);
+	} else if (tag == "conditions") {
+		this->conditions = std::make_unique<and_condition>();
+		database::process_sml_data(this->conditions, scope);
+	} else {
+		data_entry::process_sml_scope(scope);
+	}
+}
 
 void unit_class::set_town_hall(const bool town_hall)
 {

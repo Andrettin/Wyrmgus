@@ -32,6 +32,7 @@
 
 namespace wyrmgus {
 
+class condition;
 class unit_type;
 
 class unit_class final : public named_data_entry, public data_type<unit_class>
@@ -60,9 +61,10 @@ private:
 	static inline std::vector<unit_class *> town_hall_classes;
 
 public:
-	explicit unit_class(const std::string &identifier) : named_data_entry(identifier)
-	{
-	}
+	explicit unit_class(const std::string &identifier);
+	~unit_class();
+
+	virtual void process_sml_scope(const sml_data &scope) override;
 
 	int get_index() const
 	{
@@ -75,6 +77,16 @@ public:
 	}
 
 	void set_town_hall(const bool town_hall);
+
+	const std::unique_ptr<condition> &get_preconditions() const
+	{
+		return this->preconditions;
+	}
+
+	const std::unique_ptr<condition> &get_conditions() const
+	{
+		return this->conditions;
+	}
 
 	const std::vector<unit_type *> &get_unit_types() const
 	{
@@ -93,6 +105,8 @@ public:
 private:
 	int index = -1;
 	bool town_hall = false; //whether the building class is a settlement head building class, e.g. a town hall or fortress
+	std::unique_ptr<condition> preconditions;
+	std::unique_ptr<condition> conditions;
 	std::vector<unit_type *> unit_types;
 };
 

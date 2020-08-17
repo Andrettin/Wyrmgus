@@ -62,10 +62,11 @@ public:
 	virtual std::string get_string(const std::string &prefix = "") const = 0;
 };
 
-extern bool check_special_conditions(const unit_type *target, const CPlayer *player);
+template <bool precondition>
+extern bool check_special_conditions(const unit_type *target, const CPlayer *player, const bool ignore_units, const bool is_neutral_use);
 
 template <bool precondition>
-extern bool check_special_conditions(const CUpgrade *target, const CPlayer *player, const bool is_neutral_use);
+extern bool check_special_conditions(const CUpgrade *target, const CPlayer *player, const bool ignore_units, const bool is_neutral_use);
 
 //check conditions for player
 template <bool precondition = false, typename T>
@@ -78,11 +79,11 @@ extern bool check_conditions(const T *target, const CPlayer *player, const bool 
 	}
 
 	if constexpr (std::is_same_v<T, unit_type>) {
-		if (!check_special_conditions(target, player)) {
+		if (!check_special_conditions<precondition>(target, player, ignore_units, is_neutral_use)) {
 			return false;
 		}
 	} else if constexpr (std::is_same_v<T, CUpgrade>) {
-		if (!check_special_conditions<precondition>(target, player, is_neutral_use)) {
+		if (!check_special_conditions<precondition>(target, player, ignore_units, is_neutral_use)) {
 			return false;
 		}
 	}
@@ -94,7 +95,11 @@ extern bool check_conditions(const T *target, const CPlayer *player, const bool 
 	}
 }
 
-extern bool check_special_conditions(const CUpgrade *target, const CUnit *unit);
+template <bool precondition>
+extern bool check_special_conditions(const unit_type *target, const CUnit *unit, const bool ignore_units);
+
+template <bool precondition>
+extern bool check_special_conditions(const CUpgrade *target, const CUnit *unit, const bool ignore_units);
 
 //check conditions for unit
 template <bool precondition = false, typename T>
@@ -107,11 +112,11 @@ extern bool check_conditions(const T *target, const CUnit *unit, const bool igno
 	}
 
 	if constexpr (std::is_same_v<T, unit_type>) {
-		if (!check_special_conditions(target, unit->Player)) {
+		if (!check_special_conditions<precondition>(target, unit, ignore_units)) {
 			return false;
 		}
 	} else if constexpr (std::is_same_v<T, CUpgrade>) {
-		if (!check_special_conditions(target, unit)) {
+		if (!check_special_conditions<precondition>(target, unit, ignore_units)) {
 			return false;
 		}
 	}

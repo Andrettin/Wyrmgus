@@ -52,6 +52,7 @@
 #include "translate.h"
 #include "ui/button.h"
 #include "ui/interface.h"
+#include "upgrade/upgrade_class.h"
 #include "upgrade/upgrade_modifier.h"
 #include "util/string_util.h"
 #include "util/vector_util.h"
@@ -252,17 +253,25 @@ void season_condition::ProcessConfigDataProperty(const std::pair<std::string, st
 	}
 }
 
-bool check_special_conditions(const unit_type *target, const CPlayer *player)
+template <bool precondition>
+bool check_special_conditions(const unit_type *target, const CPlayer *player, const bool ignore_units, const bool is_neutral_use)
 {
 	if (UnitIdAllowed(*player, target->Slot) == 0) {
 		return false;
 	}
 
+	if (target->get_unit_class() != nullptr) {
+		return check_conditions<precondition>(target->get_unit_class(), player, ignore_units, is_neutral_use);
+	}
+
 	return true;
 }
 
+template bool check_special_conditions<false>(const unit_type *target, const CPlayer *player, const bool ignore_units, const bool is_neutral_use);
+template bool check_special_conditions<true>(const unit_type *target, const CPlayer *player, const bool ignore_units, const bool is_neutral_use);
+
 template <bool precondition>
-bool check_special_conditions(const CUpgrade *target, const CPlayer *player, const bool is_neutral_use)
+bool check_special_conditions(const CUpgrade *target, const CPlayer *player, const bool ignore_units, const bool is_neutral_use)
 {
 	if (UpgradeIdAllowed(*player, target->ID) != 'A' && !((precondition || is_neutral_use) && UpgradeIdAllowed(*player, target->ID) == 'R')) {
 		return false;
@@ -287,20 +296,49 @@ bool check_special_conditions(const CUpgrade *target, const CPlayer *player, con
 		}
 	}
 
+	if (target->get_upgrade_class() != nullptr) {
+		return check_conditions<precondition>(target->get_upgrade_class(), player, ignore_units, is_neutral_use);
+	}
+
 	return true;
 }
 
-template bool check_special_conditions<false>(const CUpgrade *target, const CPlayer *player, const bool is_neutral_use);
-template bool check_special_conditions<true>(const CUpgrade *target, const CPlayer *player, const bool is_neutral_use);
+template bool check_special_conditions<false>(const CUpgrade *target, const CPlayer *player, const bool ignore_units, const bool is_neutral_use);
+template bool check_special_conditions<true>(const CUpgrade *target, const CPlayer *player, const bool ignore_units, const bool is_neutral_use);
 
-bool check_special_conditions(const CUpgrade *target, const CUnit *unit)
+template <bool precondition>
+bool check_special_conditions(const unit_type *target, const CUnit *unit, const bool ignore_units)
+{
+	if (UnitIdAllowed(*unit->Player, target->Slot) == 0) {
+		return false;
+	}
+
+	if (target->get_unit_class() != nullptr) {
+		return check_conditions<precondition>(target->get_unit_class(), unit, ignore_units);
+	}
+
+	return true;
+}
+
+template bool check_special_conditions<false>(const unit_type *target, const CUnit *unit, const bool ignore_units);
+template bool check_special_conditions<true>(const unit_type *target, const CUnit *unit, const bool ignore_units);
+
+template <bool precondition>
+bool check_special_conditions(const CUpgrade *target, const CUnit *unit, const bool ignore_units)
 {
 	if (UpgradeIdAllowed(*unit->Player, target->ID) == 'F') {
 		return false;
 	}
 
+	if (target->get_upgrade_class() != nullptr) {
+		return check_conditions<precondition>(target->get_upgrade_class(), unit, ignore_units);
+	}
+
 	return true;
 }
+
+template bool check_special_conditions<false>(const CUpgrade *target, const CUnit *unit, const bool ignore_units);
+template bool check_special_conditions<true>(const CUpgrade *target, const CUnit *unit, const bool ignore_units);
 
 }
 

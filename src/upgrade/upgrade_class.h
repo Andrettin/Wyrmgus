@@ -34,6 +34,8 @@ class CUpgrade;
 
 namespace wyrmgus {
 
+class condition;
+
 class upgrade_class final : public named_data_entry, public data_type<upgrade_class>
 {
 	Q_OBJECT
@@ -49,13 +51,24 @@ public:
 		return upgrade_class;
 	}
 
-	upgrade_class(const std::string &identifier) : named_data_entry(identifier)
-	{
-	}
+	explicit upgrade_class(const std::string &identifier);
+	~upgrade_class();
+
+	virtual void process_sml_scope(const sml_data &scope) override;
 
 	int get_index() const
 	{
 		return this->index;
+	}
+
+	const std::unique_ptr<condition> &get_preconditions() const
+	{
+		return this->preconditions;
+	}
+
+	const std::unique_ptr<condition> &get_conditions() const
+	{
+		return this->conditions;
 	}
 
 	const std::vector<CUpgrade *> &get_upgrades() const
@@ -74,6 +87,8 @@ public:
 
 private:
 	int index = -1;
+	std::unique_ptr<condition> preconditions;
+	std::unique_ptr<condition> conditions;
 	std::vector<CUpgrade *> upgrades;
 };
 
