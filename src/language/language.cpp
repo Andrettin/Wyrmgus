@@ -29,8 +29,10 @@
 
 #include "language/language.h"
 
+#include "language/grammatical_gender.h"
 #include "language/word.h"
 #include "language/word_type.h"
+#include "util/string_util.h"
 
 namespace wyrmgus {
 
@@ -49,7 +51,7 @@ word *language::GetWord(const std::string &word, const word_type word_type, cons
 	return nullptr;
 }
 
-std::string language::GetArticle(int gender, int grammatical_case, int article_type, int grammatical_number)
+const std::string &language::GetArticle(const grammatical_gender gender, int grammatical_case, int article_type, int grammatical_number)
 {
 	for (const word *word : this->LanguageWords) {
 		if (word->get_type() != word_type::article || word->ArticleType != article_type) {
@@ -60,7 +62,7 @@ std::string language::GetArticle(int gender, int grammatical_case, int article_t
 			continue;
 		}
 
-		if (gender == -1 || word->Gender == -1 || gender == word->Gender) {
+		if (gender == grammatical_gender::none || word->get_gender() == grammatical_gender::none || gender == word->get_gender()) {
 			if (grammatical_case == GrammaticalCaseNominative && !word->Nominative.empty()) {
 				return word->Nominative;
 			} else if (grammatical_case == GrammaticalCaseAccusative && !word->Accusative.empty()) {
@@ -72,7 +74,7 @@ std::string language::GetArticle(int gender, int grammatical_case, int article_t
 			}
 		}
 	}
-	return "";
+	return string::empty_str;
 }
 
 std::string language::GetNounEnding(int grammatical_number, int grammatical_case, int word_junction_type)
@@ -90,22 +92,18 @@ std::string language::GetNounEnding(int grammatical_number, int grammatical_case
 	return "";
 }
 
-std::string language::GetAdjectiveEnding(int article_type, int grammatical_case, int grammatical_number, int grammatical_gender)
+std::string language::GetAdjectiveEnding(int article_type, int grammatical_case, int grammatical_number, const grammatical_gender grammatical_gender)
 {
 	if (grammatical_number == -1) {
 		grammatical_number = GrammaticalNumberNoNumber;
 	}
 
-	if (grammatical_gender == -1) {
-		grammatical_gender = GrammaticalGenderNoGender;
-	}
-
-	if (!this->AdjectiveEndings[article_type][grammatical_case][grammatical_number][grammatical_gender].empty()) {
-		return this->AdjectiveEndings[article_type][grammatical_case][grammatical_number][grammatical_gender];
-	} else if (!this->AdjectiveEndings[article_type][grammatical_case][grammatical_number][GrammaticalGenderNoGender].empty()) {
-		return this->AdjectiveEndings[article_type][grammatical_case][grammatical_number][GrammaticalGenderNoGender];
-	} else if (!this->AdjectiveEndings[article_type][grammatical_case][GrammaticalNumberNoNumber][GrammaticalGenderNoGender].empty()) {
-		return this->AdjectiveEndings[article_type][grammatical_case][GrammaticalNumberNoNumber][GrammaticalGenderNoGender];
+	if (!this->AdjectiveEndings[article_type][grammatical_case][grammatical_number][static_cast<int>(grammatical_gender)].empty()) {
+		return this->AdjectiveEndings[article_type][grammatical_case][grammatical_number][static_cast<int>(grammatical_gender)];
+	} else if (!this->AdjectiveEndings[article_type][grammatical_case][grammatical_number][static_cast<int>(grammatical_gender::none)].empty()) {
+		return this->AdjectiveEndings[article_type][grammatical_case][grammatical_number][static_cast<int>(grammatical_gender::none)];
+	} else if (!this->AdjectiveEndings[article_type][grammatical_case][GrammaticalNumberNoNumber][static_cast<int>(grammatical_gender::none)].empty()) {
+		return this->AdjectiveEndings[article_type][grammatical_case][GrammaticalNumberNoNumber][static_cast<int>(grammatical_gender::none)];
 	}
 
 	return "";
@@ -227,36 +225,6 @@ int GetGrammaticalPersonIdByName(const std::string &grammatical_person)
 		return GrammaticalPersonSecondPerson;
 	} else if (grammatical_person == "third-person") {
 		return GrammaticalPersonThirdPerson;
-	}
-
-	return -1;
-}
-
-std::string GetGrammaticalGenderNameById(int grammatical_gender)
-{
-	if (grammatical_gender == GrammaticalGenderNoGender) {
-		return "no-gender";
-	} else if (grammatical_gender == GrammaticalGenderMasculine) {
-		return "masculine";
-	} else if (grammatical_gender == GrammaticalGenderFeminine) {
-		return "feminine";
-	} else if (grammatical_gender == GrammaticalGenderNeuter) {
-		return "neuter";
-	}
-
-	return "";
-}
-
-int GetGrammaticalGenderIdByName(const std::string &grammatical_gender)
-{
-	if (grammatical_gender == "no-gender") {
-		return GrammaticalGenderNoGender;
-	} else if (grammatical_gender == "masculine") {
-		return GrammaticalGenderMasculine;
-	} else if (grammatical_gender == "feminine") {
-		return GrammaticalGenderFeminine;
-	} else if (grammatical_gender == "neuter") {
-		return GrammaticalGenderNeuter;
 	}
 
 	return -1;

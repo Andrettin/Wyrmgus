@@ -29,6 +29,7 @@
 
 #include "database/data_type.h"
 #include "database/named_data_entry.h"
+#include "language/grammatical_gender.h"
 
 enum ArticleTypes {
 	ArticleTypeNoArticle,
@@ -62,15 +63,6 @@ enum GrammaticalPersons {
 	GrammaticalPersonThirdPerson,
 
 	MaxGrammaticalPersons
-};
-
-enum GrammaticalGenders {
-	GrammaticalGenderNoGender,
-	GrammaticalGenderMasculine,
-	GrammaticalGenderFeminine,
-	GrammaticalGenderNeuter,
-
-	MaxGrammaticalGenders
 };
 
 enum GrammaticalTenses {
@@ -116,6 +108,7 @@ enum WordJunctionTypes {
 namespace wyrmgus {
 
 class word;
+enum class grammatical_gender;
 enum class word_type;
 
 class language final : public named_data_entry, public data_type<language>
@@ -131,14 +124,14 @@ public:
 	}
 
 	word *GetWord(const std::string &word, const word_type word_type, const std::vector<std::string> &word_meanings) const;
-	std::string GetArticle(int gender, int grammatical_case, int article_type, int grammatical_number);
+	const std::string &GetArticle(const grammatical_gender gender, int grammatical_case, int article_type, int grammatical_number);
 	std::string GetNounEnding(int grammatical_number, int grammatical_case, int word_junction_type = -1);
-	std::string GetAdjectiveEnding(int article_type, int grammatical_case, int grammatical_number, int grammatical_gender);
+	std::string GetAdjectiveEnding(int article_type, int grammatical_case, int grammatical_number, const grammatical_gender grammatical_gender);
 	void RemoveWord(word *word);
 
 	std::string Family;											/// Family of the language
 	std::string NounEndings[MaxGrammaticalNumbers][MaxGrammaticalCases][MaxWordJunctionTypes];
-	std::string AdjectiveEndings[MaxArticleTypes][MaxGrammaticalCases][MaxGrammaticalNumbers][MaxGrammaticalGenders];
+	std::string AdjectiveEndings[MaxArticleTypes][MaxGrammaticalCases][MaxGrammaticalNumbers][static_cast<int>(grammatical_gender::count)];
 	bool used_by_civilization_or_faction = false;
 	language *DialectOf = nullptr; /// Of which language this is a dialect of (if at all); dialects inherit the words from the parent language unless specified otherwise
 	std::vector<language *> Dialects;							/// Dialects of this language
@@ -156,8 +149,6 @@ extern std::string GetGrammaticalNumberNameById(int grammatical_number);
 extern int GetGrammaticalNumberIdByName(const std::string &grammatical_number);
 extern std::string GetGrammaticalPersonNameById(int grammatical_person);
 extern int GetGrammaticalPersonIdByName(const std::string &grammatical_person);
-extern std::string GetGrammaticalGenderNameById(int grammatical_gender);
-extern int GetGrammaticalGenderIdByName(const std::string &grammatical_gender);
 extern std::string GetGrammaticalTenseNameById(int grammatical_tense);
 extern int GetGrammaticalTenseIdByName(const std::string &grammatical_tense);
 extern std::string GetGrammaticalMoodNameById(int grammatical_mood);

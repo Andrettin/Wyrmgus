@@ -38,6 +38,7 @@ int CclDefineLanguageWord(lua_State *l);
 namespace wyrmgus {
 
 class language;
+enum class grammatical_gender;
 enum class word_type;
 
 class word final : public named_data_entry, public data_type<word>
@@ -46,6 +47,7 @@ class word final : public named_data_entry, public data_type<word>
 
 	Q_PROPERTY(wyrmgus::language* language MEMBER language READ get_language)
 	Q_PROPERTY(wyrmgus::word_type type MEMBER type READ get_type)
+	Q_PROPERTY(wyrmgus::grammatical_gender gender MEMBER gender READ get_gender)
 	Q_PROPERTY(wyrmgus::word* etymon MEMBER etymon READ get_etymon WRITE set_etymon)
 	Q_PROPERTY(QStringList meanings READ get_meanings_qstring_list)
 
@@ -72,6 +74,11 @@ public:
 	word_type get_type() const
 	{
 		return this->type;
+	}
+
+	grammatical_gender get_gender() const
+	{
+		return this->gender;
 	}
 
 	word *get_etymon() const
@@ -115,16 +122,15 @@ public:
 	}
 
 	std::string GetNounInflection(int grammatical_number, int grammatical_case, int word_junction_type = -1);
-	std::string GetVerbInflection(int grammatical_number, int grammatical_person, int grammatical_tense, int grammatical_mood);
-	std::string GetAdjectiveInflection(int comparison_degree, int article_type = -1, int grammatical_case = -1, int grammatical_number = -1, int grammatical_gender = -1);
-	std::string GetParticiple(int grammatical_tense);
-	void RemoveFromVector(std::vector<word *> &word_vector);
+	const std::string &GetVerbInflection(int grammatical_number, int grammatical_person, int grammatical_tense, int grammatical_mood);
+	std::string GetAdjectiveInflection(int comparison_degree, int article_type, int grammatical_case, int grammatical_number, const grammatical_gender grammatical_gender);
+	const std::string &GetParticiple(int grammatical_tense);
 
 private:
 	language *language = nullptr;
 	word_type type;
+	grammatical_gender gender; //what is the gender of the word, if it is a noun or article
 public:
-	int Gender = -1;					/// What is the gender of the noun or article (Masculine, Feminine or Neuter)
 	int GrammaticalNumber = -1;			/// Grammatical number (i.e. whether the word is necessarily plural or not)
 	bool Archaic = false;				/// Whether the word is archaic (whether it is used in current speech)
 private:

@@ -29,13 +29,15 @@
 
 #include "language/word.h"
 
+#include "language/grammatical_gender.h"
 #include "language/word_type.h"
 #include "util/container_util.h"
 #include "util/vector_util.h"
 
 namespace wyrmgus {
 
-word::word(const std::string &identifier) : named_data_entry(identifier), type(word_type::none)
+word::word(const std::string &identifier)
+	: named_data_entry(identifier), type(word_type::none), gender(grammatical_gender::none)
 {
 }
 
@@ -66,23 +68,25 @@ void word::remove_meaning(const std::string &meaning)
 
 std::string word::GetNounInflection(int grammatical_number, int grammatical_case, int word_junction_type)
 {
-	if (this->NumberCaseInflections.find(std::tuple<int, int>(grammatical_number, grammatical_case)) != this->NumberCaseInflections.end()) {
-		return this->NumberCaseInflections.find(std::tuple<int, int>(grammatical_number, grammatical_case))->second;
+	auto find_iterator = this->NumberCaseInflections.find(std::make_tuple(grammatical_number, grammatical_case));
+	if (find_iterator != this->NumberCaseInflections.end()) {
+		return find_iterator->second;
 	}
 
 	return this->get_name() + this->language->GetNounEnding(grammatical_number, grammatical_case, word_junction_type);
 }
 
-std::string word::GetVerbInflection(int grammatical_number, int grammatical_person, int grammatical_tense, int grammatical_mood)
+const std::string &word::GetVerbInflection(int grammatical_number, int grammatical_person, int grammatical_tense, int grammatical_mood)
 {
-	if (this->NumberPersonTenseMoodInflections.find(std::tuple<int, int, int, int>(grammatical_number, grammatical_person, grammatical_tense, grammatical_mood)) != this->NumberPersonTenseMoodInflections.end()) {
-		return this->NumberPersonTenseMoodInflections.find(std::tuple<int, int, int, int>(grammatical_number, grammatical_person, grammatical_tense, grammatical_mood))->second;
+	auto find_iterator = this->NumberPersonTenseMoodInflections.find(std::make_tuple(grammatical_number, grammatical_person, grammatical_tense, grammatical_mood));
+	if (find_iterator != this->NumberPersonTenseMoodInflections.end()) {
+		return find_iterator->second;
 	}
 
 	return this->get_name();
 }
 
-std::string word::GetAdjectiveInflection(int comparison_degree, int article_type, int grammatical_case, int grammatical_number, int grammatical_gender)
+std::string word::GetAdjectiveInflection(int comparison_degree, int article_type, int grammatical_case, int grammatical_number, const grammatical_gender grammatical_gender)
 {
 	std::string inflected_word;
 
@@ -105,26 +109,13 @@ std::string word::GetAdjectiveInflection(int comparison_degree, int article_type
 	return inflected_word;
 }
 
-std::string word::GetParticiple(int grammatical_tense)
+const std::string &word::GetParticiple(int grammatical_tense)
 {
 	if (!this->Participles[grammatical_tense].empty()) {
 		return this->Participles[grammatical_tense];
 	}
 
 	return this->get_name();
-}
-
-void word::RemoveFromVector(std::vector<word *> &word_vector)
-{
-	std::vector<word *> word_vector_copy = word_vector;
-
-	if (std::find(word_vector.begin(), word_vector.end(), this) != word_vector.end()) {
-		word_vector.erase(std::remove(word_vector.begin(), word_vector.end(), this), word_vector.end());
-	}
-
-	if (word_vector.size() == 0) { // if removing the word from the vector left it empty, undo the removal
-		word_vector = word_vector_copy;
-	}
 }
 
 }

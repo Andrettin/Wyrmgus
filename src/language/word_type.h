@@ -40,9 +40,7 @@ enum class word_type {
 	adposition,
 	article,
 	numeral,
-	affix,
-
-	count
+	affix
 };
 
 inline word_type string_to_word_type(const std::string &str)

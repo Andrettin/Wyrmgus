@@ -1156,9 +1156,9 @@ static int CclDefineLanguageWord(lua_State *l)
 			}
 		} else if (!strcmp(value, "Gender")) {
 			std::string grammatical_gender_name = LuaToString(l, -1);
-			int grammatical_gender = GetGrammaticalGenderIdByName(grammatical_gender_name);
-			if (grammatical_gender != -1) {
-				word->Gender = grammatical_gender;
+			const wyrmgus::grammatical_gender grammatical_gender = wyrmgus::string_to_grammatical_gender(grammatical_gender_name);
+			if (grammatical_gender != wyrmgus::grammatical_gender::none) {
+				word->gender = grammatical_gender;
 			} else {
 				LuaError(l, "Grammatical gender \"%s\" doesn't exist." _C_ grammatical_gender_name.c_str());
 			}
@@ -2169,13 +2169,10 @@ static int CclDefineLanguage(lua_State *l)
 				++k;
 				
 				std::string grammatical_gender_name = LuaToString(l, -1, k + 1);
-				int grammatical_gender = GetGrammaticalGenderIdByName(grammatical_gender_name);
-				if (grammatical_gender == -1) {
-					LuaError(l, "Grammatical gender \"%s\" doesn't exist." _C_ grammatical_gender_name.c_str());
-				}
+				const wyrmgus::grammatical_gender grammatical_gender = wyrmgus::string_to_grammatical_gender(grammatical_gender_name);
 				++k;
 				
-				language->AdjectiveEndings[article_type][grammatical_case][grammatical_number][grammatical_gender] = LuaToString(l, -1, k + 1);
+				language->AdjectiveEndings[article_type][grammatical_case][grammatical_number][static_cast<int>(grammatical_gender)] = LuaToString(l, -1, k + 1);
 			}
 		} else if (!strcmp(value, "NameTranslations")) {
 			if (!lua_istable(l, -1)) {

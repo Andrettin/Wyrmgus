@@ -50,6 +50,7 @@
 #include "government_type.h"
 #include "item_class.h"
 #include "item_slot.h"
+#include "language/grammatical_gender.h"
 #include "language/language.h"
 #include "language/word.h"
 #include "language/word_type.h"
@@ -228,6 +229,8 @@ QVariant database::process_sml_property_value(const sml_property &property, cons
 			new_property_value = QVariant::fromValue(string_to_gender(property.get_value()));
 		} else if (property_class_name == "wyrmgus::government_type") {
 			new_property_value = QVariant::fromValue(string_to_government_type(property.get_value()));
+		} else if (property_class_name == "wyrmgus::grammatical_gender") {
+			new_property_value = QVariant::fromValue(string_to_grammatical_gender(property.get_value()));
 		} else if (property_class_name == "wyrmgus::icon*") {
 			new_property_value = QVariant::fromValue(icon::get(property.get_value()));
 		} else if (property_class_name == "wyrmgus::item_class") {
