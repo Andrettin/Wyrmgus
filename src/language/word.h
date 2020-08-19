@@ -45,10 +45,10 @@ class word final : public named_data_entry, public data_type<word>
 {
 	Q_OBJECT
 
-	Q_PROPERTY(wyrmgus::language* language MEMBER language READ get_language)
+	Q_PROPERTY(wyrmgus::language* language READ get_language WRITE set_language)
 	Q_PROPERTY(wyrmgus::word_type type MEMBER type READ get_type)
 	Q_PROPERTY(wyrmgus::grammatical_gender gender MEMBER gender READ get_gender)
-	Q_PROPERTY(wyrmgus::word* etymon MEMBER etymon READ get_etymon WRITE set_etymon)
+	Q_PROPERTY(wyrmgus::word* etymon READ get_etymon WRITE set_etymon)
 	Q_PROPERTY(QStringList meanings READ get_meanings_qstring_list)
 
 public:
@@ -69,6 +69,16 @@ public:
 	language *get_language() const
 	{
 		return this->language;
+	}
+
+	void set_language(language *language)
+	{
+		if (language == this->get_language()) {
+			return;
+		}
+
+		this->language = language;
+		language->add_word(this);
 	}
 
 	word_type get_type() const

@@ -38,7 +38,7 @@ namespace wyrmgus {
 
 word *language::GetWord(const std::string &word, const word_type word_type, const std::vector<std::string> &word_meanings) const
 {
-	for (wyrmgus::word *language_word : this->LanguageWords) {
+	for (wyrmgus::word *language_word : this->words) {
 		if (
 			language_word->get_name() == word
 			&& (word_type == word_type::none || language_word->get_type() == word_type)
@@ -53,7 +53,7 @@ word *language::GetWord(const std::string &word, const word_type word_type, cons
 
 const std::string &language::GetArticle(const grammatical_gender gender, int grammatical_case, int article_type, int grammatical_number)
 {
-	for (const word *word : this->LanguageWords) {
+	for (const word *word : this->words) {
 		if (word->get_type() != word_type::article || word->ArticleType != article_type) {
 			continue;
 		}
@@ -107,13 +107,6 @@ std::string language::GetAdjectiveEnding(int article_type, int grammatical_case,
 	}
 
 	return "";
-}
-
-void language::RemoveWord(word *word)
-{
-	if (std::find(this->LanguageWords.begin(), this->LanguageWords.end(), word) != this->LanguageWords.end()) {
-		this->LanguageWords.erase(std::remove(this->LanguageWords.begin(), this->LanguageWords.end(), word), this->LanguageWords.end());
-	}
 }
 
 }

@@ -123,11 +123,15 @@ public:
 	{
 	}
 
+	void add_word(word *word)
+	{
+		this->words.push_back(word);
+	}
+
 	word *GetWord(const std::string &word, const word_type word_type, const std::vector<std::string> &word_meanings) const;
 	const std::string &GetArticle(const grammatical_gender gender, int grammatical_case, int article_type, int grammatical_number);
 	std::string GetNounEnding(int grammatical_number, int grammatical_case, int word_junction_type = -1);
 	std::string GetAdjectiveEnding(int article_type, int grammatical_case, int grammatical_number, const grammatical_gender grammatical_gender);
-	void RemoveWord(word *word);
 
 	std::string Family;											/// Family of the language
 	std::string NounEndings[MaxGrammaticalNumbers][MaxGrammaticalCases][MaxWordJunctionTypes];
@@ -135,7 +139,9 @@ public:
 	bool used_by_civilization_or_faction = false;
 	language *DialectOf = nullptr; /// Of which language this is a dialect of (if at all); dialects inherit the words from the parent language unless specified otherwise
 	std::vector<language *> Dialects;							/// Dialects of this language
-	std::vector<word *> LanguageWords;					/// Words of the language
+private:
+	std::vector<word *> words;
+public:
 	std::map<std::string, std::vector<std::string>> NameTranslations;	/// Name translations; possible translations mapped to the name to be translated
 };
 
