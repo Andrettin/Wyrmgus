@@ -37,7 +37,6 @@
 class CAiBuildingTemplate;
 class CCurrency;
 class CForceTemplate;
-class CLanguage;
 class CUpgrade;
 enum class ForceType;
 struct lua_State;
@@ -161,6 +160,7 @@ public:
 		return this->upgrade;
 	}
 
+	language *get_language() const;
 	calendar *get_calendar() const;
 	CCurrency *GetCurrency() const;
 
@@ -300,8 +300,8 @@ private:
 	CUpgrade *upgrade = nullptr;
 public:
 	unit_sound_set UnitSounds;			/// sounds for unit events
-	CLanguage *Language = nullptr;	/// the language used by the civilization
 private:
+	language *language = nullptr;	/// the language used by the civilization
 	calendar *calendar = nullptr;	/// the calendar used by the civilization
 public:
 	CCurrency *Currency = nullptr;	/// the currency used by the civilization

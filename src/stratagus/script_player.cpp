@@ -43,6 +43,8 @@
 #include "faction.h"
 #include "government_type.h"
 #include "grand_strategy.h"
+#include "language/language.h"
+#include "language/word.h"
 #include "luacallback.h"
 #include "map/map.h"
 #include "map/site.h"
@@ -737,13 +739,9 @@ static int CclDefineCivilization(lua_State *l)
 		} else if (!strcmp(value, "ParentCivilization")) {
 			civilization->parent_civilization = wyrmgus::civilization::get(LuaToString(l, -1));
 		} else if (!strcmp(value, "Language")) {
-			CLanguage *language = PlayerRaces.GetLanguage(LuaToString(l, -1));
-			if (language) {
-				civilization->Language = language;
-				language->used_by_civilization_or_faction = true;
-			} else {
-				LuaError(l, "Language not found.");
-			}
+			wyrmgus::language *language = wyrmgus::language::get(LuaToString(l, -1));
+			civilization->language = language;
+			language->used_by_civilization_or_faction = true;
 		} else if (!strcmp(value, "Calendar")) {
 			wyrmgus::calendar *calendar = wyrmgus::calendar::get(LuaToString(l, -1));
 			civilization->calendar = calendar;
@@ -1015,27 +1013,24 @@ static int CclDefineLanguageWord(lua_State *l)
 		LuaError(l, "incorrect argument (expected table)");
 	}
 
-	LanguageWord *word = new LanguageWord;
-	word->Word = LuaToString(l, 1);
+	const std::string word_name = LuaToString(l, 1);
+	wyrmgus::word *word = wyrmgus::word::add(word_name, nullptr);
+	word->set_name(word_name);
 	
-	LanguageWord *replaces = nullptr;
+	wyrmgus::word *replaces = nullptr;
 	
 	//  Parse the list:
 	for (lua_pushnil(l); lua_next(l, 2); lua_pop(l, 1)) {
 		const char *value = LuaToString(l, -2);
 		
 		if (!strcmp(value, "Language")) {
-			CLanguage *language = PlayerRaces.GetLanguage(LuaToString(l, -1));
+			wyrmgus::language *language = wyrmgus::language::get(LuaToString(l, -1));
 			
-			if (language) {
-				language->LanguageWords.push_back(word);
-				word->Language = language;
-				
-				for (size_t i = 0; i < language->Dialects.size(); ++i) { //copy the word over for dialects
-					language->Dialects[i]->LanguageWords.push_back(word);
-				}
-			} else {
-				LuaError(l, "Language not found.");
+			language->LanguageWords.push_back(word);
+			word->language = language;
+
+			for (size_t i = 0; i < language->Dialects.size(); ++i) { //copy the word over for dialects
+				language->Dialects[i]->LanguageWords.push_back(word);
 			}
 		} else if (!strcmp(value, "Meanings")) {
 			if (!lua_istable(l, -1)) {
@@ -1058,7 +1053,7 @@ static int CclDefineLanguageWord(lua_State *l)
 				LuaError(l, "incorrect argument");
 			}
 			int j = 0;
-			CLanguage *derives_from_language = PlayerRaces.GetLanguage(LuaToString(l, -1, j + 1));
+			wyrmgus::language *derives_from_language = wyrmgus::language::get(LuaToString(l, -1, j + 1));
 			++j;
 			int derives_from_word_type = GetWordTypeIdByName(LuaToString(l, -1, j + 1));
 			++j;
@@ -1082,17 +1077,17 @@ static int CclDefineLanguageWord(lua_State *l)
 				if (word->DerivesFrom != nullptr) {
 					word->DerivesFrom->DerivesTo.push_back(word);
 				} else {
-					LuaError(l, "Word \"%s\" is set to derive from \"%s\" (%s, %s), but the latter doesn't exist" _C_ word->Word.c_str() _C_ derives_from_word.c_str() _C_ derives_from_language->Ident.c_str() _C_ GetWordTypeNameById(derives_from_word_type).c_str());
+					LuaError(l, "Word \"%s\" is set to derive from \"%s\" (%s, %s), but the latter doesn't exist" _C_ word->get_identifier().c_str() _C_ derives_from_word.c_str() _C_ derives_from_language->get_identifier().c_str() _C_ GetWordTypeNameById(derives_from_word_type).c_str());
 				}
 			} else {
-				LuaError(l, "Word \"%s\"'s derives from is incorrectly set, as either the language or the word type set for the original word given is incorrect" _C_ word->Word.c_str());
+				LuaError(l, "Word \"%s\"'s derives from is incorrectly set, as either the language or the word type set for the original word given is incorrect" _C_ word->get_identifier().c_str());
 			}
 		} else if (!strcmp(value, "Replaces")) {
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument");
 			}
 			int j = 0;
-			CLanguage *replaces_language = PlayerRaces.GetLanguage(LuaToString(l, -1, j + 1));
+			wyrmgus::language *replaces_language = wyrmgus::language::get(LuaToString(l, -1, j + 1));
 			++j;
 			int replaces_word_type = GetWordTypeIdByName(LuaToString(l, -1, j + 1));
 			++j;
@@ -1114,10 +1109,10 @@ static int CclDefineLanguageWord(lua_State *l)
 				replaces = replaces_language->GetWord(replaces_word, replaces_word_type, word_meanings);
 				
 				if (replaces == nullptr) {
-					LuaError(l, "Word \"%s\" is set to replace \"%s\" (%s, %s), but the latter doesn't exist" _C_ word->Word.c_str() _C_ replaces_word.c_str() _C_ replaces_language->Ident.c_str() _C_ GetWordTypeNameById(replaces_word_type).c_str());
+					LuaError(l, "Word \"%s\" is set to replace \"%s\" (%s, %s), but the latter doesn't exist" _C_ word->get_identifier().c_str() _C_ replaces_word.c_str() _C_ replaces_language->get_identifier().c_str() _C_ GetWordTypeNameById(replaces_word_type).c_str());
 				}
 			} else {
-				LuaError(l, "Word \"%s\"'s replace is incorrectly set, as either the language or the word type set for the original word given is incorrect" _C_ word->Word.c_str());
+				LuaError(l, "Word \"%s\"'s replace is incorrectly set, as either the language or the word type set for the original word given is incorrect" _C_ word->get_identifier().c_str());
 			}
 		} else if (!strcmp(value, "CompoundElements")) {
 			if (!lua_istable(l, -1)) {
@@ -1132,7 +1127,7 @@ static int CclDefineLanguageWord(lua_State *l)
 				}
 				++j;
 				
-				CLanguage *affix_language = PlayerRaces.GetLanguage(LuaToString(l, -1, j + 1)); // should be the same language as that of the word, but needs to be specified since the word's language may not have been set yet
+				wyrmgus::language *affix_language = wyrmgus::language::get(LuaToString(l, -1, j + 1)); // should be the same language as that of the word, but needs to be specified since the word's language may not have been set yet
 				++j;
 				int affix_word_type = GetWordTypeIdByName(LuaToString(l, -1, j + 1));
 				++j;
@@ -1156,10 +1151,10 @@ static int CclDefineLanguageWord(lua_State *l)
 					if (word->CompoundElements[affix_type] != nullptr) {
 						word->CompoundElements[affix_type]->CompoundElementOf[affix_type].push_back(word);
 					} else {
-						LuaError(l, "Word \"%s\" is set to be a compound formed by \"%s\" (%s, %s), but the latter doesn't exist" _C_ word->Word.c_str() _C_ affix_word.c_str() _C_ affix_language->Ident.c_str() _C_ GetWordTypeNameById(affix_word_type).c_str());
+						LuaError(l, "Word \"%s\" is set to be a compound formed by \"%s\" (%s, %s), but the latter doesn't exist" _C_ word->get_identifier().c_str() _C_ affix_word.c_str() _C_ affix_language->get_identifier().c_str() _C_ GetWordTypeNameById(affix_word_type).c_str());
 					}
 				} else {
-					LuaError(l, "Word \"%s\"'s compound elements are incorrectly set, as either the language or the word type set for one of the element words given is incorrect" _C_ word->Word.c_str());
+					LuaError(l, "Word \"%s\"'s compound elements are incorrectly set, as either the language or the word type set for one of the element words given is incorrect" _C_ word->get_identifier().c_str());
 				}
 			}
 		} else if (!strcmp(value, "Gender")) {
@@ -1312,16 +1307,16 @@ static int CclDefineLanguageWord(lua_State *l)
 		}
 	}
 	
-	if (!word->Language) {
-		LuaError(l, "Word \"%s\" has not been assigned to any language" _C_ word->Word.c_str());
+	if (!word->language) {
+		LuaError(l, "Word \"%s\" has not been assigned to any language" _C_ word->get_identifier().c_str());
 	}
 	
 	if (word->Type == -1) {
-		LuaError(l, "Word \"%s\" has no type" _C_ word->Word.c_str());
+		LuaError(l, "Word \"%s\" has no type" _C_ word->get_identifier().c_str());
 	}
 	
 	if (replaces != nullptr) {
-		word->Language->RemoveWord(replaces);
+		word->language->RemoveWord(replaces);
 	}
 	
 	return 0;
@@ -1386,9 +1381,9 @@ static int CclGetCivilizationData(lua_State *l)
 		}
 		return 1;
 	} else if (!strcmp(data, "Language")) {
-		CLanguage *language = PlayerRaces.get_civilization_language(civilization_id);
+		wyrmgus::language *language = civilization->get_language();
 		if (language) {
-			lua_pushstring(l, language->Ident.c_str());
+			lua_pushstring(l, language->get_identifier().c_str());
 		} else {
 			lua_pushstring(l, "");
 		}
@@ -2111,32 +2106,21 @@ static int CclDefineLanguage(lua_State *l)
 		LuaError(l, "incorrect argument (expected table)");
 	}
 
-	std::string language_ident = LuaToString(l, 1);
-	CLanguage *language = PlayerRaces.GetLanguage(language_ident);
-	if (!language) {
-		language = new CLanguage;
-		PlayerRaces.Languages.push_back(language);
-		LanguageIdentToPointer[language_ident] = language;
-	}
-	
-	language->Ident = language_ident;
+	const std::string language_ident = LuaToString(l, 1);
+	wyrmgus::language *language = wyrmgus::language::get_or_add(language_ident, nullptr);
 	
 	//  Parse the list:
 	for (lua_pushnil(l); lua_next(l, 2); lua_pop(l, 1)) {
 		const char *value = LuaToString(l, -2);
 		
 		if (!strcmp(value, "Name")) {
-			language->Name = LuaToString(l, -1);
+			language->set_name(LuaToString(l, -1));
 		} else if (!strcmp(value, "Family")) {
 			language->Family = LuaToString(l, -1);
 		} else if (!strcmp(value, "DialectOf")) {
-			CLanguage *parent_language = PlayerRaces.GetLanguage(LuaToString(l, -1));
-			if (parent_language) {
-				language->DialectOf = parent_language;
-				parent_language->Dialects.push_back(language);
-			} else {
-				LuaError(l, "Language not found.");
-			}
+			wyrmgus::language *parent_language = wyrmgus::language::get(LuaToString(l, -1));
+			language->DialectOf = parent_language;
+			parent_language->Dialects.push_back(language);
 		} else if (!strcmp(value, "NounEndings")) {
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument");
@@ -2931,9 +2915,9 @@ static int CclGetLanguages(lua_State *l)
 	}
 	
 	std::vector<std::string> languages;
-	for (size_t i = 0; i != PlayerRaces.Languages.size(); ++i) {
-		if (!only_used || PlayerRaces.Languages[i]->used_by_civilization_or_faction) {
-			languages.push_back(PlayerRaces.Languages[i]->Ident);
+	for (const wyrmgus::language *language : wyrmgus::language::get_all()) {
+		if (!only_used || language->used_by_civilization_or_faction) {
+			languages.push_back(language->get_identifier());
 		}
 	}
 		
@@ -2957,14 +2941,11 @@ static int CclGetLanguageData(lua_State *l)
 		LuaError(l, "incorrect argument");
 	}
 	std::string language_name = LuaToString(l, 1);
-	const CLanguage *language = PlayerRaces.GetLanguage(language_name);
-	if (!language) {
-		LuaError(l, "Language \"%s\" doesn't exist." _C_ language_name.c_str());
-	}
+	const wyrmgus::language *language = wyrmgus::language::get(language_name);
 	const char *data = LuaToString(l, 2);
 
 	if (!strcmp(data, "Name")) {
-		lua_pushstring(l, language->Name.c_str());
+		lua_pushstring(l, language->get_name().c_str());
 		return 1;
 	} else if (!strcmp(data, "Family")) {
 		lua_pushstring(l, language->Family.c_str());
@@ -2973,7 +2954,7 @@ static int CclGetLanguageData(lua_State *l)
 		lua_createtable(l, language->LanguageWords.size(), 0);
 		for (size_t i = 1; i <= language->LanguageWords.size(); ++i)
 		{
-			lua_pushstring(l, language->LanguageWords[i-1]->Word.c_str());
+			lua_pushstring(l, language->LanguageWords[i-1]->get_identifier().c_str());
 			lua_rawseti(l, -2, i);
 		}
 		return 1;
@@ -2995,14 +2976,14 @@ static int CclGetLanguageWordData(lua_State *l)
 		LuaError(l, "incorrect argument");
 	}
 	std::string language_name = LuaToString(l, 1);
-	const CLanguage *language = PlayerRaces.GetLanguage(language_name);
+	const wyrmgus::language *language = wyrmgus::language::get(language_name);
 	if (!language) {
 		LuaError(l, "Language \"%s\" doesn't exist." _C_ language_name.c_str());
 	}
 	
 	std::string word_name = LuaToString(l, 2);
 	std::vector<std::string> word_meanings;
-	const LanguageWord *word = language->GetWord(word_name, -1, word_meanings);
+	const wyrmgus::word *word = language->GetWord(word_name, -1, word_meanings);
 	if (word == nullptr) {
 		LuaError(l, "Word \"%s\" doesn't exist for the \"%s\" language." _C_ word_name.c_str() _C_ language_name.c_str());
 	}

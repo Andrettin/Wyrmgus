@@ -196,6 +196,12 @@ set(guichan_SRCS
 )
 source_group(guichan FILES ${guichan_SRCS})
 
+set(language_SRCS
+	src/language/language.cpp
+	src/language/word.cpp
+)
+source_group(language FILES ${language_SRCS})
+
 set(map_SRCS
 	src/map/historical_location.cpp
 	src/map/map.cpp
@@ -515,6 +521,7 @@ set(stratagus_SRCS
 	${editor_SRCS}
 	${game_SRCS}
 	${guichan_SRCS}
+	${language_SRCS}
 	${map_SRCS}
 	${missile_SRCS}
 	${network_SRCS}
@@ -648,6 +655,11 @@ set(stratagus_database_HDRS
 	src/database/sml_parser.h
 	src/database/sml_property.h
 	src/database/sml_property_visitor.h
+)
+
+set(stratagus_language_HDRS
+	src/language/language.h
+	src/language/word.h
 )
 
 set(stratagus_map_HDRS
@@ -907,6 +919,7 @@ source_group(action FILES ${stratagus_action_HDRS})
 source_group(animation FILES ${stratagus_animation_HDRS})
 source_group(database FILES ${stratagus_database_HDRS})
 source_group(guichan FILES ${stratagus_guichan_HDRS})
+source_group(language FILES ${stratagus_language_HDRS})
 source_group(map FILES ${stratagus_map_HDRS})
 source_group(missile FILES ${stratagus_missile_HDRS})
 source_group(religion FILES ${stratagus_religion_HDRS})
@@ -930,6 +943,7 @@ set(stratagus_HDRS
 	${stratagus_animation_HDRS}
 	${stratagus_database_HDRS}
 	${stratagus_guichan_HDRS}
+	${stratagus_language_HDRS}
 	${stratagus_map_HDRS}
 	${stratagus_missile_HDRS}
 	${stratagus_religion_HDRS}

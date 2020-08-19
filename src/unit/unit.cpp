@@ -3455,7 +3455,7 @@ void CUnit::UpdatePersonalName(bool update_settlement_name)
 	const wyrmgus::civilization *civilization = this->get_civilization();
 	const wyrmgus::faction *faction = this->Player->get_faction();
 	
-	CLanguage *language = PlayerRaces.get_civilization_language(civilization ? civilization->ID : -1);
+	wyrmgus::language *language = civilization ? civilization->get_language() : nullptr;
 	
 	if (this->Name.empty()) { //this is the first time the unit receives a name
 		if (!this->Type->BoolFlag[FAUNA_INDEX].value && this->Trait != nullptr && this->Trait->Epithets.size() > 0 && SyncRand(4) == 0) { // 25% chance to give the unit an epithet based on their trait

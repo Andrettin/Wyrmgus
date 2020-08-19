@@ -47,7 +47,6 @@ static constexpr int DefaultTradeCost = 30;
 class CCurrency;
 class CFile;
 class CGraphic;
-class CLanguage;
 class CProvince;
 class CUnit;
 class PlayerAi;
@@ -66,6 +65,7 @@ namespace wyrmgus {
 	class civilization;
 	class deity;
 	class dynasty;
+	class language;
 	class player_color;
 	class player_quest_objective;
 	class quest;
@@ -649,104 +649,6 @@ enum class ForceType {
 	Count
 };
 
-enum WordTypes {
-	WordTypeNoun,
-	WordTypeVerb,
-	WordTypeAdjective,
-	WordTypePronoun,
-	WordTypeAdverb,
-	WordTypeConjunction,
-	WordTypeAdposition,
-	WordTypeArticle,
-	WordTypeNumeral,
-	WordTypeAffix,
-	
-	MaxWordTypes
-};
-
-enum ArticleTypes {
-	ArticleTypeNoArticle,
-	ArticleTypeDefinite,
-	ArticleTypeIndefinite,
-	
-	MaxArticleTypes
-};
-
-enum GrammaticalCases {
-	GrammaticalCaseNoCase,
-	GrammaticalCaseNominative,
-	GrammaticalCaseAccusative,
-	GrammaticalCaseDative,
-	GrammaticalCaseGenitive,
-	
-	MaxGrammaticalCases
-};
-
-enum GrammaticalNumbers {
-	GrammaticalNumberNoNumber,
-	GrammaticalNumberSingular,
-	GrammaticalNumberPlural,
-	
-	MaxGrammaticalNumbers
-};
-
-enum GrammaticalPersons {
-	GrammaticalPersonFirstPerson,
-	GrammaticalPersonSecondPerson,
-	GrammaticalPersonThirdPerson,
-	
-	MaxGrammaticalPersons
-};
-
-enum GrammaticalGenders {
-	GrammaticalGenderNoGender,
-	GrammaticalGenderMasculine,
-	GrammaticalGenderFeminine,
-	GrammaticalGenderNeuter,
-	
-	MaxGrammaticalGenders
-};
-
-enum GrammaticalTenses {
-	GrammaticalTenseNoTense,
-	GrammaticalTensePresent,
-	GrammaticalTensePast,
-	GrammaticalTenseFuture,
-	
-	MaxGrammaticalTenses
-};
-
-enum GrammaticalMoods {
-	GrammaticalMoodIndicative,
-	GrammaticalMoodSubjunctive,
-	
-	MaxGrammaticalMoods
-};
-
-enum ComparisonDegrees {
-	ComparisonDegreePositive,
-	ComparisonDegreeComparative,
-	ComparisonDegreeSuperlative,
-	
-	MaxComparisonDegrees
-};
-
-enum AffixTypes {
-	AffixTypePrefix,
-	AffixTypeSuffix,
-	AffixTypeInfix,
-	
-	MaxAffixTypes
-};
-
-enum WordJunctionTypes {
-	WordJunctionTypeNoWordJunction,
-	WordJunctionTypeCompound,
-	WordJunctionTypeSeparate,
-	
-	MaxWordJunctionTypes
-};
-
 class CForceTemplate
 {
 public:
@@ -806,87 +708,6 @@ private:
 	int priority = 100;
 	bool per_settlement = false;	/// Whether the building should be constructed for each settlement
 };
-
-class LanguageWord
-{
-public:
-	LanguageWord() : 
-		Type(-1), Gender(-1), GrammaticalNumber(-1),
-		Language(nullptr), DerivesFrom(nullptr),
-		Archaic(false),
-		Uncountable(false),
-		ArticleType(-1),
-		Number(-1)
-	{
-	}
-	
-	bool HasMeaning(const std::string &meaning);
-	std::string GetNounInflection(int grammatical_number, int grammatical_case, int word_junction_type = -1);
-	std::string GetVerbInflection(int grammatical_number, int grammatical_person, int grammatical_tense, int grammatical_mood);
-	std::string GetAdjectiveInflection(int comparison_degree, int article_type = -1, int grammatical_case = -1, int grammatical_number = -1, int grammatical_gender = -1);
-	std::string GetParticiple(int grammatical_tense);
-	void RemoveFromVector(std::vector<LanguageWord *>& word_vector);
-
-	std::string Word;									/// Word name / ID.
-	CLanguage *Language;								/// The language the word belongs to
-	int Type;											/// Word type
-	int Gender;											/// What is the gender of the noun or article (Masculine, Feminine or Neuter)
-	int GrammaticalNumber;								/// Grammatical number (i.e. whether the word is necessarily plural or not)
-	bool Archaic;										/// Whether the word is archaic (whether it is used in current speech)
-	std::map<std::tuple<int, int>, std::string> NumberCaseInflections;	/// For nouns, mapped to grammatical number and grammatical case
-	std::map<std::tuple<int, int, int, int>, std::string> NumberPersonTenseMoodInflections;	/// For verbs, mapped to grammatical number, grammatical person, grammatical tense and grammatical mood
-	std::string ComparisonDegreeCaseInflections[MaxComparisonDegrees][MaxGrammaticalCases];	/// For adjectives
-	std::string Participles[MaxGrammaticalTenses];		/// For verbs
-	std::vector<std::string> Meanings;					/// Meanings of the word in English.
-	LanguageWord *DerivesFrom;    						/// From which word does this word derive
-	std::vector<LanguageWord *> DerivesTo;				/// Which words derive from this word
-	LanguageWord *CompoundElements[MaxAffixTypes];    	/// From which compound elements is this word formed
-	std::vector<LanguageWord *> CompoundElementOf[MaxAffixTypes];	/// Which words are formed from this word as a compound element
-	
-	// noun-specific variables
-	bool Uncountable;				/// Whether the noun is uncountable or not.
-	
-	//pronoun and article-specific variables
-	std::string Nominative;			/// Nominative case for the pronoun (if any)
-	std::string Accusative;			/// Accusative case for the pronoun (if any)
-	std::string Dative;				/// Dative case for the pronoun (if any)
-	std::string Genitive;			/// Genitive case for the pronoun (if any)
-	
-	//article-specific variables
-	int ArticleType;				/// Which article type this article belongs to
-	
-	//numeral-specific variables
-	int Number;
-	
-	std::string Mod;				/// To which mod (or map), if any, this word belongs
-};
-
-class CLanguage
-{
-public:
-	CLanguage() :
-		used_by_civilization_or_faction(false),
-		DialectOf(nullptr)
-	{
-	}
-
-	LanguageWord *GetWord(const std::string word, int word_type, std::vector<std::string>& word_meanings) const;
-	std::string GetArticle(int gender, int grammatical_case, int article_type, int grammatical_number);
-	std::string GetNounEnding(int grammatical_number, int grammatical_case, int word_junction_type = -1);
-	std::string GetAdjectiveEnding(int article_type, int grammatical_case, int grammatical_number, int grammatical_gender);
-	void RemoveWord(LanguageWord *word);
-	
-	std::string Ident;											/// Ident of the language
-	std::string Name;											/// Name of the language
-	std::string Family;											/// Family of the language
-	std::string NounEndings[MaxGrammaticalNumbers][MaxGrammaticalCases][MaxWordJunctionTypes];
-	std::string AdjectiveEndings[MaxArticleTypes][MaxGrammaticalCases][MaxGrammaticalNumbers][MaxGrammaticalGenders];
-	bool used_by_civilization_or_faction;
-	CLanguage *DialectOf;										/// Of which language this is a dialect of (if at all); dialects inherit the words from the parent language unless specified otherwise
-	std::vector<CLanguage *> Dialects;							/// Dialects of this language
-	std::vector<LanguageWord *> LanguageWords;					/// Words of the language
-	std::map<std::string, std::vector<std::string>> NameTranslations;	/// Name translations; possible translations mapped to the name to be translated
-};
 //Wyrmgus end
 
 /**
@@ -896,17 +717,13 @@ public:
 class PlayerRace
 {
 public:
-	void Clean();
 	//Wyrmgus start
-	CLanguage *GetLanguage(const std::string &language_ident) const;
-	CLanguage *get_civilization_language(int civilization);
-	std::string TranslateName(const std::string &name, CLanguage *language);
+	std::string TranslateName(const std::string &name, wyrmgus::language *language);
 	//Wyrmgus end
 
 public:
 	//Wyrmgus start
 	std::map<ButtonCmd, IconConfig> ButtonIcons[MAX_RACES];					/// icons for button actions
-	std::vector<CLanguage *> Languages;									/// languages
 	//Wyrmgus end
 };
 
@@ -974,22 +791,10 @@ enum NotifyType {
 	NotifyGreen    /// Green alarm
 };
 
-/*----------------------------------------------------------------------------
---  Variables
-----------------------------------------------------------------------------*/
-
 extern int NumPlayers; //how many player slots used
 extern bool NoRescueCheck; //disable rescue check
-//Wyrmgus start
-
-extern bool LanguageCacheOutdated;
-//Wyrmgus end
 
 extern PlayerRace PlayerRaces;  /// Player races
-
-/*----------------------------------------------------------------------------
---  Functions
-----------------------------------------------------------------------------*/
 
 /// Init players
 extern void InitPlayers();
@@ -1034,33 +839,4 @@ extern std::string GetFactionTypeNameById(int faction_type);
 extern int GetFactionTypeIdByName(const std::string &faction_type);
 extern std::string GetForceTypeNameById(const ForceType force_type);
 extern ForceType GetForceTypeIdByName(const std::string &force_type);
-extern std::string GetWordTypeNameById(int word_type);
-extern int GetWordTypeIdByName(const std::string &word_type);
-extern std::string GetArticleTypeNameById(int article_type);
-extern int GetArticleTypeIdByName(const std::string &article_type);
-extern std::string GetGrammaticalCaseNameById(int grammatical_case);
-extern int GetGrammaticalCaseIdByName(const std::string &grammatical_case);
-extern std::string GetGrammaticalNumberNameById(int grammatical_number);
-extern int GetGrammaticalNumberIdByName(const std::string &grammatical_number);
-extern std::string GetGrammaticalPersonNameById(int grammatical_person);
-extern int GetGrammaticalPersonIdByName(const std::string &grammatical_person);
-extern std::string GetGrammaticalGenderNameById(int grammatical_gender);
-extern int GetGrammaticalGenderIdByName(const std::string &grammatical_gender);
-extern std::string GetGrammaticalTenseNameById(int grammatical_tense);
-extern int GetGrammaticalTenseIdByName(const std::string &grammatical_tense);
-extern std::string GetGrammaticalMoodNameById(int grammatical_mood);
-extern int GetGrammaticalMoodIdByName(const std::string &grammatical_mood);
-extern std::string GetComparisonDegreeNameById(int comparison_degree);
-extern int GetComparisonDegreeIdByName(const std::string &comparison_degree);
-extern std::string GetAffixTypeNameById(int affix_type);
-extern int GetAffixTypeIdByName(const std::string &affix_type);
-extern std::string GetWordJunctionTypeNameById(int word_junction_type);
-extern int GetWordJunctionTypeIdByName(const std::string &word_junction_type);
 extern bool IsNameValidForWord(const std::string &word_name);
-
-/*----------------------------------------------------------------------------
---  Variables
-----------------------------------------------------------------------------*/
-
-extern std::map<std::string, CLanguage *> LanguageIdentToPointer;
-//Wyrmgus end

@@ -432,6 +432,19 @@ int civilization::GetForceTypeWeight(const ForceType force_type) const
 	return 1;
 }
 
+language *civilization::get_language() const
+{
+	if (this->language != nullptr) {
+		return this->language;
+	}
+	
+	if (this->parent_civilization != nullptr) {
+		return this->parent_civilization->get_language();
+	}
+	
+	return nullptr;
+}
+
 calendar *civilization::get_calendar() const
 {
 	if (this->calendar != nullptr) {

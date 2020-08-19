@@ -530,9 +530,13 @@ religion *character::get_religion() const
 	return nullptr;
 }
 
-CLanguage *character::GetLanguage() const
+language *character::get_language() const
 {
-	return PlayerRaces.get_civilization_language(this->civilization->ID);
+	if (this->civilization != nullptr) {
+		return this->civilization->get_language();
+	}
+
+	return nullptr;
 }
 
 calendar *character::get_calendar() const

@@ -100,7 +100,6 @@ void CleanModules()
 
 	CleanUserInterface();
 	FreeAi();
-	PlayerRaces.Clean();
 	CAchievement::ClearAchievements();
 	CCurrency::ClearCurrencies();
 	CleanDecorations();

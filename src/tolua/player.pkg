@@ -86,8 +86,6 @@ class CPlayer
 };
 
 //Wyrmgus start
-extern bool LanguageCacheOutdated;
-
 extern void CleanPlayers();
 extern void NetworkSetFaction(int player, std::string faction_name);
 extern bool IsNameValidForWord(std::string word_name);

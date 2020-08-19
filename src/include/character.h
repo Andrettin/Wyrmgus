@@ -35,7 +35,6 @@
 #include "ui/icon.h"
 
 class CFile;
-class CLanguage;
 class CProvince;
 class CUnit;
 class CUpgrade;
@@ -55,6 +54,7 @@ namespace wyrmgus {
 	class dynasty;
 	class faction;
 	class historical_location;
+	class language;
 	class persistent_item;
 	class quest;
 	class religion;
@@ -184,7 +184,7 @@ public:
 	int GetMartialAttribute() const;
 	int GetAttributeModifier(int attribute) const;
 	religion *get_religion() const;
-	CLanguage *GetLanguage() const;
+	language *get_language() const;
 	calendar *get_calendar() const;
 
 	const std::vector<std::unique_ptr<persistent_item>> &get_items() const
