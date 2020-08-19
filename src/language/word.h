@@ -55,6 +55,8 @@ public:
 
 	explicit word(const std::string &identifier);
 
+	virtual void process_sml_scope(const sml_data &scope) override;
+
 	virtual void check() const override
 	{
 		if (this->get_language() == nullptr) {
@@ -106,7 +108,12 @@ public:
 
 	Q_INVOKABLE void remove_meaning(const std::string &meaning);
 
-	bool HasMeaning(const std::string &meaning);
+	void add_compound_element(word *word)
+	{
+		this->compound_elements.push_back(word);
+		word->compound_element_of.push_back(this);
+	}
+
 	std::string GetNounInflection(int grammatical_number, int grammatical_case, int word_junction_type = -1);
 	std::string GetVerbInflection(int grammatical_number, int grammatical_person, int grammatical_tense, int grammatical_mood);
 	std::string GetAdjectiveInflection(int comparison_degree, int article_type = -1, int grammatical_case = -1, int grammatical_number = -1, int grammatical_gender = -1);
@@ -130,10 +137,10 @@ public:
 	std::string Participles[MaxGrammaticalTenses];		/// For verbs
 private:
 	std::vector<std::string> meanings; //meanings of the word in English.
-public:
-	word *CompoundElements[MaxAffixTypes];    	/// From which compound elements is this word formed
-	std::vector<word *> CompoundElementOf[MaxAffixTypes]; /// Which words are formed from this word as a compound element
+	std::vector<const word *> compound_elements; //from which compound elements is this word formed
+	std::vector<const word *> compound_element_of; //which words are formed from this word as a compound element
 
+public:
 	// noun-specific variables
 	bool Uncountable = false;				/// Whether the noun is uncountable or not.
 

@@ -39,6 +39,21 @@ word::word(const std::string &identifier) : named_data_entry(identifier), type(w
 {
 }
 
+void word::process_sml_scope(const sml_data &scope)
+{
+	const std::string &tag = scope.get_tag();
+	const std::vector<std::string> &values = scope.get_values();
+
+	if (tag == "compound_elements") {
+		for (const std::string &value : values) {
+			word *other_word = word::get(value);
+			this->add_compound_element(other_word);
+		}
+	} else {
+		data_entry::process_sml_scope(scope);
+	}
+}
+
 QStringList word::get_meanings_qstring_list() const
 {
 	return container::to_qstring_list(this->get_meanings());
@@ -47,11 +62,6 @@ QStringList word::get_meanings_qstring_list() const
 void word::remove_meaning(const std::string &meaning)
 {
 	vector::remove_one(this->meanings, meaning);
-}
-
-bool word::HasMeaning(const std::string &meaning)
-{
-	return vector::contains(this->get_meanings(), meaning);
 }
 
 std::string word::GetNounInflection(int grammatical_number, int grammatical_case, int word_junction_type)

@@ -1143,10 +1143,10 @@ static int CclDefineLanguageWord(lua_State *l)
 
 				if (affix_language && affix_word_type != wyrmgus::word_type::none) {
 					std::string affix_word = LuaToString(l, -1, j + 1);
-					word->CompoundElements[affix_type] = affix_language->GetWord(affix_word, affix_word_type, word_meanings);
+					wyrmgus::word *other_word = affix_language->GetWord(affix_word, affix_word_type, word_meanings);
 					
-					if (word->CompoundElements[affix_type] != nullptr) {
-						word->CompoundElements[affix_type]->CompoundElementOf[affix_type].push_back(word);
+					if (other_word != nullptr) {
+						word->add_compound_element(other_word);
 					} else {
 						LuaError(l, "Word \"%s\" is set to be a compound formed by \"%s\" (%s, %s), but the latter doesn't exist" _C_ word->get_identifier().c_str() _C_ affix_word.c_str() _C_ affix_language->get_identifier().c_str() _C_ wyrmgus::word_type_to_string(affix_word_type).c_str());
 					}
