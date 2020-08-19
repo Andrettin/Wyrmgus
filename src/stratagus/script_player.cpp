@@ -67,10 +67,9 @@
 #include "unit/unit_type.h"
 #include "upgrade/upgrade.h"
 #include "upgrade/upgrade_class.h"
-//Wyrmgus start
 #include "ui/ui.h"
+#include "util/string_util.h"
 #include "util/util.h"
-//Wyrmgus end
 #include "util/vector_util.h"
 #include "vassalage_type.h"
 #include "video/font.h"
@@ -1014,9 +1013,12 @@ static int CclDefineLanguageWord(lua_State *l)
 		LuaError(l, "incorrect argument (expected table)");
 	}
 
+	static unsigned definition_count = 0;
+
 	const std::string word_name = LuaToString(l, 1);
-	wyrmgus::word *word = wyrmgus::word::add(word_name, nullptr);
+	wyrmgus::word *word = wyrmgus::word::add(string::to_lower(word_name) + "_" + std::to_string(definition_count), nullptr);
 	word->set_name(word_name);
+	++definition_count;
 	
 	//  Parse the list:
 	for (lua_pushnil(l); lua_next(l, 2); lua_pop(l, 1)) {
