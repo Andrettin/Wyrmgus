@@ -40,6 +40,7 @@ class civilization_base : public detailed_data_entry
 	Q_OBJECT
 
 	Q_PROPERTY(wyrmgus::species* species MEMBER species READ get_species)
+	Q_PROPERTY(QStringList ship_names READ get_ship_names_qstring_list)
 
 public:
 	explicit civilization_base(const std::string &identifier) : detailed_data_entry(identifier) {}

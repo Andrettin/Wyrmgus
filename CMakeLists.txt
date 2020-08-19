@@ -660,6 +660,7 @@ set(stratagus_database_HDRS
 set(stratagus_language_HDRS
 	src/language/language.h
 	src/language/word.h
+	src/language/word_type.h
 )
 
 set(stratagus_map_HDRS

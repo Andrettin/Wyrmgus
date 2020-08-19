@@ -29,11 +29,29 @@
 
 #include "language/word.h"
 
+#include "language/word_type.h"
+#include "util/container_util.h"
+#include "util/vector_util.h"
+
 namespace wyrmgus {
+
+word::word(const std::string &identifier) : named_data_entry(identifier), type(word_type::none)
+{
+}
+
+QStringList word::get_meanings_qstring_list() const
+{
+	return container::to_qstring_list(this->get_meanings());
+}
+
+void word::remove_meaning(const std::string &meaning)
+{
+	vector::remove_one(this->meanings, meaning);
+}
 
 bool word::HasMeaning(const std::string &meaning)
 {
-	return std::find(this->Meanings.begin(), this->Meanings.end(), meaning) != this->Meanings.end();
+	return vector::contains(this->get_meanings(), meaning);
 }
 
 std::string word::GetNounInflection(int grammatical_number, int grammatical_case, int word_junction_type)

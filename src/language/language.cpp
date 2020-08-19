@@ -30,18 +30,19 @@
 #include "language/language.h"
 
 #include "language/word.h"
+#include "language/word_type.h"
 
 namespace wyrmgus {
 
-word *language::GetWord(const std::string word, int word_type, std::vector<std::string> &word_meanings) const
+word *language::GetWord(const std::string &word, const word_type word_type, const std::vector<std::string> &word_meanings) const
 {
-	for (size_t i = 0; i < this->LanguageWords.size(); ++i) {
+	for (wyrmgus::word *language_word : this->LanguageWords) {
 		if (
-			this->LanguageWords[i]->get_name() == word
-			&& (word_type == -1 || this->LanguageWords[i]->Type == word_type)
-			&& (word_meanings.size() == 0 || this->LanguageWords[i]->Meanings == word_meanings)
-			) {
-			return this->LanguageWords[i];
+			language_word->get_name() == word
+			&& (word_type == word_type::none || language_word->get_type() == word_type)
+			&& (word_meanings.size() == 0 || language_word->get_meanings() == word_meanings)
+		) {
+			return language_word;
 		}
 	}
 
@@ -50,24 +51,24 @@ word *language::GetWord(const std::string word, int word_type, std::vector<std::
 
 std::string language::GetArticle(int gender, int grammatical_case, int article_type, int grammatical_number)
 {
-	for (size_t i = 0; i < this->LanguageWords.size(); ++i) {
-		if (this->LanguageWords[i]->Type != WordTypeArticle || this->LanguageWords[i]->ArticleType != article_type) {
+	for (const word *word : this->LanguageWords) {
+		if (word->get_type() != word_type::article || word->ArticleType != article_type) {
 			continue;
 		}
 
-		if (grammatical_number != -1 && this->LanguageWords[i]->GrammaticalNumber != -1 && this->LanguageWords[i]->GrammaticalNumber != grammatical_number) {
+		if (grammatical_number != -1 && word->GrammaticalNumber != -1 && word->GrammaticalNumber != grammatical_number) {
 			continue;
 		}
 
-		if (gender == -1 || this->LanguageWords[i]->Gender == -1 || gender == this->LanguageWords[i]->Gender) {
-			if (grammatical_case == GrammaticalCaseNominative && !this->LanguageWords[i]->Nominative.empty()) {
-				return this->LanguageWords[i]->Nominative;
-			} else if (grammatical_case == GrammaticalCaseAccusative && !this->LanguageWords[i]->Accusative.empty()) {
-				return this->LanguageWords[i]->Accusative;
-			} else if (grammatical_case == GrammaticalCaseDative && !this->LanguageWords[i]->Dative.empty()) {
-				return this->LanguageWords[i]->Dative;
-			} else if (grammatical_case == GrammaticalCaseGenitive && !this->LanguageWords[i]->Genitive.empty()) {
-				return this->LanguageWords[i]->Genitive;
+		if (gender == -1 || word->Gender == -1 || gender == word->Gender) {
+			if (grammatical_case == GrammaticalCaseNominative && !word->Nominative.empty()) {
+				return word->Nominative;
+			} else if (grammatical_case == GrammaticalCaseAccusative && !word->Accusative.empty()) {
+				return word->Accusative;
+			} else if (grammatical_case == GrammaticalCaseDative && !word->Dative.empty()) {
+				return word->Dative;
+			} else if (grammatical_case == GrammaticalCaseGenitive && !word->Genitive.empty()) {
+				return word->Genitive;
 			}
 		}
 	}
@@ -117,60 +118,6 @@ void language::RemoveWord(word *word)
 	}
 }
 
-}
-
-std::string GetWordTypeNameById(int word_type)
-{
-	if (word_type == WordTypeNoun) {
-		return "noun";
-	} else if (word_type == WordTypeVerb) {
-		return "verb";
-	} else if (word_type == WordTypeAdjective) {
-		return "adjective";
-	} else if (word_type == WordTypePronoun) {
-		return "pronoun";
-	} else if (word_type == WordTypeAdverb) {
-		return "adverb";
-	} else if (word_type == WordTypeConjunction) {
-		return "conjunction";
-	} else if (word_type == WordTypeAdposition) {
-		return "adposition";
-	} else if (word_type == WordTypeArticle) {
-		return "article";
-	} else if (word_type == WordTypeNumeral) {
-		return "numeral";
-	} else if (word_type == WordTypeAffix) {
-		return "affix";
-	}
-
-	return "";
-}
-
-int GetWordTypeIdByName(const std::string &word_type)
-{
-	if (word_type == "noun") {
-		return WordTypeNoun;
-	} else if (word_type == "verb") {
-		return WordTypeVerb;
-	} else if (word_type == "adjective") {
-		return WordTypeAdjective;
-	} else if (word_type == "pronoun") {
-		return WordTypePronoun;
-	} else if (word_type == "adverb") {
-		return WordTypeAdverb;
-	} else if (word_type == "conjunction") {
-		return WordTypeConjunction;
-	} else if (word_type == "adposition") {
-		return WordTypeAdposition;
-	} else if (word_type == "article") {
-		return WordTypeArticle;
-	} else if (word_type == "numeral") {
-		return WordTypeNumeral;
-	} else if (word_type == "affix") {
-		return WordTypeAffix;
-	}
-
-	return -1;
 }
 
 std::string GetArticleTypeNameById(int article_type)

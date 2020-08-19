@@ -45,6 +45,7 @@
 #include "grand_strategy.h"
 #include "language/language.h"
 #include "language/word.h"
+#include "language/word_type.h"
 #include "luacallback.h"
 #include "map/map.h"
 #include "map/site.h"
@@ -1038,16 +1039,12 @@ static int CclDefineLanguageWord(lua_State *l)
 			}
 			const int subargs = lua_rawlen(l, -1);
 			for (int j = 0; j < subargs; ++j) {
-				word->Meanings.push_back(LuaToString(l, -1, j + 1));
+				word->meanings.push_back(LuaToString(l, -1, j + 1));
 			}
 		} else if (!strcmp(value, "Type")) {
 			std::string word_type_name = LuaToString(l, -1);
-			int word_type = GetWordTypeIdByName(word_type_name);
-			if (word_type != -1) {
-				word->Type = word_type;
-			} else {
-				LuaError(l, "Word type \"%s\" doesn't exist." _C_ word_type_name.c_str());
-			}
+			const wyrmgus::word_type word_type = wyrmgus::string_to_word_type(word_type_name);
+			word->type = word_type;
 		} else if (!strcmp(value, "DerivesFrom")) {
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument");
@@ -1055,7 +1052,7 @@ static int CclDefineLanguageWord(lua_State *l)
 			int j = 0;
 			wyrmgus::language *derives_from_language = wyrmgus::language::get(LuaToString(l, -1, j + 1));
 			++j;
-			int derives_from_word_type = GetWordTypeIdByName(LuaToString(l, -1, j + 1));
+			const wyrmgus::word_type derives_from_word_type = wyrmgus::string_to_word_type(LuaToString(l, -1, j + 1));
 			++j;
 			
 			std::vector<std::string> word_meanings;
@@ -1070,14 +1067,14 @@ static int CclDefineLanguageWord(lua_State *l)
 			}
 			lua_pop(l, 1);
 			
-			if (derives_from_language && derives_from_word_type != -1) {
+			if (derives_from_language && derives_from_word_type != wyrmgus::word_type::none) {
 				std::string derives_from_word = LuaToString(l, -1, j + 1);
-				word->DerivesFrom = derives_from_language->GetWord(derives_from_word, derives_from_word_type, word_meanings);
+				wyrmgus::word *etymon = derives_from_language->GetWord(derives_from_word, derives_from_word_type, word_meanings);
 				
-				if (word->DerivesFrom != nullptr) {
-					word->DerivesFrom->DerivesTo.push_back(word);
+				if (etymon != nullptr) {
+					word->set_etymon(etymon);
 				} else {
-					LuaError(l, "Word \"%s\" is set to derive from \"%s\" (%s, %s), but the latter doesn't exist" _C_ word->get_identifier().c_str() _C_ derives_from_word.c_str() _C_ derives_from_language->get_identifier().c_str() _C_ GetWordTypeNameById(derives_from_word_type).c_str());
+					LuaError(l, "Word \"%s\" is set to derive from \"%s\" (%s, %s), but the latter doesn't exist" _C_ word->get_identifier().c_str() _C_ derives_from_word.c_str() _C_ derives_from_language->get_identifier().c_str() _C_ wyrmgus::word_type_to_string(derives_from_word_type).c_str());
 				}
 			} else {
 				LuaError(l, "Word \"%s\"'s derives from is incorrectly set, as either the language or the word type set for the original word given is incorrect" _C_ word->get_identifier().c_str());
@@ -1089,7 +1086,7 @@ static int CclDefineLanguageWord(lua_State *l)
 			int j = 0;
 			wyrmgus::language *replaces_language = wyrmgus::language::get(LuaToString(l, -1, j + 1));
 			++j;
-			int replaces_word_type = GetWordTypeIdByName(LuaToString(l, -1, j + 1));
+			const wyrmgus::word_type replaces_word_type = wyrmgus::string_to_word_type(LuaToString(l, -1, j + 1));
 			++j;
 			
 			std::vector<std::string> word_meanings;
@@ -1104,12 +1101,12 @@ static int CclDefineLanguageWord(lua_State *l)
 			}
 			lua_pop(l, 1);
 			
-			if (replaces_language && replaces_word_type != -1) {
+			if (replaces_language && replaces_word_type != wyrmgus::word_type::none) {
 				std::string replaces_word = LuaToString(l, -1, j + 1);
 				replaces = replaces_language->GetWord(replaces_word, replaces_word_type, word_meanings);
 				
 				if (replaces == nullptr) {
-					LuaError(l, "Word \"%s\" is set to replace \"%s\" (%s, %s), but the latter doesn't exist" _C_ word->get_identifier().c_str() _C_ replaces_word.c_str() _C_ replaces_language->get_identifier().c_str() _C_ GetWordTypeNameById(replaces_word_type).c_str());
+					LuaError(l, "Word \"%s\" is set to replace \"%s\" (%s, %s), but the latter doesn't exist" _C_ word->get_identifier().c_str() _C_ replaces_word.c_str() _C_ replaces_language->get_identifier().c_str() _C_ wyrmgus::word_type_to_string(replaces_word_type).c_str());
 				}
 			} else {
 				LuaError(l, "Word \"%s\"'s replace is incorrectly set, as either the language or the word type set for the original word given is incorrect" _C_ word->get_identifier().c_str());
@@ -1129,7 +1126,7 @@ static int CclDefineLanguageWord(lua_State *l)
 				
 				wyrmgus::language *affix_language = wyrmgus::language::get(LuaToString(l, -1, j + 1)); // should be the same language as that of the word, but needs to be specified since the word's language may not have been set yet
 				++j;
-				int affix_word_type = GetWordTypeIdByName(LuaToString(l, -1, j + 1));
+				const wyrmgus::word_type affix_word_type = wyrmgus::string_to_word_type(LuaToString(l, -1, j + 1));
 				++j;
 				
 				std::vector<std::string> word_meanings;
@@ -1144,14 +1141,14 @@ static int CclDefineLanguageWord(lua_State *l)
 				}
 				lua_pop(l, 1);
 
-				if (affix_language && affix_word_type != -1) {
+				if (affix_language && affix_word_type != wyrmgus::word_type::none) {
 					std::string affix_word = LuaToString(l, -1, j + 1);
 					word->CompoundElements[affix_type] = affix_language->GetWord(affix_word, affix_word_type, word_meanings);
 					
 					if (word->CompoundElements[affix_type] != nullptr) {
 						word->CompoundElements[affix_type]->CompoundElementOf[affix_type].push_back(word);
 					} else {
-						LuaError(l, "Word \"%s\" is set to be a compound formed by \"%s\" (%s, %s), but the latter doesn't exist" _C_ word->get_identifier().c_str() _C_ affix_word.c_str() _C_ affix_language->get_identifier().c_str() _C_ GetWordTypeNameById(affix_word_type).c_str());
+						LuaError(l, "Word \"%s\" is set to be a compound formed by \"%s\" (%s, %s), but the latter doesn't exist" _C_ word->get_identifier().c_str() _C_ affix_word.c_str() _C_ affix_language->get_identifier().c_str() _C_ wyrmgus::word_type_to_string(affix_word_type).c_str());
 					}
 				} else {
 					LuaError(l, "Word \"%s\"'s compound elements are incorrectly set, as either the language or the word type set for one of the element words given is incorrect" _C_ word->get_identifier().c_str());
@@ -1297,21 +1294,12 @@ static int CclDefineLanguageWord(lua_State *l)
 		//numeral-specific variables
 		} else if (!strcmp(value, "Number")) {
 			word->Number = LuaToNumber(l, -1);
-		//type name variables
-		} else if (!strcmp(value, "Mod")) {
-			word->Mod = LuaToString(l, -1);
-		} else if (!strcmp(value, "MapWord")) { //to keep backwards compatibility
-			word->Mod = CMap::Map.Info.Filename;
 		} else {
 			LuaError(l, "Unsupported tag: %s" _C_ value);
 		}
 	}
 	
-	if (!word->language) {
-		LuaError(l, "Word \"%s\" has not been assigned to any language" _C_ word->get_identifier().c_str());
-	}
-	
-	if (word->Type == -1) {
+	if (word->get_type() == wyrmgus::word_type::none) {
 		LuaError(l, "Word \"%s\" has no type" _C_ word->get_identifier().c_str());
 	}
 	
@@ -2965,59 +2953,6 @@ static int CclGetLanguageData(lua_State *l)
 	return 0;
 }
 
-/**
-**  Get language word data.
-**
-**  @param l  Lua state.
-*/
-static int CclGetLanguageWordData(lua_State *l)
-{
-	if (lua_gettop(l) < 3) {
-		LuaError(l, "incorrect argument");
-	}
-	std::string language_name = LuaToString(l, 1);
-	const wyrmgus::language *language = wyrmgus::language::get(language_name);
-	if (!language) {
-		LuaError(l, "Language \"%s\" doesn't exist." _C_ language_name.c_str());
-	}
-	
-	std::string word_name = LuaToString(l, 2);
-	std::vector<std::string> word_meanings;
-	const wyrmgus::word *word = language->GetWord(word_name, -1, word_meanings);
-	if (word == nullptr) {
-		LuaError(l, "Word \"%s\" doesn't exist for the \"%s\" language." _C_ word_name.c_str() _C_ language_name.c_str());
-	}
-	
-	const char *data = LuaToString(l, 3);
-
-	if (!strcmp(data, "Type")) {
-		if (word->Type != -1) {
-			lua_pushstring(l, GetWordTypeNameById(word->Type).c_str());
-		} else {
-			lua_pushstring(l, "");
-		}
-		return 1;
-	} else if (!strcmp(data, "Meaning")) {
-		for (size_t i = 0; i < word->Meanings.size(); ++i) {
-			lua_pushstring(l, word->Meanings[i].c_str());
-			return 1;
-		}
-		lua_pushstring(l, "");
-		return 1;
-	} else if (!strcmp(data, "Gender")) {
-		if (word->Gender != -1) {
-			lua_pushstring(l, GetGrammaticalGenderNameById(word->Gender).c_str());
-		} else {
-			lua_pushstring(l, "");
-		}
-		return 1;
-	} else {
-		LuaError(l, "Invalid field: %s" _C_ data);
-	}
-
-	return 0;
-}
-
 static int CclGetReligions(lua_State *l)
 {
 	lua_createtable(l, wyrmgus::religion::get_all().size(), 0);
@@ -3256,7 +3191,6 @@ void PlayerCclRegister()
 	lua_register(Lua, "InitAi", CclInitAi);
 	lua_register(Lua, "GetLanguages", CclGetLanguages);
 	lua_register(Lua, "GetLanguageData", CclGetLanguageData);
-	lua_register(Lua, "GetLanguageWordData", CclGetLanguageWordData);
 	
 	lua_register(Lua, "GetReligions", CclGetReligions);
 	lua_register(Lua, "GetDeityDomains", CclGetDeityDomains);

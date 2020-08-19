@@ -38,16 +38,73 @@ int CclDefineLanguageWord(lua_State *l);
 namespace wyrmgus {
 
 class language;
+enum class word_type;
 
 class word final : public named_data_entry, public data_type<word>
 {
+	Q_OBJECT
+
+	Q_PROPERTY(wyrmgus::language* language MEMBER language READ get_language)
+	Q_PROPERTY(wyrmgus::word_type type MEMBER type READ get_type)
+	Q_PROPERTY(wyrmgus::word* etymon MEMBER etymon READ get_etymon WRITE set_etymon)
+	Q_PROPERTY(QStringList meanings READ get_meanings_qstring_list)
+
 public:
 	static constexpr const char *class_identifier = "word";
 	static constexpr const char *database_folder = "words";
 
-	explicit word(const std::string &identifier) : named_data_entry(identifier)
+	explicit word(const std::string &identifier);
+
+	virtual void check() const override
 	{
+		if (this->get_language() == nullptr) {
+			throw std::runtime_error("Word \"" + this->get_identifier() + "\" has not been assigned to any language.");
+		}
 	}
+
+	language *get_language() const
+	{
+		return this->language;
+	}
+
+	word_type get_type() const
+	{
+		return this->type;
+	}
+
+	word *get_etymon() const
+	{
+		return this->etymon;
+	}
+
+	void set_etymon(word *etymon)
+	{
+		if (etymon == this->get_etymon()) {
+			return;
+		}
+
+		this->etymon = etymon;
+		etymon->reflexes.push_back(this);
+	}
+
+	const std::vector<const word *> &get_reflexes() const
+	{
+		return this->reflexes;
+	}
+
+	const std::vector<std::string> &get_meanings() const
+	{
+		return this->meanings;
+	}
+
+	QStringList get_meanings_qstring_list() const;
+
+	Q_INVOKABLE void add_meaning(const std::string &meaning)
+	{
+		this->meanings.push_back(meaning);
+	}
+
+	Q_INVOKABLE void remove_meaning(const std::string &meaning);
 
 	bool HasMeaning(const std::string &meaning);
 	std::string GetNounInflection(int grammatical_number, int grammatical_case, int word_junction_type = -1);
@@ -56,18 +113,24 @@ public:
 	std::string GetParticiple(int grammatical_tense);
 	void RemoveFromVector(std::vector<word *> &word_vector);
 
+private:
 	language *language = nullptr;
-	int Type = -1;						/// Word type
+	word_type type;
+public:
 	int Gender = -1;					/// What is the gender of the noun or article (Masculine, Feminine or Neuter)
 	int GrammaticalNumber = -1;			/// Grammatical number (i.e. whether the word is necessarily plural or not)
 	bool Archaic = false;				/// Whether the word is archaic (whether it is used in current speech)
+private:
+	word *etymon = nullptr; //the word from which this one derives
+	std::vector<const word *> reflexes; //words derived from this one
+public:
 	std::map<std::tuple<int, int>, std::string> NumberCaseInflections;	/// For nouns, mapped to grammatical number and grammatical case
 	std::map<std::tuple<int, int, int, int>, std::string> NumberPersonTenseMoodInflections;	/// For verbs, mapped to grammatical number, grammatical person, grammatical tense and grammatical mood
 	std::string ComparisonDegreeCaseInflections[MaxComparisonDegrees][MaxGrammaticalCases];	/// For adjectives
 	std::string Participles[MaxGrammaticalTenses];		/// For verbs
-	std::vector<std::string> Meanings;					/// Meanings of the word in English.
-	word *DerivesFrom = nullptr;    			/// From which word does this word derive
-	std::vector<word *> DerivesTo;				/// Which words derive from this word
+private:
+	std::vector<std::string> meanings; //meanings of the word in English.
+public:
 	word *CompoundElements[MaxAffixTypes];    	/// From which compound elements is this word formed
 	std::vector<word *> CompoundElementOf[MaxAffixTypes]; /// Which words are formed from this word as a compound element
 
@@ -86,7 +149,7 @@ public:
 	//numeral-specific variables
 	int Number = -1;
 
-	std::string Mod;				/// To which mod (or map), if any, this word belongs
+	friend int ::CclDefineLanguageWord(lua_State *l);
 };
 
 }

@@ -50,6 +50,9 @@
 #include "government_type.h"
 #include "item_class.h"
 #include "item_slot.h"
+#include "language/language.h"
+#include "language/word.h"
+#include "language/word_type.h"
 #include "map/map_template.h"
 #include "map/region.h"
 #include "map/site.h"
@@ -231,6 +234,8 @@ QVariant database::process_sml_property_value(const sml_property &property, cons
 			new_property_value = QVariant::fromValue(string_to_item_class(property.get_value()));
 		} else if (property_class_name == "wyrmgus::item_slot") {
 			new_property_value = QVariant::fromValue(string_to_item_slot(property.get_value()));
+		} else if (property_class_name == "wyrmgus::language*") {
+			new_property_value = QVariant::fromValue(language::get(property.get_value()));
 		} else if (property_class_name == "wyrmgus::map_template*") {
 			new_property_value = QVariant::fromValue(map_template::get(property.get_value()));
 		} else if (property_class_name == "wyrmgus::missile_class") {
@@ -271,6 +276,10 @@ QVariant database::process_sml_property_value(const sml_property &property, cons
 			new_property_value = QVariant::fromValue(CUpgrade::get(property.get_value()));
 		} else if (property_class_name == "wyrmgus::upgrade_class*") {
 			new_property_value = QVariant::fromValue(upgrade_class::get(property.get_value()));
+		} else if (property_class_name == "wyrmgus::word*") {
+			new_property_value = QVariant::fromValue(word::get(property.get_value()));
+		} else if (property_class_name == "wyrmgus::word_type") {
+			new_property_value = QVariant::fromValue(string_to_word_type(property.get_value()));
 		} else if (property_class_name == "wyrmgus::world*") {
 			new_property_value = QVariant::fromValue(world::get(property.get_value()));
 		} else {

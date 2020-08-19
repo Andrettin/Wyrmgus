@@ -67,7 +67,6 @@ class civilization final : public civilization_base, public data_type<civilizati
 	Q_PROPERTY(QString interface READ get_interface_qstring)
 	Q_PROPERTY(QString default_color READ get_default_color_qstring)
 	Q_PROPERTY(CUpgrade* upgrade MEMBER upgrade READ get_upgrade)
-	Q_PROPERTY(QStringList ship_names READ get_ship_names_qstring_list)
 	Q_PROPERTY(QVariantList acquired_upgrades READ get_acquired_upgrades_qstring_list)
 
 public:

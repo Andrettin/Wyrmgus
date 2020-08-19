@@ -30,21 +30,6 @@
 #include "database/data_type.h"
 #include "database/named_data_entry.h"
 
-enum WordTypes {
-	WordTypeNoun,
-	WordTypeVerb,
-	WordTypeAdjective,
-	WordTypePronoun,
-	WordTypeAdverb,
-	WordTypeConjunction,
-	WordTypeAdposition,
-	WordTypeArticle,
-	WordTypeNumeral,
-	WordTypeAffix,
-
-	MaxWordTypes
-};
-
 enum ArticleTypes {
 	ArticleTypeNoArticle,
 	ArticleTypeDefinite,
@@ -131,9 +116,12 @@ enum WordJunctionTypes {
 namespace wyrmgus {
 
 class word;
+enum class word_type;
 
 class language final : public named_data_entry, public data_type<language>
 {
+	Q_OBJECT
+
 public:
 	static constexpr const char *class_identifier = "language";
 	static constexpr const char *database_folder = "languages";
@@ -142,7 +130,7 @@ public:
 	{
 	}
 
-	word *GetWord(const std::string word, int word_type, std::vector<std::string> &word_meanings) const;
+	word *GetWord(const std::string &word, const word_type word_type, const std::vector<std::string> &word_meanings) const;
 	std::string GetArticle(int gender, int grammatical_case, int article_type, int grammatical_number);
 	std::string GetNounEnding(int grammatical_number, int grammatical_case, int word_junction_type = -1);
 	std::string GetAdjectiveEnding(int article_type, int grammatical_case, int grammatical_number, int grammatical_gender);
@@ -160,8 +148,6 @@ public:
 
 }
 
-extern std::string GetWordTypeNameById(int word_type);
-extern int GetWordTypeIdByName(const std::string &word_type);
 extern std::string GetArticleTypeNameById(int article_type);
 extern int GetArticleTypeIdByName(const std::string &article_type);
 extern std::string GetGrammaticalCaseNameById(int grammatical_case);
