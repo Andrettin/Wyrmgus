@@ -44,6 +44,7 @@
 #include "government_type.h"
 #include "grand_strategy.h"
 #include "language/language.h"
+#include "language/language_family.h"
 #include "language/word.h"
 #include "language/word_type.h"
 #include "luacallback.h"
@@ -2062,7 +2063,7 @@ static int CclDefineLanguage(lua_State *l)
 		if (!strcmp(value, "Name")) {
 			language->set_name(LuaToString(l, -1));
 		} else if (!strcmp(value, "Family")) {
-			language->Family = LuaToString(l, -1);
+			language->family = wyrmgus::language_family::get(LuaToString(l, -1));
 		} else if (!strcmp(value, "DialectOf")) {
 			wyrmgus::language *parent_language = wyrmgus::language::get(LuaToString(l, -1));
 			language->DialectOf = parent_language;
@@ -2891,7 +2892,11 @@ static int CclGetLanguageData(lua_State *l)
 		lua_pushstring(l, language->get_name().c_str());
 		return 1;
 	} else if (!strcmp(data, "Family")) {
-		lua_pushstring(l, language->Family.c_str());
+		if (language->get_family() != nullptr) {
+			lua_pushstring(l, language->get_family()->get_identifier().c_str());
+		} else {
+			lua_pushstring(l, "");
+		}
 		return 1;
 	} else {
 		LuaError(l, "Invalid field: %s" _C_ data);

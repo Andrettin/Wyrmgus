@@ -52,6 +52,7 @@
 #include "item_slot.h"
 #include "language/grammatical_gender.h"
 #include "language/language.h"
+#include "language/language_family.h"
 #include "language/word.h"
 #include "language/word_type.h"
 #include "map/map_template.h"
@@ -239,6 +240,8 @@ QVariant database::process_sml_property_value(const sml_property &property, cons
 			new_property_value = QVariant::fromValue(string_to_item_slot(property.get_value()));
 		} else if (property_class_name == "wyrmgus::language*") {
 			new_property_value = QVariant::fromValue(language::get(property.get_value()));
+		} else if (property_class_name == "wyrmgus::language_family*") {
+			new_property_value = QVariant::fromValue(language_family::get(property.get_value()));
 		} else if (property_class_name == "wyrmgus::map_template*") {
 			new_property_value = QVariant::fromValue(map_template::get(property.get_value()));
 		} else if (property_class_name == "wyrmgus::missile_class") {

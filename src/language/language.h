@@ -31,6 +31,10 @@
 #include "database/named_data_entry.h"
 #include "language/grammatical_gender.h"
 
+struct lua_State;
+
+int CclDefineLanguage(lua_State *l);
+
 enum ArticleTypes {
 	ArticleTypeNoArticle,
 	ArticleTypeDefinite,
@@ -107,6 +111,7 @@ enum WordJunctionTypes {
 
 namespace wyrmgus {
 
+class language_family;
 class word;
 enum class grammatical_gender;
 enum class word_type;
@@ -115,12 +120,19 @@ class language final : public named_data_entry, public data_type<language>
 {
 	Q_OBJECT
 
+	Q_PROPERTY(wyrmgus::language_family* family MEMBER family READ get_family)
+
 public:
 	static constexpr const char *class_identifier = "language";
 	static constexpr const char *database_folder = "languages";
 
 	explicit language(const std::string &identifier) : named_data_entry(identifier)
 	{
+	}
+
+	language_family *get_family() const
+	{
+		return this->family;
 	}
 
 	void add_word(word *word)
@@ -133,7 +145,9 @@ public:
 	std::string GetNounEnding(int grammatical_number, int grammatical_case, int word_junction_type = -1);
 	std::string GetAdjectiveEnding(int article_type, int grammatical_case, int grammatical_number, const grammatical_gender grammatical_gender);
 
-	std::string Family;											/// Family of the language
+private:
+	language_family *family = nullptr;
+public:
 	std::string NounEndings[MaxGrammaticalNumbers][MaxGrammaticalCases][MaxWordJunctionTypes];
 	std::string AdjectiveEndings[MaxArticleTypes][MaxGrammaticalCases][MaxGrammaticalNumbers][static_cast<int>(grammatical_gender::count)];
 	bool used_by_civilization_or_faction = false;
@@ -143,6 +157,8 @@ private:
 	std::vector<word *> words;
 public:
 	std::map<std::string, std::vector<std::string>> NameTranslations;	/// Name translations; possible translations mapped to the name to be translated
+
+	friend int ::CclDefineLanguage(lua_State *l);
 };
 
 }
