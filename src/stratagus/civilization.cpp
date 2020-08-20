@@ -388,6 +388,10 @@ void civilization::check() const
 		if (this->get_group() == nullptr) {
 			throw std::runtime_error("Civilization \"" + this->get_identifier() + "\" has no civilization group.");
 		}
+
+		if (this->get_language() == nullptr) {
+			throw std::runtime_error("Civilization \"" + this->get_identifier() + "\" has no language.");
+		}
 	}
 
 	data_entry::check();
@@ -430,19 +434,6 @@ int civilization::GetForceTypeWeight(const ForceType force_type) const
 	}
 	
 	return 1;
-}
-
-language *civilization::get_language() const
-{
-	if (this->language != nullptr) {
-		return this->language;
-	}
-	
-	if (this->parent_civilization != nullptr) {
-		return this->parent_civilization->get_language();
-	}
-	
-	return nullptr;
 }
 
 calendar *civilization::get_calendar() const

@@ -49,6 +49,7 @@ class calendar;
 class civilization_group;
 class civilization_supergroup;
 class deity;
+class language;
 class quest;
 class species;
 class unit_class;
@@ -67,6 +68,7 @@ class civilization final : public civilization_base, public data_type<civilizati
 	Q_PROPERTY(QString interface READ get_interface_qstring)
 	Q_PROPERTY(QString default_color READ get_default_color_qstring)
 	Q_PROPERTY(CUpgrade* upgrade MEMBER upgrade READ get_upgrade)
+	Q_PROPERTY(wyrmgus::language* language MEMBER language READ get_language)
 	Q_PROPERTY(QVariantList acquired_upgrades READ get_acquired_upgrades_qstring_list)
 
 public:
@@ -159,7 +161,11 @@ public:
 		return this->upgrade;
 	}
 
-	language *get_language() const;
+	language *get_language() const
+	{
+		return this->language;
+	}
+
 	calendar *get_calendar() const;
 	CCurrency *GetCurrency() const;
 
