@@ -51,6 +51,20 @@ deity::deity(const std::string &identifier)
 {
 }
 
+void deity::process_sml_scope(const sml_data &scope)
+{
+	const std::string &tag = scope.get_tag();
+
+	if (tag == "cultural_names") {
+		scope.for_each_property([&](const sml_property &property) {
+			const civilization *civilization = civilization::get(property.get_key());
+			this->cultural_names[civilization] = property.get_value();
+		});
+	} else {
+		data_entry::process_sml_scope(scope);
+	}
+}
+
 void deity::ProcessConfigData(const CConfigData *config_data)
 {
 	for (size_t i = 0; i < config_data->Properties.size(); ++i) {
