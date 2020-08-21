@@ -81,10 +81,7 @@ void deity::ProcessConfigData(const CConfigData *config_data)
 		} else if (key == "quote") {
 			this->set_quote(value);
 		} else if (key == "icon") {
-			value = FindAndReplaceString(value, "_", "-");
-			this->Icon.Name = value;
-			this->Icon.Icon = nullptr;
-			this->Icon.Load();
+			this->icon = icon::get(value);
 		} else if (key == "home_plane") {
 			plane *plane = plane::get(value);
 			this->home_plane = plane;

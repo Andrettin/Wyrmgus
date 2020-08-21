@@ -42,6 +42,7 @@ namespace wyrmgus {
 class civilization;
 class deity_domain;
 class faction;
+class icon;
 class pantheon;
 class plane;
 class religion;
@@ -52,6 +53,7 @@ class deity final : public detailed_data_entry, public data_type<deity>, public 
 	Q_OBJECT
 
 	Q_PROPERTY(wyrmgus::pantheon* pantheon MEMBER pantheon READ get_pantheon)
+	Q_PROPERTY(wyrmgus::icon* icon MEMBER icon READ get_icon)
 	Q_PROPERTY(wyrmgus::gender gender MEMBER gender READ get_gender)
 	Q_PROPERTY(bool major MEMBER major READ is_major)
 	Q_PROPERTY(wyrmgus::plane* home_plane MEMBER home_plane READ get_home_plane)
@@ -95,6 +97,11 @@ public:
 	pantheon *get_pantheon() const
 	{
 		return this->pantheon;
+	}
+
+	icon *get_icon() const
+	{
+		return this->icon;
 	}
 
 	gender get_gender() const
@@ -151,6 +158,7 @@ public:
 	Q_INVOKABLE void remove_domain(deity_domain *domain);
 
 private:
+	icon *icon = nullptr;
 	wyrmgus::gender gender;
 	bool major = false;							//whether the deity is a major one or not
 	pantheon *pantheon = nullptr;				//pantheon to which the deity belongs
@@ -158,7 +166,6 @@ private:
 public:
 	CUpgrade *DeityUpgrade = nullptr;			//the deity's upgrade applied to a player that worships it
 	CUpgrade *CharacterUpgrade = nullptr;		//the deity's upgrade applied to its character as an individual upgrade
-	IconConfig Icon;							//deity's icon
 private:
 	std::vector<civilization *> civilizations;	//civilizations which may worship the deity
 	std::vector<religion *> religions;			//religions for which this deity is available

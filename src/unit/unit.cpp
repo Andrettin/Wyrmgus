@@ -6561,10 +6561,10 @@ const wyrmgus::construction *CUnit::get_construction() const
 
 const wyrmgus::icon *CUnit::get_icon() const
 {
-	if (this->Character != nullptr && this->Character->get_level() >= 3 && this->Character->HeroicIcon.Icon) {
-		return this->Character->HeroicIcon.Icon;
-	} else if (this->Character != nullptr && this->Character->Icon.Icon) {
-		return this->Character->Icon.Icon;
+	if (this->Character != nullptr && this->Character->get_level() >= 3 && this->Character->get_heroic_icon() != nullptr) {
+		return this->Character->get_heroic_icon();
+	} else if (this->Character != nullptr && this->Character->get_base_icon() != nullptr) {
+		return this->Character->get_base_icon();
 	} else if (this->Unique != nullptr && this->Unique->get_icon() != nullptr) {
 		return this->Unique->get_icon();
 	}

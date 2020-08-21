@@ -1956,9 +1956,7 @@ static int CclDefineDeity(lua_State *l)
 			CUpgrade *upgrade = CUpgrade::get(LuaToString(l, -1));
 			deity->CharacterUpgrade = upgrade;
 		} else if (!strcmp(value, "Icon")) {
-			deity->Icon.Name = LuaToString(l, -1);
-			deity->Icon.Icon = nullptr;
-			deity->Icon.Load();
+			deity->icon = wyrmgus::icon::get(LuaToString(l, -1));
 		} else if (!strcmp(value, "Civilizations")) {
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument (expected table)");
@@ -3042,7 +3040,11 @@ static int CclGetDeityData(lua_State *l)
 		}
 		return 1;
 	} else if (!strcmp(data, "Icon")) {
-		lua_pushstring(l, deity->Icon.Name.c_str());
+		if (deity->get_icon() != nullptr) {
+			lua_pushstring(l, deity->get_icon()->get_identifier().c_str());
+		} else {
+			lua_pushstring(l, "");
+		}
 		return 1;
 	} else if (!strcmp(data, "Civilizations")) {
 		lua_createtable(l, deity->get_civilizations().size(), 0);

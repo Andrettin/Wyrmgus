@@ -107,7 +107,6 @@ void CleanModules()
 	CleanGrandStrategyEvents();
 	//Wyrmgus end
 	CleanMissiles();
-	CPantheon::ClearPantheons();
 	//Wyrmgus start
 	CleanProvinces();
 	CSchoolOfMagic::ClearSchoolsOfMagic();

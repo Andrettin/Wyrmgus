@@ -220,15 +220,9 @@ void character::ProcessConfigData(const CConfigData *config_data)
 		} else if (key == "quote") {
 			this->set_quote(value);
 		} else if (key == "icon") {
-			value = FindAndReplaceString(value, "_", "-");
-			this->Icon.Name = value;
-			this->Icon.Icon = nullptr;
-			this->Icon.Load();
+			this->icon = icon::get(value);
 		} else if (key == "heroic_icon") {
-			value = FindAndReplaceString(value, "_", "-");
-			this->HeroicIcon.Name = value;
-			this->HeroicIcon.Icon = nullptr;
-			this->HeroicIcon.Load();
+			this->heroic_icon = icon::get(value);
 		} else if (key == "forbidden_upgrade") {
 			wyrmgus::unit_type *unit_type = unit_type::get(value);
 			this->ForbiddenUpgrades.push_back(unit_type);
@@ -654,16 +648,16 @@ std::string character::GetFullName() const
 	return full_name;
 }
 
-IconConfig character::GetIcon() const
+const icon *character::get_icon() const
 {
-	if (this->get_level() >= 3 && this->HeroicIcon.Icon) {
-		return this->HeroicIcon;
-	} else if (this->Icon.Icon) {
-		return this->Icon;
+	if (this->get_level() >= 3 && this->heroic_icon != nullptr) {
+		return this->heroic_icon;
+	} else if (this->icon != nullptr) {
+		return this->icon;
 	} else if (!this->get_variation().empty() && this->get_unit_type()->GetVariation(this->get_variation()) != nullptr && !this->get_unit_type()->GetVariation(this->get_variation())->Icon.Name.empty()) {
-		return this->get_unit_type()->GetVariation(this->get_variation())->Icon;
+		return this->get_unit_type()->GetVariation(this->get_variation())->Icon.Icon;
 	} else {
-		return this->get_unit_type()->Icon;
+		return this->get_unit_type()->Icon.Icon;
 	}
 }
 

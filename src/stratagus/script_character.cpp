@@ -142,13 +142,9 @@ static int CclDefineCharacter(lua_State *l)
 		} else if (!strcmp(value, "Gender")) {
 			character->gender = wyrmgus::string_to_gender(LuaToString(l, -1));
 		} else if (!strcmp(value, "Icon")) {
-			character->Icon.Name = LuaToString(l, -1);
-			character->Icon.Icon = nullptr;
-			character->Icon.Load();
+			character->icon = wyrmgus::icon::get(LuaToString(l, -1));
 		} else if (!strcmp(value, "HeroicIcon")) {
-			character->HeroicIcon.Name = LuaToString(l, -1);
-			character->HeroicIcon.Icon = nullptr;
-			character->HeroicIcon.Load();
+			character->heroic_icon = wyrmgus::icon::get(LuaToString(l, -1));
 		} else if (!strcmp(value, "Level")) {
 			character->level = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "ExperiencePercent")) {
@@ -156,10 +152,8 @@ static int CclDefineCharacter(lua_State *l)
 		} else if (!strcmp(value, "Deity")) {
 			wyrmgus::deity *deity = wyrmgus::deity::get(LuaToString(l, -1));
 			character->Deity = deity;
-			if (character->Icon.Name.empty() && !deity->Icon.Name.empty()) {
-				character->Icon.Name = deity->Icon.Name;
-				character->Icon.Icon = nullptr;
-				character->Icon.Load();
+			if (character->icon == nullptr && deity->get_icon() != nullptr) {
+				character->icon = deity->get_icon();
 			}
 		} else if (!strcmp(value, "Conditions")) {
 			character->Conditions = new LuaCallback(l, -1);
@@ -635,13 +629,9 @@ static int CclDefineCustomHero(lua_State *l)
 				hero->ForbiddenUpgrades.push_back(unit_type);
 			}
 		} else if (!strcmp(value, "Icon")) {
-			hero->Icon.Name = LuaToString(l, -1);
-			hero->Icon.Icon = nullptr;
-			hero->Icon.Load();
+			hero->icon = wyrmgus::icon::get(LuaToString(l, -1));
 		} else if (!strcmp(value, "HeroicIcon")) {
-			hero->HeroicIcon.Name = LuaToString(l, -1);
-			hero->HeroicIcon.Icon = nullptr;
-			hero->HeroicIcon.Load();
+			hero->heroic_icon = wyrmgus::icon::get(LuaToString(l, -1));
 		} else {
 			LuaError(l, "Unsupported tag: %s" _C_ value);
 		}
@@ -800,10 +790,11 @@ static int CclGetCharacterData(lua_State *l)
 		}
 		return 1;
 	} else if (!strcmp(data, "Icon")) {
-		lua_pushstring(l, character->GetIcon().Name.c_str());
-		return 1;
-	} else if (!strcmp(data, "BaseIcon")) {
-		lua_pushstring(l, character->Icon.Name.c_str());
+		if (character->get_icon() != nullptr) {
+			lua_pushstring(l, character->get_icon()->get_identifier().c_str());
+		} else {
+			lua_pushstring(l, "");
+		}
 		return 1;
 	} else if (!strcmp(data, "HairVariation")) {
 		lua_pushstring(l, character->get_variation().c_str());
@@ -880,7 +871,11 @@ static int CclGetCustomHeroData(lua_State *l)
 		}
 		return 1;
 	} else if (!strcmp(data, "Icon")) {
-		lua_pushstring(l, character->GetIcon().Name.c_str());
+		if (character->get_icon() != nullptr) {
+			lua_pushstring(l, character->get_icon()->get_identifier().c_str());
+		} else {
+			lua_pushstring(l, "");
+		}
 		return 1;
 	} else {
 		LuaError(l, "Invalid field: %s" _C_ data);

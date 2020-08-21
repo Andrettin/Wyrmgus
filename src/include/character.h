@@ -96,6 +96,8 @@ class character : public detailed_data_entry, public data_type<character>, publi
 
 	Q_PROPERTY(wyrmgus::dynasty* dynasty MEMBER dynasty READ get_dynasty)
 	Q_PROPERTY(QString surname READ get_surname_qstring)
+	Q_PROPERTY(wyrmgus::icon* icon MEMBER icon READ get_base_icon)
+	Q_PROPERTY(wyrmgus::icon* heroic_icon MEMBER heroic_icon READ get_heroic_icon)
 	Q_PROPERTY(wyrmgus::unit_type* unit_type READ get_unit_type WRITE set_unit_type)
 	Q_PROPERTY(wyrmgus::civilization* civilization MEMBER civilization READ get_civilization)
 	Q_PROPERTY(wyrmgus::faction* default_faction MEMBER default_faction READ get_default_faction)
@@ -218,7 +220,18 @@ public:
 		return QString::fromStdString(this->get_variation());
 	}
 
-	IconConfig GetIcon() const;
+	icon *get_base_icon() const
+	{
+		return this->icon;
+	}
+
+	icon *get_heroic_icon() const
+	{
+		return this->heroic_icon;
+	}
+
+	const icon *get_icon() const;
+
 	void UpdateAttributes();
 
 	bool is_ai_active() const
@@ -312,10 +325,8 @@ public:
 private:
 	std::string surname; //the character's surname
 	std::string variation; //the identifier of the character variation
-public:
-	IconConfig Icon;					/// Character's icon
-	IconConfig HeroicIcon;				/// Character's heroic icon (level 3 and upper)
-private:
+	wyrmgus::icon *icon = nullptr;
+	wyrmgus::icon *heroic_icon = nullptr; //the character's heroic icon (level 3 and upper)
 	wyrmgus::unit_type *unit_type = nullptr;
 	CUpgrade *trait = nullptr;
 public:
