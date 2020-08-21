@@ -29,30 +29,22 @@
 
 #pragma once
 
-/*----------------------------------------------------------------------------
---  Includes
-----------------------------------------------------------------------------*/
+#include "database/data_type.h"
+#include "database/detailed_data_entry.h"
 
-#include "data_type.h"
+namespace wyrmgus {
 
-/*----------------------------------------------------------------------------
---  Declarations
-----------------------------------------------------------------------------*/
-
-class CPantheon : public CDataType
+class pantheon : public detailed_data_entry, public data_type<pantheon>
 {
+	Q_OBJECT
+
 public:
-	static CPantheon *GetPantheon(const std::string &ident, const bool should_find = true);
-	static CPantheon *GetOrAddPantheon(const std::string &ident);
-	static void ClearPantheons();
-	
-	static std::vector<CPantheon *> Pantheons;	/// Pantheons
-	static std::map<std::string, CPantheon *> PantheonsByIdent;
-	
-	virtual void ProcessConfigData(const CConfigData *config_data) override;
-	
-	std::string Name;							/// Name of the pantheon
-	std::string Description;
-	std::string Background;
-	std::string Quote;
+	static constexpr const char *class_identifier = "pantheon";
+	static constexpr const char *database_folder = "pantheons";
+
+	explicit pantheon(const std::string &identifier) : detailed_data_entry(identifier)
+	{
+	}
 };
+
+}

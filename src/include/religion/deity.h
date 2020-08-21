@@ -32,7 +32,6 @@
 #include "data_type.h"
 #include "ui/icon.h"
 
-class CPantheon;
 class CUpgrade;
 struct lua_State;
 
@@ -43,6 +42,7 @@ namespace wyrmgus {
 class civilization;
 class deity_domain;
 class faction;
+class pantheon;
 class plane;
 class religion;
 enum class gender;
@@ -51,6 +51,7 @@ class deity final : public detailed_data_entry, public data_type<deity>, public 
 {
 	Q_OBJECT
 
+	Q_PROPERTY(wyrmgus::pantheon* pantheon MEMBER pantheon READ get_pantheon)
 	Q_PROPERTY(wyrmgus::gender gender MEMBER gender READ get_gender)
 	Q_PROPERTY(bool major MEMBER major READ is_major)
 	Q_PROPERTY(wyrmgus::plane* home_plane MEMBER home_plane READ get_home_plane)
@@ -90,6 +91,11 @@ public:
 	virtual void initialize() override;
 
 	const std::string &get_cultural_name(const civilization *civilization) const;
+
+	pantheon *get_pantheon() const
+	{
+		return this->pantheon;
+	}
 
 	gender get_gender() const
 	{
@@ -147,9 +153,7 @@ public:
 private:
 	wyrmgus::gender gender;
 	bool major = false;							//whether the deity is a major one or not
-public:
-	CPantheon *Pantheon = nullptr;				//pantheon to which the deity belongs
-private:
+	pantheon *pantheon = nullptr;				//pantheon to which the deity belongs
 	plane *home_plane = nullptr;				//the home plane of the deity
 public:
 	CUpgrade *DeityUpgrade = nullptr;			//the deity's upgrade applied to a player that worships it

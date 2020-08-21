@@ -60,8 +60,7 @@ void deity::ProcessConfigData(const CConfigData *config_data)
 		if (key == "name") {
 			this->set_name(value);
 		} else if (key == "pantheon") {
-			value = FindAndReplaceString(value, "_", "-");
-			this->Pantheon = CPantheon::GetPantheon(value);
+			this->pantheon = pantheon::get(value);
 		} else if (key == "gender") {
 			this->gender = string_to_gender(value);
 		} else if (key == "major") {

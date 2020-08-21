@@ -266,11 +266,6 @@ void CConfigData::ProcessConfigData(const std::vector<CConfigData *> &config_dat
 			if (!define_only) {
 				missile_type->ProcessConfigData(config_data);
 			}
-		} else if (config_data->Tag == "pantheon") {
-			CPantheon *pantheon = CPantheon::GetOrAddPantheon(ident);
-			if (!define_only) {
-				pantheon->ProcessConfigData(config_data);
-			}
 		} else if (config_data->Tag == "plane") {
 			wyrmgus::plane *plane = wyrmgus::plane::get_or_add(ident, nullptr);
 			if (!define_only) {

@@ -1934,7 +1934,7 @@ static int CclDefineDeity(lua_State *l)
 		if (!strcmp(value, "Name")) {
 			deity->set_name(LuaToString(l, -1));
 		} else if (!strcmp(value, "Pantheon")) {
-			deity->Pantheon = CPantheon::GetPantheon(LuaToString(l, -1));
+			deity->pantheon = wyrmgus::pantheon::get(LuaToString(l, -1));
 		} else if (!strcmp(value, "Gender")) {
 			deity->gender = wyrmgus::string_to_gender(LuaToString(l, -1));
 		} else if (!strcmp(value, "Major")) {
@@ -3016,8 +3016,8 @@ static int CclGetDeityData(lua_State *l)
 		lua_pushstring(l, deity->get_name().c_str());
 		return 1;
 	} else if (!strcmp(data, "Pantheon")) {
-		if (deity->Pantheon) {
-			lua_pushstring(l, deity->Pantheon->Name.c_str());
+		if (deity->get_pantheon() != nullptr) {
+			lua_pushstring(l, deity->get_pantheon()->get_name().c_str());
 		} else {
 			lua_pushstring(l, "");
 		}

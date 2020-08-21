@@ -67,6 +67,7 @@
 #include "quest.h"
 #include "religion/deity.h"
 #include "religion/deity_domain.h"
+#include "religion/pantheon.h"
 #include "religion/religion.h"
 #include "resource.h"
 #include "sound/sound.h"
@@ -250,6 +251,8 @@ QVariant database::process_sml_property_value(const sml_property &property, cons
 			new_property_value = QVariant::fromValue(missile_type::get(property.get_value()));
 		} else if (property_class_name == "wyrmgus::module*") {
 			new_property_value = QVariant::fromValue(database::get()->get_module(property.get_value()));
+		} else if (property_class_name == "wyrmgus::pantheon*") {
+			new_property_value = QVariant::fromValue(pantheon::get(property.get_value()));
 		} else if (property_class_name == "wyrmgus::plane*") {
 			new_property_value = QVariant::fromValue(plane::get(property.get_value()));
 		} else if (property_class_name == "wyrmgus::player_color*") {
@@ -258,6 +261,8 @@ QVariant database::process_sml_property_value(const sml_property &property, cons
 			new_property_value = QVariant::fromValue(quest::get(property.get_value()));
 		} else if (property_class_name == "wyrmgus::region*") {
 			new_property_value = QVariant::fromValue(region::get(property.get_value()));
+		} else if (property_class_name == "wyrmgus::religion*") {
+			new_property_value = QVariant::fromValue(religion::get(property.get_value()));
 		} else if (property_class_name == "wyrmgus::resource*") {
 			new_property_value = QVariant::fromValue(resource::get(property.get_value()));
 		} else if (property_class_name == "wyrmgus::site*") {

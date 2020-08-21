@@ -280,7 +280,6 @@ source_group(pathfinder FILES ${pathfinder_SRCS})
 set(religion_SRCS
 	src/religion/deity.cpp
 	src/religion/deity_domain.cpp
-	src/religion/pantheon.cpp
 	src/religion/religion.cpp
 )
 source_group(religion FILES ${religion_SRCS})
