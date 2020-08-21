@@ -1950,11 +1950,11 @@ static int CclDefineDeity(lua_State *l)
 			deity->home_plane = plane;
 		} else if (!strcmp(value, "DeityUpgrade")) {
 			CUpgrade *upgrade = CUpgrade::get(LuaToString(l, -1));
-			deity->DeityUpgrade = upgrade;
+			deity->deity_upgrade = upgrade;
 			wyrmgus::deity::deities_by_upgrade[upgrade] = deity;
 		} else if (!strcmp(value, "CharacterUpgrade")) {
 			CUpgrade *upgrade = CUpgrade::get(LuaToString(l, -1));
-			deity->CharacterUpgrade = upgrade;
+			deity->character_upgrade = upgrade;
 		} else if (!strcmp(value, "Icon")) {
 			deity->icon = wyrmgus::icon::get(LuaToString(l, -1));
 		} else if (!strcmp(value, "Civilizations")) {

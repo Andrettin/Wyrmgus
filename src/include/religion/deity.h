@@ -57,6 +57,8 @@ class deity final : public detailed_data_entry, public data_type<deity>, public 
 	Q_PROPERTY(wyrmgus::gender gender MEMBER gender READ get_gender)
 	Q_PROPERTY(bool major MEMBER major READ is_major)
 	Q_PROPERTY(wyrmgus::plane* home_plane MEMBER home_plane READ get_home_plane)
+	Q_PROPERTY(CUpgrade* deity_upgrade MEMBER deity_upgrade READ get_deity_upgrade)
+	Q_PROPERTY(CUpgrade* character_upgrade MEMBER character_upgrade READ get_character_upgrade)
 	Q_PROPERTY(QVariantList civilizations READ get_civilizations_qvariant_list)
 	Q_PROPERTY(QVariantList religions READ get_religions_qvariant_list)
 	Q_PROPERTY(QVariantList domains READ get_domains_qvariant_list)
@@ -119,6 +121,16 @@ public:
 		return this->home_plane;
 	}
 
+	CUpgrade *get_deity_upgrade() const
+	{
+		return this->deity_upgrade;
+	}
+
+	CUpgrade *get_character_upgrade() const
+	{
+		return this->character_upgrade;
+	}
+
 	const std::vector<civilization *> &get_civilizations() const
 	{
 		return this->civilizations;
@@ -163,10 +175,8 @@ private:
 	bool major = false;							//whether the deity is a major one or not
 	pantheon *pantheon = nullptr;				//pantheon to which the deity belongs
 	plane *home_plane = nullptr;				//the home plane of the deity
-public:
-	CUpgrade *DeityUpgrade = nullptr;			//the deity's upgrade applied to a player that worships it
-	CUpgrade *CharacterUpgrade = nullptr;		//the deity's upgrade applied to its character as an individual upgrade
-private:
+	CUpgrade *deity_upgrade = nullptr;			//the deity's upgrade applied to a player that worships it
+	CUpgrade *character_upgrade = nullptr;		//the deity's upgrade applied to its character as an individual upgrade
 	std::vector<civilization *> civilizations;	//civilizations which may worship the deity
 	std::vector<religion *> religions;			//religions for which this deity is available
 public:

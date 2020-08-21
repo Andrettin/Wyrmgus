@@ -86,14 +86,12 @@ void deity::ProcessConfigData(const CConfigData *config_data)
 			plane *plane = plane::get(value);
 			this->home_plane = plane;
 		} else if (key == "deity_upgrade") {
-			value = FindAndReplaceString(value, "_", "-");
 			CUpgrade *upgrade = CUpgrade::get(value);
-			this->DeityUpgrade = upgrade;
+			this->deity_upgrade = upgrade;
 			deity::deities_by_upgrade[upgrade] = this;
 		} else if (key == "character_upgrade") {
-			value = FindAndReplaceString(value, "_", "-");
 			CUpgrade *upgrade = CUpgrade::get(value);
-			this->CharacterUpgrade = upgrade;
+			this->character_upgrade = upgrade;
 		} else if (key == "holy_order") {
 			faction *holy_order = faction::get(value);
 			this->HolyOrders.push_back(holy_order);
