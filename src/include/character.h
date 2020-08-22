@@ -177,9 +177,14 @@ public:
 		return this->default_faction;
 	}
 
-	deity *get_deity() const
+	const deity *get_deity() const
 	{
 		return this->deity;
+	}
+
+	void set_deity(const deity *deity)
+	{
+		this->deity = deity;
 	}
 
 	bool is_deity() const
@@ -325,7 +330,7 @@ private:
 	wyrmgus::dynasty *dynasty = nullptr;
 	civilization *civilization = nullptr;	/// Culture to which the character belongs
 	faction *default_faction = nullptr;	//the default faction to which the character belongs
-	deity *deity = nullptr; //the deity which the character is (if it is a deity)
+	const deity *deity = nullptr; //the deity which the character is (if it is a deity)
 	gender gender;				/// Character's gender
 	int base_level = 1; //the level that the character starts with
 	int level = 0; //the character's current level

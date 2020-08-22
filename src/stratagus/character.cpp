@@ -315,8 +315,10 @@ void character::ProcessConfigData(const CConfigData *config_data)
 
 void character::initialize()
 {
-	if (this->level < this->get_unit_type()->DefaultStat.Variables[LEVEL_INDEX].Value) {
-		this->level = this->get_unit_type()->DefaultStat.Variables[LEVEL_INDEX].Value;
+	if (this->get_unit_type() != nullptr) {
+		if (this->level < this->get_unit_type()->DefaultStat.Variables[LEVEL_INDEX].Value) {
+			this->level = this->get_unit_type()->DefaultStat.Variables[LEVEL_INDEX].Value;
+		}
 	}
 
 	if (this->level < this->get_base_level()) {
@@ -582,6 +584,10 @@ bool character::is_item_equipped(const persistent_item *item) const
 
 bool character::IsUsable() const
 {
+	if (this->get_unit_type() == nullptr) {
+		return false;
+	}
+
 	if (this->get_unit_type()->DefaultStat.Variables[GENDER_INDEX].Value != 0 && this->get_gender() != static_cast<wyrmgus::gender>(this->get_unit_type()->DefaultStat.Variables[GENDER_INDEX].Value)) {
 		return false; // hero not usable if their unit type has a set gender which is different from the hero's (this is because this means that the unit type lacks appropriate graphics for that gender)
 	}
@@ -654,11 +660,17 @@ const icon *character::get_icon() const
 		return this->heroic_icon;
 	} else if (this->icon != nullptr) {
 		return this->icon;
-	} else if (!this->get_variation().empty() && this->get_unit_type()->GetVariation(this->get_variation()) != nullptr && !this->get_unit_type()->GetVariation(this->get_variation())->Icon.Name.empty()) {
-		return this->get_unit_type()->GetVariation(this->get_variation())->Icon.Icon;
-	} else {
-		return this->get_unit_type()->Icon.Icon;
 	}
+	
+	if (this->get_unit_type() != nullptr) {
+		if (!this->get_variation().empty() && this->get_unit_type()->GetVariation(this->get_variation()) != nullptr && !this->get_unit_type()->GetVariation(this->get_variation())->Icon.Name.empty()) {
+			return this->get_unit_type()->GetVariation(this->get_variation())->Icon.Icon;
+		} else {
+			return this->get_unit_type()->Icon.Icon;
+		}
+	}
+
+	return nullptr;
 }
 
 void character::add_child(character *child)

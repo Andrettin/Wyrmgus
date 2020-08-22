@@ -53,7 +53,7 @@ class deity final : public detailed_data_entry, public data_type<deity>
 
 	Q_PROPERTY(wyrmgus::pantheon* pantheon MEMBER pantheon READ get_pantheon)
 	Q_PROPERTY(wyrmgus::icon* icon MEMBER icon)
-	Q_PROPERTY(wyrmgus::character* character MEMBER character READ get_character)
+	Q_PROPERTY(wyrmgus::character* character READ get_character WRITE set_character)
 	Q_PROPERTY(wyrmgus::gender gender MEMBER gender)
 	Q_PROPERTY(bool major MEMBER major READ is_major)
 	Q_PROPERTY(wyrmgus::plane* home_plane MEMBER home_plane READ get_home_plane)
@@ -105,6 +105,8 @@ public:
 	{
 		return this->character;
 	}
+
+	void set_character(character *character);
 
 	const icon *get_icon() const;
 

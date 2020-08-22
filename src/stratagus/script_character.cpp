@@ -149,9 +149,6 @@ static int CclDefineCharacter(lua_State *l)
 			character->level = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "ExperiencePercent")) {
 			character->ExperiencePercent = LuaToNumber(l, -1);
-		} else if (!strcmp(value, "Deity")) {
-			wyrmgus::deity *deity = wyrmgus::deity::get(LuaToString(l, -1));
-			character->deity = deity;
 		} else if (!strcmp(value, "Conditions")) {
 			character->Conditions = new LuaCallback(l, -1);
 		} else if (!strcmp(value, "Abilities")) {

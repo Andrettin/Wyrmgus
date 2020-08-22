@@ -96,6 +96,23 @@ const std::string &deity::get_cultural_name(const civilization *civilization) co
 	return string::empty_str;
 }
 
+void deity::set_character(wyrmgus::character *character)
+{
+	if (character == this->get_character()) {
+		return;
+	}
+
+	if (this->character != nullptr) {
+		this->character->set_deity(nullptr);
+	}
+
+	this->character = character;
+
+	if (character != nullptr) {
+		character->set_deity(this);
+	}
+}
+
 const icon *deity::get_icon() const
 {
 	if (this->icon != nullptr) {
