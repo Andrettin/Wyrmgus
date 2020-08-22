@@ -325,7 +325,7 @@ void character::initialize()
 		this->level = this->get_base_level();
 	}
 
-	if (this->get_gender() == gender::none) { //if no gender was set so far, have the character be the same gender as the unit type (if the unit type has it predefined)
+	if (this->get_gender() == gender::none && this->get_unit_type() != nullptr) { //if no gender was set so far, have the character be the same gender as the unit type (if the unit type has it predefined)
 		if (this->get_unit_type()->DefaultStat.Variables[GENDER_INDEX].Value != 0) {
 			this->gender = static_cast<wyrmgus::gender>(this->get_unit_type()->DefaultStat.Variables[GENDER_INDEX].Value);
 		}
