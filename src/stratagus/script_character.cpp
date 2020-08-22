@@ -754,7 +754,7 @@ static int CclGetCharacterData(lua_State *l)
 		return 1;
 	} else if (!strcmp(data, "Deity")) {
 		if (character->Deity != nullptr) {
-			lua_pushstring(l, character->Deity->Ident.c_str());
+			lua_pushstring(l, character->Deity->get_identifier().c_str());
 		} else {
 			lua_pushstring(l, "");
 		}
@@ -763,7 +763,7 @@ static int CclGetCharacterData(lua_State *l)
 		lua_createtable(l, character->Deities.size(), 0);
 		for (size_t i = 1; i <= character->Deities.size(); ++i)
 		{
-			lua_pushstring(l, character->Deities[i-1]->Ident.c_str());
+			lua_pushstring(l, character->Deities[i-1]->get_identifier().c_str());
 			lua_rawseti(l, -2, i);
 		}
 		return 1;

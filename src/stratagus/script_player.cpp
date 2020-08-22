@@ -1984,15 +1984,6 @@ static int CclDefineDeity(lua_State *l)
 				wyrmgus::deity_domain *domain = wyrmgus::deity_domain::get(LuaToString(l, -1, j + 1));
 				deity->domains.push_back(domain);
 			}
-		} else if (!strcmp(value, "HolyOrders")) {
-			if (!lua_istable(l, -1)) {
-				LuaError(l, "incorrect argument (expected table)");
-			}
-			const int subargs = lua_rawlen(l, -1);
-			for (int j = 0; j < subargs; ++j) {
-				wyrmgus::faction *holy_order = wyrmgus::faction::get(LuaToString(l, -1, j + 1));
-				holy_order->set_holy_order_deity(deity);
-			}
 		} else if (!strcmp(value, "Abilities")) {
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument (expected table)");
@@ -2929,7 +2920,7 @@ static int CclGetDeities(lua_State *l)
 	lua_createtable(l, wyrmgus::deity::get_all().size(), 0);
 	for (size_t i = 1; i <= wyrmgus::deity::get_all().size(); ++i)
 	{
-		lua_pushstring(l, wyrmgus::deity::get_all()[i-1]->Ident.c_str());
+		lua_pushstring(l, wyrmgus::deity::get_all()[i-1]->get_identifier().c_str());
 		lua_rawseti(l, -2, i);
 	}
 	return 1;

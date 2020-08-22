@@ -32,7 +32,6 @@
 #include "data_type.h"
 #include "item_slot.h"
 #include "time/date.h"
-#include "ui/icon.h"
 
 class CFile;
 class CProvince;
@@ -54,6 +53,7 @@ namespace wyrmgus {
 	class dynasty;
 	class faction;
 	class historical_location;
+	class icon;
 	class language;
 	class persistent_item;
 	class quest;

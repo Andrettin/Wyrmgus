@@ -30,7 +30,6 @@
 #include "religion/deity.h"
 
 #include "civilization.h"
-#include "config.h"
 #include "faction.h"
 #include "gender.h"
 #include "plane.h"
@@ -47,7 +46,7 @@
 namespace wyrmgus {
 
 deity::deity(const std::string &identifier)
-	: detailed_data_entry(identifier), CDataType(identifier), gender(gender::none)
+	: detailed_data_entry(identifier), gender(gender::none)
 {
 }
 
@@ -62,70 +61,6 @@ void deity::process_sml_scope(const sml_data &scope)
 		});
 	} else {
 		data_entry::process_sml_scope(scope);
-	}
-}
-
-void deity::ProcessConfigData(const CConfigData *config_data)
-{
-	for (size_t i = 0; i < config_data->Properties.size(); ++i) {
-		std::string key = config_data->Properties[i].first;
-		std::string value = config_data->Properties[i].second;
-		
-		if (key == "name") {
-			this->set_name(value);
-		} else if (key == "pantheon") {
-			this->pantheon = pantheon::get(value);
-		} else if (key == "gender") {
-			this->gender = string_to_gender(value);
-		} else if (key == "major") {
-			this->major = string::to_bool(value);
-		} else if (key == "civilization") {
-			civilization *civilization = civilization::get(value);
-			this->add_civilization(civilization);
-		} else if (key == "religion") {
-			religion *religion = religion::get(value);
-			this->religions.push_back(religion);
-		} else if (key == "domain") {
-			deity_domain *domain = deity_domain::get(value);
-			this->domains.push_back(domain);
-		} else if (key == "description") {
-			this->set_description(value);
-		} else if (key == "background") {
-			this->set_background(value);
-		} else if (key == "quote") {
-			this->set_quote(value);
-		} else if (key == "icon") {
-			this->icon = icon::get(value);
-		} else if (key == "home_plane") {
-			plane *plane = plane::get(value);
-			this->home_plane = plane;
-		} else if (key == "deity_upgrade") {
-			CUpgrade *upgrade = CUpgrade::get(value);
-			this->deity_upgrade = upgrade;
-			deity::deities_by_upgrade[upgrade] = this;
-		} else if (key == "character_upgrade") {
-			CUpgrade *upgrade = CUpgrade::get(value);
-			this->character_upgrade = upgrade;
-		} else if (key == "holy_order") {
-			faction *holy_order = faction::get(value);
-			holy_order->set_holy_order_deity(this);
-		} else {
-			fprintf(stderr, "Invalid deity property: \"%s\".\n", key.c_str());
-		}
-	}
-	
-	for (const CConfigData *child_config_data : config_data->Children) {
-		if (child_config_data->Tag == "cultural_names") {
-			for (size_t j = 0; j < child_config_data->Properties.size(); ++j) {
-				std::string key = child_config_data->Properties[j].first;
-				std::string value = child_config_data->Properties[j].second;
-				
-				const civilization *civilization = civilization::get(key);
-				this->cultural_names[civilization] = value;
-			}
-		} else {
-			fprintf(stderr, "Invalid deity property: \"%s\".\n", child_config_data->Tag.c_str());
-		}
 	}
 }
 

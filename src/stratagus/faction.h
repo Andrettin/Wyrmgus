@@ -71,7 +71,7 @@ class faction final : public detailed_data_entry, public data_type<faction>
 	Q_PROPERTY(wyrmgus::site* default_capital MEMBER default_capital READ get_default_capital)
 	Q_PROPERTY(bool simple_name MEMBER simple_name READ uses_simple_name)
 	Q_PROPERTY(bool short_name MEMBER short_name READ uses_short_name)
-	Q_PROPERTY(wyrmgus::deity* holy_order_deity READ get_holy_order_deity WRITE set_holy_order_deity)
+	Q_PROPERTY(wyrmgus::deity* holy_order_deity MEMBER holy_order_deity READ get_holy_order_deity)
 	Q_PROPERTY(QStringList ship_names READ get_ship_names_qstring_list)
 	Q_PROPERTY(wyrmgus::faction_tier tier MEMBER tier READ get_tier)
 	Q_PROPERTY(wyrmgus::government_type government_type MEMBER government_type READ get_government_type)
@@ -171,15 +171,6 @@ public:
 	deity *get_holy_order_deity() const
 	{
 		return this->holy_order_deity;
-	}
-
-	void set_holy_order_deity(deity *deity)
-	{
-		if (deity == this->get_holy_order_deity()) {
-			return;
-		}
-
-		this->holy_order_deity = deity;
 	}
 
 	std::string_view get_title_name(const government_type government_type, const faction_tier tier) const;

@@ -8,8 +8,6 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name config.cpp - The config source file. */
-//
 //      (c) Copyright 2018-2020 by Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
@@ -43,7 +41,6 @@
 #include "map/terrain_type.h"
 #include "missile.h"
 #include "plane.h"
-#include "religion/deity.h"
 #include "religion/deity_domain.h"
 #include "religion/pantheon.h"
 #include "school_of_magic.h"
@@ -245,11 +242,6 @@ void CConfigData::ProcessConfigData(const std::vector<CConfigData *> &config_dat
 			CCurrency *currency = CCurrency::GetOrAddCurrency(ident);
 			if (!define_only) {
 				currency->ProcessConfigData(config_data);
-			}
-		} else if (config_data->Tag == "deity") {
-			wyrmgus::deity *deity = wyrmgus::deity::get_or_add(ident, nullptr);
-			if (!define_only) {
-				deity->ProcessConfigData(config_data);
 			}
 		} else if (config_data->Tag == "deity_domain") {
 			wyrmgus::deity_domain *deity_domain = wyrmgus::deity_domain::get_or_add(ident, nullptr);

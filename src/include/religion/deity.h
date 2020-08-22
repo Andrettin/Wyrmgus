@@ -29,8 +29,6 @@
 
 #include "database/data_type.h"
 #include "database/detailed_data_entry.h"
-#include "data_type.h"
-#include "ui/icon.h"
 
 class CUpgrade;
 struct lua_State;
@@ -48,7 +46,7 @@ class plane;
 class religion;
 enum class gender;
 
-class deity final : public detailed_data_entry, public data_type<deity>, public CDataType
+class deity final : public detailed_data_entry, public data_type<deity>
 {
 	Q_OBJECT
 
@@ -92,7 +90,6 @@ public:
 	explicit deity(const std::string &identifier);
 	
 	virtual void process_sml_scope(const sml_data &scope) override;
-	virtual void ProcessConfigData(const CConfigData *config_data) override;
 	virtual void initialize() override;
 
 	const std::string &get_cultural_name(const civilization *civilization) const;

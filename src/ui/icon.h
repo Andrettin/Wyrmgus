@@ -65,7 +65,7 @@ class CPlayer;
 class ButtonStyle;
 struct lua_State;
 
-int CclDefineIcon(lua_State *l);;
+int CclDefineIcon(lua_State *l);
 
 namespace wyrmgus {
 

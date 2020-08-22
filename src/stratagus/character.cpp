@@ -837,7 +837,7 @@ void SaveHero(wyrmgus::character *hero)
 	if (hero->Custom && hero->Deities.size() > 0) {
 		fprintf(fd, "\tDeities = {");
 		for (size_t j = 0; j < hero->Deities.size(); ++j) {
-			fprintf(fd, "\"%s\"", hero->Deities[j]->Ident.c_str());
+			fprintf(fd, "\"%s\"", hero->Deities[j]->get_identifier().c_str());
 			if (j < (hero->Deities.size() - 1)) {
 				fprintf(fd, ", ");
 			}

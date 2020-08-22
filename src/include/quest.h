@@ -29,7 +29,6 @@
 
 #include "database/data_type.h"
 #include "database/detailed_data_entry.h"
-#include "ui/icon.h"
 
 class CUpgrade;
 class LuaCallback;
@@ -45,6 +44,7 @@ class condition;
 class dialogue;
 class effect_list;
 class faction;
+class icon;
 class player_color;
 class quest;
 class site;
