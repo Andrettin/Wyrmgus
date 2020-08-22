@@ -365,9 +365,9 @@ private:
 	faction *faction = nullptr; //the character's faction, used for history
 	std::unique_ptr<historical_location> location; //the character's location, used for history
 public:
-	std::vector<std::pair<CDate, wyrmgus::faction *>> HistoricalFactions;	/// historical locations of the character; the values are: date, faction
-	std::vector<std::unique_ptr<historical_location>> HistoricalLocations;	/// historical locations of the character
-	std::vector<std::tuple<CDate, CDate, wyrmgus::faction *, character_title>> HistoricalTitles;	/// historical titles of the character, the first element is the beginning date of the term, the second one the end date, the third the faction it pertains to (if any, if not then it is null), and the fourth is the character title itself (from the character title enums)
+	std::vector<std::pair<CDate, wyrmgus::faction *>> HistoricalFactions;
+	std::vector<std::unique_ptr<historical_location>> HistoricalLocations;
+	std::vector<std::tuple<CDate, CDate, wyrmgus::faction *, character_title>> HistoricalTitles; //historical titles of the character, the first element is the beginning date of the term, the second one the end date, the third the faction it pertains to (if any, if not then it is null), and the fourth is the character title itself (from the character title enums)
 	std::vector<std::tuple<int, int, CProvince *, int>> HistoricalProvinceTitles;
 
 	friend ::Spell_Polymorph;

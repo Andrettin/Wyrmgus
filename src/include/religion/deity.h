@@ -170,9 +170,9 @@ public:
 private:
 	icon *icon = nullptr;
 	wyrmgus::gender gender;
-	bool major = false;							//whether the deity is a major one or not
-	pantheon *pantheon = nullptr;				//pantheon to which the deity belongs
-	plane *home_plane = nullptr;				//the home plane of the deity
+	bool major = false;
+	pantheon *pantheon = nullptr;
+	plane *home_plane = nullptr;
 	CUpgrade *deity_upgrade = nullptr;			//the deity's upgrade applied to a player that worships it
 	CUpgrade *character_upgrade = nullptr;		//the deity's upgrade applied to its character as an individual upgrade
 	std::vector<civilization *> civilizations;	//civilizations which may worship the deity
