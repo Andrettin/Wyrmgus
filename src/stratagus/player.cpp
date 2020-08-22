@@ -4117,7 +4117,7 @@ bool CPlayer::HasBuildingAccess(const CPlayer &player, const ButtonCmd button_ac
 		player.HasNeutralFactionType()
 		&& (player.get_overlord() == nullptr || this->is_any_overlord_of(&player) || player.get_overlord()->IsAllied(*this))
 	) {
-		if (wyrmgus::faction::get_all()[player.Faction]->Type != FactionTypeHolyOrder || (button_action != ButtonCmd::Train && button_action != ButtonCmd::TrainClass && button_action != ButtonCmd::Buy) || wyrmgus::vector::contains(this->Deities, wyrmgus::faction::get_all()[player.Faction]->HolyOrderDeity)) { //if the faction is a holy order, the player must have chosen its respective deity
+		if (player.get_faction()->Type != FactionTypeHolyOrder || (button_action != ButtonCmd::Train && button_action != ButtonCmd::TrainClass && button_action != ButtonCmd::Buy) || wyrmgus::vector::contains(this->Deities, player.get_faction()->get_holy_order_deity())) { //if the faction is a holy order, the player must have chosen its respective deity
 			return true;
 		}
 	}

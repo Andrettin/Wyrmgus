@@ -1991,8 +1991,7 @@ static int CclDefineDeity(lua_State *l)
 			const int subargs = lua_rawlen(l, -1);
 			for (int j = 0; j < subargs; ++j) {
 				wyrmgus::faction *holy_order = wyrmgus::faction::get(LuaToString(l, -1, j + 1));
-				deity->HolyOrders.push_back(holy_order);
-				holy_order->HolyOrderDeity = deity;
+				holy_order->set_holy_order_deity(deity);
 			}
 		} else if (!strcmp(value, "Abilities")) {
 			if (!lua_istable(l, -1)) {

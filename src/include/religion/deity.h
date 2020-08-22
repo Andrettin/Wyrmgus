@@ -185,7 +185,6 @@ public:
 private:
 	std::vector<deity_domain *> domains;
 public:
-	std::vector<faction *> HolyOrders;			//holy orders of this deity
 	std::vector<CUpgrade *> Abilities;			//abilities linked to this deity
 private:
 	std::map<const civilization *, std::string> cultural_names;	//names of the deity in different cultures (for example, Odin is known as Hroptatyr by the dwarves)

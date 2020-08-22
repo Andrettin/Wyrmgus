@@ -108,8 +108,7 @@ void deity::ProcessConfigData(const CConfigData *config_data)
 			this->character_upgrade = upgrade;
 		} else if (key == "holy_order") {
 			faction *holy_order = faction::get(value);
-			this->HolyOrders.push_back(holy_order);
-			holy_order->HolyOrderDeity = this;
+			holy_order->set_holy_order_deity(this);
 		} else {
 			fprintf(stderr, "Invalid deity property: \"%s\".\n", key.c_str());
 		}

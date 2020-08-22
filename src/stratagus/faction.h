@@ -71,6 +71,7 @@ class faction final : public detailed_data_entry, public data_type<faction>
 	Q_PROPERTY(wyrmgus::site* default_capital MEMBER default_capital READ get_default_capital)
 	Q_PROPERTY(bool simple_name MEMBER simple_name READ uses_simple_name)
 	Q_PROPERTY(bool short_name MEMBER short_name READ uses_short_name)
+	Q_PROPERTY(wyrmgus::deity* holy_order_deity READ get_holy_order_deity WRITE set_holy_order_deity)
 	Q_PROPERTY(QStringList ship_names READ get_ship_names_qstring_list)
 	Q_PROPERTY(wyrmgus::faction_tier tier MEMBER tier READ get_tier)
 	Q_PROPERTY(wyrmgus::government_type government_type MEMBER government_type READ get_government_type)
@@ -165,6 +166,20 @@ public:
 	bool uses_short_name() const
 	{
 		return this->short_name;
+	}
+
+	deity *get_holy_order_deity() const
+	{
+		return this->holy_order_deity;
+	}
+
+	void set_holy_order_deity(deity *deity)
+	{
+		if (deity == this->get_holy_order_deity()) {
+			return;
+		}
+
+		this->holy_order_deity = deity;
 	}
 
 	std::string_view get_title_name(const government_type government_type, const faction_tier tier) const;
@@ -324,9 +339,13 @@ public:
 	int ParentFaction = -1;												/// parent faction of this faction
 	bool Playable = true;												/// faction playability
 	bool DefiniteArticle = false;										/// whether the faction's name should be preceded by a definite article (e.g. "the Netherlands")
-	icon *icon = nullptr;												/// Faction's icon
+private:
+	icon *icon = nullptr;
+public:
 	CCurrency *Currency = nullptr;										/// The faction's currency
-	deity *HolyOrderDeity = nullptr;									/// deity this faction belongs to, if it is a holy order
+private:
+	deity *holy_order_deity = nullptr; //deity this faction belongs to, if it is a holy order
+public:
 	LuaCallback *Conditions = nullptr;
 private:
 	player_color *color = nullptr; /// faction color

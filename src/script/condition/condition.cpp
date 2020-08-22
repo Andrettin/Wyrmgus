@@ -281,9 +281,9 @@ bool check_special_conditions(const CUpgrade *target, const CPlayer *player, con
 
 	const faction *player_faction = player->get_faction();
 	if (player_faction != nullptr && player_faction->Type == FactionTypeHolyOrder) { // if the player is a holy order, and the upgrade is incompatible with its deity, don't allow it
-		if (player_faction->HolyOrderDeity) {
-			const CUpgrade *deity_upgrade = player_faction->HolyOrderDeity->get_deity_upgrade();
-			if (deity_upgrade) {
+		if (player_faction->get_holy_order_deity() != nullptr) {
+			const CUpgrade *deity_upgrade = player_faction->get_holy_order_deity()->get_deity_upgrade();
+			if (deity_upgrade != nullptr) {
 				for (const auto &modifier : target->get_modifiers()) {
 					if (vector::contains(modifier->RemoveUpgrades, deity_upgrade)) {
 						return false;
