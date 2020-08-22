@@ -177,6 +177,16 @@ public:
 		return this->default_faction;
 	}
 
+	deity *get_deity() const
+	{
+		return this->deity;
+	}
+
+	bool is_deity() const
+	{
+		return this->get_deity() != nullptr;
+	}
+
 	gender get_gender() const
 	{
 		return this->gender;
@@ -315,6 +325,7 @@ private:
 	wyrmgus::dynasty *dynasty = nullptr;
 	civilization *civilization = nullptr;	/// Culture to which the character belongs
 	faction *default_faction = nullptr;	//the default faction to which the character belongs
+	deity *deity = nullptr; //the deity which the character is (if it is a deity)
 	gender gender;				/// Character's gender
 	int base_level = 1; //the level that the character starts with
 	int level = 0; //the character's current level
@@ -329,9 +340,6 @@ private:
 	wyrmgus::icon *heroic_icon = nullptr; //the character's heroic icon (level 3 and upper)
 	wyrmgus::unit_type *unit_type = nullptr;
 	CUpgrade *trait = nullptr;
-public:
-	deity *Deity = nullptr;			/// The deity which the character is (if it is a deity)
-private:
 	character *father = nullptr;
 	character *mother = nullptr;
 	std::vector<character *> children;
@@ -345,7 +353,7 @@ private:
 	site *home_settlement = nullptr; //the home settlement of this character, where they can preferentially be recruited
 	bool ai_active = true; //whether the character's AI is active
 public:
-	std::vector<deity *> Deities;		/// Deities chosen by this character to worship
+	std::vector<wyrmgus::deity *> Deities;		/// Deities chosen by this character to worship
 private:
 	std::vector<const CUpgrade *> base_abilities; //the character's base abilities; these will not be lost after retraining
 	std::vector<const CUpgrade *> abilities;

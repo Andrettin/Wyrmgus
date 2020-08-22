@@ -1798,7 +1798,7 @@ template bool CPlayer::can_choose_dynasty<true>(const wyrmgus::dynasty *dynasty)
 
 bool CPlayer::is_character_available_for_recruitment(const wyrmgus::character *character, bool ignore_neutral) const
 {
-	if (character->Deity != nullptr) { //character is a deity
+	if (character->is_deity()) {
 		return false;
 	}
 	

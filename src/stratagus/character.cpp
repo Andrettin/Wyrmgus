@@ -100,7 +100,7 @@ void character::process_sml_scope(const sml_data &scope)
 		database::process_sml_data(this->conditions, scope);
 	} else if (tag == "deities") {
 		for (const std::string &value : values) {
-			deity *deity = deity::get(value);
+			wyrmgus::deity *deity = deity::get(value);
 			this->Deities.push_back(deity);
 		}
 	} else if (tag == "forbidden_upgrades") {
@@ -211,7 +211,7 @@ void character::ProcessConfigData(const CConfigData *config_data)
 			character *mother = character::get(value);
 			this->mother = mother;
 		} else if (key == "deity") {
-			deity *deity = deity::get(value);
+			wyrmgus::deity *deity = deity::get(value);
 			this->Deities.push_back(deity);
 		} else if (key == "description") {
 			this->set_description(value);
@@ -515,7 +515,7 @@ religion *character::get_religion() const
 {
 	//get the first religion of the character's first deity, since at present we don't set the religion directly for the character
 	
-	for (const deity *deity : this->Deities) {
+	for (const wyrmgus::deity *deity : this->Deities) {
 		if (!deity->get_religions().empty()) {
 			return deity->get_religions().front();
 		}
@@ -614,7 +614,7 @@ bool character::CanAppear(bool ignore_neutral) const
 */
 bool character::CanWorship() const
 {
-	if (this->Deity) {
+	if (this->is_deity()) {
 		return false; //the character cannot worship a deity if it is itself a deity
 	}
 	
@@ -627,7 +627,7 @@ bool character::CanWorship() const
 
 bool character::HasMajorDeity() const
 {
-	for (deity *deity : this->Deities) {
+	for (wyrmgus::deity *deity : this->Deities) {
 		if (deity->is_major()) {
 			return true;
 		}

@@ -37,6 +37,7 @@ int CclDefineDeity(lua_State *l);
 
 namespace wyrmgus {
 
+class character;
 class civilization;
 class deity_domain;
 class faction;
@@ -51,8 +52,9 @@ class deity final : public detailed_data_entry, public data_type<deity>
 	Q_OBJECT
 
 	Q_PROPERTY(wyrmgus::pantheon* pantheon MEMBER pantheon READ get_pantheon)
-	Q_PROPERTY(wyrmgus::icon* icon MEMBER icon READ get_icon)
-	Q_PROPERTY(wyrmgus::gender gender MEMBER gender READ get_gender)
+	Q_PROPERTY(wyrmgus::icon* icon MEMBER icon)
+	Q_PROPERTY(wyrmgus::character* character MEMBER character READ get_character)
+	Q_PROPERTY(wyrmgus::gender gender MEMBER gender)
 	Q_PROPERTY(bool major MEMBER major READ is_major)
 	Q_PROPERTY(wyrmgus::plane* home_plane MEMBER home_plane READ get_home_plane)
 	Q_PROPERTY(CUpgrade* deity_upgrade MEMBER deity_upgrade READ get_deity_upgrade)
@@ -99,15 +101,14 @@ public:
 		return this->pantheon;
 	}
 
-	icon *get_icon() const
+	character *get_character() const
 	{
-		return this->icon;
+		return this->character;
 	}
 
-	gender get_gender() const
-	{
-		return this->gender;
-	}
+	const icon *get_icon() const;
+
+	gender get_gender() const;
 
 	bool is_major() const
 	{
@@ -168,10 +169,11 @@ public:
 	Q_INVOKABLE void remove_domain(deity_domain *domain);
 
 private:
+	pantheon *pantheon = nullptr;
 	icon *icon = nullptr;
+	character *character = nullptr;
 	wyrmgus::gender gender;
 	bool major = false;
-	pantheon *pantheon = nullptr;
 	plane *home_plane = nullptr;
 	CUpgrade *deity_upgrade = nullptr;			//the deity's upgrade applied to a player that worships it
 	CUpgrade *character_upgrade = nullptr;		//the deity's upgrade applied to its character as an individual upgrade

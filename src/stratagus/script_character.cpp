@@ -151,10 +151,7 @@ static int CclDefineCharacter(lua_State *l)
 			character->ExperiencePercent = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "Deity")) {
 			wyrmgus::deity *deity = wyrmgus::deity::get(LuaToString(l, -1));
-			character->Deity = deity;
-			if (character->icon == nullptr && deity->get_icon() != nullptr) {
-				character->icon = deity->get_icon();
-			}
+			character->deity = deity;
 		} else if (!strcmp(value, "Conditions")) {
 			character->Conditions = new LuaCallback(l, -1);
 		} else if (!strcmp(value, "Abilities")) {
@@ -753,8 +750,8 @@ static int CclGetCharacterData(lua_State *l)
 		}
 		return 1;
 	} else if (!strcmp(data, "Deity")) {
-		if (character->Deity != nullptr) {
-			lua_pushstring(l, character->Deity->get_identifier().c_str());
+		if (character->get_deity() != nullptr) {
+			lua_pushstring(l, character->get_deity()->get_identifier().c_str());
 		} else {
 			lua_pushstring(l, "");
 		}

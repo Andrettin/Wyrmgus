@@ -29,6 +29,7 @@
 
 #include "religion/deity.h"
 
+#include "character.h"
 #include "civilization.h"
 #include "faction.h"
 #include "gender.h"
@@ -93,6 +94,32 @@ const std::string &deity::get_cultural_name(const civilization *civilization) co
 	}
 	
 	return string::empty_str;
+}
+
+const icon *deity::get_icon() const
+{
+	if (this->icon != nullptr) {
+		return this->icon;
+	}
+
+	if (this->get_character() != nullptr) {
+		return this->get_character()->get_icon();
+	}
+
+	return nullptr;
+}
+
+gender deity::get_gender() const
+{
+	if (this->gender != gender::none) {
+		return this->gender;
+	}
+
+	if (this->get_character() != nullptr) {
+		return this->get_character()->get_gender();
+	}
+
+	return gender::none;
 }
 
 QVariantList deity::get_civilizations_qvariant_list() const

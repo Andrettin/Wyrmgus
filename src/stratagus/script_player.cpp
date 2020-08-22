@@ -3036,6 +3036,13 @@ static int CclGetDeityData(lua_State *l)
 			lua_pushstring(l, "");
 		}
 		return 1;
+	} else if (!strcmp(data, "Character")) {
+		if (deity->get_character() != nullptr) {
+			lua_pushstring(l, deity->get_character()->get_identifier().c_str());
+		} else {
+			lua_pushstring(l, "");
+		}
+		return 1;
 	} else if (!strcmp(data, "Civilizations")) {
 		lua_createtable(l, deity->get_civilizations().size(), 0);
 		for (size_t i = 1; i <= deity->get_civilizations().size(); ++i)
