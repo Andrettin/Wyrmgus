@@ -150,13 +150,13 @@ void deity::set_mother(wyrmgus::character *character)
 	this->get_character()->set_mother(character);
 }
 
-void deity::set_deity_upgrade(CUpgrade *upgrade)
+void deity::set_upgrade(CUpgrade *upgrade)
 {
-	if (upgrade == this->get_deity_upgrade()) {
+	if (upgrade == this->get_upgrade()) {
 		return;
 	}
 
-	this->deity_upgrade = upgrade;
+	this->upgrade = upgrade;
 	upgrade->set_deity(this);
 }
 

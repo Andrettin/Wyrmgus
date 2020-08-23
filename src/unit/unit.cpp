@@ -964,13 +964,9 @@ void CUnit::set_character(wyrmgus::character *character)
 		TraitAcquire(*this, this->Type->Traits[SyncRand(this->Type->Traits.size())]);
 	}
 
-	if (this->Character->get_deity() != nullptr && this->Character->get_deity()->get_character_upgrade() != nullptr) {
-		IndividualUpgradeAcquire(*this, this->Character->get_deity()->get_character_upgrade());
-	}
-
 	//load worshipped deities
 	for (size_t i = 0; i < this->Character->Deities.size(); ++i) {
-		const CUpgrade *deity_upgrade = this->Character->Deities[i]->get_deity_upgrade();
+		const CUpgrade *deity_upgrade = this->Character->Deities[i]->get_upgrade();
 		if (deity_upgrade != nullptr) {
 			IndividualUpgradeAcquire(*this, deity_upgrade);
 		}

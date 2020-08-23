@@ -58,8 +58,7 @@ class deity final : public detailed_data_entry, public data_type<deity>
 	Q_PROPERTY(wyrmgus::plane* home_plane MEMBER home_plane READ get_home_plane)
 	Q_PROPERTY(wyrmgus::character* father READ get_father WRITE set_father)
 	Q_PROPERTY(wyrmgus::character* mother READ get_mother WRITE set_mother)
-	Q_PROPERTY(CUpgrade* deity_upgrade READ get_deity_upgrade WRITE set_deity_upgrade)
-	Q_PROPERTY(CUpgrade* character_upgrade MEMBER character_upgrade READ get_character_upgrade)
+	Q_PROPERTY(CUpgrade* upgrade READ get_upgrade WRITE set_upgrade)
 	Q_PROPERTY(QVariantList civilizations READ get_civilizations_qvariant_list)
 	Q_PROPERTY(QVariantList religions READ get_religions_qvariant_list)
 	Q_PROPERTY(QVariantList domains READ get_domains_qvariant_list)
@@ -112,17 +111,12 @@ public:
 	character *get_mother() const;
 	void set_mother(character *character);
 
-	CUpgrade *get_deity_upgrade() const
+	CUpgrade *get_upgrade() const
 	{
-		return this->deity_upgrade;
+		return this->upgrade;
 	}
 
-	void set_deity_upgrade(CUpgrade *upgrade);
-
-	CUpgrade *get_character_upgrade() const
-	{
-		return this->character_upgrade;
-	}
+	void set_upgrade(CUpgrade *upgrade);
 
 	const std::vector<civilization *> &get_civilizations() const
 	{
@@ -167,10 +161,9 @@ private:
 	character *character = nullptr;
 	bool major = false;
 	plane *home_plane = nullptr;
-	CUpgrade *deity_upgrade = nullptr;			//the deity's upgrade applied to a player that worships it
-	CUpgrade *character_upgrade = nullptr;		//the deity's upgrade applied to its character as an individual upgrade
-	std::vector<civilization *> civilizations;	//civilizations which may worship the deity
-	std::vector<religion *> religions;			//religions for which this deity is available
+	CUpgrade *upgrade = nullptr; //the deity's upgrade applied to a player that worships it
+	std::vector<civilization *> civilizations; //civilizations which may worship the deity
+	std::vector<religion *> religions; //religions for which this deity is available
 public:
 	std::vector<std::string> Feasts;
 private:
