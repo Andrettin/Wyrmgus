@@ -83,7 +83,6 @@ void upgrade_modifier::ProcessConfigData(const CConfigData *config_data)
 		if (key == "apply_to") {
 			this->unit_types.push_back(unit_type::get(value));
 		} else if (key == "remove_upgrade") {
-			value = FindAndReplaceString(value, "_", "-");
 			CUpgrade *removed_upgrade = CUpgrade::get(value);
 			this->RemoveUpgrades.push_back(removed_upgrade);
 		} else {

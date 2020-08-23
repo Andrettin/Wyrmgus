@@ -41,8 +41,6 @@
 #include "map/terrain_type.h"
 #include "missile.h"
 #include "plane.h"
-#include "religion/deity_domain.h"
-#include "religion/pantheon.h"
 #include "school_of_magic.h"
 #include "script/trigger.h"
 #include "sound/sound.h"
@@ -242,11 +240,6 @@ void CConfigData::ProcessConfigData(const std::vector<CConfigData *> &config_dat
 			CCurrency *currency = CCurrency::GetOrAddCurrency(ident);
 			if (!define_only) {
 				currency->ProcessConfigData(config_data);
-			}
-		} else if (config_data->Tag == "deity_domain") {
-			wyrmgus::deity_domain *deity_domain = wyrmgus::deity_domain::get_or_add(ident, nullptr);
-			if (!define_only) {
-				deity_domain->ProcessConfigData(config_data);
 			}
 		} else if (config_data->Tag == "map_template") {
 			wyrmgus::map_template *map_template = wyrmgus::map_template::get_or_add(ident, nullptr);

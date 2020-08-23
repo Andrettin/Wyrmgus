@@ -234,7 +234,6 @@ void character::ProcessConfigData(const CConfigData *config_data)
 				fprintf(stderr, "Upgrade \"%s\" does not exist.\n", value.c_str());
 			}
 		} else if (key == "read_work") {
-			value = FindAndReplaceString(value, "_", "-");
 			CUpgrade *upgrade = CUpgrade::try_get(value);
 			if (upgrade) {
 				this->ReadWorks.push_back(upgrade);
@@ -242,7 +241,6 @@ void character::ProcessConfigData(const CConfigData *config_data)
 				fprintf(stderr, "Upgrade \"%s\" does not exist.\n", value.c_str());
 			}
 		} else if (key == "consumed_elixir") {
-			value = FindAndReplaceString(value, "_", "-");
 			CUpgrade *upgrade = CUpgrade::try_get(value);
 			if (upgrade) {
 				this->ConsumedElixirs.push_back(upgrade);

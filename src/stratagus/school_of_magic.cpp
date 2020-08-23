@@ -142,12 +142,10 @@ void CSchoolOfMagic::ProcessConfigData(const CConfigData *config_data)
 		if (key == "name") {
 			this->Name = value;
 		} else if (key == "upgrade") {
-			value = FindAndReplaceString(value, "_", "-");
 			CUpgrade *upgrade = CUpgrade::get(value);
 			this->Upgrade = upgrade;
 			CSchoolOfMagic::SchoolsOfMagicByUpgrade[upgrade] = this;
 		} else if (key == "ability") {
-			value = FindAndReplaceString(value, "_", "-");
 			CUpgrade *ability = CUpgrade::get(value);
 			this->Abilities.push_back(ability);
 			ability->SchoolsOfMagic.push_back(this);

@@ -34,42 +34,19 @@
 
 namespace wyrmgus {
 
-deity_domain *deity_domain::get_by_upgrade(const CUpgrade *upgrade)
+void deity_domain::process_sml_scope(const sml_data &scope)
 {
-	auto find_iterator = deity_domain::domains_by_upgrade.find(upgrade);
-	if (find_iterator != deity_domain::domains_by_upgrade.end()) {
-		return find_iterator->second;
-	}
+	const std::string &tag = scope.get_tag();
+	const std::vector<std::string> &values = scope.get_values();
 
-	throw std::runtime_error("No deity domain found for upgrade \"" + upgrade->get_identifier() + "\".");
-}
-
-void deity_domain::ProcessConfigData(const CConfigData *config_data)
-{
-	for (size_t i = 0; i < config_data->Properties.size(); ++i) {
-		std::string key = config_data->Properties[i].first;
-		std::string value = config_data->Properties[i].second;
-
-		if (key == "name") {
-			this->set_name(value);
-		} else if (key == "upgrade") {
-			CUpgrade *upgrade = CUpgrade::get(value);
-			this->Upgrade = upgrade;
-			deity_domain::domains_by_upgrade[upgrade] = this;
-		} else if (key == "ability") {
-			value = FindAndReplaceString(value, "_", "-");
+	if (tag == "abilities") {
+		for (const std::string &value : values) {
 			CUpgrade *ability = CUpgrade::get(value);
-			this->Abilities.push_back(ability);
+			this->abilities.push_back(ability);
 			ability->DeityDomains.push_back(this);
-		} else if (key == "description") {
-			this->set_description(value);
-		} else if (key == "background") {
-			this->set_background(value);
-		} else if (key == "quote") {
-			this->set_quote(value);
-		} else {
-			fprintf(stderr, "Invalid school of magic property: \"%s\".\n", key.c_str());
 		}
+	} else {
+		data_entry::process_sml_scope(scope);
 	}
 }
 

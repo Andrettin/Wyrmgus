@@ -35,34 +35,36 @@ class CUpgrade;
 
 namespace wyrmgus {
 
-class deity_domain final : public detailed_data_entry, public data_type<deity_domain>, public CDataType
+class deity_domain final : public detailed_data_entry, public data_type<deity_domain>
 {
 	Q_OBJECT
+
+	Q_PROPERTY(CUpgrade* upgrade MEMBER upgrade READ get_upgrade)
 
 public:
 	static constexpr const char *class_identifier = "deity_domain";
 	static constexpr const char *database_folder = "deity_domains";
 
-	static deity_domain *get_by_upgrade(const CUpgrade *upgrade);
-
-	static void clear()
+public:
+	explicit deity_domain(const std::string &identifier) : detailed_data_entry(identifier)
 	{
-		data_type::clear();
-		deity_domain::domains_by_upgrade.clear();
+	}
+
+	virtual void process_sml_scope(const sml_data &scope) override;
+
+	CUpgrade *get_upgrade() const
+	{
+		return this->upgrade;
+	}
+
+	const std::vector<const CUpgrade *> &get_abilities() const
+	{
+		return this->abilities;
 	}
 
 private:
-	static inline std::map<const CUpgrade *, deity_domain *> domains_by_upgrade;
-
-public:
-	explicit deity_domain(const std::string &identifier) : detailed_data_entry(identifier), CDataType(identifier)
-	{
-	}
-
-	virtual void ProcessConfigData(const CConfigData *config_data) override;
-
-	CUpgrade *Upgrade = nullptr;						/// Upgrade corresponding to the domain
-	std::vector<CUpgrade *> Abilities;					/// Abilities linked to this domain
+	CUpgrade *upgrade = nullptr; //the upgrade corresponding to the domain
+	std::vector<const CUpgrade *> abilities; //abilities linked to this domain
 };
 
 }

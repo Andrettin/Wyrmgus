@@ -352,7 +352,6 @@ void spell::ProcessConfigData(const CConfigData *config_data)
 				this->SoundWhenCast.Name.clear();
 			}
 		} else if (key == "depend_upgrade") {
-			value = FindAndReplaceString(value, "_", "-");
 			this->DependencyId = UpgradeIdByIdent(value);
 			if (this->DependencyId == -1) {
 				fprintf(stderr, "Invalid upgrade: \"%s\".\n", value.c_str());

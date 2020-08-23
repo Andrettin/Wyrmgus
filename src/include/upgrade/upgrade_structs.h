@@ -293,7 +293,7 @@ private:
 public:
 	std::vector<wyrmgus::unique_item *> UniqueItems;	/// Unique items who form a part of this set upgrade
 	std::vector<wyrmgus::unit_type *> ScaledCostUnits;	/// Units for which the upgrade's costs are scaled
-	std::vector<wyrmgus::deity_domain *> DeityDomains;	/// Deity domains to which this ability belongs
+	std::vector<const wyrmgus::deity_domain *> DeityDomains; //deity domains to which this ability belongs
 	std::vector<CSchoolOfMagic *> SchoolsOfMagic;	/// Schools of magic to which this ability belongs
 	std::vector<wyrmgus::character *> Characters;	/// Characters who appear in this literary work (if it is one)
 	//Wyrmgus end

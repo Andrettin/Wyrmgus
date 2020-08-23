@@ -159,7 +159,6 @@ void Spell_SpawnMissile::ProcessConfigData(const CConfigData *config_data)
 		} else if (key == "ttl") {
 			this->TTL = std::stoi(value);
 		} else if (key == "missile") {
-			value = FindAndReplaceString(value, "_", "-");
 			this->Missile = wyrmgus::missile_type::get(value);
 		} else {
 			fprintf(stderr, "Invalid spawn missile spell action property: \"%s\".\n", key.c_str());

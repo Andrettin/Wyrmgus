@@ -206,7 +206,6 @@ void CScheduledTimeOfDay::ProcessConfigData(const CConfigData *config_data)
 				std::string value = child_config_data->Properties[j].second;
 				
 				if (key == "season") {
-					value = FindAndReplaceString(value, "_", "-");
 					season = wyrmgus::season::get(value);
 				} else if (key == "hours") {
 					season_hours = std::stoi(value);

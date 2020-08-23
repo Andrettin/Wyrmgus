@@ -88,8 +88,8 @@ void deity::initialize()
 		this->domains.resize(deity::minor_deity_domain_max);
 	}
 
-	for (deity_domain *domain : this->get_domains()) {
-		for (CUpgrade *ability : domain->Abilities) {
+	for (const deity_domain *domain : this->get_domains()) {
+		for (const CUpgrade *ability : domain->get_abilities()) {
 			if (!vector::contains(this->Abilities, ability)) {
 				this->Abilities.push_back(ability);
 			}
