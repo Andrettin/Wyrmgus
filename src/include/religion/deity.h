@@ -52,11 +52,12 @@ class deity final : public detailed_data_entry, public data_type<deity>
 	Q_OBJECT
 
 	Q_PROPERTY(wyrmgus::pantheon* pantheon MEMBER pantheon READ get_pantheon)
-	Q_PROPERTY(wyrmgus::icon* icon MEMBER icon)
-	Q_PROPERTY(wyrmgus::character* character READ get_character WRITE set_character)
-	Q_PROPERTY(wyrmgus::gender gender MEMBER gender)
+	Q_PROPERTY(wyrmgus::icon* icon READ get_icon WRITE set_icon)
+	Q_PROPERTY(wyrmgus::gender gender READ get_gender WRITE set_gender)
 	Q_PROPERTY(bool major MEMBER major READ is_major)
 	Q_PROPERTY(wyrmgus::plane* home_plane MEMBER home_plane READ get_home_plane)
+	Q_PROPERTY(wyrmgus::character* father READ get_father WRITE set_father)
+	Q_PROPERTY(wyrmgus::character* mother READ get_mother WRITE set_mother)
 	Q_PROPERTY(CUpgrade* deity_upgrade MEMBER deity_upgrade READ get_deity_upgrade)
 	Q_PROPERTY(CUpgrade* character_upgrade MEMBER character_upgrade READ get_character_upgrade)
 	Q_PROPERTY(QVariantList civilizations READ get_civilizations_qvariant_list)
@@ -78,6 +79,8 @@ public:
 
 		return nullptr;
 	}
+
+	static deity *add(const std::string &identifier, const wyrmgus::module *module);
 
 	static void clear()
 	{
@@ -106,11 +109,11 @@ public:
 		return this->character;
 	}
 
-	void set_character(character *character);
-
-	const icon *get_icon() const;
+	icon *get_icon() const;
+	void set_icon(icon *icon);
 
 	gender get_gender() const;
+	void set_gender(const gender gender);
 
 	bool is_major() const
 	{
@@ -121,6 +124,12 @@ public:
 	{
 		return this->home_plane;
 	}
+
+	character *get_father() const;
+	void set_father(character *character);
+
+	character *get_mother() const;
+	void set_mother(character *character);
 
 	CUpgrade *get_deity_upgrade() const
 	{
@@ -172,9 +181,7 @@ public:
 
 private:
 	pantheon *pantheon = nullptr;
-	icon *icon = nullptr;
 	character *character = nullptr;
-	wyrmgus::gender gender;
 	bool major = false;
 	plane *home_plane = nullptr;
 	CUpgrade *deity_upgrade = nullptr;			//the deity's upgrade applied to a player that worships it

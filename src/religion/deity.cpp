@@ -46,8 +46,21 @@
 
 namespace wyrmgus {
 
+deity *deity::add(const std::string &identifier, const wyrmgus::module *module)
+{
+	deity *deity = data_type::add(identifier, module);
+
+	//add a character with the same identifier as the deity for it
+	wyrmgus::character *character = character::add(identifier, module);
+	character->set_deity(deity);
+	deity->character = character;
+
+	return deity;
+}
+
+
 deity::deity(const std::string &identifier)
-	: detailed_data_entry(identifier), gender(gender::none)
+	: detailed_data_entry(identifier)
 {
 }
 
@@ -55,7 +68,9 @@ void deity::process_sml_scope(const sml_data &scope)
 {
 	const std::string &tag = scope.get_tag();
 
-	if (tag == "cultural_names") {
+	if (tag == "character") {
+		database::process_sml_data(this->get_character(), scope);
+	} else if (tag == "cultural_names") {
 		scope.for_each_property([&](const sml_property &property) {
 			const civilization *civilization = civilization::get(property.get_key());
 			this->cultural_names[civilization] = property.get_value();
@@ -67,7 +82,6 @@ void deity::process_sml_scope(const sml_data &scope)
 
 void deity::initialize()
 {
-
 	if (this->is_major() && this->domains.size() > deity::major_deity_domain_max) { // major deities can only have up to three domains
 		this->domains.resize(deity::major_deity_domain_max);
 	} else if (!this->is_major() && this->domains.size() > deity::minor_deity_domain_max) { // minor deities can only have one domain
@@ -96,47 +110,44 @@ const std::string &deity::get_cultural_name(const civilization *civilization) co
 	return string::empty_str;
 }
 
-void deity::set_character(wyrmgus::character *character)
+icon *deity::get_icon() const
 {
-	if (character == this->get_character()) {
-		return;
-	}
-
-	if (this->character != nullptr) {
-		this->character->set_deity(nullptr);
-	}
-
-	this->character = character;
-
-	if (character != nullptr) {
-		character->set_deity(this);
-	}
+	return this->get_character()->get_base_icon();
 }
 
-const icon *deity::get_icon() const
+void deity::set_icon(icon *icon)
 {
-	if (this->icon != nullptr) {
-		return this->icon;
-	}
-
-	if (this->get_character() != nullptr) {
-		return this->get_character()->get_icon();
-	}
-
-	return nullptr;
+	this->get_character()->set_base_icon(icon);
 }
 
 gender deity::get_gender() const
 {
-	if (this->gender != gender::none) {
-		return this->gender;
-	}
+	return this->get_character()->get_gender();
+}
 
-	if (this->get_character() != nullptr) {
-		return this->get_character()->get_gender();
-	}
+void deity::set_gender(const gender gender)
+{
+	this->get_character()->set_gender(gender);
+}
 
-	return gender::none;
+character *deity::get_father() const
+{
+	return this->get_character()->get_father();
+}
+
+void deity::set_father(wyrmgus::character *character)
+{
+	this->get_character()->set_father(character);
+}
+
+character *deity::get_mother() const
+{
+	return this->get_character()->get_mother();
+}
+
+void deity::set_mother(wyrmgus::character *character)
+{
+	this->get_character()->set_mother(character);
 }
 
 QVariantList deity::get_civilizations_qvariant_list() const

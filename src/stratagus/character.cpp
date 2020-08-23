@@ -347,6 +347,24 @@ void character::initialize()
 		}
 	}
 
+	if (this->get_deity() != nullptr) {
+		if (this->get_name().empty()) {
+			this->set_name(this->get_deity()->get_name());
+		}
+
+		if (this->get_description().empty()) {
+			this->set_description(this->get_deity()->get_description());
+		}
+
+		if (this->get_background().empty()) {
+			this->set_background(this->get_deity()->get_background());
+		}
+
+		if (this->get_quote().empty()) {
+			this->set_quote(this->get_deity()->get_quote());
+		}
+	}
+
 	//use the character's name for name generation (do this only after setting all properties so that the type, civilization and gender will have been parsed if given
 	if (this->get_unit_type() != nullptr && this->get_unit_type()->BoolFlag[FAUNA_INDEX].value) {
 		if (!this->get_name().empty()) {

@@ -96,15 +96,15 @@ class character : public detailed_data_entry, public data_type<character>, publi
 
 	Q_PROPERTY(wyrmgus::dynasty* dynasty MEMBER dynasty READ get_dynasty)
 	Q_PROPERTY(QString surname READ get_surname_qstring)
-	Q_PROPERTY(wyrmgus::icon* icon MEMBER icon READ get_base_icon)
+	Q_PROPERTY(wyrmgus::icon* icon READ get_base_icon WRITE set_base_icon)
 	Q_PROPERTY(wyrmgus::icon* heroic_icon MEMBER heroic_icon READ get_heroic_icon)
 	Q_PROPERTY(wyrmgus::unit_type* unit_type READ get_unit_type WRITE set_unit_type)
 	Q_PROPERTY(wyrmgus::civilization* civilization MEMBER civilization READ get_civilization)
 	Q_PROPERTY(wyrmgus::faction* default_faction MEMBER default_faction READ get_default_faction)
-	Q_PROPERTY(wyrmgus::gender gender MEMBER gender READ get_gender)
+	Q_PROPERTY(wyrmgus::gender gender READ get_gender WRITE set_gender)
 	Q_PROPERTY(wyrmgus::site* home_settlement MEMBER home_settlement)
-	Q_PROPERTY(wyrmgus::character* father MEMBER father READ get_father)
-	Q_PROPERTY(wyrmgus::character* mother MEMBER mother READ get_mother)
+	Q_PROPERTY(wyrmgus::character* father READ get_father WRITE set_father)
+	Q_PROPERTY(wyrmgus::character* mother READ get_mother WRITE set_mother)
 	Q_PROPERTY(QString variation READ get_variation_qstring)
 	Q_PROPERTY(bool ai_active MEMBER ai_active READ is_ai_active)
 	Q_PROPERTY(CUpgrade* trait MEMBER trait READ get_trait)
@@ -197,6 +197,15 @@ public:
 		return this->gender;
 	}
 
+	void set_gender(const gender gender)
+	{
+		if (gender == this->get_gender()) {
+			return;
+		}
+
+		this->gender = gender;
+	}
+
 	void GenerateMissingDates();
 	int GetMartialAttribute() const;
 	int GetAttributeModifier(int attribute) const;
@@ -240,6 +249,15 @@ public:
 		return this->icon;
 	}
 
+	void set_base_icon(icon *icon)
+	{
+		if (icon == this->get_icon()) {
+			return;
+		}
+
+		this->icon = icon;
+	}
+
 	icon *get_heroic_icon() const
 	{
 		return this->heroic_icon;
@@ -269,9 +287,27 @@ public:
 		return this->father;
 	}
 
+	void set_father(character *character)
+	{
+		if (character == this->get_father()) {
+			return;
+		}
+
+		this->father = character;
+	}
+
 	character *get_mother() const
 	{
 		return this->mother;
+	}
+
+	void set_mother(character *character)
+	{
+		if (character == this->get_mother()) {
+			return;
+		}
+
+		this->mother = character;
 	}
 
 	const std::vector<character *> &get_children() const

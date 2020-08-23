@@ -225,7 +225,7 @@ public:
 
 	static spell *add(const std::string &identifier, const wyrmgus::module *module);
 
-	spell(const std::string &identifier);
+	explicit spell(const std::string &identifier);
 	~spell();
 
 	virtual void ProcessConfigData(const CConfigData *config_data) override;

@@ -36,7 +36,7 @@ class CGraphic;
 
 namespace wyrmgus {
 
-class time_of_day : public named_data_entry, public data_type<time_of_day>
+class time_of_day final : public named_data_entry, public data_type<time_of_day>
 {
 	Q_OBJECT
 
@@ -56,7 +56,7 @@ public:
 		return time_of_day;
 	}
 
-	time_of_day(const std::string &identifier) : named_data_entry(identifier)
+	explicit time_of_day(const std::string &identifier) : named_data_entry(identifier)
 	{
 	}
 

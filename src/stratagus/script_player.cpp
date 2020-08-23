@@ -1936,7 +1936,7 @@ static int CclDefineDeity(lua_State *l)
 		} else if (!strcmp(value, "Pantheon")) {
 			deity->pantheon = wyrmgus::pantheon::get(LuaToString(l, -1));
 		} else if (!strcmp(value, "Gender")) {
-			deity->gender = wyrmgus::string_to_gender(LuaToString(l, -1));
+			deity->set_gender(wyrmgus::string_to_gender(LuaToString(l, -1)));
 		} else if (!strcmp(value, "Major")) {
 			deity->major = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "Description")) {
@@ -1956,7 +1956,7 @@ static int CclDefineDeity(lua_State *l)
 			CUpgrade *upgrade = CUpgrade::get(LuaToString(l, -1));
 			deity->character_upgrade = upgrade;
 		} else if (!strcmp(value, "Icon")) {
-			deity->icon = wyrmgus::icon::get(LuaToString(l, -1));
+			deity->set_icon(wyrmgus::icon::get(LuaToString(l, -1)));
 		} else if (!strcmp(value, "Civilizations")) {
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument (expected table)");
