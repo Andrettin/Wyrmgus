@@ -58,7 +58,7 @@ class deity final : public detailed_data_entry, public data_type<deity>
 	Q_PROPERTY(wyrmgus::plane* home_plane MEMBER home_plane READ get_home_plane)
 	Q_PROPERTY(wyrmgus::character* father READ get_father WRITE set_father)
 	Q_PROPERTY(wyrmgus::character* mother READ get_mother WRITE set_mother)
-	Q_PROPERTY(CUpgrade* deity_upgrade MEMBER deity_upgrade READ get_deity_upgrade)
+	Q_PROPERTY(CUpgrade* deity_upgrade READ get_deity_upgrade WRITE set_deity_upgrade)
 	Q_PROPERTY(CUpgrade* character_upgrade MEMBER character_upgrade READ get_character_upgrade)
 	Q_PROPERTY(QVariantList civilizations READ get_civilizations_qvariant_list)
 	Q_PROPERTY(QVariantList religions READ get_religions_qvariant_list)
@@ -70,26 +70,7 @@ public:
 	static constexpr int major_deity_domain_max = 3; //major deities can only have up to three domains
 	static constexpr int minor_deity_domain_max = 1; //minor deities can only have one domain
 
-	static deity *get_by_upgrade(const CUpgrade *upgrade)
-	{
-		auto find_iterator = deity::deities_by_upgrade.find(upgrade);
-		if (find_iterator != deity::deities_by_upgrade.end()) {
-			return find_iterator->second;
-		}
-
-		return nullptr;
-	}
-
 	static deity *add(const std::string &identifier, const wyrmgus::module *module);
-
-	static void clear()
-	{
-		data_type::clear();
-		deity::deities_by_upgrade.clear();
-	}
-
-private:
-	static inline std::map<const CUpgrade *, deity *> deities_by_upgrade;
 
 public:
 	explicit deity(const std::string &identifier);
@@ -135,6 +116,8 @@ public:
 	{
 		return this->deity_upgrade;
 	}
+
+	void set_deity_upgrade(CUpgrade *upgrade);
 
 	CUpgrade *get_character_upgrade() const
 	{

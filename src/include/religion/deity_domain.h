@@ -35,7 +35,7 @@ class CUpgrade;
 
 namespace wyrmgus {
 
-class deity_domain : public detailed_data_entry, public data_type<deity_domain>, public CDataType
+class deity_domain final : public detailed_data_entry, public data_type<deity_domain>, public CDataType
 {
 	Q_OBJECT
 

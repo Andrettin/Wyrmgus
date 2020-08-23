@@ -651,7 +651,7 @@ bool character::CanWorship() const
 
 bool character::HasMajorDeity() const
 {
-	for (wyrmgus::deity *deity : this->Deities) {
+	for (const wyrmgus::deity *deity : this->Deities) {
 		if (deity->is_major()) {
 			return true;
 		}

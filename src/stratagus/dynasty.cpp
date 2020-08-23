@@ -60,11 +60,14 @@ void dynasty::process_sml_scope(const sml_data &scope)
 	}
 }
 
-void dynasty::initialize()
+void dynasty::set_upgrade(CUpgrade *upgrade)
 {
-	if (this->get_upgrade() != nullptr) {
-		this->get_upgrade()->set_dynasty(this);
+	if (upgrade == this->get_upgrade()) {
+		return;
 	}
+
+	this->upgrade = upgrade;
+	upgrade->set_dynasty(this);
 }
 
 QVariantList dynasty::get_factions_qvariant_list() const

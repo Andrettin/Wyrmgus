@@ -819,7 +819,7 @@ void CUnit::Retrain()
 			for (int i = 0; i < remove_count; ++i) {
 				AbilityLost(*this, upgrade);
 			}
-		} else if (!strncmp(upgrade->Ident.c_str(), "upgrade-deity-", 14) && strncmp(upgrade->Ident.c_str(), "upgrade-deity-domain-", 21) && this->Character && this->Character->Custom) { //allow changing the deity for custom heroes
+		} else if (upgrade->get_deity() != nullptr && this->Character && this->Character->Custom) { //allow changing the deity for custom heroes
 			IndividualUpgradeLost(*this, upgrade, true);
 		}
 	}
@@ -964,8 +964,8 @@ void CUnit::set_character(wyrmgus::character *character)
 		TraitAcquire(*this, this->Type->Traits[SyncRand(this->Type->Traits.size())]);
 	}
 
-	if (this->Character->Deity != nullptr && this->Character->Deity->get_character_upgrade() != nullptr) {
-		IndividualUpgradeAcquire(*this, this->Character->Deity->get_character_upgrade());
+	if (this->Character->get_deity() != nullptr && this->Character->get_deity()->get_character_upgrade() != nullptr) {
+		IndividualUpgradeAcquire(*this, this->Character->get_deity()->get_character_upgrade());
 	}
 
 	//load worshipped deities
@@ -6363,7 +6363,7 @@ bool CUnit::HasInventory() const
 template <bool precondition>
 bool CUnit::can_learn_ability(const CUpgrade *ability) const
 {
-	if (!strncmp(ability->Ident.c_str(), "upgrade-deity-", 14)) { //if is a deity choice "ability", only allow for custom heroes (but display the icon for already-acquired deities for all heroes)
+	if (ability->get_deity() != nullptr) { //if is a deity choice "ability", only allow for custom heroes (but display the icon for already-acquired deities for all heroes)
 		if (!this->Character) {
 			return false;
 		}
@@ -6618,16 +6618,16 @@ CPlayerColorGraphic *CUnit::GetLayerSprite(int image_layer) const
 
 std::string CUnit::GetName() const
 {
-	if (GameRunning && this->Character && this->Character->Deity) {
+	if (GameRunning && this->Character && this->Character->get_deity()) {
 		if (CPlayer::GetThisPlayer()->Race >= 0) {
-			const std::string &cultural_name = this->Character->Deity->get_cultural_name(wyrmgus::civilization::get_all()[CPlayer::GetThisPlayer()->Race]);
+			const std::string &cultural_name = this->Character->get_deity()->get_cultural_name(wyrmgus::civilization::get_all()[CPlayer::GetThisPlayer()->Race]);
 			
 			if (!cultural_name.empty()) {
 				return cultural_name;
 			}
 		}
 		
-		return this->Character->Deity->get_name();
+		return this->Character->get_deity()->get_name();
 	}
 	
 	std::string name = this->Name;
@@ -6649,10 +6649,6 @@ std::string CUnit::GetName() const
 
 std::string CUnit::GetTypeName() const
 {
-	if (this->Character && this->Character->Deity) {
-		return _("Deity");
-	}
-	
 	const wyrmgus::unit_type_variation *variation = this->GetVariation();
 	if (variation && !variation->TypeName.empty()) {
 		return _(variation->TypeName.c_str());

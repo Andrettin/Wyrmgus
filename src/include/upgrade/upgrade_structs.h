@@ -48,6 +48,7 @@ namespace wyrmgus {
 	class character;
 	class civilization;
 	class condition;
+	class deity;
 	class deity_domain;
 	class dynasty;
 	class icon;
@@ -236,7 +237,20 @@ public:
 		return this->dynasty;
 	}
 
-	void set_dynasty(const wyrmgus::dynasty *dynasty);
+	void set_dynasty(const wyrmgus::dynasty *dynasty)
+	{
+		this->dynasty = dynasty;
+	}
+
+	const wyrmgus::deity *get_deity() const
+	{
+		return this->deity;
+	}
+
+	void set_deity(const wyrmgus::deity *deity)
+	{
+		this->deity = deity;
+	}
 
 private:
 	wyrmgus::upgrade_class *upgrade_class = nullptr; //upgrade class (e.g. siege weapon projectile I)
@@ -288,6 +302,7 @@ private:
 	std::unique_ptr<wyrmgus::condition> preconditions;
 	std::unique_ptr<wyrmgus::condition> conditions;
 	const wyrmgus::dynasty *dynasty = nullptr; //the dynasty to which the upgrade pertains, if this is a dynasty upgrade
+	const wyrmgus::deity *deity = nullptr; //the deity to which the upgrade pertains, if this is a deity upgrade
 
 	friend int CclDefineUpgrade(lua_State *l);
 	friend int CclDefineDependency(lua_State *l);

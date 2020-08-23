@@ -339,6 +339,14 @@ void CUpgrade::process_sml_scope(const wyrmgus::sml_data &scope)
 
 void CUpgrade::initialize()
 {
+	if (this->get_icon() == nullptr) {
+		if (this->get_dynasty() != nullptr) {
+			this->icon = this->get_dynasty()->get_icon();
+		} else if (this->get_deity() != nullptr) {
+			this->icon = this->get_deity()->get_icon();
+		}
+	}
+
 	for (CUpgrade *other_upgrade : CUpgrade::get_all()) { //add the upgrade to the incompatible affix's counterpart list here
 		if (this->IncompatibleAffixes[other_upgrade->ID]) {
 			other_upgrade->IncompatibleAffixes[this->ID] = true;
@@ -447,12 +455,6 @@ void CUpgrade::set_upgrade_class(wyrmgus::upgrade_class *upgrade_class)
 void CUpgrade::add_modifier(std::unique_ptr<wyrmgus::upgrade_modifier> &&modifier)
 {
 	this->modifiers.push_back(std::move(modifier));
-}
-
-void CUpgrade::set_dynasty(const wyrmgus::dynasty *dynasty)
-{
-	this->dynasty = dynasty;
-	this->icon = dynasty->get_icon();
 }
 
 /**
@@ -2160,18 +2162,15 @@ void UpgradeAcquire(CPlayer &player, const CUpgrade *upgrade)
 	player.UpgradeTimers.Upgrades[id] = upgrade->Costs[TimeCost];
 	AllowUpgradeId(player, id, 'R');  // research done
 
-	//Wyrmgus start
-	if (!strncmp(upgrade->Ident.c_str(), "upgrade-deity-", 14) && strncmp(upgrade->Ident.c_str(), "upgrade-deity-domain-", 21)) { // if is a deity upgrade, but isn't a deity domain upgrade
-		wyrmgus::deity *upgrade_deity = wyrmgus::deity::get_by_upgrade(upgrade);
-		if (upgrade_deity) {
-			for (wyrmgus::deity_domain *domain : upgrade_deity->get_domains()) {
-				CUpgrade *domain_upgrade = domain->Upgrade;
-				if (player.Allow.Upgrades[domain_upgrade->ID] != 'R') {
-					UpgradeAcquire(player, domain_upgrade);
-				}
+	const wyrmgus::deity *upgrade_deity = upgrade->get_deity();
+	if (upgrade_deity != nullptr) { // if is a deity upgrade
+		for (const wyrmgus::deity_domain *domain : upgrade_deity->get_domains()) {
+			const CUpgrade *domain_upgrade = domain->Upgrade;
+			if (player.Allow.Upgrades[domain_upgrade->ID] != 'R') {
+				UpgradeAcquire(player, domain_upgrade);
 			}
-			player.Deities.push_back(upgrade_deity);
 		}
+		player.Deities.push_back(upgrade_deity);
 	}
 	//Wyrmgus end
 
@@ -2208,33 +2207,25 @@ void UpgradeLost(CPlayer &player, int id)
 	}
 	//Wyrmgus end
 	player.UpgradeTimers.Upgrades[id] = 0;
-	//Wyrmgus start
 	AllowUpgradeId(player, id, 'A'); // research is lost i.e. available
-	//Wyrmgus end
 	
-	//Wyrmgus start
-	CUpgrade *upgrade = CUpgrade::get_all()[id];
-	if (!strncmp(upgrade->Ident.c_str(), "upgrade-deity-", 14) && strncmp(upgrade->Ident.c_str(), "upgrade-deity-domain-", 21)) { // if is a deity upgrade, but isn't a deity domain upgrade
-		wyrmgus::deity *upgrade_deity = wyrmgus::deity::get_by_upgrade(upgrade);
-		if (upgrade_deity) {
-			for (wyrmgus::deity_domain *domain : upgrade_deity->get_domains()) {
-				CUpgrade *domain_upgrade = domain->Upgrade;
-				if (player.Allow.Upgrades[domain_upgrade->ID] == 'R') {
-					UpgradeLost(player, domain_upgrade->ID);
-				}
+	const CUpgrade *upgrade = CUpgrade::get_all()[id];
+	const wyrmgus::deity *upgrade_deity = upgrade->get_deity();
+	if (upgrade_deity != nullptr) {
+		for (const wyrmgus::deity_domain *domain : upgrade_deity->get_domains()) {
+			const CUpgrade *domain_upgrade = domain->Upgrade;
+			if (player.Allow.Upgrades[domain_upgrade->ID] == 'R') {
+				UpgradeLost(player, domain_upgrade->ID);
 			}
-			player.Deities.erase(std::remove(player.Deities.begin(), player.Deities.end(), upgrade_deity), player.Deities.end());
 		}
+		wyrmgus::vector::remove(player.Deities, upgrade_deity);
 	}
 
 	for (const auto &modifier : upgrade->get_modifiers()) {
 		RemoveUpgradeModifier(player, modifier.get());
 	}
-	//Wyrmgus end
 
-	//
-	//  Upgrades could change the buttons displayed.
-	//
+	//upgrades could change the buttons displayed.
 	if (&player == CPlayer::GetThisPlayer()) {
 		SelectedUnitChanged();
 	}
@@ -2335,19 +2326,17 @@ void IndividualUpgradeAcquire(CUnit &unit, const CUpgrade *upgrade)
 	//Wyrmgus end
 	unit.SetIndividualUpgrade(upgrade, unit.GetIndividualUpgrade(upgrade) + 1);
 	
-	if (!strncmp(upgrade->Ident.c_str(), "upgrade-deity-", 14) && strncmp(upgrade->Ident.c_str(), "upgrade-deity-domain-", 21)) { // if is a deity upgrade, but isn't a deity domain upgrade
-		wyrmgus::deity *upgrade_deity = wyrmgus::deity::get_by_upgrade(upgrade);
-		if (upgrade_deity) {
-			for (wyrmgus::deity_domain *domain : upgrade_deity->get_domains()) {
-				CUpgrade *domain_upgrade = domain->Upgrade;
-				if (unit.GetIndividualUpgrade(domain_upgrade) == 0) {
-					IndividualUpgradeAcquire(unit, domain_upgrade);
-				}
+	const wyrmgus::deity *upgrade_deity = upgrade->get_deity();
+	if (upgrade_deity != nullptr) {
+		for (const wyrmgus::deity_domain *domain : upgrade_deity->get_domains()) {
+			const CUpgrade *domain_upgrade = domain->Upgrade;
+			if (unit.GetIndividualUpgrade(domain_upgrade) == 0) {
+				IndividualUpgradeAcquire(unit, domain_upgrade);
 			}
-			if (unit.Character && std::find(unit.Character->Deities.begin(), unit.Character->Deities.end(), upgrade_deity) == unit.Character->Deities.end() && unit.Player == CPlayer::GetThisPlayer()) {
-				unit.Character->Deities.push_back(upgrade_deity);
-				SaveHero(unit.Character);
-			}
+		}
+		if (unit.Character && !wyrmgus::vector::contains(unit.Character->Deities, upgrade_deity) && unit.Player == CPlayer::GetThisPlayer()) {
+			unit.Character->Deities.push_back(upgrade_deity);
+			SaveHero(unit.Character);
 		}
 	}
 
@@ -2387,19 +2376,17 @@ void IndividualUpgradeLost(CUnit &unit, const CUpgrade *upgrade, bool lose_all)
 	//Wyrmgus end
 	unit.SetIndividualUpgrade(upgrade, unit.GetIndividualUpgrade(upgrade) - 1);
 
-	if (!strncmp(upgrade->Ident.c_str(), "upgrade-deity-", 14) && strncmp(upgrade->Ident.c_str(), "upgrade-deity-domain-", 21)) { // if is a deity upgrade, but isn't a deity domain upgrade
-		wyrmgus::deity *upgrade_deity = wyrmgus::deity::get_by_upgrade(upgrade);
-		if (upgrade_deity) {
-			for (wyrmgus::deity_domain *domain : upgrade_deity->get_domains()) {
-				CUpgrade *domain_upgrade = domain->Upgrade;
-				if (unit.GetIndividualUpgrade(domain_upgrade) > 0) {
-					IndividualUpgradeLost(unit, domain_upgrade);
-				}
+	const wyrmgus::deity *upgrade_deity = upgrade->get_deity();
+	if (upgrade_deity != nullptr) {
+		for (const wyrmgus::deity_domain *domain : upgrade_deity->get_domains()) {
+			const CUpgrade *domain_upgrade = domain->Upgrade;
+			if (unit.GetIndividualUpgrade(domain_upgrade) > 0) {
+				IndividualUpgradeLost(unit, domain_upgrade);
 			}
-			if (unit.Character && unit.Player == CPlayer::GetThisPlayer()) {
-				unit.Character->Deities.erase(std::remove(unit.Character->Deities.begin(), unit.Character->Deities.end(), upgrade_deity), unit.Character->Deities.end());
-				SaveHero(unit.Character);
-			}
+		}
+		if (unit.Character && unit.Player == CPlayer::GetThisPlayer()) {
+			wyrmgus::vector::remove(unit.Character->Deities, upgrade_deity);
+			SaveHero(unit.Character);
 		}
 	}
 

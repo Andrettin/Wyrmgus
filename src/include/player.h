@@ -322,12 +322,12 @@ public:
 	std::map<const wyrmgus::unit_type *, int> UnitTypesAiActiveCount;  				/// total units of unit-type that have their AI set to active
 	std::map<const wyrmgus::unit_type *, std::vector<CUnit *>> UnitsByType;			/// units owned by this player for each type
 	std::map<const wyrmgus::unit_type *, std::vector<CUnit *>> AiActiveUnitsByType;	/// AI active units owned by this player for each type
-	std::vector<CUnit *> Heroes;											/// hero units owned by this player
-	std::vector<wyrmgus::deity *> Deities;								/// deities chosen by this player
+	std::vector<CUnit *> Heroes;							/// hero units owned by this player
+	std::vector<const wyrmgus::deity *> Deities;			/// deities chosen by this player
 private:
 	std::vector<wyrmgus::quest *> available_quests;			/// quests available to this player
-	std::vector<wyrmgus::quest *> current_quests;				/// quests being pursued by this player
-	std::vector<const wyrmgus::quest *> completed_quests;		/// quests completed by this player
+	std::vector<wyrmgus::quest *> current_quests;			/// quests being pursued by this player
+	std::vector<const wyrmgus::quest *> completed_quests;	/// quests completed by this player
 	std::vector<std::unique_ptr<wyrmgus::player_quest_objective>> quest_objectives; //objectives of the player's current quests
 public:
 	std::vector<std::pair<CUpgrade *, int>> Modifiers;						/// Modifiers affecting the player, and until which cycle it should last

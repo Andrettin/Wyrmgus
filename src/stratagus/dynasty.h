@@ -42,7 +42,7 @@ class dynasty final : public detailed_data_entry, public data_type<dynasty>
 {
 	Q_OBJECT
 
-	Q_PROPERTY(CUpgrade* upgrade MEMBER upgrade READ get_upgrade)
+	Q_PROPERTY(CUpgrade* upgrade READ get_upgrade WRITE set_upgrade)
 	Q_PROPERTY(wyrmgus::icon* icon MEMBER icon READ get_icon)
 	Q_PROPERTY(QVariantList factions READ get_factions_qvariant_list)
 
@@ -61,7 +61,6 @@ public:
 	~dynasty();
 
 	virtual void process_sml_scope(const sml_data &scope) override;
-	virtual void initialize() override;
 
 	int get_index() const
 	{
@@ -72,6 +71,8 @@ public:
 	{
 		return this->upgrade;
 	}
+
+	void set_upgrade(CUpgrade *upgrade);
 
 	icon *get_icon() const
 	{

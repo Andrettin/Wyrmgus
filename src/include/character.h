@@ -394,7 +394,7 @@ private:
 	site *home_settlement = nullptr; //the home settlement of this character, where they can preferentially be recruited
 	bool ai_active = true; //whether the character's AI is active
 public:
-	std::vector<wyrmgus::deity *> Deities;		/// Deities chosen by this character to worship
+	std::vector<const wyrmgus::deity *> Deities; //deities chosen by this character to worship
 private:
 	std::vector<const CUpgrade *> base_abilities; //the character's base abilities; these will not be lost after retraining
 	std::vector<const CUpgrade *> abilities;

@@ -150,6 +150,16 @@ void deity::set_mother(wyrmgus::character *character)
 	this->get_character()->set_mother(character);
 }
 
+void deity::set_deity_upgrade(CUpgrade *upgrade)
+{
+	if (upgrade == this->get_deity_upgrade()) {
+		return;
+	}
+
+	this->deity_upgrade = upgrade;
+	upgrade->set_deity(this);
+}
+
 QVariantList deity::get_civilizations_qvariant_list() const
 {
 	return container::to_qvariant_list(this->get_civilizations());
