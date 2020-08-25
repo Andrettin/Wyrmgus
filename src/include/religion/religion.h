@@ -32,9 +32,9 @@
 
 namespace wyrmgus {
 
-class deity_domain;
+class magic_domain;
 
-class religion : public detailed_data_entry, public data_type<religion>
+class religion final : public detailed_data_entry, public data_type<religion>
 {
 	Q_OBJECT
 
@@ -47,7 +47,7 @@ public:
 	}
 
 	bool CulturalDeities = false;				/// Whether the religion's deities (or equivalent) must belong to the civilization that has the religion; for instance: the deities under paganism must belong to the civilization of the player, but under hinduism they musn't (meaning that a Teuton player which has hinduism as a religion can select Hindu deities, but an Indian pagan cannot select Teuton pagan deities)
-	std::vector<deity_domain *> Domains;
+	std::vector<magic_domain *> Domains;
 };
 
 }

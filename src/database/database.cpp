@@ -55,6 +55,7 @@
 #include "language/language_family.h"
 #include "language/word.h"
 #include "language/word_type.h"
+#include "magic_domain.h"
 #include "map/map_template.h"
 #include "map/region.h"
 #include "map/site.h"
@@ -66,7 +67,6 @@
 #include "player_color.h"
 #include "quest.h"
 #include "religion/deity.h"
-#include "religion/deity_domain.h"
 #include "religion/pantheon.h"
 #include "religion/religion.h"
 #include "resource.h"
@@ -243,6 +243,8 @@ QVariant database::process_sml_property_value(const sml_property &property, cons
 			new_property_value = QVariant::fromValue(language::get(property.get_value()));
 		} else if (property_class_name == "wyrmgus::language_family*") {
 			new_property_value = QVariant::fromValue(language_family::get(property.get_value()));
+		} else if (property_class_name == "wyrmgus::magic_domain*") {
+			new_property_value = QVariant::fromValue(magic_domain::get(property.get_value()));
 		} else if (property_class_name == "wyrmgus::map_template*") {
 			new_property_value = QVariant::fromValue(map_template::get(property.get_value()));
 		} else if (property_class_name == "wyrmgus::missile_class") {
@@ -423,8 +425,8 @@ void database::modify_list_property_for_object(QObject *object, const std::strin
 		module *module_value = database::get()->get_module(value);
 		success = QMetaObject::invokeMethod(object, method_name.c_str(), Qt::ConnectionType::DirectConnection, Q_ARG(module *, module_value));
 	} else if (property_name == "domains") {
-		deity_domain *domain_value = deity_domain::get(value);
-		success = QMetaObject::invokeMethod(object, method_name.c_str(), Qt::ConnectionType::DirectConnection, Q_ARG(deity_domain *, domain_value));
+		magic_domain *domain_value = magic_domain::get(value);
+		success = QMetaObject::invokeMethod(object, method_name.c_str(), Qt::ConnectionType::DirectConnection, Q_ARG(magic_domain *, domain_value));
 	} else if (property_name == "factions" || property_name == "cores") {
 		faction *faction_value = faction::get(value);
 		success = QMetaObject::invokeMethod(object, method_name.c_str(), Qt::ConnectionType::DirectConnection, Q_ARG(faction *, faction_value));

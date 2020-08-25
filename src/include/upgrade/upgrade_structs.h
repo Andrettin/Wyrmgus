@@ -38,7 +38,6 @@
 #include "stratagus.h"
 #include "unit/unit_variable.h"
 
-class CSchoolOfMagic;
 struct lua_State;
 
 int CclDefineDependency(lua_State *l);
@@ -49,9 +48,9 @@ namespace wyrmgus {
 	class civilization;
 	class condition;
 	class deity;
-	class deity_domain;
 	class dynasty;
 	class icon;
+	class magic_domain;
 	class unique_item;
 	class unit_type;
 	class upgrade_class;
@@ -222,6 +221,16 @@ public:
 
 	void add_modifier(std::unique_ptr<wyrmgus::upgrade_modifier> &&modifier);
 
+	const std::vector<const wyrmgus::magic_domain *> &get_magic_domains() const
+	{
+		return this->magic_domains;
+	}
+
+	void add_magic_domain(const wyrmgus::magic_domain *domain)
+	{
+		this->magic_domains.push_back(domain);
+	}
+
 	const std::unique_ptr<wyrmgus::condition> &get_preconditions() const
 	{
 		return this->preconditions;
@@ -293,8 +302,9 @@ private:
 public:
 	std::vector<wyrmgus::unique_item *> UniqueItems;	/// Unique items who form a part of this set upgrade
 	std::vector<wyrmgus::unit_type *> ScaledCostUnits;	/// Units for which the upgrade's costs are scaled
-	std::vector<const wyrmgus::deity_domain *> DeityDomains; //deity domains to which this ability belongs
-	std::vector<CSchoolOfMagic *> SchoolsOfMagic;	/// Schools of magic to which this ability belongs
+private:
+	std::vector<const wyrmgus::magic_domain *> magic_domains; //magic domains to which this ability belongs
+public:
 	std::vector<wyrmgus::character *> Characters;	/// Characters who appear in this literary work (if it is one)
 	//Wyrmgus end
 	// TODO: not used by buttons

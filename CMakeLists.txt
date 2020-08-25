@@ -279,7 +279,6 @@ source_group(pathfinder FILES ${pathfinder_SRCS})
 
 set(religion_SRCS
 	src/religion/deity.cpp
-	src/religion/deity_domain.cpp
 	src/religion/religion.cpp
 )
 source_group(religion FILES ${religion_SRCS})
@@ -350,6 +349,7 @@ set(stratagusmain_SRCS
 	src/stratagus/iolib.cpp
 	src/stratagus/luacallback.cpp
 	src/stratagus/item_class.cpp
+	src/stratagus/magic_domain.cpp
 	src/stratagus/main.cpp
 	src/stratagus/mainloop.cpp
 	src/stratagus/mod.cpp
@@ -361,7 +361,6 @@ set(stratagusmain_SRCS
 	src/stratagus/province.cpp
 	src/stratagus/quest.cpp
 	src/stratagus/resource.cpp
-	src/stratagus/school_of_magic.cpp
 	src/stratagus/script.cpp
 	src/stratagus/script_player.cpp
 	src/stratagus/script_character.cpp
@@ -686,7 +685,6 @@ set(stratagus_missile_HDRS
 
 set(stratagus_religion_HDRS
 	src/include/religion/deity.h
-	src/include/religion/deity_domain.h
 	src/include/religion/pantheon.h
 	src/include/religion/religion.h
 )
@@ -880,7 +878,6 @@ set(stratagus_generic_HDRS
 	src/include/replay.h
 	src/include/resource.h
 	src/include/results.h
-	src/include/school_of_magic.h
 	src/include/script.h
 	src/include/settings.h
 	src/include/shaders.h
@@ -908,6 +905,7 @@ set(stratagus_generic_HDRS
 	src/stratagus/government_type.h
 	src/stratagus/item_class.h
 	src/stratagus/item_slot.h
+	src/stratagus/magic_domain.h
 	src/stratagus/objective_type.h
 	src/stratagus/persistent_item.h
 	src/stratagus/player_container.h

@@ -6449,17 +6449,9 @@ bool CUnit::IsAbilityEmpowered(const CUpgrade *ability) const
 	const wyrmgus::plane *plane = this->MapLayer->plane;
 
 	if (plane != nullptr) {
-		if (!plane->EmpoweredDeityDomains.empty()) {
-			for (const wyrmgus::deity_domain *deity_domain : ability->DeityDomains) {
-				if (wyrmgus::vector::contains(plane->EmpoweredDeityDomains, deity_domain)) {
-					return true;
-				}
-			}
-		}
-		
-		if (!plane->EmpoweredSchoolsOfMagic.empty()) {
-			for (const CSchoolOfMagic *school_of_magic : ability->SchoolsOfMagic) {
-				if (std::find(plane->EmpoweredSchoolsOfMagic.begin(), plane->EmpoweredSchoolsOfMagic.end(), school_of_magic) != plane->EmpoweredSchoolsOfMagic.end()) {
+		if (!plane->EmpoweredMagicDomains.empty()) {
+			for (const wyrmgus::magic_domain *magic_domain : ability->get_magic_domains()) {
+				if (wyrmgus::vector::contains(plane->EmpoweredMagicDomains, magic_domain)) {
 					return true;
 				}
 			}

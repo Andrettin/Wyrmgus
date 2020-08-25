@@ -41,7 +41,6 @@
 #include "map/terrain_type.h"
 #include "missile.h"
 #include "plane.h"
-#include "school_of_magic.h"
 #include "script/trigger.h"
 #include "sound/sound.h"
 #include "spells.h"
@@ -255,11 +254,6 @@ void CConfigData::ProcessConfigData(const std::vector<CConfigData *> &config_dat
 			wyrmgus::plane *plane = wyrmgus::plane::get_or_add(ident, nullptr);
 			if (!define_only) {
 				plane->ProcessConfigData(config_data);
-			}
-		} else if (config_data->Tag == "school_of_magic") {
-			CSchoolOfMagic *school_of_magic = CSchoolOfMagic::GetOrAddSchoolOfMagic(ident);
-			if (!define_only) {
-				school_of_magic->ProcessConfigData(config_data);
 			}
 		} else if (config_data->Tag == "season") {
 			wyrmgus::season *season = wyrmgus::season::get_or_add(ident, nullptr);

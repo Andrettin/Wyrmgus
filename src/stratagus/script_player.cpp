@@ -48,6 +48,7 @@
 #include "language/word.h"
 #include "language/word_type.h"
 #include "luacallback.h"
+#include "magic_domain.h"
 #include "map/map.h"
 #include "map/site.h"
 #include "plane.h"
@@ -55,7 +56,6 @@
 #include "province.h"
 #include "quest.h"
 #include "religion/deity.h"
-#include "religion/deity_domain.h"
 #include "religion/pantheon.h"
 #include "religion/religion.h"
 #include "script.h"
@@ -1901,7 +1901,7 @@ static int CclDefineReligion(lua_State *l)
 			}
 			const int subargs = lua_rawlen(l, -1);
 			for (int j = 0; j < subargs; ++j) {
-				wyrmgus::deity_domain *domain = wyrmgus::deity_domain::get(LuaToString(l, -1, j + 1));
+				wyrmgus::magic_domain *domain = wyrmgus::magic_domain::get(LuaToString(l, -1, j + 1));
 				religion->Domains.push_back(domain);
 			}
 		} else {
@@ -1977,7 +1977,7 @@ static int CclDefineDeity(lua_State *l)
 			}
 			const int subargs = lua_rawlen(l, -1);
 			for (int j = 0; j < subargs; ++j) {
-				wyrmgus::deity_domain *domain = wyrmgus::deity_domain::get(LuaToString(l, -1, j + 1));
+				wyrmgus::magic_domain *domain = wyrmgus::magic_domain::get(LuaToString(l, -1, j + 1));
 				deity->domains.push_back(domain);
 			}
 		} else if (!strcmp(value, "Abilities")) {
@@ -2900,12 +2900,12 @@ static int CclGetReligions(lua_State *l)
 	return 1;
 }
 
-static int CclGetDeityDomains(lua_State *l)
+static int CclGetMagicDomains(lua_State *l)
 {
-	lua_createtable(l, wyrmgus::deity_domain::get_all().size(), 0);
-	for (size_t i = 1; i <= wyrmgus::deity_domain::get_all().size(); ++i)
+	lua_createtable(l, wyrmgus::magic_domain::get_all().size(), 0);
+	for (size_t i = 1; i <= wyrmgus::magic_domain::get_all().size(); ++i)
 	{
-		lua_pushstring(l, wyrmgus::deity_domain::get_all()[i-1]->get_identifier().c_str());
+		lua_pushstring(l, wyrmgus::magic_domain::get_all()[i-1]->get_identifier().c_str());
 		lua_rawseti(l, -2, i);
 	}
 	return 1;
@@ -2959,24 +2959,25 @@ static int CclGetReligionData(lua_State *l)
 	return 0;
 }
 
-static int CclGetDeityDomainData(lua_State *l)
+static int CclGetMagicDomainData(lua_State *l)
 {
 	if (lua_gettop(l) < 2) {
 		LuaError(l, "incorrect argument");
 	}
-	std::string deity_domain_ident = LuaToString(l, 1);
-	const wyrmgus::deity_domain *deity_domain = wyrmgus::deity_domain::get(deity_domain_ident);
+
+	const std::string magic_domain_ident = LuaToString(l, 1);
+	const wyrmgus::magic_domain *magic_domain = wyrmgus::magic_domain::get(magic_domain_ident);
 
 	const char *data = LuaToString(l, 2);
 
 	if (!strcmp(data, "Name")) {
-		lua_pushstring(l, deity_domain->get_name().c_str());
+		lua_pushstring(l, magic_domain->get_name().c_str());
 		return 1;
 	} else if (!strcmp(data, "Abilities")) {
-		lua_createtable(l, deity_domain->get_abilities().size(), 0);
-		for (size_t i = 1; i <= deity_domain->get_abilities().size(); ++i)
+		lua_createtable(l, magic_domain->get_abilities().size(), 0);
+		for (size_t i = 1; i <= magic_domain->get_abilities().size(); ++i)
 		{
-			lua_pushstring(l, deity_domain->get_abilities()[i-1]->Ident.c_str());
+			lua_pushstring(l, magic_domain->get_abilities()[i-1]->Ident.c_str());
 			lua_rawseti(l, -2, i);
 		}
 		return 1;
@@ -3140,10 +3141,10 @@ void PlayerCclRegister()
 	lua_register(Lua, "GetLanguageData", CclGetLanguageData);
 	
 	lua_register(Lua, "GetReligions", CclGetReligions);
-	lua_register(Lua, "GetDeityDomains", CclGetDeityDomains);
+	lua_register(Lua, "GetMagicDomains", CclGetMagicDomains);
 	lua_register(Lua, "GetDeities", CclGetDeities);
 	lua_register(Lua, "GetReligionData", CclGetReligionData);
-	lua_register(Lua, "GetDeityDomainData", CclGetDeityDomainData);
+	lua_register(Lua, "GetMagicDomainData", CclGetMagicDomainData);
 	lua_register(Lua, "GetDeityData", CclGetDeityData);
 	//Wyrmgus end
 }

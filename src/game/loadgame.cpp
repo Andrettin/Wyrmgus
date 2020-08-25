@@ -30,35 +30,22 @@
 #include "achievement.h"
 #include "actions.h"
 #include "ai.h"
-#include "campaign.h"
-#include "character.h"
-#include "civilization.h"
 #include "commands.h"
 #include "currency.h"
 #include "database/database.h"
-#include "dialogue.h"
 //Wyrmgus start
 #include "grand_strategy.h"
 //Wyrmgus end
 #include "map/map.h"
 #include "map/map_layer.h"
-#include "map/map_template.h"
 #include "map/minimap.h"
-#include "map/site.h"
 #include "map/terrain_type.h"
 #include "map/tileset.h"
 #include "missile.h"
 #include "particle.h"
 #include "pathfinder.h"
-#include "plane.h"
-#include "player_color.h"
 #include "quest.h"
-#include "religion/deity.h"
-#include "religion/deity_domain.h"
-#include "religion/pantheon.h"
-#include "religion/religion.h"
 #include "replay.h"
-#include "school_of_magic.h"
 #include "script.h"
 #include "script/condition/condition.h"
 #include "script/trigger.h"
@@ -66,12 +53,8 @@
 #include "sound/sound_server.h"
 #include "spells.h"
 #include "text.h"
-#include "time/calendar.h"
-#include "time/season.h"
 #include "time/season_schedule.h"
-#include "time/time_of_day.h"
 #include "time/time_of_day_schedule.h"
-#include "time/timeline.h"
 #include "ui/button.h"
 #include "ui/button_level.h"
 #include "ui/cursor.h"
@@ -109,7 +92,6 @@ void CleanModules()
 	CleanMissiles();
 	//Wyrmgus start
 	CleanProvinces();
-	CSchoolOfMagic::ClearSchoolsOfMagic();
 	CleanTexts();
 	//Wyrmgus end
 	CleanUnits();

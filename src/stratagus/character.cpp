@@ -48,7 +48,6 @@
 #include "province.h"
 #include "quest.h"
 #include "religion/deity.h"
-#include "religion/deity_domain.h"
 #include "script/condition/and_condition.h"
 #include "spells.h"
 #include "time/calendar.h"

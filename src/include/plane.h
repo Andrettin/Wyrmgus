@@ -31,16 +31,15 @@
 #include "database/detailed_data_entry.h"
 #include "data_type.h"
 
-class CSchoolOfMagic;
 class CSeasonSchedule;
 class CTimeOfDaySchedule;
 
 namespace wyrmgus {
 
-class deity_domain;
+class magic_domain;
 class species;
 
-class plane : public detailed_data_entry, public data_type<plane>, public CDataType
+class plane final : public detailed_data_entry, public data_type<plane>, public CDataType
 {
 	Q_OBJECT
 
@@ -56,8 +55,7 @@ public:
 
 	CTimeOfDaySchedule *TimeOfDaySchedule = nullptr; //this plane's time of day schedule
 	CSeasonSchedule *SeasonSchedule = nullptr; //this plane's season schedule
-	std::vector<deity_domain *> EmpoweredDeityDomains; ///deity domains empowered in this plane
-	std::vector<CSchoolOfMagic *> EmpoweredSchoolsOfMagic; ///schools of magic empowered in this plane
+	std::vector<magic_domain *> EmpoweredMagicDomains; ///deity domains empowered in this plane
 	std::vector<species *> Species; ///species in this plane
 };
 

@@ -68,7 +68,6 @@
 //Wyrmgus start
 #include "quest.h"
 #include "religion/deity.h"
-#include "religion/deity_domain.h"
 #include "religion/religion.h"
 //Wyrmgus end
 #include "script/condition/condition.h"

@@ -52,6 +52,7 @@
 //Wyrmgus end
 #include "iolib.h"
 #include "item_class.h"
+#include "magic_domain.h"
 #include "map/map.h"
 #include "map/tileset.h"
 //Wyrmgus start
@@ -59,7 +60,6 @@
 //Wyrmgus end
 #include "player.h"
 #include "religion/deity.h"
-#include "religion/deity_domain.h"
 #include "script.h"
 #include "script/condition/and_condition.h"
 //Wyrmgus start
@@ -2165,7 +2165,7 @@ void UpgradeAcquire(CPlayer &player, const CUpgrade *upgrade)
 
 	const wyrmgus::deity *upgrade_deity = upgrade->get_deity();
 	if (upgrade_deity != nullptr) { // if is a deity upgrade
-		for (const wyrmgus::deity_domain *domain : upgrade_deity->get_domains()) {
+		for (const wyrmgus::magic_domain *domain : upgrade_deity->get_domains()) {
 			const CUpgrade *domain_upgrade = domain->get_upgrade();
 			if (player.Allow.Upgrades[domain_upgrade->ID] != 'R') {
 				UpgradeAcquire(player, domain_upgrade);
@@ -2213,7 +2213,7 @@ void UpgradeLost(CPlayer &player, int id)
 	const CUpgrade *upgrade = CUpgrade::get_all()[id];
 	const wyrmgus::deity *upgrade_deity = upgrade->get_deity();
 	if (upgrade_deity != nullptr) {
-		for (const wyrmgus::deity_domain *domain : upgrade_deity->get_domains()) {
+		for (const wyrmgus::magic_domain *domain : upgrade_deity->get_domains()) {
 			const CUpgrade *domain_upgrade = domain->get_upgrade();
 			if (player.Allow.Upgrades[domain_upgrade->ID] == 'R') {
 				UpgradeLost(player, domain_upgrade->ID);
@@ -2329,7 +2329,7 @@ void IndividualUpgradeAcquire(CUnit &unit, const CUpgrade *upgrade)
 	
 	const wyrmgus::deity *upgrade_deity = upgrade->get_deity();
 	if (upgrade_deity != nullptr) {
-		for (const wyrmgus::deity_domain *domain : upgrade_deity->get_domains()) {
+		for (const wyrmgus::magic_domain *domain : upgrade_deity->get_domains()) {
 			const CUpgrade *domain_upgrade = domain->get_upgrade();
 			if (unit.GetIndividualUpgrade(domain_upgrade) == 0) {
 				IndividualUpgradeAcquire(unit, domain_upgrade);
@@ -2379,7 +2379,7 @@ void IndividualUpgradeLost(CUnit &unit, const CUpgrade *upgrade, bool lose_all)
 
 	const wyrmgus::deity *upgrade_deity = upgrade->get_deity();
 	if (upgrade_deity != nullptr) {
-		for (const wyrmgus::deity_domain *domain : upgrade_deity->get_domains()) {
+		for (const wyrmgus::magic_domain *domain : upgrade_deity->get_domains()) {
 			const CUpgrade *domain_upgrade = domain->get_upgrade();
 			if (unit.GetIndividualUpgrade(domain_upgrade) > 0) {
 				IndividualUpgradeLost(unit, domain_upgrade);

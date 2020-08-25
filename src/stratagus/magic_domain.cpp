@@ -27,14 +27,14 @@
 
 #include "stratagus.h"
 
-#include "religion/deity_domain.h"
+#include "magic_domain.h"
 
 #include "config.h"
 #include "upgrade/upgrade_structs.h"
 
 namespace wyrmgus {
 
-void deity_domain::process_sml_scope(const sml_data &scope)
+void magic_domain::process_sml_scope(const sml_data &scope)
 {
 	const std::string &tag = scope.get_tag();
 	const std::vector<std::string> &values = scope.get_values();
@@ -43,7 +43,7 @@ void deity_domain::process_sml_scope(const sml_data &scope)
 		for (const std::string &value : values) {
 			CUpgrade *ability = CUpgrade::get(value);
 			this->abilities.push_back(ability);
-			ability->DeityDomains.push_back(this);
+			ability->add_magic_domain(this);
 		}
 	} else {
 		data_entry::process_sml_scope(scope);

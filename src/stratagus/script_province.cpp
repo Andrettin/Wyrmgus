@@ -42,7 +42,6 @@
 #include "map/tileset.h"
 #include "plane.h"
 #include "player.h"
-#include "religion/deity_domain.h"
 #include "script.h"
 #include "species.h"
 #include "time/season_schedule.h"

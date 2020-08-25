@@ -39,9 +39,9 @@ namespace wyrmgus {
 
 class character;
 class civilization;
-class deity_domain;
 class faction;
 class icon;
+class magic_domain;
 class pantheon;
 class plane;
 class religion;
@@ -142,19 +142,19 @@ public:
 
 	Q_INVOKABLE void remove_religion(religion *religion);
 
-	const std::vector<deity_domain *> &get_domains() const
+	const std::vector<magic_domain *> &get_domains() const
 	{
 		return this->domains;
 	}
 
 	QVariantList get_domains_qvariant_list() const;
 
-	Q_INVOKABLE void add_domain(deity_domain *domain)
+	Q_INVOKABLE void add_domain(magic_domain *domain)
 	{
 		this->domains.push_back(domain);
 	}
 
-	Q_INVOKABLE void remove_domain(deity_domain *domain);
+	Q_INVOKABLE void remove_domain(magic_domain *domain);
 
 private:
 	pantheon *pantheon = nullptr;
@@ -167,7 +167,7 @@ private:
 public:
 	std::vector<std::string> Feasts;
 private:
-	std::vector<deity_domain *> domains;
+	std::vector<magic_domain *> domains;
 public:
 	std::vector<const CUpgrade *> Abilities; //abilities linked to this deity
 private:

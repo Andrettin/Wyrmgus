@@ -33,10 +33,10 @@
 #include "civilization.h"
 #include "faction.h"
 #include "gender.h"
+#include "magic_domain.h"
 #include "plane.h"
 #include "player.h"
 #include "province.h"
-#include "religion/deity_domain.h"
 #include "religion/pantheon.h"
 #include "religion/religion.h"
 #include "upgrade/upgrade.h"
@@ -88,7 +88,7 @@ void deity::initialize()
 		this->domains.resize(deity::minor_deity_domain_max);
 	}
 
-	for (const deity_domain *domain : this->get_domains()) {
+	for (const magic_domain *domain : this->get_domains()) {
 		for (const CUpgrade *ability : domain->get_abilities()) {
 			if (!vector::contains(this->Abilities, ability)) {
 				this->Abilities.push_back(ability);
@@ -192,7 +192,7 @@ QVariantList deity::get_domains_qvariant_list() const
 	return container::to_qvariant_list(this->get_domains());
 }
 
-void deity::remove_domain(deity_domain *domain)
+void deity::remove_domain(magic_domain *domain)
 {
 	vector::remove(this->domains, domain);
 }
