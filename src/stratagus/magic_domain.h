@@ -39,20 +39,20 @@ class magic_domain final : public detailed_data_entry, public data_type<magic_do
 {
 	Q_OBJECT
 
-	Q_PROPERTY(CUpgrade* upgrade MEMBER upgrade READ get_upgrade)
-
 public:
 	static constexpr const char *class_identifier = "magic_domain";
 	static constexpr const char *database_folder = "magic_domains";
 
 public:
+	static magic_domain *add(const std::string &identifier, const wyrmgus::module *module);
+
 	explicit magic_domain(const std::string &identifier) : detailed_data_entry(identifier)
 	{
 	}
 
 	virtual void process_sml_scope(const sml_data &scope) override;
 
-	CUpgrade *get_upgrade() const
+	const CUpgrade *get_upgrade() const
 	{
 		return this->upgrade;
 	}

@@ -257,6 +257,22 @@ void CUpgrade::initialize()
 			this->icon = this->get_dynasty()->get_icon();
 		} else if (this->get_deity() != nullptr) {
 			this->icon = this->get_deity()->get_icon();
+		} else if (this->magic_domain != nullptr) {
+			if (this->get_name().empty()) {
+				this->set_name(this->magic_domain->get_name());
+			}
+
+			if (this->get_description().empty()) {
+				this->set_description(this->magic_domain->get_description());
+			}
+
+			if (this->get_background().empty()) {
+				this->set_background(this->magic_domain->get_background());
+			}
+
+			if (this->get_quote().empty()) {
+				this->set_quote(this->magic_domain->get_quote());
+			}
 		}
 	}
 

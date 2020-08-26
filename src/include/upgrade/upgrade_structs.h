@@ -120,6 +120,27 @@ public:
 		return upgrade;
 	}
 
+	static CUpgrade *add(const std::string &identifier, const wyrmgus::module *module, const wyrmgus::deity *deity)
+	{
+		CUpgrade *upgrade = CUpgrade::add(identifier, module);
+		upgrade->deity = deity;
+		return upgrade;
+	}
+
+	static CUpgrade *add(const std::string &identifier, const wyrmgus::module *module, const wyrmgus::dynasty *dynasty)
+	{
+		CUpgrade *upgrade = CUpgrade::add(identifier, module);
+		upgrade->dynasty = dynasty;
+		return upgrade;
+	}
+
+	static CUpgrade *add(const std::string &identifier, const wyrmgus::module *module, const wyrmgus::magic_domain *domain)
+	{
+		CUpgrade *upgrade = CUpgrade::add(identifier, module);
+		upgrade->magic_domain = domain;
+		return upgrade;
+	}
+
 	CUpgrade(const std::string &identifier);
 	~CUpgrade();
 
@@ -322,6 +343,7 @@ private:
 	std::unique_ptr<wyrmgus::condition> conditions;
 	const wyrmgus::dynasty *dynasty = nullptr; //the dynasty to which the upgrade pertains, if this is a dynasty upgrade
 	const wyrmgus::deity *deity = nullptr; //the deity to which the upgrade pertains, if this is a deity upgrade
+	const wyrmgus::magic_domain *magic_domain = nullptr; //the magic domain to which the upgrade pertains, if this is a magic domain upgrade
 
 	friend int CclDefineUpgrade(lua_State *l);
 	friend int CclDefineDependency(lua_State *l);

@@ -34,12 +34,25 @@
 
 namespace wyrmgus {
 
+magic_domain *magic_domain::add(const std::string &identifier, const wyrmgus::module *module)
+{
+	magic_domain *domain = data_type::add(identifier, module);
+
+	//add an upgrade with an identifier based on that of the magic domain for it
+	CUpgrade *upgrade = CUpgrade::add("upgrade_magic_domain_" + identifier, module, domain);
+	domain->upgrade = upgrade;
+
+	return domain;
+}
+
 void magic_domain::process_sml_scope(const sml_data &scope)
 {
 	const std::string &tag = scope.get_tag();
 	const std::vector<std::string> &values = scope.get_values();
 
-	if (tag == "abilities") {
+	if (tag == "upgrade") {
+		database::process_sml_data(this->upgrade, scope);
+	} else if (tag == "abilities") {
 		for (const std::string &value : values) {
 			CUpgrade *ability = CUpgrade::get(value);
 			this->abilities.push_back(ability);
