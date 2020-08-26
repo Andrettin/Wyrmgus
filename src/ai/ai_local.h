@@ -276,23 +276,20 @@ private:
 class AiBuildQueue
 {
 public:
-	//Wyrmgus start
-//	AiBuildQueue() : Want(0), Made(0), Type(nullptr), Wait(0)
-	AiBuildQueue() : Want(0), Made(0), Type(nullptr), Wait(0), MapLayer(0), Landmass(0)
-	//Wyrmgus end
+	AiBuildQueue()
 	{
 		Pos.x = Pos.y = -1;
 	}
 
 public:
-	unsigned int Want;  /// requested number
-	unsigned int Made;  /// built number
-	wyrmgus::unit_type *Type;    /// unit-type
-	unsigned long Wait; /// wait until this cycle
+	unsigned int Want = 0;  /// requested number
+	unsigned int Made = 0;  /// built number
+	const wyrmgus::unit_type *Type = nullptr;    /// unit-type
+	unsigned long Wait = 0; /// wait until this cycle
 	Vec2i Pos;          /// build near pos on map
 	//Wyrmgus start
-	int MapLayer;
-	int Landmass;
+	int MapLayer = 0;
+	int Landmass = 0;
 	const wyrmgus::site *settlement = nullptr;
 	//Wyrmgus end
 };
@@ -374,9 +371,35 @@ public:
 class AiHelper
 {
 public:
-	const std::vector<wyrmgus::unit_type *> &get_trainers(const wyrmgus::unit_type *unit_type) const
+	void clear()
 	{
-		static std::vector<wyrmgus::unit_type *> empty_vector;
+		this->trainers.clear();
+		this->trainer_classes.clear();
+		this->builders.clear();
+		this->builder_classes.clear();
+		this->unit_type_upgrades.clear();
+		this->unit_type_upgradees.clear();
+		this->unit_class_upgrades.clear();
+		this->unit_class_upgradees.clear();
+		this->researchers.clear();
+		this->researcher_classes.clear();
+		this->Repair.clear();
+		this->UnitLimit.clear();
+		this->Mines.clear();
+		this->Depots.clear();
+		this->SellMarkets.clear();
+		this->BuyMarkets.clear();
+		this->ProducedResources.clear();
+		this->researched_upgrades.clear();
+		this->researched_upgrade_classes.clear();
+		this->ExperienceUpgrades.clear();
+		this->LearnableAbilities.clear();
+		this->NavalTransporters.clear();
+	}
+
+	const std::vector<const wyrmgus::unit_type *> &get_trainers(const wyrmgus::unit_type *unit_type) const
+	{
+		static std::vector<const wyrmgus::unit_type *> empty_vector;
 
 		auto find_iterator = this->trainers.find(unit_type);
 		if (find_iterator != this->trainers.end()) {
@@ -398,9 +421,9 @@ public:
 		return empty_vector;
 	}
 
-	const std::vector<wyrmgus::unit_type *> &get_builders(const wyrmgus::unit_type *unit_type) const
+	const std::vector<const wyrmgus::unit_type *> &get_builders(const wyrmgus::unit_type *unit_type) const
 	{
-		static std::vector<wyrmgus::unit_type *> empty_vector;
+		static std::vector<const wyrmgus::unit_type *> empty_vector;
 
 		auto find_iterator = this->builders.find(unit_type);
 		if (find_iterator != this->builders.end()) {
@@ -422,9 +445,57 @@ public:
 		return empty_vector;
 	}
 
-	const std::vector<wyrmgus::unit_type *> &get_researchers(const CUpgrade *upgrade) const
+	const std::vector<const wyrmgus::unit_type *> &get_unit_type_upgrades(const wyrmgus::unit_type *unit_type) const
 	{
-		static std::vector<wyrmgus::unit_type *> empty_vector;
+		static std::vector<const wyrmgus::unit_type *> empty_vector;
+
+		auto find_iterator = this->unit_type_upgrades.find(unit_type);
+		if (find_iterator != this->unit_type_upgrades.end()) {
+			return find_iterator->second;
+		}
+
+		return empty_vector;
+	}
+
+	const std::vector<const wyrmgus::unit_type *> &get_unit_type_upgradees(const wyrmgus::unit_type *unit_type) const
+	{
+		static std::vector<const wyrmgus::unit_type *> empty_vector;
+
+		auto find_iterator = this->unit_type_upgradees.find(unit_type);
+		if (find_iterator != this->unit_type_upgradees.end()) {
+			return find_iterator->second;
+		}
+
+		return empty_vector;
+	}
+
+	const std::vector<const wyrmgus::unit_class *> &get_unit_class_upgrades(const wyrmgus::unit_class *unit_class) const
+	{
+		static std::vector<const wyrmgus::unit_class *> empty_vector;
+
+		auto find_iterator = this->unit_class_upgrades.find(unit_class);
+		if (find_iterator != this->unit_class_upgrades.end()) {
+			return find_iterator->second;
+		}
+
+		return empty_vector;
+	}
+
+	const std::vector<const wyrmgus::unit_class *> &get_unit_class_upgradees(const wyrmgus::unit_class *unit_class) const
+	{
+		static std::vector<const wyrmgus::unit_class *> empty_vector;
+
+		auto find_iterator = this->unit_class_upgradees.find(unit_class);
+		if (find_iterator != this->unit_class_upgradees.end()) {
+			return find_iterator->second;
+		}
+
+		return empty_vector;
+	}
+
+	const std::vector<const wyrmgus::unit_type *> &get_researchers(const CUpgrade *upgrade) const
+	{
+		static std::vector<const wyrmgus::unit_type *> empty_vector;
 
 		auto find_iterator = this->researchers.find(upgrade);
 		if (find_iterator != this->researchers.end()) {
@@ -470,30 +541,38 @@ public:
 		return empty_vector;
 	}
 
+private:
 	//unit types associated with lists of other unit types which can train them
-	std::map<const wyrmgus::unit_type *, std::vector<wyrmgus::unit_type *>> trainers;
+	std::map<const wyrmgus::unit_type *, std::vector<const wyrmgus::unit_type *>> trainers;
 
 	//unit classes associated with lists of other unit classes which can train them
 	std::map<const wyrmgus::unit_class *, std::vector<const wyrmgus::unit_class *>> trainer_classes;
 
 	//(building) unit types associated with lists of other unit types which can build them
-	std::map<const wyrmgus::unit_type *, std::vector<wyrmgus::unit_type *>> builders;
+	std::map<const wyrmgus::unit_type *, std::vector<const wyrmgus::unit_type *>> builders;
 
 	//(building) unit classes associated with lists of other unit classes which can build them
 	std::map<const wyrmgus::unit_class *, std::vector<const wyrmgus::unit_class *>> builder_classes;
 
-	/**
-	** The index is the upgrade that should be made, giving a table of all
-	** units/buildings which could do the upgrade.
-	*/
-	std::vector<std::vector<wyrmgus::unit_type *> > Upgrade;
+	//lists of unit type upgrades, mapped to the unit type for which they are available
+	std::map<const wyrmgus::unit_type *, std::vector<const wyrmgus::unit_type *>> unit_type_upgrades;
+
+	//lists of unit types which can perform unit type upgrades, mapped to the unit type to which they can upgrade
+	std::map<const wyrmgus::unit_type *, std::vector<const wyrmgus::unit_type *>> unit_type_upgradees;
+
+	//lists of unit class upgrades, mapped to the unit class for which they are available
+	std::map<const wyrmgus::unit_class *, std::vector<const wyrmgus::unit_class *>> unit_class_upgrades;
+
+	//lists of unit classes which can perform unit class upgrades, mapped to the unit class to which they can upgrade
+	std::map<const wyrmgus::unit_class *, std::vector<const wyrmgus::unit_class *>> unit_class_upgradees;
 
 	//upgrades associated with lists of unit types which can research them
-	std::map<const CUpgrade *, std::vector<wyrmgus::unit_type *>> researchers;
+	std::map<const CUpgrade *, std::vector<const wyrmgus::unit_type *>> researchers;
 
 	//upgrade classes associated with lists of unit classes which can research them
 	std::map<const wyrmgus::upgrade_class *, std::vector<const wyrmgus::unit_class *>> researcher_classes;
 
+public:
 	/**
 	** The index is the unit that should be repaired, giving a table of all
 	** units/buildings which could repair this unit.
@@ -541,18 +620,14 @@ public:
 	*/
 	std::vector<std::vector<int> > ProducedResources;
 
+private:
 	//unit types associated with lists of upgrades which they can research
 	std::map<const wyrmgus::unit_type *, std::vector<const CUpgrade *>> researched_upgrades;
 
 	//unit classes associated with lists of upgrade classes which they can research
 	std::map<const wyrmgus::unit_class *, std::vector<const wyrmgus::upgrade_class *>> researched_upgrade_classes;
 
-	/**
-	** The index is the unit that should perform an upgrade, giving a table of all
-	** possible (non-experience) upgrades for it.
-	*/
-	std::vector<std::vector<wyrmgus::unit_type *> > UpgradesTo;
-	
+public:
 	/**
 	** The index is the unit that should acquire an experience upgrade, giving a table of all
 	** possible upgrades for it.
@@ -570,12 +645,9 @@ public:
 	** naval transporter units.
 	*/
 	std::vector<std::vector<wyrmgus::unit_type *> > NavalTransporters;
-	//Wyrmgus end
-};
 
-/*----------------------------------------------------------------------------
---  Variables
-----------------------------------------------------------------------------*/
+	friend void InitAiHelper(AiHelper &aiHelper);
+};
 
 extern std::vector<CAiType *> AiTypes;   /// List of all AI types
 extern AiHelper AiHelpers; /// AI helper variables
@@ -592,7 +664,7 @@ extern PlayerAi *AiPlayer; /// Current AI player
 //
 extern void AiCheckWorkers();
 /// Add unit-type request to resource manager
-extern void AiAddUnitTypeRequest(wyrmgus::unit_type &type, const int count, const int landmass = 0, const wyrmgus::site *settlement = nullptr, const Vec2i pos = Vec2i(-1, -1), const int z = 0);
+extern void AiAddUnitTypeRequest(const wyrmgus::unit_type &type, const int count, const int landmass = 0, const wyrmgus::site *settlement = nullptr, const Vec2i pos = Vec2i(-1, -1), const int z = 0);
 /// Add upgrade-to request to resource manager
 extern void AiAddUpgradeToRequest(wyrmgus::unit_type &type);
 /// Add research request to resource manager

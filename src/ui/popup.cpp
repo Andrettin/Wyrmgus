@@ -530,9 +530,10 @@ CPopupContentTypeLine::CPopupContentTypeLine() : Color(ColorWhite), Width(0), He
 		switch (button.Action) {
 			case ButtonCmd::TrainClass:
 			case ButtonCmd::BuildClass:
+			case ButtonCmd::UpgradeToClass:
 				unit_class = wyrmgus::unit_class::get_all()[button.Value];
-				if (Selected[0]->Player->Faction != -1) {
-					unit_type = wyrmgus::faction::get_all()[Selected[0]->Player->Faction]->get_class_unit_type(unit_class);
+				if (Selected[0]->Player->get_faction() != nullptr) {
+					unit_type = Selected[0]->Player->get_faction()->get_class_unit_type(unit_class);
 				}
 				break;
 			case ButtonCmd::Unit:

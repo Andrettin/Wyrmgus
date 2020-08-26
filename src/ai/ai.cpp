@@ -754,29 +754,7 @@ void FreeAi()
 	AiTypes.clear();
 
 	//  Free AiHelpers.
-	AiHelpers.trainers.clear();
-	AiHelpers.trainer_classes.clear();
-	AiHelpers.builders.clear();
-	AiHelpers.builder_classes.clear();
-	AiHelpers.Upgrade.clear();
-	AiHelpers.researchers.clear();
-	AiHelpers.researcher_classes.clear();
-	AiHelpers.Repair.clear();
-	AiHelpers.UnitLimit.clear();
-	AiHelpers.Equiv.clear();
-	AiHelpers.Mines.clear();
-	AiHelpers.Depots.clear();
-	//Wyrmgus start
-	AiHelpers.SellMarkets.clear();
-	AiHelpers.BuyMarkets.clear();
-	AiHelpers.ProducedResources.clear();
-	AiHelpers.researched_upgrades.clear();
-	AiHelpers.researched_upgrade_classes.clear();
-	AiHelpers.UpgradesTo.clear();
-	AiHelpers.ExperienceUpgrades.clear();
-	AiHelpers.LearnableAbilities.clear();
-	AiHelpers.NavalTransporters.clear();
-	//Wyrmgus end
+	AiHelpers.clear();
 
 	AiResetUnitTypeEquiv();
 }
@@ -1631,9 +1609,23 @@ int AiGetUnitTypeCount(const PlayerAi &pai, const wyrmgus::unit_type *type, cons
 	}
 	
 	if (include_upgrades) {
-		if (type->Slot < (int) AiHelpers.UpgradesTo.size()) {
-			for (size_t i = 0; i != AiHelpers.UpgradesTo[type->Slot].size(); ++i) {
-				count += AiGetUnitTypeCount(pai, AiHelpers.UpgradesTo[type->Slot][i], landmass, include_requests, include_upgrades);
+		const std::vector<const wyrmgus::unit_type *> &unit_type_upgrades = AiHelpers.get_unit_type_upgrades(type);
+
+		for (const wyrmgus::unit_type *unit_type_upgrade : unit_type_upgrades) {
+			count += AiGetUnitTypeCount(pai, unit_type_upgrade, landmass, include_requests, include_upgrades);
+		}
+
+		if (type->get_unit_class() != nullptr && pai.Player->get_faction() != nullptr) {
+			const std::vector<const wyrmgus::unit_class *> &unit_class_upgrades = AiHelpers.get_unit_class_upgrades(type->get_unit_class());
+
+			for (const wyrmgus::unit_class *unit_class_upgrade : unit_class_upgrades) {
+				const wyrmgus::unit_type *unit_type_upgrade = pai.Player->get_faction()->get_class_unit_type(unit_class_upgrade);
+
+				if (unit_type_upgrade == nullptr) {
+					continue;
+				}
+
+				count += AiGetUnitTypeCount(pai, unit_type_upgrade, landmass, include_requests, include_upgrades);
 			}
 		}
 	}

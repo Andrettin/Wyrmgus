@@ -52,7 +52,8 @@ enum class ButtonCmd {
 	ResearchClass, //research order (upgrade class)
 	LearnAbility,   /// order learn ability
 	ExperienceUpgradeTo,   /// order upgrade (experience)
-	UpgradeTo,      /// order upgrade
+	UpgradeTo,      //upgrade order
+	UpgradeToClass, //upgrade order (unit class)
 	RallyPoint,		/// set rally point
 	Faction,		/// change faction
 	Dynasty,		/// change dynasty

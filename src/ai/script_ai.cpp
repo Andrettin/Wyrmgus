@@ -71,8 +71,8 @@ static void AiHelperInsert(std::vector<std::vector<wyrmgus::unit_type *> > &tabl
 	table[n].push_back(&base);
 }
 
-static void AiHelperInsert(std::map<const wyrmgus::unit_type *, std::vector<wyrmgus::unit_type *>> &table,
-	const wyrmgus::unit_type *key, wyrmgus::unit_type *target)
+static void AiHelperInsert(std::map<const wyrmgus::unit_type *, std::vector<const wyrmgus::unit_type *>> &table,
+	const wyrmgus::unit_type *key, const wyrmgus::unit_type *target)
 {
 	if (table.contains(key) && wyrmgus::vector::contains(table[key], target)) {
 		return;
@@ -91,8 +91,8 @@ static void AiHelperInsert(std::map<const wyrmgus::unit_class *, std::vector<con
 	table[key].push_back(target);
 }
 
-static void AiHelperInsert(std::map<const CUpgrade *, std::vector<wyrmgus::unit_type *>> &table,
-	const CUpgrade *key, wyrmgus::unit_type *target)
+static void AiHelperInsert(std::map<const CUpgrade *, std::vector<const wyrmgus::unit_type *>> &table,
+	const CUpgrade *key, const wyrmgus::unit_type *target)
 {
 	if (table.contains(key) && wyrmgus::vector::contains(table[key], target)) {
 		return;
@@ -360,26 +360,7 @@ static void InitAiHelper(AiHelper &aiHelper)
 {
 	//Wyrmgus start
 	//free AI helper (except for equivs) before initializing, in case this is a re-definition
-	AiHelpers.trainers.clear();
-	AiHelpers.trainer_classes.clear();
-	AiHelpers.builders.clear();
-	AiHelpers.builder_classes.clear();
-	AiHelpers.Upgrade.clear();
-	AiHelpers.researchers.clear();
-	AiHelpers.researcher_classes.clear();
-	AiHelpers.Repair.clear();
-	AiHelpers.UnitLimit.clear();
-	AiHelpers.Mines.clear();
-	AiHelpers.Depots.clear();
-	AiHelpers.SellMarkets.clear();
-	AiHelpers.BuyMarkets.clear();
-	AiHelpers.ProducedResources.clear();
-	AiHelpers.researched_upgrades.clear();
-	AiHelpers.researched_upgrade_classes.clear();
-	AiHelpers.UpgradesTo.clear();
-	AiHelpers.ExperienceUpgrades.clear();
-	AiHelpers.LearnableAbilities.clear();
-	AiHelpers.NavalTransporters.clear();
+	AiHelpers.clear();
 	//Wyrmgus end
 	
 	std::vector<wyrmgus::unit_type *> reparableUnits = getReparableUnits();
@@ -462,21 +443,27 @@ static void InitAiHelper(AiHelper &aiHelper)
 				break;
 			}
 			case ButtonCmd::UpgradeTo : {
-				wyrmgus::unit_type *upgradeToType = wyrmgus::unit_type::get(button->ValueStr);
+				const wyrmgus::unit_type *upgrade_to_type = wyrmgus::unit_type::get(button->ValueStr);
 
-				for (std::vector<wyrmgus::unit_type *>::const_iterator j = unitmask.begin(); j != unitmask.end(); ++j) {
-					AiHelperInsert(aiHelper.Upgrade, upgradeToType->Slot, **j);
+				for (const wyrmgus::unit_type *unit_type : unitmask) {
+					AiHelperInsert(aiHelper.unit_type_upgrades, unit_type, upgrade_to_type);
+					AiHelperInsert(aiHelper.unit_type_upgradees, upgrade_to_type, unit_type);
 				}
-				
-				for (std::vector<wyrmgus::unit_type *>::const_iterator j = unitmask.begin(); j != unitmask.end(); ++j) {
-					AiHelperInsert(aiHelper.UpgradesTo, (**j).Slot, *upgradeToType);
+				break;
+			}
+			case ButtonCmd::UpgradeToClass: {
+				const wyrmgus::unit_class *upgrade_to_class = wyrmgus::unit_class::get(button->ValueStr);
+
+				for (const wyrmgus::unit_class *unit_class : button->get_unit_classes()) {
+					AiHelperInsert(aiHelper.unit_class_upgrades, unit_class, upgrade_to_class);
+					AiHelperInsert(aiHelper.unit_class_upgradees, upgrade_to_class, unit_class);
 				}
 				break;
 			}
 			case ButtonCmd::Research : {
 				const CUpgrade *upgrade = CUpgrade::get(button->ValueStr);
 
-				for (wyrmgus::unit_type *researcher : unitmask) {
+				for (const wyrmgus::unit_type *researcher : unitmask) {
 					AiHelperInsert(aiHelper.researchers, upgrade, researcher);
 					AiHelperInsert(aiHelper.researched_upgrades, researcher, upgrade);
 				}

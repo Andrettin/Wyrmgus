@@ -56,7 +56,7 @@
 
 static constexpr int COLLECT_RESOURCES_INTERVAL = 4;
 
-static int AiMakeUnit(wyrmgus::unit_type &type, const Vec2i &nearPos, int z, int landmass = 0, const wyrmgus::site *settlement = nullptr);
+static int AiMakeUnit(const wyrmgus::unit_type &type, const Vec2i &nearPos, int z, int landmass = 0, const wyrmgus::site *settlement = nullptr);
 
 /**
 **  Check if the costs are available for the AI.
@@ -413,18 +413,17 @@ bool AiRequestedTypeAllowed(const CPlayer &player, const wyrmgus::unit_type &typ
 		return false;
 	}
 
-	const std::vector<std::vector<wyrmgus::unit_type *>> *tablep = nullptr;
-
-	const std::vector<wyrmgus::unit_type *> *builders = nullptr;
+	const std::vector<const wyrmgus::unit_type *> *builders = nullptr;
 	const std::vector<const wyrmgus::unit_class *> *builder_classes = nullptr;
 
 	if (type.BoolFlag[BUILDING_INDEX].value) {
 		if (
 			include_upgrade
 			&& AiHelpers.get_builders(&type).empty() && AiHelpers.get_builder_classes(type.get_unit_class()).empty()
-			&& type.Slot < (int) AiHelpers.Upgrade.size() && !AiHelpers.Upgrade[type.Slot].empty()
+			&& (!AiHelpers.get_unit_type_upgradees(&type).empty() || !AiHelpers.get_unit_class_upgradees(type.get_unit_class()).empty())
 		) {
-			tablep = &AiHelpers.Upgrade;
+			builders = &AiHelpers.get_unit_type_upgradees(&type);
+			builder_classes = &AiHelpers.get_unit_class_upgradees(type.get_unit_class());
 		} else {
 			builders = &AiHelpers.get_builders(&type);
 			builder_classes = &AiHelpers.get_builder_classes(type.get_unit_class());
@@ -441,9 +440,9 @@ bool AiRequestedTypeAllowed(const CPlayer &player, const wyrmgus::unit_type &typ
 			}
 		}
 
-		if (type.get_unit_class() != nullptr && player.Faction != -1) {
+		if (type.get_unit_class() != nullptr && player.get_faction() != nullptr) {
 			for (const wyrmgus::unit_class *builder_class : *builder_classes) {
-				const wyrmgus::unit_type *builder = wyrmgus::faction::get_all()[player.Faction]->get_class_unit_type(builder_class);
+				const wyrmgus::unit_type *builder = player.get_faction()->get_class_unit_type(builder_class);
 
 				if (builder == nullptr) {
 					continue;
@@ -458,17 +457,6 @@ bool AiRequestedTypeAllowed(const CPlayer &player, const wyrmgus::unit_type &typ
 		return false;
 	}
 
-	if (type.Slot >= (int) (*tablep).size()) {
-		return false;
-	}
-
-	const size_t size = (*tablep)[type.Slot].size();
-
-	for (const wyrmgus::unit_type *builder : (*tablep)[type.Slot]) {
-		if (player.GetUnitTypeAiActiveCount(builder) > 0 || (allow_can_build_builder && AiRequestedTypeAllowed(player, *builder))) {
-			return true;
-		}
-	}
 	return false;
 }
 
@@ -736,7 +724,7 @@ void AiTransportCapacityRequest(int capacity_needed, int landmass)
 		count_requested = std::max(count_requested, 1);
 
 		bool has_builder = false;
-		for (wyrmgus::unit_type *builder : AiHelpers.get_trainers(best_type)) {
+		for (const wyrmgus::unit_type *builder : AiHelpers.get_trainers(best_type)) {
 			if (AiPlayer->Player->GetUnitTypeAiActiveCount(builder) > 0) {
 				std::vector<CUnit *> builder_table;
 
@@ -800,7 +788,7 @@ void AiTransportCapacityRequest(int capacity_needed, int landmass)
 		
 		if (!has_builder) { // if doesn't have a builder, request one
 			bool requested_builder = false;
-			for (wyrmgus::unit_type *builder : AiHelpers.get_trainers(best_type)) {
+			for (const wyrmgus::unit_type *builder : AiHelpers.get_trainers(best_type)) {
 				if (!AiRequestedTypeAllowed(*AiPlayer->Player, *builder)) {
 					continue;
 				}
@@ -1016,7 +1004,7 @@ static bool AiTrainUnit(const wyrmgus::unit_type &type, wyrmgus::unit_type &what
 **
 **  @note        We must check if the dependencies are fulfilled.
 */
-static int AiMakeUnit(wyrmgus::unit_type &typeToMake, const Vec2i &nearPos, int z, int landmass, const wyrmgus::site *settlement)
+static int AiMakeUnit(const wyrmgus::unit_type &typeToMake, const Vec2i &nearPos, int z, int landmass, const wyrmgus::site *settlement)
 {
 	// Find equivalents unittypes.
 	int usableTypes[UnitTypeMax + 1];
@@ -1026,7 +1014,7 @@ static int AiMakeUnit(wyrmgus::unit_type &typeToMake, const Vec2i &nearPos, int 
 	for (int currentType = 0; currentType < usableTypesCount; ++currentType) {
 		wyrmgus::unit_type &type = *wyrmgus::unit_type::get_all()[usableTypes[currentType]];
 
-		const std::vector<wyrmgus::unit_type *> *builders = nullptr;
+		const std::vector<const wyrmgus::unit_type *> *builders = nullptr;
 		const std::vector<const wyrmgus::unit_class *> *builder_classes = nullptr;
 
 		//
@@ -1040,7 +1028,7 @@ static int AiMakeUnit(wyrmgus::unit_type &typeToMake, const Vec2i &nearPos, int 
 			builder_classes = &AiHelpers.get_trainer_classes(type.get_unit_class());
 		}
 
-		for (wyrmgus::unit_type *builder : *builders) {
+		for (const wyrmgus::unit_type *builder : *builders) {
 			if (AiPlayer->Player->GetUnitTypeAiActiveCount(builder)) {
 				if (type.BoolFlag[BUILDING_INDEX].value) {
 					if (AiBuildBuilding(*builder, type, nearPos, z, landmass, settlement)) {
@@ -1054,9 +1042,9 @@ static int AiMakeUnit(wyrmgus::unit_type &typeToMake, const Vec2i &nearPos, int 
 			}
 		}
 
-		if (AiPlayer->Player->Faction != -1) {
+		if (AiPlayer->Player->get_faction() != nullptr) {
 			for (const wyrmgus::unit_class *builder_class : *builder_classes) {
-				const wyrmgus::unit_type *builder = wyrmgus::faction::get_all()[AiPlayer->Player->Faction]->get_class_unit_type(builder_class);
+				const wyrmgus::unit_type *builder = AiPlayer->Player->get_faction()->get_class_unit_type(builder_class);
 
 				if (builder == nullptr) {
 					continue;
@@ -1186,28 +1174,35 @@ void AiAddUpgradeToRequest(wyrmgus::unit_type &type)
 	//
 	// Check if we have a place for the upgrade to.
 	//
-	const int n = AiHelpers.Upgrade.size();
-	std::vector<std::vector<wyrmgus::unit_type *> > &tablep = AiHelpers.Upgrade;
+	const std::vector<const wyrmgus::unit_type *> &unit_type_upgradees = AiHelpers.get_unit_type_upgradees(&type);
+	const std::vector<const wyrmgus::unit_class *> &unit_class_upgradees = AiHelpers.get_unit_class_upgradees(type.get_unit_class());
 
-	if (type.Slot >= n) { // Oops not known.
-		DebugPrint("%d: AiAddUpgradeToRequest I: Nothing known about '%s'\n"
-				   _C_ AiPlayer->Player->Index _C_ type.Ident.c_str());
-		return;
-	}
-	std::vector<wyrmgus::unit_type *> &table = tablep[type.Slot];
-	if (table.empty()) { // Oops not known.
-		DebugPrint("%d: AiAddUpgradeToRequest II: Nothing known about '%s'\n"
+	if (unit_type_upgradees.empty() && unit_class_upgradees.empty()) { // Oops not known.
+		DebugPrint("%d: AiAddUpgradeToRequest: Nothing known about '%s'\n"
 				   _C_ AiPlayer->Player->Index _C_ type.Ident.c_str());
 		return;
 	}
 
-	for (unsigned int i = 0; i < table.size(); ++i) {
-		//
-		// The type is available
-		//
-		if (AiPlayer->Player->GetUnitTypeAiActiveCount(table[i])) {
-			if (AiUpgradeTo(*table[i], type)) {
+	for (const wyrmgus::unit_type *unit_type_upgradee : unit_type_upgradees) {
+		if (AiPlayer->Player->GetUnitTypeAiActiveCount(unit_type_upgradee)) {
+			if (AiUpgradeTo(*unit_type_upgradee, type)) {
 				return;
+			}
+		}
+	}
+
+	if (AiPlayer->Player->get_faction() != nullptr) {
+		for (const wyrmgus::unit_class *unit_class_upgradee : unit_class_upgradees) {
+			const wyrmgus::unit_type *unit_type_upgradee = AiPlayer->Player->get_faction()->get_class_unit_type(unit_class_upgradee);
+
+			if (unit_type_upgradee == nullptr) {
+				continue;
+			}
+
+			if (AiPlayer->Player->GetUnitTypeAiActiveCount(unit_type_upgradee)) {
+				if (AiUpgradeTo(*unit_type_upgradee, type)) {
+					return;
+				}
 			}
 		}
 	}
@@ -1229,7 +1224,7 @@ static void AiCheckingWork()
 	const int sz = AiPlayer->UnitTypeBuilt.size();
 	for (int i = 0; i < sz; ++i) {
 		AiBuildQueue *queuep = &AiPlayer->UnitTypeBuilt[AiPlayer->UnitTypeBuilt.size() - sz + i];
-		wyrmgus::unit_type &type = *queuep->Type;
+		const wyrmgus::unit_type &type = *queuep->Type;
 		
 		if ( //if has a build request specific to a settlement, but the player doesn't own the settlement, remove the order
 			queuep->settlement != nullptr
@@ -2301,9 +2296,9 @@ static void AiCheckPathwayConstruction()
 							}
 						}
 
-						if (!built_pathway && AiPlayer->Player->Faction != -1) {
+						if (!built_pathway && AiPlayer->Player->get_faction() != nullptr) {
 							for (const wyrmgus::unit_class *builder_class : AiHelpers.get_builder_classes(pathway_types[p]->get_unit_class())) {
-								const wyrmgus::unit_type *builder_type = wyrmgus::faction::get_all()[AiPlayer->Player->Faction]->get_class_unit_type(builder_class);
+								const wyrmgus::unit_type *builder_type = AiPlayer->Player->get_faction()->get_class_unit_type(builder_class);
 
 								if (builder_type == nullptr) {
 									continue;
@@ -2621,7 +2616,7 @@ void AiCheckBuildings()
 	
 	if (!AiHelpers.get_builders(unit_type).empty() || !AiHelpers.get_builder_classes(unit_type->get_unit_class()).empty()) { //constructed by worker
 		AiAddUnitTypeRequest(*unit_type, 1);
-	} else if (unit_type->Slot < (int) AiHelpers.Upgrade.size() && !AiHelpers.Upgrade[unit_type->Slot].empty()) { //upgraded to from another building
+	} else if (!AiHelpers.get_unit_type_upgradees(unit_type).empty() || !AiHelpers.get_unit_class_upgradees(unit_type->get_unit_class()).empty()) { //upgraded to from another building
 		AiAddUpgradeToRequest(*unit_type);
 	} else {
 		fprintf(stderr, "Unit type \"%s\" is in an AiBuildingTemplate, but it cannot be built by any worker, and no unit type can upgrade to it.\n", unit_type->Ident.c_str());
@@ -2768,7 +2763,7 @@ void AiCheckWorkers()
 **
 **  @todo         FIXME: should store the end of list and not search it.
 */
-void AiAddUnitTypeRequest(wyrmgus::unit_type &type, const int count, const int landmass, const wyrmgus::site *settlement, const Vec2i pos, int z)
+void AiAddUnitTypeRequest(const wyrmgus::unit_type &type, const int count, const int landmass, const wyrmgus::site *settlement, const Vec2i pos, int z)
 {
 	AiBuildQueue queue;
 

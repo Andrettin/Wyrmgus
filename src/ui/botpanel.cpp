@@ -435,7 +435,7 @@ static bool CanShowPopupContent(const PopupConditionPanel *condition,
 	}
 	
 	if (condition->RequirementsString != CONDITION_TRUE) {
-		if ((condition->RequirementsString == CONDITION_ONLY) ^ ((button.Action == ButtonCmd::Research || button.Action == ButtonCmd::ResearchClass || button.Action == ButtonCmd::LearnAbility || button.Action == ButtonCmd::Faction || button.Action == ButtonCmd::Dynasty || button.Action == ButtonCmd::Train || button.Action == ButtonCmd::TrainClass || button.Action == ButtonCmd::Build || button.Action == ButtonCmd::BuildClass || button.Action == ButtonCmd::UpgradeTo || button.Action == ButtonCmd::Buy) && !IsButtonUsable(*Selected[0], button) && Selected[0]->Player == CPlayer::GetThisPlayer() && ((type && !type->RequirementsString.empty()) ||  ((button.Action == ButtonCmd::Research || button.Action == ButtonCmd::ResearchClass || button.Action == ButtonCmd::LearnAbility || button.Action == ButtonCmd::Faction || button.Action == ButtonCmd::Dynasty) && !upgrade->get_requirements_string().empty())))) {
+		if ((condition->RequirementsString == CONDITION_ONLY) ^ ((button.Action == ButtonCmd::Research || button.Action == ButtonCmd::ResearchClass || button.Action == ButtonCmd::LearnAbility || button.Action == ButtonCmd::Faction || button.Action == ButtonCmd::Dynasty || button.Action == ButtonCmd::Train || button.Action == ButtonCmd::TrainClass || button.Action == ButtonCmd::Build || button.Action == ButtonCmd::BuildClass || button.Action == ButtonCmd::UpgradeTo || button.Action == ButtonCmd::UpgradeToClass || button.Action == ButtonCmd::Buy) && !IsButtonUsable(*Selected[0], button) && Selected[0]->Player == CPlayer::GetThisPlayer() && ((type && !type->RequirementsString.empty()) ||  ((button.Action == ButtonCmd::Research || button.Action == ButtonCmd::ResearchClass || button.Action == ButtonCmd::LearnAbility || button.Action == ButtonCmd::Faction || button.Action == ButtonCmd::Dynasty) && !upgrade->get_requirements_string().empty())))) {
 			return false;
 		}
 	}
@@ -698,9 +698,10 @@ static void GetPopupSize(const CPopup &popup, const wyrmgus::button &button,
 	switch (button.Action) {
 		case ButtonCmd::BuildClass:
 		case ButtonCmd::TrainClass:
+		case ButtonCmd::UpgradeToClass:
 			unit_class = wyrmgus::unit_class::get_all()[button.Value];
-			if (Selected[0]->Player->Faction != -1) {
-				unit_type = wyrmgus::faction::get_all()[Selected[0]->Player->Faction]->get_class_unit_type(unit_class);
+			if (Selected[0]->Player->get_faction() != nullptr) {
+				unit_type = Selected[0]->Player->get_faction()->get_class_unit_type(unit_class);
 			}
 			break;
 		case ButtonCmd::Unit:
@@ -782,9 +783,10 @@ void DrawPopup(const wyrmgus::button &button, int x, int y, bool above)
 			break;
 		case ButtonCmd::BuildClass:
 		case ButtonCmd::TrainClass:
+		case ButtonCmd::UpgradeToClass:
 			unit_class = wyrmgus::unit_class::get_all()[button.Value];
-			if (Selected[0]->Player->Faction != -1) {
-				unit_type = wyrmgus::faction::get_all()[Selected[0]->Player->Faction]->get_class_unit_type(unit_class);
+			if (Selected[0]->Player->get_faction() != nullptr) {
+				unit_type = Selected[0]->Player->get_faction()->get_class_unit_type(unit_class);
 			}
 			break;
 		case ButtonCmd::Salvage:
@@ -827,6 +829,7 @@ void DrawPopup(const wyrmgus::button &button, int x, int y, bool above)
 		case ButtonCmd::Train:
 		case ButtonCmd::TrainClass:
 		case ButtonCmd::UpgradeTo:
+		case ButtonCmd::UpgradeToClass:
 			CPlayer::GetThisPlayer()->GetUnitTypeCosts(unit_type, type_costs, Selected[0]->Type->Stats[Selected[0]->Player->Index].GetUnitStock(unit_type) != 0);
 			memcpy(Costs, type_costs, sizeof(type_costs));
 			Costs[FoodCost] = unit_type->Stats[CPlayer::GetThisPlayer()->Index].Variables[DEMAND_INDEX].Value;
@@ -1108,6 +1111,7 @@ void CButtonPanel::Draw()
 				break;
 			case ButtonCmd::BuildClass:
 			case ButtonCmd::TrainClass:
+			case ButtonCmd::UpgradeToClass:
 				if (player_faction != nullptr) {
 					button_unit_type = player_faction->get_class_unit_type(wyrmgus::unit_class::get_all()[button->Value]);
 				}
@@ -1132,9 +1136,9 @@ void CButtonPanel::Draw()
 			button_icon = Selected[0]->GetButtonIcon(button->Action);
 		} else if (button->Action == ButtonCmd::ExperienceUpgradeTo && Selected[0]->GetVariation() && button_unit_type->GetVariation(Selected[0]->GetVariation()->get_identifier()) != nullptr && !button_unit_type->GetVariation(Selected[0]->GetVariation()->get_identifier())->Icon.Name.empty()) {
 			button_icon = button_unit_type->GetVariation(Selected[0]->GetVariation()->get_identifier())->Icon.Icon;
-		} else if ((button->Action == ButtonCmd::Train || button->Action == ButtonCmd::TrainClass || button->Action == ButtonCmd::Build || button->Action == ButtonCmd::BuildClass || button->Action == ButtonCmd::UpgradeTo || button->Action == ButtonCmd::ExperienceUpgradeTo) && button->Icon.Name.empty() && button_unit_type->GetDefaultVariation(CPlayer::GetThisPlayer()) != nullptr && !button_unit_type->GetDefaultVariation(CPlayer::GetThisPlayer())->Icon.Name.empty()) {
+		} else if ((button->Action == ButtonCmd::Train || button->Action == ButtonCmd::TrainClass || button->Action == ButtonCmd::Build || button->Action == ButtonCmd::BuildClass || button->Action == ButtonCmd::UpgradeTo || button->Action == ButtonCmd::UpgradeToClass || button->Action == ButtonCmd::ExperienceUpgradeTo) && button->Icon.Name.empty() && button_unit_type->GetDefaultVariation(CPlayer::GetThisPlayer()) != nullptr && !button_unit_type->GetDefaultVariation(CPlayer::GetThisPlayer())->Icon.Name.empty()) {
 			button_icon = button_unit_type->GetDefaultVariation(CPlayer::GetThisPlayer())->Icon.Icon;
-		} else if ((button->Action == ButtonCmd::Train || button->Action == ButtonCmd::TrainClass || button->Action == ButtonCmd::Build || button->Action == ButtonCmd::BuildClass || button->Action == ButtonCmd::UpgradeTo || button->Action == ButtonCmd::ExperienceUpgradeTo) && button->Icon.Name.empty() && !button_unit_type->Icon.Name.empty()) {
+		} else if ((button->Action == ButtonCmd::Train || button->Action == ButtonCmd::TrainClass || button->Action == ButtonCmd::Build || button->Action == ButtonCmd::BuildClass || button->Action == ButtonCmd::UpgradeTo || button->Action == ButtonCmd::UpgradeToClass || button->Action == ButtonCmd::ExperienceUpgradeTo) && button->Icon.Name.empty() && !button_unit_type->Icon.Name.empty()) {
 			button_icon = button_unit_type->Icon.Icon;
 		} else if (button->Action == ButtonCmd::Buy) {
 			button_icon = UnitManager.GetSlotUnit(button->Value).get_icon();
@@ -1278,6 +1282,7 @@ bool IsButtonAllowed(const CUnit &unit, const wyrmgus::button &buttonaction)
 			break;
 		case ButtonCmd::TrainClass:
 		case ButtonCmd::BuildClass:
+		case ButtonCmd::UpgradeToClass:
 			unit_class = wyrmgus::unit_class::get_all()[buttonaction.Value];
 			if (unit.Player->get_faction() != nullptr) {
 				unit_type = unit.Player->get_faction()->get_class_unit_type(unit_class);
@@ -1364,6 +1369,7 @@ bool IsButtonAllowed(const CUnit &unit, const wyrmgus::button &buttonaction)
 			}
 		// FALL THROUGH
 		case ButtonCmd::UpgradeTo:
+		case ButtonCmd::UpgradeToClass:
 		case ButtonCmd::Build:
 		case ButtonCmd::BuildClass:
 			if (unit_type == nullptr) {
@@ -1485,6 +1491,7 @@ bool IsButtonUsable(const CUnit &unit, const wyrmgus::button &buttonaction)
 			break;
 		case ButtonCmd::TrainClass:
 		case ButtonCmd::BuildClass:
+		case ButtonCmd::UpgradeToClass:
 			unit_class = wyrmgus::unit_class::get_all()[buttonaction.Value];
 			if (unit.Player->get_faction() != nullptr) {
 				unit_type = unit.Player->get_faction()->get_class_unit_type(unit_class);
@@ -1525,6 +1532,7 @@ bool IsButtonUsable(const CUnit &unit, const wyrmgus::button &buttonaction)
 		case ButtonCmd::Train:
 		case ButtonCmd::TrainClass:
 		case ButtonCmd::UpgradeTo:
+		case ButtonCmd::UpgradeToClass:
 		case ButtonCmd::Build:
 		case ButtonCmd::BuildClass:
 			res = check_conditions<false>(unit_type, unit.Player, false, !CPlayer::GetThisPlayer()->IsTeamed(unit));
@@ -2105,8 +2113,8 @@ void CButtonPanel::DoClicked_Train(const std::unique_ptr<wyrmgus::button> &butto
 			break;
 		case ButtonCmd::TrainClass:
 			unit_class = wyrmgus::unit_class::get_all()[button->Value];
-			if (Selected[0]->Player->Faction != -1) {
-				unit_type = wyrmgus::faction::get_all()[Selected[0]->Player->Faction]->get_class_unit_type(unit_class);
+			if (Selected[0]->Player->get_faction() != nullptr) {
+				unit_type = Selected[0]->Player->get_faction()->get_class_unit_type(unit_class);
 			}
 			break;
 		default:
@@ -2166,14 +2174,30 @@ void CButtonPanel::DoClicked_Train(const std::unique_ptr<wyrmgus::button> &butto
 	//Wyrmgus end
 }
 
-void CButtonPanel::DoClicked_UpgradeTo(int button)
+void CButtonPanel::DoClicked_UpgradeTo(const std::unique_ptr<wyrmgus::button> &button)
 {
-	// FIXME: store pointer in button table!
-	wyrmgus::unit_type &type = *wyrmgus::unit_type::get_all()[CurrentButtons[button]->Value];
+	const wyrmgus::unit_class *unit_class = nullptr;
+	wyrmgus::unit_type *unit_type = nullptr;
+
+	switch (button->Action) {
+		case ButtonCmd::UpgradeTo:
+			// FIXME: store pointer in button table!
+			unit_type = wyrmgus::unit_type::get_all()[button->Value];
+			break;
+		case ButtonCmd::UpgradeToClass:
+			unit_class = wyrmgus::unit_class::get_all()[button->Value];
+			if (Selected[0]->Player->get_faction() != nullptr) {
+				unit_type = Selected[0]->Player->get_faction()->get_class_unit_type(unit_class);
+			}
+			break;
+		default:
+			break;
+	}
+
 	for (size_t i = 0; i != Selected.size(); ++i) {
-		if (Selected[i]->Player->CheckLimits(type) != -6 && !Selected[i]->Player->CheckUnitType(type)) {
+		if (Selected[i]->Player->CheckLimits(*unit_type) != -6 && !Selected[i]->Player->CheckUnitType(*unit_type)) {
 			if (Selected[i]->CurrentAction() != UnitAction::UpgradeTo) {
-				SendCommandUpgradeTo(*Selected[i], type, !(KeyModifiers & ModifierShift));
+				SendCommandUpgradeTo(*Selected[i], *unit_type, !(KeyModifiers & ModifierShift));
 				UI.StatusLine.Clear();
 				UI.StatusLine.ClearCosts();
 			}
@@ -2458,7 +2482,10 @@ void CButtonPanel::DoClicked(int button)
 		case ButtonCmd::TrainClass:
 			DoClicked_Train(CurrentButtons[button]);
 			break;
-		case ButtonCmd::UpgradeTo: { DoClicked_UpgradeTo(button); break; }
+		case ButtonCmd::UpgradeTo:
+		case ButtonCmd::UpgradeToClass:
+			DoClicked_UpgradeTo(CurrentButtons[button]);
+			break;
 		case ButtonCmd::Research:
 		case ButtonCmd::ResearchClass:
 		case ButtonCmd::Dynasty:

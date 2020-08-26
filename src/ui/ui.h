@@ -264,7 +264,7 @@ private:
 	void DoClicked_CancelBuild();
 	void DoClicked_Build(const std::unique_ptr<wyrmgus::button> &button);
 	void DoClicked_Train(const std::unique_ptr<wyrmgus::button> &button);
-	void DoClicked_UpgradeTo(int button);
+	void DoClicked_UpgradeTo(const std::unique_ptr<wyrmgus::button> &button);
 	void DoClicked_ExperienceUpgradeTo(int button);
 	void DoClicked_Research(const std::unique_ptr<wyrmgus::button> &button);
 	void DoClicked_CallbackAction(int button);

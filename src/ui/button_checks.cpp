@@ -397,7 +397,14 @@ bool ButtonCheckUpgradeTo(const CUnit &unit, const wyrmgus::button &button)
 	if (unit.CurrentAction() != UnitAction::Still) {
 		return false;
 	}
-	return check_conditions<true>(wyrmgus::unit_type::get_all()[button.Value], unit.Player, false);
+
+	const wyrmgus::unit_type *unit_type = button.get_value_unit_type(&unit);
+
+	if (unit_type == nullptr) {
+		return false;
+	}
+
+	return check_conditions<true>(unit_type, unit.Player, false);
 }
 
 /**

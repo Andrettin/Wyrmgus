@@ -1658,7 +1658,7 @@ void CPlayer::update_building_settlement_assignment(const wyrmgus::site *old_set
 
 bool CPlayer::HasUnitBuilder(const wyrmgus::unit_type *type, const wyrmgus::site *settlement) const
 {
-	const std::vector<wyrmgus::unit_type *> *builders = nullptr;
+	const std::vector<const wyrmgus::unit_type *> *builders = nullptr;
 	const std::vector<const wyrmgus::unit_class *> *builder_classes = nullptr;
 
 	if (type->BoolFlag[BUILDING_INDEX].value) {
@@ -1675,9 +1675,9 @@ bool CPlayer::HasUnitBuilder(const wyrmgus::unit_type *type, const wyrmgus::site
 		}
 	}
 
-	if (this->Faction != -1) {
+	if (this->get_faction() != nullptr) {
 		for (const wyrmgus::unit_class *builder_class : *builder_classes) {
-			const wyrmgus::unit_type *builder = wyrmgus::faction::get_all()[this->Faction]->get_class_unit_type(builder_class);
+			const wyrmgus::unit_type *builder = this->get_faction()->get_class_unit_type(builder_class);
 
 			if (builder == nullptr) {
 				continue;
@@ -1689,15 +1689,39 @@ bool CPlayer::HasUnitBuilder(const wyrmgus::unit_type *type, const wyrmgus::site
 		}
 	}
 
-	if (type->Slot < (int) AiHelpers.Upgrade.size()) {
-		for (size_t j = 0; j < AiHelpers.Upgrade[type->Slot].size(); ++j) {
-			if (this->GetUnitTypeCount(AiHelpers.Upgrade[type->Slot][j]) > 0) {
+	const std::vector<const wyrmgus::unit_type *> &unit_type_upgradees = AiHelpers.get_unit_type_upgradees(type);
+	const std::vector<const wyrmgus::unit_class *> &unit_class_upgradees = AiHelpers.get_unit_class_upgradees(type->get_unit_class());
+
+	for (const wyrmgus::unit_type *unit_type_upgradee : unit_type_upgradees) {
+		if (this->GetUnitTypeCount(unit_type_upgradee) > 0) {
+			if (!settlement) {
+				return true;
+			} else {
+				for (int i = 0; i < this->GetUnitCount(); ++i) {
+					CUnit &unit = this->GetUnit(i);
+					if (unit.Type == unit_type_upgradee && unit.settlement == settlement) {
+						return true;
+					}
+				}
+			}
+		}
+	}
+
+	if (this->get_faction() != nullptr) {
+		for (const wyrmgus::unit_class *unit_class_upgradee : unit_class_upgradees) {
+			const wyrmgus::unit_type *unit_type_upgradee = this->get_faction()->get_class_unit_type(unit_class_upgradee);
+
+			if (unit_type_upgradee == nullptr) {
+				continue;
+			}
+
+			if (this->GetUnitTypeCount(unit_type_upgradee) > 0) {
 				if (!settlement) {
 					return true;
 				} else {
 					for (int i = 0; i < this->GetUnitCount(); ++i) {
 						CUnit &unit = this->GetUnit(i);
-						if (unit.Type == AiHelpers.Upgrade[type->Slot][j] && unit.settlement == settlement) {
+						if (unit.Type->get_unit_class() == unit_class_upgradee && unit.settlement == settlement) {
 							return true;
 						}
 					}
@@ -1705,6 +1729,7 @@ bool CPlayer::HasUnitBuilder(const wyrmgus::unit_type *type, const wyrmgus::site
 			}
 		}
 	}
+
 	return false;
 }
 
