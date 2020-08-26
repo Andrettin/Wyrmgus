@@ -767,7 +767,7 @@ void CPlayer::Save(CFile &file) const
 		if (j) {
 			file.printf(" ");
 		}
-		file.printf("\"%s\", %d,", p.Modifiers[j].first->Ident.c_str(), p.Modifiers[j].second);
+		file.printf("\"%s\", %d,", p.Modifiers[j].first->get_identifier().c_str(), p.Modifiers[j].second);
 	}
 	file.printf("},");
 	//Wyrmgus end
@@ -799,7 +799,7 @@ void CPlayer::Save(CFile &file) const
 			} else {
 				file.printf(", ");
 			}
-			file.printf("\"%s\", %d", upgrade->Ident.c_str(), p.UpgradeTimers.Upgrades[upgrade->ID]);
+			file.printf("\"%s\", %d", upgrade->get_identifier().c_str(), p.UpgradeTimers.Upgrades[upgrade->ID]);
 		}
 		//Wyrmgus end
 	}

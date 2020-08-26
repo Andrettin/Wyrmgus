@@ -58,7 +58,6 @@ deity *deity::add(const std::string &identifier, const wyrmgus::module *module)
 	return deity;
 }
 
-
 deity::deity(const std::string &identifier)
 	: detailed_data_entry(identifier)
 {

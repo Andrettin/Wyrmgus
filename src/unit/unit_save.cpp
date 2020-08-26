@@ -160,7 +160,7 @@ void SaveUnit(const CUnit &unit, CFile &file)
 	file.printf("\"attacked\", %lu,\n ", unit.Attacked);
 	//Wyrmgus start
 	if (unit.Trait != nullptr) {
-		file.printf("\"trait\", \"%s\", ", unit.Trait->Ident.c_str());
+		file.printf("\"trait\", \"%s\", ", unit.Trait->get_identifier().c_str());
 	}
 	file.printf("\"personal-name\", \"%s\", ", unit.Name.c_str());
 	if (!unit.ExtraName.empty()) {
@@ -173,21 +173,21 @@ void SaveUnit(const CUnit &unit, CFile &file)
 		file.printf("\"settlement\", \"%s\", ", unit.settlement->Ident.c_str());
 	}
 	if (unit.Prefix != nullptr) {
-		file.printf("\"prefix\", \"%s\", ", unit.Prefix->Ident.c_str());
+		file.printf("\"prefix\", \"%s\", ", unit.Prefix->get_identifier().c_str());
 	}
 	if (unit.Suffix != nullptr) {
-		file.printf("\"suffix\", \"%s\", ", unit.Suffix->Ident.c_str());
+		file.printf("\"suffix\", \"%s\", ", unit.Suffix->get_identifier().c_str());
 	}
 	if (unit.Spell != nullptr) {
 		file.printf("\"spell\", \"%s\", ", unit.Spell->Ident.c_str());
 	}
 	if (unit.Work != nullptr) {
-		file.printf("\"work\", \"%s\", ", unit.Work->Ident.c_str());
+		file.printf("\"work\", \"%s\", ", unit.Work->get_identifier().c_str());
 	}
 	if (unit.Elixir != nullptr) {
-		file.printf("\"elixir\", \"%s\", ", unit.Elixir->Ident.c_str());
+		file.printf("\"elixir\", \"%s\", ", unit.Elixir->get_identifier().c_str());
 	}
-	if (unit.Unique) {
+	if (unit.Unique != nullptr) {
 		file.printf("\"unique\", \"%s\", ", unit.Unique->get_identifier().c_str());
 	}
 	if (unit.Bound) {
@@ -418,7 +418,7 @@ void SaveUnit(const CUnit &unit, CFile &file)
 		CUpgrade *upgrade = CUpgrade::get_all()[upgrade_id];
 		
 		if (unit.GetIndividualUpgrade(upgrade)) {
-			file.printf(",\n  \"individual-upgrade\", \"%s\", %d", upgrade->Ident.c_str(), unit.GetIndividualUpgrade(upgrade));
+			file.printf(",\n  \"individual-upgrade\", \"%s\", %d", upgrade->get_identifier().c_str(), unit.GetIndividualUpgrade(upgrade));
 		}
 	}
 	if (unit.RallyPointPos.x != -1 && unit.RallyPointPos.y != -1 && unit.RallyPointMapLayer) {

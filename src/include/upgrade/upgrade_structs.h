@@ -49,6 +49,7 @@ namespace wyrmgus {
 	class condition;
 	class deity;
 	class dynasty;
+	class faction;
 	class icon;
 	class magic_domain;
 	class unique_item;
@@ -91,11 +92,12 @@ public:
 	std::map<int, int> UnitStock;	/// Units in stock
 };
 
-class CUpgrade final : public wyrmgus::detailed_data_entry, public wyrmgus::data_type<CUpgrade>, public CDataType
+class CUpgrade final : public wyrmgus::detailed_data_entry, public wyrmgus::data_type<CUpgrade>
 {
 	Q_OBJECT
 
 	Q_PROPERTY(wyrmgus::civilization* civilization MEMBER civilization READ get_civilization)
+	Q_PROPERTY(wyrmgus::faction* faction MEMBER faction READ get_faction)
 	Q_PROPERTY(wyrmgus::icon* icon MEMBER icon READ get_icon)
 	Q_PROPERTY(wyrmgus::upgrade_class* upgrade_class READ get_upgrade_class WRITE set_upgrade_class)
 	Q_PROPERTY(QString requirements_string READ get_requirements_string_qstring)
@@ -105,6 +107,7 @@ class CUpgrade final : public wyrmgus::detailed_data_entry, public wyrmgus::data
 	Q_PROPERTY(bool shield MEMBER shield READ is_shield)
 	Q_PROPERTY(bool boots MEMBER boots READ is_boots)
 	Q_PROPERTY(bool arrows MEMBER arrows READ is_arrows)
+	Q_PROPERTY(wyrmgus::unit_type* item MEMBER item READ get_item)
 
 public:
 	static constexpr const char *class_identifier = "upgrade";
@@ -120,7 +123,6 @@ public:
 	CUpgrade(const std::string &identifier);
 	~CUpgrade();
 
-	virtual void ProcessConfigData(const CConfigData *config_data) override;
 	virtual void process_sml_property(const wyrmgus::sml_property &property) override;
 	virtual void process_sml_scope(const wyrmgus::sml_data &scope) override;
 	virtual void initialize() override;
@@ -149,7 +151,7 @@ public:
 		return this->civilization;
 	}
 
-	int get_faction() const
+	wyrmgus::faction *get_faction() const
 	{
 		return this->faction;
 	}
@@ -214,6 +216,11 @@ public:
 		return this->arrows;
 	}
 
+	wyrmgus::unit_type *get_item() const
+	{
+		return this->item;
+	}
+
 	const std::vector<std::unique_ptr<wyrmgus::upgrade_modifier>> &get_modifiers() const
 	{
 		return this->modifiers;
@@ -264,7 +271,7 @@ public:
 private:
 	wyrmgus::upgrade_class *upgrade_class = nullptr; //upgrade class (e.g. siege weapon projectile I)
 	wyrmgus::civilization *civilization = nullptr; //which civilization this upgrade belongs to, if any
-	int faction = -1;				/// which faction this upgrade belongs to, if any
+	wyrmgus::faction *faction = nullptr; //which faction this upgrade belongs to, if any
 	std::string effects_string; //effects string of the upgrade
 	std::string requirements_string; //requirements string of the upgrade
 	wyrmgus::icon *icon = nullptr; //icon to display to the user
@@ -285,8 +292,10 @@ public:
 	std::set<wyrmgus::item_class> WeaponClasses; //if isn't empty, one of these weapon classes will need to be equipped for the upgrade to be applied
 	//Wyrmgus start
 	std::vector<std::string> Epithets;	/// epithets when a character has a certain trait
-	wyrmgus::unit_type *Item = nullptr;
 	//Wyrmgus end
+private:
+	wyrmgus::unit_type *item = nullptr;
+public:
 	int   ID = 0;						/// numerical id
 	int   Costs[MaxCosts];				/// costs for the upgrade
 	int   ScaledCosts[MaxCosts];		/// scaled costs for the upgrade
@@ -303,7 +312,7 @@ public:
 	std::vector<wyrmgus::unique_item *> UniqueItems;	/// Unique items who form a part of this set upgrade
 	std::vector<wyrmgus::unit_type *> ScaledCostUnits;	/// Units for which the upgrade's costs are scaled
 private:
-	std::vector<const wyrmgus::magic_domain *> magic_domains; //magic domains to which this ability belongs
+	std::vector<const wyrmgus::magic_domain *> magic_domains; //the magic domains to which this skill/ability belongs
 public:
 	std::vector<wyrmgus::character *> Characters;	/// Characters who appear in this literary work (if it is one)
 	//Wyrmgus end

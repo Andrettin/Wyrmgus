@@ -2439,7 +2439,7 @@ static int CclGetUnitTypeData(lua_State *l)
 		lua_createtable(l, type->Affixes.size(), 0);
 		for (size_t i = 1; i <= type->Affixes.size(); ++i)
 		{
-			lua_pushstring(l, type->Affixes[i-1]->Ident.c_str());
+			lua_pushstring(l, type->Affixes[i-1]->get_identifier().c_str());
 			lua_rawseti(l, -2, i);
 		}
 		return 1;
@@ -2465,7 +2465,7 @@ static int CclGetUnitTypeData(lua_State *l)
 		lua_createtable(l, type->Traits.size(), 0);
 		for (size_t i = 1; i <= type->Traits.size(); ++i)
 		{
-			lua_pushstring(l, type->Traits[i-1]->Ident.c_str());
+			lua_pushstring(l, type->Traits[i-1]->get_identifier().c_str());
 			lua_rawseti(l, -2, i);
 		}
 		return 1;
@@ -2473,7 +2473,7 @@ static int CclGetUnitTypeData(lua_State *l)
 		lua_createtable(l, type->StartingAbilities.size(), 0);
 		for (size_t i = 1; i <= type->StartingAbilities.size(); ++i)
 		{
-			lua_pushstring(l, type->StartingAbilities[i-1]->Ident.c_str());
+			lua_pushstring(l, type->StartingAbilities[i-1]->get_identifier().c_str());
 			lua_rawseti(l, -2, i);
 		}
 		return 1;
@@ -2496,7 +2496,7 @@ static int CclGetUnitTypeData(lua_State *l)
 		lua_createtable(l, prefixes.size(), 0);
 		for (size_t i = 1; i <= prefixes.size(); ++i)
 		{
-			lua_pushstring(l, prefixes[i-1]->Ident.c_str());
+			lua_pushstring(l, prefixes[i-1]->get_identifier().c_str());
 			lua_rawseti(l, -2, i);
 		}
 		return 1;
@@ -2519,7 +2519,7 @@ static int CclGetUnitTypeData(lua_State *l)
 		lua_createtable(l, suffixes.size(), 0);
 		for (size_t i = 1; i <= suffixes.size(); ++i)
 		{
-			lua_pushstring(l, suffixes[i-1]->Ident.c_str());
+			lua_pushstring(l, suffixes[i-1]->get_identifier().c_str());
 			lua_rawseti(l, -2, i);
 		}
 		return 1;
@@ -2536,7 +2536,7 @@ static int CclGetUnitTypeData(lua_State *l)
 		lua_createtable(l, works.size(), 0);
 		for (size_t i = 1; i <= works.size(); ++i)
 		{
-			lua_pushstring(l, works[i-1]->Ident.c_str());
+			lua_pushstring(l, works[i-1]->get_identifier().c_str());
 			lua_rawseti(l, -2, i);
 		}
 		return 1;

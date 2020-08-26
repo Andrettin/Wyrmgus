@@ -1022,19 +1022,19 @@ int WriteMapSetup(const char *mapSetup, CMap &map, int writeTerrain, bool is_mod
 					}
 				}
 				if (unit.Trait != nullptr) {
-					f->printf("AcquireTrait(unit, \"%s\")\n", unit.Trait->Ident.c_str());
+					f->printf("AcquireTrait(unit, \"%s\")\n", unit.Trait->get_identifier().c_str());
 				}
 				if (unit.Prefix != nullptr) {
-					f->printf("SetUnitVariable(unit, \"Prefix\", \"%s\")\n", unit.Prefix->Ident.c_str());
+					f->printf("SetUnitVariable(unit, \"Prefix\", \"%s\")\n", unit.Prefix->get_identifier().c_str());
 				}
 				if (unit.Suffix != nullptr) {
-					f->printf("SetUnitVariable(unit, \"Suffix\", \"%s\")\n", unit.Suffix->Ident.c_str());
+					f->printf("SetUnitVariable(unit, \"Suffix\", \"%s\")\n", unit.Suffix->get_identifier().c_str());
 				}
 				if (unit.Work != nullptr) {
-					f->printf("SetUnitVariable(unit, \"Work\", \"%s\")\n", unit.Work->Ident.c_str());
+					f->printf("SetUnitVariable(unit, \"Work\", \"%s\")\n", unit.Work->get_identifier().c_str());
 				}
 				if (unit.Elixir != nullptr) {
-					f->printf("SetUnitVariable(unit, \"Elixir\", \"%s\")\n", unit.Elixir->Ident.c_str());
+					f->printf("SetUnitVariable(unit, \"Elixir\", \"%s\")\n", unit.Elixir->get_identifier().c_str());
 				}
 				if (unit.Variable[HP_INDEX].Value != unit.GetModifiedVariable(HP_INDEX, VariableMax)) {
 					f->printf("SetUnitVariable(unit, \"HitPoints\", %d)\n", unit.Variable[HP_INDEX].Value);

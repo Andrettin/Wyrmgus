@@ -76,7 +76,7 @@ COrder *COrder::NewActionResearch(CUnit &unit, const CUpgrade &upgrade, int play
 	file.printf("\"player\", %d,", this->Player);
 	//Wyrmgus end
 	if (this->Upgrade) {
-		file.printf(" \"upgrade\", \"%s\"", this->Upgrade->Ident.c_str());
+		file.printf(" \"upgrade\", \"%s\"", this->Upgrade->get_identifier().c_str());
 	}
 	file.printf("}");
 }

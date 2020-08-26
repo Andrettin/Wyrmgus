@@ -1180,15 +1180,15 @@ void CUnit::ChooseVariation(const wyrmgus::unit_type *new_type, bool ignore_old_
 		for (const CUpgrade *required_upgrade : variation->UpgradesRequired) {
 			if (required_upgrade->is_weapon()) {
 				requires_weapon = true;
-				if (UpgradeIdentAllowed(*this->Player, required_upgrade->Ident.c_str()) == 'R' || this->GetIndividualUpgrade(required_upgrade)) {
+				if (UpgradeIdentAllowed(*this->Player, required_upgrade->get_identifier().c_str()) == 'R' || this->GetIndividualUpgrade(required_upgrade)) {
 					found_weapon = true;
 				}
 			} else if (required_upgrade->is_shield()) {
 				requires_shield = true;
-				if (UpgradeIdentAllowed(*this->Player, required_upgrade->Ident.c_str()) == 'R' || this->GetIndividualUpgrade(required_upgrade)) {
+				if (UpgradeIdentAllowed(*this->Player, required_upgrade->get_identifier().c_str()) == 'R' || this->GetIndividualUpgrade(required_upgrade)) {
 					found_shield = true;
 				}
-			} else if (UpgradeIdentAllowed(*this->Player, required_upgrade->Ident.c_str()) != 'R' && this->GetIndividualUpgrade(required_upgrade) == false) {
+			} else if (UpgradeIdentAllowed(*this->Player, required_upgrade->get_identifier().c_str()) != 'R' && this->GetIndividualUpgrade(required_upgrade) == false) {
 				upgrades_check = false;
 				break;
 			}
@@ -1196,7 +1196,7 @@ void CUnit::ChooseVariation(const wyrmgus::unit_type *new_type, bool ignore_old_
 		
 		if (upgrades_check) {
 			for (const CUpgrade *forbidden_upgrade : variation->UpgradesForbidden) {
-				if (UpgradeIdentAllowed(*this->Player, forbidden_upgrade->Ident.c_str()) == 'R' || this->GetIndividualUpgrade(forbidden_upgrade)) {
+				if (UpgradeIdentAllowed(*this->Player, forbidden_upgrade->get_identifier().c_str()) == 'R' || this->GetIndividualUpgrade(forbidden_upgrade)) {
 					upgrades_check = false;
 					break;
 				}
@@ -1364,16 +1364,16 @@ void CUnit::ChooseButtonIcon(const ButtonCmd button_action)
 		if (this->Player->Allow.Upgrades[upgrade->ID] == 'R' && modifier->applies_to(this->Type)) {
 			if (
 				(
-					(button_action == ButtonCmd::Attack && ((upgrade->is_weapon() && upgrade->Item->get_item_class() != wyrmgus::item_class::bow) || upgrade->is_arrows()))
+					(button_action == ButtonCmd::Attack && ((upgrade->is_weapon() && upgrade->get_item()->get_item_class() != wyrmgus::item_class::bow) || upgrade->is_arrows()))
 					|| (button_action == ButtonCmd::Stop && upgrade->is_shield())
 					|| (button_action == ButtonCmd::Move && upgrade->is_boots())
 				)
-				&& upgrade->Item->Icon.Icon != nullptr
+				&& upgrade->get_item()->Icon.Icon != nullptr
 			) {
-				this->ButtonIcons[button_action] = upgrade->Item->Icon.Icon;
+				this->ButtonIcons[button_action] = upgrade->get_item()->Icon.Icon;
 				return;
-			} else if (button_action == ButtonCmd::StandGround && (upgrade->is_weapon() || upgrade->is_arrows()) && upgrade->Item->ButtonIcons.find(button_action) != upgrade->Item->ButtonIcons.end()) {
-				this->ButtonIcons[button_action] = upgrade->Item->ButtonIcons.find(button_action)->second.Icon;
+			} else if (button_action == ButtonCmd::StandGround && (upgrade->is_weapon() || upgrade->is_arrows()) && upgrade->get_item()->ButtonIcons.contains(button_action)) {
+				this->ButtonIcons[button_action] = upgrade->get_item()->ButtonIcons.find(button_action)->second.Icon;
 				return;
 			}
 		}
@@ -4757,7 +4757,7 @@ void CUnit::ChangeOwner(CPlayer &newplayer, bool show_change)
 				&& (!modifier_upgrade->is_boots() || EquippedItems[static_cast<int>(wyrmgus::item_slot::boots)].size() == 0)
 				&& (!modifier_upgrade->is_arrows() || EquippedItems[static_cast<int>(wyrmgus::item_slot::arrows)].size() == 0)
 				&& !(newplayer.Race != -1 && modifier_upgrade == wyrmgus::civilization::get_all()[newplayer.Race]->get_upgrade())
-				&& !(newplayer.Race != -1 && newplayer.Faction != -1 && modifier_upgrade->Ident == wyrmgus::faction::get_all()[newplayer.Faction]->FactionUpgrade)
+				&& !(newplayer.Race != -1 && newplayer.get_faction() != nullptr && modifier_upgrade->get_identifier() == newplayer.get_faction()->FactionUpgrade)
 			) {
 				ApplyIndividualUpgradeModifier(*this, modifier);
 			}

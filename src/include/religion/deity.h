@@ -71,7 +71,6 @@ public:
 
 	static deity *add(const std::string &identifier, const wyrmgus::module *module);
 
-public:
 	explicit deity(const std::string &identifier);
 	
 	virtual void process_sml_scope(const sml_data &scope) override;

@@ -1428,7 +1428,7 @@ static int CclAiDump(lua_State *l)
 			n = aip.Ai->ResearchRequests.size();
 			printf("ResearchRequests(%u):\n", static_cast<unsigned int>(n));
 			for (size_t i = 0; i < n; ++i) {
-				printf("%s ", aip.Ai->ResearchRequests[i]->Ident.c_str());
+				printf("%s ", aip.Ai->ResearchRequests[i]->get_identifier().c_str());
 			}
 			printf("\n");
 

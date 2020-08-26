@@ -1810,7 +1810,7 @@ const unit_type_variation *unit_type::GetDefaultVariation(const CPlayer *player,
 	for (const auto &variation : variation_list) {
 		bool upgrades_check = true;
 		for (const CUpgrade *required_upgrade : variation->UpgradesRequired) {
-			if (UpgradeIdentAllowed(*player, required_upgrade->Ident.c_str()) != 'R') {
+			if (UpgradeIdentAllowed(*player, required_upgrade->get_identifier().c_str()) != 'R') {
 				upgrades_check = false;
 				break;
 			}
@@ -1818,7 +1818,7 @@ const unit_type_variation *unit_type::GetDefaultVariation(const CPlayer *player,
 		
 		if (upgrades_check) {
 			for (const CUpgrade *forbidden_upgrade : variation->UpgradesForbidden) {
-				if (UpgradeIdentAllowed(*player, forbidden_upgrade->Ident.c_str()) == 'R') {
+				if (UpgradeIdentAllowed(*player, forbidden_upgrade->get_identifier().c_str()) == 'R') {
 					upgrades_check = false;
 					break;
 				}

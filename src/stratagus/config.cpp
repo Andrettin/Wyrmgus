@@ -290,11 +290,6 @@ void CConfigData::ProcessConfigData(const std::vector<CConfigData *> &config_dat
 			if (!define_only) {
 				unit_type->ProcessConfigData(config_data);
 			}
-		} else if (config_data->Tag == "upgrade") {
-			CUpgrade *upgrade = CUpgrade::get_or_add(ident, nullptr);
-			if (!define_only) {
-				upgrade->ProcessConfigData(config_data);
-			}
 		} else if (config_data->Tag == "world") {
 			wyrmgus::world *world = wyrmgus::world::get_or_add(ident, nullptr);
 			if (!define_only) {

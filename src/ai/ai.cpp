@@ -566,7 +566,7 @@ static void SaveAiPlayer(CFile &file, int plynr, const PlayerAi &ai)
 	file.printf("  \"research\", {");
 	const size_t researchRequestsCount = ai.ResearchRequests.size();
 	for (size_t i = 0; i != researchRequestsCount; ++i) {
-		file.printf("\"%s\", ", ai.ResearchRequests[i]->Ident.c_str());
+		file.printf("\"%s\", ", ai.ResearchRequests[i]->get_identifier().c_str());
 	}
 	file.printf("},\n");
 
@@ -1494,8 +1494,8 @@ void AiUpgradeToComplete(CUnit &unit, const wyrmgus::unit_type &what)
 void AiResearchComplete(CUnit &unit, const CUpgrade *what)
 {
 	DebugPrint("%d: %d(%s) research %s at %d,%d completed\n" _C_
-			   unit.Player->Index _C_ UnitNumber(unit) _C_ unit.Type->Ident.c_str() _C_
-			   what->Ident.c_str() _C_ unit.tilePos.x _C_ unit.tilePos.y);
+			   unit.Player->Index _C_ UnitNumber(unit) _C_ unit.Type->get_identifier().c_str() _C_
+			   what->get_identifier().c_str() _C_ unit.tilePos.x _C_ unit.tilePos.y);
 
 	Assert(unit.Player->Type != PlayerPerson);
 

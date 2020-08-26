@@ -73,37 +73,6 @@ std::unique_ptr<upgrade_modifier> upgrade_modifier::duplicate() const
 	return modifier;
 }
 
-
-void upgrade_modifier::ProcessConfigData(const CConfigData *config_data)
-{
-	for (size_t i = 0; i < config_data->Properties.size(); ++i) {
-		std::string key = config_data->Properties[i].first;
-		std::string value = config_data->Properties[i].second;
-		
-		if (key == "apply_to") {
-			this->unit_types.push_back(unit_type::get(value));
-		} else if (key == "remove_upgrade") {
-			CUpgrade *removed_upgrade = CUpgrade::get(value);
-			this->RemoveUpgrades.push_back(removed_upgrade);
-		} else {
-			key = string::snake_case_to_pascal_case(key);
-			
-			int index = UnitTypeVar.VariableNameLookup[key.c_str()]; // variable index
-			if (index != -1) { // valid index
-				if (string::is_number(value)) {
-					this->Modifier.Variables[index].Enable = 1;
-					this->Modifier.Variables[index].Value = std::stoi(value);
-					this->Modifier.Variables[index].Max = std::stoi(value);
-				} else { // error
-					fprintf(stderr, "Invalid value (\"%s\") for variable \"%s\" when defining modifier for upgrade \"%s\".\n", value.c_str(), key.c_str(), CUpgrade::get_all()[this->UpgradeId]->Ident.c_str());
-				}
-			} else {
-				fprintf(stderr, "Invalid upgrade modifier property: \"%s\".\n", key.c_str());
-			}
-		}
-	}
-}
-
 void upgrade_modifier::process_sml_property(const sml_property &property)
 {
 	const std::string &key = property.get_key();
@@ -137,6 +106,11 @@ void upgrade_modifier::process_sml_scope(const sml_data &scope)
 	} else if (tag == "unit_classes") {
 		for (const std::string &value : values) {
 			this->unit_classes.push_back(unit_class::get(value));
+		}
+	} else if (tag == "remove_upgrades") {
+		for (const std::string &value : values) {
+			CUpgrade *removed_upgrade = CUpgrade::get(value);
+			this->RemoveUpgrades.push_back(removed_upgrade);
 		}
 	} else {
 		const std::string variable_name = string::snake_case_to_pascal_case(tag);

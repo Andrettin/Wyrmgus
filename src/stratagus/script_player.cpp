@@ -2977,7 +2977,7 @@ static int CclGetMagicDomainData(lua_State *l)
 		lua_createtable(l, magic_domain->get_abilities().size(), 0);
 		for (size_t i = 1; i <= magic_domain->get_abilities().size(); ++i)
 		{
-			lua_pushstring(l, magic_domain->get_abilities()[i-1]->Ident.c_str());
+			lua_pushstring(l, magic_domain->get_abilities()[i-1]->get_identifier().c_str());
 			lua_rawseti(l, -2, i);
 		}
 		return 1;
@@ -3068,7 +3068,7 @@ static int CclGetDeityData(lua_State *l)
 		lua_createtable(l, deity->Abilities.size(), 0);
 		for (size_t i = 1; i <= deity->Abilities.size(); ++i)
 		{
-			lua_pushstring(l, deity->Abilities[i-1]->Ident.c_str());
+			lua_pushstring(l, deity->Abilities[i-1]->get_identifier().c_str());
 			lua_rawseti(l, -2, i);
 		}
 		return 1;

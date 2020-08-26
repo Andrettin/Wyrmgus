@@ -741,7 +741,7 @@ static int CclGetCharacterData(lua_State *l)
 		return 1;
 	} else if (!strcmp(data, "Trait")) {
 		if (character->get_trait() != nullptr) {
-			lua_pushstring(l, character->get_trait()->Ident.c_str());
+			lua_pushstring(l, character->get_trait()->get_identifier().c_str());
 		} else {
 			lua_pushstring(l, "");
 		}
@@ -800,7 +800,7 @@ static int CclGetCharacterData(lua_State *l)
 		lua_createtable(l, character->get_abilities().size(), 0);
 		for (size_t i = 1; i <= character->get_abilities().size(); ++i)
 		{
-			lua_pushstring(l, character->get_abilities()[i-1]->Ident.c_str());
+			lua_pushstring(l, character->get_abilities()[i-1]->get_identifier().c_str());
 			lua_rawseti(l, -2, i);
 		}
 		return 1;
@@ -859,7 +859,7 @@ static int CclGetCustomHeroData(lua_State *l)
 		return 1;
 	} else if (!strcmp(data, "Trait")) {
 		if (character->get_trait() != nullptr) {
-			lua_pushstring(l, character->get_trait()->Ident.c_str());
+			lua_pushstring(l, character->get_trait()->get_identifier().c_str());
 		} else {
 			lua_pushstring(l, "");
 		}

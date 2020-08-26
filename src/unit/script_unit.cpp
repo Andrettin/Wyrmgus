@@ -1720,19 +1720,19 @@ static int CclGetUnitVariable(lua_State *l)
 		lua_pushstring(l, unit->GetTypeName().c_str());
 	} else if (!strcmp(value, "Trait")) {
 		if (unit->Trait != nullptr) {
-			lua_pushstring(l, unit->Trait->Ident.c_str());
+			lua_pushstring(l, unit->Trait->get_identifier().c_str());
 		} else {
 			lua_pushstring(l, "");
 		}
 	} else if (!strcmp(value, "Prefix")) {
 		if (unit->Prefix != nullptr) {
-			lua_pushstring(l, unit->Prefix->Ident.c_str());
+			lua_pushstring(l, unit->Prefix->get_identifier().c_str());
 		} else {
 			lua_pushstring(l, "");
 		}
 	} else if (!strcmp(value, "Suffix")) {
 		if (unit->Suffix != nullptr) {
-			lua_pushstring(l, unit->Suffix->Ident.c_str());
+			lua_pushstring(l, unit->Suffix->get_identifier().c_str());
 		} else {
 			lua_pushstring(l, "");
 		}
@@ -1744,13 +1744,13 @@ static int CclGetUnitVariable(lua_State *l)
 		}
 	} else if (!strcmp(value, "Work")) {
 		if (unit->Work != nullptr) {
-			lua_pushstring(l, unit->Work->Ident.c_str());
+			lua_pushstring(l, unit->Work->get_identifier().c_str());
 		} else {
 			lua_pushstring(l, "");
 		}
 	} else if (!strcmp(value, "Elixir")) {
 		if (unit->Elixir != nullptr) {
-			lua_pushstring(l, unit->Elixir->Ident.c_str());
+			lua_pushstring(l, unit->Elixir->get_identifier().c_str());
 		} else {
 			lua_pushstring(l, "");
 		}

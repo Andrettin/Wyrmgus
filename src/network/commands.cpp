@@ -664,7 +664,7 @@ void SendCommandCancelResearch(CUnit &unit)
 void SendCommandLearnAbility(CUnit &unit, CUpgrade &what)
 {
 	if (!IsNetworkGame()) {
-		CommandLog("learn-ability", &unit, 0, -1, -1, NoUnitP, what.Ident.c_str(), -1);
+		CommandLog("learn-ability", &unit, 0, -1, -1, NoUnitP, what.get_identifier().c_str(), -1);
 		CommandLearnAbility(unit, what);
 	} else {
 		NetworkSendCommand(MessageCommandLearnAbility, unit,
@@ -1022,8 +1022,8 @@ void ExecCommand(unsigned char msgnr, UnitRef unum,
 		case MessageCommandResearch:
 			CommandLog("research", &unit, status, -1, -1, NoUnitP,
 					   //Wyrmgus start
-//					   CUpgrade::get_all()[arg1]->Ident.c_str(), -1);
-					   CUpgrade::get_all()[arg1]->Ident.c_str(), arg2);
+//					   CUpgrade::get_all()[arg1]->get_identifier().c_str(), -1);
+					   CUpgrade::get_all()[arg1]->get_identifier().c_str(), arg2);
 					   //Wyrmgus end
 			//Wyrmgus start
 //			CommandResearch(unit, *CUpgrade::get_all()[arg1], status);
@@ -1037,7 +1037,7 @@ void ExecCommand(unsigned char msgnr, UnitRef unum,
 		//Wyrmgus start
 		case MessageCommandLearnAbility:
 			CommandLog("learn-ability", &unit, 0, -1, -1, NoUnitP,
-					   CUpgrade::get_all()[arg1]->Ident.c_str(), -1);
+					   CUpgrade::get_all()[arg1]->get_identifier().c_str(), -1);
 			CommandLearnAbility(unit, *CUpgrade::get_all()[arg1]);
 			break;
 		case MessageCommandQuest: {

@@ -190,7 +190,7 @@ void CUnitStats::ChangeUnitStock(const wyrmgus::unit_type *unit_type, int quanti
 	this->SetUnitStock(unit_type, this->GetUnitStock(unit_type) + quantity);
 }
 
-CUpgrade::CUpgrade(const std::string &identifier) : CDataType(identifier), detailed_data_entry(identifier), Work(wyrmgus::item_class::none)
+CUpgrade::CUpgrade(const std::string &identifier) : detailed_data_entry(identifier), Work(wyrmgus::item_class::none)
 {
 	memset(this->Costs, 0, sizeof(this->Costs));
 	//Wyrmgus start
@@ -206,90 +206,6 @@ CUpgrade::~CUpgrade()
 {
 }
 
-void CUpgrade::ProcessConfigData(const CConfigData *config_data)
-{
-	for (size_t i = 0; i < config_data->Properties.size(); ++i) {
-		std::string key = config_data->Properties[i].first;
-		std::string value = config_data->Properties[i].second;
-		
-		if (key == "name") {
-			this->set_name(value);
-		} else if (key == "icon") {
-			wyrmgus::icon *icon = wyrmgus::icon::get(value);
-			this->icon = icon;
-		} else if (key == "class") {
-			this->set_upgrade_class(wyrmgus::upgrade_class::get(value));
-		} else if (key == "civilization") {
-			wyrmgus::civilization *civilization = wyrmgus::civilization::get(value);
-			this->civilization = civilization;
-		} else if (key == "faction") {
-			const wyrmgus::faction *faction = wyrmgus::faction::get(value);
-			this->faction = faction->ID;
-		} else if (key == "ability") {
-			this->ability = string::to_bool(value);
-		} else if (key == "weapon") {
-			this->weapon = string::to_bool(value);
-		} else if (key == "shield") {
-			this->shield = string::to_bool(value);
-		} else if (key == "boots") {
-			this->boots = string::to_bool(value);
-		} else if (key == "arrows") {
-			this->arrows = string::to_bool(value);
-		} else if (key == "item") {
-			wyrmgus::unit_type *item = wyrmgus::unit_type::get(value);
-			this->Item = item;
-		} else if (key == "description") {
-			this->set_description(value);
-		} else if (key == "quote") {
-			this->set_quote(value);
-		} else if (key == "background") {
-			this->set_background(value);
-		} else if (key == "effects_string") {
-			this->effects_string = value;
-		} else if (key == "requirements_string") {
-			this->requirements_string = value;
-		} else {
-			fprintf(stderr, "Invalid upgrade property: \"%s\".\n", key.c_str());
-		}
-	}
-	
-	for (const CConfigData *child_config_data : config_data->Children) {
-		if (child_config_data->Tag == "costs") {
-			for (size_t j = 0; j < child_config_data->Properties.size(); ++j) {
-				std::string key = child_config_data->Properties[j].first;
-				std::string value = child_config_data->Properties[j].second;
-				
-				key = FindAndReplaceString(key, "_", "-");
-				
-				const int resource = GetResourceIdByName(key.c_str());
-				if (resource != -1) {
-					this->Costs[resource] = std::stoi(value);
-				} else {
-					fprintf(stderr, "Invalid resource: \"%s\".\n", key.c_str());
-				}
-			}
-		} else if (child_config_data->Tag == "preconditions") {
-			this->preconditions = std::make_unique<wyrmgus::and_condition>();
-			this->preconditions->ProcessConfigData(child_config_data);
-		} else if (child_config_data->Tag == "conditions") {
-			this->conditions = std::make_unique<wyrmgus::and_condition>();
-			this->conditions->ProcessConfigData(child_config_data);
-		} else if (child_config_data->Tag == "modifier") {
-			auto modifier = std::make_unique<wyrmgus::upgrade_modifier>();
-			modifier->UpgradeId = this->ID;
-			
-			modifier->ProcessConfigData(child_config_data);
-			
-			wyrmgus::upgrade_modifier::UpgradeModifiers.push_back(modifier.get());
-			this->modifiers.push_back(std::move(modifier));
-		} else {
-			fprintf(stderr, "Invalid upgrade property: \"%s\".\n", child_config_data->Tag.c_str());
-		}
-	}
-
-	this->set_defined(true);
-}
-
 void CUpgrade::process_sml_property(const wyrmgus::sml_property &property)
 {
 	const std::string &key = property.get_key();
@@ -298,9 +214,6 @@ void CUpgrade::process_sml_property(const wyrmgus::sml_property &property)
 	if (key == "parent") {
 		CUpgrade *parent_upgrade = CUpgrade::get(value);
 		this->set_parent(parent_upgrade);
-	} else if (key == "faction") {
-		const wyrmgus::faction *faction = wyrmgus::faction::get(value);
-		this->faction = faction->ID;
 	} else if (key == "button_key") {
 		this->button_key = value;
 	} else {
@@ -355,17 +268,14 @@ void CUpgrade::initialize()
 
 	if (this->get_upgrade_class() != nullptr) { //if class is defined, then use this upgrade to help build the classes table, and add this upgrade to the civilization class table (if the civilization is defined)
 		const wyrmgus::upgrade_class *upgrade_class = this->get_upgrade_class();
-		if (this->get_faction() != -1) {
-			const int faction_id = this->get_faction();
-			if (faction_id != -1) {
-				wyrmgus::faction::get_all()[faction_id]->set_class_upgrade(upgrade_class, this);
-			}
+		if (this->get_faction() != nullptr) {
+			this->get_faction()->set_class_upgrade(upgrade_class, this);
 		} else if (this->get_civilization() != nullptr) {
 			this->get_civilization()->set_class_upgrade(upgrade_class, this);
 		}
 	}
 
-	CclCommand("if not (GetArrayIncludes(Units, \"" + this->Ident + "\")) then table.insert(Units, \"" + this->Ident + "\") end"); //FIXME: needed at present to make upgrade data files work without scripting being necessary, but it isn't optimal to interact with a scripting table like "Units" in this manner (that table should probably be replaced with getting a list of unit types from the engine)
+	CclCommand("if not (GetArrayIncludes(Units, \"" + this->get_identifier() + "\")) then table.insert(Units, \"" + this->get_identifier() + "\") end"); //FIXME: needed at present to make upgrade data files work without scripting being necessary, but it isn't optimal to interact with a scripting table like "Units" in this manner (that table should probably be replaced with getting a list of unit types from the engine)
 
 	data_entry::initialize();
 }
@@ -402,7 +312,7 @@ void CUpgrade::set_parent(const CUpgrade *parent_upgrade)
 	this->shield = parent_upgrade->is_shield();
 	this->boots = parent_upgrade->is_boots();
 	this->arrows = parent_upgrade->is_arrows();
-	this->Item = parent_upgrade->Item;
+	this->item = parent_upgrade->get_item();
 	this->MagicPrefix = parent_upgrade->MagicPrefix;
 	this->MagicSuffix = parent_upgrade->MagicSuffix;
 	this->RunicAffix = parent_upgrade->RunicAffix;
@@ -486,7 +396,7 @@ void SaveUpgrades(CFile &file)
 	//  Save the upgrades
 	//
 	for (const CUpgrade *upgrade : CUpgrade::get_all()) {
-		file.printf("DefineAllow(\"%s\", \"", upgrade->Ident.c_str());
+		file.printf("DefineAllow(\"%s\", \"", upgrade->get_identifier().c_str());
 		for (int p = 0; p < PlayerMax; ++p) {
 			file.printf("%c", CPlayer::Players[p]->Allow.Upgrades[upgrade->ID]);
 		}
@@ -535,7 +445,7 @@ static int CclDefineUpgrade(lua_State *l)
 		} else if (!strcmp(value, "Faction")) {
 			std::string faction_name = LuaToString(l, -1);
 			wyrmgus::faction *faction = wyrmgus::faction::get(faction_name);
-			upgrade->faction = faction->ID;
+			upgrade->faction = faction;
 		} else if (!strcmp(value, "Description")) {
 			upgrade->set_description(LuaToString(l, -1));
 		} else if (!strcmp(value, "Quote")) {
@@ -574,7 +484,7 @@ static int CclDefineUpgrade(lua_State *l)
 			upgrade->Work = wyrmgus::string_to_item_class(LuaToString(l, -1));
 		} else if (!strcmp(value, "Item")) {
 			wyrmgus::unit_type *item = wyrmgus::unit_type::get(LuaToString(l, -1));
-			upgrade->Item = item;
+			upgrade->item = item;
 		} else if (!strcmp(value, "Costs")) {
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument (expected table)");
@@ -967,7 +877,7 @@ static int CclGetUpgrades(lua_State *l)
 	lua_createtable(l, CUpgrade::get_all().size(), 0);
 	for (size_t i = 1; i <= CUpgrade::get_all().size(); ++i)
 	{
-		lua_pushstring(l, CUpgrade::get_all()[i-1]->Ident.c_str());
+		lua_pushstring(l, CUpgrade::get_all()[i-1]->get_identifier().c_str());
 		lua_rawseti(l, -2, i);
 	}
 	return 1;
@@ -985,7 +895,7 @@ static int CclGetItemPrefixes(lua_State *l)
 	lua_createtable(l, item_prefixes.size(), 0);
 	for (size_t i = 1; i <= item_prefixes.size(); ++i)
 	{
-		lua_pushstring(l, item_prefixes[i-1]->Ident.c_str());
+		lua_pushstring(l, item_prefixes[i-1]->get_identifier().c_str());
 		lua_rawseti(l, -2, i);
 	}
 	return 1;
@@ -1003,7 +913,7 @@ static int CclGetItemSuffixes(lua_State *l)
 	lua_createtable(l, item_suffixes.size(), 0);
 	for (size_t i = 1; i <= item_suffixes.size(); ++i)
 	{
-		lua_pushstring(l, item_suffixes[i-1]->Ident.c_str());
+		lua_pushstring(l, item_suffixes[i-1]->get_identifier().c_str());
 		lua_rawseti(l, -2, i);
 	}
 	return 1;
@@ -1021,7 +931,7 @@ static int CclGetRunicSuffixes(lua_State *l)
 	lua_createtable(l, item_suffixes.size(), 0);
 	for (size_t i = 1; i <= item_suffixes.size(); ++i)
 	{
-		lua_pushstring(l, item_suffixes[i-1]->Ident.c_str());
+		lua_pushstring(l, item_suffixes[i-1]->get_identifier().c_str());
 		lua_rawseti(l, -2, i);
 	}
 	return 1;
@@ -1039,7 +949,7 @@ static int CclGetLiteraryWorks(lua_State *l)
 	lua_createtable(l, literary_works.size(), 0);
 	for (size_t i = 1; i <= literary_works.size(); ++i)
 	{
-		lua_pushstring(l, literary_works[i-1]->Ident.c_str());
+		lua_pushstring(l, literary_works[i-1]->get_identifier().c_str());
 		lua_rawseti(l, -2, i);
 	}
 	return 1;
@@ -1078,8 +988,8 @@ static int CclGetUpgradeData(lua_State *l)
 		}
 		return 1;
 	} else if (!strcmp(data, "Faction")) {
-		if (upgrade->get_faction() != -1) {
-			lua_pushstring(l, wyrmgus::faction::get_all()[upgrade->get_faction()]->get_identifier().c_str());
+		if (upgrade->get_faction() != nullptr) {
+			lua_pushstring(l, upgrade->get_faction()->get_identifier().c_str());
 		} else {
 			lua_pushstring(l, "");
 		}

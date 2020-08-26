@@ -839,7 +839,7 @@ void SaveHero(wyrmgus::character *hero)
 	}
 	if (hero->Custom) {
 		if (hero->get_trait() != nullptr) {
-			fprintf(fd, "\tTrait = \"%s\",\n", hero->get_trait()->Ident.c_str());
+			fprintf(fd, "\tTrait = \"%s\",\n", hero->get_trait()->get_identifier().c_str());
 		}
 		if (!hero->get_variation().empty()) {
 			fprintf(fd, "\tVariation = \"%s\",\n", hero->get_variation().c_str());
@@ -854,7 +854,7 @@ void SaveHero(wyrmgus::character *hero)
 	if (hero->get_abilities().size() > 0) {
 		fprintf(fd, "\tAbilities = {");
 		for (size_t j = 0; j < hero->get_abilities().size(); ++j) {
-			fprintf(fd, "\"%s\"", hero->get_abilities()[j]->Ident.c_str());
+			fprintf(fd, "\"%s\"", hero->get_abilities()[j]->get_identifier().c_str());
 			if (j < (hero->get_abilities().size() - 1)) {
 				fprintf(fd, ", ");
 			}
@@ -874,7 +874,7 @@ void SaveHero(wyrmgus::character *hero)
 	if (hero->ReadWorks.size() > 0) {
 		fprintf(fd, "\tReadWorks = {");
 		for (size_t j = 0; j < hero->ReadWorks.size(); ++j) {
-			fprintf(fd, "\"%s\"", hero->ReadWorks[j]->Ident.c_str());
+			fprintf(fd, "\"%s\"", hero->ReadWorks[j]->get_identifier().c_str());
 			if (j < (hero->ReadWorks.size() - 1)) {
 				fprintf(fd, ", ");
 			}
@@ -884,7 +884,7 @@ void SaveHero(wyrmgus::character *hero)
 	if (hero->ConsumedElixirs.size() > 0) {
 		fprintf(fd, "\tConsumedElixirs = {");
 		for (size_t j = 0; j < hero->ConsumedElixirs.size(); ++j) {
-			fprintf(fd, "\"%s\"", hero->ConsumedElixirs[j]->Ident.c_str());
+			fprintf(fd, "\"%s\"", hero->ConsumedElixirs[j]->get_identifier().c_str());
 			if (j < (hero->ConsumedElixirs.size() - 1)) {
 				fprintf(fd, ", ");
 			}
@@ -898,19 +898,19 @@ void SaveHero(wyrmgus::character *hero)
 			fprintf(fd, "\n\t\t{");
 			fprintf(fd, "\n\t\t\t\"type\", \"%s\",", item->get_unit_type()->Ident.c_str());
 			if (item->Prefix != nullptr) {
-				fprintf(fd, "\n\t\t\t\"prefix\", \"%s\",", item->Prefix->Ident.c_str());
+				fprintf(fd, "\n\t\t\t\"prefix\", \"%s\",", item->Prefix->get_identifier().c_str());
 			}
 			if (item->Suffix != nullptr) {
-				fprintf(fd, "\n\t\t\t\"suffix\", \"%s\",", item->Suffix->Ident.c_str());
+				fprintf(fd, "\n\t\t\t\"suffix\", \"%s\",", item->Suffix->get_identifier().c_str());
 			}
 			if (item->Spell != nullptr) {
-				fprintf(fd, "\n\t\t\t\"spell\", \"%s\",", item->Spell->Ident.c_str());
+				fprintf(fd, "\n\t\t\t\"spell\", \"%s\",", item->Spell->get_identifier().c_str());
 			}
 			if (item->Work != nullptr) {
-				fprintf(fd, "\n\t\t\t\"work\", \"%s\",", item->Work->Ident.c_str());
+				fprintf(fd, "\n\t\t\t\"work\", \"%s\",", item->Work->get_identifier().c_str());
 			}
 			if (item->Elixir != nullptr) {
-				fprintf(fd, "\n\t\t\t\"elixir\", \"%s\",", item->Elixir->Ident.c_str());
+				fprintf(fd, "\n\t\t\t\"elixir\", \"%s\",", item->Elixir->get_identifier().c_str());
 			}
 			if (!item->Name.empty()) {
 				fprintf(fd, "\n\t\t\t\"name\", \"%s\",", item->Name.c_str());
