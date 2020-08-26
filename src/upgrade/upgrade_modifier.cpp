@@ -112,6 +112,14 @@ void upgrade_modifier::process_sml_scope(const sml_data &scope)
 			CUpgrade *removed_upgrade = CUpgrade::get(value);
 			this->RemoveUpgrades.push_back(removed_upgrade);
 		}
+	} else if (tag == "costs") {
+		scope.for_each_property([&](const sml_property &property) {
+			const std::string &key = property.get_key();
+			const std::string &value = property.get_value();
+
+			const resource *resource = resource::get(key);
+			this->Modifier.Costs[resource->get_index()] = std::stoi(value);
+		});
 	} else {
 		const std::string variable_name = string::snake_case_to_pascal_case(tag);
 		const int index = UnitTypeVar.VariableNameLookup[variable_name.c_str()]; // variable index

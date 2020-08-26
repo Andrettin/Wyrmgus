@@ -233,6 +233,15 @@ void CUpgrade::process_sml_scope(const wyrmgus::sml_data &scope)
 			const wyrmgus::resource *resource = wyrmgus::resource::get(key);
 			this->Costs[resource->get_index()] = std::stoi(value);
 		});
+	} else if (tag == "civilization_priorities") {
+		scope.for_each_property([&](const wyrmgus::sml_property &property) {
+			const std::string &key = property.get_key();
+			const std::string &value = property.get_value();
+
+			wyrmgus::civilization *priority_civilization = wyrmgus::civilization::get(key);
+			const int priority = std::stoi(value);
+			priority_civilization->UpgradePriorities[this] = priority;
+		});
 	} else if (tag == "modifier") {
 		auto modifier = std::make_unique<wyrmgus::upgrade_modifier>();
 		modifier->UpgradeId = this->ID;
