@@ -56,7 +56,7 @@
 #include "script/condition/and_condition.h"
 #include "sound/sound.h"
 #include "sound/unitsound.h"
-#include "species.h"
+#include "species/species.h"
 #include "spells.h"
 #include "translate.h"
 #include "ui/button.h"

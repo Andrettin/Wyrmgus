@@ -37,7 +37,7 @@
 #include "map/map_template.h"
 #include "player.h"
 #include "quest.h"
-#include "species.h"
+#include "species/species.h"
 #include "time/calendar.h"
 #include "time/timeline.h"
 #include "util/container_util.h"

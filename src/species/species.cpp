@@ -27,7 +27,7 @@
 
 #include "stratagus.h"
 
-#include "species.h"
+#include "species/species.h"
 
 #include "util/vector_util.h"
 

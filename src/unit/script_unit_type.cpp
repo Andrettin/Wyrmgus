@@ -56,7 +56,7 @@
 #include "script.h"
 #include "sound/sound.h"
 #include "sound/unitsound.h"
-#include "species.h"
+#include "species/species.h"
 #include "spells.h"
 #include "time/season.h"
 #include "ui/button.h"

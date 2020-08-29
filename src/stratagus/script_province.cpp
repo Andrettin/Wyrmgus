@@ -43,7 +43,7 @@
 #include "plane.h"
 #include "player.h"
 #include "script.h"
-#include "species.h"
+#include "species/species.h"
 #include "time/season_schedule.h"
 #include "time/time_of_day_schedule.h"
 #include "unit/unit_type.h"

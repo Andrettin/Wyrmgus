@@ -71,7 +71,7 @@
 #include "religion/religion.h"
 #include "resource.h"
 #include "sound/sound.h"
-#include "species.h"
+#include "species/species.h"
 #include "spells.h"
 #include "time/calendar.h"
 #include "time/time_of_day.h"

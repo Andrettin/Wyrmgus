@@ -59,7 +59,7 @@
 #include "religion/pantheon.h"
 #include "religion/religion.h"
 #include "script.h"
-#include "species.h"
+#include "species/species.h"
 #include "time/calendar.h"
 #include "ui/button.h"
 #include "unit/unit.h"

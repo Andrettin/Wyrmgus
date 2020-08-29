@@ -55,7 +55,7 @@
 #include "sound/sound.h"
 //Wyrmgus end
 #include "sound/unit_sound_type.h"
-#include "species.h"
+#include "species/species.h"
 #include "spells.h"
 #include "unit/unit.h"
 #include "unit/unit_find.h"
