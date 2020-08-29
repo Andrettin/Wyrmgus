@@ -47,7 +47,7 @@ public:
 	static constexpr const char *class_identifier = "species";
 	static constexpr const char *database_folder = "species";
 
-	species(const std::string &identifier) : detailed_data_entry(identifier)
+	explicit species(const std::string &identifier) : detailed_data_entry(identifier)
 	{
 	}
 

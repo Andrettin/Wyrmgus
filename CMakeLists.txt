@@ -311,6 +311,11 @@ set(sound_SRCS
 )
 source_group(sound FILES ${sound_SRCS})
 
+set(species_SRCS
+	src/species/species.cpp
+)
+source_group(species FILES ${species_SRCS})
+
 set(spell_SRCS
 	src/spell/script_spell.cpp
 	src/spell/spell_adjustvariable.cpp
@@ -370,7 +375,6 @@ set(stratagusmain_SRCS
 	src/stratagus/script_quest.cpp
 	src/stratagus/script_text.cpp
 	src/stratagus/selection.cpp
-	src/stratagus/species.cpp
 	src/stratagus/stratagus.cpp
 	src/stratagus/text.cpp
 	src/stratagus/title.cpp
@@ -530,6 +534,7 @@ set(stratagus_SRCS
 	${script_condition_SRCS}
 	${script_effect_SRCS}
 	${sound_SRCS}
+	${species_SRCS}
 	${spell_SRCS}
 	${stratagusmain_SRCS}
 	${time_SRCS}
@@ -728,6 +733,10 @@ set(stratagus_sound_HDRS
 	src/sound/unit_sound_type.h
 )
 
+set(stratagus_species_HDRS
+	src/species/species.h
+)
+
 set(stratagus_spell_HDRS
 	src/include/spell/spell_adjustvariable.h
 	src/include/spell/spell_adjustvital.h
@@ -909,7 +918,6 @@ set(stratagus_generic_HDRS
 	src/stratagus/objective_type.h
 	src/stratagus/persistent_item.h
 	src/stratagus/player_container.h
-	src/stratagus/species.h
 	src/stratagus/unique_item.h
 	src/stratagus/vassalage_type.h
 )
@@ -927,6 +935,7 @@ source_group(script FILES ${stratagus_script_HDRS})
 source_group(script\\condition FILES ${stratagus_script_condition_HDRS})
 source_group(script\\effect FILES ${stratagus_script_effect_HDRS})
 source_group(sound FILES ${stratagus_sound_HDRS})
+source_group(species FILES ${stratagus_species_HDRS})
 source_group(spell FILES ${stratagus_spell_HDRS})
 source_group(time FILES ${stratagus_time_HDRS})
 source_group(ui FILES ${stratagus_ui_HDRS})
@@ -951,6 +960,7 @@ set(stratagus_HDRS
 	${stratagus_script_condition_HDRS}
 	${stratagus_script_effect_HDRS}
 	${stratagus_sound_HDRS}
+	${stratagus_species_HDRS}
 	${stratagus_spell_HDRS}
 	${stratagus_time_HDRS}
 	${stratagus_ui_HDRS}
