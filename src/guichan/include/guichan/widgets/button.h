@@ -82,7 +82,11 @@ namespace gcn
          *
          * @param caption the caption of the Button.
          */
-        Button(const std::string& caption);
+        explicit Button(const std::string& caption);
+
+        virtual ~Button()
+        {
+        }
 
         /**
          * Sets the Button caption.

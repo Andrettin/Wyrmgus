@@ -8,7 +8,8 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-//      (c) Copyright 2005-2006 by Francois Beerten and Jimmy Salmon
+//      (c) Copyright 2005-2020 by Francois Beerten, Jimmy Salmon and
+//                                 Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -29,6 +30,7 @@
 
 #include "widgets.h"
 
+#include "database/defines.h"
 //Wyrmgus start
 #include "grand_strategy.h"
 //Wyrmgus end
@@ -60,21 +62,25 @@ static void MenuHandleButtonDown(unsigned button)
 //Wyrmgus end
 {
 }
+
 //Wyrmgus start
 //static void MenuHandleButtonUp(unsigned)
 static void MenuHandleButtonUp(unsigned button)
 //Wyrmgus end
 {
 }
+
 static void MenuHandleMouseMove(const PixelPos &screenPos)
 {
 	PixelPos pos(screenPos);
 	HandleCursorMove(&pos.x, &pos.y);
 }
+
 static void MenuHandleKeyDown(unsigned key, unsigned keychar)
 {
 	HandleKeyModifiersDown(key, keychar);
 }
+
 static void MenuHandleKeyUp(unsigned key, unsigned keychar)
 {
 	//Wyrmgus start
@@ -96,12 +102,12 @@ static void MenuHandleKeyUp(unsigned key, unsigned keychar)
 	//Wyrmgus end
 	HandleKeyModifiersUp(key, keychar);
 }
+
 static void MenuHandleKeyRepeat(unsigned key, unsigned keychar)
 {
 	Input->processKeyRepeat();
 	HandleKeyModifiersDown(key, keychar);
 }
-
 
 /**
 **  Initializes the GUI stuff
@@ -328,10 +334,36 @@ void MyOpenGLGraphics::fillRectangle(const gcn::Rectangle &rectangle)
 
 #endif
 
-//Wyrmgus start
+ImageWidget::ImageWidget(const std::string &image_path, const int scale_factor, const int image_width, const int image_height)
+	: gcn::Icon(CGraphic::New(image_path))
+{
+	CGraphic *graphic = static_cast<CGraphic *>(this->mImage);
+	graphic->Load(false, scale_factor);
+
+	if (image_width != -1 && image_height != -1) {
+		graphic->Resize(image_width, image_height);
+	}
+
+	setHeight(graphic->getHeight());
+	setWidth(graphic->getWidth());
+}
+
 /*----------------------------------------------------------------------------
 --  PlayerColorImageWidget
 ----------------------------------------------------------------------------*/
+
+PlayerColorImageWidget::PlayerColorImageWidget(const std::string &image_path, const std::string &playercolor)
+	: gcn::Icon(CPlayerColorGraphic::Get(image_path)), WidgetPlayerColor(playercolor)
+{
+	ImageOrigin.x = 0;
+	ImageOrigin.y = 0;
+
+	CPlayerColorGraphic *graphic = static_cast<CPlayerColorGraphic *>(this->mImage);
+	graphic->Load(false, wyrmgus::defines::get()->get_scale_factor());
+
+	setHeight(graphic->getHeight());
+	setWidth(graphic->getWidth());
+}
 
 void PlayerColorImageWidget::draw(gcn::Graphics* graphics)
 {
@@ -342,7 +374,20 @@ void PlayerColorImageWidget::draw(gcn::Graphics* graphics)
 	
 	graphics->drawImage(mImage, ImageOrigin.x, ImageOrigin.y, 0, 0, mImage->getWidth(), mImage->getHeight(), player_color, 0, this->grayscale);
 }
-//Wyrmgus end
+
+void PlayerColorImageWidget::set_frame(const int frame)
+{
+	this->frame = frame;
+
+	if (this->mImage != nullptr) {
+		CPlayerColorGraphic *graphic = static_cast<CPlayerColorGraphic *>(this->mImage);
+
+		const int x_origin = (this->frame * graphic->get_frame_width()) % graphic->get_width();
+		const int y_origin = this->frame * graphic->get_frame_width() / graphic->get_width() * graphic->get_frame_height();
+		this->setImageOrigin(x_origin, y_origin);
+		this->setSize(graphic->get_frame_width(), graphic->get_frame_height());
+	}
+}
 
 ButtonWidget::ButtonWidget(const std::string &caption) : Button(caption)
 {
@@ -354,12 +399,7 @@ ButtonWidget::ButtonWidget(const std::string &caption) : Button(caption)
 	//Wyrmgus end
 }
 
-ImageButton::ImageButton() :
-	Button(), normalImage(nullptr), pressedImage(nullptr),
-	//Wyrmgus start
-//	disabledImage(nullptr)
-	disabledImage(nullptr), frameImage(nullptr), pressedframeImage(nullptr), Transparency(0)
-	//Wyrmgus end
+ImageButton::ImageButton() : Button()
 {
 	setForegroundColor(0xffffff);
 	//Wyrmgus start
@@ -373,18 +413,17 @@ ImageButton::ImageButton() :
 **
 **  @param caption  Caption text
 */
-ImageButton::ImageButton(const std::string &caption) :
-	Button(caption), normalImage(nullptr), pressedImage(nullptr),
-	//Wyrmgus start
-//	disabledImage(nullptr)
-	disabledImage(nullptr), frameImage(nullptr), pressedframeImage(nullptr), Transparency(0)
-	//Wyrmgus end
+ImageButton::ImageButton(const std::string &caption) : Button(caption)
 {
 	setForegroundColor(0xffffff);
 	//Wyrmgus start
 	ImageOrigin.x = 0;
 	ImageOrigin.y = 0;
 	//Wyrmgus end
+}
+
+ImageButton::~ImageButton()
+{
 }
 
 /**
@@ -550,6 +589,25 @@ void ImageButton::adjustSize()
 	}
 }
 
+void ImageButton::setNormalImage(const std::string &image_path)
+{ 
+	normalImage = CGraphic::New(image_path); 
+	normalImage->Load(false, wyrmgus::defines::get()->get_scale_factor());
+	adjustSize();
+}
+
+void ImageButton::setPressedImage(const std::string &image_path) 
+{ 
+	pressedImage = CGraphic::New(image_path);
+	pressedImage->Load(false, wyrmgus::defines::get()->get_scale_factor());
+}
+
+void ImageButton::setDisabledImage(const std::string &image_path) 
+{ 
+	disabledImage = CGraphic::New(image_path);
+	disabledImage->Load(false, wyrmgus::defines::get()->get_scale_factor());
+}
+
 //Wyrmgus start
 void ImageButton::setPosition(int x, int y)
 {
@@ -570,9 +628,7 @@ void ImageButton::setPosition(int x, int y)
 /**
 **  PlayerColorImageButton constructor
 */
-PlayerColorImageButton::PlayerColorImageButton() :
-	Button(), normalImage(nullptr), pressedImage(nullptr),
-	disabledImage(nullptr), frameImage(nullptr), pressedframeImage(nullptr), ButtonPlayerColor(""), Transparency(0)
+PlayerColorImageButton::PlayerColorImageButton() : Button()
 {
 	setForegroundColor(0xffffff);
 	ImageOrigin.x = 0;
@@ -584,9 +640,8 @@ PlayerColorImageButton::PlayerColorImageButton() :
 **
 **  @param caption  Caption text
 */
-PlayerColorImageButton::PlayerColorImageButton(const std::string &caption, const std::string &playercolor) :
-	Button(caption), normalImage(nullptr), pressedImage(nullptr),
-	disabledImage(nullptr), frameImage(nullptr), pressedframeImage(nullptr), ButtonPlayerColor(playercolor), Transparency(0)
+PlayerColorImageButton::PlayerColorImageButton(const std::string &caption, const std::string &playercolor)
+	: Button(caption), ButtonPlayerColor(playercolor)
 {
 	setForegroundColor(0xffffff);
 	ImageOrigin.x = 0;
@@ -724,6 +779,25 @@ void PlayerColorImageButton::adjustSize()
 	}
 }
 
+void PlayerColorImageButton::setNormalImage(const std::string &image_path)
+{
+	normalImage = CPlayerColorGraphic::Get(image_path);
+	normalImage->Load(false, wyrmgus::defines::get()->get_scale_factor());
+	adjustSize();
+}
+
+void PlayerColorImageButton::setPressedImage(const std::string &image_path)
+{
+	pressedImage = CPlayerColorGraphic::Get(image_path);
+	pressedImage->Load(false, wyrmgus::defines::get()->get_scale_factor());
+}
+
+void PlayerColorImageButton::setDisabledImage(const std::string &image_path)
+{
+	disabledImage = CPlayerColorGraphic::Get(image_path);
+	disabledImage->Load(false, wyrmgus::defines::get()->get_scale_factor());
+}
+
 void PlayerColorImageButton::setPosition(int x, int y)
 {
 	if (frameImage) {
@@ -736,6 +810,18 @@ void PlayerColorImageButton::setPosition(int x, int y)
 }
 //Wyrmgus end
 
+void PlayerColorImageButton::set_frame(const int frame)
+{
+	this->frame = frame;
+
+	if (this->normalImage != nullptr) {
+		const int x_origin = (this->frame * this->normalImage->get_frame_width()) % this->normalImage->get_width();
+		const int y_origin = this->frame * this->normalImage->get_frame_width() / this->normalImage->get_width() * this->normalImage->get_frame_height();
+		this->setImageOrigin(x_origin, y_origin);
+		this->setSize(this->normalImage->get_frame_width(), this->normalImage->get_frame_height());
+	}
+}
+
 /*----------------------------------------------------------------------------
 --  ImageRadioButton
 ----------------------------------------------------------------------------*/
@@ -744,10 +830,7 @@ void PlayerColorImageButton::setPosition(int x, int y)
 /**
 **  ImageRadioButton constructor
 */
-ImageRadioButton::ImageRadioButton() : gcn::RadioButton(),
-	uncheckedNormalImage(nullptr), uncheckedPressedImage(nullptr), uncheckedDisabledImage(nullptr),
-	checkedNormalImage(nullptr), checkedPressedImage(nullptr), checkedDisabledImage(nullptr),
-	mMouseDown(false)
+ImageRadioButton::ImageRadioButton() : gcn::RadioButton()
 {
 }
 
@@ -756,10 +839,7 @@ ImageRadioButton::ImageRadioButton() : gcn::RadioButton(),
 */
 ImageRadioButton::ImageRadioButton(const std::string &caption,
 								   const std::string &group, bool marked) :
-	gcn::RadioButton(caption, group, marked),
-	uncheckedNormalImage(nullptr), uncheckedPressedImage(nullptr), uncheckedDisabledImage(nullptr),
-	checkedNormalImage(nullptr), checkedPressedImage(nullptr), checkedDisabledImage(nullptr),
-	mMouseDown(false)
+	gcn::RadioButton(caption, group, marked)
 {
 }
 
@@ -874,19 +954,50 @@ void ImageRadioButton::adjustSize()
 	setWidth(getFont()->getWidth(mCaption) + width);
 }
 
+void ImageRadioButton::setUncheckedNormalImage(const std::string &image_path)
+{ 
+	uncheckedNormalImage = CGraphic::New(image_path);
+	uncheckedNormalImage->Load(false, wyrmgus::defines::get()->get_scale_factor());
+}
+
+void ImageRadioButton::setUncheckedPressedImage(const std::string &image_path)
+{
+	uncheckedPressedImage = CGraphic::New(image_path);
+	uncheckedPressedImage->Load(false, wyrmgus::defines::get()->get_scale_factor());
+}
+
+void ImageRadioButton::setUncheckedDisabledImage(const std::string &image_path)
+{
+	uncheckedDisabledImage = CGraphic::New(image_path);
+	uncheckedDisabledImage->Load(false, wyrmgus::defines::get()->get_scale_factor());
+}
+
+void ImageRadioButton::setCheckedNormalImage(const std::string &image_path)
+{
+	checkedNormalImage = CGraphic::New(image_path);
+	checkedNormalImage->Load(false, wyrmgus::defines::get()->get_scale_factor());
+}
+
+void ImageRadioButton::setCheckedPressedImage(const std::string &image_path)
+{
+	checkedPressedImage = CGraphic::New(image_path);
+	checkedPressedImage->Load(false, wyrmgus::defines::get()->get_scale_factor());
+}
+
+void ImageRadioButton::setCheckedDisabledImage(const std::string &image_path)
+{
+	checkedDisabledImage = CGraphic::New(image_path);
+	checkedDisabledImage->Load(false, wyrmgus::defines::get()->get_scale_factor());
+}
 
 /*----------------------------------------------------------------------------
 --  ImageCheckbox
 ----------------------------------------------------------------------------*/
 
-
 /**
 **  Image checkbox constructor
 */
-ImageCheckBox::ImageCheckBox() : gcn::CheckBox(),
-	uncheckedNormalImage(nullptr), uncheckedPressedImage(nullptr), uncheckedDisabledImage(nullptr),
-	checkedNormalImage(nullptr), checkedPressedImage(nullptr), checkedDisabledImage(nullptr),
-	mMouseDown(false)
+ImageCheckBox::ImageCheckBox() : gcn::CheckBox()
 {
 }
 
@@ -894,10 +1005,7 @@ ImageCheckBox::ImageCheckBox() : gcn::CheckBox(),
 **  Image checkbox constructor
 */
 ImageCheckBox::ImageCheckBox(const std::string &caption, bool marked) :
-	gcn::CheckBox(caption, marked),
-	uncheckedNormalImage(nullptr), uncheckedPressedImage(nullptr), uncheckedDisabledImage(nullptr),
-	checkedNormalImage(nullptr), checkedPressedImage(nullptr), checkedDisabledImage(nullptr),
-	mMouseDown(false)
+	gcn::CheckBox(caption, marked)
 {
 }
 
@@ -1011,6 +1119,42 @@ void ImageCheckBox::adjustSize()
 	setWidth(getFont()->getWidth(mCaption) + width);
 }
 
+
+void ImageCheckBox::setUncheckedNormalImage(const std::string &image_path)
+{
+	uncheckedNormalImage = CGraphic::New(image_path);
+	uncheckedNormalImage->Load(false, wyrmgus::defines::get()->get_scale_factor());
+}
+
+void ImageCheckBox::setUncheckedPressedImage(const std::string &image_path)
+{
+	uncheckedPressedImage = CGraphic::New(image_path);
+	uncheckedPressedImage->Load(false, wyrmgus::defines::get()->get_scale_factor());
+}
+
+void ImageCheckBox::setUncheckedDisabledImage(const std::string &image_path)
+{
+	uncheckedDisabledImage = CGraphic::New(image_path);
+	uncheckedDisabledImage->Load(false, wyrmgus::defines::get()->get_scale_factor());
+}
+
+void ImageCheckBox::setCheckedNormalImage(const std::string &image_path)
+{
+	checkedNormalImage = CGraphic::New(image_path);
+	checkedNormalImage->Load(false, wyrmgus::defines::get()->get_scale_factor());
+}
+
+void ImageCheckBox::setCheckedPressedImage(const std::string &image_path)
+{
+	checkedPressedImage = CGraphic::New(image_path);
+	checkedPressedImage->Load(false, wyrmgus::defines::get()->get_scale_factor());
+}
+
+void ImageCheckBox::setCheckedDisabledImage(const std::string &image_path)
+{
+	checkedDisabledImage = CGraphic::New(image_path);
+	checkedDisabledImage->Load(false, wyrmgus::defines::get()->get_scale_factor());
+}
 
 /*----------------------------------------------------------------------------
 --  ImageSlider
@@ -2425,6 +2569,24 @@ void ImageDropDownWidget::setSize(int width, int height)
 {
 	DropDown::setSize(width, height);
 	this->getListBox()->setSize(width, height);
+}
+
+void ImageDropDownWidget::setItemImage(const std::string &image_path) {
+	itemImage = CGraphic::New(image_path);
+	itemImage->Load(false, wyrmgus::defines::get()->get_scale_factor());
+	mListBox.setItemImage(itemImage);
+}
+
+void ImageDropDownWidget::setDownNormalImage(const std::string &image_path)
+{
+	DownNormalImage = CGraphic::New(image_path);
+	DownNormalImage->Load(false, wyrmgus::defines::get()->get_scale_factor());
+}
+
+void ImageDropDownWidget::setDownPressedImage(const std::string &image_path)
+{
+	DownPressedImage = CGraphic::New(image_path);
+	DownPressedImage->Load(false, wyrmgus::defines::get()->get_scale_factor());
 }
 
 void ImageDropDownWidget::draw(gcn::Graphics *graphics)

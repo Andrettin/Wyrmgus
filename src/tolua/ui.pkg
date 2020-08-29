@@ -317,19 +317,15 @@ class ScrollArea : public BasicContainer
 
 class ImageWidget : public Widget
 {
-	ImageWidget(CGraphic *image);
-	
-	//Wyrmgus start
-	void setImageOrigin(int x, int y);
-	//Wyrmgus end
+	ImageWidget(const std::string image_path, int scale_factor = 1, int image_width = -1, int image_height = -1);
 };
 
 //Wyrmgus start
 class PlayerColorImageWidget : public Widget
 {
-	PlayerColorImageWidget(CPlayerColorGraphic *image, const std::string playercolor);
+	PlayerColorImageWidget(const std::string image_path, const std::string playercolor);
 	
-	void setImageOrigin(int x, int y);
+	void set_frame(int frame);
 	void setGrayscale(bool grayscale);
 };
 //Wyrmgus end
@@ -356,33 +352,30 @@ class ImageButton : public Button
 	ImageButton();
 	ImageButton(const std::string caption);
 
-	void setNormalImage(CGraphic *image);
-	void setPressedImage(CGraphic *image);
-	void setDisabledImage(CGraphic *image);
+	void setNormalImage(const std::string image_path);
+	void setPressedImage(const std::string image_path);
+	void setDisabledImage(const std::string image_path);
 	//Wyrmgus start
 	void setFrameImage(CGraphic *image);
 	void setPressedFrameImage(CGraphic *image);
 	void setTransparency(int alpha);
-	void setImageOrigin(int x, int y);
 	//Wyrmgus end
 };
 
-// Wyrmgus start
 class PlayerColorImageButton : public Button
 {
 	PlayerColorImageButton();
 	PlayerColorImageButton(const std::string caption, const std::string playercolor);
 
-	void setNormalImage(CPlayerColorGraphic *image);
-	void setPressedImage(CPlayerColorGraphic *image);
-	void setDisabledImage(CPlayerColorGraphic *image);
+	void setNormalImage(const std::string image_path);
+	void setPressedImage(const std::string image_path);
+	void setDisabledImage(const std::string image_path);
 	void setFrameImage(CGraphic *image);
 	void setPressedFrameImage(CGraphic *image);
 	void setTransparency(int alpha);
-	void setImageOrigin(int x, int y);
+	void set_frame(int frame);
 	void setGrayscale(bool grayscale);
 };
-// Wyrmgus end
 
 class RadioButton : public Widget
 {
@@ -403,12 +396,12 @@ class ImageRadioButton : public RadioButton
 	ImageRadioButton();
 	ImageRadioButton(const std::string caption, const std::string group, bool marked = false);
 
-	void setUncheckedNormalImage(CGraphic *image);
-	void setUncheckedPressedImage(CGraphic *image);
-	void setUncheckedDisabledImage(CGraphic *image);
-	void setCheckedNormalImage(CGraphic *image);
-	void setCheckedPressedImage(CGraphic *image);
-	void setCheckedDisabledImage(CGraphic *image);
+	void setUncheckedNormalImage(const std::string image_path);
+	void setUncheckedPressedImage(const std::string image_path);
+	void setUncheckedDisabledImage(const std::string image_path);
+	void setCheckedNormalImage(const std::string image_path);
+	void setCheckedPressedImage(const std::string image_path);
+	void setCheckedDisabledImage(const std::string image_path);
 };
 
 class CheckBox : public Widget
@@ -428,12 +421,12 @@ class ImageCheckBox : public CheckBox
 	ImageCheckBox();
 	ImageCheckBox(const std::string caption, bool marked = false);
 
-	void setUncheckedNormalImage(CGraphic *image);
-	void setUncheckedPressedImage(CGraphic *image);
-	void setUncheckedDisabledImage(CGraphic *image);
-	void setCheckedNormalImage(CGraphic *image);
-	void setCheckedPressedImage(CGraphic *image);
-	void setCheckedDisabledImage(CGraphic *image);
+	void setUncheckedNormalImage(const std::string image_path);
+	void setUncheckedPressedImage(const std::string image_path);
+	void setUncheckedDisabledImage(const std::string image_path);
+	void setCheckedNormalImage(const std::string image_path);
+	void setCheckedPressedImage(const std::string image_path);
+	void setCheckedDisabledImage(const std::string image_path);
 };
 
 class Slider : public Widget
@@ -514,14 +507,6 @@ class TextField : public Widget
 	virtual std::string &getText();
 };
 
-class ImageTextField : public Widget
-{
-	ImageTextField(const std::string text);
-	virtual void setText(const std::string text);
-	virtual std::string &getText();
-	void setItemImage(CGraphic *image);
-};
-
 class ListBox : public Widget
 {
 };
@@ -536,26 +521,6 @@ class ListBoxWidget : public ScrollArea
 	void setList(lua_State *lua, lua_Object *lo);
 	void setSelected (int selected);
 	int getSelected();
-};
-
-class ImageListBoxWidget : public ListBoxWidget
-{
-	ImageListBoxWidget(unsigned int width, unsigned int height);
-	void setList(lua_State *lua, lua_Object *lo);
-	void setSelected (int selected);
-	int getSelected();
-	void setItemImage(CGraphic *image);
-	void setUpButtonImage(CGraphic *image);
-	void setUpPressedButtonImage(CGraphic *image);
-	void setDownButtonImage(CGraphic *image);
-	void setDownPressedButtonImage(CGraphic *image);
-	void setLeftButtonImage(CGraphic *image);
-	void setLeftPressedButtonImage(CGraphic *image);
-	void setRightButtonImage(CGraphic *image);
-	void setRightPressedButtonImage(CGraphic *image);
-	void setHBarImage(CGraphic *image);
-	void setVBarImage(CGraphic *image);
-	void setMarkerImage(CGraphic *image);
 };
 
 class Window : public BasicContainer
@@ -623,9 +588,9 @@ class ImageDropDownWidget : public DropDown
 	void setList(lua_State *lua, lua_Object *lo);
 	virtual ListBox *getListBox();
 	virtual void setSize(int width, int height);
-	void setItemImage(CGraphic *image);
-	void setDownNormalImage(CGraphic *image);
-	void setDownPressedImage(CGraphic *image);
+	void setItemImage(const std::string image_path);
+	void setDownNormalImage(const std::string image_path);
+	void setDownPressedImage(const std::string image_path);
 };
 
 class StatBoxWidget : public Widget

@@ -33,6 +33,7 @@
 #include "luacallback.h"
 
 class CGraphic;
+class CPlayerColorGraphic;
 
 extern bool GuichanActive;
 
@@ -75,23 +76,13 @@ private:
 class ImageWidget : public gcn::Icon
 {
 public:
-	//Wyrmgus start
-//	explicit ImageWidget(gcn::Image *img) : gcn::Icon(img) {}
-	explicit ImageWidget(gcn::Image *img) : gcn::Icon(img) { ImageOrigin.x = 0; ImageOrigin.y = 0; }
-	//Wyrmgus end
-	
-	//Wyrmgus start
-	void setImageOrigin(int x, int y) { ImageOrigin.x = x; ImageOrigin.y = y; }
-	
-	Vec2i ImageOrigin;
-	//Wyrmgus end
+	explicit ImageWidget(const std::string &image_path, const int scale_factor = 1, const int image_width = -1, const int image_height = -1);
 };
 
-//Wyrmgus start
 class PlayerColorImageWidget : public gcn::Icon
 {
 public:
-	explicit PlayerColorImageWidget(gcn::Image *img, const std::string &playercolor) : gcn::Icon(img), WidgetPlayerColor(playercolor) {ImageOrigin.x = 0; ImageOrigin.y = 0;}
+	explicit PlayerColorImageWidget(const std::string &image_path, const std::string &playercolor);
 
 	virtual void draw(gcn::Graphics *graphics);
 	void setImageOrigin(int x, int y) { ImageOrigin.x = x; ImageOrigin.y = y; }
@@ -101,11 +92,13 @@ public:
 		this->grayscale = grayscale;
 	}
 
+	void set_frame(const int frame);
+
 	std::string WidgetPlayerColor;
 	Vec2i ImageOrigin;
+	int frame = 0;
 	bool grayscale = false;
 };
-//Wyrmgus end
 
 class ButtonWidget : public gcn::Button
 {
@@ -118,13 +111,14 @@ class ImageButton : public gcn::Button
 public:
 	ImageButton();
 	explicit ImageButton(const std::string &caption);
+	~ImageButton();
 
 	virtual void draw(gcn::Graphics *graphics);
 	virtual void adjustSize();
 
-	void setNormalImage(gcn::Image *image) { normalImage = image; adjustSize(); }
-	void setPressedImage(gcn::Image *image) { pressedImage = image; }
-	void setDisabledImage(gcn::Image *image) { disabledImage = image; }
+	void setNormalImage(const std::string &image_path);
+	void setPressedImage(const std::string &image_path);
+	void setDisabledImage(const std::string &image_path);
 	//Wyrmgus start
 	void setFrameImage(gcn::Image *image) { frameImage = image; adjustSize(); }
 	void setPressedFrameImage(gcn::Image *image) { pressedframeImage = image; }
@@ -133,18 +127,17 @@ public:
 	void setImageOrigin(int x, int y) { ImageOrigin.x = x; ImageOrigin.y = y; }
 	//Wyrmgus end
 
-	gcn::Image *normalImage;
-	gcn::Image *pressedImage;
-	gcn::Image *disabledImage;
+	CGraphic *normalImage = nullptr;
+	CGraphic *pressedImage = nullptr;
+	CGraphic *disabledImage = nullptr;
 	//Wyrmgus start
-	gcn::Image *frameImage;
-	gcn::Image *pressedframeImage;
-	int Transparency;
+	gcn::Image *frameImage = nullptr;
+	gcn::Image *pressedframeImage = nullptr;
+	int Transparency = 0;
 	Vec2i ImageOrigin;
 	//Wyrmgus end
 };
 
-//Wyrmgus start
 class PlayerColorImageButton : public gcn::Button
 {
 public:
@@ -154,31 +147,33 @@ public:
 	virtual void draw(gcn::Graphics *graphics);
 	virtual void adjustSize();
 
-	void setNormalImage(gcn::Image *image) { normalImage = image; adjustSize(); }
-	void setPressedImage(gcn::Image *image) { pressedImage = image; }
-	void setDisabledImage(gcn::Image *image) { disabledImage = image; }
+	void setNormalImage(const std::string &image_path);
+	void setPressedImage(const std::string &image_path);
+	void setDisabledImage(const std::string &image_path);
 	void setFrameImage(gcn::Image *image) { frameImage = image; adjustSize(); }
 	void setPressedFrameImage(gcn::Image *image) { pressedframeImage = image; }
 	virtual void setPosition(int x, int y);
 	void setTransparency(int alpha) { Transparency = alpha; }
 	void setImageOrigin(int x, int y) { ImageOrigin.x = x; ImageOrigin.y = y; }
 
+	void set_frame(const int frame);
+
 	void setGrayscale(bool grayscale)
 	{
 		this->grayscale = grayscale;
 	}
 
-	gcn::Image *normalImage;
-	gcn::Image *pressedImage;
-	gcn::Image *disabledImage;
-	gcn::Image *frameImage;	
-	gcn::Image *pressedframeImage;
-	std::string ButtonPlayerColor;
-	int Transparency;
+	CPlayerColorGraphic *normalImage = nullptr;
+	CPlayerColorGraphic *pressedImage = nullptr;
+	CPlayerColorGraphic *disabledImage = nullptr;
+	gcn::Image *frameImage = nullptr;
+	gcn::Image *pressedframeImage = nullptr;
+	std::string ButtonPlayerColor = nullptr;
+	int Transparency = 0;
 	Vec2i ImageOrigin;
+	int frame = 0;
 	bool grayscale = false;
 };
-//Wyrmgus end
 
 class ImageRadioButton : public gcn::RadioButton
 {
@@ -195,20 +190,20 @@ public:
 	virtual void mouseClick(int x, int y, int button, int count);
 	virtual void adjustSize();
 
-	void setUncheckedNormalImage(gcn::Image *image) { uncheckedNormalImage = image; }
-	void setUncheckedPressedImage(gcn::Image *image) { uncheckedPressedImage = image; }
-	void setUncheckedDisabledImage(gcn::Image *image) { uncheckedDisabledImage = image; }
-	void setCheckedNormalImage(gcn::Image *image) { checkedNormalImage = image; }
-	void setCheckedPressedImage(gcn::Image *image) { checkedPressedImage = image; }
-	void setCheckedDisabledImage(gcn::Image *image) { checkedDisabledImage = image; }
+	void setUncheckedNormalImage(const std::string &image_path);
+	void setUncheckedPressedImage(const std::string &image_path);
+	void setUncheckedDisabledImage(const std::string &image_path);
+	void setCheckedNormalImage(const std::string &image_path);
+	void setCheckedPressedImage(const std::string &image_path);
+	void setCheckedDisabledImage(const std::string &image_path);
 
-	gcn::Image *uncheckedNormalImage;
-	gcn::Image *uncheckedPressedImage;
-	gcn::Image *uncheckedDisabledImage;
-	gcn::Image *checkedNormalImage;
-	gcn::Image *checkedPressedImage;
-	gcn::Image *checkedDisabledImage;
-	bool mMouseDown;
+	CGraphic *uncheckedNormalImage = nullptr;
+	CGraphic *uncheckedPressedImage = nullptr;
+	CGraphic *uncheckedDisabledImage = nullptr;
+	CGraphic *checkedNormalImage = nullptr;
+	CGraphic *checkedPressedImage = nullptr;
+	CGraphic *checkedDisabledImage = nullptr;
+	bool mMouseDown = false;
 };
 
 class ImageCheckBox : public gcn::CheckBox
@@ -225,20 +220,20 @@ public:
 	virtual void mouseClick(int x, int y, int button, int count);
 	virtual void adjustSize();
 
-	void setUncheckedNormalImage(gcn::Image *image) { uncheckedNormalImage = image; }
-	void setUncheckedPressedImage(gcn::Image *image) { uncheckedPressedImage = image; }
-	void setUncheckedDisabledImage(gcn::Image *image) { uncheckedDisabledImage = image; }
-	void setCheckedNormalImage(gcn::Image *image) { checkedNormalImage = image; }
-	void setCheckedPressedImage(gcn::Image *image) { checkedPressedImage = image; }
-	void setCheckedDisabledImage(gcn::Image *image) { checkedDisabledImage = image; }
+	void setUncheckedNormalImage(const std::string &image_path);
+	void setUncheckedPressedImage(const std::string &image_path);
+	void setUncheckedDisabledImage(const std::string &image_path);
+	void setCheckedNormalImage(const std::string &image_path);
+	void setCheckedPressedImage(const std::string &image_path);
+	void setCheckedDisabledImage(const std::string &image_path);
 
-	gcn::Image *uncheckedNormalImage;
-	gcn::Image *uncheckedPressedImage;
-	gcn::Image *uncheckedDisabledImage;
-	gcn::Image *checkedNormalImage;
-	gcn::Image *checkedPressedImage;
-	gcn::Image *checkedDisabledImage;
-	bool mMouseDown;
+	CGraphic *uncheckedNormalImage = nullptr;
+	CGraphic *uncheckedPressedImage = nullptr;
+	CGraphic *uncheckedDisabledImage = nullptr;
+	CGraphic *checkedNormalImage = nullptr;
+	CGraphic *checkedPressedImage = nullptr;
+	CGraphic *checkedDisabledImage = nullptr;
+	bool mMouseDown = false;
 };
 
 class ImageSlider : public gcn::Slider
@@ -465,17 +460,15 @@ public:
 class ImageDropDownWidget : public DropDownWidget
 {
 public:
-	ImageDropDownWidget() : itemImage(nullptr) {
+	ImageDropDownWidget() {
 		mListBox.addActionListener(this);
 		setListModel(&listmodel);
 		mScrollArea->setContent(&mListBox);
 	}
-	void setItemImage(CGraphic *image) {
-		itemImage = image;
-		mListBox.setItemImage(image);
-	}
-	void setDownNormalImage(CGraphic *image) { DownNormalImage = image; }
-	void setDownPressedImage(CGraphic *image) { DownPressedImage = image; }
+
+	void setItemImage(const std::string &image_path);
+	void setDownNormalImage(const std::string &image_path);
+	void setDownPressedImage(const std::string &image_path);
 
 	virtual ImageListBox *getListBox() { return &mListBox; }
 	virtual void draw(gcn::Graphics *graphics);
@@ -491,9 +484,9 @@ public:
 	void setFont(gcn::Font *font);
 	void _mouseInputMessage(const gcn::MouseInput &mouseInput);
 private:
-	CGraphic *itemImage;
-	CGraphic *DownNormalImage;
-	CGraphic *DownPressedImage;
+	CGraphic *itemImage = nullptr;
+	CGraphic *DownNormalImage = nullptr;
+	CGraphic *DownPressedImage = nullptr;
 	ImageListBox mListBox;
 	LuaListModel listmodel;
 };

@@ -8,8 +8,6 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name pantheon.h - The pantheon header file. */
-//
 //      (c) Copyright 2018-2020 by Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
@@ -34,7 +32,7 @@
 
 namespace wyrmgus {
 
-class pantheon : public detailed_data_entry, public data_type<pantheon>
+class pantheon final : public detailed_data_entry, public data_type<pantheon>
 {
 	Q_OBJECT
 

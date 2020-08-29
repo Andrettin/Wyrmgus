@@ -61,7 +61,6 @@
 
 namespace gcn
 {
-
     Icon::Icon(Image* image)
     {
         mImage = image;
