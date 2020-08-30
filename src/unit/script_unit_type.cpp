@@ -57,6 +57,8 @@
 #include "sound/sound.h"
 #include "sound/unitsound.h"
 #include "species/species.h"
+#include "species/taxon.h"
+#include "species/taxonomic_rank.h"
 #include "spells.h"
 #include "time/season.h"
 #include "ui/button.h"
@@ -3272,25 +3274,17 @@ static int CclDefineSpeciesPhylum(lua_State *l)
 	}
 
 	std::string phylum_ident = LuaToString(l, 1);
-	CSpeciesPhylum *phylum = GetSpeciesPhylum(phylum_ident);
-	if (!phylum) {
-		phylum = new CSpeciesPhylum;
-		SpeciesPhylums.push_back(phylum);
-		phylum->Ident = phylum_ident;
-	}
+	wyrmgus::taxon *phylum = wyrmgus::taxon::add(phylum_ident, nullptr);
+	phylum->rank = wyrmgus::taxonomic_rank::phylum;
 	
 	//  Parse the list:
 	for (lua_pushnil(l); lua_next(l, 2); lua_pop(l, 1)) {
 		const char *value = LuaToString(l, -2);
 		
 		if (!strcmp(value, "Name")) {
-			phylum->Name = LuaToString(l, -1);
+			phylum->set_name(LuaToString(l, -1));
 		} else if (!strcmp(value, "Kingdom")) {
-			phylum->Kingdom = LuaToString(l, -1);
-		} else if (!strcmp(value, "Subkingdom")) {
-			phylum->Subkingdom = LuaToString(l, -1);
-		} else if (!strcmp(value, "Infrakingdom")) {
-			phylum->Infrakingdom = LuaToString(l, -1);
+			phylum->supertaxon = wyrmgus::taxon::get(LuaToString(l, -1));
 		} else {
 			LuaError(l, "Unsupported tag: %s" _C_ value);
 		}
@@ -3312,33 +3306,19 @@ static int CclDefineSpeciesClass(lua_State *l)
 	}
 
 	std::string class_ident = LuaToString(l, 1);
-	CSpeciesClass *species_class = GetSpeciesClass(class_ident);
-	if (!species_class) {
-		species_class = new CSpeciesClass;
-		SpeciesClasses.push_back(species_class);
-		species_class->Ident = class_ident;
-	}
+	wyrmgus::taxon *species_class = wyrmgus::taxon::add(class_ident, nullptr);
+	species_class->rank = wyrmgus::taxonomic_rank::class_rank;
 	
 	//  Parse the list:
 	for (lua_pushnil(l); lua_next(l, 2); lua_pop(l, 1)) {
 		const char *value = LuaToString(l, -2);
 		
 		if (!strcmp(value, "Name")) {
-			species_class->Name = LuaToString(l, -1);
+			species_class->set_name(LuaToString(l, -1));
 		} else if (!strcmp(value, "Phylum")) {
 			std::string phylum_ident = LuaToString(l, -1);
-			CSpeciesPhylum *phylum = GetSpeciesPhylum(phylum_ident);
-			if (phylum) {
-				species_class->Phylum = phylum;
-			} else {
-				LuaError(l, "Species phylum \"%s\" doesn't exist." _C_ phylum_ident.c_str());
-			}
-		} else if (!strcmp(value, "Subphylum")) {
-			species_class->Subphylum = LuaToString(l, -1);
-		} else if (!strcmp(value, "Infraphylum")) {
-			species_class->Infraphylum = LuaToString(l, -1);
-		} else if (!strcmp(value, "Superclass")) {
-			species_class->Superclass = LuaToString(l, -1);
+			wyrmgus::taxon *phylum = wyrmgus::taxon::get(phylum_ident);
+			species_class->supertaxon = phylum;
 		} else {
 			LuaError(l, "Unsupported tag: %s" _C_ value);
 		}
@@ -3360,31 +3340,19 @@ static int CclDefineSpeciesOrder(lua_State *l)
 	}
 
 	std::string order_ident = LuaToString(l, 1);
-	CSpeciesOrder *order = GetSpeciesOrder(order_ident);
-	if (!order) {
-		order = new CSpeciesOrder;
-		SpeciesOrders.push_back(order);
-		order->Ident = order_ident;
-	}
+	wyrmgus::taxon *order = wyrmgus::taxon::add(order_ident, nullptr);
+	order->rank = wyrmgus::taxonomic_rank::order;
 	
 	//  Parse the list:
 	for (lua_pushnil(l); lua_next(l, 2); lua_pop(l, 1)) {
 		const char *value = LuaToString(l, -2);
 		
 		if (!strcmp(value, "Name")) {
-			order->Name = LuaToString(l, -1);
+			order->set_name(LuaToString(l, -1));
 		} else if (!strcmp(value, "Class")) {
 			std::string class_ident = LuaToString(l, -1);
-			CSpeciesClass *species_class = GetSpeciesClass(class_ident);
-			if (species_class) {
-				order->Class = species_class;
-			} else {
-				LuaError(l, "Species class \"%s\" doesn't exist." _C_ class_ident.c_str());
-			}
-		} else if (!strcmp(value, "Subclass")) {
-			order->Subclass = LuaToString(l, -1);
-		} else if (!strcmp(value, "Infraclass")) {
-			order->Infraclass = LuaToString(l, -1);
+			wyrmgus::taxon *species_class = wyrmgus::taxon::get(class_ident);
+			order->supertaxon = species_class;
 		} else {
 			LuaError(l, "Unsupported tag: %s" _C_ value);
 		}
@@ -3406,33 +3374,19 @@ static int CclDefineSpeciesFamily(lua_State *l)
 	}
 
 	std::string family_ident = LuaToString(l, 1);
-	CSpeciesFamily *family = GetSpeciesFamily(family_ident);
-	if (!family) {
-		family = new CSpeciesFamily;
-		SpeciesFamilies.push_back(family);
-		family->Ident = family_ident;
-	}
+	wyrmgus::taxon *family = wyrmgus::taxon::add(family_ident, nullptr);
+	family->rank = wyrmgus::taxonomic_rank::family;
 	
 	//  Parse the list:
 	for (lua_pushnil(l); lua_next(l, 2); lua_pop(l, 1)) {
 		const char *value = LuaToString(l, -2);
 		
 		if (!strcmp(value, "Name")) {
-			family->Name = LuaToString(l, -1);
+			family->set_name(LuaToString(l, -1));
 		} else if (!strcmp(value, "Order")) {
 			std::string order_ident = LuaToString(l, -1);
-			CSpeciesOrder *order = GetSpeciesOrder(order_ident);
-			if (order) {
-				family->Order = order;
-			} else {
-				LuaError(l, "Species order \"%s\" doesn't exist." _C_ order_ident.c_str());
-			}
-		} else if (!strcmp(value, "Suborder")) {
-			family->Suborder = LuaToString(l, -1);
-		} else if (!strcmp(value, "Infraorder")) {
-			family->Infraorder = LuaToString(l, -1);
-		} else if (!strcmp(value, "Superfamily")) {
-			family->Superfamily = LuaToString(l, -1);
+			wyrmgus::taxon *order = wyrmgus::taxon::get(order_ident);
+			family->supertaxon = order;
 		} else {
 			LuaError(l, "Unsupported tag: %s" _C_ value);
 		}
@@ -3454,33 +3408,21 @@ static int CclDefineSpeciesGenus(lua_State *l)
 	}
 
 	std::string genus_ident = LuaToString(l, 1);
-	CSpeciesGenus *genus = GetSpeciesGenus(genus_ident);
-	if (!genus) {
-		genus = new CSpeciesGenus;
-		SpeciesGenuses.push_back(genus);
-		genus->Ident = genus_ident;
-	}
+	wyrmgus::taxon *genus = wyrmgus::taxon::add(genus_ident, nullptr);
+	genus->rank = wyrmgus::taxonomic_rank::genus;
 	
 	//  Parse the list:
 	for (lua_pushnil(l); lua_next(l, 2); lua_pop(l, 1)) {
 		const char *value = LuaToString(l, -2);
 		
 		if (!strcmp(value, "Name")) {
-			genus->Name = LuaToString(l, -1);
+			genus->set_name(LuaToString(l, -1));
 		} else if (!strcmp(value, "CommonName")) {
-			genus->CommonName = LuaToString(l, -1);
+			genus->common_name = LuaToString(l, -1);
 		} else if (!strcmp(value, "Family")) {
 			std::string family_ident = LuaToString(l, -1);
-			CSpeciesFamily *family = GetSpeciesFamily(family_ident);
-			if (family) {
-				genus->Family = family;
-			} else {
-				LuaError(l, "Species family \"%s\" doesn't exist." _C_ family_ident.c_str());
-			}
-		} else if (!strcmp(value, "Subfamily")) {
-			genus->Subfamily = LuaToString(l, -1);
-		} else if (!strcmp(value, "Tribe")) {
-			genus->Tribe = LuaToString(l, -1);
+			wyrmgus::taxon *family = wyrmgus::taxon::get(family_ident);
+			genus->supertaxon = family;
 		} else {
 			LuaError(l, "Unsupported tag: %s" _C_ value);
 		}
@@ -3530,12 +3472,8 @@ static int CclDefineSpecies(lua_State *l)
 			species->Prehistoric = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "Genus")) {
 			std::string genus_ident = LuaToString(l, -1);
-			CSpeciesGenus *genus = GetSpeciesGenus(genus_ident);
-			if (genus) {
-				species->Genus = genus;
-			} else {
-				LuaError(l, "Species genus \"%s\" doesn't exist." _C_ genus_ident.c_str());
-			}
+			wyrmgus::taxon *genus = wyrmgus::taxon::get(genus_ident);
+			species->genus = genus;
 		} else if (!strcmp(value, "Species")) {
 			species->Species = LuaToString(l, -1);
 		} else if (!strcmp(value, "ChildUpgrade")) {
@@ -3620,15 +3558,16 @@ static int CclGetSpeciesData(lua_State *l)
 		lua_pushstring(l, species->get_background().c_str());
 		return 1;
 	} else if (!strcmp(data, "Family")) {
-		if (species->Genus != nullptr && species->Genus->Family != nullptr) {
-			lua_pushstring(l, species->Genus->Family->Ident.c_str());
+		const wyrmgus::taxon *family = species->get_supertaxon_of_rank(wyrmgus::taxonomic_rank::family);
+		if (family != nullptr) {
+			lua_pushstring(l, family->get_identifier().c_str());
 		} else {
 			lua_pushstring(l, "");
 		}
 		return 1;
 	} else if (!strcmp(data, "Genus")) {
-		if (species->Genus != nullptr) {
-			lua_pushstring(l, species->Genus->Ident.c_str());
+		if (species->get_genus() != nullptr) {
+			lua_pushstring(l, species->get_genus()->get_identifier().c_str());
 		} else {
 			lua_pushstring(l, "");
 		}
@@ -3708,20 +3647,22 @@ static int CclGetSpeciesGenusData(lua_State *l)
 		LuaError(l, "incorrect argument");
 	}
 	std::string genus_ident = LuaToString(l, 1);
-	const CSpeciesGenus *genus = GetSpeciesGenus(genus_ident);
-	if (!genus) {
-		LuaError(l, "Species genus \"%s\" doesn't exist." _C_ genus_ident.c_str());
-	}
+	const wyrmgus::taxon *genus = wyrmgus::taxon::get(genus_ident);
 	const char *data = LuaToString(l, 2);
 
 	if (!strcmp(data, "Name")) {
-		lua_pushstring(l, genus->Name.c_str());
+		lua_pushstring(l, genus->get_name().c_str());
 		return 1;
 	} else if (!strcmp(data, "CommonName")) {
-		lua_pushstring(l, genus->CommonName.c_str());
+		lua_pushstring(l, genus->get_common_name().c_str());
 		return 1;
 	} else if (!strcmp(data, "Family")) {
-		lua_pushstring(l, genus->Family->Ident.c_str());
+		const wyrmgus::taxon *family = genus->get_supertaxon_of_rank(wyrmgus::taxonomic_rank::family);
+		if (family != nullptr) {
+			lua_pushstring(l, family->get_identifier().c_str());
+		} else {
+			lua_pushstring(l, "");
+		}
 		return 1;
 	} else {
 		LuaError(l, "Invalid field: %s" _C_ data);

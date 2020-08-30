@@ -459,12 +459,6 @@ std::string ExtraDeathTypes[ANIMATIONS_DEATHTYPES];
 
 //Wyrmgus start
 wyrmgus::unit_type *settlement_site_unit_type;
-
-std::vector<CSpeciesGenus *> SpeciesGenuses;
-std::vector<CSpeciesFamily *> SpeciesFamilies;
-std::vector<CSpeciesOrder *> SpeciesOrders;
-std::vector<CSpeciesClass *> SpeciesClasses;
-std::vector<CSpeciesPhylum *> SpeciesPhylums;
 //Wyrmgus end
 
 int GetResourceIdByName(const char *resourceName)
@@ -2876,31 +2870,6 @@ void CleanUnitTypeVariables()
 
 	// Clean all unit-types
 	UnitTypeVar.Clear();
-
-	// Clean hardcoded unit types.
-	
-	//Wyrmgus start
-	for (size_t i = 0; i < SpeciesGenuses.size(); ++i) {
-		delete SpeciesGenuses[i];
-	}
-	SpeciesGenuses.clear();
-	for (size_t i = 0; i < SpeciesFamilies.size(); ++i) {
-		delete SpeciesFamilies[i];
-	}
-	SpeciesFamilies.clear();
-	for (size_t i = 0; i < SpeciesOrders.size(); ++i) {
-		delete SpeciesOrders[i];
-	}
-	SpeciesOrders.clear();
-	for (size_t i = 0; i < SpeciesClasses.size(); ++i) {
-		delete SpeciesClasses[i];
-	}
-	SpeciesClasses.clear();
-	for (size_t i = 0; i < SpeciesPhylums.size(); ++i) {
-		delete SpeciesPhylums[i];
-	}
-	SpeciesPhylums.clear();
-	//Wyrmgus end
 }
 
 //Wyrmgus start
@@ -2955,61 +2924,6 @@ std::string GetUnitTypeStatsString(const std::string &unit_type_ident)
 	}
 	
 	return "";
-}
-
-CSpeciesGenus *GetSpeciesGenus(const std::string &genus_ident)
-{
-	for (size_t i = 0; i < SpeciesGenuses.size(); ++i) {
-		if (genus_ident == SpeciesGenuses[i]->Ident) {
-			return SpeciesGenuses[i];
-		}
-	}
-	
-	return nullptr;
-}
-
-CSpeciesFamily *GetSpeciesFamily(const std::string &family_ident)
-{
-	for (size_t i = 0; i < SpeciesFamilies.size(); ++i) {
-		if (family_ident == SpeciesFamilies[i]->Ident) {
-			return SpeciesFamilies[i];
-		}
-	}
-	
-	return nullptr;
-}
-
-CSpeciesOrder *GetSpeciesOrder(const std::string &order_ident)
-{
-	for (size_t i = 0; i < SpeciesOrders.size(); ++i) {
-		if (order_ident == SpeciesOrders[i]->Ident) {
-			return SpeciesOrders[i];
-		}
-	}
-	
-	return nullptr;
-}
-
-CSpeciesClass *GetSpeciesClass(const std::string &class_ident)
-{
-	for (size_t i = 0; i < SpeciesClasses.size(); ++i) {
-		if (class_ident == SpeciesClasses[i]->Ident) {
-			return SpeciesClasses[i];
-		}
-	}
-	
-	return nullptr;
-}
-
-CSpeciesPhylum *GetSpeciesPhylum(const std::string &phylum_ident)
-{
-	for (size_t i = 0; i < SpeciesPhylums.size(); ++i) {
-		if (phylum_ident == SpeciesPhylums[i]->Ident) {
-			return SpeciesPhylums[i];
-		}
-	}
-	
-	return nullptr;
 }
 
 std::string GetImageLayerNameById(int image_layer)

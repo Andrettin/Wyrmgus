@@ -757,86 +757,6 @@ public:
 	wyrmgus::terrain_type *RestrictTerrainType = nullptr;
 };
 
-//Wyrmgus start
-class CSpeciesPhylum
-{
-public:
-	CSpeciesPhylum() :
-		Ident("")
-	{
-	}
-	
-	std::string Ident;				/// Ident of the species phylum
-	std::string Name;				/// Name of the species phylum
-	std::string Kingdom;
-	std::string Subkingdom;
-	std::string Infrakingdom;
-};	
-
-class CSpeciesClass
-{
-public:
-	CSpeciesClass() :
-		Phylum(nullptr)
-	{
-	}
-	
-	std::string Ident;				/// Ident of the species class
-	std::string Name;				/// Name of the species class
-	CSpeciesPhylum *Phylum;
-	std::string Subphylum;
-	std::string Infraphylum;
-	std::string Superclass;
-};	
-
-class CSpeciesOrder
-{
-public:
-	CSpeciesOrder() :
-		Class(nullptr)
-	{
-	}
-	
-	std::string Ident;				/// Ident of the species order
-	std::string Name;				/// Name of the species order
-	CSpeciesClass *Class;
-	std::string Subclass;
-	std::string Infraclass;
-};	
-
-class CSpeciesFamily
-{
-public:
-	CSpeciesFamily() :
-		Order(nullptr)
-	{
-	}
-	
-	std::string Ident;				/// Ident of the species family
-	std::string Name;				/// Name of the species family
-	CSpeciesOrder *Order;
-	std::string Suborder;
-	std::string Infraorder;
-	std::string Superfamily;
-};	
-
-class CSpeciesGenus
-{
-public:
-	CSpeciesGenus() :
-		Family(nullptr)
-	{
-	}
-	
-	std::string Ident;				/// Ident of the genus
-	std::string Name;				/// Name of the genus
-	std::string CommonName;			/// Common name of the genus
-	CSpeciesFamily *Family;
-	std::string Subfamily;
-	std::string Tribe;
-};	
-//Wyrmgus end
-
 namespace wyrmgus {
 
 /// Base structure of unit-type
@@ -1443,12 +1363,6 @@ extern CUnitTypeVar UnitTypeVar;
 
 //Wyrmgus start
 extern wyrmgus::unit_type *settlement_site_unit_type;
-
-extern std::vector<CSpeciesGenus *> SpeciesGenuses;
-extern std::vector<CSpeciesFamily *> SpeciesFamilies;
-extern std::vector<CSpeciesOrder *> SpeciesOrders;
-extern std::vector<CSpeciesClass *> SpeciesClasses;
-extern std::vector<CSpeciesPhylum *> SpeciesPhylums;
 //Wyrmgus end
 
 extern wyrmgus::unit_type *CclGetUnitType(lua_State *l);  /// Access unit-type object
@@ -1459,12 +1373,6 @@ extern void UpdateStats(int reset_to_default);       /// Update unit stats
 //Wyrmgus start
 
 extern std::string GetUnitTypeStatsString(const std::string &unit_type_ident);
-
-extern CSpeciesGenus *GetSpeciesGenus(const std::string &genus_ident);
-extern CSpeciesFamily *GetSpeciesFamily(const std::string &family_ident);
-extern CSpeciesOrder *GetSpeciesOrder(const std::string &order_ident);
-extern CSpeciesClass *GetSpeciesClass(const std::string &class_ident);
-extern CSpeciesPhylum *GetSpeciesPhylum(const std::string &phylum_ident);
 //Wyrmgus end
 
 extern void SaveUnitTypes(CFile &file);              /// Save the unit-type table

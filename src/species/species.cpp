@@ -29,9 +29,24 @@
 
 #include "species/species.h"
 
+#include "species/taxon.h"
 #include "util/vector_util.h"
 
 namespace wyrmgus {
+
+
+const taxon *species::get_supertaxon_of_rank(const taxonomic_rank rank) const
+{
+	if (this->get_genus() == nullptr) {
+		return nullptr;
+	}
+
+	if (this->get_genus()->get_rank() == rank) {
+		return nullptr;
+	}
+
+	return this->get_genus()->get_supertaxon_of_rank(rank);
+}
 
 bool species::CanEvolveToAUnitType(terrain_type *terrain, bool sapient_only) const
 {

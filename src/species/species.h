@@ -30,18 +30,24 @@
 #include "database/data_type.h"
 #include "database/detailed_data_entry.h"
 
-class CSpeciesGenus;
+struct lua_State;
+
+int CclDefineSpecies(lua_State *l);
 
 namespace wyrmgus {
 
 class plane;
+class taxon;
 class terrain_type;
 class unit_type;
 class world;
+enum class taxonomic_rank;
 
 class species final : public detailed_data_entry, public data_type<species>
 {
 	Q_OBJECT
+
+	Q_PROPERTY(wyrmgus::taxon* genus MEMBER genus READ get_genus)
 
 public:
 	static constexpr const char *class_identifier = "species";
@@ -51,13 +57,22 @@ public:
 	{
 	}
 
+	taxon *get_genus() const
+	{
+		return this->genus;
+	}
+
+	const taxon *get_supertaxon_of_rank(const taxonomic_rank rank) const;
+
 	bool CanEvolveToAUnitType(terrain_type *terrain = nullptr, bool sapient_only = false) const;
 	species *GetRandomEvolution(terrain_type *terrain) const;
 	
 	int Era = -1;					/// Era ID
 	bool Sapient = false;			/// Whether the species is sapient
 	bool Prehistoric = false;		/// Whether the species is prehistoric or not
-	CSpeciesGenus *Genus = nullptr;
+private:
+	taxon *genus = nullptr;
+public:
 	std::string Species;
 	std::string ChildUpgrade;		/// Which individual upgrade the children of this species get
 	plane *home_plane = nullptr;
@@ -66,6 +81,8 @@ public:
 	std::vector<terrain_type *> Terrains;	/// in which terrains does this species live
 	std::vector<species *> EvolvesFrom;	/// from which species this one can evolve
 	std::vector<species *> EvolvesTo;		/// to which species this one can evolve
+
+	friend int ::CclDefineSpecies(lua_State *l);
 };
 
 }
