@@ -46,6 +46,7 @@ class taxon final : public named_data_entry, public data_type<taxon>
 {
 	Q_OBJECT
 
+	Q_PROPERTY(QString common_name READ get_common_name_qstring)
 	Q_PROPERTY(wyrmgus::taxonomic_rank rank MEMBER rank READ get_rank)
 	Q_PROPERTY(wyrmgus::taxon* supertaxon MEMBER supertaxon READ get_supertaxon)
 
