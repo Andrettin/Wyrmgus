@@ -29,18 +29,14 @@
 
 #include "unit/unit_type.h"
 
-//Wyrmgus start
 #include "ai/ai_local.h" //for using AiHelpers
-//Wyrmgus end
 #include "animation.h"
 #include "animation/animation_exactframe.h"
 #include "animation/animation_frame.h"
 #include "civilization.h"
 #include "config.h"
 #include "database/defines.h"
-//Wyrmgus start
 #include "editor.h" //for personal name generation
-//Wyrmgus end
 #include "faction.h"
 #include "iolib.h"
 #include "item_class.h"
@@ -65,9 +61,7 @@
 #include "unit/unit_class.h"
 #include "unit/unit_type_type.h"
 #include "unit/unit_type_variation.h"
-//Wyrmgus start
 #include "upgrade/upgrade.h"
-//Wyrmgus end
 #include "util/size_util.h"
 #include "util/string_util.h"
 #include "util/util.h"

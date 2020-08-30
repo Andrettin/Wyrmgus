@@ -29,10 +29,12 @@
 
 #include "species/species.h"
 
+#include "plane.h"
 #include "species/taxon.h"
 #include "species/taxonomic_rank.h"
 #include "util/vector_random_util.h"
 #include "util/vector_util.h"
+#include "world.h"
 
 namespace wyrmgus {
 
@@ -49,6 +51,17 @@ void species::process_sml_scope(const sml_data &scope)
 		}
 	} else {
 		data_entry::process_sml_scope(scope);
+	}
+}
+
+void species::initialize()
+{
+	if (this->get_home_plane() != nullptr) {
+		this->get_home_plane()->Species.push_back(this);
+	}
+
+	if (this->get_homeworld() != nullptr) {
+		this->get_homeworld()->Species.push_back(this);
 	}
 }
 
@@ -74,6 +87,15 @@ const taxon *species::get_supertaxon_of_rank(const taxonomic_rank rank) const
 	}
 
 	return this->get_genus()->get_supertaxon_of_rank(rank);
+}
+
+std::string species::get_scientific_name() const
+{
+	if (!this->get_specific_name().empty()) {
+		return this->get_genus()->get_name() + " " + this->get_specific_name();
+	}
+
+	return this->get_genus()->get_name();
 }
 
 bool species::has_evolution(const terrain_type *terrain, const bool sapient_only) const

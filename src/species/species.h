@@ -48,7 +48,10 @@ class species final : public detailed_data_entry, public data_type<species>
 	Q_OBJECT
 
 	Q_PROPERTY(wyrmgus::taxon* genus MEMBER genus READ get_genus)
+	Q_PROPERTY(QString specific_name READ get_specific_name_qstring)
 	Q_PROPERTY(bool sapient MEMBER sapient READ is_sapient)
+	Q_PROPERTY(wyrmgus::plane* home_plane MEMBER home_plane READ get_home_plane)
+	Q_PROPERTY(wyrmgus::world* homeworld MEMBER homeworld READ get_homeworld)
 
 public:
 	static constexpr const char *class_identifier = "species";
@@ -59,6 +62,7 @@ public:
 	}
 
 	virtual void process_sml_scope(const sml_data &scope) override;
+	virtual void initialize();
 	virtual void check() const;
 
 	taxon *get_genus() const
@@ -68,9 +72,36 @@ public:
 
 	const taxon *get_supertaxon_of_rank(const taxonomic_rank rank) const;
 
+	const std::string &get_specific_name() const
+	{
+		return this->specific_name;
+	}
+
+	QString get_specific_name_qstring() const
+	{
+		return QString::fromStdString(this->specific_name);
+	}
+
+	Q_INVOKABLE void set_specific_name(const std::string &name)
+	{
+		this->specific_name = name;
+	}
+
+	std::string get_scientific_name() const;
+
 	bool is_sapient() const
 	{
 		return this->sapient;
+	}
+
+	plane *get_home_plane() const
+	{
+		return this->home_plane;
+	}
+
+	world *get_homeworld() const
+	{
+		return this->homeworld;
 	}
 
 	const std::vector<const species *> &get_pre_evolutions() const
@@ -96,8 +127,10 @@ private:
 public:
 	bool Prehistoric = false;		/// Whether the species is prehistoric or not
 	std::string ChildUpgrade; //which individual upgrade the children of this species get
+private:
 	plane *home_plane = nullptr;
 	world *homeworld = nullptr;
+public:
 	unit_type *Type = nullptr;
 	std::vector<terrain_type *> Terrains; //in which terrains does this species live
 private:

@@ -3482,12 +3482,10 @@ static int CclDefineSpecies(lua_State *l)
 			const std::string plane_ident = LuaToString(l, -1);
 			wyrmgus::plane *plane = wyrmgus::plane::get(plane_ident);
 			species->home_plane = plane;
-			plane->Species.push_back(species);
 		} else if (!strcmp(value, "Homeworld")) {
 			const std::string world_ident = LuaToString(l, -1);
 			wyrmgus::world *world = wyrmgus::world::get(world_ident);
 			species->homeworld = world;
-			world->Species.push_back(species);
 		} else if (!strcmp(value, "Terrains")) {
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument");
@@ -3548,6 +3546,9 @@ static int CclGetSpeciesData(lua_State *l)
 	if (!strcmp(data, "Name")) {
 		lua_pushstring(l, species->get_name().c_str());
 		return 1;
+	} else if (!strcmp(data, "ScientificName")) {
+		lua_pushstring(l, species->get_scientific_name().c_str());
+		return 1;
 	} else if (!strcmp(data, "Description")) {
 		lua_pushstring(l, species->get_description().c_str());
 		return 1;
@@ -3585,15 +3586,15 @@ static int CclGetSpeciesData(lua_State *l)
 		lua_pushstring(l, species->ChildUpgrade.c_str());
 		return 1;
 	} else if (!strcmp(data, "HomePlane")) {
-		if (species->home_plane != nullptr) {
-			lua_pushstring(l, species->home_plane->Ident.c_str());
+		if (species->get_home_plane() != nullptr) {
+			lua_pushstring(l, species->get_home_plane()->get_identifier().c_str());
 		} else {
 			lua_pushstring(l, "");
 		}
 		return 1;
 	} else if (!strcmp(data, "Homeworld")) {
-		if (species->homeworld != nullptr) {
-			lua_pushstring(l, species->homeworld->Ident.c_str());
+		if (species->get_homeworld() != nullptr) {
+			lua_pushstring(l, species->get_homeworld()->get_identifier().c_str());
 		} else {
 			lua_pushstring(l, "");
 		}
