@@ -25,10 +25,6 @@
 //      02111-1307, USA.
 //
 
-/*----------------------------------------------------------------------------
---  Includes
-----------------------------------------------------------------------------*/
-
 #include "stratagus.h"
 
 #include "province.h"
@@ -36,17 +32,9 @@
 #include "map/map.h" // for the terrain features, which are cleaned here
 #include "map/tileset.h" // for the terrain types, which are cleaned here
 
-/*----------------------------------------------------------------------------
---  Variables
-----------------------------------------------------------------------------*/
-
 std::vector<CProvince *> Provinces;
 std::vector<CWorldMapTerrainType *> WorldMapTerrainTypes;
 std::map<std::string, int> WorldMapTerrainTypeStringToIndex;
-
-/*----------------------------------------------------------------------------
---  Functions
-----------------------------------------------------------------------------*/
 
 void CleanProvinces()
 {
@@ -66,9 +54,6 @@ CProvince *GetProvince(const std::string &province_name)
 	return nullptr;
 }
 
-/**
-**  Get the ID of a world map terrain type
-*/
 int GetWorldMapTerrainTypeId(const std::string &terrain_type_name)
 {
 	if (terrain_type_name.empty()) {
@@ -79,71 +64,5 @@ int GetWorldMapTerrainTypeId(const std::string &terrain_type_name)
 		return WorldMapTerrainTypeStringToIndex[terrain_type_name];
 	}
 	
-	return -1;
-}
-
-std::string GetEraNameById(int era)
-{
-	if (era == EraDevonian) {
-		return "devonian";
-	} else if (era == EraCarboniferous) {
-		return "carboniferous";
-	} else if (era == EraPermian) {
-		return "permian";
-	} else if (era == EraTriassic) {
-		return "triassic";
-	} else if (era == EraJurassic) {
-		return "jurassic";
-	} else if (era == EraCretaceous) {
-		return "cretaceous";
-	} else if (era == EraPaleocene) {
-		return "paleocene";
-	} else if (era == EraEocene) {
-		return "eocene";
-	} else if (era == EraOligocene) {
-		return "oligocene";
-	} else if (era == EraMiocene) {
-		return "miocene";
-	} else if (era == EraPliocene) {
-		return "pliocene";
-	} else if (era == EraPleistocene) {
-		return "pleistocene";
-	} else if (era == EraHolocene) {
-		return "holocene";
-	}
-
-	return "";
-}
-
-int GetEraIdByName(const std::string &era)
-{
-	if (era == "devonian") {
-		return EraDevonian;
-	} else if (era == "carboniferous") {
-		return EraCarboniferous;
-	} else if (era == "permian") {
-		return EraPermian;
-	} else if (era == "triassic") {
-		return EraTriassic;
-	} else if (era == "jurassic") {
-		return EraJurassic;
-	} else if (era == "cretaceous") {
-		return EraCretaceous;
-	} else if (era == "paleocene") {
-		return EraPaleocene;
-	} else if (era == "eocene") {
-		return EraEocene;
-	} else if (era == "oligocene") {
-		return EraOligocene;
-	} else if (era == "miocene") {
-		return EraMiocene;
-	} else if (era == "pliocene") {
-		return EraPliocene;
-	} else if (era == "pleistocene") {
-		return EraPleistocene;
-	} else if (era == "holocene") {
-		return EraHolocene;
-	}
-
 	return -1;
 }

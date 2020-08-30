@@ -56,6 +56,7 @@
 #include "script.h"
 #include "sound/sound.h"
 #include "sound/unitsound.h"
+#include "species/geological_era.h"
 #include "species/species.h"
 #include "species/taxon.h"
 #include "species/taxonomic_rank.h"
@@ -3157,11 +3158,6 @@ void UpdateUnitVariables(CUnit &unit)
 	unit.Variable[TRANSPARENCY_INDEX].Max = 100;
 
 	unit.Variable[LEVEL_INDEX].Max = 100000;
-	
-	if (unit.Variable[BIRTHCYCLE_INDEX].Value && (GameCycle - unit.Variable[BIRTHCYCLE_INDEX].Value) > 1000 && unit.Type->get_species() != nullptr && !unit.Type->get_species()->ChildUpgrade.empty()) { // 1000 cycles until maturation, for all species (should change this to have different maturation times for different species)
-		unit.Variable[BIRTHCYCLE_INDEX].Value = 0;
-		IndividualUpgradeLost(unit, CUpgrade::get(unit.Type->get_species()->ChildUpgrade));
-	}
 	//Wyrmgus end
 
 	// Shield permeability
@@ -3459,25 +3455,16 @@ static int CclDefineSpecies(lua_State *l)
 		} else if (!strcmp(value, "Background")) {
 			species->set_background(LuaToString(l, -1));
 		} else if (!strcmp(value, "Era")) {
-			std::string era_ident = LuaToString(l, -1);
-			int era_id = GetEraIdByName(era_ident);
-			if (era_id != -1) {
-				species->Era = era_id;
-			} else {
-				LuaError(l, "Era \"%s\" doesn't exist." _C_ era_ident.c_str());
-			}
+			const std::string era_ident = LuaToString(l, -1);
+			species->era = wyrmgus::string_to_geological_era(era_ident);
 		} else if (!strcmp(value, "Sapient")) {
 			species->sapient = LuaToBoolean(l, -1);
-		} else if (!strcmp(value, "Prehistoric")) {
-			species->Prehistoric = LuaToBoolean(l, -1);
-		} else if (!strcmp(value, "Genus")) {
+		} else if (!strcmp(value, "Supertaxon") || !strcmp(value, "Genus")) {
 			std::string genus_ident = LuaToString(l, -1);
 			wyrmgus::taxon *genus = wyrmgus::taxon::get(genus_ident);
-			species->genus = genus;
+			species->supertaxon = genus;
 		} else if (!strcmp(value, "Species")) {
 			species->specific_name = LuaToString(l, -1);
-		} else if (!strcmp(value, "ChildUpgrade")) {
-			species->ChildUpgrade = LuaToString(l, -1);
 		} else if (!strcmp(value, "HomePlane")) {
 			const std::string plane_ident = LuaToString(l, -1);
 			wyrmgus::plane *plane = wyrmgus::plane::get(plane_ident);
@@ -3493,7 +3480,7 @@ static int CclDefineSpecies(lua_State *l)
 			const int subargs = lua_rawlen(l, -1);
 			for (int j = 0; j < subargs; ++j) {
 				wyrmgus::terrain_type *terrain = wyrmgus::terrain_type::get(LuaToString(l, -1, j + 1));
-				species->Terrains.push_back(terrain);
+				species->native_terrain_types.push_back(terrain);
 			}
 		} else if (!strcmp(value, "EvolvesFrom")) {
 			species->pre_evolutions.clear();
@@ -3506,12 +3493,6 @@ static int CclDefineSpecies(lua_State *l)
 			}
 		} else {
 			LuaError(l, "Unsupported tag: %s" _C_ value);
-		}
-	}
-	
-	for (const wyrmgus::species *pre_evolution : species->pre_evolutions) {
-		if (species->Era != -1 && pre_evolution->Era != -1 && species->Era <= pre_evolution->Era) {
-			LuaError(l, "Species \"%s\" is set to evolve from \"%s\", but is from the same or an earlier era than the latter." _C_ species->get_identifier().c_str() _C_ pre_evolution->get_identifier().c_str());
 		}
 	}
 	
@@ -3566,24 +3547,21 @@ static int CclGetSpeciesData(lua_State *l)
 			lua_pushstring(l, "");
 		}
 		return 1;
-	} else if (!strcmp(data, "Genus")) {
-		if (species->get_genus() != nullptr) {
-			lua_pushstring(l, species->get_genus()->get_identifier().c_str());
+	} else if (!strcmp(data, "Supertaxon")) {
+		if (species->get_supertaxon() != nullptr) {
+			lua_pushstring(l, species->get_supertaxon()->get_identifier().c_str());
 		} else {
 			lua_pushstring(l, "");
 		}
 		return 1;
 	} else if (!strcmp(data, "Era")) {
-		lua_pushnumber(l, species->Era);
+		lua_pushstring(l, wyrmgus::geological_era_to_string(species->get_era()).c_str());
 		return 1;
 	} else if (!strcmp(data, "Sapient")) {
 		lua_pushboolean(l, species->is_sapient());
 		return 1;
 	} else if (!strcmp(data, "Prehistoric")) {
-		lua_pushboolean(l, species->Prehistoric);
-		return 1;
-	} else if (!strcmp(data, "ChildUpgrade")) {
-		lua_pushstring(l, species->ChildUpgrade.c_str());
+		lua_pushboolean(l, species->is_prehistoric());
 		return 1;
 	} else if (!strcmp(data, "HomePlane")) {
 		if (species->get_home_plane() != nullptr) {
@@ -3607,10 +3585,10 @@ static int CclGetSpeciesData(lua_State *l)
 		}
 		return 1;
 	} else if (!strcmp(data, "Terrains")) {
-		lua_createtable(l, species->Terrains.size(), 0);
-		for (size_t i = 1; i <= species->Terrains.size(); ++i)
+		lua_createtable(l, species->get_native_terrain_types().size(), 0);
+		for (size_t i = 1; i <= species->get_native_terrain_types().size(); ++i)
 		{
-			lua_pushstring(l, species->Terrains[i-1]->Ident.c_str());
+			lua_pushstring(l, species->get_native_terrain_types()[i-1]->get_identifier().c_str());
 			lua_rawseti(l, -2, i);
 		}
 		return 1;
@@ -3642,25 +3620,24 @@ static int CclGetSpeciesData(lua_State *l)
 **
 **  @param l  Lua state.
 */
-static int CclGetSpeciesGenusData(lua_State *l)
+static int CclGetTaxonData(lua_State *l)
 {
 	if (lua_gettop(l) < 2) {
 		LuaError(l, "incorrect argument");
 	}
-	std::string genus_ident = LuaToString(l, 1);
-	const wyrmgus::taxon *genus = wyrmgus::taxon::get(genus_ident);
+	const std::string taxon_ident = LuaToString(l, 1);
+	const wyrmgus::taxon *taxon = wyrmgus::taxon::get(taxon_ident);
 	const char *data = LuaToString(l, 2);
 
 	if (!strcmp(data, "Name")) {
-		lua_pushstring(l, genus->get_name().c_str());
+		lua_pushstring(l, taxon->get_name().c_str());
 		return 1;
 	} else if (!strcmp(data, "CommonName")) {
-		lua_pushstring(l, genus->get_common_name().c_str());
+		lua_pushstring(l, taxon->get_common_name().c_str());
 		return 1;
-	} else if (!strcmp(data, "Family")) {
-		const wyrmgus::taxon *family = genus->get_supertaxon_of_rank(wyrmgus::taxonomic_rank::family);
-		if (family != nullptr) {
-			lua_pushstring(l, family->get_identifier().c_str());
+	} else if (!strcmp(data, "Supertaxon")) {
+		if (taxon->get_supertaxon() != nullptr) {
+			lua_pushstring(l, taxon->get_supertaxon()->get_identifier().c_str());
 		} else {
 			lua_pushstring(l, "");
 		}
@@ -4055,7 +4032,7 @@ void UnitTypeCclRegister()
 	lua_register(Lua, "DefineSpecies", CclDefineSpecies);
 	lua_register(Lua, "GetSpecies", CclGetSpecies);
 	lua_register(Lua, "GetSpeciesData", CclGetSpeciesData);
-	lua_register(Lua, "GetSpeciesGenusData", CclGetSpeciesGenusData);
+	lua_register(Lua, "GetTaxonData", CclGetTaxonData);
 	lua_register(Lua, "SetSettlementSiteUnit", CclSetSettlementSiteUnit);
 	lua_register(Lua, "SetModTrains", CclSetModTrains);
 	lua_register(Lua, "SetModAiDrops", CclSetModAiDrops);

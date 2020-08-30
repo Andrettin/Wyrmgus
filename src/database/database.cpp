@@ -71,6 +71,7 @@
 #include "religion/religion.h"
 #include "resource.h"
 #include "sound/sound.h"
+#include "species/geological_era.h"
 #include "species/species.h"
 #include "species/taxon.h"
 #include "species/taxonomic_rank.h"
@@ -231,6 +232,8 @@ QVariant database::process_sml_property_value(const sml_property &property, cons
 			new_property_value = QVariant::fromValue(font_color::get(property.get_value()));
 		} else if (property_class_name == "wyrmgus::gender") {
 			new_property_value = QVariant::fromValue(string_to_gender(property.get_value()));
+		} else if (property_class_name == "wyrmgus::geological_era") {
+			new_property_value = QVariant::fromValue(string_to_geological_era(property.get_value()));
 		} else if (property_class_name == "wyrmgus::government_type") {
 			new_property_value = QVariant::fromValue(string_to_government_type(property.get_value()));
 		} else if (property_class_name == "wyrmgus::grammatical_gender") {

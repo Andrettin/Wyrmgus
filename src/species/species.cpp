@@ -29,7 +29,9 @@
 
 #include "species/species.h"
 
+#include "map/terrain_type.h"
 #include "plane.h"
+#include "species/geological_era.h"
 #include "species/taxon.h"
 #include "species/taxonomic_rank.h"
 #include "util/vector_random_util.h"
@@ -38,12 +40,21 @@
 
 namespace wyrmgus {
 
+species::species(const std::string &identifier) : detailed_data_entry(identifier), era(geological_era::none)
+{
+}
+
 void species::process_sml_scope(const sml_data &scope)
 {
 	const std::string &tag = scope.get_tag();
 	const std::vector<std::string> &values = scope.get_values();
 
-	if (tag == "pre_evolutions") {
+	if (tag == "native_terrain_types") {
+		for (const std::string &value : values) {
+			const terrain_type *terrain = terrain_type::get(value);
+			this->native_terrain_types.push_back(terrain);
+		}
+	} else if (tag == "pre_evolutions") {
 		for (const std::string &value : values) {
 			species *other_species = species::get(value);
 			this->pre_evolutions.push_back(other_species);
@@ -67,42 +78,57 @@ void species::initialize()
 
 void species::check() const
 {
-	if (this->get_genus() == nullptr) {
-		throw std::runtime_error("Species \"" + this->get_identifier() + "\" has no genus.");
+	if (this->get_supertaxon() == nullptr) {
+		throw std::runtime_error("Species \"" + this->get_identifier() + "\" has no supertaxon.");
 	}
 
-	if (this->get_genus()->get_rank() != taxonomic_rank::genus) {
-		throw std::runtime_error("The genus of species \"" + this->get_identifier() + "\" has a taxonomic rank different than genus.");
+	for (const species *pre_evolution : this->pre_evolutions) {
+		if (this->get_era() != geological_era::none && pre_evolution->get_era() != geological_era::none && this->get_era() <= pre_evolution->get_era()) {
+			throw std::runtime_error("Species \"" + this->get_identifier() + "\" is set to evolve from \"" + pre_evolution->get_identifier() + "\", but is from the same or an earlier era than the latter.");
+		}
 	}
 }
 
 const taxon *species::get_supertaxon_of_rank(const taxonomic_rank rank) const
 {
-	if (this->get_genus() == nullptr) {
+	if (this->get_supertaxon() == nullptr) {
 		return nullptr;
 	}
 
-	if (this->get_genus()->get_rank() == rank) {
+	if (this->get_supertaxon()->get_rank() == rank) {
 		return nullptr;
 	}
 
-	return this->get_genus()->get_supertaxon_of_rank(rank);
+	return this->get_supertaxon()->get_supertaxon_of_rank(rank);
 }
 
 std::string species::get_scientific_name() const
 {
-	if (!this->get_specific_name().empty()) {
-		return this->get_genus()->get_name() + " " + this->get_specific_name();
+	if (this->get_supertaxon() == nullptr) {
+		throw std::runtime_error("Cannot get the scientific name for species \"" + this->get_identifier() + "\", as it has no supertaxon.");
 	}
 
-	return this->get_genus()->get_name();
+	if (this->get_supertaxon()->get_rank() != taxonomic_rank::genus) {
+		throw std::runtime_error("Cannot get the scientific name for species \"" + this->get_identifier() + "\", as its supertaxon is not a genus.");
+	}
+
+	if (!this->get_specific_name().empty()) {
+		return this->get_supertaxon()->get_name() + " " + this->get_specific_name();
+	}
+
+	return this->get_supertaxon()->get_name();
+}
+
+bool species::is_prehistoric() const
+{
+	return this->get_era() < geological_era::holocene;
 }
 
 bool species::has_evolution(const terrain_type *terrain, const bool sapient_only) const
 {
 	for (const species *evolution : this->get_evolutions()) {
 		if (
-			(evolution->Type != nullptr && (!terrain || vector::contains(evolution->Terrains, terrain)) && (!sapient_only || evolution->is_sapient()))
+			(evolution->Type != nullptr && (!terrain || vector::contains(evolution->get_native_terrain_types(), terrain)) && (!sapient_only || evolution->is_sapient()))
 			|| evolution->has_evolution(terrain, sapient_only)
 		) {
 			return true;
@@ -118,7 +144,7 @@ const species *species::get_random_evolution(const terrain_type *terrain) const
 	for (const species *evolution : this->get_evolutions()) {
 		//give preference to evolutions that are native to the current terrain
 		if (
-			(evolution->Type != nullptr && vector::contains(evolution->Terrains, terrain))
+			(evolution->Type != nullptr && vector::contains(evolution->get_native_terrain_types(), terrain))
 			|| evolution->has_evolution(terrain)
 		) {
 			potential_evolutions.push_back(evolution);

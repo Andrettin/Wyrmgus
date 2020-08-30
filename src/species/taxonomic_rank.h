@@ -46,6 +46,7 @@ enum class taxonomic_rank {
 	infraphylum,
 	subphylum,
 	phylum,
+	superphylum,
 	infrakingdom,
 	subkingdom,
 	kingdom,
@@ -85,6 +86,8 @@ inline taxonomic_rank string_to_taxonomic_rank(const std::string &str)
 		return taxonomic_rank::subphylum;
 	} else if (str == "phylum") {
 		return taxonomic_rank::phylum;
+	} else if (str == "superphylum") {
+		return taxonomic_rank::superphylum;
 	} else if (str == "infrakingdom") {
 		return taxonomic_rank::infrakingdom;
 	} else if (str == "subkingdom") {
@@ -133,6 +136,8 @@ inline std::string taxonomic_rank_to_string(const taxonomic_rank rank)
 			return "subphylum";
 		case taxonomic_rank::phylum:
 			return "phylum";
+		case taxonomic_rank::superphylum:
+			return "superphylum";
 		case taxonomic_rank::infrakingdom:
 			return "infrakingdom";
 		case taxonomic_rank::subkingdom:

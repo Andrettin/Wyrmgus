@@ -43,27 +43,6 @@ namespace wyrmgus {
 	class world;
 }
 
-/**
-**  Indexes into era array.
-*/
-enum Eras {
-	EraDevonian,
-	EraCarboniferous,
-	EraPermian,
-	EraTriassic,
-	EraJurassic,
-	EraCretaceous,
-	EraPaleocene,
-	EraEocene,
-	EraOligocene,
-	EraMiocene,
-	EraPliocene,
-	EraPleistocene,
-	EraHolocene,
-	
-	MaxEras
-};
-
 class CWorldMapTerrainType
 {
 public:
@@ -134,21 +113,11 @@ public:
 	std::map<int, wyrmgus::faction *> HistoricalClaims;							/// Historical claims over the tile, mapped to the year
 };
 
-/*----------------------------------------------------------------------------
--- Variables
-----------------------------------------------------------------------------*/
-
 extern std::vector<CProvince *> Provinces;
 extern std::vector<CWorldMapTerrainType *>  WorldMapTerrainTypes;
 extern std::map<std::string, int> WorldMapTerrainTypeStringToIndex;
 
-/*----------------------------------------------------------------------------
--- Functions
-----------------------------------------------------------------------------*/
-
 extern void CleanProvinces();
 extern CProvince *GetProvince(const std::string &province_name);
 extern int GetWorldMapTerrainTypeId(const std::string &terrain_type_name);
-extern std::string GetEraNameById(int era);
-extern int GetEraIdByName(const std::string &era);
 extern void ProvinceCclRegister();

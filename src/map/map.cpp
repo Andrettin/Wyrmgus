@@ -317,19 +317,15 @@ Vec2i CMap::GenerateUnitLocation(const wyrmgus::unit_type *unit_type, const wyrm
 	
 	Vec2i random_pos(-1, -1);
 	
-	std::vector<wyrmgus::terrain_type *> allowed_terrains;
+	std::vector<const wyrmgus::terrain_type *> allowed_terrains;
 	if (unit_type->BoolFlag[FAUNA_INDEX].value && unit_type->get_species() != nullptr) { //if the unit is a fauna one, it has to start on terrain it is native to
-		for (size_t i = 0; i < unit_type->get_species()->Terrains.size(); ++i) {
-			allowed_terrains.push_back(unit_type->get_species()->Terrains[i]);
-		}
+		allowed_terrains = unit_type->get_species()->get_native_terrain_types();
 	}
 	
 	for (size_t i = 0; i < unit_type->SpawnUnits.size(); ++i) {
 		wyrmgus::unit_type *spawned_type = unit_type->SpawnUnits[i];
 		if (spawned_type->BoolFlag[FAUNA_INDEX].value && spawned_type->get_species()) {
-			for (size_t j = 0; j < spawned_type->get_species()->Terrains.size(); ++j) {
-				allowed_terrains.push_back(spawned_type->get_species()->Terrains[j]);
-			}
+			wyrmgus::vector::merge(allowed_terrains, spawned_type->get_species()->get_native_terrain_types());
 		}
 	}
 

@@ -41,33 +41,34 @@ class taxon;
 class terrain_type;
 class unit_type;
 class world;
+enum class geological_era;
 enum class taxonomic_rank;
 
 class species final : public detailed_data_entry, public data_type<species>
 {
 	Q_OBJECT
 
-	Q_PROPERTY(wyrmgus::taxon* genus MEMBER genus READ get_genus)
+	Q_PROPERTY(wyrmgus::taxon* supertaxon MEMBER supertaxon READ get_supertaxon)
 	Q_PROPERTY(QString specific_name READ get_specific_name_qstring)
-	Q_PROPERTY(bool sapient MEMBER sapient READ is_sapient)
+	Q_PROPERTY(wyrmgus::geological_era era MEMBER era READ get_era)
 	Q_PROPERTY(wyrmgus::plane* home_plane MEMBER home_plane READ get_home_plane)
 	Q_PROPERTY(wyrmgus::world* homeworld MEMBER homeworld READ get_homeworld)
+	Q_PROPERTY(bool sapient MEMBER sapient READ is_sapient)
+	Q_PROPERTY(bool asexual MEMBER asexual READ is_asexual)
 
 public:
 	static constexpr const char *class_identifier = "species";
 	static constexpr const char *database_folder = "species";
 
-	explicit species(const std::string &identifier) : detailed_data_entry(identifier)
-	{
-	}
+	explicit species(const std::string &identifier);
 
 	virtual void process_sml_scope(const sml_data &scope) override;
 	virtual void initialize();
 	virtual void check() const;
 
-	taxon *get_genus() const
+	taxon *get_supertaxon() const
 	{
-		return this->genus;
+		return this->supertaxon;
 	}
 
 	const taxon *get_supertaxon_of_rank(const taxonomic_rank rank) const;
@@ -89,9 +90,9 @@ public:
 
 	std::string get_scientific_name() const;
 
-	bool is_sapient() const
+	geological_era get_era() const
 	{
-		return this->sapient;
+		return this->era;
 	}
 
 	plane *get_home_plane() const
@@ -102,6 +103,23 @@ public:
 	world *get_homeworld() const
 	{
 		return this->homeworld;
+	}
+
+	bool is_sapient() const
+	{
+		return this->sapient;
+	}
+
+	bool is_prehistoric() const;
+
+	bool is_asexual() const
+	{
+		return this->asexual;
+	}
+
+	const std::vector<const terrain_type *> &get_native_terrain_types() const
+	{
+		return this->native_terrain_types;
 	}
 
 	const std::vector<const species *> &get_pre_evolutions() const
@@ -118,22 +136,17 @@ public:
 	const species *get_random_evolution(const terrain_type *terrain) const;
 	
 private:
-	taxon *genus = nullptr;
+	taxon *supertaxon = nullptr;
 	std::string specific_name;
-public:
-	int Era = -1;					/// Era ID
-private:
-	bool sapient = false;			/// Whether the species is sapient
-public:
-	bool Prehistoric = false;		/// Whether the species is prehistoric or not
-	std::string ChildUpgrade; //which individual upgrade the children of this species get
-private:
+	geological_era era;
 	plane *home_plane = nullptr;
 	world *homeworld = nullptr;
+	bool sapient = false;
+	bool asexual = false;
 public:
 	unit_type *Type = nullptr;
-	std::vector<terrain_type *> Terrains; //in which terrains does this species live
 private:
+	std::vector<const terrain_type *> native_terrain_types; //in which terrains does this species live
 	std::vector<const species *> pre_evolutions; //species from which this one can evolve
 	std::vector<const species *> evolutions; //species to which this one can evolve
 

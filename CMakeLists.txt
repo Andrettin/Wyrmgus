@@ -735,6 +735,7 @@ set(stratagus_sound_HDRS
 )
 
 set(stratagus_species_HDRS
+	src/species/geological_era.h
 	src/species/species.h
 	src/species/taxon.h
 	src/species/taxonomic_rank.h
