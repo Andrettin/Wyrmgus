@@ -30,10 +30,21 @@
 #include "species/species.h"
 
 #include "species/taxon.h"
+#include "species/taxonomic_rank.h"
 #include "util/vector_util.h"
 
 namespace wyrmgus {
 
+void species::check() const
+{
+	if (this->get_genus() == nullptr) {
+		throw std::runtime_error("Species \"" + this->get_identifier() + "\" has no genus.");
+	}
+
+	if (this->get_genus()->get_rank() != taxonomic_rank::genus) {
+		throw std::runtime_error("The genus of species \"" + this->get_identifier() + "\" has a taxonomic rank different than genus.");
+	}
+}
 
 const taxon *species::get_supertaxon_of_rank(const taxonomic_rank rank) const
 {

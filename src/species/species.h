@@ -57,6 +57,8 @@ public:
 	{
 	}
 
+	virtual void check() const;
+
 	taxon *get_genus() const
 	{
 		return this->genus;
