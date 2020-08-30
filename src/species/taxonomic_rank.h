@@ -49,7 +49,8 @@ enum class taxonomic_rank {
 	infrakingdom,
 	subkingdom,
 	kingdom,
-	domain
+	domain,
+	empire
 };
 
 inline taxonomic_rank string_to_taxonomic_rank(const std::string &str)
@@ -92,6 +93,8 @@ inline taxonomic_rank string_to_taxonomic_rank(const std::string &str)
 		return taxonomic_rank::kingdom;
 	} else if (str == "domain") {
 		return taxonomic_rank::domain;
+	} else if (str == "empire") {
+		return taxonomic_rank::empire;
 	}
 
 	throw std::runtime_error("Invalid taxonomic rank: \"" + str + "\".");
@@ -138,6 +141,8 @@ inline std::string taxonomic_rank_to_string(const taxonomic_rank rank)
 			return "kingdom";
 		case taxonomic_rank::domain:
 			return "domain";
+		case taxonomic_rank::empire:
+			return "empire";
 		default:
 			break;
 	}
