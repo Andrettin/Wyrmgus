@@ -31,9 +31,26 @@
 
 #include "species/taxon.h"
 #include "species/taxonomic_rank.h"
+#include "util/vector_random_util.h"
 #include "util/vector_util.h"
 
 namespace wyrmgus {
+
+void species::process_sml_scope(const sml_data &scope)
+{
+	const std::string &tag = scope.get_tag();
+	const std::vector<std::string> &values = scope.get_values();
+
+	if (tag == "pre_evolutions") {
+		for (const std::string &value : values) {
+			species *other_species = species::get(value);
+			this->pre_evolutions.push_back(other_species);
+			other_species->evolutions.push_back(this);
+		}
+	} else {
+		data_entry::process_sml_scope(scope);
+	}
+}
 
 void species::check() const
 {
@@ -59,12 +76,12 @@ const taxon *species::get_supertaxon_of_rank(const taxonomic_rank rank) const
 	return this->get_genus()->get_supertaxon_of_rank(rank);
 }
 
-bool species::CanEvolveToAUnitType(terrain_type *terrain, bool sapient_only) const
+bool species::has_evolution(const terrain_type *terrain, const bool sapient_only) const
 {
-	for (const species *evolution : this->EvolvesTo) {
+	for (const species *evolution : this->get_evolutions()) {
 		if (
-			(evolution->Type != nullptr && (!terrain || vector::contains(evolution->Terrains, terrain)) && (!sapient_only || evolution->Sapient))
-			|| evolution->CanEvolveToAUnitType(terrain, sapient_only)
+			(evolution->Type != nullptr && (!terrain || vector::contains(evolution->Terrains, terrain)) && (!sapient_only || evolution->is_sapient()))
+			|| evolution->has_evolution(terrain, sapient_only)
 		) {
 			return true;
 		}
@@ -72,29 +89,30 @@ bool species::CanEvolveToAUnitType(terrain_type *terrain, bool sapient_only) con
 	return false;
 }
 
-species *species::GetRandomEvolution(terrain_type *terrain) const
+const species *species::get_random_evolution(const terrain_type *terrain) const
 {
-	std::vector<species *> potential_evolutions;
+	std::vector<const species *> potential_evolutions;
 	
-	for (species *evolution : this->EvolvesTo) {
+	for (const species *evolution : this->get_evolutions()) {
+		//give preference to evolutions that are native to the current terrain
 		if (
 			(evolution->Type != nullptr && vector::contains(evolution->Terrains, terrain))
-			|| evolution->CanEvolveToAUnitType(terrain)
-		) { //give preference to evolutions that are native to the current terrain
+			|| evolution->has_evolution(terrain)
+		) {
 			potential_evolutions.push_back(evolution);
 		}
 	}
 	
 	if (potential_evolutions.size() == 0) {
-		for (species *evolution : this->EvolvesTo) {
-			if (evolution->Type != nullptr || evolution->CanEvolveToAUnitType()) {
+		for (const species *evolution : this->get_evolutions()) {
+			if (evolution->Type != nullptr || evolution->has_evolution()) {
 				potential_evolutions.push_back(evolution);
 			}
 		}
 	}
 	
 	if (potential_evolutions.size() > 0) {
-		return potential_evolutions[SyncRand(potential_evolutions.size())];
+		return vector::get_random(potential_evolutions);
 	}
 	
 	return nullptr;

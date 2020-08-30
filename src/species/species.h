@@ -48,6 +48,7 @@ class species final : public detailed_data_entry, public data_type<species>
 	Q_OBJECT
 
 	Q_PROPERTY(wyrmgus::taxon* genus MEMBER genus READ get_genus)
+	Q_PROPERTY(bool sapient MEMBER sapient READ is_sapient)
 
 public:
 	static constexpr const char *class_identifier = "species";
@@ -57,6 +58,7 @@ public:
 	{
 	}
 
+	virtual void process_sml_scope(const sml_data &scope) override;
 	virtual void check() const;
 
 	taxon *get_genus() const
@@ -66,23 +68,41 @@ public:
 
 	const taxon *get_supertaxon_of_rank(const taxonomic_rank rank) const;
 
-	bool CanEvolveToAUnitType(terrain_type *terrain = nullptr, bool sapient_only = false) const;
-	species *GetRandomEvolution(terrain_type *terrain) const;
+	bool is_sapient() const
+	{
+		return this->sapient;
+	}
+
+	const std::vector<const species *> &get_pre_evolutions() const
+	{
+		return this->pre_evolutions;
+	}
+
+	const std::vector<const species *> &get_evolutions() const
+	{
+		return this->evolutions;
+	}
+
+	bool has_evolution(const terrain_type *terrain = nullptr, const bool sapient_only = false) const;
+	const species *get_random_evolution(const terrain_type *terrain) const;
 	
-	int Era = -1;					/// Era ID
-	bool Sapient = false;			/// Whether the species is sapient
-	bool Prehistoric = false;		/// Whether the species is prehistoric or not
 private:
 	taxon *genus = nullptr;
+	std::string specific_name;
 public:
-	std::string Species;
-	std::string ChildUpgrade;		/// Which individual upgrade the children of this species get
+	int Era = -1;					/// Era ID
+private:
+	bool sapient = false;			/// Whether the species is sapient
+public:
+	bool Prehistoric = false;		/// Whether the species is prehistoric or not
+	std::string ChildUpgrade; //which individual upgrade the children of this species get
 	plane *home_plane = nullptr;
 	world *homeworld = nullptr;
 	unit_type *Type = nullptr;
-	std::vector<terrain_type *> Terrains;	/// in which terrains does this species live
-	std::vector<species *> EvolvesFrom;	/// from which species this one can evolve
-	std::vector<species *> EvolvesTo;		/// to which species this one can evolve
+	std::vector<terrain_type *> Terrains; //in which terrains does this species live
+private:
+	std::vector<const species *> pre_evolutions; //species from which this one can evolve
+	std::vector<const species *> evolutions; //species to which this one can evolve
 
 	friend int ::CclDefineSpecies(lua_State *l);
 };

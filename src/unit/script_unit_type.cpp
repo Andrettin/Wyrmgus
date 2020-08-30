@@ -3467,7 +3467,7 @@ static int CclDefineSpecies(lua_State *l)
 				LuaError(l, "Era \"%s\" doesn't exist." _C_ era_ident.c_str());
 			}
 		} else if (!strcmp(value, "Sapient")) {
-			species->Sapient = LuaToBoolean(l, -1);
+			species->sapient = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "Prehistoric")) {
 			species->Prehistoric = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "Genus")) {
@@ -3475,7 +3475,7 @@ static int CclDefineSpecies(lua_State *l)
 			wyrmgus::taxon *genus = wyrmgus::taxon::get(genus_ident);
 			species->genus = genus;
 		} else if (!strcmp(value, "Species")) {
-			species->Species = LuaToString(l, -1);
+			species->specific_name = LuaToString(l, -1);
 		} else if (!strcmp(value, "ChildUpgrade")) {
 			species->ChildUpgrade = LuaToString(l, -1);
 		} else if (!strcmp(value, "HomePlane")) {
@@ -3498,22 +3498,22 @@ static int CclDefineSpecies(lua_State *l)
 				species->Terrains.push_back(terrain);
 			}
 		} else if (!strcmp(value, "EvolvesFrom")) {
-			species->EvolvesFrom.clear();
+			species->pre_evolutions.clear();
 			const int args = lua_rawlen(l, -1);
 			for (int j = 0; j < args; ++j) {
 				std::string evolves_from_ident = LuaToString(l, -1, j + 1);
 				wyrmgus::species *evolves_from = wyrmgus::species::get(evolves_from_ident);
-				species->EvolvesFrom.push_back(evolves_from);
-				evolves_from->EvolvesTo.push_back(species);
+				species->pre_evolutions.push_back(evolves_from);
+				evolves_from->evolutions.push_back(species);
 			}
 		} else {
 			LuaError(l, "Unsupported tag: %s" _C_ value);
 		}
 	}
 	
-	for (size_t i = 0; i < species->EvolvesFrom.size(); ++i) {
-		if (species->Era != -1 && species->EvolvesFrom[i]->Era != -1 && species->Era <= species->EvolvesFrom[i]->Era) {
-			LuaError(l, "Species \"%s\" is set to evolve from \"%s\", but is from the same or an earlier era than the latter." _C_ species->get_identifier().c_str() _C_ species->EvolvesFrom[i]->get_identifier().c_str());
+	for (const wyrmgus::species *pre_evolution : species->pre_evolutions) {
+		if (species->Era != -1 && pre_evolution->Era != -1 && species->Era <= pre_evolution->Era) {
+			LuaError(l, "Species \"%s\" is set to evolve from \"%s\", but is from the same or an earlier era than the latter." _C_ species->get_identifier().c_str() _C_ pre_evolution->get_identifier().c_str());
 		}
 	}
 	
@@ -3576,7 +3576,7 @@ static int CclGetSpeciesData(lua_State *l)
 		lua_pushnumber(l, species->Era);
 		return 1;
 	} else if (!strcmp(data, "Sapient")) {
-		lua_pushboolean(l, species->Sapient);
+		lua_pushboolean(l, species->is_sapient());
 		return 1;
 	} else if (!strcmp(data, "Prehistoric")) {
 		lua_pushboolean(l, species->Prehistoric);
@@ -3614,18 +3614,18 @@ static int CclGetSpeciesData(lua_State *l)
 		}
 		return 1;
 	} else if (!strcmp(data, "EvolvesFrom")) {
-		lua_createtable(l, species->EvolvesFrom.size(), 0);
-		for (size_t i = 1; i <= species->EvolvesFrom.size(); ++i)
+		lua_createtable(l, species->get_pre_evolutions().size(), 0);
+		for (size_t i = 1; i <= species->get_pre_evolutions().size(); ++i)
 		{
-			lua_pushstring(l, species->EvolvesFrom[i-1]->get_identifier().c_str());
+			lua_pushstring(l, species->get_pre_evolutions()[i-1]->get_identifier().c_str());
 			lua_rawseti(l, -2, i);
 		}
 		return 1;
 	} else if (!strcmp(data, "EvolvesTo")) {
-		lua_createtable(l, species->EvolvesTo.size(), 0);
-		for (size_t i = 1; i <= species->EvolvesTo.size(); ++i)
+		lua_createtable(l, species->get_evolutions().size(), 0);
+		for (size_t i = 1; i <= species->get_evolutions().size(); ++i)
 		{
-			lua_pushstring(l, species->EvolvesTo[i-1]->get_identifier().c_str());
+			lua_pushstring(l, species->get_evolutions()[i-1]->get_identifier().c_str());
 			lua_rawseti(l, -2, i);
 		}
 		return 1;
