@@ -72,6 +72,7 @@ public:
 	}
 
 	const taxon *get_supertaxon_of_rank(const taxonomic_rank rank) const;
+	bool is_subtaxon_of(const taxon *taxon) const;
 
 	const std::string &get_specific_name() const
 	{

@@ -102,6 +102,15 @@ const taxon *species::get_supertaxon_of_rank(const taxonomic_rank rank) const
 	return this->get_supertaxon()->get_supertaxon_of_rank(rank);
 }
 
+bool species::is_subtaxon_of(const taxon *taxon) const
+{
+	if (taxon == this->get_supertaxon()) {
+		return true;
+	}
+
+	return this->get_supertaxon()->is_subtaxon_of(taxon);
+}
+
 std::string species::get_scientific_name() const
 {
 	if (this->get_supertaxon() == nullptr) {

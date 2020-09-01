@@ -3615,16 +3615,12 @@ static int CclGetSpeciesData(lua_State *l)
 	return 0;
 }
 
-/**
-**  Get species genus data.
-**
-**  @param l  Lua state.
-*/
 static int CclGetTaxonData(lua_State *l)
 {
 	if (lua_gettop(l) < 2) {
 		LuaError(l, "incorrect argument");
 	}
+
 	const std::string taxon_ident = LuaToString(l, 1);
 	const wyrmgus::taxon *taxon = wyrmgus::taxon::get(taxon_ident);
 	const char *data = LuaToString(l, 2);

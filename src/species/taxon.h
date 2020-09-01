@@ -100,6 +100,23 @@ public:
 		return this->get_supertaxon()->get_supertaxon_of_rank(rank);
 	}
 
+	bool is_subtaxon_of(const taxon *other_taxon) const
+	{
+		if (this->get_supertaxon() == nullptr) {
+			return false;
+		}
+
+		if (other_taxon->get_rank() <= this->get_rank()) {
+			return false;
+		}
+
+		if (other_taxon == this->get_supertaxon()) {
+			return true;
+		}
+
+		return this->get_supertaxon()->is_subtaxon_of(other_taxon);
+	}
+
 private:
 	std::string common_name;
 	taxonomic_rank rank;
