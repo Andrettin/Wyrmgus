@@ -72,6 +72,19 @@ public:
 	terrain_geodata_map parse_terrain_geojson_folder() const;
 	std::map<const site *, std::vector<std::unique_ptr<QGeoShape>>> parse_territories_geojson_folder() const;
 
+	const std::vector<const species *> &get_species() const
+	{
+		return this->species;
+	}
+
+	void add_species(const species *species)
+	{
+		this->species.push_back(species);
+	}
+
+	std::vector<const species *> get_sapient_species() const;
+	std::vector<const species *> get_fauna_species() const;
+
 	int ID = -1;
 private:
 	plane *plane = nullptr;
@@ -79,7 +92,8 @@ public:
 	CTimeOfDaySchedule *TimeOfDaySchedule = nullptr;					/// this world's time of day schedule
 	CSeasonSchedule *SeasonSchedule = nullptr;							/// this world's season schedule
 	std::vector<CProvince *> Provinces;									/// Provinces in this world
-	std::vector<species *> Species;									/// Species in this world
+private:
+	std::vector<const species *> species;								/// Species in this world
 };
 
 }

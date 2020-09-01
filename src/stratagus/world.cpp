@@ -35,6 +35,7 @@
 #include "map/terrain_type.h"
 #include "plane.h"
 #include "province.h"
+#include "species/species.h"
 #include "time/season_schedule.h"
 #include "time/time_of_day_schedule.h"
 #include "ui/ui.h"
@@ -180,6 +181,28 @@ std::map<const site *, std::vector<std::unique_ptr<QGeoShape>>> world::parse_ter
 	});
 
 	return territory_data;
+}
+
+std::vector<const species *> world::get_sapient_species() const
+{
+	std::vector<const wyrmgus::species *> sapient_species;
+	for (const wyrmgus::species *species : this->get_species()) {
+		if (species->is_sapient()) {
+			sapient_species.push_back(species);
+		}
+	}
+	return sapient_species;
+}
+
+std::vector<const species *> world::get_fauna_species() const
+{
+	std::vector<const wyrmgus::species *> fauna_species;
+	for (const wyrmgus::species *species : this->get_species()) {
+		if (!species->is_sapient()) {
+			fauna_species.push_back(species);
+		}
+	}
+	return fauna_species;
 }
 
 }

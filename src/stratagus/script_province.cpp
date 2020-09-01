@@ -500,7 +500,7 @@ static int CclGetPlaneData(lua_State *l)
 		LuaError(l, "incorrect argument");
 	}
 	std::string plane_ident = LuaToString(l, 1);
-	wyrmgus::plane *plane = wyrmgus::plane::get(plane_ident);
+	const wyrmgus::plane *plane = wyrmgus::plane::get(plane_ident);
 	const char *data = LuaToString(l, 2);
 
 	if (!strcmp(data, "Name")) {
@@ -516,10 +516,10 @@ static int CclGetPlaneData(lua_State *l)
 		lua_pushstring(l, plane->get_quote().c_str());
 		return 1;
 	} else if (!strcmp(data, "Species")) {
-		lua_createtable(l, plane->Species.size(), 0);
-		for (size_t i = 1; i <= plane->Species.size(); ++i)
+		lua_createtable(l, plane->get_species().size(), 0);
+		for (size_t i = 1; i <= plane->get_species().size(); ++i)
 		{
-			lua_pushstring(l, plane->Species[i-1]->get_identifier().c_str());
+			lua_pushstring(l, plane->get_species()[i-1]->get_identifier().c_str());
 			lua_rawseti(l, -2, i);
 		}
 		return 1;
@@ -541,7 +541,7 @@ static int CclGetWorldData(lua_State *l)
 		LuaError(l, "incorrect argument");
 	}
 	std::string world_ident = LuaToString(l, 1);
-	wyrmgus::world *world = wyrmgus::world::get(world_ident);
+	const wyrmgus::world *world = wyrmgus::world::get(world_ident);
 	const char *data = LuaToString(l, 2);
 
 	if (!strcmp(data, "Name")) {
@@ -575,8 +575,10 @@ static int CclGetWorldData(lua_State *l)
 		}
 		return 1;
 	} else if (!strcmp(data, "Species")) {
-		lua_createtable(l, world->Species.size(), 0);
-		for (size_t i = 1; i <= world->Species.size(); ++i)
+		lua_createtable(l, world->get_species().size(), 0);
+		for (size_t i = 1; i <= world->get_species().size(); ++i)
+		{
+			lua_pushstring(l, world->get_species()[i-1]->get_identifier().c_str());
 		{
 			lua_pushstring(l, world->Species[i-1]->get_identifier().c_str());
 			lua_rawseti(l, -2, i);

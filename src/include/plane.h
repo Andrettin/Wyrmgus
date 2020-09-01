@@ -53,10 +53,24 @@ public:
 
 	virtual void ProcessConfigData(const CConfigData *config_data) override;
 
-	CTimeOfDaySchedule *TimeOfDaySchedule = nullptr; //this plane's time of day schedule
-	CSeasonSchedule *SeasonSchedule = nullptr; //this plane's season schedule
-	std::vector<magic_domain *> EmpoweredMagicDomains; ///deity domains empowered in this plane
-	std::vector<species *> Species; ///species in this plane
+	const std::vector<const species *> &get_species() const
+	{
+		return this->species;
+	}
+
+	void add_species(const species *species)
+	{
+		this->species.push_back(species);
+	}
+
+	std::vector<const species *> get_sapient_species() const;
+	std::vector<const species *> get_fauna_species() const;
+
+	CTimeOfDaySchedule *TimeOfDaySchedule = nullptr;
+	CSeasonSchedule *SeasonSchedule = nullptr;
+	std::vector<magic_domain *> EmpoweredMagicDomains; //magic domains empowered in this plane
+private:
+	std::vector<const species *> species; //species in this plane
 };
 
 }

@@ -31,6 +31,7 @@
 
 #include "config.h"
 #include "magic_domain.h"
+#include "species/species.h"
 #include "time/season_schedule.h"
 #include "time/time_of_day_schedule.h"
 #include "ui/ui.h"
@@ -64,6 +65,28 @@ void plane::ProcessConfigData(const CConfigData *config_data)
 			fprintf(stderr, "Invalid plane property: \"%s\".\n", key.c_str());
 		}
 	}
+}
+
+std::vector<const species *> plane::get_sapient_species() const
+{
+	std::vector<const wyrmgus::species *> sapient_species;
+	for (const wyrmgus::species *species : this->get_species()) {
+		if (species->is_sapient()) {
+			sapient_species.push_back(species);
+		}
+	}
+	return sapient_species;
+}
+
+std::vector<const species *> plane::get_fauna_species() const
+{
+	std::vector<const wyrmgus::species *> fauna_species;
+	for (const wyrmgus::species *species : this->get_species()) {
+		if (!species->is_sapient()) {
+			fauna_species.push_back(species);
+		}
+	}
+	return fauna_species;
 }
 
 }
