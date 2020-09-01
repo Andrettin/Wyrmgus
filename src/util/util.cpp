@@ -35,6 +35,7 @@
 #include "network.h"
 //Wyrmgus end
 #include "util/random.h"
+#include "util/string_util.h"
 
 #include <boost/tokenizer.hpp>
 
@@ -1077,35 +1078,7 @@ std::string FullyDecapitalizeString(const std::string &text)
 
 std::string GetPluralForm(const std::string &name)
 {
-	if (name == "Einherjar" || name == "Wose") {
-		return name; // no difference
-	}
-	
-	std::string result(name);
-	
-	if (result != "Monkey") {
-		result = FindAndReplaceStringEnding(result, "y", "ie");
-	}
-	
-	if (result.substr(result.size() - 2, 2) == "os" || result.substr(result.size() - 2, 2) == "us" || result.substr(result.size() - 1, 1) == "x") {
-		result += "es";
-	}
-	
-	if (result.substr(result.size() - 1, 1) != "s") {
-		result += "s";
-	}
-	
-	result = FindAndReplaceString(result, "Barracks", "Barrackses");
-	result = FindAndReplaceString(result, "Dwarfs", "Dwarves");
-	result = FindAndReplaceString(result, "Elfs", "Elves");
-	result = FindAndReplaceString(result, "Ostrichs", "Ostriches");
-	result = FindAndReplaceString(result, "Thiefs", "Thieves");
-	result = FindAndReplaceString(result, "Wolfs", "Wolves");
-	if (result != "Humans") {
-		result = FindAndReplaceStringEnding(result, "mans", "men");
-	}
-	
-	return result;
+	return string::get_plural_form(name);
 }
 
 std::string IdentToName(const std::string &text)

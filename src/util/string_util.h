@@ -191,6 +191,29 @@ inline std::string get_singular_form(const std::string &str)
 	return str;
 }
 
+inline std::string get_plural_form(const std::string &str)
+{
+	if (str == "Einherjar" || str == "Wose") {
+		return str; // no difference
+	}
+
+	std::string result(str);
+
+	if (result.ends_with("y") && result != "Monkey") {
+		string::replace(result, "y", "ies");
+	} else if (result.ends_with("ch") || result.ends_with("os") || result.ends_with("sh") || result.ends_with("us") || result.ends_with("x")) {
+		result += "es";
+	} else if (result.ends_with("man") && result != "Human") {
+		string::replace(result, "man", "men");
+	} else if (result.ends_with("f")) {
+		string::replace(result, "f", "ves");
+	} else if (!result.ends_with("s")) {
+		result += "s";
+	}
+
+	return result;
+}
+
 inline std::string snake_case_to_pascal_case(const std::string &str)
 {
 	if (str.empty()) {
