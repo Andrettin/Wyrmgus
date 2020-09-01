@@ -68,11 +68,11 @@ void species::process_sml_scope(const sml_data &scope)
 void species::initialize()
 {
 	if (this->get_home_plane() != nullptr) {
-		this->get_home_plane()->Species.push_back(this);
+		this->get_home_plane()->add_species(this);
 	}
 
 	if (this->get_homeworld() != nullptr) {
-		this->get_homeworld()->Species.push_back(this);
+		this->get_homeworld()->add_species(this);
 	}
 }
 
