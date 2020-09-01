@@ -201,7 +201,7 @@ inline std::string get_plural_form(const std::string &str)
 
 	if (result.ends_with("y") && result != "Monkey") {
 		string::replace(result, "y", "ies");
-	} else if (result.ends_with("ch") || result.ends_with("os") || result.ends_with("sh") || result.ends_with("us") || result.ends_with("x")) {
+	} else if (result.ends_with("ch") || result.ends_with("os") || result.ends_with("ps") || result.ends_with("sh") || result.ends_with("us") || result.ends_with("x")) {
 		result += "es";
 	} else if (result.ends_with("man") && result != "Human") {
 		string::replace(result, "man", "men");
