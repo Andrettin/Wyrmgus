@@ -515,16 +515,16 @@ static int CclGetPlaneData(lua_State *l)
 	} else if (!strcmp(data, "Quote")) {
 		lua_pushstring(l, plane->get_quote().c_str());
 		return 1;
-	} else if (!strcmp(data, "Species")) {
-		lua_createtable(l, plane->get_species().size(), 0);
-		for (size_t i = 1; i <= plane->get_species().size(); ++i)
+	} else if (!strcmp(data, "NativeSpecies")) {
+		lua_createtable(l, plane->get_native_species().size(), 0);
+		for (size_t i = 1; i <= plane->get_native_species().size(); ++i)
 		{
-			lua_pushstring(l, plane->get_species()[i-1]->get_identifier().c_str());
+			lua_pushstring(l, plane->get_native_species()[i-1]->get_identifier().c_str());
 			lua_rawseti(l, -2, i);
 		}
 		return 1;
-	} else if (!strcmp(data, "SapientSpeciesNames")) {
-		const std::vector<std::string> species_names = wyrmgus::species::get_name_list(plane->get_sapient_species());
+	} else if (!strcmp(data, "NativeSapientSpeciesNames")) {
+		const std::vector<std::string> species_names = wyrmgus::species::get_name_list(plane->get_native_sapient_species());
 		lua_createtable(l, species_names.size(), 0);
 		for (size_t i = 1; i <= species_names.size(); ++i)
 		{
@@ -532,8 +532,8 @@ static int CclGetPlaneData(lua_State *l)
 			lua_rawseti(l, -2, i);
 		}
 		return 1;
-	} else if (!strcmp(data, "FaunaSpeciesNames")) {
-		const std::vector<std::string> species_names = wyrmgus::species::get_name_list(plane->get_fauna_species());
+	} else if (!strcmp(data, "NativeFaunaSpeciesNames")) {
+		const std::vector<std::string> species_names = wyrmgus::species::get_name_list(plane->get_native_fauna_species());
 		lua_createtable(l, species_names.size(), 0);
 		for (size_t i = 1; i <= species_names.size(); ++i)
 		{
@@ -592,16 +592,16 @@ static int CclGetWorldData(lua_State *l)
 			lua_rawseti(l, -2, i);
 		}
 		return 1;
-	} else if (!strcmp(data, "Species")) {
-		lua_createtable(l, world->get_species().size(), 0);
-		for (size_t i = 1; i <= world->get_species().size(); ++i)
+	} else if (!strcmp(data, "NativeSpecies")) {
+		lua_createtable(l, world->get_native_species().size(), 0);
+		for (size_t i = 1; i <= world->get_native_species().size(); ++i)
 		{
-			lua_pushstring(l, world->get_species()[i-1]->get_identifier().c_str());
+			lua_pushstring(l, world->get_native_species()[i-1]->get_identifier().c_str());
 			lua_rawseti(l, -2, i);
 		}
 		return 1;
-	} else if (!strcmp(data, "SapientSpeciesNames")) {
-		const std::vector<std::string> species_names = wyrmgus::species::get_name_list(world->get_sapient_species());
+	} else if (!strcmp(data, "NativeSapientSpeciesNames")) {
+		const std::vector<std::string> species_names = wyrmgus::species::get_name_list(world->get_native_sapient_species());
 		lua_createtable(l, species_names.size(), 0);
 		for (size_t i = 1; i <= species_names.size(); ++i)
 		{
@@ -609,8 +609,8 @@ static int CclGetWorldData(lua_State *l)
 			lua_rawseti(l, -2, i);
 		}
 		return 1;
-	} else if (!strcmp(data, "FaunaSpeciesNames")) {
-		const std::vector<std::string> species_names = wyrmgus::species::get_name_list(world->get_fauna_species());
+	} else if (!strcmp(data, "NativeFaunaSpeciesNames")) {
+		const std::vector<std::string> species_names = wyrmgus::species::get_name_list(world->get_native_fauna_species());
 		lua_createtable(l, species_names.size(), 0);
 		for (size_t i = 1; i <= species_names.size(); ++i)
 		{

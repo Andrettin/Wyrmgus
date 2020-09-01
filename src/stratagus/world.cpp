@@ -183,10 +183,10 @@ std::map<const site *, std::vector<std::unique_ptr<QGeoShape>>> world::parse_ter
 	return territory_data;
 }
 
-std::vector<const species *> world::get_sapient_species() const
+std::vector<const species *> world::get_native_sapient_species() const
 {
-	std::vector<const wyrmgus::species *> sapient_species;
-	for (const wyrmgus::species *species : this->get_species()) {
+	std::vector<const species *> sapient_species;
+	for (const species *species : this->get_native_species()) {
 		if (species->is_sapient()) {
 			sapient_species.push_back(species);
 		}
@@ -194,10 +194,10 @@ std::vector<const species *> world::get_sapient_species() const
 	return sapient_species;
 }
 
-std::vector<const species *> world::get_fauna_species() const
+std::vector<const species *> world::get_native_fauna_species() const
 {
-	std::vector<const wyrmgus::species *> fauna_species;
-	for (const wyrmgus::species *species : this->get_species()) {
+	std::vector<const species *> fauna_species;
+	for (const species *species : this->get_native_species()) {
 		if (!species->is_sapient()) {
 			fauna_species.push_back(species);
 		}
