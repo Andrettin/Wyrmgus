@@ -60,7 +60,11 @@ public:
 
 	const std::string &get_common_name() const
 	{
-		return this->common_name;
+		if (!this->common_name.empty()) {
+			return this->common_name;
+		}
+
+		return this->get_name();
 	}
 
 	QString get_common_name_qstring() const
