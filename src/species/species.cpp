@@ -40,6 +40,102 @@
 
 namespace wyrmgus {
 
+std::map<const taxon *, int> species::get_supertaxon_counts(const std::vector<const species *> &species_list, const std::vector<const taxon *> &taxons)
+{
+	std::map<const taxon *, int> supertaxon_counts;
+
+	for (const species *species : species_list) {
+		const taxon *supertaxon = species->get_supertaxon();
+		while (supertaxon != nullptr) {
+			supertaxon_counts[supertaxon]++;
+			supertaxon = supertaxon->get_supertaxon();
+		}
+	}
+
+	for (const taxon *taxon : taxons) {
+		const wyrmgus::taxon *supertaxon = taxon->get_supertaxon();
+		while (supertaxon != nullptr) {
+			supertaxon_counts[supertaxon]++;
+			supertaxon = supertaxon->get_supertaxon();
+		}
+	}
+
+	return supertaxon_counts;
+}
+
+std::vector<std::string> species::get_name_list(const std::vector<const species *> &source_species_list)
+{
+	static constexpr size_t max_species_names_size = 20;
+
+	std::vector<const species *> species_list = source_species_list;
+	std::vector<const taxon *> taxons;
+	
+	std::vector<std::string> species_names;
+	for (const species *species : species_list) {
+		species_names.push_back(species->get_name());
+	}
+	
+	bool changed_name_list = true;
+	std::map<const taxon *, int> supertaxon_counts;
+	while (species_names.size() > max_species_names_size && changed_name_list == true) {
+		changed_name_list = false;
+		
+		supertaxon_counts = get_supertaxon_counts(species_list, taxons);
+
+		//get the taxon with lowest rank and highest count
+		const taxon *best_taxon = nullptr;
+		taxonomic_rank best_taxonomic_rank = taxonomic_rank::none;
+		int best_value = 0;
+		for (const auto &kv_pair : supertaxon_counts) {
+			const taxon *taxon = kv_pair.first;
+			const int value = kv_pair.second;
+			if (value > 1) {
+				const taxonomic_rank taxonomic_rank = taxon->get_rank();
+				if (best_taxon == nullptr || taxonomic_rank < best_taxonomic_rank || (taxonomic_rank == best_taxonomic_rank && value > best_value)) {
+					best_taxon = taxon;
+					best_taxonomic_rank = taxonomic_rank;
+					best_value = value;
+				}
+			}
+		}
+		
+		if (best_taxon != nullptr) {
+			changed_name_list = true;
+			
+			std::vector<const species *> new_species_list;
+			std::vector<const taxon *> new_taxons;
+			
+			for (const species *species : species_list) {
+				if (!species->is_subtaxon_of(best_taxon)) {
+					new_species_list.push_back(species);
+				}
+			}
+			for (const taxon *taxon : taxons) {
+				if (!taxon->is_subtaxon_of(best_taxon)) {
+					new_taxons.push_back(taxon);
+				}
+			}
+			new_taxons.push_back(best_taxon);
+			
+			species_list = new_species_list;
+			taxons = new_taxons;
+			
+			species_names.clear();
+			
+			for (const species *species : species_list) {
+				species_names.push_back(species->get_name());
+			}
+			for (const taxon *taxon : taxons) {
+				species_names.push_back(taxon->get_common_name());
+			}
+		}
+	}
+
+	std::sort(species_names.begin(), species_names.end());
+
+	return species_names;
+}
+
 species::species(const std::string &identifier) : detailed_data_entry(identifier), era(geological_era::none)
 {
 }

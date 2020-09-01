@@ -60,6 +60,9 @@ public:
 	static constexpr const char *class_identifier = "species";
 	static constexpr const char *database_folder = "species";
 
+	static std::map<const taxon *, int> get_supertaxon_counts(const std::vector<const species *> &source_species_list, const std::vector<const taxon *> &taxons);
+	static std::vector<std::string> get_name_list(const std::vector<const species *> &species_list);
+
 	explicit species(const std::string &identifier);
 
 	virtual void process_sml_scope(const sml_data &scope) override;

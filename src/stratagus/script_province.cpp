@@ -523,6 +523,24 @@ static int CclGetPlaneData(lua_State *l)
 			lua_rawseti(l, -2, i);
 		}
 		return 1;
+	} else if (!strcmp(data, "SapientSpeciesNames")) {
+		const std::vector<std::string> species_names = wyrmgus::species::get_name_list(plane->get_sapient_species());
+		lua_createtable(l, species_names.size(), 0);
+		for (size_t i = 1; i <= species_names.size(); ++i)
+		{
+			lua_pushstring(l, species_names[i - 1].c_str());
+			lua_rawseti(l, -2, i);
+		}
+		return 1;
+	} else if (!strcmp(data, "FaunaSpeciesNames")) {
+		const std::vector<std::string> species_names = wyrmgus::species::get_name_list(plane->get_fauna_species());
+		lua_createtable(l, species_names.size(), 0);
+		for (size_t i = 1; i <= species_names.size(); ++i)
+		{
+			lua_pushstring(l, species_names[i - 1].c_str());
+			lua_rawseti(l, -2, i);
+		}
+		return 1;
 	} else {
 		LuaError(l, "Invalid field: %s" _C_ data);
 	}
@@ -579,8 +597,24 @@ static int CclGetWorldData(lua_State *l)
 		for (size_t i = 1; i <= world->get_species().size(); ++i)
 		{
 			lua_pushstring(l, world->get_species()[i-1]->get_identifier().c_str());
+			lua_rawseti(l, -2, i);
+		}
+		return 1;
+	} else if (!strcmp(data, "SapientSpeciesNames")) {
+		const std::vector<std::string> species_names = wyrmgus::species::get_name_list(world->get_sapient_species());
+		lua_createtable(l, species_names.size(), 0);
+		for (size_t i = 1; i <= species_names.size(); ++i)
 		{
-			lua_pushstring(l, world->Species[i-1]->get_identifier().c_str());
+			lua_pushstring(l, species_names[i - 1].c_str());
+			lua_rawseti(l, -2, i);
+		}
+		return 1;
+	} else if (!strcmp(data, "FaunaSpeciesNames")) {
+		const std::vector<std::string> species_names = wyrmgus::species::get_name_list(world->get_fauna_species());
+		lua_createtable(l, species_names.size(), 0);
+		for (size_t i = 1; i <= species_names.size(); ++i)
+		{
+			lua_pushstring(l, species_names[i - 1].c_str());
 			lua_rawseti(l, -2, i);
 		}
 		return 1;
