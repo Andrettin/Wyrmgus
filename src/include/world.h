@@ -47,6 +47,8 @@ class world final : public detailed_data_entry, public data_type<world>, public 
 {
 	Q_OBJECT
 
+	Q_PROPERTY(wyrmgus::plane* plane MEMBER plane READ get_plane)
+
 public:
 	static constexpr const char *class_identifier = "world";
 	static constexpr const char *database_folder = "worlds";
