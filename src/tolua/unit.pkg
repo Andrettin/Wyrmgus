@@ -44,15 +44,6 @@ class CPreference
 	//Wyrmgus end
 	
 	std::string SF2Soundfont;
-	
-	//Wyrmgus start
-	CGraphic *IconFrameG;
-	CGraphic *PressedIconFrameG;
-	CGraphic *CommandButtonFrameG;
-	CGraphic *BarFrameG;
-	CGraphic *InfoPanelFrameG;
-	CGraphic *ProgressBarG;
-	//Wyrmgus end
 };
 
 class CUnitManager

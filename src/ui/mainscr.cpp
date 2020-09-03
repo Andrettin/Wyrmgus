@@ -164,7 +164,7 @@ static void UiDrawLifeBar(const CUnit &unit, int x, int y)
 	int hBar, hAll;
 	const int scale_factor = wyrmgus::defines::get()->get_scale_factor();
 	//Wyrmgus start
-	if (Preference.IconsShift && Preference.IconFrameG && Preference.PressedIconFrameG) {
+	if (Preference.IconsShift && wyrmgus::defines::get()->get_icon_frame_graphics() != nullptr && wyrmgus::defines::get()->get_pressed_icon_frame_graphics() != nullptr) {
 //	if (Preference.IconsShift) {
 		hBar = 4 * scale_factor;
 		hAll = 8 * scale_factor;
@@ -183,8 +183,8 @@ static void UiDrawLifeBar(const CUnit &unit, int x, int y)
 	Video.FillRectangleClip(ColorBlack, x - 4, y + 2,
 		unit.Type->Icon.Icon->G->Width + 8, hAll);
 	*/
-	if (Preference.BarFrameG) {
-		Preference.BarFrameG->DrawClip(x + (-2 - 4) * scale_factor, y + (4 - 4) * scale_factor);
+	if (wyrmgus::defines::get()->get_bar_frame_graphics() != nullptr) {
+		wyrmgus::defines::get()->get_bar_frame_graphics()->DrawClip(x + (-2 - 4) * scale_factor, y + (4 - 4) * scale_factor);
 		Video.FillRectangleClip(ColorBlack, x - 2 * scale_factor, y + 4 * scale_factor,
 			unit.Type->Icon.Icon->G->Width + (6 - 2) * scale_factor, hBar);
 	} else {
@@ -1933,7 +1933,7 @@ static void InfoPanel_draw_single_selection(CUnit *selUnit)
 	//Wyrmgus start
 	//draw icon panel frame, if any
 	if (
-		Preference.InfoPanelFrameG
+		wyrmgus::defines::get()->get_infopanel_frame_graphics() != nullptr
 		&& (unit.CurrentAction() != UnitAction::Train || static_cast<COrder_Train *>(unit.CurrentOrder())->GetUnitType().Stats[unit.Player->Index].Costs[TimeCost] == 0) //don't stop showing the info panel frame for a quick moment if the time cost is 0
 		&& (unit.CurrentAction() != UnitAction::UpgradeTo || static_cast<COrder_UpgradeTo *>(unit.CurrentOrder())->GetUnitType().Stats[unit.Player->Index].Costs[TimeCost] == 0)
 		&& (unit.CurrentAction() != UnitAction::Research || static_cast<COrder_Research *>(unit.CurrentOrder())->GetUpgrade().Costs[TimeCost] == 0)
@@ -1941,7 +1941,7 @@ static void InfoPanel_draw_single_selection(CUnit *selUnit)
 		&& !unit.IsEnemy(*CPlayer::GetThisPlayer())
 		&& (unit.Player->Type != PlayerNeutral || unit.Type->GivesResource)
 	) {
-		Preference.InfoPanelFrameG->DrawClip(UI.InfoPanel.X - 4 * wyrmgus::defines::get()->get_scale_factor(), UI.InfoPanel.Y + 93 * wyrmgus::defines::get()->get_scale_factor());
+		wyrmgus::defines::get()->get_infopanel_frame_graphics()->DrawClip(UI.InfoPanel.X - 4 * wyrmgus::defines::get()->get_scale_factor(), UI.InfoPanel.Y + 93 * wyrmgus::defines::get()->get_scale_factor());
 	}
 	//Wyrmgus end	
 	DrawUnitInfo(unit);

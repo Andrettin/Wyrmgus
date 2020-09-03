@@ -604,8 +604,6 @@ void database::load_defines()
 			}
 		}
 	}
-
-	defines::get()->initialize();
 }
 
 void database::load_history()
@@ -619,6 +617,8 @@ void database::load_history()
 
 void database::initialize()
 {
+	defines::get()->initialize();
+
 	//initialize data entries for each data type
 	for (const std::unique_ptr<data_type_metadata> &metadata : this->metadata) {
 		try {

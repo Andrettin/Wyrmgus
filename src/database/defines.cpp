@@ -31,8 +31,19 @@
 #include "database/preferences.h"
 #include "database/sml_data.h"
 #include "database/sml_parser.h"
+#include "video/video.h"
 
 namespace wyrmgus {
+
+defines::~defines()
+{
+	CGraphic::Free(this->icon_frame_graphics);
+	CGraphic::Free(this->pressed_icon_frame_graphics);
+	CGraphic::Free(this->command_button_frame_graphics);
+	CGraphic::Free(this->bar_frame_graphics);
+	CGraphic::Free(this->infopanel_frame_graphics);
+	CGraphic::Free(this->progress_bar_graphics);
+}
 
 void defines::load(const std::filesystem::path &data_path)
 {
@@ -49,7 +60,24 @@ void defines::load(const std::filesystem::path &data_path)
 
 void defines::process_sml_property(const sml_property &property)
 {
-	database::process_sml_property_for_object(this, property);
+	const std::string &key = property.get_key();
+	const std::string &value = property.get_value();
+
+	if (key == "icon_frame_file") {
+		this->icon_frame_graphics = CGraphic::New(value);
+	} else if (key == "pressed_icon_frame_file") {
+		this->pressed_icon_frame_graphics = CGraphic::New(value);
+	} else if (key == "command_button_frame_file") {
+		this->command_button_frame_graphics = CGraphic::New(value);
+	} else if (key == "bar_frame_file") {
+		this->bar_frame_graphics = CGraphic::New(value);
+	} else if (key == "infopanel_frame_file") {
+		this->infopanel_frame_graphics = CGraphic::New(value);
+	} else if (key == "progress_bar_file") {
+		this->progress_bar_graphics = CGraphic::New(value);
+	} else {
+		database::process_sml_property_for_object(this, property);
+	}
 }
 
 void defines::process_sml_scope(const sml_data &scope)
@@ -59,7 +87,29 @@ void defines::process_sml_scope(const sml_data &scope)
 
 void defines::initialize()
 {
-	this->scale_factor = preferences::get()->get_scale_factor();
+	if (this->icon_frame_graphics != nullptr) {
+		this->icon_frame_graphics->Load(false, this->get_scale_factor());
+	}
+
+	if (this->pressed_icon_frame_graphics != nullptr) {
+		this->pressed_icon_frame_graphics->Load(false, this->get_scale_factor());
+	}
+
+	if (this->command_button_frame_graphics != nullptr) {
+		this->command_button_frame_graphics->Load(false, this->get_scale_factor());
+	}
+
+	if (this->bar_frame_graphics != nullptr) {
+		this->bar_frame_graphics->Load(false, this->get_scale_factor());
+	}
+
+	if (this->infopanel_frame_graphics != nullptr) {
+		this->infopanel_frame_graphics->Load(false, this->get_scale_factor());
+	}
+
+	if (this->progress_bar_graphics != nullptr) {
+		this->progress_bar_graphics->Load(false, this->get_scale_factor());
+	}
 }
 
 }

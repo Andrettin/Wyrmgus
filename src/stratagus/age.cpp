@@ -107,7 +107,7 @@ void age::process_sml_scope(const sml_data &scope)
 
 	if (tag == "image") {
 		std::filesystem::path filepath;
-		Vec2i size(0, 0);
+		QSize size(0, 0);
 
 		scope.for_each_property([&](const sml_property &property) {
 			const std::string &key = property.get_key();
@@ -115,9 +115,9 @@ void age::process_sml_scope(const sml_data &scope)
 			if (key == "file") {
 				filepath = database::get_graphics_path(this->get_module()) / value;
 			} else if (key == "width") {
-				size.x = std::stoi(value);
+				size.setWidth(std::stoi(value));
 			} else if (key == "height") {
-				size.y = std::stoi(value);
+				size.setHeight(std::stoi(value));
 			} else {
 				throw std::runtime_error("Invalid image property: \"" + key + "\".");
 			}
@@ -127,15 +127,15 @@ void age::process_sml_scope(const sml_data &scope)
 			throw std::runtime_error("Image has no file.");
 		}
 
-		if (size.x == 0) {
+		if (size.width() == 0) {
 			throw std::runtime_error("Image has no width.");
 		}
 
-		if (size.y == 0) {
+		if (size.height() == 0) {
 			throw std::runtime_error("Image has no height.");
 		}
 
-		this->graphics = CGraphic::New(filepath.string(), size.x, size.y);
+		this->graphics = CGraphic::New(filepath, size);
 	} else if (tag == "preconditions") {
 		this->preconditions = std::make_unique<and_condition>();
 		database::process_sml_data(this->preconditions, scope);

@@ -154,7 +154,7 @@ void icon::DrawUnitIcon(const ButtonStyle &style, unsigned flags,
 	const int scale_factor = defines::get()->get_scale_factor();
 
 	//Wyrmgus start
-	if (Preference.IconsShift && Preference.IconFrameG && Preference.PressedIconFrameG) {
+	if (Preference.IconsShift && defines::get()->get_icon_frame_graphics() != nullptr && defines::get()->get_pressed_icon_frame_graphics() != nullptr) {
 		Video.FillRectangle(ColorBlack, pos.x, pos.y, 46 * scale_factor, 38 * scale_factor);
 		if (flags & IconClicked) { // Shift the icon a bit to make it look like it's been pressed.
 			if (show_percent < 100) {
@@ -166,10 +166,10 @@ void icon::DrawUnitIcon(const ButtonStyle &style, unsigned flags,
 			} else if (flags & IconAutoCast) {
 				Video.DrawRectangle(Video.MapRGB(TheScreen->format, UI.ButtonPanel.AutoCastBorderColorRGB), pos.x + 1 * scale_factor, pos.y + 1 * scale_factor, 46 * scale_factor - 1 * scale_factor, 38 * scale_factor - 1 * scale_factor);
 			}
-			if (!Preference.CommandButtonFrameG || !(flags & IconCommandButton)) {
-				Preference.PressedIconFrameG->DrawClip(pos.x - 4 * scale_factor, pos.y - 4 * scale_factor);
+			if (defines::get()->get_command_button_frame_graphics() == nullptr || !(flags & IconCommandButton)) {
+				defines::get()->get_pressed_icon_frame_graphics()->DrawClip(pos.x - 4 * scale_factor, pos.y - 4 * scale_factor);
 			} else {
-				Preference.CommandButtonFrameG->DrawClip(pos.x - 5 * scale_factor, pos.y - 4 * scale_factor);
+				defines::get()->get_command_button_frame_graphics()->DrawClip(pos.x - 5 * scale_factor, pos.y - 4 * scale_factor);
 			}
 		} else {
 			if (show_percent < 100) {
@@ -181,10 +181,10 @@ void icon::DrawUnitIcon(const ButtonStyle &style, unsigned flags,
 			} else if (flags & IconAutoCast) {
 				Video.DrawRectangle(Video.MapRGB(TheScreen->format, UI.ButtonPanel.AutoCastBorderColorRGB), pos.x, pos.y, 46 * scale_factor, 38 * scale_factor);
 			}
-			if (Preference.CommandButtonFrameG && (flags & IconCommandButton)) {
-				Preference.CommandButtonFrameG->DrawClip(pos.x - 5 * scale_factor, pos.y - 4 * scale_factor);
+			if (defines::get()->get_command_button_frame_graphics() != nullptr && (flags & IconCommandButton)) {
+				defines::get()->get_command_button_frame_graphics()->DrawClip(pos.x - 5 * scale_factor, pos.y - 4 * scale_factor);
 			} else {
-				Preference.IconFrameG->DrawClip(pos.x - 4 * scale_factor, pos.y - 4 * scale_factor);
+				defines::get()->get_icon_frame_graphics()->DrawClip(pos.x - 4 * scale_factor, pos.y - 4 * scale_factor);
 			}
 		}
 	//Wyrmgus end

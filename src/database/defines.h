@@ -29,6 +29,8 @@
 
 #include "util/singleton.h"
 
+class CGraphic;
+
 namespace wyrmgus {
 
 class button_level;
@@ -73,6 +75,8 @@ class defines final : public QObject, public singleton<defines>
 	Q_PROPERTY(wyrmgus::unit_class* default_population_class MEMBER default_population_class READ get_default_population_class)
 
 public:
+	~defines();
+
 	void load(const std::filesystem::path &base_path);
 	void process_sml_property(const sml_property &property);
 	void process_sml_scope(const sml_data &scope);
@@ -146,6 +150,11 @@ public:
 	int get_scale_factor() const
 	{
 		return this->scale_factor;
+	}
+
+	void set_scale_factor(const int factor)
+	{
+		this->scale_factor = factor;
 	}
 
 	QSize get_scaled_tile_size() const
@@ -228,6 +237,36 @@ public:
 		return this->default_population_class;
 	}
 
+	const CGraphic *get_icon_frame_graphics() const
+	{
+		return this->icon_frame_graphics;
+	}
+
+	const CGraphic *get_pressed_icon_frame_graphics() const
+	{
+		return this->pressed_icon_frame_graphics;
+	}
+
+	const CGraphic *get_command_button_frame_graphics() const
+	{
+		return this->command_button_frame_graphics;
+	}
+
+	const CGraphic *get_bar_frame_graphics() const
+	{
+		return this->bar_frame_graphics;
+	}
+
+	const CGraphic *get_infopanel_frame_graphics() const
+	{
+		return this->infopanel_frame_graphics;
+	}
+
+	const CGraphic *get_progress_bar_graphics() const
+	{
+		return this->progress_bar_graphics;
+	}
+
 private:
 	font *small_font = nullptr;
 	font *game_font = nullptr;
@@ -254,6 +293,12 @@ private:
 	button_level *cancel_button_level = nullptr;
 	unit_class *town_hall_class = nullptr;
 	unit_class *default_population_class = nullptr;
+	CGraphic *icon_frame_graphics = nullptr;
+	CGraphic *pressed_icon_frame_graphics = nullptr;
+	CGraphic *command_button_frame_graphics = nullptr;
+	CGraphic *bar_frame_graphics = nullptr;
+	CGraphic *infopanel_frame_graphics = nullptr;
+	CGraphic *progress_bar_graphics = nullptr;
 };
 
 }

@@ -249,27 +249,6 @@ void CUserInterface::Load()
 		PieMenu.G->Load(false, wyrmgus::defines::get()->get_scale_factor());
 	}
 
-	//Wyrmgus start
-	if (Preference.IconFrameG) {
-		Preference.IconFrameG->Load(false, wyrmgus::defines::get()->get_scale_factor());
-	}
-	if (Preference.PressedIconFrameG) {
-		Preference.PressedIconFrameG->Load(false, wyrmgus::defines::get()->get_scale_factor());
-	}
-	if (Preference.CommandButtonFrameG) {
-		Preference.CommandButtonFrameG->Load(false, wyrmgus::defines::get()->get_scale_factor());
-	}
-	if (Preference.BarFrameG) {
-		Preference.BarFrameG->Load(false, wyrmgus::defines::get()->get_scale_factor());
-	}
-	if (Preference.InfoPanelFrameG) {
-		Preference.InfoPanelFrameG->Load(false, wyrmgus::defines::get()->get_scale_factor());
-	}
-	if (Preference.ProgressBarG) {
-		Preference.ProgressBarG->Load(false, wyrmgus::defines::get()->get_scale_factor());
-	}
-	//Wyrmgus end
-	
 	//  Resolve cursors
 	for (int i = 0; i < static_cast<int>(wyrmgus::cursor_type::count); ++i) {
 		auto cursor_type = static_cast<wyrmgus::cursor_type>(i);
@@ -350,15 +329,6 @@ void CleanUserInterface()
 	}
 	UI.InfoPanelContents.clear();
 	
-	//Wyrmgus start
-	CGraphic::Free(Preference.IconFrameG);
-	CGraphic::Free(Preference.PressedIconFrameG);
-	CGraphic::Free(Preference.CommandButtonFrameG);
-	CGraphic::Free(Preference.BarFrameG);
-	CGraphic::Free(Preference.InfoPanelFrameG);
-	CGraphic::Free(Preference.ProgressBarG);
-	//Wyrmgus end
-
 	// Button Popups
 	for (std::vector<CPopup *>::iterator popup = UI.ButtonPopups.begin();
 		 popup != UI.ButtonPopups.end(); ++popup) {

@@ -693,8 +693,7 @@ public:
 		PlayerColorCircle(false), SepiaForGrayscale(false),
 		ShowPathlines(false),
 //		ShowOrders(0), ShowNameDelay(0), ShowNameTime(0), AutosaveMinutes(5) {};
-		ShowOrders(0), ShowNameDelay(0), ShowNameTime(0), AutosaveMinutes(5), HotkeySetup(0),
-		IconFrameG(nullptr), PressedIconFrameG(nullptr), CommandButtonFrameG(nullptr), BarFrameG(nullptr), ProgressBarG(nullptr) {};
+		ShowOrders(0), ShowNameDelay(0), ShowNameTime(0), AutosaveMinutes(5), HotkeySetup(0) {};
 		//Wyrmgus end
 
 	bool ShowSightRange;     /// Show sight range.
@@ -723,21 +722,9 @@ public:
 	int HotkeySetup;			/// Hotkey layout (0 = default, 1 = position-based, 2 = position-based (except commands))
 	//Wyrmgus end
 	std::string SF2Soundfont;/// Path to SF2 soundfont
-	//Wyrmgus start
-	CGraphic *IconFrameG;
-	CGraphic *PressedIconFrameG;
-	CGraphic *CommandButtonFrameG;
-	CGraphic *BarFrameG;
-	CGraphic *InfoPanelFrameG = nullptr;
-	CGraphic *ProgressBarG;
-	//Wyrmgus end
 };
 
 extern CPreference Preference;
-
-/*----------------------------------------------------------------------------
--- Variables
-----------------------------------------------------------------------------*/
 
 // in unit_draw.c
 /// @todo could be moved into the user interface ?

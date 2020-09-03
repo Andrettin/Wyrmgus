@@ -54,10 +54,7 @@ public:
 		return this->scale_factor;
 	}
 
-	void set_scale_factor(const int factor)
-	{
-		this->scale_factor = factor;
-	}
+	void set_scale_factor(const int factor);
 
 	campaign *get_selected_campaign() const
 	{

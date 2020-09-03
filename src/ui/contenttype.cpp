@@ -373,8 +373,8 @@ static const CUnit *GetUnitRef(const CUnit &unit, EnumUnit e)
 	//Wyrmgus start
 //	Video.FillRectangleClip(ColorBlack, this->Pos.x - 2, this->Pos.y - 2,
 //							this->Width + 3, this->Height + 3);
-	if (Preference.BarFrameG) {
-		Preference.BarFrameG->DrawClip(this->Pos.x + (-1 - 4) * scale_factor, this->Pos.y + (-1 - 4) * scale_factor);
+	if (wyrmgus::defines::get()->get_bar_frame_graphics() != nullptr) {
+		wyrmgus::defines::get()->get_bar_frame_graphics()->DrawClip(this->Pos.x + (-1 - 4) * scale_factor, this->Pos.y + (-1 - 4) * scale_factor);
 		Video.FillRectangleClip(ColorBlack, this->Pos.x - 1 * scale_factor, this->Pos.y - 1 * scale_factor,
 								this->Width * scale_factor, this->Height * scale_factor);
 	} else {
@@ -430,8 +430,8 @@ static const CUnit *GetUnitRef(const CUnit &unit, EnumUnit e)
 
 	if (!this->hasBorder) {
 		//Wyrmgus start
-		if (Preference.ProgressBarG) {
-			Preference.ProgressBarG->DrawClip(this->Pos.x - 4 * scale_factor, this->Pos.y - 5 * scale_factor);
+		if (wyrmgus::defines::get()->get_progress_bar_graphics() != nullptr) {
+			wyrmgus::defines::get()->get_progress_bar_graphics()->DrawClip(this->Pos.x - 4 * scale_factor, this->Pos.y - 5 * scale_factor);
 		}
 		//Wyrmgus end
 		Video.FillRectangleClip(color, x, y, f * w / 100, h);

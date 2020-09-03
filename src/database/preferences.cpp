@@ -29,6 +29,7 @@
 
 #include "campaign.h"
 #include "database/database.h"
+#include "database/defines.h"
 #include "database/sml_data.h"
 #include "database/sml_parser.h"
 #include "util/exception_util.h"
@@ -92,5 +93,17 @@ void preferences::process_sml_scope(const sml_data &scope)
 {
 	database::process_sml_scope_for_object(this, scope);
 }
+
+void preferences::set_scale_factor(const int factor)
+{
+	if (factor == this->get_scale_factor()) {
+		return;
+	}
+
+	this->scale_factor = factor;
+
+	defines::get()->set_scale_factor(factor);
+}
+
 
 }

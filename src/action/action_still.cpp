@@ -212,8 +212,8 @@ static bool MoveRandomly(CUnit &unit)
 			MarkUnitFieldFlags(unit);
 			//Wyrmgus start
 			//prefer terrains which this unit's species is native to; only go to other ones if is already in a non-native terrain type
-			if (unit.Type->get_species() != nullptr && wyrmgus::vector::contains(unit.Type->get_species()->Terrains, CMap::Map.GetTileTopTerrain(unit.tilePos, false, unit.MapLayer->ID))) {
-				if (!wyrmgus::vector::contains(unit.Type->get_species()->Terrains, CMap::Map.GetTileTopTerrain(pos, false, unit.MapLayer->ID))) {
+			if (unit.Type->get_species() != nullptr && wyrmgus::vector::contains(unit.Type->get_species()->get_native_terrain_types(), CMap::Map.GetTileTopTerrain(unit.tilePos, false, unit.MapLayer->ID))) {
+				if (!wyrmgus::vector::contains(unit.Type->get_species()->get_native_terrain_types(), CMap::Map.GetTileTopTerrain(pos, false, unit.MapLayer->ID))) {
 					return false;
 				}
 			}
