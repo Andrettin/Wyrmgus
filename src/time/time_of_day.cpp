@@ -27,12 +27,6 @@
 
 #include "time/time_of_day.h"
 
-#include "config.h"
-#include "database/defines.h"
-#include "mod.h"
-#include "util/string_util.h"
-#include "video/video.h"
-
 namespace wyrmgus {
 
 void time_of_day::process_sml_scope(const sml_data &scope)
@@ -40,38 +34,7 @@ void time_of_day::process_sml_scope(const sml_data &scope)
 	const std::string &tag = scope.get_tag();
 	const std::vector<std::string> &values = scope.get_values();
 
-	if (tag == "image") {
-		std::filesystem::path filepath;
-		Vec2i size(0, 0);
-
-		scope.for_each_property([&](const sml_property &property) {
-			const std::string &key = property.get_key();
-			const std::string &value = property.get_value();
-			if (key == "file") {
-				filepath = database::get_graphics_path(this->get_module()) / value;
-			} else if (key == "width") {
-				size.x = std::stoi(value);
-			} else if (key == "height") {
-				size.y = std::stoi(value);
-			} else {
-				throw std::runtime_error("Invalid image property: \"" + key + "\".");
-			}
-		});
-
-		if (filepath.empty()) {
-			throw std::runtime_error("Image has no file.");
-		}
-
-		if (size.x == 0) {
-			throw std::runtime_error("Image has no width.");
-		}
-
-		if (size.y == 0) {
-			throw std::runtime_error("Image has no height.");
-		}
-
-		this->G = CGraphic::New(filepath.string(), size.x, size.y);
-	} else if (tag == "color_modification") {
+	if (tag == "color_modification") {
 		const std::vector<std::string> &values = scope.get_values();
 		this->ColorModification.R = std::stoi(values[0]);
 		this->ColorModification.G = std::stoi(values[1]);
@@ -79,15 +42,6 @@ void time_of_day::process_sml_scope(const sml_data &scope)
 	} else {
 		data_entry::process_sml_scope(scope);
 	}
-}
-
-void time_of_day::initialize()
-{
-	if (this->G != nullptr) {
-		this->G->Load(false, defines::get()->get_scale_factor());
-	}
-
-	data_entry::initialize();
 }
 
 /**

@@ -32,9 +32,9 @@
 #include "database/named_data_entry.h"
 #include "data_type.h"
 
-class CGraphic;
-
 namespace wyrmgus {
+
+class resource_icon;
 
 class time_of_day final : public named_data_entry, public data_type<time_of_day>
 {
@@ -44,6 +44,7 @@ class time_of_day final : public named_data_entry, public data_type<time_of_day>
 	Q_PROPERTY(bool day MEMBER day READ is_day)
 	Q_PROPERTY(bool dusk MEMBER dusk READ is_dusk)
 	Q_PROPERTY(bool night MEMBER night READ is_night)
+	Q_PROPERTY(wyrmgus::resource_icon* icon MEMBER icon READ get_icon)
 
 public:
 	static constexpr const char *class_identifier = "time_of_day";
@@ -61,11 +62,10 @@ public:
 	}
 
 	virtual void process_sml_scope(const sml_data &scope) override;
-	virtual void initialize() override;
 
 	virtual void check() const override
 	{
-		if (this->G == nullptr) {
+		if (this->get_icon() == nullptr) {
 			throw std::runtime_error("Time of day \"" + this->get_identifier() + "\" has no icon.");
 		}
 	}
@@ -90,6 +90,11 @@ public:
 		return this->night;
 	}
 
+	resource_icon *get_icon() const
+	{
+		return this->icon;
+	}
+
 	bool HasColorModification() const;
 
 	int ID = -1;								/// The ID of this time of day
@@ -98,9 +103,9 @@ private:
 	bool day = false;							/// Whether this is a day time of day
 	bool dusk = false;							/// Whether this is a dusk time of day
 	bool night = false;							/// Whether this is a night time of day
+	resource_icon *icon = nullptr;
 public:
 	CColor ColorModification;					/// The color modification applied to graphics when the time of day is active
-	CGraphic *G = nullptr;
 };
 
 }

@@ -891,28 +891,18 @@ void DrawTime()
 		const QPoint tile_pos = UI.SelectedViewport->screen_center_to_tile_pos();
 		const wyrmgus::time_of_day *time_of_day = UI.CurrentMapLayer->get_tile_time_of_day(tile_pos);
 		if (time_of_day != nullptr) {
-			UI.TimeOfDayPanel.G = time_of_day->G;
-		} else {
-			UI.TimeOfDayPanel.G = nullptr;
+			const wyrmgus::resource_icon *icon = time_of_day->get_icon();
+			icon->get_graphics()->DrawFrameClip(icon->get_frame(), UI.TimeOfDayPanel.IconX, UI.TimeOfDayPanel.IconY);
 		}
 
 		const wyrmgus::season *season = UI.CurrentMapLayer->GetSeason();
-		if (season) {
-			UI.SeasonPanel.G = season->G;
-		} else {
-			UI.SeasonPanel.G = nullptr;
+		if (season != nullptr) {
+			const wyrmgus::resource_icon *icon = season->get_icon();
+			icon->get_graphics()->DrawFrameClip(icon->get_frame(), UI.SeasonPanel.IconX, UI.SeasonPanel.IconY);
 		}
 	}
 	
-	if (UI.TimeOfDayPanel.G) {
-		UI.TimeOfDayPanel.G->DrawFrameClip(UI.TimeOfDayPanel.IconFrame, UI.TimeOfDayPanel.IconX, UI.TimeOfDayPanel.IconY);
-	}
-	
-	if (UI.SeasonPanel.G) {
-		UI.SeasonPanel.G->DrawFrameClip(UI.SeasonPanel.IconFrame, UI.SeasonPanel.IconX, UI.SeasonPanel.IconY);
-	}
-	
-	if (CPlayer::GetThisPlayer()) {
+	if (CPlayer::GetThisPlayer() != nullptr) {
 		wyrmgus::calendar *calendar = wyrmgus::civilization::get_all()[CPlayer::GetThisPlayer()->Race]->get_calendar();
 		
 		if (UI.DatePanel.TextX != -1) {
@@ -1166,30 +1156,41 @@ void DrawPopups()
 		DrawGenericPopup(_("Score"), UI.Resources[ScoreCost].IconX, UI.Resources[ScoreCost].IconY + 16 * wyrmgus::defines::get()->get_scale_factor() + GameCursor->get_graphic()->getHeight() / 2, nullptr, nullptr, false);
 	}
 	
+	const QPoint tile_pos = UI.SelectedViewport->screen_center_to_tile_pos();
+	const wyrmgus::time_of_day *time_of_day = UI.CurrentMapLayer->get_tile_time_of_day(tile_pos);
+	const CGraphic *time_of_day_icon_graphics = nullptr;
+	if (time_of_day != nullptr) {
+		time_of_day_icon_graphics = time_of_day->get_icon()->get_graphics();
+	}
+
 	if (
-		UI.TimeOfDayPanel.G
+		time_of_day_icon_graphics != nullptr
 		&& UI.TimeOfDayPanel.IconX != -1
 		&& UI.TimeOfDayPanel.IconY != -1
 		&& CursorScreenPos.x >= UI.TimeOfDayPanel.IconX
-		&& CursorScreenPos.x < (UI.TimeOfDayPanel.IconX + UI.TimeOfDayPanel.G->getWidth())
+		&& CursorScreenPos.x < (UI.TimeOfDayPanel.IconX + time_of_day_icon_graphics->get_frame_width())
 		&& CursorScreenPos.y >= UI.TimeOfDayPanel.IconY
-		&& CursorScreenPos.y < (UI.TimeOfDayPanel.IconY + UI.TimeOfDayPanel.G->getHeight())
+		&& CursorScreenPos.y < (UI.TimeOfDayPanel.IconY + time_of_day_icon_graphics->get_frame_height())
 	) {
-		const QPoint tile_pos = UI.SelectedViewport->screen_center_to_tile_pos();
-		const wyrmgus::time_of_day *time_of_day = UI.CurrentMapLayer->get_tile_time_of_day(tile_pos);
 		DrawGenericPopup(_(time_of_day->get_name().c_str()), UI.TimeOfDayPanel.IconX, UI.TimeOfDayPanel.IconY + 16 * wyrmgus::defines::get()->get_scale_factor() + GameCursor->get_graphic()->getHeight() / 2, nullptr, nullptr, false);
 	}
 	
+	const wyrmgus::season *season = UI.CurrentMapLayer->GetSeason();
+	const CGraphic *season_icon_graphics = nullptr;
+	if (season != nullptr) {
+		season_icon_graphics = season->get_icon()->get_graphics();
+	}
+
 	if (
-		UI.SeasonPanel.G
+		season_icon_graphics != nullptr
 		&& UI.SeasonPanel.IconX != -1
 		&& UI.SeasonPanel.IconY != -1
 		&& CursorScreenPos.x >= UI.SeasonPanel.IconX
-		&& CursorScreenPos.x < (UI.SeasonPanel.IconX + UI.SeasonPanel.G->getWidth())
+		&& CursorScreenPos.x < (UI.SeasonPanel.IconX + season_icon_graphics->get_frame_width())
 		&& CursorScreenPos.y >= UI.SeasonPanel.IconY
-		&& CursorScreenPos.y < (UI.SeasonPanel.IconY + UI.SeasonPanel.G->getHeight())
+		&& CursorScreenPos.y < (UI.SeasonPanel.IconY + season_icon_graphics->get_frame_height())
 	) {
-		DrawGenericPopup(_(UI.CurrentMapLayer->GetSeason()->get_name().c_str()), UI.SeasonPanel.IconX, UI.SeasonPanel.IconY + 16 * wyrmgus::defines::get()->get_scale_factor() + GameCursor->get_graphic()->getHeight() / 2, nullptr, nullptr, false);
+		DrawGenericPopup(_(season->get_name().c_str()), UI.SeasonPanel.IconX, UI.SeasonPanel.IconY + 16 * wyrmgus::defines::get()->get_scale_factor() + GameCursor->get_graphic()->getHeight() / 2, nullptr, nullptr, false);
 	}
 	
 	//commented out as right now the popup is a bit pointless, as it only shows the same text as what's already written in the HUD; the popup should be restored when they are able to show more text

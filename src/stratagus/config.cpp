@@ -44,13 +44,9 @@
 #include "script/trigger.h"
 #include "sound/sound.h"
 #include "spells.h"
-#include "time/calendar.h"
-#include "time/season.h"
 #include "time/season_schedule.h"
-#include "time/time_of_day.h"
 #include "time/time_of_day_schedule.h"
 #include "ui/button.h"
-#include "ui/icon.h"
 #include "unit/unit_type.h"
 #include "util/util.h"
 #include "world.h"
@@ -254,11 +250,6 @@ void CConfigData::ProcessConfigData(const std::vector<CConfigData *> &config_dat
 			wyrmgus::plane *plane = wyrmgus::plane::get_or_add(ident, nullptr);
 			if (!define_only) {
 				plane->ProcessConfigData(config_data);
-			}
-		} else if (config_data->Tag == "season") {
-			wyrmgus::season *season = wyrmgus::season::get_or_add(ident, nullptr);
-			if (!define_only) {
-				season->ProcessConfigData(config_data);
 			}
 		} else if (config_data->Tag == "season_schedule") {
 			CSeasonSchedule *season_schedule = CSeasonSchedule::GetOrAddSeasonSchedule(ident);

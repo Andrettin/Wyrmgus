@@ -29,25 +29,39 @@
 
 #include "database/data_type.h"
 #include "database/named_data_entry.h"
-#include "data_type.h"
-
-class CGraphic;
 
 namespace wyrmgus {
 
-class season : public named_data_entry, public data_type<season>, public CDataType
+class resource_icon;
+
+class season final : public named_data_entry, public data_type<season>
 {
+	Q_OBJECT
+
+	Q_PROPERTY(wyrmgus::resource_icon* icon MEMBER icon READ get_icon)
+
 public:
 	static constexpr const char *class_identifier = "season";
 	static constexpr const char *database_folder = "seasons";
 
-	season(const std::string &identifier) : named_data_entry(identifier), CDataType(identifier)
+	explicit season(const std::string &identifier) : named_data_entry(identifier)
 	{
 	}
 
-	virtual void ProcessConfigData(const CConfigData *config_data) override;
+	virtual void check() const override
+	{
+		if (this->get_icon() == nullptr) {
+			throw std::runtime_error("Season \"" + this->get_identifier() + "\" has no icon.");
+		}
+	}
 
-	CGraphic *G = nullptr;
+	resource_icon *get_icon() const
+	{
+		return this->icon;
+	}
+
+private:
+	resource_icon *icon = nullptr;
 };
 
 }
