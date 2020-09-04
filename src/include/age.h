@@ -30,17 +30,16 @@
 #include "database/data_type.h"
 #include "database/named_data_entry.h"
 
-class CGraphic;
-class CUpgrade;
-
 namespace wyrmgus {
 
 class condition;
+class resource_icon;
 
 class age final : public named_data_entry, public data_type<age>
 {
 	Q_OBJECT
 
+	Q_PROPERTY(wyrmgus::resource_icon* icon MEMBER icon READ get_icon)
 	Q_PROPERTY(int priority MEMBER priority)
 
 public:
@@ -58,18 +57,17 @@ public:
 	virtual ~age() override;
 	
 	virtual void process_sml_scope(const sml_data &scope) override;
-	virtual void initialize() override;
 
 	virtual void check() const override
 	{
-		if (this->get_graphics() == nullptr) {
+		if (this->get_icon() == nullptr) {
 			throw std::runtime_error("Age \"" + this->get_identifier() + "\" has no icon.");
 		}
 	}
 
-	CGraphic *get_graphics() const
+	resource_icon *get_icon() const
 	{
-		return this->graphics;
+		return this->icon;
 	}
 
 	const std::unique_ptr<condition> &get_preconditions() const
@@ -83,7 +81,7 @@ public:
 	}
 
 private:
-	CGraphic *graphics = nullptr;
+	resource_icon *icon = nullptr;
 	int priority = 0;
 	std::unique_ptr<condition> preconditions;
 	std::unique_ptr<condition> conditions;

@@ -914,14 +914,17 @@ void DrawTime()
 	}
 }
 
-/**
-**	@brief	Draw the age
-*/
 void DrawAge()
 {
-	if (UI.AgePanel.G) {
-		UI.AgePanel.G->DrawFrameClip(UI.AgePanel.IconFrame, UI.AgePanel.IconX, UI.AgePanel.IconY);
+	const wyrmgus::age *age = nullptr;
+	if (CPlayer::GetThisPlayer() != nullptr) {
+		age = CPlayer::GetThisPlayer()->get_age();
+	} else {
+		age = wyrmgus::age::current_age;
 	}
+
+	const wyrmgus::resource_icon *icon = age->get_icon();
+	icon->get_graphics()->DrawFrameClip(icon->get_frame(), UI.AgePanel.IconX, UI.AgePanel.IconY);
 	
 	if (UI.AgePanel.TextX != -1 && !UI.AgePanel.Text.empty()) {
 		UI.AgePanel.Font = wyrmgus::defines::get()->get_game_font();

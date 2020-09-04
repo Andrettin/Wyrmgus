@@ -92,12 +92,8 @@ age::age(const std::string &identifier) : named_data_entry(identifier)
 {
 }
 
-
 age::~age()
 {
-	if (this->graphics) {
-		CGraphic::Free(this->graphics);
-	}
 }
 
 void age::process_sml_scope(const sml_data &scope)
@@ -105,38 +101,7 @@ void age::process_sml_scope(const sml_data &scope)
 	const std::string &tag = scope.get_tag();
 	const std::vector<std::string> &values = scope.get_values();
 
-	if (tag == "image") {
-		std::filesystem::path filepath;
-		QSize size(0, 0);
-
-		scope.for_each_property([&](const sml_property &property) {
-			const std::string &key = property.get_key();
-			const std::string &value = property.get_value();
-			if (key == "file") {
-				filepath = database::get_graphics_path(this->get_module()) / value;
-			} else if (key == "width") {
-				size.setWidth(std::stoi(value));
-			} else if (key == "height") {
-				size.setHeight(std::stoi(value));
-			} else {
-				throw std::runtime_error("Invalid image property: \"" + key + "\".");
-			}
-		});
-
-		if (filepath.empty()) {
-			throw std::runtime_error("Image has no file.");
-		}
-
-		if (size.width() == 0) {
-			throw std::runtime_error("Image has no width.");
-		}
-
-		if (size.height() == 0) {
-			throw std::runtime_error("Image has no height.");
-		}
-
-		this->graphics = CGraphic::New(filepath, size);
-	} else if (tag == "preconditions") {
+	if (tag == "preconditions") {
 		this->preconditions = std::make_unique<and_condition>();
 		database::process_sml_data(this->preconditions, scope);
 	} else if (tag == "conditions") {
@@ -145,15 +110,6 @@ void age::process_sml_scope(const sml_data &scope)
 	} else {
 		data_entry::process_sml_scope(scope);
 	}
-}
-
-void age::initialize()
-{
-	if (this->graphics != nullptr) {
-		this->graphics->Load(false, defines::get()->get_scale_factor());
-	}
-
-	data_entry::initialize();
 }
 
 }
