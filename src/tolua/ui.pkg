@@ -102,8 +102,6 @@ class CPieMenu
 
 class CResourceInfo
 {
-	CGraphic *G;
-	int IconFrame;
 	int IconX;
 	int IconY;
 	int IconWidth;
