@@ -403,6 +403,7 @@ set(ui_SRCS
 	src/ui/contenttype.cpp
 	src/ui/cursor.cpp
 	src/ui/icon.cpp
+	src/ui/icon_base.cpp
 	src/ui/interface.cpp
 	src/ui/mainscr.cpp
 	src/ui/uibuttons_proc.cpp
@@ -776,6 +777,7 @@ set(stratagus_ui_HDRS
 	src/ui/cursor.h
 	src/ui/cursor_type.h
 	src/ui/icon.h
+	src/ui/icon_base.h
 	src/ui/interface.h
 	src/ui/popup.h
 	src/ui/statusline.h
