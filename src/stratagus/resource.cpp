@@ -54,8 +54,8 @@ void resource::process_sml_property(const sml_property &property)
 
 void resource::initialize()
 {
-	if (this->FinalResource == -1) {
-		this->FinalResource = this->get_index();
+	if (this->final_resource != nullptr) {
+		this->final_resource->ChildResources.push_back(this);
 	}
 
 	if (!this->icon_file.empty()) {

@@ -390,13 +390,13 @@
 **
 **    The resource this is for. Mostly redundant.
 **
-**  resource_info::FinalResource
+**  resource_info::final_resource
 **
 **    The resource is converted to this at the depot. Useful for
 **    a fisherman who harvests fish, but it all turns to food at the
 **    depot.
 **
-**  resource_info::FinalResourceConversionRate
+**  resource_info::final_resource_conversion_rate
 **
 **    The rate at which the resource is converted to the final resource at the depot. Useful for
 **    silver mines returning a lower amount of gold.

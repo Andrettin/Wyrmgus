@@ -439,7 +439,7 @@ public:
 		const wyrmgus::unit_type &type = *unit->Type;
 		//Wyrmgus start
 //		return (type.GivesResource == resource
-		return ((unit->GivesResource == resource || (!only_same && unit->GivesResource != TradeCost && wyrmgus::resource::get_all()[unit->GivesResource]->FinalResource == resource) || (include_luxury && wyrmgus::resource::get_all()[unit->GivesResource]->LuxuryResource))
+		return ((unit->GivesResource == resource || (!only_same && unit->GivesResource != TradeCost && wyrmgus::resource::get_all()[unit->GivesResource]->get_final_resource()->get_index() == resource) || (include_luxury && wyrmgus::resource::get_all()[unit->GivesResource]->LuxuryResource))
 		//Wyrmgus end
 				&& unit->ResourcesHeld != 0
 				//Wyrmgus start
@@ -571,10 +571,10 @@ void ResourceUnitFinder::ResourceUnitFinder_Cost::SetFrom(const CUnit &mine, con
 
 	distance = deposit ? mine.MapDistanceTo(*deposit) : 0;
 	//Wyrmgus start
-	distance = distance * 100 / resource->FinalResourceConversionRate;
+	distance = distance * 100 / resource->get_final_resource_conversion_rate();
 	
 	//alter the distance score by the conversion rate, so that the unit will prefer resources with better conversion rates, but without going for ones that are too far away
-	int price_modifier = worker.Player->GetResourcePrice(resource->FinalResource) * resource->FinalResourceConversionRate / 100;
+	int price_modifier = worker.Player->GetResourcePrice(resource->get_final_resource()->get_index()) * resource->get_final_resource_conversion_rate() / 100;
 	if (resource->InputResource) {
 		price_modifier -= worker.Player->GetResourcePrice(resource->InputResource);
 	}

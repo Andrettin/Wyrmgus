@@ -2123,15 +2123,10 @@ static int CclDefineResource(lua_State *l)
 		} else if (!strcmp(value, "ActionName")) {
 			resource->action_name = LuaToString(l, -1);
 		} else if (!strcmp(value, "FinalResource")) {
-			std::string final_resource_ident = LuaToString(l, -1);
-			int final_resource_id = GetResourceIdByName(final_resource_ident.c_str());
-			if (final_resource_id == -1) {
-				LuaError(l, "Resource \"%s\" doesn't exist." _C_ final_resource_ident.c_str());
-			}
-			resource->FinalResource = final_resource_id;
-			wyrmgus::resource::get_all()[final_resource_id]->ChildResources.push_back(resource);
+			const std::string final_resource_ident = LuaToString(l, -1);
+			resource->final_resource = wyrmgus::resource::get(final_resource_ident);
 		} else if (!strcmp(value, "FinalResourceConversionRate")) {
-			resource->FinalResourceConversionRate = LuaToNumber(l, -1);
+			resource->final_resource_conversion_rate = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "LuxuryResource")) {
 			resource->LuxuryResource = LuaToBoolean(l, -1);
 			LuxuryResources.push_back(resource_id);

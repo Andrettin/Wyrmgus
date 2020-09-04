@@ -1566,14 +1566,14 @@ static void AiCollectResources()
 			const COrder_Resource &order = *static_cast<COrder_Resource *>(unit.CurrentOrder());
 			//Wyrmgus start
 //			const int c = order.GetCurrentResource();
-			int c = wyrmgus::resource::get_all()[order.GetCurrentResource()]->FinalResource;
-			if (wyrmgus::resource::get_all()[c]->LuxuryResource) {
-				num_units_assigned[c]++;
-				c = CopperCost;
+			const wyrmgus::resource *cost_resource = wyrmgus::resource::get_all()[order.GetCurrentResource()]->get_final_resource();
+			if (cost_resource->LuxuryResource) {
+				num_units_assigned[cost_resource->get_index()]++;
+				cost_resource = wyrmgus::resource::get_all()[CopperCost];
 			}
 			//Wyrmgus end
-			units_assigned[c].push_back(&unit);
-			num_units_assigned[c]++;
+			units_assigned[cost_resource->get_index()].push_back(&unit);
+			num_units_assigned[cost_resource->get_index()]++;
 			total_harvester++;
 			continue;
 		}

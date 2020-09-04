@@ -1868,7 +1868,7 @@ std::string EvalString(const StringDesc *s)
 					conversion_rates += " to ";
 					conversion_rates += wyrmgus::resource::get_all()[(**resource)]->get_name();
 					conversion_rates += " Conversion Rate: ";
-					conversion_rates += std::to_string(child_resource->FinalResourceConversionRate);
+					conversion_rates += std::to_string(child_resource->get_final_resource_conversion_rate());
 					conversion_rates += "%";
 				}
 				return conversion_rates;

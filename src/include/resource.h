@@ -82,6 +82,8 @@ class resource final : public named_data_entry, public data_type<resource>
 
 	Q_PROPERTY(int default_income MEMBER default_income READ get_default_income)
 	Q_PROPERTY(int default_amount MEMBER default_amount READ get_default_amount)
+	Q_PROPERTY(wyrmgus::resource* final_resource MEMBER final_resource)
+	Q_PROPERTY(int final_resource_conversion_rate MEMBER final_resource_conversion_rate READ get_final_resource_conversion_rate)
 	Q_PROPERTY(int base_price MEMBER base_price READ get_base_price)
 
 public:
@@ -122,6 +124,20 @@ public:
 		return this->default_amount;
 	}
 
+	const resource *get_final_resource() const
+	{
+		if (this->final_resource != nullptr) {
+			return this->final_resource;
+		}
+
+		return this;
+	}
+
+	int get_final_resource_conversion_rate() const
+	{
+		return this->final_resource_conversion_rate;
+	}
+
 	int get_base_price() const
 	{
 		return this->base_price;
@@ -138,9 +154,9 @@ private:
 	int default_amount = 1000;
 public:
 	int DefaultMaxAmount = -1;
-	int FinalResource = -1;
-	int FinalResourceConversionRate = 100;
 private:
+	resource *final_resource = nullptr;
+	int final_resource_conversion_rate = 100;
 	int base_price = 0;
 public:
 	int DemandElasticity = 100;

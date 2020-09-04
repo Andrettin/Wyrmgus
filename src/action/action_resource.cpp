@@ -1329,8 +1329,8 @@ int COrder_Resource::MoveToDepot(CUnit &unit)
 	}
 
 	// Update resource.
-	const int rindex = wyrmgus::resource::get_all()[this->CurrentResource]->FinalResource;
-	int resource_change = unit.ResourcesHeld * wyrmgus::resource::get_all()[this->CurrentResource]->FinalResourceConversionRate / 100;
+	const wyrmgus::resource *resource = wyrmgus::resource::get_all()[this->CurrentResource]->get_final_resource();
+	const int resource_change = unit.ResourcesHeld * wyrmgus::resource::get_all()[this->CurrentResource]->get_final_resource_conversion_rate() / 100;
 	int processed_resource_change = (resource_change * player.Incomes[this->CurrentResource]) / 100;
 	
 	if (player.AiEnabled) {
@@ -1344,9 +1344,9 @@ int COrder_Resource::MoveToDepot(CUnit &unit)
 		}
 	}
 	
-	player.change_resource(wyrmgus::resource::get_all()[rindex], processed_resource_change, true);
-	player.TotalResources[rindex] += processed_resource_change;
-	player.pay_overlord_tax(wyrmgus::resource::get_all()[rindex], processed_resource_change);
+	player.change_resource(resource, processed_resource_change, true);
+	player.TotalResources[resource->get_index()] += processed_resource_change;
+	player.pay_overlord_tax(resource, processed_resource_change);
 	
 	//give XP to the worker according to how much was gathered, based on their base price in relation to gold
 	int xp_gained = unit.ResourcesHeld;
@@ -1357,7 +1357,7 @@ int COrder_Resource::MoveToDepot(CUnit &unit)
 	for (const auto &objective : player.get_quest_objectives()) {
 		const wyrmgus::quest_objective *quest_objective = objective->get_quest_objective();
 		if (quest_objective->get_objective_type() == wyrmgus::objective_type::gather_resource) {
-			if (quest_objective->Resource == rindex) {
+			if (quest_objective->Resource == resource->get_index()) {
 				objective->Counter = std::min(objective->Counter + processed_resource_change, quest_objective->get_quantity());
 			} else if (quest_objective->Resource == this->CurrentResource) {
 				objective->Counter = std::min(objective->Counter + unit.ResourcesHeld, quest_objective->get_quantity());
