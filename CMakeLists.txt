@@ -780,6 +780,7 @@ set(stratagus_ui_HDRS
 	src/ui/icon_base.h
 	src/ui/interface.h
 	src/ui/popup.h
+	src/ui/resource_icon.h
 	src/ui/statusline.h
 	src/ui/ui.h
 	src/ui/uitimer.h

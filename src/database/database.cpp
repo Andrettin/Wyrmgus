@@ -83,6 +83,7 @@
 #include "ui/cursor.h"
 #include "ui/cursor_type.h"
 #include "ui/icon.h"
+#include "ui/resource_icon.h"
 #include "unit/construction.h"
 #include "unit/historical_unit.h"
 #include "unit/unit_class.h"
@@ -272,6 +273,8 @@ QVariant database::process_sml_property_value(const sml_property &property, cons
 			new_property_value = QVariant::fromValue(religion::get(property.get_value()));
 		} else if (property_class_name == "wyrmgus::resource*") {
 			new_property_value = QVariant::fromValue(resource::get(property.get_value()));
+		} else if (property_class_name == "wyrmgus::resource_icon*") {
+			new_property_value = QVariant::fromValue(resource_icon::get(property.get_value()));
 		} else if (property_class_name == "wyrmgus::site*") {
 			new_property_value = QVariant::fromValue(site::get(property.get_value()));
 		} else if (property_class_name == "wyrmgus::sound*") {
