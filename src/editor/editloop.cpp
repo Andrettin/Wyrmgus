@@ -710,8 +710,8 @@ static void CalculateMaxIconSize()
 		Assert(type->Icon.Icon);
 		const wyrmgus::icon &icon = *type->Icon.Icon;
 
-		IconWidth = std::max(IconWidth, icon.G->Width);
-		IconHeight = std::max(IconHeight, icon.G->Height);
+		IconWidth = std::max(IconWidth, icon.get_graphics()->Width);
+		IconHeight = std::max(IconHeight, icon.get_graphics()->Height);
 	}
 }
 
@@ -886,7 +886,7 @@ static void DrawUnitIcons()
 //			Video.DrawRectangleClip(ColorGreen, x + 1, y + 1,
 //									icon.G->Width - 2, icon.G->Height - 2);
 			Video.DrawRectangleClip(ColorGreen, x, y,
-									icon.G->Width, icon.G->Height);
+									icon.get_graphics()->Width, icon.get_graphics()->Height);
 			//Wyrmgus end
 		}
 		if (i == Editor.CursorUnitIndex) {
@@ -2257,9 +2257,9 @@ static void EditorCallbackMouse(const PixelPos &pos)
 
 	// Handle buttons
 	if (UI.InfoPanel.X + 11 * scale_factor < CursorScreenPos.x
-		&& CursorScreenPos.x < UI.InfoPanel.X + 11 * scale_factor + Editor.Select.Icon->G->Width
+		&& CursorScreenPos.x < UI.InfoPanel.X + 11 * scale_factor + Editor.Select.Icon->get_graphics()->Width
 		&& UI.InfoPanel.Y + 7 * scale_factor < CursorScreenPos.y
-		&& CursorScreenPos.y < UI.InfoPanel.Y + 7 * scale_factor + Editor.Select.Icon->G->Width) {
+		&& CursorScreenPos.y < UI.InfoPanel.Y + 7 * scale_factor + Editor.Select.Icon->get_graphics()->Width) {
 		// FIXME: what is this button?
 		ButtonAreaUnderCursor = -1;
 		ButtonUnderCursor = SelectButton;
@@ -2268,9 +2268,9 @@ static void EditorCallbackMouse(const PixelPos &pos)
 		return;
 	}
 	if (UI.InfoPanel.X + 11 * scale_factor + get_unit_icon_x() < CursorScreenPos.x
-		&& CursorScreenPos.x < UI.InfoPanel.X + 11 * scale_factor + get_unit_icon_x() + Editor.Units.Icon->G->Width
+		&& CursorScreenPos.x < UI.InfoPanel.X + 11 * scale_factor + get_unit_icon_x() + Editor.Units.Icon->get_graphics()->Width
 		&& UI.InfoPanel.Y + 7 * scale_factor + get_unit_icon_y() < CursorScreenPos.y
-		&& CursorScreenPos.y < UI.InfoPanel.Y + 7 * scale_factor + get_unit_icon_y() + Editor.Units.Icon->G->Height) {
+		&& CursorScreenPos.y < UI.InfoPanel.Y + 7 * scale_factor + get_unit_icon_y() + Editor.Units.Icon->get_graphics()->Height) {
 		ButtonAreaUnderCursor = -1;
 		ButtonUnderCursor = UnitButton;
 		CursorOn = cursor_on::button;
@@ -2290,8 +2290,8 @@ static void EditorCallbackMouse(const PixelPos &pos)
 		}
 	}
 
-	int StartUnitWidth = Editor.StartUnit ? Editor.StartUnit->Icon.Icon->G->Width : wyrmgus::defines::get()->get_scaled_tile_width() + 7 * scale_factor;
-	int StartUnitHeight = Editor.StartUnit ? Editor.StartUnit->Icon.Icon->G->Height : wyrmgus::defines::get()->get_scaled_tile_height() + 7 * scale_factor;
+	int StartUnitWidth = Editor.StartUnit ? Editor.StartUnit->Icon.Icon->get_graphics()->Width : wyrmgus::defines::get()->get_scaled_tile_width() + 7 * scale_factor;
+	int StartUnitHeight = Editor.StartUnit ? Editor.StartUnit->Icon.Icon->get_graphics()->Height : wyrmgus::defines::get()->get_scaled_tile_height() + 7 * scale_factor;
 	if (UI.InfoPanel.X + 11 * scale_factor + get_start_icon_x() < CursorScreenPos.x
 		&& CursorScreenPos.x < UI.InfoPanel.X + 11 * scale_factor + get_start_icon_x() + StartUnitWidth
 		&& UI.InfoPanel.Y + 5 * scale_factor + get_start_icon_y() < CursorScreenPos.y

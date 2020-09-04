@@ -40,47 +40,34 @@
 
 namespace wyrmgus {
 
-icon::icon(const std::string &identifier) : data_entry(identifier)
+icon::icon(const std::string &identifier) : icon_base(identifier)
 {
-}
-
-icon::~icon()
-{
-	CPlayerColorGraphic::Free(this->G);
 }
 
 void icon::initialize()
 {
-	if (!this->get_file().empty() && this->G == nullptr) {
-		const QSize &icon_size = defines::get()->get_icon_size();
-		this->G = CPlayerColorGraphic::New(this->get_file().string(), icon_size, this->get_conversible_player_color());
+	if (!this->get_file().empty() && this->get_graphics() == nullptr) {
+		const QSize &icon_size = this->get_size();
+		this->set_graphics(CPlayerColorGraphic::New(this->get_file().string(), icon_size, this->get_conversible_player_color()));
 	}
 
-	this->load();
-
-	data_entry::initialize();
+	icon_base::initialize();
 }
 
-void icon::set_file(const std::filesystem::path &filepath)
+const QSize &icon::get_size() const
 {
-	if (filepath == this->get_file()) {
-		return;
-	}
-
-	this->file = database::get_graphics_path(this->get_module()) / filepath;
+	return defines::get()->get_icon_size();
 }
 
-void icon::load()
+bool icon::is_grayscale_enabled() const
 {
-	if (this->G == nullptr) {
-		throw std::runtime_error("Icon \"" + this->get_identifier() + "\" has no graphics.");
-	}
+	return Preference.GrayscaleIcons;
+}
 
-	this->G->Load(Preference.GrayscaleIcons, defines::get()->get_scale_factor());
-	if (this->get_frame() >= G->NumFrames) {
-		DebugPrint("Invalid icon frame: %s - %d\n" _C_ this->get_identifier().c_str() _C_ this->get_frame());
-		this->frame = 0;
-	}
+
+CPlayerColorGraphic *icon::get_graphics() const
+{
+	return static_cast<CPlayerColorGraphic *>(icon_base::get_graphics());
 }
 
 /**
@@ -92,9 +79,9 @@ void icon::load()
 void icon::DrawIcon(const PixelPos &pos, const player_color *player_color) const
 {
 	if (player_color != nullptr) {
-		this->G->DrawPlayerColorFrameClip(player_color, this->get_frame(), pos.x, pos.y, nullptr);
+		this->get_graphics()->DrawPlayerColorFrameClip(player_color, this->get_frame(), pos.x, pos.y, nullptr);
 	} else {
-		this->G->DrawFrameClip(this->get_frame(), pos.x, pos.y);
+		this->get_graphics()->DrawFrameClip(this->get_frame(), pos.x, pos.y);
 	}
 }
 
@@ -105,7 +92,7 @@ void icon::DrawIcon(const PixelPos &pos, const player_color *player_color) const
 */
 void icon::DrawGrayscaleIcon(const PixelPos &pos) const
 {
-	this->G->DrawGrayscaleFrameClip(this->get_frame(), pos.x, pos.y);
+	this->get_graphics()->DrawGrayscaleFrameClip(this->get_frame(), pos.x, pos.y);
 }
 
 /**
@@ -117,9 +104,9 @@ void icon::DrawGrayscaleIcon(const PixelPos &pos) const
 void icon::DrawCooldownSpellIcon(const PixelPos &pos, const int percent) const
 {
 	// TO-DO: implement more effect types (clock-like)
-	this->G->DrawGrayscaleFrameClip(this->get_frame(), pos.x, pos.y);
-	const int height = (G->Height * (100 - percent)) / 100;
-	this->G->DrawSubClip(G->frame_map[this->get_frame()].x, G->frame_map[this->get_frame()].y + G->Height - height, G->Width, height, pos.x, pos.y + G->Height - height);
+	this->get_graphics()->DrawGrayscaleFrameClip(this->get_frame(), pos.x, pos.y);
+	const int height = (this->get_graphics()->Height * (100 - percent)) / 100;
+	this->get_graphics()->DrawSubClip(this->get_graphics()->frame_map[this->get_frame()].x, this->get_graphics()->frame_map[this->get_frame()].y + this->get_graphics()->Height - height, this->get_graphics()->Width, height, pos.x, pos.y + this->get_graphics()->Height - height);
 }
 
 /**
@@ -135,7 +122,7 @@ void icon::DrawUnitIcon(const ButtonStyle &style, unsigned flags,
 {
 	ButtonStyle s(style);
 
-	s.Default.Sprite = s.Hover.Sprite = s.Clicked.Sprite = this->G;
+	s.Default.Sprite = s.Hover.Sprite = s.Clicked.Sprite = this->get_graphics();
 	//Wyrmgus end
 	s.Default.Frame = s.Hover.Frame = s.Clicked.Frame = this->get_frame();
 	if (!(flags & IconSelected) && (flags & IconAutoCast)) {

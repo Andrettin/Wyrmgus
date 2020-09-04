@@ -43,6 +43,7 @@
 #endif
 
 class CFile;
+class CPlayer;
 class CPlayerColorGraphic;
 struct lua_State;
 #ifdef USE_MNG

@@ -177,7 +177,7 @@ static void UiDrawLifeBar(const CUnit &unit, int x, int y)
 		hBar = 5 * scale_factor;
 		hAll = 7 * scale_factor;
 	}
-	y += unit.Type->Icon.Icon->G->Height;
+	y += unit.Type->Icon.Icon->get_graphics()->Height;
 	//Wyrmgus start
 	/*
 	Video.FillRectangleClip(ColorBlack, x - 4, y + 2,
@@ -186,10 +186,10 @@ static void UiDrawLifeBar(const CUnit &unit, int x, int y)
 	if (wyrmgus::defines::get()->get_bar_frame_graphics() != nullptr) {
 		wyrmgus::defines::get()->get_bar_frame_graphics()->DrawClip(x + (-2 - 4) * scale_factor, y + (4 - 4) * scale_factor);
 		Video.FillRectangleClip(ColorBlack, x - 2 * scale_factor, y + 4 * scale_factor,
-			unit.Type->Icon.Icon->G->Width + (6 - 2) * scale_factor, hBar);
+			unit.Type->Icon.Icon->get_graphics()->Width + (6 - 2) * scale_factor, hBar);
 	} else {
 		Video.FillRectangleClip(ColorBlack, x - 4 * scale_factor, y + 2 * scale_factor,
-			unit.Type->Icon.Icon->G->Width + 8 * scale_factor, hAll);
+			unit.Type->Icon.Icon->get_graphics()->Width + 8 * scale_factor, hAll);
 	}
 	//Wyrmgus end
 
@@ -223,7 +223,7 @@ static void UiDrawLifeBar(const CUnit &unit, int x, int y)
 			//Wyrmgus end
 		}
 
-		f = (f * (unit.Type->Icon.Icon->G->Width + 6 * scale_factor)) / 100;
+		f = (f * (unit.Type->Icon.Icon->get_graphics()->Width + 6 * scale_factor)) / 100;
 		Video.FillRectangleClip(color, x - 2 * scale_factor, y + 4 * scale_factor,
 			f > 1 ? f - 2 : 0, hBar);
 		//Wyrmgus start
@@ -244,8 +244,8 @@ static void UiDrawLifeBar(const CUnit &unit, int x, int y)
 static void UiDrawManaBar(const CUnit &unit, int x, int y)
 {
 	// FIXME: add icon borders
-	y += unit.Type->Icon.Icon->G->Height;
-	Video.FillRectangleClip(ColorBlack, x, y + 3, unit.Type->Icon.Icon->G->Width, 4);
+	y += unit.Type->Icon.Icon->get_graphics()->Height;
+	Video.FillRectangleClip(ColorBlack, x, y + 3, unit.Type->Icon.Icon->get_graphics()->Width, 4);
 
 	//Wyrmgus start
 //	if (unit.Stats->Variables[MANA_INDEX].Max) {
@@ -255,7 +255,7 @@ static void UiDrawManaBar(const CUnit &unit, int x, int y)
 //		int f = (100 * unit.Variable[MANA_INDEX].Value) / unit.Variable[MANA_INDEX].Max;
 		int f = (100 * unit.GetModifiedVariable(MANA_INDEX, VariableValue)) / unit.GetModifiedVariable(MANA_INDEX, VariableMax);
 		//Wyrmgus end
-		f = (f * (unit.Type->Icon.Icon->G->Width)) / 100;
+		f = (f * (unit.Type->Icon.Icon->get_graphics()->Width)) / 100;
 		Video.FillRectangleClip(ColorBlue, x + 1, y + 3 + 1, f, 2);
 	}
 }

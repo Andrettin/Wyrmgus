@@ -27,9 +27,8 @@
 
 #pragma once
 
-#include "database/data_entry.h"
 #include "database/data_type.h"
-#include "vec2i.h"
+#include "ui/icon_base.h"
 
 /**
 **  @class IconConfig icon.h
@@ -58,10 +57,7 @@ static constexpr int IconAutoCast = 16; //auto cast icon
 static constexpr int IconCommandButton = 32; //if the icon is a command button
 //Wyrmgus end
 
-class CConfigData;
-class CGraphic;
 class CPlayerColorGraphic;
-class CPlayer;
 class ButtonStyle;
 struct lua_State;
 
@@ -72,12 +68,10 @@ namespace wyrmgus {
 class player_color;
 
 /// Icon: rectangle image used in menus
-class icon final : public data_entry, public data_type<icon>
+class icon final : public icon_base, public data_type<icon>
 {
 	Q_OBJECT
 
-	Q_PROPERTY(QString file READ get_file_qstring)
-	Q_PROPERTY(int frame MEMBER frame READ get_frame)
 	Q_PROPERTY(wyrmgus::player_color* conversible_player_color MEMBER conversible_player_color READ get_conversible_player_color)
 
 public:
@@ -91,43 +85,18 @@ public:
 	}
 
 	explicit icon(const std::string &identifier);
-	~icon();
 
 	virtual void initialize() override;
 
-	virtual void check() const override
-	{
-		if (this->get_file().empty()) {
-			throw std::runtime_error("Icon \"" + this->get_identifier() + "\" has no image file associated with it.");
-		}
-	}
-
-	const std::filesystem::path &get_file() const
-	{
-		return this->file;
-	}
-
-	void set_file(const std::filesystem::path &filepath);
-
-	QString get_file_qstring() const
-	{
-		return QString::fromStdString(this->get_file().string());
-	}
-
-	Q_INVOKABLE void set_file(const std::string &filepath)
-	{
-		this->set_file(std::filesystem::path(filepath));
-	}
-
-	int get_frame() const
-	{
-		return this->frame;
-	}
+	virtual const QSize &get_size() const override;
+	virtual bool is_grayscale_enabled() const override;
 
 	player_color *get_conversible_player_color() const
 	{
 		return this->conversible_player_color;
 	}
+
+	CPlayerColorGraphic *get_graphics() const;
 
 	/// Draw icon
 	void DrawIcon(const PixelPos &pos, const player_color *player_color = nullptr) const;
@@ -140,13 +109,6 @@ public:
 					  unsigned flags, const PixelPos &pos, const std::string &text, const player_color *player = nullptr, bool transparent = false, bool grayscale = false, int show_percent = 100) const;
 
 private:
-	void load();
-
-public:
-	CPlayerColorGraphic *G = nullptr; //graphic data
-private:
-	std::filesystem::path file;
-	int frame = 0; //frame number in the icon's image
 	player_color *conversible_player_color = nullptr;
 
 	friend int ::CclDefineIcon(lua_State *l);

@@ -55,7 +55,7 @@ int main(int argc, char **argv)
 			if (!obj && url == objUrl) {
 				QCoreApplication::exit(-1);
 			}
-			}, Qt::QueuedConnection);
+		}, Qt::QueuedConnection);
 		engine.load(url);
 
 		const int result = app.exec();

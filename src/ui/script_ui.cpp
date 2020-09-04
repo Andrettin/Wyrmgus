@@ -1241,8 +1241,8 @@ static int CclDefineIcon(lua_State *l)
 
 	wyrmgus::icon *icon = wyrmgus::icon::add(ident, nullptr);
 	icon->file = file;
-	icon->frame = frame;
-	icon->G = CPlayerColorGraphic::New(icon->get_file().string(), size, nullptr);
+	icon->set_frame(frame);
+	icon->set_graphics(CPlayerColorGraphic::New(icon->get_file().string(), size, nullptr));
 
 	return 0;
 }
