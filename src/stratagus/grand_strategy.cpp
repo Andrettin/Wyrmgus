@@ -42,6 +42,7 @@
 #include "sound/sound_server.h"
 #include "ui/cursor.h"
 #include "ui/interface.h"
+#include "ui/resource_icon.h"
 #include "ui/ui.h"
 #include "unit/unit.h"
 #include "unit/unit_class.h"
@@ -83,8 +84,9 @@ void CGrandStrategyGame::DrawInterface()
 			int x = 154 + (100 * i);
 			int y = 0;
 			const wyrmgus::resource *resource = wyrmgus::resource::get_all()[stored_resources[i]];
-			CGraphic *icon_graphics = resource->get_icon_graphics();
-			icon_graphics->DrawFrameClip(0, x, y, nullptr);
+			const wyrmgus::resource_icon *icon = resource->get_icon();
+			CGraphic *icon_graphics = icon->get_graphics();
+			icon_graphics->DrawFrameClip(icon->get_frame(), x, y, nullptr);
 			
 			int quantity_stored = this->PlayerFaction->Resources[stored_resources[i]];
 			int income = 0;

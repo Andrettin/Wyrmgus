@@ -33,19 +33,12 @@
 
 namespace wyrmgus {
 
-resource::~resource()
-{
-	CGraphic::Free(this->icon_graphics);
-}
-
 void resource::process_sml_property(const sml_property &property)
 {
 	const std::string &key = property.get_key();
 	const std::string &value = property.get_value();
 
-	if (key == "icon_file") {
-		this->icon_file = database::get_graphics_path(this->get_module()) / value;
-	} else if (key == "action_name") {
+	if (key == "action_name") {
 		this->action_name = value;
 	} else {
 		data_entry::process_sml_property(property);
@@ -56,11 +49,6 @@ void resource::initialize()
 {
 	if (this->final_resource != nullptr) {
 		this->final_resource->ChildResources.push_back(this);
-	}
-
-	if (!this->icon_file.empty()) {
-		this->icon_graphics = CGraphic::New(this->icon_file, defines::get()->get_resource_icon_size());
-		this->icon_graphics->Load(false, wyrmgus::defines::get()->get_scale_factor());
 	}
 
 	data_entry::initialize();

@@ -316,8 +316,6 @@ public:
 class CResourceInfo
 {
 public:
-	CGraphic *G = nullptr;	/// icon graphic
-	int IconFrame = 0;	/// icon frame
 	int IconX = -1;		/// icon X position
 	int IconY = -1;		/// icon Y position
 	int IconWidth = -1;	/// icon W size

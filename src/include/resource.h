@@ -76,10 +76,13 @@ static constexpr int FreeWorkersCount = MaxCosts + 3;
 
 namespace wyrmgus {
 
+class resource_icon;
+
 class resource final : public named_data_entry, public data_type<resource>
 {
 	Q_OBJECT
 
+	Q_PROPERTY(wyrmgus::resource_icon* icon MEMBER icon READ get_icon)
 	Q_PROPERTY(int default_income MEMBER default_income READ get_default_income)
 	Q_PROPERTY(int default_amount MEMBER default_amount READ get_default_amount)
 	Q_PROPERTY(wyrmgus::resource* final_resource MEMBER final_resource)
@@ -94,8 +97,6 @@ public:
 	{
 	}
 
-	~resource();
-
 	virtual void process_sml_property(const sml_property &property) override;
 	virtual void initialize() override;
 
@@ -104,9 +105,9 @@ public:
 		return this->index;
 	}
 
-	CGraphic *get_icon_graphics() const
+	resource_icon *get_icon() const
 	{
-		return this->icon_graphics;
+		return this->icon;
 	}
 
 	const std::string &get_action_name() const
@@ -147,7 +148,7 @@ public:
 
 private:
 	int index = -1;
-	CGraphic *icon_graphics = nullptr;
+	resource_icon *icon = nullptr;
 	std::filesystem::path icon_file;
 	std::string action_name;
 	int default_income = 100;

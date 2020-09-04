@@ -33,6 +33,7 @@
 
 #include "database/defines.h"
 #include "ui/interface.h"
+#include "ui/resource_icon.h"
 #include "ui/ui.h"
 #include "video/font.h"
 #include "video/video.h"
@@ -78,9 +79,6 @@ void CStatusLine::SetCosts(int mana, int food, const int *costs)
 	Costs[FoodCost] = food;
 }
 
-/**
-**  Clear costs in status line.
-*/
 void CStatusLine::ClearCosts()
 {
 	SetCosts(0, 0, nullptr);
@@ -99,7 +97,8 @@ void CStatusLine::DrawCosts()
 	int x = UI.StatusLine.TextX + 268;
 	CLabel label(wyrmgus::defines::get()->get_game_font());
 	if (this->Costs[ManaResCost]) {
-		UI.Resources[ManaResCost].G->DrawFrameClip(UI.Resources[ManaResCost].IconFrame, x, UI.StatusLine.TextY);
+		const wyrmgus::resource_icon *mana_icon = wyrmgus::defines::get()->get_mana_icon();
+		mana_icon->get_graphics()->DrawFrameClip(mana_icon->get_frame(), x, UI.StatusLine.TextY);
 
 		x += 20;
 		x += label.Draw(x, UI.StatusLine.TextY, this->Costs[ManaResCost]);
@@ -108,10 +107,23 @@ void CStatusLine::DrawCosts()
 	for (unsigned int i = 1; i <= MaxCosts; ++i) {
 		if (this->Costs[i]) {
 			x += 5;
-			const wyrmgus::resource *resource = wyrmgus::resource::get_all()[i];
-			CGraphic *icon_graphics = resource->get_icon_graphics();
-			if (icon_graphics != nullptr) {
-				icon_graphics->DrawFrameClip(UI.Resources[i].IconFrame, x, UI.StatusLine.TextY);
+
+			const wyrmgus::resource_icon *icon = nullptr;
+
+			switch (i) {
+				case FoodCost:
+					icon = wyrmgus::defines::get()->get_food_icon();
+					break;
+				default: {
+					const wyrmgus::resource *resource = wyrmgus::resource::get_all()[i];
+					icon = resource->get_icon();
+					break;
+				}
+			}
+
+			if (icon != nullptr) {
+				CGraphic *icon_graphics = icon->get_graphics();
+				icon_graphics->DrawFrameClip(icon->get_frame(), x, UI.StatusLine.TextY);
 				x += 20;
 			}
 			x += label.Draw(x, UI.StatusLine.TextY, this->Costs[i]);
@@ -122,9 +134,6 @@ void CStatusLine::DrawCosts()
 	}
 }
 
-/**
-**  Clear status line.
-*/
 void CStatusLine::Clear()
 {
 	if (KeyState != KeyStateInput) {

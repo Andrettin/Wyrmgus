@@ -69,6 +69,7 @@
 #include "ui/cursor.h"
 #include "ui/icon.h"
 #include "ui/interface.h"
+#include "ui/resource_icon.h"
 #include "ui/ui.h"
 #include "unit/unit.h"
 #include "unit/unit_type.h"
@@ -790,16 +791,32 @@ void DrawResources()
 	CLabel label(wyrmgus::defines::get()->get_game_font());
 
 	for (const wyrmgus::resource *resource : wyrmgus::resource::get_all()) {
-		CGraphic *icon_graphics = resource->get_icon_graphics();
+		const wyrmgus::resource_icon *icon = resource->get_icon();
 		const int index = resource->get_index();
-		if (icon_graphics != nullptr && UI.Resources[index].IconX != -1) {
-			icon_graphics->DrawFrameClip(UI.Resources[index].IconFrame, UI.Resources[index].IconX, UI.Resources[index].IconY);
+		if (icon != nullptr && UI.Resources[index].IconX != -1) {
+			CGraphic *icon_graphics = icon->get_graphics();
+			icon_graphics->DrawFrameClip(icon->get_frame(), UI.Resources[index].IconX, UI.Resources[index].IconY);
 		}
 	}
 
 	// Draw all icons of resource.
 	for (int i = FoodCost; i <= FreeWorkersCount; ++i) {
-		if (UI.Resources[i].G == nullptr) {
+		const wyrmgus::resource_icon *icon = nullptr;
+		switch (i) {
+			case FoodCost:
+				icon = wyrmgus::defines::get()->get_food_icon();
+				break;
+			case ScoreCost:
+				icon = wyrmgus::defines::get()->get_score_icon();
+				break;
+			case ManaResCost:
+				icon = wyrmgus::defines::get()->get_mana_icon();
+				break;
+			default:
+				break;
+		}
+
+		if (icon == nullptr) {
 			continue;
 		}
 
@@ -807,7 +824,7 @@ void DrawResources()
 			continue;
 		}
 
-		UI.Resources[i].G->DrawFrameClip(UI.Resources[i].IconFrame, UI.Resources[i].IconX, UI.Resources[i].IconY);
+		icon->get_graphics()->DrawFrameClip(icon->get_frame(), UI.Resources[i].IconX, UI.Resources[i].IconY);
 	}
 	for (int i = 0; i < MaxCosts; ++i) {
 		if (UI.Resources[i].TextX != -1) {
@@ -1110,8 +1127,8 @@ void DrawPopups()
 		
 	//draw a popup when hovering over a resource icon
 	for (const wyrmgus::resource *resource : wyrmgus::resource::get_all()) {
-		const CGraphic *icon_graphics = resource->get_icon_graphics();
-		if (icon_graphics == nullptr) {
+		const wyrmgus::resource_icon *icon = resource->get_icon();
+		if (icon == nullptr) {
 			continue;
 		}
 
@@ -1120,7 +1137,7 @@ void DrawPopups()
 			continue;
 		}
 
-		if (CursorScreenPos.x >= UI.Resources[index].IconX && CursorScreenPos.x < (UI.Resources[index].TextX + UI.Resources[index].Font->Width(UI.Resources[index].Text)) && CursorScreenPos.y >= UI.Resources[index].IconY && CursorScreenPos.y < (UI.Resources[index].IconY + icon_graphics->Height)) {
+		if (CursorScreenPos.x >= UI.Resources[index].IconX && CursorScreenPos.x < (UI.Resources[index].TextX + UI.Resources[index].Font->Width(UI.Resources[index].Text)) && CursorScreenPos.y >= UI.Resources[index].IconY && CursorScreenPos.y < (UI.Resources[index].IconY + icon->get_graphics()->Height)) {
 			//hackish way to make the popup appear correctly for the resource
 			auto ba = std::make_unique<wyrmgus::button>();
 			ba->Hint = resource->get_name();;
@@ -1133,7 +1150,8 @@ void DrawPopups()
 		}
 	}
 	
-	if (UI.Resources[FoodCost].G && CursorScreenPos.x >= UI.Resources[FoodCost].IconX && CursorScreenPos.x < (UI.Resources[FoodCost].TextX + UI.Resources[FoodCost].Font->Width(UI.Resources[FoodCost].Text)) && CursorScreenPos.y >= UI.Resources[FoodCost].IconY && CursorScreenPos.y < (UI.Resources[FoodCost].IconY + UI.Resources[FoodCost].G->Height)) {
+	const wyrmgus::resource_icon *food_icon = wyrmgus::defines::get()->get_food_icon();
+	if (food_icon != nullptr && CursorScreenPos.x >= UI.Resources[FoodCost].IconX && CursorScreenPos.x < (UI.Resources[FoodCost].TextX + UI.Resources[FoodCost].Font->Width(UI.Resources[FoodCost].Text)) && CursorScreenPos.y >= UI.Resources[FoodCost].IconY && CursorScreenPos.y < (UI.Resources[FoodCost].IconY + food_icon->get_graphics()->get_frame_height())) {
 		//hackish way to make the popup appear correctly
 		wyrmgus::button ba;
 		ba.Hint = _("Food");
@@ -1143,7 +1161,8 @@ void DrawPopups()
 		LastDrawnButtonPopup = nullptr;
 	}
 	
-	if (UI.Resources[ScoreCost].G && CursorScreenPos.x >= UI.Resources[ScoreCost].IconX && CursorScreenPos.x < (UI.Resources[ScoreCost].TextX + UI.Resources[ScoreCost].Font->Width(UI.Resources[ScoreCost].Text)) && CursorScreenPos.y >= UI.Resources[ScoreCost].IconY && CursorScreenPos.y < (UI.Resources[ScoreCost].IconY + UI.Resources[ScoreCost].G->Height)) {
+	const wyrmgus::resource_icon *score_icon = wyrmgus::defines::get()->get_score_icon();
+	if (score_icon != nullptr && CursorScreenPos.x >= UI.Resources[ScoreCost].IconX && CursorScreenPos.x < (UI.Resources[ScoreCost].TextX + UI.Resources[ScoreCost].Font->Width(UI.Resources[ScoreCost].Text)) && CursorScreenPos.y >= UI.Resources[ScoreCost].IconY && CursorScreenPos.y < (UI.Resources[ScoreCost].IconY + score_icon->get_graphics()->get_frame_height())) {
 		DrawGenericPopup(_("Score"), UI.Resources[ScoreCost].IconX, UI.Resources[ScoreCost].IconY + 16 * wyrmgus::defines::get()->get_scale_factor() + GameCursor->get_graphic()->getHeight() / 2, nullptr, nullptr, false);
 	}
 	

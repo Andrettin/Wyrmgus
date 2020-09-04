@@ -41,6 +41,7 @@
 #include "translate.h"
 //Wyrmgus end
 #include "ui/button.h"
+#include "ui/resource_icon.h"
 #include "ui/ui.h"
 //Wyrmgus start
 #include "unit/unit.h"
@@ -307,23 +308,36 @@
 			if (UI.Resources[i].IconWidth != -1)	{
 				popupWidth += (UI.Resources[i].IconWidth + 5 * scale_factor);
 			} else {
-				const CGraphic *icon_graphics = nullptr;
+				const wyrmgus::resource_icon *icon = nullptr;
 				if (i >= MaxCosts) {
-					icon_graphics = UI.Resources[i].G;
+					switch (i) {
+						case FoodCost:
+							icon = wyrmgus::defines::get()->get_food_icon();
+							break;
+						case ScoreCost:
+							icon = wyrmgus::defines::get()->get_score_icon();
+							break;
+						case ManaResCost:
+							icon = wyrmgus::defines::get()->get_mana_icon();
+							break;
+						default:
+							break;
+					}
 				} else {
 					const wyrmgus::resource *resource = wyrmgus::resource::get_all()[i];
-					icon_graphics = resource->get_icon_graphics();
+					icon = resource->get_icon();
 				}
 
-				if (icon_graphics != nullptr) {
-					popupWidth += (icon_graphics->Width + 5 * scale_factor);
+				if (icon != nullptr) {
+					popupWidth += (icon->get_graphics()->Width + 5 * scale_factor);
 				}
 			}
 			popupWidth += (font->Width(Costs[i]) + 5 * scale_factor);
 		}
 	}
+
 	if (Costs[ManaResCost]) {
-		const CGraphic *G = UI.Resources[ManaResCost].G;
+		const wyrmgus::resource_icon *icon = wyrmgus::defines::get()->get_mana_icon();
 		const wyrmgus::spell *spell = wyrmgus::spell::get_all()[button.Value];
 
 		if (spell->ManaCost) {
@@ -331,8 +345,8 @@
 			if (UI.Resources[ManaResCost].IconWidth != -1) {
 				popupWidth += (UI.Resources[ManaResCost].IconWidth + 5 * scale_factor);
 			} else {
-				if (G) {
-					popupWidth += (G->Width + 5 * scale_factor);
+				if (icon != nullptr) {
+					popupWidth += (icon->get_graphics()->Width + 5 * scale_factor);
 				}
 			}
 			popupWidth += font->Width(spell->ManaCost);
@@ -351,16 +365,28 @@
 	const wyrmgus::font *font = this->Font ? this->Font : wyrmgus::defines::get()->get_small_font();
 
 	for (unsigned int i = 1; i <= ManaResCost; ++i) {
-		const CGraphic *icon_graphics = nullptr;
+		const wyrmgus::resource_icon *icon = nullptr;
 		if (i >= MaxCosts) {
-			icon_graphics = UI.Resources[i].G;
+			switch (i) {
+				case FoodCost:
+					icon = wyrmgus::defines::get()->get_food_icon();
+					break;
+				case ScoreCost:
+					icon = wyrmgus::defines::get()->get_score_icon();
+					break;
+				case ManaResCost:
+					icon = wyrmgus::defines::get()->get_mana_icon();
+					break;
+				default:
+					break;
+			}
 		} else {
 			const wyrmgus::resource *resource = wyrmgus::resource::get_all()[i];
-			icon_graphics = resource->get_icon_graphics();
+			icon = resource->get_icon();
 		}
 
-		if (Costs[i] && icon_graphics != nullptr) {
-			popupHeight = std::max(icon_graphics->Height, popupHeight);
+		if (Costs[i] && icon != nullptr) {
+			popupHeight = std::max(icon->get_graphics()->Height, popupHeight);
 		}
 	}
 	return std::max(popupHeight, font->Height());
@@ -376,17 +402,30 @@
 		if (Costs[i]) {
 			int y_offset = 0;
 
-			CGraphic *icon_graphics = nullptr;
+			const wyrmgus::resource_icon *icon = nullptr;
 			if (i >= MaxCosts) {
-				icon_graphics = UI.Resources[i].G;
+				switch (i) {
+					case FoodCost:
+						icon = wyrmgus::defines::get()->get_food_icon();
+						break;
+					case ScoreCost:
+						icon = wyrmgus::defines::get()->get_score_icon();
+						break;
+					case ManaResCost:
+						icon = wyrmgus::defines::get()->get_mana_icon();
+						break;
+					default:
+						break;
+				}
 			} else {
 				const wyrmgus::resource *resource = wyrmgus::resource::get_all()[i];
-				icon_graphics = resource->get_icon_graphics();
+				icon = resource->get_icon();
 			}
 
-			if (icon_graphics != nullptr) {
+			if (icon != nullptr) {
 				int x_offset = UI.Resources[i].IconWidth;
-				icon_graphics->DrawFrameClip(UI.Resources[i].IconFrame,	x , y);
+				CGraphic *icon_graphics = icon->get_graphics();
+				icon_graphics->DrawFrameClip(icon->get_frame(),	x , y);
 				x += ((x_offset != -1 ? x_offset : icon_graphics->Width) + 5 * scale_factor);
 				y_offset = icon_graphics->Height;
 				y_offset -= label.Height();
@@ -396,17 +435,19 @@
 			x += 5 * scale_factor;
 		}
 	}
+
 	if (Costs[ManaResCost]) {
 		const wyrmgus::spell &spell = *wyrmgus::spell::get_all()[button.Value];
-		CGraphic *G = UI.Resources[ManaResCost].G;
+		const wyrmgus::resource_icon *icon = wyrmgus::defines::get()->get_mana_icon();
 		if (spell.ManaCost) {
 			int y_offset = 0;
-			if (G) {
+			if (icon != nullptr) {
 				int x_offset =  UI.Resources[ManaResCost].IconWidth;
 				x += 5 * scale_factor;
-				G->DrawFrameClip(UI.Resources[ManaResCost].IconFrame, x, y);
-				x += ((x_offset != -1 ? x_offset : G->Width) + 5 * scale_factor);
-				y_offset = G->Height;
+				CGraphic *icon_graphics = icon->get_graphics();
+				icon_graphics->DrawFrameClip(icon->get_frame(), x, y);
+				x += ((x_offset != -1 ? x_offset : icon_graphics->Width) + 5 * scale_factor);
+				y_offset = icon_graphics->Height;
 				y_offset -= font->Height();
 				y_offset /= 2;
 			}

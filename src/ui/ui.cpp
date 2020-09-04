@@ -233,12 +233,6 @@ void CUserInterface::Load()
 		this->Fillers.at(i).Load();
 	}
 
-	for (int i = 0; i <= FreeWorkersCount; ++i) {
-		if (this->Resources[i].G != nullptr) {
-			this->Resources[i].G->Load(false, wyrmgus::defines::get()->get_scale_factor());
-		}
-	}
-
 	if (InfoPanel.G) {
 		InfoPanel.G->Load(false, wyrmgus::defines::get()->get_scale_factor());
 	}
@@ -315,11 +309,6 @@ void CleanUserInterface()
 {
 	// Filler
 	UI.Fillers.clear();
-
-	// Resource Icons
-	for (int i = FoodCost; i <= FreeWorkersCount; ++i) {
-		CGraphic::Free(UI.Resources[i].G);
-	}
 
 	// Info Panel
 	CGraphic::Free(UI.InfoPanel.G);

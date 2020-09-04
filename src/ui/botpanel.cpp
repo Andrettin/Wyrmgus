@@ -76,6 +76,7 @@
 #include "ui/cursor_type.h"
 #include "ui/interface.h"
 #include "ui/popup.h"
+#include "ui/resource_icon.h"
 #include "unique_item.h"
 #include "unit/unit.h"
 #include "unit/unit_class.h"
@@ -901,7 +902,7 @@ void DrawGenericPopup(const std::string &popup_text, int x, int y, const wyrmgus
 			const int res = std::stoi(content_width_sub.substr(cost_symbol_pos + 5, content_width_sub.find(" ", cost_symbol_pos) - (cost_symbol_pos + 5) + 1));
 			line_width -= font->getWidth("COST_" + std::to_string(res));
 			const wyrmgus::resource *resource = wyrmgus::resource::get_all()[res];
-			line_width += resource->get_icon_graphics()->Width;
+			line_width += resource->get_icon()->get_graphics()->Width;
 		}
 		content_width = std::max(content_width, line_width);
 	}
@@ -998,8 +999,9 @@ void DrawGenericPopup(const std::string &popup_text, int x, int y, const wyrmgus
 			label.Draw(x, y_off, sub_first);
 			x_offset += font->getWidth(sub_first);
 			const wyrmgus::resource *resource = wyrmgus::resource::get_all()[res];
-			CGraphic *icon_graphics = resource->get_icon_graphics();
-			icon_graphics->DrawFrameClip(UI.Resources[res].IconFrame, x + x_offset, y + ((font->getHeight() - icon_graphics->Height) / 2), nullptr);
+			const wyrmgus::resource_icon *icon = resource->get_icon();
+			CGraphic *icon_graphics = icon->get_graphics();
+			icon_graphics->DrawFrameClip(icon->get_frame(), x + x_offset, y + ((font->getHeight() - icon_graphics->Height) / 2), nullptr);
 			x_offset += icon_graphics->Width;
 			label.Draw(x + x_offset, y_off, sub_second);
 		} else {

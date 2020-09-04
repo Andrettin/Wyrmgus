@@ -39,6 +39,7 @@ class dialogue;
 class font;
 class font_color;
 class player_color;
+class resource_icon;
 class sml_data;
 class sml_property;
 class terrain_type;
@@ -73,6 +74,9 @@ class defines final : public QObject, public singleton<defines>
 	Q_PROPERTY(wyrmgus::button_level* cancel_button_level MEMBER cancel_button_level READ get_cancel_button_level)
 	Q_PROPERTY(wyrmgus::unit_class* town_hall_class MEMBER town_hall_class READ get_town_hall_class)
 	Q_PROPERTY(wyrmgus::unit_class* default_population_class MEMBER default_population_class READ get_default_population_class)
+	Q_PROPERTY(wyrmgus::resource_icon* food_icon MEMBER food_icon READ get_food_icon)
+	Q_PROPERTY(wyrmgus::resource_icon* score_icon MEMBER score_icon READ get_score_icon)
+	Q_PROPERTY(wyrmgus::resource_icon* mana_icon MEMBER mana_icon READ get_mana_icon)
 
 public:
 	~defines();
@@ -267,6 +271,21 @@ public:
 		return this->progress_bar_graphics;
 	}
 
+	resource_icon *get_food_icon() const
+	{
+		return this->food_icon;
+	}
+
+	resource_icon *get_score_icon() const
+	{
+		return this->score_icon;
+	}
+
+	resource_icon *get_mana_icon() const
+	{
+		return this->mana_icon;
+	}
+
 private:
 	font *small_font = nullptr;
 	font *game_font = nullptr;
@@ -299,6 +318,9 @@ private:
 	CGraphic *bar_frame_graphics = nullptr;
 	CGraphic *infopanel_frame_graphics = nullptr;
 	CGraphic *progress_bar_graphics = nullptr;
+	resource_icon *food_icon = nullptr;
+	resource_icon *score_icon = nullptr;
+	resource_icon *mana_icon = nullptr;
 };
 
 }
