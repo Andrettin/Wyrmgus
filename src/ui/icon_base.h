@@ -45,7 +45,7 @@ public:
 	{
 	}
 
-	~icon_base();
+	virtual ~icon_base();
 
 	virtual void initialize() override;
 
