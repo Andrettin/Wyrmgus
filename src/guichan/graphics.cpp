@@ -107,7 +107,7 @@ namespace gcn
         mClipStack.pop();
     }
 
-    const ClipRectangle& Graphics::getCurrentClipArea()
+    const ClipRectangle& Graphics::getCurrentClipArea() const
     {
         if (mClipStack.empty())
         {
@@ -118,7 +118,7 @@ namespace gcn
         return mClipStack.top();
     }
 
-    void Graphics::drawImage(Image* image, int dstX, int dstY, const wyrmgus::player_color *player_color, unsigned int transparency)
+    void Graphics::drawImage(const Image* image, int dstX, int dstY, const wyrmgus::player_color *player_color, unsigned int transparency) const
     {
         drawImage(image, 0, 0, dstX, dstY, image->getWidth(), image->getHeight(), player_color, transparency);
     }

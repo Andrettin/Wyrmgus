@@ -235,8 +235,7 @@ void MyOpenGLGraphics::_endDraw()
 	popClipArea();
 }
 
-void MyOpenGLGraphics::drawImage(gcn::Image *image, int srcX, int srcY,
-								 int dstX, int dstY, int width, int height, const wyrmgus::player_color *player_color, unsigned int transparency, bool grayscale)
+void MyOpenGLGraphics::drawImage(const gcn::Image *image, int srcX, int srcY, int dstX, int dstY, int width, int height, const wyrmgus::player_color *player_color, unsigned int transparency, bool grayscale) const
 {
 	const gcn::ClipRectangle &r = this->getCurrentClipArea();
 	int right = std::min<int>(r.x + r.width - 1, Video.Width - 1);
@@ -255,10 +254,10 @@ void MyOpenGLGraphics::drawImage(gcn::Image *image, int srcX, int srcY,
 		((CPlayerColorGraphic *)image)->DrawPlayerColorSubClip(player_color, srcX, srcY, width, height,
 										 dstX + mClipStack.top().xOffset, dstY + mClipStack.top().yOffset);
 	} else if (grayscale) {
-		((CGraphic *)image)->DrawGrayscaleSubClip(srcX, srcY, width, height,
+		static_cast<const CGraphic *>(image)->DrawGrayscaleSubClip(srcX, srcY, width, height,
 										 dstX + mClipStack.top().xOffset, dstY + mClipStack.top().yOffset);
 	} else {
-		((CGraphic *)image)->DrawSubClip(srcX, srcY, width, height,
+		static_cast<const CGraphic *>(image)->DrawSubClip(srcX, srcY, width, height,
 										 dstX + mClipStack.top().xOffset, dstY + mClipStack.top().yOffset);
 	}
 	//Wyrmgus end
@@ -608,6 +607,13 @@ void ImageButton::setDisabledImage(const std::string &image_path)
 	disabledImage->Load(false, wyrmgus::defines::get()->get_scale_factor());
 }
 
+void ImageButton::setIconFrameImage()
+{
+	this->frameImage = wyrmgus::defines::get()->get_icon_frame_graphics();
+	this->pressedframeImage = wyrmgus::defines::get()->get_pressed_icon_frame_graphics();
+	adjustSize();
+}
+
 //Wyrmgus start
 void ImageButton::setPosition(int x, int y)
 {
@@ -796,6 +802,14 @@ void PlayerColorImageButton::setDisabledImage(const std::string &image_path)
 {
 	disabledImage = CPlayerColorGraphic::Get(image_path);
 	disabledImage->Load(false, wyrmgus::defines::get()->get_scale_factor());
+}
+
+
+void PlayerColorImageButton::setIconFrameImage()
+{
+	this->frameImage = wyrmgus::defines::get()->get_icon_frame_graphics();
+	this->pressedframeImage = wyrmgus::defines::get()->get_pressed_icon_frame_graphics();
+	adjustSize();
 }
 
 void PlayerColorImageButton::setPosition(int x, int y)

@@ -151,7 +151,7 @@ namespace gcn
          *
          * @return the current ClipArea.
          */
-        virtual const ClipRectangle& getCurrentClipArea();
+        virtual const ClipRectangle& getCurrentClipArea() const;
 
         /**
          * Draws a part of an Image.
@@ -176,12 +176,12 @@ namespace gcn
          */
 		//Wyrmgus start
 //        virtual void drawImage(const Image* image, int srcX, int srcY,
-        virtual void drawImage(Image* image, int srcX, int srcY,
+        virtual void drawImage(const Image* image, int srcX, int srcY,
 		//Wyrmgus end
                                int dstX, int dstY, int width,
 							   //Wyrmgus start
 //                               int height) = 0;
-                               int height, const wyrmgus::player_color *player_color = nullptr, unsigned int transparency = 0, bool grayscale = false) = 0;
+                               int height, const wyrmgus::player_color *player_color = nullptr, unsigned int transparency = 0, bool grayscale = false) const = 0;
 							   //Wyrmgus end
         /**
          * Draws an image. A simplified version of the other drawImage.
@@ -191,7 +191,7 @@ namespace gcn
          */
 		//Wyrmgus start
 //        virtual void drawImage(const Image* image, int dstX, int dstY);
-        virtual void drawImage(Image* image, int dstX, int dstY, const wyrmgus::player_color *player_color = nullptr, unsigned int transparency = 0);
+        virtual void drawImage(const Image* image, int dstX, int dstY, const wyrmgus::player_color *player_color = nullptr, unsigned int transparency = 0) const;
 		//Wyrmgus end
 
         /**

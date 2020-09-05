@@ -353,11 +353,8 @@ class ImageButton : public Button
 	void setNormalImage(const std::string image_path);
 	void setPressedImage(const std::string image_path);
 	void setDisabledImage(const std::string image_path);
-	//Wyrmgus start
-	void setFrameImage(CGraphic *image);
-	void setPressedFrameImage(CGraphic *image);
+	void setIconFrameImage();
 	void setTransparency(int alpha);
-	//Wyrmgus end
 };
 
 class PlayerColorImageButton : public Button
@@ -368,8 +365,7 @@ class PlayerColorImageButton : public Button
 	void setNormalImage(const std::string image_path);
 	void setPressedImage(const std::string image_path);
 	void setDisabledImage(const std::string image_path);
-	void setFrameImage(CGraphic *image);
-	void setPressedFrameImage(CGraphic *image);
+	void setIconFrameImage();
 	void setTransparency(int alpha);
 	void set_frame(int frame);
 	void setGrayscale(bool grayscale);

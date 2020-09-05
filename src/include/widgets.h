@@ -57,8 +57,7 @@ public:
 	virtual void _beginDraw();
 	virtual void _endDraw();
 
-	virtual void drawImage(gcn::Image *image, int srcX, int srcY,
-						   int dstX, int dstY, int width, int height, const wyrmgus::player_color *player_color = nullptr, unsigned int transparency = 0, bool grayscale = false);
+	virtual void drawImage(const gcn::Image *image, int srcX, int srcY, int dstX, int dstY, int width, int height, const wyrmgus::player_color *player_color = nullptr, unsigned int transparency = 0, bool grayscale = false) const;
 
 	virtual void drawPoint(int x, int y);
 	virtual void drawLine(int x1, int y1, int x2, int y2);
@@ -106,7 +105,7 @@ public:
 	explicit ButtonWidget(const std::string &caption);
 };
 
-class ImageButton : public gcn::Button
+class ImageButton final : public gcn::Button
 {
 public:
 	ImageButton();
@@ -119,26 +118,21 @@ public:
 	void setNormalImage(const std::string &image_path);
 	void setPressedImage(const std::string &image_path);
 	void setDisabledImage(const std::string &image_path);
-	//Wyrmgus start
-	void setFrameImage(gcn::Image *image) { frameImage = image; adjustSize(); }
-	void setPressedFrameImage(gcn::Image *image) { pressedframeImage = image; }
+	void setIconFrameImage();
 	virtual void setPosition(int x, int y);
 	void setTransparency(int alpha) { Transparency = alpha; }
 	void setImageOrigin(int x, int y) { ImageOrigin.x = x; ImageOrigin.y = y; }
-	//Wyrmgus end
 
 	CGraphic *normalImage = nullptr;
 	CGraphic *pressedImage = nullptr;
 	CGraphic *disabledImage = nullptr;
-	//Wyrmgus start
-	gcn::Image *frameImage = nullptr;
-	gcn::Image *pressedframeImage = nullptr;
+	const gcn::Image *frameImage = nullptr;
+	const gcn::Image *pressedframeImage = nullptr;
 	int Transparency = 0;
 	Vec2i ImageOrigin;
-	//Wyrmgus end
 };
 
-class PlayerColorImageButton : public gcn::Button
+class PlayerColorImageButton final : public gcn::Button
 {
 public:
 	PlayerColorImageButton();
@@ -150,8 +144,7 @@ public:
 	void setNormalImage(const std::string &image_path);
 	void setPressedImage(const std::string &image_path);
 	void setDisabledImage(const std::string &image_path);
-	void setFrameImage(gcn::Image *image) { frameImage = image; adjustSize(); }
-	void setPressedFrameImage(gcn::Image *image) { pressedframeImage = image; }
+	void setIconFrameImage();
 	virtual void setPosition(int x, int y);
 	void setTransparency(int alpha) { Transparency = alpha; }
 	void setImageOrigin(int x, int y) { ImageOrigin.x = x; ImageOrigin.y = y; }
@@ -166,8 +159,8 @@ public:
 	CPlayerColorGraphic *normalImage = nullptr;
 	CPlayerColorGraphic *pressedImage = nullptr;
 	CPlayerColorGraphic *disabledImage = nullptr;
-	gcn::Image *frameImage = nullptr;
-	gcn::Image *pressedframeImage = nullptr;
+	const gcn::Image *frameImage = nullptr;
+	const gcn::Image *pressedframeImage = nullptr;
 	std::string ButtonPlayerColor = nullptr;
 	int Transparency = 0;
 	Vec2i ImageOrigin;
