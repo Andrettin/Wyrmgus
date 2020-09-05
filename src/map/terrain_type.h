@@ -206,7 +206,7 @@ public:
 		this->set_image_file(std::filesystem::path(filepath));
 	}
 
-	CPlayerColorGraphic *get_graphics(const season *season = nullptr) const;
+	const std::shared_ptr<CPlayerColorGraphic> &get_graphics(const season *season = nullptr) const;
 
 	const std::filesystem::path &get_transition_image_file() const
 	{
@@ -225,7 +225,7 @@ public:
 		this->set_transition_image_file(std::filesystem::path(filepath));
 	}
 
-	CPlayerColorGraphic *get_transition_graphics(const season *season) const
+	const std::shared_ptr<CPlayerColorGraphic> &get_transition_graphics(const season *season) const
 	{
 		if (this->transition_graphics != nullptr) {
 			return this->transition_graphics;
@@ -256,7 +256,7 @@ public:
 		this->set_elevation_image_file(std::filesystem::path(filepath));
 	}
 
-	CGraphic *get_elevation_graphics() const
+	const std::shared_ptr<CGraphic> &get_elevation_graphics() const
 	{
 		return this->elevation_graphics;
 	}
@@ -417,14 +417,13 @@ public:
 	unit_type *UnitType = nullptr;
 private:
 	std::filesystem::path image_file;
-	CPlayerColorGraphic *graphics = nullptr;
+	std::shared_ptr<CPlayerColorGraphic> graphics;
 	std::filesystem::path transition_image_file;
-	CPlayerColorGraphic *transition_graphics = nullptr;
+	std::shared_ptr<CPlayerColorGraphic> transition_graphics;
 	std::map<const season *, std::filesystem::path> season_image_files;
-	std::map<const season *, CPlayerColorGraphic *> season_graphics;		/// Graphics to be displayed instead of the normal ones during particular seasons
+	std::map<const season *, std::shared_ptr<CPlayerColorGraphic>> season_graphics;		/// Graphics to be displayed instead of the normal ones during particular seasons
 	std::filesystem::path elevation_image_file;
-	CGraphic *elevation_graphics = nullptr; //semi-transparent elevation graphics, displayed on borders so that they look better
-private:
+	std::shared_ptr<CGraphic> elevation_graphics; //semi-transparent elevation graphics, displayed on borders so that they look better
 	std::vector<terrain_type *> base_terrain_types; //possible base terrain types for this terrain type (if it is an overlay terrain)
 public:
 	std::vector<terrain_type *> BorderTerrains;				/// Terrain types which this one can border

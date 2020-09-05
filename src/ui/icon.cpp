@@ -65,9 +65,9 @@ bool icon::is_grayscale_enabled() const
 }
 
 
-CPlayerColorGraphic *icon::get_graphics() const
+std::shared_ptr<CPlayerColorGraphic> icon::get_graphics() const
 {
-	return static_cast<CPlayerColorGraphic *>(icon_base::get_graphics());
+	return std::static_pointer_cast<CPlayerColorGraphic>(icon_base::get_graphics());
 }
 
 /**

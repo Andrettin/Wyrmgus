@@ -333,7 +333,7 @@ void CViewport::DrawMapBackgroundInViewport() const
 			}
 
 			if (mf.get_owner() != nullptr && mf.get_ownership_border_tile() != -1 && wyrmgus::defines::get()->get_border_terrain_type() && is_unpassable) { //if the tile is not passable, draw the border under its overlay, but otherwise, draw the border over it
-				CPlayerColorGraphic *border_graphics = wyrmgus::defines::get()->get_border_terrain_type()->get_graphics(season);
+				const std::shared_ptr<CPlayerColorGraphic> &border_graphics = wyrmgus::defines::get()->get_border_terrain_type()->get_graphics(season);
 				if (border_graphics != nullptr) {
 					border_graphics->DrawPlayerColorFrameClip(player_color, mf.get_ownership_border_tile(), dx, dy, nullptr);
 				}
@@ -360,7 +360,7 @@ void CViewport::DrawMapBackgroundInViewport() const
 
 			//if the tile is not passable, draw the border under its overlay, but otherwise, draw the border over it
 			if (mf.get_owner() != nullptr && mf.get_ownership_border_tile() != -1 && wyrmgus::defines::get()->get_border_terrain_type() && !is_unpassable) {
-				CPlayerColorGraphic *border_graphics = wyrmgus::defines::get()->get_border_terrain_type()->get_graphics(season);
+				const std::shared_ptr<CPlayerColorGraphic> &border_graphics = wyrmgus::defines::get()->get_border_terrain_type()->get_graphics(season);
 				if (border_graphics != nullptr) {
 					border_graphics->DrawPlayerColorFrameClip(player_color, mf.get_ownership_border_tile(), dx, dy, nullptr);
 				}
@@ -396,7 +396,7 @@ static void ShowUnitName(const CViewport &vp, PixelPos pos, CUnit *unit, bool hi
 	int height = font->Height() + 6;
 	CLabel label(font, wyrmgus::defines::get()->get_default_font_color(), wyrmgus::defines::get()->get_default_highlight_font_color());
 	int x;
-	int y = std::min<int>(GameCursor->get_graphic()->Height + pos.y + 10, vp.BottomRightPos.y - 1 - height);
+	int y = std::min<int>(GameCursor->get_graphics()->Height + pos.y + 10, vp.BottomRightPos.y - 1 - height);
 	const CPlayer *tplayer = CPlayer::GetThisPlayer();
 
 	if (unit && unit->IsAliveOnMap()) {
@@ -414,7 +414,7 @@ static void ShowUnitName(const CViewport &vp, PixelPos pos, CUnit *unit, bool hi
 //		width = font->getWidth(unit->Type->Name) + 10;
 		width = font->getWidth(unit->GetTypeName()) + 10;
 		//Wyrmgus end
-		x = std::min<int>(GameCursor->get_graphic()->Width + pos.x, vp.BottomRightPos.x - 1 - width);
+		x = std::min<int>(GameCursor->get_graphics()->Width + pos.x, vp.BottomRightPos.x - 1 - width);
 		Video.FillTransRectangle(backgroundColor, x, y, width, height, 128);
 		Video.DrawRectangle(ColorWhite, x, y, width, height);
 		//Wyrmgus start
@@ -424,7 +424,7 @@ static void ShowUnitName(const CViewport &vp, PixelPos pos, CUnit *unit, bool hi
 	} else if (hidden) {
 		const std::string str("Unrevealed terrain");
 		width = font->getWidth(str) + 10;
-		x = std::min<int>(GameCursor->get_graphic()->Width + pos.x, vp.BottomRightPos.x - 1 - width);
+		x = std::min<int>(GameCursor->get_graphics()->Width + pos.x, vp.BottomRightPos.x - 1 - width);
 		Video.FillTransRectangle(ColorBlue, x, y, width, height, 128);
 		Video.DrawRectangle(ColorWhite, x, y, width, height);
 		label.DrawCentered(x + width / 2, y + 3, str);

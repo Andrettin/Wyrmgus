@@ -80,13 +80,13 @@ public:
 		this->set_file(std::filesystem::path(filepath));
 	}
 
-	CGraphic *get_graphics() const
+	const std::shared_ptr<CGraphic> &get_graphics() const
 	{
 		return this->graphics;
 	}
 
 protected:
-	void set_graphics(CGraphic *graphics)
+	void set_graphics(const std::shared_ptr<CGraphic> &graphics)
 	{
 		this->graphics = graphics;
 	}
@@ -106,7 +106,7 @@ protected:
 protected:
 	std::filesystem::path file;
 private:
-	CGraphic *graphics = nullptr;
+	std::shared_ptr<CGraphic> graphics;
 	int frame = 0;
 };
 

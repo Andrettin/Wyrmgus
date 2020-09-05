@@ -550,31 +550,6 @@ unit_type::~unit_type()
 	delete TeleportEffectIn;
 	delete TeleportEffectOut;
 
-	BoolFlag.clear();
-
-	// Free Building Restrictions if there are any
-	this->BuildingRules.clear();
-	this->AiBuildingRules.clear();
-
-	for (int res = 0; res < MaxCosts; ++res) {
-		if (this->ResInfo[res] != nullptr) {
-			if (this->ResInfo[res]->SpriteWhenLoaded) {
-				CGraphic::Free(this->ResInfo[res]->SpriteWhenLoaded);
-			}
-			if (this->ResInfo[res]->SpriteWhenEmpty) {
-				CGraphic::Free(this->ResInfo[res]->SpriteWhenEmpty);
-			}
-		}
-	}
-
-	CGraphic::Free(Sprite);
-	CGraphic::Free(ShadowSprite);
-	//Wyrmgus start
-	CGraphic::Free(LightSprite);
-	for (int i = 0; i < MaxImageLayers; ++i) {
-		CGraphic::Free(LayerSprites[i]);
-	}
-	//Wyrmgus end
 #ifdef USE_MNG
 	if (this->Portrait.Num) {
 		for (int j = 0; j < this->Portrait.Num; ++j) {
@@ -1106,9 +1081,8 @@ void unit_type::ProcessConfigData(const CConfigData *config_data)
 				fprintf(stderr, "Image has no height.\n");
 			}
 			
-			if (this->Sprite) {
-				CGraphic::Free(this->Sprite);
-				this->Sprite = nullptr;
+			if (this->Sprite != nullptr) {
+				this->Sprite.reset();
 			}
 		} else if (child_config_data->Tag == "default_equipment") {
 			for (size_t j = 0; j < child_config_data->Properties.size(); ++j) {
@@ -1858,7 +1832,7 @@ const std::string &unit_type::GetDefaultName(const CPlayer *player) const
 	}
 }
 
-CPlayerColorGraphic *unit_type::GetDefaultLayerSprite(const CPlayer *player, int image_layer) const
+const std::shared_ptr<CPlayerColorGraphic> &unit_type::GetDefaultLayerSprite(const CPlayer *player, int image_layer) const
 {
 	const unit_type_variation *variation = this->GetDefaultVariation(player);
 	if (this->LayerVariations[image_layer].size() > 0 && this->GetDefaultVariation(player, image_layer)->Sprite) {
@@ -1868,7 +1842,8 @@ CPlayerColorGraphic *unit_type::GetDefaultLayerSprite(const CPlayer *player, int
 	} else if (this->LayerSprites[image_layer])  {
 		return this->LayerSprites[image_layer];
 	} else {
-		return nullptr;
+		static std::shared_ptr<CPlayerColorGraphic> null_graphic;
+		return null_graphic;
 	}
 }
 
@@ -2509,7 +2484,7 @@ void SaveUnitTypes(CFile &file)
 **  @todo  Do screen position caculation in high level.
 **         Better way to handle in x mirrored sprites.
 */
-void DrawUnitType(const wyrmgus::unit_type &type, CPlayerColorGraphic *sprite, int player, int frame, const PixelPos &screenPos, const wyrmgus::time_of_day *time_of_day)
+void DrawUnitType(const wyrmgus::unit_type &type, const std::shared_ptr<CPlayerColorGraphic> &sprite, int player, int frame, const PixelPos &screenPos, const wyrmgus::time_of_day *time_of_day)
 {
 	//Wyrmgus start
 	if (sprite == nullptr) {

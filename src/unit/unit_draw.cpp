@@ -66,15 +66,15 @@
 class Decoration
 {
 public:
-	Decoration() : HotPos(0, 0), Width(0), Height(0), Sprite(nullptr) {}
+	Decoration() {}
 
 	std::string File; /// File containing the graphics data
-	PixelPos HotPos;  /// drawing position (relative)
-	int Width;        /// width of the decoration
-	int Height;       /// height of the decoration
+	PixelPos HotPos = PixelPos(0, 0);  /// drawing position (relative)
+	int Width = 0;        /// width of the decoration
+	int Height = 0;       /// height of the decoration
 
 	// --- FILLED UP ---
-	CGraphic *Sprite;  /// loaded sprite images
+	std::shared_ptr<CGraphic> Sprite;  /// loaded sprite images
 };
 
 
@@ -414,15 +414,8 @@ void LoadDecorations()
 	}
 }
 
-/**
-**  Clean decorations.
-*/
 void CleanDecorations()
 {
-	for (unsigned int i = 0; i < DecoSprite.SpriteArray.size(); ++i) {
-		CGraphic::Free(DecoSprite.SpriteArray[i].Sprite);
-	}
-
 	DecoSprite.Name.clear();
 	DecoSprite.SpriteArray.clear();
 }
@@ -657,7 +650,7 @@ static void DrawDecoration(const CUnit &unit, const wyrmgus::unit_type &type, co
 **
 **  @todo FIXME: combine new shadow code with old shadow code.
 */
-void DrawShadow(const wyrmgus::unit_type &type, CGraphic *sprite, int frame, const PixelPos &screenPos)
+void DrawShadow(const wyrmgus::unit_type &type, const std::shared_ptr<CGraphic> &sprite, int frame, const PixelPos &screenPos)
 {
 	// Draw normal shadow sprite if available
 	//Wyrmgus start
@@ -698,7 +691,7 @@ void DrawShadow(const wyrmgus::unit_type &type, CGraphic *sprite, int frame, con
 }
 
 //Wyrmgus start
-void DrawPlayerColorOverlay(const wyrmgus::unit_type &type, CPlayerColorGraphic *sprite, const int player, int frame, const PixelPos &screenPos, const wyrmgus::time_of_day *time_of_day)
+void DrawPlayerColorOverlay(const wyrmgus::unit_type &type, const std::shared_ptr<CPlayerColorGraphic> &sprite, const int player, int frame, const PixelPos &screenPos, const wyrmgus::time_of_day *time_of_day)
 {
 	if (!sprite) {
 		return;
@@ -742,7 +735,7 @@ void DrawPlayerColorOverlay(const wyrmgus::unit_type &type, CPlayerColorGraphic 
 	}
 }
 
-void DrawOverlay(const wyrmgus::unit_type &type, CGraphic *sprite, int player, int frame, const PixelPos &screenPos, const wyrmgus::time_of_day *time_of_day)
+void DrawOverlay(const wyrmgus::unit_type &type, const std::shared_ptr<CGraphic> &sprite, int player, int frame, const PixelPos &screenPos, const wyrmgus::time_of_day *time_of_day)
 {
 	if (!sprite) {
 		return;
@@ -1187,7 +1180,7 @@ void CUnit::Draw(const CViewport &vp) const
 	//
 	// Adjust sprite for Harvesters.
 	//
-	CPlayerColorGraphic *sprite = type->Sprite;
+	std::shared_ptr<CPlayerColorGraphic> sprite = type->Sprite;
 	if (type->BoolFlag[HARVESTER_INDEX].value && this->CurrentResource) {
 		const auto &resinfo = type->ResInfo[this->CurrentResource];
 		if (this->ResourcesHeld) {

@@ -90,7 +90,7 @@ private:
 	std::filesystem::path filepath;
 	QSize size;
 	char *CharWidth = nullptr; /// Real font width (starting with ' ')
-	CGraphic *G = nullptr; /// Graphic object used to draw
+	std::shared_ptr<CGraphic> G; /// Graphic object used to draw
 	std::map<const wyrmgus::font_color *, std::unique_ptr<CGraphic>> font_color_graphics;
 };
 

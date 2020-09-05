@@ -61,7 +61,6 @@ void construction_frame::process_sml_property(const sml_property &property)
 
 construction::~construction()
 {
-	CGraphic::Free(this->graphics);
 }
 
 void construction::process_sml_property(const sml_property &property)

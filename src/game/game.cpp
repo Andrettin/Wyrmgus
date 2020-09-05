@@ -1405,10 +1405,10 @@ static void GameTypeManTeamVsMachine()
 
 static int itemsToLoad;
 static int itemsLoaded;
-static CGraphic *loadingEmpty = nullptr;
-static CGraphic *loadingFull = nullptr;
+static std::shared_ptr<CGraphic> loadingEmpty;
+static std::shared_ptr<CGraphic> loadingFull;
 static std::vector<std::string> loadingBackgrounds;
-CGraphic *loadingBackground = nullptr;
+std::shared_ptr<CGraphic> loadingBackground;
 static wyrmgus::font *loadingFont = nullptr;
 static std::vector<std::string> loadingTips;
 static std::vector<std::string> loadingTip;

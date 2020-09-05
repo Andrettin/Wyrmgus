@@ -794,7 +794,7 @@ void DrawResources()
 		const wyrmgus::resource_icon *icon = resource->get_icon();
 		const int index = resource->get_index();
 		if (icon != nullptr && UI.Resources[index].IconX != -1) {
-			CGraphic *icon_graphics = icon->get_graphics();
+			const std::shared_ptr<CGraphic> &icon_graphics = icon->get_graphics();
 			icon_graphics->DrawFrameClip(icon->get_frame(), UI.Resources[index].IconX, UI.Resources[index].IconY);
 		}
 	}
@@ -1138,7 +1138,7 @@ void DrawPopups()
 			ba->Value = index;
 			ba->ValueStr = resource->get_identifier();
 			ba->Popup = "popup_resource";
-			DrawPopup(*ba, UI.Resources[index].IconX, UI.Resources[index].IconY + 16 * wyrmgus::defines::get()->get_scale_factor() + GameCursor->get_graphic()->getHeight() / 2, false);
+			DrawPopup(*ba, UI.Resources[index].IconX, UI.Resources[index].IconY + 16 * wyrmgus::defines::get()->get_scale_factor() + GameCursor->get_graphics()->getHeight() / 2, false);
 			LastDrawnButtonPopup = nullptr;
 		}
 	}
@@ -1150,18 +1150,18 @@ void DrawPopups()
 		ba.Hint = _("Food");
 		ba.Action = ButtonCmd::None;
 		ba.Popup = "popup_food";
-		DrawPopup(ba, UI.Resources[FoodCost].IconX, UI.Resources[FoodCost].IconY + 16 * wyrmgus::defines::get()->get_scale_factor() + GameCursor->get_graphic()->getHeight() / 2, false);
+		DrawPopup(ba, UI.Resources[FoodCost].IconX, UI.Resources[FoodCost].IconY + 16 * wyrmgus::defines::get()->get_scale_factor() + GameCursor->get_graphics()->getHeight() / 2, false);
 		LastDrawnButtonPopup = nullptr;
 	}
 	
 	const wyrmgus::resource_icon *score_icon = wyrmgus::defines::get()->get_score_icon();
 	if (score_icon != nullptr && CursorScreenPos.x >= UI.Resources[ScoreCost].IconX && CursorScreenPos.x < (UI.Resources[ScoreCost].TextX + UI.Resources[ScoreCost].Font->Width(UI.Resources[ScoreCost].Text)) && CursorScreenPos.y >= UI.Resources[ScoreCost].IconY && CursorScreenPos.y < (UI.Resources[ScoreCost].IconY + score_icon->get_graphics()->get_frame_height())) {
-		DrawGenericPopup(_("Score"), UI.Resources[ScoreCost].IconX, UI.Resources[ScoreCost].IconY + 16 * wyrmgus::defines::get()->get_scale_factor() + GameCursor->get_graphic()->getHeight() / 2, nullptr, nullptr, false);
+		DrawGenericPopup(_("Score"), UI.Resources[ScoreCost].IconX, UI.Resources[ScoreCost].IconY + 16 * wyrmgus::defines::get()->get_scale_factor() + GameCursor->get_graphics()->getHeight() / 2, nullptr, nullptr, false);
 	}
 	
 	const QPoint tile_pos = UI.SelectedViewport->screen_center_to_tile_pos();
 	const wyrmgus::time_of_day *time_of_day = UI.CurrentMapLayer->get_tile_time_of_day(tile_pos);
-	const CGraphic *time_of_day_icon_graphics = nullptr;
+	std::shared_ptr<const CGraphic> time_of_day_icon_graphics;
 	if (time_of_day != nullptr) {
 		time_of_day_icon_graphics = time_of_day->get_icon()->get_graphics();
 	}
@@ -1175,11 +1175,11 @@ void DrawPopups()
 		&& CursorScreenPos.y >= UI.TimeOfDayPanel.IconY
 		&& CursorScreenPos.y < (UI.TimeOfDayPanel.IconY + time_of_day_icon_graphics->get_frame_height())
 	) {
-		DrawGenericPopup(_(time_of_day->get_name().c_str()), UI.TimeOfDayPanel.IconX, UI.TimeOfDayPanel.IconY + 16 * wyrmgus::defines::get()->get_scale_factor() + GameCursor->get_graphic()->getHeight() / 2, nullptr, nullptr, false);
+		DrawGenericPopup(_(time_of_day->get_name().c_str()), UI.TimeOfDayPanel.IconX, UI.TimeOfDayPanel.IconY + 16 * wyrmgus::defines::get()->get_scale_factor() + GameCursor->get_graphics()->getHeight() / 2, nullptr, nullptr, false);
 	}
 	
 	const wyrmgus::season *season = UI.CurrentMapLayer->GetSeason();
-	const CGraphic *season_icon_graphics = nullptr;
+	std::shared_ptr<const CGraphic> season_icon_graphics;
 	if (season != nullptr) {
 		season_icon_graphics = season->get_icon()->get_graphics();
 	}
@@ -1193,7 +1193,7 @@ void DrawPopups()
 		&& CursorScreenPos.y >= UI.SeasonPanel.IconY
 		&& CursorScreenPos.y < (UI.SeasonPanel.IconY + season_icon_graphics->get_frame_height())
 	) {
-		DrawGenericPopup(_(season->get_name().c_str()), UI.SeasonPanel.IconX, UI.SeasonPanel.IconY + 16 * wyrmgus::defines::get()->get_scale_factor() + GameCursor->get_graphic()->getHeight() / 2, nullptr, nullptr, false);
+		DrawGenericPopup(_(season->get_name().c_str()), UI.SeasonPanel.IconX, UI.SeasonPanel.IconY + 16 * wyrmgus::defines::get()->get_scale_factor() + GameCursor->get_graphics()->getHeight() / 2, nullptr, nullptr, false);
 	}
 	
 	//commented out as right now the popup is a bit pointless, as it only shows the same text as what's already written in the HUD; the popup should be restored when they are able to show more text

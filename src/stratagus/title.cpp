@@ -142,7 +142,7 @@ void TitleScreen::ShowTitleImage()
 
 	SetCallbacks(&callbacks);
 
-	CGraphic *g = CGraphic::New(this->File);
+	std::shared_ptr<CGraphic> g = CGraphic::New(this->File);
 	g->Load();
 	if (this->StretchImage) {
 		g->Resize(Video.Width, Video.Height);
@@ -159,7 +159,6 @@ void TitleScreen::ShowTitleImage()
 	}
 
 	SetCallbacks(old_callbacks);
-	CGraphic::Free(g);
 }
 
 /**

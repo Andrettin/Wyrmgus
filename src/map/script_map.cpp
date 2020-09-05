@@ -531,11 +531,6 @@ static int CclSetFogOfWarGraphics(lua_State *l)
 	LuaCheckArgs(l, 1);
 	FogGraphicFile = LuaToString(l, 1);
 	
-	if (CMap::FogGraphics != nullptr) {
-		CGraphic::Free(CMap::FogGraphics);
-		CMap::FogGraphics = nullptr;
-	}
-	
 	CMap::FogGraphics = CGraphic::New(FogGraphicFile, wyrmgus::defines::get()->get_tile_size());
 
 	return 0;

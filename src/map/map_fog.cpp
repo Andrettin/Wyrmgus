@@ -28,10 +28,6 @@
 //      02111-1307, USA.
 //
 
-/*----------------------------------------------------------------------------
---  Includes
-----------------------------------------------------------------------------*/
-
 #include "stratagus.h"
 
 #include "map/map.h"
@@ -56,7 +52,7 @@ int FogOfWarOpacity;                 /// Fog of war Opacity.
 Uint32 FogOfWarColorSDL;
 CColor FogOfWarColor;
 
-CGraphic *CMap::FogGraphics = nullptr;
+std::shared_ptr<CGraphic> CMap::FogGraphics;
 
 /**
 **  Mapping for fog of war tiles.
@@ -74,11 +70,6 @@ static std::vector<std::vector<unsigned short>> VisibleTable;
 //Wyrmgus end
 
 static SDL_Surface *OnlyFogSurface = nullptr;
-static CGraphic *AlphaFogGraphics = nullptr;
-
-/*----------------------------------------------------------------------------
---  Functions
-----------------------------------------------------------------------------*/
 
 class _filter_flags
 {
@@ -899,7 +890,7 @@ static void GetFogOfWarTile(int sx, int sy, int *fogTile, int *blackFogTile, int
 //	*blackFogTile = FogTable[blackFogTileIndex];
 	//apply variation according to tile index (sx is equal to the tile index, so let's use it)
 	int FogTileVariation = 0;
-	CGraphic *fog_graphic = CMap::Map.FogGraphics;
+	const std::shared_ptr<CGraphic> &fog_graphic = CMap::Map.FogGraphics;
 	if (sx % 3 == 0 && fog_graphic->get_height() / wyrmgus::defines::get()->get_scaled_tile_height() >= 3) {
 		FogTileVariation = 2;
 	} else if (sx % 2 == 0 && fog_graphic->get_height() / wyrmgus::defines::get()->get_scaled_tile_height() >= 2) {
@@ -937,8 +928,7 @@ static void DrawFogOfWarTile(int sx, int sy, int dx, int dy)
 	//Wyrmgus end
 
 	//Wyrmgus start
-	CGraphic *fog_graphic = CMap::Map.FogGraphics;
-	CGraphic *alpha_fog_graphic = AlphaFogGraphics;
+	const std::shared_ptr<CGraphic> &fog_graphic = CMap::Map.FogGraphics;
 	
 //	if (IsMapFieldVisibleTable(sx) || ReplayRevealMap) {
 	if ((IsMapFieldVisibleTable(sx, UI.CurrentMapLayer->ID) && blackFogTile != 16 && fogTile != 16) || ReplayRevealMap) {
@@ -1016,7 +1006,7 @@ void CViewport::DrawMapFogOfWar() const
 */
 void CMap::InitFogOfWar()
 {
-	CGraphic *fog_graphic = this->FogGraphics;
+	const std::shared_ptr<CGraphic> &fog_graphic = CMap::FogGraphics;
 	
 	//calculate this once from the settings and store it
 	FogOfWarColorSDL = Video.MapRGB(TheScreen->format, FogOfWarColor);
@@ -1041,6 +1031,5 @@ void CMap::CleanFogOfWar()
 {
 	VisibleTable.clear();
 
-	CGraphic::Free(this->FogGraphics);
-	this->FogGraphics = nullptr;
+	CMap::FogGraphics.reset();
 }

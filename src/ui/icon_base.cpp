@@ -37,7 +37,6 @@ namespace wyrmgus {
 
 icon_base::~icon_base()
 {
-	CGraphic::Free(this->graphics);
 }
 
 void icon_base::initialize()

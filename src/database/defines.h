@@ -241,32 +241,32 @@ public:
 		return this->default_population_class;
 	}
 
-	const CGraphic *get_icon_frame_graphics() const
+	const std::shared_ptr<CGraphic> &get_icon_frame_graphics() const
 	{
 		return this->icon_frame_graphics;
 	}
 
-	const CGraphic *get_pressed_icon_frame_graphics() const
+	const std::shared_ptr<CGraphic> &get_pressed_icon_frame_graphics() const
 	{
 		return this->pressed_icon_frame_graphics;
 	}
 
-	const CGraphic *get_command_button_frame_graphics() const
+	const std::shared_ptr<CGraphic> &get_command_button_frame_graphics() const
 	{
 		return this->command_button_frame_graphics;
 	}
 
-	const CGraphic *get_bar_frame_graphics() const
+	const std::shared_ptr<CGraphic> &get_bar_frame_graphics() const
 	{
 		return this->bar_frame_graphics;
 	}
 
-	const CGraphic *get_infopanel_frame_graphics() const
+	const std::shared_ptr<CGraphic> &get_infopanel_frame_graphics() const
 	{
 		return this->infopanel_frame_graphics;
 	}
 
-	const CGraphic *get_progress_bar_graphics() const
+	const std::shared_ptr<CGraphic> &get_progress_bar_graphics() const
 	{
 		return this->progress_bar_graphics;
 	}
@@ -312,12 +312,12 @@ private:
 	button_level *cancel_button_level = nullptr;
 	unit_class *town_hall_class = nullptr;
 	unit_class *default_population_class = nullptr;
-	CGraphic *icon_frame_graphics = nullptr;
-	CGraphic *pressed_icon_frame_graphics = nullptr;
-	CGraphic *command_button_frame_graphics = nullptr;
-	CGraphic *bar_frame_graphics = nullptr;
-	CGraphic *infopanel_frame_graphics = nullptr;
-	CGraphic *progress_bar_graphics = nullptr;
+	std::shared_ptr<CGraphic> icon_frame_graphics;
+	std::shared_ptr<CGraphic> pressed_icon_frame_graphics;
+	std::shared_ptr<CGraphic> command_button_frame_graphics;
+	std::shared_ptr<CGraphic> bar_frame_graphics;
+	std::shared_ptr<CGraphic> infopanel_frame_graphics;
+	std::shared_ptr<CGraphic> progress_bar_graphics;
 	resource_icon *food_icon = nullptr;
 	resource_icon *score_icon = nullptr;
 	resource_icon *mana_icon = nullptr;

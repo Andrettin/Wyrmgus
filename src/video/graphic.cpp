@@ -53,11 +53,19 @@
 #include "video/video.h"
 #include "xbrz.h"
 
-std::map<std::string, CGraphic *> CGraphic::graphics_by_filepath;
+std::map<std::string, std::weak_ptr<CGraphic>> CGraphic::graphics_by_filepath;
 std::list<CGraphic *> CGraphic::graphics;
 
 CGraphic::~CGraphic()
 {
+	std::unique_lock<std::shared_mutex> lock(CGraphic::mutex);
+
+	CGraphic::graphics.remove(this);
+
+	if (!this->HashFile.empty()) {
+		CGraphic::graphics_by_filepath.erase(this->HashFile);
+	}
+
 	if (this->textures != nullptr) {
 		glDeleteTextures(this->NumTextures, this->textures);
 		delete[] this->textures;
@@ -478,7 +486,7 @@ void CPlayerColorGraphic::DrawPlayerColorFrameClipX(const wyrmgus::player_color 
 **
 **  @return      New graphic object
 */
-CGraphic *CGraphic::New(const std::string &filepath, const int w, const int h)
+std::shared_ptr<CGraphic> CGraphic::New(const std::string &filepath, const int w, const int h)
 {
 	std::unique_lock<std::shared_mutex> lock(CGraphic::mutex);
 
@@ -487,23 +495,25 @@ CGraphic *CGraphic::New(const std::string &filepath, const int w, const int h)
 	}
 
 	const std::string library_filepath = LibraryFileName(filepath.c_str());
-	CGraphic *g = CGraphic::graphics_by_filepath[library_filepath];
-	if (g == nullptr) {
-		g = new CGraphic(library_filepath);
-		if (!g) {
-			fprintf(stderr, "Out of memory\n");
-			ExitFatal(-1);
-		}
-		// FIXME: use a constructor for this
-		g->HashFile = library_filepath;
-		g->Width = w;
-		g->Height = h;
-		g->original_frame_size = QSize(w, h);
-		CGraphic::graphics_by_filepath[g->HashFile] = g;
-	} else {
-		++g->refs;
+
+	const auto find_iterator = CGraphic::graphics_by_filepath.find(library_filepath);
+	if (find_iterator != CGraphic::graphics_by_filepath.end()) {
+		std::shared_ptr<CGraphic> g = find_iterator->second.lock();
 		Assert((w == 0 || g->Width == w) && (g->Height == h || h == 0));
+		return g;
 	}
+
+	auto g = std::make_shared<CGraphic>(library_filepath);
+	if (!g) {
+		throw std::runtime_error("Out of memory");
+	}
+
+	// FIXME: use a constructor for this
+	g->HashFile = library_filepath;
+	g->Width = w;
+	g->Height = h;
+	g->original_frame_size = QSize(w, h);
+	CGraphic::graphics_by_filepath[g->HashFile] = g;
 
 	return g;
 }
@@ -517,7 +527,7 @@ CGraphic *CGraphic::New(const std::string &filepath, const int w, const int h)
 **
 **  @return      New graphic object
 */
-CPlayerColorGraphic *CPlayerColorGraphic::New(const std::string &filepath, const QSize &size, const wyrmgus::player_color *conversible_player_color)
+std::shared_ptr<CPlayerColorGraphic> CPlayerColorGraphic::New(const std::string &filepath, const QSize &size, const wyrmgus::player_color *conversible_player_color)
 {
 	std::unique_lock<std::shared_mutex> lock(CGraphic::mutex);
 
@@ -526,23 +536,32 @@ CPlayerColorGraphic *CPlayerColorGraphic::New(const std::string &filepath, const
 	}
 
 	const std::string file = LibraryFileName(filepath.c_str());
-	CPlayerColorGraphic *g = dynamic_cast<CPlayerColorGraphic *>(CGraphic::graphics_by_filepath[file]);
-	if (g == nullptr) {
-		g = new CPlayerColorGraphic(file, conversible_player_color);
-		if (!g) {
-			fprintf(stderr, "Out of memory\n");
-			ExitFatal(-1);
-		}
-		// FIXME: use a constructor for this
-		g->HashFile = file;
-		g->Width = size.width();
-		g->Height = size.height();
-		g->original_frame_size = size;
-		CGraphic::graphics_by_filepath[g->HashFile] = g;
-	} else {
-		++g->refs;
+
+	const auto find_iterator = CGraphic::graphics_by_filepath.find(file);
+	if (find_iterator != CGraphic::graphics_by_filepath.end()) {
+		std::shared_ptr<CGraphic> g = find_iterator->second.lock();
 		Assert((size.width() == 0 || g->Width == size.width()) && (g->Height == size.height() || size.height() == 0));
+
+		auto pcg = std::dynamic_pointer_cast<CPlayerColorGraphic>(g);
+
+		if (pcg == nullptr) {
+			throw std::runtime_error("Tried to create player color graphic \"" + file + "\", but it has already been created as a non-player color graphic.");
+		}
+
+		return pcg;
 	}
+
+	auto g = std::make_shared<CPlayerColorGraphic>(file, conversible_player_color);
+	if (!g) {
+		throw std::runtime_error("Out of memory");
+	}
+
+	// FIXME: use a constructor for this
+	g->HashFile = file;
+	g->Width = size.width();
+	g->Height = size.height();
+	g->original_frame_size = size;
+	CGraphic::graphics_by_filepath[g->HashFile] = g;
 
 	return g;
 }
@@ -579,27 +598,6 @@ const GLuint *CPlayerColorGraphic::get_textures(const wyrmgus::player_color *pla
 }
 
 /**
-**  Get a graphic object.
-**
-**  @param filename  Filename
-**
-**  @return      Graphic object
-*/
-CGraphic *CGraphic::Get(const std::string &filename)
-{
-	std::shared_lock<std::shared_mutex> lock(CGraphic::mutex);
-
-	if (filename.empty()) {
-		return nullptr;
-	}
-
-	const std::string file = LibraryFileName(filename.c_str());
-	CGraphic *&g = CGraphic::graphics_by_filepath[file];
-
-	return g;
-}
-
-/**
 **  Get a player color graphic object.
 **
 **  @param filename  Filename
@@ -615,9 +613,13 @@ CPlayerColorGraphic *CPlayerColorGraphic::Get(const std::string &filename)
 	}
 
 	const std::string file = LibraryFileName(filename.c_str());
-	CPlayerColorGraphic *g = dynamic_cast<CPlayerColorGraphic *>(CGraphic::graphics_by_filepath[file]);
 
-	return g;
+	const auto find_iterator = CGraphic::graphics_by_filepath.find(file);
+	if (find_iterator != CGraphic::graphics_by_filepath.end()) {
+		return std::dynamic_pointer_cast<CPlayerColorGraphic>(find_iterator->second.lock()).get();
+	}
+
+	return nullptr;
 }
 
 void CGraphic::GenFramesMap()
@@ -901,36 +903,6 @@ static void FreeSurface(SDL_Surface **surface)
 	SDL_FreeSurface(*surface);
 	delete[] pixels;
 	*surface = nullptr;
-}
-
-/**
-**  Free a graphic
-**
-**  @param g  Pointer to the graphic
-*/
-void CGraphic::Free(CGraphic *g)
-{
-	if (!g) {
-		return;
-	}
-
-	std::unique_lock<std::shared_mutex> lock(CGraphic::mutex);
-
-	if (g->refs <= 0) {
-		throw std::runtime_error("Tried to free an already-freed graphic.");
-	}
-
-	--g->refs;
-	if (g->refs == 0) {
-		// No more uses of this graphic
-		CGraphic::graphics.remove(g);
-
-		if (!g->HashFile.empty()) {
-			CGraphic::graphics_by_filepath.erase(g->HashFile);
-		}
-
-		delete g;
-	}
 }
 
 #if defined(USE_OPENGL) || defined(USE_GLES)
@@ -1376,37 +1348,17 @@ const wyrmgus::player_color *CGraphic::get_conversible_player_color() const
 	return wyrmgus::defines::get()->get_conversible_player_color();
 }
 
-void FreeGraphics()
-{
-	std::shared_lock<std::shared_mutex> lock(CGraphic::mutex);
-
-	std::map<std::string, CGraphic *>::iterator i;
-	while (!CGraphic::graphics_by_filepath.empty()) {
-		i = CGraphic::graphics_by_filepath.begin();
-		lock.unlock();
-		CGraphic::Free((*i).second);
-		lock.lock();
-	}
-}
-
 CFiller &CFiller::operator =(const CFiller &other_filler)
 {
 	if (other_filler.G == nullptr) {
 		throw std::runtime_error("Tried to create a copy of a UI filler which has no graphics.");
 	}
 
-	this->G = CGraphic::New(other_filler.G->get_filepath().string());
+	this->G = other_filler.G;
 	this->X = other_filler.X;
 	this->Y = other_filler.Y;
 
 	return *this;
-}
-
-CFiller::~CFiller()
-{
-	if (this->G != nullptr) {
-		CGraphic::Free(this->G);
-	}
 }
 
 void CFiller::Load()

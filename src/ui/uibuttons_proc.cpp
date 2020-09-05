@@ -79,7 +79,7 @@ void DrawUIButton(ButtonStyle *style, unsigned flags, int x, int y,
 		pimage->Sprite->Load(false, wyrmgus::defines::get()->get_scale_factor());
 	}
 	if (pimage->Sprite) {
-		CPlayerColorGraphic *colorGraphic = dynamic_cast<CPlayerColorGraphic *>(pimage->Sprite);
+		auto colorGraphic = std::dynamic_pointer_cast<CPlayerColorGraphic>(pimage->Sprite);
 
 		if (grayscale) {
 			pimage->Sprite->DrawGrayscaleFrameClip(pimage->Frame, x, y, show_percent);

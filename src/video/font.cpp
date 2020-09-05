@@ -290,9 +290,6 @@ font::font(const std::string &identifier) : data_entry(identifier)
 
 font::~font()
 {
-	if (this->G != nullptr) {
-		CGraphic::Free(this->G);
-	}
 	delete[] CharWidth;
 }
 
@@ -355,7 +352,7 @@ CGraphic *font::GetFontColorGraphic(const wyrmgus::font_color &fontColor) const
 #ifdef DEBUG
 	fprintf(stderr, "Could not load font color %s for font %s\n", fontColor.Ident.c_str(), this->Ident.c_str());
 #endif
-	return this->G;
+	return this->G.get();
 }
 
 }

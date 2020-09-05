@@ -6587,7 +6587,7 @@ MissileConfig CUnit::GetMissile() const
 	}
 }
 
-CPlayerColorGraphic *CUnit::GetLayerSprite(int image_layer) const
+const std::shared_ptr<CPlayerColorGraphic> &CUnit::GetLayerSprite(const int image_layer) const
 {
 	const wyrmgus::unit_type_variation *layer_variation = this->GetLayerVariation(image_layer);
 	if (layer_variation && layer_variation->Sprite) {
@@ -6600,7 +6600,8 @@ CPlayerColorGraphic *CUnit::GetLayerSprite(int image_layer) const
 	} else if (this->Type->LayerSprites[image_layer])  {
 		return this->Type->LayerSprites[image_layer];
 	} else {
-		return nullptr;
+		static std::shared_ptr<CPlayerColorGraphic> null_graphic;
+		return null_graphic;
 	}
 }
 

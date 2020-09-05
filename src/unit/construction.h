@@ -140,7 +140,7 @@ public:
 		return this->get_frame_size().height();
 	}
 
-	CPlayerColorGraphic *get_graphics() const
+	const std::shared_ptr<CPlayerColorGraphic> &get_graphics() const
 	{
 		return this->graphics;
 	}
@@ -154,7 +154,7 @@ private:
 	std::filesystem::path image_file;
 	QSize frame_size = QSize(0, 0); //sprite frame size
 	std::vector<std::unique_ptr<construction_frame>> frames;  /// construction frames
-	CPlayerColorGraphic *graphics = nullptr; /// construction sprite image
+	std::shared_ptr<CPlayerColorGraphic> graphics; /// construction sprite image
 };
 
 }

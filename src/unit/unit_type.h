@@ -169,8 +169,8 @@ public:
 	unsigned WaitAtDepot = 0;       /// Cycles the unit waits while returning.
 	unsigned char LoseResources = 0; /// The unit will lose it's resource when distracted.
 	//  Runtime info:
-	CPlayerColorGraphic *SpriteWhenLoaded = nullptr; /// The graphic corresponding to FileWhenLoaded.
-	CPlayerColorGraphic *SpriteWhenEmpty = nullptr;  /// The graphic corresponding to FileWhenEmpty
+	std::shared_ptr<CPlayerColorGraphic> SpriteWhenLoaded; /// The graphic corresponding to FileWhenLoaded.
+	std::shared_ptr<CPlayerColorGraphic> SpriteWhenEmpty;  /// The graphic corresponding to FileWhenEmpty
 
 	friend int ::CclDefineUnitType(lua_State *l);
 };
@@ -936,7 +936,7 @@ public:
 	unit_type_variation *GetVariation(const std::string &variation_name, int image_layer = -1) const;
 	std::string GetRandomVariationIdent(int image_layer = -1) const;
 	const std::string &GetDefaultName(const CPlayer *player) const;
-	CPlayerColorGraphic *GetDefaultLayerSprite(const CPlayer *player, const int image_layer) const;
+	const std::shared_ptr<CPlayerColorGraphic> &GetDefaultLayerSprite(const CPlayer *player, const int image_layer) const;
 	const std::string &get_default_button_key(const CPlayer *player) const;
 	bool CanExperienceUpgradeTo(const unit_type *type) const;
 	std::string GetNamePlural() const;
@@ -1218,11 +1218,11 @@ public:
 	/// @todo This stats should? be moved into the player struct
 	CUnitStats Stats[PlayerMax];     /// Unit status for each player
 
-	CPlayerColorGraphic *Sprite;     /// Sprite images
-	CGraphic *ShadowSprite;          /// Shadow sprite image
+	std::shared_ptr<CPlayerColorGraphic> Sprite;     /// Sprite images
+	std::shared_ptr<CGraphic> ShadowSprite;          /// Shadow sprite image
 	//Wyrmgus start
-	CGraphic *LightSprite;						/// Light sprite image
-	CPlayerColorGraphic *LayerSprites[MaxImageLayers];	/// Layer sprite images
+	std::shared_ptr<CGraphic> LightSprite;						/// Light sprite image
+	std::shared_ptr<CPlayerColorGraphic> LayerSprites[MaxImageLayers];	/// Layer sprite images
 	
 private:
 	std::unique_ptr<condition> preconditions;
@@ -1378,7 +1378,7 @@ extern std::string GetUnitTypeStatsString(const std::string &unit_type_ident);
 
 extern void SaveUnitTypes(CFile &file);              /// Save the unit-type table
 /// Draw the sprite frame of unit-type
-extern void DrawUnitType(const wyrmgus::unit_type &type, CPlayerColorGraphic *sprite,
+extern void DrawUnitType(const wyrmgus::unit_type &type, const std::shared_ptr<CPlayerColorGraphic> &sprite,
 						 int player, int frame, const PixelPos &screenPos, const wyrmgus::time_of_day *time_of_day);
 
 extern void InitUnitTypes(int reset_player_stats);   /// Init unit-type table

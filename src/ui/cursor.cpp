@@ -86,13 +86,12 @@ cursor::cursor(const std::string &identifier) : data_entry(identifier), type(cur
 
 cursor::~cursor()
 {
-	CGraphic::Free(this->graphic);
 }
 
 void cursor::initialize()
 {
-	this->graphic = CGraphic::New(this->get_file().string(), this->get_frame_size());
-	this->graphic->Load(false, wyrmgus::defines::get()->get_scale_factor());
+	this->graphics = CGraphic::New(this->get_file().string(), this->get_frame_size());
+	this->graphics->Load(false, wyrmgus::defines::get()->get_scale_factor());
 
 	if (this->get_civilization() != nullptr) {
 		this->get_civilization()->set_cursor(this->get_type(), this);
@@ -121,7 +120,7 @@ int GetCursorsCount()
 {
 	int count = 0;
 	for (const wyrmgus::cursor *cursor : wyrmgus::cursor::get_all()) {
-		if (cursor->get_graphic() != nullptr && !cursor->get_graphic()->IsLoaded()) {
+		if (cursor->get_graphics() != nullptr && !cursor->get_graphics()->IsLoaded()) {
 			count++;
 		}
 	}
@@ -323,10 +322,10 @@ void DrawCursor()
 	const PixelPos pos = CursorScreenPos - GameCursor->get_hot_pos() * wyrmgus::defines::get()->get_scale_factor();
 
 	//  Last, Normal cursor.
-	if (!GameCursor->get_graphic()->IsLoaded()) {
-		GameCursor->get_graphic()->Load();
+	if (!GameCursor->get_graphics()->IsLoaded()) {
+		GameCursor->get_graphics()->Load();
 	}
-	GameCursor->get_graphic()->DrawFrameClip(GameCursor->get_current_frame(), pos.x, pos.y);
+	GameCursor->get_graphics()->DrawFrameClip(GameCursor->get_current_frame(), pos.x, pos.y);
 }
 
 /**
@@ -344,7 +343,7 @@ void CursorAnimate(unsigned ticks)
 	if (ticks > last + GameCursor->get_frame_rate()) {
 		last = ticks + GameCursor->get_frame_rate();
 		GameCursor->increment_current_frame();
-		if ((GameCursor->get_frame_rate() & 127) >= GameCursor->get_graphic()->NumFrames) {
+		if ((GameCursor->get_frame_rate() & 127) >= GameCursor->get_graphics()->NumFrames) {
 			GameCursor->reset_current_frame();
 		}
 	}

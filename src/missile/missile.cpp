@@ -1943,7 +1943,6 @@ missile_type::missile_type(const std::string &identifier) : data_entry(identifie
 
 missile_type::~missile_type()
 {
-	CGraphic::Free(this->G);
 	Impact.clear();
 	delete ImpactParticle;
 	delete SmokeParticle;

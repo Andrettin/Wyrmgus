@@ -134,23 +134,8 @@ unsigned long terrain_type::GetTerrainFlagByName(const std::string &flag_name)
 	}
 }
 
-/**
-**	@brief	Destructor
-*/
 terrain_type::~terrain_type()
 {
-	if (this->graphics != nullptr) {
-		CGraphic::Free(this->graphics);
-	}
-	if (this->transition_graphics != nullptr) {
-		CGraphic::Free(this->transition_graphics);
-	}
-	for (const auto &kv_pair : this->season_graphics) {
-		CGraphic::Free(kv_pair.second);
-	}
-	if (this->elevation_graphics != nullptr) {
-		CGraphic::Free(this->elevation_graphics);
-	}
 }
 
 void terrain_type::process_sml_property(const sml_property &property)
@@ -458,7 +443,7 @@ void terrain_type::calculate_minimap_color(const season *season)
 		return;
 	}
 
-	const CGraphic *graphic = this->get_graphics(season);
+	const std::shared_ptr<CPlayerColorGraphic> &graphic = this->get_graphics(season);
 
 	const QImage &image = graphic->get_image();
 	const player_color *conversible_player_color = graphic->get_conversible_player_color();
@@ -523,7 +508,7 @@ void terrain_type::set_image_file(const std::filesystem::path &filepath)
 	this->image_file = database::get_graphics_path(this->get_module()) / filepath;
 }
 
-CPlayerColorGraphic *terrain_type::get_graphics(const season *season) const
+const std::shared_ptr<CPlayerColorGraphic> &terrain_type::get_graphics(const season *season) const
 {
 	if (season != nullptr) {
 		auto find_iterator = this->season_graphics.find(season);

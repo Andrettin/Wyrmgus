@@ -67,7 +67,7 @@ class CGraphic : public gcn::Image
 	};
 
 public:
-	static std::map<std::string, CGraphic *> graphics_by_filepath;
+	static std::map<std::string, std::weak_ptr<CGraphic>> graphics_by_filepath;
 	static std::list<CGraphic *> graphics;
 
 protected:
@@ -110,21 +110,17 @@ public:
 	void DrawFrameTransX(unsigned frame, int x, int y, int alpha) const;
 	void DrawFrameClipTransX(unsigned frame, int x, int y, int alpha, const wyrmgus::time_of_day *time_of_day = nullptr, SDL_Surface *surface = nullptr);
 
-	static CGraphic *New(const std::string &filepath, const int w = 0, const int h = 0);
+	static std::shared_ptr<CGraphic> New(const std::string &filepath, const int w = 0, const int h = 0);
 
-	static CGraphic *New(const std::string &filepath, const QSize &size)
+	static std::shared_ptr<CGraphic> New(const std::string &filepath, const QSize &size)
 	{
 		return CGraphic::New(filepath, size.width(), size.height());
 	}
 
-	static CGraphic *New(const std::filesystem::path &filepath, const QSize &size)
+	static std::shared_ptr<CGraphic> New(const std::filesystem::path &filepath, const QSize &size)
 	{
 		return CGraphic::New(filepath.string(), size);
 	}
-
-	static CGraphic *Get(const std::string &file);
-
-	static void Free(CGraphic *g);
 
 	void Load(const bool create_grayscale_textures = false, const int scale_factor = 1);
 	void Resize(int w, int h);
@@ -254,8 +250,6 @@ public:
 	int GraphicHeight = 0;			/// Original graphic height
 private:
 	const wyrmgus::player_color *conversible_player_color = nullptr;
-protected:
-	int refs = 1;					/// Uses of this graphic
 public:
 	bool Resized = false;			/// Image has been resized
 public:
@@ -271,12 +265,11 @@ private:
 
 	friend wyrmgus::font;
 	friend int LoadGraphicPNG(CGraphic *g, const int scale_factor);
-	friend void FreeGraphics();
 };
 
 class CPlayerColorGraphic final : public CGraphic
 {
-protected:
+public:
 	explicit CPlayerColorGraphic(const std::filesystem::path &filepath, const wyrmgus::player_color *conversible_player_color)
 		: CGraphic(filepath, conversible_player_color)
 	{
@@ -284,7 +277,6 @@ protected:
 
 	virtual ~CPlayerColorGraphic() override;
 
-public:
 	void DrawPlayerColorSub(const wyrmgus::player_color *player_color, int gx, int gy, int w, int h, int x, int y);
 	void DrawPlayerColorSubClip(const wyrmgus::player_color *player_color, int gx, int gy, int w, int h, int x, int y);
 	void DrawPlayerColorFrameClipX(const wyrmgus::player_color *player_color, unsigned frame, int x, int y, const wyrmgus::time_of_day *time_of_day = nullptr);
@@ -292,9 +284,9 @@ public:
 	void DrawPlayerColorFrameClipTransX(const wyrmgus::player_color *player_color, unsigned frame, int x, int y, int alpha, const wyrmgus::time_of_day *time_of_day = nullptr);
 	void DrawPlayerColorFrameClipTrans(const wyrmgus::player_color *player_color, unsigned frame, int x, int y, int alpha, const wyrmgus::time_of_day *time_of_day = nullptr, int show_percent = 100);
 
-	static CPlayerColorGraphic *New(const std::string &filepath, const QSize &size, const wyrmgus::player_color *conversible_player_color);
+	static std::shared_ptr<CPlayerColorGraphic> New(const std::string &filepath, const QSize &size, const wyrmgus::player_color *conversible_player_color);
 
-	static CPlayerColorGraphic *New(const std::filesystem::path &filepath, const QSize &size, const wyrmgus::player_color *conversible_player_color)
+	static std::shared_ptr<CPlayerColorGraphic> New(const std::filesystem::path &filepath, const QSize &size, const wyrmgus::player_color *conversible_player_color)
 	{
 		return CPlayerColorGraphic::New(filepath.string(), size, conversible_player_color);
 	}
@@ -648,8 +640,6 @@ extern Uint32 ColorYellow;
 void DrawTexture(const CGraphic *g, const GLuint *textures, int sx, int sy,
 				 int ex, int ey, int x, int y, int flip);
 #endif
-
-extern void FreeGraphics();
 
 
 // ARB_texture_compression

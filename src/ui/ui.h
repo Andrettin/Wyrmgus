@@ -65,7 +65,7 @@ enum class TextAlignment {
 class ButtonStyleProperties
 {
 public:
-	CGraphic *Sprite = nullptr;
+	std::shared_ptr<CGraphic> Sprite;
 	int Frame = 0;
 	CColor BorderColorRGB;
 	IntColor BorderColor = 0;
@@ -222,8 +222,6 @@ public:
 		filler.G = nullptr;
 	}
 
-	~CFiller();
-
 	CFiller &operator =(const CFiller &other_filler);
 
 	bool is_loaded() const
@@ -234,7 +232,7 @@ public:
 	void Load();
 	bool OnGraphic(int x, int y) const;
 
-	CGraphic *G = nullptr;   /// Graphic
+	std::shared_ptr<CGraphic> G; /// Graphic
 	int X = 0;               /// X coordinate
 	int Y = 0;               /// Y coordinate
 private:
@@ -280,7 +278,7 @@ private:
 
 
 public:
-	CGraphic *G = nullptr;
+	std::shared_ptr<CGraphic> G;
 	int X = 0;
 	int Y = 0;
 	std::vector<CUIButton> Buttons;
@@ -297,7 +295,7 @@ public:
 		memset(this->Y, 0, sizeof(this->Y));
 	}
 
-	CGraphic *G = nullptr; /// Optional background image
+	std::shared_ptr<CGraphic> G; /// Optional background image
 	int MouseButton = NoButton; /// Which mouse button pops up the piemenu, deactivate with NoButton
 	int X[9];            /// X position of the pies
 	int Y[9];            /// Y position of the pies
@@ -332,7 +330,7 @@ class CInfoPanel
 public:
 	void Draw();
 
-	CGraphic *G = nullptr;
+	std::shared_ptr<CGraphic> G;
 	int X = 0;
 	int Y = 0;
 };
@@ -511,8 +509,8 @@ private:
 	int tooltip_cycle_count = 0;
 
 public:
-	CGraphic *VictoryBackgroundG;       /// Victory background graphic
-	CGraphic *DefeatBackgroundG;        /// Defeat background graphic
+	std::shared_ptr<CGraphic> VictoryBackgroundG;       /// Victory background graphic
+	std::shared_ptr<CGraphic> DefeatBackgroundG;        /// Defeat background graphic
 };
 
 extern std::vector<std::unique_ptr<wyrmgus::button>> CurrentButtons;  /// Current Selected Buttons

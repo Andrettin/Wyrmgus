@@ -1000,7 +1000,7 @@ void DrawGenericPopup(const std::string &popup_text, int x, int y, const wyrmgus
 			x_offset += font->getWidth(sub_first);
 			const wyrmgus::resource *resource = wyrmgus::resource::get_all()[res];
 			const wyrmgus::resource_icon *icon = resource->get_icon();
-			CGraphic *icon_graphics = icon->get_graphics();
+			const std::shared_ptr<CGraphic> &icon_graphics = icon->get_graphics();
 			icon_graphics->DrawFrameClip(icon->get_frame(), x + x_offset, y + ((font->getHeight() - icon_graphics->Height) / 2), nullptr);
 			x_offset += icon_graphics->Width;
 			label.Draw(x + x_offset, y_off, sub_second);

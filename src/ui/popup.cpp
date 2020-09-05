@@ -424,7 +424,7 @@
 
 			if (icon != nullptr) {
 				int x_offset = UI.Resources[i].IconWidth;
-				CGraphic *icon_graphics = icon->get_graphics();
+				const std::shared_ptr<CGraphic> &icon_graphics = icon->get_graphics();
 				icon_graphics->DrawFrameClip(icon->get_frame(),	x , y);
 				x += ((x_offset != -1 ? x_offset : icon_graphics->Width) + 5 * scale_factor);
 				y_offset = icon_graphics->Height;
@@ -444,7 +444,7 @@
 			if (icon != nullptr) {
 				int x_offset =  UI.Resources[ManaResCost].IconWidth;
 				x += 5 * scale_factor;
-				CGraphic *icon_graphics = icon->get_graphics();
+				const std::shared_ptr<CGraphic> &icon_graphics = icon->get_graphics();
 				icon_graphics->DrawFrameClip(icon->get_frame(), x, y);
 				x += ((x_offset != -1 ? x_offset : icon_graphics->Width) + 5 * scale_factor);
 				y_offset = icon_graphics->Height;

@@ -493,7 +493,7 @@ void InitVideoSdl()
 
 #ifndef __MORPHOS__	
 		SDL_Surface *icon = nullptr;
-		CGraphic *g = nullptr;
+		std::shared_ptr<CGraphic> g = nullptr;
 		struct stat st;
 
 		std::string FullGameNameL = FullGameName;
@@ -523,7 +523,6 @@ void InitVideoSdl()
 
 		for (size_t i = 0; i < pixmaps.size(); ++i) {
 			if (stat(pixmaps[i].c_str(), &st) == 0) {
-				if (g) { CGraphic::Free(g); }
 				g = CGraphic::New(pixmaps[i].c_str());
 				g->Load();
 				icon = g->Surface;
@@ -533,10 +532,6 @@ void InitVideoSdl()
 
 		if (icon) {
 			SDL_WM_SetIcon(icon, 0);
-		}
-
-		if (g) {
-			CGraphic::Free(g);
 		}
 #endif
 		

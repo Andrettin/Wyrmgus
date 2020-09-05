@@ -473,7 +473,7 @@ public:
 	LuaCallback *OnImpact;                 /// called when
 
 	// --- FILLED UP ---
-	CGraphic *G;         /// missile graphic
+	std::shared_ptr<CGraphic> G;         /// missile graphic
 };
 
 }

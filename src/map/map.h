@@ -322,8 +322,8 @@ public:
 
 	CTileset *Tileset;          /// tileset data
 	std::string TileModelsFileName; /// lua filename that loads all tilemodels
-	CGraphic *TileGraphic;     /// graphic for all the tiles
-	static CGraphic *FogGraphics; //graphics for fog of war
+	std::shared_ptr<CGraphic> TileGraphic;     /// graphic for all the tiles
+	static std::shared_ptr<CGraphic> FogGraphics; //graphics for fog of war
 	//Wyrmgus start
 	int Landmasses;						/// how many landmasses are there
 	std::vector<std::vector<int>> BorderLandmasses;	/// "landmasses" which border the one to which each vector belongs

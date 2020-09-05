@@ -334,17 +334,20 @@ void MyOpenGLGraphics::fillRectangle(const gcn::Rectangle &rectangle)
 #endif
 
 ImageWidget::ImageWidget(const std::string &image_path, const int scale_factor, const int image_width, const int image_height)
-	: gcn::Icon(CGraphic::New(image_path))
+	: ImageWidget(CGraphic::New(image_path), scale_factor, image_width, image_height)
 {
-	CGraphic *graphic = static_cast<CGraphic *>(this->mImage);
-	graphic->Load(false, scale_factor);
+}
+
+ImageWidget::ImageWidget(const std::shared_ptr<CGraphic> &graphic, const int scale_factor, const int image_width, const int image_height) : gcn::Icon(graphic.get()), graphic(graphic)
+{
+	this->graphic->Load(false, scale_factor);
 
 	if (image_width != -1 && image_height != -1) {
-		graphic->Resize(image_width, image_height);
+		this->graphic->Resize(image_width, image_height);
 	}
 
-	setHeight(graphic->getHeight());
-	setWidth(graphic->getWidth());
+	setHeight(this->graphic->getHeight());
+	setWidth(this->graphic->getWidth());
 }
 
 /*----------------------------------------------------------------------------
@@ -437,7 +440,7 @@ void ImageButton::draw(gcn::Graphics *graphics)
 		return;
 	}
 
-	gcn::Image *img;
+	std::shared_ptr<CGraphic> img;
 
 	if (!isEnabled()) {
 		img = disabledImage ? disabledImage : normalImage;
@@ -457,20 +460,20 @@ void ImageButton::draw(gcn::Graphics *graphics)
 	if (frameImage) {
         graphics->setColor(ColorBlack);
 		graphics->fillRectangle(gcn::Rectangle((frameImage->getWidth() - img->getWidth()) / 2, (frameImage->getHeight() - img->getHeight()) / 2, img->getWidth(), img->getHeight()));
-		graphics->drawImage(frameImage, 0, 0, 0, 0,
+		graphics->drawImage(frameImage.get(), 0, 0, 0, 0,
 							frameImage->getWidth(), frameImage->getHeight());
 		if (isPressed()) {
 			if (Transparency) {
 				glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 				glColor4ub(255, 255, 255, int(256 - 2.56 * Transparency));
 			}
-			graphics->drawImage(img, ImageOrigin.x, ImageOrigin.y, ((frameImage->getWidth() - img->getWidth()) / 2) + 1, ((frameImage->getHeight() - img->getHeight()) / 2) + 1,
+			graphics->drawImage(img.get(), ImageOrigin.x, ImageOrigin.y, ((frameImage->getWidth() - img->getWidth()) / 2) + 1, ((frameImage->getHeight() - img->getHeight()) / 2) + 1,
 								img->getWidth() - 1, img->getHeight() - 1);
 			if (Transparency) {
 				glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
 			}
 			if (pressedframeImage) {
-				graphics->drawImage(pressedframeImage, 0, 0, 0, 0,
+				graphics->drawImage(pressedframeImage.get(), 0, 0, 0, 0,
 									pressedframeImage->getWidth(), pressedframeImage->getHeight());
 			}
 		} else {
@@ -478,7 +481,7 @@ void ImageButton::draw(gcn::Graphics *graphics)
 				glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 				glColor4ub(255, 255, 255, int(256 - 2.56 * Transparency));
 			}
-			graphics->drawImage(img, ImageOrigin.x, ImageOrigin.y, (frameImage->getWidth() - img->getWidth()) / 2, (frameImage->getHeight() - img->getHeight()) / 2,
+			graphics->drawImage(img.get(), ImageOrigin.x, ImageOrigin.y, (frameImage->getWidth() - img->getWidth()) / 2, (frameImage->getHeight() - img->getHeight()) / 2,
 								img->getWidth(), img->getHeight());
 			if (Transparency) {
 				glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
@@ -489,7 +492,7 @@ void ImageButton::draw(gcn::Graphics *graphics)
 			glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 			glColor4ub(255, 255, 255, int(256 - 2.56 * Transparency));
 		}
-		graphics->drawImage(img, ImageOrigin.x, ImageOrigin.y, 0, 0,
+		graphics->drawImage(img.get(), ImageOrigin.x, ImageOrigin.y, 0, 0,
 							img->getWidth(), img->getHeight());
 		if (Transparency) {
 			glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
@@ -687,7 +690,7 @@ void PlayerColorImageButton::draw(gcn::Graphics *graphics)
 	if (frameImage) {
         graphics->setColor(ColorBlack);
 		graphics->fillRectangle(gcn::Rectangle((frameImage->getWidth() - img->getWidth()) / 2, (frameImage->getHeight() - img->getHeight()) / 2, img->getWidth(), img->getHeight()));
-		graphics->drawImage(frameImage, 0, 0, 0, 0,
+		graphics->drawImage(frameImage.get(), 0, 0, 0, 0,
 							frameImage->getWidth(), frameImage->getHeight());
 		if (isPressed()) {
 			if (Transparency) {
@@ -700,7 +703,7 @@ void PlayerColorImageButton::draw(gcn::Graphics *graphics)
 				glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
 			}
 			if (pressedframeImage) {
-				graphics->drawImage(pressedframeImage, 0, 0, 0, 0,
+				graphics->drawImage(pressedframeImage.get(), 0, 0, 0, 0,
 									pressedframeImage->getWidth(), pressedframeImage->getHeight());
 			}
 		} else {
@@ -862,7 +865,7 @@ ImageRadioButton::ImageRadioButton(const std::string &caption,
 */
 void ImageRadioButton::drawBox(gcn::Graphics *graphics)
 {
-	gcn::Image *img = nullptr;
+	std::shared_ptr<CGraphic> img;
 
 	if (isMarked()) {
 		if (isEnabled() == false) {
@@ -883,7 +886,7 @@ void ImageRadioButton::drawBox(gcn::Graphics *graphics)
 	}
 
 	if (img) {
-		graphics->drawImage(img, 0, 0, 0, (getHeight() - img->getHeight()) / 2,
+		graphics->drawImage(img.get(), 0, 0, 0, (getHeight() - img->getHeight()) / 2,
 							img->getWidth(), img->getHeight());
 	} else {
 		RadioButton::drawBox(graphics);
@@ -1054,7 +1057,7 @@ void ImageCheckBox::draw(gcn::Graphics *graphics)
 */
 void ImageCheckBox::drawBox(gcn::Graphics *graphics)
 {
-	gcn::Image *img = nullptr;
+	std::shared_ptr<CGraphic> img;
 
 	if (mMarked) {
 		if (isEnabled() == false) {
@@ -1075,7 +1078,7 @@ void ImageCheckBox::drawBox(gcn::Graphics *graphics)
 	}
 
 	if (img) {
-		graphics->drawImage(img, 0, 0, 0, (getHeight() - img->getHeight()) / 2,
+		graphics->drawImage(img.get(), 0, 0, 0, (getHeight() - img->getHeight()) / 2,
 							img->getWidth(), img->getHeight());
 	} else {
 		CheckBox::drawBox(graphics);
@@ -1186,17 +1189,17 @@ ImageSlider::ImageSlider(double scaleStart, double scaleEnd) :
 
 void ImageSlider::drawMarker(gcn::Graphics *graphics)
 {
-	gcn::Image *img = markerImage;
+	std::shared_ptr<CGraphic> img = markerImage;
 
 	if (isEnabled()) {
 		if (img) {
 			if (getOrientation() == HORIZONTAL) {
 				int v = getMarkerPosition();
-				graphics->drawImage(img, 0, 0, v, 0,
+				graphics->drawImage(img.get(), 0, 0, v, 0,
 					img->getWidth(), img->getHeight());
 			} else {
 				int v = (getHeight() - getMarkerLength()) - getMarkerPosition();
-				graphics->drawImage(img, 0, 0, 0, v,
+				graphics->drawImage(img.get(), 0, 0, 0, v,
 					img->getWidth(), img->getHeight());
 			}
 		} else {
@@ -1207,7 +1210,7 @@ void ImageSlider::drawMarker(gcn::Graphics *graphics)
 
 void ImageSlider::draw(gcn::Graphics *graphics)
 {
-	gcn::Image *img = nullptr;
+	std::shared_ptr<CGraphic> img;
 
 	if (isEnabled()) {
 		img = backgroundImage;
@@ -1216,7 +1219,7 @@ void ImageSlider::draw(gcn::Graphics *graphics)
 	}
 
 	if (img) {
-		graphics->drawImage(img, 0, 0, 0, 0, img->getWidth(), img->getHeight());
+		graphics->drawImage(img.get(), 0, 0, 0, 0, img->getWidth(), img->getHeight());
 		if (isEnabled()) {
 			drawMarker(graphics);
 		}
@@ -2568,7 +2571,7 @@ void ImageDropDownWidget::setSize(int width, int height)
 void ImageDropDownWidget::setItemImage(const std::string &image_path) {
 	itemImage = CGraphic::New(image_path);
 	itemImage->Load(false, wyrmgus::defines::get()->get_scale_factor());
-	mListBox.setItemImage(itemImage);
+	mListBox.setItemImage(itemImage.get());
 }
 
 void ImageDropDownWidget::setDownNormalImage(const std::string &image_path)
@@ -2597,7 +2600,7 @@ void ImageDropDownWidget::draw(gcn::Graphics *graphics)
 		h = getHeight();
 	}
 
-	CGraphic *img = this->itemImage;
+	std::shared_ptr<CGraphic> img = this->itemImage;
 	if (!this->itemImage || !this->DownNormalImage || !this->DownPressedImage) {
 		fprintf(stderr, "Not all graphics for ImageDropDownWidget were set\n");
 		ExitFatal(1);
@@ -2616,7 +2619,7 @@ void ImageDropDownWidget::draw(gcn::Graphics *graphics)
 //	img->Resize(getWidth(), h);
 //	graphics->drawImage(img, 0, 0, 0, 0, getWidth(), h);
 //	img->SetOriginalSize();
-	graphics->drawImage(img, 0, 0, 0, 0, img->getWidth(), img->getHeight());
+	graphics->drawImage(img.get(), 0, 0, 0, 0, img->getWidth(), img->getHeight());
 	//Wyrmgus end
 	
 	graphics->setFont(getFont());
@@ -2698,7 +2701,7 @@ void ImageDropDownWidget::drawButton(gcn::Graphics *graphics)
 	//Wyrmgus end
 	int y = 0;
 
-	CGraphic *img = nullptr;
+	std::shared_ptr<CGraphic> img = nullptr;
 	if (mDroppedDown) {
 		img = this->DownPressedImage;
 	} else {
@@ -2707,7 +2710,7 @@ void ImageDropDownWidget::drawButton(gcn::Graphics *graphics)
 	//Wyrmgus start
 //	img->Resize(h, h);
 	//Wyrmgus end
-	graphics->drawImage(img, 0, 0, x, y, h, h);
+	graphics->drawImage(img.get(), 0, 0, x, y, h, h);
 	//Wyrmgus start
 //	img->SetOriginalSize();
 	//Wyrmgus end

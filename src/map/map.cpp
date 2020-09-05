@@ -1536,8 +1536,7 @@ void CMap::Clean()
 	this->NoFogOfWar = false;
 	this->Tileset->clear();
 	this->TileModelsFileName.clear();
-	CGraphic::Free(this->TileGraphic);
-	this->TileGraphic = nullptr;
+	this->TileGraphic.reset();
 
 	FlagRevealMap = 0;
 	ReplayRevealMap = 0;
@@ -2103,7 +2102,7 @@ void CMap::calculate_tile_solid_tile(const QPoint &pos, const bool overlay, cons
 	}
 
 	if (terrain_type->has_tiled_background()) {
-		const CPlayerColorGraphic *terrain_graphics = terrain_type->get_graphics();
+		const std::shared_ptr<CPlayerColorGraphic> &terrain_graphics = terrain_type->get_graphics();
 		const int solid_tile_frame_x = pos.x() % terrain_graphics->get_frames_per_row();
 		const int solid_tile_frame_y = pos.y() % terrain_graphics->get_frames_per_column();
 		solid_tile = terrain_graphics->get_frame_index(QPoint(solid_tile_frame_x, solid_tile_frame_y));

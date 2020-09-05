@@ -122,7 +122,7 @@ void CStatusLine::DrawCosts()
 			}
 
 			if (icon != nullptr) {
-				CGraphic *icon_graphics = icon->get_graphics();
+				const std::shared_ptr<CGraphic> &icon_graphics = icon->get_graphics();
 				icon_graphics->DrawFrameClip(icon->get_frame(), x, UI.StatusLine.TextY);
 				x += 20;
 			}

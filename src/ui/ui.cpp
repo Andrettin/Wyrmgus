@@ -311,7 +311,7 @@ void CleanUserInterface()
 	UI.Fillers.clear();
 
 	// Info Panel
-	CGraphic::Free(UI.InfoPanel.G);
+	UI.InfoPanel.G.reset();
 	for (std::vector<CUnitInfoPanel *>::iterator panel = UI.InfoPanelContents.begin();
 		 panel != UI.InfoPanelContents.end(); ++panel) {
 		delete *panel;
@@ -343,14 +343,14 @@ void CleanUserInterface()
 	UI.UserButtons.clear();
 
 	// Button Panel
-	CGraphic::Free(UI.ButtonPanel.G);
+	UI.ButtonPanel.G.reset();
 
 	// Pie Menu
-	CGraphic::Free(UI.PieMenu.G);
+	UI.PieMenu.G.reset();
 
 	// Backgrounds
-	CGraphic::Free(UI.VictoryBackgroundG);
-	CGraphic::Free(UI.DefeatBackgroundG);
+	UI.VictoryBackgroundG.reset();
+	UI.DefeatBackgroundG.reset();
 
 	// Title Screens
 	if (TitleScreens) {

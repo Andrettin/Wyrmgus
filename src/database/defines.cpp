@@ -37,12 +37,6 @@ namespace wyrmgus {
 
 defines::~defines()
 {
-	CGraphic::Free(this->icon_frame_graphics);
-	CGraphic::Free(this->pressed_icon_frame_graphics);
-	CGraphic::Free(this->command_button_frame_graphics);
-	CGraphic::Free(this->bar_frame_graphics);
-	CGraphic::Free(this->infopanel_frame_graphics);
-	CGraphic::Free(this->progress_bar_graphics);
 }
 
 void defines::load(const std::filesystem::path &data_path)

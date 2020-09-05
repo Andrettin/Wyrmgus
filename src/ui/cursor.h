@@ -113,9 +113,9 @@ public:
 		this->set_file(std::filesystem::path(filepath));
 	}
 
-	CGraphic *get_graphic() const
+	const std::shared_ptr<CGraphic> &get_graphics() const
 	{
-		return this->graphic;
+		return this->graphics;
 	}
 
 	const QPoint &get_hot_pos() const
@@ -152,7 +152,7 @@ private:
 	cursor_type type;
 	wyrmgus::civilization *civilization = nullptr;
 	std::filesystem::path file;
-	CGraphic *graphic = nullptr; /// Cursor sprite image
+	std::shared_ptr<CGraphic> graphics; /// Cursor sprite image
 	QPoint hot_pos = QPoint(0, 0);     /// Hot point
 	QSize frame_size = QSize(0, 0);
 	int current_frame = 0;  /// Current displayed cursor frame

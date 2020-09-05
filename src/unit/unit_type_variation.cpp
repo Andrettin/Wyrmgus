@@ -43,28 +43,6 @@ namespace wyrmgus {
 
 unit_type_variation::~unit_type_variation()
 {
-	if (this->Sprite) {
-		CGraphic::Free(this->Sprite);
-	}
-	if (this->ShadowSprite) {
-		CGraphic::Free(this->ShadowSprite);
-	}
-	if (this->LightSprite) {
-		CGraphic::Free(this->LightSprite);
-	}
-	for (int i = 0; i < MaxImageLayers; ++i) {
-		if (this->LayerSprites[i]) {
-			CGraphic::Free(this->LayerSprites[i]);
-		}
-	}
-	for (int res = 0; res < MaxCosts; ++res) {
-		if (this->SpriteWhenLoaded[res]) {
-			CGraphic::Free(this->SpriteWhenLoaded[res]);
-		}
-		if (this->SpriteWhenEmpty[res]) {
-			CGraphic::Free(this->SpriteWhenEmpty[res]);
-		}
-	}
 }
 
 void unit_type_variation::process_sml_property(const sml_property &property)

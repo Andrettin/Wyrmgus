@@ -477,7 +477,7 @@ public:
 	const wyrmgus::icon *get_icon() const;
 	const wyrmgus::icon *GetButtonIcon(const ButtonCmd button_action) const;
 	MissileConfig GetMissile() const;
-	CPlayerColorGraphic *GetLayerSprite(int image_layer) const;
+	const std::shared_ptr<CPlayerColorGraphic> &GetLayerSprite(int image_layer) const;
 	std::string GetName() const;
 	std::string GetTypeName() const;
 	std::string GetMessageName() const;
@@ -885,11 +885,11 @@ extern void LoadDecorations();
 extern void CleanDecorations();
 
 /// Draw unit's shadow
-extern void DrawShadow(const wyrmgus::unit_type &type, CGraphic *sprite, int frame, const PixelPos &screenPos);
+extern void DrawShadow(const wyrmgus::unit_type &type, const std::shared_ptr<CGraphic> &sprite, int frame, const PixelPos &screenPos);
 //Wyrmgus start
 /// Draw unit's overlay
-extern void DrawPlayerColorOverlay(const wyrmgus::unit_type &type, CPlayerColorGraphic *sprite, const int player, int frame, const PixelPos &screenPos, const wyrmgus::time_of_day *time_of_day);
-extern void DrawOverlay(const wyrmgus::unit_type &type, CGraphic *sprite, int player, int frame, const PixelPos &screenPos, const wyrmgus::time_of_day *time_of_day);
+extern void DrawPlayerColorOverlay(const wyrmgus::unit_type &type, const std::shared_ptr<CPlayerColorGraphic> &sprite, const int player, int frame, const PixelPos &screenPos, const wyrmgus::time_of_day *time_of_day);
+extern void DrawOverlay(const wyrmgus::unit_type &type, const std::shared_ptr<CGraphic> &sprite, int player, int frame, const PixelPos &screenPos, const wyrmgus::time_of_day *time_of_day);
 //Wyrmgus end
 /// Draw all units visible on map in viewport
 extern int FindAndSortUnits(const CViewport &vp, std::vector<CUnit *> &table);

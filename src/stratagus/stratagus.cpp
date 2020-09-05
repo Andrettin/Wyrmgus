@@ -388,7 +388,6 @@ void Exit(int err)
 	ExitNetwork1();
 	CleanModules();
 	FreeBurningBuildingFrames();
-	FreeGraphics();
 	FreeButtonStyles();
 	FreeAllContainers();
 	freeGuichan();

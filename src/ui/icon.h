@@ -96,7 +96,7 @@ public:
 		return this->conversible_player_color;
 	}
 
-	CPlayerColorGraphic *get_graphics() const;
+	std::shared_ptr<CPlayerColorGraphic> get_graphics() const;
 
 	/// Draw icon
 	void DrawIcon(const PixelPos &pos, const player_color *player_color = nullptr) const;

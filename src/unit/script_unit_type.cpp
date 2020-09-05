@@ -841,9 +841,8 @@ static int CclDefineUnitType(lua_State *l)
 					LuaError(l, "Unsupported image tag: %s" _C_ value);
 				}
 			}
-			if (redefine && type->Sprite) {
-				CGraphic::Free(type->Sprite);
-				type->Sprite = nullptr;
+			if (redefine && type->Sprite != nullptr) {
+				type->Sprite.reset();
 			}
 		} else if (!strcmp(value, "Shadow")) {
 			if (!lua_istable(l, -1)) {
@@ -869,8 +868,7 @@ static int CclDefineUnitType(lua_State *l)
 				}
 			}
 			if (redefine && type->ShadowSprite) {
-				CGraphic::Free(type->ShadowSprite);
-				type->ShadowSprite = nullptr;
+				type->ShadowSprite.reset();
 			}
 		//Wyrmgus start
 		} else if (!strcmp(value, "LightImage")) {
@@ -889,8 +887,7 @@ static int CclDefineUnitType(lua_State *l)
 				}
 			}
 			if (redefine && type->LightSprite) {
-				CGraphic::Free(type->LightSprite);
-				type->LightSprite = nullptr;
+				type->LightSprite.reset();
 			}
 		} else if (!strcmp(value, "LayerImages")) {
 			if (!lua_istable(l, -1)) {
@@ -913,9 +910,8 @@ static int CclDefineUnitType(lua_State *l)
 						LuaError(l, "Unsupported layer image tag: %s" _C_ value);
 					}
 				}
-				if (redefine && type->LayerSprites[image_layer]) {
-					CGraphic::Free(type->LayerSprites[image_layer]);
-					type->LayerSprites[image_layer] = nullptr;
+				if (redefine && type->LayerSprites[image_layer] != nullptr) {
+					type->LayerSprites[image_layer].reset();
 				}
 				lua_pop(l, 1);
 			}

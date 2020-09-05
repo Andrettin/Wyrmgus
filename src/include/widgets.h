@@ -76,6 +76,10 @@ class ImageWidget : public gcn::Icon
 {
 public:
 	explicit ImageWidget(const std::string &image_path, const int scale_factor = 1, const int image_width = -1, const int image_height = -1);
+	explicit ImageWidget(const std::shared_ptr<CGraphic> &graphic, const int scale_factor = 1, const int image_width = -1, const int image_height = -1);
+
+private:
+	std::shared_ptr<CGraphic> graphic;
 };
 
 class PlayerColorImageWidget : public gcn::Icon
@@ -123,11 +127,11 @@ public:
 	void setTransparency(int alpha) { Transparency = alpha; }
 	void setImageOrigin(int x, int y) { ImageOrigin.x = x; ImageOrigin.y = y; }
 
-	CGraphic *normalImage = nullptr;
-	CGraphic *pressedImage = nullptr;
-	CGraphic *disabledImage = nullptr;
-	const gcn::Image *frameImage = nullptr;
-	const gcn::Image *pressedframeImage = nullptr;
+	std::shared_ptr<CGraphic> normalImage;
+	std::shared_ptr<CGraphic> pressedImage;
+	std::shared_ptr<CGraphic> disabledImage;
+	std::shared_ptr<CGraphic> frameImage;
+	std::shared_ptr<CGraphic> pressedframeImage;
 	int Transparency = 0;
 	Vec2i ImageOrigin;
 };
@@ -159,8 +163,8 @@ public:
 	CPlayerColorGraphic *normalImage = nullptr;
 	CPlayerColorGraphic *pressedImage = nullptr;
 	CPlayerColorGraphic *disabledImage = nullptr;
-	const gcn::Image *frameImage = nullptr;
-	const gcn::Image *pressedframeImage = nullptr;
+	std::shared_ptr<CGraphic> frameImage;
+	std::shared_ptr<CGraphic> pressedframeImage;
 	std::string ButtonPlayerColor = nullptr;
 	int Transparency = 0;
 	Vec2i ImageOrigin;
@@ -190,12 +194,12 @@ public:
 	void setCheckedPressedImage(const std::string &image_path);
 	void setCheckedDisabledImage(const std::string &image_path);
 
-	CGraphic *uncheckedNormalImage = nullptr;
-	CGraphic *uncheckedPressedImage = nullptr;
-	CGraphic *uncheckedDisabledImage = nullptr;
-	CGraphic *checkedNormalImage = nullptr;
-	CGraphic *checkedPressedImage = nullptr;
-	CGraphic *checkedDisabledImage = nullptr;
+	std::shared_ptr<CGraphic> uncheckedNormalImage;
+	std::shared_ptr<CGraphic> uncheckedPressedImage;
+	std::shared_ptr<CGraphic> uncheckedDisabledImage;
+	std::shared_ptr<CGraphic> checkedNormalImage;
+	std::shared_ptr<CGraphic> checkedPressedImage;
+	std::shared_ptr<CGraphic> checkedDisabledImage;
 	bool mMouseDown = false;
 };
 
@@ -220,12 +224,12 @@ public:
 	void setCheckedPressedImage(const std::string &image_path);
 	void setCheckedDisabledImage(const std::string &image_path);
 
-	CGraphic *uncheckedNormalImage = nullptr;
-	CGraphic *uncheckedPressedImage = nullptr;
-	CGraphic *uncheckedDisabledImage = nullptr;
-	CGraphic *checkedNormalImage = nullptr;
-	CGraphic *checkedPressedImage = nullptr;
-	CGraphic *checkedDisabledImage = nullptr;
+	std::shared_ptr<CGraphic> uncheckedNormalImage;
+	std::shared_ptr<CGraphic> uncheckedPressedImage;
+	std::shared_ptr<CGraphic> uncheckedDisabledImage;
+	std::shared_ptr<CGraphic> checkedNormalImage;
+	std::shared_ptr<CGraphic> checkedPressedImage;
+	std::shared_ptr<CGraphic> checkedDisabledImage;
 	bool mMouseDown = false;
 };
 
@@ -242,9 +246,9 @@ public:
 	void setBackgroundImage(const std::string &image_path);
 	void setDisabledBackgroundImage(const std::string &image_path);
 
-	CGraphic *markerImage = nullptr;
-	CGraphic *backgroundImage = nullptr;
-	CGraphic *disabledBackgroundImage = nullptr;
+	std::shared_ptr<CGraphic> markerImage;
+	std::shared_ptr<CGraphic> backgroundImage;
+	std::shared_ptr<CGraphic> disabledBackgroundImage;
 };
 
 class MultiLineLabel : public gcn::Widget
@@ -477,9 +481,9 @@ public:
 	void setFont(gcn::Font *font);
 	void _mouseInputMessage(const gcn::MouseInput &mouseInput);
 private:
-	CGraphic *itemImage = nullptr;
-	CGraphic *DownNormalImage = nullptr;
-	CGraphic *DownPressedImage = nullptr;
+	std::shared_ptr<CGraphic> itemImage;
+	std::shared_ptr<CGraphic> DownNormalImage;
+	std::shared_ptr<CGraphic> DownPressedImage;
 	ImageListBox mListBox;
 	LuaListModel listmodel;
 };

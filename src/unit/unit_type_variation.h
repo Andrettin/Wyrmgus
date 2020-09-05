@@ -155,9 +155,9 @@ public:
 	int ResourceMax = 0;
 	int Weight = 1;							/// The weight for when randomly choosing a variation
 	IconConfig Icon;						/// Icon to display for this unit
-	CPlayerColorGraphic *Sprite = nullptr;	/// The graphic corresponding to File.
-	CGraphic *ShadowSprite = nullptr;		/// The graphic corresponding to ShadowFile.
-	CGraphic *LightSprite = nullptr;		/// The graphic corresponding to LightFile.
+	std::shared_ptr<CPlayerColorGraphic> Sprite; /// The graphic corresponding to File.
+	std::shared_ptr<CGraphic> ShadowSprite;		/// The graphic corresponding to ShadowFile.
+	std::shared_ptr<CGraphic> LightSprite;		/// The graphic corresponding to LightFile.
 	animation_set *Animations = nullptr;		/// Animation scripts
 private:
 	wyrmgus::construction *construction = nullptr;	/// What is shown in construction phase
@@ -177,9 +177,9 @@ public:
 	std::string LayerFiles[MaxImageLayers];	/// Variation's layer graphics.
 	std::string FileWhenLoaded[MaxCosts];     /// Change the graphic when the unit is loaded.
 	std::string FileWhenEmpty[MaxCosts];      /// Change the graphic when the unit is empty.
-	CPlayerColorGraphic *LayerSprites[MaxImageLayers];	/// The graphics corresponding to LayerFiles.
-	CPlayerColorGraphic *SpriteWhenLoaded[MaxCosts]; /// The graphic corresponding to FileWhenLoaded.
-	CPlayerColorGraphic *SpriteWhenEmpty[MaxCosts];  /// The graphic corresponding to FileWhenEmpty
+	std::shared_ptr<CPlayerColorGraphic> LayerSprites[MaxImageLayers];	/// The graphics corresponding to LayerFiles.
+	std::shared_ptr<CPlayerColorGraphic> SpriteWhenLoaded[MaxCosts]; /// The graphic corresponding to FileWhenLoaded.
+	std::shared_ptr<CPlayerColorGraphic> SpriteWhenEmpty[MaxCosts];  /// The graphic corresponding to FileWhenEmpty
 	
 	std::map<ButtonCmd, IconConfig> ButtonIcons;				/// icons for button actions
 
