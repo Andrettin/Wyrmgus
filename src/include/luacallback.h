@@ -31,10 +31,10 @@
 typedef int lua_Object; // from tolua++.h
 struct lua_State;
 
-class LuaCallback
+class LuaCallback final
 {
 public:
-	LuaCallback(lua_State *lua, lua_Object luaref);
+	explicit LuaCallback(lua_State *lua, lua_Object luaref);
 	~LuaCallback();
 	void pushPreamble();
 	void pushInteger(int value);

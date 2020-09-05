@@ -33,6 +33,7 @@
 #include "commands.h"
 #include "currency.h"
 #include "database/database.h"
+#include "faction.h"
 //Wyrmgus start
 #include "grand_strategy.h"
 //Wyrmgus end
@@ -108,6 +109,29 @@ void CleanModules()
 	CParticleManager::exit();
 	CleanReplayLog();
 	FreePathfinder();
+
+	//delete lua callbacks, as that needs to be done before closing the Lua state, and database clearing is done in the Qt main thread
+	for (wyrmgus::unit_type *unit_type : wyrmgus::unit_type::get_all()) {
+		delete unit_type->DeathExplosion;
+		unit_type->DeathExplosion = nullptr;
+		delete unit_type->OnHit;
+		unit_type->OnHit = nullptr;
+		delete unit_type->OnEachCycle;
+		unit_type->OnEachCycle = nullptr;
+		delete unit_type->OnEachSecond;
+		unit_type->OnEachSecond = nullptr;
+		delete unit_type->OnInit;
+		unit_type->OnInit = nullptr;
+		delete unit_type->TeleportEffectIn;
+		unit_type->TeleportEffectIn = nullptr;
+		delete unit_type->TeleportEffectOut;
+		unit_type->TeleportEffectOut = nullptr;
+	}
+
+	for (wyrmgus::faction *faction : wyrmgus::faction::get_all()) {
+		delete faction->Conditions;
+		faction->Conditions = nullptr;
+	}
 
 	wyrmgus::database::get()->clear();
 
