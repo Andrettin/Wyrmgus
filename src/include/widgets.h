@@ -238,13 +238,13 @@ public:
 	virtual void drawMarker(gcn::Graphics *graphics);
 	virtual void draw(gcn::Graphics *graphics);
 
-	void setMarkerImage(gcn::Image *image);
-	void setBackgroundImage(gcn::Image *image);
-	void setDisabledBackgroundImage(gcn::Image *image);
+	void setMarkerImage(const std::string &image_path);
+	void setBackgroundImage(const std::string &image_path);
+	void setDisabledBackgroundImage(const std::string &image_path);
 
-	gcn::Image *markerImage;
-	gcn::Image *backgroundImage;
-	gcn::Image *disabledBackgroundImage;
+	CGraphic *markerImage = nullptr;
+	CGraphic *backgroundImage = nullptr;
+	CGraphic *disabledBackgroundImage = nullptr;
 };
 
 class MultiLineLabel : public gcn::Widget

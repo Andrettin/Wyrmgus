@@ -18,26 +18,6 @@ public:
 CVideo Video;
 void ToggleFullScreen(void);
 
-class CGraphic
-{
-public:
-	static CGraphic *New(const std::string file, const int w = 0, const int h = 0);
-	static CGraphic *Get(const std::string file);
-	static void Free(CGraphic *);
-	void Load(const bool grayscale = false, const int scale_factor = 1);
-	void Resize(int w, int h);
-	int get_frame_width() const;
-	int get_frame_height() const;
-	int get_width() const;
-	int get_height() const;
-};
-
-class CPlayerColorGraphic : public CGraphic
-{
-public:
-	static CPlayerColorGraphic *Get(const std::string file);
-};
-
 class CColor {
 	CColor(unsigned char r = 0, unsigned char g = 0, unsigned char b = 0,
 		unsigned char a = 0);

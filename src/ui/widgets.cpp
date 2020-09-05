@@ -1174,26 +1174,16 @@ void ImageCheckBox::setCheckedDisabledImage(const std::string &image_path)
 --  ImageSlider
 ----------------------------------------------------------------------------*/
 
-
-/**
-**  Image slider constructor
-*/
 ImageSlider::ImageSlider(double scaleEnd) :
-	Slider(scaleEnd), markerImage(nullptr), backgroundImage(nullptr), disabledBackgroundImage(nullptr)
+	Slider(scaleEnd)
 {
 }
 
-/**
-**  Image slider constructor
-*/
 ImageSlider::ImageSlider(double scaleStart, double scaleEnd) :
-	Slider(scaleStart, scaleEnd), markerImage(nullptr), backgroundImage(nullptr), disabledBackgroundImage(nullptr)
+	Slider(scaleStart, scaleEnd)
 {
 }
 
-/**
-**  Draw the image slider marker
-*/
 void ImageSlider::drawMarker(gcn::Graphics *graphics)
 {
 	gcn::Image *img = markerImage;
@@ -1215,9 +1205,6 @@ void ImageSlider::drawMarker(gcn::Graphics *graphics)
 	}
 }
 
-/**
-**  Draw the image slider
-*/
 void ImageSlider::draw(gcn::Graphics *graphics)
 {
 	gcn::Image *img = nullptr;
@@ -1238,31 +1225,24 @@ void ImageSlider::draw(gcn::Graphics *graphics)
 	}
 }
 
-/**
-**  Set the marker image
-*/
-void ImageSlider::setMarkerImage(gcn::Image *image)
+void ImageSlider::setMarkerImage(const std::string &image_path)
 {
-	markerImage = image;
-	setMarkerLength(image->getWidth());
+	markerImage = CGraphic::New(image_path);
+	markerImage->Load(false, wyrmgus::defines::get()->get_scale_factor());
+	setMarkerLength(markerImage->getWidth());
 }
 
-/**
-**  Set the background image
-*/
-void ImageSlider::setBackgroundImage(gcn::Image *image)
+void ImageSlider::setBackgroundImage(const std::string &image_path)
 {
-	backgroundImage = image;
+	backgroundImage = CGraphic::New(image_path);
+	backgroundImage->Load(false, wyrmgus::defines::get()->get_scale_factor());
 }
 
-/**
-**  Set the disabled background image
-*/
-void ImageSlider::setDisabledBackgroundImage(gcn::Image *image)
+void ImageSlider::setDisabledBackgroundImage(const std::string &image_path)
 {
-	disabledBackgroundImage = image;
+	disabledBackgroundImage = CGraphic::New(image_path);
+	disabledBackgroundImage->Load(false, wyrmgus::defines::get()->get_scale_factor());
 }
-
 
 /*----------------------------------------------------------------------------
 --  MultiLineLabel

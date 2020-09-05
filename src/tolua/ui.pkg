@@ -92,7 +92,6 @@ class CButtonPanel
 
 class CPieMenu
 {
-	CGraphic *G;
 	int MouseButton;
 	int X[8];
 	int Y[8];
@@ -111,7 +110,6 @@ class CResourceInfo
 
 class CInfoPanel
 {
-	CGraphic *G;
 	int X;
 	int Y;
 };
@@ -448,9 +446,9 @@ class ImageSlider : public Slider
 {
 	ImageSlider(double scaleEnd = 1.0);
 	ImageSlider(double scaleStart, double scaleEnd);
-	void setMarkerImage(CGraphic *image);
-	void setBackgroundImage(CGraphic *image);
-	void setDisabledBackgroundImage(CGraphic *image);
+	void setMarkerImage(const std::string image_path);
+	void setBackgroundImage(const std::string image_path);
+	void setDisabledBackgroundImage(const std::string image_path);
 };
 
 class Label : public Widget
