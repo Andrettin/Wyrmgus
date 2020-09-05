@@ -501,7 +501,6 @@ set(tolua_FILES
 	src/tolua/minimap.pkg
 	src/tolua/mod.pkg
 	src/tolua/network.pkg
-	src/tolua/particle.pkg
 	src/tolua/pathfinder.pkg
 	src/tolua/player.pkg
 	src/tolua/sound.pkg
