@@ -1029,17 +1029,16 @@ void MakeTextures2(const CGraphic *g, const QImage &image, GLuint texture, const
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 
-	//Wyrmgus start
 	int time_of_day_red = 0;
 	int time_of_day_green = 0;
 	int time_of_day_blue = 0;
 	
-	if (time_of_day && time_of_day->HasColorModification()) {
+	const bool has_time_of_day_color_modification = time_of_day != nullptr && time_of_day->HasColorModification();
+	if (has_time_of_day_color_modification) {
 		time_of_day_red = time_of_day->ColorModification.R;
 		time_of_day_green = time_of_day->ColorModification.G;
 		time_of_day_blue = time_of_day->ColorModification.B;
 	}
-	//Wyrmgus end
 
 	if (image.isNull()) {
 		throw std::runtime_error("Cannot generate a texture for a null image.");
@@ -1072,14 +1071,16 @@ void MakeTextures2(const CGraphic *g, const QImage &image, GLuint texture, const
 			dst_blue = src_blue;
 			dst_alpha = src_alpha;
 
-			if (time_of_day_red != 0) {
-				dst_red = std::max<int>(0, std::min<int>(255, dst_red + time_of_day_red));
-			}
-			if (time_of_day_green != 0) {
-				dst_green = std::max<int>(0, std::min<int>(255, dst_green + time_of_day_green));
-			}
-			if (time_of_day_blue != 0) {
-				dst_blue = std::max<int>(0, std::min<int>(255, dst_blue + time_of_day_blue));
+			if (has_time_of_day_color_modification) {
+				if (time_of_day_red != 0) {
+					dst_red = std::max<int>(0, std::min<int>(255, dst_red + time_of_day_red));
+				}
+				if (time_of_day_green != 0) {
+					dst_green = std::max<int>(0, std::min<int>(255, dst_green + time_of_day_green));
+				}
+				if (time_of_day_blue != 0) {
+					dst_blue = std::max<int>(0, std::min<int>(255, dst_blue + time_of_day_blue));
+				}
 			}
 		}
 	}
@@ -1101,7 +1102,7 @@ void MakeTextures2(const CGraphic *g, const QImage &image, GLuint texture, const
 
 static void MakeTextures(CGraphic *g, const bool grayscale, const wyrmgus::player_color *player_color, const wyrmgus::time_of_day *time_of_day)
 {
-	int tw = (g->get_width() - 1) / GLMaxTextureSize + 1;
+	const int tw = (g->get_width() - 1) / GLMaxTextureSize + 1;
 	const int th = (g->get_height() - 1) / GLMaxTextureSize + 1;
 
 	int w = g->get_width() % GLMaxTextureSize;

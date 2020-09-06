@@ -72,7 +72,7 @@ private:
 };
 #endif
 
-class ImageWidget : public gcn::Icon
+class ImageWidget final : public gcn::Icon
 {
 public:
 	explicit ImageWidget(const std::string &image_path, const int scale_factor = 1, const int image_width = -1, const int image_height = -1);
