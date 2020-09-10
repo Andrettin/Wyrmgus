@@ -2002,7 +2002,7 @@ static int SendSpellCast(const Vec2i &tilePos, int flush)
 			continue;
 		}
 		
-		SendCommandSpellCast(unit, tilePos, spell->Target == TargetType::Position ? nullptr : dest , CursorValue, flush, UI.CurrentMapLayer->ID);
+		SendCommandSpellCast(unit, tilePos, spell->Target == wyrmgus::spell_target_type::position ? nullptr : dest , CursorValue, flush, UI.CurrentMapLayer->ID);
 		ret = 1;
 		
 		//if the spell's effects do not stack on the same target, then only one selected unit should cast it

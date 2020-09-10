@@ -74,7 +74,7 @@
 	const int hp = this->HP * modifier / 100;
 	const int mana = this->Mana * modifier / 100;
 	const int shield = this->Shield * modifier / 100;
-	const int manacost = spell.ManaCost;
+	const int manacost = spell.get_mana_cost();
 	int diffHP;
 	int diffMana;
 	int diffShield;

@@ -2046,32 +2046,32 @@ void CUnit::CheckKnowledgeChange(int variable, int change) // this happens after
 void CUnit::UpdateItemName()
 {
 	if (this->Unique) {
-		Name = _(this->Unique->get_name().c_str());
+		this->Name = _(this->Unique->get_name().c_str());
 		return;
 	}
 	
-	Name.clear();
-	if (Prefix == nullptr && Spell == nullptr && Work == nullptr && Suffix == nullptr) { //elixirs use the name of their unit type
+	this->Name.clear();
+	if (this->Prefix == nullptr && this->Spell == nullptr && this->Work == nullptr && this->Suffix == nullptr) { //elixirs use the name of their unit type
 		return;
 	}
 	
-	if (Prefix != nullptr) {
-		Name += _(Prefix->get_name().c_str());
-		Name += " ";
+	if (this->Prefix != nullptr) {
+		this->Name += _(this->Prefix->get_name().c_str());
+		this->Name += " ";
 	}
-	if (Work != nullptr) {
-		Name += _(Work->get_name().c_str());
+	if (this->Work != nullptr) {
+		this->Name += _(this->Work->get_name().c_str());
 	} else {
-		Name += GetTypeName();
+		this->Name += GetTypeName();
 	}
-	if (Suffix != nullptr) {
-		Name += " ";
-		Name += _(Suffix->get_name().c_str());
-	} else if (Spell != nullptr) {
-		Name += " ";
-		Name += _("of");
-		Name += " ";
-		Name += _(Spell->Name.c_str());
+	if (this->Suffix != nullptr) {
+		this->Name += " ";
+		this->Name += _(this->Suffix->get_name().c_str());
+	} else if (this->Spell != nullptr) {
+		this->Name += " ";
+		this->Name += _("of");
+		this->Name += " ";
+		this->Name += _(this->Spell->get_name().c_str());
 	}
 }
 
@@ -6021,7 +6021,7 @@ bool CUnit::CanCastSpell(const wyrmgus::spell *spell, const bool ignore_mana_and
 {
 	if (spell->IsAvailableForUnit(*this)) {
 		if (!ignore_mana_and_cooldown) {
-			if (this->Variable[MANA_INDEX].Value < spell->ManaCost) {
+			if (this->Variable[MANA_INDEX].Value < spell->get_mana_cost()) {
 				return false;
 			}
 			

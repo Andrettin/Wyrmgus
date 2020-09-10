@@ -70,7 +70,7 @@
 {
 	COrder_SpellCast *order = new COrder_SpellCast(isAutocast);
 
-	order->Range = spell.Range;
+	order->Range = spell.get_range();
 	if (target) {
 		// Destination could be killed.
 		// Should be handled in action, but is not possible!
@@ -398,14 +398,14 @@ bool COrder_SpellCast::SpellMoveToTarget(CUnit &unit)
 			// Check if we can cast the spell.
 			if (!CanCastSpell(unit, spell, order.GetGoal(), order.goalPos, CMap::Map.MapLayers[order.MapLayer])) {
 				// Notify player about this problem
-				if (unit.Variable[MANA_INDEX].Value < spell.ManaCost) {
+				if (unit.Variable[MANA_INDEX].Value < spell.get_mana_cost()) {
 					unit.Player->Notify(NotifyYellow, unit.tilePos,
 										//Wyrmgus start
 										unit.MapLayer->ID,
 //										_("%s: not enough mana for spell: %s"),
 										_("%s does not have enough mana to use the %s ability."),
 //										unit.Type->Name.c_str(), spell.Name.c_str());
-										unit.GetMessageName().c_str(), spell.Name.c_str());
+										unit.GetMessageName().c_str(), spell.get_name().c_str());
 										//Wyrmgus end
 				} else if (unit.SpellCoolDownTimers[spell.Slot]) {
 					unit.Player->Notify(NotifyYellow, unit.tilePos,
@@ -414,7 +414,7 @@ bool COrder_SpellCast::SpellMoveToTarget(CUnit &unit)
 //										_("%s: spell is not ready yet: %s"),
 										_("%s's ability %s is not ready yet."),
 //										unit.Type->Name.c_str(), spell.Name.c_str());
-										unit.GetMessageName().c_str(), spell.Name.c_str());
+										unit.GetMessageName().c_str(), spell.get_name().c_str());
 										//Wyrmgus end
 				} else if (unit.Player->CheckCosts(spell.Costs, false)) {
 					unit.Player->Notify(NotifyYellow, unit.tilePos,
@@ -423,13 +423,13 @@ bool COrder_SpellCast::SpellMoveToTarget(CUnit &unit)
 //										_("%s: not enough resources to cast spell: %s"),
 										_("You do not have enough resources for %s to use the %s ability."),
 //										unit.Type->Name.c_str(), spell.Name.c_str());
-										unit.GetMessageName().c_str(), spell.Name.c_str());
+										unit.GetMessageName().c_str(), spell.get_name().c_str());
 										//Wyrmgus end
 				//Wyrmgus start
-				} else if (spell.Target == TargetType::Unit && order.GetGoal() == nullptr) {
+				} else if (spell.Target == wyrmgus::spell_target_type::unit && order.GetGoal() == nullptr) {
 					unit.Player->Notify(NotifyYellow, unit.tilePos, unit.MapLayer->ID,
 										_("%s needs a target to use the %s ability."),
-										unit.GetMessageName().c_str(), spell.Name.c_str());
+										unit.GetMessageName().c_str(), spell.get_name().c_str());
 				//Wyrmgus end
 				} else {
 					unit.Player->Notify(NotifyYellow, unit.tilePos,
@@ -438,7 +438,7 @@ bool COrder_SpellCast::SpellMoveToTarget(CUnit &unit)
 //										_("%s: can't cast spell: %s"),
 										_("%s cannot use the %s ability."),
 //										unit.Type->Name.c_str(), spell.Name.c_str());
-										unit.GetMessageName().c_str(), spell.Name.c_str());
+										unit.GetMessageName().c_str(), spell.get_name().c_str());
 										//Wyrmgus end
 				}
 
@@ -459,8 +459,8 @@ bool COrder_SpellCast::SpellMoveToTarget(CUnit &unit)
 		// FALL THROUGH
 		case 1:                         // Move to the target.
 			//Wyrmgus start
-//			if (spell.Range != INFINITE_RANGE) {
-			if (spell.Range != INFINITE_RANGE && spell.Range != 0) {
+//			if (spell.Range != wyrmgus::spell::infinite_range) {
+			if (spell.get_range() != wyrmgus::spell::infinite_range && spell.get_range() != 0) {
 			//Wyrmgus end
 				if (SpellMoveToTarget(unit) == true) {
 					if (!unit.RestoreOrder()) {

@@ -1598,7 +1598,7 @@ void Missile::MissileHit(CUnit *unit)
 					if (this->TargetUnit == nullptr) {
 						if (this->SourceUnit->CurrentAction() == UnitAction::SpellCast) {
 							const COrder_SpellCast &order = *static_cast<COrder_SpellCast *>(this->SourceUnit->CurrentOrder());
-							if (order.GetSpell().Target == TargetType::Position) {
+							if (order.GetSpell().Target == wyrmgus::spell_target_type::position) {
 								isPosition = true;
 							}
 						} else {

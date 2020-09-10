@@ -160,7 +160,7 @@
 //	target->Remove(nullptr);
 //	Vec2i offset;
 	//Wyrmgus end
-	caster.Variable[MANA_INDEX].Value -= spell.ManaCost;
+	caster.Variable[MANA_INDEX].Value -= spell.get_mana_cost();
 	//Wyrmgus start
 //	Vec2i resPos;
 //	FindNearestDrop(type, pos, resPos, LookingW);

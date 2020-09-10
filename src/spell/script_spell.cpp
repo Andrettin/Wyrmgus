@@ -324,11 +324,11 @@ static int CclDefineSpell(lua_State *l)
 		const char *value = LuaToString(l, i + 1);
 		++i;
 		if (!strcmp(value, "showname")) {
-			spell->Name = LuaToString(l, i + 1);
+			spell->set_name(LuaToString(l, i + 1));
 		} else if (!strcmp(value, "description")) {
-			spell->Description = LuaToString(l, i + 1);
+			spell->effects_string = LuaToString(l, i + 1);
 		} else if (!strcmp(value, "manacost")) {
-			spell->ManaCost = LuaToNumber(l, i + 1);
+			spell->mana_cost = LuaToNumber(l, i + 1);
 		} else if (!strcmp(value, "cooldown")) {
 			spell->CoolDown = LuaToNumber(l, i + 1);
 		} else if (!strcmp(value, "res-cost")) {
@@ -351,9 +351,9 @@ static int CclDefineSpell(lua_State *l)
 				LuaError(l, "incorrect argument");
 			}
 			if (lua_isstring(l, i + 1) && !strcmp(lua_tostring(l, i + 1), "infinite")) {
-				spell->Range = INFINITE_RANGE;
+				spell->range = wyrmgus::spell::infinite_range;
 			} else if (lua_isnumber(l, i + 1)) {
-				spell->Range = static_cast<int>(lua_tonumber(l, i + 1));
+				spell->range = static_cast<int>(lua_tonumber(l, i + 1));
 			} else {
 				LuaError(l, "Invalid range");
 			}
@@ -368,11 +368,11 @@ static int CclDefineSpell(lua_State *l)
 		} else if (!strcmp(value, "target")) {
 			value = LuaToString(l, i + 1);
 			if (!strcmp(value, "self")) {
-				spell->Target = TargetType::Self;
+				spell->Target = wyrmgus::spell_target_type::self;
 			} else if (!strcmp(value, "unit")) {
-				spell->Target = TargetType::Unit;
+				spell->Target = wyrmgus::spell_target_type::unit;
 			} else if (!strcmp(value, "position")) {
-				spell->Target = TargetType::Position;
+				spell->Target = wyrmgus::spell_target_type::position;
 			} else {
 				LuaError(l, "Unsupported spell target type tag: %s" _C_ value);
 			}

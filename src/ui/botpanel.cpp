@@ -823,7 +823,7 @@ void DrawPopup(const wyrmgus::button &button, int x, int y, bool above)
 			break;
 		case ButtonCmd::SpellCast:
 			memcpy(Costs, wyrmgus::spell::get_all()[button.Value]->Costs, sizeof(wyrmgus::spell::get_all()[button.Value]->Costs));
-			Costs[ManaResCost] = wyrmgus::spell::get_all()[button.Value]->ManaCost;
+			Costs[ManaResCost] = wyrmgus::spell::get_all()[button.Value]->get_mana_cost();
 			break;
 		case ButtonCmd::Build:
 		case ButtonCmd::BuildClass:

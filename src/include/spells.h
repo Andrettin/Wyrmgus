@@ -45,6 +45,8 @@ class CPlayer;
 class CUnit;
 struct lua_State;
 
+int CclDefineSpell(lua_State *l);
+
 namespace wyrmgus {
 	class faction;
 	class missile_type;
@@ -69,15 +71,15 @@ public:
 	const int ModifyManaCaster;
 };
 
+namespace wyrmgus {
 
-/**
-**  Different targets.
-*/
-enum class TargetType {
-	Self,
-	Position,
-	Unit
+enum class spell_target_type {
+	self,
+	position,
+	unit
 };
+
+}
 
 /*
 ** *******************
@@ -88,10 +90,10 @@ enum class TargetType {
 class Target
 {
 public:
-	Target(const TargetType type, CUnit *unit, const Vec2i &pos, int z) :
+	explicit Target(const wyrmgus::spell_target_type type, CUnit *unit, const Vec2i &pos, int z) :
 		Type(type), Unit(unit), targetPos(pos), MapLayer(z) {}
 
-	TargetType Type;                  /// type of target.
+	wyrmgus::spell_target_type Type;                  /// type of target.
 	CUnit *Unit;                      /// Unit target.
 	Vec2i targetPos;
 	int MapLayer;
@@ -106,22 +108,18 @@ public:
 class ConditionInfoVariable
 {
 public:
-	ConditionInfoVariable() : Enable(0), Check(false), ExactValue(0), ExceptValue(0),
-		MinValue(0), MaxValue(0), MinMax(0), MinValuePercent(0), MaxValuePercent(0),
-		ConditionApplyOnCaster(0) {};
+	char Enable = 0;                /// Target is 'user defined variable'.
+	bool Check = false;                 /// True if need to check that variable.
 
-	char Enable;                /// Target is 'user defined variable'.
-	bool Check;                 /// True if need to check that variable.
+	int ExactValue = 0;             /// Target must have exactly ExactValue of it's value.
+	int ExceptValue = 0;            /// Target mustn't have ExceptValue of it's value.
+	int MinValue = 0;               /// Target must have more Value than that.
+	int MaxValue = 0;               /// Target must have less Value than that.
+	int MinMax = 0;                 /// Target must have more Max than that.
+	int MinValuePercent = 0;        /// Target must have more (100 * Value / Max) than that.
+	int MaxValuePercent = 0;        /// Target must have less (100 * Value / Max) than that.
 
-	int ExactValue;             /// Target must have exactly ExactValue of it's value.
-	int ExceptValue;            /// Target mustn't have ExceptValue of it's value.
-	int MinValue;               /// Target must have more Value than that.
-	int MaxValue;               /// Target must have less Value than that.
-	int MinMax;                 /// Target must have more Max than that.
-	int MinValuePercent;        /// Target must have more (100 * Value / Max) than that.
-	int MaxValuePercent;        /// Target must have less (100 * Value / Max) than that.
-
-	char ConditionApplyOnCaster; /// true if these condition are for caster.
+	char ConditionApplyOnCaster = 0; /// true if these condition are for caster.
 	// FIXME : More (increase, MaxMax) ?
 };
 
@@ -133,11 +131,6 @@ public:
 class ConditionInfo
 {
 public:
-	ConditionInfo() : Alliance(0), Opponent(0), TargetSelf(0),
-		//Wyrmgus start
-		ThrustingWeapon(0), FactionUnit(0),
-		//Wyrmgus end
-		BoolFlag(nullptr), Variable(nullptr), CheckFunc(nullptr) {};
 	~ConditionInfo()
 	{
 		delete[] BoolFlag;
@@ -153,20 +146,20 @@ public:
 #define CONDITION_FALSE 1
 #define CONDITION_TRUE  0
 #define CONDITION_ONLY  2
-	char Alliance;          /// Target is allied. (neutral is neither allied, nor opponent)
-	char Opponent;          /// Target is opponent. (neutral is neither allied, nor opponent)
-	char TargetSelf;        /// Target is the same as the caster.
+	char Alliance = 0;          /// Target is allied. (neutral is neither allied, nor opponent)
+	char Opponent = 0;          /// Target is opponent. (neutral is neither allied, nor opponent)
+	char TargetSelf = 0;        /// Target is the same as the caster.
 	//Wyrmgus start
-	char ThrustingWeapon;	/// Caster has a thrusting weapon as the current weapon.
-	char FactionUnit;		/// Caster is a faction-specific unit.
+	char ThrustingWeapon = 0;	/// Caster has a thrusting weapon as the current weapon.
+	char FactionUnit = 0;		/// Caster is a faction-specific unit.
 	const wyrmgus::civilization *civilization_equivalent = nullptr;
 	const wyrmgus::faction *FactionEquivalent = nullptr;	/// Caster is of the same civilization as this faction, and the faction has its own unit of the caster's class.
 	//Wyrmgus end
 
-	char *BoolFlag;         /// User defined boolean flag.
+	char *BoolFlag = nullptr;         /// User defined boolean flag.
 
-	ConditionInfoVariable *Variable;
-	LuaCallback *CheckFunc;
+	ConditionInfoVariable *Variable = nullptr;
+	LuaCallback *CheckFunc = nullptr;
 	//
 	//  @todo more? feel free to add, here and to
 	//  @todo PassCondition, CclSpellParseCondition, SaveSpells
@@ -219,16 +212,36 @@ class spell final : public named_data_entry, public data_type<spell>, public CDa
 {
 	Q_OBJECT
 
+	Q_PROPERTY(int mana_cost MEMBER mana_cost READ get_mana_cost)
+
 public:
 	static constexpr const char *class_identifier = "spell";
 	static constexpr const char *database_folder = "spells";
+	static constexpr int infinite_range = 0xFFFFFFF;
 
 	static spell *add(const std::string &identifier, const wyrmgus::module *module);
 
 	explicit spell(const std::string &identifier);
 	~spell();
 
+	virtual void process_sml_property(const sml_property &property) override;
 	virtual void ProcessConfigData(const CConfigData *config_data) override;
+
+	int get_mana_cost() const
+	{
+		return this->mana_cost;
+	}
+
+	int get_range() const
+	{
+		return this->range;
+	}
+
+	const std::string &get_effects_string() const
+	{
+		return this->effects_string;
+	}
+
 	/// return 1 if spell is available, 0 if not (must upgrade)
 	bool IsAvailableForUnit(const CUnit &unit) const;
 	const AutoCastInfo *GetAutoCastInfo(const bool ai) const;
@@ -237,22 +250,26 @@ public:
 	std::vector<CUnit *> GetPotentialAutoCastTargets(const CUnit &caster, const AutoCastInfo *autocast) const;
 
 	// Identification stuff
-	std::string Name;     /// Spell name shown by the engine
-	std::string Description;	/// Spell description
 	int Slot;             /// Spell numeric identifier
 
+public:
 	// Spell Specifications
-	TargetType Target;          /// Targeting information. See TargetType.
+	spell_target_type Target;          /// Targeting information. See TargetType.
 	std::vector<SpellActionType *> Action; /// More arguments for spell (damage, delay, additional sounds...).
 
-	int Range = 0;              /// Max range of the target.
-#define INFINITE_RANGE 0xFFFFFFF
-	int ManaCost = 0;           /// Required mana for each cast.
+private:
+	int mana_cost = 0;           /// Required mana for each cast.
+	int range = 0;              /// Max range of the target.
+public:
 	int RepeatCast = 0;         /// If the spell will be cast again until out of targets.
 	bool Stackable = true;		/// Whether the spell has an effect if cast multiple times at the same target
 	int Costs[MaxCosts];        /// Resource costs of spell.
 	int CoolDown = 0;           /// How much time spell needs to be cast again.
 
+private:
+	std::string effects_string;
+
+public:
 	int DependencyId = -1;      /// Id of upgrade, -1 if no upgrade needed for cast the spell.
 	ConditionInfo *Condition = nullptr; /// Conditions to cast the spell. (generic (no test for each target))
 
@@ -269,10 +286,12 @@ public:
 
 	bool IsCasterOnly() const
 	{
-		return !Range && Target == TargetType::Self;
+		return this->get_range() == 0 && Target == spell_target_type::self;
 	}
 
 	bool ForceUseAnimation = false;
+
+	friend int ::CclDefineSpell(lua_State *l);
 };
 
 }

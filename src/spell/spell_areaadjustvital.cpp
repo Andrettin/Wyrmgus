@@ -108,7 +108,7 @@
 		clamp(&target->Variable[SHIELD_INDEX].Value, 0, target->Variable[SHIELD_INDEX].Max);
 	}
 	if (UseMana) {
-		caster.Variable[MANA_INDEX].Value -= spell.ManaCost;
+		caster.Variable[MANA_INDEX].Value -= spell.get_mana_cost();
 	}
 	return 0;
 }

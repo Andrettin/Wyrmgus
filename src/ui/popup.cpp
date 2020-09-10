@@ -340,7 +340,7 @@
 		const wyrmgus::resource_icon *icon = wyrmgus::defines::get()->get_mana_icon();
 		const wyrmgus::spell *spell = wyrmgus::spell::get_all()[button.Value];
 
-		if (spell->ManaCost) {
+		if (spell->get_mana_cost()) {
 			popupWidth = 10;
 			if (UI.Resources[ManaResCost].IconWidth != -1) {
 				popupWidth += (UI.Resources[ManaResCost].IconWidth + 5 * scale_factor);
@@ -349,8 +349,8 @@
 					popupWidth += (icon->get_graphics()->Width + 5 * scale_factor);
 				}
 			}
-			popupWidth += font->Width(spell->ManaCost);
-			popupWidth = std::max<int>(popupWidth, font->Width(spell->Name) + 10 * scale_factor);
+			popupWidth += font->Width(spell->get_mana_cost());
+			popupWidth = std::max<int>(popupWidth, font->Width(spell->get_name()) + 10 * scale_factor);
 		} else {
 			popupWidth = font->Width(button.get_hint()) + 10 * scale_factor;
 		}
@@ -439,7 +439,7 @@
 	if (Costs[ManaResCost]) {
 		const wyrmgus::spell &spell = *wyrmgus::spell::get_all()[button.Value];
 		const wyrmgus::resource_icon *icon = wyrmgus::defines::get()->get_mana_icon();
-		if (spell.ManaCost) {
+		if (spell.get_mana_cost() != 0) {
 			int y_offset = 0;
 			if (icon != nullptr) {
 				int x_offset =  UI.Resources[ManaResCost].IconWidth;
@@ -451,7 +451,7 @@
 				y_offset -= font->Height();
 				y_offset /= 2;
 			}
-			label.Draw(x, y + y_offset, spell.ManaCost);
+			label.Draw(x, y + y_offset, spell.get_mana_cost());
 		}
 	}
 }

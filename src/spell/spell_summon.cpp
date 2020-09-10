@@ -148,7 +148,7 @@ public:
 				}
 			}
 
-			caster.Variable[MANA_INDEX].Value -= spell.ManaCost;
+			caster.Variable[MANA_INDEX].Value -= spell.get_mana_cost();
 		} else {
 			DebugPrint("Unable to allocate Unit");
 		}

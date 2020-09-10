@@ -126,7 +126,7 @@
 		caster.Remove(nullptr);
 		caster.Release();
 	} else {
-		caster.Variable[MANA_INDEX].Value -= spell.ManaCost;
+		caster.Variable[MANA_INDEX].Value -= spell.get_mana_cost();
 	}
 	return 0;
 }
