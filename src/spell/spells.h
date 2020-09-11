@@ -50,6 +50,7 @@ int CclDefineSpell(lua_State *l);
 namespace wyrmgus {
 	class faction;
 	class missile_type;
+	class sound;
 	class spell;
 	class unit_type;
 }
@@ -213,6 +214,7 @@ class spell final : public named_data_entry, public data_type<spell>, public CDa
 	Q_OBJECT
 
 	Q_PROPERTY(int mana_cost MEMBER mana_cost READ get_mana_cost)
+	Q_PROPERTY(wyrmgus::sound* sound_when_cast MEMBER sound_when_cast READ get_sound_when_cast)
 
 public:
 	static constexpr const char *class_identifier = "spell";
@@ -240,6 +242,11 @@ public:
 	const std::string &get_effects_string() const
 	{
 		return this->effects_string;
+	}
+
+	sound *get_sound_when_cast() const
+	{
+		return this->sound_when_cast;
 	}
 
 	/// return 1 if spell is available, 0 if not (must upgrade)
@@ -277,9 +284,10 @@ public:
 	AutoCastInfo *AutoCast = nullptr; /// AutoCast information for your own units
 	AutoCastInfo *AICast = nullptr;   /// AutoCast information for ai. More detalied.
 
-	// Graphics and sounds. Add something else here?
-	SoundConfig SoundWhenCast;  /// Sound played if cast
+private:
+	sound *sound_when_cast = nullptr;  /// Sound played if cast
 
+public:
 	//Wyrmgus start
 	bool ItemSpell[static_cast<int>(item_class::count)];
 	//Wyrmgus end

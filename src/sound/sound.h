@@ -38,6 +38,9 @@ class CUnit;
 class LuaActionListener;
 class Missile;
 
+extern wyrmgus::sound *RegisterTwoGroups(const std::string &identifier, wyrmgus::sound *first, wyrmgus::sound *second);
+extern void SetSoundRange(wyrmgus::sound *sound, unsigned char range);
+
 static constexpr int MaxSampleVolume = 255;  /// Maximum sample volume
 
 /**
@@ -82,7 +85,7 @@ class sound final : public data_entry, public data_type<sound>
 	Q_OBJECT
 
 	Q_PROPERTY(QVariantList files READ get_files_qvariant_list)
-	Q_PROPERTY(int range MEMBER range)
+	Q_PROPERTY(int range MEMBER range READ get_range)
 	Q_PROPERTY(wyrmgus::sound* first_sound MEMBER first_sound READ get_first_sound)
 	Q_PROPERTY(wyrmgus::sound* second_sound MEMBER second_sound READ get_second_sound)
 
@@ -114,18 +117,14 @@ public:
 		return this->samples;
 	}
 
+	int get_range() const
+	{
+		return this->range;
+	}
+
 	sound *get_first_sound() const
 	{
 		return this->first_sound;
-	}
-
-	void set_first_sound(sound *sound)
-	{
-		if (sound == this->get_first_sound()) {
-			return;
-		}
-
-		this->first_sound = sound;
 	}
 
 	sound *get_second_sound() const
@@ -133,20 +132,13 @@ public:
 		return this->second_sound;
 	}
 
-	void set_second_sound(sound *sound)
-	{
-		if (sound == this->get_second_sound()) {
-			return;
-		}
-
-		this->second_sound = sound;
-	}
-
 	/**
 	**  Range is a multiplier for ::DistanceSilent.
 	**  255 means infinite range of the sound.
 	*/
+private:
 	int range = sound::max_range; //range is a multiplier for DistanceSilent
+public:
 	//Wyrmgus start
 //	unsigned char Number = 0;       /// single, group, or table of sounds.
 	unsigned int Number = 0;       /// single, group, or table of sounds.
@@ -162,6 +154,8 @@ private:
 	sound *second_sound = nullptr; //annoyed sound
 
 	friend sound *::RegisterSound(const std::string &identifier, const std::vector<std::filesystem::path> &files);
+	friend sound *::RegisterTwoGroups(const std::string &identifier, sound *first, sound *second);
+	friend void ::SetSoundRange(wyrmgus::sound *sound, unsigned char range);
 };
 
 }

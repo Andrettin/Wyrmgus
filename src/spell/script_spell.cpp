@@ -39,6 +39,7 @@
 //Wyrmgus end
 #include "script.h"
 #include "sound/script_sound.h"
+#include "sound/sound.h"
 #include "spell/spell_adjustvariable.h"
 #include "spell/spell_adjustvital.h"
 #include "spell/spell_areaadjustvital.h"
@@ -404,13 +405,7 @@ static int CclDefineSpell(lua_State *l)
 			CclSpellAutocast(l, spell->AICast);
 			lua_pop(l, 1);
 		} else if (!strcmp(value, "sound-when-cast")) {
-			//  Free the old name, get the new one
-			spell->SoundWhenCast.Name = LuaToString(l, i + 1);
-			spell->SoundWhenCast.MapSound();
-			//  Check for sound.
-			if (!spell->SoundWhenCast.Sound) {
-				spell->SoundWhenCast.Name.clear();
-			}
+			spell->sound_when_cast = wyrmgus::sound::get(LuaToString(l, i + 1));
 		} else if (!strcmp(value, "depend-upgrade")) {
 			value = LuaToString(l, i + 1);
 			spell->DependencyId = UpgradeIdByIdent(value);

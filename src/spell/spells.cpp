@@ -355,14 +355,7 @@ void spell::ProcessConfigData(const CConfigData *config_data)
 				fprintf(stderr, "Invalid spell target type: \"%s\".\n", value.c_str());
 			}
 		} else if (key == "sound_when_cast") {
-			value = FindAndReplaceString(value, "_", "-");
-			this->SoundWhenCast.Name = value;
-			this->SoundWhenCast.MapSound();
-
-			//check the sound
-			if (!this->SoundWhenCast.Sound) {
-				this->SoundWhenCast.Name.clear();
-			}
+			this->sound_when_cast = sound::get(value);
 		} else if (key == "depend_upgrade") {
 			this->DependencyId = UpgradeIdByIdent(value);
 			if (this->DependencyId == -1) {
@@ -807,17 +800,17 @@ int SpellCast(CUnit &caster, const wyrmgus::spell &spell, CUnit *target, const V
 		//
 		//  Ugly hack, CastAdjustVitals makes it's own mana calculation.
 		//
-		if (spell.SoundWhenCast.Sound) {
+		if (spell.get_sound_when_cast() != nullptr) {
 			if (spell.Target == wyrmgus::spell_target_type::self) {
-				PlayUnitSound(caster, spell.SoundWhenCast.Sound);
+				PlayUnitSound(caster, spell.get_sound_when_cast());
 			} else {
-				PlayGameSound(spell.SoundWhenCast.Sound, CalculateVolume(false, ViewPointDistance(target ? target->tilePos : goalPos), spell.SoundWhenCast.Sound->range) * spell.SoundWhenCast.Sound->VolumePercent / 100);
+				PlayGameSound(spell.get_sound_when_cast(), CalculateVolume(false, ViewPointDistance(target ? target->tilePos : goalPos), spell.get_sound_when_cast()->get_range()) * spell.get_sound_when_cast()->VolumePercent / 100);
 			}
 		} else if (caster.Type->MapSound.Hit.Sound) { //if the spell has no sound-when-cast designated, use the unit's hit sound instead (if any)
 			if (spell.Target == wyrmgus::spell_target_type::self) {
 				PlayUnitSound(caster, caster.Type->MapSound.Hit.Sound);
 			} else {
-				PlayGameSound(caster.Type->MapSound.Hit.Sound, CalculateVolume(false, ViewPointDistance(target ? target->tilePos : goalPos), caster.Type->MapSound.Hit.Sound->range) * caster.Type->MapSound.Hit.Sound->VolumePercent / 100);
+				PlayGameSound(caster.Type->MapSound.Hit.Sound, CalculateVolume(false, ViewPointDistance(target ? target->tilePos : goalPos), caster.Type->MapSound.Hit.Sound->get_range()) * caster.Type->MapSound.Hit.Sound->VolumePercent / 100);
 			}
 		}
 		

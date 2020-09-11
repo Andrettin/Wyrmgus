@@ -422,7 +422,7 @@ void PlayUnitSound(const CUnit &unit, wyrmgus::sound *sound)
 
 	Origin source = {&unit, unsigned(UnitNumber(unit))};
 
-	const int volume = CalculateVolume(false, ViewPointDistanceToUnit(unit), sound->range) * sound->VolumePercent / 100;
+	const int volume = CalculateVolume(false, ViewPointDistanceToUnit(unit), sound->get_range()) * sound->VolumePercent / 100;
 
 	if (volume == 0) {
 		return;
@@ -453,7 +453,7 @@ void PlayMissileSound(const Missile &missile, wyrmgus::sound *sound)
 	clamp(&stereo, -128, 127);
 
 	Origin source = {nullptr, 0};
-	const int volume = CalculateVolume(false, ViewPointDistanceToMissile(missile), sound->range) * sound->VolumePercent / 100;
+	const int volume = CalculateVolume(false, ViewPointDistanceToMissile(missile), sound->get_range()) * sound->VolumePercent / 100;
 
 	if (volume == 0) {
 		return;
@@ -486,7 +486,7 @@ void PlayGameSound(wyrmgus::sound *sound, unsigned char volume, bool always)
 		return;
 	}
 
-	volume = CalculateVolume(true, volume, sound->range) * sound->VolumePercent / 100;
+	volume = CalculateVolume(true, volume, sound->get_range()) * sound->VolumePercent / 100;
 	if (volume == 0) {
 		return;
 	}
@@ -580,8 +580,8 @@ wyrmgus::sound *RegisterTwoGroups(const std::string &identifier, wyrmgus::sound 
 	}
 	wyrmgus::sound *id = wyrmgus::sound::add(identifier, nullptr);
 	id->Number = TWO_GROUPS;
-	id->set_first_sound(first);
-	id->set_second_sound(second);
+	id->first_sound = first;
+	id->second_sound = second;
 	id->range = wyrmgus::sound::max_range;
 	//Wyrmgus start
 	id->VolumePercent = first->VolumePercent + second->VolumePercent / 2;
