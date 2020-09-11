@@ -36,7 +36,7 @@
 
 #include "stratagus.h"
 
-#include "spells.h"
+#include "spell/spells.h"
 
 #include "actions.h"
 #include "character.h"

@@ -75,7 +75,7 @@
 #include "species/species.h"
 #include "species/taxon.h"
 #include "species/taxonomic_rank.h"
-#include "spells.h"
+#include "spell/spells.h"
 #include "time/calendar.h"
 #include "time/time_of_day.h"
 #include "time/timeline.h"

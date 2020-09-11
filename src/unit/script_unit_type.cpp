@@ -60,7 +60,7 @@
 #include "species/species.h"
 #include "species/taxon.h"
 #include "species/taxonomic_rank.h"
-#include "spells.h"
+#include "spell/spells.h"
 #include "time/season.h"
 #include "ui/button.h"
 #include "ui/button_level.h"

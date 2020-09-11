@@ -58,7 +58,7 @@
 #include "iolib.h"
 #include "player.h"
 #include "script.h"
-#include "spells.h"
+#include "spell/spells.h"
 #include "unit/unit.h"
 #include "unit/unit_type.h"
 

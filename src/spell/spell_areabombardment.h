@@ -9,7 +9,8 @@
 //         Stratagus - A free fantasy real time strategy game engine
 //
 //
-//      (c) Copyright 2013 by cybermind
+//      (c) Copyright 1999-2012 by Vladi Belperchinov-Shabanski,
+//                                 Joris DAUPHIN, and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -28,18 +29,23 @@
 
 #pragma once
 
-/*----------------------------------------------------------------------------
---  Includes
-----------------------------------------------------------------------------*/
+#include "spell/spells.h"
 
-#include "spells.h"
-
-class Spell_Teleport : public SpellActionType
+class Spell_AreaBombardment : public SpellActionType
 {
 public:
-	Spell_Teleport() : SpellActionType(0) {}
+	Spell_AreaBombardment() : Fields(0), Shards(0), Damage(0),
+		StartOffsetX(0), StartOffsetY(0), Missile(nullptr) {};
 	virtual void ProcessConfigData(const CConfigData *config_data) override {}
 	virtual int Cast(CUnit &caster, const wyrmgus::spell &spell,
 					 CUnit *target, const Vec2i &goalPos, int z, int modifier);
 	virtual void Parse(lua_State *l, int startIndex, int endIndex);
+
+private:
+	int Fields;             /// The size of the affected square.
+	int Shards;             /// Number of shards thrown.
+	int Damage;             /// Damage for every shard.
+	int StartOffsetX;       /// The offset of the missile start point to the hit location.
+	int StartOffsetY;       /// The offset of the missile start point to the hit location.
+	wyrmgus::missile_type *Missile;   /// Missile fired on cast
 };

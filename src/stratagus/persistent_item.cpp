@@ -32,7 +32,7 @@
 #include "character.h"
 #include "config.h"
 #include "item_slot.h"
-#include "spells.h"
+#include "spell/spells.h"
 #include "unique_item.h"
 #include "unit/unit.h"
 #include "unit/unit_type.h"

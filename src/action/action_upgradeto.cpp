@@ -48,7 +48,7 @@
 #include "quest.h"
 #include "script.h"
 #include "script/condition/condition.h"
-#include "spells.h"
+#include "spell/spells.h"
 #include "translate.h"
 #include "ui/interface.h"
 #include "unit/unit.h"

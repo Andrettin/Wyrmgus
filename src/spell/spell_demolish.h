@@ -29,11 +29,7 @@
 
 #pragma once
 
-/*----------------------------------------------------------------------------
---  Includes
-----------------------------------------------------------------------------*/
-
-#include "spells.h"
+#include "spell/spells.h"
 
 class Spell_Demolish : public SpellActionType
 {

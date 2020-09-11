@@ -27,10 +27,6 @@
 //      02111-1307, USA.
 //
 
-/*----------------------------------------------------------------------------
---  Includes
-----------------------------------------------------------------------------*/
-
 #include "stratagus.h"
 
 #include "unit/unit_find.h"
@@ -42,7 +38,7 @@
 #include "missile.h"
 #include "pathfinder.h"
 #include "player.h"
-#include "spells.h"
+#include "spell/spells.h"
 #include "unit/unit.h"
 #include "unit/unit_manager.h"
 #include "unit/unit_type.h"

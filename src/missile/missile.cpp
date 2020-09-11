@@ -50,7 +50,7 @@
 #include "sound/sound.h"
 #include "sound/unitsound.h"
 #include "sound/unit_sound_type.h"
-#include "spells.h"
+#include "spell/spells.h"
 #include "ui/ui.h"
 #include "unit/unit.h"
 #include "unit/unit_find.h"

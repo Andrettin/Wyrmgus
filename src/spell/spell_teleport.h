@@ -9,7 +9,7 @@
 //         Stratagus - A free fantasy real time strategy game engine
 //
 //
-//      (c) Copyright 2014 by cybermind
+//      (c) Copyright 2013 by cybermind
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -28,24 +28,14 @@
 
 #pragma once
 
-/*----------------------------------------------------------------------------
---  Includes
-----------------------------------------------------------------------------*/
+#include "spell/spells.h"
 
-#include "luacallback.h"
-#include "spells.h"
-
-
-class Spell_LuaCallback : public SpellActionType
+class Spell_Teleport : public SpellActionType
 {
 public:
-	Spell_LuaCallback() : Func(nullptr) {};
-	~Spell_LuaCallback() { delete Func; };
+	Spell_Teleport() : SpellActionType(0) {}
 	virtual void ProcessConfigData(const CConfigData *config_data) override {}
 	virtual int Cast(CUnit &caster, const wyrmgus::spell &spell,
 					 CUnit *target, const Vec2i &goalPos, int z, int modifier);
 	virtual void Parse(lua_State *l, int startIndex, int endIndex);
-
-private:
-	LuaCallback *Func;
 };

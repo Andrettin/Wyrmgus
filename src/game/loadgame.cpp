@@ -52,7 +52,7 @@
 #include "script/trigger.h"
 #include "sound/sound.h"
 #include "sound/sound_server.h"
-#include "spells.h"
+#include "spell/spells.h"
 #include "text.h"
 #include "time/season_schedule.h"
 #include "time/time_of_day_schedule.h"

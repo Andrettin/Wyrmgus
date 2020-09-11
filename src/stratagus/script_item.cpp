@@ -31,7 +31,7 @@
 
 #include "player.h"
 #include "script.h"
-#include "spells.h"
+#include "spell/spells.h"
 #include "unique_item.h"
 #include "unit/unit_type.h"
 #include "upgrade/upgrade.h"

@@ -29,24 +29,44 @@
 
 #pragma once
 
-/*----------------------------------------------------------------------------
---  Includes
-----------------------------------------------------------------------------*/
+#include "spell/spells.h"
 
-#include "spells.h"
-
-class Spell_AreaAdjustVital : public SpellActionType
+class SpellActionTypeAdjustVariable
 {
 public:
-	virtual void ProcessConfigData(const CConfigData *config_data) override {}
+	SpellActionTypeAdjustVariable() : Enable(0), Value(0), Max(0), Increase(0),
+		ModifEnable(0), ModifValue(0), ModifMax(0), ModifIncrease(0),
+		InvertEnable(0), AddValue(0), AddMax(0), AddIncrease(0), IncreaseTime(0),
+		TargetIsCaster(0) {};
+
+	int Enable;                 /// Value to affect to this field.
+	int Value;                  /// Value to affect to this field.
+	int Max;                    /// Value to affect to this field.
+	int Increase;               /// Value to affect to this field.
+
+	char ModifEnable;           /// true if we modify this field.
+	char ModifValue;            /// true if we modify this field.
+	char ModifMax;              /// true if we modify this field.
+	char ModifIncrease;         /// true if we modify this field.
+
+	char InvertEnable;          /// true if we invert this field.
+	int AddValue;               /// Add this value to this field.
+	int AddMax;                 /// Add this value to this field.
+	int AddIncrease;            /// Add this value to this field.
+	int IncreaseTime;           /// How many time increase the Value field.
+	char TargetIsCaster;        /// true if the target is the caster.
+};
+
+class Spell_AdjustVariable : public SpellActionType
+{
+public:
+	Spell_AdjustVariable() : Var(nullptr) {};
+	~Spell_AdjustVariable() { delete [](this->Var); };
+	virtual void ProcessConfigData(const CConfigData *config_data) override;
 	virtual int Cast(CUnit &caster, const wyrmgus::spell &spell,
 					 CUnit *target, const Vec2i &goalPos, int z, int modifier);
 	virtual void Parse(lua_State *l, int startIndex, int endIndex);
 
 private:
-	int HP = 0;				/// Target HP gain.(can be negative)
-	int Mana = 0;			/// Target Mana gain.(can be negative)
-	int Shield = 0;			/// Target SP gain.(can be negative)
-	int Range = 1;			/// Range of spell
-	bool UseMana = false;	/// If true, use mana for spell cast
+	SpellActionTypeAdjustVariable *Var;
 };

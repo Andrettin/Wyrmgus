@@ -58,7 +58,7 @@
 #include "script/trigger.h"
 #include "sound/sound.h"
 #include "sound/unitsound.h"
-#include "spells.h"
+#include "spell/spells.h"
 #include "time/calendar.h"
 #include "time/season.h"
 #include "time/time_of_day.h"

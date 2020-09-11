@@ -8,9 +8,8 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name ai_magic.cpp - AI magic functions. */
 //
-//      (c) Copyright 2002-2005 by Lutz Sammer, Joris Dauphin
+//      (c) Copyright 2014 by cybermind
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -27,42 +26,21 @@
 //      02111-1307, USA.
 //
 
-#include "stratagus.h"
-#include "unit/unit_type.h"
-#include "unit/unit.h"
+#pragma once
+
+#include "luacallback.h"
 #include "spell/spells.h"
-#include "actions.h"
-#include "ai_local.h"
 
-/**
-**  Check what computer units can do with magic.
-**  In fact, turn on autocast for AI.
-*/
-void AiCheckMagic()
+class Spell_LuaCallback : public SpellActionType
 {
-	CPlayer &player = *AiPlayer->Player;
-	const int n = player.GetUnitCount();
+public:
+	Spell_LuaCallback() : Func(nullptr) {};
+	~Spell_LuaCallback() { delete Func; };
+	virtual void ProcessConfigData(const CConfigData *config_data) override {}
+	virtual int Cast(CUnit &caster, const wyrmgus::spell &spell,
+					 CUnit *target, const Vec2i &goalPos, int z, int modifier);
+	virtual void Parse(lua_State *l, int startIndex, int endIndex);
 
-	for (int i = 0; i < n; ++i) {
-		CUnit &unit = player.GetUnit(i);
-
-		if (unit.Type->Spells.size() > 0) {
-			// Check only idle magic units
-			for (size_t i = 0; i != unit.Orders.size(); ++i) {
-				if (unit.Orders[i]->Action == UnitAction::SpellCast) {
-					return;
-				}
-			}
-			for (unsigned int j = 0; j < unit.Type->Spells.size(); ++j) {
-				wyrmgus::spell *spell = unit.Type->Spells[j];
-				// Check if we can cast this spell. SpellIsAvailable checks for upgrades.
-				if (spell->IsAvailableForUnit(unit)
-					&& spell->AICast) {
-					if (AutoCastSpell(unit, *spell)) {
-						break;
-					}
-				}
-			}
-		}
-	}
-}
+private:
+	LuaCallback *Func;
+};

@@ -33,7 +33,7 @@
 #include "dynasty.h"
 #include "faction.h"
 #include "script/trigger.h"
-#include "spells.h"
+#include "spell/spells.h"
 #include "ui/button_level.h"
 #include "ui/interface.h"
 #include "unit/unit.h"

@@ -45,7 +45,7 @@
 #include "quest.h"
 #include "religion/deity.h"
 #include "script.h"
-#include "spells.h"
+#include "spell/spells.h"
 #include "time/timeline.h"
 #include "unique_item.h"
 #include "unit/unit_type.h"

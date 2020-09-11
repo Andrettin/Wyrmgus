@@ -742,19 +742,20 @@ set(stratagus_species_HDRS
 )
 
 set(stratagus_spell_HDRS
-	src/include/spell/spell_adjustvariable.h
-	src/include/spell/spell_adjustvital.h
-	src/include/spell/spell_areaadjustvital.h
-	src/include/spell/spell_areabombardment.h
-	src/include/spell/spell_capture.h
-	src/include/spell/spell_demolish.h
-	src/include/spell/spell_luacallback.h
-	src/include/spell/spell_polymorph.h
-	src/include/spell/spell_retrain.h
-	src/include/spell/spell_spawnmissile.h
-	src/include/spell/spell_spawnportal.h
-	src/include/spell/spell_summon.h
-	src/include/spell/spell_teleport.h
+	src/spell/spell_adjustvariable.h
+	src/spell/spell_adjustvital.h
+	src/spell/spell_areaadjustvital.h
+	src/spell/spell_areabombardment.h
+	src/spell/spell_capture.h
+	src/spell/spell_demolish.h
+	src/spell/spell_luacallback.h
+	src/spell/spell_polymorph.h
+	src/spell/spell_retrain.h
+	src/spell/spell_spawnmissile.h
+	src/spell/spell_spawnportal.h
+	src/spell/spell_summon.h
+	src/spell/spell_teleport.h
+	src/spell/spells.h
 )
 
 set(stratagus_time_HDRS
@@ -896,7 +897,6 @@ set(stratagus_generic_HDRS
 	src/include/script.h
 	src/include/settings.h
 	src/include/shaders.h
-	src/include/spells.h
 	src/include/stratagus.h
 	src/include/text.h
 	src/include/title.h

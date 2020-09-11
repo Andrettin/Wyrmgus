@@ -81,7 +81,7 @@
 #include "settings.h"
 #include "sound/sound.h"
 #include "sound/sound_server.h"
-#include "spells.h"
+#include "spell/spells.h"
 #include "text.h"
 #include "time/calendar.h"
 #include "translate.h"

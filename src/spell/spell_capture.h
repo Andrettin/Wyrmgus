@@ -29,25 +29,21 @@
 
 #pragma once
 
-/*----------------------------------------------------------------------------
---  Includes
-----------------------------------------------------------------------------*/
+#include "spell/spells.h"
 
-#include "spells.h"
-
-class Spell_Summon : public SpellActionType
+class Spell_Capture : public SpellActionType
 {
 public:
-	Spell_Summon() : SpellActionType(1), UnitType(nullptr), TTL(0),
-		RequireCorpse(false), JoinToAiForce(false) {};
-	virtual void ProcessConfigData(const CConfigData *config_data) override {}
+	Spell_Capture() : SacrificeEnable(false), JoinToAIForce(false), Damage(0), DamagePercent(0) {};
+	virtual void ProcessConfigData(const CConfigData *config_data) override {};
 	virtual int Cast(CUnit &caster, const wyrmgus::spell &spell,
 					 CUnit *target, const Vec2i &goalPos, int z, int modifier);
 	virtual void Parse(lua_State *l, int startIndex, int endIndex);
 
 private:
-	wyrmgus::unit_type *UnitType;    /// Type of unit to be summoned.
-	int TTL;                /// Time to live for summoned unit. 0 means infinite
-	int RequireCorpse;      /// Corpse consumed while summoning.
-	bool JoinToAiForce;     /// if true, captured unit is joined into caster's AI force, if available
+	bool SacrificeEnable; /// true if the caster dies after casting.
+	bool JoinToAIForce;   /// if true, captured unit is joined into caster's AI force, if available
+	int Damage;           /// damage the spell does if unable to caputre
+	int DamagePercent;    /// percent the target must be damaged for a
+	/// capture to succeed.
 };

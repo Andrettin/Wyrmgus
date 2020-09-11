@@ -29,28 +29,22 @@
 
 #pragma once
 
-/*----------------------------------------------------------------------------
---  Includes
-----------------------------------------------------------------------------*/
+#include "spell/spells.h"
 
-#include "spells.h"
-
-class Spell_Polymorph : public SpellActionType
+class Spell_AdjustVital : public SpellActionType
 {
 public:
-	Spell_Polymorph() : SpellActionType(1) {};
+	Spell_AdjustVital() : SpellActionType(1), HP(0), Mana(0), Shield(0), MaxMultiCast(0) {};
 	virtual void ProcessConfigData(const CConfigData *config_data) override {}
 	virtual int Cast(CUnit &caster, const wyrmgus::spell &spell,
 					 CUnit *target, const Vec2i &goalPos, int z, int modifier);
 	virtual void Parse(lua_State *l, int startIndex, int endIndex);
 
 private:
-	wyrmgus::unit_type *NewForm = nullptr;	/// The new form
-	int PlayerNeutral = 0;			/// Convert the unit to the neutral player, or to the caster's player.
-	//Wyrmgus start
-	wyrmgus::civilization *civilization = nullptr;			/// For using with the Faction value.
-	int Faction = -1;				/// If the unit should be transformed in its faction equivalent.
-	bool Detachment = false;		/// If the unit should be transformed from its faction-specific type to the generic civilization equivalent.
-	//Wyrmgus end
-	// TODO: temporary polymorphs would be awesome, but hard to implement
+	int HP;         /// Target HP gain.(can be negative)
+	int Mana;       /// Target Mana gain.(can be negative)
+	int Shield;     /// Target SP gain.(can be negative)
+	/// This spell is designed to be used wit very small amounts. The spell
+	/// can scale up to MaxMultiCast times. Use 0 for infinite.
+	int MaxMultiCast;
 };

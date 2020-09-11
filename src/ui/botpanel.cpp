@@ -68,7 +68,7 @@
 #include "script/trigger.h"
 #include "sound/sound.h"
 #include "sound/unit_sound_type.h"
-#include "spells.h"
+#include "spell/spells.h"
 #include "translate.h"
 #include "ui/button.h"
 #include "ui/button_level.h"

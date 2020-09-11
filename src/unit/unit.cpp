@@ -74,7 +74,7 @@
 #include "sound/sound_server.h"
 #include "sound/unitsound.h"
 #include "sound/unit_sound_type.h"
-#include "spells.h"
+#include "spell/spells.h"
 #include "time/time_of_day.h"
 #include "translate.h"
 #include "ui/button.h"

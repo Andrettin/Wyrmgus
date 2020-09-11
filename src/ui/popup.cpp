@@ -36,7 +36,7 @@
 #include "player.h"
 #include "script/condition/condition.h"
 #include "script/trigger.h"
-#include "spells.h"
+#include "spell/spells.h"
 //Wyrmgus start
 #include "translate.h"
 //Wyrmgus end

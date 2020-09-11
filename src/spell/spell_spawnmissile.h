@@ -29,49 +29,57 @@
 
 #pragma once
 
-/*----------------------------------------------------------------------------
---  Includes
-----------------------------------------------------------------------------*/
+#include "spell/spells.h"
 
-#include "spells.h"
-
-class SpellActionTypeAdjustVariable
-{
-public:
-	SpellActionTypeAdjustVariable() : Enable(0), Value(0), Max(0), Increase(0),
-		ModifEnable(0), ModifValue(0), ModifMax(0), ModifIncrease(0),
-		InvertEnable(0), AddValue(0), AddMax(0), AddIncrease(0), IncreaseTime(0),
-		TargetIsCaster(0) {};
-
-	int Enable;                 /// Value to affect to this field.
-	int Value;                  /// Value to affect to this field.
-	int Max;                    /// Value to affect to this field.
-	int Increase;               /// Value to affect to this field.
-
-	char ModifEnable;           /// true if we modify this field.
-	char ModifValue;            /// true if we modify this field.
-	char ModifMax;              /// true if we modify this field.
-	char ModifIncrease;         /// true if we modify this field.
-
-	char InvertEnable;          /// true if we invert this field.
-	int AddValue;               /// Add this value to this field.
-	int AddMax;                 /// Add this value to this field.
-	int AddIncrease;            /// Add this value to this field.
-	int IncreaseTime;           /// How many time increase the Value field.
-	char TargetIsCaster;        /// true if the target is the caster.
+/**
+**  Different targets.
+*/
+enum LocBaseType {
+	LocBaseCaster,
+	LocBaseTarget
 };
 
-
-class Spell_AdjustVariable : public SpellActionType
+/**
+**  This struct is used for defining a missile start/stop location.
+**
+**  It's evaluated like this, and should be more or less flexible.:
+**  base coordinates(caster or target) + (AddX,AddY) + (rand()%AddRandX,rand()%AddRandY)
+*/
+class SpellActionMissileLocation
 {
 public:
-	Spell_AdjustVariable() : Var(nullptr) {};
-	~Spell_AdjustVariable() { delete [](this->Var); };
+	SpellActionMissileLocation(LocBaseType base) : Base(base) {}
+
+	void ProcessConfigData(const CConfigData *config_data);
+	
+	LocBaseType Base;	/// The base for the location (caster/target)
+	int AddX = 0;		/// Add to the X coordinate
+	int AddY = 0;		/// Add to the X coordinate
+	int AddRandX = 0;	/// Random add to the X coordinate
+	int AddRandY = 0;	/// Random add to the X coordinate
+};
+
+class Spell_SpawnMissile : public SpellActionType
+{
+public:
+	Spell_SpawnMissile() : 
+		StartPoint(LocBaseCaster), EndPoint(LocBaseTarget) {}
 	virtual void ProcessConfigData(const CConfigData *config_data) override;
 	virtual int Cast(CUnit &caster, const wyrmgus::spell &spell,
 					 CUnit *target, const Vec2i &goalPos, int z, int modifier);
-	virtual void Parse(lua_State *l, int startIndex, int endIndex);
+	virtual void Parse(lua_State *lua, int startIndex, int endIndex);
 
 private:
-	SpellActionTypeAdjustVariable *Var;
+	int Damage = 0;							/// Missile damage.
+	int LightningDamage = 0;				/// Missile lightning damage.
+	int TTL = -1;							/// Missile TTL.
+	int Delay = 0;							/// Missile original delay.
+	bool UseUnitVar = false;				/// Use the caster's damage parameters
+	//Wyrmgus start
+	bool AlwaysHits = false;				/// The missile spawned from the spell always hits
+	bool AlwaysCritical = false;			/// The damage from the spell is always a critical hit (double damage)
+	//Wyrmgus end
+	SpellActionMissileLocation StartPoint;	/// Start point description.
+	SpellActionMissileLocation EndPoint;	/// Start point description.
+	wyrmgus::missile_type *Missile = nullptr;			/// Missile fired on cast
 };

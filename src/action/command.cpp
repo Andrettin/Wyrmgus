@@ -41,7 +41,7 @@
 #include "map/tileset.h"
 #include "pathfinder.h"
 #include "player.h"
-#include "spells.h"
+#include "spell/spells.h"
 #include "translate.h"
 #include "ui/ui.h"
 #include "unit/unit.h"
