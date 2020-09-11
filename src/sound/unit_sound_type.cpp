@@ -45,7 +45,7 @@ int get_unit_sound_type_range(const unit_sound_type unit_sound_type)
 		case unit_sound_type::used:
 			return 32;
 		default:
-			return INFINITE_SOUND_RANGE;
+			return sound::infinite_range;
 	}
 }
 

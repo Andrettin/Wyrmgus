@@ -69,15 +69,6 @@ static constexpr int ONE_SOUND = 0;
 */
 static constexpr int TWO_GROUPS = 1;
 
-/**
-** the range value that makes a sound volume distance independent
-*/
-static constexpr int INFINITE_SOUND_RANGE = 255;
-/**
-** the maximum range value
-*/
-static constexpr int MAX_SOUND_RANGE = 254;
-
 /// Register a sound (can be a simple sound or a group)
 extern wyrmgus::sound *RegisterSound(const std::string &identifier, const std::vector<std::filesystem::path> &files);
 
@@ -98,6 +89,8 @@ class sound final : public data_entry, public data_type<sound>
 public:
 	static constexpr const char *class_identifier = "sound";
 	static constexpr const char *database_folder = "sounds";
+	static constexpr int max_range = 254;
+	static constexpr int infinite_range = 255; //the range value that makes a sound volume distance independent
 
 	static void initialize_all();
 
@@ -153,7 +146,7 @@ public:
 	**  Range is a multiplier for ::DistanceSilent.
 	**  255 means infinite range of the sound.
 	*/
-	int range = MAX_SOUND_RANGE; //range is a multiplier for DistanceSilent
+	int range = sound::max_range; //range is a multiplier for DistanceSilent
 	//Wyrmgus start
 //	unsigned char Number = 0;       /// single, group, or table of sounds.
 	unsigned int Number = 0;       /// single, group, or table of sounds.
@@ -184,20 +177,12 @@ struct Origin {
 	unsigned Id;        /// unique identifier (if the pointer has been shared)
 };
 
-/*----------------------------------------------------------------------------
---  Variables
-----------------------------------------------------------------------------*/
-
 extern GameSound GameSounds;  /// Game sound configuration
 
 extern bool CallbackMusic;  /// flag true callback ccl if stops
 
 /// global range control (max cut off distance for sound)
 extern int DistanceSilent;
-
-/*----------------------------------------------------------------------------
---  Functions
-----------------------------------------------------------------------------*/
 
 /// Calculates volume level
 extern unsigned char CalculateVolume(bool isVolume, int power, unsigned char range);
@@ -223,7 +208,6 @@ extern wyrmgus::sound *RegisterTwoGroups(const std::string &identifier, wyrmgus:
 
 /// Initialize client side of the sound layer.
 extern void InitSoundClient();
-
 
 // music.cpp
 

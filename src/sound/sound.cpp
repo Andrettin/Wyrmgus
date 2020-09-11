@@ -306,17 +306,17 @@ static wyrmgus::sound *ChooseUnitVoiceSound(const CUnit &unit, const wyrmgus::un
 unsigned char VolumeForDistance(unsigned short d, unsigned char range)
 {
 	// FIXME: THIS IS SLOW!!!!!!!
-	if (d <= ViewPointOffset || range == INFINITE_SOUND_RANGE) {
+	if (d <= ViewPointOffset || range == wyrmgus::sound::infinite_range) {
 		return MaxVolume;
 	} else {
 		if (range) {
 			d -= ViewPointOffset;
-			int d_tmp = d * MAX_SOUND_RANGE;
+			int d_tmp = d * wyrmgus::sound::max_range;
 			int range_tmp = DistanceSilent * range;
 			if (d_tmp > range_tmp) {
 				return 0;
 			} else {
-				return (unsigned char)((range_tmp - d_tmp) * MAX_SOUND_RANGE / range_tmp);
+				return (unsigned char)((range_tmp - d_tmp) * wyrmgus::sound::max_range / range_tmp);
 			}
 		} else {
 			return 0;
@@ -582,7 +582,7 @@ wyrmgus::sound *RegisterTwoGroups(const std::string &identifier, wyrmgus::sound 
 	id->Number = TWO_GROUPS;
 	id->set_first_sound(first);
 	id->set_second_sound(second);
-	id->range = MAX_SOUND_RANGE;
+	id->range = wyrmgus::sound::max_range;
 	//Wyrmgus start
 	id->VolumePercent = first->VolumePercent + second->VolumePercent / 2;
 	//Wyrmgus end
