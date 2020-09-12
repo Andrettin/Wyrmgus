@@ -6463,8 +6463,8 @@ bool CUnit::IsAbilityEmpowered(const CUpgrade *ability) const
 
 bool CUnit::IsSpellEmpowered(const wyrmgus::spell *spell) const
 {
-	if (spell->DependencyId != -1) {
-		return this->IsAbilityEmpowered(CUpgrade::get_all()[spell->DependencyId]);
+	if (spell->get_dependency_upgrade() != nullptr) {
+		return this->IsAbilityEmpowered(spell->get_dependency_upgrade());
 	} else {
 		return false;
 	}

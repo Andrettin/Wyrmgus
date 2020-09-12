@@ -206,6 +206,7 @@ class spell final : public named_data_entry, public data_type<spell>, public CDa
 
 	Q_PROPERTY(int mana_cost MEMBER mana_cost READ get_mana_cost)
 	Q_PROPERTY(wyrmgus::spell_target_type target MEMBER target READ get_target)
+	Q_PROPERTY(CUpgrade* dependency_upgrade MEMBER dependency_upgrade READ get_dependency_upgrade)
 	Q_PROPERTY(wyrmgus::sound* sound_when_cast MEMBER sound_when_cast READ get_sound_when_cast)
 
 public:
@@ -241,6 +242,11 @@ public:
 		return this->effects_string;
 	}
 
+	CUpgrade *get_dependency_upgrade() const
+	{
+		return this->dependency_upgrade;
+	}
+
 	sound *get_sound_when_cast() const
 	{
 		return this->sound_when_cast;
@@ -270,8 +276,8 @@ public:
 	int CoolDown = 0;           /// How much time spell needs to be cast again.
 private:
 	std::string effects_string;
+	CUpgrade *dependency_upgrade = nullptr;
 public:
-	int DependencyId = -1;      /// Id of upgrade, -1 if no upgrade needed for cast the spell.
 	ConditionInfo *Condition = nullptr; /// Conditions to cast the spell. (generic (no test for each target))
 
 	// Autocast information. No AICast means the AI use AutoCast.

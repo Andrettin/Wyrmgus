@@ -350,10 +350,7 @@ void spell::ProcessConfigData(const CConfigData *config_data)
 		} else if (key == "sound_when_cast") {
 			this->sound_when_cast = sound::get(value);
 		} else if (key == "depend_upgrade") {
-			this->DependencyId = UpgradeIdByIdent(value);
-			if (this->DependencyId == -1) {
-				fprintf(stderr, "Invalid upgrade: \"%s\".\n", value.c_str());
-			}
+			this->dependency_upgrade = CUpgrade::get(value);
 		} else if (key == "item_spell") {
 			const int item_class = static_cast<int>(string_to_item_class(value));
 			this->ItemSpell[item_class] = true;
@@ -589,11 +586,11 @@ std::vector<CUnit *> spell::GetPotentialAutoCastTargets(const CUnit &caster, con
 */
 bool spell::IsAvailableForUnit(const CUnit &unit) const
 {
-	const int dependencyId = this->DependencyId;
+	const CUpgrade *dependency_upgrade = this->get_dependency_upgrade();
 
 	//Wyrmgus start
-//	return dependencyId == -1 || UpgradeIdAllowed(player, dependencyId) == 'R';
-	return dependencyId == -1 || unit.GetIndividualUpgrade(CUpgrade::get_all()[dependencyId]) > 0 || UpgradeIdAllowed(*unit.Player, dependencyId) == 'R';
+//	return dependency_upgrade == nullptr || UpgradeIdAllowed(player, dependencyId) == 'R';
+	return dependency_upgrade == nullptr || unit.GetIndividualUpgrade(dependency_upgrade) > 0 || UpgradeIdAllowed(*unit.Player, dependency_upgrade->get_index()) == 'R';
 	//Wyrmgus end
 }
 

@@ -401,10 +401,7 @@ static int CclDefineSpell(lua_State *l)
 			spell->sound_when_cast = wyrmgus::sound::get(LuaToString(l, i + 1));
 		} else if (!strcmp(value, "depend-upgrade")) {
 			value = LuaToString(l, i + 1);
-			spell->DependencyId = UpgradeIdByIdent(value);
-			if (spell->DependencyId == -1) {
-				lua_pushfstring(l, "Bad upgrade name: %s", value);
-			}
+			spell->dependency_upgrade = CUpgrade::get(value);
 		//Wyrmgus start
 		} else if (!strcmp(value, "item-spell")) {
 			const int item_class = static_cast<int>(wyrmgus::string_to_item_class(LuaToString(l, i + 1)));
