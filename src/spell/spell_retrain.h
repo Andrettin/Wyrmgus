@@ -29,15 +29,19 @@
 
 #pragma once
 
-#include "spell/spells.h"
+#include "spell/spell_action.h"
 
-class Spell_Retrain : public SpellActionType
+class Spell_Retrain : public wyrmgus::spell_action
 {
 public:
+	virtual const std::string &get_class_identifier() const override
+	{
+		static const std::string identifier = "retrain";
+		return identifier;
+	}
+
 	virtual void ProcessConfigData(const CConfigData *config_data) override {}
 	virtual int Cast(CUnit &caster, const wyrmgus::spell &spell,
-					 CUnit *target, const Vec2i &goalPos, int z, int modifier);
-	virtual void Parse(lua_State *l, int startIndex, int endIndex);
-
-private:
+					 CUnit *target, const Vec2i &goalPos, int z, int modifier) override;
+	virtual void Parse(lua_State *l, int startIndex, int endIndex) override;
 };

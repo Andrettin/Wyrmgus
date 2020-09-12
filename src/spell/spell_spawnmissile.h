@@ -9,8 +9,8 @@
 //         Stratagus - A free fantasy real time strategy game engine
 //
 //
-//      (c) Copyright 1999-2012 by Vladi Belperchinov-Shabanski,
-//                                 Joris DAUPHIN, and Jimmy Salmon
+//      (c) Copyright 1999-2020 by Vladi Belperchinov-Shabanski,
+//                                 Joris Dauphin, Jimmy Salmon and Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -29,12 +29,16 @@
 
 #pragma once
 
-#include "spell/spells.h"
+#include "spell/spell_action.h"
+
+namespace wyrmgus {
+	class missile_type;
+}
 
 /**
 **  Different targets.
 */
-enum LocBaseType {
+enum class LocBaseType {
 	LocBaseCaster,
 	LocBaseTarget
 };
@@ -45,11 +49,13 @@ enum LocBaseType {
 **  It's evaluated like this, and should be more or less flexible.:
 **  base coordinates(caster or target) + (AddX,AddY) + (rand()%AddRandX,rand()%AddRandY)
 */
-class SpellActionMissileLocation
+class SpellActionMissileLocation final
 {
 public:
-	SpellActionMissileLocation(LocBaseType base) : Base(base) {}
+	explicit SpellActionMissileLocation(const LocBaseType base) : Base(base) {}
 
+	void process_sml_property(const wyrmgus::sml_property &property);
+	void process_sml_scope(const wyrmgus::sml_data &scope);
 	void ProcessConfigData(const CConfigData *config_data);
 	
 	LocBaseType Base;	/// The base for the location (caster/target)
@@ -59,15 +65,26 @@ public:
 	int AddRandY = 0;	/// Random add to the X coordinate
 };
 
-class Spell_SpawnMissile : public SpellActionType
+class Spell_SpawnMissile final : public wyrmgus::spell_action
 {
 public:
-	Spell_SpawnMissile() : 
-		StartPoint(LocBaseCaster), EndPoint(LocBaseTarget) {}
+	Spell_SpawnMissile() : StartPoint(LocBaseType::LocBaseCaster), EndPoint(LocBaseType::LocBaseTarget)
+	{
+	}
+
+	virtual const std::string &get_class_identifier() const override
+	{
+		static const std::string identifier = "spawn_missile";
+		return identifier;
+	}
+
+	virtual void process_sml_property(const wyrmgus::sml_property &property) override;
+	virtual void process_sml_scope(const wyrmgus::sml_data &scope) override;
+	virtual void check() const override;
 	virtual void ProcessConfigData(const CConfigData *config_data) override;
 	virtual int Cast(CUnit &caster, const wyrmgus::spell &spell,
-					 CUnit *target, const Vec2i &goalPos, int z, int modifier);
-	virtual void Parse(lua_State *lua, int startIndex, int endIndex);
+					 CUnit *target, const Vec2i &goalPos, int z, int modifier) override;
+	virtual void Parse(lua_State *lua, int startIndex, int endIndex) override;
 
 private:
 	int Damage = 0;							/// Missile damage.
@@ -80,6 +97,6 @@ private:
 	bool AlwaysCritical = false;			/// The damage from the spell is always a critical hit (double damage)
 	//Wyrmgus end
 	SpellActionMissileLocation StartPoint;	/// Start point description.
-	SpellActionMissileLocation EndPoint;	/// Start point description.
+	SpellActionMissileLocation EndPoint;	/// End point description.
 	wyrmgus::missile_type *Missile = nullptr;			/// Missile fired on cast
 };

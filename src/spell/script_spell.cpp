@@ -68,7 +68,7 @@
 **
 **  @param l  Lua state.
 */
-static SpellActionType *CclSpellAction(lua_State *l)
+static std::unique_ptr<wyrmgus::spell_action> CclSpellAction(lua_State *l)
 {
 	if (!lua_istable(l, -1)) {
 		LuaError(l, "incorrect argument");
@@ -77,35 +77,35 @@ static SpellActionType *CclSpellAction(lua_State *l)
 
 	const char *value = LuaToString(l, -1, 1);
 
-	SpellActionType *spellaction = nullptr;
+	std::unique_ptr<wyrmgus::spell_action> spellaction;
 	if (!strcmp(value, "adjust-variable")) {
-		spellaction = new Spell_AdjustVariable;
+		spellaction = std::make_unique<Spell_AdjustVariable>();
 	} else if (!strcmp(value, "adjust-vitals")) {
-		spellaction = new Spell_AdjustVital;
+		spellaction = std::make_unique<Spell_AdjustVital>();
 	} else if (!strcmp(value, "area-adjust-vitals")) {
-		spellaction = new Spell_AreaAdjustVital;
+		spellaction = std::make_unique<Spell_AreaAdjustVital>();
 	} else if (!strcmp(value, "area-bombardment")) {
-		spellaction = new Spell_AreaBombardment;
+		spellaction = std::make_unique<Spell_AreaBombardment>();
 	} else if (!strcmp(value, "capture")) {
-		spellaction = new Spell_Capture;
+		spellaction = std::make_unique<Spell_Capture>();
 	} else if (!strcmp(value, "demolish")) {
-		spellaction = new Spell_Demolish;
+		spellaction = std::make_unique<Spell_Demolish>();
 	} else if (!strcmp(value, "lua-callback")) {
-		spellaction = new Spell_LuaCallback;
+		spellaction = std::make_unique<Spell_LuaCallback>();
 	} else if (!strcmp(value, "polymorph")) {
-		spellaction = new Spell_Polymorph;
+		spellaction = std::make_unique<Spell_Polymorph>();
 	//Wyrmgus start
 	} else if (!strcmp(value, "retrain")) {
-		spellaction = new Spell_Retrain;
+		spellaction = std::make_unique<Spell_Retrain>();
 	//Wyrmgus end
 	} else if (!strcmp(value, "spawn-missile")) {
-		spellaction = new Spell_SpawnMissile;
+		spellaction = std::make_unique<Spell_SpawnMissile>();
 	} else if (!strcmp(value, "spawn-portal")) {
-		spellaction = new Spell_SpawnPortal;
+		spellaction = std::make_unique<Spell_SpawnPortal>();
 	} else if (!strcmp(value, "summon")) {
-		spellaction = new Spell_Summon;
+		spellaction = std::make_unique<Spell_Summon>();
 	} else if (!strcmp(value, "teleport")) {
-		spellaction = new Spell_Teleport;
+		spellaction = std::make_unique<Spell_Teleport>();
 	} else {
 		LuaError(l, "Unsupported action type: %s" _C_ value);
 	}
@@ -373,7 +373,7 @@ static int CclDefineSpell(lua_State *l)
 			const int subargs = lua_rawlen(l, i + 1);
 			for (int k = 0; k < subargs; ++k) {
 				lua_rawgeti(l, i + 1, k + 1);
-				spell->Action.push_back(CclSpellAction(l));
+				spell->actions.push_back(CclSpellAction(l));
 				lua_pop(l, 1);
 			}
 		} else if (!strcmp(value, "condition")) {

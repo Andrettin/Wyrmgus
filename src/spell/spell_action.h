@@ -8,7 +8,6 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-//
 //      (c) Copyright 1999-2020 by Vladi Belperchinov-Shabanski,
 //                                 Joris Dauphin, Jimmy Salmon and Andrettin
 //
@@ -29,28 +28,42 @@
 
 #pragma once
 
-#include "spell/spell_action.h"
+class CConfigData;
+class CUnit;
+struct lua_State;
 
 namespace wyrmgus {
-	class unit_type;
-}
 
-class Spell_SpawnPortal final : public wyrmgus::spell_action
+class sml_data;
+class sml_property;
+class spell;
+
+/**
+**  Generic spell action virtual class.
+**  Spells are sub class of this one
+*/
+class spell_action
 {
 public:
-	virtual const std::string &get_class_identifier() const override
+	static std::unique_ptr<spell_action> from_sml_scope(const sml_data &scope);
+
+	explicit spell_action(const int mod = 0) : ModifyManaCaster(mod)
 	{
-		static const std::string identifier = "spawn_portal";
-		return identifier;
-	}
+	};
 
-	virtual void ProcessConfigData(const CConfigData *config_data) override {}
-	virtual int Cast(CUnit &caster, const wyrmgus::spell &spell,
-					 CUnit *target, const Vec2i &goalPos, int z, int modifier) override;
-	virtual void Parse(lua_State *l, int startIndex, int endIndex) override;
+	virtual ~spell_action()
+	{
+	};
 
-private:
-	wyrmgus::unit_type *PortalType = nullptr;   /// The unit type spawned
-	int TTL = 0;                 /// Time to live for summoned portal. 0 means infinite
-	bool CurrentPlayer = false;      /// If true, summon portal for caster's player rather than neutral
+	virtual const std::string &get_class_identifier() const = 0;
+	virtual void process_sml_property(const sml_property &property);
+	virtual void process_sml_scope(const sml_data &scope);
+	virtual void check() const {}
+	virtual void ProcessConfigData(const CConfigData *config_data) = 0;
+	virtual int Cast(CUnit &caster, const wyrmgus::spell &spell, CUnit *target, const Vec2i &goalPos, int z, int modifier) = 0;
+	virtual void Parse(lua_State *l, int startIndex, int endIndex) = 0;
+
+	const int ModifyManaCaster;
 };
+
+}

@@ -9,8 +9,8 @@
 //         Stratagus - A free fantasy real time strategy game engine
 //
 //
-//      (c) Copyright 1999-2012 by Vladi Belperchinov-Shabanski,
-//                                 Joris DAUPHIN, and Jimmy Salmon
+//      (c) Copyright 1999-2020 by Vladi Belperchinov-Shabanski,
+//                                 Joris Dauphin, Jimmy Salmon and Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -29,44 +29,51 @@
 
 #pragma once
 
-#include "spell/spells.h"
+#include "spell/spell_action.h"
 
-class SpellActionTypeAdjustVariable
+class SpellActionTypeAdjustVariable final
 {
 public:
-	SpellActionTypeAdjustVariable() : Enable(0), Value(0), Max(0), Increase(0),
-		ModifEnable(0), ModifValue(0), ModifMax(0), ModifIncrease(0),
-		InvertEnable(0), AddValue(0), AddMax(0), AddIncrease(0), IncreaseTime(0),
-		TargetIsCaster(0) {};
+	int Enable = 0;                 /// Value to affect to this field.
+	int Value = 0;                  /// Value to affect to this field.
+	int Max = 0;                    /// Value to affect to this field.
+	int Increase = 0;               /// Value to affect to this field.
 
-	int Enable;                 /// Value to affect to this field.
-	int Value;                  /// Value to affect to this field.
-	int Max;                    /// Value to affect to this field.
-	int Increase;               /// Value to affect to this field.
+	char ModifEnable = 0;           /// true if we modify this field.
+	char ModifValue = 0;            /// true if we modify this field.
+	char ModifMax = 0;              /// true if we modify this field.
+	char ModifIncrease = 0;         /// true if we modify this field.
 
-	char ModifEnable;           /// true if we modify this field.
-	char ModifValue;            /// true if we modify this field.
-	char ModifMax;              /// true if we modify this field.
-	char ModifIncrease;         /// true if we modify this field.
-
-	char InvertEnable;          /// true if we invert this field.
-	int AddValue;               /// Add this value to this field.
-	int AddMax;                 /// Add this value to this field.
-	int AddIncrease;            /// Add this value to this field.
-	int IncreaseTime;           /// How many time increase the Value field.
-	char TargetIsCaster;        /// true if the target is the caster.
+	char InvertEnable = 0;          /// true if we invert this field.
+	int AddValue = 0;               /// Add this value to this field.
+	int AddMax = 0;                 /// Add this value to this field.
+	int AddIncrease = 0;            /// Add this value to this field.
+	int IncreaseTime = 0;           /// How many time increase the Value field.
+	char TargetIsCaster = 0;        /// true if the target is the caster.
 };
 
-class Spell_AdjustVariable : public SpellActionType
+class Spell_AdjustVariable final : public wyrmgus::spell_action
 {
 public:
-	Spell_AdjustVariable() : Var(nullptr) {};
-	~Spell_AdjustVariable() { delete [](this->Var); };
+	Spell_AdjustVariable();
+
+	~Spell_AdjustVariable() {
+		delete [](this->Var);
+	}
+
+	virtual const std::string &get_class_identifier() const override
+	{
+		static const std::string identifier = "adjust_variable";
+		return identifier;
+	}
+
+	virtual void process_sml_property(const wyrmgus::sml_property &property) override;
+	virtual void process_sml_scope(const wyrmgus::sml_data &scope) override;
 	virtual void ProcessConfigData(const CConfigData *config_data) override;
 	virtual int Cast(CUnit &caster, const wyrmgus::spell &spell,
-					 CUnit *target, const Vec2i &goalPos, int z, int modifier);
-	virtual void Parse(lua_State *l, int startIndex, int endIndex);
+					 CUnit *target, const Vec2i &goalPos, int z, int modifier) override;
+	virtual void Parse(lua_State *l, int startIndex, int endIndex) override;
 
 private:
-	SpellActionTypeAdjustVariable *Var;
+	SpellActionTypeAdjustVariable *Var = nullptr;
 };

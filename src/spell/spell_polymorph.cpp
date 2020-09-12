@@ -8,8 +8,6 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name spell_polymorph.cpp - The spell Polymorph. */
-//
 //      (c) Copyright 1998-2020 by Vladi Belperchinov-Shabanski, Lutz Sammer,
 //                                 Jimmy Salmon, Joris Dauphin and Andrettin
 //
@@ -44,6 +42,7 @@
 #include "network.h"
 //Wyrmgus end
 #include "script.h"
+#include "spell/spells.h"
 #include "unit/unit.h"
 //Wyrmgus start
 #include "unit/unit_find.h"

@@ -9,8 +9,8 @@
 //         Stratagus - A free fantasy real time strategy game engine
 //
 //
-//      (c) Copyright 1999-2012 by Vladi Belperchinov-Shabanski,
-//                                 Joris DAUPHIN, and Jimmy Salmon
+//      (c) Copyright 1999-2020 by Vladi Belperchinov-Shabanski,
+//                                 Joris DAUPHIN, Jimmy Salmon and Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -29,15 +29,21 @@
 
 #pragma once
 
-#include "spell/spells.h"
+#include "spell/spell_action.h"
 
-class Spell_AreaAdjustVital : public SpellActionType
+class Spell_AreaAdjustVital final : public wyrmgus::spell_action
 {
 public:
+	virtual const std::string &get_class_identifier() const override
+	{
+		static const std::string identifier = "area_adjust_vital";
+		return identifier;
+	}
+
 	virtual void ProcessConfigData(const CConfigData *config_data) override {}
 	virtual int Cast(CUnit &caster, const wyrmgus::spell &spell,
-					 CUnit *target, const Vec2i &goalPos, int z, int modifier);
-	virtual void Parse(lua_State *l, int startIndex, int endIndex);
+					 CUnit *target, const Vec2i &goalPos, int z, int modifier) override;
+	virtual void Parse(lua_State *l, int startIndex, int endIndex) override;
 
 private:
 	int HP = 0;				/// Target HP gain.(can be negative)

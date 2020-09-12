@@ -8,8 +8,6 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name spell_summon.cpp - The spell Summon. */
-//
 //      (c) Copyright 1998-2020 by Vladi Belperchinov-Shabanski, Lutz Sammer,
 //                                 Jimmy Salmon, Joris Dauphin and Andrettin
 //
@@ -30,15 +28,15 @@
 
 #include "stratagus.h"
 
-#include "action/action_defend.h"
-
 #include "spell/spell_summon.h"
 
-#include "ai/ai_local.h"
+#include "action/action_defend.h"
 #include "actions.h"
+#include "ai/ai_local.h"
 #include "commands.h"
 #include "map/map_layer.h"
 #include "script.h"
+#include "spell/spells.h"
 #include "unit/unit.h"
 #include "unit/unit_find.h"
 

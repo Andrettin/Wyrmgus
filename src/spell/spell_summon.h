@@ -9,8 +9,8 @@
 //         Stratagus - A free fantasy real time strategy game engine
 //
 //
-//      (c) Copyright 1999-2012 by Vladi Belperchinov-Shabanski,
-//                                 Joris DAUPHIN, and Jimmy Salmon
+//      (c) Copyright 1999-2020 by Vladi Belperchinov-Shabanski,
+//                                 Joris Dauphin, Jimmy Salmon and Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -29,21 +29,33 @@
 
 #pragma once
 
-#include "spell/spells.h"
+#include "spell/spell_action.h"
 
-class Spell_Summon : public SpellActionType
+namespace wyrmgus {
+	class unit_type;
+}
+
+class Spell_Summon final : public wyrmgus::spell_action
 {
 public:
-	Spell_Summon() : SpellActionType(1), UnitType(nullptr), TTL(0),
-		RequireCorpse(false), JoinToAiForce(false) {};
+	Spell_Summon() : wyrmgus::spell_action(1)
+	{
+	}
+
+	virtual const std::string &get_class_identifier() const override
+	{
+		static const std::string identifier = "summon";
+		return identifier;
+	}
+
 	virtual void ProcessConfigData(const CConfigData *config_data) override {}
 	virtual int Cast(CUnit &caster, const wyrmgus::spell &spell,
-					 CUnit *target, const Vec2i &goalPos, int z, int modifier);
-	virtual void Parse(lua_State *l, int startIndex, int endIndex);
+					 CUnit *target, const Vec2i &goalPos, int z, int modifier) override;
+	virtual void Parse(lua_State *l, int startIndex, int endIndex) override;
 
 private:
-	wyrmgus::unit_type *UnitType;    /// Type of unit to be summoned.
-	int TTL;                /// Time to live for summoned unit. 0 means infinite
-	int RequireCorpse;      /// Corpse consumed while summoning.
-	bool JoinToAiForce;     /// if true, captured unit is joined into caster's AI force, if available
+	wyrmgus::unit_type *UnitType = nullptr;    /// Type of unit to be summoned.
+	int TTL = 0;                /// Time to live for summoned unit. 0 means infinite
+	int RequireCorpse = false;      /// Corpse consumed while summoning.
+	bool JoinToAiForce = false;     /// if true, captured unit is joined into caster's AI force, if available
 };

@@ -8,8 +8,6 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name spell_adjustvariable.cpp - The spell LuaCallback. */
-//
 //      (c) Copyright 2014 by cybermind
 //
 //      This program is free software; you can redistribute it and/or modify
@@ -32,6 +30,7 @@
 #include "spell/spell_luacallback.h"
 
 #include "script.h"
+#include "spell/spells.h"
 #include "unit/unit.h"
 
 

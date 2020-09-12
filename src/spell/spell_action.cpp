@@ -8,7 +8,6 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-//
 //      (c) Copyright 1999-2020 by Vladi Belperchinov-Shabanski,
 //                                 Joris Dauphin, Jimmy Salmon and Andrettin
 //
@@ -27,30 +26,44 @@
 //      02111-1307, USA.
 //
 
-#pragma once
+#include "stratagus.h"
 
 #include "spell/spell_action.h"
 
-namespace wyrmgus {
-	class unit_type;
-}
+#include "database/database.h"
+#include "database/sml_data.h"
+#include "spell/spell_adjustvariable.h"
+#include "spell/spell_spawnmissile.h"
 
-class Spell_SpawnPortal final : public wyrmgus::spell_action
+namespace wyrmgus {
+
+std::unique_ptr<spell_action> spell_action::from_sml_scope(const sml_data &scope)
 {
-public:
-	virtual const std::string &get_class_identifier() const override
-	{
-		static const std::string identifier = "spawn_portal";
-		return identifier;
+	const std::string &action_identifier = scope.get_tag();
+	std::unique_ptr<spell_action> action;
+
+	if (action_identifier == "adjust_variable") {
+		action = std::make_unique<Spell_AdjustVariable>();
+	} else if (action_identifier == "spawn_missile") {
+		action = std::make_unique<Spell_SpawnMissile>();
+	} else {
+		throw std::runtime_error("Invalid scope spell action: \"" + action_identifier + "\".");
 	}
 
-	virtual void ProcessConfigData(const CConfigData *config_data) override {}
-	virtual int Cast(CUnit &caster, const wyrmgus::spell &spell,
-					 CUnit *target, const Vec2i &goalPos, int z, int modifier) override;
-	virtual void Parse(lua_State *l, int startIndex, int endIndex) override;
+	database::process_sml_data(action, scope);
+	action->check();
 
-private:
-	wyrmgus::unit_type *PortalType = nullptr;   /// The unit type spawned
-	int TTL = 0;                 /// Time to live for summoned portal. 0 means infinite
-	bool CurrentPlayer = false;      /// If true, summon portal for caster's player rather than neutral
-};
+	return action;
+}
+
+void spell_action::process_sml_property(const sml_property &property)
+{
+	throw std::runtime_error("Invalid property for \"" + this->get_class_identifier() + "\" effect: \"" + property.get_key() + "\".");
+}
+
+void spell_action::process_sml_scope(const sml_data &scope)
+{
+	throw std::runtime_error("Invalid scope for \"" + this->get_class_identifier() + "\" effect: \"" + scope.get_tag() + "\".");
+}
+
+}

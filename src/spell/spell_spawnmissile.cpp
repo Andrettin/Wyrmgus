@@ -8,8 +8,6 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name spell_spawnmissile.cpp - The spell SpawnMissile. */
-//
 //      (c) Copyright 1998-2020 by Vladi Belperchinov-Shabanski, Lutz Sammer,
 //                                 Jimmy Salmon, Joris Dauphin and Andrettin
 //
@@ -79,9 +77,9 @@ static void CclSpellMissileLocation(lua_State *l, SpellActionMissileLocation *lo
 		if (!strcmp(value, "base")) {
 			value = LuaToString(l, -1, j + 1);
 			if (!strcmp(value, "caster")) {
-				location->Base = LocBaseCaster;
+				location->Base = LocBaseType::LocBaseCaster;
 			} else if (!strcmp(value, "target")) {
-				location->Base = LocBaseTarget;
+				location->Base = LocBaseType::LocBaseTarget;
 			} else {
 				LuaError(l, "Unsupported missile location base flag: %s" _C_ value);
 			}
@@ -99,11 +97,37 @@ static void CclSpellMissileLocation(lua_State *l, SpellActionMissileLocation *lo
 	}
 }
 
-/**
-**	@brief	Process data provided by a configuration file
-**
-**	@param	config_data	The configuration data
-*/
+void SpellActionMissileLocation::process_sml_property(const wyrmgus::sml_property &property)
+{
+	const std::string &key = property.get_key();
+	const std::string &value = property.get_value();
+
+	if (key == "base") {
+		if (value == "caster") {
+			this->Base = LocBaseType::LocBaseCaster;
+		} else if (value == "target") {
+			this->Base = LocBaseType::LocBaseTarget;
+		} else {
+			throw std::runtime_error("Unsupported missile location base flag: \"" + value + "\".");
+		}
+	} else if (key == "add_x") {
+		this->AddX = std::stoi(value);
+	} else if (key == "add_y") {
+		this->AddY = std::stoi(value);
+	} else if (key == "add_rand_x") {
+		this->AddRandX = std::stoi(value);
+	} else if (key == "add_rand_y") {
+		this->AddRandY = std::stoi(value);
+	} else {
+		throw std::runtime_error("Invalid spawn missile spell location property: \"" + key + "\".");
+	}
+}
+
+void SpellActionMissileLocation::process_sml_scope(const wyrmgus::sml_data &scope)
+{
+	throw std::runtime_error("Invalid spawn missile spell location scope: \"" + scope.get_tag() + "\".");
+}
+
 void SpellActionMissileLocation::ProcessConfigData(const CConfigData *config_data)
 {
 	for (size_t i = 0; i < config_data->Properties.size(); ++i) {
@@ -112,13 +136,12 @@ void SpellActionMissileLocation::ProcessConfigData(const CConfigData *config_dat
 		
 		if (key == "base") {
 			if (value == "caster") {
-				this->Base = LocBaseCaster;
+				this->Base = LocBaseType::LocBaseCaster;
 			} else if (value == "target") {
-				this->Base = LocBaseTarget;
+				this->Base = LocBaseType::LocBaseTarget;
 			} else {
 				fprintf(stderr, "Unsupported missile location base flag: \"%s\".\n", value.c_str());
 			}
-			
 		} else if (key == "add_x") {
 			this->AddX = std::stoi(value);
 		} else if (key == "add_y") {
@@ -133,11 +156,52 @@ void SpellActionMissileLocation::ProcessConfigData(const CConfigData *config_dat
 	}
 }
 
-/**
-**	@brief	Process data provided by a configuration file
-**
-**	@param	config_data	The configuration data
-*/
+void Spell_SpawnMissile::process_sml_property(const wyrmgus::sml_property &property)
+{
+	const std::string &key = property.get_key();
+	const std::string &value = property.get_value();
+
+	if (key == "damage") {
+		this->Damage = std::stoi(value);
+	} else if (key == "lightning_damage") {
+		this->LightningDamage = std::stoi(value);
+	} else if (key == "use_unit_var") {
+		this->UseUnitVar = string::to_bool(value);
+	} else if (key == "always_hits") {
+		this->AlwaysHits = string::to_bool(value);
+	} else if (key == "always_critical") {
+		this->AlwaysCritical = string::to_bool(value);
+	} else if (key == "delay") {
+		this->Delay = std::stoi(value);
+	} else if (key == "ttl") {
+		this->TTL = std::stoi(value);
+	} else if (key == "missile") {
+		this->Missile = wyrmgus::missile_type::get(value);
+	} else {
+		throw std::runtime_error("Invalid spawn missile spell action property: \"" + key + "\".");
+	}
+}
+
+void Spell_SpawnMissile::process_sml_scope(const wyrmgus::sml_data &scope)
+{
+	const std::string &tag = scope.get_tag();
+
+	if (tag == "start_point") {
+		wyrmgus::database::process_sml_data(this->StartPoint, scope);
+	} else if (tag == "end_point") {
+		wyrmgus::database::process_sml_data(this->EndPoint, scope);
+	} else {
+		throw std::runtime_error("Invalid spawn missile spell action scope: \"" + tag + "\".");
+	}
+}
+
+void Spell_SpawnMissile::check() const
+{
+	if (this->Missile == nullptr) {
+		throw std::runtime_error("Use a missile for spawn-missile (with missile).");
+	}
+}
+
 void Spell_SpawnMissile::ProcessConfigData(const CConfigData *config_data)
 {
 	for (size_t i = 0; i < config_data->Properties.size(); ++i) {
@@ -237,7 +301,7 @@ void Spell_SpawnMissile::ProcessConfigData(const CConfigData *config_data)
 static void EvaluateMissileLocation(const SpellActionMissileLocation &location,
 									CUnit &caster, CUnit *target, const Vec2i &goalPos, PixelPos *res)
 {
-	if (location.Base == LocBaseCaster) {
+	if (location.Base == LocBaseType::LocBaseCaster) {
 		*res = caster.get_map_pixel_pos_center();
 	} else {
 		if (target) {

@@ -8,10 +8,8 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name spell_adjustvital.cpp - The spell AdjustVital. */
-//
-//      (c) Copyright 1998-2012 by Vladi Belperchinov-Shabanski, Lutz Sammer,
-//                                 Jimmy Salmon, and Joris DAUPHIN
+//      (c) Copyright 1998-2020 by Vladi Belperchinov-Shabanski, Lutz Sammer,
+//                                 Jimmy Salmon, Joris Dauphin and Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -33,6 +31,7 @@
 #include "spell/spell_adjustvital.h"
 
 #include "script.h"
+#include "spell/spells.h"
 #include "unit/unit.h"
 
 /* virtual */ void Spell_AdjustVital::Parse(lua_State *l, int startIndex, int endIndex)

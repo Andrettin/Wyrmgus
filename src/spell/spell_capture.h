@@ -29,16 +29,23 @@
 
 #pragma once
 
-#include "spell/spells.h"
+#include "spell/spell_action.h"
 
-class Spell_Capture : public SpellActionType
+class Spell_Capture : public wyrmgus::spell_action
 {
 public:
 	Spell_Capture() : SacrificeEnable(false), JoinToAIForce(false), Damage(0), DamagePercent(0) {};
+
+	virtual const std::string &get_class_identifier() const override
+	{
+		static const std::string identifier = "capture";
+		return identifier;
+	}
+
 	virtual void ProcessConfigData(const CConfigData *config_data) override {};
 	virtual int Cast(CUnit &caster, const wyrmgus::spell &spell,
-					 CUnit *target, const Vec2i &goalPos, int z, int modifier);
-	virtual void Parse(lua_State *l, int startIndex, int endIndex);
+					 CUnit *target, const Vec2i &goalPos, int z, int modifier) override;
+	virtual void Parse(lua_State *l, int startIndex, int endIndex) override;
 
 private:
 	bool SacrificeEnable; /// true if the caster dies after casting.

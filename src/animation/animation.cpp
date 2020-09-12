@@ -476,7 +476,7 @@ void animation_set::process_sml_scope(const sml_data &scope)
 
 		scope.for_each_property([&](const sml_property &property) {
 			const std::string &key = property.get_key();
-			const std::string &value = property.get_value();;
+			const std::string &value = property.get_value();
 
 			std::unique_ptr<CAnimation> anim;
 

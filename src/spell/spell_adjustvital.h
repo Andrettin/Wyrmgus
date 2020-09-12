@@ -9,8 +9,8 @@
 //         Stratagus - A free fantasy real time strategy game engine
 //
 //
-//      (c) Copyright 1999-2012 by Vladi Belperchinov-Shabanski,
-//                                 Joris DAUPHIN, and Jimmy Salmon
+//      (c) Copyright 1999-2020 by Vladi Belperchinov-Shabanski,
+//                                 Joris Dauphin, Jimmy Salmon and Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -29,22 +29,31 @@
 
 #pragma once
 
-#include "spell/spells.h"
+#include "spell/spell_action.h"
 
-class Spell_AdjustVital : public SpellActionType
+class Spell_AdjustVital final : public wyrmgus::spell_action
 {
 public:
-	Spell_AdjustVital() : SpellActionType(1), HP(0), Mana(0), Shield(0), MaxMultiCast(0) {};
+	Spell_AdjustVital() : wyrmgus::spell_action(1) 
+	{
+	}
+
+	virtual const std::string &get_class_identifier() const override
+	{
+		static const std::string identifier = "adjust_vital";
+		return identifier;
+	}
+
 	virtual void ProcessConfigData(const CConfigData *config_data) override {}
 	virtual int Cast(CUnit &caster, const wyrmgus::spell &spell,
-					 CUnit *target, const Vec2i &goalPos, int z, int modifier);
-	virtual void Parse(lua_State *l, int startIndex, int endIndex);
+					 CUnit *target, const Vec2i &goalPos, int z, int modifier) override;
+	virtual void Parse(lua_State *l, int startIndex, int endIndex) override;
 
 private:
-	int HP;         /// Target HP gain.(can be negative)
-	int Mana;       /// Target Mana gain.(can be negative)
-	int Shield;     /// Target SP gain.(can be negative)
+	int HP = 0;         /// Target HP gain.(can be negative)
+	int Mana = 0;       /// Target Mana gain.(can be negative)
+	int Shield = 0;     /// Target SP gain.(can be negative)
 	/// This spell is designed to be used wit very small amounts. The spell
 	/// can scale up to MaxMultiCast times. Use 0 for infinite.
-	int MaxMultiCast;
+	int MaxMultiCast = 0;
 };

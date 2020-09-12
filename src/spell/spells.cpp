@@ -48,6 +48,7 @@
 #include "map/map_layer.h"
 #include "map/tileset.h"
 #include "sound/sound.h"
+#include "spell/spell_action.h"
 #include "spell/spell_adjustvariable.h"
 #include "spell/spell_spawnmissile.h"
 #include "spell/spell_target_type.h"
@@ -288,11 +289,6 @@ spell::spell(const std::string &identifier) : named_data_entry(identifier), CDat
 
 spell::~spell()
 {
-	for (std::vector<SpellActionType *>::iterator act = Action.begin(); act != Action.end(); ++act) {
-		delete *act;
-	}
-	Action.clear();
-
 	delete Condition;
 	//
 	// Free Autocast.
@@ -316,6 +312,19 @@ void spell::process_sml_property(const sml_property &property)
 		this->effects_string = value;
 	} else {
 		data_entry::process_sml_property(property);
+	}
+}
+
+void spell::process_sml_scope(const sml_data &scope)
+{
+	const std::string &tag = scope.get_tag();
+
+	if (tag == "actions") {
+		scope.for_each_child([&](const sml_data &child_scope) {
+			this->actions.push_back(spell_action::from_sml_scope(child_scope));
+		});
+	} else {
+		data_entry::process_sml_scope(scope);
 	}
 }
 
@@ -362,18 +371,18 @@ void spell::ProcessConfigData(const CConfigData *config_data)
 	for (const CConfigData *child_config_data : config_data->Children) {
 		if (child_config_data->Tag == "actions") {
 			for (const CConfigData *grandchild_config_data : child_config_data->Children) {
-				SpellActionType *spell_action = nullptr;
+				std::unique_ptr<spell_action> spell_action;
 
 				if (grandchild_config_data->Tag == "adjust_variable") {
-					spell_action = new Spell_AdjustVariable;
+					spell_action = std::make_unique<Spell_AdjustVariable>();
 				} else if (grandchild_config_data->Tag == "spawn_missile") {
-					spell_action = new Spell_SpawnMissile;
+					spell_action = std::make_unique<Spell_SpawnMissile>();
 				} else {
 					fprintf(stderr, "Invalid spell action type: \"%s\".\n", grandchild_config_data->Tag.c_str());
 				}
 
 				spell_action->ProcessConfigData(grandchild_config_data);
-				this->Action.push_back(spell_action);
+				this->actions.push_back(std::move(spell_action));
 			}
 		} else if (child_config_data->Tag == "condition") {
 			if (!this->Condition) {
@@ -812,13 +821,12 @@ int SpellCast(CUnit &caster, const wyrmgus::spell &spell, CUnit *target, const V
 			modifier += 100; //empowered spells have double the effect
 		}
 			
-		for (std::vector<SpellActionType *>::const_iterator act = spell.Action.begin();
-			 act != spell.Action.end(); ++act) {
-			if ((*act)->ModifyManaCaster) {
+		for (const auto &spell_action : spell.get_actions()) {
+			if (spell_action->ModifyManaCaster != 0) {
 				mustSubtractMana = false;
 			}
 			
-			cont = cont & (*act)->Cast(caster, spell, target, pos, z, modifier);
+			cont = cont & spell_action->Cast(caster, spell, target, pos, z, modifier);
 		}
 		if (mustSubtractMana) {
 			caster.Variable[MANA_INDEX].Value -= spell.get_mana_cost();

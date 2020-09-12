@@ -8,8 +8,6 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name spell_adjustvariable.cpp - The spell AdjustVariable. */
-//
 //      (c) Copyright 1998-2020 by Vladi Belperchinov-Shabanski, Lutz Sammer,
 //                                 Jimmy Salmon, Joris Dauphin and Andrettin
 //
@@ -40,15 +38,89 @@
 #include "unit/unit.h"
 #include "util/string_util.h"
 
-/**
-**	@brief	Process data provided by a configuration file
-**
-**	@param	config_data	The configuration data
-*/
-void Spell_AdjustVariable::ProcessConfigData(const CConfigData *config_data)
+Spell_AdjustVariable::Spell_AdjustVariable()
 {
 	this->Var = new SpellActionTypeAdjustVariable[UnitTypeVar.GetNumberVariable()];
-	
+}
+
+void Spell_AdjustVariable::process_sml_property(const wyrmgus::sml_property &property)
+{
+	const std::string &key = property.get_key();
+	const std::string &value = property.get_value();
+
+	const std::string pascal_case_key = string::snake_case_to_pascal_case(key);
+
+	const int index = UnitTypeVar.VariableNameLookup[pascal_case_key.c_str()];
+	if (index != -1) {
+		if (string::is_number(value)) {
+			const int number_value = std::stoi(value);
+			this->Var[index].Enable = number_value != 0;
+			this->Var[index].ModifEnable = 1;
+			this->Var[index].Value = number_value;
+			this->Var[index].ModifValue = 1;
+			this->Var[index].Max = number_value;
+			this->Var[index].ModifMax = 1;
+		} else {
+			throw std::runtime_error("Invalid value (\"" + value + "\") for variable \"" + key + "\" when defining an adjust variable spell action.");
+		}
+	} else {
+		throw std::runtime_error("Invalid adjust variable spell action property: \"" + key + "\".");
+	}
+}
+
+void Spell_AdjustVariable::process_sml_scope(const wyrmgus::sml_data &scope)
+{
+	const std::string &tag = scope.get_tag();
+
+	const std::string pascal_case_tag = string::snake_case_to_pascal_case(tag);
+
+	const int index = UnitTypeVar.VariableNameLookup[pascal_case_tag.c_str()];
+	if (index != -1) {
+		scope.for_each_property([&](const wyrmgus::sml_property &property) {
+			const std::string &key = property.get_key();
+			const std::string &value = property.get_value();
+
+			if (key == "enable") {
+				this->Var[index].Enable = string::to_bool(value);
+				this->Var[index].ModifEnable = 1;
+			} else if (key == "value") {
+				this->Var[index].Value = std::stoi(value);
+				this->Var[index].ModifValue = 1;
+			} else if (key == "max") {
+				this->Var[index].Max = std::stoi(value);
+				this->Var[index].ModifMax = 1;
+			} else if (key == "increase") {
+				this->Var[index].Increase = std::stoi(value);
+				this->Var[index].ModifIncrease = 1;
+			} else if (key == "invert_enable") {
+				this->Var[index].InvertEnable = string::to_bool(value);
+			} else if (key == "add_value") {
+				this->Var[index].AddValue = std::stoi(value);
+			} else if (key == "add_max") {
+				this->Var[index].AddMax = std::stoi(value);
+			} else if (key == "add_increase") {
+				this->Var[index].AddIncrease = std::stoi(value);
+			} else if (key == "increase_time") {
+				this->Var[index].IncreaseTime = std::stoi(value);
+			} else if (key == "target_is_caster") {
+				if (value == "caster") {
+					this->Var[index].TargetIsCaster = 1;
+				} else if (value == "target") {
+					this->Var[index].TargetIsCaster = 0;
+				} else {
+					throw std::runtime_error("Invalid target_is_caster value: \"" + value + "\".");
+				}
+			} else {
+				throw std::runtime_error("Invalid adjust variable spell action variable property: \"" + key + "\".");
+			}
+		});
+	} else {
+		throw std::runtime_error("Invalid adjust variable spell action scope: \"" + tag + "\".");
+	}
+}
+
+void Spell_AdjustVariable::ProcessConfigData(const CConfigData *config_data)
+{
 	for (size_t i = 0; i < config_data->Properties.size(); ++i) {
 		std::string key = config_data->Properties[i].first;
 		std::string value = config_data->Properties[i].second;
@@ -130,7 +202,6 @@ void Spell_AdjustVariable::ProcessConfigData(const CConfigData *config_data)
 	if (!lua_istable(l, -1)) {
 		LuaError(l, "Table expected for adjust-variable.");
 	}
-	this->Var = new SpellActionTypeAdjustVariable[UnitTypeVar.GetNumberVariable()];
 	for (lua_pushnil(l); lua_next(l, -2); lua_pop(l, 1)) {
 		const char *const name = LuaToString(l, -2);
 		int i = UnitTypeVar.VariableNameLookup[name];

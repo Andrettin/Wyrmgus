@@ -52,26 +52,10 @@ namespace wyrmgus {
 	class missile_type;
 	class sound;
 	class spell;
+	class spell_action;
 	class unit_type;
 	enum class spell_target_type;
 }
-
-/**
-**  Generic spell action virtual class.
-**  Spells are sub class of this one
-*/
-class SpellActionType
-{
-public:
-	SpellActionType(int mod = 0) : ModifyManaCaster(mod) {};
-	virtual ~SpellActionType() {};
-
-	virtual void ProcessConfigData(const CConfigData *config_data) = 0;
-	virtual int Cast(CUnit &caster, const wyrmgus::spell &spell, CUnit *target, const Vec2i &goalPos, int z, int modifier) = 0;
-	virtual void Parse(lua_State *l, int startIndex, int endIndex) = 0;
-
-	const int ModifyManaCaster;
-};
 
 /*
 ** *******************
@@ -204,8 +188,8 @@ class spell final : public named_data_entry, public data_type<spell>, public CDa
 {
 	Q_OBJECT
 
-	Q_PROPERTY(int mana_cost MEMBER mana_cost READ get_mana_cost)
 	Q_PROPERTY(wyrmgus::spell_target_type target MEMBER target READ get_target)
+	Q_PROPERTY(int mana_cost MEMBER mana_cost READ get_mana_cost)
 	Q_PROPERTY(CUpgrade* dependency_upgrade MEMBER dependency_upgrade READ get_dependency_upgrade)
 	Q_PROPERTY(wyrmgus::sound* sound_when_cast MEMBER sound_when_cast READ get_sound_when_cast)
 
@@ -220,7 +204,18 @@ public:
 	~spell();
 
 	virtual void process_sml_property(const sml_property &property) override;
+	virtual void process_sml_scope(const sml_data &scope) override;
 	virtual void ProcessConfigData(const CConfigData *config_data) override;
+
+	spell_target_type get_target() const
+	{
+		return this->target;
+	}
+
+	const std::vector<std::unique_ptr<spell_action>> &get_actions() const
+	{
+		return this->actions;
+	}
 
 	int get_mana_cost() const
 	{
@@ -230,11 +225,6 @@ public:
 	int get_range() const
 	{
 		return this->range;
-	}
-
-	spell_target_type get_target() const
-	{
-		return this->target;
 	}
 
 	const std::string &get_effects_string() const
@@ -264,9 +254,7 @@ public:
 	int Slot;             /// Spell numeric identifier
 private:
 	spell_target_type target; //targeting information
-public:
-	std::vector<SpellActionType *> Action; /// More arguments for spell (damage, delay, additional sounds...).
-private:
+	std::vector<std::unique_ptr<spell_action>> actions; //more arguments for spell (damage, delay, additional sounds...).
 	int mana_cost = 0;           /// Required mana for each cast.
 	int range = 0;              /// Max range of the target.
 public:

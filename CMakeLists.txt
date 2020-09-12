@@ -319,6 +319,7 @@ source_group(species FILES ${species_SRCS})
 
 set(spell_SRCS
 	src/spell/script_spell.cpp
+	src/spell/spell_action.cpp
 	src/spell/spell_adjustvariable.cpp
 	src/spell/spell_adjustvital.cpp
 	src/spell/spell_areaadjustvital.cpp
@@ -742,6 +743,7 @@ set(stratagus_species_HDRS
 )
 
 set(stratagus_spell_HDRS
+	src/spell/spell_action.h
 	src/spell/spell_adjustvariable.h
 	src/spell/spell_adjustvital.h
 	src/spell/spell_areaadjustvital.h
