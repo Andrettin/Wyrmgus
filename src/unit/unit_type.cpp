@@ -1358,7 +1358,7 @@ void unit_type::initialize()
 void unit_type::check() const
 {
 	for (const spell *spell : this->get_autocast_spells()) {
-		if (!spell->AutoCast) {
+		if (spell->get_autocast_info() == nullptr) {
 			throw std::runtime_error("The spell \"" + spell->get_identifier() + "\" is set to be autocast by default for unit type \"" + this->get_identifier() + "\", but has no defined autocast method.");
 		}
 	}

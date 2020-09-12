@@ -40,12 +40,14 @@
 #undef Enable
 #endif
 
+class AutoCastInfo;
 class CMapLayer;
 class CPlayer;
 class CUnit;
 struct lua_State;
 
 int CclDefineSpell(lua_State *l);
+void CclSpellAutocast(lua_State *l, AutoCastInfo *autocast);
 
 namespace wyrmgus {
 	class faction;
@@ -104,9 +106,11 @@ public:
 **
 **  @todo  Move more parameters into this structure.
 */
-class ConditionInfo
+class ConditionInfo final
 {
 public:
+	ConditionInfo();
+
 	~ConditionInfo()
 	{
 		delete[] BoolFlag;
@@ -114,6 +118,8 @@ public:
 		delete CheckFunc;
 	};
 	
+	void process_sml_property(const wyrmgus::sml_property &property);
+	void process_sml_scope(const wyrmgus::sml_data &scope);
 	void ProcessConfigData(const CConfigData *config_data);
 	
 	//
@@ -153,16 +159,20 @@ public:
 #define ACP_DISTANCE -2
 	~AutoCastInfo()
 	{
-		if (this->Condition) {
-			delete Condition;
-		}
 		if (this->PositionAutoCast) {
 			delete PositionAutoCast;
 		}
 	};
 	
+	void process_sml_property(const wyrmgus::sml_property &property);
+	void process_sml_scope(const wyrmgus::sml_data &scope);
 	void ProcessConfigData(const CConfigData *config_data);
 	
+	const ConditionInfo *get_cast_conditions() const
+	{
+		return this->cast_conditions.get();
+	}
+
 	/// @todo this below is SQUARE!!!
 	int Range = 0;					/// Max range of the target.
 	int MinRange = 0;				/// Min range of the target.
@@ -170,8 +180,10 @@ public:
 	int PriorityVar = ACP_NOVALUE;	/// Variable to sort autocast targets by priority.
 	bool ReverseSort = false;		/// If true, small values have the highest priority.
 
-	ConditionInfo *Condition = nullptr;	/// Conditions to cast the spell.
+private:
+	std::unique_ptr<ConditionInfo> cast_conditions;	/// Conditions to cast the spell.
 
+public:
 	/// Detailed generic conditions (not per-target, where Condition is evaluated.)
 	/// Combat mode is when there are hostile non-coward units around
 	int Combat = 0;					/// If it should be casted in combat
@@ -180,6 +192,8 @@ public:
 
 	// Position autocast callback
 	LuaCallback *PositionAutoCast = nullptr;
+
+	friend void ::CclSpellAutocast(lua_State *l, AutoCastInfo *autocast);
 };
 
 namespace wyrmgus {
@@ -242,9 +256,25 @@ public:
 		return this->sound_when_cast;
 	}
 
+	const ConditionInfo *get_cast_conditions() const
+	{
+		return this->cast_conditions.get();
+	}
+
 	/// return 1 if spell is available, 0 if not (must upgrade)
 	bool IsAvailableForUnit(const CUnit &unit) const;
-	const AutoCastInfo *GetAutoCastInfo(const bool ai) const;
+
+	const AutoCastInfo *get_autocast_info() const
+	{
+		return this->autocast.get();
+	}
+
+	const AutoCastInfo *get_ai_cast_info() const
+	{
+		return this->ai_cast.get();
+	}
+
+	const AutoCastInfo *get_autocast_info(const bool ai) const;
 	bool CheckAutoCastGenericConditions(const CUnit &caster, const AutoCastInfo *autocast, const bool ignore_combat_status = false) const;
 	bool IsUnitValidAutoCastTarget(const CUnit *target, const CUnit &caster, const AutoCastInfo *autocast, const int max_path_length = 0) const;
 	std::vector<CUnit *> GetPotentialAutoCastTargets(const CUnit &caster, const AutoCastInfo *autocast) const;
@@ -265,15 +295,12 @@ public:
 private:
 	std::string effects_string;
 	CUpgrade *dependency_upgrade = nullptr;
-public:
-	ConditionInfo *Condition = nullptr; /// Conditions to cast the spell. (generic (no test for each target))
+	sound *sound_when_cast = nullptr;  /// Sound played if cast
+	std::unique_ptr<ConditionInfo> cast_conditions; /// Conditions to cast the spell. (generic (no test for each target))
 
 	// Autocast information. No AICast means the AI use AutoCast.
-	AutoCastInfo *AutoCast = nullptr; /// AutoCast information for your own units
-	AutoCastInfo *AICast = nullptr;   /// AutoCast information for ai. More detalied.
-
-private:
-	sound *sound_when_cast = nullptr;  /// Sound played if cast
+	std::unique_ptr<AutoCastInfo> autocast; /// AutoCast information for your own units
+	std::unique_ptr<AutoCastInfo> ai_cast;  /// AutoCast information for AI. More detalied.
 
 public:
 	//Wyrmgus start

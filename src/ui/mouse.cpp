@@ -238,7 +238,7 @@ static bool DoRightButton_AutoCast(CUnit &unit, CUnit *dest, const Vec2i &pos, i
 	
 	for (const wyrmgus::spell *spell : unit.get_autocast_spells()) {
 		if (unit.CanAutoCastSpell(spell)) {
-			const AutoCastInfo *autocast = spell->GetAutoCastInfo(unit.Player->AiEnabled);
+			const AutoCastInfo *autocast = spell->get_autocast_info(unit.Player->AiEnabled);
 
 			if (!spell->CheckAutoCastGenericConditions(unit, autocast, true)) {
 				continue;

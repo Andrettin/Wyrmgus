@@ -289,12 +289,6 @@ spell::spell(const std::string &identifier) : named_data_entry(identifier), CDat
 
 spell::~spell()
 {
-	delete Condition;
-	//
-	// Free Autocast.
-	//
-	delete AutoCast;
-	delete AICast;
 }
 
 void spell::process_sml_property(const sml_property &property)
@@ -323,6 +317,21 @@ void spell::process_sml_scope(const sml_data &scope)
 		scope.for_each_child([&](const sml_data &child_scope) {
 			this->actions.push_back(spell_action::from_sml_scope(child_scope));
 		});
+	} else if (tag == "cast_conditions") {
+		if (!this->cast_conditions) {
+			this->cast_conditions = std::make_unique<ConditionInfo>();
+		}
+		database::process_sml_data(this->cast_conditions, scope);
+	} else if (tag == "autocast") {
+		if (!this->autocast) {
+			this->autocast = std::make_unique<AutoCastInfo>();
+		}
+		database::process_sml_data(this->autocast, scope);
+	} else if (tag == "ai_cast") {
+		if (!this->ai_cast) {
+			this->ai_cast = std::make_unique<AutoCastInfo>();
+		}
+		database::process_sml_data(this->ai_cast, scope);
 	} else {
 		data_entry::process_sml_scope(scope);
 	}
@@ -385,20 +394,20 @@ void spell::ProcessConfigData(const CConfigData *config_data)
 				this->actions.push_back(std::move(spell_action));
 			}
 		} else if (child_config_data->Tag == "condition") {
-			if (!this->Condition) {
-				this->Condition = new ConditionInfo;
+			if (!this->cast_conditions) {
+				this->cast_conditions = std::make_unique<ConditionInfo>();
 			}
-			this->Condition->ProcessConfigData(child_config_data);
+			this->cast_conditions->ProcessConfigData(child_config_data);
 		} else if (child_config_data->Tag == "autocast") {
-			if (!this->AutoCast) {
-				this->AutoCast = new AutoCastInfo();
+			if (!this->autocast) {
+				this->autocast = std::make_unique<AutoCastInfo>();
 			}
-			this->AutoCast->ProcessConfigData(child_config_data);
+			this->autocast->ProcessConfigData(child_config_data);
 		} else if (child_config_data->Tag == "ai_cast") {
-			if (!this->AICast) {
-				this->AICast = new AutoCastInfo();
+			if (!this->ai_cast) {
+				this->ai_cast = std::make_unique<AutoCastInfo>();
 			}
-			this->AICast->ProcessConfigData(child_config_data);
+			this->ai_cast->ProcessConfigData(child_config_data);
 		} else if (child_config_data->Tag == "resource_cost") {
 			int resource = -1;
 			int cost = 0;
@@ -444,12 +453,12 @@ void spell::ProcessConfigData(const CConfigData *config_data)
 **
 **	@return	The autocast info for the spell if present, or null otherwise
 */
-const AutoCastInfo *spell::GetAutoCastInfo(const bool ai) const
+const AutoCastInfo *spell::get_autocast_info(const bool ai) const
 {
-	if (ai && this->AICast) {
-		return this->AICast;
+	if (ai && this->ai_cast) {
+		return this->ai_cast.get();
 	} else {
-		return this->AutoCast;
+		return this->autocast.get();
 	}
 }
 
@@ -528,7 +537,7 @@ bool spell::IsUnitValidAutoCastTarget(const CUnit *target, const CUnit &caster, 
 		}
 	}
 
-	if (!PassCondition(caster, *this, target, caster.tilePos, this->Condition, target->MapLayer) || !PassCondition(caster, *this, target, caster.tilePos, autocast->Condition, target->MapLayer)) {
+	if (!PassCondition(caster, *this, target, caster.tilePos, this->get_cast_conditions(), target->MapLayer) || !PassCondition(caster, *this, target, caster.tilePos, autocast->get_cast_conditions(), target->MapLayer)) {
 		return false;
 	}
 
@@ -622,7 +631,7 @@ bool spell::is_caster_only() const
 */
 static Target *SelectTargetUnitsOfAutoCast(CUnit &caster, const wyrmgus::spell &spell)
 {
-	const AutoCastInfo *autocast = spell.GetAutoCastInfo(caster.Player->AiEnabled);
+	const AutoCastInfo *autocast = spell.get_autocast_info(caster.Player->AiEnabled);
 	Assert(autocast);
 	
 	if (!spell.CheckAutoCastGenericConditions(caster, autocast)) {
@@ -643,7 +652,7 @@ static Target *SelectTargetUnitsOfAutoCast(CUnit &caster, const wyrmgus::spell &
 	SelectAroundUnit(caster, range, table, OutOfMinRange(minRange, caster.tilePos, caster.MapLayer->ID));
 
 	if (spell.get_target() == wyrmgus::spell_target_type::self) {
-		if (PassCondition(caster, spell, &caster, caster.tilePos, spell.Condition, map_layer) && PassCondition(caster, spell, &caster, caster.tilePos, autocast->Condition, map_layer)) {
+		if (PassCondition(caster, spell, &caster, caster.tilePos, spell.get_cast_conditions(), map_layer) && PassCondition(caster, spell, &caster, caster.tilePos, autocast->get_cast_conditions(), map_layer)) {
 			return NewTargetUnit(caster);
 		}
 	} else if (spell.get_target() == wyrmgus::spell_target_type::position) {
@@ -730,7 +739,7 @@ bool CanCastSpell(const CUnit &caster, const wyrmgus::spell &spell,
 	if (spell.get_target() == wyrmgus::spell_target_type::unit && target == nullptr) {
 		return false;
 	}
-	return PassCondition(caster, spell, target, goalPos, spell.Condition, map_layer);
+	return PassCondition(caster, spell, target, goalPos, spell.get_cast_conditions(), map_layer);
 }
 
 /**
@@ -863,12 +872,7 @@ char StringToCondition(const std::string &str)
 	}
 }
 
-/**
-**	@brief	Process data provided by a configuration file
-**
-**	@param	config_data	The configuration data
-*/
-void ConditionInfo::ProcessConfigData(const CConfigData *config_data)
+ConditionInfo::ConditionInfo()
 {
 	// Flags are defaulted to 0(CONDITION_TRUE)
 	size_t new_bool_size = UnitTypeVar.GetNumberBoolFlag();
@@ -888,7 +892,82 @@ void ConditionInfo::ProcessConfigData(const CConfigData *config_data)
 		this->Variable[i].MinValuePercent = -8;
 		this->Variable[i].MaxValuePercent = 1024;
 	}
-	
+}
+
+void ConditionInfo::process_sml_property(const wyrmgus::sml_property &property)
+{
+	const std::string &key = property.get_key();
+	const std::string &value = property.get_value();
+
+	if (key == "alliance") {
+		this->Alliance = StringToCondition(value);
+	} else if (key == "opponent") {
+		this->Opponent = StringToCondition(value);
+	} else if (key == "self") {
+		this->TargetSelf = StringToCondition(value);
+	} else if (key == "thrusting_weapon") {
+		this->ThrustingWeapon = StringToCondition(value);
+	} else if (key == "faction_unit") {
+		this->FactionUnit = StringToCondition(value);
+	} else if (key == "civilization_equivalent") {
+		this->civilization_equivalent = wyrmgus::civilization::get(value);
+	} else if (key == "faction_equivalent") {
+		this->FactionEquivalent = wyrmgus::faction::get(value);
+	} else {
+		const std::string pascal_case_key = string::snake_case_to_pascal_case(key);
+
+		const int index = UnitTypeVar.BoolFlagNameLookup[pascal_case_key.c_str()];
+		if (index != -1) {
+			this->BoolFlag[index] = StringToCondition(value);
+		} else {
+			throw std::runtime_error("Invalid spell condition property: \"" + key + "\".");
+		}
+	}
+}
+
+void ConditionInfo::process_sml_scope(const wyrmgus::sml_data &scope)
+{
+	const std::string &tag = scope.get_tag();
+
+	const std::string pascal_case_tag = string::snake_case_to_pascal_case(tag);
+
+	const int index = UnitTypeVar.VariableNameLookup[pascal_case_tag.c_str()];
+	if (index != -1) {
+		this->Variable[index].Check = true;
+
+		scope.for_each_property([&](const wyrmgus::sml_property &property) {
+			const std::string &key = property.get_key();
+			const std::string &value = property.get_value();
+
+			if (key == "enable") {
+				this->Variable[index].Enable = StringToCondition(value);
+			} else if (key == "exact_value") {
+				this->Variable[index].ExactValue = std::stoi(value);
+			} else if (key == "except_value") {
+				this->Variable[index].ExceptValue = std::stoi(value);
+			} else if (key == "min_value") {
+				this->Variable[index].MinValue = std::stoi(value);
+			} else if (key == "max_value") {
+				this->Variable[index].MaxValue = std::stoi(value);
+			} else if (key == "min_max") {
+				this->Variable[index].MinMax = std::stoi(value);
+			} else if (key == "min_value_percent") {
+				this->Variable[index].MinValuePercent = std::stoi(value);
+			} else if (key == "max_value_percent") {
+				this->Variable[index].MaxValuePercent = std::stoi(value);
+			} else if (key == "condition_apply_on_caster") {
+				this->Variable[index].ConditionApplyOnCaster = string::to_bool(value);
+			} else {
+				throw std::runtime_error("Invalid adjust variable spell action variable property: \"" + key + "\".");
+			}
+		});
+	} else {
+		throw std::runtime_error("Invalid spell condition scope: \"" + tag + "\".");
+	}
+}
+
+void ConditionInfo::ProcessConfigData(const CConfigData *config_data)
+{
 	for (size_t i = 0; i < config_data->Properties.size(); ++i) {
 		std::string key = config_data->Properties[i].first;
 		std::string value = config_data->Properties[i].second;
@@ -961,11 +1040,65 @@ void ConditionInfo::ProcessConfigData(const CConfigData *config_data)
 	}
 }
 
-/**
-**	@brief	Process data provided by a configuration file
-**
-**	@param	config_data	The configuration data
-*/
+void AutoCastInfo::process_sml_property(const wyrmgus::sml_property &property)
+{
+	const std::string &key = property.get_key();
+	const std::string &value = property.get_value();
+
+	if (key == "range") {
+		this->Range = std::stoi(value);
+	} else if (key == "min_range") {
+		this->MinRange = std::stoi(value);
+	} else if (key == "combat") {
+		this->Combat = StringToCondition(value);
+	} else if (key == "attacker") {
+		this->Attacker = StringToCondition(value);
+	} else if (key == "corpse") {
+		this->Corpse = StringToCondition(value);
+	} else {
+		throw std::runtime_error("Invalid autocast info property: \"" + key + "\".");
+	}
+}
+
+void AutoCastInfo::process_sml_scope(const wyrmgus::sml_data &scope)
+{
+	const std::string &tag = scope.get_tag();
+
+	if (tag == "priority") {
+		scope.for_each_property([&](const wyrmgus::sml_property &property) {
+			const std::string &key = property.get_key();
+			const std::string &value = property.get_value();
+
+			if (key == "priority_var") {
+				int index = -1;
+				if (value == "distance") {
+					index = ACP_DISTANCE;
+				} else {
+					const std::string pascal_case_value = string::snake_case_to_pascal_case(value);
+					index = UnitTypeVar.VariableNameLookup[pascal_case_value.c_str()];
+				}
+
+				if (index != -1) {
+					this->PriorityVar = index;
+				} else {
+					throw std::runtime_error("Invalid autocast priority variable value: \"" + value + "\".");
+				}
+			} else if (key == "reverse_sort") {
+				this->ReverseSort = string::to_bool(value);
+			} else {
+				throw std::runtime_error("Invalid autocast priority property: \"" + key + "\".");
+			}
+		});
+	} else if (tag == "cast_conditions") {
+		if (!this->cast_conditions) {
+			this->cast_conditions = std::make_unique<ConditionInfo>();
+		}
+		wyrmgus::database::process_sml_data(this->cast_conditions, scope);
+	} else {
+		throw std::runtime_error("Invalid autocast info scope: \"" + tag + "\".");
+	}
+}
+
 void AutoCastInfo::ProcessConfigData(const CConfigData *config_data)
 {
 	for (size_t i = 0; i < config_data->Properties.size(); ++i) {
@@ -1014,10 +1147,10 @@ void AutoCastInfo::ProcessConfigData(const CConfigData *config_data)
 				}
 			}
 		} else if (child_config_data->Tag == "condition") {
-			if (!this->Condition) {
-				this->Condition = new ConditionInfo;
+			if (!this->cast_conditions) {
+				this->cast_conditions = std::make_unique<ConditionInfo>();
 			}
-			this->Condition->ProcessConfigData(child_config_data);
+			this->cast_conditions->ProcessConfigData(child_config_data);
 		} else {
 			fprintf(stderr, "Invalid autocast property: \"%s\".\n", child_config_data->Tag.c_str());
 		}

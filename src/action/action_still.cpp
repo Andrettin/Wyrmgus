@@ -339,7 +339,7 @@ bool AutoCast(CUnit &unit)
 {
 	if (!unit.Removed) { // Removed units can't cast any spells, from bunker)
 		for (const wyrmgus::spell *spell : unit.get_autocast_spells()) {
-			if ((spell->AutoCast || spell->AICast) && AutoCastSpell(unit, *spell)) {
+			if ((spell->get_autocast_info() != nullptr || spell->get_ai_cast_info() != nullptr) && AutoCastSpell(unit, *spell)) {
 				return true;
 			}
 		}
@@ -456,7 +456,7 @@ bool COrder_Still::AutoCastStand(CUnit &unit)
 {
 	if (!unit.Removed) { // Removed units can't cast any spells, from bunker)
 		for (const wyrmgus::spell *spell : unit.get_autocast_spells()) {
-			if ((spell->AutoCast || spell->AICast) && AutoCastSpell(unit, *spell)) {
+			if ((spell->get_autocast_info() != nullptr || spell->get_ai_cast_info() != nullptr) && AutoCastSpell(unit, *spell)) {
 				return true;
 			}
 		}

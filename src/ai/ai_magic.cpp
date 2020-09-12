@@ -56,8 +56,7 @@ void AiCheckMagic()
 			for (unsigned int j = 0; j < unit.Type->Spells.size(); ++j) {
 				wyrmgus::spell *spell = unit.Type->Spells[j];
 				// Check if we can cast this spell. SpellIsAvailable checks for upgrades.
-				if (spell->IsAvailableForUnit(unit)
-					&& spell->AICast) {
+				if (spell->IsAvailableForUnit(unit) && spell->get_ai_cast_info() != nullptr) {
 					if (AutoCastSpell(unit, *spell)) {
 						break;
 					}

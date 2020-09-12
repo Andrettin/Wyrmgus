@@ -534,7 +534,7 @@ static bool CanShowPopupContent(const PopupConditionPanel *condition,
 	//Wyrmgus start
 	if (button.Action == ButtonCmd::SpellCast) {
 		if (condition->AutoCast != CONDITION_TRUE) {
-			if ((condition->AutoCast == CONDITION_ONLY) ^ (wyrmgus::spell::get_all()[button.Value]->AutoCast != nullptr)) {
+			if ((condition->AutoCast == CONDITION_ONLY) ^ (wyrmgus::spell::get_all()[button.Value]->get_autocast_info() != nullptr)) {
 				return false;
 			}
 		}
@@ -1945,7 +1945,7 @@ void CButtonPanel::DoClicked_SpellCast(int button)
 	const int spell_id = CurrentButtons[button]->Value;
 	const wyrmgus::spell *spell = wyrmgus::spell::get_all()[spell_id];
 	if (KeyModifiers & ModifierControl) {
-		if (!spell->AutoCast) {
+		if (spell->get_autocast_info() == nullptr) {
 			PlayGameSound(GameSounds.PlacementError[CPlayer::GetThisPlayer()->Race].Sound, MaxSampleVolume);
 			return;
 		}

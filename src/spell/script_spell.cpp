@@ -147,24 +147,6 @@ char Ccl2Condition(lua_State *l, const char *value)
 */
 static void CclSpellCondition(lua_State *l, ConditionInfo *condition)
 {
-	// Flags are defaulted to 0(CONDITION_TRUE)
-	size_t new_bool_size = UnitTypeVar.GetNumberBoolFlag();
-
-	condition->BoolFlag = new char[new_bool_size];
-	memset(condition->BoolFlag, 0, new_bool_size * sizeof(char));
-
-	condition->Variable = new ConditionInfoVariable[UnitTypeVar.GetNumberVariable()];
-	// Initialize min/max stuff to values with no effect.
-	for (unsigned int i = 0; i < UnitTypeVar.GetNumberVariable(); i++) {
-		condition->Variable[i].Check = false;
-		condition->Variable[i].ExactValue = -1;
-		condition->Variable[i].ExceptValue = -1;
-		condition->Variable[i].MinValue = -1;
-		condition->Variable[i].MaxValue = -1;
-		condition->Variable[i].MinMax = -1;
-		condition->Variable[i].MinValuePercent = -8;
-		condition->Variable[i].MaxValuePercent = 1024;
-	}
 	//  Now parse the list and set values.
 	if (!lua_istable(l, -1)) {
 		LuaError(l, "incorrect argument");
@@ -295,11 +277,11 @@ static void CclSpellAutocast(lua_State *l, AutoCastInfo *autocast)
 
 			lua_pop(l, 1);
 		} else if (!strcmp(value, "condition")) {
-			if (!autocast->Condition) {
-				autocast->Condition = new ConditionInfo;
+			if (!autocast->cast_conditions) {
+				autocast->cast_conditions = std::make_unique<ConditionInfo>();
 			}
 			lua_rawgeti(l, -1, j + 1);
-			CclSpellCondition(l, autocast->Condition);
+			CclSpellCondition(l, autocast->cast_conditions.get());
 			lua_pop(l, 1);
 		} else {
 			LuaError(l, "Unsupported autocast tag: %s" _C_ value);
@@ -377,25 +359,25 @@ static int CclDefineSpell(lua_State *l)
 				lua_pop(l, 1);
 			}
 		} else if (!strcmp(value, "condition")) {
-			if (!spell->Condition) {
-				spell->Condition = new ConditionInfo;
+			if (!spell->cast_conditions) {
+				spell->cast_conditions = std::make_unique<ConditionInfo>();
 			}
 			lua_pushvalue(l, i + 1);
-			CclSpellCondition(l, spell->Condition);
+			CclSpellCondition(l, spell->cast_conditions.get());
 			lua_pop(l, 1);
 		} else if (!strcmp(value, "autocast")) {
-			if (!spell->AutoCast) {
-				spell->AutoCast = new AutoCastInfo();
+			if (!spell->autocast) {
+				spell->autocast = std::make_unique<AutoCastInfo>();
 			}
 			lua_pushvalue(l, i + 1);
-			CclSpellAutocast(l, spell->AutoCast);
+			CclSpellAutocast(l, spell->autocast.get());
 			lua_pop(l, 1);
 		} else if (!strcmp(value, "ai-cast")) {
-			if (!spell->AICast) {
-				spell->AICast = new AutoCastInfo();
+			if (!spell->ai_cast) {
+				spell->ai_cast = std::make_unique<AutoCastInfo>();
 			}
 			lua_pushvalue(l, i + 1);
-			CclSpellAutocast(l, spell->AICast);
+			CclSpellAutocast(l, spell->ai_cast.get());
 			lua_pop(l, 1);
 		} else if (!strcmp(value, "sound-when-cast")) {
 			spell->sound_when_cast = wyrmgus::sound::get(LuaToString(l, i + 1));

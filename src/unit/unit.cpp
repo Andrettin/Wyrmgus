@@ -6085,7 +6085,7 @@ void CUnit::remove_autocast_spell(const wyrmgus::spell *spell)
 */
 bool CUnit::CanAutoCastSpell(const wyrmgus::spell *spell) const
 {
-	if (!spell || !this->is_autocast_spell(spell) || !spell->AutoCast) {
+	if (!spell || !this->is_autocast_spell(spell) || spell->get_autocast_info() == nullptr) {
 		return false;
 	}
 	
