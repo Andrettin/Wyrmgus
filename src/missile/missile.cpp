@@ -50,6 +50,7 @@
 #include "sound/sound.h"
 #include "sound/unitsound.h"
 #include "sound/unit_sound_type.h"
+#include "spell/spell_target_type.h"
 #include "spell/spells.h"
 #include "ui/ui.h"
 #include "unit/unit.h"
@@ -1598,7 +1599,7 @@ void Missile::MissileHit(CUnit *unit)
 					if (this->TargetUnit == nullptr) {
 						if (this->SourceUnit->CurrentAction() == UnitAction::SpellCast) {
 							const COrder_SpellCast &order = *static_cast<COrder_SpellCast *>(this->SourceUnit->CurrentOrder());
-							if (order.GetSpell().Target == wyrmgus::spell_target_type::position) {
+							if (order.GetSpell().get_target() == wyrmgus::spell_target_type::position) {
 								isPosition = true;
 							}
 						} else {

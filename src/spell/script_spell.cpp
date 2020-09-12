@@ -54,6 +54,7 @@
 #include "spell/spell_spawnmissile.h"
 #include "spell/spell_spawnportal.h"
 #include "spell/spell_summon.h"
+#include "spell/spell_target_type.h"
 #include "spell/spell_teleport.h"
 #include "unit/unit_type.h"
 #include "upgrade/upgrade.h"
@@ -364,15 +365,7 @@ static int CclDefineSpell(lua_State *l)
 			--i;
 		} else if (!strcmp(value, "target")) {
 			value = LuaToString(l, i + 1);
-			if (!strcmp(value, "self")) {
-				spell->Target = wyrmgus::spell_target_type::self;
-			} else if (!strcmp(value, "unit")) {
-				spell->Target = wyrmgus::spell_target_type::unit;
-			} else if (!strcmp(value, "position")) {
-				spell->Target = wyrmgus::spell_target_type::position;
-			} else {
-				LuaError(l, "Unsupported spell target type tag: %s" _C_ value);
-			}
+			spell->target = wyrmgus::string_to_spell_target_type(value);
 		} else if (!strcmp(value, "action")) {
 			if (!lua_istable(l, i + 1)) {
 				LuaError(l, "incorrect argument");

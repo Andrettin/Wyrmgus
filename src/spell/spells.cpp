@@ -50,6 +50,7 @@
 #include "sound/sound.h"
 #include "spell/spell_adjustvariable.h"
 #include "spell/spell_spawnmissile.h"
+#include "spell/spell_target_type.h"
 #include "unit/unit.h"
 #include "unit/unit_find.h"
 #include "upgrade/upgrade.h"
@@ -101,7 +102,7 @@ static bool PassCondition(const CUnit &caster, const wyrmgus::spell &spell, cons
 	if (caster.Player->CheckCosts(spell.Costs, false)) {
 		return false;
 	}
-	if (spell.Target == wyrmgus::spell_target_type::unit) { // Casting a unit spell without a target.
+	if (spell.get_target() == wyrmgus::spell_target_type::unit) { // Casting a unit spell without a target.
 		if ((!target) || target->IsAlive() == false) {
 			return false;
 		}
@@ -345,15 +346,7 @@ void spell::ProcessConfigData(const CConfigData *config_data)
 		} else if (key == "force_use_animation") {
 			this->ForceUseAnimation = string::to_bool(value);
 		} else if (key == "target") {
-			if (value == "self") {
-				this->Target = spell_target_type::self;
-			} else if (value == "unit") {
-				this->Target = spell_target_type::unit;
-			} else if (value == "position") {
-				this->Target = spell_target_type::position;
-			} else {
-				fprintf(stderr, "Invalid spell target type: \"%s\".\n", value.c_str());
-			}
+			this->target = string_to_spell_target_type(value);
 		} else if (key == "sound_when_cast") {
 			this->sound_when_cast = sound::get(value);
 		} else if (key == "depend_upgrade") {
@@ -494,7 +487,7 @@ bool spell::IsUnitValidAutoCastTarget(const CUnit *target, const CUnit &caster, 
 	}
 
 	// Check if unit is in battle
-	if (this->Target == spell_target_type::unit) {
+	if (this->get_target() == spell_target_type::unit) {
 		if (autocast->Attacker == CONDITION_ONLY) {
 			const int react_range = target->GetReactionRange();
 			if (
@@ -522,14 +515,12 @@ bool spell::IsUnitValidAutoCastTarget(const CUnit *target, const CUnit &caster, 
 		}
 	}
 
-	//Wyrmgus start
-	if (this->Target == spell_target_type::unit) {
+	if (this->get_target() == spell_target_type::unit) {
 		//if caster is terrified, don't target enemy units
 		if (caster.Variable[TERROR_INDEX].Value > 0 && caster.IsEnemy(*target)) {
 			return false;
 		}
 	}
-	//Wyrmgus end
 
 	if (!PassCondition(caster, *this, target, caster.tilePos, this->Condition, target->MapLayer) || !PassCondition(caster, *this, target, caster.tilePos, autocast->Condition, target->MapLayer)) {
 		return false;
@@ -606,6 +597,11 @@ bool spell::IsAvailableForUnit(const CUnit &unit) const
 	//Wyrmgus end
 }
 
+bool spell::is_caster_only() const
+{
+	return this->get_range() == 0 && this->get_target() == spell_target_type::self;
+}
+
 }
 
 /**
@@ -640,11 +636,11 @@ static Target *SelectTargetUnitsOfAutoCast(CUnit &caster, const wyrmgus::spell &
 	std::vector<CUnit *> table;
 	SelectAroundUnit(caster, range, table, OutOfMinRange(minRange, caster.tilePos, caster.MapLayer->ID));
 
-	if (spell.Target == wyrmgus::spell_target_type::self) {
+	if (spell.get_target() == wyrmgus::spell_target_type::self) {
 		if (PassCondition(caster, spell, &caster, caster.tilePos, spell.Condition, map_layer) && PassCondition(caster, spell, &caster, caster.tilePos, autocast->Condition, map_layer)) {
 			return NewTargetUnit(caster);
 		}
-	} else if (spell.Target == wyrmgus::spell_target_type::position) {
+	} else if (spell.get_target() == wyrmgus::spell_target_type::position) {
 		if (!autocast->PositionAutoCast) {
 			return nullptr;
 		}
@@ -669,7 +665,7 @@ static Target *SelectTargetUnitsOfAutoCast(CUnit &caster, const wyrmgus::spell &
 				return target;
 			}
 		}
-	} else if (spell.Target == wyrmgus::spell_target_type::unit) {
+	} else if (spell.get_target() == wyrmgus::spell_target_type::unit) {
 		std::vector<CUnit *> table = spell.GetPotentialAutoCastTargets(caster, autocast);
 		//now select the best unit to target.
 		if (!table.empty()) {
@@ -725,7 +721,7 @@ void InitSpells()
 bool CanCastSpell(const CUnit &caster, const wyrmgus::spell &spell,
 				  const CUnit *target, const Vec2i &goalPos, const CMapLayer *map_layer)
 {
-	if (spell.Target == wyrmgus::spell_target_type::unit && target == nullptr) {
+	if (spell.get_target() == wyrmgus::spell_target_type::unit && target == nullptr) {
 		return false;
 	}
 	return PassCondition(caster, spell, target, goalPos, spell.Condition, map_layer);
@@ -787,7 +783,7 @@ int SpellCast(CUnit &caster, const wyrmgus::spell &spell, CUnit *target, const V
 	//
 	// For TargetSelf, you target.... YOURSELF
 	//
-	if (spell.Target == wyrmgus::spell_target_type::self) {
+	if (spell.get_target() == wyrmgus::spell_target_type::self) {
 		pos = caster.tilePos;
 		map_layer = caster.MapLayer;
 		target = &caster;
@@ -801,13 +797,13 @@ int SpellCast(CUnit &caster, const wyrmgus::spell &spell, CUnit *target, const V
 		//  Ugly hack, CastAdjustVitals makes it's own mana calculation.
 		//
 		if (spell.get_sound_when_cast() != nullptr) {
-			if (spell.Target == wyrmgus::spell_target_type::self) {
+			if (spell.get_target() == wyrmgus::spell_target_type::self) {
 				PlayUnitSound(caster, spell.get_sound_when_cast());
 			} else {
 				PlayGameSound(spell.get_sound_when_cast(), CalculateVolume(false, ViewPointDistance(target ? target->tilePos : goalPos), spell.get_sound_when_cast()->get_range()) * spell.get_sound_when_cast()->VolumePercent / 100);
 			}
 		} else if (caster.Type->MapSound.Hit.Sound) { //if the spell has no sound-when-cast designated, use the unit's hit sound instead (if any)
-			if (spell.Target == wyrmgus::spell_target_type::self) {
+			if (spell.get_target() == wyrmgus::spell_target_type::self) {
 				PlayUnitSound(caster, caster.Type->MapSound.Hit.Sound);
 			} else {
 				PlayGameSound(caster.Type->MapSound.Hit.Sound, CalculateVolume(false, ViewPointDistance(target ? target->tilePos : goalPos), caster.Type->MapSound.Hit.Sound->get_range()) * caster.Type->MapSound.Hit.Sound->VolumePercent / 100);

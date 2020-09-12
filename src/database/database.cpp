@@ -75,6 +75,7 @@
 #include "species/species.h"
 #include "species/taxon.h"
 #include "species/taxonomic_rank.h"
+#include "spell/spell_target_type.h"
 #include "spell/spells.h"
 #include "time/calendar.h"
 #include "time/time_of_day.h"
@@ -283,6 +284,8 @@ QVariant database::process_sml_property_value(const sml_property &property, cons
 			new_property_value = QVariant::fromValue(species::get(property.get_value()));
 		} else if (property_class_name == "wyrmgus::spell*") {
 			new_property_value = QVariant::fromValue(spell::get(property.get_value()));
+		} else if (property_class_name == "wyrmgus::spell_target_type") {
+			new_property_value = QVariant::fromValue(string_to_spell_target_type(property.get_value()));
 		} else if (property_class_name == "wyrmgus::taxon*") {
 			new_property_value = QVariant::fromValue(taxon::get(property.get_value()));
 		} else if (property_class_name == "wyrmgus::taxonomic_rank") {

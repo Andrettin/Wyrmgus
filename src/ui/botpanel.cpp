@@ -1968,7 +1968,7 @@ void CButtonPanel::DoClicked_SpellCast(int button)
 		return;
 	}
 
-	if (spell->IsCasterOnly()) {
+	if (spell->is_caster_only()) {
 		const int flush = !(KeyModifiers & ModifierShift);
 
 		for (size_t i = 0; i != Selected.size(); ++i) {

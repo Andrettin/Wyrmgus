@@ -754,6 +754,7 @@ set(stratagus_spell_HDRS
 	src/spell/spell_spawnmissile.h
 	src/spell/spell_spawnportal.h
 	src/spell/spell_summon.h
+	src/spell/spell_target_type.h
 	src/spell/spell_teleport.h
 	src/spell/spells.h
 )

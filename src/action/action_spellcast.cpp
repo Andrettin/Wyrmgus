@@ -33,10 +33,6 @@
 ** be considered a 'special' case attack action... //Vladi
 */
 
-/*----------------------------------------------------------------------------
---  Includes
-----------------------------------------------------------------------------*/
-
 #include "stratagus.h"
 
 #include "action/action_spellcast.h"
@@ -55,6 +51,7 @@
 #include "player.h"
 #include "script.h"
 #include "sound/sound.h"
+#include "spell/spell_target_type.h"
 #include "spell/spells.h"
 #include "translate.h"
 #include "ui/ui.h"
@@ -426,7 +423,7 @@ bool COrder_SpellCast::SpellMoveToTarget(CUnit &unit)
 										unit.GetMessageName().c_str(), spell.get_name().c_str());
 										//Wyrmgus end
 				//Wyrmgus start
-				} else if (spell.Target == wyrmgus::spell_target_type::unit && order.GetGoal() == nullptr) {
+				} else if (spell.get_target() == wyrmgus::spell_target_type::unit && order.GetGoal() == nullptr) {
 					unit.Player->Notify(NotifyYellow, unit.tilePos, unit.MapLayer->ID,
 										_("%s needs a target to use the %s ability."),
 										unit.GetMessageName().c_str(), spell.get_name().c_str());
@@ -474,7 +471,7 @@ bool COrder_SpellCast::SpellMoveToTarget(CUnit &unit)
 			}
 		// FALL THROUGH
 		case 2:                         // Cast spell on the target.
-			if (!spell.IsCasterOnly() || spell.ForceUseAnimation) {
+			if (!spell.is_caster_only() || spell.ForceUseAnimation) {
 				AnimateActionSpellCast(unit, *this);
 				if (unit.Anim.Unbreakable) {
 					return ;

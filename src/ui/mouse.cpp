@@ -55,6 +55,7 @@
 #include "sound/sound.h"
 #include "sound/unitsound.h"
 #include "sound/unit_sound_type.h"
+#include "spell/spell_target_type.h"
 #include "spell/spells.h"
 #include "translate.h"
 #include "ui/button.h"
@@ -2002,7 +2003,7 @@ static int SendSpellCast(const Vec2i &tilePos, int flush)
 			continue;
 		}
 		
-		SendCommandSpellCast(unit, tilePos, spell->Target == wyrmgus::spell_target_type::position ? nullptr : dest , CursorValue, flush, UI.CurrentMapLayer->ID);
+		SendCommandSpellCast(unit, tilePos, spell->get_target() == wyrmgus::spell_target_type::position ? nullptr : dest , CursorValue, flush, UI.CurrentMapLayer->ID);
 		ret = 1;
 		
 		//if the spell's effects do not stack on the same target, then only one selected unit should cast it

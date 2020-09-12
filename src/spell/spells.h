@@ -53,6 +53,7 @@ namespace wyrmgus {
 	class sound;
 	class spell;
 	class unit_type;
+	enum class spell_target_type;
 }
 
 /**
@@ -71,16 +72,6 @@ public:
 
 	const int ModifyManaCaster;
 };
-
-namespace wyrmgus {
-
-enum class spell_target_type {
-	self,
-	position,
-	unit
-};
-
-}
 
 /*
 ** *******************
@@ -214,6 +205,7 @@ class spell final : public named_data_entry, public data_type<spell>, public CDa
 	Q_OBJECT
 
 	Q_PROPERTY(int mana_cost MEMBER mana_cost READ get_mana_cost)
+	Q_PROPERTY(wyrmgus::spell_target_type target MEMBER target READ get_target)
 	Q_PROPERTY(wyrmgus::sound* sound_when_cast MEMBER sound_when_cast READ get_sound_when_cast)
 
 public:
@@ -239,6 +231,11 @@ public:
 		return this->range;
 	}
 
+	spell_target_type get_target() const
+	{
+		return this->target;
+	}
+
 	const std::string &get_effects_string() const
 	{
 		return this->effects_string;
@@ -256,14 +253,13 @@ public:
 	bool IsUnitValidAutoCastTarget(const CUnit *target, const CUnit &caster, const AutoCastInfo *autocast, const int max_path_length = 0) const;
 	std::vector<CUnit *> GetPotentialAutoCastTargets(const CUnit &caster, const AutoCastInfo *autocast) const;
 
-	// Identification stuff
+	bool is_caster_only() const;
+
 	int Slot;             /// Spell numeric identifier
-
+private:
+	spell_target_type target; //targeting information
 public:
-	// Spell Specifications
-	spell_target_type Target;          /// Targeting information. See TargetType.
 	std::vector<SpellActionType *> Action; /// More arguments for spell (damage, delay, additional sounds...).
-
 private:
 	int mana_cost = 0;           /// Required mana for each cast.
 	int range = 0;              /// Max range of the target.
@@ -272,10 +268,8 @@ public:
 	bool Stackable = true;		/// Whether the spell has an effect if cast multiple times at the same target
 	int Costs[MaxCosts];        /// Resource costs of spell.
 	int CoolDown = 0;           /// How much time spell needs to be cast again.
-
 private:
 	std::string effects_string;
-
 public:
 	int DependencyId = -1;      /// Id of upgrade, -1 if no upgrade needed for cast the spell.
 	ConditionInfo *Condition = nullptr; /// Conditions to cast the spell. (generic (no test for each target))
@@ -291,11 +285,6 @@ public:
 	//Wyrmgus start
 	bool ItemSpell[static_cast<int>(item_class::count)];
 	//Wyrmgus end
-
-	bool IsCasterOnly() const
-	{
-		return this->get_range() == 0 && Target == spell_target_type::self;
-	}
 
 	bool ForceUseAnimation = false;
 
