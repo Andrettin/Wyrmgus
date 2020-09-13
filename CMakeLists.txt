@@ -328,7 +328,6 @@ set(spell_SRCS
 	src/spell/spell_areabombardment.cpp
 	src/spell/spell_capture.cpp
 	src/spell/spell_demolish.cpp
-	src/spell/spell_luacallback.cpp
 	src/spell/spell_polymorph.cpp
 	src/spell/spell_retrain.cpp
 	src/spell/spell_spawnportal.cpp
@@ -752,7 +751,6 @@ set(stratagus_spell_HDRS
 	src/spell/spell_areabombardment.h
 	src/spell/spell_capture.h
 	src/spell/spell_demolish.h
-	src/spell/spell_luacallback.h
 	src/spell/spell_polymorph.h
 	src/spell/spell_retrain.h
 	src/spell/spell_spawnportal.h

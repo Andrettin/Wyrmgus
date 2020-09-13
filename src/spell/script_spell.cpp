@@ -47,7 +47,6 @@
 #include "spell/spell_areabombardment.h"
 #include "spell/spell_capture.h"
 #include "spell/spell_demolish.h"
-#include "spell/spell_luacallback.h"
 #include "spell/spell_polymorph.h"
 //Wyrmgus start
 #include "spell/spell_retrain.h"
@@ -90,8 +89,6 @@ static std::unique_ptr<wyrmgus::spell_action> CclSpellAction(lua_State *l)
 		spellaction = std::make_unique<Spell_Capture>();
 	} else if (!strcmp(value, "demolish")) {
 		spellaction = std::make_unique<Spell_Demolish>();
-	} else if (!strcmp(value, "lua-callback")) {
-		spellaction = std::make_unique<Spell_LuaCallback>();
 	} else if (!strcmp(value, "polymorph")) {
 		spellaction = std::make_unique<Spell_Polymorph>();
 	//Wyrmgus start
