@@ -321,7 +321,8 @@ set(spell_SRCS
 	src/spell/script_spell.cpp
 	src/spell/spell.cpp
 	src/spell/spell_action.cpp
-	src/spell/spell_adjustvariable.cpp
+	src/spell/spell_action_adjust_variable.cpp
+	src/spell/spell_action_spawn_missile.cpp
 	src/spell/spell_adjustvital.cpp
 	src/spell/spell_areaadjustvital.cpp
 	src/spell/spell_areabombardment.cpp
@@ -330,7 +331,6 @@ set(spell_SRCS
 	src/spell/spell_luacallback.cpp
 	src/spell/spell_polymorph.cpp
 	src/spell/spell_retrain.cpp
-	src/spell/spell_spawnmissile.cpp
 	src/spell/spell_spawnportal.cpp
 	src/spell/spell_summon.cpp
 	src/spell/spell_teleport.cpp
@@ -745,7 +745,8 @@ set(stratagus_species_HDRS
 set(stratagus_spell_HDRS
 	src/spell/spell.h
 	src/spell/spell_action.h
-	src/spell/spell_adjustvariable.h
+	src/spell/spell_action_adjust_variable.h
+	src/spell/spell_action_spawn_missile.h
 	src/spell/spell_adjustvital.h
 	src/spell/spell_areaadjustvital.h
 	src/spell/spell_areabombardment.h
@@ -754,7 +755,6 @@ set(stratagus_spell_HDRS
 	src/spell/spell_luacallback.h
 	src/spell/spell_polymorph.h
 	src/spell/spell_retrain.h
-	src/spell/spell_spawnmissile.h
 	src/spell/spell_spawnportal.h
 	src/spell/spell_summon.h
 	src/spell/spell_target_type.h
