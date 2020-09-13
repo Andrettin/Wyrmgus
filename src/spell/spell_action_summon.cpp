@@ -28,7 +28,7 @@
 
 #include "stratagus.h"
 
-#include "spell/spell_summon.h"
+#include "spell/spell_action_summon.h"
 
 #include "action/action_defend.h"
 #include "actions.h"

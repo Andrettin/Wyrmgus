@@ -28,7 +28,7 @@
 
 #include "stratagus.h"
 
-#include "spell/spell_adjustvital.h"
+#include "spell/spell_action_adjust_vitals.h"
 
 #include "script.h"
 #include "spell/spell.h"

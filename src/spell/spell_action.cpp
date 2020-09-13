@@ -33,8 +33,8 @@
 #include "database/database.h"
 #include "database/sml_data.h"
 #include "spell/spell_action_adjust_variable.h"
+#include "spell/spell_action_adjust_vitals.h"
 #include "spell/spell_action_spawn_missile.h"
-#include "spell/spell_adjustvital.h"
 
 namespace wyrmgus {
 
