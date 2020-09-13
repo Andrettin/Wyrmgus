@@ -88,9 +88,9 @@ void deity::initialize()
 	}
 
 	for (const magic_domain *domain : this->get_domains()) {
-		for (const CUpgrade *ability : domain->get_abilities()) {
-			if (!vector::contains(this->Abilities, ability)) {
-				this->Abilities.push_back(ability);
+		for (const spell *spell : domain->get_spells()) {
+			if (!vector::contains(this->spells, spell)) {
+				this->spells.push_back(spell);
 			}
 		}
 	}

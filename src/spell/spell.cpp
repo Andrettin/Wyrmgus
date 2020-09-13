@@ -44,6 +44,7 @@
 #include "commands.h"
 #include "config.h"
 #include "faction.h"
+#include "magic_domain.h"
 #include "map/map.h"
 #include "map/map_layer.h"
 #include "map/tileset.h"
@@ -315,8 +316,15 @@ void spell::process_sml_property(const sml_property &property)
 void spell::process_sml_scope(const sml_data &scope)
 {
 	const std::string &tag = scope.get_tag();
+	const std::vector<std::string> &values = scope.get_values();
 
-	if (tag == "actions") {
+	if (tag == "magic_domains") {
+		for (const std::string &value : values) {
+			magic_domain *domain = magic_domain::get(value);
+			this->magic_domains.push_back(domain);
+			domain->add_spell(this);
+		}
+	} else if (tag == "actions") {
 		scope.for_each_child([&](const sml_data &child_scope) {
 			this->actions.push_back(spell_action::from_sml_scope(child_scope));
 		});
@@ -717,7 +725,7 @@ int SpellCast(CUnit &caster, const wyrmgus::spell &spell, CUnit *target, const V
 		}
 		
 		int modifier = 100;
-		if (caster.IsSpellEmpowered(&spell)) {
+		if (caster.is_spell_empowered(&spell)) {
 			modifier += 100; //empowered spells have double the effect
 		}
 			

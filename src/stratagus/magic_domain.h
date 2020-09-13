@@ -35,6 +35,8 @@ class CUpgrade;
 
 namespace wyrmgus {
 
+class spell;
+
 class magic_domain final : public detailed_data_entry, public data_type<magic_domain>
 {
 	Q_OBJECT
@@ -57,14 +59,19 @@ public:
 		return this->upgrade;
 	}
 
-	const std::vector<const CUpgrade *> &get_abilities() const
+	const std::vector<const spell *> &get_spells() const
 	{
-		return this->abilities;
+		return this->spells;
+	}
+
+	void add_spell(const spell *spell)
+	{
+		this->spells.push_back(spell);
 	}
 
 private:
 	CUpgrade *upgrade = nullptr; //the upgrade corresponding to the domain
-	std::vector<const CUpgrade *> abilities; //abilities linked to this domain
+	std::vector<const spell *> spells; //spells which belong to this domain
 };
 
 }

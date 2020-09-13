@@ -51,7 +51,7 @@ private:
 	int HP = 0;         /// Target HP gain.(can be negative)
 	int Mana = 0;       /// Target Mana gain.(can be negative)
 	int Shield = 0;     /// Target SP gain.(can be negative)
-	/// This spell is designed to be used wit very small amounts. The spell
+	/// This spell is designed to be used with very small amounts. The spell
 	/// can scale up to MaxMultiCast times. Use 0 for infinite.
 	int MaxMultiCast = 0;
 };

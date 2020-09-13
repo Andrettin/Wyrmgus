@@ -249,16 +249,6 @@ public:
 
 	void add_modifier(std::unique_ptr<wyrmgus::upgrade_modifier> &&modifier);
 
-	const std::vector<const wyrmgus::magic_domain *> &get_magic_domains() const
-	{
-		return this->magic_domains;
-	}
-
-	void add_magic_domain(const wyrmgus::magic_domain *domain)
-	{
-		this->magic_domains.push_back(domain);
-	}
-
 	const std::unique_ptr<wyrmgus::condition> &get_preconditions() const
 	{
 		return this->preconditions;
@@ -332,9 +322,6 @@ private:
 public:
 	std::vector<wyrmgus::unique_item *> UniqueItems;	/// Unique items who form a part of this set upgrade
 	std::vector<wyrmgus::unit_type *> ScaledCostUnits;	/// Units for which the upgrade's costs are scaled
-private:
-	std::vector<const wyrmgus::magic_domain *> magic_domains; //the magic domains to which this skill/ability belongs
-public:
 	std::vector<wyrmgus::character *> Characters;	/// Characters who appear in this literary work (if it is one)
 	//Wyrmgus end
 	// TODO: not used by buttons

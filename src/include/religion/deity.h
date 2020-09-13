@@ -45,6 +45,7 @@ class magic_domain;
 class pantheon;
 class plane;
 class religion;
+class spell;
 enum class gender;
 
 class deity final : public detailed_data_entry, public data_type<deity>
@@ -155,6 +156,11 @@ public:
 
 	Q_INVOKABLE void remove_domain(magic_domain *domain);
 
+	const std::vector<const spell *> &get_spells() const
+	{
+		return this->spells;
+	}
+
 private:
 	pantheon *pantheon = nullptr;
 	character *character = nullptr;
@@ -167,9 +173,7 @@ public:
 	std::vector<std::string> Feasts;
 private:
 	std::vector<magic_domain *> domains;
-public:
-	std::vector<const CUpgrade *> Abilities; //abilities linked to this deity
-private:
+	std::vector<const spell *> spells; //abilities linked to this deity
 	std::map<const civilization *, std::string> cultural_names;	//names of the deity in different cultures (for example, Odin is known as Hroptatyr by the dwarves)
 
 	friend int ::CclDefineDeity(lua_State *l);

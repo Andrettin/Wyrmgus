@@ -6444,30 +6444,21 @@ bool CUnit::LevelCheck(const int level) const
 	return SyncRand((this->Variable[LEVEL_INDEX].Value * 2) + 1) >= level;
 }
 
-bool CUnit::IsAbilityEmpowered(const CUpgrade *ability) const
+bool CUnit::is_spell_empowered(const wyrmgus::spell *spell) const
 {
 	const wyrmgus::plane *plane = this->MapLayer->plane;
 
 	if (plane != nullptr) {
 		if (!plane->EmpoweredMagicDomains.empty()) {
-			for (const wyrmgus::magic_domain *magic_domain : ability->get_magic_domains()) {
+			for (const wyrmgus::magic_domain *magic_domain : spell->get_magic_domains()) {
 				if (wyrmgus::vector::contains(plane->EmpoweredMagicDomains, magic_domain)) {
 					return true;
 				}
 			}
 		}
 	}
-	
-	return false;
-}
 
-bool CUnit::IsSpellEmpowered(const wyrmgus::spell *spell) const
-{
-	if (spell->get_dependency_upgrade() != nullptr) {
-		return this->IsAbilityEmpowered(spell->get_dependency_upgrade());
-	} else {
-		return false;
-	}
+	return false;
 }
 
 /**

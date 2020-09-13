@@ -393,10 +393,32 @@ static int CclDefineSpell(lua_State *l)
 	return 0;
 }
 
+static int CclGetSpellData(lua_State *l)
+{
+	if (lua_gettop(l) < 2) {
+		LuaError(l, "incorrect argument");
+	}
+
+	const std::string identifier = LuaToString(l, 1);
+	const wyrmgus::spell *spell = wyrmgus::spell::get(identifier);
+
+	const char *data = LuaToString(l, 2);
+
+	if (!strcmp(data, "Name")) {
+		lua_pushstring(l, spell->get_name().c_str());
+		return 1;
+	} else {
+		LuaError(l, "Invalid field: %s" _C_ data);
+	}
+
+	return 0;
+}
+
 /**
 ** Register CCL features for Spell.
 */
 void SpellCclRegister()
 {
 	lua_register(Lua, "DefineSpell", CclDefineSpell);
+	lua_register(Lua, "GetSpellData", CclGetSpellData);
 }

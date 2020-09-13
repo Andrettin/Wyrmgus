@@ -54,7 +54,7 @@
 **
 **  @return             =!0 if spell should be repeated, 0 if not
 */
-/* virtual */ int Spell_Teleport::Cast(CUnit &caster, const wyrmgus::spell &spell, CUnit * /*target*/, const Vec2i &goalPos, int z, int modifier)
+int Spell_Teleport::Cast(CUnit &caster, const wyrmgus::spell &spell, CUnit * /*target*/, const Vec2i &goalPos, int z, int modifier)
 {
 	if (CMap::Map.Info.IsPointOnMap(goalPos, z)) {
 		unsigned int selected = caster.Selected;

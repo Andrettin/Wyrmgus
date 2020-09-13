@@ -98,7 +98,7 @@
 **
 **  @return             =!0 if spell should be repeated, 0 if not
 */
-/* virtual */ int Spell_Polymorph::Cast(CUnit &caster, const wyrmgus::spell &spell, CUnit *target, const Vec2i &goalPos, int z, int modifier)
+int Spell_Polymorph::Cast(CUnit &caster, const wyrmgus::spell &spell, CUnit *target, const Vec2i &goalPos, int z, int modifier)
 {
 	if (!target) {
 		return 0;

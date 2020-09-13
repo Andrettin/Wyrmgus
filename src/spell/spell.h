@@ -222,6 +222,11 @@ public:
 	virtual void process_sml_property(const sml_property &property) override;
 	virtual void process_sml_scope(const sml_data &scope) override;
 
+	const std::vector<const magic_domain *> &get_magic_domains() const
+	{
+		return this->magic_domains;
+	}
+
 	spell_target_type get_target() const
 	{
 		return this->target;
@@ -305,6 +310,7 @@ public:
 
 	int Slot;             /// Spell numeric identifier
 private:
+	std::vector<const magic_domain *> magic_domains;
 	spell_target_type target; //targeting information
 	std::vector<std::unique_ptr<spell_action>> actions; //more arguments for spell (damage, delay, additional sounds...).
 	int mana_cost = 0;           /// Required mana for each cast.

@@ -52,12 +52,6 @@ void magic_domain::process_sml_scope(const sml_data &scope)
 
 	if (tag == "upgrade") {
 		database::process_sml_data(this->upgrade, scope);
-	} else if (tag == "abilities") {
-		for (const std::string &value : values) {
-			CUpgrade *ability = CUpgrade::get(value);
-			this->abilities.push_back(ability);
-			ability->add_magic_domain(this);
-		}
 	} else {
 		data_entry::process_sml_scope(scope);
 	}

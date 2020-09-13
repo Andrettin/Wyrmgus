@@ -69,7 +69,7 @@
 **
 **  @return             =!0 if spell should be repeated, 0 if not
 */
-/* virtual */ int Spell_Capture::Cast(CUnit &caster, const wyrmgus::spell &spell, CUnit *target, const Vec2i &/*goalPos*/, int /*z*/, int modifier)
+int Spell_Capture::Cast(CUnit &caster, const wyrmgus::spell &spell, CUnit *target, const Vec2i &/*goalPos*/, int /*z*/, int modifier)
 {
 	if (!target || caster.Player == target->Player) {
 		return 0;

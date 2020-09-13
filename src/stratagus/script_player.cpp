@@ -60,6 +60,7 @@
 #include "religion/religion.h"
 #include "script.h"
 #include "species/species.h"
+#include "spell/spell.h"
 #include "time/calendar.h"
 #include "ui/button.h"
 #include "unit/unit.h"
@@ -1980,21 +1981,6 @@ static int CclDefineDeity(lua_State *l)
 				wyrmgus::magic_domain *domain = wyrmgus::magic_domain::get(LuaToString(l, -1, j + 1));
 				deity->domains.push_back(domain);
 			}
-		} else if (!strcmp(value, "Abilities")) {
-			if (!lua_istable(l, -1)) {
-				LuaError(l, "incorrect argument (expected table)");
-			}
-			const int subargs = lua_rawlen(l, -1);
-			for (int j = 0; j < subargs; ++j) {
-				CUpgrade *ability = CUpgrade::get(LuaToString(l, -1, j + 1));
-				if (!ability->is_ability()) {
-					LuaError(l, "Ability upgrade is not actually an ability.");
-				}
-
-				if (std::find(deity->Abilities.begin(), deity->Abilities.end(), ability) == deity->Abilities.end()) {
-					deity->Abilities.push_back(ability);
-				}
-			}
 		} else if (!strcmp(value, "Feasts")) {
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument (expected table)");
@@ -2973,11 +2959,10 @@ static int CclGetMagicDomainData(lua_State *l)
 	if (!strcmp(data, "Name")) {
 		lua_pushstring(l, magic_domain->get_name().c_str());
 		return 1;
-	} else if (!strcmp(data, "Abilities")) {
-		lua_createtable(l, magic_domain->get_abilities().size(), 0);
-		for (size_t i = 1; i <= magic_domain->get_abilities().size(); ++i)
-		{
-			lua_pushstring(l, magic_domain->get_abilities()[i-1]->get_identifier().c_str());
+	} else if (!strcmp(data, "Spells")) {
+		lua_createtable(l, magic_domain->get_spells().size(), 0);
+		for (size_t i = 1; i <= magic_domain->get_spells().size(); ++i) {
+			lua_pushstring(l, magic_domain->get_spells()[i-1]->get_identifier().c_str());
 			lua_rawseti(l, -2, i);
 		}
 		return 1;
@@ -3064,11 +3049,11 @@ static int CclGetDeityData(lua_State *l)
 			lua_rawseti(l, -2, i);
 		}
 		return 1;
-	} else if (!strcmp(data, "Abilities")) {
-		lua_createtable(l, deity->Abilities.size(), 0);
-		for (size_t i = 1; i <= deity->Abilities.size(); ++i)
+	} else if (!strcmp(data, "Spells")) {
+		lua_createtable(l, deity->get_spells().size(), 0);
+		for (size_t i = 1; i <= deity->get_spells().size(); ++i)
 		{
-			lua_pushstring(l, deity->Abilities[i-1]->get_identifier().c_str());
+			lua_pushstring(l, deity->get_spells()[i-1]->get_identifier().c_str());
 			lua_rawseti(l, -2, i);
 		}
 		return 1;

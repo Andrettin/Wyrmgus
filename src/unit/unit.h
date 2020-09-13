@@ -468,8 +468,7 @@ public:
 	bool CanHireMercenary(wyrmgus::unit_type *type, int civilization_id = -1) const;
 	bool CanEat(const CUnit &unit) const;
 	bool LevelCheck(const int level) const;
-	bool IsAbilityEmpowered(const CUpgrade *ability) const;
-	bool IsSpellEmpowered(const wyrmgus::spell *spell) const;
+	bool is_spell_empowered(const wyrmgus::spell *spell) const;
 	bool UpgradeRemovesExistingUpgrade(const CUpgrade *upgrade) const;
 	bool HasAdjacentRailForUnitType(const wyrmgus::unit_type *type) const;
 	const wyrmgus::animation_set *get_animation_set() const;
