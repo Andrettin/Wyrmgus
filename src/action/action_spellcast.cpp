@@ -108,7 +108,7 @@
 	//Wyrmgus end
 
 	file.printf("\"state\", %d,", this->State);
-	file.printf(" \"spell\", \"%s\"", this->Spell->Ident.c_str());
+	file.printf(" \"spell\", \"%s\"", this->Spell->get_identifier().c_str());
 
 	file.printf("}");
 }
@@ -471,7 +471,7 @@ bool COrder_SpellCast::SpellMoveToTarget(CUnit &unit)
 			}
 		// FALL THROUGH
 		case 2:                         // Cast spell on the target.
-			if (!spell.is_caster_only() || spell.ForceUseAnimation) {
+			if (!spell.is_caster_only() || spell.forces_use_animation()) {
 				AnimateActionSpellCast(unit, *this);
 				if (unit.Anim.Unbreakable) {
 					return ;

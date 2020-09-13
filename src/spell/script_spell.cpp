@@ -310,7 +310,7 @@ static int CclDefineSpell(lua_State *l)
 		} else if (!strcmp(value, "manacost")) {
 			spell->mana_cost = LuaToNumber(l, i + 1);
 		} else if (!strcmp(value, "cooldown")) {
-			spell->CoolDown = LuaToNumber(l, i + 1);
+			spell->cooldown = LuaToNumber(l, i + 1);
 		} else if (!strcmp(value, "res-cost")) {
 			lua_pushvalue(l, i + 1);
 			if (!lua_istable(l, -1)) {
@@ -338,12 +338,12 @@ static int CclDefineSpell(lua_State *l)
 				LuaError(l, "Invalid range");
 			}
 		} else if (!strcmp(value, "repeat-cast")) {
-			spell->RepeatCast = 1;
+			spell->repeat_cast = true;
 			--i;
 		} else if (!strcmp(value, "stackable")) {
-			spell->Stackable = LuaToBoolean(l, i + 1);
+			spell->stackable = LuaToBoolean(l, i + 1);
 		} else if (!strcmp(value, "force-use-animation")) {
-			spell->ForceUseAnimation = true;
+			spell->force_use_animation = true;
 			--i;
 		} else if (!strcmp(value, "target")) {
 			value = LuaToString(l, i + 1);

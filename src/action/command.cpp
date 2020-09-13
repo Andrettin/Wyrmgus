@@ -1280,7 +1280,7 @@ void CommandLearnAbility(CUnit &unit, CUpgrade &what)
 void CommandSpellCast(CUnit &unit, const Vec2i &pos, CUnit *dest, const wyrmgus::spell &spell, int flush, int z, bool isAutocast)
 {
 	DebugPrint(": %d casts %s at %d %d on %d\n" _C_
-			   UnitNumber(unit) _C_ spell.Ident.c_str() _C_ pos.x _C_ pos.y _C_ dest ? UnitNumber(*dest) : 0);
+			   UnitNumber(unit) _C_ spell.get_identifier().c_str() _C_ pos.x _C_ pos.y _C_ dest ? UnitNumber(*dest) : 0);
 	Assert(std::find(unit.Type->Spells.begin(), unit.Type->Spells.end(), &spell) != unit.Type->Spells.end());
 	
 	Assert(CMap::Map.Info.IsPointOnMap(pos, z));

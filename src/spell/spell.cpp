@@ -185,7 +185,7 @@ static bool PassCondition(const CUnit &caster, const wyrmgus::spell &spell, cons
 
 	if (condition->CheckFunc) {
 		condition->CheckFunc->pushPreamble();
-		condition->CheckFunc->pushString(spell.Ident);
+		condition->CheckFunc->pushString(spell.get_identifier());
 		condition->CheckFunc->pushInteger(UnitNumber(caster));
 		condition->CheckFunc->pushInteger(goalPos.x);
 		condition->CheckFunc->pushInteger(goalPos.y);
@@ -279,7 +279,7 @@ spell *spell::add(const std::string &identifier, const wyrmgus::module *module)
 	return spell;
 }
 
-spell::spell(const std::string &identifier) : named_data_entry(identifier), CDataType(identifier)
+spell::spell(const std::string &identifier) : named_data_entry(identifier)
 {
 	memset(Costs, 0, sizeof(Costs));
 	//Wyrmgus start
@@ -304,6 +304,9 @@ void spell::process_sml_property(const sml_property &property)
 		}
 	} else if (key == "effects_string") {
 		this->effects_string = value;
+	} else if (key == "item_spell") {
+		const int item_class = static_cast<int>(string_to_item_class(value));
+		this->ItemSpell[item_class] = true;
 	} else {
 		data_entry::process_sml_property(property);
 	}
@@ -332,117 +335,16 @@ void spell::process_sml_scope(const sml_data &scope)
 			this->ai_cast = std::make_unique<AutoCastInfo>();
 		}
 		database::process_sml_data(this->ai_cast, scope);
+	} else if (tag == "resource_costs") {
+		scope.for_each_property([&](const wyrmgus::sml_property &property) {
+			const std::string &key = property.get_key();
+			const std::string &value = property.get_value();
+
+			const wyrmgus::resource *resource = resource::get(key);
+			this->Costs[resource->get_index()] = std::stoi(value);
+		});
 	} else {
 		data_entry::process_sml_scope(scope);
-	}
-}
-
-void spell::ProcessConfigData(const CConfigData *config_data)
-{
-	for (size_t i = 0; i < config_data->Properties.size(); ++i) {
-		std::string key = config_data->Properties[i].first;
-		std::string value = config_data->Properties[i].second;
-
-		if (key == "name") {
-			this->set_name(value);
-		} else if (key == "description") {
-			this->effects_string = value;
-		} else if (key == "mana_cost") {
-			this->mana_cost = std::stoi(value);
-		} else if (key == "cooldown") {
-			this->CoolDown = std::stoi(value);
-		} else if (key == "range") {
-			if (value == "infinite") {
-				this->range = spell::infinite_range;
-			} else {
-				this->range = std::stoi(value);
-			}
-		} else if (key == "repeat_cast") {
-			this->RepeatCast = string::to_bool(value);
-		} else if (key == "stackable") {
-			this->Stackable = string::to_bool(value);
-		} else if (key == "force_use_animation") {
-			this->ForceUseAnimation = string::to_bool(value);
-		} else if (key == "target") {
-			this->target = string_to_spell_target_type(value);
-		} else if (key == "sound_when_cast") {
-			this->sound_when_cast = sound::get(value);
-		} else if (key == "depend_upgrade") {
-			this->dependency_upgrade = CUpgrade::get(value);
-		} else if (key == "item_spell") {
-			const int item_class = static_cast<int>(string_to_item_class(value));
-			this->ItemSpell[item_class] = true;
-		} else {
-			fprintf(stderr, "Invalid spell property: \"%s\".\n", key.c_str());
-		}
-	}
-
-	for (const CConfigData *child_config_data : config_data->Children) {
-		if (child_config_data->Tag == "actions") {
-			for (const CConfigData *grandchild_config_data : child_config_data->Children) {
-				std::unique_ptr<spell_action> spell_action;
-
-				if (grandchild_config_data->Tag == "adjust_variable") {
-					spell_action = std::make_unique<Spell_AdjustVariable>();
-				} else if (grandchild_config_data->Tag == "spawn_missile") {
-					spell_action = std::make_unique<spell_action_spawn_missile>();
-				} else {
-					fprintf(stderr, "Invalid spell action type: \"%s\".\n", grandchild_config_data->Tag.c_str());
-				}
-
-				spell_action->ProcessConfigData(grandchild_config_data);
-				this->actions.push_back(std::move(spell_action));
-			}
-		} else if (child_config_data->Tag == "condition") {
-			if (!this->cast_conditions) {
-				this->cast_conditions = std::make_unique<ConditionInfo>();
-			}
-			this->cast_conditions->ProcessConfigData(child_config_data);
-		} else if (child_config_data->Tag == "autocast") {
-			if (!this->autocast) {
-				this->autocast = std::make_unique<AutoCastInfo>();
-			}
-			this->autocast->ProcessConfigData(child_config_data);
-		} else if (child_config_data->Tag == "ai_cast") {
-			if (!this->ai_cast) {
-				this->ai_cast = std::make_unique<AutoCastInfo>();
-			}
-			this->ai_cast->ProcessConfigData(child_config_data);
-		} else if (child_config_data->Tag == "resource_cost") {
-			int resource = -1;
-			int cost = 0;
-
-			for (size_t j = 0; j < child_config_data->Properties.size(); ++j) {
-				std::string key = child_config_data->Properties[j].first;
-				std::string value = child_config_data->Properties[j].second;
-
-				if (key == "resource") {
-					value = FindAndReplaceString(value, "_", "-");
-					resource = GetResourceIdByName(value.c_str());
-					if (resource == -1) {
-						fprintf(stderr, "Invalid resource: \"%s\".\n", value.c_str());
-					}
-				} else if (key == "cost") {
-					cost = std::stoi(value);
-				} else {
-					fprintf(stderr, "Invalid resource cost property: \"%s\".\n", key.c_str());
-				}
-			}
-
-			if (resource == -1) {
-				fprintf(stderr, "Resource cost has no resource.\n");
-				continue;
-			}
-
-			if (cost == 0) {
-				fprintf(stderr, "Resource cost has no valid cost amount.\n");
-				continue;
-			}
-
-			this->Costs[resource] = cost;
-		} else {
-			fprintf(stderr, "Invalid spell property: \"%s\".\n", child_config_data->Tag.c_str());
-		}
 	}
 }
 
@@ -792,7 +694,7 @@ int SpellCast(CUnit &caster, const wyrmgus::spell &spell, CUnit *target, const V
 		map_layer = caster.MapLayer;
 		target = &caster;
 	}
-	DebugPrint("Spell cast: (%s), %s -> %s (%d,%d)\n" _C_ spell.Ident.c_str() _C_
+	DebugPrint("Spell cast: (%s), %s -> %s (%d,%d)\n" _C_ spell.get_identifier().c_str() _C_
 			   caster.Type->get_name().c_str() _C_ target ? target->Type->get_name().c_str() : "none" _C_ pos.x _C_ pos.y);
 	if (CanCastSpell(caster, spell, target, pos, map_layer)) {
 		int cont = 1; // Should we recast the spell.
@@ -830,7 +732,7 @@ int SpellCast(CUnit &caster, const wyrmgus::spell &spell, CUnit *target, const V
 			caster.Variable[MANA_INDEX].Value -= spell.get_mana_cost();
 		}
 		caster.Player->SubCosts(spell.Costs);
-		caster.SpellCoolDownTimers[spell.Slot] = spell.CoolDown;
+		caster.SpellCoolDownTimers[spell.Slot] = spell.get_cooldown();
 		//
 		// Spells like blizzard are casted again.
 		// This is sort of confusing, we do the test again, to
@@ -838,7 +740,7 @@ int SpellCast(CUnit &caster, const wyrmgus::spell &spell, CUnit *target, const V
 		// when you're out of mana the caster will try again ( do the
 		// anim but fail in this proc.
 		//
-		if (spell.RepeatCast && cont) {
+		if (spell.repeats_cast() && cont) {
 			return CanCastSpell(caster, spell, target, pos, map_layer);
 		}
 	}
@@ -967,80 +869,6 @@ void ConditionInfo::process_sml_scope(const wyrmgus::sml_data &scope)
 	}
 }
 
-void ConditionInfo::ProcessConfigData(const CConfigData *config_data)
-{
-	for (size_t i = 0; i < config_data->Properties.size(); ++i) {
-		std::string key = config_data->Properties[i].first;
-		std::string value = config_data->Properties[i].second;
-		
-		if (key == "alliance") {
-			this->Alliance = StringToCondition(value);
-		} else if (key == "opponent") {
-			this->Opponent = StringToCondition(value);
-		} else if (key == "self") {
-			this->TargetSelf = StringToCondition(value);
-		} else if (key == "thrusting_weapon") {
-			this->ThrustingWeapon = StringToCondition(value);
-		} else if (key == "faction_unit") {
-			this->FactionUnit = StringToCondition(value);
-		} else if (key == "civilization_equivalent") {
-			const wyrmgus::civilization *civilization = wyrmgus::civilization::get(value);
-			this->civilization_equivalent = civilization;
-		} else if (key == "faction_equivalent") {
-			wyrmgus::faction *faction = wyrmgus::faction::get(value);
-			this->FactionEquivalent = faction;
-		} else {
-			key = string::snake_case_to_pascal_case(key);
-			
-			int index = UnitTypeVar.BoolFlagNameLookup[key.c_str()];
-			if (index != -1) {
-				this->BoolFlag[index] = StringToCondition(value);
-			} else {
-				fprintf(stderr, "Invalid spell condition property: \"%s\".\n", key.c_str());
-			}
-		}
-	}
-	
-	for (const CConfigData *child_config_data : config_data->Children) {
-		std::string tag = child_config_data->Tag;
-		tag = string::snake_case_to_pascal_case(tag);
-		
-		int index = UnitTypeVar.VariableNameLookup[tag.c_str()];
-		if (index != -1) {
-			this->Variable[index].Check = true;
-			
-			for (size_t j = 0; j < child_config_data->Properties.size(); ++j) {
-				std::string key = child_config_data->Properties[j].first;
-				std::string value = child_config_data->Properties[j].second;
-				
-				if (key == "enable") {
-					this->Variable[index].Enable = StringToCondition(value);
-				} else if (key == "exact_value") {
-					this->Variable[index].ExactValue = std::stoi(value);
-				} else if (key == "except_value") {
-					this->Variable[index].ExceptValue = std::stoi(value);
-				} else if (key == "min_value") {
-					this->Variable[index].MinValue = std::stoi(value);
-				} else if (key == "max_value") {
-					this->Variable[index].MaxValue = std::stoi(value);
-				} else if (key == "min_max") {
-					this->Variable[index].MinMax = std::stoi(value);
-				} else if (key == "min_value_percent") {
-					this->Variable[index].MinValuePercent = std::stoi(value);
-				} else if (key == "max_value_percent") {
-					this->Variable[index].MaxValuePercent = std::stoi(value);
-				} else if (key == "condition_apply_on_caster") {
-					this->Variable[index].ConditionApplyOnCaster = string::to_bool(value);
-				} else {
-					fprintf(stderr, "Invalid adjust variable spell action variable property: \"%s\".\n", key.c_str());
-				}
-			}
-		} else {
-			fprintf(stderr, "Invalid spell condition property: \"%s\".\n", child_config_data->Tag.c_str());
-		}
-	}
-}
-
 void AutoCastInfo::process_sml_property(const wyrmgus::sml_property &property)
 {
 	const std::string &key = property.get_key();
@@ -1097,63 +925,5 @@ void AutoCastInfo::process_sml_scope(const wyrmgus::sml_data &scope)
 		wyrmgus::database::process_sml_data(this->cast_conditions, scope);
 	} else {
 		throw std::runtime_error("Invalid autocast info scope: \"" + tag + "\".");
-	}
-}
-
-void AutoCastInfo::ProcessConfigData(const CConfigData *config_data)
-{
-	for (size_t i = 0; i < config_data->Properties.size(); ++i) {
-		std::string key = config_data->Properties[i].first;
-		std::string value = config_data->Properties[i].second;
-		
-		if (key == "range") {
-			this->Range = std::stoi(value);
-		} else if (key == "min_range") {
-			this->MinRange = std::stoi(value);
-		} else if (key == "combat") {
-			this->Combat = StringToCondition(value);
-		} else if (key == "attacker") {
-			this->Attacker = StringToCondition(value);
-		} else if (key == "corpse") {
-			this->Corpse = StringToCondition(value);
-		} else {
-			fprintf(stderr, "Invalid autocast property: \"%s\".\n", key.c_str());
-		}
-	}
-	
-	for (const CConfigData *child_config_data : config_data->Children) {
-		if (child_config_data->Tag == "priority") {
-			for (size_t j = 0; j < child_config_data->Properties.size(); ++j) {
-				std::string key = child_config_data->Properties[j].first;
-				std::string value = child_config_data->Properties[j].second;
-				
-				if (key == "priority_var") {
-					int index = -1;
-					if (value == "distance") {
-						index = ACP_DISTANCE;
-					} else {
-						value = string::snake_case_to_pascal_case(value);
-						index = UnitTypeVar.VariableNameLookup[value.c_str()];
-					}
-					
-					if (index != -1) {
-						this->PriorityVar = index;
-					} else {
-						fprintf(stderr, "Invalid autocast priority variable value: \"%s\".\n", value.c_str());
-					}
-				} else if (key == "reverse_sort") {
-					this->ReverseSort = string::to_bool(value);
-				} else {
-					fprintf(stderr, "Invalid autocast priority property: \"%s\".\n", key.c_str());
-				}
-			}
-		} else if (child_config_data->Tag == "condition") {
-			if (!this->cast_conditions) {
-				this->cast_conditions = std::make_unique<ConditionInfo>();
-			}
-			this->cast_conditions->ProcessConfigData(child_config_data);
-		} else {
-			fprintf(stderr, "Invalid autocast property: \"%s\".\n", child_config_data->Tag.c_str());
-		}
 	}
 }

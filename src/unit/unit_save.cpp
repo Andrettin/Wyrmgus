@@ -179,7 +179,7 @@ void SaveUnit(const CUnit &unit, CFile &file)
 		file.printf("\"suffix\", \"%s\", ", unit.Suffix->get_identifier().c_str());
 	}
 	if (unit.Spell != nullptr) {
-		file.printf("\"spell\", \"%s\", ", unit.Spell->Ident.c_str());
+		file.printf("\"spell\", \"%s\", ", unit.Spell->get_identifier().c_str());
 	}
 	if (unit.Work != nullptr) {
 		file.printf("\"work\", \"%s\", ", unit.Work->get_identifier().c_str());

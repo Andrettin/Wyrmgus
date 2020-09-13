@@ -64,7 +64,7 @@
 **
 **  @return             =!0 if spell should be repeated, 0 if not
 */
-/* virtual */ int Spell_AdjustVital::Cast(CUnit &caster, const wyrmgus::spell &spell, CUnit *target, const Vec2i &/*goalPos*/, int /*z*/, int modifier)
+int Spell_AdjustVital::Cast(CUnit &caster, const wyrmgus::spell &spell, CUnit *target, const Vec2i &/*goalPos*/, int /*z*/, int modifier)
 {
 	if (!target) {
 		return 0;
@@ -149,7 +149,7 @@
 	target->Variable[SHIELD_INDEX].Value += castcount * shield;
 	clamp(&target->Variable[SHIELD_INDEX].Value, 0, target->Variable[SHIELD_INDEX].Max);
 
-	if (spell.RepeatCast) {
+	if (spell.repeats_cast()) {
 		return 1;
 	}
 	return 0;

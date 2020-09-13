@@ -2007,7 +2007,7 @@ static int SendSpellCast(const Vec2i &tilePos, int flush)
 		ret = 1;
 		
 		//if the spell's effects do not stack on the same target, then only one selected unit should cast it
-		if (!spell->Stackable) {
+		if (!spell->is_stackable()) {
 			break;
 		}
 	}

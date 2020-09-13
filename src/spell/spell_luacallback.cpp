@@ -57,7 +57,7 @@
 {
 	if (this->Func) {
 		this->Func->pushPreamble();
-		this->Func->pushString(spell.Ident);
+		this->Func->pushString(spell.get_identifier());
 		this->Func->pushInteger(UnitNumber(caster));
 		this->Func->pushInteger(goalPos.x);
 		this->Func->pushInteger(goalPos.y);

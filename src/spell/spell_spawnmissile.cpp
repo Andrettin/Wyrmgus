@@ -143,48 +143,6 @@ void spell_action_spawn_missile::check() const
 	}
 }
 
-void spell_action_spawn_missile::ProcessConfigData(const CConfigData *config_data)
-{
-	for (size_t i = 0; i < config_data->Properties.size(); ++i) {
-		std::string key = config_data->Properties[i].first;
-		std::string value = config_data->Properties[i].second;
-
-		if (key == "damage") {
-			this->Damage = std::stoi(value);
-		} else if (key == "lightning_damage") {
-			this->LightningDamage = std::stoi(value);
-		} else if (key == "use_unit_var") {
-			this->UseUnitVar = string::to_bool(value);
-		} else if (key == "always_hits") {
-			this->AlwaysHits = string::to_bool(value);
-		} else if (key == "always_critical") {
-			this->AlwaysCritical = string::to_bool(value);
-		} else if (key == "delay") {
-			this->Delay = std::stoi(value);
-		} else if (key == "ttl") {
-			this->TTL = std::stoi(value);
-		} else if (key == "missile") {
-			this->Missile = wyrmgus::missile_type::get(value);
-		} else {
-			fprintf(stderr, "Invalid spawn missile spell action property: \"%s\".\n", key.c_str());
-		}
-	}
-
-	for (const CConfigData *child_config_data : config_data->Children) {
-		if (child_config_data->Tag == "start_point") {
-			this->StartPoint.ProcessConfigData(child_config_data);
-		} else if (child_config_data->Tag == "end_point") {
-			this->EndPoint.ProcessConfigData(child_config_data);
-		} else {
-			fprintf(stderr, "Invalid spawn missile spell action property: \"%s\".\n", child_config_data->Tag.c_str());
-		}
-	}
-
-	if (this->Missile == nullptr) {
-		fprintf(stderr, "Use a missile for spawn-missile (with missile).\n");
-	}
-}
-
 void spell_action_spawn_missile::Parse(lua_State *l, int startIndex, int endIndex)
 {
 	for (int j = startIndex; j < endIndex; ++j) {
@@ -350,28 +308,6 @@ void spell_action_spawn_missile::missile_location::process_sml_property(const wy
 void spell_action_spawn_missile::missile_location::process_sml_scope(const wyrmgus::sml_data &scope)
 {
 	throw std::runtime_error("Invalid spawn missile spell location scope: \"" + scope.get_tag() + "\".");
-}
-
-void spell_action_spawn_missile::missile_location::ProcessConfigData(const CConfigData *config_data)
-{
-	for (size_t i = 0; i < config_data->Properties.size(); ++i) {
-		std::string key = config_data->Properties[i].first;
-		std::string value = config_data->Properties[i].second;
-
-		if (key == "base") {
-			this->Base = spell_action_spawn_missile::string_to_location_base_type(value);
-		} else if (key == "add_x") {
-			this->AddX = std::stoi(value);
-		} else if (key == "add_y") {
-			this->AddY = std::stoi(value);
-		} else if (key == "add_rand_x") {
-			this->AddRandX = std::stoi(value);
-		} else if (key == "add_rand_y") {
-			this->AddRandY = std::stoi(value);
-		} else {
-			fprintf(stderr, "Invalid spell action missile location property: \"%s\".\n", key.c_str());
-		}
-	}
 }
 
 /**

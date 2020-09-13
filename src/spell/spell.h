@@ -120,7 +120,6 @@ public:
 	
 	void process_sml_property(const wyrmgus::sml_property &property);
 	void process_sml_scope(const wyrmgus::sml_data &scope);
-	void ProcessConfigData(const CConfigData *config_data);
 	
 	//
 	//  Conditions that check specific flags. Possible values are the defines below.
@@ -166,7 +165,6 @@ public:
 	
 	void process_sml_property(const wyrmgus::sml_property &property);
 	void process_sml_scope(const wyrmgus::sml_data &scope);
-	void ProcessConfigData(const CConfigData *config_data);
 	
 	const ConditionInfo *get_cast_conditions() const
 	{
@@ -198,14 +196,18 @@ public:
 
 namespace wyrmgus {
 
-class spell final : public named_data_entry, public data_type<spell>, public CDataType
+class spell final : public named_data_entry, public data_type<spell>
 {
 	Q_OBJECT
 
 	Q_PROPERTY(wyrmgus::spell_target_type target MEMBER target READ get_target)
 	Q_PROPERTY(int mana_cost MEMBER mana_cost READ get_mana_cost)
+	Q_PROPERTY(int cooldown MEMBER cooldown READ get_cooldown)
+	Q_PROPERTY(bool repeat_cast MEMBER repeat_cast READ repeats_cast)
+	Q_PROPERTY(bool stackable MEMBER stackable READ is_stackable)
 	Q_PROPERTY(CUpgrade* dependency_upgrade MEMBER dependency_upgrade READ get_dependency_upgrade)
 	Q_PROPERTY(wyrmgus::sound* sound_when_cast MEMBER sound_when_cast READ get_sound_when_cast)
+	Q_PROPERTY(bool force_use_animation MEMBER force_use_animation READ forces_use_animation)
 
 public:
 	static constexpr const char *class_identifier = "spell";
@@ -219,7 +221,6 @@ public:
 
 	virtual void process_sml_property(const sml_property &property) override;
 	virtual void process_sml_scope(const sml_data &scope) override;
-	virtual void ProcessConfigData(const CConfigData *config_data) override;
 
 	spell_target_type get_target() const
 	{
@@ -239,6 +240,21 @@ public:
 	int get_range() const
 	{
 		return this->range;
+	}
+
+	bool repeats_cast() const
+	{
+		return this->repeat_cast;
+	}
+
+	bool is_stackable() const
+	{
+		return this->stackable;
+	}
+
+	int get_cooldown() const
+	{
+		return this->cooldown;
 	}
 
 	const std::string &get_effects_string() const
@@ -261,9 +277,6 @@ public:
 		return this->cast_conditions.get();
 	}
 
-	/// return 1 if spell is available, 0 if not (must upgrade)
-	bool IsAvailableForUnit(const CUnit &unit) const;
-
 	const AutoCastInfo *get_autocast_info() const
 	{
 		return this->autocast.get();
@@ -275,6 +288,15 @@ public:
 	}
 
 	const AutoCastInfo *get_autocast_info(const bool ai) const;
+
+	bool forces_use_animation() const
+	{
+		return this->force_use_animation;
+	}
+
+	/// return 1 if spell is available, 0 if not (must upgrade)
+	bool IsAvailableForUnit(const CUnit &unit) const;
+
 	bool CheckAutoCastGenericConditions(const CUnit &caster, const AutoCastInfo *autocast, const bool ignore_combat_status = false) const;
 	bool IsUnitValidAutoCastTarget(const CUnit *target, const CUnit &caster, const AutoCastInfo *autocast, const int max_path_length = 0) const;
 	std::vector<CUnit *> GetPotentialAutoCastTargets(const CUnit &caster, const AutoCastInfo *autocast) const;
@@ -287,12 +309,12 @@ private:
 	std::vector<std::unique_ptr<spell_action>> actions; //more arguments for spell (damage, delay, additional sounds...).
 	int mana_cost = 0;           /// Required mana for each cast.
 	int range = 0;              /// Max range of the target.
+	bool repeat_cast = false; //if the spell will be cast again until out of targets.
+	bool stackable = true;		/// Whether the spell has an effect if cast multiple times at the same target
 public:
-	int RepeatCast = 0;         /// If the spell will be cast again until out of targets.
-	bool Stackable = true;		/// Whether the spell has an effect if cast multiple times at the same target
 	int Costs[MaxCosts];        /// Resource costs of spell.
-	int CoolDown = 0;           /// How much time spell needs to be cast again.
 private:
+	int cooldown = 0;           /// How much time spell needs to be cast again.
 	std::string effects_string;
 	CUpgrade *dependency_upgrade = nullptr;
 	sound *sound_when_cast = nullptr;  /// Sound played if cast
@@ -307,7 +329,8 @@ public:
 	bool ItemSpell[static_cast<int>(item_class::count)];
 	//Wyrmgus end
 
-	bool ForceUseAnimation = false;
+private:
+	bool force_use_animation = false;
 
 	friend int ::CclDefineSpell(lua_State *l);
 };

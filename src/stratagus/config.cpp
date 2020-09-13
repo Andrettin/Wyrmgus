@@ -43,7 +43,6 @@
 #include "plane.h"
 #include "script/trigger.h"
 #include "sound/sound.h"
-#include "spell/spell.h"
 #include "time/season_schedule.h"
 #include "time/time_of_day_schedule.h"
 #include "ui/button.h"
@@ -260,11 +259,6 @@ void CConfigData::ProcessConfigData(const std::vector<CConfigData *> &config_dat
 			wyrmgus::site *site = wyrmgus::site::get_or_add(ident, nullptr);
 			if (!define_only) {
 				site->ProcessConfigData(config_data);
-			}
-		} else if (config_data->Tag == "spell") {
-			wyrmgus::spell *spell = wyrmgus::spell::get_or_add(ident, nullptr);
-			if (!define_only) {
-				spell->ProcessConfigData(config_data);
 			}
 		} else if (config_data->Tag == "terrain_type") {
 			wyrmgus::terrain_type *terrain_type = wyrmgus::terrain_type::get_or_add(ident, nullptr);

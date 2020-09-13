@@ -69,7 +69,6 @@ public:
 
 	virtual void process_sml_property(const wyrmgus::sml_property &property) override;
 	virtual void process_sml_scope(const wyrmgus::sml_data &scope) override;
-	virtual void ProcessConfigData(const CConfigData *config_data) override;
 	virtual int Cast(CUnit &caster, const wyrmgus::spell &spell,
 					 CUnit *target, const Vec2i &goalPos, int z, int modifier) override;
 	virtual void Parse(lua_State *l, int startIndex, int endIndex) override;

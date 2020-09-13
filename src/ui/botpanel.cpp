@@ -1066,7 +1066,7 @@ void CButtonPanel::Draw()
 				break;
 			} else if (button->Action == ButtonCmd::SpellCast
 					   && (*Selected[j]).SpellCoolDownTimers[wyrmgus::spell::get_all()[button->Value]->Slot]) {
-				Assert(wyrmgus::spell::get_all()[button->Value]->CoolDown > 0);
+				Assert(wyrmgus::spell::get_all()[button->Value]->get_cooldown() > 0);
 				cooldownSpell = true;
 				maxCooldown = std::max(maxCooldown, (*Selected[j]).SpellCoolDownTimers[wyrmgus::spell::get_all()[button->Value]->Slot]);
 			}
@@ -1158,7 +1158,7 @@ void CButtonPanel::Draw()
 //			button->Icon.Icon->DrawCooldownSpellIcon(pos,
 			button_icon->DrawCooldownSpellIcon(pos,
 			//Wyrmgus end
-				maxCooldown * 100 / wyrmgus::spell::get_all()[button->Value]->CoolDown);
+				maxCooldown * 100 / wyrmgus::spell::get_all()[button->Value]->get_cooldown());
 		} else if (gray) {
 			//Wyrmgus start
 //			button->Icon.Icon->DrawGrayscaleIcon(pos);

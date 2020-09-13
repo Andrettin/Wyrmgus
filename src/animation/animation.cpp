@@ -200,7 +200,7 @@ int ParseAnimInt(const CUnit &unit, const char *parseint)
 		Assert(goal->CurrentAction() == UnitAction::SpellCast);
 		const COrder_SpellCast &order = *static_cast<COrder_SpellCast *>(goal->CurrentOrder());
 		const wyrmgus::spell &spell = order.GetSpell();
-		if (!strcmp(spell.Ident.c_str(), cur)) {
+		if (!strcmp(spell.get_identifier().c_str(), cur)) {
 			return 1;
 		}
 		return 0;
