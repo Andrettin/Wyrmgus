@@ -35,6 +35,7 @@
 #include "spell/spell_action_adjust_variable.h"
 #include "spell/spell_action_adjust_vitals.h"
 #include "spell/spell_action_spawn_missile.h"
+#include "spell/spell_action_summon.h"
 
 namespace wyrmgus {
 
@@ -49,6 +50,8 @@ std::unique_ptr<spell_action> spell_action::from_sml_scope(const sml_data &scope
 		action = std::make_unique<spell_action_adjust_vitals>();
 	} else if (action_identifier == "spawn_missile") {
 		action = std::make_unique<spell_action_spawn_missile>();
+	} else if (action_identifier == "summon") {
+		action = std::make_unique<spell_action_summon>();
 	} else {
 		throw std::runtime_error("Invalid scope spell action: \"" + action_identifier + "\".");
 	}
