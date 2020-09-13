@@ -83,7 +83,7 @@ void spell_action_adjust_vitals::Parse(lua_State *l, int startIndex, int endInde
 **
 **  @return             =!0 if spell should be repeated, 0 if not
 */
-int spell_action_adjust_vitals::Cast(CUnit &caster, const wyrmgus::spell &spell, CUnit *target, const Vec2i &/*goalPos*/, int /*z*/, int modifier)
+int spell_action_adjust_vitals::Cast(CUnit &caster, const spell &spell, CUnit *target, const Vec2i &/*goalPos*/, int /*z*/, int modifier)
 {
 	if (target == nullptr) {
 		return 0;

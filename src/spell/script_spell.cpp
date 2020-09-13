@@ -100,7 +100,7 @@ static std::unique_ptr<wyrmgus::spell_action> CclSpellAction(lua_State *l)
 	} else if (!strcmp(value, "spawn-portal")) {
 		spellaction = std::make_unique<Spell_SpawnPortal>();
 	} else if (!strcmp(value, "summon")) {
-		spellaction = std::make_unique<Spell_Summon>();
+		spellaction = std::make_unique<wyrmgus::spell_action_summon>();
 	} else if (!strcmp(value, "teleport")) {
 		spellaction = std::make_unique<Spell_Teleport>();
 	} else {

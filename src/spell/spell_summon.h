@@ -31,13 +31,13 @@
 #include "spell/spell_action.h"
 
 namespace wyrmgus {
-	class unit_type;
-}
 
-class Spell_Summon final : public wyrmgus::spell_action
+class unit_type;
+
+class spell_action_summon final : public spell_action
 {
 public:
-	Spell_Summon() : wyrmgus::spell_action(true)
+	spell_action_summon() : spell_action(true)
 	{
 	}
 
@@ -47,13 +47,17 @@ public:
 		return identifier;
 	}
 
-	virtual int Cast(CUnit &caster, const wyrmgus::spell &spell,
-					 CUnit *target, const Vec2i &goalPos, int z, int modifier) override;
+	virtual void process_sml_property(const sml_property &property) override;
+	virtual void check() const;
+	virtual int Cast(CUnit &caster, const spell &spell,
+		CUnit *target, const Vec2i &goalPos, int z, int modifier) override;
 	virtual void Parse(lua_State *l, int startIndex, int endIndex) override;
 
 private:
-	wyrmgus::unit_type *UnitType = nullptr;    /// Type of unit to be summoned.
+	unit_type *UnitType = nullptr;    /// Type of unit to be summoned.
 	int TTL = 0;                /// Time to live for summoned unit. 0 means infinite
 	int RequireCorpse = false;      /// Corpse consumed while summoning.
 	bool JoinToAiForce = false;     /// if true, captured unit is joined into caster's AI force, if available
 };
+
+}

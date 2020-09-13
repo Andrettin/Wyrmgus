@@ -39,15 +39,43 @@
 #include "spell/spell.h"
 #include "unit/unit.h"
 #include "unit/unit_find.h"
+#include "util/string_util.h"
 
-/* virtual */ void Spell_Summon::Parse(lua_State *l, int startIndex, int endIndex)
+namespace wyrmgus {
+
+void spell_action_summon::process_sml_property(const sml_property &property)
+{
+	const std::string &key = property.get_key();
+	const std::string &value = property.get_value();
+
+	if (key == "unit_type") {
+		this->UnitType = unit_type::get(value);
+	} else if (key == "time_to_live") {
+		this->TTL = std::stoi(value);
+	} else if (key == "require_corpse") {
+		this->RequireCorpse = string::to_bool(value);
+	} else if (key == "join_to_ai_force") {
+		this->JoinToAiForce = string::to_bool(value);
+	} else {
+		throw std::runtime_error("Invalid adjust vitals spell action property: \"" + key + "\".");
+	}
+}
+
+void spell_action_summon::check() const
+{
+	if (this->UnitType == nullptr) {
+		throw std::runtime_error("Summon spell action has no unit type.");
+	}
+}
+
+void spell_action_summon::Parse(lua_State *l, int startIndex, int endIndex)
 {
 	for (int j = startIndex; j < endIndex; ++j) {
 		const char *value = LuaToString(l, -1, j + 1);
 		++j;
 		if (!strcmp(value, "unit-type")) {
 			value = LuaToString(l, -1, j + 1);
-			this->UnitType = wyrmgus::unit_type::get(value);
+			this->UnitType = unit_type::get(value);
 		} else if (!strcmp(value, "time-to-live")) {
 			this->TTL = LuaToNumber(l, -1, j + 1);
 		} else if (!strcmp(value, "require-corpse")) {
@@ -75,7 +103,6 @@ public:
 	}
 };
 
-
 /**
 **  Cast summon spell.
 **
@@ -86,11 +113,11 @@ public:
 **
 **  @return             =!0 if spell should be repeated, 0 if not
 */
-int Spell_Summon::Cast(CUnit &caster, const wyrmgus::spell &spell, CUnit *target, const Vec2i &goalPos, int z, int modifier)
+int spell_action_summon::Cast(CUnit &caster, const spell &spell, CUnit *target, const Vec2i &goalPos, int z, int modifier)
 {
 	Vec2i pos = goalPos;
 	bool cansummon;
-	wyrmgus::unit_type &unittype = *this->UnitType;
+	unit_type &unittype = *this->UnitType;
 	int ttl = this->TTL;
 
 	if (this->RequireCorpse) {
@@ -153,4 +180,6 @@ int Spell_Summon::Cast(CUnit &caster, const wyrmgus::spell &spell, CUnit *target
 		return 1;
 	}
 	return 0;
+}
+
 }
