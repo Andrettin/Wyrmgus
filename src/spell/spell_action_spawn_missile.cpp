@@ -28,7 +28,7 @@
 
 #include "stratagus.h"
 
-#include "spell/spell_spawnmissile.h"
+#include "spell/spell_action_spawn_missile.h"
 
 #include "config.h"
 #include "map/map.h"

@@ -40,7 +40,8 @@
 #include "script.h"
 #include "sound/script_sound.h"
 #include "sound/sound.h"
-#include "spell/spell_adjustvariable.h"
+#include "spell/spell_action_adjust_variable.h"
+#include "spell/spell_action_spawn_missile.h"
 #include "spell/spell_adjustvital.h"
 #include "spell/spell_areaadjustvital.h"
 #include "spell/spell_areabombardment.h"
@@ -51,7 +52,6 @@
 //Wyrmgus start
 #include "spell/spell_retrain.h"
 //Wyrmgus end
-#include "spell/spell_spawnmissile.h"
 #include "spell/spell_spawnportal.h"
 #include "spell/spell_summon.h"
 #include "spell/spell_target_type.h"

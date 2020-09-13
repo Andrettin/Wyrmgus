@@ -28,7 +28,7 @@
 
 #include "stratagus.h"
 
-#include "spell/spell_adjustvariable.h"
+#include "spell/spell_action_adjust_variable.h"
 
 //Wyrmgus start
 #include "commands.h"
