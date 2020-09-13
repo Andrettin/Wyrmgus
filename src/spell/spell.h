@@ -89,11 +89,11 @@ public:
 	char Enable = 0;                /// Target is 'user defined variable'.
 	bool Check = false;                 /// True if need to check that variable.
 
-	int ExactValue = 0;             /// Target must have exactly ExactValue of it's value.
-	int ExceptValue = 0;            /// Target mustn't have ExceptValue of it's value.
-	int MinValue = 0;               /// Target must have more Value than that.
-	int MaxValue = 0;               /// Target must have less Value than that.
-	int MinMax = 0;                 /// Target must have more Max than that.
+	std::optional<int> ExactValue;   /// Target must have exactly ExactValue of it's value.
+	std::optional<int> ExceptValue;            /// Target mustn't have ExceptValue of it's value.
+	int MinValue = -1;               /// Target must have more Value than that.
+	std::optional<int> MaxValue;               /// Target must have less Value than that.
+	int MinMax = -1;                 /// Target must have more Max than that.
 	int MinValuePercent = 0;        /// Target must have more (100 * Value / Max) than that.
 	int MaxValuePercent = 0;        /// Target must have less (100 * Value / Max) than that.
 

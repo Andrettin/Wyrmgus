@@ -134,18 +134,18 @@ static bool PassCondition(const CUnit &caster, const wyrmgus::spell &spell, cons
 			}
 		}
 		// Value and Max
-		if (condition->Variable[i].ExactValue != -1 &&
+		if (condition->Variable[i].ExactValue.has_value() &&
 			condition->Variable[i].ExactValue != unit->Variable[i].Value) {
 			return false;
 		}
-		if (condition->Variable[i].ExceptValue != -1 &&
+		if (condition->Variable[i].ExceptValue.has_value() &&
 			condition->Variable[i].ExceptValue == unit->Variable[i].Value) {
 			return false;
 		}
 		if (condition->Variable[i].MinValue >= unit->Variable[i].Value) {
 			return false;
 		}
-		if (condition->Variable[i].MaxValue != -1 &&
+		if (condition->Variable[i].MaxValue.has_value() &&
 			//Wyrmgus start
 //			condition->Variable[i].MaxValue <= unit->Variable[i].Value) {
 			condition->Variable[i].MaxValue <= unit->GetModifiedVariable(i, VariableValue)) {
@@ -873,10 +873,7 @@ ConditionInfo::ConditionInfo()
 	// Initialize min/max stuff to values with no effect.
 	for (unsigned int i = 0; i < UnitTypeVar.GetNumberVariable(); i++) {
 		this->Variable[i].Check = false;
-		this->Variable[i].ExactValue = -1;
-		this->Variable[i].ExceptValue = -1;
 		this->Variable[i].MinValue = -1;
-		this->Variable[i].MaxValue = -1;
 		this->Variable[i].MinMax = -1;
 		this->Variable[i].MinValuePercent = -8;
 		this->Variable[i].MaxValuePercent = 1024;
@@ -886,6 +883,7 @@ ConditionInfo::ConditionInfo()
 void ConditionInfo::process_sml_property(const wyrmgus::sml_property &property)
 {
 	const std::string &key = property.get_key();
+	const wyrmgus::sml_operator &property_operator = property.get_operator();
 	const std::string &value = property.get_value();
 
 	if (key == "alliance") {
@@ -905,7 +903,21 @@ void ConditionInfo::process_sml_property(const wyrmgus::sml_property &property)
 	} else {
 		const std::string pascal_case_key = string::snake_case_to_pascal_case(key);
 
-		const int index = UnitTypeVar.BoolFlagNameLookup[pascal_case_key.c_str()];
+		int index = UnitTypeVar.VariableNameLookup[pascal_case_key.c_str()];
+		if (index != -1) {
+			this->Variable[index].Check = true;
+
+			switch (property_operator) {
+				case wyrmgus::sml_operator::equality:
+					this->Variable[index].ExactValue = std::stoi(value);
+					break;
+				default:
+					throw std::runtime_error("Invalid operator for variable property: \"" + std::to_string(static_cast<int>(property_operator)) + "\".");
+			}
+			return;
+		}
+
+		index = UnitTypeVar.BoolFlagNameLookup[pascal_case_key.c_str()];
 		if (index != -1) {
 			this->BoolFlag[index] = StringToCondition(value);
 		} else {
