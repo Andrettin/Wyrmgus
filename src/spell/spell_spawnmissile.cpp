@@ -63,7 +63,7 @@ struct CompareUnitDistance {
 **  @note This is only here to avoid code duplication. You don't have
 **        any reason to USE this:)
 */
-static void CclSpellMissileLocation(lua_State *l, SpellActionMissileLocation *location)
+static void CclSpellMissileLocation(lua_State *l, wyrmgus::spell_action_spawn_missile::missile_location *location)
 {
 	Assert(location != nullptr);
 
@@ -76,13 +76,7 @@ static void CclSpellMissileLocation(lua_State *l, SpellActionMissileLocation *lo
 		++j;
 		if (!strcmp(value, "base")) {
 			value = LuaToString(l, -1, j + 1);
-			if (!strcmp(value, "caster")) {
-				location->Base = LocBaseType::LocBaseCaster;
-			} else if (!strcmp(value, "target")) {
-				location->Base = LocBaseType::LocBaseTarget;
-			} else {
-				LuaError(l, "Unsupported missile location base flag: %s" _C_ value);
-			}
+			location->Base = wyrmgus::spell_action_spawn_missile::string_to_location_base_type(value);
 		} else if (!strcmp(value, "add-x")) {
 			location->AddX = LuaToNumber(l, -1, j + 1);
 		} else if (!strcmp(value, "add-y")) {
@@ -97,66 +91,9 @@ static void CclSpellMissileLocation(lua_State *l, SpellActionMissileLocation *lo
 	}
 }
 
-void SpellActionMissileLocation::process_sml_property(const wyrmgus::sml_property &property)
-{
-	const std::string &key = property.get_key();
-	const std::string &value = property.get_value();
+namespace wyrmgus {
 
-	if (key == "base") {
-		if (value == "caster") {
-			this->Base = LocBaseType::LocBaseCaster;
-		} else if (value == "target") {
-			this->Base = LocBaseType::LocBaseTarget;
-		} else {
-			throw std::runtime_error("Unsupported missile location base flag: \"" + value + "\".");
-		}
-	} else if (key == "add_x") {
-		this->AddX = std::stoi(value);
-	} else if (key == "add_y") {
-		this->AddY = std::stoi(value);
-	} else if (key == "add_rand_x") {
-		this->AddRandX = std::stoi(value);
-	} else if (key == "add_rand_y") {
-		this->AddRandY = std::stoi(value);
-	} else {
-		throw std::runtime_error("Invalid spawn missile spell location property: \"" + key + "\".");
-	}
-}
-
-void SpellActionMissileLocation::process_sml_scope(const wyrmgus::sml_data &scope)
-{
-	throw std::runtime_error("Invalid spawn missile spell location scope: \"" + scope.get_tag() + "\".");
-}
-
-void SpellActionMissileLocation::ProcessConfigData(const CConfigData *config_data)
-{
-	for (size_t i = 0; i < config_data->Properties.size(); ++i) {
-		std::string key = config_data->Properties[i].first;
-		std::string value = config_data->Properties[i].second;
-		
-		if (key == "base") {
-			if (value == "caster") {
-				this->Base = LocBaseType::LocBaseCaster;
-			} else if (value == "target") {
-				this->Base = LocBaseType::LocBaseTarget;
-			} else {
-				fprintf(stderr, "Unsupported missile location base flag: \"%s\".\n", value.c_str());
-			}
-		} else if (key == "add_x") {
-			this->AddX = std::stoi(value);
-		} else if (key == "add_y") {
-			this->AddY = std::stoi(value);
-		} else if (key == "add_rand_x") {
-			this->AddRandX = std::stoi(value);
-		} else if (key == "add_rand_y") {
-			this->AddRandY = std::stoi(value);
-		} else {
-			fprintf(stderr, "Invalid spell action missile location property: \"%s\".\n", key.c_str());
-		}
-	}
-}
-
-void Spell_SpawnMissile::process_sml_property(const wyrmgus::sml_property &property)
+void spell_action_spawn_missile::process_sml_property(const wyrmgus::sml_property &property)
 {
 	const std::string &key = property.get_key();
 	const std::string &value = property.get_value();
@@ -177,12 +114,16 @@ void Spell_SpawnMissile::process_sml_property(const wyrmgus::sml_property &prope
 		this->TTL = std::stoi(value);
 	} else if (key == "missile") {
 		this->Missile = wyrmgus::missile_type::get(value);
+	} else if (key == "start_point") {
+		this->StartPoint = missile_location(spell_action_spawn_missile::string_to_location_base_type(value));
+	} else if (key == "end_point") {
+		this->EndPoint = missile_location(spell_action_spawn_missile::string_to_location_base_type(value));
 	} else {
 		throw std::runtime_error("Invalid spawn missile spell action property: \"" + key + "\".");
 	}
 }
 
-void Spell_SpawnMissile::process_sml_scope(const wyrmgus::sml_data &scope)
+void spell_action_spawn_missile::process_sml_scope(const wyrmgus::sml_data &scope)
 {
 	const std::string &tag = scope.get_tag();
 
@@ -195,19 +136,19 @@ void Spell_SpawnMissile::process_sml_scope(const wyrmgus::sml_data &scope)
 	}
 }
 
-void Spell_SpawnMissile::check() const
+void spell_action_spawn_missile::check() const
 {
 	if (this->Missile == nullptr) {
 		throw std::runtime_error("Use a missile for spawn-missile (with missile).");
 	}
 }
 
-void Spell_SpawnMissile::ProcessConfigData(const CConfigData *config_data)
+void spell_action_spawn_missile::ProcessConfigData(const CConfigData *config_data)
 {
 	for (size_t i = 0; i < config_data->Properties.size(); ++i) {
 		std::string key = config_data->Properties[i].first;
 		std::string value = config_data->Properties[i].second;
-		
+
 		if (key == "damage") {
 			this->Damage = std::stoi(value);
 		} else if (key == "lightning_damage") {
@@ -228,7 +169,7 @@ void Spell_SpawnMissile::ProcessConfigData(const CConfigData *config_data)
 			fprintf(stderr, "Invalid spawn missile spell action property: \"%s\".\n", key.c_str());
 		}
 	}
-	
+
 	for (const CConfigData *child_config_data : config_data->Children) {
 		if (child_config_data->Tag == "start_point") {
 			this->StartPoint.ProcessConfigData(child_config_data);
@@ -238,13 +179,13 @@ void Spell_SpawnMissile::ProcessConfigData(const CConfigData *config_data)
 			fprintf(stderr, "Invalid spawn missile spell action property: \"%s\".\n", child_config_data->Tag.c_str());
 		}
 	}
-	
+
 	if (this->Missile == nullptr) {
 		fprintf(stderr, "Use a missile for spawn-missile (with missile).\n");
 	}
 }
 
-/* virtual */ void Spell_SpawnMissile::Parse(lua_State *l, int startIndex, int endIndex)
+void spell_action_spawn_missile::Parse(lua_State *l, int startIndex, int endIndex)
 {
 	for (int j = startIndex; j < endIndex; ++j) {
 		const char *value = LuaToString(l, -1, j + 1);
@@ -256,14 +197,14 @@ void Spell_SpawnMissile::ProcessConfigData(const CConfigData *config_data)
 		} else if (!strcmp(value, "use-unit-var")) {
 			this->UseUnitVar = true;
 			--j;
-		//Wyrmgus start
+			//Wyrmgus start
 		} else if (!strcmp(value, "always-hits")) {
 			this->AlwaysHits = true;
 			--j;
 		} else if (!strcmp(value, "always-critical")) {
 			this->AlwaysCritical = true;
 			--j;
-		//Wyrmgus end
+			//Wyrmgus end
 		} else if (!strcmp(value, "delay")) {
 			this->Delay = LuaToNumber(l, -1, j + 1);
 		} else if (!strcmp(value, "ttl")) {
@@ -290,37 +231,6 @@ void Spell_SpawnMissile::ProcessConfigData(const CConfigData *config_data)
 }
 
 /**
-** Evaluate missile location description.
-**
-** @param location     Parameters for location.
-** @param caster       Unit that casts the spell
-** @param target       Target unit that spell is addressed to
-** @param goalPos      TilePos of target spot when/if target does not exist
-** @param res          pointer to PixelPos of the result
-*/
-static void EvaluateMissileLocation(const SpellActionMissileLocation &location,
-									CUnit &caster, CUnit *target, const Vec2i &goalPos, PixelPos *res)
-{
-	if (location.Base == LocBaseType::LocBaseCaster) {
-		*res = caster.get_map_pixel_pos_center();
-	} else {
-		if (target) {
-			*res = target->get_map_pixel_pos_center();
-		} else {
-			*res = CMap::Map.tile_pos_to_map_pixel_pos_center(goalPos);
-		}
-	}
-	res->x += location.AddX;
-	if (location.AddRandX) {
-		res->x += SyncRand(location.AddRandX);
-	}
-	res->y += location.AddY;
-	if (location.AddRandY) {
-		res->y += SyncRand(location.AddRandY);
-	}
-}
-
-/**
 ** Cast spawn missile.
 **
 **  @param caster       Unit that casts the spell
@@ -330,7 +240,7 @@ static void EvaluateMissileLocation(const SpellActionMissileLocation &location,
 **
 **  @return             =!0 if spell should be repeated, 0 if not
 */
-/* virtual */ int Spell_SpawnMissile::Cast(CUnit &caster, const wyrmgus::spell &, CUnit *target, const Vec2i &goalPos, int z, int modifier)
+int spell_action_spawn_missile::Cast(CUnit &caster, const wyrmgus::spell &, CUnit *target, const Vec2i &goalPos, int z, int modifier)
 {
 	PixelPos startPos;
 	PixelPos endPos;
@@ -359,8 +269,8 @@ static void EvaluateMissileLocation(const SpellActionMissileLocation &location,
 			for (std::vector<CUnit *>::iterator it = table.begin(); it != table.begin() + count && damageLeft > 0; ++it) {
 				CUnit &unit = **it;
 				if (unit.IsAliveOnMap()) {
-					EvaluateMissileLocation(this->StartPoint, caster, &unit, unit.tilePos, &startPos);
-					EvaluateMissileLocation(this->EndPoint, caster, &unit, unit.tilePos, &endPos);
+					this->StartPoint.evaluate(caster, &unit, unit.tilePos, &startPos);
+					this->EndPoint.evaluate(caster, &unit, unit.tilePos, &endPos);
 					//Wyrmgus start
 //					::Missile *missile = MakeMissile(*this->Missile, startPos, endPos);
 					::Missile *missile = MakeMissile(*this->Missile, startPos, endPos, z);
@@ -382,8 +292,8 @@ static void EvaluateMissileLocation(const SpellActionMissileLocation &location,
 		}
 		return 0;
 	} else {
-		EvaluateMissileLocation(this->StartPoint, caster, target, goalPos, &startPos);
-		EvaluateMissileLocation(this->EndPoint, caster, target, goalPos, &endPos);
+		this->StartPoint.evaluate(caster, target, goalPos, &startPos);
+		this->EndPoint.evaluate(caster, target, goalPos, &endPos);
 
 		//Wyrmgus start
 //		::Missile *missile = MakeMissile(*this->Missile, startPos, endPos);
@@ -415,4 +325,83 @@ static void EvaluateMissileLocation(const SpellActionMissileLocation &location,
 	}
 
 	return 1;
+}
+
+void spell_action_spawn_missile::missile_location::process_sml_property(const wyrmgus::sml_property &property)
+{
+	const std::string &key = property.get_key();
+	const std::string &value = property.get_value();
+
+	if (key == "base") {
+		this->Base = spell_action_spawn_missile::string_to_location_base_type(value);
+	} else if (key == "add_x") {
+		this->AddX = std::stoi(value);
+	} else if (key == "add_y") {
+		this->AddY = std::stoi(value);
+	} else if (key == "add_rand_x") {
+		this->AddRandX = std::stoi(value);
+	} else if (key == "add_rand_y") {
+		this->AddRandY = std::stoi(value);
+	} else {
+		throw std::runtime_error("Invalid spawn missile spell location property: \"" + key + "\".");
+	}
+}
+
+void spell_action_spawn_missile::missile_location::process_sml_scope(const wyrmgus::sml_data &scope)
+{
+	throw std::runtime_error("Invalid spawn missile spell location scope: \"" + scope.get_tag() + "\".");
+}
+
+void spell_action_spawn_missile::missile_location::ProcessConfigData(const CConfigData *config_data)
+{
+	for (size_t i = 0; i < config_data->Properties.size(); ++i) {
+		std::string key = config_data->Properties[i].first;
+		std::string value = config_data->Properties[i].second;
+
+		if (key == "base") {
+			this->Base = spell_action_spawn_missile::string_to_location_base_type(value);
+		} else if (key == "add_x") {
+			this->AddX = std::stoi(value);
+		} else if (key == "add_y") {
+			this->AddY = std::stoi(value);
+		} else if (key == "add_rand_x") {
+			this->AddRandX = std::stoi(value);
+		} else if (key == "add_rand_y") {
+			this->AddRandY = std::stoi(value);
+		} else {
+			fprintf(stderr, "Invalid spell action missile location property: \"%s\".\n", key.c_str());
+		}
+	}
+}
+
+/**
+** Evaluate missile location description.
+**
+** @param location     Parameters for location.
+** @param caster       Unit that casts the spell
+** @param target       Target unit that spell is addressed to
+** @param goalPos      TilePos of target spot when/if target does not exist
+** @param res          pointer to PixelPos of the result
+*/
+void spell_action_spawn_missile::missile_location::evaluate(const CUnit &caster, const CUnit *target, const Vec2i &goalPos, PixelPos *res) const
+{
+	if (this->Base == location_base_type::caster) {
+		*res = caster.get_map_pixel_pos_center();
+	} else {
+		if (target) {
+			*res = target->get_map_pixel_pos_center();
+		} else {
+			*res = CMap::Map.tile_pos_to_map_pixel_pos_center(goalPos);
+		}
+	}
+	res->x += this->AddX;
+	if (this->AddRandX) {
+		res->x += SyncRand(this->AddRandX);
+	}
+	res->y += this->AddY;
+	if (this->AddRandY) {
+		res->y += SyncRand(this->AddRandY);
+	}
+}
+
 }

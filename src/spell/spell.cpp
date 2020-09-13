@@ -385,7 +385,7 @@ void spell::ProcessConfigData(const CConfigData *config_data)
 				if (grandchild_config_data->Tag == "adjust_variable") {
 					spell_action = std::make_unique<Spell_AdjustVariable>();
 				} else if (grandchild_config_data->Tag == "spawn_missile") {
-					spell_action = std::make_unique<Spell_SpawnMissile>();
+					spell_action = std::make_unique<spell_action_spawn_missile>();
 				} else {
 					fprintf(stderr, "Invalid spell action type: \"%s\".\n", grandchild_config_data->Tag.c_str());
 				}

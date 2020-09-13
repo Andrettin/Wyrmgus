@@ -32,43 +32,55 @@
 #include "spell/spell_action.h"
 
 namespace wyrmgus {
-	class missile_type;
-}
 
-/**
-**  Different targets.
-*/
-enum class LocBaseType {
-	LocBaseCaster,
-	LocBaseTarget
-};
+class missile_type;
 
-/**
-**  This struct is used for defining a missile start/stop location.
-**
-**  It's evaluated like this, and should be more or less flexible.:
-**  base coordinates(caster or target) + (AddX,AddY) + (rand()%AddRandX,rand()%AddRandY)
-*/
-class SpellActionMissileLocation final
+class spell_action_spawn_missile final : public spell_action
 {
 public:
-	explicit SpellActionMissileLocation(const LocBaseType base) : Base(base) {}
+	enum class location_base_type {
+		caster,
+		target
+	};
 
-	void process_sml_property(const wyrmgus::sml_property &property);
-	void process_sml_scope(const wyrmgus::sml_data &scope);
-	void ProcessConfigData(const CConfigData *config_data);
-	
-	LocBaseType Base;	/// The base for the location (caster/target)
-	int AddX = 0;		/// Add to the X coordinate
-	int AddY = 0;		/// Add to the X coordinate
-	int AddRandX = 0;	/// Random add to the X coordinate
-	int AddRandY = 0;	/// Random add to the X coordinate
-};
+	/**
+	**  This struct is used for defining a missile start/stop location.
+	**
+	**  It's evaluated like this, and should be more or less flexible.:
+	**  base coordinates(caster or target) + (AddX,AddY) + (rand()%AddRandX,rand()%AddRandY)
+	*/
+	class missile_location final
+	{
+	public:
+		explicit missile_location(const location_base_type base) : Base(base)
+		{
+		}
 
-class Spell_SpawnMissile final : public wyrmgus::spell_action
-{
-public:
-	Spell_SpawnMissile() : StartPoint(LocBaseType::LocBaseCaster), EndPoint(LocBaseType::LocBaseTarget)
+		void process_sml_property(const sml_property &property);
+		void process_sml_scope(const sml_data &scope);
+		void ProcessConfigData(const CConfigData *config_data);
+		void evaluate(const CUnit &caster, const CUnit *target, const Vec2i &goalPos, PixelPos *res) const;
+
+		location_base_type Base;	/// The base for the location (caster/target)
+		int AddX = 0;		/// Add to the X coordinate
+		int AddY = 0;		/// Add to the X coordinate
+		int AddRandX = 0;	/// Random add to the X coordinate
+		int AddRandY = 0;	/// Random add to the X coordinate
+	};
+
+	static location_base_type string_to_location_base_type(const std::string &str)
+	{
+		if (str == "caster") {
+			return location_base_type::caster;
+		} else if (str == "target") {
+			return location_base_type::target;
+		}
+
+		throw std::runtime_error("Invalid spawn missile location base type: \"" + str + "\".");
+	}
+
+	spell_action_spawn_missile()
+		: StartPoint(location_base_type::caster), EndPoint(location_base_type::target)
 	{
 	}
 
@@ -78,11 +90,11 @@ public:
 		return identifier;
 	}
 
-	virtual void process_sml_property(const wyrmgus::sml_property &property) override;
-	virtual void process_sml_scope(const wyrmgus::sml_data &scope) override;
+	virtual void process_sml_property(const sml_property &property) override;
+	virtual void process_sml_scope(const sml_data &scope) override;
 	virtual void check() const override;
 	virtual void ProcessConfigData(const CConfigData *config_data) override;
-	virtual int Cast(CUnit &caster, const wyrmgus::spell &spell,
+	virtual int Cast(CUnit &caster, const spell &spell,
 					 CUnit *target, const Vec2i &goalPos, int z, int modifier) override;
 	virtual void Parse(lua_State *lua, int startIndex, int endIndex) override;
 
@@ -96,7 +108,9 @@ private:
 	bool AlwaysHits = false;				/// The missile spawned from the spell always hits
 	bool AlwaysCritical = false;			/// The damage from the spell is always a critical hit (double damage)
 	//Wyrmgus end
-	SpellActionMissileLocation StartPoint;	/// Start point description.
-	SpellActionMissileLocation EndPoint;	/// End point description.
-	wyrmgus::missile_type *Missile = nullptr;			/// Missile fired on cast
+	missile_location StartPoint;	/// Start point description.
+	missile_location EndPoint;	/// End point description.
+	missile_type *Missile = nullptr;			/// Missile fired on cast
 };
+
+}

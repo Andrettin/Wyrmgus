@@ -45,7 +45,7 @@ std::unique_ptr<spell_action> spell_action::from_sml_scope(const sml_data &scope
 	if (action_identifier == "adjust_variable") {
 		action = std::make_unique<Spell_AdjustVariable>();
 	} else if (action_identifier == "spawn_missile") {
-		action = std::make_unique<Spell_SpawnMissile>();
+		action = std::make_unique<spell_action_spawn_missile>();
 	} else {
 		throw std::runtime_error("Invalid scope spell action: \"" + action_identifier + "\".");
 	}
