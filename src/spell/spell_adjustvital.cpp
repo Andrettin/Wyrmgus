@@ -34,7 +34,27 @@
 #include "spell/spell.h"
 #include "unit/unit.h"
 
-/* virtual */ void Spell_AdjustVital::Parse(lua_State *l, int startIndex, int endIndex)
+namespace wyrmgus {
+
+void spell_action_adjust_vitals::process_sml_property(const sml_property &property)
+{
+	const std::string &key = property.get_key();
+	const std::string &value = property.get_value();
+
+	if (key == "hit_points") {
+		this->HP = std::stoi(value);
+	} else if (key == "mana") {
+		this->Mana = std::stoi(value);
+	} else if (key == "shield") {
+		this->Shield = std::stoi(value);
+	} else if (key == "max_multi_cast") {
+		this->MaxMultiCast = std::stoi(value);
+	} else {
+		throw std::runtime_error("Invalid adjust vitals spell action property: \"" + key + "\".");
+	}
+}
+
+void spell_action_adjust_vitals::Parse(lua_State *l, int startIndex, int endIndex)
 {
 	for (int j = startIndex; j < endIndex; ++j) {
 		const char *value = LuaToString(l, -1, j + 1);
@@ -53,7 +73,6 @@
 	}
 }
 
-
 /**
 ** Cast healing. (or exorcism)
 **
@@ -64,9 +83,9 @@
 **
 **  @return             =!0 if spell should be repeated, 0 if not
 */
-int Spell_AdjustVital::Cast(CUnit &caster, const wyrmgus::spell &spell, CUnit *target, const Vec2i &/*goalPos*/, int /*z*/, int modifier)
+int spell_action_adjust_vitals::Cast(CUnit &caster, const wyrmgus::spell &spell, CUnit *target, const Vec2i &/*goalPos*/, int /*z*/, int modifier)
 {
-	if (!target) {
+	if (target == nullptr) {
 		return 0;
 	}
 
@@ -89,7 +108,7 @@ int Spell_AdjustVital::Cast(CUnit &caster, const wyrmgus::spell &spell, CUnit *t
 	}
 	if (mana > 0) {
 		//Wyrmgus start
-		
+
 //		diffMana = target->Stats->Variables[MANA_INDEX].Max - target->Variable[MANA_INDEX].Value;
 		diffMana = target->GetModifiedVariable(MANA_INDEX, VariableMax) - target->GetModifiedVariable(MANA_INDEX, VariableValue);
 		//Wyrmgus end
@@ -109,15 +128,15 @@ int Spell_AdjustVital::Cast(CUnit &caster, const wyrmgus::spell &spell, CUnit *t
 	int castcount = 1;
 	if (hp) {
 		castcount = std::max<int>(castcount,
-								  diffHP / abs(hp) + (((hp < 0) && (diffHP % (-hp) > 0)) ? 1 : 0));
+			diffHP / abs(hp) + (((hp < 0) && (diffHP % (-hp) > 0)) ? 1 : 0));
 	}
 	if (mana) {
 		castcount = std::max<int>(castcount,
-								  diffMana / abs(mana) + (((mana < 0) && (diffMana % (-mana) > 0)) ? 1 : 0));
+			diffMana / abs(mana) + (((mana < 0) && (diffMana % (-mana) > 0)) ? 1 : 0));
 	}
 	if (shield) {
 		castcount = std::max<int>(castcount,
-								  diffShield / abs(shield) + (((shield < 0) && (diffShield % (-shield) > 0)) ? 1 : 0));
+			diffShield / abs(shield) + (((shield < 0) && (diffShield % (-shield) > 0)) ? 1 : 0));
 	}
 	if (manacost) {
 		castcount = std::min<int>(castcount, caster.Variable[MANA_INDEX].Value / manacost);
@@ -153,4 +172,6 @@ int Spell_AdjustVital::Cast(CUnit &caster, const wyrmgus::spell &spell, CUnit *t
 		return 1;
 	}
 	return 0;
+}
+
 }

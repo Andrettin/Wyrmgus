@@ -71,7 +71,6 @@ spell_action_adjust_variable::~spell_action_adjust_variable()
 	delete[](this->Var);
 }
 
-
 void spell_action_adjust_variable::process_sml_property(const sml_property &property)
 {
 	const std::string &key = property.get_key();

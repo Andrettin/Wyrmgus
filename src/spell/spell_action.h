@@ -47,7 +47,7 @@ class spell_action
 public:
 	static std::unique_ptr<spell_action> from_sml_scope(const sml_data &scope);
 
-	explicit spell_action(const int mod = 0) : ModifyManaCaster(mod)
+	explicit spell_action(const bool mod = false) : ModifyManaCaster(mod)
 	{
 	};
 
@@ -62,7 +62,7 @@ public:
 	virtual int Cast(CUnit &caster, const wyrmgus::spell &spell, CUnit *target, const Vec2i &goalPos, int z, int modifier) = 0;
 	virtual void Parse(lua_State *l, int startIndex, int endIndex) = 0;
 
-	const int ModifyManaCaster;
+	const bool ModifyManaCaster;
 };
 
 }

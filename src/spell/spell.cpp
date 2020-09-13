@@ -730,7 +730,7 @@ int SpellCast(CUnit &caster, const wyrmgus::spell &spell, CUnit *target, const V
 		}
 			
 		for (const auto &spell_action : spell.get_actions()) {
-			if (spell_action->ModifyManaCaster != 0) {
+			if (spell_action->ModifyManaCaster) {
 				mustSubtractMana = false;
 			}
 			

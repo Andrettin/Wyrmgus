@@ -30,20 +30,23 @@
 
 #include "spell/spell_action.h"
 
-class Spell_AdjustVital final : public wyrmgus::spell_action
+namespace wyrmgus {
+
+class spell_action_adjust_vitals final : public spell_action
 {
 public:
-	Spell_AdjustVital() : wyrmgus::spell_action(1) 
+	spell_action_adjust_vitals() : spell_action(true)
 	{
 	}
 
 	virtual const std::string &get_class_identifier() const override
 	{
-		static const std::string identifier = "adjust_vital";
+		static const std::string identifier = "adjust_vitals";
 		return identifier;
 	}
 
-	virtual int Cast(CUnit &caster, const wyrmgus::spell &spell,
+	virtual void process_sml_property(const sml_property &property) override;
+	virtual int Cast(CUnit &caster, const spell &spell,
 					 CUnit *target, const Vec2i &goalPos, int z, int modifier) override;
 	virtual void Parse(lua_State *l, int startIndex, int endIndex) override;
 
@@ -55,3 +58,5 @@ private:
 	/// can scale up to MaxMultiCast times. Use 0 for infinite.
 	int MaxMultiCast = 0;
 };
+
+}

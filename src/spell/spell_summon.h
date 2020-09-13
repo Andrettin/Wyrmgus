@@ -37,7 +37,7 @@ namespace wyrmgus {
 class Spell_Summon final : public wyrmgus::spell_action
 {
 public:
-	Spell_Summon() : wyrmgus::spell_action(1)
+	Spell_Summon() : wyrmgus::spell_action(true)
 	{
 	}
 

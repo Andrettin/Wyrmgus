@@ -38,7 +38,7 @@ namespace wyrmgus {
 class Spell_Polymorph final : public wyrmgus::spell_action
 {
 public:
-	Spell_Polymorph() : wyrmgus::spell_action(1)
+	Spell_Polymorph() : wyrmgus::spell_action(true)
 	{
 	}
 
