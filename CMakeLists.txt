@@ -319,6 +319,7 @@ source_group(species FILES ${species_SRCS})
 
 set(spell_SRCS
 	src/spell/script_spell.cpp
+	src/spell/spell.cpp
 	src/spell/spell_action.cpp
 	src/spell/spell_adjustvariable.cpp
 	src/spell/spell_adjustvital.cpp
@@ -333,7 +334,6 @@ set(spell_SRCS
 	src/spell/spell_spawnportal.cpp
 	src/spell/spell_summon.cpp
 	src/spell/spell_teleport.cpp
-	src/spell/spells.cpp
 )
 source_group(spell FILES ${spell_SRCS})
 
@@ -743,6 +743,7 @@ set(stratagus_species_HDRS
 )
 
 set(stratagus_spell_HDRS
+	src/spell/spell.h
 	src/spell/spell_action.h
 	src/spell/spell_adjustvariable.h
 	src/spell/spell_adjustvital.h
@@ -758,7 +759,6 @@ set(stratagus_spell_HDRS
 	src/spell/spell_summon.h
 	src/spell/spell_target_type.h
 	src/spell/spell_teleport.h
-	src/spell/spells.h
 )
 
 set(stratagus_time_HDRS
