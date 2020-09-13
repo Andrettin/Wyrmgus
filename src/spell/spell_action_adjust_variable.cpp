@@ -38,12 +38,41 @@
 #include "unit/unit.h"
 #include "util/string_util.h"
 
-Spell_AdjustVariable::Spell_AdjustVariable()
+namespace wyrmgus {
+
+class spell_action_adjust_variable::variable_adjustment final
 {
-	this->Var = new SpellActionTypeAdjustVariable[UnitTypeVar.GetNumberVariable()];
+public:
+	int Enable = 0;                 /// Value to affect to this field.
+	int Value = 0;                  /// Value to affect to this field.
+	int Max = 0;                    /// Value to affect to this field.
+	int Increase = 0;               /// Value to affect to this field.
+
+	bool ModifEnable = false;       /// true if we modify this field.
+	bool ModifValue = false;        /// true if we modify this field.
+	bool ModifMax = false;          /// true if we modify this field.
+	bool ModifIncrease = false;     /// true if we modify this field.
+
+	char InvertEnable = 0;          /// true if we invert this field.
+	int AddValue = 0;               /// Add this value to this field.
+	int AddMax = 0;                 /// Add this value to this field.
+	int AddIncrease = 0;            /// Add this value to this field.
+	int IncreaseTime = 0;           /// How many time increase the Value field.
+	bool TargetIsCaster = false;    /// true if the target is the caster.
+};
+
+spell_action_adjust_variable::spell_action_adjust_variable()
+{
+	this->Var = new variable_adjustment[UnitTypeVar.GetNumberVariable()];
 }
 
-void Spell_AdjustVariable::process_sml_property(const wyrmgus::sml_property &property)
+spell_action_adjust_variable::~spell_action_adjust_variable()
+{
+	delete[](this->Var);
+}
+
+
+void spell_action_adjust_variable::process_sml_property(const sml_property &property)
 {
 	const std::string &key = property.get_key();
 	const std::string &value = property.get_value();
@@ -55,11 +84,11 @@ void Spell_AdjustVariable::process_sml_property(const wyrmgus::sml_property &pro
 		if (string::is_number(value)) {
 			const int number_value = std::stoi(value);
 			this->Var[index].Enable = number_value != 0;
-			this->Var[index].ModifEnable = 1;
+			this->Var[index].ModifEnable = true;
 			this->Var[index].Value = number_value;
-			this->Var[index].ModifValue = 1;
+			this->Var[index].ModifValue = true;
 			this->Var[index].Max = number_value;
-			this->Var[index].ModifMax = 1;
+			this->Var[index].ModifMax = true;
 		} else {
 			throw std::runtime_error("Invalid value (\"" + value + "\") for variable \"" + key + "\" when defining an adjust variable spell action.");
 		}
@@ -68,7 +97,7 @@ void Spell_AdjustVariable::process_sml_property(const wyrmgus::sml_property &pro
 	}
 }
 
-void Spell_AdjustVariable::process_sml_scope(const wyrmgus::sml_data &scope)
+void spell_action_adjust_variable::process_sml_scope(const sml_data &scope)
 {
 	const std::string &tag = scope.get_tag();
 
@@ -76,22 +105,22 @@ void Spell_AdjustVariable::process_sml_scope(const wyrmgus::sml_data &scope)
 
 	const int index = UnitTypeVar.VariableNameLookup[pascal_case_tag.c_str()];
 	if (index != -1) {
-		scope.for_each_property([&](const wyrmgus::sml_property &property) {
+		scope.for_each_property([&](const sml_property &property) {
 			const std::string &key = property.get_key();
 			const std::string &value = property.get_value();
 
 			if (key == "enable") {
 				this->Var[index].Enable = string::to_bool(value);
-				this->Var[index].ModifEnable = 1;
+				this->Var[index].ModifEnable = true;
 			} else if (key == "value") {
 				this->Var[index].Value = std::stoi(value);
-				this->Var[index].ModifValue = 1;
+				this->Var[index].ModifValue = true;
 			} else if (key == "max") {
 				this->Var[index].Max = std::stoi(value);
-				this->Var[index].ModifMax = 1;
+				this->Var[index].ModifMax = true;
 			} else if (key == "increase") {
 				this->Var[index].Increase = std::stoi(value);
-				this->Var[index].ModifIncrease = 1;
+				this->Var[index].ModifIncrease = true;
 			} else if (key == "invert_enable") {
 				this->Var[index].InvertEnable = string::to_bool(value);
 			} else if (key == "add_value") {
@@ -104,9 +133,9 @@ void Spell_AdjustVariable::process_sml_scope(const wyrmgus::sml_data &scope)
 				this->Var[index].IncreaseTime = std::stoi(value);
 			} else if (key == "target_is_caster") {
 				if (value == "caster") {
-					this->Var[index].TargetIsCaster = 1;
+					this->Var[index].TargetIsCaster = true;
 				} else if (value == "target") {
-					this->Var[index].TargetIsCaster = 0;
+					this->Var[index].TargetIsCaster = false;
 				} else {
 					throw std::runtime_error("Invalid target_is_caster value: \"" + value + "\".");
 				}
@@ -119,7 +148,7 @@ void Spell_AdjustVariable::process_sml_scope(const wyrmgus::sml_data &scope)
 	}
 }
 
-void Spell_AdjustVariable::Parse(lua_State *l, int startIndex, int endIndex)
+void spell_action_adjust_variable::Parse(lua_State *l, int startIndex, int endIndex)
 {
 	int j = startIndex;
 	lua_rawgeti(l, -1, j + 1);
@@ -135,26 +164,26 @@ void Spell_AdjustVariable::Parse(lua_State *l, int startIndex, int endIndex)
 		}
 		if (lua_isnumber(l, -1)) {
 			this->Var[i].Enable = (LuaToNumber(l, -1) != 0);
-			this->Var[i].ModifEnable = 1;
+			this->Var[i].ModifEnable = true;
 			this->Var[i].Value = LuaToNumber(l, -1);
-			this->Var[i].ModifValue = 1;
+			this->Var[i].ModifValue = true;
 			this->Var[i].Max = LuaToNumber(l, -1);
-			this->Var[i].ModifMax = 1;
+			this->Var[i].ModifMax = true;
 		} else if (lua_istable(l, -1)) {
 			for (lua_pushnil(l); lua_next(l, -2); lua_pop(l, 1)) {
 				const char *const key = LuaToString(l, -2);
 				if (!strcmp(key, "Enable")) {
 					this->Var[i].Enable = LuaToBoolean(l, -1);
-					this->Var[i].ModifEnable = 1;
+					this->Var[i].ModifEnable = true;
 				} else if (!strcmp(key, "Value")) {
 					this->Var[i].Value = LuaToNumber(l, -1);
-					this->Var[i].ModifValue = 1;
+					this->Var[i].ModifValue = true;
 				} else if (!strcmp(key, "Max")) {
 					this->Var[i].Max = LuaToNumber(l, -1);
-					this->Var[i].ModifMax = 1;
+					this->Var[i].ModifMax = true;
 				} else if (!strcmp(key, "Increase")) {
 					this->Var[i].Increase = LuaToNumber(l, -1);
-					this->Var[i].ModifIncrease = 1;
+					this->Var[i].ModifIncrease = true;
 				} else if (!strcmp(key, "InvertEnable")) {
 					this->Var[i].InvertEnable = LuaToBoolean(l, -1);
 				} else if (!strcmp(key, "AddValue")) {
@@ -168,9 +197,9 @@ void Spell_AdjustVariable::Parse(lua_State *l, int startIndex, int endIndex)
 				} else if (!strcmp(key, "TargetIsCaster")) {
 					const char *value = LuaToString(l, -1);
 					if (!strcmp(value, "caster")) {
-						this->Var[i].TargetIsCaster = 1;
+						this->Var[i].TargetIsCaster = true;
 					} else if (!strcmp(value, "target")) {
-						this->Var[i].TargetIsCaster = 0;
+						this->Var[i].TargetIsCaster = false;
 					} else { // Error
 						LuaError(l, "key '%s' not valid for TargetIsCaster in adjustvariable" _C_ value);
 					}
@@ -196,7 +225,7 @@ void Spell_AdjustVariable::Parse(lua_State *l, int startIndex, int endIndex)
 **
 **  @return        =!0 if spell should be repeated, 0 if not
 */
-/* virtual */ int Spell_AdjustVariable::Cast(CUnit &caster, const wyrmgus::spell &, CUnit *target, const Vec2i &/*goalPos*/, int /*z*/, int modifier)
+int spell_action_adjust_variable::Cast(CUnit &caster, const spell &, CUnit *target, const Vec2i &/*goalPos*/, int /*z*/, int modifier)
 {
 	for (unsigned int i = 0; i < UnitTypeVar.GetNumberVariable(); ++i) {
 		CUnit *unit = (this->Var[i].TargetIsCaster) ? &caster : target;
@@ -204,7 +233,7 @@ void Spell_AdjustVariable::Parse(lua_State *l, int startIndex, int endIndex)
 		if (!unit) {
 			continue;
 		}
-		
+
 		// Enable flag.
 		if (this->Var[i].ModifEnable) {
 			unit->Variable[i].Enable = this->Var[i].Enable;
@@ -234,7 +263,7 @@ void Spell_AdjustVariable::Parse(lua_State *l, int startIndex, int endIndex)
 //		clamp(&unit->Variable[i].Value, 0, unit->Variable[i].Max);
 		clamp(&unit->Variable[i].Value, 0, unit->GetModifiedVariable(i, VariableMax));
 		//Wyrmgus end
-		
+
 		//Wyrmgus start
 		if (i == ATTACKRANGE_INDEX && unit->Container) {
 			unit->Container->UpdateContainerAttackRange();
@@ -250,4 +279,6 @@ void Spell_AdjustVariable::Parse(lua_State *l, int startIndex, int endIndex)
 		//Wyrmgus end
 	}
 	return 1;
+}
+
 }

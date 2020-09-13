@@ -8,7 +8,6 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-//
 //      (c) Copyright 1999-2020 by Vladi Belperchinov-Shabanski,
 //                                 Joris Dauphin, Jimmy Salmon and Andrettin
 //
@@ -31,35 +30,15 @@
 
 #include "spell/spell_action.h"
 
-class SpellActionTypeAdjustVariable final
+namespace wyrmgus {
+
+class spell_action_adjust_variable final : public spell_action
 {
 public:
-	int Enable = 0;                 /// Value to affect to this field.
-	int Value = 0;                  /// Value to affect to this field.
-	int Max = 0;                    /// Value to affect to this field.
-	int Increase = 0;               /// Value to affect to this field.
+	class variable_adjustment;
 
-	char ModifEnable = 0;           /// true if we modify this field.
-	char ModifValue = 0;            /// true if we modify this field.
-	char ModifMax = 0;              /// true if we modify this field.
-	char ModifIncrease = 0;         /// true if we modify this field.
-
-	char InvertEnable = 0;          /// true if we invert this field.
-	int AddValue = 0;               /// Add this value to this field.
-	int AddMax = 0;                 /// Add this value to this field.
-	int AddIncrease = 0;            /// Add this value to this field.
-	int IncreaseTime = 0;           /// How many time increase the Value field.
-	char TargetIsCaster = 0;        /// true if the target is the caster.
-};
-
-class Spell_AdjustVariable final : public wyrmgus::spell_action
-{
-public:
-	Spell_AdjustVariable();
-
-	~Spell_AdjustVariable() {
-		delete [](this->Var);
-	}
+	spell_action_adjust_variable();
+	~spell_action_adjust_variable();
 
 	virtual const std::string &get_class_identifier() const override
 	{
@@ -67,12 +46,15 @@ public:
 		return identifier;
 	}
 
-	virtual void process_sml_property(const wyrmgus::sml_property &property) override;
-	virtual void process_sml_scope(const wyrmgus::sml_data &scope) override;
-	virtual int Cast(CUnit &caster, const wyrmgus::spell &spell,
+	virtual void process_sml_property(const sml_property &property) override;
+	virtual void process_sml_scope(const sml_data &scope) override;
+	virtual int Cast(CUnit &caster, const spell &spell,
 					 CUnit *target, const Vec2i &goalPos, int z, int modifier) override;
 	virtual void Parse(lua_State *l, int startIndex, int endIndex) override;
 
 private:
-	SpellActionTypeAdjustVariable *Var = nullptr;
+	variable_adjustment *Var = nullptr;
 };
+
+}
+

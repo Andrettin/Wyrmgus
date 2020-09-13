@@ -79,7 +79,7 @@ static std::unique_ptr<wyrmgus::spell_action> CclSpellAction(lua_State *l)
 
 	std::unique_ptr<wyrmgus::spell_action> spellaction;
 	if (!strcmp(value, "adjust-variable")) {
-		spellaction = std::make_unique<Spell_AdjustVariable>();
+		spellaction = std::make_unique<wyrmgus::spell_action_adjust_variable>();
 	} else if (!strcmp(value, "adjust-vitals")) {
 		spellaction = std::make_unique<Spell_AdjustVital>();
 	} else if (!strcmp(value, "area-adjust-vitals")) {

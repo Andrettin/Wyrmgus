@@ -93,7 +93,7 @@ static void CclSpellMissileLocation(lua_State *l, wyrmgus::spell_action_spawn_mi
 
 namespace wyrmgus {
 
-void spell_action_spawn_missile::process_sml_property(const wyrmgus::sml_property &property)
+void spell_action_spawn_missile::process_sml_property(const sml_property &property)
 {
 	const std::string &key = property.get_key();
 	const std::string &value = property.get_value();
@@ -113,7 +113,7 @@ void spell_action_spawn_missile::process_sml_property(const wyrmgus::sml_propert
 	} else if (key == "ttl") {
 		this->TTL = std::stoi(value);
 	} else if (key == "missile") {
-		this->Missile = wyrmgus::missile_type::get(value);
+		this->Missile = missile_type::get(value);
 	} else if (key == "start_point") {
 		this->StartPoint = missile_location(spell_action_spawn_missile::string_to_location_base_type(value));
 	} else if (key == "end_point") {
@@ -123,14 +123,14 @@ void spell_action_spawn_missile::process_sml_property(const wyrmgus::sml_propert
 	}
 }
 
-void spell_action_spawn_missile::process_sml_scope(const wyrmgus::sml_data &scope)
+void spell_action_spawn_missile::process_sml_scope(const sml_data &scope)
 {
 	const std::string &tag = scope.get_tag();
 
 	if (tag == "start_point") {
-		wyrmgus::database::process_sml_data(this->StartPoint, scope);
+		database::process_sml_data(this->StartPoint, scope);
 	} else if (tag == "end_point") {
-		wyrmgus::database::process_sml_data(this->EndPoint, scope);
+		database::process_sml_data(this->EndPoint, scope);
 	} else {
 		throw std::runtime_error("Invalid spawn missile spell action scope: \"" + tag + "\".");
 	}
@@ -177,7 +177,7 @@ void spell_action_spawn_missile::Parse(lua_State *l, int startIndex, int endInde
 			lua_pop(l, 1);
 		} else if (!strcmp(value, "missile")) {
 			value = LuaToString(l, -1, j + 1);
-			this->Missile = wyrmgus::missile_type::get(value);
+			this->Missile = missile_type::get(value);
 		} else {
 			LuaError(l, "Unsupported spawn-missile tag: %s" _C_ value);
 		}
@@ -198,7 +198,7 @@ void spell_action_spawn_missile::Parse(lua_State *l, int startIndex, int endInde
 **
 **  @return             =!0 if spell should be repeated, 0 if not
 */
-int spell_action_spawn_missile::Cast(CUnit &caster, const wyrmgus::spell &, CUnit *target, const Vec2i &goalPos, int z, int modifier)
+int spell_action_spawn_missile::Cast(CUnit &caster, const spell &, CUnit *target, const Vec2i &goalPos, int z, int modifier)
 {
 	PixelPos startPos;
 	PixelPos endPos;
@@ -206,7 +206,7 @@ int spell_action_spawn_missile::Cast(CUnit &caster, const wyrmgus::spell &, CUni
 	/*
 		hardcoded, will be done with Lua when it's possible
 	*/
-	if (this->Missile->get_missile_class() == wyrmgus::missile_class::death_coil) {
+	if (this->Missile->get_missile_class() == missile_class::death_coil) {
 		const Vec2i offset(2, 2);
 		std::vector<CUnit *> table;
 		//Wyrmgus start
@@ -255,8 +255,8 @@ int spell_action_spawn_missile::Cast(CUnit &caster, const wyrmgus::spell &, CUni
 
 		//Wyrmgus start
 //		::Missile *missile = MakeMissile(*this->Missile, startPos, endPos);
-		wyrmgus::missile_type *mtype = this->Missile;
-		if (mtype->get_missile_class() == wyrmgus::missile_class::none && this->UseUnitVar) {
+		missile_type *mtype = this->Missile;
+		if (mtype->get_missile_class() == missile_class::none && this->UseUnitVar) {
 			mtype = caster.GetMissile().Missile;
 		}
 		::Missile *missile = MakeMissile(*mtype, startPos, endPos, z);
@@ -285,7 +285,7 @@ int spell_action_spawn_missile::Cast(CUnit &caster, const wyrmgus::spell &, CUni
 	return 1;
 }
 
-void spell_action_spawn_missile::missile_location::process_sml_property(const wyrmgus::sml_property &property)
+void spell_action_spawn_missile::missile_location::process_sml_property(const sml_property &property)
 {
 	const std::string &key = property.get_key();
 	const std::string &value = property.get_value();
@@ -305,7 +305,7 @@ void spell_action_spawn_missile::missile_location::process_sml_property(const wy
 	}
 }
 
-void spell_action_spawn_missile::missile_location::process_sml_scope(const wyrmgus::sml_data &scope)
+void spell_action_spawn_missile::missile_location::process_sml_scope(const sml_data &scope)
 {
 	throw std::runtime_error("Invalid spawn missile spell location scope: \"" + scope.get_tag() + "\".");
 }

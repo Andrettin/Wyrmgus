@@ -8,7 +8,6 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-//
 //      (c) Copyright 1999-2012 by Vladi Belperchinov-Shabanski,
 //                                 Joris DAUPHIN, and Jimmy Salmon
 //
