@@ -44,7 +44,7 @@
 #include "quest.h"
 //Wyrmgus end
 #include "replay.h"
-#include "spell/spells.h"
+#include "spell/spell.h"
 #include "unit/unit.h"
 #include "unit/unit_manager.h"
 #include "unit/unit_type.h"

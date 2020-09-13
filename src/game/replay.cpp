@@ -46,7 +46,7 @@
 //Wyrmgus end
 #include "script.h"
 #include "settings.h"
-#include "spell/spells.h"
+#include "spell/spell.h"
 #include "sound/sound.h"
 #include "translate.h"
 #include "ui/interface.h"

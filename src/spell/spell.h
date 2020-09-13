@@ -317,9 +317,6 @@ public:
 /// register fonction.
 extern void SpellCclRegister();
 
-/// init spell tables
-extern void InitSpells();
-
 /// returns true if spell can be casted (enough mana, valid target)
 extern bool CanCastSpell(const CUnit &caster, const wyrmgus::spell &spell,
 						 const CUnit *target, const Vec2i &goalPos, const CMapLayer *map_layer);

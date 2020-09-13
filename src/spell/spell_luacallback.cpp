@@ -30,7 +30,7 @@
 #include "spell/spell_luacallback.h"
 
 #include "script.h"
-#include "spell/spells.h"
+#include "spell/spell.h"
 #include "unit/unit.h"
 
 

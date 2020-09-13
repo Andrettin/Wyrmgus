@@ -53,7 +53,7 @@
 #include "parameters.h"
 #include "player.h"
 #include "script/trigger.h"
-#include "spell/spells.h"
+#include "spell/spell.h"
 #include "time/timeline.h"
 #include "translate.h"
 #include "ui/button.h"

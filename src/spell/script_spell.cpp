@@ -29,7 +29,7 @@
 
 #include "stratagus.h"
 
-#include "spell/spells.h"
+#include "spell/spell.h"
 
 #include "civilization.h"
 #include "faction.h"

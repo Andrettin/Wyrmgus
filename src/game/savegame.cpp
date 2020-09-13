@@ -8,8 +8,6 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name savegame.cpp - Save game. */
-//
 //      (c) Copyright 2001-2020 by Lutz Sammer, Andreas Arens and Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
@@ -26,10 +24,6 @@
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
 //
-
-/*----------------------------------------------------------------------------
---  Includes
-----------------------------------------------------------------------------*/
 
 #include "stratagus.h"
 
@@ -48,8 +42,6 @@
 #include "player.h"
 #include "replay.h"
 #include "script/trigger.h"
-#include "spell/spells.h"
-#include "time/calendar.h"
 #include "ui/ui.h"
 #include "unit/unit.h"
 #include "unit/unit_manager.h"
@@ -60,10 +52,6 @@
 #include "version.h"
 
 extern void StartMap(const std::string &filename, bool clean);
-
-/*----------------------------------------------------------------------------
---  Functions
-----------------------------------------------------------------------------*/
 
 void ExpandPath(std::string &newpath, const std::string &path)
 {

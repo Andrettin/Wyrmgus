@@ -81,7 +81,7 @@
 #include "settings.h"
 #include "sound/sound.h"
 #include "sound/sound_server.h"
-#include "spell/spells.h"
+#include "spell/spell.h"
 #include "text.h"
 #include "time/calendar.h"
 #include "translate.h"
@@ -1771,11 +1771,6 @@ void CreateGame(const std::string &filename, CMap *map, bool is_mod)
 	if (SoundEnabled()) {
 		InitSoundClient();
 	}
-
-	//
-	// Spells
-	//
-	InitSpells();
 
 	//
 	// Init players?

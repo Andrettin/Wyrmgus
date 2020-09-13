@@ -42,7 +42,7 @@
 #include "map/site.h"
 #include "pathfinder.h"
 #include "player.h"
-#include "spell/spells.h"
+#include "spell/spell.h"
 #include "unique_item.h"
 #include "unit/unit_type.h"
 

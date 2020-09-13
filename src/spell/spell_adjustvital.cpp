@@ -31,7 +31,7 @@
 #include "spell/spell_adjustvital.h"
 
 #include "script.h"
-#include "spell/spells.h"
+#include "spell/spell.h"
 #include "unit/unit.h"
 
 /* virtual */ void Spell_AdjustVital::Parse(lua_State *l, int startIndex, int endIndex)

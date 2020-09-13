@@ -43,7 +43,7 @@
 #include "plane.h"
 #include "script/trigger.h"
 #include "sound/sound.h"
-#include "spell/spells.h"
+#include "spell/spell.h"
 #include "time/season_schedule.h"
 #include "time/time_of_day_schedule.h"
 #include "ui/button.h"

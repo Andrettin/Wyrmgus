@@ -49,7 +49,7 @@
 #include "quest.h"
 #include "religion/deity.h"
 #include "script/condition/and_condition.h"
-#include "spell/spells.h"
+#include "spell/spell.h"
 #include "time/calendar.h"
 #include "unique_item.h"
 #include "unit/unit.h"

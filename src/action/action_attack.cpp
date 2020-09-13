@@ -55,7 +55,7 @@
 #include "script.h"
 #include "settings.h"
 #include "sound/sound.h"
-#include "spell/spells.h"
+#include "spell/spell.h"
 #include "ui/ui.h"
 #include "unit/unit.h"
 #include "unit/unit_find.h"

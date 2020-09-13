@@ -28,11 +28,13 @@
 //
 
 #include "stratagus.h"
-#include "unit/unit_type.h"
-#include "unit/unit.h"
-#include "spell/spells.h"
-#include "actions.h"
+
 #include "ai_local.h"
+
+#include "actions.h"
+#include "spell/spell.h"
+#include "unit/unit.h"
+#include "unit/unit_type.h"
 
 /**
 **  Check what computer units can do with magic.

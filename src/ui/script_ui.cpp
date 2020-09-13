@@ -36,7 +36,7 @@
 #include "map/map.h"
 #include "menus.h"
 #include "script.h"
-#include "spell/spells.h"
+#include "spell/spell.h"
 #include "title.h"
 #include "util/util.h"
 #include "ui/button.h"

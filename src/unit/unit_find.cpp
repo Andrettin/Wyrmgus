@@ -38,7 +38,7 @@
 #include "missile.h"
 #include "pathfinder.h"
 #include "player.h"
-#include "spell/spells.h"
+#include "spell/spell.h"
 #include "unit/unit.h"
 #include "unit/unit_manager.h"
 #include "unit/unit_type.h"

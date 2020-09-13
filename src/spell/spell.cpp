@@ -36,7 +36,7 @@
 
 #include "stratagus.h"
 
-#include "spell/spells.h"
+#include "spell/spell.h"
 
 #include "actions.h"
 #include "character.h"
@@ -705,17 +705,6 @@ static Target *SelectTargetUnitsOfAutoCast(CUnit &caster, const wyrmgus::spell &
 // ****************************************************************************
 // Public spell functions
 // ****************************************************************************
-
-// ****************************************************************************
-// Constructor and destructor
-// ****************************************************************************
-
-/**
-** Spells constructor, inits spell id's and sounds
-*/
-void InitSpells()
-{
-}
 
 // ****************************************************************************
 // CanAutoCastSpell, CanCastSpell, AutoCastSpell, CastSpell.

@@ -53,7 +53,7 @@
 #include "sound/sound.h"
 #include "sound/unitsound.h"
 #include "species/species.h"
-#include "spell/spells.h"
+#include "spell/spell.h"
 #include "translate.h"
 #include "ui/button.h"
 #include "ui/button_level.h"

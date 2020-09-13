@@ -37,6 +37,7 @@
 //Wyrmgus start
 #include "grand_strategy.h"
 //Wyrmgus end
+#include "luacallback.h"
 #include "map/map.h"
 #include "map/map_layer.h"
 #include "map/minimap.h"
@@ -52,7 +53,6 @@
 #include "script/trigger.h"
 #include "sound/sound.h"
 #include "sound/sound_server.h"
-#include "spell/spells.h"
 #include "text.h"
 #include "time/season_schedule.h"
 #include "time/time_of_day_schedule.h"
@@ -159,7 +159,6 @@ void InitModules()
 	InitUnitTypes(0);
 
 	InitUnits();
-	InitSpells();
 	InitUpgrades();
 
 	InitButtons();

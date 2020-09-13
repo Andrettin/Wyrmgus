@@ -50,7 +50,7 @@
 //Wyrmgus start
 #include "sound/sound.h"
 //Wyrmgus end
-#include "spell/spells.h"
+#include "spell/spell.h"
 //Wyrmgus start
 #include "translate.h"
 //Wyrmgus end

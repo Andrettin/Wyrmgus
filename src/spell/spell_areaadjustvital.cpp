@@ -33,7 +33,7 @@
 #include "spell/spell_areaadjustvital.h"
 
 #include "script.h"
-#include "spell/spells.h"
+#include "spell/spell.h"
 #include "unit/unit.h"
 #include "unit/unit_find.h"
 
