@@ -322,8 +322,9 @@ set(spell_SRCS
 	src/spell/spell.cpp
 	src/spell/spell_action.cpp
 	src/spell/spell_action_adjust_variable.cpp
+	src/spell/spell_action_adjust_vitals.cpp
 	src/spell/spell_action_spawn_missile.cpp
-	src/spell/spell_adjustvital.cpp
+	src/spell/spell_action_summon.cpp
 	src/spell/spell_areaadjustvital.cpp
 	src/spell/spell_areabombardment.cpp
 	src/spell/spell_capture.cpp
@@ -331,7 +332,6 @@ set(spell_SRCS
 	src/spell/spell_polymorph.cpp
 	src/spell/spell_retrain.cpp
 	src/spell/spell_spawnportal.cpp
-	src/spell/spell_summon.cpp
 	src/spell/spell_teleport.cpp
 )
 source_group(spell FILES ${spell_SRCS})
@@ -745,8 +745,9 @@ set(stratagus_spell_HDRS
 	src/spell/spell.h
 	src/spell/spell_action.h
 	src/spell/spell_action_adjust_variable.h
+	src/spell/spell_action_adjust_vitals.h
 	src/spell/spell_action_spawn_missile.h
-	src/spell/spell_adjustvital.h
+	src/spell/spell_action_summon.h
 	src/spell/spell_areaadjustvital.h
 	src/spell/spell_areabombardment.h
 	src/spell/spell_capture.h
@@ -754,7 +755,6 @@ set(stratagus_spell_HDRS
 	src/spell/spell_polymorph.h
 	src/spell/spell_retrain.h
 	src/spell/spell_spawnportal.h
-	src/spell/spell_summon.h
 	src/spell/spell_target_type.h
 	src/spell/spell_teleport.h
 )
