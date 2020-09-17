@@ -800,7 +800,7 @@ static int CclDefineCivilization(lua_State *l)
 			const int args = lua_rawlen(l, -1);
 			for (int j = 0; j < args; ++j) {
 				lua_rawgeti(l, -1, j + 1);
-				CForceTemplate *force = new CForceTemplate;
+				auto force = std::make_unique<CForceTemplate>();
 				if (!lua_istable(l, -1)) {
 					LuaError(l, "incorrect argument (expected table for force templates)");
 				}
@@ -813,7 +813,6 @@ static int CclDefineCivilization(lua_State *l)
 						if (force->ForceType == ForceType::None) {
 							LuaError(l, "Force type doesn't exist.");
 						}
-						civilization->ForceTemplates[force->ForceType].push_back(force);
 					} else if (!strcmp(value, "priority")) {
 						force->Priority = LuaToNumber(l, -1, k + 1);
 					} else if (!strcmp(value, "weight")) {
@@ -829,17 +828,13 @@ static int CclDefineCivilization(lua_State *l)
 					}
 				}
 				lua_pop(l, 1);
-			}
-			for (auto &kv_pair : civilization->ForceTemplates) {
-				std::sort(kv_pair.second.begin(), kv_pair.second.end(), [](CForceTemplate *a, CForceTemplate *b) {
-					return a->Priority > b->Priority;
-				});
+				civilization->ForceTemplates[force->ForceType].push_back(std::move(force));
 			}
 		} else if (!strcmp(value, "AiBuildingTemplates")) {
 			const int args = lua_rawlen(l, -1);
 			for (int j = 0; j < args; ++j) {
 				lua_rawgeti(l, -1, j + 1);
-				CAiBuildingTemplate *building_template = new CAiBuildingTemplate;
+				auto building_template = std::make_unique<CAiBuildingTemplate>();
 				if (!lua_istable(l, -1)) {
 					LuaError(l, "incorrect argument (expected table for force templates)");
 				}
@@ -850,7 +845,6 @@ static int CclDefineCivilization(lua_State *l)
 					if (!strcmp(value, "unit-class")) {
 						const wyrmgus::unit_class *unit_class = wyrmgus::unit_class::get(LuaToString(l, -1, k + 1));
 						building_template->set_unit_class(unit_class);
-						civilization->AiBuildingTemplates.push_back(building_template);
 					} else if (!strcmp(value, "priority")) {
 						building_template->set_priority(LuaToNumber(l, -1, k + 1));
 					} else if (!strcmp(value, "per-settlement")) {
@@ -860,11 +854,9 @@ static int CclDefineCivilization(lua_State *l)
 						LuaError(l, "Unsupported tag: %s" _C_ value);
 					}
 				}
+				civilization->AiBuildingTemplates.push_back(std::move(building_template));
 				lua_pop(l, 1);
 			}
-			std::sort(civilization->AiBuildingTemplates.begin(), civilization->AiBuildingTemplates.end(), [](CAiBuildingTemplate *a, CAiBuildingTemplate *b) {
-				return a->get_priority() > b->get_priority();
-			});
 		} else if (!strcmp(value, "UIFillers")) {
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument");
@@ -1648,7 +1640,7 @@ static int CclDefineFaction(lua_State *l)
 			const int args = lua_rawlen(l, -1);
 			for (int j = 0; j < args; ++j) {
 				lua_rawgeti(l, -1, j + 1);
-				CForceTemplate *force = new CForceTemplate;
+				auto force = std::make_unique<CForceTemplate>();
 				if (!lua_istable(l, -1)) {
 					LuaError(l, "incorrect argument (expected table for force templates)");
 				}
@@ -1661,7 +1653,6 @@ static int CclDefineFaction(lua_State *l)
 						if (force->ForceType == ForceType::None) {
 							LuaError(l, "Force type doesn't exist.");
 						}
-						faction->ForceTemplates[force->ForceType].push_back(force);
 					} else if (!strcmp(value, "priority")) {
 						force->Priority = LuaToNumber(l, -1, k + 1);
 					} else if (!strcmp(value, "weight")) {
@@ -1676,18 +1667,14 @@ static int CclDefineFaction(lua_State *l)
 						LuaError(l, "Unsupported tag: %s" _C_ value);
 					}
 				}
+				faction->ForceTemplates[force->ForceType].push_back(std::move(force));
 				lua_pop(l, 1);
-			}
-			for (auto &kv_pair : faction->ForceTemplates) {
-				std::sort(kv_pair.second.begin(), kv_pair.second.end(), [](CForceTemplate *a, CForceTemplate *b) {
-					return a->Priority > b->Priority;
-				});
 			}
 		} else if (!strcmp(value, "AiBuildingTemplates")) {
 			const int args = lua_rawlen(l, -1);
 			for (int j = 0; j < args; ++j) {
 				lua_rawgeti(l, -1, j + 1);
-				CAiBuildingTemplate *building_template = new CAiBuildingTemplate;
+				auto building_template = std::make_unique<CAiBuildingTemplate>();
 				if (!lua_istable(l, -1)) {
 					LuaError(l, "incorrect argument (expected table for force templates)");
 				}
@@ -1698,7 +1685,6 @@ static int CclDefineFaction(lua_State *l)
 					if (!strcmp(value, "unit-class")) {
 						const wyrmgus::unit_class *unit_class = wyrmgus::unit_class::get(LuaToString(l, -1, k + 1));
 						building_template->set_unit_class(unit_class);
-						faction->AiBuildingTemplates.push_back(building_template);
 					} else if (!strcmp(value, "priority")) {
 						building_template->set_priority(LuaToNumber(l, -1, k + 1));
 					} else if (!strcmp(value, "per-settlement")) {
@@ -1708,11 +1694,9 @@ static int CclDefineFaction(lua_State *l)
 						LuaError(l, "Unsupported tag: %s" _C_ value);
 					}
 				}
+				faction->AiBuildingTemplates.push_back(std::move(building_template));
 				lua_pop(l, 1);
 			}
-			std::sort(faction->AiBuildingTemplates.begin(), faction->AiBuildingTemplates.end(), [](CAiBuildingTemplate *a, CAiBuildingTemplate *b) {
-				return a->get_priority() > b->get_priority();
-			});
 		} else if (!strcmp(value, "UIFillers")) {
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument");

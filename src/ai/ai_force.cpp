@@ -1873,7 +1873,7 @@ void AiForceManager::CheckForceRecruitment()
 		}
 
 		for (size_t k = 0; k < force_types.size(); ++k) {
-			std::vector<CForceTemplate *> faction_force_templates = wyrmgus::faction::get_all()[AiPlayer->Player->Faction]->GetForceTemplates(force_types[k]);
+			const std::vector<std::unique_ptr<CForceTemplate>> &faction_force_templates = AiPlayer->Player->get_faction()->GetForceTemplates(force_types[k]);
 			std::vector<CForceTemplate *> potential_force_templates;
 			int priority = 0;
 			for (size_t i = 0; i < faction_force_templates.size(); ++i) {
@@ -1900,7 +1900,7 @@ void AiForceManager::CheckForceRecruitment()
 						potential_force_templates.clear();
 					}
 					for (int j = 0; j < faction_force_templates[i]->Weight; ++j) {
-						potential_force_templates.push_back(faction_force_templates[i]);
+						potential_force_templates.push_back(faction_force_templates[i].get());
 					}
 				}
 			}

@@ -50,15 +50,6 @@ namespace wyrmgus {
 
 civilization::~civilization()
 {
-	for (const auto &kv_pair : this->ForceTemplates) {
-		for (size_t i = 0; i < kv_pair.second.size(); ++i) {
-			delete kv_pair.second[i];
-		}
-	}
-	
-	for (size_t i = 0; i < this->AiBuildingTemplates.size(); ++i) {
-		delete this->AiBuildingTemplates[i];
-	}
 }
 
 void civilization::process_sml_property(const sml_property &property)
@@ -130,7 +121,7 @@ void civilization::process_sml_scope(const sml_data &scope)
 		scope.for_each_child([&](const sml_data &child_scope) {
 			const std::string &tag = child_scope.get_tag();
 
-			CForceTemplate *force = new CForceTemplate;
+			auto force = std::make_unique<CForceTemplate>();
 
 			child_scope.for_each_element([&](const sml_property &property) {
 				if (property.get_key() == "force_type") {
@@ -157,17 +148,11 @@ void civilization::process_sml_scope(const sml_data &scope)
 				}
 			});
 
-			this->ForceTemplates[force->ForceType].push_back(force);
+			this->ForceTemplates[force->ForceType].push_back(std::move(force));
 		});
-
-		for (auto &kv_pair : this->ForceTemplates) {
-			std::sort(kv_pair.second.begin(), kv_pair.second.end(), [](CForceTemplate *a, CForceTemplate *b) {
-				return a->Priority > b->Priority;
-			});
-		}
 	} else if (tag == "ai_building_templates") {
 		scope.for_each_child([&](const sml_data &child_scope) {
-			CAiBuildingTemplate *building_template = new CAiBuildingTemplate;
+			auto building_template = std::make_unique<CAiBuildingTemplate>();
 
 			child_scope.for_each_property([&](const sml_property &property) {
 				const std::string &key = property.get_key();
@@ -185,11 +170,7 @@ void civilization::process_sml_scope(const sml_data &scope)
 				}
 			});
 
-			this->AiBuildingTemplates.push_back(building_template);
-		});
-
-		std::sort(this->AiBuildingTemplates.begin(), this->AiBuildingTemplates.end(), [](CAiBuildingTemplate *a, CAiBuildingTemplate *b) {
-			return a->get_priority() > b->get_priority();
+			this->AiBuildingTemplates.push_back(std::move(building_template));
 		});
 	} else if (tag == "develops_from") {
 		for (const std::string &value : values) {
@@ -215,6 +196,16 @@ void civilization::initialize()
 
 		this->get_group()->add_names_from(this);
 		this->get_supergroup()->add_names_from(this);
+	}
+
+	std::sort(this->AiBuildingTemplates.begin(), this->AiBuildingTemplates.end(), [](const std::unique_ptr<CAiBuildingTemplate> &a, const std::unique_ptr<CAiBuildingTemplate> &b) {
+		return a->get_priority() > b->get_priority();
+	});
+
+	for (auto &kv_pair : this->ForceTemplates) {
+		std::sort(kv_pair.second.begin(), kv_pair.second.end(), [](const std::unique_ptr<CForceTemplate> &a, const std::unique_ptr<CForceTemplate> &b) {
+			return a->Priority > b->Priority;
+		});
 	}
 
 	if (this->get_parent_civilization() != nullptr) {
@@ -697,8 +688,10 @@ void civilization::process_character_title_name_scope(const character_title titl
 	});
 }
 
-std::vector<CForceTemplate *> civilization::GetForceTemplates(const ForceType force_type) const
+const std::vector<std::unique_ptr<CForceTemplate>> &civilization::GetForceTemplates(const ForceType force_type) const
 {
+	static const std::vector<std::unique_ptr<CForceTemplate>> empty_vector;
+
 	if (force_type == ForceType::None) {
 		fprintf(stderr, "Error in civilization::GetForceTemplates: the force_type is -1.\n");
 	}
@@ -711,10 +704,10 @@ std::vector<CForceTemplate *> civilization::GetForceTemplates(const ForceType fo
 		return this->parent_civilization->GetForceTemplates(force_type);
 	}
 	
-	return std::vector<CForceTemplate *>();
+	return empty_vector;
 }
 
-std::vector<CAiBuildingTemplate *> civilization::GetAiBuildingTemplates() const
+const std::vector<std::unique_ptr<CAiBuildingTemplate>> &civilization::GetAiBuildingTemplates() const
 {
 	if (this->AiBuildingTemplates.size() > 0) {
 		return this->AiBuildingTemplates;
@@ -724,7 +717,7 @@ std::vector<CAiBuildingTemplate *> civilization::GetAiBuildingTemplates() const
 		return this->parent_civilization->GetAiBuildingTemplates();
 	}
 	
-	return std::vector<CAiBuildingTemplate *>();
+	return this->AiBuildingTemplates;
 }
 
 const std::map<gender, std::vector<std::string>> &civilization::get_personal_names() const

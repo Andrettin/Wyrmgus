@@ -447,7 +447,7 @@ static void LoadStratagusMap(const std::string &smpname, const std::string &mapn
 static int WriteMapPresentation(const std::string &mapname, CMap &map, bool is_mod)
 //Wyrmgus end
 {
-	FileWriter *f = nullptr;
+	std::unique_ptr<FileWriter> f;
 
 	const char *type[] = {"", "", "neutral", "nobody",
 						  "computer", "person", "rescue-passive", "rescue-active"
@@ -511,11 +511,9 @@ static int WriteMapPresentation(const std::string &mapname, CMap &map, bool is_m
 		//Wyrmgus end
 	} catch (const FileException &) {
 		fprintf(stderr, "ERROR: cannot write the map presentation\n");
-		delete f;
 		return -1;
 	}
 
-	delete f;
 	return 1;
 }
 
@@ -532,7 +530,7 @@ static int WriteMapPresentation(const std::string &mapname, CMap &map, bool is_m
 int WriteMapSetup(const char *mapSetup, CMap &map, int writeTerrain, bool is_mod)
 //Wyrmgus end
 {
-	FileWriter *f = nullptr;
+	std::unique_ptr<FileWriter> f;
 
 	try {
 		f = CreateFileWriter(mapSetup);
@@ -1053,11 +1051,9 @@ int WriteMapSetup(const char *mapSetup, CMap &map, int writeTerrain, bool is_mod
 		//Wyrmgus end
 	} catch (const FileException &) {
 		fprintf(stderr, "Can't save map setup : '%s' \n", mapSetup);
-		delete f;
 		return -1;
 	}
 
-	delete f;
 	return 1;
 }
 

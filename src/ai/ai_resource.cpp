@@ -2559,7 +2559,7 @@ void AiCheckBuildings()
 		return;
 	}
 
-	std::vector<CAiBuildingTemplate *> building_templates = wyrmgus::faction::get_all()[AiPlayer->Player->Faction]->GetAiBuildingTemplates();
+	const std::vector<std::unique_ptr<CAiBuildingTemplate>> &building_templates = AiPlayer->Player->get_faction()->GetAiBuildingTemplates();
 	std::vector<const CAiBuildingTemplate *> potential_building_templates;
 	
 	int priority = 0;
@@ -2571,7 +2571,7 @@ void AiCheckBuildings()
 		have_counter[unit_class] = -1;
 		have_with_requests_counter[unit_class] = -1;
 	}
-	for (const CAiBuildingTemplate *building_template : building_templates) {
+	for (const auto &building_template : building_templates) {
 		if (building_template->get_priority() < priority) {
 			break; //building templates are ordered by priority, so there is no need to go further
 		}
@@ -2603,7 +2603,7 @@ void AiCheckBuildings()
 			priority = building_template->get_priority();
 			potential_building_templates.clear();
 		}
-		potential_building_templates.push_back(building_template);
+		potential_building_templates.push_back(building_template.get());
 	}
 	
 	if (potential_building_templates.empty()) {
@@ -2612,7 +2612,7 @@ void AiCheckBuildings()
 	
 	const CAiBuildingTemplate *building_template = potential_building_templates[SyncRand(potential_building_templates.size())];
 	
-	wyrmgus::unit_type *unit_type = wyrmgus::faction::get_all()[AiPlayer->Player->Faction]->get_class_unit_type(building_template->get_unit_class());
+	wyrmgus::unit_type *unit_type = AiPlayer->Player->get_faction()->get_class_unit_type(building_template->get_unit_class());
 	
 	if (!AiHelpers.get_builders(unit_type).empty() || !AiHelpers.get_builder_classes(unit_type->get_unit_class()).empty()) { //constructed by worker
 		AiAddUnitTypeRequest(*unit_type, 1);

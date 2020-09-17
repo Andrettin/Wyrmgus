@@ -868,11 +868,11 @@ public:
 /**
 **  Create FileWriter
 */
-FileWriter *CreateFileWriter(const std::string &filename)
+std::unique_ptr<FileWriter> CreateFileWriter(const std::string &filename)
 {
 	if (strcasestr(filename.c_str(), ".gz")) {
-		return new GzFileWriter(filename);
+		return std::make_unique<GzFileWriter>(filename);
 	} else {
-		return new RawFileWriter(filename);
+		return std::make_unique<RawFileWriter>(filename);
 	}
 }

@@ -73,10 +73,9 @@ class CFile;
 class CGraphic;
 //Wyrmgus end
 
-extern void GenerateHistory();
 extern void LoadGame(const std::string &filename); /// Load saved game
 extern int SaveGame(const std::string &filename); /// Save game
-extern void DeleteSaveGame(const std::string &filename); /// Delete save game
+extern void DeleteSaveGame(const std::string &filename);
 extern bool SaveGameLoading;                 /// Save game is in progress of loading
 
 extern void InitModules();              /// Initialize all modules

@@ -118,16 +118,6 @@ faction::faction(const std::string &identifier)
 
 faction::~faction()
 {
-	for (const auto &kv_pair : this->ForceTemplates) {
-		for (size_t i = 0; i < kv_pair.second.size(); ++i) {
-			delete kv_pair.second[i];
-		}
-	}
-	
-	for (size_t i = 0; i < this->AiBuildingTemplates.size(); ++i) {
-		delete this->AiBuildingTemplates[i];
-	}
-
 	if (this->Conditions) {
 		delete Conditions;
 	}
@@ -242,6 +232,16 @@ void faction::initialize()
 {
 	if (this->Type == FactionTypeTribe) {
 		this->DefiniteArticle = true;
+	}
+
+	std::sort(this->AiBuildingTemplates.begin(), this->AiBuildingTemplates.end(), [](const std::unique_ptr<CAiBuildingTemplate> &a, const std::unique_ptr<CAiBuildingTemplate> &b) {
+		return a->get_priority() > b->get_priority();
+	});
+
+	for (auto &kv_pair : this->ForceTemplates) {
+		std::sort(kv_pair.second.begin(), kv_pair.second.end(), [](const std::unique_ptr<CForceTemplate> &a, const std::unique_ptr<CForceTemplate> &b) {
+			return a->Priority > b->Priority;
+		});
 	}
 
 	if (this->ParentFaction != -1) {
@@ -384,7 +384,7 @@ bool faction::uses_simple_name() const
 	return this->simple_name || this->Type != FactionTypePolity;
 }
 
-std::vector<CForceTemplate *> faction::GetForceTemplates(const ForceType force_type) const
+const std::vector<std::unique_ptr<CForceTemplate>> &faction::GetForceTemplates(const ForceType force_type) const
 {
 	if (force_type == ForceType::None) {
 		fprintf(stderr, "Error in faction::GetForceTemplates: the force_type is -1.\n");
@@ -401,7 +401,7 @@ std::vector<CForceTemplate *> faction::GetForceTemplates(const ForceType force_t
 	return this->civilization->GetForceTemplates(force_type);
 }
 
-std::vector<CAiBuildingTemplate *> faction::GetAiBuildingTemplates() const
+const std::vector<std::unique_ptr<CAiBuildingTemplate>> &faction::GetAiBuildingTemplates() const
 {
 	if (this->AiBuildingTemplates.size() > 0) {
 		return this->AiBuildingTemplates;

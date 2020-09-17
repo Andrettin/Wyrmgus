@@ -205,8 +205,8 @@ public:
 	void process_character_title_name_scope(const sml_data &scope);
 	void process_character_title_name_scope(const character_title title_type, const sml_data &scope);
 
-	std::vector<CForceTemplate *> GetForceTemplates(const ForceType force_type) const;
-	std::vector<CAiBuildingTemplate *> GetAiBuildingTemplates() const;
+	const std::vector<std::unique_ptr<CForceTemplate>> &GetForceTemplates(const ForceType force_type) const;
+	const std::vector<std::unique_ptr<CAiBuildingTemplate>> &GetAiBuildingTemplates() const;
 
 	const std::map<gender, std::vector<std::string>> &get_personal_names() const;
 	const std::vector<std::string> &get_personal_names(const gender gender) const;
@@ -319,9 +319,9 @@ private:
 public:
 	std::vector<quest *> Quests;	/// quests belonging to this civilization
 	std::map<const CUpgrade *, int> UpgradePriorities;		/// Priority for each upgrade
-	std::map<ForceType, std::vector<CForceTemplate *>> ForceTemplates;	/// Force templates, mapped to each force type
+	std::map<ForceType, std::vector<std::unique_ptr<CForceTemplate>>> ForceTemplates;	/// Force templates, mapped to each force type
 	std::map<ForceType, int> ForceTypeWeights;	/// Weights for each force type
-	std::vector<CAiBuildingTemplate *> AiBuildingTemplates;	/// AI building templates
+	std::vector<std::unique_ptr<CAiBuildingTemplate>> AiBuildingTemplates;	/// AI building templates
 public:
 	std::vector<std::string> ProvinceNames;		/// Province names for the civilization
 private:
