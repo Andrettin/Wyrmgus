@@ -93,13 +93,12 @@ private:
 #endif
 };
 
-CFile::CFile() : pimpl(new CFile::PImpl)
+CFile::CFile() : pimpl(std::make_unique<CFile::PImpl>())
 {
 }
 
 CFile::~CFile()
 {
-	delete pimpl;
 }
 
 

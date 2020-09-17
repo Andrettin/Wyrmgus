@@ -117,7 +117,7 @@ private:
 	const CFile &operator = (const CFile &rhs); // No implementation
 private:
 	class PImpl;
-	PImpl *pimpl;
+	std::unique_ptr<PImpl> pimpl;
 };
 
 enum {

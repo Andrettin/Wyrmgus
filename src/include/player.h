@@ -338,7 +338,7 @@ public:
 private:
 	bool revealed = false; //whether the player has been revealed (i.e. after losing the last town hall)
 public:
-	PlayerAi *Ai = nullptr;          /// Ai structure pointer
+	std::unique_ptr<PlayerAi> Ai;          /// Ai structure pointer
 
 	int NumBuildings = 0;   /// # buildings
 	//Wyrmgus start

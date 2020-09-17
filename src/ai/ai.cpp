@@ -174,7 +174,7 @@
 
 int AiSleepCycles;              /// Ai sleeps # cycles
 
-std::vector<CAiType *> AiTypes; /// List of all AI types.
+std::vector<std::unique_ptr<CAiType>> AiTypes; /// List of all AI types.
 AiHelper AiHelpers;             /// AI helper variables
 
 PlayerAi *AiPlayer;             /// Current AI player
@@ -659,7 +659,7 @@ void SaveAi(CFile &file)
 */
 void AiInit(CPlayer &player)
 {
-	PlayerAi *pai = new PlayerAi;
+	auto pai = std::make_unique<PlayerAi>();
 
 	if (!pai) {
 		fprintf(stderr, "Out of memory.\n");
@@ -677,23 +677,21 @@ void AiInit(CPlayer &player)
 		DebugPrint("AI: Look at the DefineAi() documentation.\n");
 		Exit(0);
 	}
-	size_t i;
+
 	CAiType *ait = nullptr;
 
-	for (i = 0; i < AiTypes.size(); ++i) {
-		ait = AiTypes[i];
+	for (const std::unique_ptr<CAiType> &ai_type : AiTypes) {
 		if (!ait->Race.empty() && ait->Race != wyrmgus::civilization::get_all()[player.Race]->get_identifier()) {
 			continue;
 		}
 		if (!player.AiName.empty() && ait->Name != player.AiName) {
 			continue;
 		}
+		ait = ai_type.get();
 		break;
 	}
-	if (i == AiTypes.size()) {
-		DebugPrint("AI: Found no matching ai scripts at all!\n");
-		// FIXME: surely we can do something better than exit
-		exit(0);
+	if (ait == nullptr) {
+		throw std::runtime_error("AI: Found no matching ai scripts at all!");
 	}
 	if (player.AiName.empty()) {
 		DebugPrint("AI: not found!!!!!!!!!!\n");
@@ -716,7 +714,7 @@ void AiInit(CPlayer &player)
 	pai->Collect[StoneCost] = 10;
 	//Wyrmgus end
 
-	player.Ai = pai;
+	player.Ai = std::move(pai);
 }
 
 /**
@@ -733,8 +731,7 @@ void InitAiModule()
 void CleanAi()
 {
 	for (int p = 0; p < PlayerMax; ++p) {
-		delete CPlayer::Players[p]->Ai;
-		CPlayer::Players[p]->Ai = nullptr;
+		CPlayer::Players[p]->Ai.reset();
 	}
 }
 
@@ -746,11 +743,6 @@ void FreeAi()
 	CleanAi();
 
 	//  Free AiTypes.
-	for (unsigned int i = 0; i < AiTypes.size(); ++i) {
-		CAiType *aitype = AiTypes[i];
-
-		delete aitype;
-	}
 	AiTypes.clear();
 
 	//  Free AiHelpers.
@@ -1206,7 +1198,7 @@ void AiWorkComplete(CUnit *unit, CUnit &what)
 	Assert(what.Player->Type != PlayerPerson);
 	//Wyrmgus start
 //	AiRemoveFromBuilt(what.Player->Ai, *what.Type);
-	AiRemoveFromBuilt(what.Player->Ai, *what.Type, CMap::Map.GetTileLandmass(what.tilePos, what.MapLayer->ID), what.settlement);
+	AiRemoveFromBuilt(what.Player->Ai.get(), *what.Type, CMap::Map.GetTileLandmass(what.tilePos, what.MapLayer->ID), what.settlement);
 	//Wyrmgus end
 }
 
@@ -1254,7 +1246,7 @@ static void AiMoveUnitInTheWay(CUnit &unit)
 	Vec2i movablepos[16];
 	int movablenb;
 
-	AiPlayer = unit.Player->Ai;
+	AiPlayer = unit.Player->Ai.get();
 
 	// No more than 1 move per 10 cycle ( avoid stressing the pathfinder )
 	if (GameCycle <= AiPlayer->LastCanNotMoveGameCycle + 10) {
@@ -1382,7 +1374,7 @@ void AiCanNotMove(CUnit &unit)
 	const int gw = unit.pathFinderData->input.GetGoalSize().x;
 	const int gh = unit.pathFinderData->input.GetGoalSize().y;
 
-	AiPlayer = unit.Player->Ai;
+	AiPlayer = unit.Player->Ai.get();
 	if (PlaceReachable(unit, goalPos, gw, gh, 0, MaxMapWidth - 1, 0, unit.MapLayer->ID)) {
 		// Path probably closed by unit here
 		AiMoveUnitInTheWay(unit);
@@ -1425,11 +1417,11 @@ void AiTrainingComplete(CUnit &unit, CUnit &what)
 	//Wyrmgus start
 //	AiRemoveFromBuilt(unit.Player->Ai, *what.Type);
 	if (unit.Player == what.Player) {
-		AiRemoveFromBuilt(what.Player->Ai, *what.Type, CMap::Map.GetTileLandmass(what.tilePos, what.MapLayer->ID), what.settlement);
+		AiRemoveFromBuilt(what.Player->Ai.get(), *what.Type, CMap::Map.GetTileLandmass(what.tilePos, what.MapLayer->ID), what.settlement);
 	} else { //remove the request of the unit the mercenary is substituting
 		wyrmgus::unit_type *requested_unit_type = wyrmgus::faction::get_all()[what.Player->Faction]->get_class_unit_type(what.Type->get_unit_class());
 		if (requested_unit_type != nullptr) {
-			AiRemoveFromBuilt(what.Player->Ai, *requested_unit_type, CMap::Map.GetTileLandmass(what.tilePos, what.MapLayer->ID), what.settlement);
+			AiRemoveFromBuilt(what.Player->Ai.get(), *requested_unit_type, CMap::Map.GetTileLandmass(what.tilePos, what.MapLayer->ID), what.settlement);
 		}
 	}
 	//Wyrmgus end
@@ -1487,7 +1479,7 @@ void AiResearchComplete(CUnit &unit, const CUpgrade *what)
 */
 void AiEachCycle(CPlayer &player)
 {
-	AiPlayer = player.Ai;
+	AiPlayer = player.Ai.get();
 }
 
 /**
@@ -1497,7 +1489,7 @@ void AiEachCycle(CPlayer &player)
 */
 void AiEachSecond(CPlayer &player)
 {
-	AiPlayer = player.Ai;
+	AiPlayer = player.Ai.get();
 #ifdef DEBUG
 	if (!AiPlayer) {
 		return;
@@ -1545,7 +1537,7 @@ void AiEachSecond(CPlayer &player)
 */
 void AiEachHalfMinute(CPlayer &player)
 {
-	AiPlayer = player.Ai;
+	AiPlayer = player.Ai.get();
 #ifdef DEBUG
 	if (!AiPlayer) {
 		return;
@@ -1570,7 +1562,7 @@ void AiEachHalfMinute(CPlayer &player)
 */
 void AiEachMinute(CPlayer &player)
 {
-	AiPlayer = player.Ai;
+	AiPlayer = player.Ai.get();
 #ifdef DEBUG
 	if (!AiPlayer) {
 		return;

@@ -1121,30 +1121,24 @@ public:
 //	BestRangeTargetFinder(const CUnit &a, const int r) : attacker(&a), range(r),
 	BestRangeTargetFinder(const CUnit &a, const int r, const bool i_n) : attacker(&a), range(r), include_neutral(i_n),
 	//Wyrmgus end
-		best_unit(0), best_cost(INT_MIN), size((a.GetMissile().Missile->get_range() + r) * 2)
+		size((a.GetMissile().Missile->get_range() + r) * 2)
 	{
-		good = new std::vector<int>(size * size, 0);
-		bad = new std::vector<int>(size * size, 0);
-	};
+		this->good = std::vector<int>(size * size, 0);
+		this->bad = std::vector<int>(size * size, 0);
+	}
 	
-	~BestRangeTargetFinder()
-	{
-		delete good;
-		delete bad;
-	};
-
 	class FillBadGood
 	{
 	public:
 		//Wyrmgus start
 //		FillBadGood(const CUnit &a, int r, std::vector<int> *g, std::vector<int> *b, int s):
-		FillBadGood(const CUnit &a, int r, std::vector<int> *g, std::vector<int> *b, int s, bool i_n):
+		FillBadGood(const CUnit &a, int r, std::vector<int> &g, std::vector<int> &b, int s, bool i_n):
 		//Wyrmgus end
 			attacker(&a), range(r), size(s),
 			//Wyrmgus start
 			include_neutral(i_n),
 			//Wyrmgus end
-			enemy_count(0), good(g), bad(b)
+			good(g), bad(b)
 		{
 		}
 
@@ -1296,7 +1290,7 @@ public:
 			for (int yy = 0; yy < dtype.get_tile_height(); ++yy) {
 				for (int xx = 0; xx < dtype.get_tile_width(); ++xx) {
 					int pos = (y + yy) * (size / 2) + (x + xx);
-					if (pos >= (int) good->size()) {
+					if (pos >= (int) good.size()) {
 						printf("BUG: RangeTargetFinder::FillBadGood.Compute out of range. "\
 							"size: %d, pos: %d, " \
 							"x: %d, xx: %d, y: %d, yy: %d",
@@ -1304,9 +1298,9 @@ public:
 						break;
 					}
 					if (cost < 0) {
-						good->at(pos) -= cost;
+						good.at(pos) -= cost;
 					} else {
-						bad->at(pos) += cost;
+						bad.at(pos) += cost;
 					}
 				}
 			}
@@ -1316,9 +1310,9 @@ public:
 	private:
 		const CUnit *attacker;
 		const int range;
-		int enemy_count;
-		std::vector<int> *good;
-		std::vector<int> *bad;
+		int enemy_count = 0;
+		std::vector<int> &good;
+		std::vector<int> &bad;
 		const int size;
 		//Wyrmgus start
 		const bool include_neutral;
@@ -1394,15 +1388,15 @@ private:
 			for (int xx = -1; xx <= 1; ++xx) {
 				int pos = (y + yy) * (size / 2) + (x + xx);
 				int localFactor = (!xx && !yy) ? 1 : splashFactor;
-				if (pos >= (int) good->size()) {
+				if (pos >= (int) good.size()) {
 					printf("BUG: RangeTargetFinder.Compute out of range. " \
 						"size: %d, pos: %d, "	\
 						"x: %d, xx: %d, y: %d, yy: %d",
 						size, pos, x, xx, y, yy);
 					break;
 				}
-				sbad += bad->at(pos) / localFactor;
-				sgood += good->at(pos) / localFactor;
+				sbad += bad.at(pos) / localFactor;
+				sgood += good.at(pos) / localFactor;
 			}
 		}
 
@@ -1422,10 +1416,10 @@ private:
 private:
 	const CUnit *attacker;
 	const int range;
-	CUnit *best_unit;
-	int best_cost;
-	std::vector<int> *good;
-	std::vector<int> *bad;
+	CUnit *best_unit = nullptr;
+	int best_cost = INT_MIN;
+	std::vector<int> good;
+	std::vector<int> bad;
 	const int size;
 	//Wyrmgus start
 	const bool include_neutral;

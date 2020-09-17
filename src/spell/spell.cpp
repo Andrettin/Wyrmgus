@@ -69,9 +69,9 @@
 **
 **  @return the new target.
 */
-static Target *NewTargetUnit(CUnit &unit)
+static std::unique_ptr<Target> NewTargetUnit(CUnit &unit)
 {
-	return new Target(wyrmgus::spell_target_type::unit, &unit, unit.tilePos, unit.MapLayer->ID);
+	return std::make_unique<Target>(wyrmgus::spell_target_type::unit, &unit, unit.tilePos, unit.MapLayer->ID);
 }
 
 // ****************************************************************************
@@ -539,7 +539,7 @@ bool spell::is_caster_only() const
 **	@todo FIXME: should be global (for AI) ???
 **	@todo FIXME: write for position target.
 */
-static Target *SelectTargetUnitsOfAutoCast(CUnit &caster, const wyrmgus::spell &spell)
+static std::unique_ptr<Target> SelectTargetUnitsOfAutoCast(CUnit &caster, const wyrmgus::spell &spell)
 {
 	const AutoCastInfo *autocast = spell.get_autocast_info(caster.Player->AiEnabled);
 	Assert(autocast);
@@ -586,8 +586,7 @@ static Target *SelectTargetUnitsOfAutoCast(CUnit &caster, const wyrmgus::spell &
 			autocast->PositionAutoCast->run(2);
 			Vec2i resPos(autocast->PositionAutoCast->popInteger(), autocast->PositionAutoCast->popInteger());
 			if (CMap::Map.Info.IsPointOnMap(resPos, map_layer)) {
-				Target *target = new Target(wyrmgus::spell_target_type::position, nullptr, resPos, map_layer->ID);
-				return target;
+				return std::make_unique<Target>(wyrmgus::spell_target_type::position, nullptr, resPos, map_layer->ID);
 			}
 		}
 	} else if (spell.get_target() == wyrmgus::spell_target_type::unit) {
@@ -655,7 +654,7 @@ int AutoCastSpell(CUnit &caster, const wyrmgus::spell &spell)
 	if (!caster.CanAutoCastSpell(&spell)) {
 		return 0;
 	}
-	Target *target = SelectTargetUnitsOfAutoCast(caster, spell);
+	std::unique_ptr<Target> target = SelectTargetUnitsOfAutoCast(caster, spell);
 	if (target == nullptr) {
 		return 0;
 	} else {
@@ -666,7 +665,6 @@ int AutoCastSpell(CUnit &caster, const wyrmgus::spell &spell)
 		}
 		// Must move before ?
 		CommandSpellCast(caster, target->targetPos, target->Unit, spell, FlushCommands, target->MapLayer, true);
-		delete target;
 		if (savedOrder != nullptr) {
 			caster.SavedOrder = savedOrder;
 		}

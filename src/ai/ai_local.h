@@ -649,7 +649,7 @@ public:
 	friend void InitAiHelper(AiHelper &aiHelper);
 };
 
-extern std::vector<CAiType *> AiTypes;   /// List of all AI types
+extern std::vector<std::unique_ptr<CAiType>> AiTypes;   /// List of all AI types
 extern AiHelper AiHelpers; /// AI helper variables
 
 extern int UnitTypeEquivs[UnitTypeMax + 1]; /// equivalence between unittypes

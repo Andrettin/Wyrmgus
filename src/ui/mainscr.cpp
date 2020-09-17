@@ -999,13 +999,12 @@ void DrawPopups()
 						unit_name += " (" + UnitUnderCursor->Player->Name + ")";
 					}
 					//hackish way to make the popup appear correctly for the unit under cursor
-					wyrmgus::button *ba = new wyrmgus::button;
-					ba->Hint = unit_name;
-					ba->Action = ButtonCmd::Unit;
-					ba->Value = UnitNumber(*UnitUnderCursor);
-					ba->Popup = "popup_unit_under_cursor";
-					DrawPopup(*ba, unit_center_pos.x, unit_center_pos.y);
-					delete ba;
+					wyrmgus::button ba;
+					ba.Hint = unit_name;
+					ba.Action = ButtonCmd::Unit;
+					ba.Value = UnitNumber(*UnitUnderCursor);
+					ba.Popup = "popup_unit_under_cursor";
+					DrawPopup(ba, unit_center_pos.x, unit_center_pos.y);
 					LastDrawnButtonPopup = nullptr;
 				} else if (mf.get_terrain_feature() != nullptr) {
 					if (UI.get_tooltip_cycle_count() >= UI.get_tooltip_cycle_threshold()) {
@@ -1057,22 +1056,21 @@ void DrawPopups()
 				if (ButtonAreaUnderCursor == ButtonAreaInventory
 					&& static_cast<size_t>(ButtonUnderCursor) == j) {
 					//hackish way to make the popup appear correctly for the inventory item
-					wyrmgus::button *ba = new wyrmgus::button;
+					wyrmgus::button ba;
 					if (!uins->Name.empty() && uins->Identified) {
-						ba->Hint = uins->Name;
+						ba.Hint = uins->Name;
 					} else {
-						ba->Hint = uins->GetTypeName();
+						ba.Hint = uins->GetTypeName();
 						if (!uins->Identified) {
-							ba->Hint += " (Unidentified)";
+							ba.Hint += " (Unidentified)";
 						}
 					}
-					ba->pos = j;
-					ba->level = wyrmgus::defines::get()->get_inventory_button_level();
-					ba->Action = ButtonCmd::Unit;
-					ba->Value = UnitNumber(*uins);
-					ba->Popup = "popup_item_inventory";
-					DrawPopup(*ba, UI.InventoryButtons[j].X, UI.InventoryButtons[j].Y);
-					delete ba;
+					ba.pos = j;
+					ba.level = wyrmgus::defines::get()->get_inventory_button_level();
+					ba.Action = ButtonCmd::Unit;
+					ba.Value = UnitNumber(*uins);
+					ba.Popup = "popup_item_inventory";
+					DrawPopup(ba, UI.InventoryButtons[j].X, UI.InventoryButtons[j].Y);
 					LastDrawnButtonPopup = nullptr;
 				}
 				++j;
@@ -1975,13 +1973,12 @@ static void InfoPanel_draw_single_selection(CUnit *selUnit)
 //		UI.StatusLine.Set(unit.Type->Name);
 		
 		//hackish way to make the popup appear correctly for the single selected unit
-		wyrmgus::button *ba = new wyrmgus::button;
-		ba->Hint = unit.GetMessageName();
-		ba->Action = ButtonUnit;
-		ba->Value = UnitNumber(unit);
-		ba->Popup = "popup_unit";
-		DrawPopup(*ba, UI.SingleSelectedButton->X, UI.SingleSelectedButton->Y);
-		delete ba;
+		wyrmgus::button ba;
+		ba.Hint = unit.GetMessageName();
+		ba.Action = ButtonUnit;
+		ba.Value = UnitNumber(unit);
+		ba.Popup = "popup_unit";
+		DrawPopup(ba, UI.SingleSelectedButton->X, UI.SingleSelectedButton->Y);
 		LastDrawnButtonPopup = nullptr;
 		//Wyrmgus end
 	}

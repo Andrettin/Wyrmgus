@@ -581,10 +581,9 @@ static int CclDefineAiHelper(lua_State *l)
 
 static CAiType *GetAiTypesByName(const char *name)
 {
-	for (size_t i = 0; i < AiTypes.size(); ++i) {
-		CAiType *ait = AiTypes[i];
+	for (const std::unique_ptr<CAiType> &ait : AiTypes) {
 		if (ait->Name == name) {
-			return ait;
+			return ait.get();
 		}
 	}
 	return nullptr;
@@ -604,7 +603,7 @@ static int CclDefineAi(lua_State *l)
 		LuaError(l, "incorrect argument");
 	}
 
-	CAiType *aitype = new CAiType;
+	auto aitype = std::make_unique<CAiType>();
 
 	// AI Name
 	const char *aiName = LuaToString(l, 1);
@@ -615,7 +614,6 @@ static int CclDefineAi(lua_State *l)
 		DebugPrint("Warning two or more AI's with the same name '%s'\n" _C_ aiName);
 	}
 #endif
-	AiTypes.insert(AiTypes.begin(), aitype);
 
 	// AI Race
 	const char *value = LuaToString(l, 2);
@@ -641,6 +639,8 @@ static int CclDefineAi(lua_State *l)
 	lua_pushvalue(l, 4);
 	lua_rawset(l, 5);
 	lua_pop(l, 1);
+
+	AiTypes.insert(AiTypes.begin(), std::move(aitype));
 
 	return 0;
 }
@@ -1521,11 +1521,12 @@ static int CclDefineAiPlayer(lua_State *l)
 	const unsigned int playerIdx = LuaToNumber(l, 0 + 1);
 
 	Assert(playerIdx <= PlayerMax);
-	DebugPrint("%p %d\n" _C_(void *)CPlayer::Players[playerIdx]->Ai _C_ CPlayer::Players[playerIdx]->AiEnabled);
+	DebugPrint("%p %d\n" _C_(void *)CPlayer::Players[playerIdx]->Ai.get() _C_ CPlayer::Players[playerIdx]->AiEnabled);
 	// FIXME: lose this:
 	// Assert(!Players[playerIdx].Ai && Players[playerIdx].AiEnabled);
 
-	PlayerAi *ai = CPlayer::Players[playerIdx]->Ai = new PlayerAi;
+	CPlayer::Players[playerIdx]->Ai = std::make_unique<PlayerAi>();
+	PlayerAi *ai = CPlayer::Players[playerIdx]->Ai.get();
 	ai->Player = CPlayer::Players[playerIdx];
 
 	// Parse the list: (still everything could be changed!)
