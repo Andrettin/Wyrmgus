@@ -681,10 +681,10 @@ void AiInit(CPlayer &player)
 	CAiType *ait = nullptr;
 
 	for (const std::unique_ptr<CAiType> &ai_type : AiTypes) {
-		if (!ait->Race.empty() && ait->Race != wyrmgus::civilization::get_all()[player.Race]->get_identifier()) {
+		if (!ai_type->Race.empty() && ai_type->Race != wyrmgus::civilization::get_all()[player.Race]->get_identifier()) {
 			continue;
 		}
-		if (!player.AiName.empty() && ait->Name != player.AiName) {
+		if (!player.AiName.empty() && ai_type->Name != player.AiName) {
 			continue;
 		}
 		ait = ai_type.get();
