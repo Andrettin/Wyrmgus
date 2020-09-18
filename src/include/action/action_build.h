@@ -35,37 +35,40 @@ namespace wyrmgus {
 	class site;
 }
 
-class COrder_Build : public COrder
+class COrder_Build final : public COrder
 {
-	friend COrder *COrder::NewActionBuild(const CUnit &builder, const Vec2i &pos, wyrmgus::unit_type &building, int z, const wyrmgus::site *settlement);
+	friend std::unique_ptr<COrder> COrder::NewActionBuild(const CUnit &builder, const Vec2i &pos, wyrmgus::unit_type &building, int z, const wyrmgus::site *settlement);
 public:
-	COrder_Build() : COrder(UnitAction::Build), Type(nullptr), State(0), Range(0), MapLayer(0)
+	COrder_Build() : COrder(UnitAction::Build)
 	{
 		goalPos.x = -1;
 		goalPos.y = -1;
 	}
 
-	virtual COrder_Build *Clone() const { return new COrder_Build(*this); }
+	virtual std::unique_ptr<COrder> Clone() const override
+	{
+		return std::make_unique<COrder_Build>(*this);
+	}
 
-	virtual bool IsValid() const;
+	virtual bool IsValid() const override;
 
-	virtual void Save(CFile &file, const CUnit &unit) const;
-	virtual bool ParseSpecificData(lua_State *l, int &j, const char *value, const CUnit &unit);
+	virtual void Save(CFile &file, const CUnit &unit) const override;
+	virtual bool ParseSpecificData(lua_State *l, int &j, const char *value, const CUnit &unit) override;
 
-	virtual void Execute(CUnit &unit);
-	virtual PixelPos Show(const CViewport &vp, const PixelPos &lastScreenPos) const;
-	virtual void UpdatePathFinderData(PathFinderInput &input);
+	virtual void Execute(CUnit &unit) override;
+	virtual PixelPos Show(const CViewport &vp, const PixelPos &lastScreenPos) const override;
+	virtual void UpdatePathFinderData(PathFinderInput &input) override;
 	
 	//Wyrmgus start
 	void ConvertUnitType(const CUnit &unit, wyrmgus::unit_type &newType);
 	//Wyrmgus end
 
-	virtual void AiUnitKilled(CUnit &unit);
+	virtual void AiUnitKilled(CUnit &unit) override;
 
 	const wyrmgus::unit_type &GetUnitType() const { return *Type; }
-	virtual const Vec2i GetGoalPos() const { return goalPos; }
+	virtual const Vec2i GetGoalPos() const override { return goalPos; }
 	//Wyrmgus start
-	virtual const int GetGoalMapLayer() const { return MapLayer; }
+	virtual const int GetGoalMapLayer() const override { return MapLayer; }
 	//Wyrmgus end
 
 private:
@@ -74,14 +77,15 @@ private:
 	bool StartBuilding(CUnit &unit, CUnit &ontop);
 	bool BuildFromOutside(CUnit &unit) const;
 	void HelpBuild(CUnit &unit, CUnit &building);
+
 private:
-	wyrmgus::unit_type *Type;        /// build a unit of this unit-type
+	wyrmgus::unit_type *Type = nullptr;        /// build a unit of this unit-type
 	CUnitPtr BuildingUnit;  /// unit builded.
-	int State;
-	int Range;
+	int State = 0;
+	int Range = 0;
 	Vec2i goalPos;
 	//Wyrmgus start
-	int MapLayer;
+	int MapLayer = 0;
 	const wyrmgus::site *settlement = nullptr;
 	//Wyrmgus end
 };

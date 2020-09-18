@@ -49,9 +49,9 @@
 #include "unit/unit_type_type.h"
 #include "video/video.h"
 
-COrder *COrder::NewActionUnload(const Vec2i &pos, CUnit *what, int z, int landmass)
+std::unique_ptr<COrder> COrder::NewActionUnload(const Vec2i &pos, CUnit *what, int z, int landmass)
 {
-	COrder_Unload *order = new COrder_Unload;
+	auto order = std::make_unique<COrder_Unload>();
 
 	order->goalPos = pos;
 	//Wyrmgus start

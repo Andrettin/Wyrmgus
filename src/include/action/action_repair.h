@@ -31,43 +31,44 @@
 
 #include "actions.h"
 
-class COrder_Repair : public COrder
+class COrder_Repair final : public COrder
 {
-	friend COrder *COrder::NewActionRepair(CUnit &unit, CUnit &target);
+	friend std::unique_ptr<COrder> COrder::NewActionRepair(CUnit &unit, CUnit &target);
 	//Wyrmgus start
-//	friend COrder *COrder::NewActionRepair(const Vec2i &pos);
-	friend COrder *COrder::NewActionRepair(const Vec2i &pos, int z);
+//	friend std::unique_ptr<COrder> COrder::NewActionRepair(const Vec2i &pos);
+	friend std::unique_ptr<COrder> COrder::NewActionRepair(const Vec2i &pos, int z);
 	//Wyrmgus end
 public:
-	//Wyrmgus start
-//	COrder_Repair() : COrder(UnitAction::Repair), State(0), RepairCycle(0)
-	COrder_Repair() : COrder(UnitAction::Repair), State(0), RepairCycle(0), MapLayer(0)
-	//Wyrmgus end
+	COrder_Repair() : COrder(UnitAction::Repair)
 	{
 		goalPos.x = -1;
 		goalPos.y = -1;
 	}
 
-	virtual COrder_Repair *Clone() const { return new COrder_Repair(*this); }
+	virtual std::unique_ptr<COrder> Clone() const override
+	{
+		return std::make_unique<COrder_Repair>(*this);
+	}
 
-	virtual bool IsValid() const;
+	virtual bool IsValid() const override;
 
-	virtual void Save(CFile &file, const CUnit &unit) const;
-	virtual bool ParseSpecificData(lua_State *l, int &j, const char *value, const CUnit &unit);
+	virtual void Save(CFile &file, const CUnit &unit) const override;
+	virtual bool ParseSpecificData(lua_State *l, int &j, const char *value, const CUnit &unit) override;
 
-	virtual void Execute(CUnit &unit);
-	virtual PixelPos Show(const CViewport &vp, const PixelPos &lastScreenPos) const;
-	virtual void UpdatePathFinderData(PathFinderInput &input);
+	virtual void Execute(CUnit &unit) override;
+	virtual PixelPos Show(const CViewport &vp, const PixelPos &lastScreenPos) const override;
+	virtual void UpdatePathFinderData(PathFinderInput &input) override;
 
 	const CUnitPtr &GetReparableTarget() const { return ReparableTarget; }
 private:
 	bool RepairUnit(const CUnit &unit, CUnit &goal);
+
 private:
 	CUnitPtr ReparableTarget;
-	unsigned int State;
-	unsigned int RepairCycle;
+	unsigned int State = 0;
+	unsigned int RepairCycle = 0;
 	Vec2i goalPos;
 	//Wyrmgus start
-	int MapLayer;
+	int MapLayer = 0;
 	//Wyrmgus end
 };

@@ -59,9 +59,9 @@ enum {
 	State_TargetReached = 128,
 };
 
-COrder *COrder::NewActionUse(CUnit &dest)
+std::unique_ptr<COrder> COrder::NewActionUse(CUnit &dest)
 {
-	COrder_Use *order = new COrder_Use;
+	auto order = std::make_unique<COrder_Use>();
 
 	// Destination could be killed.
 	// Should be handled in action, but is not possible!
@@ -181,7 +181,7 @@ COrder *COrder::NewActionUse(CUnit &dest)
 	CUnit *goal = this->GetGoal();
 
 	// Reached target
-	if (this->State == State_TargetReached || (goal && goal->Container == &unit) || this == unit.CriticalOrder) {
+	if (this->State == State_TargetReached || (goal && goal->Container == &unit) || this == unit.CriticalOrder.get()) {
 
 		if (!goal || (!goal->IsVisibleAsGoal(*unit.Player) && goal->Container != &unit)) {
 			DebugPrint("Goal gone\n");
@@ -353,8 +353,7 @@ COrder *COrder::NewActionUse(CUnit &dest)
 				} else {
 					if (dest.NewOrder->HasGoal()) {
 						if (dest.NewOrder->GetGoal()->Destroyed) {
-							delete dest.NewOrder;
-							dest.NewOrder = nullptr;
+							dest.NewOrder.reset();
 							this->Finished = true;
 							return ;
 						}

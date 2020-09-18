@@ -71,14 +71,14 @@ enum {
 	SUB_STILL_ATTACK
 };
 
-/* static */ COrder *COrder::NewActionStandGround()
+std::unique_ptr<COrder> COrder::NewActionStandGround()
 {
-	return new COrder_Still(true);
+	return std::make_unique<COrder_Still>(true);
 }
 
-/* static */ COrder *COrder::NewActionStill()
+std::unique_ptr<COrder> COrder::NewActionStill()
 {
-	return new COrder_Still(false);
+	return std::make_unique<COrder_Still>(false);
 }
 
 
@@ -404,15 +404,15 @@ bool AutoRepair(CUnit &unit)
 		return false;
 	}
 	const Vec2i invalidPos(-1, -1);
-	COrder *savedOrder = nullptr;
+	std::unique_ptr<COrder> saved_order;
 	if (unit.CanStoreOrder(unit.CurrentOrder())) {
-		savedOrder = unit.CurrentOrder()->Clone();
+		saved_order = unit.CurrentOrder()->Clone();
 	}
 
 	//Command* will clear unit.SavedOrder
 	CommandRepair(unit, invalidPos, repairedUnit, FlushCommands, repairedUnit->MapLayer->ID);
-	if (savedOrder != nullptr) {
-		unit.SavedOrder = savedOrder;
+	if (saved_order != nullptr) {
+		unit.SavedOrder = std::move(saved_order);
 	}
 	return true;
 }
@@ -482,22 +482,24 @@ bool AutoAttack(CUnit &unit)
 	if (goal == nullptr) {
 		return false;
 	}
-	COrder *savedOrder = nullptr;
+
+	std::unique_ptr<COrder> saved_order;
 
 	if (unit.CurrentAction() == UnitAction::Still) {
 		//Wyrmgus start
-//		savedOrder = COrder::NewActionAttack(unit, unit.tilePos);
-		savedOrder = COrder::NewActionAttack(unit, unit.tilePos, unit.MapLayer->ID);
+//		saved_order = COrder::NewActionAttack(unit, unit.tilePos);
+		saved_order = COrder::NewActionAttack(unit, unit.tilePos, unit.MapLayer->ID);
 		//Wyrmgus end
 	} else if (unit.CanStoreOrder(unit.CurrentOrder())) {
-		savedOrder = unit.CurrentOrder()->Clone();
+		saved_order = unit.CurrentOrder()->Clone();
 	}
 	// Weak goal, can choose other unit, come back after attack
 	CommandAttack(unit, goal->tilePos, nullptr, FlushCommands, goal->MapLayer->ID);
 
-	if (savedOrder != nullptr) {
-		unit.SavedOrder = savedOrder;
+	if (saved_order != nullptr) {
+		unit.SavedOrder = std::move(saved_order);
 	}
+
 	return true;
 }
 

@@ -50,8 +50,6 @@ class PathFinderData;
 enum class UnitAction : char;
 struct lua_State;
 
-typedef COrder *COrderPtr;
-
 namespace wyrmgus {
 	class animation_set;
 	class character;
@@ -115,14 +113,15 @@ static constexpr int NextDirection = 32;        /// Next direction N->NE->E...
 class CUnit
 {
 public:
-	//Wyrmgus start
-//	CUnit() : tilePos(-1, -1), pathFinderData(nullptr), SavedOrder(nullptr), NewOrder(nullptr), CriticalOrder(nullptr) { Init(); }
-	CUnit() : tilePos(-1, -1), RallyPointPos(-1, -1), MapLayer(nullptr), RallyPointMapLayer(nullptr), pathFinderData(nullptr), SavedOrder(nullptr), NewOrder(nullptr), CriticalOrder(nullptr) { Init(); }
-	//Wyrmgus end
+	CUnit();
+	~CUnit();
 
 	void Init();
 
-	COrder *CurrentOrder() const { return Orders[0]; }
+	COrder *CurrentOrder() const
+	{
+		return this->Orders.front().get();
+	}
 
 	UnitAction CurrentAction() const;
 
@@ -542,11 +541,11 @@ public:
 	std::vector<CUnit *> SoldUnits;						/// units available for sale at this unit
 	//Wyrmgus end
 	
-	Vec2i tilePos; /// Map position X
+	Vec2i tilePos = Vec2i(-1, -1); /// Map position X
 	//Wyrmgus start
-	Vec2i RallyPointPos;			/// used for storing the rally point position (where units trained by this unit will be sent to)
-	CMapLayer *MapLayer;			/// in which map layer the unit is
-	CMapLayer *RallyPointMapLayer;	/// in which map layer the unit's rally point is
+	Vec2i RallyPointPos = Vec2i(-1, -1);			/// used for storing the rally point position (where units trained by this unit will be sent to)
+	CMapLayer *MapLayer = nullptr;			/// in which map layer the unit is
+	CMapLayer *RallyPointMapLayer = nullptr;	/// in which map layer the unit's rally point is
 	//Wyrmgus end
 
 	unsigned int Offset;/// Map position as flat index offset (x + y * w)
@@ -557,7 +556,7 @@ public:
 	int         CurrentSightRange; /// Unit's Current Sight Range
 
 	// Pathfinding stuff:
-	PathFinderData *pathFinderData;
+	PathFinderData *pathFinderData = nullptr;
 
 	// DISPLAY:
 	int         Frame;      /// Image frame: <0 is mirrored
@@ -653,10 +652,10 @@ public:
 	} Anim, WaitBackup;
 
 
-	std::vector<COrder *> Orders; /// orders to process
-	COrder *SavedOrder;         /// order to continue after current
-	COrder *NewOrder;           /// order for new trained units
-	COrder *CriticalOrder;      /// order to do as possible in breakable animation.
+	std::vector<std::unique_ptr<COrder>> Orders; /// orders to process
+	std::unique_ptr<COrder> SavedOrder;         /// order to continue after current
+	std::unique_ptr<COrder> NewOrder;           /// order for new trained units
+	std::unique_ptr<COrder> CriticalOrder;      /// order to do as possible in breakable animation.
 
 private:
 	std::vector<const wyrmgus::spell *> autocast_spells; //the list of autocast spells

@@ -31,27 +31,35 @@
 
 #include "actions.h"
 
-class COrder_Built : public COrder
+class COrder_Built final : public COrder
 {
-	friend COrder *COrder::NewActionBuilt(CUnit &builder, CUnit &unit);
+	friend std::unique_ptr<COrder> COrder::NewActionBuilt(CUnit &builder, CUnit &unit);
 public:
-	COrder_Built() : COrder(UnitAction::Built) {}
+	COrder_Built() : COrder(UnitAction::Built)
+	{
+	}
 
-	virtual COrder_Built *Clone() const { return new COrder_Built(*this); }
+	virtual std::unique_ptr<COrder> Clone() const override
+	{
+		return std::make_unique<COrder_Built>(*this);
+	}
 
-	virtual bool IsValid() const;
+	virtual bool IsValid() const override;
 
-	virtual void Save(CFile &file, const CUnit &unit) const;
-	virtual bool ParseSpecificData(lua_State *l, int &j, const char *value, const CUnit &unit);
+	virtual void Save(CFile &file, const CUnit &unit) const override;
+	virtual bool ParseSpecificData(lua_State *l, int &j, const char *value, const CUnit &unit) override;
 
-	virtual void Execute(CUnit &unit);
-	virtual void Cancel(CUnit &unit);
-	virtual PixelPos Show(const CViewport &vp, const PixelPos &lastScreenPos) const;
-	virtual void UpdatePathFinderData(PathFinderInput &input) { UpdatePathFinderData_NotCalled(input); }
+	virtual void Execute(CUnit &unit) override;
+	virtual void Cancel(CUnit &unit) override;
+	virtual PixelPos Show(const CViewport &vp, const PixelPos &lastScreenPos) const override;
+	virtual void UpdatePathFinderData(PathFinderInput &input) override
+	{
+		UpdatePathFinderData_NotCalled(input);
+	}
 
-	virtual void UpdateUnitVariables(CUnit &unit) const;
-	virtual void FillSeenValues(CUnit &unit) const;
-	virtual void AiUnitKilled(CUnit &unit);
+	virtual void UpdateUnitVariables(CUnit &unit) const override;
+	virtual void FillSeenValues(CUnit &unit) const override;
+	virtual void AiUnitKilled(CUnit &unit) override;
 
 	void Progress(CUnit &unit, int amount);
 	void ProgressHp(CUnit &unit, int amount);

@@ -64,18 +64,15 @@ static void ReleaseOrders(CUnit &unit)
 	Assert(unit.Orders.empty() == false);
 
 	// Order 0 must be stopped in the action loop.
-	for (size_t i = 0; i != unit.Orders.size(); ++i) {
-		if (unit.Orders[i]->Action == UnitAction::Built) {
-			(dynamic_cast<COrder_Built *>(unit.Orders[i]))->Cancel(unit);
-		} else if (unit.Orders[i]->Action == UnitAction::Research) {
-			(dynamic_cast<COrder_Research *>(unit.Orders[i]))->Cancel(unit);
-		} else if (unit.Orders[i]->Action == UnitAction::Train) {
-			(dynamic_cast<COrder_Train *>(unit.Orders[i]))->Cancel(unit);
-		} else if (unit.Orders[i]->Action == UnitAction::UpgradeTo) {
-			(dynamic_cast<COrder_UpgradeTo *>(unit.Orders[i]))->Cancel(unit);
-		}
-		if (i > 0) {
-			delete unit.Orders[i];
+	for (const std::unique_ptr<COrder> &order : unit.Orders) {
+		if (order->Action == UnitAction::Built) {
+			(dynamic_cast<COrder_Built *>(order.get()))->Cancel(unit);
+		} else if (order->Action == UnitAction::Research) {
+			(dynamic_cast<COrder_Research *>(order.get()))->Cancel(unit);
+		} else if (order->Action == UnitAction::Train) {
+			(dynamic_cast<COrder_Train *>(order.get()))->Cancel(unit);
+		} else if (order->Action == UnitAction::UpgradeTo) {
+			(dynamic_cast<COrder_UpgradeTo *>(order.get()))->Cancel(unit);
 		}
 	}
 	unit.Orders.resize(1);
@@ -95,7 +92,7 @@ static void ReleaseOrders(CUnit &unit)
 **
 **  @return       Pointer to next free order slot.
 */
-static COrderPtr *GetNextOrder(CUnit &unit, int flush)
+static std::unique_ptr<COrder> *GetNextOrder(CUnit &unit, int flush)
 {
 	//Wyrmgus start
 //	if (flush) {
@@ -104,8 +101,9 @@ static COrderPtr *GetNextOrder(CUnit &unit, int flush)
 		// empty command queue
 		ReleaseOrders(unit);
 	}
+
 	// FIXME : Remove Hardcoded value.
-	const unsigned int maxOrderCount = 0x7F;
+	static constexpr unsigned int maxOrderCount = 0x7F;
 
 	if (unit.Orders.size() == maxOrderCount) {
 		return nullptr;
@@ -124,7 +122,6 @@ static void RemoveOrder(CUnit &unit, unsigned int order)
 {
 	Assert(order < unit.Orders.size());
 
-	delete unit.Orders[order];
 	unit.Orders.erase(unit.Orders.begin() + order);
 	if (unit.Orders.empty()) {
 		unit.Orders.push_back(COrder::NewActionStill());
@@ -133,8 +130,7 @@ static void RemoveOrder(CUnit &unit, unsigned int order)
 
 static void ClearNewAction(CUnit &unit)
 {
-	delete unit.NewOrder;
-	unit.NewOrder = nullptr;
+	unit.NewOrder.reset();
 }
 
 /**
@@ -147,8 +143,7 @@ static void ClearNewAction(CUnit &unit)
 */
 static void ClearSavedAction(CUnit &unit)
 {
-	delete unit.SavedOrder;
-	unit.SavedOrder = nullptr;
+	unit.SavedOrder.reset();
 }
 
 static bool IsUnitValidForNetwork(const CUnit &unit)
@@ -228,7 +223,7 @@ static void ReachGoalLayer(CUnit &unit, int new_z, int &flush)
 void CommandStopUnit(CUnit &unit)
 {
 	// Ignore that the unit could be removed.
-	COrderPtr *order = GetNextOrder(unit, FlushCommands); // Flush them.
+	std::unique_ptr<COrder> *order = GetNextOrder(unit, FlushCommands); // Flush them.
 	Assert(order);
 	Assert(*order == nullptr);
 	*order = COrder::NewActionStill();
@@ -245,7 +240,7 @@ void CommandStopUnit(CUnit &unit)
 */
 void CommandStandGround(CUnit &unit, int flush)
 {
-	COrderPtr *order;
+	std::unique_ptr<COrder> *order;
 
 	if (unit.Type->BoolFlag[BUILDING_INDEX].value) {
 		ClearNewAction(unit);
@@ -276,7 +271,7 @@ void CommandDefend(CUnit &unit, CUnit &dest, int flush)
 	StopRaft(unit);
 	ReachGoalLayer(unit, dest.MapLayer->ID, flush);
 	//Wyrmgus end
-	COrderPtr *order;
+	std::unique_ptr<COrder> *order;
 
 	if (!unit.CanMove()) {
 		ClearNewAction(unit);
@@ -307,7 +302,7 @@ void CommandFollow(CUnit &unit, CUnit &dest, int flush)
 	StopRaft(unit);
 	ReachGoalLayer(unit, dest.MapLayer->ID, flush);
 	//Wyrmgus end
-	COrderPtr *order;
+	std::unique_ptr<COrder> *order;
 
 	if (!unit.CanMove()) {
 		ClearNewAction(unit);
@@ -357,7 +352,7 @@ void CommandMove(CUnit &unit, const Vec2i &pos, int flush, int z)
 	
 	ReachGoalLayer(unit, z, flush);
 	//Wyrmgus end
-	COrderPtr *order;
+	std::unique_ptr<COrder> *order;
 
 	if (!unit.CanMove()) {
 		ClearNewAction(unit);
@@ -409,7 +404,7 @@ void CommandPickUp(CUnit &unit, CUnit &dest, int flush)
 	StopRaft(unit);
 	ReachGoalLayer(unit, dest.MapLayer->ID, flush);
 	//Wyrmgus end
-	COrderPtr *order;
+	std::unique_ptr<COrder> *order;
 
 	if (!unit.CanMove()) {
 		ClearNewAction(unit);
@@ -515,7 +510,7 @@ void CommandRepair(CUnit &unit, const Vec2i &pos, CUnit *dest, int flush, int z)
 	StopRaft(unit);
 	ReachGoalLayer(unit, z, flush);
 	//Wyrmgus end
-	COrderPtr *order;
+	std::unique_ptr<COrder> *order;
 
 	if (unit.Type->BoolFlag[BUILDING_INDEX].value) {
 		ClearNewAction(unit);
@@ -582,7 +577,7 @@ void CommandAttack(CUnit &unit, const Vec2i &pos, CUnit *target, int flush, int 
 	ReachGoalLayer(unit, z, flush);
 	//Wyrmgus end
 
-	COrderPtr *order;
+	std::unique_ptr<COrder> *order;
 
 	//Wyrmgus start
 //	if (!unit.Type->CanAttack) {
@@ -625,7 +620,7 @@ void CommandAttackGround(CUnit &unit, const Vec2i &pos, int flush, int z)
 	StopRaft(unit);
 	ReachGoalLayer(unit, z, flush);
 	//Wyrmgus end
-	COrderPtr *order;
+	std::unique_ptr<COrder> *order;
 
 	//Wyrmgus start
 //	if (!unit.Type->CanAttack) {
@@ -665,7 +660,7 @@ void CommandUse(CUnit &unit, CUnit &dest, int flush, bool reach_layer)
 		ReachGoalLayer(unit, dest.MapLayer->ID, flush);
 	}
 	//Wyrmgus end
-	COrderPtr *order;
+	std::unique_ptr<COrder> *order;
 
 	if (!unit.CanMove()) {
 		ClearNewAction(unit);
@@ -704,7 +699,7 @@ void CommandTrade(CUnit &unit, CUnit &dest, int flush, bool reach_layer)
 		ReachGoalLayer(unit, dest.MapLayer->ID, flush);
 	}
 	
-	COrderPtr *order;
+	std::unique_ptr<COrder> *order;
 
 	if (!unit.CanMove()) {
 		ClearNewAction(unit);
@@ -741,7 +736,7 @@ void CommandPatrolUnit(CUnit &unit, const Vec2i &pos, int flush, int z)
 	StopRaft(unit);
 	ReachGoalLayer(unit, z, flush);
 	//Wyrmgus end
-	COrderPtr *order;
+	std::unique_ptr<COrder> *order;
 
 	if (!unit.CanMove()) {
 		ClearNewAction(unit);
@@ -779,7 +774,7 @@ void CommandBoard(CUnit &unit, CUnit &dest, int flush)
 	StopRaft(unit);
 	ReachGoalLayer(unit, dest.MapLayer->ID, flush);
 	//Wyrmgus end
-	COrderPtr *order;
+	std::unique_ptr<COrder> *order;
 
 	if (unit.Type->BoolFlag[BUILDING_INDEX].value) {
 		ClearNewAction(unit);
@@ -815,7 +810,7 @@ void CommandUnload(CUnit &unit, const Vec2i &pos, CUnit *what, int flush, int z,
 	ReachGoalLayer(unit, z, flush);
 	//Wyrmgus end
 	
-	COrderPtr *order = GetNextOrder(unit, flush);
+	std::unique_ptr<COrder> *order = GetNextOrder(unit, flush);
 
 	if (order == nullptr) {
 		return;
@@ -844,7 +839,7 @@ void CommandBuildBuilding(CUnit &unit, const Vec2i &pos, wyrmgus::unit_type &wha
 	StopRaft(unit);
 	ReachGoalLayer(unit, z, flush);
 	//Wyrmgus end
-	COrderPtr *order;
+	std::unique_ptr<COrder> *order;
 
 	//Wyrmgus start
 //	if (unit.Type->BoolFlag[BUILDING_INDEX].value && !what.BoolFlag[BUILDEROUTSIDE_INDEX].value && unit.MapDistanceTo(pos) > unit.Type->RepairRange) {
@@ -924,7 +919,7 @@ void CommandResourceLoc(CUnit &unit, const Vec2i &pos, int flush, int z)
 	StopRaft(unit);
 	ReachGoalLayer(unit, z, flush);
 	//Wyrmgus end
-	COrderPtr *order;
+	std::unique_ptr<COrder> *order;
 
 	if (unit.Type->BoolFlag[BUILDING_INDEX].value) {
 		ClearNewAction(unit);
@@ -965,7 +960,7 @@ void CommandResource(CUnit &unit, CUnit &dest, int flush)
 	StopRaft(unit);
 	ReachGoalLayer(unit, dest.MapLayer->ID, flush);
 	//Wyrmgus end
-	COrderPtr *order;
+	std::unique_ptr<COrder> *order;
 
 	if (unit.Type->BoolFlag[BUILDING_INDEX].value) {
 		ClearNewAction(unit);
@@ -1004,7 +999,7 @@ void CommandReturnGoods(CUnit &unit, CUnit *depot, int flush)
 	}
 	//Wyrmgus end
 	
-	COrderPtr *order;
+	std::unique_ptr<COrder> *order;
 
 	if (unit.Type->BoolFlag[BUILDING_INDEX].value) {
 		ClearNewAction(unit);
@@ -1054,7 +1049,7 @@ void CommandTrainUnit(CUnit &unit, wyrmgus::unit_type &type, int player, int)
 	}
 
 	if (unit.Type->Stats[unit.Player->Index].GetUnitStock(&type) != 0) { //if the trainer unit/building has a stock of the unit type to be trained, do this as a critical order
-		if (unit.CriticalOrder && unit.CriticalOrder->Action == UnitAction::Train) {
+		if (unit.CriticalOrder != nullptr && unit.CriticalOrder->Action == UnitAction::Train) {
 			return;
 		}
 		Assert(unit.CriticalOrder == nullptr);
@@ -1071,7 +1066,7 @@ void CommandTrainUnit(CUnit &unit, wyrmgus::unit_type &type, int player, int)
 	}
 	
 	const int noFlushCommands = 0;
-	COrderPtr *order = GetNextOrder(unit, noFlushCommands);
+	std::unique_ptr<COrder> *order = GetNextOrder(unit, noFlushCommands);
 
 	if (order == nullptr) {
 		return;
@@ -1114,7 +1109,7 @@ void CommandCancelTraining(CUnit &unit, int slot, const wyrmgus::unit_type *type
 		// Order has moved, we are not training
 		return;
 	} else if (unit.Orders[slot]->Action == UnitAction::Train) {
-		COrder_Train &order = *static_cast<COrder_Train *>(unit.Orders[slot]);
+		COrder_Train &order = *static_cast<COrder_Train *>(unit.Orders[slot].get());
 		// Still training this order, same unit?
 		if (type && &order.GetUnitType() != type) {
 			// Different unit being trained
@@ -1148,7 +1143,7 @@ void CommandUpgradeTo(CUnit &unit, wyrmgus::unit_type &type, int flush)
 		return;
 	}
 
-	COrderPtr *order = GetNextOrder(unit, flush);
+	std::unique_ptr<COrder> *order = GetNextOrder(unit, flush);
 
 	if (order == nullptr) {
 		return;
@@ -1165,7 +1160,7 @@ void CommandUpgradeTo(CUnit &unit, wyrmgus::unit_type &type, int flush)
 */
 void CommandTransformIntoType(CUnit &unit, wyrmgus::unit_type &type)
 {
-	if (unit.CriticalOrder && unit.CriticalOrder->Action == UnitAction::TransformInto) {
+	if (unit.CriticalOrder != nullptr && unit.CriticalOrder->Action == UnitAction::TransformInto) {
 		return;
 	}
 	Assert(unit.CriticalOrder == nullptr);
@@ -1220,7 +1215,7 @@ void CommandResearch(CUnit &unit, const CUpgrade &what, int player, int flush)
 	//Wyrmgus end
 		return;
 	}
-	COrderPtr *order = GetNextOrder(unit, flush);
+	std::unique_ptr<COrder> *order = GetNextOrder(unit, flush);
 	if (order == nullptr) {
 		return;
 	}
@@ -1293,7 +1288,7 @@ void CommandSpellCast(CUnit &unit, const Vec2i &pos, CUnit *dest, const wyrmgus:
 	ReachGoalLayer(unit, z, flush);
 	//Wyrmgus end
 	
-	COrderPtr *order = GetNextOrder(unit, flush);
+	std::unique_ptr<COrder> *order = GetNextOrder(unit, flush);
 
 	if (order == nullptr) {
 		return;

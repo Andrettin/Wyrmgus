@@ -797,12 +797,12 @@ void ShowOrder(const CUnit &unit)
 	PixelPos screenStartPos = CurrentViewport->scaled_map_to_screen_pixel_pos(mapPos);
 	const bool flushed = unit.Orders[0]->Finished;
 
-	COrderPtr order;
+	COrder *order = nullptr;
 	// If the current order is cancelled show the next one
 	if (unit.Orders.size() > 1 && flushed) {
-		order = unit.Orders[1];
+		order = unit.Orders[1].get();
 	} else {
-		order = unit.Orders[0];
+		order = unit.Orders[0].get();
 	}
 	PixelPos screenPos = order->Show(*CurrentViewport, screenStartPos);
 	// Show the rest of the orders

@@ -31,33 +31,36 @@
 
 #include "actions.h"
 
-class COrder_Board : public COrder
+class COrder_Board final : public COrder
 {
-	friend COrder *COrder::NewActionBoard(CUnit &unit);
+	friend std::unique_ptr<COrder> COrder::NewActionBoard(CUnit &unit);
 public:
-	//Wyrmgus start
-//	COrder_Board() : COrder(UnitAction::Board), State(0), Range(0), goalPos(-1, -1) {}
-	COrder_Board() : COrder(UnitAction::Board), State(0), Range(0), goalPos(-1, -1), MapLayer(0) {}
-	//Wyrmgus end
+	COrder_Board() : COrder(UnitAction::Board)
+	{
+	}
 
-	virtual COrder_Board *Clone() const { return new COrder_Board(*this); }
+	virtual std::unique_ptr<COrder> Clone() const override
+	{
+		return std::make_unique<COrder_Board>(*this);
+	}
 
-	virtual bool IsValid() const;
+	virtual bool IsValid() const override;
 
-	virtual void Save(CFile &file, const CUnit &unit) const;
-	virtual bool ParseSpecificData(lua_State *l, int &j, const char *value, const CUnit &unit);
+	virtual void Save(CFile &file, const CUnit &unit) const override;
+	virtual bool ParseSpecificData(lua_State *l, int &j, const char *value, const CUnit &unit) override;
 
-	virtual void Execute(CUnit &unit);
-	virtual PixelPos Show(const CViewport &vp, const PixelPos &lastScreenPos) const;
-	virtual void UpdatePathFinderData(PathFinderInput &input);
+	virtual void Execute(CUnit &unit) override;
+	virtual PixelPos Show(const CViewport &vp, const PixelPos &lastScreenPos) const override;
+	virtual void UpdatePathFinderData(PathFinderInput &input) override;
 private:
 	bool WaitForTransporter(CUnit &unit);
 	int MoveToTransporter(CUnit &unit);
+
 private:
-	int State;
-	int Range;
-	Vec2i goalPos;
+	int State = 0;
+	int Range = 0;
+	Vec2i goalPos = Vec2i(-1, -1);
 	//Wyrmgus start
-	int MapLayer;
+	int MapLayer = 0;
 	//Wyrmgus end
 };

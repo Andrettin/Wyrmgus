@@ -275,7 +275,7 @@ static bool IsAlreadyWorking(const CUnit &unit)
 			return true;
 		}
 		if (action == UnitAction::Resource) {
-			const COrder_Resource &order = *static_cast<const COrder_Resource *>(unit.Orders[i]);
+			const COrder_Resource &order = *static_cast<const COrder_Resource *>(unit.Orders[i].get());
 
 			if (order.IsGatheringStarted()) {
 				return true;

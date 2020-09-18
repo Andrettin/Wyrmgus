@@ -36,7 +36,10 @@ class COrder_Still : public COrder
 public:
 	explicit COrder_Still(bool stand) : COrder(stand ? UnitAction::StandGround : UnitAction::Still), State(0) {}
 
-	virtual COrder_Still *Clone() const { return new COrder_Still(*this); }
+	virtual std::unique_ptr<COrder> Clone() const override
+	{
+		return std::make_unique<COrder_Still>(*this);
+	}
 
 	virtual bool IsValid() const;
 

@@ -31,38 +31,42 @@
 
 #include "actions.h"
 
-class COrder_SpellCast : public COrder
+class COrder_SpellCast final : public COrder
 {
-	friend COrder *COrder::NewActionSpellCast(const wyrmgus::spell &spell, const Vec2i &pos, CUnit *target, int z, bool isAutocast);
+	friend std::unique_ptr<COrder> COrder::NewActionSpellCast(const wyrmgus::spell &spell, const Vec2i &pos, CUnit *target, int z, bool isAutocast);
 public:
-	COrder_SpellCast(bool autocast = false) : COrder(UnitAction::SpellCast), Spell(nullptr), State(0), Range(0), MapLayer(0), isAutocast(autocast)
+	explicit COrder_SpellCast(bool autocast = false) : COrder(UnitAction::SpellCast), Spell(nullptr), State(0), Range(0), MapLayer(0), isAutocast(autocast)
 	{
 		goalPos.x = -1;
 		goalPos.y = -1;
 	}
 
-	virtual COrder_SpellCast *Clone() const { return new COrder_SpellCast(*this); }
+	virtual std::unique_ptr<COrder> Clone() const override
+	{
+		return std::make_unique<COrder_SpellCast>(*this);
+	}
 
-	virtual bool IsValid() const;
+	virtual bool IsValid() const override;
 
-	virtual void Save(CFile &file, const CUnit &unit) const;
-	virtual bool ParseSpecificData(lua_State *l, int &j, const char *value, const CUnit &unit);
+	virtual void Save(CFile &file, const CUnit &unit) const override;
+	virtual bool ParseSpecificData(lua_State *l, int &j, const char *value, const CUnit &unit) override;
 
-	virtual void Execute(CUnit &unit);
-	virtual PixelPos Show(const CViewport &vp, const PixelPos &lastScreenPos) const;
-	virtual void UpdatePathFinderData(PathFinderInput &input);
+	virtual void Execute(CUnit &unit) override;
+	virtual PixelPos Show(const CViewport &vp, const PixelPos &lastScreenPos) const override;
+	virtual void UpdatePathFinderData(PathFinderInput &input) override;
 
-	virtual void OnAnimationAttack(CUnit &unit);
+	virtual void OnAnimationAttack(CUnit &unit) override;
 
-	virtual const Vec2i GetGoalPos() const;
+	virtual const Vec2i GetGoalPos() const override;
 	//Wyrmgus start
-	virtual const int GetGoalMapLayer() const;
+	virtual const int GetGoalMapLayer() const override;
 	//Wyrmgus end
 	const wyrmgus::spell &GetSpell() const { return *Spell; }
 	void SetSpell(const wyrmgus::spell &spell) { Spell = &spell; }
 private:
 	bool CheckForDeadGoal(CUnit &unit);
 	bool SpellMoveToTarget(CUnit &unit);
+
 private:
 	const wyrmgus::spell *Spell;
 	int State;

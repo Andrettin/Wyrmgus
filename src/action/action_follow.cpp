@@ -60,15 +60,9 @@ enum {
 	State_TargetReached = 128,
 };
 
-
-
-/*----------------------------------------------------------------------------
---  Functions
-----------------------------------------------------------------------------*/
-
-/* static */ COrder *COrder::NewActionFollow(CUnit &dest)
+std::unique_ptr<COrder> COrder::NewActionFollow(CUnit &dest)
 {
-	COrder_Follow *order = new COrder_Follow;
+	auto order = std::make_unique<COrder_Follow>();
 
 	// Destination could be killed.
 	// Should be handled in action, but is not possible!
@@ -312,8 +306,7 @@ enum {
 				} else {
 					if (dest.NewOrder->HasGoal()) {
 						if (dest.NewOrder->GetGoal()->Destroyed) {
-							delete dest.NewOrder;
-							dest.NewOrder = nullptr;
+							dest.NewOrder.reset();
 							this->Finished = true;
 							return ;
 						}
@@ -360,9 +353,9 @@ enum {
 		CUnit *target = AttackUnitsInReactRange(unit);
 		if (target) {
 			// Save current command to come back.
-			COrder *savedOrder = nullptr;
+			std::unique_ptr<COrder> saved_order;
 			if (unit.CanStoreOrder(unit.CurrentOrder())) {
-				savedOrder = this->Clone();
+				saved_order = this->Clone();
 			}
 
 			this->Finished = true;
@@ -371,8 +364,8 @@ enum {
 			unit.Orders.insert(unit.Orders.begin() + 1, COrder::NewActionAttack(unit, target->tilePos, target->MapLayer->ID));
 			//Wyrmgus end
 
-			if (savedOrder != nullptr) {
-				unit.SavedOrder = savedOrder;
+			if (saved_order != nullptr) {
+				unit.SavedOrder = std::move(saved_order);
 			}
 		}
 	}

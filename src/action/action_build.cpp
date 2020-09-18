@@ -76,17 +76,11 @@ enum {
 	State_BuildFromOutside = 22
 };
 
-
-
-/*----------------------------------------------------------------------------
---  Functions
-----------------------------------------------------------------------------*/
-
-COrder *COrder::NewActionBuild(const CUnit &builder, const Vec2i &pos, wyrmgus::unit_type &building, int z, const wyrmgus::site *settlement)
+std::unique_ptr<COrder> COrder::NewActionBuild(const CUnit &builder, const Vec2i &pos, wyrmgus::unit_type &building, int z, const wyrmgus::site *settlement)
 {
 	Assert(CMap::Map.Info.IsPointOnMap(pos, z));
 
-	COrder_Build *order = new COrder_Build;
+	auto order = std::make_unique<COrder_Build>();
 
 	order->goalPos = pos;
 	//Wyrmgus start

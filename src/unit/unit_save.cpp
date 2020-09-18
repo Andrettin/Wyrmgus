@@ -368,7 +368,7 @@ void SaveUnit(const CUnit &unit, CFile &file)
 		file.printf(",\n  \"saved-order\", ");
 		unit.SavedOrder->Save(file, unit);
 	}
-	if (unit.CriticalOrder) {
+	if (unit.CriticalOrder != nullptr) {
 		file.printf(",\n  \"critical-order\", ");
 		unit.CriticalOrder->Save(file, unit);
 	}

@@ -31,34 +31,36 @@
 
 #include "actions.h"
 
-class COrder_Resource : public COrder
+class COrder_Resource final : public COrder
 {
 	//Wyrmgus start
-//	friend COrder *COrder::NewActionResource(CUnit &harvester, const Vec2i &pos);
-	friend COrder *COrder::NewActionResource(CUnit &harvester, const Vec2i &pos, int z);
+//	friend std::unique_ptr<COrder> COrder::NewActionResource(CUnit &harvester, const Vec2i &pos);
+	friend std::unique_ptr<COrder> COrder::NewActionResource(CUnit &harvester, const Vec2i &pos, int z);
 	//Wyrmgus end
-	friend COrder *COrder::NewActionResource(CUnit &harvester, CUnit &mine);
-	friend COrder *COrder::NewActionReturnGoods(CUnit &harvester, CUnit *depot);
+	friend std::unique_ptr<COrder> COrder::NewActionResource(CUnit &harvester, CUnit &mine);
+	friend std::unique_ptr<COrder> COrder::NewActionReturnGoods(CUnit &harvester, CUnit *depot);
 
 public:
-	COrder_Resource(CUnit &harvester) : COrder(UnitAction::Resource), worker(&harvester)
+	explicit COrder_Resource(CUnit &harvester) : COrder(UnitAction::Resource), worker(&harvester)
 	{
 	}
 
 	~COrder_Resource();
 
-	virtual COrder_Resource *Clone() const { return new COrder_Resource(*this); }
+	virtual std::unique_ptr<COrder> Clone() const override
+	{
+		return std::make_unique<COrder_Resource>(*this);
+	}
 
-	virtual bool IsValid() const;
+	virtual bool IsValid() const override;
 
-	virtual void Save(CFile &file, const CUnit &unit) const;
-	virtual bool ParseSpecificData(lua_State *l, int &j, const char *value, const CUnit &unit);
+	virtual void Save(CFile &file, const CUnit &unit) const override;
+	virtual bool ParseSpecificData(lua_State *l, int &j, const char *value, const CUnit &unit) override;
 
-	virtual void Execute(CUnit &unit);
-	virtual PixelPos Show(const CViewport &vp, const PixelPos &lastScreenPos) const;
-	virtual void UpdatePathFinderData(PathFinderInput &input);
-	virtual bool OnAiHitUnit(CUnit &unit, CUnit *attacker, int /*damage*/);
-
+	virtual void Execute(CUnit &unit) override;
+	virtual PixelPos Show(const CViewport &vp, const PixelPos &lastScreenPos) const override;
+	virtual void UpdatePathFinderData(PathFinderInput &input) override;
+	virtual bool OnAiHitUnit(CUnit &unit, CUnit *attacker, int /*damage*/) override;
 
 	int GetCurrentResource() const { return CurrentResource; }
 	Vec2i GetHarvestLocation() const;
@@ -83,6 +85,7 @@ private:
 	void ResourceGiveUp(CUnit &unit);
 	bool FindAnotherResource(CUnit &unit);
 	bool ActionResourceInit(CUnit &unit);
+
 private:
 	CUnitPtr worker; /// unit that own this order.
 	unsigned char CurrentResource = 0;

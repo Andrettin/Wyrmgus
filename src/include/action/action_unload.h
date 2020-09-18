@@ -31,27 +31,30 @@
 
 #include "actions.h"
 
-class COrder_Unload : public COrder
+class COrder_Unload final : public COrder
 {
 	//Wyrmgus start
-//	friend COrder *COrder::NewActionUnload(const Vec2i &pos, CUnit *what);
-	friend COrder *COrder::NewActionUnload(const Vec2i &pos, CUnit *what, int z, int landmass);
+//	friend std::unique_ptr<COrder> COrder::NewActionUnload(const Vec2i &pos, CUnit *what);
+	friend std::unique_ptr<COrder> COrder::NewActionUnload(const Vec2i &pos, CUnit *what, int z, int landmass);
 	//WYrmgus end
 public:
 	COrder_Unload() : COrder(UnitAction::Unload)
 	{
 	}
 
-	virtual COrder_Unload *Clone() const { return new COrder_Unload(*this); }
+	virtual std::unique_ptr<COrder> Clone() const override
+	{
+		return std::make_unique<COrder_Unload>(*this);
+	}
 
-	virtual bool IsValid() const;
+	virtual bool IsValid() const override;
 
-	virtual void Save(CFile &file, const CUnit &unit) const;
-	virtual bool ParseSpecificData(lua_State *l, int &j, const char *value, const CUnit &unit);
+	virtual void Save(CFile &file, const CUnit &unit) const override;
+	virtual bool ParseSpecificData(lua_State *l, int &j, const char *value, const CUnit &unit) override;
 
-	virtual void Execute(CUnit &unit);
-	virtual PixelPos Show(const CViewport &vp, const PixelPos &lastScreenPos) const;
-	virtual void UpdatePathFinderData(PathFinderInput &input);
+	virtual void Execute(CUnit &unit) override;
+	virtual PixelPos Show(const CViewport &vp, const PixelPos &lastScreenPos) const override;
+	virtual void UpdatePathFinderData(PathFinderInput &input) override;
 
 private:
 	bool LeaveTransporter(CUnit &transporter);

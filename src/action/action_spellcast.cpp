@@ -63,9 +63,9 @@
 #include "unit/unit_type_type.h"
 #include "video/video.h"
 
-/* static */ COrder *COrder::NewActionSpellCast(const wyrmgus::spell &spell, const Vec2i &pos, CUnit *target, int z, bool isAutocast)
+std::unique_ptr<COrder> COrder::NewActionSpellCast(const wyrmgus::spell &spell, const Vec2i &pos, CUnit *target, int z, bool isAutocast)
 {
-	COrder_SpellCast *order = new COrder_SpellCast(isAutocast);
+	auto order = std::make_unique<COrder_SpellCast>(isAutocast);
 
 	order->Range = spell.get_range();
 	if (target) {

@@ -60,13 +60,9 @@ enum {
 	State_Defending
 };
 
-/*----------------------------------------------------------------------------
---  Functions
-----------------------------------------------------------------------------*/
-
-/* static */ COrder *COrder::NewActionDefend(CUnit &dest)
+std::unique_ptr<COrder> COrder::NewActionDefend(CUnit &dest)
 {
-	COrder_Defend *order = new COrder_Defend();
+	auto order = std::make_unique<COrder_Defend>();
 
 	if (dest.Destroyed) {
 		order->goalPos = dest.tilePos + dest.GetHalfTileSize();

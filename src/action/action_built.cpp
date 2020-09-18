@@ -62,9 +62,9 @@ static constexpr int CancelBuildingCostsFactor = 75;
 
 extern void AiReduceMadeInBuilt(PlayerAi &pai, const wyrmgus::unit_type &type, int landmass, const wyrmgus::site *settlement);
 
-/* static */ COrder *COrder::NewActionBuilt(CUnit &builder, CUnit &unit)
+std::unique_ptr<COrder> COrder::NewActionBuilt(CUnit &builder, CUnit &unit)
 {
-	COrder_Built *order = new COrder_Built();
+	auto order = std::make_unique<COrder_Built>();
 
 	// Make sure the bulding doesn't cancel itself out right away.
 

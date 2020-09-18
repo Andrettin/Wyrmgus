@@ -659,14 +659,14 @@ int AutoCastSpell(CUnit &caster, const wyrmgus::spell &spell)
 		return 0;
 	} else {
 		// Save previous order
-		COrder *savedOrder = nullptr;
+		std::unique_ptr<COrder> saved_order;
 		if (caster.CurrentAction() != UnitAction::Still && caster.CanStoreOrder(caster.CurrentOrder())) {
-			savedOrder = caster.CurrentOrder()->Clone();
+			saved_order = caster.CurrentOrder()->Clone();
 		}
 		// Must move before ?
 		CommandSpellCast(caster, target->targetPos, target->Unit, spell, FlushCommands, target->MapLayer, true);
-		if (savedOrder != nullptr) {
-			caster.SavedOrder = savedOrder;
+		if (saved_order != nullptr) {
+			caster.SavedOrder = std::move(saved_order);
 		}
 	}
 	return 1;

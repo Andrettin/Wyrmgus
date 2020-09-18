@@ -61,9 +61,9 @@ enum {
 	State_TargetReached = 128,
 };
 
-COrder *COrder::NewActionTrade(CUnit &dest, CUnit &home_market)
+std::unique_ptr<COrder> COrder::NewActionTrade(CUnit &dest, CUnit &home_market)
 {
-	COrder_Trade *order = new COrder_Trade;
+	auto order = std::make_unique<COrder_Trade>();
 
 	// Destination could be killed.
 	// Should be handled in action, but is not possible!
@@ -358,8 +358,7 @@ COrder *COrder::NewActionTrade(CUnit &dest, CUnit &home_market)
 				} else {
 					if (dest.NewOrder->HasGoal()) {
 						if (dest.NewOrder->GetGoal()->Destroyed) {
-							delete dest.NewOrder;
-							dest.NewOrder = nullptr;
+							dest.NewOrder.reset();
 							this->Finished = true;
 							return ;
 						}

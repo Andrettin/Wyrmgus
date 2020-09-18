@@ -60,13 +60,9 @@ enum {
 	State_EnterTransporter = 202
 };
 
-/*----------------------------------------------------------------------------
---  Functions
-----------------------------------------------------------------------------*/
-
-/* static */ COrder *COrder::NewActionBoard(CUnit &unit)
+std::unique_ptr<COrder> COrder::NewActionBoard(CUnit &unit)
 {
-	COrder_Board *order = new COrder_Board;
+	auto order = std::make_unique<COrder_Board>();
 
 	order->SetGoal(&unit);
 	order->Range = 1;

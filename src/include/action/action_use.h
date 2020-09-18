@@ -33,15 +33,15 @@
 
 class COrder_Use : public COrder
 {
-	friend COrder *COrder::NewActionUse(CUnit &dest);
 public:
-	COrder_Use() : COrder(UnitAction::Use), State(0), Range(0), MapLayer(0)
+	COrder_Use() : COrder(UnitAction::Use)
 	{
-		goalPos.x = -1;
-		goalPos.y = -1;
 	}
 
-	virtual COrder_Use *Clone() const { return new COrder_Use(*this); }
+	virtual std::unique_ptr<COrder> Clone() const override
+	{
+		return std::make_unique<COrder_Use>(*this);
+	}
 
 	virtual bool IsValid() const;
 
@@ -52,8 +52,10 @@ public:
 	virtual PixelPos Show(const CViewport &vp, const PixelPos &lastScreenPos) const;
 	virtual void UpdatePathFinderData(PathFinderInput &input);
 private:
-	unsigned int State;
-	int Range;
-	Vec2i goalPos;
-	int MapLayer;
+	unsigned int State = 0;
+	int Range = 0;
+	Vec2i goalPos = Vec2i(-1, -1);
+	int MapLayer = 0;
+
+	friend std::unique_ptr<COrder> COrder::NewActionUse(CUnit &dest);
 };

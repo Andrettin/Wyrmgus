@@ -198,77 +198,79 @@ void COrder::UpdatePathFinderData_NotCalled(PathFinderInput &input)
 **  @param l      Lua state.
 **  @param order  OUT: resulting order.
 */
-void CclParseOrder(lua_State *l, CUnit &unit, COrderPtr *orderPtr)
+std::unique_ptr<COrder> CclParseOrder(lua_State *l, CUnit &unit)
 {
 	const int args = lua_rawlen(l, -1);
 	const char *actiontype = LuaToString(l, -1, 1);
 
+	std::unique_ptr<COrder> order;
+
 	if (!strcmp(actiontype, "action-attack")) {
-		*orderPtr = new COrder_Attack(false);
+		order = std::make_unique<COrder_Attack>(false);
 	} else if (!strcmp(actiontype, "action-attack-ground")) {
-		*orderPtr = new COrder_Attack(true);
+		order = std::make_unique<COrder_Attack>(true);
 	} else if (!strcmp(actiontype, "action-board")) {
-		*orderPtr = new COrder_Board;
+		order = std::make_unique<COrder_Board>();
 	} else if (!strcmp(actiontype, "action-build")) {
-		*orderPtr = new COrder_Build;
+		order = std::make_unique<COrder_Build>();
 	} else if (!strcmp(actiontype, "action-built")) {
-		*orderPtr = new COrder_Built;
+		order = std::make_unique<COrder_Built>();
 	} else if (!strcmp(actiontype, "action-defend")) {
-		*orderPtr = new COrder_Defend;
+		order = std::make_unique<COrder_Defend>();
 	} else if (!strcmp(actiontype, "action-die")) {
-		*orderPtr = new COrder_Die;
+		order = std::make_unique<COrder_Die>();
 	} else if (!strcmp(actiontype, "action-follow")) {
-		*orderPtr = new COrder_Follow;
+		order = std::make_unique<COrder_Follow>();
 	} else if (!strcmp(actiontype, "action-move")) {
-		*orderPtr = new COrder_Move;
+		order = std::make_unique<COrder_Move>();
 	} else if (!strcmp(actiontype, "action-patrol")) {
-		*orderPtr = new COrder_Patrol;
+		order = std::make_unique<COrder_Patrol>();
 	} else if (!strcmp(actiontype, "action-pick-up")) {
-		*orderPtr = new COrder_PickUp;
+		order = std::make_unique<COrder_PickUp>();
 	} else if (!strcmp(actiontype, "action-repair")) {
-		*orderPtr = new COrder_Repair;
+		order = std::make_unique<COrder_Repair>();
 	} else if (!strcmp(actiontype, "action-research")) {
-		*orderPtr = new COrder_Research;
+		order = std::make_unique<COrder_Research>();
 	} else if (!strcmp(actiontype, "action-resource")) {
-		*orderPtr = new COrder_Resource(unit);
+		order = std::make_unique<COrder_Resource>(unit);
 	} else if (!strcmp(actiontype, "action-spell-cast")) {
-		*orderPtr = new COrder_SpellCast;
+		order = std::make_unique<COrder_SpellCast>();
 	} else if (!strcmp(actiontype, "action-stand-ground")) {
-		*orderPtr = new COrder_Still(true);
+		order = std::make_unique<COrder_Still>(true);
 	} else if (!strcmp(actiontype, "action-still")) {
-		*orderPtr = new COrder_Still(false);
+		order = std::make_unique<COrder_Still>(false);
 	} else if (!strcmp(actiontype, "action-train")) {
-		*orderPtr = new COrder_Train;
+		order = std::make_unique<COrder_Train>();
 	} else if (!strcmp(actiontype, "action-transform-into")) {
-		*orderPtr = new COrder_TransformInto;
+		order = std::make_unique<COrder_TransformInto>();
 	} else if (!strcmp(actiontype, "action-upgrade-to")) {
-		*orderPtr = new COrder_UpgradeTo;
+		order = std::make_unique<COrder_UpgradeTo>();
 	} else if (!strcmp(actiontype, "action-unload")) {
-		*orderPtr = new COrder_Unload;
+		order = std::make_unique<COrder_Unload>();
 	} else if (!strcmp(actiontype, "action-use")) {
-		*orderPtr = new COrder_Use;
+		order = std::make_unique<COrder_Use>();
 	//Wyrmgus start
 	} else if (!strcmp(actiontype, "action-trade")) {
-		*orderPtr = new COrder_Trade;
+		order = std::make_unique<COrder_Trade>();
 	//Wyrmgus end
 	} else {
 		LuaError(l, "ParseOrder: Unsupported type: %s" _C_ actiontype);
 	}
 
-	COrder &order = **orderPtr;
-
 	for (int j = 1; j < args; ++j) {
 		const char *value = LuaToString(l, -1, j + 1);
 
-		if (order.ParseGenericData(l, j, value)) {
+		if (order->ParseGenericData(l, j, value)) {
 			continue;
-		} else if (order.ParseSpecificData(l, j, value, unit)) {
+		} else if (order->ParseSpecificData(l, j, value, unit)) {
 			continue;
 		} else {
 			// This leaves a half initialized unit
 			LuaError(l, "ParseOrder: Unsupported tag: %s" _C_ value);
 		}
 	}
+
+	return order;
 }
 
 
@@ -516,14 +518,12 @@ static void HandleUnitAction(CUnit &unit)
 	if (!unit.Anim.Unbreakable) {
 		if (unit.CriticalOrder != nullptr) {
 			unit.CriticalOrder->Execute(unit);
-			delete unit.CriticalOrder;
-			unit.CriticalOrder = nullptr;
+			unit.CriticalOrder.reset();
 		}
 
 		if (unit.Orders[0]->Finished && unit.Orders[0]->Action != UnitAction::Still
 			&& unit.Orders.size() == 1) {
 
-			delete unit.Orders[0];
 			unit.Orders[0] = COrder::NewActionStill();
 			if (IsOnlySelected(unit)) { // update display for new action
 				SelectedUnitChanged();
@@ -540,7 +540,6 @@ static void HandleUnitAction(CUnit &unit)
 				return;
 			}
 
-			delete unit.Orders[0];
 			unit.Orders.erase(unit.Orders.begin());
 
 			unit.Wait = 0;

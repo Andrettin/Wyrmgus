@@ -54,9 +54,9 @@
 /// How many resources the player gets back if canceling training
 static constexpr int CancelTrainingCostsFactor = 100;
 
-COrder *COrder::NewActionTrain(CUnit &trainer, wyrmgus::unit_type &type, int player)
+std::unique_ptr<COrder> COrder::NewActionTrain(CUnit &trainer, wyrmgus::unit_type &type, int player)
 {
-	COrder_Train *order = new COrder_Train;
+	auto order = std::make_unique<COrder_Train>();
 
 	order->Type = &type;
 	// FIXME: if you give quick an other order, the resources are lost!
@@ -214,7 +214,7 @@ static void AnimateActionTrain(CUnit &unit)
 		return ;
 	}
 	*/
-	if (unit.CriticalOrder != this) {
+	if (unit.CriticalOrder.get() != this) {
 		AnimateActionTrain(unit);
 		if (unit.Wait) {
 			unit.Wait--;

@@ -62,21 +62,17 @@
 /// How many resources the player gets back if canceling upgrade
 static constexpr int CancelUpgradeCostsFactor = 100;
 
-/*----------------------------------------------------------------------------
---  Functions
-----------------------------------------------------------------------------*/
-
-COrder *COrder::NewActionTransformInto(wyrmgus::unit_type &type)
+std::unique_ptr<COrder> COrder::NewActionTransformInto(wyrmgus::unit_type &type)
 {
-	COrder_TransformInto *order = new COrder_TransformInto;
+	auto order = std::make_unique<COrder_TransformInto>();
 
 	order->Type = &type;
 	return order;
 }
 
-/* static */ COrder *COrder::NewActionUpgradeTo(CUnit &unit, wyrmgus::unit_type &type)
+std::unique_ptr<COrder> COrder::NewActionUpgradeTo(CUnit &unit, wyrmgus::unit_type &type)
 {
-	COrder_UpgradeTo *order = new COrder_UpgradeTo;
+	auto order = std::make_unique<COrder_UpgradeTo>();
 
 	// FIXME: if you give quick an other order, the resources are lost!
 	unit.Player->SubUnitType(type);

@@ -31,34 +31,36 @@
 
 #include "actions.h"
 
-class COrder_Research : public COrder
+class COrder_Research final : public COrder
 {
-	friend COrder *COrder::NewActionResearch(CUnit &unit, const CUpgrade &upgrade, int player);
+	friend std::unique_ptr<COrder> COrder::NewActionResearch(CUnit &unit, const CUpgrade &upgrade, int player);
 public:
-	//Wyrmgus start
-//	COrder_Research() : COrder(UnitAction::Research), Upgrade(nullptr) {}
-	COrder_Research() : COrder(UnitAction::Research), Upgrade(nullptr), Player(0) {}
-	//Wyrmgus end
+	COrder_Research() : COrder(UnitAction::Research)
+	{
+	}
 
-	virtual COrder_Research *Clone() const { return new COrder_Research(*this); }
+	virtual std::unique_ptr<COrder> Clone() const override
+	{
+		return std::make_unique<COrder_Research>(*this);
+	}
 
-	virtual bool IsValid() const;
+	virtual bool IsValid() const override;
 
-	virtual void Save(CFile &file, const CUnit &unit) const;
-	virtual bool ParseSpecificData(lua_State *l, int &j, const char *value, const CUnit &unit);
+	virtual void Save(CFile &file, const CUnit &unit) const override;
+	virtual bool ParseSpecificData(lua_State *l, int &j, const char *value, const CUnit &unit) override;
 
-	virtual void Execute(CUnit &unit);
-	virtual void Cancel(CUnit &unit);
-	virtual PixelPos Show(const CViewport &vp, const PixelPos &lastScreenPos) const;
-	virtual void UpdatePathFinderData(PathFinderInput &input) { UpdatePathFinderData_NotCalled(input); }
+	virtual void Execute(CUnit &unit) override;
+	virtual void Cancel(CUnit &unit) override;
+	virtual PixelPos Show(const CViewport &vp, const PixelPos &lastScreenPos) const override;
+	virtual void UpdatePathFinderData(PathFinderInput &input) override { UpdatePathFinderData_NotCalled(input); }
 
-	virtual void UpdateUnitVariables(CUnit &unit) const;
+	virtual void UpdateUnitVariables(CUnit &unit) const override;
 
 	const CUpgrade &GetUpgrade() const { return *Upgrade; }
 	void SetUpgrade(const CUpgrade &upgrade) { Upgrade = &upgrade; }
 private:
-	const CUpgrade *Upgrade;
+	const CUpgrade *Upgrade = nullptr;
 	//Wyrmgus start
-	int Player;      /// Player for whom the upgrade will be acquired (needed for researching upgrades in neutral buildings)
+	int Player = 0; //player for whom the upgrade will be acquired (needed for researching upgrades in neutral buildings)
 	//Wyrmgus end
 };

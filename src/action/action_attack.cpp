@@ -107,9 +107,9 @@ void AnimateActionAttack(CUnit &unit, COrder &order)
 	//Wyrmgus end
 }
 
-/* static */ COrder *COrder::NewActionAttack(const CUnit &attacker, CUnit &target)
+std::unique_ptr<COrder> COrder::NewActionAttack(const CUnit &attacker, CUnit &target)
 {
-	COrder_Attack *order = new COrder_Attack(false);
+	auto order = std::make_unique<COrder_Attack>(false);
 
 	order->goalPos = target.tilePos + target.GetHalfTileSize();
 	//Wyrmgus start
@@ -130,11 +130,11 @@ void AnimateActionAttack(CUnit &unit, COrder &order)
 	return order;
 }
 
-/* static */ COrder *COrder::NewActionAttack(const CUnit &attacker, const Vec2i &dest, int z)
+std::unique_ptr<COrder> COrder::NewActionAttack(const CUnit &attacker, const Vec2i &dest, int z)
 {
 	Assert(CMap::Map.Info.IsPointOnMap(dest, z));
 
-	COrder_Attack *order = new COrder_Attack(false);
+	auto order = std::make_unique<COrder_Attack>(false);
 
 	if (CMap::Map.WallOnMap(dest, z) && CMap::Map.Field(dest, z)->player_info->IsTeamExplored(*attacker.Player)) {
 		// FIXME: look into action_attack.cpp about this ugly problem
@@ -152,11 +152,11 @@ void AnimateActionAttack(CUnit &unit, COrder &order)
 }
 
 //Wyrmgus start
-///* static */ COrder *COrder::NewActionAttackGround(const CUnit &attacker, const Vec2i &dest)
-/* static */ COrder *COrder::NewActionAttackGround(const CUnit &attacker, const Vec2i &dest, int z)
+//std::unique_ptr<COrder> COrder::NewActionAttackGround(const CUnit &attacker, const Vec2i &dest)
+std::unique_ptr<COrder> COrder::NewActionAttackGround(const CUnit &attacker, const Vec2i &dest, int z)
 //Wyrmgus end
 {
-	COrder_Attack *order = new COrder_Attack(true);
+	auto order = std::make_unique<COrder_Attack>(true);
 
 	order->goalPos = dest;
 	//Wyrmgus start
@@ -402,15 +402,14 @@ bool COrder_Attack::CheckForTargetInRange(CUnit &unit)
 
 		if (goal) {
 			//Wyrmgus start
-//			COrder *savedOrder = COrder::NewActionAttack(unit, this->goalPos);
-			COrder *savedOrder = COrder::NewActionAttack(unit, this->goalPos, this->MapLayer);
+//			std::unique_ptr<COrder> saved_order = COrder::NewActionAttack(unit, this->goalPos);
+			std::unique_ptr<COrder> saved_order = COrder::NewActionAttack(unit, this->goalPos, this->MapLayer);
 			//Wyrmgus end
 
-			if (unit.CanStoreOrder(savedOrder) == false) {
-				delete savedOrder;
-				savedOrder = nullptr;
+			if (unit.CanStoreOrder(saved_order.get()) == false) {
+				saved_order.reset();
 			} else {
-				unit.SavedOrder = savedOrder;
+				unit.SavedOrder = std::move(saved_order);
 			}
 			this->SetGoal(goal);
 			this->MinRange = unit.Type->MinAttackRange;
@@ -428,12 +427,12 @@ bool COrder_Attack::CheckForTargetInRange(CUnit &unit)
 		CUnit *newTarget = AttackUnitsInReactRange(unit);
 
 		if (newTarget && ThreatCalculate(unit, *newTarget) < ThreatCalculate(unit, *goal)) {
-			COrder *savedOrder = nullptr;
+			std::unique_ptr<COrder> saved_order;
 			if (unit.CanStoreOrder(this)) {
-				savedOrder = this->Clone();
+				saved_order = this->Clone();
 			}
-			if (savedOrder != nullptr) {
-				unit.SavedOrder = savedOrder;
+			if (saved_order != nullptr) {
+				unit.SavedOrder = std::move(saved_order);
 			}
 			this->SetGoal(newTarget);
 			this->goalPos = newTarget->tilePos;
@@ -634,15 +633,14 @@ void COrder_Attack::AttackTarget(CUnit &unit)
 		}
 		// Save current command to come back.
 		//Wyrmgus start
-//		COrder *savedOrder = COrder::NewActionAttack(unit, this->goalPos);
-		COrder *savedOrder = COrder::NewActionAttack(unit, this->goalPos, this->MapLayer);
+//		std::unique_ptr<COrder> saved_order = COrder::NewActionAttack(unit, this->goalPos);
+		std::unique_ptr<COrder> saved_order = COrder::NewActionAttack(unit, this->goalPos, this->MapLayer);
 		//Wyrmgus end
 
-		if (unit.CanStoreOrder(savedOrder) == false) {
-			delete savedOrder;
-			savedOrder = nullptr;
+		if (unit.CanStoreOrder(saved_order.get()) == false) {
+			saved_order.reset();
 		} else {
-			unit.SavedOrder = savedOrder;
+			unit.SavedOrder = std::move(saved_order);
 		}
 		this->SetGoal(goal);
 		this->goalPos = goal->tilePos;

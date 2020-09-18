@@ -1349,15 +1349,15 @@ static void AiMoveUnitInTheWay(CUnit &unit)
 	// Don't move more than 1 unit.
 	if (movablenb) {
 		const int index = SyncRand(movablenb);
-		COrder *savedOrder = nullptr;
+		std::unique_ptr<COrder> saved_order;
 		if (movableunits[index]->IsIdle() == false) {
 			if (unit.CanStoreOrder(unit.CurrentOrder())) {
-				savedOrder = unit.CurrentOrder()->Clone();
+				saved_order = unit.CurrentOrder()->Clone();
 			}
 		}
 		CommandMove(*movableunits[index], movablepos[index], FlushCommands, movableunits[index]->MapLayer->ID);
-		if (savedOrder != nullptr) {
-			unit.SavedOrder = savedOrder;
+		if (saved_order != nullptr) {
+			unit.SavedOrder = std::move(saved_order);
 		}
 		AiPlayer->LastCanNotMoveGameCycle = GameCycle;
 	}

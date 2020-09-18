@@ -48,9 +48,9 @@
 /// How many resources the player gets back if canceling research
 static constexpr int CancelResearchCostsFactor = 100;
 
-COrder *COrder::NewActionResearch(CUnit &unit, const CUpgrade &upgrade, int player)
+std::unique_ptr<COrder> COrder::NewActionResearch(CUnit &unit, const CUpgrade &upgrade, int player)
 {
-	COrder_Research *order = new COrder_Research();
+	auto order = std::make_unique<COrder_Research>();
 
 	// FIXME: if you give quick an other order, the resources are lost!
 	//Wyrmgus start

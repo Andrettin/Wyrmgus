@@ -8,8 +8,6 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name action_die.cpp - The die action. */
-//
 //      (c) Copyright 1998-2020 by Lutz Sammer, Jimmy Salmon and Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
@@ -27,10 +25,6 @@
 //      02111-1307, USA.
 //
 
-/*----------------------------------------------------------------------------
---  Includes
-----------------------------------------------------------------------------*/
-
 #include "stratagus.h"
 
 #include "action/action_die.h"
@@ -41,13 +35,9 @@
 #include "unit/unit.h"
 #include "unit/unit_type.h"
 
-/*----------------------------------------------------------------------------
---  Functions
-----------------------------------------------------------------------------*/
-
-/* static */ COrder *COrder::NewActionDie()
+std::unique_ptr<COrder> COrder::NewActionDie()
 {
-	return new COrder_Die;
+	return std::make_unique<COrder_Die>();
 }
 
 /* virtual */ void COrder_Die::Save(CFile &file, const CUnit &unit) const

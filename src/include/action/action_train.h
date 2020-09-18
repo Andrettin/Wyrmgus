@@ -33,11 +33,14 @@
 
 class COrder_Train : public COrder
 {
-	friend COrder *COrder::NewActionTrain(CUnit &trainer, wyrmgus::unit_type &type, int player);
+	friend std::unique_ptr<COrder> COrder::NewActionTrain(CUnit &trainer, wyrmgus::unit_type &type, int player);
 public:
 	COrder_Train() : COrder(UnitAction::Train), Type(nullptr), Player(0), Ticks(0) {}
 
-	virtual COrder_Train *Clone() const { return new COrder_Train(*this); }
+	virtual std::unique_ptr<COrder> Clone() const override
+	{
+		return std::make_unique<COrder_Train>(*this);
+	}
 
 	virtual bool IsValid() const;
 

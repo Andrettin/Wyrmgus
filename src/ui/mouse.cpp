@@ -1159,9 +1159,9 @@ static void HandleMouseOn(const PixelPos screenPos)
 					size_t j = 0;
 					for (size_t i = 0; i < Selected[0]->Orders.size() && j < size; ++i) {
 						if (Selected[0]->Orders[i]->Action == UnitAction::Train) {
-							const COrder_Train &order = *static_cast<COrder_Train *>(Selected[0]->Orders[i]);
+							const COrder_Train &order = *static_cast<COrder_Train *>(Selected[0]->Orders[i].get());
 							if (i > 0 && j > 0 && Selected[0]->Orders[i - 1]->Action == UnitAction::Train) {
-								const COrder_Train &previous_order = *static_cast<COrder_Train *>(Selected[0]->Orders[i - 1]);
+								const COrder_Train &previous_order = *static_cast<COrder_Train *>(Selected[0]->Orders[i - 1].get());
 								if (previous_order.GetUnitType().Slot == order.GetUnitType().Slot) {
 									continue;
 								}
@@ -1427,15 +1427,13 @@ void UIHandleMouseMove(const PixelPos &cursorPos)
 
 				// We now need to check if there are another build commands on this build spot
 				bool buildable = true;
-				for (std::vector<COrderPtr>::const_iterator it = unit.Orders.begin();
-					 it != unit.Orders.end(); ++it) {
-					COrder &order = **it;
-					if (order.Action == UnitAction::Build) {
-						COrder_Build &build = dynamic_cast<COrder_Build &>(order);
-						if (tilePos.x >= build.GetGoalPos().x
-							&& tilePos.x < build.GetGoalPos().x + build.GetUnitType().get_tile_width()
-							&& tilePos.y >= build.GetGoalPos().y
-							&& tilePos.y < build.GetGoalPos().y + build.GetUnitType().get_tile_height()) {
+				for (const std::unique_ptr<COrder> &order : unit.Orders) {
+					if (order->Action == UnitAction::Build) {
+						const COrder_Build *build = dynamic_cast<const COrder_Build *>(order.get());
+						if (tilePos.x >= build->GetGoalPos().x
+							&& tilePos.x < build->GetGoalPos().x + build->GetUnitType().get_tile_width()
+							&& tilePos.y >= build->GetGoalPos().y
+							&& tilePos.y < build->GetGoalPos().y + build->GetUnitType().get_tile_height()) {
 							buildable = false;
 							break;
 						}
@@ -2536,9 +2534,9 @@ static void UIHandleButtonUp_OnButton(unsigned button)
 					int order_slot = -1;
 					for (size_t i = 0; i < Selected[0]->Orders.size(); ++i) {
 						if (Selected[0]->Orders[i]->Action == UnitAction::Train) {
-							const COrder_Train &order = *static_cast<COrder_Train *>(Selected[0]->Orders[i]);
+							const COrder_Train &order = *static_cast<COrder_Train *>(Selected[0]->Orders[i].get());
 							if (i > 0 && j > 0 && Selected[0]->Orders[i - 1]->Action == UnitAction::Train) {
-								const COrder_Train &previous_order = *static_cast<COrder_Train *>(Selected[0]->Orders[i - 1]);
+								const COrder_Train &previous_order = *static_cast<COrder_Train *>(Selected[0]->Orders[i - 1].get());
 								if (previous_order.GetUnitType().Slot == order.GetUnitType().Slot) {
 									if (order_slot != -1) {
 										order_slot = i; //so that it removes the last training order of that unit type
@@ -2555,7 +2553,7 @@ static void UIHandleButtonUp_OnButton(unsigned button)
 						}
 					}
 					if (order_slot != -1) {
-						const COrder_Train &order = *static_cast<COrder_Train *>(Selected[0]->Orders[order_slot]);
+						const COrder_Train &order = *static_cast<COrder_Train *>(Selected[0]->Orders[order_slot].get());
 
 						DebugPrint("Cancel slot %d %s\n" _C_ order_slot _C_ order.GetUnitType().Ident.c_str());
 						SendCommandCancelTraining(*Selected[0], order_slot, &order.GetUnitType());

@@ -31,29 +31,30 @@
 
 #include "actions.h"
 
-class COrder_PickUp : public COrder
+class COrder_PickUp final : public COrder
 {
-	friend COrder *COrder::NewActionPickUp(CUnit &dest);
+	friend std::unique_ptr<COrder> COrder::NewActionPickUp(CUnit &dest);
 public:
-	//Wyrmgus start
-//	COrder_PickUp() : COrder(UnitAction::PickUp), State(0), Range(0)
 	COrder_PickUp() : COrder(UnitAction::PickUp), State(0), Range(0), MapLayer(0)
-	//Wyrmgus end
 	{
 		goalPos.x = -1;
 		goalPos.y = -1;
 	}
 
-	virtual COrder_PickUp *Clone() const { return new COrder_PickUp(*this); }
+	virtual std::unique_ptr<COrder> Clone() const override
+	{
+		return std::make_unique<COrder_PickUp>(*this);
+	}
 
-	virtual bool IsValid() const;
+	virtual bool IsValid() const override;
 
-	virtual void Save(CFile &file, const CUnit &unit) const;
-	virtual bool ParseSpecificData(lua_State *l, int &j, const char *value, const CUnit &unit);
+	virtual void Save(CFile &file, const CUnit &unit) const override;
+	virtual bool ParseSpecificData(lua_State *l, int &j, const char *value, const CUnit &unit) override;
 
-	virtual void Execute(CUnit &unit);
-	virtual PixelPos Show(const CViewport &vp, const PixelPos &lastScreenPos) const;
-	virtual void UpdatePathFinderData(PathFinderInput &input);
+	virtual void Execute(CUnit &unit) override;
+	virtual PixelPos Show(const CViewport &vp, const PixelPos &lastScreenPos) const override;
+	virtual void UpdatePathFinderData(PathFinderInput &input) override;
+
 private:
 	unsigned int State;
 	int Range;

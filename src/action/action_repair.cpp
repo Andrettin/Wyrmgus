@@ -59,9 +59,9 @@
 #include "unit/unit_type_type.h"
 #include "video/video.h"
 
-/* static */ COrder *COrder::NewActionRepair(CUnit &unit, CUnit &target)
+std::unique_ptr<COrder> COrder::NewActionRepair(CUnit &unit, CUnit &target)
 {
-	COrder_Repair *order = new COrder_Repair();
+	auto order = std::make_unique<COrder_Repair>();
 
 	if (target.Destroyed) {
 		order->goalPos = target.tilePos + target.GetHalfTileSize();
@@ -74,13 +74,13 @@
 }
 
 //Wyrmgus start
-///* static */ COrder *COrder::NewActionRepair(const Vec2i &pos)
-/* static */ COrder *COrder::NewActionRepair(const Vec2i &pos, int z)
+//std::unique_ptr<COrder> COrder::NewActionRepair(const Vec2i &pos)
+std::unique_ptr<COrder> COrder::NewActionRepair(const Vec2i &pos, int z)
 //Wyrmgus end
 {
 	Assert(CMap::Map.Info.IsPointOnMap(pos, z));
 
-	COrder_Repair *order = new COrder_Repair;
+	auto order = std::make_unique<COrder_Repair>();
 
 	order->goalPos = pos;
 	//Wyrmgus start

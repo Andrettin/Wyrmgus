@@ -31,11 +31,11 @@
 
 #include "actions.h"
 
-class COrder_Patrol : public COrder
+class COrder_Patrol final : public COrder
 {
 	//Wyrmgus start
-//	friend COrder *COrder::NewActionPatrol(const Vec2i &currentPos, const Vec2i &dest);
-	friend COrder *COrder::NewActionPatrol(const Vec2i &currentPos, const Vec2i &dest, int current_z, int dest_z);
+//	friend std::unique_ptr<COrder> COrder::NewActionPatrol(const Vec2i &currentPos, const Vec2i &dest);
+	friend std::unique_ptr<COrder> COrder::NewActionPatrol(const Vec2i &currentPos, const Vec2i &dest, int current_z, int dest_z);
 	//Wyrmgus end
 public:
 	//Wyrmgus start
@@ -47,18 +47,22 @@ public:
 		goalPos.y = -1;
 	}
 
-	virtual COrder_Patrol *Clone() const { return new COrder_Patrol(*this); }
+	virtual std::unique_ptr<COrder> Clone() const override
+	{
+		return std::make_unique<COrder_Patrol>(*this);
+	}
 
-	virtual bool IsValid() const;
+	virtual bool IsValid() const override;
 
-	virtual void Save(CFile &file, const CUnit &unit) const;
-	virtual bool ParseSpecificData(lua_State *l, int &j, const char *value, const CUnit &unit);
+	virtual void Save(CFile &file, const CUnit &unit) const override;
+	virtual bool ParseSpecificData(lua_State *l, int &j, const char *value, const CUnit &unit) override;
 
-	virtual void Execute(CUnit &unit);
-	virtual PixelPos Show(const CViewport &vp, const PixelPos &lastScreenPos) const;
-	virtual void UpdatePathFinderData(PathFinderInput &input);
+	virtual void Execute(CUnit &unit) override;
+	virtual PixelPos Show(const CViewport &vp, const PixelPos &lastScreenPos) const override;
+	virtual void UpdatePathFinderData(PathFinderInput &input) override;
 
 	const Vec2i &GetWayPoint() const { return WayPoint; }
+
 private:
 	Vec2i WayPoint; /// position for patroling.
 	unsigned int WaitingCycle; /// number of cycle pathfinder wait.

@@ -33,11 +33,14 @@
 
 class COrder_TransformInto : public COrder
 {
-	friend COrder *COrder::NewActionTransformInto(wyrmgus::unit_type &type);
+	friend std::unique_ptr<COrder>COrder::NewActionTransformInto(wyrmgus::unit_type &type);
 public:
 	COrder_TransformInto() : COrder(UnitAction::TransformInto), Type(nullptr) {}
 
-	virtual COrder_TransformInto *Clone() const { return new COrder_TransformInto(*this); }
+	virtual std::unique_ptr<COrder> Clone() const override
+	{
+		return std::make_unique<COrder_TransformInto>(*this);
+	}
 
 	virtual bool IsValid() const;
 
@@ -57,25 +60,30 @@ private:
 	wyrmgus::unit_type *Type; /// Transform unit into this unit-type
 };
 
-class COrder_UpgradeTo : public COrder
+class COrder_UpgradeTo final : public COrder
 {
-	friend COrder *COrder::NewActionUpgradeTo(CUnit &unit, wyrmgus::unit_type &type);
+	friend std::unique_ptr<COrder> COrder::NewActionUpgradeTo(CUnit &unit, wyrmgus::unit_type &type);
 public:
-	COrder_UpgradeTo() : COrder(UnitAction::UpgradeTo), Type(nullptr), Ticks(0) {}
+	COrder_UpgradeTo() : COrder(UnitAction::UpgradeTo)
+	{
+	}
 
-	virtual COrder_UpgradeTo *Clone() const { return new COrder_UpgradeTo(*this); }
+	virtual std::unique_ptr<COrder> Clone() const override
+	{
+		return std::make_unique<COrder_UpgradeTo>(*this);
+	}
 
-	virtual bool IsValid() const;
+	virtual bool IsValid() const override;
 
-	virtual void Save(CFile &file, const CUnit &unit) const;
-	virtual bool ParseSpecificData(lua_State *l, int &j, const char *value, const CUnit &unit);
+	virtual void Save(CFile &file, const CUnit &unit) const override;
+	virtual bool ParseSpecificData(lua_State *l, int &j, const char *value, const CUnit &unit) override;
 
-	virtual void Execute(CUnit &unit);
-	virtual void Cancel(CUnit &unit);
-	virtual PixelPos Show(const CViewport &vp, const PixelPos &lastScreenPos) const;
-	virtual void UpdatePathFinderData(PathFinderInput &input) { UpdatePathFinderData_NotCalled(input); }
+	virtual void Execute(CUnit &unit) override;
+	virtual void Cancel(CUnit &unit) override;
+	virtual PixelPos Show(const CViewport &vp, const PixelPos &lastScreenPos) const override;
+	virtual void UpdatePathFinderData(PathFinderInput &input) override { UpdatePathFinderData_NotCalled(input); }
 
-	virtual void UpdateUnitVariables(CUnit &unit) const;
+	virtual void UpdateUnitVariables(CUnit &unit) const override;
 	
 	//Wyrmgus start
 	void ConvertUnitType(const CUnit &unit, wyrmgus::unit_type &newType);
@@ -83,8 +91,8 @@ public:
 	
 	const wyrmgus::unit_type &GetUnitType() const { return *Type; }
 private:
-	wyrmgus::unit_type *Type; /// upgrade to this unit-type
-	int Ticks;       /// Ticks to complete
+	wyrmgus::unit_type *Type = nullptr; /// upgrade to this unit-type
+	int Ticks = 0;       /// Ticks to complete
 };
 
 extern int TransformUnitIntoType(CUnit &unit, const wyrmgus::unit_type &newtype);

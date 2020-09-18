@@ -57,15 +57,9 @@ enum {
 	State_TargetReached = 128,
 };
 
-
-
-/*----------------------------------------------------------------------------
---  Functions
-----------------------------------------------------------------------------*/
-
-/* static */ COrder *COrder::NewActionPickUp(CUnit &dest)
+std::unique_ptr<COrder> COrder::NewActionPickUp(CUnit &dest)
 {
-	COrder_PickUp *order = new COrder_PickUp;
+	auto order = std::make_unique<COrder_PickUp>();
 
 	// Destination could be killed.
 	// Should be handled in action, but is not possible!
@@ -228,7 +222,7 @@ enum {
 				|| (!unit.HasInventory() && goal->Type->BoolFlag[ITEM_INDEX].value && wyrmgus::is_consumable_item_class(goal->Type->get_item_class()))
 			)
 		) {
-			if (!unit.CriticalOrder) {
+			if (unit.CriticalOrder == nullptr) {
 				unit.CriticalOrder = COrder::NewActionUse(*goal);
 			}
 		}
@@ -310,8 +304,7 @@ enum {
 				} else {
 					if (dest.NewOrder->HasGoal()) {
 						if (dest.NewOrder->GetGoal()->Destroyed) {
-							delete dest.NewOrder;
-							dest.NewOrder = nullptr;
+							dest.NewOrder.reset();
 							this->Finished = true;
 							return ;
 						}

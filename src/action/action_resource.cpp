@@ -163,14 +163,12 @@ static bool FindNearestReachableTerrainType(int movemask, int resource, int rang
 	return terrainTraversal.Run(nearReachableTerrainFinder);
 }
 
-
-
 //Wyrmgus start
-///* static */ COrder *COrder::NewActionResource(CUnit &harvester, const Vec2i &pos)
-/* static */ COrder *COrder::NewActionResource(CUnit &harvester, const Vec2i &pos, int z)
+//std::unique_ptr<COrder> COrder::NewActionResource(CUnit &harvester, const Vec2i &pos)
+std::unique_ptr<COrder> COrder::NewActionResource(CUnit &harvester, const Vec2i &pos, int z)
 //Wyrmgus end
 {
-	COrder_Resource *order = new COrder_Resource(harvester);
+	auto order = std::make_unique<COrder_Resource>(harvester);
 	Vec2i ressourceLoc;
 
 	if (CMap::Map.Info.IsPointOnMap(pos, z) && CMap::Map.Field(pos, z)->get_resource() != nullptr) {
@@ -188,9 +186,9 @@ static bool FindNearestReachableTerrainType(int movemask, int resource, int rang
 	return order;
 }
 
-/* static */ COrder *COrder::NewActionResource(CUnit &harvester, CUnit &mine)
+std::unique_ptr<COrder> COrder::NewActionResource(CUnit &harvester, CUnit &mine)
 {
-	COrder_Resource *order = new COrder_Resource(harvester);
+	auto order = std::make_unique<COrder_Resource>(harvester);
 
 	order->SetGoal(&mine);
 	order->Resource.Mine = &mine;
@@ -200,9 +198,9 @@ static bool FindNearestReachableTerrainType(int movemask, int resource, int rang
 	return order;
 }
 
-/* static */ COrder *COrder::NewActionReturnGoods(CUnit &harvester, CUnit *depot)
+std::unique_ptr<COrder> COrder::NewActionReturnGoods(CUnit &harvester, CUnit *depot)
 {
-	COrder_Resource *order = new COrder_Resource(harvester);
+	auto order = std::make_unique<COrder_Resource>(harvester);
 
 	// Destination could be killed. NETWORK!
 	if (depot && depot->Destroyed) {
@@ -224,7 +222,6 @@ static bool FindNearestReachableTerrainType(int movemask, int resource, int rang
 	}
 	return order;
 }
-
 
 Vec2i COrder_Resource::GetHarvestLocation() const
 {

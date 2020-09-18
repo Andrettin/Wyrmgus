@@ -55,14 +55,14 @@
 #include "video/video.h"
 
 //Wyrmgus start
-///* static */ COrder *COrder::NewActionPatrol(const Vec2i &currentPos, const Vec2i &dest)
-/* static */ COrder *COrder::NewActionPatrol(const Vec2i &currentPos, const Vec2i &dest, int current_z, int dest_z)
+//std::unique_ptr<COrder> COrder::NewActionPatrol(const Vec2i &currentPos, const Vec2i &dest)
+std::unique_ptr<COrder> COrder::NewActionPatrol(const Vec2i &currentPos, const Vec2i &dest, int current_z, int dest_z)
 //Wyrmgus end
 {
 	Assert(CMap::Map.Info.IsPointOnMap(currentPos, current_z));
 	Assert(CMap::Map.Info.IsPointOnMap(dest, dest_z));
 
-	COrder_Patrol *order = new COrder_Patrol();
+	auto order = std::make_unique<COrder_Patrol>();
 
 	order->goalPos = dest;
 	order->WayPoint = currentPos;

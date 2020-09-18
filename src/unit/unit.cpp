@@ -407,6 +407,15 @@ void CUnit::RefsDecrease()
 	}
 }
 
+CUnit::CUnit()
+{
+	this->Init();
+}
+
+CUnit::~CUnit()
+{
+}
+
 void CUnit::Init()
 {
 	Refs = 0;
@@ -502,13 +511,10 @@ void CUnit::Init()
 	GivesResource = 0;
 	CurrentResource = 0;
 	StepCount = 0;
-	Orders.clear();
-	delete SavedOrder;
-	SavedOrder = nullptr;
-	delete NewOrder;
-	NewOrder = nullptr;
-	delete CriticalOrder;
-	CriticalOrder = nullptr;
+	this->Orders.clear();
+	this->SavedOrder.reset();
+	this->NewOrder.reset();
+	this->CriticalOrder.reset();
 	this->autocast_spells.clear();
 	this->spell_autocast.clear();
 	SpellCoolDownTimers = nullptr;
@@ -598,10 +604,7 @@ void CUnit::Release(bool final)
 	this->spell_autocast.clear();
 	delete[] SpellCoolDownTimers;
 	this->Variable.clear();
-	for (std::vector<COrder *>::iterator order = Orders.begin(); order != Orders.end(); ++order) {
-		delete *order;
-	}
-	Orders.clear();
+	this->Orders.clear();
 
 	// Remove the unit from the global units table.
 	UnitManager.ReleaseUnit(this);
@@ -899,7 +902,7 @@ void CUnit::HealingItemAutoUse()
 				uins->Variable[HITPOINTHEALING_INDEX].Value <= (this->GetModifiedVariable(HP_INDEX, VariableMax) - this->Variable[HP_INDEX].Value)
 				|| (this->Variable[HP_INDEX].Value * 100 / this->GetModifiedVariable(HP_INDEX, VariableMax)) <= 20 // use a healing item if has less than 20% health
 			) {
-				if (!this->CriticalOrder) {
+				if (this->CriticalOrder == nullptr) {
 					this->CriticalOrder = COrder::NewActionUse(*uins);
 				}
 				break;
@@ -2843,15 +2846,12 @@ void CUnit::Init(const wyrmgus::unit_type &type)
 */
 bool CUnit::RestoreOrder()
 {
-	COrder *savedOrder = this->SavedOrder;
-
-	if (savedOrder == nullptr) {
+	if (this->SavedOrder == nullptr) {
 		return false;
 	}
 
-	if (savedOrder->IsValid() == false) {
-		delete savedOrder;
-		this->SavedOrder = nullptr;
+	if (this->SavedOrder->IsValid() == false) {
+		this->SavedOrder.reset();
 		return false;
 	}
 
@@ -2860,7 +2860,7 @@ bool CUnit::RestoreOrder()
 	this->Orders[0]->Finished = true;
 
 	//copy
-	this->Orders.insert(this->Orders.begin() + 1, savedOrder);
+	this->Orders.insert(this->Orders.begin() + 1, std::move(this->SavedOrder));
 
 	this->SavedOrder = nullptr;
 	return true;
@@ -4221,9 +4221,6 @@ void UnitLost(CUnit &unit)
 */
 void UnitClearOrders(CUnit &unit)
 {
-	for (size_t i = 0; i != unit.Orders.size(); ++i) {
-		delete unit.Orders[i];
-	}
 	unit.Orders.clear();
 	unit.Orders.push_back(COrder::NewActionStill());
 }
@@ -6813,7 +6810,6 @@ void LetUnitDie(CUnit &unit, bool suicide)
 	// Unit has death animation.
 
 	// Not good: UnitUpdateHeading(unit);
-	delete unit.Orders[0];
 	unit.Orders[0] = COrder::NewActionDie();
 	if (type->get_corpse_type() != nullptr) {
 #ifdef DYNAMIC_LOAD
@@ -7282,8 +7278,9 @@ void HitUnit_RunAway(CUnit &target, const CUnit &attacker)
 
 static void HitUnit_AttackBack(CUnit &attacker, CUnit &target)
 {
-	const int threshold = 30;
-	COrder *savedOrder = nullptr;
+	static constexpr int threshold = 30;
+
+	std::unique_ptr<COrder> saved_order;
 
 	if (target.Player == CPlayer::GetThisPlayer() && target.Player->Type != PlayerNeutral) { // allow neutral units to strike back
 		if (target.CurrentAction() == UnitAction::Attack) {
@@ -7299,7 +7296,7 @@ static void HitUnit_AttackBack(CUnit &attacker, CUnit &target)
 		}
 	}
 	if (target.CanStoreOrder(target.CurrentOrder())) {
-		savedOrder = target.CurrentOrder()->Clone();
+		saved_order = target.CurrentOrder()->Clone();
 	}
 	CUnit *oldgoal = target.CurrentOrder()->GetGoal();
 	CUnit *goal, *best = oldgoal;
@@ -7334,8 +7331,8 @@ static void HitUnit_AttackBack(CUnit &attacker, CUnit &target)
 		if (best->IsAgressive()) {
 			target.Threshold = threshold;
 		}
-		if (savedOrder != nullptr) {
-			target.SavedOrder = savedOrder;
+		if (saved_order != nullptr) {
+			target.SavedOrder = std::move(saved_order);
 		}
 	}
 }

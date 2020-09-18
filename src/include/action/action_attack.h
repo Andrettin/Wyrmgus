@@ -31,37 +31,38 @@
 
 #include "actions.h"
 
-class COrder_Attack : public COrder
+class COrder_Attack final : public COrder
 {
-	friend COrder *COrder::NewActionAttack(const CUnit &attacker, CUnit &target);
+	friend std::unique_ptr<COrder> COrder::NewActionAttack(const CUnit &attacker, CUnit &target);
 	//Wyrmgus start
-//	friend COrder *COrder::NewActionAttack(const CUnit &attacker, const Vec2i &dest);
-//	friend COrder *COrder::NewActionAttackGround(const CUnit &attacker, const Vec2i &dest);
-	friend COrder *COrder::NewActionAttack(const CUnit &attacker, const Vec2i &dest, int z);
-	friend COrder *COrder::NewActionAttackGround(const CUnit &attacker, const Vec2i &dest, int z);
+//	friend std::unique_ptr<COrder> COrder::NewActionAttack(const CUnit &attacker, const Vec2i &dest);
+//	friend std::unique_ptr<COrder> COrder::NewActionAttackGround(const CUnit &attacker, const Vec2i &dest);
+	friend std::unique_ptr<COrder> COrder::NewActionAttack(const CUnit &attacker, const Vec2i &dest, int z);
+	friend std::unique_ptr<COrder> COrder::NewActionAttackGround(const CUnit &attacker, const Vec2i &dest, int z);
 	//Wyrmgus end
 public:
-	explicit COrder_Attack(bool ground) : COrder(ground ? UnitAction::AttackGround : UnitAction::Attack),
-		//Wyrmgus start
-//		State(0), MinRange(0), Range(0), goalPos(-1, -1) {}
-		State(0), MinRange(0), Range(0), goalPos(-1, -1), MapLayer(0) {}
-		//Wyrmgus end
+	explicit COrder_Attack(const bool ground) : COrder(ground ? UnitAction::AttackGround : UnitAction::Attack)
+	{
+	}
 
-	virtual COrder_Attack *Clone() const { return new COrder_Attack(*this); }
+	virtual std::unique_ptr<COrder> Clone() const override
+	{
+		return std::make_unique<COrder_Attack>(*this);
+	}
 
-	virtual bool IsValid() const;
-	virtual void Save(CFile &file, const CUnit &unit) const;
-	virtual bool ParseSpecificData(lua_State *l, int &j, const char *value, const CUnit &unit);
+	virtual bool IsValid() const override;
+	virtual void Save(CFile &file, const CUnit &unit) const override;
+	virtual bool ParseSpecificData(lua_State *l, int &j, const char *value, const CUnit &unit) override;
 
-	virtual void Execute(CUnit &unit);
-	virtual void OnAnimationAttack(CUnit &unit);
-	virtual PixelPos Show(const CViewport &vp, const PixelPos &lastScreenPos) const;
-	virtual void UpdatePathFinderData(PathFinderInput &input);
-	virtual bool OnAiHitUnit(CUnit &unit, CUnit *attacker, int /*damage*/);
+	virtual void Execute(CUnit &unit) override;
+	virtual void OnAnimationAttack(CUnit &unit) override;
+	virtual PixelPos Show(const CViewport &vp, const PixelPos &lastScreenPos) const override;
+	virtual void UpdatePathFinderData(PathFinderInput &input) override;
+	virtual bool OnAiHitUnit(CUnit &unit, CUnit *attacker, int /*damage*/) override;
 
-	virtual const Vec2i GetGoalPos() const { return goalPos; }
+	virtual const Vec2i GetGoalPos() const override { return goalPos; }
 	//Wyrmgus start
-	virtual const int GetGoalMapLayer() const { return MapLayer; }
+	virtual const int GetGoalMapLayer() const override { return MapLayer; }
 	//Wyrmgus end
 	bool IsWeakTargetSelected() const;
 
@@ -72,11 +73,11 @@ private:
 	void AttackTarget(CUnit &unit);
 
 private:
-	int State;
-	int MinRange;
-	int Range;
-	Vec2i goalPos;
+	int State = 0;
+	int MinRange = 0;
+	int Range = 0;
+	Vec2i goalPos = Vec2i(-1, -1);
 	//Wyrmgus start
-	int MapLayer;
+	int MapLayer = 0;
 	//Wyrmgus end
 };

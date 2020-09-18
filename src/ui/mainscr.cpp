@@ -525,9 +525,9 @@ static void DrawUnitInfo_Training(const CUnit &unit)
 			std::vector<int> train_counter;
 			for (size_t i = 0; i < unit.Orders.size(); ++i) {
 				if (unit.Orders[i]->Action == UnitAction::Train) {
-					const COrder_Train &order = *static_cast<COrder_Train *>(unit.Orders[i]);
+					const COrder_Train &order = *static_cast<COrder_Train *>(unit.Orders[i].get());
 					if (i > 0 && j > 0 && unit.Orders[i - 1]->Action == UnitAction::Train) {
-						const COrder_Train &previous_order = *static_cast<COrder_Train *>(unit.Orders[i - 1]);
+						const COrder_Train &previous_order = *static_cast<COrder_Train *>(unit.Orders[i - 1].get());
 						if (previous_order.GetUnitType().Slot == order.GetUnitType().Slot) {
 							train_counter[j - 1]++;
 							continue;
