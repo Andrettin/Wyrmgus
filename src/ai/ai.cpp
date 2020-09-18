@@ -985,16 +985,15 @@ void AiHelpMe(const CUnit *attacker, CUnit &defender)
 					
 					//Wyrmgus start
 //					CommandAttack(aiunit, attacker->tilePos, const_cast<CUnit *>(attacker), FlushCommands);
-//					COrder *savedOrder = COrder::NewActionAttack(aiunit, attacker->tilePos);
+//					std::unique_ptr<COrder> saved_order = COrder::NewActionAttack(aiunit, attacker->tilePos);
 					CommandAttack(aiunit, attacker->tilePos, const_cast<CUnit *>(attacker), FlushCommands, attacker->MapLayer);
 					//Wyrmgus end
 
 					//Wyrmgus start
-//					if (aiunit.CanStoreOrder(savedOrder) == false) {
-//						delete savedOrder;
-//						savedOrder = nullptr;
+//					if (aiunit.CanStoreOrder(saved_order.get()) == false) {
+//						saved_order.reset();
 //					} else {
-//						aiunit.SavedOrder = savedOrder;
+//						aiunit.SavedOrder = std::move(saved_order);
 //					}
 					//Wyrmgus end
 				}

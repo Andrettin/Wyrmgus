@@ -334,12 +334,10 @@ static void AnimateActionTrain(CUnit &unit)
 
 	if (unit.NewOrder && unit.NewOrder->HasGoal()
 		&& unit.NewOrder->GetGoal()->Destroyed) {
-		delete unit.NewOrder;
-		unit.NewOrder = nullptr;
+		unit.NewOrder.reset();
 	}
 
 	if (CanHandleOrder(*newUnit, unit.NewOrder) == true) {
-		delete newUnit->Orders[0];
 		newUnit->Orders[0] = unit.NewOrder->Clone();
 	} else {
 #if 0
@@ -410,12 +408,10 @@ static void AnimateActionTrain(CUnit &unit)
 		/*
 		if (unit.NewOrder && unit.NewOrder->HasGoal()
 			&& unit.NewOrder->GetGoal()->Destroyed) {
-			delete unit.NewOrder;
-			unit.NewOrder = nullptr;
+			unit.NewOrder.reset();
 		}
 
 		if (CanHandleOrder(*newUnit, unit.NewOrder) == true) {
-			delete newUnit->Orders[0];
 			newUnit->Orders[0] = unit.NewOrder->Clone();
 		} else {
 	#if 0

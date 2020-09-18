@@ -385,9 +385,8 @@ void COrder_Build::HelpBuild(CUnit &unit, CUnit &building)
 		  //Wyrmgus end
 
 		// shortcut to replace order, without inserting and removing in front of Orders
-		delete this; // Bad
 		unit.Orders[0] = COrder::NewActionRepair(unit, building);
-		return ;
+		return;
 	}
 //Wyrmgus start
 //#endif
@@ -440,7 +439,6 @@ bool COrder_Build::StartBuilding(CUnit &unit, CUnit &ontop)
 	}
 
 	// Must set action before placing, otherwise it will incorrectly mark radar
-	delete build->CurrentOrder();
 	build->Orders[0] = COrder::NewActionBuilt(unit, *build);
 
 	UpdateUnitSightRange(*build);
