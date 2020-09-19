@@ -61,7 +61,7 @@ PixelPos CursorStartMapPos;/// position of starting point of selection rectangle
 
 
 /*--- DRAW BUILDING  CURSOR ------------------------------------------------*/
-wyrmgus::unit_type *CursorBuilding;           /// building cursor
+const wyrmgus::unit_type *CursorBuilding;           /// building cursor
 
 /*--- DRAW SPRITE CURSOR ---------------------------------------------------*/
 wyrmgus::cursor *GameCursor = nullptr;                 /// current shown cursor-type

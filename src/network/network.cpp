@@ -589,7 +589,7 @@ void NetworkSendExtendedCommand(int command, int arg1, int arg2, int arg3,
 **  @param units  Units to send
 **  @param count  Number of units to send
 */
-void NetworkSendSelection(CUnit **units, int count)
+void NetworkSendSelection(CUnit * const *units, int count)
 {
 	// Check if we have any teammates to send to
 	bool hasteammates = false;

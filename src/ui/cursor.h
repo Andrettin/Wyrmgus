@@ -172,7 +172,7 @@ enum class CursorState {
 extern CursorState CurrentCursorState;  /// current cursor state (point,...)
 extern ButtonCmd CursorAction;          /// action for selection
 extern int CursorValue;           /// value for action (spell type f.e.)
-extern wyrmgus::unit_type *CursorBuilding; /// building cursor
+extern const wyrmgus::unit_type *CursorBuilding; /// building cursor
 extern std::string CustomCursor;  /// custom cursor for button
 
 extern wyrmgus::cursor *GameCursor;     /// cursor-type

@@ -905,7 +905,7 @@ void AiReduceMadeInBuilt(PlayerAi &pai, const wyrmgus::unit_type &type, int land
 **  @param attacker  Pointer to attacker unit.
 **  @param defender  Pointer to unit that is being attacked.
 */
-void AiHelpMe(const CUnit *attacker, CUnit &defender)
+void AiHelpMe(CUnit *attacker, CUnit &defender)
 {
 	/* Friendly Fire - typical splash */
 	if (!attacker || attacker->Player->Index == defender.Player->Index) {
@@ -984,9 +984,9 @@ void AiHelpMe(const CUnit *attacker, CUnit &defender)
 					//Wyrmgus end
 					
 					//Wyrmgus start
-//					CommandAttack(aiunit, attacker->tilePos, const_cast<CUnit *>(attacker), FlushCommands);
+//					CommandAttack(aiunit, attacker->tilePos, attacker, FlushCommands);
 //					std::unique_ptr<COrder> saved_order = COrder::NewActionAttack(aiunit, attacker->tilePos);
-					CommandAttack(aiunit, attacker->tilePos, const_cast<CUnit *>(attacker), FlushCommands, attacker->MapLayer);
+					CommandAttack(aiunit, attacker->tilePos, attacker, FlushCommands, attacker->MapLayer);
 					//Wyrmgus end
 
 					//Wyrmgus start
@@ -1071,7 +1071,7 @@ void AiHelpMe(const CUnit *attacker, CUnit &defender)
 
 						aiunit.Wait += delay;
 						
-						CommandAttack(aiunit, attacker->tilePos, const_cast<CUnit *>(attacker), FlushCommands, attacker->MapLayer);
+						CommandAttack(aiunit, attacker->tilePos, attacker, FlushCommands, attacker->MapLayer);
 					}
 				}
 			}
@@ -1136,7 +1136,7 @@ void AiHelpMe(const CUnit *attacker, CUnit &defender)
 				}
 
 				if (shouldAttack) {
-					CommandAttack(aiunit, attacker->tilePos, const_cast<CUnit *>(attacker), FlushCommands, attacker->MapLayer->ID);
+					CommandAttack(aiunit, attacker->tilePos, attacker, FlushCommands, attacker->MapLayer->ID);
 					has_helper = true;
 				}
 			}

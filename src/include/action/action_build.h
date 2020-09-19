@@ -37,7 +37,7 @@ namespace wyrmgus {
 
 class COrder_Build final : public COrder
 {
-	friend std::unique_ptr<COrder> COrder::NewActionBuild(const CUnit &builder, const Vec2i &pos, wyrmgus::unit_type &building, int z, const wyrmgus::site *settlement);
+	friend std::unique_ptr<COrder> COrder::NewActionBuild(const CUnit &builder, const Vec2i &pos, const wyrmgus::unit_type &building, int z, const wyrmgus::site *settlement);
 public:
 	COrder_Build() : COrder(UnitAction::Build)
 	{
@@ -79,7 +79,7 @@ private:
 	void HelpBuild(CUnit &unit, CUnit &building);
 
 private:
-	wyrmgus::unit_type *Type = nullptr;        /// build a unit of this unit-type
+	const wyrmgus::unit_type *Type = nullptr;        /// build a unit of this unit-type
 	CUnitPtr BuildingUnit;  /// unit builded.
 	int State = 0;
 	int Range = 0;

@@ -181,9 +181,9 @@ extern bool LeaveStops;
 extern cursor_on CursorOn;
 
 /// vladi: used for unit buttons sub-menus etc
-extern wyrmgus::button_level *CurrentButtonLevel;
+extern const wyrmgus::button_level *CurrentButtonLevel;
 /// Last drawn popup : used to speed up drawing
-extern wyrmgus::button *LastDrawnButtonPopup;
+extern const wyrmgus::button *LastDrawnButtonPopup;
 
 /// Time to detect double clicks
 extern int DoubleClickDelay;

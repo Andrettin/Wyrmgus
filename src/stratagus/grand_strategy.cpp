@@ -698,7 +698,7 @@ void CGrandStrategyFaction::SetMinister(const wyrmgus::character_title title, st
 	} else {
 		CGrandStrategyHero *hero = GrandStrategyGame.GetHero(hero_full_name);
 		if (hero) {
-			this->Ministers[title] = const_cast<CGrandStrategyHero *>(&(*hero));
+			this->Ministers[title] = hero;
 			hero->Titles.push_back(std::make_pair(title, this));
 			
 			if (this->IsAlive()) {

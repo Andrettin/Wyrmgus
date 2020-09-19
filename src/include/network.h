@@ -90,6 +90,6 @@ extern void NetworkSendCommand(int command, const CUnit &unit, int x,
 extern void NetworkSendExtendedCommand(int command, int arg1, int arg2,
 									   int arg3, int arg4, int status);
 /// Send Selections to Team
-extern void NetworkSendSelection(CUnit **units, int count);
+extern void NetworkSendSelection(CUnit * const *units, int count);
 
 extern void NetworkCclRegister();

@@ -76,7 +76,7 @@ enum {
 	State_BuildFromOutside = 22
 };
 
-std::unique_ptr<COrder> COrder::NewActionBuild(const CUnit &builder, const Vec2i &pos, wyrmgus::unit_type &building, int z, const wyrmgus::site *settlement)
+std::unique_ptr<COrder> COrder::NewActionBuild(const CUnit &builder, const Vec2i &pos, const wyrmgus::unit_type &building, int z, const wyrmgus::site *settlement)
 {
 	Assert(CMap::Map.Info.IsPointOnMap(pos, z));
 
@@ -400,7 +400,7 @@ bool COrder_Build::StartBuilding(CUnit &unit, CUnit &ontop)
 
 	unit.Player->SubUnitType(type);
 
-	CUnit *build = MakeUnit(const_cast<wyrmgus::unit_type &>(type), unit.Player);
+	CUnit *build = MakeUnit(type, unit.Player);
 	
 	//Wyrmgus start
 	build->Name.clear(); // under construction buildings should have no proper name
@@ -511,11 +511,10 @@ bool COrder_Build::BuildFromOutside(CUnit &unit) const
 	}
 
 	if (this->BuildingUnit->CurrentAction() == UnitAction::Built) {
-		COrder_Built &targetOrder = *static_cast<COrder_Built *>(this->BuildingUnit->CurrentOrder());
-		CUnit &goal = *const_cast<COrder_Build *>(this)->BuildingUnit;
+		COrder_Built &target_order = *static_cast<COrder_Built *>(this->BuildingUnit->CurrentOrder());
+		CUnit &goal = *this->BuildingUnit;
 
-
-		targetOrder.ProgressHp(goal, 100);
+		target_order.ProgressHp(goal, 100);
 	}
 	if (unit.Anim.Unbreakable) {
 		return false;

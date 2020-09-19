@@ -69,7 +69,7 @@ extern void AiAttackWithForce(unsigned int force);
 --------------------------------------------------------*/
 
 /// Called if AI unit is attacked
-extern void AiHelpMe(const CUnit *attacker, CUnit &defender);
+extern void AiHelpMe(CUnit *attacker, CUnit &defender);
 /// Called if AI unit is killed
 extern void AiUnitKilled(CUnit &unit);
 /// Called if AI needs more farms

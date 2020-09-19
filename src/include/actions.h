@@ -142,7 +142,7 @@ public:
 	static std::unique_ptr<COrder> NewActionAttackGround(const CUnit &attacker, const Vec2i &dest, int z);
 	//Wyrmgus end
 	static std::unique_ptr<COrder> NewActionBoard(CUnit &unit);
-	static std::unique_ptr<COrder> NewActionBuild(const CUnit &builder, const Vec2i &pos, wyrmgus::unit_type &building, int z, const wyrmgus::site *settlement);
+	static std::unique_ptr<COrder> NewActionBuild(const CUnit &builder, const Vec2i &pos, const wyrmgus::unit_type &building, int z, const wyrmgus::site *settlement);
 	static std::unique_ptr<COrder> NewActionBuilt(CUnit &builder, CUnit &unit);
 	static std::unique_ptr<COrder> NewActionDefend(CUnit &dest);
 	static std::unique_ptr<COrder> NewActionDie();

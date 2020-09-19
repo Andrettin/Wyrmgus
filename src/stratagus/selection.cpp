@@ -28,10 +28,6 @@
 //      02111-1307, USA.
 //
 
-/*----------------------------------------------------------------------------
---  Includes
-----------------------------------------------------------------------------*/
-
 #include "stratagus.h"
 
 //Wyrmgus start
@@ -54,10 +50,6 @@
 #include "unit/unit_manager.h"
 #include "unit/unit_type.h"
 #include "unit/unit_type_type.h"
-
-/*----------------------------------------------------------------------------
---  Variables
-----------------------------------------------------------------------------*/
 
 unsigned int MaxSelectable;								/// Maximum number of selected units
 
@@ -156,7 +148,7 @@ static void HandleSuicideClick(CUnit &unit)
 **  @param units  Array of units to be selected.
 **  @param count  Number of units in array to be selected.
 */
-static void ChangeSelectedUnits(CUnit **units, unsigned int count)
+static void ChangeSelectedUnits(CUnit * const *units, unsigned int count)
 {
 	Assert(count <= MaxSelectable);
 
@@ -585,7 +577,7 @@ int SelectGroup(int group_number, GroupSelectionMode mode)
 		return 0;
 	}
 	if (mode == GroupSelectionMode::SELECT_ALL || !IsGroupTainted(group_number)) {
-		ChangeSelectedUnits(const_cast<CUnit **>(&units[0]), units.size());
+		ChangeSelectedUnits(&units[0], units.size());
 		return Selected.size();
 	}
 	std::vector<CUnit *> table;

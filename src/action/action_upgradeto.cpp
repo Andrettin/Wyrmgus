@@ -234,7 +234,7 @@ int TransformUnitIntoType(CUnit &unit, const wyrmgus::unit_type &newtype)
 	}
 	//Wyrmgus end
 	
-	unit.Type = const_cast<wyrmgus::unit_type *>(&newtype);
+	unit.Type = &newtype;
 	unit.Stats = &unit.Type->Stats[player.Index];
 	
 	//Wyrmgus start

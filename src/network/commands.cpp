@@ -438,7 +438,7 @@ void SendCommandUnload(CUnit &unit, const Vec2i &pos, CUnit *what, int flush, in
 ** @param what    pointer to unit-type of the building.
 ** @param flush   Flag flush all pending commands.
 */
-void SendCommandBuildBuilding(CUnit &unit, const Vec2i &pos, wyrmgus::unit_type &what, int flush, int z)
+void SendCommandBuildBuilding(CUnit &unit, const Vec2i &pos, const wyrmgus::unit_type &what, int flush, int z)
 {
 	if (!IsNetworkGame()) {
 		CommandLog("build", &unit, flush, pos.x, pos.y, NoUnitP, what.Ident.c_str(), -1);

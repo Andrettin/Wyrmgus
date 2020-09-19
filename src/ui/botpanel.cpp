@@ -92,9 +92,9 @@
 #include "video/video.h"
 
 /// Last drawn popup : used to speed up drawing
-wyrmgus::button *LastDrawnButtonPopup;
+const wyrmgus::button *LastDrawnButtonPopup = nullptr;
 /// for unit buttons sub-menus etc.
-wyrmgus::button_level *CurrentButtonLevel = nullptr;
+const wyrmgus::button_level *CurrentButtonLevel = nullptr;
 /// Pointer to current buttons
 std::vector<std::unique_ptr<wyrmgus::button>> CurrentButtons;
 
@@ -763,7 +763,7 @@ void DrawPopup(const wyrmgus::button &button, int x, int y, bool above)
 	} else if (&button == LastDrawnButtonPopup) {
 		useCache = true;
 	} else {
-		LastDrawnButtonPopup = const_cast<wyrmgus::button *>(&button);
+		LastDrawnButtonPopup = &button;
 	}
 
 	int popupWidth, popupHeight;

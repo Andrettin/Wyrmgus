@@ -830,7 +830,7 @@ void CommandUnload(CUnit &unit, const Vec2i &pos, CUnit *what, int flush, int z,
 **  @param what   Unit type to build.
 **  @param flush  if true, flush command queue.
 */
-void CommandBuildBuilding(CUnit &unit, const Vec2i &pos, wyrmgus::unit_type &what, int flush, int z, const wyrmgus::site *settlement)
+void CommandBuildBuilding(CUnit &unit, const Vec2i &pos, const wyrmgus::unit_type &what, int flush, int z, const wyrmgus::site *settlement)
 {
 	if (IsUnitValidForNetwork(unit) == false) {
 		return ;

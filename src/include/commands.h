@@ -119,7 +119,7 @@ extern void CommandBoard(CUnit &unit, CUnit &dest, int flush);
 extern void CommandUnload(CUnit &unit, const Vec2i &pos, CUnit *what, int flush, int z = 0, int landmass = 0);
 //Wyrmgus end
 /// Prepare command build
-extern void CommandBuildBuilding(CUnit &unit, const Vec2i &pos, wyrmgus::unit_type &, int flush, int z = 0, const wyrmgus::site *settlement = nullptr);
+extern void CommandBuildBuilding(CUnit &unit, const Vec2i &pos, const wyrmgus::unit_type &, int flush, int z = 0, const wyrmgus::site *settlement = nullptr);
 /// Prepare command dismiss
 extern void CommandDismiss(CUnit &unit, bool salvage = false);
 /// Prepare command resource location
@@ -234,7 +234,7 @@ extern void SendCommandBoard(CUnit &unit, CUnit &dest, int flush);
 extern void SendCommandUnload(CUnit &unit, const Vec2i &pos, CUnit *what, int flush, int z = 0);
 //Wyrmgus end
 /// Send build building command
-extern void SendCommandBuildBuilding(CUnit &unit, const Vec2i &pos, wyrmgus::unit_type &what, int flush, int z = 0);
+extern void SendCommandBuildBuilding(CUnit &unit, const Vec2i &pos, const wyrmgus::unit_type &what, int flush, int z = 0);
 /// Send cancel building command
 extern void SendCommandDismiss(CUnit &unit, bool salvage = false);
 /// Send harvest location command

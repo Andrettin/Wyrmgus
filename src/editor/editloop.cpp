@@ -559,7 +559,7 @@ static void EditorActionPlaceUnit(const Vec2i &pos, const wyrmgus::unit_type &ty
 **  @param type    Unit type to edit.
 **  @param player  Player owning the unit.
 */
-static void EditorPlaceUnit(const Vec2i &pos, wyrmgus::unit_type &type, CPlayer *player)
+static void EditorPlaceUnit(const Vec2i &pos, const wyrmgus::unit_type &type, CPlayer *player)
 {
 	EditorAction editorAction;
 	editorAction.Type = EditorActionTypePlaceUnit;
@@ -1269,12 +1269,12 @@ static void DrawMapCursor()
 				break;
 			case EditorEditUnit:
 				if (Editor.SelectedUnitIndex != -1) {
-					CursorBuilding = const_cast<wyrmgus::unit_type *>(Editor.ShownUnitTypes[Editor.SelectedUnitIndex]);
+					CursorBuilding = Editor.ShownUnitTypes[Editor.SelectedUnitIndex];
 				}
 				break;
 			case EditorSetStartLocation:
 				if (Editor.StartUnit) {
-					CursorBuilding = const_cast<wyrmgus::unit_type *>(Editor.StartUnit);
+					CursorBuilding = Editor.StartUnit;
 				}
 				break;
 		}
@@ -1704,7 +1704,7 @@ static void EditorCallbackButtonDown(unsigned button)
 			if (Editor.CursorUnitIndex != (int) Editor.ShownUnitTypes.size()) {
 				if (MouseButtons & LeftButton) {
 					Editor.SelectedUnitIndex = Editor.CursorUnitIndex;
-					CursorBuilding = const_cast<wyrmgus::unit_type *>(Editor.ShownUnitTypes[Editor.CursorUnitIndex]);
+					CursorBuilding = Editor.ShownUnitTypes[Editor.CursorUnitIndex];
 					return;
 				} else if (MouseButtons & RightButton) {
 					char buf[256];
