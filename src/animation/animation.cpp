@@ -39,7 +39,6 @@
 #include "animation/animation_goto.h"
 #include "animation/animation_ifvar.h"
 #include "animation/animation_label.h"
-#include "animation/animation_luacallback.h"
 #include "animation/animation_move.h"
 #include "animation/animation_randomgoto.h"
 #include "animation/animation_randomrotate.h"
@@ -707,8 +706,6 @@ static std::unique_ptr<CAnimation> ParseAnimationFrame(lua_State *l, const char 
 		anim = std::make_unique<CAnimation_Goto>();
 	} else if (op1 == "random-goto") {
 		anim = std::make_unique<CAnimation_RandomGoto>();
-	} else if (op1 == "lua-callback") {
-		anim = std::make_unique<CAnimation_LuaCallback>();
 	} else {
 		LuaError(l, "Unknown animation: %s" _C_ op1.c_str());
 	}

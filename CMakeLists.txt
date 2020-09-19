@@ -98,7 +98,6 @@ set(animation_SRCS
 	src/animation/animation_goto.cpp
 	src/animation/animation_ifvar.cpp
 	src/animation/animation_label.cpp
-	src/animation/animation_luacallback.cpp
 	src/animation/animation_move.cpp
 	src/animation/animation_randomgoto.cpp
 	src/animation/animation_randomrotate.cpp
@@ -625,7 +624,6 @@ set(stratagus_animation_HDRS
 	src/include/animation/animation_goto.h
 	src/include/animation/animation_ifvar.h
 	src/include/animation/animation_label.h
-	src/include/animation/animation_luacallback.h
 	src/include/animation/animation_move.h
 	src/include/animation/animation_randomgoto.h
 	src/include/animation/animation_randomrotate.h
