@@ -334,23 +334,24 @@ static int CclSetTitleScreens(lua_State *l)
 					LuaError(l, "incorrect argument");
 				}
 				const int subargs = lua_rawlen(l, -1);
-				TitleScreens[j]->Labels = new TitleScreenLabel *[subargs + 1];
-				memset(TitleScreens[j]->Labels, 0, (subargs + 1) * sizeof(TitleScreenLabel *));
+
+				TitleScreens[j]->Labels.clear();
+
 				for (int k = 0; k < subargs; ++k) {
 					lua_rawgeti(l, -1, k + 1);
 					if (!lua_istable(l, -1)) {
 						LuaError(l, "incorrect argument");
 					}
-					TitleScreens[j]->Labels[k] = new TitleScreenLabel;
+					TitleScreenLabel label;
 					lua_pushnil(l);
 					while (lua_next(l, -2)) {
 						const char *value = LuaToString(l, -2);
 						if (!strcmp(value, "Text")) {
-							TitleScreens[j]->Labels[k]->Text = LuaToString(l, -1);
+							label.Text = LuaToString(l, -1);
 						} else if (!strcmp(value, "Font")) {
-							TitleScreens[j]->Labels[k]->Font = wyrmgus::font::get(LuaToString(l, -1));
+							label.Font = wyrmgus::font::get(LuaToString(l, -1));
 						} else if (!strcmp(value, "Pos")) {
-							CclGetPos(l, &TitleScreens[j]->Labels[k]->Xofs, &TitleScreens[j]->Labels[k]->Yofs);
+							CclGetPos(l, &label.Xofs, &label.Yofs);
 						} else if (!strcmp(value, "Flags")) {
 							if (!lua_istable(l, -1)) {
 								LuaError(l, "incorrect argument");
@@ -359,7 +360,7 @@ static int CclSetTitleScreens(lua_State *l)
 							for (int subk = 0; subk < subsubargs; ++subk) {
 								const char *value = LuaToString(l, -1, subk + 1);
 								if (!strcmp(value, "center")) {
-									TitleScreens[j]->Labels[k]->Flags |= TitleFlagCenter;
+									label.Flags |= TitleFlagCenter;
 								} else {
 									LuaError(l, "incorrect flag");
 								}
@@ -369,6 +370,8 @@ static int CclSetTitleScreens(lua_State *l)
 						}
 						lua_pop(l, 1);
 					}
+
+					TitleScreens[j]->Labels.push_back(std::move(label));
 					lua_pop(l, 1);
 				}
 			} else {

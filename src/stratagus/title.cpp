@@ -96,33 +96,29 @@ static void WaitCallbackExit()
 
 void TitleScreen::ShowLabels()
 {
-	TitleScreenLabel **labels = this->Labels;
+	const std::vector<TitleScreenLabel> &labels = this->Labels;
 
-	if (!labels) {
-		return ;
+	if (labels.empty()) {
+		return;
 	}
 
-	for (int i = 0; labels[i]; ++i) {
-		if (!labels[i]->Font) {
+	for (const TitleScreenLabel &title_label : labels) {
+		if (!title_label.Font) {
 			continue;
 		}
 		// offsets are for 640x480, scale up to actual resolution
-		const int x = labels[i]->Xofs * Video.Width / 640;
-		const int y = labels[i]->Yofs * Video.Height / 480;
-		CLabel label(labels[i]->Font);
+		const int x = title_label.Xofs * Video.Width / 640;
+		const int y = title_label.Yofs * Video.Height / 480;
+		CLabel label(title_label.Font);
 
-		if (labels[i]->Flags & TitleFlagCenter) {
-			label.DrawCentered(x, y, labels[i]->Text);
+		if (title_label.Flags & TitleFlagCenter) {
+			label.DrawCentered(x, y, title_label.Text);
 		} else {
-			label.Draw(x, y, labels[i]->Text);
+			label.Draw(x, y, title_label.Text);
 		}
 	}
 }
 
-
-/**
-**  Show a title image
-*/
 void TitleScreen::ShowTitleImage()
 {
 	const EventCallback *old_callbacks = GetCallbacks();

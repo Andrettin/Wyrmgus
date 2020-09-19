@@ -36,44 +36,32 @@ enum {
 	TitleFlagCenter = 1 << 0   /// Center Text
 };
 
-class TitleScreenLabel
+class TitleScreenLabel final
 {
 public:
-	TitleScreenLabel() : Font(0), Xofs(0), Yofs(0), Flags(0) {}
-
 	std::string Text;
-	wyrmgus::font *Font;
-	int Xofs;
-	int Yofs;
-	int Flags;
+	wyrmgus::font *Font = nullptr;
+	int Xofs = 0;
+	int Yofs = 0;
+	int Flags = 0;
 };
 
-class TitleScreen
+class TitleScreen final
 {
 public:
-	TitleScreen() : StretchImage(true), Timeout(0), Iterations(0), Editor(0), Labels(nullptr) {}
-	~TitleScreen()
-	{
-		if (this->Labels) {
-			for (int i = 0; this->Labels[i]; ++i) {
-				delete this->Labels[i];
-			}
-			delete[] this->Labels;
-		}
-	}
-
 	void ShowTitleImage();
 
 private:
 	void ShowLabels();
+
 public:
 	std::string File;
 	std::string Music;
-	bool StretchImage;
-	int Timeout;
-	int Iterations;
-	int Editor;
-	TitleScreenLabel **Labels;
+	bool StretchImage = true;
+	int Timeout = 0;
+	int Iterations = 0;
+	int Editor = 0;
+	std::vector<TitleScreenLabel> Labels;
 };
 
 extern TitleScreen **TitleScreens;          /// File for title screen
