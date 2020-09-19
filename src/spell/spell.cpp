@@ -184,18 +184,6 @@ static bool PassCondition(const CUnit &caster, const wyrmgus::spell &spell, cons
 		}
 	}
 
-	if (condition->CheckFunc) {
-		condition->CheckFunc->pushPreamble();
-		condition->CheckFunc->pushString(spell.get_identifier());
-		condition->CheckFunc->pushInteger(UnitNumber(caster));
-		condition->CheckFunc->pushInteger(goalPos.x);
-		condition->CheckFunc->pushInteger(goalPos.y);
-		condition->CheckFunc->pushInteger((target && target->IsAlive()) ? UnitNumber(*target) : -1);
-		condition->CheckFunc->run(1);
-		if (condition->CheckFunc->popBoolean() == false) {
-			return false;
-		}
-	}
 	if (!target) {
 		return true;
 	}

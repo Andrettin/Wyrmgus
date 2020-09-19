@@ -466,7 +466,7 @@ void CUnit::Init()
 	//Wyrmgus end
 	CurrentSightRange = 0;
 
-	pathFinderData = new PathFinderData;
+	pathFinderData = std::make_unique<PathFinderData>();
 	pathFinderData->input.SetUnit(*this);
 
 	//Wyrmgus start
@@ -599,7 +599,7 @@ void CUnit::Release(bool final)
 	this->SoldUnits.clear();
 	//Wyrmgus end
 
-	delete pathFinderData;
+	this->pathFinderData.reset();
 	this->autocast_spells.clear();
 	this->spell_autocast.clear();
 	delete[] SpellCoolDownTimers;
@@ -2855,8 +2855,7 @@ bool CUnit::RestoreOrder()
 		return false;
 	}
 
-	// Cannot delete this->Orders[0] since it is generally that order
-	// which call this method.
+	//cannot delete this->Orders[0] since it is generally that order which calls this method
 	this->Orders[0]->Finished = true;
 
 	//copy

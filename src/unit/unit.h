@@ -556,7 +556,7 @@ public:
 	int         CurrentSightRange; /// Unit's Current Sight Range
 
 	// Pathfinding stuff:
-	PathFinderData *pathFinderData = nullptr;
+	std::unique_ptr<PathFinderData> pathFinderData;
 
 	// DISPLAY:
 	int         Frame;      /// Image frame: <0 is mirrored

@@ -261,7 +261,7 @@ namespace gcn
             ret = true;
         }
 
-        else if (key.getValue() == Key::K_DELETE )
+        else if (key.getValue() == Key::K_DELETE)
         {
 			if (selLen > 0) {
 				mText.erase(selFirst, selLen);

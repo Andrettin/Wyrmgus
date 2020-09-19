@@ -70,8 +70,8 @@ void character::clear()
 {
 	data_type::clear();
 	
-	for (std::map<std::string, character *>::iterator iterator = CustomHeroes.begin(); iterator != CustomHeroes.end(); ++iterator) {
-		delete iterator->second;
+	for (const auto &kv_pair : CustomHeroes) {
+		delete kv_pair.second;
 	}
 	CustomHeroes.clear();
 }
@@ -747,9 +747,9 @@ wyrmgus::character *GetCustomHero(const std::string &hero_ident)
 		return CustomHeroes[hero_ident];
 	}
 	
-	for (std::map<std::string, wyrmgus::character *>::iterator iterator = CustomHeroes.begin(); iterator != CustomHeroes.end(); ++iterator) { // for backwards compatibility
-		if (iterator->second->GetFullName() == hero_ident) {
-			return iterator->second;
+	for (const auto &kv_pair : CustomHeroes) { // for backwards compatibility
+		if (kv_pair.second->GetFullName() == hero_ident) {
+			return kv_pair.second;
 		}
 	}
 	
@@ -758,12 +758,12 @@ wyrmgus::character *GetCustomHero(const std::string &hero_ident)
 
 void SaveHeroes()
 {
-	for (wyrmgus::character *character : wyrmgus::character::get_all()) { //save characters
+	for (const wyrmgus::character *character : wyrmgus::character::get_all()) { //save characters
 		SaveHero(character);
 	}
 
-	for (std::map<std::string, wyrmgus::character *>::iterator iterator = CustomHeroes.begin(); iterator != CustomHeroes.end(); ++iterator) { //save custom heroes
-		SaveHero(iterator->second);
+	for (const auto &kv_pair : CustomHeroes) { //save custom heroes
+		SaveHero(kv_pair.second);
 	}
 			
 	//see if the old heroes.lua save file is present, and if so, delete it
@@ -781,7 +781,7 @@ void SaveHeroes()
 	}
 }
 
-void SaveHero(wyrmgus::character *hero)
+void SaveHero(const wyrmgus::character *hero)
 {
 	struct stat tmp;
 	std::string path = Parameters::Instance.GetUserDirectory();
@@ -942,7 +942,7 @@ void SaveHero(wyrmgus::character *hero)
 
 void SaveCustomHero(const std::string &hero_full_name)
 {
-	wyrmgus::character *hero = GetCustomHero(hero_full_name);
+	const wyrmgus::character *hero = GetCustomHero(hero_full_name);
 	if (!hero) {
 		fprintf(stderr, "Custom hero \"%s\" does not exist.\n", hero_full_name.c_str());
 	}

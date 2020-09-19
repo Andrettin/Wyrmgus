@@ -67,7 +67,7 @@ namespace gcn
         mTop = nullptr;
         mInput = nullptr;
         mGraphics = nullptr;
-        mFocusHandler = new FocusHandler();
+        mFocusHandler = std::make_unique<FocusHandler>();
         mTopHasMouse = false;
         mTabbing = true;
 		mUseDirtyDrawing = true;
@@ -79,8 +79,6 @@ namespace gcn
         {
             setTop(nullptr);
         }
-
-        delete mFocusHandler;
     }
 
     void Gui::setTop(Widget* top)
@@ -91,7 +89,7 @@ namespace gcn
         }
         if (top)
         {
-            top->_setFocusHandler(mFocusHandler);
+            top->_setFocusHandler(mFocusHandler.get());
             top->setDirty(true);
         }
 

@@ -184,7 +184,7 @@ namespace gcn
         Widget* mTop;
         Graphics* mGraphics;
         Input* mInput;
-        FocusHandler* mFocusHandler;
+        std::unique_ptr<FocusHandler> mFocusHandler;
 		bool mUseDirtyDrawing;
     };
 }

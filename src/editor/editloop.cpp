@@ -149,9 +149,9 @@ static void EditorRedoAction();
 static void EditorAddUndoAction(EditorAction action);
 
 extern gcn::Gui *Gui;
-static gcn::Container *editorContainer;
-static gcn::Slider *editorUnitSlider;
-static gcn::Slider *editorSlider;
+static std::unique_ptr<gcn::Container> editorContainer;
+static std::unique_ptr<gcn::Slider> editorUnitSlider;
+static std::unique_ptr<gcn::Slider> editorSlider;
 
 class EditorUnitSliderListener : public gcn::ActionListener
 {
@@ -173,7 +173,7 @@ public:
 	}
 };
 
-static EditorUnitSliderListener *editorUnitSliderListener;
+static std::unique_ptr<EditorUnitSliderListener> editorUnitSliderListener;
 
 class EditorSliderListener : public gcn::ActionListener
 {
@@ -192,11 +192,7 @@ public:
 	}
 };
 
-static EditorSliderListener *editorSliderListener;
-
-/*----------------------------------------------------------------------------
---  Functions
-----------------------------------------------------------------------------*/
+static std::unique_ptr<EditorSliderListener> editorSliderListener;
 
 /*----------------------------------------------------------------------------
 --  Edit
@@ -1481,7 +1477,7 @@ void EditorUpdateDisplay()
 	*/
 	//Wyrmgus end
 
-	if (CursorOn == cursor_on::map && Gui->getTop() == editorContainer && !GamePaused) {
+	if (CursorOn == cursor_on::map && Gui->getTop() == editorContainer.get() && !GamePaused) {
 		DrawMapCursor(); // cursor on map
 	}
 
@@ -2594,27 +2590,27 @@ void EditorMainLoop()
 
 	gcn::Widget *oldTop = Gui->getTop();
 
-	editorContainer = new gcn::Container();
+	editorContainer = std::make_unique<gcn::Container>();
 	editorContainer->setDimension(gcn::Rectangle(0, 0, Video.Width, Video.Height));
 	editorContainer->setOpaque(false);
-	Gui->setTop(editorContainer);
+	Gui->setTop(editorContainer.get());
 
-	editorUnitSliderListener = new EditorUnitSliderListener();
-	editorSliderListener = new EditorSliderListener();
+	editorUnitSliderListener = std::make_unique<EditorUnitSliderListener>();
+	editorSliderListener = std::make_unique<EditorSliderListener>();
 
-	editorUnitSlider = new gcn::Slider();
+	editorUnitSlider = std::make_unique<gcn::Slider>();
 	editorUnitSlider->setBaseColor(gcn::Color(38, 38, 78));
 	editorUnitSlider->setForegroundColor(gcn::Color(200, 200, 120));
 	editorUnitSlider->setBackgroundColor(gcn::Color(200, 200, 120));
 	editorUnitSlider->setVisible(false);
-	editorUnitSlider->addActionListener(editorUnitSliderListener);
+	editorUnitSlider->addActionListener(editorUnitSliderListener.get());
 
-	editorSlider = new gcn::Slider();
+	editorSlider = std::make_unique<gcn::Slider>();
 	editorSlider->setBaseColor(gcn::Color(38, 38, 78));
 	editorSlider->setForegroundColor(gcn::Color(200, 200, 120));
 	editorSlider->setBackgroundColor(gcn::Color(200, 200, 120));
 	editorSlider->setVisible(false);
-	editorSlider->addActionListener(editorSliderListener);
+	editorSlider->addActionListener(editorSliderListener.get());
 
 	UpdateMinimap = true;
 
@@ -2633,10 +2629,10 @@ void EditorMainLoop()
 			editorSlider->setSize(218 - 24 - 6, 16);
 			//Wyrmgus end
 			//Wyrmgus start
-//			editorContainer->add(editorUnitSlider, UI.ButtonPanel.X + 2, UI.ButtonPanel.Y - 16);
-//			editorContainer->add(editorSlider, UI.ButtonPanel.X + 2, UI.ButtonPanel.Y - 16);
-			editorContainer->add(editorUnitSlider, UI.InfoPanel.X + 12, UI.InfoPanel.Y + 160 - 24);
-			editorContainer->add(editorSlider, UI.InfoPanel.X + 12, UI.InfoPanel.Y + 160 - 24);
+//			editorContainer->add(editorUnitSlider.get(), UI.ButtonPanel.X + 2, UI.ButtonPanel.Y - 16);
+//			editorContainer->add(editorSlider.get(), UI.ButtonPanel.X + 2, UI.ButtonPanel.Y - 16);
+			editorContainer->add(editorUnitSlider.get(), UI.InfoPanel.X + 12, UI.InfoPanel.Y + 160 - 24);
+			editorContainer->add(editorSlider.get(), UI.InfoPanel.X + 12, UI.InfoPanel.Y + 160 - 24);
 			//Wyrmgus end
 		}
 		//ProcessMenu("menu-editor-tips", 1);
@@ -2699,11 +2695,11 @@ void EditorMainLoop()
 	CommandLogDisabled = OldCommandLogDisabled;
 	SetCallbacks(old_callbacks);
 	Gui->setTop(oldTop);
-	delete editorContainer;
-	delete editorUnitSliderListener;
-	delete editorSliderListener;
-	delete editorUnitSlider;
-	delete editorSlider;
+	editorContainer.reset();
+	editorUnitSliderListener.reset();
+	editorSliderListener.reset();
+	editorUnitSlider.reset();
+	editorSlider.reset();
 }
 
 /**

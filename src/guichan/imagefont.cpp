@@ -110,7 +110,7 @@ namespace gcn
         int h = imageLoader->getHeight();
         void* data = imageLoader->finalize();
 
-        mImage = new Image(data, w, h);
+        mImage = std::make_unique<Image>(data, w, h);
         mRowSpacing = 0;
         mGlyphSpacing = 0;
     }
@@ -161,15 +161,14 @@ namespace gcn
         int h = imageLoader->getHeight();
         void* data = imageLoader->finalize();
 
-        mImage = new Image(data, w, h);
+        mImage = std::make_unique<Image>(data, w, h);
         mRowSpacing = 0;
         mGlyphSpacing = 0;
     }
 
     ImageFont::~ImageFont()
     {
-        Image::_getImageLoader()->free(mImage);
-        delete mImage;
+        Image::_getImageLoader()->free(mImage.get());
     }
 
     int ImageFont::getWidth(unsigned char glyph) const
@@ -200,7 +199,7 @@ namespace gcn
             return mGlyph[(int)(' ')].width + mGlyphSpacing;
         }
 
-        graphics->drawImage(mImage, mGlyph[glyph].x, mGlyph[glyph].y, x,
+        graphics->drawImage(mImage.get(), mGlyph[glyph].x, mGlyph[glyph].y, x,
                             y + yoffset, mGlyph[glyph].width, mGlyph[glyph].height);
 
         return mGlyph[glyph].width + mGlyphSpacing;

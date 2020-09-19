@@ -248,8 +248,8 @@ namespace gcn
         int mOldH;
         ScrollArea* mScrollArea;
         ListBox* mListBox;
-        ScrollArea* mDefaultScrollArea;
-        ListBox* mDefaultListBox;
+        std::unique_ptr<ScrollArea> mDefaultScrollArea;
+        std::unique_ptr<ListBox> mDefaultListBox;
         FocusHandler mFocusHandler;
     };
 }

@@ -158,10 +158,6 @@ static void CclSpellCondition(lua_State *l, ConditionInfo *condition)
 			condition->Opponent = Ccl2Condition(l, LuaToString(l, -1, j + 1));
 		} else if (!strcmp(value, "self")) {
 			condition->TargetSelf = Ccl2Condition(l, LuaToString(l, -1, j + 1));
-		} else if (!strcmp(value, "callback")) {
-			lua_rawgeti(l, -1, j + 1);
-			condition->CheckFunc = new LuaCallback(l, -1);
-			lua_pop(l, 1);
 		//Wyrmgus start
 		} else if (!strcmp(value, "thrusting-weapon")) {
 			condition->ThrustingWeapon = Ccl2Condition(l, LuaToString(l, -1, j + 1));
@@ -244,7 +240,7 @@ static void CclSpellAutocast(lua_State *l, AutoCastInfo *autocast)
 			autocast->MinRange = LuaToNumber(l, -1, j + 1);
 		} else if (!strcmp(value, "position-autocast")) {
 			lua_rawgeti(l, -1, j + 1);
-			autocast->PositionAutoCast = new LuaCallback(l, -1);
+			autocast->PositionAutoCast = std::make_unique<LuaCallback>(l, -1);
 			lua_pop(l, 1);
 		} else if (!strcmp(value, "combat")) {
 			autocast->Combat = Ccl2Condition(l, LuaToString(l, -1, j + 1));

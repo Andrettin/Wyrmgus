@@ -197,7 +197,7 @@ pqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"); @endcode
         int mHeight;
         int mGlyphSpacing;
         int mRowSpacing;
-        Image* mImage;
+        std::unique_ptr<Image> mImage;
         std::string mFilename;
     };
 }

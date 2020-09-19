@@ -66,15 +66,15 @@ namespace gcn
         setWidth(100);
         setFocusable(true);
 
-        mDefaultScrollArea = new ScrollArea();
+        mDefaultScrollArea = std::make_unique<ScrollArea>();
         mDefaultScrollArea->setHorizontalScrollPolicy(ScrollArea::SHOW_NEVER);
-        mDefaultListBox = new ListBox();
+        mDefaultListBox = std::make_unique<ListBox>();
 
-        mScrollArea = mDefaultScrollArea;
+        mScrollArea = mDefaultScrollArea.get();
         mScrollArea->_setFocusHandler(&mFocusHandler);
         mScrollArea->_setParent(this);
 
-        mListBox = mDefaultListBox;
+        mListBox = mDefaultListBox.get();
         mListBox->addActionListener(this);
         mScrollArea->setContent(mListBox);
 
@@ -92,13 +92,13 @@ namespace gcn
         mPushed = false;
         mOldH = 0;
 
-        mDefaultScrollArea = new ScrollArea();
+        mDefaultScrollArea = std::make_unique<ScrollArea>();
         mDefaultScrollArea->setHorizontalScrollPolicy(ScrollArea::SHOW_NEVER);
-        mDefaultListBox = new ListBox();
+        mDefaultListBox = std::make_unique<ListBox>();
 
-        mScrollArea = mDefaultScrollArea;
+        mScrollArea = mDefaultScrollArea.get();
         mScrollArea->_setParent(this);
-        mListBox = mDefaultListBox;
+        mListBox = mDefaultListBox.get();
         mListBox->addActionListener(this);
 
         mScrollArea->setContent(mListBox);
@@ -157,16 +157,6 @@ namespace gcn
         if (mScrollArea != nullptr)
         {
             mScrollArea->_setFocusHandler(nullptr);
-        }
-
-        if (mDefaultScrollArea != nullptr)
-        {
-            delete mDefaultScrollArea;
-        }
-
-        if (mDefaultListBox != nullptr)
-        {
-            delete mDefaultListBox;
         }
 
         if (widgetExists(mListBox))
@@ -656,12 +646,12 @@ namespace gcn
 
     void DropDown::setBaseColor(const Color& color)
     {
-        if (mDefaultScrollArea == mScrollArea && mScrollArea != nullptr)
+        if (mDefaultScrollArea.get() == mScrollArea && mScrollArea != nullptr)
         {
             mScrollArea->setBaseColor(color);
         }
 
-        if (mDefaultListBox == mListBox && mListBox != nullptr)
+        if (mDefaultListBox.get() == mListBox && mListBox != nullptr)
         {
             mListBox->setBaseColor(color);
         }
@@ -671,12 +661,12 @@ namespace gcn
 
     void DropDown::setBackgroundColor(const Color& color)
     {
-        if (mDefaultScrollArea == mScrollArea && mScrollArea != nullptr)
+        if (mDefaultScrollArea.get() == mScrollArea && mScrollArea != nullptr)
         {
             mScrollArea->setBackgroundColor(color);
         }
 
-        if (mDefaultListBox == mListBox && mListBox != nullptr)
+        if (mDefaultListBox.get() == mListBox && mListBox != nullptr)
         {
             mListBox->setBackgroundColor(color);
         }
@@ -686,12 +676,12 @@ namespace gcn
 
     void DropDown::setForegroundColor(const Color& color)
     {
-        if (mDefaultScrollArea == mScrollArea && mScrollArea != nullptr)
+        if (mDefaultScrollArea.get() == mScrollArea && mScrollArea != nullptr)
         {
             mScrollArea->setForegroundColor(color);
         }
 
-        if (mDefaultListBox == mListBox && mListBox != nullptr)
+        if (mDefaultListBox.get() == mListBox && mListBox != nullptr)
         {
             mListBox->setForegroundColor(color);
         }

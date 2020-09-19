@@ -115,7 +115,6 @@ public:
 	{
 		delete[] BoolFlag;
 		delete[] Variable;
-		delete CheckFunc;
 	};
 	
 	void process_sml_property(const wyrmgus::sml_property &property);
@@ -140,7 +139,6 @@ public:
 	char *BoolFlag = nullptr;         /// User defined boolean flag.
 
 	ConditionInfoVariable *Variable = nullptr;
-	LuaCallback *CheckFunc = nullptr;
 	//
 	//  @todo more? feel free to add, here and to
 	//  @todo PassCondition, CclSpellParseCondition, SaveSpells
@@ -158,10 +156,7 @@ public:
 #define ACP_DISTANCE -2
 	~AutoCastInfo()
 	{
-		if (this->PositionAutoCast) {
-			delete PositionAutoCast;
-		}
-	};
+	}
 	
 	void process_sml_property(const wyrmgus::sml_property &property);
 	void process_sml_scope(const wyrmgus::sml_data &scope);
@@ -189,7 +184,7 @@ public:
 	int Corpse = CONDITION_FALSE;	/// If it should be casted on corpses
 
 	// Position autocast callback
-	LuaCallback *PositionAutoCast = nullptr;
+	std::unique_ptr<LuaCallback> PositionAutoCast;
 
 	friend void ::CclSpellAutocast(lua_State *l, AutoCastInfo *autocast);
 };

@@ -433,7 +433,7 @@ extern bool LoadingPersistentHeroes;
 
 extern int GetAttributeVariableIndex(int attribute);
 extern wyrmgus::character *GetCustomHero(const std::string &hero_ident);
-extern void SaveHero(wyrmgus::character *hero);
+extern void SaveHero(const wyrmgus::character *hero);
 extern void SaveHeroes();
 extern void SaveCustomHero(const std::string &hero_ident);
 extern void DeleteCustomHero(const std::string &hero_ident);
