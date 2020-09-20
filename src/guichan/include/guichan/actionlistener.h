@@ -65,7 +65,7 @@ namespace gcn
      *
      * @see Widget::addActionListener
      */
-    class GCN_CORE_DECLSPEC ActionListener
+    class ActionListener
     {
     public:
 

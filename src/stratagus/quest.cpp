@@ -133,18 +133,6 @@ quest::quest(const std::string &identifier) : detailed_data_entry(identifier)
 
 quest::~quest()
 {
-	if (this->Conditions) {
-		delete Conditions;
-	}
-	if (this->AcceptEffects) {
-		delete AcceptEffects;
-	}
-	if (this->CompletionEffects) {
-		delete CompletionEffects;
-	}
-	if (this->FailEffects) {
-		delete FailEffects;
-	}
 }
 
 void quest::process_sml_scope(const sml_data &scope)

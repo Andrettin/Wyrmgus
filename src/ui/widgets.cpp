@@ -49,8 +49,8 @@
 //Wyrmgus end
 
 // Guichan stuff we need
-gcn::Gui *Gui;         /// A Gui object - binds it all together
-gcn::SDLInput *Input;  /// Input driver
+std::unique_ptr<gcn::Gui> Gui;         /// A Gui object - binds it all together
+static std::unique_ptr<gcn::SDLInput> Input;  /// Input driver
 
 static EventCallback GuichanCallbacks;
 
@@ -114,13 +114,13 @@ static void MenuHandleKeyRepeat(unsigned key, unsigned keychar)
 */
 void initGuichan()
 {
-	gcn::Graphics *graphics = new MyOpenGLGraphics();
+	std::unique_ptr<gcn::Graphics> graphics = std::make_unique<MyOpenGLGraphics>();
 
-	Input = new gcn::SDLInput();
+	Input = std::make_unique<gcn::SDLInput>();
 
-	Gui = new gcn::Gui();
-	Gui->setGraphics(graphics);
-	Gui->setInput(Input);
+	Gui = std::make_unique<gcn::Gui>();
+	Gui->setGraphics(std::move(graphics));
+	Gui->setInput(Input.get());
 	Gui->setTop(nullptr);
 
 	Gui->setUseDirtyDrawing(false);
@@ -140,14 +140,11 @@ void initGuichan()
 */
 void freeGuichan()
 {
-	if (Gui) {
-		delete Gui->getGraphics();
-		delete Gui;
-		Gui = nullptr;
+	if (Gui != nullptr) {
+		Gui.reset();
 	}
 
-	delete Input;
-	Input = nullptr;
+	Input.reset();
 }
 
 /**
@@ -1792,7 +1789,6 @@ void ImageTextField::drawBorder(gcn::Graphics *graphics)
 /*----------------------------------------------------------------------------
 --  LuaListModel
 ----------------------------------------------------------------------------*/
-
 
 /**
 **  Set the list

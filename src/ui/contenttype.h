@@ -55,7 +55,7 @@ public:
 
 public:
 	PixelPos Pos = PixelPos(0, 0); /// Coordinate where to display.
-	ConditionPanel *Condition = nullptr; /// Condition to show the content; if null, no condition.
+	std::unique_ptr<ConditionPanel> Condition; /// Condition to show the content; if null, no condition.
 	const wyrmgus::font_color *TextColor = nullptr;      /// Color used for plain text in content.
 	const wyrmgus::font_color *HighlightColor = nullptr; /// Color used for highlighted letters.
 };

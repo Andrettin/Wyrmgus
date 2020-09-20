@@ -418,11 +418,11 @@ EnumVariable Str2EnumVariable(lua_State *l, const char *s)
 **
 **  @param l   Lua State.
 */
-static ConditionPanel *ParseConditionPanel(lua_State *l)
+static std::unique_ptr<ConditionPanel> ParseConditionPanel(lua_State *l)
 {
 	Assert(lua_istable(l, -1));
 
-	ConditionPanel *condition = new ConditionPanel;
+	auto condition = std::make_unique<ConditionPanel>();
 
 	for (lua_pushnil(l); lua_next(l, -2); lua_pop(l, 1)) {
 		const char *key = LuaToString(l, -2);
@@ -476,7 +476,7 @@ static CContentType *CclParseContent(lua_State *l)
 	Assert(lua_istable(l, -1));
 
 	CContentType *content = nullptr;
-	ConditionPanel *condition = nullptr;
+	std::unique_ptr<ConditionPanel> condition;
 	PixelPos pos(0, 0);
 	//Wyrmgus start
 	std::string textColor("white");
@@ -524,7 +524,7 @@ static CContentType *CclParseContent(lua_State *l)
 		}
 	}
 	content->Pos = pos;
-	content->Condition = condition;
+	content->Condition = std::move(condition);
 	content->TextColor = wyrmgus::font_color::get(textColor);
 	content->HighlightColor = wyrmgus::font_color::get(highColor);
 	return content;

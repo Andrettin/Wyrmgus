@@ -52,7 +52,7 @@ public:
 	static constexpr const char *class_identifier = "dialogue";
 	static constexpr const char *database_folder = "dialogues";
 
-	dialogue(const std::string &identifier);
+	explicit dialogue(const std::string &identifier);
 	~dialogue();
 	
 	virtual void process_sml_scope(const sml_data &scope) override;
@@ -88,8 +88,8 @@ private:
 	std::string text;
 public:
 	wyrmgus::dialogue *Dialogue = nullptr;
-	LuaCallback *Conditions = nullptr;
-	LuaCallback *ImmediateEffects = nullptr;
+	std::unique_ptr<LuaCallback> Conditions;
+	std::unique_ptr<LuaCallback> ImmediateEffects;
 	std::vector<std::unique_ptr<dialogue_option>> options;
 
 	friend int ::CclDefineDialogue(lua_State *l);

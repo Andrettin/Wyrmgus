@@ -98,13 +98,6 @@ dialogue_node::dialogue_node()
 
 dialogue_node::~dialogue_node()
 {
-	if (this->Conditions) {
-		delete Conditions;
-	}
-	
-	if (this->ImmediateEffects) {
-		delete ImmediateEffects;
-	}
 }
 
 void dialogue_node::process_sml_property(const sml_property &property)

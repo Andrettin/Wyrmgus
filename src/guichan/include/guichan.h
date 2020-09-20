@@ -100,5 +100,5 @@ extern "C"
      *
      * @return the version of Guichan.
      */
-    GCN_CORE_DECLSPEC extern const char* gcnGuichanVersion();
+    extern const char* gcnGuichanVersion();
 }

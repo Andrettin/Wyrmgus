@@ -148,7 +148,6 @@ static void EditorUndoAction();
 static void EditorRedoAction();
 static void EditorAddUndoAction(EditorAction action);
 
-extern gcn::Gui *Gui;
 static std::unique_ptr<gcn::Container> editorContainer;
 static std::unique_ptr<gcn::Slider> editorUnitSlider;
 static std::unique_ptr<gcn::Slider> editorSlider;

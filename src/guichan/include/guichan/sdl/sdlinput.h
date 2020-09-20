@@ -67,7 +67,7 @@ namespace gcn
     /**
      * SDL implementation of Input.
      */
-    class GCN_EXTENSION_DECLSPEC SDLInput : public Input
+    class SDLInput : public Input
     {
     public:
 

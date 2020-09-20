@@ -107,5 +107,5 @@ public:
 	int HasDataToRead(int timeout);
 	bool IsValid() const;
 private:
-	CTCPSocket_Impl *m_impl;
+	std::unique_ptr<CTCPSocket_Impl> m_impl;
 };

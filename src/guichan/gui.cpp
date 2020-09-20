@@ -101,14 +101,14 @@ namespace gcn
         return mTop;
     }
 
-    void Gui::setGraphics(Graphics* graphics)
+    void Gui::setGraphics(std::unique_ptr<Graphics> &&graphics)
     {
-        mGraphics = graphics;
+        mGraphics = std::move(graphics);
     }
 
     Graphics* Gui::getGraphics() const
     {
-        return mGraphics;
+        return mGraphics.get();
     }
 
     void Gui::setInput(Input* input)
@@ -267,12 +267,12 @@ namespace gcn
                 rec.width += 2 * top->getBorderSize();
                 rec.height += 2 * top->getBorderSize();
                 mGraphics->pushClipArea(rec);
-                top->drawBorder(mGraphics);
+                top->drawBorder(mGraphics.get());
                 mGraphics->popClipArea();
             }
 
             mGraphics->pushClipArea(top->getDimension());
-            top->draw(mGraphics);
+            top->draw(mGraphics.get());
             top->setDirty(false);
             mGraphics->popClipArea();
 

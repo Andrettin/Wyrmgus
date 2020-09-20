@@ -267,10 +267,10 @@ public:
 	bool Completed = false;				/// Whether the quest has been completed
 	bool CurrentCompleted = false;		/// Whether the quest has been completed in the current game
 	wyrmgus::dialogue *IntroductionDialogue = nullptr;
-	LuaCallback *Conditions = nullptr;
-	LuaCallback *AcceptEffects = nullptr;
-	LuaCallback *CompletionEffects = nullptr;
-	LuaCallback *FailEffects = nullptr;
+	std::unique_ptr<LuaCallback> Conditions;
+	std::unique_ptr<LuaCallback> AcceptEffects;
+	std::unique_ptr<LuaCallback> CompletionEffects;
+	std::unique_ptr<LuaCallback> FailEffects;
 private:
 	std::unique_ptr<condition> conditions;
 	std::unique_ptr<effect_list> accept_effects;

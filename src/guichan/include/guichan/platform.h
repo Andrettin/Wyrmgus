@@ -57,7 +57,3 @@
 #ifndef GCN_CORE_DECLSPEC
 #define GCN_CORE_DECLSPEC
 #endif
-
-#ifndef GCN_EXTENSION_DECLSPEC
-#define GCN_EXTENSION_DECLSPEC
-#endif

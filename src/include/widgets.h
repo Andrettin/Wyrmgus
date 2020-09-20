@@ -36,6 +36,7 @@ class CGraphic;
 class CPlayerColorGraphic;
 
 extern bool GuichanActive;
+extern std::unique_ptr<gcn::Gui> Gui;
 
 void initGuichan();
 void freeGuichan();

@@ -150,7 +150,7 @@ static int CclDefineCharacter(lua_State *l)
 		} else if (!strcmp(value, "ExperiencePercent")) {
 			character->ExperiencePercent = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "Conditions")) {
-			character->Conditions = new LuaCallback(l, -1);
+			character->Conditions = std::make_unique<LuaCallback>(l, -1);
 		} else if (!strcmp(value, "Abilities")) {
 			character->abilities.clear();
 			const int args = lua_rawlen(l, -1);

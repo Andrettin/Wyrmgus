@@ -385,7 +385,7 @@ private:
 	character *mother = nullptr;
 	std::vector<character *> children;
 public:
-	LuaCallback *Conditions = nullptr;
+	std::unique_ptr<LuaCallback> Conditions;
 private:
 	std::unique_ptr<condition> conditions;
 public:

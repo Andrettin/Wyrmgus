@@ -62,8 +62,8 @@
 
 /// Scrolling area (<= 15 y)
 //Wyrmgus start
-//#define SCROLL_UP     15
-#define SCROLL_UP     7
+//static constexpr int SCROLL_UP = 15;
+static constexpr int SCROLL_UP = 7;
 //Wyrmgus end
 /// Scrolling area (>= VideoHeight - 16 y)
 //Wyrmgus start
@@ -72,8 +72,8 @@
 //Wyrmgus end
 /// Scrolling area (<= 15 y)
 //Wyrmgus start
-//#define SCROLL_LEFT   15
-#define SCROLL_LEFT   7
+//static constexpr int SCROLL_LEFT = 15;
+static constexpr int SCROLL_LEFT = 7;
 //Wyrmgus end
 /// Scrolling area (>= VideoWidth - 16 x)
 //Wyrmgus start

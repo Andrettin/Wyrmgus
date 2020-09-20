@@ -67,7 +67,7 @@ namespace gcn
      *
      * @see Container
      */
-    class GCN_CORE_DECLSPEC BasicContainer: public Widget
+    class BasicContainer: public Widget
     {
     public:
 

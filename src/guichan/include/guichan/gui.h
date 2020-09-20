@@ -77,7 +77,7 @@ namespace gcn
      * NOTE: For the Gui to function properly you need to set a Graphics
      *       object to use and an Input object to use.
      */
-    class GCN_CORE_DECLSPEC Gui
+    class Gui final
     {
     public:
 
@@ -89,21 +89,21 @@ namespace gcn
         /**
          * Destructor.
          */
-        virtual ~Gui();
+        ~Gui();
 
         /**
          * Sets the top Widget.
          *
          * @param top the top Widget.
          */
-        virtual void setTop(Widget* top);
+        void setTop(Widget* top);
 
         /**
          * Gets the top Widget.
          *
          * @return the top widget. Null if no top widget has been set.
          */
-        virtual Widget* getTop() const;
+        Widget* getTop() const;
 
         /**
          * Sets the Graphics object to use for drawing.
@@ -111,7 +111,7 @@ namespace gcn
          * @param graphics the Graphics object to use for drawing.
          * @see OpenGLGraphics, AllegroGraphics
          */
-        virtual void setGraphics(Graphics* graphics);
+        void setGraphics(std::unique_ptr<Graphics> &&graphics);
 
         /**
          * Gets the Graphics object used for drawing.
@@ -119,7 +119,7 @@ namespace gcn
          *  @return the Graphics object used for drawing. Null if no
          *          Graphics object has been set.
          */
-        virtual Graphics* getGraphics() const;
+        Graphics *getGraphics() const;
 
         /**
          * Sets the Input object to use for input handling.
@@ -127,7 +127,7 @@ namespace gcn
          * @param input the Input object to use for input handling.
          * @see SDLInput, AllegroInput
          */
-        virtual void setInput(Input* input);
+        void setInput(Input* input);
 
         /**
          * Gets the Input object being used for input handling.
@@ -135,7 +135,7 @@ namespace gcn
          *  @return the Input object used for handling input. Null if no
          *          Input object has been set.
          */
-        virtual Input* getInput() const;
+        Input* getInput() const;
 
         /**
          * Performs the Gui logic. By calling this function all logic
@@ -146,19 +146,19 @@ namespace gcn
          * NOTE: Logic also deals with user input (Mouse and Keyboard)
          *       for Widgets.
          */
-        virtual void logic();
+        void logic();
 
         /**
          * Draws the Gui. By calling this funcion all draw functions
          * down in the Gui hierarchy will be called.
          */
-        virtual void draw();
-		virtual void draw(Widget* top);
+        void draw();
+		void draw(Widget* top);
 
         /**
          * Focus none of the Widgets in the Gui.
          */
-        virtual void focusNone();
+        void focusNone();
 
         /**
          * Toggles the use of the tab key to focus Widgets.
@@ -166,23 +166,23 @@ namespace gcn
          *
          * @param tabbing set to false if you want to disable tabbing.
          */
-        virtual void setTabbingEnabled(bool tabbing);
+        void setTabbingEnabled(bool tabbing);
 
         /**
          * Checks if tabbing is enabled.
          *
          * @return true if tabbing is enabled.
          */
-        virtual bool isTabbingEnabled();
+        bool isTabbingEnabled();
 
-		virtual void setUseDirtyDrawing(bool useDirtyDrawing);
+		void setUseDirtyDrawing(bool useDirtyDrawing);
 
     protected:
         bool mTopHasMouse;
         bool mTabbing;
 
         Widget* mTop;
-        Graphics* mGraphics;
+        std::unique_ptr<Graphics> mGraphics;
         Input* mInput;
         std::unique_ptr<FocusHandler> mFocusHandler;
 		bool mUseDirtyDrawing;

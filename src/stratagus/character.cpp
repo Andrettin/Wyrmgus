@@ -84,9 +84,6 @@ character::character(const std::string &identifier)
 
 character::~character()
 {
-	if (this->Conditions) {
-		delete Conditions;
-	}
 }
 
 void character::process_sml_scope(const sml_data &scope)

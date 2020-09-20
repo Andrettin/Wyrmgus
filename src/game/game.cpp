@@ -104,6 +104,7 @@
 #include "version.h"
 #include "video/font.h"
 #include "video/video.h"
+#include "widgets.h"
 
 #include <QCalendar>
 
@@ -126,7 +127,6 @@ bool UseHPForXp = false;				/// true if gain XP by dealing damage, false if by k
 
 bool DefiningData = false;
 
-extern gcn::Gui *Gui;
 static std::vector<std::unique_ptr<gcn::Container>> Containers;
 
 namespace wyrmgus {

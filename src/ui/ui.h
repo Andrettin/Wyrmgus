@@ -196,9 +196,9 @@ public:
 	int PosY;              /// Y coordinate of the panel.
 	const wyrmgus::font *DefaultFont; /// Default font for content.
 
-	std::vector<CContentType *>Contents; /// Array of contents to display.
+	std::vector<CContentType *> Contents; /// Array of contents to display.
 
-	ConditionPanel *Condition; /// Condition to show the panel; if null, no condition.
+	std::unique_ptr<ConditionPanel> Condition; /// Condition to show the panel; if null, no condition.
 };
 
 

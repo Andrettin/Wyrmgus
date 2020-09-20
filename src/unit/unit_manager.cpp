@@ -61,18 +61,18 @@ CUnitManager::CUnitManager() : lastCreated(nullptr)
 */
 void CUnitManager::Init()
 {
-	lastCreated = nullptr;
+	this->lastCreated = nullptr;
 	//Assert(units.empty());
-	units.clear();
+	this->units.clear();
 	// Release memory of units in release list.
-	while (!releasedUnits.empty()) {
-		CUnit *unit = releasedUnits.front();
-		releasedUnits.pop_front();
+	while (!this->releasedUnits.empty()) {
+		CUnit *unit = this->releasedUnits.front();
+		this->releasedUnits.pop_front();
 		delete unit;
 	}
 
 	// Initialize the free unit slots
-	unitSlots.clear();
+	this->unitSlots.clear();
 }
 
 /**

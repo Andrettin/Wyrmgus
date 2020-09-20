@@ -55,9 +55,8 @@ struct UStrInt {
 extern UStrInt GetComponent(const CUnit &unit, int index, EnumVariable e, int t);
 extern UStrInt GetComponent(const wyrmgus::unit_type &type, int index, EnumVariable e);
 
-/* virtual */ CContentType::~CContentType()
+CContentType::~CContentType()
 {
-	delete Condition;
 }
 
 /**

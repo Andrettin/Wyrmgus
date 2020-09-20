@@ -124,8 +124,8 @@ private:
 	bool only_once = false;				/// Whether the trigger should occur only once in a game
 	bool campaign_only = false;			/// Whether the trigger should only occur in the campaign mode
 public:
-	LuaCallback *Conditions = nullptr;
-	LuaCallback *Effects = nullptr;
+	std::unique_ptr<LuaCallback> Conditions;
+	std::unique_ptr<LuaCallback> Effects;
 private:
 	std::unique_ptr<condition> preconditions;
 	std::unique_ptr<condition> conditions;

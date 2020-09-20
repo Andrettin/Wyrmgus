@@ -487,7 +487,7 @@ static int CclAddTrigger(lua_State *l)
 		LuaError(l, "incorrect argument");
 	}
 
-	std::string trigger_ident = LuaToString(l, 1);
+	const std::string trigger_ident = LuaToString(l, 1);
 	
 	if (wyrmgus::vector::contains(wyrmgus::trigger::DeactivatedTriggers, trigger_ident)) {
 		return 0;
@@ -499,8 +499,8 @@ static int CclAddTrigger(lua_State *l)
 	trigger->Local = true;
 	wyrmgus::trigger::ActiveTriggers.push_back(trigger);
 	
-	trigger->Conditions = new LuaCallback(l, 2);
-	trigger->Effects = new LuaCallback(l, 3);
+	trigger->Conditions = std::make_unique<LuaCallback>(l, 2);
+	trigger->Effects = std::make_unique<LuaCallback>(l, 3);
 	
 	if (trigger->Conditions == nullptr || trigger->Effects == nullptr) {
 		fprintf(stderr, "Trigger \"%s\" has no conditions or no effects.\n", trigger->get_identifier().c_str());
@@ -722,13 +722,6 @@ trigger::trigger(const std::string &identifier) : data_entry(identifier)
 
 trigger::~trigger()
 {
-	if (this->Conditions) {
-		delete this->Conditions;
-	}
-	
-	if (this->Effects) {
-		delete this->Effects;
-	}
 }
 
 void trigger::process_sml_property(const sml_property &property)

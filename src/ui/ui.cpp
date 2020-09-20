@@ -134,7 +134,6 @@ CUnitInfoPanel::~CUnitInfoPanel()
 		 content != Contents.end(); ++content) {
 		delete *content;
 	}
-	delete Condition;
 }
 
 

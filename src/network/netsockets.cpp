@@ -217,12 +217,11 @@ bool CTCPSocket_Impl::Open(const CHost &host)
 
 CTCPSocket::CTCPSocket()
 {
-	m_impl = new CTCPSocket_Impl();
+	m_impl = std::make_unique<CTCPSocket_Impl>();
 }
 
 CTCPSocket::~CTCPSocket()
 {
-	delete m_impl;
 }
 
 bool CTCPSocket::Open(const CHost &host)

@@ -123,13 +123,13 @@ static int CclDefineQuest(lua_State *l)
 			wyrmgus::dialogue *dialogue = wyrmgus::dialogue::get(dialogue_ident);
 			quest->IntroductionDialogue = dialogue;
 		} else if (!strcmp(value, "Conditions")) {
-			quest->Conditions = new LuaCallback(l, -1);
+			quest->Conditions = std::make_unique<LuaCallback>(l, -1);
 		} else if (!strcmp(value, "AcceptEffects")) {
-			quest->AcceptEffects = new LuaCallback(l, -1);
+			quest->AcceptEffects = std::make_unique<LuaCallback>(l, -1);
 		} else if (!strcmp(value, "CompletionEffects")) {
-			quest->CompletionEffects = new LuaCallback(l, -1);
+			quest->CompletionEffects = std::make_unique<LuaCallback>(l, -1);
 		} else if (!strcmp(value, "FailEffects")) {
-			quest->FailEffects = new LuaCallback(l, -1);
+			quest->FailEffects = std::make_unique<LuaCallback>(l, -1);
 		} else if (!strcmp(value, "ObjectiveStrings")) {
 			quest->objective_strings.clear();
 			const int args = lua_rawlen(l, -1);
@@ -731,11 +731,11 @@ static int CclDefineDialogue(lua_State *l)
 						node->text = LuaToString(l, -1, k + 1);
 					} else if (!strcmp(value, "conditions")) {
 						lua_rawgeti(l, -1, k + 1);
-						node->Conditions = new LuaCallback(l, -1);
+						node->Conditions = std::make_unique<LuaCallback>(l, -1);
 						lua_pop(l, 1);
 					} else if (!strcmp(value, "immediate-effects")) {
 						lua_rawgeti(l, -1, k + 1);
-						node->ImmediateEffects = new LuaCallback(l, -1);
+						node->ImmediateEffects = std::make_unique<LuaCallback>(l, -1);
 						lua_pop(l, 1);
 					} else if (!strcmp(value, "options")) {
 						lua_rawgeti(l, -1, k + 1);
