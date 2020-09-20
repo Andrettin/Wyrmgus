@@ -352,6 +352,7 @@ set(stratagusmain_SRCS
 	src/stratagus/grand_strategy.cpp
 	src/stratagus/groups.cpp
 	src/stratagus/iolib.cpp
+	src/stratagus/literary_text.cpp
 	src/stratagus/luacallback.cpp
 	src/stratagus/item_class.cpp
 	src/stratagus/magic_domain.cpp
@@ -371,12 +372,11 @@ set(stratagusmain_SRCS
 	src/stratagus/script_character.cpp
 	src/stratagus/script_grand_strategy.cpp
 	src/stratagus/script_item.cpp
+	src/stratagus/script_literary_text.cpp
 	src/stratagus/script_province.cpp
 	src/stratagus/script_quest.cpp
-	src/stratagus/script_text.cpp
 	src/stratagus/selection.cpp
 	src/stratagus/stratagus.cpp
-	src/stratagus/text.cpp
 	src/stratagus/title.cpp
 	src/stratagus/translate.cpp
 	src/stratagus/unique_item.cpp
@@ -918,11 +918,11 @@ set(stratagus_generic_HDRS
 	src/stratagus/government_type.h
 	src/stratagus/item_class.h
 	src/stratagus/item_slot.h
+	src/stratagus/literary_text.h
 	src/stratagus/magic_domain.h
 	src/stratagus/objective_type.h
 	src/stratagus/persistent_item.h
 	src/stratagus/player_container.h
-	src/stratagus/text.h
 	src/stratagus/unique_item.h
 	src/stratagus/vassalage_type.h
 )
