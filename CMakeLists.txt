@@ -897,7 +897,6 @@ set(stratagus_generic_HDRS
 	src/include/settings.h
 	src/include/shaders.h
 	src/include/stratagus.h
-	src/include/text.h
 	src/include/title.h
 	src/include/translate.h
 	src/include/vec2i.h
@@ -923,6 +922,7 @@ set(stratagus_generic_HDRS
 	src/stratagus/objective_type.h
 	src/stratagus/persistent_item.h
 	src/stratagus/player_container.h
+	src/stratagus/text.h
 	src/stratagus/unique_item.h
 	src/stratagus/vassalage_type.h
 )
