@@ -29,9 +29,9 @@
 
 #include "literary_text.h"
 
-std::vector<CText *> Texts;
+namespace wyrmgus {
 
-CChapter *CText::GetChapter(const std::string &chapter_name)
+chapter *literary_text::GetChapter(const std::string &chapter_name) const
 {
 	for (size_t i = 0; i < this->Chapters.size(); ++i) {
 		if (chapter_name == this->Chapters[i]->Name) {
@@ -41,20 +41,4 @@ CChapter *CText::GetChapter(const std::string &chapter_name)
 	return nullptr;
 }
 
-void CleanTexts()
-{
-	for (size_t i = 0; i < Texts.size(); ++i) {
-		delete Texts[i];
-	}
-	Texts.clear();
-}
-
-CText *GetText(const std::string &text_name)
-{
-	for (size_t i = 0; i < Texts.size(); ++i) {
-		if (text_name == Texts[i]->Name) {
-			return Texts[i];
-		}
-	}
-	return nullptr;
 }

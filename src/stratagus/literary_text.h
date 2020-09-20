@@ -27,7 +27,12 @@
 
 #pragma once
 
-class CChapter
+#include "database/data_type.h"
+#include "database/named_data_entry.h"
+
+namespace wyrmgus {
+
+class chapter
 {
 public:
 	std::string Name;				/// Name of the chapter
@@ -36,12 +41,20 @@ public:
 	std::vector<std::string> Pages;	/// Pages of text
 };
 
-class CText
+class literary_text final : public named_data_entry, public data_type<literary_text>
 {
+	Q_OBJECT
+
 public:
-	CChapter *GetChapter(const std::string &chapter_name);
+	static constexpr const char *class_identifier = "literary_text";
+	static constexpr const char *database_folder = "literary_texts";
+
+	explicit literary_text(const std::string &identifier) : named_data_entry(identifier)
+	{
+	}
+
+	chapter *GetChapter(const std::string &chapter_name) const;
 	
-	std::string Name;				/// Name of the text
 	std::string Author;				/// Author of the text
 	std::string Translator;			/// Translator of the text
 	std::string Publisher;			/// Publisher of the text
@@ -49,11 +62,9 @@ public:
 	std::string Notes;				/// Notes to appear on the cover of the text
 	int Year = 0;						/// Year of publication
 	int InitialPage = 1;				/// Page in which the text begins
-	std::vector<std::unique_ptr<CChapter>> Chapters;	/// The chapters of the text
+	std::vector<std::unique_ptr<chapter>> Chapters;	/// The chapters of the text
 };
 
-extern std::vector<CText *> Texts;
+}
 
-extern void CleanTexts();
-extern CText *GetText(const std::string &text_name);
-extern void TextCclRegister();
+extern void LiteraryTextCclRegister();

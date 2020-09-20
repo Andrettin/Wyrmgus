@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name script_text.cpp - The text ccl functions. */
+/**@name script_literary_text.cpp - The literary text ccl functions. */
 //
 //      (c) Copyright 2016-2020 by Andrettin
 //
@@ -33,26 +33,23 @@
 
 #include "script.h"
 
-static int CclDefineText(lua_State *l)
+static int CclDefineLiteraryText(lua_State *l)
 {
 	LuaCheckArgs(l, 2);
 	if (!lua_istable(l, 2)) {
 		LuaError(l, "incorrect argument (expected table)");
 	}
 
-	std::string text_name = LuaToString(l, 1);
-	CText *text = GetText(text_name);
-	if (!text) {
-		text = new CText;
-		Texts.push_back(text);
-		text->Name = text_name;
-	}
+	const std::string text_identifier = LuaToString(l, 1);
+	wyrmgus::literary_text *text = wyrmgus::literary_text::get_or_add(text_identifier, nullptr);
 	
 	//  Parse the list:
 	for (lua_pushnil(l); lua_next(l, 2); lua_pop(l, 1)) {
 		const char *value = LuaToString(l, -2);
 		
-		if (!strcmp(value, "Author")) {
+		if (!strcmp(value, "Name")) {
+			text->set_name(LuaToString(l, -1));
+		} else if (!strcmp(value, "Author")) {
 			text->Author = LuaToString(l, -1);
 		} else if (!strcmp(value, "Translator")) {
 			text->Translator = LuaToString(l, -1);
@@ -70,7 +67,7 @@ static int CclDefineText(lua_State *l)
 			const int args = lua_rawlen(l, -1);
 			for (int j = 0; j < args; ++j) {
 				lua_rawgeti(l, -1, j + 1);
-				auto chapter = std::make_unique<CChapter>();
+				auto chapter = std::make_unique<wyrmgus::chapter>();
 				if (!lua_istable(l, -1)) {
 					LuaError(l, "incorrect argument (expected table for variations)");
 				}
@@ -104,31 +101,30 @@ static int CclDefineText(lua_State *l)
 	return 0;
 }
 
-static int CclGetTexts(lua_State *l)
+static int CclGetLiteraryTexts(lua_State *l)
 {
-	lua_createtable(l, Texts.size(), 0);
-	for (size_t i = 1; i <= Texts.size(); ++i)
+	lua_createtable(l, wyrmgus::literary_text::get_all().size(), 0);
+	for (size_t i = 1; i <= wyrmgus::literary_text::get_all().size(); ++i)
 	{
-		lua_pushstring(l, Texts[i-1]->Name.c_str());
+		lua_pushstring(l, wyrmgus::literary_text::get_all()[i-1]->get_identifier().c_str());
 		lua_rawseti(l, -2, i);
 	}
 	return 1;
 }
 
-static int CclGetTextData(lua_State *l)
+static int CclGetLiteraryTextData(lua_State *l)
 {
 	if (lua_gettop(l) < 2) {
 		LuaError(l, "incorrect argument");
 	}
-	std::string text_name = LuaToString(l, 1);
-//	const CText *text = GetText(text_name);
-	CText *text = GetText(text_name);
-	if (!text) {
-		LuaError(l, "Text \"%s\" doesn't exist." _C_ text_name.c_str());
-	}
+	const std::string text_identifier = LuaToString(l, 1);
+	const wyrmgus::literary_text *text = wyrmgus::literary_text::get(text_identifier);
 	const char *data = LuaToString(l, 2);
 
-	if (!strcmp(data, "Author")) {
+	if (!strcmp(data, "Name")) {
+		lua_pushstring(l, text->get_name().c_str());
+		return 1;
+	} else if (!strcmp(data, "Author")) {
 		lua_pushstring(l, text->Author.c_str());
 		return 1;
 	} else if (!strcmp(data, "Translator")) {
@@ -166,7 +162,7 @@ static int CclGetTextData(lua_State *l)
 		if (text->GetChapter(chapter_name) != nullptr) {
 			lua_pushnumber(l, text->GetChapter(chapter_name)->ID);
 		} else {
-			LuaError(l, "Chapter \"%s\" doesn't exist for text \"%s\"" _C_ chapter_name.c_str() _C_ text->Name.c_str());
+			LuaError(l, "Chapter \"%s\" doesn't exist for text \"%s\"" _C_ chapter_name.c_str() _C_ text->get_name().c_str());
 		}
 		return 1;
 	} else if (!strcmp(data, "ChapterIntroduction")) {
@@ -175,7 +171,7 @@ static int CclGetTextData(lua_State *l)
 		if (text->GetChapter(chapter_name) != nullptr) {
 			lua_pushboolean(l, text->GetChapter(chapter_name)->Introduction);
 		} else {
-			LuaError(l, "Chapter \"%s\" doesn't exist for text \"%s\"" _C_ chapter_name.c_str() _C_ text->Name.c_str());
+			LuaError(l, "Chapter \"%s\" doesn't exist for text \"%s\"" _C_ chapter_name.c_str() _C_ text->get_name().c_str());
 		}
 		return 1;
 	} else if (!strcmp(data, "ChapterPage")) {
@@ -187,7 +183,7 @@ static int CclGetTextData(lua_State *l)
 			
 			lua_pushstring(l, text->GetChapter(chapter_name)->Pages[page].c_str());
 		} else {
-			LuaError(l, "Chapter \"%s\" doesn't exist for text \"%s\"" _C_ chapter_name.c_str() _C_ text->Name.c_str());
+			LuaError(l, "Chapter \"%s\" doesn't exist for text \"%s\"" _C_ chapter_name.c_str() _C_ text->get_name().c_str());
 		}
 		return 1;
 	} else if (!strcmp(data, "ChapterPageQuantity")) {
@@ -196,7 +192,7 @@ static int CclGetTextData(lua_State *l)
 		if (text->GetChapter(chapter_name) != nullptr) {
 			lua_pushnumber(l, text->GetChapter(chapter_name)->Pages.size());
 		} else {
-			LuaError(l, "Chapter \"%s\" doesn't exist for text \"%s\"" _C_ chapter_name.c_str() _C_ text->Name.c_str());
+			LuaError(l, "Chapter \"%s\" doesn't exist for text \"%s\"" _C_ chapter_name.c_str() _C_ text->get_name().c_str());
 		}
 		return 1;
 	} else {
@@ -211,9 +207,9 @@ static int CclGetTextData(lua_State *l)
 /**
 **  Register CCL features for quests.
 */
-void TextCclRegister()
+void LiteraryTextCclRegister()
 {
-	lua_register(Lua, "DefineText", CclDefineText);
-	lua_register(Lua, "GetTexts", CclGetTexts);
-	lua_register(Lua, "GetTextData", CclGetTextData);
+	lua_register(Lua, "DefineLiteraryText", CclDefineLiteraryText);
+	lua_register(Lua, "GetLiteraryTexts", CclGetLiteraryTexts);
+	lua_register(Lua, "GetLiteraryTextData", CclGetLiteraryTextData);
 }

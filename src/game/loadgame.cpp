@@ -37,7 +37,6 @@
 //Wyrmgus start
 #include "grand_strategy.h"
 //Wyrmgus end
-#include "literary_text.h"
 #include "luacallback.h"
 #include "map/map.h"
 #include "map/map_layer.h"
@@ -93,7 +92,6 @@ void CleanModules()
 	CleanMissiles();
 	//Wyrmgus start
 	CleanProvinces();
-	CleanTexts();
 	//Wyrmgus end
 	CleanUnits();
 	CleanUnitTypeVariables();
