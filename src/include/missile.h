@@ -466,11 +466,11 @@ private:
 	int range = 0; //missile damage range
 public:
 	int SplashFactor;                      /// missile splash divisor
-	std::vector <MissileConfig *> Impact;  /// missile produces an impact
+	std::vector<MissileConfig> Impact;  /// missile produces an impact
 	MissileConfig Smoke;                   /// trailing missile
-	LuaCallback *ImpactParticle;           /// impact particle
-	LuaCallback *SmokeParticle;            /// smoke particle
-	LuaCallback *OnImpact;                 /// called when
+	std::unique_ptr<LuaCallback> ImpactParticle;           /// impact particle
+	std::unique_ptr<LuaCallback> SmokeParticle;            /// smoke particle
+	std::unique_ptr<LuaCallback> OnImpact;                 /// called when
 
 	// --- FILLED UP ---
 	std::shared_ptr<CGraphic> G;         /// missile graphic
@@ -491,7 +491,7 @@ protected:
 public:
 	virtual ~Missile();
 
-	static Missile *Init(const wyrmgus::missile_type &mtype, const PixelPos &startPos, const PixelPos &destPos, int z);
+	static std::unique_ptr<Missile> Init(const wyrmgus::missile_type &mtype, const PixelPos &startPos, const PixelPos &destPos, int z);
 
 	virtual void Action() = 0;
 
@@ -550,112 +550,126 @@ extern bool IsPiercedUnit(const Missile &missile, const CUnit &unit);
 extern void MissileHandlePierce(Missile &missile, const Vec2i &pos);
 extern bool MissileHandleBlocking(Missile &missile, const PixelPos &position);
 
-class MissileNone : public Missile
+class MissileNone final : public Missile
 {
 public:
-	virtual void Action();
-};
-class MissilePointToPoint : public Missile
-{
-public:
-	virtual void Action();
-};
-class MissilePointToPointWithHit : public Missile
-{
-public:
-	virtual void Action();
-};
-class MissilePointToPointCycleOnce : public Missile
-{
-public:
-	virtual void Action();
-};
-class MissilePointToPointBounce : public Missile
-{
-public:
-	virtual void Action();
-};
-class MissileStay : public Missile
-{
-public:
-	virtual void Action();
-};
-class MissileCycleOnce : public Missile
-{
-public:
-	virtual void Action();
-};
-class MissileFire : public Missile
-{
-public:
-	virtual void Action();
-};
-class MissileHit : public Missile
-{
-public:
-	virtual void Action();
-};
-class MissileParabolic : public Missile
-{
-public:
-	virtual void Action();
-};
-class MissileLandMine : public Missile
-{
-public:
-	virtual void Action();
-};
-class MissileWhirlwind : public Missile
-{
-public:
-	virtual void Action();
-};
-class MissileFlameShield : public Missile
-{
-public:
-	virtual void Action();
-};
-class MissileDeathCoil : public Missile
-{
-public:
-	virtual void Action();
+	virtual void Action() override;
 };
 
-class MissileTracer : public Missile
+class MissilePointToPoint final : public Missile
 {
 public:
-	virtual void Action();
+	virtual void Action() override;
 };
 
-class MissileClipToTarget : public Missile
+class MissilePointToPointWithHit final : public Missile
 {
 public:
-	virtual void Action();
+	virtual void Action() override;
 };
 
-class MissileContinious : public Missile
+class MissilePointToPointCycleOnce final : public Missile
 {
 public:
-	virtual void Action();
+	virtual void Action() override;
 };
 
-class MissileStraightFly : public Missile
+class MissilePointToPointBounce final : public Missile
 {
 public:
-	virtual void Action();
+	virtual void Action() override;
 };
 
-
-class BurningBuildingFrame
+class MissileStay final : public Missile
 {
 public:
-	BurningBuildingFrame() : Percent(0), Missile(nullptr) {};
+	virtual void Action() override;
+};
 
-	int          Percent;  /// HP percent
-	wyrmgus::missile_type *Missile;  /// Missile to draw
+class MissileCycleOnce final : public Missile
+{
+public:
+	virtual void Action() override;
+};
+
+class MissileFire final : public Missile
+{
+public:
+	virtual void Action() override;
+};
+
+class MissileHit final : public Missile
+{
+public:
+	virtual void Action() override;
+};
+
+class MissileParabolic final : public Missile
+{
+public:
+	virtual void Action() override;
+};
+
+class MissileLandMine final : public Missile
+{
+public:
+	virtual void Action() override;
+};
+
+class MissileWhirlwind final : public Missile
+{
+public:
+	virtual void Action() override;
+};
+
+class MissileFlameShield final : public Missile
+{
+public:
+	virtual void Action() override;
+};
+
+class MissileDeathCoil final : public Missile
+{
+public:
+	virtual void Action() override;
+};
+
+class MissileTracer final : public Missile
+{
+public:
+	virtual void Action() override;
+};
+
+class MissileClipToTarget final : public Missile
+{
+public:
+	virtual void Action() override;
+};
+
+namespace wyrmgus {
+
+class missile_continuous final : public Missile
+{
+public:
+	virtual void Action() override;
+};
+
+}
+
+class MissileStraightFly final : public Missile
+{
+public:
+	virtual void Action() override;
+};
+
+class BurningBuildingFrame final
+{
+public:
+	int Percent = 0;  /// HP percent
+	const wyrmgus::missile_type *Missile = nullptr;  /// Missile to draw
 } ;
 
-extern std::vector<BurningBuildingFrame *> BurningBuildingFrames;  /// Burning building frames
+extern std::vector<std::unique_ptr<BurningBuildingFrame>> BurningBuildingFrames;  /// Burning building frames
 
 // In ccl_missile.c
 
@@ -692,7 +706,7 @@ extern void MissileActions();
 extern int ViewPointDistanceToMissile(const Missile &missile);
 
 /// Get the burning building missile based on hp percent
-extern wyrmgus::missile_type *MissileBurningBuilding(int percent);
+extern const wyrmgus::missile_type *MissileBurningBuilding(const int percent);
 
 /// Save missiles
 extern void SaveMissiles(CFile &file);

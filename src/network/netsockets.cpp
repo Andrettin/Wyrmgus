@@ -119,12 +119,11 @@ void CUDPSocket::CStatistic::clear()
 
 CUDPSocket::CUDPSocket()
 {
-	m_impl = new CUDPSocket_Impl();
+	m_impl = std::make_unique<CUDPSocket_Impl>();
 }
 
 CUDPSocket::~CUDPSocket()
 {
-	delete m_impl;
 }
 
 bool CUDPSocket::Open(const CHost &host)

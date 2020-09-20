@@ -64,7 +64,6 @@ public:
 	bool IsValid() const;
 
 #ifdef DEBUG
-
 	class CStatistic
 	{
 		friend class CUDPSocket;
@@ -89,7 +88,7 @@ private:
 #endif
 
 private:
-	CUDPSocket_Impl *m_impl;
+	std::unique_ptr<CUDPSocket_Impl> m_impl;
 };
 
 // Class representing TCP socket used in communication

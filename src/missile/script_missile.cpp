@@ -10,7 +10,7 @@
 //
 /**@name script_missile.cpp - The missile-type ccl functions. */
 //
-//      (c) Copyright 2002-2005 by Lutz Sammer and Jimmy Salmon
+//      (c) Copyright 2002-2020 by Lutz Sammer, Jimmy Salmon and Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -116,25 +116,25 @@ void missile_type::Load(lua_State *l)
 			this->range = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "ImpactMissile")) {
 			if (!lua_istable(l, -1)) {
-				MissileConfig *mc = new MissileConfig();
-				mc->Name = LuaToString(l, -1);
-				this->Impact.push_back(mc);
+				MissileConfig mc;
+				mc.Name = LuaToString(l, -1);
+				this->Impact.push_back(std::move(mc));
 			} else {
 				const int impacts = lua_rawlen(l, -1);
 				for (int i = 0; i < impacts; ++i) {
-					MissileConfig *mc = new MissileConfig();
-					mc->Name = LuaToString(l, -1, i + 1);
-					this->Impact.push_back(mc);
+					MissileConfig mc;
+					mc.Name = LuaToString(l, -1, i + 1);
+					this->Impact.push_back(std::move(mc));
 				}
 			}
 		} else if (!strcmp(value, "SmokeMissile")) {
 			this->Smoke.Name = LuaToString(l, -1);
 		} else if (!strcmp(value, "ImpactParticle")) {
-			this->ImpactParticle = new LuaCallback(l, -1);
+			this->ImpactParticle = std::make_unique<LuaCallback>(l, -1);
 		} else if (!strcmp(value, "SmokeParticle")) {
-			this->SmokeParticle = new LuaCallback(l, -1);
+			this->SmokeParticle = std::make_unique<LuaCallback>(l, -1);
 		} else if (!strcmp(value, "OnImpact")) {
-			this->OnImpact = new LuaCallback(l, -1);
+			this->OnImpact = std::make_unique<LuaCallback>(l, -1);
 		} else if (!strcmp(value, "CanHitOwner")) {
 			this->CanHitOwner = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "AlwaysFire")) {
@@ -309,10 +309,6 @@ static int CclMissile(lua_State *l)
 */
 static int CclDefineBurningBuilding(lua_State *l)
 {
-	for (std::vector<BurningBuildingFrame *>::iterator i = BurningBuildingFrames.begin();
-		 i != BurningBuildingFrames.end(); ++i) {
-		delete *i;
-	}
 	BurningBuildingFrames.clear();
 
 	const int args = lua_gettop(l);
@@ -320,7 +316,7 @@ static int CclDefineBurningBuilding(lua_State *l)
 		if (!lua_istable(l, j + 1)) {
 			LuaError(l, "incorrect argument");
 		}
-		BurningBuildingFrame *ptr = new BurningBuildingFrame;
+		auto ptr = std::make_unique<BurningBuildingFrame>();
 		const int subargs = lua_rawlen(l, j + 1);
 
 		for (int k = 0; k < subargs; ++k) {
@@ -333,7 +329,7 @@ static int CclDefineBurningBuilding(lua_State *l)
 				ptr->Missile = wyrmgus::missile_type::get(LuaToString(l, j + 1, k + 1));
 			}
 		}
-		BurningBuildingFrames.insert(BurningBuildingFrames.begin(), ptr);
+		BurningBuildingFrames.insert(BurningBuildingFrames.begin(), std::move(ptr));
 	}
 	return 0;
 }

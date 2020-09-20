@@ -40,6 +40,7 @@
 #include "grand_strategy.h" //for playing faction music
 #include "player.h" //for playing faction music
 //Wyrmgus end
+#include "sound/music.h"
 #include "sound/unit_sound_type.h"
 //Wyrmgus start
 #include "ui/interface.h" //for player faction music
@@ -109,9 +110,6 @@ static struct {
 #ifndef SDL_AUDIO_BITSIZE
 #define SDL_AUDIO_BITSIZE(x) (x&0xFF)
 #endif
-
-extern oamlApi *oaml;
-extern bool enableOAML;
 #endif
 
 /*----------------------------------------------------------------------------
@@ -372,8 +370,9 @@ static int FillThread(void *)
 		SDL_UnlockMutex(Audio.Lock);
 
 #ifdef USE_OAML
-		if (enableOAML && oaml)
+		if (enableOAML && oaml) {
 			oaml->Update();
+		}
 #endif
 	}
 
@@ -801,8 +800,9 @@ void PlayMusicName(const std::string &name) {
 	}
 	
 #ifdef USE_OAML
-	if (enableOAML == false || oaml == nullptr)
+	if (enableOAML == false || oaml == nullptr) {
 		return;
+	}
 
 	SDL_LockMutex(Audio.Lock);
 	oaml->PlayTrack(name.c_str());
@@ -816,8 +816,9 @@ void PlayMusicByGroupRandom(const std::string &group) {
 	}
 	
 #ifdef USE_OAML
-	if (enableOAML == false || oaml == nullptr)
+	if (enableOAML == false || oaml == nullptr) {
 		return;
+	}
 
 	SDL_LockMutex(Audio.Lock);
 	oaml->PlayTrackByGroupRandom(group.c_str());
@@ -831,8 +832,9 @@ void PlayMusicByGroupAndSubgroupRandom(const std::string &group, const std::stri
 	}
 	
 #ifdef USE_OAML
-	if (enableOAML == false || oaml == nullptr)
+	if (enableOAML == false || oaml == nullptr) {
 		return;
+	}
 
 	SDL_LockMutex(Audio.Lock);
 	if (oaml->PlayTrackByGroupAndSubgroupRandom(group.c_str(), subgroup.c_str()) != OAML_OK) {
@@ -848,8 +850,9 @@ void PlayMusicByGroupAndFactionRandom(const std::string &group, const std::strin
 	}
 
 #ifdef USE_OAML
-	if (enableOAML == false || oaml == nullptr)
+	if (enableOAML == false || oaml == nullptr) {
 		return;
+	}
 
 	SDL_LockMutex(Audio.Lock);
 	if (oaml->PlayTrackByGroupAndSubgroupRandom(group.c_str(), faction_name.c_str()) != OAML_OK) {
@@ -898,8 +901,9 @@ void PlayMusicByGroupAndFactionRandom(const std::string &group, const std::strin
 
 void SetMusicCondition(int id, int value) {
 #ifdef USE_OAML
-	if (enableOAML == false || oaml == nullptr)
+	if (enableOAML == false || oaml == nullptr) {
 		return;
+	}
 
 	SDL_LockMutex(Audio.Lock);
 	oaml->SetCondition(id, value);
@@ -909,8 +913,9 @@ void SetMusicCondition(int id, int value) {
 
 void SetMusicLayerGain(const std::string &layer, float gain) {
 #ifdef USE_OAML
-	if (enableOAML == false || oaml == nullptr)
+	if (enableOAML == false || oaml == nullptr) {
 		return;
+	}
 
 	SDL_LockMutex(Audio.Lock);
 	oaml->SetLayerGain(layer.c_str(), gain);
@@ -997,10 +1002,12 @@ bool IsMusicPlaying()
 {
 #ifdef USE_OAML
 	if (enableOAML && oaml) {
-		if (oaml->IsPlaying())
+		if (oaml->IsPlaying()) {
 			return true;
+		}
 	}
 #endif
+
 	return MusicPlaying;
 }
 
@@ -1010,15 +1017,15 @@ bool IsMusicPlaying()
 void AddMusicTension(int value)
 {
 #ifdef USE_OAML
-	if (enableOAML == false || oaml == nullptr)
+	if (enableOAML == false || oaml == nullptr) {
 		return;
+	}
 
 	SDL_LockMutex(Audio.Lock);
 	oaml->AddTension(value);
 	SDL_UnlockMutex(Audio.Lock);
 #endif
 }
-
 
 /*----------------------------------------------------------------------------
 --  Init
@@ -1120,8 +1127,7 @@ void QuitSound()
 #ifdef USE_OAML
 	if (oaml) {
 		oaml->Shutdown();
-		delete oaml;
-		oaml = nullptr;
+		oaml.reset();
 	}
 #endif
 

@@ -41,13 +41,11 @@ namespace wyrmgus {
 class MissileConfig
 {
 public:
-	MissileConfig() : Missile(nullptr) {}
-
 	bool MapMissileNoLog();
 	bool MapMissile();
 	bool IsEmpty() { return Name.empty(); }
 
 public:
 	std::string Name;        /// Config missile name
-	wyrmgus::missile_type *Missile;    /// Identifier to use to run time
+	const wyrmgus::missile_type *Missile = nullptr;    /// Identifier to use to run time
 };

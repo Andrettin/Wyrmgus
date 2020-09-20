@@ -8,9 +8,8 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name music.cpp - Background music support */
-//
-//      (c) Copyright 2002-2006 by Lutz Sammer, Nehal Mistry, and Jimmy Salmon
+//      (c) Copyright 2002-2020 by Lutz Sammer, Nehal Mistry, Jimmy Salmon
+//                                 and Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -27,27 +26,17 @@
 //      02111-1307, USA.
 //
 
-/*----------------------------------------------------------------------------
--- Includes
-----------------------------------------------------------------------------*/
-
 #include "stratagus.h"
 
-#include "SDL.h"
+#include "music.h"
 
 #include "sound/sound_server.h"
 #include "script.h"
 #include "iolib.h"
 
-/*----------------------------------------------------------------------------
--- Declaration
-----------------------------------------------------------------------------*/
+#include "SDL.h"
 
-#define SoundFrequency 44100 // sample rate of dsp
-
-/*----------------------------------------------------------------------------
--- Variables
-----------------------------------------------------------------------------*/
+static constexpr int SoundFrequency = 44100; // sample rate of dsp
 
 static SDL_mutex *MusicFinishedMutex;     /// Mutex for MusicFinished
 static bool MusicFinished;                /// Music ended and we need a new file
@@ -57,13 +46,9 @@ bool CallbackMusic;                       /// flag true callback ccl if stops
 #ifdef USE_OAML
 #include <oaml.h>
 
-oamlApi *oaml = nullptr;
+std::unique_ptr<oamlApi> oaml;
 bool enableOAML = false;
 #endif
-
-/*----------------------------------------------------------------------------
--- Functions
-----------------------------------------------------------------------------*/
 
 /**
 **  Callback for when music has finished
@@ -154,7 +139,7 @@ static oamlFileCallbacks fileCbs = {
 void InitMusicOAML()
 {
 	const std::string filename = LibraryFileName("oaml.defs");
-	oaml = new oamlApi();
+	oaml = std::make_unique<oamlApi>();
 	oaml->SetFileCallbacks(&fileCbs);
 	oaml->Init(filename.c_str());
 
@@ -176,8 +161,7 @@ void ShutdownMusicOAML()
 {
 	if (oaml) {
 		oaml->Shutdown();
-		delete oaml;
-		oaml = nullptr;
+		oaml.reset();
 	}
 	enableOAML = false;
 }

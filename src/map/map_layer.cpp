@@ -8,8 +8,6 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name map_layer.cpp - The map layer source file. */
-//
 //      (c) Copyright 2018-2020 by Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
@@ -27,10 +25,6 @@
 //      02111-1307, USA.
 //
 
-/*----------------------------------------------------------------------------
---  Includes
-----------------------------------------------------------------------------*/
-
 #include "stratagus.h"
 
 #include "map/map_layer.h"
@@ -40,6 +34,7 @@
 #include "map/terrain_type.h"
 #include "map/tile.h"
 #include "map/tileset.h"
+#include "sound/music.h"
 #include "sound/sound_server.h"
 #include "time/season.h"
 #include "time/season_schedule.h"
@@ -50,22 +45,8 @@
 
 #ifdef USE_OAML
 #include <oaml.h>
-
-extern oamlApi *oaml;
-extern bool enableOAML;
 #endif
 
-/*----------------------------------------------------------------------------
---  Variables
-----------------------------------------------------------------------------*/
-
-/*----------------------------------------------------------------------------
---  Functions
-----------------------------------------------------------------------------*/
-
-/**
-**	@brief	Constructor
-*/
 CMapLayer::CMapLayer(const QSize &size) : size(size)
 {
 	if (size.width() > MaxMapWidth) {
@@ -85,9 +66,6 @@ CMapLayer::CMapLayer(const QSize &size) : size(size)
 	}
 }
 
-/**
-**	@brief	Destructor
-*/
 CMapLayer::~CMapLayer()
 {
 	if (this->Fields) {

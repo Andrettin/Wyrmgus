@@ -496,7 +496,6 @@ set(tolua_FILES
 	src/tolua/grand_strategy.pkg
 	#Wyrmgus end
 	src/tolua/map.pkg
-	src/tolua/master.pkg
 	src/tolua/minimap.pkg
 	src/tolua/mod.pkg
 	src/tolua/network.pkg
@@ -725,6 +724,7 @@ set(stratagus_script_effect_HDRS
 )
 
 set(stratagus_sound_HDRS
+	src/sound/music.h
 	src/sound/script_sound.h
 	src/sound/sound.h
 	src/sound/sound_server.h

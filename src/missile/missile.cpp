@@ -67,10 +67,10 @@
 
 unsigned int Missile::Count = 0;
 
-static std::vector<Missile *> GlobalMissiles;    /// all global missiles on map
-static std::vector<Missile *> LocalMissiles;     /// all local missiles on map
+static std::vector<std::unique_ptr<Missile>> GlobalMissiles;    /// all global missiles on map
+static std::vector<std::unique_ptr<Missile>> LocalMissiles;     /// all local missiles on map
 
-std::vector<BurningBuildingFrame *> BurningBuildingFrames; /// Burning building frames
+std::vector<std::unique_ptr<BurningBuildingFrame>> BurningBuildingFrames; /// Burning building frames
 
 extern NumberDesc *Damage;                   /// Damage calculation for missile.
 
@@ -227,64 +227,64 @@ Missile::Missile() :
 **
 **  @return       created missile.
 */
-Missile *Missile::Init(const wyrmgus::missile_type &mtype, const PixelPos &startPos, const PixelPos &destPos, int z)
+std::unique_ptr<Missile> Missile::Init(const wyrmgus::missile_type &mtype, const PixelPos &startPos, const PixelPos &destPos, int z)
 {
-	Missile *missile = nullptr;
+	std::unique_ptr<Missile> missile;
 
 	switch (mtype.get_missile_class()) {
 		case wyrmgus::missile_class::none:
-			missile = new MissileNone;
+			missile = std::make_unique<MissileNone>();
 			break;
 		case wyrmgus::missile_class::point_to_point:
-			missile = new MissilePointToPoint;
+			missile = std::make_unique<MissilePointToPoint>();
 			break;
 		case wyrmgus::missile_class::point_to_point_with_hit:
-			missile = new MissilePointToPointWithHit;
+			missile = std::make_unique<MissilePointToPointWithHit>();
 			break;
 		case wyrmgus::missile_class::point_to_point_cycle_once:
-			missile = new MissilePointToPointCycleOnce;
+			missile = std::make_unique<MissilePointToPointCycleOnce>();
 			break;
 		case wyrmgus::missile_class::point_to_point_bounce:
-			missile = new MissilePointToPointBounce;
+			missile = std::make_unique<MissilePointToPointBounce>();
 			break;
 		case wyrmgus::missile_class::stay:
-			missile = new MissileStay;
+			missile = std::make_unique<MissileStay>();
 			break;
 		case wyrmgus::missile_class::cycle_once:
-			missile = new MissileCycleOnce;
+			missile = std::make_unique<MissileCycleOnce>();
 			break;
 		case wyrmgus::missile_class::fire:
-			missile = new MissileFire;
+			missile = std::make_unique<MissileFire>();
 			break;
 		case wyrmgus::missile_class::hit:
-			missile = new ::MissileHit;
+			missile = std::make_unique<::MissileHit>();
 			break;
 		case wyrmgus::missile_class::parabolic:
-			missile = new MissileParabolic;
+			missile = std::make_unique<MissileParabolic>();
 			break;
 		case wyrmgus::missile_class::land_mine:
-			missile = new MissileLandMine;
+			missile = std::make_unique<MissileLandMine>();
 			break;
 		case wyrmgus::missile_class::whirlwind:
-			missile = new MissileWhirlwind;
+			missile = std::make_unique<MissileWhirlwind>();
 			break;
 		case wyrmgus::missile_class::flame_shield:
-			missile = new MissileFlameShield;
+			missile = std::make_unique<MissileFlameShield>();
 			break;
 		case wyrmgus::missile_class::death_coil:
-			missile = new MissileDeathCoil;
+			missile = std::make_unique<MissileDeathCoil>();
 			break;
 		case wyrmgus::missile_class::tracer:
-			missile = new MissileTracer;
+			missile = std::make_unique<MissileTracer>();
 			break;
 		case wyrmgus::missile_class::clip_to_target:
-			missile = new MissileClipToTarget;
+			missile = std::make_unique<MissileClipToTarget>();
 			break;
 		case wyrmgus::missile_class::continuous:
-			missile = new MissileContinious;
+			missile = std::make_unique<wyrmgus::missile_continuous>();
 			break;
 		case wyrmgus::missile_class::straight_fly:
-			missile = new MissileStraightFly;
+			missile = std::make_unique<MissileStraightFly>();
 			break;
 	}
 	const PixelPos halfSize = mtype.get_frame_size() / 2;
@@ -319,10 +319,10 @@ Missile *Missile::Init(const wyrmgus::missile_type &mtype, const PixelPos &start
 */
 Missile *MakeMissile(const wyrmgus::missile_type &mtype, const PixelPos &startPos, const PixelPos &destPos, int z)
 {
-	Missile *missile = Missile::Init(mtype, startPos, destPos, z);
-
-	GlobalMissiles.push_back(missile);
-	return missile;
+	std::unique_ptr<Missile> missile = Missile::Init(mtype, startPos, destPos, z);
+	Missile *missile_ptr = missile.get();
+	GlobalMissiles.push_back(std::move(missile));
+	return missile_ptr;
 }
 
 /**
@@ -336,11 +336,11 @@ Missile *MakeMissile(const wyrmgus::missile_type &mtype, const PixelPos &startPo
 */
 Missile *MakeLocalMissile(const wyrmgus::missile_type &mtype, const PixelPos &startPos, const PixelPos &destPos, int z)
 {
-	Missile *missile = Missile::Init(mtype, startPos, destPos, z);
-
+	std::unique_ptr<Missile> missile = Missile::Init(mtype, startPos, destPos, z);
 	missile->Local = 1;
-	LocalMissiles.push_back(missile);
-	return missile;
+	Missile *missile_ptr = missile.get();
+	LocalMissiles.push_back(std::move(missile));
+	return missile_ptr;
 }
 
 /**
@@ -1047,7 +1047,7 @@ static bool MissileDrawLevelCompare(const Missile *const l, const Missile *const
 */
 void FindAndSortMissiles(const CViewport &vp, std::vector<Missile *> &table)
 {
-	typedef std::vector<Missile *>::const_iterator MissilePtrConstiterator;
+	typedef std::vector<std::unique_ptr<Missile>>::const_iterator MissilePtrConstiterator;
 
 	// Loop through global missiles, then through locals.
 	for (MissilePtrConstiterator i = GlobalMissiles.begin(); i != GlobalMissiles.end(); ++i) {
@@ -1075,6 +1075,7 @@ void FindAndSortMissiles(const CViewport &vp, std::vector<Missile *> &table)
 		// Local missile are visible.
 		table.push_back(&missile);
 	}
+
 	std::sort(table.begin(), table.end(), MissileDrawLevelCompare);
 }
 
@@ -1473,8 +1474,7 @@ void Missile::MissileHit(CUnit *unit)
 	// The impact generates a new missile.
 	//
 	if (mtype.Impact.empty() == false) {
-		for (std::vector<MissileConfig *>::const_iterator it = mtype.Impact.begin(); it != mtype.Impact.end(); ++it) {
-			const MissileConfig &mc = **it;
+		for (const MissileConfig &mc : mtype.Impact) {
 			//Wyrmgus start
 //			Missile *impact = MakeMissile(*mc.Missile, pixelPos, pixelPos);
 			Missile *impact = MakeMissile(*mc.Missile, pixelPos, pixelPos, this->MapLayer);
@@ -1751,7 +1751,7 @@ void Missile::NextMissileFrameCycle()
 **
 **  @param missiles  Table of missiles.
 */
-static void MissilesActionLoop(std::vector<Missile *> &missiles)
+static void MissilesActionLoop(std::vector<std::unique_ptr<Missile>> &missiles)
 {
 	for (size_t i = 0; i != missiles.size(); /* empty */) {
 		Missile &missile = *missiles[i];
@@ -1765,7 +1765,6 @@ static void MissilesActionLoop(std::vector<Missile *> &missiles)
 			missile.TTL--;  // overall time to live if specified
 		}
 		if (missile.TTL == 0) {
-			delete &missile;
 			missiles.erase(missiles.begin() + i);
 			continue;
 		}
@@ -1776,7 +1775,6 @@ static void MissilesActionLoop(std::vector<Missile *> &missiles)
 		}
 		missile.Action(); // may create other missiles, and so modifies the array
 		if (missile.TTL == 0) {
-			delete &missile;
 			missiles.erase(missiles.begin() + i);
 			continue;
 		}
@@ -1815,15 +1813,11 @@ int ViewPointDistanceToMissile(const Missile &missile)
 **
 **  @return  the missile used for burning.
 */
-wyrmgus::missile_type *MissileBurningBuilding(int percent)
+const wyrmgus::missile_type *MissileBurningBuilding(const int percent)
 {
-	for (std::vector<BurningBuildingFrame *>::iterator i = BurningBuildingFrames.begin();
-		 i != BurningBuildingFrames.end(); ++i) {
-		//Wyrmgus start
-//		if (percent > (*i)->Percent) {
-		if (percent >= (*i)->Percent) {
-		//Wyrmgus end
-			return (*i)->Missile;
+	for (const std::unique_ptr<BurningBuildingFrame> &frame : BurningBuildingFrames) {
+		if (percent >= frame->Percent) {
+			return frame->Missile;
 		}
 	}
 	return nullptr;
@@ -1883,13 +1877,11 @@ void SaveMissiles(CFile &file)
 	file.printf("\n--- -----------------------------------------\n");
 	file.printf("--- MODULE: missiles\n\n");
 
-	std::vector<Missile *>::const_iterator i;
-
-	for (i = GlobalMissiles.begin(); i != GlobalMissiles.end(); ++i) {
-		(*i)->SaveMissile(file);
+	for (const std::unique_ptr<Missile> &missile : GlobalMissiles) {
+		missile->SaveMissile(file);
 	}
-	for (i = LocalMissiles.begin(); i != LocalMissiles.end(); ++i) {
-		(*i)->SaveMissile(file);
+	for (const std::unique_ptr<Missile> &missile : LocalMissiles) {
+		missile->SaveMissile(file);
 	}
 }
 
@@ -1898,9 +1890,7 @@ namespace wyrmgus {
 void missile_type::Init()
 {
 	// Resolve impact missiles
-	for (std::vector<MissileConfig *>::iterator it = this->Impact.begin(); it != this->Impact.end(); ++it) {
-		MissileConfig &mc = **it;
-
+	for (MissileConfig &mc : this->Impact) {
 		mc.MapMissile();
 	}
 	this->Smoke.MapMissile();
@@ -1936,18 +1926,12 @@ missile_type::missile_type(const std::string &identifier) : data_entry(identifie
 //	BlizzardSpeed(0), TTL(-1), ReduceFactor(100), SmokePrecision(0),
 	BlizzardSpeed(0), AttackSpeed(10), TTL(-1), ReduceFactor(100), SmokePrecision(0),
 	//Wyrmgus end
-	MissileStopFlags(0), Damage(nullptr), SplashFactor(100),
-	ImpactParticle(nullptr), SmokeParticle(nullptr), OnImpact(nullptr),
-	G(nullptr)
+	MissileStopFlags(0), Damage(nullptr), SplashFactor(100)
 {
 }
 
 missile_type::~missile_type()
 {
-	Impact.clear();
-	delete ImpactParticle;
-	delete SmokeParticle;
-	delete OnImpact;
 	FreeNumberDesc(this->Damage);
 }
 
@@ -1966,23 +1950,11 @@ Missile::~Missile()
 */
 void CleanMissiles()
 {
-	std::vector<Missile *>::const_iterator i;
-
-	for (i = GlobalMissiles.begin(); i != GlobalMissiles.end(); ++i) {
-		delete *i;
-	}
 	GlobalMissiles.clear();
-	for (i = LocalMissiles.begin(); i != LocalMissiles.end(); ++i) {
-		delete *i;
-	}
 	LocalMissiles.clear();
 }
 
 void FreeBurningBuildingFrames()
 {
-	for (std::vector<BurningBuildingFrame *>::iterator i = BurningBuildingFrames.begin();
-		 i != BurningBuildingFrames.end(); ++i) {
-		delete *i;
-	}
 	BurningBuildingFrames.clear();
 }

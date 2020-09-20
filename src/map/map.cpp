@@ -77,13 +77,6 @@
 #include "video/video.h"
 #include "world.h"
 
-#ifdef USE_OAML
-#include <oaml.h>
-
-extern oamlApi *oaml;
-extern bool enableOAML;
-#endif
-
 CMap CMap::Map; //the current map
 int FlagRevealMap; //flag must reveal the map
 int ReplayRevealMap; //reveal Map is replay

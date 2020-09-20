@@ -64,6 +64,7 @@
 //Wyrmgus start
 #include "settings.h"
 //Wyrmgus end
+#include "sound/music.h"
 #include "sound/sound.h"
 #include "sound/sound_server.h"
 #include "time/calendar.h"
@@ -86,16 +87,9 @@
 
 #ifdef USE_OAML
 #include <oaml.h>
-
-extern oamlApi *oaml;
-extern bool enableOAML;
 #endif
 
 void DrawGuichanWidgets();
-
-//----------------------------------------------------------------------------
-// Variables
-//----------------------------------------------------------------------------
 
 /// variable set when we are scrolling via keyboard
 int KeyScrollState = ScrollNone;
@@ -105,10 +99,6 @@ int MouseScrollState = ScrollNone;
 
 EventCallback GameCallbacks;   /// Game callbacks
 EventCallback EditorCallbacks; /// Editor callbacks
-
-//----------------------------------------------------------------------------
-// Functions
-//----------------------------------------------------------------------------
 
 /**
 **  Handle scrolling area.

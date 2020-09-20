@@ -8,8 +8,6 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name missile_continuous.cpp - The missile Continuous. */
-//
 //      (c) Copyright 2012 by cybermind
 //
 //      This program is free software; you can redistribute it and/or modify
@@ -27,22 +25,22 @@
 //      02111-1307, USA.
 //
 
-/*----------------------------------------------------------------------------
---  Includes
-----------------------------------------------------------------------------*/
-
 #include "stratagus.h"
 
 #include "missile.h"
 
+namespace wyrmgus {
+
 /**
 **  Missile don't move, than disappears when TTL is 0
 */
-void MissileContinious::Action()
+void missile_continuous::Action()
 {
 	this->Wait = this->Type->get_sleep();
 	this->MissileHit();
 	if (this->NextMissileFrame(1, 0)) {
 		this->SpriteFrame = 0;
 	}
+}
+
 }

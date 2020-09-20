@@ -7204,14 +7204,13 @@ static void HitUnit_ChangeVariable(CUnit &target, const Missile &missile)
 	//Wyrmgus end
 }
 
-
 static void HitUnit_Burning(CUnit &target)
 {
 	//Wyrmgus start
 //	const int f = (100 * target.Variable[HP_INDEX].Value) / target.Variable[HP_INDEX].Max;
 	const int f = (100 * target.Variable[HP_INDEX].Value) / target.GetModifiedVariable(HP_INDEX, VariableMax);
 	//Wyrmgus end
-	wyrmgus::missile_type *fire = MissileBurningBuilding(f);
+	const wyrmgus::missile_type *fire = MissileBurningBuilding(f);
 
 	if (fire) {
 		const PixelPos targetPixelCenter = target.get_map_pixel_pos_center();

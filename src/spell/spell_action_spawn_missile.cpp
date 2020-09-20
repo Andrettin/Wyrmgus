@@ -255,7 +255,7 @@ int spell_action_spawn_missile::Cast(CUnit &caster, const spell &, CUnit *target
 
 		//Wyrmgus start
 //		::Missile *missile = MakeMissile(*this->Missile, startPos, endPos);
-		missile_type *mtype = this->Missile;
+		const missile_type *mtype = this->Missile;
 		if (mtype->get_missile_class() == missile_class::none && this->UseUnitVar) {
 			mtype = caster.GetMissile().Missile;
 		}

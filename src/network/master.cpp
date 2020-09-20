@@ -68,11 +68,7 @@ void CMetaClient::SetMetaServer(const std::string host, const int port)
 
 CMetaClient::~CMetaClient()
 {
-	for (std::list<CClientLog *>::iterator it = events.begin(); it != events.end(); ++it) {
-		CClientLog *log = *it;
-		delete log;
-	}
-	events.clear();
+	this->events.clear();
 	this->Close();
 }
 
@@ -110,7 +106,7 @@ int CMetaClient::Init()
 		MetaClient.Close();
 		return -1;
 	}
-	CClientLog &log = *GetLastMessage();
+	const CClientLog &log = *GetLastMessage();
 	if (log.entry.find("PING_OK") != std::string::npos) {
 		// Everything is OK
 		return 0;
@@ -172,9 +168,9 @@ int CMetaClient::Recv()
 	std::string cmd(buf, strlen(buf));
 	cmd += '\n';
 	cmd += '\0';
-	CClientLog *log = new CClientLog;
+	auto log = std::make_unique<CClientLog>();
 	log->entry = cmd;
-	events.push_back(log);
+	this->events.push_back(std::move(log));
 	lastRecvState = n;
 	return n;
 }
