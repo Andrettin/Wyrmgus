@@ -10,7 +10,7 @@
 //
 /**@name script_text.cpp - The text ccl functions. */
 //
-//      (c) Copyright 2016 by Andrettin
+//      (c) Copyright 2016-2020 by Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -27,29 +27,12 @@
 //      02111-1307, USA.
 //
 
-/*----------------------------------------------------------------------------
---  Includes
-----------------------------------------------------------------------------*/
-
 #include "stratagus.h"
 
 #include "text.h"
 
 #include "script.h"
 
-/*----------------------------------------------------------------------------
---  Variables
-----------------------------------------------------------------------------*/
-
-/*----------------------------------------------------------------------------
---  Functions
-----------------------------------------------------------------------------*/
-
-/**
-**  Define a text.
-**
-**  @param l  Lua state.
-*/
 static int CclDefineText(lua_State *l)
 {
 	LuaCheckArgs(l, 2);
@@ -87,8 +70,7 @@ static int CclDefineText(lua_State *l)
 			const int args = lua_rawlen(l, -1);
 			for (int j = 0; j < args; ++j) {
 				lua_rawgeti(l, -1, j + 1);
-				CChapter *chapter = new CChapter;
-				text->Chapters.push_back(chapter);
+				auto chapter = std::make_unique<CChapter>();
 				if (!lua_istable(l, -1)) {
 					LuaError(l, "incorrect argument (expected table for variations)");
 				}
@@ -111,6 +93,7 @@ static int CclDefineText(lua_State *l)
 					}
 					lua_pop(l, 1);
 				}
+				text->Chapters.push_back(std::move(chapter));
 				lua_pop(l, 1);
 			}
 		} else {
@@ -132,11 +115,6 @@ static int CclGetTexts(lua_State *l)
 	return 1;
 }
 
-/**
-**  Get text data.
-**
-**  @param l  Lua state.
-*/
 static int CclGetTextData(lua_State *l)
 {
 	if (lua_gettop(l) < 2) {

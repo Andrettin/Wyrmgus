@@ -27,37 +27,17 @@
 //      02111-1307, USA.
 //
 
-/*----------------------------------------------------------------------------
---  Includes
-----------------------------------------------------------------------------*/
-
 #include "stratagus.h"
 
 #include "text.h"
 
-/*----------------------------------------------------------------------------
---  Variables
-----------------------------------------------------------------------------*/
-
 std::vector<CText *> Texts;
 
-/*----------------------------------------------------------------------------
---  Functions
-----------------------------------------------------------------------------*/
-
-CText::~CText()
-{
-	for (size_t i = 0; i < this->Chapters.size(); ++i) {
-		delete this->Chapters[i];
-	}
-	this->Chapters.clear();
-}
-	
 CChapter *CText::GetChapter(const std::string &chapter_name)
 {
 	for (size_t i = 0; i < this->Chapters.size(); ++i) {
 		if (chapter_name == this->Chapters[i]->Name) {
-			return this->Chapters[i];
+			return this->Chapters[i].get();
 		}
 	}
 	return nullptr;
