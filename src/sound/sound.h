@@ -164,10 +164,7 @@ private:
 **  Origin of a sound
 */
 struct Origin {
-	//Wyrmgus start
-//	const void *Base;   /// pointer on a Unit
-	const CUnit *Base;   /// pointer on a Unit
-	//Wyrmgus end
+	const CUnit *Base;  /// pointer on a Unit
 	unsigned Id;        /// unique identifier (if the pointer has been shared)
 };
 

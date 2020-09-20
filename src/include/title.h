@@ -49,10 +49,10 @@ public:
 class TitleScreen final
 {
 public:
-	void ShowTitleImage();
+	void ShowTitleImage() const;
 
 private:
-	void ShowLabels();
+	void ShowLabels() const;
 
 public:
 	std::string File;
@@ -64,6 +64,6 @@ public:
 	std::vector<TitleScreenLabel> Labels;
 };
 
-extern TitleScreen **TitleScreens;          /// File for title screen
+extern std::vector<TitleScreen> TitleScreens;          /// File for title screen
 
 extern void ShowTitleScreens();

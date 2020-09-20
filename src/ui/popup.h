@@ -133,7 +133,9 @@ public:
 class CPopupContentType
 {
 public:
-	virtual ~CPopupContentType() { delete Condition; }
+	virtual ~CPopupContentType()
+	{
+	}
 
 	/// Tell how show the variable Index.
 	virtual void Draw(int x, int y, const CPopup &popup, const unsigned int popupWidth, const wyrmgus::button &button, int *Costs) const = 0;
@@ -144,7 +146,7 @@ public:
 
 	virtual void Parse(lua_State *l) = 0;
 
-	static CPopupContentType *ParsePopupContent(lua_State *l);
+	static std::unique_ptr<CPopupContentType> ParsePopupContent(lua_State *l);
 
 public:
 	PixelPos pos = PixelPos(0, 0); /// position to draw.
@@ -157,7 +159,7 @@ protected:
 	const wyrmgus::font_color *TextColor = nullptr;      /// Color used for plain text in content.
 	const wyrmgus::font_color *HighlightColor = nullptr; /// Color used for highlighted letters.
 public:
-	PopupConditionPanel *Condition = nullptr; /// Condition to show the content; if null, no condition.
+	std::unique_ptr<PopupConditionPanel> Condition; /// Condition to show the content; if null, no condition.
 };
 
 enum PopupButtonInfo_Types {
@@ -283,7 +285,7 @@ public:
 	CPopup();
 	~CPopup();
 
-	std::vector<CPopupContentType *> Contents; /// Array of contents to display.
+	std::vector<std::unique_ptr<CPopupContentType>> Contents; /// Array of contents to display.
 	std::string Ident;                         /// Ident of the popup.
 	int MarginX;                               /// Left and right margin width.
 	int MarginY;                               /// Upper and lower margin height.

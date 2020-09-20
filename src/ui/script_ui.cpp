@@ -298,44 +298,36 @@ static int CclGetVideoFullScreen(lua_State *l)
 */
 static int CclSetTitleScreens(lua_State *l)
 {
-	if (TitleScreens) {
-		for (int i = 0; TitleScreens[i]; ++i) {
-			delete TitleScreens[i];
-		}
-		delete[] TitleScreens;
-		TitleScreens = nullptr;
-	}
+	TitleScreens.clear();
 
 	const int args = lua_gettop(l);
-	TitleScreens = new TitleScreen *[args + 1];
-	memset(TitleScreens, 0, (args + 1) * sizeof(TitleScreen *));
 
 	for (int j = 0; j < args; ++j) {
 		if (!lua_istable(l, j + 1)) {
 			LuaError(l, "incorrect argument");
 		}
-		TitleScreens[j] = new TitleScreen;
-		TitleScreens[j]->Iterations = 1;
+		TitleScreen title_screen;
+		title_screen.Iterations = 1;
 		lua_pushnil(l);
 		while (lua_next(l, j + 1)) {
 			const char *value = LuaToString(l, -2);
 			if (!strcmp(value, "Image")) {
-				TitleScreens[j]->File = LuaToString(l, -1);
+				title_screen.File = LuaToString(l, -1);
 			} else if (!strcmp(value, "Music")) {
-				TitleScreens[j]->Music = LuaToString(l, -1);
+				title_screen.Music = LuaToString(l, -1);
 			} else if (!strcmp(value, "Timeout")) {
-				TitleScreens[j]->Timeout = LuaToNumber(l, -1);
+				title_screen.Timeout = LuaToNumber(l, -1);
 			} else if (!strcmp(value, "Iterations")) {
-				TitleScreens[j]->Iterations = LuaToNumber(l, -1);
+				title_screen.Iterations = LuaToNumber(l, -1);
 			} else if (!strcmp(value, "Editor")) {
-				TitleScreens[j]->Editor = LuaToNumber(l, -1);
+				title_screen.Editor = LuaToNumber(l, -1);
 			} else if (!strcmp(value, "Labels")) {
 				if (!lua_istable(l, -1)) {
 					LuaError(l, "incorrect argument");
 				}
 				const int subargs = lua_rawlen(l, -1);
 
-				TitleScreens[j]->Labels.clear();
+				title_screen.Labels.clear();
 
 				for (int k = 0; k < subargs; ++k) {
 					lua_rawgeti(l, -1, k + 1);
@@ -371,7 +363,7 @@ static int CclSetTitleScreens(lua_State *l)
 						lua_pop(l, 1);
 					}
 
-					TitleScreens[j]->Labels.push_back(std::move(label));
+					title_screen.Labels.push_back(std::move(label));
 					lua_pop(l, 1);
 				}
 			} else {
@@ -379,6 +371,7 @@ static int CclSetTitleScreens(lua_State *l)
 			}
 			lua_pop(l, 1);
 		}
+		TitleScreens.push_back(std::move(title_screen));
 	}
 	return 0;
 }

@@ -10,7 +10,7 @@
 //
 /**@name contenttype.cpp - . */
 //
-//      (c) Copyright 1999-2015 by Joris Dauphin and Andrettin
+//      (c) Copyright 1999-2020 by Joris Dauphin and Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -81,7 +81,7 @@ extern UStrInt GetComponent(const wyrmgus::unit_type &type, int index, EnumVaria
 	CLabel label(font, this->TextColor, this->HighlightColor);
 	//Wyrmgus end
 
-	if (this->Text) {
+	if (this->Text != nullptr) {
 		text = EvalString(this->Text);
 		std::string::size_type pos;
 		if ((pos = text.find("~|")) != std::string::npos) {

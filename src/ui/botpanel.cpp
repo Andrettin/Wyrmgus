@@ -717,20 +717,16 @@ static void GetPopupSize(const CPopup &popup, const wyrmgus::button &button,
 			break;
 	}
 
-	for (std::vector<CPopupContentType *>::const_iterator it = popup.Contents.begin();
-		 it != popup.Contents.end();
-		 ++it) {
-		CPopupContentType &content = **it;
-
-		if (CanShowPopupContent(content.Condition, button, unit_type)) {
+	for (const std::unique_ptr<CPopupContentType> &content : popup.Contents) {
+		if (CanShowPopupContent(content->Condition.get(), button, unit_type)) {
 			// Automatically write the calculated coordinates.
-			content.pos.x = contentWidth + content.MarginX;
-			content.pos.y = popupHeight + content.MarginY;
+			content->pos.x = contentWidth + content->MarginX;
+			content->pos.y = popupHeight + content->MarginY;
 
-			contentWidth += std::max(content.minSize.x, 2 * content.MarginX + content.GetWidth(button, Costs));
-			contentHeight = std::max(content.minSize.y, 2 * content.MarginY + content.GetHeight(button, Costs));
+			contentWidth += std::max(content->minSize.x, 2 * content->MarginX + content->GetWidth(button, Costs));
+			contentHeight = std::max(content->minSize.y, 2 * content->MarginY + content->GetHeight(button, Costs));
 			maxContentHeight = std::max(contentHeight, maxContentHeight);
-			if (content.Wrap) {
+			if (content->Wrap) {
 				popupWidth += std::max(0, contentWidth - maxContentWidth);
 				popupHeight += maxContentHeight;
 				maxContentWidth = std::max(maxContentWidth, contentWidth);
@@ -868,12 +864,10 @@ void DrawPopup(const wyrmgus::button &button, int x, int y, bool above)
 	Video.DrawRectangle(popup->BorderColor, x, y, popupWidth, popupHeight);
 
 	// Contents
-	for (std::vector<CPopupContentType *>::const_iterator it = popup->Contents.begin();
-		 it != popup->Contents.end(); ++it) {
-		const CPopupContentType &content = **it;
+	for (const std::unique_ptr<CPopupContentType> &content : popup->Contents) {
 
-		if (CanShowPopupContent(content.Condition, button, unit_type)) {
-			content.Draw(x + content.pos.x, y + content.pos.y, *popup, popupWidth, button, Costs);
+		if (CanShowPopupContent(content->Condition.get(), button, unit_type)) {
+			content->Draw(x + content->pos.x, y + content->pos.y, *popup, popupWidth, button, Costs);
 		}
 	}
 }

@@ -70,7 +70,7 @@ static bool EffectsEnabled = true;
 /// Channels for sound effects and unit speech
 struct SoundChannel {
 	wyrmgus::sample *Sample;       /// sample to play
-	Origin *Unit;          /// pointer to unit, who plays the sound, if any
+	std::unique_ptr<Origin> Unit;          /// pointer to unit, who plays the sound, if any
 	unsigned char Volume;  /// Volume of this channel
 	signed char Stereo;    /// stereo location of sound (-128 left, 0 center, 127 right)
 	//Wyrmgus start
@@ -425,13 +425,7 @@ static void ChannelFinished(int channel)
 		Channels[channel].FinishedCallback(channel);
 	}
 
-	//Wyrmgus start
-//	delete Channels[channel].Unit;
-	if (Channels[channel].Unit) {
-		delete Channels[channel].Unit;
-	}
-	//Wyrmgus end
-	Channels[channel].Unit = nullptr;
+	Channels[channel].Unit.reset();
 	
 	//Wyrmgus start
 	Channels[channel].Voice = wyrmgus::unit_sound_type::none;
@@ -461,13 +455,13 @@ static int FillChannel(wyrmgus::sample *sample, unsigned char volume, char stere
 	Channels[NextFreeChannel].Stereo = stereo;
 	Channels[NextFreeChannel].FinishedCallback = nullptr;
 	//Wyrmgus start
-	Channels[NextFreeChannel].Unit = nullptr;
+	Channels[NextFreeChannel].Unit.reset();
 	//Wyrmgus end
 	if (origin && origin->Base) {
-		Origin *source = new Origin;
+		auto source = std::make_unique<Origin>();
 		source->Base = origin->Base;
 		source->Id = origin->Id;
-		Channels[NextFreeChannel].Unit = source;
+		Channels[NextFreeChannel].Unit = std::move(source);
 	}
 	NextFreeChannel = next_free;
 
@@ -1097,7 +1091,7 @@ int InitSound()
 		Channels[i].Point = i + 1;
 		//Wyrmgus start
 		Channels[i].Sample = nullptr;
-		Channels[i].Unit = nullptr;
+		Channels[i].Unit.reset();
 		Channels[i].Volume = 0;
 		Channels[i].Stereo = 0;
 		Channels[i].Voice = wyrmgus::unit_sound_type::none;

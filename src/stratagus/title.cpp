@@ -37,7 +37,7 @@
 #include "video/font.h"
 #include "video/video.h"
 
-TitleScreen **TitleScreens;			/// Title screens to show at startup
+std::vector<TitleScreen> TitleScreens;			/// Title screens to show at startup
 static bool WaitNoEvent;			/// Flag got an event
 extern std::string CliMapName;
 
@@ -94,7 +94,7 @@ static void WaitCallbackExit()
 }
 
 
-void TitleScreen::ShowLabels()
+void TitleScreen::ShowLabels() const
 {
 	const std::vector<TitleScreenLabel> &labels = this->Labels;
 
@@ -119,7 +119,7 @@ void TitleScreen::ShowLabels()
 	}
 }
 
-void TitleScreen::ShowTitleImage()
+void TitleScreen::ShowTitleImage() const
 {
 	const EventCallback *old_callbacks = GetCallbacks();
 	EventCallback callbacks;
@@ -162,25 +162,25 @@ void TitleScreen::ShowTitleImage()
 */
 void ShowTitleScreens()
 {
-	if (!TitleScreens || !CliMapName.empty()) {
+	if (TitleScreens.empty() || !CliMapName.empty()) {
 		return;
 	}
 
 	SetVideoSync();
 
-	for (int i = 0; TitleScreens[i]; ++i) {
-		if ((Editor.Running && !TitleScreens[i]->Editor) || (!Editor.Running && TitleScreens[i]->Editor)) {
+	for (const TitleScreen &title_screen : TitleScreens) {
+		if ((Editor.Running && !title_screen.Editor) || (!Editor.Running && title_screen.Editor)) {
 			continue;
 		}
 
-		if (!TitleScreens[i]->Music.empty()) {
-			if (TitleScreens[i]->Music == "none" || PlayMusic(TitleScreens[i]->Music) == -1) {
+		if (!title_screen.Music.empty()) {
+			if (title_screen.Music == "none" || PlayMusic(title_screen.Music) == -1) {
 				StopMusic();
 			}
 		}
 
-		if (!TitleScreens[i]->File.empty() && PlayMovie(TitleScreens[i]->File)) {
-			TitleScreens[i]->ShowTitleImage();
+		if (!title_screen.File.empty() && PlayMovie(title_screen.File)) {
+			title_screen.ShowTitleImage();
 		}
 
 		Video.ClearScreen();

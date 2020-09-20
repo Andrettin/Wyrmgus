@@ -66,8 +66,6 @@ public:
 class CContentTypeText : public CContentType
 {
 public:
-	CContentTypeText() : Text(nullptr), Centered(0), Index(-1),
-		Component(VariableValue), ShowName(0), Stat(0) {}
 	virtual ~CContentTypeText()
 	{
 		FreeStringDesc(Text);
@@ -78,13 +76,13 @@ public:
 	virtual void Parse(lua_State *l) override;
 
 private:
-	StringDesc *Text;            /// Text to display.
+	StringDesc *Text = nullptr;  /// Text to display.
 	const wyrmgus::font *Font = nullptr; /// Font to use.
-	char Centered;               /// if true, center the display.
-	int Index;                   /// Index of the variable to show, -1 if not.
-	EnumVariable Component;      /// Component of the variable.
-	char ShowName;               /// If true, Show name's unit.
-	char Stat;                   /// true to special display.(value or value + diff)
+	char Centered = 0;           /// if true, center the display.
+	int Index = -1;              /// Index of the variable to show, -1 if not.
+	EnumVariable Component = VariableValue; /// Component of the variable.
+	char ShowName = 0;           /// If true, Show name's unit.
+	char Stat = 0;               /// true to special display.(value or value + diff)
 };
 
 /**
