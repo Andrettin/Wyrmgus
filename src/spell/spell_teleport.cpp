@@ -60,7 +60,7 @@ int Spell_Teleport::Cast(CUnit &caster, const wyrmgus::spell &spell, CUnit * /*t
 		unsigned int selected = caster.Selected;
 		caster.Remove(nullptr);
 		caster.tilePos = goalPos;
-		caster.MapLayer = CMap::Map.MapLayers[z];
+		caster.MapLayer = CMap::Map.MapLayers[z].get();
 		DropOutNearest(caster, goalPos, nullptr);
 		if (selected) {
 			SelectUnit(caster);

@@ -46,8 +46,8 @@ namespace wyrmgus {
 	class upgrade_class;
 }
 
-static constexpr int MARGIN_X = 4;
-static constexpr int MARGIN_Y = 2;
+constexpr int MARGIN_X = 4;
+constexpr int MARGIN_Y = 2;
 
 class PopupConditionPanel
 {

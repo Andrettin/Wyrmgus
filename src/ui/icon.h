@@ -48,13 +48,13 @@
 **    Pointer to an icon. This pointer is resolved during game start.
 */
 
-static constexpr int IconActive = 1; //cursor on icon
-static constexpr int IconClicked = 2; //mouse button down on icon
-static constexpr int IconSelected = 4; //this the selected icon
-static constexpr int IconDisabled = 8; //icon disabled
-static constexpr int IconAutoCast = 16; //auto cast icon
+constexpr int IconActive = 1; //cursor on icon
+constexpr int IconClicked = 2; //mouse button down on icon
+constexpr int IconSelected = 4; //this the selected icon
+constexpr int IconDisabled = 8; //icon disabled
+constexpr int IconAutoCast = 16; //auto cast icon
 //Wyrmgus start
-static constexpr int IconCommandButton = 32; //if the icon is a command button
+constexpr int IconCommandButton = 32; //if the icon is a command button
 //Wyrmgus end
 
 class CPlayerColorGraphic;

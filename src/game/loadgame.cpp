@@ -100,8 +100,8 @@ void CleanModules()
 	CleanGroups();
 	CleanUpgradeModifiers();
 	CleanButtons();
-	CMap::Map.Clean();
-	CMap::Map.CleanFogOfWar();
+	CMap::get()->Clean();
+	CMap::get()->CleanFogOfWar();
 	CTimeOfDaySchedule::ClearTimeOfDaySchedules();
 	CSeasonSchedule::ClearSeasonSchedules();
 	CParticleManager::exit();
@@ -110,25 +110,17 @@ void CleanModules()
 
 	//delete lua callbacks, as that needs to be done before closing the Lua state, and database clearing is done in the Qt main thread
 	for (wyrmgus::unit_type *unit_type : wyrmgus::unit_type::get_all()) {
-		delete unit_type->DeathExplosion;
-		unit_type->DeathExplosion = nullptr;
-		delete unit_type->OnHit;
-		unit_type->OnHit = nullptr;
-		delete unit_type->OnEachCycle;
-		unit_type->OnEachCycle = nullptr;
-		delete unit_type->OnEachSecond;
-		unit_type->OnEachSecond = nullptr;
-		delete unit_type->OnInit;
-		unit_type->OnInit = nullptr;
-		delete unit_type->TeleportEffectIn;
-		unit_type->TeleportEffectIn = nullptr;
-		delete unit_type->TeleportEffectOut;
-		unit_type->TeleportEffectOut = nullptr;
+		unit_type->DeathExplosion.reset();
+		unit_type->OnHit.reset();
+		unit_type->OnEachCycle.reset();
+		unit_type->OnEachSecond.reset();
+		unit_type->OnInit.reset();
+		unit_type->TeleportEffectIn.reset();
+		unit_type->TeleportEffectOut.reset();
 	}
 
 	for (wyrmgus::faction *faction : wyrmgus::faction::get_all()) {
-		delete faction->Conditions;
-		faction->Conditions = nullptr;
+		faction->Conditions.reset();
 	}
 
 	wyrmgus::database::get()->clear();
@@ -164,7 +156,7 @@ void InitModules()
 
 	InitAiModule();
 
-	CMap::Map.Init();
+	CMap::get()->Init();
 }
 
 /**

@@ -87,7 +87,7 @@ int Spell_AreaAdjustVital::Cast(CUnit &caster, const wyrmgus::spell &spell, CUni
 		// if (!PassCondition(caster, spell, target, goalPos) {
 		//Wyrmgus start
 //		if (!CanCastSpell(caster, spell, target, goalPos)) {
-		if (!CanCastSpell(caster, spell, target, goalPos, CMap::Map.MapLayers[z])) {
+		if (!CanCastSpell(caster, spell, target, goalPos, CMap::Map.MapLayers[z].get())) {
 		//Wyrmgus end
 			continue;
 		}

@@ -116,13 +116,13 @@ static int CclStratagusMap(lua_State *l)
 //					delete[] Map.Fields;
 //					CMap::Map.Fields = new CMapField[CMap::Map.Info.MapWidth * CMap::Map.Info.MapHeight];
 					CMap::Map.ClearMapLayers();
-					CMapLayer *map_layer = new CMapLayer(CMap::Map.Info.MapWidth, CMap::Map.Info.MapHeight);
+					auto map_layer = std::make_unique<CMapLayer>(CMap::Map.Info.MapWidth, CMap::Map.Info.MapHeight);
 					map_layer->ID = CMap::Map.MapLayers.size();
-					CMap::Map.MapLayers.push_back(map_layer);
 					CMap::Map.Info.MapWidths.clear();
 					CMap::Map.Info.MapWidths.push_back(CMap::Map.Info.MapWidth);
 					CMap::Map.Info.MapHeights.clear();
 					CMap::Map.Info.MapHeights.push_back(CMap::Map.Info.MapHeight);
+					CMap::Map.MapLayers.push_back(std::move(map_layer));
 					//Wyrmgus end
 					// FIXME: this should be CreateMap or InitMap?
 				} else if (!strcmp(value, "fog-of-war")) {
@@ -147,11 +147,11 @@ static int CclStratagusMap(lua_State *l)
 						}
 						const int width = LuaToNumber(l, -1, 1);
 						const int height = LuaToNumber(l, -1, 2);
-						CMapLayer *map_layer = new CMapLayer(width, height);
+						auto map_layer = std::make_unique<CMapLayer>(width, height);
 						CMap::Map.Info.MapWidths.push_back(map_layer->get_width());
 						CMap::Map.Info.MapHeights.push_back(map_layer->get_height());
 						map_layer->ID = CMap::Map.MapLayers.size();
-						CMap::Map.MapLayers.push_back(map_layer);
+						CMap::Map.MapLayers.push_back(std::move(map_layer));
 						lua_pop(l, 1);
 					}
 					lua_pop(l, 1);
@@ -162,7 +162,7 @@ static int CclStratagusMap(lua_State *l)
 					}
 					const int subsubargs = lua_rawlen(l, -1);
 					for (int z = 0; z < subsubargs; ++z) {
-						CMapLayer *map_layer = CMap::Map.MapLayers[z];
+						const std::unique_ptr<CMapLayer> &map_layer = CMap::Map.MapLayers[z];
 						if (!lua_istable(l, -1)) {
 							LuaError(l, "incorrect argument for \"time-of-day\"");
 						}
@@ -266,7 +266,7 @@ static int CclStratagusMap(lua_State *l)
 					}
 					const int subsubargs = lua_rawlen(l, -1);
 					for (int z = 0; z < subsubargs; ++z) {
-						CMapLayer *map_layer = CMap::Map.MapLayers[z];
+						const std::unique_ptr<CMapLayer> &map_layer = CMap::Map.MapLayers[z];
 						
 						lua_rawgeti(l, -1, z + 1);
 						if (!lua_istable(l, -1)) {

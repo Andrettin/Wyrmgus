@@ -314,7 +314,7 @@ void SelectFixed(const Vec2i &ltPos, const Vec2i &rbPos, std::vector<CUnit *> &u
 	Assert(CMap::Map.Info.IsPointOnMap(rbPos, z));
 	Assert(units.empty());
 	
-	const CMapLayer *map_layer = CMap::Map.MapLayers[z];
+	const CMapLayer *map_layer = CMap::Map.MapLayers[z].get();
 	
 	//Wyrmgus start
 	double middle_x;

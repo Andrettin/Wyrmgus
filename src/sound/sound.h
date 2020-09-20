@@ -41,7 +41,7 @@ class Missile;
 extern wyrmgus::sound *RegisterTwoGroups(const std::string &identifier, wyrmgus::sound *first, wyrmgus::sound *second);
 extern void SetSoundRange(wyrmgus::sound *sound, unsigned char range);
 
-static constexpr int MaxSampleVolume = 255;  /// Maximum sample volume
+constexpr int MaxSampleVolume = 255;  /// Maximum sample volume
 
 /**
 **  Global game sounds, not associated to any unit-type
@@ -65,12 +65,12 @@ public:
 /**
 ** A possible value for Number in the Sound struct: means a simple sound
 */
-static constexpr int ONE_SOUND = 0;
+constexpr int ONE_SOUND = 0;
 /**
 ** A possible value for Number in the Sound struct: means a double group (for
 ** selection/annoyed sounds)
 */
-static constexpr int TWO_GROUPS = 1;
+constexpr int TWO_GROUPS = 1;
 
 /// Register a sound (can be a simple sound or a group)
 extern wyrmgus::sound *RegisterSound(const std::string &identifier, const std::vector<std::filesystem::path> &files);

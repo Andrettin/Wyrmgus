@@ -422,7 +422,7 @@ bool COrder_Build::StartBuilding(CUnit &unit, CUnit &ontop)
 	}
 	build->UnderConstruction = 1;
 	build->CurrentSightRange = 0;
-	build->MapLayer = CMap::Map.MapLayers[this->MapLayer];
+	build->MapLayer = CMap::Map.MapLayers[this->MapLayer].get();
 
 	// Building on top of something, may remove what is beneath it
 	if (&ontop != &unit) {

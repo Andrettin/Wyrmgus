@@ -16,18 +16,11 @@ class CMapInfo
 	//Wyrmgus end
 };
 
-class CTileset
-{
-	string Name;
-};
-
-
 class CMap
 {
-	static CMap Map;
+	static CMap *get();
 
 	CMapInfo Info;
-	CTileset *Tileset;
 	
 	//Wyrmgus start
 	void AdjustMap();

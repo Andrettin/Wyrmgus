@@ -33,12 +33,12 @@ namespace wyrmgus {
 
 namespace wyrmgus::geocoordinate {
 
-static constexpr int longitude_size = 360;
-static constexpr int latitude_size = 180;
-static constexpr int min_longitude = longitude_size / 2 * -1;
-static constexpr int max_longitude = longitude_size / 2;
-static constexpr int min_latitude = latitude_size / 2 * -1;
-static constexpr int max_latitude = latitude_size / 2;
+constexpr int longitude_size = 360;
+constexpr int latitude_size = 180;
+constexpr int min_longitude = longitude_size / 2 * -1;
+constexpr int max_longitude = longitude_size / 2;
+constexpr int min_latitude = latitude_size / 2 * -1;
+constexpr int max_latitude = latitude_size / 2;
 static const QGeoCoordinate min_geocoordinate(geocoordinate::min_latitude, geocoordinate::min_longitude);
 static const QGeoCoordinate max_geocoordinate(geocoordinate::max_latitude, geocoordinate::max_longitude);
 

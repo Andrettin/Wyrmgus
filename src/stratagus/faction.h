@@ -337,7 +337,7 @@ public:
 private:
 	deity *holy_order_deity = nullptr; //deity this faction belongs to, if it is a holy order
 public:
-	LuaCallback *Conditions = nullptr;
+	std::unique_ptr<LuaCallback> Conditions;
 private:
 	player_color *color = nullptr; /// faction color
 	site *default_capital = nullptr;

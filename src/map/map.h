@@ -96,8 +96,8 @@ namespace wyrmgus {
 --  Map
 ----------------------------------------------------------------------------*/
 
-static constexpr int MaxMapWidth = 512; /// max map width supported
-static constexpr int MaxMapHeight = 512; /// max map height supported
+constexpr int MaxMapWidth = 512; /// max map width supported
+constexpr int MaxMapHeight = 512; /// max map height supported
 
 /*----------------------------------------------------------------------------
 --  Map info structure
@@ -134,13 +134,18 @@ public:
 };
 
 /*----------------------------------------------------------------------------
---  Map itself
+--  the Map itself
 ----------------------------------------------------------------------------*/
 
 /// Describes the world map
 class CMap
 {
 public:
+	static CMap *get()
+	{
+		return &CMap::Map;
+	}
+
 	static CMap Map; //the current map
 
 	CMap();
@@ -254,7 +259,6 @@ public:
 	bool TileBordersPathway(const Vec2i &pos, int z, bool only_railroad);
 	bool TileBordersUnit(const Vec2i &pos, int z);
 	bool TileBordersTerrainIncompatibleWithTerrain(const Vec2i &pos, const wyrmgus::terrain_type *terrain_type, const int z) const;
-	bool TileHasInnerBorderTerrainsIncompatibleWithOverlayTerrain(const Vec2i &pos, const wyrmgus::terrain_type *overlay_terrain, const int z);
 	bool TileBordersTerrainIncompatibleWithTerrainPair(const Vec2i &pos, const wyrmgus::terrain_type *terrain_type, const wyrmgus::terrain_type *overlay_terrain_type, const int z) const;
 	bool TileHasUnitsIncompatibleWithTerrain(const Vec2i &pos, const wyrmgus::terrain_type *terrain, const int z);
 	bool is_point_in_a_subtemplate_area(const Vec2i &pos, const int z, const wyrmgus::map_template *subtemplate = nullptr) const;
@@ -318,17 +322,17 @@ private:
 	//Wyrmgus end
 
 public:
-	bool NoFogOfWar;           /// fog of war disabled
+	bool NoFogOfWar = false;           /// fog of war disabled
 
-	CTileset *Tileset;          /// tileset data
+	std::unique_ptr<CTileset> Tileset;          /// tileset data
 	std::string TileModelsFileName; /// lua filename that loads all tilemodels
 	std::shared_ptr<CGraphic> TileGraphic;     /// graphic for all the tiles
 	static std::shared_ptr<CGraphic> FogGraphics; //graphics for fog of war
 	//Wyrmgus start
-	int Landmasses;						/// how many landmasses are there
+	int Landmasses = 0;						/// how many landmasses are there
 	std::vector<std::vector<int>> BorderLandmasses;	/// "landmasses" which border the one to which each vector belongs
 	std::vector<CUnit *> site_units;	/// the town hall / settlement site units
-	std::vector<CMapLayer *> MapLayers;				/// the map layers composing the map
+	std::vector<std::unique_ptr<CMapLayer>> MapLayers;	/// the map layers composing the map
 	//Wyrmgus end
 
 	CMapInfo Info;             /// descriptive information

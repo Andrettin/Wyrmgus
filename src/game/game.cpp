@@ -100,6 +100,7 @@
 //Wyrmgus start
 #include "util/util.h"
 //Wyrmgus end
+#include "util/vector_util.h"
 #include "version.h"
 #include "video/font.h"
 #include "video/video.h"
@@ -126,7 +127,7 @@ bool UseHPForXp = false;				/// true if gain XP by dealing damage, false if by k
 bool DefiningData = false;
 
 extern gcn::Gui *Gui;
-static std::vector<gcn::Container *> Containers;
+static std::vector<std::unique_ptr<gcn::Container>> Containers;
 
 namespace wyrmgus {
 
@@ -256,7 +257,7 @@ void game::do_cycle()
 
 		this->current_date = this->current_date.addSecs(1 * 60 * 60 * DEFAULT_DAY_MULTIPLIER_PER_YEAR);
 
-		for (CMapLayer *map_layer : CMap::Map.MapLayers) {
+		for (const std::unique_ptr<CMapLayer> &map_layer : CMap::Map.MapLayers) {
 			map_layer->DoPerHourLoop();
 		}
 	}
@@ -302,8 +303,11 @@ void StartMap(const std::string &filename, bool clean)
 		std::string nc, rc;
 
 		gcn::Widget *oldTop = Gui->getTop();
-		gcn::Container *container = new gcn::Container();
-		Containers.push_back(container);
+
+		auto container_unique_ptr = std::make_unique<gcn::Container>();
+		gcn::Container *container = container_unique_ptr.get();
+		Containers.push_back(std::move(container_unique_ptr));
+
 		container->setDimension(gcn::Rectangle(0, 0, Video.Width, Video.Height));
 		container->setOpaque(false);
 		Gui->setTop(container);
@@ -331,7 +335,7 @@ void StartMap(const std::string &filename, bool clean)
 		//Wyrmgus end
 
 		if (CPlayer::GetThisPlayer()->StartMapLayer < static_cast<int>(CMap::Map.MapLayers.size())) {
-			UI.CurrentMapLayer = CMap::Map.MapLayers[CPlayer::GetThisPlayer()->StartMapLayer];
+			UI.CurrentMapLayer = CMap::Map.MapLayers[CPlayer::GetThisPlayer()->StartMapLayer].get();
 		}
 		UI.SelectedViewport->Center(CMap::Map.tile_pos_to_scaled_map_pixel_pos_center(CPlayer::GetThisPlayer()->StartPos));
 
@@ -345,8 +349,7 @@ void StartMap(const std::string &filename, bool clean)
 		current_interface_state = interface_state::menu;
 
 		Gui->setTop(oldTop);
-		Containers.erase(std::find(Containers.begin(), Containers.end(), container));
-		delete container;
+		wyrmgus::vector::remove(Containers, container);
 	} catch (...) {
 		std::throw_with_nested(std::runtime_error("Error starting map."));
 	}
@@ -354,9 +357,7 @@ void StartMap(const std::string &filename, bool clean)
 
 void FreeAllContainers()
 {
-	for (size_t i = 0; i != Containers.size(); ++i) {
-		delete Containers[i];
-	}
+	Containers.clear();
 }
 
 /*----------------------------------------------------------------------------
@@ -831,7 +832,7 @@ int WriteMapSetup(const char *mapSetup, CMap &map, int writeTerrain, bool is_mod
 		if (writeTerrain) {
 			f->printf("-- Tiles Map\n");
 			//Wyrmgus start
-			for (const CMapLayer *map_layer : map.MapLayers) {
+			for (const std::unique_ptr<CMapLayer> &map_layer: map.MapLayers) {
 				for (int y = 0; y < map_layer->get_height(); ++y) {
 					for (int x = 0; x < map_layer->get_width(); ++x) {
 						//Wyrmgus start
@@ -1794,7 +1795,7 @@ void CreateGame(const std::string &filename, CMap *map, bool is_mod)
 	}
 #endif
 	if (CPlayer::GetThisPlayer()->StartMapLayer < static_cast<int>(CMap::Map.MapLayers.size())) {
-		UI.CurrentMapLayer = CMap::Map.MapLayers[CPlayer::GetThisPlayer()->StartMapLayer];
+		UI.CurrentMapLayer = CMap::Map.MapLayers[CPlayer::GetThisPlayer()->StartMapLayer].get();
 	}
 	UI.SelectedViewport->Center(CMap::Map.tile_pos_to_scaled_map_pixel_pos_center(CPlayer::GetThisPlayer()->StartPos));
 

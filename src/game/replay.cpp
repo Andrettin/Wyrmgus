@@ -59,10 +59,6 @@
 extern void ExpandPath(std::string &newpath, const std::string &path);
 extern void StartMap(const std::string &filename, bool clean);
 
-//----------------------------------------------------------------------------
-// Structures
-//----------------------------------------------------------------------------
-
 /**
 **  LogEntry structure.
 */
@@ -117,19 +113,25 @@ class FullReplay
 {
 public:
 	FullReplay() :
-		//Wyrmgus start
-//		MapId(0), Type(0), Race(0), LocalPlayer(0),
-		MapId(0), Type(0), Race(0), Faction(-1), LocalPlayer(0),
-		//Wyrmgus end
+		MapId(0), Type(0), Race(0), LocalPlayer(0),
 		Resource(0), NumUnits(0), Difficulty(0), NoFow(false), Inside(false), RevealMap(0),
-		//Wyrmgus start
-//		MapRichness(0), GameType(0), Opponents(0), Commands(nullptr)
-		MapRichness(0), GameType(0), Opponents(0), NoRandomness(false), NoTimeOfDay(false), TechLevel(0), MaxTechLevel(0), Commands(nullptr)
-		//Wyrmgus end
+		MapRichness(0), GameType(0), Opponents(0)
 	{
 		memset(Engine, 0, sizeof(Engine));
 		memset(Network, 0, sizeof(Network));
 	}
+
+	~FullReplay()
+	{
+		LogEntry *log = this->Commands;
+
+		while (log) {
+			LogEntry *next = log->Next;
+			delete log;
+			log = next;
+		}
+	}
+
 	std::string Comment1;
 	std::string Comment2;
 	std::string Comment3;
@@ -141,7 +143,7 @@ public:
 	int Type;
 	int Race;
 	//Wyrmgus start
-	int Faction;
+	int Faction = -1;
 	//Wyrmgus end
 	int LocalPlayer;
 	MPPlayer Players[PlayerMax];
@@ -156,32 +158,23 @@ public:
 	int GameType;
 	int Opponents;
 	//Wyrmgus start
-	bool NoRandomness;
-	bool NoTimeOfDay;
+	bool NoRandomness = false;
+	bool NoTimeOfDay = false;
 	//Wyrmgus end
-	int TechLevel;
-	int MaxTechLevel;
+	int TechLevel = 0;
+	int MaxTechLevel = 0;
 	int Engine[3];
 	int Network[3];
-	LogEntry *Commands;
+	LogEntry *Commands = nullptr;
 };
-
-//----------------------------------------------------------------------------
-// Constants
-//----------------------------------------------------------------------------
-
-
-//----------------------------------------------------------------------------
-// Variables
-//----------------------------------------------------------------------------
 
 bool CommandLogDisabled;           /// True if command log is off
 ReplayType ReplayGameType;         /// Replay game type
 static bool DisabledLog;           /// Disabled log for replay
-static CFile *LogFile;             /// Replay log file
+static std::unique_ptr<CFile> LogFile;             /// Replay log file
 static unsigned long NextLogCycle; /// Next log cycle number
 static int InitReplay;             /// Initialize replay
-static FullReplay *CurrentReplay;
+static std::unique_ptr<FullReplay> CurrentReplay;
 static LogEntry *ReplayStep;
 
 //----------------------------------------------------------------------------
@@ -193,9 +186,9 @@ static LogEntry *ReplayStep;
 **
 ** @return A new FullReplay structure
 */
-static FullReplay *StartReplay()
+static std::unique_ptr<FullReplay> StartReplay()
 {
-	FullReplay *replay = new FullReplay;
+	auto replay = std::make_unique<FullReplay>();
 
 	time_t now;
 	char dateStr[64];
@@ -253,6 +246,7 @@ static FullReplay *StartReplay()
 	replay->Network[0] = NetworkProtocolMajorVersion;
 	replay->Network[1] = NetworkProtocolMinorVersion;
 	replay->Network[2] = NetworkProtocolPatchLevel;
+
 	return replay;
 }
 
@@ -307,23 +301,6 @@ static void ApplyReplaySettings()
 	// FIXME : check engine version
 	// FIXME : FIXME: check network version
 	// FIXME : check mapid
-}
-
-/**
-**  Free a replay from memory
-**
-**  @param replay  Pointer to the replay to be freed
-*/
-static void DeleteReplay(FullReplay *replay)
-{
-	LogEntry *log = replay->Commands;
-
-	while (log) {
-		LogEntry *next = log->Next;
-		delete log;
-		log = next;
-	}
-	delete replay;
 }
 
 static void PrintLogCommand(const LogEntry &log, CFile &file)
@@ -488,12 +465,11 @@ void CommandLog(const char *action, const CUnit *unit, int flush,
 		path += buf;
 		path += ".log";
 
-		LogFile = new CFile;
+		LogFile = std::make_unique<CFile>();
 		if (LogFile->open(path.c_str(), CL_OPEN_WRITE) == -1) {
 			// don't retry for each command
 			CommandLogDisabled = false;
-			delete LogFile;
-			LogFile = nullptr;
+			LogFile.reset();
 			return;
 		}
 
@@ -622,7 +598,6 @@ static int CclLog(lua_State *l)
 */
 static int CclReplayLog(lua_State *l)
 {
-	FullReplay *replay;
 	const char *value;
 	int j;
 
@@ -633,35 +608,35 @@ static int CclReplayLog(lua_State *l)
 
 	Assert(CurrentReplay == nullptr);
 
-	replay = new FullReplay;
+	CurrentReplay = std::make_unique<FullReplay>();
 
 	lua_pushnil(l);
 	while (lua_next(l, 1) != 0) {
 		value = LuaToString(l, -2);
 		if (!strcmp(value, "Comment1")) {
-			replay->Comment1 = LuaToString(l, -1);
+			CurrentReplay->Comment1 = LuaToString(l, -1);
 		} else if (!strcmp(value, "Comment2")) {
-			replay->Comment2 = LuaToString(l, -1);
+			CurrentReplay->Comment2 = LuaToString(l, -1);
 		} else if (!strcmp(value, "Comment3")) {
-			replay->Comment3 = LuaToString(l, -1);
+			CurrentReplay->Comment3 = LuaToString(l, -1);
 		} else if (!strcmp(value, "Date")) {
-			replay->Date = LuaToString(l, -1);
+			CurrentReplay->Date = LuaToString(l, -1);
 		} else if (!strcmp(value, "Map")) {
-			replay->Map = LuaToString(l, -1);
+			CurrentReplay->Map = LuaToString(l, -1);
 		} else if (!strcmp(value, "MapPath")) {
-			replay->MapPath = LuaToString(l, -1);
+			CurrentReplay->MapPath = LuaToString(l, -1);
 		} else if (!strcmp(value, "MapId")) {
-			replay->MapId = LuaToNumber(l, -1);
+			CurrentReplay->MapId = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "Type")) {
-			replay->Type = LuaToNumber(l, -1);
+			CurrentReplay->Type = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "Race")) {
-			replay->Race = LuaToNumber(l, -1);
+			CurrentReplay->Race = LuaToNumber(l, -1);
 		//Wyrmgus start
 		} else if (!strcmp(value, "Faction")) {
-			replay->Faction = LuaToNumber(l, -1);
+			CurrentReplay->Faction = LuaToNumber(l, -1);
 		//Wyrmgus end
 		} else if (!strcmp(value, "LocalPlayer")) {
-			replay->LocalPlayer = LuaToNumber(l, -1);
+			CurrentReplay->LocalPlayer = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "Players")) {
 			if (!lua_istable(l, -1) || lua_rawlen(l, -1) != PlayerMax) {
 				LuaError(l, "incorrect argument");
@@ -678,19 +653,19 @@ static int CclReplayLog(lua_State *l)
 				while (lua_next(l, top) != 0) {
 					value = LuaToString(l, -2);
 					if (!strcmp(value, "Name")) {
-						replay->Players[j].Name = LuaToString(l, -1);
+						CurrentReplay->Players[j].Name = LuaToString(l, -1);
 					} else if (!strcmp(value, "AIScript")) {
-						replay->Players[j].AIScript = LuaToString(l, -1);
+						CurrentReplay->Players[j].AIScript = LuaToString(l, -1);
 					} else if (!strcmp(value, "Race")) {
-						replay->Players[j].Race = LuaToNumber(l, -1);
+						CurrentReplay->Players[j].Race = LuaToNumber(l, -1);
 					//Wyrmgus start
 					} else if (!strcmp(value, "Faction")) {
-						replay->Players[j].Faction = LuaToNumber(l, -1);
+						CurrentReplay->Players[j].Faction = LuaToNumber(l, -1);
 					//Wyrmgus end
 					} else if (!strcmp(value, "Team")) {
-						replay->Players[j].Team = LuaToNumber(l, -1);
+						CurrentReplay->Players[j].Team = LuaToNumber(l, -1);
 					} else if (!strcmp(value, "Type")) {
-						replay->Players[j].Type = LuaToNumber(l, -1);
+						CurrentReplay->Players[j].Type = LuaToNumber(l, -1);
 					} else {
 						LuaError(l, "Unsupported key: %s" _C_ value);
 					}
@@ -699,54 +674,52 @@ static int CclReplayLog(lua_State *l)
 				lua_pop(l, 1);
 			}
 		} else if (!strcmp(value, "Resource")) {
-			replay->Resource = LuaToNumber(l, -1);
+			CurrentReplay->Resource = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "NumUnits")) {
-			replay->NumUnits = LuaToNumber(l, -1);
+			CurrentReplay->NumUnits = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "Difficulty")) {
-			replay->Difficulty = LuaToNumber(l, -1);
+			CurrentReplay->Difficulty = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "NoFow")) {
-			replay->NoFow = LuaToBoolean(l, -1);
+			CurrentReplay->NoFow = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "Inside")) {
-			replay->Inside = LuaToBoolean(l, -1);
+			CurrentReplay->Inside = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "RevealMap")) {
-			replay->RevealMap = LuaToNumber(l, -1);
+			CurrentReplay->RevealMap = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "GameType")) {
-			replay->GameType = LuaToNumber(l, -1);
+			CurrentReplay->GameType = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "Opponents")) {
-			replay->Opponents = LuaToNumber(l, -1);
+			CurrentReplay->Opponents = LuaToNumber(l, -1);
 		//Wyrmgus start
 		} else if (!strcmp(value, "NoRandomness")) {
-			replay->NoRandomness = LuaToBoolean(l, -1);
+			CurrentReplay->NoRandomness = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "NoTimeOfDay")) {
-			replay->NoTimeOfDay = LuaToBoolean(l, -1);
+			CurrentReplay->NoTimeOfDay = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "TechLevel")) {
-			replay->TechLevel = LuaToNumber(l, -1);
+			CurrentReplay->TechLevel = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "MaxTechLevel")) {
-			replay->MaxTechLevel = LuaToNumber(l, -1);
+			CurrentReplay->MaxTechLevel = LuaToNumber(l, -1);
 		//Wyrmgus end
 		} else if (!strcmp(value, "MapRichness")) {
-			replay->MapRichness = LuaToNumber(l, -1);
+			CurrentReplay->MapRichness = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "Engine")) {
 			if (!lua_istable(l, -1) || lua_rawlen(l, -1) != 3) {
 				LuaError(l, "incorrect argument");
 			}
-			replay->Engine[0] = LuaToNumber(l, -1, 1);
-			replay->Engine[1] = LuaToNumber(l, -1, 2);
-			replay->Engine[2] = LuaToNumber(l, -1, 3);
+			CurrentReplay->Engine[0] = LuaToNumber(l, -1, 1);
+			CurrentReplay->Engine[1] = LuaToNumber(l, -1, 2);
+			CurrentReplay->Engine[2] = LuaToNumber(l, -1, 3);
 		} else if (!strcmp(value, "Network")) {
 			if (!lua_istable(l, -1) || lua_rawlen(l, -1) != 3) {
 				LuaError(l, "incorrect argument");
 			}
-			replay->Network[0] = LuaToNumber(l, -1, 1);
-			replay->Network[1] = LuaToNumber(l, -1, 2);
-			replay->Network[2] = LuaToNumber(l, -1, 3);
+			CurrentReplay->Network[0] = LuaToNumber(l, -1, 1);
+			CurrentReplay->Network[1] = LuaToNumber(l, -1, 2);
+			CurrentReplay->Network[2] = LuaToNumber(l, -1, 3);
 		} else {
 			LuaError(l, "Unsupported key: %s" _C_ value);
 		}
 		lua_pop(l, 1);
 	}
-
-	CurrentReplay = replay;
 
 	// Apply CurrentReplay settings.
 	if (!SaveGameLoading) {
@@ -804,14 +777,12 @@ int LoadReplay(const std::string &name)
 */
 void EndReplayLog()
 {
-	if (LogFile) {
+	if (LogFile != nullptr) {
 		LogFile->close();
-		delete LogFile;
-		LogFile = nullptr;
+		LogFile.reset();
 	}
-	if (CurrentReplay) {
-		DeleteReplay(CurrentReplay);
-		CurrentReplay = nullptr;
+	if (CurrentReplay != nullptr) {
+		CurrentReplay.reset();
 	}
 	ReplayStep = nullptr;
 }
@@ -821,9 +792,8 @@ void EndReplayLog()
 */
 void CleanReplayLog()
 {
-	if (CurrentReplay) {
-		DeleteReplay(CurrentReplay);
-		CurrentReplay = 0;
+	if (CurrentReplay != nullptr) {
+		CurrentReplay.reset();
 	}
 	ReplayStep = nullptr;
 

@@ -2414,13 +2414,13 @@ void CEditor::Init()
 		//Wyrmgus start
 //		Map.Fields = new CMapField[Map.Info.MapWidth * Map.Info.MapHeight];
 		CMap::Map.ClearMapLayers();
-		CMapLayer *map_layer = new CMapLayer(CMap::Map.Info.MapWidth, CMap::Map.Info.MapHeight);
+		auto map_layer = std::make_unique<CMapLayer>(CMap::Map.Info.MapWidth, CMap::Map.Info.MapHeight);
 		map_layer->ID = CMap::Map.MapLayers.size();
-		CMap::Map.MapLayers.push_back(map_layer);
 		CMap::Map.Info.MapWidths.clear();
 		CMap::Map.Info.MapWidths.push_back(CMap::Map.Info.MapWidth);
 		CMap::Map.Info.MapHeights.clear();
 		CMap::Map.Info.MapHeights.push_back(CMap::Map.Info.MapHeight);
+		CMap::Map.MapLayers.push_back(std::move(map_layer));
 		//Wyrmgus end
 
 		const int defaultTile = CMap::Map.Tileset->getDefaultTileIndex();
@@ -2429,7 +2429,7 @@ void CEditor::Init()
 		//Wyrmgus end
 
 		//Wyrmgus start
-		for (CMapLayer *map_layer : CMap::Map.MapLayers) {
+		for (const std::unique_ptr<CMapLayer> &map_layer : CMap::Map.MapLayers) {
 			int max_tile_index = map_layer->get_width() * map_layer->get_height();
 			for (int i = 0; i < max_tile_index; ++i) {
 				//Wyrmgus start

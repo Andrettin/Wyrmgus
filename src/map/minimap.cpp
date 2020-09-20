@@ -230,7 +230,7 @@ void minimap::UpdateTerrain(int z)
 	
 	const season *season = CMap::Map.MapLayers[z]->GetSeason();
 
-	const CMapLayer *map_layer = CMap::Map.MapLayers[z];
+	const CMapLayer *map_layer = CMap::Map.MapLayers[z].get();
 	const int texture_width = this->get_texture_width(z);
 	const int texture_height = this->get_texture_height(z);
 	
@@ -353,7 +353,7 @@ void minimap::update_territory_xy(const QPoint &pos, const int z)
 
 void minimap::update_territory_pixel(const int mx, const int my, const int z)
 {
-	const CMapLayer *map_layer = CMap::Map.MapLayers[z];
+	const CMapLayer *map_layer = CMap::Map.MapLayers[z].get();
 	const int non_land_territory_alpha = defines::get()->get_minimap_non_land_territory_alpha();
 	const int minimap_color_index = defines::get()->get_minimap_color_index();
 

@@ -105,7 +105,7 @@ enum class AiForceAttackingState {
 	WaitingForTransporters
 };
 
-static constexpr int AI_WAIT_ON_RALLY_POINT = 60; /// Max seconds AI units will wait on rally point
+constexpr int AI_WAIT_ON_RALLY_POINT = 60; /// Max seconds AI units will wait on rally point
 
 /**
 **  Define an AI force.
@@ -213,10 +213,10 @@ public:
 };
 
 // forces
-static constexpr int AI_MAX_FORCES = 50;			/// How many forces are supported
-static constexpr int AI_MAX_FORCE_INTERNAL = AI_MAX_FORCES / 2; /// The forces after AI_MAX_FORCE_INTERNAL are for internal use
-static constexpr int AI_MAX_COMPLETED_FORCES = AI_MAX_FORCE_INTERNAL - 1; /// How many completed forces the AI should have at maximum
-static constexpr int AI_MAX_COMPLETED_FORCE_POP = 90; /// How much population the AI completed forces should have at maximum (the AI will produce a new force if it is below this limit, even if that will make it go above it)
+constexpr int AI_MAX_FORCES = 50;			/// How many forces are supported
+constexpr int AI_MAX_FORCE_INTERNAL = AI_MAX_FORCES / 2; /// The forces after AI_MAX_FORCE_INTERNAL are for internal use
+constexpr int AI_MAX_COMPLETED_FORCES = AI_MAX_FORCE_INTERNAL - 1; /// How many completed forces the AI should have at maximum
+constexpr int AI_MAX_COMPLETED_FORCE_POP = 90; /// How much population the AI completed forces should have at maximum (the AI will produce a new force if it is below this limit, even if that will make it go above it)
 
 /**
 **  AI force manager.

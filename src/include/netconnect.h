@@ -32,10 +32,6 @@
 
 class CHost;
 
-/*----------------------------------------------------------------------------
---  Defines
-----------------------------------------------------------------------------*/
-
 /// Network protocol major version
 #define NetworkProtocolMajorVersion StratagusMajorVersion
 /// Network protocol minor version (maximum 99)
@@ -51,10 +47,6 @@ class CHost;
 #define NetworkProtocolFormatString "%d.%d.%d"
 /// Network protocol printf format arguments
 #define NetworkProtocolFormatArgs(v) (v) / 10000, ((v) / 100) % 100, (v) % 100
-
-/*----------------------------------------------------------------------------
---  Declarations
-----------------------------------------------------------------------------*/
 
 /**
 **  Network Client connect states
@@ -80,10 +72,6 @@ enum _net_client_con_state_ {
 	ccs_incompatiblenetwork   /// Incompatible netowrk version
 };
 
-/*----------------------------------------------------------------------------
---  Variables
-----------------------------------------------------------------------------*/
-
 extern int NetPlayers;                /// Network players
 
 extern int HostsCount;                /// Number of hosts.
@@ -96,10 +84,6 @@ extern int NetLocalPlayerNumber;           /// Player number of local client
 
 extern CServerSetup ServerSetupState;      /// Network menu: Multiplayer Server Menu selections state
 extern CServerSetup LocalSetupState;       /// Network menu: Multiplayer Client Menu selections local state
-
-/*----------------------------------------------------------------------------
---  Functions
-----------------------------------------------------------------------------*/
 
 extern int FindHostIndexBy(const CHost &host);
 extern void NetworkServerStartGame();       /// Server user has finally hit the start game button

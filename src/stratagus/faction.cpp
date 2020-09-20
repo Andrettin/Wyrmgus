@@ -118,9 +118,6 @@ faction::faction(const std::string &identifier)
 
 faction::~faction()
 {
-	if (this->Conditions) {
-		delete Conditions;
-	}
 }
 
 void faction::process_sml_property(const sml_property &property)

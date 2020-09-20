@@ -385,7 +385,7 @@ void CommandRallyPoint(CUnit &unit, const Vec2i &pos, int z)
 		return ;
 	}
 	unit.RallyPointPos = pos;
-	unit.RallyPointMapLayer = CMap::Map.MapLayers[z];
+	unit.RallyPointMapLayer = CMap::Map.MapLayers[z].get();
 }
 
 /**

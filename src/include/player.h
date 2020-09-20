@@ -36,13 +36,13 @@
 #include "upgrade/upgrade_structs.h"
 #include "vec2i.h"
 
-static constexpr int STORE_OVERALL = 0;
-static constexpr int STORE_BUILDING = 1;
-static constexpr int STORE_BOTH = 2;
+constexpr int STORE_OVERALL = 0;
+constexpr int STORE_BUILDING = 1;
+constexpr int STORE_BOTH = 2;
 
-static constexpr int SPEEDUP_FACTOR = 100;
+constexpr int SPEEDUP_FACTOR = 100;
 
-static constexpr int DefaultTradeCost = 30;
+constexpr int DefaultTradeCost = 30;
 
 class CCurrency;
 class CFile;
@@ -780,7 +780,7 @@ enum PlayerTypes {
 	PlayerRescueActive = 7    /// rescued  active
 };
 
-static constexpr int PlayerNumNeutral = PlayerMax - 1;  /// this is the neutral player slot
+constexpr int PlayerNumNeutral = PlayerMax - 1;  /// this is the neutral player slot
 
 /**
 **  Notify types. Noties are send to the player.

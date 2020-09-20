@@ -79,8 +79,8 @@ namespace wyrmgus {
 	enum class item_slot;
 }
 
-static constexpr int UnitSides = 8;
-static constexpr int MaxAttackPos = 5;
+constexpr int UnitSides = 8;
+constexpr int MaxAttackPos = 5;
 
 enum class GroupSelectionMode {
 	SELECTABLE_BY_RECTANGLE_ONLY = 0,
@@ -1077,15 +1077,15 @@ public:
 	MissileConfig Explosion;                         /// Missile for unit explosion
 	MissileConfig Impact[ANIMATIONS_DEATHTYPES + 2]; /// Missiles spawned if unit is hit(+shield)
 
-	LuaCallback *DeathExplosion = nullptr;
-	LuaCallback *OnHit = nullptr; //lua function called when unit is hit
-	LuaCallback *OnEachCycle = nullptr; //lua function called every cycle
-	LuaCallback *OnEachSecond = nullptr; //lua function called every second
-	LuaCallback *OnInit = nullptr; //lua function called on unit init
+	std::unique_ptr<LuaCallback> DeathExplosion;
+	std::unique_ptr<LuaCallback> OnHit; //lua function called when unit is hit
+	std::unique_ptr<LuaCallback> OnEachCycle; //lua function called every cycle
+	std::unique_ptr<LuaCallback> OnEachSecond; //lua function called every second
+	std::unique_ptr<LuaCallback> OnInit; //lua function called on unit init
 
 	int TeleportCost;               /// mana used for teleportation
-	LuaCallback *TeleportEffectIn = nullptr;   /// lua function to create effects before teleportation
-	LuaCallback *TeleportEffectOut = nullptr;  /// lua function to create effects after teleportation
+	std::unique_ptr<LuaCallback> TeleportEffectIn;   /// lua function to create effects before teleportation
+	std::unique_ptr<LuaCallback> TeleportEffectOut;  /// lua function to create effects after teleportation
 
 	mutable std::string DamageType; /// DamageType (used for extra death animations and impacts)
 

@@ -839,7 +839,7 @@ std::pair<Vec2i, Vec2i> CMap::get_subtemplate_rect(const wyrmgus::map_template *
 		if (z != -1) {
 			for (size_t i = 0; i < this->MapLayers[z]->subtemplate_areas.size(); ++i) {
 				if (subtemplate == std::get<2>(this->MapLayers[z]->subtemplate_areas[i])) {
-					return std::make_pair(std::get<0>(CMap::Map.MapLayers[z]->subtemplate_areas[i]), std::get<1>(CMap::Map.MapLayers[z]->subtemplate_areas[i]));
+					return std::make_pair(std::get<0>(this->MapLayers[z]->subtemplate_areas[i]), std::get<1>(this->MapLayers[z]->subtemplate_areas[i]));
 				}
 			}
 		}
@@ -903,7 +903,7 @@ CMapLayer *CMap::get_subtemplate_map_layer(const wyrmgus::map_template *subtempl
 		if (z != -1) {
 			for (size_t i = 0; i < this->MapLayers[z]->subtemplate_areas.size(); ++i) {
 				if (subtemplate == std::get<2>(this->MapLayers[z]->subtemplate_areas[i])) {
-					return this->MapLayers[z];
+					return this->MapLayers[z].get();
 				}
 			}
 		}
@@ -1254,7 +1254,7 @@ void ChangeCurrentMapLayer(const int z)
 	Vec2i new_viewport_map_pos(UI.SelectedViewport->MapPos.x * CMap::Map.Info.MapWidths[z] / UI.CurrentMapLayer->get_width(), UI.SelectedViewport->MapPos.y * CMap::Map.Info.MapHeights[z] / UI.CurrentMapLayer->get_height());
 	
 	UI.PreviousMapLayer = UI.CurrentMapLayer;
-	UI.CurrentMapLayer = CMap::Map.MapLayers[z];
+	UI.CurrentMapLayer = CMap::Map.MapLayers[z].get();
 	UI.Minimap.UpdateCache = true;
 	UI.SelectedViewport->Set(new_viewport_map_pos, wyrmgus::size::to_point(wyrmgus::defines::get()->get_scaled_tile_size()) / 2);
 }
@@ -1432,14 +1432,13 @@ void CMapInfo::Clear()
 	this->MapUID = 0;
 }
 
-CMap::CMap() : NoFogOfWar(false), TileGraphic(nullptr), Landmasses(0)
+CMap::CMap()
 {
-	Tileset = new CTileset;
+	Tileset = std::make_unique<CTileset>();
 }
 
 CMap::~CMap()
 {
-	delete Tileset;
 }
 
 unsigned int CMap::getIndex(int x, int y, int z) const
@@ -1486,9 +1485,8 @@ void CMap::Create()
 {
 	Assert(this->MapLayers.size() == 0);
 
-	CMapLayer *map_layer = new CMapLayer(this->Info.MapWidth, this->Info.MapHeight);
+	auto map_layer = std::make_unique<CMapLayer>(this->Info.MapWidth, this->Info.MapHeight);
 	map_layer->ID = this->MapLayers.size();
-	this->MapLayers.push_back(map_layer);
 	this->Info.MapWidths.push_back(this->Info.MapWidth);
 	this->Info.MapHeights.push_back(this->Info.MapHeight);
 	
@@ -1504,6 +1502,8 @@ void CMap::Create()
 			map_layer->SetTimeOfDay(nullptr); // make indoors have no time of day setting until it is possible to make light sources change their surrounding "time of day" // indoors it is always dark (maybe would be better to allow a special setting to have bright indoor places?
 		}
 	}
+
+	this->MapLayers.push_back(std::move(map_layer));
 }
 
 /**
@@ -1546,9 +1546,6 @@ void CMap::Clean()
 
 void CMap::ClearMapLayers()
 {
-	for (size_t z = 0; z < this->MapLayers.size(); ++z) {
-		delete this->MapLayers[z];
-	}
 	this->MapLayers.clear();
 }
 
@@ -1881,7 +1878,7 @@ void CMap::RemoveTileOverlayTerrain(const Vec2i &pos, int z)
 
 void CMap::SetOverlayTerrainDestroyed(const Vec2i &pos, bool destroyed, int z)
 {
-	CMapLayer *map_layer = this->MapLayers[z];
+	const std::unique_ptr<CMapLayer> &map_layer = this->MapLayers[z];
 	
 	if (!map_layer) {
 		return;
@@ -3486,7 +3483,7 @@ void CMap::RegenerateForest()
 		return;
 	}
 
-	for (CMapLayer *map_layer : this->MapLayers) {
+	for (const std::unique_ptr<CMapLayer> &map_layer : this->MapLayers) {
 		map_layer->RegenerateForest();
 	}
 }

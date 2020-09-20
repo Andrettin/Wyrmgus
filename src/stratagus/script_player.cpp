@@ -1719,7 +1719,7 @@ static int CclDefineFaction(lua_State *l)
 				faction->ui_fillers.push_back(std::move(filler));
 			}
 		} else if (!strcmp(value, "Conditions")) {
-			faction->Conditions = new LuaCallback(l, -1);
+			faction->Conditions = std::make_unique<LuaCallback>(l, -1);
 		} else if (!strcmp(value, "ProvinceNames")) {
 			faction->ProvinceNames.clear();
 			const int args = lua_rawlen(l, -1);

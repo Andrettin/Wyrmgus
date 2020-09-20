@@ -610,13 +610,13 @@ void map_template::Apply(const QPoint &template_start_pos, const QPoint &map_sta
 			height = current_campaign->MapSizes[z].y;
 		}
 	
-		CMapLayer *map_layer = new CMapLayer(width, height);
+		auto map_layer = std::make_unique<CMapLayer>(width, height);
 		map_layer->ID = CMap::Map.MapLayers.size();
 		CMap::Map.Info.MapWidths.push_back(map_layer->get_width());
 		CMap::Map.Info.MapHeights.push_back(map_layer->get_height());
 		map_layer->plane = this->get_plane();
 		map_layer->world = this->get_world();
-		CMap::Map.MapLayers.push_back(map_layer);
+		CMap::Map.MapLayers.push_back(std::move(map_layer));
 	} else {
 		if (!this->IsSubtemplateArea()) {
 			CMap::Map.MapLayers[z]->plane = this->get_plane();

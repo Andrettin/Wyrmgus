@@ -1169,19 +1169,19 @@ static int CclDefineUnitType(lua_State *l)
 		} else if (!strcmp(value, "TeleportCost")) {
 			type->TeleportCost = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "TeleportEffectIn")) {
-			type->TeleportEffectIn = new LuaCallback(l, -1);
+			type->TeleportEffectIn = std::make_unique<LuaCallback>(l, -1);
 		} else if (!strcmp(value, "TeleportEffectOut")) {
-			type->TeleportEffectOut = new LuaCallback(l, -1);
+			type->TeleportEffectOut = std::make_unique<LuaCallback>(l, -1);
 		} else if (!strcmp(value, "DeathExplosion")) {
-			type->DeathExplosion = new LuaCallback(l, -1);
+			type->DeathExplosion = std::make_unique<LuaCallback>(l, -1);
 		} else if (!strcmp(value, "OnHit")) {
-			type->OnHit = new LuaCallback(l, -1);
+			type->OnHit = std::make_unique<LuaCallback>(l, -1);
 		} else if (!strcmp(value, "OnEachCycle")) {
-			type->OnEachCycle = new LuaCallback(l, -1);
+			type->OnEachCycle = std::make_unique<LuaCallback>(l, -1);
 		} else if (!strcmp(value, "OnEachSecond")) {
-			type->OnEachSecond = new LuaCallback(l, -1);
+			type->OnEachSecond = std::make_unique<LuaCallback>(l, -1);
 		} else if (!strcmp(value, "OnInit")) {
-			type->OnInit = new LuaCallback(l, -1);
+			type->OnInit = std::make_unique<LuaCallback>(l, -1);
 		} else if (!strcmp(value, "Type")) {
 			value = LuaToString(l, -1);
 			if (!strcmp(value, "land")) {

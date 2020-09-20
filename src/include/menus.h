@@ -29,22 +29,14 @@
 
 #pragma once
 
-/*----------------------------------------------------------------------------
---  Defines/Declarations
-----------------------------------------------------------------------------*/
-
-static constexpr int MI_FLAGS_ACTIVE = 1;  /// cursor on item
-static constexpr int MI_FLAGS_CLICKED = 2; /// mouse button pressed down on item
+constexpr int MI_FLAGS_ACTIVE = 1;  /// cursor on item
+constexpr int MI_FLAGS_CLICKED = 2; /// mouse button pressed down on item
 
 class ButtonStyle;
 
 namespace wyrmgus {
 	class player_color;
 }
-
-/*----------------------------------------------------------------------------
---  Functions
-----------------------------------------------------------------------------*/
 
 /// Draw menu button
 extern void DrawUIButton(ButtonStyle *style, unsigned flags,

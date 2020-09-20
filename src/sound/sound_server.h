@@ -35,8 +35,8 @@
 #include <QAudioBuffer>
 #include <QAudioDecoder>
 
-static constexpr int MaxVolume = 255;
-static constexpr int SOUND_BUFFER_SIZE = 65536;
+constexpr int MaxVolume = 255;
+constexpr int SOUND_BUFFER_SIZE = 65536;
 
 namespace wyrmgus {
 

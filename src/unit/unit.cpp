@@ -3639,7 +3639,7 @@ static void UnitInXY(CUnit &unit, const Vec2i &pos, const int z)
 
 	unit.tilePos = pos;
 	unit.Offset = CMap::Map.getIndex(pos, z);
-	unit.MapLayer = CMap::Map.MapLayers[z];
+	unit.MapLayer = CMap::Map.MapLayers[z].get();
 
 	const wyrmgus::time_of_day *new_time_of_day = unit.get_center_tile_time_of_day();
 
@@ -3819,7 +3819,7 @@ CUnit *CreateUnit(const Vec2i &pos, const wyrmgus::unit_type &type, CPlayer *pla
 	CUnit *unit = MakeUnit(type, player);
 
 	if (unit != nullptr) {
-		unit->MapLayer = CMap::Map.MapLayers[z];
+		unit->MapLayer = CMap::Map.MapLayers[z].get();
 
 		Vec2i res_pos;
 		const int heading = SyncRand(256);

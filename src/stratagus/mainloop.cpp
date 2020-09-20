@@ -340,8 +340,7 @@ static void GameLogicLoop()
 		PlayersEachCycle(); // handle players
 		UpdateTimer();      // update game timer
 
-		for (size_t z = 0; z < CMap::Map.MapLayers.size(); ++z) {
-			CMapLayer *map_layer = CMap::Map.MapLayers[z];
+		for (const std::unique_ptr<CMapLayer> &map_layer : CMap::Map.MapLayers) {
 			map_layer->DoPerCycleLoop();
 		}
 		

@@ -542,14 +542,6 @@ unit_type::unit_type(const std::string &identifier) : detailed_data_entry(identi
 
 unit_type::~unit_type()
 {
-	delete DeathExplosion;
-	delete OnHit;
-	delete OnEachCycle;
-	delete OnEachSecond;
-	delete OnInit;
-	delete TeleportEffectIn;
-	delete TeleportEffectOut;
-
 #ifdef USE_MNG
 	if (this->Portrait.Num) {
 		for (int j = 0; j < this->Portrait.Num; ++j) {

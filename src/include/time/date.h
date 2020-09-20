@@ -34,7 +34,7 @@ namespace wyrmgus {
 	class timeline;
 }
 
-static constexpr int BaseCalendarYearOffsetForHours = 10000; //essentially the Human Era
+constexpr int BaseCalendarYearOffsetForHours = 10000; //essentially the Human Era
 
 class CDate
 {

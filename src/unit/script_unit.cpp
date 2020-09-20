@@ -432,7 +432,7 @@ static int CclUnit(lua_State *l)
 			// Radar(Jammer) not.
 			lua_pop(l, 1);
 		} else if (!strcmp(value, "map-layer")) {
-			unit->MapLayer = CMap::Map.MapLayers[LuaToNumber(l, 2, j + 1)];
+			unit->MapLayer = CMap::Map.MapLayers[LuaToNumber(l, 2, j + 1)].get();
 		} else if (!strcmp(value, "tile")) {
 			lua_rawgeti(l, 2, j + 1);
 			CclGetPos(l, &unit->tilePos.x , &unit->tilePos.y, -1);
@@ -707,7 +707,7 @@ static int CclUnit(lua_State *l)
 			unit->RallyPointPos.x = rally_point_x;
 			unit->RallyPointPos.y = rally_point_y;
 		} else if (!strcmp(value, "rally_point_map_layer")) {
-			unit->RallyPointMapLayer = CMap::Map.MapLayers[LuaToNumber(l, 2, j + 1)];
+			unit->RallyPointMapLayer = CMap::Map.MapLayers[LuaToNumber(l, 2, j + 1)].get();
 		//Wyrmgus end
 		} else {
 			const int index = UnitTypeVar.VariableNameLookup[value];// User variables
@@ -1001,7 +1001,7 @@ static int CclCreateUnitOnTop(lua_State *l)
 		DebugPrint("Unable to allocate unit");
 		return 0;
 	} else {
-		unit->MapLayer = CMap::Map.MapLayers[z];
+		unit->MapLayer = CMap::Map.MapLayers[z].get();
 		unit->ReplaceOnTop(*on_top);
 		unit->Place(ipos, z);
 		UpdateForNewUnit(*unit, 0);
