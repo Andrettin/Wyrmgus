@@ -37,6 +37,7 @@
 //Wyrmgus start
 #include "grand_strategy.h"
 //Wyrmgus end
+#include "literary_text.h"
 #include "luacallback.h"
 #include "map/map.h"
 #include "map/map_layer.h"
@@ -53,7 +54,6 @@
 #include "script/trigger.h"
 #include "sound/sound.h"
 #include "sound/sound_server.h"
-#include "text.h"
 #include "time/season_schedule.h"
 #include "time/time_of_day_schedule.h"
 #include "ui/button.h"
