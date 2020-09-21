@@ -59,30 +59,21 @@
 extern void ExpandPath(std::string &newpath, const std::string &path);
 extern void StartMap(const std::string &filename, bool clean);
 
-/**
-**  LogEntry structure.
-*/
 class LogEntry
 {
 public:
-	LogEntry() : GameCycle(0), Flush(0), PosX(0), PosY(0), DestUnitNumber(0),
-		Num(0), SyncRandSeed(0), Next(nullptr)
-	{
-		UnitNumber = 0;
-	}
-
-	unsigned long GameCycle;
-	int UnitNumber;
+	unsigned long GameCycle = 0;
+	int UnitNumber = 0;
 	std::string UnitIdent;
 	std::string Action;
-	int Flush;
-	int PosX;
-	int PosY;
-	int DestUnitNumber;
+	int Flush = 0;
+	int PosX = 0;
+	int PosY = 0;
+	int DestUnitNumber = 0;
 	std::string Value;
-	int Num;
-	unsigned SyncRandSeed;
-	LogEntry *Next;
+	int Num = 0;
+	unsigned SyncRandSeed = 0;
+	std::unique_ptr<LogEntry> Next;
 };
 
 /**
@@ -121,17 +112,6 @@ public:
 		memset(Network, 0, sizeof(Network));
 	}
 
-	~FullReplay()
-	{
-		LogEntry *log = this->Commands;
-
-		while (log) {
-			LogEntry *next = log->Next;
-			delete log;
-			log = next;
-		}
-	}
-
 	std::string Comment1;
 	std::string Comment2;
 	std::string Comment3;
@@ -165,7 +145,7 @@ public:
 	int MaxTechLevel = 0;
 	int Engine[3];
 	int Network[3];
-	LogEntry *Commands = nullptr;
+	std::unique_ptr<LogEntry> Commands;
 };
 
 bool CommandLogDisabled;           /// True if command log is off
@@ -391,10 +371,10 @@ static void SaveFullLog(CFile &file)
 	file.printf("  Network = { %d, %d, %d }\n",
 				CurrentReplay->Network[0], CurrentReplay->Network[1], CurrentReplay->Network[2]);
 	file.printf("} )\n");
-	const LogEntry *log = CurrentReplay->Commands;
+	const LogEntry *log = CurrentReplay->Commands.get();
 	while (log) {
 		PrintLogCommand(*log, file);
-		log = log->Next;
+		log = log->Next.get();
 	}
 }
 
@@ -404,20 +384,19 @@ static void SaveFullLog(CFile &file)
 **  @param log   Pointer the replay log entry to be added
 **  @param dest  The file to output to
 */
-static void AppendLog(LogEntry *log, CFile &file)
+static void AppendLog(std::unique_ptr<LogEntry> &&log, CFile &file)
 {
-	LogEntry **last;
-
 	// Append to linked list
-	last = &CurrentReplay->Commands;
+	std::unique_ptr<LogEntry> *last = &CurrentReplay->Commands;
 	while (*last) {
 		last = &(*last)->Next;
 	}
 
-	*last = log;
-	log->Next = 0;
+	LogEntry *log_ptr = log.get();
+	*last = std::move(log);
+	log_ptr->Next = nullptr;
 
-	PrintLogCommand(*log, file);
+	PrintLogCommand(*log_ptr, file);
 	file.flush();
 }
 
@@ -488,7 +467,7 @@ void CommandLog(const char *action, const CUnit *unit, int flush,
 		return;
 	}
 
-	LogEntry *log = new LogEntry;
+	auto log = std::make_unique<LogEntry>();
 
 	//
 	// Frame, unit, (type-ident only to be better readable).
@@ -525,7 +504,7 @@ void CommandLog(const char *action, const CUnit *unit, int flush,
 	log->SyncRandSeed = wyrmgus::random::get()->get_seed();
 
 	// Append it to ReplayLog list
-	AppendLog(log, *LogFile);
+	AppendLog(std::move(log), *LogFile);
 }
 
 /**
@@ -533,10 +512,6 @@ void CommandLog(const char *action, const CUnit *unit, int flush,
 */
 static int CclLog(lua_State *l)
 {
-	LogEntry *log;
-	LogEntry **last;
-	const char *value;
-
 	LuaCheckArgs(l, 1);
 	if (!lua_istable(l, 1)) {
 		LuaError(l, "incorrect argument");
@@ -544,7 +519,7 @@ static int CclLog(lua_State *l)
 
 	Assert(CurrentReplay);
 
-	log = new LogEntry;
+	auto log = std::make_unique<LogEntry>();
 	log->UnitNumber = -1;
 	log->PosX = -1;
 	log->PosY = -1;
@@ -553,7 +528,7 @@ static int CclLog(lua_State *l)
 
 	lua_pushnil(l);
 	while (lua_next(l, 1)) {
-		value = LuaToString(l, -2);
+		const char *value = LuaToString(l, -2);
 		if (!strcmp(value, "GameCycle")) {
 			log->GameCycle = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "UnitNumber")) {
@@ -583,12 +558,12 @@ static int CclLog(lua_State *l)
 	}
 
 	// Append to linked list
-	last = &CurrentReplay->Commands;
+	std::unique_ptr<LogEntry> *last = &CurrentReplay->Commands;
 	while (*last) {
 		last = &(*last)->Next;
 	}
 
-	*last = log;
+	*last = std::move(log);
 
 	return 0;
 }
@@ -959,8 +934,8 @@ static void DoNextReplay()
 		DebugPrint("Invalid action: %s" _C_ action);
 	}
 
-	ReplayStep = ReplayStep->Next;
-	NextLogCycle = ReplayStep ? (unsigned)ReplayStep->GameCycle : ~0UL;
+	ReplayStep = ReplayStep->Next.get();
+	NextLogCycle = ReplayStep ? ReplayStep->GameCycle : ~0UL;
 }
 
 /**
@@ -977,8 +952,8 @@ static void ReplayEachCycle()
 				CPlayer::Players[i]->SetName(CurrentReplay->Players[i].Name);
 			}
 		}
-		ReplayStep = CurrentReplay->Commands;
-		NextLogCycle = (ReplayStep ? (unsigned)ReplayStep->GameCycle : ~0UL);
+		ReplayStep = CurrentReplay->Commands.get();
+		NextLogCycle = (ReplayStep ? ReplayStep->GameCycle : ~0UL);
 		InitReplay = 0;
 	}
 
