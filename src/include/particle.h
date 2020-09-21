@@ -38,14 +38,14 @@ struct CPosition {
 	float y;
 };
 
-class GraphicAnimation
+class GraphicAnimation final
 {
 	CGraphic *g;
 	int ticksPerFrame;
-	int currentFrame;
-	int currTicks;
+	int currentFrame = 0;
+	int currTicks = 0;
 public:
-	GraphicAnimation(CGraphic *g, int ticksPerFrame);
+	explicit GraphicAnimation(CGraphic *g, int ticksPerFrame);
 	~GraphicAnimation() {}
 
 	/**
@@ -53,7 +53,7 @@ public:
 	**  @param x x screen coordinate where to draw the animation.
 	**  @param y y screen coordinate where to draw the animation.
 	*/
-	void draw(int x, int y);
+	void draw(int x, int y) const;
 
 	/**
 	**  Update the animation.
@@ -61,15 +61,13 @@ public:
 	*/
 	void update(int ticks);
 
-	bool isFinished();
+	bool isFinished() const;
 	//Wyrmgus start
 //	bool isVisible(const CViewport &vp, const CPosition &pos);
-	bool isVisible(const CViewport &vp, const CPosition &pos, int z);
+	bool isVisible(const CViewport &vp, const CPosition &pos, int z) const;
 	//Wyrmgus end
-	GraphicAnimation *clone();
+	std::unique_ptr<GraphicAnimation> clone() const;
 };
-
-
 
 // Base particle class
 class CParticle
@@ -77,7 +75,7 @@ class CParticle
 public:
 	//Wyrmgus start
 //	CParticle(CPosition position, int drawlevel = 0) :
-	CParticle(CPosition position, int z, int drawlevel = 0) :
+	explicit CParticle(CPosition position, int z, int drawlevel = 0) :
 	//Wyrmgus end
 		//Wyrmgus start
 //		pos(position), destroyed(false), drawLevel(drawlevel)
@@ -87,13 +85,13 @@ public:
 	virtual ~CParticle() {}
 
 	virtual bool isVisible(const CViewport &vp) const = 0;
-	virtual void draw() = 0;
+	virtual void draw() const = 0;
 	virtual void update(int) = 0;
 
-	inline void destroy() { destroyed = true; }
-	inline bool isDestroyed() { return destroyed; }
+	void destroy() { destroyed = true; }
+	bool isDestroyed() const { return destroyed; }
 
-	virtual CParticle *clone() = 0;
+	virtual std::unique_ptr<CParticle> clone() const = 0;
 
 	int getDrawLevel() const { return drawLevel; }
 	void setDrawLevel(int value) { drawLevel = value; }
@@ -107,25 +105,23 @@ protected:
 	//Wyrmgus end
 };
 
-
-class StaticParticle : public CParticle
+class StaticParticle final : public CParticle
 {
 public:
 	//Wyrmgus start
 //	StaticParticle(CPosition position, GraphicAnimation *flame, int drawlevel = 0);
-	StaticParticle(CPosition position, int z, GraphicAnimation *flame, int drawlevel = 0);
+	explicit StaticParticle(CPosition position, int z, const GraphicAnimation *flame, int drawlevel = 0);
 	//Wyrmgus end
 	virtual ~StaticParticle();
 
 	virtual bool isVisible(const CViewport &vp) const;
-	virtual void draw();
+	virtual void draw() const;
 	virtual void update(int ticks);
-	virtual CParticle *clone();
+	virtual std::unique_ptr<CParticle> clone() const;
 
 protected:
-	GraphicAnimation *animation;
+	std::unique_ptr<GraphicAnimation> animation;
 };
-
 
 // Chunk particle
 class CChunkParticle : public CParticle
@@ -133,7 +129,7 @@ class CChunkParticle : public CParticle
 public:
 	//Wyrmgus start
 //	CChunkParticle(CPosition position, GraphicAnimation *smokeAnimation, GraphicAnimation *debrisAnimation,
-	CChunkParticle(CPosition position, int z, GraphicAnimation *smokeAnimation, GraphicAnimation *debrisAnimation,
+	explicit CChunkParticle(CPosition position, int z, GraphicAnimation *smokeAnimation, GraphicAnimation *debrisAnimation,
 	//Wyrmgus end
 				   GraphicAnimation *destroyAnimation,
 				   int minVelocity = 0, int maxVelocity = 400,
@@ -141,9 +137,9 @@ public:
 	virtual ~CChunkParticle();
 
 	virtual bool isVisible(const CViewport &vp) const;
-	virtual void draw();
+	virtual void draw() const;
 	virtual void update(int ticks);
-	virtual CParticle *clone();
+	virtual std::unique_ptr<CParticle> clone() const;
 	int getSmokeDrawLevel() const { return smokeDrawLevel; }
 	int getDestroyDrawLevel() const { return destroyDrawLevel; }
 	void setSmokeDrawLevel(int value) { smokeDrawLevel = value; }
@@ -163,9 +159,9 @@ protected:
 	float height;
 	int smokeDrawLevel;
 	int destroyDrawLevel;
-	GraphicAnimation *debrisAnimation;
-	GraphicAnimation *smokeAnimation;
-	GraphicAnimation *destroyAnimation;
+	std::unique_ptr<GraphicAnimation> debrisAnimation;
+	std::unique_ptr<GraphicAnimation> smokeAnimation;
+	std::unique_ptr<GraphicAnimation> destroyAnimation;
 
 	struct {
 		float x;
@@ -173,24 +169,23 @@ protected:
 	} direction;
 };
 
-
 // Smoke particle
 class CSmokeParticle : public CParticle
 {
 public:
 	//Wyrmgus start
 //	CSmokeParticle(CPosition position, GraphicAnimation *animation, float speedx = 0, float speedy = -22.0f, int drawlevel = 0);
-	CSmokeParticle(CPosition position, int z, GraphicAnimation *animation, float speedx = 0, float speedy = -22.0f, int drawlevel = 0);
+	explicit CSmokeParticle(CPosition position, int z, GraphicAnimation *animation, float speedx = 0, float speedy = -22.0f, int drawlevel = 0);
 	//Wyrmgus end
 	virtual ~CSmokeParticle();
 
 	virtual bool isVisible(const CViewport &vp) const;
-	virtual void draw();
+	virtual void draw() const;
 	virtual void update(int ticks);
-	virtual CParticle *clone();
+	virtual std::unique_ptr<CParticle> clone() const;
 
 protected:
-	GraphicAnimation *puff;
+	std::unique_ptr<GraphicAnimation> puff;
 	struct {
 		float x;
 		float y;
@@ -201,25 +196,24 @@ class CRadialParticle : public CParticle
 {
 public:
 	//Wyrmgus start
-//	CRadialParticle(CPosition position, GraphicAnimation *animation, int maxSpeed, int drawlevel = 0);
-	CRadialParticle(CPosition position, int z, GraphicAnimation *animation, int maxSpeed, int drawlevel = 0);
+//	explicit CRadialParticle(CPosition position, GraphicAnimation *animation, int maxSpeed, int drawlevel = 0);
+	explicit CRadialParticle(CPosition position, int z, GraphicAnimation *animation, int maxSpeed, int drawlevel = 0);
 	//Wyrmgus end
 	virtual ~CRadialParticle();
 
 	virtual bool isVisible(const CViewport &vp) const;
-	virtual void draw();
+	virtual void draw() const;
 	virtual void update(int ticks);
-	virtual CParticle *clone();
+	virtual std::unique_ptr<CParticle> clone() const;
 
 protected:
-	GraphicAnimation *animation;
+	std::unique_ptr<GraphicAnimation> animation;
 	float direction;
 	int speed;
 	int maxSpeed;
 };
 
-
-class CParticleManager
+class CParticleManager final
 {
 public:
 	CParticleManager();
@@ -233,7 +227,7 @@ public:
 
 	void update();
 
-	void add(CParticle *particle);
+	void add(std::unique_ptr<CParticle> &&particle);
 	void clear();
 
 	CPosition getScreenPos(const CPosition &pos) const;
@@ -242,10 +236,10 @@ public:
 	inline bool getLowDetail() const { return lowDetail; }
 
 private:
-	std::vector<CParticle *> particles;
-	std::vector<CParticle *> new_particles;
-	const CViewport *vp;
-	unsigned long lastTicks;
+	std::vector<std::unique_ptr<CParticle>> particles;
+	std::vector<std::unique_ptr<CParticle>> new_particles;
+	const CViewport *vp = nullptr;
+	unsigned long lastTicks = 0;
 	bool lowDetail;
 };
 

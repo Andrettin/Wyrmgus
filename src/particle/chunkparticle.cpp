@@ -73,9 +73,6 @@ CChunkParticle::CChunkParticle(CPosition position, int z, GraphicAnimation *smok
 
 CChunkParticle::~CChunkParticle()
 {
-	delete debrisAnimation;
-	delete smokeAnimation;
-	delete destroyAnimation;
 }
 
 static float calculateScreenPos(float posy, float height)
@@ -92,7 +89,7 @@ bool CChunkParticle::isVisible(const CViewport &vp) const
 	//Wyrmgus end
 }
 
-void CChunkParticle::draw()
+void CChunkParticle::draw() const
 {
 	CPosition screenPos = ParticleManager.getScreenPos(pos);
 	screenPos.y = calculateScreenPos(screenPos.y, height);
@@ -116,12 +113,12 @@ void CChunkParticle::update(int ticks)
 	if (age >= lifetime) {
 		if (destroyAnimation) {
 			CPosition p(pos.x, calculateScreenPos(pos.y, height));
-			GraphicAnimation *destroyanimation = destroyAnimation->clone();
+			std::unique_ptr<GraphicAnimation> destroyanimation = destroyAnimation->clone();
 			//Wyrmgus start
 //			StaticParticle *destroy = new StaticParticle(p, destroyanimation, destroyDrawLevel);
-			StaticParticle *destroy = new StaticParticle(p, this->MapLayer, destroyanimation, destroyDrawLevel);
+			auto destroy = std::make_unique<StaticParticle>(p, this->MapLayer, destroyanimation.get(), destroyDrawLevel);
 			//Wyrmgus end
-			ParticleManager.add(destroy);
+			ParticleManager.add(std::move(destroy));
 		}
 
 		destroy();
@@ -133,21 +130,20 @@ void CChunkParticle::update(int ticks)
 
 	if (age > nextSmokeTicks) {
 		CPosition p(pos.x, calculateScreenPos(pos.y, height));
-		GraphicAnimation *smokeanimation = smokeAnimation->clone();
+		std::unique_ptr<GraphicAnimation> smokeanimation = smokeAnimation->clone();
 		//Wyrmgus start
 //		CSmokeParticle *smoke = new CSmokeParticle(p, smokeanimation, 0, -22.0f, smokeDrawLevel);
-		CSmokeParticle *smoke = new CSmokeParticle(p, MapLayer, smokeanimation, 0, -22.0f, smokeDrawLevel);
+		auto smoke = std::make_unique<CSmokeParticle>(p, MapLayer, smokeanimation.get(), 0, -22.0f, smokeDrawLevel);
 		//Wyrmgus end
-		ParticleManager.add(smoke);
+		ParticleManager.add(std::move(smoke));
 
 		nextSmokeTicks += MyRand() % randSmokeTicks + minSmokeTicks;
 	}
 
 	debrisAnimation->update(ticks);
 	if (debrisAnimation->isFinished()) {
-		GraphicAnimation *debrisanimation = debrisAnimation->clone();
-		delete debrisAnimation;
-		debrisAnimation = debrisanimation;
+		std::unique_ptr<GraphicAnimation> debrisanimation = debrisAnimation->clone();
+		debrisAnimation = std::move(debrisanimation);
 	}
 
 	float time = age / 1000.f;
@@ -159,12 +155,11 @@ void CChunkParticle::update(int ticks)
 	height = getVerticalPosition(initialVelocity, trajectoryAngle, time);
 }
 
-
-CParticle *CChunkParticle::clone()
+std::unique_ptr<CParticle> CChunkParticle::clone() const
 {
 	//Wyrmgus start
-//	CChunkParticle *particle = new CChunkParticle(pos, smokeAnimation, debrisAnimation, destroyAnimation, minVelocity, maxVelocity, minTrajectoryAngle, maxTTL, drawLevel);
-	CChunkParticle *particle = new CChunkParticle(pos, MapLayer, smokeAnimation, debrisAnimation, destroyAnimation, minVelocity, maxVelocity, minTrajectoryAngle, maxTTL, drawLevel);
+//	auto particle = std::make_unique<CChunkParticle>(pos, smokeAnimation, debrisAnimation, destroyAnimation, minVelocity, maxVelocity, minTrajectoryAngle, maxTTL, drawLevel);
+	auto particle = std::make_unique<CChunkParticle>(pos, MapLayer, smokeAnimation.get(), debrisAnimation.get(), destroyAnimation.get(), minVelocity, maxVelocity, minTrajectoryAngle, maxTTL, drawLevel);
 	//Wyrmgus end
 	particle->smokeDrawLevel = smokeDrawLevel;
 	particle->destroyDrawLevel = destroyDrawLevel;

@@ -39,13 +39,13 @@
 #include "video/video.h"
 
 GraphicAnimation::GraphicAnimation(CGraphic *g, int ticksPerFrame) :
-	g(g), ticksPerFrame(ticksPerFrame), currentFrame(0), currTicks(0)
+	g(g), ticksPerFrame(ticksPerFrame)
 {
 	Assert(g);
 }
 
 
-void GraphicAnimation::draw(int x, int y)
+void GraphicAnimation::draw(int x, int y) const
 {
 	if (!isFinished()) {
 		g->DrawFrameClip(currentFrame, x - g->Width / 2, y - g->Height / 2);
@@ -61,14 +61,14 @@ void GraphicAnimation::update(int ticks)
 	}
 }
 
-bool GraphicAnimation::isFinished()
+bool GraphicAnimation::isFinished() const
 {
 	return currentFrame >= g->NumFrames;
 }
 
 //Wyrmgus start
 //bool GraphicAnimation::isVisible(const CViewport &vp, const CPosition &pos)
-bool GraphicAnimation::isVisible(const CViewport &vp, const CPosition &pos, int z)
+bool GraphicAnimation::isVisible(const CViewport &vp, const CPosition &pos, int z) const
 //Wyrmgus end
 {
 	// invisible graphics always invisible
@@ -106,7 +106,7 @@ bool GraphicAnimation::isVisible(const CViewport &vp, const CPosition &pos, int 
 	return false;
 }
 
-GraphicAnimation *GraphicAnimation::clone()
+std::unique_ptr<GraphicAnimation> GraphicAnimation::clone() const
 {
-	return new GraphicAnimation(g, ticksPerFrame);
+	return std::make_unique<GraphicAnimation>(g, ticksPerFrame);
 }

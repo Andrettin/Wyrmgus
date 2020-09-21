@@ -33,7 +33,7 @@
 
 //Wyrmgus start
 //StaticParticle::StaticParticle(CPosition position, GraphicAnimation *animation, int drawlevel) :
-StaticParticle::StaticParticle(CPosition position, int z, GraphicAnimation *animation, int drawlevel) :
+StaticParticle::StaticParticle(CPosition position, int z, const GraphicAnimation *animation, int drawlevel) :
 //Wyrmgus end
 	//Wyrmgus start
 //	CParticle(position, drawlevel)
@@ -46,7 +46,6 @@ StaticParticle::StaticParticle(CPosition position, int z, GraphicAnimation *anim
 
 StaticParticle::~StaticParticle()
 {
-	delete animation;
 }
 
 bool StaticParticle::isVisible(const CViewport &vp) const
@@ -57,7 +56,7 @@ bool StaticParticle::isVisible(const CViewport &vp) const
 	//Wyrmgus end
 }
 
-void StaticParticle::draw()
+void StaticParticle::draw() const
 {
 	CPosition screenPos = ParticleManager.getScreenPos(pos);
 	animation->draw(static_cast<int>(screenPos.x), static_cast<int>(screenPos.y));
@@ -71,11 +70,10 @@ void StaticParticle::update(int ticks)
 	}
 }
 
-CParticle *StaticParticle::clone()
+std::unique_ptr<CParticle> StaticParticle::clone() const
 {
 	//Wyrmgus start
-//	CParticle *p = new StaticParticle(pos, animation, drawLevel);
-	CParticle *p = new StaticParticle(pos, MapLayer, animation, drawLevel);
+//	return std::make_unique<StaticParticle>(pos, animation, drawLevel);
+	return std::make_unique<StaticParticle>(pos, MapLayer, animation.get(), drawLevel);
 	//Wyrmgus end
-	return p;
 }

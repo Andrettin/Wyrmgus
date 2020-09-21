@@ -51,7 +51,6 @@ CRadialParticle::CRadialParticle(CPosition position, int z, GraphicAnimation *an
 
 CRadialParticle::~CRadialParticle()
 {
-	delete animation;
 }
 
 bool CRadialParticle::isVisible(const CViewport &vp) const
@@ -62,7 +61,7 @@ bool CRadialParticle::isVisible(const CViewport &vp) const
 	//Wyrmgus end
 }
 
-void CRadialParticle::draw()
+void CRadialParticle::draw() const
 {
 	CPosition screenPos = ParticleManager.getScreenPos(pos);
 	animation->draw(static_cast<int>(screenPos.x), static_cast<int>(screenPos.y));
@@ -79,11 +78,10 @@ void CRadialParticle::update(int ticks)
 	}
 }
 
-CParticle *CRadialParticle::clone()
+std::unique_ptr<CParticle> CRadialParticle::clone() const
 {
 	//Wyrmgus start
-//	CParticle *p = new CRadialParticle(pos, animation, maxSpeed, drawLevel);
-	CParticle *p = new CRadialParticle(pos, MapLayer, animation, maxSpeed, drawLevel);
+//	return std::make_unique<CRadialParticle>(pos, animation, maxSpeed, drawLevel);
+	return std::make_unique<CRadialParticle>(pos, MapLayer, animation.get(), maxSpeed, drawLevel);
 	//Wyrmgus end
-	return p;
 }

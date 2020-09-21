@@ -28,15 +28,16 @@
 //
 
 #include "stratagus.h"
+
 #include "particle.h"
+
 #include "ui/ui.h"
+#include "util/vector_util.h"
 #include "video/video.h"
 
 CParticleManager ParticleManager;
 
-
-CParticleManager::CParticleManager() :
-	vp(nullptr), lastTicks(0)
+CParticleManager::CParticleManager()
 {
 }
 
@@ -55,16 +56,8 @@ void CParticleManager::exit()
 
 void CParticleManager::clear()
 {
-	std::vector<CParticle *>::iterator i;
-	for (i = particles.begin(); i != particles.end(); ++i) {
-		delete *i;
-	}
-	particles.clear();
-
-	for (i = new_particles.begin(); i != new_particles.end(); ++i) {
-		delete *i;
-	}
-	new_particles.clear();
+	this->particles.clear();
+	this->new_particles.clear();
 }
 
 static inline bool DrawLevelCompare(const CParticle *lhs, const CParticle *rhs)
@@ -76,10 +69,9 @@ void CParticleManager::prepareToDraw(const CViewport &vp, std::vector<CParticle 
 {
 	this->vp = &vp;
 
-	for (std::vector<CParticle *>::iterator it = particles.begin(); it != particles.end(); ++it) {
-		CParticle &particle = **it;
-		if (particle.isVisible(vp)) {
-			table.push_back(&particle);
+	for (const std::unique_ptr<CParticle> &particle : this->particles) {
+		if (particle->isVisible(vp)) {
+			table.push_back(particle.get());
 		}
 	}
 
@@ -94,16 +86,15 @@ void CParticleManager::endDraw()
 void CParticleManager::update()
 {
 	unsigned long ticks = GameCycle - lastTicks;
-	std::vector<CParticle *>::iterator i;
+	std::vector<std::unique_ptr<CParticle>>::iterator i;
 
-	particles.insert(particles.end(), new_particles.begin(), new_particles.end());
-	new_particles.clear();
+	wyrmgus::vector::merge(this->particles, std::move(this->new_particles));
+	this->new_particles = std::vector<std::unique_ptr<CParticle>>();
 
 	i = particles.begin();
 	while (i != particles.end()) {
 		(*i)->update(1000.0f / CYCLES_PER_SECOND * ticks);
 		if ((*i)->isDestroyed()) {
-			delete *i;
 			i = particles.erase(i);
 		} else {
 			++i;
@@ -113,9 +104,9 @@ void CParticleManager::update()
 	lastTicks += ticks;
 }
 
-void CParticleManager::add(CParticle *particle)
+void CParticleManager::add(std::unique_ptr<CParticle> &&particle)
 {
-	new_particles.push_back(particle);
+	new_particles.push_back(std::move(particle));
 }
 
 CPosition CParticleManager::getScreenPos(const CPosition &pos) const

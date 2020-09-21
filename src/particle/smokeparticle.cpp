@@ -52,7 +52,6 @@ CSmokeParticle::CSmokeParticle(CPosition position, int z, GraphicAnimation *smok
 
 CSmokeParticle::~CSmokeParticle()
 {
-	delete puff;
 }
 
 bool CSmokeParticle::isVisible(const CViewport &vp) const
@@ -63,7 +62,7 @@ bool CSmokeParticle::isVisible(const CViewport &vp) const
 	//Wyrmgus end
 }
 
-void CSmokeParticle::draw()
+void CSmokeParticle::draw() const
 {
 	CPosition screenPos = ParticleManager.getScreenPos(pos);
 	puff->draw(static_cast<int>(screenPos.x), static_cast<int>(screenPos.y));
@@ -82,10 +81,10 @@ void CSmokeParticle::update(int ticks)
 	pos.y += ticks / 1000.f * speedVector.y;
 }
 
-CParticle *CSmokeParticle::clone()
+std::unique_ptr<CParticle> CSmokeParticle::clone() const
 {
 	//Wyrmgus starrt
 //	return new CSmokeParticle(pos, puff, speedVector.x, speedVector.y, drawLevel);
-	return new CSmokeParticle(pos, MapLayer, puff, speedVector.x, speedVector.y, drawLevel);
+	return std::make_unique<CSmokeParticle>(pos, MapLayer, puff.get(), speedVector.x, speedVector.y, drawLevel);
 	//Wyrmgus end
 }
