@@ -220,16 +220,10 @@ public:
 	std::vector<std::pair<wyrmgus::character_title, CGrandStrategyProvince *>> ProvinceTitles;	/// Provincial titles of the character (first value is the title type, and the second one is the province
 };
 
-class CGrandStrategyEvent
+class CGrandStrategyEvent final
 {
 public:
-	CGrandStrategyEvent() :
-		Persistent(false),
-		ID(-1), MinYear(0), MaxYear(0), HistoricalYear(0),
-		World(nullptr),
-		Conditions(nullptr)
-	{
-	}
+	CGrandStrategyEvent();
 	~CGrandStrategyEvent();
 	
 	void Trigger(CGrandStrategyFaction *faction);
@@ -237,16 +231,16 @@ public:
 	
 	std::string Name;
 	std::string Description;
-	bool Persistent;
-	int ID;
-	int MinYear;
-	int MaxYear;
-	int HistoricalYear;
-	wyrmgus::world *World;
-	LuaCallback *Conditions;
+	bool Persistent = false;
+	int ID = -1;
+	int MinYear = 0;
+	int MaxYear = 0;
+	int HistoricalYear = 0;
+	wyrmgus::world *World = nullptr;
+	std::unique_ptr<LuaCallback> Conditions;
 	std::vector<std::string> Options;
-	std::vector<LuaCallback *> OptionConditions;
-	std::vector<LuaCallback *> OptionEffects;
+	std::vector<std::unique_ptr<LuaCallback>> OptionConditions;
+	std::vector<std::unique_ptr<LuaCallback>> OptionEffects;
 	std::vector<std::string> OptionTooltips;
 };
 
@@ -284,22 +278,14 @@ public:
 	int CommodityPrices[MaxCosts];								/// price for every 100 of each commodity
 };
 
-/*----------------------------------------------------------------------------
--- Variables
-----------------------------------------------------------------------------*/
-
 extern bool GrandStrategy;								/// if the game is in grand strategy mode
 extern int GrandStrategyYear;
 extern std::string GrandStrategyWorld;
 extern int PopulationGrowthThreshold;					/// How much population growth progress must be accumulated before a new worker unit is created in the province
 extern CGrandStrategyGame GrandStrategyGame;			/// Grand strategy game
 extern std::map<std::string, int> GrandStrategyHeroStringToIndex;
-extern std::vector<CGrandStrategyEvent *> GrandStrategyEvents;
+extern std::vector<std::unique_ptr<CGrandStrategyEvent>> GrandStrategyEvents;
 extern std::map<std::string, CGrandStrategyEvent *> GrandStrategyEventStringToPointer;
-
-/*----------------------------------------------------------------------------
--- Functions
-----------------------------------------------------------------------------*/
 
 extern int GetProvinceId(std::string province_name);
 extern void SetProvinceOwner(std::string province_name, std::string civilization_name, std::string faction_name);

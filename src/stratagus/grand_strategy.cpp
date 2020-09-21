@@ -61,12 +61,8 @@ std::string GrandStrategyWorld;
 int PopulationGrowthThreshold = 1000;
 CGrandStrategyGame GrandStrategyGame;
 std::map<std::string, int> GrandStrategyHeroStringToIndex;
-std::vector<CGrandStrategyEvent *> GrandStrategyEvents;
+std::vector<std::unique_ptr<CGrandStrategyEvent>> GrandStrategyEvents;
 std::map<std::string, CGrandStrategyEvent *> GrandStrategyEventStringToPointer;
-
-/*----------------------------------------------------------------------------
---  Functions
-----------------------------------------------------------------------------*/
 
 void CGrandStrategyGame::DrawInterface()
 {
@@ -1069,17 +1065,12 @@ CGrandStrategyFaction *CGrandStrategyHero::GetFaction()
 	return nullptr;
 }
 
+CGrandStrategyEvent::CGrandStrategyEvent()
+{
+}
+
 CGrandStrategyEvent::~CGrandStrategyEvent()
 {
-	delete Conditions;
-	
-	for (size_t i = 0; i < this->OptionConditions.size(); ++i) {
-		delete this->OptionConditions[i];
-	}
-	
-	for (size_t i = 0; i < this->OptionEffects.size(); ++i) {
-		delete this->OptionEffects[i];
-	}
 }
 
 void CGrandStrategyEvent::Trigger(CGrandStrategyFaction *faction)
@@ -1519,9 +1510,6 @@ bool GetGrandStrategyEventTriggered(std::string event_name)
 
 void CleanGrandStrategyEvents()
 {
-	for (size_t i = 0; i < GrandStrategyEvents.size(); ++i) {
-		delete GrandStrategyEvents[i];
-	}
 	GrandStrategyEvents.clear();
 	GrandStrategyEventStringToPointer.clear();
 }

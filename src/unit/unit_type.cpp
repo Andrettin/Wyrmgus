@@ -542,16 +542,6 @@ unit_type::unit_type(const std::string &identifier) : detailed_data_entry(identi
 
 unit_type::~unit_type()
 {
-#ifdef USE_MNG
-	if (this->Portrait.Num) {
-		for (int j = 0; j < this->Portrait.Num; ++j) {
-			delete this->Portrait.Mngs[j];
-			// delete[] this->Portrait.Files[j];
-		}
-		delete[] this->Portrait.Mngs;
-		delete[] this->Portrait.Files;
-	}
-#endif
 }
 
 void unit_type::process_sml_property(const sml_property &property)
@@ -2660,9 +2650,11 @@ void LoadUnitTypeSprite(wyrmgus::unit_type &type)
 
 #ifdef USE_MNG
 	if (type.Portrait.Num) {
+		type.Portrait.Mngs.clear();
 		for (int i = 0; i < type.Portrait.Num; ++i) {
-			type.Portrait.Mngs[i] = new Mng;
-			type.Portrait.Mngs[i]->Load(type.Portrait.Files[i]);
+			auto mng = std::make_unique<Mng>();
+			mng->Load(type.Portrait.Files[i]);
+			type.Portrait.Mngs.push_back(std::move(mng));
 		}
 		// FIXME: should be configurable
 		type.Portrait.CurrMng = 0;

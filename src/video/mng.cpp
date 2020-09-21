@@ -199,9 +199,7 @@ static mng_bool MNG_DECL my_errorproc(mng_handle handle, mng_int32,
 }
 
 
-Mng::Mng() :
-	name(nullptr), fd(nullptr), handle(nullptr), surface(nullptr), buffer(nullptr),
-	ticks(0), iteration(0)
+Mng::Mng()
 {
 	texture_width = texture_height = texture_name = 0;
 }

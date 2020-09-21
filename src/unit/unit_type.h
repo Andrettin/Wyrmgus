@@ -1063,9 +1063,9 @@ public:
 	IconConfig Icon;                /// Icon to display for this unit
 #ifdef USE_MNG
 	struct _portrait_ {
-		std::string *Files;
+		std::vector<std::string> Files;
 		int Num;
-		Mng **Mngs;
+		std::vector<std::unique_ptr<Mng>> Mngs;
 		mutable int CurrMng;
 		mutable int NumIterations;
 	} Portrait;

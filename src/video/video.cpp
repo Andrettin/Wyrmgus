@@ -114,33 +114,38 @@ public:
 class CColorCycling
 {
 private:
-	CColorCycling() : ColorCycleAll(false), cycleCount(0)
-	{}
-
 	static void CreateInstanceIfNeeded()
 	{
 		if (s_instance == nullptr) {
-			s_instance = new CColorCycling;
+			s_instance = std::make_unique<CColorCycling>();
 		}
 	}
 
 public:
-	static CColorCycling &GetInstance() { CreateInstanceIfNeeded(); return *s_instance; }
+	static CColorCycling &GetInstance()
+	{
+		CreateInstanceIfNeeded();
+		return *s_instance;
+	}
 
-	static void ReleaseInstance() { delete s_instance; s_instance = nullptr; }
+	static void ReleaseInstance()
+	{
+		s_instance.reset();
+	}
+
 public:
 	std::vector<SDL_Surface *> PaletteList;        /// List of all used palettes.
 	std::vector<ColorIndexRange> ColorIndexRanges; /// List of range of color index for cycling.
-	bool ColorCycleAll;                            /// Flag Color Cycle with all palettes
-	unsigned int cycleCount;
+	bool ColorCycleAll = false;                    /// Flag Color Cycle with all palettes
+	unsigned int cycleCount = 0;
 private:
-	static CColorCycling *s_instance;
+	static std::unique_ptr<CColorCycling> s_instance;
 };
 
 extern void InitVideoSdl();         /// Init SDL video hardware driver
 
 CVideo Video;
-/*static*/ CColorCycling *CColorCycling::s_instance = nullptr;
+std::unique_ptr<CColorCycling> CColorCycling::s_instance;
 
 //Wyrmgus start
 //bool ZoomNoResize;

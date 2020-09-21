@@ -313,12 +313,12 @@ public:
 	void Draw(int x, int y);
 
 	std::string name;
-	FILE *fd;
-	mng_handle handle;
-	SDL_Surface *surface;
-	unsigned char *buffer;
-	unsigned long ticks;
-	int iteration;
+	FILE *fd = nullptr;
+	mng_handle handle = nullptr;
+	SDL_Surface *surface = nullptr;
+	unsigned char *buffer = nullptr;
+	unsigned long ticks = 0;
+	int iteration = 0;
 #if defined(USE_OPENGL) || defined(USE_GLES)
 	GLfloat texture_width;   /// Width of the texture
 	GLfloat texture_height;  /// Height of the texture

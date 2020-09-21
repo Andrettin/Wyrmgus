@@ -10,7 +10,7 @@
 //
 /**@name script_grand_strategy.cpp - The grand strategy ccl functions. */
 //
-//      (c) Copyright 2016 by Andrettin
+//      (c) Copyright 2016-2020 by Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -27,23 +27,11 @@
 //      02111-1307, USA.
 //
 
-/*----------------------------------------------------------------------------
---  Includes
-----------------------------------------------------------------------------*/
-
 #include "stratagus.h"
 
 #include "grand_strategy.h"
 #include "luacallback.h"
 #include "world.h"
-
-/*----------------------------------------------------------------------------
---  Variables
-----------------------------------------------------------------------------*/
-
-/*----------------------------------------------------------------------------
---  Functions
-----------------------------------------------------------------------------*/
 
 /**
 **  Get grand strategy province data.
@@ -118,11 +106,12 @@ static int CclDefineGrandStrategyEvent(lua_State *l)
 	std::string event_name = LuaToString(l, 1);
 	CGrandStrategyEvent *event = GetGrandStrategyEvent(event_name);
 	if (!event) {
-		event = new CGrandStrategyEvent;
+		auto new_event = std::make_unique<CGrandStrategyEvent>();
+		event = new_event.get();
 		event->Name = event_name;
 		event->ID = GrandStrategyEvents.size();
-		GrandStrategyEvents.push_back(event);
 		GrandStrategyEventStringToPointer[event_name] = event;
+		GrandStrategyEvents.push_back(std::move(new_event));
 	}
 	
 	//  Parse the list:
@@ -143,7 +132,7 @@ static int CclDefineGrandStrategyEvent(lua_State *l)
 			wyrmgus::world *world = wyrmgus::world::get(LuaToString(l, -1));
 			event->World = world;
 		} else if (!strcmp(value, "Conditions")) {
-			event->Conditions = new LuaCallback(l, -1);
+			event->Conditions = std::make_unique<LuaCallback>(l, -1);
 		} else if (!strcmp(value, "Options")) {
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument");
@@ -160,7 +149,7 @@ static int CclDefineGrandStrategyEvent(lua_State *l)
 			const int subargs = lua_rawlen(l, -1);
 			for (int j = 0; j < subargs; ++j) {
 				lua_rawgeti(l, -1, j + 1);
-				event->OptionEffects.push_back(new LuaCallback(l, -1));
+				event->OptionEffects.push_back(std::make_unique<LuaCallback>(l, -1));
 				lua_pop(l, 1);
 			}
 		} else if (!strcmp(value, "OptionConditions")) {
@@ -170,7 +159,7 @@ static int CclDefineGrandStrategyEvent(lua_State *l)
 			const int subargs = lua_rawlen(l, -1);
 			for (int j = 0; j < subargs; ++j) {
 				lua_rawgeti(l, -1, j + 1);
-				event->OptionConditions.push_back(new LuaCallback(l, -1));
+				event->OptionConditions.push_back(std::make_unique<LuaCallback>(l, -1));
 				lua_pop(l, 1);
 			}
 		} else if (!strcmp(value, "OptionTooltips")) {
