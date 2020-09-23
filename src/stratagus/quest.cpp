@@ -66,9 +66,9 @@ void SaveQuestCompletion()
 		return;
 	}
 
-	for (const CAchievement *achievement : CAchievement::GetAchievements()) {
+	for (const wyrmgus::achievement *achievement : wyrmgus::achievement::get_all()) {
 		if (achievement->is_obtained()) {
-			fprintf(fd, "SetAchievementObtained(\"%s\", false, false)\n", achievement->Ident.c_str());
+			fprintf(fd, "SetAchievementObtained(\"%s\", false, false)\n", achievement->get_identifier().c_str());
 		}
 	}
 	
@@ -221,7 +221,7 @@ void SetQuestCompleted(const std::string &quest_ident, int difficulty, bool save
 		SaveQuestCompletion();
 	}
 
-	CAchievement::CheckAchievements();
+	wyrmgus::achievement::check_achievements();
 }
 
 void SetQuestCompleted(const std::string &quest_ident, bool save)

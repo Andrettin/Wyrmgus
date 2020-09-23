@@ -545,40 +545,38 @@ static int CclDefineAchievement(lua_State *l)
 		LuaError(l, "incorrect argument (expected table)");
 	}
 
-	std::string achievement_ident = LuaToString(l, 1);
-	CAchievement *achievement = CAchievement::GetOrAddAchievement(achievement_ident);
+	const std::string identifier = LuaToString(l, 1);
+	wyrmgus::achievement *achievement = wyrmgus::achievement::get_or_add(identifier, nullptr);
 	
 	//  Parse the list:
 	for (lua_pushnil(l); lua_next(l, 2); lua_pop(l, 1)) {
 		const char *value = LuaToString(l, -2);
 		
 		if (!strcmp(value, "Name")) {
-			achievement->name = LuaToString(l, -1);
+			achievement->set_name(LuaToString(l, -1));
 		} else if (!strcmp(value, "Description")) {
 			achievement->description = LuaToString(l, -1);
 		} else if (!strcmp(value, "PlayerColor")) {
 			const std::string color_name = LuaToString(l, -1);
-			achievement->PlayerColor = wyrmgus::player_color::get(color_name);
+			achievement->player_color = wyrmgus::player_color::get(color_name);
 		} else if (!strcmp(value, "CharacterLevel")) {
-			achievement->CharacterLevel = LuaToNumber(l, -1);
+			achievement->character_level = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "Difficulty")) {
 			achievement->Difficulty = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "Hidden")) {
 			achievement->hidden = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "Unobtainable")) {
-			achievement->Unobtainable = LuaToBoolean(l, -1);
+			achievement->unobtainable = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "Icon")) {
-			achievement->Icon.Name = LuaToString(l, -1);
-			achievement->Icon.Icon = nullptr;
-			achievement->Icon.Load();
+			achievement->icon = wyrmgus::icon::get(LuaToString(l, -1));
 		} else if (!strcmp(value, "Character")) {
-			std::string character_name = LuaToString(l, -1);
-			wyrmgus::character *character = wyrmgus::character::get(character_name);
-			achievement->Character = character;
+			const std::string character_identifier = LuaToString(l, -1);
+			wyrmgus::character *character = wyrmgus::character::get(character_identifier);
+			achievement->character = character;
 		} else if (!strcmp(value, "CharacterType")) {
 			const std::string unit_type_ident = LuaToString(l, -1);
 			wyrmgus::unit_type *unit_type = wyrmgus::unit_type::get(unit_type_ident);
-			achievement->CharacterType = unit_type;
+			achievement->character_type = unit_type;
 		} else if (!strcmp(value, "RequiredQuests")) {
 			achievement->RequiredQuests.clear();
 			const int args = lua_rawlen(l, -1);
@@ -597,10 +595,10 @@ static int CclDefineAchievement(lua_State *l)
 
 static int CclGetAchievements(lua_State *l)
 {
-	lua_createtable(l, CAchievement::GetAchievements().size(), 0);
-	for (size_t i = 1; i <= CAchievement::GetAchievements().size(); ++i)
+	lua_createtable(l, wyrmgus::achievement::get_all().size(), 0);
+	for (size_t i = 1; i <= wyrmgus::achievement::get_all().size(); ++i)
 	{
-		lua_pushstring(l, CAchievement::GetAchievements()[i-1]->Ident.c_str());
+		lua_pushstring(l, wyrmgus::achievement::get_all()[i-1]->get_identifier().c_str());
 		lua_rawseti(l, -2, i);
 	}
 	return 1;
@@ -616,11 +614,8 @@ static int CclGetAchievementData(lua_State *l)
 	if (lua_gettop(l) < 2) {
 		LuaError(l, "incorrect argument");
 	}
-	std::string achievement_ident = LuaToString(l, 1);
-	const CAchievement *achievement = CAchievement::GetAchievement(achievement_ident);
-	if (!achievement) {
-		LuaError(l, "Achievement \"%s\" doesn't exist." _C_ achievement_ident.c_str());
-	}
+	const std::string achievement_ident = LuaToString(l, 1);
+	const wyrmgus::achievement *achievement = wyrmgus::achievement::get(achievement_ident);
 	const char *data = LuaToString(l, 2);
 
 	if (!strcmp(data, "Name")) {
@@ -630,28 +625,11 @@ static int CclGetAchievementData(lua_State *l)
 		lua_pushstring(l, achievement->get_description().c_str());
 		return 1;
 	} else if (!strcmp(data, "PlayerColor")) {
-		if (achievement->PlayerColor != nullptr) {
-			lua_pushstring(l, achievement->PlayerColor->get_identifier().c_str());
+		if (achievement->get_player_color() != nullptr) {
+			lua_pushstring(l, achievement->get_player_color()->get_identifier().c_str());
 		} else {
 			lua_pushstring(l, "");
 		}
-		return 1;
-	} else if (!strcmp(data, "Character")) {
-		if (achievement->Character) {
-			lua_pushstring(l, achievement->Character->Ident.c_str());
-		} else {
-			lua_pushstring(l, "");
-		}
-		return 1;
-	} else if (!strcmp(data, "CharacterType")) {
-		if (achievement->CharacterType) {
-			lua_pushstring(l, achievement->CharacterType->Ident.c_str());
-		} else {
-			lua_pushstring(l, "");
-		}
-		return 1;
-	} else if (!strcmp(data, "CharacterLevel")) {
-		lua_pushnumber(l, achievement->CharacterLevel);
 		return 1;
 	} else if (!strcmp(data, "Difficulty")) {
 		lua_pushnumber(l, achievement->Difficulty);
@@ -662,17 +640,14 @@ static int CclGetAchievementData(lua_State *l)
 	} else if (!strcmp(data, "Obtained")) {
 		lua_pushboolean(l, achievement->is_obtained());
 		return 1;
-	} else if (!strcmp(data, "Unobtainable")) {
-		lua_pushboolean(l, achievement->Unobtainable);
-		return 1;
 	} else if (!strcmp(data, "Progress")) {
-		lua_pushnumber(l, achievement->GetProgress());
+		lua_pushnumber(l, achievement->get_progress());
 		return 1;
 	} else if (!strcmp(data, "ProgressMax")) {
-		lua_pushnumber(l, achievement->GetProgressMax());
+		lua_pushnumber(l, achievement->get_progress_max());
 		return 1;
 	} else if (!strcmp(data, "Icon")) {
-		lua_pushstring(l, achievement->Icon.Name.c_str());
+		lua_pushstring(l, achievement->get_icon()->get_identifier().c_str());
 		return 1;
 	} else {
 		LuaError(l, "Invalid field: %s" _C_ data);

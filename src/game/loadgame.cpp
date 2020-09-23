@@ -27,7 +27,6 @@
 
 #include "stratagus.h"
 
-#include "achievement.h"
 #include "actions.h"
 #include "ai.h"
 #include "commands.h"
@@ -83,7 +82,6 @@ void CleanModules()
 
 	CleanUserInterface();
 	FreeAi();
-	CAchievement::ClearAchievements();
 	CCurrency::ClearCurrencies();
 	CleanDecorations();
 	//Wyrmgus start

@@ -111,7 +111,7 @@ enum ImageLayers {
 
 namespace wyrmgus {
 
-class resource_info
+class resource_info final
 {
 public:
 	explicit resource_info(const unit_type *unit_type, const resource *resource)
@@ -460,11 +460,11 @@ public:
 	bool ShowIfCanCastAnySpell;   /// if true, only show if the unit can cast a spell.
 };
 
-class CDecoVarBar : public CDecoVar
+class CDecoVarBar final : public CDecoVar
 {
 public:
 	/// function to draw the decorations.
-	virtual void Draw(int x, int y, const wyrmgus::unit_type &type, const wyrmgus::unit_variable &var) const;
+	virtual void Draw(int x, int y, const wyrmgus::unit_type &type, const wyrmgus::unit_variable &var) const override;
 
 	bool IsVertical;            /// if true, vertical bar, else horizontal.
 	bool SEToNW;                /// (SouthEastToNorthWest), if false value 0 is on the left or up of the bar.
@@ -477,7 +477,7 @@ public:
 	IntColor BColor;            /// Color of background.
 };
 
-class CDecoVarText : public CDecoVar
+class CDecoVarText final : public CDecoVar
 {
 public:
 	/// function to draw the decorations.
@@ -488,25 +488,24 @@ public:
 };
 
 /// Sprite contains frame from full (left)to empty state (right).
-class CDecoVarSpriteBar : public CDecoVar
+class CDecoVarSpriteBar final : public CDecoVar
 {
 public:
 	CDecoVarSpriteBar() : NSprite(-1) {};
 	/// function to draw the decorations.
-	virtual void Draw(int x, int y,
-					  const wyrmgus::unit_type &type, const wyrmgus::unit_variable &var) const;
+	virtual void Draw(int x, int y, const wyrmgus::unit_type &type, const wyrmgus::unit_variable &var) const override;
 
 	char NSprite; /// Index of number. (@see DefineSprites and @see GetSpriteIndex)
 	// FIXME Sprite info. better way ?
 };
 
 /// use to show specific frame in a sprite.
-class CDecoVarStaticSprite : public CDecoVar
+class CDecoVarStaticSprite final : public CDecoVar
 {
 public:
 	CDecoVarStaticSprite() : NSprite(-1), n(0), FadeValue(0) {}
 	/// function to draw the decorations.
-	virtual void Draw(int x, int y, const wyrmgus::unit_type &type, const wyrmgus::unit_variable &var) const;
+	virtual void Draw(int x, int y, const wyrmgus::unit_type &type, const wyrmgus::unit_variable &var) const override;
 
 	// FIXME Sprite info. and Replace n with more appropriate var.
 	char NSprite;  /// Index of sprite. (@see DefineSprites and @see GetSpriteIndex)

@@ -852,7 +852,7 @@ void CUnit::Retrain()
 							if (Character->get_unit_type() != unit_type) {
 								if (this->Player == CPlayer::GetThisPlayer()) {
 									Character->set_unit_type(unit_type);
-									CAchievement::CheckAchievements();
+									wyrmgus::achievement::check_achievements();
 								}
 							}
 						}
@@ -3616,7 +3616,7 @@ void CUnit::XPChanged()
 		}
 		this->Character->ExperiencePercent = (this->Variable[XP_INDEX].Value * 100) / this->Variable[XPREQUIRED_INDEX].Value;
 		SaveHero(this->Character);
-		CAchievement::CheckAchievements(); // check achievements to see if any hero now has a high enough level for a particular achievement to be obtained
+		wyrmgus::achievement::check_achievements(); // check achievements to see if any hero now has a high enough level for a particular achievement to be obtained
 	}
 }
 //Wyrmgus end

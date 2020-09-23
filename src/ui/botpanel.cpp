@@ -2217,7 +2217,7 @@ void CButtonPanel::DoClicked_ExperienceUpgradeTo(int button)
 						if (Selected[i]->Player == CPlayer::GetThisPlayer()) {
 							Selected[i]->Character->set_unit_type(wyrmgus::unit_type::get_all()[CurrentButtons[button]->Value]);
 							SaveHero(Selected[i]->Character);
-							CAchievement::CheckAchievements();
+							wyrmgus::achievement::check_achievements();
 						}
 					}
 				}

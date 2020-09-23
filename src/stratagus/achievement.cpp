@@ -30,153 +30,81 @@
 #include "achievement.h"
 
 #include "character.h"
-#include "config.h"
 #include "player.h"
 #include "player_color.h"
 #include "quest.h"
 #include "unit/unit_type.h"
 #include "util/string_util.h"
 
-/**
-**	@brief	Get an achievement
-**
-**	@param	ident	The achievement's string identifier
-**
-**	@return	The achievement if found, or null otherwise
-*/
-CAchievement *CAchievement::GetAchievement(const std::string &ident, const bool should_find)
+namespace wyrmgus {
+
+void achievement::check_achievements()
 {
-	std::map<std::string, CAchievement *>::const_iterator find_iterator = CAchievement::AchievementsByIdent.find(ident);
-
-	if (find_iterator != CAchievement::AchievementsByIdent.end()) {
-		return find_iterator->second;
-	}
-
-	if (should_find) {
-		fprintf(stderr, "Invalid achievement: \"%s\".\n", ident.c_str());
-	}
-
-	return nullptr;
-}
-
-/**
-**	@brief	Get or add an achievement
-**
-**	@param	ident	The achievement's string identifier
-**
-**	@return	The achievement if found, otherwise a new achievement is created and returned
-*/
-CAchievement *CAchievement::GetOrAddAchievement(const std::string &ident)
-{
-	CAchievement *achievement = CAchievement::GetAchievement(ident, false);
-
-	if (!achievement) {
-		achievement = new CAchievement;
-		achievement->Ident = ident;
-		CAchievement::Achievements.push_back(achievement);
-		CAchievement::AchievementsByIdent[ident] = achievement;
-	}
-
-	return achievement;
-}
-
-const std::vector<CAchievement *> &CAchievement::GetAchievements()
-{
-	return CAchievement::Achievements;
-}
-
-void CAchievement::ClearAchievements()
-{
-	for (CAchievement *achievement : CAchievement::Achievements) {
-		delete achievement;
-	}
-	CAchievement::Achievements.clear();
-}
-
-void CAchievement::CheckAchievements()
-{
-	for (CAchievement *achievement : CAchievement::Achievements) {
+	for (achievement *achievement : achievement::get_all()) {
 		if (achievement->is_obtained()) {
 			continue;
 		}
 
-		if (achievement->CanObtain()) {
-			achievement->Obtain();
+		if (achievement->can_obtain()) {
+			achievement->obtain();
 		}
 	}
 }
 
-/**
-**	@brief	Process data provided by a configuration file
-**
-**	@param	config_data	The configuration data
-*/
-void CAchievement::ProcessConfigData(const CConfigData *config_data)
+void achievement::process_sml_property(const sml_property &property)
 {
-	for (size_t i = 0; i < config_data->Properties.size(); ++i) {
-		std::string key = config_data->Properties[i].first;
-		std::string value = config_data->Properties[i].second;
+	const std::string &key = property.get_key();
+	const std::string &value = property.get_value();
 
-		if (key == "name") {
-			this->name = value;
-		} else if (key == "description") {
-			this->description = value;
-		} else if (key == "player_color") {
-			this->PlayerColor = wyrmgus::player_color::get(value);
-		} else if (key == "character_level") {
-			this->CharacterLevel = std::stoi(value);
-		} else if (key == "difficulty") {
-			this->Difficulty = std::stoi(value);
-		} else if (key == "hidden") {
-			this->hidden = string::to_bool(value);
-		} else if (key == "unobtainable") {
-			this->Unobtainable = string::to_bool(value);
-		} else if (key == "icon") {
-			value = FindAndReplaceString(value, "_", "-");
-			this->Icon.Name = value;
-			this->Icon.Icon = nullptr;
-			this->Icon.Load();
-		} else if (key == "character") {
-			const wyrmgus::character *character = wyrmgus::character::get(value);
-			this->Character = character;
-		} else if (key == "character_type") {
-			const wyrmgus::unit_type *unit_type = wyrmgus::unit_type::get(value);
-			this->CharacterType = unit_type;
-		} else if (key == "required_quest") {
-			const wyrmgus::quest *required_quest = wyrmgus::quest::get(value);
-			this->RequiredQuests.push_back(required_quest);
-		} else {
-			fprintf(stderr, "Invalid achievement property: \"%s\".\n", key.c_str());
-		}
+	if (key == "description") {
+		this->description = value;
+	} else if (key == "difficulty") {
+		this->Difficulty = std::stoi(value);
+	} else {
+		data_entry::process_sml_property(property);
 	}
 }
 
-bool CAchievement::CanObtain() const
+void achievement::process_sml_scope(const sml_data &scope)
 {
-	if (this->is_obtained() || this->Unobtainable) {
+	const std::string &tag = scope.get_tag();
+	const std::vector<std::string> &values = scope.get_values();
+
+	if (tag == "required_quests") {
+		for (const std::string &value : values) {
+			this->RequiredQuests.push_back(quest::get(value));
+		}
+	} else {
+		data_entry::process_sml_scope(scope);
+	}
+}
+
+bool achievement::can_obtain() const
+{
+	if (this->is_obtained() || this->unobtainable) {
 		return false;
 	}
 
-	for (const wyrmgus::quest *required_quest : this->RequiredQuests) {
+	for (const quest *required_quest : this->RequiredQuests) {
 		if (!required_quest->Completed || (this->Difficulty != -1 && required_quest->HighestCompletedDifficulty < this->Difficulty)) {
 			return false;
 		}
 	}
 
-	if (this->Character) {
-		if (this->CharacterType && this->Character->get_unit_type() != this->CharacterType) {
+	if (this->character != nullptr) {
+		if (this->character_type != nullptr && this->character->get_unit_type() != this->character_type) {
 			return false;
 		}
-		if (this->CharacterLevel && this->Character->get_level() < this->CharacterLevel) {
+		if (this->character_level > 0 && this->character->get_level() < this->character_level) {
 			return false;
 		}
-	} else if (this->CharacterType || this->CharacterLevel) {
+	} else if (this->character_type != nullptr || this->character_level > 0) {
 		bool found_hero = false;
 		for (std::map<std::string, wyrmgus::character *>::iterator iterator = CustomHeroes.begin(); iterator != CustomHeroes.end(); ++iterator) {
-			if (this->CharacterType && iterator->second->get_unit_type() != this->CharacterType) {
+			if (this->character_type && iterator->second->get_unit_type() != this->character_type) {
 				continue;
 			}
-			if (this->CharacterLevel && iterator->second->get_level() < this->CharacterLevel) {
+			if (this->character_level > 0 && iterator->second->get_level() < this->character_level) {
 				continue;
 			}
 			found_hero = true;
@@ -190,7 +118,7 @@ bool CAchievement::CanObtain() const
 	return true;
 }
 
-void CAchievement::Obtain(const bool save, const bool display)
+void achievement::obtain(const bool save, const bool display)
 {
 	if (this->is_obtained()) {
 		return;
@@ -203,34 +131,34 @@ void CAchievement::Obtain(const bool save, const bool display)
 	}
 
 	if (display) {
-		CclCommand("if (GenericDialog ~= nil) then GenericDialog(\"Achievement Unlocked!\", \"You have unlocked the " + this->get_name() + " achievement.\", nil, \"" + this->Icon.Name + "\", \"" + (this->PlayerColor ? this->PlayerColor->get_identifier() : "") + "\") end;");
+		CclCommand("if (GenericDialog ~= nil) then GenericDialog(\"Achievement Unlocked!\", \"You have unlocked the " + this->get_name() + " achievement.\", nil, \"" + this->get_icon()->get_identifier() + "\", \"" + (this->get_player_color() ? this->get_player_color()->get_identifier() : "") + "\") end;");
 	}
 }
 
-int CAchievement::GetProgress() const
+int achievement::get_progress() const
 {
-	if (this->Unobtainable) {
+	if (this->unobtainable) {
 		return 0;
 	}
 
 	int progress = 0;
 
-	for (const wyrmgus::quest *required_quest : this->RequiredQuests) {
+	for (const quest *required_quest : this->RequiredQuests) {
 		if (required_quest->Completed && (this->Difficulty == -1 || required_quest->HighestCompletedDifficulty >= this->Difficulty)) {
 			progress++;
 		}
 	}
 
-	if (this->Character) {
-		if (this->CharacterLevel) {
-			progress += std::min(this->Character->get_level(), this->CharacterLevel);
+	if (this->character != nullptr) {
+		if (this->character_level > 0) {
+			progress += std::min(this->character->get_level(), this->character_level);
 		}
-	} else if (this->CharacterLevel) {
+	} else if (this->character_level > 0) {
 		int highest_level = 0;
 		for (std::map<std::string, wyrmgus::character *>::iterator iterator = CustomHeroes.begin(); iterator != CustomHeroes.end(); ++iterator) {
 			highest_level = std::max(highest_level, iterator->second->get_level());
-			if (highest_level >= this->CharacterLevel) {
-				highest_level = this->CharacterLevel;
+			if (highest_level >= this->character_level) {
+				highest_level = this->character_level;
 				break;
 				continue;
 			}
@@ -241,25 +169,27 @@ int CAchievement::GetProgress() const
 	return progress;
 }
 
-int CAchievement::GetProgressMax() const
+int achievement::get_progress_max() const
 {
-	if (this->Unobtainable) {
+	if (this->unobtainable) {
 		return 0;
 	}
 
 	int progress_max = 0;
 	progress_max += this->RequiredQuests.size();
-	progress_max += this->CharacterLevel;
+	progress_max += this->character_level;
 
 	return progress_max;
 }
 
+}
+
 void SetAchievementObtained(const std::string &achievement_ident, const bool save, const bool display)
 {
-	CAchievement *achievement = CAchievement::GetAchievement(achievement_ident);
+	wyrmgus::achievement *achievement = wyrmgus::achievement::get(achievement_ident);
 	if (!achievement) {
 		return;
 	}
 
-	achievement->Obtain(save, display);
+	achievement->obtain(save, display);
 }

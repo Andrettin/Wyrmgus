@@ -27,42 +27,66 @@
 
 #pragma once
 
-#include "data_type.h"
-#include "ui/icon.h"
+#include "database/data_type.h"
+#include "database/named_data_entry.h"
 
 struct lua_State;
 
+int CclDefineAchievement(lua_State *l);
+
 namespace wyrmgus {
-	class character;
-	class player_color;
-	class quest;
-	class unit_type;
-}
 
-class CAchievement : public CDataType
+class character;
+class icon;
+class player_color;
+class quest;
+class unit_type;
+
+class achievement final : public named_data_entry, public data_type<achievement>
 {
+	Q_OBJECT
+
+	Q_PROPERTY(wyrmgus::icon* icon MEMBER icon READ get_icon)
+	Q_PROPERTY(wyrmgus::player_color* player_color MEMBER player_color READ get_player_color)
+	Q_PROPERTY(bool hidden MEMBER hidden READ is_hidden)
+	Q_PROPERTY(bool unobtainable MEMBER unobtainable)
+	Q_PROPERTY(wyrmgus::character* character MEMBER character)
+	Q_PROPERTY(wyrmgus::unit_type* character_type MEMBER character_type)
+	Q_PROPERTY(int character_level MEMBER character_level)
+
 public:
-	static CAchievement *GetAchievement(const std::string &ident, const bool should_find = true);
-	static CAchievement *GetOrAddAchievement(const std::string &ident);
-	static const std::vector<CAchievement *> &GetAchievements();
-	static void ClearAchievements();
-	static void CheckAchievements();
+	static constexpr const char *class_identifier = "achievement";
+	static constexpr const char *database_folder = "achievements";
 
-private:
-	static inline std::vector<CAchievement *> Achievements;
-	static inline std::map<std::string, CAchievement *> AchievementsByIdent;
+	static void check_achievements();
 
-public:
-	virtual void ProcessConfigData(const CConfigData *config_data) override;
-
-	const std::string &get_name() const
+	explicit achievement(const std::string &identifier) : named_data_entry(identifier)
 	{
-		return this->name;
+	}
+
+	virtual void process_sml_property(const sml_property &property) override;
+	virtual void process_sml_scope(const sml_data &scope) override;
+
+	virtual void check() const override
+	{
+		if (this->get_icon() == nullptr) {
+			throw std::runtime_error("Achievement \"" + this->get_identifier() + "\" has no icon.");
+		}
+	}
+
+	icon *get_icon() const
+	{
+		return this->icon;
 	}
 
 	const std::string &get_description() const
 	{
 		return this->description;
+	}
+
+	player_color *get_player_color() const
+	{
+		return this->player_color;
 	}
 
 	bool is_hidden() const
@@ -75,30 +99,31 @@ public:
 		return this->obtained;
 	}
 
-	bool CanObtain() const;
-	void Obtain(bool save = true, bool display = true);
-	int GetProgress() const;
-	int GetProgressMax() const;
+	bool can_obtain() const;
+	void obtain(bool save = true, bool display = true);
+	int get_progress() const;
+	int get_progress_max() const;
 
-	std::string Ident;				/// Ident of the achievement
 private:
-	std::string name;				/// Name of the achievement
-	std::string description;		/// Description of the achievement
+	wyrmgus::icon *icon = nullptr;
+	std::string description;
+	wyrmgus::player_color *player_color = nullptr; //player color used for the achievement's icon
 public:
-	const wyrmgus::player_color *PlayerColor = nullptr; //player color used for the achievement's icon
-	int CharacterLevel = 0;			/// Character level required for the achievement
-	int Difficulty = -1;			/// Which difficulty the achievement's requirements need to be done in
+	int Difficulty = -1; //in which difficulty the achievement's requirements need to be done
 private:
-	bool hidden = false;			/// Whether the achievement is hidden
-	bool obtained = false;			/// Whether the achievement has been obtained
+	bool hidden = false;
+	bool unobtainable = false; //whether this achievement can be obtained by checking for it or not
+	wyrmgus::character *character = nullptr; //character related to the achievement's requirements
+	unit_type *character_type = nullptr; //unit type required for a character to have for the achievement
+	int character_level = 0; //character level required for the achievement
 public:
-	bool Unobtainable = false;		/// Whether this achievement can be obtained by checking for it or not
-	IconConfig Icon;				/// Achievement's icon
-	const wyrmgus::character *Character = nullptr;	/// Character related to the achievement's requirements
-	const wyrmgus::unit_type *CharacterType = nullptr;	/// Unit type required for a character to have for the achievement
-	std::vector<const wyrmgus::quest *> RequiredQuests;	/// Quests required for obtaining this achievement
+	std::vector<const quest *> RequiredQuests;
+private:
+	bool obtained = false;
 
-	friend int CclDefineAchievement(lua_State *l);
+	friend int ::CclDefineAchievement(lua_State *l);
 };
+
+}
 
 extern void SetAchievementObtained(const std::string &achievement_ident, const bool save = true, const bool display = true);
