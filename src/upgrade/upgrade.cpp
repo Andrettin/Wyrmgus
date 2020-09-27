@@ -196,8 +196,6 @@ CUpgrade::CUpgrade(const std::string &identifier) : detailed_data_entry(identifi
 	//Wyrmgus start
 	memset(this->ScaledCosts, 0, sizeof(this->ScaledCosts));
 	memset(this->GrandStrategyProductionEfficiencyModifier, 0, sizeof(this->GrandStrategyProductionEfficiencyModifier));
-	memset(this->ItemPrefix, 0, sizeof(this->ItemPrefix));
-	memset(this->ItemSuffix, 0, sizeof(this->ItemSuffix));
 	memset(this->IncompatibleAffixes, 0, sizeof(this->IncompatibleAffixes));
 	//Wyrmgus end
 }
@@ -224,6 +222,7 @@ void CUpgrade::process_sml_property(const wyrmgus::sml_property &property)
 void CUpgrade::process_sml_scope(const wyrmgus::sml_data &scope)
 {
 	const std::string &tag = scope.get_tag();
+	const std::vector<std::string> &values = scope.get_values();
 
 	if (tag == "costs") {
 		scope.for_each_property([&](const wyrmgus::sml_property &property) {
@@ -256,6 +255,10 @@ void CUpgrade::process_sml_scope(const wyrmgus::sml_data &scope)
 	} else if (tag == "conditions") {
 		this->conditions = std::make_unique<wyrmgus::and_condition>();
 		wyrmgus::database::process_sml_data(this->conditions, scope);
+	} else if (tag == "affixed_item_classes") {
+		for (const std::string &value : values) {
+			this->affixed_item_classes.insert(wyrmgus::string_to_item_class(value));
+		}
 	}
 }
 
@@ -326,20 +329,17 @@ void CUpgrade::set_parent(const CUpgrade *parent_upgrade)
 		this->ScaledCosts[i] = parent_upgrade->ScaledCosts[i];
 		this->GrandStrategyProductionEfficiencyModifier[i] = parent_upgrade->GrandStrategyProductionEfficiencyModifier[i];
 	}
-	for (int i = 0; i < static_cast<int>(wyrmgus::item_class::count); ++i) {
-		this->ItemPrefix[i] = parent_upgrade->ItemPrefix[i];
-		this->ItemSuffix[i] = parent_upgrade->ItemSuffix[i];
-	}
+	this->affixed_item_classes = parent_upgrade->affixed_item_classes;
 	this->MaxLimit = parent_upgrade->MaxLimit;
-	this->MagicLevel = parent_upgrade->MagicLevel;
+	this->magic_level = parent_upgrade->magic_level;
 	this->ability = parent_upgrade->is_ability();
 	this->weapon = parent_upgrade->is_weapon();
 	this->shield = parent_upgrade->is_shield();
 	this->boots = parent_upgrade->is_boots();
 	this->arrows = parent_upgrade->is_arrows();
 	this->item = parent_upgrade->get_item();
-	this->MagicPrefix = parent_upgrade->MagicPrefix;
-	this->MagicSuffix = parent_upgrade->MagicSuffix;
+	this->magic_prefix = parent_upgrade->magic_prefix;
+	this->magic_suffix = parent_upgrade->magic_suffix;
 	this->RunicAffix = parent_upgrade->RunicAffix;
 	this->Work = parent_upgrade->Work;
 	this->UniqueOnly = parent_upgrade->UniqueOnly;
@@ -484,7 +484,7 @@ static int CclDefineUpgrade(lua_State *l)
 		} else if (!strcmp(value, "MaxLimit")) {
 			upgrade->MaxLimit = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "MagicLevel")) {
-			upgrade->MagicLevel = LuaToNumber(l, -1);
+			upgrade->magic_level = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "Year")) {
 			upgrade->Year = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "Ability")) {
@@ -498,9 +498,9 @@ static int CclDefineUpgrade(lua_State *l)
 		} else if (!strcmp(value, "Arrows")) {
 			upgrade->arrows = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "MagicPrefix")) {
-			upgrade->MagicPrefix = LuaToBoolean(l, -1);
+			upgrade->magic_prefix = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "MagicSuffix")) {
-			upgrade->MagicSuffix = LuaToBoolean(l, -1);
+			upgrade->magic_suffix = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "RunicAffix")) {
 			upgrade->RunicAffix = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "UniqueOnly")) {
@@ -580,25 +580,15 @@ static int CclDefineUpgrade(lua_State *l)
 
 				priority_faction->UpgradePriorities[upgrade] = priority;
 			}
-		} else if (!strcmp(value, "ItemPrefix")) {
+		} else if (!strcmp(value, "ItemAffix")) {
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument (expected table)");
 			}
 			const int subargs = lua_rawlen(l, -1);
 			for (int j = 0; j < subargs; ++j) {
-				const int item_class = static_cast<int>(wyrmgus::string_to_item_class(LuaToString(l, -1, j + 1)));
+				const wyrmgus::item_class item_class = wyrmgus::string_to_item_class(LuaToString(l, -1, j + 1));
 				
-				upgrade->ItemPrefix[item_class] = true;
-			}
-		} else if (!strcmp(value, "ItemSuffix")) {
-			if (!lua_istable(l, -1)) {
-				LuaError(l, "incorrect argument (expected table)");
-			}
-			const int subargs = lua_rawlen(l, -1);
-			for (int j = 0; j < subargs; ++j) {
-				const int item_class = static_cast<int>(wyrmgus::string_to_item_class(LuaToString(l, -1, j + 1)));
-
-				upgrade->ItemSuffix[item_class] = true;
+				upgrade->affixed_item_classes.insert(item_class);
 			}
 		} else if (!strcmp(value, "IncompatibleAffixes")) {
 			if (!lua_istable(l, -1)) {
@@ -912,7 +902,7 @@ static int CclGetItemPrefixes(lua_State *l)
 {
 	std::vector<const CUpgrade *> item_prefixes;
 	for (const CUpgrade *upgrade : CUpgrade::get_all()) {
-		if (upgrade->MagicPrefix) {
+		if (upgrade->is_magic_prefix()) {
 			item_prefixes.push_back(upgrade);
 		}
 	}
@@ -930,7 +920,7 @@ static int CclGetItemSuffixes(lua_State *l)
 {
 	std::vector<const CUpgrade *> item_suffixes;
 	for (const CUpgrade *upgrade : CUpgrade::get_all()) {
-		if (upgrade->MagicSuffix && !upgrade->RunicAffix) {
+		if (upgrade->is_magic_suffix() && !upgrade->RunicAffix) {
 			item_suffixes.push_back(upgrade);
 		}
 	}
@@ -948,7 +938,7 @@ static int CclGetRunicSuffixes(lua_State *l)
 {
 	std::vector<const CUpgrade *> item_suffixes;
 	for (const CUpgrade *upgrade : CUpgrade::get_all()) {
-		if (upgrade->MagicSuffix && upgrade->RunicAffix) {
+		if (upgrade->is_magic_suffix() && upgrade->RunicAffix) {
 			item_suffixes.push_back(upgrade);
 		}
 	}
@@ -1046,7 +1036,7 @@ static int CclGetUpgradeData(lua_State *l)
 		return 1;
 	} else if (!strcmp(data, "ItemPrefix")) {
 		if (nargs == 2) { //check if the upgrade is a prefix for any item type
-			if (upgrade->MagicPrefix) {
+			if (upgrade->is_magic_prefix()) {
 				lua_pushboolean(l, true);
 				return 1;
 			} else {
@@ -1056,13 +1046,13 @@ static int CclGetUpgradeData(lua_State *l)
 		} else {
 			LuaCheckArgs(l, 3);
 			const std::string item_class_name = LuaToString(l, 3);
-			const int item_class = static_cast<int>(wyrmgus::string_to_item_class(item_class_name));
-			lua_pushboolean(l, upgrade->ItemPrefix[item_class]);
+			const wyrmgus::item_class item_class = wyrmgus::string_to_item_class(item_class_name);
+			lua_pushboolean(l, upgrade->is_magic_prefix() && upgrade->has_affixed_item_class(item_class));
 			return 1;
 		}
 	} else if (!strcmp(data, "ItemSuffix")) {
 		if (nargs == 2) { //check if the item is a suffix for any item type
-			if (upgrade->MagicSuffix) {
+			if (upgrade->is_magic_suffix()) {
 				lua_pushboolean(l, true);
 				return 1;
 			} else {
@@ -1072,16 +1062,14 @@ static int CclGetUpgradeData(lua_State *l)
 		} else {
 			LuaCheckArgs(l, 3);
 			const std::string item_class_name = LuaToString(l, 3);
-			const int item_class = static_cast<int>(wyrmgus::string_to_item_class(item_class_name));
-			lua_pushboolean(l, upgrade->ItemSuffix[item_class]);
+			const wyrmgus::item_class item_class = wyrmgus::string_to_item_class(item_class_name);
+			lua_pushboolean(l, upgrade->is_magic_suffix() && upgrade->has_affixed_item_class(item_class));
 			return 1;
 		}
 	} else if (!strcmp(data, "AppliesTo")) { //to which unit types or item classes this upgrade applies
 		std::vector<std::string> applies_to;
-		for (int i = 0; i < static_cast<int>(wyrmgus::item_class::count); ++i) {
-			if (upgrade->ItemPrefix[i] || upgrade->ItemSuffix[i]) {
-				applies_to.push_back(wyrmgus::item_class_to_string(static_cast<wyrmgus::item_class>(i)));
-			}
+		for (const wyrmgus::item_class item_class : upgrade->get_affixed_item_classes()) {
+			applies_to.push_back(wyrmgus::item_class_to_string(item_class));
 		}
 
 		for (const auto &upgrade_modifier : upgrade->get_modifiers()) {

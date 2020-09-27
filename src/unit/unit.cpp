@@ -1841,8 +1841,8 @@ void CUnit::SetPrefix(CUpgrade *prefix)
 		for (const auto &modifier : Prefix->get_modifiers()) {
 			RemoveIndividualUpgradeModifier(*this, modifier.get());
 		}
-		this->Variable[MAGICLEVEL_INDEX].Value -= Prefix->MagicLevel;
-		this->Variable[MAGICLEVEL_INDEX].Max -= Prefix->MagicLevel;
+		this->Variable[MAGICLEVEL_INDEX].Value -= Prefix->get_magic_level();
+		this->Variable[MAGICLEVEL_INDEX].Max -= Prefix->get_magic_level();
 	}
 	if (!IsNetworkGame() && Container && Container->Character && Container->Player == CPlayer::GetThisPlayer() && Container->Character->get_item(*this) != nullptr && Container->Character->get_item(*this)->Prefix != prefix) { //update the persistent item, if applicable and if it hasn't been updated yet
 		Container->Character->get_item(*this)->Prefix = prefix;
@@ -1853,8 +1853,8 @@ void CUnit::SetPrefix(CUpgrade *prefix)
 		for (const auto &modifier : Prefix->get_modifiers()) {
 			ApplyIndividualUpgradeModifier(*this, modifier.get());
 		}
-		this->Variable[MAGICLEVEL_INDEX].Value += Prefix->MagicLevel;
-		this->Variable[MAGICLEVEL_INDEX].Max += Prefix->MagicLevel;
+		this->Variable[MAGICLEVEL_INDEX].Value += Prefix->get_magic_level();
+		this->Variable[MAGICLEVEL_INDEX].Max += Prefix->get_magic_level();
 	}
 	
 	this->UpdateItemName();
@@ -1866,8 +1866,8 @@ void CUnit::SetSuffix(CUpgrade *suffix)
 		for (const auto &modifier : Suffix->get_modifiers()) {
 			RemoveIndividualUpgradeModifier(*this, modifier.get());
 		}
-		this->Variable[MAGICLEVEL_INDEX].Value -= Suffix->MagicLevel;
-		this->Variable[MAGICLEVEL_INDEX].Max -= Suffix->MagicLevel;
+		this->Variable[MAGICLEVEL_INDEX].Value -= Suffix->get_magic_level();
+		this->Variable[MAGICLEVEL_INDEX].Max -= Suffix->get_magic_level();
 	}
 	if (!IsNetworkGame() && Container && Container->Character && Container->Player == CPlayer::GetThisPlayer() && Container->Character->get_item(*this) != nullptr && Container->Character->get_item(*this)->Suffix != suffix) { //update the persistent item, if applicable and if it hasn't been updated yet
 		Container->Character->get_item(*this)->Suffix = suffix;
@@ -1878,8 +1878,8 @@ void CUnit::SetSuffix(CUpgrade *suffix)
 		for (const auto &modifier : Suffix->get_modifiers()) {
 			ApplyIndividualUpgradeModifier(*this, modifier.get());
 		}
-		this->Variable[MAGICLEVEL_INDEX].Value += Suffix->MagicLevel;
-		this->Variable[MAGICLEVEL_INDEX].Max += Suffix->MagicLevel;
+		this->Variable[MAGICLEVEL_INDEX].Value += Suffix->get_magic_level();
+		this->Variable[MAGICLEVEL_INDEX].Max += Suffix->get_magic_level();
 	}
 	
 	this->UpdateItemName();
@@ -1899,8 +1899,8 @@ void CUnit::SetSpell(wyrmgus::spell *spell)
 void CUnit::SetWork(CUpgrade *work)
 {
 	if (this->Work != nullptr) {
-		this->Variable[MAGICLEVEL_INDEX].Value -= this->Work->MagicLevel;
-		this->Variable[MAGICLEVEL_INDEX].Max -= this->Work->MagicLevel;
+		this->Variable[MAGICLEVEL_INDEX].Value -= this->Work->get_magic_level();
+		this->Variable[MAGICLEVEL_INDEX].Max -= this->Work->get_magic_level();
 	}
 	
 	if (!IsNetworkGame() && Container && Container->Character && Container->Player == CPlayer::GetThisPlayer() && Container->Character->get_item(*this) != nullptr && Container->Character->get_item(*this)->Work != work) { //update the persistent item, if applicable and if it hasn't been updated yet
@@ -1911,8 +1911,8 @@ void CUnit::SetWork(CUpgrade *work)
 	Work = work;
 	
 	if (this->Work != nullptr) {
-		this->Variable[MAGICLEVEL_INDEX].Value += this->Work->MagicLevel;
-		this->Variable[MAGICLEVEL_INDEX].Max += this->Work->MagicLevel;
+		this->Variable[MAGICLEVEL_INDEX].Value += this->Work->get_magic_level();
+		this->Variable[MAGICLEVEL_INDEX].Max += this->Work->get_magic_level();
 	}
 	
 	this->UpdateItemName();
@@ -1921,8 +1921,8 @@ void CUnit::SetWork(CUpgrade *work)
 void CUnit::SetElixir(CUpgrade *elixir)
 {
 	if (this->Elixir != nullptr) {
-		this->Variable[MAGICLEVEL_INDEX].Value -= this->Elixir->MagicLevel;
-		this->Variable[MAGICLEVEL_INDEX].Max -= this->Elixir->MagicLevel;
+		this->Variable[MAGICLEVEL_INDEX].Value -= this->Elixir->get_magic_level();
+		this->Variable[MAGICLEVEL_INDEX].Max -= this->Elixir->get_magic_level();
 	}
 	
 	if (!IsNetworkGame() && Container && Container->Character && Container->Player == CPlayer::GetThisPlayer() && Container->Character->get_item(*this) != nullptr && Container->Character->get_item(*this)->Elixir != elixir) { //update the persistent item, if applicable and if it hasn't been updated yet
@@ -1933,8 +1933,8 @@ void CUnit::SetElixir(CUpgrade *elixir)
 	Elixir = elixir;
 	
 	if (this->Elixir != nullptr) {
-		this->Variable[MAGICLEVEL_INDEX].Value += this->Elixir->MagicLevel;
-		this->Variable[MAGICLEVEL_INDEX].Max += this->Elixir->MagicLevel;
+		this->Variable[MAGICLEVEL_INDEX].Value += this->Elixir->get_magic_level();
+		this->Variable[MAGICLEVEL_INDEX].Max += this->Elixir->get_magic_level();
 	}
 	
 	this->UpdateItemName();
@@ -1943,8 +1943,8 @@ void CUnit::SetElixir(CUpgrade *elixir)
 void CUnit::SetUnique(wyrmgus::unique_item *unique)
 {
 	if (this->Unique && this->Unique->Set) {
-		this->Variable[MAGICLEVEL_INDEX].Value -= this->Unique->Set->MagicLevel;
-		this->Variable[MAGICLEVEL_INDEX].Max -= this->Unique->Set->MagicLevel;
+		this->Variable[MAGICLEVEL_INDEX].Value -= this->Unique->Set->get_magic_level();
+		this->Variable[MAGICLEVEL_INDEX].Max -= this->Unique->Set->get_magic_level();
 	}
 		
 	if (unique != nullptr) {
@@ -1960,8 +1960,8 @@ void CUnit::SetUnique(wyrmgus::unique_item *unique)
 			this->Variable[GIVERESOURCE_INDEX].Enable = 1;
 		}
 		if (unique->Set) {
-			this->Variable[MAGICLEVEL_INDEX].Value += unique->Set->MagicLevel;
-			this->Variable[MAGICLEVEL_INDEX].Max += unique->Set->MagicLevel;
+			this->Variable[MAGICLEVEL_INDEX].Value += unique->Set->get_magic_level();
+			this->Variable[MAGICLEVEL_INDEX].Max += unique->Set->get_magic_level();
 		}
 		Name = unique->get_name();
 		Unique = unique;
@@ -2230,14 +2230,14 @@ void CUnit::GeneratePrefix(CUnit *dropper, CPlayer *dropper_player)
 	std::vector<CUpgrade *> potential_prefixes;
 
 	for (CUpgrade *affix : this->Type->Affixes) {
-		if ((this->Type->get_item_class() == wyrmgus::item_class::none && affix->MagicPrefix) || (this->Type->get_item_class() != wyrmgus::item_class::none && affix->ItemPrefix[static_cast<int>(Type->get_item_class())])) {
+		if ((this->Type->get_item_class() == wyrmgus::item_class::none && affix->is_magic_prefix()) || (this->Type->get_item_class() != wyrmgus::item_class::none && affix->has_affixed_item_class(Type->get_item_class()))) {
 			potential_prefixes.push_back(affix);
 		}
 	}
 
 	if (dropper_player != nullptr) {
 		for (CUpgrade *upgrade : CUpgrade::get_all()) {
-			if (this->Type->get_item_class() == wyrmgus::item_class::none || !upgrade->ItemPrefix[static_cast<int>(Type->get_item_class())]) {
+			if (this->Type->get_item_class() == wyrmgus::item_class::none || !upgrade->has_affixed_item_class(Type->get_item_class())) {
 				continue;
 			}
 
@@ -2265,7 +2265,7 @@ void CUnit::GenerateSuffix(CUnit *dropper, CPlayer *dropper_player)
 	std::vector<CUpgrade *> potential_suffixes;
 
 	for (CUpgrade *affix : this->Type->Affixes) {
-		if ((this->Type->get_item_class() == wyrmgus::item_class::none && affix->MagicSuffix) || (this->Type->get_item_class() != wyrmgus::item_class::none && affix->ItemSuffix[static_cast<int>(Type->get_item_class())])) {
+		if ((this->Type->get_item_class() == wyrmgus::item_class::none && affix->is_magic_suffix()) || (this->Type->get_item_class() != wyrmgus::item_class::none && affix->has_affixed_item_class(Type->get_item_class()))) {
 			if (Prefix == nullptr || !affix->IncompatibleAffixes[Prefix->ID]) { //don't allow a suffix incompatible with the prefix to appear
 				potential_suffixes.push_back(affix);
 			}
@@ -2274,7 +2274,7 @@ void CUnit::GenerateSuffix(CUnit *dropper, CPlayer *dropper_player)
 
 	if (dropper_player != nullptr) {
 		for (CUpgrade *upgrade : CUpgrade::get_all()) {
-			if (this->Type->get_item_class() == wyrmgus::item_class::none || !upgrade->ItemSuffix[static_cast<int>(Type->get_item_class())]) {
+			if (this->Type->get_item_class() == wyrmgus::item_class::none || !upgrade->has_affixed_item_class(Type->get_item_class())) {
 				continue;
 			}
 
@@ -5725,10 +5725,10 @@ int CUnit::GetPrice() const
 	int cost = this->Type->Stats[this->Player->Index].GetPrice();
 	
 	if (this->Prefix != nullptr) {
-		cost += this->Prefix->MagicLevel * 1000;
+		cost += this->Prefix->get_magic_level() * 1000;
 	}
 	if (this->Suffix != nullptr) {
-		cost += this->Suffix->MagicLevel * 1000;
+		cost += this->Suffix->get_magic_level() * 1000;
 	}
 	if (this->Spell != nullptr) {
 		cost += 1000;
@@ -5741,7 +5741,7 @@ int CUnit::GetPrice() const
 		}
 	}
 	if (this->Elixir != nullptr) {
-		cost += this->Elixir->MagicLevel * 1000;
+		cost += this->Elixir->get_magic_level() * 1000;
 	}
 	if (this->Character) {
 		cost += (this->Variable[LEVEL_INDEX].Value - this->Type->Stats[this->Player->Index].Variables[LEVEL_INDEX].Value) * 250;

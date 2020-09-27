@@ -2474,16 +2474,16 @@ static int CclGetUnitTypeData(lua_State *l)
 		}
 		return 1;
 	} else if (!strcmp(data, "Prefixes")) {
-		std::vector<CUpgrade *> prefixes;
+		std::vector<const CUpgrade *> prefixes;
 		for (size_t i = 0; i < type->Affixes.size(); ++i)
 		{
-			if (type->Affixes[i]->MagicPrefix) {
+			if (type->Affixes[i]->is_magic_prefix()) {
 				prefixes.push_back(type->Affixes[i]);
 			}
 		}
 		if (type->get_item_class() != wyrmgus::item_class::none) {
-			for (CUpgrade *upgrade : CUpgrade::get_all()) {
-				if (upgrade->MagicPrefix && upgrade->ItemPrefix[static_cast<int>(type->get_item_class())]) {
+			for (const CUpgrade *upgrade : CUpgrade::get_all()) {
+				if (upgrade->is_magic_prefix() && upgrade->has_affixed_item_class(type->get_item_class())) {
 					prefixes.push_back(upgrade);
 				}
 			}
@@ -2497,16 +2497,16 @@ static int CclGetUnitTypeData(lua_State *l)
 		}
 		return 1;
 	} else if (!strcmp(data, "Suffixes")) {
-		std::vector<CUpgrade *> suffixes;
+		std::vector<const CUpgrade *> suffixes;
 		for (size_t i = 0; i < type->Affixes.size(); ++i)
 		{
-			if (type->Affixes[i]->MagicSuffix) {
+			if (type->Affixes[i]->is_magic_suffix()) {
 				suffixes.push_back(type->Affixes[i]);
 			}
 		}
 		if (type->get_item_class() != wyrmgus::item_class::none) {
 			for (CUpgrade *upgrade : CUpgrade::get_all()) {
-				if (upgrade->MagicSuffix && upgrade->ItemSuffix[static_cast<int>(type->get_item_class())]) {
+				if (upgrade->is_magic_suffix() && upgrade->has_affixed_item_class(type->get_item_class())) {
 					suffixes.push_back(upgrade);
 				}
 			}

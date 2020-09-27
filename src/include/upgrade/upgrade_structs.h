@@ -62,7 +62,7 @@ namespace wyrmgus {
 /**
 **  These are the current stats of a unit. Upgraded or downgraded.
 */
-class CUnitStats
+class CUnitStats final
 {
 public:
 	CUnitStats()
@@ -107,6 +107,9 @@ class CUpgrade final : public wyrmgus::detailed_data_entry, public wyrmgus::data
 	Q_PROPERTY(bool shield MEMBER shield READ is_shield)
 	Q_PROPERTY(bool boots MEMBER boots READ is_boots)
 	Q_PROPERTY(bool arrows MEMBER arrows READ is_arrows)
+	Q_PROPERTY(bool magic_prefix MEMBER magic_prefix READ is_magic_prefix)
+	Q_PROPERTY(bool magic_suffix MEMBER magic_suffix READ is_magic_suffix)
+	Q_PROPERTY(int magic_level MEMBER magic_level READ get_magic_level)
 	Q_PROPERTY(wyrmgus::unit_type* item MEMBER item READ get_item)
 
 public:
@@ -141,7 +144,7 @@ public:
 		return upgrade;
 	}
 
-	CUpgrade(const std::string &identifier);
+	explicit CUpgrade(const std::string &identifier);
 	~CUpgrade();
 
 	virtual void process_sml_property(const wyrmgus::sml_property &property) override;
@@ -237,6 +240,31 @@ public:
 		return this->arrows;
 	}
 
+	bool is_magic_prefix() const
+	{
+		return this->magic_prefix;
+	}
+
+	bool is_magic_suffix() const
+	{
+		return this->magic_suffix;
+	}
+
+	int get_magic_level() const
+	{
+		return this->magic_level;
+	}
+
+	const std::set<wyrmgus::item_class> &get_affixed_item_classes() const
+	{
+		return this->affixed_item_classes;
+	}
+
+	bool has_affixed_item_class(const wyrmgus::item_class item_class) const
+	{
+		return this->affixed_item_classes.contains(item_class);
+	}
+
 	wyrmgus::unit_type *get_item() const
 	{
 		return this->item;
@@ -292,13 +320,15 @@ private:
 	bool shield = false;
 	bool boots = false;
 	bool arrows = false;
+	bool magic_prefix = false;
+	bool magic_suffix = false;
 public:
-	bool MagicPrefix = false;
-	bool MagicSuffix = false;
 	bool RunicAffix = false;
-	bool UniqueOnly = false;		/// whether (if this is a literary work) this should appear only on unique items (used, for instance, if a book has no copies of its text)
-	bool ItemPrefix[static_cast<int>(wyrmgus::item_class::count)];
-	bool ItemSuffix[static_cast<int>(wyrmgus::item_class::count)];
+	bool UniqueOnly = false; //whether (if this is a literary work) this should appear only on unique items (used, for instance, if a book has no copies of its text)
+private:
+	int magic_level = 0; //magic level of an affix
+	std::set<wyrmgus::item_class> affixed_item_classes;
+public:
 	bool IncompatibleAffixes[UpgradeMax];
 	std::set<wyrmgus::item_class> WeaponClasses; //if isn't empty, one of these weapon classes will need to be equipped for the upgrade to be applied
 	//Wyrmgus start
@@ -313,7 +343,6 @@ public:
 	//Wyrmgus start
 	int GrandStrategyProductionEfficiencyModifier[MaxCosts];	/// Production modifier for a particular resource for grand strategy mode
 	int MaxLimit = 1;					/// Maximum amount of times this upgrade can be acquired as an individual upgrade
-	int MagicLevel = 0;					/// Magic level of an affix
 	wyrmgus::item_class Work;			/// Form in which was inscribed (i.e. scroll or book), if is a literary work
 	int Year = 0;						/// Year of publication, if is a literary work
 	wyrmgus::character *Author = nullptr;		/// Author of this literary work (if it is one)
