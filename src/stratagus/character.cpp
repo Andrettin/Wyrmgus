@@ -115,7 +115,15 @@ void character::process_sml_scope(const sml_data &scope)
 			this->abilities.push_back(ability);
 		}
 	} else if (tag == "default_items") {
-		scope.for_each_child([&](const sml_data &child_scope) {
+		scope.for_each_element([&](const sml_property &property) {
+			const wyrmgus::unit_type *unit_type = unit_type::get(property.get_key());
+			const int quantity = std::stoi(property.get_value());
+
+			for (int i = 0; i < quantity; ++i) {
+				auto item = std::make_unique<persistent_item>(unit_type, this);
+				this->default_items.push_back(std::move(item));
+			}
+		}, [&](const sml_data &child_scope) {
 			const wyrmgus::unit_type *unit_type = unit_type::get(child_scope.get_tag());
 
 			auto item = std::make_unique<persistent_item>(unit_type, this);
