@@ -8,9 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name iolib.h - The iolib functions header file. */
-//
-//      (c) Copyright 2000-2005 by Andreas Arens
+//      (c) Copyright 2000-2020 by Andreas Arens and Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -32,10 +30,6 @@
 #ifdef __MORPHOS__
 #undef tell
 #endif
-
-/*----------------------------------------------------------------------------
---  Definitons
-----------------------------------------------------------------------------*/
 
 /**
 **  Exception thrown by FileWriter objects.
@@ -73,8 +67,6 @@ std::unique_ptr<FileWriter> CreateFileWriter(const std::string &filename);
 class FileList
 {
 public:
-	FileList() : type(0), sortmode(0) {}
-
 	bool operator < (const FileList &rhs) const
 	{
 		if (type != rhs.type) {
@@ -85,11 +77,12 @@ public:
 		}
 		return name < rhs.name;
 	}
+
 public:
 	std::string name;  /// Name of the file
-	int type;          /// Type of the file
-	int sortmode;      /// Sort by name if 0 or sort by modified time if 1
-	time_t mtime;      /// Modified time
+	int type = 0;      /// Type of the file
+	int sortmode = 0;  /// Sort by name if 0 or sort by modified time if 1
+	std::filesystem::file_time_type mtime;      /// Modified time
 };
 
 
@@ -133,14 +126,10 @@ enum {
 #define CL_WRITE_GZ 0x4
 #define CL_WRITE_BZ2 0x8
 
-/*----------------------------------------------------------------------------
---  Functions
-----------------------------------------------------------------------------*/
-
 /// Build library path name
 extern std::string LibraryFileName(const char *file);
 
 extern bool CanAccessFile(const char *filename);
 
 /// Read the contents of a directory
-extern int ReadDataDirectory(const char *dirname, std::vector<FileList> &flp, int sortmode = 0);
+extern std::vector<FileList> ReadDataDirectory(const std::filesystem::path &dir_path, int sortmode);

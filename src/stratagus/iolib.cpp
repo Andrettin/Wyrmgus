@@ -736,68 +736,34 @@ bool CanAccessFile(const char *filename)
 **
 **  @return the number of entries added to FileList.
 */
-int ReadDataDirectory(const char *dirname, std::vector<FileList> &fl, int sortmode)
+std::vector<FileList> ReadDataDirectory(const std::filesystem::path &dir_path, const int sortmode)
 {
-	struct stat st;
-	char buffer[PATH_MAX];
-	char *filename;
+	std::vector<FileList> file_list;
 
-	strcpy_s(buffer, sizeof(buffer), dirname);
-	int n = strlen(buffer);
-	if (!n || buffer[n - 1] != '/') {
-		buffer[n++] = '/';
-		buffer[n] = 0;
+	if (!std::filesystem::exists(dir_path)) {
+		return file_list;
 	}
-	char *np = buffer + n;
 
-#ifndef USE_WIN32
-	DIR *dirp = opendir(dirname);
-	struct dirent *dp;
+	std::filesystem::directory_iterator dir_iterator(dir_path);
 
-	if (dirp) {
-		while ((dp = readdir(dirp)) != nullptr) {
-			filename = dp->d_name;
-#else
-	strcat_s(buffer, sizeof(buffer), "*.*");
-	struct _finddata_t fileinfo;
-	long hFile = _findfirst(buffer, &fileinfo);
-	if (hFile != -1L) {
-		do {
-			filename = fileinfo.name;
-#endif
-			if (strcmp(filename, ".") == 0) {
-				continue;
-			}
-			if (strcmp(filename, "..") == 0) {
-				continue;
-			}
-			strcpy_s(np, sizeof(buffer) - (np - buffer), filename);
-			if (stat(buffer, &st) == 0) {
-				int isdir = S_ISDIR(st.st_mode);
-				if (isdir || S_ISREG(st.st_mode)) {
-					FileList nfl;
-
-					if (isdir) {
-						nfl.name = np;
-					} else {
-						nfl.name = np;
-						nfl.type = 1;
-					}
-					nfl.mtime = st.st_mtime;
-					nfl.sortmode = sortmode;
-					// sorted instertion
-					fl.insert(std::lower_bound(fl.begin(), fl.end(), nfl), nfl);
-				}
-			}
-#ifndef USE_WIN32
+	for (const std::filesystem::directory_entry &dir_entry : dir_iterator) {
+		if (!dir_entry.is_directory() && !dir_entry.is_regular_file()) {
+			continue;
 		}
-		closedir(dirp);
-#else
-		} while (_findnext(hFile, &fileinfo) == 0);
-		_findclose(hFile);
-#endif
+
+		FileList nfl;
+
+		nfl.name = dir_entry.path().filename().string();
+		if (!dir_entry.is_directory()) {
+			nfl.type = 1;
+		}
+		nfl.mtime = std::filesystem::last_write_time(dir_entry.path());
+		nfl.sortmode = sortmode;
+		// sorted insertion
+		file_list.insert(std::lower_bound(file_list.begin(), file_list.end(), nfl), nfl);
 	}
-	return fl.size();
+
+	return file_list;
 }
 
 void FileWriter::printf(const char *format, ...)

@@ -3299,10 +3299,9 @@ static int CclFilteredListDirectory(lua_State *l, int type, int mask, int sortmo
 	}
 	lua_pop(l, 1);
 	lua_newtable(l);
-	std::vector<FileList> flp;
-	n = ReadDataDirectory(directory, flp, sortmode);
+	const std::vector<FileList> flp = ReadDataDirectory(directory, sortmode);
 	int j = 0;
-	for (int i = 0; i < n; ++i) {
+	for (size_t i = 0; i < flp.size(); ++i) {
 		if ((flp[i].type & mask) == type) {
 			lua_pushnumber(l, j + 1);
 			lua_pushstring(l, flp[i].name.c_str());
