@@ -10,7 +10,7 @@
 //
 /**@name script_item.cpp - The item ccl functions. */
 //
-//      (c) Copyright 2015 by Andrettin
+//      (c) Copyright 2015-2020 by Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -55,34 +55,34 @@ static int CclDefineUniqueItem(lua_State *l)
 		} else if (!strcmp(value, "Type")) {
 			std::string unit_type_ident = LuaToString(l, -1);
 			wyrmgus::unit_type *unit_type = wyrmgus::unit_type::get(unit_type_ident);
-			item->Type = unit_type;
+			item->unit_type = unit_type;
 		} else if (!strcmp(value, "Icon")) {
 			item->icon = wyrmgus::icon::get(LuaToString(l, -1));
 		} else if (!strcmp(value, "Prefix")) {
 			std::string affix_ident = LuaToString(l, -1);
 			CUpgrade *upgrade = CUpgrade::get(affix_ident);
-			item->Prefix = upgrade;
+			item->prefix = upgrade;
 		} else if (!strcmp(value, "Suffix")) {
 			std::string affix_ident = LuaToString(l, -1);
 			CUpgrade *upgrade = CUpgrade::get(affix_ident);
-			item->Suffix = upgrade;
+			item->suffix = upgrade;
 		} else if (!strcmp(value, "Set")) {
 			std::string set_ident = LuaToString(l, -1);
 			CUpgrade *upgrade = CUpgrade::get(set_ident);
-			item->Set = upgrade;
-			item->Set->UniqueItems.push_back(item);
+			item->set = upgrade;
+			item->set->UniqueItems.push_back(item);
 		} else if (!strcmp(value, "Spell")) {
 			const std::string spell_ident = LuaToString(l, -1);
 			wyrmgus::spell *spell = wyrmgus::spell::get(spell_ident);
-			item->Spell = spell;
+			item->spell = spell;
 		} else if (!strcmp(value, "Work")) {
 			std::string upgrade_ident = LuaToString(l, -1);
 			CUpgrade *upgrade = CUpgrade::get(upgrade_ident);
-			item->Work = upgrade;
+			item->work = upgrade;
 		} else if (!strcmp(value, "Elixir")) {
 			std::string upgrade_ident = LuaToString(l, -1);
 			CUpgrade *upgrade = CUpgrade::get(upgrade_ident);
-			item->Elixir = upgrade;
+			item->elixir = upgrade;
 		} else if (!strcmp(value, "Description")) {
 			item->set_description(LuaToString(l, -1));
 		} else if (!strcmp(value, "Background")) {
@@ -159,59 +159,59 @@ static int CclGetUniqueItemData(lua_State *l)
 		lua_pushnumber(l, item->ResourcesHeld);
 		return 1;
 	} else if (!strcmp(data, "Type")) {
-		if (item->Type != nullptr) {
-			lua_pushstring(l, item->Type->Ident.c_str());
+		if (item->get_unit_type() != nullptr) {
+			lua_pushstring(l, item->get_unit_type()->get_identifier().c_str());
 		} else {
 			lua_pushstring(l, "");
 		}
 		return 1;
 	} else if (!strcmp(data, "Prefix")) {
-		if (item->Prefix != nullptr) {
-			lua_pushstring(l, item->Prefix->get_identifier().c_str());
+		if (item->get_prefix() != nullptr) {
+			lua_pushstring(l, item->get_prefix()->get_identifier().c_str());
 		} else {
 			lua_pushstring(l, "");
 		}
 		return 1;
 	} else if (!strcmp(data, "Suffix")) {
-		if (item->Suffix != nullptr) {
-			lua_pushstring(l, item->Suffix->get_identifier().c_str());
+		if (item->get_suffix() != nullptr) {
+			lua_pushstring(l, item->get_suffix()->get_identifier().c_str());
 		} else {
 			lua_pushstring(l, "");
 		}
 		return 1;
 	} else if (!strcmp(data, "Set")) {
-		if (item->Set != nullptr) {
-			lua_pushstring(l, item->Set->get_identifier().c_str());
+		if (item->get_set() != nullptr) {
+			lua_pushstring(l, item->get_set()->get_identifier().c_str());
 		} else {
 			lua_pushstring(l, "");
 		}
 		return 1;
 	} else if (!strcmp(data, "Spell")) {
-		if (item->Spell != nullptr) {
-			lua_pushstring(l, item->Spell->get_identifier().c_str());
+		if (item->get_spell() != nullptr) {
+			lua_pushstring(l, item->get_spell()->get_identifier().c_str());
 		} else {
 			lua_pushstring(l, "");
 		}
 		return 1;
 	} else if (!strcmp(data, "Work")) {
-		if (item->Work != nullptr) {
-			lua_pushstring(l, item->Work->get_identifier().c_str());
+		if (item->get_work() != nullptr) {
+			lua_pushstring(l, item->get_work()->get_identifier().c_str());
 		} else {
 			lua_pushstring(l, "");
 		}
 		return 1;
 	} else if (!strcmp(data, "Elixir")) {
-		if (item->Elixir != nullptr) {
-			lua_pushstring(l, item->Elixir->get_identifier().c_str());
+		if (item->get_elixir() != nullptr) {
+			lua_pushstring(l, item->get_elixir()->get_identifier().c_str());
 		} else {
 			lua_pushstring(l, "");
 		}
 		return 1;
 	} else if (!strcmp(data, "MagicLevel")) {
-		lua_pushnumber(l, item->GetMagicLevel());
+		lua_pushnumber(l, item->get_magic_level());
 		return 1;
 	} else if (!strcmp(data, "CanDrop")) {
-		lua_pushboolean(l, item->CanDrop());
+		lua_pushboolean(l, item->can_drop());
 		return 1;
 	} else if (!strcmp(data, "Icon")) {
 		if (item->get_icon() != nullptr) {

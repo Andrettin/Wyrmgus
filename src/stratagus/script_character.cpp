@@ -280,30 +280,30 @@ static int CclDefineCharacter(lua_State *l)
 							fprintf(stderr, "Elixir \"%s\" doesn't exist.", upgrade_ident.c_str());
 						}
 					} else if (!strcmp(value, "name")) {
-						item->Name = LuaToString(l, -1, k + 1);
+						item->name = LuaToString(l, -1, k + 1);
 					} else if (!strcmp(value, "unique")) {
 						std::string unique_ident = LuaToString(l, -1, k + 1);
 						wyrmgus::unique_item *unique_item = wyrmgus::unique_item::try_get(unique_ident);
 						item->unique = unique_item;
 						if (unique_item != nullptr) {
-							item->Name = unique_item->get_name();
-							if (unique_item->Type != nullptr) {
-								item->unit_type = unique_item->Type;
+							item->name = unique_item->get_name();
+							if (unique_item->get_unit_type() != nullptr) {
+								item->unit_type = unique_item->get_unit_type();
 							} else {
 								fprintf(stderr, "Unique item \"%s\" has no type.\n", unique_item->get_identifier().c_str());
 							}
-							item->Prefix = unique_item->Prefix;
-							item->Suffix = unique_item->Suffix;
-							item->Spell = unique_item->Spell;
-							item->Work = unique_item->Work;
-							item->Elixir = unique_item->Elixir;
+							item->Prefix = unique_item->get_prefix();
+							item->Suffix = unique_item->get_suffix();
+							item->Spell = unique_item->get_spell();
+							item->Work = unique_item->get_work();
+							item->Elixir = unique_item->get_elixir();
 						} else {
 							fprintf(stderr, "Unique item \"%s\" doesn't exist.\n", unique_ident.c_str());
 						}
 					} else if (!strcmp(value, "bound")) {
-						item->Bound = LuaToBoolean(l, -1, k + 1);
+						item->bound = LuaToBoolean(l, -1, k + 1);
 					} else if (!strcmp(value, "identified")) {
-						item->Identified = LuaToBoolean(l, -1, k + 1);
+						item->identified = LuaToBoolean(l, -1, k + 1);
 					} else if (!strcmp(value, "equipped")) {
 						item->equipped = LuaToBoolean(l, -1, k + 1);
 					} else {
@@ -577,30 +577,30 @@ static int CclDefineCustomHero(lua_State *l)
 							fprintf(stderr, "Elixir \"%s\" doesn't exist.", upgrade_ident.c_str());
 						}
 					} else if (!strcmp(value, "name")) {
-						item->Name = LuaToString(l, -1, k + 1);
+						item->name = LuaToString(l, -1, k + 1);
 					} else if (!strcmp(value, "unique")) {
 						std::string unique_ident = LuaToString(l, -1, k + 1);
 						wyrmgus::unique_item *unique_item = wyrmgus::unique_item::try_get(unique_ident);
 						item->unique = unique_item;
 						if (unique_item != nullptr) {
-							item->Name = unique_item->get_name();
-							if (unique_item->Type != nullptr) {
-								item->unit_type = unique_item->Type;
+							item->name = unique_item->get_name();
+							if (unique_item->get_unit_type() != nullptr) {
+								item->unit_type = unique_item->get_unit_type();
 							} else {
-								fprintf(stderr, "Unique item \"%s\" has no type.\n", item->Name.c_str());
+								fprintf(stderr, "Unique item \"%s\" has no type.\n", item->get_name().c_str());
 							}
-							item->Prefix = unique_item->Prefix;
-							item->Suffix = unique_item->Suffix;
-							item->Spell = unique_item->Spell;
-							item->Work = unique_item->Work;
-							item->Elixir = unique_item->Elixir;
+							item->Prefix = unique_item->get_prefix();
+							item->Suffix = unique_item->get_suffix();
+							item->Spell = unique_item->get_spell();
+							item->Work = unique_item->get_work();
+							item->Elixir = unique_item->get_elixir();
 						} else {
 							fprintf(stderr, "Unique item \"%s\" doesn't exist.\n", unique_ident.c_str());
 						}
 					} else if (!strcmp(value, "bound")) {
-						item->Bound = LuaToBoolean(l, -1, k + 1);
+						item->bound = LuaToBoolean(l, -1, k + 1);
 					} else if (!strcmp(value, "identified")) {
-						item->Identified = LuaToBoolean(l, -1, k + 1);
+						item->identified = LuaToBoolean(l, -1, k + 1);
 					} else if (!strcmp(value, "equipped")) {
 						item->equipped = LuaToBoolean(l, -1, k + 1);
 					} else {

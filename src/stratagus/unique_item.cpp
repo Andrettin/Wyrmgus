@@ -40,13 +40,13 @@
 
 namespace wyrmgus {
 
-bool unique_item::CanDrop() const
+bool unique_item::can_drop() const
 {
 	// unique items cannot drop if a persistent hero owns them already, or if there's already one of them in the current scenario; unless it's a character-specific bound item, in which case it can still drop
 	if (!IsNetworkGame()) {
 		for (character *character : character::get_all()) {
 			for (const auto &item : character->get_items()) {
-				if (item->get_unique() == this && !item->Bound) {
+				if (item->get_unique() == this && !item->is_bound()) {
 					return false;
 				}
 			}
@@ -54,7 +54,7 @@ bool unique_item::CanDrop() const
 		
 		for (std::map<std::string, character *>::iterator iterator = CustomHeroes.begin(); iterator != CustomHeroes.end(); ++iterator) {
 			for (const auto &item : iterator->second->get_items()) {
-				if (item->get_unique() == this && !item->Bound) {
+				if (item->get_unique() == this && !item->is_bound()) {
 					return false;
 				}
 			}
@@ -78,32 +78,32 @@ icon *unique_item::get_icon() const
 	if (this->icon != nullptr) {
 		return this->icon;
 	} else {
-		return this->Type->Icon.Icon;
+		return this->get_unit_type()->Icon.Icon;
 	}
 }
 
-int unique_item::GetMagicLevel() const
+int unique_item::get_magic_level() const
 {
 	int magic_level = 0;
 	
-	if (this->Prefix) {
-		magic_level += this->Prefix->get_magic_level();
+	if (this->get_prefix() != nullptr) {
+		magic_level += this->get_prefix()->get_magic_level();
 	}
 	
-	if (this->Suffix) {
-		magic_level += this->Suffix->get_magic_level();
+	if (this->get_suffix() != nullptr) {
+		magic_level += this->get_suffix()->get_magic_level();
 	}
 	
-	if (this->Set) {
-		magic_level += this->Set->get_magic_level();
+	if (this->get_set() != nullptr) {
+		magic_level += this->get_set()->get_magic_level();
 	}
 	
-	if (this->Work) {
-		magic_level += this->Work->get_magic_level();
+	if (this->get_work() != nullptr) {
+		magic_level += this->get_work()->get_magic_level();
 	}
 	
-	if (this->Elixir) {
-		magic_level += this->Elixir->get_magic_level();
+	if (this->get_elixir() != nullptr) {
+		magic_level += this->get_elixir()->get_magic_level();
 	}
 	
 	return magic_level;
@@ -142,9 +142,9 @@ std::string GetUniqueItemEffectsString(const std::string &item_ident)
 
 			int variable_value = 0;
 			int variable_increase = 0;
-			if (item->Type->BoolFlag[ITEM_INDEX].value && item->Work == nullptr && item->Elixir == nullptr) {
-				variable_value = item->Type->DefaultStat.Variables[var].Value;
-				variable_increase = item->Type->DefaultStat.Variables[var].Increase;
+			if (item->get_unit_type()->BoolFlag[ITEM_INDEX].value && item->get_work() == nullptr && item->get_elixir() == nullptr) {
+				variable_value = item->get_unit_type()->DefaultStat.Variables[var].Value;
+				variable_increase = item->get_unit_type()->DefaultStat.Variables[var].Increase;
 			}
 
 			if (var == GIVERESOURCE_INDEX && item->ResourcesHeld != 0) {
@@ -153,17 +153,17 @@ std::string GetUniqueItemEffectsString(const std::string &item_ident)
 
 			for (const wyrmgus::upgrade_modifier *modifier : wyrmgus::upgrade_modifier::UpgradeModifiers) {
 				if (
-					(item->Prefix != nullptr && modifier->UpgradeId == item->Prefix->ID)
-					|| (item->Suffix != nullptr && modifier->UpgradeId == item->Suffix->ID)
-					|| (item->Work != nullptr && modifier->UpgradeId == item->Work->ID)
-					|| (item->Elixir != nullptr && modifier->UpgradeId == item->Elixir->ID)
+					(item->get_prefix() != nullptr && modifier->UpgradeId == item->get_prefix()->ID)
+					|| (item->get_suffix() != nullptr && modifier->UpgradeId == item->get_suffix()->ID)
+					|| (item->get_work() != nullptr && modifier->UpgradeId == item->get_work()->ID)
+					|| (item->get_elixir() != nullptr && modifier->UpgradeId == item->get_elixir()->ID)
 					) {
 					variable_value += modifier->Modifier.Variables[var].Value;
 					variable_increase += modifier->Modifier.Variables[var].Increase;
 				}
 			}
 
-			if ((item->Type->BoolFlag[ITEM_INDEX].value && item->Type->DefaultStat.Variables[var].Enable && item->Work == nullptr && item->Elixir == nullptr) || variable_value != 0) {
+			if ((item->get_unit_type()->BoolFlag[ITEM_INDEX].value && item->get_unit_type()->DefaultStat.Variables[var].Enable && item->get_work() == nullptr && item->get_elixir() == nullptr) || variable_value != 0) {
 				if (!first_var) {
 					item_effects_string += ", ";
 				} else {
@@ -205,7 +205,7 @@ std::string GetUniqueItemEffectsString(const std::string &item_ident)
 			}
 		}
 
-		if (item->Set) {
+		if (item->get_set() != nullptr) {
 			for (size_t var = 0; var < UnitTypeVar.GetNumberVariable(); ++var) {
 				if (
 					!(var == BASICDAMAGE_INDEX || var == PIERCINGDAMAGE_INDEX || var == THORNSDAMAGE_INDEX
@@ -229,7 +229,7 @@ std::string GetUniqueItemEffectsString(const std::string &item_ident)
 				int variable_value = 0;
 				int variable_increase = 0;
 
-				for (const auto &modifier : item->Set->get_modifiers()) {
+				for (const auto &modifier : item->get_set()->get_modifiers()) {
 					variable_value += modifier->Modifier.Variables[var].Value;
 					variable_increase += modifier->Modifier.Variables[var].Increase;
 				}

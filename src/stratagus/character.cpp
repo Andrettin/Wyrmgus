@@ -577,8 +577,8 @@ void character::remove_item(const persistent_item *item)
 persistent_item *character::get_item(const CUnit &item_unit) const
 {
 	for (const auto &item : this->items) {
-		if (item->get_unit_type() == item_unit.Type && item->Prefix == item_unit.Prefix && item->Suffix == item_unit.Suffix && item->Spell == item_unit.Spell && item->Work == item_unit.Work && item->Elixir == item_unit.Elixir && item->get_unique() == item_unit.Unique && item->Bound == item_unit.Bound && item->Identified == item_unit.Identified && this->is_item_equipped(item.get()) == item_unit.Container->IsItemEquipped(&item_unit)) {
-			if (item->Name.empty() || item->Name == item_unit.Name) {
+		if (item->get_unit_type() == item_unit.Type && item->Prefix == item_unit.Prefix && item->Suffix == item_unit.Suffix && item->Spell == item_unit.Spell && item->Work == item_unit.Work && item->Elixir == item_unit.Elixir && item->get_unique() == item_unit.Unique && item->is_bound() == item_unit.Bound && item->is_identified() == item_unit.Identified && this->is_item_equipped(item.get()) == item_unit.Container->IsItemEquipped(&item_unit)) {
+			if (item->get_name().empty() || item->get_name() == item_unit.Name) {
 				return item.get();
 			}
 		}
@@ -917,16 +917,16 @@ void SaveHero(const wyrmgus::character *hero)
 			if (item->Elixir != nullptr) {
 				fprintf(fd, "\n\t\t\t\"elixir\", \"%s\",", item->Elixir->get_identifier().c_str());
 			}
-			if (!item->Name.empty()) {
-				fprintf(fd, "\n\t\t\t\"name\", \"%s\",", item->Name.c_str());
+			if (!item->get_name().empty()) {
+				fprintf(fd, "\n\t\t\t\"name\", \"%s\",", item->get_name().c_str());
 			}
 			if (item->get_unique() != nullptr) { // affixes, name and etc. will be inherited from the unique item, but we set those previous characteristics for unique items anyway, so that if a unique item no longer exists in the game's code (i.e. if it is from a mod that has been deactivated) the character retains an item with the same affixes, name and etc., even though it will no longer be unique
 				fprintf(fd, "\n\t\t\t\"unique\", \"%s\",", item->get_unique()->get_identifier().c_str());
 			}
-			if (item->Bound) {
+			if (item->is_bound()) {
 				fprintf(fd, "\n\t\t\t\"bound\", true,");
 			}
-			if (!item->Identified) {
+			if (!item->is_identified()) {
 				fprintf(fd, "\n\t\t\t\"identified\", false,");
 			}
 			if (hero->is_item_equipped(item.get())) {

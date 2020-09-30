@@ -2613,7 +2613,7 @@ bool CPlayer::can_accept_quest(const wyrmgus::quest *quest) const
 					return false;
 				}
 			} else if (objective->get_objective_type() == wyrmgus::objective_type::destroy_unique) {
-				if (objective->Unique->CanDrop()) { //if the unique "can drop" it doesn't already exist, and thus can't be destroyed
+				if (objective->Unique->can_drop()) { //if the unique "can drop" it doesn't already exist, and thus can't be destroyed
 					return false;
 				}
 			}
@@ -2789,7 +2789,7 @@ std::string CPlayer::check_quest_failure(const wyrmgus::quest *quest) const
 					return "The target no longer exists.";
 				}
 			} else if (quest_objective->get_objective_type() == wyrmgus::objective_type::destroy_unique) {
-				if (objective->Counter == 0 && quest_objective->Unique->CanDrop()) {  // if is supposed to destroy a unique, but it is nowhere to be found, fail the quest
+				if (objective->Counter == 0 && quest_objective->Unique->can_drop()) {  // if is supposed to destroy a unique, but it is nowhere to be found, fail the quest
 					return "The target no longer exists.";
 				}
 			}

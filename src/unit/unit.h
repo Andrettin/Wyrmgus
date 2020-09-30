@@ -205,15 +205,15 @@ public:
 	void ChooseButtonIcon(const ButtonCmd button_action);
 	void EquipItem(CUnit &item, bool affect_character = true);
 	void DeequipItem(CUnit &item, bool affect_character = true);
-	void ReadWork(CUpgrade *work, bool affect_character = true);
-	void ConsumeElixir(CUpgrade *elixir, bool affect_character = true);
+	void ReadWork(const CUpgrade *work, bool affect_character = true);
+	void ConsumeElixir(const CUpgrade *elixir, bool affect_character = true);
 	void ApplyAura(int aura_index);
 	void ApplyAuraEffect(int aura_index);
-	void SetPrefix(CUpgrade *prefix);
-	void SetSuffix(CUpgrade *suffix);
-	void SetSpell(wyrmgus::spell *spell);
-	void SetWork(CUpgrade *work);
-	void SetElixir(CUpgrade *elixir);
+	void SetPrefix(const CUpgrade *prefix);
+	void SetSuffix(const CUpgrade *suffix);
+	void SetSpell(const wyrmgus::spell *spell);
+	void SetWork(const CUpgrade *work);
+	void SetElixir(const CUpgrade *elixir);
 	void SetUnique(wyrmgus::unique_item *unique);
 	void Identify();
 	void CheckIdentification();
@@ -571,12 +571,12 @@ public:
 	CUpgrade *Trait;	/// Unit's trait
 	int Variation;      /// Which of the variations of its unit type this unit has
 	int LayerVariation[MaxImageLayers];	/// Which layer variations this unit has
-	CUpgrade *Prefix;	/// Item unit's prefix
-	CUpgrade *Suffix;	/// Item unit's suffix
-	wyrmgus::spell *Spell; /// Item unit's spell
-	CUpgrade *Work;		/// Item unit's literary work
-	CUpgrade *Elixir;	/// Item unit's elixir
-	wyrmgus::unique_item *Unique;		/// Whether the item is unique
+	const CUpgrade *Prefix = nullptr;	/// Item unit's prefix
+	const CUpgrade *Suffix = nullptr;	/// Item unit's suffix
+	const wyrmgus::spell *Spell = nullptr; /// Item unit's spell
+	const CUpgrade *Work = nullptr;		/// Item unit's literary work
+	const CUpgrade *Elixir = nullptr;	/// Item unit's elixir
+	wyrmgus::unique_item *Unique = nullptr;		/// Whether the item is unique
 	bool Bound;			/// Whether the item is bound to its owner
 	bool Identified;	/// Whether the item has been identified
 	CUnit *ConnectingDestination;	/// Which connector this unit connects to (if any)

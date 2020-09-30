@@ -1623,27 +1623,27 @@ std::string EvalString(const StringDesc *s)
 			}
 		case EString_UnitUniqueSet : // name of the unit's unique item set
 			unit = EvalUnit(s->D.Unit);
-			if (unit != nullptr && unit->Unique && unit->Unique->Set) {
-				return unit->Unique->Set->get_name();
+			if (unit != nullptr && unit->Unique != nullptr && unit->Unique->get_set() != nullptr) {
+				return unit->Unique->get_set()->get_name();
 			} else {
 				return std::string("");
 			}
 		case EString_UnitUniqueSetItems : // names of the unit's unique item set's items
 			unit = EvalUnit(s->D.Unit);
-			if (unit != nullptr && unit->Unique && unit->Unique->Set) {
+			if (unit != nullptr && unit->Unique != nullptr && unit->Unique->get_set() != nullptr) {
 				std::string set_items_string;
 				bool first = true;
-				for (size_t i = 0; i < unit->Unique->Set->UniqueItems.size(); ++i) {
+				for (size_t i = 0; i < unit->Unique->get_set()->UniqueItems.size(); ++i) {
 					if (!first) {
 						set_items_string += "\n";
 					} else {
 						first = false;
 					}
-					bool item_equipped = unit->Container && unit->Container->IsUniqueItemEquipped(unit->Unique->Set->UniqueItems[i]);
+					bool item_equipped = unit->Container && unit->Container->IsUniqueItemEquipped(unit->Unique->get_set()->UniqueItems[i]);
 					if (!item_equipped) {
 						set_items_string += "~<";
 					}
-					set_items_string += unit->Unique->Set->UniqueItems[i]->get_name();
+					set_items_string += unit->Unique->get_set()->UniqueItems[i]->get_name();
 					if (!item_equipped) {
 						set_items_string += "~>";
 					}

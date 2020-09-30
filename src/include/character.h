@@ -399,8 +399,8 @@ private:
 	std::vector<const CUpgrade *> base_abilities; //the character's base abilities; these will not be lost after retraining
 	std::vector<const CUpgrade *> abilities;
 public:
-	std::vector<CUpgrade *> ReadWorks;
-	std::vector<CUpgrade *> ConsumedElixirs;
+	std::vector<const CUpgrade *> ReadWorks;
+	std::vector<const CUpgrade *> ConsumedElixirs;
 	std::vector<CUpgrade *> AuthoredWorks;	/// Literary works of which this character is the author
 	std::vector<CUpgrade *> LiteraryAppearances;	/// Literary works in which this character appears
 private:

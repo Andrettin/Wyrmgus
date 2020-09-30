@@ -45,6 +45,14 @@ class unique_item final : public detailed_data_entry, public data_type<unique_it
 {
 	Q_OBJECT
 
+	Q_PROPERTY(wyrmgus::unit_type* unit_type MEMBER unit_type)
+	Q_PROPERTY(CUpgrade* prefix MEMBER prefix)
+	Q_PROPERTY(CUpgrade* suffix MEMBER suffix)
+	Q_PROPERTY(CUpgrade* set MEMBER set)
+	Q_PROPERTY(wyrmgus::spell* spell MEMBER spell)
+	Q_PROPERTY(CUpgrade* work MEMBER work)
+	Q_PROPERTY(CUpgrade* elixir MEMBER elixir)
+
 public:
 	static constexpr const char *class_identifier = "unique_item";
 	static constexpr const char *database_folder = "unique_items";
@@ -53,21 +61,62 @@ public:
 	{
 	}
 
-	bool CanDrop() const;				/// Check whether this unique item can drop
-	int GetMagicLevel() const;			/// Get this unique item's magic level
+	virtual void check() const override
+	{
+		if (this->get_unit_type() == nullptr) {
+			throw std::runtime_error("Unique item \"" + this->get_identifier() + "\" has no unit type.");
+		}
+	}
+
+	const wyrmgus::unit_type *get_unit_type() const
+	{
+		return this->unit_type;
+	}
+
+	const CUpgrade *get_prefix() const
+	{
+		return this->prefix;
+	}
+
+	const CUpgrade *get_suffix() const
+	{
+		return this->suffix;
+	}
+
+	const CUpgrade *get_set() const
+	{
+		return this->set;
+	}
+
+	const wyrmgus::spell *get_spell() const
+	{
+		return this->spell;
+	}
+
+	const CUpgrade *get_work() const
+	{
+		return this->work;
+	}
+
+	const CUpgrade *get_elixir() const
+	{
+		return this->elixir;
+	}
+
+	bool can_drop() const;				/// Check whether this unique item can drop
+	int get_magic_level() const;			/// Get this unique item's magic level
 	wyrmgus::icon *get_icon() const;
 
 	int ResourcesHeld = 0;
 private:
 	wyrmgus::icon *icon = nullptr; //the unique item's icon (if it differs from that of its type)
-public:
-	unit_type *Type = nullptr;			/// Item type of the item
-	CUpgrade *Prefix = nullptr;
-	CUpgrade *Suffix = nullptr;
-	CUpgrade *Set = nullptr;
-	spell *Spell = nullptr;
-	CUpgrade *Work = nullptr;
-	CUpgrade *Elixir = nullptr;
+	wyrmgus::unit_type *unit_type = nullptr; //unit type of the unique
+	CUpgrade *prefix = nullptr;
+	CUpgrade *suffix = nullptr;
+	CUpgrade *set = nullptr;
+	wyrmgus::spell *spell = nullptr;
+	CUpgrade *work = nullptr;
+	CUpgrade *elixir = nullptr;
 
 	friend int ::CclDefineUniqueItem(lua_State *l);
 };

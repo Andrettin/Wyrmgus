@@ -286,7 +286,7 @@ static int CclUnit(lua_State *l)
 	}
 
 	CUnit *unit = nullptr;
-	wyrmgus::unit_type *type = nullptr;
+	const wyrmgus::unit_type *type = nullptr;
 	wyrmgus::unit_type *seentype = nullptr;
 	CPlayer *player = nullptr;
 
@@ -348,23 +348,23 @@ static int CclUnit(lua_State *l)
 		} else if (!strcmp(value, "unique")) {
 			wyrmgus::unique_item *unique_item = wyrmgus::unique_item::get(LuaToString(l, 2, j + 1));
 			unit->Unique = unique_item;
-			if (unique_item->Type->BoolFlag[ITEM_INDEX].value) { //apply the unique item's prefix and suffix here, because it may have changed in the database in relation to when the game was last played
-				unit->Type = unique_item->Type;
-				type = unique_item->Type;
-				if (unique_item->Prefix != nullptr) {
-					unit->Prefix = unique_item->Prefix;
+			if (unique_item->get_unit_type()->BoolFlag[ITEM_INDEX].value) { //apply the unique item's prefix and suffix here, because it may have changed in the database in relation to when the game was last played
+				unit->Type = unique_item->get_unit_type();
+				type = unique_item->get_unit_type();
+				if (unique_item->get_prefix() != nullptr) {
+					unit->Prefix = unique_item->get_prefix();
 				}
-				if (unique_item->Suffix != nullptr) {
-					unit->Suffix = unique_item->Suffix;
+				if (unique_item->get_suffix() != nullptr) {
+					unit->Suffix = unique_item->get_suffix();
 				}
-				if (unique_item->Spell != nullptr) {
-					unit->Spell = unique_item->Spell;
+				if (unique_item->get_spell() != nullptr) {
+					unit->Spell = unique_item->get_spell();
 				}
-				if (unique_item->Work != nullptr) {
-					unit->Work = unique_item->Work;
+				if (unique_item->get_work() != nullptr) {
+					unit->Work = unique_item->get_work();
 				}
-				if (unique_item->Elixir != nullptr) {
-					unit->Elixir = unique_item->Elixir;
+				if (unique_item->get_elixir() != nullptr) {
+					unit->Elixir = unique_item->get_elixir();
 				}
 			}
 		} else if (!strcmp(value, "bound")) {

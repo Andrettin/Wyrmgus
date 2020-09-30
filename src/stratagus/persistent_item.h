@@ -91,6 +91,26 @@ public:
 		return this->unique;
 	}
 
+	const std::string &get_name() const
+	{
+		return this->name;
+	}
+
+	bool is_bound() const
+	{
+		return this->bound;
+	}
+
+	bool is_identified() const
+	{
+		return this->identified;
+	}
+
+	void set_identified(const bool identified)
+	{
+		this->identified = identified;
+	}
+
 	character *get_owner() const
 	{
 		return this->owner;
@@ -104,15 +124,15 @@ public:
 private:
 	const unit_type *unit_type = nullptr; //the item type of the item
 	unique_item *unique = nullptr;
+	std::string name;
+	bool bound = false; //whether the item is bound to its owner and can't be dropped
+	bool identified = true; //whether the item has been identified
 public:
-	std::string Name;
-	bool Bound = false; //whether the item is bound to its owner and can't be dropped
-	bool Identified = true; //whether the item has been identified
-	CUpgrade *Prefix = nullptr;
-	CUpgrade *Suffix = nullptr;
-	spell *Spell = nullptr;
-	CUpgrade *Work = nullptr;
-	CUpgrade *Elixir = nullptr;
+	const CUpgrade *Prefix = nullptr;
+	const CUpgrade *Suffix = nullptr;
+	const spell *Spell = nullptr;
+	const CUpgrade *Work = nullptr;
+	const CUpgrade *Elixir = nullptr;
 private:
 	character *owner = nullptr;
 	bool equipped = false; //used for initialization only

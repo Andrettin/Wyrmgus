@@ -2540,7 +2540,7 @@ static int CclGetUnitTypeData(lua_State *l)
 		std::vector<const wyrmgus::unique_item *> uniques;
 		for (const wyrmgus::unique_item *unique : wyrmgus::unique_item::get_all())
 		{
-			if (unique->Type == type) {
+			if (unique->get_unit_type() == type) {
 				uniques.push_back(unique);
 			}
 		}

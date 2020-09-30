@@ -60,11 +60,11 @@ persistent_item::persistent_item(const CUnit *item_unit, character *owner) : per
 		this->Elixir = item_unit->Elixir;
 	}
 	if (item_unit->Unique) {
-		this->Name = item_unit->Name;
+		this->name = item_unit->Name;
 		this->unique = item_unit->Unique;
 	}
-	this->Bound = item_unit->Bound;
-	this->Identified = item_unit->Identified;
+	this->bound = item_unit->Bound;
+	this->identified = item_unit->Identified;
 }
 
 void persistent_item::process_sml_property(const sml_property &property)
@@ -73,7 +73,7 @@ void persistent_item::process_sml_property(const sml_property &property)
 	const std::string &value = property.get_value();
 
 	if (key == "name") {
-		this->Name = value;
+		this->name = value;
 	} else if (key == "prefix") {
 		CUpgrade *upgrade = CUpgrade::try_get(value);
 		if (upgrade != nullptr) {
@@ -113,24 +113,24 @@ void persistent_item::process_sml_property(const sml_property &property)
 		unique_item *unique_item = unique_item::try_get(value);
 		if (unique_item != nullptr) {
 			this->unique = unique_item;
-			this->Name = unique_item->get_name();
-			if (unique_item->Type != nullptr) {
-				this->unit_type = unique_item->Type;
+			this->name = unique_item->get_name();
+			if (unique_item->get_unit_type() != nullptr) {
+				this->unit_type = unique_item->get_unit_type();
 			} else {
 				fprintf(stderr, "Unique item \"%s\" has no type.\n", unique_item->get_identifier().c_str());
 			}
-			this->Prefix = unique_item->Prefix;
-			this->Suffix = unique_item->Suffix;
-			this->Spell = unique_item->Spell;
-			this->Work = unique_item->Work;
-			this->Elixir = unique_item->Elixir;
+			this->Prefix = unique_item->get_prefix();
+			this->Suffix = unique_item->get_suffix();
+			this->Spell = unique_item->get_spell();
+			this->Work = unique_item->get_work();
+			this->Elixir = unique_item->get_elixir();
 		} else {
 			fprintf(stderr, "Unique item \"%s\" doesn't exist.\n", value.c_str());
 		}
 	} else if (key == "bound") {
-		this->Bound = string::to_bool(value);
+		this->bound = string::to_bool(value);
 	} else if (key == "identified") {
-		this->Identified = string::to_bool(value);
+		this->identified = string::to_bool(value);
 	} else if (key == "equipped") {
 		this->equipped = true;
 	} else {
@@ -150,7 +150,7 @@ void persistent_item::ProcessConfigData(const CConfigData *config_data)
 		std::string value = config_data->Properties[i].second;
 		
 		if (key == "name") {
-			this->Name = value;
+			this->name = value;
 		} else if (key == "type") {
 			wyrmgus::unit_type *unit_type = unit_type::get(value);
 			this->unit_type = unit_type;
@@ -189,24 +189,24 @@ void persistent_item::ProcessConfigData(const CConfigData *config_data)
 			unique_item *unique_item = unique_item::try_get(value);
 			if (unique_item != nullptr) {
 				this->unique = unique_item;
-				this->Name = unique_item->get_name();
-				if (unique_item->Type != nullptr) {
-					this->unit_type = unique_item->Type;
+				this->name = unique_item->get_name();
+				if (unique_item->get_unit_type() != nullptr) {
+					this->unit_type = unique_item->get_unit_type();
 				} else {
 					fprintf(stderr, "Unique item \"%s\" has no type.\n", unique_item->get_identifier().c_str());
 				}
-				this->Prefix = unique_item->Prefix;
-				this->Suffix = unique_item->Suffix;
-				this->Spell = unique_item->Spell;
-				this->Work = unique_item->Work;
-				this->Elixir = unique_item->Elixir;
+				this->Prefix = unique_item->get_prefix();
+				this->Suffix = unique_item->get_suffix();
+				this->Spell = unique_item->get_spell();
+				this->Work = unique_item->get_work();
+				this->Elixir = unique_item->get_elixir();
 			} else {
 				fprintf(stderr, "Unique item \"%s\" doesn't exist.\n", value.c_str());
 			}
 		} else if (key == "bound") {
-			this->Bound = string::to_bool(value);
+			this->bound = string::to_bool(value);
 		} else if (key == "identified") {
-			this->Identified = string::to_bool(value);
+			this->identified = string::to_bool(value);
 		} else if (key == "equipped") {
 			this->equipped = true;
 		} else {

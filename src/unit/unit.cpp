@@ -1043,11 +1043,11 @@ void CUnit::set_character(wyrmgus::character *character)
 			item->SetElixir(persistent_item->Elixir);
 		}
 		item->Unique = persistent_item->get_unique();
-		if (!persistent_item->Name.empty()) {
-			item->Name = persistent_item->Name;
+		if (!persistent_item->get_name().empty()) {
+			item->Name = persistent_item->get_name();
 		}
-		item->Bound = persistent_item->Bound;
-		item->Identified = persistent_item->Identified;
+		item->Bound = persistent_item->is_bound();
+		item->Identified = persistent_item->is_identified();
 		item->Remove(this);
 		if (this->Character->is_item_equipped(persistent_item.get()) && this->can_equip_item(item)) {
 			this->EquipItem(*item, false);
@@ -1508,8 +1508,8 @@ void CUnit::EquipItem(CUnit &item, bool affect_character)
 		}
 	}
 	
-	if (item.Unique && item.Unique->Set && this->EquippingItemCompletesSet(&item)) {
-		for (const auto &modifier : item.Unique->Set->get_modifiers()) {
+	if (item.Unique != nullptr && item.Unique->get_set() != nullptr && this->EquippingItemCompletesSet(&item)) {
+		for (const auto &modifier : item.Unique->get_set()->get_modifiers()) {
 			ApplyIndividualUpgradeModifier(*this, modifier.get());
 		}
 	}
@@ -1630,8 +1630,8 @@ void CUnit::DeequipItem(CUnit &item, bool affect_character)
 		}
 	}
 	
-	if (item.Unique && item.Unique->Set && this->DeequippingItemBreaksSet(&item)) {
-		for (const auto &modifier : item.Unique->Set->get_modifiers()) {
+	if (item.Unique != nullptr && item.Unique->get_set() != nullptr && this->DeequippingItemBreaksSet(&item)) {
+		for (const auto &modifier : item.Unique->get_set()->get_modifiers()) {
 			RemoveIndividualUpgradeModifier(*this, modifier.get());
 		}
 	}
@@ -1748,7 +1748,7 @@ void CUnit::DeequipItem(CUnit &item, bool affect_character)
 	this->ChooseButtonIcon(ButtonCmd::Patrol);
 }
 
-void CUnit::ReadWork(CUpgrade *work, bool affect_character)
+void CUnit::ReadWork(const CUpgrade *work, bool affect_character)
 {
 	IndividualUpgradeAcquire(*this, work);
 	
@@ -1760,7 +1760,7 @@ void CUnit::ReadWork(CUpgrade *work, bool affect_character)
 	}
 }
 
-void CUnit::ConsumeElixir(CUpgrade *elixir, bool affect_character)
+void CUnit::ConsumeElixir(const CUpgrade *elixir, bool affect_character)
 {
 	IndividualUpgradeAcquire(*this, elixir);
 	
@@ -1835,7 +1835,7 @@ void CUnit::ApplyAuraEffect(int aura_index)
 	this->Variable[effect_index].Value = std::max(CYCLES_PER_SECOND + 1, this->Variable[effect_index].Value);
 }
 
-void CUnit::SetPrefix(CUpgrade *prefix)
+void CUnit::SetPrefix(const CUpgrade *prefix)
 {
 	if (Prefix != nullptr) {
 		for (const auto &modifier : Prefix->get_modifiers()) {
@@ -1860,7 +1860,7 @@ void CUnit::SetPrefix(CUpgrade *prefix)
 	this->UpdateItemName();
 }
 
-void CUnit::SetSuffix(CUpgrade *suffix)
+void CUnit::SetSuffix(const CUpgrade *suffix)
 {
 	if (Suffix != nullptr) {
 		for (const auto &modifier : Suffix->get_modifiers()) {
@@ -1885,7 +1885,7 @@ void CUnit::SetSuffix(CUpgrade *suffix)
 	this->UpdateItemName();
 }
 
-void CUnit::SetSpell(wyrmgus::spell *spell)
+void CUnit::SetSpell(const wyrmgus::spell *spell)
 {
 	if (!IsNetworkGame() && Container && Container->Character && Container->Player == CPlayer::GetThisPlayer() && Container->Character->get_item(*this) != nullptr && Container->Character->get_item(*this)->Spell != spell) { //update the persistent item, if applicable and if it hasn't been updated yet
 		Container->Character->get_item(*this)->Spell = spell;
@@ -1896,7 +1896,7 @@ void CUnit::SetSpell(wyrmgus::spell *spell)
 	this->UpdateItemName();
 }
 
-void CUnit::SetWork(CUpgrade *work)
+void CUnit::SetWork(const CUpgrade *work)
 {
 	if (this->Work != nullptr) {
 		this->Variable[MAGICLEVEL_INDEX].Value -= this->Work->get_magic_level();
@@ -1918,7 +1918,7 @@ void CUnit::SetWork(CUpgrade *work)
 	this->UpdateItemName();
 }
 
-void CUnit::SetElixir(CUpgrade *elixir)
+void CUnit::SetElixir(const CUpgrade *elixir)
 {
 	if (this->Elixir != nullptr) {
 		this->Variable[MAGICLEVEL_INDEX].Value -= this->Elixir->get_magic_level();
@@ -1942,26 +1942,26 @@ void CUnit::SetElixir(CUpgrade *elixir)
 
 void CUnit::SetUnique(wyrmgus::unique_item *unique)
 {
-	if (this->Unique && this->Unique->Set) {
-		this->Variable[MAGICLEVEL_INDEX].Value -= this->Unique->Set->get_magic_level();
-		this->Variable[MAGICLEVEL_INDEX].Max -= this->Unique->Set->get_magic_level();
+	if (this->Unique != nullptr && this->Unique->get_set() != nullptr) {
+		this->Variable[MAGICLEVEL_INDEX].Value -= this->Unique->get_set()->get_magic_level();
+		this->Variable[MAGICLEVEL_INDEX].Max -= this->Unique->get_set()->get_magic_level();
 	}
 		
 	if (unique != nullptr) {
-		SetPrefix(unique->Prefix);
-		SetSuffix(unique->Suffix);
-		SetSpell(unique->Spell);
-		SetWork(unique->Work);
-		SetElixir(unique->Elixir);
+		SetPrefix(unique->get_prefix());
+		SetSuffix(unique->get_suffix());
+		SetSpell(unique->get_spell());
+		SetWork(unique->get_work());
+		SetElixir(unique->get_elixir());
 		if (unique->ResourcesHeld != 0) {
 			this->SetResourcesHeld(unique->ResourcesHeld);
 			this->Variable[GIVERESOURCE_INDEX].Value = unique->ResourcesHeld;
 			this->Variable[GIVERESOURCE_INDEX].Max = unique->ResourcesHeld;
 			this->Variable[GIVERESOURCE_INDEX].Enable = 1;
 		}
-		if (unique->Set) {
-			this->Variable[MAGICLEVEL_INDEX].Value += unique->Set->get_magic_level();
-			this->Variable[MAGICLEVEL_INDEX].Max += unique->Set->get_magic_level();
+		if (unique->get_set() != nullptr) {
+			this->Variable[MAGICLEVEL_INDEX].Value += unique->get_set()->get_magic_level();
+			this->Variable[MAGICLEVEL_INDEX].Max += unique->get_set()->get_magic_level();
 		}
 		Name = unique->get_name();
 		Unique = unique;
@@ -1978,8 +1978,8 @@ void CUnit::SetUnique(wyrmgus::unique_item *unique)
 
 void CUnit::Identify()
 {
-	if (!IsNetworkGame() && Container && Container->Character && Container->Player == CPlayer::GetThisPlayer() && Container->Character->get_item(*this) != nullptr && Container->Character->get_item(*this)->Identified != true) { //update the persistent item, if applicable and if it hasn't been updated yet
-		Container->Character->get_item(*this)->Identified = true;
+	if (!IsNetworkGame() && Container && Container->Character && Container->Player == CPlayer::GetThisPlayer() && Container->Character->get_item(*this) != nullptr && Container->Character->get_item(*this)->is_identified() != true) { //update the persistent item, if applicable and if it hasn't been updated yet
+		Container->Character->get_item(*this)->set_identified(true);
 		SaveHero(Container->Character);
 	}
 	
@@ -2357,115 +2357,115 @@ void CUnit::GenerateUnique(CUnit *dropper, CPlayer *dropper_player)
 	std::vector<wyrmgus::unique_item *> potential_uniques;
 
 	for (wyrmgus::unique_item *unique : wyrmgus::unique_item::get_all()) {
-		if (this->Type != unique->Type) {
+		if (this->Type != unique->get_unit_type()) {
 			continue;
 		}
 
-		if (unique->Prefix != nullptr) {
+		if (unique->get_prefix() != nullptr) {
 			//the dropper unit must be capable of generating this unique item's prefix to drop the item, or else the unit type must be capable of generating it on its own
-			if (std::find(this->Type->Affixes.begin(), this->Type->Affixes.end(), unique->Prefix) == this->Type->Affixes.end()) {
+			if (std::find(this->Type->Affixes.begin(), this->Type->Affixes.end(), unique->get_prefix()) == this->Type->Affixes.end()) {
 				if (dropper_player == nullptr) {
 					continue;
 				}
 
 				if (dropper != nullptr) {
-					if (!check_conditions(unique->Prefix, dropper)) {
+					if (!check_conditions(unique->get_prefix(), dropper)) {
 						continue;
 					}
 				} else {
-					if (!check_conditions(unique->Prefix, dropper_player)) {
+					if (!check_conditions(unique->get_prefix(), dropper_player)) {
 						continue;
 					}
 				}
 			}
 		}
 
-		if (unique->Suffix != nullptr) {
+		if (unique->get_suffix() != nullptr) {
 			//the dropper unit must be capable of generating this unique item's suffix to drop the item, or else the unit type must be capable of generating it on its own
-			if (std::find(this->Type->Affixes.begin(), this->Type->Affixes.end(), unique->Suffix) == this->Type->Affixes.end()) {
+			if (std::find(this->Type->Affixes.begin(), this->Type->Affixes.end(), unique->get_suffix()) == this->Type->Affixes.end()) {
 				if (dropper_player == nullptr) {
 					continue;
 				}
 
 				if (dropper != nullptr) {
-					if (!check_conditions(unique->Suffix, dropper)) {
+					if (!check_conditions(unique->get_suffix(), dropper)) {
 						continue;
 					}
 				} else {
-					if (!check_conditions(unique->Suffix, dropper_player)) {
+					if (!check_conditions(unique->get_suffix(), dropper_player)) {
 						continue;
 					}
 				}
 			}
 		}
 
-		if (unique->Set != nullptr) {
+		if (unique->get_set() != nullptr) {
 			//the dropper unit must be capable of generating this unique item's set to drop the item
 			if (dropper_player == nullptr) {
 				continue;
 			}
 
 			if (dropper != nullptr) {
-				if (!check_conditions(unique->Set, dropper)) {
+				if (!check_conditions(unique->get_set(), dropper)) {
 					continue;
 				}
 			} else {
-				if (!check_conditions(unique->Set, dropper_player)) {
+				if (!check_conditions(unique->get_set(), dropper_player)) {
 					continue;
 				}
 			}
 		}
 
-		if (unique->Spell != nullptr) {
+		if (unique->get_spell() != nullptr) {
 			//the dropper unit must be capable of generating this unique item's spell to drop the item
 			if (dropper == nullptr) {
 				continue;
 			}
 
-			if (std::find(dropper->Type->DropSpells.begin(), dropper->Type->DropSpells.end(), unique->Spell) == dropper->Type->DropSpells.end()) {
+			if (std::find(dropper->Type->DropSpells.begin(), dropper->Type->DropSpells.end(), unique->get_spell()) == dropper->Type->DropSpells.end()) {
 				continue;
 			}
 		}
 
-		if (unique->Work != nullptr) {
+		if (unique->get_work() != nullptr) {
 			//the dropper unit must be capable of generating this unique item's work to drop the item, or else the unit type must be capable of generating it on its own
-			if (std::find(this->Type->Affixes.begin(), this->Type->Affixes.end(), unique->Work) == this->Type->Affixes.end()) {
+			if (std::find(this->Type->Affixes.begin(), this->Type->Affixes.end(), unique->get_work()) == this->Type->Affixes.end()) {
 				if (dropper_player == nullptr) {
 					continue;
 				}
 
 				if (dropper != nullptr) {
-					if (!check_conditions(unique->Work, dropper)) {
+					if (!check_conditions(unique->get_work(), dropper)) {
 						continue;
 					}
 				} else {
-					if (!check_conditions(unique->Work, dropper_player)) {
+					if (!check_conditions(unique->get_work(), dropper_player)) {
 						continue;
 					}
 				}
 			}
 		}
 
-		if (unique->Elixir != nullptr) {
+		if (unique->get_elixir() != nullptr) {
 			//the dropper unit must be capable of generating this unique item's elixir to drop the item, or else the unit type must be capable of generating it on its own
-			if (std::find(this->Type->Affixes.begin(), this->Type->Affixes.end(), unique->Elixir) == this->Type->Affixes.end()) {
+			if (std::find(this->Type->Affixes.begin(), this->Type->Affixes.end(), unique->get_elixir()) == this->Type->Affixes.end()) {
 				if (dropper_player == nullptr) {
 					continue;
 				}
 
 				if (dropper != nullptr) {
-					if (!check_conditions(unique->Elixir, dropper)) {
+					if (!check_conditions(unique->get_elixir(), dropper)) {
 						continue;
 					}
 				} else {
-					if (!check_conditions(unique->Elixir, dropper_player)) {
+					if (!check_conditions(unique->get_elixir(), dropper_player)) {
 						continue;
 					}
 				}
 			}
 		}
 
-		if (!unique->CanDrop()) {
+		if (!unique->can_drop()) {
 			continue;
 		}
 
@@ -5618,9 +5618,9 @@ int CUnit::GetItemVariableChange(const CUnit *item, int variable_index, bool inc
 			}
 		}
 		
-		if (item->Unique && item->Unique->Set) {
+		if (item->Unique != nullptr && item->Unique->get_set() != nullptr) {
 			if (this->EquippingItemCompletesSet(item)) {
-				for (const auto &modifier : item->Unique->Set->get_modifiers()) {
+				for (const auto &modifier : item->Unique->get_set()->get_modifiers()) {
 					if (!increase) {
 						value += modifier->Modifier.Variables[variable_index].Value;
 					} else {
@@ -5644,9 +5644,9 @@ int CUnit::GetItemVariableChange(const CUnit *item, int variable_index, bool inc
 			} else {
 				value -= equipped_item->Variable[variable_index].Increase;
 			}
-			if (equipped_item != item && equipped_item->Unique && equipped_item->Unique->Set) {
+			if (equipped_item != item && equipped_item->Unique != nullptr && equipped_item->Unique->get_set() != nullptr) {
 				if (this->DeequippingItemBreaksSet(equipped_item)) {
-					for (const auto &modifier : equipped_item->Unique->Set->get_modifiers()) {
+					for (const auto &modifier : equipped_item->Unique->get_set()->get_modifiers()) {
 						if (!increase) {
 							value -= modifier->Modifier.Variables[variable_index].Value;
 						} else {
@@ -6143,7 +6143,7 @@ bool CUnit::IsItemTypeEquipped(const wyrmgus::unit_type *item_type) const
 
 bool CUnit::IsUniqueItemEquipped(const wyrmgus::unique_item *unique) const
 {
-	const wyrmgus::item_slot item_slot = wyrmgus::get_item_class_slot(unique->Type->get_item_class());
+	const wyrmgus::item_slot item_slot = wyrmgus::get_item_class_slot(unique->get_unit_type()->get_item_class());
 		
 	if (item_slot == wyrmgus::item_slot::none) {
 		return false;
@@ -6270,8 +6270,8 @@ bool CUnit::CanUseItem(CUnit *item) const
 
 bool CUnit::IsItemSetComplete(const CUnit *item) const
 {
-	for (size_t i = 0; i < item->Unique->Set->UniqueItems.size(); ++i) {
-		if (!this->IsUniqueItemEquipped(item->Unique->Set->UniqueItems[i])) {
+	for (size_t i = 0; i < item->Unique->get_set()->UniqueItems.size(); ++i) {
+		if (!this->IsUniqueItemEquipped(item->Unique->get_set()->UniqueItems[i])) {
 			return false;
 		}
 	}
@@ -6281,8 +6281,8 @@ bool CUnit::IsItemSetComplete(const CUnit *item) const
 
 bool CUnit::EquippingItemCompletesSet(const CUnit *item) const
 {
-	for (size_t i = 0; i < item->Unique->Set->UniqueItems.size(); ++i) {
-		const wyrmgus::item_slot item_slot = wyrmgus::get_item_class_slot(item->Unique->Set->UniqueItems[i]->Type->get_item_class());
+	for (size_t i = 0; i < item->Unique->get_set()->UniqueItems.size(); ++i) {
+		const wyrmgus::item_slot item_slot = wyrmgus::get_item_class_slot(item->Unique->get_set()->UniqueItems[i]->get_unit_type()->get_item_class());
 		
 		if (item_slot == wyrmgus::item_slot::none) {
 			return false;
@@ -6290,15 +6290,15 @@ bool CUnit::EquippingItemCompletesSet(const CUnit *item) const
 		
 		bool has_item_equipped = false;
 		for (size_t j = 0; j < this->EquippedItems[static_cast<int>(item_slot)].size(); ++j) {
-			if (EquippedItems[static_cast<int>(item_slot)][j]->Unique == item->Unique->Set->UniqueItems[i]) {
+			if (EquippedItems[static_cast<int>(item_slot)][j]->Unique == item->Unique->get_set()->UniqueItems[i]) {
 				has_item_equipped = true;
 				break;
 			}
 		}
 		
-		if (has_item_equipped && item->Unique->Set->UniqueItems[i] == item->Unique) { //if the unique item is already equipped, it won't complete the set (either the set is already complete, or needs something else)
+		if (has_item_equipped && item->Unique->get_set()->UniqueItems[i] == item->Unique) { //if the unique item is already equipped, it won't complete the set (either the set is already complete, or needs something else)
 			return false;
-		} else if (!has_item_equipped && item->Unique->Set->UniqueItems[i] != item->Unique) {
+		} else if (!has_item_equipped && item->Unique->get_set()->UniqueItems[i] != item->Unique) {
 			return false;
 		}
 		

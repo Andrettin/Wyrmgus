@@ -662,7 +662,7 @@ static bool CanShowPopupContent(const PopupConditionPanel *condition,
 			}
 		}
 		if (condition->UniqueSet != CONDITION_TRUE) {
-			if ((condition->UniqueSet == CONDITION_ONLY) ^ (unit.Unique && unit.Unique->Set)) {
+			if ((condition->UniqueSet == CONDITION_ONLY) ^ (unit.Unique != nullptr && unit.Unique->get_set() != nullptr)) {
 				return false;
 			}
 		}
