@@ -285,19 +285,7 @@ static int CclDefineCharacter(lua_State *l)
 						std::string unique_ident = LuaToString(l, -1, k + 1);
 						wyrmgus::unique_item *unique_item = wyrmgus::unique_item::try_get(unique_ident);
 						item->unique = unique_item;
-						if (unique_item != nullptr) {
-							item->name = unique_item->get_name();
-							if (unique_item->get_unit_type() != nullptr) {
-								item->unit_type = unique_item->get_unit_type();
-							} else {
-								fprintf(stderr, "Unique item \"%s\" has no type.\n", unique_item->get_identifier().c_str());
-							}
-							item->Prefix = unique_item->get_prefix();
-							item->Suffix = unique_item->get_suffix();
-							item->Spell = unique_item->get_spell();
-							item->Work = unique_item->get_work();
-							item->Elixir = unique_item->get_elixir();
-						} else {
+						if (unique_item == nullptr) {
 							fprintf(stderr, "Unique item \"%s\" doesn't exist.\n", unique_ident.c_str());
 						}
 					} else if (!strcmp(value, "bound")) {
@@ -582,19 +570,7 @@ static int CclDefineCustomHero(lua_State *l)
 						std::string unique_ident = LuaToString(l, -1, k + 1);
 						wyrmgus::unique_item *unique_item = wyrmgus::unique_item::try_get(unique_ident);
 						item->unique = unique_item;
-						if (unique_item != nullptr) {
-							item->name = unique_item->get_name();
-							if (unique_item->get_unit_type() != nullptr) {
-								item->unit_type = unique_item->get_unit_type();
-							} else {
-								fprintf(stderr, "Unique item \"%s\" has no type.\n", item->get_name().c_str());
-							}
-							item->Prefix = unique_item->get_prefix();
-							item->Suffix = unique_item->get_suffix();
-							item->Spell = unique_item->get_spell();
-							item->Work = unique_item->get_work();
-							item->Elixir = unique_item->get_elixir();
-						} else {
+						if (unique_item == nullptr) {
 							fprintf(stderr, "Unique item \"%s\" doesn't exist.\n", unique_ident.c_str());
 						}
 					} else if (!strcmp(value, "bound")) {

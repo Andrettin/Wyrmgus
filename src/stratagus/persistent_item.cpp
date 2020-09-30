@@ -59,7 +59,7 @@ persistent_item::persistent_item(const CUnit *item_unit, character *owner) : per
 	if (item_unit->Elixir != nullptr) {
 		this->Elixir = item_unit->Elixir;
 	}
-	if (item_unit->Unique) {
+	if (item_unit->Unique != nullptr) {
 		this->name = item_unit->Name;
 		this->unique = item_unit->Unique;
 	}
@@ -113,17 +113,6 @@ void persistent_item::process_sml_property(const sml_property &property)
 		unique_item *unique_item = unique_item::try_get(value);
 		if (unique_item != nullptr) {
 			this->unique = unique_item;
-			this->name = unique_item->get_name();
-			if (unique_item->get_unit_type() != nullptr) {
-				this->unit_type = unique_item->get_unit_type();
-			} else {
-				fprintf(stderr, "Unique item \"%s\" has no type.\n", unique_item->get_identifier().c_str());
-			}
-			this->Prefix = unique_item->get_prefix();
-			this->Suffix = unique_item->get_suffix();
-			this->Spell = unique_item->get_spell();
-			this->Work = unique_item->get_work();
-			this->Elixir = unique_item->get_elixir();
 		} else {
 			fprintf(stderr, "Unique item \"%s\" doesn't exist.\n", value.c_str());
 		}
@@ -189,17 +178,6 @@ void persistent_item::ProcessConfigData(const CConfigData *config_data)
 			unique_item *unique_item = unique_item::try_get(value);
 			if (unique_item != nullptr) {
 				this->unique = unique_item;
-				this->name = unique_item->get_name();
-				if (unique_item->get_unit_type() != nullptr) {
-					this->unit_type = unique_item->get_unit_type();
-				} else {
-					fprintf(stderr, "Unique item \"%s\" has no type.\n", unique_item->get_identifier().c_str());
-				}
-				this->Prefix = unique_item->get_prefix();
-				this->Suffix = unique_item->get_suffix();
-				this->Spell = unique_item->get_spell();
-				this->Work = unique_item->get_work();
-				this->Elixir = unique_item->get_elixir();
 			} else {
 				fprintf(stderr, "Unique item \"%s\" doesn't exist.\n", value.c_str());
 			}
@@ -213,7 +191,19 @@ void persistent_item::ProcessConfigData(const CConfigData *config_data)
 			fprintf(stderr, "Invalid item property: \"%s\".\n", key.c_str());
 		}
 	}
-	
+}
+
+void persistent_item::initialize()
+{
+	if (this->get_unique() != nullptr) {
+		this->name = this->get_unique()->get_name();
+		this->unit_type = this->get_unique()->get_unit_type();
+		this->Prefix = this->get_unique()->get_prefix();
+		this->Suffix = this->get_unique()->get_suffix();
+		this->Spell = this->get_unique()->get_spell();
+		this->Work = this->get_unique()->get_work();
+		this->Elixir = this->get_unique()->get_elixir();
+	}
 }
 
 item_class persistent_item::get_item_class() const

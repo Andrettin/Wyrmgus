@@ -77,6 +77,7 @@ public:
 	void process_sml_property(const sml_property &property);
 	void process_sml_scope(const sml_data &scope);
 	void ProcessConfigData(const CConfigData *config_data);
+	void initialize();
 
 	const unit_type *get_unit_type() const
 	{

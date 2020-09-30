@@ -428,8 +428,16 @@ void character::initialize()
 		this->get_civilization()->add_character(this);
 	}
 
+	for (const std::unique_ptr<persistent_item> &default_item : this->default_items) {
+		default_item->initialize();
+	}
+
+	for (const std::unique_ptr<persistent_item> &item : this->items) {
+		item->initialize();
+	}
+
 	if (this->items.empty() && !this->default_items.empty()) {
-		for (const auto &default_item : this->default_items) {
+		for (const std::unique_ptr<persistent_item> &default_item : this->default_items) {
 			this->add_item(default_item->duplicate());
 		}
 	}
