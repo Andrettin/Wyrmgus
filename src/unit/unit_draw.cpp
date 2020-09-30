@@ -613,8 +613,8 @@ static void DrawDecoration(const CUnit &unit, const wyrmgus::unit_type &type, co
 			  || max == 0 || max < var.MinValue)) {
 			  //Wyrmgus end
 			var.Draw(
-				x + var.OffsetX + var.OffsetXPercent * unit.Type->get_tile_width() * wyrmgus::defines::get()->get_scaled_tile_width() / 100,
-				y + var.OffsetY + var.OffsetYPercent * unit.Type->get_tile_height() * wyrmgus::defines::get()->get_scaled_tile_height() / 100,
+				x + var.OffsetX * wyrmgus::defines::get()->get_scale_factor() + var.OffsetXPercent * unit.Type->get_tile_width() * wyrmgus::defines::get()->get_scaled_tile_width() / 100,
+				y + var.OffsetY * wyrmgus::defines::get()->get_scale_factor() + var.OffsetYPercent * unit.Type->get_tile_height() * wyrmgus::defines::get()->get_scaled_tile_height() / 100,
 				type, unit.Variable[var.Index]);
 		}
 	}
