@@ -195,6 +195,14 @@ set(guichan_SRCS
 )
 source_group(guichan FILES ${guichan_SRCS})
 
+set(item_SRCS
+	src/item/item_class.cpp
+	src/item/persistent_item.cpp
+	src/item/script_item.cpp
+	src/item/unique_item.cpp
+)
+source_group(item FILES ${item_SRCS})
+
 set(language_SRCS
 	src/language/language.cpp
 	src/language/word.cpp
@@ -354,13 +362,11 @@ set(stratagusmain_SRCS
 	src/stratagus/iolib.cpp
 	src/stratagus/literary_text.cpp
 	src/stratagus/luacallback.cpp
-	src/stratagus/item_class.cpp
 	src/stratagus/magic_domain.cpp
 	src/stratagus/main.cpp
 	src/stratagus/mainloop.cpp
 	src/stratagus/mod.cpp
 	src/stratagus/parameters.cpp
-	src/stratagus/persistent_item.cpp
 	src/stratagus/plane.cpp
 	src/stratagus/player.cpp
 	src/stratagus/player_color.cpp
@@ -371,7 +377,6 @@ set(stratagusmain_SRCS
 	src/stratagus/script_player.cpp
 	src/stratagus/script_character.cpp
 	src/stratagus/script_grand_strategy.cpp
-	src/stratagus/script_item.cpp
 	src/stratagus/script_literary_text.cpp
 	src/stratagus/script_province.cpp
 	src/stratagus/script_quest.cpp
@@ -379,7 +384,6 @@ set(stratagusmain_SRCS
 	src/stratagus/stratagus.cpp
 	src/stratagus/title.cpp
 	src/stratagus/translate.cpp
-	src/stratagus/unique_item.cpp
 	src/stratagus/world.cpp
 )
 source_group(stratagus FILES ${stratagusmain_SRCS})
@@ -522,6 +526,7 @@ set(stratagus_SRCS
 	${editor_SRCS}
 	${game_SRCS}
 	${guichan_SRCS}
+	${item_SRCS}
 	${language_SRCS}
 	${map_SRCS}
 	${missile_SRCS}
@@ -656,6 +661,13 @@ set(stratagus_database_HDRS
 	src/database/sml_parser.h
 	src/database/sml_property.h
 	src/database/sml_property_visitor.h
+)
+
+set(stratagus_item_HDRS
+	src/item/item_class.h
+	src/item/item_slot.h
+	src/item/persistent_item.h
+	src/item/unique_item.h
 )
 
 set(stratagus_language_HDRS
@@ -916,14 +928,10 @@ set(stratagus_generic_HDRS
 	src/stratagus/faction_tier.h
 	src/stratagus/gender.h
 	src/stratagus/government_type.h
-	src/stratagus/item_class.h
-	src/stratagus/item_slot.h
 	src/stratagus/literary_text.h
 	src/stratagus/magic_domain.h
 	src/stratagus/objective_type.h
-	src/stratagus/persistent_item.h
 	src/stratagus/player_container.h
-	src/stratagus/unique_item.h
 	src/stratagus/vassalage_type.h
 )
 
@@ -932,6 +940,7 @@ source_group(action FILES ${stratagus_action_HDRS})
 source_group(animation FILES ${stratagus_animation_HDRS})
 source_group(database FILES ${stratagus_database_HDRS})
 source_group(guichan FILES ${stratagus_guichan_HDRS})
+source_group(item FILES ${stratagus_item_HDRS})
 source_group(language FILES ${stratagus_language_HDRS})
 source_group(map FILES ${stratagus_map_HDRS})
 source_group(missile FILES ${stratagus_missile_HDRS})
@@ -957,6 +966,7 @@ set(stratagus_HDRS
 	${stratagus_animation_HDRS}
 	${stratagus_database_HDRS}
 	${stratagus_guichan_HDRS}
+	${stratagus_item_HDRS}
 	${stratagus_language_HDRS}
 	${stratagus_map_HDRS}
 	${stratagus_missile_HDRS}
