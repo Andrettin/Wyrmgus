@@ -198,6 +198,7 @@ source_group(guichan FILES ${guichan_SRCS})
 set(item_SRCS
 	src/item/item_class.cpp
 	src/item/persistent_item.cpp
+	src/item/recipe.cpp
 	src/item/script_item.cpp
 	src/item/unique_item.cpp
 )
@@ -667,6 +668,7 @@ set(stratagus_item_HDRS
 	src/item/item_class.h
 	src/item/item_slot.h
 	src/item/persistent_item.h
+	src/item/recipe.h
 	src/item/unique_item.h
 )
 

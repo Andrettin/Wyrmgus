@@ -50,6 +50,8 @@
 #include "government_type.h"
 #include "item/item_class.h"
 #include "item/item_slot.h"
+#include "item/recipe.h"
+#include "item/unique_item.h"
 #include "language/grammatical_gender.h"
 #include "language/language.h"
 #include "language/language_family.h"
@@ -268,6 +270,8 @@ QVariant database::process_sml_property_value(const sml_property &property, cons
 			new_property_value = QVariant::fromValue(player_color::get(property.get_value()));
 		} else if (property_class_name == "wyrmgus::quest*") {
 			new_property_value = QVariant::fromValue(quest::get(property.get_value()));
+		} else if (property_class_name == "wyrmgus::recipe*") {
+			new_property_value = QVariant::fromValue(recipe::get(property.get_value()));
 		} else if (property_class_name == "wyrmgus::region*") {
 			new_property_value = QVariant::fromValue(region::get(property.get_value()));
 		} else if (property_class_name == "wyrmgus::religion*") {
@@ -296,6 +300,8 @@ QVariant database::process_sml_property_value(const sml_property &property, cons
 			new_property_value = QVariant::fromValue(terrain_type::get(property.get_value()));
 		} else if (property_class_name == "wyrmgus::time_of_day*") {
 			new_property_value = QVariant::fromValue(time_of_day::get(property.get_value()));
+		} else if (property_class_name == "wyrmgus::unique_item*") {
+			new_property_value = QVariant::fromValue(unique_item::get(property.get_value()));
 		} else if (property_class_name == "wyrmgus::unit_class*") {
 			new_property_value = QVariant::fromValue(unit_class::get(property.get_value()));
 		} else if (property_class_name == "wyrmgus::unit_type*") {
