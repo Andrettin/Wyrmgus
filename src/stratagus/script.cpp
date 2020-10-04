@@ -48,6 +48,7 @@
 //Wyrmgus end
 #include "iocompat.h"
 #include "iolib.h"
+#include "item/unique_item.h"
 #include "map/map.h"
 #include "map/site.h"
 #include "parameters.h"
@@ -58,7 +59,6 @@
 #include "translate.h"
 #include "ui/button.h"
 #include "ui/ui.h"
-#include "unique_item.h"
 #include "unit/unit.h"
 #include "unit/unit_class.h"
 //Wyrmgus start

@@ -30,7 +30,7 @@
 #include "database/data_type.h"
 #include "database/detailed_data_entry.h"
 #include "data_type.h"
-#include "item_slot.h"
+#include "item/item_slot.h"
 #include "time/date.h"
 
 class CFile;

@@ -39,8 +39,8 @@
 #include "editor.h" //for personal name generation
 #include "faction.h"
 #include "iolib.h"
-#include "item_class.h"
-#include "item_slot.h"
+#include "item/item_class.h"
+#include "item/item_slot.h"
 #include "luacallback.h"
 #include "map/map.h"
 #include "map/terrain_type.h"

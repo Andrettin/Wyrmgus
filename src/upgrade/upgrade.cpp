@@ -51,7 +51,7 @@
 #include "grand_strategy.h"
 //Wyrmgus end
 #include "iolib.h"
-#include "item_class.h"
+#include "item/item_class.h"
 #include "magic_domain.h"
 #include "map/map.h"
 #include "map/tileset.h"

@@ -39,7 +39,7 @@
 #include "game.h"
 //Wyrmgus end
 #include "iolib.h"
-#include "item_slot.h"
+#include "item/item_slot.h"
 #include "map/map.h"
 #include "map/map_layer.h"
 #include "map/tileset.h"

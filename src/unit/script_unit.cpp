@@ -40,6 +40,7 @@
 //Wyrmgus start
 #include "grand_strategy.h"
 //Wyrmgus end
+#include "item/unique_item.h"
 #include "map/map.h"
 #include "map/map_layer.h"
 #include "map/site.h"
@@ -56,15 +57,10 @@
 //Wyrmgus end
 #include "ui/interface.h"
 #include "ui/ui.h"
-#include "unique_item.h"
 #include "unit/unit_find.h"
 #include "unit/unit_manager.h"
 #include "unit/unit_type.h"
 #include "upgrade/upgrade.h"
-
-/*----------------------------------------------------------------------------
---  Functions
-----------------------------------------------------------------------------*/
 
 /// Get resource by name
 extern unsigned CclGetResourceByName(lua_State *l);

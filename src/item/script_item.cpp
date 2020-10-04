@@ -29,10 +29,10 @@
 
 #include "stratagus.h"
 
+#include "item/unique_item.h"
 #include "player.h"
 #include "script.h"
 #include "spell/spell.h"
-#include "unique_item.h"
 #include "unit/unit_type.h"
 #include "upgrade/upgrade.h"
 

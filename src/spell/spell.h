@@ -31,7 +31,7 @@
 #include "database/data_type.h"
 #include "database/named_data_entry.h"
 #include "data_type.h"
-#include "item_class.h"
+#include "item/item_class.h"
 #include "luacallback.h"
 #include "sound/unitsound.h"
 #include "vec2i.h"

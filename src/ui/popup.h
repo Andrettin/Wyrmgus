@@ -30,7 +30,7 @@
 #pragma once
 
 #include "color.h"
-#include "item_class.h"
+#include "item/item_class.h"
 #include "script.h"
 #include "ui/button_cmd.h"
 #include "unit/unit_type_type.h"

@@ -27,11 +27,11 @@
 
 #include "stratagus.h"
 
-#include "unique_item.h"
+#include "item/unique_item.h"
 
 #include "character.h"
 #include "network.h"
-#include "persistent_item.h"
+#include "item/persistent_item.h"
 #include "ui/interface.h"
 #include "unit/unit.h"
 #include "unit/unit_manager.h"

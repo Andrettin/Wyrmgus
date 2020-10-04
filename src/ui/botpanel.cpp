@@ -54,6 +54,7 @@
 //Wyrmgus end
 #include "guichan/key.h"
 #include "guichan/sdl/sdlinput.h"
+#include "item/unique_item.h"
 #include "map/map.h"
 #include "map/map_layer.h"
 #include "map/tileset.h"
@@ -77,7 +78,6 @@
 #include "ui/interface.h"
 #include "ui/popup.h"
 #include "ui/resource_icon.h"
-#include "unique_item.h"
 #include "unit/unit.h"
 #include "unit/unit_class.h"
 //Wyrmgus start

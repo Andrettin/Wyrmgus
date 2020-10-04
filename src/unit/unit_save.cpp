@@ -10,7 +10,7 @@
 //
 /**@name unit_save.cpp - Save unit. */
 //
-//      (c) Copyright 1998-2008 by Lutz Sammer and Jimmy Salmon
+//      (c) Copyright 1998-2020 by Lutz Sammer, Jimmy Salmon and Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -37,13 +37,13 @@
 #include "animation.h"
 #include "character.h"
 #include "iolib.h"
+#include "item/unique_item.h"
 #include "map/map.h"
 #include "map/map_layer.h"
 #include "map/site.h"
 #include "pathfinder.h"
 #include "player.h"
 #include "spell/spell.h"
-#include "unique_item.h"
 #include "unit/unit_type.h"
 
 /**

@@ -27,13 +27,13 @@
 
 #include "stratagus.h"
 
-#include "persistent_item.h"
+#include "item/persistent_item.h"
 
 #include "character.h"
 #include "config.h"
-#include "item_slot.h"
+#include "item/item_slot.h"
+#include "item/unique_item.h"
 #include "spell/spell.h"
-#include "unique_item.h"
 #include "unit/unit.h"
 #include "unit/unit_type.h"
 #include "upgrade/upgrade.h"

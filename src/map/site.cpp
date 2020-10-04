@@ -33,6 +33,7 @@
 #include "config.h"
 #include "database/defines.h"
 #include "faction.h"
+#include "item/unique_item.h"
 #include "map/map.h"
 #include "map/map_layer.h"
 #include "map/map_template.h"
@@ -40,7 +41,6 @@
 #include "player.h" //for factions
 #include "player_color.h"
 #include "province.h" //for regions
-#include "unique_item.h"
 #include "unit/unit.h"
 #include "unit/unit_class.h"
 #include "unit/unit_type.h"

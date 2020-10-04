@@ -25,9 +25,9 @@
 //      02111-1307, USA.
 //
 
-#include "item_class.h"
+#include "item/item_class.h"
 
-#include "item_slot.h"
+#include "item/item_slot.h"
 
 namespace wyrmgus {
 

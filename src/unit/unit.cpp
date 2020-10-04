@@ -51,7 +51,9 @@
 //Wyrmgus start
 #include "grand_strategy.h"
 //Wyrmgus end
-#include "item_slot.h"
+#include "item/item_slot.h"
+#include "item/persistent_item.h"
+#include "item/unique_item.h"
 #include "luacallback.h"
 #include "map/map.h"
 #include "map/map_layer.h"
@@ -61,7 +63,6 @@
 #include "network.h"
 #include "objective_type.h"
 #include "pathfinder.h"
-#include "persistent_item.h"
 #include "plane.h"
 #include "player.h"
 //Wyrmgus start
@@ -80,7 +81,6 @@
 #include "ui/button.h"
 #include "ui/interface.h"
 #include "ui/ui.h"
-#include "unique_item.h"
 #include "unit/unit_find.h"
 #include "unit/unit_manager.h"
 #include "unit/unit_type.h"

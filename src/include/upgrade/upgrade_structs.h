@@ -33,7 +33,7 @@
 #include "database/data_type.h"
 #include "database/detailed_data_entry.h"
 #include "data_type.h"
-#include "item_class.h"
+#include "item/item_class.h"
 #include "resource.h"
 #include "stratagus.h"
 #include "unit/unit_variable.h"

@@ -53,6 +53,7 @@
 //Wyrmgus end
 #include "iocompat.h"
 #include "iolib.h"
+#include "item/persistent_item.h"
 #include "literary_text.h"
 #include "map/map.h"
 #include "map/map_layer.h"
@@ -64,7 +65,6 @@
 #include "network.h"
 #include "parameters.h"
 #include "pathfinder.h"
-#include "persistent_item.h"
 #include "player.h"
 #include "player_color.h"
 //Wyrmgus start

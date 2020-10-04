@@ -51,6 +51,7 @@
 #include "iocompat.h"
 //Wyrmgus end
 #include "iolib.h"
+#include "item/unique_item.h"
 #include "language/language.h"
 //Wyrmgus start
 #include "luacallback.h"
@@ -81,7 +82,6 @@
 #include "translate.h"
 #include "ui/button.h"
 #include "ui/ui.h"
-#include "unique_item.h"
 #include "unit/unit.h"
 //Wyrmgus start
 #include "unit/unit_class.h"
