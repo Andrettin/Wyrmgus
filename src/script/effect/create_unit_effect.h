@@ -75,9 +75,9 @@ public:
 
 	virtual void do_assignment_effect(CPlayer *player) const override
 	{
-		QPoint unit_top_left_pos = this->site ? this->site->get_site_unit()->get_center_tile_pos() : player->StartPos;
+		QPoint unit_top_left_pos = this->site && this->site->get_site_unit() ? this->site->get_site_unit()->get_center_tile_pos() : player->StartPos;
 		unit_top_left_pos -= this->unit_type->get_tile_center_pos_offset();
-		const int map_layer = this->site ? this->site->get_site_unit()->MapLayer->ID : player->StartMapLayer;
+		const int map_layer = this->site && this->site->get_site_unit() ? this->site->get_site_unit()->MapLayer->ID : player->StartMapLayer;
 
 		CUnit *unit = MakeUnitAndPlace(unit_top_left_pos, *this->unit_type, player, map_layer);
 		if (this->ttl != 0) {

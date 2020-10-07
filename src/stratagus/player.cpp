@@ -1612,7 +1612,7 @@ wyrmgus::site *CPlayer::GetNearestSettlement(const Vec2i &pos, int z, const Vec2
 	CUnit *best_hall = nullptr;
 	int best_distance = -1;
 	
-	for (CUnit *settlement_unit : CMap::Map.site_units) {
+	for (CUnit *settlement_unit : CMap::Map.get_settlement_units()) {
 		if (!settlement_unit || !settlement_unit->IsAliveOnMap() || !settlement_unit->Type->BoolFlag[TOWNHALL_INDEX].value || z != settlement_unit->MapLayer->ID) {
 			continue;
 		}

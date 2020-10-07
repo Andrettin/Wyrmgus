@@ -1520,7 +1520,7 @@ void CMap::Clean()
 	//Wyrmgus start
 	this->ClearMapLayers();
 	this->BorderLandmasses.clear();
-	this->site_units.clear();
+	this->settlement_units.clear();
 	//Wyrmgus end
 
 	// Tileset freed by Tileset?
@@ -3335,7 +3335,7 @@ wyrmgus::point_set CMap::expand_settlement_territories(std::vector<QPoint> &&see
 
 void CMap::calculate_settlement_territory_border_tiles(const int z)
 {
-	for (const CUnit *site_unit : this->site_units) {
+	for (const CUnit *site_unit : this->settlement_units) {
 		if (site_unit->MapLayer->ID != z) {
 			continue;
 		}
@@ -3467,9 +3467,6 @@ void CMap::ClearRockTile(const Vec2i &pos)
 */
 //Wyrmgus end
 
-/**
-**	@brief	Regenerate forest.
-*/
 void CMap::RegenerateForest()
 {
 	if (!ForestRegeneration) {
@@ -3481,6 +3478,10 @@ void CMap::RegenerateForest()
 	}
 }
 
+void CMap::remove_settlement_unit(CUnit *settlement_unit)
+{
+	wyrmgus::vector::remove(this->settlement_units, settlement_unit);
+}
 
 /**
 **  Load the map presentation

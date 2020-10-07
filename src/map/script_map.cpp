@@ -1943,35 +1943,35 @@ static int CclGetSiteData(lua_State *l)
 		}
 		return 1;
 	} else if (!strcmp(data, "MapPosY")) {
-		if (site->get_site_unit()) {
+		if (site->get_site_unit() != nullptr) {
 			lua_pushnumber(l, site->get_site_unit()->tilePos.y);
 		} else {
 			lua_pushnumber(l, -1);
 		}
 		return 1;
 	} else if (!strcmp(data, "MapCenterPosX")) {
-		if (site->get_site_unit()) {
+		if (site->get_site_unit() != nullptr) {
 			lua_pushnumber(l, site->get_site_unit()->get_center_tile_pos().x());
 		} else {
 			lua_pushnumber(l, -1);
 		}
 		return 1;
 	} else if (!strcmp(data, "MapCenterPosY")) {
-		if (site->get_site_unit()) {
+		if (site->get_site_unit() != nullptr) {
 			lua_pushnumber(l, site->get_site_unit()->get_center_tile_pos().y());
 		} else {
 			lua_pushnumber(l, -1);
 		}
 		return 1;
 	} else if (!strcmp(data, "MapLayer")) {
-		if (site->get_site_unit() && site->get_site_unit()->MapLayer) {
+		if (site->get_site_unit() != nullptr && site->get_site_unit()->MapLayer != nullptr) {
 			lua_pushnumber(l, site->get_site_unit()->MapLayer->ID);
 		} else {
 			lua_pushnumber(l, -1);
 		}
 		return 1;
 	} else if (!strcmp(data, "SiteUnit")) {
-		if (site->get_site_unit()) {
+		if (site->get_site_unit() != nullptr) {
 			lua_pushnumber(l, UnitNumber(*site->get_site_unit()));
 		} else {
 			lua_pushnumber(l, -1);

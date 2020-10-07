@@ -287,7 +287,8 @@ void site::set_owner(CPlayer *player)
 	}
 
 	this->owner = player;
-	if (GameCycle > 0) {
+
+	if (this->is_major() && GameCycle > 0) {
 		this->update_border_tiles();
 		this->update_minimap_territory();
 	}

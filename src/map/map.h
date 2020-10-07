@@ -308,6 +308,18 @@ public:
 		//Wyrmgus end
 	}
 
+	const std::vector<CUnit *> &get_settlement_units() const
+	{
+		return this->settlement_units;
+	}
+
+	void add_settlement_unit(CUnit *settlement_unit)
+	{
+		this->settlement_units.push_back(settlement_unit);
+	}
+
+	void remove_settlement_unit(CUnit *settlement_unit);
+
 private:
 	/// Build tables for fog of war
 	void InitFogOfWar();
@@ -331,7 +343,9 @@ public:
 	//Wyrmgus start
 	int Landmasses = 0;						/// how many landmasses are there
 	std::vector<std::vector<int>> BorderLandmasses;	/// "landmasses" which border the one to which each vector belongs
-	std::vector<CUnit *> site_units;	/// the town hall / settlement site units
+private:
+	std::vector<CUnit *> settlement_units;	/// the town hall / settlement site units
+public:
 	std::vector<std::unique_ptr<CMapLayer>> MapLayers;	/// the map layers composing the map
 	//Wyrmgus end
 

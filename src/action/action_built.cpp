@@ -198,11 +198,11 @@ static void Finish(COrder_Built &order, CUnit &unit)
 		objective->Counter = std::min(objective->Counter + 1, quest_objective->get_quantity());
 	}
 
-	if (unit.settlement != nullptr && unit.settlement->get_site_unit() == &unit) {
+	if (unit.site != nullptr && unit.site->get_site_unit() == &unit) {
 		if (player.Index != PlayerNumNeutral) {
-			unit.settlement->set_owner(&player);
+			unit.site->set_owner(&player);
 		} else {
-			unit.settlement->set_owner(nullptr);
+			unit.site->set_owner(nullptr);
 		}
 	}
 

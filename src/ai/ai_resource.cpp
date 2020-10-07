@@ -2357,9 +2357,7 @@ void AiCheckSettlementConstruction()
 	const std::set<int> builder_landmasses = AiPlayer->Player->get_builder_landmasses(town_hall_type);
 						
 	//check settlement units to see if can build in one
-	for (size_t i = 0; i < CMap::Map.site_units.size(); ++i) {
-		CUnit *settlement_unit = CMap::Map.site_units[i];
-		
+	for (CUnit *settlement_unit : CMap::Map.get_settlement_units()) {
 		if (!settlement_unit->IsAliveOnMap()) {
 			continue;
 		}

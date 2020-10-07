@@ -323,12 +323,14 @@ static int CclUnit(lua_State *l)
 			unit->ExtraName = LuaToString(l, 2, j + 1);
 		} else if (!strcmp(value, "surname")) {
 			unit->surname = LuaToString(l, 2, j + 1);
+		} else if (!strcmp(value, "site")) {
+			unit->site = wyrmgus::site::get(LuaToString(l, 2, j + 1));
+			if (unit->site->is_major()) {
+				unit->site->set_site_unit(unit);
+				CMap::Map.add_settlement_unit(unit);
+			}
 		} else if (!strcmp(value, "settlement")) {
 			unit->settlement = wyrmgus::site::get(LuaToString(l, 2, j + 1));
-			if (type->BoolFlag[TOWNHALL_INDEX].value || settlement_site_unit_type == type) {
-				unit->settlement->set_site_unit(unit);
-				CMap::Map.site_units.push_back(unit);
-			}
 		} else if (!strcmp(value, "trait")) {
 			unit->Trait = CUpgrade::get(LuaToString(l, 2, j + 1));
 		} else if (!strcmp(value, "prefix")) {

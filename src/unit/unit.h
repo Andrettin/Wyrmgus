@@ -68,16 +68,16 @@ namespace wyrmgus {
 /*
 ** Configuration of the small (unit) AI.
 */
-#define PRIORITY_FACTOR   0x00080000
-#define HEALTH_FACTOR     0x00000001
-#define DISTANCE_FACTOR   0x00010000
-#define INRANGE_FACTOR    0x00008000
-#define INRANGE_BONUS     0x01000000
-#define CANATTACK_BONUS   0x00080000
-#define AIPRIORITY_BONUS  0x04000000
+constexpr int PRIORITY_FACTOR = 0x00080000;
+constexpr int HEALTH_FACTOR = 0x00000001;
+constexpr int DISTANCE_FACTOR = 0x00010000;
+constexpr int INRANGE_FACTOR = 0x00008000;
+constexpr int INRANGE_BONUS = 0x01000000;
+constexpr int CANATTACK_BONUS = 0x00080000;
+constexpr int AIPRIORITY_BONUS = 0x04000000;
 
 //the range in which experience is distributed
-static constexpr int ExperienceRange = 6;
+constexpr int ExperienceRange = 6;
 
 /// Called whenever the selected unit was updated
 extern void SelectedUnitChanged();
@@ -568,6 +568,7 @@ private:
 public:
 	wyrmgus::character *Character;	/// Pointer to the character represented by this unit
 	wyrmgus::site *settlement;	/// Settlement (for if the unit is a town hall or a building associated to a settlement)
+	wyrmgus::site *site = nullptr; //the site to which the unit belongs, if it is a site unit (not necessarily the same as the settlement, e.g. if the site is a non-major one)
 	CUpgrade *Trait;	/// Unit's trait
 	int Variation;      /// Which of the variations of its unit type this unit has
 	int LayerVariation[MaxImageLayers];	/// Which layer variations this unit has

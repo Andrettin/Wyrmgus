@@ -1108,7 +1108,17 @@ void map_template::apply_sites(const QPoint &template_start_pos, const QPoint &m
 		const QPoint site_raw_pos = site->get_pos();
 		Vec2i site_pos(map_start_pos + site_raw_pos - template_start_pos);
 
-		Vec2i unit_offset((settlement_site_unit_type->get_tile_size() - QSize(1, 1)) / 2);
+		Vec2i unit_offset(0, 0);
+
+		const unit_type *base_unit_type = site->get_base_unit_type();
+
+		if (site->is_major() && settlement_site_unit_type != nullptr) { //add a settlement site for major sites
+			base_unit_type = settlement_site_unit_type;
+		}
+
+		if (base_unit_type != nullptr) {
+			unit_offset = (base_unit_type->get_tile_size() - QSize(1, 1)) / 2;
+		}
 
 		//it is acceptable sites with geocoordinate to have their positions shifted, e.g. if it was coastal to shift it enough inland to give space for the building to be placed
 		const bool is_position_shift_acceptable = site->get_geocoordinate().isValid();
@@ -1117,8 +1127,8 @@ void map_template::apply_sites(const QPoint &template_start_pos, const QPoint &m
 			if (site_raw_pos.x() != -1 || site_raw_pos.y() != -1) {
 				continue;
 			}
-			if (settlement_site_unit_type) {
-				site_pos = CMap::Map.GenerateUnitLocation(settlement_site_unit_type, nullptr, map_start_pos, map_end - Vec2i(1, 1), z);
+			if (base_unit_type != nullptr) {
+				site_pos = CMap::Map.GenerateUnitLocation(base_unit_type, nullptr, map_start_pos, map_end - Vec2i(1, 1), z);
 				site_pos += unit_offset;
 			}
 		} else {
@@ -1135,18 +1145,36 @@ void map_template::apply_sites(const QPoint &template_start_pos, const QPoint &m
 			continue;
 		}
 
-		if (site->is_major() && settlement_site_unit_type != nullptr) { //add a settlement site for major sites
-			if (!is_position_shift_acceptable && !UnitTypeCanBeAt(*settlement_site_unit_type, site_pos - unit_offset, z) && CMap::Map.Info.IsPointOnMap(site_pos - unit_offset, z) && CMap::Map.Info.IsPointOnMap(site_pos - unit_offset + Vec2i(settlement_site_unit_type->get_tile_size() - QSize(1, 1)), z)) {
-				fprintf(stderr, "The settlement site for \"%s\" should be placed on (%d, %d), but it cannot be there.\n", site->Ident.c_str(), site_raw_pos.x(), site_raw_pos.y());
+		if (base_unit_type != nullptr) {
+			if (!is_position_shift_acceptable && !UnitTypeCanBeAt(*base_unit_type, site_pos - unit_offset, z) && CMap::Map.Info.IsPointOnMap(site_pos - unit_offset, z) && CMap::Map.Info.IsPointOnMap(site_pos - unit_offset + Vec2i(base_unit_type->get_tile_size() - QSize(1, 1)), z)) {
+				fprintf(stderr, "The site for \"%s\" should be placed on (%d, %d), but it cannot be there.\n", site->Ident.c_str(), site_raw_pos.x(), site_raw_pos.y());
 			}
-			CUnit *unit = CreateUnit(site_pos - unit_offset, *settlement_site_unit_type, CPlayer::Players[PlayerNumNeutral], z, true, site);
-			unit->settlement = site;
-			unit->settlement->set_site_unit(unit);
-			CMap::Map.site_units.push_back(unit);
-			for (int x = unit->tilePos.x; x < (unit->tilePos.x + unit->Type->get_tile_width()); ++x) {
-				for (int y = unit->tilePos.y; y < (unit->tilePos.y + unit->Type->get_tile_height()); ++y) {
-					const QPoint tile_pos(x, y);
-					CMap::Map.Field(tile_pos, z)->set_settlement(unit->settlement);
+			CUnit *unit = CreateUnit(site_pos - unit_offset, *base_unit_type, CPlayer::Players[PlayerNumNeutral], z, true, site);
+			unit->site = site;
+
+			if (site->is_major()) {
+				unit->settlement = site;
+			}
+
+			site->set_site_unit(unit);
+
+			if (site->is_major()) {
+				CMap::Map.add_settlement_unit(unit);
+				for (int x = unit->tilePos.x; x < (unit->tilePos.x + unit->Type->get_tile_width()); ++x) {
+					for (int y = unit->tilePos.y; y < (unit->tilePos.y + unit->Type->get_tile_height()); ++y) {
+						const QPoint tile_pos(x, y);
+						CMap::Map.Field(tile_pos, z)->set_settlement(unit->settlement);
+					}
+				}
+			}
+
+			//if the site is a connector, and the destination site has already been applied, establish the connection
+			if (site->get_connection_destination() != nullptr) {
+				CMap::Map.MapLayers[z]->LayerConnectors.push_back(unit);
+
+				if (site->get_connection_destination()->get_site_unit() != nullptr) {
+					site->get_connection_destination()->get_site_unit()->ConnectingDestination = unit;
+					unit->ConnectingDestination = site->get_connection_destination()->get_site_unit();
 				}
 			}
 		}
@@ -1268,7 +1296,7 @@ void map_template::apply_sites(const QPoint &template_start_pos, const QPoint &m
 			CUnit *unit = CreateUnit(site_pos - unit_offset, *unit_type, player, z, true, site->is_major() ? site : nullptr);
 
 			if (first_building) {
-				if (!unit_type->BoolFlag[TOWNHALL_INDEX].value) { //if one building is representing a minor site, make it have the site's name
+				if (!unit_type->BoolFlag[TOWNHALL_INDEX].value && !site->get_name().empty()) { //if one building is representing a minor site, make it have the site's name
 					unit->Name = site->get_cultural_name(site_owner->get_civilization());
 				}
 				first_building = false;

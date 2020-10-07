@@ -62,6 +62,8 @@ class site final : public named_data_entry, public data_type<site>, public CData
 	Q_PROPERTY(wyrmgus::site* geocoordinate_reference_site MEMBER geocoordinate_reference_site)
 	Q_PROPERTY(int longitude_scale MEMBER longitude_scale)
 	Q_PROPERTY(int latitude_scale MEMBER latitude_scale)
+	Q_PROPERTY(wyrmgus::unit_type* base_unit_type MEMBER base_unit_type)
+	Q_PROPERTY(wyrmgus::site* connection_destination MEMBER connection_destination)
 	Q_PROPERTY(wyrmgus::unit_class* pathway_class MEMBER pathway_class READ get_pathway_class)
 	Q_PROPERTY(QVariantList cores READ get_cores_qvariant_list)
 	Q_PROPERTY(QVariantList regions READ get_regions_qvariant_list)
@@ -146,6 +148,21 @@ public:
 		return this->geocoordinate;
 	}
 
+	const unit_type *get_base_unit_type() const
+	{
+		return this->base_unit_type;
+	}
+
+	const site *get_connection_destination() const
+	{
+		return this->connection_destination;
+	}
+
+	bool is_connector() const
+	{
+		return this->get_connection_destination() != nullptr;
+	}
+
 	CUnit *get_site_unit() const
 	{
 		return this->site_unit;
@@ -189,6 +206,11 @@ public:
 	const std::map<int, int> &get_population_groups() const
 	{
 		return this->population_groups;
+	}
+
+	bool can_be_randomly_generated() const
+	{
+		return !this->get_name().empty() && !this->is_connector();
 	}
 
 	void add_border_tile(const QPoint &tile_pos)
@@ -270,16 +292,18 @@ public:
 	}
 
 private:
-	bool major = false; /// Whether the site is a major one; major sites have settlement sites, and as such can have town halls
+	bool major = false; //whether the site is a major one; major sites have settlement sites, and as such can have town halls
+	wyrmgus::map_template *map_template = nullptr;
 	QPoint pos = QPoint(-1, -1); /// Position of the site in its map template
 	QGeoCoordinate geocoordinate; //the site's position as a geocoordinate
 	site *geocoordinate_reference_site = nullptr; //the site's reference geocoordinate site, used as an offset for its geocoordinate
 	int longitude_scale = 100;
 	int latitude_scale = 100;
-	map_template *map_template = nullptr; /// Map template where this site is located
+	unit_type *base_unit_type = nullptr;
+	site *connection_destination = nullptr;
 	CPlayer *owner = nullptr;
-	CUnit *site_unit = nullptr;									/// Unit which represents this site
-	std::vector<region *> regions;								/// Regions where this site is located
+	CUnit *site_unit = nullptr; //unit which represents this site
+	std::vector<region *> regions; //regions where this site is located
 	std::vector<faction *> cores; //factions which have this site as a core
 	std::map<const civilization *, std::string> cultural_names;	/// Names for the site for each different culture/civilization
 	QColor color; //color used to represent the site on the minimap, and to identify its territory on territory images
