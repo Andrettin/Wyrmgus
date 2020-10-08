@@ -1145,6 +1145,9 @@ void map_template::apply_sites(const QPoint &template_start_pos, const QPoint &m
 			continue;
 		}
 
+		site->set_map_pos(site_pos);
+		site->set_map_layer(CMap::Map.MapLayers[z].get());
+
 		if (base_unit_type != nullptr) {
 			if (!is_position_shift_acceptable && !UnitTypeCanBeAt(*base_unit_type, site_pos - unit_offset, z) && CMap::Map.Info.IsPointOnMap(site_pos - unit_offset, z) && CMap::Map.Info.IsPointOnMap(site_pos - unit_offset + Vec2i(base_unit_type->get_tile_size() - QSize(1, 1)), z)) {
 				fprintf(stderr, "The site for \"%s\" should be placed on (%d, %d), but it cannot be there.\n", site->Ident.c_str(), site_raw_pos.x(), site_raw_pos.y());

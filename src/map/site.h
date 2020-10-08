@@ -33,6 +33,7 @@
 #include "time/date.h"
 #include "util/color_container.h"
 
+class CMapLayer;
 class CPlayer;
 class CUnit;
 struct lua_State;
@@ -126,6 +127,15 @@ public:
 		this->population_groups.clear();
 	}
 
+	void reset_game_data()
+	{
+		this->owner = nullptr;
+		this->site_unit = nullptr;
+		this->clear_border_tiles();
+		this->map_pos = QPoint(-1, -1);
+		this->map_layer = nullptr;
+	}
+
 	const std::string &get_cultural_name(const civilization *civilization) const;
 
 	bool is_major() const
@@ -211,6 +221,26 @@ public:
 	bool can_be_randomly_generated() const
 	{
 		return !this->get_name().empty() && !this->is_connector();
+	}
+
+	const QPoint &get_map_pos() const
+	{
+		return this->map_pos;
+	}
+
+	void set_map_pos(const QPoint &pos)
+	{
+		this->map_pos = pos;
+	}
+
+	const CMapLayer *get_map_layer() const
+	{
+		return this->map_layer;
+	}
+
+	void set_map_layer(const CMapLayer *map_layer)
+	{
+		this->map_layer = map_layer;
 	}
 
 	void add_border_tile(const QPoint &tile_pos)
@@ -320,6 +350,8 @@ public:
 	std::vector<std::tuple<CDate, CDate, const unit_class *, unique_item *, const faction *>> HistoricalBuildings; /// Historical buildings, with start and end date
 	std::vector<std::tuple<CDate, CDate, const unit_type *, unique_item *, int>> HistoricalResources; /// Historical resources, with start and end date; the integer at the end is the resource quantity
 private:
+	QPoint map_pos = QPoint(-1, -1);
+	const CMapLayer *map_layer = nullptr;
 	std::vector<QPoint> border_tiles; //the tiles for this settlement which border the territory of another settlement
 	QRect territory_rect; //the territory rectangle of the site
 

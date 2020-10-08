@@ -75,9 +75,8 @@ public:
 
 	virtual void do_assignment_effect(CPlayer *player) const override
 	{
-		QPoint unit_top_left_pos = this->site && this->site->get_site_unit() ? this->site->get_site_unit()->get_center_tile_pos() : player->StartPos;
-		unit_top_left_pos -= this->unit_type->get_tile_center_pos_offset();
-		const int map_layer = this->site && this->site->get_site_unit() ? this->site->get_site_unit()->MapLayer->ID : player->StartMapLayer;
+		QPoint unit_top_left_pos = this->get_tile_pos(player) - this->unit_type->get_tile_center_pos_offset();
+		const int map_layer = this->get_map_layer_index(player);
 
 		CUnit *unit = MakeUnitAndPlace(unit_top_left_pos, *this->unit_type, player, map_layer);
 		if (this->ttl != 0) {
@@ -95,6 +94,32 @@ public:
 			str += " for " + std::to_string(this->ttl) + " cycles";
 		}
 		return str;
+	}
+
+	QPoint get_tile_pos(const CPlayer *player) const
+	{
+		if (this->site != nullptr) {
+			if (this->site->get_site_unit() != nullptr) {
+				return this->site->get_site_unit()->get_center_tile_pos();
+			} else {
+				return this->site->get_map_pos();
+			}
+		}
+
+		return player->StartPos;
+	}
+
+	int get_map_layer_index(const CPlayer *player) const
+	{
+		if (this->site != nullptr) {
+			if (this->site->get_site_unit() != nullptr) {
+				return this->site->get_site_unit()->MapLayer->ID;
+			} else if (this->site->get_map_layer() != nullptr) {
+				return this->site->get_map_layer()->ID;
+			}
+		}
+
+		return player->StartMapLayer;
 	}
 
 private:

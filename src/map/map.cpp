@@ -1517,6 +1517,10 @@ void CMap::Clean()
 	UI.PreviousMapLayer = nullptr;
 	this->Landmasses = 0;
 
+	for (wyrmgus::site *site : wyrmgus::site::get_all()) {
+		site->reset_game_data();
+	}
+
 	//Wyrmgus start
 	this->ClearMapLayers();
 	this->BorderLandmasses.clear();

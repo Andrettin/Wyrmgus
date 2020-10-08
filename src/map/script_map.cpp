@@ -1939,33 +1939,35 @@ static int CclGetSiteData(lua_State *l)
 		if (site->get_site_unit() != nullptr) {
 			lua_pushnumber(l, site->get_site_unit()->tilePos.x);
 		} else {
-			lua_pushnumber(l, -1);
+			lua_pushnumber(l, site->get_map_pos().x());
 		}
 		return 1;
 	} else if (!strcmp(data, "MapPosY")) {
 		if (site->get_site_unit() != nullptr) {
 			lua_pushnumber(l, site->get_site_unit()->tilePos.y);
 		} else {
-			lua_pushnumber(l, -1);
+			lua_pushnumber(l, site->get_map_pos().y());
 		}
 		return 1;
 	} else if (!strcmp(data, "MapCenterPosX")) {
 		if (site->get_site_unit() != nullptr) {
 			lua_pushnumber(l, site->get_site_unit()->get_center_tile_pos().x());
 		} else {
-			lua_pushnumber(l, -1);
+			lua_pushnumber(l, site->get_map_pos().x());
 		}
 		return 1;
 	} else if (!strcmp(data, "MapCenterPosY")) {
 		if (site->get_site_unit() != nullptr) {
 			lua_pushnumber(l, site->get_site_unit()->get_center_tile_pos().y());
 		} else {
-			lua_pushnumber(l, -1);
+			lua_pushnumber(l, site->get_map_pos().y());
 		}
 		return 1;
 	} else if (!strcmp(data, "MapLayer")) {
 		if (site->get_site_unit() != nullptr && site->get_site_unit()->MapLayer != nullptr) {
 			lua_pushnumber(l, site->get_site_unit()->MapLayer->ID);
+		} else if (site->get_map_layer() != nullptr) {
+			lua_pushnumber(l, site->get_map_layer()->ID);
 		} else {
 			lua_pushnumber(l, -1);
 		}
