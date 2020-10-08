@@ -41,6 +41,12 @@ class sml_property;
 class historical_location
 {
 public:
+	historical_location()
+	{
+	}
+
+	explicit historical_location(const sml_data &data);
+
 	void process_sml_property(const sml_property &property);
 	void process_sml_scope(const sml_data &scope);
 	void ProcessConfigData(const CConfigData *config_data);
@@ -49,9 +55,9 @@ public:
 	
 public:
 	CDate Date; //the historical location's date
-	wyrmgus::map_template *map_template = nullptr; //the historical location's map template (overwritten by the site's map template if the site is given)
+	const wyrmgus::map_template *map_template = nullptr; //the historical location's map template (overwritten by the site's map template if the site is given)
 	Vec2i Position = Vec2i(-1, -1); //the historical location's position in its map layer (overwritten by the site position if the site is given and has a valid position)
-	wyrmgus::site *site = nullptr; //the historical location's site (if any)
+	const wyrmgus::site *site = nullptr; //the historical location's site (if any)
 };
 
 }

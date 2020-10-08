@@ -152,11 +152,7 @@ void character::process_sml_dated_scope(const sml_data &scope, const QDateTime &
 	const std::string &tag = scope.get_tag();
 
 	if (tag == "location") {
-		auto location = std::make_unique<historical_location>();
-		database::get()->process_sml_data(location, scope);
-		location->initialize();
-		location->check();
-		this->location = std::move(location);
+		this->location = std::make_unique<historical_location>(scope);
 	} else {
 		data_entry::process_sml_dated_scope(scope, date);
 	}

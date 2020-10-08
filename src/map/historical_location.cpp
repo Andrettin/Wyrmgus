@@ -35,6 +35,13 @@
 #include "map/site.h"
 
 namespace wyrmgus {
+
+historical_location::historical_location(const sml_data &data)
+{
+	database::process_sml_data(this, data);
+	this->initialize();
+	this->check();
+}
 	
 void historical_location::process_sml_property(const sml_property &property)
 {

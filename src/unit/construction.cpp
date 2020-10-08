@@ -83,7 +83,7 @@ void construction::process_sml_scope(const sml_data &scope)
 	if (tag == "frames") {
 		scope.for_each_child([&](const sml_data &child_scope) {
 			auto cframe = std::make_unique<construction_frame>();
-			database::get()->process_sml_data(cframe, child_scope);
+			database::process_sml_data(cframe, child_scope);
 			if (!this->frames.empty()) {
 				this->frames.back()->next = cframe.get();
 			}
