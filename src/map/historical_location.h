@@ -45,6 +45,12 @@ public:
 	{
 	}
 
+	explicit historical_location(const wyrmgus::site *site) : site(site)
+	{
+		this->initialize();
+		this->check();
+	}
+
 	explicit historical_location(const sml_data &data);
 
 	void process_sml_property(const sml_property &property);

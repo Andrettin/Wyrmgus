@@ -30,6 +30,7 @@
 #include "unit/historical_unit.h"
 
 #include "map/historical_location.h"
+#include "map/site.h"
 #include "player.h"
 #include "unit/unit_class.h"
 #include "unit/unit_type.h"
@@ -79,6 +80,18 @@ void historical_unit::process_sml_scope(const sml_data &scope)
 		});
 	} else {
 		data_entry::process_sml_scope(scope);
+	}
+}
+
+void historical_unit::process_sml_dated_property(const sml_property &property, const QDateTime &date)
+{
+	const std::string &key = property.get_key();
+	const std::string &value = property.get_value();
+
+	if (key == "location") {
+		this->location = std::make_unique<historical_location>(site::get(value));
+	} else {
+		data_entry::process_sml_dated_property(property, date);
 	}
 }
 

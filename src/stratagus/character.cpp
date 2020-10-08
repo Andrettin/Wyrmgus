@@ -147,6 +147,18 @@ void character::process_sml_scope(const sml_data &scope)
 	}
 }
 
+void character::process_sml_dated_property(const sml_property &property, const QDateTime &date)
+{
+	const std::string &key = property.get_key();
+	const std::string &value = property.get_value();
+
+	if (key == "location") {
+		this->location = std::make_unique<historical_location>(site::get(value));
+	} else {
+		data_entry::process_sml_dated_property(property, date);
+	}
+}
+
 void character::process_sml_dated_scope(const sml_data &scope, const QDateTime &date)
 {
 	const std::string &tag = scope.get_tag();
@@ -476,9 +488,7 @@ void character::reset_history()
 	this->location.reset();
 	if (this->home_settlement != nullptr) {
 		//use the home settlement as the default location
-		this->location = std::make_unique<historical_location>();
-		this->location->site = this->home_settlement;
-		this->location->initialize();
+		this->location = std::make_unique<historical_location>(this->home_settlement);
 	}
 	this->active = false;
 	this->faction = this->get_default_faction();

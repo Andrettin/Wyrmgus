@@ -61,6 +61,7 @@ public:
 	~historical_unit();
 	
 	virtual void process_sml_scope(const sml_data &scope) override;
+	virtual void process_sml_dated_property(const sml_property &property, const QDateTime &date) override;
 	virtual void process_sml_dated_scope(const sml_data &scope, const QDateTime &date) override;
 	virtual void check() const override;
 	virtual void reset_history() override;
