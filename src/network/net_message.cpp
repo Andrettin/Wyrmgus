@@ -363,10 +363,10 @@ CInitMessage_Hello::CInitMessage_Hello(const char *name) :
 	this->Version = NetworkProtocolVersion;
 }
 
-const unsigned char *CInitMessage_Hello::Serialize() const
+std::unique_ptr<const unsigned char[]> CInitMessage_Hello::Serialize() const
 {
-	unsigned char *buf = new unsigned char[Size()];
-	unsigned char *p = buf;
+	auto buf = std::make_unique<unsigned char[]>(Size());
+	unsigned char *p = buf.get();
 
 	p += header.Serialize(p);
 	p += serialize(p, this->PlyName);
@@ -392,10 +392,10 @@ CInitMessage_Config::CInitMessage_Config() :
 {
 }
 
-const unsigned char *CInitMessage_Config::Serialize() const
+std::unique_ptr<const unsigned char[]> CInitMessage_Config::Serialize() const
 {
-	unsigned char *buf = new unsigned char[Size()];
-	unsigned char *p = buf;
+	auto buf = std::make_unique<unsigned char[]>(Size());
+	unsigned char *p = buf.get();
 
 	p += header.Serialize(p);
 	p += serialize8(p, this->clientIndex);
@@ -426,10 +426,10 @@ CInitMessage_EngineMismatch::CInitMessage_EngineMismatch() :
 	this->Stratagus = StratagusVersion;
 }
 
-const unsigned char *CInitMessage_EngineMismatch::Serialize() const
+std::unique_ptr<const unsigned char[]> CInitMessage_EngineMismatch::Serialize() const
 {
-	unsigned char *buf = new unsigned char[Size()];
-	unsigned char *p = buf;
+	auto buf = std::make_unique<unsigned char[]>(Size());
+	unsigned char *p = buf.get();
 
 	p += header.Serialize(p);
 	p += serialize32(p, this->Stratagus);
@@ -452,10 +452,10 @@ CInitMessage_ProtocolMismatch::CInitMessage_ProtocolMismatch() :
 	this->Version = NetworkProtocolVersion;
 }
 
-const unsigned char *CInitMessage_ProtocolMismatch::Serialize() const
+std::unique_ptr<const unsigned char[]> CInitMessage_ProtocolMismatch::Serialize() const
 {
-	unsigned char *buf = new unsigned char[Size()];
-	unsigned char *p = buf;
+	auto buf = std::make_unique<unsigned char[]>(Size());
+	unsigned char *p = buf.get();
 
 	p += header.Serialize(p);
 	p += serialize32(p, this->Version);
@@ -479,10 +479,10 @@ CInitMessage_Welcome::CInitMessage_Welcome() :
 	this->gameCyclesPerUpdate = CNetworkParameter::Instance.gameCyclesPerUpdate;
 }
 
-const unsigned char *CInitMessage_Welcome::Serialize() const
+std::unique_ptr<const unsigned char[]> CInitMessage_Welcome::Serialize() const
 {
-	unsigned char *buf = new unsigned char[Size()];
-	unsigned char *p = buf;
+	auto buf = std::make_unique<unsigned char[]>(Size());
+	unsigned char *p = buf.get();
 
 	p += header.Serialize(p);
 	for (int i = 0; i < PlayerMax; ++i) {
@@ -514,10 +514,10 @@ CInitMessage_Map::CInitMessage_Map(const char *path, uint32_t mapUID) :
 	strncpy_s(MapPath, sizeof(MapPath), path, _TRUNCATE);
 }
 
-const unsigned char *CInitMessage_Map::Serialize() const
+std::unique_ptr<const unsigned char[]> CInitMessage_Map::Serialize() const
 {
-	unsigned char *buf = new unsigned char[Size()];
-	unsigned char *p = buf;
+	auto buf = std::make_unique<unsigned char[]>(Size());
+	unsigned char *p = buf.get();
 
 	p += header.Serialize(p);
 	p += serialize(p, MapPath);
@@ -542,10 +542,10 @@ CInitMessage_State::CInitMessage_State(int type, const CServerSetup &data) :
 {
 }
 
-const unsigned char *CInitMessage_State::Serialize() const
+std::unique_ptr<const unsigned char[]> CInitMessage_State::Serialize() const
 {
-	unsigned char *buf = new unsigned char[Size()];
-	unsigned char *p = buf;
+	auto buf = std::make_unique<unsigned char[]>(Size());
+	unsigned char *p = buf.get();
 
 	p += header.Serialize(p);
 	p += this->State.Serialize(p);
@@ -567,10 +567,10 @@ CInitMessage_Resync::CInitMessage_Resync() :
 {
 }
 
-const unsigned char *CInitMessage_Resync::Serialize() const
+std::unique_ptr<const unsigned char[]> CInitMessage_Resync::Serialize() const
 {
-	unsigned char *buf = new unsigned char[Size()];
-	unsigned char *p = buf;
+	auto buf = std::make_unique<unsigned char[]>(Size());
+	unsigned char *p = buf.get();
 
 	p += header.Serialize(p);
 	for (int i = 0; i < PlayerMax; ++i) {

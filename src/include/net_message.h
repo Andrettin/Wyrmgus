@@ -150,7 +150,7 @@ public:
 	CInitMessage_Hello() {}
 	explicit CInitMessage_Hello(const char *name);
 	const CInitMessage_Header &GetHeader() const { return header; }
-	const unsigned char *Serialize() const;
+	std::unique_ptr<const unsigned char[]> Serialize() const;
 	void Deserialize(const unsigned char *p);
 	static size_t Size() { return CInitMessage_Header::Size() + NetPlayerNameSize + 2 * 4; }
 private:
@@ -166,7 +166,7 @@ class CInitMessage_Config
 public:
 	CInitMessage_Config();
 	const CInitMessage_Header &GetHeader() const { return header; }
-	const unsigned char *Serialize() const;
+	std::unique_ptr<const unsigned char[]> Serialize() const;
 	void Deserialize(const unsigned char *p);
 	static size_t Size() { return CInitMessage_Header::Size() + 4 + PlayerMax * CNetworkHost::Size(); }
 private:
@@ -182,7 +182,7 @@ class CInitMessage_EngineMismatch
 public:
 	CInitMessage_EngineMismatch();
 	const CInitMessage_Header &GetHeader() const { return header; }
-	const unsigned char *Serialize() const;
+	std::unique_ptr<const unsigned char[]> Serialize() const;
 	void Deserialize(const unsigned char *p);
 	static size_t Size() { return CInitMessage_Header::Size() + 4; }
 private:
@@ -196,7 +196,7 @@ class CInitMessage_ProtocolMismatch
 public:
 	CInitMessage_ProtocolMismatch();
 	const CInitMessage_Header &GetHeader() const { return header; }
-	const unsigned char *Serialize() const;
+	std::unique_ptr<const unsigned char[]> Serialize() const;
 	void Deserialize(const unsigned char *p);
 	static size_t Size() { return CInitMessage_Header::Size() + 4; }
 private:
@@ -210,7 +210,7 @@ class CInitMessage_Welcome
 public:
 	CInitMessage_Welcome();
 	const CInitMessage_Header &GetHeader() const { return header; }
-	const unsigned char *Serialize() const;
+	std::unique_ptr<const unsigned char[]> Serialize() const;
 	void Deserialize(const unsigned char *p);
 	static size_t Size() { return CInitMessage_Header::Size() + PlayerMax * CNetworkHost::Size() + 2 * 4; }
 private:
@@ -227,7 +227,7 @@ public:
 	CInitMessage_Map() {}
 	CInitMessage_Map(const char *path, uint32_t mapUID);
 	const CInitMessage_Header &GetHeader() const { return header; }
-	const unsigned char *Serialize() const;
+	std::unique_ptr<const unsigned char[]> Serialize() const;
 	void Deserialize(const unsigned char *p);
 	static size_t Size() { return CInitMessage_Header::Size() + 256 + 4; }
 private:
@@ -243,7 +243,7 @@ public:
 	CInitMessage_State() {}
 	CInitMessage_State(int type, const CServerSetup &data);
 	const CInitMessage_Header &GetHeader() const { return header; }
-	const unsigned char *Serialize() const;
+	std::unique_ptr<const unsigned char[]> Serialize() const;
 	void Deserialize(const unsigned char *p);
 	static size_t Size() { return CInitMessage_Header::Size() + CServerSetup::Size(); }
 private:
@@ -257,7 +257,7 @@ class CInitMessage_Resync
 public:
 	CInitMessage_Resync();
 	const CInitMessage_Header &GetHeader() const { return header; }
-	const unsigned char *Serialize() const;
+	std::unique_ptr<const unsigned char[]> Serialize() const;
 	void Deserialize(const unsigned char *p);
 	static size_t Size() { return CInitMessage_Header::Size() + CNetworkHost::Size() * PlayerMax; }
 private:

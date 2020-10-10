@@ -197,17 +197,15 @@ static CClient Client;
 template <typename T>
 static void NetworkSendICMessage(CUDPSocket &socket, const CHost &host, const T &msg)
 {
-	const unsigned char *buf = msg.Serialize();
-	socket.Send(host, buf, msg.Size());
-	delete[] buf;
+	std::unique_ptr<const unsigned char[]> buf = msg.Serialize();
+	socket.Send(host, buf.get(), msg.Size());
 }
 
 void NetworkSendICMessage(CUDPSocket &socket, const CHost &host, const CInitMessage_Header &msg)
 {
-	unsigned char *buf = new unsigned char [msg.Size()];
-	msg.Serialize(buf);
-	socket.Send(host, buf, msg.Size());
-	delete[] buf;
+	auto buf = std::make_unique<unsigned char[]>(msg.Size());
+	msg.Serialize(buf.get());
+	socket.Send(host, buf.get(), msg.Size());
 }
 
 static const char *ncconstatenames[] = {

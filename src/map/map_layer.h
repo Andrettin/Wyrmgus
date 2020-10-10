@@ -143,7 +143,7 @@ public:
 	
 	int ID = -1;
 private:
-	CMapField *Fields = nullptr;				/// fields on the map layer
+	std::unique_ptr<CMapField[]> Fields; //fields on the map layer
 	QSize size;									/// the size in tiles of the map layer
 public:
 	CScheduledTimeOfDay *TimeOfDay = nullptr;	/// the time of day for the map layer

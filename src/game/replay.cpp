@@ -1007,7 +1007,6 @@ void MultiPlayerReplayEachCycle()
 int SaveReplay(const std::string &filename)
 {
 	FILE *fd;
-	char *buf;
 	std::ostringstream logfile;
 	std::string destination;
 	struct stat sb;
@@ -1026,7 +1025,7 @@ int SaveReplay(const std::string &filename)
 		fprintf(stderr, "stat failed\n");
 		return -1;
 	}
-	buf = new char[sb.st_size];
+	auto buf = std::make_unique<char[]>(sb.st_size);
 	if (!buf) {
 		fprintf(stderr, "Out of memory\n");
 		return -1;
@@ -1034,22 +1033,18 @@ int SaveReplay(const std::string &filename)
 	fd = fopen(logfile.str().c_str(), "rb");
 	if (!fd) {
 		fprintf(stderr, "fopen failed\n");
-		delete[] buf;
 		return -1;
 	}
-	size = fread(buf, sb.st_size, 1, fd);
+	size = fread(buf.get(), sb.st_size, 1, fd);
 	fclose(fd);
 
 	fd = fopen(destination.c_str(), "wb");
 	if (!fd) {
 		fprintf(stderr, "Can't save to '%s'\n", destination.c_str());
-		delete[] buf;
 		return -1;
 	}
-	fwrite(buf, sb.st_size, size, fd);
+	fwrite(buf.get(), sb.st_size, size, fd);
 	fclose(fd);
-
-	delete[] buf;
 
 	return 0;
 }
