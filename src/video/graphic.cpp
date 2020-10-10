@@ -1140,11 +1140,12 @@ static void MakeTextures(CGraphic *g, const bool grayscale, const wyrmgus::playe
 			unsigned char &green = image_data[i + 1];
 			unsigned char &blue = image_data[i + 2];
 
-			for (const QColor &color : conversible_colors) {
+			for (size_t z = 0; z < conversible_colors.size(); ++z) {
+				const QColor &color = conversible_colors[z];
 				if (red == color.red() && green == color.green() && blue == color.blue()) {
-					red = color.red();
-					green = color.green();
-					blue = color.blue();
+					red = colors[z].red();
+					green = colors[z].green();
+					blue = colors[z].blue();
 				}
 			}
 		}
