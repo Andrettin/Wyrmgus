@@ -767,9 +767,8 @@ void font::FreeOpenGL()
 		for (const auto &kv_pair : this->font_color_graphics) {
 			CGraphic &g = *kv_pair.second;
 			if (g.textures != nullptr) {
-				glDeleteTextures(g.NumTextures, g.textures);
-				delete[] g.textures;
-				g.textures = nullptr;
+				glDeleteTextures(g.NumTextures, g.textures.get());
+				g.textures.reset();
 			}
 		}
 	}

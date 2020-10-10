@@ -67,18 +67,15 @@ CGraphic::~CGraphic()
 	}
 
 	if (this->textures != nullptr) {
-		glDeleteTextures(this->NumTextures, this->textures);
-		delete[] this->textures;
+		glDeleteTextures(this->NumTextures, this->textures.get());
 	}
 
 	if (this->grayscale_textures != nullptr) {
-		glDeleteTextures(this->NumTextures, this->grayscale_textures);
-		delete[] this->grayscale_textures;
+		glDeleteTextures(this->NumTextures, this->grayscale_textures.get());
 	}
 
 	for (const auto &kv_pair : this->texture_color_modifications) {
-		glDeleteTextures(this->NumTextures, kv_pair.second);
-		delete[] kv_pair.second;
+		glDeleteTextures(this->NumTextures, kv_pair.second.get());
 	}
 }
 
@@ -114,28 +111,26 @@ void CGraphic::DrawSub(int gx, int gy, int w, int h, int x, int y, SDL_Surface *
 //Wyrmgus end
 {
 #if defined(USE_OPENGL) || defined(USE_GLES)
-	DrawTexture(this, this->textures, gx, gy, gx + w, gy + h, x, y, 0);
+	DrawTexture(this, this->textures.get(), gx, gy, gx + w, gy + h, x, y, 0);
 #endif
 }
 
 void CGraphic::DrawGrayscaleSub(int gx, int gy, int w, int h, int x, int y) const
 {
 #if defined(USE_OPENGL) || defined(USE_GLES)
-	DrawTexture(this, this->grayscale_textures, gx, gy, gx + w, gy + h, x, y, 0);
+	DrawTexture(this, this->grayscale_textures.get(), gx, gy, gx + w, gy + h, x, y, 0);
 #endif
 }
 
 CPlayerColorGraphic::~CPlayerColorGraphic()
 {
 	for (const auto &kv_pair : this->player_color_textures) {
-		glDeleteTextures(this->NumTextures, kv_pair.second);
-		delete[] kv_pair.second;
+		glDeleteTextures(this->NumTextures, kv_pair.second.get());
 	}
 
 	for (const auto &kv_pair : this->player_color_texture_color_modifications) {
 		for (const auto &sub_kv_pair : kv_pair.second) {
-			glDeleteTextures(this->NumTextures, sub_kv_pair.second);
-			delete[] sub_kv_pair.second;
+			glDeleteTextures(this->NumTextures, sub_kv_pair.second.get());
 		}
 	}
 }
@@ -232,7 +227,7 @@ void CGraphic::DrawSubClipTrans(int gx, int gy, int w, int h, int x, int y,
 */
 void CGraphic::DrawFrame(unsigned frame, int x, int y) const
 {
-	DrawTexture(this, this->textures, frame_map[frame].x, frame_map[frame].y,
+	DrawTexture(this, this->textures.get(), frame_map[frame].x, frame_map[frame].y,
 					frame_map[frame].x +  Width, frame_map[frame].y + Height, x, y, 0);
 }
 
@@ -265,7 +260,7 @@ void CGraphic::DoDrawFrameClip(const GLuint *textures,
 void CGraphic::DrawFrameClip(unsigned frame, int x, int y, const wyrmgus::time_of_day *time_of_day, SDL_Surface *surface, int show_percent)
 {
 	if (time_of_day == nullptr || !time_of_day->HasColorModification()) {
-		DoDrawFrameClip(this->textures, frame, x, y, show_percent);
+		DoDrawFrameClip(this->textures.get(), frame, x, y, show_percent);
 	} else {
 		if (this->get_textures(time_of_day->ColorModification) == nullptr) {
 			MakeTexture(this, false, time_of_day);
@@ -294,7 +289,7 @@ void CGraphic::DrawFrameClipTrans(unsigned frame, int x, int y, int alpha, const
 
 void CGraphic::DrawGrayscaleFrameClip(unsigned frame, int x, int y, int show_percent)
 {
-	DoDrawFrameClip(this->grayscale_textures, frame, x, y, show_percent);
+	DoDrawFrameClip(this->grayscale_textures.get(), frame, x, y, show_percent);
 }
 
 void CPlayerColorGraphic::DrawPlayerColorFrameClip(const wyrmgus::player_color *player_color, unsigned frame, int x, int y, const wyrmgus::time_of_day *time_of_day, int show_percent)
@@ -369,7 +364,7 @@ void CPlayerColorGraphic::DrawPlayerColorFrameClipTransX(const wyrmgus::player_c
 */
 void CGraphic::DrawFrameX(unsigned frame, int x, int y) const
 {
-	DrawTexture(this, this->textures, frame_map[frame].x, frame_map[frame].y,
+	DrawTexture(this, this->textures.get(), frame_map[frame].x, frame_map[frame].y,
 				frame_map[frame].x +  Width, frame_map[frame].y + Height, x, y, 1);
 }
 
@@ -413,7 +408,7 @@ void CGraphic::DrawFrameClipX(unsigned frame, int x, int y, const wyrmgus::time_
 //Wyrmgus end
 {
 	if (time_of_day == nullptr || !time_of_day->HasColorModification()) {
-		DoDrawFrameClipX(this->textures, frame, x, y);
+		DoDrawFrameClipX(this->textures.get(), frame, x, y);
 	} else {
 		if (this->get_textures(time_of_day->ColorModification) == nullptr) {
 			MakeTexture(this, false, time_of_day);
@@ -574,7 +569,7 @@ const GLuint *CPlayerColorGraphic::get_textures(const wyrmgus::player_color *pla
 
 	auto find_iterator = this->player_color_textures.find(player_color);
 	if (find_iterator != this->player_color_textures.end()) {
-		return find_iterator->second;
+		return find_iterator->second.get();
 	}
 
 	return nullptr;
@@ -590,7 +585,7 @@ const GLuint *CPlayerColorGraphic::get_textures(const wyrmgus::player_color *pla
 	if (find_iterator != this->player_color_texture_color_modifications.end()) {
 		auto sub_find_iterator = find_iterator->second.find(color_modification);
 		if (sub_find_iterator != find_iterator->second.end()) {
-			return sub_find_iterator->second;
+			return sub_find_iterator->second.get();
 		}
 	}
 
@@ -882,29 +877,6 @@ void CGraphic::Load(const bool create_grayscale_textures, const int scale_factor
 	}
 }
 
-/**
-**  Free a SDL surface
-**
-**  @param surface  SDL surface to free
-*/
-static void FreeSurface(SDL_Surface **surface)
-{
-	if (!*surface) {
-		return;
-	}
-	VideoPaletteListRemove(*surface);
-
-	unsigned char *pixels = nullptr;
-
-	if ((*surface)->flags & SDL_PREALLOC) {
-		pixels = (unsigned char *)(*surface)->pixels;
-	}
-
-	SDL_FreeSurface(*surface);
-	delete[] pixels;
-	*surface = nullptr;
-}
-
 #if defined(USE_OPENGL) || defined(USE_GLES)
 
 /**
@@ -914,32 +886,30 @@ void FreeOpenGLGraphics()
 {
 	for (CGraphic *graphic : CGraphic::graphics) {
 		if (graphic->textures) {
-			glDeleteTextures(graphic->NumTextures, graphic->textures);
-			delete[] graphic->textures;
-			graphic->textures = nullptr;
+			glDeleteTextures(graphic->NumTextures, graphic->textures.get());
+			graphic->textures.reset();
 		}
 		
 		if (graphic->grayscale_textures) {
-			glDeleteTextures(graphic->NumTextures, graphic->grayscale_textures);
-			delete[] graphic->grayscale_textures;
-			graphic->grayscale_textures = nullptr;
+			glDeleteTextures(graphic->NumTextures, graphic->grayscale_textures.get());
+			graphic->grayscale_textures.reset();
 		}
 		
 		for (const auto &kv_pair : graphic->texture_color_modifications) {
-			glDeleteTextures(graphic->NumTextures, kv_pair.second);
+			glDeleteTextures(graphic->NumTextures, kv_pair.second.get());
 		}
 		graphic->texture_color_modifications.clear();
 		
 		CPlayerColorGraphic *cg = dynamic_cast<CPlayerColorGraphic *>(graphic);
 		if (cg) {
 			for (const auto &kv_pair : cg->player_color_textures) {
-				glDeleteTextures(cg->NumTextures, kv_pair.second);
+				glDeleteTextures(cg->NumTextures, kv_pair.second.get());
 			}
 			cg->player_color_textures.clear();
 			
 			for (const auto &kv_pair : cg->player_color_texture_color_modifications) {
 				for (const auto &sub_kv_pair : kv_pair.second) {
-					glDeleteTextures(cg->NumTextures, sub_kv_pair.second);
+					glDeleteTextures(cg->NumTextures, sub_kv_pair.second.get());
 				}
 			}
 			cg->player_color_texture_color_modifications.clear();
@@ -953,35 +923,21 @@ void FreeOpenGLGraphics()
 void ReloadGraphics()
 {
 	for (CGraphic *graphic : CGraphic::graphics) {
-		if (graphic->textures) {
-			delete[] graphic->textures;
-			graphic->textures = nullptr;
+		if (graphic->textures != nullptr) {
+			graphic->textures.reset();
 			MakeTexture(graphic, false, nullptr);
 		}
 		
-		if (graphic->grayscale_textures) {
-			delete[] graphic->grayscale_textures;
-			graphic->grayscale_textures = nullptr;
+		if (graphic->grayscale_textures != nullptr) {
+			graphic->grayscale_textures.reset();
 			MakeTexture(graphic, true, nullptr);
 		}
 		
-		for (const auto &kv_pair : graphic->texture_color_modifications) {
-			delete[] kv_pair.second;
-		}
 		graphic->texture_color_modifications.clear();
 				
 		CPlayerColorGraphic *cg = dynamic_cast<CPlayerColorGraphic *>(graphic);
 		if (cg) {
-			for (const auto &kv_pair : cg->player_color_texture_color_modifications) {
-				for (const auto &sub_kv_pair : kv_pair.second) {
-					delete[] sub_kv_pair.second;
-				}
-			}
 			cg->player_color_texture_color_modifications.clear();
-			
-			for (const auto &kv_pair : cg->player_color_textures) {
-				delete[] kv_pair.second;
-			}
 			cg->player_color_textures.clear();
 
 			for (const wyrmgus::player_color *player_color : wyrmgus::player_color::get_all()) {
@@ -1120,24 +1076,29 @@ static void MakeTextures(CGraphic *g, const bool grayscale, const wyrmgus::playe
 	g->NumTextures = tw * th;
 
 	CPlayerColorGraphic *cg = dynamic_cast<CPlayerColorGraphic *>(g);
-	GLuint *textures;
+	GLuint *textures = nullptr;
 	if (!player_color || !cg) {
 		if (time_of_day && time_of_day->HasColorModification()) {
-			textures = g->texture_color_modifications[time_of_day->ColorModification] = new GLuint[g->NumTextures];
-			glGenTextures(g->NumTextures, g->texture_color_modifications[time_of_day->ColorModification]);
+			g->texture_color_modifications[time_of_day->ColorModification] = std::make_unique<GLuint[]>(g->NumTextures);
+			textures = g->texture_color_modifications[time_of_day->ColorModification].get();
+			glGenTextures(g->NumTextures, g->texture_color_modifications[time_of_day->ColorModification].get());
 		} else if (grayscale) {
-			textures = g->grayscale_textures = new GLuint[g->NumTextures];
-			glGenTextures(g->NumTextures, g->grayscale_textures);
+			g->grayscale_textures = std::make_unique<GLuint[]>(g->NumTextures);
+			textures = g->grayscale_textures.get();
+			glGenTextures(g->NumTextures, g->grayscale_textures.get());
 		} else {
-			textures = g->textures = new GLuint[g->NumTextures];
-			glGenTextures(g->NumTextures, g->textures);
+			g->textures = std::make_unique<GLuint[]>(g->NumTextures);
+			textures = g->textures.get();
+			glGenTextures(g->NumTextures, g->textures.get());
 		}
 	} else if (time_of_day && time_of_day->HasColorModification()) {
-		textures = cg->player_color_texture_color_modifications[player_color][time_of_day->ColorModification] = new GLuint[cg->NumTextures];
-		glGenTextures(cg->NumTextures, cg->player_color_texture_color_modifications[player_color][time_of_day->ColorModification]);
+		cg->player_color_texture_color_modifications[player_color][time_of_day->ColorModification] = std::make_unique<GLuint[]>(cg->NumTextures);
+		textures = cg->player_color_texture_color_modifications[player_color][time_of_day->ColorModification].get();
+		glGenTextures(cg->NumTextures, cg->player_color_texture_color_modifications[player_color][time_of_day->ColorModification].get());
 	} else {
-		textures = cg->player_color_textures[player_color] = new GLuint[cg->NumTextures];
-		glGenTextures(cg->NumTextures, cg->player_color_textures[player_color]);
+		cg->player_color_textures[player_color] = std::make_unique<GLuint[]>(cg->NumTextures);
+		textures = cg->player_color_textures[player_color].get();
+		glGenTextures(cg->NumTextures, cg->player_color_textures[player_color].get());
 	}
 
 	QImage image = g->get_image();
@@ -1153,6 +1114,11 @@ static void MakeTextures(CGraphic *g, const bool grayscale, const wyrmgus::playe
 		}
 	} else if (player_color != nullptr && g->has_player_color()) {
 		const int bpp = image.depth() / 8;
+
+		if (bpp < 3) {
+			throw std::runtime_error("Image BPP must be at least 3.");
+		}
+
 		unsigned char *image_data = image.bits();
 		const wyrmgus::player_color *conversible_player_color = g->get_conversible_player_color();
 		const std::vector<QColor> &conversible_colors = conversible_player_color->get_colors();
@@ -1163,12 +1129,11 @@ static void MakeTextures(CGraphic *g, const bool grayscale, const wyrmgus::playe
 			unsigned char &green = image_data[i + 1];
 			unsigned char &blue = image_data[i + 2];
 
-			for (size_t z = 0; z < conversible_colors.size(); ++z) {
-				const QColor &color = conversible_colors[z];
+			for (const QColor &color : conversible_colors) {
 				if (red == color.red() && green == color.green() && blue == color.blue()) {
-					red = colors[z].red();
-					green = colors[z].green();
-					blue = colors[z].blue();
+					red = color.red();
+					green = color.green();
+					blue = color.blue();
 				}
 			}
 		}
@@ -1277,17 +1242,15 @@ void CGraphic::Resize(int w, int h)
 	this->Width = frame_size.width();
 	this->Height = frame_size.height();
 
-	if (this->textures) {
-		glDeleteTextures(NumTextures, this->textures);
-		delete[] this->textures;
-		this->textures = nullptr;
+	if (this->textures != nullptr) {
+		glDeleteTextures(NumTextures, this->textures.get());
+		this->textures.reset();
 		MakeTexture(this, false, nullptr);
 	}
 
-	if (this->grayscale_textures) {
-		glDeleteTextures(NumTextures, this->grayscale_textures);
-		delete[] this->grayscale_textures;
-		this->grayscale_textures = nullptr;
+	if (this->grayscale_textures != nullptr) {
+		glDeleteTextures(NumTextures, this->grayscale_textures.get());
+		this->grayscale_textures.reset();
 		MakeTexture(this, true, nullptr);
 	}
 
@@ -1311,16 +1274,14 @@ void CGraphic::SetOriginalSize()
 	}
 	this->frame_map.clear();
 
-	if (this->textures) {
-		glDeleteTextures(NumTextures, this->textures);
-		delete[] this->textures;
-		this->textures = nullptr;
+	if (this->textures != nullptr) {
+		glDeleteTextures(this->NumTextures, this->textures.get());
+		this->textures.reset();
 	}
 
-	if (this->grayscale_textures) {
-		glDeleteTextures(NumTextures, this->grayscale_textures);
-		delete[] this->grayscale_textures;
-		this->grayscale_textures = nullptr;
+	if (this->grayscale_textures != nullptr) {
+		glDeleteTextures(this->NumTextures, this->grayscale_textures.get());
+		this->grayscale_textures.reset();
 	}
 
 	this->Width = this->Height = 0;

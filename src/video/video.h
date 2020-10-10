@@ -213,14 +213,14 @@ public:
 
 	const GLuint *get_textures() const
 	{
-		return this->textures;
+		return this->textures.get();
 	}
 
 	const GLuint *get_textures(const CColor &color_modification) const
 	{
 		auto find_iterator = this->texture_color_modifications.find(color_modification);
 		if (find_iterator != this->texture_color_modifications.end()) {
-			return find_iterator->second;
+			return find_iterator->second.get();
 		}
 
 		return nullptr;
@@ -228,7 +228,7 @@ public:
 
 	const GLuint *get_grayscale_textures() const
 	{
-		return this->grayscale_textures;
+		return this->grayscale_textures.get();
 	}
 
 private:
@@ -255,9 +255,9 @@ public:
 public:
 	GLfloat TextureWidth = 0.f;      /// Width of the texture
 	GLfloat TextureHeight = 0.f;     /// Height of the texture
-	GLuint *textures = nullptr;          /// Texture names
-	GLuint *grayscale_textures = nullptr;
-	std::map<CColor, GLuint *> texture_color_modifications;	/// Textures with a color modification applied to them
+	std::unique_ptr<GLuint[]> textures; //texture names
+	std::unique_ptr<GLuint[]> grayscale_textures;
+	std::map<CColor, std::unique_ptr<GLuint[]>> texture_color_modifications; //textures with a color modification applied to them
 	int NumTextures = 0;           /// Number of textures
 private:
 	int custom_scale_factor = 1; //the scale factor of the loaded image, if it is a custom scaled image
@@ -296,8 +296,8 @@ public:
 	const GLuint *get_textures(const wyrmgus::player_color *player_color) const;
 	const GLuint *get_textures(const wyrmgus::player_color *player_color, const CColor &color_modification) const;
 
-	std::map<const wyrmgus::player_color *, GLuint *> player_color_textures;
-	std::map<const wyrmgus::player_color *, std::map<CColor, GLuint *>> player_color_texture_color_modifications; //player color textures with a color modification applied to them
+	std::map<const wyrmgus::player_color *, std::unique_ptr<GLuint[]>> player_color_textures;
+	std::map<const wyrmgus::player_color *, std::map<CColor, std::unique_ptr<GLuint[]>>> player_color_texture_color_modifications; //player color textures with a color modification applied to them
 };
 
 #ifdef USE_MNG
