@@ -368,7 +368,6 @@ void PrintLicense()
 		   "\n");
 }
 
-
 /**
 **  Exit the game.
 **
@@ -405,7 +404,12 @@ void Exit(int err)
 #endif
 
 	fprintf(stdout, "%s", _("Thanks for playing " NAME ".\n"));
-	QMetaObject::invokeMethod(QApplication::instance(), [err] { QApplication::exit(err); }, Qt::QueuedConnection);
+
+	if (GameResult == GameExit) {
+		exit(err);
+	} else {
+		QMetaObject::invokeMethod(QApplication::instance(), [err] { QApplication::exit(err); }, Qt::QueuedConnection);
+	}
 }
 
 /**

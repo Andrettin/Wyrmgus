@@ -345,10 +345,6 @@ void StartMap(const std::string &filename, bool clean)
 		//  Clear screen
 		Video.ClearScreen();
 
-		if (GameResult == GameExit) {
-			return;
-		}
-
 		CleanGame();
 		current_interface_state = interface_state::menu;
 
