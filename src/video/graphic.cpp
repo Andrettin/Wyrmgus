@@ -980,6 +980,12 @@ void MakeTextures2(const CGraphic *g, const QImage &image, GLuint texture, const
 	auto tex = std::make_unique<unsigned char[]>(w * h * 4);
 
 	glBindTexture(GL_TEXTURE_2D, texture);
+
+	GLenum error_code = glGetError();
+	if (error_code != GL_NO_ERROR) {
+		throw std::runtime_error("glBindTexture failed with error code " + std::to_string(error_code) + ".");
+	}
+
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
@@ -1050,7 +1056,7 @@ void MakeTextures2(const CGraphic *g, const QImage &image, GLuint texture, const
 
 	glTexImage2D(GL_TEXTURE_2D, 0, internalformat, w, h, 0, GL_RGBA, GL_UNSIGNED_BYTE, tex.get());
 
-	const int error_code = glGetError();
+	error_code = glGetError();
 	if (error_code != GL_NO_ERROR) {
 		throw std::runtime_error("glTexImage2D failed with error code " + std::to_string(error_code) + ".");
 	}
@@ -1099,6 +1105,11 @@ static void MakeTextures(CGraphic *g, const bool grayscale, const wyrmgus::playe
 		cg->player_color_textures[player_color] = std::make_unique<GLuint[]>(cg->NumTextures);
 		textures = cg->player_color_textures[player_color].get();
 		glGenTextures(cg->NumTextures, cg->player_color_textures[player_color].get());
+	}
+
+	const GLenum error_code = glGetError();
+	if (error_code != GL_NO_ERROR) {
+		throw std::runtime_error("glGenTextures failed with error code " + std::to_string(error_code) + ".");
 	}
 
 	QImage image = g->get_image();
