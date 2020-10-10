@@ -58,6 +58,7 @@
 //Wyrmgus end
 #include "map/map.h"
 #include "map/map_layer.h"
+#include "map/minimap.h"
 #include "map/site.h"
 #include "network.h"
 #include "netconnect.h"
@@ -3797,7 +3798,7 @@ void CPlayer::Notify(int type, const Vec2i &pos, int z, const char *fmt, ...) co
 		default: color = ColorWhite;
 	}
 
-	UI.Minimap.AddEvent(pos, z, color);
+	UI.get_minimap()->AddEvent(pos, z, color);
 
 	if (this == CPlayer::GetThisPlayer()) {
 		//Wyrmgus start

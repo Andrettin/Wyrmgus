@@ -28,10 +28,6 @@
 //      02111-1307, USA.
 //
 
-/*----------------------------------------------------------------------------
--- Includes
-----------------------------------------------------------------------------*/
-
 #include "stratagus.h"
 
 #ifdef DEBUG
@@ -324,7 +320,7 @@ void ReloadOpenGL()
 	InitOpenGL();
 	ReloadGraphics();
 	ReloadFonts();
-	UI.Minimap.Reload();
+	UI.get_minimap()->Reload();
 }
 
 #endif

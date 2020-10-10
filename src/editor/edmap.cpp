@@ -27,14 +27,11 @@
 //      02111-1307, USA.
 //
 
-/*----------------------------------------------------------------------------
---  Includes
-----------------------------------------------------------------------------*/
-
 #include "stratagus.h"
 #include "editor.h"
 #include "map/map.h"
 #include "map/map_layer.h"
+#include "map/minimap.h"
 #include "map/terrain_type.h"
 #include "map/tileset.h"
 #include "ui/ui.h"
@@ -168,8 +165,8 @@ void EditorChangeTile(const Vec2i &pos, int tileIndex)
 	}
 	//Wyrmgus end
 
-	UI.Minimap.UpdateSeenXY(pos);
-	UI.Minimap.UpdateXY(pos, UI.CurrentMapLayer->ID);
+	UI.get_minimap()->UpdateSeenXY(pos);
+	UI.get_minimap()->UpdateXY(pos, UI.CurrentMapLayer->ID);
 
 	EditorChangeSurrounding(pos, tile);
 }

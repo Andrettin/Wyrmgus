@@ -83,6 +83,7 @@
 #include "database/preferences.h"
 #include "iolib.h"
 #include "map/map.h"
+#include "map/minimap.h"
 #include "ui/cursor.h"
 #include "ui/ui.h"
 #include "util/image_util.h"
@@ -247,7 +248,7 @@ bool CVideo::ResizeScreen(int w, int h)
 	if (VideoValidResolution(w, h)) {
 		FreeOpenGLGraphics();
 		FreeOpenGLFonts();
-		UI.Minimap.FreeOpenGL();
+		UI.get_minimap()->FreeOpenGL();
 
 		TheScreen = SDL_SetVideoMode(w, h, TheScreen->format->BitsPerPixel, TheScreen->flags);
 		ViewportWidth = w;

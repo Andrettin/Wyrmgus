@@ -1746,7 +1746,7 @@ void CreateGame(const std::string &filename, CMap *map, bool is_mod)
 	UI.Load();
 
 	CMap::Map.Init();
-	UI.Minimap.Create();
+	UI.get_minimap()->Create();
 	PreprocessMap();
 	
 	//Wyrmgus start

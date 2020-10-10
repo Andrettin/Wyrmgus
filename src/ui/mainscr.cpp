@@ -43,6 +43,7 @@
 #include "game.h"
 #include "map/map.h"
 #include "map/map_layer.h"
+#include "map/minimap.h"
 #include "map/minimap_mode.h"
 #include "map/site.h"
 #include "map/terrain_feature.h"
@@ -1213,7 +1214,7 @@ void DrawPopups()
 	}
 
 	if (CursorOn == cursor_on::minimap) {
-		const QPoint tile_pos = UI.Minimap.screen_to_tile_pos(CursorScreenPos);
+		const QPoint tile_pos = UI.get_minimap()->screen_to_tile_pos(CursorScreenPos);
 		if (CMap::Map.Info.IsPointOnMap(tile_pos, UI.CurrentMapLayer->ID)) {
 			const CMapField *tile = UI.CurrentMapLayer->Field(tile_pos);
 
@@ -1223,7 +1224,7 @@ void DrawPopups()
 			const bool is_tile_space = tile->is_space();
 			const bool is_tile_non_land = is_tile_water || is_tile_space;
 
-			switch (UI.Minimap.get_mode()) {
+			switch (UI.get_minimap()->get_mode()) {
 				case wyrmgus::minimap_mode::territories:
 					if (tile->get_owner() != nullptr && !is_tile_non_land) {
 						button = get_territory_tooltip_button(tile->get_owner());

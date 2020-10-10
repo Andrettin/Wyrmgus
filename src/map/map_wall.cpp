@@ -147,7 +147,7 @@ void MapFixSeenWallTile(const Vec2i &pos)
 		mf.player_info->SeenTile = wallTile;
 		// FIXME: can this only happen if seen?
 		if (mf.player_info->IsTeamVisible(*ThisPlayer)) {
-			UI.Minimap.UpdateSeenXY(pos);
+			UI.get_minimap()->UpdateSeenXY(pos);
 		}
 	}
 }
@@ -197,10 +197,10 @@ void MapFixWallTile(const Vec2i &pos)
 
 	if (mf.getGraphicTile() != wallTile) {
 		mf.setGraphicTile(wallTile);
-		UI.Minimap.UpdateXY(pos);
+		UI.get_minimap()->UpdateXY(pos);
 
 		if (mf.player_info->IsTeamVisible(*ThisPlayer)) {
-			UI.Minimap.UpdateSeenXY(pos);
+			UI.get_minimap()->UpdateSeenXY(pos);
 			Map.MarkSeenTile(mf);
 		}
 	}
@@ -245,10 +245,10 @@ void CMap::RemoveWall(const Vec2i &pos)
 	mf.Flags &= ~(MapFieldWall | MapFieldUnpassable);
 	MapFixWallNeighbors(pos);
 
-	UI.Minimap.UpdateXY(pos);
+	UI.get_minimap()->UpdateXY(pos);
 
 	if (mf.player_info->IsTeamVisible(*ThisPlayer)) {
-		UI.Minimap.UpdateSeenXY(pos);
+		UI.get_minimap()->UpdateSeenXY(pos);
 		this->MarkSeenTile(mf);
 	}
 }
@@ -277,12 +277,12 @@ void CMap::SetWall(const Vec2i &pos, bool humanwall)
 		mf.setTileIndex(*Tileset, Tileset->getOrcWallTileIndex(0), value);
 	}
 
-	UI.Minimap.UpdateXY(pos);
+	UI.get_minimap()->UpdateXY(pos);
 	MapFixWallTile(pos);
 	MapFixWallNeighbors(pos);
 
 	if (mf.player_info->IsTeamVisible(*ThisPlayer)) {
-		UI.Minimap.UpdateSeenXY(pos);
+		UI.get_minimap()->UpdateSeenXY(pos);
 		this->MarkSeenTile(mf);
 	}
 }

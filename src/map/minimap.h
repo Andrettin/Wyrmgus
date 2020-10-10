@@ -72,6 +72,7 @@ public:
 	void DrawViewportArea(const CViewport &viewport) const;
 	void DrawUnitOn(CUnit &unit, int red_phase);
 	void AddEvent(const Vec2i &pos, int z, IntColor color);
+	void draw_events() const;
 
 	QPoint texture_to_tile_pos(const QPoint &texture_pos) const;
 	QPoint texture_to_screen_pos(const QPoint &texture_pos) const;

@@ -246,10 +246,10 @@ static void EditTile(const Vec2i &pos, wyrmgus::terrain_type *terrain)
 	}
 	//Wyrmgus end
 
-	UI.Minimap.UpdateSeenXY(pos);
+	UI.get_minimap()->UpdateSeenXY(pos);
 	//Wyrmgus start
-//	UI.Minimap.UpdateXY(pos);
-	UI.Minimap.UpdateXY(pos, UI.CurrentMapLayer->ID);
+//	UI.get_minimap()->UpdateXY(pos);
+	UI.get_minimap()->UpdateXY(pos, UI.CurrentMapLayer->ID);
 	//Wyrmgus end
 
 	//Wyrmgus start
@@ -417,7 +417,7 @@ static void EditTilesInternal(const Vec2i &pos, wyrmgus::terrain_type *terrain, 
 	for (size_t i = 0; i != changed_tiles.size(); ++i) {
 		CMap::Map.CalculateTileTransitions(changed_tiles[i], false, UI.CurrentMapLayer->ID);
 		CMap::Map.CalculateTileTransitions(changed_tiles[i], true, UI.CurrentMapLayer->ID);
-		UI.Minimap.UpdateXY(changed_tiles[i], UI.CurrentMapLayer->ID);
+		UI.get_minimap()->UpdateXY(changed_tiles[i], UI.CurrentMapLayer->ID);
 		
 		for (int x_offset = -1; x_offset <= 1; ++x_offset) {
 			for (int y_offset = -1; y_offset <= 1; ++y_offset) {
@@ -431,7 +431,7 @@ static void EditTilesInternal(const Vec2i &pos, wyrmgus::terrain_type *terrain, 
 					if (CMap::Map.Info.IsPointOnMap(adjacent_pos, UI.CurrentMapLayer)) {
 						CMap::Map.CalculateTileTransitions(adjacent_pos, false, UI.CurrentMapLayer->ID);
 						CMap::Map.CalculateTileTransitions(adjacent_pos, true, UI.CurrentMapLayer->ID);
-						UI.Minimap.UpdateXY(adjacent_pos, UI.CurrentMapLayer->ID);
+						UI.get_minimap()->UpdateXY(adjacent_pos, UI.CurrentMapLayer->ID);
 					}
 				}
 			}
@@ -1508,8 +1508,8 @@ void EditorUpdateDisplay()
 
 	// Minimap
 	if (UI.SelectedViewport) {
-		UI.Minimap.Draw();
-		UI.Minimap.DrawViewportArea(*UI.SelectedViewport);
+		UI.get_minimap()->Draw();
+		UI.get_minimap()->DrawViewportArea(*UI.SelectedViewport);
 	}
 	// Info panel
 	if (UI.InfoPanel.G) {
@@ -1619,7 +1619,7 @@ static void EditorCallbackButtonDown(unsigned button)
 	// Click on minimap
 	if (CursorOn == cursor_on::minimap) {
 		if (MouseButtons & LeftButton) { // enter move mini-mode
-			const Vec2i tilePos = UI.Minimap.screen_to_tile_pos(CursorScreenPos);
+			const Vec2i tilePos = UI.get_minimap()->screen_to_tile_pos(CursorScreenPos);
 			UI.SelectedViewport->Center(CMap::Map.tile_pos_to_scaled_map_pixel_pos_center(tilePos));
 		}
 		return;
@@ -2217,7 +2217,7 @@ static void EditorCallbackMouse(const PixelPos &pos)
 	// Minimap move viewpoint
 	if (CursorOn == cursor_on::minimap && (MouseButtons & LeftButton)) {
 		RestrictCursorToMinimap();
-		const Vec2i tilePos = UI.Minimap.screen_to_tile_pos(CursorScreenPos);
+		const Vec2i tilePos = UI.get_minimap()->screen_to_tile_pos(CursorScreenPos);
 
 		UI.SelectedViewport->Center(CMap::Map.tile_pos_to_scaled_map_pixel_pos_center(tilePos));
 		return;
@@ -2233,7 +2233,7 @@ static void EditorCallbackMouse(const PixelPos &pos)
 	OldButtonUnderCursor = -1;
 
 	// Minimap
-	if (UI.Minimap.Contains(screenPos)) {
+	if (UI.get_minimap()->Contains(screenPos)) {
 		CursorOn = cursor_on::minimap;
 	}
 	// Handle edit unit area
@@ -2305,7 +2305,7 @@ static void EditorCallbackMouse(const PixelPos &pos)
 	}
 
 	// Minimap
-	if (UI.Minimap.Contains(screenPos)) {
+	if (UI.get_minimap()->Contains(screenPos)) {
 		CursorOn = cursor_on::minimap;
 		return;
 	}
@@ -2650,7 +2650,7 @@ void EditorMainLoop()
 
 			if (FrameCounter % FRAMES_PER_SECOND == 0) {
 				if (UpdateMinimap) {
-					UI.Minimap.Update();
+					UI.get_minimap()->Update();
 					UpdateMinimap = false;
 				}
 			}

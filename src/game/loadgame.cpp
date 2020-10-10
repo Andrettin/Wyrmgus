@@ -183,7 +183,7 @@ void LoadModules()
 	}
 
 	SetPlayersPalette();
-	UI.Minimap.Create();
+	UI.get_minimap()->Create();
 
 	//Wyrmgus start
 	ResetItemsToLoad();

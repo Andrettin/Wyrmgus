@@ -143,6 +143,10 @@ class CUITimer
 
 class CUserInterface
 {
+	static CUserInterface *get();
+
+	minimap *get_minimap() const;
+	
 	CResourceInfo Resources[MaxResourceInfo];
 	CInfoPanel InfoPanel;
 	CResourceInfo TimeOfDayPanel;
@@ -194,12 +198,9 @@ class CUserInterface
 
 	vector<CUIUserButton> UserButtons;
 
-	minimap Minimap;
 	CStatusLine StatusLine;
 	CUITimer Timer;
 };
-
-extern CUserInterface UI;
 
 extern ButtonStyle *FindButtonStyle(const std::string style);
 

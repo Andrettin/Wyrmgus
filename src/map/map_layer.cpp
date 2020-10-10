@@ -31,6 +31,7 @@
 
 #include "database/defines.h"
 #include "map/map.h"
+#include "map/minimap.h"
 #include "map/terrain_type.h"
 #include "map/tile.h"
 #include "map/tileset.h"
@@ -216,16 +217,16 @@ void CMapLayer::RegenerateForestTile(const Vec2i &pos)
 		topMf.player_info->SeenTile = topMf.getGraphicTile();
 		topMf.Value = 0;
 		topMf.Flags |= MapFieldForest | MapFieldUnpassable;
-		UI.Minimap.UpdateSeenXY(pos + offset);
-		UI.Minimap.UpdateXY(pos + offset);
+		UI.get_minimap()->UpdateSeenXY(pos + offset);
+		UI.get_minimap()->UpdateXY(pos + offset);
 		
 		mf.setTileIndex(*Map.Tileset, Map.Tileset->getBottomOneTreeTile(), 0);
 		mf.setGraphicTile(Map.Tileset->getBottomOneTreeTile());
 		mf.player_info->SeenTile = mf.getGraphicTile();
 		mf.Value = 0;
 		mf.Flags |= MapFieldForest | MapFieldUnpassable;
-		UI.Minimap.UpdateSeenXY(pos);
-		UI.Minimap.UpdateXY(pos);
+		UI.get_minimap()->UpdateSeenXY(pos);
+		UI.get_minimap()->UpdateXY(pos);
 		
 		if (mf.player_info->IsTeamVisible(*ThisPlayer)) {
 			MarkSeenTile(mf);
@@ -431,7 +432,7 @@ void CMapLayer::SetSeason(CScheduledSeason *season)
 				(mf.player_info->SeenTerrain && mf.player_info->SeenTerrain->get_graphics(old_season) != mf.player_info->SeenTerrain->get_graphics(new_season))
 				|| (mf.player_info->SeenOverlayTerrain && mf.player_info->SeenOverlayTerrain->get_graphics(old_season) != mf.player_info->SeenOverlayTerrain->get_graphics(new_season))
 			) {
-				UI.Minimap.UpdateXY(Vec2i(x, y), this->ID);
+				UI.get_minimap()->UpdateXY(Vec2i(x, y), this->ID);
 			}
 		}
 	}

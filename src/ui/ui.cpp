@@ -42,6 +42,7 @@
 #include "iolib.h"
 #include "map/map.h"
 #include "map/map_layer.h"
+#include "map/minimap.h"
 #include "menus.h"
 #include "title.h"
 #include "translate.h"
@@ -62,11 +63,7 @@ static ViewportModeType NewViewportMode = VIEWPORT_SINGLE;
 /**
 **  The user interface configuration
 */
-CUserInterface UI;
-
-/*----------------------------------------------------------------------------
--- Functions
-----------------------------------------------------------------------------*/
+CUserInterface &UI = *CUserInterface::get();
 
 /**
 **  Show load progress.
@@ -154,6 +151,7 @@ CUserInterface::CUserInterface() :
 	ViewportCursorColor(0), Offset640X(0), Offset480Y(0),
 	VictoryBackgroundG(nullptr), DefeatBackgroundG(nullptr)
 {
+	this->minimap = std::make_unique<wyrmgus::minimap>();
 	MouseWarpPos.x = MouseWarpPos.y = -1;
 }
 

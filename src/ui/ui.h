@@ -33,12 +33,12 @@
 /// @todo all user interface variables should go here and be configurable
 
 #include "color.h"
-#include "map/minimap.h"
 #include "script.h"
 #include "viewport.h"
 #include "ui/interface.h"
 #include "ui/statusline.h"
 #include "ui/uitimer.h"
+#include "util/singleton.h"
 
 class CContentType;
 class CFile;
@@ -347,13 +347,23 @@ public:
 /**
 **  Defines the user interface.
 */
-class CUserInterface
+class CUserInterface final : public wyrmgus::singleton<CUserInterface>
 {
 public:
+	static CUserInterface *get()
+	{
+		return wyrmgus::singleton<CUserInterface>::get();
+	}
+
 	CUserInterface();
 	~CUserInterface();
 
 	void Load();
+
+	wyrmgus::minimap *get_minimap() const
+	{
+		return this->minimap.get();
+	}
 
 	wyrmgus::cursor *get_cursor(const wyrmgus::cursor_type cursor_type) const
 	{
@@ -480,8 +490,9 @@ public:
 	// Used defined buttons
 	std::vector<CUIUserButton> UserButtons; /// User buttons
 
-	// The minimap
-	wyrmgus::minimap Minimap;
+private:
+	std::unique_ptr<wyrmgus::minimap> minimap;
+public:
 	IntColor ViewportCursorColor;       /// minimap cursor color
 
 	// The status line
@@ -515,7 +526,7 @@ public:
 
 extern std::vector<std::unique_ptr<wyrmgus::button>> CurrentButtons;  /// Current Selected Buttons
 
-extern CUserInterface UI;                           /// The user interface
+extern CUserInterface &UI;                           /// The user interface
 
 extern std::string ClickMissile;            /// Missile to show when you click
 extern std::string DamageMissile;           /// Missile to show damage caused

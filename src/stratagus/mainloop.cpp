@@ -27,10 +27,6 @@
 //      02111-1307, USA.
 //
 
-//----------------------------------------------------------------------------
-//  Includes
-//----------------------------------------------------------------------------
-
 #include "stratagus.h"
 
 #include "actions.h"
@@ -49,6 +45,7 @@
 //Wyrmgus end
 #include "map/map.h"
 #include "map/map_layer.h"
+#include "map/minimap.h"
 #include "map/terrain_type.h"
 #include "map/tileset.h" //for tile animation
 #include "missile.h"
@@ -238,8 +235,8 @@ void UpdateDisplay()
 			DrawMenuButtonArea();
 			DrawUserDefinedButtons();
 
-			UI.Minimap.Draw();
-			UI.Minimap.DrawViewportArea(*UI.SelectedViewport);
+			UI.get_minimap()->Draw();
+			UI.get_minimap()->DrawViewportArea(*UI.SelectedViewport);
 
 			UI.InfoPanel.Draw();
 			DrawResources();
@@ -357,7 +354,7 @@ static void GameLogicLoop()
 			case 2:
 				break;
 			case 3: // minimap update
-				UI.Minimap.UpdateCache = true;
+				UI.get_minimap()->UpdateCache = true;
 				break;
 			case 4:
 				break;
@@ -447,9 +444,9 @@ static void DisplayLoop()
 	 *	update only if Update flag is set
 	 *	FIXME: still not secure
 	 */
-	if (UI.Minimap.UpdateCache) {
-		UI.Minimap.Update();
-		UI.Minimap.UpdateCache = false;
+	if (UI.get_minimap()->UpdateCache) {
+		UI.get_minimap()->Update();
+		UI.get_minimap()->UpdateCache = false;
 	}
 
 	//

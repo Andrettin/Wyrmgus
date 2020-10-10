@@ -40,6 +40,7 @@
 #include "iolib.h"
 #include "map/map.h"
 #include "map/map_layer.h"
+#include "map/minimap.h"
 #include "map/minimap_mode.h"
 #include "network.h"
 #include "player.h"
@@ -487,15 +488,15 @@ static void UiRecallMapPosition(unsigned position)
 
 void UiToggleMinimapMode()
 {
-	UI.Minimap.toggle_mode();
-	UI.StatusLine.Set(_(wyrmgus::get_minimap_mode_name(UI.Minimap.get_mode())));
+	UI.get_minimap()->toggle_mode();
+	UI.StatusLine.Set(_(wyrmgus::get_minimap_mode_name(UI.get_minimap()->get_mode())));
 }
 
 void UiToggleMinimapZoom()
 {
-	if (UI.Minimap.can_zoom(UI.CurrentMapLayer->ID)) {
-		UI.Minimap.set_zoomed(!UI.Minimap.is_zoomed());
-		if (UI.Minimap.is_zoomed()) {
+	if (UI.get_minimap()->can_zoom(UI.CurrentMapLayer->ID)) {
+		UI.get_minimap()->set_zoomed(!UI.get_minimap()->is_zoomed());
+		if (UI.get_minimap()->is_zoomed()) {
 			UI.StatusLine.Set(_("Zoomed Minimap"));
 		} else {
 			UI.StatusLine.Set(_("Unzoomed Minimap"));

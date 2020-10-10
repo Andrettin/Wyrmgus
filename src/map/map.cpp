@@ -38,6 +38,7 @@
 #include "iolib.h"
 #include "map/map_layer.h"
 #include "map/map_template.h"
+#include "map/minimap.h"
 #include "map/site.h"
 #include "map/terrain_feature.h"
 #include "map/terrain_type.h"
@@ -167,8 +168,8 @@ void CMap::MarkSeenTile(CMapField &mf, int z)
 
 #ifdef MINIMAP_UPDATE
 	//Wyrmgus start
-//	UI.Minimap.UpdateXY(pos);
-	UI.Minimap.UpdateXY(pos, z);
+//	UI.get_minimap()->UpdateXY(pos);
+	UI.get_minimap()->UpdateXY(pos, z);
 	//Wyrmgus end
 #endif
 }
@@ -1181,8 +1182,8 @@ void PreprocessMap()
 				CMap::Map.CalculateTileOwnershipTransition(tile_pos, z);
 				CMap::Map.calculate_tile_terrain_feature(tile_pos, z);
 				mf.UpdateSeenTile();
-				UI.Minimap.UpdateXY(tile_pos, z);
-				UI.Minimap.update_territory_xy(tile_pos, z);
+				UI.get_minimap()->UpdateXY(tile_pos, z);
+				UI.get_minimap()->update_territory_xy(tile_pos, z);
 				if (mf.player_info->IsTeamVisible(*CPlayer::GetThisPlayer())) {
 					CMap::Map.MarkSeenTile(mf, z);
 				}
@@ -1248,7 +1249,7 @@ void ChangeCurrentMapLayer(const int z)
 	
 	UI.PreviousMapLayer = UI.CurrentMapLayer;
 	UI.CurrentMapLayer = CMap::Map.MapLayers[z].get();
-	UI.Minimap.UpdateCache = true;
+	UI.get_minimap()->UpdateCache = true;
 	UI.SelectedViewport->Set(new_viewport_map_pos, wyrmgus::size::to_point(wyrmgus::defines::get()->get_scaled_tile_size()) / 2);
 }
 
@@ -1538,7 +1539,7 @@ void CMap::Clean()
 	FlagRevealMap = 0;
 	ReplayRevealMap = 0;
 
-	UI.Minimap.Destroy();
+	UI.get_minimap()->Destroy();
 }
 
 void CMap::ClearMapLayers()
@@ -1719,7 +1720,7 @@ void CMap::FixTile(unsigned short type, int seen, const Vec2i &pos)
 			mf.setGraphicTile(removedtile);
 			mf.Flags &= ~flags;
 			mf.Value = 0;
-			UI.Minimap.UpdateXY(pos);
+			UI.get_minimap()->UpdateXY(pos);
 		}
 	} else if (seen && this->Tileset->isEquivalentTile(tile, mf.player_info->SeenTile)) { //Same Type
 		return;
@@ -1733,7 +1734,7 @@ void CMap::FixTile(unsigned short type, int seen, const Vec2i &pos)
 
 	//maybe isExplored
 	if (mf.player_info->IsExplored(*ThisPlayer)) {
-		UI.Minimap.UpdateSeenXY(pos);
+		UI.get_minimap()->UpdateSeenXY(pos);
 		if (!seen) {
 			MarkSeenTile(mf);
 		}
@@ -1808,7 +1809,7 @@ void CMap::SetTileTerrain(const Vec2i &pos, wyrmgus::terrain_type *terrain, int 
 	if (mf.player_info->IsTeamVisible(*CPlayer::GetThisPlayer())) {
 		MarkSeenTile(mf, z);
 	}
-	UI.Minimap.UpdateXY(pos, z);
+	UI.get_minimap()->UpdateXY(pos, z);
 	
 	for (int x_offset = -1; x_offset <= 1; ++x_offset) {
 		for (int y_offset = -1; y_offset <= 1; ++y_offset) {
@@ -1827,7 +1828,7 @@ void CMap::SetTileTerrain(const Vec2i &pos, wyrmgus::terrain_type *terrain, int 
 					if (adjacent_mf.player_info->IsTeamVisible(*CPlayer::GetThisPlayer())) {
 						MarkSeenTile(adjacent_mf, z);
 					}
-					UI.Minimap.UpdateXY(adjacent_pos, z);
+					UI.get_minimap()->UpdateXY(adjacent_pos, z);
 				}
 			}
 		}
@@ -1852,7 +1853,7 @@ void CMap::RemoveTileOverlayTerrain(const Vec2i &pos, int z)
 	if (mf.player_info->IsTeamVisible(*CPlayer::GetThisPlayer())) {
 		MarkSeenTile(mf, z);
 	}
-	UI.Minimap.UpdateXY(pos, z);
+	UI.get_minimap()->UpdateXY(pos, z);
 	
 	for (int x_offset = -1; x_offset <= 1; ++x_offset) {
 		for (int y_offset = -1; y_offset <= 1; ++y_offset) {
@@ -1866,7 +1867,7 @@ void CMap::RemoveTileOverlayTerrain(const Vec2i &pos, int z)
 					if (adjacent_mf.player_info->IsTeamVisible(*CPlayer::GetThisPlayer())) {
 						MarkSeenTile(adjacent_mf, z);
 					}
-					UI.Minimap.UpdateXY(adjacent_pos, z);
+					UI.get_minimap()->UpdateXY(adjacent_pos, z);
 				}
 			}
 		}
@@ -1926,7 +1927,7 @@ void CMap::SetOverlayTerrainDestroyed(const Vec2i &pos, bool destroyed, int z)
 	if (mf.player_info->IsTeamVisible(*CPlayer::GetThisPlayer())) {
 		MarkSeenTile(mf, z);
 	}
-	UI.Minimap.UpdateXY(pos, z);
+	UI.get_minimap()->UpdateXY(pos, z);
 	
 	for (int x_offset = -1; x_offset <= 1; ++x_offset) {
 		for (int y_offset = -1; y_offset <= 1; ++y_offset) {
@@ -1944,7 +1945,7 @@ void CMap::SetOverlayTerrainDestroyed(const Vec2i &pos, bool destroyed, int z)
 					if (adjacent_mf.player_info->IsTeamVisible(*CPlayer::GetThisPlayer())) {
 						MarkSeenTile(adjacent_mf, z);
 					}
-					UI.Minimap.UpdateXY(adjacent_pos, z);
+					UI.get_minimap()->UpdateXY(adjacent_pos, z);
 				}
 			}
 		}
@@ -1974,7 +1975,7 @@ void CMap::SetOverlayTerrainDamaged(const Vec2i &pos, bool damaged, int z)
 	if (mf.player_info->IsTeamVisible(*CPlayer::GetThisPlayer())) {
 		MarkSeenTile(mf, z);
 	}
-	UI.Minimap.UpdateXY(pos, z);
+	UI.get_minimap()->UpdateXY(pos, z);
 }
 
 static wyrmgus::tile_transition_type GetTransitionType(std::vector<int> &adjacent_directions, bool allow_single = false)
@@ -3440,12 +3441,12 @@ void CMap::ClearWoodTile(const Vec2i &pos)
 	mf.Flags &= ~(MapFieldForest | MapFieldUnpassable);
 	mf.Value = 0;
 
-	UI.Minimap.UpdateXY(pos);
+	UI.get_minimap()->UpdateXY(pos);
 	FixNeighbors(MapFieldForest, 0, pos);
 
 	//maybe isExplored
 	if (mf.player_info->IsExplored(*ThisPlayer)) {
-		UI.Minimap.UpdateSeenXY(pos);
+		UI.get_minimap()->UpdateSeenXY(pos);
 		MarkSeenTile(mf);
 	}
 }
@@ -3459,12 +3460,12 @@ void CMap::ClearRockTile(const Vec2i &pos)
 	mf.Flags &= ~(MapFieldRocks | MapFieldUnpassable);
 	mf.Value = 0;
 	
-	UI.Minimap.UpdateXY(pos);
+	UI.get_minimap()->UpdateXY(pos);
 	FixNeighbors(MapFieldRocks, 0, pos);
 
 	//maybe isExplored
 	if (mf.player_info->IsExplored(*ThisPlayer)) {
-		UI.Minimap.UpdateSeenXY(pos);
+		UI.get_minimap()->UpdateSeenXY(pos);
 		MarkSeenTile(mf);
 	}
 }

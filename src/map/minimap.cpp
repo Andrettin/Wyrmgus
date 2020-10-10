@@ -455,7 +455,7 @@ void minimap::DrawUnitOn(CUnit &unit, int red_phase)
 		if (unit.Attacked && unit.Attacked + ATTACK_BLINK_DURATION > GameCycle &&
 			(red_phase || unit.Attacked + ATTACK_RED_DURATION > GameCycle)) {
 			color = ColorRed;
-		} else if (UI.Minimap.ShowSelected && unit.Selected) {
+		} else if (this->ShowSelected && unit.Selected) {
 			color = ColorWhite;
 		} else {
 			color = ColorGreen;
@@ -464,8 +464,8 @@ void minimap::DrawUnitOn(CUnit &unit, int red_phase)
 		color = Video.MapRGB(TheScreen->format, unit.Player->get_minimap_color());
 	}
 
-	int mx = 1 + UI.Minimap.XOffset[z] + Map2MinimapX[z][unit.tilePos.x];
-	int my = 1 + UI.Minimap.YOffset[z] + Map2MinimapY[z][unit.tilePos.y];
+	int mx = 1 + this->XOffset[z] + Map2MinimapX[z][unit.tilePos.x];
+	int my = 1 + this->YOffset[z] + Map2MinimapY[z][unit.tilePos.y];
 	int w = Map2MinimapX[z][type->get_tile_width()];
 
 	if (mx + w >= texture_width) { // clip right side
@@ -558,24 +558,21 @@ void minimap::Update()
 	}
 }
 
-/**
-**  Draw the minimap events
-*/
-static void DrawEvents()
+void minimap::draw_events() const
 {
 	const unsigned char alpha = 192;
 
 	for (int i = 0; i < NumMinimapEvents; ++i) {
-		QPoint screen_pos = UI.Minimap.texture_to_screen_pos(MinimapEvents[i].pos);
-		if (screen_pos.x() < UI.Minimap.X) {
-			screen_pos.setX(UI.Minimap.X);
-		} else if (screen_pos.x() >= UI.Minimap.X + UI.Minimap.get_width()) {
-			screen_pos.setX(UI.Minimap.X + UI.Minimap.get_width() - 1);
+		QPoint screen_pos = this->texture_to_screen_pos(MinimapEvents[i].pos);
+		if (screen_pos.x() < this->X) {
+			screen_pos.setX(this->X);
+		} else if (screen_pos.x() >= this->X + this->get_width()) {
+			screen_pos.setX(this->X + this->get_width() - 1);
 		}
-		if (screen_pos.y() < UI.Minimap.Y) {
-			screen_pos.setY(UI.Minimap.Y);
-		} else if (screen_pos.y() >= UI.Minimap.Y + UI.Minimap.get_height()) {
-			screen_pos.setY(UI.Minimap.Y + UI.Minimap.get_height() - 1);
+		if (screen_pos.y() < this->Y) {
+			screen_pos.setY(this->Y);
+		} else if (screen_pos.y() >= this->Y + this->get_height()) {
+			screen_pos.setY(this->Y + this->get_height() - 1);
 		}
 
 		Video.DrawTransCircleClip(MinimapEvents[i].Color, screen_pos.x(), screen_pos.y(), MinimapEvents[i].Size, alpha);
@@ -587,9 +584,6 @@ static void DrawEvents()
 	}
 }
 
-/**
-**  Draw the minimap on the screen
-*/
 void minimap::Draw() const
 {
 	const int z = UI.CurrentMapLayer->ID;

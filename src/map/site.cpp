@@ -37,6 +37,7 @@
 #include "map/map.h"
 #include "map/map_layer.h"
 #include "map/map_template.h"
+#include "map/minimap.h"
 #include "map/region.h"
 #include "player.h" //for factions
 #include "player_color.h"
@@ -381,7 +382,7 @@ void site::update_minimap_territory()
 			const CMapField *tile = CMap::Map.Field(tile_pos, z);
 
 			if (tile->get_settlement() == this) {
-				UI.Minimap.update_territory_xy(tile_pos, z);
+				UI.get_minimap()->update_territory_xy(tile_pos, z);
 			}
 		}
 	}
