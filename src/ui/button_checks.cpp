@@ -85,15 +85,13 @@ bool ButtonCheckFalse(const CUnit &, const wyrmgus::button &)
 bool ButtonCheckUpgrade(const CUnit &unit, const wyrmgus::button &button)
 {
 	CPlayer *player = unit.Player;
-	char *buf = new_strdup(button.AllowStr.c_str());
+	std::unique_ptr<char[]> buf = new_strdup(button.AllowStr.c_str());
 
-	for (const char *s = strtok(buf, ","); s; s = strtok(nullptr, ",")) {
+	for (const char *s = strtok(buf.get(), ","); s; s = strtok(nullptr, ",")) {
 		if (UpgradeIdentAllowed(*unit.Player, s) != 'R') {
-			delete[] buf;
 			return false;
 		}
 	}
-	delete[] buf;
 	return true;
 }
 
@@ -121,15 +119,13 @@ bool ButtonCheckUpgradeNot(const CUnit &unit, const wyrmgus::button &button)
 bool ButtonCheckUpgradeOr(const CUnit &unit, const wyrmgus::button &button)
 {
 	CPlayer *player = unit.Player;
-	char *buf = new_strdup(button.AllowStr.c_str());
+	std::unique_ptr<char[]> buf = new_strdup(button.AllowStr.c_str());
 
-	for (const char *s = strtok(buf, ","); s; s = strtok(nullptr, ",")) {
+	for (const char *s = strtok(buf.get(), ","); s; s = strtok(nullptr, ",")) {
 		if (UpgradeIdentAllowed(*unit.Player, s) == 'R') {
-			delete[] buf;
 			return true;
 		}
 	}
-	delete[] buf;
 	return false;
 }
 
@@ -143,15 +139,13 @@ bool ButtonCheckUpgradeOr(const CUnit &unit, const wyrmgus::button &button)
 */
 bool ButtonCheckIndividualUpgrade(const CUnit &unit, const wyrmgus::button &button)
 {
-	char *buf = new_strdup(button.AllowStr.c_str());
+	std::unique_ptr<char[]> buf = new_strdup(button.AllowStr.c_str());
 
-	for (const char *s = strtok(buf, ","); s; s = strtok(nullptr, ",")) {
+	for (const char *s = strtok(buf.get(), ","); s; s = strtok(nullptr, ",")) {
 		if (unit.GetIndividualUpgrade(CUpgrade::get(s)) == 0) {
-			delete[] buf;
 			return false;
 		}
 	}
-	delete[] buf;
 	return true;
 }
 
@@ -165,15 +159,13 @@ bool ButtonCheckIndividualUpgrade(const CUnit &unit, const wyrmgus::button &butt
 */
 bool ButtonCheckIndividualUpgradeOr(const CUnit &unit, const wyrmgus::button &button)
 {
-	char *buf = new_strdup(button.AllowStr.c_str());
+	std::unique_ptr<char[]> buf = new_strdup(button.AllowStr.c_str());
 
-	for (const char *s = strtok(buf, ","); s; s = strtok(nullptr, ",")) {
+	for (const char *s = strtok(buf.get(), ","); s; s = strtok(nullptr, ",")) {
 		if (unit.GetIndividualUpgrade(CUpgrade::get(s)) > 0) {
-			delete[] buf;
 			return true;
 		}
 	}
-	delete[] buf;
 	return false;
 }
 
@@ -187,9 +179,9 @@ bool ButtonCheckIndividualUpgradeOr(const CUnit &unit, const wyrmgus::button &bu
 */
 bool ButtonCheckUnitVariable(const CUnit &unit, const wyrmgus::button &button)
 {
-	char *buf = new_strdup(button.AllowStr.c_str());
+	std::unique_ptr<char[]> buf = new_strdup(button.AllowStr.c_str());
 
-	for (const char *var = strtok(buf, ","); var; var = strtok(nullptr, ",")) {
+	for (const char *var = strtok(buf.get(), ","); var; var = strtok(nullptr, ",")) {
 		const char *type = strtok(nullptr, ",");
 		const char *binop = strtok(nullptr, ",");
 		const char *value = strtok(nullptr, ",");
@@ -247,11 +239,9 @@ bool ButtonCheckUnitVariable(const CUnit &unit, const wyrmgus::button &button)
 			return false;
 		}
 		if (cmpResult == false) {
-			delete[] buf;
 			return false;
 		}
 	}
-	delete[] buf;
 	return true;
 }
 
@@ -266,16 +256,14 @@ bool ButtonCheckUnitVariable(const CUnit &unit, const wyrmgus::button &button)
 bool ButtonCheckUnitsOr(const CUnit &unit, const wyrmgus::button &button)
 {
 	CPlayer *player = unit.Player;
-	char *buf = new_strdup(button.AllowStr.c_str());
+	std::unique_ptr<char[]> buf = new_strdup(button.AllowStr.c_str());
 
-	for (const char *s = strtok(buf, ","); s; s = strtok(nullptr, ",")) {
+	for (const char *s = strtok(buf.get(), ","); s; s = strtok(nullptr, ",")) {
 		const wyrmgus::unit_type *unit_type = wyrmgus::unit_type::try_get(s);
 		if (unit_type != nullptr && player->has_unit_type(unit_type)) {
-			delete[] buf;
 			return true;
 		}
 	}
-	delete[] buf;
 	return false;
 }
 
@@ -290,16 +278,14 @@ bool ButtonCheckUnitsOr(const CUnit &unit, const wyrmgus::button &button)
 bool ButtonCheckUnitsAnd(const CUnit &unit, const wyrmgus::button &button)
 {
 	CPlayer *player = unit.Player;
-	char *buf = new_strdup(button.AllowStr.c_str());
+	std::unique_ptr<char[]> buf = new_strdup(button.AllowStr.c_str());
 
-	for (const char *s = strtok(buf, ","); s; s = strtok(nullptr, ",")) {
+	for (const char *s = strtok(buf.get(), ","); s; s = strtok(nullptr, ",")) {
 		const wyrmgus::unit_type *unit_type = wyrmgus::unit_type::try_get(s);
 		if (unit_type != nullptr && player->has_unit_type(unit_type)) {
-			delete[] buf;
 			return false;
 		}
 	}
-	delete[] buf;
 	return true;
 }
 

@@ -164,24 +164,21 @@ static void MixMusicToStereo32(int *buffer, int size)
 	if (MusicPlaying) {
 		Assert(MusicChannel.Sample);
 
-		short *buf = new short[size];
+		auto buf = std::make_unique<short[]>(size);
 		int len = size * sizeof(short);
-		char *tmp = new char[len];
+		auto tmp = std::make_unique<char[]>(len);
 
 		int div = 176400 / (MusicChannel.Sample->get_format().sampleRate() * (MusicChannel.Sample->get_format().sampleSize() / 8) * MusicChannel.Sample->get_format().channelCount());
 
-		size = MusicChannel.Sample->Read(tmp, len / div);
+		size = MusicChannel.Sample->Read(tmp.get(), len / div);
 
-		int n = ConvertToStereo32(tmp, (char *)buf, MusicChannel.Sample->get_format().sampleRate(), MusicChannel.Sample->get_format().sampleSize() / 8, MusicChannel.Sample->get_format().channelCount(), size);
+		int n = ConvertToStereo32(tmp.get(), reinterpret_cast<char *>(buf.get()), MusicChannel.Sample->get_format().sampleRate(), MusicChannel.Sample->get_format().sampleSize() / 8, MusicChannel.Sample->get_format().channelCount(), size);
 
-		for (int i = 0; i < n / (int)sizeof(*buf); ++i) {
+		for (int i = 0; i < n / static_cast<int>(sizeof(*buf.get())); ++i) {
 			// Add to our samples
 			// FIXME: why taking out '/ 2' leads to distortion
 			buffer[i] += buf[i] * MusicVolume / MaxVolume / 2;
 		}
-
-		delete[] tmp;
-		delete[] buf;
 
 		if (n < len) { // End reached
 			MusicPlaying = false;

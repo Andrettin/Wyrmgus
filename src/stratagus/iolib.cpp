@@ -167,7 +167,7 @@ long CFile::tell()
 int CFile::printf(const char *format, ...)
 {
 	int size = 500;
-	char *p = new char[size];
+	auto p = std::make_unique<char[]>(size);
 	if (p == nullptr) {
 		return -1;
 	}
@@ -175,7 +175,7 @@ int CFile::printf(const char *format, ...)
 		// Try to print in the allocated space.
 		va_list ap;
 		va_start(ap, format);
-		const int n = vsnprintf(p, size, format, ap);
+		const int n = vsnprintf(p.get(), size, format, ap);
 		va_end(ap);
 		// If that worked, string was processed.
 		if (n > -1 && n < size) {
@@ -187,15 +187,13 @@ int CFile::printf(const char *format, ...)
 		} else {    /* glibc 2.0, vc++ */
 			size *= 2;  // twice the old size
 		}
-		delete[] p;
-		p = new char[size];
+		p = std::make_unique<char[]>(size);
 		if (p == nullptr) {
 			return -1;
 		}
 	}
-	size = strlen(p);
-	int ret = pimpl->write(p, size);
-	delete[] p;
+	size = strlen(p.get());
+	int ret = pimpl->write(p.get(), size);
 	return ret;
 }
 

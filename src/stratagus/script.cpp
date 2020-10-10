@@ -1159,7 +1159,7 @@ StringDesc *CclParseStringDesc(lua_State *l)
 
 	if (lua_isstring(l, -1)) {
 		res->e = EString_Dir;
-		res->D.Val = new_strdup(LuaToString(l, -1));
+		res->D.Val = new_strdup(LuaToString(l, -1)).release();
 	} else if (lua_isfunction(l, -1)) {
 		res->e = EString_Lua;
 		res->D.Index = ParseLuaFunction(l, "_stringfunction_", &StringCounter);

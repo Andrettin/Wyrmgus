@@ -152,12 +152,12 @@ private:
 	std::vector<GLuint> overlay_textures;
 
 	// Minimap surface with terrain only (for OpenGL)
-	std::vector<unsigned char *> terrain_texture_data;
+	std::vector<std::unique_ptr<unsigned char[]>> terrain_texture_data;
 
-	std::map<minimap_mode, std::vector<unsigned char *>> mode_overlay_texture_data;
+	std::map<minimap_mode, std::vector<std::unique_ptr<unsigned char[]>>> mode_overlay_texture_data;
 
 	//texture data for the overlay with units and unexplored terrain
-	std::vector<unsigned char *> overlay_texture_data;
+	std::vector<std::unique_ptr<unsigned char[]>> overlay_texture_data;
 };
 
 }

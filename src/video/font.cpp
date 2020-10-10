@@ -212,7 +212,7 @@ int font::Width(const int number) const
 	const int len = text.length();
 
 	while (GetUTF8(text.c_str(), len, pos, utf8)) {
-		width += this->CharWidth[utf8 - 32] + 1;
+		width += this->char_width[utf8 - 32] + 1;
 	}
 	return width;
 }
@@ -255,7 +255,7 @@ int font::Width(const std::string &text) const
 			}
 		}
 		if (!isformat) {
-			width += this->CharWidth[utf8 - 32] + 1;
+			width += this->char_width[utf8 - 32] + 1;
 		}
 	}
 	return width;
@@ -290,7 +290,6 @@ font::font(const std::string &identifier) : data_entry(identifier)
 
 font::~font()
 {
-	delete[] CharWidth;
 }
 
 }
@@ -329,7 +328,7 @@ unsigned int font::DrawChar(CGraphic &g, int utf8, int x, int y, const wyrmgus::
 	if (c < 0 || ipr * this->G->GraphicHeight / this->G->Height <= c) {
 		c = 0;
 	}
-	const int w = this->CharWidth[c];
+	const int w = this->char_width[c];
 	const int gx = (c % ipr) * this->G->Width;
 	const int gy = (c / ipr) * this->G->Height;
 
@@ -675,10 +674,9 @@ void font::MeasureWidths()
 
 	const int maxy = image.width() / frame_size.width() * image.height() / frame_size.height();
 
-	delete[] CharWidth;
-	CharWidth = new char[maxy];
-	memset(CharWidth, 0, maxy);
-	CharWidth[0] = frame_size.width() / 2 * scale_factor;  // a reasonable value for SPACE
+	this->char_width = std::make_unique<char[]>(maxy);
+	memset(this->char_width.get(), 0, maxy);
+	this->char_width[0] = frame_size.width() / 2 * scale_factor;  // a reasonable value for SPACE
 	const int ipr = image.width() / frame_size.width(); // images per row
 
 	for (int y = 1; y < maxy; ++y) {
@@ -696,7 +694,7 @@ void font::MeasureWidths()
 
 			for (; sp < lp; --lp) {
 				if (*lp != 0 && *lp != 7) {
-					CharWidth[y] = std::max<char>(CharWidth[y], (lp - sp) * scale_factor);
+					this->char_width[y] = std::max<char>(this->char_width[y], (lp - sp) * scale_factor);
 				}
 			}
 			sp += image.bytesPerLine();
