@@ -241,10 +241,11 @@ void site::initialize()
 
 	if (this->get_map_template() != nullptr) {
 		if (this->get_pos().x() != -1 && this->get_pos().y() != -1) {
-			if (this->map_template->sites_by_position.find(this->get_pos()) == this->map_template->sites_by_position.end()) {
+			auto find_iterator = this->map_template->sites_by_position.find(this->get_pos());
+			if (find_iterator == this->map_template->sites_by_position.end()) {
 				this->map_template->sites_by_position[this->get_pos()] = this;
 			} else {
-				throw std::runtime_error("Position (" + std::to_string(this->get_pos().x()) + ", " + std::to_string(this->get_pos().y()) + ") of map template \"" + this->map_template->get_identifier() + "\" already has a site.");
+				throw std::runtime_error("Position (" + std::to_string(this->get_pos().x()) + ", " + std::to_string(this->get_pos().y()) + ") of map template \"" + this->map_template->get_identifier() + "\" already has a site (\"" + find_iterator->second->get_identifier() + "\").");
 			}
 		}
 
