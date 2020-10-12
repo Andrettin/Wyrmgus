@@ -1229,7 +1229,7 @@ void CGraphic::Resize(int w, int h)
 {
 	Assert(this->IsLoaded()); // can't resize before it's been loaded
 
-	if (GraphicWidth == w && GraphicHeight == h) {
+	if (this->GraphicWidth == w && this->GraphicHeight == h) {
 		return;
 	}
 
@@ -1241,32 +1241,41 @@ void CGraphic::Resize(int w, int h)
 	// If the image has already been resized then get a clean copy first
 	if (Resized) {
 		this->SetOriginalSize();
-		if (GraphicWidth == w && GraphicHeight == h) {
+		if (this->GraphicWidth == w && this->GraphicHeight == h) {
 			return;
 		}
 	}
 
 	this->Resized = true;
 
-	GraphicWidth = w;
-	GraphicHeight = h;
+	this->GraphicWidth = w;
+	this->GraphicHeight = h;
 
 	this->Width = frame_size.width();
 	this->Height = frame_size.height();
 
-	if (this->textures != nullptr) {
-		glDeleteTextures(NumTextures, this->textures.get());
+	const bool has_textures = this->textures != nullptr;
+	const bool has_grayscale_textures = this->grayscale_textures != nullptr;
+
+	if (has_textures) {
+		glDeleteTextures(this->NumTextures, this->textures.get());
 		this->textures.reset();
+	}
+
+	if (has_grayscale_textures) {
+		glDeleteTextures(this->NumTextures, this->grayscale_textures.get());
+		this->grayscale_textures.reset();
+	}
+
+	if (has_textures) {
 		MakeTexture(this, false, nullptr);
 	}
 
-	if (this->grayscale_textures != nullptr) {
-		glDeleteTextures(NumTextures, this->grayscale_textures.get());
-		this->grayscale_textures.reset();
+	if (has_grayscale_textures) {
 		MakeTexture(this, true, nullptr);
 	}
 
-	GenFramesMap();
+	this->GenFramesMap();
 }
 
 /**
