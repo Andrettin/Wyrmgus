@@ -214,7 +214,14 @@ public:
 	void SetSpell(const wyrmgus::spell *spell);
 	void SetWork(const CUpgrade *work);
 	void SetElixir(const CUpgrade *elixir);
-	void SetUnique(wyrmgus::unique_item *unique);
+
+	const wyrmgus::unique_item *get_unique() const
+	{
+		return this->unique;
+	}
+
+	void set_unique(const wyrmgus::unique_item *unique);
+
 	void Identify();
 	void CheckIdentification();
 	void CheckKnowledgeChange(int variable, int change);
@@ -577,7 +584,9 @@ public:
 	const wyrmgus::spell *Spell = nullptr; /// Item unit's spell
 	const CUpgrade *Work = nullptr;		/// Item unit's literary work
 	const CUpgrade *Elixir = nullptr;	/// Item unit's elixir
-	wyrmgus::unique_item *Unique = nullptr;		/// Whether the item is unique
+private:
+	const wyrmgus::unique_item *unique = nullptr;		/// Whether the item is unique
+public:
 	bool Bound;			/// Whether the item is bound to its owner
 	bool Identified;	/// Whether the item has been identified
 	CUnit *ConnectingDestination;	/// Which connector this unit connects to (if any)

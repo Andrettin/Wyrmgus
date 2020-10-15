@@ -190,8 +190,8 @@ void SaveUnit(const CUnit &unit, CFile &file)
 	if (unit.Elixir != nullptr) {
 		file.printf("\"elixir\", \"%s\", ", unit.Elixir->get_identifier().c_str());
 	}
-	if (unit.Unique != nullptr) {
-		file.printf("\"unique\", \"%s\", ", unit.Unique->get_identifier().c_str());
+	if (unit.get_unique() != nullptr) {
+		file.printf("\"unique\", \"%s\", ", unit.get_unique()->get_identifier().c_str());
 	}
 	if (unit.Bound) {
 		file.printf("\"bound\", true, ");

@@ -591,7 +591,7 @@ void character::remove_item(const persistent_item *item)
 persistent_item *character::get_item(const CUnit &item_unit) const
 {
 	for (const auto &item : this->items) {
-		if (item->get_unit_type() == item_unit.Type && item->Prefix == item_unit.Prefix && item->Suffix == item_unit.Suffix && item->Spell == item_unit.Spell && item->Work == item_unit.Work && item->Elixir == item_unit.Elixir && item->get_unique() == item_unit.Unique && item->is_bound() == item_unit.Bound && item->is_identified() == item_unit.Identified && this->is_item_equipped(item.get()) == item_unit.Container->IsItemEquipped(&item_unit)) {
+		if (item->get_unit_type() == item_unit.Type && item->Prefix == item_unit.Prefix && item->Suffix == item_unit.Suffix && item->Spell == item_unit.Spell && item->Work == item_unit.Work && item->Elixir == item_unit.Elixir && item->get_unique() == item_unit.get_unique() && item->is_bound() == item_unit.Bound && item->is_identified() == item_unit.Identified && this->is_item_equipped(item.get()) == item_unit.Container->IsItemEquipped(&item_unit)) {
 			if (item->get_name().empty() || item->get_name() == item_unit.Name) {
 				return item.get();
 			}

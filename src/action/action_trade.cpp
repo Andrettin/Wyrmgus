@@ -196,7 +196,7 @@ std::unique_ptr<COrder> COrder::NewActionTrade(CUnit &dest, CUnit &home_market)
 
 		if (goal && (goal->Type->BoolFlag[ITEM_INDEX].value || goal->Type->BoolFlag[POWERUP_INDEX].value || goal->ConnectingDestination != nullptr)) {
 			std::string goal_name = goal->GetMessageName();
-			if (!goal->Unique) {
+			if (goal->get_unique() == nullptr) {
 				goal_name = "the " + goal_name;
 			}
 			if (unit.HasInventory() && goal->Type->BoolFlag[ITEM_INDEX].value && unit.can_equip_item(goal)) { //if the item is an equipment, equip it (only for units with inventories), or deequip it (if it is already equipped)

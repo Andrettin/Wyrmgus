@@ -1574,7 +1574,7 @@ std::string EvalString(const StringDesc *s)
 		//Wyrmgus start
 		case EString_UnitTypeName : // name of the UnitType
 			unit = EvalUnit(s->D.Unit);
-			if (unit != nullptr && !unit->GetName().empty() && ((unit->Prefix == nullptr && unit->Suffix == nullptr && unit->Spell == nullptr) || unit->Unique || unit->Work != nullptr || unit->Elixir != nullptr)) { //items with affixes use their type name in their given name, so there's no need to repeat their type name
+			if (unit != nullptr && !unit->GetName().empty() && ((unit->Prefix == nullptr && unit->Suffix == nullptr && unit->Spell == nullptr) || unit->get_unique() != nullptr || unit->Work != nullptr || unit->Elixir != nullptr)) { //items with affixes use their type name in their given name, so there's no need to repeat their type name
 				return unit->GetTypeName();
 			} else { // only return a unit type name if the unit has a personal name (otherwise the unit type name would be returned as the unit name)
 				return std::string("");
@@ -1598,7 +1598,7 @@ std::string EvalString(const StringDesc *s)
 		case EString_UnitQuote : // unit's quote
 			unit = EvalUnit(s->D.Unit);
 			if (unit != nullptr) {
-				if (!unit->Unique) {
+				if (unit->get_unique() == nullptr) {
 					if (unit->Work != nullptr) {
 						return unit->Work->get_quote();
 					} else if (unit->Elixir != nullptr) {
@@ -1607,7 +1607,7 @@ std::string EvalString(const StringDesc *s)
 						return unit->Type->get_quote();
 					}
 				} else {
-					return unit->Unique->get_quote();
+					return unit->get_unique()->get_quote();
 				}
 			} else {
 				return std::string("");
@@ -1623,27 +1623,27 @@ std::string EvalString(const StringDesc *s)
 			}
 		case EString_UnitUniqueSet : // name of the unit's unique item set
 			unit = EvalUnit(s->D.Unit);
-			if (unit != nullptr && unit->Unique != nullptr && unit->Unique->get_set() != nullptr) {
-				return unit->Unique->get_set()->get_name();
+			if (unit != nullptr && unit->get_unique() != nullptr && unit->get_unique()->get_set() != nullptr) {
+				return unit->get_unique()->get_set()->get_name();
 			} else {
 				return std::string("");
 			}
 		case EString_UnitUniqueSetItems : // names of the unit's unique item set's items
 			unit = EvalUnit(s->D.Unit);
-			if (unit != nullptr && unit->Unique != nullptr && unit->Unique->get_set() != nullptr) {
+			if (unit != nullptr && unit->get_unique() != nullptr && unit->get_unique()->get_set() != nullptr) {
 				std::string set_items_string;
 				bool first = true;
-				for (size_t i = 0; i < unit->Unique->get_set()->UniqueItems.size(); ++i) {
+				for (const wyrmgus::unique_item *unique_item : unit->get_unique()->get_set()->UniqueItems) {
 					if (!first) {
 						set_items_string += "\n";
 					} else {
 						first = false;
 					}
-					bool item_equipped = unit->Container && unit->Container->IsUniqueItemEquipped(unit->Unique->get_set()->UniqueItems[i]);
+					const bool item_equipped = unit->Container && unit->Container->IsUniqueItemEquipped(unique_item);
 					if (!item_equipped) {
 						set_items_string += "~<";
 					}
-					set_items_string += unit->Unique->get_set()->UniqueItems[i]->get_name();
+					set_items_string += unique_item->get_name();
 					if (!item_equipped) {
 						set_items_string += "~>";
 					}

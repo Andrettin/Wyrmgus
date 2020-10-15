@@ -59,9 +59,9 @@ persistent_item::persistent_item(const CUnit *item_unit, character *owner) : per
 	if (item_unit->Elixir != nullptr) {
 		this->Elixir = item_unit->Elixir;
 	}
-	if (item_unit->Unique != nullptr) {
+	if (item_unit->get_unique() != nullptr) {
 		this->name = item_unit->Name;
-		this->unique = item_unit->Unique;
+		this->unique = item_unit->get_unique();
 	}
 	this->bound = item_unit->Bound;
 	this->identified = item_unit->Identified;
@@ -110,7 +110,7 @@ void persistent_item::process_sml_property(const sml_property &property)
 			fprintf(stderr, "Upgrade \"%s\" doesn't exist.\n", value.c_str());
 		}
 	} else if (key == "unique") {
-		unique_item *unique_item = unique_item::try_get(value);
+		const unique_item *unique_item = unique_item::try_get(value);
 		if (unique_item != nullptr) {
 			this->unique = unique_item;
 		} else {

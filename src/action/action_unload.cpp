@@ -274,7 +274,7 @@ static int UnloadUnit(CUnit &transporter, CUnit &unit, int landmass)
 	}
 	unit.Place(pos, transporter.MapLayer->ID);
 
-	if (unit.Type->BoolFlag[ITEM_INDEX].value && !unit.Unique) { //destroy items if they have been on the ground for too long
+	if (unit.Type->BoolFlag[ITEM_INDEX].value && unit.get_unique() == nullptr) { //destroy items if they have been on the ground for too long
 		int ttl_cycles = (5 * 60 * CYCLES_PER_SECOND);
 		if (unit.Prefix != nullptr || unit.Suffix != nullptr || unit.Spell != nullptr || unit.Work != nullptr || unit.Elixir != nullptr) {
 			ttl_cycles *= 4;

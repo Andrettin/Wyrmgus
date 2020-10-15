@@ -29,6 +29,7 @@
 
 #include "unit/historical_unit.h"
 
+#include "item/unique_item.h"
 #include "map/historical_location.h"
 #include "map/site.h"
 #include "player.h"
@@ -108,8 +109,12 @@ void historical_unit::process_sml_dated_scope(const sml_data &scope, const QDate
 
 void historical_unit::check() const
 {
-	if (this->get_unit_types().empty() && this->get_unit_classes().empty()) {
-		throw std::runtime_error("Historical unit \"" + this->get_identifier() + "\" has neither a unit type nor a unit class.");
+	if (this->get_unit_types().empty() && this->get_unit_classes().empty() && this->get_unique() == nullptr) {
+		throw std::runtime_error("Historical unit \"" + this->get_identifier() + "\" has neither a unit type nor a unit class nor is it a unique.");
+	}
+
+	if (this->get_unique() != nullptr && this->get_quantity() > 1) {
+		throw std::runtime_error("Historical unit \"" + this->get_identifier() + "\" is a unique, but has a quantity greater than 1.");
 	}
 }
 

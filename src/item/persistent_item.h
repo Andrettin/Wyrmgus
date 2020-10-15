@@ -87,7 +87,7 @@ public:
 	item_class get_item_class() const;
 	item_slot get_item_slot() const;
 
-	unique_item *get_unique() const
+	const unique_item *get_unique() const
 	{
 		return this->unique;
 	}
@@ -124,7 +124,7 @@ public:
 
 private:
 	const unit_type *unit_type = nullptr; //the item type of the item
-	unique_item *unique = nullptr;
+	const unique_item *unique = nullptr;
 	std::string name;
 	bool bound = false; //whether the item is bound to its owner and can't be dropped
 	bool identified = true; //whether the item has been identified

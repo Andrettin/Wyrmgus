@@ -295,7 +295,7 @@ static bool CanShowContent(const ConditionPanel *condition, const CUnit &unit)
 		}
 	}
 	if (condition->Unique != CONDITION_TRUE) {
-		if ((condition->Unique == CONDITION_ONLY) ^ (unit.Unique || unit.Character != nullptr)) {
+		if ((condition->Unique == CONDITION_ONLY) ^ (unit.get_unique() != nullptr || unit.Character != nullptr)) {
 			return false;
 		}
 	}
@@ -987,7 +987,7 @@ void DrawPopups()
 					PixelPos unit_center_pos = CMap::Map.tile_pos_to_scaled_map_pixel_pos_top_left(UnitUnderCursor->tilePos);
 					unit_center_pos = vp->scaled_map_to_screen_pixel_pos(unit_center_pos);
 					std::string unit_name;
-					if (UnitUnderCursor->Unique || UnitUnderCursor->Prefix || UnitUnderCursor->Suffix || UnitUnderCursor->Work || UnitUnderCursor->Spell || UnitUnderCursor->Character != nullptr) {
+					if (UnitUnderCursor->get_unique() != nullptr || UnitUnderCursor->Prefix != nullptr || UnitUnderCursor->Suffix != nullptr || UnitUnderCursor->Work != nullptr || UnitUnderCursor->Spell != nullptr || UnitUnderCursor->Character != nullptr) {
 						if (!UnitUnderCursor->Identified) {
 							unit_name = UnitUnderCursor->GetTypeName() + " (" + _("Unidentified") + ")";
 						} else {
@@ -2008,7 +2008,7 @@ static void InfoPanel_draw_multiple_selection()
 
 		if (ButtonAreaUnderCursor == ButtonAreaSelected && ButtonUnderCursor == (int) i) {
 			const wyrmgus::font_color *text_color = nullptr;
-			if (Selected[i]->Unique || Selected[i]->Character != nullptr) {
+			if (Selected[i]->get_unique() != nullptr || Selected[i]->Character != nullptr) {
 				text_color = wyrmgus::defines::get()->get_unique_font_color();
 			} else if (Selected[i]->Prefix != nullptr || Selected[i]->Suffix != nullptr) {
 				text_color = wyrmgus::defines::get()->get_magic_font_color();

@@ -2509,8 +2509,8 @@ static void UIHandleButtonUp_OnButton(unsigned button)
 					if (Selected[0]->Character != nullptr && !Selected[0]->Character->Custom) {
 						encyclopedia_ident = Selected[0]->Character->Ident;
 						encyclopedia_state = "heroes";
-					} else if (Selected[0]->Unique != nullptr) {
-						encyclopedia_ident = Selected[0]->Unique->get_identifier();
+					} else if (Selected[0]->get_unique() != nullptr) {
+						encyclopedia_ident = Selected[0]->get_unique()->get_identifier();
 						encyclopedia_state = "unique_items";
 					}
 					CclCommand("if (OpenEncyclopediaUnitEntry ~= nil) then OpenEncyclopediaUnitEntry(\"" + encyclopedia_ident + "\", \"" + encyclopedia_state + "\") end;");
@@ -2626,7 +2626,7 @@ static void UIHandleButtonUp_OnButton(unsigned button)
 										} else {
 											if (Selected[0]->Player == CPlayer::GetThisPlayer()) {
 												std::string item_name = uins->GetMessageName();
-												if (!uins->Unique) {
+												if (uins->get_unique() == nullptr) {
 													item_name = "the " + item_name;
 												}
 												Selected[0]->Player->Notify(NotifyRed, Selected[0]->tilePos, Selected[0]->MapLayer->ID, _("%s cannot drop %s."), Selected[0]->GetMessageName().c_str(), item_name.c_str());

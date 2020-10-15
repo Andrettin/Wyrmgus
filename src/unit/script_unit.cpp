@@ -345,7 +345,7 @@ static int CclUnit(lua_State *l)
 			unit->Elixir = CUpgrade::get(LuaToString(l, 2, j + 1));
 		} else if (!strcmp(value, "unique")) {
 			wyrmgus::unique_item *unique_item = wyrmgus::unique_item::get(LuaToString(l, 2, j + 1));
-			unit->Unique = unique_item;
+			unit->unique = unique_item;
 			if (unique_item->get_unit_type()->BoolFlag[ITEM_INDEX].value) { //apply the unique item's prefix and suffix here, because it may have changed in the database in relation to when the game was last played
 				unit->Type = unique_item->get_unit_type();
 				type = unique_item->get_unit_type();
@@ -1727,8 +1727,8 @@ static int CclGetUnitVariable(lua_State *l)
 			lua_pushstring(l, "");
 		}
 	} else if (!strcmp(value, "Unique")) {
-		if (unit->Unique) {
-			lua_pushstring(l, unit->Unique->get_identifier().c_str());
+		if (unit->get_unique() != nullptr) {
+			lua_pushstring(l, unit->get_unique()->get_identifier().c_str());
 		} else {
 			lua_pushstring(l, "");
 		}
@@ -1963,11 +1963,11 @@ static int CclSetUnitVariable(lua_State *l)
 		}
 	} else if (!strcmp(name, "Unique")) { //set the unit to a particular unique unit
 		LuaCheckArgs(l, 3);
-		std::string unique_name = LuaToString(l, 3);
+		const std::string unique_name = LuaToString(l, 3);
 		if (unique_name.empty()) {
-			unit->SetUnique(nullptr);
+			unit->set_unique(nullptr);
 		} else {
-			unit->SetUnique(wyrmgus::unique_item::get(unique_name));
+			unit->set_unique(wyrmgus::unique_item::get(unique_name));
 		}
 	} else if (!strcmp(name, "GenerateSpecialProperties")) {
 		CPlayer *dropper_player = nullptr;

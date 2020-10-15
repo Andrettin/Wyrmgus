@@ -39,6 +39,7 @@
 #include "game.h"
 #include "iocompat.h"
 #include "iolib.h"
+#include "item/unique_item.h"
 #include "map/historical_location.h"
 #include "map/map.h"
 #include "map/map_layer.h"
@@ -863,7 +864,7 @@ void map_template::Apply(const QPoint &template_start_pos, const QPoint &map_sta
 		}
 		
 		if (std::get<2>(iterator->second)) {
-			unit->SetUnique(std::get<2>(iterator->second));
+			unit->set_unique(std::get<2>(iterator->second));
 		}
 	}
 
@@ -1198,7 +1199,7 @@ void map_template::apply_sites(const QPoint &template_start_pos, const QPoint &m
 				Vec2i unit_offset((type->get_tile_size() - QSize(1, 1)) / 2);
 				CUnit *unit = CreateResourceUnit(site_pos - unit_offset, *type, z, false); // don't generate unique resources when setting special properties, since for map templates unique resources are supposed to be explicitly indicated
 				if (std::get<3>(site->HistoricalResources[j])) {
-					unit->SetUnique(std::get<3>(site->HistoricalResources[j]));
+					unit->set_unique(std::get<3>(site->HistoricalResources[j]));
 				}
 				int resource_quantity = std::get<4>(site->HistoricalResources[j]);
 				if (resource_quantity) { //set the resource_quantity after setting the unique unit, so that unique resources can be decreased in quantity over time
@@ -1372,10 +1373,10 @@ void map_template::apply_sites(const QPoint &template_start_pos, const QPoint &m
 					unit = CreateUnit(site_pos - unit_offset, *unit_type, player, z, true, site->is_major() ? site : nullptr);
 				}
 				if (std::get<3>(site->HistoricalBuildings[j])) {
-					unit->SetUnique(std::get<3>(site->HistoricalBuildings[j]));
+					unit->set_unique(std::get<3>(site->HistoricalBuildings[j]));
 				}
 				if (first_building) {
-					if (!unit_type->BoolFlag[TOWNHALL_INDEX].value && !unit->Unique && (!building_owner || building_owner == site_owner)) { //if one building is representing a minor site, make it have the site's name
+					if (!unit_type->BoolFlag[TOWNHALL_INDEX].value && unit->get_unique() == nullptr && (!building_owner || building_owner == site_owner)) { //if one building is representing a minor site, make it have the site's name
 						unit->Name = site->get_cultural_name(site_owner->get_civilization());
 					}
 					first_building = false;
@@ -1501,14 +1502,14 @@ void map_template::ApplyConnectors(const QPoint &template_start_pos, const QPoin
 
 		CUnit *unit = CreateUnit(unit_pos - unit_offset, *type, CPlayer::Players[PlayerNumNeutral], z, true);
 		if (std::get<3>(this->PlaneConnectors[i])) {
-			unit->SetUnique(std::get<3>(this->PlaneConnectors[i]));
+			unit->set_unique(std::get<3>(this->PlaneConnectors[i]));
 		}
 		CMap::Map.MapLayers[z]->LayerConnectors.push_back(unit);
 		for (size_t second_z = 0; second_z < CMap::Map.MapLayers.size(); ++second_z) {
 			bool found_other_connector = false;
 			if (CMap::Map.MapLayers[second_z]->plane == std::get<2>(this->PlaneConnectors[i])) {
 				for (size_t j = 0; j < CMap::Map.MapLayers[second_z]->LayerConnectors.size(); ++j) {
-					if (CMap::Map.MapLayers[second_z]->LayerConnectors[j]->Type == unit->Type && CMap::Map.MapLayers[second_z]->LayerConnectors[j]->Unique == unit->Unique && CMap::Map.MapLayers[second_z]->LayerConnectors[j]->ConnectingDestination == nullptr) {
+					if (CMap::Map.MapLayers[second_z]->LayerConnectors[j]->Type == unit->Type && CMap::Map.MapLayers[second_z]->LayerConnectors[j]->get_unique() == unit->get_unique() && CMap::Map.MapLayers[second_z]->LayerConnectors[j]->ConnectingDestination == nullptr) {
 						CMap::Map.MapLayers[second_z]->LayerConnectors[j]->ConnectingDestination = unit;
 						unit->ConnectingDestination = CMap::Map.MapLayers[second_z]->LayerConnectors[j];
 						found_other_connector = true;
@@ -1544,14 +1545,14 @@ void map_template::ApplyConnectors(const QPoint &template_start_pos, const QPoin
 
 		CUnit *unit = CreateUnit(unit_pos - unit_offset, *type, CPlayer::Players[PlayerNumNeutral], z, true);
 		if (std::get<3>(this->WorldConnectors[i])) {
-			unit->SetUnique(std::get<3>(this->WorldConnectors[i]));
+			unit->set_unique(std::get<3>(this->WorldConnectors[i]));
 		}
 		CMap::Map.MapLayers[z]->LayerConnectors.push_back(unit);
 		for (size_t second_z = 0; second_z < CMap::Map.MapLayers.size(); ++second_z) {
 			bool found_other_connector = false;
 			if (CMap::Map.MapLayers[second_z]->world == std::get<2>(this->WorldConnectors[i])) {
 				for (size_t j = 0; j < CMap::Map.MapLayers[second_z]->LayerConnectors.size(); ++j) {
-					if (CMap::Map.MapLayers[second_z]->LayerConnectors[j]->Type == unit->Type && CMap::Map.MapLayers[second_z]->LayerConnectors[j]->Unique == unit->Unique && CMap::Map.MapLayers[second_z]->LayerConnectors[j]->ConnectingDestination == nullptr) {
+					if (CMap::Map.MapLayers[second_z]->LayerConnectors[j]->Type == unit->Type && CMap::Map.MapLayers[second_z]->LayerConnectors[j]->get_unique() == unit->get_unique() && CMap::Map.MapLayers[second_z]->LayerConnectors[j]->ConnectingDestination == nullptr) {
 						CMap::Map.MapLayers[second_z]->LayerConnectors[j]->ConnectingDestination = unit;
 						unit->ConnectingDestination = CMap::Map.MapLayers[second_z]->LayerConnectors[j];
 						found_other_connector = true;
@@ -1619,7 +1620,7 @@ void map_template::ApplyUnits(const QPoint &template_start_pos, const QPoint &ma
 				player->ChangeUnitTypeAiActiveCount(type, -1);
 			}
 			if (std::get<5>(this->Units[i])) {
-				unit->SetUnique(std::get<5>(this->Units[i]));
+				unit->set_unique(std::get<5>(this->Units[i]));
 			}
 		}
 	}
@@ -1756,12 +1757,14 @@ void map_template::apply_historical_unit(const historical_unit *historical_unit,
 {
 	faction *unit_faction = historical_unit->get_faction();
 	CPlayer *unit_player = unit_faction ? GetFactionPlayer(unit_faction) : nullptr;
-	unit_type *unit_type = nullptr;
+	const unit_type *unit_type = nullptr;
 	if (!historical_unit->get_unit_types().empty()) {
 		unit_type = historical_unit->get_unit_types()[SyncRand(historical_unit->get_unit_types().size())];
 	} else if (!historical_unit->get_unit_classes().empty()) {
 		const unit_class *unit_class = historical_unit->get_unit_classes()[SyncRand(historical_unit->get_unit_classes().size())];
 		unit_type = unit_faction->get_class_unit_type(unit_class);
+	} else if (historical_unit->get_unique() != nullptr) {
+		unit_type = historical_unit->get_unique()->get_unit_type();
 	}
 
 	if (unit_type == nullptr) {
@@ -1823,19 +1826,25 @@ void map_template::apply_historical_unit(const historical_unit *historical_unit,
 	for (int i = 0; i < historical_unit->get_quantity(); ++i) {
 		//item units only use factions to generate special properties for them
 		CUnit *unit = CreateUnit(unit_top_left_pos, *unit_type, unit_type->BoolFlag[ITEM_INDEX].value ? CPlayer::Players[PlayerNumNeutral] : unit_player, z);
-		if (unit_type->BoolFlag[ITEM_INDEX].value) {
+
+		if (historical_unit->get_unique() != nullptr) {
+			unit->set_unique(historical_unit->get_unique());
+		} else if (unit_type->BoolFlag[ITEM_INDEX].value) {
 			unit->GenerateSpecialProperties(nullptr, unit_player, false);
 		}
+
 		if (historical_unit->get_resources_held() != 0) {
 			unit->SetResourcesHeld(historical_unit->get_resources_held());
 			unit->Variable[GIVERESOURCE_INDEX].Value = historical_unit->get_resources_held();
 			unit->Variable[GIVERESOURCE_INDEX].Max = historical_unit->get_resources_held();
 			unit->Variable[GIVERESOURCE_INDEX].Enable = 1;
 		}
+
 		if (!historical_unit->is_ai_active()) {
 			unit->Active = 0;
 			unit_player->ChangeUnitTypeAiActiveCount(unit_type, -1);
 		}
+
 		if (historical_unit->get_ttl() != 0) {
 			unit->TTL = historical_unit->get_ttl();
 		}

@@ -362,7 +362,7 @@ static bool CanShowPopupContent(const PopupConditionPanel *condition,
 		return false;
 	}
 	
-	if (condition->Quote && type && type->get_quote().empty() && !((button.Action == ButtonCmd::Unit || button.Action == ButtonCmd::Buy) && UnitManager.GetSlotUnit(button.Value).Unique && !UnitManager.GetSlotUnit(button.Value).Unique->get_quote().empty()) && !((button.Action == ButtonCmd::Unit || button.Action == ButtonCmd::Buy) && UnitManager.GetSlotUnit(button.Value).Work != nullptr && !UnitManager.GetSlotUnit(button.Value).Work->get_quote().empty() && UnitManager.GetSlotUnit(button.Value).Elixir != nullptr && !UnitManager.GetSlotUnit(button.Value).Elixir->get_quote().empty())) {
+	if (condition->Quote && type && type->get_quote().empty() && !((button.Action == ButtonCmd::Unit || button.Action == ButtonCmd::Buy) && UnitManager.GetSlotUnit(button.Value).get_unique() != nullptr && !UnitManager.GetSlotUnit(button.Value).get_unique()->get_quote().empty()) && !((button.Action == ButtonCmd::Unit || button.Action == ButtonCmd::Buy) && UnitManager.GetSlotUnit(button.Value).Work != nullptr && !UnitManager.GetSlotUnit(button.Value).Work->get_quote().empty() && UnitManager.GetSlotUnit(button.Value).Elixir != nullptr && !UnitManager.GetSlotUnit(button.Value).Elixir->get_quote().empty())) {
 		return false;
 	}
 	
@@ -657,12 +657,12 @@ static bool CanShowPopupContent(const PopupConditionPanel *condition,
 			}
 		}
 		if (condition->Unique != CONDITION_TRUE) {
-			if ((condition->Unique == CONDITION_ONLY) ^ (unit.Unique || unit.Character != nullptr)) {
+			if ((condition->Unique == CONDITION_ONLY) ^ (unit.get_unique() != nullptr || unit.Character != nullptr)) {
 				return false;
 			}
 		}
 		if (condition->UniqueSet != CONDITION_TRUE) {
-			if ((condition->UniqueSet == CONDITION_ONLY) ^ (unit.Unique != nullptr && unit.Unique->get_set() != nullptr)) {
+			if ((condition->UniqueSet == CONDITION_ONLY) ^ (unit.get_unique() != nullptr && unit.get_unique()->get_set() != nullptr)) {
 				return false;
 			}
 		}
@@ -1218,7 +1218,7 @@ void CButtonPanel::Draw()
 			}
 			if (static_cast<size_t>(ButtonUnderCursor) == j) {
 				const wyrmgus::font_color *text_color = nullptr;
-				if (uins->Unique || uins->Character != nullptr) {
+				if (uins->get_unique() != nullptr || uins->Character != nullptr) {
 					text_color = wyrmgus::defines::get()->get_unique_font_color();
 				} else if (uins->Prefix != nullptr || uins->Suffix != nullptr) {
 					text_color = wyrmgus::defines::get()->get_magic_font_color();
