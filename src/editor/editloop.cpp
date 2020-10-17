@@ -10,8 +10,7 @@
 //
 /**@name editloop.cpp - The editor main loop. */
 //
-//      (c) Copyright 2002-2020 by Lutz Sammer, Jimmy Salmon and
-//		Andrettin
+//      (c) Copyright 2002-2020 by Lutz Sammer, Jimmy Salmon and Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -2587,6 +2586,8 @@ int EditorSaveMap(const std::string &file, bool is_mod)
 */
 void EditorMainLoop()
 {
+	const int scale_factor = wyrmgus::defines::get()->get_scale_factor();
+
 	bool OldCommandLogDisabled = CommandLogDisabled;
 	const EventCallback *old_callbacks = GetCallbacks();
 	bool first_init = true;
@@ -2619,7 +2620,7 @@ void EditorMainLoop()
 
 	UpdateMinimap = true;
 
-	while (1) {
+	while (true) {
 		Editor.MapLoaded = false;
 		Editor.Running = EditorEditing;
 
@@ -2630,14 +2631,14 @@ void EditorMainLoop()
 			//Wyrmgus start
 //			editorUnitSlider->setSize(ButtonPanelWidth/*176*/, 16);
 //			editorSlider->setSize(ButtonPanelWidth/*176*/, 16);
-			editorUnitSlider->setSize(218 - 24 - 6, 16); // adapt to new UI size, should make this more scriptable
-			editorSlider->setSize(218 - 24 - 6, 16);
+			editorUnitSlider->setSize((218 - 24 - 6) * scale_factor, 16 * scale_factor); // adapt to new UI size, should make this more scriptable
+			editorSlider->setSize((218 - 24 - 6) * scale_factor, 16 * scale_factor);
 			//Wyrmgus end
 			//Wyrmgus start
 //			editorContainer->add(editorUnitSlider.get(), UI.ButtonPanel.X + 2, UI.ButtonPanel.Y - 16);
 //			editorContainer->add(editorSlider.get(), UI.ButtonPanel.X + 2, UI.ButtonPanel.Y - 16);
-			editorContainer->add(editorUnitSlider.get(), UI.InfoPanel.X + 12, UI.InfoPanel.Y + 160 - 24);
-			editorContainer->add(editorSlider.get(), UI.InfoPanel.X + 12, UI.InfoPanel.Y + 160 - 24);
+			editorContainer->add(editorUnitSlider.get(), UI.InfoPanel.X + 12 * scale_factor, UI.InfoPanel.Y + (160 - 24) * scale_factor);
+			editorContainer->add(editorSlider.get(), UI.InfoPanel.X + 12 * scale_factor, UI.InfoPanel.Y + (160 - 24) * scale_factor);
 			//Wyrmgus end
 		}
 		//ProcessMenu("menu-editor-tips", 1);
