@@ -741,14 +741,17 @@ void RecalculateShownUnits()
 */
 static void DrawPlayers()
 {
+	const int scale_factor = wyrmgus::defines::get()->get_scale_factor();
 	char buf[256];
 	CLabel label(wyrmgus::defines::get()->get_small_font());
 
 	//Wyrmgus start
 //	int x = UI.InfoPanel.X + 8;
-	int x = UI.InfoPanel.X + 26;
+	int x = UI.InfoPanel.X + 26 * scale_factor;
 	//Wyrmgus end
-	int y = UI.InfoPanel.Y + 4 + IconHeight + 10;
+	int y = UI.InfoPanel.Y + 4 * scale_factor + IconHeight + 10 * scale_factor;
+
+	const int rectangle_size = 20 * scale_factor;
 
 	for (int i = 0; i < PlayerMax; ++i) {
 		//Wyrmgus start
@@ -758,32 +761,32 @@ static void DrawPlayers()
 //		if (i == PlayerMax / 2) {
 		if ((i % 8) == 0) {
 		//Wyrmgus end
-			y += 20;
+			y += rectangle_size;
 		}
 		if (i == Editor.CursorPlayer && CMap::Map.Info.PlayerType[i] != PlayerNobody) {
-			Video.DrawRectangle(ColorWhite, x + i % 8 * 20, y, 20, 20);
+			Video.DrawRectangle(ColorWhite, x + i % 8 * rectangle_size, y, rectangle_size, rectangle_size);
 		}
 		Video.DrawRectangle(
 			i == Editor.CursorPlayer && CMap::Map.Info.PlayerType[i] != PlayerNobody ? ColorWhite : ColorGray,
-			x + i % 8 * 20, y, 19, 19);
+			x + i % 8 * rectangle_size, y, rectangle_size - 1, rectangle_size - 1);
 		if (CMap::Map.Info.PlayerType[i] != PlayerNobody) {
-			Video.FillRectangle(Video.MapRGB(TheScreen->format, CPlayer::Players[i]->get_minimap_color()), x + 1 + i % 8 * 20, y + 1, 17, 17);
+			Video.FillRectangle(Video.MapRGB(TheScreen->format, CPlayer::Players[i]->get_minimap_color()), x + 1 + i % 8 * rectangle_size, y + 1, rectangle_size - 1 - 2, rectangle_size - 1 - 2);
 		}
 		if (i == Editor.SelectedPlayer) {
-			Video.DrawRectangle(ColorGreen, x + 1 + i % 8 * 20, y + 1, 17, 17);
+			Video.DrawRectangle(ColorGreen, x + 1 + i % 8 * rectangle_size, y + 1, rectangle_size - 1 - 2, rectangle_size - 1 - 2);
 		}
 		//Wyrmgus start
 //		sprintf(buf, "%d", i);
 		sprintf(buf, "%d", (i == PlayerNumNeutral) ? 16 : i + 1);
 		//Wyrmgus end
-		label.DrawCentered(x + i % 8 * 20 + 10, y + 7, buf);
+		label.DrawCentered(x + i % 8 * rectangle_size + 10 * scale_factor, y + 7 * scale_factor, buf);
 	}
 
 	//Wyrmgus start
 //	x = UI.InfoPanel.X + 4;
-	x = UI.InfoPanel.X + 22;
+	x = UI.InfoPanel.X + 22 * scale_factor;
 	//Wyrmgus end
-	y += 18 * 1 + 4;
+	y += (18 * 1 + 4) * scale_factor;
 	if (Editor.SelectedPlayer != -1) {
 		//Wyrmgus start
 //		snprintf(buf, sizeof(buf), "Plyr %d %s ", Editor.SelectedPlayer,
@@ -1971,10 +1974,12 @@ static bool EditorCallbackMouse_EditUnitArea(const PixelPos &screenPos)
 	LastDrawnButtonPopup = nullptr;
 	//Wyrmgus end
 
+	const int scale_factor = wyrmgus::defines::get()->get_scale_factor();
+
 	// Scrollbar
-	if (UI.ButtonPanel.X + 4 < CursorScreenPos.x
-		&& CursorScreenPos.x < UI.ButtonPanel.X + 176 - 4
-		&& UI.ButtonPanel.Y + 4 < CursorScreenPos.y
+	if (UI.ButtonPanel.X + 4 * scale_factor < CursorScreenPos.x
+		&& CursorScreenPos.x < UI.ButtonPanel.X + (176 - 4) * scale_factor
+		&& UI.ButtonPanel.Y + 4 * scale_factor < CursorScreenPos.y
 		//Wyrmgus start
 //		&& CursorScreenPos.y < UI.ButtonPanel.Y + 24) {
 		&& CursorScreenPos.y < UI.ButtonPanel.Y) {
@@ -1983,9 +1988,9 @@ static bool EditorCallbackMouse_EditUnitArea(const PixelPos &screenPos)
 	}
 	//Wyrmgus start
 //	int bx = UI.InfoPanel.X + 8;
-	int bx = UI.InfoPanel.X + 26;
+	int bx = UI.InfoPanel.X + 26 * scale_factor;
 	//Wyrmgus end
-	int by = UI.InfoPanel.Y + 4 + IconHeight + 10;
+	int by = UI.InfoPanel.Y + 4 * scale_factor + IconHeight + 10 * scale_factor;
 	for (int i = 0; i < PlayerMax; ++i) {
 		//Wyrmgus start
 		if (i >= 15 && i < PlayerNumNeutral) {
@@ -1996,16 +2001,16 @@ static bool EditorCallbackMouse_EditUnitArea(const PixelPos &screenPos)
 		//Wyrmgus end
 			//Wyrmgus start
 //			bx = UI.InfoPanel.X + 8;
-			bx = UI.InfoPanel.X + 26;
+			bx = UI.InfoPanel.X + 26 * scale_factor;
 			//Wyrmgus end
-			by += 20;
+			by += 20 * scale_factor;
 		}
-		if (bx < screenPos.x && screenPos.x < bx + 20 && by < screenPos.y && screenPos.y < by + 20) {
+		if (bx < screenPos.x && screenPos.x < bx + 20 * scale_factor && by < screenPos.y && screenPos.y < by + 20 * scale_factor) {
 			if (CMap::Map.Info.PlayerType[i] != PlayerNobody) {
 				char buf[256];
 				//Wyrmgus start
-//				snprintf(buf, sizeof(buf), _("Select player #%d"), i);
-				snprintf(buf, sizeof(buf), _("Select player #%d"), (i == PlayerNumNeutral) ? 16 : i + 1);
+//				snprintf(buf, sizeof(buf), _("Select Player #%d"), i);
+				snprintf(buf, sizeof(buf), _("Select Player #%d"), (i == PlayerNumNeutral) ? 16 : i + 1);
 				//Wyrmgus end
 				UI.StatusLine.Set(buf);
 			} else {
@@ -2018,11 +2023,11 @@ static bool EditorCallbackMouse_EditUnitArea(const PixelPos &screenPos)
 #endif
 			return true;
 		}
-		bx += 20;
+		bx += 20 * scale_factor;
 	}
 
 	int i = Editor.UnitIndex;
-	by = UI.ButtonPanel.Y + 24;
+	by = UI.ButtonPanel.Y + 24 * scale_factor;
 	for (size_t j = 0; j < UI.ButtonPanel.Buttons.size(); ++j) {
 		const int x = UI.ButtonPanel.Buttons[j].X;
 		const int y = UI.ButtonPanel.Buttons[j].Y;
