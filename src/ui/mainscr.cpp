@@ -285,7 +285,7 @@ static bool CanShowContent(const ConditionPanel *condition, const CUnit &unit)
 	) {
 		return false;
 	}
-	if (condition->BoolFlags && !unit.Type->CheckUserBoolFlags(condition->BoolFlags)) {
+	if (condition->BoolFlags && !unit.Type->CheckUserBoolFlags(condition->BoolFlags.get())) {
 		return false;
 	}
 	//Wyrmgus start

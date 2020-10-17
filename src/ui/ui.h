@@ -126,7 +126,7 @@ enum ViewportModeType {
 	NUM_VIEWPORT_MODES             /// Number of different viewports.
 };
 
-class CMapArea
+class CMapArea final
 {
 public:
 	CMapArea() : X(0), Y(0), EndX(0), EndY(0),
@@ -149,41 +149,29 @@ public:
 /**
 **  Condition to show panel content.
 */
-class ConditionPanel
+class ConditionPanel final
 {
 public:
-	ConditionPanel() : ShowOnlySelected(false), HideNeutral(false),
-		HideAllied(false), ShowOpponent(false), ShowIfCanCastAnySpell(false), BoolFlags(nullptr),
-		//Wyrmgus start
-		Affixed(0), Unique(0), Replenishment(0),
-		//Wyrmgus end
-		Variables(nullptr) {}
-	~ConditionPanel()
-	{
-		delete[] BoolFlags;
-		delete[] Variables;
-	}
+	bool ShowOnlySelected = false; /// if true, show only for selected unit.
 
-	bool ShowOnlySelected;      /// if true, show only for selected unit.
-
-	bool HideNeutral;           /// if true, don't show for neutral unit.
-	bool HideAllied;            /// if true, don't show for allied unit. (but show own units)
-	bool ShowOpponent;          /// if true, show for opponent unit.
-	bool ShowIfCanCastAnySpell; /// if true, show only if the unit can cast any spell
+	bool HideNeutral = false;   /// if true, don't show for neutral unit.
+	bool HideAllied = false;    /// if true, don't show for allied unit. (but show own units)
+	bool ShowOpponent = false;  /// if true, show for opponent unit.
+	bool ShowIfCanCastAnySpell = false; /// if true, show only if the unit can cast any spell
 
 	//Wyrmgus start
-	char Affixed;				/// check if the button's unit has an affix
-	char Unique;				/// check if the button's unit is unique
-	char Replenishment;			/// check if the button's unit has resource replenishment
+	char Affixed = 0;			/// check if the button's unit has an affix
+	char Unique = 0;			/// check if the button's unit is unique
+	char Replenishment = 0;		/// check if the button's unit has resource replenishment
 	//Wyrmgus end
-	char *BoolFlags;            /// array of condition about user flags.
-	char *Variables;            /// array of variable to verify (enable and max > 0)
+	std::unique_ptr<char[]> BoolFlags;  /// array of condition about user flags.
+	std::unique_ptr<char[]> Variables;  /// array of variable to verify (enable and max > 0)
 };
 
 /**
 **  Info for the panel.
 */
-class CUnitInfoPanel
+class CUnitInfoPanel final
 {
 public:
 	CUnitInfoPanel() : PosX(0), PosY(0), DefaultFont(0),
@@ -202,7 +190,7 @@ public:
 };
 
 
-class CFiller
+class CFiller final
 {
 public:
 	CFiller() {}

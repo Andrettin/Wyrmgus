@@ -101,8 +101,8 @@ static struct {
 	SDL_cond *Cond;
 	SDL_Thread *Thread;
 
-	int *MixerBuffer;
-	Uint8 *Buffer;
+	std::unique_ptr<int[]> MixerBuffer;
+	std::unique_ptr<Uint8[]> Buffer;
 	bool Running;
 } Audio;
 
@@ -304,17 +304,17 @@ static void ClipMixToStereo16(const int *mix, int size, short *output)
 static void MixIntoBuffer(void *buffer, int samples)
 {
 	// FIXME: can save the memset here, if first channel sets the values
-	memset(Audio.MixerBuffer, 0, samples * sizeof(*Audio.MixerBuffer));
+	memset(Audio.MixerBuffer.get(), 0, samples * sizeof(*Audio.MixerBuffer.get()));
 
 	if (EffectsEnabled) {
 		// Add channels to mixer buffer
-		MixChannelsToStereo32(Audio.MixerBuffer, samples);
+		MixChannelsToStereo32(Audio.MixerBuffer.get(), samples);
 	}
 	if (MusicEnabled) {
 		// Add music to mixer buffer
-		MixMusicToStereo32(Audio.MixerBuffer, samples);
+		MixMusicToStereo32(Audio.MixerBuffer.get(), samples);
 	}
-	ClipMixToStereo16(Audio.MixerBuffer, samples, (short *)buffer);
+	ClipMixToStereo16(Audio.MixerBuffer.get(), samples, (short *)buffer);
 
 #ifdef USE_OAML
 	if (enableOAML && oaml) {
@@ -343,7 +343,7 @@ static void FillAudio(void *, Uint8 *stream, int len)
 	SDL_memset(stream, 0, len);
 
 	SDL_LockMutex(Audio.Lock);
-	SDL_MixAudio(stream, Audio.Buffer, len, SDL_MIX_MAXVOLUME);
+	SDL_MixAudio(stream, Audio.Buffer.get(), len, SDL_MIX_MAXVOLUME);
 
 	// Signal our FillThread, we can fill the Audio.Buffer again
 	SDL_CondSignal(Audio.Cond);
@@ -362,7 +362,7 @@ static int FillThread(void *)
 #else
 		if (SDL_CondWaitTimeout(Audio.Cond, Audio.Lock, 100) == 0) {
 #endif
-			MixIntoBuffer(Audio.Buffer, Audio.Format.samples * Audio.Format.channels);
+			MixIntoBuffer(Audio.Buffer.get(), Audio.Format.samples * Audio.Format.channels);
 		}
 		SDL_UnlockMutex(Audio.Lock);
 
@@ -1097,10 +1097,10 @@ int InitSound()
 	}
 
 	// Create mutex and cond for FillThread
-	Audio.MixerBuffer = new int[Audio.Format.samples * Audio.Format.channels];
-	memset(Audio.MixerBuffer, 0, Audio.Format.samples * Audio.Format.channels * sizeof(int));
-	Audio.Buffer = new Uint8[Audio.Format.size];
-	memset(Audio.Buffer, 0, Audio.Format.size);
+	Audio.MixerBuffer = std::make_unique<int[]>(Audio.Format.samples * Audio.Format.channels);
+	memset(Audio.MixerBuffer.get(), 0, Audio.Format.samples * Audio.Format.channels * sizeof(int));
+	Audio.Buffer = std::make_unique<Uint8[]>(Audio.Format.size);
+	memset(Audio.Buffer.get(), 0, Audio.Format.size);
 	Audio.Lock = SDL_CreateMutex();
 	Audio.Cond = SDL_CreateCond();
 	Audio.Running = true;
@@ -1130,8 +1130,6 @@ void QuitSound()
 
 	// Mustn't call SDL_CloseAudio here, it'll be called again from SDL_Quit
 	SoundInitialized = false;
-	delete[] Audio.MixerBuffer;
-	Audio.MixerBuffer = nullptr;
-	delete[] Audio.Buffer;
-	Audio.Buffer = nullptr;
+	Audio.MixerBuffer.reset();
+	Audio.Buffer.reset();
 }

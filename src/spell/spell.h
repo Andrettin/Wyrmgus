@@ -111,12 +111,6 @@ class ConditionInfo final
 public:
 	ConditionInfo();
 
-	~ConditionInfo()
-	{
-		delete[] BoolFlag;
-		delete[] Variable;
-	};
-	
 	void process_sml_property(const wyrmgus::sml_property &property);
 	void process_sml_scope(const wyrmgus::sml_data &scope);
 	
@@ -136,9 +130,9 @@ public:
 	const wyrmgus::faction *FactionEquivalent = nullptr;	/// Caster is of the same civilization as this faction, and the faction has its own unit of the caster's class.
 	//Wyrmgus end
 
-	char *BoolFlag = nullptr;         /// User defined boolean flag.
+	std::unique_ptr<char[]> BoolFlag;         /// User defined boolean flag.
 
-	ConditionInfoVariable *Variable = nullptr;
+	std::unique_ptr<ConditionInfoVariable[]> Variable;
 	//
 	//  @todo more? feel free to add, here and to
 	//  @todo PassCondition, CclSpellParseCondition, SaveSpells

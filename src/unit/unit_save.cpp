@@ -386,7 +386,7 @@ void SaveUnit(const CUnit &unit, CFile &file)
 	for (const wyrmgus::spell *spell : unit.get_autocast_spells()) {
 		file.printf(",\n  \"auto-cast\", \"%s\"", spell->get_identifier().c_str());
 	}
-	if (unit.SpellCoolDownTimers) {
+	if (unit.SpellCoolDownTimers != nullptr) {
 		file.printf(",\n  \"spell-cooldown\", {");
 		for (size_t i = 0; i < wyrmgus::spell::get_all().size(); ++i) {
 			if (i) {

@@ -672,7 +672,7 @@ private:
 	std::vector<bool> spell_autocast; //spells to auto cast, mapped to their spell IDs
 
 public:
-	int *SpellCoolDownTimers;   /// how much time unit need to wait before spell will be ready
+	std::unique_ptr<int[]> SpellCoolDownTimers;   /// how much time unit need to wait before spell will be ready
 
 	CUnit *Goal; /// Generic/Teleporter goal pointer
 

@@ -113,7 +113,7 @@ static bool PassCondition(const CUnit &caster, const wyrmgus::spell &spell, cons
 		return true;
 	}
 	
-	if (target && !target->Type->CheckUserBoolFlags(condition->BoolFlag)) {
+	if (target && !target->Type->CheckUserBoolFlags(condition->BoolFlag.get())) {
 		return false;
 	}
 
@@ -760,12 +760,12 @@ char StringToCondition(const std::string &str)
 ConditionInfo::ConditionInfo()
 {
 	// Flags are defaulted to 0(CONDITION_TRUE)
-	size_t new_bool_size = UnitTypeVar.GetNumberBoolFlag();
+	const size_t new_bool_size = UnitTypeVar.GetNumberBoolFlag();
 
-	this->BoolFlag = new char[new_bool_size];
-	memset(this->BoolFlag, 0, new_bool_size * sizeof(char));
+	this->BoolFlag = std::make_unique<char[]>(new_bool_size);
+	memset(this->BoolFlag.get(), 0, new_bool_size * sizeof(char));
 
-	this->Variable = new ConditionInfoVariable[UnitTypeVar.GetNumberVariable()];
+	this->Variable = std::make_unique<ConditionInfoVariable[]>(UnitTypeVar.GetNumberVariable());
 	// Initialize min/max stuff to values with no effect.
 	for (unsigned int i = 0; i < UnitTypeVar.GetNumberVariable(); i++) {
 		this->Variable[i].Check = false;

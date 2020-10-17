@@ -53,7 +53,7 @@ public:
 	virtual void Parse(lua_State *l, int startIndex, int endIndex) override;
 
 private:
-	variable_adjustment *Var = nullptr;
+	std::unique_ptr<variable_adjustment[]> Var;
 };
 
 }

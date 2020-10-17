@@ -518,7 +518,7 @@ void CUnit::Init()
 	this->CriticalOrder.reset();
 	this->autocast_spells.clear();
 	this->spell_autocast.clear();
-	SpellCoolDownTimers = nullptr;
+	this->SpellCoolDownTimers.reset();
 	AutoRepair = 0;
 	Goal = nullptr;
 	IndividualUpgrades.clear();
@@ -604,7 +604,7 @@ void CUnit::Release(bool final)
 	this->pathFinderData.reset();
 	this->autocast_spells.clear();
 	this->spell_autocast.clear();
-	delete[] SpellCoolDownTimers;
+	this->SpellCoolDownTimers.reset();
 	this->Variable.clear();
 	this->Orders.clear();
 
@@ -2810,8 +2810,8 @@ void CUnit::Init(const wyrmgus::unit_type &type)
 //	if (type.CanCastSpell) {
 	//to avoid crashes with spell items for units who cannot ordinarily cast spells
 	//Wyrmgus end
-		SpellCoolDownTimers = new int[wyrmgus::spell::get_all().size()];
-		memset(SpellCoolDownTimers, 0, wyrmgus::spell::get_all().size() * sizeof(int));
+		SpellCoolDownTimers = std::make_unique<int[]>(wyrmgus::spell::get_all().size());
+		memset(SpellCoolDownTimers.get(), 0, wyrmgus::spell::get_all().size() * sizeof(int));
 		this->spell_autocast = this->Type->get_spell_autocast();
 		for (size_t i = 0; i < this->spell_autocast.size(); ++i) {
 			this->autocast_spells.push_back(wyrmgus::spell::get_all()[i]);

@@ -662,8 +662,8 @@ static int CclUnit(lua_State *l)
 				LuaError(l, "incorrect argument");
 			}
 			if (!unit->SpellCoolDownTimers) {
-				unit->SpellCoolDownTimers = new int[wyrmgus::spell::get_all().size()];
-				memset(unit->SpellCoolDownTimers, 0, wyrmgus::spell::get_all().size() * sizeof(int));
+				unit->SpellCoolDownTimers = std::make_unique<int[]>(wyrmgus::spell::get_all().size());
+				memset(unit->SpellCoolDownTimers.get(), 0, wyrmgus::spell::get_all().size() * sizeof(int));
 			}
 			for (size_t k = 0; k < wyrmgus::spell::get_all().size(); ++k) {
 				unit->SpellCoolDownTimers[k] = LuaToNumber(l, -1, k + 1);

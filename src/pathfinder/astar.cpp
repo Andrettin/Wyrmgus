@@ -28,10 +28,6 @@
 //      02111-1307, USA.
 //
 
-/*----------------------------------------------------------------------------
---  Includes
-----------------------------------------------------------------------------*/
-
 #include "stratagus.h"
 
 #include "map/map.h"
@@ -44,10 +40,6 @@
 #include "unit/unit_type_type.h"
 
 #include "pathfinder.h"
-
-/*----------------------------------------------------------------------------
---  Declarations
-----------------------------------------------------------------------------*/
 
 struct Node {
 	int CostFromStart;  /// Real costs to reach this point
@@ -75,10 +67,6 @@ static inline int AStarCosts(const Vec2i &pos, const Vec2i &goalPos)
 	return std::max<int>(MyAbs(diff.x), MyAbs(diff.y));
 }
 
-/*----------------------------------------------------------------------------
---  Variables
-----------------------------------------------------------------------------*/
-
 //  Convert heading into direction.
 //                      //  N NE  E SE  S SW  W NW
 const int Heading2X[9] = {  0, +1, +1, +1, 0, -1, -1, -1, 0 };
@@ -92,7 +80,7 @@ const int XY2Heading[3][3] = { {7, 6, 5}, {0, 0, 4}, {1, 2, 3}};
 /// cost matrix
 //Wyrmgus start
 //static Node *AStarMatrix;
-static std::vector<Node *> AStarMatrix;
+static std::vector<std::unique_ptr<Node[]>> AStarMatrix;
 //Wyrmgus end
 
 /// a list of close nodes, helps to speed up the matrix cleaning
@@ -102,7 +90,7 @@ static std::vector<Node *> AStarMatrix;
 //static int Threshold;
 //static int OpenSetMaxSize;
 //static int AStarMatrixSize;
-static std::vector<int *> CloseSet;
+static std::vector<std::unique_ptr<int[]>> CloseSet;
 static std::vector<int> CloseSetSize;
 static std::vector<int> Threshold;
 static std::vector<int> OpenSetMaxSize;
@@ -135,7 +123,7 @@ static int AStarGoalY;
 /// The set of Open nodes
 //Wyrmgus start
 //static Open *OpenSet;
-static std::vector<Open *> OpenSet;
+static std::vector<std::unique_ptr<Open[]>> OpenSet;
 //Wyrmgus end
 /// The size of the open node set
 //Wyrmgus start
@@ -145,9 +133,9 @@ static std::vector<int> OpenSetSize;
 
 //Wyrmgus start
 //static int *CostMoveToCache;
-static std::vector<int *> CostMoveToCache;
+static std::vector<std::unique_ptr<int[]>> CostMoveToCache;
 //Wyrmgus end
-static const int CacheNotSet = -5;
+static constexpr int CacheNotSet = -5;
 
 /*----------------------------------------------------------------------------
 --  Profile
@@ -313,18 +301,18 @@ void InitAStar()
 		AStarMapHeight.push_back(CMap::Map.Info.MapHeights[z]);
 		
 		AStarMatrixSize.push_back(sizeof(Node) * AStarMapWidth[z] * AStarMapHeight[z]);
-		AStarMatrix.push_back(new Node[AStarMapWidth[z] * AStarMapHeight[z]]);
-		memset(AStarMatrix[z], 0, AStarMatrixSize[z]);
+		AStarMatrix.push_back(std::make_unique<Node[]>(AStarMapWidth[z] * AStarMapHeight[z]));
+		memset(AStarMatrix[z].get(), 0, AStarMatrixSize[z]);
 
 		Threshold.push_back(AStarMapWidth[z] * AStarMapHeight[z] / MAX_CLOSE_SET_RATIO);
-		CloseSet.push_back(new int[Threshold[z]]);
+		CloseSet.push_back(std::make_unique<int[]>(Threshold[z]));
 		CloseSetSize.push_back(0);
 
 		OpenSetMaxSize.push_back(AStarMapWidth[z] * AStarMapHeight[z] / MAX_OPEN_SET_RATIO);
-		OpenSet.push_back(new Open[OpenSetMaxSize[z]]);
+		OpenSet.push_back(std::make_unique<Open[]>(OpenSetMaxSize[z]));
 		OpenSetSize.push_back(0);
 
-		CostMoveToCache.push_back(new int[AStarMapWidth[z] * AStarMapHeight[z]]);
+		CostMoveToCache.push_back(std::make_unique<int[]>(AStarMapWidth[z] * AStarMapHeight[z]));
 
 		for (int i = 0; i < 9; ++i) {
 			Heading2O[i].push_back(Heading2Y[i] * AStarMapWidth[z]);
@@ -357,30 +345,14 @@ void FreeAStar()
 	delete[] CostMoveToCache;
 	CostMoveToCache = nullptr;
 	*/
-	for (size_t z = 0; z < AStarMatrix.size(); ++z) {
-		delete[] AStarMatrix[z];
-		AStarMatrix[z] = nullptr;
-	}
 	AStarMatrix.clear();
 	AStarMatrixSize.clear();
 	Threshold.clear();
-	for (size_t z = 0; z < CloseSet.size(); ++z) {
-		delete[] CloseSet[z];
-		CloseSet[z] = nullptr;
-	}
 	CloseSet.clear();
 	CloseSetSize.clear();
-	for (size_t z = 0; z < OpenSet.size(); ++z) {
-		delete[] OpenSet[z];
-		OpenSet[z] = nullptr;
-	}
 	OpenSet.clear();
 	OpenSetSize.clear();
 	OpenSetMaxSize.clear();
-	for (size_t z = 0; z < CostMoveToCache.size(); ++z) {
-		delete[] CostMoveToCache[z];
-		CostMoveToCache[z] = nullptr;
-	}
 	CostMoveToCache.clear();
 	
 	for (int i = 0; i < 9; ++i) {
@@ -401,7 +373,7 @@ static void AStarPrepare(int z)
 {
 	//Wyrmgus start
 //	memset(AStarMatrix, 0, AStarMatrixSize);
-	memset(AStarMatrix[z], 0, AStarMatrixSize[z]);
+	memset(AStarMatrix[z].get(), 0, AStarMatrixSize[z]);
 	//Wyrmgus end
 }
 
@@ -449,7 +421,7 @@ static void CostMoveToCacheCleanUp(int z)
 #if 1
 	//Wyrmgus start
 //	int *ptr = CostMoveToCache;
-	int *ptr = CostMoveToCache[z];
+	int *ptr = CostMoveToCache[z].get();
 	//Wyrmgus end
 #ifdef __x86_64__
 	union {
@@ -1602,28 +1574,26 @@ int AStarFindPath(const Vec2i &startPos, const Vec2i &goalPos, int gw, int gh,
 }
 
 struct StatsNode {
-	StatsNode() : Direction(0), InGoal(0), CostFromStart(0), Costs(0), CostToGoal(0) {}
-
-	int Direction;
-	int InGoal;
-	int CostFromStart;
-	int Costs;
-	int CostToGoal;
+	int Direction = 0;
+	int InGoal = 0;
+	int CostFromStart = 0;
+	int Costs = 0;
+	int CostToGoal = 0;
 };
 
 //Wyrmgus start
 //StatsNode *AStarGetStats()
-StatsNode *AStarGetStats(int z)
+static std::unique_ptr<StatsNode[]> AStarGetStats(const int z)
 //Wyrmgus end
 {
 	//Wyrmgus start
 //	StatsNode *stats = new StatsNode[AStarMapWidth * AStarMapHeight];
-	StatsNode *stats = new StatsNode[AStarMapWidth[z] * AStarMapHeight[z]];
+	auto stats = std::make_unique<StatsNode[]>(AStarMapWidth[z] * AStarMapHeight[z]);
 	//Wyrmgus end
-	StatsNode *s = stats;
+	StatsNode *s = stats.get();
 	//Wyrmgus start
 //	Node *m = AStarMatrix;
-	Node *m = AStarMatrix[z];
+	Node *m = AStarMatrix[z].get();
 	//Wyrmgus end
 
 	//Wyrmgus start
@@ -1652,12 +1622,8 @@ StatsNode *AStarGetStats(int z)
 		stats[OpenSet[z][i].O].Costs = OpenSet[z][i].Costs;
 		//Wyrmgus end
 	}
-	return stats;
-}
 
-void AStarFreeStats(StatsNode *stats)
-{
-	delete[] stats;
+	return stats;
 }
 
 /*----------------------------------------------------------------------------

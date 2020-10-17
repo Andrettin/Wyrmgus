@@ -63,12 +63,11 @@ public:
 
 spell_action_adjust_variable::spell_action_adjust_variable()
 {
-	this->Var = new variable_adjustment[UnitTypeVar.GetNumberVariable()];
+	this->Var = std::make_unique<variable_adjustment[]>(UnitTypeVar.GetNumberVariable());
 }
 
 spell_action_adjust_variable::~spell_action_adjust_variable()
 {
-	delete[](this->Var);
 }
 
 void spell_action_adjust_variable::process_sml_property(const sml_property &property)
