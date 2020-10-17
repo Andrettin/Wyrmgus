@@ -104,8 +104,8 @@ public:
 	unit_type *ConvertTo = nullptr;			/// convert to this unit-type.
 
 	//Wyrmgus start
-	int change_civilization_to = -1;		/// changes the player's civilization to this one
-	faction *ChangeFactionTo = nullptr;	/// changes the player's faction to this one
+	const civilization *change_civilization_to = nullptr;	/// changes the player's civilization to this one
+	const faction *change_faction_to = nullptr;	/// changes the player's faction to this one
 	
 	std::vector<CUpgrade *> RemoveUpgrades;	/// Upgrades to be removed when this upgrade modifier is implented
 	//Wyrmgus end

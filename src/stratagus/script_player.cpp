@@ -2634,8 +2634,8 @@ static int CclSetPlayerData(lua_State *l)
 		}
 
 		const char *civilization_ident = LuaToString(l, 3);
-		wyrmgus::civilization *civilization = wyrmgus::civilization::get(civilization_ident);
-		p->set_civilization(civilization->ID);
+		const wyrmgus::civilization *civilization = wyrmgus::civilization::get(civilization_ident);
+		p->set_civilization(civilization);
 	//Wyrmgus start
 	} else if (!strcmp(data, "Faction")) {
 		std::string faction_name = LuaToString(l, 3);

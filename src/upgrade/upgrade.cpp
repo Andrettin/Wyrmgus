@@ -733,11 +733,11 @@ static int CclDefineModifier(lua_State *l)
 			um->SpeedResearch = LuaToNumber(l, j + 1, 2);
 		} else if (!strcmp(key, "change-civilization-to")) {
 			const char *civilization_ident = LuaToString(l, j + 1, 2);
-			wyrmgus::civilization *civilization = wyrmgus::civilization::get(civilization_ident);
-			um->change_civilization_to = civilization->ID;
+			const wyrmgus::civilization *civilization = wyrmgus::civilization::get(civilization_ident);
+			um->change_civilization_to = civilization;
 		} else if (!strcmp(key, "change-faction-to")) {
-			std::string faction_ident = LuaToString(l, j + 1, 2);
-			um->ChangeFactionTo = wyrmgus::faction::get(faction_ident);
+			const std::string faction_ident = LuaToString(l, j + 1, 2);
+			um->change_faction_to = wyrmgus::faction::get(faction_ident);
 		//Wyrmgus end
 		} else {
 			int index = UnitTypeVar.VariableNameLookup[key]; // variable index;
@@ -1294,14 +1294,14 @@ static void ApplyUpgradeModifier(CPlayer &player, const wyrmgus::upgrade_modifie
 	if (um->SpeedResearch != 0) {
 		player.SpeedResearch += um->SpeedResearch;
 	}
-	if (um->change_civilization_to != -1 && GameRunning && um->change_civilization_to != player.Race) {
+	if (um->change_civilization_to != nullptr && GameRunning && um->change_civilization_to != player.get_civilization()) {
 		player.set_civilization(um->change_civilization_to);
 	}
-	if (um->ChangeFactionTo != nullptr && GameRunning && (um->ChangeFactionTo->get_civilization()->ID != player.Race || um->ChangeFactionTo->ID != player.Faction)) {
-		if (um->ChangeFactionTo->get_civilization()->ID != player.Race) {
-			player.set_civilization(um->ChangeFactionTo->get_civilization()->ID);
+	if (um->change_faction_to != nullptr && GameRunning && (um->change_faction_to->get_civilization() != player.get_civilization() || um->change_faction_to != player.get_faction())) {
+		if (um->change_faction_to->get_civilization() != player.get_civilization()) {
+			player.set_civilization(um->change_faction_to->get_civilization());
 		}
-		player.SetFaction(um->ChangeFactionTo);
+		player.SetFaction(um->change_faction_to);
 	}
 	//Wyrmgus end
 

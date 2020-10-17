@@ -111,7 +111,7 @@ public:
 
 	//Wyrmgus start
 	const wyrmgus::civilization *get_civilization() const;
-	void set_civilization(int civilization);
+	void set_civilization(const wyrmgus::civilization *civilization);
 	wyrmgus::faction *get_faction() const;
 	void SetFaction(const wyrmgus::faction *faction);
 	void SetRandomFaction();

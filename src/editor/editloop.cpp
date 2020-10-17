@@ -2406,7 +2406,7 @@ void CEditor::Init()
 				CMap::Map.Info.PlayerType[i] = PlayerNeutral;
 				//Wyrmgus start
 //				CMap::Map.Info.PlayerSide[i] = CPlayer::Players[i]->Race = 0;
-				CPlayer::Players[i]->set_civilization(0);
+				CPlayer::Players[i]->set_civilization(wyrmgus::defines::get()->get_neutral_civilization());
 				CMap::Map.Info.PlayerSide[i] = CPlayer::Players[i]->Race;
 				//Wyrmgus end
 			} else {

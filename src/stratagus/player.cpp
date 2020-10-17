@@ -855,7 +855,7 @@ CPlayer *GetOrAddFactionPlayer(const wyrmgus::faction *faction)
 		CPlayer *player = CPlayer::Players[i];
 		if (player->Type == PlayerNobody) {
 			player->Type = PlayerComputer;
-			player->set_civilization(faction->get_civilization()->ID);
+			player->set_civilization(faction->get_civilization());
 			player->SetFaction(faction);
 			player->AiEnabled = true;
 			player->AiName = faction->DefaultAI;
@@ -927,7 +927,7 @@ void CPlayer::Init(/* PlayerTypes */ int type)
 	DebugPrint("CreatePlayer name %s\n" _C_ this->Name.c_str());
 
 	this->Type = type;
-	this->Race = 0;
+	this->Race = wyrmgus::defines::get()->get_neutral_civilization()->ID;
 	this->Faction = -1;
 	this->faction_tier = wyrmgus::faction_tier::none;
 	this->government_type = wyrmgus::government_type::none;
@@ -1051,10 +1051,10 @@ const wyrmgus::civilization *CPlayer::get_civilization() const
 }
 
 //Wyrmgus start
-void CPlayer::set_civilization(int civilization)
+void CPlayer::set_civilization(const wyrmgus::civilization *civilization)
 {
-	if (this->Race != -1 && (GameRunning || GameEstablishing)) {
-		const wyrmgus::civilization *old_civilization = wyrmgus::civilization::get_all()[this->Race];
+	if (this->get_civilization() != nullptr && (GameRunning || GameEstablishing)) {
+		const wyrmgus::civilization *old_civilization = this->get_civilization();
 		if (old_civilization->get_upgrade() != nullptr && this->Allow.Upgrades[old_civilization->get_upgrade()->ID] == 'R') {
 			UpgradeLost(*this, old_civilization->get_upgrade()->ID);
 		}
@@ -1066,20 +1066,20 @@ void CPlayer::set_civilization(int civilization)
 		this->Faction = -1;
 	}
 
-	this->Race = civilization;
+	this->Race = civilization->ID;
 
-	//if the civilization of the person player changed, update the UI
-	if ((CPlayer::GetThisPlayer() && CPlayer::GetThisPlayer()->Index == this->Index) || (!CPlayer::GetThisPlayer() && this->Index == 0)) {
-		//load proper UI
-		char buf[256];
-		snprintf(buf, sizeof(buf), "if (LoadCivilizationUI ~= nil) then LoadCivilizationUI(\"%s\") end;", wyrmgus::civilization::get_all()[this->Race]->get_identifier().c_str());
-		CclCommand(buf);
-		
-		UI.Load();
-	}
-	
-	if (this->Race != -1) {
-		const wyrmgus::civilization *new_civilization = wyrmgus::civilization::get_all()[this->Race];
+	if (this->get_civilization() != nullptr) {
+		//if the civilization of the person player changed, update the UI
+		if ((CPlayer::GetThisPlayer() && CPlayer::GetThisPlayer()->Index == this->Index) || (!CPlayer::GetThisPlayer() && this->Index == 0)) {
+			//load proper UI
+			char buf[256];
+			snprintf(buf, sizeof(buf), "if (LoadCivilizationUI ~= nil) then LoadCivilizationUI(\"%s\") end;", this->get_civilization()->get_identifier().c_str());
+			CclCommand(buf);
+
+			UI.Load();
+		}
+
+		const wyrmgus::civilization *new_civilization = this->get_civilization();
 		CUpgrade *civilization_upgrade = new_civilization->get_upgrade();
 		if (civilization_upgrade != nullptr && this->Allow.Upgrades[civilization_upgrade->ID] != 'R') {
 			UpgradeAcquire(*this, civilization_upgrade);
@@ -1096,17 +1096,12 @@ wyrmgus::faction *CPlayer::get_faction() const
 	return nullptr;
 }
 
-/**
-**  Change player faction.
-**
-**  @param faction    New faction.
-*/
 void CPlayer::SetFaction(const wyrmgus::faction *faction)
 {
 	int old_faction_id = this->Faction;
 	
-	if (faction && faction->get_civilization()->ID != this->Race) {
-		this->set_civilization(faction->get_civilization()->ID);
+	if (faction != nullptr && faction->get_civilization() != this->get_civilization()) {
+		this->set_civilization(faction->get_civilization());
 	}
 
 	if (this->Faction != -1) {
@@ -2006,7 +2001,7 @@ void CPlayer::Clear()
 	this->Index = 0;
 	this->Name.clear();
 	this->Type = 0;
-	this->Race = 0;
+	this->Race = wyrmgus::defines::get()->get_neutral_civilization()->ID;
 	this->Faction = -1;
 	this->faction_tier = wyrmgus::faction_tier::none;
 	this->government_type = wyrmgus::government_type::none;
