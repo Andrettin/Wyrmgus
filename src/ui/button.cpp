@@ -368,10 +368,40 @@ const CUnit *button::get_unit() const
 	}
 }
 
+const unit_type *button::get_unit_type(const CUnit *unit) const
+{
+	switch (this->Action) {
+		case ButtonCmd::Train:
+		case ButtonCmd::Build:
+		case ButtonCmd::UpgradeTo:
+		case ButtonCmd::ExperienceUpgradeTo:
+		case ButtonCmd::TrainClass:
+		case ButtonCmd::BuildClass:
+		case ButtonCmd::UpgradeToClass:
+			return this->get_value_unit_type(unit);
+		case ButtonCmd::Move:
+		case ButtonCmd::Attack:
+		case ButtonCmd::Repair:
+		case ButtonCmd::Harvest:
+		case ButtonCmd::Patrol:
+		case ButtonCmd::AttackGround:
+		case ButtonCmd::SpellCast:
+		case ButtonCmd::Unload:
+		case ButtonCmd::Stop:
+		case ButtonCmd::StandGround:
+		case ButtonCmd::Return:
+		case ButtonCmd::RallyPoint:
+		case ButtonCmd::Salvage:
+		case ButtonCmd::Unit:
+		case ButtonCmd::Buy:
+			return unit->Type;
+		default:
+			return nullptr;
+	}
+}
+
 const unit_type *button::get_value_unit_type(const CUnit *unit) const
 {
-	const unit_class *unit_class = nullptr;
-	const unit_type *unit_type = nullptr;
 	switch (this->Action) {
 		case ButtonCmd::Train:
 		case ButtonCmd::Build:
@@ -380,11 +410,14 @@ const unit_type *button::get_value_unit_type(const CUnit *unit) const
 			return unit_type::get_all()[this->Value];
 		case ButtonCmd::TrainClass:
 		case ButtonCmd::BuildClass:
-		case ButtonCmd::UpgradeToClass:
-			unit_class = unit_class::get_all()[this->Value];
+		case ButtonCmd::UpgradeToClass: {
+			const unit_class *unit_class = unit_class::get_all()[this->Value];
 			if (unit->Player->get_faction() != nullptr) {
 				return unit->Player->get_faction()->get_class_unit_type(unit_class);
 			}
+			break;
+		}
+		default:
 			break;
 	}
 

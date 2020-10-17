@@ -693,29 +693,7 @@ static void GetPopupSize(const CPopup &popup, const wyrmgus::button &button,
 	popupWidth = popup.MarginX;
 	popupHeight = popup.MarginY;
 
-	const wyrmgus::unit_class *unit_class = nullptr;
-	const wyrmgus::unit_type *unit_type = nullptr;
-
-	switch (button.Action) {
-		case ButtonCmd::BuildClass:
-		case ButtonCmd::TrainClass:
-		case ButtonCmd::UpgradeToClass:
-			unit_class = wyrmgus::unit_class::get_all()[button.Value];
-			if (Selected[0]->Player->get_faction() != nullptr) {
-				unit_type = Selected[0]->Player->get_faction()->get_class_unit_type(unit_class);
-			}
-			break;
-		case ButtonCmd::Unit:
-		case ButtonCmd::Buy:
-			unit_type = UnitManager.GetSlotUnit(button.Value).Type;
-			break;
-		case ButtonCmd::Salvage:
-			unit_type = Selected[0]->Type;
-			break;
-		default:
-			unit_type = wyrmgus::unit_type::get_all()[button.Value];
-			break;
-	}
+	const wyrmgus::unit_type *unit_type = button.get_unit_type();
 
 	for (const std::unique_ptr<CPopupContentType> &content : popup.Contents) {
 		if (CanShowPopupContent(content->Condition.get(), button, unit_type)) {
@@ -766,48 +744,8 @@ void DrawPopup(const wyrmgus::button &button, int x, int y, bool above)
 	int Costs[ManaResCost + 1];
 	memset(Costs, 0, sizeof(Costs));
 
-	const wyrmgus::unit_class *unit_class = nullptr;
-	const wyrmgus::unit_type *unit_type = nullptr;
-	const wyrmgus::upgrade_class *upgrade_class = nullptr;
-	const CUpgrade *upgrade = nullptr;
-
-	switch (button.Action) {
-		case ButtonCmd::Build:
-		case ButtonCmd::Train:
-		case ButtonCmd::UpgradeTo:
-		case ButtonCmd::ExperienceUpgradeTo:
-			unit_type = wyrmgus::unit_type::get_all()[button.Value];
-			break;
-		case ButtonCmd::BuildClass:
-		case ButtonCmd::TrainClass:
-		case ButtonCmd::UpgradeToClass:
-			unit_class = wyrmgus::unit_class::get_all()[button.Value];
-			if (Selected[0]->Player->get_faction() != nullptr) {
-				unit_type = Selected[0]->Player->get_faction()->get_class_unit_type(unit_class);
-			}
-			break;
-		case ButtonCmd::Salvage:
-			unit_type = Selected[0]->Type;
-			break;
-		case ButtonCmd::Buy:
-		case ButtonCmd::Unit:
-			unit_type = UnitManager.GetSlotUnit(button.Value).Type;
-			break;
-		case ButtonCmd::Research:
-			upgrade = CUpgrade::get_all()[button.Value];
-			break;
-		case ButtonCmd::ResearchClass:
-			upgrade_class = wyrmgus::upgrade_class::get_all()[button.Value];
-			if (Selected[0]->Player->get_faction() != nullptr) {
-				upgrade = Selected[0]->Player->get_faction()->get_class_upgrade(upgrade_class);
-			}
-			break;
-		case ButtonCmd::Dynasty:
-			upgrade = CPlayer::GetThisPlayer()->get_faction()->get_dynasties()[button.Value]->get_upgrade();
-			break;
-		default:
-			break;
-	}
+	const wyrmgus::unit_type *unit_type = button.get_unit_type();
+	const CUpgrade *upgrade = button.get_value_upgrade();
 
 	int type_costs[MaxCosts];
 
@@ -865,7 +803,6 @@ void DrawPopup(const wyrmgus::button &button, int x, int y, bool above)
 
 	// Contents
 	for (const std::unique_ptr<CPopupContentType> &content : popup->Contents) {
-
 		if (CanShowPopupContent(content->Condition.get(), button, unit_type)) {
 			content->Draw(x + content->pos.x, y + content->pos.y, *popup, popupWidth, button, Costs);
 		}
