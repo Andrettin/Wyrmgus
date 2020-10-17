@@ -405,11 +405,7 @@ void Exit(int err)
 
 	fprintf(stdout, "%s", _("Thanks for playing " NAME ".\n"));
 
-	if (GameResult == GameExit) {
-		exit(err);
-	} else {
-		QMetaObject::invokeMethod(QApplication::instance(), [err] { QApplication::exit(err); }, Qt::QueuedConnection);
-	}
+	QMetaObject::invokeMethod(QApplication::instance(), [err] { QApplication::exit(err); }, Qt::QueuedConnection);
 }
 
 /**
