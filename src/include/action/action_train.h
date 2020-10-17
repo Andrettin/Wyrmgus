@@ -33,9 +33,12 @@
 
 class COrder_Train : public COrder
 {
-	friend std::unique_ptr<COrder> COrder::NewActionTrain(CUnit &trainer, wyrmgus::unit_type &type, int player);
+	friend std::unique_ptr<COrder> COrder::NewActionTrain(CUnit &trainer, const wyrmgus::unit_type &type, int player);
+
 public:
-	COrder_Train() : COrder(UnitAction::Train), Type(nullptr), Player(0), Ticks(0) {}
+	COrder_Train() : COrder(UnitAction::Train)
+	{
+	}
 
 	virtual std::unique_ptr<COrder> Clone() const override
 	{
@@ -56,10 +59,11 @@ public:
 	void ConvertUnitType(const CUnit &unit, wyrmgus::unit_type &newType);
 
 	const wyrmgus::unit_type &GetUnitType() const { return *Type; }
+
 private:
-	wyrmgus::unit_type *Type; /// train a unit of this unit-type
+	const wyrmgus::unit_type *Type = nullptr; /// train a unit of this unit-type
 	//Wyrmgus start
-	int Player;      /// Player doing the training (needed for neutral building training)
+	int Player = 0;      /// Player doing the training (needed for neutral building training)
 	//Wyrmgus end
-	int Ticks;       /// Ticks to complete
+	int Ticks = 0;       /// Ticks to complete
 };

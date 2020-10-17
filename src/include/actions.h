@@ -168,10 +168,10 @@ public:
 	static std::unique_ptr<COrder> NewActionSpellCast(const wyrmgus::spell &spell, const Vec2i &pos, CUnit *target, int z, bool isAutocast = false);
 	static std::unique_ptr<COrder> NewActionStandGround();
 	static std::unique_ptr<COrder> NewActionStill();
-	static std::unique_ptr<COrder> NewActionTrain(CUnit &trainer, wyrmgus::unit_type &type, int player);
+	static std::unique_ptr<COrder> NewActionTrain(CUnit &trainer, const wyrmgus::unit_type &type, int player);
 	static std::unique_ptr<COrder> NewActionTransformInto(wyrmgus::unit_type &type);
 	static std::unique_ptr<COrder> NewActionUnload(const Vec2i &pos, CUnit *what, int z, int landmass);
-	static std::unique_ptr<COrder> NewActionUpgradeTo(CUnit &unit, wyrmgus::unit_type &type);
+	static std::unique_ptr<COrder> NewActionUpgradeTo(CUnit &unit, const wyrmgus::unit_type &type);
 	//Wyrmgus start
 	static std::unique_ptr<COrder> NewActionUse(CUnit &dest);
 	static std::unique_ptr<COrder> NewActionTrade(CUnit &dest, CUnit &home_market);

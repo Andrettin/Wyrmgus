@@ -70,11 +70,11 @@ std::unique_ptr<COrder> COrder::NewActionTransformInto(wyrmgus::unit_type &type)
 	return order;
 }
 
-std::unique_ptr<COrder> COrder::NewActionUpgradeTo(CUnit &unit, wyrmgus::unit_type &type)
+std::unique_ptr<COrder> COrder::NewActionUpgradeTo(CUnit &unit, const wyrmgus::unit_type &type)
 {
 	auto order = std::make_unique<COrder_UpgradeTo>();
 
-	// FIXME: if you give quick an other order, the resources are lost!
+	// FIXME: if you give quick another order, the resources are lost!
 	unit.Player->SubUnitType(type);
 	order->Type = &type;
 	return order;

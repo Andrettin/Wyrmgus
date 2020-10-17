@@ -110,8 +110,20 @@ public:
 	}
 
 	const CUnit *get_unit() const;
+	const unit_type *get_unit_type(const CUnit *unit) const;
+
+	const unit_type *get_unit_type() const
+	{
+		return this->get_unit_type(this->get_unit());
+	}
+
 	const unit_type *get_value_unit_type(const CUnit *unit) const;
 	const CUpgrade *get_value_upgrade(const CUnit *unit) const;
+
+	const CUpgrade *get_value_upgrade() const
+	{
+		return this->get_value_upgrade(this->get_unit());
+	}
 
 	void SetTriggerData() const;
 	void CleanTriggerData() const;

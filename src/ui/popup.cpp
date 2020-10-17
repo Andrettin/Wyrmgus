@@ -100,7 +100,7 @@ int CPopupContentTypeButtonInfo::GetWidth(const wyrmgus::button &button, int *) 
 	return width;
 }
 
-/* virtual */ int CPopupContentTypeButtonInfo::GetHeight(const wyrmgus::button &button, int *) const
+int CPopupContentTypeButtonInfo::GetHeight(const wyrmgus::button &button, int *) const
 {
 	const wyrmgus::font *font = this->Font ? this->Font : wyrmgus::defines::get()->get_small_font();
 	std::string draw;
@@ -127,7 +127,7 @@ int CPopupContentTypeButtonInfo::GetWidth(const wyrmgus::button &button, int *) 
 	return height;
 }
 
-/* virtual */ void CPopupContentTypeButtonInfo::Draw(int x, int y, const CPopup &popup, const unsigned int popupWidth, const wyrmgus::button &button, int *) const
+void CPopupContentTypeButtonInfo::Draw(int x, int y, const CPopup &popup, const unsigned int popupWidth, const wyrmgus::button &button, int *) const
 {
 	const wyrmgus::font *font = this->Font ? this->Font : wyrmgus::defines::get()->get_small_font();
 	CLabel label(font, this->TextColor, this->HighlightColor);
@@ -160,7 +160,7 @@ int CPopupContentTypeButtonInfo::GetWidth(const wyrmgus::button &button, int *) 
 	}
 }
 
-/* virtual */ void CPopupContentTypeButtonInfo::Parse(lua_State *l)
+void CPopupContentTypeButtonInfo::Parse(lua_State *l)
 {
 	Assert(lua_istable(l, -1));
 
@@ -185,7 +185,7 @@ int CPopupContentTypeButtonInfo::GetWidth(const wyrmgus::button &button, int *) 
 	}
 }
 
-/* virtual */ int CPopupContentTypeText::GetWidth(const wyrmgus::button &button, int *) const
+int CPopupContentTypeText::GetWidth(const wyrmgus::button &button, int *) const
 {
 	const wyrmgus::font *font = this->Font ? this->Font : wyrmgus::defines::get()->get_small_font();
 	//Wyrmgus start
@@ -225,7 +225,7 @@ int CPopupContentTypeButtonInfo::GetWidth(const wyrmgus::button &button, int *) 
 	return width;
 }
 
-/* virtual */ int CPopupContentTypeText::GetHeight(const wyrmgus::button &button, int *) const
+int CPopupContentTypeText::GetHeight(const wyrmgus::button &button, int *) const
 {
 	const wyrmgus::font *font = this->Font ? this->Font : wyrmgus::defines::get()->get_small_font();
 	const int scale_factor = wyrmgus::defines::get()->get_scale_factor();
@@ -250,7 +250,7 @@ int CPopupContentTypeButtonInfo::GetWidth(const wyrmgus::button &button, int *) 
 	return height;
 }
 
-/* virtual */ void CPopupContentTypeText::Draw(int x, int y, const CPopup &popup, const unsigned int popupWidth, const wyrmgus::button &button, int *) const
+void CPopupContentTypeText::Draw(int x, int y, const CPopup &popup, const unsigned int popupWidth, const wyrmgus::button &button, int *) const
 {
 	const wyrmgus::font *font = this->Font ? this->Font : wyrmgus::defines::get()->get_small_font();
 	const int scale_factor = wyrmgus::defines::get()->get_scale_factor();
@@ -280,7 +280,7 @@ int CPopupContentTypeButtonInfo::GetWidth(const wyrmgus::button &button, int *) 
 	}
 }
 
-/* virtual */ void CPopupContentTypeText::Parse(lua_State *l)
+void CPopupContentTypeText::Parse(lua_State *l)
 {
 	Assert(lua_istable(l, -1));
 
@@ -302,7 +302,7 @@ int CPopupContentTypeButtonInfo::GetWidth(const wyrmgus::button &button, int *) 
 	}
 }
 
-/* virtual */ int CPopupContentTypeCosts::GetWidth(const wyrmgus::button &button, int *Costs) const
+int CPopupContentTypeCosts::GetWidth(const wyrmgus::button &button, int *Costs) const
 {
 	int popupWidth = 0;
 	const wyrmgus::font *font = this->Font ? this->Font : wyrmgus::defines::get()->get_small_font();
@@ -364,7 +364,7 @@ int CPopupContentTypeButtonInfo::GetWidth(const wyrmgus::button &button, int *) 
 	return popupWidth;
 }
 
-/* virtual */ int CPopupContentTypeCosts::GetHeight(const wyrmgus::button &button, int *Costs) const
+int CPopupContentTypeCosts::GetHeight(const wyrmgus::button &button, int *Costs) const
 {
 	int popupHeight = 0;
 	const wyrmgus::font *font = this->Font ? this->Font : wyrmgus::defines::get()->get_small_font();
@@ -397,7 +397,7 @@ int CPopupContentTypeButtonInfo::GetWidth(const wyrmgus::button &button, int *) 
 	return std::max(popupHeight, font->Height());
 }
 
-/* virtual */ void CPopupContentTypeCosts::Draw(int x, int y, const CPopup &, const unsigned int, const wyrmgus::button &button, int *Costs) const
+void CPopupContentTypeCosts::Draw(int x, int y, const CPopup &, const unsigned int, const wyrmgus::button &button, int *Costs) const
 {
 	const wyrmgus::font *font = this->Font ? this->Font : wyrmgus::defines::get()->get_small_font();
 	CLabel label(font, this->TextColor, this->HighlightColor);
@@ -461,7 +461,7 @@ int CPopupContentTypeButtonInfo::GetWidth(const wyrmgus::button &button, int *) 
 	}
 }
 
-/* virtual */ void CPopupContentTypeCosts::Parse(lua_State *l)
+void CPopupContentTypeCosts::Parse(lua_State *l)
 {
 	Assert(lua_istable(l, -1) || lua_isnil(l, -1));
 
@@ -483,23 +483,23 @@ CPopupContentTypeLine::CPopupContentTypeLine() : Color(ColorWhite)
 {
 }
 
-/* virtual */ int CPopupContentTypeLine::GetWidth(const wyrmgus::button &button, int *Costs) const
+int CPopupContentTypeLine::GetWidth(const wyrmgus::button &button, int *Costs) const
 {
 	return this->Width;
 }
 
-/* virtual */ int CPopupContentTypeLine::GetHeight(const wyrmgus::button &button, int *Costs) const
+int CPopupContentTypeLine::GetHeight(const wyrmgus::button &button, int *Costs) const
 {
 	return this->Height;
 }
 
-/* virtual */ void CPopupContentTypeLine::Draw(int x, int y, const CPopup &popup, const unsigned int popupWidth, const wyrmgus::button &button, int *Costs) const
+void CPopupContentTypeLine::Draw(int x, int y, const CPopup &popup, const unsigned int popupWidth, const wyrmgus::button &button, int *Costs) const
 {
 	Video.FillRectangle(this->Color, x - popup.MarginX - this->MarginX + 1,
 						y, this->Width && Width < popupWidth ? Width : popupWidth - 2, Height);
 }
 
-/* virtual */ void CPopupContentTypeLine::Parse(lua_State *l)
+void CPopupContentTypeLine::Parse(lua_State *l)
 {
 	Assert(lua_istable(l, -1) || lua_isnil(l, -1));
 
@@ -519,7 +519,7 @@ CPopupContentTypeLine::CPopupContentTypeLine() : Color(ColorWhite)
 	}
 }
 
-/* virtual */ int CPopupContentTypeVariable::GetWidth(const wyrmgus::button &button, int *) const
+int CPopupContentTypeVariable::GetWidth(const wyrmgus::button &button, int *) const
 {
 	const wyrmgus::font *font = this->Font ? this->Font : wyrmgus::defines::get()->get_small_font();
 	//Wyrmgus start
@@ -538,13 +538,13 @@ CPopupContentTypeLine::CPopupContentTypeLine() : Color(ColorWhite)
 	return font->getWidth(text);
 }
 
-/* virtual */ int CPopupContentTypeVariable::GetHeight(const wyrmgus::button &, int *) const
+int CPopupContentTypeVariable::GetHeight(const wyrmgus::button &, int *) const
 {
 	const wyrmgus::font *font = this->Font ? this->Font : wyrmgus::defines::get()->get_small_font();
 	return font->Height();
 }
 
-/* virtual */ void CPopupContentTypeVariable::Draw(int x, int y, const CPopup &, const unsigned int, const wyrmgus::button &button, int *) const
+void CPopupContentTypeVariable::Draw(int x, int y, const CPopup &, const unsigned int, const wyrmgus::button &button, int *) const
 {
 	std::string text;										// Optional text to display.
 	const wyrmgus::font *font = this->Font ? this->Font : wyrmgus::defines::get()->get_small_font(); // Font to use.
@@ -637,7 +637,7 @@ CPopupContentTypeLine::CPopupContentTypeLine() : Color(ColorWhite)
 	}
 }
 
-/* virtual */ void CPopupContentTypeVariable::Parse(lua_State *l)
+void CPopupContentTypeVariable::Parse(lua_State *l)
 {
 	Assert(lua_istable(l, -1) || lua_isstring(l, -1));
 

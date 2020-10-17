@@ -6413,13 +6413,14 @@ bool CUnit::can_learn_ability(const CUpgrade *ability) const
 template bool CUnit::can_learn_ability<false>(const CUpgrade *ability) const;
 template bool CUnit::can_learn_ability<true>(const CUpgrade *ability) const;
 
-bool CUnit::CanHireMercenary(wyrmgus::unit_type *type, int civilization_id) const
+bool CUnit::can_hire_mercenary(const wyrmgus::unit_type *type, const wyrmgus::civilization *civilization) const
 {
-	if (civilization_id == -1) {
-		civilization_id = type->get_civilization() ? type->get_civilization()->ID : -1;
+	if (civilization == nullptr) {
+		civilization = type->get_civilization();
 	}
-	for (int p = 0; p < PlayerMax; ++p) {
-		if (CPlayer::Players[p]->Type != PlayerNobody && CPlayer::Players[p]->Type != PlayerNeutral && civilization_id == CPlayer::Players[p]->Race && check_conditions(type, CPlayer::Players[p], true) && CPlayer::Players[p]->StartMapLayer == this->MapLayer->ID) {
+
+	for (const CPlayer *player : CPlayer::Players) {
+		if (player->Type != PlayerNobody && player->Type != PlayerNeutral && civilization == player->get_civilization() && check_conditions(type, player, true) && player->StartMapLayer == this->MapLayer->ID) {
 			return true;
 		}
 	}

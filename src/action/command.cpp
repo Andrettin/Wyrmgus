@@ -1021,7 +1021,7 @@ void CommandReturnGoods(CUnit &unit, CUnit *depot, int flush)
 **  @param type   unit type to train.
 **  @param flush  if true, flush command queue.
 */
-void CommandTrainUnit(CUnit &unit, wyrmgus::unit_type &type, int player, int)
+void CommandTrainUnit(CUnit &unit, const wyrmgus::unit_type &type, int player, int)
 {
 	if (IsUnitValidForNetwork(unit) == false) {
 		return ;
@@ -1132,10 +1132,10 @@ void CommandCancelTraining(CUnit &unit, int slot, const wyrmgus::unit_type *type
 **  @param type   upgrade to type
 **  @param flush  if true, flush command queue.
 */
-void CommandUpgradeTo(CUnit &unit, wyrmgus::unit_type &type, int flush)
+void CommandUpgradeTo(CUnit &unit, const wyrmgus::unit_type &type, int flush)
 {
 	if (IsUnitValidForNetwork(unit) == false) {
-		return ;
+		return;
 	}
 
 	// Check if enough resources remains? (NETWORK!)

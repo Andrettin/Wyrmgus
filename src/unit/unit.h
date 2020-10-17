@@ -471,7 +471,7 @@ public:
 	template <bool precondition = false>
 	bool can_learn_ability(const CUpgrade *ability) const;
 
-	bool CanHireMercenary(wyrmgus::unit_type *type, int civilization_id = -1) const;
+	bool can_hire_mercenary(const wyrmgus::unit_type *type, const wyrmgus::civilization *civilization = nullptr) const;
 	bool CanEat(const CUnit &unit) const;
 	bool LevelCheck(const int level) const;
 	bool is_spell_empowered(const wyrmgus::spell *spell) const;

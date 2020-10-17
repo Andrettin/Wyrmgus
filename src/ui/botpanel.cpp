@@ -1030,37 +1030,9 @@ void CButtonPanel::Draw()
 
 		//Wyrmgus start
 		const wyrmgus::icon *button_icon = button->Icon.Icon;
-		const CPlayer *player = Selected[0]->Player;
-		const wyrmgus::faction *player_faction = player->Faction != -1 ? wyrmgus::faction::get_all()[player->Faction] : nullptr;
 
-		const wyrmgus::unit_type *button_unit_type = nullptr;
-		const CUpgrade *button_upgrade = nullptr;
-		switch (button->Action) {
-			case ButtonCmd::Train:
-			case ButtonCmd::Build:
-			case ButtonCmd::UpgradeTo:
-			case ButtonCmd::ExperienceUpgradeTo:
-				button_unit_type = wyrmgus::unit_type::get_all()[button->Value];
-				break;
-			case ButtonCmd::BuildClass:
-			case ButtonCmd::TrainClass:
-			case ButtonCmd::UpgradeToClass:
-				if (player_faction != nullptr) {
-					button_unit_type = player_faction->get_class_unit_type(wyrmgus::unit_class::get_all()[button->Value]);
-				}
-				break;
-			case ButtonCmd::Research:
-				button_upgrade = CUpgrade::get_all()[button->Value];
-				break;
-			case ButtonCmd::ResearchClass:
-				if (player_faction != nullptr) {
-					button_upgrade = player_faction->get_class_upgrade(wyrmgus::upgrade_class::get_all()[button->Value]);
-				}
-				break;
-			case ButtonCmd::Dynasty:
-				button_upgrade = CPlayer::GetThisPlayer()->get_faction()->get_dynasties()[button->Value]->get_upgrade();
-				break;
-		}
+		const wyrmgus::unit_type *button_unit_type = button->get_value_unit_type(Selected[0]);
+		const CUpgrade *button_upgrade = button->get_value_upgrade(Selected[0]);
 			
 		// if there is a single unit selected, show the icon of its weapon/shield/boots/arrows equipped for the appropriate buttons
 		if (button->Icon.Name.empty() && button->Action == ButtonCmd::Attack && Selected[0]->Type->CanTransport() && Selected[0]->Type->BoolFlag[ATTACKFROMTRANSPORTER_INDEX].value && Selected[0]->BoardCount > 0 && Selected[0]->UnitInside != nullptr && Selected[0]->UnitInside->Type->BoolFlag[ATTACKFROMTRANSPORTER_INDEX].value && Selected[0]->UnitInside->GetButtonIcon(button->Action) != nullptr) {
@@ -1201,37 +1173,8 @@ bool IsButtonAllowed(const CUnit &unit, const wyrmgus::button &buttonaction)
 	}
 	//Wyrmgus end
 
-	const wyrmgus::unit_class *unit_class = nullptr;
-	wyrmgus::unit_type *unit_type = nullptr;
-	const wyrmgus::upgrade_class *upgrade_class = nullptr;
-	const CUpgrade *upgrade = nullptr;
-
-	switch (buttonaction.Action) {
-		case ButtonCmd::Train:
-		case ButtonCmd::Build:
-		case ButtonCmd::UpgradeTo:
-		case ButtonCmd::ExperienceUpgradeTo:
-			unit_type = wyrmgus::unit_type::get_all()[buttonaction.Value];
-			break;
-		case ButtonCmd::TrainClass:
-		case ButtonCmd::BuildClass:
-		case ButtonCmd::UpgradeToClass:
-			unit_class = wyrmgus::unit_class::get_all()[buttonaction.Value];
-			if (unit.Player->get_faction() != nullptr) {
-				unit_type = unit.Player->get_faction()->get_class_unit_type(unit_class);
-			}
-			break;
-		case ButtonCmd::Research:
-		case ButtonCmd::LearnAbility:
-			upgrade = CUpgrade::get_all()[buttonaction.Value];
-			break;
-		case ButtonCmd::ResearchClass:
-			upgrade_class = wyrmgus::upgrade_class::get_all()[buttonaction.Value];
-			if (unit.Player->get_faction() != nullptr) {
-				upgrade = unit.Player->get_faction()->get_class_upgrade(upgrade_class);
-			}
-			break;
-	}
+	const wyrmgus::unit_type *unit_type = buttonaction.get_value_unit_type(&unit);
+	const CUpgrade *upgrade = buttonaction.get_value_upgrade(&unit);
 
 	// Check button-specific cases
 	switch (buttonaction.Action) {
@@ -1297,7 +1240,7 @@ bool IsButtonAllowed(const CUnit &unit, const wyrmgus::button &buttonaction)
 			if (!EnableTrainingQueue && unit.CurrentAction() == UnitAction::Train) {
 				break;
 			}
-			if (unit.Player->Index == PlayerNumNeutral && !unit.CanHireMercenary(unit_type)) {
+			if (unit.Player->Index == PlayerNumNeutral && !unit.can_hire_mercenary(unit_type)) {
 				break;
 			}
 		// FALL THROUGH
@@ -1410,37 +1353,8 @@ bool IsButtonUsable(const CUnit &unit, const wyrmgus::button &buttonaction)
 		}
 	}
 
-	const wyrmgus::unit_class *unit_class = nullptr;
-	wyrmgus::unit_type *unit_type = nullptr;
-	const wyrmgus::upgrade_class *upgrade_class = nullptr;
-	const CUpgrade *upgrade = nullptr;
-
-	switch (buttonaction.Action) {
-		case ButtonCmd::Train:
-		case ButtonCmd::Build:
-		case ButtonCmd::UpgradeTo:
-		case ButtonCmd::ExperienceUpgradeTo:
-			unit_type = wyrmgus::unit_type::get_all()[buttonaction.Value];
-			break;
-		case ButtonCmd::TrainClass:
-		case ButtonCmd::BuildClass:
-		case ButtonCmd::UpgradeToClass:
-			unit_class = wyrmgus::unit_class::get_all()[buttonaction.Value];
-			if (unit.Player->get_faction() != nullptr) {
-				unit_type = unit.Player->get_faction()->get_class_unit_type(unit_class);
-			}
-			break;
-		case ButtonCmd::Research:
-		case ButtonCmd::LearnAbility:
-			upgrade = CUpgrade::get_all()[buttonaction.Value];
-			break;
-		case ButtonCmd::ResearchClass:
-			upgrade_class = wyrmgus::upgrade_class::get_all()[buttonaction.Value];
-			if (unit.Player->get_faction() != nullptr) {
-				upgrade = unit.Player->get_faction()->get_class_upgrade(upgrade_class);
-			}
-			break;
-	}
+	const wyrmgus::unit_type *unit_type = buttonaction.get_value_unit_type(&unit);
+	const CUpgrade *upgrade = buttonaction.get_value_upgrade(&unit);
 
 	// Check button-specific cases
 	switch (buttonaction.Action) {
@@ -1692,21 +1606,7 @@ static void UpdateButtonPanelSingleUnit(const CUnit &unit, const std::vector<std
 		// Special case for researches
 		int researchCheck = true;
 		if (button->is_always_shown() && !allow && (button->Action == ButtonCmd::Research || button->Action == ButtonCmd::ResearchClass || button->Action == ButtonCmd::Dynasty)) {
-			const CUpgrade *upgrade = nullptr;
-
-			switch (button->Action) {
-				case ButtonCmd::Research:
-					upgrade = CUpgrade::get_all()[button->Value];
-					break;
-				case ButtonCmd::ResearchClass:
-					if (Selected[0]->Player->get_faction() != nullptr) {
-						upgrade = Selected[0]->Player->get_faction()->get_class_upgrade(wyrmgus::upgrade_class::get_all()[button->Value]);
-					}
-					break;
-				case ButtonCmd::Dynasty:
-					upgrade = CPlayer::GetThisPlayer()->get_faction()->get_dynasties()[button->Value]->get_upgrade();
-					break;
-			}
+			const CUpgrade *upgrade = button->get_value_upgrade(Selected[0]);
 
 			if (UpgradeIdAllowed(*CPlayer::GetThisPlayer(), upgrade->ID) == 'R') {
 				researchCheck = false;
@@ -2006,23 +1906,8 @@ void CButtonPanel::DoClicked_CancelBuild()
 
 void CButtonPanel::DoClicked_Build(const std::unique_ptr<wyrmgus::button> &button)
 {
-	const wyrmgus::unit_class *unit_class = nullptr;
-	wyrmgus::unit_type *unit_type = nullptr;
-
-	switch (button->Action) {
-		case ButtonCmd::Build:
-			// FIXME: store pointer in button table!
-			unit_type = wyrmgus::unit_type::get_all()[button->Value];
-			break;
-		case ButtonCmd::BuildClass:
-			unit_class = wyrmgus::unit_class::get_all()[button->Value];
-			if (Selected[0]->Player->Faction != -1) {
-				unit_type = wyrmgus::faction::get_all()[Selected[0]->Player->Faction]->get_class_unit_type(unit_class);
-			}
-			break;
-		default:
-			break;
-	}
+	// FIXME: store pointer in button table!
+	const wyrmgus::unit_type *unit_type = button->get_value_unit_type(Selected[0]);
 
 	if (!CPlayer::GetThisPlayer()->CheckUnitType(*unit_type)) {
 		UI.StatusLine.Set(_("Select Location"));
@@ -2036,23 +1921,8 @@ void CButtonPanel::DoClicked_Build(const std::unique_ptr<wyrmgus::button> &butto
 
 void CButtonPanel::DoClicked_Train(const std::unique_ptr<wyrmgus::button> &button)
 {
-	const wyrmgus::unit_class *unit_class = nullptr;
-	wyrmgus::unit_type *unit_type = nullptr;
-
-	switch (button->Action) {
-		case ButtonCmd::Train:
-			// FIXME: store pointer in button table!
-			unit_type = wyrmgus::unit_type::get_all()[button->Value];
-			break;
-		case ButtonCmd::TrainClass:
-			unit_class = wyrmgus::unit_class::get_all()[button->Value];
-			if (Selected[0]->Player->get_faction() != nullptr) {
-				unit_type = Selected[0]->Player->get_faction()->get_class_unit_type(unit_class);
-			}
-			break;
-		default:
-			break;
-	}
+	// FIXME: store pointer in button table!
+	const wyrmgus::unit_type *unit_type = button->get_value_unit_type(Selected[0]);
 
 	// FIXME: training queue full check is not correct for network.
 	// FIXME: this can be correct written, with a little more code.
@@ -2109,23 +1979,7 @@ void CButtonPanel::DoClicked_Train(const std::unique_ptr<wyrmgus::button> &butto
 
 void CButtonPanel::DoClicked_UpgradeTo(const std::unique_ptr<wyrmgus::button> &button)
 {
-	const wyrmgus::unit_class *unit_class = nullptr;
-	wyrmgus::unit_type *unit_type = nullptr;
-
-	switch (button->Action) {
-		case ButtonCmd::UpgradeTo:
-			// FIXME: store pointer in button table!
-			unit_type = wyrmgus::unit_type::get_all()[button->Value];
-			break;
-		case ButtonCmd::UpgradeToClass:
-			unit_class = wyrmgus::unit_class::get_all()[button->Value];
-			if (Selected[0]->Player->get_faction() != nullptr) {
-				unit_type = Selected[0]->Player->get_faction()->get_class_unit_type(unit_class);
-			}
-			break;
-		default:
-			break;
-	}
+	const wyrmgus::unit_type *unit_type = button->get_value_unit_type(Selected[0]);
 
 	for (size_t i = 0; i != Selected.size(); ++i) {
 		if (Selected[i]->Player->CheckLimits(*unit_type) != -6 && !Selected[i]->Player->CheckUnitType(*unit_type)) {

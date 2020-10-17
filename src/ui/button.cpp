@@ -438,7 +438,11 @@ const CUpgrade *button::get_value_upgrade(const CUnit *unit) const
 			break;
 		}
 		case ButtonCmd::Dynasty:
-			return CPlayer::GetThisPlayer()->get_faction()->get_dynasties()[this->Value]->get_upgrade();
+			if (this->Value != -1) {
+				return CPlayer::GetThisPlayer()->get_faction()->get_dynasties()[this->Value]->get_upgrade();
+			}
+		default:
+			break;
 	}
 
 	return nullptr;

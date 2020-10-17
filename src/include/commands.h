@@ -132,11 +132,11 @@ extern void CommandResource(CUnit &unit, CUnit &dest, int flush);
 /// Prepare command return
 extern void CommandReturnGoods(CUnit &unit, CUnit *depot, int flush);
 /// Prepare command train
-extern void CommandTrainUnit(CUnit &unit, wyrmgus::unit_type &what, int player, int flush);
+extern void CommandTrainUnit(CUnit &unit, const wyrmgus::unit_type &what, int player, int flush);
 /// Prepare command cancel training
 extern void CommandCancelTraining(CUnit &unit, int slot, const wyrmgus::unit_type *type);
 /// Prepare command upgrade to
-extern void CommandUpgradeTo(CUnit &unit, wyrmgus::unit_type &what, int flush);
+extern void CommandUpgradeTo(CUnit &unit, const wyrmgus::unit_type &what, int flush);
 /// immediate transforming into type.
 extern void CommandTransformIntoType(CUnit &unit, wyrmgus::unit_type &type);
 /// Prepare command cancel upgrade to
@@ -247,11 +247,11 @@ extern void SendCommandResource(CUnit &unit, CUnit &dest, int flush);
 /// Send return goods command
 extern void SendCommandReturnGoods(CUnit &unit, CUnit *dest, int flush);
 /// Send train command
-extern void SendCommandTrainUnit(CUnit &unit, wyrmgus::unit_type &what, int player, int flush);
+extern void SendCommandTrainUnit(CUnit &unit, const wyrmgus::unit_type &what, int player, int flush);
 /// Send cancel training command
 extern void SendCommandCancelTraining(CUnit &unit, int slot, const wyrmgus::unit_type *type);
 /// Send upgrade to command
-extern void SendCommandUpgradeTo(CUnit &unit, wyrmgus::unit_type &what, int flush);
+extern void SendCommandUpgradeTo(CUnit &unit, const wyrmgus::unit_type &what, int flush);
 /// Send cancel upgrade to command
 extern void SendCommandCancelUpgradeTo(CUnit &unit);
 //Wyrmgus start

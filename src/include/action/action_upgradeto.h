@@ -62,7 +62,8 @@ private:
 
 class COrder_UpgradeTo final : public COrder
 {
-	friend std::unique_ptr<COrder> COrder::NewActionUpgradeTo(CUnit &unit, wyrmgus::unit_type &type);
+	friend std::unique_ptr<COrder> COrder::NewActionUpgradeTo(CUnit &unit, const wyrmgus::unit_type &type);
+
 public:
 	COrder_UpgradeTo() : COrder(UnitAction::UpgradeTo)
 	{
@@ -90,8 +91,9 @@ public:
 	//Wyrmgus end
 	
 	const wyrmgus::unit_type &GetUnitType() const { return *Type; }
+
 private:
-	wyrmgus::unit_type *Type = nullptr; /// upgrade to this unit-type
+	const wyrmgus::unit_type *Type = nullptr; /// upgrade to this unit-type
 	int Ticks = 0;       /// Ticks to complete
 };
 

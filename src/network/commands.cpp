@@ -528,7 +528,7 @@ void SendCommandReturnGoods(CUnit &unit, CUnit *goal, int flush)
 ** @param what    pointer to unit-type of the unit to be trained.
 ** @param flush   Flag flush all pending commands.
 */
-void SendCommandTrainUnit(CUnit &unit, wyrmgus::unit_type &what, int player, int flush)
+void SendCommandTrainUnit(CUnit &unit, const wyrmgus::unit_type &what, const int player, const int flush)
 {
 	if (!IsNetworkGame()) {
 		//Wyrmgus start
@@ -571,7 +571,7 @@ void SendCommandCancelTraining(CUnit &unit, int slot, const wyrmgus::unit_type *
 ** @param what     pointer to unit-type of the unit upgrade.
 ** @param flush    Flag flush all pending commands.
 */
-void SendCommandUpgradeTo(CUnit &unit, wyrmgus::unit_type &what, int flush)
+void SendCommandUpgradeTo(CUnit &unit, const wyrmgus::unit_type &what, int flush)
 {
 	if (!IsNetworkGame()) {
 		CommandLog("upgrade-to", &unit, flush, -1, -1, NoUnitP, what.Ident.c_str(), -1);

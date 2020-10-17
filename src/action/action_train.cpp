@@ -54,7 +54,7 @@
 /// How many resources the player gets back if canceling training
 static constexpr int CancelTrainingCostsFactor = 100;
 
-std::unique_ptr<COrder> COrder::NewActionTrain(CUnit &trainer, wyrmgus::unit_type &type, int player)
+std::unique_ptr<COrder> COrder::NewActionTrain(CUnit &trainer, const wyrmgus::unit_type &type, int player)
 {
 	auto order = std::make_unique<COrder_Train>();
 
@@ -222,11 +222,12 @@ static void AnimateActionTrain(CUnit &unit)
 		}
 	}
 	//Wyrmgus end
+
 	//Wyrmgus start
 //	CPlayer &player = *unit.Player;
 	CPlayer &player = *CPlayer::Players[this->Player];
 	//Wyrmgus end
-	wyrmgus::unit_type &nType = *this->Type;
+	const wyrmgus::unit_type &nType = *this->Type;
 	const int cost = nType.Stats[player.Index].Costs[TimeCost];
 	
 	//Wyrmgus start
