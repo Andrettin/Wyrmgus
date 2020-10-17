@@ -33,6 +33,7 @@
 
 #include "database/defines.h"
 #include "faction.h"
+#include "item/item_class.h"
 #include "player.h"
 #include "script/condition/condition.h"
 #include "script/trigger.h"
@@ -57,7 +58,11 @@
 #include "video/font_color.h"
 #include "video/video.h"
 
-/* virtual */ int CPopupContentTypeButtonInfo::GetWidth(const wyrmgus::button &button, int *) const
+PopupConditionPanel::PopupConditionPanel() : item_class(wyrmgus::item_class::none)
+{
+}
+
+int CPopupContentTypeButtonInfo::GetWidth(const wyrmgus::button &button, int *) const
 {
 	const wyrmgus::font *font = this->Font ? this->Font : wyrmgus::defines::get()->get_small_font();
 	std::string draw("");
@@ -474,7 +479,7 @@
 	}
 }
 
-CPopupContentTypeLine::CPopupContentTypeLine() : Color(ColorWhite), Width(0), Height(1)
+CPopupContentTypeLine::CPopupContentTypeLine() : Color(ColorWhite)
 {
 }
 
@@ -809,9 +814,9 @@ static std::unique_ptr<PopupConditionPanel> ParsePopupConditions(lua_State *l)
 			int index = UnitTypeVar.BoolFlagNameLookup[key];
 			if (index != -1) {
 				if (!condition->BoolFlags) {
-					size_t new_bool_size = UnitTypeVar.GetNumberBoolFlag();
-					condition->BoolFlags = new char[new_bool_size];
-					memset(condition->BoolFlags, 0, new_bool_size * sizeof(char));
+					const size_t new_bool_size = UnitTypeVar.GetNumberBoolFlag();
+					condition->BoolFlags = std::make_unique<char[]>(new_bool_size);
+					memset(condition->BoolFlags.get(), 0, new_bool_size * sizeof(char));
 				}
 				condition->BoolFlags[index] = Ccl2Condition(l, LuaToString(l, -1));
 				continue;
@@ -819,9 +824,9 @@ static std::unique_ptr<PopupConditionPanel> ParsePopupConditions(lua_State *l)
 			index = UnitTypeVar.VariableNameLookup[key];
 			if (index != -1) {
 				if (!condition->Variables) {
-					size_t new_variables_size = UnitTypeVar.GetNumberVariable();
-					condition->Variables = new char[new_variables_size];
-					memset(condition->Variables, 0, new_variables_size * sizeof(char));
+					const size_t new_variables_size = UnitTypeVar.GetNumberVariable();
+					condition->Variables = std::make_unique<char[]>(new_variables_size);
+					memset(condition->Variables.get(), 0, new_variables_size * sizeof(char));
 				}
 				condition->Variables[index] = Ccl2Condition(l, LuaToString(l, -1));
 				continue;
@@ -898,8 +903,8 @@ std::unique_ptr<CPopupContentType> CPopupContentType::ParsePopupContent(lua_Stat
 }
 
 CPopup::CPopup() :
-	Contents(), MarginX(MARGIN_X *wyrmgus::defines::get()->get_scale_factor()), MarginY(MARGIN_Y *wyrmgus::defines::get()->get_scale_factor()), MinWidth(0), MinHeight(0),
-	DefaultFont(nullptr), BackgroundColor(ColorBlue), BorderColor(ColorWhite)
+	MarginX(MARGIN_X * wyrmgus::defines::get()->get_scale_factor()), MarginY(MARGIN_Y * wyrmgus::defines::get()->get_scale_factor()),
+	BackgroundColor(ColorBlue), BorderColor(ColorWhite)
 {}
 
 CPopup::~CPopup()

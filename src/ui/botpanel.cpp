@@ -474,7 +474,7 @@ static bool CanShowPopupContent(const PopupConditionPanel *condition,
 		return false;
 	}
 
-	if (type && condition->BoolFlags && !type->CheckUserBoolFlags(condition->BoolFlags)) {
+	if (type && condition->BoolFlags && !type->CheckUserBoolFlags(condition->BoolFlags.get())) {
 		return false;
 	}
 
