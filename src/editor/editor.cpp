@@ -49,33 +49,15 @@
 **    @li More random map functions.
 */
 
-/*----------------------------------------------------------------------------
---  Includes
-----------------------------------------------------------------------------*/
-
 #include "stratagus.h"
 
 #include "editor.h"
 
 #include "player.h"
 
-/*----------------------------------------------------------------------------
---  Defines
-----------------------------------------------------------------------------*/
-
-/*----------------------------------------------------------------------------
---  Variables
-----------------------------------------------------------------------------*/
-
-/*----------------------------------------------------------------------------
---  Functions
-----------------------------------------------------------------------------*/
-
 CEditor::CEditor() :
-	TerrainEditable(true),
-	StartUnit(nullptr),
 	UnitIndex(0), CursorUnitIndex(-1), SelectedUnitIndex(-1),
 	TileIndex(0), CursorTileIndex(-1), SelectedTileIndex(-1),
 	CursorPlayer(-1), SelectedPlayer(PlayerNumNeutral),
-	MapLoaded(false), WriteCompressedMaps(true), PopUpX(-1), PopUpY(-1)
+	PopUpX(-1), PopUpY(-1)
 {}

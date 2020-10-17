@@ -73,11 +73,11 @@ public:
 	std::vector<wyrmgus::terrain_type *> ShownTileTypes;        /// Shown editor tile-type table.
 	//Wyrmgus end
 
-	bool TerrainEditable;        /// Is the terrain editable ?
+	bool TerrainEditable = true; /// Is the terrain editable ?
 	IconConfig Select;           /// Editor's select icon.
 	IconConfig Units;            /// Editor's units icon.
 	std::string StartUnitName;   /// name of the Unit used to display the start location.
-	const wyrmgus::unit_type *StartUnit;  /// Unit used to display the start location.
+	const wyrmgus::unit_type *StartUnit = nullptr;  /// Unit used to display the start location.
 
 	int UnitIndex;               /// Unit icon draw index.
 	int CursorUnitIndex;         /// Unit icon under cursor.
@@ -90,8 +90,8 @@ public:
 	int CursorPlayer;            /// Player under the cursor.
 	int SelectedPlayer;          /// Player selected for draw.
 
-	bool MapLoaded;              /// Map loaded in editor
-	bool WriteCompressedMaps;    /// Use compression when saving
+	bool MapLoaded = false;              /// Map loaded in editor
+	bool WriteCompressedMaps = true;    /// Use compression when saving
 
 	EditorRunningType Running;   /// Editor is running
 

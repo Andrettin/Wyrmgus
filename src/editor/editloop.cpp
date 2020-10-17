@@ -125,7 +125,7 @@ static int get_unit_icon_y()
 /// Tile mode icon
 static int get_tile_icon_x()
 {
-	return IconWidth * (2 + 16) * wyrmgus::defines::get()->get_scale_factor();
+	return IconWidth * 2 + 16 * wyrmgus::defines::get()->get_scale_factor();
 }
 
 static int get_tile_icon_y()
@@ -136,7 +136,7 @@ static int get_tile_icon_y()
 /// Start mode icon
 static int get_start_icon_x()
 {
-	return IconWidth * (3 + 16) * wyrmgus::defines::get()->get_scale_factor();
+	return IconWidth * 3 + 16 * wyrmgus::defines::get()->get_scale_factor();
 }
 
 static int get_start_icon_y()
@@ -990,16 +990,17 @@ static void DrawTileIcon(unsigned tilenum, unsigned x, unsigned y, unsigned flag
 static void DrawTileIcons()
 {
 	CLabel label(wyrmgus::defines::get()->get_game_font());
-	int x = UI.InfoPanel.X + 46;
-	int y = UI.InfoPanel.Y + 4 + IconHeight + 11;
+	const int scale_factor = wyrmgus::defines::get()->get_scale_factor();
+	int x = UI.InfoPanel.X + 46 * scale_factor;
+	int y = UI.InfoPanel.Y + 4 * scale_factor + IconHeight + 11 * scale_factor;
 
 	if (CursorOn == cursor_on::button && 300 <= ButtonUnderCursor && ButtonUnderCursor < 306) {
 		//Wyrmgus start
 //		Video.DrawRectangle(ColorGray, x - 42, y - 3 + (ButtonUnderCursor - 300) * 20, 100, 20);
 		if (ButtonUnderCursor <= 303) {
-			Video.DrawRectangle(ColorGray, x - 42, y - 3 + (ButtonUnderCursor - 300) * 20, 100, 20);
+			Video.DrawRectangle(ColorGray, x - 42 * scale_factor, y - 3 * scale_factor + (ButtonUnderCursor - 300) * 20 * scale_factor, 100 * scale_factor, 20 * scale_factor);
 		} else {
-			Video.DrawRectangle(ColorGray, x - 42 + 100, y - 3 + (ButtonUnderCursor - 304) * 20, 100, 20);
+			Video.DrawRectangle(ColorGray, x + (-42 + 100) * scale_factor, y - 3 * scale_factor + (ButtonUnderCursor - 304) * 20 * scale_factor, 100 * scale_factor, 20 * scale_factor);
 		}
 		//Wyrmgus end
 	}
@@ -1009,28 +1010,28 @@ static void DrawTileIcons()
 	} else {
 		label.DrawCentered(x, y, "1x1");
 	}
-	y += 20;
+	y += 20 * scale_factor;
 	if (TileCursorSize == 2) {
 		label.DrawReverseCentered(x, y, "2x2");
 	} else {
 		label.DrawCentered(x, y, "2x2");
 	}
-	y += 20;
+	y += 20 * scale_factor;
 	if (TileCursorSize == 3) {
 		label.DrawReverseCentered(x, y, "3x3");
 	} else {
 		label.DrawCentered(x, y, "3x3");
 	}
-	y += 20;
+	y += 20 * scale_factor;
 	if (TileCursorSize == 4) {
 		label.DrawReverseCentered(x, y, "4x4");
 	} else {
 		label.DrawCentered(x, y, "4x4");
 	}
 	//Wyrmgus start
-//	y += 20;
-	x += 100;
-	y -= 20 * 3;
+//	y += 20 * scale_factor;
+	x += 100 * scale_factor;
+	y -= 20 * 3 * scale_factor;
 	//Wyrmgus end
 	//Wyrmgus start
 	/*
@@ -1046,7 +1047,7 @@ static void DrawTileIcons()
 		label.DrawCentered(x, y, "5x5");
 	}
 	//Wyrmgus end
-	y += 20;
+	y += 20 * scale_factor;
 	//Wyrmgus start
 	/*
 	if (TileToolDecoration) {
@@ -1061,18 +1062,18 @@ static void DrawTileIcons()
 		label.DrawCentered(x, y, "10x10");
 	}
 	//Wyrmgus end
-	y += 20;
+	y += 20 * scale_factor;
 
 	int i = Editor.TileIndex;
 	Assert(Editor.TileIndex != -1);
-	y = UI.ButtonPanel.Y + 24;
+	y = UI.ButtonPanel.Y + 24 * scale_factor;
 	while (y < UI.ButtonPanel.Y + ButtonPanelHeight - wyrmgus::defines::get()->get_scaled_tile_height()) {
 		if (i >= (int)Editor.ShownTileTypes.size()) {
 			break;
 		}
 		//Wyrmgus start
-//		x = UI.ButtonPanel.X + 10;
-		x = UI.ButtonPanel.X + 10 + 6;
+//		x = UI.ButtonPanel.X + 10 * scale_factor;
+		x = UI.ButtonPanel.X + (10 + 6) * scale_factor;
 		//Wyrmgus end
 		while (x < UI.ButtonPanel.X + ButtonPanelWidth - wyrmgus::defines::get()->get_scaled_tile_width()) {
 			if (i >= (int) Editor.ShownTileTypes.size()) {
@@ -1103,23 +1104,25 @@ static void DrawTileIcons()
 			}
 
 			//Wyrmgus start
-//			x += wyrmgus::defines::get()->get_scaled_tile_width() + 8;
-			x += wyrmgus::defines::get()->get_scaled_tile_width() + 30; // to allow 5 tile types per row with the new UI
+//			x += wyrmgus::defines::get()->get_scaled_tile_width() + 8 * scale_factor;
+			x += wyrmgus::defines::get()->get_scaled_tile_width() + 30 * scale_factor; // to allow 5 tile types per row with the new UI
 			//Wyrmgus end
 			++i;
 		}
 		//Wyrmgus start
-//		y += wyrmgus::defines::get()->get_scaled_tile_height() + 2;
-		y += wyrmgus::defines::get()->get_scaled_tile_height() + 18; // make this space a little larger (as large as the space between the top of the panel and the first icon, minus the parts of the panel which are "lower" so to speak)
+//		y += wyrmgus::defines::get()->get_scaled_tile_height() + 2 * scale_factor;
+		y += wyrmgus::defines::get()->get_scaled_tile_height() + 18 * scale_factor; // make this space a little larger (as large as the space between the top of the panel and the first icon, minus the parts of the panel which are "lower" so to speak)
 		//Wyrmgus end
 	}
 }
 
 static void DrawEditorPanel_SelectIcon()
 {
+	const int scale_factor = wyrmgus::defines::get()->get_scale_factor();
+
 	//Wyrmgus start
 //	const PixelPos pos(UI.InfoPanel.X + 4, UI.InfoPanel.Y + 4);
-	const PixelPos pos(UI.InfoPanel.X + 11, UI.InfoPanel.Y + 7);
+	const PixelPos pos(UI.InfoPanel.X + 11 * scale_factor, UI.InfoPanel.Y + 7 * scale_factor);
 	//Wyrmgus end
 	wyrmgus::icon *icon = Editor.Select.Icon;
 	Assert(icon);
@@ -2056,36 +2059,38 @@ static bool EditorCallbackMouse_EditUnitArea(const PixelPos &screenPos)
 
 static bool EditorCallbackMouse_EditTileArea(const PixelPos &screenPos)
 {
+	const int scale_factor = wyrmgus::defines::get()->get_scale_factor();
+
 	//Wyrmgus start
 //	int bx = UI.InfoPanel.X + 4;
-	int bx = UI.InfoPanel.X + 11;
+	int bx = UI.InfoPanel.X + 11 * scale_factor;
 	//Wyrmgus end
-	int by = UI.InfoPanel.Y + 4 + IconHeight + 10;
+	int by = UI.InfoPanel.Y + 4 * scale_factor + IconHeight + 10 * scale_factor;
 
 	for (int i = 0; i < 6; ++i) {
-		if (bx < screenPos.x && screenPos.x < bx + 100 && by < screenPos.y && screenPos.y < by + 18) {
+		if (bx < screenPos.x && screenPos.x < bx + 100 * scale_factor && by < screenPos.y && screenPos.y < by + 18 * scale_factor) {
 			ButtonUnderCursor = i + 300;
 			CursorOn = cursor_on::button;
 			return true;
 		}
-		by += 20;
+		by += 20 * scale_factor;
 		//Wyrmgus start
 		if (i == 3) {
-			by = UI.InfoPanel.Y + 4 + IconHeight + 10;
-			bx += 100;
+			by = UI.InfoPanel.Y + 4 * scale_factor + IconHeight + 10 * scale_factor;
+			bx += 100 * scale_factor;
 		}
 		//Wyrmgus end
 	}
 
 	int i = Editor.TileIndex;
-	by = UI.ButtonPanel.Y + 24;
+	by = UI.ButtonPanel.Y + 24 * scale_factor;
 	while (by < UI.ButtonPanel.Y + ButtonPanelHeight - wyrmgus::defines::get()->get_scaled_tile_height()) {
 		if (i >= (int)Editor.ShownTileTypes.size()) {
 			break;
 		}
 		//Wyrmgus start
 //		bx = UI.ButtonPanel.X + 10;
-		bx = UI.ButtonPanel.X + 10 + 6;
+		bx = UI.ButtonPanel.X + (10 + 6) * scale_factor;
 		//Wyrmgus end
 		while (bx < UI.ButtonPanel.X + ButtonPanelWidth - wyrmgus::defines::get()->get_scaled_tile_width()) {
 			if (i >= (int)Editor.ShownTileTypes.size()) {
@@ -2105,13 +2110,13 @@ static bool EditorCallbackMouse_EditTileArea(const PixelPos &screenPos)
 			}
 			//Wyrmgus start
 //			bx += wyrmgus::defines::get()->get_scaled_tile_width() + 8;
-			bx += wyrmgus::defines::get()->get_scaled_tile_width() + 30;
+			bx += wyrmgus::defines::get()->get_scaled_tile_width() + 30 * scale_factor;
 			//Wyrmgus end
 			i++;
 		}
 		//Wyrmgus start
 //		by += wyrmgus::defines::get()->get_scaled_tile_height() + 2;
-		by += wyrmgus::defines::get()->get_scaled_tile_height() + 18;
+		by += wyrmgus::defines::get()->get_scaled_tile_height() + 18 * scale_factor;
 		//Wyrmgus end
 	}
 	return false;
@@ -2254,7 +2259,7 @@ static void EditorCallbackMouse(const PixelPos &pos)
 	if (UI.InfoPanel.X + 11 * scale_factor < CursorScreenPos.x
 		&& CursorScreenPos.x < UI.InfoPanel.X + 11 * scale_factor + Editor.Select.Icon->get_graphics()->Width
 		&& UI.InfoPanel.Y + 7 * scale_factor < CursorScreenPos.y
-		&& CursorScreenPos.y < UI.InfoPanel.Y + 7 * scale_factor + Editor.Select.Icon->get_graphics()->Width) {
+		&& CursorScreenPos.y < UI.InfoPanel.Y + 7 * scale_factor + Editor.Select.Icon->get_graphics()->Height) {
 		// FIXME: what is this button?
 		ButtonAreaUnderCursor = -1;
 		ButtonUnderCursor = SelectButton;
@@ -2469,8 +2474,9 @@ void CEditor::Init()
 //	ButtonPanelWidth = 170;//200;
 //	ButtonPanelHeight = 160 + (Video.Height - 480);
 	// adapt to new UI size, should make this more scriptable
-	ButtonPanelWidth = 243;
-	ButtonPanelHeight = 186;
+	const int scale_factor = wyrmgus::defines::get()->get_scale_factor();
+	ButtonPanelWidth = 243 * scale_factor;
+	ButtonPanelHeight = 186 * scale_factor;
 	//Wyrmgus end
 
 	CalculateMaxIconSize();
