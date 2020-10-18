@@ -1513,7 +1513,7 @@ static void AiProduceResources()
 			}
 		}
 
-		if (!chosen_resource && unit.Type->GivesResource) { // don't toggle off resource production if a building should always have a resource produced
+		if (!chosen_resource && unit.Type->get_given_resource() != nullptr) { // don't toggle off resource production if a building should always have a resource produced
 			continue;
 		}
 
@@ -2175,7 +2175,7 @@ static void AiCheckPathwayConstruction()
 				}
 			}
 
-			if (unit.Type->GivesResource) { //if is a mine, build pathways to the depot as well
+			if (unit.Type->get_given_resource() != nullptr) { //if is a mine, build pathways to the depot as well
 				const CUnit *depot = FindDepositNearLoc(*unit.Player, unit.tilePos + Vec2i((unit.Type->get_tile_size() - QSize(1, 1)) / 2), 32, unit.GivesResource, unit.MapLayer->ID);
 				if (depot) {
 					//create a worker to test the path; the worker can't be a rail one, or the path construction won't work

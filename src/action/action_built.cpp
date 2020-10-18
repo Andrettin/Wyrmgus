@@ -222,7 +222,7 @@ static void Finish(COrder_Built &order, CUnit &unit)
 	for (size_t i = 0; i != table.size(); ++i) {
 		if (table[i]->CurrentAction() == UnitAction::Repair && table[i]->CurrentOrder()->GetGoal() == &unit) {
 			// If we can harvest from the new building, do it.
-			if (table[i]->Type->ResInfo[type.GivesResource]) {
+			if (type.get_given_resource() != nullptr && table[i]->Type->ResInfo[type.get_given_resource()->get_index()] != nullptr) {
 				CommandResource(*table[i], unit, 0);
 			}
 			// If we can reurn goods to a new depot, do it.
@@ -255,7 +255,7 @@ static void Finish(COrder_Built &order, CUnit &unit)
 			DropOutOnSide(*worker, LookingW, &unit);
 
 			// If we can harvest from the new building, do it.
-			if (worker->Type->ResInfo[type.GivesResource]) {
+			if (type.get_given_resource() != nullptr && worker->Type->ResInfo[type.get_given_resource()->get_index()] != nullptr) {
 				CommandResource(*worker, unit, 0);
 			}
 			// If we can reurn goods to a new depot, do it.
@@ -281,7 +281,7 @@ static void Finish(COrder_Built &order, CUnit &unit)
 	}
 			
 //	if (type.GivesResource && type.StartingResources != 0) {
-	if (type.GivesResource) {
+	if (type.get_given_resource() != nullptr) {
 	//Wyrmgus end
 		// Has StartingResources, Use those
 		//Wyrmgus start
@@ -289,7 +289,7 @@ static void Finish(COrder_Built &order, CUnit &unit)
 		if (type.StartingResources.size() > 0) {
 			unit.SetResourcesHeld(type.StartingResources[SyncRand(type.StartingResources.size())]);
 		}
-		unit.GivesResource = type.GivesResource;
+		unit.GivesResource = type.get_given_resource()->get_index();
 		//Wyrmgus end
 	}
 

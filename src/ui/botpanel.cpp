@@ -2111,7 +2111,7 @@ void CButtonPanel::DoClicked_ProduceResource(int button)
 	const int resource = CurrentButtons[button]->Value;
 	if (resource != Selected[0]->GivesResource) {
 		SendCommandProduceResource(*Selected[0], resource);
-	} else if (!Selected[0]->Type->GivesResource) { //if resource production button was clicked when it was already active, then this means it should be toggled off; only do this if the building's type doesn't have a default produced resource, though, since in those cases it should always produce a resource
+	} else if (Selected[0]->Type->get_given_resource() == nullptr) { //if resource production button was clicked when it was already active, then this means it should be toggled off; only do this if the building's type doesn't have a default produced resource, though, since in those cases it should always produce a resource
 		SendCommandProduceResource(*Selected[0], 0);
 	}
 }

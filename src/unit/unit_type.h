@@ -66,6 +66,7 @@ namespace wyrmgus {
 	class missile_type;
 	class plane;
 	class player_color;
+	class resource;
 	class species;
 	class spell;
 	class terrain_type;
@@ -778,6 +779,7 @@ class unit_type final : public detailed_data_entry, public data_type<unit_type>,
 	Q_PROPERTY(wyrmgus::item_class item_class MEMBER item_class READ get_item_class)
 	Q_PROPERTY(wyrmgus::unit_type* corpse_type MEMBER corpse_type READ get_corpse_type)
 	Q_PROPERTY(wyrmgus::construction* construction MEMBER construction READ get_construction)
+	Q_PROPERTY(wyrmgus::resource* given_resource MEMBER given_resource)
 
 public:
 	static constexpr const char *class_identifier = "unit_type";
@@ -977,6 +979,11 @@ public:
 	const std::string &get_button_key() const
 	{
 		return this->button_key;
+	}
+
+	const resource *get_given_resource() const
+	{
+		return this->given_resource;
 	}
 
 	const std::vector<std::unique_ptr<unit_type_variation>> &get_variations() const
@@ -1182,7 +1189,9 @@ public:
 	std::vector<BoolFlags> BoolFlag;
 
 	int CanStore[MaxCosts];             /// Resources that we can store here.
-	int GivesResource;                  /// The resource this unit gives.
+private:
+	resource *given_resource = nullptr; //the resource this unit gives
+public:
 	//Wyrmgus start
 	int GrandStrategyProductionEfficiencyModifier[MaxCosts];	/// production modifier for a particular resource for grand strategy mode (used for buildings)
 	//Wyrmgus end

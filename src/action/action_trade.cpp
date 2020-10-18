@@ -229,12 +229,12 @@ std::unique_ptr<COrder> COrder::NewActionTrade(CUnit &dest, CUnit &home_market)
 					if (unit.Player == CPlayer::GetThisPlayer()) {
 						unit.Player->Notify(NotifyGreen, unit.tilePos, unit.MapLayer->ID, _("%s consumed %s: %s"), unit.GetMessageName().c_str(), goal_name.c_str(), GetUpgradeEffectsString(goal->Elixir->get_identifier()).c_str());
 					}
-				} else if (goal->Type->GivesResource && goal->ResourcesHeld > 0) {
+				} else if (goal->Type->get_given_resource() != nullptr && goal->ResourcesHeld > 0) {
 					if (unit.Player == CPlayer::GetThisPlayer()) {
-						unit.Player->Notify(NotifyGreen, unit.tilePos, unit.MapLayer->ID, _("Gained %d %s"), goal->ResourcesHeld, DefaultResourceNames[goal->Type->GivesResource].c_str());
+						unit.Player->Notify(NotifyGreen, unit.tilePos, unit.MapLayer->ID, _("Gained %d %s"), goal->ResourcesHeld, DefaultResourceNames[goal->Type->get_given_resource()->get_index()].c_str());
 					}
-					unit.Player->change_resource(wyrmgus::resource::get_all()[goal->Type->GivesResource], goal->ResourcesHeld);
-					unit.Player->TotalResources[goal->Type->GivesResource] += (goal->ResourcesHeld * unit.Player->Incomes[goal->Type->GivesResource]) / 100;
+					unit.Player->change_resource(goal->Type->get_given_resource(), goal->ResourcesHeld);
+					unit.Player->TotalResources[goal->Type->get_given_resource()->get_index()] += (goal->ResourcesHeld * unit.Player->Incomes[goal->Type->get_given_resource()->get_index()]) / 100;
 				} else if (goal->Variable[HITPOINTHEALING_INDEX].Value > 0) {
 					int hp_healed = std::min(goal->Variable[HITPOINTHEALING_INDEX].Value, (unit.GetModifiedVariable(HP_INDEX, VariableMax) - unit.Variable[HP_INDEX].Value));
 					if (unit.Player == CPlayer::GetThisPlayer()) {

@@ -472,8 +472,8 @@ UStrInt GetComponent(const wyrmgus::unit_type &type, int index, EnumVariable e, 
 		case VariableName:
 			if (index == GIVERESOURCE_INDEX) {
 				val.type = USTRINT_STR;
-				val.i = type.GivesResource;
-				val.s = DefaultResourceNames[type.GivesResource].c_str();
+				val.i = type.get_given_resource() != nullptr ? type.get_given_resource()->get_index() : 0;
+				val.s = DefaultResourceNames[type.get_given_resource()->get_index()].c_str();
 			} else {
 				val.type = USTRINT_STR;
 				val.i = index;
@@ -1961,7 +1961,7 @@ static void InfoPanel_draw_single_selection(CUnit *selUnit)
 		&& (unit.CurrentAction() != UnitAction::Research || static_cast<COrder_Research *>(unit.CurrentOrder())->GetUpgrade().Costs[TimeCost] == 0)
 		&& unit.CurrentAction() != UnitAction::Built
 		&& !unit.IsEnemy(*CPlayer::GetThisPlayer())
-		&& (unit.Player->Type != PlayerNeutral || unit.Type->GivesResource)
+		&& (unit.Player->Type != PlayerNeutral || unit.Type->get_given_resource() != nullptr)
 	) {
 		wyrmgus::defines::get()->get_infopanel_frame_graphics()->DrawClip(UI.InfoPanel.X - 4 * wyrmgus::defines::get()->get_scale_factor(), UI.InfoPanel.Y + 93 * wyrmgus::defines::get()->get_scale_factor());
 	}

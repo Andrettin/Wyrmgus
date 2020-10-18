@@ -307,7 +307,7 @@ private:
 bool HallPlaceFinder::IsAUsableMine(const CUnit &mine) const
 {
 	//Wyrmgus start
-	if (!mine.Type->BoolFlag[BUILDING_INDEX].value || !mine.Type->GivesResource) {
+	if (!mine.Type->BoolFlag[BUILDING_INDEX].value || mine.Type->get_given_resource() == nullptr) {
 		return false; //if isn't a building, then it isn't a mine, but a metal rock/resource pile, which is not attractive enough to build a hall nearby; if its type doesn't give a resource, then it isn't a mine but an industrial building, which should already be in a settlement
 	}
 	//Wyrmgus end
@@ -653,7 +653,7 @@ bool AiFindBuildingPlace(const CUnit &worker, const wyrmgus::unit_type &type, co
 			//mines
 			//Wyrmgus start
 //			if (type.GivesResource == i) {
-			if (type.GivesResource == i && type.GivesResource != TradeCost) {
+			if (type.get_given_resource() != nullptr && type.get_given_resource()->get_index() == i && type.get_given_resource()->get_index() != TradeCost) {
 			//Wyrmgus end
 				if (resinfo) {
 					//Mine have to be build ONTOP resources

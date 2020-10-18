@@ -511,7 +511,7 @@ unit_type::unit_type(const std::string &identifier) : detailed_data_entry(identi
 	ExplodeWhenKilled(0),
 	CanAttack(0),
 	Neutral(0),
-	GivesResource(0), PoisonDrain(0), FieldFlags(0), MovementMask(0),
+	PoisonDrain(0), FieldFlags(0), MovementMask(0),
 	//Wyrmgus start
 	Elixir(nullptr),
 //	Sprite(nullptr), ShadowSprite(nullptr)
@@ -1545,7 +1545,7 @@ void unit_type::set_parent(const unit_type *parent_type)
 	this->NeutralMinimapColorRGB = parent_type->NeutralMinimapColorRGB;
 	this->RandomMovementProbability = parent_type->RandomMovementProbability;
 	this->RandomMovementDistance = parent_type->RandomMovementDistance;
-	this->GivesResource = parent_type->GivesResource;
+	this->given_resource = parent_type->given_resource;
 	this->RequirementsString = parent_type->RequirementsString;
 	this->ExperienceRequirementsString = parent_type->ExperienceRequirementsString;
 	this->BuildingRulesString = parent_type->BuildingRulesString;

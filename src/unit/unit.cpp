@@ -2825,8 +2825,8 @@ void CUnit::Init(const wyrmgus::unit_type &type)
 	// Has StartingResources, Use those
 	//Wyrmgus start
 //	this->ResourcesHeld = type.StartingResources;
-	if (type.GivesResource) {
-		this->GivesResource = type.GivesResource;
+	if (type.get_given_resource() != nullptr) {
+		this->GivesResource = type.get_given_resource()->get_index();
 		if (type.StartingResources.size() > 0) {
 			this->ResourcesHeld = type.StartingResources[SyncRand(type.StartingResources.size())];
 		} else {
@@ -4184,7 +4184,7 @@ void UnitLost(CUnit &unit)
 	if (b != nullptr) {
 		//Wyrmgus start
 //		if (b->ReplaceOnDie && (type.GivesResource && unit.ResourcesHeld != 0)) {
-		if (b->ReplaceOnDie && (!type.GivesResource || unit.ResourcesHeld != 0)) {
+		if (b->ReplaceOnDie && (type.get_given_resource() == nullptr || unit.ResourcesHeld != 0)) {
 		//Wyrmgus end
 			CUnit *temp = MakeUnitAndPlace(unit.tilePos, *b->Parent, CPlayer::Players[PlayerNumNeutral], unit.MapLayer->ID);
 			if (temp == nullptr) {
@@ -4220,7 +4220,7 @@ void UnitLost(CUnit &unit)
 						CMap::Map.add_settlement_unit(temp);
 					}
 				}
-				if (type.GivesResource && unit.ResourcesHeld != 0) {
+				if (type.get_given_resource() != nullptr && unit.ResourcesHeld != 0) {
 					temp->SetResourcesHeld(unit.ResourcesHeld);
 					temp->Variable[GIVERESOURCE_INDEX].Value = unit.Variable[GIVERESOURCE_INDEX].Value;
 					temp->Variable[GIVERESOURCE_INDEX].Max = unit.Variable[GIVERESOURCE_INDEX].Max;

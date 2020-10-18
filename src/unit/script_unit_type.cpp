@@ -1414,9 +1414,8 @@ static int CclDefineUnitType(lua_State *l)
 			}
 			type->BoolFlag[HARVESTER_INDEX].value = 1;
 		} else if (!strcmp(value, "GivesResource")) {
-			lua_pushvalue(l, -1);
-			type->GivesResource = CclGetResourceByName(l);
-			lua_pop(l, 1);
+			const std::string resource_identifier = LuaToString(l, -1);
+			type->given_resource = wyrmgus::resource::get(resource_identifier);
 		} else if (!strcmp(value, "CanStore")) {
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument");
@@ -2237,8 +2236,8 @@ static int CclGetUnitTypeData(lua_State *l)
 		lua_pushboolean(l, type->LandUnit);
 		return 1;
 	} else if (!strcmp(data, "GivesResource")) {
-		if (type->GivesResource > 0) {
-			lua_pushstring(l, DefaultResourceNames[type->GivesResource].c_str());
+		if (type->get_given_resource() != nullptr) {
+			lua_pushstring(l, type->get_given_resource()->get_identifier().c_str());
 			return 1;
 		} else {
 			lua_pushstring(l, "");

@@ -520,7 +520,7 @@ static void EditorActionPlaceUnit(const Vec2i &pos, const wyrmgus::unit_type &ty
 		}
 	}
 	if (unit != nullptr) {
-		if (type.GivesResource) {
+		if (type.get_given_resource() != nullptr) {
 			//Wyrmgus start
 //			if (type.StartingResources != 0) {
 			if (type.StartingResources.size() > 0) {
@@ -534,9 +534,9 @@ static void EditorActionPlaceUnit(const Vec2i &pos, const wyrmgus::unit_type &ty
 				unit->Variable[GIVERESOURCE_INDEX].Max = unit->ResourcesHeld;
 				//Wyrmgus end
 			} else {
-				unit->SetResourcesHeld(wyrmgus::resource::get_all()[type.GivesResource]->get_default_amount());
-				unit->Variable[GIVERESOURCE_INDEX].Value = wyrmgus::resource::get_all()[type.GivesResource]->get_default_amount();
-				unit->Variable[GIVERESOURCE_INDEX].Max = wyrmgus::resource::get_all()[type.GivesResource]->get_default_amount();
+				unit->SetResourcesHeld(type.get_given_resource()->get_default_amount());
+				unit->Variable[GIVERESOURCE_INDEX].Value = type.get_given_resource()->get_default_amount();
+				unit->Variable[GIVERESOURCE_INDEX].Max = type.get_given_resource()->get_default_amount();
 			}
 			unit->Variable[GIVERESOURCE_INDEX].Enable = 1;
 		}
@@ -1457,7 +1457,7 @@ static void ShowUnitInfo(const CUnit &unit)
 					unit.GetTypeName().c_str(), (unit.Player->Index == PlayerNumNeutral) ? 16 : unit.Player->Index + 1,
 					//Wyrmgus end
 					unit.Active ? "active" : "passive");
-	if (unit.Type->GivesResource) {
+	if (unit.Type->get_given_resource() != nullptr) {
 		sprintf(buf + n, _(" Amount %d"), unit.ResourcesHeld);
 	}
 	UI.StatusLine.Set(buf);

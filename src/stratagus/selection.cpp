@@ -808,7 +808,7 @@ int SelectUnitsInRectangle(const PixelPos &corner_topleft, const PixelPos &corne
 		if (type.BoolFlag[BUILDING_INDEX].value && !unit.IsVisibleOnMap(*CPlayer::GetThisPlayer())) {
 			continue;
 		}
-		if ((type.GivesResource && !unit.Removed)) { // no built resources.
+		if ((type.get_given_resource() != nullptr && !unit.Removed)) { // no built resources.
 			SelectSingleUnit(unit);
 			return 1;
 		}

@@ -603,7 +603,7 @@ VisitResult ResourceUnitFinder::Visit(TerrainTraversal &terrainTraversal, const 
 //	CUnit *mine = Map.Field(pos)->UnitCache.find(res_finder);
 	CUnit *mine = worker.MapLayer->Field(pos)->UnitCache.find(res_finder);
 	
-	if (worker.MapLayer->Field(pos)->get_owner() != nullptr && worker.MapLayer->Field(pos)->get_owner() != worker.Player && !worker.MapLayer->Field(pos)->get_owner()->HasNeutralFactionType() && !worker.Player->HasNeutralFactionType() && (!mine || mine->Type->GivesResource != TradeCost)) {
+	if (worker.MapLayer->Field(pos)->get_owner() != nullptr && worker.MapLayer->Field(pos)->get_owner() != worker.Player && !worker.MapLayer->Field(pos)->get_owner()->HasNeutralFactionType() && !worker.Player->HasNeutralFactionType() && (!mine || mine->Type->get_given_resource()->get_index() != TradeCost)) {
 		return VisitResult::DeadEnd;
 	}
 	//Wyrmgus end

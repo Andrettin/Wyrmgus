@@ -976,7 +976,7 @@ int WriteMapSetup(const char *mapSetup, CMap &map, int writeTerrain, bool is_mod
 					  unit.Type->Ident.c_str(),
 					  unit.Player->Index,
 					  unit.tilePos.x, unit.tilePos.y);
-			if (unit.Type->GivesResource) {
+			if (unit.Type->get_given_resource() != nullptr) {
 				f->printf("SetResourcesHeld(unit, %d)\n", unit.ResourcesHeld);
 			}
 			if (!unit.Active) { //Active is true by default
@@ -1003,7 +1003,7 @@ int WriteMapSetup(const char *mapSetup, CMap &map, int writeTerrain, bool is_mod
 						  unit.Type->Ident.c_str(),
 						  unit.Player->Index,
 						  unit.tilePos.x, unit.tilePos.y);
-				if (unit.Type->GivesResource) {
+				if (unit.Type->get_given_resource() != nullptr) {
 					f->printf("SetResourcesHeld(unit, %d)\n", unit.ResourcesHeld);
 				}
 				if (!unit.Active) { //Active is true by default

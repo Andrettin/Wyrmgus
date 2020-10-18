@@ -971,7 +971,7 @@ void map_template::Apply(const QPoint &template_start_pos, const QPoint &map_sta
 	}
 	
 	for (size_t i = 0; i < this->GeneratedNeutralUnits.size(); ++i) {
-		bool grouped = this->GeneratedNeutralUnits[i].first->GivesResource && this->GeneratedNeutralUnits[i].first->get_tile_width() == 1 && this->GeneratedNeutralUnits[i].first->get_tile_height() == 1; // group small resources
+		const bool grouped = this->GeneratedNeutralUnits[i].first->get_given_resource() != nullptr && this->GeneratedNeutralUnits[i].first->get_tile_width() == 1 && this->GeneratedNeutralUnits[i].first->get_tile_height() == 1; // group small resources
 		CMap::Map.GenerateNeutralUnits(this->GeneratedNeutralUnits[i].first, this->GeneratedNeutralUnits[i].second, map_start_pos, map_end - Vec2i(1, 1), grouped, z);
 	}
 

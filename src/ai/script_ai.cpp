@@ -275,10 +275,11 @@ static std::vector<wyrmgus::unit_type *> getMineUnits()
 	std::vector<wyrmgus::unit_type *> res;
 
 	for (wyrmgus::unit_type *unit_type : wyrmgus::unit_type::get_all()) {
-		if (unit_type->GivesResource > 0 && unit_type->BoolFlag[CANHARVEST_INDEX].value) {
+		if (unit_type->get_given_resource() != nullptr && unit_type->BoolFlag[CANHARVEST_INDEX].value) {
 			res.push_back(unit_type);
 		}
 	}
+
 #if 0
 	std::vector<wyrmgus::unit_type *> sorted_res;
 	// Now, sort them, best first.
@@ -385,7 +386,7 @@ static void InitAiHelper(AiHelper &aiHelper)
 
 	for (int i = 1; i < MaxCosts; ++i) {
 		for (std::vector<wyrmgus::unit_type *>::const_iterator j = mineUnits.begin(); j != mineUnits.end(); ++j) {
-			if ((*j)->GivesResource == i) {
+			if ((*j)->get_given_resource()->get_index() == i) {
 				AiHelperInsert(aiHelper.Mines, i, **j);
 			}
 		}
