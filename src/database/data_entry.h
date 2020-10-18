@@ -45,7 +45,7 @@ class data_entry : public QObject
 	Q_PROPERTY(QString identifier READ get_identifier_qstring CONSTANT)
 
 public:
-	data_entry(const std::string &identifier) : identifier(identifier)
+	explicit data_entry(const std::string &identifier) : identifier(identifier)
 	{
 	}
 

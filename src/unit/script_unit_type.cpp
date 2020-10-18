@@ -1597,6 +1597,8 @@ static int CclDefineUnitType(lua_State *l)
 			std::string faction_name = LuaToString(l, -1);
 			wyrmgus::faction *faction = wyrmgus::faction::get(faction_name);
 			type->Faction = faction->ID;
+		} else if (!strcmp(value, "Notes")) {
+			type->set_notes(LuaToString(l, -1));
 		} else if (!strcmp(value, "Description")) {
 			type->set_description(LuaToString(l, -1));
 		} else if (!strcmp(value, "Quote")) {
@@ -2032,6 +2034,9 @@ static int CclGetUnitTypeData(lua_State *l)
 		} else {
 			lua_pushstring(l, "");
 		}
+		return 1;
+	} else if (!strcmp(data, "Notes")) {
+		lua_pushstring(l, type->get_notes().c_str());
 		return 1;
 	} else if (!strcmp(data, "Description")) {
 		lua_pushstring(l, type->get_description().c_str());

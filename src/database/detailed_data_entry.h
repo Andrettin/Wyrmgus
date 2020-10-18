@@ -40,16 +40,32 @@ class detailed_data_entry : public named_data_entry
 {
 	Q_OBJECT
 
+	Q_PROPERTY(QString notes READ get_notes_qstring)
 	Q_PROPERTY(QString description READ get_description_qstring)
 	Q_PROPERTY(QString quote READ get_quote_qstring)
 	Q_PROPERTY(QString background READ get_background_qstring)
 
 public:
-	detailed_data_entry(const std::string &identifier) : named_data_entry(identifier)
+	explicit detailed_data_entry(const std::string &identifier) : named_data_entry(identifier)
 	{
 	}
 
 	virtual ~detailed_data_entry() {}
+
+	const std::string &get_notes() const
+	{
+		return this->notes;
+	}
+
+	Q_INVOKABLE void set_notes(const std::string &notes)
+	{
+		this->notes = notes;
+	}
+
+	QString get_notes_qstring() const
+	{
+		return QString::fromStdString(this->get_notes());
+	}
 
 	const std::string &get_description() const
 	{
@@ -97,6 +113,7 @@ public:
 	}
 
 private:
+	std::string notes; //gameplay-related notes about the data entry
 	std::string description; //description from an in-universe perspective
 	std::string quote; //quote related to the data entry
 	std::string background; //encyclopedia text from the perspective of outside the game universe

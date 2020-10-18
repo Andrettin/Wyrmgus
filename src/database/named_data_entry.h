@@ -42,7 +42,7 @@ class named_data_entry : public data_entry
 	Q_PROPERTY(QString name READ get_name_qstring)
 
 public:
-	named_data_entry(const std::string &identifier) : data_entry(identifier)
+	explicit named_data_entry(const std::string &identifier) : data_entry(identifier)
 	{
 	}
 
