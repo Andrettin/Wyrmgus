@@ -586,6 +586,8 @@ public:
 		return QGeoRectangle(QGeoCoordinate(this->get_max_latitude(), this->get_min_longitude()), QGeoCoordinate(this->get_min_latitude(), this->get_max_longitude()));
 	}
 
+	QPoint get_geocoordinate_pos(const QGeoCoordinate &geocoordinate) const;
+
 	void save_terrain_image(const std::string &filename, const bool overlay, const terrain_geodata_map &terrain_data) const;
 	void save_territory_image(const std::string &filename, const std::map<const site *, std::vector<std::unique_ptr<QGeoShape>>> &territory_data) const;
 	

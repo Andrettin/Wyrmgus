@@ -1771,12 +1771,12 @@ void map_template::apply_historical_unit(const historical_unit *historical_unit,
 		return;
 	}
 
-	const bool in_another_map_template = historical_unit->get_location()->map_template != this;
+	const bool in_another_map_template = historical_unit->get_location()->get_map_template() != this;
 	if (in_another_map_template) {
 		return;
 	}
 
-	if (historical_unit->get_location()->Position.x != -1 && historical_unit->get_location()->Position.y != -1 && !this->contains_pos(historical_unit->get_location()->Position)) {
+	if (historical_unit->get_location()->get_pos().x() != -1 && historical_unit->get_location()->get_pos().y() != -1 && !this->contains_pos(historical_unit->get_location()->get_pos())) {
 		return;
 	}
 
@@ -1861,12 +1861,12 @@ void map_template::apply_character(character *character, const QPoint &template_
 		return;
 	}
 
-	const bool in_another_map_template = character->get_location()->map_template != this;
+	const bool in_another_map_template = character->get_location()->get_map_template() != this;
 	if (in_another_map_template) {
 		return;
 	}
 
-	if (character->get_location()->Position.x != -1 && character->get_location()->Position.y != -1 && !this->contains_pos(character->get_location()->Position)) {
+	if (character->get_location()->get_pos().x() != -1 && character->get_location()->get_pos().y() != -1 && !this->contains_pos(character->get_location()->get_pos())) {
 		return;
 	}
 
@@ -2199,12 +2199,12 @@ Vec2i map_template::get_best_location_map_position(const std::vector<std::unique
 	for (int i = ((int) historical_location_list.size() - 1); i >= 0; --i) {
 		const std::unique_ptr<historical_location> &historical_location = historical_location_list[i];
 		if (historical_location->Date.Year == 0 || start_date.ContainsDate(historical_location->Date)) {
-			if (historical_location->map_template == this) {
-				if (historical_location->Position.x != -1 && historical_location->Position.y != -1) { //historical unit position, could also have been inherited from a site with a fixed position
-					pos = map_start_pos + historical_location->Position - template_start_pos;
+			if (historical_location->get_map_template() == this) {
+				if (historical_location->get_pos().x() != -1 && historical_location->get_pos().y() != -1) { //historical unit position, could also have been inherited from a site with a fixed position
+					pos = map_start_pos + historical_location->get_pos() - template_start_pos;
 				} else if (random) {
-					if (historical_location->site != nullptr && historical_location->site->get_site_unit() != nullptr) { //sites with random positions will have no valid stored fixed position, but will have had a site unit randomly placed; use that site unit's position instead for this unit then
-						pos = historical_location->site->get_site_unit()->get_center_tile_pos();
+					if (historical_location->get_site() != nullptr && historical_location->get_site()->get_site_unit() != nullptr) { //sites with random positions will have no valid stored fixed position, but will have had a site unit randomly placed; use that site unit's position instead for this unit then
+						pos = historical_location->get_site()->get_site_unit()->get_center_tile_pos();
 					}
 				}
 			} else {
@@ -2222,17 +2222,22 @@ QPoint map_template::get_location_map_position(const std::unique_ptr<historical_
 	//get a map position for a historical location
 	QPoint pos(-1, -1);
 	
-	if (historical_location->map_template == this) {
-		if (historical_location->Position.x != -1 && historical_location->Position.y != -1) { //historical unit position, could also have been inherited from a site with a fixed position
-			return map_start_pos + historical_location->Position - template_start_pos;
+	if (historical_location->get_map_template() == this) {
+		if (historical_location->get_pos().x() != -1 && historical_location->get_pos().y() != -1) { //historical unit position, could also have been inherited from a site with a fixed position
+			return map_start_pos + historical_location->get_pos() - template_start_pos;
 		} else if (random) {
-			if (historical_location->site != nullptr && historical_location->site->get_site_unit() != nullptr) { //sites with random positions will have no valid stored fixed position, but will have had a site unit randomly placed; use that site unit's position instead for this unit then
-				return historical_location->site->get_site_unit()->get_center_tile_pos();
+			if (historical_location->get_site() != nullptr && historical_location->get_site()->get_site_unit() != nullptr) { //sites with random positions will have no valid stored fixed position, but will have had a site unit randomly placed; use that site unit's position instead for this unit then
+				return historical_location->get_site()->get_site_unit()->get_center_tile_pos();
 			}
 		}
 	}
 
 	return QPoint(-1, -1);
+}
+
+QPoint map_template::get_geocoordinate_pos(const QGeoCoordinate &geocoordinate) const
+{
+	return geocoordinate::to_point(geocoordinate, this->get_georectangle(), this->get_size());
 }
 
 void map_template::save_terrain_image(const std::string &filename, const bool overlay, const terrain_geodata_map &terrain_data) const

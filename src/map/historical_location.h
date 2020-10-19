@@ -30,6 +30,9 @@
 #include "time/date.h"
 
 class CConfigData;
+struct lua_State;
+
+int CclDefineCharacter(lua_State *l);
 
 namespace wyrmgus {
 
@@ -38,7 +41,7 @@ class site;
 class sml_data;
 class sml_property;
 
-class historical_location
+class historical_location final
 {
 public:
 	historical_location()
@@ -58,12 +61,31 @@ public:
 	void ProcessConfigData(const CConfigData *config_data);
 	void initialize();
 	void check() const;
+
+	const wyrmgus::map_template *get_map_template() const
+	{
+		return this->map_template;
+	}
+	
+	const QPoint &get_pos() const
+	{
+		return this->pos;
+	}
+
+	const wyrmgus::site *get_site() const
+	{
+		return this->site;
+	}
 	
 public:
 	CDate Date; //the historical location's date
+private:
 	const wyrmgus::map_template *map_template = nullptr; //the historical location's map template (overwritten by the site's map template if the site is given)
-	Vec2i Position = Vec2i(-1, -1); //the historical location's position in its map layer (overwritten by the site position if the site is given and has a valid position)
+	QPoint pos = QPoint(-1, -1); //the historical location's position in its map layer (overwritten by the site position if the site is given and has a valid position)
+	QGeoCoordinate geocoordinate; //the historical location's position as a geocoordinate
 	const wyrmgus::site *site = nullptr; //the historical location's site (if any)
+
+	friend int ::CclDefineCharacter(lua_State *l);
 };
 
 }

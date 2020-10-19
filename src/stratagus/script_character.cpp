@@ -347,12 +347,14 @@ static int CclDefineCharacter(lua_State *l)
 				
 				lua_rawgeti(l, -1, j + 1);
 				if (lua_istable(l, -1)) { //coordinates
-					CclGetPos(l, &location->Position.x, &location->Position.y);
+					Vec2i pos;
+					CclGetPos(l, &pos.x, &pos.y);
+					location->pos = pos;
 				} else { //site ident
 					std::string site_ident = LuaToString(l, -1);
 					location->site = wyrmgus::site::get(site_ident);
 					location->map_template = location->site->get_map_template();
-					location->Position = location->site->get_pos();
+					location->pos = location->site->get_pos();
 				}
 				lua_pop(l, 1);
 

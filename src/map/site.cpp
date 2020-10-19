@@ -218,7 +218,7 @@ void site::initialize()
 			this->geocoordinate = QGeoCoordinate(lat, lon);
 		}
 
-		this->pos = geocoordinate::to_point(this->get_geocoordinate(), this->get_map_template()->get_georectangle(), this->get_map_template()->get_size());
+		this->pos = this->get_map_template()->get_geocoordinate_pos(this->get_geocoordinate());
 	}
 
 	//if a settlement has no color assigned to it, assign a random one instead

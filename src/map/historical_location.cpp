@@ -33,6 +33,7 @@
 #include "map/map.h"
 #include "map/map_template.h"
 #include "map/site.h"
+#include "util/geocoordinate_util.h"
 
 namespace wyrmgus {
 
@@ -64,7 +65,9 @@ void historical_location::process_sml_scope(const sml_data &scope)
 	const std::string &tag = scope.get_tag();
 
 	if (tag == "pos") {
-		this->Position = scope.to_point();
+		this->pos = scope.to_point();
+	} else if (tag == "geocoordinate") {
+		this->geocoordinate = scope.to_geocoordinate();
 	} else {
 		throw std::runtime_error("Invalid historical location scope: \"" + scope.get_tag() + "\".");
 	}
@@ -84,9 +87,9 @@ void historical_location::ProcessConfigData(const CConfigData *config_data)
 		} else if (key == "site") {
 			this->site = site::get(value);
 		} else if (key == "x") {
-			this->Position.x = std::stoi(value);
+			this->pos.setX(std::stoi(value));
 		} else if (key == "y") {
-			this->Position.y = std::stoi(value);
+			this->pos.setY(std::stoi(value));
 		} else {
 			fprintf(stderr, "Invalid historical location property: \"%s\".\n", key.c_str());
 		}
@@ -97,7 +100,9 @@ void historical_location::initialize()
 {
 	if (this->site != nullptr) {
 		this->map_template = this->site->get_map_template();
-		this->Position = this->site->get_pos();
+		this->pos = this->site->get_pos();
+	} else if (this->map_template != nullptr && this->geocoordinate.isValid()) {
+		this->pos = this->map_template->get_geocoordinate_pos(this->geocoordinate);
 	}
 }
 
