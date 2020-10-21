@@ -3872,16 +3872,16 @@ CUnit *CreateResourceUnit(const Vec2i &pos, const wyrmgus::unit_type &type, int 
 			
 	// create metal rocks near metal resources
 	wyrmgus::unit_type *metal_rock_type = nullptr;
-	if (type.Ident == "unit-gold-deposit") {
-		metal_rock_type = wyrmgus::unit_type::get("unit-gold-rock");
-	} else if (type.Ident == "unit-silver-deposit") {
-		metal_rock_type = wyrmgus::unit_type::get("unit-silver-rock");
-	} else if (type.Ident == "unit-copper-deposit") {
-		metal_rock_type = wyrmgus::unit_type::get("unit-copper-rock");
+	if (type.get_identifier() == "unit_gold_deposit") {
+		metal_rock_type = wyrmgus::unit_type::get("unit_gold_rock");
+	} else if (type.get_identifier() == "unit_silver_deposit") {
+		metal_rock_type = wyrmgus::unit_type::get("unit_silver_rock");
+	} else if (type.get_identifier() == "unit_copper_deposit") {
+		metal_rock_type = wyrmgus::unit_type::get("unit_copper_rock");
 	} else if (type.Ident == "unit-diamond-deposit") {
-		metal_rock_type = wyrmgus::unit_type::get("unit-diamond-rock");
+		metal_rock_type = wyrmgus::unit_type::get("unit_diamond_rock");
 	} else if (type.Ident == "unit-emerald-deposit") {
-		metal_rock_type = wyrmgus::unit_type::get("unit-emerald-rock");
+		metal_rock_type = wyrmgus::unit_type::get("unit_emerald_rock");
 	}
 	if (metal_rock_type) {
 		Vec2i metal_rock_offset((type.get_tile_size() - QSize(1, 1)) / 2);
