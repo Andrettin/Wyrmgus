@@ -879,20 +879,17 @@ void CGraphic::Load(const bool create_grayscale_textures, const int scale_factor
 
 #if defined(USE_OPENGL) || defined(USE_GLES)
 
-/**
-**  Free OpenGL graphics
-*/
 void FreeOpenGLGraphics()
 {
 	for (CGraphic *graphic : CGraphic::graphics) {
-		if (graphic->textures) {
+		if (graphic->textures != nullptr) {
 			glDeleteTextures(graphic->NumTextures, graphic->textures.get());
-			graphic->textures.reset();
+			//don't clear the texture pointer to indicate to the reload OpenGL graphics function that they need to be recreated
 		}
 		
-		if (graphic->grayscale_textures) {
+		if (graphic->grayscale_textures != nullptr) {
 			glDeleteTextures(graphic->NumTextures, graphic->grayscale_textures.get());
-			graphic->grayscale_textures.reset();
+			//don't clear the texture pointer to indicate to the reload OpenGL graphics function that they need to be recreated
 		}
 		
 		for (const auto &kv_pair : graphic->texture_color_modifications) {
@@ -936,13 +933,9 @@ void ReloadGraphics()
 		graphic->texture_color_modifications.clear();
 				
 		CPlayerColorGraphic *cg = dynamic_cast<CPlayerColorGraphic *>(graphic);
-		if (cg) {
+		if (cg != nullptr) {
 			cg->player_color_texture_color_modifications.clear();
 			cg->player_color_textures.clear();
-
-			for (const wyrmgus::player_color *player_color : wyrmgus::player_color::get_all()) {
-				MakePlayerColorTexture(cg, player_color, nullptr);
-			}
 		}
 	}
 }
