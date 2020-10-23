@@ -283,6 +283,10 @@ public:
 		return this->scaled_cost_unit_types;
 	}
 
+	const std::vector<const wyrmgus::unit_class *> &get_scaled_cost_unit_classes() const
+	{
+		return this->scaled_cost_unit_classes;
+	}
 
 	const std::unique_ptr<wyrmgus::condition> &get_preconditions() const
 	{
@@ -359,6 +363,7 @@ public:
 	std::vector<const wyrmgus::unique_item *> UniqueItems;	/// Unique items who form a part of this set upgrade
 private:
 	std::vector<const wyrmgus::unit_type *> scaled_cost_unit_types;	//units for which the upgrade's costs are scaled
+	std::vector<const wyrmgus::unit_class *> scaled_cost_unit_classes;	//units for which the upgrade's costs are scaled
 public:
 	std::vector<wyrmgus::character *> Characters;	/// Characters who appear in this literary work (if it is one)
 	//Wyrmgus end

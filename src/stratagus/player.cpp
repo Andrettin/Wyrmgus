@@ -3427,6 +3427,10 @@ void CPlayer::GetUpgradeCosts(const CUpgrade *upgrade, int *upgrade_costs)
 		for (const wyrmgus::unit_type *unit_type : upgrade->get_scaled_cost_unit_types()) {
 			upgrade_costs[i] += upgrade->ScaledCosts[i] * this->GetUnitTypeCount(unit_type);
 		}
+
+		for (const wyrmgus::unit_class *unit_class : upgrade->get_scaled_cost_unit_classes()) {
+			upgrade_costs[i] += upgrade->ScaledCosts[i] * this->get_unit_class_count(unit_class);
+		}
 	}
 }
 

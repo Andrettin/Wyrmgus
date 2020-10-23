@@ -71,6 +71,9 @@
 //Wyrmgus start
 #include "ui/interface.h"
 #include "ui/ui.h"
+//Wyrmgus end
+#include "unit/unit_class.h"
+//Wyrmgus start
 #include "unit/unit_manager.h"
 //Wyrmgus end
 #include "unit/unit_type.h"
@@ -236,6 +239,10 @@ void CUpgrade::process_sml_scope(const wyrmgus::sml_data &scope)
 		for (const std::string &value : values) {
 			this->scaled_cost_unit_types.push_back(wyrmgus::unit_type::get(value));
 		}
+	} else if (tag == "scaled_cost_unit_classes") {
+		for (const std::string &value : values) {
+			this->scaled_cost_unit_classes.push_back(wyrmgus::unit_class::get(value));
+		}
 	} else if (tag == "civilization_priorities") {
 		scope.for_each_property([&](const wyrmgus::sml_property &property) {
 			const std::string &key = property.get_key();
@@ -348,6 +355,7 @@ void CUpgrade::set_parent(const CUpgrade *parent_upgrade)
 	this->Work = parent_upgrade->Work;
 	this->UniqueOnly = parent_upgrade->UniqueOnly;
 	this->scaled_cost_unit_types = parent_upgrade->scaled_cost_unit_types;
+	this->scaled_cost_unit_classes = parent_upgrade->scaled_cost_unit_classes;
 
 	for (const auto &modifier : parent_upgrade->get_modifiers()) {
 		std::unique_ptr<wyrmgus::upgrade_modifier> duplicated_modifier = modifier->duplicate();
