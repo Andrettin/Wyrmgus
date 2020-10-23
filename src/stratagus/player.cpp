@@ -1006,6 +1006,7 @@ void CPlayer::Init(/* PlayerTypes */ int type)
 	this->Heroes.clear();
 	this->Deities.clear();
 	this->units_by_type.clear();
+	this->units_by_class.clear();
 	this->AiActiveUnitsByType.clear();
 	//Wyrmgus end
 
@@ -2038,6 +2039,7 @@ void CPlayer::Clear()
 	this->Heroes.clear();
 	this->Deities.clear();
 	this->units_by_type.clear();
+	this->units_by_class.clear();
 	this->AiActiveUnitsByType.clear();
 	this->available_quests.clear();
 	this->current_quests.clear();
@@ -3538,6 +3540,10 @@ void CPlayer::IncreaseCountsForUnit(CUnit *unit, bool type_change)
 
 	this->ChangeUnitTypeCount(type, 1);
 	this->units_by_type[type].push_back(unit);
+
+	if (type->get_unit_class() != nullptr) {
+		this->units_by_class[type->get_unit_class()].push_back(unit);
+	}
 	
 	if (unit->Active) {
 		this->ChangeUnitTypeAiActiveCount(type, 1);
@@ -3573,6 +3579,14 @@ void CPlayer::DecreaseCountsForUnit(CUnit *unit, bool type_change)
 
 	if (this->units_by_type[type].empty()) {
 		this->units_by_type.erase(type);
+	}
+
+	if (type->get_unit_class() != nullptr) {
+		wyrmgus::vector::remove(this->units_by_class[type->get_unit_class()], unit);
+
+		if (this->units_by_class[type->get_unit_class()].empty()) {
+			this->units_by_class.erase(type->get_unit_class());
+		}
 	}
 	
 	if (unit->Active) {

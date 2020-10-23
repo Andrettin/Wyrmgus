@@ -33,6 +33,7 @@
 //Wyrmgus start
 #include "ui/ui.h" // for the UI fillers
 //Wyrmgus end
+#include "unit/unit_class_container.h"
 #include "unit/unit_type_container.h"
 #include "upgrade/upgrade_structs.h"
 #include "vec2i.h"
@@ -295,6 +296,11 @@ public:
 		return this->units_by_type;
 	}
 
+	const wyrmgus::unit_class_map<std::vector<CUnit *>> &get_units_by_class() const
+	{
+		return this->units_by_class;
+	}
+
 	bool is_revealed() const
 	{
 		return this->revealed;
@@ -328,6 +334,7 @@ public:
 	wyrmgus::unit_type_map<int> UnitTypesAiActiveCount;  				/// total units of unit-type that have their AI set to active
 private:
 	wyrmgus::unit_type_map<std::vector<CUnit *>> units_by_type; //units owned by this player for each type
+	wyrmgus::unit_class_map<std::vector<CUnit *>> units_by_class;
 public:
 	wyrmgus::unit_type_map<std::vector<CUnit *>> AiActiveUnitsByType;	/// AI active units owned by this player for each type
 	std::vector<CUnit *> Heroes;							/// hero units owned by this player
@@ -459,7 +466,17 @@ public:
 	void SetUnitTypeAiActiveCount(const wyrmgus::unit_type *type, int quantity);
 	void ChangeUnitTypeAiActiveCount(const wyrmgus::unit_type *type, int quantity);
 	int GetUnitTypeAiActiveCount(const wyrmgus::unit_type *type) const;
-	
+
+	int get_unit_class_count(const wyrmgus::unit_class *unit_class) const
+	{
+		const auto find_iterator = this->units_by_class.find(unit_class);
+		if (find_iterator != this->units_by_class.end()) {
+			return static_cast<int>(find_iterator->second.size());
+		}
+		
+		return 0;
+	}
+
 	void IncreaseCountsForUnit(CUnit *unit, bool type_change = false);
 	void DecreaseCountsForUnit(CUnit *unit, bool type_change = false);
 	//Wyrmgus end
