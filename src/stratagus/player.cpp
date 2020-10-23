@@ -3424,12 +3424,17 @@ void CPlayer::GetUpgradeCosts(const CUpgrade *upgrade, int *upgrade_costs)
 	for (int i = 0; i < MaxCosts; ++i) {
 		upgrade_costs[i] = upgrade->Costs[i];
 
-		for (const wyrmgus::unit_type *unit_type : upgrade->get_scaled_cost_unit_types()) {
-			upgrade_costs[i] += upgrade->ScaledCosts[i] * this->GetUnitTypeCount(unit_type);
-		}
+		const wyrmgus::resource *resource = wyrmgus::resource::get_all()[i];
 
-		for (const wyrmgus::unit_class *unit_class : upgrade->get_scaled_cost_unit_classes()) {
-			upgrade_costs[i] += upgrade->ScaledCosts[i] * this->get_unit_class_count(unit_class);
+		const int scaled_cost = upgrade->get_scaled_cost(resource);
+		if (scaled_cost > 0) {
+			for (const wyrmgus::unit_type *unit_type : upgrade->get_scaled_cost_unit_types()) {
+				upgrade_costs[i] += scaled_cost * this->GetUnitTypeCount(unit_type);
+			}
+
+			for (const wyrmgus::unit_class *unit_class : upgrade->get_scaled_cost_unit_classes()) {
+				upgrade_costs[i] += scaled_cost * this->get_unit_class_count(unit_class);
+			}
 		}
 	}
 }

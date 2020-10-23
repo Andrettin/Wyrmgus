@@ -278,6 +278,17 @@ public:
 
 	void add_modifier(std::unique_ptr<const wyrmgus::upgrade_modifier> &&modifier);
 
+	int get_scaled_cost(const wyrmgus::resource *resource) const
+	{
+		auto find_iterator = this->scaled_costs.find(resource);
+
+		if (find_iterator != this->scaled_costs.end()) {
+			return find_iterator->second;
+		}
+
+		return 0;
+	}
+
 	const std::vector<const wyrmgus::unit_type *> &get_scaled_cost_unit_types() const
 	{
 		return this->scaled_cost_unit_types;
@@ -350,7 +361,9 @@ private:
 public:
 	int   ID = 0;						/// numerical id
 	int   Costs[MaxCosts];				/// costs for the upgrade
-	int   ScaledCosts[MaxCosts];		/// scaled costs for the upgrade
+private:
+	std::map<const wyrmgus::resource *, int> scaled_costs; //scaled costs for the upgrade
+public:
 	//Wyrmgus start
 	int GrandStrategyProductionEfficiencyModifier[MaxCosts];	/// Production modifier for a particular resource for grand strategy mode
 	int MaxLimit = 1;					/// Maximum amount of times this upgrade can be acquired as an individual upgrade

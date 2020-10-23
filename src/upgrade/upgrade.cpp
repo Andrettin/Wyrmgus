@@ -197,7 +197,6 @@ CUpgrade::CUpgrade(const std::string &identifier) : detailed_data_entry(identifi
 {
 	memset(this->Costs, 0, sizeof(this->Costs));
 	//Wyrmgus start
-	memset(this->ScaledCosts, 0, sizeof(this->ScaledCosts));
 	memset(this->GrandStrategyProductionEfficiencyModifier, 0, sizeof(this->GrandStrategyProductionEfficiencyModifier));
 	memset(this->IncompatibleAffixes, 0, sizeof(this->IncompatibleAffixes));
 	//Wyrmgus end
@@ -234,6 +233,14 @@ void CUpgrade::process_sml_scope(const wyrmgus::sml_data &scope)
 
 			const wyrmgus::resource *resource = wyrmgus::resource::get(key);
 			this->Costs[resource->get_index()] = std::stoi(value);
+		});
+	} else if (tag == "scaled_costs") {
+		scope.for_each_property([&](const wyrmgus::sml_property &property) {
+			const std::string &key = property.get_key();
+			const std::string &value = property.get_value();
+
+			const wyrmgus::resource *resource = wyrmgus::resource::get(key);
+			this->scaled_costs[resource] = std::stoi(value);
 		});
 	} else if (tag == "scaled_cost_unit_types") {
 		for (const std::string &value : values) {
@@ -337,9 +344,9 @@ void CUpgrade::set_parent(const CUpgrade *parent_upgrade)
 	this->requirements_string = parent_upgrade->get_requirements_string();
 	for (int i = 0; i < MaxCosts; ++i) {
 		this->Costs[i] = parent_upgrade->Costs[i];
-		this->ScaledCosts[i] = parent_upgrade->ScaledCosts[i];
 		this->GrandStrategyProductionEfficiencyModifier[i] = parent_upgrade->GrandStrategyProductionEfficiencyModifier[i];
 	}
+	this->scaled_costs = parent_upgrade->scaled_costs;
 	this->affixed_item_classes = parent_upgrade->affixed_item_classes;
 	this->MaxLimit = parent_upgrade->MaxLimit;
 	this->magic_level = parent_upgrade->magic_level;
@@ -540,13 +547,10 @@ static int CclDefineUpgrade(lua_State *l)
 			}
 			const int subargs = lua_rawlen(l, -1);
 			for (int j = 0; j < subargs; ++j) {
-				int resource = GetResourceIdByName(LuaToString(l, -1, j + 1));
-				if (resource == -1) {
-					LuaError(l, "Resource doesn't exist.");
-				}
+				const wyrmgus::resource *resource = wyrmgus::resource::get(LuaToString(l, -1, j + 1));
 				++j;
 				
-				upgrade->ScaledCosts[resource] = LuaToNumber(l, -1, j + 1);
+				upgrade->scaled_costs[resource] = LuaToNumber(l, -1, j + 1);
 			}
 		} else if (!strcmp(value, "GrandStrategyProductionEfficiencyModifier")) {
 			if (!lua_istable(l, -1)) {
