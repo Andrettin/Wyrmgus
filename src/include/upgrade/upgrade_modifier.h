@@ -28,6 +28,7 @@
 
 #pragma once
 
+#include "unit/unit_type_container.h"
 #include "upgrade/upgrade_structs.h" //for CUnitStats
 
 class CConfigData;
@@ -49,7 +50,7 @@ class unit_type;
 **  This does the real action of an upgrade, and an upgrade can have multiple
 **  modifiers.
 */
-class upgrade_modifier
+class upgrade_modifier final
 {
 public:
 	static std::vector<upgrade_modifier *> UpgradeModifiers;
@@ -89,7 +90,7 @@ public:
 	int *ModifyPercent = nullptr;			/// use for percent modifiers
 	int SpeedResearch = 0;					/// speed factor for researching
 	int ImproveIncomes[MaxCosts];			/// improve incomes
-	std::map<unit_type *, int> UnitStock;	/// unit stock
+	unit_type_map<int> UnitStock;	/// unit stock
 	// allow/forbid bitmaps -- used as chars for example:
 	// `?' -- leave as is, `F' -- forbid, `A' -- allow
 	// TODO: see below allow more semantics?

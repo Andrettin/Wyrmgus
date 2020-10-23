@@ -602,7 +602,7 @@ public:
 	unsigned char CurrentResource;
 	int ResourcesHeld;      /// Resources Held by a unit
 	std::map<int, int> UnitStock; 						/// How many of each unit type this unit has stocked
-	std::map<const wyrmgus::unit_type *, int> UnitStockReplenishmentTimers; 	/// Replenishment timer for each unit type stock
+	wyrmgus::unit_type_map<int> UnitStockReplenishmentTimers; 	/// Replenishment timer for each unit type stock
 
 	unsigned char DamagedType;   /// Index of damage type of unit which damaged this unit
 	unsigned long Attacked;      /// gamecycle unit was last attacked

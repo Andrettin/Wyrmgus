@@ -28,6 +28,7 @@
 #pragma once
 
 #include "database/detailed_data_entry.h"
+#include "unit/unit_class_container.h"
 
 namespace wyrmgus {
 
@@ -107,7 +108,7 @@ private:
 	species *species = nullptr;
 	std::map<gender, std::vector<std::string>> personal_names; //personal names for the civilization, mapped to the gender they pertain to (use gender::none for names which should be available for both genders)
 	std::vector<std::string> surnames; //surnames for the civilization
-	std::map<const unit_class *, std::vector<std::string>> unit_class_names;	/// Unit class names for the civilization, mapped to the unit class they pertain to, used for mechanical units, and buildings
+	unit_class_map<std::vector<std::string>> unit_class_names;	/// Unit class names for the civilization, mapped to the unit class they pertain to, used for mechanical units, and buildings
 	std::vector<std::string> ship_names;			/// Ship names for the civilization
 };
 

@@ -2561,10 +2561,10 @@ void AiCheckBuildings()
 	std::vector<const CAiBuildingTemplate *> potential_building_templates;
 	
 	int priority = 0;
-	std::map<const wyrmgus::unit_class *, int> want_counter;
-	std::map<const wyrmgus::unit_class *, int> have_counter;
-	std::map<const wyrmgus::unit_class *, int> have_with_requests_counter;
-	for (wyrmgus::unit_class *unit_class : wyrmgus::unit_class::get_all()) {
+	wyrmgus::unit_class_map<int> want_counter;
+	wyrmgus::unit_class_map<int> have_counter;
+	wyrmgus::unit_class_map<int> have_with_requests_counter;
+	for (const wyrmgus::unit_class *unit_class : wyrmgus::unit_class::get_all()) {
 		want_counter[unit_class] = 0;
 		have_counter[unit_class] = -1;
 		have_with_requests_counter[unit_class] = -1;

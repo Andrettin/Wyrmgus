@@ -1005,7 +1005,7 @@ void CPlayer::Init(/* PlayerTypes */ int type)
 	this->UnitTypesAiActiveCount.clear();
 	this->Heroes.clear();
 	this->Deities.clear();
-	this->UnitsByType.clear();
+	this->units_by_type.clear();
 	this->AiActiveUnitsByType.clear();
 	//Wyrmgus end
 
@@ -1489,7 +1489,7 @@ int CPlayer::get_player_color_usage_count(const wyrmgus::player_color *player_co
 
 void CPlayer::update_minimap_territory()
 {
-	for (const auto &kv_pair : this->UnitsByType) {
+	for (const auto &kv_pair : this->get_units_by_type()) {
 		const wyrmgus::unit_type *unit_type = kv_pair.first;
 		if (!unit_type->BoolFlag[TOWNHALL_INDEX].value) {
 			continue;
@@ -2037,7 +2037,7 @@ void CPlayer::Clear()
 	//Wyrmgus start
 	this->Heroes.clear();
 	this->Deities.clear();
-	this->UnitsByType.clear();
+	this->units_by_type.clear();
 	this->AiActiveUnitsByType.clear();
 	this->available_quests.clear();
 	this->current_quests.clear();
@@ -3467,7 +3467,7 @@ void CPlayer::ChangeUnitTypeCount(const wyrmgus::unit_type *type, int quantity)
 
 int CPlayer::GetUnitTypeCount(const wyrmgus::unit_type *type) const
 {
-	if (type && this->UnitTypesCount.find(type) != this->UnitTypesCount.end()) {
+	if (type != nullptr && this->UnitTypesCount.find(type) != this->UnitTypesCount.end()) {
 		return this->UnitTypesCount.find(type)->second;
 	} else {
 		return 0;
@@ -3537,7 +3537,7 @@ void CPlayer::IncreaseCountsForUnit(CUnit *unit, bool type_change)
 	const wyrmgus::unit_type *type = unit->Type;
 
 	this->ChangeUnitTypeCount(type, 1);
-	this->UnitsByType[type].push_back(unit);
+	this->units_by_type[type].push_back(unit);
 	
 	if (unit->Active) {
 		this->ChangeUnitTypeAiActiveCount(type, 1);
@@ -3569,10 +3569,10 @@ void CPlayer::DecreaseCountsForUnit(CUnit *unit, bool type_change)
 
 	this->ChangeUnitTypeCount(type, -1);
 	
-	wyrmgus::vector::remove(this->UnitsByType[type], unit);
-			
-	if (this->UnitsByType[type].empty()) {
-		this->UnitsByType.erase(type);
+	wyrmgus::vector::remove(this->units_by_type[type], unit);
+
+	if (this->units_by_type[type].empty()) {
+		this->units_by_type.erase(type);
 	}
 	
 	if (unit->Active) {

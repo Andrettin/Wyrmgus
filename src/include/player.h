@@ -33,6 +33,7 @@
 //Wyrmgus start
 #include "ui/ui.h" // for the UI fillers
 //Wyrmgus end
+#include "unit/unit_type_container.h"
 #include "upgrade/upgrade_structs.h"
 #include "vec2i.h"
 
@@ -289,6 +290,11 @@ public:
 	inline void SetStartView(const Vec2i &pos, int z) { StartPos = pos; StartMapLayer = z; }
 	//Wyrmgus end
 
+	const wyrmgus::unit_type_map<std::vector<CUnit *>> &get_units_by_type() const
+	{
+		return this->units_by_type;
+	}
+
 	bool is_revealed() const
 	{
 		return this->revealed;
@@ -317,11 +323,13 @@ public:
 	int SpeedUpgrade;                /// speed factor for upgrading
 	int SpeedResearch;               /// speed factor for researching
 
-	std::map<const wyrmgus::unit_type *, int> UnitTypesCount;  						/// total units of unit-type
-	std::map<const wyrmgus::unit_type *, int> UnitTypesUnderConstructionCount;  		/// total under construction units of unit-type
-	std::map<const wyrmgus::unit_type *, int> UnitTypesAiActiveCount;  				/// total units of unit-type that have their AI set to active
-	std::map<const wyrmgus::unit_type *, std::vector<CUnit *>> UnitsByType;			/// units owned by this player for each type
-	std::map<const wyrmgus::unit_type *, std::vector<CUnit *>> AiActiveUnitsByType;	/// AI active units owned by this player for each type
+	wyrmgus::unit_type_map<int> UnitTypesCount;  						/// total units of unit-type
+	wyrmgus::unit_type_map<int> UnitTypesUnderConstructionCount;  		/// total under construction units of unit-type
+	wyrmgus::unit_type_map<int> UnitTypesAiActiveCount;  				/// total units of unit-type that have their AI set to active
+private:
+	wyrmgus::unit_type_map<std::vector<CUnit *>> units_by_type; //units owned by this player for each type
+public:
+	wyrmgus::unit_type_map<std::vector<CUnit *>> AiActiveUnitsByType;	/// AI active units owned by this player for each type
 	std::vector<CUnit *> Heroes;							/// hero units owned by this player
 	std::vector<const wyrmgus::deity *> Deities;			/// deities chosen by this player
 private:

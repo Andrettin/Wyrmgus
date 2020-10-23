@@ -71,7 +71,7 @@ static void AiHelperInsert(std::vector<std::vector<wyrmgus::unit_type *> > &tabl
 	table[n].push_back(&base);
 }
 
-static void AiHelperInsert(std::map<const wyrmgus::unit_type *, std::vector<const wyrmgus::unit_type *>> &table,
+static void AiHelperInsert(wyrmgus::unit_type_map<std::vector<const wyrmgus::unit_type *>> &table,
 	const wyrmgus::unit_type *key, const wyrmgus::unit_type *target)
 {
 	if (table.contains(key) && wyrmgus::vector::contains(table[key], target)) {
@@ -81,7 +81,7 @@ static void AiHelperInsert(std::map<const wyrmgus::unit_type *, std::vector<cons
 	table[key].push_back(target);
 }
 
-static void AiHelperInsert(std::map<const wyrmgus::unit_class *, std::vector<const wyrmgus::unit_class *>> &table,
+static void AiHelperInsert(wyrmgus::unit_class_map<std::vector<const wyrmgus::unit_class *>> &table,
 	const wyrmgus::unit_class *key, const wyrmgus::unit_class *target)
 {
 	if (table.contains(key) && wyrmgus::vector::contains(table[key], target)) {
@@ -111,7 +111,7 @@ static void AiHelperInsert(std::map<const wyrmgus::upgrade_class *, std::vector<
 	table[key].push_back(target);
 }
 
-static void AiHelperInsert(std::map<const wyrmgus::unit_type *, std::vector<const CUpgrade *>> &table,
+static void AiHelperInsert(wyrmgus::unit_type_map<std::vector<const CUpgrade *>> &table,
 	const wyrmgus::unit_type *key, const CUpgrade *target)
 {
 	if (table.contains(key) && wyrmgus::vector::contains(table[key], target)) {
@@ -121,7 +121,7 @@ static void AiHelperInsert(std::map<const wyrmgus::unit_type *, std::vector<cons
 	table[key].push_back(target);
 }
 
-static void AiHelperInsert(std::map<const wyrmgus::unit_class *, std::vector<const wyrmgus::upgrade_class *>> &table,
+static void AiHelperInsert(wyrmgus::unit_class_map<std::vector<const wyrmgus::upgrade_class *>> &table,
 	const wyrmgus::unit_class *key, const wyrmgus::upgrade_class *target)
 {
 	if (table.contains(key) && wyrmgus::vector::contains(table[key], target)) {

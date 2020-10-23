@@ -403,7 +403,7 @@ CUnit *FindDepositNearLoc(CPlayer &p, const Vec2i &pos, int range, int resource,
 {
 	BestDepotFinder<true> finder(pos, resource, range, z);
 	std::vector<CUnit *> table;
-	for (const auto &kv_pair : p.UnitsByType) {
+	for (const auto &kv_pair : p.get_units_by_type()) {
 		const wyrmgus::unit_type *unit_type = kv_pair.first;
 		if (unit_type->CanStore[resource]) {
 			wyrmgus::vector::merge(table, kv_pair.second);
@@ -412,7 +412,7 @@ CUnit *FindDepositNearLoc(CPlayer &p, const Vec2i &pos, int range, int resource,
 	for (int i = 0; i < PlayerMax - 1; ++i) {
 		const CPlayer *other_player = CPlayer::Players[i];
 		if (other_player->IsAllied(p) && p.IsAllied(*other_player)) {
-			for (const auto &kv_pair : other_player->UnitsByType) {
+			for (const auto &kv_pair : other_player->get_units_by_type()) {
 				const wyrmgus::unit_type *unit_type = kv_pair.first;
 				if (unit_type->CanStore[resource]) {
 					wyrmgus::vector::merge(table, kv_pair.second);
@@ -703,7 +703,7 @@ CUnit *FindDeposit(const CUnit &unit, int range, int resource)
 {
 	BestDepotFinder<false> finder(unit, resource, range);
 	std::vector<CUnit *> table;
-	for (const auto &kv_pair : unit.Player->UnitsByType) {
+	for (const auto &kv_pair : unit.Player->get_units_by_type()) {
 		const wyrmgus::unit_type *unit_type = kv_pair.first;
 		if (unit_type->CanStore[resource]) {
 			wyrmgus::vector::merge(table, kv_pair.second);
@@ -712,7 +712,7 @@ CUnit *FindDeposit(const CUnit &unit, int range, int resource)
 	for (int i = 0; i < PlayerMax - 1; ++i) {
 		const CPlayer *other_player = CPlayer::Players[i];
 		if (other_player->IsAllied(*unit.Player) && unit.Player->IsAllied(*other_player)) {
-			for (const auto &kv_pair : other_player->UnitsByType) {
+			for (const auto &kv_pair : other_player->get_units_by_type()) {
 				const wyrmgus::unit_type *unit_type = kv_pair.first;
 				if (unit_type->CanStore[resource]) {
 					wyrmgus::vector::merge(table, kv_pair.second);
@@ -811,21 +811,25 @@ void FindUnitsByType(const wyrmgus::unit_type &type, std::vector<CUnit *> &units
 */
 void FindPlayerUnitsByType(const CPlayer &player, const wyrmgus::unit_type &type, std::vector<CUnit *> &table, bool ai_active)
 {
-	std::vector<CUnit *> type_units;
+	const std::vector<CUnit *> *type_units = nullptr;
 
 	if (ai_active) {
-		if (player.AiActiveUnitsByType.find(&type) != player.AiActiveUnitsByType.end()) {
-			type_units = player.AiActiveUnitsByType.find(&type)->second;;
+		auto find_iterator = player.AiActiveUnitsByType.find(&type);
+		if (find_iterator != player.AiActiveUnitsByType.end()) {
+			type_units = &find_iterator->second;
 		}
 	} else {
-		if (player.UnitsByType.find(&type) != player.UnitsByType.end()) {
-			type_units = player.UnitsByType.find(&type)->second;;
+		auto find_iterator = player.get_units_by_type().find(&type);
+		if (find_iterator != player.get_units_by_type().end()) {
+			type_units = &find_iterator->second;
 		}
 	}
-	
-	for (size_t i = 0; i < type_units.size(); ++i) {
-		CUnit *unit = type_units[i];
 
+	if (type_units == nullptr) {
+		return;
+	}
+	
+	for (CUnit *unit : *type_units) {
 		if (!unit->IsUnusable()) {
 			table.push_back(unit);
 		}

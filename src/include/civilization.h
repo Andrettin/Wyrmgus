@@ -228,7 +228,7 @@ public:
 
 	void remove_class_unit_type(unit_type *unit_type)
 	{
-		for (std::map<const unit_class *, wyrmgus::unit_type *>::reverse_iterator iterator = this->class_unit_types.rbegin(); iterator != this->class_unit_types.rend(); ++iterator) {
+		for (unit_class_map<wyrmgus::unit_type *>::reverse_iterator iterator = this->class_unit_types.rbegin(); iterator != this->class_unit_types.rend(); ++iterator) {
 			if (iterator->second == unit_type) {
 				this->class_unit_types.erase(iterator->first);
 			}
@@ -325,7 +325,7 @@ public:
 public:
 	std::vector<std::string> ProvinceNames;		/// Province names for the civilization
 private:
-	std::map<const unit_class *, unit_type *> class_unit_types; //the unit type slot of a particular class for the civilization
+	unit_class_map<unit_type *> class_unit_types; //the unit type slot of a particular class for the civilization
 	std::map<const upgrade_class *, CUpgrade *> class_upgrades; //the upgrade slot of a particular class for the civilization
 	std::vector<CFiller> ui_fillers;
 	std::vector<character *> characters;

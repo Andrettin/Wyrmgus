@@ -30,6 +30,8 @@
 #pragma once
 
 #include "unit/unit_cache.h"
+#include "unit/unit_class_container.h"
+#include "unit/unit_type_container.h"
 #include "upgrade/upgrade_structs.h" // MaxCost
 #include "vec2i.h"
 
@@ -543,28 +545,28 @@ public:
 
 private:
 	//unit types associated with lists of other unit types which can train them
-	std::map<const wyrmgus::unit_type *, std::vector<const wyrmgus::unit_type *>> trainers;
+	wyrmgus::unit_type_map<std::vector<const wyrmgus::unit_type *>> trainers;
 
 	//unit classes associated with lists of other unit classes which can train them
-	std::map<const wyrmgus::unit_class *, std::vector<const wyrmgus::unit_class *>> trainer_classes;
+	wyrmgus::unit_class_map<std::vector<const wyrmgus::unit_class *>> trainer_classes;
 
 	//(building) unit types associated with lists of other unit types which can build them
-	std::map<const wyrmgus::unit_type *, std::vector<const wyrmgus::unit_type *>> builders;
+	wyrmgus::unit_type_map<std::vector<const wyrmgus::unit_type *>> builders;
 
 	//(building) unit classes associated with lists of other unit classes which can build them
-	std::map<const wyrmgus::unit_class *, std::vector<const wyrmgus::unit_class *>> builder_classes;
+	wyrmgus::unit_class_map<std::vector<const wyrmgus::unit_class *>> builder_classes;
 
 	//lists of unit type upgrades, mapped to the unit type for which they are available
-	std::map<const wyrmgus::unit_type *, std::vector<const wyrmgus::unit_type *>> unit_type_upgrades;
+	wyrmgus::unit_type_map<std::vector<const wyrmgus::unit_type *>> unit_type_upgrades;
 
 	//lists of unit types which can perform unit type upgrades, mapped to the unit type to which they can upgrade
-	std::map<const wyrmgus::unit_type *, std::vector<const wyrmgus::unit_type *>> unit_type_upgradees;
+	wyrmgus::unit_type_map<std::vector<const wyrmgus::unit_type *>> unit_type_upgradees;
 
 	//lists of unit class upgrades, mapped to the unit class for which they are available
-	std::map<const wyrmgus::unit_class *, std::vector<const wyrmgus::unit_class *>> unit_class_upgrades;
+	wyrmgus::unit_class_map<std::vector<const wyrmgus::unit_class *>> unit_class_upgrades;
 
 	//lists of unit classes which can perform unit class upgrades, mapped to the unit class to which they can upgrade
-	std::map<const wyrmgus::unit_class *, std::vector<const wyrmgus::unit_class *>> unit_class_upgradees;
+	wyrmgus::unit_class_map<std::vector<const wyrmgus::unit_class *>> unit_class_upgradees;
 
 	//upgrades associated with lists of unit types which can research them
 	std::map<const CUpgrade *, std::vector<const wyrmgus::unit_type *>> researchers;
@@ -622,10 +624,10 @@ public:
 
 private:
 	//unit types associated with lists of upgrades which they can research
-	std::map<const wyrmgus::unit_type *, std::vector<const CUpgrade *>> researched_upgrades;
+	wyrmgus::unit_type_map<std::vector<const CUpgrade *>> researched_upgrades;
 
 	//unit classes associated with lists of upgrade classes which they can research
-	std::map<const wyrmgus::unit_class *, std::vector<const wyrmgus::upgrade_class *>> researched_upgrade_classes;
+	wyrmgus::unit_class_map<std::vector<const wyrmgus::upgrade_class *>> researched_upgrade_classes;
 
 public:
 	/**
