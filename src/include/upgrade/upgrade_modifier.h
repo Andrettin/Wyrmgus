@@ -56,12 +56,6 @@ public:
 	static std::vector<upgrade_modifier *> UpgradeModifiers;
 
 	upgrade_modifier();
-	~upgrade_modifier()
-	{
-		if (this->ModifyPercent) {
-			delete [] this->ModifyPercent;
-		}
-	}
 
 	std::unique_ptr<upgrade_modifier> duplicate() const;
 	
@@ -87,7 +81,7 @@ public:
 	int UpgradeId = 0;						/// used to filter required modifier
 
 	CUnitStats Modifier;					/// modifier of unit stats.
-	int *ModifyPercent = nullptr;			/// use for percent modifiers
+	std::unique_ptr<int[]> ModifyPercent;			/// use for percent modifiers
 	int SpeedResearch = 0;					/// speed factor for researching
 	int ImproveIncomes[MaxCosts];			/// improve incomes
 	unit_type_map<int> UnitStock;	/// unit stock

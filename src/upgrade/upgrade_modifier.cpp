@@ -48,8 +48,8 @@ upgrade_modifier::upgrade_modifier()
 	
 	memset(this->ChangeUpgrades, '?', sizeof(this->ChangeUpgrades));
 	this->Modifier.Variables.resize(UnitTypeVar.GetNumberVariable());
-	this->ModifyPercent = new int[UnitTypeVar.GetNumberVariable()];
-	memset(this->ModifyPercent, 0, UnitTypeVar.GetNumberVariable() * sizeof(int));
+	this->ModifyPercent = std::make_unique<int[]>(UnitTypeVar.GetNumberVariable());
+	memset(this->ModifyPercent.get(), 0, UnitTypeVar.GetNumberVariable() * sizeof(int));
 }
 
 std::unique_ptr<upgrade_modifier> upgrade_modifier::duplicate() const
@@ -57,7 +57,7 @@ std::unique_ptr<upgrade_modifier> upgrade_modifier::duplicate() const
 	auto modifier = std::make_unique<upgrade_modifier>();
 
 	modifier->Modifier = this->Modifier;
-	memcpy(modifier->ModifyPercent, this->ModifyPercent, sizeof(UnitTypeVar.GetNumberVariable()));
+	memcpy(modifier->ModifyPercent.get(), this->ModifyPercent.get(), sizeof(UnitTypeVar.GetNumberVariable()));
 	modifier->SpeedResearch = this->SpeedResearch;
 	memcpy(modifier->ImproveIncomes, this->ImproveIncomes, sizeof(modifier->ImproveIncomes));
 	modifier->UnitStock = this->UnitStock;

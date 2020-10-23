@@ -53,6 +53,7 @@ namespace wyrmgus {
 	class icon;
 	class magic_domain;
 	class unique_item;
+	class unit_class;
 	class unit_type;
 	class upgrade_class;
 	class upgrade_modifier;
@@ -270,12 +271,13 @@ public:
 		return this->item;
 	}
 
-	const std::vector<std::unique_ptr<wyrmgus::upgrade_modifier>> &get_modifiers() const
+	const std::vector<std::unique_ptr<const wyrmgus::upgrade_modifier>> &get_modifiers() const
 	{
 		return this->modifiers;
 	}
 
-	void add_modifier(std::unique_ptr<wyrmgus::upgrade_modifier> &&modifier);
+	void add_modifier(std::unique_ptr<const wyrmgus::upgrade_modifier> &&modifier);
+
 
 	const std::unique_ptr<wyrmgus::condition> &get_preconditions() const
 	{
@@ -347,7 +349,7 @@ public:
 	int Year = 0;						/// Year of publication, if is a literary work
 	wyrmgus::character *Author = nullptr;		/// Author of this literary work (if it is one)
 private:
-	std::vector<std::unique_ptr<wyrmgus::upgrade_modifier>> modifiers; //upgrade modifiers for this upgrade
+	std::vector<std::unique_ptr<const wyrmgus::upgrade_modifier>> modifiers; //upgrade modifiers for this upgrade
 public:
 	std::vector<wyrmgus::unique_item *> UniqueItems;	/// Unique items who form a part of this set upgrade
 	std::vector<wyrmgus::unit_type *> ScaledCostUnits;	/// Units for which the upgrade's costs are scaled

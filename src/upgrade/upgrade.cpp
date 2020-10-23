@@ -387,7 +387,7 @@ void CUpgrade::set_upgrade_class(wyrmgus::upgrade_class *upgrade_class)
 	}
 }
 
-void CUpgrade::add_modifier(std::unique_ptr<wyrmgus::upgrade_modifier> &&modifier)
+void CUpgrade::add_modifier(std::unique_ptr<const wyrmgus::upgrade_modifier> &&modifier)
 {
 	this->modifiers.push_back(std::move(modifier));
 }
