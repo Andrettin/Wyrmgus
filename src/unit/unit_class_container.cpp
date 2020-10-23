@@ -35,6 +35,10 @@ namespace wyrmgus {
 
 bool unit_class_compare::operator()(const unit_class *unit_class, const wyrmgus::unit_class *other_unit_class) const
 {
+	if ((unit_class == nullptr || other_unit_class == nullptr) && unit_class != other_unit_class) {
+		return unit_class == nullptr;
+	}
+
 	return unit_class->get_index() < other_unit_class->get_index();
 }
 
