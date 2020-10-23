@@ -278,6 +278,11 @@ public:
 
 	void add_modifier(std::unique_ptr<const wyrmgus::upgrade_modifier> &&modifier);
 
+	const std::vector<const wyrmgus::unit_type *> &get_scaled_cost_unit_types() const
+	{
+		return this->scaled_cost_unit_types;
+	}
+
 
 	const std::unique_ptr<wyrmgus::condition> &get_preconditions() const
 	{
@@ -351,8 +356,10 @@ public:
 private:
 	std::vector<std::unique_ptr<const wyrmgus::upgrade_modifier>> modifiers; //upgrade modifiers for this upgrade
 public:
-	std::vector<wyrmgus::unique_item *> UniqueItems;	/// Unique items who form a part of this set upgrade
-	std::vector<wyrmgus::unit_type *> ScaledCostUnits;	/// Units for which the upgrade's costs are scaled
+	std::vector<const wyrmgus::unique_item *> UniqueItems;	/// Unique items who form a part of this set upgrade
+private:
+	std::vector<const wyrmgus::unit_type *> scaled_cost_unit_types;	//units for which the upgrade's costs are scaled
+public:
 	std::vector<wyrmgus::character *> Characters;	/// Characters who appear in this literary work (if it is one)
 	//Wyrmgus end
 	// TODO: not used by buttons

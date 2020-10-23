@@ -232,6 +232,10 @@ void CUpgrade::process_sml_scope(const wyrmgus::sml_data &scope)
 			const wyrmgus::resource *resource = wyrmgus::resource::get(key);
 			this->Costs[resource->get_index()] = std::stoi(value);
 		});
+	} else if (tag == "scaled_cost_unit_types") {
+		for (const std::string &value : values) {
+			this->scaled_cost_unit_types.push_back(wyrmgus::unit_type::get(value));
+		}
 	} else if (tag == "civilization_priorities") {
 		scope.for_each_property([&](const wyrmgus::sml_property &property) {
 			const std::string &key = property.get_key();
@@ -343,9 +347,7 @@ void CUpgrade::set_parent(const CUpgrade *parent_upgrade)
 	this->RunicAffix = parent_upgrade->RunicAffix;
 	this->Work = parent_upgrade->Work;
 	this->UniqueOnly = parent_upgrade->UniqueOnly;
-	for (size_t i = 0; i < parent_upgrade->ScaledCostUnits.size(); ++i) {
-		this->ScaledCostUnits.push_back(parent_upgrade->ScaledCostUnits[i]);
-	}
+	this->scaled_cost_unit_types = parent_upgrade->scaled_cost_unit_types;
 
 	for (const auto &modifier : parent_upgrade->get_modifiers()) {
 		std::unique_ptr<wyrmgus::upgrade_modifier> duplicated_modifier = modifier->duplicate();
@@ -609,8 +611,8 @@ static int CclDefineUpgrade(lua_State *l)
 			}
 			const int subargs = lua_rawlen(l, -1);
 			for (int j = 0; j < subargs; ++j) {
-				wyrmgus::unit_type *scaled_cost_unit = wyrmgus::unit_type::get(LuaToString(l, -1, j + 1));
-				upgrade->ScaledCostUnits.push_back(scaled_cost_unit);
+				const wyrmgus::unit_type *scaled_cost_unit = wyrmgus::unit_type::get(LuaToString(l, -1, j + 1));
+				upgrade->scaled_cost_unit_types.push_back(scaled_cost_unit);
 			}
 		} else if (!strcmp(value, "WeaponClasses")) {
 			if (!lua_istable(l, -1)) {
