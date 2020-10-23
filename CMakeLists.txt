@@ -430,10 +430,12 @@ set(unit_SRCS
 	src/unit/unit_cache.cpp
 	src/unit/unit.cpp
 	src/unit/unit_class.cpp
+	src/unit/unit_class_container.cpp
 	src/unit/unit_draw.cpp
 	src/unit/unit_find.cpp
 	src/unit/unit_manager.cpp
 	src/unit/unit_save.cpp
+	src/unit/unit_type_container.cpp
 	src/unit/unit_type_variation.cpp
 	src/unit/unitptr.cpp
 	src/unit/unit_type.cpp
@@ -805,11 +807,13 @@ set(stratagus_unit_HDRS
 	src/unit/unit.h
 	src/unit/unit_cache.h
 	src/unit/unit_class.h
+	src/unit/unit_class_container.h
 	src/unit/unit_find.h
 	src/unit/unit_manager.h
 	src/unit/unit_type_variation.h
 	src/unit/unitptr.h
 	src/unit/unit_type.h
+	src/unit/unit_type_container.h
 	src/unit/unit_type_type.h
 	src/unit/unit_variable.h
 )

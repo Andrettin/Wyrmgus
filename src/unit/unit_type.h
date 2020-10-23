@@ -421,7 +421,6 @@ class CUnit;
 class CDecoVar
 {
 public:
-
 	CDecoVar() {};
 	virtual ~CDecoVar()
 	{
@@ -800,6 +799,11 @@ public:
 	virtual void ProcessConfigData(const CConfigData *config_data) override;
 	virtual void initialize() override;
 	virtual void check() const override;
+
+	int get_index() const
+	{
+		return this->Slot;
+	}
 	
 	unit_class *get_unit_class() const
 	{
