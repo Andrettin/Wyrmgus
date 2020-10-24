@@ -39,6 +39,7 @@
 #include "iolib.h"
 #include "map/map_layer.h"
 #include "player.h"
+#include "script.h"
 #include "sound/sound.h"
 #include "sound/unitsound.h"
 #include "sound/unit_sound_type.h"

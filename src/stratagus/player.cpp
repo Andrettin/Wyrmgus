@@ -72,6 +72,7 @@
 #include "religion/deity.h"
 #include "religion/religion.h"
 //Wyrmgus end
+#include "script.h"
 #include "script/condition/condition.h"
 #include "script/effect/effect_list.h"
 //Wyrmgus start

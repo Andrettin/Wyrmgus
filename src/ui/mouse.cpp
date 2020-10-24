@@ -52,6 +52,7 @@
 //Wyrmgus start
 #include "province.h"
 //Wyrmgus end
+#include "script.h"
 #include "script/condition/condition.h"
 #include "sound/sound.h"
 #include "sound/unitsound.h"

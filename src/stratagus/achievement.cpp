@@ -33,6 +33,7 @@
 #include "player.h"
 #include "player_color.h"
 #include "quest.h"
+#include "script.h"
 #include "unit/unit_type.h"
 #include "util/string_util.h"
 

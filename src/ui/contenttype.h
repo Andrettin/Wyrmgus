@@ -29,11 +29,14 @@
 
 #pragma once
 
-#include "script.h"
 #include "vec2i.h"
 
 class CUnit;
 class ConditionPanel;
+enum EnumUnit;
+enum EnumVariable;
+struct lua_State;
+struct StringDesc;
 
 namespace wyrmgus {
 	class font;
@@ -66,11 +69,8 @@ public:
 class CContentTypeText : public CContentType
 {
 public:
-	virtual ~CContentTypeText()
-	{
-		FreeStringDesc(Text);
-		delete Text;
-	}
+	CContentTypeText();
+	virtual ~CContentTypeText();
 
 	virtual void Draw(const CUnit &unit, const wyrmgus::font *defaultfont) const override;
 	virtual void Parse(lua_State *l) override;
@@ -80,7 +80,7 @@ private:
 	const wyrmgus::font *Font = nullptr; /// Font to use.
 	char Centered = 0;           /// if true, center the display.
 	int Index = -1;              /// Index of the variable to show, -1 if not.
-	EnumVariable Component = VariableValue; /// Component of the variable.
+	EnumVariable Component;      /// Component of the variable.
 	char ShowName = 0;           /// If true, Show name's unit.
 	char Stat = 0;               /// true to special display.(value or value + diff)
 };
@@ -91,8 +91,7 @@ private:
 class CContentTypeFormattedText : public CContentType
 {
 public:
-	CContentTypeFormattedText() : Centered(false),
-		Index(-1), Component(VariableValue) {}
+	CContentTypeFormattedText();
 	virtual ~CContentTypeFormattedText() {}
 
 	virtual void Draw(const CUnit &unit, const wyrmgus::font *defaultfont) const override;
@@ -101,8 +100,8 @@ public:
 private:
 	std::string Format;          /// Text to display
 	const wyrmgus::font *Font = nullptr; /// Font to use.
-	bool Centered;               /// if true, center the display.
-	int Index;                   /// Index of the variable to show.
+	bool Centered = false;       /// if true, center the display.
+	int Index = -1;              /// Index of the variable to show.
 	EnumVariable Component;      /// Component of the variable.
 };
 
@@ -112,8 +111,7 @@ private:
 class CContentTypeFormattedText2 : public CContentType
 {
 public:
-	CContentTypeFormattedText2() : Centered(false),
-		Index1(-1), Component1(VariableValue), Index2(-1), Component2(VariableValue) {}
+	CContentTypeFormattedText2();
 	virtual ~CContentTypeFormattedText2() {}
 
 	virtual void Draw(const CUnit &unit, const wyrmgus::font *defaultfont) const override;
@@ -122,10 +120,10 @@ public:
 private:
 	std::string Format;          /// Text to display
 	const wyrmgus::font *Font = nullptr; /// Font to use.
-	bool Centered;               /// if true, center the display.
-	int Index1;                  /// Index of the variable1 to show.
+	bool Centered = false;       /// if true, center the display.
+	int Index1 = -1;             /// Index of the variable1 to show.
 	EnumVariable Component1;     /// Component of the variable1.
-	int Index2;                  /// Index of the variable to show.
+	int Index2 = -1;             /// Index of the variable to show.
 	EnumVariable Component2;     /// Component of the variable.
 };
 

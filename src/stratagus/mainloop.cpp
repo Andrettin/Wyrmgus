@@ -57,6 +57,7 @@
 //Wyrmgus end
 #include "replay.h"
 #include "results.h"
+#include "script.h"
 #include "script/trigger.h"
 //Wyrmgus start
 #include "settings.h"

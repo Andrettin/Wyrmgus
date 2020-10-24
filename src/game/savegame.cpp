@@ -41,6 +41,7 @@
 #include "parameters.h"
 #include "player.h"
 #include "replay.h"
+#include "script.h"
 #include "script/trigger.h"
 #include "ui/ui.h"
 #include "unit/unit.h"

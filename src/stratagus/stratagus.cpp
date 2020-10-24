@@ -187,6 +187,7 @@ extern void beos_init(int argc, char **argv);
 #include "player.h"
 #include "replay.h"
 #include "results.h"
+#include "script.h"
 #include "settings.h"
 #include "sound/sound_server.h"
 #include "time/calendar.h"

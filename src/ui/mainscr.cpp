@@ -56,6 +56,7 @@
 #include "province.h"
 #include "quest.h"
 //Wyrmgus end
+#include "script.h"
 #include "script/trigger.h"
 #include "sound/sound.h"
 #include "sound/unitsound.h"

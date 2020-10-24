@@ -279,7 +279,6 @@
 #include "database/data_type.h"
 #include "data_type.h"
 #include "missileconfig.h"
-#include "script.h"
 #include "sound/unitsound.h"
 #include "unit/unitptr.h"
 #include "vec2i.h"
@@ -289,6 +288,7 @@ class CUnit;
 class CViewport;
 class CFile;
 class LuaCallback;
+struct NumberDesc;
 
 /*----------------------------------------------------------------------------
 --  Missile-type

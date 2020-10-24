@@ -34,6 +34,7 @@
 //Wyrmgus start
 #include "grand_strategy.h"
 //Wyrmgus end
+#include "script.h"
 #include "ui/cursor.h"
 #include "ui/cursor_type.h"
 #include "ui/ui.h"

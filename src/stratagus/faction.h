@@ -32,6 +32,7 @@
 #include "faction_tier.h"
 #include "gender.h"
 #include "player.h" //for certain enums
+#include "time/date.h"
 
 class CAiBuildingTemplate;
 class CCurrency;

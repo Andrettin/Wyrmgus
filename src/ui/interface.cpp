@@ -46,6 +46,7 @@
 #include "player.h"
 #include "player_color.h"
 #include "replay.h"
+#include "script.h"
 #include "sound/sound.h"
 #include "sound/sound_server.h"
 #include "sound/unit_sound_type.h"

@@ -84,6 +84,7 @@
 #include "iolib.h"
 #include "map/map.h"
 #include "map/minimap.h"
+#include "script.h"
 #include "ui/cursor.h"
 #include "ui/ui.h"
 #include "util/image_util.h"

@@ -48,6 +48,7 @@
 #include "map/map.h"
 #include "map/map_layer.h"
 #include "map/tileset.h"
+#include "script.h"
 #include "sound/sound.h"
 #include "spell/spell_action.h"
 #include "spell/spell_action_adjust_variable.h"

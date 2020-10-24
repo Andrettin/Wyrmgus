@@ -43,6 +43,7 @@
 #include "missile/missile_class.h"
 #include "mod.h"
 #include "player.h"
+#include "script.h"
 #include "script/trigger.h"
 //Wyrmgus start
 #include "settings.h"

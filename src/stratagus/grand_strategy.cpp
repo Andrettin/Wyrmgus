@@ -39,6 +39,7 @@
 #include "menus.h"
 #include "player.h"
 #include "results.h"
+#include "script.h"
 #include "sound/sound_server.h"
 #include "ui/cursor.h"
 #include "ui/interface.h"

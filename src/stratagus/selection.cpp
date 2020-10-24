@@ -43,6 +43,7 @@
 #include "map/map_layer.h"
 #include "network.h"
 #include "player.h"
+#include "script.h"
 #include "ui/interface.h"
 #include "ui/ui.h"
 #include "unit/unit.h"

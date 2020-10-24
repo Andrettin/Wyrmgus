@@ -31,6 +31,7 @@
 
 #include "grand_strategy.h"
 #include "luacallback.h"
+#include "script.h"
 #include "world.h"
 
 /**

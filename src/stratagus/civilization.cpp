@@ -36,6 +36,7 @@
 #include "faction.h"
 #include "government_type.h"
 #include "player.h"
+#include "script.h"
 #include "time/calendar.h"
 #include "ui/button.h"
 #include "ui/cursor.h"

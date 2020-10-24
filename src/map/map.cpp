@@ -48,6 +48,9 @@
 //Wyrmgus start
 #include "province.h"
 #include "quest.h"
+//Wyrmgus end
+#include "script.h"
+//Wyrmgus start
 #include "settings.h"
 #include "sound/sound_server.h"
 //Wyrmgus end

@@ -33,7 +33,6 @@
 /// @todo all user interface variables should go here and be configurable
 
 #include "color.h"
-#include "script.h"
 #include "viewport.h"
 #include "ui/interface.h"
 #include "ui/statusline.h"

@@ -28,12 +28,13 @@
 #pragma once
 
 #include "color.h"
-#include "script.h"
 #include "ui/button_cmd.h"
 #include "unit/unit_type_type.h"
 #include "vec2i.h"
 
 class CPopup;
+class CUpgrade;
+struct StringDesc;
 
 namespace wyrmgus {
 	class button;
@@ -175,10 +176,7 @@ class CPopupContentTypeText final : public CPopupContentType
 public:
 	//Wyrmgus start
 //	virtual ~CPopupContentTypeText() {}
-	virtual ~CPopupContentTypeText() {
-		FreeStringDesc(Text);
-		delete Text;
-	}
+	virtual ~CPopupContentTypeText();
 	//Wyrmgus end
 
 	virtual void Draw(int x, int y, const CPopup &popup, const unsigned int popupWidth, const wyrmgus::button &button, int *Costs) const override;
@@ -233,11 +231,7 @@ private:
 class CPopupContentTypeVariable final : public CPopupContentType
 {
 public:
-	virtual ~CPopupContentTypeVariable()
-	{
-		FreeStringDesc(Text);
-		delete Text;
-	}
+	virtual ~CPopupContentTypeVariable();
 
 	virtual void Draw(int x, int y, const CPopup &popup, const unsigned int popupWidth, const wyrmgus::button &button, int *Costs) const override;
 

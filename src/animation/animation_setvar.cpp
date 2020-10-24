@@ -27,10 +27,6 @@
 //      02111-1307, USA.
 //
 
-/*----------------------------------------------------------------------------
---  Includes
-----------------------------------------------------------------------------*/
-
 #include "stratagus.h"
 
 #include "animation/animation_setvar.h"
@@ -39,6 +35,7 @@
 //Wyrmgus start
 #include "commands.h"
 //Wyrmgus end
+#include "script.h"
 #include "unit/unit.h"
 #include "unit/unit_manager.h"
 

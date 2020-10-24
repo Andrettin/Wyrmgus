@@ -35,6 +35,7 @@
 #include "faction.h"
 #include "item/item_class.h"
 #include "player.h"
+#include "script.h"
 #include "script/condition/condition.h"
 #include "script/trigger.h"
 #include "spell/spell.h"
@@ -248,6 +249,12 @@ int CPopupContentTypeText::GetHeight(const wyrmgus::button &button, int *) const
 		height += font->Height() + 2 * scale_factor;
 	}
 	return height;
+}
+
+CPopupContentTypeText::~CPopupContentTypeText()
+{
+	FreeStringDesc(Text);
+	delete Text;
 }
 
 void CPopupContentTypeText::Draw(int x, int y, const CPopup &popup, const unsigned int popupWidth, const wyrmgus::button &button, int *) const
@@ -542,6 +549,12 @@ int CPopupContentTypeVariable::GetHeight(const wyrmgus::button &, int *) const
 {
 	const wyrmgus::font *font = this->Font ? this->Font : wyrmgus::defines::get()->get_small_font();
 	return font->Height();
+}
+
+CPopupContentTypeVariable::~CPopupContentTypeVariable()
+{
+	FreeStringDesc(Text);
+	delete Text;
 }
 
 void CPopupContentTypeVariable::Draw(int x, int y, const CPopup &, const unsigned int, const wyrmgus::button &button, int *) const

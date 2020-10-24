@@ -45,6 +45,7 @@
 #include "map/tileset.h"
 #include "pathfinder.h"
 #include "player.h"
+#include "script.h"
 #include "script/condition/condition.h"
 #include "unit/unit.h"
 #include "unit/unit_class.h"

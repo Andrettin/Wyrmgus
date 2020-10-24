@@ -27,10 +27,6 @@
 //      02111-1307, USA.
 //
 
-/*----------------------------------------------------------------------------
---  Includes
-----------------------------------------------------------------------------*/
-
 #include "stratagus.h"
 
 #include "ui/contenttype.h"
@@ -38,6 +34,7 @@
 #include "actions.h"
 #include "action/action_built.h"
 #include "database/defines.h"
+#include "script.h"
 #include "translate.h"
 #include "ui/ui.h"
 #include "unit/unit.h"
@@ -57,6 +54,16 @@ extern UStrInt GetComponent(const wyrmgus::unit_type &type, int index, EnumVaria
 
 CContentType::~CContentType()
 {
+}
+
+CContentTypeText::CContentTypeText() : Component(VariableValue)
+{
+}
+
+CContentTypeText::~CContentTypeText()
+{
+	FreeStringDesc(Text);
+	delete Text;
 }
 
 /**
@@ -132,6 +139,10 @@ CContentType::~CContentType()
 	}
 }
 
+CContentTypeFormattedText::CContentTypeFormattedText() : Component(VariableValue)
+{
+}
+
 /**
 **  Draw formatted text with variable value.
 **
@@ -142,7 +153,7 @@ CContentType::~CContentType()
 **  @note text must have exactly 1 %d.
 **  @bug if text format is incorrect.
 */
-/* virtual */ void CContentTypeFormattedText::Draw(const CUnit &unit, const wyrmgus::font *defaultfont) const
+void CContentTypeFormattedText::Draw(const CUnit &unit, const wyrmgus::font *defaultfont) const
 {
 	char buf[256];
 	UStrInt usi1;
@@ -174,6 +185,10 @@ CContentType::~CContentType()
 	}
 }
 
+CContentTypeFormattedText2::CContentTypeFormattedText2() : Component1(VariableValue), Component2(VariableValue)
+{
+}
+
 /**
 **  Draw formatted text with variable value.
 **
@@ -184,7 +199,7 @@ CContentType::~CContentType()
 **  @note text must have exactly 2 %d.
 **  @bug if text format is incorrect.
 */
-/* virtual */ void CContentTypeFormattedText2::Draw(const CUnit &unit, const wyrmgus::font *defaultfont) const
+void CContentTypeFormattedText2::Draw(const CUnit &unit, const wyrmgus::font *defaultfont) const
 {
 	char buf[256];
 	UStrInt usi1, usi2;

@@ -38,6 +38,7 @@
 //Wyrmgus end
 #include "network.h"
 #include "player.h"
+#include "script.h"
 #include "script/condition/condition.h"
 #include "ui/button.h"
 #include "ui/interface.h"

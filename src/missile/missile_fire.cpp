@@ -32,6 +32,7 @@
 #include "missile.h"
 
 #include "actions.h"
+#include "script.h"
 #include "unit/unit.h"
 
 /**
