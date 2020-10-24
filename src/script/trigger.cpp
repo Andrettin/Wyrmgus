@@ -593,20 +593,24 @@ void TriggersEachCycle()
 		bool removed_trigger = false;
 		
 		//old Lua conditions/effects for triggers
-		if (current_trigger->Conditions && current_trigger->Effects) {
-			current_trigger->Conditions->pushPreamble();
-			current_trigger->Conditions->run(1);
-			if (current_trigger->Conditions->popBoolean()) {
-				current_trigger->Effects->pushPreamble();
-				current_trigger->Effects->run(1);
-				if (current_trigger->Effects->popBoolean() == false) {
-					wyrmgus::trigger::DeactivatedTriggers.push_back(current_trigger->get_identifier());
-					wyrmgus::trigger::ActiveTriggers.erase(wyrmgus::trigger::ActiveTriggers.begin() + wyrmgus::trigger::CurrentTriggerId);
-					removed_trigger = true;
-					if (current_trigger->Local) {
-						delete current_trigger;
+		if (current_trigger->Conditions != nullptr && current_trigger->Effects != nullptr) {
+			try {
+				current_trigger->Conditions->pushPreamble();
+				current_trigger->Conditions->run(1);
+				if (current_trigger->Conditions->popBoolean()) {
+					current_trigger->Effects->pushPreamble();
+					current_trigger->Effects->run(1);
+					if (current_trigger->Effects->popBoolean() == false) {
+						wyrmgus::trigger::DeactivatedTriggers.push_back(current_trigger->get_identifier());
+						wyrmgus::trigger::ActiveTriggers.erase(wyrmgus::trigger::ActiveTriggers.begin() + wyrmgus::trigger::CurrentTriggerId);
+						removed_trigger = true;
+						if (current_trigger->Local) {
+							delete current_trigger;
+						}
 					}
 				}
+			} catch (...) {
+				std::throw_with_nested(std::runtime_error("Lua error for trigger \"" + current_trigger->get_identifier() + "\"."));
 			}
 		}
 		
