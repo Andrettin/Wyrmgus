@@ -3425,14 +3425,19 @@ void CclGetDate(lua_State *l, CDate *d, const int offset)
 */
 int CclCommand(const std::string &command, bool exitOnError)
 {
-	const int status = luaL_loadbuffer(Lua, command.c_str(), command.size(), command.c_str());
+	try {
+		const int status = luaL_loadbuffer(Lua, command.c_str(), command.size(), command.c_str());
 
-	if (!status) {
-		LuaCall(0, 1, exitOnError);
-	} else {
-		report(status, exitOnError);
+		if (!status) {
+			LuaCall(0, 1, exitOnError);
+		} else {
+			report(status, exitOnError);
+		}
+
+		return status;
+	} catch (...) {
+		std::throw_with_nested("Error calling Lua command: \"" + command + "\"");
 	}
-	return status;
 }
 
 /*............................................................................
