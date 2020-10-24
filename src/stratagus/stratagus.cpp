@@ -473,6 +473,7 @@ static std::string stderrFile;
 
 static void CleanupOutput()
 {
+	std::cerr.clear();
 	fclose(stdout);
 	fclose(stderr);
 

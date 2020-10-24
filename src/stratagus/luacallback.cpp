@@ -147,13 +147,17 @@ void LuaCallback::run(int results)
 	int status = lua_pcall(luastate, arguments, results, base);
 
 	if (status) {
-		const char *msg = lua_tostring(luastate, -1);
+		std::string msg = lua_tostring(luastate, -1);
 
-		if (msg == nullptr) {
+		if (msg.empty()) {
 			msg = "(error with no message)";
 		}
-		fprintf(stderr, "%s\n", msg);
+
+		msg = "Lua error: " + msg;
+
 		lua_pop(luastate, 1);
+
+		throw std::runtime_error(msg);
 	}
 	rescount = results;
 }
