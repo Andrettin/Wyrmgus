@@ -92,10 +92,11 @@
 */
 #define _C_  ,    /// Debug , to simulate vararg macros
 
-extern void PrintLocation(const char *file, int line, const char *funcName);
+extern void PrintLocation(const char *file, int line, const char *funcName, std::ostream &output_stream);
 
 /// Print function in debug macros
-#define PrintFunction() PrintLocation(__FILE__, __LINE__, __func__);
+#define PrintFunction() PrintLocation(__FILE__, __LINE__, __func__, std::cout);
+#define PrintErrorFunction() PrintLocation(__FILE__, __LINE__, __func__, std::cerr);
 
 extern bool EnableDebugPrint;
 extern bool EnableAssert;

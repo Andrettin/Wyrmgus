@@ -529,9 +529,9 @@ int UTF8GetNext(const std::string &text, int curpos)
 --  others
 ----------------------------------------------------------------------------*/
 
-void PrintLocation(const char *file, int line, const char *funcName)
+void PrintLocation(const char *file, int line, const char *funcName, std::ostream &output_stream)
 {
-	fprintf(stdout, "%s:%d: %s: ", file, line, funcName);
+	output_stream << file << ':' << line << ": " << funcName;
 }
 
 void AbortAt(const char *file, int line, const char *funcName, const char *conditionStr)
