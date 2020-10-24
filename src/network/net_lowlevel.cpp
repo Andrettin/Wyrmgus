@@ -241,7 +241,7 @@ unsigned long NetResolveHost(const std::string &host)
 // Lookout for INTRFC.EXE on the MS web site...
 int NetSocketAddr(const Socket sock, unsigned long *ips, int maxAddr)
 {
-	INTERFACE_INFO *localAddr = new INTERFACE_INFO[maxAddr];  // Assume there will be no more than maxAddr interfaces
+	auto localAddr = std::make_unique<INTERFACE_INFO[]>(maxAddr);  // Assume there will be no more than maxAddr interfaces
 	int nif = 0;
 
 	if (sock != static_cast<Socket>(-1)) {
@@ -270,7 +270,7 @@ int NetSocketAddr(const Socket sock, unsigned long *ips, int maxAddr)
 			}
 		}
 	}
-	delete [] localAddr;
+
 	return nif;
 }
 #elif USE_LINUX // } {

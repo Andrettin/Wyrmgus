@@ -44,7 +44,7 @@ class module final : public QObject
 	Q_PROPERTY(QVariantList dependencies READ get_dependencies_qvariant_list)
 
 public:
-	module(const std::string &identifier, const std::filesystem::path &path, module *parent_module)
+	explicit module(const std::string &identifier, const std::filesystem::path &path, module *parent_module)
 		: identifier(identifier), path(path), parent_module(parent_module)
 	{
 	}

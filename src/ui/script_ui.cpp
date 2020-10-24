@@ -471,11 +471,11 @@ static std::unique_ptr<ConditionPanel> ParseConditionPanel(lua_State *l)
 	return condition;
 }
 
-static CContentType *CclParseContent(lua_State *l)
+static std::unique_ptr<CContentType> CclParseContent(lua_State *l)
 {
 	Assert(lua_istable(l, -1));
 
-	CContentType *content = nullptr;
+	std::unique_ptr<CContentType> content;
 	std::unique_ptr<ConditionPanel> condition;
 	PixelPos pos(0, 0);
 	//Wyrmgus start
@@ -501,17 +501,17 @@ static CContentType *CclParseContent(lua_State *l)
 			lua_rawgeti(l, -2, 2); // Method data
 			key = LuaToString(l, -2);
 			if (!strcmp(key, "Text")) {
-				content = new CContentTypeText;
+				content = std::make_unique<CContentTypeText>();
 			} else if (!strcmp(key, "FormattedText")) {
-				content = new CContentTypeFormattedText;
+				content = std::make_unique<CContentTypeFormattedText>();
 			} else if (!strcmp(key, "FormattedText2")) {
-				content = new CContentTypeFormattedText2;
+				content = std::make_unique<CContentTypeFormattedText2>();
 			} else if (!strcmp(key, "Icon")) {
-				content = new CContentTypeIcon;
+				content = std::make_unique<CContentTypeIcon>();
 			} else if (!strcmp(key, "LifeBar")) {
-				content = new CContentTypeLifeBar;
+				content = std::make_unique<CContentTypeLifeBar>();
 			} else if (!strcmp(key, "CompleteBar")) {
-				content = new CContentTypeCompleteBar;
+				content = std::make_unique<CContentTypeCompleteBar>();
 			} else {
 				LuaError(l, "Invalid drawing method '%s' in DefinePanelContents" _C_ key);
 			}
@@ -544,7 +544,7 @@ static int CclDefinePanelContents(lua_State *l)
 
 	for (int i = 0; i < nargs; i++) {
 		Assert(lua_istable(l, i + 1));
-		CUnitInfoPanel *infopanel = new CUnitInfoPanel;
+		auto infopanel = std::make_unique<CUnitInfoPanel>();
 
 		for (lua_pushnil(l); lua_next(l, i + 1); lua_pop(l, 1)) {
 			const char *key = LuaToString(l, -2);
@@ -567,22 +567,21 @@ static int CclDefinePanelContents(lua_State *l)
 				LuaError(l, "'%s' invalid for DefinePanelContents" _C_ key);
 			}
 		}
-		for (std::vector<CContentType *>::iterator content = infopanel->Contents.begin();
-			 content != infopanel->Contents.end(); ++content) { // Default value for invalid value.
-			(*content)->Pos.x += infopanel->PosX;
-			(*content)->Pos.y += infopanel->PosY;
+		for (const std::unique_ptr<CContentType> &content : infopanel->Contents) { // Default value for invalid value.
+			content->Pos.x += infopanel->PosX;
+			content->Pos.y += infopanel->PosY;
 		}
 		size_t j;
 		for (j = 0; j < UI.InfoPanelContents.size(); ++j) {
 			if (infopanel->Name == UI.InfoPanelContents[j]->Name) {
 				DebugPrint("Redefinition of Panel '%s'\n" _C_ infopanel->Name.c_str());
-				delete UI.InfoPanelContents[j];
-				UI.InfoPanelContents[j] = infopanel;
+				UI.InfoPanelContents[j] = std::move(infopanel);
 				break;
 			}
 		}
+
 		if (j == UI.InfoPanelContents.size()) {
-			UI.InfoPanelContents.push_back(infopanel);
+			UI.InfoPanelContents.push_back(std::move(infopanel));
 		}
 	}
 	return 0;
@@ -599,7 +598,7 @@ static int CclDefinePopup(lua_State *l)
 {
 	Assert(lua_istable(l, 1));
 
-	CPopup *popup = new CPopup;
+	auto popup = std::make_unique<CPopup>();
 
 	for (lua_pushnil(l); lua_next(l, 1); lua_pop(l, 1)) {
 		const char *key = LuaToString(l, -2);
@@ -631,12 +630,11 @@ static int CclDefinePopup(lua_State *l)
 	for (size_t j = 0; j < UI.ButtonPopups.size(); ++j) {
 		if (popup->Ident == UI.ButtonPopups[j]->Ident) {
 			DebugPrint("Redefinition of Popup '%s'\n" _C_ popup->Ident.c_str());
-			delete UI.ButtonPopups[j];
-			UI.ButtonPopups[j] = popup;
+			UI.ButtonPopups[j] = std::move(popup);
 			return 0;
 		}
 	}
-	UI.ButtonPopups.push_back(popup);
+	UI.ButtonPopups.push_back(std::move(popup));
 	return 0;
 }
 

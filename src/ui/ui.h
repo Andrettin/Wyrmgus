@@ -174,17 +174,15 @@ public:
 class CUnitInfoPanel final
 {
 public:
-	CUnitInfoPanel() : PosX(0), PosY(0), DefaultFont(0),
-		Contents(), Condition(nullptr) {}
 	~CUnitInfoPanel();
 
 public:
 	std::string Name;      /// Ident of the panel.
-	int PosX;              /// X coordinate of the panel.
-	int PosY;              /// Y coordinate of the panel.
-	const wyrmgus::font *DefaultFont; /// Default font for content.
+	int PosX = 0;              /// X coordinate of the panel.
+	int PosY = 0;              /// Y coordinate of the panel.
+	const wyrmgus::font *DefaultFont = nullptr; /// Default font for content.
 
-	std::vector<CContentType *> Contents; /// Array of contents to display.
+	std::vector<std::unique_ptr<CContentType>> Contents; /// Array of contents to display.
 
 	std::unique_ptr<ConditionPanel> Condition; /// Condition to show the panel; if null, no condition.
 };
@@ -406,9 +404,9 @@ public:
 	CResourceInfo SeasonPanel;			/// Season panel
 	CResourceInfo DatePanel;			/// Date panel
 	CResourceInfo AgePanel;				/// Age panel
-	std::vector<CUnitInfoPanel *> InfoPanelContents;	/// Info panel contents
+	std::vector<std::unique_ptr<CUnitInfoPanel>> InfoPanelContents;	/// Info panel contents
 
-	std::vector<CPopup *> ButtonPopups;	/// Popup windows for buttons
+	std::vector<std::unique_ptr<CPopup>> ButtonPopups;	/// Popup windows for buttons
 
 	CUIButton *SingleSelectedButton;	/// Button for single selected unit
 

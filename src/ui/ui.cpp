@@ -127,12 +127,7 @@ void UpdateLoadProgress()
 
 CUnitInfoPanel::~CUnitInfoPanel()
 {
-	for (std::vector<CContentType *>::iterator content = Contents.begin();
-		 content != Contents.end(); ++content) {
-		delete *content;
-	}
 }
-
 
 CUserInterface::CUserInterface() :
 	MouseScroll(false), KeyScroll(false), KeyScrollSpeed(1),
@@ -164,9 +159,9 @@ CUserInterface::CUserInterface() :
 */
 CPopup *PopupByIdent(const std::string &ident)
 {
-	for (std::vector<CPopup *>::iterator i = UI.ButtonPopups.begin(); i < UI.ButtonPopups.end(); ++i) {
-		if ((*i)->Ident == ident) {
-			return *i;
+	for (const std::unique_ptr<CPopup> &popup : UI.ButtonPopups) {
+		if (popup->Ident == ident) {
+			return popup.get();
 		}
 	}
 	return nullptr;
@@ -309,17 +304,9 @@ void CleanUserInterface()
 
 	// Info Panel
 	UI.InfoPanel.G.reset();
-	for (std::vector<CUnitInfoPanel *>::iterator panel = UI.InfoPanelContents.begin();
-		 panel != UI.InfoPanelContents.end(); ++panel) {
-		delete *panel;
-	}
 	UI.InfoPanelContents.clear();
 	
 	// Button Popups
-	for (std::vector<CPopup *>::iterator popup = UI.ButtonPopups.begin();
-		 popup != UI.ButtonPopups.end(); ++popup) {
-		delete *popup;
-	}
 	UI.ButtonPopups.clear();
 
 	delete UI.SingleSelectedButton;

@@ -96,13 +96,12 @@ void InitMusic()
 
 #ifdef USE_OAML
 static void* oamlOpen(const char *filename) {
-	CFile *f = new CFile;
+	auto f = std::make_unique<CFile>();
 	const std::string name = LibraryFileName(filename);
 	if (f->open(name.c_str(), CL_OPEN_READ) == -1) {
-		delete f;
 		return nullptr;
 	}
-	return (void*)f;
+	return f.release();
 }
 
 static size_t oamlRead(void *ptr, size_t size, size_t nitems, void *fd) {
@@ -121,12 +120,11 @@ static long oamlTell(void *fd) {
 }
 
 static int oamlClose(void *fd) {
-	CFile *f = (CFile*)fd;
+	CFile *f = reinterpret_cast<CFile *>(fd);
 	int ret = f->close();
 	delete f;
 	return ret;
 }
-
 
 static oamlFileCallbacks fileCbs = {
 	&oamlOpen,

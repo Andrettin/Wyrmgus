@@ -893,66 +893,6 @@ static int CclSetMapTemplateLayerConnector(lua_State *l)
 	return 1;
 }
 
-/*
-static std::string map_terrains[64][64];
-
-static int CclCreateMapTemplateTerrainFile(lua_State *l)
-{
-	std::string map_template_ident = LuaToString(l, 1);
-	wyrmgus::map_template *map_template = wyrmgus::map_template::GetMapTemplate(map_template_ident);
-	if (!map_template) {
-		LuaError(l, "Map template doesn't exist.\n");
-	}
-
-	bool overlay = LuaToBoolean(l, 2);
-
-	FileWriter *fw = nullptr;
-	std::string map_filename = "scripts/map_templates/" + map_template_ident;
-	if (overlay) {
-		map_filename += "_overlay";
-	}
-	map_filename += ".map";
-	
-	for (int x = 0; x < map_template->Width; ++x) {
-		for (int y = 0; y < map_template->Height; ++y) {
-			unsigned int index = x + y * map_template->Width;
-			wyrmgus::terrain_type *terrain = nullptr;
-			if (!overlay && index < map_template->TileTerrains.size() && map_template->TileTerrains[index] != -1) {
-				terrain = TerrainTypes[map_template->TileTerrains[index]];
-			} else if (overlay && index < map_template->TileOverlayTerrains.size() && map_template->TileOverlayTerrains[index] != -1) {
-				terrain = TerrainTypes[map_template->TileOverlayTerrains[index]];
-			}
-			if (terrain && !terrain->Character.empty()) {
-				map_terrains[x][y] = terrain->Character;
-			} else {
-				map_terrains[x][y] = "0";
-			}
-		}
-	}
-
-	try {
-		fw = CreateFileWriter(map_filename);
-
-		for (int y = 0; y < map_template->Height; ++y) {
-			for (int x = 0; x < map_template->Width; ++x) {
-				fw->printf("%s", map_terrains[x][y].c_str());
-			}
-			fw->printf("\n");
-		}
-			
-		fw->printf("\n");
-	} catch (const FileException &) {
-		fprintf(stderr, "Couldn't write the map setup: \"%s\"\n", map_filename.c_str());
-		delete fw;
-		return 1;
-	}
-	
-	delete fw;
-	
-	return 1;
-}
-*/
-
 void ApplyCampaignMap(const std::string &campaign_ident)
 {
 	wyrmgus::database::load_history();
