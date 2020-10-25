@@ -159,9 +159,14 @@ void faction::process_sml_scope(const sml_data &scope)
 		scope.for_each_child([&](const sml_data &child_scope) {
 			faction::process_character_title_name_scope(this->character_title_names, child_scope);
 		});
+	} else if (tag == "preconditions") {
+		auto preconditions = std::make_unique<and_condition>();
+		database::process_sml_data(preconditions, scope);
+		this->preconditions = std::move(preconditions);
 	} else if (tag == "conditions") {
-		this->conditions = std::make_unique<and_condition>();
-		database::process_sml_data(this->conditions, scope);
+		auto conditions = std::make_unique<and_condition>();
+		database::process_sml_data(conditions, scope);
+		this->conditions = std::move(conditions);
 	} else {
 		data_entry::process_sml_scope(scope);
 	}

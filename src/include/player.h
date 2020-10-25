@@ -208,10 +208,10 @@ public:
 	bool HasUnitBuilder(const wyrmgus::unit_type *type, const wyrmgus::site *settlement = nullptr) const;
 	bool HasUpgradeResearcher(const CUpgrade *upgrade) const;
 
-	template <bool precondition = false>
+	template <bool preconditions_only = false>
 	bool can_found_faction(const wyrmgus::faction *faction) const;
 
-	template <bool precondition = false>
+	template <bool preconditions_only = false>
 	bool can_choose_dynasty(const wyrmgus::dynasty *dynasty) const;
 
 	bool is_character_available_for_recruitment(const wyrmgus::character *character, bool ignore_neutral = false) const;

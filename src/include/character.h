@@ -355,7 +355,7 @@ public:
 		return this->location;
 	}
 
-	const std::unique_ptr<and_condition> &get_conditions() const
+	const std::unique_ptr<const and_condition> &get_conditions() const
 	{
 		return this->conditions;
 	}
@@ -388,7 +388,7 @@ private:
 public:
 	std::unique_ptr<LuaCallback> Conditions;
 private:
-	std::unique_ptr<and_condition> conditions;
+	std::unique_ptr<const and_condition> conditions;
 public:
 	std::vector<persistent_item *> EquippedItems[static_cast<int>(wyrmgus::item_slot::count)]; //equipped items of the character, per slot
 private:

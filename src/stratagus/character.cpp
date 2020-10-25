@@ -92,8 +92,9 @@ void character::process_sml_scope(const sml_data &scope)
 	const std::vector<std::string> &values = scope.get_values();
 
 	if (tag == "conditions") {
-		this->conditions = std::make_unique<and_condition>();
-		database::process_sml_data(this->conditions, scope);
+		auto conditions = std::make_unique<and_condition>();
+		database::process_sml_data(conditions, scope);
+		this->conditions = std::move(conditions);
 	} else if (tag == "deities") {
 		for (const std::string &value : values) {
 			wyrmgus::deity *deity = deity::get(value);

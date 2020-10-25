@@ -1747,7 +1747,7 @@ bool CPlayer::HasUpgradeResearcher(const CUpgrade *upgrade) const
 	return false;
 }
 
-template <bool precondition>
+template <bool preconditions_only>
 bool CPlayer::can_found_faction(const wyrmgus::faction *faction) const
 {
 	if (CurrentQuest != nullptr) {
@@ -1756,7 +1756,7 @@ bool CPlayer::can_found_faction(const wyrmgus::faction *faction) const
 	
 	if (!faction->FactionUpgrade.empty()) {
 		CUpgrade *faction_upgrade = CUpgrade::get(faction->FactionUpgrade);
-		if (!check_conditions<precondition>(faction_upgrade, this, false)) {
+		if (!check_conditions<preconditions_only>(faction_upgrade, this, false)) {
 			return false;
 		}
 	}
@@ -1767,8 +1767,12 @@ bool CPlayer::can_found_faction(const wyrmgus::faction *faction) const
 			return false;
 		}
 	}
-	
-	if constexpr (!precondition) {
+
+	if (faction->get_preconditions() != nullptr && !faction->get_preconditions()->check(this)) {
+		return false;
+	}
+
+	if constexpr (!preconditions_only) {
 		//check if the required core settlements are owned by the player
 		if (wyrmgus::game::get()->get_current_campaign() != nullptr) { //only check for settlements in the Scenario mode
 			for (const wyrmgus::site *core_settlement : faction->get_core_settlements()) {
@@ -1798,7 +1802,7 @@ bool CPlayer::can_found_faction(const wyrmgus::faction *faction) const
 template bool CPlayer::can_found_faction<false>(const wyrmgus::faction *faction) const;
 template bool CPlayer::can_found_faction<true>(const wyrmgus::faction *faction) const;
 
-template <bool precondition>
+template <bool preconditions_only>
 bool CPlayer::can_choose_dynasty(const wyrmgus::dynasty *dynasty) const
 {
 	if (CurrentQuest != nullptr) {
@@ -1809,11 +1813,11 @@ bool CPlayer::can_choose_dynasty(const wyrmgus::dynasty *dynasty) const
 		return false;
 	}
 
-	if (!check_conditions<precondition>(dynasty->get_upgrade(), this, false)) {
+	if (!check_conditions<preconditions_only>(dynasty->get_upgrade(), this, false)) {
 		return false;
 	}
 
-	return check_conditions<precondition>(dynasty, this, false);
+	return check_conditions<preconditions_only>(dynasty, this, false);
 }
 
 template bool CPlayer::can_choose_dynasty<false>(const wyrmgus::dynasty *dynasty) const;

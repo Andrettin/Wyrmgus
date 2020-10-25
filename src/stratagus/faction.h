@@ -239,7 +239,12 @@ public:
 
 	const std::vector<CFiller> &get_ui_fillers() const;
 
-	const std::unique_ptr<and_condition> &get_conditions() const
+	const std::unique_ptr<const and_condition> &get_preconditions() const
+	{
+		return this->preconditions;
+	}
+
+	const std::unique_ptr<const and_condition> &get_conditions() const
 	{
 		return this->conditions;
 	}
@@ -367,7 +372,8 @@ public:
 private:
 	std::vector<std::string> ship_names;								/// Ship names for the faction
 	std::vector<CFiller> ui_fillers;
-	std::unique_ptr<and_condition> conditions;
+	std::unique_ptr<const and_condition> preconditions;
+	std::unique_ptr<const and_condition> conditions;
 	std::vector<const site *> core_settlements; //the core settlements of this faction (required to found it)
 public:
 	std::vector<site *> sites; /// Sites used for this faction if it needs a randomly-generated settlement
