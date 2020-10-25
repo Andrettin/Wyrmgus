@@ -73,6 +73,7 @@ class faction final : public detailed_data_entry, public data_type<faction>
 	Q_PROPERTY(wyrmgus::site* default_capital MEMBER default_capital READ get_default_capital)
 	Q_PROPERTY(bool simple_name MEMBER simple_name READ uses_simple_name)
 	Q_PROPERTY(bool short_name MEMBER short_name READ uses_short_name)
+	Q_PROPERTY(bool definite_article MEMBER definite_article READ uses_definite_article)
 	Q_PROPERTY(wyrmgus::deity* holy_order_deity MEMBER holy_order_deity READ get_holy_order_deity)
 	Q_PROPERTY(QStringList ship_names READ get_ship_names_qstring_list)
 	Q_PROPERTY(wyrmgus::faction_tier tier MEMBER tier READ get_tier)
@@ -168,6 +169,11 @@ public:
 	bool uses_short_name() const
 	{
 		return this->short_name;
+	}
+
+	bool uses_definite_article() const
+	{
+		return this->definite_article;
 	}
 
 	deity *get_holy_order_deity() const
@@ -334,6 +340,7 @@ private:
 public:
 	int Type = FactionTypeNoFactionType;								/// faction type (i.e. tribe or polity)
 private:
+	faction *parent_faction = nullptr;
 	faction_tier default_tier;
 	faction_tier min_tier;
 	faction_tier max_tier;
@@ -341,7 +348,6 @@ private:
 public:
 	int ParentFaction = -1;												/// parent faction of this faction
 	bool Playable = true;												/// faction playability
-	bool DefiniteArticle = false;										/// whether the faction's name should be preceded by a definite article (e.g. "the Netherlands")
 private:
 	icon *icon = nullptr;
 public:
@@ -355,6 +361,7 @@ private:
 	site *default_capital = nullptr;
 	bool simple_name = false;
 	bool short_name = false;
+	bool definite_article = false; //whether the faction's name should be preceded by a definite article (e.g. "the Netherlands")
 public:
 	std::vector<faction *> DevelopsFrom;								/// from which factions can this faction develop
 	std::vector<faction *> DevelopsTo;									/// to which factions this faction can develop

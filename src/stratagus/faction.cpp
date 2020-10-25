@@ -237,7 +237,7 @@ void faction::process_sml_dated_scope(const sml_data &scope, const QDateTime &da
 void faction::initialize()
 {
 	if (this->Type == FactionTypeTribe) {
-		this->DefiniteArticle = true;
+		this->definite_article = true;
 	}
 
 	std::sort(this->AiBuildingTemplates.begin(), this->AiBuildingTemplates.end(), [](const std::unique_ptr<CAiBuildingTemplate> &a, const std::unique_ptr<CAiBuildingTemplate> &b) {

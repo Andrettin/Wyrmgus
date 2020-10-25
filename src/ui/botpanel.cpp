@@ -1669,12 +1669,12 @@ void CButtonPanel::Update()
 					const wyrmgus::faction *faction = CPlayer::GetThisPlayer()->get_faction()->DevelopsTo[potential_faction_count];
 					button->Value = potential_faction_count;
 					button->Hint = "Found ";
-					if (faction->DefiniteArticle) {
+					if (faction->uses_definite_article()) {
 						button->Hint += "the ";
 					}
 					button->Hint += faction->get_name();
 					button->Description = "Changes your faction to ";
-					if (faction->DefiniteArticle) {
+					if (faction->uses_definite_article()) {
 						button->Description += "the ";
 					}
 					button->Description += faction->get_name();

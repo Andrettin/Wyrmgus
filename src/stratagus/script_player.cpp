@@ -1550,7 +1550,7 @@ static int CclDefineFaction(lua_State *l)
 		} else if (!strcmp(value, "Playable")) {
 			faction->Playable = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "DefiniteArticle")) {
-			faction->DefiniteArticle = LuaToBoolean(l, -1);
+			faction->definite_article = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "Icon")) {
 			faction->icon = wyrmgus::icon::get(LuaToString(l, -1));
 		} else if (!strcmp(value, "Currency")) {
