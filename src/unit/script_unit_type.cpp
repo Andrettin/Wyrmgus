@@ -965,17 +965,6 @@ static int CclDefineUnitType(lua_State *l)
 			//Wyrmgus start
 			type->Icon.Load();
 			//Wyrmgus end
-#ifdef USE_MNG
-		} else if (!strcmp(value, "Portrait")) {
-			if (!lua_istable(l, -1)) {
-				LuaError(l, "incorrect argument");
-			}
-			const int subargs = lua_rawlen(l, -1);
-			type->Portrait.Num = subargs;
-			for (int k = 0; k < subargs; ++k) {
-				type->Portrait.Files.push_back(LuaToString(l, -1, k + 1));
-			}
-#endif
 		} else if (!strcmp(value, "Costs")) {
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument");

@@ -46,9 +46,6 @@ class CFile;
 class CPlayer;
 class CPlayerColorGraphic;
 struct lua_State;
-#ifdef USE_MNG
-class Mng;
-#endif
 class LuaCallback;
 enum class UnitTypeType;
 
@@ -1071,15 +1068,6 @@ public:
 	int StillFrame;                 /// Still frame
 
 	IconConfig Icon;                /// Icon to display for this unit
-#ifdef USE_MNG
-	struct _portrait_ {
-		std::vector<std::string> Files;
-		int Num;
-		std::vector<std::unique_ptr<Mng>> Mngs;
-		mutable int CurrMng;
-		mutable int NumIterations;
-	} Portrait;
-#endif
 	MissileConfig Missile;                           /// Missile weapon
 	//Wyrmgus start
 	MissileConfig FireMissile;						 /// Missile weapon if the unit has fire damage

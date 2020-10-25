@@ -518,9 +518,6 @@ unit_type::unit_type(const std::string &identifier) : detailed_data_entry(identi
 	Sprite(nullptr), ShadowSprite(nullptr), LightSprite(nullptr)
 	//Wyrmgus end
 {
-#ifdef USE_MNG
-	memset(&Portrait, 0, sizeof(Portrait));
-#endif
 	memset(RepairCosts, 0, sizeof(RepairCosts));
 	memset(CanStore, 0, sizeof(CanStore));
 	//Wyrmgus start
@@ -2647,20 +2644,6 @@ void LoadUnitTypeSprite(wyrmgus::unit_type &type)
 		type.Sprite = CPlayerColorGraphic::New(type.get_image_file().string(), type.get_frame_size(), type.get_conversible_player_color());
 		type.Sprite->Load(false, wyrmgus::defines::get()->get_scale_factor());
 	}
-
-#ifdef USE_MNG
-	if (type.Portrait.Num) {
-		type.Portrait.Mngs.clear();
-		for (int i = 0; i < type.Portrait.Num; ++i) {
-			auto mng = std::make_unique<Mng>();
-			mng->Load(type.Portrait.Files[i]);
-			type.Portrait.Mngs.push_back(std::move(mng));
-		}
-		// FIXME: should be configurable
-		type.Portrait.CurrMng = 0;
-		type.Portrait.NumIterations = SyncRand(16) + 1;
-	}
-#endif
 
 	//Wyrmgus start
 	if (!type.LightFile.empty()) {

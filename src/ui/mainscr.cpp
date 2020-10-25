@@ -571,24 +571,7 @@ static void DrawUnitInfo_Training(const CUnit &unit)
 static void DrawUnitInfo_portrait(const CUnit &unit)
 {
 	const wyrmgus::unit_type &type = *unit.Type;
-#ifdef USE_MNG
-	if (type.Portrait.Num) {
-		type.Portrait.Mngs[type.Portrait.CurrMng]->Draw(
-			UI.SingleSelectedButton->X, UI.SingleSelectedButton->Y);
-		if (type.Portrait.Mngs[type.Portrait.CurrMng]->iteration == type.Portrait.NumIterations) {
-			type.Portrait.Mngs[type.Portrait.CurrMng]->Reset();
-			// FIXME: should be configurable
-			if (type.Portrait.CurrMng == 0) {
-				type.Portrait.CurrMng = (SyncRand(type.Portrait.Num - 1)) + 1;
-				type.Portrait.NumIterations = 1;
-			} else {
-				type.Portrait.CurrMng = 0;
-				type.Portrait.NumIterations = SyncRand(16) + 1;
-			}
-		}
-		return;
-	}
-#endif
+
 	if (UI.SingleSelectedButton) {
 		const PixelPos pos(UI.SingleSelectedButton->X, UI.SingleSelectedButton->Y);
 		 //Wyrmgus start

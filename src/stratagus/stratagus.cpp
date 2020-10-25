@@ -311,9 +311,6 @@ static void PrintHeader()
 #ifdef USE_THEORA
 		"THEORA "
 #endif
-#ifdef USE_MNG
-		"MNG "
-#endif
 #ifdef USE_OPENGL
 		"OPENGL "
 #endif

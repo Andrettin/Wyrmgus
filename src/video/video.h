@@ -300,33 +300,6 @@ public:
 	std::map<const wyrmgus::player_color *, std::map<CColor, std::unique_ptr<GLuint[]>>> player_color_texture_color_modifications; //player color textures with a color modification applied to them
 };
 
-#ifdef USE_MNG
-#include <libmng.h>
-
-class Mng
-{
-public:
-	Mng();
-	~Mng();
-	int Load(const std::string &name);
-	void Reset();
-	void Draw(int x, int y);
-
-	std::string name;
-	FILE *fd = nullptr;
-	mng_handle handle = nullptr;
-	SDL_Surface *surface = nullptr;
-	unsigned char *buffer = nullptr;
-	unsigned long ticks = 0;
-	int iteration = 0;
-#if defined(USE_OPENGL) || defined(USE_GLES)
-	GLfloat texture_width;   /// Width of the texture
-	GLfloat texture_height;  /// Height of the texture
-	GLuint texture_name;     /// Texture name
-#endif
-};
-#endif
-
 /**
 **  Event call back.
 **
