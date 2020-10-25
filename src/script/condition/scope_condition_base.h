@@ -27,33 +27,54 @@
 
 #pragma once
 
-#include "age.h"
-#include "player.h"
+#include "script/condition/and_condition.h"
 #include "script/condition/condition.h"
 
 namespace wyrmgus {
 
-class age_condition final : public condition
+template <typename scope_type>
+class scope_condition_base : public condition
 {
 public:
-	explicit age_condition(const std::string &value)
+	virtual void process_sml_property(const sml_property &property) override final
 	{
-		this->age = age::get(value);
+		this->conditions.process_sml_property(property);
 	}
 
-	virtual bool check(const CPlayer *player, bool ignore_units = false) const override
+	virtual void process_sml_scope(const sml_data &scope) override final
 	{
-		return player->get_age() == this->age;
+		this->conditions.process_sml_scope(scope);
 	}
 
-	virtual std::string get_string(const std::string &prefix = "") const override
+	virtual bool check(bool ignore_units = false) const = 0;
+
+	virtual bool check(const CPlayer *player, bool ignore_units = false) const override final
 	{
-		std::string str = prefix + this->age->get_name() + '\n';
-		return str;
+		return this->check(ignore_units);
+	}
+
+	virtual bool check(const CUnit *unit, bool ignore_units = false) const override final
+	{
+		return this->check(ignore_units);
+	}
+
+	bool check_scope(const CPlayer *player, bool ignore_units = false) const
+	{
+		return this->conditions.check(player, ignore_units);
+	}
+
+	bool check_scope(const CUnit *unit, bool ignore_units = false) const
+	{
+		return this->conditions.check(unit, ignore_units);
+	}
+
+	virtual std::string get_string(const std::string &prefix = "") const override final
+	{
+		return this->conditions.get_string(prefix);
 	}
 
 private:
-	const wyrmgus::age *age = nullptr;
+	and_condition conditions;
 };
 
 }

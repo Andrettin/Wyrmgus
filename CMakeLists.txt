@@ -721,6 +721,8 @@ set(stratagus_script_condition_HDRS
 	src/script/condition/faction_condition.h
 	src/script/condition/not_condition.h
 	src/script/condition/or_condition.h
+	src/script/condition/scope_condition.h
+	src/script/condition/scope_condition_base.h
 	src/script/condition/season_condition.h
 	src/script/condition/settlement_condition.h
 	src/script/condition/trigger_condition.h

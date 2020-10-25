@@ -27,33 +27,21 @@
 
 #pragma once
 
-#include "age.h"
-#include "player.h"
-#include "script/condition/condition.h"
+#include "script/condition/scope_condition_base.h"
 
 namespace wyrmgus {
 
-class age_condition final : public condition
+template <typename scope_type>
+class scope_condition : public scope_condition_base<scope_type>
 {
 public:
-	explicit age_condition(const std::string &value)
-	{
-		this->age = age::get(value);
-	}
+	virtual const scope_type *get_scope() const = 0;
 
-	virtual bool check(const CPlayer *player, bool ignore_units = false) const override
+	virtual bool check(bool ignore_units = false) const override final
 	{
-		return player->get_age() == this->age;
+		const scope_type *scope = this->get_scope();
+		return this->check_scope(scope, ignore_units);
 	}
-
-	virtual std::string get_string(const std::string &prefix = "") const override
-	{
-		std::string str = prefix + this->age->get_name() + '\n';
-		return str;
-	}
-
-private:
-	const wyrmgus::age *age = nullptr;
 };
 
 }
