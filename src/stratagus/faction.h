@@ -64,6 +64,7 @@ class faction final : public detailed_data_entry, public data_type<faction>
 	Q_OBJECT
 
 	Q_PROPERTY(wyrmgus::civilization* civilization MEMBER civilization READ get_civilization)
+	Q_PROPERTY(wyrmgus::faction* parent_faction MEMBER parent_faction)
 	Q_PROPERTY(wyrmgus::icon* icon MEMBER icon READ get_icon)
 	Q_PROPERTY(wyrmgus::player_color* color MEMBER color READ get_color)
 	Q_PROPERTY(wyrmgus::faction_tier default_tier MEMBER default_tier READ get_default_tier)
@@ -125,6 +126,11 @@ public:
 	civilization *get_civilization() const
 	{
 		return this->civilization;
+	}
+
+	const faction *get_parent_faction() const
+	{
+		return this->parent_faction;
 	}
 
 	icon *get_icon() const
@@ -336,7 +342,7 @@ public:
 	std::string DefaultAI = "land-attack";
 	int ID = -1;														/// faction ID
 private:
-	wyrmgus::civilization *civilization = nullptr; //faction civilization
+	wyrmgus::civilization *civilization = nullptr;
 public:
 	int Type = FactionTypeNoFactionType;								/// faction type (i.e. tribe or polity)
 private:
@@ -346,7 +352,6 @@ private:
 	faction_tier max_tier;
 	government_type default_government_type;
 public:
-	int ParentFaction = -1;												/// parent faction of this faction
 	bool Playable = true;												/// faction playability
 private:
 	icon *icon = nullptr;

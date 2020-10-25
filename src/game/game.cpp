@@ -555,8 +555,8 @@ int WriteMapSetup(const char *mapSetup, CMap &map, int writeTerrain, bool is_mod
 			if (faction->Type != FactionTypeNoFactionType) {
 				f->printf("\tType = \"%s\",\n", GetFactionTypeNameById(faction->Type).c_str());
 			}
-			if (faction->ParentFaction != -1) {
-				f->printf("\tParentFaction = \"%s\",\n", wyrmgus::faction::get_all()[faction->ParentFaction]->get_identifier().c_str());
+			if (faction->get_parent_faction() != nullptr) {
+				f->printf("\tParentFaction = \"%s\",\n", faction->get_parent_faction()->get_identifier().c_str());
 			}
 			if (faction->get_color() != nullptr) {
 				f->printf("\tColor = \"%s\",\n", faction->get_color()->get_identifier().c_str());

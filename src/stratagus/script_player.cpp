@@ -1499,14 +1499,8 @@ static int CclDefineFaction(lua_State *l)
 	}
 
 	std::string faction_name = LuaToString(l, 1);
-	std::string parent_faction;
 	
 	wyrmgus::faction *faction = wyrmgus::faction::get_or_add(faction_name, nullptr);
-	if (faction) { // redefinition
-		if (faction->ParentFaction != -1) {
-			parent_faction = wyrmgus::faction::get_all()[faction->ParentFaction]->get_identifier();
-		}
-	}
 	
 	//  Parse the list:
 	for (lua_pushnil(l); lua_next(l, 2); lua_pop(l, 1)) {
@@ -1546,7 +1540,7 @@ static int CclDefineFaction(lua_State *l)
 		} else if (!strcmp(value, "DefaultAI")) {
 			faction->DefaultAI = LuaToString(l, -1);
 		} else if (!strcmp(value, "ParentFaction")) {
-			parent_faction = LuaToString(l, -1);
+			faction->parent_faction = wyrmgus::faction::get(LuaToString(l, -1));
 		} else if (!strcmp(value, "Playable")) {
 			faction->Playable = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "DefiniteArticle")) {
@@ -1840,12 +1834,6 @@ static int CclDefineFaction(lua_State *l)
 		} else {
 			LuaError(l, "Unsupported tag: %s" _C_ value);
 		}
-	}
-		
-	if (!parent_faction.empty()) { //process this here
-		faction->ParentFaction = wyrmgus::faction::get(parent_faction)->ID;
-	} else if (parent_faction.empty()) {
-		faction->ParentFaction = -1; // to allow redefinitions to remove the parent faction setting
 	}
 	
 	return 0;
@@ -2256,8 +2244,8 @@ static int CclGetFactionData(lua_State *l)
 		lua_pushstring(l, faction->FactionUpgrade.c_str());
 		return 1;
 	} else if (!strcmp(data, "ParentFaction")) {
-		if (faction->ParentFaction != -1) {
-			lua_pushstring(l, wyrmgus::faction::get_all()[faction->ParentFaction]->get_identifier().c_str());
+		if (faction->get_parent_faction() != nullptr) {
+			lua_pushstring(l, faction->get_parent_faction()->get_identifier().c_str());
 		} else {
 			lua_pushstring(l, "");
 		}

@@ -250,8 +250,8 @@ void faction::initialize()
 		});
 	}
 
-	if (this->ParentFaction != -1) {
-		const faction *parent_faction = faction::get_all()[this->ParentFaction];
+	if (this->get_parent_faction() != nullptr) {
+		const faction *parent_faction = this->get_parent_faction();
 
 		if (this->FactionUpgrade.empty()) { //if the faction has no faction upgrade, inherit that of its parent faction
 			this->FactionUpgrade = parent_faction->FactionUpgrade;
@@ -360,26 +360,21 @@ int faction::GetForceTypeWeight(const ForceType force_type) const
 		return this->ForceTypeWeights.find(force_type)->second;
 	}
 	
-	if (this->ParentFaction != -1) {
-		return faction::get_all()[this->ParentFaction]->GetForceTypeWeight(force_type);
+	if (this->get_parent_faction() != nullptr) {
+		return this->get_parent_faction()->GetForceTypeWeight(force_type);
 	}
 	
 	return this->civilization->GetForceTypeWeight(force_type);
 }
 
-/**
-**	@brief	Get the faction's currency
-**
-**	@return	The faction's currency
-*/
 CCurrency *faction::GetCurrency() const
 {
 	if (this->Currency != nullptr) {
 		return this->Currency;
 	}
 	
-	if (this->ParentFaction != -1) {
-		return faction::get_all()[this->ParentFaction]->GetCurrency();
+	if (this->get_parent_faction() != nullptr) {
+		return this->get_parent_faction()->GetCurrency();
 	}
 	
 	return this->civilization->GetCurrency();
@@ -400,8 +395,8 @@ const std::vector<std::unique_ptr<CForceTemplate>> &faction::GetForceTemplates(c
 		return this->ForceTemplates.find(force_type)->second;
 	}
 	
-	if (this->ParentFaction != -1) {
-		return faction::get_all()[this->ParentFaction]->GetForceTemplates(force_type);
+	if (this->get_parent_faction() != nullptr) {
+		return this->get_parent_faction()->GetForceTemplates(force_type);
 	}
 	
 	return this->civilization->GetForceTemplates(force_type);
@@ -413,8 +408,8 @@ const std::vector<std::unique_ptr<CAiBuildingTemplate>> &faction::GetAiBuildingT
 		return this->AiBuildingTemplates;
 	}
 	
-	if (this->ParentFaction != -1) {
-		return faction::get_all()[this->ParentFaction]->GetAiBuildingTemplates();
+	if (this->get_parent_faction() != nullptr) {
+		return this->get_parent_faction()->GetAiBuildingTemplates();
 	}
 	
 	return this->civilization->GetAiBuildingTemplates();
@@ -426,8 +421,8 @@ const std::vector<std::string> &faction::get_ship_names() const
 		return this->ship_names;
 	}
 	
-	if (this->ParentFaction != -1) {
-		return faction::get_all()[this->ParentFaction]->get_ship_names();
+	if (this->get_parent_faction() != nullptr) {
+		return this->get_parent_faction()->get_ship_names();
 	}
 	
 	return this->civilization->get_ship_names();
@@ -454,8 +449,8 @@ unit_type *faction::get_class_unit_type(const unit_class *unit_class) const
 		return find_iterator->second;
 	}
 
-	if (this->ParentFaction != -1) {
-		return faction::get_all()[this->ParentFaction]->get_class_unit_type(unit_class);
+	if (this->get_parent_faction() != nullptr) {
+		return this->get_parent_faction()->get_class_unit_type(unit_class);
 	}
 
 	return this->civilization->get_class_unit_type(unit_class);
@@ -477,8 +472,8 @@ CUpgrade *faction::get_class_upgrade(const upgrade_class *upgrade_class) const
 		return find_iterator->second;
 	}
 
-	if (this->ParentFaction != -1) {
-		return wyrmgus::faction::get_all()[ParentFaction]->get_class_upgrade(upgrade_class);
+	if (this->get_parent_faction() != nullptr) {
+		return this->get_parent_faction()->get_class_upgrade(upgrade_class);
 	}
 
 	return this->get_civilization()->get_class_upgrade(upgrade_class);
@@ -490,8 +485,8 @@ const std::vector<CFiller> &faction::get_ui_fillers() const
 		return this->ui_fillers;
 	}
 
-	if (this->ParentFaction != -1) {
-		return faction::get_all()[this->ParentFaction]->get_ui_fillers();
+	if (this->get_parent_faction() != nullptr) {
+		return this->get_parent_faction()->get_ui_fillers();
 	}
 
 	return this->get_civilization()->get_ui_fillers();

@@ -849,15 +849,15 @@ void PlayMusicByGroupAndFactionRandom(const std::string &group, const std::strin
 	if (oaml->PlayTrackByGroupAndSubgroupRandom(group.c_str(), faction_name.c_str()) != OAML_OK) {
 		const wyrmgus::civilization *civilization = wyrmgus::civilization::try_get(civilization_name);
 		const wyrmgus::faction *faction = wyrmgus::faction::try_get(faction_name);
-		int parent_faction = -1;
+		const wyrmgus::faction *parent_faction = nullptr;
 		bool found_music = false;
 		if (faction != nullptr) {
 			while (true) {
-				parent_faction = faction->ParentFaction;
-				if (parent_faction == -1) {
+				parent_faction = faction->get_parent_faction();
+				if (parent_faction == nullptr) {
 					break;
 				}
-				faction = wyrmgus::faction::get_all()[parent_faction];
+				faction = parent_faction;
 				
 				if (oaml->PlayTrackByGroupAndSubgroupRandom(group.c_str(), faction->get_identifier().c_str()) == OAML_OK) {
 					found_music = true;
