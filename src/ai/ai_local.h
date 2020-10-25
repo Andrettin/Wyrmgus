@@ -579,48 +579,48 @@ public:
 	** The index is the unit that should be repaired, giving a table of all
 	** units/buildings which could repair this unit.
 	*/
-	std::vector<std::vector<wyrmgus::unit_type *> > Repair;
+	std::vector<std::vector<const wyrmgus::unit_type *>> Repair;
 	/**
 	** The index is the unit-limit that should be solved, giving a table of all
 	** units/buildings which could reduce this unit-limit.
 	*/
-	std::vector<std::vector<wyrmgus::unit_type *> > UnitLimit;
+	std::vector<std::vector<const wyrmgus::unit_type *>> UnitLimit;
 	/**
 	** The index is the unit that should be made, giving a table of all
 	** units/buildings which are equivalent.
 	*/
-	std::vector<std::vector<wyrmgus::unit_type *> > Equiv;
+	std::vector<std::vector<const wyrmgus::unit_type *>> Equiv;
 
 	/**
 	** The index is the resource id - 1 (we can't mine TIME), giving a table of all
 	** units/buildings/mines which can harvest this resource.
 	*/
-	std::vector<std::vector<wyrmgus::unit_type *> > Mines;
+	std::vector<std::vector<const wyrmgus::unit_type *>> Mines;
 
 	/**
 	** The index is the resource id - 1 (we can't store TIME), giving a table of all
 	** units/buildings/mines which can store this resource.
 	*/
-	std::vector<std::vector<wyrmgus::unit_type *> > Depots;
+	std::vector<std::vector<const wyrmgus::unit_type *>> Depots;
 	
 	//Wyrmgus start
 	/**
 	** The index is the resource id - 1 (we can't trade TIME), giving a table of all
 	** units/buildings/mines which can sell this resource. In index 0 (respective to CopperCost) we store all units with the "Market" tag instead.
 	*/
-	std::vector<std::vector<wyrmgus::unit_type *> > SellMarkets;
+	std::vector<std::vector<const wyrmgus::unit_type *>> SellMarkets;
 	
 	/**
 	** The index is the resource id - 1 (we can't trade TIME), giving a table of all
 	** units/buildings/mines which can buy this resource.
 	*/
-	std::vector<std::vector<wyrmgus::unit_type *> > BuyMarkets;
+	std::vector<std::vector<const wyrmgus::unit_type *>> BuyMarkets;
 
 	/**
 	** The index is the unit type id, giving a table of all
 	** resources it can choose to produce.
 	*/
-	std::vector<std::vector<int> > ProducedResources;
+	std::vector<std::vector<int>> ProducedResources;
 
 private:
 	//unit types associated with lists of upgrades which they can research
@@ -634,19 +634,19 @@ public:
 	** The index is the unit that should acquire an experience upgrade, giving a table of all
 	** possible upgrades for it.
 	*/
-	std::vector<std::vector<wyrmgus::unit_type *> > ExperienceUpgrades;
+	std::vector<std::vector<const wyrmgus::unit_type *>> ExperienceUpgrades;
 	
 	/**
 	** The index is the unit type that should acquire a learnable ability, giving a table of all
 	** abilities that it can learn.
 	*/
-	std::vector<std::vector<CUpgrade *> > LearnableAbilities;
+	std::vector<std::vector<const CUpgrade *>> LearnableAbilities;
 	
 	/**
 	** The sole index is 0, giving a table of all
 	** naval transporter units.
 	*/
-	std::vector<std::vector<wyrmgus::unit_type *> > NavalTransporters;
+	std::vector<std::vector<const wyrmgus::unit_type *>> NavalTransporters;
 
 	friend void InitAiHelper(AiHelper &aiHelper);
 };

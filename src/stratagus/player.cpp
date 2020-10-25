@@ -2201,7 +2201,7 @@ bool CPlayer::HasMarketUnit() const
 	const int n_m = AiHelpers.SellMarkets[0].size();
 
 	for (int i = 0; i < n_m; ++i) {
-		wyrmgus::unit_type &market_type = *AiHelpers.SellMarkets[0][i];
+		const wyrmgus::unit_type &market_type = *AiHelpers.SellMarkets[0][i];
 
 		if (this->GetUnitTypeCount(&market_type)) {
 			return true;
@@ -2223,7 +2223,7 @@ CUnit *CPlayer::GetMarketUnit() const
 	const int n_m = AiHelpers.SellMarkets[0].size();
 
 	for (int i = 0; i < n_m; ++i) {
-		wyrmgus::unit_type &market_type = *AiHelpers.SellMarkets[0][i];
+		const wyrmgus::unit_type &market_type = *AiHelpers.SellMarkets[0][i];
 
 		if (this->GetUnitTypeCount(&market_type)) {
 			std::vector<CUnit *> market_table;

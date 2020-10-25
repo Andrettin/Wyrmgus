@@ -484,9 +484,9 @@ static bool AiRequestedUpgradeAllowed(const CPlayer &player, const CUpgrade *upg
 }
 
 struct cnode {
-	int unit_cost;
-	int needmask;
-	wyrmgus::unit_type *type;
+	int unit_cost = 0;
+	int needmask = 0;
+	const wyrmgus::unit_type *type = nullptr;
 };
 
 static bool cnode_cmp(const cnode &lhs, const cnode &rhs)
@@ -536,7 +536,7 @@ void AiNewDepotRequest(CUnit &worker)
 		 */
 		return;
 	}
-	wyrmgus::unit_type *best_type = nullptr;
+	const wyrmgus::unit_type *best_type = nullptr;
 	int best_cost = 0;
 	//int best_mask = 0;
 	// Count the already made build requests.
@@ -547,7 +547,7 @@ void AiNewDepotRequest(CUnit &worker)
 	const int n = AiHelpers.Depots[resource].size();
 
 	for (int i = 0; i < n; ++i) {
-		wyrmgus::unit_type &type = *AiHelpers.Depots[resource][i];
+		const wyrmgus::unit_type &type = *AiHelpers.Depots[resource][i];
 
 		if (counter[type.Slot]) { // Already ordered.
 			return;
@@ -686,13 +686,13 @@ void AiTransportCapacityRequest(int capacity_needed, int landmass)
 		return;
 	}
 
-	wyrmgus::unit_type *best_type = nullptr;
+	const wyrmgus::unit_type *best_type = nullptr;
 	int best_cost = 0;
 
 	const int n = AiHelpers.NavalTransporters[0].size();
 
 	for (int i = 0; i < n; ++i) {
-		wyrmgus::unit_type *type = AiHelpers.NavalTransporters[0][i];
+		const wyrmgus::unit_type *type = AiHelpers.NavalTransporters[0][i];
 
 		if (!AiPlayer->Player->get_faction()->is_class_unit_type(type)) {
 			continue;
@@ -855,7 +855,7 @@ static bool AiRequestSupply()
 	const int n = AiHelpers.UnitLimit[0].size();
 
 	for (int i = 0; i < n; ++i) {
-		wyrmgus::unit_type &type = *AiHelpers.UnitLimit[0][i];
+		const wyrmgus::unit_type &type = *AiHelpers.UnitLimit[0][i];
 		if (counter[type.Slot]) { // Already ordered.
 #if defined(DEBUG) && defined(DebugRequestSupply)
 			DebugPrint("%d: AiRequestSupply: Supply already build in %s\n"
@@ -894,7 +894,7 @@ static bool AiRequestSupply()
 	}
 	if (j) {
 		if (!cache[0].needmask) {
-			wyrmgus::unit_type &type = *cache[0].type;
+			const wyrmgus::unit_type &type = *cache[0].type;
 			Vec2i invalidPos(-1, -1);
 			//Wyrmgus start
 //			if (AiMakeUnit(type, invalidPos)) {
@@ -1348,7 +1348,7 @@ static int AiAssignHarvesterFromUnit(CUnit &unit, const wyrmgus::resource *resou
 			const int n = AiHelpers.Mines[mine->GivesResource].size();
 
 			for (int i = 0; i < n; ++i) {
-				wyrmgus::unit_type &type = *AiHelpers.Mines[mine->GivesResource][i];
+				const wyrmgus::unit_type &type = *AiHelpers.Mines[mine->GivesResource][i];
 
 				if (
 					(wyrmgus::vector::contains(AiHelpers.get_builders(&type), unit.Type) || wyrmgus::vector::contains(AiHelpers.get_builder_classes(type.get_unit_class()), unit.Type->get_unit_class()))
@@ -1805,7 +1805,7 @@ static void AiCollectResources()
 			const int n_m = AiHelpers.BuyMarkets[c - 1].size();
 
 			for (int i = 0; i < n_m; ++i) {
-				wyrmgus::unit_type &market_type = *AiHelpers.BuyMarkets[c - 1][i];
+				const wyrmgus::unit_type &market_type = *AiHelpers.BuyMarkets[c - 1][i];
 
 				if (AiPlayer->Player->GetUnitTypeAiActiveCount(&market_type)) {
 					std::vector<CUnit *> market_table;
@@ -1843,7 +1843,7 @@ static void AiCollectResources()
 			const int n_m = AiHelpers.SellMarkets[c - 1].size();
 
 			for (int i = 0; i < n_m; ++i) {
-				wyrmgus::unit_type &market_type = *AiHelpers.SellMarkets[c - 1][i];
+				const wyrmgus::unit_type &market_type = *AiHelpers.SellMarkets[c - 1][i];
 
 				if (AiPlayer->Player->GetUnitTypeAiActiveCount(&market_type)) {
 					std::vector<CUnit *> market_table;
@@ -1959,14 +1959,14 @@ static bool AiRepairBuilding(const CPlayer &player, const wyrmgus::unit_type &ty
 static int AiRepairUnit(CUnit &unit)
 {
 	int n = AiHelpers.Repair.size();
-	std::vector<std::vector<wyrmgus::unit_type *> > &tablep = AiHelpers.Repair;
+	std::vector<std::vector<const wyrmgus::unit_type *>> &tablep = AiHelpers.Repair;
 	const wyrmgus::unit_type &type = *unit.Type;
 	if (type.Slot >= n) { // Oops not known.
 		DebugPrint("%d: AiRepairUnit I: Nothing known about '%s'\n"
 				   _C_ AiPlayer->Player->Index _C_ type.Ident.c_str());
 		return 0;
 	}
-	std::vector<wyrmgus::unit_type *> &table = tablep[type.Slot];
+	std::vector<const wyrmgus::unit_type *> &table = tablep[type.Slot];
 	if (table.empty()) { // Oops not known.
 		DebugPrint("%d: AiRepairUnit II: Nothing known about '%s'\n"
 				   _C_ AiPlayer->Player->Index _C_ type.Ident.c_str());
@@ -2651,7 +2651,7 @@ static void AiCheckMinecartConstruction()
 		}
 				
 		for (size_t i = 0; i < AiHelpers.Mines[res].size(); ++i) {
-			wyrmgus::unit_type &mine_type = *AiHelpers.Mines[res][i];
+			const wyrmgus::unit_type &mine_type = *AiHelpers.Mines[res][i];
 					
 			std::vector<CUnit *> mine_table;
 			FindPlayerUnitsByType(*AiPlayer->Player, mine_type, mine_table, true);

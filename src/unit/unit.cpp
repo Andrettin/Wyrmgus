@@ -731,13 +731,13 @@ void CUnit::IncreaseLevel(int level_quantity, bool automatic_learning)
 		upgrade_found = false;
 
 		if (((int) AiHelpers.ExperienceUpgrades.size()) > Type->Slot) {
-			std::vector<wyrmgus::unit_type *> potential_upgrades;
+			std::vector<const wyrmgus::unit_type *> potential_upgrades;
 			
 			if ((this->Player->AiEnabled || this->Character == nullptr) && this->Type->BoolFlag[HARVESTER_INDEX].value && this->CurrentResource && AiHelpers.ExperienceUpgrades[Type->Slot].size() > 1) {
 				//if is a harvester who is currently gathering, try to upgrade to a unit type which is best for harvesting the current resource
 				unsigned int best_gathering_rate = 0;
 				for (size_t i = 0; i != AiHelpers.ExperienceUpgrades[Type->Slot].size(); ++i) {
-					wyrmgus::unit_type *experience_upgrade_type = AiHelpers.ExperienceUpgrades[Type->Slot][i];
+					const wyrmgus::unit_type *experience_upgrade_type = AiHelpers.ExperienceUpgrades[Type->Slot][i];
 					if (check_conditions(experience_upgrade_type, this, true)) {
 						if (this->Character == nullptr || std::find(this->Character->ForbiddenUpgrades.begin(), this->Character->ForbiddenUpgrades.end(), experience_upgrade_type) == this->Character->ForbiddenUpgrades.end()) {
 							if (!experience_upgrade_type->ResInfo[this->CurrentResource]) {
@@ -767,7 +767,7 @@ void CUnit::IncreaseLevel(int level_quantity, bool automatic_learning)
 			if (potential_upgrades.size() > 0) {
 				this->Variable[LEVELUP_INDEX].Value -= 1;
 				this->Variable[LEVELUP_INDEX].Max = this->Variable[LEVELUP_INDEX].Value;
-				wyrmgus::unit_type *chosen_unit_type = potential_upgrades[SyncRand(potential_upgrades.size())];
+				const wyrmgus::unit_type *chosen_unit_type = potential_upgrades[SyncRand(potential_upgrades.size())];
 				if (this->Player == CPlayer::GetThisPlayer()) {
 					this->Player->Notify(NotifyGreen, this->tilePos, this->MapLayer->ID, _("%s has upgraded to %s!"), this->GetMessageName().c_str(), chosen_unit_type->get_name().c_str());
 				}
@@ -778,15 +778,15 @@ void CUnit::IncreaseLevel(int level_quantity, bool automatic_learning)
 			
 		if ((this->Player->AiEnabled || this->Character == nullptr) && this->Variable[LEVELUP_INDEX].Value) {
 			if (((int) AiHelpers.LearnableAbilities.size()) > Type->Slot) {
-				std::vector<CUpgrade *> potential_abilities;
+				std::vector<const CUpgrade *> potential_abilities;
 				for (size_t i = 0; i != AiHelpers.LearnableAbilities[Type->Slot].size(); ++i) {
-					if (can_learn_ability(AiHelpers.LearnableAbilities[Type->Slot][i])) {
+					if (this->can_learn_ability(AiHelpers.LearnableAbilities[Type->Slot][i])) {
 						potential_abilities.push_back(AiHelpers.LearnableAbilities[Type->Slot][i]);
 					}
 				}
 				if (potential_abilities.size() > 0) {
 					if (potential_abilities.size() == 1 || this->Player->AiEnabled) { //if can only acquire one particular ability, get it automatically
-						CUpgrade *chosen_ability = potential_abilities[SyncRand(potential_abilities.size())];
+						const CUpgrade *chosen_ability = potential_abilities[SyncRand(potential_abilities.size())];
 						AbilityAcquire(*this, chosen_ability);
 						upgrade_found = true;
 						if (this->Player == CPlayer::GetThisPlayer()) {
