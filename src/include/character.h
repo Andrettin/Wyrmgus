@@ -46,9 +46,9 @@ int CclDefineCharacter(lua_State *l);
 int CclDefineCustomHero(lua_State *l);
 
 namespace wyrmgus {
+	class and_condition;
 	class calendar;
 	class civilization;
-	class condition;
 	class deity;
 	class dynasty;
 	class faction;
@@ -355,7 +355,7 @@ public:
 		return this->location;
 	}
 
-	const std::unique_ptr<condition> &get_conditions() const
+	const std::unique_ptr<and_condition> &get_conditions() const
 	{
 		return this->conditions;
 	}
@@ -388,7 +388,7 @@ private:
 public:
 	std::unique_ptr<LuaCallback> Conditions;
 private:
-	std::unique_ptr<condition> conditions;
+	std::unique_ptr<and_condition> conditions;
 public:
 	std::vector<persistent_item *> EquippedItems[static_cast<int>(wyrmgus::item_slot::count)]; //equipped items of the character, per slot
 private:

@@ -44,6 +44,7 @@ int CclDefineFaction(lua_State *l);
 
 namespace wyrmgus {
 
+class and_condition;
 class character;
 class civilization;
 class deity;
@@ -238,6 +239,11 @@ public:
 
 	const std::vector<CFiller> &get_ui_fillers() const;
 
+	const std::unique_ptr<and_condition> &get_conditions() const
+	{
+		return this->conditions;
+	}
+
 	const std::vector<const dynasty *> &get_dynasties() const
 	{
 		return this->dynasties;
@@ -361,6 +367,7 @@ public:
 private:
 	std::vector<std::string> ship_names;								/// Ship names for the faction
 	std::vector<CFiller> ui_fillers;
+	std::unique_ptr<and_condition> conditions;
 	std::vector<const site *> core_settlements; //the core settlements of this faction (required to found it)
 public:
 	std::vector<site *> sites; /// Sites used for this faction if it needs a randomly-generated settlement

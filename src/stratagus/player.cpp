@@ -73,7 +73,7 @@
 #include "religion/religion.h"
 //Wyrmgus end
 #include "script.h"
-#include "script/condition/condition.h"
+#include "script/condition/and_condition.h"
 #include "script/effect/effect_list.h"
 //Wyrmgus start
 #include "settings.h"
@@ -1777,8 +1777,12 @@ bool CPlayer::can_found_faction(const wyrmgus::faction *faction) const
 				}
 			}
 		}
-		
-		if (faction->Conditions) {
+
+		if (faction->get_conditions() != nullptr && !faction->get_conditions()->check(this)) {
+			return false;
+		}
+
+		if (faction->Conditions != nullptr) {
 			CclCommand("trigger_player = " + std::to_string(this->Index) + ";");
 			faction->Conditions->pushPreamble();
 			faction->Conditions->run(1);

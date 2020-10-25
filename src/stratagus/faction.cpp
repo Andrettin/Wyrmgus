@@ -36,6 +36,7 @@
 #include "government_type.h"
 #include "luacallback.h"
 #include "player_color.h"
+#include "script/condition/and_condition.h"
 #include "unit/unit_type.h"
 #include "util/container_util.h"
 #include "util/map_util.h"
@@ -158,6 +159,9 @@ void faction::process_sml_scope(const sml_data &scope)
 		scope.for_each_child([&](const sml_data &child_scope) {
 			faction::process_character_title_name_scope(this->character_title_names, child_scope);
 		});
+	} else if (tag == "conditions") {
+		this->conditions = std::make_unique<and_condition>();
+		database::process_sml_data(this->conditions, scope);
 	} else {
 		data_entry::process_sml_scope(scope);
 	}
