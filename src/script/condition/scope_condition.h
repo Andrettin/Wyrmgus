@@ -28,6 +28,7 @@
 #pragma once
 
 #include "script/condition/scope_condition_base.h"
+#include "unit/unit.h"
 
 namespace wyrmgus {
 
@@ -35,11 +36,22 @@ template <typename scope_type>
 class scope_condition : public scope_condition_base<scope_type>
 {
 public:
-	virtual const scope_type *get_scope() const = 0;
+	virtual const scope_type *get_scope(const CPlayer *player) const = 0;
 
-	virtual bool check(bool ignore_units = false) const override final
+	virtual const scope_type *get_scope(const CUnit *unit) const
 	{
-		const scope_type *scope = this->get_scope();
+		return this->get_scope(unit->Player);
+	}
+
+	virtual bool check(const CPlayer *player, bool ignore_units = false) const override final
+	{
+		const scope_type *scope = this->get_scope(player);
+		return this->check_scope(scope, ignore_units);
+	}
+
+	virtual bool check(const CUnit *unit, bool ignore_units = false) const override final
+	{
+		const scope_type *scope = this->get_scope(unit);
 		return this->check_scope(scope, ignore_units);
 	}
 };

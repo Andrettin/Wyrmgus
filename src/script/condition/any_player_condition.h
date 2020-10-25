@@ -47,6 +47,11 @@ public:
 
 		return false;
 	}
+
+	virtual bool check(const CPlayer *player, bool ignore_units = false) const override
+	{
+		return this->check(ignore_units);
+	}
 };
 
 }

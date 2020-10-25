@@ -715,6 +715,7 @@ set(stratagus_script_HDRS
 set(stratagus_script_condition_HDRS
 	src/script/condition/age_condition.h
 	src/script/condition/and_condition.h
+	src/script/condition/any_other_player_condition.h
 	src/script/condition/any_player_condition.h
 	src/script/condition/character_condition.h
 	src/script/condition/condition.h

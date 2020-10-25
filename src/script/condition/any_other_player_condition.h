@@ -27,42 +27,26 @@
 
 #pragma once
 
-#include "script/condition/and_condition.h"
-#include "script/condition/condition.h"
+#include "player.h"
+#include "script/condition/scope_condition_base.h"
 
 namespace wyrmgus {
 
-template <typename scope_type>
-class scope_condition_base : public condition
+class any_other_player_condition final : public scope_condition_base<CPlayer>
 {
 public:
-	virtual void process_sml_property(const sml_property &property) override final
+	virtual bool check(const CPlayer *player, bool ignore_units = false) const override
 	{
-		this->conditions.process_sml_property(property);
-	}
+		for (const CPlayer *scope_player : CPlayer::Players) {
+			if (scope_player != player && scope_player->is_alive() && !scope_player->is_neutral_player()) {
+				if (this->check_scope(scope_player, ignore_units)) {
+					return true;
+				}
+			}
+		}
 
-	virtual void process_sml_scope(const sml_data &scope) override final
-	{
-		this->conditions.process_sml_scope(scope);
+		return false;
 	}
-
-	bool check_scope(const CPlayer *player, bool ignore_units = false) const
-	{
-		return this->conditions.check(player, ignore_units);
-	}
-
-	bool check_scope(const CUnit *unit, bool ignore_units = false) const
-	{
-		return this->conditions.check(unit, ignore_units);
-	}
-
-	virtual std::string get_string(const std::string &prefix = "") const override final
-	{
-		return this->conditions.get_string(prefix);
-	}
-
-private:
-	and_condition conditions;
 };
 
 }
