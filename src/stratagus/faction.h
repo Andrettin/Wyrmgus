@@ -359,9 +359,6 @@ public:
 	CCurrency *Currency = nullptr;										/// The faction's currency
 private:
 	deity *holy_order_deity = nullptr; //deity this faction belongs to, if it is a holy order
-public:
-	std::unique_ptr<LuaCallback> Conditions;
-private:
 	player_color *color = nullptr; /// faction color
 	site *default_capital = nullptr;
 	bool simple_name = false;

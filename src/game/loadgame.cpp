@@ -117,10 +117,6 @@ void CleanModules()
 		unit_type->TeleportEffectOut.reset();
 	}
 
-	for (wyrmgus::faction *faction : wyrmgus::faction::get_all()) {
-		faction->Conditions.reset();
-	}
-
 	wyrmgus::database::get()->clear();
 
 	UnitTypeVar.Init(); // internal script. should be to a better place, don't find for restart.

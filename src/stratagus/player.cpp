@@ -1785,15 +1785,6 @@ bool CPlayer::can_found_faction(const wyrmgus::faction *faction) const
 		if (faction->get_conditions() != nullptr && !faction->get_conditions()->check(this)) {
 			return false;
 		}
-
-		if (faction->Conditions != nullptr) {
-			CclCommand("trigger_player = " + std::to_string(this->Index) + ";");
-			faction->Conditions->pushPreamble();
-			faction->Conditions->run(1);
-			if (faction->Conditions->popBoolean() == false) {
-				return false;
-			}
-		}
 	}
 	
 	return true;
