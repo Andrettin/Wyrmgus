@@ -108,6 +108,13 @@ public:
 	CPlayer();
 	~CPlayer();
 
+	int get_index() const
+	{
+		return this->Index;
+	}
+
+	bool is_neutral_player() const;
+
 	/// Change player name
 	void SetName(const std::string &name);
 
@@ -493,7 +500,6 @@ public:
 	//Wyrmgus end
 	/// Notify player about a problem
 	void Notify(const char *fmt, ...) const PRINTF_VAARG_ATTRIBUTE(2, 3); // Don't forget to count this
-
 
 	/**
 	**  Check if the player index is an enemy

@@ -38,6 +38,7 @@
 #include "script.h"
 #include "script/condition/age_condition.h"
 #include "script/condition/and_condition.h"
+#include "script/condition/any_player_condition.h"
 #include "script/condition/character_condition.h"
 #include "script/condition/dynasty_condition.h"
 #include "script/condition/faction_condition.h"
@@ -96,6 +97,8 @@ std::unique_ptr<const condition> condition::from_sml_scope(const sml_data &scope
 
 	if (tag == "and") {
 		condition = std::make_unique<and_condition>();
+	} else if (tag == "any_player") {
+		condition = std::make_unique<any_player_condition>();
 	} else if (tag == "or") {
 		condition = std::make_unique<or_condition>();
 	} else if (tag == "not") {

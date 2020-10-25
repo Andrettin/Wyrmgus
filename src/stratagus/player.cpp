@@ -1033,14 +1033,14 @@ void CPlayer::Init(/* PlayerTypes */ int type)
 	++NumPlayers;
 }
 
-/**
-**  Change player name.
-**
-**  @param name    New name.
-*/
+bool CPlayer::is_neutral_player() const
+{
+	return this->get_index() == PlayerNumNeutral;
+}
+
 void CPlayer::SetName(const std::string &name)
 {
-	Name = name;
+	this->Name = name;
 }
 
 const wyrmgus::civilization *CPlayer::get_civilization() const
