@@ -63,7 +63,7 @@ public:
 		}
 	}
 
-	virtual bool check(const CPlayer *player, const bool ignore_units = false) const override
+	virtual bool check(const CPlayer *player, const bool ignore_units) const override
 	{
 		if (ignore_units) {
 			return true;

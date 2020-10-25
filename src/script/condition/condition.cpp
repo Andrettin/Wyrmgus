@@ -159,7 +159,7 @@ void condition::process_sml_scope(const sml_data &scope)
 	throw std::runtime_error("Invalid condition scope: \"" + scope.get_tag() + "\".");
 }
 
-bool condition::check(const CUnit *unit, bool ignore_units) const
+bool condition::check(const CUnit *unit, const bool ignore_units) const
 {
 	//conditions check the unit's player by default, but can be overriden in the case of e.g. upgrades (where we want to check individual upgrades for the unit)
 	return this->check(unit->Player, ignore_units);
@@ -196,7 +196,7 @@ void and_condition::process_sml_scope(const sml_data &scope)
 	this->conditions.push_back(condition::from_sml_scope(scope));
 }
 
-bool and_condition::check(const CPlayer *player, bool ignore_units) const
+bool and_condition::check(const CPlayer *player, const bool ignore_units) const
 {
 	for (const auto &condition : this->conditions) {
 		if (!condition->check(player, ignore_units)) {
@@ -207,7 +207,7 @@ bool and_condition::check(const CPlayer *player, bool ignore_units) const
 	return true;
 }
 
-bool and_condition::check(const CUnit *unit, bool ignore_units) const
+bool and_condition::check(const CUnit *unit, const bool ignore_units) const
 {
 	for (const auto &condition : this->conditions) {
 		if (!condition->check(unit, ignore_units)) {

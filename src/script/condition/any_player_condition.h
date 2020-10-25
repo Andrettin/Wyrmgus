@@ -35,7 +35,7 @@ namespace wyrmgus {
 class any_player_condition final : public scope_condition_base<CPlayer>
 {
 public:
-	bool check(bool ignore_units = false) const
+	bool check(const bool ignore_units) const
 	{
 		for (const CPlayer *player : CPlayer::Players) {
 			if (player->is_alive() && !player->is_neutral_player()) {
@@ -48,8 +48,10 @@ public:
 		return false;
 	}
 
-	virtual bool check(const CPlayer *player, bool ignore_units = false) const override
+	virtual bool check(const CPlayer *player, const bool ignore_units) const override
 	{
+		Q_UNUSED(player)
+
 		return this->check(ignore_units);
 	}
 };

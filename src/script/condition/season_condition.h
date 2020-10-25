@@ -40,12 +40,12 @@ class season_condition final : public condition
 public:
 	virtual void ProcessConfigDataProperty(const std::pair<std::string, std::string> &property) override;
 
-	virtual bool check(const CPlayer *player, bool ignore_units = false) const override
+	virtual bool check(const CPlayer *player, const bool ignore_units) const override
 	{
 		return CMap::Map.MapLayers[player->StartMapLayer]->GetSeason() == this->Season;
 	}
 
-	virtual bool check(const CUnit *unit, bool ignore_units = false) const override
+	virtual bool check(const CUnit *unit, const bool ignore_units) const override
 	{
 		return unit->MapLayer->GetSeason() == this->Season;
 	}

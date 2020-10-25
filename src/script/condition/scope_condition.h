@@ -43,13 +43,13 @@ public:
 		return this->get_scope(unit->Player);
 	}
 
-	virtual bool check(const CPlayer *player, bool ignore_units = false) const override final
+	virtual bool check(const CPlayer *player, const bool ignore_units) const override final
 	{
 		const scope_type *scope = this->get_scope(player);
 		return this->check_scope(scope, ignore_units);
 	}
 
-	virtual bool check(const CUnit *unit, bool ignore_units = false) const override final
+	virtual bool check(const CUnit *unit, const bool ignore_units) const override final
 	{
 		const scope_type *scope = this->get_scope(unit);
 		return this->check_scope(scope, ignore_units);

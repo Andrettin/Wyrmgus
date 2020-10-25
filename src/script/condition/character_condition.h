@@ -41,12 +41,12 @@ public:
 		this->character = character::get(value);
 	}
 
-	virtual bool check(const CPlayer *player, bool ignore_units = false) const override
+	virtual bool check(const CPlayer *player, const bool ignore_units) const override
 	{
 		return player->HasHero(this->character);
 	}
 
-	virtual bool check(const CUnit *unit, bool ignore_units = false) const override
+	virtual bool check(const CUnit *unit, const bool ignore_units) const override
 	{
 		return unit->Character == this->character;
 	}

@@ -46,12 +46,12 @@ public:
 
 	virtual void ProcessConfigDataProperty(const std::pair<std::string, std::string> &property) override;
 
-	virtual bool check(const CPlayer *player, bool ignore_units = false) const override
+	virtual bool check(const CPlayer *player, const bool ignore_units) const override
 	{
 		return UpgradeIdAllowed(*player, this->upgrade->ID) == 'R';
 	}
 
-	virtual bool check(const CUnit *unit, bool ignore_units = false) const override
+	virtual bool check(const CUnit *unit, const bool ignore_units) const override
 	{
 		return this->check(unit->Player, ignore_units) || unit->GetIndividualUpgrade(this->upgrade);
 	}

@@ -46,12 +46,12 @@ public:
 		this->conditions.process_sml_scope(scope);
 	}
 
-	bool check_scope(const CPlayer *player, bool ignore_units = false) const
+	bool check_scope(const CPlayer *player, const bool ignore_units) const
 	{
 		return this->conditions.check(player, ignore_units);
 	}
 
-	bool check_scope(const CUnit *unit, bool ignore_units = false) const
+	bool check_scope(const CUnit *unit, const bool ignore_units) const
 	{
 		return this->conditions.check(unit, ignore_units);
 	}

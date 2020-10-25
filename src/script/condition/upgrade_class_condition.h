@@ -43,7 +43,7 @@ public:
 		this->upgrade_class = upgrade_class::get(value);
 	}
 
-	virtual bool check(const CPlayer *player, bool ignore_units = false) const override
+	virtual bool check(const CPlayer *player, const bool ignore_units) const override
 	{
 		const CUpgrade *upgrade = player->get_class_upgrade(this->upgrade_class);
 
@@ -54,7 +54,7 @@ public:
 		return UpgradeIdAllowed(*player, upgrade->ID) == 'R';
 	}
 
-	virtual bool check(const CUnit *unit, bool ignore_units = false) const override
+	virtual bool check(const CUnit *unit, const bool ignore_units) const override
 	{
 		const CUpgrade *upgrade = unit->Player->get_class_upgrade(this->upgrade_class);
 

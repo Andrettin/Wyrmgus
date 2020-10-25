@@ -59,7 +59,7 @@ public:
 		}
 	}
 
-	virtual bool check(const CPlayer *player, bool ignore_units = false) const override
+	virtual bool check(const CPlayer *player, const bool ignore_units) const override
 	{
 		Q_UNUSED(ignore_units)
 
