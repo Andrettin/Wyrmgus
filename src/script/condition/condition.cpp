@@ -41,6 +41,7 @@
 #include "script/condition/any_other_player_condition.h"
 #include "script/condition/any_player_condition.h"
 #include "script/condition/character_condition.h"
+#include "script/condition/civilization_condition.h"
 #include "script/condition/dynasty_condition.h"
 #include "script/condition/faction_condition.h"
 #include "script/condition/not_condition.h"
@@ -70,6 +71,8 @@ std::unique_ptr<const condition> condition::from_sml_property(const sml_property
 		return std::make_unique<age_condition>(value);
 	} else if (key == "character") {
 		return std::make_unique<character_condition>(value);
+	} else if (key == "civilization") {
+		return std::make_unique<civilization_condition>(value);
 	} else if (key == "dynasty") {
 		return std::make_unique<dynasty_condition>(value);
 	} else if (key == "faction") {
