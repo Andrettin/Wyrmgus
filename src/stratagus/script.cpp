@@ -132,15 +132,21 @@ static void laction(int i)
 static int report(int status, bool exitOnError)
 {
 	if (status) {
-		const char *msg = lua_tostring(Lua, -1);
-		if (msg == nullptr) {
+		std::string msg = lua_tostring(Lua, -1);
+
+		if (msg.empty()) {
 			msg = "(error with no message)";
 		}
-		fprintf(stderr, "%s\n", msg);
-		if (exitOnError) {
-			::exit(1);
-		}
+
+		msg = "Lua error: " + msg;
+
 		lua_pop(Lua, 1);
+
+		if (exitOnError) {
+			throw std::runtime_error(msg);
+		} else {
+			std::cerr << msg << std::endl;
+		}
 	}
 	return status;
 }
