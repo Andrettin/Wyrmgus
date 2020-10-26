@@ -1313,7 +1313,7 @@ bool IsButtonAllowed(const CUnit &unit, const wyrmgus::button &buttonaction)
 			break;
 		case ButtonCmd::Buy:
 			res = (buttonaction.Value != -1) && (&UnitManager.GetSlotUnit(buttonaction.Value) != nullptr);
-			if (UnitManager.GetSlotUnit(buttonaction.Value).Character != nullptr) {
+			if (res && UnitManager.GetSlotUnit(buttonaction.Value).Character != nullptr) {
 				//check whether the character's conditions are still valid
 				res = res && Selected[0]->Player->is_character_available_for_recruitment(UnitManager.GetSlotUnit(buttonaction.Value).Character, true);
 			}
