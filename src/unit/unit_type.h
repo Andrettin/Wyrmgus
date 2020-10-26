@@ -763,6 +763,7 @@ class unit_type final : public detailed_data_entry, public data_type<unit_type>,
 	Q_OBJECT
 
 	Q_PROPERTY(wyrmgus::unit_class* unit_class READ get_unit_class WRITE set_unit_class)
+	Q_PROPERTY(bool template MEMBER template_type READ is_template)
 	Q_PROPERTY(wyrmgus::civilization* civilization MEMBER civilization READ get_civilization)
 	Q_PROPERTY(wyrmgus::animation_set* animation_set MEMBER animation_set READ get_animation_set)
 	Q_PROPERTY(QSize tile_size MEMBER tile_size READ get_tile_size)
@@ -808,6 +809,11 @@ public:
 	}
 
 	void set_unit_class(unit_class *unit_class);
+
+	bool is_template() const
+	{
+		return this->template_type;
+	}
 
 	civilization *get_civilization() const
 	{
@@ -1007,6 +1013,7 @@ public:
 	//Wyrmgus start
 private:
 	wyrmgus::unit_class *unit_class = nullptr; //unit class (e.g. infantry, archer, etc.)
+	bool template_type = false;
 	wyrmgus::civilization *civilization = nullptr; //which civilization this unit belongs to, if any
 public:
 	int Faction;					/// Which faction this unit belongs to, if any

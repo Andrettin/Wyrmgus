@@ -681,6 +681,8 @@ static int CclDefineUnitType(lua_State *l)
 			const std::string parent_ident = LuaToString(l, -1);
 			const wyrmgus::unit_type *parent_type = wyrmgus::unit_type::get(parent_ident);
 			type->set_parent(parent_type);
+		} else if (!strcmp(value, "Template")) {
+			type->template_type = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "Variations")) {
 			type->DefaultStat.Variables[VARIATION_INDEX].Enable = 1;
 			type->DefaultStat.Variables[VARIATION_INDEX].Value = 0;

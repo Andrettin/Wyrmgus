@@ -1093,7 +1093,7 @@ static int CclGetUpgradeData(lua_State *l)
 		}
 
 		for (const wyrmgus::unit_type *unit_type : wyrmgus::unit_type::get_all()) {
-			if (unit_type->get_identifier().find("template") != std::string::npos) { //if is a template, continue
+			if (unit_type->is_template()) { //if is a template, continue
 				continue;
 			}
 
