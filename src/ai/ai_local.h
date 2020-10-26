@@ -580,11 +580,12 @@ public:
 	** units/buildings which could repair this unit.
 	*/
 	std::vector<std::vector<const wyrmgus::unit_type *>> Repair;
+
 	/**
-	** The index is the unit-limit that should be solved, giving a table of all
-	** units/buildings which could reduce this unit-limit.
+	** A table of all units/buildings which could reduce the unit-limit.
 	*/
-	std::vector<std::vector<const wyrmgus::unit_type *>> UnitLimit;
+	std::vector<const wyrmgus::unit_type *> UnitLimit;
+
 	/**
 	** The index is the unit that should be made, giving a table of all
 	** units/buildings which are equivalent.
@@ -643,10 +644,9 @@ public:
 	std::vector<std::vector<const CUpgrade *>> LearnableAbilities;
 	
 	/**
-	** The sole index is 0, giving a table of all
-	** naval transporter units.
+	** A table of all naval transporter units.
 	*/
-	std::vector<std::vector<const wyrmgus::unit_type *>> NavalTransporters;
+	std::vector<const wyrmgus::unit_type *> NavalTransporters;
 
 	friend void InitAiHelper(AiHelper &aiHelper);
 };

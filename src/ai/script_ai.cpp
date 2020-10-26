@@ -71,6 +71,15 @@ static void AiHelperInsert(std::vector<std::vector<const wyrmgus::unit_type *> >
 	table[n].push_back(base);
 }
 
+static void AiHelperInsert(std::vector<const wyrmgus::unit_type *> &table, const wyrmgus::unit_type *base)
+{
+	// Look if already known
+	if (wyrmgus::vector::contains(table, base)) {
+		return;
+	}
+	table.push_back(base);
+}
+
 static void AiHelperInsert(wyrmgus::unit_type_map<std::vector<const wyrmgus::unit_type *>> &table,
 	const wyrmgus::unit_type *key, const wyrmgus::unit_type *target)
 {
@@ -391,14 +400,14 @@ static void InitAiHelper(AiHelper &aiHelper)
 	//Wyrmgus end
 
 	for (const wyrmgus::unit_type *supply_unit_type : supply_units) {
-		AiHelperInsert(aiHelper.UnitLimit, 0, supply_unit_type);
+		AiHelperInsert(aiHelper.UnitLimit, supply_unit_type);
 	}
 	//Wyrmgus start
-	for (std::vector<const wyrmgus::unit_type *>::const_iterator i = market_units.begin(); i != market_units.end(); ++i) {
-		AiHelperInsert(aiHelper.SellMarkets, 0, *i);
+	for (const wyrmgus::unit_type *sell_market : market_units) {
+		AiHelperInsert(aiHelper.SellMarkets, 0, sell_market);
 	}
-	for (std::vector<const wyrmgus::unit_type *>::const_iterator i = naval_transporter_units.begin(); i != naval_transporter_units.end(); ++i) {
-		AiHelperInsert(aiHelper.NavalTransporters, 0, *i);
+	for (const wyrmgus::unit_type *naval_transporter : naval_transporter_units) {
+		AiHelperInsert(aiHelper.NavalTransporters, naval_transporter);
 	}
 	//Wyrmgus end
 

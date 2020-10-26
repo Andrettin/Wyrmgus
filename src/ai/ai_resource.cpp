@@ -689,10 +689,10 @@ void AiTransportCapacityRequest(int capacity_needed, int landmass)
 	const wyrmgus::unit_type *best_type = nullptr;
 	int best_cost = 0;
 
-	const int n = AiHelpers.NavalTransporters[0].size();
+	const int n = AiHelpers.NavalTransporters.size();
 
 	for (int i = 0; i < n; ++i) {
-		const wyrmgus::unit_type *type = AiHelpers.NavalTransporters[0][i];
+		const wyrmgus::unit_type *type = AiHelpers.NavalTransporters[i];
 
 		if (!AiPlayer->Player->get_faction()->is_class_unit_type(type)) {
 			continue;
@@ -852,10 +852,10 @@ static bool AiRequestSupply()
 	// Check if we can build this?
 	//
 	int j = 0;
-	const int n = AiHelpers.UnitLimit[0].size();
+	const int n = AiHelpers.UnitLimit.size();
 
 	for (int i = 0; i < n; ++i) {
-		const wyrmgus::unit_type &type = *AiHelpers.UnitLimit[0][i];
+		const wyrmgus::unit_type &type = *AiHelpers.UnitLimit[i];
 		if (counter[type.Slot]) { // Already ordered.
 #if defined(DEBUG) && defined(DebugRequestSupply)
 			DebugPrint("%d: AiRequestSupply: Supply already build in %s\n"
@@ -864,7 +864,7 @@ static bool AiRequestSupply()
 			return false;
 		}
 
-		if (AiPlayer->Player->Faction != -1 && !wyrmgus::faction::get_all()[AiPlayer->Player->Faction]->is_class_unit_type(&type)) {
+		if (AiPlayer->Player->get_faction() != nullptr && !AiPlayer->Player->get_faction()->is_class_unit_type(&type)) {
 			continue;
 		}
 
