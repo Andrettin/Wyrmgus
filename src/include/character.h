@@ -98,7 +98,7 @@ class character : public detailed_data_entry, public data_type<character>, publi
 	Q_PROPERTY(QString surname READ get_surname_qstring)
 	Q_PROPERTY(wyrmgus::icon* icon READ get_base_icon WRITE set_base_icon)
 	Q_PROPERTY(wyrmgus::icon* heroic_icon MEMBER heroic_icon READ get_heroic_icon)
-	Q_PROPERTY(wyrmgus::unit_type* unit_type READ get_unit_type WRITE set_unit_type)
+	Q_PROPERTY(wyrmgus::unit_type* unit_type MEMBER unit_type WRITE set_unit_type)
 	Q_PROPERTY(wyrmgus::civilization* civilization MEMBER civilization READ get_civilization)
 	Q_PROPERTY(wyrmgus::faction* default_faction MEMBER default_faction READ get_default_faction)
 	Q_PROPERTY(wyrmgus::gender gender READ get_gender WRITE set_gender)
@@ -149,7 +149,7 @@ public:
 		return QString::fromStdString(this->get_surname());
 	}
 
-	unit_type *get_unit_type() const
+	const unit_type *get_unit_type() const
 	{
 		return this->unit_type;
 	}

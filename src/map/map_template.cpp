@@ -1855,7 +1855,7 @@ void map_template::apply_character(character *character, const QPoint &template_
 {
 	faction *unit_faction = character->get_faction();
 	CPlayer *unit_player = unit_faction ? GetFactionPlayer(unit_faction) : nullptr;
-	unit_type *unit_type = character->get_unit_type();
+	const unit_type *unit_type = character->get_unit_type();
 
 	if (unit_type == nullptr) {
 		return;

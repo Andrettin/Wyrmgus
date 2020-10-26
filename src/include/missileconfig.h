@@ -43,7 +43,7 @@ class MissileConfig
 public:
 	bool MapMissileNoLog();
 	bool MapMissile();
-	bool IsEmpty() { return Name.empty(); }
+	bool IsEmpty() const { return Name.empty(); }
 
 public:
 	std::string Name;        /// Config missile name

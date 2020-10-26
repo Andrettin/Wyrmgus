@@ -846,6 +846,10 @@ void CUnit::Retrain()
 	while (this->Type->Stats[this->Player->Index].Variables[LEVEL_INDEX].Value > base_level) {
 		bool found_previous_unit_type = false;
 		for (wyrmgus::unit_type *unit_type : wyrmgus::unit_type::get_all()) {
+			if (unit_type->is_template()) {
+				continue;
+			}
+
 			if (this->Character != nullptr && std::find(this->Character->ForbiddenUpgrades.begin(), this->Character->ForbiddenUpgrades.end(), unit_type) != this->Character->ForbiddenUpgrades.end()) {
 				continue;
 			}

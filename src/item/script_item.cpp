@@ -103,6 +103,10 @@ static int CclGetItems(lua_State *l)
 {
 	std::vector<const wyrmgus::unit_type *> items;
 	for (const wyrmgus::unit_type *unit_type : wyrmgus::unit_type::get_all()) {
+		if (unit_type->is_template()) {
+			continue;
+		}
+
 		if (unit_type->BoolFlag[ITEM_INDEX].value) {
 			items.push_back(unit_type);
 		}

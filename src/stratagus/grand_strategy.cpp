@@ -296,6 +296,10 @@ void CGrandStrategyProvince::SetOwner(int civilization_id, int faction_id)
 	}
 	
 	for (const wyrmgus::unit_type *unit_type : wyrmgus::unit_type::get_all()) { //change the province's military score to be appropriate for the new faction's technologies
+		if (unit_type->is_template()) {
+			continue;
+		}
+
 		if (IsMilitaryUnit(*unit_type)) {
 			int old_owner_military_score_bonus = (this->Owner != nullptr ? this->Owner->MilitaryScoreBonus[unit_type->Slot] : 0);
 			int new_owner_military_score_bonus = (faction_id != -1 ? GrandStrategyGame.Factions[civilization_id][faction_id]->MilitaryScoreBonus[unit_type->Slot] : 0);
@@ -653,7 +657,10 @@ void CGrandStrategyFaction::SetTechnology(int upgrade_id, bool has_technology, b
 	//add military score bonuses
 	for (const auto &modifier : CUpgrade::get_all()[upgrade_id]->get_modifiers()) {
 		for (const wyrmgus::unit_type *unit_type : wyrmgus::unit_type::get_all()) {
-				
+			if (unit_type->is_template()) {
+				continue;
+			}
+
 			if (modifier->applies_to(unit_type)) {
 				if (modifier->Modifier.Variables[POINTS_INDEX].Value) {
 					this->MilitaryScoreBonus[unit_type->Slot] += modifier->Modifier.Variables[POINTS_INDEX].Value * change;

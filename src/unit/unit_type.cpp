@@ -2412,7 +2412,7 @@ static bool SaveUnitStats(const CUnitStats &stats, const wyrmgus::unit_type &typ
 		file.printf("\"%s\", %d,", DefaultResourceNames[i].c_str(), stats.ResourceDemand[i]);
 	}
 	file.printf("},\n\"unit-stock\", {");
-	for (wyrmgus::unit_type *unit_type : wyrmgus::unit_type::get_all()) {
+	for (const wyrmgus::unit_type *unit_type : wyrmgus::unit_type::get_all()) {
 		if (stats.GetUnitStock(unit_type) == type.DefaultStat.GetUnitStock(unit_type)) {
 			continue;
 		}
@@ -2714,11 +2714,10 @@ void LoadUnitTypeSprite(wyrmgus::unit_type &type)
 int GetUnitTypesCount()
 {
 	int count = 0;
-	for (wyrmgus::unit_type *unit_type : wyrmgus::unit_type::get_all()) {
+	for (const wyrmgus::unit_type *unit_type : wyrmgus::unit_type::get_all()) {
 		if (unit_type->Missile.IsEmpty() == false) count++;
 		if (unit_type->FireMissile.IsEmpty() == false) count++;
 		if (unit_type->Explosion.IsEmpty() == false) count++;
-
 
 		if (!unit_type->Sprite) {
 			count++;

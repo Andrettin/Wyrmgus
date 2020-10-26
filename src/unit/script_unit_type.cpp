@@ -2437,6 +2437,10 @@ static int CclGetUnitTypeData(lua_State *l)
 	} else if (!strcmp(data, "Droppers")) { // unit types which can drop this one
 		std::vector<const wyrmgus::unit_type *> droppers;
 		for (const wyrmgus::unit_type *other_unit_type : wyrmgus::unit_type::get_all()) {
+			if (other_unit_type->is_template()) {
+				continue;
+			}
+
 			if (
 				std::find(other_unit_type->Drops.begin(), other_unit_type->Drops.end(), type) != other_unit_type->Drops.end()
 				|| std::find(other_unit_type->AiDrops.begin(), other_unit_type->AiDrops.end(), type) != other_unit_type->AiDrops.end()

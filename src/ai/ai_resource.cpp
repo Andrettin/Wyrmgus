@@ -2114,7 +2114,11 @@ static void AiCheckPathwayConstruction()
 	std::vector<wyrmgus::unit_type *> pathway_types;
 	
 	for (wyrmgus::unit_type *unit_type : wyrmgus::unit_type::get_all()) { //assumes the pathways are listed in order of speed bonus
-		if (!unit_type || !unit_type->TerrainType || !AiRequestedTypeAllowed(*AiPlayer->Player, *unit_type)) {
+		if (unit_type->is_template()) {
+			continue;
+		}
+
+		if (!unit_type->TerrainType || !AiRequestedTypeAllowed(*AiPlayer->Player, *unit_type)) {
 			continue;
 		}
 		

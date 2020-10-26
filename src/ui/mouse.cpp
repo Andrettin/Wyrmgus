@@ -325,7 +325,11 @@ static bool DoRightButton_Harvest_Unit(CUnit &unit, CUnit &dest, int flush, int 
 //			if (unit.ResourcesHeld < type.ResInfo[res]->ResourceCapacity) {
 			if (unit.CurrentResource != res || unit.ResourcesHeld < type.ResInfo[res]->ResourceCapacity) {
 			//Wyrmgus end
-				for (wyrmgus::unit_type *unit_type : wyrmgus::unit_type::get_all()) {
+				for (const wyrmgus::unit_type *unit_type : wyrmgus::unit_type::get_all()) {
+					if (unit_type->is_template()) {
+						continue;
+					}
+
 					if (unit_type->get_given_resource() != nullptr && unit_type->get_given_resource()->get_index() == res && unit_type->BoolFlag[CANHARVEST_INDEX].value && CanBuildUnitType(&unit, *unit_type, dest.tilePos, 1, false, dest.MapLayer->ID)) {
 						if (check_conditions(unit_type, unit.Player)) {
 							if (wyrmgus::vector::contains(AiHelpers.get_builders(unit_type), unit.Type) || wyrmgus::vector::contains(AiHelpers.get_builder_classes(unit_type->get_unit_class()), unit.Type->get_unit_class())) {
@@ -354,7 +358,11 @@ static bool DoRightButton_Harvest_Unit(CUnit &unit, CUnit &dest, int flush, int 
 					}
 					SendCommandReturnGoods(unit, depot, flush);
 					//Wyrmgus start
-					for (wyrmgus::unit_type *unit_type : wyrmgus::unit_type::get_all()) {
+					for (const wyrmgus::unit_type *unit_type : wyrmgus::unit_type::get_all()) {
+						if (unit_type->is_template()) {
+							continue;
+						}
+
 						if (unit_type->get_given_resource() != nullptr && unit_type->get_given_resource()->get_index() == res && unit_type->BoolFlag[CANHARVEST_INDEX].value && CanBuildUnitType(&unit, *unit_type, dest.tilePos, 1, false, dest.MapLayer->ID)) {
 							if (check_conditions(unit_type, unit.Player)) {
 								SendCommandBuildBuilding(unit, dest.tilePos, *unit_type, 0, dest.MapLayer->ID);

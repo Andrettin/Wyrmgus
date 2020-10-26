@@ -437,7 +437,11 @@ static void AnimateActionTrain(CUnit &unit)
 					CommandResource(*newUnit, *table[j], FlushCommands);
 					command_found = true;
 				} else if (newUnit->Type->BoolFlag[HARVESTER_INDEX].value && table[j]->Type->get_given_resource() != nullptr && newUnit->Type->ResInfo[table[j]->Type->get_given_resource()->get_index()] && !table[j]->Type->BoolFlag[CANHARVEST_INDEX].value && (table[j]->Player == newUnit->Player || table[j]->Player->Index == PlayerNumNeutral)) { // see if can build mine on top of deposit
-					for (wyrmgus::unit_type *other_unit_type : wyrmgus::unit_type::get_all()) {
+					for (const wyrmgus::unit_type *other_unit_type : wyrmgus::unit_type::get_all()) {
+						if (other_unit_type->is_template()) {
+							continue;
+						}
+
 						if (other_unit_type->get_given_resource() == table[j]->Type->get_given_resource() && other_unit_type->BoolFlag[CANHARVEST_INDEX].value && CanBuildUnitType(newUnit, *other_unit_type, table[j]->tilePos, 1, false, table[j]->MapLayer->ID)) {
 							CommandBuildBuilding(*newUnit, table[j]->tilePos, *other_unit_type, FlushCommands, table[j]->MapLayer->ID);
 							command_found = true;

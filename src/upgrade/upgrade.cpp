@@ -1347,6 +1347,10 @@ static void ApplyUpgradeModifier(CPlayer &player, const wyrmgus::upgrade_modifie
 	//Wyrmgus end
 
 	for (wyrmgus::unit_type *unit_type : wyrmgus::unit_type::get_all()) {
+		if (unit_type->is_template()) {
+			continue;
+		}
+
 		CUnitStats &stat = unit_type->Stats[pn];
 		// add/remove allowed units
 
@@ -1636,6 +1640,10 @@ static void RemoveUpgradeModifier(CPlayer &player, const wyrmgus::upgrade_modifi
 	}
 
 	for (wyrmgus::unit_type *unit_type : wyrmgus::unit_type::get_all()) {
+		if (unit_type->is_template()) {
+			continue;
+		}
+
 		CUnitStats &stat = unit_type->Stats[pn];
 		// add/remove allowed units
 
@@ -2283,6 +2291,10 @@ void IndividualUpgradeAcquire(CUnit &unit, const CUpgrade *upgrade)
 			bool applies_to_this = false;
 			bool applies_to_any_unit_types = false;
 			for (const wyrmgus::unit_type *unit_type : wyrmgus::unit_type::get_all()) {
+				if (unit_type->is_template()) {
+					continue;
+				}
+
 				if (modifier->applies_to(unit_type)) {
 					applies_to_any_unit_types = true;
 					if (unit_type == unit.Type) {
@@ -2334,6 +2346,10 @@ void IndividualUpgradeLost(CUnit &unit, const CUpgrade *upgrade, bool lose_all)
 			bool applies_to_this = false;
 			bool applies_to_any_unit_types = false;
 			for (const wyrmgus::unit_type *unit_type : wyrmgus::unit_type::get_all()) {
+				if (unit_type->is_template()) {
+					continue;
+				}
+
 				if (modifier->applies_to(unit_type)) {
 					applies_to_any_unit_types = true;
 					if (unit_type == unit.Type) {
@@ -2514,6 +2530,10 @@ std::string GetUpgradeEffectsString(const std::string &upgrade_ident, bool grand
 						
 					bool first_unit_type = true;
 					for (const wyrmgus::unit_type *unit_type : wyrmgus::unit_type::get_all()) {
+						if (unit_type->is_template()) {
+							continue;
+						}
+
 						if (modifier->applies_to(unit_type)) {
 							if (!first_unit_type) {
 								upgrade_effects_string += ", ";
@@ -2565,6 +2585,10 @@ std::string GetUpgradeEffectsString(const std::string &upgrade_ident, bool grand
 							
 						bool first_unit_type = true;
 						for (const wyrmgus::unit_type *unit_type : wyrmgus::unit_type::get_all()) {
+							if (unit_type->is_template()) {
+								continue;
+							}
+
 							if (modifier->applies_to(unit_type)) {
 								if (!first_unit_type) {
 									upgrade_effects_string += ", ";

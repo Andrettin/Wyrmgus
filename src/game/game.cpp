@@ -746,19 +746,21 @@ int WriteMapSetup(const char *mapSetup, CMap &map, int writeTerrain, bool is_mod
 			}
 		}		
 
-		for (wyrmgus::unit_type *unit_type : wyrmgus::unit_type::get_all()) {
-			if (unit_type->ModTrains.find(CMap::Map.Info.Filename) != unit_type->ModTrains.end()) {
+		for (const wyrmgus::unit_type *unit_type : wyrmgus::unit_type::get_all()) {
+			const auto mod_trains_find_iterator = unit_type->ModTrains.find(CMap::Map.Info.Filename);
+			if (mod_trains_find_iterator != unit_type->ModTrains.end()) {
 				f->printf("SetModTrains(\"%s\", \"%s\", {", mod_file.c_str(), unit_type->Ident.c_str());
-				for (size_t j = 0; j < unit_type->ModTrains[CMap::Map.Info.Filename].size(); ++j) {
-					f->printf("\"%s\", ", unit_type->ModTrains[CMap::Map.Info.Filename][j]->Ident.c_str());
+				for (size_t j = 0; j < mod_trains_find_iterator->second.size(); ++j) {
+					f->printf("\"%s\", ", mod_trains_find_iterator->second[j]->Ident.c_str());
 				}
 				f->printf("})\n\n");
 			}
 			
-			if (unit_type->ModAiDrops.find(CMap::Map.Info.Filename) != unit_type->ModAiDrops.end()) {
+			const auto mod_ai_drops_find_iterator = unit_type->ModAiDrops.find(CMap::Map.Info.Filename);
+			if (mod_ai_drops_find_iterator != unit_type->ModAiDrops.end()) {
 				f->printf("SetModAiDrops(\"%s\", \"%s\", {", mod_file.c_str(), unit_type->Ident.c_str());
-				for (size_t j = 0; j < unit_type->ModAiDrops[CMap::Map.Info.Filename].size(); ++j) {
-					f->printf("\"%s\", ", unit_type->ModAiDrops[CMap::Map.Info.Filename][j]->Ident.c_str());
+				for (size_t j = 0; j < mod_ai_drops_find_iterator->second.size(); ++j) {
+					f->printf("\"%s\", ", mod_ai_drops_find_iterator->second[j]->Ident.c_str());
 				}
 				f->printf("})\n\n");
 			}

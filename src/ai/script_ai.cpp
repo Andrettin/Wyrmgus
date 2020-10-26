@@ -178,42 +178,55 @@ static void AiHelperInsert(std::vector<std::vector<int> > &table,
 /**
 **  Transform list of unit separed with coma to a true list.
 */
-static std::vector<wyrmgus::unit_type *> getUnitTypeFromString(const std::string &list)
+static std::vector<const wyrmgus::unit_type *> get_unit_type_from_string(const std::string &list)
 {
-	std::vector<wyrmgus::unit_type *> res;
+	std::vector<const wyrmgus::unit_type *> res;
 
 	if (list == "*") {
-		return wyrmgus::unit_type::get_all();
-	}
-	size_t begin = 1;
-	size_t end = list.find(",", begin);
-	while (end != std::string::npos) {
-		std::string unitName = list.substr(begin, end - begin);
-		begin = end + 1;
-		end = list.find(",", begin);
-		if (!unitName.empty()) {
-			Assert(unitName[0] != ',');
-			wyrmgus::unit_type *unit_type = wyrmgus::unit_type::try_get(unitName);
-			if (unit_type != nullptr) {
-				res.push_back(unit_type);
+		for (const wyrmgus::unit_type *unit_type : wyrmgus::unit_type::get_all()) {
+			if (unit_type->is_template()) {
+				continue;
+			}
+
+			res.push_back(unit_type);
+		}
+	} else {
+		size_t begin = 1;
+		size_t end = list.find(",", begin);
+		while (end != std::string::npos) {
+			std::string unitName = list.substr(begin, end - begin);
+			begin = end + 1;
+			end = list.find(",", begin);
+			if (!unitName.empty()) {
+				Assert(unitName[0] != ',');
+				const wyrmgus::unit_type *unit_type = wyrmgus::unit_type::try_get(unitName);
+				if (unit_type != nullptr) {
+					res.push_back(unit_type);
+				}
 			}
 		}
 	}
+
 	return res;
 }
 
 /**
-**  Get list of unittype which can be repared.
+**  Get list of unit types which can be repared.
 */
-static std::vector<const wyrmgus::unit_type *> getReparableUnits()
+static std::vector<const wyrmgus::unit_type *> get_reparable_units()
 {
 	std::vector<const wyrmgus::unit_type *> res;
 
 	for (const wyrmgus::unit_type *unit_type : wyrmgus::unit_type::get_all()) {
+		if (unit_type->is_template()) {
+			continue;
+		}
+
 		if (unit_type->RepairHP > 0) {
 			res.push_back(unit_type);
 		}
 	}
+
 	return res;
 }
 
@@ -227,6 +240,10 @@ static std::vector<const wyrmgus::unit_type *> get_supply_units()
 	std::vector<const wyrmgus::unit_type *> res;
 
 	for (const wyrmgus::unit_type *unit_type : wyrmgus::unit_type::get_all()) {
+		if (unit_type->is_template()) {
+			continue;
+		}
+
 		if (unit_type->BoolFlag[TOWNHALL_INDEX].value) {
 			continue;
 		}
@@ -260,11 +277,15 @@ static std::vector<const wyrmgus::unit_type *> get_supply_units()
 **
 **  @note Better (MaxOnBoard / cost) first.
 */
-static std::vector<const wyrmgus::unit_type *> getMineUnits()
+static std::vector<const wyrmgus::unit_type *> get_mine_units()
 {
 	std::vector<const wyrmgus::unit_type *> res;
 
 	for (const wyrmgus::unit_type *unit_type : wyrmgus::unit_type::get_all()) {
+		if (unit_type->is_template()) {
+			continue;
+		}
+
 		if (unit_type->get_given_resource() != nullptr && unit_type->BoolFlag[CANHARVEST_INDEX].value) {
 			res.push_back(unit_type);
 		}
@@ -311,11 +332,14 @@ static std::vector<const wyrmgus::unit_type *> getMineUnits()
 /**
 **  Get list of unit types which are markets.
 */
-static std::vector<const wyrmgus::unit_type *> GetMarketUnits()
+static std::vector<const wyrmgus::unit_type *> get_market_units()
 {
 	std::vector<const wyrmgus::unit_type *> res;
 
 	for (const wyrmgus::unit_type *unit_type : wyrmgus::unit_type::get_all()) {
+		if (unit_type->is_template()) {
+			continue;
+		}
 
 		if (unit_type->BoolFlag[MARKET_INDEX].value) {
 			res.push_back(unit_type);
@@ -327,11 +351,15 @@ static std::vector<const wyrmgus::unit_type *> GetMarketUnits()
 /**
 **  Get list of unit types which are transporters.
 */
-static std::vector<const wyrmgus::unit_type *> GetNavalTransporterUnits()
+static std::vector<const wyrmgus::unit_type *> get_naval_transporter_units()
 {
 	std::vector<const wyrmgus::unit_type *> res;
 
 	for (const wyrmgus::unit_type *unit_type : wyrmgus::unit_type::get_all()) {
+		if (unit_type->is_template()) {
+			continue;
+		}
+
 		if (unit_type->CanTransport() && (unit_type->UnitType == UnitTypeType::Naval || unit_type->UnitType == UnitTypeType::Fly || unit_type->UnitType == UnitTypeType::FlyLow || unit_type->UnitType == UnitTypeType::Space)) { //if the unit is a transporter that can travel through water (not necessarily a ship, can also fly)
 			res.push_back(unit_type);
 		}
@@ -354,12 +382,12 @@ static void InitAiHelper(AiHelper &aiHelper)
 	AiHelpers.clear();
 	//Wyrmgus end
 	
-	std::vector<const wyrmgus::unit_type *> reparableUnits = getReparableUnits();
-	std::vector<const wyrmgus::unit_type *> supply_units = get_supply_units();
-	std::vector<const wyrmgus::unit_type *> mineUnits = getMineUnits();
+	const std::vector<const wyrmgus::unit_type *> reparable_units = get_reparable_units();
+	const std::vector<const wyrmgus::unit_type *> supply_units = get_supply_units();
+	const std::vector<const wyrmgus::unit_type *> mine_units = get_mine_units();
 	//Wyrmgus start
-	std::vector<const wyrmgus::unit_type *> market_units = GetMarketUnits();
-	std::vector<const wyrmgus::unit_type *> naval_transporter_units = GetNavalTransporterUnits();
+	const std::vector<const wyrmgus::unit_type *> market_units = get_market_units();
+	const std::vector<const wyrmgus::unit_type *> naval_transporter_units = get_naval_transporter_units();
 	//Wyrmgus end
 
 	for (const wyrmgus::unit_type *supply_unit_type : supply_units) {
@@ -375,12 +403,16 @@ static void InitAiHelper(AiHelper &aiHelper)
 	//Wyrmgus end
 
 	for (int i = 1; i < MaxCosts; ++i) {
-		for (std::vector<const wyrmgus::unit_type *>::const_iterator j = mineUnits.begin(); j != mineUnits.end(); ++j) {
-			if ((*j)->get_given_resource()->get_index() == i) {
-				AiHelperInsert(aiHelper.Mines, i, *j);
+		for (const wyrmgus::unit_type *mine_unit_type : mine_units) {
+			if (mine_unit_type->get_given_resource()->get_index() == i) {
+				AiHelperInsert(aiHelper.Mines, i, mine_unit_type);
 			}
 		}
 		for (const wyrmgus::unit_type *unit_type : wyrmgus::unit_type::get_all()) {
+			if (unit_type->is_template()) {
+				continue;
+			}
+
 			if (unit_type->CanStore[i] > 0) {
 				AiHelperInsert(aiHelper.Depots, i, unit_type);
 			}
@@ -388,23 +420,23 @@ static void InitAiHelper(AiHelper &aiHelper)
 	}
 
 	for (const wyrmgus::button *button : wyrmgus::button::get_all()) {
-		std::vector<wyrmgus::unit_type *> unitmask = getUnitTypeFromString(button->UnitMask);
+		std::vector<const wyrmgus::unit_type *> unitmask = get_unit_type_from_string(button->UnitMask);
 		for (const wyrmgus::unit_class *unit_class : button->get_unit_classes()) {
 			wyrmgus::vector::merge(unitmask, unit_class->get_unit_types());
 		}
 
 		switch (button->Action) {
-			case ButtonCmd::Repair :
-				for (std::vector<wyrmgus::unit_type *>::const_iterator j = unitmask.begin(); j != unitmask.end(); ++j) {
-					for (std::vector<const wyrmgus::unit_type *>::const_iterator k = reparableUnits.begin(); k != reparableUnits.end(); ++k) {
-						AiHelperInsert(aiHelper.Repair, (*k)->Slot, *j);
+			case ButtonCmd::Repair:
+				for (const wyrmgus::unit_type *repairer : unitmask) {
+					for (const wyrmgus::unit_type *reparable_unit_type : reparable_units) {
+						AiHelperInsert(aiHelper.Repair, reparable_unit_type->get_index(), repairer);
 					}
 				}
 				break;
 			case ButtonCmd::Build: {
 				const wyrmgus::unit_type *buildingType = wyrmgus::unit_type::get(button->ValueStr);
 
-				for (wyrmgus::unit_type *builder : unitmask) {
+				for (const wyrmgus::unit_type *builder : unitmask) {
 					AiHelperInsert(aiHelper.builders, buildingType, builder);
 				}
 				break;
@@ -420,7 +452,7 @@ static void InitAiHelper(AiHelper &aiHelper)
 			case ButtonCmd::Train : {
 				const wyrmgus::unit_type *trained_type = wyrmgus::unit_type::get(button->ValueStr);
 
-				for (wyrmgus::unit_type *trainer : unitmask) {
+				for (const wyrmgus::unit_type *trainer : unitmask) {
 					AiHelperInsert(aiHelper.trainers, trained_type, trainer);
 				}
 				break;
@@ -470,34 +502,34 @@ static void InitAiHelper(AiHelper &aiHelper)
 				break;
 			}
 			case ButtonCmd::SellResource : {
-				int resource = GetResourceIdByName(button->ValueStr.c_str());
+				const int resource = GetResourceIdByName(button->ValueStr.c_str());
 
-				for (std::vector<wyrmgus::unit_type *>::const_iterator j = unitmask.begin(); j != unitmask.end(); ++j) {
-					AiHelperInsert(aiHelper.SellMarkets, resource - 1, *j);
+				for (const wyrmgus::unit_type *sell_market : unitmask) {
+					AiHelperInsert(aiHelper.SellMarkets, resource - 1, sell_market);
 				}
 				break;
 			}
 			case ButtonCmd::BuyResource : {
 				int resource = GetResourceIdByName(button->ValueStr.c_str());
 
-				for (std::vector<wyrmgus::unit_type *>::const_iterator j = unitmask.begin(); j != unitmask.end(); ++j) {
-					AiHelperInsert(aiHelper.BuyMarkets, resource - 1, *j);
+				for (const wyrmgus::unit_type *buy_market : unitmask) {
+					AiHelperInsert(aiHelper.BuyMarkets, resource - 1, buy_market);
 				}
 				break;
 			}
 			case ButtonCmd::ProduceResource : {
-				int resource = GetResourceIdByName(button->ValueStr.c_str());
+				const int resource = GetResourceIdByName(button->ValueStr.c_str());
 
-				for (std::vector<wyrmgus::unit_type *>::const_iterator j = unitmask.begin(); j != unitmask.end(); ++j) {
-					AiHelperInsert(aiHelper.ProducedResources, (**j).Slot, resource);
+				for (const wyrmgus::unit_type *producer : unitmask) {
+					AiHelperInsert(aiHelper.ProducedResources, producer->get_index(), resource);
 				}
 				break;
 			}
 			case ButtonCmd::ExperienceUpgradeTo : {
-				const wyrmgus::unit_type *upgradeToType = wyrmgus::unit_type::get(button->ValueStr);
+				const wyrmgus::unit_type *upgrade_to_type = wyrmgus::unit_type::get(button->ValueStr);
 
-				for (std::vector<wyrmgus::unit_type *>::const_iterator j = unitmask.begin(); j != unitmask.end(); ++j) {
-					AiHelperInsert(aiHelper.ExperienceUpgrades, (**j).Slot, upgradeToType);
+				for (const wyrmgus::unit_type *experience_upgradee : unitmask) {
+					AiHelperInsert(aiHelper.ExperienceUpgrades, experience_upgradee->get_index(), upgrade_to_type);
 				}
 				break;
 			}
@@ -505,8 +537,8 @@ static void InitAiHelper(AiHelper &aiHelper)
 				const CUpgrade *ability = CUpgrade::get(button->ValueStr);
 
 				if (ability->is_ability()) {
-					for (std::vector<wyrmgus::unit_type *>::const_iterator j = unitmask.begin(); j != unitmask.end(); ++j) {
-						AiHelperInsert(aiHelper.LearnableAbilities, (**j).Slot, ability);
+					for (const wyrmgus::unit_type *learner : unitmask) {
+						AiHelperInsert(aiHelper.LearnableAbilities, learner->get_index(), ability);
 					}
 				}
 				break;

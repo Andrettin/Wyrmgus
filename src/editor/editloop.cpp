@@ -2381,6 +2381,10 @@ void CEditor::Init()
 	if (this->UnitTypes.size() == 0) {
 		//if editor's unit types vector is still empty after loading the editor's lua file, then fill it automatically
 		for (const wyrmgus::unit_type *unit_type : wyrmgus::unit_type::get_all()) {
+			if (unit_type->is_template()) {
+				continue;
+			}
+
 			if (unit_type->Icon.Name.empty() || unit_type->BoolFlag[VANISHES_INDEX].value || unit_type->BoolFlag[HIDDENINEDITOR_INDEX].value) {
 				continue;
 			}

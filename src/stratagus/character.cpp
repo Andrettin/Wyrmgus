@@ -379,7 +379,7 @@ void character::initialize()
 	//use the character's name for name generation (do this only after setting all properties so that the type, civilization and gender will have been parsed if given
 	if (this->get_unit_type() != nullptr && this->get_unit_type()->BoolFlag[FAUNA_INDEX].value) {
 		if (!this->get_name().empty()) {
-			this->get_unit_type()->PersonalNames[this->get_gender()].push_back(this->get_name());
+			this->unit_type->PersonalNames[this->get_gender()].push_back(this->get_name());
 		}
 	} else if (this->civilization != nullptr) {
 		if (!this->civilization->is_initialized()) {
