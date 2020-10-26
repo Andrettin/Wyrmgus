@@ -1883,7 +1883,7 @@ void AiForceManager::CheckForceRecruitment()
 				bool valid = true;
 				for (size_t j = 0; j < faction_force_templates[i]->get_units().size(); ++j) {
 					const wyrmgus::unit_class *unit_class = faction_force_templates[i]->get_units()[j].first;
-					wyrmgus::unit_type *unit_type = wyrmgus::faction::get_all()[AiPlayer->Player->Faction]->get_class_unit_type(unit_class);
+					const wyrmgus::unit_type *unit_type = AiPlayer->Player->get_faction()->get_class_unit_type(unit_class);
 					if (unit_type == nullptr || !AiRequestedTypeAllowed(*AiPlayer->Player, *unit_type)) {
 						valid = false;
 						break;

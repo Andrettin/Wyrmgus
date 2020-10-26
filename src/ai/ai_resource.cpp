@@ -297,7 +297,7 @@ static bool IsAlreadyWorking(const CUnit &unit)
 **
 **  @note            We must check if the dependencies are fulfilled.
 */
-static int AiBuildBuilding(const wyrmgus::unit_type &type, wyrmgus::unit_type &building, const Vec2i &nearPos, int z, int landmass = 0, const wyrmgus::site *settlement = nullptr)
+static int AiBuildBuilding(const wyrmgus::unit_type &type, const wyrmgus::unit_type &building, const Vec2i &nearPos, int z, int landmass = 0, const wyrmgus::site *settlement = nullptr)
 {
 	std::vector<CUnit *> table;
 
@@ -549,6 +549,10 @@ void AiNewDepotRequest(CUnit &worker)
 	for (int i = 0; i < n; ++i) {
 		const wyrmgus::unit_type &type = *AiHelpers.Depots[resource][i];
 
+		if (worker.Player->get_faction() != nullptr && !worker.Player->get_faction()->is_class_unit_type(&type)) {
+			continue;
+		}
+
 		if (counter[type.Slot]) { // Already ordered.
 			return;
 		}
@@ -694,7 +698,7 @@ void AiTransportCapacityRequest(int capacity_needed, int landmass)
 	for (int i = 0; i < n; ++i) {
 		const wyrmgus::unit_type *type = AiHelpers.NavalTransporters[i];
 
-		if (!AiPlayer->Player->get_faction()->is_class_unit_type(type)) {
+		if (AiPlayer->Player->get_faction() != nullptr && !AiPlayer->Player->get_faction()->is_class_unit_type(type)) {
 			continue;
 		}
 
@@ -790,6 +794,10 @@ void AiTransportCapacityRequest(int capacity_needed, int landmass)
 		if (!has_builder) { // if doesn't have a builder, request one
 			bool requested_builder = false;
 			for (const wyrmgus::unit_type *builder : AiHelpers.get_trainers(best_type)) {
+				if (AiPlayer->Player->get_faction() != nullptr && !AiPlayer->Player->get_faction()->is_class_unit_type(builder)) {
+					continue;
+				}
+
 				if (!AiRequestedTypeAllowed(*AiPlayer->Player, *builder)) {
 					continue;
 				}
@@ -799,9 +807,9 @@ void AiTransportCapacityRequest(int capacity_needed, int landmass)
 				break;
 			}
 
-			if (!requested_builder && AiPlayer->Player->Faction != -1) {
+			if (!requested_builder && AiPlayer->Player->get_faction() != nullptr) {
 				for (const wyrmgus::unit_class *builder_class : AiHelpers.get_trainer_classes(best_type->get_unit_class())) {
-					wyrmgus::unit_type *builder = wyrmgus::faction::get_all()[AiPlayer->Player->Faction]->get_class_unit_type(builder_class);
+					const wyrmgus::unit_type *builder = AiPlayer->Player->get_faction()->get_class_unit_type(builder_class);
 
 					if (builder == nullptr) {
 						continue;
@@ -2111,10 +2119,14 @@ static void AiCheckPathwayConstruction()
 		return;
 	}
 
-	std::vector<wyrmgus::unit_type *> pathway_types;
+	std::vector<const wyrmgus::unit_type *> pathway_types;
 	
-	for (wyrmgus::unit_type *unit_type : wyrmgus::unit_type::get_all()) { //assumes the pathways are listed in order of speed bonus
+	for (const wyrmgus::unit_type *unit_type : wyrmgus::unit_type::get_all()) { //assumes the pathways are listed in order of speed bonus
 		if (unit_type->is_template()) {
+			continue;
+		}
+
+		if (AiPlayer->Player->get_faction() != nullptr && !AiPlayer->Player->get_faction()->is_class_unit_type(unit_type)) {
 			continue;
 		}
 
@@ -2439,11 +2451,11 @@ void AiCheckDockConstruction()
 		return;
 	}
 
-	if (AiPlayer->Player->Faction == -1) {
+	if (AiPlayer->Player->get_faction() == nullptr) {
 		return;
 	}
 
-	wyrmgus::unit_type *dock_type = wyrmgus::faction::get_all()[AiPlayer->Player->Faction]->get_class_unit_type(wyrmgus::unit_class::get("dock"));
+	const wyrmgus::unit_type *dock_type = AiPlayer->Player->get_faction()->get_class_unit_type(wyrmgus::unit_class::get("dock"));
 	if (dock_type == nullptr) {
 		return;
 	}
@@ -2579,7 +2591,7 @@ void AiCheckBuildings()
 			break; //building templates are ordered by priority, so there is no need to go further
 		}
 		
-		wyrmgus::unit_type *unit_type = wyrmgus::faction::get_all()[AiPlayer->Player->Faction]->get_class_unit_type(building_template->get_unit_class());
+		const wyrmgus::unit_type *unit_type = AiPlayer->Player->get_faction()->get_class_unit_type(building_template->get_unit_class());
 		if (unit_type == nullptr || !AiRequestedTypeAllowed(*AiPlayer->Player, *unit_type, false, true)) {
 			continue;
 		}
@@ -2628,7 +2640,7 @@ void AiCheckBuildings()
 
 static void AiCheckMinecartConstruction()
 {
-	wyrmgus::unit_type *minecart_type = wyrmgus::faction::get_all()[AiPlayer->Player->Faction]->get_class_unit_type(wyrmgus::unit_class::get("minecart"));
+	const wyrmgus::unit_type *minecart_type = AiPlayer->Player->get_faction()->get_class_unit_type(wyrmgus::unit_class::get("minecart"));
 	if (minecart_type == nullptr) {
 		return;
 	}
