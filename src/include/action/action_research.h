@@ -33,7 +33,7 @@
 
 class COrder_Research final : public COrder
 {
-	friend std::unique_ptr<COrder> COrder::NewActionResearch(CUnit &unit, const CUpgrade &upgrade, int player);
+	friend std::unique_ptr<COrder> COrder::NewActionResearch(const CUpgrade &upgrade, CPlayer *player);
 public:
 	COrder_Research() : COrder(UnitAction::Research)
 	{
@@ -61,6 +61,6 @@ public:
 private:
 	const CUpgrade *Upgrade = nullptr;
 	//Wyrmgus start
-	int Player = 0; //player for whom the upgrade will be acquired (needed for researching upgrades in neutral buildings)
+	CPlayer *Player = nullptr; //player for whom the upgrade will be acquired (needed for researching upgrades in neutral buildings)
 	//Wyrmgus end
 };

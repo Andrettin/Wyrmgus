@@ -81,8 +81,10 @@ std::unique_ptr<COrder> COrder::NewActionTrade(CUnit &dest, CUnit &home_market)
 	return order;
 }
 
-/* virtual */ void COrder_Trade::Save(CFile &file, const CUnit &unit) const
+void COrder_Trade::Save(CFile &file, const CUnit &unit) const
 {
+	Q_UNUSED(unit)
+
 	file.printf("{\"action-trade\",");
 
 	if (this->Finished) {
@@ -100,8 +102,10 @@ std::unique_ptr<COrder> COrder::NewActionTrade(CUnit &dest, CUnit &home_market)
 	file.printf("}");
 }
 
-/* virtual */ bool COrder_Trade::ParseSpecificData(lua_State *l, int &j, const char *value, const CUnit &unit)
+bool COrder_Trade::ParseSpecificData(lua_State *l, int &j, const char *value, const CUnit &unit)
 {
+	Q_UNUSED(unit)
+
 	if (!strcmp(value, "state")) {
 		++j;
 		this->State = LuaToNumber(l, -1, j + 1);

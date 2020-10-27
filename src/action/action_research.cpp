@@ -48,7 +48,7 @@
 /// How many resources the player gets back if canceling research
 static constexpr int CancelResearchCostsFactor = 100;
 
-std::unique_ptr<COrder> COrder::NewActionResearch(CUnit &unit, const CUpgrade &upgrade, int player)
+std::unique_ptr<COrder> COrder::NewActionResearch(const CUpgrade &upgrade, CPlayer *player)
 {
 	auto order = std::make_unique<COrder_Research>();
 
@@ -57,23 +57,25 @@ std::unique_ptr<COrder> COrder::NewActionResearch(CUnit &unit, const CUpgrade &u
 	order->Player = player;
 //	unit.Player->SubCosts(upgrade.Costs);
 	int upgrade_costs[MaxCosts];
-	CPlayer::Players[player]->GetUpgradeCosts(&upgrade, upgrade_costs);
-	CPlayer::Players[player]->SubCosts(upgrade_costs);
+	player->GetUpgradeCosts(&upgrade, upgrade_costs);
+	player->SubCosts(upgrade_costs);
 	//Wyrmgus end
 
 	order->SetUpgrade(upgrade);
 	return order;
 }
 
-/* virtual */ void COrder_Research::Save(CFile &file, const CUnit &unit) const
+void COrder_Research::Save(CFile &file, const CUnit &unit) const
 {
+	Q_UNUSED(unit)
+
 	file.printf("{\"action-research\",");
 
 	if (this->Finished) {
 		file.printf(" \"finished\", ");
 	}
 	//Wyrmgus start
-	file.printf("\"player\", %d,", this->Player);
+	file.printf("\"player\", %d,", this->Player->get_index());
 	//Wyrmgus end
 	if (this->Upgrade) {
 		file.printf(" \"upgrade\", \"%s\"", this->Upgrade->get_identifier().c_str());
@@ -81,15 +83,17 @@ std::unique_ptr<COrder> COrder::NewActionResearch(CUnit &unit, const CUpgrade &u
 	file.printf("}");
 }
 
-/* virtual */ bool COrder_Research::ParseSpecificData(lua_State *l, int &j, const char *value, const CUnit &unit)
+bool COrder_Research::ParseSpecificData(lua_State *l, int &j, const char *value, const CUnit &unit)
 {
+	Q_UNUSED(unit)
+
 	if (!strcmp(value, "upgrade")) {
 		++j;
 		this->Upgrade = CUpgrade::get(LuaToString(l, -1, j + 1));
 	//Wyrmgus start
 	} else if (!strcmp(value, "player")) {
 		++j;
-		this->Player = LuaToNumber(l, -1, j + 1);
+		this->Player = CPlayer::Players[LuaToNumber(l, -1, j + 1)];
 	//Wyrmgus end
 	} else {
 		return false;
@@ -111,7 +115,7 @@ std::unique_ptr<COrder> COrder::NewActionResearch(CUnit &unit, const CUpgrade &u
 {
 	//Wyrmgus start
 //	unit.Variable[RESEARCH_INDEX].Value = unit.Player->UpgradeTimers.Upgrades[this->Upgrade->ID];
-	unit.Variable[RESEARCH_INDEX].Value = CPlayer::Players[this->Player]->UpgradeTimers.Upgrades[this->Upgrade->ID];
+	unit.Variable[RESEARCH_INDEX].Value = this->Player->UpgradeTimers.Upgrades[this->Upgrade->ID];
 	//Wyrmgus end
 	unit.Variable[RESEARCH_INDEX].Max = this->Upgrade->Costs[TimeCost];
 }
@@ -138,7 +142,7 @@ std::unique_ptr<COrder> COrder::NewActionResearch(CUnit &unit, const CUpgrade &u
 #endif
 	//Wyrmgus start
 //	CPlayer &player = *unit.Player;
-	CPlayer &player = *CPlayer::Players[this->Player];
+	CPlayer &player = *this->Player;
 //	player.UpgradeTimers.Upgrades[upgrade.ID] += std::max(1, player.SpeedResearch / SPEEDUP_FACTOR);
 	player.UpgradeTimers.Upgrades[upgrade.ID] += std::max(1, (player.SpeedResearch + unit.Variable[TIMEEFFICIENCYBONUS_INDEX].Value + unit.Variable[RESEARCHSPEEDBONUS_INDEX].Value) / SPEEDUP_FACTOR);
 	//Wyrmgus end
@@ -174,15 +178,17 @@ std::unique_ptr<COrder> COrder::NewActionResearch(CUnit &unit, const CUpgrade &u
 	unit.Wait = CYCLES_PER_SECOND / 6;
 }
 
-/* virtual */ void COrder_Research::Cancel(CUnit &unit)
+void COrder_Research::Cancel(CUnit &unit)
 {
+	Q_UNUSED(unit)
+
 	const CUpgrade &upgrade = this->GetUpgrade();
 	//Wyrmgus start
 //	unit.Player->UpgradeTimers.Upgrades[upgrade.ID] = 0;
 
 //	unit.Player->AddCostsFactor(upgrade.Costs, CancelResearchCostsFactor);
-	CPlayer::Players[this->Player]->UpgradeTimers.Upgrades[upgrade.ID] = 0;
+	this->Player->UpgradeTimers.Upgrades[upgrade.ID] = 0;
 
-	CPlayer::Players[this->Player]->AddCostsFactor(upgrade.Costs, CancelResearchCostsFactor);
+	this->Player->AddCostsFactor(upgrade.Costs, CancelResearchCostsFactor);
 	//Wyrmgus end
 }

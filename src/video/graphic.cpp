@@ -749,7 +749,7 @@ static void ConvertImageToMap(SDL_Surface *Surface, int Width, int Height)
 			Uint32 c = *reinterpret_cast<Uint32 *>(&reinterpret_cast<Uint8 *>(Surface->pixels)[i * 4 + j * Surface->pitch]);
 			Uint8 a;
 
-			Video.GetRGBA(c, Surface->format, &r, &g, &b, &a);
+			CVideo::GetRGBA(c, Surface->format, &r, &g, &b, &a);
 			if (a >= 128) {
 				if (r == 235 && g == 235 && b == 235) {
 					map_terrains[i][j] = "s";

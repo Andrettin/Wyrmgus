@@ -120,8 +120,11 @@ void COrder::UpdatePathFinderData_NotCalled(PathFinderInput &input)
 	unit.Seen.cframe = nullptr;
 }
 
-/* virtual */ bool COrder::OnAiHitUnit(CUnit &unit, CUnit *attacker, int /*damage*/)
+bool COrder::OnAiHitUnit(CUnit &unit, CUnit *attacker, int /*damage*/)
 {
+	Q_UNUSED(unit)
+	Q_UNUSED(attacker)
+
 	return false;
 }
 

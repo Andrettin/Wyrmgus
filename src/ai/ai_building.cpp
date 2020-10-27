@@ -188,6 +188,9 @@ private:
 
 VisitResult BuildingPlaceFinder::Visit(TerrainTraversal &terrainTraversal, const Vec2i &pos, const Vec2i &from)
 {
+	Q_UNUSED(terrainTraversal)
+	Q_UNUSED(from)
+
 	//Wyrmgus start
 	/*
 #if 0
@@ -357,6 +360,9 @@ bool HallPlaceFinder::IsAUsableMine(const CUnit &mine) const
 
 VisitResult HallPlaceFinder::Visit(TerrainTraversal &terrainTraversal, const Vec2i &pos, const Vec2i &from)
 {
+	Q_UNUSED(terrainTraversal)
+	Q_UNUSED(from)
+
 	//Wyrmgus start
 	/*
 #if 0
@@ -497,6 +503,8 @@ private:
 
 VisitResult LumberMillPlaceFinder::Visit(TerrainTraversal &terrainTraversal, const Vec2i &pos, const Vec2i &from)
 {
+	Q_UNUSED(terrainTraversal)
+
 	//Wyrmgus start
 	/*
 #if 0

@@ -564,7 +564,6 @@ void CommandAttack(CUnit &unit, const Vec2i &pos, CUnit *target, int flush, int 
 	}
 	//Wyrmgus start
 	CMapField &mf = *unit.MapLayer->Field(unit.tilePos);
-	CMapField &new_mf = *CMap::Map.Field(pos, z);
 	if ((mf.Flags & MapFieldBridge) && !unit.Type->BoolFlag[BRIDGE_INDEX].value && unit.Type->UnitType == UnitTypeType::Land) {
 		std::vector<CUnit *> table;
 		Select(unit.tilePos, unit.tilePos, table, unit.MapLayer->ID);
@@ -1194,7 +1193,7 @@ void CommandCancelUpgradeTo(CUnit &unit)
 **  @param what   what to research.
 **  @param flush  if true, flush command queue.
 */
-void CommandResearch(CUnit &unit, const CUpgrade &what, int player, int flush)
+void CommandResearch(CUnit &unit, const CUpgrade &what, CPlayer *player, const int flush)
 {
 	if (IsUnitValidForNetwork(unit) == false) {
 		return ;
@@ -1211,8 +1210,8 @@ void CommandResearch(CUnit &unit, const CUpgrade &what, int player, int flush)
 	//Wyrmgus start
 //	if (unit.Player->CheckCosts(what.Costs)) {
 	int upgrade_costs[MaxCosts];
-	CPlayer::Players[player]->GetUpgradeCosts(&what, upgrade_costs);
-	if (CPlayer::Players[player]->CheckCosts(upgrade_costs)) {
+	player->GetUpgradeCosts(&what, upgrade_costs);
+	if (player->CheckCosts(upgrade_costs)) {
 	//Wyrmgus end
 		return;
 	}
@@ -1220,7 +1219,7 @@ void CommandResearch(CUnit &unit, const CUpgrade &what, int player, int flush)
 	if (order == nullptr) {
 		return;
 	}
-	*order = COrder::NewActionResearch(unit, what, player);
+	*order = COrder::NewActionResearch(what, player);
 	ClearSavedAction(unit);
 }
 

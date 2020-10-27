@@ -283,8 +283,10 @@ COrder_Resource::~COrder_Resource()
 	}
 }
 
-/* virtual */ void COrder_Resource::Save(CFile &file, const CUnit &unit) const
+void COrder_Resource::Save(CFile &file, const CUnit &unit) const
 {
+	Q_UNUSED(unit)
+
 	file.printf("{\"action-resource\",");
 	if (this->Finished) {
 		file.printf(" \"finished\",");
@@ -322,8 +324,10 @@ COrder_Resource::~COrder_Resource()
 	file.printf("}");
 }
 
-/* virtual */ bool COrder_Resource::ParseSpecificData(lua_State *l, int &j, const char *value, const CUnit &unit)
+bool COrder_Resource::ParseSpecificData(lua_State *l, int &j, const char *value, const CUnit &unit)
 {
+	Q_UNUSED(unit)
+
 	if (!strcmp(value, "current-res")) {
 		++j;
 		this->CurrentResource = LuaToNumber(l, -1, j + 1);
@@ -435,9 +439,10 @@ COrder_Resource::~COrder_Resource()
 	}
 }
 
-
-/* virtual */ bool COrder_Resource::OnAiHitUnit(CUnit &unit, CUnit *attacker, int /* damage*/)
+bool COrder_Resource::OnAiHitUnit(CUnit &unit, CUnit *attacker, int /* damage*/)
 {
+	Q_UNUSED(attacker)
+
 	if (this->IsGatheringFinished()) {
 		// Normal return to depot
 		return true;
@@ -1114,7 +1119,6 @@ int GetNumWaitingWorkers(const CUnit &mine)
 int COrder_Resource::StopGathering(CUnit &unit)
 {
 	CUnit *source = nullptr;
-	const std::unique_ptr<wyrmgus::resource_info> &resinfo = unit.Type->ResInfo[this->CurrentResource];
 
 	//Wyrmgus start
 //	if (!resinfo.TerrainHarvester) {
@@ -1495,8 +1499,6 @@ bool COrder_Resource::WaitInDepot(CUnit &unit)
 void COrder_Resource::DropResource(CUnit &unit)
 {
 	if (unit.CurrentResource) {
-		const std::unique_ptr<wyrmgus::resource_info> &resinfo = unit.Type->ResInfo[unit.CurrentResource];
-
 		//Wyrmgus start
 //		if (!resinfo.TerrainHarvester) {
 		if (!CMap::Map.Info.IsPointOnMap(this->goalPos, this->MapLayer)) {

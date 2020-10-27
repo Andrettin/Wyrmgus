@@ -402,11 +402,12 @@ int TransformUnitIntoType(CUnit &unit, const wyrmgus::unit_type &newtype)
 	return 1;
 }
 
-
 #if 1 // TransFormInto
 
-/* virtual */ void COrder_TransformInto::Save(CFile &file, const CUnit &unit) const
+void COrder_TransformInto::Save(CFile &file, const CUnit &unit) const
 {
+	Q_UNUSED(unit)
+
 	file.printf("{\"action-transform-into\",");
 	if (this->Finished) {
 		file.printf(" \"finished\", ");
@@ -415,8 +416,10 @@ int TransformUnitIntoType(CUnit &unit, const wyrmgus::unit_type &newtype)
 	file.printf("}");
 }
 
-/* virtual */ bool COrder_TransformInto::ParseSpecificData(lua_State *l, int &j, const char *value, const CUnit &unit)
+bool COrder_TransformInto::ParseSpecificData(lua_State *l, int &j, const char *value, const CUnit &unit)
 {
+	Q_UNUSED(unit)
+
 	if (!strcmp(value, "type")) {
 		++j;
 		this->Type = wyrmgus::unit_type::get(LuaToString(l, -1, j + 1));
@@ -446,7 +449,8 @@ int TransformUnitIntoType(CUnit &unit, const wyrmgus::unit_type &newtype)
 
 void COrder_TransformInto::ConvertUnitType(const CUnit &unit, wyrmgus::unit_type &newType)
 {
-	const CPlayer &player = *unit.Player;
+	Q_UNUSED(unit)
+
 	this->Type = &newType;
 }
 
@@ -454,8 +458,10 @@ void COrder_TransformInto::ConvertUnitType(const CUnit &unit, wyrmgus::unit_type
 
 #if 1  //  COrder_UpgradeTo
 
-/* virtual */ void COrder_UpgradeTo::Save(CFile &file, const CUnit &unit) const
+void COrder_UpgradeTo::Save(CFile &file, const CUnit &unit) const
 {
+	Q_UNUSED(unit)
+
 	file.printf("{\"action-upgrade-to\",");
 	if (this->Finished) {
 		file.printf(" \"finished\", ");
@@ -465,8 +471,10 @@ void COrder_TransformInto::ConvertUnitType(const CUnit &unit, wyrmgus::unit_type
 	file.printf("}");
 }
 
-/* virtual */ bool COrder_UpgradeTo::ParseSpecificData(lua_State *l, int &j, const char *value, const CUnit &unit)
+bool COrder_UpgradeTo::ParseSpecificData(lua_State *l, int &j, const char *value, const CUnit &unit)
 {
+	Q_UNUSED(unit)
+
 	if (!strcmp(value, "type")) {
 		++j;
 		this->Type = wyrmgus::unit_type::get(LuaToString(l, -1, j + 1));

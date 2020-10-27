@@ -319,9 +319,9 @@ void SelectFixed(const Vec2i &ltPos, const Vec2i &rbPos, std::vector<CUnit *> &u
 	const CMapLayer *map_layer = CMap::Map.MapLayers[z].get();
 	
 	//Wyrmgus start
-	double middle_x;
-	double middle_y;
-	double radius;
+	double middle_x = 0;
+	double middle_y = 0;
+	double radius = 0;
 	if (circle) {
 		middle_x = (rbPos.x + ltPos.x) / 2;
 		middle_y = (rbPos.y + ltPos.y) / 2;
@@ -333,9 +333,9 @@ void SelectFixed(const Vec2i &ltPos, const Vec2i &rbPos, std::vector<CUnit *> &u
 		for (posIt.x = ltPos.x; posIt.x != rbPos.x + 1; ++posIt.x) {
 			//Wyrmgus start
 			if (circle) {
-				double rel_x = posIt.x - middle_x;
-				double rel_y = posIt.y - middle_y;
-				double my = radius * radius - rel_x * rel_x;
+				const double rel_x = posIt.x - middle_x;
+				const double rel_y = posIt.y - middle_y;
+				const double my = radius * radius - rel_x * rel_x;
 				if ((rel_y * rel_y) > my) {
 					continue;
 				}

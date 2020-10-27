@@ -416,7 +416,7 @@ public:
 		return ((r << RSHIFT) | (g << GSHIFT) | (b << BSHIFT) | (a << ASHIFT));
 	}
 
-	static Uint32 MapRGBA(SDL_PixelFormat *f, const CColor &color)
+	static Uint32 MapRGBA(const CColor &color)
 	{
 		return CVideo::MapRGBA(color.R, color.G, color.B, color.A);
 	}
@@ -426,14 +426,14 @@ public:
 		return CVideo::MapRGBA(color.red(), color.green(), color.blue(), color.alpha());
 	}
 
-	inline void GetRGB(Uint32 c, SDL_PixelFormat *f, Uint8 *r, Uint8 *g, Uint8 *b)
+	static void GetRGB(Uint32 c, Uint8 *r, Uint8 *g, Uint8 *b)
 	{
 		*r = (c >> RSHIFT) & 0xff;
 		*g = (c >> GSHIFT) & 0xff;
 		*b = (c >> BSHIFT) & 0xff;
 	}
 
-	inline void GetRGBA(Uint32 c, SDL_PixelFormat *f, Uint8 *r, Uint8 *g, Uint8 *b, Uint8 *a)
+	static void GetRGBA(Uint32 c, Uint8 *r, Uint8 *g, Uint8 *b, Uint8 *a)
 	{
 		*r = (c >> RSHIFT) & 0xff;
 		*g = (c >> GSHIFT) & 0xff;

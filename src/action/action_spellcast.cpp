@@ -91,8 +91,10 @@ std::unique_ptr<COrder> COrder::NewActionSpellCast(const wyrmgus::spell &spell, 
 	return order;
 }
 
-/* virtual */ void COrder_SpellCast::Save(CFile &file, const CUnit &unit) const
+void COrder_SpellCast::Save(CFile &file, const CUnit &unit) const
 {
+	Q_UNUSED(unit)
+
 	file.printf("{\"action-spell-cast\",");
 
 	if (this->Finished) {
@@ -113,8 +115,10 @@ std::unique_ptr<COrder> COrder::NewActionSpellCast(const wyrmgus::spell &spell, 
 	file.printf("}");
 }
 
-/* virtual */ bool COrder_SpellCast::ParseSpecificData(lua_State *l, int &j, const char *value, const CUnit &unit)
+bool COrder_SpellCast::ParseSpecificData(lua_State *l, int &j, const char *value, const CUnit &unit)
 {
+	Q_UNUSED(unit)
+
 	if (!strcmp(value, "spell")) {
 		++j;
 		this->Spell = wyrmgus::spell::get(LuaToString(l, -1, j + 1));

@@ -142,7 +142,7 @@ extern void CommandTransformIntoType(CUnit &unit, wyrmgus::unit_type &type);
 /// Prepare command cancel upgrade to
 extern void CommandCancelUpgradeTo(CUnit &unit);
 /// Prepare command research
-extern void CommandResearch(CUnit &unit, const CUpgrade &what, int player, int flush);
+extern void CommandResearch(CUnit &unit, const CUpgrade &what, CPlayer *player, int flush);
 /// Prepare command cancel research
 extern void CommandCancelResearch(CUnit &unit);
 //Wyrmgus start

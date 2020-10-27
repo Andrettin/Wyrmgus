@@ -64,8 +64,10 @@ std::unique_ptr<COrder> COrder::NewActionUnload(const Vec2i &pos, CUnit *what, i
 	return order;
 }
 
-/* virtual */ void COrder_Unload::Save(CFile &file, const CUnit &unit) const
+void COrder_Unload::Save(CFile &file, const CUnit &unit) const
 {
+	Q_UNUSED(unit)
+
 	file.printf("{\"action-unload\",");
 	if (this->Finished) {
 		file.printf(" \"finished\", ");
@@ -85,8 +87,10 @@ std::unique_ptr<COrder> COrder::NewActionUnload(const Vec2i &pos, CUnit *what, i
 	file.printf("}");
 }
 
-/* virtual */ bool COrder_Unload::ParseSpecificData(lua_State *l, int &j, const char *value, const CUnit &unit)
+bool COrder_Unload::ParseSpecificData(lua_State *l, int &j, const char *value, const CUnit &unit)
 {
+	Q_UNUSED(unit)
+
 	if (!strcmp("state", value)) {
 		++j;
 		this->State = LuaToNumber(l, -1, j + 1);

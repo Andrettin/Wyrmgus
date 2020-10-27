@@ -50,8 +50,8 @@ void AiCheckMagic()
 
 		if (unit.Type->Spells.size() > 0) {
 			// Check only idle magic units
-			for (size_t i = 0; i != unit.Orders.size(); ++i) {
-				if (unit.Orders[i]->Action == UnitAction::SpellCast) {
+			for (const std::unique_ptr<COrder> &order : unit.Orders) {
+				if (order->Action == UnitAction::SpellCast) {
 					return;
 				}
 			}

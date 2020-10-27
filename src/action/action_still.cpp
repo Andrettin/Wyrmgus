@@ -82,8 +82,10 @@ std::unique_ptr<COrder> COrder::NewActionStill()
 }
 
 
-/* virtual */ void COrder_Still::Save(CFile &file, const CUnit &unit) const
+void COrder_Still::Save(CFile &file, const CUnit &unit) const
 {
+	Q_UNUSED(unit)
+
 	if (this->Action == UnitAction::Still) {
 		file.printf("{\"action-still\",");
 	} else {
@@ -98,8 +100,10 @@ std::unique_ptr<COrder> COrder::NewActionStill()
 	file.printf("}");
 }
 
-/* virtual */ bool COrder_Still::ParseSpecificData(lua_State *l, int &j, const char *value, const CUnit &unit)
+bool COrder_Still::ParseSpecificData(lua_State *l, int &j, const char *value, const CUnit &unit)
 {
+	Q_UNUSED(unit)
+
 	if (!strcmp("state", value)) {
 		++j;
 		this->State = LuaToNumber(l, -1, j + 1);

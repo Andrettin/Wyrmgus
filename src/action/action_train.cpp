@@ -70,8 +70,10 @@ std::unique_ptr<COrder> COrder::NewActionTrain(CUnit &trainer, const wyrmgus::un
 	return order;
 }
 
-/* virtual */ void COrder_Train::Save(CFile &file, const CUnit &unit) const
+void COrder_Train::Save(CFile &file, const CUnit &unit) const
 {
+	Q_UNUSED(unit)
+
 	file.printf("{\"action-train\",");
 	if (this->Finished) {
 		file.printf(" \"finished\", ");
@@ -84,8 +86,10 @@ std::unique_ptr<COrder> COrder::NewActionTrain(CUnit &trainer, const wyrmgus::un
 	file.printf("}");
 }
 
-/* virtual */ bool COrder_Train::ParseSpecificData(lua_State *l, int &j, const char *value, const CUnit &unit)
+bool COrder_Train::ParseSpecificData(lua_State *l, int &j, const char *value, const CUnit &unit)
 {
+	Q_UNUSED(unit)
+
 	if (!strcmp(value, "type")) {
 		++j;
 		this->Type = wyrmgus::unit_type::get(LuaToString(l, -1, j + 1));
@@ -103,19 +107,21 @@ std::unique_ptr<COrder> COrder::NewActionTrain(CUnit &trainer, const wyrmgus::un
 	return true;
 }
 
-/* virtual */ bool COrder_Train::IsValid() const
+bool COrder_Train::IsValid() const
 {
 	return true;
 }
 
-/* virtual */ PixelPos COrder_Train::Show(const CViewport &, const PixelPos &lastScreenPos) const
+PixelPos COrder_Train::Show(const CViewport &, const PixelPos &lastScreenPos) const
 {
 	return lastScreenPos;
 }
 
 
-/* virtual */ void COrder_Train::Cancel(CUnit &unit)
+void COrder_Train::Cancel(CUnit &unit)
 {
+	Q_UNUSED(unit)
+
 	DebugPrint("Cancel training\n");
 	//Wyrmgus start
 //	CPlayer &player = *unit.Player;
@@ -143,6 +149,8 @@ std::unique_ptr<COrder> COrder::NewActionTrain(CUnit &trainer, const wyrmgus::un
 
 void COrder_Train::ConvertUnitType(const CUnit &unit, wyrmgus::unit_type &newType)
 {
+	Q_UNUSED(unit)
+
 	//Wyrmgus start
 //	const CPlayer &player = *unit.Player;
 	const CPlayer &player = *CPlayer::Players[this->Player];
@@ -154,7 +162,6 @@ void COrder_Train::ConvertUnitType(const CUnit &unit, wyrmgus::unit_type &newTyp
 	this->Ticks = this->Ticks * newCost / oldCost;
 	this->Type = &newType;
 }
-
 
 /**
 **  Unit can handle order.

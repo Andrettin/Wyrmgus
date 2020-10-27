@@ -1096,7 +1096,7 @@ static bool AiResearchUpgrade(const wyrmgus::unit_type &type, const CUpgrade &wh
 		CUnit &unit = *table[i];
 
 		if (unit.IsIdle()) {
-			CommandResearch(unit, what, AiPlayer->Player->Index, FlushCommands);
+			CommandResearch(unit, what, AiPlayer->Player, FlushCommands);
 			return true;
 		}
 	}

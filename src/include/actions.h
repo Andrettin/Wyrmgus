@@ -32,10 +32,6 @@
 #include "unit/unitptr.h"
 #include "vec2i.h"
 
-/*----------------------------------------------------------------------------
---  Declarations
-----------------------------------------------------------------------------*/
-
 /**
 **  All possible unit actions.
 **
@@ -80,10 +76,11 @@ enum class UnitAction : char {
 
 class CAnimation;
 class CFile;
+class CPlayer;
 class CUnit;
 class CUpgrade;
-class PathFinderInput;
 class CViewport;
+class PathFinderInput;
 struct lua_State;
 
 namespace wyrmgus {
@@ -170,7 +167,7 @@ public:
 //	static std::unique_ptr<COrder> NewActionRepair(const Vec2i &pos);
 	static std::unique_ptr<COrder> NewActionRepair(const Vec2i &pos, int z);
 	//Wyrmgus end
-	static std::unique_ptr<COrder> NewActionResearch(CUnit &unit, const CUpgrade &upgrade, int player);
+	static std::unique_ptr<COrder> NewActionResearch(const CUpgrade &upgrade, CPlayer *player);
 	static std::unique_ptr<COrder> NewActionResource(CUnit &harvester, const Vec2i &pos, int z);
 	static std::unique_ptr<COrder> NewActionResource(CUnit &harvester, CUnit &mine);
 	static std::unique_ptr<COrder> NewActionReturnGoods(CUnit &harvester, CUnit *depot);
