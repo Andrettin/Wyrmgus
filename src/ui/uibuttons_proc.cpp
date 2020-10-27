@@ -133,7 +133,7 @@ void DrawUIButton(ButtonStyle *style, unsigned flags, int x, int y,
 		}
 		*/
 		//Wyrmgus end
-		p->BorderColor = Video.MapRGB(TheScreen->format, color);
+		p->BorderColor = CVideo::MapRGB(color);
 	}
 	if (p->BorderSize) {
 		for (int i = 0; i < p->BorderSize; ++i) {

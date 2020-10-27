@@ -396,33 +396,34 @@ public:
 	void FillCircleClip(Uint32 color, const PixelPos &screenPos, int radius);
 	void FillTransCircleClip(Uint32 color, int x, int y, int radius, unsigned char alpha);
 
-	inline Uint32 MapRGB(SDL_PixelFormat *f, Uint8 r, Uint8 g, Uint8 b)
+	static Uint32 MapRGB(Uint8 r, Uint8 g, Uint8 b)
 	{
-		return MapRGBA(f, r, g, b, 0xFF);
+		return CVideo::MapRGBA(r, g, b, 0xFF);
 	}
 
-	inline Uint32 MapRGB(SDL_PixelFormat *f, const CColor &color)
+	static Uint32 MapRGB(const CColor &color)
 	{
-		return MapRGB(f, color.R, color.G, color.B);
+		return CVideo::MapRGB(color.R, color.G, color.B);
 	}
 
-	inline Uint32 MapRGB(SDL_PixelFormat *f, const QColor &color)
+	static Uint32 MapRGB(const QColor &color)
 	{
-		return MapRGB(f, color.red(), color.green(), color.blue());
+		return CVideo::MapRGB(color.red(), color.green(), color.blue());
 	}
-	inline Uint32 MapRGBA(SDL_PixelFormat *f, Uint8 r, Uint8 g, Uint8 b, Uint8 a)
+
+	static Uint32 MapRGBA(Uint8 r, Uint8 g, Uint8 b, Uint8 a)
 	{
 		return ((r << RSHIFT) | (g << GSHIFT) | (b << BSHIFT) | (a << ASHIFT));
 	}
 
-	inline Uint32 MapRGBA(SDL_PixelFormat *f, const CColor &color)
+	static Uint32 MapRGBA(SDL_PixelFormat *f, const CColor &color)
 	{
-		return MapRGBA(f, color.R, color.G, color.B, color.A);
+		return CVideo::MapRGBA(color.R, color.G, color.B, color.A);
 	}
 
-	inline Uint32 MapRGBA(const QColor &color)
+	static Uint32 MapRGBA(const QColor &color)
 	{
-		return MapRGBA(nullptr, color.red(), color.green(), color.blue(), color.alpha());
+		return CVideo::MapRGBA(color.red(), color.green(), color.blue(), color.alpha());
 	}
 
 	inline void GetRGB(Uint32 c, SDL_PixelFormat *f, Uint8 *r, Uint8 *g, Uint8 *b)

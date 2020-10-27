@@ -892,8 +892,8 @@ void DrawGenericPopup(const std::string &popup_text, int x, int y, const wyrmgus
 	clamp<int>(&y, 0, Video.Height - 1);
 
 	// Background
-	IntColor BackgroundColor = Video.MapRGBA(TheScreen->format, 28, 28, 28, 208);
-	IntColor BorderColor = Video.MapRGBA(TheScreen->format, 93, 93, 93, 160);
+	const IntColor BackgroundColor = CVideo::MapRGBA(28, 28, 28, 208);
+	const IntColor BorderColor = CVideo::MapRGBA(93, 93, 93, 160);
 
 	Video.FillTransRectangle(BackgroundColor, x, y, popupWidth, popupHeight, BackgroundColor >> ASHIFT);
 	Video.DrawRectangle(BorderColor, x, y, popupWidth, popupHeight);

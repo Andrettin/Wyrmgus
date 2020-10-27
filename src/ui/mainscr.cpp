@@ -207,22 +207,22 @@ static void UiDrawLifeBar(const CUnit &unit, int x, int y)
 		if (f > 75) {
 			color = ColorDarkGreen;
 			//Wyrmgus start
-			lighter_color = Video.MapRGB(TheScreen->format, 67, 137, 8);
+			lighter_color = CVideo::MapRGB(67, 137, 8);
 			//Wyrmgus end
 		} else if (f > 50) {
 			color = ColorYellow;
 			//Wyrmgus start
-			lighter_color = Video.MapRGB(TheScreen->format, 255, 255, 210);
+			lighter_color = CVideo::MapRGB(255, 255, 210);
 			//Wyrmgus end
 		} else if (f > 25) {
 			color = ColorOrange;
 			//Wyrmgus start
-			lighter_color = Video.MapRGB(TheScreen->format, 255, 180, 90);
+			lighter_color = CVideo::MapRGB(255, 180, 90);
 			//Wyrmgus end
 		} else {
 			color = ColorRed;
 			//Wyrmgus start
-			lighter_color = Video.MapRGB(TheScreen->format, 255, 100, 100);
+			lighter_color = CVideo::MapRGB(255, 100, 100);
 			//Wyrmgus end
 		}
 
@@ -1366,7 +1366,7 @@ void MessagesDisplay::DrawMessages()
 			// background so the text is easier to read
 			if (MessagesCount) {
 				int textHeight = MessagesCount * (UI.MessageFont->Height() + 1 * scale_factor);
-				Uint32 color = Video.MapRGB(TheScreen->format, 38, 38, 78);
+				Uint32 color = CVideo::MapRGB(38, 38, 78);
 				//Wyrmgus start
 				/*
 				Video.FillTransRectangleClip(color, UI.MapArea.X + 7, UI.MapArea.Y + 7,
@@ -1896,7 +1896,7 @@ static void InfoPanel_draw_no_selection()
 			}
 
 			Video.DrawRectangleClip(ColorWhite, x, y, 12 * scale_factor, 12 * scale_factor);
-			Video.FillRectangleClip(Video.MapRGB(TheScreen->format, player->get_minimap_color()), x + 1, y + 1, 12 * scale_factor - 2, 12 * scale_factor - 2);
+			Video.FillRectangleClip(CVideo::MapRGB(player->get_minimap_color()), x + 1, y + 1, 12 * scale_factor - 2, 12 * scale_factor - 2);
 
 			label.Draw(x + 15 * scale_factor, y, _(player->get_full_name().c_str()));
 			y += 14 * scale_factor;

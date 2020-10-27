@@ -265,7 +265,7 @@ void MyOpenGLGraphics::drawImage(const gcn::Image *image, int srcX, int srcY, in
 void MyOpenGLGraphics::drawPoint(int x, int y)
 {
 	gcn::Color c = this->getColor();
-	Video.DrawPixelClip(Video.MapRGBA(0, c.r, c.g, c.b, c.a),
+	Video.DrawPixelClip(CVideo::MapRGBA(c.r, c.g, c.b, c.a),
 						x + mClipStack.top().xOffset, y + mClipStack.top().yOffset);
 }
 
@@ -275,7 +275,7 @@ void MyOpenGLGraphics::drawLine(int x1, int y1, int x2, int y2)
 	const PixelPos pos1(x1 + mClipStack.top().xOffset, y1 + mClipStack.top().yOffset);
 	const PixelPos pos2(x2 + mClipStack.top().xOffset, y2 + mClipStack.top().yOffset);
 
-	Video.DrawLineClip(Video.MapRGBA(0, c.r, c.g, c.b, c.a), pos1, pos2);
+	Video.DrawLineClip(CVideo::MapRGBA(c.r, c.g, c.b, c.a), pos1, pos2);
 }
 
 void MyOpenGLGraphics::drawRectangle(const gcn::Rectangle &rectangle)
@@ -299,7 +299,7 @@ void MyOpenGLGraphics::drawRectangle(const gcn::Rectangle &rectangle)
 	int x2 = std::min<int>(area.x + area.width, top.x + top.width);
 	int y2 = std::min<int>(area.y + area.height, top.y + top.height);
 
-	Video.DrawTransRectangle(Video.MapRGB(0, c.r, c.g, c.b),
+	Video.DrawTransRectangle(CVideo::MapRGB(c.r, c.g, c.b),
 							 x1, y1, x2 - x1, y2 - y1, mColor.a);
 }
 
@@ -325,7 +325,7 @@ void MyOpenGLGraphics::fillRectangle(const gcn::Rectangle &rectangle)
 	int x2 = std::min<int>(area.x + area.width, top.x + top.width);
 	int y2 = std::min<int>(area.y + area.height, top.y + top.height);
 
-	Video.FillTransRectangle(Video.MapRGB(0, c.r, c.g, c.b),
+	Video.FillTransRectangle(CVideo::MapRGB(c.r, c.g, c.b),
 							 x1, y1, x2 - x1, y2 - y1, c.a);
 }
 

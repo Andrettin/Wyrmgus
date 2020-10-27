@@ -95,7 +95,13 @@ public:
 
 	void decode(const std::filesystem::path &filepath);
 
-	virtual int Read(void *buf, int len) { return 0; }
+	virtual int Read(void *buf, int len)
+	{
+		Q_UNUSED(buf)
+		Q_UNUSED(len)
+
+		return 0;
+	}
 
 	void read_audio_buffer(const QAudioBuffer &buffer);
 

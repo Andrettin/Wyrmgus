@@ -402,13 +402,13 @@ static void ShowUnitName(const CViewport &vp, PixelPos pos, CUnit *unit, bool hi
 	if (unit && unit->IsAliveOnMap()) {
 		int backgroundColor;
 		if (unit->Player->Index == (*tplayer).Index) {
-			backgroundColor = Video.MapRGB(TheScreen->format, 0, 0, 252);
+			backgroundColor = CVideo::MapRGB(0, 0, 252);
 		} else if (unit->Player->IsAllied(*tplayer)) {
-			backgroundColor = Video.MapRGB(TheScreen->format, 0, 176, 0);
+			backgroundColor = CVideo::MapRGB(0, 176, 0);
 		} else if (unit->Player->IsEnemy(*tplayer)) {
-			backgroundColor = Video.MapRGB(TheScreen->format, 252, 0, 0);
+			backgroundColor = CVideo::MapRGB(252, 0, 0);
 		} else {
-			backgroundColor = Video.MapRGB(TheScreen->format, 176, 176, 176);
+			backgroundColor = CVideo::MapRGB(176, 176, 176);
 		}
 		//Wyrmgus start
 //		width = font->getWidth(unit->Type->Name) + 10;

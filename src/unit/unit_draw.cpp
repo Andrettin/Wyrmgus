@@ -147,7 +147,7 @@ void DrawUnitSelection(const CViewport &vp, const CUnit &unit)
 	
 	// show player color circle below unit if that is activated
 	if (Preference.PlayerColorCircle && unit.Player->Index != PlayerNumNeutral && unit.CurrentAction() != UnitAction::Die) {
-		DrawSelectionCircleWithTrans(Video.MapRGB(TheScreen->format, unit.Player->get_minimap_color()), x + type.BoxOffsetX * scale_factor + 1, y + type.BoxOffsetY * scale_factor + 1, x + type.get_box_width() * scale_factor + type.BoxOffsetX * scale_factor - 1, y + type.get_box_height() * scale_factor + type.BoxOffsetY * scale_factor - 1);
+		DrawSelectionCircleWithTrans(CVideo::MapRGB(unit.Player->get_minimap_color()), x + type.BoxOffsetX * scale_factor + 1, y + type.BoxOffsetY * scale_factor + 1, x + type.get_box_width() * scale_factor + type.BoxOffsetX * scale_factor - 1, y + type.get_box_height() * scale_factor + type.BoxOffsetY * scale_factor - 1);
 //		DrawSelectionRectangle(unit.Player->Color, x + type.BoxOffsetX, y + type.BoxOffsetY, x + type.BoxWidth + type.BoxOffsetX + 1, y + type.BoxHeight + type.BoxOffsetY + 1);
 	}
 	//Wyrmgus end
@@ -165,11 +165,11 @@ void DrawUnitSelection(const CViewport &vp, const CUnit &unit)
 		} else if (CPlayer::GetThisPlayer()->IsEnemy(unit)) {
 			color = ColorRed;
 		} else {
-			color = Video.MapRGB(TheScreen->format, unit.Player->get_minimap_color());
+			color = CVideo::MapRGB(unit.Player->get_minimap_color());
 
 			for (int i = 0; i < PlayerMax; ++i) {
 				if (unit.TeamSelected & (1 << i)) {
-					color = Video.MapRGB(TheScreen->format, CPlayer::Players[i]->get_minimap_color());
+					color = CVideo::MapRGB(CPlayer::Players[i]->get_minimap_color());
 				}
 			}
 		}

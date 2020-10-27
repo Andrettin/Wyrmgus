@@ -327,22 +327,22 @@ static const CUnit *GetUnitRef(const CUnit &unit, EnumUnit e)
 	if (f > 75) {
 		color = ColorDarkGreen;
 		//Wyrmgus start
-		lighter_color = Video.MapRGB(TheScreen->format, 67, 137, 8);
+		lighter_color = CVideo::MapRGB(67, 137, 8);
 		//Wyrmgus end
 	} else if (f > 50) {
 		color = ColorYellow;
 		//Wyrmgus start
-		lighter_color = Video.MapRGB(TheScreen->format, 255, 255, 210);
+		lighter_color = CVideo::MapRGB(255, 255, 210);
 		//Wyrmgus end
 	} else if (f > 25) {
 		color = ColorOrange;
 		//Wyrmgus start
-		lighter_color = Video.MapRGB(TheScreen->format, 255, 180, 90);
+		lighter_color = CVideo::MapRGB(255, 180, 90);
 		//Wyrmgus end
 	} else {
 		color = ColorRed;
 		//Wyrmgus start
-		lighter_color = Video.MapRGB(TheScreen->format, 255, 100, 100);
+		lighter_color = CVideo::MapRGB(255, 100, 100);
 		//Wyrmgus end
 	}
 	*/
@@ -351,33 +351,33 @@ static const CUnit *GetUnitRef(const CUnit &unit, EnumUnit e)
 		if (f > 75) {
 			color = ColorDarkGreen;
 			//Wyrmgus start
-			lighter_color = Video.MapRGB(TheScreen->format, 67, 137, 8);
+			lighter_color = CVideo::MapRGB(67, 137, 8);
 			//Wyrmgus end
 		} else if (f > 50) {
 			color = ColorYellow;
 			//Wyrmgus start
-			lighter_color = Video.MapRGB(TheScreen->format, 255, 255, 210);
+			lighter_color = CVideo::MapRGB(255, 255, 210);
 			//Wyrmgus end
 		} else if (f > 25) {
 			color = ColorOrange;
 			//Wyrmgus start
-			lighter_color = Video.MapRGB(TheScreen->format, 255, 180, 90);
+			lighter_color = CVideo::MapRGB(255, 180, 90);
 			//Wyrmgus end
 		} else {
 			color = ColorRed;
 			//Wyrmgus start
-			lighter_color = Video.MapRGB(TheScreen->format, 255, 100, 100);
+			lighter_color = CVideo::MapRGB(255, 100, 100);
 			//Wyrmgus end
 		}
 	} else if (this->Index == MANA_INDEX) {
-		color = Video.MapRGB(TheScreen->format, 4, 70, 100);
-		lighter_color = Video.MapRGB(TheScreen->format, 8, 97, 137);
+		color = CVideo::MapRGB(4, 70, 100);
+		lighter_color = CVideo::MapRGB(8, 97, 137);
 	} else if (this->Index == XP_INDEX) {
-		color = Video.MapRGB(TheScreen->format, 97, 103, 0);
-		lighter_color = Video.MapRGB(TheScreen->format, 132, 141, 3);
+		color = CVideo::MapRGB(97, 103, 0);
+		lighter_color = CVideo::MapRGB(132, 141, 3);
 	} else {
 		color = ColorDarkGreen;
-		lighter_color = Video.MapRGB(TheScreen->format, 67, 137, 8);
+		lighter_color = CVideo::MapRGB(67, 137, 8);
 	}
 	//Wyrmgus end
 

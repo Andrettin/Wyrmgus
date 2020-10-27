@@ -402,7 +402,7 @@ void CPlayer::Load(lua_State *l)
 			const int r = LuaToNumber(l, j + 1, 1);
 			const int g = LuaToNumber(l, j + 1, 2);
 			const int b = LuaToNumber(l, j + 1, 3);
-			this->Color = Video.MapRGB(TheScreen->format, r, g, b);
+			this->Color = CVideo::MapRGB(r, g, b);
 		*/
 		//Wyrmgus end
 		//Wyrmgus start

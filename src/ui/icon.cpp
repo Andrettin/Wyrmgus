@@ -151,7 +151,7 @@ void icon::DrawUnitIcon(const ButtonStyle &style, unsigned flags,
 			if (flags & IconSelected) {
 				Video.DrawRectangle(ColorGreen, pos.x + 1 * scale_factor, pos.y + 1 * scale_factor, 46 * scale_factor - 1 * scale_factor, 38 * scale_factor - 1 * scale_factor);
 			} else if (flags & IconAutoCast) {
-				Video.DrawRectangle(Video.MapRGB(TheScreen->format, UI.ButtonPanel.AutoCastBorderColorRGB), pos.x + 1 * scale_factor, pos.y + 1 * scale_factor, 46 * scale_factor - 1 * scale_factor, 38 * scale_factor - 1 * scale_factor);
+				Video.DrawRectangle(CVideo::MapRGB(UI.ButtonPanel.AutoCastBorderColorRGB), pos.x + 1 * scale_factor, pos.y + 1 * scale_factor, 46 * scale_factor - 1 * scale_factor, 38 * scale_factor - 1 * scale_factor);
 			}
 			if (defines::get()->get_command_button_frame_graphics() == nullptr || !(flags & IconCommandButton)) {
 				defines::get()->get_pressed_icon_frame_graphics()->DrawClip(pos.x - 4 * scale_factor, pos.y - 4 * scale_factor);
@@ -166,7 +166,7 @@ void icon::DrawUnitIcon(const ButtonStyle &style, unsigned flags,
 			if (flags & IconSelected) {
 				Video.DrawRectangle(ColorGreen, pos.x, pos.y, 46 * scale_factor, 38 * scale_factor);
 			} else if (flags & IconAutoCast) {
-				Video.DrawRectangle(Video.MapRGB(TheScreen->format, UI.ButtonPanel.AutoCastBorderColorRGB), pos.x, pos.y, 46 * scale_factor, 38 * scale_factor);
+				Video.DrawRectangle(CVideo::MapRGB(UI.ButtonPanel.AutoCastBorderColorRGB), pos.x, pos.y, 46 * scale_factor, 38 * scale_factor);
 			}
 			if (defines::get()->get_command_button_frame_graphics() != nullptr && (flags & IconCommandButton)) {
 				defines::get()->get_command_button_frame_graphics()->DrawClip(pos.x - 5 * scale_factor, pos.y - 4 * scale_factor);

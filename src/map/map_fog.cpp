@@ -695,7 +695,7 @@ void UpdateFogOfWarChange()
 */
 void VideoDrawOnlyFog(int x, int y)
 {
-	Video.FillRectangleClip(Video.MapRGBA(0, 0, 0, 0, FogOfWarOpacity), x, y, wyrmgus::defines::get()->get_scaled_tile_width(), wyrmgus::defines::get()->get_scaled_tile_height());
+	Video.FillRectangleClip(CVideo::MapRGBA(0, 0, 0, FogOfWarOpacity), x, y, wyrmgus::defines::get()->get_scaled_tile_width(), wyrmgus::defines::get()->get_scaled_tile_height());
 }
 
 /*----------------------------------------------------------------------------
@@ -1008,7 +1008,7 @@ void CMap::InitFogOfWar()
 	const std::shared_ptr<CGraphic> &fog_graphic = CMap::FogGraphics;
 	
 	//calculate this once from the settings and store it
-	FogOfWarColorSDL = Video.MapRGB(TheScreen->format, FogOfWarColor);
+	FogOfWarColorSDL = CVideo::MapRGB(FogOfWarColor);
 
 	fog_graphic->Load(false, wyrmgus::defines::get()->get_scale_factor());
 

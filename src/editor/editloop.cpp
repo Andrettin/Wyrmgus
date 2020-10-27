@@ -770,7 +770,7 @@ static void DrawPlayers()
 			i == Editor.CursorPlayer && CMap::Map.Info.PlayerType[i] != PlayerNobody ? ColorWhite : ColorGray,
 			x + i % 8 * rectangle_size, y, rectangle_size - 1, rectangle_size - 1);
 		if (CMap::Map.Info.PlayerType[i] != PlayerNobody) {
-			Video.FillRectangle(Video.MapRGB(TheScreen->format, CPlayer::Players[i]->get_minimap_color()), x + 1 + i % 8 * rectangle_size, y + 1, rectangle_size - 1 - 2, rectangle_size - 1 - 2);
+			Video.FillRectangle(CVideo::MapRGB(CPlayer::Players[i]->get_minimap_color()), x + 1 + i % 8 * rectangle_size, y + 1, rectangle_size - 1 - 2, rectangle_size - 1 - 2);
 		}
 		if (i == Editor.SelectedPlayer) {
 			Video.DrawRectangle(ColorGreen, x + 1 + i % 8 * rectangle_size, y + 1, rectangle_size - 1 - 2, rectangle_size - 1 - 2);
@@ -829,7 +829,7 @@ static void DrawPopup()
 	if (Editor.State == EditorEditUnit && Editor.CursorUnitIndex != -1) {
 		DrawPopupUnitInfo(Editor.ShownUnitTypes[Editor.CursorUnitIndex],
 						  Editor.SelectedPlayer, GetSmallFont(),
-						  Video.MapRGB(TheScreen->format, 38, 38, 78),
+						  CVideo::MapRGB(38, 38, 78),
 						  Editor.PopUpX, Editor.PopUpY);
 	}
 }
@@ -1209,7 +1209,7 @@ static void DrawEditorPanel_StartIcon()
 		const PixelPos lb(x, y + IconHeight - 3 * scale_factor);
 		const PixelPos rt(x + IconHeight - 3 * scale_factor, y);
 		const PixelPos rb(x + IconHeight - 2 * scale_factor, y + IconHeight - 2 * scale_factor);
-		const Uint32 color = Video.MapRGB(TheScreen->format, CPlayer::Players[Editor.SelectedPlayer]->get_minimap_color());
+		const Uint32 color = CVideo::MapRGB(CPlayer::Players[Editor.SelectedPlayer]->get_minimap_color());
 
 		Video.DrawLineClip(color, lt, rb);
 		Video.DrawLineClip(color, rt, lb);
@@ -1356,7 +1356,7 @@ static void DrawStartLocations()
 				if (type) {
 					DrawUnitType(*type, type->Sprite, i, 0, startScreenPos, nullptr);
 				} else { // Draw a cross
-					DrawCross(startScreenPos, wyrmgus::defines::get()->get_scaled_tile_size(), Video.MapRGB(TheScreen->format, CPlayer::Players[i]->get_minimap_color()));
+					DrawCross(startScreenPos, wyrmgus::defines::get()->get_scaled_tile_size(), CVideo::MapRGB(CPlayer::Players[i]->get_minimap_color()));
 				}
 			}
 		}

@@ -895,7 +895,7 @@ void DrawTransPixel(Uint32 color, int x, int y, unsigned char alpha)
 	GLubyte r, g, b;
 
 	Video.GetRGB(color, nullptr, &r, &g, &b);
-	color = Video.MapRGBA(0, r, g, b, alpha);
+	color = CVideo::MapRGBA(r, g, b, alpha);
 	DrawPixel(color, x, y);
 }
 
@@ -927,7 +927,7 @@ void DrawTransPixelClip(Uint32 color, int x, int y, unsigned char alpha)
 	GLubyte r, g, b;
 
 	Video.GetRGB(color, nullptr, &r, &g, &b);
-	color = Video.MapRGBA(0, r, g, b, alpha);
+	color = CVideo::MapRGBA(r, g, b, alpha);
 	DrawPixelClip(color, x, y);
 }
 
@@ -982,7 +982,7 @@ void DrawTransHLine(Uint32 color, int x, int y, int width, unsigned char alpha)
 	GLubyte r, g, b;
 
 	Video.GetRGB(color, nullptr, &r, &g, &b);
-	color = Video.MapRGBA(0, r, g, b, alpha);
+	color = CVideo::MapRGBA(r, g, b, alpha);
 	DrawHLine(color, x, y, width);
 }
 
@@ -1030,7 +1030,7 @@ void DrawTransHLineClip(Uint32 color, int x, int y, int width, unsigned char alp
 	GLubyte r, g, b;
 
 	Video.GetRGB(color, nullptr, &r, &g, &b);
-	color = Video.MapRGBA(0, r, g, b, alpha);
+	color = CVideo::MapRGBA(r, g, b, alpha);
 	DrawHLineClip(color, x, y, width);
 }
 
@@ -1085,7 +1085,7 @@ void DrawTransVLine(Uint32 color, int x, int y, int height, unsigned char alpha)
 	GLubyte r, g, b;
 
 	Video.GetRGB(color, nullptr, &r, &g, &b);
-	color = Video.MapRGBA(0, r, g, b, alpha);
+	color = CVideo::MapRGBA(r, g, b, alpha);
 	DrawVLine(color, x, y, height);
 }
 
@@ -1133,7 +1133,7 @@ void DrawTransVLineClip(Uint32 color, int x, int y, int height, unsigned char al
 	GLubyte r, g, b;
 
 	Video.GetRGB(color, nullptr, &r, &g, &b);
-	color = Video.MapRGBA(0, r, g, b, alpha);
+	color = CVideo::MapRGBA(r, g, b, alpha);
 	DrawVLineClip(color, x, y, height);
 }
 
@@ -1397,7 +1397,7 @@ void DrawTransRectangle(Uint32 color, int x, int y,
 	GLubyte r, g, b;
 
 	Video.GetRGB(color, nullptr, &r, &g, &b);
-	color = Video.MapRGBA(0, r, g, b, alpha);
+	color = CVideo::MapRGBA(r, g, b, alpha);
 	DrawRectangle(color, x, y, w, h);
 }
 
@@ -1505,7 +1505,7 @@ void DrawTransRectangleClip(Uint32 color, int x, int y,
 	GLubyte r, g, b;
 
 	Video.GetRGB(color, nullptr, &r, &g, &b);
-	color = Video.MapRGBA(0, r, g, b, alpha);
+	color = CVideo::MapRGBA(r, g, b, alpha);
 	DrawRectangleClip(color, x, y, w, h);
 }
 
@@ -1568,7 +1568,7 @@ void FillTransRectangle(Uint32 color, int x, int y,
 	GLubyte r, g, b;
 
 	Video.GetRGB(color, nullptr, &r, &g, &b);
-	color = Video.MapRGBA(0, r, g, b, alpha);
+	color = CVideo::MapRGBA(r, g, b, alpha);
 	FillRectangle(color, x, y, w, h);
 }
 
@@ -1604,7 +1604,7 @@ void FillTransRectangleClip(Uint32 color, int x, int y,
 	GLubyte r, g, b;
 
 	Video.GetRGB(color, nullptr, &r, &g, &b);
-	color = Video.MapRGBA(0, r, g, b, alpha);
+	color = CVideo::MapRGBA(r, g, b, alpha);
 	FillRectangleClip(color, x, y, w, h);
 }
 
@@ -1729,7 +1729,7 @@ void DrawTransCircle(Uint32 color, int x, int y, int radius,
 	GLubyte r, g, b;
 
 	Video.GetRGB(color, nullptr, &r, &g, &b);
-	color = Video.MapRGBA(0, r, g, b, alpha);
+	color = CVideo::MapRGBA(r, g, b, alpha);
 	DrawCircle(color, x, y, radius);
 }
 
@@ -1748,7 +1748,7 @@ void DrawTransCircleClip(Uint32 color, int x, int y, int radius,
 	GLubyte r, g, b;
 
 	Video.GetRGB(color, nullptr, &r, &g, &b);
-	color = Video.MapRGBA(0, r, g, b, alpha);
+	color = CVideo::MapRGBA(r, g, b, alpha);
 	DrawCircleClip(color, x, y, radius);
 }
 
@@ -1805,7 +1805,7 @@ void FillTransCircle(Uint32 color, int x, int y,
 	GLubyte r, g, b;
 
 	Video.GetRGB(color, nullptr, &r, &g, &b);
-	color = Video.MapRGBA(0, r, g, b, alpha);
+	color = CVideo::MapRGBA(r, g, b, alpha);
 	FillCircle(color, x, y, radius);
 }
 
@@ -1863,7 +1863,7 @@ void FillTransCircleClip(Uint32 color, int x, int y,
 	GLubyte r, g, b;
 
 	Video.GetRGB(color, nullptr, &r, &g, &b);
-	color = Video.MapRGBA(0, r, g, b, alpha);
+	color = CVideo::MapRGBA(r, g, b, alpha);
 	FillCircleClip(color, x, y, radius);
 }
 

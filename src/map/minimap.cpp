@@ -241,7 +241,7 @@ void minimap::UpdateTerrain(int z)
 	
 			const QColor color = terrain ? terrain->get_minimap_color(season) : QColor(0, 0, 0);
 
-			const uint32_t c = Video.MapRGB(0, color.red(), color.green(), color.blue());
+			const uint32_t c = CVideo::MapRGB(color);
 			*(uint32_t *) &(this->terrain_texture_data[z][(mx + my * MinimapTextureWidth[z]) * 4]) = c;
 		}
 	}
@@ -312,7 +312,7 @@ void minimap::UpdateXY(const Vec2i &pos, int z)
 
 			const QColor color = terrain ? terrain->get_minimap_color(season) : QColor(0, 0, 0);
 
-			const uint32_t c = Video.MapRGB(0, color.red(), color.green(), color.blue());
+			const uint32_t c = CVideo::MapRGB(color);
 			*(uint32_t *) &(this->terrain_texture_data[z][(mx + my * MinimapTextureWidth[z]) * 4]) = c;
 		}
 	}
@@ -404,20 +404,20 @@ void minimap::update_territory_pixel(const int mx, const int my, const int z)
 		const bool is_settlement_space = settlement_center_tile->is_space();
 		if (is_tile_water == is_settlement_water && is_tile_space == is_settlement_space) {
 			const QColor settlement_color = settlement->get_color();
-			*(uint32_t *) &(this->mode_overlay_texture_data[minimap_mode::settlements][z][pixel_index]) = Video.MapRGBA(settlement_color);
+			*(uint32_t *) &(this->mode_overlay_texture_data[minimap_mode::settlements][z][pixel_index]) = CVideo::MapRGBA(settlement_color);
 		}
 	}
 
-	const uint32_t c = Video.MapRGBA(color);
+	const uint32_t c = CVideo::MapRGBA(color);
 	*(uint32_t *) &(this->mode_overlay_texture_data[minimap_mode::territories][z][pixel_index]) = c;
 
-	const uint32_t with_non_land_c = Video.MapRGBA(with_non_land_color);
+	const uint32_t with_non_land_c = CVideo::MapRGBA(with_non_land_color);
 	*(uint32_t *) &(this->mode_overlay_texture_data[minimap_mode::territories_with_non_land][z][pixel_index]) = with_non_land_c;
 
-	const uint32_t realm_c = Video.MapRGBA(realm_color);
+	const uint32_t realm_c = CVideo::MapRGBA(realm_color);
 	*(uint32_t *) &(this->mode_overlay_texture_data[minimap_mode::realms][z][pixel_index]) = realm_c;
 
-	const uint32_t realm_with_non_land_c = Video.MapRGBA(realm_with_non_land_color);
+	const uint32_t realm_with_non_land_c = CVideo::MapRGBA(realm_with_non_land_color);
 	*(uint32_t *) &(this->mode_overlay_texture_data[minimap_mode::realms_with_non_land][z][pixel_index]) = realm_with_non_land_c;
 }
 
@@ -450,7 +450,7 @@ void minimap::DrawUnitOn(CUnit &unit, int red_phase)
 
 	uint32_t color;
 	if (unit.GetDisplayPlayer() == PlayerNumNeutral) {
-		color = Video.MapRGB(TheScreen->format, type->NeutralMinimapColorRGB);
+		color = CVideo::MapRGB(type->NeutralMinimapColorRGB);
 	} else if (unit.Player == CPlayer::GetThisPlayer() && !Editor.Running) {
 		if (unit.Attacked && unit.Attacked + ATTACK_BLINK_DURATION > GameCycle &&
 			(red_phase || unit.Attacked + ATTACK_RED_DURATION > GameCycle)) {
@@ -461,7 +461,7 @@ void minimap::DrawUnitOn(CUnit &unit, int red_phase)
 			color = ColorGreen;
 		}
 	} else {
-		color = Video.MapRGB(TheScreen->format, unit.Player->get_minimap_color());
+		color = CVideo::MapRGB(unit.Player->get_minimap_color());
 	}
 
 	int mx = 1 + this->XOffset[z] + Map2MinimapX[z][unit.tilePos.x];
@@ -511,12 +511,12 @@ void minimap::Update()
 	const int texture_width = this->get_texture_width(z);
 	const int texture_height = this->get_texture_height(z);
 
-	const uint32_t unexplored_color = Video.MapRGB(nullptr, 0, 0, 0);
-	const uint32_t explored_color = Video.MapRGBA(nullptr, 0, 0, 0, 128); //explored but not visible
+	const uint32_t unexplored_color = CVideo::MapRGB(0, 0, 0);
+	const uint32_t explored_color = CVideo::MapRGBA(0, 0, 0, 128); //explored but not visible
 	for (int my = 0; my < texture_height; ++my) {
 		for (int mx = 0; mx < texture_width; ++mx) {
 			if (mx < XOffset[z] || mx >= texture_width - XOffset[z] || my < YOffset[z] || my >= texture_height - YOffset[z]) {
-				*(uint32_t *) &(this->overlay_texture_data[z][(mx + my * MinimapTextureWidth[z]) * 4]) = Video.MapRGB(nullptr, 0, 0, 0);
+				*(uint32_t *) &(this->overlay_texture_data[z][(mx + my * MinimapTextureWidth[z]) * 4]) = CVideo::MapRGB(0, 0, 0);
 				continue;
 			}
 			
