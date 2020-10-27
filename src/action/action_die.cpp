@@ -40,8 +40,10 @@ std::unique_ptr<COrder> COrder::NewActionDie()
 	return std::make_unique<COrder_Die>();
 }
 
-/* virtual */ void COrder_Die::Save(CFile &file, const CUnit &unit) const
+void COrder_Die::Save(CFile &file, const CUnit &unit) const
 {
+	Q_UNUSED(unit)
+
 	file.printf("{\"action-die\"");
 	if (this->Finished) {
 		file.printf(", \"finished\"");
@@ -49,8 +51,13 @@ std::unique_ptr<COrder> COrder::NewActionDie()
 	file.printf("}");
 }
 
-/* virtual */ bool COrder_Die::ParseSpecificData(lua_State *l, int &j, const char *value, const CUnit &unit)
+bool COrder_Die::ParseSpecificData(lua_State *l, int &j, const char *value, const CUnit &unit)
 {
+	Q_UNUSED(l)
+	Q_UNUSED(j)
+	Q_UNUSED(value)
+	Q_UNUSED(unit)
+
 	return false;
 }
 

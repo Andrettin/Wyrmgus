@@ -168,8 +168,10 @@ std::unique_ptr<COrder> COrder::NewActionAttackGround(const CUnit &attacker, con
 }
 
 
-/* virtual */ void COrder_Attack::Save(CFile &file, const CUnit &unit) const
+void COrder_Attack::Save(CFile &file, const CUnit &unit) const
 {
+	Q_UNUSED(unit)
+
 	Assert(Action == UnitAction::Attack || Action == UnitAction::AttackGround);
 
 	if (Action == UnitAction::Attack) {
@@ -195,9 +197,10 @@ std::unique_ptr<COrder> COrder::NewActionAttackGround(const CUnit &attacker, con
 	file.printf("}");
 }
 
-
-/* virtual */ bool COrder_Attack::ParseSpecificData(lua_State *l, int &j, const char *value, const CUnit &unit)
+bool COrder_Attack::ParseSpecificData(lua_State *l, int &j, const char *value, const CUnit &unit)
 {
+	Q_UNUSED(unit)
+		
 	if (!strcmp(value, "state")) {
 		++j;
 		this->State = LuaToNumber(l, -1, j + 1);
@@ -616,7 +619,6 @@ void COrder_Attack::AttackTarget(CUnit &unit)
 		return;
 	}
 	CUnit *goal = this->GetGoal();
-	bool dead = !goal || goal->IsAlive() == false;
 
 	// No target choose one.
 	if (!goal) {

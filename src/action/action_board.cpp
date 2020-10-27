@@ -70,8 +70,10 @@ std::unique_ptr<COrder> COrder::NewActionBoard(CUnit &unit)
 	return order;
 }
 
-/* virtual */ void COrder_Board::Save(CFile &file, const CUnit &unit) const
+void COrder_Board::Save(CFile &file, const CUnit &unit) const
 {
+	Q_UNUSED(unit)
+	
 	file.printf("{\"action-board\",");
 
 	if (this->Finished) {
@@ -86,8 +88,10 @@ std::unique_ptr<COrder> COrder::NewActionBoard(CUnit &unit)
 	file.printf("}");
 }
 
-/* virtual */ bool COrder_Board::ParseSpecificData(lua_State *l, int &j, const char *value, const CUnit &unit)
+bool COrder_Board::ParseSpecificData(lua_State *l, int &j, const char *value, const CUnit &unit)
 {
+	Q_UNUSED(unit)
+	
 	if (!strcmp("state", value)) {
 		++j;
 		this->State = LuaToNumber(l, -1, j + 1);

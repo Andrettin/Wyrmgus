@@ -106,7 +106,12 @@ public:
 
 	virtual std::unique_ptr<COrder> Clone() const = 0;
 	virtual void Execute(CUnit &unit) = 0;
-	virtual void Cancel(CUnit &unit) {}
+
+	virtual void Cancel(CUnit &unit)
+	{
+		Q_UNUSED(unit)
+	}
+
 	virtual bool IsValid() const = 0;
 
 	virtual PixelPos Show(const CViewport &vp, const PixelPos &lastScreenPos) const = 0;
@@ -117,7 +122,11 @@ public:
 	bool ParseGenericData(lua_State *l, int &j, const char *value);
 	virtual bool ParseSpecificData(lua_State *l, int &j, const char *value, const CUnit &unit) = 0;
 
-	virtual void UpdateUnitVariables(CUnit &unit) const {}
+	virtual void UpdateUnitVariables(CUnit &unit) const
+	{
+		Q_UNUSED(unit)
+	}
+
 	virtual void FillSeenValues(CUnit &unit) const;
 	virtual void AiUnitKilled(CUnit &unit);
 
@@ -156,7 +165,7 @@ public:
 	//Wyrmgus start
 	static std::unique_ptr<COrder> NewActionPickUp(CUnit &dest);
 	//Wyrmgus end
-	static std::unique_ptr<COrder> NewActionRepair(CUnit &unit, CUnit &target);
+	static std::unique_ptr<COrder> NewActionRepair(CUnit &target);
 	//Wyrmgus start
 //	static std::unique_ptr<COrder> NewActionRepair(const Vec2i &pos);
 	static std::unique_ptr<COrder> NewActionRepair(const Vec2i &pos, int z);

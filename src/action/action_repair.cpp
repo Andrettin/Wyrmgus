@@ -59,7 +59,7 @@
 #include "unit/unit_type_type.h"
 #include "video/video.h"
 
-std::unique_ptr<COrder> COrder::NewActionRepair(CUnit &unit, CUnit &target)
+std::unique_ptr<COrder> COrder::NewActionRepair(CUnit &target)
 {
 	auto order = std::make_unique<COrder_Repair>();
 
@@ -89,8 +89,10 @@ std::unique_ptr<COrder> COrder::NewActionRepair(const Vec2i &pos, int z)
 	return order;
 }
 
-/* virtual */ void COrder_Repair::Save(CFile &file, const CUnit &unit) const
+void COrder_Repair::Save(CFile &file, const CUnit &unit) const
 {
+	Q_UNUSED(unit)
+	
 	file.printf("{\"action-repair\",");
 
 	if (this->Finished) {
@@ -114,8 +116,10 @@ std::unique_ptr<COrder> COrder::NewActionRepair(const Vec2i &pos, int z)
 	file.printf("}");
 }
 
-/* virtual */ bool COrder_Repair::ParseSpecificData(lua_State *l, int &j, const char *value, const CUnit &unit)
+bool COrder_Repair::ParseSpecificData(lua_State *l, int &j, const char *value, const CUnit &unit)
 {
+	Q_UNUSED(unit)
+	
 	if (!strcmp("repaircycle", value)) {
 		++j;
 		this->RepairCycle = LuaToNumber(l, -1, j + 1);

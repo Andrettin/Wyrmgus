@@ -549,7 +549,7 @@ static void AnimateActionUpgradeTo(CUnit &unit)
 	//Wyrmgus end
 }
 
-/* virtual */ void COrder_UpgradeTo::Cancel(CUnit &unit)
+void COrder_UpgradeTo::Cancel(CUnit &unit)
 {
 	CPlayer &player = *unit.Player;
 	

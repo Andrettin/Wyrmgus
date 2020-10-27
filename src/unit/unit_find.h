@@ -53,6 +53,8 @@ class CUnitFilter
 public:
 	bool operator()(const CUnit *unit) const
 	{
+		Q_UNUSED(unit)
+
 		return true;
 	}
 };
@@ -399,7 +401,7 @@ inline void Select(const Vec2i &ltPos, const Vec2i &rbPos, std::vector<CUnit *> 
 {
 	//Wyrmgus start
 //	Select(ltPos, rbPos, units, NoFilter());
-	Select(ltPos, rbPos, units, z, NoFilter());
+	Select(ltPos, rbPos, units, z, NoFilter(), circle);
 	//Wyrmgus end
 }
 
@@ -407,13 +409,13 @@ inline void SelectFixed(const Vec2i &ltPos, const Vec2i &rbPos, std::vector<CUni
 {
 	//Wyrmgus start
 //	Select(ltPos, rbPos, units, NoFilter());
-	Select(ltPos, rbPos, units, z, NoFilter());
+	Select(ltPos, rbPos, units, z, NoFilter(), circle);
 	//Wyrmgus end
 }
 
 inline void SelectAroundUnit(const CUnit &unit, int range, std::vector<CUnit *> &around, bool circle = false)
 {
-	SelectAroundUnit(unit, range, around, NoFilter());
+	SelectAroundUnit(unit, range, around, NoFilter(), circle);
 }
 
 template <typename Pred>

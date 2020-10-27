@@ -77,8 +77,10 @@ std::unique_ptr<COrder> COrder::NewActionFollow(CUnit &dest)
 	return order;
 }
 
-/* virtual */ void COrder_Follow::Save(CFile &file, const CUnit &unit) const
+void COrder_Follow::Save(CFile &file, const CUnit &unit) const
 {
+	Q_UNUSED(unit)
+	
 	file.printf("{\"action-follow\",");
 
 	if (this->Finished) {
@@ -98,8 +100,10 @@ std::unique_ptr<COrder> COrder::NewActionFollow(CUnit &dest)
 	file.printf("}");
 }
 
-/* virtual */ bool COrder_Follow::ParseSpecificData(lua_State *l, int &j, const char *value, const CUnit &unit)
+bool COrder_Follow::ParseSpecificData(lua_State *l, int &j, const char *value, const CUnit &unit)
 {
+	Q_UNUSED(unit)
+	
 	if (!strcmp(value, "state")) {
 		++j;
 		this->State = LuaToNumber(l, -1, j + 1);

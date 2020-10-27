@@ -74,8 +74,10 @@ std::unique_ptr<COrder> COrder::NewActionPatrol(const Vec2i &currentPos, const V
 }
 
 
-/* virtual */ void COrder_Patrol::Save(CFile &file, const CUnit &unit) const
+void COrder_Patrol::Save(CFile &file, const CUnit &unit) const
 {
+	Q_UNUSED(unit)
+	
 	file.printf("{\"action-patrol\",");
 
 	if (this->Finished) {
@@ -98,8 +100,10 @@ std::unique_ptr<COrder> COrder::NewActionPatrol(const Vec2i &currentPos, const V
 	file.printf("}");
 }
 
-/* virtual */ bool COrder_Patrol::ParseSpecificData(lua_State *l, int &j, const char *value, const CUnit &unit)
+bool COrder_Patrol::ParseSpecificData(lua_State *l, int &j, const char *value, const CUnit &unit)
 {
+	Q_UNUSED(unit)
+	
 	if (!strcmp(value, "patrol")) {
 		++j;
 		lua_rawgeti(l, -1, j + 1);

@@ -93,12 +93,17 @@ class CAnimation
 public:
 	static inline std::vector<CAnimation *> animation_list;
 
-	CAnimation(AnimationType type) : Type(type) {}
+	explicit CAnimation(AnimationType type) : Type(type) {}
 
 	virtual ~CAnimation() {}
 
 	virtual void Action(CUnit &unit, int &move, int scale) const = 0;
-	virtual void Init(const char *s, lua_State *l = nullptr) {}
+
+	virtual void Init(const char *s, lua_State *l = nullptr)
+	{
+		Q_UNUSED(s)
+		Q_UNUSED(l)
+	}
 
 	CAnimation *get_next() const
 	{

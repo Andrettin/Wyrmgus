@@ -81,7 +81,7 @@ std::unique_ptr<COrder> COrder::NewActionBuilt(CUnit &builder, CUnit &unit)
 }
 
 
-/* virtual */ void COrder_Built::Save(CFile &file, const CUnit &unit) const
+void COrder_Built::Save(CFile &file, const CUnit &unit) const
 {
 	file.printf("{\"action-built\", ");
 	if (this->Finished) {
@@ -415,8 +415,10 @@ static void Finish(COrder_Built &order, CUnit &unit)
 	}
 }
 
-/* virtual */ void COrder_Built::Cancel(CUnit &unit)
+void COrder_Built::Cancel(CUnit &unit)
 {
+	Q_UNUSED(unit)
+
 	this->IsCancelled = true;
 }
 

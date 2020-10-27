@@ -1522,7 +1522,7 @@ add_custom_command(OUTPUT tolua.cpp
 add_executable(stratagus WIN32 ${stratagus_SRCS} ${stratagus_HDRS})
 
 if (MSVC)
-	target_compile_options(stratagus PRIVATE /W4 /w44800)
+	target_compile_options(stratagus PRIVATE /W4 /w44800 /wd4458)
 endif()
 
 target_precompile_headers(stratagus PRIVATE

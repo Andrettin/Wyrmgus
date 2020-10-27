@@ -70,8 +70,10 @@ std::unique_ptr<COrder> COrder::NewActionMove(const Vec2i &pos, int z)
 	return order;
 }
 
-/* virtual */ void COrder_Move::Save(CFile &file, const CUnit &unit) const
+void COrder_Move::Save(CFile &file, const CUnit &unit) const
 {
+	Q_UNUSED(unit)
+	
 	file.printf("{\"action-move\",");
 
 	if (this->Finished) {
@@ -87,8 +89,10 @@ std::unique_ptr<COrder> COrder::NewActionMove(const Vec2i &pos, int z)
 	file.printf("}");
 }
 
-/* virtual */ bool COrder_Move::ParseSpecificData(lua_State *l, int &j, const char *value, const CUnit &unit)
+bool COrder_Move::ParseSpecificData(lua_State *l, int &j, const char *value, const CUnit &unit)
 {
+	Q_UNUSED(unit)
+	
 	if (!strcmp(value, "range")) {
 		++j;
 		this->Range = LuaToNumber(l, -1, j + 1);

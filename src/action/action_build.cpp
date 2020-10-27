@@ -101,8 +101,10 @@ std::unique_ptr<COrder> COrder::NewActionBuild(const CUnit &builder, const Vec2i
 }
 
 
-/* virtual */ void COrder_Build::Save(CFile &file, const CUnit &unit) const
+void COrder_Build::Save(CFile &file, const CUnit &unit) const
 {
+	Q_UNUSED(unit)
+	
 	file.printf("{\"action-build\",");
 
 	if (this->Finished) {
@@ -112,8 +114,8 @@ std::unique_ptr<COrder> COrder::NewActionBuild(const CUnit &builder, const Vec2i
 	file.printf(" \"tile\", {%d, %d},", this->goalPos.x, this->goalPos.y);
 	//Wyrmgus start
 	file.printf(" \"map-layer\", %d,", this->MapLayer);
-	if (this->settlement) {
-		file.printf(" \"settlement\", \"%s\",", this->settlement->Ident.c_str());
+	if (this->settlement != nullptr) {
+		file.printf(" \"settlement\", \"%s\",", this->settlement->get_identifier().c_str());
 	}
 	//Wyrmgus end
 
@@ -125,8 +127,10 @@ std::unique_ptr<COrder> COrder::NewActionBuild(const CUnit &builder, const Vec2i
 	file.printf("}");
 }
 
-/* virtual */ bool COrder_Build::ParseSpecificData(lua_State *l, int &j, const char *value, const CUnit &unit)
+bool COrder_Build::ParseSpecificData(lua_State *l, int &j, const char *value, const CUnit &unit)
 {
+	Q_UNUSED(unit)
+	
 	if (!strcmp(value, "building")) {
 		++j;
 		lua_rawgeti(l, -1, j + 1);
@@ -385,7 +389,7 @@ void COrder_Build::HelpBuild(CUnit &unit, CUnit &building)
 		  //Wyrmgus end
 
 		// shortcut to replace order, without inserting and removing in front of Orders
-		unit.Orders[0] = COrder::NewActionRepair(unit, building);
+		unit.Orders[0] = COrder::NewActionRepair(building);
 		return;
 	}
 //Wyrmgus start
@@ -479,6 +483,8 @@ bool COrder_Build::StartBuilding(CUnit &unit, CUnit &ontop)
 
 void COrder_Build::ConvertUnitType(const CUnit &unit, wyrmgus::unit_type &newType)
 {
+	Q_UNUSED(unit)
+	
 	this->Type = &newType;
 }
 
@@ -522,8 +528,7 @@ bool COrder_Build::BuildFromOutside(CUnit &unit) const
 	return this->BuildingUnit->CurrentAction() != UnitAction::Built;
 }
 
-
-/* virtual */ void COrder_Build::Execute(CUnit &unit)
+void COrder_Build::Execute(CUnit &unit)
 {
 	if (unit.Wait) {
 		if (!unit.Waiting) {
@@ -541,9 +546,10 @@ bool COrder_Build::BuildFromOutside(CUnit &unit) const
 	if (this->State <= State_MoveToLocationMax) {
 		if (this->MoveToLocation(unit)) {
 			this->Finished = true;
-			return ;
+			return;
 		}
 	}
+
 	const wyrmgus::unit_type &type = this->GetUnitType();
 
 	if (State_NearOfLocation <= this->State && this->State < State_StartBuilding_Failed) {
@@ -565,11 +571,9 @@ bool COrder_Build::BuildFromOutside(CUnit &unit) const
 			}
 			//Wyrmgus end
 			this->StartBuilding(unit, *ontop);
-		}
-		else { /* can't be built */
+		} else { /* can't be built */
 			// Check if already building
 			const Vec2i pos = this->goalPos;
-			const wyrmgus::unit_type &type = this->GetUnitType();
 
 			CUnit *building = AlreadyBuildingFinder(unit, type).Find(CMap::Map.Field(pos, this->MapLayer));
 

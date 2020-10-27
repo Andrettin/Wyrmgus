@@ -33,7 +33,7 @@
 
 class COrder_Repair final : public COrder
 {
-	friend std::unique_ptr<COrder> COrder::NewActionRepair(CUnit &unit, CUnit &target);
+	friend std::unique_ptr<COrder> COrder::NewActionRepair(CUnit &target);
 	//Wyrmgus start
 //	friend std::unique_ptr<COrder> COrder::NewActionRepair(const Vec2i &pos);
 	friend std::unique_ptr<COrder> COrder::NewActionRepair(const Vec2i &pos, int z);

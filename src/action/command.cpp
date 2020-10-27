@@ -523,7 +523,7 @@ void CommandRepair(CUnit &unit, const Vec2i &pos, CUnit *dest, int flush, int z)
 		}
 	}
 	if (dest) {
-		*order = COrder::NewActionRepair(unit, *dest);
+		*order = COrder::NewActionRepair(*dest);
 	} else {
 		//Wyrmgus start
 //		*order = COrder::NewActionRepair(pos);
