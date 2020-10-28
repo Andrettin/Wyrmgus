@@ -897,7 +897,7 @@ static void DoNextReplay()
 	} else if (!strcmp(action, "spell-cast")) {
 		SendCommandSpellCast(*unit, pos, dunit, num, flags);
 	} else if (!strcmp(action, "auto-spell-cast")) {
-		SendCommandAutoSpellCast(*unit, wyrmgus::spell::get_all()[num], arg1);
+		SendCommandAutoSpellCast(*unit, wyrmgus::spell::get_all()[num], arg1 != 0);
 	//Wyrmgus start
 	} else if (!strcmp(action, "rally_point")) {
 		SendCommandRallyPoint(*unit, pos);

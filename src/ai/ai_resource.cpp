@@ -1687,7 +1687,7 @@ static void AiCollectResources()
 					
 				// remove it from other ressources
 				for (size_t j = 0; j < wyrmgus::resource::get_all().size(); ++j) {
-					if (j == c || !unit->Type->ResInfo[j]) {
+					if (static_cast<int>(j) == c || !unit->Type->ResInfo[j]) {
 						continue;
 					}
 					for (int k = 0; k < num_units_unassigned[j]; ++k) {
@@ -1869,16 +1869,16 @@ static void AiCollectResources()
 	
 	//explore with the workers that are still idle (as that means they haven't gotten something to harvest)
 	for (int i = 0; i < n; ++i) {
-		CUnit &unit = AiPlayer->Player->GetUnit(i);
-		if (!unit.Type->BoolFlag[HARVESTER_INDEX].value || !unit.Active) {
+		CUnit &scout_unit = AiPlayer->Player->GetUnit(i);
+		if (!scout_unit.Type->BoolFlag[HARVESTER_INDEX].value || !scout_unit.Active) {
 			continue;
 		}
 
-		if (!unit.IsIdle()) {
+		if (!scout_unit.IsIdle()) {
 			continue;
 		}
 		
-		unit.Scout();
+		scout_unit.Scout();
 		break; //only do this with one at a time to not strain performance too much
 	}
 	//Wyrmgus end

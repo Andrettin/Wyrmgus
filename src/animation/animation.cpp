@@ -734,8 +734,8 @@ static std::unique_ptr<CAnimation> ParseAnimation(lua_State *l, int idx)
 	std::unique_ptr<CAnimation> firstAnim = ParseAnimationFrame(l, str);
 	CAnimation *prev = firstAnim.get();
 	for (int j = 1; j < args; ++j) {
-		const char *str = LuaToString(l, idx, j + 1);
-		std::unique_ptr<CAnimation> anim = ParseAnimationFrame(l, str);
+		const char *secondary_str = LuaToString(l, idx, j + 1);
+		std::unique_ptr<CAnimation> anim = ParseAnimationFrame(l, secondary_str);
 		CAnimation *temp_anim = anim.get();
 		prev->set_next(std::move(anim));
 		prev = temp_anim;

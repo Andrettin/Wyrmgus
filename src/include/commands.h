@@ -150,7 +150,7 @@ extern void CommandCancelResearch(CUnit &unit);
 extern void CommandLearnAbility(CUnit &unit, CUpgrade &what);
 //Wyrmgus end
 /// Prepare command spellcast
-extern void CommandSpellCast(CUnit &unit, const Vec2i &pos, CUnit *dest, const wyrmgus::spell &spell, int flush, int z = 0, bool isAutocast = false);
+extern void CommandSpellCast(CUnit &unit, const Vec2i &pos, CUnit *dest, const wyrmgus::spell &spell, int flush, int z = 0);
 /// Prepare command auto spellcast
 extern void CommandAutoSpellCast(CUnit &unit, const wyrmgus::spell *spell, const bool on);
 /// Prepare diplomacy command

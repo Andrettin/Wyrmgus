@@ -197,9 +197,7 @@ static void EditorChangeSurrounding(const Vec2i &pos, int tile)
 				if (x_offset != 0 || y_offset != 0) {
 					Vec2i adjacent_pos(pos.x + x_offset, pos.y + y_offset);
 					if (CMap::Map.Info.IsPointOnMap(adjacent_pos, UI.CurrentMapLayer)) {
-						CMapField &adjacent_mf = *UI.CurrentMapLayer->Field(adjacent_pos);
-							
-						wyrmgus::terrain_type *adjacent_terrain = CMap::Map.GetTileTerrain(adjacent_pos, overlay, UI.CurrentMapLayer->ID);
+						const wyrmgus::terrain_type *adjacent_terrain = CMap::Map.GetTileTerrain(adjacent_pos, overlay, UI.CurrentMapLayer->ID);
 						if (overlay && adjacent_terrain && UI.CurrentMapLayer->Field(adjacent_pos)->OverlayTerrainDestroyed) {
 							adjacent_terrain = nullptr;
 						}

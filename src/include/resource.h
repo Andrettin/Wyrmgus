@@ -34,8 +34,8 @@
 class CGraphic;
 struct lua_State;
 
-int CclDefineDefaultResourceNames(lua_State *l);
-int CclDefineResource(lua_State *l);
+static int CclDefineDefaultResourceNames(lua_State *l);
+static int CclDefineResource(lua_State *l);
 
 /**
 **  Indices into costs/resource/income array.
@@ -166,8 +166,8 @@ public:
 	bool Hidden = false;
 	std::vector<resource *> ChildResources; //resources (other than this one) that have this resource as their final resource
 
-	friend int ::CclDefineDefaultResourceNames(lua_State *l);
-	friend int ::CclDefineResource(lua_State *l);
+	friend static int ::CclDefineDefaultResourceNames(lua_State *l);
+	friend static int ::CclDefineResource(lua_State *l);
 };
 
 }

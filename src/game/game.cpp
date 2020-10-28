@@ -391,13 +391,13 @@ static void LoadStratagusMap(const std::string &smpname, const std::string &mapn
 		strcpy_s(mapfull, sizeof(mapfull), StratagusLibPath.c_str());
 		strcat_s(mapfull, sizeof(mapfull), "/");
 		strcat_s(mapfull, sizeof(mapfull), smpname.c_str());
-		char *p = strrchr(mapfull, '/');
-		if (!p) {
-			p = mapfull;
+		char *p2 = strrchr(mapfull, '/');
+		if (!p2) {
+			p2 = mapfull;
 		} else {
-			++p;
+			++p2;
 		}
-		strcpy_s(p, sizeof(mapfull) - (p - mapfull), mapname.c_str());
+		strcpy_s(p2, sizeof(mapfull) - (p2 - mapfull), mapname.c_str());
 		if (file.open(mapfull, CL_OPEN_READ) == -1) {
 			// Not found again, try StratagusLibPath
 			strcpy_s(mapfull, sizeof(mapfull), StratagusLibPath.c_str());
@@ -617,11 +617,11 @@ int WriteMapSetup(const char *mapSetup, CMap &map, int writeTerrain, bool is_mod
 			f->printf("},\n");
 			f->printf("\tUnitStock = {");
 			for (const auto &kv_pair : unit_type->DefaultStat.UnitStock) {
-				const wyrmgus::unit_type *unit_type = wyrmgus::unit_type::get_all()[kv_pair.first];
+				const wyrmgus::unit_type *other_unit_type = wyrmgus::unit_type::get_all()[kv_pair.first];
 				const int unit_stock = kv_pair.second;
 
-				if (unit_stock != 0 && (!unit_type->Parent || unit_stock != unit_type->Parent->DefaultStat.GetUnitStock(unit_type))) {
-					f->printf("\"%s\", ", unit_type->Ident.c_str());
+				if (unit_stock != 0 && (!unit_type->Parent || unit_stock != unit_type->Parent->DefaultStat.GetUnitStock(other_unit_type))) {
+					f->printf("\"%s\", ", other_unit_type->get_identifier().c_str());
 					f->printf("%d, ", unit_stock);
 				}
 			}
@@ -871,11 +871,11 @@ int WriteMapSetup(const char *mapSetup, CMap &map, int writeTerrain, bool is_mod
 				}
 
 				for (const auto &kv_pair : unit_type->ModDefaultStats[CMap::Map.Info.Filename].UnitStock) {
-					const wyrmgus::unit_type *unit_type = wyrmgus::unit_type::get_all()[kv_pair.first];
+					const wyrmgus::unit_type *other_unit_type = wyrmgus::unit_type::get_all()[kv_pair.first];
 					const int unit_stock = kv_pair.second;
 
 					if (unit_stock != 0) {
-						f->printf("SetModStat(\"%s\", \"%s\", \"UnitStock\", %d, \"%s\")\n", mod_file.c_str(), unit_type->Ident.c_str(), unit_stock, unit_type->Ident.c_str());
+						f->printf("SetModStat(\"%s\", \"%s\", \"UnitStock\", %d, \"%s\")\n", mod_file.c_str(), unit_type->get_identifier().c_str(), unit_stock, other_unit_type->get_identifier().c_str());
 					}
 				}
 

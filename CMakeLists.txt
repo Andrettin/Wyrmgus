@@ -1566,6 +1566,7 @@ target_precompile_headers(stratagus PRIVATE
 	<QAudioFormat>
 	<QColor>
 	<QDateTime>
+	<QDebug>
 	<QGeoCircle>
 	<QGeoCoordinate>
 	<QGeoPath>

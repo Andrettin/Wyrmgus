@@ -653,7 +653,7 @@ int AutoCastSpell(CUnit &caster, const wyrmgus::spell &spell)
 			saved_order = caster.CurrentOrder()->Clone();
 		}
 		// Must move before ?
-		CommandSpellCast(caster, target->targetPos, target->Unit, spell, FlushCommands, target->MapLayer, true);
+		CommandSpellCast(caster, target->targetPos, target->Unit, spell, FlushCommands, target->MapLayer);
 		if (saved_order != nullptr) {
 			caster.SavedOrder = std::move(saved_order);
 		}

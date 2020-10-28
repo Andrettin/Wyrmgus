@@ -27,21 +27,18 @@
 //      02111-1307, USA.
 //
 
-/*----------------------------------------------------------------------------
---  Includes
-----------------------------------------------------------------------------*/
-
 #include "stratagus.h"
 
 #include "animation/animation_label.h"
 
 #include "unit/unit.h"
 
-/* virtual */ void CAnimation_Label::Action(CUnit &unit, int &/*move*/, int /*scale*/) const
+void CAnimation_Label::Action(CUnit &unit, int &/*move*/, int /*scale*/) const
 {
 	Assert(unit.Anim.Anim == this);
 }
 
-/* virtual */ void CAnimation_Label::Init(const char *s, lua_State *)
+void CAnimation_Label::Init(const char *s, lua_State *)
 {
+	Q_UNUSED(s)
 }

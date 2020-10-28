@@ -209,7 +209,6 @@ static void EditTile(const Vec2i &pos, wyrmgus::terrain_type *terrain)
 {
 	Assert(CMap::Map.Info.IsPointOnMap(pos, UI.CurrentMapLayer));
 	
-	const CTileset &tileset = *CMap::Map.Tileset;
 	CMapField &mf = *UI.CurrentMapLayer->Field(pos);
 	
 	//Wyrmgus start
@@ -314,9 +313,7 @@ static void EditTilesInternal(const Vec2i &pos, wyrmgus::terrain_type *terrain, 
 					if (x_offset != 0 || y_offset != 0) {
 						Vec2i adjacent_pos(changed_tiles[i].x + x_offset, changed_tiles[i].y + y_offset);
 						if (CMap::Map.Info.IsPointOnMap(adjacent_pos, UI.CurrentMapLayer)) {
-							CMapField &adjacent_mf = *UI.CurrentMapLayer->Field(adjacent_pos);
-									
-							wyrmgus::terrain_type *adjacent_terrain = CMap::Map.GetTileTerrain(adjacent_pos, tile_terrain->is_overlay(), UI.CurrentMapLayer->ID);
+							const wyrmgus::terrain_type *adjacent_terrain = CMap::Map.GetTileTerrain(adjacent_pos, tile_terrain->is_overlay(), UI.CurrentMapLayer->ID);
 							if (tile_terrain->is_overlay() && adjacent_terrain && UI.CurrentMapLayer->Field(adjacent_pos)->OverlayTerrainDestroyed) {
 								adjacent_terrain = nullptr;
 							}
@@ -925,7 +922,7 @@ static void DrawUnitIcons()
 **  @param y        Y display position
 **  @param flags    State of the icon (::IconActive,::IconClicked,...)
 */
-static void DrawTileIcon(unsigned tilenum, unsigned x, unsigned y, unsigned flags)
+static void DrawTileIcon(const wyrmgus::terrain_type *terrain, unsigned x, unsigned y, unsigned flags)
 {
 	//Wyrmgus start
 	/*
@@ -973,7 +970,6 @@ static void DrawTileIcon(unsigned tilenum, unsigned x, unsigned y, unsigned flag
 	x -= 1;
 	y -= 1;
 //	Map.TileGraphic->DrawFrameClip(Map.Tileset->tiles[tilenum].tile, x, y);
-	const wyrmgus::terrain_type *terrain = Editor.ShownTileTypes[0];
 	terrain->get_graphics()->DrawFrameClip(terrain->get_solid_tiles().front(), x, y);
 	//Wyrmgus end
 
@@ -1231,7 +1227,7 @@ static void DrawEditorPanel()
 		const int x = UI.InfoPanel.X + get_tile_icon_x() + 11 * scale_factor;
 		const int y = UI.InfoPanel.Y + get_tile_icon_y() + 4 * scale_factor;
 
-		DrawTileIcon(0x10 + 4 * 16, x, y,
+		DrawTileIcon(Editor.ShownTileTypes[0], x, y,
 					 (ButtonUnderCursor == TileButton ? IconActive : 0) |
 					 (Editor.State == EditorEditTile ? IconSelected : 0));
 	}
@@ -1408,8 +1404,6 @@ static void DrawEditorInfo()
 
 	CLabel(wyrmgus::defines::get()->get_game_font()).Draw(UI.StatusLine.TextX + 118, UI.StatusLine.TextY - 12, buf);
 
-	// Tile info
-	const CTileset &tileset = *CMap::Map.Tileset;
 	//Wyrmgus start
 //	const int index = tileset.findTileIndexByTile(mf.getGraphicTile());
 //	Assert(index != -1);
@@ -1646,9 +1640,7 @@ static void EditorCallbackButtonDown(unsigned button)
 				editorSlider->setVisible(false);
 				return;
 			case TileButton :
-				if (EditorEditTile) {
-					Editor.State = EditorEditTile;
-				}
+				Editor.State = EditorEditTile;
 				editorUnitSlider->setVisible(false);
 				if (VisibleTileIcons < (int)Editor.ShownTileTypes.size()) {
 					editorSlider->setVisible(true);
@@ -2426,13 +2418,13 @@ void CEditor::Init()
 		//Wyrmgus start
 //		Map.Fields = new CMapField[Map.Info.MapWidth * Map.Info.MapHeight];
 		CMap::Map.ClearMapLayers();
-		auto map_layer = std::make_unique<CMapLayer>(CMap::Map.Info.MapWidth, CMap::Map.Info.MapHeight);
-		map_layer->ID = CMap::Map.MapLayers.size();
+		auto new_map_layer = std::make_unique<CMapLayer>(CMap::Map.Info.MapWidth, CMap::Map.Info.MapHeight);
+		new_map_layer->ID = CMap::Map.MapLayers.size();
 		CMap::Map.Info.MapWidths.clear();
 		CMap::Map.Info.MapWidths.push_back(CMap::Map.Info.MapWidth);
 		CMap::Map.Info.MapHeights.clear();
 		CMap::Map.Info.MapHeights.push_back(CMap::Map.Info.MapHeight);
-		CMap::Map.MapLayers.push_back(std::move(map_layer));
+		CMap::Map.MapLayers.push_back(std::move(new_map_layer));
 		//Wyrmgus end
 
 		const int defaultTile = CMap::Map.Tileset->getDefaultTileIndex();

@@ -27,10 +27,6 @@
 //      02111-1307, USA.
 //
 
-/*----------------------------------------------------------------------------
---  Includes
-----------------------------------------------------------------------------*/
-
 #include "stratagus.h"
 
 #include "animation/animation_attack.h"
@@ -38,12 +34,13 @@
 #include "actions.h"
 #include "unit/unit.h"
 
-/* virtual */ void CAnimation_Attack::Action(CUnit &unit, int &/*move*/, int /*scale*/) const
+void CAnimation_Attack::Action(CUnit &unit, int &/*move*/, int /*scale*/) const
 {
 	Assert(unit.Anim.Anim == this);
 	unit.CurrentOrder()->OnAnimationAttack(unit);
 }
 
-/* virtual */ void CAnimation_Attack::Init(const char *s, lua_State *)
+void CAnimation_Attack::Init(const char *s, lua_State *)
 {
+	Q_UNUSED(s)
 }

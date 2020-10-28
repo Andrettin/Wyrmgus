@@ -648,7 +648,7 @@ public:
 	*/
 	std::vector<const wyrmgus::unit_type *> NavalTransporters;
 
-	friend void InitAiHelper(AiHelper &aiHelper);
+	friend static void InitAiHelper(AiHelper &aiHelper);
 };
 
 extern std::vector<std::unique_ptr<CAiType>> AiTypes;   /// List of all AI types

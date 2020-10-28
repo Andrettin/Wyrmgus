@@ -86,6 +86,9 @@ private:
 
 VisitResult EnemyUnitFinder::Visit(TerrainTraversal &terrainTraversal, const Vec2i &pos, const Vec2i &from)
 {
+	Q_UNUSED(terrainTraversal)
+	Q_UNUSED(from)
+
 	if (!unit.MapLayer->Field(pos)->player_info->IsTeamExplored(*unit.Player)) {
 		return VisitResult::DeadEnd;
 	}
@@ -192,7 +195,7 @@ public:
 		//Wyrmgus start
 		CheckedTypes.push_back(unit->Type);
 		//Wyrmgus end
-		if (FIND_TYPE == AIATTACK_RANGE) {
+		if constexpr (FIND_TYPE == AIATTACK_RANGE) {
 			//Wyrmgus start
 //			*enemy = AttackUnitsInReactRange(*unit);
 			*enemy = AttackUnitsInReactRange(*unit, HasNotSamePlayerAs(*CPlayer::Players[PlayerNumNeutral]), IncludeNeutral);
@@ -509,6 +512,9 @@ private:
 
 VisitResult AiForceRallyPointFinder::Visit(TerrainTraversal &terrainTraversal, const Vec2i &pos, const Vec2i &from)
 {
+	Q_UNUSED(terrainTraversal)
+	Q_UNUSED(from)
+
 	//Wyrmgus start
 	if (!CMap::Map.Field(pos, z)->player_info->IsTeamExplored(*startUnit.Player)) { // don't pick unexplored positions
 		return VisitResult::DeadEnd;

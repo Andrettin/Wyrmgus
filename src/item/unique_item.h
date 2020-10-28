@@ -33,7 +33,7 @@
 class CUpgrade;
 struct lua_State;
 
-int CclDefineUniqueItem(lua_State *l);
+static int CclDefineUniqueItem(lua_State *l);
 
 namespace wyrmgus {
 
@@ -118,7 +118,7 @@ private:
 	CUpgrade *work = nullptr;
 	CUpgrade *elixir = nullptr;
 
-	friend int ::CclDefineUniqueItem(lua_State *l);
+	friend static int ::CclDefineUniqueItem(lua_State *l);
 };
 
 }

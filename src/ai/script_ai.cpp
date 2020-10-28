@@ -1596,30 +1596,30 @@ static int CclDefineAiPlayer(lua_State *l)
 			const int forceIdx = ai->Force.FindFreeForce(AiForceRole::Default);
 
 			for (int k = 1; k < subargs; ++k) {
-				const char *value = LuaToString(l, j + 1, k + 1);
+				const char *secondary_value = LuaToString(l, j + 1, k + 1);
 				++k;
-				if (!strcmp(value, "complete")) {
+				if (!strcmp(secondary_value, "complete")) {
 					ai->Force[forceIdx].Completed = true;
 					--k;
-				} else if (!strcmp(value, "recruit")) {
+				} else if (!strcmp(secondary_value, "recruit")) {
 					ai->Force[forceIdx].Completed = false;
 					--k;
-				} else if (!strcmp(value, "attack")) {
+				} else if (!strcmp(secondary_value, "attack")) {
 					ai->Force[forceIdx].Attacking = true;
 					--k;
-				} else if (!strcmp(value, "defend")) {
+				} else if (!strcmp(secondary_value, "defend")) {
 					ai->Force[forceIdx].Defending = true;
 					--k;
-				} else if (!strcmp(value, "role")) {
-					value = LuaToString(l, j + 1, k + 1);
-					if (!strcmp(value, "attack")) {
+				} else if (!strcmp(secondary_value, "role")) {
+					secondary_value = LuaToString(l, j + 1, k + 1);
+					if (!strcmp(secondary_value, "attack")) {
 						ai->Force[forceIdx].Role = AiForceRole::Attack;
-					} else if (!strcmp(value, "defend")) {
+					} else if (!strcmp(secondary_value, "defend")) {
 						ai->Force[forceIdx].Role = AiForceRole::Defend;
 					} else {
-						LuaError(l, "Unsupported force tag: %s" _C_ value);
+						LuaError(l, "Unsupported force tag: %s" _C_ secondary_value);
 					}
-				} else if (!strcmp(value, "types")) {
+				} else if (!strcmp(secondary_value, "types")) {
 					lua_rawgeti(l, j + 1, k + 1);
 					if (!lua_istable(l, -1)) {
 						LuaError(l, "incorrect argument");
@@ -1636,7 +1636,7 @@ static int CclDefineAiPlayer(lua_State *l)
 						ai->Force[forceIdx].UnitTypes.push_back(queue);
 					}
 					lua_pop(l, 1);
-				} else if (!strcmp(value, "units")) {
+				} else if (!strcmp(secondary_value, "units")) {
 					lua_rawgeti(l, j + 1, k + 1);
 					if (!lua_istable(l, -1)) {
 						LuaError(l, "incorrect argument");
@@ -1652,16 +1652,16 @@ static int CclDefineAiPlayer(lua_State *l)
 						ai->Force[forceIdx].Units.Insert(&UnitManager.GetSlotUnit(num));
 					}
 					lua_pop(l, 1);
-				} else if (!strcmp(value, "state")) {
+				} else if (!strcmp(secondary_value, "state")) {
 					ai->Force[forceIdx].State = AiForceAttackingState(LuaToNumber(l, j + 1, k + 1));
-				} else if (!strcmp(value, "goalx")) {
+				} else if (!strcmp(secondary_value, "goalx")) {
 					ai->Force[forceIdx].GoalPos.x = LuaToNumber(l, j + 1, k + 1);
-				} else if (!strcmp(value, "goaly")) {
+				} else if (!strcmp(secondary_value, "goaly")) {
 					ai->Force[forceIdx].GoalPos.y = LuaToNumber(l, j + 1, k + 1);
-				} else if (!strcmp(value, "must-transport")) {
+				} else if (!strcmp(secondary_value, "must-transport")) {
 					// Keep for backward compatibility
 				} else {
-					LuaError(l, "Unsupported tag: %s" _C_ value);
+					LuaError(l, "Unsupported tag: %s" _C_ secondary_value);
 				}
 			}
 		} else if (!strcmp(value, "reserve")) {

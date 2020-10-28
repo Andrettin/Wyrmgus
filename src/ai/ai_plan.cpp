@@ -254,6 +254,9 @@ private:
 
 VisitResult ReachableTerrainMarker::Visit(TerrainTraversal &terrainTraversal, const Vec2i &pos, const Vec2i &from)
 {
+	Q_UNUSED(terrainTraversal)
+	Q_UNUSED(from)
+
 	if (!unit.MapLayer->Field(pos)->player_info->IsTeamExplored(*unit.Player)) {
 		return VisitResult::DeadEnd;
 	}
@@ -300,6 +303,8 @@ bool EnemyFinderWithTransporter::IsAccessibleForTransporter(const Vec2i &pos) co
 
 VisitResult EnemyFinderWithTransporter::Visit(TerrainTraversal &terrainTraversal, const Vec2i &pos, const Vec2i &from)
 {
+	Q_UNUSED(terrainTraversal)
+
 	if (!unit.MapLayer->Field(pos)->player_info->IsTeamExplored(*unit.Player)) {
 		return VisitResult::DeadEnd;
 	}
