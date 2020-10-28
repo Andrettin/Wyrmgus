@@ -38,15 +38,15 @@ double longitude_to_scaled_longitude(const double longitude, const std::vector<s
 	double scaled_longitude = unsigned_longitude;
 
 	for (const auto &scaling : degree_scalings) {
-		const double min_longitude = scaling->get_min_degree();
-		const double max_longitude = scaling->get_max_degree();
+		const double min_lon = scaling->get_min_degree();
+		const double max_lon = scaling->get_max_degree();
 		const int scale = scaling->get_scale();
 		const double longitude_length = scaling->get_length();
 
 		if (scaling->contains(longitude)) {
-			const double longitude_diff = longitude - min_longitude;
+			const double longitude_diff = longitude - min_lon;
 			scaled_longitude += (longitude_diff * scale / 100) - longitude_diff;
-		} else if (longitude > max_longitude) {
+		} else if (longitude > max_lon) {
 			scaled_longitude += (longitude_length * scale / 100) - longitude_length;
 		}
 	}
@@ -61,15 +61,15 @@ double latitude_to_scaled_latitude(const double latitude, const std::vector<std:
 	double scaled_latitude = unsigned_latitude;
 
 	for (const auto &scaling : degree_scalings) {
-		const double min_latitude = scaling->get_min_degree();
-		const double max_latitude = scaling->get_max_degree();
+		const double min_lat = scaling->get_min_degree();
+		const double max_lat = scaling->get_max_degree();
 		const int scale = scaling->get_scale();
 		const double latitude_length = scaling->get_length();
 
 		if (scaling->contains(latitude)) {
-			const double latitude_diff = latitude - min_latitude;
+			const double latitude_diff = latitude - min_lat;
 			scaled_latitude += (latitude_diff * scale / 100) - latitude_diff;
-		} else if (latitude > max_latitude) {
+		} else if (latitude > max_lat) {
 			scaled_latitude += (latitude_length * scale / 100) - latitude_length;
 		}
 	}
@@ -79,22 +79,22 @@ double latitude_to_scaled_latitude(const double latitude, const std::vector<std:
 
 double scaled_longitude_size(const QGeoRectangle &georectangle, const std::vector<std::unique_ptr<degree_scaling>> &degree_scalings)
 {
-	const double min_longitude = georectangle.bottomLeft().longitude();
-	const double max_longitude = georectangle.topRight().longitude();
+	const double min_lon = georectangle.bottomLeft().longitude();
+	const double max_lon = georectangle.topRight().longitude();
 
-	const double min_scaled_longitude = longitude_to_scaled_longitude(min_longitude, degree_scalings);
-	const double max_scaled_longitude = longitude_to_scaled_longitude(max_longitude, degree_scalings);
+	const double min_scaled_longitude = longitude_to_scaled_longitude(min_lon, degree_scalings);
+	const double max_scaled_longitude = longitude_to_scaled_longitude(max_lon, degree_scalings);
 	
 	return max_scaled_longitude - min_scaled_longitude;
 }
 
 double scaled_latitude_size(const QGeoRectangle &georectangle, const std::vector<std::unique_ptr<degree_scaling>> &degree_scalings)
 {
-	const double min_latitude = georectangle.bottomLeft().latitude();
-	const double max_latitude = georectangle.topRight().latitude();
+	const double min_lat = georectangle.bottomLeft().latitude();
+	const double max_lat = georectangle.topRight().latitude();
 
-	const double min_scaled_latitude = latitude_to_scaled_latitude(min_latitude, degree_scalings);
-	const double max_scaled_latitude = latitude_to_scaled_latitude(max_latitude, degree_scalings);
+	const double min_scaled_latitude = latitude_to_scaled_latitude(min_lat, degree_scalings);
+	const double max_scaled_latitude = latitude_to_scaled_latitude(max_lat, degree_scalings);
 
 	return max_scaled_latitude - min_scaled_latitude;
 }

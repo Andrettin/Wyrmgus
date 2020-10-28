@@ -57,7 +57,7 @@
 */
 CBuildRestrictionOnTop *OnTopDetails(const wyrmgus::unit_type &type, const wyrmgus::unit_type *parent)
 {
-	for (const auto &b :type.BuildingRules) {
+	for (const std::unique_ptr<CBuildRestriction> &b : type.BuildingRules) {
 		CBuildRestrictionOnTop *ontopb = dynamic_cast<CBuildRestrictionOnTop *>(b.get());
 
 		if (ontopb) {

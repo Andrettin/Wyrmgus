@@ -1652,6 +1652,9 @@ private:
 
 VisitResult PathwayConnectionFinder::Visit(TerrainTraversal &terrainTraversal, const Vec2i &pos, const Vec2i &from)
 {
+	Q_UNUSED(terrainTraversal)
+	Q_UNUSED(from)
+
 	if (pos.x >= dst_unit.tilePos.x && pos.x <= (dst_unit.tilePos.x + dst_unit.Type->get_tile_width() - 1) && pos.y >= dst_unit.tilePos.y && pos.y <= (dst_unit.tilePos.y + dst_unit.Type->get_tile_height() - 1)) {
 		*result = true;
 		return VisitResult::Finished;

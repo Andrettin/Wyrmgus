@@ -91,14 +91,14 @@ inline int latitude_to_y(const double latitude, const double lat_per_pixel)
 	return geocoordinate::unsigned_latitude_to_y(y, lat_per_pixel);
 }
 
-inline double longitude_per_pixel(const double longitude_size, const QSize &size)
+inline double longitude_per_pixel(const double lon_size, const QSize &size)
 {
-	return longitude_size / static_cast<double>(size.width());
+	return lon_size / static_cast<double>(size.width());
 }
 
-inline double latitude_per_pixel(const double latitude_size, const QSize &size)
+inline double latitude_per_pixel(const double lat_size, const QSize &size)
 {
-	return latitude_size / static_cast<double>(size.height());
+	return lat_size / static_cast<double>(size.height());
 }
 
 extern double longitude_to_scaled_longitude(const double longitude, const std::vector<std::unique_ptr<degree_scaling>> &degree_scalings);

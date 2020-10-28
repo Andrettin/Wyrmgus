@@ -1415,10 +1415,10 @@ static void ApplyUpgradeModifier(CPlayer &player, const wyrmgus::upgrade_modifie
 			}
 			
 			for (const auto &kv_pair : um->Modifier.UnitStock) {
-				const wyrmgus::unit_type *unit_type = wyrmgus::unit_type::get_all()[kv_pair.first];
+				const wyrmgus::unit_type *stock_unit_type = wyrmgus::unit_type::get_all()[kv_pair.first];
 				const int unit_stock = kv_pair.second;
 				if (unit_stock != 0) {
-					stat.ChangeUnitStock(unit_type, unit_stock);
+					stat.ChangeUnitStock(stock_unit_type, unit_stock);
 				}
 			}
 
@@ -1532,10 +1532,10 @@ static void ApplyUpgradeModifier(CPlayer &player, const wyrmgus::upgrade_modifie
 					}
 					
 					for (const auto &kv_pair : um->Modifier.UnitStock) {
-						const wyrmgus::unit_type *unit_type = wyrmgus::unit_type::get_all()[kv_pair.first];
+						const wyrmgus::unit_type *stock_unit_type = wyrmgus::unit_type::get_all()[kv_pair.first];
 						const int unit_stock = kv_pair.second;
 						if (unit_stock < 0) {
-							unit->ChangeUnitStock(unit_type, unit_stock);
+							unit->ChangeUnitStock(stock_unit_type, unit_stock);
 						}
 					}
 				}
@@ -1708,10 +1708,10 @@ static void RemoveUpgradeModifier(CPlayer &player, const wyrmgus::upgrade_modifi
 			}
 
 			for (const auto &kv_pair : um->Modifier.UnitStock) {
-				const wyrmgus::unit_type *unit_type = wyrmgus::unit_type::get_all()[kv_pair.first];
+				const wyrmgus::unit_type *stock_unit_type = wyrmgus::unit_type::get_all()[kv_pair.first];
 				const int unit_stock = kv_pair.second;
 				if (unit_stock != 0) {
-					stat.ChangeUnitStock(unit_type, -unit_stock);
+					stat.ChangeUnitStock(stock_unit_type, -unit_stock);
 				}
 			}
 
@@ -1826,10 +1826,10 @@ static void RemoveUpgradeModifier(CPlayer &player, const wyrmgus::upgrade_modifi
 					}
 					
 					for (const auto &kv_pair : um->Modifier.UnitStock) {
-						const wyrmgus::unit_type *unit_type = wyrmgus::unit_type::get_all()[kv_pair.first];
+						const wyrmgus::unit_type *stock_unit_type = wyrmgus::unit_type::get_all()[kv_pair.first];
 						const int unit_stock = kv_pair.second;
 						if (unit_stock > 0) {
-							unit->ChangeUnitStock(unit_type, -unit_stock);
+							unit->ChangeUnitStock(stock_unit_type, -unit_stock);
 						}
 					}
 				}
