@@ -1100,7 +1100,6 @@ bool CUnit::CheckTerrainForVariation(const wyrmgus::unit_type_variation *variati
 			return false;
 		}
 
-		bool terrain_check = true;
 		for (int x = 0; x < this->Type->get_tile_width(); ++x) {
 			for (int y = 0; y < this->Type->get_tile_height(); ++y) {
 				if (CMap::Map.Info.IsPointOnMap(this->tilePos + Vec2i(x, y), this->MapLayer)) {
@@ -1277,11 +1276,11 @@ void CUnit::ChooseVariation(const wyrmgus::unit_type *new_type, bool ignore_old_
 		}
 	}
 	if (type_variations.size() > 0) {
-		this->SetVariation(type_variations[SyncRand(type_variations.size())], new_type, image_layer);
+		this->SetVariation(type_variations[SyncRand(type_variations.size())], image_layer);
 	}
 }
 
-void CUnit::SetVariation(wyrmgus::unit_type_variation *new_variation, const wyrmgus::unit_type *new_type, int image_layer)
+void CUnit::SetVariation(const wyrmgus::unit_type_variation *new_variation, const int image_layer)
 {
 	if (image_layer == -1) {
 		if (
@@ -3890,7 +3889,7 @@ CUnit *CreateResourceUnit(const Vec2i &pos, const wyrmgus::unit_type &type, int 
 	if (metal_rock_type) {
 		Vec2i metal_rock_offset((type.get_tile_size() - QSize(1, 1)) / 2);
 		for (int i = 0; i < 9; ++i) {
-			CUnit *metal_rock_unit = CreateUnit(unit->tilePos + metal_rock_offset, *metal_rock_type, CPlayer::Players[PlayerNumNeutral], z);
+			CreateUnit(unit->tilePos + metal_rock_offset, *metal_rock_type, CPlayer::Players[PlayerNumNeutral], z);
 		}
 	}
 			
@@ -6176,7 +6175,6 @@ bool CUnit::IsUniqueItemEquipped(const wyrmgus::unique_item *unique) const
 		return false;
 	}
 		
-	int item_equipped_quantity = 0;
 	for (size_t i = 0; i < this->EquippedItems[static_cast<int>(item_slot)].size(); ++i) {
 		if (EquippedItems[static_cast<int>(item_slot)][i]->get_unique() == unique) {
 			return true;

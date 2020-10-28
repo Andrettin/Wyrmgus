@@ -429,13 +429,13 @@ UStrInt GetComponent(const CUnit &unit, int index, EnumVariable e, int t)
 UStrInt GetComponent(const wyrmgus::unit_type &type, int index, EnumVariable e, int t)
 {
 	UStrInt val;
-	const wyrmgus::unit_variable *var;
+	const wyrmgus::unit_variable *var = nullptr;
 
 	Assert((unsigned int) index < UnitTypeVar.GetNumberVariable());
 
 	switch (t) {
 		case 0: // Unit:
-			var = &type.Stats[CPlayer::GetThisPlayer()->Index].Variables[index];;
+			var = &type.Stats[CPlayer::GetThisPlayer()->Index].Variables[index];
 			break;
 		case 1: // Type:
 			var = &type.MapDefaultStat.Variables[index];
@@ -570,8 +570,6 @@ static void DrawUnitInfo_Training(const CUnit &unit)
 
 static void DrawUnitInfo_portrait(const CUnit &unit)
 {
-	const wyrmgus::unit_type &type = *unit.Type;
-
 	if (UI.SingleSelectedButton) {
 		const PixelPos pos(UI.SingleSelectedButton->X, UI.SingleSelectedButton->Y);
 		 //Wyrmgus start
@@ -1304,7 +1302,6 @@ protected:
 private:
 	char Messages[MESSAGES_MAX][256];         /// Array of messages
 	int  MessagesCount;                       /// Number of messages
-	int  MessagesSameCount;                   /// Counts same message repeats
 	int  MessagesScrollY;
 	//Wyrmgus start
 	char Objectives[OBJECTIVES_MAX][256];         /// Array of objectives
@@ -1413,9 +1410,6 @@ void MessagesDisplay::DrawMessages()
 				if (z == 0) {
 					PopClipping();
 				}
-			}
-			if (MessagesCount < 1) {
-				MessagesSameCount = 0;
 			}
 			
 			//Wyrmgus start
@@ -1561,24 +1555,7 @@ bool MessagesDisplay::CheckRepeatMessage(const char *msg)
 		return false;
 	}
 	if (!strcmp(msg, Messages[MessagesCount - 1])) {
-		++MessagesSameCount;
 		return true;
-	}
-	if (MessagesSameCount > 0) {
-		//Wyrmgus start
-//		char temp[256];
-		//Wyrmgus end
-		int n = MessagesSameCount;
-
-		MessagesSameCount = 0;
-		// NOTE: vladi: yep it's a tricky one, but should work fine prbably :)
-		//Wyrmgus start
-		// we don't need a message that messages have repeated X times on top of the repeated messages
-		/*
-		snprintf(temp, sizeof(temp), _("Last message repeated ~<%d~> times"), n + 1);
-		AddMessage(temp);
-		*/
-		//Wyrmgus end
 	}
 	return false;
 }
@@ -1662,7 +1639,6 @@ void MessagesDisplay::AddUniqueMessage(const char *s)
 void MessagesDisplay::CleanMessages()
 {
 	MessagesCount = 0;
-	MessagesSameCount = 0;
 	MessagesScrollY = 0;
 	MessagesFrameTimeout = 0;
 	//Wyrmgus start

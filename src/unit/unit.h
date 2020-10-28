@@ -198,7 +198,7 @@ public:
 	bool CheckTerrainForVariation(const wyrmgus::unit_type_variation *variation) const;
 	bool CheckSeasonForVariation(const wyrmgus::unit_type_variation *variation) const;
 	void ChooseVariation(const wyrmgus::unit_type *new_type = nullptr, bool ignore_old_variation = false, int image_layer = -1);
-	void SetVariation(wyrmgus::unit_type_variation *new_variation, const wyrmgus::unit_type *new_type = nullptr, int image_layer = -1);
+	void SetVariation(const wyrmgus::unit_type_variation *new_variation, int image_layer = -1);
 	const wyrmgus::unit_type_variation *GetVariation() const;
 	const wyrmgus::unit_type_variation *GetLayerVariation(const unsigned int image_layer) const;
 	void UpdateButtonIcons();
@@ -257,7 +257,7 @@ public:
 	/// Returns true, if unit is directly seen by an allied unit.
 	bool IsVisible(const CPlayer &player) const;
 
-	inline bool IsInvisibile(const CPlayer &player) const
+	bool IsInvisibile(const CPlayer &player) const
 	{
 		return (&player != Player && !!Variable[INVISIBLE_INDEX].Value
 				&& !player.has_mutual_shared_vision_with(*Player));
@@ -277,7 +277,7 @@ public:
 	**
 	**  @return        True if alive, false otherwise.
 	*/
-	inline bool IsAliveOnMap() const
+	bool IsAliveOnMap() const
 	{
 		return !Removed && IsAlive();
 	}
@@ -289,7 +289,7 @@ public:
 	**
 	**  @return        True if visible, false otherwise.
 	*/
-	inline bool IsVisibleAsGoal(const CPlayer &player) const
+	bool IsVisibleAsGoal(const CPlayer &player) const
 	{
 		// Invisibility
 		if (IsInvisibile(player)) {
@@ -323,7 +323,7 @@ public:
 	**
 	**  @return        True if visible, false otherwise.
 	*/
-	inline bool IsVisibleOnMap(const CPlayer &player) const
+	bool IsVisibleOnMap(const CPlayer &player) const
 	{
 		return IsAliveOnMap() && !IsInvisibile(player) && IsVisible(player);
 	}
@@ -349,6 +349,11 @@ public:
 	bool IsTeamed(const CUnit &unit) const;
 
 	bool IsUnusable(bool ignore_built_state = false) const;
+
+	bool is_ai_active() const
+	{
+		return this->Active != 0;
+	}
 
 	int MapDistanceTo(const CUnit &dst) const;
 
@@ -676,7 +681,7 @@ public:
 
 	CUnit *Goal; /// Generic/Teleporter goal pointer
 
-	friend int CclUnit(lua_State *l);
+	friend static int CclUnit(lua_State *l);
 };
 
 #define NoUnitP (CUnit *)0        /// return value: for no unit found

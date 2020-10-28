@@ -1886,8 +1886,8 @@ static int CclSetUnitVariable(lua_State *l)
 			IndividualUpgradeLost(*unit, CUpgrade::get(upgrade_ident));
 		}
 	} else if (!strcmp(name, "Active")) {
-		bool ai_active = LuaToBoolean(l, 3);
-		if (ai_active != unit->Active) {
+		const bool ai_active = LuaToBoolean(l, 3);
+		if (ai_active != unit->is_ai_active()) {
 			if (ai_active) {
 				unit->Player->ChangeUnitTypeAiActiveCount(unit->Type, 1);
 			} else {
@@ -1916,7 +1916,7 @@ static int CclSetUnitVariable(lua_State *l)
 		if (image_layer != -1) {
 			size_t variation_index = LuaToNumber(l, 4);
 			if (variation_index >= 0 && variation_index < unit->Type->LayerVariations[image_layer].size()) {
-				unit->SetVariation(unit->Type->LayerVariations[image_layer][variation_index].get(), nullptr, image_layer);
+				unit->SetVariation(unit->Type->LayerVariations[image_layer][variation_index].get(), image_layer);
 			}
 		} else {
 			LuaError(l, "Image layer \"%s\" doesn't exist." _C_ image_layer_name.c_str());
