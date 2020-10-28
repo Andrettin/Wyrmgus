@@ -96,10 +96,7 @@ char CurrentMapPath[1024]; //path of the current map
 **
 **  @param mf  MapField-position.
 */
-//Wyrmgus start
-//void CMap::MarkSeenTile(CMapField &mf)
-void CMap::MarkSeenTile(CMapField &mf, int z)
-//Wyrmgus end
+void CMap::MarkSeenTile(CMapField &mf)
 {
 	//Wyrmgus start
 //	const unsigned int tile = mf.getGraphicTile();
@@ -211,7 +208,7 @@ void CMap::Reveal(bool only_person_players)
 					player_info->Visible[p] = std::max<unsigned short>(1, player_info->Visible[p]);
 				}
 			}
-			MarkSeenTile(mf, z);
+			MarkSeenTile(mf);
 		}
 	}
 	//Wyrmgus end
@@ -1186,7 +1183,7 @@ void PreprocessMap()
 				UI.get_minimap()->UpdateXY(tile_pos, z);
 				UI.get_minimap()->update_territory_xy(tile_pos, z);
 				if (mf.player_info->IsTeamVisible(*CPlayer::GetThisPlayer())) {
-					CMap::Map.MarkSeenTile(mf, z);
+					CMap::Map.MarkSeenTile(mf);
 				}
 			}
 		}
@@ -1808,7 +1805,7 @@ void CMap::SetTileTerrain(const Vec2i &pos, wyrmgus::terrain_type *terrain, int 
 	this->calculate_tile_terrain_feature(pos, z);
 	
 	if (mf.player_info->IsTeamVisible(*CPlayer::GetThisPlayer())) {
-		MarkSeenTile(mf, z);
+		MarkSeenTile(mf);
 	}
 	UI.get_minimap()->UpdateXY(pos, z);
 	
@@ -1827,7 +1824,7 @@ void CMap::SetTileTerrain(const Vec2i &pos, wyrmgus::terrain_type *terrain, int 
 					this->CalculateTileTransitions(adjacent_pos, true, z);
 					
 					if (adjacent_mf.player_info->IsTeamVisible(*CPlayer::GetThisPlayer())) {
-						MarkSeenTile(adjacent_mf, z);
+						MarkSeenTile(adjacent_mf);
 					}
 					UI.get_minimap()->UpdateXY(adjacent_pos, z);
 				}
@@ -1850,7 +1847,7 @@ void CMap::RemoveTileOverlayTerrain(const Vec2i &pos, int z)
 	this->calculate_tile_terrain_feature(pos, z);
 	
 	if (mf.player_info->IsTeamVisible(*CPlayer::GetThisPlayer())) {
-		MarkSeenTile(mf, z);
+		MarkSeenTile(mf);
 	}
 	UI.get_minimap()->UpdateXY(pos, z);
 	
@@ -1864,7 +1861,7 @@ void CMap::RemoveTileOverlayTerrain(const Vec2i &pos, int z)
 					this->CalculateTileTransitions(adjacent_pos, true, z);
 					
 					if (adjacent_mf.player_info->IsTeamVisible(*CPlayer::GetThisPlayer())) {
-						MarkSeenTile(adjacent_mf, z);
+						MarkSeenTile(adjacent_mf);
 					}
 					UI.get_minimap()->UpdateXY(adjacent_pos, z);
 				}
@@ -1924,7 +1921,7 @@ void CMap::SetOverlayTerrainDestroyed(const Vec2i &pos, bool destroyed, int z)
 	this->CalculateTileTransitions(pos, true, z);
 	
 	if (mf.player_info->IsTeamVisible(*CPlayer::GetThisPlayer())) {
-		MarkSeenTile(mf, z);
+		MarkSeenTile(mf);
 	}
 	UI.get_minimap()->UpdateXY(pos, z);
 	
@@ -1942,7 +1939,7 @@ void CMap::SetOverlayTerrainDestroyed(const Vec2i &pos, bool destroyed, int z)
 					this->CalculateTileTransitions(adjacent_pos, true, z);
 					
 					if (adjacent_mf.player_info->IsTeamVisible(*CPlayer::GetThisPlayer())) {
-						MarkSeenTile(adjacent_mf, z);
+						MarkSeenTile(adjacent_mf);
 					}
 					UI.get_minimap()->UpdateXY(adjacent_pos, z);
 				}
@@ -1972,7 +1969,7 @@ void CMap::SetOverlayTerrainDamaged(const Vec2i &pos, bool damaged, int z)
 	this->CalculateTileTransitions(pos, true, z);
 	
 	if (mf.player_info->IsTeamVisible(*CPlayer::GetThisPlayer())) {
-		MarkSeenTile(mf, z);
+		MarkSeenTile(mf);
 	}
 	UI.get_minimap()->UpdateXY(pos, z);
 }

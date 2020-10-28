@@ -1418,13 +1418,13 @@ void CommandSharedVision(int player, bool state, int opponent)
 				if (mfp->Visible[player] && !mfp->Visible[opponent] && !CPlayer::Players[player]->is_revealed()) {
 					mfp->Visible[opponent] = 1;
 					if (opponent == CPlayer::GetThisPlayer()->Index) {
-						CMap::Map.MarkSeenTile(mf, z);
+						CMap::Map.MarkSeenTile(mf);
 					}
 				}
 				if (mfp->Visible[opponent] && !mfp->Visible[player] && !CPlayer::Players[opponent]->is_revealed()) {
 					mfp->Visible[player] = 1;
 					if (player == CPlayer::GetThisPlayer()->Index) {
-						CMap::Map.MarkSeenTile(mf, z);
+						CMap::Map.MarkSeenTile(mf);
 					}
 				}
 			}

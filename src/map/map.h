@@ -225,7 +225,7 @@ public:
 	//Wyrmgus end
 
 	/// Mark a tile as seen by the player.
-	void MarkSeenTile(CMapField &mf, int z);
+	void MarkSeenTile(CMapField &mf);
 
 	/// Regenerate the forest.
 	void RegenerateForest();

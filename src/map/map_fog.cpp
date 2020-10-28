@@ -262,10 +262,7 @@ void MapMarkTileSight(const CPlayer &player, const unsigned int index, int z)
 		}
 		*v = 2;
 		if (mf.player_info->IsTeamVisible(*CPlayer::GetThisPlayer())) {
-			//Wyrmgus start
-//			CMap::Map.MarkSeenTile(mf);
-			CMap::Map.MarkSeenTile(mf, z);
-			//Wyrmgus end
+			CMap::Map.MarkSeenTile(mf);
 		}
 		return;
 	}
@@ -313,10 +310,7 @@ void MapUnmarkTileSight(const CPlayer &player, const unsigned int index, int z)
 			}
 			// Check visible Tile, then deduct...
 			if (mf.player_info->IsTeamVisible(*CPlayer::GetThisPlayer())) {
-				//Wyrmgus start
-//				CMap::Map.MarkSeenTile(mf);
-				CMap::Map.MarkSeenTile(mf, z);
-				//Wyrmgus end
+				CMap::Map.MarkSeenTile(mf);
 			}
 		default:  // seen -> seen
 			--*v;
@@ -670,7 +664,7 @@ void UpdateFogOfWarChange()
 			for (unsigned int index = 0; index != w; ++index) {
 				CMapField &mf = *CMap::Map.Field(index, z);
 				if (mf.player_info->IsExplored(*CPlayer::GetThisPlayer())) {
-					CMap::Map.MarkSeenTile(mf, z);
+					CMap::Map.MarkSeenTile(mf);
 				}
 			}
 		}

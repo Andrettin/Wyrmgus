@@ -1088,8 +1088,8 @@ static int CclDefineLanguageWord(lua_State *l)
 				std::vector<std::string> word_meanings;
 				lua_rawgeti(l, -1, j + 1);
 				if (lua_istable(l, -1)) {
-					const int subargs = lua_rawlen(l, -1);
-					for (int k = 0; k < subargs; ++k) {
+					const int subsubargs = lua_rawlen(l, -1);
+					for (int k = 0; k < subsubargs; ++k) {
 						word_meanings.push_back(LuaToString(l, -1, k + 1));
 					}
 					

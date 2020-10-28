@@ -2917,7 +2917,7 @@ static int CclDefineDecorations(lua_State *l)
 		bool already_defined = false;
 		for (std::vector<CDecoVar *>::iterator it = UnitTypeVar.DecoVar.begin();
 			 it != UnitTypeVar.DecoVar.end(); ++it) {
-			if ((*it)->Index == tmp.Index) { // replace other decorations which use the same variable
+			if (static_cast<int>((*it)->Index) == tmp.Index) { // replace other decorations which use the same variable
 				*it = decovar;
 				already_defined = true;
 			}
