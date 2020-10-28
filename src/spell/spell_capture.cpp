@@ -40,7 +40,7 @@
 #include "unit/unit_find.h"
 //Wyrmgus end
 
-/* virtual */ void Spell_Capture::Parse(lua_State *l, int startIndex, int endIndex)
+void Spell_Capture::Parse(lua_State *l, int startIndex, int endIndex)
 {
 	for (int j = startIndex; j < endIndex; ++j) {
 		const char *value = LuaToString(l, -1, j + 1);
@@ -69,8 +69,10 @@
 **
 **  @return             =!0 if spell should be repeated, 0 if not
 */
-int Spell_Capture::Cast(CUnit &caster, const wyrmgus::spell &spell, CUnit *target, const Vec2i &/*goalPos*/, int /*z*/, int modifier)
+int Spell_Capture::Cast(CUnit &caster, const wyrmgus::spell &spell, CUnit *target, const Vec2i &/*goalPos*/, int /*z*/, const int modifier)
 {
+	Q_UNUSED(modifier)
+
 	if (!target || caster.Player == target->Player) {
 		return 0;
 	}

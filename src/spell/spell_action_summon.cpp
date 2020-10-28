@@ -113,12 +113,12 @@ public:
 **
 **  @return             =!0 if spell should be repeated, 0 if not
 */
-int spell_action_summon::Cast(CUnit &caster, const spell &spell, CUnit *target, const Vec2i &goalPos, int z, int modifier)
+int spell_action_summon::Cast(CUnit &caster, const spell &spell, CUnit *target, const Vec2i &goalPos, const int z, const int modifier)
 {
 	Vec2i pos = goalPos;
 	bool cansummon;
 	unit_type &unittype = *this->UnitType;
-	int ttl = this->TTL;
+	const int ttl = this->TTL * modifier / 100;
 
 	if (this->RequireCorpse) {
 		const Vec2i offset(1, 1);
@@ -130,7 +130,6 @@ int spell_action_summon::Cast(CUnit &caster, const spell &spell, CUnit *target, 
 
 		if (unit != nullptr) { //  Found a corpse. eliminate it and proceed to summoning.
 			pos = unit->tilePos;
-			z = unit->MapLayer->ID;
 			unit->Remove(nullptr);
 			unit->Release();
 			cansummon = true;

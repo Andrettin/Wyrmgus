@@ -62,6 +62,7 @@ int Spell_Retrain::Cast(CUnit &caster, const wyrmgus::spell &, CUnit *, const Ve
 {
 	Q_UNUSED(goalPos)
 	Q_UNUSED(z)
+	Q_UNUSED(modifier)
 
 	caster.Retrain();
 	

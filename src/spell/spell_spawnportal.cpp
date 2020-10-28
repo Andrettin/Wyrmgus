@@ -73,6 +73,8 @@ int Spell_SpawnPortal::Cast(CUnit &caster, const wyrmgus::spell &, CUnit *, cons
 	// FIXME: vladi: cop should be placed only on explored land
 	CUnit *portal = caster.Goal;
 
+	const int ttl = this->TTL * modifier / 100;
+
 	DebugPrint("Spawning a portal exit.\n");
 	if (portal && portal->IsAlive()) {
 		//Wyrmgus start
@@ -87,7 +89,7 @@ int Spell_SpawnPortal::Cast(CUnit &caster, const wyrmgus::spell &, CUnit *, cons
 								  //Wyrmgus end
 		portal->Summoned = 1;
 	}
-	portal->TTL = GameCycle + this->TTL;
+	portal->TTL = GameCycle + ttl;
 	//  Goal is used to link to destination circle of power
 	caster.Goal = portal;
 	//FIXME: setting destination circle of power should use mana

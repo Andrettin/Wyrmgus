@@ -56,6 +56,8 @@
 */
 int Spell_Teleport::Cast(CUnit &caster, const wyrmgus::spell &spell, CUnit * /*target*/, const Vec2i &goalPos, int z, int modifier)
 {
+	Q_UNUSED(spell)
+
 	if (CMap::Map.Info.IsPointOnMap(goalPos, z)) {
 		unsigned int selected = caster.Selected;
 		caster.Remove(nullptr);
