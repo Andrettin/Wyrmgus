@@ -77,7 +77,7 @@ void font::drawString(gcn::Graphics *graphics, const std::string &txt, int x, in
 **  @param y   Y screen position
 */
 static void VideoDrawChar(const CGraphic &g,
-						  int gx, int gy, int w, int h, int x, int y, const wyrmgus::font_color &fc)
+						  int gx, int gy, int w, int h, int x, int y)
 {
 #if defined(USE_OPENGL) || defined(USE_GLES)
 	g.DrawSub(gx, gy, w, h, x, y);
@@ -306,20 +306,20 @@ font::~font()
 **  @param y   Y screen position
 */
 static void VideoDrawCharClip(const CGraphic &g, int gx, int gy, int w, int h,
-							  int x, int y, const wyrmgus::font_color &fc)
+							  int x, int y)
 {
 	int ox;
 	int oy;
 	int ex;
 	CLIP_RECTANGLE_OFS(x, y, w, h, ox, oy, ex);
 	UNUSED(ex);
-	VideoDrawChar(g, gx + ox, gy + oy, w, h, x, y, fc);
+	VideoDrawChar(g, gx + ox, gy + oy, w, h, x, y);
 }
 
 namespace wyrmgus {
 
 template<bool CLIP>
-unsigned int font::DrawChar(CGraphic &g, int utf8, int x, int y, const wyrmgus::font_color &fc) const
+unsigned int font::DrawChar(CGraphic &g, int utf8, int x, int y) const
 {
 	int c = utf8 - 32;
 	Assert(c >= 0);
@@ -332,10 +332,10 @@ unsigned int font::DrawChar(CGraphic &g, int utf8, int x, int y, const wyrmgus::
 	const int gx = (c % ipr) * this->G->Width;
 	const int gy = (c / ipr) * this->G->Height;
 
-	if (CLIP) {
-		VideoDrawCharClip(g, gx, gy, w, this->G->Height, x , y, fc);
+	if constexpr (CLIP) {
+		VideoDrawCharClip(g, gx, gy, w, this->G->Height, x , y);
 	} else {
-		VideoDrawChar(g, gx, gy, w, this->G->Height, x, y, fc);
+		VideoDrawChar(g, gx, gy, w, this->G->Height, x, y);
 	}
 	return w + 1;
 }
@@ -455,10 +455,10 @@ int CLabel::DoDrawText(int x, int y,
 		}
 		if (tab) {
 			for (int tabs = 0; tabs < tabSize; ++tabs) {
-				widths += font->DrawChar<CLIP>(*g, ' ', x + widths, y, *fc);
+				widths += font->DrawChar<CLIP>(*g, ' ', x + widths, y);
 			}
 		} else {
-			widths += font->DrawChar<CLIP>(*g, utf8, x + widths, y, *fc);
+			widths += font->DrawChar<CLIP>(*g, utf8, x + widths, y);
 		}
 
 		if (isColor == false && fc != backup) {

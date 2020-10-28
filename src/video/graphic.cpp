@@ -105,10 +105,7 @@ void CGraphic::DrawClip(int x, int y) const
 **  @param x   X screen position
 **  @param y   Y screen position
 */
-//Wyrmgus start
-//void CGraphic::DrawSub(int gx, int gy, int w, int h, int x, int y) const
-void CGraphic::DrawSub(int gx, int gy, int w, int h, int x, int y, SDL_Surface *surface) const
-//Wyrmgus end
+void CGraphic::DrawSub(const int gx, const int gy, const int w, const int h, const int x, const int y) const
 {
 #if defined(USE_OPENGL) || defined(USE_GLES)
 	DrawTexture(this, this->textures.get(), gx, gy, gx + w, gy + h, x, y, 0);
@@ -143,12 +140,12 @@ void CPlayerColorGraphic::DrawPlayerColorSub(const wyrmgus::player_color *player
 	DrawTexture(this, this->get_textures(player_color), gx, gy, gx + w, gy + h, x, y, 0);
 }
 
-void CGraphic::DrawSubClip(int gx, int gy, int w, int h, int x, int y, SDL_Surface *surface) const
+void CGraphic::DrawSubClip(const int gx, const int gy, int w, int h, int x, int y) const
 {
 	int oldx = x;
 	int oldy = y;
 	CLIP_RECTANGLE(x, y, w, h);
-	DrawSub(gx + x - oldx, gy + y - oldy, w, h, x, y, surface);
+	DrawSub(gx + x - oldx, gy + y - oldy, w, h, x, y);
 }
 
 void CGraphic::DrawGrayscaleSubClip(int gx, int gy, int w, int h, int x, int y) const
@@ -178,11 +175,7 @@ void CPlayerColorGraphic::DrawPlayerColorSubClip(const wyrmgus::player_color *pl
 **  @param y      Y screen position
 **  @param alpha  Alpha
 */
-void CGraphic::DrawSubTrans(int gx, int gy, int w, int h, int x, int y,
-							//Wyrmgus start
-//							unsigned char alpha) const
-							unsigned char alpha, SDL_Surface *surface) const
-							//Wyrmgus end
+void CGraphic::DrawSubTrans(const int gx, const int gy, const int w, const int h, const int x, const int y, const unsigned char alpha) const
 {
 #if defined(USE_OPENGL) || defined(USE_GLES)
 	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
@@ -203,19 +196,12 @@ void CGraphic::DrawSubTrans(int gx, int gy, int w, int h, int x, int y,
 **  @param y      Y screen position
 **  @param alpha  Alpha
 */
-void CGraphic::DrawSubClipTrans(int gx, int gy, int w, int h, int x, int y,
-								//Wyrmgus start
-//								unsigned char alpha) const
-								unsigned char alpha, SDL_Surface *surface) const
-								//Wyrmgus end
+void CGraphic::DrawSubClipTrans(const int gx, const int gy, int w, int h, int x, int y, const unsigned char alpha) const
 {
 	int oldx = x;
 	int oldy = y;
 	CLIP_RECTANGLE(x, y, w, h);
-	//Wyrmgus start
-//	DrawSubTrans(gx + x - oldx, gy + y - oldy, w, h, x, y, alpha);
-	DrawSubTrans(gx + x - oldx, gy + y - oldy, w, h, x, y, alpha, surface);
-	//Wyrmgus end
+	DrawSubTrans(gx + x - oldx, gy + y - oldy, w, h, x, y, alpha);
 }
 
 /**
@@ -257,7 +243,7 @@ void CGraphic::DoDrawFrameClip(const GLuint *textures,
 **  @param x       x coordinate on the screen
 **  @param y       y coordinate on the screen
 */
-void CGraphic::DrawFrameClip(unsigned frame, int x, int y, const wyrmgus::time_of_day *time_of_day, SDL_Surface *surface, int show_percent)
+void CGraphic::DrawFrameClip(unsigned frame, int x, int y, const wyrmgus::time_of_day *time_of_day, int show_percent)
 {
 	if (time_of_day == nullptr || !time_of_day->HasColorModification()) {
 		DoDrawFrameClip(this->textures.get(), frame, x, y, show_percent);
@@ -277,12 +263,12 @@ void CGraphic::DrawFrameTrans(unsigned frame, int x, int y, int alpha) const
 	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
 }
 
-void CGraphic::DrawFrameClipTrans(unsigned frame, int x, int y, int alpha, const wyrmgus::time_of_day *time_of_day, SDL_Surface *surface, int show_percent)
+void CGraphic::DrawFrameClipTrans(const unsigned frame, const int x, const int y, const int alpha, const wyrmgus::time_of_day *time_of_day, const int show_percent)
 {
 #if defined(USE_OPENGL) || defined(USE_GLES)
 	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 	glColor4ub(255, 255, 255, alpha);
-	DrawFrameClip(frame, x, y, time_of_day, surface, show_percent);
+	DrawFrameClip(frame, x, y, time_of_day, show_percent);
 	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
 #endif
 }
@@ -404,7 +390,7 @@ void CGraphic::DoDrawFrameClipX(const GLuint *textures, unsigned frame,
 */
 //Wyrmgus start
 //void CGraphic::DrawFrameClipX(unsigned frame, int x, int y) const
-void CGraphic::DrawFrameClipX(unsigned frame, int x, int y, const wyrmgus::time_of_day *time_of_day, SDL_Surface *surface)
+void CGraphic::DrawFrameClipX(unsigned frame, int x, int y, const wyrmgus::time_of_day *time_of_day)
 //Wyrmgus end
 {
 	if (time_of_day == nullptr || !time_of_day->HasColorModification()) {
@@ -429,7 +415,7 @@ void CGraphic::DrawFrameTransX(unsigned frame, int x, int y, int alpha) const
 
 //Wyrmgus start
 //void CGraphic::DrawFrameClipTransX(unsigned frame, int x, int y, int alpha) const
-void CGraphic::DrawFrameClipTransX(unsigned frame, int x, int y, int alpha, const wyrmgus::time_of_day *time_of_day, SDL_Surface *surface)
+void CGraphic::DrawFrameClipTransX(const unsigned frame, const int x, const int y, const int alpha, const wyrmgus::time_of_day *time_of_day)
 //Wyrmgus end
 {
 #if defined(USE_OPENGL) || defined(USE_GLES)
@@ -963,7 +949,7 @@ static int PowerOf2(int x)
 **  @param ow       Offset width.
 **  @param oh       Offset height.
 */
-void MakeTextures2(const CGraphic *g, const QImage &image, GLuint texture, const int ow, const int oh, const wyrmgus::time_of_day *time_of_day)
+void MakeTextures2(const QImage &image, GLuint texture, const int ow, const int oh, const wyrmgus::time_of_day *time_of_day)
 {
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 	int maxw = std::min<int>(image.width() - ow, GLMaxTextureSize);
@@ -1161,7 +1147,7 @@ static void MakeTextures(CGraphic *g, const bool grayscale, const wyrmgus::playe
 
 	for (int j = 0; j < th; ++j) {
 		for (int i = 0; i < tw; ++i) {
-			MakeTextures2(g, image, textures[j * tw + i], GLMaxTextureSize * i, GLMaxTextureSize * j, time_of_day);
+			MakeTextures2(image, textures[j * tw + i], GLMaxTextureSize * i, GLMaxTextureSize * j, time_of_day);
 		}
 	}
 }

@@ -35,7 +35,7 @@ class CConfigData;
 class CUpgrade;
 struct lua_State;
 
-int CclDefineModifier(lua_State *l);
+static int CclDefineModifier(lua_State *l);
 
 namespace wyrmgus {
 
@@ -105,7 +105,7 @@ public:
 	std::vector<CUpgrade *> RemoveUpgrades;	/// Upgrades to be removed when this upgrade modifier is implented
 	//Wyrmgus end
 
-	friend int ::CclDefineModifier(lua_State *l);
+	friend static int ::CclDefineModifier(lua_State *l);
 };
 
 }

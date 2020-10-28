@@ -1005,22 +1005,15 @@ void ToggleFullScreen()
 #if defined(USE_WIN32) || defined(__APPLE__)
 	long framesize;
 	SDL_Rect clip;
-	Uint32 flags;
-	int w;
-	int h;
-	int bpp;
-	unsigned char *pixels = nullptr;
-	SDL_Color *palette = nullptr;
-	int ncolors = 0;
 
 	if (!TheScreen) { // don't bother if there's no surface.
 		return;
 	}
 
-	flags = TheScreen->flags;
-	w = TheScreen->w;
-	h = TheScreen->h;
-	bpp = TheScreen->format->BitsPerPixel;
+	Uint32 flags = TheScreen->flags;
+	int w = TheScreen->w;
+	int h = TheScreen->h;
+	int bpp = TheScreen->format->BitsPerPixel;
 
 	if (!SDL_VideoModeOK(w, h, bpp,	flags ^ SDL_FULLSCREEN)) {
 		return;

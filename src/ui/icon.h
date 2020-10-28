@@ -61,7 +61,7 @@ class CPlayerColorGraphic;
 class ButtonStyle;
 struct lua_State;
 
-int CclDefineIcon(lua_State *l);
+static int CclDefineIcon(lua_State *l);
 
 namespace wyrmgus {
 
@@ -111,7 +111,7 @@ public:
 private:
 	player_color *conversible_player_color = nullptr;
 
-	friend int ::CclDefineIcon(lua_State *l);
+	friend static int ::CclDefineIcon(lua_State *l);
 };
 
 }

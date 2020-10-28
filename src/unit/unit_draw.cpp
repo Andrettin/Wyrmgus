@@ -66,8 +66,6 @@
 class Decoration
 {
 public:
-	Decoration() {}
-
 	std::string File; /// File containing the graphics data
 	PixelPos HotPos = PixelPos(0, 0);  /// drawing position (relative)
 	int Width = 0;        /// width of the decoration
@@ -106,10 +104,6 @@ unsigned long ShowNameTime;                  /// Show unit's name for some time
 **  @param x2,y2    Coordinates of the bottom right corner.
 */
 void (*DrawSelection)(IntColor color, int x1, int y1, int x2, int y2) = DrawSelectionNone;
-
-/*----------------------------------------------------------------------------
---  Functions
-----------------------------------------------------------------------------*/
 
 // FIXME: clean split screen support
 // FIXME: integrate this with global versions of these functions in map.c

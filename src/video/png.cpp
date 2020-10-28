@@ -44,23 +44,6 @@
 #include "iolib.h"
 #include "iocompat.h"
 
-/**
-**  png read callback for CL-IO.
-**
-**  @param png_ptr  png struct pointer.
-**  @param data     byte address to read to.
-**  @param length   number of bytes to read.
-*/
-static void CL_png_read_data(png_structp png_ptr, png_bytep data, png_size_t length)
-{
-	CFile *f = (CFile *)png_get_io_ptr(png_ptr);
-	png_size_t check = (png_size_t)f->read(data, (size_t)length);
-
-	if (check != length) {
-		png_error(png_ptr, "Read Error");
-	}
-}
-
 class AutoPng_read_structp
 {
 public:

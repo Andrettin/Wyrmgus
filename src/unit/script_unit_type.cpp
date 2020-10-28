@@ -925,7 +925,6 @@ static int CclDefineUnitType(lua_State *l)
 			for (int j = 0; j < args; ++j) {
 				lua_rawgeti(l, -1, j + 1);
 				const int subargs = lua_rawlen(l, -1);
-				int image_layer = 0;
 				for (int k = 0; k < subargs; ++k) {
 					const ButtonCmd button_action = GetButtonActionIdByName(LuaToString(l, -1, k + 1));
 					++k;
@@ -943,7 +942,6 @@ static int CclDefineUnitType(lua_State *l)
 			for (int j = 0; j < args; ++j) {
 				lua_rawgeti(l, -1, j + 1);
 				const int subargs = lua_rawlen(l, -1);
-				int image_layer = 0;
 				for (int k = 0; k < subargs; ++k) {
 					const wyrmgus::item_slot item_slot = wyrmgus::string_to_item_slot(LuaToString(l, -1, k + 1));
 					++k;

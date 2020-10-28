@@ -78,7 +78,7 @@ public:
 	CGraphic *GetFontColorGraphic(const wyrmgus::font_color &fontColor) const;
 
 	template<bool CLIP>
-	unsigned int DrawChar(CGraphic &g, int utf8, int x, int y, const wyrmgus::font_color &fc) const;
+	unsigned int DrawChar(CGraphic &g, int utf8, int x, int y) const;
 
 private:
 #if defined(USE_OPENGL) || defined(USE_GLES)

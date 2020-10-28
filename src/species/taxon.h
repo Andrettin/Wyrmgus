@@ -32,11 +32,11 @@
 
 struct lua_State;
 
-int CclDefineSpeciesGenus(lua_State *l);
-int CclDefineSpeciesFamily(lua_State *l);
-int CclDefineSpeciesOrder(lua_State *l);
-int CclDefineSpeciesClass(lua_State *l);
-int CclDefineSpeciesPhylum(lua_State *l);
+static int CclDefineSpeciesGenus(lua_State *l);
+static int CclDefineSpeciesFamily(lua_State *l);
+static int CclDefineSpeciesOrder(lua_State *l);
+static int CclDefineSpeciesClass(lua_State *l);
+static int CclDefineSpeciesPhylum(lua_State *l);
 
 namespace wyrmgus {
 
@@ -126,11 +126,11 @@ private:
 	taxonomic_rank rank;
 	taxon *supertaxon = nullptr;
 
-	friend int ::CclDefineSpeciesGenus(lua_State *l);
-	friend int ::CclDefineSpeciesFamily(lua_State *l);
-	friend int ::CclDefineSpeciesOrder(lua_State *l);
-	friend int ::CclDefineSpeciesClass(lua_State *l);
-	friend int ::CclDefineSpeciesPhylum(lua_State *l);
+	friend static int ::CclDefineSpeciesGenus(lua_State *l);
+	friend static int ::CclDefineSpeciesFamily(lua_State *l);
+	friend static int ::CclDefineSpeciesOrder(lua_State *l);
+	friend static int ::CclDefineSpeciesClass(lua_State *l);
+	friend static int ::CclDefineSpeciesPhylum(lua_State *l);
 };
 
 }

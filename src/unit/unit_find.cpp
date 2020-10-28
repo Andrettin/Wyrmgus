@@ -71,6 +71,8 @@ CUnit *UnitFinder::FindUnitAtPos(const Vec2i &pos) const
 
 VisitResult UnitFinder::Visit(TerrainTraversal &terrainTraversal, const Vec2i &pos, const Vec2i &from)
 {
+	Q_UNUSED(from)
+
 	if (!CMap::Map.Field(pos, z)->player_info->IsTeamExplored(player)) {
 		return VisitResult::DeadEnd;
 	}
@@ -119,6 +121,8 @@ private:
 
 VisitResult TerrainFinder::Visit(TerrainTraversal &terrainTraversal, const Vec2i &pos, const Vec2i &from)
 {
+	Q_UNUSED(from)
+
 	if (!CMap::Map.Field(pos, z)->player_info->IsTeamExplored(player)) {
 		return VisitResult::DeadEnd;
 	}
@@ -593,6 +597,8 @@ void ResourceUnitFinder::ResourceUnitFinder_Cost::SetFrom(const CUnit &mine, con
 
 VisitResult ResourceUnitFinder::Visit(TerrainTraversal &terrainTraversal, const Vec2i &pos, const Vec2i &from)
 {
+	Q_UNUSED(from)
+
 	//Wyrmgus start
 //	if (!worker.Player->AiEnabled && !Map.Field(pos)->player_info->IsExplored(*worker.Player)) {
 	if (!worker.MapLayer->Field(pos)->player_info->IsTeamExplored(*worker.Player) && !ignore_exploration) {

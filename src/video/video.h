@@ -86,29 +86,27 @@ public:
 
 	// Draw
 	void DrawClip(int x, int y) const;
-	void DrawSub(int gx, int gy, int w, int h, int x, int y, SDL_Surface *surface = nullptr) const;
+	void DrawSub(int gx, int gy, int w, int h, int x, int y) const;
 	void DrawGrayscaleSub(int gx, int gy, int w, int h, int x, int y) const;
-	void DrawSubClip(int gx, int gy, int w, int h, int x, int y, SDL_Surface *surface = nullptr) const;
+	void DrawSubClip(int gx, int gy, int w, int h, int x, int y) const;
 	void DrawGrayscaleSubClip(int gx, int gy, int w, int h, int x, int y) const;
-	void DrawSubTrans(int gx, int gy, int w, int h, int x, int y,
-					  unsigned char alpha, SDL_Surface *surface = nullptr) const;
-	void DrawSubClipTrans(int gx, int gy, int w, int h, int x, int y,
-						  unsigned char alpha, SDL_Surface *surface = nullptr) const;
+	void DrawSubTrans(int gx, int gy, int w, int h, int x, int y, unsigned char alpha) const;
+	void DrawSubClipTrans(int gx, int gy, int w, int h, int x, int y, unsigned char alpha) const;
 
 	// Draw frame
 	void DrawFrame(unsigned frame, int x, int y) const;
 	void DoDrawFrameClip(const GLuint *textures, unsigned frame, int x, int y, int show_percent = 100) const;
-	void DrawFrameClip(unsigned frame, int x, int y, const wyrmgus::time_of_day *time_of_day = nullptr, SDL_Surface *surface = nullptr, int show_percent = 100);
+	void DrawFrameClip(unsigned frame, int x, int y, const wyrmgus::time_of_day *time_of_day = nullptr, int show_percent = 100);
 	void DrawFrameTrans(unsigned frame, int x, int y, int alpha) const;
-	void DrawFrameClipTrans(unsigned frame, int x, int y, int alpha, const wyrmgus::time_of_day *time_of_day = nullptr, SDL_Surface *surface = nullptr, int show_percent = 100);
+	void DrawFrameClipTrans(unsigned frame, int x, int y, int alpha, const wyrmgus::time_of_day *time_of_day = nullptr, int show_percent = 100);
 	void DrawGrayscaleFrameClip(unsigned frame, int x, int y, int show_percent = 100);
 
 	// Draw frame flipped horizontally
 	void DrawFrameX(unsigned frame, int x, int y) const;
 	void DoDrawFrameClipX(const GLuint *textures, unsigned frame, int x, int y) const;
-	void DrawFrameClipX(unsigned frame, int x, int y, const wyrmgus::time_of_day *time_of_day = nullptr, SDL_Surface *surface = nullptr);
+	void DrawFrameClipX(unsigned frame, int x, int y, const wyrmgus::time_of_day *time_of_day = nullptr);
 	void DrawFrameTransX(unsigned frame, int x, int y, int alpha) const;
-	void DrawFrameClipTransX(unsigned frame, int x, int y, int alpha, const wyrmgus::time_of_day *time_of_day = nullptr, SDL_Surface *surface = nullptr);
+	void DrawFrameClipTransX(unsigned frame, int x, int y, int alpha, const wyrmgus::time_of_day *time_of_day = nullptr);
 
 	static std::shared_ptr<CGraphic> New(const std::string &filepath, const int w = 0, const int h = 0);
 
@@ -531,7 +529,7 @@ extern int LoadGraphicPNG(CGraphic *g, const int scale_factor);
 /// Make an OpenGL texture
 extern void MakeTexture(CGraphic *graphic, const bool grayscale, const wyrmgus::time_of_day *time_of_day);
 //Wyrmgus start
-extern void MakeTextures2(const CGraphic *g, const QImage &image, GLuint texture, const int ow, const int oh, const wyrmgus::time_of_day *time_of_day = nullptr);
+extern void MakeTextures2(const QImage &image, GLuint texture, const int ow, const int oh, const wyrmgus::time_of_day *time_of_day = nullptr);
 //Wyrmgus end
 extern void MakePlayerColorTexture(CPlayerColorGraphic *graphic, const wyrmgus::player_color *player_color, const wyrmgus::time_of_day *time_of_day = nullptr);
 

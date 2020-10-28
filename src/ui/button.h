@@ -36,7 +36,7 @@
 class CUnit;
 struct lua_State;
 
-int CclDefineButton(lua_State *l);
+static int CclDefineButton(lua_State *l);
 
 namespace wyrmgus {
 
@@ -160,7 +160,7 @@ public:
 	std::string Popup;          /// Popup screen used for button
 	std::string Mod;			/// Mod to which this button belongs to
 
-	friend int ::CclDefineButton(lua_State *l);
+	friend static int ::CclDefineButton(lua_State *l);
 };
 
 }
