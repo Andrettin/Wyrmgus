@@ -34,7 +34,7 @@ class CPlayer;
 class LuaCallback;
 struct lua_State;
 
-int CclDefineDialogue(lua_State *l);
+static int CclDefineDialogue(lua_State *l);
 
 namespace wyrmgus {
 
@@ -64,7 +64,7 @@ public:
 private:
 	std::vector<std::unique_ptr<dialogue_node>> nodes;	/// The nodes of the dialogue
 
-	friend int ::CclDefineDialogue(lua_State *l);
+	friend static int ::CclDefineDialogue(lua_State *l);
 };
 
 class dialogue_node
@@ -92,7 +92,7 @@ public:
 	std::unique_ptr<LuaCallback> ImmediateEffects;
 	std::vector<std::unique_ptr<dialogue_option>> options;
 
-	friend int ::CclDefineDialogue(lua_State *l);
+	friend static int ::CclDefineDialogue(lua_State *l);
 };
 
 }

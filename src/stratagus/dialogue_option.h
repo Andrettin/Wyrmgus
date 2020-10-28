@@ -31,7 +31,7 @@ class CPlayer;
 class LuaCallback;
 struct lua_State;
 
-int CclDefineDialogue(lua_State *l);
+static int CclDefineDialogue(lua_State *l);
 
 namespace wyrmgus {
 
@@ -63,7 +63,7 @@ private:
 	std::unique_ptr<LuaCallback> lua_effects = nullptr;
 	std::string tooltip;
 
-	friend int ::CclDefineDialogue(lua_State *l);
+	friend static int ::CclDefineDialogue(lua_State *l);
 };
 
 }

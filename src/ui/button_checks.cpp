@@ -85,11 +85,11 @@ bool ButtonCheckFalse(const CUnit &, const wyrmgus::button &)
 */
 bool ButtonCheckUpgrade(const CUnit &unit, const wyrmgus::button &button)
 {
-	CPlayer *player = unit.Player;
+	const CPlayer *player = unit.Player;
 	std::unique_ptr<char[]> buf = new_strdup(button.AllowStr.c_str());
 
 	for (const char *s = strtok(buf.get(), ","); s; s = strtok(nullptr, ",")) {
-		if (UpgradeIdentAllowed(*unit.Player, s) != 'R') {
+		if (UpgradeIdentAllowed(*player, s) != 'R') {
 			return false;
 		}
 	}
@@ -119,11 +119,11 @@ bool ButtonCheckUpgradeNot(const CUnit &unit, const wyrmgus::button &button)
 */
 bool ButtonCheckUpgradeOr(const CUnit &unit, const wyrmgus::button &button)
 {
-	CPlayer *player = unit.Player;
+	const CPlayer *player = unit.Player;
 	std::unique_ptr<char[]> buf = new_strdup(button.AllowStr.c_str());
 
 	for (const char *s = strtok(buf.get(), ","); s; s = strtok(nullptr, ",")) {
-		if (UpgradeIdentAllowed(*unit.Player, s) == 'R') {
+		if (UpgradeIdentAllowed(*player, s) == 'R') {
 			return true;
 		}
 	}
@@ -471,6 +471,8 @@ bool ButtonCheckSingleResearch(const CUnit &unit, const wyrmgus::button &button)
 */
 bool ButtonCheckHasInventory(const CUnit &unit, const wyrmgus::button &button)
 {
+	Q_UNUSED(button)
+
 	return Selected.size() == 1 && unit.HasInventory();
 }
 

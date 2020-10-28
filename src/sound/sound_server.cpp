@@ -335,7 +335,7 @@ static void MixIntoBuffer(void *buffer, int samples)
 */
 static void FillAudio(void *, Uint8 *stream, int len)
 {
-	Assert((len/2) != Audio.Format.size);
+	Assert((len/2) != static_cast<int>(Audio.Format.size));
 
 	if (Audio.Running == false)
 		return;

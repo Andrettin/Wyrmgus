@@ -84,11 +84,7 @@ int Spell_AreaAdjustVital::Cast(CUnit &caster, const wyrmgus::spell &spell, CUni
 	int shield = this->Shield * modifier / 100;
 	for (size_t j = 0; j != units.size(); ++j) {
 		target = units[j];
-		// if (!PassCondition(caster, spell, target, goalPos) {
-		//Wyrmgus start
-//		if (!CanCastSpell(caster, spell, target, goalPos)) {
-		if (!CanCastSpell(caster, spell, target, goalPos, CMap::Map.MapLayers[z].get())) {
-		//Wyrmgus end
+		if (!CanCastSpell(caster, spell, target)) {
 			continue;
 		}
 		if (hp < 0) {

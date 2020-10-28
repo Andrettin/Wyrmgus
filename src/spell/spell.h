@@ -336,8 +336,7 @@ private:
 extern void SpellCclRegister();
 
 /// returns true if spell can be casted (enough mana, valid target)
-extern bool CanCastSpell(const CUnit &caster, const wyrmgus::spell &spell,
-						 const CUnit *target, const Vec2i &goalPos, const CMapLayer *map_layer);
+extern bool CanCastSpell(const CUnit &caster, const wyrmgus::spell &spell, const CUnit *target);
 
 /// cast spell on target unit or place at x,y
 extern int SpellCast(CUnit &caster, const wyrmgus::spell &spell,

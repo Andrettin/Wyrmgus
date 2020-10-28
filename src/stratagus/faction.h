@@ -40,7 +40,7 @@ class CForceTemplate;
 class CUpgrade;
 class LuaCallback;
 
-int CclDefineFaction(lua_State *l);
+static int CclDefineFaction(lua_State *l);
 
 namespace wyrmgus {
 
@@ -411,7 +411,7 @@ public:
 	std::vector<std::pair<CDate, std::string>> HistoricalCapitals;		/// historical capitals of the faction; the values are: date and settlement ident
 	std::string Mod;							/// To which mod (or map), if any, this faction belongs
 
-	friend int ::CclDefineFaction(lua_State *l);
+	friend static int ::CclDefineFaction(lua_State *l);
 };
 
 }

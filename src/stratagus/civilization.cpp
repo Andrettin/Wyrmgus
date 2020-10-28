@@ -120,8 +120,6 @@ void civilization::process_sml_scope(const sml_data &scope)
 		});
 	} else if (tag == "force_templates") {
 		scope.for_each_child([&](const sml_data &child_scope) {
-			const std::string &tag = child_scope.get_tag();
-
 			auto force = std::make_unique<CForceTemplate>();
 
 			child_scope.for_each_element([&](const sml_property &property) {

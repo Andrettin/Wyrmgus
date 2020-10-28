@@ -41,7 +41,7 @@ class CUpgrade;
 enum class ForceType;
 struct lua_State;
 
-int CclDefineCivilization(lua_State *l);
+static int CclDefineCivilization(lua_State *l);
 
 namespace wyrmgus {
 
@@ -339,7 +339,7 @@ private:
 public:
 	std::map<std::string, std::map<CDate, bool>> HistoricalUpgrades;	/// historical upgrades of the faction, with the date of change
 
-	friend int ::CclDefineCivilization(lua_State *l);
+	friend static int ::CclDefineCivilization(lua_State *l);
 };
 
 }

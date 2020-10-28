@@ -404,14 +404,14 @@ void character::initialize()
 		}
 	}
 
-	std::map<const CUpgrade *, int> ability_count;
+	std::map<const CUpgrade *, int> ability_counts;
 	for (const CUpgrade *ability : this->get_abilities()) {
-		ability_count[ability]++;
+		ability_counts[ability]++;
 	}
 
 	//add base abilities if not already present in the saved abilities
 	for (const CUpgrade *ability : this->get_base_abilities()) {
-		int &count = ability_count[ability];
+		int &count = ability_counts[ability];
 		if (count > 0) {
 			count--;
 		} else {

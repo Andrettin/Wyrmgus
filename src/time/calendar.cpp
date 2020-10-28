@@ -49,7 +49,6 @@ calendar::~calendar()
 void calendar::process_sml_scope(const sml_data &scope)
 {
 	const std::string &tag = scope.get_tag();
-	const std::vector<std::string> &values = scope.get_values();
 
 	if (tag == "day_of_the_week_names") {
 		scope.for_each_property([&](const sml_property &property) {

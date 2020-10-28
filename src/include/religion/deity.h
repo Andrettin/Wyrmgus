@@ -33,7 +33,7 @@
 class CUpgrade;
 struct lua_State;
 
-int CclDefineDeity(lua_State *l);
+static int CclDefineDeity(lua_State *l);
 
 namespace wyrmgus {
 
@@ -176,7 +176,7 @@ private:
 	std::vector<const spell *> spells; //abilities linked to this deity
 	std::map<const civilization *, std::string> cultural_names;	//names of the deity in different cultures (for example, Odin is known as Hroptatyr by the dwarves)
 
-	friend int ::CclDefineDeity(lua_State *l);
+	friend static int ::CclDefineDeity(lua_State *l);
 };
 
 }

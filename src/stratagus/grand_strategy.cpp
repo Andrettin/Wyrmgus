@@ -289,8 +289,6 @@ void CGrandStrategyProvince::SetOwner(int civilization_id, int faction_id)
 		return;
 	}
 	
-	CGrandStrategyFaction *old_owner = this->Owner;
-	
 	if (this->Owner != nullptr) { //if province has a previous owner, remove it from the owner's province list
 		this->Owner->OwnedProvinces.erase(std::remove(this->Owner->OwnedProvinces.begin(), this->Owner->OwnedProvinces.end(), this->ID), this->Owner->OwnedProvinces.end());
 	}
@@ -1041,8 +1039,8 @@ std::string CGrandStrategyHero::GetMinisterEffectsString(const wyrmgus::characte
 std::string CGrandStrategyHero::GetBestDisplayTitle()
 {
 	std::string best_title = this->get_unit_type()->get_name();
-	int best_title_type = -1;
 	/*
+	int best_title_type = -1;
 	for (size_t i = 0; i < this->Titles.size(); ++i) {
 		if (this->Titles[i].second != this->GetFaction()) {
 			continue;
@@ -1066,7 +1064,7 @@ CGrandStrategyFaction *CGrandStrategyHero::GetFaction()
 {
 	if (this->Province != nullptr) {
 		return this->Province->Owner;
-	} else {
+	} else if (this->ProvinceOfOrigin != nullptr) {
 		return this->ProvinceOfOrigin->Owner;
 	}
 	
@@ -1098,8 +1096,8 @@ void CGrandStrategyEvent::Trigger(CGrandStrategyFaction *faction)
 
 bool CGrandStrategyEvent::CanTrigger(CGrandStrategyFaction *faction)
 {
-//	fprintf(stderr, "Checking for triggers for event \"%s\" for faction %s.\n", this->Name.c_str(), wyrmgus::faction::get_all()[faction->Faction]->Name.c_str());	
-	
+	Q_UNUSED(faction)
+
 	if (this->MinYear && GrandStrategyYear < this->MinYear) {
 		return false;
 	}
@@ -1236,6 +1234,8 @@ void RemoveProvinceClaim(std::string province_name, std::string civilization_nam
 
 void InitializeGrandStrategyGame(bool show_loading)
 {
+	Q_UNUSED(show_loading)
+
 	//initialize literary works
 	for (CUpgrade *upgrade : CUpgrade::get_all()) {
 		if (upgrade->Work == wyrmgus::item_class::none || upgrade->UniqueOnly) { // literary works that can only appear in unique items wouldn't be publishable

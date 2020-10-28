@@ -42,8 +42,8 @@ class Spell_Polymorph;
 struct lua_State;
 
 void ChangeCustomHeroCivilization(const std::string &hero_full_name, const std::string &civilization_name, const std::string &new_hero_name, const std::string &new_hero_family_name);
-int CclDefineCharacter(lua_State *l);
-int CclDefineCustomHero(lua_State *l);
+static int CclDefineCharacter(lua_State *l);
+static int CclDefineCustomHero(lua_State *l);
 
 namespace wyrmgus {
 	class and_condition;
@@ -422,8 +422,8 @@ public:
 
 	friend ::Spell_Polymorph;
 	friend void ::ChangeCustomHeroCivilization(const std::string &hero_full_name, const std::string &civilization_name, const std::string &new_hero_name, const std::string &new_hero_family_name);
-	friend int ::CclDefineCharacter(lua_State *l);
-	friend int ::CclDefineCustomHero(lua_State *l);
+	friend static int ::CclDefineCharacter(lua_State *l);
+	friend static int ::CclDefineCustomHero(lua_State *l);
 };
 
 }

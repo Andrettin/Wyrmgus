@@ -32,7 +32,7 @@
 
 struct lua_State;
 
-int CclDefineAchievement(lua_State *l);
+static int CclDefineAchievement(lua_State *l);
 
 namespace wyrmgus {
 
@@ -121,7 +121,7 @@ public:
 private:
 	bool obtained = false;
 
-	friend int ::CclDefineAchievement(lua_State *l);
+	friend static int ::CclDefineAchievement(lua_State *l);
 };
 
 }

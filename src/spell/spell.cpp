@@ -619,8 +619,7 @@ static std::unique_ptr<Target> SelectTargetUnitsOfAutoCast(CUnit &caster, const 
 **	@return	True if the spell should/can casted, false if not
 **	@note	caster must know the spell, and spell must be researched.
 */
-bool CanCastSpell(const CUnit &caster, const wyrmgus::spell &spell,
-				  const CUnit *target, const Vec2i &goalPos, const CMapLayer *map_layer)
+bool CanCastSpell(const CUnit &caster, const wyrmgus::spell &spell, const CUnit *target)
 {
 	if (spell.get_target() == wyrmgus::spell_target_type::unit && target == nullptr) {
 		return false;
@@ -690,7 +689,7 @@ int SpellCast(CUnit &caster, const wyrmgus::spell &spell, CUnit *target, const V
 	}
 	DebugPrint("Spell cast: (%s), %s -> %s (%d,%d)\n" _C_ spell.get_identifier().c_str() _C_
 			   caster.Type->get_name().c_str() _C_ target ? target->Type->get_name().c_str() : "none" _C_ pos.x _C_ pos.y);
-	if (CanCastSpell(caster, spell, target, pos, map_layer)) {
+	if (CanCastSpell(caster, spell, target)) {
 		int cont = 1; // Should we recast the spell.
 		bool mustSubtractMana = true; // false if action which have their own calculation is present.
 		//
@@ -735,7 +734,7 @@ int SpellCast(CUnit &caster, const wyrmgus::spell &spell, CUnit *target, const V
 		// anim but fail in this proc.
 		//
 		if (spell.repeats_cast() && cont) {
-			return CanCastSpell(caster, spell, target, pos, map_layer);
+			return CanCastSpell(caster, spell, target);
 		}
 	}
 	//

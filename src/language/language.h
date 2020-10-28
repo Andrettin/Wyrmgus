@@ -33,7 +33,7 @@
 
 struct lua_State;
 
-int CclDefineLanguage(lua_State *l);
+static int CclDefineLanguage(lua_State *l);
 
 enum ArticleTypes {
 	ArticleTypeNoArticle,
@@ -158,7 +158,7 @@ private:
 public:
 	std::map<std::string, std::vector<std::string>> NameTranslations;	/// Name translations; possible translations mapped to the name to be translated
 
-	friend int ::CclDefineLanguage(lua_State *l);
+	friend static int ::CclDefineLanguage(lua_State *l);
 };
 
 }

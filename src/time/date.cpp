@@ -82,7 +82,7 @@ CDate CDate::FromString(const std::string &date_str)
 	if (date_vector.size() >= (4 + offset)) {
 		date.Hour = std::stoi(date_vector[3 + offset]);
 	}
-	
+
 	if (calendar) {
 		date = date.ToBaseCalendar(calendar);
 	}
@@ -211,7 +211,7 @@ CDate CDate::ToBaseCalendar(wyrmgus::calendar *current_calendar) const
 	return date;
 }
 
-std::string CDate::ToString(const wyrmgus::calendar *calendar) const
+std::string CDate::ToString() const
 {
 	std::string date_string;
 	

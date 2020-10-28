@@ -34,7 +34,7 @@ class CUpgrade;
 class LuaCallback;
 struct lua_State;
 
-int CclDefineQuest(lua_State *l);
+static int CclDefineQuest(lua_State *l);
 
 namespace wyrmgus {
 
@@ -127,7 +127,7 @@ private:
 	const wyrmgus::site *settlement = nullptr;
 	const wyrmgus::faction *faction = nullptr;
 
-	friend int ::CclDefineQuest(lua_State *l);
+	friend static int ::CclDefineQuest(lua_State *l);
 };
 
 class player_quest_objective
@@ -281,7 +281,7 @@ public:
 	std::vector<std::string> BriefingSounds;	/// The briefing sounds of this quest
 	std::vector<character *> HeroesMustSurvive;	/// Which heroes must survive or this quest fails
 
-	friend int ::CclDefineQuest(lua_State *l);
+	friend static int ::CclDefineQuest(lua_State *l);
 };
 
 }

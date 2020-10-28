@@ -1117,7 +1117,7 @@ void CPlayer::SetFaction(const wyrmgus::faction *faction)
 		}
 	}
 
-	int faction_id = faction ? faction->ID : -1;
+	const int faction_id = faction ? faction->ID : -1;
 	
 	if (old_faction_id != -1 && faction_id != -1) {
 		for (const wyrmgus::upgrade_class *upgrade_class : wyrmgus::upgrade_class::get_all()) {
@@ -1155,9 +1155,8 @@ void CPlayer::SetFaction(const wyrmgus::faction *faction)
 	if (!IsNetworkGame()) { //only set the faction's name as the player's name if this is a single player game
 		this->SetName(wyrmgus::faction::get_all()[this->Faction]->get_name());
 	}
-	if (this->Faction != -1) {
+	if (this->get_faction() != nullptr) {
 		const wyrmgus::player_color *player_color = nullptr;
-		const wyrmgus::faction *faction = wyrmgus::faction::get_all()[faction_id];
 
 		this->set_faction_tier(faction->get_default_tier());
 		this->set_government_type(faction->get_default_government_type());
@@ -1917,12 +1916,11 @@ std::string_view CPlayer::get_faction_title_name() const
 
 std::string_view CPlayer::GetCharacterTitleName(const wyrmgus::character_title title_type, const wyrmgus::gender gender) const
 {
-	if (this->Race == -1 || this->Faction == -1 || title_type == wyrmgus::character_title::none || gender == wyrmgus::gender::none) {
+	if (this->get_faction() == nullptr || title_type == wyrmgus::character_title::none || gender == wyrmgus::gender::none) {
 		return string::empty_str;
 	}
 	
-	wyrmgus::civilization *civilization = wyrmgus::civilization::get_all()[this->Race];
-	wyrmgus::faction *faction = wyrmgus::faction::get_all()[this->Faction];
+	const wyrmgus::faction *faction = wyrmgus::faction::get_all()[this->Faction];
 	const wyrmgus::government_type government_type = this->get_government_type();
 	const wyrmgus::faction_tier tier = this->get_faction_tier();
 

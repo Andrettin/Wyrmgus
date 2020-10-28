@@ -33,7 +33,7 @@
 
 struct lua_State;
 
-int CclDefineLanguageWord(lua_State *l);
+static int CclDefineLanguageWord(lua_State *l);
 
 namespace wyrmgus {
 
@@ -172,7 +172,7 @@ public:
 	//numeral-specific variables
 	int Number = -1;
 
-	friend int ::CclDefineLanguageWord(lua_State *l);
+	friend static int ::CclDefineLanguageWord(lua_State *l);
 };
 
 }

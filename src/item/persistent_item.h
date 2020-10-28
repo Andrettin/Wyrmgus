@@ -32,8 +32,8 @@ class CUnit;
 class CUpgrade;
 struct lua_State;
 
-int CclDefineCharacter(lua_State *l);
-int CclDefineCustomHero(lua_State *l);
+static int CclDefineCharacter(lua_State *l);
+static int CclDefineCustomHero(lua_State *l);
 
 namespace wyrmgus {
 
@@ -138,8 +138,8 @@ private:
 	character *owner = nullptr;
 	bool equipped = false; //used for initialization only
 
-	friend int ::CclDefineCharacter(lua_State *l);
-	friend int ::CclDefineCustomHero(lua_State *l);
+	friend static int ::CclDefineCharacter(lua_State *l);
+	friend static int ::CclDefineCustomHero(lua_State *l);
 };
 
 }

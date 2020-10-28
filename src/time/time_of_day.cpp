@@ -35,7 +35,6 @@ void time_of_day::process_sml_scope(const sml_data &scope)
 	const std::vector<std::string> &values = scope.get_values();
 
 	if (tag == "color_modification") {
-		const std::vector<std::string> &values = scope.get_values();
 		this->ColorModification.R = std::stoi(values[0]);
 		this->ColorModification.G = std::stoi(values[1]);
 		this->ColorModification.B = std::stoi(values[2]);

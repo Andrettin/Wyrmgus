@@ -1277,7 +1277,6 @@ static int CclGetCivilizationData(lua_State *l)
 	if (!civilization) {
 		return 0;
 	}
-	int civilization_id = civilization->ID;
 	
 	const char *data = LuaToString(l, 2);
 

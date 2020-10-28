@@ -78,7 +78,7 @@ public:
 	void AddHours(const long long int hours, const int day_multiplier = 1);
 	CDate ToCalendar(wyrmgus::calendar *current_calendar, wyrmgus::calendar *new_calendar) const;
 	CDate ToBaseCalendar(wyrmgus::calendar *current_calendar) const;
-	std::string ToString(const wyrmgus::calendar *calendar) const;
+	std::string ToString() const;
 	std::string ToDisplayString(const wyrmgus::calendar *calendar, const bool year_only = false) const;
 	int GetTotalDays() const;
 	unsigned long long GetTotalHours() const;	/// gets the total amount of hours for the particular calendar in this date, counting from -10,000 in the base calendar

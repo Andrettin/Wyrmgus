@@ -48,7 +48,6 @@ magic_domain *magic_domain::add(const std::string &identifier, const wyrmgus::mo
 void magic_domain::process_sml_scope(const sml_data &scope)
 {
 	const std::string &tag = scope.get_tag();
-	const std::vector<std::string> &values = scope.get_values();
 
 	if (tag == "upgrade") {
 		database::process_sml_data(this->upgrade, scope);

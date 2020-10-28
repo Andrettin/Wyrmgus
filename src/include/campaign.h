@@ -36,8 +36,8 @@
 class LuaCallback;
 struct lua_State;
 
-int CclDefineCampaign(lua_State *l);
-int CclGetCampaignData(lua_State *l);
+static int CclDefineCampaign(lua_State *l);
+static int CclGetCampaignData(lua_State *l);
 
 namespace wyrmgus {
 
@@ -139,8 +139,8 @@ public:
 	std::vector<Vec2i> MapSizes;				/// Map sizes
 	std::vector<Vec2i> MapTemplateStartPos;		/// Map template position the map will start on
 	
-	friend int ::CclDefineCampaign(lua_State *l);
-	friend int ::CclGetCampaignData(lua_State *l);
+	friend static int ::CclDefineCampaign(lua_State *l);
+	friend static int ::CclGetCampaignData(lua_State *l);
 };
 
 }

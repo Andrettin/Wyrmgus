@@ -542,7 +542,6 @@ void SetSoundVolumePercent(wyrmgus::sound *sound, int volume_percent)
 wyrmgus::sound *RegisterSound(const std::string &identifier, const std::vector<std::filesystem::path> &files)
 {
 	wyrmgus::sound *id = wyrmgus::sound::add(identifier, nullptr);
-	size_t number = files.size();
 
 	id->files = files;
 	id->initialize();

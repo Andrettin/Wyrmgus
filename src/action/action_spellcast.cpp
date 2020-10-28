@@ -397,7 +397,7 @@ bool COrder_SpellCast::SpellMoveToTarget(CUnit &unit)
 	switch (this->State) {
 		case 0:
 			// Check if we can cast the spell.
-			if (!CanCastSpell(unit, spell, order.GetGoal(), order.goalPos, CMap::Map.MapLayers[order.MapLayer].get())) {
+			if (!CanCastSpell(unit, spell, order.GetGoal())) {
 				// Notify player about this problem
 				if (unit.Variable[MANA_INDEX].Value < spell.get_mana_cost()) {
 					unit.Player->Notify(NotifyYellow, unit.tilePos,
