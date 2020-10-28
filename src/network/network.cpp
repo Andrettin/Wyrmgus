@@ -859,7 +859,7 @@ void NetworkEvent()
 
 	// Setup messages
 	if (NetConnectRunning) {
-		if (NetworkParseSetupEvent(buf, len, host)) {
+		if (NetworkParseSetupEvent(buf, host)) {
 			return;
 		}
 	}

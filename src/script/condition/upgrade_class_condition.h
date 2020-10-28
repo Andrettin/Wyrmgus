@@ -45,6 +45,8 @@ public:
 
 	virtual bool check(const CPlayer *player, const bool ignore_units) const override
 	{
+		Q_UNUSED(ignore_units)
+
 		const CUpgrade *upgrade = player->get_class_upgrade(this->upgrade_class);
 
 		if (upgrade == nullptr) {

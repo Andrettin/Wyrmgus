@@ -499,21 +499,6 @@ void PlayGameSound(wyrmgus::sound *sound, unsigned char volume, bool always)
 	SetChannelVolume(channel, volume);
 }
 
-static std::map<int, LuaActionListener *> ChannelMap;
-
-/**
-**  Callback for PlaySoundFile
-*/
-static void PlaySoundFileCallback(int channel)
-{
-	LuaActionListener *listener = ChannelMap[channel];
-	if (listener != nullptr) {
-		listener->action("");
-		ChannelMap[channel] = nullptr;
-	}
-	delete GetChannelSample(channel);
-}
-
 /**
 **  Ask the sound server to change the range of a sound.
 **

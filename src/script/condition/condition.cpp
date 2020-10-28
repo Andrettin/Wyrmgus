@@ -361,7 +361,7 @@ template bool check_special_conditions<true>(const CUpgrade *target, const CUnit
 **
 **  @return        True if available, false otherwise.
 */
-std::string PrintConditions(const CPlayer &player, const wyrmgus::button &button)
+std::string PrintConditions(const wyrmgus::button &button)
 {
 	std::string rules;
 

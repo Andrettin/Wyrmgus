@@ -75,7 +75,7 @@ int CPopupContentTypeButtonInfo::GetWidth(const wyrmgus::button &button, int *) 
 			draw = button.Description;
 			break;
 		case PopupButtonInfo_Conditions:
-			draw = PrintConditions(*CPlayer::GetThisPlayer(), button);
+			draw = PrintConditions(button);
 			break;
 	}
 	int width = 0;
@@ -115,7 +115,7 @@ int CPopupContentTypeButtonInfo::GetHeight(const wyrmgus::button &button, int *)
 			draw = button.Description;
 			break;
 		case PopupButtonInfo_Conditions:
-			draw = PrintConditions(*CPlayer::GetThisPlayer(), button);
+			draw = PrintConditions(button);
 			break;
 	}
 	int height = 0;
@@ -143,7 +143,7 @@ void CPopupContentTypeButtonInfo::Draw(int x, int y, const CPopup &popup, const 
 			draw = button.Description;
 			break;
 		case PopupButtonInfo_Conditions:
-			draw = PrintConditions(*CPlayer::GetThisPlayer(), button);
+			draw = PrintConditions(button);
 			break;
 	}
 	std::string sub(draw);

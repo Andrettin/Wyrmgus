@@ -356,7 +356,7 @@ static void FillAudio(void *, Uint8 *stream, int len)
 static int FillThread(void *)
 {
 	while (Audio.Running == true) {
-		int status = SDL_LockMutex(Audio.Lock);
+		SDL_LockMutex(Audio.Lock);
 #ifdef USE_WIN32
 		if (SDL_CondWaitTimeout(Audio.Cond, Audio.Lock, 1000) == 0) {
 #else

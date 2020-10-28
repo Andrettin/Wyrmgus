@@ -98,6 +98,9 @@
 */
 int Spell_Demolish::Cast(CUnit &caster, const wyrmgus::spell &, CUnit *, const Vec2i &goalPos, int z, int modifier)
 {
+	Q_UNUSED(goalPos)
+	Q_UNUSED(z)
+
 	// Allow error margins. (Lame, I know)
 	const Vec2i offset(this->Range + 2, this->Range + 2);
 	//Wyrmgus start

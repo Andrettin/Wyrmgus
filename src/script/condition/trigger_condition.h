@@ -43,13 +43,18 @@ public:
 
 	virtual bool check(const CPlayer *player, const bool ignore_units) const override
 	{
+		Q_UNUSED(player)
+		Q_UNUSED(ignore_units)
+
 		//checks whether a trigger has already fired
 
 		return vector::contains(trigger::DeactivatedTriggers, this->trigger->get_identifier()); //this works fine for global triggers, but for player triggers perhaps it should check only the player?
 	}
 
-	virtual std::string get_string(const std::string &prefix = "") const override
+	virtual std::string get_string(const std::string &prefix) const override
 	{
+		Q_UNUSED(prefix)
+
 		return std::string();
 	}
 

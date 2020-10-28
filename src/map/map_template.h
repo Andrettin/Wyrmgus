@@ -39,7 +39,7 @@
 class CMapField;
 struct lua_State;
 
-int CclDefineMapTemplate(lua_State *l);
+static int CclDefineMapTemplate(lua_State *l);
 
 namespace wyrmgus {
 
@@ -662,7 +662,7 @@ private:
 	double min_latitude;
 	double max_latitude;
 
-	friend int ::CclDefineMapTemplate(lua_State *l);
+	friend static int ::CclDefineMapTemplate(lua_State *l);
 };
 
 }

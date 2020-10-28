@@ -42,11 +42,15 @@ public:
 
 	virtual bool check(const CPlayer *player, const bool ignore_units) const override
 	{
+		Q_UNUSED(ignore_units)
+
 		return CMap::Map.MapLayers[player->StartMapLayer]->GetSeason() == this->Season;
 	}
 
 	virtual bool check(const CUnit *unit, const bool ignore_units) const override
 	{
+		Q_UNUSED(ignore_units)
+
 		return unit->MapLayer->GetSeason() == this->Season;
 	}
 

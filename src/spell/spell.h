@@ -46,8 +46,8 @@ class CPlayer;
 class CUnit;
 struct lua_State;
 
-int CclDefineSpell(lua_State *l);
-void CclSpellAutocast(lua_State *l, AutoCastInfo *autocast);
+static int CclDefineSpell(lua_State *l);
+static void CclSpellAutocast(lua_State *l, AutoCastInfo *autocast);
 
 namespace wyrmgus {
 	class faction;
@@ -180,7 +180,7 @@ public:
 	// Position autocast callback
 	std::unique_ptr<LuaCallback> PositionAutoCast;
 
-	friend void ::CclSpellAutocast(lua_State *l, AutoCastInfo *autocast);
+	friend static void ::CclSpellAutocast(lua_State *l, AutoCastInfo *autocast);
 };
 
 namespace wyrmgus {
@@ -327,7 +327,7 @@ public:
 private:
 	bool force_use_animation = false;
 
-	friend int ::CclDefineSpell(lua_State *l);
+	friend static int ::CclDefineSpell(lua_State *l);
 };
 
 }

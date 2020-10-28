@@ -38,7 +38,7 @@ class CPlayer;
 class CUnit;
 struct lua_State;
 
-int CclDefineSite(lua_State *l);
+static int CclDefineSite(lua_State *l);
 
 namespace wyrmgus {
 
@@ -355,7 +355,7 @@ private:
 	std::vector<QPoint> border_tiles; //the tiles for this settlement which border the territory of another settlement
 	QRect territory_rect; //the territory rectangle of the site
 
-	friend int ::CclDefineSite(lua_State *l);
+	friend static int ::CclDefineSite(lua_State *l);
 };
 
 }

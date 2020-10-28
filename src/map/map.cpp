@@ -290,7 +290,7 @@ wyrmgus::terrain_type *CMap::GetTileTopTerrain(const Vec2i &pos, const bool seen
 	
 	CMapField &mf = *this->Field(pos, z);
 	
-	return mf.GetTopTerrain();
+	return mf.GetTopTerrain(seen, ignore_destroyed);
 }
 
 int CMap::GetTileLandmass(const Vec2i &pos, int z) const
@@ -427,9 +427,7 @@ bool CMap::CurrentTerrainCanBeAt(const Vec2i &pos, bool overlay, int z)
 			if (x_offset != 0 || y_offset != 0) {
 				Vec2i adjacent_pos(pos.x + x_offset, pos.y + y_offset);
 				if (Map.Info.IsPointOnMap(adjacent_pos, z)) {
-					CMapField &adjacent_mf = *this->Field(adjacent_pos, z);
-						
-					wyrmgus::terrain_type *adjacent_terrain = this->GetTileTerrain(adjacent_pos, overlay, z);
+					const wyrmgus::terrain_type *adjacent_terrain = this->GetTileTerrain(adjacent_pos, overlay, z);
 					if (overlay && adjacent_terrain && this->Field(adjacent_pos, z)->OverlayTerrainDestroyed) {
 						adjacent_terrain = nullptr;
 					}
@@ -1846,8 +1844,6 @@ void CMap::RemoveTileOverlayTerrain(const Vec2i &pos, int z)
 		return;
 	}
 	
-	wyrmgus::terrain_type *old_terrain = mf.OverlayTerrain;
-	
 	mf.RemoveOverlayTerrain();
 	
 	this->CalculateTileTransitions(pos, true, z);
@@ -2133,8 +2129,6 @@ void CMap::CalculateTileTransitions(const Vec2i &pos, bool overlay, int z)
 		return;
 	}
 	
-	int terrain_id = terrain->ID;
-	
 	std::map<int, std::vector<int>> adjacent_terrain_directions;
 	
 	for (int x_offset = -1; x_offset <= 1; ++x_offset) {
@@ -2245,7 +2239,6 @@ void CMap::CalculateTileTransitions(const Vec2i &pos, bool overlay, int z)
 		for (int passes = 0; passes < (int) mf.OverlayTransitionTiles.size() && swapped; ++passes) {
 			swapped = false;
 			for (int i = 0; i < ((int) mf.OverlayTransitionTiles.size()) - 1; ++i) {
-				bool change_order = false;
 				if (wyrmgus::vector::contains(mf.OverlayTransitionTiles[i + 1].first->get_inner_border_terrain_types(), mf.OverlayTransitionTiles[i].first)) {
 					std::pair<wyrmgus::terrain_type *, int> temp_transition = mf.OverlayTransitionTiles[i];
 					mf.OverlayTransitionTiles[i] = mf.OverlayTransitionTiles[i + 1];
@@ -2259,7 +2252,6 @@ void CMap::CalculateTileTransitions(const Vec2i &pos, bool overlay, int z)
 		for (int passes = 0; passes < (int) mf.TransitionTiles.size() && swapped; ++passes) {
 			swapped = false;
 			for (int i = 0; i < ((int) mf.TransitionTiles.size()) - 1; ++i) {
-				bool change_order = false;
 				if (wyrmgus::vector::contains(mf.TransitionTiles[i + 1].first->get_inner_border_terrain_types(), mf.TransitionTiles[i].first)) {
 					std::pair<wyrmgus::terrain_type *, int> temp_transition = mf.TransitionTiles[i];
 					mf.TransitionTiles[i] = mf.TransitionTiles[i + 1];
@@ -3381,9 +3373,9 @@ void CMap::GenerateNeutralUnits(wyrmgus::unit_type *unit_type, int quantity, con
 			continue;
 		}
 		if (unit_type->get_given_resource() != nullptr) {
-			CUnit *unit = CreateResourceUnit(unit_pos, *unit_type, z);
+			CreateResourceUnit(unit_pos, *unit_type, z);
 		} else {
-			CUnit *unit = CreateUnit(unit_pos, *unit_type, CPlayer::Players[PlayerNumNeutral], z, unit_type->BoolFlag[BUILDING_INDEX].value && unit_type->get_tile_width() > 1 && unit_type->get_tile_height() > 1);
+			CreateUnit(unit_pos, *unit_type, CPlayer::Players[PlayerNumNeutral], z, unit_type->BoolFlag[BUILDING_INDEX].value && unit_type->get_tile_width() > 1 && unit_type->get_tile_height() > 1);
 		}
 	}
 }

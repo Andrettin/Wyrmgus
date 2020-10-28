@@ -125,7 +125,7 @@ public:
 	void Init(const std::string &name, CUDPSocket *socket, CServerSetup *serverSetup, CServerSetup *localSetup, unsigned long tick);
 	void SetServerHost(const CHost &host) { serverHost = host; }
 
-	bool Parse(const unsigned char *buf, const CHost &host);
+	bool Parse(const unsigned char *buf);
 	bool Update(unsigned long tick);
 
 	void DetachFromServer();
@@ -625,7 +625,7 @@ void CClient::SetConfig(const CInitMessage_Config &msg)
 #endif
 }
 
-bool CClient::Parse(const unsigned char *buf, const CHost &host)
+bool CClient::Parse(const unsigned char *buf)
 {
 	CInitMessage_Header header;
 	header.Deserialize(buf);
@@ -1374,7 +1374,7 @@ void CServer::Parse(unsigned long frameCounter, const unsigned char *buf, const 
 **
 **  @return 1 if packet is an InitConfig message, 0 otherwise
 */
-int NetworkParseSetupEvent(const unsigned char *buf, int size, const CHost &host)
+int NetworkParseSetupEvent(const unsigned char *buf, const CHost &host)
 {
 	Assert(NetConnectRunning != 0);
 
@@ -1399,7 +1399,7 @@ int NetworkParseSetupEvent(const unsigned char *buf, int size, const CHost &host
 			   hostStr.c_str());
 #endif
 	if (NetConnectRunning == 2) { // client
-		if (Client.Parse(buf, host) == false) {
+		if (Client.Parse(buf) == false) {
 			NetConnectRunning = 0;
 		}
 	} else if (NetConnectRunning == 1) { // server

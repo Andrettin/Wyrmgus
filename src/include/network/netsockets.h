@@ -31,9 +31,9 @@
 class CHost
 {
 public:
-	CHost() : ip(0), port(0) {}
-	CHost(const char *name, int port);
-	CHost(unsigned long ip, int port) : ip(ip), port(port) {}
+	CHost() {}
+	explicit CHost(const char *name, int port);
+	explicit CHost(unsigned long ip, int port) : ip(ip), port(port) {}
 	unsigned long getIp() const { return ip; }
 	int getPort() const { return port; }
 	std::string toString() const;
@@ -42,8 +42,8 @@ public:
 	bool operator == (const CHost &rhs) const { return ip == rhs.ip && port == rhs.port; }
 	bool operator != (const CHost &rhs) const { return !(*this == rhs); }
 private:
-	unsigned long ip;
-	int port;
+	unsigned long ip = 0;
+	int port = 0;
 };
 
 class CUDPSocket_Impl;

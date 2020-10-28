@@ -100,6 +100,9 @@
 */
 int Spell_Polymorph::Cast(CUnit &caster, const wyrmgus::spell &spell, CUnit *target, const Vec2i &goalPos, int z, int modifier)
 {
+	Q_UNUSED(goalPos)
+	Q_UNUSED(z)
+
 	if (!target) {
 		return 0;
 	}

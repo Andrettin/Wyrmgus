@@ -531,49 +531,6 @@ static int CclSetDeactivatedTriggers(lua_State *l)
 }
 
 /**
-**  Execute a trigger action
-**
-**  @param script  Script to execute
-**
-**  @return        1 if the trigger should be removed
-*/
-static int TriggerExecuteAction(int script)
-{
-	const int base = lua_gettop(Lua);
-	int ret = 0;
-
-	lua_rawgeti(Lua, -1, script + 1);
-	const int args = lua_rawlen(Lua, -1);
-	for (int j = 0; j < args; ++j) {
-		lua_rawgeti(Lua, -1, j + 1);
-		LuaCall(0, 0);
-		if (lua_gettop(Lua) > base + 1 && lua_toboolean(Lua, -1)) {
-			ret = 1;
-		} else {
-			ret = 0;
-		}
-		lua_settop(Lua, base + 1);
-	}
-	lua_pop(Lua, 1);
-
-	// If action returns false remove it
-	return !ret;
-}
-
-/**
-**  Remove a trigger
-**
-**  @param trig  Current trigger
-*/
-static void TriggerRemoveTrigger(int trig)
-{
-	lua_pushnumber(Lua, -1);
-	lua_rawseti(Lua, -2, trig + 1);
-	lua_pushnumber(Lua, -1);
-	lua_rawseti(Lua, -2, trig + 2);
-}
-
-/**
 **  Check trigger each game cycle.
 */
 void TriggersEachCycle()

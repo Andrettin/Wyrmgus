@@ -37,7 +37,7 @@ class CGraphic;
 class CPlayerColorGraphic;
 struct lua_State;
 
-int CclDefineTerrainType(lua_State *l);
+static int CclDefineTerrainType(lua_State *l);
 
 namespace wyrmgus {
 
@@ -436,7 +436,7 @@ private:
 	std::map<const terrain_type *, std::map<tile_transition_type, std::vector<int>>> transition_tiles;	/// Transition graphics, mapped to the tile type (-1 means any tile) and the transition type (i.e. northeast outer)
 	std::map<const terrain_type *, std::map<tile_transition_type, std::vector<int>>> adjacent_transition_tiles;	/// Transition graphics for the tiles adjacent to this terrain type, mapped to the tile type (-1 means any tile) and the transition type (i.e. northeast outer)
 
-	friend int ::CclDefineTerrainType(lua_State *l);
+	friend static int ::CclDefineTerrainType(lua_State *l);
 };
 
 }

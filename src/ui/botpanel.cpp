@@ -291,7 +291,7 @@ static bool CanShowPopupContent(const PopupConditionPanel *condition,
 		return false;
 	}
 
-	if (condition->HasConditions && PrintConditions(*CPlayer::GetThisPlayer(), button).empty()) {
+	if (condition->HasConditions && PrintConditions(button).empty()) {
 		return false;
 	}
 	

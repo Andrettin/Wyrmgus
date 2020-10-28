@@ -92,7 +92,7 @@ static std::unique_ptr<Target> NewTargetUnit(CUnit &unit)
 **	@return	True if passed, or false otherwise.
 */
 static bool PassCondition(const CUnit &caster, const wyrmgus::spell &spell, const CUnit *target,
-						  const Vec2i &goalPos, const ConditionInfo *condition, const CMapLayer *map_layer)
+						  const ConditionInfo *condition)
 {
 	if (caster.Variable[MANA_INDEX].Value < spell.get_mana_cost()) { // Check caster mana.
 		return false;
@@ -436,7 +436,7 @@ bool spell::IsUnitValidAutoCastTarget(const CUnit *target, const CUnit &caster, 
 		}
 	}
 
-	if (!PassCondition(caster, *this, target, caster.tilePos, this->get_cast_conditions(), target->MapLayer) || !PassCondition(caster, *this, target, caster.tilePos, autocast->get_cast_conditions(), target->MapLayer)) {
+	if (!PassCondition(caster, *this, target, this->get_cast_conditions()) || !PassCondition(caster, *this, target, autocast->get_cast_conditions())) {
 		return false;
 	}
 
@@ -537,7 +537,6 @@ static std::unique_ptr<Target> SelectTargetUnitsOfAutoCast(CUnit &caster, const 
 		return nullptr;
 	}
 	
-	const Vec2i &pos = caster.tilePos;
 	CMapLayer *map_layer = caster.MapLayer;
 	int range = autocast->Range;
 	int minRange = autocast->MinRange;
@@ -551,7 +550,7 @@ static std::unique_ptr<Target> SelectTargetUnitsOfAutoCast(CUnit &caster, const 
 	SelectAroundUnit(caster, range, table, OutOfMinRange(minRange, caster.tilePos, caster.MapLayer->ID));
 
 	if (spell.get_target() == wyrmgus::spell_target_type::self) {
-		if (PassCondition(caster, spell, &caster, caster.tilePos, spell.get_cast_conditions(), map_layer) && PassCondition(caster, spell, &caster, caster.tilePos, autocast->get_cast_conditions(), map_layer)) {
+		if (PassCondition(caster, spell, &caster, spell.get_cast_conditions()) && PassCondition(caster, spell, &caster, autocast->get_cast_conditions())) {
 			return NewTargetUnit(caster);
 		}
 	} else if (spell.get_target() == wyrmgus::spell_target_type::position) {
@@ -626,7 +625,7 @@ bool CanCastSpell(const CUnit &caster, const wyrmgus::spell &spell,
 	if (spell.get_target() == wyrmgus::spell_target_type::unit && target == nullptr) {
 		return false;
 	}
-	return PassCondition(caster, spell, target, goalPos, spell.get_cast_conditions(), map_layer);
+	return PassCondition(caster, spell, target, spell.get_cast_conditions());
 }
 
 /**

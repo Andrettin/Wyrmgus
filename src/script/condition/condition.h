@@ -134,4 +134,4 @@ extern bool check_conditions(const T *target, const CUnit *unit, const bool igno
 extern void DependenciesCclRegister();
 
 /// Print all unit conditions into string
-extern std::string PrintConditions(const CPlayer &player, const wyrmgus::button &button);
+extern std::string PrintConditions(const wyrmgus::button &button);

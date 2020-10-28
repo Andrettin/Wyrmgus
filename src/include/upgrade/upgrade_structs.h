@@ -40,8 +40,8 @@
 
 struct lua_State;
 
-int CclDefineDependency(lua_State *l);
-int CclDefinePredependency(lua_State *l);
+static int CclDefineDependency(lua_State *l);
+static int CclDefinePredependency(lua_State *l);
 
 namespace wyrmgus {
 	class character;
@@ -388,9 +388,9 @@ private:
 	const wyrmgus::deity *deity = nullptr; //the deity to which the upgrade pertains, if this is a deity upgrade
 	const wyrmgus::magic_domain *magic_domain = nullptr; //the magic domain to which the upgrade pertains, if this is a magic domain upgrade
 
-	friend int CclDefineUpgrade(lua_State *l);
-	friend int CclDefineDependency(lua_State *l);
-	friend int CclDefinePredependency(lua_State *l);
+	friend static int CclDefineUpgrade(lua_State *l);
+	friend static int CclDefineDependency(lua_State *l);
+	friend static int CclDefinePredependency(lua_State *l);
 };
 
 /**

@@ -48,6 +48,8 @@ public:
 
 	virtual bool check(const CPlayer *player, const bool ignore_units) const override
 	{
+		Q_UNUSED(ignore_units)
+
 		return UpgradeIdAllowed(*player, this->upgrade->ID) == 'R';
 	}
 

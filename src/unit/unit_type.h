@@ -49,9 +49,9 @@ struct lua_State;
 class LuaCallback;
 enum class UnitTypeType;
 
-int CclDefineDependency(lua_State *l);
-int CclDefinePredependency(lua_State *l);
-int CclDefineUnitType(lua_State *l);
+static int CclDefineDependency(lua_State *l);
+static int CclDefinePredependency(lua_State *l);
+static int CclDefineUnitType(lua_State *l);
 
 namespace wyrmgus {
 	class animation_set;
@@ -1239,9 +1239,9 @@ public:
 	std::string Mod;							/// To which mod (or map), if any, this unit type belongs
 	//Wyrmgus end
 
-	friend int ::CclDefineUnitType(lua_State *l);
-	friend int ::CclDefineDependency(lua_State *l);
-	friend int ::CclDefinePredependency(lua_State *l);
+	friend static int ::CclDefineUnitType(lua_State *l);
+	friend static int ::CclDefineDependency(lua_State *l);
+	friend static int ::CclDefinePredependency(lua_State *l);
 };
 
 }

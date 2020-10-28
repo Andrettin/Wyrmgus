@@ -148,6 +148,8 @@ void spell_action_adjust_variable::process_sml_scope(const sml_data &scope)
 
 void spell_action_adjust_variable::Parse(lua_State *l, int startIndex, int endIndex)
 {
+	Q_UNUSED(endIndex)
+
 	int j = startIndex;
 	lua_rawgeti(l, -1, j + 1);
 	if (!lua_istable(l, -1)) {

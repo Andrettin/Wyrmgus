@@ -1078,7 +1078,7 @@ void ExecCommand(unsigned char msgnr, UnitRef unum,
 				CommandSpellCast(unit, pos, dest, *wyrmgus::spell::get_all()[id], status);
 			} else {
 				CommandLog("auto-spell-cast", &unit, status, arg1, -1, NoUnitP, nullptr, id);
-				CommandAutoSpellCast(unit, wyrmgus::spell::get_all()[id], arg1);
+				CommandAutoSpellCast(unit, wyrmgus::spell::get_all()[id], arg1 != 0);
 			}
 			break;
 		}

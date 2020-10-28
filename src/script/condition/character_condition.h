@@ -43,11 +43,15 @@ public:
 
 	virtual bool check(const CPlayer *player, const bool ignore_units) const override
 	{
+		Q_UNUSED(ignore_units)
+
 		return player->HasHero(this->character);
 	}
 
 	virtual bool check(const CUnit *unit, const bool ignore_units) const override
 	{
+		Q_UNUSED(ignore_units)
+
 		return unit->Character == this->character;
 	}
 

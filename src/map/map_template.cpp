@@ -821,9 +821,6 @@ void map_template::Apply(const QPoint &template_start_pos, const QPoint &map_sta
 		ShowLoadProgress(_("Generating \"%s\" Map Template Random Terrain"), this->get_name().c_str());
 		
 		for (const auto &generated_terrain : this->generated_terrains) {
-			int map_width = (map_end.x() - map_start_pos.x());
-			int map_height = (map_end.y() - map_start_pos.y());
-			
 			CMap::Map.GenerateTerrain(generated_terrain, map_start_pos, map_end - Vec2i(1, 1), has_base_map, z);
 		}
 	}
@@ -887,9 +884,6 @@ void map_template::Apply(const QPoint &template_start_pos, const QPoint &map_sta
 		ShowLoadProgress(_("Generating \"%s\" Map Template Random Terrain"), this->get_name().c_str());
 		
 		for (const auto &generated_terrain : this->generated_terrains) {
-			int map_width = (map_end.x() - map_start_pos.x());
-			int map_height = (map_end.y() - map_start_pos.y());
-			
 			CMap::Map.GenerateTerrain(generated_terrain, map_start_pos, map_end - Vec2i(1, 1), has_base_map, z);
 			generated_random_terrain = true;
 		}
@@ -958,7 +952,7 @@ void map_template::Apply(const QPoint &template_start_pos, const QPoint &map_sta
 				}
 				
 				for (int j = 0; j < 5; ++j) {
-					CUnit *worker_unit = CreateUnit(worker_pos, *worker_type, CPlayer::Players[i], CPlayer::Players[i]->StartMapLayer);
+					CreateUnit(worker_pos, *worker_type, CPlayer::Players[i], CPlayer::Players[i]->StartMapLayer);
 				}
 			}
 		}
@@ -1448,7 +1442,7 @@ void map_template::apply_sites(const QPoint &template_start_pos, const QPoint &m
 					}
 					Vec2i unit_offset((type->get_tile_size() - QSize(1, 1)) / 2);
 
-					for (int j = 0; j < unit_quantity; ++j) {
+					for (int k = 0; k < unit_quantity; ++k) {
 						CUnit *unit = CreateUnit(site_pos - unit_offset, *type, unit_player, z, false, site->is_major() ? site : nullptr);
 						if (!type->BoolFlag[HARVESTER_INDEX].value) { // make non-worker units not have an active AI
 							unit->Active = 0;

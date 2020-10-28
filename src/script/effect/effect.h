@@ -45,6 +45,10 @@ public:
 
 	explicit effect(const sml_operator effect_operator);
 
+	virtual ~effect()
+	{
+	}
+
 	virtual const std::string &get_class_identifier() const = 0;
 
 	virtual void process_sml_property(const sml_property &property);
