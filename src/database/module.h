@@ -41,10 +41,9 @@ class module final : public QObject
 	Q_OBJECT
 
 	Q_PROPERTY(QString name READ get_name_qstring)
-	Q_PROPERTY(QVariantList dependencies READ get_dependencies_qvariant_list)
 
 public:
-	explicit module(const std::string &identifier, const std::filesystem::path &path, module *parent_module)
+	explicit module(const std::string &identifier, const std::filesystem::path &path, const module *parent_module)
 		: identifier(identifier), path(path), parent_module(parent_module)
 	{
 	}
@@ -77,9 +76,7 @@ public:
 		return this->path;
 	}
 
-	QVariantList get_dependencies_qvariant_list() const;
-
-	Q_INVOKABLE void add_dependency(module *module)
+	void add_dependency(const module *module)
 	{
 		if (module->depends_on(this)) {
 			throw std::runtime_error("Cannot make module \"" + this->identifier + "\" depend on module \"" + module->identifier + "\", as that would create a circular dependency.");
@@ -88,12 +85,7 @@ public:
 		this->dependencies.insert(module);
 	}
 
-	Q_INVOKABLE void remove_dependency(module *module)
-	{
-		this->dependencies.erase(module);
-	}
-
-	bool depends_on(module *module) const
+	bool depends_on(const module *module) const
 	{
 		if (module == this->parent_module) {
 			return true;
@@ -131,8 +123,8 @@ private:
 	std::string identifier;
 	std::string name;
 	std::filesystem::path path; //the module's path
-	module *parent_module = nullptr;
-	std::set<module *> dependencies; //modules on which this one is dependent
+	const module *parent_module = nullptr;
+	std::set<const module *> dependencies; //modules on which this one is dependent
 };
 
 }

@@ -33,6 +33,7 @@
 
 #include "database/data_type_metadata.h"
 #include "database/database.h"
+#include "database/module_container.h"
 #include "database/sml_data.h"
 #include "database/sml_operator.h"
 #include "util/qunique_ptr.h"
@@ -283,7 +284,7 @@ private:
 	static inline std::vector<T *> instances;
 	static inline std::map<std::string, qunique_ptr<T>> instances_by_identifier;
 	static inline std::map<std::string, T *> instances_by_alias;
-	static inline std::map<const module *, std::vector<sml_data>> sml_data_to_process;
+	static inline module_map<std::vector<sml_data>> sml_data_to_process;
 #ifdef __GNUC__
 	//the "used" attribute is needed under GCC, or else this variable will be optimized away (even in debug builds)
 	static inline bool class_initialized [[gnu::used]] = data_type::initialize_class();

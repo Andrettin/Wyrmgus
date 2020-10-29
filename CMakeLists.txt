@@ -133,6 +133,7 @@ set(database_SRCS
 	src/database/database.cpp
 	src/database/defines.cpp
 	src/database/module.cpp
+	src/database/module_container.cpp
 	src/database/predefines.cpp
 	src/database/preferences.cpp
 	src/database/sml_data.cpp
@@ -653,6 +654,7 @@ set(stratagus_database_HDRS
 	src/database/defines.h
 	src/database/detailed_data_entry.h
 	src/database/module.h
+	src/database/module_container.h
 	src/database/named_data_entry.h
 	src/database/predefines.h
 	src/database/preferences.h

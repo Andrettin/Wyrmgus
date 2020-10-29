@@ -37,6 +37,7 @@
 #include "database/data_type_metadata.h"
 #include "database/defines.h"
 #include "database/module.h"
+#include "database/module_container.h"
 #include "database/predefines.h"
 #include "database/sml_data.h"
 #include "database/sml_operator.h"
@@ -442,9 +443,6 @@ void database::modify_list_property_for_object(QObject *object, const std::strin
 	if (property_name == "civilizations") {
 		civilization *civilization_value = civilization::get(value);
 		success = QMetaObject::invokeMethod(object, method_name.c_str(), Qt::ConnectionType::DirectConnection, Q_ARG(civilization *, civilization_value));
-	} else if (property_name == "dependencies") {
-		module *module_value = database::get()->get_module(value);
-		success = QMetaObject::invokeMethod(object, method_name.c_str(), Qt::ConnectionType::DirectConnection, Q_ARG(module *, module_value));
 	} else if (property_name == "domains") {
 		magic_domain *domain_value = magic_domain::get(value);
 		success = QMetaObject::invokeMethod(object, method_name.c_str(), Qt::ConnectionType::DirectConnection, Q_ARG(magic_domain *, domain_value));
@@ -551,7 +549,8 @@ database::~database()
 
 void database::parse()
 {
-	for (const auto &kv_pair : database::get()->get_data_paths_with_module()) {
+	const auto data_paths_with_module = this->get_data_paths_with_module();
+	for (const auto &kv_pair : data_paths_with_module) {
 		const std::filesystem::path &path = kv_pair.first;
 		const module *module = kv_pair.second;
 
@@ -687,13 +686,7 @@ void database::process_modules()
 	}
 
 	std::sort(this->modules.begin(), this->modules.end(), [](const qunique_ptr<module> &a, const qunique_ptr<module> &b) {
-		if (a->depends_on(b.get())) {
-			return false;
-		} else if (b->depends_on(a.get())) {
-			return true;
-		}
-
-		return a->get_dependency_count() < b->get_dependency_count();
+		return module_compare()(a.get(), b.get());
 	});
 }
 
