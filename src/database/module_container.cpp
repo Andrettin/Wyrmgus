@@ -45,7 +45,11 @@ bool module_compare::operator()(const module *module, const wyrmgus::module *oth
 		return true;
 	}
 
-	return module->get_dependency_count() < other_module->get_dependency_count();
+	if (module->get_dependency_count() != other_module->get_dependency_count()) {
+		return module->get_dependency_count() < other_module->get_dependency_count();
+	}
+
+	return module->get_identifier() < other_module->get_identifier();
 }
 
 }
