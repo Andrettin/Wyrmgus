@@ -89,6 +89,7 @@ class map_template final : public named_data_entry, public data_type<map_templat
 	Q_PROPERTY(QSize size MEMBER size READ get_size)
 	Q_PROPERTY(bool circle MEMBER circle READ is_circle)
 	Q_PROPERTY(bool optional MEMBER optional READ is_optional)
+	Q_PROPERTY(bool constructed_only MEMBER constructed_only READ is_constructed_only)
 	Q_PROPERTY(QPoint start_pos MEMBER start_pos READ get_start_pos)
 	Q_PROPERTY(QPoint end_pos MEMBER end_pos READ get_end_pos)
 	Q_PROPERTY(QPoint subtemplate_top_left_pos MEMBER subtemplate_top_left_pos READ get_subtemplate_top_left_pos)
@@ -131,12 +132,13 @@ public:
 	virtual void process_sml_scope(const sml_data &scope) override;
 	virtual void ProcessConfigData(const CConfigData *config_data) override;
 	virtual void initialize() override;
+	virtual void check() const override;
 
 	void ApplyTerrainFile(bool overlay, Vec2i template_start_pos, Vec2i map_start_pos, int z) const;
 	void ApplyTerrainImage(bool overlay, Vec2i template_start_pos, Vec2i map_start_pos, int z) const;
 	void apply_territory_image(const QPoint &template_start_pos, const QPoint &map_start_pos, const int z) const;
 	void Apply(const QPoint &template_start_pos, const QPoint &map_start_pos, const int z);
-	void apply_subtemplates(const QPoint &template_start_pos, const QPoint &map_start_pos, const QPoint &map_end, const int z, const bool random = false) const;
+	void apply_subtemplates(const QPoint &template_start_pos, const QPoint &map_start_pos, const QPoint &map_end, int z, bool random, bool constructed) const;
 	void apply_subtemplate(map_template *subtemplate, const QPoint &template_start_pos, const QPoint &map_start_pos, const QPoint &map_end, const int z, const bool random = false) const;
 	void apply_sites(const QPoint &template_start_pos, const QPoint &map_start_pos, const QPoint &map_end, const int z, const bool random = false) const;
 	void apply_population_unit(const unit_class *unit_class, const int population, const QPoint &unit_pos, const int z, CPlayer *player, const site *settlement) const;
@@ -284,6 +286,11 @@ public:
 	bool is_optional() const
 	{
 		return this->optional;
+	}
+
+	bool is_constructed_only() const
+	{
+		return this->constructed_only;
 	}
 
 	bool contains_map_pos(const QPoint &pos) const
@@ -495,7 +502,9 @@ public:
 		return count;
 	}
 
-	QPoint generate_subtemplate_position(const map_template *subtemplate, const QPoint &template_start_pos, const QPoint &map_start_pos, const QPoint &map_end, const int z, const QPoint &max_adjacent_template_distance, bool &adjacency_restriction_occurred) const;
+	QPoint generate_subtemplate_position(const map_template *subtemplate, const QPoint &template_start_pos, const QPoint &map_start_pos, const QPoint &map_end, int z, const QPoint &max_adjacent_template_distance, bool &adjacency_restriction_occurred) const;
+	bool is_constructed_subtemplate_suitable_for_pos(const map_template *subtemplate, const QPoint &map_start_pos, int z) const;
+	bool is_constructed_subtemplate_compatible_with_terrain(const map_template *subtemplate, const QPoint &map_start_pos, int z) const;
 
 	Vec2i get_best_location_map_position(const std::vector<std::unique_ptr<historical_location>> &historical_location_list, bool &in_another_map_template, const Vec2i &template_start_pos, const Vec2i &map_start_pos, const bool random) const;
 
@@ -603,6 +612,7 @@ public:
 private:
 	bool circle = false; //whether the template should be applied as a circle, i.e. it should apply no subtemplates and etc. or generate terrain outside the boundaries of the circle
 	bool optional = false;
+	bool constructed_only = false;
 	bool output_terrain_image = false;
 	bool output_territory_image = false;
 private:

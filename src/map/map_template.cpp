@@ -369,6 +369,37 @@ void map_template::initialize()
 	data_entry::initialize();
 }
 
+void map_template::check() const
+{
+	if (!this->get_terrain_image().empty()) {
+		const std::string terrain_filename = LibraryFileName(this->get_terrain_image().string().c_str());
+
+		if (!CanAccessFile(terrain_filename.c_str())) {
+			throw std::runtime_error("The terrain image file \"" + terrain_filename + "\" for map template \"" + this->get_identifier() + "\" does not exist.");
+		}
+
+		const QImage terrain_image(terrain_filename.c_str());
+
+		if (terrain_image.size() != this->get_size()) {
+			throw std::runtime_error("The terrain image for map template \"" + this->get_identifier() + "\" has a different size (" + std::to_string(terrain_image.width()) + ", " + std::to_string(terrain_image.height()) + ") than that of the map template itself (" + std::to_string(this->get_width()) + ", " + std::to_string(this->get_height()) + ").");
+		}
+	}
+
+	if (!this->get_overlay_terrain_image().empty()) {
+		const std::string terrain_filename = LibraryFileName(this->get_overlay_terrain_image().string().c_str());
+
+		if (!CanAccessFile(terrain_filename.c_str())) {
+			throw std::runtime_error("The overlay terrain image file \"" + terrain_filename + "\" for map template \"" + this->get_identifier() + "\" does not exist.");
+		}
+
+		const QImage terrain_image(terrain_filename.c_str());
+
+		if (terrain_image.size() != this->get_size()) {
+			throw std::runtime_error("The overlay terrain image for map template \"" + this->get_identifier() + "\" has a different size (" + std::to_string(terrain_image.width()) + ", " + std::to_string(terrain_image.height()) + ") than that of the map template itself (" + std::to_string(this->get_width()) + ", " + std::to_string(this->get_height()) + ").");
+		}
+	}
+}
+
 void map_template::ApplyTerrainFile(bool overlay, Vec2i template_start_pos, Vec2i map_start_pos, int z) const
 {
 	std::filesystem::path terrain_file;
@@ -492,7 +523,7 @@ void map_template::ApplyTerrainImage(bool overlay, Vec2i template_start_pos, Vec
 
 			const QColor color = terrain_image.pixelColor(x, y);
 			
-			if (color.alpha() == 0) { //transparent pixels means leaving the area as it is (e.g. if it is a subtemplate use the main template's terrain for this tile instead)
+			if (color.alpha() == 0) { //transparent pixels mean leaving the area as it is (e.g. if it is a subtemplate use the main template's terrain for this tile instead)
 				continue;
 			}
 
@@ -566,7 +597,7 @@ void map_template::apply_territory_image(const QPoint &template_start_pos, const
 
 			const QColor color = territory_image.pixelColor(x, y);
 			
-			if (color.alpha() == 0) { //transparent pixels means leaving the tile as it is
+			if (color.alpha() == 0) { //transparent pixels mean leaving the tile as it is
 				continue;
 			}
 
@@ -809,8 +840,8 @@ void map_template::Apply(const QPoint &template_start_pos, const QPoint &map_sta
 	
 	if (!this->get_subtemplates().empty()) {
 		ShowLoadProgress(_("Applying \"%s\" Subtemplates"), this->get_name().c_str());
-		this->apply_subtemplates(template_start_pos, map_start_pos, map_end, z, false);
-		this->apply_subtemplates(template_start_pos, map_start_pos, map_end, z, true);
+		this->apply_subtemplates(template_start_pos, map_start_pos, map_end, z, false, false);
+		this->apply_subtemplates(template_start_pos, map_start_pos, map_end, z, true, false);
 	}
 
 	if (!this->IsSubtemplateArea()) {
@@ -878,7 +909,13 @@ void map_template::Apply(const QPoint &template_start_pos, const QPoint &map_sta
 	}
 	this->apply_sites(template_start_pos, map_start_pos, map_end, z);
 	this->ApplyUnits(template_start_pos, map_start_pos, map_end, z);
-	
+
+	if (!this->get_subtemplates().empty()) {
+		ShowLoadProgress(_("Applying \"%s\" Constructed Subtemplates"), this->get_name().c_str());
+		this->apply_subtemplates(template_start_pos, map_start_pos, map_end, z, false, true);
+		this->apply_subtemplates(template_start_pos, map_start_pos, map_end, z, true, true);
+	}
+
 	bool generated_random_terrain = false;
 	if (has_base_map) {
 		ShowLoadProgress(_("Generating \"%s\" Map Template Random Terrain"), this->get_name().c_str());
@@ -983,9 +1020,13 @@ void map_template::Apply(const QPoint &template_start_pos, const QPoint &map_sta
 **	@param	z					The map layer
 **	@param	random				Whether it is subtemplates with a random position that should be applied, or ones with a fixed one
 */
-void map_template::apply_subtemplates(const QPoint &template_start_pos, const QPoint &map_start_pos, const QPoint &map_end, const int z, const bool random) const
+void map_template::apply_subtemplates(const QPoint &template_start_pos, const QPoint &map_start_pos, const QPoint &map_end, const int z, const bool random, bool constructed) const
 {
 	for (map_template *subtemplate : this->get_subtemplates()) {
+		if (constructed != subtemplate->is_constructed_only()) {
+			continue;
+		}
+
 		if (CMap::Map.is_subtemplate_on_map(subtemplate)) {
 			continue;
 		}
@@ -999,14 +1040,14 @@ void map_template::apply_subtemplate(map_template *subtemplate, const QPoint &te
 	QPoint subtemplate_pos = subtemplate->get_subtemplate_top_left_pos();
 	bool found_location = false;
 
-	if (subtemplate->UpperTemplate && (subtemplate_pos.x() < 0 || subtemplate_pos.y() < 0)) { //if has no given position, but has an upper template, use its coordinates instead
+	if (subtemplate->UpperTemplate != nullptr && (subtemplate_pos.x() < 0 || subtemplate_pos.y() < 0)) { //if has no given position, but has an upper template, use its coordinates instead
 		subtemplate_pos = CMap::Map.get_subtemplate_pos(subtemplate->UpperTemplate);
 		if (subtemplate_pos.x() >= 0 && subtemplate_pos.y() >= 0) {
 			found_location = true;
 		}
 	}
 
-	if (subtemplate->LowerTemplate && (subtemplate_pos.x() < 0 || subtemplate_pos.y() < 0)) { //if has no given position, but has a lower template, use its coordinates instead
+	if (subtemplate->LowerTemplate != nullptr && (subtemplate_pos.x() < 0 || subtemplate_pos.y() < 0)) { //if has no given position, but has a lower template, use its coordinates instead
 		subtemplate_pos = CMap::Map.get_subtemplate_pos(subtemplate->LowerTemplate);
 		if (subtemplate_pos.x() >= 0 && subtemplate_pos.y() >= 0) {
 			found_location = true;
@@ -2162,6 +2203,12 @@ QPoint map_template::generate_subtemplate_position(const map_template *subtempla
 			}
 		}
 
+		if (on_usable_area && subtemplate->is_constructed_only()) {
+			if (!this->is_constructed_subtemplate_suitable_for_pos(subtemplate, subtemplate_pos, z)) {
+				on_usable_area = false;
+			}
+		}
+
 		if (!on_usable_area) {
 			continue;
 		}
@@ -2170,6 +2217,88 @@ QPoint map_template::generate_subtemplate_position(const map_template *subtempla
 	}
 
 	return QPoint(-1, -1);
+}
+
+bool map_template::is_constructed_subtemplate_suitable_for_pos(const map_template *subtemplate, const QPoint &map_start_pos, const int z) const
+{
+	//there must be no units in the position where the subtemplate would be applied
+	std::vector<CUnit *> table;
+	Select(map_start_pos, map_start_pos + size::to_point(subtemplate->get_applied_size()) - QPoint(1, 1), table, z);
+	if (!table.empty()) {
+		return false;
+	}
+
+	return this->is_constructed_subtemplate_compatible_with_terrain(subtemplate, map_start_pos, z);
+}
+
+bool map_template::is_constructed_subtemplate_compatible_with_terrain(const map_template *subtemplate, const QPoint &map_start_pos, const int z) const
+{
+	if (subtemplate->get_overlay_terrain_image().empty()) {
+		return true;
+	}
+
+	const QPoint template_start_pos = subtemplate->get_start_pos();
+
+	const std::string terrain_filename = LibraryFileName(subtemplate->get_overlay_terrain_image().string().c_str());
+
+	if (!CanAccessFile(terrain_filename.c_str())) {
+		throw std::runtime_error("File \"" + terrain_filename + "\" not found.");
+	}
+
+	const QImage terrain_image(terrain_filename.c_str());
+
+	const int applied_width = subtemplate->get_applied_width();
+	const int applied_height = subtemplate->get_applied_height();
+
+	for (int x_offset = 0; x_offset < applied_width; ++x_offset) {
+		const int x = template_start_pos.x() + x_offset;
+		const int map_x = map_start_pos.x() + x_offset;
+
+		if (map_x >= CMap::Map.Info.MapWidths[z]) {
+			break;
+		}
+
+		for (int y_offset = 0; y_offset < applied_height; ++y_offset) {
+			const int y = template_start_pos.y() + y_offset;
+			const int map_y = map_start_pos.y() + y_offset;
+
+			if (map_y >= CMap::Map.Info.MapHeights[z]) {
+				break;
+			}
+
+			const QColor color = terrain_image.pixelColor(x, y);
+
+			if (color.alpha() == 0) {
+				//transparent pixels mean ignoring the tile's overlay for the check
+				continue;
+			}
+
+			const CMapField *tile = CMap::Map.Field(map_x, map_y, z);
+
+			if (color.red() == 0 && color.green() == 0 && color.blue() == 0) {
+				//a pure black pixel means the tile must have no overlay
+				if (tile->OverlayTerrain != nullptr) {
+					return false;
+				}
+
+				continue;
+			}
+
+			const terrain_type *terrain = terrain_type::get_by_color(color);
+
+			//the tile's overlay terrain must either match that in the map template exactly, or not be set
+			if (tile->OverlayTerrain != nullptr && tile->OverlayTerrain != terrain) {
+				return false;
+			}
+
+			if (tile->OverlayTerrain != terrain && !vector::contains(terrain->get_base_terrain_types(), tile->Terrain)) {
+				//the tile's terrain must be a valid base terrain for the overlay terrain type
+				return false;
+			}
+		}
+	}
+
+	return true;
 }
 
 /**
