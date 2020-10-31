@@ -131,6 +131,14 @@ static std::vector<std::unique_ptr<gcn::Container>> Containers;
 
 namespace wyrmgus {
 
+game::game()
+{
+}
+
+game::~game()
+{
+}
+
 void game::apply_player_history()
 {
 	const CDate start_date = current_campaign->get_start_date();
@@ -261,6 +269,21 @@ void game::do_cycle()
 			map_layer->DoPerHourLoop();
 		}
 	}
+}
+
+void game::add_local_trigger(std::unique_ptr<trigger> &&local_trigger)
+{
+	this->local_triggers.push_back(std::move(local_trigger));
+}
+
+void game::remove_local_trigger(trigger *local_trigger)
+{
+	vector::remove(this->local_triggers, local_trigger);
+}
+
+void game::clear_local_triggers()
+{
+	this->local_triggers.clear();
 }
 
 }

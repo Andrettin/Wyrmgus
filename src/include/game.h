@@ -33,10 +33,14 @@
 namespace wyrmgus {
 
 class campaign;
+class trigger;
 
 class game final : public singleton<game>
 {
 public:
+	game();
+	~game();
+
 	campaign *get_current_campaign() const
 	{
 		return this->current_campaign;
@@ -61,9 +65,14 @@ public:
 
 	void do_cycle();
 
+	void add_local_trigger(std::unique_ptr<trigger> &&local_trigger);
+	void remove_local_trigger(trigger *local_trigger);
+	void clear_local_triggers();
+
 private:
 	campaign *current_campaign = nullptr;
 	QDateTime current_date;
+	std::vector<std::unique_ptr<trigger>> local_triggers; //triggers "local" to the current game
 };
 
 }

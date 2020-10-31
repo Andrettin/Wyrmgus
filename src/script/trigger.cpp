@@ -495,9 +495,9 @@ static int CclAddTrigger(lua_State *l)
 	
 	//this function only adds temporary triggers, that is, ones that will only last for the current game
 	
-	wyrmgus::trigger *trigger = new wyrmgus::trigger(trigger_ident);
+	auto trigger = std::make_unique<wyrmgus::trigger>(trigger_ident);
 	trigger->Local = true;
-	wyrmgus::trigger::ActiveTriggers.push_back(trigger);
+	wyrmgus::trigger::ActiveTriggers.push_back(trigger.get());
 	
 	trigger->Conditions = std::make_unique<LuaCallback>(l, 2);
 	trigger->Effects = std::make_unique<LuaCallback>(l, 3);
@@ -505,6 +505,8 @@ static int CclAddTrigger(lua_State *l)
 	if (trigger->Conditions == nullptr || trigger->Effects == nullptr) {
 		fprintf(stderr, "Trigger \"%s\" has no conditions or no effects.\n", trigger->get_identifier().c_str());
 	}
+
+	wyrmgus::game::get()->add_local_trigger(std::move(trigger));
 
 	return 0;
 }
@@ -562,7 +564,7 @@ void TriggersEachCycle()
 						wyrmgus::trigger::ActiveTriggers.erase(wyrmgus::trigger::ActiveTriggers.begin() + wyrmgus::trigger::CurrentTriggerId);
 						removed_trigger = true;
 						if (current_trigger->Local) {
-							delete current_trigger;
+							wyrmgus::game::get()->remove_local_trigger(current_trigger);
 						}
 					}
 				}
@@ -601,7 +603,7 @@ void TriggersEachCycle()
 				wyrmgus::trigger::ActiveTriggers.erase(wyrmgus::trigger::ActiveTriggers.begin() + wyrmgus::trigger::CurrentTriggerId);
 				removed_trigger = true;
 				if (current_trigger->Local) {
-					delete current_trigger;
+					wyrmgus::game::get()->remove_local_trigger(current_trigger);
 				}
 			}
 		}
@@ -659,12 +661,7 @@ void trigger::ClearActiveTriggers()
 
 	trigger::CurrentTriggerId = 0;
 
-	for (trigger *trigger : trigger::ActiveTriggers) {
-		if (trigger->Local) {
-			delete trigger;
-		}
-	}
-	
+	wyrmgus::game::get()->clear_local_triggers();
 	trigger::ActiveTriggers.clear();
 	trigger::DeactivatedTriggers.clear();
 	
