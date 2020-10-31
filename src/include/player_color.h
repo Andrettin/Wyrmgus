@@ -36,6 +36,7 @@ class player_color final : public named_data_entry, public data_type<player_colo
 {
 	Q_OBJECT
 
+	Q_PROPERTY(bool hidden MEMBER hidden READ is_hidden)
 	Q_PROPERTY(QVariantList colors READ get_colors_qvariant_list)
 
 public:
@@ -47,6 +48,11 @@ public:
 	}
 
 	virtual void check() const override;
+
+	bool is_hidden() const
+	{
+		return this->hidden;
+	}
 
 	const std::vector<QColor> &get_colors() const
 	{
@@ -61,6 +67,7 @@ public:
 	}
 
 private:
+	bool hidden = false;
 	std::vector<QColor> colors; //the color shades of the player color
 };
 

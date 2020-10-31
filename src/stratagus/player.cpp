@@ -1179,6 +1179,10 @@ void CPlayer::SetFaction(const wyrmgus::faction *faction)
 					continue;
 				}
 
+				if (pc->is_hidden()) {
+					continue;
+				}
+
 				const int usage_count = this->get_player_color_usage_count(pc);
 				if (best_usage_count != -1 && usage_count > best_usage_count) {
 					continue;
