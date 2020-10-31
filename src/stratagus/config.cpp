@@ -84,7 +84,6 @@ void CConfigData::ParseConfigData(const std::string &filepath, const bool define
 	
 	CConfigData *config_data = nullptr;
 	std::string key;
-	std::string value;
 	for (size_t i = 0; i < data.size(); ++i) {
 		std::string str = data[i];
 		if (str.size() >= 2 && str[0] == '[' && str[1] != '/') { //opens a tag

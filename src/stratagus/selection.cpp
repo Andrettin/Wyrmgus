@@ -320,7 +320,7 @@ void UnSelectUnit(CUnit &unit)
 }
 
 //Wyrmgus start
-bool UnitCanBeSelectedWith(CUnit &first_unit, CUnit &second_unit)
+bool UnitCanBeSelectedWith(const CUnit &first_unit, const CUnit &second_unit)
 {
 	if (first_unit.Type->BoolFlag[BUILDING_INDEX].value != second_unit.Type->BoolFlag[BUILDING_INDEX].value) {
 		return false;
@@ -604,16 +604,16 @@ int SelectGroup(int group_number, GroupSelectionMode mode)
 **  @return      0 if the unit doesn't belong to a group,
 **               or the number of units in the group.
 */
-int AddGroupFromUnitToSelection(CUnit &unit)
+int AddGroupFromUnitToSelection(const CUnit &group_unit)
 {
-	unsigned int group = unit.LastGroup;
+	const unsigned int group = group_unit.LastGroup;
 
 	if (!group) { // belongs to no group
 		return 0;
 	}
 	
 	//Wyrmgus start
-	if (Selected.size() && !UnitCanBeSelectedWith(*Selected[0], unit)) {
+	if (Selected.size() && !UnitCanBeSelectedWith(*Selected[0], group_unit)) {
 		return 0;
 	}
 	//Wyrmgus end
@@ -640,7 +640,7 @@ int AddGroupFromUnitToSelection(CUnit &unit)
 **  @return      0 if the unit doesn't belong to a group,
 **               or the number of units in the group.
 */
-int SelectGroupFromUnit(CUnit &unit)
+int SelectGroupFromUnit(const CUnit &unit)
 {
 	if (!unit.LastGroup) { // belongs to no group
 		return 0;

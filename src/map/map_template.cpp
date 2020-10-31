@@ -1251,8 +1251,8 @@ void map_template::apply_sites(const QPoint &template_start_pos, const QPoint &m
 					fprintf(stderr, "Error in CMap::apply_sites (site ident \"%s\"): historical resource type is null.\n", site->Ident.c_str());
 					continue;
 				}
-				Vec2i unit_offset((type->get_tile_size() - QSize(1, 1)) / 2);
-				CUnit *unit = CreateResourceUnit(site_pos - unit_offset, *type, z, false); // don't generate unique resources when setting special properties, since for map templates unique resources are supposed to be explicitly indicated
+				const Vec2i resource_unit_offset((type->get_tile_size() - QSize(1, 1)) / 2);
+				CUnit *unit = CreateResourceUnit(site_pos - resource_unit_offset, *type, z, false); // don't generate unique resources when setting special properties, since for map templates unique resources are supposed to be explicitly indicated
 				if (std::get<3>(site->HistoricalResources[j])) {
 					unit->set_unique(std::get<3>(site->HistoricalResources[j]));
 				}
@@ -1345,14 +1345,14 @@ void map_template::apply_sites(const QPoint &template_start_pos, const QPoint &m
 				throw std::runtime_error("Site \"" + site->get_identifier() + "\" has a town hall, but isn't set as a major one.");
 			}
 
-			const QPoint unit_offset = unit_type->get_tile_center_pos_offset();
+			const QPoint building_unit_offset = unit_type->get_tile_center_pos_offset();
 			if (!is_position_shift_acceptable && first_building) {
-				if (!OnTopDetails(*unit_type, nullptr) && !UnitTypeCanBeAt(*unit_type, site_pos - unit_offset, z) && CMap::Map.Info.IsPointOnMap(site_pos - unit_offset, z) && CMap::Map.Info.IsPointOnMap(site_pos - unit_offset + size::to_point(unit_type->get_tile_size() - QSize(1, 1)), z)) {
+				if (!OnTopDetails(*unit_type, nullptr) && !UnitTypeCanBeAt(*unit_type, site_pos - building_unit_offset, z) && CMap::Map.Info.IsPointOnMap(site_pos - building_unit_offset, z) && CMap::Map.Info.IsPointOnMap(site_pos - building_unit_offset + size::to_point(unit_type->get_tile_size() - QSize(1, 1)), z)) {
 					throw std::runtime_error("The \"" + unit_type->get_identifier() + "\" representing the minor site of \"" + site->get_identifier() + "\" should be placed on (" + std::to_string(site_raw_pos.x()) + ", " + std::to_string(site_raw_pos.y()) + "), but it cannot be there.");
 				}
 			}
 
-			CUnit *unit = CreateUnit(site_pos - unit_offset, *unit_type, player, z, true, site->is_major() ? site : nullptr);
+			CUnit *unit = CreateUnit(site_pos - building_unit_offset, *unit_type, player, z, true, site->is_major() ? site : nullptr);
 
 			if (first_building) {
 				if (!unit_type->BoolFlag[TOWNHALL_INDEX].value && !site->get_name().empty()) { //if one building is representing a minor site, make it have the site's name
@@ -1408,9 +1408,9 @@ void map_template::apply_sites(const QPoint &template_start_pos, const QPoint &m
 					fprintf(stderr, "Error in CMap::apply_sites (site ident \"%s\"): site has a town hall, but isn't set as a major one.\n", site->Ident.c_str());
 					continue;
 				}
-				Vec2i unit_offset((unit_type->get_tile_size() - QSize(1, 1)) / 2);
+				const Vec2i building_unit_offset((unit_type->get_tile_size() - QSize(1, 1)) / 2);
 				if (!is_position_shift_acceptable && first_building) {
-					if (!OnTopDetails(*unit_type, nullptr) && !UnitTypeCanBeAt(*unit_type, site_pos - unit_offset, z) && CMap::Map.Info.IsPointOnMap(site_pos - unit_offset, z) && CMap::Map.Info.IsPointOnMap(site_pos - unit_offset + Vec2i(unit_type->get_tile_size() - QSize(1, 1)), z)) {
+					if (!OnTopDetails(*unit_type, nullptr) && !UnitTypeCanBeAt(*unit_type, site_pos - building_unit_offset, z) && CMap::Map.Info.IsPointOnMap(site_pos - building_unit_offset, z) && CMap::Map.Info.IsPointOnMap(site_pos - building_unit_offset + Vec2i(unit_type->get_tile_size() - QSize(1, 1)), z)) {
 						fprintf(stderr, "The \"%s\" representing the minor site of \"%s\" should be placed on (%d, %d), but it cannot be there.\n", unit_type->Ident.c_str(), site->Ident.c_str(), site_raw_pos.x(), site_raw_pos.y());
 					}
 				}
@@ -1421,11 +1421,11 @@ void map_template::apply_sites(const QPoint &template_start_pos, const QPoint &m
 						continue;
 					}
 					if (building_player->StartPos.x == 0 && building_player->StartPos.y == 0) {
-						building_player->SetStartView(site_pos - unit_offset, z);
+						building_player->SetStartView(site_pos - building_unit_offset, z);
 					}
-					unit = CreateUnit(site_pos - unit_offset, *unit_type, building_player, z, true, site->is_major() ? site : nullptr);
+					unit = CreateUnit(site_pos - building_unit_offset, *unit_type, building_player, z, true, site->is_major() ? site : nullptr);
 				} else {
-					unit = CreateUnit(site_pos - unit_offset, *unit_type, player, z, true, site->is_major() ? site : nullptr);
+					unit = CreateUnit(site_pos - building_unit_offset, *unit_type, player, z, true, site->is_major() ? site : nullptr);
 				}
 				if (std::get<3>(site->HistoricalBuildings[j])) {
 					unit->set_unique(std::get<3>(site->HistoricalBuildings[j]));
@@ -1501,10 +1501,10 @@ void map_template::apply_sites(const QPoint &template_start_pos, const QPoint &m
 					} else {
 						unit_player = player;
 					}
-					Vec2i unit_offset((type->get_tile_size() - QSize(1, 1)) / 2);
+					const Vec2i historical_unit_offset((type->get_tile_size() - QSize(1, 1)) / 2);
 
 					for (int k = 0; k < unit_quantity; ++k) {
-						CUnit *unit = CreateUnit(site_pos - unit_offset, *type, unit_player, z, false, site->is_major() ? site : nullptr);
+						CUnit *unit = CreateUnit(site_pos - historical_unit_offset, *type, unit_player, z, false, site->is_major() ? site : nullptr);
 						if (!type->BoolFlag[HARVESTER_INDEX].value) { // make non-worker units not have an active AI
 							unit->Active = 0;
 							unit_player->ChangeUnitTypeAiActiveCount(type, -1);

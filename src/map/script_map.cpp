@@ -104,10 +104,10 @@ static int CclStratagusMap(lua_State *l)
 			}
 			int subargs = lua_rawlen(l, j + 1);
 			for (int k = 0; k < subargs; ++k) {
-				const char *value = LuaToString(l, j + 1, k + 1);
+				const char *subvalue = LuaToString(l, j + 1, k + 1);
 				++k;
 
-				if (!strcmp(value, "size")) {
+				if (!strcmp(subvalue, "size")) {
 					lua_rawgeti(l, j + 1, k + 1);
 					CclGetPos(l, &CMap::Map.Info.MapWidth, &CMap::Map.Info.MapHeight);
 					lua_pop(l, 1);
@@ -125,16 +125,16 @@ static int CclStratagusMap(lua_State *l)
 					CMap::Map.MapLayers.push_back(std::move(map_layer));
 					//Wyrmgus end
 					// FIXME: this should be CreateMap or InitMap?
-				} else if (!strcmp(value, "fog-of-war")) {
+				} else if (!strcmp(subvalue, "fog-of-war")) {
 					CMap::Map.NoFogOfWar = false;
 					--k;
-				} else if (!strcmp(value, "no-fog-of-war")) {
+				} else if (!strcmp(subvalue, "no-fog-of-war")) {
 					CMap::Map.NoFogOfWar = true;
 					--k;
-				} else if (!strcmp(value, "filename")) {
+				} else if (!strcmp(subvalue, "filename")) {
 					CMap::Map.Info.Filename = LuaToString(l, j + 1, k + 1);
 				//Wyrmgus start
-				} else if (!strcmp(value, "extra-map-layers")) {
+				} else if (!strcmp(subvalue, "extra-map-layers")) {
 					lua_rawgeti(l, j + 1, k + 1);
 					if (!lua_istable(l, -1)) {
 						LuaError(l, "incorrect argument for \"extra-map-layers\"");
@@ -155,7 +155,7 @@ static int CclStratagusMap(lua_State *l)
 						lua_pop(l, 1);
 					}
 					lua_pop(l, 1);
-				} else if (!strcmp(value, "time-of-day")) {
+				} else if (!strcmp(subvalue, "time-of-day")) {
 					lua_rawgeti(l, j + 1, k + 1);
 					if (!lua_istable(l, -1)) {
 						LuaError(l, "incorrect argument for \"time-of-day\"");
@@ -181,7 +181,7 @@ static int CclStratagusMap(lua_State *l)
 						lua_pop(l, 1);
 					}
 					lua_pop(l, 1);
-				} else if (!strcmp(value, "season")) {
+				} else if (!strcmp(subvalue, "season")) {
 					lua_rawgeti(l, j + 1, k + 1);
 					if (!lua_istable(l, -1)) {
 						LuaError(l, "incorrect argument for \"season\"");
@@ -201,7 +201,7 @@ static int CclStratagusMap(lua_State *l)
 						lua_pop(l, 1);
 					}
 					lua_pop(l, 1);
-				} else if (!strcmp(value, "layer-references")) {
+				} else if (!strcmp(subvalue, "layer-references")) {
 					lua_rawgeti(l, j + 1, k + 1);
 					if (!lua_istable(l, -1)) {
 						LuaError(l, "incorrect argument for \"layer-references\"");
@@ -217,7 +217,7 @@ static int CclStratagusMap(lua_State *l)
 						lua_pop(l, 1);
 					}
 					lua_pop(l, 1);
-				} else if (!strcmp(value, "landmasses")) {
+				} else if (!strcmp(subvalue, "landmasses")) {
 					lua_rawgeti(l, j + 1, k + 1);
 					if (!lua_istable(l, -1)) {
 						LuaError(l, "incorrect argument for \"landmasses\"");
@@ -239,7 +239,7 @@ static int CclStratagusMap(lua_State *l)
 					}
 					lua_pop(l, 1);
 				//Wyrmgus end
-				} else if (!strcmp(value, "map-fields")) {
+				} else if (!strcmp(subvalue, "map-fields")) {
 					//Wyrmgus start
 					/*
 					lua_rawgeti(l, j + 1, k + 1);
@@ -293,7 +293,7 @@ static int CclStratagusMap(lua_State *l)
 					lua_pop(l, 1);
 					//Wyrmgus end
 				} else {
-					LuaError(l, "Unsupported tag: %s" _C_ value);
+					LuaError(l, "Unsupported tag: %s" _C_ subvalue);
 				}
 			}
 		} else {

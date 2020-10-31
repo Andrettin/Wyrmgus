@@ -2030,7 +2030,7 @@ static int CclDefineLanguage(lua_State *l)
 				int word_junction_type = WordJunctionTypeNoWordJunction;
 				if (GetWordJunctionTypeIdByName(LuaToString(l, -1, k + 1)) != -1) {
 					std::string word_junction_type_name = LuaToString(l, -1, k + 1);
-					int word_junction_type = GetWordJunctionTypeIdByName(word_junction_type_name);
+					word_junction_type = GetWordJunctionTypeIdByName(word_junction_type_name);
 					if (word_junction_type == -1) {
 						LuaError(l, "Word junction type \"%s\" doesn't exist." _C_ word_junction_type_name.c_str());
 					}

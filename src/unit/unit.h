@@ -956,7 +956,7 @@ extern void SelectSingleUnit(CUnit &unit);
 extern void UnSelectUnit(CUnit &unit);
 //Wyrmgus start
 /// Check whether two units can be selected together
-extern bool UnitCanBeSelectedWith(CUnit &first_unit, CUnit &second_unit);
+extern bool UnitCanBeSelectedWith(const CUnit &first_unit, const CUnit &second_unit);
 //Wyrmgus end
 /// Add a unit to selected if not already selected, remove it otherwise
 extern int ToggleSelectUnit(CUnit &unit);
@@ -970,9 +970,9 @@ extern int ToggleUnitsByType(CUnit &base);
 /// Select the units belonging to a particular group
 extern int SelectGroup(int group_number, GroupSelectionMode mode = GroupSelectionMode::SELECTABLE_BY_RECTANGLE_ONLY);
 /// Add the units from the same group as the one in parameter
-extern int AddGroupFromUnitToSelection(CUnit &unit);
+extern int AddGroupFromUnitToSelection(const CUnit &unit);
 /// Select the units from the same group as the one in parameter
-extern int SelectGroupFromUnit(CUnit &unit);
+extern int SelectGroupFromUnit(const CUnit &group_unit);
 //Wyrmgus start
 /// Select entire army
 extern int SelectArmy();

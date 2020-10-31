@@ -271,7 +271,7 @@ void UpdateDisplay()
 		//draw icon if the player has a hero
 		for (size_t i = 0; i < UI.HeroUnitButtons.size() && i < CPlayer::GetThisPlayer()->Heroes.size(); ++i) {
 			const PixelPos pos(UI.HeroUnitButtons[i].X, UI.HeroUnitButtons[i].Y);
-			const int flag = (ButtonAreaUnderCursor == ButtonAreaHeroUnit && ButtonUnderCursor == i) ? (IconActive | (MouseButtons & LeftButton)) : 0;
+			const int flag = (ButtonAreaUnderCursor == ButtonAreaHeroUnit && ButtonUnderCursor == static_cast<int>(i)) ? (IconActive | (MouseButtons & LeftButton)) : 0;
 									 
 			CPlayer::GetThisPlayer()->Heroes[i]->get_icon()->DrawUnitIcon(*UI.HeroUnitButtons[i].Style, flag, pos, "", CPlayer::GetThisPlayer()->get_player_color());
 		}
