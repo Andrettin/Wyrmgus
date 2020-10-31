@@ -96,6 +96,8 @@ class map_template final : public named_data_entry, public data_type<map_templat
 	Q_PROPERTY(QPoint subtemplate_center_pos MEMBER subtemplate_center_pos READ get_subtemplate_center_pos)
 	Q_PROPERTY(QPoint min_subtemplate_pos MEMBER min_subtemplate_pos READ get_min_subtemplate_pos)
 	Q_PROPERTY(QPoint max_subtemplate_pos MEMBER max_subtemplate_pos READ get_max_subtemplate_pos)
+	Q_PROPERTY(QGeoCoordinate min_subtemplate_geocoordinate MEMBER min_subtemplate_geocoordinate)
+	Q_PROPERTY(QGeoCoordinate max_subtemplate_geocoordinate MEMBER max_subtemplate_geocoordinate)
 	Q_PROPERTY(wyrmgus::plane* plane MEMBER plane READ get_plane)
 	Q_PROPERTY(wyrmgus::world* world READ get_world WRITE set_world)
 	Q_PROPERTY(wyrmgus::map_template* main_template READ get_main_template WRITE set_main_template)
@@ -620,6 +622,8 @@ private:
 	QPoint subtemplate_center_pos = QPoint(-1, -1); //this template's position as a subtemplate in its main template; the position is relative to the subtemplate's center
 	QPoint min_subtemplate_pos = QPoint(-1, -1); //the minimum position this subtemplate can be applied to in its main template; the position is relative to the subtemplate's center
 	QPoint max_subtemplate_pos = QPoint(-1, -1); //the maximum position this subtemplate can be applied to in its main template; the position is relative to the subtemplate's center
+	QGeoCoordinate min_subtemplate_geocoordinate;
+	QGeoCoordinate max_subtemplate_geocoordinate;
 	QPoint start_pos = QPoint(0, 0); //the start position within the map template to be applied when it is used
 	QPoint end_pos = QPoint(-1, -1); //the end position within the map template to be applied when it is used
 private:

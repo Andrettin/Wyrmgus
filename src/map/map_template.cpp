@@ -297,6 +297,26 @@ void map_template::initialize()
 		if (this->get_main_template()->get_world() != nullptr) {
 			this->world = this->get_main_template()->get_world();
 		}
+
+		if (this->min_subtemplate_geocoordinate.isValid()) {
+			this->min_subtemplate_pos = this->get_main_template()->get_geocoordinate_pos(this->min_subtemplate_geocoordinate);
+
+			this->min_subtemplate_pos.setX(std::max(this->min_subtemplate_pos.x(), 0));
+			this->min_subtemplate_pos.setY(std::max(this->min_subtemplate_pos.y(), 0));
+
+			this->min_subtemplate_pos.setX(std::min(this->min_subtemplate_pos.x(), this->get_main_template()->get_width() - 1));
+			this->min_subtemplate_pos.setY(std::min(this->min_subtemplate_pos.y(), this->get_main_template()->get_height() - 1));
+		}
+
+		if (this->max_subtemplate_geocoordinate.isValid()) {
+			this->max_subtemplate_pos = this->get_main_template()->get_geocoordinate_pos(this->max_subtemplate_geocoordinate);
+
+			this->max_subtemplate_pos.setX(std::max(this->max_subtemplate_pos.x(), 0));
+			this->max_subtemplate_pos.setY(std::max(this->max_subtemplate_pos.y(), 0));
+
+			this->max_subtemplate_pos.setX(std::min(this->max_subtemplate_pos.x(), this->get_main_template()->get_width() - 1));
+			this->max_subtemplate_pos.setY(std::min(this->max_subtemplate_pos.y(), this->get_main_template()->get_height() - 1));
+		}
 	}
 
 	if (!this->subtemplates.empty()) { //if this template has subtemplates, sort them according to priority, and to size (the larger map templates should be applied first, to make it more likely that they appear at all
