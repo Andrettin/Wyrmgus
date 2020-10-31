@@ -40,7 +40,7 @@ class unique_item;
 class unit_class;
 class unit_type;
 
-class historical_unit : public named_data_entry, public data_type<historical_unit>
+class historical_unit final : public named_data_entry, public data_type<historical_unit>
 {
 	Q_OBJECT
 
@@ -163,7 +163,7 @@ private:
 	bool ai_active = true; //whether the unit's AI is active
 	int ttl = 0; //the TTL (time to live, in cycles) of the unit, useful for revealers
 	bool active = false; //whether the unit is active, i.e. should be applied to the map; used for history
-	faction *faction = nullptr; //the unit's faction, used for history
+	wyrmgus::faction *faction = nullptr; //the unit's faction, used for history
 	std::unique_ptr<historical_location> location; //the unit's location, used for history
 };
 
