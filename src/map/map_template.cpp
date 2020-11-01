@@ -389,37 +389,6 @@ void map_template::initialize()
 	data_entry::initialize();
 }
 
-void map_template::check() const
-{
-	if (!this->get_terrain_image().empty()) {
-		const std::string terrain_filename = LibraryFileName(this->get_terrain_image().string().c_str());
-
-		if (!CanAccessFile(terrain_filename.c_str())) {
-			throw std::runtime_error("The terrain image file \"" + terrain_filename + "\" for map template \"" + this->get_identifier() + "\" does not exist.");
-		}
-
-		const QImage terrain_image(terrain_filename.c_str());
-
-		if (terrain_image.size() != this->get_size()) {
-			throw std::runtime_error("The terrain image for map template \"" + this->get_identifier() + "\" has a different size (" + std::to_string(terrain_image.width()) + ", " + std::to_string(terrain_image.height()) + ") than that of the map template itself (" + std::to_string(this->get_width()) + ", " + std::to_string(this->get_height()) + ").");
-		}
-	}
-
-	if (!this->get_overlay_terrain_image().empty()) {
-		const std::string terrain_filename = LibraryFileName(this->get_overlay_terrain_image().string().c_str());
-
-		if (!CanAccessFile(terrain_filename.c_str())) {
-			throw std::runtime_error("The overlay terrain image file \"" + terrain_filename + "\" for map template \"" + this->get_identifier() + "\" does not exist.");
-		}
-
-		const QImage terrain_image(terrain_filename.c_str());
-
-		if (terrain_image.size() != this->get_size()) {
-			throw std::runtime_error("The overlay terrain image for map template \"" + this->get_identifier() + "\" has a different size (" + std::to_string(terrain_image.width()) + ", " + std::to_string(terrain_image.height()) + ") than that of the map template itself (" + std::to_string(this->get_width()) + ", " + std::to_string(this->get_height()) + ").");
-		}
-	}
-}
-
 void map_template::ApplyTerrainFile(bool overlay, Vec2i template_start_pos, Vec2i map_start_pos, int z) const
 {
 	std::filesystem::path terrain_file;
@@ -503,6 +472,8 @@ void map_template::ApplyTerrainFile(bool overlay, Vec2i template_start_pos, Vec2
 
 void map_template::ApplyTerrainImage(bool overlay, Vec2i template_start_pos, Vec2i map_start_pos, int z) const
 {
+	using namespace std::string_literals;
+
 	std::filesystem::path terrain_file;
 	if (overlay) {
 		terrain_file = this->get_overlay_terrain_image();
@@ -518,11 +489,15 @@ void map_template::ApplyTerrainImage(bool overlay, Vec2i template_start_pos, Vec
 	const std::string terrain_filename = LibraryFileName(terrain_file.string().c_str());
 		
 	if (!CanAccessFile(terrain_filename.c_str())) {
-		fprintf(stderr, "File \"%s\" not found.\n", terrain_filename.c_str());
+		throw std::runtime_error("The "s + (overlay ? "overlay " : "") + "terrain image file \"" + terrain_filename + "\" for map template \"" + this->get_identifier() + "\" does not exist.");
 	}
 	
 	const QImage terrain_image(terrain_filename.c_str());
-	
+
+	if (terrain_image.size() != this->get_size()) {
+		throw std::runtime_error("The "s + (overlay ? "overlay " : "") + "terrain image for map template \"" + this->get_identifier() + "\" has a different size (" + std::to_string(terrain_image.width()) + ", " + std::to_string(terrain_image.height()) + ") than that of the map template itself (" + std::to_string(this->get_width()) + ", " + std::to_string(this->get_height()) + ").");
+	}
+
 	for (int y = 0; y < terrain_image.height(); ++y) {
 		if (y < template_start_pos.y || y >= (template_start_pos.y + CMap::Map.Info.MapHeights[z])) {
 			continue;

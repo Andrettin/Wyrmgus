@@ -134,7 +134,6 @@ public:
 	virtual void process_sml_scope(const sml_data &scope) override;
 	virtual void ProcessConfigData(const CConfigData *config_data) override;
 	virtual void initialize() override;
-	virtual void check() const override;
 
 	void ApplyTerrainFile(bool overlay, Vec2i template_start_pos, Vec2i map_start_pos, int z) const;
 	void ApplyTerrainImage(bool overlay, Vec2i template_start_pos, Vec2i map_start_pos, int z) const;
