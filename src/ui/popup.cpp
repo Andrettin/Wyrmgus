@@ -191,9 +191,9 @@ int CPopupContentTypeText::GetWidth(const wyrmgus::button &button, int *) const
 	const wyrmgus::font *font = this->Font ? this->Font : wyrmgus::defines::get()->get_small_font();
 	//Wyrmgus start
 	button.SetTriggerData();
-	int resource = button.Value;
+	const int resource = button.Value;
 	if (button.Action == ButtonCmd::ProduceResource || button.Action == ButtonCmd::SellResource || button.Action == ButtonCmd::BuyResource) {
-		TriggerData.Resource = &resource;
+		TriggerData.resource = wyrmgus::resource::get_all()[resource];
 	}
 	std::string text = EvalString(this->Text);
 	button.CleanTriggerData();
@@ -233,9 +233,9 @@ int CPopupContentTypeText::GetHeight(const wyrmgus::button &button, int *) const
 
 	//Wyrmgus start
 	button.SetTriggerData();
-	int resource = button.Value;
+	const int resource = button.Value;
 	if (button.Action == ButtonCmd::ProduceResource || button.Action == ButtonCmd::SellResource || button.Action == ButtonCmd::BuyResource) {
-		TriggerData.Resource = &resource;
+		TriggerData.resource = wyrmgus::resource::get_all()[resource];
 	}
 	std::string text = EvalString(this->Text);
 	button.CleanTriggerData();
@@ -264,9 +264,9 @@ void CPopupContentTypeText::Draw(int x, int y, const CPopup &popup, const unsign
 
 	//Wyrmgus start
 	button.SetTriggerData();
-	int resource = button.Value;
+	const int resource = button.Value;
 	if (button.Action == ButtonCmd::ProduceResource || button.Action == ButtonCmd::SellResource || button.Action == ButtonCmd::BuyResource) {
-		TriggerData.Resource = &resource;
+		TriggerData.resource = wyrmgus::resource::get_all()[resource];
 	}
 	std::string text = EvalString(this->Text);
 	button.CleanTriggerData();
@@ -532,9 +532,9 @@ int CPopupContentTypeVariable::GetWidth(const wyrmgus::button &button, int *) co
 	//Wyrmgus start
 //	TriggerData.Type = UnitTypes[button.Value];
 	button.SetTriggerData();
-	int resource = button.Value;
+	const int resource = button.Value;
 	if (button.Action == ButtonCmd::ProduceResource || button.Action == ButtonCmd::SellResource || button.Action == ButtonCmd::BuyResource) {
-		TriggerData.Resource = &resource;
+		TriggerData.resource = wyrmgus::resource::get_all()[resource];
 	}
 	//Wyrmgus end
 	std::string text = EvalString(this->Text);
@@ -568,9 +568,9 @@ void CPopupContentTypeVariable::Draw(int x, int y, const CPopup &, const unsigne
 
 	if (this->Text) {
 		button.SetTriggerData();
-		int resource = button.Value;
+		const int resource = button.Value;
 		if (button.Action == ButtonCmd::ProduceResource || button.Action == ButtonCmd::SellResource || button.Action == ButtonCmd::BuyResource) {
-			TriggerData.Resource = &resource;
+			TriggerData.resource = wyrmgus::resource::get_all()[resource];
 		}
 		text = EvalString(this->Text);
 		button.CleanTriggerData();

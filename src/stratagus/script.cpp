@@ -555,13 +555,13 @@ static const CUpgrade **Str2UpgradeRef(lua_State *l, const char *s)
 **
 **  @todo better check for error (restrict param).
 */
-static int **Str2ResourceRef(lua_State *l, const char *s)
+static const wyrmgus::resource **Str2ResourceRef(lua_State *l, const char *s)
 {
-	int **res = nullptr; // Result.
+	const wyrmgus::resource **res = nullptr; // Result.
 
 	Assert(l);
 	if (!strcmp(s, "Resource")) {
-		res = &TriggerData.Resource;
+		res = &TriggerData.resource;
 	} else {
 		LuaError(l, "Invalid type reference '%s'\n" _C_ s);
 	}
@@ -678,9 +678,9 @@ const CUpgrade **CclParseUpgradeDesc(lua_State *l)
 **
 **  @return   resource index.
 */
-int **CclParseResourceDesc(lua_State *l)
+const wyrmgus::resource **CclParseResourceDesc(lua_State *l)
 {
-	int **res = nullptr;
+	const wyrmgus::resource **res = nullptr;
 
 	if (lua_isstring(l, -1)) {
 		res = Str2ResourceRef(l, LuaToString(l, -1));
@@ -1536,7 +1536,7 @@ std::string EvalString(const StringDesc *s)
 	//Wyrmgus start
 	const wyrmgus::unit_type **type;	// Temporary unit type
 	const CUpgrade **upgrade;	// Temporary upgrade
-	int **resource;		// Temporary resource
+	const wyrmgus::resource **resource;		// Temporary resource
 	const wyrmgus::faction **faction;	// Temporary faction
 	//Wyrmgus end
 	int player_index;
@@ -1731,16 +1731,18 @@ std::string EvalString(const StringDesc *s)
 			if (type != nullptr) {
 				std::string improve_incomes;
 				bool first = true;
-				for (int res = 1; res < MaxCosts; ++res) {
-					if ((**type).Stats[CPlayer::GetThisPlayer()->Index].ImproveIncomes[res] > wyrmgus::resource::get_all()[res]->get_default_income()) {
+				for (int res_index = 1; res_index < MaxCosts; ++res_index) {
+					const wyrmgus::resource *loop_resource = wyrmgus::resource::get_all()[res_index];
+
+					if ((**type).Stats[CPlayer::GetThisPlayer()->Index].ImproveIncomes[res_index] > loop_resource->get_default_income()) {
 						if (!first) {
 							improve_incomes += "\n";
 						} else {
 							first = false;
 						}
-						improve_incomes += IdentToName(DefaultResourceNames[res]);
+						improve_incomes += loop_resource->get_name();
 						improve_incomes += " Processing Bonus: +";
-						improve_incomes += std::to_string((**type).Stats[CPlayer::GetThisPlayer()->Index].ImproveIncomes[res] - wyrmgus::resource::get_all()[res]->get_default_income());
+						improve_incomes += std::to_string((**type).Stats[CPlayer::GetThisPlayer()->Index].ImproveIncomes[res_index] - loop_resource->get_default_income());
 						improve_incomes += "%";
 					}
 				}
@@ -1753,16 +1755,18 @@ std::string EvalString(const StringDesc *s)
 			if (type != nullptr) {
 				std::string luxury_demand;
 				bool first = true;
-				for (int res = 1; res < MaxCosts; ++res) {
-					if ((**type).Stats[CPlayer::GetThisPlayer()->Index].ResourceDemand[res]) {
+				for (int res_index = 1; res_index < MaxCosts; ++res_index) {
+					const wyrmgus::resource *loop_resource = wyrmgus::resource::get_all()[res_index];
+
+					if ((**type).Stats[CPlayer::GetThisPlayer()->Index].ResourceDemand[res_index]) {
 						if (!first) {
 							luxury_demand += "\n";
 						} else {
 							first = false;
 						}
-						luxury_demand += IdentToName(DefaultResourceNames[res]);
+						luxury_demand += loop_resource->get_name();
 						luxury_demand += " Demand: ";
-						luxury_demand += std::to_string((**type).Stats[CPlayer::GetThisPlayer()->Index].ResourceDemand[res]);
+						luxury_demand += std::to_string((**type).Stats[CPlayer::GetThisPlayer()->Index].ResourceDemand[res_index]);
 					}
 				}
 				return luxury_demand;
@@ -1845,14 +1849,14 @@ std::string EvalString(const StringDesc *s)
 		case EString_ResourceIdent : // resource ident
 			resource = s->D.Resource;
 			if (resource != nullptr) {
-				return DefaultResourceNames[(**resource)];
+				return (*resource)->get_identifier();
 			} else { // ERROR.
 				return std::string("");
 			}
 		case EString_ResourceName : // resource ident
 			resource = s->D.Resource;
 			if (resource != nullptr) {
-				return IdentToName(DefaultResourceNames[(**resource)]);
+				return (*resource)->get_name();
 			} else { // ERROR.
 				return std::string("");
 			}
@@ -1861,7 +1865,7 @@ std::string EvalString(const StringDesc *s)
 			if (resource != nullptr) {
 				std::string conversion_rates;
 				bool first = true;
-				for (const wyrmgus::resource *child_resource : wyrmgus::resource::get_all()[(**resource)]->ChildResources) {
+				for (const wyrmgus::resource *child_resource : (*resource)->ChildResources) {
 					if (child_resource->get_index() == TradeCost || child_resource->Hidden) {
 						continue;
 					}
@@ -1872,7 +1876,7 @@ std::string EvalString(const StringDesc *s)
 					}
 					conversion_rates += child_resource->get_name();
 					conversion_rates += " to ";
-					conversion_rates += wyrmgus::resource::get_all()[(**resource)]->get_name();
+					conversion_rates += (*resource)->get_name();
 					conversion_rates += " Conversion Rate: ";
 					conversion_rates += std::to_string(child_resource->get_final_resource_conversion_rate());
 					conversion_rates += "%";
@@ -1886,14 +1890,14 @@ std::string EvalString(const StringDesc *s)
 			if (resource != nullptr) {
 				std::string improve_incomes;
 				bool first = true;
-				if (CPlayer::GetThisPlayer()->Incomes[(**resource)] > wyrmgus::resource::get_all()[(**resource)]->get_default_income()) {
+				if (CPlayer::GetThisPlayer()->Incomes[(*resource)->get_index()] > (*resource)->get_default_income()) {
 					first = false;
-					improve_incomes += wyrmgus::resource::get_all()[(**resource)]->get_name();
+					improve_incomes += (*resource)->get_name();
 					improve_incomes += " Processing Bonus: +";
-					improve_incomes += std::to_string(CPlayer::GetThisPlayer()->Incomes[(**resource)] - wyrmgus::resource::get_all()[(**resource)]->get_default_income());
+					improve_incomes += std::to_string(CPlayer::GetThisPlayer()->Incomes[(*resource)->get_index()] - (*resource)->get_default_income());
 					improve_incomes += "%";
 				}
-				for (const wyrmgus::resource *child_resource : wyrmgus::resource::get_all()[(**resource)]->ChildResources) {
+				for (const wyrmgus::resource *child_resource : (*resource)->ChildResources) {
 					if (child_resource->get_index() == TradeCost || child_resource->Hidden) {
 						continue;
 					}

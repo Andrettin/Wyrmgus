@@ -43,6 +43,7 @@ namespace wyrmgus {
 	class effect;
 	class effect_list;
 	class faction;
+	class resource;
 	class unit_type;
 }
 
@@ -149,11 +150,11 @@ struct TriggerDataType {
 	//Wyrmgus start
 	CUnit *Unit;	  /// Unit used in trigger
 	//Wyrmgus end
-	const wyrmgus::unit_type *Type;  /// Type used in trigger;
-	const CUpgrade *Upgrade; /// Upgrade used in trigger
-	int *Resource;		/// Resource used in trigger
-	const wyrmgus::faction *faction; /// Faction used in trigger
-	const wyrmgus::dynasty *dynasty; /// Dynasty used in trigger
+	const wyrmgus::unit_type *Type = nullptr;		/// Type used in trigger;
+	const CUpgrade *Upgrade = nullptr;		/// Upgrade used in trigger
+	const wyrmgus::resource *resource = nullptr;	/// Resource used in trigger
+	const wyrmgus::faction *faction = nullptr;		/// Faction used in trigger
+	const wyrmgus::dynasty *dynasty = nullptr;		/// Dynasty used in trigger
 	const CPlayer *player = nullptr;
 };
 

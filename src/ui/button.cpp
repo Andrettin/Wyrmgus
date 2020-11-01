@@ -495,7 +495,7 @@ void button::CleanTriggerData() const
 	TriggerData.Type = nullptr;
 	TriggerData.Unit = nullptr;
 	TriggerData.Upgrade = nullptr;
-	TriggerData.Resource = nullptr;
+	TriggerData.resource = nullptr;
 	TriggerData.faction = nullptr;
 	TriggerData.dynasty = nullptr;
 	TriggerData.player = nullptr;

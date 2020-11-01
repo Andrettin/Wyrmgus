@@ -47,7 +47,6 @@ unit_class::~unit_class()
 void unit_class::process_sml_scope(const sml_data &scope)
 {
 	const std::string &tag = scope.get_tag();
-	const std::vector<std::string> &values = scope.get_values();
 
 	if (tag == "preconditions") {
 		this->preconditions = std::make_unique<and_condition>();

@@ -66,7 +66,6 @@ unsigned int trigger::CurrentTriggerId = 0;
 
 }
 
-
 /**
 **  Get player number.
 **

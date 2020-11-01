@@ -48,6 +48,7 @@ class CFile;
 namespace wyrmgus {
 	class faction;
 	class font;
+	class resource;
 	class unit_type;
 }
 
@@ -244,10 +245,9 @@ struct NumberDesc {
 		int Val;       /// Direct value.
 		NumberDesc *N; /// Other number.
 		//Wyrmgus start
-		const wyrmgus::unit_type **Type;     /// Which unit type.
-		CUpgrade **Upgrade;         /// Which upgrade.
-		wyrmgus::faction **Faction;			/// Which faction.
-		int **Resource;				/// Which resource
+		const wyrmgus::unit_type **Type;    /// Which unit type.
+		const CUpgrade **Upgrade;			/// Which upgrade.
+		const wyrmgus::faction **Faction;	/// Which faction.
 		//Wyrmgus end
 		const CPlayer **player;
 		BinOp binOp;   /// For binary operand.
@@ -310,10 +310,10 @@ struct StringDesc {
 		StringDesc *String;  /// String.
 		UnitDesc *Unit;      /// Unit desciption.
 		//Wyrmgus start
-		const wyrmgus::unit_type **Type;     /// Which unit type.
-		const CUpgrade **Upgrade;         /// Which upgrade.
-		const wyrmgus::faction **Faction;			/// Which faction.
-		int **Resource;				/// Which resource
+		const wyrmgus::unit_type **Type;    /// Which unit type.
+		const CUpgrade **Upgrade;			/// Which upgrade.
+		const wyrmgus::faction **Faction;	/// Which faction.
+		const wyrmgus::resource **Resource;	/// Which resource
 		//Wyrmgus end
 		struct {
 			NumberDesc *Cond;  /// Branch condition.
@@ -405,7 +405,7 @@ extern UnitDesc *CclParseUnitDesc(lua_State *l);     /// Parse a unit descriptio
 extern const wyrmgus::unit_type **CclParseTypeDesc(lua_State *l);   /// Parse a unit type description.
 //Wyrmgus start
 extern const CUpgrade **CclParseUpgradeDesc(lua_State *l);   /// Parse an upgrade description.
-extern int **CclParseResourceDesc(lua_State *l);   /// Parse a resource description.
+extern const wyrmgus::resource **CclParseResourceDesc(lua_State *l);   /// Parse a resource description.
 extern const wyrmgus::faction **CclParseFactionDesc(lua_State *l);   /// Parse a faction description.
 //Wyrmgus end
 extern const CPlayer **CclParsePlayerDesc(lua_State *l);   /// Parse a faction description.
