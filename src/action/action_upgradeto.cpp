@@ -157,9 +157,9 @@ int TransformUnitIntoType(CUnit &unit, const wyrmgus::unit_type &newtype)
 	//if the old unit type had a starting ability that the new one doesn't have, remove it; and apply it if the reverse happens
 	for (const CUpgrade *upgrade : CUpgrade::get_all()) {
 		if (upgrade->is_ability()) {
-			if (unit.GetIndividualUpgrade(upgrade) && std::find(oldtype.StartingAbilities.begin(), oldtype.StartingAbilities.end(), upgrade) != oldtype.StartingAbilities.end() && std::find(newtype.StartingAbilities.begin(), newtype.StartingAbilities.end(), upgrade) == newtype.StartingAbilities.end()) {
+			if (unit.GetIndividualUpgrade(upgrade) > 0 && wyrmgus::vector::contains(oldtype.StartingAbilities, upgrade) && !wyrmgus::vector::contains(newtype.StartingAbilities, upgrade)) {
 				IndividualUpgradeLost(unit, upgrade);
-			} else if (!unit.GetIndividualUpgrade(upgrade) && std::find(newtype.StartingAbilities.begin(), newtype.StartingAbilities.end(), upgrade) != newtype.StartingAbilities.end() && check_conditions(upgrade, &unit)) {
+			} else if (unit.GetIndividualUpgrade(upgrade) == 0 && wyrmgus::vector::contains(newtype.StartingAbilities, upgrade) && check_conditions(upgrade, &unit)) {
 				IndividualUpgradeAcquire(unit, upgrade);
 			}
 		}

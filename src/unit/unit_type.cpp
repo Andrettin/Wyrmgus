@@ -736,6 +736,10 @@ void unit_type::process_sml_scope(const sml_data &scope)
 				throw std::runtime_error("Unsupported flag tag for CanTransport: " + key);
 			}
 		});
+	} else if (tag == "starting_abilities") {
+		for (const std::string &value : values) {
+			this->StartingAbilities.push_back(CUpgrade::get(value));
+		}
 	} else if (tag == "spells") {
 		for (const std::string &value : values) {
 			this->Spells.push_back(spell::get(value));
@@ -1605,9 +1609,7 @@ void unit_type::set_parent(const unit_type *parent_type)
 	for (size_t i = 0; i < parent_type->Traits.size(); ++i) {
 		this->Traits.push_back(parent_type->Traits[i]);
 	}
-	for (size_t i = 0; i < parent_type->StartingAbilities.size(); ++i) {
-		this->StartingAbilities.push_back(parent_type->StartingAbilities[i]);
-	}
+	this->StartingAbilities = parent_type->StartingAbilities;
 	for (size_t i = 0; i < parent_type->Trains.size(); ++i) {
 		this->Trains.push_back(parent_type->Trains[i]);
 		parent_type->Trains[i]->TrainedBy.push_back(this);

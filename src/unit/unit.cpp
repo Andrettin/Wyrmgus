@@ -3068,9 +3068,9 @@ CUnit *MakeUnit(const wyrmgus::unit_type &type, CPlayer *player)
 		TraitAcquire(*unit, unit->Type->Traits[SyncRand(unit->Type->Traits.size())]);
 	}
 	
-	for (size_t i = 0; i < unit->Type->StartingAbilities.size(); ++i) {
-		if (check_conditions(unit->Type->StartingAbilities[i], unit)) {
-			IndividualUpgradeAcquire(*unit, unit->Type->StartingAbilities[i]);
+	for (const CUpgrade *starting_ability : unit->Type->StartingAbilities) {
+		if (check_conditions(starting_ability, unit)) {
+			IndividualUpgradeAcquire(*unit, starting_ability);
 		}
 	}
 	
