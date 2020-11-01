@@ -5344,6 +5344,8 @@ void DropOutAll(const CUnit &source)
 CUnit *UnitOnScreen(int x, int y)
 {
 	CUnit *candidate = nullptr;
+	bool is_candidate_selected = false;
+
 	for (CUnitManager::Iterator it = UnitManager.begin(); it != UnitManager.end(); ++it) {
 		CUnit &unit = **it;
 		if (unit.MapLayer != UI.CurrentMapLayer) {
@@ -5382,14 +5384,41 @@ CUnit *UnitOnScreen(int x, int y)
 		//Wyrmgus end
 		if (x >= unitSpritePos.x && x < (unitSpritePos.x + type.get_box_width() * scale_factor)
 			&& y >= unitSpritePos.y  && y < (unitSpritePos.y + type.get_box_height() * scale_factor)) {
-			// Check if there are other units on this place
+			if (unit.Type->BoolFlag[ISNOTSELECTABLE_INDEX].value) {
+				continue;
+			}
+
+			if (!unit.IsAlive()) {
+				//don't selected a dead unit
+				continue;
+			}
+
+			if (candidate != nullptr && !is_candidate_selected) {
+				if (unit.Player->Type == PlayerNeutral && candidate->Player->Type != PlayerNeutral) {
+					//prefer selecting a non-neutral unit over a neutral one
+					continue;
+				}
+
+				if (unit.Type->BoolFlag[ITEM_INDEX].value && !candidate->Type->BoolFlag[ITEM_INDEX].value) {
+					//prefer selecting a non-item unit over an item one
+					continue;
+				}
+
+				if ((unit.Player->Type == PlayerNeutral) == (candidate->Player->Type == PlayerNeutral) && (unit.Type->BoolFlag[ITEM_INDEX].value == candidate->Type->BoolFlag[ITEM_INDEX].value)) {
+					continue; //no difference
+				}
+			}
+
+			if (candidate != nullptr && IsOnlySelected(unit)) {
+				//don't pick the unit if it is already selected
+				continue;
+			}
+
 			candidate = &unit;
-			//Wyrmgus start
-			std::vector<CUnit *> table;
-			Select(candidate->tilePos, candidate->tilePos, table, candidate->MapLayer->ID, HasNotSamePlayerAs(*CPlayer::Players[PlayerNumNeutral]));
-//			if (IsOnlySelected(*candidate) || candidate->Type->BoolFlag[ISNOTSELECTABLE_INDEX].value) {
-			if (IsOnlySelected(*candidate) || candidate->Type->BoolFlag[ISNOTSELECTABLE_INDEX].value || (candidate->Player->Type == PlayerNeutral && table.size()) || !candidate->IsAlive()) { // don't select a neutral unit if there's a player-owned unit there as well; don't selected a dead unit
-			//Wyrmgus end
+			is_candidate_selected = IsOnlySelected(*candidate);
+
+			if (is_candidate_selected || candidate->Player->Type == PlayerNeutral || candidate->Type->BoolFlag[ITEM_INDEX].value) {
+				//check if there are other units in this place
 				continue;
 			} else {
 				break;
