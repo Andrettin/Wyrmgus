@@ -432,7 +432,7 @@ public:
 	int GetModifiedVariable(int index, int variable_type = 0) const;
 
 	int GetReactionRange() const;
-	int get_item_slot_quantity(const wyrmgus::item_slot item_slot) const;
+	unsigned get_item_slot_quantity(const wyrmgus::item_slot item_slot) const;
 	wyrmgus::item_class GetCurrentWeaponClass() const;
 	int GetItemVariableChange(const CUnit *item, int variable_index, bool increase = false) const;
 	int GetDisplayPlayer() const;

@@ -5590,7 +5590,7 @@ int CUnit::GetReactionRange() const
 	return reaction_range;
 }
 
-int CUnit::get_item_slot_quantity(const wyrmgus::item_slot item_slot) const
+unsigned CUnit::get_item_slot_quantity(const wyrmgus::item_slot item_slot) const
 {
 	if (!this->HasInventory()) {
 		return 0;
