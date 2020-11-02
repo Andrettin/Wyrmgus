@@ -89,7 +89,7 @@ static SoundChannel Channels[MaxChannels];
 static int NextFreeChannel;
 
 static struct {
-	wyrmgus::sample *Sample;       /// Music sample
+	std::unique_ptr<wyrmgus::sample> Sample;       /// Music sample
 	void (*FinishedCallback)(); /// Callback for when music finishes playing
 } MusicChannel;
 
@@ -182,8 +182,7 @@ static void MixMusicToStereo32(int *buffer, int size)
 
 		if (n < len) { // End reached
 			MusicPlaying = false;
-			delete MusicChannel.Sample;
-			MusicChannel.Sample = nullptr;
+			MusicChannel.Sample.reset();
 
 			if (MusicChannel.FinishedCallback) {
 				MusicChannel.FinishedCallback();
@@ -745,11 +744,11 @@ void SetMusicFinishedCallback(void (*callback)())
 **
 **  @return        0 if music is playing, -1 if not.
 */
-int PlayMusic(wyrmgus::sample *sample)
+int PlayMusic(std::unique_ptr<wyrmgus::sample> &&sample)
 {
 	if (sample) {
 		StopMusic();
-		MusicChannel.Sample = sample;
+		MusicChannel.Sample = std::move(sample);
 		MusicPlaying = true;
 		return 0;
 	} else {
@@ -772,11 +771,11 @@ int PlayMusic(const std::string &file)
 	}
 	const std::string name = LibraryFileName(file.c_str());
 	DebugPrint("play music %s\n" _C_ name.c_str());
-	wyrmgus::sample *sample = LoadSample(name).release();
+	std::unique_ptr<wyrmgus::sample> sample = LoadSample(name);
 
-	if (sample) {
+	if (sample != nullptr) {
 		StopMusic();
-		MusicChannel.Sample = sample;
+		MusicChannel.Sample = std::move(sample);
 		MusicPlaying = true;
 		return 0;
 	} else {
@@ -931,8 +930,7 @@ void StopMusic()
 		MusicPlaying = false;
 		if (MusicChannel.Sample) {
 			SDL_LockMutex(Audio.Lock);
-			delete MusicChannel.Sample;
-			MusicChannel.Sample = nullptr;
+			MusicChannel.Sample.reset();
 			SDL_UnlockMutex(Audio.Lock);
 		}
 	}

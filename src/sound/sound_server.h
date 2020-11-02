@@ -166,7 +166,7 @@ extern bool IsEffectsEnabled();
 /// Set the music finished callback
 void SetMusicFinishedCallback(void (*callback)());
 /// Play a music file
-extern int PlayMusic(wyrmgus::sample *sample);
+extern int PlayMusic(std::unique_ptr<wyrmgus::sample> &&sample);
 /// Play a music file
 extern int PlayMusic(const std::string &file);
 /// Play a music track
