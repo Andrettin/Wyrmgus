@@ -195,7 +195,7 @@ int CPopupContentTypeText::GetWidth(const wyrmgus::button &button, int *) const
 	if (button.Action == ButtonCmd::ProduceResource || button.Action == ButtonCmd::SellResource || button.Action == ButtonCmd::BuyResource) {
 		TriggerData.resource = wyrmgus::resource::get_all()[resource];
 	}
-	std::string text = EvalString(this->Text);
+	const std::string text = EvalString(this->Text.get());
 	button.CleanTriggerData();
 	//Wyrmgus end
 	
@@ -237,7 +237,7 @@ int CPopupContentTypeText::GetHeight(const wyrmgus::button &button, int *) const
 	if (button.Action == ButtonCmd::ProduceResource || button.Action == ButtonCmd::SellResource || button.Action == ButtonCmd::BuyResource) {
 		TriggerData.resource = wyrmgus::resource::get_all()[resource];
 	}
-	std::string text = EvalString(this->Text);
+	const std::string text = EvalString(this->Text.get());
 	button.CleanTriggerData();
 	//Wyrmgus end
 	int height = 0;
@@ -253,8 +253,6 @@ int CPopupContentTypeText::GetHeight(const wyrmgus::button &button, int *) const
 
 CPopupContentTypeText::~CPopupContentTypeText()
 {
-	FreeStringDesc(Text);
-	delete Text;
 }
 
 void CPopupContentTypeText::Draw(int x, int y, const CPopup &popup, const unsigned int popupWidth, const wyrmgus::button &button, int *) const
@@ -268,7 +266,7 @@ void CPopupContentTypeText::Draw(int x, int y, const CPopup &popup, const unsign
 	if (button.Action == ButtonCmd::ProduceResource || button.Action == ButtonCmd::SellResource || button.Action == ButtonCmd::BuyResource) {
 		TriggerData.resource = wyrmgus::resource::get_all()[resource];
 	}
-	std::string text = EvalString(this->Text);
+	const std::string text = EvalString(this->Text.get());
 	button.CleanTriggerData();
 	//Wyrmgus end
 	CLabel label(font, this->TextColor, this->HighlightColor);
@@ -537,7 +535,7 @@ int CPopupContentTypeVariable::GetWidth(const wyrmgus::button &button, int *) co
 		TriggerData.resource = wyrmgus::resource::get_all()[resource];
 	}
 	//Wyrmgus end
-	std::string text = EvalString(this->Text);
+	const std::string text = EvalString(this->Text.get());
 	//Wyrmgus start
 //	TriggerData.Type = nullptr;
 	button.CleanTriggerData();
@@ -553,13 +551,10 @@ int CPopupContentTypeVariable::GetHeight(const wyrmgus::button &, int *) const
 
 CPopupContentTypeVariable::~CPopupContentTypeVariable()
 {
-	FreeStringDesc(Text);
-	delete Text;
 }
 
 void CPopupContentTypeVariable::Draw(int x, int y, const CPopup &, const unsigned int, const wyrmgus::button &button, int *) const
 {
-	std::string text;										// Optional text to display.
 	const wyrmgus::font *font = this->Font ? this->Font : wyrmgus::defines::get()->get_small_font(); // Font to use.
 
 	Assert(this->Index == -1 || ((unsigned int) this->Index < UnitTypeVar.GetNumberVariable()));
@@ -572,7 +567,7 @@ void CPopupContentTypeVariable::Draw(int x, int y, const CPopup &, const unsigne
 		if (button.Action == ButtonCmd::ProduceResource || button.Action == ButtonCmd::SellResource || button.Action == ButtonCmd::BuyResource) {
 			TriggerData.resource = wyrmgus::resource::get_all()[resource];
 		}
-		text = EvalString(this->Text);
+		const std::string text = EvalString(this->Text.get());
 		button.CleanTriggerData();
 		if (this->Centered) {
 			x += (label.DrawCentered(x, y, text) * 2);

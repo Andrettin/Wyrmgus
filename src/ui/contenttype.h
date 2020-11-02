@@ -76,7 +76,7 @@ public:
 	virtual void Parse(lua_State *l) override;
 
 private:
-	StringDesc *Text = nullptr;  /// Text to display.
+	std::unique_ptr<StringDesc> Text;  /// Text to display.
 	const wyrmgus::font *Font = nullptr; /// Font to use.
 	char Centered = 0;           /// if true, center the display.
 	int Index = -1;              /// Index of the variable to show, -1 if not.

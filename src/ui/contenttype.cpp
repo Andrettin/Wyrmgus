@@ -62,8 +62,6 @@ CContentTypeText::CContentTypeText() : Component(VariableValue)
 
 CContentTypeText::~CContentTypeText()
 {
-	FreeStringDesc(Text);
-	delete Text;
 }
 
 /**
@@ -88,7 +86,7 @@ CContentTypeText::~CContentTypeText()
 	//Wyrmgus end
 
 	if (this->Text != nullptr) {
-		text = EvalString(this->Text);
+		text = EvalString(this->Text.get());
 		std::string::size_type pos;
 		if ((pos = text.find("~|")) != std::string::npos) {
 			x += (label.Draw(x - font->getWidth(text.substr(0, pos)), y, text) - font->getWidth(text.substr(0, pos)));

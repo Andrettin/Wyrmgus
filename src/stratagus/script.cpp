@@ -72,7 +72,7 @@ lua_State *Lua;                       /// Structure to work with lua files.
 
 int CclInConfigFile;                  /// True while config file parsing
 
-NumberDesc *Damage;                   /// Damage calculation for missile.
+std::unique_ptr<NumberDesc> Damage;                   /// Damage calculation for missile.
 
 static int NumberCounter = 0; /// Counter for lua function.
 static int StringCounter = 0; /// Counter for lua function.
@@ -615,11 +615,10 @@ static const CPlayer **Str2PlayerRef(lua_State *l, const char *s)
 **
 **  @return   unit referernce definition.
 */
-UnitDesc *CclParseUnitDesc(lua_State *l)
+std::unique_ptr<UnitDesc> CclParseUnitDesc(lua_State *l)
 {
-	UnitDesc *res;  // Result
+	auto res = std::make_unique<UnitDesc>();  // Result
 
-	res = new UnitDesc;
 	if (lua_isstring(l, -1)) {
 		res->e = EUnit_Ref;
 		res->D.AUnit = Str2UnitRef(l, LuaToString(l, -1));
@@ -627,6 +626,7 @@ UnitDesc *CclParseUnitDesc(lua_State *l)
 		LuaError(l, "Parse Error in ParseUnit\n");
 	}
 	lua_pop(l, 1);
+
 	return res;
 }
 
@@ -956,9 +956,9 @@ static int GetPlayerData(const int player_index, const char *prop, const char *a
 **
 **  @return   number.
 */
-NumberDesc *CclParseNumberDesc(lua_State *l)
+std::unique_ptr<NumberDesc> CclParseNumberDesc(lua_State *l)
 {
-	NumberDesc *res = new NumberDesc;
+	auto res = std::make_unique<NumberDesc>();
 
 	if (lua_isnumber(l, -1)) {
 		res->e = ENumber_Dir;
@@ -1159,13 +1159,13 @@ NumberDesc *CclParseNumberDesc(lua_State *l)
 **
 **  @return   String description.
 */
-StringDesc *CclParseStringDesc(lua_State *l)
+std::unique_ptr<StringDesc> CclParseStringDesc(lua_State *l)
 {
-	StringDesc *res = new StringDesc;
+	auto res = std::make_unique<StringDesc>();
 
 	if (lua_isstring(l, -1)) {
 		res->e = EString_Dir;
-		res->D.Val = new_strdup(LuaToString(l, -1)).release();
+		res->D.Val = LuaToString(l, -1);
 	} else if (lua_isfunction(l, -1)) {
 		res->e = EString_Lua;
 		res->D.Index = ParseLuaFunction(l, "_stringfunction_", &StringCounter);
@@ -1179,17 +1179,14 @@ StringDesc *CclParseStringDesc(lua_State *l)
 		lua_pop(l, 1);
 		lua_rawgeti(l, -1, 2); // table
 		if (!strcmp(key, "Concat")) {
-			int i; // iterator.
-
 			res->e = EString_Concat;
-			res->D.Concat.n = lua_rawlen(l, -1);
-			if (res->D.Concat.n < 1) {
+			const size_t size = lua_rawlen(l, -1);
+			if (size < 1) {
 				LuaError(l, "Bad number of args in Concat\n");
 			}
-			res->D.Concat.Strings = new StringDesc *[res->D.Concat.n];
-			for (i = 0; i < res->D.Concat.n; ++i) {
+			for (size_t i = 0; i < size; ++i) {
 				lua_rawgeti(l, -1, 1 + i);
-				res->D.Concat.Strings[i] = CclParseStringDesc(l);
+				res->D.Concat.Strings.push_back(CclParseStringDesc(l));
 			}
 			lua_pop(l, 1); // table.
 		} else if (!strcmp(key, "String")) {
@@ -1352,6 +1349,7 @@ StringDesc *CclParseStringDesc(lua_State *l)
 		LuaError(l, "Parse Error in ParseString");
 	}
 	lua_pop(l, 1);
+
 	return res;
 }
 
@@ -1402,56 +1400,56 @@ int EvalNumber(const NumberDesc *number)
 		case ENumber_Dir :     // directly a number.
 			return number->D.Val;
 		case ENumber_Add :     // a + b.
-			return EvalNumber(number->D.binOp.Left) + EvalNumber(number->D.binOp.Right);
+			return EvalNumber(number->D.binOp.Left.get()) + EvalNumber(number->D.binOp.Right.get());
 		case ENumber_Sub :     // a - b.
-			return EvalNumber(number->D.binOp.Left) - EvalNumber(number->D.binOp.Right);
+			return EvalNumber(number->D.binOp.Left.get()) - EvalNumber(number->D.binOp.Right.get());
 		case ENumber_Mul :     // a * b.
-			return EvalNumber(number->D.binOp.Left) * EvalNumber(number->D.binOp.Right);
+			return EvalNumber(number->D.binOp.Left.get()) * EvalNumber(number->D.binOp.Right.get());
 		case ENumber_Div :     // a / b.
-			a = EvalNumber(number->D.binOp.Left);
-			b = EvalNumber(number->D.binOp.Right);
+			a = EvalNumber(number->D.binOp.Left.get());
+			b = EvalNumber(number->D.binOp.Right.get());
 			if (!b) { // FIXME : manage better this.
 				return 0;
 			}
 			return a / b;
 		case ENumber_Min :     // a <= b ? a : b
-			a = EvalNumber(number->D.binOp.Left);
-			b = EvalNumber(number->D.binOp.Right);
+			a = EvalNumber(number->D.binOp.Left.get());
+			b = EvalNumber(number->D.binOp.Right.get());
 			return std::min(a, b);
 		case ENumber_Max :     // a >= b ? a : b
-			a = EvalNumber(number->D.binOp.Left);
-			b = EvalNumber(number->D.binOp.Right);
+			a = EvalNumber(number->D.binOp.Left.get());
+			b = EvalNumber(number->D.binOp.Right.get());
 			return std::max(a, b);
 		case ENumber_Gt  :     // a > b  ? 1 : 0
-			a = EvalNumber(number->D.binOp.Left);
-			b = EvalNumber(number->D.binOp.Right);
+			a = EvalNumber(number->D.binOp.Left.get());
+			b = EvalNumber(number->D.binOp.Right.get());
 			return (a > b ? 1 : 0);
 		case ENumber_GtEq :    // a >= b ? 1 : 0
-			a = EvalNumber(number->D.binOp.Left);
-			b = EvalNumber(number->D.binOp.Right);
+			a = EvalNumber(number->D.binOp.Left.get());
+			b = EvalNumber(number->D.binOp.Right.get());
 			return (a >= b ? 1 : 0);
 		case ENumber_Lt  :     // a < b  ? 1 : 0
-			a = EvalNumber(number->D.binOp.Left);
-			b = EvalNumber(number->D.binOp.Right);
+			a = EvalNumber(number->D.binOp.Left.get());
+			b = EvalNumber(number->D.binOp.Right.get());
 			return (a < b ? 1 : 0);
 		case ENumber_LtEq :    // a <= b ? 1 : 0
-			a = EvalNumber(number->D.binOp.Left);
-			b = EvalNumber(number->D.binOp.Right);
+			a = EvalNumber(number->D.binOp.Left.get());
+			b = EvalNumber(number->D.binOp.Right.get());
 			return (a <= b ? 1 : 0);
 		case ENumber_Eq  :     // a == b ? 1 : 0
-			a = EvalNumber(number->D.binOp.Left);
-			b = EvalNumber(number->D.binOp.Right);
+			a = EvalNumber(number->D.binOp.Left.get());
+			b = EvalNumber(number->D.binOp.Right.get());
 			return (a == b ? 1 : 0);
 		case ENumber_NEq  :    // a != b ? 1 : 0
-			a = EvalNumber(number->D.binOp.Left);
-			b = EvalNumber(number->D.binOp.Right);
+			a = EvalNumber(number->D.binOp.Left.get());
+			b = EvalNumber(number->D.binOp.Right.get());
 			return (a != b ? 1 : 0);
 
 		case ENumber_Rand :    // random(a) [0..a-1]
-			a = EvalNumber(number->D.N);
+			a = EvalNumber(number->D.N.get());
 			return SyncRand(a);
 		case ENumber_UnitStat : // property of unit.
-			unit = EvalUnit(number->D.UnitStat.Unit);
+			unit = EvalUnit(number->D.UnitStat.Unit.get());
 			if (unit != nullptr) {
 				return GetComponent(*unit, number->D.UnitStat.Index,
 									number->D.UnitStat.Component, number->D.UnitStat.Loc).i;
@@ -1468,24 +1466,24 @@ int EvalNumber(const NumberDesc *number)
 			}
 		case ENumber_VideoTextLength : // VideoTextLength(font, s)
 			if (number->D.VideoTextLength.String != nullptr
-				&& !(s = EvalString(number->D.VideoTextLength.String)).empty()) {
+				&& !(s = EvalString(number->D.VideoTextLength.String.get())).empty()) {
 				return number->D.VideoTextLength.Font->Width(s);
 			} else { // ERROR.
 				return 0;
 			}
 		case ENumber_StringFind : // s.find(c)
 			if (number->D.StringFind.String != nullptr
-				&& !(s = EvalString(number->D.StringFind.String)).empty()) {
+				&& !(s = EvalString(number->D.StringFind.String.get())).empty()) {
 				size_t pos = s.find(number->D.StringFind.C);
 				return pos != std::string::npos ? (int)pos : -1;
 			} else { // ERROR.
 				return 0;
 			}
 		case ENumber_NumIf : // cond ? True : False;
-			if (EvalNumber(number->D.NumIf.Cond)) {
-				return EvalNumber(number->D.NumIf.BTrue);
+			if (EvalNumber(number->D.NumIf.Cond.get())) {
+				return EvalNumber(number->D.NumIf.BTrue.get());
 			} else if (number->D.NumIf.BFalse) {
-				return EvalNumber(number->D.NumIf.BFalse);
+				return EvalNumber(number->D.NumIf.BFalse.get());
 			} else {
 				return 0;
 			}
@@ -1505,13 +1503,13 @@ int EvalNumber(const NumberDesc *number)
 				return 0;
 			}
 		case ENumber_PlayerData : // getplayerdata(player, data, res);
-			int player = EvalNumber(number->D.PlayerData.Player);
-			std::string data = EvalString(number->D.PlayerData.DataType);
+			int player = EvalNumber(number->D.PlayerData.Player.get());
+			std::string data = EvalString(number->D.PlayerData.DataType.get());
 			//Wyrmgus start
 //			std::string res = EvalString(number->D.PlayerData.ResType);
 			std::string res;
 			if (number->D.PlayerData.ResType != nullptr) {
-				res = EvalString(number->D.PlayerData.ResType);
+				res = EvalString(number->D.PlayerData.ResType.get());
 			}
 			//Wyrmgus end
 			return GetPlayerData(player, data.c_str(), res.c_str());
@@ -1548,21 +1546,21 @@ std::string EvalString(const StringDesc *s)
 		case EString_Dir :     // directly a string.
 			return std::string(s->D.Val);
 		case EString_Concat :     // a + b -> "ab"
-			res = EvalString(s->D.Concat.Strings[0]);
-			for (int i = 1; i < s->D.Concat.n; i++) {
-				res += EvalString(s->D.Concat.Strings[i]);
+			res = EvalString(s->D.Concat.Strings.front().get());
+			for (size_t i = 1; i < s->D.Concat.Strings.size(); ++i) {
+				res += EvalString(s->D.Concat.Strings[i].get());
 			}
 			return res;
 		case EString_String : {   // 42 -> "42".
-			return wyrmgus::number::to_formatted_string(EvalNumber(s->D.Number));
+			return wyrmgus::number::to_formatted_string(EvalNumber(s->D.Number.get()));
 		}
 		case EString_InverseVideo : // "a" -> "~<a~>"
-			tmp1 = EvalString(s->D.String);
+			tmp1 = EvalString(s->D.String.get());
 			// FIXME replace existing "~<" by "~>" in tmp1.
 			res = std::string("~<") + tmp1 + "~>";
 			return res;
 		case EString_UnitName : // name of the UnitType
-			unit = EvalUnit(s->D.Unit);
+			unit = EvalUnit(s->D.Unit.get());
 			if (unit != nullptr) {
 				//Wyrmgus start
 //				return unit->Type->Name;
@@ -1579,21 +1577,21 @@ std::string EvalString(const StringDesc *s)
 			}
 		//Wyrmgus start
 		case EString_UnitTypeName : // name of the UnitType
-			unit = EvalUnit(s->D.Unit);
+			unit = EvalUnit(s->D.Unit.get());
 			if (unit != nullptr && !unit->GetName().empty() && ((unit->Prefix == nullptr && unit->Suffix == nullptr && unit->Spell == nullptr) || unit->get_unique() != nullptr || unit->Work != nullptr || unit->Elixir != nullptr)) { //items with affixes use their type name in their given name, so there's no need to repeat their type name
 				return unit->GetTypeName();
 			} else { // only return a unit type name if the unit has a personal name (otherwise the unit type name would be returned as the unit name)
 				return std::string("");
 			}
 		case EString_UnitTrait : // name of the unit's trait
-			unit = EvalUnit(s->D.Unit);
+			unit = EvalUnit(s->D.Unit.get());
 			if (unit != nullptr && unit->Trait != nullptr) {
 				return _(unit->Trait->get_name().c_str());
 			} else {
 				return std::string("");
 			}
 		case EString_UnitSpell : // name of the unit's spell
-			unit = EvalUnit(s->D.Unit);
+			unit = EvalUnit(s->D.Unit.get());
 			if (unit != nullptr && unit->Spell != nullptr) {
 				std::string spell_description = unit->Spell->get_effects_string();
 				spell_description[0] = tolower(spell_description[0]);
@@ -1602,7 +1600,7 @@ std::string EvalString(const StringDesc *s)
 				return std::string("");
 			}
 		case EString_UnitQuote : // unit's quote
-			unit = EvalUnit(s->D.Unit);
+			unit = EvalUnit(s->D.Unit.get());
 			if (unit != nullptr) {
 				if (unit->get_unique() == nullptr) {
 					if (unit->Work != nullptr) {
@@ -1619,7 +1617,7 @@ std::string EvalString(const StringDesc *s)
 				return std::string("");
 			}
 		case EString_UnitSettlementName: // name of the unit's settlement
-			unit = EvalUnit(s->D.Unit);
+			unit = EvalUnit(s->D.Unit.get());
 			if (unit != nullptr && unit->settlement != nullptr && unit->settlement->get_site_unit() != nullptr) {
 				const CUnit *site_unit = unit->settlement->get_site_unit();
 				const wyrmgus::civilization *civilization = site_unit->get_civilization();
@@ -1628,14 +1626,14 @@ std::string EvalString(const StringDesc *s)
 				return std::string("");
 			}
 		case EString_UnitUniqueSet : // name of the unit's unique item set
-			unit = EvalUnit(s->D.Unit);
+			unit = EvalUnit(s->D.Unit.get());
 			if (unit != nullptr && unit->get_unique() != nullptr && unit->get_unique()->get_set() != nullptr) {
 				return unit->get_unique()->get_set()->get_name();
 			} else {
 				return std::string("");
 			}
 		case EString_UnitUniqueSetItems : // names of the unit's unique item set's items
-			unit = EvalUnit(s->D.Unit);
+			unit = EvalUnit(s->D.Unit.get());
 			if (unit != nullptr && unit->get_unique() != nullptr && unit->get_unique()->get_set() != nullptr) {
 				std::string set_items_string;
 				bool first = true;
@@ -1919,26 +1917,26 @@ std::string EvalString(const StringDesc *s)
 			}
 		//Wyrmgus end
 		case EString_If : // cond ? True : False;
-			if (EvalNumber(s->D.If.Cond)) {
-				return EvalString(s->D.If.BTrue);
+			if (EvalNumber(s->D.If.Cond.get())) {
+				return EvalString(s->D.If.BTrue.get());
 			} else if (s->D.If.BFalse) {
-				return EvalString(s->D.If.BFalse);
+				return EvalString(s->D.If.BFalse.get());
 			} else {
 				return std::string("");
 			}
 		case EString_SubString : // substring(s, begin, end)
 			if (s->D.SubString.String != nullptr
-				&& !(tmp1 = EvalString(s->D.SubString.String)).empty()) {
+				&& !(tmp1 = EvalString(s->D.SubString.String.get())).empty()) {
 				int begin;
 				int end;
 
-				begin = EvalNumber(s->D.SubString.Begin);
+				begin = EvalNumber(s->D.SubString.Begin.get());
 				if ((unsigned) begin > tmp1.size() && begin > 0) {
 					return std::string("");
 				}
 				res = tmp1.c_str() + begin;
 				if (s->D.SubString.End) {
-					end = EvalNumber(s->D.SubString.End);
+					end = EvalNumber(s->D.SubString.End.get());
 				} else {
 					end = -1;
 				}
@@ -1950,19 +1948,19 @@ std::string EvalString(const StringDesc *s)
 				return std::string("");
 			}
 		case EString_Line : // line n of the string
-			if (s->D.Line.String == nullptr || (tmp1 = EvalString(s->D.Line.String)).empty()) {
+			if (s->D.Line.String == nullptr || (tmp1 = EvalString(s->D.Line.String.get())).empty()) {
 				return std::string(""); // ERROR.
 			} else {
 				int line;
 				int maxlen;
 				wyrmgus::font *font;
 
-				line = EvalNumber(s->D.Line.Line);
+				line = EvalNumber(s->D.Line.Line.get());
 				if (line <= 0) {
 					return std::string("");
 				}
 				if (s->D.Line.MaxLen) {
-					maxlen = EvalNumber(s->D.Line.MaxLen);
+					maxlen = EvalNumber(s->D.Line.MaxLen.get());
 					maxlen = std::max(maxlen, 0);
 				} else {
 					maxlen = 0;
@@ -1972,14 +1970,14 @@ std::string EvalString(const StringDesc *s)
 				return res;
 			}
 		case EString_PlayerName: // player name
-			player_index = EvalNumber(s->D.PlayerName);
+			player_index = EvalNumber(s->D.PlayerName.get());
 			try {
 				return CPlayer::Players.at(player_index)->Name;
 			} catch (...) {
 				std::throw_with_nested(std::runtime_error("Error getting the player name for index " + std::to_string(player_index) + "."));
 			}
 		case EString_PlayerFullName: // player full name
-			player_index = EvalNumber(s->D.PlayerName);
+			player_index = EvalNumber(s->D.PlayerName.get());
 			try {
 				return CPlayer::Players.at(player_index)->get_full_name();
 			} catch (...) {
@@ -1987,229 +1985,6 @@ std::string EvalString(const StringDesc *s)
 			}
 	}
 	return std::string("");
-}
-
-
-/**
-**  Free the unit expression content. (not the pointer itself).
-**
-**  @param unitdesc  struct to free
-*/
-void FreeUnitDesc(UnitDesc *)
-{
-#if 0 // Nothing to free mow.
-	if (!unitdesc) {
-		return;
-	}
-#endif
-}
-
-/**
-**  Free the number expression content. (not the pointer itself).
-**
-**  @param number  struct to free
-*/
-void FreeNumberDesc(NumberDesc *number)
-{
-	if (number == 0) {
-		return;
-	}
-	switch (number->e) {
-		case ENumber_Lua :     // a lua function.
-		// FIXME: when lua table should be freed ?
-		case ENumber_Dir :     // directly a number.
-			break;
-		case ENumber_Add :     // a + b.
-		case ENumber_Sub :     // a - b.
-		case ENumber_Mul :     // a * b.
-		case ENumber_Div :     // a / b.
-		case ENumber_Min :     // a <= b ? a : b
-		case ENumber_Max :     // a >= b ? a : b
-		case ENumber_Gt  :     // a > b  ? 1 : 0
-		case ENumber_GtEq :    // a >= b ? 1 : 0
-		case ENumber_Lt  :     // a < b  ? 1 : 0
-		case ENumber_LtEq :    // a <= b ? 1 : 0
-		case ENumber_NEq  :    // a <> b ? 1 : 0
-		case ENumber_Eq  :     // a == b ? 1 : 0
-			FreeNumberDesc(number->D.binOp.Left);
-			FreeNumberDesc(number->D.binOp.Right);
-			delete number->D.binOp.Left;
-			delete number->D.binOp.Right;
-			break;
-		case ENumber_Rand :    // random(a) [0..a-1]
-			FreeNumberDesc(number->D.N);
-			delete number->D.N;
-			break;
-		case ENumber_UnitStat : // property of unit.
-			FreeUnitDesc(number->D.UnitStat.Unit);
-			delete number->D.UnitStat.Unit;
-			break;
-		case ENumber_TypeStat : // property of unit type.
-			delete *number->D.TypeStat.Type;
-			break;
-		case ENumber_VideoTextLength : // VideoTextLength(font, s)
-			FreeStringDesc(number->D.VideoTextLength.String);
-			delete number->D.VideoTextLength.String;
-			break;
-		case ENumber_StringFind : // strchr(s, c) - s.
-			FreeStringDesc(number->D.StringFind.String);
-			delete number->D.StringFind.String;
-			break;
-		case ENumber_NumIf : // cond ? True : False;
-			FreeNumberDesc(number->D.NumIf.Cond);
-			delete number->D.NumIf.Cond;
-			FreeNumberDesc(number->D.NumIf.BTrue);
-			delete number->D.NumIf.BTrue;
-			FreeNumberDesc(number->D.NumIf.BFalse);
-			delete number->D.NumIf.BFalse;
-			break;
-		case ENumber_PlayerData : // getplayerdata(player, data, res);
-			FreeNumberDesc(number->D.PlayerData.Player);
-			delete number->D.PlayerData.Player;
-			FreeStringDesc(number->D.PlayerData.DataType);
-			delete number->D.PlayerData.DataType;
-			FreeStringDesc(number->D.PlayerData.ResType);
-			delete number->D.PlayerData.ResType;
-			break;
-		//Wyrmgus start
-		case ENumber_TypeTrainQuantity : // Class of the unit type
-			delete *number->D.Type;
-			break;
-		case ENumber_ButtonPlayer: // Class of the unit type
-			delete *number->D.player;
-			break;
-		//Wyrmgus end
-	}
-}
-
-/**
-**  Free the String expression content. (not the pointer itself).
-**
-**  @param s  struct to free
-*/
-void FreeStringDesc(StringDesc *s)
-{
-	int i;
-
-	if (s == 0) {
-		return;
-	}
-	switch (s->e) {
-		case EString_Lua :     // a lua function.
-			// FIXME: when lua table should be freed ?
-			break;
-		case EString_Dir :     // directly a string.
-			delete[] s->D.Val;
-			break;
-		case EString_Concat :  // "a" + "b" -> "ab"
-			for (i = 0; i < s->D.Concat.n; i++) {
-				FreeStringDesc(s->D.Concat.Strings[i]);
-				delete s->D.Concat.Strings[i];
-			}
-			delete[] s->D.Concat.Strings;
-
-			break;
-		case EString_String : // 42 -> "42"
-			FreeNumberDesc(s->D.Number);
-			delete s->D.Number;
-			break;
-		case EString_InverseVideo : // "a" -> "~<a~>"
-			FreeStringDesc(s->D.String);
-			delete s->D.String;
-			break;
-		case EString_UnitName : // Name of the UnitType
-			FreeUnitDesc(s->D.Unit);
-			delete s->D.Unit;
-			break;
-		//Wyrmgus start
-		case EString_UnitTypeName : // Name of the UnitType
-			FreeUnitDesc(s->D.Unit);
-			delete s->D.Unit;
-			break;
-		case EString_UnitTrait : // Trait of the unit
-			FreeUnitDesc(s->D.Unit);
-			delete s->D.Unit;
-			break;
-		case EString_UnitSpell : // Spell of the unit
-			FreeUnitDesc(s->D.Unit);
-			delete s->D.Unit;
-			break;
-		case EString_UnitQuote : // Quote of the unit
-			FreeUnitDesc(s->D.Unit);
-			delete s->D.Unit;
-			break;
-		case EString_UnitSettlementName : // Settlement name of the unit
-			FreeUnitDesc(s->D.Unit);
-			delete s->D.Unit;
-			break;
-		case EString_UnitUniqueSet : // Unique item set name of the unit
-			FreeUnitDesc(s->D.Unit);
-			delete s->D.Unit;
-			break;
-		case EString_UnitUniqueSetItems : // Unique item names for the unit's unique item set name
-			FreeUnitDesc(s->D.Unit);
-			delete s->D.Unit;
-			break;
-		case EString_TypeName : // Name of the unit type
-		case EString_TypeIdent : // Ident of the unit type
-		case EString_TypeClass : // Class of the unit type
-		case EString_TypeDescription : // Description of the unit type
-		case EString_TypeQuote : // Quote of the unit type
-		case EString_TypeRequirementsString : // Requirements string of the unit type
-		case EString_TypeExperienceRequirementsString : // Experience requirements string of the unit type
-		case EString_TypeBuildingRulesString : // Building rules string of the unit type
-		case EString_TypeImproveIncomes : // Income improvements of the unit type
-		case EString_TypeLuxuryDemand : // Luxury demand of the unit type
-			delete *s->D.Type;
-			break;
-		case EString_UpgradeCivilization : // Civilization of the upgrade
-		case EString_UpgradeEffectsString : // Effects string of the upgrade
-		case EString_UpgradeRequirementsString : // Requirements string of the upgrade
-		case EString_UpgradeMaxLimit : // Requirements string of the upgrade
-			delete *s->D.Upgrade;
-			break;
-		case EString_ResourceIdent : // Ident of the resource
-		case EString_ResourceName : // Name of the resource
-		case EString_ResourceConversionRates : // Conversion rates of the resource
-		case EString_ResourceImproveIncomes : // Income improvements of the resource
-			delete *s->D.Resource;
-			break;
-		case EString_FactionCivilization : // Civilization of the faction
-		case EString_FactionType : // Type of the faction
-		case EString_FactionCoreSettlements : // Core settlements of the faction
-			delete *s->D.Faction;
-			break;
-		//Wyrmgus end
-		case EString_If : // cond ? True : False;
-			FreeNumberDesc(s->D.If.Cond);
-			delete s->D.If.Cond;
-			FreeStringDesc(s->D.If.BTrue);
-			delete s->D.If.BTrue;
-			FreeStringDesc(s->D.If.BFalse);
-			delete s->D.If.BFalse;
-			break;
-		case EString_SubString : // substring(s, begin, end)
-			FreeStringDesc(s->D.SubString.String);
-			delete s->D.SubString.String;
-			FreeNumberDesc(s->D.SubString.Begin);
-			delete s->D.SubString.Begin;
-			FreeNumberDesc(s->D.SubString.End);
-			delete s->D.SubString.End;
-			break;
-		case EString_Line : // line n of the string
-			FreeStringDesc(s->D.Line.String);
-			delete s->D.Line.String;
-			FreeNumberDesc(s->D.Line.Line);
-			delete s->D.Line.Line;
-			FreeNumberDesc(s->D.Line.MaxLen);
-			delete s->D.Line.MaxLen;
-			break;
-		case EString_PlayerName: // player name
-		case EString_PlayerFullName: // player full name
-			FreeNumberDesc(s->D.PlayerName);
-			delete s->D.PlayerName;
-			break;
-	}
 }
 
 /*............................................................................
@@ -3362,10 +3137,6 @@ static int CclListDirsInDirectory(lua_State *l)
 static int CclSetDamageFormula(lua_State *l)
 {
 	Assert(l);
-	if (Damage) {
-		FreeNumberDesc(Damage);
-		delete Damage;
-	}
 	Damage = CclParseNumberDesc(l);
 	return 0;
 }

@@ -177,11 +177,6 @@ enum EString {
 	// add more...
 };
 
-/// All possible value for a game info string.
-enum ES_GameInfo {
-	ES_GameInfo_Objectives       /// All Objectives of the game.
-};
-
 /**
 **  Enumeration to know which variable to be selected.
 */
@@ -231,8 +226,8 @@ struct StringDesc;
 
 /// for Bin operand  a ?? b
 struct BinOp {
-	NumberDesc *Left;           /// Left operand.
-	NumberDesc *Right;          /// Right operand.
+	std::unique_ptr<NumberDesc> Left;           /// Left operand.
+	std::unique_ptr<NumberDesc> Right;          /// Right operand.
 };
 
 /**
@@ -240,46 +235,46 @@ struct BinOp {
 */
 struct NumberDesc {
 	ENumber e;       /// which number.
-	union {
-		unsigned int Index; /// index of the lua function.
-		int Val;       /// Direct value.
-		NumberDesc *N; /// Other number.
+	struct {
+		unsigned int Index = 0; /// index of the lua function.
+		int Val = 0;       /// Direct value.
+		std::unique_ptr<NumberDesc> N; /// Other number.
 		//Wyrmgus start
-		const wyrmgus::unit_type **Type;    /// Which unit type.
-		const CUpgrade **Upgrade;			/// Which upgrade.
-		const wyrmgus::faction **Faction;	/// Which faction.
+		const wyrmgus::unit_type **Type = nullptr;    /// Which unit type.
+		const CUpgrade **Upgrade = nullptr;			/// Which upgrade.
+		const wyrmgus::faction **Faction = nullptr;	/// Which faction.
 		//Wyrmgus end
-		const CPlayer **player;
+		const CPlayer **player = nullptr;
 		BinOp binOp;   /// For binary operand.
 		struct {
-			UnitDesc *Unit;            /// Which unit.
-			int Index;                 /// Which index variable.
-			EnumVariable Component;    /// Which component.
-			int Loc;                   /// Location of Variables[].
+			std::unique_ptr<UnitDesc> Unit; /// Which unit.
+			int Index = 0;                 /// Which index variable.
+			EnumVariable Component = VariableValue;    /// Which component.
+			int Loc = 0;                   /// Location of Variables[].
 		} UnitStat;
 		struct {
-			const wyrmgus::unit_type **Type;    /// Which unit type.
-			int Index;                 /// Which index variable.
-			EnumVariable Component;    /// Which component.
-			int Loc;                   /// Location of Variables[].
+			const wyrmgus::unit_type **Type = nullptr;    /// Which unit type.
+			int Index = 0;                 /// Which index variable.
+			EnumVariable Component = VariableValue;    /// Which component.
+			int Loc = 0;                   /// Location of Variables[].
 		} TypeStat;
 		struct {
-			StringDesc *String; /// String.
-			wyrmgus::font *Font;        /// Font.
+			std::unique_ptr<StringDesc> String; /// String.
+			wyrmgus::font *Font = nullptr;        /// Font.
 		} VideoTextLength;
 		struct {
-			StringDesc *String; /// String.
-			char C;             /// Char.
+			std::unique_ptr<StringDesc> String; /// String.
+			char C = 0;             /// Char.
 		} StringFind;
 		struct {
-			NumberDesc *Cond;   /// Branch condition.
-			NumberDesc *BTrue;  /// Number if Cond is true.
-			NumberDesc *BFalse; /// Number if Cond is false.
+			std::unique_ptr<NumberDesc> Cond;   /// Branch condition.
+			std::unique_ptr<NumberDesc> BTrue;  /// Number if Cond is true.
+			std::unique_ptr<NumberDesc> BFalse; /// Number if Cond is false.
 		} NumIf; /// conditional string.
 		struct {
-			NumberDesc *Player;   /// Number of player
-			StringDesc *DataType; /// Player's data
-			StringDesc *ResType;  /// Resource type
+			std::unique_ptr<NumberDesc> Player; /// Number of player
+			std::unique_ptr<StringDesc> DataType; /// Player's data
+			std::unique_ptr<StringDesc> ResType;  /// Resource type
 		} PlayerData; /// conditional string.
 	} D;
 };
@@ -299,40 +294,38 @@ struct UnitDesc {
 */
 struct StringDesc {
 	EString e;       /// which number.
-	union {
-		unsigned int Index; /// index of the lua function.
-		char *Val;       /// Direct value.
+	struct {
+		unsigned int Index = 0; /// index of the lua function.
+		std::string Val;       /// Direct value.
 		struct {
-			StringDesc **Strings;  /// Array of operands.
-			int n;                 /// number of operand to concat
+			std::vector<std::unique_ptr<StringDesc>> Strings;  /// Array of operands.
 		} Concat; /// for Concat two string.
-		NumberDesc *Number;  /// Number.
-		StringDesc *String;  /// String.
-		UnitDesc *Unit;      /// Unit desciption.
+		std::unique_ptr<NumberDesc> Number;  /// Number.
+		std::unique_ptr<StringDesc> String;  /// String.
+		std::unique_ptr<UnitDesc> Unit;      /// Unit desciption.
 		//Wyrmgus start
-		const wyrmgus::unit_type **Type;    /// Which unit type.
-		const CUpgrade **Upgrade;			/// Which upgrade.
-		const wyrmgus::faction **Faction;	/// Which faction.
-		const wyrmgus::resource **Resource;	/// Which resource
+		const wyrmgus::unit_type **Type = nullptr;    /// Which unit type.
+		const CUpgrade **Upgrade = nullptr;			/// Which upgrade.
+		const wyrmgus::faction **Faction = nullptr;	/// Which faction.
+		const wyrmgus::resource **Resource = nullptr;	/// Which resource
 		//Wyrmgus end
 		struct {
-			NumberDesc *Cond;  /// Branch condition.
-			StringDesc *BTrue;  /// String if Cond is true.
-			StringDesc *BFalse; /// String if Cond is false.
+			std::unique_ptr<NumberDesc> Cond;  /// Branch condition.
+			std::unique_ptr<StringDesc> BTrue;  /// String if Cond is true.
+			std::unique_ptr<StringDesc> BFalse; /// String if Cond is false.
 		} If; /// conditional string.
 		struct {
-			StringDesc *String;  /// Original string.
-			NumberDesc *Begin;   /// Begin of result string.
-			NumberDesc *End;     /// End of result string.
+			std::unique_ptr<StringDesc> String;  /// Original string.
+			std::unique_ptr<NumberDesc> Begin;   /// Begin of result string.
+			std::unique_ptr<NumberDesc> End;     /// End of result string.
 		} SubString; /// For extract a substring
 		struct {
-			StringDesc *String;  /// Original string.
-			NumberDesc *Line;    /// Line number.
-			NumberDesc *MaxLen;  /// Max length of line.
-			wyrmgus::font *Font;         /// Font to consider (else (-1) consider just char).
+			std::unique_ptr<StringDesc> String;  /// Original string.
+			std::unique_ptr<NumberDesc> Line;    /// Line number.
+			std::unique_ptr<NumberDesc> MaxLen;  /// Max length of line.
+			wyrmgus::font *Font = nullptr;         /// Font to consider (else (-1) consider just char).
 		} Line; /// For specific line.
-		ES_GameInfo GameInfoType;
-		NumberDesc *PlayerName;  /// Player name.
+		std::unique_ptr<NumberDesc> PlayerName;  /// Player name.
 	} D;
 };
 
@@ -396,12 +389,12 @@ static void CclGetPos(lua_State *l, T *x , T *y, const int offset = -1)
 extern void CclGetDate(lua_State *l, CDate *d, const int offset = -1);
 //Wyrmgus end
 
-extern NumberDesc *Damage;  /// Damage calculation for missile.
+extern std::unique_ptr<NumberDesc> Damage;  /// Damage calculation for missile.
 
 /// transform string in corresponding index.
 extern EnumVariable Str2EnumVariable(lua_State *l, const char *s);
-extern NumberDesc *CclParseNumberDesc(lua_State *l); /// Parse a number description.
-extern UnitDesc *CclParseUnitDesc(lua_State *l);     /// Parse a unit description.
+extern std::unique_ptr<NumberDesc> CclParseNumberDesc(lua_State *l); /// Parse a number description.
+extern std::unique_ptr<UnitDesc> CclParseUnitDesc(lua_State *l);     /// Parse a unit description.
 extern const wyrmgus::unit_type **CclParseTypeDesc(lua_State *l);   /// Parse a unit type description.
 //Wyrmgus start
 extern const CUpgrade **CclParseUpgradeDesc(lua_State *l);   /// Parse an upgrade description.
@@ -409,12 +402,8 @@ extern const wyrmgus::resource **CclParseResourceDesc(lua_State *l);   /// Parse
 extern const wyrmgus::faction **CclParseFactionDesc(lua_State *l);   /// Parse a faction description.
 //Wyrmgus end
 extern const CPlayer **CclParsePlayerDesc(lua_State *l);   /// Parse a faction description.
-StringDesc *CclParseStringDesc(lua_State *l);        /// Parse a string description.
+std::unique_ptr<StringDesc> CclParseStringDesc(lua_State *l);        /// Parse a string description.
 
 extern int EvalNumber(const NumberDesc *numberdesc); /// Evaluate the number.
 extern CUnit *EvalUnit(const UnitDesc *unitdesc);    /// Evaluate the unit.
 std::string EvalString(const StringDesc *s);         /// Evaluate the string.
-
-void FreeNumberDesc(NumberDesc *number);  /// Free number description content. (no pointer itself).
-void FreeUnitDesc(UnitDesc *unitdesc);    /// Free unit description content. (no pointer itself).
-void FreeStringDesc(StringDesc *s);       /// Frre string description content. (no pointer itself).

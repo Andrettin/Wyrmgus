@@ -73,8 +73,6 @@ static std::vector<std::unique_ptr<Missile>> LocalMissiles;     /// all local mi
 
 std::vector<std::unique_ptr<BurningBuildingFrame>> BurningBuildingFrames; /// Burning building frames
 
-extern NumberDesc *Damage;                   /// Damage calculation for missile.
-
 namespace wyrmgus {
 
 void missile_type::ProcessConfigData(const CConfigData *config_data)
@@ -801,7 +799,7 @@ void FireMissile(CUnit &unit, CUnit *goal, const Vec2i &goalPos, int z)
 		//Wyrmgus start
 //		HitUnit(&unit, *goal, CalculateDamage(unit, *goal, Damage));
 		if (CalculateHit(unit, *goal->Stats, goal) == true) {
-			damage = CalculateDamage(unit, *goal, Damage);
+			damage = CalculateDamage(unit, *goal, Damage.get());
 			HitUnit(&unit, *goal, damage);
 			if (goal->IsAlive()) {
 				HitUnit_NormalHitSpecialDamageEffects(unit, *goal);
@@ -1351,7 +1349,7 @@ static void MissileHitsGoal(const Missile &missile, CUnit &goal, int splash)
 			Assert(missile.SourceUnit != nullptr);
 			//Wyrmgus start
 //			damage = CalculateDamage(*missile.SourceUnit, goal, missile.Type->Damage) / splash;
-			damage = CalculateDamage(*missile.SourceUnit, goal, missile.Type->Damage, &missile) / splash;
+			damage = CalculateDamage(*missile.SourceUnit, goal, missile.Type->Damage.get(), &missile) / splash;
 			//Wyrmgus end
 		} else if (missile.Damage || missile.LightningDamage) {  // direct damage, spells mostly
 			damage = missile.Damage / splash;
@@ -1360,7 +1358,7 @@ static void MissileHitsGoal(const Missile &missile, CUnit &goal, int splash)
 			Assert(missile.SourceUnit != nullptr);
 			//Wyrmgus start
 //			damage = CalculateDamage(*missile.SourceUnit, goal, Damage) / splash;
-			damage = CalculateDamage(*missile.SourceUnit, goal, Damage, &missile) / splash;
+			damage = CalculateDamage(*missile.SourceUnit, goal, Damage.get(), &missile) / splash;
 			//Wyrmgus end
 		}
 		if (missile.Type->Pierce && !missile.PiercedUnits.empty()) {  // Handle pierce factor
@@ -1927,13 +1925,12 @@ missile_type::missile_type(const std::string &identifier) : data_entry(identifie
 //	BlizzardSpeed(0), TTL(-1), ReduceFactor(100), SmokePrecision(0),
 	BlizzardSpeed(0), AttackSpeed(10), TTL(-1), ReduceFactor(100), SmokePrecision(0),
 	//Wyrmgus end
-	MissileStopFlags(0), Damage(nullptr), SplashFactor(100)
+	MissileStopFlags(0), SplashFactor(100)
 {
 }
 
 missile_type::~missile_type()
 {
-	FreeNumberDesc(this->Damage);
 }
 
 }

@@ -460,7 +460,7 @@ public:
 	int ReduceFactor;          /// Multiplier for reduce or increase damage dealt to the next unit
 	int SmokePrecision;        /// How frequently the smoke missile will generate itself
 	int MissileStopFlags;      /// On which terrain types missile won't fly
-	NumberDesc *Damage;        /// missile damage (used for non-direct missiles, e.g. impacts)
+	std::unique_ptr<NumberDesc> Damage;        /// missile damage (used for non-direct missiles, e.g. impacts)
 
 private:
 	int range = 0; //missile damage range
