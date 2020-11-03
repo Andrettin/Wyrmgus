@@ -91,6 +91,7 @@
 //Wyrmgus start
 #include "util/util.h"
 //Wyrmgus end
+#include "util/size_util.h"
 #include "util/vector_random_util.h"
 #include "util/vector_util.h"
 #include "video/video.h"
@@ -5482,6 +5483,12 @@ PixelSize CUnit::get_scaled_half_tile_pixel_size() const
 	return this->get_half_tile_pixel_size() * wyrmgus::defines::get()->get_scale_factor();
 }
 
+QPoint CUnit::get_bottom_right_tile_pos() const
+{
+	const CUnit *first_container = this->GetFirstContainer();
+	return first_container->tilePos + wyrmgus::size::to_point(first_container->Type->get_tile_size()) - QPoint(1, 1);
+}
+
 QPoint CUnit::get_center_tile_pos() const
 {
 	const CUnit *first_container = this->GetFirstContainer();
@@ -6725,6 +6732,23 @@ bool CUnit::is_seen_by_player(const CPlayer *player) const
 bool CUnit::is_seen_destroyed_by_player(const CPlayer *player) const
 {
 	return this->is_seen_destroyed_by_player(player->Index);
+}
+
+bool CUnit::is_in_subtemplate_area(const wyrmgus::map_template *subtemplate) const
+{
+	const CUnit *first_container = this->GetFirstContainer();
+	const CMapLayer *map_layer = first_container->MapLayer;
+	const int z = map_layer->ID;
+
+	for (int x = 0; x < first_container->Type->get_tile_width(); ++x) {
+		for (int y = 0; y < first_container->Type->get_tile_height(); ++y) {
+			if (CMap::get()->is_point_in_subtemplate_area(first_container->tilePos + QPoint(x, y), z, subtemplate)) {
+				return true;
+			}
+		}
+	}
+
+	return false;
 }
 
 /**

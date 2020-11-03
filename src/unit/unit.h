@@ -55,6 +55,7 @@ namespace wyrmgus {
 	class character;
 	class construction;
 	class construction_frame;
+	class map_template;
 	class player_color;
 	class spell;
 	class time_of_day;
@@ -383,6 +384,7 @@ public:
 	PixelSize get_scaled_tile_pixel_size() const;
 	PixelSize get_half_tile_pixel_size() const;
 	PixelSize get_scaled_half_tile_pixel_size() const;
+	QPoint get_bottom_right_tile_pos() const;
 	QPoint get_center_tile_pos() const;
 	const CMapField *get_center_tile() const;
 
@@ -513,6 +515,8 @@ public:
 	{
 		return this->Seen.destroyed.contains(index);
 	}
+
+	bool is_in_subtemplate_area(const wyrmgus::map_template *subtemplate) const;
 
 public:
 	class CUnitManagerData
