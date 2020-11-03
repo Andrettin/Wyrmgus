@@ -537,17 +537,7 @@ static std::unique_ptr<Target> SelectTargetUnitsOfAutoCast(CUnit &caster, const 
 		return nullptr;
 	}
 	
-	CMapLayer *map_layer = caster.MapLayer;
-	int range = autocast->Range;
-	int minRange = autocast->MinRange;
-
-	if (caster.CurrentAction() == UnitAction::StandGround) {
-		range = std::min(range, spell.get_range());
-	}
-
-	// Select all units around the caster
-	std::vector<CUnit *> table;
-	SelectAroundUnit(caster, range, table, OutOfMinRange(minRange, caster.tilePos, caster.MapLayer->ID));
+	const CMapLayer *map_layer = caster.MapLayer;
 
 	if (spell.get_target() == wyrmgus::spell_target_type::self) {
 		if (PassCondition(caster, spell, &caster, spell.get_cast_conditions()) && PassCondition(caster, spell, &caster, autocast->get_cast_conditions())) {
