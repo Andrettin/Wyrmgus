@@ -54,14 +54,11 @@ public:
 	{
 		Q_UNUSED(player)
 
-		for (const CPlayer *loop_player : CPlayer::Players) {
-			for (CUnit *character_unit : loop_player->Heroes) {
-				if (character_unit->Character == this->character) {
-					character_unit->Remove(nullptr);
-					LetUnitDie(*character_unit);
-					return;
-				}
-			}
+		CUnit *character_unit = this->character->get_unit();
+
+		if (character_unit != nullptr) {
+			character_unit->Remove(nullptr);
+			LetUnitDie(*character_unit);
 		}
 	}
 

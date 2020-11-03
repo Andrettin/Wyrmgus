@@ -744,6 +744,19 @@ void character::remove_ability(const CUpgrade *ability)
 	vector::remove(this->abilities, ability);
 }
 
+CUnit *character::get_unit() const
+{
+	for (const CPlayer *player : CPlayer::Players) {
+		for (CUnit *character_unit : player->Heroes) {
+			if (character_unit->Character == this) {
+				return character_unit;
+			}
+		}
+	}
+
+	return nullptr;
+}
+
 }
 
 int GetAttributeVariableIndex(int attribute)

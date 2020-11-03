@@ -360,6 +360,8 @@ public:
 		return this->conditions;
 	}
 
+	CUnit *get_unit() const;
+
 	CDate BirthDate;			/// Date in which the character was born
 	CDate StartDate;			/// Date in which the character historically starts being active
 	CDate DeathDate;			/// Date in which the character historically died
