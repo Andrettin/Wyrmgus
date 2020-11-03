@@ -124,7 +124,7 @@ public:
 
 private:
 	const wyrmgus::unit_type *unit_type = nullptr; //the unit type to be created
-	const site *site = nullptr; //the site where the unit type is to be located, if any
+	const wyrmgus::site *site = nullptr; //the site where the unit type is to be located, if any
 	int ttl = 0; //the time to live (in cycles) of the created unit, if any; useful for revealers
 };
 

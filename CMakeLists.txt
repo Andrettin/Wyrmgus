@@ -742,6 +742,7 @@ set(stratagus_script_effect_HDRS
 	src/script/effect/create_unit_effect.h
 	src/script/effect/effect.h
 	src/script/effect/effect_list.h
+	src/script/effect/remove_character_effect.h
 	src/script/effect/resource_effect.h
 )
 
