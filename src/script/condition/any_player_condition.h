@@ -32,7 +32,7 @@
 
 namespace wyrmgus {
 
-class any_player_condition final : public scope_condition_base<CPlayer>
+class any_player_condition final : public scope_condition_base
 {
 public:
 	bool check(const bool ignore_units) const

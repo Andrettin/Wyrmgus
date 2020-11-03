@@ -33,7 +33,7 @@
 namespace wyrmgus {
 
 template <typename scope_type>
-class scope_condition : public scope_condition_base<scope_type>
+class scope_condition : public scope_condition_base
 {
 public:
 	virtual const scope_type *get_scope(const CPlayer *player) const = 0;

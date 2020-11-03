@@ -32,7 +32,6 @@
 
 namespace wyrmgus {
 
-template <typename scope_type>
 class scope_condition_base : public condition
 {
 public:
