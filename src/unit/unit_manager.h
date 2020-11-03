@@ -64,7 +64,7 @@ public:
 private:
 	std::vector<CUnit *> units;
 	std::vector<CUnit *> unitSlots;
-	std::list<CUnit *> releasedUnits;
+	std::list<CUnit *> released_units;
 	CUnit *lastCreated;
 };
 

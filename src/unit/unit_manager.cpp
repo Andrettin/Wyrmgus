@@ -65,9 +65,9 @@ void CUnitManager::Init()
 	//Assert(units.empty());
 	this->units.clear();
 	// Release memory of units in release list.
-	while (!this->releasedUnits.empty()) {
-		CUnit *unit = this->releasedUnits.front();
-		this->releasedUnits.pop_front();
+	while (!this->released_units.empty()) {
+		CUnit *unit = this->released_units.front();
+		this->released_units.pop_front();
 		delete unit;
 	}
 
@@ -83,20 +83,20 @@ void CUnitManager::Init()
 CUnit *CUnitManager::AllocUnit()
 {
 	// Can use released unit?
-	if (!releasedUnits.empty() && releasedUnits.front()->ReleaseCycle < GameCycle) {
-		CUnit *unit = releasedUnits.front();
-		releasedUnits.pop_front();
+	if (!this->released_units.empty() && this->released_units.front()->ReleaseCycle < GameCycle) {
+		CUnit *unit = this->released_units.front();
+		this->released_units.pop_front();
 		const int slot = unit->UnitManagerData.slot;
 		unit->Init();
 		unit->UnitManagerData.slot = slot;
 		unit->UnitManagerData.unitSlot = -1;
 		return unit;
 	} else {
-		CUnit *unit = new CUnit;
+		auto unit = std::make_unique<CUnit>();
 
 		unit->UnitManagerData.slot = unitSlots.size();
-		unitSlots.push_back(unit);
-		return unit;
+		unitSlots.push_back(unit.get());
+		return unit.release();
 	}
 }
 
@@ -113,15 +113,15 @@ void CUnitManager::ReleaseUnit(CUnit *unit)
 		lastCreated = nullptr;
 	}
 	if (unit->UnitManagerData.unitSlot != -1) { // == -1 when loading.
-		Assert(units[unit->UnitManagerData.unitSlot] == unit);
+		Assert(this->units[unit->UnitManagerData.unitSlot] == unit);
 
-		CUnit *temp = units.back();
+		CUnit *temp = this->units.back();
 		temp->UnitManagerData.unitSlot = unit->UnitManagerData.unitSlot;
-		units[unit->UnitManagerData.unitSlot] = temp;
+		this->units[unit->UnitManagerData.unitSlot] = temp;
 		unit->UnitManagerData.unitSlot = -1;
-		units.pop_back();
+		this->units.pop_back();
 	}
-	releasedUnits.push_back(unit);
+	this->released_units.push_back(unit);
 	unit->ReleaseCycle = GameCycle + 500; // can be reused after this time
 	//Refs = GameCycle + (NetworkMaxLag << 1); // could be reuse after this time
 }
@@ -172,9 +172,8 @@ void CUnitManager::Save(CFile &file) const
 {
 	file.printf("SlotUsage(%lu, {", (long unsigned int)unitSlots.size());
 
-	for (std::list<CUnit *>::const_iterator it = releasedUnits.begin(); it != releasedUnits.end(); ++it) {
-		const CUnit &unit = **it;
-		file.printf("{Slot = %d, FreeCycle = %u}, ", UnitNumber(unit), unit.ReleaseCycle);
+	for (const CUnit *unit : this->released_units) {
+		file.printf("{Slot = %d, FreeCycle = %u}, ", UnitNumber(*unit), unit->ReleaseCycle);
 	}
 	//Wyrmgus start
 	//add items owned by persistent heroes here, as if they were released
