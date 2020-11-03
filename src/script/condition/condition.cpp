@@ -40,6 +40,7 @@
 #include "script/condition/and_condition.h"
 #include "script/condition/any_other_player_condition.h"
 #include "script/condition/any_player_condition.h"
+#include "script/condition/any_unit_condition.h"
 #include "script/condition/character_condition.h"
 #include "script/condition/civilization_condition.h"
 #include "script/condition/dynasty_condition.h"
@@ -105,6 +106,8 @@ std::unique_ptr<const condition> condition::from_sml_scope(const sml_data &scope
 		condition = std::make_unique<any_other_player_condition>();
 	} else if (tag == "any_player") {
 		condition = std::make_unique<any_player_condition>();
+	} else if (tag == "any_unit") {
+		condition = std::make_unique<any_unit_condition>();
 	} else if (tag == "or") {
 		condition = std::make_unique<or_condition>();
 	} else if (tag == "not") {

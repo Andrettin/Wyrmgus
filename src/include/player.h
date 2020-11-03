@@ -223,6 +223,11 @@ public:
 	std::set<int> get_builder_landmasses(const wyrmgus::unit_type *building) const;	/// Builds a vector with builder landmasses; the building is the structure to be built by the builder in question
 	std::vector<const CUpgrade *> GetResearchableUpgrades();
 
+	const std::vector<CUnit *> &get_units() const
+	{
+		return this->Units;
+	}
+
 	CUnit &GetUnit(int index) const;
 	int GetUnitCount() const;
 
