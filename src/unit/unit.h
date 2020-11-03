@@ -516,6 +516,7 @@ public:
 		return this->Seen.destroyed.contains(index);
 	}
 
+	bool is_in_tile_rect(const QRect &tile_rect, int z) const;
 	bool is_in_subtemplate_area(const wyrmgus::map_template *subtemplate) const;
 
 public:

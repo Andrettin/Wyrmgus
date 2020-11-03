@@ -48,7 +48,20 @@ public:
 		if (key == "map_template") {
 			this->map_template = map_template::get(value);
 		} else {
-			throw std::runtime_error("Invalid location condition property: \"" + property.get_key() + "\".");
+			throw std::runtime_error("Invalid location condition property: \"" + key + "\".");
+		}
+	}
+
+	virtual void process_sml_scope(const sml_data &scope) override
+	{
+		const std::string &tag = scope.get_tag();
+
+		if (tag == "min_pos") {
+			this->min_pos = scope.to_point();
+		} else if (tag == "max_pos") {
+			this->max_pos = scope.to_point();
+		} else {
+			throw std::runtime_error("Invalid location condition scope: \"" + tag + "\".");
 		}
 	}
 
@@ -64,7 +77,31 @@ public:
 	{
 		Q_UNUSED(ignore_units)
 
-		return unit->is_in_subtemplate_area(this->map_template);
+		if (min_pos == QPoint(-1, -1) && max_pos == QPoint(-1, -1)) {
+			return unit->is_in_subtemplate_area(this->map_template);
+		}
+
+		const QRect &subtemplate_rect = unit->MapLayer->get_subtemplate_rect(this->map_template);
+
+		if (!subtemplate_rect.isValid()) {
+			return false;
+		}
+
+		QPoint min_map_pos(-1, -1);
+		if (this->min_pos != QPoint(-1, -1)) {
+			min_map_pos = this->map_template->pos_to_map_pos(this->min_pos);
+		} else {
+			min_map_pos = subtemplate_rect.topLeft();
+		}
+
+		QPoint max_map_pos(-1, -1);
+		if (this->max_pos != QPoint(-1, -1)) {
+			max_map_pos = this->map_template->pos_to_map_pos(this->max_pos);
+		} else {
+			max_map_pos = subtemplate_rect.bottomRight();
+		}
+
+		return unit->is_in_tile_rect(QRect(min_map_pos, max_map_pos), unit->MapLayer->ID);
 	}
 
 	virtual std::string get_string(const std::string &prefix = "") const override
@@ -74,6 +111,8 @@ public:
 
 private:
 	const wyrmgus::map_template *map_template = nullptr;
+	QPoint min_pos = QPoint(-1, -1);
+	QPoint max_pos = QPoint(-1, -1);
 };
 
 }

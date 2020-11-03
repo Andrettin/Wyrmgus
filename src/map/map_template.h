@@ -600,6 +600,11 @@ public:
 
 	void save_terrain_image(const std::string &filename, const bool overlay, const terrain_geodata_map &terrain_data) const;
 	void save_territory_image(const std::string &filename, const std::map<const site *, std::vector<std::unique_ptr<QGeoShape>>> &territory_data) const;
+
+	QPoint pos_to_map_pos(const QPoint &pos) const
+	{
+		return this->get_current_map_start_pos() + pos - this->get_start_pos();
+	}
 	
 private:
 	std::filesystem::path terrain_file;

@@ -6734,6 +6734,26 @@ bool CUnit::is_seen_destroyed_by_player(const CPlayer *player) const
 	return this->is_seen_destroyed_by_player(player->Index);
 }
 
+bool CUnit::is_in_tile_rect(const QRect &tile_rect, const int z) const
+{
+	const CUnit *first_container = this->GetFirstContainer();
+	const CMapLayer *map_layer = first_container->MapLayer;
+
+	if (z != map_layer->ID) {
+		return false;
+	}
+
+	for (int x = 0; x < first_container->Type->get_tile_width(); ++x) {
+		for (int y = 0; y < first_container->Type->get_tile_height(); ++y) {
+			if (tile_rect.contains(first_container->tilePos + QPoint(x, y))) {
+				return true;
+			}
+		}
+	}
+
+	return false;
+}
+
 bool CUnit::is_in_subtemplate_area(const wyrmgus::map_template *subtemplate) const
 {
 	const CUnit *first_container = this->GetFirstContainer();
