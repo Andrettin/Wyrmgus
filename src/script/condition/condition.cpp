@@ -47,6 +47,7 @@
 #include "script/condition/faction_condition.h"
 #include "script/condition/not_condition.h"
 #include "script/condition/or_condition.h"
+#include "script/condition/quest_condition.h"
 #include "script/condition/season_condition.h"
 #include "script/condition/settlement_condition.h"
 #include "script/condition/trigger_condition.h"
@@ -78,6 +79,8 @@ std::unique_ptr<const condition> condition::from_sml_property(const sml_property
 		return std::make_unique<dynasty_condition>(value);
 	} else if (key == "faction") {
 		return std::make_unique<faction_condition>(value);
+	} else if (key == "quest") {
+		return std::make_unique<quest_condition>(value);
 	} else if (key == "settlement") {
 		return std::make_unique<settlement_condition>(value);
 	} else if (key == "trigger") {

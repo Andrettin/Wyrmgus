@@ -27,34 +27,34 @@
 
 #pragma once
 
-#include "faction.h"
+#include "quest.h"
 #include "script/condition/condition.h"
 
 namespace wyrmgus {
 
-class faction_condition final : public condition
+class quest_condition final : public condition
 {
 public:
-	explicit faction_condition(const std::string &value)
+	explicit quest_condition(const std::string &value)
 	{
-		this->faction = faction::get(value);
+		this->quest = quest::get(value);
 	}
 
 	virtual bool check(const CPlayer *player, const bool ignore_units) const override
 	{
 		Q_UNUSED(ignore_units)
 
-		return player->get_faction() == this->faction;
+		return player->has_quest(this->quest);
 	}
 
 	virtual std::string get_string(const std::string &prefix = "") const override
 	{
-		std::string str = prefix + this->faction->get_name() + " Faction\n";
+		std::string str = prefix + "Has " + this->quest->get_name() + " Quest\n";
 		return str;
 	}
 
 private:
-	const wyrmgus::faction *faction = nullptr;
+	const wyrmgus::quest *quest = nullptr;
 };
 
 }
