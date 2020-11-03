@@ -517,14 +517,17 @@ public:
 public:
 	class CUnitManagerData
 	{
-		friend class CUnitManager;
 	public:
-		CUnitManagerData() : slot(-1), unitSlot(-1) {}
+		int GetUnitId() const
+		{
+			return this->slot;
+		}
 
-		int GetUnitId() const { return slot; }
 	private:
-		int slot;           /// index in UnitManager::unitSlots
-		int unitSlot;       /// index in UnitManager::units
+		int slot = -1;           /// index in UnitManager::unitSlots
+		int unitSlot = -1;       /// index in UnitManager::units
+
+		friend class CUnitManager;
 	};
 
 public:
@@ -689,7 +692,10 @@ public:
 /**
 **  Returns unit number (unique to this unit)
 */
-#define UnitNumber(unit) ((unit).UnitManagerData.GetUnitId())
+inline int UnitNumber(const CUnit &unit)
+{
+	return unit.UnitManagerData.GetUnitId();
+}
 
 /**
 **  User preference.
