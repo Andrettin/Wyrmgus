@@ -830,13 +830,13 @@ void CreatePlayer(int type)
 
 CPlayer *GetFactionPlayer(const wyrmgus::faction *faction)
 {
-	if (!faction) {
+	if (faction == nullptr) {
 		return nullptr;
 	}
 	
-	for (int i = 0; i < NumPlayers; ++i) {
-		if (CPlayer::Players[i]->Race == faction->get_civilization()->ID && CPlayer::Players[i]->Faction == faction->ID) {
-			return CPlayer::Players[i];
+	for (CPlayer *player : CPlayer::Players) {
+		if (player->get_faction() == faction) {
+			return player;
 		}
 	}
 	

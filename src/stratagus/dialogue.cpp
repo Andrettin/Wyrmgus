@@ -35,8 +35,11 @@
 #include "luacallback.h"
 #include "player.h"
 #include "script.h"
+#include "unit/unit.h"
+#include "unit/unit_find.h"
 #include "unit/unit_type.h"
 #include "util/string_util.h"
+#include "util/vector_random_util.h"
 
 namespace wyrmgus {
 
@@ -111,6 +114,8 @@ void dialogue_node::process_sml_property(const sml_property &property)
 		this->speaker = character::get(value);
 	} else if (key == "speaker_unit_type") {
 		this->speaker_unit_type = unit_type::get(value);
+	} else if (key == "speaker_faction") {
+		this->speaker_faction = faction::get(value);
 	} else {
 		throw std::runtime_error("Invalid dialogue node property: \"" + key + "\".");
 	}
@@ -147,22 +152,31 @@ void dialogue_node::call(CPlayer *player) const
 	
 	std::string lua_command = "Event(";
 	
+	const CUnit *speaker_unit = nullptr;
 	if (this->speaker != nullptr) {
-		lua_command += "FindHero(\"" + this->speaker->get_identifier();
+		speaker_unit = this->speaker->get_unit();
 	} else if (this->speaker_unit_type != nullptr) {
-		lua_command += "FindUnit(\"" + this->speaker_unit_type->get_identifier();
+		const CPlayer *speaker_player = CPlayer::Players[PlayerNumNeutral];
+		if (this->speaker_faction != nullptr) {
+			speaker_player = GetFactionPlayer(this->speaker_faction);
+		}
+
+		if (speaker_player != nullptr) {
+			std::vector<CUnit *> potential_speaker_units;
+			FindPlayerUnitsByType(*speaker_player, *this->speaker_unit_type, potential_speaker_units);
+
+			if (!potential_speaker_units.empty()) {
+				speaker_unit = vector::get_random(potential_speaker_units);
+			}
+		}
+	}
+
+	if (speaker_unit != nullptr) {
+		lua_command += std::to_string(UnitNumber(*speaker_unit)) + ", ";
 	} else {
 		lua_command += "\"" + this->speaker_name + "\", ";
 	}
-	
-	if (this->speaker != nullptr || this->speaker_unit_type != nullptr) {
-		lua_command += "\"";
-		if (this->speaker_faction != nullptr) {
-			lua_command += ", GetFactionPlayer(\"" + this->speaker_faction->get_identifier() + "\")";
-		}
-		lua_command += "), ";
-	}
-	
+
 	lua_command += "\"" + FindAndReplaceString(FindAndReplaceString(this->text, "\"", "\\\""), "\n", "\\n") + "\", ";
 	lua_command += std::to_string(player->Index) + ", ";
 	
