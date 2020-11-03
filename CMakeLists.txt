@@ -219,6 +219,7 @@ set(map_SRCS
 	src/map/map_layer.cpp
 	src/map/map_radar.cpp
 	src/map/map_template.cpp
+	src/map/map_template_container.cpp
 	src/map/map_wall.cpp
 	src/map/mapfield.cpp
 	src/map/minimap.cpp
@@ -688,6 +689,7 @@ set(stratagus_map_HDRS
 	src/map/map.h
 	src/map/map_layer.h
 	src/map/map_template.h
+	src/map/map_template_container.h
 	src/map/minimap.h
 	src/map/minimap_mode.h
 	src/map/region.h

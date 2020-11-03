@@ -787,30 +787,27 @@ bool CMap::TileHasUnitsIncompatibleWithTerrain(const Vec2i &pos, const wyrmgus::
 	return false;
 }
 
-/**
-**	@brief	Get whether a given tile is in a subtemplate area
-**
-**	@param	pos				The tile's position
-**	@param	z				The tile's map layer
-**	@param	subtemplate		Optional subtemplate argument, if not null then will only return true if the point is in that specific subtemplate area; if it is null, then true will be returned if the point is in any subtemplate area
-**
-**	@return	True if the tile is in a subtemplate area, or false otherwise
-*/
-bool CMap::is_point_in_a_subtemplate_area(const Vec2i &pos, const int z, const wyrmgus::map_template *subtemplate) const
+bool CMap::is_point_in_a_subtemplate_area(const QPoint &pos, const int z) const
 {
-	for (size_t i = 0; i < this->MapLayers[z]->subtemplate_areas.size(); ++i) {
-		if (subtemplate && subtemplate != std::get<2>(this->MapLayers[z]->subtemplate_areas[i])) {
-			continue;
-		}
-		
-		Vec2i min_pos = std::get<0>(this->MapLayers[z]->subtemplate_areas[i]);
-		Vec2i max_pos = std::get<1>(this->MapLayers[z]->subtemplate_areas[i]);
-		if (pos.x >= min_pos.x && pos.y >= min_pos.y && pos.x <= max_pos.x && pos.y <= max_pos.y) {
+	for (const auto &kv_pair : this->MapLayers[z]->subtemplate_areas) {
+		const QRect &subtemplate_rect = kv_pair.second;
+		if (subtemplate_rect.contains(pos)) {
 			return true;
 		}
 	}
 
 	return false;
+}
+
+bool CMap::is_point_in_subtemplate_area(const QPoint &pos, const int z, const wyrmgus::map_template *subtemplate) const
+{
+	const QRect &subtemplate_rect = this->MapLayers[z]->get_subtemplate_rect(subtemplate);
+
+	if (!subtemplate_rect.isValid()) {
+		return false;
+	}
+
+	return subtemplate_rect.contains(pos);
 }
 
 bool CMap::is_subtemplate_on_map(const wyrmgus::map_template *subtemplate) const
@@ -819,61 +816,59 @@ bool CMap::is_subtemplate_on_map(const wyrmgus::map_template *subtemplate) const
 	return subtemplate_pos.x() != -1 && subtemplate_pos.y() != -1;
 }
 
-std::pair<Vec2i, Vec2i> CMap::get_subtemplate_rect(const wyrmgus::map_template *subtemplate) const
+const QRect &CMap::get_subtemplate_rect(const wyrmgus::map_template *subtemplate) const
 {
-	if (!subtemplate) {
-		return std::make_pair(Vec2i(-1, -1), Vec2i(-1, -1));
+	static QRect empty_rect;
+
+	if (subtemplate == nullptr) {
+		return empty_rect;
 	}
 
 	const wyrmgus::map_template *main_template = subtemplate->GetTopMapTemplate();
 	if (main_template && subtemplate != main_template) {
 		const int z = GetMapLayer(main_template->get_plane() ? main_template->get_plane()->Ident : "", main_template->get_world() ? main_template->get_world()->get_identifier() : "");
 		if (z != -1) {
-			for (size_t i = 0; i < this->MapLayers[z]->subtemplate_areas.size(); ++i) {
-				if (subtemplate == std::get<2>(this->MapLayers[z]->subtemplate_areas[i])) {
-					return std::make_pair(std::get<0>(this->MapLayers[z]->subtemplate_areas[i]), std::get<1>(this->MapLayers[z]->subtemplate_areas[i]));
-				}
-			}
+			return this->MapLayers[z]->get_subtemplate_rect(subtemplate);
 		}
 	}
 
-	return std::make_pair(Vec2i(-1, -1), Vec2i(-1, -1));
+	return empty_rect;
 }
 
-/**
-**	@brief	Get the applied map position of a given subtemplate
-**
-**	@param	subtemplate		The subtemplate
-**
-**	@return	The subtemplate's position if found, or (-1, -1) otherwise
-*/
-Vec2i CMap::get_subtemplate_pos(const wyrmgus::map_template *subtemplate) const
+QPoint CMap::get_subtemplate_pos(const wyrmgus::map_template *subtemplate) const
 {
-	std::pair<Vec2i, Vec2i> subtemplate_rect = this->get_subtemplate_rect(subtemplate);
-	return subtemplate_rect.first;
+	const QRect &subtemplate_rect = this->get_subtemplate_rect(subtemplate);
+
+	if (!subtemplate_rect.isValid()) {
+		return QPoint(-1, -1);
+	}
+
+	return subtemplate_rect.topLeft();
 }
 
-Vec2i CMap::get_subtemplate_center_pos(const wyrmgus::map_template *subtemplate) const
+QPoint CMap::get_subtemplate_center_pos(const wyrmgus::map_template *subtemplate) const
 {
-	std::pair<Vec2i, Vec2i> subtemplate_rect = this->get_subtemplate_rect(subtemplate);
+	const QRect &subtemplate_rect = this->get_subtemplate_rect(subtemplate);
 
-	const Vec2i &start_pos = subtemplate_rect.first;
-	const Vec2i &end_pos = subtemplate_rect.second;
+	if (!subtemplate_rect.isValid()) {
+		return QPoint(-1, -1);
+	}
+
+	const QPoint start_pos = subtemplate_rect.topLeft();
+	const QPoint end_pos = subtemplate_rect.bottomRight();
 
 	return start_pos + ((end_pos - start_pos) / 2);
 }
 
-/**
-**	@brief	Get the applied end map position of a given subtemplate
-**
-**	@param	subtemplate		The subtemplate
-**
-**	@return	The subtemplate's end position if found, or (-1, -1) otherwise
-*/
-Vec2i CMap::get_subtemplate_end_pos(const wyrmgus::map_template *subtemplate) const
+QPoint CMap::get_subtemplate_end_pos(const wyrmgus::map_template *subtemplate) const
 {
-	std::pair<Vec2i, Vec2i> subtemplate_rect = this->get_subtemplate_rect(subtemplate);
-	return subtemplate_rect.second;
+	const QRect &subtemplate_rect = this->get_subtemplate_rect(subtemplate);
+
+	if (!subtemplate_rect.isValid()) {
+		return QPoint(-1, -1);
+	}
+
+	return subtemplate_rect.bottomRight();
 }
 
 /**
@@ -893,10 +888,8 @@ CMapLayer *CMap::get_subtemplate_map_layer(const wyrmgus::map_template *subtempl
 	if (main_template && subtemplate != main_template) {
 		const int z = GetMapLayer(main_template->get_plane() ? main_template->get_plane()->Ident : "", main_template->get_world() ? main_template->get_world()->get_identifier() : "");
 		if (z != -1) {
-			for (size_t i = 0; i < this->MapLayers[z]->subtemplate_areas.size(); ++i) {
-				if (subtemplate == std::get<2>(this->MapLayers[z]->subtemplate_areas[i])) {
-					return this->MapLayers[z].get();
-				}
+			if (this->MapLayers[z]->has_subtemplate_area(subtemplate)) {
+				return this->MapLayers[z].get();
 			}
 		}
 	}
@@ -930,7 +923,7 @@ std::vector<CUnit *> CMap::get_map_template_layer_connectors(const wyrmgus::map_
 				
 				if (is_main_template && this->is_point_in_a_subtemplate_area(unit_pos, z)) {
 					continue;
-				} else if (!is_main_template && !this->is_point_in_a_subtemplate_area(unit_pos, z, map_template)) {
+				} else if (!is_main_template && !this->is_point_in_subtemplate_area(unit_pos, z, map_template)) {
 					continue;
 				}
 
@@ -2650,12 +2643,14 @@ void CMap::GenerateTerrain(const std::unique_ptr<wyrmgus::generated_terrain> &ge
 	}
 	
 	if (generated_terrain->UseSubtemplateBordersAsSeeds) {
-		for (size_t i = 0; i < this->MapLayers[z]->subtemplate_areas.size(); ++i) {
-			const Vec2i subtemplate_min_pos = std::get<0>(this->MapLayers[z]->subtemplate_areas[i]);
-			const Vec2i subtemplate_max_pos = std::get<1>(this->MapLayers[z]->subtemplate_areas[i]);
+		for (const auto &kv_pair : this->MapLayers[z]->subtemplate_areas) {
+			const QRect &subtemplate_rect = kv_pair.second;
+
+			const QPoint subtemplate_min_pos = subtemplate_rect.topLeft();
+			const QPoint subtemplate_max_pos = subtemplate_rect.bottomRight();
 			
-			for (int x = subtemplate_min_pos.x; x <= subtemplate_max_pos.x; ++x) {
-				for (int y = subtemplate_min_pos.y; y <= subtemplate_max_pos.y; ++y) {
+			for (int x = subtemplate_min_pos.x(); x <= subtemplate_max_pos.x(); ++x) {
+				for (int y = subtemplate_min_pos.y(); y <= subtemplate_max_pos.y(); ++y) {
 					const Vec2i tile_pos(x, y);
 					const CMapField *tile = this->Field(x, y, z);
 					

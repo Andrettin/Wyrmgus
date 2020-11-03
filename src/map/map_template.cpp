@@ -1003,7 +1003,7 @@ void map_template::Apply(const QPoint &template_start_pos, const QPoint &map_sta
 
 	//this has to be done at the end, so that it doesn't prevent the application from working properly, due to the map template code thinking that its own area belongs to another map template
 	if (this->IsSubtemplateArea()) {
-		CMap::Map.MapLayers[z]->subtemplate_areas.push_back(std::tuple<Vec2i, Vec2i, map_template *>(map_start_pos, map_end - Vec2i(1, 1), this));
+		CMap::Map.MapLayers[z]->subtemplate_areas[this] = QRect(map_start_pos, map_end - Vec2i(1, 1));
 	}
 }
 

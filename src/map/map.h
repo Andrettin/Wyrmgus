@@ -261,12 +261,13 @@ public:
 	bool TileBordersTerrainIncompatibleWithTerrain(const Vec2i &pos, const wyrmgus::terrain_type *terrain_type, const int z) const;
 	bool TileBordersTerrainIncompatibleWithTerrainPair(const Vec2i &pos, const wyrmgus::terrain_type *terrain_type, const wyrmgus::terrain_type *overlay_terrain_type, const int z) const;
 	bool TileHasUnitsIncompatibleWithTerrain(const Vec2i &pos, const wyrmgus::terrain_type *terrain, const int z);
-	bool is_point_in_a_subtemplate_area(const Vec2i &pos, const int z, const wyrmgus::map_template *subtemplate = nullptr) const;
+	bool is_point_in_a_subtemplate_area(const QPoint &pos, const int z) const;
+	bool is_point_in_subtemplate_area(const QPoint &pos, const int z, const wyrmgus::map_template *subtemplate) const;
 	bool is_subtemplate_on_map(const wyrmgus::map_template *subtemplate) const;
-	std::pair<Vec2i, Vec2i> get_subtemplate_rect(const wyrmgus::map_template *subtemplate) const;
-	Vec2i get_subtemplate_pos(const wyrmgus::map_template *subtemplate) const;
-	Vec2i get_subtemplate_center_pos(const wyrmgus::map_template *subtemplate) const;
-	Vec2i get_subtemplate_end_pos(const wyrmgus::map_template *subtemplate) const;
+	const QRect &get_subtemplate_rect(const wyrmgus::map_template *subtemplate) const;
+	QPoint get_subtemplate_pos(const wyrmgus::map_template *subtemplate) const;
+	QPoint get_subtemplate_center_pos(const wyrmgus::map_template *subtemplate) const;
+	QPoint get_subtemplate_end_pos(const wyrmgus::map_template *subtemplate) const;
 	CMapLayer *get_subtemplate_map_layer(const wyrmgus::map_template *subtemplate) const;
 	std::vector<CUnit *> get_map_template_layer_connectors(const wyrmgus::map_template *map_template) const;
 	bool is_point_adjacent_to_non_subtemplate_area(const Vec2i &pos, const int z) const;

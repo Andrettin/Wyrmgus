@@ -27,15 +27,8 @@
 
 #pragma once
 
-/*----------------------------------------------------------------------------
---  Includes
-----------------------------------------------------------------------------*/
-
+#include "map/map_template_container.h"
 #include "vec2i.h"
-
-/*----------------------------------------------------------------------------
---  Declarations
-----------------------------------------------------------------------------*/
 
 class CMapField;
 class CScheduledSeason;
@@ -45,7 +38,6 @@ class CTimeOfDaySchedule;
 class CUnit;
 
 namespace wyrmgus {
-	class map_template;
 	class plane;
 	class season;
 	class time_of_day;
@@ -140,6 +132,23 @@ public:
 	void SetSeasonByHours(const unsigned long long hours);
 	void SetSeason(CScheduledSeason *season);
 	wyrmgus::season *GetSeason() const;
+
+	bool has_subtemplate_area(const wyrmgus::map_template *map_template) const
+	{
+		return this->subtemplate_areas.contains(map_template);
+	}
+
+	const QRect &get_subtemplate_rect(const wyrmgus::map_template *map_template) const
+	{
+		static QRect empty_rect;
+
+		auto find_iterator = this->subtemplate_areas.find(map_template);
+		if (find_iterator != this->subtemplate_areas.end()) {
+			return find_iterator->second;
+		}
+
+		return empty_rect;
+	}
 	
 	int ID = -1;
 private:
@@ -155,6 +164,6 @@ public:
 	wyrmgus::plane *plane = nullptr;			/// the plane pointer (if any) for the map layer
 	wyrmgus::world *world = nullptr;			/// the world pointer (if any) for the map layer
 	std::vector<CUnit *> LayerConnectors;		/// connectors in the map layer which lead to other map layers
-	std::vector<std::tuple<Vec2i, Vec2i, wyrmgus::map_template *>> subtemplate_areas;
+	wyrmgus::map_template_map<QRect> subtemplate_areas;
 	std::vector<Vec2i> DestroyedForestTiles;	/// destroyed forest tiles; this list is used for forest regeneration
 };

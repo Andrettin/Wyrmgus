@@ -113,7 +113,7 @@ public:
 	}
 
 private:
-	const unit_type *unit_type = nullptr;
+	const wyrmgus::unit_type *unit_type = nullptr;
 	int count = 1; //how many of the unit type are required
 	const site *settlement = nullptr; //in which settlement the unit should be located
 };
