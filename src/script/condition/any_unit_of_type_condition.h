@@ -27,46 +27,60 @@
 
 #pragma once
 
-#include "script/condition/and_condition.h"
-#include "script/condition/condition.h"
+#include "player.h"
+#include "script/condition/scope_condition_base.h"
+#include "unit/unit.h"
+#include "unit/unit_find.h"
+#include "unit/unit_type.h"
 
 namespace wyrmgus {
 
-class scope_condition_base : public condition
+class any_unit_of_type_condition final : public scope_condition_base
 {
 public:
 	virtual void process_sml_property(const sml_property &property) override
 	{
-		this->conditions.process_sml_property(property);
-	}
+		const std::string &key = property.get_key();
+		const std::string &value = property.get_value();
 
-	virtual void process_sml_scope(const sml_data &scope) override final
-	{
-		this->conditions.process_sml_scope(scope);
+		if (key == "unit_type") {
+			this->unit_type = unit_type::get(value);
+		} else {
+			scope_condition_base::process_sml_property(property);
+		}
 	}
 
 	virtual void check_validity() const override
 	{
-		this->conditions.check_validity();
+		if (this->unit_type == nullptr) {
+			throw std::runtime_error("\"any_unit_type\" condition has no unit type set for it.");
+		}
+
+		scope_condition_base::check_validity();
 	}
 
-	bool check_scope(const CPlayer *player, const bool ignore_units) const
+	virtual bool check(const CPlayer *player, const bool ignore_units) const override
 	{
-		return this->conditions.check(player, ignore_units);
+		for (const CUnit *unit : player->get_type_units(this->unit_type)) {
+			if (unit->IsUnusable()) {
+				continue;
+			}
+
+			if (this->check_scope(unit, ignore_units)) {
+				return true;
+			}
+		}
+
+		return false;
 	}
 
-	bool check_scope(const CUnit *unit, const bool ignore_units) const
+	virtual bool check(const CUnit *unit, const bool ignore_units) const override
 	{
-		return this->conditions.check(unit, ignore_units);
-	}
-
-	virtual std::string get_string(const std::string &prefix = "") const override final
-	{
-		return this->conditions.get_string(prefix);
+		return this->check_scope(unit, ignore_units);
 	}
 
 private:
-	and_condition conditions;
+	const wyrmgus::unit_type *unit_type = nullptr;
 };
 
 }

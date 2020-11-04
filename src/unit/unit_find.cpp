@@ -816,11 +816,11 @@ void FindUnitsByType(const wyrmgus::unit_type &type, std::vector<CUnit *> &units
 **  @param type    type of unit requested
 **  @param table   table in which we have to store the units
 */
-void FindPlayerUnitsByType(const CPlayer &player, const wyrmgus::unit_type &type, std::vector<CUnit *> &table, bool ai_active)
+void FindPlayerUnitsByType(const CPlayer &player, const wyrmgus::unit_type &type, std::vector<CUnit *> &table, const bool ai_active_only)
 {
 	const std::vector<CUnit *> *type_units = nullptr;
 
-	if (ai_active) {
+	if (ai_active_only) {
 		auto find_iterator = player.AiActiveUnitsByType.find(&type);
 		if (find_iterator != player.AiActiveUnitsByType.end()) {
 			type_units = &find_iterator->second;

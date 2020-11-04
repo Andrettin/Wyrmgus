@@ -308,9 +308,33 @@ public:
 		return this->units_by_type;
 	}
 
+	const std::vector<CUnit *> &get_type_units(const wyrmgus::unit_type *unit_type) const
+	{
+		static std::vector<CUnit *> empty_vector;
+
+		auto find_iterator = this->get_units_by_type().find(unit_type);
+		if (find_iterator != this->get_units_by_type().end()) {
+			return find_iterator->second;
+		}
+
+		return empty_vector;
+	}
+
 	const wyrmgus::unit_class_map<std::vector<CUnit *>> &get_units_by_class() const
 	{
 		return this->units_by_class;
+	}
+
+	const std::vector<CUnit *> &get_class_units(const wyrmgus::unit_class *unit_class) const
+	{
+		static std::vector<CUnit *> empty_vector;
+
+		auto find_iterator = this->get_units_by_class().find(unit_class);
+		if (find_iterator != this->get_units_by_class().end()) {
+			return find_iterator->second;
+		}
+
+		return empty_vector;
 	}
 
 	bool is_revealed() const
