@@ -45,6 +45,11 @@ public:
 		this->conditions.process_sml_scope(scope);
 	}
 
+	virtual void check_validity() const override
+	{
+		this->conditions.check_validity();
+	}
+
 	bool check_scope(const CPlayer *player, const bool ignore_units) const
 	{
 		return this->conditions.check(player, ignore_units);

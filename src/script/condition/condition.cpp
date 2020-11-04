@@ -135,11 +135,6 @@ std::unique_ptr<const condition> condition::from_sml_scope(const sml_data &scope
 	return condition;
 }
 
-/**
-**	@brief	Process data provided by a configuration file
-**
-**	@param	config_data	The configuration data
-*/
 void condition::ProcessConfigData(const CConfigData *config_data)
 {
 	for (size_t i = 0; i < config_data->Properties.size(); ++i) {
@@ -206,6 +201,13 @@ void and_condition::process_sml_property(const sml_property &property)
 void and_condition::process_sml_scope(const sml_data &scope)
 {
 	this->conditions.push_back(condition::from_sml_scope(scope));
+}
+
+void and_condition::check_validity() const
+{
+	for (const auto &condition : this->conditions) {
+		condition->check_validity();
+	}
 }
 
 bool and_condition::check(const CPlayer *player, const bool ignore_units) const

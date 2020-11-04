@@ -98,6 +98,7 @@ public:
 	
 	virtual void process_sml_property(const sml_property &property) override;
 	virtual void process_sml_scope(const sml_data &scope) override;
+	virtual void check() const override;
 
 	bool fires_only_once() const
 	{

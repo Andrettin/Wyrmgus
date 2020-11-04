@@ -151,6 +151,7 @@ public:
 	virtual void process_sml_property(const wyrmgus::sml_property &property) override;
 	virtual void process_sml_scope(const wyrmgus::sml_data &scope) override;
 	virtual void initialize() override;
+	virtual void check() const override;
 
 	int get_index() const
 	{

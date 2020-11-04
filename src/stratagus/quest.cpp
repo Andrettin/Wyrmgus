@@ -173,6 +173,13 @@ void quest::initialize()
 	}
 }
 
+void quest::check() const
+{
+	if (this->get_conditions() != nullptr) {
+		this->get_conditions()->check_validity();
+	}
+}
+
 std::string quest::get_rewards_string() const
 {
 	if (!this->rewards_string.empty()) {

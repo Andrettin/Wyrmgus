@@ -59,6 +59,17 @@ void upgrade_class::process_sml_scope(const sml_data &scope)
 	}
 }
 
+void upgrade_class::check() const
+{
+	if (this->get_preconditions() != nullptr) {
+		this->get_preconditions()->check_validity();
+	}
+
+	if (this->get_conditions() != nullptr) {
+		this->get_conditions()->check_validity();
+	}
+}
+
 bool upgrade_class::has_upgrade(CUpgrade *upgrade) const
 {
 	return vector::contains(this->upgrades, upgrade);

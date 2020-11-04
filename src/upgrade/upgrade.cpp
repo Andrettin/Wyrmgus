@@ -326,6 +326,17 @@ void CUpgrade::initialize()
 	data_entry::initialize();
 }
 
+void CUpgrade::check() const
+{
+	if (this->get_preconditions() != nullptr) {
+		this->get_preconditions()->check_validity();
+	}
+
+	if (this->get_conditions() != nullptr) {
+		this->get_conditions()->check_validity();
+	}
+}
+
 void CUpgrade::set_parent(const CUpgrade *parent_upgrade)
 {
 	if (!parent_upgrade->is_defined()) {

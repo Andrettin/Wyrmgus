@@ -111,6 +111,22 @@ void age::process_sml_scope(const sml_data &scope)
 	}
 }
 
+void age::check() const
+{
+	if (this->get_icon() == nullptr) {
+		throw std::runtime_error("Age \"" + this->get_identifier() + "\" has no icon.");
+	}
+
+	if (this->get_preconditions() != nullptr) {
+		this->get_preconditions()->check_validity();
+	}
+
+	if (this->get_conditions() != nullptr) {
+		this->get_conditions()->check_validity();
+	}
+}
+
+
 }
 
 /**

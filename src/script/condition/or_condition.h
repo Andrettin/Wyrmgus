@@ -53,6 +53,13 @@ public:
 		this->conditions.push_back(condition::from_sml_scope(scope));
 	}
 
+	virtual void check_validity() const override
+	{
+		for (const auto &condition : this->conditions) {
+			condition->check_validity();
+		}
+	}
+
 	virtual bool check(const CPlayer *player, const bool ignore_units) const override
 	{
 		for (const auto &condition : this->conditions) {

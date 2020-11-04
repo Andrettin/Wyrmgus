@@ -65,6 +65,13 @@ public:
 		}
 	}
 
+	virtual void check_validity() const override
+	{
+		if (this->map_template == nullptr) {
+			throw std::runtime_error("\"location\" condition has no map template.");
+		}
+	}
+
 	virtual bool check(const CPlayer *player, const bool ignore_units) const override
 	{
 		Q_UNUSED(player)

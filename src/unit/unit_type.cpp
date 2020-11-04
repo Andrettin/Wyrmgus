@@ -1345,6 +1345,14 @@ void unit_type::check() const
 			throw std::runtime_error("The spell \"" + spell->get_identifier() + "\" is set to be autocast by default for unit type \"" + this->get_identifier() + "\", but has no defined autocast method.");
 		}
 	}
+
+	if (this->get_preconditions() != nullptr) {
+		this->get_preconditions()->check_validity();
+	}
+
+	if (this->get_conditions() != nullptr) {
+		this->get_conditions()->check_validity();
+	}
 }
 
 void unit_type::set_unit_class(wyrmgus::unit_class *unit_class)

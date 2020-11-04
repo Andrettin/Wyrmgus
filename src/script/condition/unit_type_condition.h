@@ -64,6 +64,13 @@ public:
 		}
 	}
 
+	virtual void check_validity() const override
+	{
+		if (this->unit_type == nullptr) {
+			throw std::runtime_error("\"unit_type\" condition has no unit type.");
+		}
+	}
+
 	virtual bool check(const CPlayer *player, const bool ignore_units) const override
 	{
 		if (ignore_units) {

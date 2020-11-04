@@ -57,13 +57,7 @@ public:
 	virtual ~age() override;
 	
 	virtual void process_sml_scope(const sml_data &scope) override;
-
-	virtual void check() const override
-	{
-		if (this->get_icon() == nullptr) {
-			throw std::runtime_error("Age \"" + this->get_identifier() + "\" has no icon.");
-		}
-	}
+	virtual void check() const override;
 
 	resource_icon *get_icon() const
 	{

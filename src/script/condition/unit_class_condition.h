@@ -63,6 +63,13 @@ public:
 		}
 	}
 
+	virtual void check_validity() const override
+	{
+		if (this->unit_class == nullptr) {
+			throw std::runtime_error("\"unit_class\" condition has no unit class.");
+		}
+	}
+
 	virtual bool check(const CPlayer *player, const bool ignore_units) const override
 	{
 		if (ignore_units) {
@@ -118,7 +125,7 @@ public:
 	}
 
 private:
-	const unit_class *unit_class = nullptr;
+	const wyrmgus::unit_class *unit_class = nullptr;
 	int count = 1; //how many of the unit type are required
 	const site *settlement = nullptr; //in which settlement the unit should be located
 };

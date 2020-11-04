@@ -55,6 +55,11 @@ public:
 	virtual void ProcessConfigDataSection(const CConfigData *section);
 	virtual void process_sml_property(const sml_property &property);
 	virtual void process_sml_scope(const sml_data &scope);
+
+	virtual void check_validity() const
+	{
+	}
+
 	virtual bool check(const CPlayer *player, bool ignore_units = false) const = 0;
 	virtual bool check(const CUnit *unit, bool ignore_units = false) const;
 

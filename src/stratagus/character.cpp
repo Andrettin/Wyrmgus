@@ -482,6 +482,10 @@ void character::check() const
 	if (this->get_mother() != nullptr && this->get_mother()->get_gender() != gender::female) {
 		throw std::runtime_error("Character \"" + this->get_mother()->get_identifier() + "\" is set to be the biological mother of \"" + this->get_identifier() + "\", but isn't female.");
 	}
+
+	if (this->get_conditions() != nullptr) {
+		this->get_conditions()->check_validity();
+	}
 }
 
 void character::reset_history()

@@ -287,6 +287,14 @@ void faction::check() const
 	if (this->civilization == nullptr) {
 		throw std::runtime_error("Faction \"" + this->get_identifier() + "\" has no civilization.");
 	}
+
+	if (this->get_preconditions() != nullptr) {
+		this->get_preconditions()->check_validity();
+	}
+
+	if (this->get_conditions() != nullptr) {
+		this->get_conditions()->check_validity();
+	}
 }
 
 std::string_view faction::get_title_name(const wyrmgus::government_type government_type, const faction_tier tier) const

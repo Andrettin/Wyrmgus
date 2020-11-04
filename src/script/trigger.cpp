@@ -714,6 +714,17 @@ void trigger::process_sml_scope(const sml_data &scope)
 	}
 }
 
+void trigger::check() const
+{
+	if (this->get_preconditions() != nullptr) {
+		this->get_preconditions()->check_validity();
+	}
+
+	if (this->get_conditions() != nullptr) {
+		this->get_conditions()->check_validity();
+	}
+}
+
 }
 
 /**
