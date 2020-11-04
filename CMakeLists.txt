@@ -729,6 +729,7 @@ set(stratagus_script_condition_HDRS
 	src/script/condition/dynasty_condition.h
 	src/script/condition/faction_condition.h
 	src/script/condition/location_condition.h
+	src/script/condition/neutral_player_condition.h
 	src/script/condition/not_condition.h
 	src/script/condition/or_condition.h
 	src/script/condition/quest_condition.h

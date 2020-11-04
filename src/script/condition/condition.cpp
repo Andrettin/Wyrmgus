@@ -48,6 +48,7 @@
 #include "script/condition/dynasty_condition.h"
 #include "script/condition/faction_condition.h"
 #include "script/condition/location_condition.h"
+#include "script/condition/neutral_player_condition.h"
 #include "script/condition/not_condition.h"
 #include "script/condition/or_condition.h"
 #include "script/condition/quest_condition.h"
@@ -122,6 +123,8 @@ std::unique_ptr<const condition> condition::from_sml_scope(const sml_data &scope
 		condition = std::make_unique<location_condition>();
 	} else if (tag == "or") {
 		condition = std::make_unique<or_condition>();
+	} else if (tag == "neutral_player") {
+		condition = std::make_unique<neutral_player_condition>();
 	} else if (tag == "not") {
 		condition = std::make_unique<not_condition>();
 	} else if (tag == "unit_class") {
