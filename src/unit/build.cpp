@@ -55,10 +55,10 @@
 **
 **  @return        the BuildingRestrictionDetails
 */
-CBuildRestrictionOnTop *OnTopDetails(const wyrmgus::unit_type &type, const wyrmgus::unit_type *parent)
+const CBuildRestrictionOnTop *OnTopDetails(const wyrmgus::unit_type &type, const wyrmgus::unit_type *parent)
 {
 	for (const std::unique_ptr<CBuildRestriction> &b : type.BuildingRules) {
-		CBuildRestrictionOnTop *ontopb = dynamic_cast<CBuildRestrictionOnTop *>(b.get());
+		const CBuildRestrictionOnTop *ontopb = dynamic_cast<CBuildRestrictionOnTop *>(b.get());
 
 		if (ontopb) {
 			if (!parent) {
@@ -74,7 +74,7 @@ CBuildRestrictionOnTop *OnTopDetails(const wyrmgus::unit_type &type, const wyrmg
 
 		if (andb) {
 			for (const auto &sub_b : andb->and_list) {
-				CBuildRestrictionOnTop *ontopb = dynamic_cast<CBuildRestrictionOnTop *>(sub_b.get());
+				const CBuildRestrictionOnTop *ontopb = dynamic_cast<CBuildRestrictionOnTop *>(sub_b.get());
 				if (ontopb) {
 					if (!parent) {
 						// Guess this is right
@@ -87,6 +87,7 @@ CBuildRestrictionOnTop *OnTopDetails(const wyrmgus::unit_type &type, const wyrmg
 			}
 		}
 	}
+
 	return nullptr;
 }
 

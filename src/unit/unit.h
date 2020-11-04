@@ -829,7 +829,7 @@ extern void DropOutNearest(CUnit &unit, const Vec2i &goalPos, const CUnit *conta
 extern void DropOutAll(const CUnit &unit);
 
 /// Return the rule used to build this building.
-extern CBuildRestrictionOnTop *OnTopDetails(const wyrmgus::unit_type &type, const wyrmgus::unit_type *parent);
+extern const CBuildRestrictionOnTop *OnTopDetails(const wyrmgus::unit_type &type, const wyrmgus::unit_type *parent);
 /// @todo more docu
 extern CUnit *CanBuildHere(const CUnit *unit, const wyrmgus::unit_type &type, const Vec2i &pos, int z, bool no_bordering_building = false);
 /// @todo more docu

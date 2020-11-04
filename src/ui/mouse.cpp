@@ -762,14 +762,8 @@ static bool DoRightButton_Follow(CUnit &unit, CUnit &dest, int flush, int &ackno
 
 static bool DoRightButton_Harvest_Reverse(CUnit &unit, CUnit &dest, int flush, int &acknowledged)
 {
-	const wyrmgus::unit_type &type = *unit.Type;
-
 	// tell to return a loaded harvester to deposit
-	if (dest.ResourcesHeld > 0
-	//Wyrmgus start
-//		&& type.CanStore[dest.CurrentResource]
-		&& dest.CanReturnGoodsTo(&unit)
-	//Wyrmgus end
+	if (dest.ResourcesHeld > 0 && dest.CanReturnGoodsTo(&unit)
 		&& dest.Player == unit.Player) {
 		dest.Blink = 4;
 		SendCommandReturnGoods(dest, &unit, flush);
@@ -779,25 +773,16 @@ static bool DoRightButton_Harvest_Reverse(CUnit &unit, CUnit &dest, int flush, i
 		}
 		return true;
 	}
+
 	// tell to go and harvest from a building
-	//Wyrmgus start
-//	const int res = type.GivesResource;
 	const int res = unit.GivesResource;
-	//Wyrmgus end
-	//Wyrmgus start
-//	if (res
-//		&& dest.Type->ResInfo[res]
-//		&& dest.ResourcesHeld < dest.Type->ResInfo[res]->ResourceCapacity
-//		&& type.BoolFlag[CANHARVEST_INDEX].value
-	if (
-		dest.CanHarvest(&unit)
-		&& dest.ResourcesHeld < dest.Type->ResInfo[res]->ResourceCapacity
-	//Wyrmgus end
-		&& dest.Player == unit.Player) {
+
+	if (dest.CanHarvest(&unit) && dest.ResourcesHeld < dest.Type->ResInfo[res]->ResourceCapacity && dest.Player == unit.Player) {
 		unit.Blink = 4;
 		SendCommandResource(dest, unit, flush);
 		return true;
 	}
+
 	return false;
 }
 
@@ -1102,10 +1087,10 @@ static void HandleMouseOn(const PixelPos screenPos)
 	}
 
 	for (size_t i = 0; i < UI.UserButtons.size(); ++i) {
-		const CUIUserButton &button = UI.UserButtons[i];
+		const CUIUserButton &user_button = UI.UserButtons[i];
 
-		if (button.Button.X != -1) {
-			if (button.Button.Contains(screenPos)) {
+		if (user_button.Button.X != -1) {
+			if (user_button.Button.Contains(screenPos)) {
 				ButtonAreaUnderCursor = ButtonAreaUser;
 				ButtonUnderCursor = i;
 				CursorOn = cursor_on::button;
@@ -1401,16 +1386,12 @@ void UIHandleMouseMove(const PixelPos &cursorPos)
 	//Wyrmgus end
 		return;
 	} else {
-		for (size_t i = 0; i < UI.WorldButtons.size(); ++i) {
-			const CUIButton &button = UI.WorldButtons[i];
-
+		for (const CUIButton &button : UI.WorldButtons) {
 			if (button.Clicked) {
 				return;
 			}
 		}
-		for (size_t i = 0; i < UI.UserButtons.size(); ++i) {
-			const CUIUserButton &button = UI.UserButtons[i];
-
+		for (const CUIUserButton &button : UI.UserButtons) {
 			if (button.Clicked) {
 				return;
 			}
@@ -2452,21 +2433,21 @@ static void UIHandleButtonDown_OnButton(unsigned button)
 			}
 		} else if (ButtonAreaUnderCursor == ButtonAreaMapLayerWorld) {
 			for (size_t i = 0; i < UI.WorldButtons.size(); ++i) {
-				CUIButton &button = UI.WorldButtons[i];
+				CUIButton &world_button = UI.WorldButtons[i];
 
-				if (i == size_t(ButtonUnderCursor) && !button.Clicked) {
+				if (i == static_cast<size_t>(ButtonUnderCursor) && !world_button.Clicked) {
 					PlayGameSound(GameSounds.Click.Sound, MaxSampleVolume);
-					button.Clicked = true;
+					world_button.Clicked = true;
 				}
 			}
 		//  clicked on user buttons
 		} else if (ButtonAreaUnderCursor == ButtonAreaUser) {
 			for (size_t i = 0; i < UI.UserButtons.size(); ++i) {
-				CUIUserButton &button = UI.UserButtons[i];
+				CUIUserButton &user_button = UI.UserButtons[i];
 
-				if (i == size_t(ButtonUnderCursor) && !button.Clicked) {
+				if (i == static_cast<size_t>(ButtonUnderCursor) && !user_button.Clicked) {
 					PlayGameSound(GameSounds.Click.Sound, MaxSampleVolume);
-					button.Clicked = true;
+					user_button.Clicked = true;
 				}
 			}
 			//  clicked on selected button
@@ -2862,14 +2843,14 @@ void UIHandleButtonUp(unsigned button)
 		//  World buttons
 		//
 		for (size_t i = 0; i < UI.WorldButtons.size(); ++i) {
-			CUIButton &button = UI.WorldButtons[i];
+			CUIButton &world_button = UI.WorldButtons[i];
 
-			if (button.Clicked) {
-				button.Clicked = false;
+			if (world_button.Clicked) {
+				world_button.Clicked = false;
 				if (ButtonAreaUnderCursor == ButtonAreaMapLayerWorld) {
 					CMap::Map.SetCurrentWorld(wyrmgus::world::get_all()[i]);
-					if (button.Callback) {
-						button.Callback->action("");
+					if (world_button.Callback) {
+						world_button.Callback->action("");
 					}
 					return;
 				}
@@ -2879,14 +2860,12 @@ void UIHandleButtonUp(unsigned button)
 		//
 		//  User buttons
 		//
-		for (size_t i = 0; i < UI.UserButtons.size(); ++i) {
-			CUIUserButton &button = UI.UserButtons[i];
-
-			if (button.Clicked) {
-				button.Clicked = false;
+		for (CUIUserButton &user_button : UI.UserButtons) {
+			if (user_button.Clicked) {
+				user_button.Clicked = false;
 				if (ButtonAreaUnderCursor == ButtonAreaUser) {
-					if (button.Button.Callback) {
-						button.Button.Callback->action("");
+					if (user_button.Button.Callback) {
+						user_button.Button.Callback->action("");
 					}
 					return;
 				}

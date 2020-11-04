@@ -503,8 +503,8 @@ static void EditorActionPlaceUnit(const Vec2i &pos, const wyrmgus::unit_type &ty
 	}
 
 	//Wyrmgus start
-//	CBuildRestrictionOnTop *b = OnTopDetails(*unit, nullptr);
-	CBuildRestrictionOnTop *b = OnTopDetails(*unit->Type, nullptr);
+//	const CBuildRestrictionOnTop *b = OnTopDetails(*unit, nullptr);
+	const CBuildRestrictionOnTop *b = OnTopDetails(*unit->Type, nullptr);
 	//Wyrmgus end
 	if (b && b->ReplaceOnBuild) {
 		CUnitCache &unitCache = UI.CurrentMapLayer->Field(pos)->UnitCache;

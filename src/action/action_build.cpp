@@ -430,11 +430,9 @@ bool COrder_Build::StartBuilding(CUnit &unit, CUnit &ontop)
 
 	// Building on top of something, may remove what is beneath it
 	if (&ontop != &unit) {
-		CBuildRestrictionOnTop *b;
-
 		//Wyrmgus start
-//		b = static_cast<CBuildRestrictionOnTop *>(OnTopDetails(*build, ontop.Type));
-		b = static_cast<CBuildRestrictionOnTop *>(OnTopDetails(*build->Type, ontop.Type));
+//		const CBuildRestrictionOnTop *b = OnTopDetails(*build, ontop.Type));
+		const CBuildRestrictionOnTop *b = OnTopDetails(*build->Type, ontop.Type);
 		//Wyrmgus end
 		Assert(b);
 		if (b->ReplaceOnBuild) {

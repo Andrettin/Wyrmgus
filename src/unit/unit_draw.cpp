@@ -837,17 +837,12 @@ static void DrawInformations(const CUnit &unit, const wyrmgus::unit_type &type, 
 	CLabel(GetSmallFont()).Draw(screenPos.x + 10, screenPos.y + 10, buf);
 #endif
 
-	const CUnitStats &stats = *unit.Stats;
-
 	// For debug draw sight, react and attack range!
 	if (IsOnlySelected(unit)) {
 		const PixelPos center(screenPos + type.get_scaled_half_tile_pixel_size());
 
 		if (Preference.ShowSightRange) {
-			//Wyrmgus start
-//			const int value = stats.Variables[SIGHTRANGE_INDEX].Max;
 			const int value = unit.CurrentSightRange;
-			//Wyrmgus end
 			const int radius = value * wyrmgus::defines::get()->get_scaled_tile_width() + (type.get_tile_width() - 1) * wyrmgus::defines::get()->get_scaled_tile_width() / 2;
 
 			if (value) {
@@ -860,10 +855,7 @@ static void DrawInformations(const CUnit &unit, const wyrmgus::unit_type &type, 
 		if (unit.CanAttack(true)) {
 		//Wyrmgus end
 			if (Preference.ShowReactionRange) {
-				//Wyrmgus start
-//				const int value = (unit.Player->Type == PlayerPerson) ? type.ReactRangePerson : type.ReactRangeComputer;
 				const int value = unit.GetReactionRange();
-				//Wyrmgus end
 				const int radius = value * wyrmgus::defines::get()->get_scaled_tile_width() + (type.get_tile_width() - 1) * wyrmgus::defines::get()->get_scaled_tile_width() / 2;
 
 				if (value) {

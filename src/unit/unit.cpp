@@ -2133,7 +2133,7 @@ void CUnit::GenerateDrop()
 	}
 		
 	if (chosen_drop != nullptr) {
-		CBuildRestrictionOnTop *ontop_b = OnTopDetails(*this->Type, nullptr);
+		const CBuildRestrictionOnTop *ontop_b = OnTopDetails(*this->Type, nullptr);
 		if (((chosen_drop->BoolFlag[ITEM_INDEX].value || chosen_drop->BoolFlag[POWERUP_INDEX].value) && (this->MapLayer->Field(drop_pos)->Flags & MapFieldItem)) || (ontop_b && ontop_b->ReplaceOnDie)) { //if the dropped unit is an item (and there's already another item there), or if this building is an ontop one (meaning another will appear under it after it is destroyed), search for another spot
 			Vec2i resPos;
 			FindNearestDrop(*chosen_drop, drop_pos, resPos, LookingW, this->MapLayer->ID);
@@ -3851,7 +3851,7 @@ CUnit *CreateUnit(const Vec2i &pos, const wyrmgus::unit_type &type, CPlayer *pla
 		FindNearestDrop(type, pos, res_pos, heading, z, no_bordering_building, false, settlement);
 		
 		if (type.BoolFlag[BUILDING_INDEX].value) {
-			CBuildRestrictionOnTop *b = OnTopDetails(type, nullptr);
+			const CBuildRestrictionOnTop *b = OnTopDetails(type, nullptr);
 			if (b && b->ReplaceOnBuild) {
 				CUnitCache &unitCache = CMap::Map.Field(res_pos, z)->UnitCache;
 				CUnitCache::iterator it = std::find_if(unitCache.begin(), unitCache.end(), HasSameTypeAs(*b->Parent));
@@ -4182,8 +4182,8 @@ void UnitLost(CUnit &unit)
 
 	// Destroy resource-platform, must re-make resource patch.
 	//Wyrmgus start
-//	CBuildRestrictionOnTop *b = OnTopDetails(unit, nullptr);
-	CBuildRestrictionOnTop *b = OnTopDetails(*unit.Type, nullptr);
+//	const CBuildRestrictionOnTop *b = OnTopDetails(unit, nullptr);
+	const CBuildRestrictionOnTop *b = OnTopDetails(*unit.Type, nullptr);
 	//Wyrmgus end
 	if (b != nullptr) {
 		//Wyrmgus start
