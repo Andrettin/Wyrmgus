@@ -198,7 +198,7 @@ static bool PassCondition(const CUnit &caster, const wyrmgus::spell &spell, cons
 	}
 	if (condition->Opponent != CONDITION_TRUE) {
 		if ((condition->Opponent == CONDITION_ONLY) ^
-			(caster.IsEnemy(*target) && 1)) {
+			(caster.IsEnemy(*target))) {
 			return false;
 		}
 	}

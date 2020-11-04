@@ -285,7 +285,7 @@ static bool LeaveShelter(CUnit &unit)
 	if (unit.Type->BoolFlag[FAUNA_INDEX].value) {
 		SelectAroundUnit(*unit.Container, 1, table, HasNotSamePlayerAs(*unit.Player));
 	} else {
-		SelectAroundUnit(*unit.Container, unit.CurrentSightRange, table, MakeAndPredicate(IsEnemyWith(*unit.Player), HasNotSamePlayerAs(*CPlayer::Players[PlayerNumNeutral])));
+		SelectAroundUnit(*unit.Container, unit.CurrentSightRange, table, MakeAndPredicate(IsEnemyWithPlayer(*unit.Player), HasNotSamePlayerAs(*CPlayer::Players[PlayerNumNeutral])));
 	}
 
 	if (table.size() > 0) {

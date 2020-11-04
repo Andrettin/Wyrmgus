@@ -873,7 +873,7 @@ void CommandDismiss(CUnit &unit, bool salvage)
 	} else {
 		if (salvage) {
 			std::vector<CUnit *> table;
-			SelectAroundUnit(unit, 16, table, IsEnemyWith(*unit.Player));
+			SelectAroundUnit(unit, 16, table, IsEnemyWithUnit(&unit));
 			for (size_t i = 0; i != table.size(); ++i) {
 				if (
 					(table[i]->CurrentAction() == UnitAction::Attack || table[i]->CurrentAction() == UnitAction::SpellCast)

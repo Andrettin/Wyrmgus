@@ -116,16 +116,35 @@ private:
 	const CPlayer *player;
 };
 
-class IsEnemyWith : public CUnitFilter
+class IsEnemyWithPlayer final : public CUnitFilter
 {
 public:
-	explicit IsEnemyWith(const CPlayer &_player) : player(&_player) {}
+	explicit IsEnemyWithPlayer(const CPlayer &_player) : player(&_player)
+	{
+	}
+
 	bool operator()(const CUnit *unit) const
 	{
 		return unit->IsEnemy(*player);
 	}
+
 private:
-	const CPlayer *player;
+	const CPlayer *player = nullptr;
+};
+
+class IsEnemyWithUnit final : public CUnitFilter
+{
+public:
+	explicit IsEnemyWithUnit(const CUnit *unit) : unit(unit)
+	{
+	}
+
+	bool operator()(const CUnit *unit) const
+	{
+		return unit->IsEnemy(*this->unit);
+	}
+private:
+	const CUnit *unit = nullptr;
 };
 
 class HasSamePlayerAndTypeAs : public CUnitFilter

@@ -470,7 +470,7 @@ static void HandleBuffsEachSecond(CUnit &unit)
 				&& (unit.Variable[INVISIBLE_INDEX].Value > 0 || !unit.IsInCombat())
 			) {				
 				std::vector<CUnit *> table;
-				SelectAroundUnit(unit, 1, table, IsEnemyWith(*unit.Player));
+				SelectAroundUnit(unit, 1, table, IsEnemyWithUnit(&unit));
 				if (table.size() == 0) { //only apply the -stalk invisibility if the unit is not adjacent to an enemy unit
 					unit.Variable[INVISIBLE_INDEX].Enable = 1;
 					unit.Variable[INVISIBLE_INDEX].Max = std::max(CYCLES_PER_SECOND + 1, unit.Variable[INVISIBLE_INDEX].Max);

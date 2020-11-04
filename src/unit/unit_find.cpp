@@ -979,7 +979,7 @@ class BestTargetFinder
 public:
 	//Wyrmgus start
 //	BestTargetFinder(const CUnit &a) :
-	BestTargetFinder(const CUnit &a, bool i_n) :
+	explicit BestTargetFinder(const CUnit &a, bool i_n) :
 	//Wyrmgus end
 		//Wyrmgus start
 //		attacker(&a)

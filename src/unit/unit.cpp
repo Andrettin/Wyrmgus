@@ -5590,8 +5590,8 @@ int CUnit::GetReactionRange() const
 {
 	int reaction_range = this->CurrentSightRange;
 
-	if (this->Player->Type != PlayerPerson) {
-		reaction_range += 2;
+	if (this->Player->Type == PlayerComputer) {
+		reaction_range += 2; //+2 reaction range bonus for computer players
 	}
 	
 	return reaction_range;
@@ -5973,7 +5973,7 @@ bool CUnit::IsInCombat() const
 {
 	// Select all units around the unit
 	std::vector<CUnit *> table;
-	SelectAroundUnit(*this, this->GetReactionRange(), table, IsEnemyWith(*this->Player));
+	SelectAroundUnit(*this, this->GetReactionRange(), table, IsEnemyWithUnit(this));
 
 	for (size_t i = 0; i < table.size(); ++i) {
 		const CUnit &target = *table[i];
@@ -7533,7 +7533,7 @@ void HitUnit(CUnit *attacker, CUnit &target, int damage, const Missile *missile,
 		if (!destroyer) {
 			int best_distance = 0;
 			std::vector<CUnit *> table;
-			SelectAroundUnit(target, ExperienceRange, table, IsEnemyWith(*target.Player));
+			SelectAroundUnit(target, ExperienceRange, table, IsEnemyWithUnit(&target));
 			for (size_t i = 0; i < table.size(); i++) {
 				CUnit *potential_destroyer = table[i];
 				int distance = target.MapDistanceTo(*potential_destroyer);
