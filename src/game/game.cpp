@@ -362,6 +362,8 @@ void StartMap(const std::string &filename, bool clean)
 		}
 		UI.SelectedViewport->Center(CMap::Map.tile_pos_to_scaled_map_pixel_pos_center(CPlayer::GetThisPlayer()->StartPos));
 
+		UI.get_minimap()->Update();
+
 		//  Play the game.
 		GameMainLoop();
 
