@@ -57,7 +57,7 @@ public:
 
 	virtual std::string get_string(const std::string &prefix = "") const override
 	{
-		std::string str = prefix + this->character->GetFullName() + '\n';
+		std::string str = prefix + this->character->get_full_name() + '\n';
 		return str;
 	}
 

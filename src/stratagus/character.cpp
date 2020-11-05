@@ -681,7 +681,7 @@ bool character::HasMajorDeity() const
 	return false;
 }
 
-std::string character::GetFullName() const
+std::string character::get_full_name() const
 {
 	std::string full_name = this->get_name();
 	if (!this->ExtraName.empty()) {
@@ -785,7 +785,7 @@ wyrmgus::character *GetCustomHero(const std::string &hero_ident)
 	}
 	
 	for (const auto &kv_pair : CustomHeroes) { // for backwards compatibility
-		if (kv_pair.second->GetFullName() == hero_ident) {
+		if (kv_pair.second->get_full_name() == hero_ident) {
 			return kv_pair.second;
 		}
 	}
@@ -841,7 +841,7 @@ void SaveHero(const wyrmgus::character *hero)
 	std::string old_path = path;
 	path += hero->Ident;
 	path += ".lua";
-	old_path += hero->GetFullName();
+	old_path += hero->get_full_name();
 	old_path += ".lua";
 	if (std::filesystem::exists(old_path)) {
 		std::filesystem::remove(old_path);

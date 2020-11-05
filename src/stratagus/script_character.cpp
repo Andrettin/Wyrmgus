@@ -637,7 +637,7 @@ static int CclGetCharacterData(lua_State *l)
 		lua_pushstring(l, character->get_surname().c_str());
 		return 1;
 	} else if (!strcmp(data, "FullName")) {
-		lua_pushstring(l, character->GetFullName().c_str());
+		lua_pushstring(l, character->get_full_name().c_str());
 		return 1;
 	} else if (!strcmp(data, "Description")) {
 		lua_pushstring(l, character->get_description().c_str());
@@ -801,7 +801,7 @@ static int CclGetCustomHeroData(lua_State *l)
 		lua_pushstring(l, character->get_surname().c_str());
 		return 1;
 	} else if (!strcmp(data, "FullName")) {
-		lua_pushstring(l, character->GetFullName().c_str());
+		lua_pushstring(l, character->get_full_name().c_str());
 		return 1;
 	} else if (!strcmp(data, "Civilization")) {
 		if (character->get_civilization() != nullptr) {
@@ -881,7 +881,7 @@ static int CclGetGrandStrategyHeroes(lua_State *l)
 	lua_createtable(l, GrandStrategyGame.Heroes.size(), 0);
 	for (size_t i = 1; i <= GrandStrategyGame.Heroes.size(); ++i)
 	{
-		lua_pushstring(l, GrandStrategyGame.Heroes[i-1]->GetFullName().c_str());
+		lua_pushstring(l, GrandStrategyGame.Heroes[i-1]->get_full_name().c_str());
 		lua_rawseti(l, -2, i);
 	}
 	return 1;

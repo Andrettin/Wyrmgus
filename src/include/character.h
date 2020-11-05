@@ -228,7 +228,7 @@ public:
 	bool CanAppear(bool ignore_neutral = false) const;
 	bool CanWorship() const;
 	bool HasMajorDeity() const;
-	std::string GetFullName() const;
+	std::string get_full_name() const;
 
 	const std::string &get_variation() const
 	{

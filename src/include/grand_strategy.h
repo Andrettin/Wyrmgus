@@ -166,7 +166,7 @@ public:
 	bool CanHaveSuccession(const wyrmgus::character_title title, bool family_inheritance);
 	bool IsConquestDesirable(CGrandStrategyProvince *province);
 	int GetTroopCostModifier();
-	std::string GetFullName();
+	std::string get_full_name();
 	CGrandStrategyProvince *GetRandomProvinceWeightedByPopulation();
 	
 	int Faction;												/// The faction's ID (-1 = none).

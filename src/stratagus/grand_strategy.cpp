@@ -148,7 +148,7 @@ void CGrandStrategyGame::DoTurn()
 	for (int i = (works_size - 1); i >= 0; --i) {
 		CGrandStrategyHero *author = nullptr;
 		if (this->UnpublishedWorks[i]->Author != nullptr) {
-			author = this->GetHero(this->UnpublishedWorks[i]->Author->GetFullName());
+			author = this->GetHero(this->UnpublishedWorks[i]->Author->get_full_name());
 			if (author != nullptr && !author->IsAlive()) {
 				continue;
 			}
@@ -165,7 +165,7 @@ void CGrandStrategyGame::DoTurn()
 		) {
 			bool characters_existed = true;
 			for (size_t j = 0; j < this->UnpublishedWorks[i]->Characters.size(); ++j) {
-				CGrandStrategyHero *hero = this->GetHero(this->UnpublishedWorks[i]->Characters[j]->GetFullName());
+				CGrandStrategyHero *hero = this->GetHero(this->UnpublishedWorks[i]->Characters[j]->get_full_name());
 				
 				if (hero == nullptr || !hero->Existed) {
 					characters_existed = false;
@@ -239,7 +239,7 @@ void CGrandStrategyGame::CreateWork(CUpgrade *work, CGrandStrategyHero *author, 
 	if (province->Owner == GrandStrategyGame.PlayerFaction || work != nullptr) { // only show foreign works that are predefined
 		std::string work_creation_message = "if (GenericDialog ~= nil) then GenericDialog(\"" + work_name + "\", \"";
 		if (author != nullptr) {
-			work_creation_message += "The " + FullyDecapitalizeString(author->get_unit_type()->get_name()) + " " + author->GetFullName() + " ";
+			work_creation_message += "The " + FullyDecapitalizeString(author->get_unit_type()->get_name()) + " " + author->get_full_name() + " ";
 		} else {
 			work_creation_message += "A sage ";
 		}
@@ -712,12 +712,12 @@ void CGrandStrategyFaction::SetMinister(const wyrmgus::character_title title, st
 				}
 			}
 		} else {
-			fprintf(stderr, "Tried to make \"%s\" the \"%s\" of the \"%s\", but the hero doesn't exist.\n", hero_full_name.c_str(), GetCharacterTitleNameById(title).c_str(), this->GetFullName().c_str());
+			fprintf(stderr, "Tried to make \"%s\" the \"%s\" of the \"%s\", but the hero doesn't exist.\n", hero_full_name.c_str(), GetCharacterTitleNameById(title).c_str(), this->get_full_name().c_str());
 		}
 		
 		if (this == GrandStrategyGame.PlayerFaction) {
 			std::string new_minister_message = "if (GenericDialog ~= nil) then GenericDialog(\"";
-//			new_minister_message += this->GetCharacterTitle(title, this->Ministers[title]->Gender) + " " + this->Ministers[title]->GetFullName();
+//			new_minister_message += this->GetCharacterTitle(title, this->Ministers[title]->Gender) + " " + this->Ministers[title]->get_full_name();
 			new_minister_message += "\", \"";
 //			new_minister_message += "A new " + FullyDecapitalizeString(this->GetCharacterTitle(title, this->Ministers[title]->Gender));
 			if (title == wyrmgus::character_title::head_of_state) {
@@ -725,7 +725,7 @@ void CGrandStrategyFaction::SetMinister(const wyrmgus::character_title title, st
 			} else {
 				new_minister_message += " has been appointed, ";
 			}
-			new_minister_message += this->Ministers[title]->GetFullName() + "!\\n\\n";
+			new_minister_message += this->Ministers[title]->get_full_name() + "!\\n\\n";
 			new_minister_message += "Type: " + this->Ministers[title]->get_unit_type()->get_name() + "\\n" + "Trait: " + this->Ministers[title]->get_trait()->get_name() + "\\n" +  + "\\n\\n" + this->Ministers[title]->GetMinisterEffectsString(title);
 			new_minister_message += "\") end;";
 			CclCommand(new_minister_message);	
@@ -736,7 +736,7 @@ void CGrandStrategyFaction::SetMinister(const wyrmgus::character_title title, st
 		}
 		
 		if (this->IsAlive() && (hero->Province == nullptr || hero->Province->Owner != this)) { // if the hero's province is not owned by this faction, move him to a random province owned by this faction
-			this->GetRandomProvinceWeightedByPopulation()->SetHero(hero->GetFullName(), hero->State);
+			this->GetRandomProvinceWeightedByPopulation()->SetHero(hero->get_full_name(), hero->State);
 		}
 	}
 }
@@ -750,25 +750,25 @@ void CGrandStrategyFaction::MinisterSuccession(const wyrmgus::character_title ti
 	) { //if is a tribe or a monarchical polity, try to perform ruler succession by descent
 		for (size_t i = 0; i < this->Ministers[title]->Children.size(); ++i) {
 			if (this->Ministers[title]->Children[i]->IsAlive() && this->Ministers[title]->Children[i]->IsVisible() && this->Ministers[title]->Children[i]->get_gender() == wyrmgus::gender::male) { //historically males have generally been given priority in throne inheritance (if not exclusivity), specially in the cultures currently playable in the game
-				this->SetMinister(title, this->Ministers[title]->Children[i]->GetFullName());
+				this->SetMinister(title, this->Ministers[title]->Children[i]->get_full_name());
 				return;
 			}
 		}
 		for (size_t i = 0; i < this->Ministers[title]->Siblings.size(); ++i) { // now check for male siblings of the current ruler
 			if (this->Ministers[title]->Siblings[i]->IsAlive() && this->Ministers[title]->Siblings[i]->IsVisible() && this->Ministers[title]->Siblings[i]->get_gender() == wyrmgus::gender::male) {
-				this->SetMinister(title, this->Ministers[title]->Siblings[i]->GetFullName());
+				this->SetMinister(title, this->Ministers[title]->Siblings[i]->get_full_name());
 				return;
 			}
 		}		
 		for (size_t i = 0; i < this->Ministers[title]->Children.size(); ++i) { //check again for children, but now allow for inheritance regardless of gender
 			if (this->Ministers[title]->Children[i]->IsAlive() && this->Ministers[title]->Children[i]->IsVisible()) {
-				this->SetMinister(title, this->Ministers[title]->Children[i]->GetFullName());
+				this->SetMinister(title, this->Ministers[title]->Children[i]->get_full_name());
 				return;
 			}
 		}
 		for (size_t i = 0; i < this->Ministers[title]->Siblings.size(); ++i) { //check again for siblings, but now allow for inheritance regardless of gender
 			if (this->Ministers[title]->Siblings[i]->IsAlive() && this->Ministers[title]->Siblings[i]->IsVisible()) {
-				this->SetMinister(title, this->Ministers[title]->Siblings[i]->GetFullName());
+				this->SetMinister(title, this->Ministers[title]->Siblings[i]->get_full_name());
 				return;
 			}
 		}
@@ -802,7 +802,7 @@ void CGrandStrategyFaction::MinisterSuccession(const wyrmgus::character_title ti
 		}
 	}
 	if (best_candidate != nullptr) {
-		this->SetMinister(title, best_candidate->GetFullName());
+		this->SetMinister(title, best_candidate->get_full_name());
 		return;
 	}
 
@@ -864,7 +864,7 @@ int CGrandStrategyFaction::GetTroopCostModifier()
 	return modifier;
 }
 
-std::string CGrandStrategyFaction::GetFullName()
+std::string CGrandStrategyFaction::get_full_name()
 {
 	if (wyrmgus::faction::get_all()[this->Faction]->Type == FactionTypeTribe) {
 		return wyrmgus::faction::get_all()[this->Faction]->get_name();
@@ -901,16 +901,16 @@ void CGrandStrategyHero::Die()
 			char buf[256];
 			snprintf(
 				buf, sizeof(buf), "if (GenericDialog ~= nil) then GenericDialog(\"%s\", \"%s\") end;",
-				(GrandStrategyGame.PlayerFaction->GetCharacterTitle(wyrmgus::character_title::head_of_state, this->Gender) + " " + this->GetFullName() + " Dies").c_str(),
-				("Tragic news spread throughout our realm. Our " + FullyDecapitalizeString(GrandStrategyGame.PlayerFaction->GetCharacterTitle(wyrmgus::character_title::head_of_state, this->Gender)) + ", " + this->GetFullName() + ", has died! May his soul rest in peace.").c_str()
+				(GrandStrategyGame.PlayerFaction->GetCharacterTitle(wyrmgus::character_title::head_of_state, this->Gender) + " " + this->get_full_name() + " Dies").c_str(),
+				("Tragic news spread throughout our realm. Our " + FullyDecapitalizeString(GrandStrategyGame.PlayerFaction->GetCharacterTitle(wyrmgus::character_title::head_of_state, this->Gender)) + ", " + this->get_full_name() + ", has died! May his soul rest in peace.").c_str()
 			);
 			CclCommand(buf);	
 		} else if (this->GetFaction() == GrandStrategyGame.PlayerFaction) {
 			char buf[256];
 			snprintf(
 				buf, sizeof(buf), "if (GenericDialog ~= nil) then GenericDialog(\"%s\", \"%s\") end;",
-				(this->GetBestDisplayTitle() + " " + this->GetFullName() + " Dies").c_str(),
-				("My lord, the " + FullyDecapitalizeString(this->GetBestDisplayTitle()) + " " + this->GetFullName() + " has died!").c_str()
+				(this->GetBestDisplayTitle() + " " + this->get_full_name() + " Dies").c_str(),
+				("My lord, the " + FullyDecapitalizeString(this->GetBestDisplayTitle()) + " " + this->get_full_name() + " has died!").c_str()
 			);
 			CclCommand(buf);	
 		}
@@ -940,7 +940,7 @@ bool CGrandStrategyHero::IsVisible()
 
 bool CGrandStrategyHero::IsGenerated()
 {
-	return !this->Custom && wyrmgus::character::get(this->GetFullName()) == nullptr;
+	return !this->Custom && wyrmgus::character::get(this->get_full_name()) == nullptr;
 }
 
 bool CGrandStrategyHero::IsEligibleForTitle(const wyrmgus::character_title title)
@@ -1452,7 +1452,7 @@ std::string GetFactionMinister(std::string civilization_name, std::string factio
 	}
 	
 	if (GrandStrategyGame.Factions[civilization->ID][faction]->Ministers[title] != nullptr) {
-		return GrandStrategyGame.Factions[civilization->ID][faction]->Ministers[title]->GetFullName();
+		return GrandStrategyGame.Factions[civilization->ID][faction]->Ministers[title]->get_full_name();
 	} else {
 		return "";
 	}
