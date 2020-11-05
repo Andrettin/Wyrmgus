@@ -38,6 +38,7 @@ static int CclDefineDialogue(lua_State *l);
 
 namespace wyrmgus {
 
+class and_condition;
 class character;
 class dialogue_node;
 class dialogue_option;
@@ -90,8 +91,12 @@ private:
 	std::string text;
 public:
 	wyrmgus::dialogue *Dialogue = nullptr;
+private:
+	std::unique_ptr<const and_condition> conditions;
+public:
 	std::unique_ptr<LuaCallback> Conditions;
 	std::unique_ptr<LuaCallback> ImmediateEffects;
+private:
 	std::vector<std::unique_ptr<dialogue_option>> options;
 
 	friend static int ::CclDefineDialogue(lua_State *l);

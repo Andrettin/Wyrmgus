@@ -35,6 +35,7 @@
 #include "luacallback.h"
 #include "player.h"
 #include "script.h"
+#include "script/condition/and_condition.h"
 #include "unit/unit.h"
 #include "unit/unit_find.h"
 #include "unit/unit_type.h"
@@ -132,7 +133,11 @@ void dialogue_node::process_sml_scope(const sml_data &scope)
 {
 	const std::string &tag = scope.get_tag();
 
-	if (tag == "option") {
+	if (tag == "conditions") {
+		auto conditions = std::make_unique<and_condition>();
+		database::process_sml_data(conditions, scope);
+		this->conditions = std::move(conditions);
+	} else if (tag == "option") {
 		auto option = std::make_unique<dialogue_option>();
 		database::process_sml_data(option, scope);
 		this->options.push_back(std::move(option));
@@ -147,11 +152,21 @@ void dialogue_node::check() const
 		option->check();
 	}
 
+	if (this->conditions != nullptr) {
+		this->conditions->check_validity();
+	}
 }
 
 void dialogue_node::call(CPlayer *player) const
 {
-	if (this->Conditions) {
+	if (this->conditions != nullptr) {
+		if (!this->conditions->check(player)) {
+			this->Dialogue->call_node(this->ID + 1, player);
+			return;
+		}
+	}
+
+	if (this->Conditions != nullptr) {
 		this->Conditions->pushPreamble();
 		this->Conditions->run(1);
 		if (this->Conditions->popBoolean() == false) {
