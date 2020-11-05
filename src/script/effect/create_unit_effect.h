@@ -27,6 +27,7 @@
 
 #pragma once
 
+#include "character.h"
 #include "map/map.h"
 #include "map/map_layer.h"
 #include "map/map_template.h"
@@ -66,6 +67,8 @@ public:
 
 		if (key == "unit_type") {
 			this->unit_type = unit_type::get(value);
+		} else if (key == "character") {
+			this->character = character::get(value);
 		} else if (key == "site") {
 			this->site = site::get(value);
 		} else if (key == "map_template") {
@@ -90,6 +93,9 @@ public:
 
 	virtual void check() const override
 	{
+		if (this->unit_type == nullptr && this->character == nullptr) {
+			throw std::runtime_error("\"create_unit\" effect has neither a unit type nor a character.");
+		}
 
 		if (this->site != nullptr && this->map_template != nullptr) {
 			throw std::runtime_error("\"create_unit\" effect has both a site and a map template.");
@@ -102,10 +108,14 @@ public:
 
 	virtual void do_assignment_effect(CPlayer *player) const override
 	{
-		QPoint unit_top_left_pos = this->get_tile_pos(player) - this->unit_type->get_tile_center_pos_offset();
+		const wyrmgus::unit_type *unit_type = this->get_unit_type();
+		const QPoint unit_top_left_pos = this->get_tile_pos(player) - unit_type->get_tile_center_pos_offset();
 		const int map_layer = this->get_map_layer_index(player);
 
-		CUnit *unit = MakeUnitAndPlace(unit_top_left_pos, *this->unit_type, player, map_layer);
+		CUnit *unit = MakeUnitAndPlace(unit_top_left_pos, *unit_type, player, map_layer);
+		if (this->character != nullptr) {
+			unit->set_character(this->character);
+		}
 		if (this->ttl != 0) {
 			unit->TTL = this->ttl;
 		}
@@ -113,7 +123,12 @@ public:
 
 	virtual std::string get_assignment_string() const override
 	{
-		std::string str = "Receive a " + string::highlight(this->unit_type->get_name()) + " unit";
+		std::string str = "Receive ";
+		if (this->character != nullptr) {
+			str += "the " + string::highlight(this->character->get_full_name()) + " character";
+		} else {
+			str += "a " + string::highlight(this->unit_type->get_name()) + " unit";
+		}
 		if (this->site != nullptr) {
 			str += " at " + this->site->get_name();
 		}
@@ -121,6 +136,15 @@ public:
 			str += " for " + std::to_string(this->ttl) + " cycles";
 		}
 		return str;
+	}
+
+	const unit_type *get_unit_type() const
+	{
+		if (this->character != nullptr) {
+			return this->character->get_unit_type();
+		}
+
+		return this->unit_type;
 	}
 
 	QPoint get_tile_pos(const CPlayer *player) const
@@ -159,6 +183,7 @@ public:
 
 private:
 	const wyrmgus::unit_type *unit_type = nullptr; //the unit type to be created
+	wyrmgus::character *character = nullptr; //the character to be created
 	const wyrmgus::site *site = nullptr; //the site where the unit type is to be located, if any
 	const wyrmgus::map_template *map_template = nullptr; //the map template where the unit type is to be located, if any
 	QPoint pos = QPoint(-1, -1); //the unit's position in the map template
