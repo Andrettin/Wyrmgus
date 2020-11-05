@@ -32,12 +32,14 @@
 #include "database/database.h"
 #include "database/sml_data.h"
 #include "database/sml_property.h"
+#include "dialogue.h"
 #include "luacallback.h"
 #include "script/effect/effect_list.h"
+#include "util/string_util.h"
 
 namespace wyrmgus {
 
-dialogue_option::dialogue_option()
+dialogue_option::dialogue_option(const dialogue_node *node) : node(node)
 {
 }
 
@@ -52,6 +54,10 @@ void dialogue_option::process_sml_property(const sml_property &property)
 
 	if (key == "name") {
 		this->name = value;
+	} else if (key == "next_node") {
+		this->next_node_identifier = value;
+	} else if (key == "end_dialogue") {
+		this->end_dialogue = string::to_bool(value);
 	} else if (key == "tooltip") {
 		this->tooltip = value;
 	} else {
@@ -71,11 +77,28 @@ void dialogue_option::process_sml_scope(const sml_data &scope)
 	}
 }
 
+void dialogue_option::initialize()
+{
+	if (!this->next_node_identifier.empty()) {
+		this->next_node = this->get_dialogue()->get_node(this->next_node_identifier);
+		this->next_node_identifier.clear();
+	}
+}
+
 void dialogue_option::check() const
 {
+	if (this->ends_dialogue() && this->get_next_node() != nullptr) {
+		throw std::runtime_error("Dialogue option is set to end the dialogue at the same time that it has a next node set for it.");
+	}
+
 	if (this->effects != nullptr) {
 		this->effects->check();
 	}
+}
+
+const dialogue *dialogue_option::get_dialogue() const
+{
+	return this->node->get_dialogue();
 }
 
 void dialogue_option::do_effects(CPlayer *player) const

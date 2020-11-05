@@ -57,7 +57,18 @@ public:
 	~dialogue();
 	
 	virtual void process_sml_scope(const sml_data &scope) override;
+	virtual void initialize() override;
 	virtual void check() const override;
+
+	const dialogue_node *get_node(const std::string &identifier) const
+	{
+		auto find_iterator = this->nodes_by_identifier.find(identifier);
+		if (find_iterator != this->nodes_by_identifier.end()) {
+			return find_iterator->second;
+		}
+
+		throw std::runtime_error("Invalid dialogue node for dialogue \"" + this->get_identifier() + "\": \"" + identifier + "\".");
+	}
 
 	void call(CPlayer *player) const;
 	void call_node(const int node_index, CPlayer *player) const;
@@ -65,6 +76,7 @@ public:
 	
 private:
 	std::vector<std::unique_ptr<dialogue_node>> nodes;	/// The nodes of the dialogue
+	std::map<std::string, const dialogue_node *> nodes_by_identifier;
 
 	friend static int ::CclDefineDialogue(lua_State *l);
 };
@@ -72,26 +84,30 @@ private:
 class dialogue_node
 {
 public:
-	dialogue_node();
+	explicit dialogue_node(const wyrmgus::dialogue *dialogue);
 	~dialogue_node();
 	
 	void process_sml_property(const sml_property &property);
 	void process_sml_scope(const sml_data &scope);
+	void initialize();
 	void check() const;
+
+	const wyrmgus::dialogue *get_dialogue() const
+	{
+		return this->dialogue;
+	}
 
 	void call(CPlayer *player) const;
 	void option_effect(const int option_index, CPlayer *player) const;
 	
 	int ID = -1;
 private:
+	const wyrmgus::dialogue *dialogue = nullptr;
 	const character *speaker = nullptr;
 	const unit_type *speaker_unit_type = nullptr;
 	std::string speaker_name;
 	const faction *speaker_faction = nullptr; //faction of the player to whom the speaker belongs
 	std::string text;
-public:
-	wyrmgus::dialogue *Dialogue = nullptr;
-private:
 	std::unique_ptr<const and_condition> conditions;
 public:
 	std::unique_ptr<LuaCallback> Conditions;

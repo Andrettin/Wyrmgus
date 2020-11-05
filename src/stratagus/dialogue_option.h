@@ -35,6 +35,7 @@ static int CclDefineDialogue(lua_State *l);
 
 namespace wyrmgus {
 
+class dialogue;
 class dialogue_node;
 class effect_list;
 class sml_data;
@@ -43,11 +44,12 @@ class sml_property;
 class dialogue_option final
 {
 public:
-	dialogue_option();
+	explicit dialogue_option(const dialogue_node *node);
 	~dialogue_option();
 
 	void process_sml_property(const sml_property &property);
 	void process_sml_scope(const sml_data &scope);
+	void initialize();
 	void check() const;
 
 	const std::string &get_name() const
@@ -55,13 +57,29 @@ public:
 		return this->name;
 	}
 
+	const dialogue *get_dialogue() const;
+
+	const dialogue_node *get_next_node() const
+	{
+		return this->next_node;
+	}
+
+	bool ends_dialogue() const
+	{
+		return this->end_dialogue;
+	}
+
 	void do_effects(CPlayer *player) const;
 	std::string get_tooltip() const;
 
 private:
 	std::string name;
+	const dialogue_node *node = nullptr;
+	std::string next_node_identifier;
+	const dialogue_node *next_node = nullptr;
+	bool end_dialogue = false;
 	std::unique_ptr<effect_list> effects;
-	std::unique_ptr<LuaCallback> lua_effects = nullptr;
+	std::unique_ptr<LuaCallback> lua_effects;
 	std::string tooltip;
 
 	friend static int ::CclDefineDialogue(lua_State *l);

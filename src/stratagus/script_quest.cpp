@@ -679,9 +679,8 @@ static int CclDefineDialogue(lua_State *l)
 			const int args = lua_rawlen(l, -1);
 			for (int j = 0; j < args; ++j) {
 				lua_rawgeti(l, -1, j + 1);
-				auto node = std::make_unique<wyrmgus::dialogue_node>();
+				auto node = std::make_unique<wyrmgus::dialogue_node>(dialogue);
 				node->ID = dialogue->nodes.size();
-				node->Dialogue = dialogue;
 				if (!lua_istable(l, -1)) {
 					LuaError(l, "incorrect argument (expected table for dialogue nodes)");
 				}
@@ -717,7 +716,7 @@ static int CclDefineDialogue(lua_State *l)
 						const int subsubargs = lua_rawlen(l, -1);
 						for (int n = 0; n < subsubargs; ++n) {
 							if (n >= static_cast<int>(node->options.size())) {
-								auto option = std::make_unique<wyrmgus::dialogue_option>();
+								auto option = std::make_unique<wyrmgus::dialogue_option>(node.get());
 								node->options.push_back(std::move(option));
 							}
 							node->options.at(n)->name = LuaToString(l, -1, n + 1);
@@ -729,7 +728,7 @@ static int CclDefineDialogue(lua_State *l)
 						for (int n = 0; n < subsubargs; ++n) {
 							lua_rawgeti(l, -1, n + 1);
 							if (n >= static_cast<int>(node->options.size())) {
-								auto option = std::make_unique<wyrmgus::dialogue_option>();
+								auto option = std::make_unique<wyrmgus::dialogue_option>(node.get());
 								node->options.push_back(std::move(option));
 							}
 							node->options.at(n)->lua_effects = std::make_unique<LuaCallback>(l, -1);
@@ -741,7 +740,7 @@ static int CclDefineDialogue(lua_State *l)
 						const int subsubargs = lua_rawlen(l, -1);
 						for (int n = 0; n < subsubargs; ++n) {
 							if (n >= static_cast<int>(node->options.size())) {
-								auto option = std::make_unique<wyrmgus::dialogue_option>();
+								auto option = std::make_unique<wyrmgus::dialogue_option>(node.get());
 								node->options.push_back(std::move(option));
 							}
 							node->options.at(n)->tooltip = LuaToString(l, -1, n + 1);

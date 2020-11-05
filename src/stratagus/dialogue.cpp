@@ -52,19 +52,25 @@ dialogue::~dialogue()
 {
 }
 
-
 void dialogue::process_sml_scope(const sml_data &scope)
 {
 	const std::string &tag = scope.get_tag();
 
-	if (tag.empty()) {
-		auto node = std::make_unique<dialogue_node>();
-		node->ID = this->nodes.size();
-		node->Dialogue = this;
-		database::process_sml_data(node, scope);
-		this->nodes.push_back(std::move(node));
-	} else {
-		data_entry::process_sml_scope(scope);
+	auto node = std::make_unique<dialogue_node>(this);
+	node->ID = this->nodes.size();
+	database::process_sml_data(node, scope);
+
+	if (!tag.empty()) {
+		this->nodes_by_identifier[tag] = node.get();
+	}
+
+	this->nodes.push_back(std::move(node));
+}
+
+void dialogue::initialize()
+{
+	for (const std::unique_ptr<dialogue_node> &node : this->nodes) {
+		node->initialize();
 	}
 }
 
@@ -103,7 +109,7 @@ void dialogue::call_node_option_effect(const int node_index, const int option_in
 	this->nodes[node_index]->option_effect(option_index, player);
 }
 
-dialogue_node::dialogue_node()
+dialogue_node::dialogue_node(const wyrmgus::dialogue *dialogue) : dialogue(dialogue)
 {
 }
 
@@ -138,11 +144,18 @@ void dialogue_node::process_sml_scope(const sml_data &scope)
 		database::process_sml_data(conditions, scope);
 		this->conditions = std::move(conditions);
 	} else if (tag == "option") {
-		auto option = std::make_unique<dialogue_option>();
+		auto option = std::make_unique<dialogue_option>(this);
 		database::process_sml_data(option, scope);
 		this->options.push_back(std::move(option));
 	} else {
 		throw std::runtime_error("Invalid dialogue node scope: \"" + tag + "\".");
+	}
+}
+
+void dialogue_node::initialize()
+{
+	for (const auto &option : this->options) {
+		option->initialize();
 	}
 }
 
@@ -161,7 +174,7 @@ void dialogue_node::call(CPlayer *player) const
 {
 	if (this->conditions != nullptr) {
 		if (!this->conditions->check(player)) {
-			this->Dialogue->call_node(this->ID + 1, player);
+			this->get_dialogue()->call_node(this->ID + 1, player);
 			return;
 		}
 	}
@@ -170,7 +183,7 @@ void dialogue_node::call(CPlayer *player) const
 		this->Conditions->pushPreamble();
 		this->Conditions->run(1);
 		if (this->Conditions->popBoolean() == false) {
-			this->Dialogue->call_node(this->ID + 1, player);
+			this->get_dialogue()->call_node(this->ID + 1, player);
 			return;
 		}
 	}
@@ -236,12 +249,12 @@ void dialogue_node::call(CPlayer *player) const
 				first = false;
 			}
 			lua_command += "function(s) ";
-			lua_command += "CallDialogueNodeOptionEffect(\"" + this->Dialogue->get_identifier() + "\", " + std::to_string(this->ID) + ", " + std::to_string(i) + ", " + std::to_string(player->Index) + ");";
+			lua_command += "CallDialogueNodeOptionEffect(\"" + this->get_dialogue()->get_identifier() + "\", " + std::to_string(this->ID) + ", " + std::to_string(i) + ", " + std::to_string(player->Index) + ");";
 			lua_command += " end";
 		}
 	} else {
 		lua_command += "function(s) ";
-		lua_command += "CallDialogueNodeOptionEffect(\"" + this->Dialogue->get_identifier() + "\", " + std::to_string(this->ID) + ", " + std::to_string(0) + ", " + std::to_string(player->Index) + ");";
+		lua_command += "CallDialogueNodeOptionEffect(\"" + this->get_dialogue()->get_identifier() + "\", " + std::to_string(this->ID) + ", " + std::to_string(0) + ", " + std::to_string(player->Index) + ");";
 		lua_command += " end";
 	}
 	lua_command += "}, ";
@@ -277,27 +290,33 @@ void dialogue_node::option_effect(const int option_index, CPlayer *player) const
 	if (option_index < static_cast<int>(this->options.size())) {
 		const auto &option = this->options[option_index];
 		option->do_effects(player);
+		if (option->ends_dialogue()) {
+			return;
+		} else if (option->get_next_node() != nullptr) {
+			option->get_next_node()->call(player);
+			return;
+		}
 	}
 
-	this->Dialogue->call_node(this->ID + 1, player);
+	this->get_dialogue()->call_node(this->ID + 1, player);
 }
 
 }
 
 void CallDialogue(const std::string &dialogue_ident, int player)
 {
-	wyrmgus::dialogue *dialogue = wyrmgus::dialogue::get(dialogue_ident);
+	const wyrmgus::dialogue *dialogue = wyrmgus::dialogue::get(dialogue_ident);
 	dialogue->call(CPlayer::Players.at(player));
 }
 
 void CallDialogueNode(const std::string &dialogue_ident, int node, int player)
 {
-	wyrmgus::dialogue *dialogue = wyrmgus::dialogue::get(dialogue_ident);
+	const wyrmgus::dialogue *dialogue = wyrmgus::dialogue::get(dialogue_ident);
 	dialogue->call_node(node, CPlayer::Players.at(player));
 }
 
 void CallDialogueNodeOptionEffect(const std::string &dialogue_ident, int node, int option, int player)
 {
-	wyrmgus::dialogue *dialogue = wyrmgus::dialogue::get(dialogue_ident);
+	const wyrmgus::dialogue *dialogue = wyrmgus::dialogue::get(dialogue_ident);
 	dialogue->call_node_option_effect(node, option, CPlayer::Players.at(player));
 }
