@@ -120,6 +120,11 @@ public:
 		return this->conditions;
 	}
 
+	const std::unique_ptr<effect_list> &get_effects() const
+	{
+		return this->effects;
+	}
+
 	TriggerType Type = TriggerType::GlobalTrigger;
 	bool Local = false;
 private:
@@ -131,7 +136,6 @@ public:
 private:
 	std::unique_ptr<condition> preconditions;
 	std::unique_ptr<condition> conditions;
-public:
 	std::unique_ptr<effect_list> effects;
 };
 

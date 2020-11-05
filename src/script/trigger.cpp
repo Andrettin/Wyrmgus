@@ -572,13 +572,13 @@ void TriggersEachCycle()
 			}
 		}
 		
-		if (current_trigger->effects != nullptr) {
+		if (current_trigger->get_effects() != nullptr) {
 			bool triggered = false;
 			
 			if (current_trigger->Type == wyrmgus::trigger::TriggerType::GlobalTrigger) {
 				if (check_conditions(current_trigger, CPlayer::Players[PlayerNumNeutral])) {
 					triggered = true;
-					current_trigger->effects->do_effects(CPlayer::Players[PlayerNumNeutral]);
+					current_trigger->get_effects()->do_effects(CPlayer::Players[PlayerNumNeutral]);
 				}
 			} else if (current_trigger->Type == wyrmgus::trigger::TriggerType::PlayerTrigger) {
 				for (int i = 0; i < PlayerNumNeutral; ++i) {
@@ -590,7 +590,7 @@ void TriggersEachCycle()
 						continue;
 					}
 					triggered = true;
-					current_trigger->effects->do_effects(player);
+					current_trigger->get_effects()->do_effects(player);
 					if (current_trigger->fires_only_once()) {
 						break;
 					}
