@@ -54,6 +54,10 @@ public:
 	virtual void process_sml_property(const sml_property &property);
 	virtual void process_sml_scope(const sml_data &scope);
 
+	virtual void check() const
+	{
+	}
+
 	void do_effect(CPlayer *player) const;
 
 	virtual void do_assignment_effect(CPlayer *player) const

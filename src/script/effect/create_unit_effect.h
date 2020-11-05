@@ -88,6 +88,18 @@ public:
 		}
 	}
 
+	virtual void check() const override
+	{
+
+		if (this->site != nullptr && this->map_template != nullptr) {
+			throw std::runtime_error("\"create_unit\" effect has both a site and a map template.");
+		}
+
+		if (this->map_template != nullptr && this->pos == QPoint(-1, -1)) {
+			throw std::runtime_error("\"create_unit\" effect has a map template but no position.");
+		}
+	}
+
 	virtual void do_assignment_effect(CPlayer *player) const override
 	{
 		QPoint unit_top_left_pos = this->get_tile_pos(player) - this->unit_type->get_tile_center_pos_offset();

@@ -56,6 +56,7 @@ public:
 	~dialogue();
 	
 	virtual void process_sml_scope(const sml_data &scope) override;
+	virtual void check() const override;
 
 	void call(CPlayer *player) const;
 	void call_node(const int node_index, CPlayer *player) const;
@@ -75,6 +76,7 @@ public:
 	
 	void process_sml_property(const sml_property &property);
 	void process_sml_scope(const sml_data &scope);
+	void check() const;
 
 	void call(CPlayer *player) const;
 	void option_effect(const int option_index, CPlayer *player) const;

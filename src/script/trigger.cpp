@@ -723,6 +723,10 @@ void trigger::check() const
 	if (this->get_conditions() != nullptr) {
 		this->get_conditions()->check_validity();
 	}
+
+	if (this->get_effects() != nullptr) {
+		this->get_effects()->check();
+	}
 }
 
 }

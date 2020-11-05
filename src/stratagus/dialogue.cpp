@@ -67,6 +67,13 @@ void dialogue::process_sml_scope(const sml_data &scope)
 	}
 }
 
+void dialogue::check() const
+{
+	for (const std::unique_ptr<dialogue_node> &node : this->nodes) {
+		node->check();
+	}
+}
+
 void dialogue::call(CPlayer *player) const
 {
 	if (this->nodes.empty()) {
@@ -132,6 +139,14 @@ void dialogue_node::process_sml_scope(const sml_data &scope)
 	} else {
 		throw std::runtime_error("Invalid dialogue node scope: \"" + tag + "\".");
 	}
+}
+
+void dialogue_node::check() const
+{
+	for (const auto &option : this->options) {
+		option->check();
+	}
+
 }
 
 void dialogue_node::call(CPlayer *player) const

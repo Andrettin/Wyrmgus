@@ -178,6 +178,14 @@ void quest::check() const
 	if (this->get_conditions() != nullptr) {
 		this->get_conditions()->check_validity();
 	}
+
+	if (this->get_accept_effects() != nullptr) {
+		this->get_accept_effects()->check();
+	}
+
+	if (this->get_completion_effects() != nullptr) {
+		this->get_completion_effects()->check();
+	}
 }
 
 std::string quest::get_rewards_string() const

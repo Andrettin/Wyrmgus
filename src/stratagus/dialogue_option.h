@@ -48,6 +48,7 @@ public:
 
 	void process_sml_property(const sml_property &property);
 	void process_sml_scope(const sml_data &scope);
+	void check() const;
 
 	const std::string &get_name() const
 	{

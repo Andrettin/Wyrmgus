@@ -71,6 +71,13 @@ void dialogue_option::process_sml_scope(const sml_data &scope)
 	}
 }
 
+void dialogue_option::check() const
+{
+	if (this->effects != nullptr) {
+		this->effects->check();
+	}
+}
+
 void dialogue_option::do_effects(CPlayer *player) const
 {
 	if (this->effects != nullptr) {

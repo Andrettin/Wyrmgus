@@ -53,6 +53,13 @@ void effect_list::process_sml_scope(const sml_data &scope)
 	this->effects.push_back(effect::from_sml_scope(scope));
 }
 
+void effect_list::check() const
+{
+	for (const std::unique_ptr<effect> &effect : this->effects) {
+		effect->check();
+	}
+}
+
 void effect_list::do_effects(CPlayer *player) const
 {
 	for (const std::unique_ptr<effect> &effect : this->effects) {
