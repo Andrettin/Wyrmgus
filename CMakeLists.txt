@@ -897,7 +897,6 @@ set(stratagus_generic_HDRS
 	src/include/config.h
 	src/include/currency.h
 	src/include/data_type.h
-	src/include/dialogue.h
 	src/include/editor.h
 	src/include/game.h
 	src/include/grand_strategy.h
@@ -943,6 +942,7 @@ set(stratagus_generic_HDRS
 	src/stratagus/civilization_base.h
 	src/stratagus/civilization_group.h
 	src/stratagus/civilization_supergroup.h
+	src/stratagus/dialogue.h
 	src/stratagus/dialogue_option.h
 	src/stratagus/diplomacy_state.h
 	src/stratagus/dynasty.h
