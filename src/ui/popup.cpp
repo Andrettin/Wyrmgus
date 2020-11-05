@@ -371,6 +371,8 @@ int CPopupContentTypeCosts::GetWidth(const wyrmgus::button &button, int *Costs) 
 
 int CPopupContentTypeCosts::GetHeight(const wyrmgus::button &button, int *Costs) const
 {
+	Q_UNUSED(button)
+
 	int popupHeight = 0;
 	const wyrmgus::font *font = this->Font ? this->Font : wyrmgus::defines::get()->get_small_font();
 
@@ -490,16 +492,25 @@ CPopupContentTypeLine::CPopupContentTypeLine() : Color(ColorWhite)
 
 int CPopupContentTypeLine::GetWidth(const wyrmgus::button &button, int *Costs) const
 {
+	Q_UNUSED(button)
+	Q_UNUSED(Costs)
+
 	return this->Width;
 }
 
 int CPopupContentTypeLine::GetHeight(const wyrmgus::button &button, int *Costs) const
 {
+	Q_UNUSED(button)
+	Q_UNUSED(Costs)
+
 	return this->Height;
 }
 
 void CPopupContentTypeLine::Draw(int x, int y, const CPopup &popup, const unsigned int popupWidth, const wyrmgus::button &button, int *Costs) const
 {
+	Q_UNUSED(button)
+	Q_UNUSED(Costs)
+
 	Video.FillRectangle(this->Color, x - popup.MarginX - this->MarginX + 1,
 						y, this->Width && Width < popupWidth ? Width : popupWidth - 2, Height);
 }

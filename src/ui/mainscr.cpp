@@ -1195,9 +1195,9 @@ void DrawPopups()
 	}
 
 	if (CursorOn == cursor_on::minimap) {
-		const QPoint tile_pos = UI.get_minimap()->screen_to_tile_pos(CursorScreenPos);
-		if (CMap::Map.Info.IsPointOnMap(tile_pos, UI.CurrentMapLayer->ID)) {
-			const CMapField *tile = UI.CurrentMapLayer->Field(tile_pos);
+		const QPoint minimap_tile_pos = UI.get_minimap()->screen_to_tile_pos(CursorScreenPos);
+		if (CMap::Map.Info.IsPointOnMap(minimap_tile_pos, UI.CurrentMapLayer->ID)) {
+			const CMapField *tile = UI.CurrentMapLayer->Field(minimap_tile_pos);
 
 			//hackish way to make the popup appear correctly
 			std::unique_ptr<wyrmgus::button> button;
