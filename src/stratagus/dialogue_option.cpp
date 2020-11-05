@@ -53,7 +53,9 @@ void dialogue_option::process_sml_property(const sml_property &property)
 	const std::string &key = property.get_key();
 	const std::string &value = property.get_value();
 
-	if (key == "name") {
+	if (key == "identifier") {
+		this->get_dialogue()->map_option(this, value);
+	} else if (key == "name") {
 		this->name = value;
 	} else if (key == "next_node") {
 		this->next_node_identifier = value;
@@ -97,7 +99,7 @@ void dialogue_option::check() const
 	}
 }
 
-const dialogue *dialogue_option::get_dialogue() const
+dialogue *dialogue_option::get_dialogue() const
 {
 	return this->node->get_dialogue();
 }

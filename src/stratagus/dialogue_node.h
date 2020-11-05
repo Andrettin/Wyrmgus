@@ -47,7 +47,7 @@ class unit_type;
 class dialogue_node final
 {
 public:
-	explicit dialogue_node(const wyrmgus::dialogue *dialogue);
+	explicit dialogue_node(wyrmgus::dialogue *dialogue);
 	~dialogue_node();
 
 	void process_sml_property(const sml_property &property);
@@ -55,9 +55,15 @@ public:
 	void initialize();
 	void check() const;
 
-	const wyrmgus::dialogue *get_dialogue() const
+	wyrmgus::dialogue *get_dialogue() const
 	{
 		return this->dialogue;
+	}
+
+	void add_option(std::unique_ptr<dialogue_option> &&option)
+	{
+		this->option_pointers.push_back(option.get());
+		this->options.push_back(std::move(option));
 	}
 
 	void call(CPlayer *player) const;
@@ -65,7 +71,7 @@ public:
 
 	int ID = -1;
 private:
-	const wyrmgus::dialogue *dialogue = nullptr;
+	wyrmgus::dialogue *dialogue = nullptr;
 	const character *speaker = nullptr;
 	const unit_type *speaker_unit_type = nullptr;
 	std::string speaker_name;
@@ -77,6 +83,7 @@ public:
 	std::unique_ptr<LuaCallback> ImmediateEffects;
 private:
 	std::vector<std::unique_ptr<dialogue_option>> options;
+	std::vector<const dialogue_option *> option_pointers;
 
 	friend static int ::CclDefineDialogue(lua_State *l);
 };

@@ -57,7 +57,7 @@ public:
 		return this->name;
 	}
 
-	const dialogue *get_dialogue() const;
+	dialogue *get_dialogue() const;
 
 	const dialogue_node *get_next_node() const
 	{

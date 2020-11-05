@@ -43,7 +43,7 @@
 
 namespace wyrmgus {
 
-dialogue_node::dialogue_node(const wyrmgus::dialogue *dialogue) : dialogue(dialogue)
+dialogue_node::dialogue_node(wyrmgus::dialogue *dialogue) : dialogue(dialogue)
 {
 }
 
@@ -64,6 +64,8 @@ void dialogue_node::process_sml_property(const sml_property &property)
 		this->speaker_unit_type = unit_type::get(value);
 	} else if (key == "speaker_faction") {
 		this->speaker_faction = faction::get(value);
+	} else if (key == "option") {
+		this->option_pointers.push_back(this->get_dialogue()->get_option(value));
 	} else {
 		throw std::runtime_error("Invalid dialogue node property: \"" + key + "\".");
 	}
@@ -80,7 +82,7 @@ void dialogue_node::process_sml_scope(const sml_data &scope)
 	} else if (tag == "option") {
 		auto option = std::make_unique<dialogue_option>(this);
 		database::process_sml_data(option, scope);
-		this->options.push_back(std::move(option));
+		this->add_option(std::move(option));
 	} else {
 		throw std::runtime_error("Invalid dialogue node scope: \"" + tag + "\".");
 	}
@@ -88,14 +90,14 @@ void dialogue_node::process_sml_scope(const sml_data &scope)
 
 void dialogue_node::initialize()
 {
-	for (const auto &option : this->options) {
+	for (const std::unique_ptr<dialogue_option> &option : this->options) {
 		option->initialize();
 	}
 }
 
 void dialogue_node::check() const
 {
-	for (const auto &option : this->options) {
+	for (const std::unique_ptr<dialogue_option> &option : this->options) {
 		option->check();
 	}
 
@@ -158,9 +160,9 @@ void dialogue_node::call(CPlayer *player) const
 	lua_command += std::to_string(player->Index) + ", ";
 
 	lua_command += "{";
-	if (!this->options.empty() && !this->options.front()->get_name().empty()) {
+	if (!this->option_pointers.empty() && !this->option_pointers.front()->get_name().empty()) {
 		bool first = true;
-		for (const auto &option : this->options) {
+		for (const dialogue_option *option : this->option_pointers) {
 			if (!first) {
 				lua_command += ", ";
 			} else {
@@ -174,9 +176,9 @@ void dialogue_node::call(CPlayer *player) const
 	lua_command += "}, ";
 
 	lua_command += "{";
-	if (!this->options.empty()) {
+	if (!this->option_pointers.empty()) {
 		bool first = true;
-		for (size_t i = 0; i < this->options.size(); ++i) {
+		for (size_t i = 0; i < this->option_pointers.size(); ++i) {
 			if (!first) {
 				lua_command += ", ";
 			} else {
@@ -196,10 +198,10 @@ void dialogue_node::call(CPlayer *player) const
 	lua_command += "nil, nil, nil, ";
 
 	lua_command += "{";
-	if (!this->options.empty() && !this->options.front()->get_tooltip().empty()) {
+	if (!this->option_pointers.empty() && !this->option_pointers.front()->get_tooltip().empty()) {
 		lua_command += "OptionTooltips = {";
 		bool first = true;
-		for (const auto &option : this->options) {
+		for (const dialogue_option *option : this->option_pointers) {
 			if (!first) {
 				lua_command += ", ";
 			} else {
@@ -221,8 +223,8 @@ void dialogue_node::call(CPlayer *player) const
 
 void dialogue_node::option_effect(const int option_index, CPlayer *player) const
 {
-	if (option_index < static_cast<int>(this->options.size())) {
-		const auto &option = this->options[option_index];
+	if (option_index < static_cast<int>(this->option_pointers.size())) {
+		const dialogue_option *option = this->option_pointers[option_index];
 		option->do_effects(player);
 		if (option->ends_dialogue()) {
 			return;

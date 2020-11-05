@@ -39,6 +39,7 @@ static int CclDefineDialogue(lua_State *l);
 namespace wyrmgus {
 
 class dialogue_node;
+class dialogue_option;
 
 class dialogue final : public data_entry, public data_type<dialogue>
 {
@@ -65,6 +66,18 @@ public:
 		throw std::runtime_error("Invalid dialogue node for dialogue \"" + this->get_identifier() + "\": \"" + identifier + "\".");
 	}
 
+	const dialogue_option *get_option(const std::string &identifier) const
+	{
+		auto find_iterator = this->options_by_identifier.find(identifier);
+		if (find_iterator != this->options_by_identifier.end()) {
+			return find_iterator->second;
+		}
+
+		throw std::runtime_error("Invalid dialogue option for dialogue \"" + this->get_identifier() + "\": \"" + identifier + "\".");
+	}
+
+	void map_option(const dialogue_option *option, const std::string &identifier);
+
 	void call(CPlayer *player) const;
 	void call_node(const int node_index, CPlayer *player) const;
 	void call_node_option_effect(const int node_index, const int option_index, CPlayer *player) const;
@@ -72,6 +85,7 @@ public:
 private:
 	std::vector<std::unique_ptr<dialogue_node>> nodes;	/// The nodes of the dialogue
 	std::map<std::string, const dialogue_node *> nodes_by_identifier;
+	std::map<std::string, const dialogue_option *> options_by_identifier;
 
 	friend static int ::CclDefineDialogue(lua_State *l);
 };

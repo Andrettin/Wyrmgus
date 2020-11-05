@@ -30,6 +30,7 @@
 #include "dialogue.h"
 
 #include "dialogue_node.h"
+#include "dialogue_option.h"
 #include "player.h"
 #include "script.h"
 
@@ -70,6 +71,15 @@ void dialogue::check() const
 	for (const std::unique_ptr<dialogue_node> &node : this->nodes) {
 		node->check();
 	}
+}
+
+void dialogue::map_option(const dialogue_option *option, const std::string &identifier)
+{
+	if (identifier.empty()) {
+		throw std::runtime_error("Cannot map option to an empty string identifier.");
+	}
+
+	this->options_by_identifier[identifier] = option;
 }
 
 void dialogue::call(CPlayer *player) const
