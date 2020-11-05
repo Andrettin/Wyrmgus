@@ -724,6 +724,7 @@ set(stratagus_script_condition_HDRS
 	src/script/condition/any_unit_of_class_condition.h
 	src/script/condition/any_unit_of_type_condition.h
 	src/script/condition/character_condition.h
+	src/script/condition/character_exists_condition.h
 	src/script/condition/civilization_condition.h
 	src/script/condition/condition.h
 	src/script/condition/dynasty_condition.h
