@@ -27,9 +27,6 @@
 
 #pragma once
 
-#include "database/data_entry.h"
-#include "database/data_type.h"
-
 class CPlayer;
 class LuaCallback;
 struct lua_State;
@@ -38,46 +35,50 @@ static int CclDefineDialogue(lua_State *l);
 
 namespace wyrmgus {
 
-class dialogue_node;
+class and_condition;
+class character;
+class dialogue;
+class dialogue_option;
+class faction;
+class sml_data;
+class sml_property;
+class unit_type;
 
-class dialogue final : public data_entry, public data_type<dialogue>
+class dialogue_node final
 {
-	Q_OBJECT
-
 public:
-	static constexpr const char *class_identifier = "dialogue";
-	static constexpr const char *database_folder = "dialogues";
+	explicit dialogue_node(const wyrmgus::dialogue *dialogue);
+	~dialogue_node();
 
-	explicit dialogue(const std::string &identifier);
-	~dialogue();
-	
-	virtual void process_sml_scope(const sml_data &scope) override;
-	virtual void initialize() override;
-	virtual void check() const override;
+	void process_sml_property(const sml_property &property);
+	void process_sml_scope(const sml_data &scope);
+	void initialize();
+	void check() const;
 
-	const dialogue_node *get_node(const std::string &identifier) const
+	const wyrmgus::dialogue *get_dialogue() const
 	{
-		auto find_iterator = this->nodes_by_identifier.find(identifier);
-		if (find_iterator != this->nodes_by_identifier.end()) {
-			return find_iterator->second;
-		}
-
-		throw std::runtime_error("Invalid dialogue node for dialogue \"" + this->get_identifier() + "\": \"" + identifier + "\".");
+		return this->dialogue;
 	}
 
 	void call(CPlayer *player) const;
-	void call_node(const int node_index, CPlayer *player) const;
-	void call_node_option_effect(const int node_index, const int option_index, CPlayer *player) const;
-	
+	void option_effect(const int option_index, CPlayer *player) const;
+
+	int ID = -1;
 private:
-	std::vector<std::unique_ptr<dialogue_node>> nodes;	/// The nodes of the dialogue
-	std::map<std::string, const dialogue_node *> nodes_by_identifier;
+	const wyrmgus::dialogue *dialogue = nullptr;
+	const character *speaker = nullptr;
+	const unit_type *speaker_unit_type = nullptr;
+	std::string speaker_name;
+	const faction *speaker_faction = nullptr; //faction of the player to whom the speaker belongs
+	std::string text;
+	std::unique_ptr<const and_condition> conditions;
+public:
+	std::unique_ptr<LuaCallback> Conditions;
+	std::unique_ptr<LuaCallback> ImmediateEffects;
+private:
+	std::vector<std::unique_ptr<dialogue_option>> options;
 
 	friend static int ::CclDefineDialogue(lua_State *l);
 };
 
 }
-
-extern void CallDialogue(const std::string &dialogue_ident, int player);
-extern void CallDialogueNode(const std::string &dialogue_ident, int node, int player);
-extern void CallDialogueNodeOptionEffect(const std::string &dialogue_ident, int node, int option, int player);

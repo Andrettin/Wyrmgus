@@ -33,6 +33,7 @@
 #include "database/sml_data.h"
 #include "database/sml_property.h"
 #include "dialogue.h"
+#include "dialogue_node.h"
 #include "luacallback.h"
 #include "script/effect/effect_list.h"
 #include "util/string_util.h"

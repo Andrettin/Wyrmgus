@@ -357,6 +357,7 @@ set(stratagusmain_SRCS
 	src/stratagus/config.cpp
 	src/stratagus/currency.cpp
 	src/stratagus/dialogue.cpp
+	src/stratagus/dialogue_node.cpp
 	src/stratagus/dialogue_option.cpp
 	src/stratagus/dynasty.cpp
 	src/stratagus/faction.cpp
@@ -943,6 +944,7 @@ set(stratagus_generic_HDRS
 	src/stratagus/civilization_group.h
 	src/stratagus/civilization_supergroup.h
 	src/stratagus/dialogue.h
+	src/stratagus/dialogue_node.h
 	src/stratagus/dialogue_option.h
 	src/stratagus/diplomacy_state.h
 	src/stratagus/dynasty.h

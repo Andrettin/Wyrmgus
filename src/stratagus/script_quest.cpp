@@ -34,6 +34,7 @@
 #include "character.h"
 #include "civilization.h"
 #include "dialogue.h"
+#include "dialogue_node.h"
 #include "dialogue_option.h"
 #include "faction.h"
 #include "item/unique_item.h"
