@@ -27,7 +27,9 @@
 
 #pragma once
 
+#include "map/map.h"
 #include "map/map_layer.h"
+#include "map/map_template.h"
 #include "map/site.h"
 #include "player.h"
 #include "script/effect/effect.h"
@@ -66,10 +68,23 @@ public:
 			this->unit_type = unit_type::get(value);
 		} else if (key == "site") {
 			this->site = site::get(value);
+		} else if (key == "map_template") {
+			this->map_template = map_template::get(value);
 		} else if (key == "ttl") {
 			this->ttl = std::stoi(value);
 		} else {
 			effect::process_sml_property(property);
+		}
+	}
+
+	virtual void process_sml_scope(const sml_data &scope) override
+	{
+		const std::string &tag = scope.get_tag();
+
+		if (tag == "pos") {
+			this->pos = scope.to_point();
+		} else {
+			effect::process_sml_scope(scope);
 		}
 	}
 
@@ -106,6 +121,10 @@ public:
 			}
 		}
 
+		if (this->map_template != nullptr && CMap::get()->is_subtemplate_on_map(this->map_template)) {
+			return this->map_template->pos_to_map_pos(this->pos);
+		}
+
 		return player->StartPos;
 	}
 
@@ -119,12 +138,18 @@ public:
 			}
 		}
 
+		if (this->map_template != nullptr && CMap::get()->is_subtemplate_on_map(this->map_template)) {
+			return CMap::get()->get_subtemplate_map_layer(this->map_template)->ID;
+		}
+
 		return player->StartMapLayer;
 	}
 
 private:
 	const wyrmgus::unit_type *unit_type = nullptr; //the unit type to be created
 	const wyrmgus::site *site = nullptr; //the site where the unit type is to be located, if any
+	const wyrmgus::map_template *map_template = nullptr; //the map template where the unit type is to be located, if any
+	QPoint pos = QPoint(-1, -1); //the unit's position in the map template
 	int ttl = 0; //the time to live (in cycles) of the created unit, if any; useful for revealers
 };
 
