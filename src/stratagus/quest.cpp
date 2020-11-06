@@ -156,10 +156,10 @@ void quest::process_sml_scope(const sml_data &scope)
 		this->conditions = std::make_unique<and_condition>();
 		database::process_sml_data(this->conditions, scope);
 	} else if (tag == "accept_effects") {
-		this->accept_effects = std::make_unique<effect_list>();
+		this->accept_effects = std::make_unique<effect_list<CPlayer>>();
 		database::process_sml_data(this->accept_effects, scope);
 	} else if (tag == "completion_effects") {
-		this->completion_effects = std::make_unique<effect_list>();
+		this->completion_effects = std::make_unique<effect_list<CPlayer>>();
 		database::process_sml_data(this->completion_effects, scope);
 	} else {
 		data_entry::process_sml_scope(scope);

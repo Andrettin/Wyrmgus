@@ -7,7 +7,7 @@ namespace wyrmgus {
 
 class resource;
 
-class resource_effect final : public effect
+class resource_effect final : public effect<CPlayer>
 {
 public:
 	explicit resource_effect(const resource *resource, const std::string &value, const sml_operator effect_operator)

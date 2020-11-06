@@ -73,7 +73,7 @@ void dialogue_option::process_sml_scope(const sml_data &scope)
 	const std::string &tag = scope.get_tag();
 
 	if (tag == "effects") {
-		this->effects = std::make_unique<effect_list>();
+		this->effects = std::make_unique<effect_list<CPlayer>>();
 		database::process_sml_data(this->effects, scope);
 	} else {
 		throw std::runtime_error("Invalid dialogue option scope: \"" + tag + "\".");

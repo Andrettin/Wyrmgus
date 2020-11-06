@@ -35,43 +35,50 @@
 
 namespace wyrmgus {
 
-effect_list::effect_list()
+template <typename scope_type>
+effect_list<scope_type>::effect_list()
 {
 }
 
-effect_list::~effect_list()
+template <typename scope_type>
+effect_list<scope_type>::~effect_list()
 {
 }
 
-void effect_list::process_sml_property(const sml_property &property)
+template <typename scope_type>
+void effect_list<scope_type>::process_sml_property(const sml_property &property)
 {
-	this->effects.push_back(effect::from_sml_property(property));
+	this->effects.push_back(effect<scope_type>::from_sml_property(property));
 }
 
-void effect_list::process_sml_scope(const sml_data &scope)
+template <typename scope_type>
+void effect_list<scope_type>::process_sml_scope(const sml_data &scope)
 {
-	this->effects.push_back(effect::from_sml_scope(scope));
+	this->effects.push_back(effect<scope_type>::from_sml_scope(scope));
 }
 
-void effect_list::check() const
+template <typename scope_type>
+void effect_list<scope_type>::check() const
 {
-	for (const std::unique_ptr<effect> &effect : this->effects) {
+	for (const std::unique_ptr<effect<scope_type>> &effect : this->effects) {
 		effect->check();
 	}
 }
 
-void effect_list::do_effects(CPlayer *player) const
+template <typename scope_type>
+void effect_list<scope_type>::do_effects(scope_type *scope) const
 {
-	for (const std::unique_ptr<effect> &effect : this->effects) {
-		effect->do_effect(player);
+	for (const std::unique_ptr<effect<scope_type>> &effect : this->effects) {
+		effect->do_effect(scope);
 	}
 }
 
-std::string effect_list::get_effects_string(const size_t indent) const
+template <typename scope_type>
+std::string effect_list<scope_type>::get_effects_string(const size_t indent) const
 {
 	std::string effects_string;
 	bool first = true;
-	for (const std::unique_ptr<effect> &effect : this->effects) {
+	for (const std::unique_ptr<effect<scope_type>> &effect : this->effects) {
 		if (effect->is_hidden()) {
 			continue;
 		}
@@ -97,5 +104,8 @@ std::string effect_list::get_effects_string(const size_t indent) const
 	}
 	return effects_string;
 }
+
+template class effect_list<CPlayer>;
+template class effect_list<CUnit>;
 
 }

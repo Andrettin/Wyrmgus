@@ -39,34 +39,40 @@
 
 namespace wyrmgus {
 
-std::unique_ptr<effect> effect::from_sml_property(const sml_property &property)
+template <typename scope_type>
+std::unique_ptr<effect<scope_type>> effect<scope_type>::from_sml_property(const sml_property &property)
 {
 	const std::string &key = property.get_key();
 	const sml_operator effect_operator = property.get_operator();
 	const std::string &value = property.get_value();
 
-	if (key == "accept_quest") {
-		return std::make_unique<accept_quest_effect>(value, effect_operator);
-	} else if (key == "call_dialogue") {
-		return std::make_unique<call_dialogue_effect>(value, effect_operator);
-	} else if (key == "create_unit") {
-		return std::make_unique<create_unit_effect>(value, effect_operator);
-	} else if (key == "remove_character") {
-		return std::make_unique<remove_character_effect>(value, effect_operator);
-	} else if (resource::try_get(key) != nullptr) {
-		return std::make_unique<resource_effect>(resource::get(key), value, effect_operator);
+	if constexpr (std::is_same_v<scope_type, CPlayer>) {
+		if (key == "accept_quest") {
+			return std::make_unique<accept_quest_effect>(value, effect_operator);
+		} else if (key == "call_dialogue") {
+			return std::make_unique<call_dialogue_effect>(value, effect_operator);
+		} else if (key == "create_unit") {
+			return std::make_unique<create_unit_effect>(value, effect_operator);
+		} else if (key == "remove_character") {
+			return std::make_unique<remove_character_effect>(value, effect_operator);
+		} else if (resource::try_get(key) != nullptr) {
+			return std::make_unique<resource_effect>(resource::get(key), value, effect_operator);
+		}
 	}
 
 	throw std::runtime_error("Invalid property effect: \"" + key + "\".");
 }
 
-std::unique_ptr<effect> effect::from_sml_scope(const sml_data &scope)
+template <typename scope_type>
+std::unique_ptr<effect<scope_type>> effect<scope_type>::from_sml_scope(const sml_data &scope)
 {
 	const std::string &effect_identifier = scope.get_tag();
 	std::unique_ptr<effect> effect;
 
-	if (effect_identifier == "create_unit") {
-		effect = std::make_unique<create_unit_effect>(scope.get_operator());
+	if constexpr (std::is_same_v<scope_type, CPlayer>) {
+		if (effect_identifier == "create_unit") {
+			effect = std::make_unique<create_unit_effect>(scope.get_operator());
+		}
 	}
 
 	if (effect == nullptr) {
@@ -78,38 +84,43 @@ std::unique_ptr<effect> effect::from_sml_scope(const sml_data &scope)
 	return effect;
 }
 
-effect::effect(const sml_operator effect_operator) : effect_operator(effect_operator)
+template <typename scope_type>
+effect<scope_type>::effect(const sml_operator effect_operator) : effect_operator(effect_operator)
 {
 }
 
-void effect::process_sml_property(const sml_property &property)
+template <typename scope_type>
+void effect<scope_type>::process_sml_property(const sml_property &property)
 {
 	throw std::runtime_error("Invalid property for \"" + this->get_class_identifier() + "\" effect: \"" + property.get_key() + "\".");
 }
 
-void effect::process_sml_scope(const sml_data &scope)
+template <typename scope_type>
+void effect<scope_type>::process_sml_scope(const sml_data &scope)
 {
 	throw std::runtime_error("Invalid scope for \"" + this->get_class_identifier() + "\" effect: \"" + scope.get_tag() + "\".");
 }
 
-void effect::do_effect(CPlayer *player) const
+template <typename scope_type>
+void effect<scope_type>::do_effect(scope_type *scope) const
 {
 	switch (this->effect_operator) {
 		case sml_operator::assignment:
-			this->do_assignment_effect(player);
+			this->do_assignment_effect(scope);
 			break;
 		case sml_operator::addition:
-			this->do_addition_effect(player);
+			this->do_addition_effect(scope);
 			break;
 		case sml_operator::subtraction:
-			this->do_subtraction_effect(player);
+			this->do_subtraction_effect(scope);
 			break;
 		default:
 			throw std::runtime_error("Invalid effect operator: \"" + std::to_string(static_cast<int>(this->effect_operator)) + "\".");
 	}
 }
 
-std::string effect::get_string() const
+template <typename scope_type>
+std::string effect<scope_type>::get_string() const
 {
 	switch (this->effect_operator) {
 		case sml_operator::assignment:
@@ -122,5 +133,8 @@ std::string effect::get_string() const
 			throw std::runtime_error("Invalid effect operator: \"" + std::to_string(static_cast<int>(this->effect_operator)) + "\".");
 	}
 }
+
+template class effect<CPlayer>;
+template class effect<CUnit>;
 
 }

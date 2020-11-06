@@ -28,6 +28,7 @@
 #pragma once
 
 class CPlayer;
+class CUnit;
 
 namespace wyrmgus {
 
@@ -37,6 +38,7 @@ class sml_property;
 enum class sml_operator;
 
 //a scripted effect
+template <typename scope_type>
 class effect
 {
 public:
@@ -58,25 +60,25 @@ public:
 	{
 	}
 
-	void do_effect(CPlayer *player) const;
+	void do_effect(scope_type *scope) const;
 
-	virtual void do_assignment_effect(CPlayer *player) const
+	virtual void do_assignment_effect(scope_type *scope) const
 	{
-		Q_UNUSED(player)
+		Q_UNUSED(scope)
 
 		throw std::runtime_error("The assignment operator is not supported for \"" + this->get_class_identifier() + "\" effects.");
 	}
 
-	virtual void do_addition_effect(CPlayer *player) const
+	virtual void do_addition_effect(scope_type *scope) const
 	{
-		Q_UNUSED(player)
+		Q_UNUSED(scope)
 
 		throw std::runtime_error("The addition operator is not supported for \"" + this->get_class_identifier() + "\" effects.");
 	}
 
-	virtual void do_subtraction_effect(CPlayer *player) const
+	virtual void do_subtraction_effect(scope_type *scope) const
 	{
-		Q_UNUSED(player)
+		Q_UNUSED(scope)
 
 		throw std::runtime_error("The subtraction operator is not supported for \"" + this->get_class_identifier() + "\" effects.");
 	}
@@ -106,5 +108,8 @@ public:
 private:
 	sml_operator effect_operator;
 };
+
+extern template class effect<CPlayer>;
+extern template class effect<CUnit>;
 
 }

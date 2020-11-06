@@ -28,14 +28,18 @@
 #pragma once
 
 class CPlayer;
+class CUnit;
 
 namespace wyrmgus {
 
-class effect;
 class sml_data;
 class sml_property;
 
-class effect_list
+template <typename scope_type>
+class effect;
+
+template <typename scope_type>
+class effect_list final
 {
 public:
 	effect_list();
@@ -44,11 +48,14 @@ public:
 	void process_sml_property(const sml_property &property);
 	void process_sml_scope(const sml_data &scope);
 	void check() const;
-	void do_effects(CPlayer *player) const;
+	void do_effects(scope_type *scope) const;
 	std::string get_effects_string(const size_t indent = 0) const;
 
 private:
-	std::vector<std::unique_ptr<effect>> effects;
+	std::vector<std::unique_ptr<effect<scope_type>>> effects;
 };
+
+extern template class effect_list<CPlayer>;
+extern template class effect_list<CUnit>;
 
 }

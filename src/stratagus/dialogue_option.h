@@ -37,9 +37,11 @@ namespace wyrmgus {
 
 class dialogue;
 class dialogue_node;
-class effect_list;
 class sml_data;
 class sml_property;
+
+template <typename scope_type>
+class effect_list;
 
 class dialogue_option final
 {
@@ -80,7 +82,7 @@ private:
 	std::string next_node_identifier;
 	const dialogue_node *next_node = nullptr;
 	bool end_dialogue = false;
-	std::unique_ptr<effect_list> effects;
+	std::unique_ptr<effect_list<CPlayer>> effects;
 	std::unique_ptr<LuaCallback> lua_effects;
 	std::string tooltip;
 

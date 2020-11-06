@@ -34,7 +34,7 @@
 
 namespace wyrmgus {
 
-class call_dialogue_effect final : public effect
+class call_dialogue_effect final : public effect<CPlayer>
 {
 public:
 	explicit call_dialogue_effect(const std::string &dialogue_identifier, const sml_operator effect_operator)

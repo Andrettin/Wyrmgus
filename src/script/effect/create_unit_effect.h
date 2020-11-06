@@ -40,7 +40,7 @@
 
 namespace wyrmgus {
 
-class create_unit_effect final : public effect
+class create_unit_effect final : public effect<CPlayer>
 {
 public:
 	explicit create_unit_effect(const sml_operator effect_operator)

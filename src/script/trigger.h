@@ -40,11 +40,12 @@ struct lua_State;
 namespace wyrmgus {
 	class condition;
 	class dynasty;
-	class effect;
-	class effect_list;
 	class faction;
 	class resource;
 	class unit_type;
+
+	template <typename scope_type>
+	class effect_list;
 }
 
 class CTimer
@@ -120,7 +121,7 @@ public:
 		return this->conditions;
 	}
 
-	const std::unique_ptr<effect_list> &get_effects() const
+	const std::unique_ptr<effect_list<CPlayer>> &get_effects() const
 	{
 		return this->effects;
 	}
@@ -136,7 +137,7 @@ public:
 private:
 	std::unique_ptr<condition> preconditions;
 	std::unique_ptr<condition> conditions;
-	std::unique_ptr<effect_list> effects;
+	std::unique_ptr<effect_list<CPlayer>> effects;
 };
 
 }

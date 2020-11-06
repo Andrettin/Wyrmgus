@@ -35,7 +35,7 @@
 
 namespace wyrmgus {
 
-class remove_character_effect final : public effect
+class remove_character_effect final : public effect<CPlayer>
 {
 public:
 	explicit remove_character_effect(const std::string &character_identifier, const sml_operator effect_operator)

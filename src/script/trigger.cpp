@@ -704,7 +704,7 @@ void trigger::process_sml_scope(const sml_data &scope)
 	const std::string &tag = scope.get_tag();
 
 	if (tag == "effects") {
-		this->effects = std::make_unique<effect_list>();
+		this->effects = std::make_unique<effect_list<CPlayer>>();
 		database::process_sml_data(this->effects, scope);
 	} else if (tag == "conditions") {
 		this->conditions = std::make_unique<and_condition>();

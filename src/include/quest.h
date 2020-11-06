@@ -30,6 +30,7 @@
 #include "database/data_type.h"
 #include "database/detailed_data_entry.h"
 
+class CPlayer;
 class CUpgrade;
 class LuaCallback;
 struct lua_State;
@@ -42,7 +43,6 @@ class character;
 class civilization;
 class condition;
 class dialogue;
-class effect_list;
 class faction;
 class icon;
 class player_color;
@@ -52,6 +52,9 @@ class unique_item;
 class unit_class;
 class unit_type;
 enum class objective_type;
+
+template <typename scope_type>
+class effect_list;
 
 class quest_objective
 {
@@ -211,12 +214,12 @@ public:
 		return this->conditions;
 	}
 
-	const std::unique_ptr<effect_list> &get_accept_effects() const
+	const std::unique_ptr<effect_list<CPlayer>> &get_accept_effects() const
 	{
 		return this->accept_effects;
 	}
 
-	const std::unique_ptr<effect_list> &get_completion_effects() const
+	const std::unique_ptr<effect_list<CPlayer>> &get_completion_effects() const
 	{
 		return this->completion_effects;
 	}
@@ -274,8 +277,8 @@ public:
 	std::unique_ptr<LuaCallback> FailEffects;
 private:
 	std::unique_ptr<condition> conditions;
-	std::unique_ptr<effect_list> accept_effects;
-	std::unique_ptr<effect_list> completion_effects;
+	std::unique_ptr<effect_list<CPlayer>> accept_effects;
+	std::unique_ptr<effect_list<CPlayer>> completion_effects;
 	std::vector<std::unique_ptr<quest_objective>> objectives;
 	std::vector<std::string> objective_strings; //display-only objective strings for the quest
 public:
