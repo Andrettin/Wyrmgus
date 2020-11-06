@@ -37,6 +37,7 @@
 #include "script/effect/create_unit_effect.h"
 #include "script/effect/neutral_player_effect.h"
 #include "script/effect/remove_character_effect.h"
+#include "script/effect/remove_unit_effect.h"
 #include "script/effect/resource_effect.h"
 
 namespace wyrmgus {
@@ -59,6 +60,10 @@ std::unique_ptr<effect<scope_type>> effect<scope_type>::from_sml_property(const 
 			return std::make_unique<remove_character_effect>(value, effect_operator);
 		} else if (resource::try_get(key) != nullptr) {
 			return std::make_unique<resource_effect>(resource::get(key), value, effect_operator);
+		}
+	} else if constexpr (std::is_same_v<scope_type, CUnit>) {
+		if (key == "remove_unit") {
+			return std::make_unique<remove_unit_effect>(value, effect_operator);
 		}
 	}
 

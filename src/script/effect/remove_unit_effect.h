@@ -27,66 +27,43 @@
 
 #pragma once
 
-#include "player.h"
-#include "script/effect/scope_effect_base.h"
+#include "script/effect/effect.h"
 #include "unit/unit.h"
-#include "unit/unit_find.h"
-#include "unit/unit_type.h"
+#include "util/string_util.h"
 
 namespace wyrmgus {
 
-class any_unit_of_type_effect final : public scope_effect_base<CPlayer, CUnit>
+class remove_unit_effect final : public effect<CUnit>
 {
 public:
-	explicit any_unit_of_type_effect(const sml_operator effect_operator) : scope_effect_base(effect_operator)
+	explicit remove_unit_effect(const std::string &value, const sml_operator effect_operator)
+		: effect(effect_operator)
 	{
+		this->remove_unit = string::to_bool(value);
 	}
 
 	virtual const std::string &get_class_identifier() const override
 	{
-		static const std::string class_identifier = "any_unit_of_type";
+		static const std::string class_identifier = "remove_unit";
 		return class_identifier;
 	}
 
-	virtual void process_sml_property(const sml_property &property) override
+	virtual void do_assignment_effect(CUnit *unit) const override
 	{
-		const std::string &key = property.get_key();
-		const std::string &value = property.get_value();
-
-		if (key == "unit_type") {
-			this->unit_type = unit_type::get(value);
-		} else {
-			scope_effect_base::process_sml_property(property);
+		if (this->remove_unit) {
+			unit->Remove(nullptr);
+			LetUnitDie(*unit);
 		}
 	}
 
-	virtual std::string get_scope_name() const override
+	virtual std::string get_assignment_string() const override
 	{
-		return "Any " + string::highlight(this->unit_type->get_name()) + " Unit";
-	}
-
-	virtual void check() const override
-	{
-		if (this->unit_type == nullptr) {
-			throw std::runtime_error("\"any_unit_of_type\" effect has no unit type set for it.");
-		}
-
-		scope_effect_base::check();
-	}
-
-	virtual void do_assignment_effect(CPlayer *player) const override
-	{
-		for (CUnit *unit : player->get_type_units(this->unit_type)) {
-			if (unit->IsUnusable()) {
-				continue;
-			}
-
-			this->do_scope_effect(unit);
-		}
+		std::string str = "Remove the unit";
+		return str;
 	}
 
 private:
-	const wyrmgus::unit_type *unit_type = nullptr;
+	bool remove_unit = false; //whether to remove the unit
 };
 
 }

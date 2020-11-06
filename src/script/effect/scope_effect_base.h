@@ -67,7 +67,7 @@ public:
 
 	std::string get_assignment_string(const size_t indent) const override final
 	{
-		std::string str = string::highlight(this->get_scope_name()) + ":\n";
+		std::string str = this->get_scope_name() + ":\n";
 		str += this->effects.get_effects_string(indent + 1);
 		return str;
 	}
