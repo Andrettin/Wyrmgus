@@ -76,7 +76,10 @@ public:
 
 	virtual void do_assignment_effect(CPlayer *player) const override
 	{
-		for (CUnit *unit : player->get_type_units(this->unit_type)) {
+		//copy the unit list, as the effects could change the player's list (e.g. by removing a unit)
+		const std::vector<CUnit *> type_units = player->get_type_units(this->unit_type);
+
+		for (CUnit *unit : type_units) {
 			if (unit->IsUnusable()) {
 				continue;
 			}
