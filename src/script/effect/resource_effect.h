@@ -10,7 +10,7 @@ class resource;
 class resource_effect final : public effect
 {
 public:
-	resource_effect(const resource *resource, const std::string &value, const sml_operator effect_operator)
+	explicit resource_effect(const resource *resource, const std::string &value, const sml_operator effect_operator)
 		: effect(effect_operator), resource(resource)
 	{
 		this->quantity = std::stoi(value);
@@ -53,7 +53,7 @@ public:
 	}
 
 private:
-	const resource *resource = nullptr;
+	const wyrmgus::resource *resource = nullptr;
 	int quantity = 0;
 };
 

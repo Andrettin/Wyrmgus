@@ -44,6 +44,8 @@ class sml_property;
 class dialogue_option final
 {
 public:
+	static constexpr const char *default_name = "~!Continue";
+
 	explicit dialogue_option(const dialogue_node *node);
 	~dialogue_option();
 
@@ -73,7 +75,7 @@ public:
 	std::string get_tooltip() const;
 
 private:
-	std::string name;
+	std::string name = dialogue_option::default_name;
 	const dialogue_node *node = nullptr;
 	std::string next_node_identifier;
 	const dialogue_node *next_node = nullptr;
