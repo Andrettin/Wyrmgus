@@ -678,8 +678,6 @@ public:
 class CBuildRestrictionHasUnit final : public CBuildRestriction
 {
 public:
-	CBuildRestrictionHasUnit() : Count(0), RestrictType(nullptr) {};
-
 	virtual std::unique_ptr<CBuildRestriction> duplicate() const override
 	{
 		auto b = std::make_unique<CBuildRestrictionHasUnit>();
@@ -694,10 +692,10 @@ public:
 	virtual void Init() override;
 	virtual bool Check(const CUnit *builder, const wyrmgus::unit_type &type, const Vec2i &pos, CUnit *&ontoptarget, int z) const override;
 	
-	int Count;
+	int Count = 0;
 	DistanceTypeType CountType;
 	std::string RestrictTypeName;
-	wyrmgus::unit_type *RestrictType;
+	wyrmgus::unit_type *RestrictType = nullptr;
 	std::string RestrictTypeOwner;
 };
 

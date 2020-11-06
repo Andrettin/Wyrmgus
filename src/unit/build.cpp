@@ -70,11 +70,12 @@ const CBuildRestrictionOnTop *OnTopDetails(const wyrmgus::unit_type &type, const
 			}
 			continue;
 		}
+
 		CBuildRestrictionAnd *andb = dynamic_cast<CBuildRestrictionAnd *>(b.get());
 
 		if (andb) {
 			for (const auto &sub_b : andb->and_list) {
-				const CBuildRestrictionOnTop *ontopb = dynamic_cast<CBuildRestrictionOnTop *>(sub_b.get());
+				ontopb = dynamic_cast<CBuildRestrictionOnTop *>(sub_b.get());
 				if (ontopb) {
 					if (!parent) {
 						// Guess this is right
@@ -210,8 +211,12 @@ void CBuildRestrictionHasUnit::Init()
 /**
 **  Check HasUnit Restriction
 */
-bool CBuildRestrictionHasUnit::Check(const CUnit *builder, const wyrmgus::unit_type &type, const Vec2i &pos, CUnit *&, int z) const
+bool CBuildRestrictionHasUnit::Check(const CUnit *builder, const wyrmgus::unit_type &type, const Vec2i &pos, CUnit *&, const int z) const
 {
+	Q_UNUSED(type)
+	Q_UNUSED(pos)
+	Q_UNUSED(z)
+
 	Vec2i pos1(0, 0);
 	Vec2i pos2(0, 0);
 	CPlayer* player = builder != nullptr ? builder->Player : CPlayer::GetThisPlayer();
@@ -446,6 +451,8 @@ void CBuildRestrictionTerrain::Init()
 */
 bool CBuildRestrictionTerrain::Check(const CUnit *builder, const wyrmgus::unit_type &type, const Vec2i &pos, CUnit *&, int z) const
 {
+	Q_UNUSED(builder)
+
 	Assert(CMap::Map.Info.IsPointOnMap(pos, z));
 
 	for (int x = pos.x; x < pos.x + type.get_tile_width(); ++x) {
