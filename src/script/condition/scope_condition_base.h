@@ -32,6 +32,7 @@
 
 namespace wyrmgus {
 
+template <typename scope_type>
 class scope_condition_base : public condition
 {
 public:
@@ -50,14 +51,9 @@ public:
 		this->conditions.check_validity();
 	}
 
-	bool check_scope(const CPlayer *player, const bool ignore_units) const
+	bool check_scope(const scope_type *scope, const bool ignore_units) const
 	{
-		return this->conditions.check(player, ignore_units);
-	}
-
-	bool check_scope(const CUnit *unit, const bool ignore_units) const
-	{
-		return this->conditions.check(unit, ignore_units);
+		return this->conditions.check(scope, ignore_units);
 	}
 
 	virtual std::string get_string(const std::string &prefix = "") const override final

@@ -35,7 +35,7 @@
 
 namespace wyrmgus {
 
-class any_unit_of_class_condition final : public scope_condition_base
+class any_unit_of_class_condition final : public scope_condition_base<CUnit>
 {
 public:
 	virtual void process_sml_property(const sml_property &property) override

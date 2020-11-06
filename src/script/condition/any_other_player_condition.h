@@ -32,7 +32,7 @@
 
 namespace wyrmgus {
 
-class any_other_player_condition final : public scope_condition_base
+class any_other_player_condition final : public scope_condition_base<CPlayer>
 {
 public:
 	virtual bool check(const CPlayer *player, const bool ignore_units) const override
