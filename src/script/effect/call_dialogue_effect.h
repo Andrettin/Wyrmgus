@@ -45,7 +45,7 @@ public:
 
 	virtual const std::string &get_class_identifier() const override
 	{
-		static std::string class_identifier = "call_dialogue";
+		static const std::string class_identifier = "call_dialogue";
 		return class_identifier;
 	}
 

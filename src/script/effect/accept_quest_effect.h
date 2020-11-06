@@ -45,7 +45,7 @@ public:
 
 	virtual const std::string &get_class_identifier() const override
 	{
-		static std::string class_identifier = "accept_quest";
+		static const std::string class_identifier = "accept_quest";
 		return class_identifier;
 	}
 

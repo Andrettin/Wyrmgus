@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-//      (c) Copyright 2019-2020 by Andrettin
+//      (c) Copyright 2020 by Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -27,49 +27,37 @@
 
 #pragma once
 
-#include "character.h"
 #include "player.h"
-#include "script/effect/effect.h"
-#include "unit/unit.h"
-#include "util/string_util.h"
+#include "script/effect/scope_effect.h"
 
 namespace wyrmgus {
 
-class remove_character_effect final : public effect<CPlayer>
+template <typename scope_type>
+class neutral_player_effect final : public scope_effect<scope_type, CPlayer>
 {
 public:
-	explicit remove_character_effect(const std::string &character_identifier, const sml_operator effect_operator)
-		: effect(effect_operator)
+	explicit neutral_player_effect(const sml_operator effect_operator) : scope_effect(effect_operator)
 	{
-		this->character = character::get(character_identifier);
 	}
 
 	virtual const std::string &get_class_identifier() const override
 	{
-		static const std::string class_identifier = "remove_character";
+		static const std::string class_identifier = "neutral_player";
 		return class_identifier;
 	}
 
-	virtual void do_assignment_effect(CPlayer *player) const override
+	virtual const std::string &get_scope_name() const override
 	{
-		Q_UNUSED(player)
-
-		CUnit *character_unit = this->character->get_unit();
-
-		if (character_unit != nullptr) {
-			character_unit->Remove(nullptr);
-			LetUnitDie(*character_unit);
-		}
+		static const std::string scope_name = "Neutral Player";
+		return scope_name;
 	}
-
-	virtual std::string get_assignment_string() const override
+		
+	virtual CPlayer *get_scope(const scope_type *upper_scope) const override
 	{
-		std::string str = "Remove the " + string::highlight(this->character->get_name()) + " character";
-		return str;
-	}
+		Q_UNUSED(upper_scope)
 
-private:
-	const wyrmgus::character *character = nullptr; //the character to be removed
+		return CPlayer::Players[PlayerNumNeutral];
+	}
 };
 
 }

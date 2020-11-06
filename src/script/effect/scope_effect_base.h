@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-//      (c) Copyright 2019-2020 by Andrettin
+//      (c) Copyright 2020 by Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -27,49 +27,50 @@
 
 #pragma once
 
-#include "character.h"
-#include "player.h"
 #include "script/effect/effect.h"
-#include "unit/unit.h"
-#include "util/string_util.h"
+#include "script/effect/effect_list.h"
 
 namespace wyrmgus {
 
-class remove_character_effect final : public effect<CPlayer>
+template <typename upper_scope_type, typename scope_type>
+class scope_effect_base : public effect<upper_scope_type>
 {
 public:
-	explicit remove_character_effect(const std::string &character_identifier, const sml_operator effect_operator)
-		: effect(effect_operator)
+	explicit scope_effect_base(const sml_operator effect_operator) : effect(effect_operator)
 	{
-		this->character = character::get(character_identifier);
 	}
 
-	virtual const std::string &get_class_identifier() const override
+	virtual void process_sml_property(const sml_property &property) override
 	{
-		static const std::string class_identifier = "remove_character";
-		return class_identifier;
+		this->effects.process_sml_property(property);
 	}
 
-	virtual void do_assignment_effect(CPlayer *player) const override
+	virtual void process_sml_scope(const sml_data &scope) override final
 	{
-		Q_UNUSED(player)
-
-		CUnit *character_unit = this->character->get_unit();
-
-		if (character_unit != nullptr) {
-			character_unit->Remove(nullptr);
-			LetUnitDie(*character_unit);
-		}
+		this->effects.process_sml_scope(scope);
 	}
 
-	virtual std::string get_assignment_string() const override
+	virtual void check() const override
 	{
-		std::string str = "Remove the " + string::highlight(this->character->get_name()) + " character";
+		this->effects.check();
+	}
+
+	void do_scope_effect(scope_type *scope) const
+	{
+		this->effects.do_effects(scope);
+	}
+
+	virtual const std::string &get_scope_name() const = 0;
+
+	std::string get_assignment_string(const size_t indent) const override final
+	{
+		std::string str = string::highlight(this->get_scope_name()) + ":\n";
+		str += this->effects.get_effects_string(indent + 1);
 		return str;
 	}
 
 private:
-	const wyrmgus::character *character = nullptr; //the character to be removed
+	effect_list<scope_type> effects;
 };
 
 }

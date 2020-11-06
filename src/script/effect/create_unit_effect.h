@@ -56,7 +56,7 @@ public:
 
 	virtual const std::string &get_class_identifier() const override
 	{
-		static std::string class_identifier = "create_unit";
+		static const std::string class_identifier = "create_unit";
 		return class_identifier;
 	}
 

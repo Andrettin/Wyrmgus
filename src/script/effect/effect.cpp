@@ -34,6 +34,7 @@
 #include "script/effect/accept_quest_effect.h"
 #include "script/effect/call_dialogue_effect.h"
 #include "script/effect/create_unit_effect.h"
+#include "script/effect/neutral_player_effect.h"
 #include "script/effect/remove_character_effect.h"
 #include "script/effect/resource_effect.h"
 
@@ -69,9 +70,13 @@ std::unique_ptr<effect<scope_type>> effect<scope_type>::from_sml_scope(const sml
 	const std::string &effect_identifier = scope.get_tag();
 	std::unique_ptr<effect> effect;
 
-	if constexpr (std::is_same_v<scope_type, CPlayer>) {
-		if (effect_identifier == "create_unit") {
-			effect = std::make_unique<create_unit_effect>(scope.get_operator());
+	if (effect_identifier == "neutral_player") {
+		effect = std::make_unique<neutral_player_effect<scope_type>>(scope.get_operator());
+	} else {
+		if constexpr (std::is_same_v<scope_type, CPlayer>) {
+			if (effect_identifier == "create_unit") {
+				effect = std::make_unique<create_unit_effect>(scope.get_operator());
+			}
 		}
 	}
 
@@ -120,11 +125,11 @@ void effect<scope_type>::do_effect(scope_type *scope) const
 }
 
 template <typename scope_type>
-std::string effect<scope_type>::get_string() const
+std::string effect<scope_type>::get_string(const size_t indent) const
 {
 	switch (this->effect_operator) {
 		case sml_operator::assignment:
-			return this->get_assignment_string();
+			return this->get_assignment_string(indent);
 		case sml_operator::addition:
 			return this->get_addition_string();
 		case sml_operator::subtraction:

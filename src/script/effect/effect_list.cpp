@@ -83,7 +83,7 @@ std::string effect_list<scope_type>::get_effects_string(const size_t indent) con
 			continue;
 		}
 
-		const std::string effect_string = effect->get_string();
+		const std::string effect_string = effect->get_string(indent);
 		if (effect_string.empty()) {
 			continue;
 		}

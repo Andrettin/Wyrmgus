@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-//      (c) Copyright 2019-2020 by Andrettin
+//      (c) Copyright 2020 by Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -27,49 +27,25 @@
 
 #pragma once
 
-#include "character.h"
-#include "player.h"
-#include "script/effect/effect.h"
-#include "unit/unit.h"
-#include "util/string_util.h"
+#include "script/effect/scope_effect_base.h"
 
 namespace wyrmgus {
 
-class remove_character_effect final : public effect<CPlayer>
+template <typename upper_scope_type, typename scope_type>
+class scope_effect : public scope_effect_base<upper_scope_type, scope_type>
 {
 public:
-	explicit remove_character_effect(const std::string &character_identifier, const sml_operator effect_operator)
-		: effect(effect_operator)
+	explicit scope_effect(const sml_operator effect_operator) : scope_effect_base(effect_operator)
 	{
-		this->character = character::get(character_identifier);
 	}
 
-	virtual const std::string &get_class_identifier() const override
+	virtual scope_type *get_scope(const upper_scope_type *upper_scope) const = 0;
+
+	virtual void do_assignment_effect(upper_scope_type *upper_scope) const override final
 	{
-		static const std::string class_identifier = "remove_character";
-		return class_identifier;
+		scope_type *new_scope = this->get_scope(upper_scope);
+		this->do_scope_effect(new_scope);
 	}
-
-	virtual void do_assignment_effect(CPlayer *player) const override
-	{
-		Q_UNUSED(player)
-
-		CUnit *character_unit = this->character->get_unit();
-
-		if (character_unit != nullptr) {
-			character_unit->Remove(nullptr);
-			LetUnitDie(*character_unit);
-		}
-	}
-
-	virtual std::string get_assignment_string() const override
-	{
-		std::string str = "Remove the " + string::highlight(this->character->get_name()) + " character";
-		return str;
-	}
-
-private:
-	const wyrmgus::character *character = nullptr; //the character to be removed
 };
 
 }
