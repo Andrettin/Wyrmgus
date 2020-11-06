@@ -32,6 +32,7 @@
 #include "config.h"
 #include "database/database.h"
 #include "script/effect/accept_quest_effect.h"
+#include "script/effect/any_unit_of_type_effect.h"
 #include "script/effect/call_dialogue_effect.h"
 #include "script/effect/create_unit_effect.h"
 #include "script/effect/neutral_player_effect.h"
@@ -74,7 +75,9 @@ std::unique_ptr<effect<scope_type>> effect<scope_type>::from_sml_scope(const sml
 		effect = std::make_unique<neutral_player_effect<scope_type>>(scope.get_operator());
 	} else {
 		if constexpr (std::is_same_v<scope_type, CPlayer>) {
-			if (effect_identifier == "create_unit") {
+			if (effect_identifier == "any_unit_of_type") {
+				effect = std::make_unique<any_unit_of_type_effect>(scope.get_operator());
+			} else if (effect_identifier == "create_unit") {
 				effect = std::make_unique<create_unit_effect>(scope.get_operator());
 			}
 		}

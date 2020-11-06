@@ -53,7 +53,7 @@ public:
 	virtual void check_validity() const override
 	{
 		if (this->unit_class == nullptr) {
-			throw std::runtime_error("\"any_unit_class\" condition has no unit class set for it.");
+			throw std::runtime_error("\"any_unit_of_class\" condition has no unit class set for it.");
 		}
 
 		scope_condition_base::check_validity();

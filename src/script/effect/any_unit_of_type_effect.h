@@ -27,53 +27,66 @@
 
 #pragma once
 
-#include "script/effect/effect.h"
-#include "script/effect/effect_list.h"
+#include "player.h"
+#include "script/effect/scope_effect_base.h"
+#include "unit/unit.h"
+#include "unit/unit_find.h"
+#include "unit/unit_type.h"
 
 namespace wyrmgus {
 
-template <typename upper_scope_type, typename scope_type>
-class scope_effect_base : public effect<upper_scope_type>
+class any_unit_of_type_effect final : public scope_effect_base<CPlayer, CUnit>
 {
 public:
-	explicit scope_effect_base(const sml_operator effect_operator) : effect(effect_operator)
+	explicit any_unit_of_type_effect(const sml_operator effect_operator) : scope_effect_base(effect_operator)
 	{
-		if (effect_operator != sml_operator::assignment) {
-			throw std::runtime_error("Scope effects can only have the assignment operator as their operator.");
-		}
+	}
+
+	virtual const std::string &get_class_identifier() const override
+	{
+		static const std::string class_identifier = "any_unit_of_type";
+		return class_identifier;
 	}
 
 	virtual void process_sml_property(const sml_property &property) override
 	{
-		this->effects.process_sml_property(property);
+		const std::string &key = property.get_key();
+		const std::string &value = property.get_value();
+
+		if (key == "unit_type") {
+			this->unit_type = unit_type::get(value);
+		} else {
+			scope_effect_base::process_sml_property(property);
+		}
 	}
 
-	virtual void process_sml_scope(const sml_data &scope) override final
+	virtual std::string get_scope_name() const override
 	{
-		this->effects.process_sml_scope(scope);
+		return "Any " + this->unit_type->get_name() + " Unit";
 	}
 
 	virtual void check() const override
 	{
-		this->effects.check();
+		if (this->unit_type == nullptr) {
+			throw std::runtime_error("\"any_unit_of_type\" effect has no unit type set for it.");
+		}
+
+		scope_effect_base::check();
 	}
 
-	void do_scope_effect(scope_type *scope) const
+	virtual void do_assignment_effect(CPlayer *player) const override
 	{
-		this->effects.do_effects(scope);
-	}
+		for (CUnit *unit : player->get_type_units(this->unit_type)) {
+			if (unit->IsUnusable()) {
+				continue;
+			}
 
-	virtual std::string get_scope_name() const = 0;
-
-	std::string get_assignment_string(const size_t indent) const override final
-	{
-		std::string str = string::highlight(this->get_scope_name()) + ":\n";
-		str += this->effects.get_effects_string(indent + 1);
-		return str;
+			this->do_scope_effect(unit);
+		}
 	}
 
 private:
-	effect_list<scope_type> effects;
+	const wyrmgus::unit_type *unit_type = nullptr;
 };
 
 }

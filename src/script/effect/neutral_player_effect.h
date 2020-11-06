@@ -46,12 +46,11 @@ public:
 		return class_identifier;
 	}
 
-	virtual const std::string &get_scope_name() const override
+	virtual std::string get_scope_name() const override
 	{
-		static const std::string scope_name = "Neutral Player";
-		return scope_name;
+		return "Neutral Player";
 	}
-		
+	
 	virtual CPlayer *get_scope(const scope_type *upper_scope) const override
 	{
 		Q_UNUSED(upper_scope)
