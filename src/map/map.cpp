@@ -2170,9 +2170,9 @@ void CMap::CalculateTileTransitions(const Vec2i &pos, bool overlay, int z)
 							mf.TransitionTiles.push_back(std::pair<wyrmgus::terrain_type *, int>(adjacent_terrain, adjacent_transition_tiles[SyncRand(adjacent_transition_tiles.size())]));
 							found_transition = true;
 						} else {
-							const std::vector<int> &adjacent_transition_tiles = adjacent_terrain->get_adjacent_transition_tiles(nullptr, transition_type);
-							if (!adjacent_transition_tiles.empty()) {
-								mf.TransitionTiles.push_back(std::pair<wyrmgus::terrain_type *, int>(adjacent_terrain, adjacent_transition_tiles[SyncRand(adjacent_transition_tiles.size())]));
+							const std::vector<int> &sub_adjacent_transition_tiles = adjacent_terrain->get_adjacent_transition_tiles(nullptr, transition_type);
+							if (!sub_adjacent_transition_tiles.empty()) {
+								mf.TransitionTiles.push_back(std::pair<wyrmgus::terrain_type *, int>(adjacent_terrain, wyrmgus::vector::get_random(sub_adjacent_transition_tiles)));
 								found_transition = true;
 							}
 						}
@@ -2195,9 +2195,9 @@ void CMap::CalculateTileTransitions(const Vec2i &pos, bool overlay, int z)
 							mf.OverlayTransitionTiles.push_back(std::pair<wyrmgus::terrain_type *, int>(adjacent_terrain, adjacent_transition_tiles[SyncRand(adjacent_transition_tiles.size())]));
 							found_transition = true;
 						} else {
-							const std::vector<int> &adjacent_transition_tiles = adjacent_terrain->get_transition_tiles(nullptr, transition_type);
-							if (!adjacent_transition_tiles.empty()) {
-								mf.OverlayTransitionTiles.push_back(std::pair<wyrmgus::terrain_type *, int>(adjacent_terrain, adjacent_transition_tiles[SyncRand(adjacent_transition_tiles.size())]));
+							const std::vector<int> &sub_adjacent_transition_tiles = adjacent_terrain->get_transition_tiles(nullptr, transition_type);
+							if (!sub_adjacent_transition_tiles.empty()) {
+								mf.OverlayTransitionTiles.push_back(std::pair<wyrmgus::terrain_type *, int>(adjacent_terrain, wyrmgus::vector::get_random(sub_adjacent_transition_tiles)));
 								found_transition = true;
 							}
 						}
