@@ -205,7 +205,7 @@ extern void ExitFatal(int err);             /// Exit with fatal error
 extern void UpdateDisplay();            /// Game display update
 extern void DrawMapArea();              /// Draw the map area
 extern void GameMainLoop();             /// Game main loop
-extern int stratagusMain(int argc, char **argv); /// main entry
+extern void stratagusMain(int argc, char **argv); /// main entry
 
 //Wyrmgus start
 enum Directions {

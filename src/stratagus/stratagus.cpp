@@ -664,7 +664,7 @@ static LONG WINAPI CreateDumpFile(EXCEPTION_POINTERS *ExceptionInfo)
 **  @param argc  Number of arguments.
 **  @param argv  Vector of arguments.
 */
-int stratagusMain(int argc, char **argv)
+void stratagusMain(int argc, char **argv)
 {
 #ifdef USE_BEOS
 	//  Parse arguments for BeOS
@@ -761,7 +761,13 @@ int stratagusMain(int argc, char **argv)
 	UnitManager.Init();	// Units memory management
 	PreMenuSetup();		// Load everything needed for menus
 
-	MenuLoop();
+	try {
+		MenuLoop();
+	} catch (const std::exception &exception) {
+		wyrmgus::exception::report(exception);
+		Exit(EXIT_FAILURE);
+		return;
+	}
 
 	Exit(0);
 #ifdef USE_STACKTRACE
@@ -774,7 +780,6 @@ int stratagusMain(int argc, char **argv)
 		exit(1);
 	}
 #endif
-	return 0;
 }
 
 //Wyrmgus start
