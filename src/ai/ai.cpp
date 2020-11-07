@@ -662,8 +662,7 @@ void AiInit(CPlayer &player)
 	auto pai = std::make_unique<PlayerAi>();
 
 	if (!pai) {
-		fprintf(stderr, "Out of memory.\n");
-		exit(0);
+		throw std::runtime_error("Out of memory.");
 	}
 
 	pai->Player = &player;
@@ -673,9 +672,7 @@ void AiInit(CPlayer &player)
 
 	//  Search correct AI type.
 	if (AiTypes.empty()) {
-		DebugPrint("AI: Got no scripts at all! You need at least one dummy fallback script.\n");
-		DebugPrint("AI: Look at the DefineAi() documentation.\n");
-		Exit(0);
+		throw std::runtime_error("AI: Got no scripts at all! You need at least one dummy fallback script. See the DefineAi() documentation.");
 	}
 
 	CAiType *ait = nullptr;
