@@ -101,4 +101,9 @@ inline bool is_cardinally_adjacent_to(const QPoint &point, const QPoint &other_p
 	return point::is_horizontally_adjacent_to(point, other_point) || point::is_vertically_adjacent_to(point, other_point);
 }
 
+inline std::string to_string(const QPoint &point)
+{
+	return "(" + std::to_string(point.x()) + ", " + std::to_string(point.y()) + ")";
+}
+
 }

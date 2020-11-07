@@ -47,6 +47,7 @@
 #include "unit/unit_type.h"
 #include "util/container_util.h"
 #include "util/geocoordinate_util.h"
+#include "util/point_util.h"
 #include "util/random.h"
 #include "util/string_util.h"
 #include "util/vector_util.h"
@@ -245,7 +246,7 @@ void site::initialize()
 			if (find_iterator == this->map_template->sites_by_position.end()) {
 				this->map_template->sites_by_position[this->get_pos()] = this;
 			} else {
-				throw std::runtime_error("Position (" + std::to_string(this->get_pos().x()) + ", " + std::to_string(this->get_pos().y()) + ") of map template \"" + this->map_template->get_identifier() + "\" already has a site (\"" + find_iterator->second->get_identifier() + "\").");
+				throw std::runtime_error("Position " + point::to_string(this->get_pos()) + " of map template \"" + this->map_template->get_identifier() + "\" already has a site (\"" + find_iterator->second->get_identifier() + "\").");
 			}
 		}
 

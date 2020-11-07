@@ -64,6 +64,7 @@
 #include "unit/historical_unit.h"
 #include "unit/unit.h"
 #include "unit/unit_class.h"
+#include "util/point_util.h"
 #include "version.h"
 #include "video/video.h"
 #include "world.h"
@@ -615,13 +616,15 @@ static int CclSetMapTemplateTile(lua_State *l)
 	const int x = LuaToNumber(l, 3);
 	const int y = LuaToNumber(l, 4);
 
+	const QPoint tile_pos(x, y);
+
 	try {
 		const int tile_number = LuaToNumber(l, 2);
 		wyrmgus::terrain_type *terrain = wyrmgus::terrain_type::get_by_tile_number(tile_number);
 
-		map_template->set_tile_terrain(QPoint(x, y), terrain);
+		map_template->set_tile_terrain(tile_pos, terrain);
 	} catch (...) {
-		std::throw_with_nested(std::runtime_error("Failed to set tile (" + std::to_string(x) + ", " + std::to_string(y) + ") for map template \"" + map_template->get_identifier() + "\"."));
+		std::throw_with_nested(std::runtime_error("Failed to set tile " + wyrmgus::point::to_string(tile_pos) + " for map template \"" + map_template->get_identifier() + "\"."));
 	}
 	
 	return 1;

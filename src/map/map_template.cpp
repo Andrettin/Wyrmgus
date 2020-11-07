@@ -495,7 +495,7 @@ void map_template::ApplyTerrainImage(bool overlay, Vec2i template_start_pos, Vec
 	const QImage terrain_image(terrain_filename.c_str());
 
 	if (terrain_image.size() != this->get_size()) {
-		throw std::runtime_error("The "s + (overlay ? "overlay " : "") + "terrain image for map template \"" + this->get_identifier() + "\" has a different size (" + std::to_string(terrain_image.width()) + ", " + std::to_string(terrain_image.height()) + ") than that of the map template itself (" + std::to_string(this->get_width()) + ", " + std::to_string(this->get_height()) + ").");
+		throw std::runtime_error("The "s + (overlay ? "overlay " : "") + "terrain image for map template \"" + this->get_identifier() + "\" has a different size " + size::to_string(terrain_image.size()) + " than that of the map template itself " + size::to_string(this->get_size()) + ".");
 	}
 
 	for (int y = 0; y < terrain_image.height(); ++y) {
@@ -1327,7 +1327,7 @@ void map_template::apply_sites(const QPoint &template_start_pos, const QPoint &m
 			const QPoint building_unit_offset = unit_type->get_tile_center_pos_offset();
 			if (!is_position_shift_acceptable && first_building) {
 				if (!OnTopDetails(*unit_type, nullptr) && !UnitTypeCanBeAt(*unit_type, site_pos - building_unit_offset, z) && CMap::Map.Info.IsPointOnMap(site_pos - building_unit_offset, z) && CMap::Map.Info.IsPointOnMap(site_pos - building_unit_offset + size::to_point(unit_type->get_tile_size() - QSize(1, 1)), z)) {
-					throw std::runtime_error("The \"" + unit_type->get_identifier() + "\" representing the minor site of \"" + site->get_identifier() + "\" should be placed on (" + std::to_string(site_raw_pos.x()) + ", " + std::to_string(site_raw_pos.y()) + "), but it cannot be there.");
+					throw std::runtime_error("The \"" + unit_type->get_identifier() + "\" representing the minor site of \"" + site->get_identifier() + "\" should be placed on " + point::to_string(site_raw_pos) + ", but it cannot be there.");
 				}
 			}
 
