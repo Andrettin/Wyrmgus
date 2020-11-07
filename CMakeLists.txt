@@ -221,7 +221,6 @@ set(map_SRCS
 	src/map/map_template.cpp
 	src/map/map_template_container.cpp
 	src/map/map_wall.cpp
-	src/map/mapfield.cpp
 	src/map/minimap.cpp
 	src/map/region.cpp
 	src/map/script_map.cpp
@@ -230,6 +229,7 @@ set(map_SRCS
 	src/map/terrain_feature.cpp
 	src/map/terrain_geodata_map.cpp
 	src/map/terrain_type.cpp
+	src/map/tile.cpp
 	src/map/tileset.cpp
 )
 source_group(map FILES ${map_SRCS})
