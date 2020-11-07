@@ -123,7 +123,7 @@ int Spell_Demolish::Cast(CUnit &caster, const wyrmgus::spell &, CUnit *, const V
 	Vec2i ipos;
 	for (ipos.x = minpos.x; ipos.x <= maxpos.x; ++ipos.x) {
 		for (ipos.y = minpos.y; ipos.y <= maxpos.y; ++ipos.y) {
-			const CMapField &mf = *Map.Field(ipos);
+			const wyrmgus::tile &mf = *Map.Field(ipos);
 			if (SquareDistance(ipos, goalPos) > square(this->Range)) {
 				// Not in circle range
 				continue;
@@ -143,8 +143,8 @@ int Spell_Demolish::Cast(CUnit &caster, const wyrmgus::spell &, CUnit *, const V
 		for (ipos.x = minpos.x; ipos.x <= maxpos.x; ++ipos.x) {
 			for (ipos.y = minpos.y; ipos.y <= maxpos.y; ++ipos.y) {
 				//Wyrmgus start
-//				const CMapField &mf = *CMap::Map.Field(ipos);
-				const CMapField &mf = *CMap::Map.Field(ipos, z);
+//				const wyrmgus::tile &mf = *CMap::Map.Field(ipos);
+				const wyrmgus::tile &mf = *CMap::Map.Field(ipos, z);
 				//Wyrmgus end
 				//Wyrmgus start
 //				if (SquareDistance(ipos, caster.tilePos) > square(this->Range)) {

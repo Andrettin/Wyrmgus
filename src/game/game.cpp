@@ -863,7 +863,7 @@ int WriteMapSetup(const char *mapSetup, CMap &map, int writeTerrain, bool is_mod
 				for (int y = 0; y < map_layer->get_height(); ++y) {
 					for (int x = 0; x < map_layer->get_width(); ++x) {
 						//Wyrmgus start
-						const CMapField &mf = *map_layer->Field(x, y);
+						const wyrmgus::tile &mf = *map_layer->Field(x, y);
 	//					const int tile = mf.getGraphicTile();
 	//					const int n = map.Tileset->findTileIndexByTile(tile);
 						//Wyrmgus end

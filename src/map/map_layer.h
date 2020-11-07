@@ -30,7 +30,6 @@
 #include "map/map_template_container.h"
 #include "vec2i.h"
 
-class CMapField;
 class CScheduledSeason;
 class CScheduledTimeOfDay;
 class CSeasonSchedule;
@@ -40,6 +39,7 @@ class CUnit;
 namespace wyrmgus {
 	class plane;
 	class season;
+	class tile;
 	class time_of_day;
 	class world;
 }
@@ -62,7 +62,7 @@ public:
 	**
 	**	@return	The map field
 	*/
-	CMapField *Field(const unsigned int index) const;
+	wyrmgus::tile *Field(const unsigned int index) const;
 	
 	/**
 	**	@brief	Get the map field at a given location
@@ -72,7 +72,7 @@ public:
 	**
 	**	@return	The map field
 	*/
-	CMapField *Field(const int x, const int y) const
+	wyrmgus::tile *Field(const int x, const int y) const
 	{
 		return this->Field(x + y * this->get_width());
 	}
@@ -84,7 +84,7 @@ public:
 	**
 	**	@return	The map field
 	*/
-	CMapField *Field(const Vec2i &pos) const
+	wyrmgus::tile *Field(const Vec2i &pos) const
 	{
 		return this->Field(pos.x, pos.y);
 	}
@@ -152,7 +152,7 @@ public:
 	
 	int ID = -1;
 private:
-	std::unique_ptr<CMapField[]> Fields; //fields on the map layer
+	std::unique_ptr<wyrmgus::tile[]> Fields; //fields on the map layer
 	QSize size;									/// the size in tiles of the map layer
 public:
 	CScheduledTimeOfDay *TimeOfDay = nullptr;	/// the time of day for the map layer

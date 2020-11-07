@@ -959,7 +959,7 @@ int COrder_Resource::GatherResource(CUnit &unit)
 		if (CMap::Map.Info.IsPointOnMap(this->goalPos, this->MapLayer)) {
 		//Wyrmgus end
 			//Wyrmgus start
-			CMapField &mf = *CMap::Map.Field(this->goalPos, this->MapLayer);
+			wyrmgus::tile &mf = *CMap::Map.Field(this->goalPos, this->MapLayer);
 			if (addload > mf.get_value()) {
 				addload = mf.get_value();
 			}

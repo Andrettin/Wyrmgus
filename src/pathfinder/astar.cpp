@@ -697,7 +697,7 @@ static int CostMoveToCallBack_Default(unsigned int index, const CUnit &unit, int
 	int h = unit.Type->get_tile_height();
 	const int w = unit.Type->get_tile_width();
 	do {
-		const CMapField *mf = CMap::Map.Field(index, z);
+		const wyrmgus::tile *mf = CMap::Map.Field(index, z);
 		int i = w;
 		do {
 			//Wyrmgus start

@@ -3299,7 +3299,7 @@ void MarkUnitFieldFlags(const CUnit &unit)
 		return ;
 	}
 	do {
-		CMapField *mf = unit.MapLayer->Field(index);
+		wyrmgus::tile *mf = unit.MapLayer->Field(index);
 		int w = width;
 		do {
 			mf->Flags |= flags;
@@ -3312,7 +3312,7 @@ void MarkUnitFieldFlags(const CUnit &unit)
 class _UnmarkUnitFieldFlags
 {
 public:
-	_UnmarkUnitFieldFlags(const CUnit &unit, CMapField *mf) : main(&unit), mf(mf)
+	_UnmarkUnitFieldFlags(const CUnit &unit, wyrmgus::tile *mf) : main(&unit), mf(mf)
 	{}
 
 	void operator()(CUnit *const unit) const
@@ -3323,7 +3323,7 @@ public:
 	}
 private:
 	const CUnit *const main;
-	CMapField *mf;
+	wyrmgus::tile *mf;
 };
 
 
@@ -3343,7 +3343,7 @@ void UnmarkUnitFieldFlags(const CUnit &unit)
 		return ;
 	}
 	do {
-		CMapField *mf = unit.MapLayer->Field(index);
+		wyrmgus::tile *mf = unit.MapLayer->Field(index);
 
 		int w = width;
 		do {
@@ -3587,7 +3587,7 @@ void CUnit::UpdateSettlement()
 			return;
 		}
 
-		const CMapField *tile = this->get_center_tile();
+		const wyrmgus::tile *tile = this->get_center_tile();
 
 		if (tile->get_owner() == this->Player || (this->Player->HasNeutralFactionType() && tile->get_owner() != nullptr)) {
 			this->settlement = tile->get_settlement();
@@ -3779,7 +3779,7 @@ void CUnit::Place(const Vec2i &pos, int z)
 						continue;
 					}
 					Vec2i building_tile_pos(x, y);
-					CMapField &mf = *this->MapLayer->Field(building_tile_pos);
+					wyrmgus::tile &mf = *this->MapLayer->Field(building_tile_pos);
 					if ((mf.Flags & MapFieldRoad) || (mf.Flags & MapFieldRailroad) || (mf.Flags & MapFieldWall)) {
 						CMap::Map.RemoveTileOverlayTerrain(building_tile_pos, this->MapLayer->ID);
 					}
@@ -4501,7 +4501,7 @@ void UnitCountSeen(CUnit &unit)
 			int y = height;
 			unsigned int index = unit.Offset;
 			do {
-				CMapField *mf = unit.MapLayer->Field(index);
+				wyrmgus::tile *mf = unit.MapLayer->Field(index);
 				int x = width;
 				do {
 					if (unit.Type->BoolFlag[PERMANENTCLOAK_INDEX].value && unit.Player != CPlayer::Players[p]) {
@@ -5495,7 +5495,7 @@ QPoint CUnit::get_center_tile_pos() const
 	return first_container->tilePos + first_container->Type->get_tile_center_pos_offset();
 }
 
-const CMapField *CUnit::get_center_tile() const
+const wyrmgus::tile *CUnit::get_center_tile() const
 {
 	return this->MapLayer->Field(this->get_center_tile_pos());
 }

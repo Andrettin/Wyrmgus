@@ -327,7 +327,7 @@ public:
 		return (!unit->Destroyed && unit->Type == type
 				&& (worker->Player == unit->Player || worker->IsAllied(*unit)));
 	}
-	CUnit *Find(const CMapField *const mf) const
+	CUnit *Find(const wyrmgus::tile *const mf) const
 	{
 		return mf->UnitCache.find(*this);
 	}

@@ -36,7 +36,6 @@
 #include "util/point_container.h"
 #include "vec2i.h"
 
-class CMapField;
 struct lua_State;
 
 static int CclDefineMapTemplate(lua_State *l);
@@ -50,6 +49,7 @@ class historical_unit;
 class plane;
 class site;
 class terrain_type;
+class tile;
 class unique_item;
 class unit_class;
 class unit_type;
@@ -68,10 +68,10 @@ public:
 	void process_sml_scope(const sml_data &scope);
 	void ProcessConfigData(const CConfigData *config_data);
 	
-	bool CanUseTileAsSeed(const CMapField *tile) const;
-	bool CanGenerateOnTile(const CMapField *tile) const;
-	bool CanTileBePartOfExpansion(const CMapField *tile) const;
-	bool CanRemoveTileOverlayTerrain(const CMapField *tile) const;
+	bool CanUseTileAsSeed(const tile *tile) const;
+	bool CanGenerateOnTile(const tile *tile) const;
+	bool CanTileBePartOfExpansion(const tile *tile) const;
+	bool CanRemoveTileOverlayTerrain(const tile *tile) const;
 
 	terrain_type *TerrainType = nullptr;
 	int SeedCount = 0;

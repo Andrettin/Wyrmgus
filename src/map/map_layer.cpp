@@ -61,9 +61,9 @@ CMapLayer::CMapLayer(const QSize &size) : size(size)
 	const int max_tile_index = size.width() * size.height();
 
 	try {
-		this->Fields = std::make_unique<CMapField[]>(max_tile_index);
+		this->Fields = std::make_unique<wyrmgus::tile[]>(max_tile_index);
 	} catch (const std::bad_alloc &) {
-		std::throw_with_nested(std::runtime_error("Failed to allocate map layer with a tile area of " + std::to_string(max_tile_index) + ", for " + std::to_string(max_tile_index * sizeof(CMapField)) + " bytes in total."));
+		std::throw_with_nested(std::runtime_error("Failed to allocate map layer with a tile area of " + std::to_string(max_tile_index) + ", for " + std::to_string(max_tile_index * sizeof(wyrmgus::tile)) + " bytes in total."));
 	}
 }
 
@@ -78,7 +78,7 @@ CMapLayer::~CMapLayer()
 **
 **	@return	The map field
 */
-CMapField *CMapLayer::Field(const unsigned int index) const
+wyrmgus::tile *CMapLayer::Field(const unsigned int index) const
 {
 	return &this->Fields[index];
 }
@@ -93,7 +93,7 @@ void CMapLayer::DoPerCycleLoop()
 		if (GameCycle % (CYCLES_PER_SECOND / 4) == 0) { // same speed as color-cycling
 			const int max_tile_index = this->get_width() * this->get_height();
 			for (int i = 0; i < max_tile_index; ++i) {
-				CMapField &mf = *this->Field(i);
+				wyrmgus::tile &mf = *this->Field(i);
 				
 				if (mf.Terrain && mf.Terrain->SolidAnimationFrames > 0) {
 					mf.AnimationFrame += 1;
@@ -129,7 +129,7 @@ void CMapLayer::RegenerateForest()
 {
 	for (size_t i = 0; i < this->DestroyedForestTiles.size();) {
 		const Vec2i &pos = this->DestroyedForestTiles[i];
-		CMapField &mf = *this->Field(pos);
+		wyrmgus::tile &mf = *this->Field(pos);
 		if (!mf.IsDestroyedForestTile()) { //the destroyed forest tile may have become invalid, e.g. because the terrain changed, or because of the regeneration itself; we keep the removal of elements centralized here so that we can loop through the tiles reliably
 			this->DestroyedForestTiles.erase(this->DestroyedForestTiles.begin() + i);
 		} else {
@@ -150,7 +150,7 @@ void CMapLayer::RegenerateForestTile(const Vec2i &pos)
 {
 	Assert(CMap::Map.Info.IsPointOnMap(pos, this->ID));
 	
-	CMapField &mf = *this->Field(pos);
+	wyrmgus::tile &mf = *this->Field(pos);
 
 	//  Increment each value of no wood.
 	//  If grown up, place new wood.
@@ -177,16 +177,16 @@ void CMapLayer::RegenerateForestTile(const Vec2i &pos)
 	
 	//Wyrmgus start
 //	const Vec2i offset(0, -1);
-//	CMapField &topMf = *(&mf - this->Info.MapWidth);
+//	wyrmgus::tile &topMf = *(&mf - this->Info.MapWidth);
 
 	for (int x_offset = -1; x_offset <= 1; x_offset+=2) { //increment by 2 to avoid instances where it is 0
 		for (int y_offset = -1; y_offset <= 1; y_offset+=2) {
 			const Vec2i verticalOffset(0, y_offset);
-			CMapField &verticalMf = *this->Field(pos + verticalOffset);
+			wyrmgus::tile &verticalMf = *this->Field(pos + verticalOffset);
 			const Vec2i horizontalOffset(x_offset, 0);
-			CMapField &horizontalMf = *this->Field(pos + horizontalOffset);
+			wyrmgus::tile &horizontalMf = *this->Field(pos + horizontalOffset);
 			const Vec2i diagonalOffset(x_offset, y_offset);
-			CMapField &diagonalMf = *this->Field(pos + diagonalOffset);
+			wyrmgus::tile &diagonalMf = *this->Field(pos + diagonalOffset);
 			
 			if (
 				CMap::Map.Info.IsPointOnMap(pos + diagonalOffset, this->ID)
@@ -351,7 +351,7 @@ wyrmgus::time_of_day *CMapLayer::GetTimeOfDay() const
 
 wyrmgus::time_of_day *CMapLayer::get_tile_time_of_day(const QPoint &tile_pos) const
 {
-	const CMapField *tile = this->Field(tile_pos);
+	const wyrmgus::tile *tile = this->Field(tile_pos);
 	if (tile->Flags & MapFieldUnderground) {
 		return wyrmgus::defines::get()->get_underground_time_of_day();
 	}
@@ -425,7 +425,7 @@ void CMapLayer::SetSeason(CScheduledSeason *season)
 	//update map layer tiles affected by the season change
 	for (int x = 0; x < this->get_width(); x++) {
 		for (int y = 0; y < this->get_height(); y++) {
-			const CMapField &mf = *this->Field(x, y);
+			const wyrmgus::tile &mf = *this->Field(x, y);
 			
 			//check if the tile's terrain graphics have changed due to the new season and if so, update the minimap
 			if (

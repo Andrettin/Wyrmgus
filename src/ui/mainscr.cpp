@@ -960,7 +960,7 @@ void DrawPopups()
 		CViewport *vp = GetViewport(CursorScreenPos);
 		if (vp) {
 			const Vec2i tilePos = vp->ScreenToTilePos(CursorScreenPos);
-			CMapField &mf = *UI.CurrentMapLayer->Field(tilePos);
+			const wyrmgus::tile &mf = *UI.CurrentMapLayer->Field(tilePos);
 			const bool isMapFieldVisible = mf.player_info->IsTeamVisible(*CPlayer::GetThisPlayer());
 
 			if (UI.MouseViewport && UI.MouseViewport->IsInsideMapArea(CursorScreenPos) && (isMapFieldVisible || ReplayRevealMap) && !(MouseButtons & MiddleButton)) { //don't display if in move map mode
@@ -1197,7 +1197,7 @@ void DrawPopups()
 	if (CursorOn == cursor_on::minimap) {
 		const QPoint minimap_tile_pos = UI.get_minimap()->screen_to_tile_pos(CursorScreenPos);
 		if (CMap::Map.Info.IsPointOnMap(minimap_tile_pos, UI.CurrentMapLayer->ID)) {
-			const CMapField *tile = UI.CurrentMapLayer->Field(minimap_tile_pos);
+			const wyrmgus::tile *tile = UI.CurrentMapLayer->Field(minimap_tile_pos);
 
 			//hackish way to make the popup appear correctly
 			std::unique_ptr<wyrmgus::button> button;

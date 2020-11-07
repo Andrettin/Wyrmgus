@@ -350,8 +350,8 @@ static int CclSetTitleScreens(lua_State *l)
 							}
 							const int subsubargs = lua_rawlen(l, -1);
 							for (int subk = 0; subk < subsubargs; ++subk) {
-								const char *value = LuaToString(l, -1, subk + 1);
-								if (!strcmp(value, "center")) {
+								const char *subvalue = LuaToString(l, -1, subk + 1);
+								if (!strcmp(subvalue, "center")) {
 									label.Flags |= TitleFlagCenter;
 								} else {
 									LuaError(l, "incorrect flag");

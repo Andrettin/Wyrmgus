@@ -107,7 +107,7 @@ static int GetDirectionFromSurrounding(const Vec2i &pos, bool human, bool seen)
 		if (!CMap::Map.Info.IsPointOnMap(newpos)) {
 			dirFlag |= 1 << i;
 		} else {
-			const CMapField &mf = *Map.Field(newpos);
+			const wyrmgus::tile &mf = *Map.Field(newpos);
 			const unsigned int tile = seen ? mf.player_info->SeenTile : mf.getGraphicTile();
 
 			if (Map.Tileset->isARaceWallTile(tile, human)) {
@@ -133,7 +133,7 @@ void MapFixSeenWallTile(const Vec2i &pos)
 	if (!Map.Info.IsPointOnMap(pos)) {
 		return;
 	}
-	CMapField &mf = *Map.Field(pos);
+	wyrmgus::tile &mf = *Map.Field(pos);
 	const CTileset &tileset = *Map.Tileset;
 	const unsigned tile = mf.player_info->SeenTile;
 	if (!tileset.isAWallTile(tile)) {
@@ -185,7 +185,7 @@ void MapFixWallTile(const Vec2i &pos)
 	if (!Map.Info.IsPointOnMap(pos)) {
 		return;
 	}
-	CMapField &mf = *Map.Field(pos);
+	wyrmgus::tile &mf = *Map.Field(pos);
 	const CTileset &tileset = *Map.Tileset;
 	const int tile = mf.getGraphicTile();
 	if (!tileset.isAWallTile(tile)) {
@@ -237,7 +237,7 @@ static void MapFixWallNeighbors(const Vec2i &pos)
 /*
 void CMap::RemoveWall(const Vec2i &pos)
 {
-	CMapField &mf = *Field(pos);
+	wyrmgus::tile &mf = *Field(pos);
 
 	mf.set_value(0);
 
@@ -267,7 +267,7 @@ void CMap::RemoveWall(const Vec2i &pos)
 /*
 void CMap::SetWall(const Vec2i &pos, bool humanwall)
 {
-	CMapField &mf = *Field(pos);
+	wyrmgus::tile &mf = *Field(pos);
 
 	if (humanwall) {
 		const int value = UnitTypeHumanWall->MapDefaultStat.Variables[HP_INDEX].Max;

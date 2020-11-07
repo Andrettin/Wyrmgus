@@ -520,8 +520,8 @@ CUnit *CanBuildHere(const CUnit *unit, const wyrmgus::unit_type &type, const Vec
 		//Wyrmgus end
 		do {
 			//Wyrmgus start
-//			const CMapField *mf = CMap::Map.Field(index);
-			const CMapField *mf = CMap::Map.Field(index, z);
+//			const wyrmgus::tile *mf = CMap::Map.Field(index);
+			const wyrmgus::tile *mf = CMap::Map.Field(index, z);
 			//Wyrmgus end
 			int w = width;
 			do {
@@ -603,7 +603,7 @@ bool CanBuildOn(const QPoint &pos, const int mask, const int z, const CPlayer *p
 		return false;
 	}
 
-	const CMapField *tile = CMap::Map.Field(pos, z);
+	const wyrmgus::tile *tile = CMap::Map.Field(pos, z);
 
 	if (tile->CheckMask(mask)) {
 		return false;
@@ -674,7 +674,7 @@ CUnit *CanBuildUnitType(const CUnit *unit, const wyrmgus::unit_type &type, const
 				testmask = type.MovementMask;
 			}
 			/*second part of if (!CanBuildOn(x + w, y + h, testmask)) */
-			const CMapField *tile = CMap::Map.Field(index + pos.x + w, z);
+			const wyrmgus::tile *tile = CMap::Map.Field(index + pos.x + w, z);
 			if (tile->CheckMask(testmask)) {
 				h = type.get_tile_height();
 				ontop = nullptr;

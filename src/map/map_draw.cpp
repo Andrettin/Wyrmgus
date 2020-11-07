@@ -283,7 +283,7 @@ void CViewport::DrawMapBackgroundInViewport() const
 				dx += wyrmgus::defines::get()->get_scaled_tile_width();
 				continue;
 			}
-			const CMapField &mf = *UI.CurrentMapLayer->Field(sx);
+			const wyrmgus::tile &mf = *UI.CurrentMapLayer->Field(sx);
 
 			const wyrmgus::terrain_type *terrain = nullptr;
 			const wyrmgus::terrain_type *overlay_terrain = nullptr;

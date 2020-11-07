@@ -803,7 +803,7 @@ static bool DoRightButton_NewOrder(CUnit &unit, CUnit *dest, const Vec2i &pos, i
 		return true;
 	}
 	// FIXME: support harvesting more types of terrain.
-	const CMapField &mf = *UI.CurrentMapLayer->Field(pos);
+	const wyrmgus::tile &mf = *UI.CurrentMapLayer->Field(pos);
 	if (mf.player_info->IsTeamExplored(*unit.Player) && mf.get_resource() != nullptr) {
 		if (!acknowledged) {
 			PlayUnitSound(unit, wyrmgus::unit_sound_type::acknowledging);
@@ -1457,7 +1457,7 @@ void UIHandleMouseMove(const PixelPos &cursorPos)
 
 		bool show = ReplayRevealMap ? true : false;
 		if (show == false) {
-			CMapField &mf = *UI.CurrentMapLayer->Field(tilePos);
+			const wyrmgus::tile &mf = *UI.CurrentMapLayer->Field(tilePos);
 			for (int i = 0; i < PlayerMax; ++i) {
 				if (mf.player_info->IsTeamExplored(*CPlayer::Players[i])
 					&& (i == CPlayer::GetThisPlayer()->Index || CPlayer::Players[i]->has_mutual_shared_vision_with(*CPlayer::GetThisPlayer()) || CPlayer::Players[i]->is_revealed())) {
@@ -1840,7 +1840,7 @@ static int SendResource(const Vec2i &pos, int flush)
 	//Wyrmgus start
 //	const int flush = !(KeyModifiers & ModifierShift);
 	//Wyrmgus end
-	const CMapField &mf = *UI.CurrentMapLayer->Field(pos);
+	const wyrmgus::tile &mf = *UI.CurrentMapLayer->Field(pos);
 
 	for (size_t i = 0; i != Selected.size(); ++i) {
 		CUnit &unit = *Selected[i];

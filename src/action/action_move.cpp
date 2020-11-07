@@ -155,7 +155,7 @@ bool COrder_Move::ParseSpecificData(lua_State *l, int &j, const char *value, con
 int DoActionMove(CUnit &unit)
 {
 	//Wyrmgus start
-	CMapField &mf = *unit.MapLayer->Field(unit.tilePos);
+	wyrmgus::tile &mf = *unit.MapLayer->Field(unit.tilePos);
 	if (unit.Type->BoolFlag[BRIDGE_INDEX].value && unit.CanMove()) { // if is a raft, don't move if any unit over it is still moving
 		std::vector<CUnit *> table;
 		Select(unit.tilePos, unit.tilePos, table, unit.MapLayer->ID);
@@ -234,10 +234,10 @@ int DoActionMove(CUnit &unit)
 		
 		if (unit.Type->UnitType == UnitTypeType::Naval) { // Boat (un)docking?
 			//Wyrmgus start
-//			const CMapField &mf_cur = *Map.Field(unit.Offset);
-//			const CMapField &mf_next = *Map.Field(unit.tilePos + posd);
-			const CMapField &mf_cur = *unit.MapLayer->Field(unit.Offset);
-			const CMapField &mf_next = *unit.MapLayer->Field(unit.tilePos + posd);
+//			const wyrmgus::tile &mf_cur = *Map.Field(unit.Offset);
+//			const wyrmgus::tile &mf_next = *Map.Field(unit.tilePos + posd);
+			const wyrmgus::tile &mf_cur = *unit.MapLayer->Field(unit.Offset);
+			const wyrmgus::tile &mf_next = *unit.MapLayer->Field(unit.tilePos + posd);
 			//Wyrmgus end
 
 			if (mf_cur.WaterOnMap() && mf_next.CoastOnMap()) {

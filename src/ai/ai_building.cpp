@@ -53,7 +53,7 @@ static bool IsPosFree(const Vec2i &pos, const CUnit &exceptionUnit, int z)
 	if (CMap::Map.Info.IsPointOnMap(pos, z) == false) {
 		return false;
 	}
-	const CMapField &mf = *CMap::Map.Field(pos, z);
+	const wyrmgus::tile &mf = *CMap::Map.Field(pos, z);
 	const CUnitCache &unitCache = mf.UnitCache;
 	if (std::find(unitCache.begin(), unitCache.end(), &exceptionUnit) != unitCache.end()) {
 		return true;
@@ -200,7 +200,7 @@ VisitResult BuildingPlaceFinder::Visit(TerrainTraversal &terrainTraversal, const
 #endif
 	*/
 
-	const CMapField *tile = CMap::Map.Field(pos, z);
+	const wyrmgus::tile *tile = CMap::Map.Field(pos, z);
 
 	if (!IgnoreExploration && !tile->player_info->IsTeamExplored(*worker.Player)) {
 		return VisitResult::DeadEnd;
@@ -514,7 +514,7 @@ VisitResult LumberMillPlaceFinder::Visit(TerrainTraversal &terrainTraversal, con
 #endif
 	*/
 
-	const CMapField *tile = CMap::Map.Field(pos, z);
+	const wyrmgus::tile *tile = CMap::Map.Field(pos, z);
 	if (!IgnoreExploration && !tile->player_info->IsTeamExplored(*worker.Player)) {
 		return VisitResult::DeadEnd;
 	}

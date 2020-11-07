@@ -115,7 +115,7 @@ static int CclStratagusMap(lua_State *l)
 
 					//Wyrmgus start
 //					delete[] Map.Fields;
-//					CMap::Map.Fields = new CMapField[CMap::Map.Info.MapWidth * CMap::Map.Info.MapHeight];
+//					CMap::Map.Fields = new wyrmgus::tile[CMap::Map.Info.MapWidth * CMap::Map.Info.MapHeight];
 					CMap::Map.ClearMapLayers();
 					auto map_layer = std::make_unique<CMapLayer>(CMap::Map.Info.MapWidth, CMap::Map.Info.MapHeight);
 					map_layer->ID = CMap::Map.MapLayers.size();
@@ -282,7 +282,7 @@ static int CclStratagusMap(lua_State *l)
 							if (!lua_istable(l, -1)) {
 								LuaError(l, "incorrect argument");
 							}
-							CMapField &mf = *map_layer->Field(i);
+							wyrmgus::tile &mf = *map_layer->Field(i);
 							mf.parse(l);
 							if (mf.IsDestroyedForestTile()) {
 								map_layer->DestroyedForestTiles.push_back(map_layer->GetPosFromIndex(i));
@@ -570,8 +570,8 @@ void SetTile(unsigned int tileIndex, const Vec2i &pos, int value, int z)
 	if (static_cast<int>(CMap::Map.MapLayers.size()) >= z) {
 	//Wyrmgus end
 		//Wyrmgus start
-//		CMapField &mf = *CMap::Map.Field(pos);
-		CMapField &mf = *CMap::Map.Field(pos, z);
+//		wyrmgus::tile &mf = *CMap::Map.Field(pos);
+		wyrmgus::tile &mf = *CMap::Map.Field(pos, z);
 		//Wyrmgus end
 
 		mf.setTileIndex(*CMap::Map.Tileset, tileIndex, value);
@@ -601,7 +601,7 @@ void SetTileTerrain(const std::string &terrain_ident, const Vec2i &pos, int valu
 	}
 	
 	if (static_cast<int>(CMap::Map.MapLayers.size()) >= z) {
-		CMapField &mf = *CMap::Map.Field(pos, z);
+		wyrmgus::tile &mf = *CMap::Map.Field(pos, z);
 
 		mf.set_value(value);
 		mf.SetTerrain(terrain);
@@ -1063,7 +1063,7 @@ static int CclGetTileTerrainName(lua_State *l)
 
 	//Wyrmgus start
 	/*
-	const CMapField &mf = *Map.Field(pos);
+	const wyrmgus::tile &mf = *Map.Field(pos);
 	const CTileset &tileset = *Map.Tileset;
 	const int index = tileset.findTileIndexByTile(mf.getGraphicTile());
 	Assert(index != -1);
@@ -1091,7 +1091,7 @@ static int CclGetTileTerrainMixedName(lua_State *l)
 
 	const Vec2i pos(LuaToNumber(l, 1), LuaToNumber(l, 2));
 
-	const CMapField &mf = *Map.Field(pos);
+	const wyrmgus::tile &mf = *Map.Field(pos);
 	const CTileset &tileset = *Map.Tileset;
 	//Wyrmgus start
 //	const int index = tileset.findTileIndexByTile(mf.getGraphicTile());
@@ -1187,8 +1187,8 @@ static int CclGetTileTerrainHasFlag(lua_State *l)
 	}
 
 	//Wyrmgus start
-//	const CMapField &mf = *CMap::Map.Field(pos);
-	const CMapField &mf = *CMap::Map.Field(pos, z);
+//	const wyrmgus::tile &mf = *CMap::Map.Field(pos);
+	const wyrmgus::tile &mf = *CMap::Map.Field(pos, z);
 	//Wyrmgus end
 
 	if (mf.get_flags() & flag) {

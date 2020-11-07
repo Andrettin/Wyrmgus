@@ -1296,8 +1296,8 @@ bool PointToPointMissile(Missile &missile)
 				return false;
 			}
 			//Wyrmgus start
-//			const CMapField &mf = *CMap::Map.Field(tilePos);
-			const CMapField &mf = *CMap::Map.Field(tilePos, missile.MapLayer);
+//			const wyrmgus::tile &mf = *CMap::Map.Field(tilePos);
+			const wyrmgus::tile &mf = *CMap::Map.Field(tilePos, missile.MapLayer);
 			//Wyrmgus end
 			if (missile.Type->MissileStopFlags & mf.Flags) { // incompatible terrain
 				missile.position = position;

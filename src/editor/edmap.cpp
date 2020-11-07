@@ -61,7 +61,7 @@ void ChangeTile(const Vec2i &pos, int tile)
 {
 	Assert(Map.Info.IsPointOnMap(pos));
 
-	CMapField &mf = *Map.Field(pos);
+	wyrmgus::tile &mf = *Map.Field(pos);
 	mf.setGraphicTile(tile);
 	mf.player_info->SeenTile = tile;
 	mf.UpdateSeenTile();
@@ -104,7 +104,7 @@ void EditorChangeTile(const Vec2i &pos, int tileIndex)
 	Assert(CMap::Map.Info.IsPointOnMap(pos, UI.CurrentMapLayer));
 
 	// Change the flags
-	CMapField &mf = *UI.CurrentMapLayer->Field(pos);
+	wyrmgus::tile &mf = *UI.CurrentMapLayer->Field(pos);
 
 	int tile = tileIndex;
 	if (TileToolRandom) {
@@ -183,7 +183,7 @@ static void EditorChangeSurrounding(const Vec2i &pos, int tile)
 //Wyrmgus end
 {
 	// Special case 1) Walls.
-	CMapField &mf = *UI.CurrentMapLayer->Field(pos);
+	wyrmgus::tile &mf = *UI.CurrentMapLayer->Field(pos);
 	
 	//Wyrmgus start
 	//see if the tile's terrain can be here as is, or if it is needed to change surrounding tiles

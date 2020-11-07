@@ -52,7 +52,7 @@ struct LandMineTargetFinder {
 				&& unit->Type->UnitType != UnitTypeType::Space
 				&& unit->CurrentAction() != UnitAction::Die);
 	}
-	inline CUnit *FindOnTile(const CMapField *const mf) const
+	inline CUnit *FindOnTile(const wyrmgus::tile *const mf) const
 	{
 		return mf->UnitCache.find(*this);
 	}

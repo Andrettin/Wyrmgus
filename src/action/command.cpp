@@ -155,7 +155,7 @@ static bool IsUnitValidForNetwork(const CUnit &unit)
 //Wyrmgus start
 static void StopRaft(CUnit &unit)
 {
-	CMapField &mf = *unit.MapLayer->Field(unit.tilePos);
+	wyrmgus::tile &mf = *unit.MapLayer->Field(unit.tilePos);
 	if ((mf.Flags & MapFieldBridge) && !unit.Type->BoolFlag[BRIDGE_INDEX].value && unit.Type->UnitType == UnitTypeType::Land) {
 		std::vector<CUnit *> table;
 		Select(unit.tilePos, unit.tilePos, table, unit.MapLayer->ID);
@@ -333,8 +333,8 @@ void CommandMove(CUnit &unit, const Vec2i &pos, int flush, int z)
 		return ;
 	}
 	//Wyrmgus start
-	CMapField &mf = *unit.MapLayer->Field(unit.tilePos);
-	CMapField &new_mf = *CMap::Map.Field(pos, z);
+	wyrmgus::tile &mf = *unit.MapLayer->Field(unit.tilePos);
+	wyrmgus::tile &new_mf = *CMap::Map.Field(pos, z);
 	//if the unit is a land unit over a raft, move the raft instead of the unit
 	if ((mf.Flags & MapFieldBridge) && !unit.Type->BoolFlag[BRIDGE_INDEX].value && unit.Type->UnitType == UnitTypeType::Land) {
 		std::vector<CUnit *> table;
@@ -563,7 +563,7 @@ void CommandAttack(CUnit &unit, const Vec2i &pos, CUnit *target, int flush, int 
 		return ;
 	}
 	//Wyrmgus start
-	CMapField &mf = *unit.MapLayer->Field(unit.tilePos);
+	wyrmgus::tile &mf = *unit.MapLayer->Field(unit.tilePos);
 	if ((mf.Flags & MapFieldBridge) && !unit.Type->BoolFlag[BRIDGE_INDEX].value && unit.Type->UnitType == UnitTypeType::Land) {
 		std::vector<CUnit *> table;
 		Select(unit.tilePos, unit.tilePos, table, unit.MapLayer->ID);
@@ -1387,8 +1387,8 @@ void CommandSharedVision(int player, bool state, int opponent)
 		//Wyrmgus start
 		/*
 		for (int i = 0; i != Map.Info.MapWidth * Map.Info.MapHeight; ++i) {
-			CMapField &mf = *Map.Field(i);
-			CMapFieldPlayerInfo &mfp = mf.playerInfo;
+			wyrmgus::tile &mf = *Map.Field(i);
+			wyrmgus::tile_player_info &mfp = mf.playerInfo;
 
 			//Wyrmgus start
 //			if (mfp.Visible[player] && !mfp.Visible[opponent]) {
@@ -1412,8 +1412,8 @@ void CommandSharedVision(int player, bool state, int opponent)
 		*/
 		for (size_t z = 0; z < CMap::Map.MapLayers.size(); ++z) {
 			for (int i = 0; i != CMap::Map.Info.MapWidths[z] * CMap::Map.Info.MapHeights[z]; ++i) {
-				CMapField &mf = *CMap::Map.Field(i, z);
-				const std::unique_ptr<CMapFieldPlayerInfo> &mfp = mf.player_info;
+				wyrmgus::tile &mf = *CMap::Map.Field(i, z);
+				const std::unique_ptr<wyrmgus::tile_player_info> &mfp = mf.player_info;
 
 				if (mfp->Visible[player] && !mfp->Visible[opponent] && !CPlayer::Players[player]->is_revealed()) {
 					mfp->Visible[opponent] = 1;

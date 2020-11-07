@@ -61,7 +61,7 @@
 **  CTileset::Flags
 **
 **      Table of the tile flags used by the editor.
-**      @see CMapField::Flags
+**      @see wyrmgus::tile::Flags
 **
 **  CTileset::solidTerrainTypes
 **

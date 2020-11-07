@@ -236,7 +236,7 @@ void minimap::UpdateTerrain(int z)
 	
 	for (int my = YOffset[z]; my < texture_height - YOffset[z]; ++my) {
 		for (int mx = XOffset[z]; mx < texture_width - XOffset[z]; ++mx) {
-			const CMapField &mf = *map_layer->Field(Minimap2MapX[z][mx] + Minimap2MapY[z][my]);
+			const tile &mf = *map_layer->Field(Minimap2MapX[z][mx] + Minimap2MapY[z][my]);
 			const terrain_type *terrain = mf.GetTopTerrain(true);
 	
 			const QColor color = terrain ? terrain->get_minimap_color(season) : QColor(0, 0, 0);
@@ -307,7 +307,7 @@ void minimap::UpdateXY(const Vec2i &pos, int z)
 				break;
 			}
 
-			const CMapField &mf = *CMap::Map.MapLayers[z]->Field(x + y);
+			const tile &mf = *CMap::Map.MapLayers[z]->Field(x + y);
 			const terrain_type *terrain = mf.GetTopTerrain(true);
 
 			const QColor color = terrain ? terrain->get_minimap_color(season) : QColor(0, 0, 0);
@@ -363,7 +363,7 @@ void minimap::update_territory_pixel(const int mx, const int my, const int z)
 	QColor realm_color(Qt::transparent);
 	QColor realm_with_non_land_color(Qt::transparent);
 
-	const CMapField &mf = *map_layer->Field(Minimap2MapX[z][mx] + Minimap2MapY[z][my]);
+	const tile &mf = *map_layer->Field(Minimap2MapX[z][mx] + Minimap2MapY[z][my]);
 	const site *settlement = mf.get_settlement();
 	if (settlement != nullptr) {
 		const bool is_tile_water = mf.is_water() && !mf.is_river();
@@ -399,7 +399,7 @@ void minimap::update_territory_pixel(const int mx, const int my, const int z)
 			throw std::runtime_error("Settlement \"" + settlement->get_identifier() + "\" has territory, but no settlement unit.");
 		}
 
-		const CMapField *settlement_center_tile = settlement_unit->get_center_tile();
+		const tile *settlement_center_tile = settlement_unit->get_center_tile();
 		const bool is_settlement_water = settlement_center_tile->is_water() && !settlement_center_tile->is_river();
 		const bool is_settlement_space = settlement_center_tile->is_space();
 		if (is_tile_water == is_settlement_water && is_tile_space == is_settlement_space) {

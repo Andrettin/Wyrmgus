@@ -154,7 +154,7 @@ static wyrmgus::sample *ChooseSample(wyrmgus::sound *sound, bool selection, Orig
 */
 static wyrmgus::sound *ChooseUnitVoiceSound(const CUnit &unit, const wyrmgus::unit_sound_type unit_sound_type)
 {
-	const CMapField &mf = *unit.MapLayer->Field(unit.tilePos);
+	const wyrmgus::tile &mf = *unit.MapLayer->Field(unit.tilePos);
 
 	const wyrmgus::civilization *civilization = unit.get_civilization();
 

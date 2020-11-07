@@ -38,7 +38,6 @@ class CAnimation;
 class CBuildRestrictionOnTop;
 class CFile;
 class Missile;
-class CMapField;
 class COrder;
 class CPlayer;
 class CUnit;
@@ -58,6 +57,7 @@ namespace wyrmgus {
 	class map_template;
 	class player_color;
 	class spell;
+	class tile;
 	class time_of_day;
 	class unique_item;
 	class unit_type;
@@ -386,7 +386,7 @@ public:
 	PixelSize get_scaled_half_tile_pixel_size() const;
 	QPoint get_bottom_right_tile_pos() const;
 	QPoint get_center_tile_pos() const;
-	const CMapField *get_center_tile() const;
+	const wyrmgus::tile *get_center_tile() const;
 
 	const QPoint &get_pixel_offset() const
 	{

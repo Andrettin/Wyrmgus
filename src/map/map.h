@@ -88,6 +88,7 @@ namespace wyrmgus {
 	class map_template;
 	class plane;
 	class site;
+	class tile;
 	class unit_type;
 	class world;
 }
@@ -154,9 +155,9 @@ public:
 	unsigned int getIndex(int x, int y, int z) const;
 	unsigned int getIndex(const Vec2i &pos, int z) const;
 	
-	CMapField *Field(const unsigned int index, const int z) const;
+	wyrmgus::tile *Field(const unsigned int index, const int z) const;
 	/// Get the map field at location x, y
-	CMapField *Field(const int x, const int y, const int z) const;
+	wyrmgus::tile *Field(const int x, const int y, const int z) const;
 	
 	/**
 	**	@brief	Get the map field at a given location
@@ -166,7 +167,7 @@ public:
 	**
 	**	@return	The map field
 	*/
-	CMapField *Field(const Vec2i &pos, const int z) const
+	wyrmgus::tile *Field(const Vec2i &pos, const int z) const
 	{
 		return this->Field(pos.x, pos.y, z);
 	}
@@ -197,7 +198,7 @@ public:
 	void AdjustTileMapTransitions(const Vec2i &min_pos, const Vec2i &max_pos, int z);
 	void adjust_territory_irregularities(const QPoint &min_pos, const QPoint &max_pos, const int z);
 	void GenerateTerrain(const std::unique_ptr<wyrmgus::generated_terrain> &generated_terrain, const Vec2i &min_pos, const Vec2i &max_pos, const bool preserve_coastline, const int z);
-	bool CanTileBePartOfMissingTerrainGeneration(const CMapField *tile, const wyrmgus::terrain_type *terrain_type, const wyrmgus::terrain_type *overlay_terrain_type) const;
+	bool CanTileBePartOfMissingTerrainGeneration(const wyrmgus::tile *tile, const wyrmgus::terrain_type *terrain_type, const wyrmgus::terrain_type *overlay_terrain_type) const;
 	void generate_missing_terrain(const Vec2i &min_pos, const Vec2i &max_pos, const int z);
 	void generate_settlement_territories(const int z);
 	wyrmgus::point_set expand_settlement_territories(std::vector<QPoint> &&seeds, const int z, const int block_flags = 0, const int same_flags = 0);
@@ -225,7 +226,7 @@ public:
 	//Wyrmgus end
 
 	/// Mark a tile as seen by the player.
-	void MarkSeenTile(CMapField &mf);
+	void MarkSeenTile(wyrmgus::tile &mf);
 
 	/// Regenerate the forest.
 	void RegenerateForest();

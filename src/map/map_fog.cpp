@@ -205,8 +205,8 @@ private:
 **  @param cloak   If we mark cloaked units too.
 */
 //Wyrmgus start
-//static void UnitsOnTileMarkSeen(const CPlayer &player, CMapField &mf, int cloak)
-static void UnitsOnTileMarkSeen(const CPlayer &player, CMapField &mf, int cloak, int ethereal)
+//static void UnitsOnTileMarkSeen(const CPlayer &player, wyrmgus::tile &mf, int cloak)
+static void UnitsOnTileMarkSeen(const CPlayer &player, wyrmgus::tile &mf, int cloak, int ethereal)
 //Wyrmgus end
 {
 	//Wyrmgus start
@@ -224,8 +224,8 @@ static void UnitsOnTileMarkSeen(const CPlayer &player, CMapField &mf, int cloak,
 **  @param cloak     If this is for cloaked units.
 */
 //Wyrmgus start
-//static void UnitsOnTileUnmarkSeen(const CPlayer &player, CMapField &mf, int cloak)
-static void UnitsOnTileUnmarkSeen(const CPlayer &player, CMapField &mf, int cloak, int ethereal)
+//static void UnitsOnTileUnmarkSeen(const CPlayer &player, wyrmgus::tile &mf, int cloak)
+static void UnitsOnTileUnmarkSeen(const CPlayer &player, wyrmgus::tile &mf, int cloak, int ethereal)
 //Wyrmgus end
 {
 	//Wyrmgus start
@@ -248,8 +248,8 @@ void MapMarkTileSight(const CPlayer &player, const unsigned int index, int z)
 //Wyrmgus end
 {
 	//Wyrmgus start
-//	CMapField &mf = *CMap::Map.Field(index);
-	CMapField &mf = *CMap::Map.Field(index, z);
+//	wyrmgus::tile &mf = *CMap::Map.Field(index);
+	wyrmgus::tile &mf = *CMap::Map.Field(index, z);
 	//Wyrmgus end
 	unsigned short *v = &(mf.player_info->Visible[player.Index]);
 	if (*v == 0 || *v == 1) { // Unexplored or unseen
@@ -291,8 +291,8 @@ void MapUnmarkTileSight(const CPlayer &player, const unsigned int index, int z)
 //Wyrmgus end
 {
 	//Wyrmgus start
-//	CMapField &mf = *CMap::Map.Field(index);
-	CMapField &mf = *CMap::Map.Field(index, z);
+//	wyrmgus::tile &mf = *CMap::Map.Field(index);
+	wyrmgus::tile &mf = *CMap::Map.Field(index, z);
 	//Wyrmgus end
 	unsigned short *v = &mf.player_info->Visible[player.Index];
 	switch (*v) {
@@ -339,8 +339,8 @@ void MapMarkTileDetectCloak(const CPlayer &player, const unsigned int index, int
 //Wyrmgus end
 {
 	//Wyrmgus start
-//	CMapField &mf = *CMap::Map.Field(index);
-	CMapField &mf = *CMap::Map.Field(index, z);
+//	wyrmgus::tile &mf = *CMap::Map.Field(index);
+	wyrmgus::tile &mf = *CMap::Map.Field(index, z);
 	//Wyrmgus end
 	unsigned char *v = &mf.player_info->VisCloak[player.Index];
 	if (*v == 0) {
@@ -376,8 +376,8 @@ void MapUnmarkTileDetectCloak(const CPlayer &player, const unsigned int index, i
 //Wyrmgus end
 {
 	//Wyrmgus start
-//	CMapField &mf = *CMap::Map.Field(index);
-	CMapField &mf = *CMap::Map.Field(index, z);
+//	wyrmgus::tile &mf = *CMap::Map.Field(index);
+	wyrmgus::tile &mf = *CMap::Map.Field(index, z);
 	//Wyrmgus end
 	unsigned char *v = &mf.player_info->VisCloak[player.Index];
 	Assert(*v != 0);
@@ -410,7 +410,7 @@ void MapUnmarkTileDetectCloak(const CPlayer &player, const Vec2i &pos, int z)
 */
 void MapMarkTileDetectEthereal(const CPlayer &player, const unsigned int index, int z)
 {
-	CMapField &mf = *CMap::Map.Field(index, z);
+	wyrmgus::tile &mf = *CMap::Map.Field(index, z);
 	unsigned char *v = &mf.player_info->VisEthereal[player.Index];
 	if (*v == 0) {
 		UnitsOnTileMarkSeen(player, mf, 0, 1);
@@ -432,7 +432,7 @@ void MapMarkTileDetectEthereal(const CPlayer &player, const Vec2i &pos, int z)
 */
 void MapUnmarkTileDetectEthereal(const CPlayer &player, const unsigned int index, int z)
 {
-	CMapField &mf = *CMap::Map.Field(index, z);
+	wyrmgus::tile &mf = *CMap::Map.Field(index, z);
 	unsigned char *v = &mf.player_info->VisEthereal[player.Index];
 	Assert(*v != 0);
 	if (*v == 1) {
@@ -653,7 +653,7 @@ void UpdateFogOfWarChange()
 		/*
 		const unsigned int w = Map.Info.MapHeight * Map.Info.MapWidth;
 		for (unsigned int index = 0; index != w; ++index) {
-			CMapField &mf = *Map.Field(index);
+			wyrmgus::tile &mf = *Map.Field(index);
 			if (mf.player_info->IsExplored(*ThisPlayer)) {
 				Map.MarkSeenTile(mf);
 			}
@@ -662,7 +662,7 @@ void UpdateFogOfWarChange()
 		for (size_t z = 0; z < CMap::Map.MapLayers.size(); ++z) {
 			const unsigned int w = CMap::Map.Info.MapHeights[z] * CMap::Map.Info.MapWidths[z];
 			for (unsigned int index = 0; index != w; ++index) {
-				CMapField &mf = *CMap::Map.Field(index, z);
+				wyrmgus::tile &mf = *CMap::Map.Field(index, z);
 				if (mf.player_info->IsExplored(*CPlayer::GetThisPlayer())) {
 					CMap::Map.MarkSeenTile(mf);
 				}

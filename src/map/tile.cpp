@@ -44,7 +44,9 @@
 #include "unit/unit_manager.h"
 #include "util/vector_util.h"
 
-CMapField::CMapField() :
+namespace wyrmgus {
+
+tile::tile() :
 	Flags(0),
 	cost(0),
 	Landmass(0),
@@ -55,10 +57,10 @@ CMapField::CMapField() :
 	OverlayTerrainDamaged(false),
 	UnitCache()
 {
-	this->player_info = std::make_unique<CMapFieldPlayerInfo>();
+	this->player_info = std::make_unique<tile_player_info>();
 }
 
-const wyrmgus::terrain_type *CMapField::GetTerrain(const bool overlay) const
+const terrain_type *tile::GetTerrain(const bool overlay) const
 {
 	if (overlay) {
 		return this->OverlayTerrain;
@@ -75,7 +77,7 @@ const wyrmgus::terrain_type *CMapField::GetTerrain(const bool overlay) const
 **
 **	@return	The topmost terrain of the tile
 */
-const wyrmgus::terrain_type *CMapField::GetTopTerrain(const bool seen, const bool ignore_destroyed) const
+const terrain_type *tile::GetTopTerrain(const bool seen, const bool ignore_destroyed) const
 {
 	if (!seen) {
 		if (this->OverlayTerrain && (!ignore_destroyed || !this->OverlayTerrainDestroyed)) {
@@ -92,21 +94,21 @@ const wyrmgus::terrain_type *CMapField::GetTopTerrain(const bool seen, const boo
 	}
 }
 
-bool CMapField::IsSeenTileCorrect() const
+bool tile::IsSeenTileCorrect() const
 {
 	return this->Terrain == this->player_info->SeenTerrain && this->OverlayTerrain == this->player_info->SeenOverlayTerrain && this->SolidTile == this->player_info->SeenSolidTile && this->OverlaySolidTile == this->player_info->SeenOverlaySolidTile && this->TransitionTiles == this->player_info->SeenTransitionTiles && this->OverlayTransitionTiles == this->player_info->SeenOverlayTransitionTiles;
 }
 
-const wyrmgus::resource *CMapField::get_resource() const
+const resource *tile::get_resource() const
 {
 	if (this->OverlayTerrain && !this->OverlayTerrainDestroyed) {
 		return this->OverlayTerrain->get_resource();
 	}
-	
+
 	return nullptr;
 }
 
-bool CMapField::IsDestroyedForestTile() const
+bool tile::IsDestroyedForestTile() const
 {
 	return this->OverlayTerrain && this->OverlayTerrainDestroyed && (this->get_flags() & MapFieldStumps);
 }
@@ -117,12 +119,12 @@ bool CMapField::IsDestroyedForestTile() const
 **
 **	@param	terrain_type	The new terrain type for the tile
 */
-void CMapField::SetTerrain(const wyrmgus::terrain_type *terrain_type)
+void tile::SetTerrain(const terrain_type *terrain_type)
 {
 	if (!terrain_type) {
 		return;
 	}
-	
+
 	//remove the flags of the old terrain type
 	if (terrain_type->is_overlay()) {
 		if (this->OverlayTerrain == terrain_type) {
@@ -130,12 +132,12 @@ void CMapField::SetTerrain(const wyrmgus::terrain_type *terrain_type)
 		}
 		if (this->OverlayTerrain) {
 			this->Flags &= ~(this->OverlayTerrain->Flags);
-			
+
 			if (this->OverlayTerrainDestroyed) {
 				if (this->OverlayTerrain->Flags & MapFieldForest) {
 					this->Flags &= ~(MapFieldStumps);
 				}
-				
+
 				if (((this->OverlayTerrain->Flags & MapFieldRocks) || (this->OverlayTerrain->Flags & MapFieldWall)) && !(this->Terrain->Flags & MapFieldGravel)) {
 					this->Flags &= ~(MapFieldGravel);
 				}
@@ -150,9 +152,9 @@ void CMapField::SetTerrain(const wyrmgus::terrain_type *terrain_type)
 			this->Flags &= ~(this->Terrain->Flags);
 		}
 	}
-	
+
 	if (terrain_type->is_overlay()) {
-		if (!this->Terrain || !wyrmgus::vector::contains(terrain_type->get_base_terrain_types(), this->Terrain)) {
+		if (!this->Terrain || !vector::contains(terrain_type->get_base_terrain_types(), this->Terrain)) {
 			this->SetTerrain(terrain_type->get_base_terrain_types().front());
 		}
 		if ((terrain_type->Flags & MapFieldWaterAllowed) || terrain_type->Flags & MapFieldSpace) {
@@ -166,14 +168,14 @@ void CMapField::SetTerrain(const wyrmgus::terrain_type *terrain_type)
 		this->OverlayTerrainDamaged = false;
 	} else {
 		this->Terrain = terrain_type;
-		if (this->OverlayTerrain && !wyrmgus::vector::contains(this->OverlayTerrain->get_base_terrain_types(), terrain_type)) { //if the overlay terrain is incompatible with the new base terrain, remove the overlay
+		if (this->OverlayTerrain && !vector::contains(this->OverlayTerrain->get_base_terrain_types(), terrain_type)) { //if the overlay terrain is incompatible with the new base terrain, remove the overlay
 			this->Flags &= ~(this->OverlayTerrain->Flags);
 			this->Flags &= ~(MapFieldCoastAllowed); // need to do this manually, since MapFieldCoast is added dynamically
 			this->OverlayTerrain = nullptr;
 			this->OverlayTransitionTiles.clear();
 		}
 	}
-	
+
 	if (Editor.Running == EditorNotRunning && terrain_type->SolidAnimationFrames > 0) {
 		if (terrain_type->is_overlay()) {
 			this->OverlayAnimationFrame = SyncRand(terrain_type->SolidAnimationFrames);
@@ -187,7 +189,7 @@ void CMapField::SetTerrain(const wyrmgus::terrain_type *terrain_type)
 			this->AnimationFrame = 0;
 		}
 	}
-	
+
 	//apply the flags from the new terrain type
 	this->Flags |= terrain_type->Flags;
 	const CUnitCache &cache = this->UnitCache;
@@ -198,7 +200,7 @@ void CMapField::SetTerrain(const wyrmgus::terrain_type *terrain_type)
 				this->Flags |= MapFieldUnpassable;
 				this->Flags |= MapFieldAirUnpassable;
 			}
-			const wyrmgus::unit_type_variation *variation = unit.GetVariation();
+			const unit_type_variation *variation = unit.GetVariation();
 			if (variation && !unit.CheckTerrainForVariation(variation)) { // if a unit that is on the tile has a terrain-dependent variation that is not compatible with the current variation, repick the unit's variation
 				unit.ChooseVariation();
 			}
@@ -212,7 +214,7 @@ void CMapField::SetTerrain(const wyrmgus::terrain_type *terrain_type)
 	} else {
 		this->cost = DefaultTileMovementCost; // default speed
 	}
-	
+
 	if (this->Flags & MapFieldRailroad) {
 		this->Flags &= ~(MapFieldNoRail);
 	} else {
@@ -230,26 +232,26 @@ void CMapField::SetTerrain(const wyrmgus::terrain_type *terrain_type)
 	} else if ((terrain_type->Flags & MapFieldWall) && terrain_type->UnitType) {
 		this->value = terrain_type->UnitType->MapDefaultStat.Variables[HP_INDEX].Max;
 	}
-	
+
 	//remove the terrain feature, unless it is a trade route and a pathway is being built over it
 	if (this->get_terrain_feature() != nullptr && (!this->get_terrain_feature()->is_trade_route() || !terrain_type->is_pathway())) {
 		this->terrain_feature = nullptr;
 	}
 }
 
-void CMapField::RemoveOverlayTerrain()
+void tile::RemoveOverlayTerrain()
 {
 	if (!this->OverlayTerrain) {
 		return;
 	}
-	
+
 	this->value = 0;
 	this->Flags &= ~(this->OverlayTerrain->Flags);
-	
+
 	this->Flags &= ~(MapFieldCoastAllowed); // need to do this manually, since MapFieldCoast is added dynamically
 	this->OverlayTerrain = nullptr;
 	this->OverlayTransitionTiles.clear();
-	
+
 	this->Flags |= this->Terrain->Flags;
 	// restore MapFieldAirUnpassable related to units (i.e. doors)
 	const CUnitCache &cache = this->UnitCache;
@@ -260,7 +262,7 @@ void CMapField::RemoveOverlayTerrain()
 			this->Flags |= MapFieldAirUnpassable;
 		}
 	}
-	
+
 	if (this->Flags & MapFieldRailroad) {
 		this->cost = DefaultTileMovementCost - 1;
 	} else if (this->Flags & MapFieldRoad) {
@@ -268,7 +270,7 @@ void CMapField::RemoveOverlayTerrain()
 	} else {
 		this->cost = DefaultTileMovementCost; // default speed
 	}
-	
+
 	if (this->Flags & MapFieldRailroad) {
 		this->Flags &= ~(MapFieldNoRail);
 	} else {
@@ -280,26 +282,26 @@ void CMapField::RemoveOverlayTerrain()
 	}
 }
 
-void CMapField::SetOverlayTerrainDestroyed(bool destroyed)
+void tile::SetOverlayTerrainDestroyed(bool destroyed)
 {
 	if (!this->OverlayTerrain || this->OverlayTerrainDestroyed == destroyed) {
 		return;
 	}
-	
+
 	this->OverlayTerrainDestroyed = destroyed;
 }
 
-void CMapField::SetOverlayTerrainDamaged(bool damaged)
+void tile::SetOverlayTerrainDamaged(bool damaged)
 {
 	if (!this->OverlayTerrain || this->OverlayTerrainDamaged == damaged) {
 		return;
 	}
-	
+
 	this->OverlayTerrainDamaged = damaged;
 }
 //Wyrmgus end
 
-void CMapField::setTileIndex(const CTileset &tileset, unsigned int tileIndex, int value)
+void tile::setTileIndex(const CTileset &tileset, unsigned int tileIndex, int value)
 {
 	const CTile &tile = tileset.tiles[tileIndex];
 	//Wyrmgus start
@@ -327,14 +329,14 @@ void CMapField::setTileIndex(const CTileset &tileset, unsigned int tileIndex, in
 #endif
 	*/
 	//Wyrmgus end
-	
+
 	//Wyrmgus start
-	wyrmgus::terrain_type *terrain = wyrmgus::terrain_type::get(tileset.getTerrainName(tile.tileinfo.BaseTerrain));
+	terrain_type *terrain = terrain_type::get(tileset.getTerrainName(tile.tileinfo.BaseTerrain));
 	if (terrain->is_overlay()) {
 		if (terrain->Flags & MapFieldForest) {
-			this->SetTerrain(wyrmgus::terrain_type::get(tileset.solidTerrainTypes[3].TerrainName));
+			this->SetTerrain(terrain_type::get(tileset.solidTerrainTypes[3].TerrainName));
 		} else if (terrain->Flags & MapFieldRocks || terrain->Flags & MapFieldWaterAllowed) {
-			this->SetTerrain(wyrmgus::terrain_type::get(tileset.solidTerrainTypes[2].TerrainName));
+			this->SetTerrain(terrain_type::get(tileset.solidTerrainTypes[2].TerrainName));
 		}
 	}
 	this->SetTerrain(terrain);
@@ -345,7 +347,7 @@ void CMapField::setTileIndex(const CTileset &tileset, unsigned int tileIndex, in
 }
 
 //Wyrmgus start
-void CMapField::UpdateSeenTile()
+void tile::UpdateSeenTile()
 {
 	this->player_info->SeenTerrain = this->Terrain;
 	this->player_info->SeenOverlayTerrain = this->OverlayTerrain;
@@ -358,24 +360,24 @@ void CMapField::UpdateSeenTile()
 }
 //Wyrmgus end
 
-void CMapField::Save(CFile &file) const
+void tile::Save(CFile &file) const
 {
 	const wyrmgus::terrain_feature *terrain_feature = this->get_terrain_feature();
 
 	file.printf("  {\"%s\", \"%s\", \"%s\", %s, %s, \"%s\", \"%s\", %d, %d, %d, %d, %2d, %2d, %2d, \"%s\"", (Terrain ? Terrain->Ident.c_str() : ""), (OverlayTerrain ? OverlayTerrain->Ident.c_str() : ""), (terrain_feature != nullptr ? terrain_feature->get_identifier().c_str() : ""), OverlayTerrainDamaged ? "true" : "false", OverlayTerrainDestroyed ? "true" : "false", player_info->SeenTerrain ? player_info->SeenTerrain->Ident.c_str() : "", player_info->SeenOverlayTerrain ? player_info->SeenOverlayTerrain->Ident.c_str() : "", SolidTile, OverlaySolidTile, player_info->SeenSolidTile, player_info->SeenOverlaySolidTile, this->get_value(), this->get_cost(), Landmass, this->get_settlement() != nullptr ? this->get_settlement()->get_identifier().c_str() : "");
-	
+
 	for (size_t i = 0; i != TransitionTiles.size(); ++i) {
 		file.printf(", \"transition-tile\", \"%s\", %d", TransitionTiles[i].first->Ident.c_str(), TransitionTiles[i].second);
 	}
-	
+
 	for (size_t i = 0; i != OverlayTransitionTiles.size(); ++i) {
 		file.printf(", \"overlay-transition-tile\", \"%s\", %d", OverlayTransitionTiles[i].first->Ident.c_str(), OverlayTransitionTiles[i].second);
 	}
-	
+
 	for (size_t i = 0; i != player_info->SeenTransitionTiles.size(); ++i) {
 		file.printf(", \"seen-transition-tile\", \"%s\", %d", player_info->SeenTransitionTiles[i].first->Ident.c_str(), player_info->SeenTransitionTiles[i].second);
 	}
-	
+
 	for (size_t i = 0; i != player_info->SeenOverlayTransitionTiles.size(); ++i) {
 		file.printf(", \"seen-overlay-transition-tile\", \"%s\", %d", player_info->SeenOverlayTransitionTiles[i].first->Ident.c_str(), player_info->SeenOverlayTransitionTiles[i].second);
 	}
@@ -488,7 +490,7 @@ void CMapField::Save(CFile &file) const
 }
 
 
-void CMapField::parse(lua_State *l)
+void tile::parse(lua_State *l)
 {
 	if (!lua_istable(l, -1)) {
 		LuaError(l, "incorrect argument");
@@ -497,7 +499,7 @@ void CMapField::parse(lua_State *l)
 	//Wyrmgus start
 //	if (len < 4) {
 	if (len < 14) {
-	//Wyrmgus end
+		//Wyrmgus end
 		LuaError(l, "incorrect argument");
 	}
 
@@ -510,32 +512,32 @@ void CMapField::parse(lua_State *l)
 	*/
 	const std::string terrain_ident = LuaToString(l, -1, 1);
 	if (!terrain_ident.empty()) {
-		this->Terrain = wyrmgus::terrain_type::get(terrain_ident);
+		this->Terrain = terrain_type::get(terrain_ident);
 	}
-	
+
 	const std::string overlay_terrain_ident = LuaToString(l, -1, 2);
 	if (!overlay_terrain_ident.empty()) {
-		this->OverlayTerrain = wyrmgus::terrain_type::get(overlay_terrain_ident);
+		this->OverlayTerrain = terrain_type::get(overlay_terrain_ident);
 	}
 
 	const std::string terrain_feature_ident = LuaToString(l, -1, 3);
 	if (!terrain_feature_ident.empty()) {
-		this->terrain_feature = wyrmgus::terrain_feature::get(terrain_feature_ident);
+		this->terrain_feature = terrain_feature::get(terrain_feature_ident);
 	}
 
 	this->SetOverlayTerrainDamaged(LuaToBoolean(l, -1, 4));
 	this->SetOverlayTerrainDestroyed(LuaToBoolean(l, -1, 5));
-	
+
 	const std::string seen_terrain_ident = LuaToString(l, -1, 6);
 	if (!seen_terrain_ident.empty()) {
-		this->player_info->SeenTerrain = wyrmgus::terrain_type::get(seen_terrain_ident);
+		this->player_info->SeenTerrain = terrain_type::get(seen_terrain_ident);
 	}
-	
+
 	const std::string seen_overlay_terrain_ident = LuaToString(l, -1, 7);
 	if (!seen_overlay_terrain_ident.empty()) {
-		this->player_info->SeenOverlayTerrain = wyrmgus::terrain_type::get(seen_overlay_terrain_ident);
+		this->player_info->SeenOverlayTerrain = terrain_type::get(seen_overlay_terrain_ident);
 	}
-	
+
 	this->SolidTile = LuaToNumber(l, -1, 8);
 	this->OverlaySolidTile = LuaToNumber(l, -1, 9);
 	this->player_info->SeenSolidTile = LuaToNumber(l, -1, 10);
@@ -545,7 +547,7 @@ void CMapField::parse(lua_State *l)
 	this->Landmass = LuaToNumber(l, -1, 14);
 	const std::string settlement_identifier = LuaToString(l, -1, 15);
 	if (!settlement_identifier.empty()) {
-		this->settlement = wyrmgus::site::get(settlement_identifier);
+		this->settlement = site::get(settlement_identifier);
 	}
 	//Wyrmgus end
 
@@ -556,30 +558,30 @@ void CMapField::parse(lua_State *l)
 //		if (!strcmp(value, "explored")) {
 		if (!strcmp(value, "transition-tile")) {
 			++j;
-			wyrmgus::terrain_type *terrain = wyrmgus::terrain_type::get(LuaToString(l, -1, j + 1));
+			terrain_type *terrain = terrain_type::get(LuaToString(l, -1, j + 1));
 			++j;
 			int tile_number = LuaToNumber(l, -1, j + 1);
-			this->TransitionTiles.push_back(std::pair<wyrmgus::terrain_type *, int>(terrain, tile_number));
+			this->TransitionTiles.push_back(std::pair<terrain_type *, int>(terrain, tile_number));
 		} else if (!strcmp(value, "overlay-transition-tile")) {
 			++j;
-			wyrmgus::terrain_type *terrain = wyrmgus::terrain_type::get(LuaToString(l, -1, j + 1));
+			terrain_type *terrain = terrain_type::get(LuaToString(l, -1, j + 1));
 			++j;
 			int tile_number = LuaToNumber(l, -1, j + 1);
-			this->OverlayTransitionTiles.push_back(std::pair<wyrmgus::terrain_type *, int>(terrain, tile_number));
+			this->OverlayTransitionTiles.push_back(std::pair<terrain_type *, int>(terrain, tile_number));
 		} else if (!strcmp(value, "seen-transition-tile")) {
 			++j;
-			wyrmgus::terrain_type *terrain = wyrmgus::terrain_type::get(LuaToString(l, -1, j + 1));
+			terrain_type *terrain = terrain_type::get(LuaToString(l, -1, j + 1));
 			++j;
 			int tile_number = LuaToNumber(l, -1, j + 1);
-			this->player_info->SeenTransitionTiles.push_back(std::pair<wyrmgus::terrain_type *, int>(terrain, tile_number));
+			this->player_info->SeenTransitionTiles.push_back(std::pair<terrain_type *, int>(terrain, tile_number));
 		} else if (!strcmp(value, "seen-overlay-transition-tile")) {
 			++j;
-			wyrmgus::terrain_type *terrain = wyrmgus::terrain_type::get(LuaToString(l, -1, j + 1));
+			terrain_type *terrain = terrain_type::get(LuaToString(l, -1, j + 1));
 			++j;
 			int tile_number = LuaToNumber(l, -1, j + 1);
-			this->player_info->SeenOverlayTransitionTiles.push_back(std::pair<wyrmgus::terrain_type *, int>(terrain, tile_number));
+			this->player_info->SeenOverlayTransitionTiles.push_back(std::pair<terrain_type *, int>(terrain, tile_number));
 		} else if (!strcmp(value, "explored")) {
-		//Wyrmgus end
+			//Wyrmgus end
 			++j;
 			this->player_info->Visible[LuaToNumber(l, -1, j + 1)] = 1;
 		} else if (!strcmp(value, "land")) {
@@ -588,10 +590,10 @@ void CMapField::parse(lua_State *l)
 			this->Flags |= MapFieldCoastAllowed;
 		} else if (!strcmp(value, "water")) {
 			this->Flags |= MapFieldWaterAllowed;
-		//Wyrmgus start
-//		} else if (!strcmp(value, "mud")) {
+			//Wyrmgus start
+	//		} else if (!strcmp(value, "mud")) {
 		} else if (!strcmp(value, "no-building")) {
-		//Wyrmgus end
+			//Wyrmgus end
 			this->Flags |= MapFieldNoBuilding;
 		} else if (!strcmp(value, "block")) {
 			this->Flags |= MapFieldUnpassable;
@@ -650,7 +652,7 @@ void CMapField::parse(lua_State *l)
 }
 
 /// Check if a field flags.
-bool CMapField::CheckMask(int mask) const
+bool tile::CheckMask(const int mask) const
 {
 	//Wyrmgus start
 	//for purposes of this check, don't count MapFieldWaterAllowed and MapFieldCoastAllowed if there is a bridge present
@@ -658,66 +660,66 @@ bool CMapField::CheckMask(int mask) const
 	if (check_flags & MapFieldBridge) {
 		check_flags &= ~(MapFieldWaterAllowed | MapFieldCoastAllowed);
 	}
-//	return (this->Flags & mask) != 0;
+	//	return (this->Flags & mask) != 0;
 	return (check_flags & mask) != 0;
 	//Wyrmgus end
 }
 
-bool CMapField::is_water() const
+bool tile::is_water() const
 {
 	return this->Flags & (MapFieldWaterAllowed | MapFieldCoastAllowed);
 }
 
-bool CMapField::is_non_coastal_water() const
+bool tile::is_non_coastal_water() const
 {
 	return this->Flags & MapFieldWaterAllowed;
 }
 
-bool CMapField::is_coastal_water() const
+bool tile::is_coastal_water() const
 {
 	return this->Flags & MapFieldCoastAllowed;
 }
 
-bool CMapField::is_river() const
+bool tile::is_river() const
 {
 	return this->get_terrain_feature() != nullptr && this->get_terrain_feature()->is_river();
 }
 
-bool CMapField::is_space() const
+bool tile::is_space() const
 {
 	return this->Flags & MapFieldSpace;
 }
 
 /// Returns true, if water on the map tile field
-bool CMapField::WaterOnMap() const
+bool tile::WaterOnMap() const
 {
 	return CheckMask(MapFieldWaterAllowed);
 }
 
 /// Returns true, if coast on the map tile field
-bool CMapField::CoastOnMap() const
+bool tile::CoastOnMap() const
 {
 	return CheckMask(MapFieldCoastAllowed);
 }
 
 /// Returns true, if water on the map tile field
-bool CMapField::ForestOnMap() const
+bool tile::ForestOnMap() const
 {
 	return CheckMask(MapFieldForest);
 }
 
 /// Returns true, if coast on the map tile field
-bool CMapField::RockOnMap() const
+bool tile::RockOnMap() const
 {
 	return CheckMask(MapFieldRocks);
 }
 
-bool CMapField::isAWall() const
+bool tile::isAWall() const
 {
 	return CheckMask(MapFieldWall);
 }
 
-CPlayer *CMapField::get_owner() const
+CPlayer *tile::get_owner() const
 {
 	if (this->get_settlement() == nullptr) {
 		return nullptr;
@@ -726,7 +728,7 @@ CPlayer *CMapField::get_owner() const
 	return this->get_settlement()->get_owner();
 }
 
-CPlayer *CMapField::get_realm_owner() const
+CPlayer *tile::get_realm_owner() const
 {
 	if (this->get_settlement() == nullptr) {
 		return nullptr;
@@ -736,10 +738,10 @@ CPlayer *CMapField::get_realm_owner() const
 }
 
 //
-//  CMapFieldPlayerInfo
+//  tile_player_info
 //
 
-unsigned char CMapFieldPlayerInfo::TeamVisibilityState(const CPlayer &player) const
+unsigned char tile_player_info::TeamVisibilityState(const CPlayer &player) const
 {
 	if (this->IsVisible(player)) {
 		return 2;
@@ -780,25 +782,27 @@ unsigned char CMapFieldPlayerInfo::TeamVisibilityState(const CPlayer &player) co
 	return maxVision;
 }
 
-bool CMapFieldPlayerInfo::IsExplored(const CPlayer &player) const
+bool tile_player_info::IsExplored(const CPlayer &player) const
 {
 	return Visible[player.Index] != 0;
 }
 
 //Wyrmgus start
-bool CMapFieldPlayerInfo::IsTeamExplored(const CPlayer &player) const
+bool tile_player_info::IsTeamExplored(const CPlayer &player) const
 {
 	return Visible[player.Index] != 0 || TeamVisibilityState(player) != 0;
 }
 //Wyrmgus end
 
-bool CMapFieldPlayerInfo::IsVisible(const CPlayer &player) const
+bool tile_player_info::IsVisible(const CPlayer &player) const
 {
 	const bool fogOfWar = !CMap::Map.NoFogOfWar;
 	return Visible[player.Index] >= 2 || (!fogOfWar && IsExplored(player));
 }
 
-bool CMapFieldPlayerInfo::IsTeamVisible(const CPlayer &player) const
+bool tile_player_info::IsTeamVisible(const CPlayer &player) const
 {
 	return TeamVisibilityState(player) == 2;
+}
+
 }

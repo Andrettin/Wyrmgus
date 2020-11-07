@@ -361,7 +361,7 @@ void site::update_border_tiles()
 					continue;
 				}
 
-				CMapField *adjacent_tile = CMap::Map.Field(adjacent_pos, z);
+				tile *adjacent_tile = CMap::Map.Field(adjacent_pos, z);
 				if (adjacent_tile->get_settlement() != nullptr && adjacent_tile->get_settlement() != this) {
 					CMap::Map.CalculateTileOwnershipTransition(adjacent_pos, z);
 				}
@@ -381,7 +381,7 @@ void site::update_minimap_territory()
 	for (int x = this->territory_rect.x(); x <= this->territory_rect.right(); ++x) {
 		for (int y = this->territory_rect.y(); y <= this->territory_rect.bottom(); ++y) {
 			const QPoint tile_pos(x, y);
-			const CMapField *tile = CMap::Map.Field(tile_pos, z);
+			const tile *tile = CMap::Map.Field(tile_pos, z);
 
 			if (tile->get_settlement() == this) {
 				UI.get_minimap()->update_territory_xy(tile_pos, z);

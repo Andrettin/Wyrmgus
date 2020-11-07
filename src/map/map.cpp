@@ -97,7 +97,7 @@ char CurrentMapPath[1024]; //path of the current map
 **
 **  @param mf  MapField-position.
 */
-void CMap::MarkSeenTile(CMapField &mf)
+void CMap::MarkSeenTile(wyrmgus::tile &mf)
 {
 	//Wyrmgus start
 //	const unsigned int tile = mf.getGraphicTile();
@@ -187,8 +187,8 @@ void CMap::Reveal(bool only_person_players)
 	//Wyrmgus start
 	/*
 	for (int i = 0; i != this->Info.MapWidth * this->Info.MapHeight; ++i) {
-		CMapField &mf = *this->Field(i);
-		CMapFieldPlayerInfo &playerInfo = mf.playerInfo;
+		wyrmgus::tile &mf = *this->Field(i);
+		wyrmgus::tile_player_info &playerInfo = mf.playerInfo;
 		for (int p = 0; p < PlayerMax; ++p) {
 			//Wyrmgus start
 //			playerInfo.Visible[p] = std::max<unsigned short>(1, playerInfo.Visible[p]);
@@ -202,8 +202,8 @@ void CMap::Reveal(bool only_person_players)
 	*/
 	for (size_t z = 0; z < this->MapLayers.size(); ++z) {
 		for (int i = 0; i != this->Info.MapWidths[z] * this->Info.MapHeights[z]; ++i) {
-			CMapField &mf = *this->Field(i, z);
-			const std::unique_ptr<CMapFieldPlayerInfo> &player_info = mf.player_info;
+			wyrmgus::tile &mf = *this->Field(i, z);
+			const std::unique_ptr<wyrmgus::tile_player_info> &player_info = mf.player_info;
 			for (int p = 0; p < PlayerMax; ++p) {
 				if (CPlayer::Players[p]->Type == PlayerPerson || !only_person_players) {
 					player_info->Visible[p] = std::max<unsigned short>(1, player_info->Visible[p]);
@@ -275,7 +275,7 @@ const wyrmgus::terrain_type *CMap::GetTileTerrain(const Vec2i &pos, const bool o
 		return nullptr;
 	}
 	
-	CMapField &mf = *this->Field(pos, z);
+	wyrmgus::tile &mf = *this->Field(pos, z);
 	
 	return mf.GetTerrain(overlay);
 }
@@ -286,7 +286,7 @@ const wyrmgus::terrain_type *CMap::GetTileTopTerrain(const Vec2i &pos, const boo
 		return nullptr;
 	}
 	
-	CMapField &mf = *this->Field(pos, z);
+	wyrmgus::tile &mf = *this->Field(pos, z);
 	
 	return mf.GetTopTerrain(seen, ignore_destroyed);
 }
@@ -297,7 +297,7 @@ int CMap::GetTileLandmass(const Vec2i &pos, int z) const
 		return 0;
 	}
 	
-	CMapField &mf = *this->Field(pos, z);
+	wyrmgus::tile &mf = *this->Field(pos, z);
 	
 	return mf.Landmass;
 }
@@ -401,7 +401,7 @@ bool CMap::WallOnMap(const Vec2i &pos, int z) const
 //Wyrmgus start
 bool CMap::CurrentTerrainCanBeAt(const Vec2i &pos, bool overlay, int z)
 {
-	CMapField &mf = *this->Field(pos, z);
+	wyrmgus::tile &mf = *this->Field(pos, z);
 	const wyrmgus::terrain_type *terrain = nullptr;
 	
 	if (overlay) {
@@ -521,7 +521,7 @@ bool CMap::TileBordersFlag(const Vec2i &pos, int z, int flag, bool reverse) cons
 			if (!this->Info.IsPointOnMap(adjacent_pos, z) || (sub_x == 0 && sub_y == 0)) {
 				continue;
 			}
-			CMapField &mf = *Map.Field(adjacent_pos, z);
+			const wyrmgus::tile &mf = *Map.Field(adjacent_pos, z);
 			
 			if ((!reverse && mf.CheckMask(flag)) || (reverse && !mf.CheckMask(flag))) {
 				return true;
@@ -611,7 +611,7 @@ bool CMap::TileBordersBuilding(const Vec2i &pos, int z)
 			if (!this->Info.IsPointOnMap(adjacent_pos, z) || (sub_x == 0 && sub_y == 0)) {
 				continue;
 			}
-			CMapField &mf = *Map.Field(adjacent_pos, z);
+			const wyrmgus::tile &mf = *Map.Field(adjacent_pos, z);
 			
 			if (mf.CheckMask(MapFieldBuilding)) {
 				return true;
@@ -630,7 +630,7 @@ bool CMap::TileBordersPathway(const Vec2i &pos, int z, bool only_railroad)
 			if (!this->Info.IsPointOnMap(adjacent_pos, z) || (sub_x == 0 && sub_y == 0)) {
 				continue;
 			}
-			CMapField &mf = *Map.Field(adjacent_pos, z);
+			const wyrmgus::tile &mf = *Map.Field(adjacent_pos, z);
 			
 			if (
 				(!only_railroad && mf.CheckMask(MapFieldRoad))
@@ -652,7 +652,7 @@ bool CMap::TileBordersUnit(const Vec2i &pos, int z)
 			if (!this->Info.IsPointOnMap(adjacent_pos, z) || (sub_x == 0 && sub_y == 0)) {
 				continue;
 			}
-			CMapField &mf = *Map.Field(adjacent_pos, z);
+			const wyrmgus::tile &mf = *Map.Field(adjacent_pos, z);
 			
 			const CUnitCache &cache = mf.UnitCache;
 			for (size_t i = 0; i != cache.size(); ++i) {
@@ -775,7 +775,7 @@ bool CMap::TileBordersTerrainIncompatibleWithTerrainPair(const Vec2i &pos, const
 */
 bool CMap::TileHasUnitsIncompatibleWithTerrain(const Vec2i &pos, const wyrmgus::terrain_type *terrain_type, const int z)
 {
-	CMapField &mf = *Map.Field(pos, z);
+	const wyrmgus::tile &mf = *Map.Field(pos, z);
 	
 	const CUnitCache &cache = mf.UnitCache;
 	for (size_t i = 0; i != cache.size(); ++i) {
@@ -973,7 +973,7 @@ bool CMap::is_rect_in_settlement(const QRect &rect, const int z, const wyrmgus::
 				return false;
 			}
 
-			const CMapField *tile = this->Field(tile_pos, z);
+			const wyrmgus::tile *tile = this->Field(tile_pos, z);
 
 			//doesn't return false for tiles with no settlement
 			if (tile->get_settlement() == nullptr) {
@@ -1098,7 +1098,7 @@ bool UnitTypeCanBeAt(const wyrmgus::unit_type &type, const Vec2i &pos, int z)
 				return false;
 			}
 
-			const CMapField *tile = CMap::Map.Field(pos.x + addx + index, z);
+			const wyrmgus::tile *tile = CMap::Map.Field(pos.x + addx + index, z);
 			if (tile->CheckMask(mask) == true || (tile->Terrain == nullptr && wyrmgus::game::get()->get_current_campaign() != nullptr)) {
 				return false;
 			}
@@ -1143,7 +1143,7 @@ void PreprocessMap()
 	/*
 	for (int ix = 0; ix < Map.Info.MapWidth; ++ix) {
 		for (int iy = 0; iy < Map.Info.MapHeight; ++iy) {
-			CMapField &mf = *Map.Field(ix, iy);
+			wyrmgus::tile &mf = *Map.Field(ix, iy);
 			mf.player_info->SeenTile = mf.getGraphicTile();
 		}
 	}
@@ -1153,7 +1153,7 @@ void PreprocessMap()
 		for (int ix = 0; ix < CMap::Map.Info.MapWidths[z]; ++ix) {
 			for (int iy = 0; iy < CMap::Map.Info.MapHeights[z]; ++iy) {
 				const QPoint tile_pos(ix, iy);
-				CMapField &mf = *CMap::Map.Field(tile_pos, z);
+				wyrmgus::tile &mf = *CMap::Map.Field(tile_pos, z);
 				CMap::Map.calculate_tile_solid_tile(tile_pos, false, z);
 				if (mf.OverlayTerrain != nullptr) {
 					CMap::Map.calculate_tile_solid_tile(tile_pos, true, z);
@@ -1169,7 +1169,7 @@ void PreprocessMap()
 		for (int ix = 0; ix < CMap::Map.Info.MapWidths[z]; ++ix) {
 			for (int iy = 0; iy < CMap::Map.Info.MapHeights[z]; ++iy) {
 				const QPoint tile_pos(ix, iy);
-				CMapField &mf = *CMap::Map.Field(tile_pos, z);
+				wyrmgus::tile &mf = *CMap::Map.Field(tile_pos, z);
 				CMap::Map.CalculateTileLandmass(tile_pos, z);
 				CMap::Map.CalculateTileOwnershipTransition(tile_pos, z);
 				CMap::Map.calculate_tile_terrain_feature(tile_pos, z);
@@ -1445,7 +1445,7 @@ unsigned int CMap::getIndex(const Vec2i &pos, int z) const
 **
 **	@return	The map field
 */
-CMapField *CMap::Field(const unsigned int index, const int z) const
+wyrmgus::tile *CMap::Field(const unsigned int index, const int z) const
 {
 	return this->MapLayers[z]->Field(index);
 }
@@ -1459,7 +1459,7 @@ CMapField *CMap::Field(const unsigned int index, const int z) const
 **
 **	@return	The map field
 */
-CMapField *CMap::Field(const int x, const int y, const int z) const
+wyrmgus::tile *CMap::Field(const int x, const int y, const int z) const
 {
 	return this->MapLayers[z]->Field(x, y);
 }
@@ -1594,7 +1594,7 @@ void CMap::Save(CFile &file) const
 	for (int h = 0; h < this->Info.MapHeight; ++h) {
 		file.printf("  -- %d\n", h);
 		for (int w = 0; w < this->Info.MapWidth; ++w) {
-			const CMapField &mf = *this->Field(w, h);
+			const wyrmgus::tile &mf = *this->Field(w, h);
 
 			mf.Save(file);
 			if (w & 1) {
@@ -1610,7 +1610,7 @@ void CMap::Save(CFile &file) const
 		for (int h = 0; h < this->Info.MapHeights[z]; ++h) {
 			file.printf("  -- %d\n", h);
 			for (int w = 0; w < this->Info.MapWidths[z]; ++w) {
-				const CMapField &mf = *this->Field(w, h, z);
+				const wyrmgus::tile &mf = *this->Field(w, h, z);
 
 				mf.Save(file);
 				if (w & 1) {
@@ -1648,7 +1648,7 @@ void CMap::FixTile(unsigned short type, int seen, const Vec2i &pos)
 		return;
 	}
 	unsigned int index = getIndex(pos);
-	CMapField &mf = *this->Field(index);
+	wyrmgus::tile &mf = *this->Field(index);
 
 	if (!((type == MapFieldForest && Tileset->isAWoodTile(mf.player_info->SeenTile))
 		  || (type == MapFieldRocks && Tileset->isARockTile(mf.player_info->SeenTile)))) {
@@ -1680,25 +1680,25 @@ void CMap::FixTile(unsigned short type, int seen, const Vec2i &pos)
 	if (pos.y - 1 < 0) {
 		ttup = -1; //Assign trees in all directions
 	} else {
-		const CMapField &new_mf = *(&mf - this->Info.MapWidth);
+		const wyrmgus::tile &new_mf = *(&mf - this->Info.MapWidth);
 		ttup = seen ? new_mf.player_info->SeenTile : new_mf.getGraphicTile();
 	}
 	if (pos.x + 1 >= this->Info.MapWidth) {
 		ttright = -1; //Assign trees in all directions
 	} else {
-		const CMapField &new_mf = *(&mf + 1);
+		const wyrmgus::tile &new_mf = *(&mf + 1);
 		ttright = seen ? new_mf.player_info->SeenTile : new_mf.getGraphicTile();
 	}
 	if (pos.y + 1 >= this->Info.MapHeight) {
 		ttdown = -1; //Assign trees in all directions
 	} else {
-		const CMapField &new_mf = *(&mf + this->Info.MapWidth);
+		const wyrmgus::tile &new_mf = *(&mf + this->Info.MapWidth);
 		ttdown = seen ? new_mf.player_info->SeenTile : new_mf.getGraphicTile();
 	}
 	if (pos.x - 1 < 0) {
 		ttleft = -1; //Assign trees in all directions
 	} else {
-		const CMapField &new_mf = *(&mf - 1);
+		const wyrmgus::tile &new_mf = *(&mf - 1);
 		ttleft = seen ? new_mf.player_info->SeenTile : new_mf.getGraphicTile();
 	}
 	int tile = this->Tileset->getTileBySurrounding(type, ttup, ttright, ttdown, ttleft);
@@ -1764,7 +1764,7 @@ void CMap::SetTileTerrain(const Vec2i &pos, const wyrmgus::terrain_type *terrain
 		return;
 	}
 	
-	CMapField &mf = *this->Field(pos, z);
+	wyrmgus::tile &mf = *this->Field(pos, z);
 	
 	const wyrmgus::terrain_type *old_terrain = this->GetTileTerrain(pos, terrain->is_overlay(), z);
 	
@@ -1808,7 +1808,7 @@ void CMap::SetTileTerrain(const Vec2i &pos, const wyrmgus::terrain_type *terrain
 			if (x_offset != 0 || y_offset != 0) {
 				Vec2i adjacent_pos(pos.x + x_offset, pos.y + y_offset);
 				if (Map.Info.IsPointOnMap(adjacent_pos, z)) {
-					CMapField &adjacent_mf = *this->Field(adjacent_pos, z);
+					wyrmgus::tile &adjacent_mf = *this->Field(adjacent_pos, z);
 					
 					if (terrain->is_overlay() && adjacent_mf.OverlayTerrain != terrain && adjacent_mf.OverlayTerrain != old_terrain && Editor.Running == EditorNotRunning) {
 						continue;
@@ -1829,7 +1829,7 @@ void CMap::SetTileTerrain(const Vec2i &pos, const wyrmgus::terrain_type *terrain
 
 void CMap::RemoveTileOverlayTerrain(const Vec2i &pos, int z)
 {
-	CMapField &mf = *this->Field(pos, z);
+	wyrmgus::tile &mf = *this->Field(pos, z);
 	
 	if (!mf.OverlayTerrain) {
 		return;
@@ -1850,7 +1850,7 @@ void CMap::RemoveTileOverlayTerrain(const Vec2i &pos, int z)
 			if (x_offset != 0 || y_offset != 0) {
 				Vec2i adjacent_pos(pos.x + x_offset, pos.y + y_offset);
 				if (Map.Info.IsPointOnMap(adjacent_pos, z)) {
-					CMapField &adjacent_mf = *this->Field(adjacent_pos, z);
+					wyrmgus::tile &adjacent_mf = *this->Field(adjacent_pos, z);
 					
 					this->CalculateTileTransitions(adjacent_pos, true, z);
 					
@@ -1872,7 +1872,7 @@ void CMap::SetOverlayTerrainDestroyed(const Vec2i &pos, bool destroyed, int z)
 		return;
 	}
 	
-	CMapField &mf = *map_layer->Field(pos);
+	wyrmgus::tile &mf = *map_layer->Field(pos);
 	
 	if (!mf.OverlayTerrain || mf.OverlayTerrainDestroyed == destroyed) {
 		return;
@@ -1924,7 +1924,7 @@ void CMap::SetOverlayTerrainDestroyed(const Vec2i &pos, bool destroyed, int z)
 			if (x_offset != 0 || y_offset != 0) {
 				Vec2i adjacent_pos(pos.x + x_offset, pos.y + y_offset);
 				if (Map.Info.IsPointOnMap(adjacent_pos, z)) {
-					CMapField &adjacent_mf = *this->Field(adjacent_pos, z);
+					wyrmgus::tile &adjacent_mf = *this->Field(adjacent_pos, z);
 					
 					if (adjacent_mf.OverlayTerrain != mf.OverlayTerrain) {
 						continue;
@@ -1944,7 +1944,7 @@ void CMap::SetOverlayTerrainDestroyed(const Vec2i &pos, bool destroyed, int z)
 
 void CMap::SetOverlayTerrainDamaged(const Vec2i &pos, bool damaged, int z)
 {
-	CMapField &mf = *this->Field(pos, z);
+	wyrmgus::tile &mf = *this->Field(pos, z);
 	
 	if (!mf.OverlayTerrain || mf.OverlayTerrainDamaged == damaged) {
 		return;
@@ -2075,7 +2075,7 @@ static wyrmgus::tile_transition_type GetTransitionType(std::vector<int> &adjacen
 
 void CMap::calculate_tile_solid_tile(const QPoint &pos, const bool overlay, const int z)
 {
-	CMapField *tile = this->Field(pos, z);
+	wyrmgus::tile *tile = this->Field(pos, z);
 
 	const wyrmgus::terrain_type *terrain_type = nullptr;
 	int solid_tile = 0;
@@ -2110,7 +2110,7 @@ void CMap::calculate_tile_solid_tile(const QPoint &pos, const bool overlay, cons
 
 void CMap::CalculateTileTransitions(const Vec2i &pos, bool overlay, int z)
 {
-	CMapField &mf = *this->Field(pos, z);
+	wyrmgus::tile &mf = *this->Field(pos, z);
 	const wyrmgus::terrain_type *terrain = nullptr;
 	if (overlay) {
 		terrain = mf.OverlayTerrain;
@@ -2268,7 +2268,7 @@ void CMap::CalculateTileLandmass(const Vec2i &pos, int z)
 		return;
 	}
 	
-	CMapField &mf = *this->Field(pos, z);
+	wyrmgus::tile &mf = *this->Field(pos, z);
 
 	if (mf.Landmass != 0) {
 		return; //already calculated
@@ -2296,7 +2296,7 @@ void CMap::CalculateTileLandmass(const Vec2i &pos, int z)
 				if (x_offset != 0 || y_offset != 0) {
 					Vec2i adjacent_pos(landmass_tiles[i].x + x_offset, landmass_tiles[i].y + y_offset);
 					if (this->Info.IsPointOnMap(adjacent_pos, z)) {
-						CMapField &adjacent_mf = *this->Field(adjacent_pos, z);
+						wyrmgus::tile &adjacent_mf = *this->Field(adjacent_pos, z);
 						const bool adjacent_is_space = adjacent_mf.Flags & MapFieldSpace;
 
 						if (adjacent_is_space) {
@@ -2329,7 +2329,7 @@ void CMap::calculate_tile_terrain_feature(const Vec2i &pos, int z)
 		return;
 	}
 	
-	CMapField &mf = *this->Field(pos, z);
+	wyrmgus::tile &mf = *this->Field(pos, z);
 
 	if (mf.get_terrain_feature() != nullptr) {
 		return; //already has a terrain feature
@@ -2341,7 +2341,7 @@ void CMap::calculate_tile_terrain_feature(const Vec2i &pos, int z)
 			if ((x_offset != 0 || y_offset != 0) && !(x_offset != 0 && y_offset != 0)) { //only directly adjacent tiles (no diagonal ones, and not the same tile)
 				Vec2i adjacent_pos(pos.x + x_offset, pos.y + y_offset);
 				if (Map.Info.IsPointOnMap(adjacent_pos, z)) {
-					CMapField &adjacent_mf = *this->Field(adjacent_pos, z);
+					wyrmgus::tile &adjacent_mf = *this->Field(adjacent_pos, z);
 
 					if (adjacent_mf.get_terrain_feature() != nullptr && adjacent_mf.get_terrain_feature()->get_terrain_type() == GetTileTopTerrain(pos, false, z)) {
 						mf.set_terrain_feature(adjacent_mf.get_terrain_feature());
@@ -2363,7 +2363,7 @@ void CMap::CalculateTileOwnershipTransition(const Vec2i &pos, int z)
 		return;
 	}
 	
-	CMapField &mf = *this->Field(pos, z);
+	wyrmgus::tile &mf = *this->Field(pos, z);
 	
 	mf.set_ownership_border_tile(-1);
 
@@ -2378,7 +2378,7 @@ void CMap::CalculateTileOwnershipTransition(const Vec2i &pos, int z)
 			if (x_offset != 0 || y_offset != 0) {
 				Vec2i adjacent_pos(pos.x + x_offset, pos.y + y_offset);
 				if (Map.Info.IsPointOnMap(adjacent_pos, z)) {
-					CMapField &adjacent_mf = *this->Field(adjacent_pos, z);
+					wyrmgus::tile &adjacent_mf = *this->Field(adjacent_pos, z);
 					if (adjacent_mf.get_owner() != mf.get_owner()) {
 						adjacent_directions.push_back(GetDirectionFromOffset(x_offset, y_offset));
 					}
@@ -2422,7 +2422,7 @@ void CMap::AdjustTileMapIrregularities(const bool overlay, const Vec2i &min_pos,
 
 		for (int x = min_pos.x; x < max_pos.x; ++x) {
 			for (int y = min_pos.y; y < max_pos.y; ++y) {
-				CMapField &mf = *this->Field(x, y, z);
+				wyrmgus::tile &mf = *this->Field(x, y, z);
 				const wyrmgus::terrain_type *terrain = overlay ? mf.OverlayTerrain : mf.Terrain;
 				if (!terrain || terrain->allows_single()) {
 					continue;
@@ -2519,7 +2519,7 @@ void CMap::AdjustTileMapTransitions(const Vec2i &min_pos, const Vec2i &max_pos, 
 {
 	for (int x = min_pos.x; x < max_pos.x; ++x) {
 		for (int y = min_pos.y; y < max_pos.y; ++y) {
-			CMapField &mf = *this->Field(x, y, z);
+			wyrmgus::tile &mf = *this->Field(x, y, z);
 
 			for (int sub_x = -1; sub_x <= 1; ++sub_x) {
 				for (int sub_y = -1; sub_y <= 1; ++sub_y) {
@@ -2544,7 +2544,7 @@ void CMap::AdjustTileMapTransitions(const Vec2i &min_pos, const Vec2i &max_pos, 
 
 	for (int x = min_pos.x; x < max_pos.x; ++x) {
 		for (int y = min_pos.y; y < max_pos.y; ++y) {
-			CMapField &mf = *this->Field(x, y, z);
+			wyrmgus::tile &mf = *this->Field(x, y, z);
 
 			for (int sub_x = -1; sub_x <= 1; ++sub_x) {
 				for (int sub_y = -1; sub_y <= 1; ++sub_y) {
@@ -2578,7 +2578,7 @@ void CMap::adjust_territory_irregularities(const QPoint &min_pos, const QPoint &
 		for (int x = min_pos.x(); x <= max_pos.x(); ++x) {
 			for (int y = min_pos.y(); y <= max_pos.y(); ++y) {
 				const QPoint tile_pos(x, y);
-				CMapField *tile = this->Field(tile_pos, z);
+				wyrmgus::tile *tile = this->Field(tile_pos, z);
 
 				if (tile->get_settlement() == nullptr) {
 					continue;
@@ -2628,7 +2628,7 @@ void CMap::GenerateTerrain(const std::unique_ptr<wyrmgus::generated_terrain> &ge
 		for (int x = min_pos.x; x <= max_pos.x; ++x) {
 			for (int y = min_pos.y; y <= max_pos.y; ++y) {
 				const Vec2i tile_pos(x, y);
-				const CMapField *tile = this->Field(x, y, z);
+				const wyrmgus::tile *tile = this->Field(x, y, z);
 				
 				if (max_tile_quantity != 0 && tile->GetTopTerrain() == terrain_type) {
 					tile_quantity++;
@@ -2657,7 +2657,7 @@ void CMap::GenerateTerrain(const std::unique_ptr<wyrmgus::generated_terrain> &ge
 			for (int x = subtemplate_min_pos.x(); x <= subtemplate_max_pos.x(); ++x) {
 				for (int y = subtemplate_min_pos.y(); y <= subtemplate_max_pos.y(); ++y) {
 					const Vec2i tile_pos(x, y);
-					const CMapField *tile = this->Field(x, y, z);
+					const wyrmgus::tile *tile = this->Field(x, y, z);
 					
 					if (!generated_terrain->CanUseTileAsSeed(tile)) {
 						continue;
@@ -2945,7 +2945,7 @@ void CMap::GenerateTerrain(const std::unique_ptr<wyrmgus::generated_terrain> &ge
 	}
 }
 
-bool CMap::CanTileBePartOfMissingTerrainGeneration(const CMapField *tile, const wyrmgus::terrain_type *terrain_type, const wyrmgus::terrain_type *overlay_terrain_type) const
+bool CMap::CanTileBePartOfMissingTerrainGeneration(const wyrmgus::tile *tile, const wyrmgus::terrain_type *terrain_type, const wyrmgus::terrain_type *overlay_terrain_type) const
 {
 	if (tile->GetTopTerrain() == nullptr) {
 		return true;
@@ -2971,7 +2971,7 @@ void CMap::generate_missing_terrain(const Vec2i &min_pos, const Vec2i &max_pos, 
 	for (int x = min_pos.x; x <= max_pos.x; ++x) {
 		for (int y = min_pos.y; y <= max_pos.y; ++y) {
 			const QPoint tile_pos(x, y);
-			const CMapField *tile = this->Field(x, y, z);
+			const wyrmgus::tile *tile = this->Field(x, y, z);
 
 			if (tile->GetTopTerrain() == nullptr) {
 				has_tile_with_missing_terrain = true;
@@ -2995,7 +2995,7 @@ void CMap::generate_missing_terrain(const Vec2i &min_pos, const Vec2i &max_pos, 
 		Vec2i seed_pos = seeds[SyncRand(seeds.size())];
 		wyrmgus::vector::remove(seeds, seed_pos);
 
-		const CMapField *seed_tile = this->Field(seed_pos, z);
+		const wyrmgus::tile *seed_tile = this->Field(seed_pos, z);
 
 		const wyrmgus::terrain_type *terrain_type = seed_tile->Terrain;
 		const wyrmgus::terrain_type *overlay_terrain_type = seed_tile->OverlayTerrain;
@@ -3100,7 +3100,7 @@ void CMap::generate_missing_terrain(const Vec2i &min_pos, const Vec2i &max_pos, 
 		for (int y = min_pos.y; y <= max_pos.y; ++y) {
 			const Vec2i tile_pos(x, y);
 
-			CMapField *tile = this->Field(x, y, z);
+			wyrmgus::tile *tile = this->Field(x, y, z);
 
 			if (tile->GetTopTerrain() != nullptr) {
 				continue;
@@ -3120,7 +3120,7 @@ void CMap::generate_missing_terrain(const Vec2i &min_pos, const Vec2i &max_pos, 
 						continue;
 					}
 
-					const CMapField *adjacent_tile = this->Field(adjacent_pos, z);
+					const wyrmgus::tile *adjacent_tile = this->Field(adjacent_pos, z);
 					const wyrmgus::terrain_type *adjacent_terrain_type = adjacent_tile->GetTerrain(false);
 					const wyrmgus::terrain_type *adjacent_overlay_terrain_type = adjacent_tile->GetTerrain(true);
 
@@ -3167,7 +3167,7 @@ void CMap::generate_settlement_territories(const int z)
 		for (int y = 0; y < this->Info.MapHeights[z]; ++y) {
 			QPoint tile_pos(x, y);
 
-			CMapField *tile = this->Field(tile_pos, z);
+			wyrmgus::tile *tile = this->Field(tile_pos, z);
 
 			const wyrmgus::site *settlement = tile->get_settlement();
 			if (settlement == nullptr) {
@@ -3193,7 +3193,7 @@ void CMap::generate_settlement_territories(const int z)
 		for (int y = 0; y < this->Info.MapHeights[z]; ++y) {
 			const QPoint tile_pos(x, y);
 
-			CMapField *tile = this->Field(x, y, z);
+			wyrmgus::tile *tile = this->Field(x, y, z);
 
 			if (tile->get_settlement() != nullptr) {
 				continue;
@@ -3213,7 +3213,7 @@ void CMap::generate_settlement_territories(const int z)
 						continue;
 					}
 
-					const CMapField *adjacent_tile = this->Field(adjacent_pos, z);
+					const wyrmgus::tile *adjacent_tile = this->Field(adjacent_pos, z);
 					wyrmgus::site *adjacent_settlement = adjacent_tile->get_settlement();
 
 					if (adjacent_settlement == nullptr) {
@@ -3260,7 +3260,7 @@ wyrmgus::point_set CMap::expand_settlement_territories(std::vector<QPoint> &&see
 		const QPoint seed_pos = seeds[SyncRand(seeds.size())];
 		wyrmgus::vector::remove(seeds, seed_pos);
 
-		const CMapField *seed_tile = this->Field(seed_pos, z);
+		const wyrmgus::tile *seed_tile = this->Field(seed_pos, z);
 
 		//tiles with a block flag can be expanded to, but they can't serve as a basis for further expansion
 		if (seed_tile->CheckMask(block_flags)) {
@@ -3269,7 +3269,7 @@ wyrmgus::point_set CMap::expand_settlement_territories(std::vector<QPoint> &&see
 		}
 
 		wyrmgus::site *settlement = seed_tile->get_settlement();
-		const CMapField *settlement_tile = this->Field(settlement->get_site_unit()->get_center_tile_pos(), z);
+		const wyrmgus::tile *settlement_tile = this->Field(settlement->get_site_unit()->get_center_tile_pos(), z);
 
 		std::vector<QPoint> adjacent_positions;
 		for (int sub_x = -1; sub_x <= 1; sub_x += 2) { // +2 so that only diagonals are used
@@ -3282,9 +3282,9 @@ wyrmgus::point_set CMap::expand_settlement_territories(std::vector<QPoint> &&see
 					continue;
 				}
 
-				CMapField *diagonal_tile = this->Field(diagonal_pos, z);
-				CMapField *vertical_tile = this->Field(vertical_pos, z);
-				CMapField *horizontal_tile = this->Field(horizontal_pos, z);
+				wyrmgus::tile *diagonal_tile = this->Field(diagonal_pos, z);
+				wyrmgus::tile *vertical_tile = this->Field(vertical_pos, z);
+				wyrmgus::tile *horizontal_tile = this->Field(horizontal_pos, z);
 
 				if ( //the tiles must either have no settlement, or have the settlement we want to assign
 					(diagonal_tile->get_settlement() != nullptr && diagonal_tile->get_settlement() != settlement)
@@ -3344,7 +3344,7 @@ void CMap::calculate_settlement_territory_border_tiles(const int z)
 		for (int y = 0; y < this->Info.MapHeights[z]; ++y) {
 			const QPoint tile_pos(x, y);
 			if (this->tile_borders_other_settlement_territory(tile_pos, z)) {
-				const CMapField *tile = this->Field(x, y, z);
+				const wyrmgus::tile *tile = this->Field(x, y, z);
 				wyrmgus::site *settlement = tile->get_settlement();
 				if (settlement != nullptr) {
 					settlement->add_border_tile(tile_pos);
@@ -3381,7 +3381,7 @@ void CMap::GenerateNeutralUnits(wyrmgus::unit_type *unit_type, int quantity, con
 //Wyrmgus start
 void CMap::ClearOverlayTile(const Vec2i &pos, int z)
 {
-	CMapField &mf = *this->Field(pos, z);
+	wyrmgus::tile &mf = *this->Field(pos, z);
 
 	if (!mf.OverlayTerrain) {
 		return;
@@ -3409,7 +3409,7 @@ void CMap::ClearOverlayTile(const Vec2i &pos, int z)
 				if (x_offset != 0 || y_offset != 0) {
 					Vec2i adjacent_pos(pos.x + x_offset, pos.y + y_offset);
 					if (Map.Info.IsPointOnMap(adjacent_pos, z)) {
-						CMapField &adjacent_mf = *this->Field(adjacent_pos, z);
+						wyrmgus::tile &adjacent_mf = *this->Field(adjacent_pos, z);
 						
 						if (adjacent_mf.OverlayTerrain == mf.OverlayTerrain && !adjacent_mf.OverlayTerrainDestroyed && !this->CurrentTerrainCanBeAt(adjacent_pos, true, z)) {
 							this->ClearOverlayTile(adjacent_pos, z);
@@ -3427,7 +3427,7 @@ void CMap::ClearOverlayTile(const Vec2i &pos, int z)
 /// Remove wood from the map.
 void CMap::ClearWoodTile(const Vec2i &pos)
 {
-	CMapField &mf = *this->Field(pos);
+	wyrmgus::tile &mf = *this->Field(pos);
 
 	mf.setGraphicTile(this->Tileset->getRemovedTreeTile());
 	mf.Flags &= ~(MapFieldForest | MapFieldUnpassable);
@@ -3446,7 +3446,7 @@ void CMap::ClearWoodTile(const Vec2i &pos)
 /// Remove rock from the map.
 void CMap::ClearRockTile(const Vec2i &pos)
 {
-	CMapField &mf = *this->Field(pos);
+	wyrmgus::tile &mf = *this->Field(pos);
 
 	mf.setGraphicTile(this->Tileset->getRemovedRockTile());
 	mf.Flags &= ~(MapFieldRocks | MapFieldUnpassable);

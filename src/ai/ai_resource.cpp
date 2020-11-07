@@ -2260,7 +2260,7 @@ static void AiCheckPathwayConstruction()
 				if (!CMap::Map.Info.IsPointOnMap(pathway_pos, unit.MapLayer)) {
 					continue;
 				}
-				CMapField &mf = *unit.MapLayer->Field(pathway_pos);
+				wyrmgus::tile &mf = *unit.MapLayer->Field(pathway_pos);
 				if (mf.Flags & MapFieldBuilding) { //this is a tile where the building itself is located, continue
 					continue;
 				}

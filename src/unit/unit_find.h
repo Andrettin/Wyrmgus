@@ -361,7 +361,7 @@ void SelectFixed(const Vec2i &ltPos, const Vec2i &rbPos, std::vector<CUnit *> &u
 			}
 			//Wyrmgus end
 
-			const CMapField &mf = *map_layer->Field(posIt);
+			const wyrmgus::tile &mf = *map_layer->Field(posIt);
 			const CUnitCache &cache = mf.UnitCache;
 
 			for (CUnit *unit : cache) {
@@ -445,7 +445,7 @@ CUnit *FindUnit_IfFixed(const Vec2i &ltPos, const Vec2i &rbPos, int z, Pred pred
 
 	for (Vec2i posIt = ltPos; posIt.y != rbPos.y + 1; ++posIt.y) {
 		for (posIt.x = ltPos.x; posIt.x != rbPos.x + 1; ++posIt.x) {
-			const CMapField &mf = *CMap::Map.Field(posIt, z);
+			const wyrmgus::tile &mf = *CMap::Map.Field(posIt, z);
 			const CUnitCache &cache = mf.UnitCache;
 
 			CUnitCache::const_iterator it = std::find_if(cache.begin(), cache.end(), pred);

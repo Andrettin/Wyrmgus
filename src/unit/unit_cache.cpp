@@ -57,7 +57,7 @@ void CMap::Insert(CUnit &unit)
 	int j, i = h;
 
 	do {
-		CMapField *mf = unit.MapLayer->Field(index);
+		wyrmgus::tile *mf = unit.MapLayer->Field(index);
 		j = w;
 		do {
 			mf->UnitCache.Insert(&unit);
@@ -81,7 +81,7 @@ void CMap::Remove(CUnit &unit)
 	int j, i = h;
 
 	do {
-		CMapField *mf = unit.MapLayer->Field(index);
+		wyrmgus::tile *mf = unit.MapLayer->Field(index);
 		j = w;
 		do {
 			mf->UnitCache.Remove(&unit);

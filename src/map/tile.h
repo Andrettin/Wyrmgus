@@ -28,52 +28,44 @@
 #pragma once
 
 /**
-**  @class CMapField tile.h
-**
-**  \#include "map/tile.h"
-**
-**  CMapFieldPlayerInfo::SeenTile
+**  tile_player_info::SeenTile
 **
 **    This is the tile number, that the player sitting on the computer
 **    currently knows. Idea: Can be uses for illusions.
 **
-**  CMapFieldPlayerInfo::Visible[]
+**  tile_player_info::Visible[]
 **
 **    Counter how many units of the player can see this field. 0 the
 **    field is not explored, 1 explored, n-1 unit see it. Currently
 **    no more than 253 units can see a field.
 **
-**  CMapFieldPlayerInfo::VisCloak[]
+**  tile_player_info::VisCloak[]
 **
 **    Visiblity for cloaking.
 **
-**  CMapFieldPlayerInfo::Radar[]
+**  tile_player_info::Radar[]
 **
 **    Visiblity for radar.
 **
-**  CMapFieldPlayerInfo::RadarJammer[]
+**  tile_player_info::RadarJammer[]
 **
 **    Jamming capabilities.
 */
 
 /**
-**  @class CMapField tile.h
-**
-**  \#include "map/tile.h"
-**
 **  This class contains all information about a field on map.
 **  It contains its look, properties and content.
 **
 **  The map-field class members:
 **
-**  CMapField::Tile
+**  tile::Tile
 **
 **    Tile is number defining the graphic image display for the
 **    map-field. 65535 different tiles are supported. A tile is
 **    currently 32x32 pixels. In the future is planned to support
 **    animated tiles.
 **
-**  CMapField::Flags
+**  tile::Flags
 **
 **    Contains special information of that tile. What units are
 **    on this field, what units could be placed on this field.
@@ -98,17 +90,17 @@
 **    Note: We want to add support for more unit-types like under
 **      ground units.
 **
-**  CMapField::Cost
+**  tile::Cost
 **
 **    Unit cost to move in this tile.
 **
-**  CMapField::Value
+**  tile::value
 **
 **    Extra value for each tile. This currently only used for
 **    walls, contains the remaining hit points of the wall and
 **    for forest, contains the frames until they grow.
 **
-**  CMapField::UnitCache
+**  tile::UnitCache
 **
 **    Contains a vector of all units currently on this field.
 **    Note: currently units are only inserted at the insert point.
@@ -128,16 +120,16 @@ class CGraphic;
 struct lua_State;
 
 namespace wyrmgus {
-	class resource;
-	class site;
-	class terrain_feature;
-	class terrain_type;
-}
 
-class CMapFieldPlayerInfo
+class resource;
+class site;
+class terrain_feature;
+class terrain_type;
+
+class tile_player_info final
 {
 public:
-	CMapFieldPlayerInfo()
+	tile_player_info()
 	{
 		memset(Visible, 0, sizeof(Visible));
 		memset(VisCloak, 0, sizeof(VisCloak));
@@ -183,16 +175,16 @@ public:
 };
 
 /// Describes a field of the map
-class CMapField
+class tile final
 {
 public:
-	CMapField();
+	tile();
 
 	void Save(CFile &file) const;
 	void parse(lua_State *l);
 
 	//Wyrmgus start
-	void SetTerrain(const wyrmgus::terrain_type *terrain_type);
+	void SetTerrain(const terrain_type *terrain_type);
 	void RemoveOverlayTerrain();
 	void SetOverlayTerrainDestroyed(bool destroyed);
 	void SetOverlayTerrainDamaged(bool damaged);
@@ -213,9 +205,9 @@ public:
 	/// Check if a field flags.
 	bool CheckMask(int mask) const;
 	
-	const wyrmgus::terrain_type *GetTerrain(const bool overlay) const;
+	const terrain_type *GetTerrain(const bool overlay) const;
 
-	const wyrmgus::terrain_type *GetTopTerrain(const bool seen = false, const bool ignore_destroyed = false) const;
+	const terrain_type *GetTopTerrain(const bool seen = false, const bool ignore_destroyed = false) const;
 
 	bool is_water() const;
 	bool is_non_coastal_water() const;
@@ -239,17 +231,17 @@ public:
 
 	bool IsSeenTileCorrect() const;
 	
-	const wyrmgus::terrain_feature *get_terrain_feature() const
+	const terrain_feature *get_terrain_feature() const
 	{
 		return this->terrain_feature;
 	}
 
-	void set_terrain_feature(const wyrmgus::terrain_feature *terrain_feature)
+	void set_terrain_feature(const terrain_feature *terrain_feature)
 	{
 		this->terrain_feature = terrain_feature;
 	}
 
-	const wyrmgus::resource *get_resource() const;
+	const resource *get_resource() const;
 
 	bool IsDestroyedForestTile() const;
 	
@@ -305,12 +297,12 @@ public:
 		this->ownership_border_tile = tile;
 	}
 
-	wyrmgus::site *get_settlement() const
+	site *get_settlement() const
 	{
 		return this->settlement;
 	}
 
-	void set_settlement(wyrmgus::site *settlement)
+	void set_settlement(site *settlement)
 	{
 		if (settlement == this->get_settlement()) {
 			return;
@@ -325,8 +317,8 @@ public:
 	unsigned long Flags;      /// field flags
 	unsigned char AnimationFrame;		/// current frame of the tile's animation
 	unsigned char OverlayAnimationFrame;		/// current frame of the overlay tile's animation
-	const wyrmgus::terrain_type *Terrain = nullptr;
-	const wyrmgus::terrain_type *OverlayTerrain = nullptr;
+	const terrain_type *Terrain = nullptr;
+	const terrain_type *OverlayTerrain = nullptr;
 private:
 	const wyrmgus::terrain_feature *terrain_feature = nullptr;
 public:
@@ -334,8 +326,8 @@ public:
 	short OverlaySolidTile;
 	bool OverlayTerrainDestroyed;
 	bool OverlayTerrainDamaged;
-	std::vector<std::pair<const wyrmgus::terrain_type *, short>> TransitionTiles;			/// Transition tiles; the pair contains the terrain type and the tile index
-	std::vector<std::pair<const wyrmgus::terrain_type *, short>> OverlayTransitionTiles;		/// Overlay transition tiles; the pair contains the terrain type and the tile index
+	std::vector<std::pair<const terrain_type *, short>> TransitionTiles;			/// Transition tiles; the pair contains the terrain type and the tile index
+	std::vector<std::pair<const terrain_type *, short>> OverlayTransitionTiles;		/// Overlay transition tiles; the pair contains the terrain type and the tile index
 	//Wyrmgus end
 private:
 	unsigned char cost;        /// unit cost to move in this tile
@@ -344,9 +336,11 @@ public:
 	int Landmass;			   /// to which "landmass" (can also be water) does this map field belong (if any); a "landmass" is a collection of adjacent land tiles, or a collection of adjacent water tiles; 0 means none has been set yet
 private:
 	short ownership_border_tile = -1; //the transition type of the border between this tile's owner, and other players' tiles, if applicable)
-	wyrmgus::site *settlement = nullptr;
+	site *settlement = nullptr;
 public:
 	CUnitCache UnitCache;      /// a unit on the map field.
 
-	std::unique_ptr<CMapFieldPlayerInfo> player_info;	/// stuff related to player
+	std::unique_ptr<tile_player_info> player_info;	/// stuff related to player
 };
+
+}

@@ -209,7 +209,7 @@ static void EditTile(const Vec2i &pos, wyrmgus::terrain_type *terrain)
 {
 	Assert(CMap::Map.Info.IsPointOnMap(pos, UI.CurrentMapLayer));
 	
-	CMapField &mf = *UI.CurrentMapLayer->Field(pos);
+	wyrmgus::tile &mf = *UI.CurrentMapLayer->Field(pos);
 	
 	//Wyrmgus start
 	int value = 0;
@@ -1377,7 +1377,7 @@ static void DrawEditorInfo()
 	char buf[256];
 	snprintf(buf, sizeof(buf), _("Editor (%d %d)"), pos.x, pos.y);
 	CLabel(wyrmgus::defines::get()->get_game_font()).Draw(UI.StatusLine.TextX + 2, UI.StatusLine.TextY - 12, buf);
-	const CMapField &mf = *UI.CurrentMapLayer->Field(pos);
+	const wyrmgus::tile &mf = *UI.CurrentMapLayer->Field(pos);
 	//
 	// Flags info
 	//
@@ -2416,7 +2416,7 @@ void CEditor::Init()
 		}
 
 		//Wyrmgus start
-//		Map.Fields = new CMapField[Map.Info.MapWidth * Map.Info.MapHeight];
+//		Map.Fields = new wyrmgus::tile[Map.Info.MapWidth * Map.Info.MapHeight];
 		CMap::Map.ClearMapLayers();
 		auto new_map_layer = std::make_unique<CMapLayer>(CMap::Map.Info.MapWidth, CMap::Map.Info.MapHeight);
 		new_map_layer->ID = CMap::Map.MapLayers.size();

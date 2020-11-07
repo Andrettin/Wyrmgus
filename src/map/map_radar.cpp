@@ -40,8 +40,7 @@
 #include "unit/unit.h"
 #include "unit/unit_type.h"
 
-static inline unsigned char
-IsTileRadarVisible(const CPlayer &pradar, const CPlayer &punit, const CMapFieldPlayerInfo &mfp)
+static inline unsigned char IsTileRadarVisible(const CPlayer &pradar, const CPlayer &punit, const wyrmgus::tile_player_info &mfp)
 {
 	if (mfp.RadarJammer[punit.Index]) {
 		return 0;
@@ -91,7 +90,7 @@ bool CUnit::IsVisibleOnRadar(const CPlayer &pradar) const
 	unsigned int index = Offset;
 	int j = Type->get_tile_height();
 	do {
-		const CMapField *mf = this->MapLayer->Field(index);
+		const wyrmgus::tile *mf = this->MapLayer->Field(index);
 
 		int i = x_max;
 		do {

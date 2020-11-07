@@ -445,7 +445,7 @@ void map_template::ApplyTerrainFile(bool overlay, Vec2i template_start_pos, Vec2
 					continue;
 				}
 
-				CMapField *tile = CMap::Map.Field(real_pos, z);
+				tile *tile = CMap::Map.Field(real_pos, z);
 
 				if (terrain_character != '0' && terrain_character != '=') {
 					terrain = terrain_type::get_by_character(terrain_character);
@@ -1350,7 +1350,7 @@ void map_template::apply_sites(const QPoint &template_start_pos, const QPoint &m
 						if (!CMap::Map.Info.IsPointOnMap(x, y, unit->MapLayer)) {
 							continue;
 						}
-						CMapField &mf = *unit->MapLayer->Field(x, y);
+						tile &mf = *unit->MapLayer->Field(x, y);
 						if (mf.Flags & MapFieldBuilding) { //this is a tile where the building itself is located, continue
 							continue;
 						}
@@ -1424,7 +1424,7 @@ void map_template::apply_sites(const QPoint &template_start_pos, const QPoint &m
 							if (!CMap::Map.Info.IsPointOnMap(x, y, unit->MapLayer)) {
 								continue;
 							}
-							CMapField &mf = *unit->MapLayer->Field(x, y);
+							tile &mf = *unit->MapLayer->Field(x, y);
 							if (mf.Flags & MapFieldBuilding) { //this is a tile where the building itself is located, continue
 								continue;
 							}
@@ -2272,7 +2272,7 @@ bool map_template::is_constructed_subtemplate_compatible_with_terrain(const map_
 				continue;
 			}
 
-			const CMapField *tile = CMap::Map.Field(map_x, map_y, z);
+			const tile *tile = CMap::Map.Field(map_x, map_y, z);
 
 			if (color.red() == 0 && color.green() == 0 && color.blue() == 0) {
 				//a pure black pixel means the tile must have no overlay
@@ -2585,7 +2585,7 @@ void generated_terrain::ProcessConfigData(const CConfigData *config_data)
 **
 **	@return	True if the tile can be used as a seed, or false otherwise
 */
-bool generated_terrain::CanUseTileAsSeed(const CMapField *tile) const
+bool generated_terrain::CanUseTileAsSeed(const tile *tile) const
 {
 	const terrain_type *top_terrain = tile->GetTopTerrain();
 	
@@ -2607,7 +2607,7 @@ bool generated_terrain::CanUseTileAsSeed(const CMapField *tile) const
 **
 **	@return	True if the terrain can be generated on the tile, or false otherwise
 */
-bool generated_terrain::CanGenerateOnTile(const CMapField *tile) const
+bool generated_terrain::CanGenerateOnTile(const tile *tile) const
 {
 	if (this->TerrainType->is_overlay()) {
 		if (std::find(this->TargetTerrainTypes.begin(), this->TargetTerrainTypes.end(), tile->GetTopTerrain()) == this->TargetTerrainTypes.end()) { //disallow generating over terrains that aren't a target for the generation
@@ -2644,7 +2644,7 @@ bool generated_terrain::CanGenerateOnTile(const CMapField *tile) const
 **
 **	@return	True if the tile can be part of an expansion, or false otherwise
 */
-bool generated_terrain::CanTileBePartOfExpansion(const CMapField *tile) const
+bool generated_terrain::CanTileBePartOfExpansion(const tile *tile) const
 {
 	if (this->CanGenerateOnTile(tile)) {
 		return true;
@@ -2670,7 +2670,7 @@ bool generated_terrain::CanTileBePartOfExpansion(const CMapField *tile) const
 **
 **	@return	True if the terrain generation can remove the tile's overlay terrain, or false otherwise
 */
-bool generated_terrain::CanRemoveTileOverlayTerrain(const CMapField *tile) const
+bool generated_terrain::CanRemoveTileOverlayTerrain(const tile *tile) const
 {
 	if (std::find(this->TargetTerrainTypes.begin(), this->TargetTerrainTypes.end(), tile->OverlayTerrain) == this->TargetTerrainTypes.end()) {
 		return false;
