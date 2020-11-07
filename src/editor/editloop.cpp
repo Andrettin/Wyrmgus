@@ -299,7 +299,7 @@ static void EditTilesInternal(const Vec2i &pos, wyrmgus::terrain_type *terrain, 
 	//now, check if the tiles adjacent to the placed ones need correction
 	//Wyrmgus start
 	for (int i = (((int) changed_tiles.size()) - 1); i >= 0; --i) {
-		wyrmgus::terrain_type *tile_terrain = CMap::Map.GetTileTerrain(changed_tiles[i], terrain->is_overlay(), UI.CurrentMapLayer->ID);
+		const wyrmgus::terrain_type *tile_terrain = CMap::Map.GetTileTerrain(changed_tiles[i], terrain->is_overlay(), UI.CurrentMapLayer->ID);
 		
 		CMap::Map.CalculateTileTransitions(changed_tiles[i], false, UI.CurrentMapLayer->ID);
 		CMap::Map.CalculateTileTransitions(changed_tiles[i], true, UI.CurrentMapLayer->ID);
@@ -358,7 +358,7 @@ static void EditTilesInternal(const Vec2i &pos, wyrmgus::terrain_type *terrain, 
 					
 					if (CMap::Map.Info.IsPointOnMap(adjacent_pos, UI.CurrentMapLayer)) {
 						for (int overlay = 1; overlay >= 0; --overlay) {
-							wyrmgus::terrain_type *adjacent_terrain = CMap::Map.GetTileTerrain(adjacent_pos, overlay > 0, UI.CurrentMapLayer->ID);
+							const wyrmgus::terrain_type *adjacent_terrain = CMap::Map.GetTileTerrain(adjacent_pos, overlay > 0, UI.CurrentMapLayer->ID);
 							if (!adjacent_terrain || adjacent_terrain == CMap::Map.GetTileTerrain(changed_tiles[i], overlay > 0, UI.CurrentMapLayer->ID)) {
 								continue;
 							}
@@ -381,7 +381,7 @@ static void EditTilesInternal(const Vec2i &pos, wyrmgus::terrain_type *terrain, 
 										if (sub_x_offset != 0 || sub_y_offset != 0) {
 											Vec2i sub_adjacent_pos(adjacent_pos.x + sub_x_offset, adjacent_pos.y + sub_y_offset);
 											if (CMap::Map.Info.IsPointOnMap(sub_adjacent_pos, UI.CurrentMapLayer)) {
-												wyrmgus::terrain_type *sub_adjacent_terrain = CMap::Map.GetTileTerrain(sub_adjacent_pos, overlay > 0, UI.CurrentMapLayer->ID);
+												const wyrmgus::terrain_type *sub_adjacent_terrain = CMap::Map.GetTileTerrain(sub_adjacent_pos, overlay > 0, UI.CurrentMapLayer->ID);
 												if (adjacent_terrain->is_overlay() && sub_adjacent_terrain && UI.CurrentMapLayer->Field(sub_adjacent_pos)->OverlayTerrainDestroyed) {
 													sub_adjacent_terrain = nullptr;
 												}

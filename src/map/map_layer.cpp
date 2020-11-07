@@ -209,13 +209,13 @@ void CMapLayer::RegenerateForestTile(const Vec2i &pos)
 
 	/*
 	if (topMf.getGraphicTile() == this->Tileset->getRemovedTreeTile()
-		&& topMf.Value >= ForestRegeneration
+		&& topMf.get_value() >= ForestRegeneration
 		&& !(topMf.Flags & occupied_flag)) {
 		DebugPrint("Real place wood\n");
 		topMf.setTileIndex(*Map.Tileset, Map.Tileset->getTopOneTreeTile(), 0);
 		topMf.setGraphicTile(Map.Tileset->getTopOneTreeTile());
 		topMf.player_info->SeenTile = topMf.getGraphicTile();
-		topMf.Value = 0;
+		topMf.set_value(0);
 		topMf.Flags |= MapFieldForest | MapFieldUnpassable;
 		UI.get_minimap()->UpdateSeenXY(pos + offset);
 		UI.get_minimap()->UpdateXY(pos + offset);
@@ -223,7 +223,7 @@ void CMapLayer::RegenerateForestTile(const Vec2i &pos)
 		mf.setTileIndex(*Map.Tileset, Map.Tileset->getBottomOneTreeTile(), 0);
 		mf.setGraphicTile(Map.Tileset->getBottomOneTreeTile());
 		mf.player_info->SeenTile = mf.getGraphicTile();
-		mf.Value = 0;
+		mf.set_value(0);
 		mf.Flags |= MapFieldForest | MapFieldUnpassable;
 		UI.get_minimap()->UpdateSeenXY(pos);
 		UI.get_minimap()->UpdateXY(pos);

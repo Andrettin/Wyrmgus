@@ -187,7 +187,7 @@ static void EditorChangeSurrounding(const Vec2i &pos, int tile)
 	
 	//Wyrmgus start
 	//see if the tile's terrain can be here as is, or if it is needed to change surrounding tiles
-	wyrmgus::terrain_type *terrain = CMap::Map.GetTileTopTerrain(pos, false, UI.CurrentMapLayer->ID);
+	const wyrmgus::terrain_type *terrain = CMap::Map.GetTileTopTerrain(pos, false, UI.CurrentMapLayer->ID);
 	bool overlay = mf.OverlayTerrain ? true : false;
 	if (!terrain->allows_single()) {
 		std::vector<int> transition_directions;

@@ -460,8 +460,8 @@ bool CBuildRestrictionTerrain::Check(const CUnit *builder, const wyrmgus::unit_t
 			if (!CMap::Map.Info.IsPointOnMap(x, y, z)) {
 				continue;
 			}
-			Vec2i tile_pos(x, y);
-			wyrmgus::terrain_type *terrain = CMap::Map.GetTileTerrain(tile_pos, this->RestrictTerrainType->is_overlay(), z);
+			const Vec2i tile_pos(x, y);
+			const wyrmgus::terrain_type *terrain = CMap::Map.GetTileTerrain(tile_pos, this->RestrictTerrainType->is_overlay(), z);
 			if (this->RestrictTerrainType == terrain) {
 				return true;
 			}

@@ -183,7 +183,7 @@ public:
 	void ClearMapLayers();
 	
 	//Wyrmgus start
-	void SetTileTerrain(const Vec2i &pos, wyrmgus::terrain_type *terrain, int z);
+	void SetTileTerrain(const Vec2i &pos, const wyrmgus::terrain_type *terrain, int z);
 	void RemoveTileOverlayTerrain(const Vec2i &pos, int z);
 	void SetOverlayTerrainDestroyed(const Vec2i &pos, bool destroyed, int z);
 	void SetOverlayTerrainDamaged(const Vec2i &pos, bool damaged, int z);
@@ -218,8 +218,8 @@ public:
 	PixelPos tile_pos_to_scaled_map_pixel_pos_center(const Vec2i &tilePos) const;
 	
 	//Wyrmgus start
-	wyrmgus::terrain_type *GetTileTerrain(const Vec2i &pos, const bool overlay, const int z) const;
-	wyrmgus::terrain_type *GetTileTopTerrain(const Vec2i &pos, const bool seen, const int z, const bool ignore_destroyed = false) const;
+	const wyrmgus::terrain_type *GetTileTerrain(const Vec2i &pos, const bool overlay, const int z) const;
+	const wyrmgus::terrain_type *GetTileTopTerrain(const Vec2i &pos, const bool seen, const int z, const bool ignore_destroyed = false) const;
 	int GetTileLandmass(const Vec2i &pos, int z) const;
 	Vec2i GenerateUnitLocation(const wyrmgus::unit_type *unit_type, const wyrmgus::faction *faction, const Vec2i &min_pos, const Vec2i &max_pos, const int z) const;
 	//Wyrmgus end

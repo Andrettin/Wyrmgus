@@ -269,7 +269,7 @@ PixelPos CMap::tile_pos_to_scaled_map_pixel_pos_center(const Vec2i &tilePos) con
 }
 
 //Wyrmgus start
-wyrmgus::terrain_type *CMap::GetTileTerrain(const Vec2i &pos, const bool overlay, const int z) const
+const wyrmgus::terrain_type *CMap::GetTileTerrain(const Vec2i &pos, const bool overlay, const int z) const
 {
 	if (!Map.Info.IsPointOnMap(pos, z)) {
 		return nullptr;
@@ -280,7 +280,7 @@ wyrmgus::terrain_type *CMap::GetTileTerrain(const Vec2i &pos, const bool overlay
 	return mf.GetTerrain(overlay);
 }
 
-wyrmgus::terrain_type *CMap::GetTileTopTerrain(const Vec2i &pos, const bool seen, const int z, const bool ignore_destroyed) const
+const wyrmgus::terrain_type *CMap::GetTileTopTerrain(const Vec2i &pos, const bool seen, const int z, const bool ignore_destroyed) const
 {
 	if (!Map.Info.IsPointOnMap(pos, z)) {
 		return nullptr;
@@ -402,7 +402,7 @@ bool CMap::WallOnMap(const Vec2i &pos, int z) const
 bool CMap::CurrentTerrainCanBeAt(const Vec2i &pos, bool overlay, int z)
 {
 	CMapField &mf = *this->Field(pos, z);
-	wyrmgus::terrain_type *terrain = nullptr;
+	const wyrmgus::terrain_type *terrain = nullptr;
 	
 	if (overlay) {
 		terrain = mf.OverlayTerrain;
@@ -486,8 +486,8 @@ bool CMap::TileBordersOnlySameTerrain(const Vec2i &pos, const wyrmgus::terrain_t
 			if (this->is_point_in_a_subtemplate_area(pos, z) && !this->is_point_in_a_subtemplate_area(adjacent_pos, z)) {
 				continue;
 			}
-			wyrmgus::terrain_type *top_terrain = GetTileTopTerrain(pos, false, z);
-			wyrmgus::terrain_type *adjacent_top_terrain = GetTileTopTerrain(adjacent_pos, false, z);
+			const wyrmgus::terrain_type *top_terrain = GetTileTopTerrain(pos, false, z);
+			const wyrmgus::terrain_type *adjacent_top_terrain = GetTileTopTerrain(adjacent_pos, false, z);
 			if (!new_terrain_type->is_overlay()) {
 				if (
 					adjacent_top_terrain
@@ -682,7 +682,7 @@ bool CMap::TileBordersTerrainIncompatibleWithTerrain(const Vec2i &pos, const wyr
 		return false;
 	}
 	
-	wyrmgus::terrain_type *tile_terrain = this->GetTileTerrain(pos, false, z);
+	const wyrmgus::terrain_type *tile_terrain = this->GetTileTerrain(pos, false, z);
 	
 	for (int sub_x = -1; sub_x <= 1; ++sub_x) {
 		for (int sub_y = -1; sub_y <= 1; ++sub_y) {
@@ -692,7 +692,7 @@ bool CMap::TileBordersTerrainIncompatibleWithTerrain(const Vec2i &pos, const wyr
 				continue;
 			}
 			
-			wyrmgus::terrain_type *adjacent_terrain = this->GetTileTerrain(adjacent_pos, false, z);
+			const wyrmgus::terrain_type *adjacent_terrain = this->GetTileTerrain(adjacent_pos, false, z);
 			
 			if (adjacent_terrain == nullptr) {
 				continue;
@@ -735,7 +735,7 @@ bool CMap::TileBordersTerrainIncompatibleWithTerrainPair(const Vec2i &pos, const
 				continue;
 			}
 
-			wyrmgus::terrain_type *adjacent_terrain = this->GetTileTerrain(adjacent_pos, false, z);
+			const wyrmgus::terrain_type *adjacent_terrain = this->GetTileTerrain(adjacent_pos, false, z);
 
 			if (adjacent_terrain == nullptr) {
 				continue;
@@ -1758,7 +1758,7 @@ void CMap::FixNeighbors(unsigned short type, int seen, const Vec2i &pos)
 //Wyrmgus end
 
 //Wyrmgus start
-void CMap::SetTileTerrain(const Vec2i &pos, wyrmgus::terrain_type *terrain, int z)
+void CMap::SetTileTerrain(const Vec2i &pos, const wyrmgus::terrain_type *terrain, const int z)
 {
 	if (!terrain) {
 		return;
@@ -2111,7 +2111,7 @@ void CMap::calculate_tile_solid_tile(const QPoint &pos, const bool overlay, cons
 void CMap::CalculateTileTransitions(const Vec2i &pos, bool overlay, int z)
 {
 	CMapField &mf = *this->Field(pos, z);
-	wyrmgus::terrain_type *terrain = nullptr;
+	const wyrmgus::terrain_type *terrain = nullptr;
 	if (overlay) {
 		terrain = mf.OverlayTerrain;
 		mf.OverlayTransitionTiles.clear();
@@ -2131,7 +2131,7 @@ void CMap::CalculateTileTransitions(const Vec2i &pos, bool overlay, int z)
 			if (x_offset != 0 || y_offset != 0) {
 				Vec2i adjacent_pos(pos.x + x_offset, pos.y + y_offset);
 				if (Map.Info.IsPointOnMap(adjacent_pos, z)) {
-					wyrmgus::terrain_type *adjacent_terrain = this->GetTileTerrain(adjacent_pos, overlay, z);
+					const wyrmgus::terrain_type *adjacent_terrain = this->GetTileTerrain(adjacent_pos, overlay, z);
 					if (overlay && adjacent_terrain && this->Field(adjacent_pos, z)->OverlayTerrainDestroyed) {
 						adjacent_terrain = nullptr;
 					}
@@ -2167,12 +2167,12 @@ void CMap::CalculateTileTransitions(const Vec2i &pos, bool overlay, int z)
 				if (adjacent_terrain != nullptr) {
 					const std::vector<int> &transition_tiles = terrain->get_transition_tiles(adjacent_terrain, transition_type);
 					if (!transition_tiles.empty()) {
-						mf.TransitionTiles.push_back(std::pair<wyrmgus::terrain_type *, int>(terrain, transition_tiles[SyncRand(transition_tiles.size())]));
+						mf.TransitionTiles.push_back(std::pair<const wyrmgus::terrain_type *, int>(terrain, transition_tiles[SyncRand(transition_tiles.size())]));
 						found_transition = true;
 					} else {
 						const std::vector<int> &adjacent_transition_tiles = adjacent_terrain->get_adjacent_transition_tiles(terrain, transition_type);
 						if (!adjacent_transition_tiles.empty()) {
-							mf.TransitionTiles.push_back(std::pair<wyrmgus::terrain_type *, int>(adjacent_terrain, adjacent_transition_tiles[SyncRand(adjacent_transition_tiles.size())]));
+							mf.TransitionTiles.push_back(std::pair<const wyrmgus::terrain_type *, int>(adjacent_terrain, adjacent_transition_tiles[SyncRand(adjacent_transition_tiles.size())]));
 							found_transition = true;
 						} else {
 							const std::vector<int> &sub_adjacent_transition_tiles = adjacent_terrain->get_adjacent_transition_tiles(nullptr, transition_type);
@@ -2185,24 +2185,24 @@ void CMap::CalculateTileTransitions(const Vec2i &pos, bool overlay, int z)
 				} else {
 					const std::vector<int> &transition_tiles = terrain->get_transition_tiles(nullptr, transition_type);
 					if (!transition_tiles.empty()) {
-						mf.TransitionTiles.push_back(std::pair<wyrmgus::terrain_type *, int>(terrain, transition_tiles[SyncRand(transition_tiles.size())]));
+						mf.TransitionTiles.push_back(std::pair<const wyrmgus::terrain_type *, int>(terrain, transition_tiles[SyncRand(transition_tiles.size())]));
 					}
 				}
 			} else {
 				if (adjacent_terrain != nullptr) {
 					const std::vector<int> &transition_tiles = terrain->get_transition_tiles(adjacent_terrain, transition_type);
 					if (!transition_tiles.empty()) {
-						mf.OverlayTransitionTiles.push_back(std::pair<wyrmgus::terrain_type *, int>(terrain, transition_tiles[SyncRand(transition_tiles.size())]));
+						mf.OverlayTransitionTiles.push_back(std::pair<const wyrmgus::terrain_type *, int>(terrain, transition_tiles[SyncRand(transition_tiles.size())]));
 						found_transition = true;
 					} else {
 						const std::vector<int> &adjacent_transition_tiles = adjacent_terrain->get_transition_tiles(terrain, transition_type);
 						if (!adjacent_transition_tiles.empty()) {
-							mf.OverlayTransitionTiles.push_back(std::pair<wyrmgus::terrain_type *, int>(adjacent_terrain, adjacent_transition_tiles[SyncRand(adjacent_transition_tiles.size())]));
+							mf.OverlayTransitionTiles.push_back(std::pair<const wyrmgus::terrain_type *, int>(adjacent_terrain, adjacent_transition_tiles[SyncRand(adjacent_transition_tiles.size())]));
 							found_transition = true;
 						} else {
 							const std::vector<int> &sub_adjacent_transition_tiles = adjacent_terrain->get_transition_tiles(nullptr, transition_type);
 							if (!sub_adjacent_transition_tiles.empty()) {
-								mf.OverlayTransitionTiles.push_back(std::pair<wyrmgus::terrain_type *, int>(adjacent_terrain, wyrmgus::vector::get_random(sub_adjacent_transition_tiles)));
+								mf.OverlayTransitionTiles.push_back(std::pair<const wyrmgus::terrain_type *, int>(adjacent_terrain, wyrmgus::vector::get_random(sub_adjacent_transition_tiles)));
 								found_transition = true;
 							}
 						}
@@ -2210,7 +2210,7 @@ void CMap::CalculateTileTransitions(const Vec2i &pos, bool overlay, int z)
 				} else {
 					const std::vector<int> &transition_tiles = terrain->get_transition_tiles(nullptr, transition_type);
 					if (!transition_tiles.empty()) {
-						mf.OverlayTransitionTiles.push_back(std::pair<wyrmgus::terrain_type *, int>(terrain, transition_tiles[SyncRand(transition_tiles.size())]));
+						mf.OverlayTransitionTiles.push_back(std::pair<const wyrmgus::terrain_type *, int>(terrain, transition_tiles[SyncRand(transition_tiles.size())]));
 					}
 				}
 				
@@ -2235,7 +2235,7 @@ void CMap::CalculateTileTransitions(const Vec2i &pos, bool overlay, int z)
 			swapped = false;
 			for (int i = 0; i < ((int) mf.OverlayTransitionTiles.size()) - 1; ++i) {
 				if (wyrmgus::vector::contains(mf.OverlayTransitionTiles[i + 1].first->get_inner_border_terrain_types(), mf.OverlayTransitionTiles[i].first)) {
-					std::pair<wyrmgus::terrain_type *, int> temp_transition = mf.OverlayTransitionTiles[i];
+					std::pair<const wyrmgus::terrain_type *, int> temp_transition = mf.OverlayTransitionTiles[i];
 					mf.OverlayTransitionTiles[i] = mf.OverlayTransitionTiles[i + 1];
 					mf.OverlayTransitionTiles[i + 1] = temp_transition;
 					swapped = true;
@@ -2248,7 +2248,7 @@ void CMap::CalculateTileTransitions(const Vec2i &pos, bool overlay, int z)
 			swapped = false;
 			for (int i = 0; i < ((int) mf.TransitionTiles.size()) - 1; ++i) {
 				if (wyrmgus::vector::contains(mf.TransitionTiles[i + 1].first->get_inner_border_terrain_types(), mf.TransitionTiles[i].first)) {
-					std::pair<wyrmgus::terrain_type *, int> temp_transition = mf.TransitionTiles[i];
+					std::pair<const wyrmgus::terrain_type *, int> temp_transition = mf.TransitionTiles[i];
 					mf.TransitionTiles[i] = mf.TransitionTiles[i + 1];
 					mf.TransitionTiles[i + 1] = temp_transition;
 					swapped = true;
@@ -2423,11 +2423,11 @@ void CMap::AdjustTileMapIrregularities(const bool overlay, const Vec2i &min_pos,
 		for (int x = min_pos.x; x < max_pos.x; ++x) {
 			for (int y = min_pos.y; y < max_pos.y; ++y) {
 				CMapField &mf = *this->Field(x, y, z);
-				wyrmgus::terrain_type *terrain = overlay ? mf.OverlayTerrain : mf.Terrain;
+				const wyrmgus::terrain_type *terrain = overlay ? mf.OverlayTerrain : mf.Terrain;
 				if (!terrain || terrain->allows_single()) {
 					continue;
 				}
-				std::vector<wyrmgus::terrain_type *> acceptable_adjacent_tile_types;
+				std::vector<const wyrmgus::terrain_type *> acceptable_adjacent_tile_types;
 				acceptable_adjacent_tile_types.push_back(terrain);
 				wyrmgus::vector::merge(acceptable_adjacent_tile_types, terrain->get_outer_border_terrain_types());
 				
@@ -2482,21 +2482,21 @@ void CMap::AdjustTileMapIrregularities(const bool overlay, const Vec2i &min_pos,
 					if (overlay) {
 						mf.RemoveOverlayTerrain();
 					} else {
-						std::map<wyrmgus::terrain_type *, int> best_terrain_scores;
+						std::map<const wyrmgus::terrain_type *, int> best_terrain_scores;
 
 						for (int sub_x = -1; sub_x <= 1; ++sub_x) {
 							for (int sub_y = -1; sub_y <= 1; ++sub_y) {
 								if ((x + sub_x) < min_pos.x || (x + sub_x) >= max_pos.x || (y + sub_y) < min_pos.y || (y + sub_y) >= max_pos.y || (sub_x == 0 && sub_y == 0)) {
 									continue;
 								}
-								wyrmgus::terrain_type *tile_terrain = GetTileTerrain(Vec2i(x + sub_x, y + sub_y), false, z);
+								const wyrmgus::terrain_type *tile_terrain = GetTileTerrain(Vec2i(x + sub_x, y + sub_y), false, z);
 								if (mf.Terrain != tile_terrain) {
 									best_terrain_scores[tile_terrain]++;
 								}
 							}
 						}
 
-						wyrmgus::terrain_type *best_terrain = nullptr;
+						const wyrmgus::terrain_type *best_terrain = nullptr;
 						int best_score = 0;
 						for (const auto &score_pair : best_terrain_scores) {
 							const int score = score_pair.second;
@@ -2526,8 +2526,8 @@ void CMap::AdjustTileMapTransitions(const Vec2i &min_pos, const Vec2i &max_pos, 
 					if ((x + sub_x) < min_pos.x || (x + sub_x) >= max_pos.x || (y + sub_y) < min_pos.y || (y + sub_y) >= max_pos.y || (sub_x == 0 && sub_y == 0)) {
 						continue;
 					}
-					wyrmgus::terrain_type *tile_terrain = GetTileTerrain(Vec2i(x + sub_x, y + sub_y), false, z);
-					wyrmgus::terrain_type *tile_top_terrain = GetTileTopTerrain(Vec2i(x + sub_x, y + sub_y), false, z);
+					const wyrmgus::terrain_type *tile_terrain = GetTileTerrain(Vec2i(x + sub_x, y + sub_y), false, z);
+					const wyrmgus::terrain_type *tile_top_terrain = GetTileTopTerrain(Vec2i(x + sub_x, y + sub_y), false, z);
 					if (
 						mf.Terrain != tile_terrain
 						&& tile_top_terrain->is_overlay()
@@ -2551,7 +2551,7 @@ void CMap::AdjustTileMapTransitions(const Vec2i &min_pos, const Vec2i &max_pos, 
 					if ((x + sub_x) < min_pos.x || (x + sub_x) >= max_pos.x || (y + sub_y) < min_pos.y || (y + sub_y) >= max_pos.y || (sub_x == 0 && sub_y == 0)) {
 						continue;
 					}
-					wyrmgus::terrain_type *tile_terrain = GetTileTerrain(Vec2i(x + sub_x, y + sub_y), false, z);
+					const wyrmgus::terrain_type *tile_terrain = GetTileTerrain(Vec2i(x + sub_x, y + sub_y), false, z);
 					if (mf.Terrain != tile_terrain && !wyrmgus::vector::contains(mf.Terrain->BorderTerrains, tile_terrain)) {
 						for (wyrmgus::terrain_type *border_terrain : mf.Terrain->BorderTerrains) {
 							if (wyrmgus::vector::contains(border_terrain->BorderTerrains, mf.Terrain) && wyrmgus::vector::contains(border_terrain->BorderTerrains, tile_terrain)) {
@@ -2693,7 +2693,7 @@ void CMap::GenerateTerrain(const std::unique_ptr<wyrmgus::generated_terrain> &ge
 			continue;
 		}
 		
-		wyrmgus::terrain_type *tile_terrain = this->GetTileTerrain(random_pos, false, z);
+		const wyrmgus::terrain_type *tile_terrain = this->GetTileTerrain(random_pos, false, z);
 		
 		if (!generated_terrain->CanGenerateOnTile(this->Field(random_pos, z))) {
 			continue;
@@ -2725,9 +2725,9 @@ void CMap::GenerateTerrain(const std::unique_ptr<wyrmgus::generated_terrain> &ge
 						continue;
 					}
 					
-					wyrmgus::terrain_type *diagonal_tile_terrain = this->GetTileTerrain(diagonal_pos, false, z);
-					wyrmgus::terrain_type *vertical_tile_terrain = this->GetTileTerrain(vertical_pos, false, z);
-					wyrmgus::terrain_type *horizontal_tile_terrain = this->GetTileTerrain(horizontal_pos, false, z);
+					const wyrmgus::terrain_type *diagonal_tile_terrain = this->GetTileTerrain(diagonal_pos, false, z);
+					const wyrmgus::terrain_type *vertical_tile_terrain = this->GetTileTerrain(vertical_pos, false, z);
+					const wyrmgus::terrain_type *horizontal_tile_terrain = this->GetTileTerrain(horizontal_pos, false, z);
 					
 					if (
 						!generated_terrain->CanGenerateOnTile(this->Field(diagonal_pos, z))
@@ -2817,12 +2817,12 @@ void CMap::GenerateTerrain(const std::unique_ptr<wyrmgus::generated_terrain> &ge
 					continue;
 				}
 		
-				wyrmgus::terrain_type *diagonal_tile_terrain = this->GetTileTerrain(diagonal_pos, false, z);
-				wyrmgus::terrain_type *vertical_tile_terrain = this->GetTileTerrain(vertical_pos, false, z);
-				wyrmgus::terrain_type *horizontal_tile_terrain = this->GetTileTerrain(horizontal_pos, false, z);
-				wyrmgus::terrain_type *diagonal_tile_top_terrain = this->GetTileTopTerrain(diagonal_pos, false, z);
-				wyrmgus::terrain_type *vertical_tile_top_terrain = this->GetTileTopTerrain(vertical_pos, false, z);
-				wyrmgus::terrain_type *horizontal_tile_top_terrain = this->GetTileTopTerrain(horizontal_pos, false, z);
+				const wyrmgus::terrain_type *diagonal_tile_terrain = this->GetTileTerrain(diagonal_pos, false, z);
+				const wyrmgus::terrain_type *vertical_tile_terrain = this->GetTileTerrain(vertical_pos, false, z);
+				const wyrmgus::terrain_type *horizontal_tile_terrain = this->GetTileTerrain(horizontal_pos, false, z);
+				const wyrmgus::terrain_type *diagonal_tile_top_terrain = this->GetTileTopTerrain(diagonal_pos, false, z);
+				const wyrmgus::terrain_type *vertical_tile_top_terrain = this->GetTileTopTerrain(vertical_pos, false, z);
+				const wyrmgus::terrain_type *horizontal_tile_top_terrain = this->GetTileTopTerrain(horizontal_pos, false, z);
 				
 				if (!terrain_type->is_overlay()) {
 					if (diagonal_tile_terrain != terrain_type && (std::find(terrain_type->BorderTerrains.begin(), terrain_type->BorderTerrains.end(), diagonal_tile_terrain) == terrain_type->BorderTerrains.end() || this->TileBordersTerrainIncompatibleWithTerrain(diagonal_pos, terrain_type, z))) {
@@ -2997,8 +2997,8 @@ void CMap::generate_missing_terrain(const Vec2i &min_pos, const Vec2i &max_pos, 
 
 		const CMapField *seed_tile = this->Field(seed_pos, z);
 
-		wyrmgus::terrain_type *terrain_type = seed_tile->Terrain;
-		wyrmgus::terrain_type *overlay_terrain_type = seed_tile->OverlayTerrain;
+		const wyrmgus::terrain_type *terrain_type = seed_tile->Terrain;
+		const wyrmgus::terrain_type *overlay_terrain_type = seed_tile->OverlayTerrain;
 		const wyrmgus::terrain_feature *terrain_feature = seed_tile->get_terrain_feature();
 
 		if (overlay_terrain_type != nullptr) {
@@ -3029,9 +3029,9 @@ void CMap::generate_missing_terrain(const Vec2i &min_pos, const Vec2i &max_pos, 
 					continue;
 				}
 
-				wyrmgus::terrain_type *diagonal_tile_top_terrain = this->GetTileTopTerrain(diagonal_pos, false, z);
-				wyrmgus::terrain_type *vertical_tile_top_terrain = this->GetTileTopTerrain(vertical_pos, false, z);
-				wyrmgus::terrain_type *horizontal_tile_top_terrain = this->GetTileTopTerrain(horizontal_pos, false, z);
+				const wyrmgus::terrain_type *diagonal_tile_top_terrain = this->GetTileTopTerrain(diagonal_pos, false, z);
+				const wyrmgus::terrain_type *vertical_tile_top_terrain = this->GetTileTopTerrain(vertical_pos, false, z);
+				const wyrmgus::terrain_type *horizontal_tile_top_terrain = this->GetTileTopTerrain(horizontal_pos, false, z);
 
 				if (diagonal_tile_top_terrain == nullptr && this->TileBordersTerrainIncompatibleWithTerrainPair(diagonal_pos, terrain_type, overlay_terrain_type, z)) {
 					continue;
@@ -3106,7 +3106,7 @@ void CMap::generate_missing_terrain(const Vec2i &min_pos, const Vec2i &max_pos, 
 				continue;
 			}
 
-			std::map<std::pair<wyrmgus::terrain_type *, wyrmgus::terrain_type *>, int> terrain_type_pair_neighbor_count;
+			std::map<std::pair<const wyrmgus::terrain_type *, const wyrmgus::terrain_type *>, int> terrain_type_pair_neighbor_count;
 
 			for (int x_offset = -1; x_offset <= 1; ++x_offset) {
 				for (int y_offset = -1; y_offset <= 1; ++y_offset) {
@@ -3121,14 +3121,14 @@ void CMap::generate_missing_terrain(const Vec2i &min_pos, const Vec2i &max_pos, 
 					}
 
 					const CMapField *adjacent_tile = this->Field(adjacent_pos, z);
-					wyrmgus::terrain_type *adjacent_terrain_type = adjacent_tile->GetTerrain(false);
-					wyrmgus::terrain_type *adjacent_overlay_terrain_type = adjacent_tile->GetTerrain(true);
+					const wyrmgus::terrain_type *adjacent_terrain_type = adjacent_tile->GetTerrain(false);
+					const wyrmgus::terrain_type *adjacent_overlay_terrain_type = adjacent_tile->GetTerrain(true);
 
 					if (adjacent_terrain_type == nullptr) {
 						continue;
 					}
 
-					std::pair<wyrmgus::terrain_type *, wyrmgus::terrain_type *> terrain_type_pair(adjacent_terrain_type, adjacent_overlay_terrain_type);
+					std::pair<const wyrmgus::terrain_type *, const wyrmgus::terrain_type *> terrain_type_pair(adjacent_terrain_type, adjacent_overlay_terrain_type);
 
 					auto find_iterator = terrain_type_pair_neighbor_count.find(terrain_type_pair);
 					if (find_iterator == terrain_type_pair_neighbor_count.end()) {
@@ -3139,7 +3139,7 @@ void CMap::generate_missing_terrain(const Vec2i &min_pos, const Vec2i &max_pos, 
 				}
 			}
 
-			std::pair<wyrmgus::terrain_type *, wyrmgus::terrain_type *> best_terrain_type_pair(nullptr, nullptr);
+			std::pair<const wyrmgus::terrain_type *, const wyrmgus::terrain_type *> best_terrain_type_pair(nullptr, nullptr);
 			int best_terrain_type_neighbor_count = 0;
 			for (const auto &element : terrain_type_pair_neighbor_count) {
 				if (element.second > best_terrain_type_neighbor_count) {

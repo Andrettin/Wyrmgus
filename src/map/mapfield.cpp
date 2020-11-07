@@ -58,14 +58,7 @@ CMapField::CMapField() :
 	this->player_info = std::make_unique<CMapFieldPlayerInfo>();
 }
 
-/**
-**	@brief	Get the terrain of the tile
-**
-**	@param	overlay		Whether it is the overlay terrain that should be obtained
-**
-**	@return	The terrain of the tile for the given overlay parameter
-*/
-wyrmgus::terrain_type *CMapField::GetTerrain(const bool overlay) const
+const wyrmgus::terrain_type *CMapField::GetTerrain(const bool overlay) const
 {
 	if (overlay) {
 		return this->OverlayTerrain;
@@ -82,7 +75,7 @@ wyrmgus::terrain_type *CMapField::GetTerrain(const bool overlay) const
 **
 **	@return	The topmost terrain of the tile
 */
-wyrmgus::terrain_type *CMapField::GetTopTerrain(const bool seen, const bool ignore_destroyed) const
+const wyrmgus::terrain_type *CMapField::GetTopTerrain(const bool seen, const bool ignore_destroyed) const
 {
 	if (!seen) {
 		if (this->OverlayTerrain && (!ignore_destroyed || !this->OverlayTerrainDestroyed)) {
@@ -124,7 +117,7 @@ bool CMapField::IsDestroyedForestTile() const
 **
 **	@param	terrain_type	The new terrain type for the tile
 */
-void CMapField::SetTerrain(wyrmgus::terrain_type *terrain_type)
+void CMapField::SetTerrain(const wyrmgus::terrain_type *terrain_type)
 {
 	if (!terrain_type) {
 		return;
