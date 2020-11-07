@@ -27,36 +27,62 @@
 
 #pragma once
 
-#include "player.h"
-#include "script/effect/scope_effect.h"
+#include "script/condition/and_condition.h"
+#include "script/effect/effect.h"
+#include "script/effect/effect_list.h"
 
 namespace wyrmgus {
 
 template <typename scope_type>
-class neutral_player_effect final : public scope_effect<scope_type, CPlayer>
+class if_effect final : public effect<scope_type>
 {
 public:
-	explicit neutral_player_effect(const sml_operator effect_operator) : scope_effect(effect_operator)
+	explicit if_effect(const sml_operator effect_operator) : effect(effect_operator)
 	{
 	}
 
 	virtual const std::string &get_class_identifier() const override
 	{
-		static const std::string class_identifier = "neutral_player";
+		static const std::string class_identifier = "if";
 		return class_identifier;
 	}
 
-	virtual std::string get_scope_name() const override
+	virtual void process_sml_property(const sml_property &property) override
 	{
-		return "Neutral player";
+		this->effects.process_sml_property(property);
 	}
-	
-	virtual CPlayer *get_scope(const scope_type *upper_scope) const override
-	{
-		Q_UNUSED(upper_scope)
 
-		return CPlayer::Players[PlayerNumNeutral];
+	virtual void process_sml_scope(const sml_data &scope) override
+	{
+		const std::string &tag = scope.get_tag();
+
+		if (tag == "conditions") {
+			database::process_sml_data(this->conditions, scope);
+		} else {
+			this->effects.process_sml_scope(scope);
+		}
 	}
+
+	virtual void do_assignment_effect(scope_type *scope) const override
+	{
+		if (!this->conditions.check(scope)) {
+			return;
+		}
+
+		this->effects.do_effects(scope);
+	}
+
+	virtual std::string get_assignment_string(const size_t indent) const override
+	{
+		std::string str = "If:\n";
+		str += this->conditions.get_conditions_string(indent + 1);
+		str += "\n" + std::string(indent, '\t') + "Then:\n";
+		return str + this->effects.get_effects_string(indent + 1);
+	}
+
+private:
+	and_condition conditions;
+	effect_list<scope_type> effects;
 };
 
 }

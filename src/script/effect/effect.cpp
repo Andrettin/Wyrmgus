@@ -35,6 +35,7 @@
 #include "script/effect/any_unit_of_type_effect.h"
 #include "script/effect/call_dialogue_effect.h"
 #include "script/effect/create_unit_effect.h"
+#include "script/effect/if_effect.h"
 #include "script/effect/neutral_player_effect.h"
 #include "script/effect/remove_character_effect.h"
 #include "script/effect/remove_unit_effect.h"
@@ -76,7 +77,9 @@ std::unique_ptr<effect<scope_type>> effect<scope_type>::from_sml_scope(const sml
 	const std::string &effect_identifier = scope.get_tag();
 	std::unique_ptr<effect> effect;
 
-	if (effect_identifier == "neutral_player") {
+	if (effect_identifier == "if") {
+		effect = std::make_unique<if_effect<scope_type>>(scope.get_operator());
+	} else if (effect_identifier == "neutral_player") {
 		effect = std::make_unique<neutral_player_effect<scope_type>>(scope.get_operator());
 	} else {
 		if constexpr (std::is_same_v<scope_type, CPlayer>) {

@@ -60,11 +60,6 @@ public:
 		}
 	}
 
-	virtual std::string get_scope_name() const override
-	{
-		return "Any " + string::highlight(this->unit_type->get_name()) + " Unit";
-	}
-
 	virtual void check() const override
 	{
 		if (this->unit_type == nullptr) {
@@ -86,6 +81,11 @@ public:
 
 			this->do_scope_effect(unit);
 		}
+	}
+
+	virtual std::string get_scope_name() const override
+	{
+		return "Any " + string::highlight(this->unit_type->get_name()) + " unit";
 	}
 
 private:
