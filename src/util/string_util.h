@@ -244,4 +244,11 @@ inline std::string highlight(const std::string &str)
 	return "~<" + str + "~>";
 }
 
+inline std::string to_tooltip(const std::string &str)
+{
+	std::string tooltip = str;
+	string::replace(tooltip, "\t", "    "); //the game can't count character width correctly for tabs
+	return tooltip;
+}
+
 }

@@ -207,7 +207,7 @@ void dialogue_node::call(CPlayer *player) const
 			} else {
 				first = false;
 			}
-			std::string tooltip = option->get_tooltip();
+			std::string tooltip = string::to_tooltip(option->get_tooltip());
 			string::replace(tooltip, "\n", "\\n");
 			string::replace(tooltip, "\t", "\\t");
 			lua_command += "\"" + tooltip + "\"";
