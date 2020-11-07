@@ -1018,6 +1018,10 @@ void map_template::Apply(const QPoint &template_start_pos, const QPoint &map_sta
 void map_template::apply_subtemplates(const QPoint &template_start_pos, const QPoint &map_start_pos, const QPoint &map_end, const int z, const bool random, bool constructed) const
 {
 	for (map_template *subtemplate : this->get_subtemplates()) {
+		if (!subtemplate->is_active()) {
+			continue;
+		}
+
 		if (constructed != subtemplate->is_constructed_only()) {
 			continue;
 		}

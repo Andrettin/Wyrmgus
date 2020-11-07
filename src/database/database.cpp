@@ -624,6 +624,7 @@ void database::load_history()
 	site::load_history_database();
 	character::load_history_database();
 	historical_unit::load_history_database();
+	map_template::load_history_database();
 }
 
 void database::initialize()

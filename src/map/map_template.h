@@ -120,6 +120,7 @@ class map_template final : public named_data_entry, public data_type<map_templat
 	Q_PROPERTY(double max_longitude MEMBER max_longitude READ get_max_longitude)
 	Q_PROPERTY(double min_latitude MEMBER min_latitude READ get_min_latitude)
 	Q_PROPERTY(double max_latitude MEMBER max_latitude READ get_max_latitude)
+	Q_PROPERTY(bool active MEMBER active READ is_active)
 
 public:
 	static constexpr const char *class_identifier = "map_template";
@@ -134,6 +135,11 @@ public:
 	virtual void process_sml_scope(const sml_data &scope) override;
 	virtual void ProcessConfigData(const CConfigData *config_data) override;
 	virtual void initialize() override;
+
+	virtual void reset_history() override
+	{
+		this->active = this->is_active_by_default();
+	}
 
 	void ApplyTerrainFile(bool overlay, Vec2i template_start_pos, Vec2i map_start_pos, int z) const;
 	void ApplyTerrainImage(bool overlay, Vec2i template_start_pos, Vec2i map_start_pos, int z) const;
@@ -605,6 +611,16 @@ public:
 	{
 		return this->get_current_map_start_pos() + pos - this->get_start_pos();
 	}
+
+	bool is_active_by_default() const
+	{
+		return !this->is_constructed_only();
+	}
+
+	bool is_active() const
+	{
+		return this->active;
+	}
 	
 private:
 	std::filesystem::path terrain_file;
@@ -679,6 +695,7 @@ private:
 	double max_longitude;
 	double min_latitude;
 	double max_latitude;
+	bool active = true; //used for history
 
 	friend static int ::CclDefineMapTemplate(lua_State *l);
 };
