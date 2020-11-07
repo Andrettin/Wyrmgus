@@ -70,7 +70,6 @@
 */
 
 #include "color.h"
-#include "map/tile.h"
 #include "time/date.h"
 #include "util/point_container.h"
 #include "vec2i.h"
@@ -81,6 +80,7 @@ class CFile;
 class CMapLayer;
 class CTileset;
 class CUnit;
+class CUnitCache;
 
 namespace wyrmgus {
 	class faction;
@@ -88,6 +88,7 @@ namespace wyrmgus {
 	class map_template;
 	class plane;
 	class site;
+	class terrain_type;
 	class tile;
 	class unit_type;
 	class world;
@@ -222,6 +223,11 @@ public:
 	const wyrmgus::terrain_type *GetTileTerrain(const Vec2i &pos, const bool overlay, const int z) const;
 	const wyrmgus::terrain_type *GetTileTopTerrain(const Vec2i &pos, const bool seen, const int z, const bool ignore_destroyed = false) const;
 	int GetTileLandmass(const Vec2i &pos, int z) const;
+	//Wyrmgus end
+
+	const CUnitCache &get_tile_unit_cache(const QPoint &pos, int z);
+
+	//Wyrmgus start
 	Vec2i GenerateUnitLocation(const wyrmgus::unit_type *unit_type, const wyrmgus::faction *faction, const Vec2i &min_pos, const Vec2i &max_pos, const int z) const;
 	//Wyrmgus end
 
@@ -496,15 +502,8 @@ void MapMarkUnitSight(CUnit &unit);
 /// Unmark on vision table the Sight of the unit.
 void MapUnmarkUnitSight(CUnit &unit);
 
-/*----------------------------------------------------------------------------
---  Defines
-----------------------------------------------------------------------------*/
-
 /// Can a unit with 'mask' enter the field
-inline bool CanMoveToMask(const Vec2i &pos, int mask, int z)
-{
-	return !CMap::Map.Field(pos, z)->CheckMask(mask);
-}
+extern bool CanMoveToMask(const Vec2i &pos, int mask, int z);
 
 /// Handle Marking and Unmarking of radar vision
 inline void MapMarkRadar(const CPlayer &player, const Vec2i &pos, int w, int h, int range, int z)

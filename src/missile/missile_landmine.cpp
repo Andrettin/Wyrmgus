@@ -27,32 +27,32 @@
 //      02111-1307, USA.
 //
 
-/*----------------------------------------------------------------------------
---  Includes
-----------------------------------------------------------------------------*/
-
 #include "stratagus.h"
 
 #include "missile.h"
 
 #include "actions.h"
 #include "map/map.h"
+#include "map/tile.h"
 #include "unit/unit.h"
 #include "unit/unit_type_type.h"
 
 struct LandMineTargetFinder {
 	const CUnit *const source;
 	int CanHitOwner;
-	LandMineTargetFinder(const CUnit *unit, int hit):
+
+	explicit LandMineTargetFinder(const CUnit *unit, int hit):
 		source(unit), CanHitOwner(hit) {}
-	inline bool operator()(const CUnit *const unit) const
+
+	bool operator()(const CUnit *const unit) const
 	{
 		return (!(unit == source && !CanHitOwner)
 				&& unit->Type->UnitType != UnitTypeType::Fly
 				&& unit->Type->UnitType != UnitTypeType::Space
 				&& unit->CurrentAction() != UnitAction::Die);
 	}
-	inline CUnit *FindOnTile(const wyrmgus::tile *const mf) const
+
+	CUnit *FindOnTile(const wyrmgus::tile *const mf) const
 	{
 		return mf->UnitCache.find(*this);
 	}

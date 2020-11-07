@@ -27,26 +27,19 @@
 //      02111-1307, USA.
 //
 
-/*----------------------------------------------------------------------------
---  Includes
-----------------------------------------------------------------------------*/
-
 #include "stratagus.h"
 
 #include "ai_local.h"
 
 #include "map/map.h"
 #include "map/map_layer.h"
+#include "map/tile.h"
 #include "map/tileset.h"
 #include "pathfinder.h"
 #include "player.h"
 #include "unit/unit.h"
 #include "unit/unit_find.h"
 #include "unit/unit_type.h"
-
-/*----------------------------------------------------------------------------
---  Functions
-----------------------------------------------------------------------------*/
 
 static bool IsPosFree(const Vec2i &pos, const CUnit &exceptionUnit, int z)
 {

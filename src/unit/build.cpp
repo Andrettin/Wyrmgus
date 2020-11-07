@@ -38,6 +38,7 @@
 #include "map/map_layer.h"
 #include "map/terrain_feature.h"
 #include "map/terrain_type.h"
+#include "map/tile.h"
 #include "map/tileset.h"
 #include "player.h"
 #include "quest.h"

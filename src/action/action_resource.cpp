@@ -41,6 +41,7 @@
 #include "iolib.h"
 #include "map/map.h"
 #include "map/map_layer.h"
+#include "map/tile.h"
 #include "map/tileset.h"
 #include "objective_type.h"
 #include "pathfinder.h"

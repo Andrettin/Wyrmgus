@@ -42,6 +42,7 @@
 #include "map/site.h"
 #include "map/terrain_feature.h"
 #include "map/terrain_type.h"
+#include "map/tile.h"
 #include "map/tileset.h"
 #include "plane.h"
 #include "player.h"
@@ -300,6 +301,11 @@ int CMap::GetTileLandmass(const Vec2i &pos, int z) const
 	wyrmgus::tile &mf = *this->Field(pos, z);
 	
 	return mf.Landmass;
+}
+
+const CUnitCache &CMap::get_tile_unit_cache(const QPoint &pos, int z)
+{
+	return this->Field(pos, z)->UnitCache;
 }
 
 Vec2i CMap::GenerateUnitLocation(const wyrmgus::unit_type *unit_type, const wyrmgus::faction *faction, const Vec2i &min_pos, const Vec2i &max_pos, const int z) const
@@ -1346,6 +1352,11 @@ void SetSeasonSchedule(const std::string &season_schedule_ident, int z)
 	}
 }
 //Wyrmgus end
+
+bool CanMoveToMask(const Vec2i &pos, const int mask, const int z)
+{
+	return !CMap::Map.Field(pos, z)->CheckMask(mask);
+}
 
 /**
 **	@brief	Get whether a given coordinate is a valid point on the map

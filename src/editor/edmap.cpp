@@ -33,6 +33,7 @@
 #include "map/map_layer.h"
 #include "map/minimap.h"
 #include "map/terrain_type.h"
+#include "map/tile.h"
 #include "map/tileset.h"
 #include "ui/ui.h"
 #include "player.h"
@@ -42,10 +43,6 @@
 
 /// Callback for changed tile (with direction mask)
 static void EditorChangeSurrounding(const Vec2i &pos, int d);
-
-/*----------------------------------------------------------------------------
---  Functions
-----------------------------------------------------------------------------*/
 
 /**
 **  Change tile from abstract tile-type.

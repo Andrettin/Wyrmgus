@@ -32,6 +32,7 @@
 
 #include "map/map.h"
 #include "map/map_layer.h"
+#include "map/tile.h"
 #include "map/tileset.h"
 #include "settings.h"
 #include "time/time_of_day.h"

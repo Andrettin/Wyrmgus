@@ -27,10 +27,6 @@
 //      02111-1307, USA.
 //
 
-/*----------------------------------------------------------------------------
---  Includes
-----------------------------------------------------------------------------*/
-
 #include "stratagus.h"
 
 #include "action/action_follow.h"
@@ -42,6 +38,7 @@
 #include "iolib.h"
 #include "luacallback.h"
 #include "map/map_layer.h"
+#include "map/tile.h"
 #include "map/tileset.h"
 #include "missile.h"
 #include "pathfinder.h"

@@ -27,10 +27,6 @@
 //      02111-1307, USA.
 //
 
-/*----------------------------------------------------------------------------
---  Includes
-----------------------------------------------------------------------------*/
-
 #include "stratagus.h"
 
 #include "currency.h"
@@ -40,14 +36,6 @@
 std::vector<CCurrency *> CCurrency::Currencies;
 std::map<std::string, CCurrency *> CCurrency::CurrenciesByIdent;
 
-/**
-**	@brief	Get a currency
-**
-**	@param	ident		The currency's string identifier
-**	@param	should_find	Whether it is an error if the currency couldn't be found
-**
-**	@return	The currency if found, or null otherwise
-*/
 CCurrency *CCurrency::GetCurrency(const std::string &ident, const bool should_find)
 {
 	std::map<std::string, CCurrency *>::const_iterator find_iterator = CurrenciesByIdent.find(ident);
@@ -63,13 +51,6 @@ CCurrency *CCurrency::GetCurrency(const std::string &ident, const bool should_fi
 	return nullptr;
 }
 
-/**
-**	@brief	Get or add a currency
-**
-**	@param	ident	The currency's string identifier
-**
-**	@return	The currency if found, otherwise a new currency is created and returned
-*/
 CCurrency *CCurrency::GetOrAddCurrency(const std::string &ident)
 {
 	CCurrency *currency = GetCurrency(ident, false);
@@ -84,9 +65,6 @@ CCurrency *CCurrency::GetOrAddCurrency(const std::string &ident)
 	return currency;
 }
 
-/**
-**	@brief	Remove the existing currencies
-*/
 void CCurrency::ClearCurrencies()
 {
 	for (size_t i = 0; i < Currencies.size(); ++i) {
@@ -95,11 +73,6 @@ void CCurrency::ClearCurrencies()
 	Currencies.clear();
 }
 
-/**
-**	@brief	Process data provided by a configuration file
-**
-**	@param	config_data	The configuration data
-*/
 void CCurrency::ProcessConfigData(const CConfigData *config_data)
 {
 	for (size_t i = 0; i < config_data->Properties.size(); ++i) {

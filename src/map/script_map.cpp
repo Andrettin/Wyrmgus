@@ -46,6 +46,7 @@
 #include "map/site.h"
 #include "map/terrain_feature.h"
 #include "map/terrain_type.h"
+#include "map/tile.h"
 #include "map/tileset.h"
 //Wyrmgus start
 #include "plane.h"

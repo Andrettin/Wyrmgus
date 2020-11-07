@@ -34,6 +34,7 @@
 #include "map/map_layer.h"
 #include "pathfinder.h"
 #include "unit/unit.h"
+#include "unit/unit_cache.h"
 #include "unit/unit_type.h"
 
 class CPlayer;
@@ -335,8 +336,6 @@ void SelectFixed(const Vec2i &ltPos, const Vec2i &rbPos, std::vector<CUnit *> &u
 	Assert(CMap::Map.Info.IsPointOnMap(rbPos, z));
 	Assert(units.empty());
 	
-	const CMapLayer *map_layer = CMap::Map.MapLayers[z].get();
-	
 	//Wyrmgus start
 	double middle_x = 0;
 	double middle_y = 0;
@@ -361,8 +360,7 @@ void SelectFixed(const Vec2i &ltPos, const Vec2i &rbPos, std::vector<CUnit *> &u
 			}
 			//Wyrmgus end
 
-			const wyrmgus::tile &mf = *map_layer->Field(posIt);
-			const CUnitCache &cache = mf.UnitCache;
+			const CUnitCache &cache = CMap::Map.get_tile_unit_cache(posIt, z);
 
 			for (CUnit *unit : cache) {
 				if (unit->CacheLock == 0 && pred(unit)) {
@@ -445,8 +443,7 @@ CUnit *FindUnit_IfFixed(const Vec2i &ltPos, const Vec2i &rbPos, int z, Pred pred
 
 	for (Vec2i posIt = ltPos; posIt.y != rbPos.y + 1; ++posIt.y) {
 		for (posIt.x = ltPos.x; posIt.x != rbPos.x + 1; ++posIt.x) {
-			const wyrmgus::tile &mf = *CMap::Map.Field(posIt, z);
-			const CUnitCache &cache = mf.UnitCache;
+			const CUnitCache &cache = CMap::Map.get_tile_unit_cache(posIt, z);
 
 			CUnitCache::const_iterator it = std::find_if(cache.begin(), cache.end(), pred);
 			if (it != cache.end()) {

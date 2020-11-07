@@ -47,6 +47,7 @@
 #include "map/minimap_mode.h"
 #include "map/site.h"
 #include "map/terrain_feature.h"
+#include "map/tile.h"
 #include "map/tileset.h"
 #include "menus.h"
 #include "network.h"

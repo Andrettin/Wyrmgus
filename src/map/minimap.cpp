@@ -36,6 +36,7 @@
 #include "map/minimap_mode.h"
 #include "map/site.h"
 #include "map/terrain_type.h"
+#include "map/tile.h"
 #include "map/tileset.h"
 #include "plane.h"
 #include "player.h"

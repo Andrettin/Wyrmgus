@@ -42,6 +42,7 @@
 #include "map/map_layer.h"
 #include "map/site.h"
 #include "map/terrain_type.h"
+#include "map/tile.h"
 #include "map/tileset.h"
 #include "pathfinder.h"
 #include "player.h"

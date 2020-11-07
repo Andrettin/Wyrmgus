@@ -35,6 +35,7 @@
 #include "map/map.h"
 #include "map/map_layer.h"
 #include "map/terrain_type.h"
+#include "map/tile.h"
 #include "map/tileset.h"
 #include "missile.h"
 #include "particle.h"

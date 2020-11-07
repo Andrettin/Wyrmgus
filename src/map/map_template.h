@@ -31,11 +31,11 @@
 #include "database/named_data_entry.h"
 #include "data_type.h"
 #include "map/terrain_geodata_map.h"
-#include "map/tile.h"
 #include "time/date.h"
 #include "util/point_container.h"
 #include "vec2i.h"
 
+class CPlayer;
 struct lua_State;
 
 static int CclDefineMapTemplate(lua_State *l);

@@ -26,10 +26,6 @@
 //      02111-1307, USA.
 //
 
-//----------------------------------------------------------------------------
-// Documentation
-//----------------------------------------------------------------------------
-
 /**
 ** @page AiModule Module - AI
 **
@@ -149,6 +145,7 @@
 #include "map/map.h"
 #include "map/map_layer.h"
 #include "map/site.h"
+#include "map/tile.h"
 //Wyrmgus start
 #include "network.h"
 //Wyrmgus end

@@ -35,6 +35,7 @@
 #include "actions.h"
 #include "database/defines.h"
 #include "map/map_layer.h"
+#include "map/tile.h"
 #include "map/tileset.h"
 #include "player.h"
 #include "ui/ui.h"

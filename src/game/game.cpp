@@ -59,6 +59,7 @@
 #include "map/map_layer.h"
 #include "map/minimap.h"
 #include "map/terrain_type.h"
+#include "map/tile.h"
 #include "map/tileset.h"
 #include "missile.h"
 #include "netconnect.h"

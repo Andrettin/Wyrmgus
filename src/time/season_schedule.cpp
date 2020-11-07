@@ -25,10 +25,6 @@
 //      02111-1307, USA.
 //
 
-/*----------------------------------------------------------------------------
---  Includes
-----------------------------------------------------------------------------*/
-
 #include "stratagus.h"
 
 #include "time/season_schedule.h"
@@ -37,17 +33,9 @@
 #include "time/season.h"
 #include "util/string_util.h"
 
-/*----------------------------------------------------------------------------
---  Variables
-----------------------------------------------------------------------------*/
-
 std::vector<CSeasonSchedule *> CSeasonSchedule::SeasonSchedules;
 std::map<std::string, CSeasonSchedule *> CSeasonSchedule::SeasonSchedulesByIdent;
 CSeasonSchedule *CSeasonSchedule::DefaultSeasonSchedule = nullptr;
-	
-/*----------------------------------------------------------------------------
---  Functions
-----------------------------------------------------------------------------*/
 
 /**
 **	@brief	Get a season schedule

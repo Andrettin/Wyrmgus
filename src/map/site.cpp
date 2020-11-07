@@ -39,6 +39,7 @@
 #include "map/map_template.h"
 #include "map/minimap.h"
 #include "map/region.h"
+#include "map/tile.h"
 #include "player.h" //for factions
 #include "player_color.h"
 #include "province.h" //for regions

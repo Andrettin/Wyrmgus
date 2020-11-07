@@ -34,6 +34,7 @@
 #include "database/defines.h"
 #include "map/map.h"
 #include "map/map_layer.h"
+#include "map/tile.h"
 #include "player.h"
 #include "ui/ui.h"
 #include "video/video.h"

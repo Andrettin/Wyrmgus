@@ -8,8 +8,6 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name unit_cache.h - The unit cache headerfile. */
-//
 //      (c) Copyright 2008 by Rafal Bursig
 //
 //      This program is free software; you can redistribute it and/or modify
@@ -32,10 +30,6 @@
 #undef Insert
 #undef Remove
 #endif
-
-/*----------------------------------------------------------------------------
---  Declarations
-----------------------------------------------------------------------------*/
 
 class CUnit;
 class CMap;

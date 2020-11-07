@@ -27,15 +27,12 @@
 //      02111-1307, USA.
 //
 
-/*----------------------------------------------------------------------------
---  Includes
-----------------------------------------------------------------------------*/
-
 #include "stratagus.h"
 
 #include "map/map.h"
 
 #include "map/map_layer.h"
+#include "map/tile.h"
 #include "player.h"
 #include "unit/unit.h"
 #include "unit/unit_type.h"

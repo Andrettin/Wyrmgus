@@ -38,6 +38,7 @@
 //Wyrmgus end
 #include "iolib.h"
 #include "map/map_layer.h"
+#include "map/tile.h"
 #include "player.h"
 #include "script.h"
 #include "sound/sound.h"
