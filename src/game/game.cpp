@@ -161,15 +161,11 @@ void game::apply_player_history()
 		player->set_dynasty(faction->get_dynasty());
 
 		for (const auto &kv_pair : civilization->HistoricalUpgrades) {
-			int upgrade_id = UpgradeIdByIdent(kv_pair.first);
-			if (upgrade_id == -1) {
-				fprintf(stderr, "Upgrade \"%s\" doesn't exist.\n", kv_pair.first.c_str());
-				continue;
-			}
+			const CUpgrade *upgrade = CUpgrade::get(kv_pair.first);
 			for (std::map<CDate, bool>::const_reverse_iterator second_iterator = kv_pair.second.rbegin(); second_iterator != kv_pair.second.rend(); ++second_iterator) {
 				if (second_iterator->first.Year == 0 || start_date.ContainsDate(second_iterator->first)) {
 					if (second_iterator->second && UpgradeIdentAllowed(*player, kv_pair.first.c_str()) != 'R') {
-						UpgradeAcquire(*player, CUpgrade::get_all()[upgrade_id]);
+						UpgradeAcquire(*player, upgrade);
 					} else if (!second_iterator->second) {
 						break;
 					}
@@ -178,15 +174,11 @@ void game::apply_player_history()
 		}
 
 		for (const auto &kv_pair : faction->HistoricalUpgrades) {
-			int upgrade_id = UpgradeIdByIdent(kv_pair.first);
-			if (upgrade_id == -1) {
-				fprintf(stderr, "Upgrade \"%s\" doesn't exist.\n", kv_pair.first.c_str());
-				continue;
-			}
+			const CUpgrade *upgrade = CUpgrade::get(kv_pair.first);
 			for (std::map<CDate, bool>::const_reverse_iterator second_iterator = kv_pair.second.rbegin(); second_iterator != kv_pair.second.rend(); ++second_iterator) {
 				if (second_iterator->first.Year == 0 || start_date.ContainsDate(second_iterator->first)) {
 					if (second_iterator->second && UpgradeIdentAllowed(*player, kv_pair.first.c_str()) != 'R') {
-						UpgradeAcquire(*player, CUpgrade::get_all()[upgrade_id]);
+						UpgradeAcquire(*player, upgrade);
 					} else if (!second_iterator->second) {
 						break;
 					}

@@ -1025,8 +1025,7 @@ int SaveReplay(const std::string &filename)
 	}
 	auto buf = std::make_unique<char[]>(sb.st_size);
 	if (!buf) {
-		fprintf(stderr, "Out of memory\n");
-		return -1;
+		throw std::runtime_error("Out of memory.");
 	}
 	fd = fopen(logfile.str().c_str(), "rb");
 	if (!fd) {

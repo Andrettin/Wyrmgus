@@ -742,7 +742,7 @@ void CClient::Parse_Map(const unsigned char *buf)
 
 	msg.Deserialize(buf);
 	if (!IsSafeMapName(msg.MapPath)) {
-		fprintf(stderr, "Unsecure map name!\n");
+		fprintf(stderr, "Insecure map name!\n");
 		networkState.State = ccs_badmap;
 		return;
 	}
