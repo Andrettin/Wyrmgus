@@ -567,14 +567,6 @@ void GameMainLoop()
 
 	SingleGameLoop();
 
-	//
-	// Game over
-	//
-	if (GameResult == GameExit) {
-		Exit(0);
-		return;
-	}
-
 #ifdef REALVIDEO
 	if (FastForwardCycle > GameCycle) {
 		VideoSyncSpeed = RealVideoSyncSpeed;

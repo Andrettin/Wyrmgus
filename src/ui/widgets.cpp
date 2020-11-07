@@ -2938,6 +2938,10 @@ int MenuScreen::run(bool loop)
 		const EventCallback *old_callbacks = GetCallbacks();
 		SetCallbacks(&GuichanCallbacks);
 		while (runLoop) {
+			if (GameResult == GameExit) {
+				break;
+			}
+
 			UpdateDisplay();
 			RealizeVideoMemory();
 			CheckMusicFinished();
