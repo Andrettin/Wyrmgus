@@ -110,6 +110,13 @@ void dialogue::call_node_option_effect(const int node_index, const int option_in
 	this->nodes[node_index]->option_effect(option_index, player);
 }
 
+void dialogue::delete_lua_callbacks()
+{
+	for (const std::unique_ptr<dialogue_node> &node : this->nodes) {
+		node->delete_lua_callbacks();
+	}
+}
+
 }
 
 void CallDialogue(const std::string &dialogue_ident, int player)

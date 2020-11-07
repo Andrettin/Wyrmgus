@@ -32,6 +32,7 @@
 #include "commands.h"
 #include "currency.h"
 #include "database/database.h"
+#include "dialogue.h"
 #include "faction.h"
 //Wyrmgus start
 #include "grand_strategy.h"
@@ -115,6 +116,10 @@ void CleanModules()
 		unit_type->OnInit.reset();
 		unit_type->TeleportEffectIn.reset();
 		unit_type->TeleportEffectOut.reset();
+	}
+
+	for (wyrmgus::dialogue *dialogue : wyrmgus::dialogue::get_all()) {
+		dialogue->delete_lua_callbacks();
 	}
 
 	wyrmgus::database::get()->clear();

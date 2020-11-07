@@ -69,6 +69,8 @@ public:
 	void call(CPlayer *player) const;
 	void option_effect(const int option_index, CPlayer *player) const;
 
+	void delete_lua_callbacks();
+
 	int ID = -1;
 private:
 	wyrmgus::dialogue *dialogue = nullptr;

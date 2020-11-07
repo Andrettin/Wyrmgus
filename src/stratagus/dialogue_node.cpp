@@ -237,4 +237,14 @@ void dialogue_node::option_effect(const int option_index, CPlayer *player) const
 	this->get_dialogue()->call_node(this->ID + 1, player);
 }
 
+void dialogue_node::delete_lua_callbacks()
+{
+	this->Conditions.reset();
+	this->ImmediateEffects.reset();
+
+	for (const std::unique_ptr<dialogue_option> &option : this->options) {
+		option->delete_lua_callbacks();
+	}
+}
+
 }

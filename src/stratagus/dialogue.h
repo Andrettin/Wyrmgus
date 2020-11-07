@@ -31,7 +31,6 @@
 #include "database/data_type.h"
 
 class CPlayer;
-class LuaCallback;
 struct lua_State;
 
 static int CclDefineDialogue(lua_State *l);
@@ -81,6 +80,8 @@ public:
 	void call(CPlayer *player) const;
 	void call_node(const int node_index, CPlayer *player) const;
 	void call_node_option_effect(const int node_index, const int option_index, CPlayer *player) const;
+
+	void delete_lua_callbacks();
 	
 private:
 	std::vector<std::unique_ptr<dialogue_node>> nodes;	/// The nodes of the dialogue

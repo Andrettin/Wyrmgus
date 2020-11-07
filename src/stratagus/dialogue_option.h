@@ -76,6 +76,8 @@ public:
 	void do_effects(CPlayer *player) const;
 	std::string get_tooltip() const;
 
+	void delete_lua_callbacks();
+
 private:
 	std::string name = dialogue_option::default_name;
 	const dialogue_node *node = nullptr;

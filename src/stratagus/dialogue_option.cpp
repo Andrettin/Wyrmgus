@@ -129,4 +129,9 @@ std::string dialogue_option::get_tooltip() const
 	return std::string();
 }
 
+void dialogue_option::delete_lua_callbacks()
+{
+	this->lua_effects.reset();
+}
+
 }
