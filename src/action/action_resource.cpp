@@ -960,10 +960,10 @@ int COrder_Resource::GatherResource(CUnit &unit)
 		//Wyrmgus end
 			//Wyrmgus start
 			CMapField &mf = *CMap::Map.Field(this->goalPos, this->MapLayer);
-			if (addload > mf.Value) {
-				addload = mf.Value;
+			if (addload > mf.get_value()) {
+				addload = mf.get_value();
 			}
-			mf.Value -= addload;
+			mf.change_value(-addload);
 			//Wyrmgus end
 			//Wyrmgus start
 //			unit.ResourcesHeld += addload;
@@ -972,7 +972,7 @@ int COrder_Resource::GatherResource(CUnit &unit)
 			
 			//Wyrmgus start
 //			if (addload && unit.ResourcesHeld == resinfo.ResourceCapacity) {
-			if (mf.Value <= 0) {
+			if (mf.get_value() <= 0) {
 			//Wyrmgus end
 				//Wyrmgus start
 //				CMap::Map.ClearWoodTile(this->goalPos);

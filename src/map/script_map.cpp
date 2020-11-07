@@ -600,10 +600,10 @@ void SetTileTerrain(const std::string &terrain_ident, const Vec2i &pos, int valu
 		return;
 	}
 	
-	if ((int) CMap::Map.MapLayers.size() >= z) {
+	if (static_cast<int>(CMap::Map.MapLayers.size()) >= z) {
 		CMapField &mf = *CMap::Map.Field(pos, z);
 
-		mf.Value = value;
+		mf.set_value(value);
 		mf.SetTerrain(terrain);
 	}
 }
@@ -1191,7 +1191,7 @@ static int CclGetTileTerrainHasFlag(lua_State *l)
 	const CMapField &mf = *CMap::Map.Field(pos, z);
 	//Wyrmgus end
 
-	if (mf.getFlag() & flag) {
+	if (mf.get_flags() & flag) {
 		lua_pushboolean(l, 1);
 	} else {
 		lua_pushboolean(l, 0);

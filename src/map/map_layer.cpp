@@ -161,7 +161,7 @@ void CMapLayer::RegenerateForestTile(const Vec2i &pos)
 	const unsigned long occupied_flag = (permanent_occupied_flag | MapFieldLandUnit | MapFieldItem);
 	
 	if ((mf.Flags & permanent_occupied_flag)) { //if the tree tile is permanently occupied by buildings and the like, reset the regeneration process
-		mf.Value = 0;
+		mf.set_value(0);
 		return;
 	}
 
@@ -169,11 +169,11 @@ void CMapLayer::RegenerateForestTile(const Vec2i &pos)
 		return;
 	}
 	
-	++mf.Value;
-	if (mf.Value < ForestRegeneration) {
+	mf.increment_value();
+	if (mf.get_value() < ForestRegeneration) {
 		return;
 	}
-	mf.Value = ForestRegeneration;
+	mf.set_value(ForestRegeneration);
 	
 	//Wyrmgus start
 //	const Vec2i offset(0, -1);
@@ -192,9 +192,9 @@ void CMapLayer::RegenerateForestTile(const Vec2i &pos)
 				CMap::Map.Info.IsPointOnMap(pos + diagonalOffset, this->ID)
 				&& CMap::Map.Info.IsPointOnMap(pos + verticalOffset, this->ID)
 				&& CMap::Map.Info.IsPointOnMap(pos + horizontalOffset, this->ID)
-				&& ((verticalMf.IsDestroyedForestTile() && verticalMf.Value >= ForestRegeneration && !(verticalMf.Flags & occupied_flag)) || (verticalMf.getFlag() & MapFieldForest))
-				&& ((diagonalMf.IsDestroyedForestTile() && diagonalMf.Value >= ForestRegeneration && !(diagonalMf.Flags & occupied_flag)) || (diagonalMf.getFlag() & MapFieldForest))
-				&& ((horizontalMf.IsDestroyedForestTile() && horizontalMf.Value >= ForestRegeneration && !(horizontalMf.Flags & occupied_flag)) || (horizontalMf.getFlag() & MapFieldForest))
+				&& ((verticalMf.IsDestroyedForestTile() && verticalMf.get_value() >= ForestRegeneration && !(verticalMf.Flags & occupied_flag)) || (verticalMf.get_flags() & MapFieldForest))
+				&& ((diagonalMf.IsDestroyedForestTile() && diagonalMf.get_value() >= ForestRegeneration && !(diagonalMf.Flags & occupied_flag)) || (diagonalMf.get_flags() & MapFieldForest))
+				&& ((horizontalMf.IsDestroyedForestTile() && horizontalMf.get_value() >= ForestRegeneration && !(horizontalMf.Flags & occupied_flag)) || (horizontalMf.get_flags() & MapFieldForest))
 			) {
 				DebugPrint("Real place wood\n");
 				CMap::Map.SetOverlayTerrainDestroyed(pos + verticalOffset, false, this->ID);

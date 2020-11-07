@@ -253,9 +253,36 @@ public:
 
 	bool IsDestroyedForestTile() const;
 	
-	unsigned char getCost() const { return cost; }
-	unsigned long getFlag() const { return Flags; }
-	
+	unsigned long get_flags() const
+	{
+		return this->Flags;
+	}
+
+	unsigned char get_cost() const
+	{
+		return this->cost;
+	}
+
+	short get_value() const
+	{
+		return this->value;
+	}
+
+	void set_value(const short value)
+	{
+		this->value = value;
+	}
+
+	void change_value(const short change)
+	{
+		this->value += change;
+	}
+
+	void increment_value()
+	{
+		++this->value;
+	}
+
 	//Wyrmgus start
 //	void setGraphicTile(unsigned int tile) { this->tile = tile; }
 	//Wyrmgus end
@@ -312,12 +339,8 @@ public:
 	//Wyrmgus end
 private:
 	unsigned char cost;        /// unit cost to move in this tile
+	short value = 0;       /// HP for walls/ Wood Regeneration
 public:
-	// FIXME: Value should be removed, walls and regeneration can be handled differently.
-	//Wyrmgus start
-//	unsigned char Value;       /// HP for walls / wood regeneration
-	short Value;       /// HP for walls/ Wood Regeneration
-	//Wyrmgus end
 	int Landmass;			   /// to which "landmass" (can also be water) does this map field belong (if any); a "landmass" is a collection of adjacent land tiles, or a collection of adjacent water tiles; 0 means none has been set yet
 private:
 	short ownership_border_tile = -1; //the transition type of the border between this tile's owner, and other players' tiles, if applicable)

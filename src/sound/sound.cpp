@@ -190,15 +190,15 @@ static wyrmgus::sound *ChooseUnitVoiceSound(const CUnit &unit, const wyrmgus::un
 		case wyrmgus::unit_sound_type::fire_missile:
 			return unit.Type->MapSound.FireMissile.Sound;
 		case wyrmgus::unit_sound_type::step:
-			if (unit.Type->MapSound.StepMud.Sound && ((mf.getFlag() & MapFieldMud) || (mf.getFlag() & MapFieldSnow))) {
+			if (unit.Type->MapSound.StepMud.Sound && ((mf.get_flags() & MapFieldMud) || (mf.get_flags() & MapFieldSnow))) {
 				return unit.Type->MapSound.StepMud.Sound;
-			} else if (unit.Type->MapSound.StepDirt.Sound && ((mf.getFlag() & MapFieldDirt) || (mf.getFlag() & MapFieldIce))) {
+			} else if (unit.Type->MapSound.StepDirt.Sound && ((mf.get_flags() & MapFieldDirt) || (mf.get_flags() & MapFieldIce))) {
 				return unit.Type->MapSound.StepDirt.Sound;
-			} else if (unit.Type->MapSound.StepGravel.Sound && mf.getFlag() & MapFieldGravel) {
+			} else if (unit.Type->MapSound.StepGravel.Sound && mf.get_flags() & MapFieldGravel) {
 				return unit.Type->MapSound.StepGravel.Sound;
-			} else if (unit.Type->MapSound.StepGrass.Sound && ((mf.getFlag() & MapFieldGrass) || (mf.getFlag() & MapFieldStumps))) {
+			} else if (unit.Type->MapSound.StepGrass.Sound && ((mf.get_flags() & MapFieldGrass) || (mf.get_flags() & MapFieldStumps))) {
 				return unit.Type->MapSound.StepGrass.Sound;
-			} else if (unit.Type->MapSound.StepStone.Sound && mf.getFlag() & MapFieldStoneFloor) {
+			} else if (unit.Type->MapSound.StepStone.Sound && mf.get_flags() & MapFieldStoneFloor) {
 				return unit.Type->MapSound.StepStone.Sound;
 			} else {
 				return unit.Type->MapSound.Step.Sound;

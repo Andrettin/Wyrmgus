@@ -47,7 +47,6 @@
 CMapField::CMapField() :
 	Flags(0),
 	cost(0),
-	Value(0),
 	Landmass(0),
 	AnimationFrame(0),
 	OverlayAnimationFrame(0),
@@ -116,7 +115,7 @@ const wyrmgus::resource *CMapField::get_resource() const
 
 bool CMapField::IsDestroyedForestTile() const
 {
-	return this->OverlayTerrain && this->OverlayTerrainDestroyed && (this->getFlag() & MapFieldStumps);
+	return this->OverlayTerrain && this->OverlayTerrainDestroyed && (this->get_flags() & MapFieldStumps);
 }
 
 //Wyrmgus start
@@ -234,9 +233,9 @@ void CMapField::SetTerrain(wyrmgus::terrain_type *terrain_type)
 
 	//wood and rock tiles must always begin with the default value for their respective resource types
 	if (terrain_type->is_overlay() && terrain_type->get_resource() != nullptr) {
-		this->Value = terrain_type->get_resource()->get_default_amount();
+		this->value = terrain_type->get_resource()->get_default_amount();
 	} else if ((terrain_type->Flags & MapFieldWall) && terrain_type->UnitType) {
-		this->Value = terrain_type->UnitType->MapDefaultStat.Variables[HP_INDEX].Max;
+		this->value = terrain_type->UnitType->MapDefaultStat.Variables[HP_INDEX].Max;
 	}
 	
 	//remove the terrain feature, unless it is a trade route and a pathway is being built over it
@@ -251,7 +250,7 @@ void CMapField::RemoveOverlayTerrain()
 		return;
 	}
 	
-	this->Value = 0;
+	this->value = 0;
 	this->Flags &= ~(this->OverlayTerrain->Flags);
 	
 	this->Flags &= ~(MapFieldCoastAllowed); // need to do this manually, since MapFieldCoast is added dynamically
@@ -313,7 +312,7 @@ void CMapField::setTileIndex(const CTileset &tileset, unsigned int tileIndex, in
 	//Wyrmgus start
 //	this->tile = tile.tile;
 	//Wyrmgus end
-	this->Value = value;
+	this->value = value;
 	//Wyrmgus start
 	/*
 #if 0
@@ -370,7 +369,7 @@ void CMapField::Save(CFile &file) const
 {
 	const wyrmgus::terrain_feature *terrain_feature = this->get_terrain_feature();
 
-	file.printf("  {\"%s\", \"%s\", \"%s\", %s, %s, \"%s\", \"%s\", %d, %d, %d, %d, %2d, %2d, %2d, \"%s\"", (Terrain ? Terrain->Ident.c_str() : ""), (OverlayTerrain ? OverlayTerrain->Ident.c_str() : ""), (terrain_feature != nullptr ? terrain_feature->get_identifier().c_str() : ""), OverlayTerrainDamaged ? "true" : "false", OverlayTerrainDestroyed ? "true" : "false", player_info->SeenTerrain ? player_info->SeenTerrain->Ident.c_str() : "", player_info->SeenOverlayTerrain ? player_info->SeenOverlayTerrain->Ident.c_str() : "", SolidTile, OverlaySolidTile, player_info->SeenSolidTile, player_info->SeenOverlaySolidTile, Value, cost, Landmass, this->get_settlement() != nullptr ? this->get_settlement()->get_identifier().c_str() : "");
+	file.printf("  {\"%s\", \"%s\", \"%s\", %s, %s, \"%s\", \"%s\", %d, %d, %d, %d, %2d, %2d, %2d, \"%s\"", (Terrain ? Terrain->Ident.c_str() : ""), (OverlayTerrain ? OverlayTerrain->Ident.c_str() : ""), (terrain_feature != nullptr ? terrain_feature->get_identifier().c_str() : ""), OverlayTerrainDamaged ? "true" : "false", OverlayTerrainDestroyed ? "true" : "false", player_info->SeenTerrain ? player_info->SeenTerrain->Ident.c_str() : "", player_info->SeenOverlayTerrain ? player_info->SeenOverlayTerrain->Ident.c_str() : "", SolidTile, OverlaySolidTile, player_info->SeenSolidTile, player_info->SeenOverlaySolidTile, this->get_value(), this->get_cost(), Landmass, this->get_settlement() != nullptr ? this->get_settlement()->get_identifier().c_str() : "");
 	
 	for (size_t i = 0; i != TransitionTiles.size(); ++i) {
 		file.printf(", \"transition-tile\", \"%s\", %d", TransitionTiles[i].first->Ident.c_str(), TransitionTiles[i].second);
@@ -534,12 +533,12 @@ void CMapField::parse(lua_State *l)
 	this->SetOverlayTerrainDamaged(LuaToBoolean(l, -1, 4));
 	this->SetOverlayTerrainDestroyed(LuaToBoolean(l, -1, 5));
 	
-	std::string seen_terrain_ident = LuaToString(l, -1, 6);
+	const std::string seen_terrain_ident = LuaToString(l, -1, 6);
 	if (!seen_terrain_ident.empty()) {
 		this->player_info->SeenTerrain = wyrmgus::terrain_type::get(seen_terrain_ident);
 	}
 	
-	std::string seen_overlay_terrain_ident = LuaToString(l, -1, 7);
+	const std::string seen_overlay_terrain_ident = LuaToString(l, -1, 7);
 	if (!seen_overlay_terrain_ident.empty()) {
 		this->player_info->SeenOverlayTerrain = wyrmgus::terrain_type::get(seen_overlay_terrain_ident);
 	}
@@ -548,7 +547,7 @@ void CMapField::parse(lua_State *l)
 	this->OverlaySolidTile = LuaToNumber(l, -1, 9);
 	this->player_info->SeenSolidTile = LuaToNumber(l, -1, 10);
 	this->player_info->SeenOverlaySolidTile = LuaToNumber(l, -1, 11);
-	this->Value = LuaToNumber(l, -1, 12);
+	this->value = LuaToNumber(l, -1, 12);
 	this->cost = LuaToNumber(l, -1, 13);
 	this->Landmass = LuaToNumber(l, -1, 14);
 	const std::string settlement_identifier = LuaToString(l, -1, 15);

@@ -1657,7 +1657,7 @@ void CMap::FixTile(unsigned short type, int seen, const Vec2i &pos)
 		}
 	}
 
-	if (!seen && !(mf.getFlag() & type)) {
+	if (!seen && !(mf.get_flags() & type)) {
 		return;
 	}
 
@@ -1711,7 +1711,7 @@ void CMap::FixTile(unsigned short type, int seen, const Vec2i &pos)
 		} else {
 			mf.setGraphicTile(removedtile);
 			mf.Flags &= ~flags;
-			mf.Value = 0;
+			mf.set_value(0);
 			UI.get_minimap()->UpdateXY(pos);
 		}
 	} else if (seen && this->Tileset->isEquivalentTile(tile, mf.player_info->SeenTile)) { //Same Type
@@ -1895,12 +1895,12 @@ void CMap::SetOverlayTerrainDestroyed(const Vec2i &pos, bool destroyed, int z)
 				mf.Flags &= ~(MapFieldAirUnpassable);
 			}
 		}
-		mf.Value = 0;
+		mf.set_value(0);
 	} else {
 		if (mf.Flags & MapFieldStumps) { //if is a cleared tree tile regrowing trees
 			mf.Flags &= ~(MapFieldStumps);
 			mf.Flags |= MapFieldForest | MapFieldUnpassable;
-			mf.Value = wyrmgus::resource::get_all()[WoodCost]->get_default_amount();
+			mf.set_value(mf.OverlayTerrain->get_resource()->get_default_amount());
 		}
 	}
 	
@@ -3431,7 +3431,7 @@ void CMap::ClearWoodTile(const Vec2i &pos)
 
 	mf.setGraphicTile(this->Tileset->getRemovedTreeTile());
 	mf.Flags &= ~(MapFieldForest | MapFieldUnpassable);
-	mf.Value = 0;
+	mf.set_value(0);
 
 	UI.get_minimap()->UpdateXY(pos);
 	FixNeighbors(MapFieldForest, 0, pos);
@@ -3450,7 +3450,7 @@ void CMap::ClearRockTile(const Vec2i &pos)
 
 	mf.setGraphicTile(this->Tileset->getRemovedRockTile());
 	mf.Flags &= ~(MapFieldRocks | MapFieldUnpassable);
-	mf.Value = 0;
+	mf.set_value(0);
 	
 	UI.get_minimap()->UpdateXY(pos);
 	FixNeighbors(MapFieldRocks, 0, pos);

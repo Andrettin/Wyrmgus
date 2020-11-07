@@ -221,7 +221,7 @@ static void EditTile(const Vec2i &pos, wyrmgus::terrain_type *terrain)
 	if (!terrain->is_overlay() && !(KeyModifiers & ModifierShift)) { // don't remove overlay terrains if holding shift
 		mf.RemoveOverlayTerrain();
 	}
-	mf.Value = value;
+	mf.set_value(value);
 //	mf.player_info->SeenTile = mf.getGraphicTile();
 	mf.UpdateSeenTile();
 	//Wyrmgus end
@@ -1381,9 +1381,9 @@ static void DrawEditorInfo()
 	//
 	// Flags info
 	//
-	const unsigned flag = mf.getFlag();
+	const unsigned flag = mf.get_flags();
 	sprintf(buf, "%02X|%04X|%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c",
-			mf.Value, flag,
+			mf.get_value(), flag,
 			flag & MapFieldUnpassable   ? 'u' : '-',
 			flag & MapFieldAirUnpassable   ? 'A' : '-',
 			flag & MapFieldNoBuilding   ? 'n' : '-',

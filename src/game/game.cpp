@@ -867,7 +867,7 @@ int WriteMapSetup(const char *mapSetup, CMap &map, int writeTerrain, bool is_mod
 	//					const int tile = mf.getGraphicTile();
 	//					const int n = map.Tileset->findTileIndexByTile(tile);
 						//Wyrmgus end
-						const int value = mf.Value;
+						const int value = mf.get_value();
 						//Wyrmgus start
 	//					f->printf("SetTile(%3d, %d, %d, %d)\n", n, j, i, value);
 						f->printf("SetTileTerrain(\"%s\", %d, %d, %d, %d)\n", mf.Terrain->Ident.c_str(), x, y, 0, map_layer->ID);

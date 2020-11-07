@@ -770,7 +770,7 @@ static int CostMoveToCallBack_Default(unsigned int index, const CUnit &unit, int
 			if (unit.Type->UnitType == UnitTypeType::Fly || unit.Type->UnitType == UnitTypeType::FlyLow || unit.Type->UnitType == UnitTypeType::Space) {
 				cost += DefaultTileMovementCost;
 			} else {
-				cost += mf->getCost();
+				cost += mf->get_cost();
 			}
 			++mf;
 		} while (--i);

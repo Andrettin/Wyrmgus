@@ -141,7 +141,7 @@ void MapFixSeenWallTile(const Vec2i &pos)
 	}
 	const bool human = tileset.isARaceWallTile(tile, true);
 	const int dirFlag = GetDirectionFromSurrounding(pos, human, true);
-	const int wallTile = getWallTile(tileset, human, dirFlag, mf.Value, tile);
+	const int wallTile = getWallTile(tileset, human, dirFlag, mf.get_value(), tile);
 
 	if (mf.player_info->SeenTile != wallTile) { // Already there!
 		mf.player_info->SeenTile = wallTile;
@@ -193,7 +193,7 @@ void MapFixWallTile(const Vec2i &pos)
 	}
 	const bool human = tileset.isARaceWallTile(tile, true);
 	const int dirFlag = GetDirectionFromSurrounding(pos, human, false);
-	const unsigned int wallTile = getWallTile(tileset, human, dirFlag, mf.Value, tile);
+	const unsigned int wallTile = getWallTile(tileset, human, dirFlag, mf.get_value(), tile);
 
 	if (mf.getGraphicTile() != wallTile) {
 		mf.setGraphicTile(wallTile);
@@ -239,7 +239,7 @@ void CMap::RemoveWall(const Vec2i &pos)
 {
 	CMapField &mf = *Field(pos);
 
-	mf.Value = 0;
+	mf.set_value(0);
 
 	MapFixWallTile(pos);
 	mf.Flags &= ~(MapFieldWall | MapFieldUnpassable);
@@ -301,8 +301,8 @@ void CMap::HitWall(const Vec2i &pos, unsigned damage, int z)
 //Wyrmgus end
 {
 	//Wyrmgus start
-//	const unsigned v = this->Field(pos)->Value;
-	const unsigned v = this->Field(pos, z)->Value;
+//	const unsigned v = this->Field(pos)->get_value();
+	const unsigned v = this->Field(pos, z)->get_value();
 	//Wyrmgus end
 
 	if (v <= damage) {
@@ -312,10 +312,10 @@ void CMap::HitWall(const Vec2i &pos, unsigned damage, int z)
 		//Wyrmgus end
 	} else {
 		//Wyrmgus start
-//		this->Field(pos)->Value = v - damage;
-		this->Field(pos, z)->Value = v - damage;
+//		this->Field(pos)->set_value(v - damage);
+		this->Field(pos, z)->set_value(v - damage);
 //		MapFixWallTile(pos);
-		if (this->Field(pos, z)->OverlayTerrain->UnitType && this->Field(pos, z)->Value <= this->Field(pos, z)->OverlayTerrain->UnitType->MapDefaultStat.Variables[HP_INDEX].Max / 2) {
+		if (this->Field(pos, z)->OverlayTerrain->UnitType && this->Field(pos, z)->get_value() <= this->Field(pos, z)->OverlayTerrain->UnitType->MapDefaultStat.Variables[HP_INDEX].Max / 2) {
 			this->SetOverlayTerrainDamaged(pos, true, z);
 		}
 		//Wyrmgus end
