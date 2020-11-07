@@ -98,8 +98,6 @@ std::string effect_list<scope_type>::get_effects_string(const size_t indent) con
 			effects_string += std::string(indent, '\t');
 		}
 
-		effects_string += "- ";
-
 		effects_string += effect_string;
 	}
 	return effects_string;
