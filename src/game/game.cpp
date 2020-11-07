@@ -376,7 +376,7 @@ void StartMap(const std::string &filename, bool clean)
 		Gui->setTop(oldTop);
 		wyrmgus::vector::remove(Containers, container);
 	} catch (...) {
-		std::throw_with_nested(std::runtime_error("Error starting map."));
+		std::throw_with_nested(std::runtime_error("Error running map."));
 	}
 }
 
@@ -1774,7 +1774,12 @@ void CreateGame(const std::string &filename, CMap *map, bool is_mod)
 
 	CMap::Map.Init();
 	UI.get_minimap()->Create();
-	PreprocessMap();
+
+	try {
+		PreprocessMap();
+	} catch (...) {
+		std::throw_with_nested(std::runtime_error("Failed to preprocess map."));
+	}
 	
 	//Wyrmgus start
 	//update the sight of all units
