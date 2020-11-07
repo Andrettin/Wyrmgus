@@ -102,9 +102,11 @@ public:
 		}
 	}
 
-	virtual std::string get_string(const std::string &prefix = "") const override
+	virtual std::string get_string(const size_t indent) const override
 	{
-		std::string str = prefix + this->unit_type->get_name();
+		Q_UNUSED(indent)
+
+		std::string str = string::highlight(this->unit_type->get_name());
 
 		if (this->count > 1) {
 			str += '(' + std::to_string(this->count) + ')';
@@ -113,8 +115,6 @@ public:
 		if (this->settlement != nullptr) {
 			str += " in " + settlement->get_name();
 		}
-
-		str += '\n';
 
 		return str;
 	}

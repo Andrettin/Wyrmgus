@@ -48,6 +48,35 @@ public:
 	static std::unique_ptr<const condition> from_sml_property(const sml_property &property);
 	static std::unique_ptr<const condition> from_sml_scope(const sml_data &scope);
 
+	static std::string get_conditions_string(const std::vector<std::unique_ptr<const condition>> &conditions, const size_t indent)
+	{
+		std::string conditions_string;
+		bool first = true;
+		for (const std::unique_ptr<const condition> &condition : conditions) {
+			if (condition->is_hidden()) {
+				continue;
+			}
+
+			const std::string condition_string = condition->get_string(indent);
+			if (condition_string.empty()) {
+				continue;
+			}
+
+			if (first) {
+				first = false;
+			} else {
+				conditions_string += "\n";
+			}
+
+			if (indent > 0) {
+				conditions_string += std::string(indent, '\t');
+			}
+
+			conditions_string += condition_string;
+		}
+		return conditions_string;
+	}
+
 	virtual ~condition() {}
 
 	void ProcessConfigData(const CConfigData *config_data);
@@ -64,7 +93,12 @@ public:
 	virtual bool check(const CUnit *unit, bool ignore_units = false) const;
 
 	//get the condition as a string
-	virtual std::string get_string(const std::string &prefix = "") const = 0;
+	virtual std::string get_string(const size_t indent) const = 0;
+
+	virtual bool is_hidden() const
+	{
+		return false;
+	}
 };
 
 template <bool precondition>

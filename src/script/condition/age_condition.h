@@ -48,10 +48,11 @@ public:
 		return player->get_age() == this->age;
 	}
 
-	virtual std::string get_string(const std::string &prefix = "") const override
+	virtual std::string get_string(const size_t indent) const override
 	{
-		std::string str = prefix + this->age->get_name() + '\n';
-		return str;
+		Q_UNUSED(indent)
+
+		return this->age->get_name();
 	}
 
 private:

@@ -54,6 +54,11 @@ public:
 
 		return this->check(ignore_units);
 	}
+
+	virtual std::string get_scope_name() const override
+	{
+		return "Any player";
+	}
 };
 
 }

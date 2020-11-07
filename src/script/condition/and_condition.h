@@ -48,30 +48,16 @@ public:
 	virtual bool check(const CPlayer *player, bool ignore_units = false) const override;
 	virtual bool check(const CUnit *unit, bool ignore_units = false) const override;
 
-	virtual std::string get_string(const std::string &prefix = "") const override
+	virtual std::string get_string(const size_t indent) const override
 	{
-		int element_count = 0;
+		std::string str = "All of these must be true:\n";
+		str += this->get_conditions_string(indent + 1);
+		return str;
+	}
 
-		for (const auto &condition : this->conditions) {
-			if (!condition->get_string(prefix + '\t').empty()) {
-				element_count++;
-			}
-		}
-
-		if (element_count >= 1) {
-			std::string str;
-			if (element_count > 1) {
-				str += prefix + "AND:\n";
-			}
-
-			for (const auto &condition : this->conditions) {
-				str += condition->get_string((element_count > 1) ? prefix + '\t' : prefix);
-			}
-
-			return str;
-		} else {
-			return std::string();
-		}
+	std::string get_conditions_string(const size_t indent) const
+	{
+		return condition::get_conditions_string(this->conditions, indent);
 	}
 
 private:

@@ -79,6 +79,11 @@ public:
 		return this->check_scope(unit, ignore_units);
 	}
 
+	virtual std::string get_scope_name() const override
+	{
+		return "Any " + string::highlight(this->unit_type->get_name()) + " unit";
+	}
+
 private:
 	const wyrmgus::unit_type *unit_type = nullptr;
 };

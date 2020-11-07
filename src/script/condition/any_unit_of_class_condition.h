@@ -32,6 +32,7 @@
 #include "unit/unit.h"
 #include "unit/unit_class.h"
 #include "unit/unit_find.h"
+#include "util/string_util.h"
 
 namespace wyrmgus {
 
@@ -77,6 +78,11 @@ public:
 	virtual bool check(const CUnit *unit, const bool ignore_units) const override
 	{
 		return this->check_scope(unit, ignore_units);
+	}
+
+	virtual std::string get_scope_name() const override
+	{
+		return "Any " + string::highlight(this->unit_class->get_name()) + " unit";
 	}
 
 private:

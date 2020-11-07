@@ -394,12 +394,12 @@ std::string PrintConditions(const wyrmgus::button &button)
 	if (!strncmp(button.ValueStr.c_str(), "unit-", 5)) {
 		// target string refers to unit-XXX
 		const wyrmgus::unit_type *unit_type = wyrmgus::unit_type::get(button.ValueStr);
-		rules = unit_type->get_conditions()->get_string();
+		rules = unit_type->get_conditions()->get_string(0);
 	} else if (!strncmp(button.ValueStr.c_str(), "upgrade", 7)) {
 		// target string refers to upgrade-XXX
 		const CUpgrade *upgrade = CUpgrade::get(button.ValueStr);
 		if (upgrade->get_conditions()) {
-			rules = upgrade->get_conditions()->get_string();
+			rules = upgrade->get_conditions()->get_string(0);
 		}
 	} else {
 		DebugPrint("target '%s' should be unit-type or upgrade\n" _C_ button.ValueStr.c_str());

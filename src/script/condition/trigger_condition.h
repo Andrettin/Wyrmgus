@@ -51,15 +51,20 @@ public:
 		return vector::contains(trigger::DeactivatedTriggers, this->trigger->get_identifier()); //this works fine for global triggers, but for player triggers perhaps it should check only the player?
 	}
 
-	virtual std::string get_string(const std::string &prefix) const override
+	virtual std::string get_string(const size_t indent) const override
 	{
-		Q_UNUSED(prefix)
+		Q_UNUSED(indent)
 
 		return std::string();
 	}
 
+	virtual bool is_hidden() const override
+	{
+		return true;
+	}
+
 private:
-	const trigger *trigger = nullptr;
+	const wyrmgus::trigger *trigger = nullptr;
 };
 
 }

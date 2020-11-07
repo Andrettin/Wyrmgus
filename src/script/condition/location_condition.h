@@ -30,6 +30,7 @@
 #include "map/map_template.h"
 #include "script/condition/condition.h"
 #include "unit/unit.h"
+#include "util/string_util.h"
 
 namespace wyrmgus {
 
@@ -111,9 +112,19 @@ public:
 		return unit->is_in_tile_rect(QRect(min_map_pos, max_map_pos), unit->MapLayer->ID);
 	}
 
-	virtual std::string get_string(const std::string &prefix = "") const override
+	virtual std::string get_string(const size_t indent) const override
 	{
-		return prefix;
+		Q_UNUSED(indent)
+
+		std::string str = "Is in ";
+
+		if (this->min_pos != QPoint(-1, -1) || this->max_pos != QPoint(-1, -1)) {
+			str += "a given part of ";
+		}
+
+		str += "the " + string::highlight(this->map_template->get_name()) + " map area";
+
+		return str;
 	}
 
 private:

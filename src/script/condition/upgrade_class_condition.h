@@ -32,6 +32,7 @@
 #include "upgrade/upgrade.h"
 #include "upgrade/upgrade_class.h"
 #include "upgrade/upgrade_structs.h"
+#include "util/string_util.h"
 
 namespace wyrmgus {
 
@@ -67,10 +68,11 @@ public:
 		return this->check(unit->Player, ignore_units) || unit->GetIndividualUpgrade(upgrade);
 	}
 
-	virtual std::string get_string(const std::string &prefix = "") const override
+	virtual std::string get_string(const size_t indent) const override
 	{
-		std::string str = prefix + this->upgrade_class->get_name() + '\n';
-		return str;
+		Q_UNUSED(indent)
+
+		return "Has an upgrade of the " + string::highlight(this->upgrade_class->get_name()) + " upgrade class";
 	}
 
 private:

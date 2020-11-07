@@ -47,10 +47,11 @@ public:
 		return player->get_faction() == this->faction;
 	}
 
-	virtual std::string get_string(const std::string &prefix = "") const override
+	virtual std::string get_string(const size_t indent) const override
 	{
-		std::string str = prefix + this->faction->get_name() + " Faction\n";
-		return str;
+		Q_UNUSED(indent)
+
+		return this->faction->get_name() + " Faction";
 	}
 
 private:

@@ -54,10 +54,11 @@ public:
 		return unit->MapLayer->GetSeason() == this->Season;
 	}
 
-	virtual std::string get_string(const std::string &prefix = "") const override
+	virtual std::string get_string(const size_t indent) const override
 	{
-		std::string str = prefix + this->Season->get_name() + '\n';
-		return str;
+		Q_UNUSED(indent)
+
+		return this->Season->get_name() + " season";
 	}
 
 private:

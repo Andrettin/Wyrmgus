@@ -56,9 +56,13 @@ public:
 		return this->conditions.check(scope, ignore_units);
 	}
 
-	virtual std::string get_string(const std::string &prefix = "") const override final
+	virtual std::string get_scope_name() const = 0;
+
+	virtual std::string get_string(const size_t indent) const override final
 	{
-		return this->conditions.get_string(prefix);
+		std::string str = this->get_scope_name() + ":\n";
+		str += this->conditions.get_conditions_string(indent + 1);
+		return str;
 	}
 
 private:

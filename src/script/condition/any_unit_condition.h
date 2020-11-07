@@ -55,6 +55,11 @@ public:
 	{
 		return this->check_scope(unit, ignore_units);
 	}
+
+	virtual std::string get_scope_name() const override
+	{
+		return "Any unit";
+	}
 };
 
 }

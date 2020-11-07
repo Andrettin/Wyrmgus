@@ -48,10 +48,11 @@ public:
 		return character->get_unit() != nullptr;
 	}
 
-	virtual std::string get_string(const std::string &prefix = "") const override
+	virtual std::string get_string(const size_t indent) const override
 	{
-		std::string str = prefix + this->character->get_full_name() + " exists\n";
-		return str;
+		Q_UNUSED(indent)
+
+		return this->character->get_full_name() + " exists";
 	}
 
 private:

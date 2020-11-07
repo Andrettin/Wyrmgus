@@ -47,6 +47,11 @@ public:
 
 		return false;
 	}
+
+	virtual std::string get_scope_name() const override
+	{
+		return "Any other player";
+	}
 };
 
 }

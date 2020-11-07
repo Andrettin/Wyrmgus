@@ -47,10 +47,11 @@ public:
 		return player->has_quest(this->quest);
 	}
 
-	virtual std::string get_string(const std::string &prefix = "") const override
+	virtual std::string get_string(const size_t indent) const override
 	{
-		std::string str = prefix + "Has " + this->quest->get_name() + " Quest\n";
-		return str;
+		Q_UNUSED(indent)
+
+		return "Has the " + this->quest->get_name() + " Quest";
 	}
 
 private:

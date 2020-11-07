@@ -82,30 +82,11 @@ public:
 		return false;
 	}
 
-	virtual std::string get_string(const std::string &prefix = "") const override
+	virtual std::string get_string(const size_t indent) const override
 	{
-		int element_count = 0;
-
-		for (const auto &condition : this->conditions) {
-			if (!condition->get_string(prefix + '\t').empty()) {
-				element_count++;
-			}
-		}
-
-		if (element_count >= 1) {
-			std::string str;
-			if (element_count > 1) {
-				str += prefix + "OR:\n";
-			}
-
-			for (const auto &condition : this->conditions) {
-				str += condition->get_string((element_count > 1) ? prefix + '\t' : prefix);
-			}
-
-			return str;
-		} else {
-			return std::string();
-		}
+		std::string str = "One of these must be true:\n";
+		str += condition::get_conditions_string(this->conditions, indent + 1);
+		return str;
 	}
 
 private:

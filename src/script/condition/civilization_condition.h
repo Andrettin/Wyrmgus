@@ -47,10 +47,11 @@ public:
 		return player->get_civilization() == this->civilization;
 	}
 
-	virtual std::string get_string(const std::string &prefix = "") const override
+	virtual std::string get_string(const size_t indent) const override
 	{
-		std::string str = prefix + this->civilization->get_name() + " Civilization\n";
-		return str;
+		Q_UNUSED(indent)
+
+		return this->civilization->get_name() + " Civilization";
 	}
 
 private:

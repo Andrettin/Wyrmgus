@@ -41,6 +41,11 @@ public:
 
 		return CPlayer::Players[PlayerNumNeutral];
 	}
+
+	virtual std::string get_scope_name() const override
+	{
+		return "Neutral player";
+	}
 };
 
 }

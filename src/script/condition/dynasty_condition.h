@@ -47,10 +47,11 @@ public:
 		return player->get_dynasty() == this->dynasty;
 	}
 
-	virtual std::string get_string(const std::string &prefix = "") const override
+	virtual std::string get_string(const size_t indent) const override
 	{
-		std::string str = prefix + this->dynasty->get_name() + " Dynasty\n";
-		return str;
+		Q_UNUSED(indent)
+
+		return this->dynasty->get_name() + " Dynasty";
 	}
 
 private:

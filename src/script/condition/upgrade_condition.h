@@ -58,10 +58,11 @@ public:
 		return this->check(unit->Player, ignore_units) || unit->GetIndividualUpgrade(this->upgrade);
 	}
 
-	virtual std::string get_string(const std::string &prefix = "") const override
+	virtual std::string get_string(const size_t indent) const override
 	{
-		std::string str = prefix + this->upgrade->get_name() + '\n';
-		return str;
+		Q_UNUSED(indent)
+
+		return "Has the " + this->upgrade->get_name() + " upgrade";
 	}
 
 private:
