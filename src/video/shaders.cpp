@@ -503,8 +503,7 @@ extern void SetupFramebuffer() {
 	GLenum DrawBuffers[1] = { GL_COLOR_ATTACHMENT0_EXT };
 	glDrawBuffers(1, DrawBuffers);
 	if (glCheckFramebufferStatus(GL_FRAMEBUFFER_EXT) != GL_FRAMEBUFFER_COMPLETE_EXT) {
-		fprintf(stderr, "FATAL: Error Creating Framebuffer! Try running without OpenGL.");
-		exit(-1);
+		throw std::runtime_error("FATAL: Error Creating Framebuffer! Try running without OpenGL.");
 	}
 	glBindFramebuffer(GL_FRAMEBUFFER_EXT, fullscreenFramebuffer);
 }

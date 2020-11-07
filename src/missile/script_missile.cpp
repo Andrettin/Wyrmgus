@@ -69,9 +69,7 @@ void missile_type::Load(lua_State *l)
 		} else if (!strcmp(value, "ChangeVariable")) {
 			const int index = UnitTypeVar.VariableNameLookup[LuaToString(l, -1)];// User variables
 			if (index == -1) {
-				fprintf(stderr, "Bad variable name '%s'\n", LuaToString(l, -1));
-				Exit(1);
-				return;
+				throw std::runtime_error("Bad variable name \"" + std::string(LuaToString(l, -1))  + "\".");
 			}
 			this->ChangeVariable = index;
 		} else if (!strcmp(value, "ChangeAmount")) {

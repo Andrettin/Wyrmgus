@@ -37,8 +37,7 @@
 {
 	Assert(unit.Anim.Anim == this);
 	if (unit.Anim.Unbreakable) {
-		fprintf(stderr, "Can't call \"die\" action in unbreakable section\n");
-		Exit(1);
+		throw std::runtime_error("Can't call \"die\" action in unbreakable section.");
 	}
 	if (this->DeathType.empty() == false) {
 		unit.DamagedType = ExtraDeathIndex(this->DeathType.c_str());

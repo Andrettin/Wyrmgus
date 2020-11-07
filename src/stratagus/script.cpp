@@ -808,76 +808,46 @@ static int GetPlayerData(const int player_index, const char *prop, const char *a
 	if (!strcmp(prop, "RaceName")) {
 		return player->Race;
 	} else if (!strcmp(prop, "Resources")) {
-		const int resId = GetResourceIdByName(arg);
-		if (resId == -1) {
-			fprintf(stderr, "Invalid resource \"%s\"", arg);
-			Exit(1);
-		}
-		return player->Resources[resId] + player->StoredResources[resId];
+		const wyrmgus::resource *resource = wyrmgus::resource::get(arg);
+		const int res_id = resource->get_index();
+		return player->Resources[res_id] + player->StoredResources[res_id];
 	} else if (!strcmp(prop, "StoredResources")) {
-		const int resId = GetResourceIdByName(arg);
-		if (resId == -1) {
-			fprintf(stderr, "Invalid resource \"%s\"", arg);
-			Exit(1);
-		}
-		return player->StoredResources[resId];
+		const wyrmgus::resource *resource = wyrmgus::resource::get(arg);
+		const int res_id = resource->get_index();
+		return player->StoredResources[res_id];
 	} else if (!strcmp(prop, "MaxResources")) {
-		const int resId = GetResourceIdByName(arg);
-		if (resId == -1) {
-			fprintf(stderr, "Invalid resource \"%s\"", arg);
-			Exit(1);
-		}
-		return player->MaxResources[resId];
+		const wyrmgus::resource *resource = wyrmgus::resource::get(arg);
+		const int res_id = resource->get_index();
+		return player->MaxResources[res_id];
 	} else if (!strcmp(prop, "Incomes")) {
-		const int resId = GetResourceIdByName(arg);
-		if (resId == -1) {
-			fprintf(stderr, "Invalid resource \"%s\"", arg);
-			Exit(1);
-		}
-		return player->Incomes[resId];
+		const wyrmgus::resource *resource = wyrmgus::resource::get(arg);
+		const int res_id = resource->get_index();
+		return player->Incomes[res_id];
 		//Wyrmgus start
 	} else if (!strcmp(prop, "Prices")) {
-		const int resId = GetResourceIdByName(arg);
-		if (resId == -1) {
-			fprintf(stderr, "Invalid resource \"%s\"", arg);
-			Exit(1);
-		}
-		return player->GetResourcePrice(resId);
+		const wyrmgus::resource *resource = wyrmgus::resource::get(arg);
+		const int res_id = resource->get_index();
+		return player->GetResourcePrice(res_id);
 	} else if (!strcmp(prop, "ResourceDemand")) {
-		const int resId = GetResourceIdByName(arg);
-		if (resId == -1) {
-			fprintf(stderr, "Invalid resource \"%s\"", arg);
-			Exit(1);
-		}
-		return player->ResourceDemand[resId];
+		const wyrmgus::resource *resource = wyrmgus::resource::get(arg);
+		const int res_id = resource->get_index();
+		return player->ResourceDemand[res_id];
 	} else if (!strcmp(prop, "StoredResourceDemand")) {
-		const int resId = GetResourceIdByName(arg);
-		if (resId == -1) {
-			fprintf(stderr, "Invalid resource \"%s\"", arg);
-			Exit(1);
-		}
-		return player->StoredResourceDemand[resId];
+		const wyrmgus::resource *resource = wyrmgus::resource::get(arg);
+		const int res_id = resource->get_index();
+		return player->StoredResourceDemand[res_id];
 	} else if (!strcmp(prop, "EffectiveResourceDemand")) {
-		const int resId = GetResourceIdByName(arg);
-		if (resId == -1) {
-			fprintf(stderr, "Invalid resource \"%s\"", arg);
-			Exit(1);
-		}
-		return player->GetEffectiveResourceDemand(resId);
+		const wyrmgus::resource *resource = wyrmgus::resource::get(arg);
+		const int res_id = resource->get_index();
+		return player->GetEffectiveResourceDemand(res_id);
 	} else if (!strcmp(prop, "EffectiveResourceBuyPrice")) {
-		const int resId = GetResourceIdByName(arg);
-		if (resId == -1) {
-			fprintf(stderr, "Invalid resource \"%s\"", arg);
-			Exit(1);
-		}
-		return player->GetEffectiveResourceBuyPrice(resId);
+		const wyrmgus::resource *resource = wyrmgus::resource::get(arg);
+		const int res_id = resource->get_index();
+		return player->GetEffectiveResourceBuyPrice(res_id);
 	} else if (!strcmp(prop, "EffectiveResourceSellPrice")) {
-		const int resId = GetResourceIdByName(arg);
-		if (resId == -1) {
-			fprintf(stderr, "Invalid resource \"%s\"", arg);
-			Exit(1);
-		}
-		return player->GetEffectiveResourceSellPrice(resId);
+		const wyrmgus::resource *resource = wyrmgus::resource::get(arg);
+		const int res_id = resource->get_index();
+		return player->GetEffectiveResourceSellPrice(res_id);
 	} else if (!strcmp(prop, "TradeCost")) {
 		return player->TradeCost;
 		//Wyrmgus end
@@ -920,12 +890,9 @@ static int GetPlayerData(const int player_index, const char *prop, const char *a
 	} else if (!strcmp(prop, "TotalBuildings")) {
 		return player->TotalBuildings;
 	} else if (!strcmp(prop, "TotalResources")) {
-		const int resId = GetResourceIdByName(arg);
-		if (resId == -1) {
-			fprintf(stderr, "Invalid resource \"%s\"", arg);
-			Exit(1);
-		}
-		return player->TotalResources[resId];
+		const wyrmgus::resource *resource = wyrmgus::resource::get(arg);
+		const int res_id = resource->get_index();
+		return player->TotalResources[res_id];
 	} else if (!strcmp(prop, "TotalRazings")) {
 		return player->TotalRazings;
 	} else if (!strcmp(prop, "TotalKills")) {
@@ -943,8 +910,7 @@ static int GetPlayerData(const int player_index, const char *prop, const char *a
 		}
 		return -1;
 	} else {
-		fprintf(stderr, "Invalid field: %s" _C_ prop);
-		Exit(1);
+		throw std::runtime_error("Invalid field: \"" + std::string(prop) + "\".");
 	}
 	return 0;
 }
@@ -3633,8 +3599,7 @@ void LoadCcl(const std::string &filename, const std::string &luaArgStr)
 	CclInConfigFile = 1;
 	const std::string name = LibraryFileName(filename.c_str());
 	if (CanAccessFile(name.c_str()) == 0) {
-		fprintf(stderr, "Maybe you need to specify another gamepath with '-d /path/to/datadir'?\n");
-		ExitFatal(-1);
+		throw std::runtime_error("Maybe you need to specify another gamepath with '-d /path/to/datadir'?");
 	}
 
 	ShowLoadProgress(_("Loading Script \"%s\"\n"), name.c_str());

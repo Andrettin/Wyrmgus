@@ -463,8 +463,7 @@ void InitVideoSdl()
 					  SDL_INIT_AUDIO | SDL_INIT_VIDEO |
 					  SDL_INIT_TIMER);
 		if (res < 0) {
-			fprintf(stderr, "Couldn't initialize SDL: %s\n", SDL_GetError());
-			exit(1);
+			throw std::runtime_error("Couldn't initialize SDL: " + std::string(SDL_GetError()));
 		}
 
 		// Clean up on exit
@@ -604,9 +603,7 @@ void InitVideoSdl()
 #endif
 	}
 	if (TheScreen == nullptr) {
-		fprintf(stderr, "Couldn't set %dx%dx%d video mode: %s\n",
-				Video.Width, Video.Height, Video.Depth, SDL_GetError());
-		exit(1);
+		throw std::runtime_error("Couldn't set " + std::to_string(Video.Width) + "x" + std::to_string(Video.Height) + "x" + std::to_string(Video.Depth) + " video mode: " + std::string(SDL_GetError()));
 	}
 
 	Video.FullScreen = (TheScreen->flags & SDL_FULLSCREEN) ? 1 : 0;
@@ -640,19 +637,16 @@ void InitVideoSdl()
 	SDL_SysWMinfo sysInfo; //Will hold our Window information
 	SDL_VERSION(&sysInfo.version); //Set SDL version
 	if (SDL_GetWMInfo(&sysInfo) <= 0) {
-		fprintf(stderr, "Unable to get window handle\n");
-		exit(1);
+		throw std::runtime_error("Unable to get window handle.");
 	}
 
 	eglDisplay = eglGetDisplay((EGLNativeDisplayType)sysInfo.info.x11.display);
 	if (!eglDisplay) {
-		fprintf(stderr, "Couldn't open EGL Display\n");
-		exit(1);
+		throw std::runtime_error("Couldn't open EGL Display.");
 	}
 
 	if (!eglInitialize(eglDisplay, nullptr, nullptr)) {
-		fprintf(stderr, "Couldn't initialize EGL Display\n");
-		exit(1);
+		throw std::runtime_error("Couldn't initialize EGL Display.");
 	}
 
 	// Find a matching config
@@ -660,14 +654,12 @@ void InitVideoSdl()
 	EGLint numConfigsOut = 0;
 	EGLConfig eglConfig;
 	if (eglChooseConfig(eglDisplay, configAttribs, &eglConfig, 1, &numConfigsOut) != EGL_TRUE || numConfigsOut == 0) {
-		fprintf(stderr, "Unable to find appropriate EGL config\n");
-		exit(1);
+		throw std::runtime_error("Unable to find appropriate EGL config.");
 	}
 
 	eglSurface = eglCreateWindowSurface(eglDisplay, eglConfig, (EGLNativeWindowType)sysInfo.info.x11.window, 0);
 	if (eglSurface == EGL_NO_SURFACE) {
-		fprintf(stderr, "Unable to create EGL surface\n");
-		exit(1);
+		throw std::runtime_error("Unable to create EGL surface.");
 	}
 
 	// Bind GLES and create the context
@@ -675,13 +667,11 @@ void InitVideoSdl()
 	EGLint contextParams[] = {EGL_CONTEXT_CLIENT_VERSION, 1, EGL_NONE};
 	EGLContext eglContext = eglCreateContext(eglDisplay, eglConfig, nullptr, nullptr);
 	if (eglContext == EGL_NO_CONTEXT) {
-		fprintf(stderr, "Unable to create GLES context\n");
-		exit(1);
+		throw std::runtime_error("Unable to create GLES context.");
 	}
 
 	if (eglMakeCurrent(eglDisplay, eglSurface, eglSurface, eglContext) == EGL_FALSE) {
-		fprintf(stderr, "Unable to make GLES context current\n");
-		exit(1);
+		throw std::runtime_error("Unable to make GLES context current.");
 	}
 #endif
 	InitOpenGL();
@@ -1028,8 +1018,7 @@ void ToggleFullScreen()
 	if (!TheScreen) {
 		TheScreen = SDL_SetVideoMode(w, h, bpp, flags);
 		if (!TheScreen) { // completely screwed.
-			fprintf(stderr, "Toggle to fullscreen, crashed all\n");
-			Exit(-1);
+			throw std::runtime_error("Toggle to fullscreen, crashed all.");
 		}
 	}
 

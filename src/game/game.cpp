@@ -443,27 +443,23 @@ static void LoadStratagusMap(const std::string &smpname, const std::string &mapn
 	}
 
 	if (LcmPreventRecurse) {
-		fprintf(stderr, "recursive use of load map!\n");
-		ExitFatal(-1);
+		throw std::runtime_error("Recursive use of load map!");
 	}
 	InitPlayers();
 	LcmPreventRecurse = 1;
 	if (LuaLoadFile(mapfull) == -1) {
-		fprintf(stderr, "Can't load lua file: %s\n", mapfull);
-		ExitFatal(-1);
+		throw std::runtime_error("Can't load lua file: " + std::string(mapfull));
 	}
 	LcmPreventRecurse = 0;
 
 #if 0
 	// Not true if multiplayer levels!
 	if (!ThisPlayer) { /// ARI: bomb if nothing was loaded!
-		fprintf(stderr, "%s: invalid map\n", mapname.c_str());
-		ExitFatal(-1);
+		throw std::runtime_error(mapname + ": invalid map");
 	}
 #endif
 	if (!CMap::Map.Info.MapWidth || !CMap::Map.Info.MapHeight) {
-		fprintf(stderr, "%s: invalid map\n", mapname.c_str());
-		ExitFatal(-1);
+		throw std::runtime_error(mapname + ": invalid map");
 	}
 	CMap::Map.Info.Filename = mapname;
 }
@@ -1101,15 +1097,14 @@ int SaveStratagusMap(const std::string &mapName, CMap &map, int writeTerrain, bo
 //Wyrmgus end
 {
 	if (!map.Info.MapWidth || !map.Info.MapHeight) {
-		fprintf(stderr, "%s: invalid Stratagus map\n", mapName.c_str());
-		ExitFatal(-1);
+		throw std::runtime_error(mapName + ": invalid Stratagus map");
 	}
 
 	char mapSetup[PATH_MAX];
 	strcpy_s(mapSetup, sizeof(mapSetup), mapName.c_str());
 	char *setupExtension = strstr(mapSetup, ".smp");
 	if (!setupExtension) {
-		fprintf(stderr, "%s: invalid Stratagus map filename\n", mapName.c_str());
+		throw std::runtime_error(mapName + ": invalid Stratagus map filename");
 	}
 
 	memcpy(setupExtension, ".sms", 4 * sizeof(char));
@@ -1181,8 +1176,7 @@ static void LoadMap(const std::string &filename, CMap &map, bool is_mod)
 		}
 	}
 
-	fprintf(stderr, "Unrecognized map format\n");
-	ExitFatal(-1);
+	throw std::runtime_error("Unrecognized map format.");
 }
 
 /**

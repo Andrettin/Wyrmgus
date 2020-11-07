@@ -138,8 +138,7 @@ int ParseAnimInt(const CUnit &unit, const char *parseint)
 		}
 		char *next = strchr(cur, '.');
 		if (next == nullptr) {
-			fprintf(stderr, "Need also specify the variable '%s' tag \n", cur);
-			ExitFatal(1);
+			throw std::runtime_error("Need also specify the variable \"" + std::string(cur) + "\" tag.");
 		} else {
 			*next = '\0';
 		}
@@ -154,8 +153,7 @@ int ParseAnimInt(const CUnit &unit, const char *parseint)
 			} else if (!strcmp(cur, "_Distance")) {
 				return unit.MapDistanceTo(*goal);
 			}
-			fprintf(stderr, "Bad variable name '%s'\n", cur);
-			ExitFatal(1);
+			throw std::runtime_error("Bad variable name \"" + std::string(cur) + "\".");
 		}
 		if (!strcmp(next + 1, "Value")) {
 			//Wyrmgus start
@@ -191,8 +189,7 @@ int ParseAnimInt(const CUnit &unit, const char *parseint)
 		}
 		const int index = UnitTypeVar.BoolFlagNameLookup[cur];// User bool flags
 		if (index == -1) {
-			fprintf(stderr, "Bad bool-flag name '%s'\n", cur);
-			ExitFatal(1);
+			throw std::runtime_error("Bad bool-flag name \"" + std::string(cur) + "\".");
 		}
 		return goal->Type->BoolFlag[index].value;
 	} else if (s[0] == 's') { //spell type detected
@@ -266,8 +263,7 @@ int ParseAnimFlags(const CUnit &unit, const char *parseflag)
 			}  else if (!strcmp(cur, "setdirection")) {
 				flags |= SM_SetDirection;
 			} else {
-				fprintf(stderr, "Unknown animation flag: %s\n", cur);
-				ExitFatal(1);
+				throw std::runtime_error("Unknown animation flag: \"" + std::string(cur) + "\".");
 			}
 		} else if (unit.Anim.Anim->Type == AnimationSpawnUnit) {
 			if (!strcmp(cur, "none")) {
@@ -278,8 +274,7 @@ int ParseAnimFlags(const CUnit &unit, const char *parseflag)
 			} else if (!strcmp(cur, "jointoai")) {
 				flags |= SU_JoinToAIForce;
 			} else {
-				fprintf(stderr, "Unknown animation flag: %s\n", cur);
-				ExitFatal(1);
+				throw std::runtime_error("Unknown animation flag: \"" + std::string(cur) + "\".");
 			}
 		}
 		cur = next;

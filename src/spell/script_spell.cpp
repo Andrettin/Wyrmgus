@@ -260,8 +260,7 @@ static void CclSpellAutocast(lua_State *l, AutoCastInfo *autocast)
 				if (!strcmp(var.c_str(), "Distance")) {
 					index = ACP_DISTANCE;
 				} else {
-					fprintf(stderr, "Bad variable name '%s'\n", var.c_str());
-					Exit(1);
+					throw std::runtime_error("Bad variable name \"" + var + "\".");
 				}
 			}
 			autocast->PriorityVar = index;

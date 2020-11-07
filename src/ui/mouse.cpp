@@ -1978,10 +1978,9 @@ static int SendSpellCast(const Vec2i &tilePos, int flush)
 			continue;
 		}
 		// CursorValue here holds the spell type id
-		const wyrmgus::spell *spell = wyrmgus::spell::get_all()[CursorValue];
+		const wyrmgus::spell *spell = wyrmgus::spell::get_all().at(CursorValue);
 		if (!spell) {
-			fprintf(stderr, "unknown spell-id: %d\n", CursorValue);
-			ExitFatal(1);
+			throw std::runtime_error("Unknown spell-id: " + std::to_string(CursorValue));
 		}
 		
 		if (std::find(unit.Type->Spells.begin(), unit.Type->Spells.end(), spell) == unit.Type->Spells.end()) {

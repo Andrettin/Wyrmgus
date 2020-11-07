@@ -818,10 +818,7 @@ void CGraphic::Load(const bool create_grayscale_textures, const int scale_factor
 
 	if ((GraphicWidth / Width) * Width != GraphicWidth ||
 		(GraphicHeight / Height) * Height != GraphicHeight) {
-		fprintf(stderr, "Invalid graphic (width, height) %s\n", this->get_filepath().string().c_str());
-		fprintf(stderr, "Expected: (%d,%d)  Found: (%d,%d)\n",
-				Width, Height, GraphicWidth, GraphicHeight);
-		ExitFatal(-1);
+		throw std::runtime_error("Invalid graphic (width, height) " + this->get_filepath().string() + "; Expected: (" + std::to_string(this->Width) + ", " + std::to_string(this->Height) + ")  Found: (" + std::to_string(this->GraphicWidth) + ", " + std::to_string(this->GraphicHeight) + ")");
 	}
 
 	NumFrames = GraphicWidth / Width * GraphicHeight / Height;

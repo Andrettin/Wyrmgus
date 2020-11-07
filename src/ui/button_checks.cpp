@@ -188,9 +188,7 @@ bool ButtonCheckUnitVariable(const CUnit &unit, const wyrmgus::button &button)
 		const char *value = strtok(nullptr, ",");
 		const int index = UnitTypeVar.VariableNameLookup[var];// User variables
 		if (index == -1) {
-			fprintf(stderr, "Bad variable name '%s'\n", var);
-			Exit(1);
-			return false;
+			throw std::runtime_error("Bad variable name \"" + std::string(var) + "\".");
 		}
 		int varValue;
 		if (!strcmp(type, "Value")) {
@@ -216,9 +214,7 @@ bool ButtonCheckUnitVariable(const CUnit &unit, const wyrmgus::button &button)
 			varValue = unit.GetModifiedVariable(index, VariableValue) * 100 / unit.GetModifiedVariable(index, VariableMax);
 			//Wyrmgus end
 		} else {
-			fprintf(stderr, "Bad variable type '%s'\n", type);
-			Exit(1);
-			return false;
+			throw std::runtime_error("Bad variable type \"" + std::string(type) + "\".");
 		}
 		const int cmpValue = atoi(value);
 		bool cmpResult = false;
@@ -235,9 +231,7 @@ bool ButtonCheckUnitVariable(const CUnit &unit, const wyrmgus::button &button)
 		} else if (!strcmp(binop, "!=")) {
 			cmpResult = varValue != cmpValue;
 		} else {
-			fprintf(stderr, "Bad compare type '%s'\n", binop);
-			Exit(1);
-			return false;
+			throw std::runtime_error("Bad compare type \"" + std::string(binop) + "\".");
 		}
 		if (cmpResult == false) {
 			return false;

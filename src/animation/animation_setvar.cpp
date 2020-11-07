@@ -71,24 +71,18 @@
 		if (!strcmp(arg1, "DamageType")) {
 			int death = ExtraDeathIndex(this->valueStr.c_str());
 			if (death == ANIMATIONS_DEATHTYPES) {
-				fprintf(stderr, "Incorrect death type : %s \n" _C_ this->valueStr.c_str());
-				Exit(1);
-				return;
+				throw std::runtime_error("Incorrect death type: " + this->valueStr + ".");
 			}
 			goal->Type->DamageType = this->valueStr;
 			return;
 		}
-		fprintf(stderr, "Need also specify the variable '%s' tag \n" _C_ arg1);
-		Exit(1);
-		return;
+		throw std::runtime_error("Need also specify the variable \"" + std::string(arg1) + "\" tag.");
 	} else {
 		*next = '\0';
 	}
 	const int index = UnitTypeVar.VariableNameLookup[arg1];// User variables
 	if (index == -1) {
-		fprintf(stderr, "Bad variable name '%s'\n" _C_ arg1);
-		Exit(1);
-		return;
+		throw std::runtime_error("Bad variable name \"" + std::string(arg1) + "\".");
 	}
 
 	const int rop = ParseAnimInt(unit, this->valueStr.c_str());
@@ -116,17 +110,13 @@
 			break;
 		case modDiv:
 			if (!rop) {
-				fprintf(stderr, "Division by zero in AnimationSetVar\n");
-				Exit(1);
-				return;
+				throw std::runtime_error("Division by zero in AnimationSetVar.");
 			}
 			value /= rop;
 			break;
 		case modMod:
 			if (!rop) {
-				fprintf(stderr, "Division by zero in AnimationSetVar\n");
-				Exit(1);
-				return;
+				throw std::runtime_error("Division by zero in AnimationSetVar.");
 			}
 			value %= rop;
 			break;

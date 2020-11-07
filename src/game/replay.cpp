@@ -258,9 +258,7 @@ static void ApplyReplaySettings()
 	}
 
 	if (strcpy_s(CurrentMapPath, sizeof(CurrentMapPath), CurrentReplay->MapPath.c_str()) != 0) {
-		fprintf(stderr, "Replay map path is too long\n");
-		// FIXME: need to handle errors better
-		Exit(1);
+		throw std::runtime_error("Replay map path is too long.");
 	}
 	GameSettings.Resources = CurrentReplay->Resource;
 	GameSettings.NumUnits = CurrentReplay->NumUnits;
