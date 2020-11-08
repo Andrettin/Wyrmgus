@@ -389,7 +389,7 @@ void map_template::initialize()
 	data_entry::initialize();
 }
 
-void map_template::ApplyTerrainFile(bool overlay, Vec2i template_start_pos, Vec2i map_start_pos, int z) const
+void map_template::apply_terrain_file(const bool overlay, const QPoint &template_start_pos, const QPoint &map_start_pos, const int z) const
 {
 	std::filesystem::path terrain_file;
 	if (overlay) {
@@ -412,11 +412,14 @@ void map_template::ApplyTerrainFile(bool overlay, Vec2i template_start_pos, Vec2
 	
 	std::string line_str;
 	int y = 0;
-	while (std::getline(is_map, line_str))
-	{
-		if (y < template_start_pos.y || y >= (template_start_pos.y + CMap::Map.Info.MapHeights[z])) {
-			y += 1;
+	while (std::getline(is_map, line_str)) {
+		if (y < template_start_pos.y()) {
+			++y;
 			continue;
+		}
+
+		if (y >= (template_start_pos.y() + CMap::Map.Info.MapHeights[z])) {
+			break;
 		}
 
 		if (this->get_end_pos().y() != -1 && y > this->get_end_pos().y()) {
@@ -427,9 +430,13 @@ void map_template::ApplyTerrainFile(bool overlay, Vec2i template_start_pos, Vec2
 		
 		for (unsigned int i = 0; i < line_str.length(); ++i) {
 			try {
-				if (x < template_start_pos.x || x >= (template_start_pos.x + CMap::Map.Info.MapWidths[z])) {
-					x++;
+				if (x < template_start_pos.x()) {
+					++x;
 					continue;
+				}
+
+				if (x >= (template_start_pos.x() + CMap::Map.Info.MapWidths[z])) {
+					break;
 				}
 
 				if (this->get_end_pos().x() != -1 && x > this->get_end_pos().x()) {
@@ -439,7 +446,7 @@ void map_template::ApplyTerrainFile(bool overlay, Vec2i template_start_pos, Vec2
 				const char terrain_character = line_str.at(i);
 				terrain_type *terrain = nullptr;
 
-				const QPoint real_pos(map_start_pos.x + x - template_start_pos.x, map_start_pos.y + y - template_start_pos.y);
+				const QPoint real_pos(map_start_pos.x() + x - template_start_pos.x(), map_start_pos.y() + y - template_start_pos.y());
 
 				if (!this->is_map_pos_usable(real_pos)) {
 					continue;
@@ -460,13 +467,13 @@ void map_template::ApplyTerrainFile(bool overlay, Vec2i template_start_pos, Vec2
 					}
 				}
 
-				x += 1;
+				++x;
 			} catch (...) {
 				std::throw_with_nested(std::runtime_error("Failed to parse character " + std::to_string(i) + " of line for terrain file \"" + terrain_filename + "\": \"" + line_str + "\"."));
 			}
 		}
 		
-		y += 1;
+		++y;
 	}
 }
 
@@ -482,7 +489,7 @@ void map_template::ApplyTerrainImage(bool overlay, Vec2i template_start_pos, Vec
 	}
 	
 	if (terrain_file.empty()) {
-		ApplyTerrainFile(overlay, template_start_pos, map_start_pos, z);
+		this->apply_terrain_file(overlay, template_start_pos, map_start_pos, z);
 		return;
 	}
 	
@@ -573,17 +580,25 @@ void map_template::apply_territory_image(const QPoint &template_start_pos, const
 	const QImage territory_image(territory_filename.c_str());
 	
 	for (int y = 0; y < territory_image.height(); ++y) {
-		if (y < template_start_pos.y() || y >= (template_start_pos.y() + CMap::Map.Info.MapHeights[z])) {
+		if (y < template_start_pos.y()) {
 			continue;
 		}
 		
+		if (y >= (template_start_pos.y() + CMap::Map.Info.MapHeights[z])) {
+			break;
+		}
+
 		if (this->get_end_pos().y() != -1 && y > this->get_end_pos().y()) {
 			break;
 		}
 
 		for (int x = 0; x < territory_image.width(); ++x) {
-			if (x < template_start_pos.x() || x >= (template_start_pos.x() + CMap::Map.Info.MapWidths[z])) {
+			if (x < template_start_pos.x()) {
 				continue;
+			}
+
+			if (x >= (template_start_pos.x() + CMap::Map.Info.MapWidths[z])) {
+				break;
 			}
 
 			if (this->get_end_pos().x() != -1 && x > this->get_end_pos().x()) {
@@ -2232,11 +2247,108 @@ bool map_template::is_constructed_subtemplate_suitable_for_pos(const map_templat
 
 bool map_template::is_constructed_subtemplate_compatible_with_terrain(const map_template *subtemplate, const QPoint &map_start_pos, const int z) const
 {
-	if (subtemplate->get_overlay_terrain_image().empty()) {
-		return true;
+	if (!subtemplate->get_overlay_terrain_file().empty()) {
+		return this->is_constructed_subtemplate_compatible_with_terrain_file(subtemplate, map_start_pos, z);
+	} else if (!subtemplate->get_overlay_terrain_image().empty()) {
+		return this->is_constructed_subtemplate_compatible_with_terrain_image(subtemplate, map_start_pos, z);
 	}
 
-	const QPoint template_start_pos = subtemplate->get_start_pos();
+	return true;
+}
+
+bool map_template::is_constructed_subtemplate_compatible_with_terrain_file(const map_template *subtemplate, const QPoint &map_start_pos, const int z) const
+{
+	const QPoint &template_start_pos = subtemplate->get_start_pos();
+
+	const std::string terrain_filename = LibraryFileName(subtemplate->get_overlay_terrain_file().string().c_str());
+
+	if (!CanAccessFile(terrain_filename.c_str())) {
+		throw std::runtime_error("File \"" + terrain_filename + "\" not found.");
+	}
+
+	std::ifstream is_map(terrain_filename);
+
+	std::string line_str;
+	int y = 0;
+	while (std::getline(is_map, line_str))
+	{
+		if (y < template_start_pos.y()) {
+			++y;
+			continue;
+		}
+
+		if (y >= (template_start_pos.y() + CMap::Map.Info.MapHeights[z])) {
+			break;
+		}
+
+		if (subtemplate->get_end_pos().y() != -1 && y > subtemplate->get_end_pos().y()) {
+			break;
+		}
+
+		int x = 0;
+
+		for (unsigned int i = 0; i < line_str.length(); ++i) {
+			try {
+				if (x < template_start_pos.x()) {
+					++x;
+					continue;
+				}
+
+				if (x >= (template_start_pos.x() + CMap::Map.Info.MapWidths[z])) {
+					break;
+				}
+
+				if (subtemplate->get_end_pos().x() != -1 && x > subtemplate->get_end_pos().x()) {
+					break;
+				}
+
+				const char terrain_character = line_str.at(i);
+
+				if (terrain_character == '=') {
+					//the '=' character means the tile is allowed to stay the same for the check, i.e. it is ignored for it
+					continue;
+				}
+
+				const QPoint map_pos(map_start_pos.x() + x - template_start_pos.x(), map_start_pos.y() + y - template_start_pos.y());
+
+				const tile *tile = CMap::Map.Field(map_pos, z);
+
+				if (terrain_character == '0') {
+					//the '0' character means the tile must have no overlay
+					if (tile->OverlayTerrain != nullptr) {
+						return false;
+					}
+
+					continue;
+				}
+
+				const terrain_type *terrain = terrain_type::get_by_character(terrain_character);
+
+				//the tile's overlay terrain must either match that in the map template exactly, or not be set
+				if (tile->OverlayTerrain != nullptr && tile->OverlayTerrain != terrain) {
+					return false;
+				}
+
+				if (tile->OverlayTerrain != terrain && !vector::contains(terrain->get_base_terrain_types(), tile->Terrain)) {
+					//the tile's terrain must be a valid base terrain for the overlay terrain type
+					return false;
+				}
+
+				++x;
+			} catch (...) {
+				std::throw_with_nested(std::runtime_error("Failed to parse character " + std::to_string(i) + " of line for terrain file \"" + terrain_filename + "\": \"" + line_str + "\"."));
+			}
+		}
+
+		++y;
+	}
+
+	return true;
+}
+
+bool map_template::is_constructed_subtemplate_compatible_with_terrain_image(const map_template *subtemplate, const QPoint &map_start_pos, const int z) const
+{
+	const QPoint &template_start_pos = subtemplate->get_start_pos();
 
 	const std::string terrain_filename = LibraryFileName(subtemplate->get_overlay_terrain_image().string().c_str());
 
@@ -2245,6 +2357,10 @@ bool map_template::is_constructed_subtemplate_compatible_with_terrain(const map_
 	}
 
 	const QImage terrain_image(terrain_filename.c_str());
+
+	if (terrain_image.size() != subtemplate->get_size()) {
+		throw std::runtime_error("The overlay terrain image for map template \"" + subtemplate->get_identifier() + "\" has a different size " + size::to_string(terrain_image.size()) + " than that of the map template itself " + size::to_string(subtemplate->get_size()) + ".");
+	}
 
 	const int applied_width = subtemplate->get_applied_width();
 	const int applied_height = subtemplate->get_applied_height();
@@ -2421,10 +2537,10 @@ void map_template::save_terrain_image(const std::string &filename, const bool ov
 
 				image.setPixelColor(x, y, color);
 
-				x += 1;
+				++x;
 			}
 
-			y += 1;
+			++y;
 		}
 	} else {
 		const QGeoRectangle georectangle = this->get_georectangle();

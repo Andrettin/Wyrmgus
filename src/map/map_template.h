@@ -141,7 +141,7 @@ public:
 		this->active = this->is_active_by_default();
 	}
 
-	void ApplyTerrainFile(bool overlay, Vec2i template_start_pos, Vec2i map_start_pos, int z) const;
+	void apply_terrain_file(bool overlay, const QPoint &template_start_pos, const QPoint &map_start_pos, int z) const;
 	void ApplyTerrainImage(bool overlay, Vec2i template_start_pos, Vec2i map_start_pos, int z) const;
 	void apply_territory_image(const QPoint &template_start_pos, const QPoint &map_start_pos, const int z) const;
 	void Apply(const QPoint &template_start_pos, const QPoint &map_start_pos, const int z);
@@ -512,6 +512,8 @@ public:
 	QPoint generate_subtemplate_position(const map_template *subtemplate, const QPoint &template_start_pos, const QPoint &map_start_pos, const QPoint &map_end, int z, const QPoint &max_adjacent_template_distance, bool &adjacency_restriction_occurred) const;
 	bool is_constructed_subtemplate_suitable_for_pos(const map_template *subtemplate, const QPoint &map_start_pos, int z) const;
 	bool is_constructed_subtemplate_compatible_with_terrain(const map_template *subtemplate, const QPoint &map_start_pos, int z) const;
+	bool is_constructed_subtemplate_compatible_with_terrain_file(const map_template *subtemplate, const QPoint &map_start_pos, int z) const;
+	bool is_constructed_subtemplate_compatible_with_terrain_image(const map_template *subtemplate, const QPoint &map_start_pos, int z) const;
 
 	Vec2i get_best_location_map_position(const std::vector<std::unique_ptr<historical_location>> &historical_location_list, bool &in_another_map_template, const Vec2i &template_start_pos, const Vec2i &map_start_pos, const bool random) const;
 
