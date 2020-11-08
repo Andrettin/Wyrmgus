@@ -59,10 +59,13 @@ struct Open {
 };
 
 //for 32 bit signed int
-inline int MyAbs(int x) { return (x ^ (x >> 31)) - (x >> 31); }
+static int MyAbs(int x)
+{
+	return (x ^ (x >> 31)) - (x >> 31);
+}
 
 /// heuristic cost function for a*
-static inline int AStarCosts(const Vec2i &pos, const Vec2i &goalPos)
+static int AStarCosts(const Vec2i &pos, const Vec2i &goalPos)
 {
 	const Vec2i diff = pos - goalPos;
 	return std::max<int>(MyAbs(diff.x), MyAbs(diff.y));

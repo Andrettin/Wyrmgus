@@ -36,8 +36,11 @@
 #include "actions.h"
 #include "map/map.h"
 #include "map/map_layer.h"
+#include "map/tile.h"
+#include "map/tileset.h"
 #include "unit/unit.h"
 #include "unit/unit_type.h"
+#include "util/size_util.h"
 
 //astar.cpp
 
@@ -101,6 +104,15 @@ void TerrainTraversal::PushPos(const Vec2i &pos)
 	}
 }
 
+void TerrainTraversal::push_pos_if_passable(const QPoint &pos, int z, const unsigned long passability_mask)
+{
+	if (!CanMoveToMask(pos, passability_mask, z)) {
+		return;
+	}
+
+	this->PushPos(pos);
+}
+
 void TerrainTraversal::PushNeighbor(const Vec2i &pos)
 {
 	const Vec2i offsets[] = {Vec2i(0, -1), Vec2i(-1, 0), Vec2i(1, 0), Vec2i(0, 1),
@@ -118,26 +130,98 @@ void TerrainTraversal::PushNeighbor(const Vec2i &pos)
 	}
 }
 
-void TerrainTraversal::PushUnitPosAndNeighbor(const CUnit &unit)
+void TerrainTraversal::push_pos_rect(const QRect &rect)
 {
-	const CUnit *startUnit = unit.GetFirstContainer();
-	//Wyrmgus start
-	if (startUnit == nullptr) {
-		fprintf(stderr, "TerrainTraversal::PushUnitPosAndNeighbor() error: startUnit is null.\n");
-	} else if (startUnit->Type == nullptr) {
-		fprintf(stderr, "TerrainTraversal::PushUnitPosAndNeighbor() error: startUnit's \"%s\" (ID %d) (%d, %d) type is null.\n", startUnit->Name.c_str(), UnitNumber(*startUnit), startUnit->tilePos.x, startUnit->tilePos.y);
-	}
-	//Wyrmgus end
-	const Vec2i offset(1, 1);
-	const Vec2i extraTileSize(startUnit->Type->get_tile_size() - QSize(1, 1));
-	const Vec2i start = startUnit->tilePos - offset;
-	const Vec2i end = startUnit->tilePos + extraTileSize + offset;
+	const QPoint top_left = rect.topLeft();
+	const QPoint bottom_right = rect.bottomRight();
 
-	for (Vec2i it = start; it.y <= end.y; ++it.y) {
-		for (it.x = start.x; it.x <= end.x; ++it.x) {
-			PushPos(it);
+	for (int y = top_left.y(); y <= bottom_right.y(); ++y) {
+		for (int x = top_left.x(); x <= bottom_right.x(); ++x) {
+			this->PushPos(QPoint(x, y));
 		}
 	}
+}
+
+void TerrainTraversal::push_pos_rect_if_passable(const QRect &rect, const int z, const unsigned long passability_mask)
+{
+	const QPoint top_left = rect.topLeft();
+	const QPoint bottom_right = rect.bottomRight();
+
+	for (int y = top_left.y(); y <= bottom_right.y(); ++y) {
+		for (int x = top_left.x(); x <= bottom_right.x(); ++x) {
+			this->push_pos_if_passable(QPoint(x, y), z, passability_mask);
+		}
+	}
+}
+
+void TerrainTraversal::push_pos_rect_borders(const QRect &rect)
+{
+	const QPoint top_left = rect.topLeft();
+	const QPoint bottom_right = rect.bottomRight();
+
+	for (int x = top_left.x(); x <= bottom_right.x(); ++x) {
+		this->PushPos(QPoint(x, top_left.y()));
+		this->PushPos(QPoint(x, bottom_right.y()));
+	}
+
+	for (int y = top_left.y(); y <= bottom_right.y(); ++y) {
+		this->PushPos(QPoint(top_left.x(), y));
+		this->PushPos(QPoint(bottom_right.x(), y));
+	}
+}
+
+void TerrainTraversal::push_pos_rect_borders_if_passable(const QRect &rect, const int z, const unsigned long passability_mask)
+{
+	const QPoint top_left = rect.topLeft();
+	const QPoint bottom_right = rect.bottomRight();
+
+	for (int x = top_left.x(); x <= bottom_right.x(); ++x) {
+		this->push_pos_if_passable(QPoint(x, top_left.y()), z, passability_mask);
+		this->push_pos_if_passable(QPoint(x, bottom_right.y()), z, passability_mask);
+	}
+
+	for (int y = top_left.y(); y <= bottom_right.y(); ++y) {
+		this->push_pos_if_passable(QPoint(top_left.x(), y), z, passability_mask);
+		this->push_pos_if_passable(QPoint(bottom_right.x(), y), z, passability_mask);
+	}
+}
+
+void TerrainTraversal::PushUnitPosAndNeighbor(const CUnit &unit)
+{
+	const CUnit *start_unit = unit.GetFirstContainer();
+
+	//Wyrmgus start
+	if (start_unit == nullptr) {
+		fprintf(stderr, "TerrainTraversal::PushUnitPosAndNeighbor() error: startUnit is null.\n");
+	} else if (start_unit->Type == nullptr) {
+		fprintf(stderr, "TerrainTraversal::PushUnitPosAndNeighbor() error: startUnit's \"%s\" (ID %d) (%d, %d) type is null.\n", start_unit->Name.c_str(), UnitNumber(*start_unit), start_unit->tilePos.x, start_unit->tilePos.y);
+	}
+	//Wyrmgus end
+
+	const QPoint offset(1, 1);
+	const QPoint start = start_unit->tilePos - offset;
+	const QPoint end = start_unit->get_bottom_right_tile_pos() + offset;
+
+	const QRect rect(start, end);
+	this->push_pos_rect(rect);
+}
+
+void TerrainTraversal::push_unit_pos_and_neighbor_if_passable(const CUnit &unit, const unsigned long passability_mask)
+{
+	const CUnit *start_unit = unit.GetFirstContainer();
+
+	if (start_unit == nullptr) {
+		fprintf(stderr, "TerrainTraversal::push_unit_pos_and_passable_neighbor() error: startUnit is null.\n");
+	} else if (start_unit->Type == nullptr) {
+		fprintf(stderr, "TerrainTraversal::push_unit_pos_and_passable_neighbor() error: startUnit's \"%s\" (ID %d) (%d, %d) type is null.\n", start_unit->Name.c_str(), UnitNumber(*start_unit), start_unit->tilePos.x, start_unit->tilePos.y);
+	}
+
+	const QPoint offset(1, 1);
+	const QPoint start = start_unit->tilePos - offset;
+	const QPoint end = start_unit->get_bottom_right_tile_pos() + offset;
+
+	const QRect rect(start, end);
+	this->push_pos_rect_if_passable(rect, start_unit->MapLayer->ID, passability_mask);
 }
 
 bool TerrainTraversal::IsVisited(const Vec2i &pos) const
@@ -164,10 +248,6 @@ void TerrainTraversal::Set(const Vec2i &pos, TerrainTraversal::dataType value)
 {
 	m_values[m_extented_width + 1 + pos.y * m_extented_width + pos.x] = value;
 }
-
-/*----------------------------------------------------------------------------
---  Functions
-----------------------------------------------------------------------------*/
 
 /**
 **  Init the pathfinder

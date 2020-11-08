@@ -142,16 +142,21 @@ enum class VisitResult {
 class TerrainTraversal
 {
 public:
-	typedef short int dataType;
-public:
-	TerrainTraversal() : allow_diagonal(true) {}
+	using dataType = short int;
+
 	void SetSize(unsigned int width, unsigned int height);
-	void SetDiagonalAllowed(const bool allowed);
+	void SetDiagonalAllowed(bool allowed);
 	void Init();
 
 	void PushPos(const Vec2i &pos);
+	void push_pos_if_passable(const QPoint &pos, int z, unsigned long passability_mask);
 	void PushNeighbor(const Vec2i &pos);
+	void push_pos_rect(const QRect &rect);
+	void push_pos_rect_if_passable(const QRect &rect, int z, unsigned long passability_mask);
+	void push_pos_rect_borders(const QRect &rect);
+	void push_pos_rect_borders_if_passable(const QRect &rect, int z, unsigned long passability_mask);
 	void PushUnitPosAndNeighbor(const CUnit &unit);
+	void push_unit_pos_and_neighbor_if_passable(const CUnit &unit, unsigned long passability_mask);
 
 	template <typename T>
 	bool Run(T &context);
@@ -177,7 +182,7 @@ private:
 	std::queue<PosNode> m_queue;
 	unsigned int m_extented_width;
 	unsigned int m_height;
-	bool allow_diagonal;
+	bool allow_diagonal = true;
 };
 
 template <typename T>

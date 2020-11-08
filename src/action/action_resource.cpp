@@ -1456,8 +1456,7 @@ bool COrder_Resource::WaitInDepot(CUnit &unit)
 			//Wyrmgus start
 //			goal = UnitFindResource(unit, newdepot ? *newdepot : (mine ? *mine : unit), mine ? range : 1000,
 //									this->CurrentResource, unit.Player->AiEnabled, newdepot ? newdepot : depot);
-			goal = UnitFindResource(unit, newdepot ? *newdepot : ((mine && mine->Type) ? *mine : unit), (mine && mine->Type) ? range : 1000,
-									this->CurrentResource, true, newdepot ? newdepot : depot, true, false, false, false, true, true, true);
+			goal = UnitFindResource(unit, newdepot ? *newdepot : ((mine && mine->Type) ? *mine : unit), (mine && mine->Type) ? range : 1000, this->CurrentResource, true, newdepot ? newdepot : depot, true, false, false, false, true);
 			//Wyrmgus end
 		}
 

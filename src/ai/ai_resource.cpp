@@ -2738,7 +2738,7 @@ static void AiCheckMinecartSalvaging()
 				continue;
 			}
 			
-			if (UnitFindResource(*minecart_unit, *minecart_unit, 1000, res, false, nullptr, true, true, false, false, true, false) != nullptr) {
+			if (UnitFindResource(*minecart_unit, *minecart_unit, 1000, res, false, nullptr, true, true, false, false) != nullptr) {
 				has_accessible_mine = true;
 				break;
 			}

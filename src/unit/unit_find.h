@@ -465,10 +465,10 @@ CUnit *FindUnit_If(const Vec2i &ltPos, const Vec2i &rbPos, int z, Pred pred)
 }
 
 /// Find resource
-extern CUnit *UnitFindResource(const CUnit &unit, const CUnit &startUnit, int range,
+extern CUnit *UnitFindResource(const CUnit &unit, const CUnit &start_unit, int range,
 								//Wyrmgus Start
 //							   int resource, bool check_usage = false, const CUnit *deposit = nullptr);
-							   int resource, bool check_usage = false, const CUnit *deposit = nullptr, bool only_harvestable = true, bool ignore_exploration = false, bool only_unsettled_area = false, bool include_luxury = false, bool only_same = false, bool check_reachable = true, bool from_outside_container = false);
+							   int resource, bool check_usage = false, const CUnit *deposit = nullptr, bool only_harvestable = true, bool ignore_exploration = false, bool only_unsettled_area = false, bool include_luxury = false, bool only_same = false);
 								//Wyrmgus end
 
 /// Find nearest deposit
