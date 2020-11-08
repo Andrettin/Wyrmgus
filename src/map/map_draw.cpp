@@ -315,21 +315,25 @@ void CViewport::DrawMapBackgroundInViewport() const
 			}
 			const wyrmgus::player_color *player_color = (mf.get_owner() != nullptr) ? mf.get_owner()->get_player_color() : CPlayer::Players[PlayerNumNeutral]->get_player_color();
 
-			if (terrain && terrain->get_graphics(season)) {
-				terrain->get_graphics(season)->DrawFrameClip(solid_tile + (terrain == mf.Terrain ? mf.AnimationFrame : 0), dx, dy, time_of_day);
+			if (terrain != nullptr) {
+				const std::shared_ptr<CPlayerColorGraphic> &terrain_graphics = terrain->get_graphics(season);
+				if (terrain_graphics != nullptr) {
+					terrain_graphics->DrawFrameClip(solid_tile + (terrain == mf.Terrain ? mf.AnimationFrame : 0), dx, dy, time_of_day);
+				}
 			}
 
 			for (size_t i = 0; i != transition_tiles.size(); ++i) {
 				const wyrmgus::terrain_type *transition_terrain = transition_tiles[i].first;
+				const std::shared_ptr<CPlayerColorGraphic> &transition_terrain_graphics = transition_terrain->get_graphics(season);
 
-				if (transition_terrain->get_graphics(season)) {
+				if (transition_terrain_graphics != nullptr) {
 					const bool is_transition_space = transition_terrain && transition_terrain->Flags & MapFieldSpace;
 					const wyrmgus::time_of_day *transition_time_of_day = nullptr;
 					if (!is_transition_space) {
 						const bool is_transition_underground = transition_terrain->Flags & MapFieldUnderground;
 						transition_time_of_day = is_transition_underground ? wyrmgus::defines::get()->get_underground_time_of_day() : UI.CurrentMapLayer->GetTimeOfDay();
 					}
-					transition_terrain->get_graphics(season)->DrawFrameClip(transition_tiles[i].second, dx, dy, transition_time_of_day);
+					transition_terrain_graphics->DrawFrameClip(transition_tiles[i].second, dx, dy, transition_time_of_day);
 				}
 			}
 
@@ -342,8 +346,9 @@ void CViewport::DrawMapBackgroundInViewport() const
 
 			if (overlay_terrain && (overlay_transition_tiles.size() == 0 || overlay_terrain->has_transition_mask())) {
 				const bool is_overlay_space = overlay_terrain->Flags & MapFieldSpace;
-				if (overlay_terrain->get_graphics(season)) {
-					overlay_terrain->get_graphics(season)->DrawPlayerColorFrameClip(player_color, overlay_solid_tile + (overlay_terrain == mf.OverlayTerrain ? mf.OverlayAnimationFrame : 0), dx, dy, is_overlay_space ? nullptr : time_of_day);
+				const std::shared_ptr<CPlayerColorGraphic> &overlay_terrain_graphics = overlay_terrain->get_graphics(season);
+				if (overlay_terrain_graphics != nullptr) {
+					overlay_terrain_graphics->DrawPlayerColorFrameClip(player_color, overlay_solid_tile + (overlay_terrain == mf.OverlayTerrain ? mf.OverlayAnimationFrame : 0), dx, dy, is_overlay_space ? nullptr : time_of_day);
 				}
 			}
 
