@@ -200,6 +200,11 @@ static bool MoveRandomly(CUnit &unit)
 	if (!unit.Type->RandomMovementProbability || SyncRand(100) > unit.Type->RandomMovementProbability) {
 		return false;
 	}
+
+	if (!unit.is_ai_active()) {
+		return false;
+	}
+
 	// pick random location
 	Vec2i pos = unit.tilePos;
 
@@ -225,31 +230,27 @@ static bool MoveRandomly(CUnit &unit)
 			if (unit.Type->BoolFlag[PEOPLEAVERSION_INDEX].value) {
 				std::vector<CUnit *> table;
 				SelectAroundUnit(unit, std::max(6, unit.Type->RandomMovementDistance), table, HasNotSamePlayerAs(*unit.Player));
-				if (!table.size()) { //only avoid going near a settled area if isn't already surrounded by civilizations' units
+
+				if (table.empty()) { //only avoid going near a settled area if isn't already surrounded by civilizations' units
 					//don't go near settled areas
-					Vec2i minpos = pos;
-					Vec2i maxpos = pos;
-					minpos.x = pos.x - std::max(6, unit.Type->RandomMovementDistance);
-					minpos.y = pos.y - std::max(6, unit.Type->RandomMovementDistance);
-					maxpos.x = pos.x + std::max(6, unit.Type->RandomMovementDistance);
-					maxpos.y = pos.y + std::max(6, unit.Type->RandomMovementDistance);
+					const QPoint offset(std::max(6, unit.Type->RandomMovementDistance), std::max(6, unit.Type->RandomMovementDistance));
+					const QPoint minpos = pos - offset;
+					const QPoint maxpos = pos + offset;
+
 					std::vector<CUnit *> second_table;
 					Select(minpos, maxpos, second_table, unit.MapLayer->ID, HasNotSamePlayerAs(*unit.Player));
 
-					if (second_table.size() > 0) {
+					if (!second_table.empty()) {
 						return false;
 					}
 				} else { //even if is already in a settled area, don't go to places adjacent to units owned by players other than the neutral player
-					Vec2i minpos = pos;
-					Vec2i maxpos = pos;
-					minpos.x = pos.x - 1;
-					minpos.y = pos.y - 1;
-					maxpos.x = pos.x + 1;
-					maxpos.y = pos.y + 1;
+					const QPoint offset(1, 1);
+					const QPoint minpos = pos - offset;
+					const QPoint maxpos = pos + offset;
 					std::vector<CUnit *> second_table;
 					Select(minpos, maxpos, second_table, unit.MapLayer->ID, HasNotSamePlayerAs(*unit.Player));
 
-					if (second_table.size() > 0) {
+					if (!second_table.empty()) {
 						return false;
 					}
 				}
