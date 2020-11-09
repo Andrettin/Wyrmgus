@@ -521,7 +521,7 @@ public:
 	bool is_in_subtemplate_area(const wyrmgus::map_template *subtemplate) const;
 
 public:
-	class CUnitManagerData
+	class CUnitManagerData final
 	{
 	public:
 		int GetUnitId() const

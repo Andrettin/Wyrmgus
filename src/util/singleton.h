@@ -37,6 +37,10 @@ template <typename T>
 class singleton
 {
 public:
+	singleton() = default;
+	singleton(const singleton &other) = delete;
+	singleton &operator =(const singleton &other) = delete;
+
 	static T *get()
 	{
 		static std::unique_ptr<T> instance = T::create();

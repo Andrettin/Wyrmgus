@@ -8,9 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name unit_manager.h - Unit manager header. */
-//
-//      (c) Copyright 2007 by Jimmy Salmon
+//      (c) Copyright 2007-2020 by Jimmy Salmon and Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -39,8 +37,9 @@ namespace wyrmgus {
 class unit_manager final : public singleton<unit_manager>
 {
 public:
-	using Iterator = std::vector<CUnit *>::iterator;
-public:
+	unit_manager();
+	~unit_manager();
+
 	void Init();
 
 	CUnit *AllocUnit();
@@ -64,8 +63,12 @@ public:
 	unsigned int GetUsedSlotCount() const;
 
 private:
+	//units currently in use
 	std::vector<CUnit *> units;
-	std::vector<CUnit *> unitSlots;
+
+	//all units, including released ones; the unit's index here is its slot
+	std::vector<std::unique_ptr<CUnit>> unit_slots;
+
 	std::list<CUnit *> released_units;
 	CUnit *lastCreated = nullptr;
 };

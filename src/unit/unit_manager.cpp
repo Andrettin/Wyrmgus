@@ -37,23 +37,23 @@
 
 namespace wyrmgus {
 
+unit_manager::unit_manager()
+{
+}
+
+unit_manager::~unit_manager()
+{
+}
+
 /**
 **  Initial memory allocation for units.
 */
 void unit_manager::Init()
 {
 	this->lastCreated = nullptr;
-	//Assert(units.empty());
 	this->units.clear();
-	// Release memory of units in release list.
-	while (!this->released_units.empty()) {
-		CUnit *unit = this->released_units.front();
-		this->released_units.pop_front();
-		delete unit;
-	}
-
-	// Initialize the free unit slots
-	this->unitSlots.clear();
+	this->released_units.clear();
+	this->unit_slots.clear();
 }
 
 /**
@@ -75,9 +75,11 @@ CUnit *unit_manager::AllocUnit()
 	} else {
 		auto unit = std::make_unique<CUnit>();
 
-		unit->UnitManagerData.slot = unitSlots.size();
-		unitSlots.push_back(unit.get());
-		return unit.release();
+		unit->UnitManagerData.slot = this->unit_slots.size();
+		CUnit *unit_ptr = unit.get();
+		this->unit_slots.push_back(std::move(unit));
+
+		return unit_ptr;
 	}
 }
 
@@ -90,9 +92,10 @@ void unit_manager::ReleaseUnit(CUnit *unit)
 {
 	Assert(unit);
 
-	if (lastCreated == unit) {
-		lastCreated = nullptr;
+	if (this->lastCreated == unit) {
+		this->lastCreated = nullptr;
 	}
+
 	if (unit->UnitManagerData.unitSlot != -1) { // == -1 when loading.
 		Assert(this->units[unit->UnitManagerData.unitSlot] == unit);
 
@@ -102,19 +105,20 @@ void unit_manager::ReleaseUnit(CUnit *unit)
 		unit->UnitManagerData.unitSlot = -1;
 		this->units.pop_back();
 	}
+
 	this->released_units.push_back(unit);
 	unit->ReleaseCycle = GameCycle + 500; // can be reused after this time
 	//Refs = GameCycle + (NetworkMaxLag << 1); // could be reuse after this time
 }
 
-CUnit &unit_manager::GetSlotUnit(int index) const
+CUnit &unit_manager::GetSlotUnit(const int index) const
 {
-	return *unitSlots[index];
+	return *this->unit_slots[index];
 }
 
 unsigned int unit_manager::GetUsedSlotCount() const
 {
-	return static_cast<unsigned int>(unitSlots.size());
+	return static_cast<unsigned int>(this->unit_slots.size());
 }
 
 bool unit_manager::empty() const
@@ -129,9 +133,9 @@ CUnit *unit_manager::lastCreatedUnit()
 
 void unit_manager::Add(CUnit *unit)
 {
-	lastCreated = unit;
-	unit->UnitManagerData.unitSlot = static_cast<int>(units.size());
-	units.push_back(unit);
+	this->lastCreated = unit;
+	unit->UnitManagerData.unitSlot = static_cast<int>(this->units.size());
+	this->units.push_back(unit);
 }
 
 /**
@@ -141,7 +145,7 @@ void unit_manager::Add(CUnit *unit)
 */
 void unit_manager::Save(CFile &file) const
 {
-	file.printf("SlotUsage(%lu, {", (long unsigned int)unitSlots.size());
+	file.printf("SlotUsage(%lu, {", (long unsigned int)this->unit_slots.size());
 
 	for (const CUnit *unit : this->released_units) {
 		file.printf("{Slot = %d, FreeCycle = %u}, ", UnitNumber(*unit), unit->ReleaseCycle);
@@ -179,9 +183,9 @@ void unit_manager::Load(lua_State *l)
 		LuaError(l, "incorrect argument");
 	}
 	for (unsigned int i = 0; i < unitCount; i++) {
-		CUnit *unit = new CUnit;
-		unitSlots.push_back(unit);
+		auto unit = std::make_unique<CUnit>();
 		unit->UnitManagerData.slot = i;
+		this->unit_slots.push_back(std::move(unit));
 	}
 	const unsigned int args = lua_rawlen(l, 2);
 	for (unsigned int i = 0; i < args; i++) {
@@ -201,8 +205,8 @@ void unit_manager::Load(lua_State *l)
 			}
 		}
 		Assert(unit_index != -1 && cycle != static_cast<unsigned long>(-1));
-		ReleaseUnit(unitSlots[unit_index]);
-		unitSlots[unit_index]->ReleaseCycle = cycle;
+		this->ReleaseUnit(this->unit_slots[unit_index].get());
+		this->unit_slots[unit_index]->ReleaseCycle = cycle;
 		lua_pop(l, 1);
 	}
 }
