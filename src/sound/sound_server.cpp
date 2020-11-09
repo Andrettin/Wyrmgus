@@ -250,7 +250,7 @@ static int MixSampleToStereo32(wyrmgus::sample *sample, int index, unsigned char
 **
 **  @return        How many channels become free after mixing them.
 */
-static int MixChannelsToStereo32(int *buffer, int size)
+static int MixChannelsToStereo32(int *buffer, const int size)
 {
 	int new_free_channels = 0;
 
@@ -258,7 +258,7 @@ static int MixChannelsToStereo32(int *buffer, int size)
 		if (Channels[channel].Playing && Channels[channel].Sample) {
 			//Wyrmgus start
 			if ((Channels[channel].Point & 1)) {
-				fprintf(stderr, "Sound effect error; Index: %d, Voice: %d, Origin: \"%s\", Sample Length: %d\n", Channels[channel].Point, Channels[channel].Voice, (Channels[channel].Unit && Channels[channel].Unit->Base) ? UnitManager.GetSlotUnit(Channels[channel].Unit->Id).Type->Ident.c_str() : "", Channels[channel].Sample->get_length());
+				fprintf(stderr, "Sound effect error; Index: %d, Voice: %d, Origin: \"%s\", Sample Length: %d\n", Channels[channel].Point, Channels[channel].Voice, (Channels[channel].Unit && Channels[channel].Unit->Base) ? wyrmgus::unit_manager::get()->GetSlotUnit(Channels[channel].Unit->Id).Type->Ident.c_str() : "", Channels[channel].Sample->get_length());
 			}
 			//Wyrmgus end
 			int i = MixSampleToStereo32(Channels[channel].Sample,

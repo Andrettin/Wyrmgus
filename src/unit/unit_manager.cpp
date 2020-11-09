@@ -8,9 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name unit_manager.cpp - Unit manager. */
-//
-//      (c) Copyright 2007 by Jimmy Salmon
+//      (c) Copyright 2007-2020 by Jimmy Salmon and Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -37,16 +35,12 @@
 #include "iolib.h"
 #include "script.h"
 
-CUnitManager UnitManager;          /// Unit manager
-
-CUnitManager::CUnitManager() : lastCreated(nullptr)
-{
-}
+namespace wyrmgus {
 
 /**
 **  Initial memory allocation for units.
 */
-void CUnitManager::Init()
+void unit_manager::Init()
 {
 	this->lastCreated = nullptr;
 	//Assert(units.empty());
@@ -67,7 +61,7 @@ void CUnitManager::Init()
 **
 **  @return  New unit
 */
-CUnit *CUnitManager::AllocUnit()
+CUnit *unit_manager::AllocUnit()
 {
 	// Can use released unit?
 	if (!this->released_units.empty() && this->released_units.front()->ReleaseCycle < GameCycle) {
@@ -92,7 +86,7 @@ CUnit *CUnitManager::AllocUnit()
 **
 **  @param unit  Unit to release
 */
-void CUnitManager::ReleaseUnit(CUnit *unit)
+void unit_manager::ReleaseUnit(CUnit *unit)
 {
 	Assert(unit);
 
@@ -113,37 +107,27 @@ void CUnitManager::ReleaseUnit(CUnit *unit)
 	//Refs = GameCycle + (NetworkMaxLag << 1); // could be reuse after this time
 }
 
-CUnit &CUnitManager::GetSlotUnit(int index) const
+CUnit &unit_manager::GetSlotUnit(int index) const
 {
 	return *unitSlots[index];
 }
 
-unsigned int CUnitManager::GetUsedSlotCount() const
+unsigned int unit_manager::GetUsedSlotCount() const
 {
 	return static_cast<unsigned int>(unitSlots.size());
 }
 
-CUnitManager::Iterator CUnitManager::begin()
-{
-	return units.begin();
-}
-
-CUnitManager::Iterator CUnitManager::end()
-{
-	return units.end();
-}
-
-bool CUnitManager::empty() const
+bool unit_manager::empty() const
 {
 	return units.empty();
 }
 
-CUnit *CUnitManager::lastCreatedUnit()
+CUnit *unit_manager::lastCreatedUnit()
 {
 	return this->lastCreated;
 }
 
-void CUnitManager::Add(CUnit *unit)
+void unit_manager::Add(CUnit *unit)
 {
 	lastCreated = unit;
 	unit->UnitManagerData.unitSlot = static_cast<int>(units.size());
@@ -155,7 +139,7 @@ void CUnitManager::Add(CUnit *unit)
 **
 **  @param file  Output file.
 */
-void CUnitManager::Save(CFile &file) const
+void unit_manager::Save(CFile &file) const
 {
 	file.printf("SlotUsage(%lu, {", (long unsigned int)unitSlots.size());
 
@@ -184,7 +168,7 @@ void CUnitManager::Save(CFile &file) const
 	}
 }
 
-void CUnitManager::Load(lua_State *l)
+void unit_manager::Load(lua_State *l)
 {
 	Init();
 	if (lua_gettop(l) != 2) {
@@ -221,4 +205,6 @@ void CUnitManager::Load(lua_State *l)
 		unitSlots[unit_index]->ReleaseCycle = cycle;
 		lua_pop(l, 1);
 	}
+}
+
 }

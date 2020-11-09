@@ -645,9 +645,8 @@ void UpdateFogOfWarChange()
 		//Wyrmgus end
 	}
 	//  Global seen recount.
-	for (CUnitManager::Iterator it = UnitManager.begin(); it != UnitManager.end(); ++it) {
-		CUnit &unit = **it;
-		UnitCountSeen(unit);
+	for (CUnit *unit : wyrmgus::unit_manager::get()->get_units()) {
+		UnitCountSeen(*unit);
 	}
 }
 

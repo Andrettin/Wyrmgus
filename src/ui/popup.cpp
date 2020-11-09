@@ -603,7 +603,7 @@ void CPopupContentTypeVariable::Draw(int x, int y, const CPopup &, const unsigne
 				break;
 			case ButtonCmd::Unit:
 			case ButtonCmd::Buy:
-				unit_type = UnitManager.GetSlotUnit(button.Value).Type;
+				unit_type = wyrmgus::unit_manager::get()->GetSlotUnit(button.Value).Type;
 				break;
 			default:
 				unit_type = wyrmgus::unit_type::get_all()[button.Value];
@@ -616,20 +616,20 @@ void CPopupContentTypeVariable::Draw(int x, int y, const CPopup &, const unsigne
 				if (
 					unit_type->BoolFlag[ITEM_INDEX].value
 					&& this->Index != HITPOINTHEALING_INDEX
-					&& UnitManager.GetSlotUnit(button.Value).Container
-					&& (UnitManager.GetSlotUnit(button.Value).Container->can_equip_item(&UnitManager.GetSlotUnit(button.Value)) || UnitManager.GetSlotUnit(button.Value).Work != nullptr || UnitManager.GetSlotUnit(button.Value).Elixir != nullptr)
+					&& wyrmgus::unit_manager::get()->GetSlotUnit(button.Value).Container
+					&& (wyrmgus::unit_manager::get()->GetSlotUnit(button.Value).Container->can_equip_item(&wyrmgus::unit_manager::get()->GetSlotUnit(button.Value)) || wyrmgus::unit_manager::get()->GetSlotUnit(button.Value).Work != nullptr || wyrmgus::unit_manager::get()->GetSlotUnit(button.Value).Elixir != nullptr)
 					) {
-					value = UnitManager.GetSlotUnit(button.Value).Container->GetItemVariableChange(&UnitManager.GetSlotUnit(button.Value), this->Index);
+					value = wyrmgus::unit_manager::get()->GetSlotUnit(button.Value).Container->GetItemVariableChange(&wyrmgus::unit_manager::get()->GetSlotUnit(button.Value), this->Index);
 					if (value >= 0) {
 						x += label.Draw(x, y, "+");
 					}
-				} else if (UnitManager.GetSlotUnit(button.Value).Work != nullptr || UnitManager.GetSlotUnit(button.Value).Elixir != nullptr) {
-					value = UnitManager.GetSlotUnit(button.Value).GetItemVariableChange(&UnitManager.GetSlotUnit(button.Value), this->Index);
+				} else if (wyrmgus::unit_manager::get()->GetSlotUnit(button.Value).Work != nullptr || wyrmgus::unit_manager::get()->GetSlotUnit(button.Value).Elixir != nullptr) {
+					value = wyrmgus::unit_manager::get()->GetSlotUnit(button.Value).GetItemVariableChange(&wyrmgus::unit_manager::get()->GetSlotUnit(button.Value), this->Index);
 					if (value >= 0) {
 						x += label.Draw(x, y, "+");
 					}
 				} else {
-					value = UnitManager.GetSlotUnit(button.Value).Variable[this->Index].Value;
+					value = wyrmgus::unit_manager::get()->GetSlotUnit(button.Value).Variable[this->Index].Value;
 					if (
 						(unit_type->BoolFlag[ITEM_INDEX].value && button.Action == ButtonCmd::Buy)
 						|| IsBonusVariable(this->Index)

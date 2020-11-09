@@ -144,7 +144,7 @@ static CUnit *CclGetUnit(lua_State *l)
 		return nullptr;
 	//Wyrmgus end
 	}
-	return &UnitManager.GetSlotUnit(num);
+	return &wyrmgus::unit_manager::get()->GetSlotUnit(num);
 }
 
 /**
@@ -158,8 +158,8 @@ CUnit *CclGetUnitFromRef(lua_State *l)
 {
 	const char *const value = LuaToString(l, -1);
 	unsigned int slot = strtol(value + 1, nullptr, 16);
-	Assert(slot < UnitManager.GetUsedSlotCount());
-	return &UnitManager.GetSlotUnit(slot);
+	Assert(slot < wyrmgus::unit_manager::get()->GetUsedSlotCount());
+	return &wyrmgus::unit_manager::get()->GetSlotUnit(slot);
 }
 
 
@@ -310,7 +310,7 @@ static int CclUnit(lua_State *l)
 			// unit->CurrentAction()==UnitAction::Die so we have to wait
 			// until we parsed at least Unit::Orders[].
 			Assert(type);
-			unit = &UnitManager.GetSlotUnit(slot);
+			unit = &wyrmgus::unit_manager::get()->GetSlotUnit(slot);
 			unit->Init(*type);
 			unit->Seen.Type = seentype;
 			unit->Active = 0;
@@ -380,7 +380,7 @@ static int CclUnit(lua_State *l)
 				unit->Container->SoldUnits.push_back(unit);
 			}
 		} else if (!strcmp(value, "connecting-destination")) {
-			unit->ConnectingDestination = &UnitManager.GetSlotUnit(LuaToNumber(l, 2, j + 1));
+			unit->ConnectingDestination = &wyrmgus::unit_manager::get()->GetSlotUnit(LuaToNumber(l, 2, j + 1));
 			unit->MapLayer->LayerConnectors.push_back(unit);
 		//Wyrmgus end
 		} else if (!strcmp(value, "current-sight-range")) {
@@ -652,7 +652,7 @@ static int CclUnit(lua_State *l)
 			unit->NewOrder = CclParseOrder(l, *unit);
 			lua_pop(l, 1);
 		} else if (!strcmp(value, "goal")) {
-			unit->Goal = &UnitManager.GetSlotUnit(LuaToNumber(l, 2, j + 1));
+			unit->Goal = &wyrmgus::unit_manager::get()->GetSlotUnit(LuaToNumber(l, 2, j + 1));
 		} else if (!strcmp(value, "auto-cast")) {
 			const char *s = LuaToString(l, 2, j + 1);
 			unit->add_autocast_spell(wyrmgus::spell::get(s));
@@ -1116,7 +1116,7 @@ static int CclDamageUnit(lua_State *l)
 	const int attacker = LuaToNumber(l, 1);
 	CUnit *attackerUnit = nullptr;
 	if (attacker != -1) {
-		attackerUnit = &UnitManager.GetSlotUnit(attacker);
+		attackerUnit = &wyrmgus::unit_manager::get()->GetSlotUnit(attacker);
 	}
 	lua_pushvalue(l, 2);
 	CUnit *targetUnit = CclGetUnit(l);
@@ -1484,9 +1484,8 @@ static int CclGetUnits(lua_State *l)
 	lua_newtable(l);
 	if (plynr == -1) {
 		int i = 0;
-		for (CUnitManager::Iterator it = UnitManager.begin(); it != UnitManager.end(); ++it, ++i) {
-			const CUnit &unit = **it;
-			lua_pushnumber(l, UnitNumber(unit));
+		for (const CUnit *unit : wyrmgus::unit_manager::get()->get_units()) {
+			lua_pushnumber(l, UnitNumber(*unit));
 			lua_rawseti(l, -2, i + 1);
 		}
 	} else {
@@ -1513,7 +1512,7 @@ static int CclGetUnitsAroundUnit(lua_State *l)
 	}
 	
 	const int slot = LuaToNumber(l, 1);
-	const CUnit &unit = UnitManager.GetSlotUnit(slot);
+	const CUnit &unit = wyrmgus::unit_manager::get()->GetSlotUnit(slot);
 	const int range = LuaToNumber(l, 2);
 	bool allUnits = false;
 	if (nargs == 3) {
@@ -1555,7 +1554,7 @@ static int CclGetPlayersAroundUnit(lua_State *l)
 	}
 	
 	const int slot = LuaToNumber(l, 1);
-	const CUnit &unit = UnitManager.GetSlotUnit(slot);
+	const CUnit &unit = wyrmgus::unit_manager::get()->GetSlotUnit(slot);
 	const int range = LuaToNumber(l, 2);
 	lua_newtable(l);
 	std::vector<CUnit *> table;
@@ -1586,7 +1585,7 @@ static int CclGetUnitsInsideUnit(lua_State *l)
 	LuaCheckArgs(l, 1);
 
 	const int slot = LuaToNumber(l, 1);
-	const CUnit &transporter = UnitManager.GetSlotUnit(slot);
+	const CUnit &transporter = wyrmgus::unit_manager::get()->GetSlotUnit(slot);
 	
 	lua_newtable(l);
 	
@@ -2045,7 +2044,7 @@ static int CclSetUnitVariable(lua_State *l)
 */
 static int CclSlotUsage(lua_State *l)
 {
-	UnitManager.Load(l);
+	wyrmgus::unit_manager::get()->Load(l);
 	return 0;
 }
 

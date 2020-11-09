@@ -799,16 +799,14 @@ CUnit *FindIdleWorker(const CPlayer &player, const CUnit *last)
 **  @param units      array in which we have to store the units
 **  @param everybody  if true, include all units
 */
-void FindUnitsByType(const wyrmgus::unit_type &type, std::vector<CUnit *> &units, bool everybody)
+void FindUnitsByType(const wyrmgus::unit_type &type, std::vector<CUnit *> &units, const bool everybody)
 {
-	for (CUnitManager::Iterator it = UnitManager.begin(); it != UnitManager.end(); ++it) {
-		CUnit &unit = **it;
-
+	for (CUnit *unit : wyrmgus::unit_manager::get()->get_units()) {
 		//Wyrmgus start
-//		if (unit.Type == &type && !unit.IsUnusable(everybody)) {
-		if (unit.Type == &type && (!unit.IsUnusable(everybody) || (everybody && unit.IsAlive()))) {
+//		if (unit->Type == &type && !unit->IsUnusable(everybody)) {
+		if (unit->Type == &type && (!unit->IsUnusable(everybody) || (everybody && unit->IsAlive()))) {
 		//Wyrmgus end
-			units.push_back(&unit);
+			units.push_back(unit);
 		}
 	}
 }

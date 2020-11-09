@@ -442,8 +442,8 @@ static void EditorRandomizeUnit(const char *unit_type, int count, int value)
 */
 static void EditorDestroyAllUnits()
 {
-	while (UnitManager.empty() == false) {
-		CUnit &unit = **UnitManager.begin();
+	while (wyrmgus::unit_manager::get()->empty() == false) {
+		CUnit &unit = **wyrmgus::unit_manager::get()->get_units().begin();
 
 		unit.Remove(nullptr);
 		UnitLost(unit);

@@ -318,10 +318,9 @@ void CMapLayer::SetTimeOfDay(CScheduledTimeOfDay *time_of_day)
 	
 	//update the sight of all units
 	if (is_day_changed || is_night_changed) {
-		for (CUnitManager::Iterator it = UnitManager.begin(); it != UnitManager.end(); ++it) {
-			CUnit *unit = *it;
+		for (CUnit *unit : wyrmgus::unit_manager::get()->get_units()) {
 			if (
-				unit && unit->IsAlive() && unit->MapLayer == this &&
+				unit->IsAlive() && unit->MapLayer == this &&
 				(
 					(is_day_changed && unit->Variable[DAYSIGHTRANGEBONUS_INDEX].Value != 0) // if has day sight bonus and is entering or exiting day
 					|| (is_night_changed && unit->Variable[NIGHTSIGHTRANGEBONUS_INDEX].Value != 0) // if has night sight bonus and is entering or exiting night
@@ -438,9 +437,8 @@ void CMapLayer::SetSeason(CScheduledSeason *season)
 	}
 	
 	//update units which may have had their variation become invalid due to the season change
-	for (CUnitManager::Iterator it = UnitManager.begin(); it != UnitManager.end(); ++it) {
-		CUnit *unit = *it;
-		if (unit && unit->IsAlive() && unit->MapLayer == this) {
+	for (CUnit *unit : wyrmgus::unit_manager::get()->get_units()) {
+		if (unit->IsAlive() && unit->MapLayer == this) {
 			const wyrmgus::unit_type_variation *variation = unit->GetVariation();
 			if (variation && !unit->CheckSeasonForVariation(variation)) {
 				unit->ChooseVariation(); //choose a new variation, as the old one has become invalid due to the season change

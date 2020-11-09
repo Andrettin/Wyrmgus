@@ -214,20 +214,20 @@ void CMap::Reveal(bool only_person_players)
 		}
 	}
 	//Wyrmgus end
+
 	//  Global seen recount. Simple and effective.
-	for (CUnitManager::Iterator it = UnitManager.begin(); it != UnitManager.end(); ++it) {
-		CUnit &unit = **it;
+	for (CUnit *unit : wyrmgus::unit_manager::get()->get_units()) {
 		//  Reveal neutral buildings. Gold mines:)
-		if (unit.Player->Type == PlayerNeutral) {
+		if (unit->Player->Type == PlayerNeutral) {
 			for (int p = 0; p < PlayerMax; ++p) {
 				const CPlayer *player = CPlayer::Players[p];
-				if (player->Type != PlayerNobody && (player->Type == PlayerPerson || !only_person_players) && !unit.is_seen_by_player(p)) {
-					UnitGoesOutOfFog(unit, *player);
-					UnitGoesUnderFog(unit, *player);
+				if (player->Type != PlayerNobody && (player->Type == PlayerPerson || !only_person_players) && !unit->is_seen_by_player(p)) {
+					UnitGoesOutOfFog(*unit, *player);
+					UnitGoesUnderFog(*unit, *player);
 				}
 			}
 		}
-		UnitCountSeen(unit);
+		UnitCountSeen(*unit);
 	}
 }
 

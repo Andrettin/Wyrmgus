@@ -3499,9 +3499,7 @@ void DeleteModUnitType(const std::string &unit_type_ident)
 	if (Editor.Running == EditorEditing) {
 		std::vector<CUnit *> units_to_remove;
 
-		for (CUnitManager::Iterator it = UnitManager.begin(); it != UnitManager.end(); ++it) {
-			CUnit *unit = *it;
-
+		for (CUnit *unit : wyrmgus::unit_manager::get()->get_units()) {
 			if (unit->Type == unit_type) {
 				units_to_remove.push_back(unit);
 			}

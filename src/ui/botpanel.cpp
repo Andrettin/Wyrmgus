@@ -363,7 +363,7 @@ static bool CanShowPopupContent(const PopupConditionPanel *condition,
 		return false;
 	}
 	
-	if (condition->Quote && type && type->get_quote().empty() && !((button.Action == ButtonCmd::Unit || button.Action == ButtonCmd::Buy) && UnitManager.GetSlotUnit(button.Value).get_unique() != nullptr && !UnitManager.GetSlotUnit(button.Value).get_unique()->get_quote().empty()) && !((button.Action == ButtonCmd::Unit || button.Action == ButtonCmd::Buy) && UnitManager.GetSlotUnit(button.Value).Work != nullptr && !UnitManager.GetSlotUnit(button.Value).Work->get_quote().empty() && UnitManager.GetSlotUnit(button.Value).Elixir != nullptr && !UnitManager.GetSlotUnit(button.Value).Elixir->get_quote().empty())) {
+	if (condition->Quote && type && type->get_quote().empty() && !((button.Action == ButtonCmd::Unit || button.Action == ButtonCmd::Buy) && wyrmgus::unit_manager::get()->GetSlotUnit(button.Value).get_unique() != nullptr && !wyrmgus::unit_manager::get()->GetSlotUnit(button.Value).get_unique()->get_quote().empty()) && !((button.Action == ButtonCmd::Unit || button.Action == ButtonCmd::Buy) && wyrmgus::unit_manager::get()->GetSlotUnit(button.Value).Work != nullptr && !wyrmgus::unit_manager::get()->GetSlotUnit(button.Value).Work->get_quote().empty() && wyrmgus::unit_manager::get()->GetSlotUnit(button.Value).Elixir != nullptr && !wyrmgus::unit_manager::get()->GetSlotUnit(button.Value).Elixir->get_quote().empty())) {
 		return false;
 	}
 	
@@ -371,11 +371,11 @@ static bool CanShowPopupContent(const PopupConditionPanel *condition,
 		return false;
 	}
 	
-	if (condition->settlement_name && !(button.Action == ButtonCmd::Unit && UnitManager.GetSlotUnit(button.Value).settlement)) {
+	if (condition->settlement_name && !(button.Action == ButtonCmd::Unit && wyrmgus::unit_manager::get()->GetSlotUnit(button.Value).settlement)) {
 		return false;
 	}
 	
-	if (condition->CanActiveHarvest && !(button.Action == ButtonCmd::Unit && Selected.size() > 0 && Selected[0]->CanHarvest(&UnitManager.GetSlotUnit(button.Value), false))) {
+	if (condition->CanActiveHarvest && !(button.Action == ButtonCmd::Unit && Selected.size() > 0 && Selected[0]->CanHarvest(&wyrmgus::unit_manager::get()->GetSlotUnit(button.Value), false))) {
 		return false;
 	}
 
@@ -494,8 +494,8 @@ static bool CanShowPopupContent(const PopupConditionPanel *condition,
 	} else if (condition->Variables && (button.Action == ButtonCmd::Unit || button.Action == ButtonCmd::Buy)) {
 		for (unsigned int i = 0; i < UnitTypeVar.GetNumberVariable(); ++i) {
 			if (condition->Variables[i] != CONDITION_TRUE) {
-//				if ((condition->Variables[i] == CONDITION_ONLY) ^ UnitManager.GetSlotUnit(button.Value).Variable[i].Enable) {
-				CUnit &unit = UnitManager.GetSlotUnit(button.Value);
+//				if ((condition->Variables[i] == CONDITION_ONLY) ^ wyrmgus::unit_manager::get()->GetSlotUnit(button.Value).Variable[i].Enable) {
+				CUnit &unit = wyrmgus::unit_manager::get()->GetSlotUnit(button.Value);
 				if (unit.Type->BoolFlag[ITEM_INDEX].value && unit.Container != nullptr && unit.Container->HasInventory()) {
 					if (i == BASICDAMAGE_INDEX) {
 						if ((condition->Variables[i] == CONDITION_ONLY) ^ (unit.Container->GetItemVariableChange(&unit, i) != 0 || unit.Container->GetItemVariableChange(&unit, PIERCINGDAMAGE_INDEX) != 0)) {
@@ -542,7 +542,7 @@ static bool CanShowPopupContent(const PopupConditionPanel *condition,
 	}
 		
 	if (button.Action == ButtonCmd::Unit || button.Action == ButtonCmd::Buy) {
-		CUnit &unit = UnitManager.GetSlotUnit(button.Value);
+		CUnit &unit = wyrmgus::unit_manager::get()->GetSlotUnit(button.Value);
 		if (unit.Type->BoolFlag[ITEM_INDEX].value) {
 			if (condition->Equipped != CONDITION_TRUE) {
 				if ((condition->Equipped == CONDITION_ONLY) ^ (unit.Container != nullptr && unit.Container->HasInventory() && unit.Container->IsItemEquipped(&unit))) {
@@ -771,8 +771,8 @@ void DrawPopup(const wyrmgus::button &button, int x, int y, bool above)
 			Costs[FoodCost] = unit_type->Stats[CPlayer::GetThisPlayer()->Index].Variables[DEMAND_INDEX].Value;
 			break;
 		case ButtonCmd::Buy:
-			Costs[FoodCost] = UnitManager.GetSlotUnit(button.Value).Variable[DEMAND_INDEX].Value;
-			Costs[CopperCost] = UnitManager.GetSlotUnit(button.Value).GetPrice();
+			Costs[FoodCost] = wyrmgus::unit_manager::get()->GetSlotUnit(button.Value).Variable[DEMAND_INDEX].Value;
+			Costs[CopperCost] = wyrmgus::unit_manager::get()->GetSlotUnit(button.Value).GetPrice();
 			break;
 		default:
 			break;
@@ -1047,7 +1047,7 @@ void CButtonPanel::Draw()
 		} else if ((button->Action == ButtonCmd::Train || button->Action == ButtonCmd::TrainClass || button->Action == ButtonCmd::Build || button->Action == ButtonCmd::BuildClass || button->Action == ButtonCmd::UpgradeTo || button->Action == ButtonCmd::UpgradeToClass || button->Action == ButtonCmd::ExperienceUpgradeTo) && button->Icon.Name.empty() && !button_unit_type->Icon.Name.empty()) {
 			button_icon = button_unit_type->Icon.Icon;
 		} else if (button->Action == ButtonCmd::Buy) {
-			button_icon = UnitManager.GetSlotUnit(button->Value).get_icon();
+			button_icon = wyrmgus::unit_manager::get()->GetSlotUnit(button->Value).get_icon();
 		} else if ((button->Action == ButtonCmd::Research || button->Action == ButtonCmd::ResearchClass) && button->Icon.Name.empty() && button_upgrade->get_icon()) {
 			button_icon = button_upgrade->get_icon();
 		} else if (button->Action == ButtonCmd::Faction && button->Icon.Name.empty() && wyrmgus::faction::get_all()[CPlayer::GetThisPlayer()->Faction]->DevelopsTo[button->Value]->get_icon() != nullptr) {
@@ -1313,10 +1313,10 @@ bool IsButtonAllowed(const CUnit &unit, const wyrmgus::button &buttonaction)
 			res = buttonaction.Value < static_cast<int>(unit.Player->get_available_quests().size()) && unit.Player->can_accept_quest(unit.Player->get_available_quests().at(buttonaction.Value));
 			break;
 		case ButtonCmd::Buy:
-			res = (buttonaction.Value != -1) && (&UnitManager.GetSlotUnit(buttonaction.Value) != nullptr);
-			if (res && UnitManager.GetSlotUnit(buttonaction.Value).Character != nullptr) {
+			res = (buttonaction.Value != -1) && (&wyrmgus::unit_manager::get()->GetSlotUnit(buttonaction.Value) != nullptr);
+			if (res && wyrmgus::unit_manager::get()->GetSlotUnit(buttonaction.Value).Character != nullptr) {
 				//check whether the character's conditions are still valid
-				res = res && Selected[0]->Player->is_character_available_for_recruitment(UnitManager.GetSlotUnit(buttonaction.Value).Character, true);
+				res = res && Selected[0]->Player->is_character_available_for_recruitment(wyrmgus::unit_manager::get()->GetSlotUnit(buttonaction.Value).Character, true);
 			}
 			break;
 	}
@@ -1409,7 +1409,7 @@ bool IsButtonUsable(const CUnit &unit, const wyrmgus::button &buttonaction)
 			break;
 		case ButtonCmd::Buy:
 			res = true;
-			if (UnitManager.GetSlotUnit(buttonaction.Value).Character != nullptr) {
+			if (wyrmgus::unit_manager::get()->GetSlotUnit(buttonaction.Value).Character != nullptr) {
 				res = CPlayer::GetThisPlayer()->Heroes.size() < PlayerHeroMax;
 			}
 			break;
@@ -1444,7 +1444,7 @@ int GetButtonCooldown(const CUnit &unit, const wyrmgus::button &buttonaction)
 	// Check button-specific cases
 	switch (buttonaction.Action) {
 		case ButtonCmd::Buy:
-			if (buttonaction.Value != -1 && UnitManager.GetSlotUnit(buttonaction.Value).Character != nullptr) {
+			if (buttonaction.Value != -1 && wyrmgus::unit_manager::get()->GetSlotUnit(buttonaction.Value).Character != nullptr) {
 				cooldown = CPlayer::GetThisPlayer()->HeroCooldownTimer;
 			}
 			break;
@@ -1468,7 +1468,7 @@ int GetButtonCooldownPercent(const CUnit &unit, const wyrmgus::button &buttonact
 	// Check button-specific cases
 	switch (buttonaction.Action) {
 		case ButtonCmd::Buy:
-			if (buttonaction.Value != -1 && UnitManager.GetSlotUnit(buttonaction.Value).Character != nullptr) {
+			if (buttonaction.Value != -1 && wyrmgus::unit_manager::get()->GetSlotUnit(buttonaction.Value).Character != nullptr) {
 				cooldown = CPlayer::GetThisPlayer()->HeroCooldownTimer * 100 / HeroCooldownCycles;
 			}
 			break;
@@ -2091,16 +2091,16 @@ void CButtonPanel::DoClicked_Buy(int button)
 {
 	int buy_costs[MaxCosts];
 	memset(buy_costs, 0, sizeof(buy_costs));
-	buy_costs[CopperCost] = UnitManager.GetSlotUnit(CurrentButtons[button]->Value).GetPrice();
-	if (!CPlayer::GetThisPlayer()->CheckCosts(buy_costs) && CPlayer::GetThisPlayer()->CheckLimits(*UnitManager.GetSlotUnit(CurrentButtons[button]->Value).Type) >= 0) {
-		SendCommandBuy(*Selected[0], &UnitManager.GetSlotUnit(CurrentButtons[button]->Value), CPlayer::GetThisPlayer()->Index);
+	buy_costs[CopperCost] = wyrmgus::unit_manager::get()->GetSlotUnit(CurrentButtons[button]->Value).GetPrice();
+	if (!CPlayer::GetThisPlayer()->CheckCosts(buy_costs) && CPlayer::GetThisPlayer()->CheckLimits(*wyrmgus::unit_manager::get()->GetSlotUnit(CurrentButtons[button]->Value).Type) >= 0) {
+		SendCommandBuy(*Selected[0], &wyrmgus::unit_manager::get()->GetSlotUnit(CurrentButtons[button]->Value), CPlayer::GetThisPlayer()->Index);
 		ButtonUnderCursor = -1;
 		OldButtonUnderCursor = -1;
 		LastDrawnButtonPopup = nullptr;
 		if (IsOnlySelected(*Selected[0])) {
 			SelectedUnitChanged();
 		}
-	} else if (CPlayer::GetThisPlayer()->CheckLimits(*UnitManager.GetSlotUnit(CurrentButtons[button]->Value).Type) == -3) {
+	} else if (CPlayer::GetThisPlayer()->CheckLimits(*wyrmgus::unit_manager::get()->GetSlotUnit(CurrentButtons[button]->Value).Type) == -3) {
 		if (GameSounds.NotEnoughFood[CPlayer::GetThisPlayer()->Race].Sound) {
 			PlayGameSound(GameSounds.NotEnoughFood[CPlayer::GetThisPlayer()->Race].Sound, MaxSampleVolume);
 		}
@@ -2218,7 +2218,7 @@ void CButtonPanel::DoClicked(int button)
 			|| (CurrentButtons[button]->Action == ButtonCmd::LearnAbility && Selected[0]->GetIndividualUpgrade(button_upgrade) == button_upgrade->MaxLimit)
 		) {
 			CPlayer::GetThisPlayer()->Notify(NotifyYellow, Selected[0]->tilePos, Selected[0]->MapLayer->ID, "%s", _("The upgrade has already been acquired"));
-		} else if (CurrentButtons[button]->Action == ButtonCmd::Buy && CPlayer::GetThisPlayer()->Heroes.size() >= PlayerHeroMax && CurrentButtons[button]->Value != -1 && UnitManager.GetSlotUnit(CurrentButtons[button]->Value).Character != nullptr) {
+		} else if (CurrentButtons[button]->Action == ButtonCmd::Buy && CPlayer::GetThisPlayer()->Heroes.size() >= PlayerHeroMax && CurrentButtons[button]->Value != -1 && wyrmgus::unit_manager::get()->GetSlotUnit(CurrentButtons[button]->Value).Character != nullptr) {
 			CPlayer::GetThisPlayer()->Notify(NotifyYellow, Selected[0]->tilePos, Selected[0]->MapLayer->ID, "%s", _("The hero limit has been reached"));
 		} else {
 			CPlayer::GetThisPlayer()->Notify(NotifyYellow, Selected[0]->tilePos, Selected[0]->MapLayer->ID, "%s", _("The requirements have not been fulfilled"));

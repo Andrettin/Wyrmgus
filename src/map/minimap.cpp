@@ -425,7 +425,7 @@ void minimap::update_territory_pixel(const int mx, const int my, const int z)
 /**
 **  Draw a unit on the minimap.
 */
-void minimap::DrawUnitOn(CUnit &unit, int red_phase)
+void minimap::DrawUnitOn(const CUnit *unit, int red_phase)
 {
 	const int z = UI.CurrentMapLayer->ID;
 	const int texture_width = this->get_texture_width(z);
@@ -433,14 +433,14 @@ void minimap::DrawUnitOn(CUnit &unit, int red_phase)
 
 	const unit_type *type;
 
-	if (Editor.Running || ReplayRevealMap || unit.IsVisible(*CPlayer::GetThisPlayer())) {
-		type = unit.Type;
+	if (Editor.Running || ReplayRevealMap || unit->IsVisible(*CPlayer::GetThisPlayer())) {
+		type = unit->Type;
 	} else {
-		type = unit.Seen.Type;
+		type = unit->Seen.Type;
 		// This will happen for radar if the unit has not been seen and we
 		// have it on radar.
 		if (!type) {
-			type = unit.Type;
+			type = unit->Type;
 		}
 	}
 
@@ -450,23 +450,23 @@ void minimap::DrawUnitOn(CUnit &unit, int red_phase)
 	}
 
 	uint32_t color;
-	if (unit.GetDisplayPlayer() == PlayerNumNeutral) {
+	if (unit->GetDisplayPlayer() == PlayerNumNeutral) {
 		color = CVideo::MapRGB(type->NeutralMinimapColorRGB);
-	} else if (unit.Player == CPlayer::GetThisPlayer() && !Editor.Running) {
-		if (unit.Attacked && unit.Attacked + ATTACK_BLINK_DURATION > GameCycle &&
-			(red_phase || unit.Attacked + ATTACK_RED_DURATION > GameCycle)) {
+	} else if (unit->Player == CPlayer::GetThisPlayer() && !Editor.Running) {
+		if (unit->Attacked && unit->Attacked + ATTACK_BLINK_DURATION > GameCycle &&
+			(red_phase || unit->Attacked + ATTACK_RED_DURATION > GameCycle)) {
 			color = ColorRed;
-		} else if (this->ShowSelected && unit.Selected) {
+		} else if (this->ShowSelected && unit->Selected) {
 			color = ColorWhite;
 		} else {
 			color = ColorGreen;
 		}
 	} else {
-		color = CVideo::MapRGB(unit.Player->get_minimap_color());
+		color = CVideo::MapRGB(unit->Player->get_minimap_color());
 	}
 
-	int mx = 1 + this->XOffset[z] + Map2MinimapX[z][unit.tilePos.x];
-	int my = 1 + this->YOffset[z] + Map2MinimapY[z][unit.tilePos.y];
+	int mx = 1 + this->XOffset[z] + Map2MinimapX[z][unit->tilePos.x];
+	int my = 1 + this->YOffset[z] + Map2MinimapY[z][unit->tilePos.y];
 	int w = Map2MinimapX[z][type->get_tile_width()];
 
 	if (mx + w >= texture_width) { // clip right side
@@ -550,9 +550,8 @@ void minimap::Update()
 
 	if (this->are_units_visible()) {
 		//draw units on the map
-		for (CUnitManager::Iterator it = UnitManager.begin(); it != UnitManager.end(); ++it) {
-			CUnit &unit = **it;
-			if (unit.IsVisibleOnMinimap()) {
+		for (const CUnit *unit : unit_manager::get()->get_units()) {
+			if (unit->IsVisibleOnMinimap()) {
 				this->DrawUnitOn(unit, red_phase);
 			}
 		}

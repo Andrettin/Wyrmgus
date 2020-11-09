@@ -986,7 +986,7 @@ int WriteMapSetup(const char *mapSetup, CMap &map, int writeTerrain, bool is_mod
 		f->printf("\n-- place units\n");
 		f->printf("if (MapUnitsInit ~= nil) then MapUnitsInit() end\n");
 		std::vector<CUnit *> teleporters;
-		for (CUnitManager::Iterator it = UnitManager.begin(); it != UnitManager.end(); ++it) {
+		for (auto it = wyrmgus::unit_manager::get()->get_units().begin(); it != wyrmgus::unit_manager::get()->get_units().end(); ++it) {
 			const CUnit &unit = **it;
 			f->printf("unit = CreateUnit(\"%s\", %d, {%d, %d})\n",
 					  unit.Type->Ident.c_str(),
@@ -1012,56 +1012,54 @@ int WriteMapSetup(const char *mapSetup, CMap &map, int writeTerrain, bool is_mod
 		if (!is_mod) {
 			f->printf("\n-- place units\n");
 			f->printf("if (MapUnitsInit ~= nil) then MapUnitsInit() end\n");
-			std::vector<CUnit *> teleporters;
-			for (CUnitManager::Iterator it = UnitManager.begin(); it != UnitManager.end(); ++it) {
-				const CUnit &unit = **it;
+			std::vector<const CUnit *> teleporters;
+			for (const CUnit *unit : wyrmgus::unit_manager::get()->get_units()) {
 				f->printf("unit = CreateUnit(\"%s\", %d, {%d, %d})\n",
-						  unit.Type->Ident.c_str(),
-						  unit.Player->Index,
-						  unit.tilePos.x, unit.tilePos.y);
-				if (unit.Type->get_given_resource() != nullptr) {
-					f->printf("SetResourcesHeld(unit, %d)\n", unit.ResourcesHeld);
+						  unit->Type->Ident.c_str(),
+						  unit->Player->Index,
+						  unit->tilePos.x, unit->tilePos.y);
+				if (unit->Type->get_given_resource() != nullptr) {
+					f->printf("SetResourcesHeld(unit, %d)\n", unit->ResourcesHeld);
 				}
-				if (!unit.Active) { //Active is true by default
+				if (!unit->Active) { //Active is true by default
 					f->printf("SetUnitVariable(unit, \"Active\", false)\n");
 				}
-				if (unit.Character != nullptr) {
-					if (!unit.Character->Custom) {
-						f->printf("SetUnitVariable(unit, \"Character\", \"%s\")\n", unit.Character->Ident.c_str());
+				if (unit->Character != nullptr) {
+					if (!unit->Character->Custom) {
+						f->printf("SetUnitVariable(unit, \"Character\", \"%s\")\n", unit->Character->Ident.c_str());
 					} else {
-						f->printf("SetUnitVariable(unit, \"CustomHero\", \"%s\")\n", unit.Character->Ident.c_str());
+						f->printf("SetUnitVariable(unit, \"CustomHero\", \"%s\")\n", unit->Character->Ident.c_str());
 					}
 				} else {
-					if (!unit.Name.empty()) {
-						f->printf("SetUnitVariable(unit, \"Name\", \"%s\")\n", unit.Name.c_str());
+					if (!unit->Name.empty()) {
+						f->printf("SetUnitVariable(unit, \"Name\", \"%s\")\n", unit->Name.c_str());
 					}
 				}
-				if (unit.Trait != nullptr) {
-					f->printf("AcquireTrait(unit, \"%s\")\n", unit.Trait->get_identifier().c_str());
+				if (unit->Trait != nullptr) {
+					f->printf("AcquireTrait(unit, \"%s\")\n", unit->Trait->get_identifier().c_str());
 				}
-				if (unit.Prefix != nullptr) {
-					f->printf("SetUnitVariable(unit, \"Prefix\", \"%s\")\n", unit.Prefix->get_identifier().c_str());
+				if (unit->Prefix != nullptr) {
+					f->printf("SetUnitVariable(unit, \"Prefix\", \"%s\")\n", unit->Prefix->get_identifier().c_str());
 				}
-				if (unit.Suffix != nullptr) {
-					f->printf("SetUnitVariable(unit, \"Suffix\", \"%s\")\n", unit.Suffix->get_identifier().c_str());
+				if (unit->Suffix != nullptr) {
+					f->printf("SetUnitVariable(unit, \"Suffix\", \"%s\")\n", unit->Suffix->get_identifier().c_str());
 				}
-				if (unit.Work != nullptr) {
-					f->printf("SetUnitVariable(unit, \"Work\", \"%s\")\n", unit.Work->get_identifier().c_str());
+				if (unit->Work != nullptr) {
+					f->printf("SetUnitVariable(unit, \"Work\", \"%s\")\n", unit->Work->get_identifier().c_str());
 				}
-				if (unit.Elixir != nullptr) {
-					f->printf("SetUnitVariable(unit, \"Elixir\", \"%s\")\n", unit.Elixir->get_identifier().c_str());
+				if (unit->Elixir != nullptr) {
+					f->printf("SetUnitVariable(unit, \"Elixir\", \"%s\")\n", unit->Elixir->get_identifier().c_str());
 				}
-				if (unit.Variable[HP_INDEX].Value != unit.GetModifiedVariable(HP_INDEX, VariableMax)) {
-					f->printf("SetUnitVariable(unit, \"HitPoints\", %d)\n", unit.Variable[HP_INDEX].Value);
+				if (unit->Variable[HP_INDEX].Value != unit->GetModifiedVariable(HP_INDEX, VariableMax)) {
+					f->printf("SetUnitVariable(unit, \"HitPoints\", %d)\n", unit->Variable[HP_INDEX].Value);
 				}
-				if (unit.Type->BoolFlag[TELEPORTER_INDEX].value && unit.Goal) {
-					teleporters.push_back(*it);
+				if (unit->Type->BoolFlag[TELEPORTER_INDEX].value && unit->Goal) {
+					teleporters.push_back(unit);
 				}
 			}
 			f->printf("\n\n");
-			for (std::vector<CUnit *>::iterator it = teleporters.begin(); it != teleporters.end(); ++it) {
-				CUnit &unit = **it;
-				f->printf("SetTeleportDestination(%d, %d)\n", UnitNumber(unit), UnitNumber(*unit.Goal));
+			for (const CUnit *unit : teleporters) {
+				f->printf("SetTeleportDestination(%d, %d)\n", UnitNumber(*unit), UnitNumber(*unit->Goal));
 			}
 			f->printf("\n\n");
 		}
@@ -1770,12 +1768,11 @@ void CreateGame(const std::string &filename, CMap *map, bool is_mod)
 	
 	//Wyrmgus start
 	//update the sight of all units
-	for (CUnitManager::Iterator it = UnitManager.begin(); it != UnitManager.end(); ++it) {
-		CUnit &unit = **it;
-		if (!unit.Destroyed) {
-			MapUnmarkUnitSight(unit);
-			UpdateUnitSightRange(unit);
-			MapMarkUnitSight(unit);
+	for (CUnit *unit : wyrmgus::unit_manager::get()->get_units()) {
+		if (!unit->Destroyed) {
+			MapUnmarkUnitSight(*unit);
+			UpdateUnitSightRange(*unit);
+			MapMarkUnitSight(*unit);
 		}
 	}
 	//Wyrmgus end

@@ -1366,10 +1366,9 @@ void CommandDiplomacy(const int player, const wyrmgus::diplomacy_state state, co
 void CommandSharedVision(int player, bool state, int opponent)
 {
 	// Do a real hardcore seen recount. First we unmark EVERYTHING.
-	for (CUnitManager::Iterator it = UnitManager.begin(); it != UnitManager.end(); ++it) {
-		CUnit &unit = **it;
-		if (!unit.Destroyed) {
-			MapUnmarkUnitSight(unit);
+	for (CUnit *unit : wyrmgus::unit_manager::get()->get_units()) {
+		if (!unit->Destroyed) {
+			MapUnmarkUnitSight(*unit);
 		}
 	}
 
@@ -1434,10 +1433,9 @@ void CommandSharedVision(int player, bool state, int opponent)
 	}
 
 	// Do a real hardcore seen recount. Now we remark EVERYTHING
-	for (CUnitManager::Iterator it = UnitManager.begin(); it != UnitManager.end(); ++it) {
-		CUnit &unit = **it;
-		if (!unit.Destroyed) {
-			MapMarkUnitSight(unit);
+	for (CUnit *unit : wyrmgus::unit_manager::get()->get_units()) {
+		if (!unit->Destroyed) {
+			MapMarkUnitSight(*unit);
 		}
 	}
 }

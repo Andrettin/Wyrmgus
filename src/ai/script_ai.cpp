@@ -1649,7 +1649,7 @@ static int CclDefineAiPlayer(lua_State *l)
 						const char *ident = LuaToString(l, -1, subk + 1);
 						UNUSED(ident);
 #endif
-						ai->Force[forceIdx].Units.Insert(&UnitManager.GetSlotUnit(num));
+						ai->Force[forceIdx].Units.Insert(&wyrmgus::unit_manager::get()->GetSlotUnit(num));
 					}
 					lua_pop(l, 1);
 				} else if (!strcmp(secondary_value, "state")) {
@@ -1808,7 +1808,7 @@ static int CclDefineAiPlayer(lua_State *l)
 			for (int k = 0; k < subargs; ++k) {
 				const int num = LuaToNumber(l, j + 1, k + 1);
 				++k;
-				ai->Scouts.push_back(&UnitManager.GetSlotUnit(num));
+				ai->Scouts.push_back(&wyrmgus::unit_manager::get()->GetSlotUnit(num));
 			}
 		} else if (!strcmp(value, "transporters")) {
 			if (!lua_istable(l, j + 1)) {
@@ -1819,7 +1819,7 @@ static int CclDefineAiPlayer(lua_State *l)
 				int landmass = LuaToNumber(l, j + 1, k + 1);
 				++k;
 				const int num = LuaToNumber(l, j + 1, k + 1);
-				ai->Transporters[landmass].push_back(&UnitManager.GetSlotUnit(num));
+				ai->Transporters[landmass].push_back(&wyrmgus::unit_manager::get()->GetSlotUnit(num));
 			}
 		//Wyrmgus end
 		} else {

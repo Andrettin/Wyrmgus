@@ -720,7 +720,7 @@ static bool IsAValidCommand_Command(const CNetworkPacket &packet, int index, con
 	CNetworkCommand nc;
 	nc.Deserialize(&packet.Command[index][0]);
 	const unsigned int slot = nc.Unit;
-	const CUnit *unit = slot < UnitManager.GetUsedSlotCount() ? &UnitManager.GetSlotUnit(slot) : nullptr;
+	const CUnit *unit = slot < wyrmgus::unit_manager::get()->GetUsedSlotCount() ? &wyrmgus::unit_manager::get()->GetSlotUnit(slot) : nullptr;
 
 	if (unit && (unit->Player->Index == player
 				 || CPlayer::Players[player]->IsTeamed(*unit) || unit->Player->Type == PlayerNeutral)) {
@@ -735,7 +735,7 @@ static bool IsAValidCommand_Dismiss(const CNetworkPacket &packet, int index, con
 	CNetworkCommand nc;
 	nc.Deserialize(&packet.Command[index][0]);
 	const unsigned int slot = nc.Unit;
-	const CUnit *unit = slot < UnitManager.GetUsedSlotCount() ? &UnitManager.GetSlotUnit(slot) : nullptr;
+	const CUnit *unit = slot < wyrmgus::unit_manager::get()->GetUsedSlotCount() ? &wyrmgus::unit_manager::get()->GetSlotUnit(slot) : nullptr;
 
 	if (unit && unit->Type->ClicksToExplode) {
 		return true;
@@ -930,7 +930,7 @@ static void NetworkExecCommand_Selection(const CNetworkCommandQueue &ncq)
 	std::vector<CUnit *> units;
 
 	for (size_t i = 0; i != ns.Units.size(); ++i) {
-		units.push_back(&UnitManager.GetSlotUnit(ns.Units[i]));
+		units.push_back(&wyrmgus::unit_manager::get()->GetSlotUnit(ns.Units[i]));
 	}
 	ChangeTeamSelectedUnits(*CPlayer::Players[ns.player], units);
 }
@@ -1023,7 +1023,7 @@ static void NetworkSendCommands(unsigned long gameNetCycle)
 				CNetworkCommand nc;
 				nc.Deserialize(&incommand.Data[0]);
 
-				const CUnit &unit = UnitManager.GetSlotUnit(nc.Unit);
+				const CUnit &unit = wyrmgus::unit_manager::get()->GetSlotUnit(nc.Unit);
 				// FIXME: we can send destoyed units over network :(
 				if (unit.Destroyed) {
 					DebugPrint("Sending destroyed unit %d over network!!!!!!\n" _C_ nc.Unit);

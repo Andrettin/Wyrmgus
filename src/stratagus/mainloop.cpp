@@ -548,7 +548,7 @@ void GameMainLoop()
 		
 		//update the sold units of all units before starting, to make sure they fit the current conditions
 		//make a copy of the units list, as updating the sold units can change the list
-		const std::vector<CUnit *> units(UnitManager.begin(), UnitManager.end());
+		const std::vector<CUnit *> units = wyrmgus::unit_manager::get()->get_units();
 		for (CUnit *unit : units) {
 			if (unit && unit->IsAlive()) {
 				unit->UpdateSoldUnits();

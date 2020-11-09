@@ -28,20 +28,19 @@
 
 #pragma once
 
-/*----------------------------------------------------------------------------
---  Declarations
-----------------------------------------------------------------------------*/
+#include "util/singleton.h"
 
 class CUnit;
 class CFile;
 struct lua_State;
 
-class CUnitManager
+namespace wyrmgus {
+
+class unit_manager final : public singleton<unit_manager>
 {
 public:
-	typedef std::vector<CUnit *>::iterator Iterator;
+	using Iterator = std::vector<CUnit *>::iterator;
 public:
-	CUnitManager();
 	void Init();
 
 	CUnit *AllocUnit();
@@ -51,9 +50,12 @@ public:
 
 	// Following is for already allocated Unit (no specific order)
 	void Add(CUnit *unit);
-	Iterator begin();
-	Iterator end();
 	bool empty() const;
+
+	const std::vector<CUnit *> &get_units() const
+	{
+		return this->units;
+	}
 
 	CUnit *lastCreatedUnit();
 
@@ -65,12 +67,7 @@ private:
 	std::vector<CUnit *> units;
 	std::vector<CUnit *> unitSlots;
 	std::list<CUnit *> released_units;
-	CUnit *lastCreated;
+	CUnit *lastCreated = nullptr;
 };
 
-
-/*----------------------------------------------------------------------------
---  Variables
-----------------------------------------------------------------------------*/
-
-extern CUnitManager UnitManager;   /// Unit manager
+}

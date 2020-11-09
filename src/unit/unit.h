@@ -60,6 +60,7 @@ namespace wyrmgus {
 	class tile;
 	class time_of_day;
 	class unique_item;
+	class unit_manager;
 	class unit_type;
 	class unit_type_variation;
 	enum class item_class;
@@ -532,7 +533,7 @@ public:
 		int slot = -1;           /// index in UnitManager::unitSlots
 		int unitSlot = -1;       /// index in UnitManager::units
 
-		friend class CUnitManager;
+		friend class wyrmgus::unit_manager;
 	};
 
 public:

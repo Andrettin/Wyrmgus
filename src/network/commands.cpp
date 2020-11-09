@@ -805,7 +805,7 @@ void SendCommandAutosellResource(int player, int resource)
 void ExecCommand(unsigned char msgnr, UnitRef unum,
 				 unsigned short x, unsigned short y, UnitRef dstnr)
 {
-	CUnit &unit = UnitManager.GetSlotUnit(unum);
+	CUnit &unit = wyrmgus::unit_manager::get()->GetSlotUnit(unum);
 	const Vec2i pos(x, y);
 	const int arg1 = x;
 	const int arg2 = y;
@@ -839,7 +839,7 @@ void ExecCommand(unsigned char msgnr, UnitRef unum,
 			break;
 		case MessageCommandDefend: {
 			if (dstnr != (unsigned short)0xFFFF) {
-				CUnit &dest = UnitManager.GetSlotUnit(dstnr);
+				CUnit &dest = wyrmgus::unit_manager::get()->GetSlotUnit(dstnr);
 				Assert(dest.Type);
 				CommandLog("defend", &unit, status, -1, -1, &dest, nullptr, -1);
 				CommandDefend(unit, dest, status);
@@ -848,7 +848,7 @@ void ExecCommand(unsigned char msgnr, UnitRef unum,
 		}
 		case MessageCommandFollow: {
 			if (dstnr != (unsigned short)0xFFFF) {
-				CUnit &dest = UnitManager.GetSlotUnit(dstnr);
+				CUnit &dest = wyrmgus::unit_manager::get()->GetSlotUnit(dstnr);
 				Assert(dest.Type);
 				CommandLog("follow", &unit, status, -1, -1, &dest, nullptr, -1);
 				CommandFollow(unit, dest, status);
@@ -871,7 +871,7 @@ void ExecCommand(unsigned char msgnr, UnitRef unum,
 		//Wyrmgus start
 		case MessageCommandPickUp: {
 			if (dstnr != (unsigned short)0xFFFF) {
-				CUnit &dest = UnitManager.GetSlotUnit(dstnr);
+				CUnit &dest = wyrmgus::unit_manager::get()->GetSlotUnit(dstnr);
 				Assert(dest.Type);
 				CommandLog("pick-up", &unit, status, -1, -1, &dest, nullptr, -1);
 				CommandPickUp(unit, dest, status);
@@ -882,7 +882,7 @@ void ExecCommand(unsigned char msgnr, UnitRef unum,
 		case MessageCommandRepair: {
 			CUnit *dest = NoUnitP;
 			if (dstnr != (unsigned short)0xFFFF) {
-				dest = &UnitManager.GetSlotUnit(dstnr);
+				dest = &wyrmgus::unit_manager::get()->GetSlotUnit(dstnr);
 				Assert(dest && dest->Type);
 			}
 			CommandLog("repair", &unit, status, pos.x, pos.y, dest, nullptr, -1);
@@ -896,7 +896,7 @@ void ExecCommand(unsigned char msgnr, UnitRef unum,
 		case MessageCommandAttack: {
 			CUnit *dest = NoUnitP;
 			if (dstnr != (unsigned short)0xFFFF) {
-				dest = &UnitManager.GetSlotUnit(dstnr);
+				dest = &wyrmgus::unit_manager::get()->GetSlotUnit(dstnr);
 				Assert(dest && dest->Type);
 			}
 			CommandLog("attack", &unit, status, pos.x, pos.y, dest, nullptr, -1);
@@ -910,7 +910,7 @@ void ExecCommand(unsigned char msgnr, UnitRef unum,
 		//Wyrmgus start
 		case MessageCommandUse: {
 			if (dstnr != (unsigned short)0xFFFF) {
-				CUnit &dest = UnitManager.GetSlotUnit(dstnr);
+				CUnit &dest = wyrmgus::unit_manager::get()->GetSlotUnit(dstnr);
 				Assert(dest.Type);
 				CommandLog("use", &unit, status, -1, -1, &dest, nullptr, -1);
 				CommandUse(unit, dest, status);
@@ -919,7 +919,7 @@ void ExecCommand(unsigned char msgnr, UnitRef unum,
 		}
 		case MessageCommandTrade: {
 			if (dstnr != (unsigned short)0xFFFF) {
-				CUnit &dest = UnitManager.GetSlotUnit(dstnr);
+				CUnit &dest = wyrmgus::unit_manager::get()->GetSlotUnit(dstnr);
 				Assert(dest.Type);
 				CommandLog("trade", &unit, status, -1, -1, &dest, nullptr, -1);
 				CommandTrade(unit, dest, status);
@@ -933,7 +933,7 @@ void ExecCommand(unsigned char msgnr, UnitRef unum,
 			break;
 		case MessageCommandBoard: {
 			if (dstnr != (unsigned short)0xFFFF) {
-				CUnit &dest = UnitManager.GetSlotUnit(dstnr);
+				CUnit &dest = wyrmgus::unit_manager::get()->GetSlotUnit(dstnr);
 				Assert(dest.Type);
 				CommandLog("board", &unit, status, arg1, arg2, &dest, nullptr, -1);
 				CommandBoard(unit, dest, status);
@@ -943,7 +943,7 @@ void ExecCommand(unsigned char msgnr, UnitRef unum,
 		case MessageCommandUnload: {
 			CUnit *dest = nullptr;
 			if (dstnr != (unsigned short)0xFFFF) {
-				dest = &UnitManager.GetSlotUnit(dstnr);
+				dest = &wyrmgus::unit_manager::get()->GetSlotUnit(dstnr);
 				Assert(dest && dest->Type);
 			}
 			CommandLog("unload", &unit, status, pos.x, pos.y, dest, nullptr, -1);
@@ -964,7 +964,7 @@ void ExecCommand(unsigned char msgnr, UnitRef unum,
 			break;
 		case MessageCommandResource: {
 			if (dstnr != (unsigned short)0xFFFF) {
-				CUnit &dest = UnitManager.GetSlotUnit(dstnr);
+				CUnit &dest = wyrmgus::unit_manager::get()->GetSlotUnit(dstnr);
 				Assert(dest.Type);
 				CommandLog("resource", &unit, status, -1, -1, &dest, nullptr, -1);
 				CommandResource(unit, dest, status);
@@ -972,7 +972,7 @@ void ExecCommand(unsigned char msgnr, UnitRef unum,
 			break;
 		}
 		case MessageCommandReturn: {
-			CUnit *dest = (dstnr != (unsigned short)0xFFFF) ? &UnitManager.GetSlotUnit(dstnr) : nullptr;
+			CUnit *dest = (dstnr != (unsigned short)0xFFFF) ? &wyrmgus::unit_manager::get()->GetSlotUnit(dstnr) : nullptr;
 			CommandLog("return", &unit, status, -1, -1, dest, nullptr, -1);
 			CommandReturnGoods(unit, dest, status);
 			break;
@@ -1043,7 +1043,7 @@ void ExecCommand(unsigned char msgnr, UnitRef unum,
 		}
 		case MessageCommandBuy: {
 			if (dstnr != (unsigned short)0xFFFF) {
-				CUnit &dest = UnitManager.GetSlotUnit(dstnr);
+				CUnit &dest = wyrmgus::unit_manager::get()->GetSlotUnit(dstnr);
 				Assert(dest.Type);
 				CommandLog("buy", &unit, 0, -1, -1, &dest, nullptr, arg1);
 				CommandBuy(unit, &dest, arg1);
@@ -1071,7 +1071,7 @@ void ExecCommand(unsigned char msgnr, UnitRef unum,
 			if (arg2 != (unsigned short)0xFFFF) {
 				CUnit *dest = nullptr;
 				if (dstnr != (unsigned short)0xFFFF) {
-					dest = &UnitManager.GetSlotUnit(dstnr);
+					dest = &wyrmgus::unit_manager::get()->GetSlotUnit(dstnr);
 					Assert(dest && dest->Type);
 				}
 				CommandLog("spell-cast", &unit, status, pos.x, pos.y, dest, nullptr, id);

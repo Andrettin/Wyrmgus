@@ -449,7 +449,7 @@ void CUnit::Init()
 	RallyPointMapLayer = nullptr;
 	//Wyrmgus end
 	Offset = 0;
-	Type = nullptr;
+	this->Type = nullptr;
 	Player = nullptr;
 	Stats = nullptr;
 	//Wyrmgus start
@@ -531,17 +531,18 @@ void CUnit::Init()
 **
 **  The unit is only released, if all references are dropped.
 */
-void CUnit::Release(bool final)
+void CUnit::Release(const bool final)
 {
-	if (Type == nullptr) {
-		DebugPrint("unit already free\n");
-		return;
+	if (this->Type == nullptr) {
+		throw std::runtime_error("Unit already free.");
 	}
+
 	//Wyrmgus start
 	if (Orders.size() != 1) {
 		fprintf(stderr, "Unit to be released has more than 1 order; Unit Type: \"%s\", Orders: %d, First Order Type: %d.\n", this->Type->Ident.c_str(), (int)Orders.size(), this->CurrentAction());
 	}
 	//Wyrmgus end
+
 	Assert(Orders.size() == 1);
 	// Must be removed before here
 	Assert(Removed);
@@ -578,7 +579,7 @@ void CUnit::Release(bool final)
 	// memory.
 	//
 
-	Type = nullptr;
+	this->Type = nullptr;
 	//Wyrmgus start
 	Character = nullptr;
 	this->settlement = nullptr;
@@ -611,7 +612,7 @@ void CUnit::Release(bool final)
 	this->Orders.clear();
 
 	// Remove the unit from the global units table.
-	UnitManager.ReleaseUnit(this);
+	wyrmgus::unit_manager::get()->ReleaseUnit(this);
 }
 
 //Wyrmgus start
@@ -2784,7 +2785,7 @@ void CUnit::Init(const wyrmgus::unit_type &type)
 	Refs = 1;
 
 	//  Build all unit table
-	UnitManager.Add(this);
+	wyrmgus::unit_manager::get()->Add(this);
 
 	//  Initialise unit structure (must be zero filled!)
 	Type = &type;
@@ -3031,7 +3032,7 @@ const wyrmgus::civilization *CUnit::get_civilization() const
 */
 CUnit *MakeUnit(const wyrmgus::unit_type &type, CPlayer *player)
 {
-	CUnit *unit = UnitManager.AllocUnit();
+	CUnit *unit = wyrmgus::unit_manager::get()->AllocUnit();
 	if (unit == nullptr) {
 		return nullptr;
 	}
@@ -3876,7 +3877,7 @@ CUnit *CreateResourceUnit(const Vec2i &pos, const wyrmgus::unit_type &type, int 
 	unit->GenerateSpecialProperties(nullptr, nullptr, allow_unique);
 			
 	// create metal rocks near metal resources
-	wyrmgus::unit_type *metal_rock_type = nullptr;
+	const wyrmgus::unit_type *metal_rock_type = nullptr;
 	if (type.get_identifier() == "unit_gold_deposit") {
 		metal_rock_type = wyrmgus::unit_type::get("unit_gold_rock");
 	} else if (type.get_identifier() == "unit_silver_deposit") {
@@ -3889,7 +3890,7 @@ CUnit *CreateResourceUnit(const Vec2i &pos, const wyrmgus::unit_type &type, int 
 		metal_rock_type = wyrmgus::unit_type::get("unit_emerald_rock");
 	}
 	if (metal_rock_type) {
-		Vec2i metal_rock_offset((type.get_tile_size() - QSize(1, 1)) / 2);
+		const Vec2i metal_rock_offset((type.get_tile_size() - QSize(1, 1)) / 2);
 		for (int i = 0; i < 9; ++i) {
 			CreateUnit(unit->tilePos + metal_rock_offset, *metal_rock_type, CPlayer::Players[PlayerNumNeutral], z);
 		}
@@ -5348,15 +5349,14 @@ CUnit *UnitOnScreen(int x, int y)
 	CUnit *candidate = nullptr;
 	bool is_candidate_selected = false;
 
-	for (CUnitManager::Iterator it = UnitManager.begin(); it != UnitManager.end(); ++it) {
-		CUnit &unit = **it;
-		if (unit.MapLayer != UI.CurrentMapLayer) {
+	for (CUnit *unit : wyrmgus::unit_manager::get()->get_units()) {
+		if (unit->MapLayer != UI.CurrentMapLayer) {
 			continue;
 		}
-		if (!ReplayRevealMap && !unit.IsVisibleAsGoal(*CPlayer::GetThisPlayer())) {
+		if (!ReplayRevealMap && !unit->IsVisibleAsGoal(*CPlayer::GetThisPlayer())) {
 			continue;
 		}
-		const wyrmgus::unit_type &type = *unit.Type;
+		const wyrmgus::unit_type &type = *unit->Type;
 		if (!type.Sprite) {
 			continue;
 		}
@@ -5364,14 +5364,14 @@ CUnit *UnitOnScreen(int x, int y)
 		//
 		// Check if mouse is over the unit.
 		//
-		PixelPos unitSpritePos = unit.get_scaled_map_pixel_pos_center();
+		PixelPos unitSpritePos = unit->get_scaled_map_pixel_pos_center();
 		const int scale_factor = wyrmgus::defines::get()->get_scale_factor();
 		//Wyrmgus start
 //		unitSpritePos.x = unitSpritePos.x - type.BoxWidth / 2 -
 //						  (type.Width - type.Sprite->Width) / 2 + type.BoxOffsetX;
 //		unitSpritePos.y = unitSpritePos.y - type.BoxHeight / 2 -
 //						  (type.Height - type.Sprite->Height) / 2 + type.BoxOffsetY;
-		const wyrmgus::unit_type_variation *variation = unit.GetVariation();
+		const wyrmgus::unit_type_variation *variation = unit->GetVariation();
 		if (variation && variation->FrameWidth && variation->FrameHeight && !variation->get_image_file().empty()) {
 			unitSpritePos.x = unitSpritePos.x - type.get_box_width() * scale_factor / 2 -
 							  (variation->FrameWidth * scale_factor - variation->Sprite->Width) / 2 + type.BoxOffsetX * scale_factor;
@@ -5386,37 +5386,37 @@ CUnit *UnitOnScreen(int x, int y)
 		//Wyrmgus end
 		if (x >= unitSpritePos.x && x < (unitSpritePos.x + type.get_box_width() * scale_factor)
 			&& y >= unitSpritePos.y  && y < (unitSpritePos.y + type.get_box_height() * scale_factor)) {
-			if (unit.Type->BoolFlag[ISNOTSELECTABLE_INDEX].value) {
+			if (unit->Type->BoolFlag[ISNOTSELECTABLE_INDEX].value) {
 				continue;
 			}
 
-			if (!unit.IsAlive()) {
+			if (!unit->IsAlive()) {
 				//don't selected a dead unit
 				continue;
 			}
 
 			if (candidate != nullptr && !is_candidate_selected) {
-				if (unit.Player->Type == PlayerNeutral && candidate->Player->Type != PlayerNeutral) {
+				if (unit->Player->Type == PlayerNeutral && candidate->Player->Type != PlayerNeutral) {
 					//prefer selecting a non-neutral unit over a neutral one
 					continue;
 				}
 
-				if (unit.Type->BoolFlag[ITEM_INDEX].value && !candidate->Type->BoolFlag[ITEM_INDEX].value) {
+				if (unit->Type->BoolFlag[ITEM_INDEX].value && !candidate->Type->BoolFlag[ITEM_INDEX].value) {
 					//prefer selecting a non-item unit over an item one
 					continue;
 				}
 
-				if ((unit.Player->Type == PlayerNeutral) == (candidate->Player->Type == PlayerNeutral) && (unit.Type->BoolFlag[ITEM_INDEX].value == candidate->Type->BoolFlag[ITEM_INDEX].value)) {
+				if ((unit->Player->Type == PlayerNeutral) == (candidate->Player->Type == PlayerNeutral) && (unit->Type->BoolFlag[ITEM_INDEX].value == candidate->Type->BoolFlag[ITEM_INDEX].value)) {
 					continue; //no difference
 				}
 			}
 
-			if (candidate != nullptr && IsOnlySelected(unit)) {
+			if (candidate != nullptr && IsOnlySelected(*unit)) {
 				//don't pick the unit if it is already selected
 				continue;
 			}
 
-			candidate = &unit;
+			candidate = unit;
 			is_candidate_selected = IsOnlySelected(*candidate);
 
 			if (is_candidate_selected || candidate->Player->Type == PlayerNeutral || candidate->Type->BoolFlag[ITEM_INDEX].value) {
@@ -8099,7 +8099,7 @@ bool CUnit::IsAttackRanged(CUnit *goal, const Vec2i &goalPos, int z)
 void InitUnits()
 {
 	if (!SaveGameLoading) {
-		UnitManager.Init();
+		wyrmgus::unit_manager::get()->Init();
 	}
 }
 
@@ -8109,39 +8109,27 @@ void InitUnits()
 void CleanUnits()
 {
 	//  Free memory for all units in unit table.
-	std::vector<CUnit *> units(UnitManager.begin(), UnitManager.end());
+	const std::vector<CUnit *> units = wyrmgus::unit_manager::get()->get_units();
 
-	for (std::vector<CUnit *>::iterator it = units.begin(); it != units.end(); ++it) {
-		//Wyrmgus start
-		if (*it == nullptr) {
-			fprintf(stderr, "Error in CleanUnits: unit is null.\n");
-			continue;
+	for (CUnit *unit : units) {
+		if (unit == nullptr) {
+			throw std::runtime_error("Error in CleanUnits: unit is null.");
 		}
-		//Wyrmgus end
-		CUnit &unit = **it;
 
-		//Wyrmgus start
-		/*
-		if (&unit == nullptr) {
-			continue;
+		if (unit->Type == nullptr) {
+			throw std::runtime_error("Unit \"" + std::to_string(UnitNumber(*unit)) + "\"'s type is null.");
 		}
-		*/
-		//Wyrmgus end
-		//Wyrmgus start
-		if (unit.Type == nullptr) {
-			fprintf(stderr, "Unit \"%d\"'s type is null.\n", UnitNumber(unit));
-		}
-		//Wyrmgus end
-		if (!unit.Destroyed) {
-			if (!unit.Removed) {
-				unit.Remove(nullptr);
+
+		if (!unit->Destroyed) {
+			if (!unit->Removed) {
+				unit->Remove(nullptr);
 			}
-			UnitClearOrders(unit);
+			UnitClearOrders(*unit);
 		}
-		unit.Release(true);
+		unit->Release(true);
 	}
 
-	UnitManager.Init();
+	wyrmgus::unit_manager::get()->Init();
 
 	HelpMeLastCycle = 0;
 }

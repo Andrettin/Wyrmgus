@@ -1256,7 +1256,7 @@ static void AiMoveUnitInTheWay(CUnit &unit)
 	//Wyrmgus start
 	std::vector<CUnit *> table;
 	SelectAroundUnit(unit, 1, table);
-//	for (CUnitManager::Iterator it = UnitManager.begin(); it != UnitManager.end(); ++it) {
+//	for (auto it = wyrmgus::unit_manager::get()->get_units().begin(); it != wyrmgus::unit_manager::get()->get_units().end(); ++it) {
 	for (size_t i = 0; i != table.size(); ++i) {
 	//Wyrmgus end
 		//Wyrmgus start

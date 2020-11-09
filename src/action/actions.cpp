@@ -706,10 +706,11 @@ static void UnitActionsEachMinute(UNITP_ITERATOR begin, UNITP_ITERATOR end)
 void UnitActions()
 {
 	const bool isASecondCycle = !(GameCycle % CYCLES_PER_SECOND);
-	// Unit list may be modified during loop... so make a copy
-	std::vector<CUnit *> table(UnitManager.begin(), UnitManager.end());
 
-	// Check for things that only happen every second
+	//unit list may be modified during loop... so make a copy
+	std::vector<CUnit *> table = wyrmgus::unit_manager::get()->get_units();
+
+	//check for things that only happen every second
 	if (isASecondCycle) {
 		UnitActionsEachSecond(table.begin(), table.end());
 	}

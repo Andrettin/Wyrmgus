@@ -62,9 +62,8 @@ bool unique_item::can_drop() const
 	}
 	
 	if (GameRunning) {
-		for (CUnitManager::Iterator it = UnitManager.begin(); it != UnitManager.end(); ++it) {
-			CUnit &unit = **it;
-			if (unit.get_unique() == this && !unit.Bound) {
+		for (const CUnit *unit : unit_manager::get()->get_units()) {
+			if (unit->get_unique() == this && !unit->Bound) {
 				return false;
 			}
 		}

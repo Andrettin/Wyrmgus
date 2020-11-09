@@ -359,7 +359,7 @@ const CUnit *button::get_unit() const
 	switch (this->Action) {
 		case ButtonCmd::Buy:
 		case ButtonCmd::Unit:
-			return &UnitManager.GetSlotUnit(this->Value);
+			return &wyrmgus::unit_manager::get()->GetSlotUnit(this->Value);
 		default:
 			if (!Selected.empty()) {
 				return Selected[0];
@@ -468,8 +468,8 @@ void button::SetTriggerData() const
 			break;
 		case ButtonCmd::Unit:
 		case ButtonCmd::Buy:
-			TriggerData.Type = UnitManager.GetSlotUnit(this->Value).Type;
-			TriggerData.Unit = &UnitManager.GetSlotUnit(this->Value);
+			TriggerData.Type = wyrmgus::unit_manager::get()->GetSlotUnit(this->Value).Type;
+			TriggerData.Unit = &wyrmgus::unit_manager::get()->GetSlotUnit(this->Value);
 			break;
 		case ButtonCmd::Faction:
 			TriggerData.faction = CPlayer::GetThisPlayer()->get_faction()->DevelopsTo[this->Value];

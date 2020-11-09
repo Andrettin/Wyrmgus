@@ -618,15 +618,15 @@ int AddGroupFromUnitToSelection(const CUnit &group_unit)
 	}
 	//Wyrmgus end
 
-	for (CUnitManager::Iterator it = UnitManager.begin(); it != UnitManager.end(); ++it) {
-		CUnit &unit = **it;
-		if (unit.LastGroup == group && !unit.Removed) {
-			SelectUnit(unit);
+	for (CUnit *unit : wyrmgus::unit_manager::get()->get_units()) {
+		if (unit->LastGroup == group && !unit->Removed) {
+			SelectUnit(*unit);
 			if (Selected.size() == MaxSelectable) {
 				return Selected.size();
 			}
 		}
 	}
+
 	return Selected.size();
 }
 
@@ -1260,7 +1260,7 @@ static int CclSelection(lua_State *l)
 	const int args = lua_rawlen(l, 2);
 	for (int j = 0; j < args; ++j) {
 		const char *str = LuaToString(l, 2, j + 1);
-		Selected.push_back(&UnitManager.GetSlotUnit(strtol(str + 1, nullptr, 16)));
+		Selected.push_back(&wyrmgus::unit_manager::get()->GetSlotUnit(strtol(str + 1, nullptr, 16)));
 	}
 	return 0;
 }

@@ -193,20 +193,19 @@ void LoadModules()
 
 static void PlaceUnits()
 {
-	for (CUnitManager::Iterator it = UnitManager.begin(); it != UnitManager.end(); ++it) {
-		CUnit &unit = **it;
-		if (!unit.Removed) {
-			unit.Removed = 1;
-			unit.Place(unit.tilePos, unit.MapLayer->ID);
+	for (CUnit *unit : wyrmgus::unit_manager::get()->get_units()) {
+		if (!unit->Removed) {
+			unit->Removed = 1;
+			unit->Place(unit->tilePos, unit->MapLayer->ID);
 		}
 		
 		//Wyrmgus start
 		//calculate attack range for containers now, as when loading a game it couldn't be done when the container was initially loaded
-		if (unit.BoardCount > 0 && unit.InsideCount > 0) {
-			unit.UpdateContainerAttackRange();
+		if (unit->BoardCount > 0 && unit->InsideCount > 0) {
+			unit->UpdateContainerAttackRange();
 		}
 		
-		unit.UpdateXPRequired();
+		unit->UpdateXPRequired();
 		//Wyrmgus end
 	}
 }

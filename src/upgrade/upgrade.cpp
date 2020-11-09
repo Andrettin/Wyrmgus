@@ -877,7 +877,7 @@ static int CclAcquireAbility(lua_State *l)
 	}
 	
 	lua_pushvalue(l, 1);
-	CUnit *unit = &UnitManager.GetSlotUnit(LuaToNumber(l, -1));
+	CUnit *unit = &wyrmgus::unit_manager::get()->GetSlotUnit(LuaToNumber(l, -1));
 	lua_pop(l, 1);
 	const char *ident = LuaToString(l, 2);
 	AbilityAcquire(*unit, CUpgrade::get(ident));
@@ -896,7 +896,7 @@ static int CclAcquireTrait(lua_State *l)
 	}
 	
 	lua_pushvalue(l, 1);
-	CUnit *unit = &UnitManager.GetSlotUnit(LuaToNumber(l, -1));
+	CUnit *unit = &wyrmgus::unit_manager::get()->GetSlotUnit(LuaToNumber(l, -1));
 	lua_pop(l, 1);
 	const std::string ident = LuaToString(l, 2);
 	if (!ident.empty()) {
