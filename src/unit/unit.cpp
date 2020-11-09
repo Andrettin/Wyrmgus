@@ -7883,11 +7883,6 @@ bool CanPickUp(const CUnit &picker, const CUnit &unit)
 }
 //Wyrmgus end
 
-/**
-**  Check if the player is an enemy
-**
-**  @param player  Player to check
-*/
 bool CUnit::IsEnemy(const CPlayer &player) const
 {
 	//Wyrmgus start
@@ -7899,72 +7894,66 @@ bool CUnit::IsEnemy(const CPlayer &player) const
 	return this->Player->IsEnemy(player);
 }
 
-/**
-**  Check if the unit is an enemy
-**
-**  @param unit  Unit to check
-*/
 bool CUnit::IsEnemy(const CUnit &unit) const
 {
-	if (
-		this->Player->Type == PlayerNeutral
-		&& this->Type->BoolFlag[NEUTRAL_HOSTILE_INDEX].value
-		&& unit.Player->Type != PlayerNeutral
-		) {
-		return true;
-	}
+	switch (this->Player->Type) {
+		case PlayerNeutral:
+			if (this->Type->BoolFlag[NEUTRAL_HOSTILE_INDEX].value && unit.Player->Type != PlayerNeutral) {
+				return true;
+			}
 
-	if (
-		this->Player->Type == PlayerNeutral
-		&& this->Type->BoolFlag[FAUNA_INDEX].value
-		&& this->Type->BoolFlag[ORGANIC_INDEX].value
-		&& unit.Type->BoolFlag[ORGANIC_INDEX].value
-		&& this->Type->Slot != unit.Type->Slot
-	) {
-		if (
-			this->Type->BoolFlag[PREDATOR_INDEX].value
-			&& !unit.Type->BoolFlag[PREDATOR_INDEX].value
-			&& this->CanEat(unit)
-		) {
-			return true;
-		} else if (
-			this->Type->BoolFlag[PEOPLEAVERSION_INDEX].value
-			&& !unit.Type->BoolFlag[FAUNA_INDEX].value
-			&& unit.Player->Type != PlayerNeutral
-			&& this->MapDistanceTo(unit) <= 1
-		) {
-			return true;
-		}
+			if (
+				this->Type->BoolFlag[FAUNA_INDEX].value
+				&& this->Type->BoolFlag[ORGANIC_INDEX].value
+				&& unit.Type->BoolFlag[ORGANIC_INDEX].value
+				&& this->Type->Slot != unit.Type->Slot
+				&& (!unit.Type->BoolFlag[NEUTRAL_HOSTILE_INDEX].value || unit.Player->Type != PlayerNeutral)
+			) {
+				if (
+					this->Type->BoolFlag[PREDATOR_INDEX].value
+					&& !unit.Type->BoolFlag[PREDATOR_INDEX].value
+					&& this->CanEat(unit)
+				) {
+					return true;
+				} else if (
+					this->Type->BoolFlag[PEOPLEAVERSION_INDEX].value
+					&& !unit.Type->BoolFlag[FAUNA_INDEX].value
+					&& unit.Player->Type != PlayerNeutral
+					&& this->MapDistanceTo(unit) <= 1
+				) {
+					return true;
+				}
+			}
+			break;
+		default:
+			if (this->Player != unit.Player) {
+				if (
+					unit.Player->Type == PlayerNeutral
+					&& (unit.Type->BoolFlag[NEUTRAL_HOSTILE_INDEX].value || unit.Type->BoolFlag[PREDATOR_INDEX].value)
+				) {
+					return true;
+				}
+
+				if (
+					unit.CurrentAction() == UnitAction::Attack
+					&& unit.CurrentOrder()->HasGoal()
+					&& unit.CurrentOrder()->GetGoal()->Player == this->Player
+					&& !unit.CurrentOrder()->GetGoal()->Type->BoolFlag[HIDDENOWNERSHIP_INDEX].value
+				) {
+					return true;
+				}
+
+				if (
+					unit.Player->Type != PlayerNeutral && !this->Player->HasBuildingAccess(*unit.Player) && !this->Player->HasNeutralFactionType()
+					&& ((this->Type->BoolFlag[HIDDENOWNERSHIP_INDEX].value && this->IsAgressive()) || (unit.Type->BoolFlag[HIDDENOWNERSHIP_INDEX].value && unit.IsAgressive()))
+				) {
+					return true;
+				}
+			}
+			break;
 	}
 		
-	if (
-		unit.Player->Type == PlayerNeutral
-		&& (unit.Type->BoolFlag[NEUTRAL_HOSTILE_INDEX].value || unit.Type->BoolFlag[PREDATOR_INDEX].value)
-		&& this->Player->Type != PlayerNeutral
-	) {
-		return true;
-	}
-	
-	if (
-		this->Player != unit.Player
-		&& this->Player->Type != PlayerNeutral
-		&& unit.CurrentAction() == UnitAction::Attack
-		&& unit.CurrentOrder()->HasGoal()
-		&& unit.CurrentOrder()->GetGoal()->Player == this->Player
-		&& !unit.CurrentOrder()->GetGoal()->Type->BoolFlag[HIDDENOWNERSHIP_INDEX].value
-	) {
-		return true;
-	}
-	
-	if (
-		this->Player != unit.Player && this->Player->Type != PlayerNeutral && unit.Player->Type != PlayerNeutral && !this->Player->HasBuildingAccess(*unit.Player) && !this->Player->HasNeutralFactionType()
-		&& ((this->Type->BoolFlag[HIDDENOWNERSHIP_INDEX].value && this->IsAgressive()) || (unit.Type->BoolFlag[HIDDENOWNERSHIP_INDEX].value && unit.IsAgressive()))
-	) {
-		return true;
-	}
-
 	return IsEnemy(*unit.Player);
-	//Wyrmgus end
 }
 
 /**
