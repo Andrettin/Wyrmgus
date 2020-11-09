@@ -33,7 +33,7 @@
 
 namespace wyrmgus {
 
-struct point_compare
+struct point_compare final
 {
 	bool operator()(const QPoint &point, const QPoint &other_point) const;
 };

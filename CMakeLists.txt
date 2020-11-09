@@ -865,11 +865,13 @@ set(stratagus_util_HDRS
 	src/util/map_util.h
 	src/util/number_util.h
 	src/util/point_container.h
+	src/util/point_operators.h
 	src/util/point_util.h
 	src/util/queue_util.h
 	src/util/qunique_ptr.h
 	src/util/random.h
 	src/util/singleton.h
+	src/util/size_operators.h
 	src/util/size_util.h
 	src/util/string_util.h
 	src/util/type_traits.h
