@@ -61,6 +61,8 @@ public:
 
 private:
 	void set_unit(CUnit *unit);
+
+	CUnit *unit = nullptr;
 };
 
 }
