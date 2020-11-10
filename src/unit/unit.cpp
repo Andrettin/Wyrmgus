@@ -470,16 +470,16 @@ void CUnit::Init()
 	Character = nullptr;
 	this->settlement = nullptr;
 	this->site = nullptr;
-	Trait = nullptr;
-	Prefix = nullptr;
-	Suffix = nullptr;
-	Spell = nullptr;
-	Work = nullptr;
-	Elixir = nullptr;
+	this->Trait = nullptr;
+	this->Prefix = nullptr;
+	this->Suffix = nullptr;
+	this->Spell = nullptr;
+	this->Work = nullptr;
+	this->Elixir = nullptr;
 	this->unique = nullptr;
-	Bound = false;
-	Identified = true;
-	ConnectingDestination = nullptr;
+	this->Bound = false;
+	this->Identified = true;
+	this->ConnectingDestination = nullptr;
 	//Wyrmgus end
 	CurrentSightRange = 0;
 
@@ -609,16 +609,8 @@ void CUnit::Release(const bool final)
 		this->site->set_site_unit(nullptr);
 	}
 	this->site = nullptr;
-	Trait = nullptr;
-	Prefix = nullptr;
-	Suffix = nullptr;
-	Spell = nullptr;
-	Work = nullptr;
-	Elixir = nullptr;
 	this->unique = nullptr;
-	Bound = false;
-	Identified = true;
-	ConnectingDestination = nullptr;
+	this->ConnectingDestination = nullptr;
 	
 	for (int i = 0; i < static_cast<int>(wyrmgus::item_slot::count); ++i) {
 		this->EquippedItems[i].clear();
