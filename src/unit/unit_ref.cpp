@@ -40,7 +40,7 @@ void unit_ref::set_unit(CUnit *unit)
 	}
 
 	if (this->unit != nullptr) {
-		unit->RefsDecrease();
+		this->unit->RefsDecrease();
 	}
 
 	this->unit = unit;
