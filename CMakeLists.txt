@@ -1618,9 +1618,7 @@ if(stratagus_LIBS_DEBUG)
 	target_link_libraries(stratagus ${stratagus_LIBS_DEBUG})
 endif()
 
-if(CMAKE_BUILD_TYPE STREQUAL "Debug")
-	set_target_properties(stratagus PROPERTIES OUTPUT_NAME stratagus-dbg)
-endif()
+set_target_properties(stratagus PROPERTIES OUTPUT_NAME wyrmsun)
 
 if(WIN32 AND MINGW AND ENABLE_STATIC)
 	set_target_properties(stratagus PROPERTIES LINK_FLAGS "${LINK_FLAGS} -static-libgcc -static-libstdc++ -Wl,--stack,10485760")
