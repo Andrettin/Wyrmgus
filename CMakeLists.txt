@@ -437,10 +437,10 @@ set(unit_SRCS
 	src/unit/unit_draw.cpp
 	src/unit/unit_find.cpp
 	src/unit/unit_manager.cpp
+	src/unit/unit_ref.cpp
 	src/unit/unit_save.cpp
 	src/unit/unit_type_container.cpp
 	src/unit/unit_type_variation.cpp
-	src/unit/unitptr.cpp
 	src/unit/unit_type.cpp
 )
 source_group(unit FILES ${unit_SRCS})
@@ -834,8 +834,8 @@ set(stratagus_unit_HDRS
 	src/unit/unit_class_container.h
 	src/unit/unit_find.h
 	src/unit/unit_manager.h
+	src/unit/unit_ref.h
 	src/unit/unit_type_variation.h
-	src/unit/unitptr.h
 	src/unit/unit_type.h
 	src/unit/unit_type_container.h
 	src/unit/unit_type_type.h
