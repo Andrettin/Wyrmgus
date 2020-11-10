@@ -78,23 +78,18 @@
 
 unsigned SyncHash; /// Hash calculated to find sync failures
 
-/*----------------------------------------------------------------------------
---  Functions
-----------------------------------------------------------------------------*/
-
 COrder::~COrder()
 {
-	Goal.Reset();
 }
 
 void COrder::SetGoal(CUnit *const new_goal)
 {
-	Goal = new_goal;
+	this->Goal = new_goal;
 }
 
 void COrder::ClearGoal()
 {
-	Goal.Reset();
+	this->Goal.reset();
 }
 
 void COrder::UpdatePathFinderData_NotCalled(PathFinderInput &input)

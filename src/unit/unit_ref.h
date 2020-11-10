@@ -37,16 +37,29 @@ namespace wyrmgus {
 class unit_ref final
 {
 public:
-	unit_ref() {}
-	unit_ref(CUnit *u);
-	unit_ref(const unit_ref &u);
+	unit_ref()
+	{
+	}
+
+	unit_ref(CUnit *u)
+	{
+		this->set_unit(u);
+	}
+
+	unit_ref(const unit_ref &u)
+	{
+		this->set_unit(u.unit);
+	}
 
 	~unit_ref()
 	{
-		this->Reset();
+		this->reset();
 	}
 
-	void Reset();
+	void reset()
+	{
+		this->set_unit(nullptr);
+	}
 
 	operator CUnit *() { return unit; }
 	operator CUnit *() const { return unit; }
@@ -54,7 +67,11 @@ public:
 	CUnit &operator*() { return *unit; }
 	CUnit *operator->() const { return unit; }
 
-	unit_ref &operator= (CUnit *u);
+	unit_ref &operator= (CUnit *u)
+	{
+		this->set_unit(u);
+		return *this;
+	}
 
 	bool operator== (CUnit *u) const { return this->unit == u; }
 	bool operator!= (CUnit *u) const { return this->unit != u; }

@@ -33,41 +33,21 @@
 
 namespace wyrmgus {
 
-unit_ref::unit_ref(CUnit *u) : unit(u)
+void unit_ref::set_unit(CUnit *unit)
 {
-	if (this->unit != nullptr) {
-		this->unit->RefsIncrease();
+	if (unit == this->unit) {
+		return;
 	}
-}
 
-unit_ref::unit_ref(const unit_ref &u) : unit(u.unit)
-{
-	if (this->unit != nullptr) {
-		unit->RefsIncrease();
-	}
-}
-
-void unit_ref::Reset()
-{
 	if (this->unit != nullptr) {
 		unit->RefsDecrease();
 	}
 
-	this->unit = nullptr;
-}
+	this->unit = unit;
 
-unit_ref &unit_ref::operator= (CUnit *u)
-{
-	if (this->unit != u) {
-		if (u) {
-			u->RefsIncrease();
-		}
-		if (this->unit != nullptr) {
-			this->unit->RefsDecrease();
-		}
-		unit = u;
+	if (unit != nullptr) {
+		unit->RefsIncrease();
 	}
-	return *this;
 }
 
 }

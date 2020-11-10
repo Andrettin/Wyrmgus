@@ -43,13 +43,13 @@ enum SpawnMissile_Flags {
 	SM_SetDirection = 32   /// Missile takes the same direction as spawner
 };
 
-class CAnimation_SpawnMissile : public CAnimation
+class CAnimation_SpawnMissile final : public CAnimation
 {
 public:
 	CAnimation_SpawnMissile() : CAnimation(AnimationSpawnMissile) {}
 
-	virtual void Action(CUnit &unit, int &move, int scale) const;
-	virtual void Init(const char *s, lua_State *l);
+	virtual void Action(CUnit &unit, int &move, int scale) const override;
+	virtual void Init(const char *s, lua_State *l) override;
 
 private:
 	std::string missileTypeStr;
