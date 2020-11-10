@@ -78,10 +78,6 @@
 
 unsigned SyncHash; /// Hash calculated to find sync failures
 
-COrder::~COrder()
-{
-}
-
 void COrder::SetGoal(CUnit *const new_goal)
 {
 	this->Goal = new_goal;

@@ -96,10 +96,13 @@ namespace wyrmgus {
 class COrder
 {
 public:
-	explicit COrder(const UnitAction action) : Goal(), Action(action), Finished(false)
+	explicit COrder(const UnitAction action) : Action(action)
 	{
 	}
-	virtual ~COrder();
+
+	virtual ~COrder()
+	{
+	}
 
 	virtual std::unique_ptr<COrder> Clone() const = 0;
 	virtual void Execute(CUnit &unit) = 0;
@@ -190,7 +193,7 @@ private:
 	wyrmgus::unit_ref Goal;
 public:
 	const UnitAction Action;   /// global action
-	bool Finished; /// true when order is finished
+	bool Finished = false; /// true when order is finished
 };
 
 extern unsigned SyncHash;  /// Hash calculated to find sync failures

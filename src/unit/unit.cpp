@@ -89,10 +89,11 @@
 #include "unit/unit_type_variation.h"
 #include "upgrade/upgrade.h"
 #include "upgrade/upgrade_modifier.h"
+#include "util/exception_util.h"
+#include "util/size_util.h"
 //Wyrmgus start
 #include "util/util.h"
 //Wyrmgus end
-#include "util/size_util.h"
 #include "util/vector_random_util.h"
 #include "util/vector_util.h"
 #include "video/video.h"
@@ -385,9 +386,16 @@ extern int ExtraDeathIndex(const char *death);
 */
 void CUnit::RefsIncrease()
 {
-	Assert(Refs && !Destroyed);
+	if (this->Refs == 0) {
+		throw std::runtime_error("Unit is having its reference count incremented, despite it being at 0.");
+	}
+
+	if (this->Destroyed) {
+		throw std::runtime_error("Unit is having its reference count incremented, despite the unit having been destroyed.");
+	}
+
 	if (!SaveGameLoading) {
-		++Refs;
+		++this->Refs;
 	}
 }
 
@@ -396,15 +404,21 @@ void CUnit::RefsIncrease()
 */
 void CUnit::RefsDecrease()
 {
-	Assert(Refs);
+	if (this->Refs == 0) {
+		throw std::runtime_error("Unit is having its reference count decremented, despite it already being at 0.");
+	}
+
 	if (!SaveGameLoading) {
-		if (Destroyed) {
-			if (!--Refs) {
-				Release();
+		if (this->Destroyed) {
+			if (!--this->Refs) {
+				this->Release();
 			}
 		} else {
-			--Refs;
-			Assert(Refs);
+			--this->Refs;
+
+			if (this->Refs == 0) {
+				throw std::runtime_error("CUnit::RefsDecrease caused the unit's reference count to reach 0, despite it not being destroyed.");
+			}
 		}
 	}
 }
@@ -566,12 +580,20 @@ void CUnit::Release(const bool final)
 			Resource.Workers->DeAssignWorkerFromMine(*this);
 		}
 
-		if (--Refs > 0) {
+		if (this->Refs == 0) {
+			throw std::runtime_error("Unit is having its reference count decremented for release, despite it already being at 0.");
+		}
+
+		--this->Refs;
+
+		if (this->Refs > 0) {
 			return;
 		}
 	}
 
-	Assert(!Refs);
+	if (this->Refs != 0) {
+		throw std::runtime_error("Unit being released despite there still being references to it.");
+	}
 
 	//
 	// No more references remaining, but the network could have an order
@@ -581,7 +603,7 @@ void CUnit::Release(const bool final)
 
 	this->Type = nullptr;
 	//Wyrmgus start
-	Character = nullptr;
+	this->Character = nullptr;
 	this->settlement = nullptr;
 	if (this->site != nullptr && this->site->get_site_unit() == this) {
 		this->site->set_site_unit(nullptr);
@@ -2782,7 +2804,7 @@ int CUnit::GetDrawLevel() const
 void CUnit::Init(const wyrmgus::unit_type &type)
 {
 	//  Set refs to 1. This is the "I am alive ref", lost in ReleaseUnit.
-	Refs = 1;
+	this->Refs = 1;
 
 	//  Build all unit table
 	wyrmgus::unit_manager::get()->Add(this);
@@ -8092,6 +8114,25 @@ void InitUnits()
 	}
 }
 
+static void clean_unit(CUnit *unit)
+{
+	if (unit == nullptr) {
+		throw std::runtime_error("Error cleaning unit: unit is null.");
+	}
+
+	if (unit->Type == nullptr) {
+		throw std::runtime_error("Unit \"" + std::to_string(UnitNumber(*unit)) + "\"'s type is null.");
+	}
+
+	if (!unit->Destroyed) {
+		if (!unit->Removed) {
+			unit->Remove(nullptr);
+		}
+		UnitClearOrders(*unit);
+	}
+	unit->Release(true);
+}
+
 /**
 **  Clean up unit module.
 */
@@ -8101,21 +8142,11 @@ void CleanUnits()
 	const std::vector<CUnit *> units = wyrmgus::unit_manager::get()->get_units();
 
 	for (CUnit *unit : units) {
-		if (unit == nullptr) {
-			throw std::runtime_error("Error in CleanUnits: unit is null.");
+		try {
+			clean_unit(unit);
+		} catch (const std::exception &exception) {
+			wyrmgus::exception::report(exception);
 		}
-
-		if (unit->Type == nullptr) {
-			throw std::runtime_error("Unit \"" + std::to_string(UnitNumber(*unit)) + "\"'s type is null.");
-		}
-
-		if (!unit->Destroyed) {
-			if (!unit->Removed) {
-				unit->Remove(nullptr);
-			}
-			UnitClearOrders(*unit);
-		}
-		unit->Release(true);
 	}
 
 	wyrmgus::unit_manager::get()->Init();
