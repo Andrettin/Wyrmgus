@@ -385,15 +385,14 @@ void COrder_Build::HelpBuild(CUnit &unit, CUnit &building)
 		  _C_ UnitNumber(building));
 		  //Wyrmgus end
 
-		// shortcut to replace order, without inserting and removing in front of Orders
-		unit.Orders[0] = COrder::NewActionRepair(building);
+		//insert a repair order right after the current order
+		unit.Orders.insert(unit.Orders.begin() + 1, COrder::NewActionRepair(building));
 		return;
 	}
 //Wyrmgus start
 //#endif
 //Wyrmgus end
 }
-
 
 bool COrder_Build::StartBuilding(CUnit &unit, CUnit &ontop)
 {
@@ -473,6 +472,7 @@ bool COrder_Build::StartBuilding(CUnit &unit, CUnit &ontop)
 		UnitHeadingFromDeltaXY(unit, dir);
 		//Wyrmgus end
 	}
+
 	return true;
 }
 
@@ -562,7 +562,7 @@ void COrder_Build::Execute(CUnit &unit)
 			//Wyrmgus start
 			if (CheckLimit(unit, type, CMap::Map.GetTileLandmass(this->goalPos, this->MapLayer), this->settlement) == false) {
 				this->Finished = true;
-				return ;
+				return;
 			}
 			//Wyrmgus end
 			this->StartBuilding(unit, *ontop);
@@ -574,8 +574,8 @@ void COrder_Build::Execute(CUnit &unit)
 
 			if (building != nullptr) {
 				this->HelpBuild(unit, *building);
-				// HelpBuild replaces this command so return immediately
-				return ;
+				this->Finished = true;
+				return;
 			}
 
 			// failed, retry later
@@ -608,9 +608,8 @@ void COrder_Build::Execute(CUnit &unit)
 //		}
 		if (this->BuildingUnit != nullptr) {
 			this->HelpBuild(unit, *this->BuildingUnit);
-		} else {
-			this->Finished = true;
 		}
+		this->Finished = true;
 		//Wyrmgus end
 	}
 }
