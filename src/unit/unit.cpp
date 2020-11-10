@@ -624,6 +624,9 @@ void CUnit::Release(const bool final)
 	this->SpellCoolDownTimers.reset();
 	this->Variable.clear();
 	this->Orders.clear();
+	this->SavedOrder.reset();
+	this->NewOrder.reset();
+	this->CriticalOrder.reset();
 
 	// Remove the unit from the global units table.
 	wyrmgus::unit_manager::get()->ReleaseUnit(this);
