@@ -280,7 +280,7 @@
 #include "data_type.h"
 #include "missileconfig.h"
 #include "sound/unitsound.h"
-#include "unit/unitptr.h"
+#include "unit/unit_ref.h"
 #include "vec2i.h"
 
 class CGraphic;

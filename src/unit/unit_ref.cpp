@@ -27,7 +27,7 @@
 
 #include "stratagus.h"
 
-#include "unit/unitptr.h"
+#include "unit/unit_ref.h"
 
 #include "unit/unit.h"
 
