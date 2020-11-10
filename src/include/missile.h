@@ -517,8 +517,8 @@ public:
 	int MapLayer;	  /// map layer the missile is in
 	//Wyrmgus end
 
-	CUnitPtr SourceUnit;  /// unit that fires (could be killed)
-	CUnitPtr TargetUnit;  /// target unit, used for spells
+	wyrmgus::unit_ref SourceUnit;  /// unit that fires (could be killed)
+	wyrmgus::unit_ref TargetUnit;  /// target unit, used for spells
 
 	std::vector<CUnit *> PiercedUnits;	/// Units which are already pierced by this missile
 

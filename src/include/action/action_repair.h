@@ -59,12 +59,12 @@ public:
 	virtual PixelPos Show(const CViewport &vp, const PixelPos &lastScreenPos) const override;
 	virtual void UpdatePathFinderData(PathFinderInput &input) override;
 
-	const CUnitPtr &GetReparableTarget() const { return ReparableTarget; }
+	const wyrmgus::unit_ref &GetReparableTarget() const { return ReparableTarget; }
 private:
 	bool RepairUnit(const CUnit &unit, CUnit &goal);
 
 private:
-	CUnitPtr ReparableTarget;
+	wyrmgus::unit_ref ReparableTarget;
 	unsigned int State = 0;
 	unsigned int RepairCycle = 0;
 	Vec2i goalPos;

@@ -87,16 +87,16 @@ private:
 	bool ActionResourceInit(CUnit &unit);
 
 private:
-	CUnitPtr worker; /// unit that own this order.
+	wyrmgus::unit_ref worker; /// unit that own this order.
 	unsigned char CurrentResource = 0;
 	struct {
 		Vec2i Pos = Vec2i(-1, -1);; /// position for terrain resource.
 		//Wyrmgus start
 		int MapLayer = -1;
 		//Wyrmgus end
-		CUnitPtr Mine;
+		wyrmgus::unit_ref Mine;
 	} Resource;
-	CUnitPtr Depot;
+	wyrmgus::unit_ref Depot;
 	int State = 0;
 	int TimeToHarvest = 0;          /// how much time until we harvest some more.
 	bool DoneHarvesting = false;  /// Harvesting done, wait for action to break.

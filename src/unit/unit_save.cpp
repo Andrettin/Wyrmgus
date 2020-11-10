@@ -60,7 +60,7 @@ std::string UnitReference(const CUnit &unit)
 /**
 **  Generate a unit reference, a printable unique string for unit.
 */
-std::string UnitReference(const CUnitPtr &unit)
+std::string UnitReference(const wyrmgus::unit_ref &unit)
 {
 	Assert(unit != nullptr);
 

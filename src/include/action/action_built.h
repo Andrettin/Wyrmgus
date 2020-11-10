@@ -65,7 +65,7 @@ public:
 	void ProgressHp(CUnit &unit, int amount);
 
 	const wyrmgus::construction_frame *get_frame() const { return this->frame; }
-	const CUnitPtr &GetWorker() const { return Worker; }
+	const wyrmgus::unit_ref &GetWorker() const { return Worker; }
 	CUnit *GetWorkerPtr() { return Worker; }
 
 private:
@@ -73,7 +73,7 @@ private:
 	void UpdateConstructionFrame(CUnit &unit);
 
 private:
-	CUnitPtr Worker;                  /// Worker building this unit
+	wyrmgus::unit_ref Worker;                  /// Worker building this unit
 	int ProgressCounter = 0;          /// Progress counter, in 1/100 cycles.
 	bool IsCancelled = false;         /// Cancel construction
 	const wyrmgus::construction_frame *frame = nullptr; /// Construction frame

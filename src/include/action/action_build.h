@@ -80,7 +80,7 @@ private:
 
 private:
 	const wyrmgus::unit_type *Type = nullptr;        /// build a unit of this unit-type
-	CUnitPtr BuildingUnit;  /// unit builded.
+	wyrmgus::unit_ref BuildingUnit;  /// unit builded.
 	int State = 0;
 	int Range = 0;
 	Vec2i goalPos;

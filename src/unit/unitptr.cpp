@@ -8,9 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name unitptr.cpp - The units ptr. */
-//
-//      (c) Copyright 2012 by Joris Dauphin
+//      (c) Copyright 2012-2020 by Joris Dauphin and Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -33,38 +31,43 @@
 
 #include "unit/unit.h"
 
-CUnitPtr::CUnitPtr(CUnit *u) : unit(u)
+namespace wyrmgus {
+
+unit_ref::unit_ref(CUnit *u) : unit(u)
 {
-	if (unit) {
+	if (this->unit != nullptr) {
+		this->unit->RefsIncrease();
+	}
+}
+
+unit_ref::unit_ref(const unit_ref &u) : unit(u.unit)
+{
+	if (this->unit != nullptr) {
 		unit->RefsIncrease();
 	}
 }
 
-CUnitPtr::CUnitPtr(const CUnitPtr &u) : unit(u.unit)
+void unit_ref::Reset()
 {
-	if (unit) {
-		unit->RefsIncrease();
-	}
-}
-
-void CUnitPtr::Reset()
-{
-	if (unit) {
+	if (this->unit != nullptr) {
 		unit->RefsDecrease();
 	}
-	unit = nullptr;
+
+	this->unit = nullptr;
 }
 
-CUnitPtr &CUnitPtr::operator= (CUnit *u)
+unit_ref &unit_ref::operator= (CUnit *u)
 {
 	if (this->unit != u) {
 		if (u) {
 			u->RefsIncrease();
 		}
-		if (unit) {
-			unit->RefsDecrease();
+		if (this->unit != nullptr) {
+			this->unit->RefsDecrease();
 		}
 		unit = u;
 	}
 	return *this;
+}
+
 }

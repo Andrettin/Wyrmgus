@@ -8,9 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name unitptr.h - The unitptr headerfile. */
-//
-//      (c) Copyright 2012 by Joris Dauphin
+//      (c) Copyright 2012-2020 by Joris Dauphin and Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -31,16 +29,22 @@
 
 class CUnit;
 
+namespace wyrmgus {
+
 /**
 **  Class to ease the ref counting of each CUnit instance.
 */
-class CUnitPtr
+class unit_ref final
 {
 public:
-	CUnitPtr() : unit(nullptr) {}
-	CUnitPtr(CUnit *u);
-	CUnitPtr(const CUnitPtr &u);
-	~CUnitPtr() { Reset(); }
+	unit_ref() {}
+	unit_ref(CUnit *u);
+	unit_ref(const unit_ref &u);
+
+	~unit_ref()
+	{
+		this->Reset();
+	}
 
 	void Reset();
 
@@ -50,11 +54,13 @@ public:
 	CUnit &operator*() { return *unit; }
 	CUnit *operator->() const { return unit; }
 
-	CUnitPtr &operator= (CUnit *u);
+	unit_ref &operator= (CUnit *u);
 
 	bool operator== (CUnit *u) const { return this->unit == u; }
 	bool operator!= (CUnit *u) const { return this->unit != u; }
 
 private:
-	CUnit *unit;
+	void set_unit(CUnit *unit);
 };
+
+}

@@ -41,7 +41,6 @@ class Missile;
 class COrder;
 class CPlayer;
 class CUnit;
-class CUnitPtr;
 class CUnitStats;
 class CUpgrade;
 class CViewport;
@@ -61,6 +60,7 @@ namespace wyrmgus {
 	class time_of_day;
 	class unique_item;
 	class unit_manager;
+	class unit_ref;
 	class unit_type;
 	class unit_type_variation;
 	enum class item_class;
@@ -767,10 +767,6 @@ extern void (*DrawSelection)(IntColor, int, int, int, int);
 extern unsigned int MaxSelectable;    /// How many units could be selected
 extern std::vector<CUnit *> Selected; /// currently selected units
 
-/*----------------------------------------------------------------------------
--- Functions
-----------------------------------------------------------------------------*/
-
 /// Mark the field with the FieldFlags.
 void MarkUnitFieldFlags(const CUnit &unit);
 /// Unmark the field with the FieldFlags.
@@ -875,7 +871,7 @@ extern bool CanPickUp(const CUnit &picker, const CUnit &unit);
 /// Generate a unit reference, a printable unique string for unit
 extern std::string UnitReference(const CUnit &unit);
 /// Generate a unit reference, a printable unique string for unit
-extern std::string UnitReference(const CUnitPtr &unit);
+extern std::string UnitReference(const wyrmgus::unit_ref &unit);
 
 /// save unit-structure
 extern void SaveUnit(const CUnit &unit, CFile &file);

@@ -187,7 +187,7 @@ protected:
 	void UpdatePathFinderData_NotCalled(PathFinderInput &input);
 
 private:
-	CUnitPtr Goal;
+	wyrmgus::unit_ref Goal;
 public:
 	const UnitAction Action;   /// global action
 	bool Finished; /// true when order is finished

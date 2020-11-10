@@ -123,7 +123,7 @@ unsigned int unit_manager::GetUsedSlotCount() const
 
 bool unit_manager::empty() const
 {
-	return units.empty();
+	return this->units.empty();
 }
 
 CUnit *unit_manager::lastCreatedUnit()
