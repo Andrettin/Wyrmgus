@@ -170,6 +170,8 @@ void species::initialize()
 	if (this->get_homeworld() != nullptr) {
 		this->get_homeworld()->add_native_species(this);
 	}
+
+	taxon_base::initialize();
 }
 
 void species::check() const

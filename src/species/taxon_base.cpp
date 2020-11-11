@@ -66,6 +66,8 @@ void taxon_base::initialize()
 
 		this->get_supertaxon()->add_specimen_names_from(this);
 	}
+
+	data_entry::initialize();
 }
 
 const taxon *taxon_base::get_supertaxon_of_rank(const taxonomic_rank rank) const
