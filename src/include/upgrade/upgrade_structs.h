@@ -57,6 +57,7 @@ namespace wyrmgus {
 	class unit_type;
 	class upgrade_class;
 	class upgrade_modifier;
+	enum class gender;
 	enum class item_class;
 }
 
@@ -84,6 +85,9 @@ public:
 	int GetUnitStock(const wyrmgus::unit_type *unit_type) const;
 	void SetUnitStock(const wyrmgus::unit_type *unit_type, int quantity);
 	void ChangeUnitStock(const wyrmgus::unit_type *unit_type, int quantity);
+
+	wyrmgus::gender get_gender() const;
+
 public:
 	std::vector<wyrmgus::unit_variable> Variables;           /// user defined variable.
 	int Costs[MaxCosts];            /// current costs of the unit

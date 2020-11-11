@@ -337,8 +337,8 @@ void character::initialize()
 	}
 
 	if (this->get_gender() == gender::none && this->get_unit_type() != nullptr) { //if no gender was set so far, have the character be the same gender as the unit type (if the unit type has it predefined)
-		if (this->get_unit_type()->DefaultStat.Variables[GENDER_INDEX].Value != 0) {
-			this->gender = static_cast<wyrmgus::gender>(this->get_unit_type()->DefaultStat.Variables[GENDER_INDEX].Value);
+		if (this->get_unit_type()->get_gender() != gender::none) {
+			this->gender = this->get_unit_type()->get_gender();
 		}
 	}
 
@@ -627,7 +627,7 @@ bool character::IsUsable() const
 		return false;
 	}
 
-	if (this->get_unit_type()->DefaultStat.Variables[GENDER_INDEX].Value != 0 && this->get_gender() != static_cast<wyrmgus::gender>(this->get_unit_type()->DefaultStat.Variables[GENDER_INDEX].Value)) {
+	if (this->get_unit_type()->get_gender() != gender::none && this->get_gender() != this->get_unit_type()->get_gender()) {
 		return false; // hero not usable if their unit type has a set gender which is different from the hero's (this is because this means that the unit type lacks appropriate graphics for that gender)
 	}
 	

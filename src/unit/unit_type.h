@@ -1006,6 +1006,8 @@ public:
 		return this->conditions;
 	}
 
+	gender get_gender() const;
+
 public:
 	const unit_type *Parent = nullptr;				/// Parent unit type
 	//Wyrmgus start

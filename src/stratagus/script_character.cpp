@@ -598,8 +598,8 @@ static int CclDefineCustomHero(lua_State *l)
 	}
 	
 	if (hero->get_gender() == wyrmgus::gender::none) { //if no gender was set, have the hero be the same gender as the unit type (if the unit type has it predefined)
-		if (hero->get_unit_type() != nullptr && hero->get_unit_type()->DefaultStat.Variables[GENDER_INDEX].Value != 0) {
-			hero->gender = static_cast<wyrmgus::gender>(hero->get_unit_type()->DefaultStat.Variables[GENDER_INDEX].Value);
+		if (hero->get_unit_type() != nullptr && hero->get_unit_type()->get_gender() != wyrmgus::gender::none) {
+			hero->gender = hero->get_unit_type()->get_gender();
 		}
 	}
 	

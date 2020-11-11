@@ -48,6 +48,9 @@
 #include "faction.h"
 //Wyrmgus start
 #include "game.h"
+//Wyrmgus end
+#include "gender.h"
+//Wyrmgus start
 #include "grand_strategy.h"
 //Wyrmgus end
 #include "iolib.h"
@@ -191,6 +194,11 @@ void CUnitStats::SetUnitStock(const wyrmgus::unit_type *unit_type, int quantity)
 void CUnitStats::ChangeUnitStock(const wyrmgus::unit_type *unit_type, int quantity)
 {
 	this->SetUnitStock(unit_type, this->GetUnitStock(unit_type) + quantity);
+}
+
+wyrmgus::gender CUnitStats::get_gender() const
+{
+	return static_cast<wyrmgus::gender>(this->Variables[GENDER_INDEX].Value);
 }
 
 CUpgrade::CUpgrade(const std::string &identifier) : detailed_data_entry(identifier), Work(wyrmgus::item_class::none)

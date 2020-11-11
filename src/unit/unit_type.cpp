@@ -1949,6 +1949,11 @@ std::vector<std::string> unit_type::GetPotentialPersonalNames(const wyrmgus::fac
 	return potential_names;
 }
 
+gender unit_type::get_gender() const
+{
+	return this->DefaultStat.get_gender();
+}
+
 void resource_info::process_sml_property(const sml_property &property)
 {
 	const std::string &key = property.get_key();

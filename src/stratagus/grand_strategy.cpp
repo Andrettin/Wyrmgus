@@ -935,7 +935,7 @@ bool CGrandStrategyHero::IsAlive()
 
 bool CGrandStrategyHero::IsVisible()
 {
-	return this->get_unit_type()->DefaultStat.Variables[GENDER_INDEX].Value == 0 || this->get_gender() == static_cast<wyrmgus::gender>(this->get_unit_type()->DefaultStat.Variables[GENDER_INDEX].Value); // hero not visible if their unit type has a set gender which is different from the hero's (this is because of instances where i.e. females have a unit type that only has male portraits)
+	return this->get_unit_type()->get_gender() == wyrmgus::gender::none || this->get_gender() == this->get_unit_type()->get_gender(); // hero not visible if their unit type has a set gender which is different from the hero's (this is because of instances where i.e. females have a unit type that only has male portraits)
 }
 
 bool CGrandStrategyHero::IsGenerated()
