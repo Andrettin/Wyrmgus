@@ -1564,10 +1564,9 @@ void unit_type::set_parent(const unit_type *parent_type)
 	if (!this->Icon.Name.empty()) {
 		this->Icon.Load();
 	}
-	for (size_t i = 0; i < parent_type->Spells.size(); ++i) {
-		this->Spells.push_back(parent_type->Spells[i]);
-	}
+	this->Spells = parent_type->Spells;
 	this->spell_autocast = parent_type->spell_autocast;
+
 	for (unsigned int i = 0; i < MaxCosts; ++i) {
 		this->DefaultStat.Costs[i] = parent_type->DefaultStat.Costs[i];
 		this->RepairCosts[i] = parent_type->RepairCosts[i];
@@ -1593,38 +1592,20 @@ void unit_type::set_parent(const unit_type *parent_type)
 		this->BoolFlag[i].value = parent_type->BoolFlag[i].value;
 		this->BoolFlag[i].CanTransport = parent_type->BoolFlag[i].CanTransport;
 	}
-	for (size_t i = 0; i < parent_type->WeaponClasses.size(); ++i) {
-		this->WeaponClasses.push_back(parent_type->WeaponClasses[i]);
-	}
-	for (size_t i = 0; i < parent_type->SoldUnits.size(); ++i) {
-		this->SoldUnits.push_back(parent_type->SoldUnits[i]);
-	}
-	for (size_t i = 0; i < parent_type->SpawnUnits.size(); ++i) {
-		this->SpawnUnits.push_back(parent_type->SpawnUnits[i]);
-	}
-	for (size_t i = 0; i < parent_type->Drops.size(); ++i) {
-		this->Drops.push_back(parent_type->Drops[i]);
-	}
-	for (size_t i = 0; i < parent_type->AiDrops.size(); ++i) {
-		this->AiDrops.push_back(parent_type->AiDrops[i]);
-	}
-	for (size_t i = 0; i < parent_type->DropSpells.size(); ++i) {
-		this->DropSpells.push_back(parent_type->DropSpells[i]);
-	}
-	for (size_t i = 0; i < parent_type->Affixes.size(); ++i) {
-		this->Affixes.push_back(parent_type->Affixes[i]);
-	}
-	for (size_t i = 0; i < parent_type->Traits.size(); ++i) {
-		this->Traits.push_back(parent_type->Traits[i]);
-	}
+	this->WeaponClasses = parent_type->WeaponClasses;
+	this->SoldUnits = parent_type->SoldUnits;
+	this->SpawnUnits = parent_type->SpawnUnits;
+	this->Drops = parent_type->Drops;
+	this->AiDrops = parent_type->AiDrops;
+	this->DropSpells = parent_type->DropSpells;
+	this->Affixes = parent_type->Affixes;
+	this->Traits = parent_type->Traits;
 	this->StartingAbilities = parent_type->StartingAbilities;
 	for (size_t i = 0; i < parent_type->Trains.size(); ++i) {
 		this->Trains.push_back(parent_type->Trains[i]);
 		parent_type->Trains[i]->TrainedBy.push_back(this);
 	}
-	for (size_t i = 0; i < parent_type->StartingResources.size(); ++i) {
-		this->StartingResources.push_back(parent_type->StartingResources[i]);
-	}
+	this->StartingResources = parent_type->StartingResources;
 	this->PersonalNames = parent_type->PersonalNames;
 
 	for (const auto &building_rule : parent_type->BuildingRules) {
