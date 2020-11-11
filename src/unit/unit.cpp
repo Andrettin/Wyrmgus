@@ -2163,7 +2163,7 @@ void CUnit::GenerateDrop()
 			
 		if (droppedUnit != nullptr) {
 			if (droppedUnit->Type->BoolFlag[FAUNA_INDEX].value) {
-				droppedUnit->Name = droppedUnit->Type->GeneratePersonalName(nullptr, static_cast<wyrmgus::gender>(droppedUnit->Variable[GENDER_INDEX].Value));
+				droppedUnit->Name = droppedUnit->Type->GeneratePersonalName(nullptr, droppedUnit->get_gender());
 			}
 			
 			droppedUnit->GenerateSpecialProperties(this, this->Player);
@@ -2998,7 +2998,7 @@ void CUnit::AssignToPlayer(CPlayer &player)
 	//Wyrmgus start
 	if (!SaveGameLoading) {
 		//assign a gender to the unit
-		if (static_cast<wyrmgus::gender>(this->Variable[GENDER_INDEX].Value) == wyrmgus::gender::none && this->Type->BoolFlag[ORGANIC_INDEX].value) { // Gender: 0 = Not Set, 1 = Male, 2 = Female, 3 = Asexual
+		if (this->get_gender() == wyrmgus::gender::none && this->Type->BoolFlag[ORGANIC_INDEX].value) { // Gender: 0 = Not Set, 1 = Male, 2 = Female, 3 = Asexual
 			this->Variable[GENDER_INDEX].Value = SyncRand(2) + 1;
 			this->Variable[GENDER_INDEX].Max = static_cast<int>(wyrmgus::gender::count);
 			this->Variable[GENDER_INDEX].Enable = 1;
@@ -3489,13 +3489,13 @@ void CUnit::UpdatePersonalName(bool update_settlement_name)
 		}
 	}
 	
-	if (!this->Type->IsPersonalNameValid(this->Name, faction, static_cast<wyrmgus::gender>(this->Variable[GENDER_INDEX].Value))) {
+	if (!this->Type->IsPersonalNameValid(this->Name, faction, this->get_gender())) {
 		// first see if can translate the current personal name
 		std::string new_personal_name = PlayerRaces.TranslateName(this->Name, language);
 		if (!new_personal_name.empty()) {
 			this->Name = new_personal_name;
 		} else {
-			this->Name = this->Type->GeneratePersonalName(faction, static_cast<wyrmgus::gender>(this->Variable[GENDER_INDEX].Value));
+			this->Name = this->Type->GeneratePersonalName(faction, this->get_gender());
 		}
 	}
 
@@ -6787,6 +6787,11 @@ bool CUnit::is_in_subtemplate_area(const wyrmgus::map_template *subtemplate) con
 	}
 
 	return false;
+}
+
+wyrmgus::gender CUnit::get_gender() const
+{
+	return static_cast<wyrmgus::gender>(this->Variable[GENDER_INDEX].Value);
 }
 
 /**

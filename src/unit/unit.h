@@ -63,6 +63,7 @@ namespace wyrmgus {
 	class unit_ref;
 	class unit_type;
 	class unit_type_variation;
+	enum class gender;
 	enum class item_class;
 	enum class item_slot;
 }
@@ -519,6 +520,8 @@ public:
 
 	bool is_in_tile_rect(const QRect &tile_rect, int z) const;
 	bool is_in_subtemplate_area(const wyrmgus::map_template *subtemplate) const;
+
+	wyrmgus::gender get_gender() const;
 
 public:
 	class CUnitManagerData final
