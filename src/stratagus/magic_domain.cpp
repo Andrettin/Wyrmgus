@@ -34,12 +34,12 @@
 
 namespace wyrmgus {
 
-magic_domain *magic_domain::add(const std::string &identifier, const wyrmgus::module *module)
+magic_domain *magic_domain::add(const std::string &identifier, const wyrmgus::data_module *data_module)
 {
-	magic_domain *domain = data_type::add(identifier, module);
+	magic_domain *domain = data_type::add(identifier, data_module);
 
 	//add an upgrade with an identifier based on that of the magic domain for it
-	CUpgrade *upgrade = CUpgrade::add("upgrade_magic_domain_" + identifier, module, domain);
+	CUpgrade *upgrade = CUpgrade::add("upgrade_magic_domain_" + identifier, data_module, domain);
 	domain->upgrade = upgrade;
 
 	return domain;

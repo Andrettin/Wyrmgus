@@ -55,7 +55,7 @@ public:
 	static constexpr const char *terrain_map_folder = "terrain";
 	static constexpr const char *territories_map_folder = "territories";
 
-	static world *add(const std::string &identifier, const wyrmgus::module *module);
+	static world *add(const std::string &identifier, const wyrmgus::data_module *data_module);
 
 	explicit world(const std::string &identifier) : detailed_data_entry(identifier), CDataType(identifier)
 	{

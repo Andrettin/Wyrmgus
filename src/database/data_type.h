@@ -31,16 +31,16 @@
 
 #pragma once
 
+#include "database/data_module_container.h"
 #include "database/data_type_metadata.h"
 #include "database/database.h"
-#include "database/module_container.h"
 #include "database/sml_data.h"
 #include "database/sml_operator.h"
 #include "util/qunique_ptr.h"
 
 namespace wyrmgus {
 
-class module;
+class data_module;
 
 class data_type_base
 {
@@ -86,14 +86,14 @@ public:
 		return nullptr;
 	}
 
-	static T *get_or_add(const std::string &identifier, const module *module)
+	static T *get_or_add(const std::string &identifier, const data_module *data_module)
 	{
 		T *instance = T::try_get(identifier);
 		if (instance != nullptr) {
 			return instance;
 		}
 
-		return T::add(identifier, module);
+		return T::add(identifier, data_module);
 	}
 
 	static const std::vector<T *> &get_all()
@@ -106,7 +106,7 @@ public:
 		return data_type::instances_by_identifier.contains(identifier) || data_type::instances_by_alias.contains(identifier);
 	}
 
-	static T *add(const std::string &identifier, const module *module)
+	static T *add(const std::string &identifier, const data_module *data_module)
 	{
 		if (identifier.empty()) {
 			throw std::runtime_error("Tried to add a " + std::string(T::class_identifier) + " instance with an empty string identifier.");
@@ -121,7 +121,7 @@ public:
 		T *instance = data_type::instances_by_identifier.find(identifier)->second.get();
 		data_type::instances.push_back(instance);
 		instance->moveToThread(QApplication::instance()->thread());
-		instance->set_module(module);
+		instance->set_module(data_module);
 
 		//for backwards compatibility, change instances of "_" in the identifier with "-" and add that as an alias, and do the opposite as well
 		if (identifier.find("_") != std::string::npos) {
@@ -176,7 +176,7 @@ public:
 		std::sort(data_type::instances.begin(), data_type::instances.end(), function);
 	}
 
-	static void parse_database(const std::filesystem::path &data_path, const module *module)
+	static void parse_database(const std::filesystem::path &data_path, const data_module *data_module)
 	{
 		if (std::string(T::database_folder).empty()) {
 			return;
@@ -188,7 +188,7 @@ public:
 			return;
 		}
 
-		database::parse_folder(database_path, data_type::sml_data_to_process[module]);
+		database::parse_folder(database_path, data_type::sml_data_to_process[data_module]);
 	}
 
 	static void process_database(const bool definition)
@@ -198,7 +198,7 @@ public:
 		}
 
 		for (const auto &kv_pair : data_type::sml_data_to_process) {
-			const module *module = kv_pair.first;
+			const data_module *data_module = kv_pair.first;
 			const std::vector<sml_data> &sml_data_list = kv_pair.second;
 			for (const sml_data &data : sml_data_list) {
 				data.for_each_child([&](const sml_data &data_entry) {
@@ -207,7 +207,7 @@ public:
 					T *instance = nullptr;
 					if (definition) {
 						if (data_entry.get_operator() != sml_operator::addition) { //addition operators for data entry scopes mean modifying already-defined entries
-							instance = T::add(identifier, module);
+							instance = T::add(identifier, data_module);
 						} else {
 							instance = T::get(identifier);
 						}
@@ -288,7 +288,7 @@ private:
 	static inline std::vector<T *> instances;
 	static inline std::map<std::string, qunique_ptr<T>> instances_by_identifier;
 	static inline std::map<std::string, T *> instances_by_alias;
-	static inline module_map<std::vector<sml_data>> sml_data_to_process;
+	static inline data_module_map<std::vector<sml_data>> sml_data_to_process;
 #ifdef __GNUC__
 	//the "used" attribute is needed under GCC, or else this variable will be optimized away (even in debug builds)
 	static inline bool class_initialized [[gnu::used]] = data_type::initialize_class();

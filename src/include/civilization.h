@@ -75,9 +75,9 @@ public:
 	static constexpr const char *class_identifier = "civilization";
 	static constexpr const char *database_folder = "civilizations";
 
-	static civilization *add(const std::string &identifier, const wyrmgus::module *module)
+	static civilization *add(const std::string &identifier, const wyrmgus::data_module *data_module)
 	{
-		civilization *civilization = data_type::add(identifier, module);
+		civilization *civilization = data_type::add(identifier, data_module);
 		civilization->ID = civilization::get_all().size() - 1;
 		return civilization;
 	}

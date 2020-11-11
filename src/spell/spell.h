@@ -203,7 +203,7 @@ public:
 	static constexpr const char *database_folder = "spells";
 	static constexpr int infinite_range = 0xFFFFFFF;
 
-	static spell *add(const std::string &identifier, const wyrmgus::module *module);
+	static spell *add(const std::string &identifier, const wyrmgus::data_module *data_module);
 
 	explicit spell(const std::string &identifier);
 	~spell();

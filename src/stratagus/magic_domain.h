@@ -46,7 +46,7 @@ public:
 	static constexpr const char *database_folder = "magic_domains";
 
 public:
-	static magic_domain *add(const std::string &identifier, const wyrmgus::module *module);
+	static magic_domain *add(const std::string &identifier, const wyrmgus::data_module *data_module);
 
 	explicit magic_domain(const std::string &identifier) : detailed_data_entry(identifier)
 	{

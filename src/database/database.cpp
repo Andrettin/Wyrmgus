@@ -34,10 +34,10 @@
 #include "civilization.h"
 #include "civilization_group.h"
 #include "civilization_supergroup.h"
+#include "database/data_module.h"
+#include "database/data_module_container.h"
 #include "database/data_type_metadata.h"
 #include "database/defines.h"
-#include "database/module.h"
-#include "database/module_container.h"
 #include "database/predefines.h"
 #include "database/sml_data.h"
 #include "database/sml_operator.h"
@@ -516,10 +516,10 @@ void database::modify_list_property_for_object(QObject *object, const std::strin
 	}
 }
 
-std::filesystem::path database::get_base_path(const module *module)
+std::filesystem::path database::get_base_path(const data_module *data_module)
 {
-	if (module != nullptr) {
-		return module->get_path();
+	if (data_module != nullptr) {
+		return data_module->get_path();
 	}
 
 	return database::get_root_path();
@@ -552,11 +552,11 @@ void database::parse()
 	const auto data_paths_with_module = this->get_data_paths_with_module();
 	for (const auto &kv_pair : data_paths_with_module) {
 		const std::filesystem::path &path = kv_pair.first;
-		const module *module = kv_pair.second;
+		const data_module *data_module = kv_pair.second;
 
 		//parse the files in each data type's folder
 		for (const std::unique_ptr<data_type_metadata> &metadata : this->metadata) {
-			metadata->get_parsing_function()(path, module);
+			metadata->get_parsing_function()(path, data_module);
 		}
 	}
 }
@@ -603,13 +603,13 @@ void database::load_defines()
 {
 	for (const auto &kv_pair : this->get_data_paths_with_module()) {
 		const std::filesystem::path &path = kv_pair.first;
-		const module *module = kv_pair.second;
+		const data_module *data_module = kv_pair.second;
 
 		try {
 			defines::get()->load(path);
 		} catch (...) {
-			if (module != nullptr) {
-				std::throw_with_nested(std::runtime_error("Failed to load the defines for the \"" + module->get_identifier() + "\" module."));
+			if (data_module != nullptr) {
+				std::throw_with_nested(std::runtime_error("Failed to load the defines for the \"" + data_module->get_identifier() + "\" module."));
 			} else {
 				std::throw_with_nested(std::runtime_error("Failed to load defines."));
 			}
@@ -677,21 +677,21 @@ void database::process_modules()
 		this->process_modules_at_dir(database::get_documents_modules_path());
 	}
 
-	for (const qunique_ptr<module> &module : this->modules) {
-		const std::filesystem::path module_filepath = module->get_path() / "module.txt";
+	for (const qunique_ptr<data_module> &data_module : this->modules) {
+		const std::filesystem::path module_filepath = data_module->get_path() / "module.txt";
 
 		if (std::filesystem::exists(module_filepath)) {
 			sml_parser parser(module_filepath);
-			database::process_sml_data(module, parser.parse());
+			database::process_sml_data(data_module, parser.parse());
 		}
 	}
 
-	std::sort(this->modules.begin(), this->modules.end(), [](const qunique_ptr<module> &a, const qunique_ptr<module> &b) {
-		return module_compare()(a.get(), b.get());
+	std::sort(this->modules.begin(), this->modules.end(), [](const qunique_ptr<data_module> &a, const qunique_ptr<data_module> &b) {
+		return data_module_compare()(a.get(), b.get());
 	});
 }
 
-void database::process_modules_at_dir(const std::filesystem::path &path, module *parent_module)
+void database::process_modules_at_dir(const std::filesystem::path &path, data_module *parent_module)
 {
 	std::filesystem::directory_iterator dir_iterator(path);
 
@@ -705,15 +705,15 @@ void database::process_modules_at_dir(const std::filesystem::path &path, module 
 		}
 
 		const std::string module_identifier = dir_entry.path().stem().string();
-		auto module = make_qunique<wyrmgus::module>(module_identifier, dir_entry.path(), parent_module);
+		auto data_module = make_qunique<wyrmgus::data_module>(module_identifier, dir_entry.path(), parent_module);
 
 		std::filesystem::path submodules_path = dir_entry.path() / "modules";
 		if (std::filesystem::exists(submodules_path)) {
-			this->process_modules_at_dir(submodules_path, module.get());
+			this->process_modules_at_dir(submodules_path, data_module.get());
 		}
 
-		this->modules_by_identifier[module_identifier] = module.get();
-		this->modules.push_back(std::move(module));
+		this->modules_by_identifier[module_identifier] = data_module.get();
+		this->modules.push_back(std::move(data_module));
 	}
 }
 
@@ -721,19 +721,19 @@ std::vector<std::filesystem::path> database::get_module_paths() const
 {
 	std::vector<std::filesystem::path> module_paths;
 
-	for (const qunique_ptr<module> &module : this->modules) {
-		module_paths.push_back(module->get_path());
+	for (const qunique_ptr<data_module> &data_module : this->modules) {
+		module_paths.push_back(data_module->get_path());
 	}
 
 	return module_paths;
 }
 
-std::vector<std::pair<std::filesystem::path, const module *>> database::get_module_paths_with_module() const
+std::vector<std::pair<std::filesystem::path, const data_module *>> database::get_module_paths_with_module() const
 {
-	std::vector<std::pair<std::filesystem::path, const module *>> module_paths;
+	std::vector<std::pair<std::filesystem::path, const data_module *>> module_paths;
 
-	for (const qunique_ptr<module> &module : this->modules) {
-		module_paths.emplace_back(module->get_path(), module.get());
+	for (const qunique_ptr<data_module> &data_module : this->modules) {
+		module_paths.emplace_back(data_module->get_path(), data_module.get());
 	}
 
 	return module_paths;

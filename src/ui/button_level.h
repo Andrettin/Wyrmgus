@@ -40,9 +40,9 @@ public:
 	static constexpr const char *class_identifier = "button_level";
 	static constexpr const char *database_folder = "button_levels";
 
-	static button_level *add(const std::string &identifier, const wyrmgus::module *module)
+	static button_level *add(const std::string &identifier, const wyrmgus::data_module *data_module)
 	{
-		button_level *button_level = data_type::add(identifier, module);
+		button_level *button_level = data_type::add(identifier, data_module);
 		button_level->index = button_level::get_all().size() - 1;
 		return button_level;
 	}

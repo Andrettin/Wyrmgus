@@ -50,9 +50,9 @@ public:
 	static constexpr const char *class_identifier = "time_of_day";
 	static constexpr const char *database_folder = "times_of_day";
 
-	static time_of_day *add(const std::string &identifier, const wyrmgus::module *module)
+	static time_of_day *add(const std::string &identifier, const wyrmgus::data_module *data_module)
 	{
-		time_of_day *time_of_day = data_type::add(identifier, module);
+		time_of_day *time_of_day = data_type::add(identifier, data_module);
 		time_of_day->ID = time_of_day::get_all().size() - 1;
 		return time_of_day;
 	}

@@ -36,14 +36,14 @@ namespace wyrmgus {
 class sml_data;
 class sml_property;
 
-class module final : public QObject
+class data_module final : public QObject
 {
 	Q_OBJECT
 
 	Q_PROPERTY(QString name READ get_name_qstring)
 
 public:
-	explicit module(const std::string &identifier, const std::filesystem::path &path, const module *parent_module)
+	explicit data_module(const std::string &identifier, const std::filesystem::path &path, const data_module *parent_module)
 		: identifier(identifier), path(path), parent_module(parent_module)
 	{
 	}
@@ -76,33 +76,33 @@ public:
 		return this->path;
 	}
 
-	void add_dependency(const module *module)
+	void add_dependency(const data_module *data_module)
 	{
-		if (module->depends_on(this)) {
-			throw std::runtime_error("Cannot make module \"" + this->identifier + "\" depend on module \"" + module->identifier + "\", as that would create a circular dependency.");
+		if (data_module->depends_on(this)) {
+			throw std::runtime_error("Cannot make module \"" + this->identifier + "\" depend on module \"" + data_module->identifier + "\", as that would create a circular dependency.");
 		}
 
-		this->dependencies.insert(module);
+		this->dependencies.insert(data_module);
 	}
 
-	bool depends_on(const module *module) const
+	bool depends_on(const data_module *data_module) const
 	{
-		if (module == this->parent_module) {
+		if (data_module == this->parent_module) {
 			return true;
 		}
 
-		if (this->dependencies.contains(module)) {
+		if (this->dependencies.contains(data_module)) {
 			return true;
 		}
 
-		for (const wyrmgus::module *dependency : this->dependencies) {
-			if (dependency->depends_on(module)) {
+		for (const wyrmgus::data_module *dependency : this->dependencies) {
+			if (dependency->depends_on(data_module)) {
 				return true;
 			}
 		}
 
 		if (this->parent_module != nullptr) {
-			return this->parent_module->depends_on(module);
+			return this->parent_module->depends_on(data_module);
 		}
 
 		return false;
@@ -112,7 +112,7 @@ public:
 	{
 		size_t count = this->dependencies.size();
 
-		for (const wyrmgus::module *dependency : this->dependencies) {
+		for (const wyrmgus::data_module *dependency : this->dependencies) {
 			count += dependency->get_dependency_count();
 		}
 
@@ -123,8 +123,8 @@ private:
 	std::string identifier;
 	std::string name;
 	std::filesystem::path path; //the module's path
-	const module *parent_module = nullptr;
-	std::set<const module *> dependencies; //modules on which this one is dependent
+	const data_module *parent_module = nullptr;
+	std::set<const data_module *> dependencies; //modules on which this one is dependent
 };
 
 }

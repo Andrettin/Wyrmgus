@@ -165,9 +165,9 @@ public:
 	static constexpr const char *class_identifier = "quest";
 	static constexpr const char *database_folder = "quests";
 
-	static quest *add(const std::string &identifier, const wyrmgus::module *module)
+	static quest *add(const std::string &identifier, const wyrmgus::data_module *data_module)
 	{
-		quest *quest = data_type::add(identifier, module);
+		quest *quest = data_type::add(identifier, data_module);
 		quest->ID = quest::get_all().size() - 1;
 		return quest;
 	}

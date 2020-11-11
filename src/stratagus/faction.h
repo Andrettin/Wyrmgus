@@ -90,9 +90,9 @@ public:
 	static constexpr const char *class_identifier = "faction";
 	static constexpr const char *database_folder = "factions";
 
-	static faction *add(const std::string &identifier, const wyrmgus::module *module)
+	static faction *add(const std::string &identifier, const wyrmgus::data_module *data_module)
 	{
-		faction *faction = data_type::add(identifier, module);
+		faction *faction = data_type::add(identifier, data_module);
 		faction->ID = faction::get_all().size() - 1;
 		return faction;
 	}

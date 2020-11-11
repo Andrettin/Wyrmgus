@@ -33,13 +33,13 @@
 
 namespace wyrmgus {
 
-class module;
+class data_module;
 
 //the metadata for a data type, including e.g. its initialization function
 class data_type_metadata
 {
 public:
-	data_type_metadata(const std::string &class_identifier, const std::set<std::string> &database_dependencies, const std::function<void(const std::filesystem::path &, const module *)> &parsing_function, const std::function<void(bool)> &processing_function, const std::function<void()> &initialization_function, const std::function<void()> &checking_function, const std::function<void()> &clearing_function)
+	data_type_metadata(const std::string &class_identifier, const std::set<std::string> &database_dependencies, const std::function<void(const std::filesystem::path &, const data_module *)> &parsing_function, const std::function<void(bool)> &processing_function, const std::function<void()> &initialization_function, const std::function<void()> &checking_function, const std::function<void()> &clearing_function)
 		: class_identifier(class_identifier), database_dependencies(database_dependencies), parsing_function(parsing_function), processing_function(processing_function), initialization_function(initialization_function), checking_function(checking_function), clearing_function(clearing_function)
 	{
 	}
@@ -64,7 +64,7 @@ public:
 		return this->database_dependencies.size();
 	}
 
-	const std::function<void(const std::filesystem::path &, const module *)> &get_parsing_function() const
+	const std::function<void(const std::filesystem::path &, const data_module *)> &get_parsing_function() const
 	{
 		return this->parsing_function;
 	}
@@ -92,7 +92,7 @@ public:
 private:
 	std::string class_identifier;
 	const std::set<std::string> &database_dependencies;
-	std::function<void(const std::filesystem::path &, const module *)> parsing_function;
+	std::function<void(const std::filesystem::path &, const data_module *)> parsing_function;
 	std::function<void(bool)> processing_function;
 	std::function<void()> initialization_function; //functions to initialize entries
 	std::function<void()> checking_function; //functions to check if data entries are valid

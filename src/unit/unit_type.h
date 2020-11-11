@@ -780,9 +780,9 @@ public:
 	static constexpr const char *class_identifier = "unit_type";
 	static constexpr const char *database_folder = "unit_types";
 
-	static unit_type *add(const std::string &identifier, const wyrmgus::module *module)
+	static unit_type *add(const std::string &identifier, const wyrmgus::data_module *data_module)
 	{
-		unit_type *unit_type = data_type::add(identifier, module);
+		unit_type *unit_type = data_type::add(identifier, data_module);
 		unit_type->Slot = unit_type::get_all().size() - 1;
 		return unit_type;
 	}

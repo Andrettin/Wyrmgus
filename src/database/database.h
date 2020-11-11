@@ -35,8 +35,8 @@
 namespace wyrmgus {
 
 class data_entry;
+class data_module;
 class data_type_metadata;
-class module;
 
 class database final : public singleton<database>
 {
@@ -111,21 +111,21 @@ public:
 		return documents_path;
 	}
 
-	static std::filesystem::path get_base_path(const module *module);
+	static std::filesystem::path get_base_path(const data_module *data_module);
 
-	static std::filesystem::path get_graphics_path(const module *module)
+	static std::filesystem::path get_graphics_path(const data_module *data_module)
 	{
-		return database::get_base_path(module) / database::graphics_folder;
+		return database::get_base_path(data_module) / database::graphics_folder;
 	}
 
-	static std::filesystem::path get_maps_path(const module *module)
+	static std::filesystem::path get_maps_path(const data_module *data_module)
 	{
-		return database::get_base_path(module) / database::maps_folder;
+		return database::get_base_path(data_module) / database::maps_folder;
 	}
 
-	static std::filesystem::path get_sounds_path(const module *module)
+	static std::filesystem::path get_sounds_path(const data_module *data_module)
 	{
-		return database::get_base_path(module) / database::sounds_folder;
+		return database::get_base_path(data_module) / database::sounds_folder;
 	}
 
 	static void parse_folder(const std::filesystem::path &path, std::vector<sml_data> &sml_data_list);
@@ -151,11 +151,11 @@ public:
 	void register_metadata(std::unique_ptr<data_type_metadata> &&metadata);
 
 	void process_modules();
-	void process_modules_at_dir(const std::filesystem::path &path, module *parent_module = nullptr);
+	void process_modules_at_dir(const std::filesystem::path &path, data_module *parent_module = nullptr);
 	std::vector<std::filesystem::path> get_module_paths() const;
-	std::vector<std::pair<std::filesystem::path, const module *>> get_module_paths_with_module() const;
+	std::vector<std::pair<std::filesystem::path, const data_module *>> get_module_paths_with_module() const;
 
-	module *get_module(const std::string &identifier) const
+	data_module *get_module(const std::string &identifier) const
 	{
 		auto find_iterator = this->modules_by_identifier.find(identifier);
 		if (find_iterator != this->modules_by_identifier.end()) {
@@ -176,12 +176,12 @@ public:
 		return base_paths;
 	}
 
-	std::vector<std::pair<std::filesystem::path, const module *>> get_base_paths_with_module() const
+	std::vector<std::pair<std::filesystem::path, const data_module *>> get_base_paths_with_module() const
 	{
-		std::vector<std::pair<std::filesystem::path, const module *>> base_paths;
+		std::vector<std::pair<std::filesystem::path, const data_module *>> base_paths;
 		base_paths.emplace_back(database::get_root_path(), nullptr);
 
-		std::vector<std::pair<std::filesystem::path, const module *>> module_paths = this->get_module_paths_with_module();
+		std::vector<std::pair<std::filesystem::path, const data_module *>> module_paths = this->get_module_paths_with_module();
 		base_paths.insert(base_paths.end(), module_paths.begin(), module_paths.end());
 
 		return base_paths;
@@ -203,9 +203,9 @@ public:
 		return paths;
 	}
 
-	std::vector<std::pair<std::filesystem::path, const module *>> get_data_paths_with_module() const
+	std::vector<std::pair<std::filesystem::path, const data_module *>> get_data_paths_with_module() const
 	{
-		std::vector<std::pair<std::filesystem::path, const module *>> paths = this->get_base_paths_with_module();
+		std::vector<std::pair<std::filesystem::path, const data_module *>> paths = this->get_base_paths_with_module();
 
 		for (auto &kv_pair : paths) {
 			std::filesystem::path &path = kv_pair.first;
@@ -239,8 +239,8 @@ public:
 
 private:
 	std::vector<std::unique_ptr<data_type_metadata>> metadata;
-	std::vector<qunique_ptr<module>> modules;
-	std::map<std::string, module *> modules_by_identifier;
+	std::vector<qunique_ptr<data_module>> modules;
+	std::map<std::string, data_module *> modules_by_identifier;
 	bool initialized = false;
 };
 

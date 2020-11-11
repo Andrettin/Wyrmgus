@@ -50,9 +50,9 @@ public:
 	static constexpr const char *class_identifier = "dynasty";
 	static constexpr const char *database_folder = "dynasties";
 
-	static dynasty *add(const std::string &identifier, const wyrmgus::module *module)
+	static dynasty *add(const std::string &identifier, const wyrmgus::data_module *data_module)
 	{
-		dynasty *dynasty = data_type::add(identifier, module);
+		dynasty *dynasty = data_type::add(identifier, data_module);
 		dynasty->index = dynasty::get_all().size() - 1;
 		return dynasty;
 	}

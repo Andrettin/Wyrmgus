@@ -45,9 +45,9 @@ public:
 	static constexpr const char *class_identifier = "unit_class";
 	static constexpr const char *database_folder = "unit_classes";
 
-	static unit_class *add(const std::string &identifier, const wyrmgus::module *module)
+	static unit_class *add(const std::string &identifier, const wyrmgus::data_module *data_module)
 	{
-		unit_class *unit_class = data_type::add(identifier, module);
+		unit_class *unit_class = data_type::add(identifier, data_module);
 		unit_class->index = unit_class::get_all().size() - 1;
 		return unit_class;
 	}

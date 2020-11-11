@@ -70,7 +70,7 @@ public:
 	static constexpr int major_deity_domain_max = 3; //major deities can only have up to three domains
 	static constexpr int minor_deity_domain_max = 1; //minor deities can only have one domain
 
-	static deity *add(const std::string &identifier, const wyrmgus::module *module);
+	static deity *add(const std::string &identifier, const wyrmgus::data_module *data_module);
 
 	explicit deity(const std::string &identifier);
 	

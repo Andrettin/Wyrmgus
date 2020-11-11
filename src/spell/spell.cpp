@@ -261,9 +261,9 @@ private:
 
 namespace wyrmgus {
 
-spell *spell::add(const std::string &identifier, const wyrmgus::module *module)
+spell *spell::add(const std::string &identifier, const wyrmgus::data_module *data_module)
 {
-	spell *spell = data_type::add(identifier, module);
+	spell *spell = data_type::add(identifier, data_module);
 	spell->Slot = spell::get_all().size() - 1;
 
 	return spell;

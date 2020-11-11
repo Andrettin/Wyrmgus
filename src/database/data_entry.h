@@ -33,7 +33,7 @@
 
 namespace wyrmgus {
 
-class module;
+class data_module;
 class sml_data;
 class sml_property;
 
@@ -102,18 +102,18 @@ public:
 
 	virtual void check() const {}
 
-	const module *get_module() const
+	const data_module *get_module() const
 	{
-		return this->module;
+		return this->data_module;
 	}
 
-	void set_module(const module *module)
+	void set_module(const data_module *data_module)
 	{
-		if (module == this->get_module()) {
+		if (data_module == this->get_module()) {
 			return;
 		}
 
-		this->module = module;
+		this->data_module = data_module;
 	}
 
 	void load_history();
@@ -125,7 +125,7 @@ private:
 	std::set<std::string> aliases;
 	bool defined = false; //whether the data entry's definition has been concluded (with its data having been processed)
 	bool initialized = false;
-	const module *module = nullptr; //the module to which the data entry belongs, if any
+	const data_module *data_module = nullptr; //the module to which the data entry belongs, if any
 	std::vector<sml_data> history_data;
 };
 

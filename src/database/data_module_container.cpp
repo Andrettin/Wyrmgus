@@ -27,29 +27,29 @@
 
 #include "stratagus.h"
 
-#include "database/module_container.h"
+#include "database/data_module_container.h"
 
-#include "database/module.h"
+#include "database/data_module.h"
 
 namespace wyrmgus {
 
-bool module_compare::operator()(const module *module, const wyrmgus::module *other_module) const
+bool data_module_compare::operator()(const data_module *data_module, const wyrmgus::data_module *other_data_module) const
 {
-	if ((module == nullptr) != (other_module == nullptr)) {
-		return module == nullptr;
+	if ((data_module == nullptr) != (other_data_module == nullptr)) {
+		return data_module == nullptr;
 	}
 
-	if (module->depends_on(other_module)) {
+	if (data_module->depends_on(other_data_module)) {
 		return false;
-	} else if (other_module->depends_on(module)) {
+	} else if (other_data_module->depends_on(data_module)) {
 		return true;
 	}
 
-	if (module->get_dependency_count() != other_module->get_dependency_count()) {
-		return module->get_dependency_count() < other_module->get_dependency_count();
+	if (data_module->get_dependency_count() != other_data_module->get_dependency_count()) {
+		return data_module->get_dependency_count() < other_data_module->get_dependency_count();
 	}
 
-	return module->get_identifier() < other_module->get_identifier();
+	return data_module->get_identifier() < other_data_module->get_identifier();
 }
 
 }

@@ -46,12 +46,12 @@
 
 namespace wyrmgus {
 
-deity *deity::add(const std::string &identifier, const wyrmgus::module *module)
+deity *deity::add(const std::string &identifier, const wyrmgus::data_module *data_module)
 {
-	deity *deity = data_type::add(identifier, module);
+	deity *deity = data_type::add(identifier, data_module);
 
 	//add a character with the same identifier as the deity for it
-	wyrmgus::character *character = character::add(identifier, module);
+	wyrmgus::character *character = character::add(identifier, data_module);
 	character->set_deity(deity);
 	deity->character = character;
 

@@ -121,30 +121,30 @@ public:
 	static constexpr const char *class_identifier = "upgrade";
 	static constexpr const char *database_folder = "upgrades";
 
-	static CUpgrade *add(const std::string &identifier, const wyrmgus::module *module)
+	static CUpgrade *add(const std::string &identifier, const wyrmgus::data_module *data_module)
 	{
-		CUpgrade *upgrade = data_type::add(identifier, module);
+		CUpgrade *upgrade = data_type::add(identifier, data_module);
 		upgrade->ID = CUpgrade::get_all().size() - 1;
 		return upgrade;
 	}
 
-	static CUpgrade *add(const std::string &identifier, const wyrmgus::module *module, const wyrmgus::deity *deity)
+	static CUpgrade *add(const std::string &identifier, const wyrmgus::data_module *data_module, const wyrmgus::deity *deity)
 	{
-		CUpgrade *upgrade = CUpgrade::add(identifier, module);
+		CUpgrade *upgrade = CUpgrade::add(identifier, data_module);
 		upgrade->deity = deity;
 		return upgrade;
 	}
 
-	static CUpgrade *add(const std::string &identifier, const wyrmgus::module *module, const wyrmgus::dynasty *dynasty)
+	static CUpgrade *add(const std::string &identifier, const wyrmgus::data_module *data_module, const wyrmgus::dynasty *dynasty)
 	{
-		CUpgrade *upgrade = CUpgrade::add(identifier, module);
+		CUpgrade *upgrade = CUpgrade::add(identifier, data_module);
 		upgrade->dynasty = dynasty;
 		return upgrade;
 	}
 
-	static CUpgrade *add(const std::string &identifier, const wyrmgus::module *module, const wyrmgus::magic_domain *domain)
+	static CUpgrade *add(const std::string &identifier, const wyrmgus::data_module *data_module, const wyrmgus::magic_domain *domain)
 	{
-		CUpgrade *upgrade = CUpgrade::add(identifier, module);
+		CUpgrade *upgrade = CUpgrade::add(identifier, data_module);
 		upgrade->magic_domain = domain;
 		return upgrade;
 	}
