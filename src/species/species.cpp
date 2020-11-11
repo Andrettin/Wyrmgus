@@ -157,7 +157,7 @@ void species::process_sml_scope(const sml_data &scope)
 			other_species->evolutions.push_back(this);
 		}
 	} else {
-		data_entry::process_sml_scope(scope);
+		taxon_base::process_sml_scope(scope);
 	}
 }
 
