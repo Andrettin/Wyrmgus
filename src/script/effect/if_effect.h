@@ -37,7 +37,7 @@ template <typename scope_type>
 class if_effect final : public effect<scope_type>
 {
 public:
-	explicit if_effect(const sml_operator effect_operator) : effect(effect_operator)
+	explicit if_effect(const sml_operator effect_operator) : effect<scope_type>(effect_operator)
 	{
 	}
 

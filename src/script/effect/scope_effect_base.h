@@ -36,7 +36,7 @@ template <typename upper_scope_type, typename scope_type>
 class scope_effect_base : public effect<upper_scope_type>
 {
 public:
-	explicit scope_effect_base(const sml_operator effect_operator) : effect(effect_operator)
+	explicit scope_effect_base(const sml_operator effect_operator) : effect<upper_scope_type>(effect_operator)
 	{
 		if (effect_operator != sml_operator::assignment) {
 			throw std::runtime_error("Scope effects can only have the assignment operator as their operator.");

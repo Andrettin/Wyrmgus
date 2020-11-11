@@ -954,27 +954,15 @@ void missile_type::DrawMissileType(int frame, const PixelPos &pos) const
 	if (this->Flip) {
 		if (frame < 0) {
 			if (this->Transparency > 0) {
-				//Wyrmgus start
-//				this->G->DrawFrameClipTransX(-frame - 1, pos.x, pos.y, int(256 - 2.56 * Transparency));
-				this->G->DrawFrameClipTransX(-frame - 1, pos.x, pos.y, int(256 - 2.56 * Transparency), false);
-				//Wyrmgus end
+				this->G->DrawFrameClipTransX(-frame - 1, pos.x, pos.y, int(256 - 2.56 * Transparency));
 			} else {
-				//Wyrmgus start
-//				this->G->DrawFrameClipX(-frame - 1, pos.x, pos.y);
-				this->G->DrawFrameClipX(-frame - 1, pos.x, pos.y, false);
-				//Wyrmgus end
+				this->G->DrawFrameClipX(-frame - 1, pos.x, pos.y);
 			}
 		} else {
 			if (this->Transparency > 0) {
-				//Wyrmgus start
-//				this->G->DrawFrameClipTrans(frame, pos.x, pos.y, int(256 - 2.56 * Transparency));
-				this->G->DrawFrameClipTrans(frame, pos.x, pos.y, int(256 - 2.56 * Transparency), false);
-				//Wyrmgus end
+				this->G->DrawFrameClipTrans(frame, pos.x, pos.y, int(256 - 2.56 * Transparency));
 			} else {
-				//Wyrmgus start
-//				this->G->DrawFrameClip(frame, pos.x, pos.y);
-				this->G->DrawFrameClip(frame, pos.x, pos.y, false);
-				//Wyrmgus end
+				this->G->DrawFrameClip(frame, pos.x, pos.y);
 			}
 		}
 	} else {
@@ -986,15 +974,9 @@ void missile_type::DrawMissileType(int frame, const PixelPos &pos) const
 			frame = (frame / row) * this->get_num_directions() + frame % row;
 		}
 		if (this->Transparency > 0) {
-			//Wyrmgus start
-//			this->G->DrawFrameClipTrans(frame, pos.x, pos.y, int(256 - 2.56 * Transparency));
-			this->G->DrawFrameClipTrans(frame, pos.x, pos.y, int(256 - 2.56 * Transparency), false);
-			//Wyrmgus end
+			this->G->DrawFrameClipTrans(frame, pos.x, pos.y, int(256 - 2.56 * Transparency));
 		} else {
-			//Wyrmgus start
-//			this->G->DrawFrameClip(frame, pos.x, pos.y);
-			this->G->DrawFrameClip(frame, pos.x, pos.y, false);
-			//Wyrmgus end
+			this->G->DrawFrameClip(frame, pos.x, pos.y);
 		}
 	}
 }

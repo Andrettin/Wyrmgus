@@ -36,7 +36,7 @@ template <typename scope_type>
 class hidden_effect final : public effect<scope_type>
 {
 public:
-	explicit hidden_effect(const sml_operator effect_operator) : effect(effect_operator)
+	explicit hidden_effect(const sml_operator effect_operator) : effect<scope_type>(effect_operator)
 	{
 	}
 

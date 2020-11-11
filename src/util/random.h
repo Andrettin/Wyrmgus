@@ -52,9 +52,9 @@ public:
 		this->engine.seed(seed);
 	}
 	
-	void reset_seed(const bool default)
+	void reset_seed(const bool default_seed)
 	{
-		if (default) {
+		if (default_seed) {
 			//reset the seed to the default
 			this->set_seed(random::default_seed);
 		} else {
