@@ -131,10 +131,10 @@ source_group(beos FILES ${beos_SRCS})
 
 set(database_SRCS
 	src/database/data_entry.cpp
+	src/database/data_module.cpp
+	src/database/data_module_container.cpp
 	src/database/database.cpp
 	src/database/defines.cpp
-	src/database/module.cpp
-	src/database/module_container.cpp
 	src/database/predefines.cpp
 	src/database/preferences.cpp
 	src/database/sml_data.cpp
@@ -651,13 +651,13 @@ set(stratagus_animation_HDRS
 
 set(stratagus_database_HDRS
 	src/database/data_entry.h
+	src/database/data_module.h
+	src/database/data_module_container.h
 	src/database/data_type.h
 	src/database/data_type_metadata.h
 	src/database/database.h
 	src/database/defines.h
 	src/database/detailed_data_entry.h
-	src/database/module.h
-	src/database/module_container.h
 	src/database/named_data_entry.h
 	src/database/predefines.h
 	src/database/preferences.h
