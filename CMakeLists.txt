@@ -130,6 +130,7 @@ set(beos_SRCS
 source_group(beos FILES ${beos_SRCS})
 
 set(database_SRCS
+	src/database/data_entry.cpp
 	src/database/database.cpp
 	src/database/defines.cpp
 	src/database/module.cpp
@@ -649,7 +650,6 @@ set(stratagus_animation_HDRS
 )
 
 set(stratagus_database_HDRS
-	src/database/data_entry.cpp
 	src/database/data_entry.h
 	src/database/data_type.h
 	src/database/data_type_metadata.h
