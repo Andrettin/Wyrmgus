@@ -27,11 +27,11 @@
 
 #pragma once
 
-#include "database/data_type.h"
-#include "species/taxon_base.h"
+#include "database/detailed_data_entry.h"
 
 struct lua_State;
 
+static int CclDefineSpecies(lua_State *l);
 static int CclDefineSpeciesGenus(lua_State *l);
 static int CclDefineSpeciesFamily(lua_State *l);
 static int CclDefineSpeciesOrder(lua_State *l);
@@ -40,51 +40,35 @@ static int CclDefineSpeciesPhylum(lua_State *l);
 
 namespace wyrmgus {
 
+class taxon;
 enum class taxonomic_rank;
 
-class taxon final : public taxon_base, public data_type<taxon>
+class taxon_base : public detailed_data_entry
 {
 	Q_OBJECT
 
-	Q_PROPERTY(QString common_name READ get_common_name_qstring)
-	Q_PROPERTY(wyrmgus::taxonomic_rank rank MEMBER rank READ get_rank)
+	Q_PROPERTY(wyrmgus::taxon* supertaxon MEMBER supertaxon READ get_supertaxon)
+
+protected:
+	explicit taxon_base(const std::string &identifier) : detailed_data_entry(identifier)
+	{
+	}
 
 public:
-	static constexpr const char *class_identifier = "taxon";
-	static constexpr const char *database_folder = "taxons";
+	virtual taxonomic_rank get_rank() const = 0;
 
-	explicit taxon(const std::string &identifier);
-
-	virtual void check() const override;
-
-	const std::string &get_common_name() const
+	taxon *get_supertaxon() const
 	{
-		if (!this->common_name.empty()) {
-			return this->common_name;
-		}
-
-		return this->get_name();
+		return this->supertaxon;
 	}
 
-	QString get_common_name_qstring() const
-	{
-		return QString::fromStdString(this->common_name);
-	}
-
-	Q_INVOKABLE void set_common_name(const std::string &name)
-	{
-		this->common_name = name;
-	}
-
-	virtual taxonomic_rank get_rank() const override
-	{
-		return this->rank;
-	}
+	const taxon *get_supertaxon_of_rank(taxonomic_rank rank) const;
+	bool is_subtaxon_of(const taxon *other_taxon) const;
 
 private:
-	std::string common_name;
-	taxonomic_rank rank;
+	taxon *supertaxon = nullptr;
 
+	friend static int ::CclDefineSpecies(lua_State *l);
 	friend static int ::CclDefineSpeciesGenus(lua_State *l);
 	friend static int ::CclDefineSpeciesFamily(lua_State *l);
 	friend static int ::CclDefineSpeciesOrder(lua_State *l);

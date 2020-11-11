@@ -136,7 +136,7 @@ std::vector<std::string> species::get_name_list(const std::vector<const species 
 	return species_names;
 }
 
-species::species(const std::string &identifier) : detailed_data_entry(identifier), era(geological_era::none)
+species::species(const std::string &identifier) : taxon_base(identifier), era(geological_era::none)
 {
 }
 
@@ -178,33 +178,16 @@ void species::check() const
 		throw std::runtime_error("Species \"" + this->get_identifier() + "\" has no supertaxon.");
 	}
 
-	for (const species *pre_evolution : this->pre_evolutions) {
+	for (const species *pre_evolution : this->get_pre_evolutions()) {
 		if (this->get_era() != geological_era::none && pre_evolution->get_era() != geological_era::none && this->get_era() <= pre_evolution->get_era()) {
 			throw std::runtime_error("Species \"" + this->get_identifier() + "\" is set to evolve from \"" + pre_evolution->get_identifier() + "\", but is from the same or an earlier era than the latter.");
 		}
 	}
 }
 
-const taxon *species::get_supertaxon_of_rank(const taxonomic_rank rank) const
+taxonomic_rank species::get_rank() const
 {
-	if (this->get_supertaxon() == nullptr) {
-		return nullptr;
-	}
-
-	if (this->get_supertaxon()->get_rank() == rank) {
-		return nullptr;
-	}
-
-	return this->get_supertaxon()->get_supertaxon_of_rank(rank);
-}
-
-bool species::is_subtaxon_of(const taxon *taxon) const
-{
-	if (taxon == this->get_supertaxon()) {
-		return true;
-	}
-
-	return this->get_supertaxon()->is_subtaxon_of(taxon);
+	return taxonomic_rank::species;
 }
 
 std::string species::get_scientific_name() const

@@ -27,29 +27,44 @@
 
 #include "stratagus.h"
 
-#include "species/taxon.h"
+#include "species/taxon_base.h"
 
-#include "species/taxonomic_rank.h"
+#include "species/taxon.h"
 
 namespace wyrmgus {
 
-taxon::taxon(const std::string &identifier) : taxon_base(identifier), rank(taxonomic_rank::none)
+const taxon *taxon_base::get_supertaxon_of_rank(const taxonomic_rank rank) const
 {
+	if (this->get_supertaxon() == nullptr) {
+		return nullptr;
+	}
+
+	if (this->get_supertaxon()->get_rank() > rank) {
+		return nullptr;
+	}
+
+	if (this->get_supertaxon()->get_rank() == rank) {
+		return this->get_supertaxon();
+	}
+
+	return this->get_supertaxon()->get_supertaxon_of_rank(rank);
 }
 
-void taxon::check() const
+bool taxon_base::is_subtaxon_of(const taxon *other_taxon) const
 {
-	if (this->get_rank() == taxonomic_rank::none) {
-		throw std::runtime_error("Taxon \"" + this->get_identifier() + "\" has no rank.");
+	if (this->get_supertaxon() == nullptr) {
+		return false;
 	}
 
-	if (this->get_rank() == taxonomic_rank::species) {
-		throw std::runtime_error("Taxon \"" + this->get_identifier() + "\" has \"species\" as its taxonomic rank.");
+	if (other_taxon->get_rank() <= this->get_rank()) {
+		return false;
 	}
 
-	if (this->get_supertaxon() != nullptr && this->get_rank() >= this->get_supertaxon()->get_rank()) {
-		throw std::runtime_error("The rank of taxon \"" + this->get_identifier() + "\" is greater than or equal to the rank of its supertaxon.");
+	if (other_taxon == this->get_supertaxon()) {
+		return true;
 	}
+
+	return this->get_supertaxon()->is_subtaxon_of(other_taxon);
 }
 
 }

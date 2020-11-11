@@ -28,7 +28,7 @@
 #pragma once
 
 #include "database/data_type.h"
-#include "database/detailed_data_entry.h"
+#include "species/taxon_base.h"
 
 struct lua_State;
 
@@ -44,11 +44,10 @@ class world;
 enum class geological_era;
 enum class taxonomic_rank;
 
-class species final : public detailed_data_entry, public data_type<species>
+class species final : public taxon_base, public data_type<species>
 {
 	Q_OBJECT
 
-	Q_PROPERTY(wyrmgus::taxon* supertaxon MEMBER supertaxon READ get_supertaxon)
 	Q_PROPERTY(QString specific_name READ get_specific_name_qstring)
 	Q_PROPERTY(wyrmgus::geological_era era MEMBER era READ get_era)
 	Q_PROPERTY(wyrmgus::plane* home_plane MEMBER home_plane READ get_home_plane)
@@ -69,13 +68,7 @@ public:
 	virtual void initialize();
 	virtual void check() const;
 
-	taxon *get_supertaxon() const
-	{
-		return this->supertaxon;
-	}
-
-	const taxon *get_supertaxon_of_rank(const taxonomic_rank rank) const;
-	bool is_subtaxon_of(const taxon *taxon) const;
+	virtual taxonomic_rank get_rank() const override;
 
 	const std::string &get_specific_name() const
 	{
@@ -140,7 +133,6 @@ public:
 	const species *get_random_evolution(const terrain_type *terrain) const;
 	
 private:
-	taxon *supertaxon = nullptr;
 	std::string specific_name;
 	geological_era era;
 	plane *home_plane = nullptr;

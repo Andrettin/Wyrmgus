@@ -31,6 +31,7 @@ namespace wyrmgus {
 
 enum class taxonomic_rank {
 	none,
+	species,
 	genus,
 	tribe,
 	subfamily,
@@ -56,7 +57,9 @@ enum class taxonomic_rank {
 
 inline taxonomic_rank string_to_taxonomic_rank(const std::string &str)
 {
-	if (str == "genus") {
+	if (str == "species") {
+		return taxonomic_rank::species;
+	} else if (str == "genus") {
 		return taxonomic_rank::genus;
 	} else if (str == "tribe") {
 		return taxonomic_rank::tribe;
@@ -106,6 +109,8 @@ inline taxonomic_rank string_to_taxonomic_rank(const std::string &str)
 inline std::string taxonomic_rank_to_string(const taxonomic_rank rank)
 {
 	switch (rank) {
+		case taxonomic_rank::species:
+			return "species";
 		case taxonomic_rank::genus:
 			return "genus";
 		case taxonomic_rank::tribe:

@@ -324,6 +324,7 @@ source_group(sound FILES ${sound_SRCS})
 set(species_SRCS
 	src/species/species.cpp
 	src/species/taxon.cpp
+	src/species/taxon_base.cpp
 )
 source_group(species FILES ${species_SRCS})
 
@@ -776,6 +777,7 @@ set(stratagus_species_HDRS
 	src/species/geological_era.h
 	src/species/species.h
 	src/species/taxon.h
+	src/species/taxon_base.h
 	src/species/taxonomic_rank.h
 )
 
