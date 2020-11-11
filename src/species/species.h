@@ -129,9 +129,9 @@ public:
 		return this->evolutions;
 	}
 
-	bool has_evolution(const terrain_type *terrain = nullptr, const bool sapient_only = false) const;
+	bool has_evolution(const terrain_type *terrain = nullptr, bool sapient_only = false) const;
 	const species *get_random_evolution(const terrain_type *terrain) const;
-	
+
 private:
 	std::string specific_name;
 	geological_era era;

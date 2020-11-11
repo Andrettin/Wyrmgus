@@ -29,9 +29,44 @@
 
 #include "species/taxon_base.h"
 
+#include "database/sml_data.h"
+#include "gender.h"
 #include "species/taxon.h"
+#include "util/vector_util.h"
 
 namespace wyrmgus {
+
+void taxon_base::process_sml_scope(const sml_data &scope)
+{
+	const std::string &tag = scope.get_tag();
+	const std::vector<std::string> &values = scope.get_values();
+
+	if (tag == "specimen_names") {
+		if (!values.empty()) {
+			vector::merge(this->specimen_names[gender::none], values);
+		}
+
+		scope.for_each_child([&](const sml_data &child_scope) {
+			const std::string &tag = child_scope.get_tag();
+
+			const wyrmgus::gender gender = string_to_gender(tag);
+			vector::merge(this->specimen_names[gender], child_scope.get_values());
+		});
+	} else {
+		data_entry::process_sml_scope(scope);
+	}
+}
+
+void taxon_base::initialize()
+{
+	if (this->get_supertaxon() != nullptr) {
+		if (!this->get_supertaxon()->is_initialized()) {
+			this->get_supertaxon()->initialize();
+		}
+
+		this->get_supertaxon()->add_specimen_names_from(this);
+	}
+}
 
 const taxon *taxon_base::get_supertaxon_of_rank(const taxonomic_rank rank) const
 {
@@ -65,6 +100,53 @@ bool taxon_base::is_subtaxon_of(const taxon *other_taxon) const
 	}
 
 	return this->get_supertaxon()->is_subtaxon_of(other_taxon);
+}
+
+const std::map<gender, std::vector<std::string>> &taxon_base::get_specimen_names() const
+{
+	if (!this->specimen_names.empty()) {
+		return this->specimen_names;
+	}
+
+	if (this->get_supertaxon() != nullptr) {
+		return this->get_supertaxon()->get_specimen_names();
+	}
+
+	return this->specimen_names;
+}
+
+const std::vector<std::string> &taxon_base::get_specimen_names(const gender gender) const
+{
+	auto find_iterator = this->specimen_names.find(gender);
+	if (find_iterator != this->specimen_names.end()) {
+		return find_iterator->second;
+	}
+
+	if (this->get_supertaxon() != nullptr) {
+		return this->get_supertaxon()->get_specimen_names(gender);
+	}
+
+	return vector::empty_string_vector;
+}
+
+void taxon_base::add_specimen_name(const gender gender, const std::string &name)
+{
+	this->specimen_names[gender].push_back(name);
+
+	if (this->get_supertaxon() != nullptr) {
+		this->get_supertaxon()->add_specimen_name(gender, name);
+	}
+}
+
+void taxon_base::add_specimen_names_from(const taxon_base *other)
+{
+	for (const auto &kv_pair : other->specimen_names) {
+		vector::merge(this->specimen_names[kv_pair.first], kv_pair.second);
+	}
+
+	if (this->get_supertaxon() != nullptr) {
+		this->get_supertaxon()->add_specimen_names_from(other);
+	}
 }
 
 }
