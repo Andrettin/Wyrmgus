@@ -209,6 +209,10 @@ inline std::string get_plural_form(const std::string &str)
 		string::replace(result, "f", "ves");
 	} else if (!result.ends_with("s")) {
 		result += "s";
+	} else if (result.ends_with("mouse")) {
+		string::replace(result, "mouse", "mice");
+	} else if (result.ends_with("Mouse")) {
+		string::replace(result, "Mouse", "Mice");
 	}
 
 	return result;
