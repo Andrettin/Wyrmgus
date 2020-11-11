@@ -946,9 +946,9 @@ public:
 	const std::string &get_default_button_key(const CPlayer *player) const;
 	bool CanExperienceUpgradeTo(const unit_type *type) const;
 	std::string GetNamePlural() const;
-	std::string GeneratePersonalName(const faction *faction, const gender gender) const;
-	bool IsPersonalNameValid(const std::string &name, const faction *faction, const gender gender) const;
-	std::vector<std::string> GetPotentialPersonalNames(const faction *faction, const gender gender) const;
+	std::string GeneratePersonalName(const faction *faction, gender gender) const;
+	bool IsPersonalNameValid(const std::string &name, const faction *faction, gender gender) const;
+	std::vector<std::string> GetPotentialPersonalNames(const faction *faction, gender gender) const;
 	//Wyrmgus end
 
 	item_class get_item_class() const

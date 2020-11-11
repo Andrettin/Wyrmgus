@@ -65,6 +65,8 @@
 #include "util/size_util.h"
 #include "util/string_util.h"
 #include "util/util.h"
+#include "util/vector_util.h"
+#include "util/vector_random_util.h"
 #include "video/video.h"
 
 /**
@@ -1851,10 +1853,10 @@ std::string unit_type::GeneratePersonalName(const wyrmgus::faction *faction, con
 		return "";
 	}
 	
-	std::vector<std::string> potential_names = this->GetPotentialPersonalNames(faction, gender);
+	const std::vector<std::string> potential_names = this->GetPotentialPersonalNames(faction, gender);
 	
-	if (potential_names.size() > 0) {
-		return potential_names[SyncRand(potential_names.size())];
+	if (!potential_names.empty()) {
+		return vector::get_random(potential_names);
 	}
 
 	return "";
@@ -1866,13 +1868,9 @@ bool unit_type::IsPersonalNameValid(const std::string &name, const wyrmgus::fact
 		return false;
 	}
 	
-	std::vector<std::string> potential_names = this->GetPotentialPersonalNames(faction, gender);
+	const std::vector<std::string> potential_names = this->GetPotentialPersonalNames(faction, gender);
 	
-	if (std::find(potential_names.begin(), potential_names.end(), name) != potential_names.end()) {
-		return true;
-	}
-
-	return false;
+	return vector::contains(potential_names, name);
 }
 
 std::vector<std::string> unit_type::GetPotentialPersonalNames(const wyrmgus::faction *faction, const gender gender) const
@@ -1889,34 +1887,55 @@ std::vector<std::string> unit_type::GetPotentialPersonalNames(const wyrmgus::fac
 			potential_names.push_back(this->PersonalNames.find(gender)->second[i]);
 		}
 	}
-	
-	if (potential_names.size() == 0 && this->get_civilization() != nullptr) {
+
+	if (!potential_names.empty()) {
+		return potential_names;
+	}
+
+	const wyrmgus::species *species = this->get_species();
+	if (species != nullptr) {
+		auto find_iterator = species->get_specimen_names().find(gender::none);
+		if (find_iterator != species->get_specimen_names().end()) {
+			vector::merge(potential_names, find_iterator->second);
+		}
+
+		if (gender != gender::none) {
+			find_iterator = species->get_specimen_names().find(gender);
+			if (find_iterator != species->get_specimen_names().end()) {
+				vector::merge(potential_names, find_iterator->second);
+			}
+		}
+	} else if (this->get_civilization() != nullptr) {
 		const wyrmgus::civilization *civilization = this->get_faction_civilization(faction);
 		if (faction != nullptr && faction->get_civilization() != civilization) {
 			faction = nullptr;
 		}
-		if (this->Faction != -1 && !faction) {
+		if (this->Faction != -1 && faction == nullptr) {
 			faction = faction::get_all()[this->Faction];
 		}
 
 		if (this->BoolFlag[ORGANIC_INDEX].value) {
-			if (civilization->get_personal_names().find(gender::none) != civilization->get_personal_names().end()) {
-				for (size_t i = 0; i < civilization->get_personal_names().find(gender::none)->second.size(); ++i) {
-					potential_names.push_back(civilization->get_personal_names().find(gender::none)->second[i]);
-				}
+			auto find_iterator = civilization->get_personal_names().find(gender::none);
+			if (find_iterator != civilization->get_personal_names().end()) {
+				vector::merge(potential_names, find_iterator->second);
 			}
-			if (gender != gender::none && civilization->get_personal_names().find(gender) != civilization->get_personal_names().end()) {
-				for (size_t i = 0; i < civilization->get_personal_names().find(gender)->second.size(); ++i) {
-					potential_names.push_back(civilization->get_personal_names().find(gender)->second[i]);
+
+			if (gender != gender::none) {
+				find_iterator = civilization->get_personal_names().find(gender);
+				if (find_iterator != civilization->get_personal_names().end()) {
+					vector::merge(potential_names, find_iterator->second);
 				}
 			}
 		} else {
-			if (this->get_unit_class() != nullptr && civilization->get_unit_class_names(this->get_unit_class()).size() > 0) {
-				return civilization->get_unit_class_names(this->get_unit_class());
+			if (this->get_unit_class() != nullptr) {
+				const std::vector<std::string> &unit_class_names = civilization->get_unit_class_names(this->get_unit_class());
+				if (!unit_class_names.empty()) {
+					return unit_class_names;
+				}
 			}
 
 			if (this->UnitType == UnitTypeType::Naval) { // if is a ship
-				if (faction && !faction->get_ship_names().empty()) {
+				if (faction != nullptr && !faction->get_ship_names().empty()) {
 					return faction->get_ship_names();
 				}
 

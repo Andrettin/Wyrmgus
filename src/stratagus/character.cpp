@@ -50,6 +50,7 @@
 #include "quest.h"
 #include "religion/deity.h"
 #include "script/condition/and_condition.h"
+#include "species/species.h"
 #include "spell/spell.h"
 #include "time/calendar.h"
 #include "unit/unit.h"
@@ -377,9 +378,14 @@ void character::initialize()
 	}
 
 	//use the character's name for name generation (do this only after setting all properties so that the type, civilization and gender will have been parsed if given
-	if (this->get_unit_type() != nullptr && this->get_unit_type()->BoolFlag[FAUNA_INDEX].value) {
+	if (this->get_unit_type() != nullptr && this->get_unit_type()->BoolFlag[FAUNA_INDEX].value && this->get_unit_type()->get_species() != nullptr) {
+		wyrmgus::species *species = this->get_unit_type()->get_species();
+		if (!species->is_initialized()) {
+			species->initialize();
+		}
+
 		if (!this->get_name().empty()) {
-			this->unit_type->PersonalNames[this->get_gender()].push_back(this->get_name());
+			this->unit_type->get_species()->add_specimen_name(this->get_gender(), this->get_name());
 		}
 	} else if (this->civilization != nullptr) {
 		if (!this->civilization->is_initialized()) {

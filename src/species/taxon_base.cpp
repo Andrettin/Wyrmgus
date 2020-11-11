@@ -117,20 +117,6 @@ const std::map<gender, std::vector<std::string>> &taxon_base::get_specimen_names
 	return this->specimen_names;
 }
 
-const std::vector<std::string> &taxon_base::get_specimen_names(const gender gender) const
-{
-	auto find_iterator = this->specimen_names.find(gender);
-	if (find_iterator != this->specimen_names.end()) {
-		return find_iterator->second;
-	}
-
-	if (this->get_supertaxon() != nullptr) {
-		return this->get_supertaxon()->get_specimen_names(gender);
-	}
-
-	return vector::empty_string_vector;
-}
-
 void taxon_base::add_specimen_name(const gender gender, const std::string &name)
 {
 	this->specimen_names[gender].push_back(name);

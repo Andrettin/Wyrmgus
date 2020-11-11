@@ -48,6 +48,7 @@
 #include "quest.h"
 #include "script.h"
 #include "script/condition/condition.h"
+#include "species/species.h"
 #include "spell/spell.h"
 #include "translate.h"
 #include "ui/interface.h"
@@ -280,6 +281,11 @@ int TransformUnitIntoType(CUnit &unit, const wyrmgus::unit_type &newtype)
 		unit.Character == nullptr
 		&& (
 			oldtype.PersonalNames != newtype.PersonalNames
+			|| (
+				oldtype.get_species() != newtype.get_species() 
+				&& (oldtype.get_species() != nullptr || newtype.get_species() != nullptr)
+				&& (oldtype.get_species() == nullptr || newtype.get_species() == nullptr || oldtype.get_species()->get_specimen_names() != newtype.get_species()->get_specimen_names())
+			)
 			|| (
 				oldtype.get_civilization() != nullptr && newtype.get_civilization() != nullptr && oldtype.get_civilization() != newtype.get_civilization()
 				&& (
