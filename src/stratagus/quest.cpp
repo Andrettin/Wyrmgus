@@ -171,6 +171,8 @@ void quest::initialize()
 	if (!this->Hidden && this->civilization != nullptr && std::find(this->civilization->Quests.begin(), this->civilization->Quests.end(), this) == this->civilization->Quests.end()) {
 		this->civilization->Quests.push_back(this);
 	}
+
+	data_entry::initialize();
 }
 
 void quest::check() const

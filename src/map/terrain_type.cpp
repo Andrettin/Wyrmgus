@@ -387,6 +387,8 @@ void terrain_type::initialize()
 			this->season_graphics[season] = CPlayerColorGraphic::New(filepath.string(), defines::get()->get_tile_size(), nullptr);
 		}
 	}
+
+	data_entry::initialize();
 }
 
 void terrain_type::set_character(const char character)

@@ -146,6 +146,8 @@ void missile_type::initialize()
 	if (!this->get_image_file().empty()) {
 		this->G = CGraphic::New(this->get_image_file().string(), this->get_frame_size());
 	}
+
+	data_entry::initialize();
 }
 
 void missile_type::set_image_file(const std::filesystem::path &filepath)

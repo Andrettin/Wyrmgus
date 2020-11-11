@@ -64,6 +64,8 @@ void dialogue::initialize()
 	for (const std::unique_ptr<dialogue_node> &node : this->nodes) {
 		node->initialize();
 	}
+
+	data_entry::initialize();
 }
 
 void dialogue::check() const

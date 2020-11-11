@@ -257,6 +257,10 @@ public:
 			} catch (...) {
 				std::throw_with_nested(std::runtime_error("Failed to initialize the " + std::string(T::class_identifier) + " instance \"" + instance->get_identifier() + "\"."));
 			}
+
+			if (!instance->is_initialized()) {
+				throw std::runtime_error("The " + std::string(T::class_identifier) + " instance \"" + instance->get_identifier() + "\" is not marked as initialized despite the initialization function having been called for it.");
+			}
 		}
 	}
 

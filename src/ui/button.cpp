@@ -352,6 +352,8 @@ void button::initialize()
 	if (this->UnitMask[0] != '*') {
 		this->UnitMask = "," + this->UnitMask + ",";
 	}
+
+	data_entry::initialize();
 }
 
 const CUnit *button::get_unit() const
