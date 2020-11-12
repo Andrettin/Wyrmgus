@@ -1118,6 +1118,6 @@ std::string SeparateCapitalizedStringElements(const std::string &text)
 std::string GeneratePersonalName(const std::string &unit_type_ident)
 {
 	const wyrmgus::unit_type *unit_type = wyrmgus::unit_type::get(unit_type_ident);
-	return unit_type->GeneratePersonalName(nullptr, unit_type->get_gender());
+	return unit_type->generate_personal_name(nullptr, unit_type->get_gender());
 }
 //Wyrmgus end

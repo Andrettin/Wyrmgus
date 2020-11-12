@@ -1826,13 +1826,13 @@ std::string unit_type::GetNamePlural() const
 	return GetPluralForm(this->get_name());
 }
 
-std::string unit_type::GeneratePersonalName(const wyrmgus::faction *faction, const gender gender) const
+std::string unit_type::generate_personal_name(const wyrmgus::faction *faction, const gender gender) const
 {
 	if (Editor.Running == EditorEditing) { // don't set the personal name if in the editor
 		return "";
 	}
 	
-	const std::vector<std::string> potential_names = this->GetPotentialPersonalNames(faction, gender);
+	const std::vector<std::string> potential_names = this->get_potential_personal_names(faction, gender);
 	
 	if (!potential_names.empty()) {
 		return vector::get_random(potential_names);
@@ -1841,34 +1841,24 @@ std::string unit_type::GeneratePersonalName(const wyrmgus::faction *faction, con
 	return "";
 }
 
-bool unit_type::IsPersonalNameValid(const std::string &name, const wyrmgus::faction *faction, const gender gender) const
+bool unit_type::is_personal_name_valid(const std::string &name, const wyrmgus::faction *faction, const gender gender) const
 {
 	if (name.empty()) {
 		return false;
 	}
 	
-	const std::vector<std::string> potential_names = this->GetPotentialPersonalNames(faction, gender);
+	const std::vector<std::string> potential_names = this->get_potential_personal_names(faction, gender);
 	
 	return vector::contains(potential_names, name);
 }
 
-std::vector<std::string> unit_type::GetPotentialPersonalNames(const wyrmgus::faction *faction, const gender gender) const
+std::vector<std::string> unit_type::get_potential_personal_names(const wyrmgus::faction *faction, const gender gender) const
 {
 	std::vector<std::string> potential_names;
 	
 	const wyrmgus::species *species = this->get_species();
 	if (species != nullptr) {
-		auto find_iterator = species->get_specimen_names().find(gender::none);
-		if (find_iterator != species->get_specimen_names().end()) {
-			vector::merge(potential_names, find_iterator->second);
-		}
-
-		if (gender != gender::none) {
-			find_iterator = species->get_specimen_names().find(gender);
-			if (find_iterator != species->get_specimen_names().end()) {
-				vector::merge(potential_names, find_iterator->second);
-			}
-		}
+		return species->get_specimen_names(gender);
 	} else if (this->get_civilization() != nullptr) {
 		const wyrmgus::civilization *civilization = this->get_faction_civilization(faction);
 		if (faction != nullptr && faction->get_civilization() != civilization) {

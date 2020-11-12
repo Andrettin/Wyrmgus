@@ -66,12 +66,12 @@ public:
 		return this->supertaxon;
 	}
 
-	const taxon *get_supertaxon_of_rank(taxonomic_rank rank) const;
+	const taxon *get_supertaxon_of_rank(const taxonomic_rank rank) const;
 	bool is_subtaxon_of(const taxon *other_taxon) const;
 
-	const std::map<gender, std::vector<std::string>> &get_specimen_names() const;
+	std::vector<std::string> get_specimen_names(const gender gender) const;
 
-	void add_specimen_name(gender gender, const std::string &name);
+	void add_specimen_name(const gender gender, const std::string &name);
 	void add_specimen_names_from(const taxon_base *other);
 
 private:

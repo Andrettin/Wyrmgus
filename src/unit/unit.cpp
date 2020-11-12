@@ -2163,7 +2163,7 @@ void CUnit::GenerateDrop()
 			
 		if (droppedUnit != nullptr) {
 			if (droppedUnit->Type->BoolFlag[FAUNA_INDEX].value) {
-				droppedUnit->Name = droppedUnit->Type->GeneratePersonalName(nullptr, droppedUnit->get_gender());
+				droppedUnit->Name = droppedUnit->Type->generate_personal_name(nullptr, droppedUnit->get_gender());
 			}
 			
 			droppedUnit->GenerateSpecialProperties(this, this->Player);
@@ -3489,13 +3489,13 @@ void CUnit::UpdatePersonalName(bool update_settlement_name)
 		}
 	}
 	
-	if (!this->Type->IsPersonalNameValid(this->Name, faction, this->get_gender())) {
+	if (!this->Type->is_personal_name_valid(this->Name, faction, this->get_gender())) {
 		// first see if can translate the current personal name
 		std::string new_personal_name = PlayerRaces.TranslateName(this->Name, language);
 		if (!new_personal_name.empty()) {
 			this->Name = new_personal_name;
 		} else {
-			this->Name = this->Type->GeneratePersonalName(faction, this->get_gender());
+			this->Name = this->Type->generate_personal_name(faction, this->get_gender());
 		}
 	}
 

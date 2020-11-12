@@ -104,17 +104,29 @@ bool taxon_base::is_subtaxon_of(const taxon *other_taxon) const
 	return this->get_supertaxon()->is_subtaxon_of(other_taxon);
 }
 
-const std::map<gender, std::vector<std::string>> &taxon_base::get_specimen_names() const
+std::vector<std::string> taxon_base::get_specimen_names(const gender gender) const
 {
-	if (!this->specimen_names.empty()) {
-		return this->specimen_names;
+	static constexpr size_t minimum_name_count = 10;
+
+	std::vector<std::string> potential_names;
+
+	auto find_iterator = this->specimen_names.find(gender::none);
+	if (find_iterator != this->specimen_names.end()) {
+		vector::merge(potential_names, find_iterator->second);
 	}
 
-	if (this->get_supertaxon() != nullptr) {
-		return this->get_supertaxon()->get_specimen_names();
+	if (gender != gender::none) {
+		find_iterator = this->specimen_names.find(gender);
+		if (find_iterator != this->specimen_names.end()) {
+			vector::merge(potential_names, find_iterator->second);
+		}
 	}
 
-	return this->specimen_names;
+	if (potential_names.size() < minimum_name_count && this->get_supertaxon() != nullptr) {
+		return this->get_supertaxon()->get_specimen_names(gender);
+	}
+
+	return potential_names;
 }
 
 void taxon_base::add_specimen_name(const gender gender, const std::string &name)
