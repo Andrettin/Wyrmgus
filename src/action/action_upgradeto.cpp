@@ -280,8 +280,7 @@ int TransformUnitIntoType(CUnit &unit, const wyrmgus::unit_type &newtype)
 	if (
 		unit.Character == nullptr
 		&& (
-			oldtype.PersonalNames != newtype.PersonalNames
-			|| (
+			(
 				oldtype.get_species() != newtype.get_species() 
 				&& (oldtype.get_species() != nullptr || newtype.get_species() != nullptr)
 				&& (oldtype.get_species() == nullptr || newtype.get_species() == nullptr || oldtype.get_species()->get_specimen_names() != newtype.get_species()->get_specimen_names())

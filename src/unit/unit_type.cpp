@@ -1608,7 +1608,6 @@ void unit_type::set_parent(const unit_type *parent_type)
 		parent_type->Trains[i]->TrainedBy.push_back(this);
 	}
 	this->StartingResources = parent_type->StartingResources;
-	this->PersonalNames = parent_type->PersonalNames;
 
 	for (const auto &building_rule : parent_type->BuildingRules) {
 		this->BuildingRules.push_back(building_rule->duplicate());
@@ -1877,21 +1876,6 @@ std::vector<std::string> unit_type::GetPotentialPersonalNames(const wyrmgus::fac
 {
 	std::vector<std::string> potential_names;
 	
-	if (this->PersonalNames.find(gender::none) != this->PersonalNames.end()) {
-		for (size_t i = 0; i < this->PersonalNames.find(gender::none)->second.size(); ++i) {
-			potential_names.push_back(this->PersonalNames.find(gender::none)->second[i]);
-		}
-	}
-	if (gender != gender::none && this->PersonalNames.find(gender) != this->PersonalNames.end()) {
-		for (size_t i = 0; i < this->PersonalNames.find(gender)->second.size(); ++i) {
-			potential_names.push_back(this->PersonalNames.find(gender)->second[i]);
-		}
-	}
-
-	if (!potential_names.empty()) {
-		return potential_names;
-	}
-
 	const wyrmgus::species *species = this->get_species();
 	if (species != nullptr) {
 		auto find_iterator = species->get_specimen_names().find(gender::none);

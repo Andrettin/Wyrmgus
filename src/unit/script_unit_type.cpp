@@ -1674,18 +1674,6 @@ static int CclDefineUnitType(lua_State *l)
 			for (int j = 0; j < args; ++j) {
 				type->WeaponClasses.push_back(wyrmgus::string_to_item_class(LuaToString(l, -1, j + 1)));
 			}
-		} else if (!strcmp(value, "PersonalNames")) {
-			type->PersonalNames.clear();
-			const int args = lua_rawlen(l, -1);
-			for (int j = 0; j < args; ++j) {
-				wyrmgus::gender gender = wyrmgus::gender::none;
-				gender = wyrmgus::try_string_to_gender(LuaToString(l, -1, j + 1));
-				if (gender != wyrmgus::gender::none) {
-					++j;
-				}
-				
-				type->PersonalNames[gender].push_back(LuaToString(l, -1, j + 1));
-			}
 		} else if (!strcmp(value, "Mod")) {
 			type->Mod = LuaToString(l, -1);
 		//Wyrmgus end

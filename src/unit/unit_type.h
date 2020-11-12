@@ -1056,7 +1056,6 @@ public:
 	int ShadowHeight;                                     /// Shadow sprite height
 	int ShadowOffsetX;                                    /// Shadow horizontal offset
 	int ShadowOffsetY;                                    /// Shadow vertical offset
-	//Wyrmgus start
 	int TrainQuantity;										/// Quantity to be trained
 	int CostModifier;										/// Cost modifier (cost increase for every unit of this type the player has)
 private:
@@ -1065,8 +1064,6 @@ private:
 public:
 	wyrmgus::terrain_type *TerrainType;
 	std::vector<wyrmgus::item_class> WeaponClasses; //weapon classes that the unit type can use (if the unit type uses a weapon)
-	std::map<gender, std::vector<std::string>> PersonalNames;	/// Personal names for the unit type, mapped to the gender they pertain to (use NoGender for names which should be available for both genders)
-	//Wyrmgus end
 	PixelPos MissileOffsets[UnitSides][MaxAttackPos];     /// Attack offsets for missiles
 
 private:
