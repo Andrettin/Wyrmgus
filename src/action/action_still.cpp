@@ -311,7 +311,7 @@ static bool PickUpItem(CUnit &unit)
 		return false;
 	}
 	
-	if (unit.Variable[HP_INDEX].Value == unit.GetModifiedVariable(HP_INDEX, VariableMax) && !unit.HasInventory()) { //only look for items to pick up if the unit is damaged or has an inventory
+	if (unit.Variable[HP_INDEX].Value == unit.GetModifiedVariable(HP_INDEX, VariableAttribute::Max) && !unit.HasInventory()) { //only look for items to pick up if the unit is damaged or has an inventory
 		return false;
 	}
 
@@ -322,7 +322,7 @@ static bool PickUpItem(CUnit &unit)
 	for (size_t i = 0; i != table.size(); ++i) {
 		if (!table[i]->Removed) {
 			if (CanPickUp(unit, *table[i])) {
-				if (table[i]->Variable[HITPOINTHEALING_INDEX].Value > 0 && (unit.GetModifiedVariable(HP_INDEX, VariableMax) - unit.Variable[HP_INDEX].Value) > 0) {
+				if (table[i]->Variable[HITPOINTHEALING_INDEX].Value > 0 && (unit.GetModifiedVariable(HP_INDEX, VariableAttribute::Max) - unit.Variable[HP_INDEX].Value) > 0) {
 					if (UnitReachable(unit, *table[i], 1, unit.GetReactionRange() * 8)) {
 						CommandPickUp(unit, *table[i], FlushCommands);
 						return true;
@@ -362,7 +362,7 @@ public:
 				&& unit->Type->RepairHP
 				//Wyrmgus start
 //				&& unit->Variable[HP_INDEX].Value < unit->Variable[HP_INDEX].Max
-				&& unit->Variable[HP_INDEX].Value < unit->GetModifiedVariable(HP_INDEX, VariableMax)
+				&& unit->Variable[HP_INDEX].Value < unit->GetModifiedVariable(HP_INDEX, VariableAttribute::Max)
 				//Wyrmgus end
 				&& unit->IsVisibleAsGoal(*worker->Player));
 	}

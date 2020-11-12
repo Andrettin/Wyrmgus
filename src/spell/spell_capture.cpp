@@ -81,7 +81,7 @@ int Spell_Capture::Cast(CUnit &caster, const wyrmgus::spell &spell, CUnit *targe
 		if ((100 * target->Variable[HP_INDEX].Value) /
 			//Wyrmgus start
 //			target->Variable[HP_INDEX].Max > this->DamagePercent &&
-			target->GetModifiedVariable(HP_INDEX, VariableMax) > this->DamagePercent &&
+			target->GetModifiedVariable(HP_INDEX, VariableAttribute::Max) > this->DamagePercent &&
 			//Wyrmgus end
 			target->Variable[HP_INDEX].Value > this->Damage) {
 			HitUnit(&caster, *target, this->Damage);

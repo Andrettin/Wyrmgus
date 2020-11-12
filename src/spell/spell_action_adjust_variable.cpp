@@ -261,7 +261,7 @@ int spell_action_adjust_variable::Cast(CUnit &caster, const spell &, CUnit *targ
 
 		//Wyrmgus start
 //		clamp(&unit->Variable[i].Value, 0, unit->Variable[i].Max);
-		clamp(&unit->Variable[i].Value, 0, unit->GetModifiedVariable(i, VariableMax));
+		clamp(&unit->Variable[i].Value, 0, unit->GetModifiedVariable(i, VariableAttribute::Max));
 		//Wyrmgus end
 
 		//Wyrmgus start

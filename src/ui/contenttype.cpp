@@ -49,14 +49,14 @@ struct UStrInt {
 	UStrIntType type;
 };
 
-extern UStrInt GetComponent(const CUnit &unit, int index, EnumVariable e, int t);
-extern UStrInt GetComponent(const wyrmgus::unit_type &type, int index, EnumVariable e);
+extern UStrInt GetComponent(const CUnit &unit, int index, VariableAttribute e, int t);
+extern UStrInt GetComponent(const wyrmgus::unit_type &type, int index, VariableAttribute e);
 
 CContentType::~CContentType()
 {
 }
 
-CContentTypeText::CContentTypeText() : Component(VariableValue)
+CContentTypeText::CContentTypeText() : Component(VariableAttribute::Value)
 {
 }
 
@@ -107,16 +107,16 @@ CContentTypeText::~CContentTypeText()
 
 	if (this->Index != -1) {
 		if (!this->Stat) {
-			EnumVariable component = this->Component;
+			const VariableAttribute component = this->Component;
 			switch (component) {
-				case VariableValue:
-				case VariableMax:
-				case VariableIncrease:
-				case VariableDiff:
-				case VariablePercent:
+				case VariableAttribute::Value:
+				case VariableAttribute::Max:
+				case VariableAttribute::Increase:
+				case VariableAttribute::Diff:
+				case VariableAttribute::Percent:
 					label.Draw(x, y, GetComponent(unit, this->Index, component, 0).i);
 					break;
-				case VariableName:
+				case VariableAttribute::Name:
 					label.Draw(x, y, GetComponent(unit, this->Index, component, 0).s);
 					break;
 				default:
@@ -137,7 +137,7 @@ CContentTypeText::~CContentTypeText()
 	}
 }
 
-CContentTypeFormattedText::CContentTypeFormattedText() : Component(VariableValue)
+CContentTypeFormattedText::CContentTypeFormattedText() : Component(VariableAttribute::Value)
 {
 }
 
@@ -183,7 +183,7 @@ void CContentTypeFormattedText::Draw(const CUnit &unit, const wyrmgus::font *def
 	}
 }
 
-CContentTypeFormattedText2::CContentTypeFormattedText2() : Component1(VariableValue), Component2(VariableValue)
+CContentTypeFormattedText2::CContentTypeFormattedText2() : Component1(VariableAttribute::Value), Component2(VariableAttribute::Value)
 {
 }
 
@@ -305,7 +305,7 @@ static const CUnit *GetUnitRef(const CUnit &unit, EnumUnit e)
 	if (this->Index == XP_INDEX) {
 		max = unit.Variable[XPREQUIRED_INDEX].Value;
 	} else {
-		max = unit.GetModifiedVariable(this->Index, VariableMax);
+		max = unit.GetModifiedVariable(this->Index, VariableAttribute::Max);
 	}
 //	if (!unit.Variable[this->Index].Max) {
 	if (!max) {
@@ -417,7 +417,7 @@ static const CUnit *GetUnitRef(const CUnit &unit, EnumUnit e)
 	Assert((unsigned int) this->varIndex < UnitTypeVar.GetNumberVariable());
 	//Wyrmgus start
 //	if (!unit.Variable[this->varIndex].Max) {
-	if (!unit.GetModifiedVariable(this->varIndex, VariableMax)) {
+	if (!unit.GetModifiedVariable(this->varIndex, VariableAttribute::Max)) {
 	//Wyrmgus end
 		return;
 	}
@@ -437,7 +437,7 @@ static const CUnit *GetUnitRef(const CUnit &unit, EnumUnit e)
 	const Uint32 color = (colorIndex != -1) ? colors[colorIndex] : UI.CompletedBarColor;
 	//Wyrmgus start
 //	const int f = (100 * unit.Variable[this->varIndex].Value) / unit.Variable[this->varIndex].Max;
-	const int f = (100 * unit.GetModifiedVariable(this->varIndex, VariableValue)) / unit.GetModifiedVariable(this->varIndex, VariableMax);
+	const int f = (100 * unit.GetModifiedVariable(this->varIndex, VariableAttribute::Value)) / unit.GetModifiedVariable(this->varIndex, VariableAttribute::Max);
 	//Wyrmgus end
 
 	if (!this->hasBorder) {
@@ -487,7 +487,7 @@ static const CUnit *GetUnitRef(const CUnit &unit, EnumUnit e)
 					LuaError(l, "unknown variable '%s'" _C_ LuaToString(l, -1));
 				}
 			} else if (!strcmp(key, "Component")) {
-				this->Component = Str2EnumVariable(l, LuaToString(l, -1));
+				this->Component = Str2VariableAttribute(l, LuaToString(l, -1));
 			} else if (!strcmp(key, "Stat")) {
 				this->Stat = LuaToBoolean(l, -1);
 			} else if (!strcmp(key, "ShowName")) {
@@ -516,7 +516,7 @@ static const CUnit *GetUnitRef(const CUnit &unit, EnumUnit e)
 				LuaError(l, "unknown variable '%s'" _C_ name);
 			}
 		} else if (!strcmp(key, "Component")) {
-			this->Component = Str2EnumVariable(l, LuaToString(l, -1));
+			this->Component = Str2VariableAttribute(l, LuaToString(l, -1));
 		} else if (!strcmp(key, "Centered")) {
 			this->Centered = LuaToBoolean(l, -1);
 		} else {
@@ -542,8 +542,8 @@ static const CUnit *GetUnitRef(const CUnit &unit, EnumUnit e)
 				LuaError(l, "unknown variable '%s'" _C_ name);
 			}
 		} else if (!strcmp(key, "Component")) {
-			this->Component1 = Str2EnumVariable(l, LuaToString(l, -1));
-			this->Component2 = Str2EnumVariable(l, LuaToString(l, -1));
+			this->Component1 = Str2VariableAttribute(l, LuaToString(l, -1));
+			this->Component2 = Str2VariableAttribute(l, LuaToString(l, -1));
 		} else if (!strcmp(key, "Variable1")) {
 			const char *const name = LuaToString(l, -1);
 			this->Index1 = UnitTypeVar.VariableNameLookup[name];
@@ -551,7 +551,7 @@ static const CUnit *GetUnitRef(const CUnit &unit, EnumUnit e)
 				LuaError(l, "unknown variable '%s'" _C_ name);
 			}
 		} else if (!strcmp(key, "Component1")) {
-			this->Component1 = Str2EnumVariable(l, LuaToString(l, -1));
+			this->Component1 = Str2VariableAttribute(l, LuaToString(l, -1));
 		} else if (!strcmp(key, "Variable2")) {
 			const char *const name = LuaToString(l, -1);
 			this->Index2 = UnitTypeVar.VariableNameLookup[name];
@@ -559,7 +559,7 @@ static const CUnit *GetUnitRef(const CUnit &unit, EnumUnit e)
 				LuaError(l, "unknown variable '%s'" _C_ LuaToString(l, -1));
 			}
 		} else if (!strcmp(key, "Component2")) {
-			this->Component2 = Str2EnumVariable(l, LuaToString(l, -1));
+			this->Component2 = Str2VariableAttribute(l, LuaToString(l, -1));
 		} else if (!strcmp(key, "Centered")) {
 			this->Centered = LuaToBoolean(l, -1);
 		} else {

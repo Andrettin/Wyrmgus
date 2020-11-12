@@ -3220,14 +3220,14 @@ void UpdateUnitVariables(CUnit &unit)
 		unit.Variable[i].Enable &= unit.Variable[i].Max > 0;
 		//Wyrmgus start
 //		if (unit.Variable[i].Value > unit.Variable[i].Max) {
-		if (unit.Variable[i].Value > unit.GetModifiedVariable(i, VariableMax)) {
+		if (unit.Variable[i].Value > unit.GetModifiedVariable(i, VariableAttribute::Max)) {
 		//Wyrmgus end
 			DebugPrint("Value out of range: '%s'(%d), for variable '%s',"
 					   " value = %d, max = %d\n"
 					   _C_ type->Ident.c_str() _C_ UnitNumber(unit) _C_ UnitTypeVar.VariableNameLookup[i]
 					   //Wyrmgus start
 //					   _C_ unit.Variable[i].Value _C_ unit.Variable[i].Max);
-					   _C_ unit.Variable[i].Value _C_ unit.GetModifiedVariable(i, VariableMax));
+					   _C_ unit.Variable[i].Value _C_ unit.GetModifiedVariable(i, VariableAttribute::Max));
 					   //Wyrmgus end
 			clamp(&unit.Variable[i].Value, 0, unit.Variable[i].Max);
 		}

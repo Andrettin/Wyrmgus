@@ -279,7 +279,7 @@ static inline void IncreaseVariable(CUnit &unit, int index)
 		unit.HealingItemAutoUse();
 	} else if (index == GIVERESOURCE_INDEX && !unit.Type->BoolFlag[INEXHAUSTIBLE_INDEX].value) {
 		unit.ChangeResourcesHeld(unit.Variable[index].Increase);
-		clamp(&unit.ResourcesHeld, 0, unit.GetModifiedVariable(index, VariableMax));
+		clamp(&unit.ResourcesHeld, 0, unit.GetModifiedVariable(index, VariableAttribute::Max));
 	}
 	//Wyrmgus end
 
@@ -376,7 +376,7 @@ static bool HandleBurnAndPoison(CUnit &unit)
 	// Burn & poison
 	//Wyrmgus start
 //	const int hpPercent = (100 * unit.Variable[HP_INDEX].Value) / unit.Variable[HP_INDEX].Max;
-	const int hpPercent = (100 * unit.Variable[HP_INDEX].Value) / unit.GetModifiedVariable(HP_INDEX, VariableMax);
+	const int hpPercent = (100 * unit.Variable[HP_INDEX].Value) / unit.GetModifiedVariable(HP_INDEX, VariableAttribute::Max);
 	//Wyrmgus end
 	if (hpPercent <= unit.Type->BurnPercent && unit.Type->BurnDamageRate) {
 		//Wyrmgus start
@@ -426,7 +426,7 @@ static void HandleBuffsEachSecond(CUnit &unit)
 		//Wyrmgus start
 		if (i == HP_INDEX && unit.Variable[REGENERATION_INDEX].Value > 0) {
 			unit.Variable[i].Value += 1;
-			clamp(&unit.Variable[i].Value, 0, unit.GetModifiedVariable(i, VariableMax));
+			clamp(&unit.Variable[i].Value, 0, unit.GetModifiedVariable(i, VariableAttribute::Max));
 		}
 		//Wyrmgus end
 		if (unit.Variable[i].Enable && unit.Variable[i].Increase) {

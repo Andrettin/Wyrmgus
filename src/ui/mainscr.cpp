@@ -202,7 +202,7 @@ static void UiDrawLifeBar(const CUnit &unit, int x, int y)
 		//Wyrmgus start
 		Uint32 lighter_color;
 //		int f = (100 * unit.Variable[HP_INDEX].Value) / unit.Variable[HP_INDEX].Max;
-		int f = (100 * unit.Variable[HP_INDEX].Value) / unit.GetModifiedVariable(HP_INDEX, VariableMax);
+		int f = (100 * unit.Variable[HP_INDEX].Value) / unit.GetModifiedVariable(HP_INDEX, VariableAttribute::Max);
 		//Wyrmgus end
 
 		if (f > 75) {
@@ -253,11 +253,11 @@ static void UiDrawManaBar(const CUnit &unit, int x, int y)
 
 	//Wyrmgus start
 //	if (unit.Stats->Variables[MANA_INDEX].Max) {
-	if (unit.GetModifiedVariable(MANA_INDEX, VariableMax)) {
+	if (unit.GetModifiedVariable(MANA_INDEX, VariableAttribute::Max)) {
 	//Wyrmgus end
 		//Wyrmgus start
 //		int f = (100 * unit.Variable[MANA_INDEX].Value) / unit.Variable[MANA_INDEX].Max;
-		int f = (100 * unit.GetModifiedVariable(MANA_INDEX, VariableValue)) / unit.GetModifiedVariable(MANA_INDEX, VariableMax);
+		int f = (100 * unit.GetModifiedVariable(MANA_INDEX, VariableAttribute::Value)) / unit.GetModifiedVariable(MANA_INDEX, VariableAttribute::Max);
 		//Wyrmgus end
 		f = (f * (unit.Type->Icon.Icon->get_graphics()->Width)) / 100;
 		Video.FillRectangleClip(ColorBlue, x + 1, y + 3 + 1, f, 2);
@@ -337,7 +337,7 @@ struct UStrInt {
 **
 **  @return       Value corresponding
 */
-UStrInt GetComponent(const CUnit &unit, int index, EnumVariable e, int t)
+UStrInt GetComponent(const CUnit &unit, int index, VariableAttribute e, int t)
 {
 	UStrInt val;
 	const wyrmgus::unit_variable *var;
@@ -361,28 +361,28 @@ UStrInt GetComponent(const CUnit &unit, int index, EnumVariable e, int t)
 	}
 
 	switch (e) {
-		case VariableValue:
+		case VariableAttribute::Value:
 			val.type = USTRINT_INT;
 			val.i = var->Value;
 			break;
-		case VariableMax:
+		case VariableAttribute::Max:
 			val.type = USTRINT_INT;
 			val.i = var->Max;
 			break;
-		case VariableIncrease:
+		case VariableAttribute::Increase:
 			val.type = USTRINT_INT;
 			val.i = var->Increase;
 			break;
-		case VariableDiff:
+		case VariableAttribute::Diff:
 			val.type = USTRINT_INT;
 			val.i = var->Max - var->Value;
 			break;
-		case VariablePercent:
+		case VariableAttribute::Percent:
 			Assert(unit.Variable[index].Max != 0);
 			val.type = USTRINT_INT;
 			val.i = 100 * var->Value / var->Max;
 			break;
-		case VariableName:
+		case VariableAttribute::Name:
 			if (index == GIVERESOURCE_INDEX) {
 				val.type = USTRINT_STR;
 				//Wyrmgus start
@@ -402,7 +402,7 @@ UStrInt GetComponent(const CUnit &unit, int index, EnumVariable e, int t)
 			}
 			break;
 		//Wyrmgus start
-		case VariableChange:
+		case VariableAttribute::Change:
 			val.type = USTRINT_INT;
 			if (unit.Container && unit.Container->HasInventory()) {
 				val.i = unit.Container->GetItemVariableChange(&unit, index);
@@ -412,7 +412,7 @@ UStrInt GetComponent(const CUnit &unit, int index, EnumVariable e, int t)
 				val.i = var->Value;
 			}
 			break;
-		case VariableIncreaseChange:
+		case VariableAttribute::IncreaseChange:
 			val.type = USTRINT_INT;
 			if (unit.Container && unit.Container->HasInventory()) {
 				val.i = unit.Container->GetItemVariableChange(&unit, index, true);
@@ -427,7 +427,7 @@ UStrInt GetComponent(const CUnit &unit, int index, EnumVariable e, int t)
 	return val;
 }
 
-UStrInt GetComponent(const wyrmgus::unit_type &type, int index, EnumVariable e, int t)
+UStrInt GetComponent(const wyrmgus::unit_type &type, int index, VariableAttribute e, int t)
 {
 	UStrInt val;
 	const wyrmgus::unit_variable *var = nullptr;
@@ -450,28 +450,28 @@ UStrInt GetComponent(const wyrmgus::unit_type &type, int index, EnumVariable e, 
 			break;
 	}
 	switch (e) {
-		case VariableValue:
+		case VariableAttribute::Value:
 			val.type = USTRINT_INT;
 			val.i = var->Value;
 			break;
-		case VariableMax:
+		case VariableAttribute::Max:
 			val.type = USTRINT_INT;
 			val.i = var->Max;
 			break;
-		case VariableIncrease:
+		case VariableAttribute::Increase:
 			val.type = USTRINT_INT;
 			val.i = var->Increase;
 			break;
-		case VariableDiff:
+		case VariableAttribute::Diff:
 			val.type = USTRINT_INT;
 			val.i = var->Max - var->Value;
 			break;
-		case VariablePercent:
+		case VariableAttribute::Percent:
 			Assert(type.Stats[CPlayer::GetThisPlayer()->Index].Variables[index].Max != 0);
 			val.type = USTRINT_INT;
 			val.i = 100 * var->Value / var->Max;
 			break;
-		case VariableName:
+		case VariableAttribute::Name:
 			if (index == GIVERESOURCE_INDEX) {
 				val.type = USTRINT_STR;
 				val.i = type.get_given_resource() != nullptr ? type.get_given_resource()->get_index() : 0;
@@ -483,8 +483,8 @@ UStrInt GetComponent(const wyrmgus::unit_type &type, int index, EnumVariable e, 
 			}
 			break;
 		//Wyrmgus start
-		case VariableIncreaseChange:
-		case VariableChange:
+		case VariableAttribute::IncreaseChange:
+		case VariableAttribute::Change:
 			val.type = USTRINT_INT;
 			val.i = 0;
 			break;
@@ -669,7 +669,7 @@ static void DrawUnitInfo_transporter(CUnit &unit)
 		//Wyrmgus start
 //		UiDrawLifeBar(*uins, pos.x, pos.y);
 //		if (uins->Type->CanCastSpell && uins->Variable[MANA_INDEX].Max) {
-		if (uins->Type->Spells.size() > 0 && uins->Variable[MANA_INDEX].Enable && uins->GetModifiedVariable(MANA_INDEX, VariableMax)) {
+		if (uins->Type->Spells.size() > 0 && uins->Variable[MANA_INDEX].Enable && uins->GetModifiedVariable(MANA_INDEX, VariableAttribute::Max)) {
 		//Wyrmgus end
 			//Wyrmgus start
 //			UiDrawManaBar(*uins, pos.x, pos.y);
@@ -1902,7 +1902,7 @@ static void InfoPanel_draw_single_selection(CUnit *selUnit)
 			panelIndex = 3;
 		//Wyrmgus start
 //		} else if (unit.Stats->Variables[MANA_INDEX].Max) {
-		} else if (unit.GetModifiedVariable(MANA_INDEX, VariableMax)) {
+		} else if (unit.GetModifiedVariable(MANA_INDEX, VariableAttribute::Max)) {
 		//Wyrmgus end
 			panelIndex = 2;
 		} else {

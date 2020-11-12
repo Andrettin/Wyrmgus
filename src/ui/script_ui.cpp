@@ -385,23 +385,23 @@ static int CclSetTitleScreens(lua_State *l)
 **  @return  Corresponding value.
 **  @note    Stop on error.
 */
-EnumVariable Str2EnumVariable(lua_State *l, const char *s)
+VariableAttribute Str2VariableAttribute(lua_State *l, const char *s)
 {
 	static struct {
 		const char *s;
-		EnumVariable e;
+		VariableAttribute e;
 	} list[] = {
-		{"Value", VariableValue},
-		{"Max", VariableMax},
-		{"Increase", VariableIncrease},
-		{"Diff", VariableDiff},
-		{"Percent", VariablePercent},
-		{"Name", VariableName},
+		{"Value", VariableAttribute::Value},
+		{"Max", VariableAttribute::Max},
+		{"Increase", VariableAttribute::Increase},
+		{"Diff", VariableAttribute::Diff},
+		{"Percent", VariableAttribute::Percent},
+		{"Name", VariableAttribute::Name},
 		//Wyrmgus start
-		{"Change", VariableChange},
-		{"IncreaseChange", VariableIncreaseChange},
+		{"Change", VariableAttribute::Change},
+		{"IncreaseChange", VariableAttribute::IncreaseChange},
 		//Wyrmgus end
-		{0, VariableValue}
+		{0, VariableAttribute::Value}
 	}; // List of possible values.
 
 	for (int i = 0; list[i].s; ++i) {
@@ -410,7 +410,7 @@ EnumVariable Str2EnumVariable(lua_State *l, const char *s)
 		}
 	}
 	LuaError(l, "'%s' is a invalid variable component" _C_ s);
-	return VariableValue;
+	return VariableAttribute::Value;
 }
 
 /**

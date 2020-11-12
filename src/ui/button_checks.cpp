@@ -194,24 +194,24 @@ bool ButtonCheckUnitVariable(const CUnit &unit, const wyrmgus::button &button)
 		if (!strcmp(type, "Value")) {
 			//Wyrmgus start
 //			varValue = unit.Variable[index].Value;
-			varValue = unit.GetModifiedVariable(index, VariableValue);
+			varValue = unit.GetModifiedVariable(index, VariableAttribute::Value);
 			//Wyrmgus end
 		} else if (!strcmp(type, "Max")) {
 			//Wyrmgus start
 //			varValue = unit.Variable[index].Max;
-			varValue = unit.GetModifiedVariable(index, VariableMax);
+			varValue = unit.GetModifiedVariable(index, VariableAttribute::Max);
 			//Wyrmgus end
 		} else if (!strcmp(type, "Increase")) {
 			//Wyrmgus start
 //			varValue = unit.Variable[index].Increase;
-			varValue = unit.GetModifiedVariable(index, VariableIncrease);
+			varValue = unit.GetModifiedVariable(index, VariableAttribute::Increase);
 			//Wyrmgus end
 		} else if (!strcmp(type, "Enable")) {
 			varValue = unit.Variable[index].Enable;
 		} else if (!strcmp(type, "Percent")) {
 			//Wyrmgus start
 //			varValue = unit.Variable[index].Value * 100 / unit.Variable[index].Max;
-			varValue = unit.GetModifiedVariable(index, VariableValue) * 100 / unit.GetModifiedVariable(index, VariableMax);
+			varValue = unit.GetModifiedVariable(index, VariableAttribute::Value) * 100 / unit.GetModifiedVariable(index, VariableAttribute::Max);
 			//Wyrmgus end
 		} else {
 			throw std::runtime_error("Bad variable type \"" + std::string(type) + "\".");

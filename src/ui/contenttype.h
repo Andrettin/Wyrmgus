@@ -34,7 +34,7 @@
 class CUnit;
 class ConditionPanel;
 enum EnumUnit;
-enum EnumVariable;
+enum class VariableAttribute;
 struct lua_State;
 struct StringDesc;
 
@@ -80,7 +80,7 @@ private:
 	const wyrmgus::font *Font = nullptr; /// Font to use.
 	char Centered = 0;           /// if true, center the display.
 	int Index = -1;              /// Index of the variable to show, -1 if not.
-	EnumVariable Component;      /// Component of the variable.
+	VariableAttribute Component; /// Component of the variable.
 	char ShowName = 0;           /// If true, Show name's unit.
 	char Stat = 0;               /// true to special display.(value or value + diff)
 };
@@ -102,7 +102,7 @@ private:
 	const wyrmgus::font *Font = nullptr; /// Font to use.
 	bool Centered = false;       /// if true, center the display.
 	int Index = -1;              /// Index of the variable to show.
-	EnumVariable Component;      /// Component of the variable.
+	VariableAttribute Component; /// Component of the variable.
 };
 
 /**
@@ -122,9 +122,9 @@ private:
 	const wyrmgus::font *Font = nullptr; /// Font to use.
 	bool Centered = false;       /// if true, center the display.
 	int Index1 = -1;             /// Index of the variable1 to show.
-	EnumVariable Component1;     /// Component of the variable1.
+	VariableAttribute Component1; /// Component of the variable1.
 	int Index2 = -1;             /// Index of the variable to show.
-	EnumVariable Component2;     /// Component of the variable.
+	VariableAttribute Component2; /// Component of the variable.
 };
 
 /**

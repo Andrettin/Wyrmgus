@@ -150,35 +150,35 @@ static bool PassCondition(const CUnit &caster, const wyrmgus::spell &spell, cons
 		if (condition->Variable[i].MaxValue.has_value() &&
 			//Wyrmgus start
 //			condition->Variable[i].MaxValue <= unit->Variable[i].Value) {
-			condition->Variable[i].MaxValue <= unit->GetModifiedVariable(i, VariableValue)) {
+			condition->Variable[i].MaxValue <= unit->GetModifiedVariable(i, VariableAttribute::Value)) {
 			//Wyrmgus end
 			return false;
 		}
 
 		//Wyrmgus start
 //		if (condition->Variable[i].MinMax >= unit->Variable[i].Max) {
-		if (condition->Variable[i].MinMax >= unit->GetModifiedVariable(i, VariableMax)) {
+		if (condition->Variable[i].MinMax >= unit->GetModifiedVariable(i, VariableAttribute::Max)) {
 		//Wyrmgus end
 			return false;
 		}
 
 		//Wyrmgus start
 //		if (!unit->Variable[i].Max) {
-		if (!unit->GetModifiedVariable(i, VariableMax)) {
+		if (!unit->GetModifiedVariable(i, VariableAttribute::Max)) {
 		//Wyrmgus end
 			continue;
 		}
 		// Percent
 		//Wyrmgus start
 //		if (condition->Variable[i].MinValuePercent * unit->Variable[i].Max
-		if (condition->Variable[i].MinValuePercent * unit->GetModifiedVariable(i, VariableMax)
+		if (condition->Variable[i].MinValuePercent * unit->GetModifiedVariable(i, VariableAttribute::Max)
 		//Wyrmgus end
 			>= 100 * unit->Variable[i].Value) {
 			return false;
 		}
 		//Wyrmgus start
 //		if (condition->Variable[i].MaxValuePercent * unit->Variable[i].Max
-		if (condition->Variable[i].MaxValuePercent * unit->GetModifiedVariable(i, VariableMax)
+		if (condition->Variable[i].MaxValuePercent * unit->GetModifiedVariable(i, VariableAttribute::Max)
 		//Wyrmgus end
 			<= 100 * unit->Variable[i].Value) {
 			return false;

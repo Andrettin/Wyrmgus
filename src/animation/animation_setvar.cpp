@@ -148,7 +148,7 @@
 	}
 	//Wyrmgus start
 //	clamp(&goal->Variable[index].Value, 0, goal->Variable[index].Max);
-	clamp(&goal->Variable[index].Value, 0, goal->GetModifiedVariable(index, VariableMax));
+	clamp(&goal->Variable[index].Value, 0, goal->GetModifiedVariable(index, VariableAttribute::Max));
 	//Wyrmgus end
 	//Wyrmgus start
 	if (index == ATTACKRANGE_INDEX && goal->Container) {

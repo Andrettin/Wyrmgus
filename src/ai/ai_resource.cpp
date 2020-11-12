@@ -2044,7 +2044,7 @@ static void AiCheckRepair()
 			&& unit.CurrentAction() != UnitAction::UpgradeTo
 			//Wyrmgus start
 //			&& unit.Variable[HP_INDEX].Value < unit.Variable[HP_INDEX].Max
-			&& unit.Variable[HP_INDEX].Value < unit.GetModifiedVariable(HP_INDEX, VariableMax)
+			&& unit.Variable[HP_INDEX].Value < unit.GetModifiedVariable(HP_INDEX, VariableAttribute::Max)
 //			&& unit.Attacked + 5 * CYCLES_PER_SECOND < GameCycle) {
 			) {
 			//Wyrmgus end

@@ -101,7 +101,7 @@ int spell_action_adjust_vitals::Cast(CUnit &caster, const spell &spell, CUnit *t
 	if (hp > 0) {
 		//Wyrmgus start
 //		diffHP = target->Variable[HP_INDEX].Max - target->Variable[HP_INDEX].Value;
-		diffHP = target->GetModifiedVariable(HP_INDEX, VariableMax) - target->Variable[HP_INDEX].Value;
+		diffHP = target->GetModifiedVariable(HP_INDEX, VariableAttribute::Max) - target->Variable[HP_INDEX].Value;
 		//Wyrmgus end
 	} else {
 		diffHP = target->Variable[HP_INDEX].Value;
@@ -110,7 +110,7 @@ int spell_action_adjust_vitals::Cast(CUnit &caster, const spell &spell, CUnit *t
 		//Wyrmgus start
 
 //		diffMana = target->Stats->Variables[MANA_INDEX].Max - target->Variable[MANA_INDEX].Value;
-		diffMana = target->GetModifiedVariable(MANA_INDEX, VariableMax) - target->GetModifiedVariable(MANA_INDEX, VariableValue);
+		diffMana = target->GetModifiedVariable(MANA_INDEX, VariableAttribute::Max) - target->GetModifiedVariable(MANA_INDEX, VariableAttribute::Value);
 		//Wyrmgus end
 	} else {
 		diffMana = target->Variable[MANA_INDEX].Value;
@@ -157,13 +157,13 @@ int spell_action_adjust_vitals::Cast(CUnit &caster, const spell &spell, CUnit *t
 		target->Variable[HP_INDEX].Value += castcount * hp;
 		//Wyrmgus start
 //		target->Variable[HP_INDEX].Value = std::min(target->Variable[HP_INDEX].Max, target->Variable[HP_INDEX].Value);
-		target->Variable[HP_INDEX].Value = std::min(target->GetModifiedVariable(HP_INDEX, VariableMax), target->Variable[HP_INDEX].Value);
+		target->Variable[HP_INDEX].Value = std::min(target->GetModifiedVariable(HP_INDEX, VariableAttribute::Max), target->Variable[HP_INDEX].Value);
 		//Wyrmgus end
 	}
 	target->Variable[MANA_INDEX].Value += castcount * mana;
 	//Wyrmgus start
 //	clamp(&target->Variable[MANA_INDEX].Value, 0, target->Variable[MANA_INDEX].Max);
-	clamp(&target->Variable[MANA_INDEX].Value, 0, target->GetModifiedVariable(MANA_INDEX, VariableMax));
+	clamp(&target->Variable[MANA_INDEX].Value, 0, target->GetModifiedVariable(MANA_INDEX, VariableAttribute::Max));
 	//Wyrmgus end
 	target->Variable[SHIELD_INDEX].Value += castcount * shield;
 	clamp(&target->Variable[SHIELD_INDEX].Value, 0, target->Variable[SHIELD_INDEX].Max);

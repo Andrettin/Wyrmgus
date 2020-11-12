@@ -236,13 +236,13 @@ bool COrder_Use::ParseSpecificData(lua_State *l, int &j, const char *value, cons
 					unit.Player->change_resource(goal->Type->get_given_resource(), goal->ResourcesHeld);
 					unit.Player->TotalResources[goal->Type->get_given_resource()->get_index()] += (goal->ResourcesHeld * unit.Player->Incomes[goal->Type->get_given_resource()->get_index()]) / 100;
 				} else if (goal->Variable[HITPOINTHEALING_INDEX].Value > 0) {
-					int hp_healed = std::min(goal->Variable[HITPOINTHEALING_INDEX].Value, (unit.GetModifiedVariable(HP_INDEX, VariableMax) - unit.Variable[HP_INDEX].Value));
+					const int hp_healed = std::min(goal->Variable[HITPOINTHEALING_INDEX].Value, (unit.GetModifiedVariable(HP_INDEX, VariableAttribute::Max) - unit.Variable[HP_INDEX].Value));
 					if (unit.Player == CPlayer::GetThisPlayer()) {
 						unit.Player->Notify(NotifyGreen, unit.tilePos, unit.MapLayer->ID, _("%s healed for %d HP"), unit.GetMessageName().c_str(), hp_healed);
 					}
 					unit.Variable[HP_INDEX].Value += hp_healed;
 					
-					if (unit.HasInventory() && unit.Variable[HP_INDEX].Value < unit.GetModifiedVariable(HP_INDEX, VariableMax)) { //if unit is still damaged, see if there are further healing items for it to use
+					if (unit.HasInventory() && unit.Variable[HP_INDEX].Value < unit.GetModifiedVariable(HP_INDEX, VariableAttribute::Max)) { //if unit is still damaged, see if there are further healing items for it to use
 						unit.HealingItemAutoUse();
 					}
 				} else if (goal->Variable[HITPOINTHEALING_INDEX].Value < 0 && unit.Type->UnitType != UnitTypeType::Fly && unit.Type->UnitType != UnitTypeType::FlyLow && unit.Type->UnitType != UnitTypeType::Space) {

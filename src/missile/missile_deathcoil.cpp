@@ -67,7 +67,7 @@ void MissileDeathCoil::Action()
 			source.Variable[HP_INDEX].Value += this->Damage;
 			//Wyrmgus start
 //			source.Variable[HP_INDEX].Value = std::min(source.Variable[HP_INDEX].Max, source.Variable[HP_INDEX].Value);
-			source.Variable[HP_INDEX].Value = std::min(source.GetModifiedVariable(HP_INDEX, VariableMax), source.Variable[HP_INDEX].Value);
+			source.Variable[HP_INDEX].Value = std::min(source.GetModifiedVariable(HP_INDEX, VariableAttribute::Max), source.Variable[HP_INDEX].Value);
 			//Wyrmgus end
 		}
 	}

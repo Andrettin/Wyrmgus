@@ -438,7 +438,7 @@ static void AnimateActionTrain(CUnit &unit)
 				if (!table[j]->IsAliveOnMap() || table[j]->Type->BoolFlag[DECORATION_INDEX].value) {
 					continue;
 				}
-				if (newUnit->Type->RepairRange && table[j]->Type->RepairHP && table[j]->Variable[HP_INDEX].Value < table[j]->GetModifiedVariable(HP_INDEX, VariableMax) && (table[j]->Player == newUnit->Player || newUnit->IsAllied(*table[j]))) { //see if can repair
+				if (newUnit->Type->RepairRange && table[j]->Type->RepairHP && table[j]->Variable[HP_INDEX].Value < table[j]->GetModifiedVariable(HP_INDEX, VariableAttribute::Max) && (table[j]->Player == newUnit->Player || newUnit->IsAllied(*table[j]))) { //see if can repair
 					CommandRepair(*newUnit, unit.RallyPointPos, table[j], FlushCommands, unit.RallyPointMapLayer->ID);
 					command_found = true;
 				} else if (newUnit->CanHarvest(table[j])) { // see if can harvest

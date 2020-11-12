@@ -158,24 +158,24 @@ int ParseAnimInt(const CUnit &unit, const char *parseint)
 		if (!strcmp(next + 1, "Value")) {
 			//Wyrmgus start
 //			return goal->Variable[index].Value;
-			return goal->GetModifiedVariable(index, VariableValue);
+			return goal->GetModifiedVariable(index, VariableAttribute::Value);
 			//Wyrmgus end
 		} else if (!strcmp(next + 1, "Max")) {
 			//Wyrmgus start
 //			return goal->Variable[index].Max;
-			return goal->GetModifiedVariable(index, VariableMax);
+			return goal->GetModifiedVariable(index, VariableAttribute::Max);
 			//Wyrmgus end
 		} else if (!strcmp(next + 1, "Increase")) {
 			//Wyrmgus start
 //			return goal->Variable[index].Increase;
-			return goal->GetModifiedVariable(index, VariableIncrease);
+			return goal->GetModifiedVariable(index, VariableAttribute::Increase);
 			//Wyrmgus end
 		} else if (!strcmp(next + 1, "Enable")) {
 			return goal->Variable[index].Enable;
 		} else if (!strcmp(next + 1, "Percent")) {
 			//Wyrmgus start
 //			return goal->Variable[index].Value * 100 / goal->Variable[index].Max;
-			return goal->GetModifiedVariable(index, VariableValue) * 100 / goal->GetModifiedVariable(index, VariableMax);
+			return goal->GetModifiedVariable(index, VariableAttribute::Value) * 100 / goal->GetModifiedVariable(index, VariableAttribute::Max);
 			//Wyrmgus end
 		}
 		return 0;

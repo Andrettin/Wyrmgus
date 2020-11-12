@@ -740,7 +740,7 @@ void CUnit::IncreaseLevel(int level_quantity, bool automatic_learning)
 				this->Variable[LEVELUP_INDEX].Max = this->Variable[LEVELUP_INDEX].Value;
 			}
 		}
-		this->Variable[HP_INDEX].Value = this->GetModifiedVariable(HP_INDEX, VariableMax);
+		this->Variable[HP_INDEX].Value = this->GetModifiedVariable(HP_INDEX, VariableAttribute::Max);
 		level_quantity -= 1;
 	}
 	
@@ -931,8 +931,8 @@ void CUnit::HealingItemAutoUse()
 		
 		if (uins->Variable[HITPOINTHEALING_INDEX].Value > 0) {
 			if (
-				uins->Variable[HITPOINTHEALING_INDEX].Value <= (this->GetModifiedVariable(HP_INDEX, VariableMax) - this->Variable[HP_INDEX].Value)
-				|| (this->Variable[HP_INDEX].Value * 100 / this->GetModifiedVariable(HP_INDEX, VariableMax)) <= 20 // use a healing item if has less than 20% health
+				uins->Variable[HITPOINTHEALING_INDEX].Value <= (this->GetModifiedVariable(HP_INDEX, VariableAttribute::Max) - this->Variable[HP_INDEX].Value)
+				|| (this->Variable[HP_INDEX].Value * 100 / this->GetModifiedVariable(HP_INDEX, VariableAttribute::Max)) <= 20 // use a healing item if has less than 20% health
 			) {
 				if (this->CriticalOrder == nullptr) {
 					this->CriticalOrder = COrder::NewActionUse(*uins);
@@ -1844,7 +1844,7 @@ void CUnit::ApplyAuraEffect(int aura_index)
 		}
 		effect_index = LEADERSHIP_INDEX;
 	} else if (aura_index == REGENERATIONAURA_INDEX) {
-		if (!this->Type->BoolFlag[ORGANIC_INDEX].value || this->Variable[HP_INDEX].Value >= this->GetModifiedVariable(HP_INDEX, VariableMax)) {
+		if (!this->Type->BoolFlag[ORGANIC_INDEX].value || this->Variable[HP_INDEX].Value >= this->GetModifiedVariable(HP_INDEX, VariableAttribute::Max)) {
 			return;
 		}
 		effect_index = REGENERATION_INDEX;
@@ -5579,14 +5579,14 @@ int CUnit::GetAvailableLevelUpUpgrades(bool only_units) const
 	return value;
 }
 
-int CUnit::GetModifiedVariable(int index, int variable_type) const
+int CUnit::GetModifiedVariable(const int index, const VariableAttribute variable_type) const
 {
 	int value = 0;
-	if (variable_type == VariableValue) {
+	if (variable_type == VariableAttribute::Value) {
 		value = this->get_variable_value(index);
-	} else if (variable_type == VariableMax) {
+	} else if (variable_type == VariableAttribute::Max) {
 		value = this->get_variable_max(index);
-	} else if (variable_type == VariableIncrease) {
+	} else if (variable_type == VariableAttribute::Increase) {
 		value = this->get_variable_increase(index);
 	}
 	
@@ -5602,6 +5602,11 @@ int CUnit::GetModifiedVariable(int index, int variable_type) const
 	}
 	
 	return value;
+}
+
+int CUnit::GetModifiedVariable(const int index) const
+{
+	return this->GetModifiedVariable(index, VariableAttribute::Value);
 }
 
 int CUnit::GetReactionRange() const
@@ -6340,7 +6345,7 @@ bool CUnit::CanUseItem(CUnit *item) const
 		}
 	}
 	
-	if (item->Elixir == nullptr && item->Variable[HITPOINTHEALING_INDEX].Value > 0 && this->Variable[HP_INDEX].Value >= this->GetModifiedVariable(HP_INDEX, VariableMax)) {
+	if (item->Elixir == nullptr && item->Variable[HITPOINTHEALING_INDEX].Value > 0 && this->Variable[HP_INDEX].Value >= this->GetModifiedVariable(HP_INDEX, VariableAttribute::Max)) {
 		return false;
 	}
 	
@@ -7022,7 +7027,7 @@ int ThreatCalculate(const CUnit &unit, const CUnit &dest)
 	// Remaining HP (Health) 0-65535
 	//Wyrmgus start
 //	cost += dest.Variable[HP_INDEX].Value * 100 / dest.Variable[HP_INDEX].Max * HEALTH_FACTOR;
-	cost += dest.Variable[HP_INDEX].Value * 100 / dest.GetModifiedVariable(HP_INDEX, VariableMax) * HEALTH_FACTOR;
+	cost += dest.Variable[HP_INDEX].Value * 100 / dest.GetModifiedVariable(HP_INDEX, VariableAttribute::Max) * HEALTH_FACTOR;
 	//Wyrmgus end
 
 	const int d = unit.MapDistanceTo(dest);
@@ -7132,7 +7137,7 @@ static void HitUnit_Raid(CUnit *attacker, CUnit &target, int damage)
 	
 	for (int i = 0; i < MaxCosts; ++i) {
 		if (target.Type->Stats[target.Player->Index].Costs[i] > 0) {
-			int resource_change = target.Type->Stats[target.Player->Index].Costs[i] * damage * attacker->Variable[var_index].Value / target.GetModifiedVariable(HP_INDEX, VariableMax) / 100;
+			int resource_change = target.Type->Stats[target.Player->Index].Costs[i] * damage * attacker->Variable[var_index].Value / target.GetModifiedVariable(HP_INDEX, VariableAttribute::Max) / 100;
 			resource_change = std::min(resource_change, target.Player->get_resource(wyrmgus::resource::get_all()[i], STORE_BOTH));
 			attacker->Player->change_resource(wyrmgus::resource::get_all()[i], resource_change);
 			attacker->Player->TotalResources[i] += resource_change;
@@ -7302,11 +7307,11 @@ static void HitUnit_ChangeVariable(CUnit &target, const Missile &missile)
 			target.Variable[var].Max = target.Variable[var].Value;
 		//Wyrmgus start
 //		} else {
-		} else if (target.Variable[var].Value > target.GetModifiedVariable(var, VariableMax)) {
+		} else if (target.Variable[var].Value > target.GetModifiedVariable(var, VariableAttribute::Max)) {
 		//Wyrmgus end
 			//Wyrmgus start
 //			target.Variable[var].Value = target.Variable[var].Max;
-			target.Variable[var].Value = target.GetModifiedVariable(var, VariableMax);
+			target.Variable[var].Value = target.GetModifiedVariable(var, VariableAttribute::Max);
 			//Wyrmgus end
 		}
 	}
@@ -7330,7 +7335,7 @@ static void HitUnit_Burning(CUnit &target)
 {
 	//Wyrmgus start
 //	const int f = (100 * target.Variable[HP_INDEX].Value) / target.Variable[HP_INDEX].Max;
-	const int f = (100 * target.Variable[HP_INDEX].Value) / target.GetModifiedVariable(HP_INDEX, VariableMax);
+	const int f = (100 * target.Variable[HP_INDEX].Value) / target.GetModifiedVariable(HP_INDEX, VariableAttribute::Max);
 	//Wyrmgus end
 	const wyrmgus::missile_type *fire = MissileBurningBuilding(f);
 

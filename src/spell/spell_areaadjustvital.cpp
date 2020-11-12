@@ -93,13 +93,13 @@ int Spell_AreaAdjustVital::Cast(CUnit &caster, const wyrmgus::spell &spell, CUni
 			target->Variable[HP_INDEX].Value += hp;
 			//Wyrmgus start
 //			target->Variable[HP_INDEX].Value = std::min(target->Variable[HP_INDEX].Max, target->Variable[HP_INDEX].Value);
-			target->Variable[HP_INDEX].Value = std::min(target->GetModifiedVariable(HP_INDEX, VariableMax), target->Variable[HP_INDEX].Value);
+			target->Variable[HP_INDEX].Value = std::min(target->GetModifiedVariable(HP_INDEX, VariableAttribute::Max), target->Variable[HP_INDEX].Value);
 			//Wyrmgus end
 		}
 		target->Variable[MANA_INDEX].Value += mana;
 		//Wyrmgus start
 //		clamp(&target->Variable[MANA_INDEX].Value, 0, target->Variable[MANA_INDEX].Max);
-		clamp(&target->Variable[MANA_INDEX].Value, 0, target->GetModifiedVariable(MANA_INDEX, VariableMax));
+		clamp(&target->Variable[MANA_INDEX].Value, 0, target->GetModifiedVariable(MANA_INDEX, VariableAttribute::Max));
 		//Wyrmgus end
 		target->Variable[SHIELD_INDEX].Value += shield;
 		clamp(&target->Variable[SHIELD_INDEX].Value, 0, target->Variable[SHIELD_INDEX].Max);

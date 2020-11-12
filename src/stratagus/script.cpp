@@ -87,17 +87,13 @@ struct UStrInt {
 };
 
 /// Get component for unit variable.
-extern UStrInt GetComponent(const CUnit &unit, int index, EnumVariable e, int t);
+extern UStrInt GetComponent(const CUnit &unit, int index, VariableAttribute e, int t);
 /// Get component for unit type variable.
-extern UStrInt GetComponent(const wyrmgus::unit_type &type, int index, EnumVariable e, int t);
+extern UStrInt GetComponent(const wyrmgus::unit_type &type, int index, VariableAttribute e, int t);
 
 //Wyrmgus start
 std::map<std::string, std::string> DLCFileEquivalency;
 //Wyrmgus end
-
-/*----------------------------------------------------------------------------
---  Functions
-----------------------------------------------------------------------------*/
 
 /**
 **  FIXME: docu
@@ -996,7 +992,7 @@ std::unique_ptr<NumberDesc> CclParseNumberDesc(lua_State *l)
 						LuaError(l, "Bad variable name :'%s'" _C_ LuaToString(l, -1));
 					}
 				} else if (!strcmp(key, "Component")) {
-					res->D.UnitStat.Component = Str2EnumVariable(l, LuaToString(l, -1));
+					res->D.UnitStat.Component = Str2VariableAttribute(l, LuaToString(l, -1));
 				} else if (!strcmp(key, "Loc")) {
 					res->D.UnitStat.Loc = LuaToNumber(l, -1);
 					if (res->D.UnitStat.Loc < 0 || 2 < res->D.UnitStat.Loc) {
@@ -1017,7 +1013,7 @@ std::unique_ptr<NumberDesc> CclParseNumberDesc(lua_State *l)
 					res->D.TypeStat.Type = CclParseTypeDesc(l);
 					lua_pushnil(l);
 				} else if (!strcmp(key, "Component")) {
-					res->D.TypeStat.Component = Str2EnumVariable(l, LuaToString(l, -1));
+					res->D.TypeStat.Component = Str2VariableAttribute(l, LuaToString(l, -1));
 				} else if (!strcmp(key, "Variable")) {
 					const char *const name = LuaToString(l, -1);
 					res->D.TypeStat.Index = UnitTypeVar.VariableNameLookup[name];

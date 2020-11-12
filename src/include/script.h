@@ -180,17 +180,17 @@ enum EString {
 /**
 **  Enumeration to know which variable to be selected.
 */
-enum EnumVariable {
-	VariableValue = 0,  /// Value of the variable.
-	VariableMax,        /// Max of the variable.
-	VariableIncrease,   /// Increase value of the variable.
-	VariableDiff,       /// (Max - Value)
-	VariablePercent,    /// (100 * Value / Max)
+enum class VariableAttribute {
+	Value = 0,  /// Value of the variable.
+	Max,        /// Max of the variable.
+	Increase,   /// Increase value of the variable.
+	Diff,       /// (Max - Value)
+	Percent,    /// (100 * Value / Max)
 	//Wyrmgus start
-//	VariableName        /// Name of the variable.
-	VariableName,		/// Name of the variable.
-	VariableChange,		/// Change of the variable.
-	VariableIncreaseChange,	/// Change of the variable's increase.
+//	Name        /// Name of the variable.
+	Name,		/// Name of the variable.
+	Change,		/// Change of the variable.
+	IncreaseChange	/// Change of the variable's increase.
 	//Wyrmgus end
 };
 
@@ -249,13 +249,13 @@ struct NumberDesc {
 		struct {
 			std::unique_ptr<UnitDesc> Unit; /// Which unit.
 			int Index = 0;                 /// Which index variable.
-			EnumVariable Component = VariableValue;    /// Which component.
+			VariableAttribute Component = VariableAttribute::Value;    /// Which component.
 			int Loc = 0;                   /// Location of Variables[].
 		} UnitStat;
 		struct {
 			const wyrmgus::unit_type **Type = nullptr;    /// Which unit type.
 			int Index = 0;                 /// Which index variable.
-			EnumVariable Component = VariableValue;    /// Which component.
+			VariableAttribute Component = VariableAttribute::Value;    /// Which component.
 			int Loc = 0;                   /// Location of Variables[].
 		} TypeStat;
 		struct {
@@ -392,7 +392,7 @@ extern void CclGetDate(lua_State *l, CDate *d, const int offset = -1);
 extern std::unique_ptr<NumberDesc> Damage;  /// Damage calculation for missile.
 
 /// transform string in corresponding index.
-extern EnumVariable Str2EnumVariable(lua_State *l, const char *s);
+extern VariableAttribute Str2VariableAttribute(lua_State *l, const char *s);
 extern std::unique_ptr<NumberDesc> CclParseNumberDesc(lua_State *l); /// Parse a number description.
 extern std::unique_ptr<UnitDesc> CclParseUnitDesc(lua_State *l);     /// Parse a unit description.
 extern const wyrmgus::unit_type **CclParseTypeDesc(lua_State *l);   /// Parse a unit type description.

@@ -586,7 +586,7 @@ static void DrawDecoration(const CUnit &unit, const wyrmgus::unit_type &type, co
 		const int value = unit.Variable[var.Index].Value;
 		//Wyrmgus start
 //		const int max = unit.Variable[var.Index].Max;
-		const int max = unit.GetModifiedVariable(var.Index, VariableMax);
+		const int max = unit.GetModifiedVariable(var.Index, VariableAttribute::Max);
 		//Wyrmgus end
 		Assert(value <= max);
 

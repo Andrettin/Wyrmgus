@@ -51,7 +51,7 @@ void MissileFire::Action()
 		this->SpriteFrame = 0;
 		//Wyrmgus start
 //		const int f = (100 * unit.Variable[HP_INDEX].Value) / unit.Variable[HP_INDEX].Max;
-		const int f = (100 * unit.get_variable_value(HP_INDEX)) / unit.GetModifiedVariable(HP_INDEX, VariableMax);
+		const int f = (100 * unit.get_variable_value(HP_INDEX)) / unit.GetModifiedVariable(HP_INDEX, VariableAttribute::Max);
 		//Wyrmgus end
 		const wyrmgus::missile_type *fire = MissileBurningBuilding(f);
 

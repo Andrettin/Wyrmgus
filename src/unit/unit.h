@@ -46,6 +46,7 @@ class CUpgrade;
 class CViewport;
 class PathFinderData;
 enum class UnitAction : char;
+enum class VariableAttribute;
 struct lua_State;
 
 namespace wyrmgus {
@@ -433,7 +434,8 @@ public:
 		return this->Variable.at(var_index).Increase;
 	}
 
-	int GetModifiedVariable(int index, int variable_type = 0) const;
+	int GetModifiedVariable(const int index, const VariableAttribute variable_type) const;
+	int GetModifiedVariable(const int index) const;
 
 	int GetReactionRange() const;
 	unsigned get_item_slot_quantity(const wyrmgus::item_slot item_slot) const;

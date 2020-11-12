@@ -442,7 +442,7 @@ static bool DoRightButton_Worker(CUnit &unit, CUnit *dest, const Vec2i &pos, int
 		&& dest->Type->RepairHP
 		//Wyrmgus start
 //		&& dest->Variable[HP_INDEX].Value < dest->Variable[HP_INDEX].Max
-		&& dest->Variable[HP_INDEX].Value < dest->GetModifiedVariable(HP_INDEX, VariableMax)
+		&& dest->Variable[HP_INDEX].Value < dest->GetModifiedVariable(HP_INDEX, VariableAttribute::Max)
 		//Wyrmgus end
 		&& (dest->Player == unit.Player || unit.IsAllied(*dest))) {
 		dest->Blink = 4;
@@ -1598,7 +1598,7 @@ static int SendRepair(const Vec2i &tilePos, int flush)
 	// Check if the dest is repairable!
 	//Wyrmgus start
 //	if (dest && dest->Variable[HP_INDEX].Value < dest->Variable[HP_INDEX].Max
-	if (dest && dest->Variable[HP_INDEX].Value < dest->GetModifiedVariable(HP_INDEX, VariableMax)
+	if (dest && dest->Variable[HP_INDEX].Value < dest->GetModifiedVariable(HP_INDEX, VariableAttribute::Max)
 	//Wyrmgus end
 		&& dest->Type->RepairHP
 		&& (dest->Player == CPlayer::GetThisPlayer() || CPlayer::GetThisPlayer()->IsAllied(*dest))) {

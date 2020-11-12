@@ -1050,7 +1050,7 @@ int WriteMapSetup(const char *mapSetup, CMap &map, int writeTerrain, bool is_mod
 				if (unit->Elixir != nullptr) {
 					f->printf("SetUnitVariable(unit, \"Elixir\", \"%s\")\n", unit->Elixir->get_identifier().c_str());
 				}
-				if (unit->Variable[HP_INDEX].Value != unit->GetModifiedVariable(HP_INDEX, VariableMax)) {
+				if (unit->Variable[HP_INDEX].Value != unit->GetModifiedVariable(HP_INDEX, VariableAttribute::Max)) {
 					f->printf("SetUnitVariable(unit, \"HitPoints\", %d)\n", unit->Variable[HP_INDEX].Value);
 				}
 				if (unit->Type->BoolFlag[TELEPORTER_INDEX].value && unit->Goal) {

@@ -242,7 +242,7 @@ bool COrder_Repair::RepairUnit(const CUnit &unit, CUnit &goal)
 	}
 	//Wyrmgus start
 //	if (goal.Variable[HP_INDEX].Value >= goal.Variable[HP_INDEX].Max) {
-	if (goal.Variable[HP_INDEX].Value >= goal.GetModifiedVariable(HP_INDEX, VariableMax)) {
+	if (goal.Variable[HP_INDEX].Value >= goal.GetModifiedVariable(HP_INDEX, VariableAttribute::Max)) {
 	//Wyrmgus end
 		return true;
 	}
@@ -256,11 +256,11 @@ bool COrder_Repair::RepairUnit(const CUnit &unit, CUnit &goal)
 	goal.Variable[HP_INDEX].Value += goal.Type->RepairHP;
 	//Wyrmgus start
 //	if (goal.Variable[HP_INDEX].Value >= goal.Variable[HP_INDEX].Max) {
-	if (goal.Variable[HP_INDEX].Value >= goal.GetModifiedVariable(HP_INDEX, VariableMax)) {
+	if (goal.Variable[HP_INDEX].Value >= goal.GetModifiedVariable(HP_INDEX, VariableAttribute::Max)) {
 	//Wyrmgus end
 		//Wyrmgus start
 //		goal.Variable[HP_INDEX].Value = goal.Variable[HP_INDEX].Max;
-		goal.Variable[HP_INDEX].Value = goal.GetModifiedVariable(HP_INDEX, VariableMax);
+		goal.Variable[HP_INDEX].Value = goal.GetModifiedVariable(HP_INDEX, VariableAttribute::Max);
 		//Wyrmgus end
 		return true;
 	}
@@ -311,7 +311,7 @@ static void AnimateActionRepair(CUnit &unit)
 				if (goal && unit.MapDistanceTo(*goal) <= unit.Type->RepairRange
 					//Wyrmgus start
 //					&& goal->Variable[HP_INDEX].Value < goal->Variable[HP_INDEX].Max) {
-					&& goal->Variable[HP_INDEX].Value < goal->GetModifiedVariable(HP_INDEX, VariableMax)) {
+					&& goal->Variable[HP_INDEX].Value < goal->GetModifiedVariable(HP_INDEX, VariableAttribute::Max)) {
 					//Wyrmgus end
 					this->State = 2;
 					this->RepairCycle = 0;
@@ -379,7 +379,7 @@ static void AnimateActionRepair(CUnit &unit)
 			// Target is fine, choose new one.
 			//Wyrmgus start
 //			if (!goal || goal->Variable[HP_INDEX].Value >= goal->Variable[HP_INDEX].Max) {
-			if (!goal || goal->Variable[HP_INDEX].Value >= goal->GetModifiedVariable(HP_INDEX, VariableMax)) {
+			if (!goal || goal->Variable[HP_INDEX].Value >= goal->GetModifiedVariable(HP_INDEX, VariableAttribute::Max)) {
 			//Wyrmgus end
 				this->Finished = true;
 				return ;
