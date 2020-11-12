@@ -1119,7 +1119,7 @@ void CPlayer::SetFaction(const wyrmgus::faction *faction)
 
 	const int faction_id = faction ? faction->ID : -1;
 	
-	if (old_faction_id != -1 && faction_id != -1) {
+	if (old_faction_id != -1 && faction != nullptr) {
 		for (const wyrmgus::upgrade_class *upgrade_class : wyrmgus::upgrade_class::get_all()) {
 			const CUpgrade *old_faction_class_upgrade = wyrmgus::faction::get_all()[old_faction_id]->get_class_upgrade(upgrade_class);
 			const CUpgrade *new_faction_class_upgrade = faction->get_class_upgrade(upgrade_class);
@@ -1252,7 +1252,7 @@ void CPlayer::SetFaction(const wyrmgus::faction *faction)
 			}
 		}
 	} else {
-		fprintf(stderr, "Invalid faction \"%s\" tried to be set for player %d of civilization \"%s\".\n", faction->get_name().c_str(), this->Index, wyrmgus::civilization::get_all()[this->Race]->get_identifier().c_str());
+		fprintf(stderr, "Invalid faction \"%s\" tried to be set for player %d of civilization \"%s\".\n", faction->get_name().c_str(), this->Index, this->get_civilization()->get_identifier().c_str());
 	}
 	
 	for (int i = 0; i < this->GetUnitCount(); ++i) {
@@ -1281,7 +1281,7 @@ void CPlayer::SetRandomFaction()
 	std::vector<wyrmgus::faction *> local_factions;
 	
 	for (wyrmgus::faction *faction : wyrmgus::faction::get_all()) {
-		if (faction->get_civilization()->ID != this->Race) {
+		if (faction->get_civilization() != this->get_civilization()) {
 			continue;
 		}
 		if (!faction->Playable) {
@@ -1415,8 +1415,8 @@ CCurrency *CPlayer::GetCurrency() const
 		return this->get_faction()->GetCurrency();
 	}
 	
-	if (this->Race != -1) {
-		return wyrmgus::civilization::get_all()[this->Race]->GetCurrency();
+	if (this->get_civilization() != nullptr) {
+		return this->get_civilization()->GetCurrency();
 	}
 	
 	return nullptr;
@@ -1440,7 +1440,7 @@ void CPlayer::ShareUpgradeProgress(CPlayer &player, CUnit &unit)
 			continue;
 		}
 		
-		CUpgrade *upgrade = wyrmgus::faction::get_all()[player.Faction]->get_class_upgrade(upgrade_list[i]->get_upgrade_class());
+		const CUpgrade *upgrade = player.get_faction()->get_class_upgrade(upgrade_list[i]->get_upgrade_class());
 		if (upgrade == nullptr) {
 			continue;
 		}
@@ -1533,7 +1533,7 @@ CUpgrade *CPlayer::get_class_upgrade(const wyrmgus::upgrade_class *upgrade_class
 
 bool CPlayer::has_upgrade_class(const wyrmgus::upgrade_class *upgrade_class) const
 {
-	if (this->Race == -1 || upgrade_class == nullptr) {
+	if (this->get_civilization() == nullptr || upgrade_class == nullptr) {
 		return false;
 	}
 	
@@ -1542,7 +1542,7 @@ bool CPlayer::has_upgrade_class(const wyrmgus::upgrade_class *upgrade_class) con
 	if (this->get_faction() != nullptr) {
 		upgrade = this->get_faction()->get_class_upgrade(upgrade_class);
 	} else {
-		upgrade = wyrmgus::civilization::get_all()[this->Race]->get_class_upgrade(upgrade_class);
+		upgrade = this->get_civilization()->get_class_upgrade(upgrade_class);
 	}
 	
 	if (upgrade != nullptr && this->Allow.Upgrades[upgrade->ID] == 'R') {
@@ -1824,7 +1824,7 @@ bool CPlayer::is_character_available_for_recruitment(const wyrmgus::character *c
 		return false;
 	}
 	
-	if (!character->get_civilization() || character->get_civilization()->ID != this->Race) {
+	if (!character->get_civilization() || character->get_civilization() != this->get_civilization()) {
 		return false;
 	}
 	
@@ -1907,7 +1907,7 @@ std::string CPlayer::get_full_name() const
 
 std::string_view CPlayer::get_faction_title_name() const
 {
-	if (this->Race == -1 || this->get_faction() == nullptr) {
+	if (this->get_civilization() == nullptr || this->get_faction() == nullptr) {
 		return string::empty_str;
 	}
 	
@@ -4130,7 +4130,7 @@ bool CPlayer::HasContactWith(const CPlayer &player) const
 bool CPlayer::HasNeutralFactionType() const
 {
 	if (
-		this->Race != -1
+		this->get_civilization() != nullptr
 		&& this->get_faction() != nullptr
 		&& (this->get_faction()->Type == FactionTypeMercenaryCompany || this->get_faction()->Type == FactionTypeHolyOrder || this->get_faction()->Type == FactionTypeTradingCompany)
 	) {

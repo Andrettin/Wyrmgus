@@ -752,7 +752,7 @@ void AiTransportCapacityRequest(int capacity_needed, int landmass)
 
 		if (!has_builder && AiPlayer->Player->Faction != -1) {
 			for (const wyrmgus::unit_class *builder_class : AiHelpers.get_trainer_classes(best_type->get_unit_class())) {
-				wyrmgus::unit_type *builder = wyrmgus::faction::get_all()[AiPlayer->Player->Faction]->get_class_unit_type(builder_class);
+				const wyrmgus::unit_type *builder = AiPlayer->Player->get_faction()->get_class_unit_type(builder_class);
 
 				if (builder == nullptr) {
 					continue;
@@ -2197,7 +2197,7 @@ static void AiCheckPathwayConstruction()
 				const CUnit *depot = FindDepositNearLoc(*unit.Player, unit.tilePos + Vec2i((unit.Type->get_tile_size() - QSize(1, 1)) / 2), 32, unit.GivesResource, unit.MapLayer->ID);
 				if (depot) {
 					//create a worker to test the path; the worker can't be a rail one, or the path construction won't work
-					wyrmgus::unit_type *worker_type = wyrmgus::faction::get_all()[AiPlayer->Player->Faction]->get_class_unit_type(wyrmgus::unit_class::get("worker"));
+					const wyrmgus::unit_type *worker_type = AiPlayer->Player->get_faction()->get_class_unit_type(wyrmgus::unit_class::get("worker"));
 					if (worker_type != nullptr) {						
 						UnmarkUnitFieldFlags(unit);
 						UnmarkUnitFieldFlags(*depot);
@@ -2362,7 +2362,7 @@ void AiCheckSettlementConstruction()
 		return;
 	}
 
-	wyrmgus::unit_type *town_hall_type = wyrmgus::faction::get_all()[AiPlayer->Player->Faction]->get_class_unit_type(wyrmgus::defines::get()->get_town_hall_class());
+	const wyrmgus::unit_type *town_hall_type = AiPlayer->Player->get_faction()->get_class_unit_type(wyrmgus::defines::get()->get_town_hall_class());
 	if (town_hall_type == nullptr) {
 		return;
 	}
@@ -2419,7 +2419,7 @@ void AiCheckSettlementConstruction()
 
 		if (!requested_settlement && AiPlayer->Player->Faction != -1) {
 			for (const wyrmgus::unit_class *builder_class : AiHelpers.get_builder_classes(town_hall_type->get_unit_class())) {
-				const wyrmgus::unit_type *builder_type = wyrmgus::faction::get_all()[AiPlayer->Player->Faction]->get_class_unit_type(builder_class);
+				const wyrmgus::unit_type *builder_type = AiPlayer->Player->get_faction()->get_class_unit_type(builder_class);
 
 				if (builder_type == nullptr) {
 					continue;
@@ -2712,7 +2712,7 @@ static void AiCheckMinecartConstruction()
 
 static void AiCheckMinecartSalvaging()
 {
-	wyrmgus::unit_type *minecart_type = wyrmgus::faction::get_all()[AiPlayer->Player->Faction]->get_class_unit_type(wyrmgus::unit_class::get("minecart"));
+	const wyrmgus::unit_type *minecart_type = AiPlayer->Player->get_faction()->get_class_unit_type(wyrmgus::unit_class::get("minecart"));
 	if (minecart_type == nullptr) {
 		return;
 	}

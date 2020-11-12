@@ -6636,8 +6636,8 @@ const wyrmgus::icon *CUnit::GetButtonIcon(const ButtonCmd button_action) const
 {
 	if (this->ButtonIcons.find(button_action) != this->ButtonIcons.end()) {
 		return this->ButtonIcons.find(button_action)->second;
-	} else if (this->Player == CPlayer::GetThisPlayer() && CPlayer::GetThisPlayer()->Faction != -1 && wyrmgus::faction::get_all()[CPlayer::GetThisPlayer()->Faction]->ButtonIcons.find(button_action) != wyrmgus::faction::get_all()[CPlayer::GetThisPlayer()->Faction]->ButtonIcons.end()) {
-		return wyrmgus::faction::get_all()[CPlayer::GetThisPlayer()->Faction]->ButtonIcons[button_action].Icon;
+	} else if (this->Player == CPlayer::GetThisPlayer() && CPlayer::GetThisPlayer()->get_faction() != nullptr && CPlayer::GetThisPlayer()->get_faction()->ButtonIcons.find(button_action) != CPlayer::GetThisPlayer()->get_faction()->ButtonIcons.end()) {
+		return CPlayer::GetThisPlayer()->get_faction()->ButtonIcons[button_action].Icon;
 	} else if (this->Player == CPlayer::GetThisPlayer() && PlayerRaces.ButtonIcons[CPlayer::GetThisPlayer()->Race].find(button_action) != PlayerRaces.ButtonIcons[CPlayer::GetThisPlayer()->Race].end()) {
 		return PlayerRaces.ButtonIcons[CPlayer::GetThisPlayer()->Race][button_action].Icon;
 	}

@@ -107,6 +107,7 @@ int Spell_Polymorph::Cast(CUnit &caster, const wyrmgus::spell &spell, CUnit *tar
 	if (!target) {
 		return 0;
 	}
+
 	wyrmgus::unit_type *type = this->NewForm;
 	//Wyrmgus start
 	if (this->NewForm == nullptr) {

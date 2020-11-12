@@ -397,10 +397,10 @@ static void AiCheckUnits()
 	
 	//Wyrmgus start
 	//check if any factions can be founded, and if so, pick one randomly
-	if (AiPlayer->Player->Faction != -1 && AiPlayer->Player->NumTownHalls > 0) {
-		std::vector<wyrmgus::faction *> potential_factions;
-		for (size_t i = 0; i < wyrmgus::faction::get_all()[AiPlayer->Player->Faction]->DevelopsTo.size(); ++i) {
-			wyrmgus::faction *possible_faction = wyrmgus::faction::get_all()[AiPlayer->Player->Faction]->DevelopsTo[i];
+	if (AiPlayer->Player->get_faction() != nullptr && AiPlayer->Player->NumTownHalls > 0) {
+		std::vector<const wyrmgus::faction *> potential_factions;
+		for (size_t i = 0; i < AiPlayer->Player->get_faction()->DevelopsTo.size(); ++i) {
+			const wyrmgus::faction *possible_faction = AiPlayer->Player->get_faction()->DevelopsTo[i];
 			
 			if (!AiPlayer->Player->can_found_faction(possible_faction)) {
 				continue;
@@ -430,10 +430,6 @@ static void AiCheckUnits()
 	}
 	//Wyrmgus end
 }
-
-/*----------------------------------------------------------------------------
--- Functions
-----------------------------------------------------------------------------*/
 
 /**
 **  Save state of player AI.
@@ -1412,7 +1408,7 @@ void AiTrainingComplete(CUnit &unit, CUnit &what)
 	if (unit.Player == what.Player) {
 		AiRemoveFromBuilt(what.Player->Ai.get(), *what.Type, CMap::Map.GetTileLandmass(what.tilePos, what.MapLayer->ID), what.settlement);
 	} else { //remove the request of the unit the mercenary is substituting
-		wyrmgus::unit_type *requested_unit_type = wyrmgus::faction::get_all()[what.Player->Faction]->get_class_unit_type(what.Type->get_unit_class());
+		wyrmgus::unit_type *requested_unit_type = what.Player->get_faction()->get_class_unit_type(what.Type->get_unit_class());
 		if (requested_unit_type != nullptr) {
 			AiRemoveFromBuilt(what.Player->Ai.get(), *requested_unit_type, CMap::Map.GetTileLandmass(what.tilePos, what.MapLayer->ID), what.settlement);
 		}

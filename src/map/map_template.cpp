@@ -969,7 +969,7 @@ void map_template::Apply(const QPoint &template_start_pos, const QPoint &map_sta
 		}
 		// add five workers at the player's starting location
 		if (CPlayer::Players[i]->NumTownHalls > 0) {
-			unit_type *worker_type = faction::get_all()[CPlayer::Players[i]->Faction]->get_class_unit_type(unit_class::get("worker"));
+			const unit_type *worker_type = CPlayer::Players[i]->get_faction()->get_class_unit_type(unit_class::get("worker"));
 			if (worker_type != nullptr && CPlayer::Players[i]->GetUnitTypeCount(worker_type) == 0) { //only create if the player doesn't have any workers created in another manner
 				Vec2i worker_unit_offset((worker_type->get_tile_size() - QSize(1, 1)) / 2);
 				

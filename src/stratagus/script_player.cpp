@@ -2280,8 +2280,8 @@ static int CclGetPlayerData(lua_State *l)
 		return 1;
 	//Wyrmgus start
 	} else if (!strcmp(data, "Faction")) {
-		if (p->Race != -1 && p->Faction != -1) {
-			lua_pushstring(l, wyrmgus::faction::get_all()[p->Faction]->get_identifier().c_str());
+		if (p->get_faction() != nullptr) {
+			lua_pushstring(l, p->get_faction()->get_identifier().c_str());
 		} else {
 			lua_pushstring(l, "");
 		}

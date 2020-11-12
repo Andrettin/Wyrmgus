@@ -205,8 +205,8 @@ void CUserInterface::Load()
 	const wyrmgus::faction *faction = nullptr;
 
 	if (CPlayer::GetThisPlayer() != nullptr) {
-		if (CPlayer::GetThisPlayer()->Faction != -1) {
-			faction = wyrmgus::faction::get_all()[CPlayer::GetThisPlayer()->Faction];
+		if (CPlayer::GetThisPlayer()->get_faction() != nullptr) {
+			faction = CPlayer::GetThisPlayer()->get_faction();
 		}
 		
 		if (CPlayer::GetThisPlayer()->Race != -1) {

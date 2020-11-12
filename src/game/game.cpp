@@ -833,7 +833,7 @@ int WriteMapSetup(const char *mapSetup, CMap &map, int writeTerrain, bool is_mod
 						  i, wyrmgus::civilization::get_all()[CPlayer::Players[i]->Race]->get_identifier().c_str());
 				if (CPlayer::Players[i]->Faction != -1) {
 					f->printf("SetPlayerData(%d, \"Faction\", \"%s\")\n",
-							  i, wyrmgus::faction::get_all()[CPlayer::Players[i]->Faction]->get_identifier().c_str());
+							  i, CPlayer::Players[i]->get_faction()->get_identifier().c_str());
 				}
 				f->printf("SetAiType(%d, \"%s\")\n",
 						  i, CPlayer::Players[i]->AiName.c_str());

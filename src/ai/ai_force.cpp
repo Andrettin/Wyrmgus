@@ -1866,7 +1866,7 @@ void AiForceManager::CheckForceRecruitment()
 	if (all_forces_completed && AiPlayer->Player->Race != -1 && AiPlayer->Player->Faction != -1 && completed_forces < AI_MAX_COMPLETED_FORCES && completed_force_pop < AI_MAX_COMPLETED_FORCE_POP) { //all current forces completed and not too many forces are in existence, create a new one
 		int force_type_weights[static_cast<int>(ForceType::Count)];
 		for (int i = 0; i < static_cast<int>(ForceType::Count); ++i) {
-			force_type_weights[i] = wyrmgus::faction::get_all()[AiPlayer->Player->Faction]->GetForceTypeWeight(static_cast<ForceType>(i));
+			force_type_weights[i] = AiPlayer->Player->get_faction()->GetForceTypeWeight(static_cast<ForceType>(i));
 		}
 		
 		std::vector<ForceType> force_types;
@@ -1922,13 +1922,13 @@ void AiForceManager::CheckForceRecruitment()
 				new_force.Role = AiForceRole::Default;
 				for (size_t i = 0; i < force_template->get_units().size(); ++i) {
 					const wyrmgus::unit_class *unit_class = force_template->get_units()[i].first;
-					wyrmgus::unit_type *unit_type = wyrmgus::faction::get_all()[AiPlayer->Player->Faction]->get_class_unit_type(unit_class);
+					const wyrmgus::unit_type *unit_type = AiPlayer->Player->get_faction()->get_class_unit_type(unit_class);
 					const int count = force_template->get_units()[i].second;
 					
 					AiUnitType newaiut;
 					newaiut.Want = count;
 					newaiut.Type = unit_type;
-					new_force.UnitTypes.push_back(newaiut);
+					new_force.UnitTypes.push_back(std::move(newaiut));
 				}
 				AiAssignFreeUnitsToForce(new_force_id);
 				break;

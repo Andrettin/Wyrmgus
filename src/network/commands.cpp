@@ -748,7 +748,7 @@ void SendCommandSharedVision(int player, bool state, int opponent)
 	}
 }
 
-void SendCommandSetFaction(int player, int faction)
+void SendCommandSetFaction(const int player, const int faction)
 {
 	if (!IsNetworkGame()) {
 		//FIXME: should add log of faction change here

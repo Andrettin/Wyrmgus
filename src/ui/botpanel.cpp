@@ -392,7 +392,7 @@ static bool CanShowPopupContent(const PopupConditionPanel *condition,
 	}
 	
 	if (condition->FactionCoreSettlements != CONDITION_TRUE) {
-		if ((condition->FactionCoreSettlements == CONDITION_ONLY) ^ (wyrmgus::game::get()->get_current_campaign() != nullptr && button.Action == ButtonCmd::Faction && button.Value != -1 && wyrmgus::faction::get_all()[CPlayer::GetThisPlayer()->Faction]->DevelopsTo[button.Value]->get_core_settlements().size() > 0)) {
+		if ((condition->FactionCoreSettlements == CONDITION_ONLY) ^ (wyrmgus::game::get()->get_current_campaign() != nullptr && button.Action == ButtonCmd::Faction && button.Value != -1 && CPlayer::GetThisPlayer()->get_faction()->DevelopsTo[button.Value]->get_core_settlements().size() > 0)) {
 			return false;
 		}
 	}
@@ -1050,8 +1050,8 @@ void CButtonPanel::Draw()
 			button_icon = wyrmgus::unit_manager::get()->GetSlotUnit(button->Value).get_icon();
 		} else if ((button->Action == ButtonCmd::Research || button->Action == ButtonCmd::ResearchClass) && button->Icon.Name.empty() && button_upgrade->get_icon()) {
 			button_icon = button_upgrade->get_icon();
-		} else if (button->Action == ButtonCmd::Faction && button->Icon.Name.empty() && wyrmgus::faction::get_all()[CPlayer::GetThisPlayer()->Faction]->DevelopsTo[button->Value]->get_icon() != nullptr) {
-			button_icon = wyrmgus::faction::get_all()[CPlayer::GetThisPlayer()->Faction]->DevelopsTo[button->Value]->get_icon();
+		} else if (button->Action == ButtonCmd::Faction && button->Icon.Name.empty() && CPlayer::GetThisPlayer()->get_faction()->DevelopsTo[button->Value]->get_icon() != nullptr) {
+			button_icon = CPlayer::GetThisPlayer()->get_faction()->DevelopsTo[button->Value]->get_icon();
 		} else if (button->Action == ButtonCmd::Dynasty && button->Icon.Name.empty() && CPlayer::GetThisPlayer()->get_faction()->get_dynasties()[button->Value]->get_icon() != nullptr) {
 			button_icon = CPlayer::GetThisPlayer()->get_faction()->get_dynasties()[button->Value]->get_icon();
 		}
@@ -2066,7 +2066,7 @@ void CButtonPanel::DoClicked_LearnAbility(int button)
 void CButtonPanel::DoClicked_Faction(int button)
 {
 	const int index = CurrentButtons[button]->Value;
-	SendCommandSetFaction(CPlayer::GetThisPlayer()->Index, wyrmgus::faction::get_all()[CPlayer::GetThisPlayer()->Faction]->DevelopsTo[index]->ID);
+	SendCommandSetFaction(CPlayer::GetThisPlayer()->Index, CPlayer::GetThisPlayer()->get_faction()->DevelopsTo[index]->ID);
 	ButtonUnderCursor = -1;
 	OldButtonUnderCursor = -1;
 	LastDrawnButtonPopup = nullptr;

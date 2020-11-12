@@ -79,13 +79,11 @@ public:
 /**
 **  Ai unit-type in a force.
 */
-class AiUnitType
+class AiUnitType final
 {
 public:
-	AiUnitType() : Want(0), Type(nullptr) {}
-
-	unsigned int Want; /// number of this unit-type wanted
-	wyrmgus::unit_type *Type;   /// unit-type self
+	unsigned int Want = 0; /// number of this unit-type wanted
+	const wyrmgus::unit_type *Type = nullptr;   /// unit-type self
 };
 
 /**
