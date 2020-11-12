@@ -1018,11 +1018,11 @@ private:
 	bool template_type = false;
 	wyrmgus::civilization *civilization = nullptr; //which civilization this unit belongs to, if any
 public:
-	int Faction;					/// Which faction this unit belongs to, if any
+	int Faction = -1;				/// Which faction this unit belongs to, if any
 	std::string RequirementsString;	/// Requirements string of the unit type
 	std::string ExperienceRequirementsString;	/// Experience requirements string of the unit type
 	std::string BuildingRulesString;	/// Building rules string of the unit type
-	CUpgrade *Elixir;						/// Which elixir does this (item) unit type always have
+	const CUpgrade *Elixir = nullptr;		/// Which elixir does this (item) unit type always have
 	std::vector<unit_type *> SoldUnits;		/// Units which this unit can sell.
 	std::vector<unit_type *> SpawnUnits;	/// Units which this unit can spawn.
 	std::vector<unit_type *> Drops;			/// Units which can spawn upon death (i.e. items).
@@ -1037,7 +1037,7 @@ public:
 	std::map<std::string, std::vector<unit_type *>> ModTrainedBy;	/// Units which can train this unit (as set in a mod)
 	std::map<std::string, std::vector<unit_type *>> ModAiDrops;	/// Units dropped by this unit, if it is AI-controlled (as set in a mod)
 	//Wyrmgus end
-	int Slot;                       /// Type as number
+	int Slot = 0;                    /// Type as number
 private:
 	std::filesystem::path image_file;
 public:
@@ -1054,24 +1054,24 @@ private:
 	player_color *conversible_player_color = nullptr; //the conversible player color for the unit graphics
 	int draw_level = 0;                                   /// Level to Draw UnitType at
 public:
-	int ShadowWidth;                                      /// Shadow sprite width
-	int ShadowHeight;                                     /// Shadow sprite height
-	int ShadowOffsetX;                                    /// Shadow horizontal offset
-	int ShadowOffsetY;                                    /// Shadow vertical offset
-	int TrainQuantity;										/// Quantity to be trained
-	int CostModifier;										/// Cost modifier (cost increase for every unit of this type the player has)
+	int ShadowWidth = 0;					/// Shadow sprite width
+	int ShadowHeight = 0;					/// Shadow sprite height
+	int ShadowOffsetX = 0;					/// Shadow horizontal offset
+	int ShadowOffsetY = 0;					/// Shadow vertical offset
+	int TrainQuantity = 0;					/// Quantity to be trained
+	int CostModifier = 0;					/// Cost modifier (cost increase for every unit of this type the player has)
 private:
 	wyrmgus::item_class item_class; //item class (if the unit type is an item)
 	wyrmgus::species *species = nullptr;
 public:
-	wyrmgus::terrain_type *TerrainType;
+	wyrmgus::terrain_type *TerrainType = nullptr;
 	std::vector<wyrmgus::item_class> WeaponClasses; //weapon classes that the unit type can use (if the unit type uses a weapon)
 	PixelPos MissileOffsets[UnitSides][MaxAttackPos];     /// Attack offsets for missiles
 
 private:
 	wyrmgus::animation_set *animation_set = nullptr;        /// Animation scripts
 public:
-	int StillFrame;                 /// Still frame
+	int StillFrame = 0;				/// Still frame
 
 	IconConfig Icon;                /// Icon to display for this unit
 	MissileConfig Missile;                           /// Missile weapon
@@ -1087,7 +1087,7 @@ public:
 	std::unique_ptr<LuaCallback> OnEachSecond; //lua function called every second
 	std::unique_ptr<LuaCallback> OnInit; //lua function called on unit init
 
-	int TeleportCost;               /// mana used for teleportation
+	int TeleportCost = 0;               /// mana used for teleportation
 	std::unique_ptr<LuaCallback> TeleportEffectIn;   /// lua function to create effects before teleportation
 	std::unique_ptr<LuaCallback> TeleportEffectOut;  /// lua function to create effects after teleportation
 
@@ -1099,42 +1099,42 @@ private:
 	wyrmgus::construction *construction = nullptr;    /// What is shown in the construction phase
 
 public:
-	int RepairHP;                   /// Amount of HP per repair
+	int RepairHP = 0;				/// Amount of HP per repair
 	int RepairCosts[MaxCosts];      /// How much it costs to repair
 
 private:
 	QSize tile_size = QSize(0, 0);
 	QSize box_size = QSize(0, 0);
 public:
-	int BoxOffsetX;                 /// Selected box size horizontal offset
-	int BoxOffsetY;                 /// Selected box size vertical offset
-	int NumDirections;              /// Number of directions unit can face
-	int MinAttackRange;             /// Minimal attack range
+	int BoxOffsetX = 0;				/// Selected box size horizontal offset
+	int BoxOffsetY = 0;				/// Selected box size vertical offset
+	int NumDirections = 0;			/// Number of directions unit can face
+	int MinAttackRange = 0;			/// Minimal attack range
 	//Wyrmgus start
 	/*
 	int ReactRangeComputer;         /// Reacts on enemy for computer
 	int ReactRangePerson;           /// Reacts on enemy for person player
 	*/
 	//Wyrmgus end
-	int BurnPercent;                /// Burning percent.
-	int BurnDamageRate;             /// HP burn rate per sec
-	int RepairRange;                /// Units repair range.
+	int BurnPercent = 0;			/// Burning percent.
+	int BurnDamageRate = 0;			/// HP burn rate per sec
+	int RepairRange = 0;			/// Units repair range.
 #define InfiniteRepairRange INT_MAX
 	std::vector<spell *> Spells;	/// Spells the unit is able to cast.
 private:
 	std::vector<const spell *> autocast_spells; //the list of autocast spells
 	std::vector<bool> spell_autocast; //the default value for the autocast, mapped to spell indexes
 public:
-	int AutoBuildRate;              /// The rate at which the building builds itself
-	int RandomMovementProbability;  /// Probability to move randomly.
-	int RandomMovementDistance;  	/// Quantity of tiles to move randomly.
-	int ClicksToExplode;            /// Number of consecutive clicks until unit suicides.
-	int MaxOnBoard;                 /// Number of Transporter slots.
-	int BoardSize;                  /// How much "cells" unit occupies inside transporter
-	wyrmgus::button_level *ButtonLevelForTransporter;  /// On which button level game will show units inside transporter
+	int AutoBuildRate = 0;			/// The rate at which the building builds itself
+	int RandomMovementProbability = 0;  /// Probability to move randomly.
+	int RandomMovementDistance = 1;  /// Quantity of tiles to move randomly.
+	int ClicksToExplode = 0;		/// Number of consecutive clicks until unit suicides.
+	int MaxOnBoard = 0;				/// Number of Transporter slots.
+	int BoardSize = 1;				/// How much "cells" unit occupies inside transporter
+	wyrmgus::button_level *ButtonLevelForTransporter = nullptr; //on which button level game will show units inside transporter
 	//Wyrmgus start
-	int ButtonPos;					/// Position of this unit as a train/build button
-	wyrmgus::button_level *ButtonLevel;		/// Level of this unit's button
+	int ButtonPos = 0;				/// Position of this unit as a train/build button
+	wyrmgus::button_level *ButtonLevel = nullptr;	/// Level of this unit's button
 	std::string ButtonPopup;		/// Popup of this unit's button
 	std::string ButtonHint;			/// Hint of this unit's button
 private:
@@ -1145,11 +1145,11 @@ public:
 	//Wyrmgus end
 	/// originally only visual effect, we do more with this!
 	UnitTypeType UnitType;          /// Land / fly / naval
-	int DecayRate;                  /// Decay rate in 1/6 seconds
+	int DecayRate = 0;				/// Decay rate in 1/6 seconds
 	// TODO: not used
-	int AnnoyComputerFactor;        /// How much this annoys the computer
-	int AiAdjacentRange;            /// Min radius for AI build surroundings checking
-	int MouseAction;                /// Right click action
+	int AnnoyComputerFactor = 0;	/// How much this annoys the computer
+	int AiAdjacentRange = -1;		/// Min radius for AI build surroundings checking
+	int MouseAction = 0;			/// Right click action
 #define MouseActionNone      0      /// Nothing
 #define MouseActionAttack    1      /// Attack
 #define MouseActionMove      2      /// Move
@@ -1160,7 +1160,7 @@ public:
 #define MouseActionRallyPoint 7		/// Rally point
 #define MouseActionTrade      8		/// Trade
 //Wyrmgus end
-	int CanTarget;                  /// Which units can it attack
+	int CanTarget = 0;                  /// Which units can it attack
 #define CanTargetLand 1             /// Can attack land units
 #define CanTargetSea  2             /// Can attack sea units
 #define CanTargetAir  4             /// Can attack air units
@@ -1210,15 +1210,15 @@ public:
 	std::map<std::string, unit_sound_set> ModSounds;
 	//Wyrmgus end
 
-	int PoisonDrain;                /// How much health is drained every second when poisoned
+	int PoisonDrain = 0;                /// How much health is drained every second when poisoned
 
 	// --- FILLED UP ---
 
 	//Wyrmgus start
 //	unsigned FieldFlags;            /// Unit map field flags
 //	unsigned MovementMask;          /// Unit check this map flags for move
-	unsigned long FieldFlags;            /// Unit map field flags
-	unsigned long MovementMask;          /// Unit check this map flags for move
+	unsigned long FieldFlags = 0;            /// Unit map field flags
+	unsigned long MovementMask = 0;          /// Unit check this map flags for move
 	//Wyrmgus end
 
 	/// @todo This stats should? be moved into the player struct

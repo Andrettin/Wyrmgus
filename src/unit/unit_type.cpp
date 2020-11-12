@@ -490,35 +490,15 @@ std::string GetResourceNameById(int resource_id)
 namespace wyrmgus {
 
 unit_type::unit_type(const std::string &identifier) : detailed_data_entry(identifier), CDataType(identifier),
-	Slot(0),
-	ShadowWidth(0), ShadowHeight(0), ShadowOffsetX(0), ShadowOffsetY(0),
 	//Wyrmgus start
-	TrainQuantity(0), CostModifier(0), item_class(item_class::none),
-	Faction(-1), TerrainType(nullptr),
+	item_class(item_class::none),
+//	StartingResources(0),
 	//Wyrmgus end
-	StillFrame(0),
-	TeleportCost(0),
-	RepairHP(0),
-	BoxOffsetX(0), BoxOffsetY(0), NumDirections(0),
-	MinAttackRange(0),
-	BurnPercent(0), BurnDamageRate(0), RepairRange(0),
-	AutoBuildRate(0), RandomMovementProbability(0), RandomMovementDistance(1), ClicksToExplode(0),
-	//Wyrmgus start
-//	MaxOnBoard(0), BoardSize(1), ButtonLevelForTransporter(0), StartingResources(0),
-	MaxOnBoard(0), BoardSize(1), ButtonLevelForTransporter(nullptr), ButtonPos(0), ButtonLevel(0),
-	//Wyrmgus end
-	UnitType(UnitTypeType::Land), DecayRate(0), AnnoyComputerFactor(0), AiAdjacentRange(-1),
-	MouseAction(0), CanTarget(0),
+	UnitType(UnitTypeType::Land),
 	Flip(1), LandUnit(0), AirUnit(0), SeaUnit(0),
 	ExplodeWhenKilled(0),
 	CanAttack(0),
-	Neutral(0),
-	PoisonDrain(0), FieldFlags(0), MovementMask(0),
-	//Wyrmgus start
-	Elixir(nullptr),
-//	Sprite(nullptr), ShadowSprite(nullptr)
-	Sprite(nullptr), ShadowSprite(nullptr), LightSprite(nullptr)
-	//Wyrmgus end
+	Neutral(0)
 {
 	memset(RepairCosts, 0, sizeof(RepairCosts));
 	memset(CanStore, 0, sizeof(CanStore));
