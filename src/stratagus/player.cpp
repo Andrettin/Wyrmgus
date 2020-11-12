@@ -1100,18 +1100,18 @@ wyrmgus::faction *CPlayer::get_faction() const
 
 void CPlayer::SetFaction(const wyrmgus::faction *faction)
 {
-	int old_faction_id = this->Faction;
+	const int old_faction_id = this->Faction;
 	
 	if (faction != nullptr && faction->get_civilization() != this->get_civilization()) {
 		this->set_civilization(faction->get_civilization());
 	}
 
-	if (this->Faction != -1) {
-		if (!wyrmgus::faction::get_all()[this->Faction]->FactionUpgrade.empty() && this->Allow.Upgrades[CUpgrade::get(wyrmgus::faction::get_all()[this->Faction]->FactionUpgrade)->ID] == 'R') {
-			UpgradeLost(*this, CUpgrade::get(wyrmgus::faction::get_all()[this->Faction]->FactionUpgrade)->ID);
+	if (this->get_faction() != nullptr) {
+		if (!this->get_faction()->FactionUpgrade.empty() && this->Allow.Upgrades[CUpgrade::get(this->get_faction()->FactionUpgrade)->ID] == 'R') {
+			UpgradeLost(*this, CUpgrade::get(this->get_faction()->FactionUpgrade)->ID);
 		}
 
-		int faction_type_upgrade_id = UpgradeIdByIdent("upgrade-" + GetFactionTypeNameById(wyrmgus::faction::get_all()[this->Faction]->Type));
+		const int faction_type_upgrade_id = UpgradeIdByIdent("upgrade-" + GetFactionTypeNameById(this->get_faction()->Type));
 		if (faction_type_upgrade_id != -1 && this->Allow.Upgrades[faction_type_upgrade_id] == 'R') {
 			UpgradeLost(*this, faction_type_upgrade_id);
 		}
@@ -1137,8 +1137,8 @@ void CPlayer::SetFaction(const wyrmgus::faction *faction)
 	
 	bool personal_names_changed = true;
 	bool ship_names_changed = true;
-	if (this->Faction != -1 && faction_id != -1) {
-		ship_names_changed = wyrmgus::faction::get_all()[this->Faction]->get_ship_names() != wyrmgus::faction::get_all()[faction_id]->get_ship_names();
+	if (this->get_faction() != nullptr && faction != nullptr) {
+		ship_names_changed = this->get_faction()->get_ship_names() != faction->get_ship_names();
 		personal_names_changed = false; // setting to a faction of the same civilization
 	}
 	
@@ -1148,12 +1148,12 @@ void CPlayer::SetFaction(const wyrmgus::faction *faction)
 		UI.Load();
 	}
 	
-	if (this->Faction == -1) {
+	if (this->get_faction() == nullptr) {
 		return;
 	}
 	
 	if (!IsNetworkGame()) { //only set the faction's name as the player's name if this is a single player game
-		this->SetName(wyrmgus::faction::get_all()[this->Faction]->get_name());
+		this->SetName(this->get_faction()->get_name());
 	}
 	if (this->get_faction() != nullptr) {
 		const wyrmgus::player_color *player_color = nullptr;
@@ -1232,8 +1232,8 @@ void CPlayer::SetFaction(const wyrmgus::faction *faction)
 		//update the territory on the minimap for the new color
 		this->update_minimap_territory();
 
-		if (!wyrmgus::faction::get_all()[this->Faction]->FactionUpgrade.empty()) {
-			CUpgrade *faction_upgrade = CUpgrade::try_get(wyrmgus::faction::get_all()[this->Faction]->FactionUpgrade);
+		if (!this->get_faction()->FactionUpgrade.empty()) {
+			CUpgrade *faction_upgrade = CUpgrade::try_get(this->get_faction()->FactionUpgrade);
 			if (faction_upgrade && this->Allow.Upgrades[faction_upgrade->ID] != 'R') {
 				if (GameEstablishing) {
 					AllowUpgradeId(*this, faction_upgrade->ID, 'R');
@@ -1243,7 +1243,7 @@ void CPlayer::SetFaction(const wyrmgus::faction *faction)
 			}
 		}
 		
-		int faction_type_upgrade_id = UpgradeIdByIdent("upgrade-" + GetFactionTypeNameById(wyrmgus::faction::get_all()[this->Faction]->Type));
+		int faction_type_upgrade_id = UpgradeIdByIdent("upgrade-" + GetFactionTypeNameById(this->get_faction()->Type));
 		if (faction_type_upgrade_id != -1 && this->Allow.Upgrades[faction_type_upgrade_id] != 'R') {
 			if (GameEstablishing) {
 				AllowUpgradeId(*this, faction_type_upgrade_id, 'R');
@@ -1411,8 +1411,8 @@ void CPlayer::set_age(const wyrmgus::age *age)
 */
 CCurrency *CPlayer::GetCurrency() const
 {
-	if (this->Faction != -1) {
-		return wyrmgus::faction::get_all()[this->Faction]->GetCurrency();
+	if (this->get_faction() != nullptr) {
+		return this->get_faction()->GetCurrency();
 	}
 	
 	if (this->Race != -1) {
@@ -1539,8 +1539,8 @@ bool CPlayer::has_upgrade_class(const wyrmgus::upgrade_class *upgrade_class) con
 	
 	const CUpgrade *upgrade = nullptr;
 	
-	if (this->Faction != -1) {
-		upgrade = wyrmgus::faction::get_all()[this->Faction]->get_class_upgrade(upgrade_class);
+	if (this->get_faction() != nullptr) {
+		upgrade = this->get_faction()->get_class_upgrade(upgrade_class);
 	} else {
 		upgrade = wyrmgus::civilization::get_all()[this->Race]->get_class_upgrade(upgrade_class);
 	}
@@ -1569,7 +1569,7 @@ bool CPlayer::HasSettlementNearWaterZone(int water_zone) const
 {
 	std::vector<CUnit *> settlement_unit_table;
 	
-	const wyrmgus::unit_type *town_hall_type = wyrmgus::faction::get_all()[this->Faction]->get_class_unit_type(wyrmgus::defines::get()->get_town_hall_class());
+	const wyrmgus::unit_type *town_hall_type = this->get_faction()->get_class_unit_type(wyrmgus::defines::get()->get_town_hall_class());
 	if (town_hall_type == nullptr) {
 		return false;
 	}
@@ -1579,7 +1579,7 @@ bool CPlayer::HasSettlementNearWaterZone(int water_zone) const
 	std::vector<const wyrmgus::unit_type *> additional_town_hall_types;
 
 	for (const wyrmgus::unit_class *additional_town_hall_class : wyrmgus::unit_class::get_town_hall_classes()) {
-		const wyrmgus::unit_type *additional_town_hall_type = wyrmgus::faction::get_all()[this->Faction]->get_class_unit_type(additional_town_hall_class);
+		const wyrmgus::unit_type *additional_town_hall_type = this->get_faction()->get_class_unit_type(additional_town_hall_class);
 
 		if (additional_town_hall_type == nullptr) {
 			continue;
@@ -1877,7 +1877,7 @@ bool CPlayer::UpgradeRemovesExistingUpgrade(const CUpgrade *upgrade, bool ignore
 			const CUpgrade *removed_upgrade = modifier->RemoveUpgrades[j];
 			bool has_upgrade = this->AiEnabled ? AiHasUpgrade(*this->Ai, removed_upgrade, true) : (UpgradeIdAllowed(*this, removed_upgrade->ID) == 'R');
 			if (has_upgrade) {
-				if (ignore_lower_priority && this->Faction != -1 && wyrmgus::faction::get_all()[this->Faction]->GetUpgradePriority(removed_upgrade) < wyrmgus::faction::get_all()[this->Faction]->GetUpgradePriority(upgrade)) {
+				if (ignore_lower_priority && this->get_faction() != nullptr && this->get_faction()->GetUpgradePriority(removed_upgrade) < this->get_faction()->GetUpgradePriority(upgrade)) {
 					continue;
 				}
 				return true;
@@ -1907,7 +1907,7 @@ std::string CPlayer::get_full_name() const
 
 std::string_view CPlayer::get_faction_title_name() const
 {
-	if (this->Race == -1 || this->Faction == -1) {
+	if (this->Race == -1 || this->get_faction() == nullptr) {
 		return string::empty_str;
 	}
 	
@@ -1924,7 +1924,7 @@ std::string_view CPlayer::GetCharacterTitleName(const wyrmgus::character_title t
 		return string::empty_str;
 	}
 	
-	const wyrmgus::faction *faction = wyrmgus::faction::get_all()[this->Faction];
+	const wyrmgus::faction *faction = this->get_faction();
 	const wyrmgus::government_type government_type = this->get_government_type();
 	const wyrmgus::faction_tier tier = this->get_faction_tier();
 
@@ -1948,9 +1948,9 @@ std::set<int> CPlayer::get_builder_landmasses(const wyrmgus::unit_type *building
 		}
 	}
 
-	if (this->Faction != -1) {
+	if (this->get_faction() != nullptr) {
 		for (const wyrmgus::unit_class *builder_class : AiHelpers.get_builder_classes(building->get_unit_class())) {
-			const wyrmgus::unit_type *builder_type = wyrmgus::faction::get_all()[this->Faction]->get_class_unit_type(builder_class);
+			const wyrmgus::unit_type *builder_type = this->get_faction()->get_class_unit_type(builder_class);
 
 			if (this->GetUnitTypeAiActiveCount(builder_type) > 0) {
 				std::vector<CUnit *> builder_table;
@@ -2279,7 +2279,7 @@ void CPlayer::update_quest_pool()
 		return;
 	}
 
-	if (this->Faction == -1) {
+	if (this->get_faction() == nullptr) {
 		return;
 	}
 	
@@ -2521,7 +2521,7 @@ bool CPlayer::can_accept_quest(const wyrmgus::quest *quest) const
 			std::vector<wyrmgus::unit_type *> unit_types = objective->UnitTypes;
 
 			for (const wyrmgus::unit_class *unit_class : objective->get_unit_classes()) {
-				wyrmgus::unit_type *unit_type = wyrmgus::faction::get_all()[this->Faction]->get_class_unit_type(unit_class);
+				wyrmgus::unit_type *unit_type = this->get_faction()->get_class_unit_type(unit_class);
 				if (unit_type == nullptr) {
 					continue;
 				}
@@ -2563,7 +2563,7 @@ bool CPlayer::can_accept_quest(const wyrmgus::quest *quest) const
 						std::vector<wyrmgus::unit_type *> unit_types = second_objective->UnitTypes;
 
 						for (const wyrmgus::unit_class *unit_class : second_objective->get_unit_classes()) {
-							wyrmgus::unit_type *unit_type = wyrmgus::faction::get_all()[this->Faction]->get_class_unit_type(unit_class);
+							wyrmgus::unit_type *unit_type = this->get_faction()->get_class_unit_type(unit_class);
 							if (unit_type == nullptr) {
 								continue;
 							}
@@ -2691,7 +2691,7 @@ std::string CPlayer::check_quest_failure(const wyrmgus::quest *quest) const
 				std::vector<wyrmgus::unit_type *> unit_types = quest_objective->UnitTypes;
 
 				for (const wyrmgus::unit_class *unit_class : quest_objective->get_unit_classes()) {
-					wyrmgus::unit_type *unit_type = wyrmgus::faction::get_all()[this->Faction]->get_class_unit_type(unit_class);
+					wyrmgus::unit_type *unit_type = this->get_faction()->get_class_unit_type(unit_class);
 					if (unit_type == nullptr) {
 						continue;
 					}
@@ -2739,7 +2739,7 @@ std::string CPlayer::check_quest_failure(const wyrmgus::quest *quest) const
 							std::vector<wyrmgus::unit_type *> unit_types = second_quest_objective->UnitTypes;
 
 							for (const wyrmgus::unit_class *unit_class : second_quest_objective->get_unit_classes()) {
-								wyrmgus::unit_type *unit_type = wyrmgus::faction::get_all()[this->Faction]->get_class_unit_type(unit_class);
+								wyrmgus::unit_type *unit_type = this->get_faction()->get_class_unit_type(unit_class);
 								if (unit_type == nullptr) {
 									continue;
 								}
@@ -4131,8 +4131,8 @@ bool CPlayer::HasNeutralFactionType() const
 {
 	if (
 		this->Race != -1
-		&& this->Faction != -1
-		&& (wyrmgus::faction::get_all()[this->Faction]->Type == FactionTypeMercenaryCompany || wyrmgus::faction::get_all()[this->Faction]->Type == FactionTypeHolyOrder || wyrmgus::faction::get_all()[this->Faction]->Type == FactionTypeTradingCompany)
+		&& this->get_faction() != nullptr
+		&& (this->get_faction()->Type == FactionTypeMercenaryCompany || this->get_faction()->Type == FactionTypeHolyOrder || this->get_faction()->Type == FactionTypeTradingCompany)
 	) {
 		return true;
 	}
