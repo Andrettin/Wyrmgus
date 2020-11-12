@@ -1933,6 +1933,11 @@ std::vector<std::string> unit_type::GetPotentialPersonalNames(const wyrmgus::fac
 	return potential_names;
 }
 
+bool unit_type::is_ship() const
+{
+	return this->UnitType == UnitTypeType::Naval && !this->BoolFlag[ORGANIC_INDEX].value;
+}
+
 gender unit_type::get_gender() const
 {
 	return this->DefaultStat.get_gender();

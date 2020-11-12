@@ -1257,8 +1257,8 @@ void CPlayer::SetFaction(const wyrmgus::faction *faction)
 	
 	for (int i = 0; i < this->GetUnitCount(); ++i) {
 		CUnit &unit = this->GetUnit(i);
-		if (unit.get_unique() == nullptr && unit.Type->PersonalNames.empty()) {
-			if (!unit.Type->BoolFlag[ORGANIC_INDEX].value && unit.Type->UnitType == UnitTypeType::Naval && ship_names_changed) {
+		if (unit.get_unique() == nullptr) {
+			if (unit.Type->is_ship() && ship_names_changed) {
 				unit.UpdatePersonalName();
 			}
 		}

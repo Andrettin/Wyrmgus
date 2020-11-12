@@ -289,7 +289,7 @@ int TransformUnitIntoType(CUnit &unit, const wyrmgus::unit_type &newtype)
 				oldtype.get_civilization() != nullptr && newtype.get_civilization() != nullptr && oldtype.get_civilization() != newtype.get_civilization()
 				&& (
 					newtype.BoolFlag[ORGANIC_INDEX].value
-					|| (newtype.PersonalNames.size() == 0 && !newtype.BoolFlag[ORGANIC_INDEX].value && newtype.UnitType == UnitTypeType::Naval)
+					|| (oldtype.is_ship() != newtype.is_ship() || (oldtype.is_ship() && newtype.is_ship() && oldtype.get_civilization()->get_ship_names() != newtype.get_civilization()->get_ship_names()))
 					|| (oldtype.get_civilization()->get_unit_class_names(oldtype.get_unit_class()) != newtype.get_civilization()->get_unit_class_names(newtype.get_unit_class()))
 					|| (oldtype.get_civilization()->get_unit_class_names(oldtype.get_unit_class()) != wyrmgus::civilization::get_all()[player.Race]->get_unit_class_names(newtype.get_unit_class()))
 				)

@@ -1006,6 +1006,8 @@ public:
 		return this->conditions;
 	}
 
+	bool is_ship() const;
+
 	gender get_gender() const;
 
 public:
