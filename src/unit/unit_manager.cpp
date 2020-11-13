@@ -90,14 +90,18 @@ CUnit *unit_manager::AllocUnit()
 */
 void unit_manager::ReleaseUnit(CUnit *unit)
 {
-	Assert(unit);
+	if (unit == nullptr) {
+		throw std::runtime_error("Tried to call the unit manager's release unit function for a null unit.");
+	}
 
 	if (this->lastCreated == unit) {
 		this->lastCreated = nullptr;
 	}
 
 	if (unit->UnitManagerData.unitSlot != -1) { // == -1 when loading.
-		Assert(this->units[unit->UnitManagerData.unitSlot] == unit);
+		if (this->units[unit->UnitManagerData.unitSlot] != unit) {
+			throw std::runtime_error("Unit has index \"" + std::to_string(unit->UnitManagerData.unitSlot) + "\" in the unit manager's units vector, but another unit is present there at that index.");
+		}
 
 		CUnit *temp = this->units.back();
 		temp->UnitManagerData.unitSlot = unit->UnitManagerData.unitSlot;

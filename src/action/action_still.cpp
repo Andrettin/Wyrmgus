@@ -211,10 +211,10 @@ static bool MoveRandomly(CUnit &unit)
 	pos.x += SyncRand(unit.Type->RandomMovementDistance * 2 + 1) - unit.Type->RandomMovementDistance;
 	pos.y += SyncRand(unit.Type->RandomMovementDistance * 2 + 1) - unit.Type->RandomMovementDistance;
 
-	// restrict to map
+	//restrict to map
 	CMap::Map.Clamp(pos, unit.MapLayer->ID);
 
-	// move if possible
+	//move if possible
 	if (pos != unit.tilePos) {
 		UnmarkUnitFieldFlags(unit);
 		if (UnitCanBeAt(unit, pos, unit.MapLayer->ID)) {

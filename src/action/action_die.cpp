@@ -109,7 +109,7 @@ static bool AnimateActionDie(CUnit &unit)
 		UnitClearOrders(unit);
 		//Wyrmgus end
 		unit.Release();
-		return ;
+		return;
 	}
 
 	const wyrmgus::unit_type *corpse_type = type.get_corpse_type();

@@ -556,7 +556,7 @@ void CUnit::Release(const bool final)
 	}
 
 	//Wyrmgus start
-	if (Orders.size() != 1) {
+	if (Orders.size() > 1) {
 		fprintf(stderr, "Unit to be released has more than 1 order; Unit Type: \"%s\", Orders: %d, First Order Type: %d.\n", this->Type->Ident.c_str(), (int)Orders.size(), this->CurrentAction());
 	}
 	//Wyrmgus end
