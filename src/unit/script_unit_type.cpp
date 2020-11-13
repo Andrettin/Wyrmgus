@@ -1664,7 +1664,7 @@ static int CclDefineUnitType(lua_State *l)
 			type->item_class = wyrmgus::string_to_item_class(LuaToString(l, -1));
 		} else if (!strcmp(value, "Species")) {
 			type->species = wyrmgus::species::get(LuaToString(l, -1));
-			type->species->Type = type;
+			type->species->set_unit_type(type);
 		} else if (!strcmp(value, "TerrainType")) {
 			type->TerrainType = wyrmgus::terrain_type::get(LuaToString(l, -1));
 			type->TerrainType->UnitType = type;
@@ -3556,8 +3556,8 @@ static int CclGetSpeciesData(lua_State *l)
 		}
 		return 1;
 	} else if (!strcmp(data, "Type")) {
-		if (species->Type != nullptr) {
-			lua_pushstring(l, species->Type->Ident.c_str());
+		if (species->get_unit_type() != nullptr) {
+			lua_pushstring(l, species->get_unit_type()->get_identifier().c_str());
 		} else {
 			lua_pushstring(l, "");
 		}

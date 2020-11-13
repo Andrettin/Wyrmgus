@@ -911,7 +911,7 @@ void unit_type::ProcessConfigData(const CConfigData *config_data)
 			this->item_class = string_to_item_class(value);
 		} else if (key == "species") {
 			this->species = species::get(value);
-			this->species->Type = this;
+			this->species->set_unit_type(this);
 		} else if (key == "right_mouse_action") {
 			if (value == "none") {
 				this->MouseAction = MouseActionNone;

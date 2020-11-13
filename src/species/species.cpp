@@ -218,7 +218,7 @@ bool species::has_evolution(const terrain_type *terrain, const bool sapient_only
 {
 	for (const species *evolution : this->get_evolutions()) {
 		if (
-			(evolution->Type != nullptr && (!terrain || vector::contains(evolution->get_native_terrain_types(), terrain)) && (!sapient_only || evolution->is_sapient()))
+			(evolution->get_unit_type() != nullptr && (!terrain || vector::contains(evolution->get_native_terrain_types(), terrain)) && (!sapient_only || evolution->is_sapient()))
 			|| evolution->has_evolution(terrain, sapient_only)
 		) {
 			return true;
@@ -234,7 +234,7 @@ const species *species::get_random_evolution(const terrain_type *terrain) const
 	for (const species *evolution : this->get_evolutions()) {
 		//give preference to evolutions that are native to the current terrain
 		if (
-			(evolution->Type != nullptr && vector::contains(evolution->get_native_terrain_types(), terrain))
+			(evolution->get_unit_type() != nullptr && vector::contains(evolution->get_native_terrain_types(), terrain))
 			|| evolution->has_evolution(terrain)
 		) {
 			potential_evolutions.push_back(evolution);
@@ -243,7 +243,7 @@ const species *species::get_random_evolution(const terrain_type *terrain) const
 	
 	if (potential_evolutions.size() == 0) {
 		for (const species *evolution : this->get_evolutions()) {
-			if (evolution->Type != nullptr || evolution->has_evolution()) {
+			if (evolution->get_unit_type() != nullptr || evolution->has_evolution()) {
 				potential_evolutions.push_back(evolution);
 			}
 		}
