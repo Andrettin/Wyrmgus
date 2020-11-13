@@ -547,8 +547,12 @@ void CUnit::Init()
 */
 void CUnit::Release(const bool final)
 {
-	if (this->Type == nullptr) {
+	if (this->ReleaseCycle != 0) {
 		throw std::runtime_error("Unit already free.");
+	}
+
+	if (this->Type == nullptr) {
+		throw std::runtime_error("Unit being released has no type.");
 	}
 
 	//Wyrmgus start
@@ -601,7 +605,6 @@ void CUnit::Release(const bool final)
 	// memory.
 	//
 
-	this->Type = nullptr;
 	//Wyrmgus start
 	this->Character = nullptr;
 	this->settlement = nullptr;
