@@ -729,9 +729,9 @@ static int CclDefineUnitType(lua_State *l)
 					} else if (!strcmp(value, "light-file")) {
 						variation->LightFile = LuaToString(l, -1, k + 1);
 					} else if (!strcmp(value, "layer-file")) {
-						int image_layer = GetImageLayerIdByName(LuaToString(l, -1, k + 1));
+						const int layer_file_image_layer = GetImageLayerIdByName(LuaToString(l, -1, k + 1));
 						++k;
-						variation->LayerFiles[image_layer] = LuaToString(l, -1, k + 1);
+						variation->LayerFiles[layer_file_image_layer] = LuaToString(l, -1, k + 1);
 					} else if (!strcmp(value, "frame-size")) {
 						lua_rawgeti(l, -1, k + 1);
 						CclGetPos(l, &variation->FrameWidth, &variation->FrameHeight);
@@ -775,13 +775,13 @@ static int CclDefineUnitType(lua_State *l)
 						const wyrmgus::item_class item_class = wyrmgus::string_to_item_class(item_class_ident);
 						variation->item_classes_not_equipped.insert(item_class);
 					} else if (!strcmp(value, "item-equipped")) {
-						std::string type_ident = LuaToString(l, -1, k + 1);
-						const wyrmgus::unit_type *type = wyrmgus::unit_type::get(type_ident);
-						variation->ItemsEquipped.push_back(type);
+						const std::string type_ident = LuaToString(l, -1, k + 1);
+						const wyrmgus::unit_type *item_type = wyrmgus::unit_type::get(type_ident);
+						variation->ItemsEquipped.push_back(item_type);
 					} else if (!strcmp(value, "item-not-equipped")) {
-						std::string type_ident = LuaToString(l, -1, k + 1);
-						const wyrmgus::unit_type *type = wyrmgus::unit_type::get(type_ident);
-						variation->ItemsNotEquipped.push_back(type);
+						const std::string type_ident = LuaToString(l, -1, k + 1);
+						const wyrmgus::unit_type *item_type = wyrmgus::unit_type::get(type_ident);
+						variation->ItemsNotEquipped.push_back(item_type);
 					} else if (!strcmp(value, "terrain")) {
 						std::string terrain_ident = LuaToString(l, -1, k + 1);
 						const wyrmgus::terrain_type *terrain = wyrmgus::terrain_type::get(terrain_ident);
