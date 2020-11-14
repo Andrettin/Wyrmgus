@@ -337,10 +337,10 @@ struct UStrInt {
 **
 **  @return       Value corresponding
 */
-UStrInt GetComponent(const CUnit &unit, int index, VariableAttribute e, int t)
+UStrInt GetComponent(const CUnit &unit, const int index, const VariableAttribute e, const int t)
 {
 	UStrInt val;
-	const wyrmgus::unit_variable *var;
+	const wyrmgus::unit_variable *var = nullptr;
 
 	Assert((unsigned int) index < UnitTypeVar.GetNumberVariable());
 	
@@ -423,11 +423,13 @@ UStrInt GetComponent(const CUnit &unit, int index, VariableAttribute e, int t)
 			}
 			break;
 		//Wyrmgus end
+		default:
+			throw std::runtime_error("Invalid variable attribute: " + std::to_string(static_cast<int>(e)));
 	}
 	return val;
 }
 
-UStrInt GetComponent(const wyrmgus::unit_type &type, int index, VariableAttribute e, int t)
+UStrInt GetComponent(const wyrmgus::unit_type &type, const int index, const VariableAttribute e, const int t)
 {
 	UStrInt val;
 	const wyrmgus::unit_variable *var = nullptr;
@@ -449,6 +451,7 @@ UStrInt GetComponent(const wyrmgus::unit_type &type, int index, VariableAttribut
 			var = &type.Stats[CPlayer::GetThisPlayer()->Index].Variables[index];
 			break;
 	}
+
 	switch (e) {
 		case VariableAttribute::Value:
 			val.type = USTRINT_INT;
@@ -489,7 +492,10 @@ UStrInt GetComponent(const wyrmgus::unit_type &type, int index, VariableAttribut
 			val.i = 0;
 			break;
 		//Wyrmgus end
+		default:
+			throw std::runtime_error("Invalid variable attribute: " + std::to_string(static_cast<int>(e)));
 	}
+
 	return val;
 }
 
@@ -929,7 +935,7 @@ void DrawMapLayerButtons()
 	for (size_t i = 0; i < UI.WorldButtons.size(); ++i) {
 		if (UI.WorldButtons[i].X != -1) {
 			DrawUIButton(UI.WorldButtons[i].Style,
-				(ButtonAreaUnderCursor == ButtonAreaMapLayerWorld && ButtonUnderCursor == i ? MI_FLAGS_ACTIVE : 0)
+				(ButtonAreaUnderCursor == ButtonAreaMapLayerWorld && ButtonUnderCursor == static_cast<int>(i) ? MI_FLAGS_ACTIVE : 0)
 				| ((UI.WorldButtons[i].Clicked || CMap::Map.GetCurrentWorld() == wyrmgus::world::get_all()[i]) ? MI_FLAGS_CLICKED : 0),
 				UI.WorldButtons[i].X, UI.WorldButtons[i].Y,
 				UI.WorldButtons[i].Text
@@ -1092,7 +1098,7 @@ void DrawPopups()
 	}
 
 	for (size_t i = 0; i < UI.HeroUnitButtons.size() && i < CPlayer::GetThisPlayer()->Heroes.size(); ++i) {
-		if (ButtonAreaUnderCursor == ButtonAreaHeroUnit && ButtonUnderCursor == i) { //if the mouse is hovering over the level up unit button, draw a tooltip
+		if (ButtonAreaUnderCursor == ButtonAreaHeroUnit && ButtonUnderCursor == static_cast<int>(i)) { //if the mouse is hovering over the level up unit button, draw a tooltip
 			std::string custom_hero_unit_tooltip = _("Select");
 			custom_hero_unit_tooltip += " " + CPlayer::GetThisPlayer()->Heroes[i]->GetMessageName();
 			DrawGenericPopup(custom_hero_unit_tooltip, UI.HeroUnitButtons[i].X, UI.HeroUnitButtons[i].Y);

@@ -337,28 +337,28 @@ static int CclSetTitleScreens(lua_State *l)
 					TitleScreenLabel label;
 					lua_pushnil(l);
 					while (lua_next(l, -2)) {
-						const char *value = LuaToString(l, -2);
-						if (!strcmp(value, "Text")) {
+						const char *subvalue = LuaToString(l, -2);
+						if (!strcmp(subvalue, "Text")) {
 							label.Text = LuaToString(l, -1);
-						} else if (!strcmp(value, "Font")) {
+						} else if (!strcmp(subvalue, "Font")) {
 							label.Font = wyrmgus::font::get(LuaToString(l, -1));
-						} else if (!strcmp(value, "Pos")) {
+						} else if (!strcmp(subvalue, "Pos")) {
 							CclGetPos(l, &label.Xofs, &label.Yofs);
-						} else if (!strcmp(value, "Flags")) {
+						} else if (!strcmp(subvalue, "Flags")) {
 							if (!lua_istable(l, -1)) {
 								LuaError(l, "incorrect argument");
 							}
 							const int subsubargs = lua_rawlen(l, -1);
 							for (int subk = 0; subk < subsubargs; ++subk) {
-								const char *subvalue = LuaToString(l, -1, subk + 1);
-								if (!strcmp(subvalue, "center")) {
+								const char *subsubvalue = LuaToString(l, -1, subk + 1);
+								if (!strcmp(subsubvalue, "center")) {
 									label.Flags |= TitleFlagCenter;
 								} else {
 									LuaError(l, "incorrect flag");
 								}
 							}
 						} else {
-							LuaError(l, "Unsupported key: %s" _C_ value);
+							LuaError(l, "Unsupported key: %s" _C_ subvalue);
 						}
 						lua_pop(l, 1);
 					}
