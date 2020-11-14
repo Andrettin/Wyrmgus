@@ -60,30 +60,13 @@ tile::tile() :
 	this->player_info = std::make_unique<tile_player_info>();
 }
 
-const terrain_type *tile::GetTerrain(const bool overlay) const
-{
-	if (overlay) {
-		return this->OverlayTerrain;
-	} else {
-		return this->Terrain;
-	}
-}
-
-/**
-**	@brief	Get the top terrain of the tile
-**
-**	@param	seen				Whether the seen tile terrain that should be obtained
-**	@param	ignore_destroyed	Whether the tile's overlay terrain should be ignored if destroyed
-**
-**	@return	The topmost terrain of the tile
-*/
-const terrain_type *tile::GetTopTerrain(const bool seen, const bool ignore_destroyed) const
+const terrain_type *tile::get_top_terrain(const bool seen, const bool ignore_destroyed) const
 {
 	if (!seen) {
-		if (this->OverlayTerrain && (!ignore_destroyed || !this->OverlayTerrainDestroyed)) {
-			return this->OverlayTerrain;
+		if (this->get_overlay_terrain() != nullptr && (!ignore_destroyed || !this->OverlayTerrainDestroyed)) {
+			return this->get_overlay_terrain();
 		} else {
-			return this->Terrain;
+			return this->get_terrain();
 		}
 	} else {
 		if (this->player_info->SeenOverlayTerrain) {
@@ -96,13 +79,13 @@ const terrain_type *tile::GetTopTerrain(const bool seen, const bool ignore_destr
 
 bool tile::IsSeenTileCorrect() const
 {
-	return this->Terrain == this->player_info->SeenTerrain && this->OverlayTerrain == this->player_info->SeenOverlayTerrain && this->SolidTile == this->player_info->SeenSolidTile && this->OverlaySolidTile == this->player_info->SeenOverlaySolidTile && this->TransitionTiles == this->player_info->SeenTransitionTiles && this->OverlayTransitionTiles == this->player_info->SeenOverlayTransitionTiles;
+	return this->get_terrain() == this->player_info->SeenTerrain && this->get_overlay_terrain() == this->player_info->SeenOverlayTerrain && this->SolidTile == this->player_info->SeenSolidTile && this->OverlaySolidTile == this->player_info->SeenOverlaySolidTile && this->TransitionTiles == this->player_info->SeenTransitionTiles && this->OverlayTransitionTiles == this->player_info->SeenOverlayTransitionTiles;
 }
 
 const resource *tile::get_resource() const
 {
-	if (this->OverlayTerrain && !this->OverlayTerrainDestroyed) {
-		return this->OverlayTerrain->get_resource();
+	if (this->get_overlay_terrain() != nullptr && !this->OverlayTerrainDestroyed) {
+		return this->get_overlay_terrain()->get_resource();
 	}
 
 	return nullptr;
@@ -110,7 +93,7 @@ const resource *tile::get_resource() const
 
 bool tile::is_destroyed_tree_tile() const
 {
-	return this->OverlayTerrain != nullptr && this->OverlayTerrainDestroyed && (this->get_flags() & MapFieldStumps);
+	return this->get_overlay_terrain() != nullptr && this->OverlayTerrainDestroyed && (this->get_flags() & MapFieldStumps);
 }
 
 //Wyrmgus start
@@ -127,51 +110,51 @@ void tile::SetTerrain(const terrain_type *terrain_type)
 
 	//remove the flags of the old terrain type
 	if (terrain_type->is_overlay()) {
-		if (this->OverlayTerrain == terrain_type) {
+		if (this->get_overlay_terrain() == terrain_type) {
 			return;
 		}
-		if (this->OverlayTerrain) {
-			this->Flags &= ~(this->OverlayTerrain->Flags);
+		if (this->get_overlay_terrain() != nullptr) {
+			this->Flags &= ~(this->get_overlay_terrain()->Flags);
 
 			if (this->OverlayTerrainDestroyed) {
-				if (this->OverlayTerrain->Flags & MapFieldForest) {
+				if (this->get_overlay_terrain()->Flags & MapFieldForest) {
 					this->Flags &= ~(MapFieldStumps);
 				}
 
-				if (((this->OverlayTerrain->Flags & MapFieldRocks) || (this->OverlayTerrain->Flags & MapFieldWall)) && !(this->Terrain->Flags & MapFieldGravel)) {
+				if (((this->get_overlay_terrain()->Flags & MapFieldRocks) || (this->get_overlay_terrain()->Flags & MapFieldWall)) && !(this->get_terrain()->Flags & MapFieldGravel)) {
 					this->Flags &= ~(MapFieldGravel);
 				}
 			}
 			this->Flags &= ~(MapFieldGravel);
 		}
 	} else {
-		if (this->Terrain == terrain_type) {
+		if (this->get_terrain() == terrain_type) {
 			return;
 		}
-		if (this->Terrain) {
-			this->Flags &= ~(this->Terrain->Flags);
+		if (this->get_terrain() != nullptr) {
+			this->Flags &= ~(this->get_terrain()->Flags);
 		}
 	}
 
 	if (terrain_type->is_overlay()) {
-		if (!this->Terrain || !vector::contains(terrain_type->get_base_terrain_types(), this->Terrain)) {
+		if (this->get_terrain() == nullptr || !vector::contains(terrain_type->get_base_terrain_types(), this->get_terrain())) {
 			this->SetTerrain(terrain_type->get_base_terrain_types().front());
 		}
 		if ((terrain_type->Flags & MapFieldWaterAllowed) || terrain_type->Flags & MapFieldSpace) {
-			this->Flags &= ~(this->Terrain->Flags); // if the overlay is water or space, remove all flags from the base terrain
+			this->Flags &= ~(this->get_terrain()->Flags); // if the overlay is water or space, remove all flags from the base terrain
 			if (terrain_type->Flags & MapFieldWaterAllowed) {
 				this->Flags &= ~(MapFieldCoastAllowed); // need to do this manually, since MapFieldCoast is added dynamically
 			}
 		}
-		this->OverlayTerrain = terrain_type;
+		this->overlay_terrain = terrain_type;
 		this->OverlayTerrainDestroyed = false;
 		this->OverlayTerrainDamaged = false;
 	} else {
-		this->Terrain = terrain_type;
-		if (this->OverlayTerrain && !vector::contains(this->OverlayTerrain->get_base_terrain_types(), terrain_type)) { //if the overlay terrain is incompatible with the new base terrain, remove the overlay
-			this->Flags &= ~(this->OverlayTerrain->Flags);
+		this->terrain = terrain_type;
+		if (this->get_overlay_terrain() != nullptr && !vector::contains(this->get_overlay_terrain()->get_base_terrain_types(), terrain_type)) { //if the overlay terrain is incompatible with the new base terrain, remove the overlay
+			this->Flags &= ~(this->get_overlay_terrain()->Flags);
 			this->Flags &= ~(MapFieldCoastAllowed); // need to do this manually, since MapFieldCoast is added dynamically
-			this->OverlayTerrain = nullptr;
+			this->overlay_terrain = nullptr;
 			this->OverlayTransitionTiles.clear();
 		}
 	}
@@ -241,20 +224,20 @@ void tile::SetTerrain(const terrain_type *terrain_type)
 
 void tile::RemoveOverlayTerrain()
 {
-	if (!this->OverlayTerrain) {
+	if (this->get_overlay_terrain() == nullptr) {
 		return;
 	}
 
 	this->value = 0;
-	this->Flags &= ~(this->OverlayTerrain->Flags);
+	this->Flags &= ~(this->get_overlay_terrain()->Flags);
 
 	this->Flags &= ~(MapFieldCoastAllowed); // need to do this manually, since MapFieldCoast is added dynamically
-	this->OverlayTerrain = nullptr;
+	this->overlay_terrain = nullptr;
 	this->OverlayTerrainDestroyed = false;
 	this->OverlayTerrainDamaged = false;
 	this->OverlayTransitionTiles.clear();
 
-	this->Flags |= this->Terrain->Flags;
+	this->Flags |= this->get_terrain()->Flags;
 	// restore MapFieldAirUnpassable related to units (i.e. doors)
 	const CUnitCache &cache = this->UnitCache;
 	for (size_t i = 0; i != cache.size(); ++i) {
@@ -286,7 +269,7 @@ void tile::RemoveOverlayTerrain()
 
 void tile::SetOverlayTerrainDestroyed(bool destroyed)
 {
-	if (!this->OverlayTerrain || this->OverlayTerrainDestroyed == destroyed) {
+	if (this->get_overlay_terrain() == nullptr || this->OverlayTerrainDestroyed == destroyed) {
 		return;
 	}
 
@@ -295,7 +278,7 @@ void tile::SetOverlayTerrainDestroyed(bool destroyed)
 
 void tile::SetOverlayTerrainDamaged(bool damaged)
 {
-	if (!this->OverlayTerrain || this->OverlayTerrainDamaged == damaged) {
+	if (this->get_overlay_terrain() == nullptr || this->OverlayTerrainDamaged == damaged) {
 		return;
 	}
 
@@ -351,8 +334,8 @@ void tile::setTileIndex(const CTileset &tileset, unsigned int tileIndex, int val
 //Wyrmgus start
 void tile::UpdateSeenTile()
 {
-	this->player_info->SeenTerrain = this->Terrain;
-	this->player_info->SeenOverlayTerrain = this->OverlayTerrain;
+	this->player_info->SeenTerrain = this->get_terrain();
+	this->player_info->SeenOverlayTerrain = this->get_overlay_terrain();
 	this->player_info->SeenSolidTile = this->SolidTile;
 	this->player_info->SeenOverlaySolidTile = this->OverlaySolidTile;
 	this->player_info->SeenTransitionTiles.clear();
@@ -366,7 +349,7 @@ void tile::Save(CFile &file) const
 {
 	const wyrmgus::terrain_feature *terrain_feature = this->get_terrain_feature();
 
-	file.printf("  {\"%s\", \"%s\", \"%s\", %s, %s, \"%s\", \"%s\", %d, %d, %d, %d, %2d, %2d, %2d, \"%s\"", (Terrain ? Terrain->Ident.c_str() : ""), (OverlayTerrain ? OverlayTerrain->Ident.c_str() : ""), (terrain_feature != nullptr ? terrain_feature->get_identifier().c_str() : ""), OverlayTerrainDamaged ? "true" : "false", OverlayTerrainDestroyed ? "true" : "false", player_info->SeenTerrain ? player_info->SeenTerrain->Ident.c_str() : "", player_info->SeenOverlayTerrain ? player_info->SeenOverlayTerrain->Ident.c_str() : "", SolidTile, OverlaySolidTile, player_info->SeenSolidTile, player_info->SeenOverlaySolidTile, this->get_value(), this->get_cost(), Landmass, this->get_settlement() != nullptr ? this->get_settlement()->get_identifier().c_str() : "");
+	file.printf("  {\"%s\", \"%s\", \"%s\", %s, %s, \"%s\", \"%s\", %d, %d, %d, %d, %2d, %2d, %2d, \"%s\"", (this->get_terrain() != nullptr ? this->get_terrain()->get_identifier().c_str() : ""), (this->get_overlay_terrain() != nullptr ? this->get_overlay_terrain()->get_identifier().c_str() : ""), (terrain_feature != nullptr ? terrain_feature->get_identifier().c_str() : ""), OverlayTerrainDamaged ? "true" : "false", OverlayTerrainDestroyed ? "true" : "false", player_info->SeenTerrain ? player_info->SeenTerrain->Ident.c_str() : "", player_info->SeenOverlayTerrain ? player_info->SeenOverlayTerrain->Ident.c_str() : "", SolidTile, OverlaySolidTile, player_info->SeenSolidTile, player_info->SeenOverlaySolidTile, this->get_value(), this->get_cost(), Landmass, this->get_settlement() != nullptr ? this->get_settlement()->get_identifier().c_str() : "");
 
 	for (size_t i = 0; i != TransitionTiles.size(); ++i) {
 		file.printf(", \"transition-tile\", \"%s\", %d", TransitionTiles[i].first->Ident.c_str(), TransitionTiles[i].second);
@@ -514,12 +497,12 @@ void tile::parse(lua_State *l)
 	*/
 	const std::string terrain_ident = LuaToString(l, -1, 1);
 	if (!terrain_ident.empty()) {
-		this->Terrain = terrain_type::get(terrain_ident);
+		this->terrain = terrain_type::get(terrain_ident);
 	}
 
 	const std::string overlay_terrain_ident = LuaToString(l, -1, 2);
 	if (!overlay_terrain_ident.empty()) {
-		this->OverlayTerrain = terrain_type::get(overlay_terrain_ident);
+		this->overlay_terrain = terrain_type::get(overlay_terrain_ident);
 	}
 
 	const std::string terrain_feature_ident = LuaToString(l, -1, 3);

@@ -95,16 +95,16 @@ void CMapLayer::DoPerCycleLoop()
 			for (int i = 0; i < max_tile_index; ++i) {
 				wyrmgus::tile &mf = *this->Field(i);
 				
-				if (mf.Terrain && mf.Terrain->SolidAnimationFrames > 0) {
+				if (mf.get_terrain() != nullptr && mf.get_terrain()->SolidAnimationFrames > 0) {
 					mf.AnimationFrame += 1;
-					if (mf.AnimationFrame >= mf.Terrain->SolidAnimationFrames) {
+					if (mf.AnimationFrame >= mf.get_terrain()->SolidAnimationFrames) {
 						mf.AnimationFrame = 0;
 					}
 				}
 				
-				if (mf.OverlayTerrain && mf.OverlayTerrain->SolidAnimationFrames > 0) {
+				if (mf.get_overlay_terrain() != nullptr && mf.get_overlay_terrain()->SolidAnimationFrames > 0) {
 					mf.OverlayAnimationFrame += 1;
-					if (mf.OverlayAnimationFrame >= mf.OverlayTerrain->SolidAnimationFrames) {
+					if (mf.OverlayAnimationFrame >= mf.get_overlay_terrain()->SolidAnimationFrames) {
 						mf.OverlayAnimationFrame = 0;
 					}
 				}
@@ -132,7 +132,7 @@ void CMapLayer::handle_destroyed_overlay_terrain()
 		const QPoint &pos = this->destroyed_overlay_terrain_tiles[i];
 		wyrmgus::tile &mf = *this->Field(pos);
 
-		if (mf.OverlayTerrain == nullptr || !mf.OverlayTerrainDestroyed || (mf.get_flags() & MapFieldStumps)) { 
+		if (mf.get_overlay_terrain() == nullptr || !mf.OverlayTerrainDestroyed || (mf.get_flags() & MapFieldStumps)) {
 			//the destroyed overlay terrain tile may have become invalid, e.g. because the terrain changed, or because of the handling of destroyed overlay tiles itself; we keep the removal of elements centralized here so that we can loop through the tiles reliably
 			this->destroyed_overlay_terrain_tiles.erase(this->destroyed_overlay_terrain_tiles.begin() + i);
 		} else {

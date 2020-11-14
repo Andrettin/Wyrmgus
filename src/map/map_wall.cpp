@@ -308,7 +308,7 @@ void CMap::HitWall(const Vec2i &pos, unsigned damage, int z)
 //		this->Field(pos)->set_value(v - damage);
 		this->Field(pos, z)->set_value(v - damage);
 //		MapFixWallTile(pos);
-		if (this->Field(pos, z)->OverlayTerrain->UnitType && this->Field(pos, z)->get_value() <= this->Field(pos, z)->OverlayTerrain->UnitType->MapDefaultStat.Variables[HP_INDEX].Max / 2) {
+		if (this->Field(pos, z)->get_overlay_terrain()->UnitType && this->Field(pos, z)->get_value() <= this->Field(pos, z)->get_overlay_terrain()->UnitType->MapDefaultStat.Variables[HP_INDEX].Max / 2) {
 			this->SetOverlayTerrainDamaged(pos, true, z);
 		}
 		//Wyrmgus end

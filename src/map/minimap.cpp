@@ -238,7 +238,7 @@ void minimap::UpdateTerrain(int z)
 	for (int my = YOffset[z]; my < texture_height - YOffset[z]; ++my) {
 		for (int mx = XOffset[z]; mx < texture_width - XOffset[z]; ++mx) {
 			const tile &mf = *map_layer->Field(Minimap2MapX[z][mx] + Minimap2MapY[z][my]);
-			const terrain_type *terrain = mf.GetTopTerrain(true);
+			const terrain_type *terrain = mf.get_top_terrain(true);
 	
 			const QColor color = terrain ? terrain->get_minimap_color(season) : QColor(0, 0, 0);
 
@@ -309,7 +309,7 @@ void minimap::UpdateXY(const Vec2i &pos, int z)
 			}
 
 			const tile &mf = *CMap::Map.MapLayers[z]->Field(x + y);
-			const terrain_type *terrain = mf.GetTopTerrain(true);
+			const terrain_type *terrain = mf.get_top_terrain(true);
 
 			const QColor color = terrain ? terrain->get_minimap_color(season) : QColor(0, 0, 0);
 

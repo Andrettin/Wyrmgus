@@ -773,11 +773,11 @@ void FireMissile(CUnit &unit, CUnit *goal, const Vec2i &goalPos, int z)
 			if (CMap::Map.WallOnMap(goalPos, z)) {
 				//Wyrmgus start
 //				if (CMap::Map.HumanWallOnMap(goalPos)) {
-				if (CMap::Map.Field(goalPos, z)->OverlayTerrain->UnitType && CalculateHit(unit, *CMap::Map.Field(goalPos, z)->OverlayTerrain->UnitType->Stats, nullptr) == true) {
+				if (CMap::Map.Field(goalPos, z)->get_overlay_terrain()->UnitType && CalculateHit(unit, *CMap::Map.Field(goalPos, z)->get_overlay_terrain()->UnitType->Stats, nullptr) == true) {
 				//Wyrmgus end
 					//Wyrmgus start
 					PlayUnitSound(unit, wyrmgus::unit_sound_type::hit);
-					damage = CalculateDamageStats(unit, *CMap::Map.Field(goalPos, z)->OverlayTerrain->UnitType->Stats, nullptr);
+					damage = CalculateDamageStats(unit, *CMap::Map.Field(goalPos, z)->get_overlay_terrain()->UnitType->Stats, nullptr);
 					//Wyrmgus end
 					CMap::Map.HitWall(goalPos,
 								//Wyrmgus start
@@ -1394,7 +1394,7 @@ static void MissileHitsWall(const Missile &missile, const Vec2i &tilePos, int sp
 		return;
 	}
 	
-	stats = CMap::Map.Field(tilePos, missile.MapLayer)->OverlayTerrain->UnitType->Stats;
+	stats = CMap::Map.Field(tilePos, missile.MapLayer)->get_overlay_terrain()->UnitType->Stats;
 	
 	if (missile.Damage || missile.LightningDamage) {  // direct damage, spells mostly
 		int damage = missile.Damage / splash;

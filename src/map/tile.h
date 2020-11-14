@@ -205,9 +205,17 @@ public:
 	/// Check if a field flags.
 	bool CheckMask(int mask) const;
 	
-	const terrain_type *GetTerrain(const bool overlay) const;
+	const terrain_type *get_terrain() const
+	{
+		return this->terrain;
+	}
 
-	const terrain_type *GetTopTerrain(const bool seen = false, const bool ignore_destroyed = false) const;
+	const terrain_type *get_overlay_terrain() const
+	{
+		return this->overlay_terrain;
+	}
+
+	const terrain_type *get_top_terrain(const bool seen = false, const bool ignore_destroyed = false) const;
 
 	bool is_water() const;
 	bool is_non_coastal_water() const;
@@ -322,9 +330,9 @@ public:
 	unsigned long Flags;      /// field flags
 	unsigned char AnimationFrame;		/// current frame of the tile's animation
 	unsigned char OverlayAnimationFrame;		/// current frame of the overlay tile's animation
-	const terrain_type *Terrain = nullptr;
-	const terrain_type *OverlayTerrain = nullptr;
 private:
+	const terrain_type *terrain = nullptr;
+	const terrain_type *overlay_terrain = nullptr;
 	const wyrmgus::terrain_feature *terrain_feature = nullptr;
 public:
 	short SolidTile;

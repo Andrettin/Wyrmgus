@@ -287,7 +287,7 @@ static int CclStratagusMap(lua_State *l)
 							mf.parse(l);
 							if (mf.is_destroyed_tree_tile()) {
 								map_layer->destroyed_tree_tiles.push_back(map_layer->GetPosFromIndex(i));
-							} else if (mf.OverlayTerrain != nullptr && mf.OverlayTerrainDestroyed) {
+							} else if (mf.get_overlay_terrain() != nullptr && mf.OverlayTerrainDestroyed) {
 								map_layer->destroyed_overlay_terrain_tiles.push_back(map_layer->GetPosFromIndex(i));
 							}
 							lua_pop(l, 1);

@@ -859,9 +859,9 @@ int WriteMapSetup(const char *mapSetup, CMap &map, int writeTerrain, bool is_mod
 						const int value = mf.get_value();
 						//Wyrmgus start
 	//					f->printf("SetTile(%3d, %d, %d, %d)\n", n, j, i, value);
-						f->printf("SetTileTerrain(\"%s\", %d, %d, %d, %d)\n", mf.Terrain->Ident.c_str(), x, y, 0, map_layer->ID);
-						if (mf.OverlayTerrain) {
-							f->printf("SetTileTerrain(\"%s\", %d, %d, %d, %d)\n", mf.OverlayTerrain->Ident.c_str(), x, y, value, map_layer->ID);
+						f->printf("SetTileTerrain(\"%s\", %d, %d, %d, %d)\n", mf.get_terrain()->get_identifier().c_str(), x, y, 0, map_layer->ID);
+						if (mf.get_overlay_terrain() != nullptr) {
+							f->printf("SetTileTerrain(\"%s\", %d, %d, %d, %d)\n", mf.get_overlay_terrain()->get_identifier().c_str(), x, y, value, map_layer->ID);
 						}
 						//Wyrmgus end
 					}

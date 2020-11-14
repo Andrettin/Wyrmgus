@@ -1418,11 +1418,11 @@ static void DrawEditorInfo()
 	snprintf(buf, sizeof(buf), "%s %s", baseTerrainStr, mixTerrainStr);
 	*/
 	std::string terrain_name;
-	if (mf.Terrain) {
-		if (mf.OverlayTerrain) {
-			terrain_name = mf.OverlayTerrain->get_name() + " (" + mf.Terrain->get_name() + ")";
+	if (mf.get_terrain() != nullptr) {
+		if (mf.get_overlay_terrain() != nullptr) {
+			terrain_name = mf.get_overlay_terrain()->get_name() + " (" + mf.get_terrain()->get_name() + ")";
 		} else {
-			terrain_name = mf.Terrain->get_name();
+			terrain_name = mf.get_terrain()->get_name();
 		}
 	}
 	snprintf(buf, sizeof(buf), "%s", terrain_name.c_str());

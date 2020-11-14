@@ -459,7 +459,7 @@ void map_template::apply_terrain_file(const bool overlay, const QPoint &template
 					tile->SetTerrain(terrain);
 				} else if (terrain_character == '0') {
 					if (overlay) { //"0" in an overlay terrain file means no overlay, while "=" means no change
-						if (tile->OverlayTerrain) {
+						if (tile->get_overlay_terrain() != nullptr) {
 							tile->RemoveOverlayTerrain();
 						}
 					} else {
@@ -555,7 +555,7 @@ void map_template::ApplyTerrainImage(bool overlay, Vec2i template_start_pos, Vec
 			} else {
 				if (terrain_feature == nullptr && (color.red() != 0 || color.green() != 0 || color.blue() != 0 || !overlay)) { //fully black pixels represent areas in overlay terrain files that don't have any overlays
 					throw std::runtime_error("Invalid map terrain: (" + std::to_string(x) + ", " + std::to_string(y) + ") (RGB: " + std::to_string(color.red()) + "/" + std::to_string(color.green()) + "/" + std::to_string(color.blue()) + ").");
-				} else if (overlay && CMap::Map.Field(real_pos, z)->OverlayTerrain) { //fully black pixel or trade route on overlay terrain map = no overlay
+				} else if (overlay && CMap::Map.Field(real_pos, z)->get_overlay_terrain() != nullptr) { //fully black pixel or trade route on overlay terrain map = no overlay
 					CMap::Map.Field(real_pos, z)->RemoveOverlayTerrain();
 				}
 			}
@@ -2315,7 +2315,7 @@ bool map_template::is_constructed_subtemplate_compatible_with_terrain_file(const
 
 				if (terrain_character == '0') {
 					//the '0' character means the tile must have no overlay
-					if (tile->OverlayTerrain != nullptr) {
+					if (tile->get_overlay_terrain() != nullptr) {
 						return false;
 					}
 
@@ -2325,11 +2325,11 @@ bool map_template::is_constructed_subtemplate_compatible_with_terrain_file(const
 				const terrain_type *terrain = terrain_type::get_by_character(terrain_character);
 
 				//the tile's overlay terrain must either match that in the map template exactly, or not be set
-				if (tile->OverlayTerrain != nullptr && tile->OverlayTerrain != terrain) {
+				if (tile->get_overlay_terrain() != nullptr && tile->get_overlay_terrain() != terrain) {
 					return false;
 				}
 
-				if (tile->OverlayTerrain != terrain && !vector::contains(terrain->get_base_terrain_types(), tile->Terrain)) {
+				if (tile->get_overlay_terrain() != terrain && !vector::contains(terrain->get_base_terrain_types(), tile->get_terrain())) {
 					//the tile's terrain must be a valid base terrain for the overlay terrain type
 					return false;
 				}
@@ -2392,7 +2392,7 @@ bool map_template::is_constructed_subtemplate_compatible_with_terrain_image(cons
 
 			if (color.red() == 0 && color.green() == 0 && color.blue() == 0) {
 				//a pure black pixel means the tile must have no overlay
-				if (tile->OverlayTerrain != nullptr) {
+				if (tile->get_overlay_terrain() != nullptr) {
 					return false;
 				}
 
@@ -2402,11 +2402,11 @@ bool map_template::is_constructed_subtemplate_compatible_with_terrain_image(cons
 			const terrain_type *terrain = terrain_type::get_by_color(color);
 
 			//the tile's overlay terrain must either match that in the map template exactly, or not be set
-			if (tile->OverlayTerrain != nullptr && tile->OverlayTerrain != terrain) {
+			if (tile->get_overlay_terrain() != nullptr && tile->get_overlay_terrain() != terrain) {
 				return false;
 			}
 
-			if (tile->OverlayTerrain != terrain && !vector::contains(terrain->get_base_terrain_types(), tile->Terrain)) {
+			if (tile->get_overlay_terrain() != terrain && !vector::contains(terrain->get_base_terrain_types(), tile->get_terrain())) {
 				//the tile's terrain must be a valid base terrain for the overlay terrain type
 				return false;
 			}
@@ -2703,13 +2703,13 @@ void generated_terrain::ProcessConfigData(const CConfigData *config_data)
 */
 bool generated_terrain::CanUseTileAsSeed(const tile *tile) const
 {
-	const terrain_type *top_terrain = tile->GetTopTerrain();
+	const terrain_type *top_terrain = tile->get_top_terrain();
 	
 	if (top_terrain == this->TerrainType) { //top terrain is the same as the one for the generation, so the tile can be used as a seed
 		return true;
 	}
 	
-	if (this->TerrainType == tile->Terrain && std::find(this->TargetTerrainTypes.begin(), this->TargetTerrainTypes.end(), top_terrain) == this->TargetTerrainTypes.end()) { //the tile's base terrain is the same as the one for the generation, and its overlay terrain is not a target for the generation
+	if (this->TerrainType == tile->get_terrain() && std::find(this->TargetTerrainTypes.begin(), this->TargetTerrainTypes.end(), top_terrain) == this->TargetTerrainTypes.end()) { //the tile's base terrain is the same as the one for the generation, and its overlay terrain is not a target for the generation
 		return true;
 	}
 	
@@ -2726,26 +2726,26 @@ bool generated_terrain::CanUseTileAsSeed(const tile *tile) const
 bool generated_terrain::CanGenerateOnTile(const tile *tile) const
 {
 	if (this->TerrainType->is_overlay()) {
-		if (std::find(this->TargetTerrainTypes.begin(), this->TargetTerrainTypes.end(), tile->GetTopTerrain()) == this->TargetTerrainTypes.end()) { //disallow generating over terrains that aren't a target for the generation
+		if (std::find(this->TargetTerrainTypes.begin(), this->TargetTerrainTypes.end(), tile->get_top_terrain()) == this->TargetTerrainTypes.end()) { //disallow generating over terrains that aren't a target for the generation
 			return false;
 		}
 	} else {
 		if (
-			std::find(this->TargetTerrainTypes.begin(), this->TargetTerrainTypes.end(), tile->GetTopTerrain()) == this->TargetTerrainTypes.end()
-			&& std::find(this->TargetTerrainTypes.begin(), this->TargetTerrainTypes.end(), tile->Terrain) == this->TargetTerrainTypes.end()
+			std::find(this->TargetTerrainTypes.begin(), this->TargetTerrainTypes.end(), tile->get_top_terrain()) == this->TargetTerrainTypes.end()
+			&& std::find(this->TargetTerrainTypes.begin(), this->TargetTerrainTypes.end(), tile->get_terrain()) == this->TargetTerrainTypes.end()
 		) {
 			return false;
 		}
 		
 		if ( //don't allow generating the terrain on the tile if it is a base terrain, and putting it there would destroy an overlay terrain that isn't a target of the generation
-			tile->OverlayTerrain
+			tile->get_overlay_terrain() != nullptr
 			&& !this->CanRemoveTileOverlayTerrain(tile)
-			&& !vector::contains(tile->OverlayTerrain->get_base_terrain_types(), this->TerrainType)
+			&& !vector::contains(tile->get_overlay_terrain()->get_base_terrain_types(), this->TerrainType)
 		) {
 			return false;
 		}
 		
-		if (std::find(this->TerrainType->BorderTerrains.begin(), this->TerrainType->BorderTerrains.end(), tile->Terrain) == this->TerrainType->BorderTerrains.end()) { //don't allow generating on the tile if it can't be a border terrain to the terrain we want to generate
+		if (std::find(this->TerrainType->BorderTerrains.begin(), this->TerrainType->BorderTerrains.end(), tile->get_terrain()) == this->TerrainType->BorderTerrains.end()) { //don't allow generating on the tile if it can't be a border terrain to the terrain we want to generate
 			return false;
 		}
 	}
@@ -2766,12 +2766,12 @@ bool generated_terrain::CanTileBePartOfExpansion(const tile *tile) const
 		return true;
 	}
 	
-	if (this->TerrainType == tile->GetTopTerrain()) {
+	if (this->TerrainType == tile->get_top_terrain()) {
 		return true;
 	}
 	
 	if (!this->TerrainType->is_overlay()) {
-		if (this->TerrainType == tile->Terrain) {
+		if (this->TerrainType == tile->get_terrain()) {
 			return true;
 		}
 	}
@@ -2788,7 +2788,7 @@ bool generated_terrain::CanTileBePartOfExpansion(const tile *tile) const
 */
 bool generated_terrain::CanRemoveTileOverlayTerrain(const tile *tile) const
 {
-	if (std::find(this->TargetTerrainTypes.begin(), this->TargetTerrainTypes.end(), tile->OverlayTerrain) == this->TargetTerrainTypes.end()) {
+	if (std::find(this->TargetTerrainTypes.begin(), this->TargetTerrainTypes.end(), tile->get_overlay_terrain()) == this->TargetTerrainTypes.end()) {
 		return false;
 	}
 	

@@ -662,7 +662,7 @@ static void DoRightButton_Attack(CUnit &unit, CUnit *dest, const Vec2i &pos, int
 	}
 	*/
 	if (CMap::Map.WallOnMap(pos, UI.CurrentMapLayer->ID) && (UI.CurrentMapLayer->Field(pos)->get_owner() == nullptr || CPlayer::GetThisPlayer()->IsEnemy(*UI.CurrentMapLayer->Field(pos)->get_owner()))) {
-		if (!UI.CurrentMapLayer->Field(pos)->OverlayTerrain->UnitType->BoolFlag[INDESTRUCTIBLE_INDEX].value) {
+		if (!UI.CurrentMapLayer->Field(pos)->get_overlay_terrain()->UnitType->BoolFlag[INDESTRUCTIBLE_INDEX].value) {
 			SendCommandAttack(unit, pos, NoUnitP, flush, UI.CurrentMapLayer->ID);
 			return;
 		}

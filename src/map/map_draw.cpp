@@ -292,8 +292,8 @@ void CViewport::DrawMapBackgroundInViewport() const
 			int overlay_solid_tile = 0;
 
 			if (ReplayRevealMap) {
-				terrain = mf.Terrain;
-				overlay_terrain = mf.OverlayTerrain;
+				terrain = mf.get_terrain();
+				overlay_terrain = mf.get_overlay_terrain();
 				solid_tile = mf.SolidTile;
 				overlay_solid_tile = mf.OverlaySolidTile;
 			} else {
@@ -318,7 +318,7 @@ void CViewport::DrawMapBackgroundInViewport() const
 			if (terrain != nullptr) {
 				const std::shared_ptr<CPlayerColorGraphic> &terrain_graphics = terrain->get_graphics(season);
 				if (terrain_graphics != nullptr) {
-					terrain_graphics->DrawFrameClip(solid_tile + (terrain == mf.Terrain ? mf.AnimationFrame : 0), dx, dy, time_of_day);
+					terrain_graphics->DrawFrameClip(solid_tile + (terrain == mf.get_terrain() ? mf.AnimationFrame : 0), dx, dy, time_of_day);
 				}
 			}
 
@@ -348,7 +348,7 @@ void CViewport::DrawMapBackgroundInViewport() const
 				const bool is_overlay_space = overlay_terrain->Flags & MapFieldSpace;
 				const std::shared_ptr<CPlayerColorGraphic> &overlay_terrain_graphics = overlay_terrain->get_graphics(season);
 				if (overlay_terrain_graphics != nullptr) {
-					overlay_terrain_graphics->DrawPlayerColorFrameClip(player_color, overlay_solid_tile + (overlay_terrain == mf.OverlayTerrain ? mf.OverlayAnimationFrame : 0), dx, dy, is_overlay_space ? nullptr : time_of_day);
+					overlay_terrain_graphics->DrawPlayerColorFrameClip(player_color, overlay_solid_tile + (overlay_terrain == mf.get_overlay_terrain() ? mf.OverlayAnimationFrame : 0), dx, dy, is_overlay_space ? nullptr : time_of_day);
 				}
 			}
 
