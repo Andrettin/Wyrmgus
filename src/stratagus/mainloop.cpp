@@ -359,8 +359,9 @@ static void GameLogicLoop()
 				break;
 			case 4:
 				break;
-			case 5: // forest grow
-				CMap::Map.RegenerateForest();
+			case 5:
+				//regrow forests and remove other destroyed overlay tiles after a delay
+				CMap::get()->handle_destroyed_overlay_terrain();
 				break;
 			case 6: // overtaking units
 				RescueUnits();

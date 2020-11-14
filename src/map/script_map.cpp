@@ -285,8 +285,10 @@ static int CclStratagusMap(lua_State *l)
 							}
 							wyrmgus::tile &mf = *map_layer->Field(i);
 							mf.parse(l);
-							if (mf.IsDestroyedForestTile()) {
-								map_layer->DestroyedForestTiles.push_back(map_layer->GetPosFromIndex(i));
+							if (mf.is_destroyed_tree_tile()) {
+								map_layer->destroyed_tree_tiles.push_back(map_layer->GetPosFromIndex(i));
+							} else if (mf.OverlayTerrain != nullptr && mf.OverlayTerrainDestroyed) {
+								map_layer->destroyed_overlay_terrain_tiles.push_back(map_layer->GetPosFromIndex(i));
 							}
 							lua_pop(l, 1);
 						}
@@ -463,38 +465,6 @@ static int CclSetFogOfWarOpacity(lua_State *l)
 		CMap::Map.Init();
 	}
 	return 0;
-}
-
-/**
-**  Set forest regeneration speed.
-**
-**  @param l  Lua state.
-**
-**  @return   Old speed
-*/
-static int CclSetForestRegeneration(lua_State *l)
-{
-	LuaCheckArgs(l, 1);
-	int i = LuaToNumber(l, 1);
-	//Wyrmgus start
-	/*
-	if (i < 0 || i > 255) {
-		PrintFunction();
-		fprintf(stdout, "Regeneration speed should be 0 - 255\n");
-		i = 100;
-	}
-	*/
-	if (i < 0) {
-		PrintFunction();
-		fprintf(stdout, "Regeneration speed should be greater than 0\n");
-		i = 100;
-	}
-	//Wyrmgus end
-	const int old = ForestRegeneration;
-	ForestRegeneration = i;
-
-	lua_pushnumber(l, old);
-	return 1;
 }
 
 /**
@@ -1949,8 +1919,6 @@ void MapCclRegister()
 	lua_register(Lua, "SetFogOfWarOpacity", CclSetFogOfWarOpacity);
 	lua_register(Lua, "SetFogOfWarColor", CclSetFogOfWarColor);
 	
-	lua_register(Lua, "SetForestRegeneration", CclSetForestRegeneration);
-
 	lua_register(Lua, "LoadTileModels", CclLoadTileModels);
 	lua_register(Lua, "DefinePlayerTypes", CclDefinePlayerTypes);
 

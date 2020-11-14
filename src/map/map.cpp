@@ -86,7 +86,6 @@
 CMap CMap::Map; //the current map
 int FlagRevealMap; //flag must reveal the map
 int ReplayRevealMap; //reveal Map is replay
-int ForestRegeneration; //forest regeneration
 char CurrentMapPath[1024]; //path of the current map
 
 /*----------------------------------------------------------------------------
@@ -1895,17 +1894,22 @@ void CMap::SetOverlayTerrainDestroyed(const Vec2i &pos, bool destroyed, int z)
 		if (mf.OverlayTerrain->Flags & MapFieldForest) {
 			mf.Flags &= ~(MapFieldForest | MapFieldUnpassable);
 			mf.Flags |= MapFieldStumps;
-			map_layer->DestroyedForestTiles.push_back(pos);
-		} else if (mf.OverlayTerrain->Flags & MapFieldRocks) {
-			mf.Flags &= ~(MapFieldRocks | MapFieldUnpassable);
-			mf.Flags |= MapFieldGravel;
-		} else if (mf.OverlayTerrain->Flags & MapFieldWall) {
-			mf.Flags &= ~(MapFieldWall | MapFieldUnpassable);
-			mf.Flags |= MapFieldGravel;
-			if (mf.Flags & MapFieldUnderground) {
-				mf.Flags &= ~(MapFieldAirUnpassable);
+			map_layer->destroyed_tree_tiles.push_back(pos);
+		} else {
+			if (mf.OverlayTerrain->Flags & MapFieldRocks) {
+				mf.Flags &= ~(MapFieldRocks | MapFieldUnpassable);
+				mf.Flags |= MapFieldGravel;
+			} else if (mf.OverlayTerrain->Flags & MapFieldWall) {
+				mf.Flags &= ~(MapFieldWall | MapFieldUnpassable);
+				mf.Flags |= MapFieldGravel;
+				if (mf.Flags & MapFieldUnderground) {
+					mf.Flags &= ~(MapFieldAirUnpassable);
+				}
 			}
+
+			map_layer->destroyed_overlay_terrain_tiles.push_back(pos);
 		}
+
 		mf.set_value(0);
 	} else {
 		if (mf.Flags & MapFieldStumps) { //if is a cleared tree tile regrowing trees
@@ -3475,14 +3479,10 @@ void CMap::ClearRockTile(const Vec2i &pos)
 */
 //Wyrmgus end
 
-void CMap::RegenerateForest()
+void CMap::handle_destroyed_overlay_terrain()
 {
-	if (!ForestRegeneration) {
-		return;
-	}
-
 	for (const std::unique_ptr<CMapLayer> &map_layer : this->MapLayers) {
-		map_layer->RegenerateForest();
+		map_layer->handle_destroyed_overlay_terrain();
 	}
 }
 

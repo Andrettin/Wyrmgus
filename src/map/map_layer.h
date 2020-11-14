@@ -44,12 +44,12 @@ namespace wyrmgus {
 	class world;
 }
 
-class CMapLayer
+class CMapLayer final
 {
 public:
-	CMapLayer(const QSize &size);
+	explicit CMapLayer(const QSize &size);
 
-	CMapLayer(const int width, const int height) : CMapLayer(QSize(width, height))
+	explicit CMapLayer(const int width, const int height) : CMapLayer(QSize(width, height))
 	{
 	}
 
@@ -114,9 +114,10 @@ public:
 	
 	void DoPerCycleLoop();
 	void DoPerHourLoop();
-	void RegenerateForest();
-	//regenerate a forest tile	
-	void RegenerateForestTile(const Vec2i &pos);
+	void handle_destroyed_overlay_terrain();
+	void decay_destroyed_overlay_terrain_tile(const QPoint &pos);
+	void regenerate_forests();
+	void regenerate_tree_tile(const QPoint &pos);
 private:
 	void DecrementRemainingTimeOfDayHours();
 	void IncrementTimeOfDay();
@@ -165,5 +166,6 @@ public:
 	wyrmgus::world *world = nullptr;			/// the world pointer (if any) for the map layer
 	std::vector<CUnit *> LayerConnectors;		/// connectors in the map layer which lead to other map layers
 	wyrmgus::map_template_map<QRect> subtemplate_areas;
-	std::vector<Vec2i> DestroyedForestTiles;	/// destroyed forest tiles; this list is used for forest regeneration
+	std::vector<QPoint> destroyed_overlay_terrain_tiles; /// destroyed overlay terrain tiles (excluding trees)
+	std::vector<QPoint> destroyed_tree_tiles;	/// destroyed tree tiles; this list is used for forest regeneration
 };

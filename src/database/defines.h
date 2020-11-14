@@ -77,6 +77,8 @@ class defines final : public QObject, public singleton<defines>
 	Q_PROPERTY(wyrmgus::resource_icon* food_icon MEMBER food_icon READ get_food_icon)
 	Q_PROPERTY(wyrmgus::resource_icon* score_icon MEMBER score_icon READ get_score_icon)
 	Q_PROPERTY(wyrmgus::resource_icon* mana_icon MEMBER mana_icon READ get_mana_icon)
+	Q_PROPERTY(int forest_regeneration_threshold MEMBER forest_regeneration_threshold READ get_forest_regeneration_threshold)
+	Q_PROPERTY(int destroyed_overlay_terrain_decay_threshold MEMBER destroyed_overlay_terrain_decay_threshold READ get_destroyed_overlay_terrain_decay_threshold)
 
 public:
 	~defines();
@@ -286,6 +288,16 @@ public:
 		return this->mana_icon;
 	}
 
+	int get_forest_regeneration_threshold() const
+	{
+		return this->forest_regeneration_threshold;
+	}
+
+	int get_destroyed_overlay_terrain_decay_threshold() const
+	{
+		return this->destroyed_overlay_terrain_decay_threshold;
+	}
+
 private:
 	font *small_font = nullptr;
 	font *game_font = nullptr;
@@ -321,6 +333,8 @@ private:
 	resource_icon *food_icon = nullptr;
 	resource_icon *score_icon = nullptr;
 	resource_icon *mana_icon = nullptr;
+	int forest_regeneration_threshold = 0;
+	int destroyed_overlay_terrain_decay_threshold = 0;
 };
 
 }

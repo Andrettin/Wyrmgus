@@ -243,7 +243,7 @@ public:
 
 	const resource *get_resource() const;
 
-	bool IsDestroyedForestTile() const;
+	bool is_destroyed_tree_tile() const;
 	
 	unsigned long get_flags() const
 	{
@@ -273,6 +273,11 @@ public:
 	void increment_value()
 	{
 		++this->value;
+	}
+
+	void decrement_value()
+	{
+		--this->value;
 	}
 
 	//Wyrmgus start

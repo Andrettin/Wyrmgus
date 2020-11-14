@@ -234,8 +234,8 @@ public:
 	/// Mark a tile as seen by the player.
 	void MarkSeenTile(wyrmgus::tile &mf);
 
-	/// Regenerate the forest.
-	void RegenerateForest();
+	void handle_destroyed_overlay_terrain();
+
 	/// Reveal the complete map, make everything known.
 	//Wyrmgus start
 //	void Reveal();
@@ -366,8 +366,6 @@ extern char CurrentMapPath[1024]; /// Path to the current map
 extern int FogOfWarOpacity;
 /// fog of war color
 extern CColor FogOfWarColor;
-/// Forest regeneration
-extern int ForestRegeneration;
 /// Flag must reveal the map
 extern int FlagRevealMap;
 /// Flag must reveal map when in replay

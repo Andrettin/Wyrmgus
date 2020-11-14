@@ -122,33 +122,67 @@ void CMapLayer::DoPerHourLoop()
 	this->DecrementRemainingTimeOfDayHours();
 }
 
-/**
-**	@brief	Regenerate forest tiles in the map layer
-*/
-void CMapLayer::RegenerateForest()
+void CMapLayer::handle_destroyed_overlay_terrain()
 {
-	for (size_t i = 0; i < this->DestroyedForestTiles.size();) {
-		const Vec2i &pos = this->DestroyedForestTiles[i];
+	if (wyrmgus::defines::get()->get_destroyed_overlay_terrain_decay_threshold() == 0) {
+		return;
+	}
+
+	for (size_t i = 0; i < this->destroyed_overlay_terrain_tiles.size();) {
+		const QPoint &pos = this->destroyed_overlay_terrain_tiles[i];
 		wyrmgus::tile &mf = *this->Field(pos);
-		if (!mf.IsDestroyedForestTile()) { //the destroyed forest tile may have become invalid, e.g. because the terrain changed, or because of the regeneration itself; we keep the removal of elements centralized here so that we can loop through the tiles reliably
-			this->DestroyedForestTiles.erase(this->DestroyedForestTiles.begin() + i);
+
+		if (mf.OverlayTerrain == nullptr || !mf.OverlayTerrainDestroyed || (mf.get_flags() & MapFieldStumps)) { 
+			//the destroyed overlay terrain tile may have become invalid, e.g. because the terrain changed, or because of the handling of destroyed overlay tiles itself; we keep the removal of elements centralized here so that we can loop through the tiles reliably
+			this->destroyed_overlay_terrain_tiles.erase(this->destroyed_overlay_terrain_tiles.begin() + i);
 		} else {
-			this->RegenerateForestTile(pos);
+			this->decay_destroyed_overlay_terrain_tile(pos);
 			++i;
 		}
 	}
 }
 
-/**
-**	@brief	Regenerate a forest tile
-**
-**	@param	pos		Map tile pos
-**
-**	@return	True if the forest tile was regenerated, or false otherwise
-*/
-void CMapLayer::RegenerateForestTile(const Vec2i &pos)
+void CMapLayer::decay_destroyed_overlay_terrain_tile(const QPoint &pos)
 {
-	Assert(CMap::Map.Info.IsPointOnMap(pos, this->ID));
+	if (!CMap::Map.Info.IsPointOnMap(pos, this->ID)) {
+		throw std::runtime_error("Tried to decay a destroyed overlay terrain tile for an invalid tile position.");
+	}
+
+	wyrmgus::tile &mf = *this->Field(pos);
+
+	mf.decrement_value();
+
+	if (mf.get_value() > wyrmgus::defines::get()->get_destroyed_overlay_terrain_decay_threshold()) {
+		return;
+	}
+
+	mf.set_value(wyrmgus::defines::get()->get_destroyed_overlay_terrain_decay_threshold());
+	CMap::get()->RemoveTileOverlayTerrain(pos, this->ID);
+}
+
+void CMapLayer::regenerate_forests()
+{
+	if (wyrmgus::defines::get()->get_forest_regeneration_threshold() == 0) {
+		return;
+	}
+
+	for (size_t i = 0; i < this->destroyed_tree_tiles.size();) {
+		const QPoint &pos = this->destroyed_tree_tiles[i];
+		wyrmgus::tile &mf = *this->Field(pos);
+		if (!mf.is_destroyed_tree_tile()) { //the destroyed forest tile may have become invalid, e.g. because the terrain changed, or because of the regeneration itself; we keep the removal of elements centralized here so that we can loop through the tiles reliably
+			this->destroyed_tree_tiles.erase(this->destroyed_tree_tiles.begin() + i);
+		} else {
+			this->regenerate_tree_tile(pos);
+			++i;
+		}
+	}
+}
+
+void CMapLayer::regenerate_tree_tile(const QPoint &pos)
+{
+	if (!CMap::Map.Info.IsPointOnMap(pos, this->ID)) {
+		throw std::runtime_error("Tried to regenerate a tree tile for an invalid tile position.");
+	}
 	
 	wyrmgus::tile &mf = *this->Field(pos);
 
@@ -170,10 +204,13 @@ void CMapLayer::RegenerateForestTile(const Vec2i &pos)
 	}
 	
 	mf.increment_value();
-	if (mf.get_value() < ForestRegeneration) {
+
+	const int forest_regeneration_threshold = wyrmgus::defines::get()->get_forest_regeneration_threshold();
+
+	if (mf.get_value() < forest_regeneration_threshold) {
 		return;
 	}
-	mf.set_value(ForestRegeneration);
+	mf.set_value(forest_regeneration_threshold);
 	
 	//Wyrmgus start
 //	const Vec2i offset(0, -1);
@@ -192,9 +229,9 @@ void CMapLayer::RegenerateForestTile(const Vec2i &pos)
 				CMap::Map.Info.IsPointOnMap(pos + diagonalOffset, this->ID)
 				&& CMap::Map.Info.IsPointOnMap(pos + verticalOffset, this->ID)
 				&& CMap::Map.Info.IsPointOnMap(pos + horizontalOffset, this->ID)
-				&& ((verticalMf.IsDestroyedForestTile() && verticalMf.get_value() >= ForestRegeneration && !(verticalMf.Flags & occupied_flag)) || (verticalMf.get_flags() & MapFieldForest))
-				&& ((diagonalMf.IsDestroyedForestTile() && diagonalMf.get_value() >= ForestRegeneration && !(diagonalMf.Flags & occupied_flag)) || (diagonalMf.get_flags() & MapFieldForest))
-				&& ((horizontalMf.IsDestroyedForestTile() && horizontalMf.get_value() >= ForestRegeneration && !(horizontalMf.Flags & occupied_flag)) || (horizontalMf.get_flags() & MapFieldForest))
+				&& ((verticalMf.is_destroyed_tree_tile() && verticalMf.get_value() >= forest_regeneration_threshold && !(verticalMf.Flags & occupied_flag)) || (verticalMf.get_flags() & MapFieldForest))
+				&& ((diagonalMf.is_destroyed_tree_tile() && diagonalMf.get_value() >= forest_regeneration_threshold && !(diagonalMf.Flags & occupied_flag)) || (diagonalMf.get_flags() & MapFieldForest))
+				&& ((horizontalMf.is_destroyed_tree_tile() && horizontalMf.get_value() >= forest_regeneration_threshold && !(horizontalMf.Flags & occupied_flag)) || (horizontalMf.get_flags() & MapFieldForest))
 			) {
 				DebugPrint("Real place wood\n");
 				CMap::Map.SetOverlayTerrainDestroyed(pos + verticalOffset, false, this->ID);
@@ -209,7 +246,7 @@ void CMapLayer::RegenerateForestTile(const Vec2i &pos)
 
 	/*
 	if (topMf.getGraphicTile() == this->Tileset->getRemovedTreeTile()
-		&& topMf.get_value() >= ForestRegeneration
+		&& topMf.get_value() >= forest_regeneration_threshold
 		&& !(topMf.Flags & occupied_flag)) {
 		DebugPrint("Real place wood\n");
 		topMf.setTileIndex(*Map.Tileset, Map.Tileset->getTopOneTreeTile(), 0);

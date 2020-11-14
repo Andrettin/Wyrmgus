@@ -345,7 +345,7 @@ static void Finish(COrder_Built &order, CUnit &unit)
 		UnitLost(unit);
 		UnitClearOrders(unit);
 		unit.Release();
-		return ;
+		return;
 	}
 
 	UpdateForNewUnit(unit, 0);

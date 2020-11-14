@@ -108,9 +108,9 @@ const resource *tile::get_resource() const
 	return nullptr;
 }
 
-bool tile::IsDestroyedForestTile() const
+bool tile::is_destroyed_tree_tile() const
 {
-	return this->OverlayTerrain && this->OverlayTerrainDestroyed && (this->get_flags() & MapFieldStumps);
+	return this->OverlayTerrain != nullptr && this->OverlayTerrainDestroyed && (this->get_flags() & MapFieldStumps);
 }
 
 //Wyrmgus start
@@ -250,6 +250,8 @@ void tile::RemoveOverlayTerrain()
 
 	this->Flags &= ~(MapFieldCoastAllowed); // need to do this manually, since MapFieldCoast is added dynamically
 	this->OverlayTerrain = nullptr;
+	this->OverlayTerrainDestroyed = false;
+	this->OverlayTerrainDamaged = false;
 	this->OverlayTransitionTiles.clear();
 
 	this->Flags |= this->Terrain->Flags;
