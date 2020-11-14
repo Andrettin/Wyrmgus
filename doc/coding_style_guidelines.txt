@@ -1,9 +1,19 @@
 Coding Style Guidelines for Wyrmgus
 
-1. Class names are prefixed with the letter "C", capitalized.
+1. Namespace, class, variable and function names are in snake_case.
 
-2. Class, member variable and function names are in PascalCase.
+2. Function names generally begin with a verb in the imperative, for example: do_something().
 
-3. Local variable names are in snake_case.
+3. Prefer defining functions in headers if they don't require any external includes (which aren't already in the precompiled headers), so that the compiler is able to inline the functions if it deems optimal to do so, thus providing performance improvements.
 
-4. Prefer defining functions in headers if they don't require any external includes, so that the compiler is able to inline the functions if it deems optimal to do so, thus providing performance improvements.
+4. Braces are always used for "if" statements.
+
+5. Header files are included in the following order: first the header which corresponds to the current source file, then the other Wyrmgus headers, then headers for third-party libraries, then Qt headers, and finally standard library headers.
+
+6. Class definitions should be ordered in the following fashion: first, any macros which define a portion of the class (e.g. the Q_OBJECT macro). Then, aliases, followed by enumerations, constant expressions, static methods, static variables, constructors/destructor, instance methods and finally instance variables. Within each of these, public ones are to be followed by protected members, and finally private ones.
+
+7. The precompiled headers should include all library/third party headers used by the engine, but no headers belonging to Wyrmgus itself. This way, compile times are reduced substantially, without unnecessarily causing a full recompilation.
+
+8. Using classes from the standard C++ library is to be preferred to Qt-specific ones.
+
+9. Include Wyrmgus headers in other Wyrmgus headers only in the following circumstances: 1. if a class defined in the header derives from a class defined in the other header, 2. if a template class defined in the header requires the inclusion of the other header or 3. if the header pertains to a small derived class of e.g. a scripted condition, and is itself only included in a source file with a factory function (in such a case the header of the small derived class should have no source file, so that compilation and linking times are kept in check).
