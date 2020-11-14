@@ -33,7 +33,7 @@
 
 class CUnit;
 class ConditionPanel;
-enum EnumUnit;
+enum EnumUnit : int;
 enum class VariableAttribute;
 struct lua_State;
 struct StringDesc;
