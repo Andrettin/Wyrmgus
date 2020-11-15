@@ -477,10 +477,8 @@ void map_template::apply_terrain_file(const bool overlay, const QPoint &template
 	}
 }
 
-void map_template::ApplyTerrainImage(bool overlay, Vec2i template_start_pos, Vec2i map_start_pos, int z) const
+void map_template::apply_terrain_image(const bool overlay, const QPoint &template_start_pos, const QPoint &map_start_pos, const int z)
 {
-	using namespace std::string_literals;
-
 	std::filesystem::path terrain_file;
 	if (overlay) {
 		terrain_file = this->get_overlay_terrain_image_file();
@@ -492,21 +490,13 @@ void map_template::ApplyTerrainImage(bool overlay, Vec2i template_start_pos, Vec
 		this->apply_terrain_file(overlay, template_start_pos, map_start_pos, z);
 		return;
 	}
-	
-	const std::string terrain_filename = LibraryFileName(terrain_file.string().c_str());
-		
-	if (!CanAccessFile(terrain_filename.c_str())) {
-		throw std::runtime_error("The "s + (overlay ? "overlay " : "") + "terrain image file \"" + terrain_filename + "\" for map template \"" + this->get_identifier() + "\" does not exist.");
-	}
-	
-	const QImage terrain_image(terrain_filename.c_str());
 
-	if (terrain_image.size() != this->get_size()) {
-		throw std::runtime_error("The "s + (overlay ? "overlay " : "") + "terrain image for map template \"" + this->get_identifier() + "\" has a different size " + size::to_string(terrain_image.size()) + " than that of the map template itself " + size::to_string(this->get_size()) + ".");
-	}
+	this->load_terrain_image(overlay);
+	
+	const QImage &terrain_image = overlay ? this->overlay_terrain_image : this->terrain_image;
 
 	for (int y = 0; y < terrain_image.height(); ++y) {
-		if (y < template_start_pos.y || y >= (template_start_pos.y + CMap::Map.Info.MapHeights[z])) {
+		if (y < template_start_pos.y() || y >= (template_start_pos.y() + CMap::Map.Info.MapHeights[z])) {
 			continue;
 		}
 		
@@ -515,7 +505,7 @@ void map_template::ApplyTerrainImage(bool overlay, Vec2i template_start_pos, Vec
 		}
 
 		for (int x = 0; x < terrain_image.width(); ++x) {
-			if (x < template_start_pos.x || x >= (template_start_pos.x + CMap::Map.Info.MapWidths[z])) {
+			if (x < template_start_pos.x() || x >= (template_start_pos.x() + CMap::Map.Info.MapWidths[z])) {
 				continue;
 			}
 
@@ -536,7 +526,7 @@ void map_template::ApplyTerrainImage(bool overlay, Vec2i template_start_pos, Vec
 			} else {
 				terrain = terrain_type::try_get_by_color(color);
 			}
-			Vec2i real_pos(map_start_pos.x + (x - template_start_pos.x), map_start_pos.y + (y - template_start_pos.y));
+			const Vec2i real_pos(map_start_pos.x() + (x - template_start_pos.x()), map_start_pos.y() + (y - template_start_pos.y()));
 
 			if (!CMap::Map.Info.IsPointOnMap(real_pos, z)) {
 				continue;
@@ -627,7 +617,7 @@ void map_template::apply_territory_image(const QPoint &template_start_pos, const
 	}
 }
 
-void map_template::Apply(const QPoint &template_start_pos, const QPoint &map_start_pos, const int z)
+void map_template::apply(const QPoint &template_start_pos, const QPoint &map_start_pos, const int z)
 {
 	if (SaveGameLoading) {
 		return;
@@ -758,8 +748,8 @@ void map_template::Apply(const QPoint &template_start_pos, const QPoint &map_sta
 	}
 	
 	try {
-		this->ApplyTerrainImage(false, template_start_pos, map_start_pos, z);
-		this->ApplyTerrainImage(true, template_start_pos, map_start_pos, z);
+		this->apply_terrain_image(false, template_start_pos, map_start_pos, z);
+		this->apply_terrain_image(true, template_start_pos, map_start_pos, z);
 	} catch (...) {
 		std::throw_with_nested(std::runtime_error("Failed to apply terrain file for map template \"" + this->get_identifier() + "\"."));
 	}
@@ -1020,6 +1010,8 @@ void map_template::Apply(const QPoint &template_start_pos, const QPoint &map_sta
 	if (this->IsSubtemplateArea()) {
 		CMap::Map.MapLayers[z]->subtemplate_areas[this] = QRect(map_start_pos, map_end - Vec2i(1, 1));
 	}
+
+	this->clear_terrain_images();
 }
 
 /**
@@ -1090,7 +1082,7 @@ void map_template::apply_subtemplate(map_template *subtemplate, const QPoint &te
 
 			if (subtemplate_pos.x() < 0 || subtemplate_pos.y() < 0) {
 				if (!subtemplate->is_optional()) {
-					fprintf(stderr, "No location available for map template \"%s\" to be applied to.\n", subtemplate->get_identifier().c_str());
+					throw std::runtime_error("No location available for map template \"" + subtemplate->get_identifier() + "\" to be applied to.");
 				}
 			} else {
 				found_location = true;
@@ -1110,7 +1102,7 @@ void map_template::apply_subtemplate(map_template *subtemplate, const QPoint &te
 
 	if (found_location) {
 		if (subtemplate_pos.x() >= 0 && subtemplate_pos.y() >= 0 && subtemplate_pos.x() < CMap::Map.Info.MapWidths[z] && subtemplate_pos.y() < CMap::Map.Info.MapHeights[z]) {
-			subtemplate->Apply(subtemplate->get_start_pos(), subtemplate_pos, z);
+			subtemplate->apply(subtemplate->get_start_pos(), subtemplate_pos, z);
 
 			//also apply all dependent adjacent templates, if the other templates they depend on have also been applied, so that they are more likely to be close to this subtemplate
 			for (map_template *dependent_subtemplate : subtemplate->dependent_adjacent_templates) {
@@ -1133,8 +1125,13 @@ void map_template::apply_subtemplate(map_template *subtemplate, const QPoint &te
 				this->apply_subtemplate(dependent_subtemplate, template_start_pos, map_start_pos, map_end, z, random);
 			}
 		}
-	} else if (!subtemplate->is_optional()) {
-		throw std::runtime_error("Failed to apply subtemplate \"" + subtemplate->get_identifier() + "\".");
+	} else {
+		//terrain images could have been loaded for the purpose of finding an appropriate location for the subtemplate
+		subtemplate->clear_terrain_images();
+
+		if (!subtemplate->is_optional()) {
+			throw std::runtime_error("Failed to apply subtemplate \"" + subtemplate->get_identifier() + "\".");
+		}
 	}
 }
 
@@ -2055,6 +2052,36 @@ void map_template::set_overlay_terrain_image_file(const std::filesystem::path &f
 	this->overlay_terrain_image_file = database::get_maps_path(this->get_module()) / filepath;
 }
 
+void map_template::load_terrain_image(const bool overlay)
+{
+	using namespace std::string_literals;
+
+	QImage &terrain_image = overlay ? this->overlay_terrain_image : this->terrain_image;
+	if (!terrain_image.isNull()) {
+		//already loaded
+		return;
+	}
+
+	std::filesystem::path terrain_file;
+	if (overlay) {
+		terrain_file = this->get_overlay_terrain_image_file();
+	} else {
+		terrain_file = this->get_terrain_image_file();
+	}
+
+	const std::string terrain_filename = LibraryFileName(terrain_file.string().c_str());
+
+	if (!CanAccessFile(terrain_filename.c_str())) {
+		throw std::runtime_error("The "s + (overlay ? "overlay " : "") + "terrain image file \"" + terrain_filename + "\" for map template \"" + this->get_identifier() + "\" does not exist.");
+	}
+
+	terrain_image = QImage(terrain_filename.c_str());
+
+	if (terrain_image.size() != this->get_size()) {
+		throw std::runtime_error("The "s + (overlay ? "overlay " : "") + "terrain image for map template \"" + this->get_identifier() + "\" has a different size " + size::to_string(terrain_image.size()) + " than that of the map template itself " + size::to_string(this->get_size()) + ".");
+	}
+}
+
 void map_template::set_territory_image_file(const std::filesystem::path &filepath)
 {
 	if (filepath == this->get_territory_image_file()) {
@@ -2084,7 +2111,7 @@ void map_template::add_dependency_template(const map_template *other_template)
 	}
 }
 
-QPoint map_template::generate_subtemplate_position(const map_template *subtemplate, const QPoint &template_start_pos, const QPoint &map_start_pos, const QPoint &map_end, const int z, const QPoint &max_adjacent_template_distance, bool &adjacency_restriction_occurred) const
+QPoint map_template::generate_subtemplate_position(map_template *subtemplate, const QPoint &template_start_pos, const QPoint &map_start_pos, const QPoint &map_end, const int z, const QPoint &max_adjacent_template_distance, bool &adjacency_restriction_occurred) const
 {
 	QPoint min_pos(map_start_pos);
 	QPoint max_pos(map_end.x() - subtemplate->get_applied_width(), map_end.y() - subtemplate->get_applied_height());
@@ -2233,7 +2260,7 @@ QPoint map_template::generate_subtemplate_position(const map_template *subtempla
 	return QPoint(-1, -1);
 }
 
-bool map_template::is_constructed_subtemplate_suitable_for_pos(const map_template *subtemplate, const QPoint &map_start_pos, const int z) const
+bool map_template::is_constructed_subtemplate_suitable_for_pos(map_template *subtemplate, const QPoint &map_start_pos, const int z) const
 {
 	//there must be no units in the position where the subtemplate would be applied
 	std::vector<CUnit *> table;
@@ -2245,7 +2272,7 @@ bool map_template::is_constructed_subtemplate_suitable_for_pos(const map_templat
 	return this->is_constructed_subtemplate_compatible_with_terrain(subtemplate, map_start_pos, z);
 }
 
-bool map_template::is_constructed_subtemplate_compatible_with_terrain(const map_template *subtemplate, const QPoint &map_start_pos, const int z) const
+bool map_template::is_constructed_subtemplate_compatible_with_terrain(map_template *subtemplate, const QPoint &map_start_pos, const int z) const
 {
 	if (!subtemplate->get_overlay_terrain_file().empty()) {
 		return this->is_constructed_subtemplate_compatible_with_terrain_file(subtemplate, map_start_pos, z);
@@ -2346,21 +2373,12 @@ bool map_template::is_constructed_subtemplate_compatible_with_terrain_file(const
 	return true;
 }
 
-bool map_template::is_constructed_subtemplate_compatible_with_terrain_image(const map_template *subtemplate, const QPoint &map_start_pos, const int z) const
+bool map_template::is_constructed_subtemplate_compatible_with_terrain_image(map_template *subtemplate, const QPoint &map_start_pos, const int z) const
 {
 	const QPoint &template_start_pos = subtemplate->get_start_pos();
 
-	const std::string terrain_filename = LibraryFileName(subtemplate->get_overlay_terrain_image_file().string().c_str());
-
-	if (!CanAccessFile(terrain_filename.c_str())) {
-		throw std::runtime_error("File \"" + terrain_filename + "\" not found.");
-	}
-
-	const QImage terrain_image(terrain_filename.c_str());
-
-	if (terrain_image.size() != subtemplate->get_size()) {
-		throw std::runtime_error("The overlay terrain image for map template \"" + subtemplate->get_identifier() + "\" has a different size " + size::to_string(terrain_image.size()) + " than that of the map template itself " + size::to_string(subtemplate->get_size()) + ".");
-	}
+	subtemplate->load_terrain_image(true);
+	const QImage &terrain_image = subtemplate->overlay_terrain_image;
 
 	const int applied_width = subtemplate->get_applied_width();
 	const int applied_height = subtemplate->get_applied_height();

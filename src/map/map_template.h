@@ -142,9 +142,9 @@ public:
 	}
 
 	void apply_terrain_file(bool overlay, const QPoint &template_start_pos, const QPoint &map_start_pos, int z) const;
-	void ApplyTerrainImage(bool overlay, Vec2i template_start_pos, Vec2i map_start_pos, int z) const;
+	void apply_terrain_image(const bool overlay, const QPoint &template_start_pos, const QPoint &map_start_pos, const int z);
 	void apply_territory_image(const QPoint &template_start_pos, const QPoint &map_start_pos, const int z) const;
-	void Apply(const QPoint &template_start_pos, const QPoint &map_start_pos, const int z);
+	void apply(const QPoint &template_start_pos, const QPoint &map_start_pos, const int z);
 	void apply_subtemplates(const QPoint &template_start_pos, const QPoint &map_start_pos, const QPoint &map_end, int z, bool random, bool constructed) const;
 	void apply_subtemplate(map_template *subtemplate, const QPoint &template_start_pos, const QPoint &map_start_pos, const QPoint &map_end, const int z, const bool random = false) const;
 	void apply_sites(const QPoint &template_start_pos, const QPoint &map_start_pos, const QPoint &map_end, const int z, const bool random = false) const;
@@ -458,6 +458,14 @@ public:
 		this->set_overlay_terrain_image_file(std::filesystem::path(filepath));
 	}
 
+	void load_terrain_image(const bool overlay);
+
+	void clear_terrain_images()
+	{
+		this->terrain_image = QImage();
+		this->overlay_terrain_image = QImage();
+	}
+
 	const std::filesystem::path &get_territory_image_file() const
 	{
 		return this->territory_image_file;
@@ -509,11 +517,11 @@ public:
 		return count;
 	}
 
-	QPoint generate_subtemplate_position(const map_template *subtemplate, const QPoint &template_start_pos, const QPoint &map_start_pos, const QPoint &map_end, int z, const QPoint &max_adjacent_template_distance, bool &adjacency_restriction_occurred) const;
-	bool is_constructed_subtemplate_suitable_for_pos(const map_template *subtemplate, const QPoint &map_start_pos, int z) const;
-	bool is_constructed_subtemplate_compatible_with_terrain(const map_template *subtemplate, const QPoint &map_start_pos, int z) const;
+	QPoint generate_subtemplate_position(map_template *subtemplate, const QPoint &template_start_pos, const QPoint &map_start_pos, const QPoint &map_end, int z, const QPoint &max_adjacent_template_distance, bool &adjacency_restriction_occurred) const;
+	bool is_constructed_subtemplate_suitable_for_pos(map_template *subtemplate, const QPoint &map_start_pos, int z) const;
+	bool is_constructed_subtemplate_compatible_with_terrain(map_template *subtemplate, const QPoint &map_start_pos, int z) const;
 	bool is_constructed_subtemplate_compatible_with_terrain_file(const map_template *subtemplate, const QPoint &map_start_pos, int z) const;
-	bool is_constructed_subtemplate_compatible_with_terrain_image(const map_template *subtemplate, const QPoint &map_start_pos, int z) const;
+	bool is_constructed_subtemplate_compatible_with_terrain_image(map_template *subtemplate, const QPoint &map_start_pos, int z) const;
 
 	Vec2i get_best_location_map_position(const std::vector<std::unique_ptr<historical_location>> &historical_location_list, bool &in_another_map_template, const Vec2i &template_start_pos, const Vec2i &map_start_pos, const bool random) const;
 
@@ -628,7 +636,9 @@ private:
 	std::filesystem::path terrain_file;
 	std::filesystem::path overlay_terrain_file;
 	std::filesystem::path terrain_image_file;
+	QImage terrain_image;
 	std::filesystem::path overlay_terrain_image_file;
+	QImage overlay_terrain_image;
 	std::filesystem::path territory_image_file;
 	QSize size = QSize(0, 0);
 public:

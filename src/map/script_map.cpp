@@ -879,7 +879,7 @@ void ApplyCampaignMap(const std::string &campaign_ident)
 		if (i < campaign->MapTemplateStartPos.size()) {
 			start_pos = campaign->MapTemplateStartPos[i];
 		}
-		map_template->Apply(start_pos, Vec2i(0, 0), i);
+		map_template->apply(start_pos, QPoint(0, 0), i);
 	}
 }
 //Wyrmgus end
