@@ -82,4 +82,16 @@ inline void remove_one(std::vector<T> &vector, const T &element)
 	vector.erase(std::find(vector.begin(), vector.end(), element));
 }
 
+template <typename T>
+inline std::optional<size_t> find_index(const std::vector<T> &vector, const T &element)
+{
+	const auto find_iterator = std::find(vector.begin(), vector.end(), element);
+
+	if (find_iterator == vector.end()) {
+		return std::nullopt;
+	}
+
+	return static_cast<size_t>(find_iterator - vector.begin());
+}
+
 }
