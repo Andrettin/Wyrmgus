@@ -41,4 +41,13 @@ T take(std::queue<T> &queue)
 	return value;
 }
 
+template <typename T, typename function_type>
+void process(std::queue<T> &queue, const function_type &function)
+{
+	while (!queue.empty()) {
+		function(queue.front());
+		queue.pop();
+	}
+}
+
 }
