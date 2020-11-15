@@ -42,6 +42,7 @@
 #include "iocompat.h"
 #include "iolib.h"
 #include "item/unique_item.h"
+#include "map/character_substitution.h"
 #include "map/historical_location.h"
 #include "map/map.h"
 #include "map/map_layer.h"
@@ -143,6 +144,12 @@ void map_template::process_sml_scope(const sml_data &scope)
 			} else if (tag == "player_location_generated_neutral_units") {
 				this->PlayerLocationGeneratedNeutralUnits.push_back(std::pair<wyrmgus::unit_type *, int>(unit_type, quantity));
 			}
+		});
+	} else if (tag == "character_substitutions") {
+		scope.for_each_child([&](const sml_data &child_scope) {
+			auto substitution = std::make_unique<character_substitution>();
+			database::process_sml_data(substitution, child_scope);
+			this->character_substitutions.push_back(std::move(substitution));
 		});
 	} else {
 		data_entry::process_sml_scope(scope);
@@ -2085,6 +2092,17 @@ void map_template::load_terrain_character_map(const bool overlay)
 	if (character_map_size != this->get_size()) {
 		throw std::runtime_error("The "s + (overlay ? "overlay " : "") + "terrain file for map template \"" + this->get_identifier() + "\" has a different size " + size::to_string(character_map_size) + " than that of the map template itself " + size::to_string(this->get_size()) + ".");
 	}
+
+	this->do_character_substitutions(overlay);
+}
+
+void map_template::do_character_substitutions(const bool overlay)
+{
+	terrain_character_map_type &terrain_character_map = overlay ? this->overlay_terrain_character_map : this->terrain_character_map;
+
+	for (const std::unique_ptr<character_substitution> &substitution : this->character_substitutions) {
+		substitution->apply_to_map(terrain_character_map);
+	}
 }
 
 void map_template::set_terrain_image_file(const std::filesystem::path &filepath)
@@ -2710,7 +2728,9 @@ void generated_terrain::process_sml_property(const sml_property &property)
 
 void generated_terrain::process_sml_scope(const sml_data &scope)
 {
-	throw std::runtime_error("Invalid generated terrain scope: \"" + scope.get_tag() + "\".");
+	const std::string &tag = scope.get_tag();
+
+	throw std::runtime_error("Invalid generated terrain scope: \"" + tag + "\".");
 }
 
 void generated_terrain::ProcessConfigData(const CConfigData *config_data)

@@ -43,6 +43,7 @@ static int CclDefineMapTemplate(lua_State *l);
 namespace wyrmgus {
 
 class character;
+class character_substitution;
 class faction;
 class historical_location;
 class historical_unit;
@@ -438,6 +439,8 @@ public:
 		this->overlay_terrain_character_map.clear();
 	}
 
+	void do_character_substitutions(const bool overlay);
+
 	const std::filesystem::path &get_terrain_image_file() const
 	{
 		return this->terrain_image_file;
@@ -718,6 +721,7 @@ private:
 	double max_longitude;
 	double min_latitude;
 	double max_latitude;
+	std::vector<std::unique_ptr<character_substitution>> character_substitutions; //substitutions applied to the terrain character map, in order
 	std::unique_ptr<map_template_history> history;
 
 	friend static int ::CclDefineMapTemplate(lua_State *l);
