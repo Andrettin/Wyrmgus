@@ -145,6 +145,16 @@ void map_template::process_sml_scope(const sml_data &scope)
 				this->PlayerLocationGeneratedNeutralUnits.push_back(std::pair<wyrmgus::unit_type *, int>(unit_type, quantity));
 			}
 		});
+	} else if (tag == "character_units") {
+		scope.for_each_property([&](const sml_property &property) {
+			const std::string &key = property.get_key();
+			const std::string &value = property.get_value();
+
+			const char character = string::to_character(key);
+			const unit_type *unit_type = unit_type::get(value);
+
+			this->character_units[character] = unit_type;
+		});
 	} else if (tag == "character_substitutions") {
 		scope.for_each_child([&](const sml_data &child_scope) {
 			auto substitution = std::make_unique<character_substitution>();
@@ -413,6 +423,8 @@ void map_template::reset_history()
 
 void map_template::apply_terrain_file(const bool overlay, const QPoint &template_start_pos, const QPoint &map_start_pos, const int z)
 {
+	using namespace std::string_literals;
+
 	std::filesystem::path terrain_file;
 	if (overlay) {
 		terrain_file = this->get_overlay_terrain_file();
@@ -457,17 +469,13 @@ void map_template::apply_terrain_file(const bool overlay, const QPoint &template
 					continue;
 				}
 
+				if (terrain_character == '=') {
+					continue;
+				}
+
 				tile *tile = CMap::Map.Field(real_pos, z);
 
-				if (terrain_character != '0' && terrain_character != '=') {
-					const terrain_type *terrain = terrain_type::get_by_character(terrain_character);
-
-					if (this->is_constructed_only() && !terrain->is_constructed()) {
-						throw std::runtime_error("A non-constructed terrain is present in constructed-only map template \"" + this->get_identifier() + "\", as character \"" + terrain_character + "\".");
-					}
-
-					tile->SetTerrain(terrain);
-				} else if (terrain_character == '0') {
+				if (terrain_character == '0') {
 					if (overlay) { //"0" in an overlay terrain file means no overlay, while "=" means no change
 						if (tile->get_overlay_terrain() != nullptr) {
 							tile->RemoveOverlayTerrain();
@@ -475,7 +483,27 @@ void map_template::apply_terrain_file(const bool overlay, const QPoint &template
 					} else {
 						throw std::runtime_error("\"0\" cannot be used for non-overlay terrain files.");
 					}
+
+					continue;
 				}
+
+				const unit_type *character_unit_type = this->get_character_unit_type(terrain_character);
+				if (character_unit_type != nullptr) {
+					if (!overlay) {
+						throw std::runtime_error("Tried to use a character unit (character \""s + terrain_character + "\") in a non-overlay terrain map.");
+					}
+
+					CreateUnit(real_pos - character_unit_type->get_tile_center_pos_offset(), *character_unit_type, CPlayer::Players[PlayerNumNeutral], z);
+					continue;
+				}
+
+				const terrain_type *terrain = terrain_type::get_by_character(terrain_character);
+
+				if (this->is_constructed_only() && !terrain->is_constructed()) {
+					throw std::runtime_error("A non-constructed terrain is present in constructed-only map template \"" + this->get_identifier() + "\", as character \"" + terrain_character + "\".");
+				}
+
+				tile->SetTerrain(terrain);
 			} catch (...) {
 				std::throw_with_nested(std::runtime_error("Failed to process character " + std::to_string(x) + " of line " + std::to_string(y) + " for terrain file \"" + terrain_file.string() + "."));
 			}
@@ -967,7 +995,7 @@ void map_template::apply(const QPoint &template_start_pos, const QPoint &map_sta
 		if (CPlayer::Players[i]->NumTownHalls > 0) {
 			const unit_type *worker_type = CPlayer::Players[i]->get_faction()->get_class_unit_type(unit_class::get("worker"));
 			if (worker_type != nullptr && CPlayer::Players[i]->GetUnitTypeCount(worker_type) == 0) { //only create if the player doesn't have any workers created in another manner
-				Vec2i worker_unit_offset((worker_type->get_tile_size() - QSize(1, 1)) / 2);
+				const Vec2i worker_unit_offset((worker_type->get_tile_size() - QSize(1, 1)) / 2);
 				
 				Vec2i worker_pos(CPlayer::Players[i]->StartPos);
 
@@ -995,7 +1023,7 @@ void map_template::apply(const QPoint &template_start_pos, const QPoint &map_sta
 				}
 				
 				for (int j = 0; j < 5; ++j) {
-					CreateUnit(worker_pos, *worker_type, CPlayer::Players[i], CPlayer::Players[i]->StartMapLayer);
+					CreateUnit(worker_pos - worker_unit_offset, *worker_type, CPlayer::Players[i], CPlayer::Players[i]->StartMapLayer);
 				}
 			}
 		}
@@ -2398,7 +2426,7 @@ bool map_template::is_constructed_subtemplate_compatible_with_terrain_file(map_t
 
 				const tile *tile = CMap::Map.Field(map_pos, z);
 
-				if (terrain_character == '0') {
+				if (terrain_character == '0' || subtemplate->get_character_unit_type(terrain_character) != nullptr) {
 					//the '0' character means the tile must have no overlay
 					if (tile->get_overlay_terrain() != nullptr) {
 						return false;

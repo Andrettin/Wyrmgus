@@ -643,6 +643,16 @@ public:
 	{
 		return !this->is_constructed_only();
 	}
+
+	const unit_type *get_character_unit_type(const char character) const
+	{
+		auto find_iterator = this->character_units.find(character);
+		if (find_iterator != this->character_units.end()) {
+			return find_iterator->second;
+		}
+
+		return nullptr;
+	}
 	
 private:
 	std::filesystem::path terrain_file;
@@ -721,6 +731,7 @@ private:
 	double max_longitude;
 	double min_latitude;
 	double max_latitude;
+	std::map<char, const unit_type *> character_units;
 	std::vector<std::unique_ptr<character_substitution>> character_substitutions; //substitutions applied to the terrain character map, in order
 	std::unique_ptr<map_template_history> history;
 
