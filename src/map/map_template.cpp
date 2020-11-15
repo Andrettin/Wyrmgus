@@ -164,10 +164,10 @@ void map_template::ProcessConfigData(const CConfigData *config_data)
 			this->terrain_file = value;
 		} else if (key == "overlay_terrain_file") {
 			this->overlay_terrain_file = value;
-		} else if (key == "terrain_image") {
-			this->terrain_image = value;
-		} else if (key == "overlay_terrain_image") {
-			this->overlay_terrain_image = value;
+		} else if (key == "terrain_image_file") {
+			this->terrain_image_file = value;
+		} else if (key == "overlay_terrain_image_file") {
+			this->overlay_terrain_image_file = value;
 		} else if (key == "width") {
 			this->size.setWidth(std::stoi(value));
 		} else if (key == "height") {
@@ -483,9 +483,9 @@ void map_template::ApplyTerrainImage(bool overlay, Vec2i template_start_pos, Vec
 
 	std::filesystem::path terrain_file;
 	if (overlay) {
-		terrain_file = this->get_overlay_terrain_image();
+		terrain_file = this->get_overlay_terrain_image_file();
 	} else {
-		terrain_file = this->get_terrain_image();
+		terrain_file = this->get_terrain_image_file();
 	}
 	
 	if (terrain_file.empty()) {
@@ -565,7 +565,7 @@ void map_template::ApplyTerrainImage(bool overlay, Vec2i template_start_pos, Vec
 
 void map_template::apply_territory_image(const QPoint &template_start_pos, const QPoint &map_start_pos, const int z) const
 {
-	const std::filesystem::path territory_file = this->get_territory_image();
+	const std::filesystem::path territory_file = this->get_territory_image_file();
 	
 	if (territory_file.empty()) {
 		return;
@@ -701,7 +701,7 @@ void map_template::Apply(const QPoint &template_start_pos, const QPoint &map_sta
 		return;
 	}
 	
-	bool has_base_map = !this->get_terrain_file().empty() || !this->get_terrain_image().empty();
+	bool has_base_map = !this->get_terrain_file().empty() || !this->get_terrain_image_file().empty();
 	
 	ShowLoadProgress(_("Applying \"%s\" Map Template Terrain"), this->get_name().c_str());
 	
@@ -906,7 +906,7 @@ void map_template::Apply(const QPoint &template_start_pos, const QPoint &map_sta
 		}
 	}
 
-	if (!this->get_territory_image().empty()) {
+	if (!this->get_territory_image_file().empty()) {
 		this->apply_territory_image(template_start_pos, map_start_pos, z);
 	}
 
@@ -2037,31 +2037,31 @@ void map_template::set_overlay_terrain_file(const std::filesystem::path &filepat
 	this->overlay_terrain_file = database::get_maps_path(this->get_module()) / filepath;
 }
 
-void map_template::set_terrain_image(const std::filesystem::path &filepath)
+void map_template::set_terrain_image_file(const std::filesystem::path &filepath)
 {
-	if (filepath == this->get_terrain_image()) {
+	if (filepath == this->get_terrain_image_file()) {
 		return;
 	}
 
-	this->terrain_image = database::get_maps_path(this->get_module()) / filepath;
+	this->terrain_image_file = database::get_maps_path(this->get_module()) / filepath;
 }
 
-void map_template::set_overlay_terrain_image(const std::filesystem::path &filepath)
+void map_template::set_overlay_terrain_image_file(const std::filesystem::path &filepath)
 {
-	if (filepath == this->get_overlay_terrain_image()) {
+	if (filepath == this->get_overlay_terrain_image_file()) {
 		return;
 	}
 
-	this->overlay_terrain_image = database::get_maps_path(this->get_module()) / filepath;
+	this->overlay_terrain_image_file = database::get_maps_path(this->get_module()) / filepath;
 }
 
-void map_template::set_territory_image(const std::filesystem::path &filepath)
+void map_template::set_territory_image_file(const std::filesystem::path &filepath)
 {
-	if (filepath == this->get_territory_image()) {
+	if (filepath == this->get_territory_image_file()) {
 		return;
 	}
 
-	this->territory_image = database::get_maps_path(this->get_module()) / filepath;
+	this->territory_image_file = database::get_maps_path(this->get_module()) / filepath;
 }
 
 bool map_template::is_dependent_on(const map_template *other_template) const
@@ -2249,7 +2249,7 @@ bool map_template::is_constructed_subtemplate_compatible_with_terrain(const map_
 {
 	if (!subtemplate->get_overlay_terrain_file().empty()) {
 		return this->is_constructed_subtemplate_compatible_with_terrain_file(subtemplate, map_start_pos, z);
-	} else if (!subtemplate->get_overlay_terrain_image().empty()) {
+	} else if (!subtemplate->get_overlay_terrain_image_file().empty()) {
 		return this->is_constructed_subtemplate_compatible_with_terrain_image(subtemplate, map_start_pos, z);
 	}
 
@@ -2350,7 +2350,7 @@ bool map_template::is_constructed_subtemplate_compatible_with_terrain_image(cons
 {
 	const QPoint &template_start_pos = subtemplate->get_start_pos();
 
-	const std::string terrain_filename = LibraryFileName(subtemplate->get_overlay_terrain_image().string().c_str());
+	const std::string terrain_filename = LibraryFileName(subtemplate->get_overlay_terrain_image_file().string().c_str());
 
 	if (!CanAccessFile(terrain_filename.c_str())) {
 		throw std::runtime_error("File \"" + terrain_filename + "\" not found.");
@@ -2494,9 +2494,9 @@ void map_template::save_terrain_image(const std::string &filename, const bool ov
 
 	std::filesystem::path terrain_image;
 	if (overlay) {
-		terrain_image = this->get_overlay_terrain_image();
+		terrain_image = this->get_overlay_terrain_image_file();
 	} else {
-		terrain_image = this->get_terrain_image();
+		terrain_image = this->get_terrain_image_file();
 	}
 
 	QImage image;
@@ -2604,7 +2604,7 @@ void map_template::save_terrain_image(const std::string &filename, const bool ov
 
 void map_template::save_territory_image(const std::string &filename, const std::map<const site *, std::vector<std::unique_ptr<QGeoShape>>> &territory_data) const
 {
-	const std::filesystem::path territory_image = this->get_territory_image();
+	const std::filesystem::path territory_image = this->get_territory_image_file();
 
 	QImage image;
 	if (!territory_image.empty()) {

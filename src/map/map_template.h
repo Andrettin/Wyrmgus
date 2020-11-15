@@ -103,9 +103,9 @@ class map_template final : public named_data_entry, public data_type<map_templat
 	Q_PROPERTY(wyrmgus::map_template* main_template READ get_main_template WRITE set_main_template)
 	Q_PROPERTY(QString terrain_file READ get_terrain_file_qstring)
 	Q_PROPERTY(QString overlay_terrain_file READ get_overlay_terrain_file_qstring)
-	Q_PROPERTY(QString terrain_image READ get_terrain_image_qstring)
-	Q_PROPERTY(QString overlay_terrain_image READ get_overlay_terrain_image_qstring)
-	Q_PROPERTY(QString territory_image READ get_territory_image_qstring)
+	Q_PROPERTY(QString terrain_image_file READ get_terrain_image_file_qstring)
+	Q_PROPERTY(QString overlay_terrain_image_file READ get_overlay_terrain_image_file_qstring)
+	Q_PROPERTY(QString territory_image READ get_territory_image_file_qstring)
 	Q_PROPERTY(wyrmgus::terrain_type* base_terrain_type MEMBER base_terrain_type READ get_base_terrain_type)
 	Q_PROPERTY(wyrmgus::terrain_type* base_overlay_terrain_type MEMBER base_overlay_terrain_type READ get_base_overlay_terrain_type)
 	Q_PROPERTY(wyrmgus::terrain_type* border_terrain_type MEMBER border_terrain_type READ get_border_terrain_type)
@@ -424,55 +424,55 @@ public:
 		this->set_overlay_terrain_file(std::filesystem::path(filepath));
 	}
 
-	const std::filesystem::path &get_terrain_image() const
+	const std::filesystem::path &get_terrain_image_file() const
 	{
-		return this->terrain_image;
+		return this->terrain_image_file;
 	}
 
-	void set_terrain_image(const std::filesystem::path &filepath);
+	void set_terrain_image_file(const std::filesystem::path &filepath);
 
-	QString get_terrain_image_qstring() const
+	QString get_terrain_image_file_qstring() const
 	{
-		return QString::fromStdString(this->get_terrain_image().string());
+		return QString::fromStdString(this->get_terrain_image_file().string());
 	}
 
-	Q_INVOKABLE void set_terrain_image(const std::string &filepath)
+	Q_INVOKABLE void set_terrain_image_file(const std::string &filepath)
 	{
-		this->set_terrain_image(std::filesystem::path(filepath));
+		this->set_terrain_image_file(std::filesystem::path(filepath));
 	}
 
-	const std::filesystem::path &get_overlay_terrain_image() const
+	const std::filesystem::path &get_overlay_terrain_image_file() const
 	{
-		return this->overlay_terrain_image;
+		return this->overlay_terrain_image_file;
 	}
 
-	void set_overlay_terrain_image(const std::filesystem::path &filepath);
+	void set_overlay_terrain_image_file(const std::filesystem::path &filepath);
 
-	QString get_overlay_terrain_image_qstring() const
+	QString get_overlay_terrain_image_file_qstring() const
 	{
-		return QString::fromStdString(this->get_overlay_terrain_image().string());
+		return QString::fromStdString(this->get_overlay_terrain_image_file().string());
 	}
 
-	Q_INVOKABLE void set_overlay_terrain_image(const std::string &filepath)
+	Q_INVOKABLE void set_overlay_terrain_image_file(const std::string &filepath)
 	{
-		this->set_overlay_terrain_image(std::filesystem::path(filepath));
+		this->set_overlay_terrain_image_file(std::filesystem::path(filepath));
 	}
 
-	const std::filesystem::path &get_territory_image() const
+	const std::filesystem::path &get_territory_image_file() const
 	{
-		return this->territory_image;
+		return this->territory_image_file;
 	}
 
-	void set_territory_image(const std::filesystem::path &filepath);
+	void set_territory_image_file(const std::filesystem::path &filepath);
 
-	QString get_territory_image_qstring() const
+	QString get_territory_image_file_qstring() const
 	{
-		return QString::fromStdString(this->get_territory_image().string());
+		return QString::fromStdString(this->get_territory_image_file().string());
 	}
 
-	Q_INVOKABLE void set_territory_image(const std::string &filepath)
+	Q_INVOKABLE void set_territory_image_file(const std::string &filepath)
 	{
-		this->set_territory_image(std::filesystem::path(filepath));
+		this->set_territory_image_file(std::filesystem::path(filepath));
 	}
 
 	const QPoint &get_subtemplate_top_left_pos() const
@@ -627,9 +627,9 @@ public:
 private:
 	std::filesystem::path terrain_file;
 	std::filesystem::path overlay_terrain_file;
-	std::filesystem::path terrain_image;
-	std::filesystem::path overlay_terrain_image;
-	std::filesystem::path territory_image;
+	std::filesystem::path terrain_image_file;
+	std::filesystem::path overlay_terrain_image_file;
+	std::filesystem::path territory_image_file;
 	QSize size = QSize(0, 0);
 public:
 	int Priority = 100; //the priority of this map template, for the order of application of subtemplates
