@@ -76,6 +76,18 @@ inline std::set<typename T::value_type> to_set(const T &container)
 }
 
 template <typename T>
+inline std::queue<typename T::value_type> to_queue(const T &container)
+{
+	std::queue<typename T::value_type> queue;
+
+	for (const typename T::value_type &element : container) {
+		queue.push(element);
+	}
+
+	return queue;
+}
+
+template <typename T>
 inline std::vector<typename T::value_type> to_vector(const T &container)
 {
 	std::vector<typename T::value_type> vector;
