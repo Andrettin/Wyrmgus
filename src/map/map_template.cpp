@@ -450,7 +450,6 @@ void map_template::apply_terrain_file(const bool overlay, const QPoint &template
 				}
 
 				const char terrain_character = row.at(x);
-				terrain_type *terrain = nullptr;
 
 				const QPoint real_pos(map_start_pos.x() + x - template_start_pos.x(), map_start_pos.y() + y - template_start_pos.y());
 
@@ -461,7 +460,12 @@ void map_template::apply_terrain_file(const bool overlay, const QPoint &template
 				tile *tile = CMap::Map.Field(real_pos, z);
 
 				if (terrain_character != '0' && terrain_character != '=') {
-					terrain = terrain_type::get_by_character(terrain_character);
+					const terrain_type *terrain = terrain_type::get_by_character(terrain_character);
+
+					if (this->is_constructed_only() && !terrain->is_constructed()) {
+						throw std::runtime_error("A non-constructed terrain is present in constructed-only map template \"" + this->get_identifier() + "\", as character \"" + terrain_character + "\".");
+					}
+
 					tile->SetTerrain(terrain);
 				} else if (terrain_character == '0') {
 					if (overlay) { //"0" in an overlay terrain file means no overlay, while "=" means no change
@@ -2404,6 +2408,10 @@ bool map_template::is_constructed_subtemplate_compatible_with_terrain_file(map_t
 				}
 
 				const terrain_type *terrain = terrain_type::get_by_character(terrain_character);
+
+				if (!terrain->is_constructed()) {
+					throw std::runtime_error("A non-constructed terrain is present in constructed-only map template \"" + subtemplate->get_identifier() + "\", as character \"" + terrain_character + "\".");
+				}
 
 				//the tile's overlay terrain must either match that in the map template exactly, or not be set
 				if (tile->get_overlay_terrain() != nullptr && tile->get_overlay_terrain() != terrain) {

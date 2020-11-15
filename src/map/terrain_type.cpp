@@ -541,6 +541,21 @@ void terrain_type::set_elevation_image_file(const std::filesystem::path &filepat
 	this->elevation_image_file = database::get_graphics_path(this->get_module()) / filepath;
 }
 
+bool terrain_type::is_water() const
+{
+	return this->Flags & MapFieldWaterAllowed;
+}
+
+bool terrain_type::is_wall() const
+{
+	return this->Flags & MapFieldWall;
+}
+
+bool terrain_type::is_constructed() const
+{
+	return this->is_overlay() && (this->is_wall() || (this->Flags & MapFieldRoad) || (this->Flags & MapFieldRailroad));
+}
+
 QVariantList terrain_type::get_base_terrain_types_qvariant_list() const
 {
 	return container::to_qvariant_list(this->get_base_terrain_types());
@@ -569,11 +584,6 @@ QVariantList terrain_type::get_inner_border_terrain_types_qvariant_list() const
 void terrain_type::remove_inner_border_terrain_type(terrain_type *terrain_type)
 {
 	vector::remove(this->inner_border_terrain_types, terrain_type);
-}
-
-bool terrain_type::is_water() const
-{
-	return this->Flags & MapFieldWaterAllowed;
 }
 
 }

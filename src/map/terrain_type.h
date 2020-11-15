@@ -276,6 +276,11 @@ public:
 		return this->pathway;
 	}
 
+	bool is_water() const;
+	bool is_wall() const;
+	bool is_road() const;
+	bool is_constructed() const;
+
 	bool has_tiled_background() const
 	{
 		return this->tiled_background;
@@ -390,8 +395,6 @@ public:
 
 		return empty_vector;
 	}
-
-	bool is_water() const;
 
 private:
 	char character = 0;
