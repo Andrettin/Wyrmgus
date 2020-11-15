@@ -123,6 +123,8 @@ class map_template final : public named_data_entry, public data_type<map_templat
 	Q_PROPERTY(bool active MEMBER active READ is_active)
 
 public:
+	using terrain_character_map_type = std::vector<std::vector<char>>;
+
 	static constexpr const char *class_identifier = "map_template";
 	static constexpr const char *database_folder = "map_templates";
 	static constexpr QPoint min_adjacent_template_distance = QPoint(4, 4);
@@ -141,7 +143,7 @@ public:
 		this->active = this->is_active_by_default();
 	}
 
-	void apply_terrain_file(bool overlay, const QPoint &template_start_pos, const QPoint &map_start_pos, int z) const;
+	void apply_terrain_file(bool overlay, const QPoint &template_start_pos, const QPoint &map_start_pos, int z);
 	void apply_terrain_image(const bool overlay, const QPoint &template_start_pos, const QPoint &map_start_pos, const int z);
 	void apply_territory_image(const QPoint &template_start_pos, const QPoint &map_start_pos, const int z) const;
 	void apply(const QPoint &template_start_pos, const QPoint &map_start_pos, const int z);
@@ -153,6 +155,13 @@ public:
 	void ApplyUnits(const QPoint &template_start_pos, const QPoint &map_start_pos, const QPoint &map_end, const int z, const bool random = false) const;
 	void apply_historical_unit(const historical_unit *historical_unit, const QPoint &template_start_pos, const QPoint &map_start_pos, const QPoint &map_end, const int z, const bool random) const;
 	void apply_character(character *character, const QPoint &template_start_pos, const QPoint &map_start_pos, const QPoint &map_end, const int z, const bool random) const;
+
+	void clear_application_data()
+	{
+		//clear data created for the application or position generation for the template
+		this->clear_terrain_character_maps();
+		this->clear_terrain_images();
+	}
 
 	bool IsSubtemplateArea() const;
 	const map_template *GetTopMapTemplate() const;
@@ -424,6 +433,14 @@ public:
 		this->set_overlay_terrain_file(std::filesystem::path(filepath));
 	}
 
+	void load_terrain_character_map(const bool overlay);
+
+	void clear_terrain_character_maps()
+	{
+		this->terrain_character_map.clear();
+		this->overlay_terrain_character_map.clear();
+	}
+
 	const std::filesystem::path &get_terrain_image_file() const
 	{
 		return this->terrain_image_file;
@@ -520,7 +537,7 @@ public:
 	QPoint generate_subtemplate_position(map_template *subtemplate, const QPoint &template_start_pos, const QPoint &map_start_pos, const QPoint &map_end, int z, const QPoint &max_adjacent_template_distance, bool &adjacency_restriction_occurred) const;
 	bool is_constructed_subtemplate_suitable_for_pos(map_template *subtemplate, const QPoint &map_start_pos, int z) const;
 	bool is_constructed_subtemplate_compatible_with_terrain(map_template *subtemplate, const QPoint &map_start_pos, int z) const;
-	bool is_constructed_subtemplate_compatible_with_terrain_file(const map_template *subtemplate, const QPoint &map_start_pos, int z) const;
+	bool is_constructed_subtemplate_compatible_with_terrain_file(map_template *subtemplate, const QPoint &map_start_pos, int z) const;
 	bool is_constructed_subtemplate_compatible_with_terrain_image(map_template *subtemplate, const QPoint &map_start_pos, int z) const;
 
 	Vec2i get_best_location_map_position(const std::vector<std::unique_ptr<historical_location>> &historical_location_list, bool &in_another_map_template, const Vec2i &template_start_pos, const Vec2i &map_start_pos, const bool random) const;
@@ -634,7 +651,9 @@ public:
 	
 private:
 	std::filesystem::path terrain_file;
+	terrain_character_map_type terrain_character_map;
 	std::filesystem::path overlay_terrain_file;
+	terrain_character_map_type overlay_terrain_character_map;
 	std::filesystem::path terrain_image_file;
 	QImage terrain_image;
 	std::filesystem::path overlay_terrain_image_file;
