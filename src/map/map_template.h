@@ -105,7 +105,7 @@ class map_template final : public named_data_entry, public data_type<map_templat
 	Q_PROPERTY(QString overlay_terrain_file READ get_overlay_terrain_file_qstring)
 	Q_PROPERTY(QString terrain_image_file READ get_terrain_image_file_qstring)
 	Q_PROPERTY(QString overlay_terrain_image_file READ get_overlay_terrain_image_file_qstring)
-	Q_PROPERTY(QString territory_image READ get_territory_image_file_qstring)
+	Q_PROPERTY(QString territory_image_file READ get_territory_image_file_qstring)
 	Q_PROPERTY(wyrmgus::terrain_type* base_terrain_type MEMBER base_terrain_type READ get_base_terrain_type)
 	Q_PROPERTY(wyrmgus::terrain_type* base_overlay_terrain_type MEMBER base_overlay_terrain_type READ get_base_overlay_terrain_type)
 	Q_PROPERTY(wyrmgus::terrain_type* border_terrain_type MEMBER border_terrain_type READ get_border_terrain_type)
