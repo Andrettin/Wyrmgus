@@ -46,10 +46,10 @@ void character_substitution::process_sml_property(const sml_property &property)
 
 	if (key == "source_character") {
 		this->source_characters.clear();
-		this->add_source_character(value);
+		this->source_characters.push_back(string::to_character(value));
 	} else if (key == "target_character") {
 		this->target_characters.clear();
-		this->add_target_character(value);
+		this->target_characters.push_back(string::to_character(value));
 	} else {
 		throw std::runtime_error("Invalid character substitution property: \"" + key + "\".");
 	}
@@ -62,22 +62,18 @@ void character_substitution::process_sml_scope(const sml_data &scope)
 
 	if (tag == "source_characters") {
 		for (const std::string &value : values) {
-			this->add_source_character(value);
+			this->source_characters.push_back(string::to_character(value));
 		}
 	} else if (tag == "target_characters") {
 		for (const std::string &value : values) {
-			this->add_target_character(value);
+			this->target_characters.push_back(string::to_character(value));
 		}
 	} else if (tag == "shuffle_character_sets") {
 		scope.for_each_child([&](const sml_data &child_scope) {
 			std::vector<char> character_set;
 
 			for (const std::string &value : child_scope.get_values()) {
-				if (value.size() != 1) {
-					throw std::runtime_error("Character substitution shuffle character \"" + value + "\" has a string size different than 1.");
-				}
-
-				character_set.push_back(value.front());
+				character_set.push_back(string::to_character(value));
 			}
 
 			this->shuffle_character_sets.push_back(std::move(character_set));

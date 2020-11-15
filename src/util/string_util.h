@@ -118,6 +118,15 @@ inline bool to_bool(const std::string &str)
 	throw std::runtime_error("Invalid string used for conversion to boolean: \"" + str + "\".");
 }
 
+inline char to_character(const std::string &str)
+{
+	if (str.size() != 1) {
+		throw std::runtime_error("Character string \"" + str + "\" has a string size different than 1.");
+	}
+
+	return str.front();
+}
+
 inline bool is_number(const std::string &str)
 {
 	bool digit_found = false;

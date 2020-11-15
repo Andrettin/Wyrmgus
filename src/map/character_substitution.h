@@ -44,24 +44,6 @@ public:
 	void process_sml_property(const sml_property &property);
 	void process_sml_scope(const sml_data &scope);
 
-	void add_source_character(const std::string &source_character_str)
-	{
-		if (source_character_str.size() != 1) {
-			throw std::runtime_error("Character substitution source character \"" + source_character_str + "\" has a string size different than 1.");
-		}
-
-		this->source_characters.push_back(source_character_str.front());
-	}
-
-	void add_target_character(const std::string &target_character_str)
-	{
-		if (target_character_str.size() != 1) {
-			throw std::runtime_error("Character substitution target character \"" + target_character_str + "\" has a string size different than 1.");
-		}
-
-		this->target_characters.push_back(target_character_str.front());
-	}
-
 	void apply_to_map(character_map &map) const;
 
 private:
