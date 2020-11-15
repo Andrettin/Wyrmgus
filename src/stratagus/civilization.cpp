@@ -31,6 +31,7 @@
 
 #include "character.h"
 #include "civilization_group.h"
+#include "civilization_history.h"
 #include "civilization_supergroup.h"
 #include "database/defines.h"
 #include "faction.h"
@@ -42,12 +43,14 @@
 #include "ui/cursor.h"
 #include "unit/unit_class.h"
 #include "unit/unit_type.h"
-#include "util/container_util.h"
 #include "util/string_util.h"
-#include "util/vector_util.h"
 #include "video/video.h"
 
 namespace wyrmgus {
+
+civilization::civilization(const std::string &identifier) : civilization_base(identifier)
+{
+}
 
 civilization::~civilization()
 {
@@ -385,6 +388,16 @@ void civilization::check() const
 	}
 
 	data_entry::check();
+}
+
+data_entry_history *civilization::get_history_base()
+{
+	return this->history.get();
+}
+
+void civilization::reset_history()
+{
+	this->history = std::make_unique<civilization_history>();
 }
 
 civilization_supergroup *civilization::get_supergroup() const
@@ -860,16 +873,6 @@ CUpgrade *civilization::get_class_upgrade(const upgrade_class *upgrade_class) co
 	}
 
 	return nullptr;
-}
-
-QVariantList civilization::get_acquired_upgrades_qstring_list() const
-{
-	return container::to_qvariant_list(this->get_acquired_upgrades());
-}
-
-void civilization::remove_acquired_upgrade(CUpgrade *upgrade)
-{
-	vector::remove(this->acquired_upgrades, upgrade);
 }
 
 }

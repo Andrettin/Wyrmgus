@@ -43,11 +43,13 @@
 #include "character.h"
 //Wyrmgus end
 #include "civilization.h"
+#include "civilization_history.h"
 #include "commands.h"
 #include "database/defines.h"
 #include "diplomacy_state.h"
 #include "editor.h"
 #include "faction.h"
+#include "faction_history.h"
 //Wyrmgus start
 #include "grand_strategy.h"
 //Wyrmgus end
@@ -154,11 +156,14 @@ void game::apply_player_history()
 		}
 
 		const civilization *civilization = player->get_civilization();
-		const faction *faction = player->get_faction();
+		const civilization_history *civilization_history = civilization->get_history();
 
-		player->set_faction_tier(faction->get_tier());
-		player->set_government_type(faction->get_government_type());
-		player->set_dynasty(faction->get_dynasty());
+		const faction *faction = player->get_faction();
+		const faction_history *faction_history = faction->get_history();
+
+		player->set_faction_tier(faction_history->get_tier());
+		player->set_government_type(faction_history->get_government_type());
+		player->set_dynasty(faction_history->get_dynasty());
 
 		for (const auto &kv_pair : civilization->HistoricalUpgrades) {
 			const CUpgrade *upgrade = CUpgrade::get(kv_pair.first);
@@ -186,13 +191,13 @@ void game::apply_player_history()
 			}
 		}
 
-		for (const CUpgrade *upgrade : civilization->get_acquired_upgrades()) {
+		for (const CUpgrade *upgrade : civilization_history->get_acquired_upgrades()) {
 			if (UpgradeIdAllowed(*player, upgrade->ID) != 'R') {
 				UpgradeAcquire(*player, upgrade);
 			}
 		}
 
-		for (const CUpgrade *upgrade : faction->get_acquired_upgrades()) {
+		for (const CUpgrade *upgrade : faction_history->get_acquired_upgrades()) {
 			if (UpgradeIdAllowed(*player, upgrade->ID) != 'R') {
 				UpgradeAcquire(*player, upgrade);
 			}
@@ -212,7 +217,7 @@ void game::apply_player_history()
 			}
 		}
 
-		for (const auto &kv_pair : faction->get_diplomacy_states()) {
+		for (const auto &kv_pair : faction_history->get_diplomacy_states()) {
 			const wyrmgus::faction *other_faction = kv_pair.first;
 			const diplomacy_state state = kv_pair.second;
 
@@ -243,7 +248,7 @@ void game::apply_player_history()
 			}
 		}
 
-		for (const auto &kv_pair : faction->get_resources()) {
+		for (const auto &kv_pair : faction_history->get_resources()) {
 			const resource *resource = kv_pair.first;
 			const int quantity = kv_pair.second;
 			player->set_resource(resource, quantity);

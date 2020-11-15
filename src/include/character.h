@@ -48,6 +48,7 @@ static int CclDefineCustomHero(lua_State *l);
 namespace wyrmgus {
 	class and_condition;
 	class calendar;
+	class character_history;
 	class civilization;
 	class deity;
 	class dynasty;
@@ -109,8 +110,6 @@ class character : public detailed_data_entry, public data_type<character>, publi
 	Q_PROPERTY(bool ai_active MEMBER ai_active READ is_ai_active)
 	Q_PROPERTY(CUpgrade* trait MEMBER trait READ get_trait)
 	Q_PROPERTY(int base_level MEMBER base_level READ get_base_level)
-	Q_PROPERTY(bool active MEMBER active READ is_active)
-	Q_PROPERTY(wyrmgus::faction *faction MEMBER faction READ get_faction)
 
 public:
 	static constexpr const char *class_identifier = "character";
@@ -122,11 +121,21 @@ public:
 	~character();
 	
 	virtual void process_sml_scope(const sml_data &scope) override;
-	virtual void process_sml_dated_property(const sml_property &property, const QDateTime &date) override;
-	virtual void process_sml_dated_scope(const sml_data &scope, const QDateTime &date) override;
 	virtual void ProcessConfigData(const CConfigData *config_data) override;
 	virtual void initialize() override;
 	virtual void check() const override;
+	virtual data_entry_history *get_history_base() override;
+
+	character_history *get_history()
+	{
+		return this->history.get();
+	}
+
+	const character_history *get_history() const
+	{
+		return this->history.get();
+	}
+
 	virtual void reset_history() override;
 
 	dynasty *get_dynasty() const
@@ -273,16 +282,6 @@ public:
 		return this->ai_active;
 	}
 
-	bool is_active() const
-	{
-		return this->active;
-	}
-
-	faction *get_faction() const
-	{
-		return this->faction;
-	}
-
 	character *get_father() const
 	{
 		return this->father;
@@ -350,11 +349,6 @@ public:
 
 	void remove_ability(const CUpgrade *ability);
 
-	const std::unique_ptr<historical_location> &get_location() const
-	{
-		return this->location;
-	}
-
 	const std::unique_ptr<const and_condition> &get_conditions() const
 	{
 		return this->conditions;
@@ -413,9 +407,7 @@ public:
 	int Attributes[MaxAttributes];
 	std::vector<wyrmgus::unit_type *> ForbiddenUpgrades;	/// which unit types this character is forbidden to upgrade to
 private:
-	bool active = false; //whether the character is active, i.e. should be applied to the map; used for history
-	faction *faction = nullptr; //the character's faction, used for history
-	std::unique_ptr<historical_location> location; //the character's location, used for history
+	std::unique_ptr<character_history> history;
 public:
 	std::vector<std::pair<CDate, wyrmgus::faction *>> HistoricalFactions;
 	std::vector<std::unique_ptr<historical_location>> HistoricalLocations;

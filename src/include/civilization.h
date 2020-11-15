@@ -47,6 +47,7 @@ namespace wyrmgus {
 
 class calendar;
 class civilization_group;
+class civilization_history;
 class civilization_supergroup;
 class deity;
 class language;
@@ -69,7 +70,6 @@ class civilization final : public civilization_base, public data_type<civilizati
 	Q_PROPERTY(QString default_color READ get_default_color_qstring)
 	Q_PROPERTY(CUpgrade* upgrade MEMBER upgrade READ get_upgrade)
 	Q_PROPERTY(wyrmgus::language* language MEMBER language READ get_language)
-	Q_PROPERTY(QVariantList acquired_upgrades READ get_acquired_upgrades_qstring_list)
 
 public:
 	static constexpr const char *class_identifier = "civilization";
@@ -82,21 +82,21 @@ public:
 		return civilization;
 	}
 
-	explicit civilization(const std::string &identifier) : civilization_base(identifier)
-	{
-	}
-
+	explicit civilization(const std::string &identifier);
 	~civilization();
 
 	virtual void process_sml_property(const sml_property &property) override;
 	virtual void process_sml_scope(const sml_data &scope) override;
 	virtual void initialize() override;
 	virtual void check() const override;
+	virtual data_entry_history *get_history_base() override;
 
-	virtual void reset_history() override
+	const civilization_history *get_history() const
 	{
-		this->acquired_upgrades.clear();
+		return this->history.get();
 	}
+
+	virtual void reset_history() override;
 
 	civilization *get_parent_civilization() const
 	{
@@ -279,20 +279,6 @@ public:
 		this->characters.push_back(character);
 	}
 
-	const std::vector<CUpgrade *> &get_acquired_upgrades() const
-	{
-		return this->acquired_upgrades;
-	}
-
-	QVariantList get_acquired_upgrades_qstring_list() const;
-
-	Q_INVOKABLE void add_acquired_upgrade(CUpgrade *upgrade)
-	{
-		this->acquired_upgrades.push_back(upgrade);
-	}
-
-	Q_INVOKABLE void remove_acquired_upgrade(CUpgrade *upgrade);
-
 	int ID = -1;
 private:
 	civilization *parent_civilization = nullptr;
@@ -335,7 +321,7 @@ public:
 private:
 	std::map<government_type, std::map<faction_tier, std::string>> title_names;
 	std::map<character_title, std::map<int, std::map<government_type, std::map<faction_tier, std::map<gender, std::string>>>>> character_title_names;
-	std::vector<CUpgrade *> acquired_upgrades;
+	std::unique_ptr<civilization_history> history;
 public:
 	std::map<std::string, std::map<CDate, bool>> HistoricalUpgrades;	/// historical upgrades of the faction, with the date of change
 

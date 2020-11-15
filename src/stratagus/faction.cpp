@@ -32,6 +32,7 @@
 #include "character.h"
 #include "civilization.h"
 #include "diplomacy_state.h"
+#include "faction_history.h"
 #include "faction_tier.h"
 #include "government_type.h"
 #include "luacallback.h"
@@ -39,7 +40,6 @@
 #include "script/condition/and_condition.h"
 #include "unit/unit_type.h"
 #include "util/container_util.h"
-#include "util/map_util.h"
 #include "util/string_util.h"
 #include "util/vector_util.h"
 
@@ -113,7 +113,7 @@ void faction::process_character_title_name_scope(std::map<faction_tier, std::map
 }
 
 faction::faction(const std::string &identifier)
-	: detailed_data_entry(identifier), default_tier(faction_tier::barony), min_tier(faction_tier::none), max_tier(faction_tier::none), tier(faction_tier::barony), default_government_type(government_type::monarchy), government_type(government_type::monarchy)
+	: detailed_data_entry(identifier), default_tier(faction_tier::barony), min_tier(faction_tier::none), max_tier(faction_tier::none), default_government_type(government_type::monarchy)
 {
 }
 
@@ -169,68 +169,6 @@ void faction::process_sml_scope(const sml_data &scope)
 		this->conditions = std::move(conditions);
 	} else {
 		data_entry::process_sml_scope(scope);
-	}
-}
-
-void faction::process_sml_dated_scope(const sml_data &scope, const QDateTime &date)
-{
-	const std::string &tag = scope.get_tag();
-
-	if (tag == "resources") {
-		scope.for_each_property([&](const sml_property &property) {
-			const std::string &key = property.get_key();
-			const sml_operator sml_operator = property.get_operator();
-			const std::string &value = property.get_value();
-
-			const resource *resource = resource::get(key);
-			const int quantity = std::stoi(value);
-
-			if (sml_operator == sml_operator::assignment) {
-				this->resources[resource] = quantity;
-			} else if (sml_operator == sml_operator::addition) {
-				this->resources[resource] += quantity;
-			} else if (sml_operator == sml_operator::subtraction) {
-				this->resources[resource] -= quantity;
-			} else {
-				throw std::runtime_error("Invalid faction resource operator: \"" + std::to_string(static_cast<int>(sml_operator)) + "\".");
-			}
-		});
-	} else if (tag == "diplomacy_state") {
-		const faction *other_faction = nullptr;
-		std::optional<diplomacy_state> state;
-		scope.for_each_property([&](const sml_property &property) {
-			const std::string &key = property.get_key();
-			const std::string &value = property.get_value();
-
-			if (key == "faction") {
-				other_faction = faction::get(value);
-			} else if (key == "state") {
-				state = string_to_diplomacy_state(value);
-			} else {
-				throw std::runtime_error("Invalid diplomacy state property: \"" + key + "\".");
-			}
-		});
-
-		if (other_faction == nullptr) {
-			throw std::runtime_error("Diplomacy state has no faction.");
-		}
-
-		if (!state.has_value()) {
-			throw std::runtime_error("Diplomacy state has no state.");
-		}
-
-		const bool is_vassalage = is_vassalage_diplomacy_state(state.value());
-
-		if (is_vassalage) {
-			//a faction can only have one overlord, so remove any other vassalage states
-			map::remove_value_if(this->diplomacy_states, [](const diplomacy_state state) {
-				return is_vassalage_diplomacy_state(state);
-			});
-		}
-
-		this->diplomacy_states[other_faction] = state.value();
-	} else {
-		data_entry::process_sml_dated_scope(scope, date);
 	}
 }
 
@@ -295,6 +233,16 @@ void faction::check() const
 	if (this->get_conditions() != nullptr) {
 		this->get_conditions()->check_validity();
 	}
+}
+
+data_entry_history *faction::get_history_base()
+{
+	return this->history.get();
+}
+
+void faction::reset_history()
+{
+	this->history = std::make_unique<faction_history>(this->get_default_tier(), this->get_default_government_type(), this->get_default_capital());
 }
 
 std::string_view faction::get_title_name(const wyrmgus::government_type government_type, const faction_tier tier) const
@@ -503,16 +451,6 @@ const std::vector<CFiller> &faction::get_ui_fillers() const
 void faction::remove_dynasty(const wyrmgus::dynasty *dynasty)
 {
 	vector::remove(this->dynasties, dynasty);
-}
-
-QVariantList faction::get_acquired_upgrades_qstring_list() const
-{
-	return container::to_qvariant_list(this->get_acquired_upgrades());
-}
-
-void faction::remove_acquired_upgrade(CUpgrade *upgrade)
-{
-	vector::remove(this->acquired_upgrades, upgrade);
 }
 
 }

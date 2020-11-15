@@ -33,6 +33,7 @@
 #include "map/historical_location.h"
 #include "map/site.h"
 #include "player.h"
+#include "unit/historical_unit_history.h"
 #include "unit/unit_class.h"
 #include "unit/unit_type.h"
 
@@ -84,29 +85,6 @@ void historical_unit::process_sml_scope(const sml_data &scope)
 	}
 }
 
-void historical_unit::process_sml_dated_property(const sml_property &property, const QDateTime &date)
-{
-	const std::string &key = property.get_key();
-	const std::string &value = property.get_value();
-
-	if (key == "location") {
-		this->location = std::make_unique<historical_location>(site::get(value));
-	} else {
-		data_entry::process_sml_dated_property(property, date);
-	}
-}
-
-void historical_unit::process_sml_dated_scope(const sml_data &scope, const QDateTime &date)
-{
-	const std::string &tag = scope.get_tag();
-
-	if (tag == "location") {
-		this->location = std::make_unique<historical_location>(scope);
-	} else {
-		data_entry::process_sml_dated_scope(scope, date);
-	}
-}
-
 void historical_unit::check() const
 {
 	if (this->get_unit_types().empty() && this->get_unit_classes().empty() && this->get_unique() == nullptr) {
@@ -118,11 +96,14 @@ void historical_unit::check() const
 	}
 }
 
+data_entry_history *historical_unit::get_history_base()
+{
+	return this->history.get();
+}
+
 void historical_unit::reset_history()
 {
-	this->location.reset();
-	this->active = false;
-	this->faction = nullptr;
+	this->history = std::make_unique<historical_unit_history>();
 }
 
 }

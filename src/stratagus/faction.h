@@ -49,6 +49,7 @@ class character;
 class civilization;
 class deity;
 class dynasty;
+class faction_history;
 class icon;
 class resource;
 class unit_class;
@@ -77,11 +78,6 @@ class faction final : public detailed_data_entry, public data_type<faction>
 	Q_PROPERTY(bool definite_article MEMBER definite_article READ uses_definite_article)
 	Q_PROPERTY(wyrmgus::deity* holy_order_deity MEMBER holy_order_deity READ get_holy_order_deity)
 	Q_PROPERTY(QStringList ship_names READ get_ship_names_qstring_list)
-	Q_PROPERTY(wyrmgus::faction_tier tier MEMBER tier READ get_tier)
-	Q_PROPERTY(wyrmgus::government_type government_type MEMBER government_type READ get_government_type)
-	Q_PROPERTY(wyrmgus::site* capital MEMBER capital READ get_capital)
-	Q_PROPERTY(wyrmgus::dynasty* dynasty MEMBER dynasty READ get_dynasty)
-	Q_PROPERTY(QVariantList acquired_upgrades READ get_acquired_upgrades_qstring_list)
 
 public:
 	using title_name_map = std::map<government_type, std::map<faction_tier, std::string>>;
@@ -108,20 +104,16 @@ public:
 
 	virtual void process_sml_property(const sml_property &property) override;
 	virtual void process_sml_scope(const sml_data &scope) override;
-	virtual void process_sml_dated_scope(const sml_data &scope, const QDateTime &date) override;
 	virtual void initialize() override;
 	virtual void check() const override;
+	virtual data_entry_history *get_history_base() override;
 
-	virtual void reset_history() override
+	const faction_history *get_history() const
 	{
-		this->tier = this->get_default_tier();
-		this->government_type = this->get_default_government_type();
-		this->capital = this->get_default_capital();
-		this->dynasty = nullptr;
-		this->resources.clear();
-		this->diplomacy_states.clear();
-		this->acquired_upgrades.clear();
+		return this->history.get();
 	}
+
+	virtual void reset_history() override;
 
 	civilization *get_civilization() const
 	{
@@ -293,50 +285,6 @@ public:
 		this->core_settlements.push_back(settlement);
 	}
 
-	faction_tier get_tier() const
-	{
-		return this->tier;
-	}
-
-	government_type get_government_type() const
-	{
-		return this->government_type;
-	}
-
-	site *get_capital() const
-	{
-		return this->capital;
-	}
-
-	dynasty *get_dynasty() const
-	{
-		return this->dynasty;
-	}
-
-	const std::map<const resource *, int> &get_resources() const
-	{
-		return this->resources;
-	}
-
-	const std::map<const faction *, diplomacy_state> &get_diplomacy_states() const
-	{
-		return this->diplomacy_states;
-	}
-
-	const std::vector<CUpgrade *> &get_acquired_upgrades() const
-	{
-		return this->acquired_upgrades;
-	}
-
-	QVariantList get_acquired_upgrades_qstring_list() const;
-
-	Q_INVOKABLE void add_acquired_upgrade(CUpgrade *upgrade)
-	{
-		this->acquired_upgrades.push_back(upgrade);
-	}
-
-	Q_INVOKABLE void remove_acquired_upgrade(CUpgrade *upgrade);
-
 	std::string FactionUpgrade;											/// faction upgrade applied when the faction is set
 	std::string Adjective;												/// adjective pertaining to the faction
 	std::string DefaultAI = "land-attack";
@@ -398,13 +346,7 @@ public:
 	std::map<int, faction_tier> HistoricalTiers; /// dates in which this faction's tier changed; faction tier mapped to year
 	std::map<int, government_type> HistoricalGovernmentTypes;						/// dates in which this faction's government type changed; government type mapped to year
 private:
-	faction_tier tier;
-	government_type government_type;
-	site *capital = nullptr;
-	wyrmgus::dynasty *dynasty = nullptr;
-	std::map<const resource *, int> resources;
-	std::map<const faction *, diplomacy_state> diplomacy_states;
-	std::vector<CUpgrade *> acquired_upgrades;
+	std::unique_ptr<faction_history> history;
 public:
 	std::map<std::pair<CDate, faction *>, diplomacy_state> HistoricalDiplomacyStates;	/// dates in which this faction's diplomacy state to another faction changed; diplomacy state mapped to year and faction
 	std::map<std::pair<CDate, int>, int> HistoricalResources;	/// dates in which this faction's storage of a particular resource changed; resource quantities mapped to date and resource

@@ -36,6 +36,7 @@ namespace wyrmgus {
 
 class faction;
 class historical_location;
+class historical_unit_history;
 class unique_item;
 class unit_class;
 class unit_type;
@@ -52,8 +53,6 @@ class historical_unit final : public named_data_entry, public data_type<historic
 	Q_PROPERTY(int resources_held MEMBER resources_held READ get_resources_held)
 	Q_PROPERTY(bool ai_active MEMBER ai_active READ is_ai_active)
 	Q_PROPERTY(int ttl MEMBER ttl READ get_ttl)
-	Q_PROPERTY(bool active MEMBER active READ is_active)
-	Q_PROPERTY(wyrmgus::faction* faction MEMBER faction READ get_faction)
 
 public:
 	static constexpr const char *class_identifier = "historical_unit";
@@ -63,9 +62,14 @@ public:
 	~historical_unit();
 	
 	virtual void process_sml_scope(const sml_data &scope) override;
-	virtual void process_sml_dated_property(const sml_property &property, const QDateTime &date) override;
-	virtual void process_sml_dated_scope(const sml_data &scope, const QDateTime &date) override;
 	virtual void check() const override;
+	virtual data_entry_history *get_history_base() override;
+
+	const historical_unit_history *get_history() const
+	{
+		return this->history.get();
+	}
+
 	virtual void reset_history() override;
 
 	const std::vector<unit_class *> &get_unit_classes() const
@@ -137,21 +141,6 @@ public:
 	{
 		return this->ttl;
 	}
-
-	bool is_active() const
-	{
-		return this->active;
-	}
-
-	faction *get_faction() const
-	{
-		return this->faction;
-	}
-
-	const std::unique_ptr<historical_location> &get_location() const
-	{
-		return this->location;
-	}
 	
 private:
 	std::vector<unit_class *> unit_classes; //the unit's possible unit classes
@@ -162,9 +151,7 @@ private:
 	int resources_held = 0; //how much of the unit's resource, if any, does the unit contain
 	bool ai_active = true; //whether the unit's AI is active
 	int ttl = 0; //the TTL (time to live, in cycles) of the unit, useful for revealers
-	bool active = false; //whether the unit is active, i.e. should be applied to the map; used for history
-	wyrmgus::faction *faction = nullptr; //the unit's faction, used for history
-	std::unique_ptr<historical_location> location; //the unit's location, used for history
+	std::unique_ptr<historical_unit_history> history;
 };
 
 }

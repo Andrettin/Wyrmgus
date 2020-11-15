@@ -31,11 +31,13 @@
 
 #include "campaign.h"
 #include "character.h"
+#include "character_history.h"
 #include "civilization.h"
 #include "config.h"
 #include "database/defines.h"
 #include "editor.h"
 #include "faction.h"
+#include "faction_history.h"
 #include "game.h"
 #include "iocompat.h"
 #include "iolib.h"
@@ -43,7 +45,9 @@
 #include "map/historical_location.h"
 #include "map/map.h"
 #include "map/map_layer.h"
+#include "map/map_template_history.h"
 #include "map/site.h"
+#include "map/site_history.h"
 #include "map/terrain_feature.h"
 #include "map/terrain_type.h"
 #include "map/tile.h"
@@ -57,6 +61,7 @@
 #include "time/time_of_day_schedule.h"
 #include "translate.h"
 #include "unit/historical_unit.h"
+#include "unit/historical_unit_history.h"
 #include "unit/unit.h"
 #include "unit/unit_class.h"
 #include "unit/unit_find.h"
@@ -387,6 +392,16 @@ void map_template::initialize()
 	}
 
 	data_entry::initialize();
+}
+
+data_entry_history *map_template::get_history_base()
+{
+	return this->history.get();
+}
+
+void map_template::reset_history()
+{
+	this->history = std::make_unique<map_template_history>(this->is_active_by_default());
 }
 
 void map_template::apply_terrain_file(const bool overlay, const QPoint &template_start_pos, const QPoint &map_start_pos, const int z)
@@ -1005,7 +1020,7 @@ void map_template::apply(const QPoint &template_start_pos, const QPoint &map_sta
 void map_template::apply_subtemplates(const QPoint &template_start_pos, const QPoint &map_start_pos, const QPoint &map_end, const int z, const bool random, bool constructed) const
 {
 	for (map_template *subtemplate : this->get_subtemplates()) {
-		if (!subtemplate->is_active()) {
+		if (!subtemplate->history->is_active()) {
 			continue;
 		}
 
@@ -1240,8 +1255,10 @@ void map_template::apply_sites(const QPoint &template_start_pos, const QPoint &m
 		if (current_campaign == nullptr) {
 			continue;
 		}
+
+		const site_history *site_history = site->get_history();
 		
-		const faction *site_owner = site->get_owner_faction();
+		const faction *site_owner = site_history->get_owner();
 		if (site_owner == nullptr) {
 			//fall back to the old historical owners functionality
 			for (std::map<CDate, const faction *>::reverse_iterator owner_iterator = site->HistoricalOwners.rbegin(); owner_iterator != site->HistoricalOwners.rend(); ++owner_iterator) {
@@ -1262,7 +1279,7 @@ void map_template::apply_sites(const QPoint &template_start_pos, const QPoint &m
 			continue;
 		}
 		
-		bool is_capital = site_owner->get_capital() == site;
+		bool is_capital = site_owner->get_history()->get_capital() == site;
 		if (!is_capital) {
 			for (int i = ((int) site_owner->HistoricalCapitals.size() - 1); i >= 0; --i) {
 				if (start_date.ContainsDate(site_owner->HistoricalCapitals[i].first) || site_owner->HistoricalCapitals[i].first.Year == 0) {
@@ -1278,9 +1295,9 @@ void map_template::apply_sites(const QPoint &template_start_pos, const QPoint &m
 			player->SetStartView(site_pos, z);
 		}
 		
-		unit_type *pathway_type = nullptr;
-		if (site->get_pathway_class() != nullptr) {
-			pathway_type = site_owner->get_class_unit_type(site->get_pathway_class());
+		const unit_type *pathway_type = nullptr;
+		if (site_history->get_pathway_class() != nullptr) {
+			pathway_type = site_owner->get_class_unit_type(site_history->get_pathway_class());
 		}
 
 		for (size_t j = 0; j < site->HistoricalBuildings.size(); ++j) {
@@ -1301,7 +1318,7 @@ void map_template::apply_sites(const QPoint &template_start_pos, const QPoint &m
 		}
 		
 		bool first_building = true;
-		for (const unit_class *building_class : site->get_building_classes()) {
+		for (const unit_class *building_class : site_history->get_building_classes()) {
 			const unit_type *unit_type = site_owner->get_class_unit_type(building_class);
 
 			if (unit_type == nullptr) {
@@ -1432,10 +1449,10 @@ void map_template::apply_sites(const QPoint &template_start_pos, const QPoint &m
 			}
 		}
 
-		int population = site->get_population();
+		int population = site_history->get_population();
 
-		for (const auto &kv_pair : site->get_population_groups()) {
-			const unit_class *unit_class = unit_class::get_all()[kv_pair.first];
+		for (const auto &kv_pair : site_history->get_population_groups()) {
+			const unit_class *unit_class = kv_pair.first;
 			const int group_population = kv_pair.second;
 
 			this->apply_population_unit(unit_class, group_population, site_pos, z, player, site->is_major() ? site : nullptr);
@@ -1694,7 +1711,9 @@ void map_template::ApplyUnits(const QPoint &template_start_pos, const QPoint &ma
 	}
 	
 	for (const historical_unit *historical_unit : historical_unit::get_all()) {
-		if (!historical_unit->is_active()) {
+		const historical_unit_history *unit_history = historical_unit->get_history();
+
+		if (!unit_history->is_active()) {
 			continue;
 		}
 		
@@ -1704,7 +1723,7 @@ void map_template::ApplyUnits(const QPoint &template_start_pos, const QPoint &ma
 	}
 
 	for (character *character : character::get_all()) {
-		if (!character->is_active()) {
+		if (!character->get_history()->is_active()) {
 			continue;
 		}
 
@@ -1781,8 +1800,11 @@ void map_template::ApplyUnits(const QPoint &template_start_pos, const QPoint &ma
 
 void map_template::apply_historical_unit(const historical_unit *historical_unit, const QPoint &template_start_pos, const QPoint &map_start_pos, const QPoint &map_end, const int z, const bool random) const
 {
-	faction *unit_faction = historical_unit->get_faction();
+	const historical_unit_history *unit_history = historical_unit->get_history();
+
+	const faction *unit_faction = unit_history->get_faction();
 	CPlayer *unit_player = unit_faction ? GetFactionPlayer(unit_faction) : nullptr;
+
 	const unit_type *unit_type = nullptr;
 	if (!historical_unit->get_unit_types().empty()) {
 		unit_type = historical_unit->get_unit_types()[SyncRand(historical_unit->get_unit_types().size())];
@@ -1797,23 +1819,25 @@ void map_template::apply_historical_unit(const historical_unit *historical_unit,
 		return;
 	}
 
-	const bool in_another_map_template = historical_unit->get_location()->get_map_template() != this;
+	const historical_location *unit_location = unit_history->get_location();
+
+	const bool in_another_map_template = unit_location->get_map_template() != this;
 	if (in_another_map_template) {
 		return;
 	}
 
-	if (historical_unit->get_location()->get_pos().x() != -1 && historical_unit->get_location()->get_pos().y() != -1 && !this->contains_pos(historical_unit->get_location()->get_pos())) {
+	if (unit_location->get_pos().x() != -1 && unit_location->get_pos().y() != -1 && !this->contains_pos(unit_location->get_pos())) {
 		return;
 	}
 
-	QPoint unit_pos = this->get_location_map_position(historical_unit->get_location(), template_start_pos, map_start_pos, false);
+	QPoint unit_pos = this->get_location_map_position(unit_location, template_start_pos, map_start_pos, false);
 
 	if (unit_pos.x() == -1 && unit_pos.y() == -1) {
 		if (!random) { //apply units whose position is that of a randomly-placed site, or that of their player's start position, together with randomly-placed units
 			return;
 		}
 
-		unit_pos = this->get_location_map_position(historical_unit->get_location(), template_start_pos, map_start_pos, true);
+		unit_pos = this->get_location_map_position(unit_location, template_start_pos, map_start_pos, true);
 
 		if (unit_pos.x() == -1 && unit_pos.y() == -1) {
 			unit_pos = CMap::Map.GenerateUnitLocation(unit_type, unit_faction, map_start_pos, map_end - Vec2i(1, 1), z);
@@ -1879,7 +1903,8 @@ void map_template::apply_historical_unit(const historical_unit *historical_unit,
 
 void map_template::apply_character(character *character, const QPoint &template_start_pos, const QPoint &map_start_pos, const QPoint &map_end, const int z, const bool random) const
 {
-	faction *unit_faction = character->get_faction();
+	const character_history *character_history = character->get_history();
+	const faction *unit_faction = character_history->get_faction();
 	CPlayer *unit_player = unit_faction ? GetFactionPlayer(unit_faction) : nullptr;
 	const unit_type *unit_type = character->get_unit_type();
 
@@ -1887,23 +1912,24 @@ void map_template::apply_character(character *character, const QPoint &template_
 		return;
 	}
 
-	const bool in_another_map_template = character->get_location()->get_map_template() != this;
+	const historical_location *character_location = character_history->get_location();
+	const bool in_another_map_template = character_location->get_map_template() != this;
 	if (in_another_map_template) {
 		return;
 	}
 
-	if (character->get_location()->get_pos().x() != -1 && character->get_location()->get_pos().y() != -1 && !this->contains_pos(character->get_location()->get_pos())) {
+	if (character_location->get_pos().x() != -1 && character_location->get_pos().y() != -1 && !this->contains_pos(character_location->get_pos())) {
 		return;
 	}
 
-	QPoint unit_pos = this->get_location_map_position(character->get_location(), template_start_pos, map_start_pos, false);
+	QPoint unit_pos = this->get_location_map_position(character_location, template_start_pos, map_start_pos, false);
 
 	if (unit_pos.x() == -1 && unit_pos.y() == -1) {
 		if (!random) { //apply units whose position is that of a randomly-placed site, or that of their player's start position, together with randomly-placed units
 			return;
 		}
 
-		unit_pos = this->get_location_map_position(character->get_location(), template_start_pos, map_start_pos, true);
+		unit_pos = this->get_location_map_position(character_location, template_start_pos, map_start_pos, true);
 
 		if (unit_pos.x() == -1 && unit_pos.y() == -1) {
 			unit_pos = CMap::Map.GenerateUnitLocation(unit_type, unit_faction, map_start_pos, map_end - Vec2i(1, 1), z);
@@ -2479,7 +2505,7 @@ Vec2i map_template::get_best_location_map_position(const std::vector<std::unique
 	return pos;
 }
 
-QPoint map_template::get_location_map_position(const std::unique_ptr<historical_location> &historical_location, const QPoint &template_start_pos, const QPoint &map_start_pos, const bool random) const
+QPoint map_template::get_location_map_position(const historical_location *historical_location, const QPoint &template_start_pos, const QPoint &map_start_pos, const bool random) const
 {
 	//get a map position for a historical location
 	QPoint pos(-1, -1);

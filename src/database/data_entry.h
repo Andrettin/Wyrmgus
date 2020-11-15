@@ -33,6 +33,7 @@
 
 namespace wyrmgus {
 
+class data_entry_history;
 class data_module;
 class sml_data;
 class sml_property;
@@ -45,11 +46,8 @@ class data_entry : public QObject
 	Q_PROPERTY(QString identifier READ get_identifier_qstring CONSTANT)
 
 public:
-	explicit data_entry(const std::string &identifier) : identifier(identifier)
-	{
-	}
-
-	virtual ~data_entry() {}
+	explicit data_entry(const std::string &identifier);
+	virtual ~data_entry();
 
 	const std::string &get_identifier() const
 	{
@@ -116,9 +114,17 @@ public:
 		this->data_module = data_module;
 	}
 
+	virtual data_entry_history *get_history_base()
+	{
+		return nullptr;
+	}
+
 	void load_history();
 	void load_date_scope(const sml_data &date_scope, const QDateTime &date);
-	virtual void reset_history() {}
+
+	virtual void reset_history()
+	{
+	}
 
 private:
 	std::string identifier;

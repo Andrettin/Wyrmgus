@@ -131,6 +131,7 @@ source_group(beos FILES ${beos_SRCS})
 
 set(database_SRCS
 	src/database/data_entry.cpp
+	src/database/data_entry_history.cpp
 	src/database/data_module.cpp
 	src/database/data_module_container.cpp
 	src/database/database.cpp
@@ -227,6 +228,7 @@ set(map_SRCS
 	src/map/script_map.cpp
 	src/map/script_tileset.cpp
 	src/map/site.cpp
+	src/map/site_history.cpp
 	src/map/terrain_feature.cpp
 	src/map/terrain_geodata_map.cpp
 	src/map/terrain_type.cpp
@@ -353,9 +355,11 @@ set(stratagusmain_SRCS
 	src/stratagus/age.cpp
 	src/stratagus/campaign.cpp
 	src/stratagus/character.cpp
+	src/stratagus/character_history.cpp
 	src/stratagus/civilization.cpp
 	src/stratagus/civilization_base.cpp
 	src/stratagus/civilization_group.cpp
+	src/stratagus/civilization_history.cpp
 	src/stratagus/config.cpp
 	src/stratagus/currency.cpp
 	src/stratagus/dialogue.cpp
@@ -363,6 +367,7 @@ set(stratagusmain_SRCS
 	src/stratagus/dialogue_option.cpp
 	src/stratagus/dynasty.cpp
 	src/stratagus/faction.cpp
+	src/stratagus/faction_history.cpp
 	src/stratagus/grand_strategy.cpp
 	src/stratagus/groups.cpp
 	src/stratagus/iolib.cpp
@@ -430,6 +435,7 @@ set(unit_SRCS
 	src/unit/build.cpp
 	src/unit/construction.cpp
 	src/unit/historical_unit.cpp
+	src/unit/historical_unit_history.cpp
 	src/unit/script_unit.cpp
 	src/unit/script_unit_type.cpp
 	src/unit/unit_cache.cpp
@@ -651,6 +657,7 @@ set(stratagus_animation_HDRS
 
 set(stratagus_database_HDRS
 	src/database/data_entry.h
+	src/database/data_entry_history.h
 	src/database/data_module.h
 	src/database/data_module_container.h
 	src/database/data_type.h
@@ -692,10 +699,12 @@ set(stratagus_map_HDRS
 	src/map/map_layer.h
 	src/map/map_template.h
 	src/map/map_template_container.h
+	src/map/map_template_history.h
 	src/map/minimap.h
 	src/map/minimap_mode.h
 	src/map/region.h
 	src/map/site.h
+	src/map/site_history.h
 	src/map/terrain_feature.h
 	src/map/terrain_geodata_map.h
 	src/map/terrain_type.h
@@ -830,6 +839,7 @@ set(stratagus_ui_HDRS
 set(stratagus_unit_HDRS
 	src/unit/construction.h
 	src/unit/historical_unit.h
+	src/unit/historical_unit_history.h
 	src/unit/unit.h
 	src/unit/unit_cache.h
 	src/unit/unit_class.h
@@ -952,6 +962,8 @@ set(stratagus_generic_HDRS
 	src/include/SetupConsole_win32.h
 	src/stratagus/achievement.h
 	src/stratagus/civilization_base.h
+	src/stratagus/character_history.h
+	src/stratagus/civilization_history.h
 	src/stratagus/civilization_group.h
 	src/stratagus/civilization_supergroup.h
 	src/stratagus/dialogue.h
@@ -960,6 +972,7 @@ set(stratagus_generic_HDRS
 	src/stratagus/diplomacy_state.h
 	src/stratagus/dynasty.h
 	src/stratagus/faction.h
+	src/stratagus/faction_history.h
 	src/stratagus/faction_tier.h
 	src/stratagus/gender.h
 	src/stratagus/government_type.h

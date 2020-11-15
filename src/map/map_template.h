@@ -46,6 +46,7 @@ class character;
 class faction;
 class historical_location;
 class historical_unit;
+class map_template_history;
 class plane;
 class site;
 class terrain_type;
@@ -120,7 +121,6 @@ class map_template final : public named_data_entry, public data_type<map_templat
 	Q_PROPERTY(double max_longitude MEMBER max_longitude READ get_max_longitude)
 	Q_PROPERTY(double min_latitude MEMBER min_latitude READ get_min_latitude)
 	Q_PROPERTY(double max_latitude MEMBER max_latitude READ get_max_latitude)
-	Q_PROPERTY(bool active MEMBER active READ is_active)
 
 public:
 	using terrain_character_map_type = std::vector<std::vector<char>>;
@@ -137,11 +137,8 @@ public:
 	virtual void process_sml_scope(const sml_data &scope) override;
 	virtual void ProcessConfigData(const CConfigData *config_data) override;
 	virtual void initialize() override;
-
-	virtual void reset_history() override
-	{
-		this->active = this->is_active_by_default();
-	}
+	virtual data_entry_history *get_history_base() override;
+	virtual void reset_history() override;
 
 	void apply_terrain_file(bool overlay, const QPoint &template_start_pos, const QPoint &map_start_pos, int z);
 	void apply_terrain_image(const bool overlay, const QPoint &template_start_pos, const QPoint &map_start_pos, const int z);
@@ -542,7 +539,7 @@ public:
 
 	Vec2i get_best_location_map_position(const std::vector<std::unique_ptr<historical_location>> &historical_location_list, bool &in_another_map_template, const Vec2i &template_start_pos, const Vec2i &map_start_pos, const bool random) const;
 
-	QPoint get_location_map_position(const std::unique_ptr<historical_location> &historical_location, const QPoint &template_start_pos, const QPoint &map_start_pos, const bool random) const;
+	QPoint get_location_map_position(const historical_location *historical_location, const QPoint &template_start_pos, const QPoint &map_start_pos, const bool random) const;
 
 	terrain_type *get_base_terrain_type() const
 	{
@@ -643,11 +640,6 @@ public:
 	{
 		return !this->is_constructed_only();
 	}
-
-	bool is_active() const
-	{
-		return this->active;
-	}
 	
 private:
 	std::filesystem::path terrain_file;
@@ -726,7 +718,7 @@ private:
 	double max_longitude;
 	double min_latitude;
 	double max_latitude;
-	bool active = true; //used for history
+	std::unique_ptr<map_template_history> history;
 
 	friend static int ::CclDefineMapTemplate(lua_State *l);
 };

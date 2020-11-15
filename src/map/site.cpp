@@ -39,6 +39,7 @@
 #include "map/map_template.h"
 #include "map/minimap.h"
 #include "map/region.h"
+#include "map/site_history.h"
 #include "map/tile.h"
 #include "player.h" //for factions
 #include "player_color.h"
@@ -54,6 +55,14 @@
 #include "util/vector_util.h"
 
 namespace wyrmgus {
+
+site::site(const std::string &identifier) : named_data_entry(identifier), CDataType(identifier)
+{
+}
+
+site::~site()
+{
+}
 
 void site::process_sml_property(const sml_property &property)
 {
@@ -80,20 +89,6 @@ void site::process_sml_scope(const sml_data &scope)
 		});
 	} else {
 		data_entry::process_sml_scope(scope);
-	}
-}
-
-void site::process_sml_dated_scope(const sml_data &scope, const QDateTime &date)
-{
-	const std::string &tag = scope.get_tag();
-
-	if (tag == "population_groups") {
-		scope.for_each_property([&](const sml_property &property) {
-			const unit_class *unit_class = unit_class::get(property.get_key());
-			this->population_groups[unit_class->get_index()] = std::stoi(property.get_value());
-		});
-	} else {
-		data_entry::process_sml_dated_scope(scope, date);
 	}
 }
 
@@ -191,6 +186,16 @@ void site::ProcessConfigData(const CConfigData *config_data)
 			fprintf(stderr, "Invalid site property: \"%s\".\n", child_config_data->Tag.c_str());
 		}
 	}
+}
+
+data_entry_history *site::get_history_base()
+{
+	return this->history.get();
+}
+
+void site::reset_history()
+{
+	this->history = std::make_unique<site_history>(this);
 }
 
 void site::initialize()
@@ -305,39 +310,6 @@ CPlayer *site::get_realm_owner() const
 	}
 
 	return nullptr;
-}
-
-QVariantList site::get_building_classes_qvariant_list() const
-{
-	return container::to_qvariant_list(this->get_building_classes());
-}
-
-void site::add_building_class(unit_class *building_class)
-{
-	if (building_class->is_town_hall()) {
-		if (!this->is_major()) {
-			throw std::runtime_error("Tried to add a settlement head building to a non-major site.");
-		}
-
-		//remove other settlement head buildings (there can be only one at a time for a given settlement)
-		for (size_t i = 0; i < this->building_classes.size();) {
-			unit_class *other_building_class = this->building_classes[i];
-
-			if (other_building_class->is_town_hall()) {
-				this->building_classes.erase(this->building_classes.begin() + i);
-			} else {
-				i++;
-			}
-		}
-	}
-
-	this->building_classes.push_back(building_class);
-}
-
-
-void site::remove_building_class(unit_class *building_class)
-{
-	vector::remove_one(this->building_classes, building_class);
 }
 
 void site::update_border_tiles()

@@ -30,6 +30,7 @@
 #include "database/data_entry.h"
 
 #include "campaign.h"
+#include "database/data_entry_history.h"
 #include "database/database.h"
 #include "game.h"
 #include "time/calendar.h"
@@ -37,6 +38,14 @@
 #include "util/string_util.h"
 
 namespace wyrmgus {
+
+data_entry::data_entry(const std::string &identifier) : identifier(identifier)
+{
+}
+
+data_entry::~data_entry()
+{
+}
 
 void data_entry::process_sml_property(const sml_property &property)
 {
@@ -59,13 +68,13 @@ void data_entry::process_sml_scope(const sml_data &scope)
 void data_entry::process_sml_dated_property(const sml_property &property, const QDateTime &date)
 {
 	Q_UNUSED(date)
-	database::process_sml_property_for_object(this, property);
+	this->get_history_base()->process_sml_property(property);
 }
 
 void data_entry::process_sml_dated_scope(const sml_data &scope, const QDateTime &date)
 {
 	Q_UNUSED(date)
-	database::process_sml_scope_for_object(this, scope);
+	this->get_history_base()->process_sml_scope(scope);
 }
 
 void data_entry::load_history()
