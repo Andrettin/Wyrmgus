@@ -46,4 +46,20 @@ inline T take_random(std::vector<T> &vector)
 	return element;
 }
 
+template <typename T, typename function_type>
+inline void process_randomly(std::vector<T> &vector, const function_type &function)
+{
+	while (!vector.empty()) {
+		T element = vector::take_random(vector);
+		function(std::move(element));
+	}
+}
+
+template <typename T, typename function_type>
+inline void process_randomly(const std::vector<T> &vector, const function_type &function)
+{
+	std::vector<T> vector_copy = vector;
+	vector::process_randomly(vector_copy, function);
+}
+
 }
