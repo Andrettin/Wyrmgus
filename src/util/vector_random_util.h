@@ -32,9 +32,18 @@
 namespace wyrmgus::vector {
 
 template <typename T>
-inline const typename T::value_type &get_random(const T &vector)
+inline const T &get_random(const std::vector<T> &vector)
 {
 	return vector[random::get()->generate(vector.size())];
+}
+
+template <typename T>
+inline T take_random(std::vector<T> &vector)
+{
+	const size_t index = random::get()->generate(vector.size());
+	T element = std::move(vector[index]);
+	vector.erase(vector.begin() + index);
+	return element;
 }
 
 }
