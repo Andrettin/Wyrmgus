@@ -43,6 +43,7 @@
 #include "iolib.h"
 #include "item/unique_item.h"
 #include "map/character_substitution.h"
+#include "map/character_unit.h"
 #include "map/historical_location.h"
 #include "map/map.h"
 #include "map/map_layer.h"
@@ -146,14 +147,21 @@ void map_template::process_sml_scope(const sml_data &scope)
 			}
 		});
 	} else if (tag == "character_units") {
-		scope.for_each_property([&](const sml_property &property) {
+		scope.for_each_element([&](const sml_property &property) {
 			const std::string &key = property.get_key();
 			const std::string &value = property.get_value();
 
 			const char character = string::to_character(key);
 			const unit_type *unit_type = unit_type::get(value);
 
-			this->character_units[character] = unit_type;
+			this->character_units[character] = std::make_unique<character_unit>(unit_type);
+		}, [&](const sml_data &child_scope) {
+			const char character = string::to_character(child_scope.get_tag());
+
+			auto unit = std::make_unique<character_unit>();
+			database::process_sml_data(unit, child_scope);
+
+			this->character_units[character] = std::move(unit);
 		});
 	} else if (tag == "character_substitutions") {
 		scope.for_each_child([&](const sml_data &child_scope) {
@@ -487,13 +495,13 @@ void map_template::apply_terrain_file(const bool overlay, const QPoint &template
 					continue;
 				}
 
-				const unit_type *character_unit_type = this->get_character_unit_type(terrain_character);
-				if (character_unit_type != nullptr) {
+				const character_unit *character_unit = this->get_character_unit(terrain_character);
+				if (character_unit != nullptr) {
 					if (!overlay) {
 						throw std::runtime_error("Tried to use a character unit (character \""s + terrain_character + "\") in a non-overlay terrain map.");
 					}
 
-					CreateUnit(real_pos - character_unit_type->get_tile_center_pos_offset(), *character_unit_type, CPlayer::Players[PlayerNumNeutral], z);
+					character_unit->create_at(real_pos, z);
 					continue;
 				}
 
@@ -2426,7 +2434,7 @@ bool map_template::is_constructed_subtemplate_compatible_with_terrain_file(map_t
 
 				const tile *tile = CMap::Map.Field(map_pos, z);
 
-				if (terrain_character == '0' || subtemplate->get_character_unit_type(terrain_character) != nullptr) {
+				if (terrain_character == '0' || subtemplate->get_character_unit(terrain_character) != nullptr) {
 					//the '0' character means the tile must have no overlay
 					if (tile->get_overlay_terrain() != nullptr) {
 						return false;

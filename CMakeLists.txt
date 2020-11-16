@@ -215,6 +215,7 @@ source_group(language FILES ${language_SRCS})
 
 set(map_SRCS
 	src/map/character_substitution.cpp
+	src/map/character_unit.cpp
 	src/map/historical_location.cpp
 	src/map/map.cpp
 	src/map/map_draw.cpp
@@ -696,6 +697,7 @@ set(stratagus_language_HDRS
 
 set(stratagus_map_HDRS
 	src/map/character_substitution.h
+	src/map/character_unit.h
 	src/map/historical_location.h
 	src/map/map.h
 	src/map/map_layer.h
