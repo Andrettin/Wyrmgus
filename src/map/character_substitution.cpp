@@ -69,6 +69,10 @@ void character_substitution::process_sml_scope(const sml_data &scope)
 			this->target_characters.push_back(string::to_character(value));
 		}
 	} else if (tag == "shuffle_character_sets") {
+		for (const std::string &value : values) {
+			this->shuffle_character_sets.push_back({ string::to_character(value) });
+		}
+
 		scope.for_each_child([&](const sml_data &child_scope) {
 			std::vector<char> character_set;
 
