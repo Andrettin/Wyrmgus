@@ -84,6 +84,11 @@ void character_unit::create_at(const QPoint &pos, const int z) const
 
 	const unit_type *unit_type = vector::get_random(this->unit_types);
 
+	if (unit_type == nullptr) {
+		//no unit type means the unit doesn't get generated (this is valid if "none" was given for the unit type)
+		return;
+	}
+
 	CUnit *unit = CreateUnit(pos - unit_type->get_tile_center_pos_offset(), *unit_type, CPlayer::Players[PlayerNumNeutral], z);
 	unit->Active = this->ai_active;
 }
