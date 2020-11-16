@@ -131,6 +131,7 @@ public:
 	static constexpr const char *database_folder = "map_templates";
 	static constexpr QPoint min_adjacent_template_distance = QPoint(4, 4);
 	static constexpr QPoint max_adjacent_template_distance = QPoint(16, 16);
+	static constexpr QPoint min_constructed_adjacent_template_distance = QPoint(1, 1);
 
 	explicit map_template(const std::string &identifier);
 	~map_template();
@@ -396,6 +397,15 @@ public:
 	const std::vector<map_template *> &get_subtemplates() const
 	{
 		return this->subtemplates;
+	}
+
+	const QPoint &get_min_adjacent_template_distance() const
+	{
+		if (this->is_constructed_only()) {
+			return map_template::min_constructed_adjacent_template_distance;
+		} else {
+			return map_template::min_adjacent_template_distance;
+		}
 	}
 
 	const std::filesystem::path &get_terrain_file() const

@@ -2329,8 +2329,8 @@ QPoint map_template::generate_subtemplate_position(map_template *subtemplate, co
 		}
 
 		bool on_usable_area = true;
-		for (int x = (map_template::min_adjacent_template_distance.x() * -1) - west_offset; x < (subtemplate->get_applied_width() + map_template::min_adjacent_template_distance.x() + east_offset); ++x) {
-			for (int y = (map_template::min_adjacent_template_distance.y() * -1) - north_offset; y < (subtemplate->get_applied_height() + map_template::min_adjacent_template_distance.y() + south_offset); ++y) {
+		for (int x = (subtemplate->get_min_adjacent_template_distance().x() * -1) - west_offset; x < (subtemplate->get_applied_width() + subtemplate->get_min_adjacent_template_distance().x() + east_offset); ++x) {
+			for (int y = (subtemplate->get_min_adjacent_template_distance().y() * -1) - north_offset; y < (subtemplate->get_applied_height() + subtemplate->get_min_adjacent_template_distance().y() + south_offset); ++y) {
 				if (CMap::Map.is_point_in_a_subtemplate_area(subtemplate_pos + Vec2i(x, y), z)) {
 					on_usable_area = false;
 					break;
