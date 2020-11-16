@@ -44,8 +44,9 @@ public:
 	{
 	}
 
-	explicit character_unit(const unit_type *unit_type) : unit_type(unit_type)
+	explicit character_unit(const unit_type *unit_type)
 	{
+		this->unit_types.push_back(unit_type);
 	}
 
 	void process_sml_property(const sml_property &property);
@@ -54,7 +55,7 @@ public:
 	void create_at(const QPoint &pos, const int z) const;
 
 private:
-	const wyrmgus::unit_type *unit_type = nullptr;
+	std::vector<const unit_type *> unit_types;
 	bool ai_active = false;
 };
 

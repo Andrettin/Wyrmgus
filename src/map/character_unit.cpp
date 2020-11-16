@@ -34,6 +34,7 @@
 #include "unit/unit.h"
 #include "unit/unit_type.h"
 #include "util/string_util.h"
+#include "util/vector_random_util.h"
 
 namespace wyrmgus {
 
@@ -43,7 +44,8 @@ void character_unit::process_sml_property(const sml_property &property)
 	const std::string &value = property.get_value();
 
 	if (key == "unit_type") {
-		this->unit_type = unit_type::get(value);
+		this->unit_types.clear();
+		this->unit_types.push_back(unit_type::get(value));
 	} else if (key == "ai_active") {
 		this->ai_active = string::to_bool(value);
 	} else {
@@ -54,13 +56,35 @@ void character_unit::process_sml_property(const sml_property &property)
 void character_unit::process_sml_scope(const sml_data &scope)
 {
 	const std::string &tag = scope.get_tag();
+	const std::vector<std::string> &values = scope.get_values();
 
-	throw std::runtime_error("Invalid character unit scope: \"" + tag + "\".");
+	if (tag == "unit_types") {
+		for (const std::string &value : values) {
+			this->unit_types.push_back(unit_type::get(value));
+		}
+
+		scope.for_each_property([&](const sml_property &property) {
+			const unit_type *unit_type = unit_type::get(property.get_key());
+			const int weight = std::stoi(property.get_value());
+
+			for (int i = 0; i < weight; ++i) {
+				this->unit_types.push_back(unit_type);
+			}
+		});
+	} else {
+		throw std::runtime_error("Invalid character unit scope: \"" + tag + "\".");
+	}
 }
 
 void character_unit::create_at(const QPoint &pos, const int z) const
 {
-	CUnit *unit = CreateUnit(pos - this->unit_type->get_tile_center_pos_offset(), *this->unit_type, CPlayer::Players[PlayerNumNeutral], z);
+	if (this->unit_types.empty()) {
+		throw std::runtime_error("Character unit has no unit types.");
+	}
+
+	const unit_type *unit_type = vector::get_random(this->unit_types);
+
+	CUnit *unit = CreateUnit(pos - unit_type->get_tile_center_pos_offset(), *unit_type, CPlayer::Players[PlayerNumNeutral], z);
 	unit->Active = this->ai_active;
 }
 
