@@ -160,12 +160,12 @@ VisitResult EnemyUnitFinder::Visit(TerrainTraversal &terrainTraversal, const Vec
 //Wyrmgus end
 
 template <const int FIND_TYPE>
-class AiForceEnemyFinder
+class AiForceEnemyFinder final
 {
 public:
 	//Wyrmgus start
 //	AiForceEnemyFinder(int force, const CUnit **enemy) : enemy(enemy)
-	AiForceEnemyFinder(int force, const CUnit **enemy, Vec2i *result_enemy_wall_pos, int *result_enemy_wall_map_layer, const bool include_neutral, const bool allow_water) : enemy(enemy), result_enemy_wall_pos(result_enemy_wall_pos), result_enemy_wall_map_layer(result_enemy_wall_map_layer), IncludeNeutral(include_neutral), allow_water(allow_water)
+	explicit AiForceEnemyFinder(const int force, const CUnit **enemy, Vec2i *result_enemy_wall_pos, int *result_enemy_wall_map_layer, const bool include_neutral, const bool allow_water) : enemy(enemy), result_enemy_wall_pos(result_enemy_wall_pos), result_enemy_wall_map_layer(result_enemy_wall_map_layer), IncludeNeutral(include_neutral), allow_water(allow_water)
 	//Wyrmgus end
 	{
 		Assert(enemy != nullptr);
@@ -175,7 +175,7 @@ public:
 
 	//Wyrmgus start
 //	AiForceEnemyFinder(AiForce &force, const CUnit **enemy) : enemy(enemy)
-	AiForceEnemyFinder(AiForce &force, const CUnit **enemy, Vec2i *result_enemy_wall_pos, int *result_enemy_wall_map_layer, const bool include_neutral, const bool allow_water) : enemy(enemy), result_enemy_wall_pos(result_enemy_wall_pos), result_enemy_wall_map_layer(result_enemy_wall_map_layer), IncludeNeutral(include_neutral), allow_water(allow_water)
+	explicit AiForceEnemyFinder(AiForce &force, const CUnit **enemy, Vec2i *result_enemy_wall_pos, int *result_enemy_wall_map_layer, const bool include_neutral, const bool allow_water) : enemy(enemy), result_enemy_wall_pos(result_enemy_wall_pos), result_enemy_wall_map_layer(result_enemy_wall_map_layer), IncludeNeutral(include_neutral), allow_water(allow_water)
 	//Wyrmgus end
 	{
 		Assert(enemy != nullptr);
