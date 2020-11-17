@@ -596,7 +596,7 @@ void CUnit::Release(const bool final)
 	}
 
 	if (this->Refs != 0) {
-		throw std::runtime_error("Unit being released despite there still being references to it.");
+		throw std::runtime_error("Unit of type \"" + this->Type->get_identifier() + "\" being released despite there still being " + std::to_string(this->Refs) + " references to it.");
 	}
 
 	//
