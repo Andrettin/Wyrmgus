@@ -52,6 +52,13 @@ public:
 	void process_sml_property(const sml_property &property);
 	void process_sml_scope(const sml_data &scope);
 
+	void check() const
+	{
+		if (this->unit_types.empty()) {
+			throw std::runtime_error("Character unit has no unit types.");
+		}
+	}
+
 	void create_at(const QPoint &pos, const int z) const;
 
 private:

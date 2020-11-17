@@ -139,6 +139,7 @@ public:
 	virtual void process_sml_property(const sml_property &property) override;
 	virtual void process_sml_scope(const sml_data &scope) override;
 	virtual void ProcessConfigData(const CConfigData *config_data) override;
+	virtual void check() const override;
 	virtual void initialize() override;
 	virtual data_entry_history *get_history_base() override;
 	virtual void reset_history() override;

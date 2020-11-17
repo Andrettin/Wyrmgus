@@ -78,10 +78,6 @@ void character_unit::process_sml_scope(const sml_data &scope)
 
 void character_unit::create_at(const QPoint &pos, const int z) const
 {
-	if (this->unit_types.empty()) {
-		throw std::runtime_error("Character unit has no unit types.");
-	}
-
 	const unit_type *unit_type = vector::get_random(this->unit_types);
 
 	if (unit_type == nullptr) {

@@ -44,6 +44,20 @@ public:
 	void process_sml_property(const sml_property &property);
 	void process_sml_scope(const sml_data &scope);
 
+	void check() const
+	{
+		if (!this->shuffle_character_sets.empty()) {
+			const size_t front_set_size = this->shuffle_character_sets.front().size();
+			for (size_t i = 1; i < this->shuffle_character_sets.size(); ++i) {
+				const std::vector<char> &character_set = this->shuffle_character_sets[i];
+
+				if (character_set.size() != front_set_size) {
+					throw std::runtime_error("Shuffle character set at index " + std::to_string(i) + " has a different size (" + std::to_string(character_set.size()) + ") than the front set (" + std::to_string(front_set_size) + ").");
+				}
+			}
+		}
+	}
+
 	void apply_to_map(character_map &map) const;
 
 private:

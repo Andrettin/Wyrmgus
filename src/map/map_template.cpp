@@ -309,6 +309,18 @@ void map_template::ProcessConfigData(const CConfigData *config_data)
 	}
 }
 
+void map_template::check() const
+{
+	for (const auto &kv_pair : this->character_units) {
+		const std::unique_ptr<character_unit> &character_unit = kv_pair.second;
+		character_unit->check();
+	}
+
+	for (const std::unique_ptr<character_substitution> &substitution : this->character_substitutions) {
+		substitution->check();
+	}
+}
+
 void map_template::initialize()
 {
 	if (this->get_subtemplate_top_left_pos().x() == -1 && this->get_subtemplate_top_left_pos().y() == -1 && this->get_subtemplate_center_pos().x() == -1 && this->get_subtemplate_center_pos().y() == -1) {
