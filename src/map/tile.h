@@ -258,10 +258,12 @@ public:
 		return this->Flags;
 	}
 
-	unsigned char get_cost() const
+	unsigned char get_movement_cost() const
 	{
-		return this->cost;
+		return this->movement_cost;
 	}
+
+	void update_movement_cost();
 
 	short get_value() const
 	{
@@ -326,27 +328,27 @@ public:
 
 public:
 	//Wyrmgus start
-//	unsigned short Flags;      /// field flags
-	unsigned long Flags;      /// field flags
-	unsigned char AnimationFrame;		/// current frame of the tile's animation
-	unsigned char OverlayAnimationFrame;		/// current frame of the overlay tile's animation
+//	unsigned short Flags = 0;      /// field flags
+	unsigned long Flags = 0;      /// field flags
+	unsigned char AnimationFrame = 0;		/// current frame of the tile's animation
+	unsigned char OverlayAnimationFrame = 0;		/// current frame of the overlay tile's animation
 private:
 	const terrain_type *terrain = nullptr;
 	const terrain_type *overlay_terrain = nullptr;
 	const wyrmgus::terrain_feature *terrain_feature = nullptr;
 public:
-	short SolidTile;
-	short OverlaySolidTile;
-	bool OverlayTerrainDestroyed;
-	bool OverlayTerrainDamaged;
+	short SolidTile = 0;
+	short OverlaySolidTile = 0;
+	bool OverlayTerrainDestroyed = false;
+	bool OverlayTerrainDamaged = false;
 	std::vector<std::pair<const terrain_type *, short>> TransitionTiles;			/// Transition tiles; the pair contains the terrain type and the tile index
 	std::vector<std::pair<const terrain_type *, short>> OverlayTransitionTiles;		/// Overlay transition tiles; the pair contains the terrain type and the tile index
 	//Wyrmgus end
 private:
-	unsigned char cost;        /// unit cost to move in this tile
-	short value = 0;       /// HP for walls/ Wood Regeneration
+	unsigned char movement_cost = 0; //unit cost to move in this tile
+	short value = 0; //HP for walls/resource quantity/forest regeneration/destroyed wall and rock decay
 public:
-	int Landmass;			   /// to which "landmass" (can also be water) does this map field belong (if any); a "landmass" is a collection of adjacent land tiles, or a collection of adjacent water tiles; 0 means none has been set yet
+	int Landmass = 0; //to which "landmass" (can also be water) does this map field belong (if any); a "landmass" is a collection of adjacent land tiles, or a collection of adjacent water tiles; 0 means none has been set yet
 private:
 	short ownership_border_tile = -1; //the transition type of the border between this tile's owner, and other players' tiles, if applicable)
 	site *settlement = nullptr;

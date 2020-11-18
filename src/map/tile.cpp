@@ -46,16 +46,7 @@
 
 namespace wyrmgus {
 
-tile::tile() :
-	Flags(0),
-	cost(0),
-	Landmass(0),
-	AnimationFrame(0),
-	OverlayAnimationFrame(0),
-	SolidTile(0), OverlaySolidTile(0),
-	OverlayTerrainDestroyed(false),
-	OverlayTerrainDamaged(false),
-	UnitCache()
+tile::tile()
 {
 	this->player_info = std::make_unique<tile_player_info>();
 }
@@ -190,13 +181,7 @@ void tile::SetTerrain(const terrain_type *terrain_type)
 		}
 	}
 
-	if (this->Flags & MapFieldRailroad) {
-		this->cost = DefaultTileMovementCost - 1;
-	} else if (this->Flags & MapFieldRoad) {
-		this->cost = DefaultTileMovementCost - 1;
-	} else {
-		this->cost = DefaultTileMovementCost; // default speed
-	}
+	this->update_movement_cost();
 
 	if (this->Flags & MapFieldRailroad) {
 		this->Flags &= ~(MapFieldNoRail);
@@ -248,13 +233,7 @@ void tile::RemoveOverlayTerrain()
 		}
 	}
 
-	if (this->Flags & MapFieldRailroad) {
-		this->cost = DefaultTileMovementCost - 1;
-	} else if (this->Flags & MapFieldRoad) {
-		this->cost = DefaultTileMovementCost - 1;
-	} else {
-		this->cost = DefaultTileMovementCost; // default speed
-	}
+	this->update_movement_cost();
 
 	if (this->Flags & MapFieldRailroad) {
 		this->Flags &= ~(MapFieldNoRail);
@@ -308,7 +287,7 @@ void tile::setTileIndex(const CTileset &tileset, unsigned int tileIndex, int val
 					 //Wyrmgus end
 	this->Flags |= tile.flag;
 #endif
-	this->cost = 1 << (tile.flag & MapFieldSpeedMask);
+	this->movement_cost = 1 << (tile.flag & MapFieldSpeedMask);
 #ifdef DEBUG
 	this->tilesetTile = tileIndex;
 #endif
@@ -349,7 +328,7 @@ void tile::Save(CFile &file) const
 {
 	const wyrmgus::terrain_feature *terrain_feature = this->get_terrain_feature();
 
-	file.printf("  {\"%s\", \"%s\", \"%s\", %s, %s, \"%s\", \"%s\", %d, %d, %d, %d, %2d, %2d, %2d, \"%s\"", (this->get_terrain() != nullptr ? this->get_terrain()->get_identifier().c_str() : ""), (this->get_overlay_terrain() != nullptr ? this->get_overlay_terrain()->get_identifier().c_str() : ""), (terrain_feature != nullptr ? terrain_feature->get_identifier().c_str() : ""), OverlayTerrainDamaged ? "true" : "false", OverlayTerrainDestroyed ? "true" : "false", player_info->SeenTerrain ? player_info->SeenTerrain->Ident.c_str() : "", player_info->SeenOverlayTerrain ? player_info->SeenOverlayTerrain->Ident.c_str() : "", SolidTile, OverlaySolidTile, player_info->SeenSolidTile, player_info->SeenOverlaySolidTile, this->get_value(), this->get_cost(), Landmass, this->get_settlement() != nullptr ? this->get_settlement()->get_identifier().c_str() : "");
+	file.printf("  {\"%s\", \"%s\", \"%s\", %s, %s, \"%s\", \"%s\", %d, %d, %d, %d, %2d, %2d, %2d, \"%s\"", (this->get_terrain() != nullptr ? this->get_terrain()->get_identifier().c_str() : ""), (this->get_overlay_terrain() != nullptr ? this->get_overlay_terrain()->get_identifier().c_str() : ""), (terrain_feature != nullptr ? terrain_feature->get_identifier().c_str() : ""), OverlayTerrainDamaged ? "true" : "false", OverlayTerrainDestroyed ? "true" : "false", player_info->SeenTerrain ? player_info->SeenTerrain->Ident.c_str() : "", player_info->SeenOverlayTerrain ? player_info->SeenOverlayTerrain->Ident.c_str() : "", SolidTile, OverlaySolidTile, player_info->SeenSolidTile, player_info->SeenOverlaySolidTile, this->get_value(), this->get_movement_cost(), Landmass, this->get_settlement() != nullptr ? this->get_settlement()->get_identifier().c_str() : "");
 
 	for (size_t i = 0; i != TransitionTiles.size(); ++i) {
 		file.printf(", \"transition-tile\", \"%s\", %d", TransitionTiles[i].first->Ident.c_str(), TransitionTiles[i].second);
@@ -493,7 +472,7 @@ void tile::parse(lua_State *l)
 	this->tile = LuaToNumber(l, -1, 1);
 	this->player_info->SeenTile = LuaToNumber(l, -1, 2);
 	this->Value = LuaToNumber(l, -1, 3);
-	this->cost = LuaToNumber(l, -1, 4);
+	this->movement_cost = LuaToNumber(l, -1, 4);
 	*/
 	const std::string terrain_ident = LuaToString(l, -1, 1);
 	if (!terrain_ident.empty()) {
@@ -528,7 +507,7 @@ void tile::parse(lua_State *l)
 	this->player_info->SeenSolidTile = LuaToNumber(l, -1, 10);
 	this->player_info->SeenOverlaySolidTile = LuaToNumber(l, -1, 11);
 	this->value = LuaToNumber(l, -1, 12);
-	this->cost = LuaToNumber(l, -1, 13);
+	this->movement_cost = LuaToNumber(l, -1, 13);
 	this->Landmass = LuaToNumber(l, -1, 14);
 	const std::string settlement_identifier = LuaToString(l, -1, 15);
 	if (!settlement_identifier.empty()) {
@@ -702,6 +681,17 @@ bool tile::RockOnMap() const
 bool tile::isAWall() const
 {
 	return CheckMask(MapFieldWall);
+}
+
+void tile::update_movement_cost()
+{
+	if (this->Flags & MapFieldRailroad) {
+		this->movement_cost = DefaultTileMovementCost - 1;
+	} else if (this->Flags & MapFieldRoad) {
+		this->movement_cost = DefaultTileMovementCost - 1;
+	} else {
+		this->movement_cost = DefaultTileMovementCost; // default speed
+	}
 }
 
 CPlayer *tile::get_owner() const

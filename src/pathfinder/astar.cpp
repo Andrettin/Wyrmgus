@@ -771,11 +771,17 @@ static int CostMoveToCallBack_Default(unsigned int index, const CUnit &unit, int
 			//Wyrmgus end
 			
 			// Add tile movement cost
-			if (unit.Type->UnitType == UnitTypeType::Fly || unit.Type->UnitType == UnitTypeType::FlyLow || unit.Type->UnitType == UnitTypeType::Space) {
-				cost += DefaultTileMovementCost;
-			} else {
-				cost += mf->get_cost();
+			switch (unit.Type->UnitType) {
+				case UnitTypeType::Fly:
+				case UnitTypeType::FlyLow:
+				case UnitTypeType::Space:
+					cost += DefaultTileMovementCost;
+					break;
+				default:
+					cost += mf->get_movement_cost();
+					break;
 			}
+
 			++mf;
 		} while (--i);
 		//Wyrmgus start

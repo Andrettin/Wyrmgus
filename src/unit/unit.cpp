@@ -5609,7 +5609,7 @@ int CUnit::GetModifiedVariable(const int index, const VariableAttribute variable
 			break;
 		case SPEED_INDEX:
 			if (this->MapLayer != nullptr && this->Type->UnitType != UnitTypeType::Fly && this->Type->UnitType != UnitTypeType::FlyLow && this->Type->UnitType != UnitTypeType::Space) {
-				value += DefaultTileMovementCost - this->MapLayer->Field(this->Offset)->get_cost();
+				value += DefaultTileMovementCost - this->MapLayer->Field(this->Offset)->get_movement_cost();
 			}
 			break;
 		default:
