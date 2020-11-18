@@ -5585,23 +5585,35 @@ int CUnit::GetAvailableLevelUpUpgrades(bool only_units) const
 int CUnit::GetModifiedVariable(const int index, const VariableAttribute variable_type) const
 {
 	int value = 0;
-	if (variable_type == VariableAttribute::Value) {
-		value = this->get_variable_value(index);
-	} else if (variable_type == VariableAttribute::Max) {
-		value = this->get_variable_max(index);
-	} else if (variable_type == VariableAttribute::Increase) {
-		value = this->get_variable_increase(index);
+
+	switch (variable_type) {
+		case VariableAttribute::Value:
+			value = this->get_variable_value(index);
+			break;
+		case VariableAttribute::Max:
+			value = this->get_variable_max(index);
+			break;
+		case VariableAttribute::Increase:
+			value = this->get_variable_increase(index);
+			break;
+		default:
+			break;
 	}
 	
-	if (index == ATTACKRANGE_INDEX) {
-		if (this->Container && this->Container->Variable[GARRISONEDRANGEBONUS_INDEX].Enable) {
-			value += this->Container->Variable[GARRISONEDRANGEBONUS_INDEX].Value; //treat the container's attack range as a bonus to the unit's attack range
-		}
-		value = std::min<int>(this->CurrentSightRange, value); // if the unit's current sight range is smaller than its attack range, use it instead
-	} else if (index == SPEED_INDEX) {
-		if (this->MapLayer && this->Type->UnitType != UnitTypeType::Fly && this->Type->UnitType != UnitTypeType::FlyLow && this->Type->UnitType != UnitTypeType::Space) {
-			value += DefaultTileMovementCost - this->MapLayer->Field(this->Offset)->get_cost();
-		}
+	switch (index) {
+		case ATTACKRANGE_INDEX:
+			if (this->Container && this->Container->Variable[GARRISONEDRANGEBONUS_INDEX].Enable) {
+				value += this->Container->Variable[GARRISONEDRANGEBONUS_INDEX].Value; //treat the container's attack range as a bonus to the unit's attack range
+			}
+			value = std::min<int>(this->CurrentSightRange, value); // if the unit's current sight range is smaller than its attack range, use it instead
+			break;
+		case SPEED_INDEX:
+			if (this->MapLayer != nullptr && this->Type->UnitType != UnitTypeType::Fly && this->Type->UnitType != UnitTypeType::FlyLow && this->Type->UnitType != UnitTypeType::Space) {
+				value += DefaultTileMovementCost - this->MapLayer->Field(this->Offset)->get_cost();
+			}
+			break;
+		default:
+			break;
 	}
 	
 	return value;
