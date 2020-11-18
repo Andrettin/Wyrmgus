@@ -89,7 +89,9 @@ namespace gcn
         /**
          * Destructor.
          */
-        virtual ~Slider() { }
+        virtual ~Slider()
+        {
+        }
 
         /**
          * Sets the scale.
@@ -195,25 +197,25 @@ namespace gcn
 
         // Inherited from Widget
 
-        virtual void draw(gcn::Graphics* graphics);
+        virtual void draw(gcn::Graphics* graphics) override;
 
-        virtual void drawBorder(gcn::Graphics* graphics);
+        virtual void drawBorder(gcn::Graphics* graphics) override;
 
-        virtual void lostFocus();
+        virtual void lostFocus() override;
 
 
         // Inherited from MouseListener.
 
-        virtual void mousePress(int x, int y, int button);
+        virtual void mousePress(int x, int y, int button) override;
 
-        virtual void mouseRelease(int x, int y, int button);
+        virtual void mouseRelease(int x, int y, int button) override;
 
-        virtual void mouseMotion(int x, int y);
+        virtual void mouseMotion(int x, int y) override;
 
 
         // Inherited from KeyListener
 
-        virtual bool keyPress(const Key& key);
+        virtual bool keyPress(const Key& key) override;
 
         /**
          * Draw orientations for the slider. It can be drawn verticaly or
