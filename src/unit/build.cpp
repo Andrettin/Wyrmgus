@@ -618,7 +618,7 @@ bool CanBuildOn(const QPoint &pos, const int mask, const int z, const CPlayer *p
 	const wyrmgus::terrain_type *built_terrain = unit_type->TerrainType;
 
 	//cannot build anything other than pathways on trade routes
-	if (tile->get_terrain_feature() != nullptr && tile->get_terrain_feature()->is_trade_route() && (built_terrain == nullptr || !built_terrain->is_pathway())) {
+	if (tile->is_on_trade_route() && (built_terrain == nullptr || !built_terrain->is_pathway())) {
 		return false;
 	}
 
@@ -703,7 +703,7 @@ CUnit *CanBuildUnitType(const CUnit *unit, const wyrmgus::unit_type &type, const
 			}
 
 			//cannot build anything other than pathways on trade routes
-			if (tile->get_terrain_feature() != nullptr && tile->get_terrain_feature()->is_trade_route() && (type.TerrainType == nullptr || !type.TerrainType->is_pathway())) {
+			if (tile->is_on_trade_route() && (type.TerrainType == nullptr || !type.TerrainType->is_pathway())) {
 				ontop = nullptr;
 				break;
 			}

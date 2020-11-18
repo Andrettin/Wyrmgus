@@ -326,6 +326,8 @@ public:
 		this->settlement = settlement;
 	}
 
+	bool is_on_trade_route() const;
+
 public:
 	//Wyrmgus start
 //	unsigned short Flags = 0;      /// field flags

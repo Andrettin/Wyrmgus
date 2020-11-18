@@ -708,6 +708,11 @@ CPlayer *tile::get_realm_owner() const
 	return this->get_settlement()->get_realm_owner();
 }
 
+bool tile::is_on_trade_route() const
+{
+	return this->get_terrain_feature() != nullptr && this->get_terrain_feature()->is_trade_route();
+}
+
 //
 //  tile_player_info
 //
