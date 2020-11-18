@@ -203,7 +203,10 @@ void tile::SetTerrain(const terrain_type *terrain_type)
 
 	//remove the terrain feature, unless it is a trade route and a pathway is being built over it
 	if (this->get_terrain_feature() != nullptr && (!this->get_terrain_feature()->is_trade_route() || !terrain_type->is_pathway())) {
-		this->terrain_feature = nullptr;
+		//only remove the terrain feature if we are changing the top terrain type
+		if (terrain_type->is_overlay() || !this->get_terrain_feature()->get_terrain_type()->is_overlay()) {
+			this->terrain_feature = nullptr;
+		}
 	}
 }
 
