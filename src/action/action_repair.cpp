@@ -277,7 +277,7 @@ static void AnimateActionRepair(CUnit &unit)
 	UnitShowAnimation(unit, unit.get_animation_set()->Repair.get());
 }
 
-/* virtual */ void COrder_Repair::Execute(CUnit &unit)
+void COrder_Repair::Execute(CUnit &unit)
 {
 	Assert(this->ReparableTarget == this->get_goal());
 

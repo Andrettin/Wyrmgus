@@ -46,9 +46,15 @@ public:
 		this->set_unit(u);
 	}
 
-	unit_ref(const unit_ref &u)
+	unit_ref(const unit_ref &other)
 	{
-		this->set_unit(u.unit);
+		this->set_unit(other.unit);
+	}
+
+	unit_ref(unit_ref &&other)
+	{
+		this->unit = other.unit;
+		other.unit = nullptr;
 	}
 
 	~unit_ref()
@@ -67,8 +73,38 @@ public:
 	CUnit &operator*() { return *unit; }
 	CUnit *operator->() const { return unit; }
 
-	bool operator== (CUnit *u) const { return this->unit == u; }
-	bool operator!= (CUnit *u) const { return this->unit != u; }
+	unit_ref &operator= (const unit_ref &other)
+	{
+		this->set_unit(other.unit);
+		return *this;
+	}
+
+	unit_ref &operator= (unit_ref &&other)
+	{
+		this->unit = other.unit;
+		other.unit = nullptr;
+		return *this;
+	}
+
+	bool operator== (const unit_ref &other) const
+	{
+		return this->unit == other.unit;
+	}
+
+	bool operator!= (const unit_ref &other) const
+	{
+		return this->unit != other.unit;
+	}
+
+	bool operator== (CUnit *u) const
+	{
+		return this->unit == u;
+	}
+
+	bool operator!= (CUnit *u) const
+	{
+		return this->unit != u;
+	}
 
 private:
 	void set_unit(CUnit *unit);
