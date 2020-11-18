@@ -80,7 +80,7 @@ unsigned SyncHash; /// Hash calculated to find sync failures
 
 void COrder::set_goal(CUnit *const new_goal)
 {
-	this->goal = new_goal;
+	this->goal = wyrmgus::unit_ref(new_goal);
 }
 
 void COrder::clear_goal()

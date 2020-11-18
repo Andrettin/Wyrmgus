@@ -7360,7 +7360,7 @@ static void HitUnit_Burning(CUnit &target)
 		const PixelDiff offset(0, -wyrmgus::defines::get()->get_tile_height());
 		Missile *missile = MakeMissile(*fire, targetPixelCenter + offset, targetPixelCenter + offset, target.MapLayer->ID);
 
-		missile->SourceUnit = &target;
+		missile->SourceUnit = wyrmgus::unit_ref(&target);
 		target.Burning = 1;
 	}
 }

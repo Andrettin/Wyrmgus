@@ -137,7 +137,7 @@ public:
 		return this->goal != nullptr;
 	}
 
-	CUnit *get_goal() const
+	const wyrmgus::unit_ref &get_goal() const
 	{
 		return this->goal;
 	}

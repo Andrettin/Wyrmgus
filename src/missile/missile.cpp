@@ -868,9 +868,9 @@ void FireMissile(CUnit &unit, CUnit *goal, const Vec2i &goalPos, int z)
 	// Damage of missile
 	//
 	if (goal) {
-		missile->TargetUnit = goal;
+		missile->TargetUnit = wyrmgus::unit_ref(goal);
 	}
-	missile->SourceUnit = &unit;
+	missile->SourceUnit = wyrmgus::unit_ref(&unit);
 
 	//for pierce missiles, make them continue up to the limits of the attacker's range
 	if (missile->Type->Pierce) {
@@ -1175,7 +1175,7 @@ bool MissileHandleBlocking(Missile &missile, const PixelPos &position)
 						if (&unit != missile.SourceUnit && unit.Type->BoolFlag[WALL_INDEX].value
 							&& unit.Player != missile.SourceUnit->Player && unit.IsAllied(*missile.SourceUnit) == false) {
 							if (missile.TargetUnit) {
-								missile.TargetUnit = &unit;
+								missile.TargetUnit = wyrmgus::unit_ref(&unit);
 								if (unit.Type->get_tile_width() == 1 || unit.Type->get_tile_height() == 1) {
 									missile.position = CMap::Map.tile_pos_to_map_pixel_pos_top_left(unit.tilePos);
 								}
@@ -1197,7 +1197,7 @@ bool MissileHandleBlocking(Missile &missile, const PixelPos &position)
 //					if (missile.Type->FriendlyFire == false || unit.IsEnemy(*missile.SourceUnit->Player)) {
 					if (missile.Type->FriendlyFire == true || unit.IsEnemy(*missile.SourceUnit)) {
 					//Wyrmgus end
-						missile.TargetUnit = &unit;
+						missile.TargetUnit = wyrmgus::unit_ref(&unit);
 						if (unit.Type->get_tile_width() == 1 || unit.Type->get_tile_height() == 1) {
 							missile.position = CMap::Map.tile_pos_to_map_pixel_pos_top_left(unit.tilePos);
 						}
@@ -1528,7 +1528,7 @@ void Missile::MissileHit(CUnit *unit)
 				}
 			}
 			if (goal.Destroyed) {
-				this->TargetUnit = nullptr;
+				this->TargetUnit.reset();
 				return;
 			}
 			int splash = 1;

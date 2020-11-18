@@ -49,18 +49,7 @@
 /**
 **  Generate a unit reference, a printable unique string for unit.
 */
-std::string UnitReference(const CUnit &unit)
-{
-	std::ostringstream ss;
-	ss << "U" << std::setfill('0') << std::setw(4) << std::uppercase
-	   << std::hex << UnitNumber(unit);
-	return ss.str();
-}
-
-/**
-**  Generate a unit reference, a printable unique string for unit.
-*/
-std::string UnitReference(const wyrmgus::unit_ref &unit)
+std::string UnitReference(const CUnit *unit)
 {
 	Assert(unit != nullptr);
 
@@ -332,13 +321,13 @@ void SaveUnit(const CUnit &unit, CFile &file)
 			 * array - this means it won't be saved!!! */
 			printf("FIXME: storing destroyed Worker - loading will fail.\n");
 		}
-		file.printf(" \"next-worker\", \"%s\",", UnitReference(*unit.NextWorker).c_str());
+		file.printf(" \"next-worker\", \"%s\",", UnitReference(unit.NextWorker).c_str());
 	}
 
 	if (unit.Resource.Workers != nullptr) {
 		file.printf(" \"resource-active\", %d,", unit.Resource.Active);
 		file.printf(" \"resource-assigned\", %d,", unit.Resource.Assigned);
-		file.printf(" \"resource-workers\", \"%s\",", UnitReference(*unit.Resource.Workers).c_str());
+		file.printf(" \"resource-workers\", \"%s\",", UnitReference(unit.Resource.Workers).c_str());
 	} else {
 		Assert(unit.Resource.Active == 0);
 		Assert(unit.Resource.Assigned == 0);
@@ -352,7 +341,7 @@ void SaveUnit(const CUnit &unit, CFile &file)
 		file.printf("\n  \"units-contained\", {");
 		CUnit *uins = unit.UnitInside->PrevContained;
 		for (int i = unit.InsideCount; i; --i, uins = uins->PrevContained) {
-			file.printf("\"%s\"", UnitReference(*uins).c_str());
+			file.printf("\"%s\"", UnitReference(uins).c_str());
 			if (i > 1) {
 				file.printf(", ");
 			}

@@ -131,7 +131,7 @@ bool COrder_Build::ParseSpecificData(lua_State *l, int &j, const char *value, co
 	if (!strcmp(value, "building")) {
 		++j;
 		lua_rawgeti(l, -1, j + 1);
-		this->BuildingUnit = CclGetUnitFromRef(l);
+		this->BuildingUnit = wyrmgus::unit_ref(CclGetUnitFromRef(l));
 		lua_pop(l, 1);
 	} else if (!strcmp(value, "range")) {
 		++j;
@@ -464,7 +464,7 @@ bool COrder_Build::StartBuilding(CUnit &unit, CUnit &ontop)
 		}
 	} else {
 		this->State = State_BuildFromOutside;
-		this->BuildingUnit = build;
+		this->BuildingUnit = wyrmgus::unit_ref(build);
 		//Wyrmgus start
 //		unit.Direction = DirectionToHeading(build->tilePos - unit.tilePos);
 //		UnitUpdateHeading(unit);

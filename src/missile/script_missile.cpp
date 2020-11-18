@@ -257,12 +257,12 @@ static int CclMissile(lua_State *l)
 		} else if (!strcmp(value, "source")) {
 			Assert(missile);
 			lua_pushvalue(l, j + 1);
-			missile->SourceUnit = CclGetUnitFromRef(l);
+			missile->SourceUnit = wyrmgus::unit_ref(CclGetUnitFromRef(l));
 			lua_pop(l, 1);
 		} else if (!strcmp(value, "target")) {
 			Assert(missile);
 			lua_pushvalue(l, j + 1);
-			missile->TargetUnit = CclGetUnitFromRef(l);
+			missile->TargetUnit = wyrmgus::unit_ref(CclGetUnitFromRef(l));
 			lua_pop(l, 1);
 		} else if (!strcmp(value, "damage")) {
 			Assert(missile);
@@ -376,9 +376,9 @@ static int CclCreateMissile(lua_State *l)
 		return 0;
 	}
 	if (dealDamage) {
-		missile->SourceUnit = sourceUnit;
+		missile->SourceUnit = wyrmgus::unit_ref(sourceUnit);
 	}
-	missile->TargetUnit = destUnit;
+	missile->TargetUnit = wyrmgus::unit_ref(destUnit);
 	return 0;
 }
 

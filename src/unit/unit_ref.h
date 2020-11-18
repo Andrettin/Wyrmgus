@@ -41,7 +41,7 @@ public:
 	{
 	}
 
-	unit_ref(CUnit *u)
+	explicit unit_ref(CUnit *u)
 	{
 		this->set_unit(u);
 	}
@@ -66,12 +66,6 @@ public:
 
 	CUnit &operator*() { return *unit; }
 	CUnit *operator->() const { return unit; }
-
-	unit_ref &operator= (CUnit *u)
-	{
-		this->set_unit(u);
-		return *this;
-	}
 
 	bool operator== (CUnit *u) const { return this->unit == u; }
 	bool operator!= (CUnit *u) const { return this->unit != u; }

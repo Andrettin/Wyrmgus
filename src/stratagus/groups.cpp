@@ -118,7 +118,7 @@ void SaveGroups(CFile &file)
 	for (int g = 0; g < NUM_GROUPS; ++g) {
 		file.printf("Group(%d, %lu, {", g, (long unsigned int)Groups[g].getUnits().size());
 		for (size_t i = 0; i < Groups[g].getUnits().size(); ++i) {
-			file.printf("\"%s\", ", UnitReference(*Groups[g].getUnits()[i]).c_str());
+			file.printf("\"%s\", ", UnitReference(Groups[g].getUnits()[i]).c_str());
 		}
 		file.printf("})\n");
 	}

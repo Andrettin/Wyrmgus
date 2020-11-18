@@ -214,7 +214,7 @@ std::unique_ptr<COrder> COrder::NewActionReturnGoods(CUnit &harvester, CUnit *de
 		depot = FindDeposit(harvester, 1000, harvester.CurrentResource);
 	}
 	if (depot) {
-		order->Depot = depot;
+		order->Depot = wyrmgus::unit_ref(depot);
 		order->UnitGotoGoal(harvester, depot, SUB_MOVE_TO_DEPOT);
 	} else {
 		order->State = SUB_UNREACHABLE_DEPOT;
@@ -337,16 +337,16 @@ bool COrder_Resource::ParseSpecificData(lua_State *l, int &j, const char *value,
 	} else if (!strcmp(value, "res-depot")) {
 		++j;
 		lua_rawgeti(l, -1, j + 1);
-		this->Depot = CclGetUnitFromRef(l);
+		this->Depot = wyrmgus::unit_ref(CclGetUnitFromRef(l));
 		lua_pop(l, 1);
 	} else if (!strcmp(value, "res-mine")) {
 		++j;
 		lua_rawgeti(l, -1, j + 1);
-		this->Resource.Mine = CclGetUnitFromRef(l);
+		this->Resource.Mine = wyrmgus::unit_ref(CclGetUnitFromRef(l));
 		lua_pop(l, 1);
 		//Wyrmgus start
 		if (this->Resource.Mine->Type == nullptr) {
-			this->Resource.Mine = nullptr;
+			this->Resource.Mine.reset();
 		}
 		//Wyrmgus end
 	} else if (!strcmp(value, "res-pos")) {
@@ -368,7 +368,7 @@ bool COrder_Resource::ParseSpecificData(lua_State *l, int &j, const char *value,
 	} else if (!strcmp(value, "worker")) {
 		++j;
 		lua_rawgeti(l, -1, j + 1);
-		this->worker = CclGetUnitFromRef(l);
+		this->worker = wyrmgus::unit_ref(CclGetUnitFromRef(l));
 		lua_pop(l, 1);
 	} else if (!strcmp(value, "tile")) {
 		++j;
@@ -1137,7 +1137,7 @@ int COrder_Resource::StopGathering(CUnit &unit)
 		source->Resource.Active--;
 		Assert(source->Resource.Active >= 0);
 		//Store resource position.
-		this->Resource.Mine = source;
+		this->Resource.Mine = wyrmgus::unit_ref(source);
 		
 		if (Preference.MineNotifications && unit.Player->Index == CPlayer::GetThisPlayer()->Index
 			&& source->IsAlive()
@@ -1210,7 +1210,7 @@ int COrder_Resource::StopGathering(CUnit &unit)
 
 		if (mine) {
 			unit.DeAssignWorkerFromMine(*mine);
-			this->Resource.Mine = nullptr;
+			this->Resource.Mine.reset();
 		}
 
 		DebugPrint("%d: Worker %d report: Can't find a resource [%d] deposit.\n"
@@ -1470,7 +1470,7 @@ bool COrder_Resource::WaitInDepot(CUnit &unit)
 					unit.DeAssignWorkerFromMine(*mine);
 				}
 				unit.AssignWorkerToMine(*goal);
-				this->Resource.Mine = goal;
+				this->Resource.Mine = wyrmgus::unit_ref(goal);
 			}
 			this->set_goal(goal);
 			this->goalPos.x = this->goalPos.y = -1;
@@ -1487,7 +1487,7 @@ bool COrder_Resource::WaitInDepot(CUnit &unit)
 			}
 			if (mine) {
 				unit.DeAssignWorkerFromMine(*mine);
-				this->Resource.Mine = nullptr;
+				this->Resource.Mine.reset();
 			}
 			this->Finished = true;
 			return false;
@@ -1509,7 +1509,7 @@ void COrder_Resource::DropResource(CUnit &unit)
 			}
 		}
 		//fast clean both resource data: pos and mine
-		this->Resource.Mine = nullptr;
+		this->Resource.Mine.reset();
 		unit.CurrentResource = 0;
 		//Wyrmgus start
 //		unit.ResourcesHeld = 0;
@@ -1559,7 +1559,7 @@ bool COrder_Resource::FindAnotherResource(CUnit &unit)
 						unit.DeAssignWorkerFromMine(*mine);
 					}
 					unit.AssignWorkerToMine(*newGoal);
-					this->Resource.Mine = newGoal;
+					this->Resource.Mine = wyrmgus::unit_ref(newGoal);
 					this->goalPos.x = -1;
 					this->goalPos.y = -1;
 					this->State = SUB_MOVE_TO_RESOURCE;
@@ -1595,19 +1595,22 @@ bool COrder_Resource::ActionResourceInit(CUnit &unit)
 	Assert(this->State == SUB_START_RESOURCE);
 
 	this->Range = 0;
-	CUnit *const goal = this->get_goal();
+	const wyrmgus::unit_ref &goal = this->get_goal();
 	CUnit *mine = this->Resource.Mine;
 
 	if (mine) {
 		unit.DeAssignWorkerFromMine(*mine);
-		this->Resource.Mine = nullptr;
+		this->Resource.Mine.reset();
 	}
-	if (goal && goal->IsAlive() == false) {
-		return false;
-	}
-	if (goal && goal->CurrentAction() != UnitAction::Built) {
-		unit.AssignWorkerToMine(*goal);
-		this->Resource.Mine = goal;
+	if (goal != nullptr) {
+		if (!goal->IsAlive()) {
+			return false;
+		}
+
+		if (goal->CurrentAction() != UnitAction::Built) {
+			unit.AssignWorkerToMine(*goal);
+			this->Resource.Mine = goal;
+		}
 	}
 
 	UnitGotoGoal(unit, goal, SUB_MOVE_TO_RESOURCE);
@@ -1624,7 +1627,7 @@ bool COrder_Resource::ActionResourceInit(CUnit &unit)
 void COrder_Resource::Execute(CUnit &unit)
 {
 	// can be different by Cloning (trained unit)...
-	this->worker = &unit;
+	this->worker = wyrmgus::unit_ref(&unit);
 
 	if (unit.Wait) {
 		if (!unit.Waiting) {

@@ -76,7 +76,7 @@ std::unique_ptr<COrder> COrder::NewActionBuilt(CUnit &builder, CUnit &unit)
 	order->UpdateConstructionFrame(unit);
 
 	if (unit.Type->BoolFlag[BUILDEROUTSIDE_INDEX].value == false) {
-		order->Worker = &builder;
+		order->Worker = wyrmgus::unit_ref(&builder);
 	}
 	return order;
 }
@@ -111,7 +111,7 @@ void COrder_Built::Save(CFile &file, const CUnit &unit) const
 	if (!strcmp(value, "worker")) {
 		++j;
 		lua_rawgeti(l, -1, j + 1);
-		this->Worker = CclGetUnitFromRef(l);
+		this->Worker = wyrmgus::unit_ref(CclGetUnitFromRef(l));
 		lua_pop(l, 1);
 	} else if (!strcmp(value, "progress")) {
 		++j;

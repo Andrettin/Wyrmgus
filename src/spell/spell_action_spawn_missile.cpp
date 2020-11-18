@@ -242,8 +242,8 @@ int spell_action_spawn_missile::Cast(CUnit &caster, const spell &, CUnit *target
 						missile->Damage = std::min(damageLeft, unit.Variable[HP_INDEX].Value);
 						damageLeft -= unit.Variable[HP_INDEX].Value;
 					}
-					missile->SourceUnit = &caster;
-					missile->TargetUnit = &unit;
+					missile->SourceUnit = wyrmgus::unit_ref(&caster);
+					missile->TargetUnit = wyrmgus::unit_ref(&unit);
 				}
 			}
 			return 1;
@@ -264,12 +264,12 @@ int spell_action_spawn_missile::Cast(CUnit &caster, const spell &, CUnit *target
 		missile->TTL = this->TTL;
 		missile->Delay = this->Delay;
 		if (this->UseUnitVar) {
-			missile->SourceUnit = &caster;
+			missile->SourceUnit = wyrmgus::unit_ref(&caster);
 		} else {
 			missile->Damage = this->Damage * modifier / 100;
 			missile->LightningDamage = this->LightningDamage * modifier / 100;
 			if (missile->Damage != 0 || missile->LightningDamage != 0) {
-				missile->SourceUnit = &caster;
+				missile->SourceUnit = wyrmgus::unit_ref(&caster);
 			}
 		}
 		//Wyrmgus start
@@ -279,7 +279,7 @@ int spell_action_spawn_missile::Cast(CUnit &caster, const spell &, CUnit *target
 		missile->AlwaysCritical = this->AlwaysCritical;
 		//Wyrmgus end
 
-		missile->TargetUnit = target;
+		missile->TargetUnit = wyrmgus::unit_ref(target);
 	}
 
 	return 1;

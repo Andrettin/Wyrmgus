@@ -874,9 +874,7 @@ extern bool CanPickUp(const CUnit &picker, const CUnit &unit);
 //Wyrmgus end
 
 /// Generate a unit reference, a printable unique string for unit
-extern std::string UnitReference(const CUnit &unit);
-/// Generate a unit reference, a printable unique string for unit
-extern std::string UnitReference(const wyrmgus::unit_ref &unit);
+extern std::string UnitReference(const CUnit *unit);
 
 /// save unit-structure
 extern void SaveUnit(const CUnit &unit, CFile &file);

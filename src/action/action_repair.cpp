@@ -65,7 +65,7 @@ std::unique_ptr<COrder> COrder::NewActionRepair(CUnit &target)
 		order->MapLayer = target.MapLayer->ID;
 	} else {
 		order->set_goal(&target);
-		order->ReparableTarget = &target;
+		order->ReparableTarget = wyrmgus::unit_ref(&target);
 	}
 	return order;
 }
@@ -123,7 +123,7 @@ bool COrder_Repair::ParseSpecificData(lua_State *l, int &j, const char *value, c
 	} else if (!strcmp("repair-target", value)) {
 		++j;
 		lua_rawgeti(l, -1, j + 1);
-		this->ReparableTarget = CclGetUnitFromRef(l);
+		this->ReparableTarget = wyrmgus::unit_ref(CclGetUnitFromRef(l));
 		lua_pop(l, 1);
 	} else if (!strcmp("state", value)) {
 		++j;
@@ -298,7 +298,7 @@ static void AnimateActionRepair(CUnit &unit)
 						DebugPrint("repair target gone.\n");
 						this->goalPos = goal->tilePos + goal->GetHalfTileSize();
 						this->MapLayer = goal->MapLayer->ID;
-						ReparableTarget = nullptr;
+						this->ReparableTarget.reset();
 						this->clear_goal();
 						goal = nullptr;
 					}
@@ -360,7 +360,7 @@ static void AnimateActionRepair(CUnit &unit)
 					this->MapLayer = goal->MapLayer->ID;
 					// FIXME: should I clear this here?
 					this->clear_goal();
-					ReparableTarget = nullptr;
+					this->ReparableTarget.reset();
 					goal = nullptr;
 				} else {
 					const int dist = unit.MapDistanceTo(*goal);
