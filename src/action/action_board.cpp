@@ -61,7 +61,7 @@ std::unique_ptr<COrder> COrder::NewActionBoard(CUnit &unit)
 {
 	auto order = std::make_unique<COrder_Board>();
 
-	order->SetGoal(&unit);
+	order->set_goal(&unit);
 	order->Range = 1;
 
 	return order;
@@ -77,8 +77,8 @@ void COrder_Board::Save(CFile &file, const CUnit &unit) const
 		file.printf(" \"finished\", ");
 	}
 	file.printf(" \"range\", %d,", this->Range);
-	if (this->HasGoal()) {
-		file.printf(" \"goal\", \"%s\",", UnitReference(this->GetGoal()).c_str());
+	if (this->has_goal()) {
+		file.printf(" \"goal\", \"%s\",", UnitReference(this->get_goal()).c_str());
 	}
 	file.printf(" \"state\", %d", this->State);
 
@@ -111,22 +111,22 @@ bool COrder_Board::ParseSpecificData(lua_State *l, int &j, const char *value, co
 	return true;
 }
 
-/* virtual */ bool COrder_Board::IsValid() const
+bool COrder_Board::IsValid() const
 {
-	return this->HasGoal() && this->GetGoal()->IsAliveOnMap();
+	return this->has_goal() && this->get_goal()->IsAliveOnMap();
 }
 
-/* virtual */ PixelPos COrder_Board::Show(const CViewport &vp, const PixelPos &lastScreenPos) const
+PixelPos COrder_Board::Show(const CViewport &vp, const PixelPos &lastScreenPos) const
 {
 	PixelPos targetPos;
 
-	if (this->HasGoal()) {
+	if (this->has_goal()) {
 		//Wyrmgus start
-		if (this->GetGoal()->MapLayer != UI.CurrentMapLayer) {
+		if (this->get_goal()->MapLayer != UI.CurrentMapLayer) {
 			return lastScreenPos;
 		}
 		//Wyrmgus end
-		targetPos = vp.scaled_map_to_screen_pixel_pos(this->GetGoal()->get_scaled_map_pixel_pos_center());
+		targetPos = vp.scaled_map_to_screen_pixel_pos(this->get_goal()->get_scaled_map_pixel_pos_center());
 	} else {
 		//Wyrmgus start
 		if (this->MapLayer != UI.CurrentMapLayer->ID) {
@@ -148,14 +148,14 @@ bool COrder_Board::ParseSpecificData(lua_State *l, int &j, const char *value, co
 	return targetPos;
 }
 
-/* virtual */ void COrder_Board::UpdatePathFinderData(PathFinderInput &input)
+void COrder_Board::UpdatePathFinderData(PathFinderInput &input)
 {
 	input.SetMinRange(0);
 	input.SetMaxRange(this->Range);
 
 	Vec2i tileSize;
-	if (this->HasGoal()) {
-		CUnit *goal = this->GetGoal();
+	if (this->has_goal()) {
+		CUnit *goal = this->get_goal();
 		tileSize = goal->GetTileSize();
 		input.SetGoal(goal->tilePos, tileSize, goal->MapLayer->ID);
 	} else {
@@ -204,7 +204,7 @@ bool COrder_Board::WaitForTransporter(CUnit &unit)
 		return false;
 	}
 
-	const CUnit *trans = this->GetGoal();
+	const CUnit *trans = this->get_goal();
 
 	if (!trans || !CanTransport(*trans, unit)) {
 		// FIXME: destination destroyed??
@@ -217,7 +217,7 @@ bool COrder_Board::WaitForTransporter(CUnit &unit)
 	if (!trans->IsVisibleAsGoal(*unit.Player) && unit.Player->Type != PlayerNeutral) { // neutral units continue waiting for the transporter even if it is not visible
 	//Wyrmgus end
 		DebugPrint("Transporter Gone\n");
-		this->ClearGoal();
+		this->clear_goal();
 		unit.Wait = 6;
 		return false;
 	}
@@ -249,7 +249,7 @@ bool COrder_Board::WaitForTransporter(CUnit &unit)
 */
 static void EnterTransporter(CUnit &unit, COrder_Board &order)
 {
-	CUnit *transporter = order.GetGoal();
+	CUnit *transporter = order.get_goal();
 
 	Assert(transporter != nullptr);
 
@@ -319,7 +319,7 @@ static void EnterTransporter(CUnit &unit, COrder_Board &order)
 								if (!table[i]->Removed && table[i]->Type->BoolFlag[BRIDGE_INDEX].value && table[i]->CanMove()) {
 									if (table[i]->CurrentAction() == UnitAction::Still) {
 										CommandStopUnit(*table[i]);
-										CommandMove(*table[i], this->HasGoal() ? this->GetGoal()->tilePos : this->goalPos, FlushCommands, this->HasGoal() ? this->GetGoal()->MapLayer->ID : this->MapLayer);
+										CommandMove(*table[i], this->has_goal() ? this->get_goal()->tilePos : this->goalPos, FlushCommands, this->has_goal() ? this->get_goal()->MapLayer->ID : this->MapLayer);
 									}
 									return;
 								}

@@ -130,8 +130,8 @@ int ParseAnimInt(const CUnit &unit, const char *parseint)
 	char *cur = &s[2];
 	if (s[0] == 'v' || s[0] == 't') { //unit variable detected
 		if (s[0] == 't') {
-			if (unit.CurrentOrder()->HasGoal()) {
-				goal = unit.CurrentOrder()->GetGoal();
+			if (unit.CurrentOrder()->has_goal()) {
+				goal = unit.CurrentOrder()->get_goal();
 			} else {
 				return 0;
 			}
@@ -181,8 +181,8 @@ int ParseAnimInt(const CUnit &unit, const char *parseint)
 		return 0;
 	} else if (s[0] == 'b' || s[0] == 'g') { //unit bool flag detected
 		if (s[0] == 'g') {
-			if (unit.CurrentOrder()->HasGoal()) {
-				goal = unit.CurrentOrder()->GetGoal();
+			if (unit.CurrentOrder()->has_goal()) {
+				goal = unit.CurrentOrder()->get_goal();
 			} else {
 				return 0;
 			}

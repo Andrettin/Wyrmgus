@@ -1112,12 +1112,12 @@ void AiHelpMe(CUnit *attacker, CUnit &defender)
 			// can attack our attacker then ask for help
 			// FIXME ad support for help from Coward type units
 			if (aiunit.Active && aiunit.IsAgressive() && CanTarget(*aiunit.Type, *attacker->Type)
-				&& aiunit.CurrentOrder()->GetGoal() != attacker) {
+				&& aiunit.CurrentOrder()->get_goal() != attacker) {
 				bool shouldAttack = aiunit.IsIdle() && aiunit.Threshold == 0;
 
 				if (aiunit.CurrentAction() == UnitAction::Attack) {
 					const COrder_Attack &orderAttack = *static_cast<COrder_Attack *>(aiunit.CurrentOrder());
-					const CUnit *oldGoal = orderAttack.GetGoal();
+					const CUnit *oldGoal = orderAttack.get_goal();
 
 					if (oldGoal == nullptr || (ThreatCalculate(defender, *attacker) < ThreatCalculate(defender, *oldGoal)
 											&& aiunit.MapDistanceTo(defender) <= aiunit.GetModifiedVariable(ATTACKRANGE_INDEX))) {

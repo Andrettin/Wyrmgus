@@ -81,7 +81,7 @@ std::unique_ptr<COrder> COrder::NewActionSpellCast(const wyrmgus::spell &spell, 
 			order->MapLayer = target->MapLayer->ID;
 			order->Range <<= 1;
 		} else {
-			order->SetGoal(target);
+			order->set_goal(target);
 		}
 	} else {
 		order->goalPos = pos;
@@ -102,8 +102,8 @@ void COrder_SpellCast::Save(CFile &file, const CUnit &unit) const
 		file.printf(" \"finished\", ");
 	}
 	file.printf(" \"range\", %d,", this->Range);
-	if (this->HasGoal()) {
-		file.printf(" \"goal\", \"%s\",", UnitReference(this->GetGoal()).c_str());
+	if (this->has_goal()) {
+		file.printf(" \"goal\", \"%s\",", UnitReference(this->get_goal()).c_str());
 	}
 	file.printf(" \"tile\", {%d, %d},", this->goalPos.x, this->goalPos.y);
 	//Wyrmgus start
@@ -145,26 +145,26 @@ bool COrder_SpellCast::ParseSpecificData(lua_State *l, int &j, const char *value
 	return true;
 }
 
-/* virtual */ bool COrder_SpellCast::IsValid() const
+bool COrder_SpellCast::IsValid() const
 {
 	Assert(Action == UnitAction::SpellCast);
-	if (this->HasGoal()) {
-		return this->GetGoal()->IsAliveOnMap();
+	if (this->has_goal()) {
+		return this->get_goal()->IsAliveOnMap();
 	} else {
 		return CMap::Map.Info.IsPointOnMap(this->goalPos, this->MapLayer);
 	}
 }
 
-/* virtual */ PixelPos COrder_SpellCast::Show(const CViewport &vp, const PixelPos &lastScreenPos) const
+PixelPos COrder_SpellCast::Show(const CViewport &vp, const PixelPos &lastScreenPos) const
 {
 	PixelPos targetPos;
 
-	if (this->HasGoal()) {
-		if (this->GetGoal()->MapLayer != UI.CurrentMapLayer) {
+	if (this->has_goal()) {
+		if (this->get_goal()->MapLayer != UI.CurrentMapLayer) {
 			return lastScreenPos;
 		}
 
-		targetPos = vp.scaled_map_to_screen_pixel_pos(this->GetGoal()->get_scaled_map_pixel_pos_center());
+		targetPos = vp.scaled_map_to_screen_pixel_pos(this->get_goal()->get_scaled_map_pixel_pos_center());
 	} else {
 		if (this->MapLayer != UI.CurrentMapLayer->ID) {
 			return lastScreenPos;
@@ -182,14 +182,14 @@ bool COrder_SpellCast::ParseSpecificData(lua_State *l, int &j, const char *value
 	return targetPos;
 }
 
-/* virtual */ void COrder_SpellCast::UpdatePathFinderData(PathFinderInput &input)
+void COrder_SpellCast::UpdatePathFinderData(PathFinderInput &input)
 {
 	input.SetMinRange(0);
 	//Wyrmgus start
 //	input.SetMaxRange(this->Range);
 	int distance = this->Range;
 	if (input.GetUnit()->GetModifiedVariable(ATTACKRANGE_INDEX) > 1) {
-		if (!CheckObstaclesBetweenTiles(input.GetUnitPos(), this->HasGoal() ? this->GetGoal()->tilePos : this->goalPos, MapFieldAirUnpassable, this->MapLayer)) {
+		if (!CheckObstaclesBetweenTiles(input.GetUnitPos(), this->has_goal() ? this->get_goal()->tilePos : this->goalPos, MapFieldAirUnpassable, this->MapLayer)) {
 			distance = 1;
 		}
 	}
@@ -197,8 +197,8 @@ bool COrder_SpellCast::ParseSpecificData(lua_State *l, int &j, const char *value
 	//Wyrmgus end
 
 	Vec2i tileSize;
-	if (this->HasGoal()) {
-		CUnit *goal = this->GetGoal();
+	if (this->has_goal()) {
+		CUnit *goal = this->get_goal();
 		tileSize = goal->GetTileSize();
 		input.SetGoal(goal->tilePos, tileSize, goal->MapLayer->ID);
 	} else {
@@ -211,10 +211,10 @@ bool COrder_SpellCast::ParseSpecificData(lua_State *l, int &j, const char *value
 /**
 **  Call when animation step is "attack"
 */
-/* virtual */ void COrder_SpellCast::OnAnimationAttack(CUnit &unit)
+void COrder_SpellCast::OnAnimationAttack(CUnit &unit)
 {
 	UnHideUnit(unit); // unit is invisible until attacks
-	CUnit *goal = GetGoal();
+	CUnit *goal = this->get_goal();
 	if (goal && !goal->IsVisibleAsGoal(*unit.Player)) {
 		unit.ReCast = 0;
 	} else {
@@ -225,14 +225,14 @@ bool COrder_SpellCast::ParseSpecificData(lua_State *l, int &j, const char *value
 /**
 **  Get goal position
 */
-/* virtual */ const Vec2i COrder_SpellCast::GetGoalPos() const
+const Vec2i COrder_SpellCast::GetGoalPos() const
 {
 	const Vec2i invalidPos(-1, -1);
 	if (goalPos != invalidPos) {
 		return goalPos;
 	}
-	if (this->HasGoal()) {
-		return this->GetGoal()->tilePos;
+	if (this->has_goal()) {
+		return this->get_goal()->tilePos;
 	}
 	return invalidPos;
 }
@@ -241,14 +241,14 @@ bool COrder_SpellCast::ParseSpecificData(lua_State *l, int &j, const char *value
 /**
 **  Get goal map layer
 */
-/* virtual */ const int COrder_SpellCast::GetGoalMapLayer() const
+const int COrder_SpellCast::GetGoalMapLayer() const
 {
 	const Vec2i invalidPos(-1, -1);
 	if (goalPos != invalidPos) {
 		return MapLayer;
 	}
-	if (this->HasGoal()) {
-		return this->GetGoal()->MapLayer->ID;
+	if (this->has_goal()) {
+		return this->get_goal()->MapLayer->ID;
 	}
 	return 0;
 }
@@ -289,7 +289,7 @@ static void AnimateActionSpellCast(CUnit &unit, COrder_SpellCast &order)
 */
 bool COrder_SpellCast::CheckForDeadGoal(CUnit &unit)
 {
-	const CUnit *goal = this->GetGoal();
+	const CUnit *goal = this->get_goal();
 
 	// Position or valid target, it is ok.
 	if (!goal || goal->IsVisibleAsGoal(*unit.Player)) {
@@ -301,7 +301,7 @@ bool COrder_SpellCast::CheckForDeadGoal(CUnit &unit)
 	this->goalPos = goal->tilePos;
 	this->MapLayer = goal->MapLayer->ID;
 	this->Range = 0;
-	this->ClearGoal();
+	this->clear_goal();
 
 	// If we have a saved order continue this saved order.
 	if (unit.RestoreOrder()) {
@@ -328,7 +328,7 @@ bool COrder_SpellCast::SpellMoveToTarget(CUnit &unit)
 
 	// when reached DoActionMove changes unit action
 	// FIXME: use return codes from pathfinder
-	CUnit *goal = this->GetGoal();
+	CUnit *goal = this->get_goal();
 	
 	//Wyrmgus start
 	bool obstacle_check = CheckObstaclesBetweenTiles(unit.tilePos, goal ? goal->tilePos : this->goalPos, MapFieldAirUnpassable, this->MapLayer);
@@ -363,7 +363,7 @@ bool COrder_SpellCast::SpellMoveToTarget(CUnit &unit)
 				if (!table[i]->Removed && table[i]->Type->BoolFlag[BRIDGE_INDEX].value && table[i]->CanMove()) {
 					if (table[i]->CurrentAction() == UnitAction::Still) {
 						CommandStopUnit(*table[i]);
-						CommandMove(*table[i], this->HasGoal() ? this->GetGoal()->tilePos : this->goalPos, FlushCommands, this->HasGoal() ? this->GetGoal()->MapLayer->ID : this->MapLayer);
+						CommandMove(*table[i], this->has_goal() ? this->get_goal()->tilePos : this->goalPos, FlushCommands, this->has_goal() ? this->get_goal()->MapLayer->ID : this->MapLayer);
 					}
 					return false;
 				}
@@ -398,7 +398,7 @@ bool COrder_SpellCast::SpellMoveToTarget(CUnit &unit)
 	switch (this->State) {
 		case 0:
 			// Check if we can cast the spell.
-			if (!CanCastSpell(unit, spell, order.GetGoal())) {
+			if (!CanCastSpell(unit, spell, order.get_goal())) {
 				// Notify player about this problem
 				if (unit.Variable[MANA_INDEX].Value < spell.get_mana_cost()) {
 					unit.Player->Notify(NotifyYellow, unit.tilePos,
@@ -428,7 +428,7 @@ bool COrder_SpellCast::SpellMoveToTarget(CUnit &unit)
 										unit.GetMessageName().c_str(), spell.get_name().c_str());
 										//Wyrmgus end
 				//Wyrmgus start
-				} else if (spell.get_target() == wyrmgus::spell_target_type::unit && order.GetGoal() == nullptr) {
+				} else if (spell.get_target() == wyrmgus::spell_target_type::unit && order.get_goal() == nullptr) {
 					unit.Player->Notify(NotifyYellow, unit.tilePos, unit.MapLayer->ID,
 										_("%s needs a target to use the %s ability."),
 										unit.GetMessageName().c_str(), spell.get_name().c_str());
@@ -483,7 +483,7 @@ bool COrder_SpellCast::SpellMoveToTarget(CUnit &unit)
 				}
 			} else {
 				// FIXME: what todo, if unit/goal is removed?
-				CUnit *goal = order.GetGoal();
+				CUnit *goal = order.get_goal();
 				if (goal && goal != &unit && !goal->IsVisibleAsGoal(*unit.Player)) {
 					unit.ReCast = 0;
 				} else {
@@ -501,17 +501,17 @@ bool COrder_SpellCast::SpellMoveToTarget(CUnit &unit)
 
 			// Check, if goal has moved (for ReCast)
 			if (unit.ReCast) {
-				if (order.GetGoal() && unit.MapDistanceTo(*order.GetGoal()) > this->Range) {
+				if (order.has_goal() && unit.MapDistanceTo(*order.get_goal()) > this->Range) {
 					this->State = 0;
 					return;
 				}
 				if (this->isAutocast) {
 					//Wyrmgus start
-//					if (order.GetGoal() && order.GetGoal()->tilePos != order.goalPos) {
-					if (order.GetGoal() && (order.GetGoal()->tilePos != order.goalPos || order.GetGoal()->MapLayer->ID != order.MapLayer)) {
+//					if (order.has_goal() && order.get_goal()->tilePos != order.goalPos) {
+					if (order.has_goal() && (order.get_goal()->tilePos != order.goalPos || order.get_goal()->MapLayer->ID != order.MapLayer)) {
 					//Wyrmgus end
-						order.goalPos = order.GetGoal()->tilePos;
-						order.MapLayer = order.GetGoal()->MapLayer->ID;
+						order.goalPos = order.get_goal()->tilePos;
+						order.MapLayer = order.get_goal()->MapLayer->ID;
 					}
 					if (unit.Player->AiEnabled) {
 						if (!unit.RestoreOrder()) {

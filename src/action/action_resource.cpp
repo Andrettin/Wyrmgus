@@ -191,8 +191,8 @@ std::unique_ptr<COrder> COrder::NewActionResource(CUnit &harvester, CUnit &mine)
 {
 	auto order = std::make_unique<COrder_Resource>(harvester);
 
-	order->SetGoal(&mine);
-	order->Resource.Mine = &mine;
+	order->set_goal(&mine);
+	order->Resource.Mine = wyrmgus::unit_ref(&mine);
 	order->Resource.Pos = mine.tilePos + mine.GetHalfTileSize();
 	order->Resource.MapLayer = mine.MapLayer->ID;
 	order->CurrentResource = mine.GivesResource;
@@ -273,7 +273,7 @@ COrder_Resource::~COrder_Resource()
 		worker->DeAssignWorkerFromMine(*mine);
 	}
 
-	CUnit *goal = this->GetGoal();
+	CUnit *goal = this->get_goal();
 	if (goal) {
 		// If mining decrease the active count on the resource.
 		if (this->State == SUB_GATHER_RESOURCE) {
@@ -292,8 +292,8 @@ void COrder_Resource::Save(CFile &file, const CUnit &unit) const
 	if (this->Finished) {
 		file.printf(" \"finished\",");
 	}
-	if (this->HasGoal()) {
-		file.printf(" \"goal\", \"%s\",", UnitReference(this->GetGoal()).c_str());
+	if (this->has_goal()) {
+		file.printf(" \"goal\", \"%s\",", UnitReference(this->get_goal()).c_str());
 	}
 	file.printf(" \"tile\", {%d, %d},", this->goalPos.x, this->goalPos.y);
 	//Wyrmgus start
@@ -395,13 +395,13 @@ bool COrder_Resource::ParseSpecificData(lua_State *l, int &j, const char *value,
 {
 	PixelPos targetPos;
 
-	if (this->HasGoal()) {
+	if (this->has_goal()) {
 		//Wyrmgus start
-		if (this->GetGoal()->MapLayer != UI.CurrentMapLayer) {
+		if (this->get_goal()->MapLayer != UI.CurrentMapLayer) {
 			return lastScreenPos;
 		}
 		//Wyrmgus end
-		targetPos = vp.scaled_map_to_screen_pixel_pos(this->GetGoal()->get_scaled_map_pixel_pos_center());
+		targetPos = vp.scaled_map_to_screen_pixel_pos(this->get_goal()->get_scaled_map_pixel_pos_center());
 	} else {
 		//Wyrmgus start
 		if (this->MapLayer != UI.CurrentMapLayer->ID) {
@@ -429,8 +429,8 @@ bool COrder_Resource::ParseSpecificData(lua_State *l, int &j, const char *value,
 	input.SetMaxRange(1);
 
 	Vec2i tileSize;
-	if (this->HasGoal()) {
-		CUnit *goal = this->GetGoal();
+	if (this->has_goal()) {
+		CUnit *goal = this->get_goal();
 		tileSize = goal->GetTileSize();
 		input.SetGoal(goal->tilePos, tileSize, goal->MapLayer->ID);
 	} else {
@@ -494,7 +494,7 @@ int COrder_Resource::MoveToResource_Terrain(CUnit &unit)
 					if (!table[i]->Removed && table[i]->Type->BoolFlag[BRIDGE_INDEX].value && table[i]->CanMove()) {
 						if (table[i]->CurrentAction() == UnitAction::Still) {
 							CommandStopUnit(*table[i]);
-							CommandMove(*table[i], this->HasGoal() ? this->GetGoal()->tilePos : this->goalPos, FlushCommands, this->HasGoal() ? this->GetGoal()->MapLayer->ID : this->MapLayer);
+							CommandMove(*table[i], this->has_goal() ? this->get_goal()->tilePos : this->goalPos, FlushCommands, this->has_goal() ? this->get_goal()->MapLayer->ID : this->MapLayer);
 						}
 						return 0;
 					}
@@ -543,7 +543,7 @@ int COrder_Resource::MoveToResource_Terrain(CUnit &unit)
 */
 int COrder_Resource::MoveToResource_Unit(CUnit &unit)
 {
-	const CUnit *goal = this->GetGoal();
+	const CUnit *goal = this->get_goal();
 	Assert(goal);
 
 	switch (DoActionMove(unit)) { // reached end-point?
@@ -557,7 +557,7 @@ int COrder_Resource::MoveToResource_Unit(CUnit &unit)
 					if (!table[i]->Removed && table[i]->Type->BoolFlag[BRIDGE_INDEX].value && table[i]->CanMove()) {
 						if (table[i]->CurrentAction() == UnitAction::Still) {
 							CommandStopUnit(*table[i]);
-							CommandMove(*table[i], this->HasGoal() ? this->GetGoal()->tilePos : this->goalPos, FlushCommands, this->HasGoal() ? this->GetGoal()->MapLayer->ID : this->MapLayer);
+							CommandMove(*table[i], this->has_goal() ? this->get_goal()->tilePos : this->goalPos, FlushCommands, this->has_goal() ? this->get_goal()->MapLayer->ID : this->MapLayer);
 						}
 						return 0;
 					}
@@ -603,8 +603,8 @@ int COrder_Resource::MoveToResource(CUnit &unit)
 
 void COrder_Resource::UnitGotoGoal(CUnit &unit, CUnit *const goal, int state)
 {
-	if (this->GetGoal() != goal) {
-		this->SetGoal(goal);
+	if (this->get_goal() != goal) {
+		this->set_goal(goal);
 		if (goal) {
 			this->goalPos.x = this->goalPos.y = -1;
 		}
@@ -668,7 +668,7 @@ int COrder_Resource::StartGathering(CUnit &unit)
 		return 1;
 	}
 
-	goal = this->GetGoal();
+	goal = this->get_goal();
 
 	// Target is dead, stop getting resources.
 	//Wyrmgus start
@@ -684,9 +684,9 @@ int COrder_Resource::StartGathering(CUnit &unit)
 		if ((goal = UnitFindResource(unit, unit, 15, this->CurrentResource, true, nullptr, true, false, false, false, true))) {
 		//Wyrmgus end
 			this->State = SUB_START_RESOURCE;
-			this->SetGoal(goal);
+			this->set_goal(goal);
 		} else {
-			this->ClearGoal();
+			this->clear_goal();
 			this->Finished = true;
 		}
 		return 0;
@@ -721,7 +721,7 @@ int COrder_Resource::StartGathering(CUnit &unit)
 //		if (goal->Variable[MAXHARVESTERS_INDEX].Value == 0 || goal->Variable[MAXHARVESTERS_INDEX].Value > goal->InsideCount) {
 		if (goal->Variable[MAXHARVESTERS_INDEX].Value == 0 || goal->Variable[MAXHARVESTERS_INDEX].Value > goal->Resource.Active) {
 		//Wyrmgus end
-			this->ClearGoal();
+			this->clear_goal();
 			int selected = unit.Selected;
 			unit.Remove(goal);
 			if (selected && !Preference.DeselectInMine) {
@@ -800,7 +800,7 @@ void COrder_Resource::LoseResource(CUnit &unit, CUnit &source)
 //	if (resinfo.HarvestFromOutside) {
 	if (source_type.BoolFlag[HARVESTFROMOUTSIDE_INDEX].value) {
 	//Wyrmgus end
-		this->ClearGoal();
+		this->clear_goal();
 		--source.Resource.Active;
 	}
 
@@ -818,7 +818,7 @@ void COrder_Resource::LoseResource(CUnit &unit, CUnit &source)
 			this->goalPos.x = -1;
 			this->goalPos.y = -1;
 			this->State = SUB_START_RESOURCE;
-			this->SetGoal(goal);
+			this->set_goal(goal);
 			return;
 		}
 	}
@@ -858,7 +858,7 @@ void COrder_Resource::LoseResource(CUnit &unit, CUnit &source)
 		DebugPrint("%d: Worker %d report: Resource is exhausted, Found another resource.\n"
 				   _C_ unit.Player->Index _C_ UnitNumber(unit));
 		this->State = SUB_START_RESOURCE;
-		this->SetGoal(depot);
+		this->set_goal(depot);
 	} else {
 		DebugPrint("%d: Worker %d report: Resource is exhausted, Just sits around confused.\n"
 				   _C_ unit.Player->Index _C_ UnitNumber(unit));
@@ -882,7 +882,7 @@ int COrder_Resource::GatherResource(CUnit &unit)
 	int addload;
 
 	//Wyrmgus start
-	bool harvest_from_outside = (this->GetGoal() && this->GetGoal()->Type->BoolFlag[HARVESTFROMOUTSIDE_INDEX].value);
+	bool harvest_from_outside = (this->get_goal() && this->get_goal()->Type->BoolFlag[HARVESTFROMOUTSIDE_INDEX].value);
 //	if (resinfo.HarvestFromOutside || resinfo.TerrainHarvester) {
 	if (harvest_from_outside || CMap::Map.Info.IsPointOnMap(this->goalPos, this->MapLayer)) {
 	//Wyrmgus end
@@ -927,8 +927,8 @@ int COrder_Resource::GatherResource(CUnit &unit)
 			if (!CMap::Map.Info.IsPointOnMap(this->goalPos, this->MapLayer) && !harvest_from_outside) {
 				wait_at_resource = resinfo->WaitAtResource * 100 / unit.GetResourceStep(this->CurrentResource);
 			}
-			if (this->GetGoal()) {
-				resource_harvest_speed += this->GetGoal()->Variable[TIMEEFFICIENCYBONUS_INDEX].Value;
+			if (this->get_goal()) {
+				resource_harvest_speed += this->get_goal()->Variable[TIMEEFFICIENCYBONUS_INDEX].Value;
 			}
 			this->TimeToHarvest += std::max<int>(1, wait_at_resource * SPEEDUP_FACTOR / resource_harvest_speed);
 			//Wyrmgus end
@@ -985,7 +985,7 @@ int COrder_Resource::GatherResource(CUnit &unit)
 //			if (resinfo.HarvestFromOutside) {
 			if (harvest_from_outside) {
 			//Wyrmgus end
-				source = this->GetGoal();
+				source = this->get_goal();
 			} else {
 				source = unit.Container;
 			}
@@ -1127,10 +1127,10 @@ int COrder_Resource::StopGathering(CUnit &unit)
 	//Wyrmgus end
 		//Wyrmgus start
 //		if (resinfo.HarvestFromOutside) {
-		if (this->GetGoal() && this->GetGoal()->Type->BoolFlag[HARVESTFROMOUTSIDE_INDEX].value) {
+		if (this->get_goal() && this->get_goal()->Type->BoolFlag[HARVESTFROMOUTSIDE_INDEX].value) {
 		//Wyrmgus end
-			source = this->GetGoal();
-			this->ClearGoal();
+			source = this->get_goal();
+			this->clear_goal();
 		} else {
 			source = unit.Container;
 		}
@@ -1245,7 +1245,7 @@ int COrder_Resource::StopGathering(CUnit &unit)
 int COrder_Resource::MoveToDepot(CUnit &unit)
 {
 	const std::unique_ptr<wyrmgus::resource_info> &resinfo = unit.Type->ResInfo[this->CurrentResource];
-	CUnit &goal = *this->GetGoal();
+	CUnit &goal = *this->get_goal();
 	CPlayer &player = *unit.Player;
 	Assert(&goal);
 
@@ -1260,7 +1260,7 @@ int COrder_Resource::MoveToDepot(CUnit &unit)
 					if (!table[i]->Removed && table[i]->Type->BoolFlag[BRIDGE_INDEX].value && table[i]->CanMove()) {
 						if (table[i]->CurrentAction() == UnitAction::Still) {
 							CommandStopUnit(*table[i]);
-							CommandMove(*table[i], this->HasGoal() ? this->GetGoal()->tilePos : this->goalPos, FlushCommands, this->HasGoal() ? this->GetGoal()->MapLayer->ID : this->MapLayer);
+							CommandMove(*table[i], this->has_goal() ? this->get_goal()->tilePos : this->goalPos, FlushCommands, this->has_goal() ? this->get_goal()->MapLayer->ID : this->MapLayer);
 						}
 						return 0;
 					}
@@ -1291,7 +1291,7 @@ int COrder_Resource::MoveToDepot(CUnit &unit)
 	if (!goal.IsVisibleAsGoal(player)) {
 		DebugPrint("%d: Worker %d report: Destroyed depot\n" _C_ player.Index _C_ UnitNumber(unit));
 
-		unit.CurrentOrder()->ClearGoal();
+		unit.CurrentOrder()->clear_goal();
 
 		CUnit *depot = FindDeposit(unit, 1000, unit.CurrentResource);
 
@@ -1314,7 +1314,7 @@ int COrder_Resource::MoveToDepot(CUnit &unit)
 		return 0;
 	}
 
-	this->ClearGoal();
+	this->clear_goal();
 	unit.Wait = resinfo->WaitAtDepot;
 
 	// Place unit inside the depot
@@ -1472,7 +1472,7 @@ bool COrder_Resource::WaitInDepot(CUnit &unit)
 				unit.AssignWorkerToMine(*goal);
 				this->Resource.Mine = goal;
 			}
-			this->SetGoal(goal);
+			this->set_goal(goal);
 			this->goalPos.x = this->goalPos.y = -1;
 		} else {
 #ifdef DEBUG
@@ -1526,9 +1526,9 @@ void COrder_Resource::DropResource(CUnit &unit)
 void COrder_Resource::ResourceGiveUp(CUnit &unit)
 {
 	DebugPrint("%d: Worker %d report: Gave up on resource gathering.\n" _C_ unit.Player->Index _C_ UnitNumber(unit));
-	if (this->HasGoal()) {
+	if (this->has_goal()) {
 		DropResource(unit);
-		this->ClearGoal();
+		this->clear_goal();
 	}
 	this->Finished = true;
 }
@@ -1563,7 +1563,7 @@ bool COrder_Resource::FindAnotherResource(CUnit &unit)
 					this->goalPos.x = -1;
 					this->goalPos.y = -1;
 					this->State = SUB_MOVE_TO_RESOURCE;
-					this->SetGoal(newGoal);
+					this->set_goal(newGoal);
 					return true;
 				}
 			} else {
@@ -1595,7 +1595,7 @@ bool COrder_Resource::ActionResourceInit(CUnit &unit)
 	Assert(this->State == SUB_START_RESOURCE);
 
 	this->Range = 0;
-	CUnit *const goal = this->GetGoal();
+	CUnit *const goal = this->get_goal();
 	CUnit *mine = this->Resource.Mine;
 
 	if (mine) {

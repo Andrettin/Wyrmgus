@@ -78,14 +78,14 @@
 
 unsigned SyncHash; /// Hash calculated to find sync failures
 
-void COrder::SetGoal(CUnit *const new_goal)
+void COrder::set_goal(CUnit *const new_goal)
 {
-	this->Goal = new_goal;
+	this->goal = new_goal;
 }
 
-void COrder::ClearGoal()
+void COrder::clear_goal()
 {
-	this->Goal.reset();
+	this->goal.reset();
 }
 
 void COrder::UpdatePathFinderData_NotCalled(PathFinderInput &input)
@@ -164,8 +164,8 @@ bool COrder::OnAiHitUnit(CUnit &unit, CUnit *attacker, int /*damage*/)
 /* virtual */ const Vec2i COrder::GetGoalPos() const
 {
 	const Vec2i invalidPos(-1, -1);
-	if (this->HasGoal()) {
-		return this->GetGoal()->tilePos;
+	if (this->has_goal()) {
+		return this->get_goal()->tilePos;
 	}
 	return invalidPos;
 }
@@ -176,8 +176,8 @@ bool COrder::OnAiHitUnit(CUnit &unit, CUnit *attacker, int /*damage*/)
 */
 /* virtual */ const int COrder::GetGoalMapLayer() const
 {
-	if (this->HasGoal()) {
-		return this->GetGoal()->MapLayer->ID;
+	if (this->has_goal()) {
+		return this->get_goal()->MapLayer->ID;
 	}
 	return 0;
 }

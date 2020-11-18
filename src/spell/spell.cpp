@@ -410,7 +410,7 @@ bool spell::IsUnitValidAutoCastTarget(const CUnit *target, const CUnit &caster, 
 					&& target->CurrentAction() != UnitAction::AttackGround
 					&& target->CurrentAction() != UnitAction::SpellCast
 					)
-				|| target->CurrentOrder()->HasGoal() == false
+				|| target->CurrentOrder()->has_goal() == false
 				|| target->MapDistanceTo(target->CurrentOrder()->GetGoalPos(), target->CurrentOrder()->GetGoalMapLayer()) > react_range
 				) {
 				return false;

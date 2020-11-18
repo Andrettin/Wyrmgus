@@ -71,7 +71,7 @@ std::unique_ptr<COrder> COrder::NewActionUse(CUnit &dest)
 		order->goalPos = dest.tilePos + dest.GetHalfTileSize();
 		order->MapLayer = dest.MapLayer->ID;
 	} else {
-		order->SetGoal(&dest);
+		order->set_goal(&dest);
 		order->Range = 1;
 	}
 	return order;
@@ -87,8 +87,8 @@ void COrder_Use::Save(CFile &file, const CUnit &unit) const
 		file.printf(" \"finished\", ");
 	}
 	file.printf(" \"range\", %d,", this->Range);
-	if (this->HasGoal()) {
-		file.printf(" \"goal\", \"%s\",", UnitReference(this->GetGoal()).c_str());
+	if (this->has_goal()) {
+		file.printf(" \"goal\", \"%s\",", UnitReference(this->get_goal()).c_str());
 	}
 	file.printf(" \"tile\", {%d, %d},", this->goalPos.x, this->goalPos.y);
 	file.printf(" \"map-layer\", %d,", this->MapLayer);
@@ -131,11 +131,11 @@ bool COrder_Use::ParseSpecificData(lua_State *l, int &j, const char *value, cons
 {
 	PixelPos targetPos;
 
-	if (this->HasGoal()) {
-		if (this->GetGoal()->MapLayer != UI.CurrentMapLayer) {
+	if (this->has_goal()) {
+		if (this->get_goal()->MapLayer != UI.CurrentMapLayer) {
 			return lastScreenPos;
 		}
-		targetPos = vp.scaled_map_to_screen_pixel_pos(this->GetGoal()->get_scaled_map_pixel_pos_center());
+		targetPos = vp.scaled_map_to_screen_pixel_pos(this->get_goal()->get_scaled_map_pixel_pos_center());
 	} else {
 		if (this->MapLayer != UI.CurrentMapLayer->ID) {
 			return lastScreenPos;
@@ -156,8 +156,8 @@ bool COrder_Use::ParseSpecificData(lua_State *l, int &j, const char *value, cons
 	input.SetMaxRange(this->Range);
 
 	Vec2i tileSize;
-	if (this->HasGoal()) {
-		CUnit *goal = this->GetGoal();
+	if (this->has_goal()) {
+		CUnit *goal = this->get_goal();
 		tileSize = goal->GetTileSize();
 		input.SetGoal(goal->tilePos, tileSize, goal->MapLayer->ID);
 	} else {
@@ -183,7 +183,7 @@ bool COrder_Use::ParseSpecificData(lua_State *l, int &j, const char *value, cons
 		unit.Anim = unit.WaitBackup;
 		unit.Waiting = 0;
 	}
-	CUnit *goal = this->GetGoal();
+	CUnit *goal = this->get_goal();
 
 	// Reached target
 	if (this->State == State_TargetReached || (goal && goal->Container == &unit) || this == unit.CriticalOrder.get()) {
@@ -296,7 +296,7 @@ bool COrder_Use::ParseSpecificData(lua_State *l, int &j, const char *value, cons
 					if (!table[i]->Removed && table[i]->Type->BoolFlag[BRIDGE_INDEX].value && table[i]->CanMove()) {
 						if (table[i]->CurrentAction() == UnitAction::Still) {
 							CommandStopUnit(*table[i]);
-							CommandMove(*table[i], this->HasGoal() ? this->GetGoal()->tilePos : this->goalPos, FlushCommands, this->HasGoal() ? this->GetGoal()->MapLayer->ID : this->MapLayer);
+							CommandMove(*table[i], this->has_goal() ? this->get_goal()->tilePos : this->goalPos, FlushCommands, this->has_goal() ? this->get_goal()->MapLayer->ID : this->MapLayer);
 						}
 						return;
 					}
@@ -356,8 +356,8 @@ bool COrder_Use::ParseSpecificData(lua_State *l, int &j, const char *value, cons
 					this->Finished = true;
 					return ;
 				} else {
-					if (dest.NewOrder->HasGoal()) {
-						if (dest.NewOrder->GetGoal()->Destroyed) {
+					if (dest.NewOrder->has_goal()) {
+						if (dest.NewOrder->get_goal()->Destroyed) {
 							dest.NewOrder.reset();
 							this->Finished = true;
 							return ;
@@ -382,7 +382,7 @@ bool COrder_Use::ParseSpecificData(lua_State *l, int &j, const char *value, cons
 		DebugPrint("Goal gone\n");
 		this->goalPos = goal->tilePos + goal->GetHalfTileSize();
 		this->MapLayer = goal->MapLayer->ID;
-		this->ClearGoal();
+		this->clear_goal();
 		goal = nullptr;
 	}
 

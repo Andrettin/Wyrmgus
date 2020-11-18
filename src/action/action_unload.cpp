@@ -59,7 +59,7 @@ std::unique_ptr<COrder> COrder::NewActionUnload(const Vec2i &pos, CUnit *what, i
 	order->Landmass = landmass;
 	//Wyrmgus end
 	if (what && !what->Destroyed) {
-		order->SetGoal(what);
+		order->set_goal(what);
 	}
 	return order;
 }
@@ -73,8 +73,8 @@ void COrder_Unload::Save(CFile &file, const CUnit &unit) const
 		file.printf(" \"finished\", ");
 	}
 	file.printf(" \"range\", %d,", this->Range);
-	if (this->HasGoal()) {
-		file.printf(" \"goal\", \"%s\",", UnitReference(this->GetGoal()).c_str());
+	if (this->has_goal()) {
+		file.printf(" \"goal\", \"%s\",", UnitReference(this->get_goal()).c_str());
 	}
 	file.printf(" \"tile\", {%d, %d}, ", this->goalPos.x, this->goalPos.y);
 	//Wyrmgus start
@@ -494,12 +494,12 @@ bool COrder_Unload::LeaveTransporter(CUnit &transporter)
 
 	// Goal is the specific unit unit that you want to unload.
 	// This can be null, in case you want to unload everything.
-	if (this->HasGoal()) {
-		CUnit &goal = *this->GetGoal();
+	if (this->has_goal()) {
+		CUnit &goal = *this->get_goal();
 
 		if (goal.Destroyed) {
 			DebugPrint("destroyed unit unloading?\n");
-			this->ClearGoal();
+			this->clear_goal();
 			return true;
 		}
 		//Wyrmgus start
@@ -510,7 +510,7 @@ bool COrder_Unload::LeaveTransporter(CUnit &transporter)
 //		if (UnloadUnit(transporter, goal)) {
 		if (UnloadUnit(transporter, goal, this->Landmass)) {
 		//Wyrmgus end
-			this->ClearGoal();
+			this->clear_goal();
 		} else {
 			++stillonboard;
 		}
@@ -578,7 +578,7 @@ bool COrder_Unload::LeaveTransporter(CUnit &transporter)
 
 				//Wyrmgus start
 //				if (!ClosestFreeDropZone(unit, this->goalPos, maxSearchRange, &pos)) {
-				if (!ClosestFreeDropZone(unit, this->goalPos, maxSearchRange, &pos, this->MapLayer, this->Landmass, this->GetGoal())) {
+				if (!ClosestFreeDropZone(unit, this->goalPos, maxSearchRange, &pos, this->MapLayer, this->Landmass, this->get_goal())) {
 				//Wyrmgus end
 					this->Finished = true;
 					return ;

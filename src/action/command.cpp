@@ -878,8 +878,8 @@ void CommandDismiss(CUnit &unit, bool salvage)
 			for (size_t i = 0; i != table.size(); ++i) {
 				if (
 					(table[i]->CurrentAction() == UnitAction::Attack || table[i]->CurrentAction() == UnitAction::SpellCast)
-					&& table[i]->CurrentOrder()->HasGoal()
-					&& table[i]->CurrentOrder()->GetGoal() == &unit
+					&& table[i]->CurrentOrder()->has_goal()
+					&& table[i]->CurrentOrder()->get_goal() == &unit
 				) {
 					if (unit.Player->Index == CPlayer::GetThisPlayer()->Index) {
 						CPlayer::GetThisPlayer()->Notify(NotifyRed, unit.tilePos, unit.MapLayer->ID, "%s", _("Cannot salvage if enemies are attacking it."));

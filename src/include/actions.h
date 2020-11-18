@@ -132,10 +132,18 @@ public:
 
 	virtual void UpdatePathFinderData(PathFinderInput &input) = 0;
 
-	bool HasGoal() const { return Goal != nullptr; }
-	CUnit *GetGoal() const { return Goal; };
-	void SetGoal(CUnit *const new_goal);
-	void ClearGoal();
+	bool has_goal() const
+	{
+		return this->goal != nullptr;
+	}
+
+	CUnit *get_goal() const
+	{
+		return this->goal;
+	}
+
+	void set_goal(CUnit *const new_goal);
+	void clear_goal();
 	virtual const Vec2i GetGoalPos() const;
 	//Wyrmgus start
 	virtual const int GetGoalMapLayer() const;
@@ -190,7 +198,7 @@ protected:
 	void UpdatePathFinderData_NotCalled(PathFinderInput &input);
 
 private:
-	wyrmgus::unit_ref Goal;
+	wyrmgus::unit_ref goal;
 public:
 	const UnitAction Action;   /// global action
 	bool Finished = false; /// true when order is finished

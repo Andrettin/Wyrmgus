@@ -92,7 +92,7 @@ void AnimateActionAttack(CUnit &unit, COrder &order)
 		UnitShowAnimation(unit, unit.Type->Animations->Attack);
 	}
 	*/
-	if (unit.get_animation_set() && unit.get_animation_set()->RangedAttack && unit.IsAttackRanged(order.GetGoal(), order.GetGoalPos(), order.GetGoalMapLayer())) {
+	if (unit.get_animation_set() && unit.get_animation_set()->RangedAttack && unit.IsAttackRanged(order.get_goal(), order.GetGoalPos(), order.GetGoalMapLayer())) {
 		UnitShowAnimation(unit, unit.get_animation_set()->RangedAttack.get());
 	} else {
 		if (!unit.get_animation_set() || !unit.get_animation_set()->Attack) {
@@ -113,7 +113,7 @@ std::unique_ptr<COrder> COrder::NewActionAttack(const CUnit &attacker, CUnit &ta
 	order->MapLayer = target.MapLayer->ID;
 	//Wyrmgus end
 	// Removed, Dying handled by action routine.
-	order->SetGoal(&target);
+	order->set_goal(&target);
 	order->Range = attacker.GetModifiedVariable(ATTACKRANGE_INDEX);
 	order->MinRange = attacker.Type->MinAttackRange;
 	if (attacker.Player->AiEnabled && attacker.Variable[SPEED_INDEX].Value > target.Variable[SPEED_INDEX].Value && attacker.GetModifiedVariable(ATTACKRANGE_INDEX) > target.GetModifiedVariable(ATTACKRANGE_INDEX)) { //makes fast AI ranged units move away from slower targets that have smaller range
@@ -182,8 +182,8 @@ void COrder_Attack::Save(CFile &file, const CUnit &unit) const
 	if (this->Finished) {
 		file.printf(" \"finished\", ");
 	}
-	if (this->HasGoal()) {
-		file.printf(" \"goal\", \"%s\",", UnitReference(this->GetGoal()).c_str());
+	if (this->has_goal()) {
+		file.printf(" \"goal\", \"%s\",", UnitReference(this->get_goal()).c_str());
 	}
 	file.printf(" \"tile\", {%d, %d},", this->goalPos.x, this->goalPos.y);
 	//Wyrmgus start
@@ -226,8 +226,8 @@ bool COrder_Attack::ParseSpecificData(lua_State *l, int &j, const char *value, c
 /* virtual */ bool COrder_Attack::IsValid() const
 {
 	if (Action == UnitAction::Attack) {
-		if (this->HasGoal()) {
-			return this->GetGoal()->IsAliveOnMap();
+		if (this->has_goal()) {
+			return this->get_goal()->IsAliveOnMap();
 		} else {
 			return CMap::Map.Info.IsPointOnMap(this->goalPos, this->MapLayer);
 		}
@@ -241,11 +241,11 @@ bool COrder_Attack::ParseSpecificData(lua_State *l, int &j, const char *value, c
 {
 	PixelPos targetPos;
 
-	if (this->HasGoal()) {
-		if (this->GetGoal()->MapLayer != UI.CurrentMapLayer) {
+	if (this->has_goal()) {
+		if (this->get_goal()->MapLayer != UI.CurrentMapLayer) {
 			return lastScreenPos;
 		}
-		targetPos = vp.scaled_map_to_screen_pixel_pos(this->GetGoal()->get_scaled_map_pixel_pos_center());
+		targetPos = vp.scaled_map_to_screen_pixel_pos(this->get_goal()->get_scaled_map_pixel_pos_center());
 	} else {
 		if (this->MapLayer != UI.CurrentMapLayer->ID) {
 			return lastScreenPos;
@@ -263,8 +263,8 @@ bool COrder_Attack::ParseSpecificData(lua_State *l, int &j, const char *value, c
 /* virtual */ void COrder_Attack::UpdatePathFinderData(PathFinderInput &input)
 {
 	Vec2i tileSize;
-	if (this->HasGoal()) {
-		CUnit *goal = this->GetGoal();
+	if (this->has_goal()) {
+		CUnit *goal = this->get_goal();
 		tileSize = goal->GetTileSize();
 		//Wyrmgus start
 //		input.SetGoal(goal->tilePos, tileSize);
@@ -282,7 +282,7 @@ bool COrder_Attack::ParseSpecificData(lua_State *l, int &j, const char *value, c
 	input.SetMinRange(this->MinRange);
 	int distance = this->Range;
 	if (input.GetUnit()->GetModifiedVariable(ATTACKRANGE_INDEX) > 1) {
-		if (!CheckObstaclesBetweenTiles(input.GetUnitPos(), this->HasGoal() ? this->GetGoal()->tilePos : this->goalPos, MapFieldAirUnpassable, this->MapLayer)) {
+		if (!CheckObstaclesBetweenTiles(input.GetUnitPos(), this->has_goal() ? this->get_goal()->tilePos : this->goalPos, MapFieldAirUnpassable, this->MapLayer)) {
 			distance = 1;
 		}
 	}
@@ -299,8 +299,8 @@ bool COrder_Attack::ParseSpecificData(lua_State *l, int &j, const char *value, c
 	//Wyrmgus end
 
 	//Wyrmgus start
-//	FireMissile(unit, this->GetGoal(), this->goalPos);
-	FireMissile(unit, this->GetGoal(), this->goalPos, this->MapLayer);
+//	FireMissile(unit, this->get_goal(), this->goalPos);
+	FireMissile(unit, this->get_goal(), this->goalPos, this->MapLayer);
 	//Wyrmgus end
 	UnHideUnit(unit); // unit is invisible until attacks
 	unit.StepCount = 0;
@@ -308,11 +308,11 @@ bool COrder_Attack::ParseSpecificData(lua_State *l, int &j, const char *value, c
 
 /* virtual */ bool COrder_Attack::OnAiHitUnit(CUnit &unit, CUnit *attacker, int /*damage*/)
 {
-	CUnit *goal = this->GetGoal();
+	CUnit *goal = this->get_goal();
 
 	if (goal) {
 		if (goal->IsAlive() == false) {
-			this->ClearGoal();
+			this->clear_goal();
 			this->goalPos = goal->tilePos;
 			this->MapLayer = goal->MapLayer->ID;
 			return false;
@@ -325,7 +325,7 @@ bool COrder_Attack::ParseSpecificData(lua_State *l, int &j, const char *value, c
 		if (goal->CurrentAction() == UnitAction::Attack && unit.MapDistanceTo(*goal) <= unit.GetModifiedVariable(ATTACKRANGE_INDEX)) {
 		//Wyrmgus end
 			const COrder_Attack &order = *static_cast<COrder_Attack *>(goal->CurrentOrder());
-			if (order.GetGoal() == &unit) {
+			if (order.get_goal() == &unit) {
 				//we already fight with one of attackers;
 				return true;
 			}
@@ -355,7 +355,7 @@ bool COrder_Attack::IsWeakTargetSelected() const
 */
 bool COrder_Attack::CheckForDeadGoal(CUnit &unit)
 {
-	CUnit *goal = this->GetGoal();
+	CUnit *goal = this->get_goal();
 
 	// Position or valid target, it is ok.
 	if (!goal || goal->IsVisibleAsGoal(*unit.Player)) {
@@ -368,7 +368,7 @@ bool COrder_Attack::CheckForDeadGoal(CUnit &unit)
 	this->MapLayer = goal->MapLayer->ID;
 	this->MinRange = 0;
 	this->Range = 0;
-	this->ClearGoal();
+	this->clear_goal();
 
 	// If we have a saved order continue this saved order.
 	if (unit.RestoreOrder()) {
@@ -392,7 +392,7 @@ bool COrder_Attack::CheckForTargetInRange(CUnit &unit)
 	}
 	
 	// No goal: if meeting enemy attack it.
-	if (!this->HasGoal()
+	if (!this->has_goal()
 		&& this->Action != UnitAction::AttackGround
 		//Wyrmgus start
 //		&& !CMap::Map.WallOnMap(this->goalPos)) {
@@ -411,7 +411,7 @@ bool COrder_Attack::CheckForTargetInRange(CUnit &unit)
 			} else {
 				unit.SavedOrder = std::move(saved_order);
 			}
-			this->SetGoal(goal);
+			this->set_goal(goal);
 			this->MinRange = unit.Type->MinAttackRange;
 			if (unit.Player->AiEnabled && unit.Variable[SPEED_INDEX].Value > goal->Variable[SPEED_INDEX].Value && unit.GetModifiedVariable(ATTACKRANGE_INDEX) > goal->GetModifiedVariable(ATTACKRANGE_INDEX)) { //makes fast AI ranged units move away from slower targets that have smaller range
 				this->MinRange = unit.GetModifiedVariable(ATTACKRANGE_INDEX);
@@ -422,8 +422,8 @@ bool COrder_Attack::CheckForTargetInRange(CUnit &unit)
 			this->State |= WEAK_TARGET; // weak target
 		}
 		// Have a weak target, try a better target.
-	} else if (this->HasGoal() && (this->State & WEAK_TARGET || unit.Player->AiEnabled)) {
-		CUnit *goal = this->GetGoal();
+	} else if (this->has_goal() && (this->State & WEAK_TARGET || unit.Player->AiEnabled)) {
+		CUnit *goal = this->get_goal();
 		CUnit *newTarget = AttackUnitsInReactRange(unit);
 
 		if (newTarget && ThreatCalculate(unit, *newTarget) < ThreatCalculate(unit, *goal)) {
@@ -434,7 +434,7 @@ bool COrder_Attack::CheckForTargetInRange(CUnit &unit)
 			if (saved_order != nullptr) {
 				unit.SavedOrder = std::move(saved_order);
 			}
-			this->SetGoal(newTarget);
+			this->set_goal(newTarget);
 			this->goalPos = newTarget->tilePos;
 			this->MapLayer = newTarget->MapLayer->ID;
 			
@@ -460,7 +460,7 @@ void COrder_Attack::MoveToTarget(CUnit &unit)
 	Assert(!unit.Type->BoolFlag[VANISHES_INDEX].value && !unit.Destroyed && !unit.Removed);
 	Assert(unit.CurrentOrder() == this);
 	Assert(unit.CanMove());
-	Assert(this->HasGoal() || CMap::Map.Info.IsPointOnMap(this->goalPos, this->MapLayer));
+	Assert(this->has_goal() || CMap::Map.Info.IsPointOnMap(this->goalPos, this->MapLayer));
 
 	//Wyrmgus start
 	//if is on a moving raft and target is now within range, stop the raft
@@ -470,7 +470,7 @@ void COrder_Attack::MoveToTarget(CUnit &unit)
 		for (size_t i = 0; i != table.size(); ++i) {
 			if (!table[i]->Removed && table[i]->Type->BoolFlag[BRIDGE_INDEX].value && table[i]->CanMove()) {
 				if (table[i]->CurrentAction() == UnitAction::Move) {
-					if ((this->GetGoal() && unit.MapDistanceTo(*this->GetGoal()) <= unit.GetModifiedVariable(ATTACKRANGE_INDEX)) || (!this->HasGoal() && unit.MapDistanceTo(this->goalPos, this->MapLayer) <= unit.GetModifiedVariable(ATTACKRANGE_INDEX))) {
+					if ((this->get_goal() && unit.MapDistanceTo(*this->get_goal()) <= unit.GetModifiedVariable(ATTACKRANGE_INDEX)) || (!this->has_goal() && unit.MapDistanceTo(this->goalPos, this->MapLayer) <= unit.GetModifiedVariable(ATTACKRANGE_INDEX))) {
 						if (CheckObstaclesBetweenTiles(unit.tilePos, goalPos, MapFieldAirUnpassable, MapLayer)) {
 							CommandStopUnit(*table[i]);
 						}
@@ -488,7 +488,7 @@ void COrder_Attack::MoveToTarget(CUnit &unit)
 	}
 
 	// Look if we have reached the target.
-	if (err == 0 && !this->HasGoal()) {
+	if (err == 0 && !this->has_goal()) {
 		// Check if we're in range when attacking a location and we are waiting
 		if (unit.MapDistanceTo(this->goalPos, this->MapLayer) <= unit.GetModifiedVariable(ATTACKRANGE_INDEX)) {
 			if (CheckObstaclesBetweenTiles(unit.tilePos, goalPos, MapFieldAirUnpassable, MapLayer)) {
@@ -503,7 +503,7 @@ void COrder_Attack::MoveToTarget(CUnit &unit)
 		return;
 	}
 	if (err == PF_REACHED) {
-		CUnit *goal = this->GetGoal();
+		CUnit *goal = this->get_goal();
 		// Have reached target? FIXME: could use the new return code?
 		if (goal && unit.MapDistanceTo(*goal) <= unit.GetModifiedVariable(ATTACKRANGE_INDEX)) {
 			if (CheckObstaclesBetweenTiles(unit.tilePos, goalPos, MapFieldAirUnpassable, MapLayer)) {
@@ -567,20 +567,20 @@ void COrder_Attack::MoveToTarget(CUnit &unit)
 				if (!table[i]->Removed && table[i]->Type->BoolFlag[BRIDGE_INDEX].value && table[i]->CanMove()) {
 					if (table[i]->CurrentAction() == UnitAction::Still) {
 						CommandStopUnit(*table[i]);
-						CommandMove(*table[i], this->HasGoal() ? this->GetGoal()->tilePos : this->goalPos, FlushCommands, this->HasGoal() ? this->GetGoal()->MapLayer->ID : this->MapLayer);
+						CommandMove(*table[i], this->has_goal() ? this->get_goal()->tilePos : this->goalPos, FlushCommands, this->has_goal() ? this->get_goal()->MapLayer->ID : this->MapLayer);
 					}
 					return;
 				}
 			}
 		}
 		//Wyrmgus end
-		if (!this->HasGoal()) {
+		if (!this->has_goal()) {
 			// When attack-moving we have to allow a bigger range
 			this->Range++;
 			unit.Wait = 5;
 			return;
 		} else {
-			this->ClearGoal();
+			this->clear_goal();
 		}
 	}
 
@@ -597,7 +597,7 @@ void COrder_Attack::MoveToTarget(CUnit &unit)
 */
 void COrder_Attack::AttackTarget(CUnit &unit)
 {
-	Assert(this->HasGoal() || CMap::Map.Info.IsPointOnMap(this->goalPos, this->MapLayer));
+	Assert(this->has_goal() || CMap::Map.Info.IsPointOnMap(this->goalPos, this->MapLayer));
 
 	AnimateActionAttack(unit, *this);
 	if (unit.Anim.Unbreakable) {
@@ -605,8 +605,8 @@ void COrder_Attack::AttackTarget(CUnit &unit)
 	}
 
 	//Wyrmgus start
-//	if (!this->HasGoal() && (this->Action == UnitAction::AttackGround || CMap::Map.WallOnMap(this->goalPos))) {
-	if (!this->HasGoal() && (this->Action == UnitAction::AttackGround || CMap::Map.WallOnMap(this->goalPos, this->MapLayer))) {
+//	if (!this->has_goal() && (this->Action == UnitAction::AttackGround || CMap::Map.WallOnMap(this->goalPos))) {
+	if (!this->has_goal() && (this->Action == UnitAction::AttackGround || CMap::Map.WallOnMap(this->goalPos, this->MapLayer))) {
 	//Wyrmgus end
 		return;
 	}
@@ -615,7 +615,7 @@ void COrder_Attack::AttackTarget(CUnit &unit)
 	if (CheckForDeadGoal(unit)) {
 		return;
 	}
-	CUnit *goal = this->GetGoal();
+	CUnit *goal = this->get_goal();
 
 	// No target choose one.
 	if (!goal) {
@@ -641,7 +641,7 @@ void COrder_Attack::AttackTarget(CUnit &unit)
 		} else {
 			unit.SavedOrder = std::move(saved_order);
 		}
-		this->SetGoal(goal);
+		this->set_goal(goal);
 		this->goalPos = goal->tilePos;
 		this->MapLayer = goal->MapLayer->ID;
 		this->MinRange = unit.Type->MinAttackRange;
@@ -661,7 +661,7 @@ void COrder_Attack::AttackTarget(CUnit &unit)
 					unit.SavedOrder = this->Clone();
 				}
 				goal = newTarget;
-				this->SetGoal(newTarget);
+				this->set_goal(newTarget);
 				this->goalPos = newTarget->tilePos;
 				this->MapLayer = newTarget->MapLayer->ID;
 				this->MinRange = unit.Type->MinAttackRange;
@@ -738,9 +738,9 @@ void COrder_Attack::AttackTarget(CUnit &unit)
 **
 **  @param unit  Unit, for that the attack is handled.
 */
-/* virtual */ void COrder_Attack::Execute(CUnit &unit)
+void COrder_Attack::Execute(CUnit &unit)
 {
-	Assert(this->HasGoal() || CMap::Map.Info.IsPointOnMap(this->goalPos, this->MapLayer));
+	Assert(this->has_goal() || CMap::Map.Info.IsPointOnMap(this->goalPos, this->MapLayer));
 
 	if (unit.Wait) {
 		if (!unit.Waiting) {
@@ -757,7 +757,7 @@ void COrder_Attack::AttackTarget(CUnit &unit)
 	}
 	
 	//Wyrmgus start
-	if (!unit.CanAttack(true) && !this->HasGoal()) { //if unit is a transporter that can't attack, return false if the original target no longer exists
+	if (!unit.CanAttack(true) && !this->has_goal()) { //if unit is a transporter that can't attack, return false if the original target no longer exists
 		this->Finished = true;
 		return;
 	}
@@ -770,8 +770,8 @@ void COrder_Attack::AttackTarget(CUnit &unit)
 				return;
 			}
 			// Can we already attack ?
-			if (this->HasGoal()) {
-				CUnit &goal = *this->GetGoal();
+			if (this->has_goal()) {
+				CUnit &goal = *this->get_goal();
 				const int dist = goal.MapDistanceTo(unit);
 
 				if (unit.Type->MinAttackRange < dist &&

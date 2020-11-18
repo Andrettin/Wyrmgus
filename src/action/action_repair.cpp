@@ -64,7 +64,7 @@ std::unique_ptr<COrder> COrder::NewActionRepair(CUnit &target)
 		order->goalPos = target.tilePos + target.GetHalfTileSize();
 		order->MapLayer = target.MapLayer->ID;
 	} else {
-		order->SetGoal(&target);
+		order->set_goal(&target);
 		order->ReparableTarget = &target;
 	}
 	return order;
@@ -95,8 +95,8 @@ void COrder_Repair::Save(CFile &file, const CUnit &unit) const
 	if (this->Finished) {
 		file.printf(" \"finished\", ");
 	}
-	if (this->HasGoal()) {
-		file.printf(" \"goal\", \"%s\",", UnitReference(this->GetGoal()).c_str());
+	if (this->has_goal()) {
+		file.printf(" \"goal\", \"%s\",", UnitReference(this->get_goal()).c_str());
 	}
 	file.printf(" \"tile\", {%d, %d},", this->goalPos.x, this->goalPos.y);
 	//Wyrmgus start
@@ -279,7 +279,7 @@ static void AnimateActionRepair(CUnit &unit)
 
 /* virtual */ void COrder_Repair::Execute(CUnit &unit)
 {
-	Assert(this->ReparableTarget == this->GetGoal());
+	Assert(this->ReparableTarget == this->get_goal());
 
 	switch (this->State) {
 		case 0:
@@ -291,7 +291,7 @@ static void AnimateActionRepair(CUnit &unit)
 			int err = DoActionMove(unit);
 			if (!unit.Anim.Unbreakable) {
 				// No goal: if meeting damaged building repair it.
-				CUnit *goal = this->GetGoal();
+				CUnit *goal = this->get_goal();
 
 				if (goal) {
 					if (!goal->IsVisibleAsGoal(*unit.Player)) {
@@ -299,7 +299,7 @@ static void AnimateActionRepair(CUnit &unit)
 						this->goalPos = goal->tilePos + goal->GetHalfTileSize();
 						this->MapLayer = goal->MapLayer->ID;
 						ReparableTarget = nullptr;
-						this->ClearGoal();
+						this->clear_goal();
 						goal = nullptr;
 					}
 				} else if (unit.Player->AiEnabled) {
@@ -331,7 +331,7 @@ static void AnimateActionRepair(CUnit &unit)
 								if (!table[i]->Removed && table[i]->Type->BoolFlag[BRIDGE_INDEX].value && table[i]->CanMove()) {
 									if (table[i]->CurrentAction() == UnitAction::Still) {
 										CommandStopUnit(*table[i]);
-										CommandMove(*table[i], this->HasGoal() ? this->GetGoal()->tilePos : this->goalPos, FlushCommands, this->HasGoal() ? this->GetGoal()->MapLayer->ID : this->MapLayer);
+										CommandMove(*table[i], this->has_goal() ? this->get_goal()->tilePos : this->goalPos, FlushCommands, this->has_goal() ? this->get_goal()->MapLayer->ID : this->MapLayer);
 									}
 									return;
 								}
@@ -351,7 +351,7 @@ static void AnimateActionRepair(CUnit &unit)
 			if (unit.Anim.Unbreakable) {
 				return ;
 			}
-			CUnit *goal = this->GetGoal();
+			CUnit *goal = this->get_goal();
 
 			if (goal) {
 				if (!goal->IsVisibleAsGoal(*unit.Player)) {
@@ -359,7 +359,7 @@ static void AnimateActionRepair(CUnit &unit)
 					this->goalPos = goal->tilePos + goal->GetHalfTileSize();
 					this->MapLayer = goal->MapLayer->ID;
 					// FIXME: should I clear this here?
-					this->ClearGoal();
+					this->clear_goal();
 					ReparableTarget = nullptr;
 					goal = nullptr;
 				} else {

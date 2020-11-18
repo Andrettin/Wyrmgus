@@ -52,7 +52,7 @@
 	const int desty = ParseAnimInt(unit, this->destYStr.c_str());
 	const SpawnMissile_Flags flags = (SpawnMissile_Flags)(ParseAnimFlags(unit, this->flagsStr.c_str()));
 	const int offsetnum = ParseAnimInt(unit, this->offsetNumStr.c_str());
-	const CUnit *goal = flags & SM_RelTarget ? unit.CurrentOrder()->GetGoal() : &unit;
+	const CUnit *goal = flags & SM_RelTarget ? unit.CurrentOrder()->get_goal() : &unit;
 	const int dir = ((goal->Direction + NextDirection / 2) & 0xFF) / NextDirection;
 	const PixelPos moff = goal->Type->MissileOffsets[dir][!offsetnum ? 0 : offsetnum - 1];
 	PixelPos start;
@@ -73,7 +73,7 @@
 		start.y = (goal->tilePos.y + starty) * wyrmgus::defines::get()->get_tile_height() + wyrmgus::defines::get()->get_tile_height() / 2 + moff.y;
 	}
 	if ((flags & SM_ToTarget)) {
-		CUnit *target = goal->CurrentOrder()->GetGoal();
+		CUnit *target = goal->CurrentOrder()->get_goal();
 		if (!target || target->Destroyed) {
 			Assert(!mtype->AlwaysFire || mtype->get_range());
 			if (!target && mtype->AlwaysFire == false) {
@@ -131,7 +131,7 @@
 		if (flags & SM_Damage) {
 			missile->SourceUnit = &unit;
 		}
-		CUnit *target = goal->CurrentOrder()->GetGoal();
+		CUnit *target = goal->CurrentOrder()->get_goal();
 		if (flags & SM_ToTarget && target && target->IsAlive()) {
 			missile->TargetUnit = target;
 		}

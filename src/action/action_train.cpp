@@ -183,7 +183,7 @@ static bool CanHandleOrder(const CUnit &unit, COrder *order)
 			return false;
 		}
 		//  Also check if new unit can harvest this specific resource.
-		CUnit *goal = order->GetGoal();
+		CUnit *goal = order->get_goal();
 		//Wyrmgus start
 //		if (goal && !unit.Type->ResInfo[goal->Type->GivesResource]) {
 		if (goal && !unit.Type->ResInfo[goal->GivesResource]) {

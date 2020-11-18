@@ -166,12 +166,12 @@ private:
 		return;
 	}
 	
-	CUnit *goal = this->GetGoal();
+	CUnit *goal = this->get_goal();
 	if (goal == nullptr) {
 		return;
 	}
 	if (IsTargetInRange(unit)(goal) == false) {
-		this->ClearGoal();
+		this->clear_goal();
 		return;
 	}
 
@@ -434,7 +434,7 @@ bool COrder_Still::AutoAttackStand(CUnit &unit)
 	//Wyrmgus start
 	//if unit is in a container which is attacking, and the container has a goal, use that goal (if possible) instead
 //	CUnit *autoAttackUnit = AttackUnitsInRange(unit);
-	CUnit *autoAttackUnit = unit.Container && unit.Container->CurrentAction() == UnitAction::Attack && unit.Container->CurrentOrder()->HasGoal() ? unit.Container->CurrentOrder()->GetGoal() : AttackUnitsInRange(unit);
+	CUnit *autoAttackUnit = unit.Container && unit.Container->CurrentAction() == UnitAction::Attack && unit.Container->CurrentOrder()->has_goal() ? unit.Container->CurrentOrder()->get_goal() : AttackUnitsInRange(unit);
 	//Wyrmgus end
 
 	if (autoAttackUnit == nullptr) {
@@ -449,7 +449,7 @@ bool COrder_Still::AutoAttackStand(CUnit &unit)
 		return false;
 	}
 	this->State = SUB_STILL_ATTACK; // Mark attacking.
-	this->SetGoal(autoAttackUnit);
+	this->set_goal(autoAttackUnit);
 	//Wyrmgus start
 //	UnitHeadingFromDeltaXY(unit, autoAttackUnit->tilePos + autoAttackUnit->Type->GetHalfTileSize() - unit.tilePos);
 	UnitHeadingFromDeltaXY(unit, PixelSize(PixelSize(autoAttackUnit->tilePos) * wyrmgus::defines::get()->get_tile_size()) + autoAttackUnit->get_half_tile_pixel_size() - PixelSize(PixelSize(unit.tilePos) * wyrmgus::defines::get()->get_tile_size()) - unit.get_half_tile_pixel_size());

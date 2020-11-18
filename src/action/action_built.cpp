@@ -221,7 +221,7 @@ static void Finish(COrder_Built &order, CUnit &unit)
 	std::vector<CUnit *> table;
 	SelectAroundUnit(unit, 2, table);
 	for (size_t i = 0; i != table.size(); ++i) {
-		if (table[i]->CurrentAction() == UnitAction::Repair && table[i]->CurrentOrder()->GetGoal() == &unit) {
+		if (table[i]->CurrentAction() == UnitAction::Repair && table[i]->CurrentOrder()->get_goal() == &unit) {
 			// If we can harvest from the new building, do it.
 			if (type.get_given_resource() != nullptr && table[i]->Type->ResInfo[type.get_given_resource()->get_index()] != nullptr) {
 				CommandResource(*table[i], unit, 0);
@@ -276,7 +276,7 @@ static void Finish(COrder_Built &order, CUnit &unit)
 
 	//Wyrmgus start
 	for (size_t i = 0; i != table.size(); ++i) { // also give experience to all other workers who helped build the structure
-		if (table[i]->CurrentAction() == UnitAction::Repair && table[i]->CurrentOrder()->GetGoal() == &unit) {
+		if (table[i]->CurrentAction() == UnitAction::Repair && table[i]->CurrentOrder()->get_goal() == &unit) {
 			table[i]->ChangeExperience(xp_gained / worker_count);
 		}
 	}
@@ -311,7 +311,7 @@ static void Finish(COrder_Built &order, CUnit &unit)
 			// why play the under-construction sound if the building has just been completed?
 //			PlayUnitSound(unit, wyrmgus::unit_sound_type::construction);
 			for (size_t i = 0; i != table.size(); ++i) { // see if there is a builder/repairer available to give the work completed voice, if the "worker" pointer is null
-				if (table[i]->CurrentAction() == UnitAction::Repair && table[i]->CurrentOrder()->GetGoal() == &unit) {
+				if (table[i]->CurrentAction() == UnitAction::Repair && table[i]->CurrentOrder()->get_goal() == &unit) {
 					if (!type.TerrainType || table[i]->Orders.size() == 1 || table[i]->Orders[1]->Action != UnitAction::Build) { //don't play the work complete sound if building a tile unit and the worker has further build orders, to prevent the voice from repetitively being played after each tile in a series is constructed
 						PlayUnitSound(*table[i], wyrmgus::unit_sound_type::work_completed);
 						break;

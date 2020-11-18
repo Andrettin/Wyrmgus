@@ -7439,7 +7439,7 @@ static void HitUnit_AttackBack(CUnit &attacker, CUnit &target)
 	if (target.CanStoreOrder(target.CurrentOrder())) {
 		saved_order = target.CurrentOrder()->Clone();
 	}
-	CUnit *oldgoal = target.CurrentOrder()->GetGoal();
+	CUnit *oldgoal = target.CurrentOrder()->get_goal();
 	CUnit *goal, *best = oldgoal;
 
 	if (RevealAttacker && CanTarget(*target.Type, *attacker.Type)) {
@@ -7641,7 +7641,7 @@ void HitUnit(CUnit *attacker, CUnit &target, int damage, const Missile *missile,
 
 	const int threshold = 30;
 
-	if (target.Threshold && target.CurrentOrder()->HasGoal() && target.CurrentOrder()->GetGoal() == attacker) {
+	if (target.Threshold && target.CurrentOrder()->has_goal() && target.CurrentOrder()->get_goal() == attacker) {
 		target.Threshold = threshold;
 		return;
 	}
@@ -7979,9 +7979,9 @@ bool CUnit::IsEnemy(const CUnit &unit) const
 
 				if (
 					unit.CurrentAction() == UnitAction::Attack
-					&& unit.CurrentOrder()->HasGoal()
-					&& unit.CurrentOrder()->GetGoal()->Player == this->Player
-					&& !unit.CurrentOrder()->GetGoal()->Type->BoolFlag[HIDDENOWNERSHIP_INDEX].value
+					&& unit.CurrentOrder()->has_goal()
+					&& unit.CurrentOrder()->get_goal()->Player == this->Player
+					&& !unit.CurrentOrder()->get_goal()->Type->BoolFlag[HIDDENOWNERSHIP_INDEX].value
 				) {
 					return true;
 				}

@@ -54,7 +54,7 @@
 				goal = wyrmgus::unit_manager::get()->lastCreatedUnit();
 				break;
 			case 't': // target unit
-				goal = unit.CurrentOrder()->GetGoal();
+				goal = unit.CurrentOrder()->get_goal();
 				break;
 			case 's': // unit self (no use)
 				goal = &unit;

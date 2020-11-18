@@ -170,7 +170,7 @@ bool COrder::ParseGenericData(lua_State *l, int &j, const char *value)
 	} else if (!strcmp(value, "goal")) {
 		++j;
 		lua_rawgeti(l, -1, j + 1);
-		this->SetGoal(CclGetUnitFromRef(l));
+		this->set_goal(CclGetUnitFromRef(l));
 		lua_pop(l, 1);
 	} else {
 		return false;
