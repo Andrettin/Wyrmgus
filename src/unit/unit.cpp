@@ -58,6 +58,7 @@
 #include "map/map.h"
 #include "map/map_layer.h"
 #include "map/site.h"
+#include "map/terrain_type.h"
 #include "map/tile.h"
 #include "map/tileset.h"
 #include "missile.h"
@@ -3800,9 +3801,9 @@ void CUnit::Place(const Vec2i &pos, int z)
 					if (!CMap::Map.Info.IsPointOnMap(x, y, this->MapLayer)) {
 						continue;
 					}
-					Vec2i building_tile_pos(x, y);
+					const QPoint building_tile_pos(x, y);
 					wyrmgus::tile &mf = *this->MapLayer->Field(building_tile_pos);
-					if ((mf.Flags & MapFieldRoad) || (mf.Flags & MapFieldRailroad) || (mf.Flags & MapFieldWall)) {
+					if (mf.get_overlay_terrain() != nullptr && mf.get_overlay_terrain()->is_constructed()) {
 						CMap::Map.RemoveTileOverlayTerrain(building_tile_pos, this->MapLayer->ID);
 					}
 					//remove decorations if a building has been built here

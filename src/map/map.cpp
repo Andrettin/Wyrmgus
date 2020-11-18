@@ -627,20 +627,21 @@ bool CMap::TileBordersBuilding(const Vec2i &pos, int z)
 	return false;
 }
 
-bool CMap::TileBordersPathway(const Vec2i &pos, int z, bool only_railroad)
+bool CMap::tile_borders_pathway(const QPoint &pos, const int z, const bool only_railroad)
 {
 	for (int sub_x = -1; sub_x <= 1; ++sub_x) {
 		for (int sub_y = -1; sub_y <= 1; ++sub_y) {
-			Vec2i adjacent_pos(pos.x + sub_x, pos.y + sub_y);
+			const QPoint adjacent_pos(pos.x() + sub_x, pos.y() + sub_y);
 			if (!this->Info.IsPointOnMap(adjacent_pos, z) || (sub_x == 0 && sub_y == 0)) {
 				continue;
 			}
 			const wyrmgus::tile &mf = *Map.Field(adjacent_pos, z);
+
+			if (mf.get_overlay_terrain() == nullptr || !mf.get_overlay_terrain()->is_pathway()) {
+				continue;
+			}
 			
-			if (
-				(!only_railroad && mf.CheckMask(MapFieldRoad))
-				|| mf.CheckMask(MapFieldRailroad)
-			) {
+			if (!only_railroad || mf.CheckMask(MapFieldRailroad)) {
 				return true;
 			}
 		}
@@ -3016,14 +3017,8 @@ void CMap::generate_missing_terrain(const Vec2i &min_pos, const Vec2i &max_pos, 
 		const wyrmgus::terrain_type *overlay_terrain_type = seed_tile->get_overlay_terrain();
 		const wyrmgus::terrain_feature *terrain_feature = seed_tile->get_terrain_feature();
 
-		if (overlay_terrain_type != nullptr) {
-			if (
-				(overlay_terrain_type->Flags & MapFieldWall)
-				|| (overlay_terrain_type->Flags & MapFieldRoad)
-				|| (overlay_terrain_type->Flags & MapFieldRailroad)
-			) {
-				overlay_terrain_type = nullptr; //don't expand overlay terrain to tiles with empty terrain if the overlay is a wall or pathway
-			}
+		if (overlay_terrain_type != nullptr && overlay_terrain_type->is_constructed()) {
+			overlay_terrain_type = nullptr; //don't expand overlay terrain to tiles with empty terrain if the overlay is a constructed one
 		}
 
 		std::vector<Vec2i> adjacent_positions;

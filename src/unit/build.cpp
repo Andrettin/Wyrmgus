@@ -484,24 +484,25 @@ bool CBuildRestrictionTerrain::Check(const CUnit *builder, const wyrmgus::unit_t
 **
 **  @return      OnTop, parent unit, builder on true or 1 if unit==nullptr, null false.
 */
-CUnit *CanBuildHere(const CUnit *unit, const wyrmgus::unit_type &type, const Vec2i &pos, int z, bool no_bordering_building)
+CUnit *CanBuildHere(const CUnit *unit, const wyrmgus::unit_type &type, const QPoint &pos, const int z, const bool no_bordering_building)
 {
 	//  Can't build outside the map
 	if (!CMap::Map.Info.IsPointOnMap(pos, z)) {
 		return nullptr;
 	}
 
-	if (pos.x + type.get_tile_width() > CMap::Map.Info.MapWidths[z]) {
+	if ((pos.x() + type.get_tile_width()) > CMap::Map.Info.MapWidths[z]) {
 		return nullptr;
 	}
-	if (pos.y + type.get_tile_height() > CMap::Map.Info.MapHeights[z]) {
+	if ((pos.y() + type.get_tile_height()) > CMap::Map.Info.MapHeights[z]) {
 		return nullptr;
 	}
 	
 	if (no_bordering_building && !OnTopDetails(type, nullptr)) { // if a game is starting, only place buildings with a certain space from other buildings
-		for (int x = pos.x - 1; x < pos.x + type.get_tile_width() + 1; ++x) {
-			for (int y = pos.y - 1; y < pos.y + type.get_tile_height() + 1; ++y) {
-				if (CMap::Map.Info.IsPointOnMap(x, y, z) && (CMap::Map.Field(x, y, z)->Flags & MapFieldBuilding)) {
+		for (int x = pos.x() - 1; x < pos.x() + type.get_tile_width() + 1; ++x) {
+			for (int y = pos.y() - 1; y < pos.y() + type.get_tile_height() + 1; ++y) {
+				const QPoint tile_pos(x, y);
+				if (CMap::Map.Info.IsPointOnMap(tile_pos, z) && (CMap::Map.Field(tile_pos, z)->Flags & MapFieldBuilding)) {
 					return nullptr;
 				}
 			}
@@ -614,8 +615,17 @@ bool CanBuildOn(const QPoint &pos, const int mask, const int z, const CPlayer *p
 		return false;
 	}
 
+	const wyrmgus::terrain_type *built_terrain = unit_type->TerrainType;
+
 	//cannot build anything other than pathways on trade routes
-	if (tile->get_terrain_feature() != nullptr && tile->get_terrain_feature()->is_trade_route() && (unit_type->TerrainType == nullptr || !unit_type->TerrainType->is_pathway())) {
+	if (tile->get_terrain_feature() != nullptr && tile->get_terrain_feature()->is_trade_route() && (built_terrain == nullptr || !built_terrain->is_pathway())) {
+		return false;
+	}
+
+	const wyrmgus::terrain_type *overlay_terrain = tile->get_overlay_terrain();
+
+	//can only build a pathway on top of another pathway if the latter has a smaller movement bonus, or if the former is a railroad and the latter isn't
+	if (built_terrain != nullptr && built_terrain->is_pathway() && overlay_terrain != nullptr && overlay_terrain->is_pathway() && built_terrain->get_movement_bonus() <= overlay_terrain->get_movement_bonus() && (!(built_terrain->Flags & MapFieldRailroad) || (tile->get_flags() & MapFieldRailroad))) {
 		return false;
 	}
 
@@ -633,7 +643,7 @@ bool CanBuildOn(const QPoint &pos, const int mask, const int z, const CPlayer *p
 **  @return      OnTop, parent unit, builder on true, null false.
 **
 */
-CUnit *CanBuildUnitType(const CUnit *unit, const wyrmgus::unit_type &type, const Vec2i &pos, int real, bool ignore_exploration, int z, const bool no_bordering_building)
+CUnit *CanBuildUnitType(const CUnit *unit, const wyrmgus::unit_type &type, const QPoint &pos, const int real, const bool ignore_exploration, const int z, const bool no_bordering_building)
 {
 	// Terrain Flags don't matter if building on top of a unit.
 	CUnit *ontop = CanBuildHere(unit, type, pos, z, no_bordering_building);
@@ -658,26 +668,24 @@ CUnit *CanBuildUnitType(const CUnit *unit, const wyrmgus::unit_type &type, const
 		player = unit->Player;
 	}
 	int testmask;
-	unsigned int index = pos.y * CMap::Map.Info.MapWidths[z];
+	unsigned int index = pos.y() * CMap::Map.Info.MapWidths[z];
 	for (int h = 0; h < type.get_tile_height(); ++h) {
 		for (int w = type.get_tile_width(); w--;) {
 			/* first part of if (!CanBuildOn(x + w, y + h, testmask)) */
-			if (!CMap::Map.Info.IsPointOnMap(pos.x + w, pos.y + h, z)) {
-				h = type.get_tile_height();
+			if (!CMap::Map.Info.IsPointOnMap(pos.x() + w, pos.y() + h, z)) {
 				ontop = nullptr;
 				break;
 			}
 			if (player && !real) {
 				//testmask = MapFogFilterFlags(player, x + w, y + h, type.MovementMask);
 				testmask = MapFogFilterFlags(*player,
-											 index + pos.x + w, type.MovementMask, z);
+											 index + pos.x() + w, type.MovementMask, z);
 			} else {
 				testmask = type.MovementMask;
 			}
 			/*second part of if (!CanBuildOn(x + w, y + h, testmask)) */
-			const wyrmgus::tile *tile = CMap::Map.Field(index + pos.x + w, z);
+			const wyrmgus::tile *tile = CMap::Map.Field(index + pos.x() + w, z);
 			if (tile->CheckMask(testmask)) {
-				h = type.get_tile_height();
 				ontop = nullptr;
 				break;
 			}
@@ -685,24 +693,32 @@ CUnit *CanBuildUnitType(const CUnit *unit, const wyrmgus::unit_type &type, const
 //			if (player && !mf.player_info->IsExplored(*player)) {
 			if (player && !ignore_exploration && !tile->player_info->IsTeamExplored(*player)) {
 			//Wyrmgus end
-				h = type.get_tile_height();
 				ontop = nullptr;
 				break;
 			}
 
 			if (player != nullptr && tile->get_owner() != nullptr && tile->get_owner() != player) {
-				h = type.get_tile_height();
 				ontop = nullptr;
 				break;
 			}
 
 			//cannot build anything other than pathways on trade routes
 			if (tile->get_terrain_feature() != nullptr && tile->get_terrain_feature()->is_trade_route() && (type.TerrainType == nullptr || !type.TerrainType->is_pathway())) {
-				h = type.get_tile_height();
+				ontop = nullptr;
+				break;
+			}
+
+			//can only build a pathway on top of another pathway if the latter has a smaller movement bonus
+			if (type.TerrainType != nullptr && type.TerrainType->is_pathway() && tile->get_overlay_terrain() != nullptr && tile->get_overlay_terrain()->is_pathway() && type.TerrainType->get_movement_bonus() <= tile->get_overlay_terrain()->get_movement_bonus()) {
 				ontop = nullptr;
 				break;
 			}
 		}
+
+		if (ontop == nullptr) {
+			break;
+		}
+
 		index += CMap::Map.Info.MapWidths[z];
 	}
 	if (unit) {

@@ -841,7 +841,7 @@ void map_template::apply(const QPoint &template_start_pos, const QPoint &map_sta
 				}
 
 				if (historical_terrain) {
-					if (historical_terrain->is_overlay() && ((historical_terrain->Flags & MapFieldRoad) || (historical_terrain->Flags & MapFieldRailroad)) && !(CMap::Map.Field(real_pos, z)->Flags & MapFieldLandAllowed)) {
+					if (historical_terrain->is_overlay() && historical_terrain->is_pathway() && !(CMap::Map.Field(real_pos, z)->Flags & MapFieldLandAllowed)) {
 						continue;
 					}
 					CMap::Map.Field(real_pos, z)->SetTerrain(historical_terrain);
@@ -1368,10 +1368,8 @@ void map_template::apply_sites(const QPoint &template_start_pos, const QPoint &m
 				if (unit_type == nullptr) {
 					continue;
 				}
-				if (unit_type->TerrainType != nullptr) {
-					if ((unit_type->TerrainType->Flags & MapFieldRoad) || (unit_type->TerrainType->Flags & MapFieldRailroad)) {
-						pathway_type = unit_type;
-					}
+				if (unit_type->TerrainType != nullptr && unit_type->TerrainType->is_pathway()) {
+					pathway_type = unit_type;
 				}
 			}
 		}

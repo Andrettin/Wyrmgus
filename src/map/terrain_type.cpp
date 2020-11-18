@@ -391,6 +391,13 @@ void terrain_type::initialize()
 	data_entry::initialize();
 }
 
+void terrain_type::check() const
+{
+	if (this->movement_bonus >= DefaultTileMovementCost) {
+		throw std::runtime_error("The movement bonus for terrain type \"" + this->get_identifier() + "\" is greater than or equal to the default tile movement cost.");
+	}
+}
+
 void terrain_type::set_character(const char character)
 {
 	if (character == this->get_character()) {

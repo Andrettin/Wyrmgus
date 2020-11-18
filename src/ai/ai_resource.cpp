@@ -2131,7 +2131,7 @@ static void AiCheckPathwayConstruction()
 			continue;
 		}
 
-		if (!unit_type->TerrainType || !AiRequestedTypeAllowed(*AiPlayer->Player, *unit_type)) {
+		if (unit_type->TerrainType == nullptr || !AiRequestedTypeAllowed(*AiPlayer->Player, *unit_type)) {
 			continue;
 		}
 		
@@ -2140,12 +2140,12 @@ static void AiCheckPathwayConstruction()
 			continue;
 		}
 		
-		if ((unit_type->TerrainType->Flags & MapFieldRoad) || (unit_type->TerrainType->Flags & MapFieldRailroad)) {
+		if (unit_type->TerrainType->is_pathway()) {
 			pathway_types.push_back(unit_type);
 		}
 	}
 	
-	if (pathway_types.size() == 0) {
+	if (pathway_types.empty()) {
 		return;
 	}
 	
@@ -2278,17 +2278,7 @@ static void AiCheckPathwayConstruction()
 						continue;
 					}
 						
-					if (
-						(
-							!(mf.Flags & MapFieldRailroad)
-							&& (pathway_types[p]->TerrainType->Flags & MapFieldRailroad)
-						)
-						|| (
-							!(mf.Flags & MapFieldRoad)
-							&& !(mf.Flags & MapFieldRailroad)
-							&& (pathway_types[p]->TerrainType->Flags & MapFieldRoad)
-						)
-					) {
+					if (mf.get_overlay_terrain() == nullptr || pathway_types[p]->TerrainType->get_movement_bonus() > mf.get_overlay_terrain()->get_movement_bonus()) {
 						if (!UnitTypeCanBeAt(*pathway_types[p], pathway_pos, unit.MapLayer->ID) || !CanBuildHere(nullptr, *pathway_types[p], pathway_pos, unit.MapLayer->ID)) {
 							continue;
 						}

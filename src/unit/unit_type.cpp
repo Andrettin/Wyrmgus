@@ -2231,14 +2231,13 @@ void UpdateUnitStats(wyrmgus::unit_type &type, int reset)
 		type.MovementMask |= MapFieldNoBuilding;
 		//Wyrmgus start
 		type.MovementMask |= MapFieldItem;
-		if (type.TerrainType) {
-			if ((type.TerrainType->Flags & MapFieldRailroad) || (type.TerrainType->Flags & MapFieldRoad)) {
+
+		if (type.TerrainType != nullptr) {
+			if (type.TerrainType->Flags & MapFieldRoad) {
 				type.MovementMask |= MapFieldRailroad;
 			}
-			if (type.TerrainType->Flags & MapFieldRoad) {
-				type.MovementMask |= MapFieldRoad;
-			}
 		}
+
 		if (type.BoolFlag[AIRUNPASSABLE_INDEX].value) { // for air unpassable units (i.e. doors)
 			type.FieldFlags |= MapFieldUnpassable;
 			type.FieldFlags |= MapFieldAirUnpassable;

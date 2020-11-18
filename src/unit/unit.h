@@ -833,11 +833,11 @@ extern void DropOutAll(const CUnit &unit);
 /// Return the rule used to build this building.
 extern const CBuildRestrictionOnTop *OnTopDetails(const wyrmgus::unit_type &type, const wyrmgus::unit_type *parent);
 /// @todo more docu
-extern CUnit *CanBuildHere(const CUnit *unit, const wyrmgus::unit_type &type, const Vec2i &pos, int z, bool no_bordering_building = false);
+extern CUnit *CanBuildHere(const CUnit *unit, const wyrmgus::unit_type &type, const QPoint &pos, const int z, const bool no_bordering_building = false);
 /// @todo more docu
 extern bool CanBuildOn(const QPoint &pos, const int mask, const int z, const CPlayer *player, const wyrmgus::unit_type *unit_type);
 /// FIXME: more docu
-extern CUnit *CanBuildUnitType(const CUnit *unit, const wyrmgus::unit_type &type, const Vec2i &pos, int real, bool ignore_exploration, int z, const bool no_bordering_building = false);
+extern CUnit *CanBuildUnitType(const CUnit *unit, const wyrmgus::unit_type &type, const QPoint &pos, const int real, const bool ignore_exploration, const int z, const bool no_bordering_building = false);
 /// Get the suitable animation frame depends of unit's damaged type.
 extern int ExtraDeathIndex(const char *death);
 

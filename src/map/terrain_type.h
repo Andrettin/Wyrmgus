@@ -62,7 +62,8 @@ class terrain_type final : public named_data_entry, public data_type<terrain_typ
 	Q_PROPERTY(bool transition_mask MEMBER transition_mask READ has_transition_mask)
 	Q_PROPERTY(bool allow_single MEMBER allow_single READ allows_single)
 	Q_PROPERTY(bool hidden MEMBER hidden READ is_hidden)
-	Q_PROPERTY(wyrmgus::resource* resource MEMBER resource READ get_resource)
+	Q_PROPERTY(wyrmgus::resource* resource MEMBER resource)
+	Q_PROPERTY(int movement_bonus MEMBER movement_bonus READ get_movement_bonus)
 	Q_PROPERTY(QVariantList base_terrain_types READ get_base_terrain_types_qvariant_list)
 	Q_PROPERTY(QVariantList outer_border_terrain_types READ get_outer_border_terrain_types_qvariant_list)
 	Q_PROPERTY(QVariantList inner_border_terrain_types READ get_inner_border_terrain_types_qvariant_list)
@@ -169,6 +170,7 @@ public:
 	virtual void process_sml_scope(const sml_data &scope) override;
 	virtual void ProcessConfigData(const CConfigData *config_data) override;
 	virtual void initialize() override;
+	virtual void check() const override;
 
 	char get_character() const
 	{
@@ -278,7 +280,6 @@ public:
 
 	bool is_water() const;
 	bool is_wall() const;
-	bool is_road() const;
 	bool is_constructed() const;
 
 	bool has_tiled_background() const
@@ -296,9 +297,14 @@ public:
 		return this->hidden;
 	}
 
-	resource *get_resource() const
+	const resource *get_resource() const
 	{
 		return this->resource;
+	}
+
+	int get_movement_bonus() const
+	{
+		return this->movement_bonus;
 	}
 
 	const std::vector<terrain_type *> &get_base_terrain_types() const
@@ -416,6 +422,7 @@ private:
 	bool transition_mask = false;
 	bool allow_single = false;			/// Whether this terrain type has transitions for single tiles
 	bool hidden = false;
+	int movement_bonus = 0;
 public:
 	unit_type *UnitType = nullptr;
 private:

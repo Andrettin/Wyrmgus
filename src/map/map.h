@@ -263,7 +263,7 @@ public:
 	bool tile_borders_other_settlement_territory(const QPoint &pos, const int z) const;
 	bool tile_borders_other_player_territory(const QPoint &pos, const int z, const int range = 0) const;
 	bool TileBordersBuilding(const Vec2i &pos, int z);
-	bool TileBordersPathway(const Vec2i &pos, int z, bool only_railroad);
+	bool tile_borders_pathway(const QPoint &pos, const int z, const bool only_railroad);
 	bool TileBordersUnit(const Vec2i &pos, int z);
 	bool TileBordersTerrainIncompatibleWithTerrain(const Vec2i &pos, const wyrmgus::terrain_type *terrain_type, const int z) const;
 	bool TileBordersTerrainIncompatibleWithTerrainPair(const Vec2i &pos, const wyrmgus::terrain_type *terrain_type, const wyrmgus::terrain_type *overlay_terrain_type, const int z) const;

@@ -253,6 +253,7 @@ void tile::SetOverlayTerrainDestroyed(bool destroyed)
 	}
 
 	this->OverlayTerrainDestroyed = destroyed;
+	this->update_movement_cost();
 }
 
 void tile::SetOverlayTerrainDamaged(bool damaged)
@@ -685,13 +686,8 @@ bool tile::isAWall() const
 
 void tile::update_movement_cost()
 {
-	if (this->Flags & MapFieldRailroad) {
-		this->movement_cost = DefaultTileMovementCost - 1;
-	} else if (this->Flags & MapFieldRoad) {
-		this->movement_cost = DefaultTileMovementCost - 1;
-	} else {
-		this->movement_cost = DefaultTileMovementCost; // default speed
-	}
+	this->movement_cost = DefaultTileMovementCost; // default speed
+	this->movement_cost -= this->get_top_terrain(false, true)->get_movement_bonus();
 }
 
 CPlayer *tile::get_owner() const
