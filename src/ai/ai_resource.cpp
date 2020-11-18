@@ -2135,7 +2135,6 @@ static void AiCheckPathwayConstruction()
 			continue;
 		}
 		
-		const int resourceNeeded = AiCheckUnitTypeCosts(*unit_type);
 		if (AiPlayer->NeededMask & AiPlayer->Player->GetUnitTypeCostsMask(unit_type)) { //don't request the pathway type if it is going to use up a resource that is currently needed
 			continue;
 		}
@@ -2148,6 +2147,22 @@ static void AiCheckPathwayConstruction()
 	if (pathway_types.empty()) {
 		return;
 	}
+
+	//give priority to pathways that improve movement more, and then to railroad ones
+	std::sort(pathway_types.begin(), pathway_types.begin(), [](const wyrmgus::unit_type *type, const wyrmgus::unit_type *other_type) {
+		const wyrmgus::terrain_type *terrain_type = type->TerrainType;
+		const wyrmgus::terrain_type *other_terrain_type = other_type->TerrainType;
+
+		if (terrain_type->get_movement_bonus() != other_terrain_type->get_movement_bonus()) {
+			return terrain_type->get_movement_bonus() > other_terrain_type->get_movement_bonus();
+		}
+
+		if ((terrain_type->Flags & MapFieldRailroad) != (other_terrain_type->Flags & MapFieldRailroad)) {
+			return static_cast<bool>(terrain_type->Flags & MapFieldRailroad);
+		}
+
+		return type->get_index() < other_type->get_index();
+	});
 	
 	const int n = AiPlayer->Player->GetUnitCount();
 	int k = 0;
@@ -2164,9 +2179,10 @@ static void AiCheckPathwayConstruction()
 	}
 
 	//build roads around buildings
+	static constexpr int max_checked_buildings = 2;
 	int checked_buildings = 0;
 	for (int i = k; i < n; ++i) {
-		CUnit &unit = AiPlayer->Player->GetUnit(i);
+		const CUnit &unit = AiPlayer->Player->GetUnit(i);
 
 		if (!unit.IsAliveOnMap()) {
 			continue;
@@ -2175,164 +2191,128 @@ static void AiCheckPathwayConstruction()
 		bool built_pathway_for_building = false;
 					
 		// Building should have pathways but doesn't?
-		if (
-			unit.Type->BoolFlag[BUILDING_INDEX].value
-			&& unit.CurrentAction() != UnitAction::Built //only build pathways for buildings that have already been constructed
-		) {
-			//
-			// FIXME: Construct pathways only for buildings under control
-			//
-			if (AiEnemyUnitsInDistance(unit, 8, unit.MapLayer->ID)) {
-				continue;
-			}
-			
-			std::vector<Vec2i> pathway_tiles;
-			for (int x = unit.tilePos.x - 1; x < unit.tilePos.x + unit.Type->get_tile_width() + 1; ++x) {
-				for (int y = unit.tilePos.y - 1; y < unit.tilePos.y + unit.Type->get_tile_height() + 1; ++y) {
-					pathway_tiles.push_back(Vec2i(x, y));
-				}
-			}
 
-			if (unit.Type->get_given_resource() != nullptr) { //if is a mine, build pathways to the depot as well
-				const CUnit *depot = FindDepositNearLoc(*unit.Player, unit.tilePos + Vec2i((unit.Type->get_tile_size() - QSize(1, 1)) / 2), 32, unit.GivesResource, unit.MapLayer->ID);
-				if (depot) {
-					//create a worker to test the path; the worker can't be a rail one, or the path construction won't work
-					const wyrmgus::unit_type *worker_type = AiPlayer->Player->get_faction()->get_class_unit_type(wyrmgus::unit_class::get("worker"));
-					if (worker_type != nullptr) {						
-						UnmarkUnitFieldFlags(unit);
-						UnmarkUnitFieldFlags(*depot);
-						
-						CUnit *test_worker = MakeUnitAndPlace(unit.tilePos + Vec2i((unit.Type->get_tile_size() - QSize(1, 1)) / 2), *worker_type, CPlayer::Players[PlayerNumNeutral], unit.MapLayer->ID);
-						char worker_path[64];
-						
-						//make the first path
-						int worker_path_length = AStarFindPath(test_worker->tilePos, depot->tilePos, depot->Type->get_tile_width(), depot->Type->get_tile_height(), test_worker->Type->get_tile_width(), test_worker->Type->get_tile_height(), 0, 1, worker_path, 64, *test_worker, 0, unit.MapLayer->ID, false);
-						Vec2i worker_path_pos(test_worker->tilePos);
-						std::vector<Vec2i> first_path_tiles;
-						while (worker_path_length > 0 && worker_path_length <= 64) {
-							Vec2i pos_change(0, 0);
-							pos_change.x = Heading2X[(int)worker_path[worker_path_length - 1]];
-							pos_change.y = Heading2Y[(int)worker_path[worker_path_length - 1]];
-							worker_path_pos += pos_change;
-							pathway_tiles.push_back(worker_path_pos);
-							if (worker_path_length > 1) {
-								first_path_tiles.push_back(worker_path_pos);
-							}
-							worker_path_length -= 1;
-						}
-						
-						// mark the tiles of the first path (that aren't the first and last tile) as unpassable, so that the second path has to follow a different way
-						for (size_t z = 1; z < first_path_tiles.size(); ++z) {
-							if (!(unit.MapLayer->Field(first_path_tiles[z])->Flags & MapFieldForest) && !(unit.MapLayer->Field(first_path_tiles[z])->Flags & MapFieldRocks) && !(unit.MapLayer->Field(first_path_tiles[z])->Flags & MapFieldWall)) {
-								unit.MapLayer->Field(first_path_tiles[z])->Flags |= MapFieldUnpassable;
-							}
-						}
-						
-						//make the second path
-						worker_path_length = AStarFindPath(test_worker->tilePos, depot->tilePos, depot->Type->get_tile_width(), depot->Type->get_tile_height(), test_worker->Type->get_tile_width(), test_worker->Type->get_tile_height(), 0, 1, worker_path, 64, *test_worker, 0, unit.MapLayer->ID, false);
-						worker_path_pos = test_worker->tilePos;
-						while (worker_path_length > 0 && worker_path_length <= 64) {
-							Vec2i pos_change(0, 0);
-							pos_change.x = Heading2X[(int)worker_path[worker_path_length - 1]];
-							pos_change.y = Heading2Y[(int)worker_path[worker_path_length - 1]];
-							worker_path_pos += pos_change;
-							pathway_tiles.push_back(worker_path_pos);
-							worker_path_length -= 1;
-						}
-						
-						//unmark the tiles of the first path
-						for (size_t z = 1; z < first_path_tiles.size(); ++z) {
-							if (!(unit.MapLayer->Field(first_path_tiles[z])->Flags & MapFieldForest) && !(unit.MapLayer->Field(first_path_tiles[z])->Flags & MapFieldRocks) && !(unit.MapLayer->Field(first_path_tiles[z])->Flags & MapFieldWall)) {
-								unit.MapLayer->Field(first_path_tiles[z])->Flags &= ~(MapFieldUnpassable);
-							}
-						}
-						
-						MarkUnitFieldFlags(unit);
-						MarkUnitFieldFlags(*depot);
-						
-						test_worker->Remove(nullptr);
-						LetUnitDie(*test_worker);
-					}
-				}
-			}
-			
-			for (size_t z = 0; z != pathway_tiles.size(); ++z) {
-				Vec2i pathway_pos(pathway_tiles[z].x, pathway_tiles[z].y);
+		//only build pathways for buildings that have already been constructed
+		if (!unit.Type->BoolFlag[BUILDING_INDEX].value || unit.CurrentAction() == UnitAction::Built) {
+			continue;
+		}
+
+		// FIXME: Construct pathways only for buildings under control
+		if (AiEnemyUnitsInDistance(unit, 8, unit.MapLayer->ID)) {
+			continue;
+		}
+
+		static constexpr int pathway_construction_range = 16;
+
+		std::vector<QPoint> pathway_tiles;
+		for (int x = unit.tilePos.x - pathway_construction_range; x < unit.tilePos.x + unit.Type->get_tile_width() + pathway_construction_range; ++x) {
+			for (int y = unit.tilePos.y - pathway_construction_range; y < unit.tilePos.y + unit.Type->get_tile_height() + pathway_construction_range; ++y) {
+				QPoint pathway_pos(x, y);
+
 				if (!CMap::Map.Info.IsPointOnMap(pathway_pos, unit.MapLayer)) {
 					continue;
 				}
-				wyrmgus::tile &mf = *unit.MapLayer->Field(pathway_pos);
-				if (mf.Flags & MapFieldBuilding) { //this is a tile where the building itself is located, continue
+
+				const wyrmgus::tile *tile = unit.MapLayer->Field(pathway_pos);
+				if (tile->get_flags() & MapFieldBuilding) { //this is a tile where the building itself is located, continue
 					continue;
 				}
-					
-				if (pathway_types.size() == 0) {
-					AiPlayer->LastPathwayConstructionBuilding = UnitNumber(unit);
-					return;
+
+				const bool horizontally_adjacent = (pathway_pos.x() >= (unit.tilePos.x - 1)) && (pathway_pos.x() <= (unit.tilePos.x + unit.Type->get_tile_width()));
+				const bool vertically_adjacent = (pathway_pos.y() >= (unit.tilePos.y - 1)) && (pathway_pos.y() <= (unit.tilePos.y + unit.Type->get_tile_height()));
+
+				//the tile must be either adjacent to the building, or on a trade route
+				if ((!horizontally_adjacent || !vertically_adjacent) && !tile->is_on_trade_route()) {
+					continue;
 				}
 
-				bool built_pathway = false;
-					
-				for (int p = (pathway_types.size()  - 1); p >= 0; --p) {
-					if ((pathway_types[p]->TerrainType->Flags & MapFieldRailroad) && (unit.GivesResource == -1 || !wyrmgus::resource::get_all()[unit.GivesResource]->IsMineResource())) { //build roads around buildings, not railroads (except for mines)
-						continue;
+				pathway_tiles.push_back(std::move(pathway_pos));
+			}
+		}
+
+		std::sort(pathway_tiles.begin(), pathway_tiles.end(), [&unit](const QPoint &pos, const QPoint &other_pos) {
+			return unit.MapDistanceTo(pos, unit.MapLayer->ID) < unit.MapDistanceTo(other_pos, unit.MapLayer->ID);
+		});
+
+		for (const QPoint &pathway_pos : pathway_tiles) {
+			const wyrmgus::tile &mf = *unit.MapLayer->Field(pathway_pos);
+
+			bool built_pathway = false;
+
+			for (size_t p = 0; p < pathway_types.size(); ++p) {
+				const wyrmgus::unit_type *pathway_type = pathway_types[p];
+
+				if ((pathway_type->TerrainType->Flags & MapFieldRailroad) && (unit.GivesResource == -1 || !wyrmgus::resource::get_all()[unit.GivesResource]->IsMineResource())) { //build roads around buildings, not railroads (except for mines)
+					continue;
+				}
+
+				if (mf.get_overlay_terrain() != nullptr && pathway_type->TerrainType->get_movement_bonus() <= mf.get_overlay_terrain()->get_movement_bonus()) {
+					continue;
+				}
+
+				if (!UnitTypeCanBeAt(*pathway_type, pathway_pos, unit.MapLayer->ID) || !CanBuildHere(nullptr, *pathway_type, pathway_pos, unit.MapLayer->ID)) {
+					continue;
+				}
+
+				const int resource_needed = AiCheckUnitTypeCosts(*pathway_type);
+				if (resource_needed != 0) { //if no longer has the resource, or if the resource is already needed, don't build this pathway type
+					wyrmgus::vector::remove(pathway_types, pathway_type);
+
+					if (pathway_types.empty()) {
+						AiPlayer->LastPathwayConstructionBuilding = UnitNumber(unit);
+						return;
 					}
-						
-					if (mf.get_overlay_terrain() == nullptr || pathway_types[p]->TerrainType->get_movement_bonus() > mf.get_overlay_terrain()->get_movement_bonus()) {
-						if (!UnitTypeCanBeAt(*pathway_types[p], pathway_pos, unit.MapLayer->ID) || !CanBuildHere(nullptr, *pathway_types[p], pathway_pos, unit.MapLayer->ID)) {
-							continue;
-						}
-							
-						const int resourceNeeded = AiCheckUnitTypeCosts(*pathway_types[p]);
-						if (resourceNeeded) { //if no longer has the resource, or if the resource is already needed, don't build this pathway type
-							pathway_types.erase(std::remove(pathway_types.begin(), pathway_types.end(), pathway_types[p]), pathway_types.end());
-							continue;
-						}
-						//
-						// Find a free worker, who can build pathways for this building
-						//
-						for (const wyrmgus::unit_type *builder_type : AiHelpers.get_builders(pathway_types[p])) {
-							//
-							// The type is available
-							//
-							if (AiPlayer->Player->GetUnitTypeAiActiveCount(builder_type)) {
-								if (AiBuildBuilding(*builder_type, *pathway_types[p], pathway_pos, unit.MapLayer->ID)) {
-									built_pathway = true;
-									built_pathway_for_building = true;
-									break;
-								}
-							}
-						}
 
-						if (!built_pathway && AiPlayer->Player->get_faction() != nullptr) {
-							for (const wyrmgus::unit_class *builder_class : AiHelpers.get_builder_classes(pathway_types[p]->get_unit_class())) {
-								const wyrmgus::unit_type *builder_type = AiPlayer->Player->get_faction()->get_class_unit_type(builder_class);
+					--p;
+					continue;
+				}
 
-								if (builder_type == nullptr) {
-									continue;
-								}
-
-								if (AiPlayer->Player->GetUnitTypeAiActiveCount(builder_type)) {
-									if (AiBuildBuilding(*builder_type, *pathway_types[p], pathway_pos, unit.MapLayer->ID)) {
-										built_pathway = true;
-										built_pathway_for_building = true;
-										break;
-									}
-								}
-							}
+				//
+				// Find a free worker, who can build pathways for this building
+				//
+				for (const wyrmgus::unit_type *builder_type : AiHelpers.get_builders(pathway_type)) {
+					//
+					// The type is available
+					//
+					if (AiPlayer->Player->GetUnitTypeAiActiveCount(builder_type)) {
+						if (AiBuildBuilding(*builder_type, *pathway_type, pathway_pos, unit.MapLayer->ID)) {
+							built_pathway = true;
+							built_pathway_for_building = true;
+							break;
 						}
-					}
-					if (built_pathway) {
-						break;
 					}
 				}
-			}
 
-			checked_buildings += 1;
-			if (built_pathway_for_building || checked_buildings >= 2) { //don't check too many buildings at once, for performance reasons; and stop if succeeded in building a pathway for a building, so that we can check again the next time if that building still needs pathways
-				AiPlayer->LastPathwayConstructionBuilding = UnitNumber(unit);
-				return;
+				if (!built_pathway && AiPlayer->Player->get_faction() != nullptr) {
+					for (const wyrmgus::unit_class *builder_class : AiHelpers.get_builder_classes(pathway_type->get_unit_class())) {
+						const wyrmgus::unit_type *builder_type = AiPlayer->Player->get_faction()->get_class_unit_type(builder_class);
+
+						if (builder_type == nullptr) {
+							continue;
+						}
+
+						if (AiPlayer->Player->GetUnitTypeAiActiveCount(builder_type)) {
+							if (AiBuildBuilding(*builder_type, *pathway_type, pathway_pos, unit.MapLayer->ID)) {
+								built_pathway = true;
+								built_pathway_for_building = true;
+								break;
+							}
+						}
+					}
+				}
+
+				if (built_pathway) {
+					break;
+				}
 			}
+		}
+
+		++checked_buildings;
+
+		if (built_pathway_for_building || checked_buildings >= max_checked_buildings) {
+			//don't check too many buildings at once, for performance reasons; and stop if succeeded in building a pathway for a building, so that we can check again the next time if that building still needs pathways
+			AiPlayer->LastPathwayConstructionBuilding = UnitNumber(unit);
+			return;
 		}
 	}
 		
