@@ -3248,7 +3248,7 @@ void CMap::generate_settlement_territories(const int z)
 		}
 	}
 
-	this->calculate_settlement_territory_border_tiles(z);
+	this->calculate_settlement_territory_tiles(z);
 
 	//update the settlement of all buildings, as settlement territories have changed
 	for (const CPlayer *player : CPlayer::Players) {
@@ -3340,25 +3340,32 @@ wyrmgus::point_set CMap::expand_settlement_territories(std::vector<QPoint> &&see
 	return blocked_seeds;
 }
 
-void CMap::calculate_settlement_territory_border_tiles(const int z)
+void CMap::calculate_settlement_territory_tiles(const int z)
 {
 	for (const CUnit *site_unit : this->settlement_units) {
 		if (site_unit->MapLayer->ID != z) {
 			continue;
 		}
 
-		site_unit->settlement->clear_border_tiles();
+		site_unit->settlement->clear_tiles();
 	}
 
 	for (int x = 0; x < this->Info.MapWidths[z]; ++x) {
 		for (int y = 0; y < this->Info.MapHeights[z]; ++y) {
 			const QPoint tile_pos(x, y);
+			const wyrmgus::tile *tile = this->Field(x, y, z);
+			wyrmgus::site *settlement = tile->get_settlement();
+
+			if (settlement == nullptr) {
+				continue;
+			}
+
 			if (this->tile_borders_other_settlement_territory(tile_pos, z)) {
-				const wyrmgus::tile *tile = this->Field(x, y, z);
-				wyrmgus::site *settlement = tile->get_settlement();
-				if (settlement != nullptr) {
-					settlement->add_border_tile(tile_pos);
-				}
+				settlement->add_border_tile(tile_pos);
+			}
+
+			if (tile->is_on_trade_route()) {
+				settlement->add_trade_route_tile(tile_pos);
 			}
 		}
 	}

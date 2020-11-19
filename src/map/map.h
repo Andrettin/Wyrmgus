@@ -203,7 +203,7 @@ public:
 	void generate_missing_terrain(const Vec2i &min_pos, const Vec2i &max_pos, const int z);
 	void generate_settlement_territories(const int z);
 	wyrmgus::point_set expand_settlement_territories(std::vector<QPoint> &&seeds, const int z, const int block_flags = 0, const int same_flags = 0);
-	void calculate_settlement_territory_border_tiles(const int z);
+	void calculate_settlement_territory_tiles(const int z);
 	void GenerateNeutralUnits(wyrmgus::unit_type *unit_type, int quantity, const Vec2i &min_pos, const Vec2i &max_pos, bool grouped, int z);
 	//Wyrmgus end
 

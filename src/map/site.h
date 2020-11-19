@@ -125,7 +125,7 @@ public:
 	{
 		this->owner = nullptr;
 		this->site_unit = nullptr;
-		this->clear_border_tiles();
+		this->clear_tiles();
 		this->map_pos = QPoint(-1, -1);
 		this->map_layer = nullptr;
 	}
@@ -208,6 +208,12 @@ public:
 		this->map_layer = map_layer;
 	}
 
+	void clear_tiles()
+	{
+		this->clear_border_tiles();
+		this->clear_trade_route_tiles();
+	}
+
 	void add_border_tile(const QPoint &tile_pos)
 	{
 		this->border_tiles.push_back(tile_pos);
@@ -236,6 +242,21 @@ public:
 
 	void update_border_tiles();
 	void update_minimap_territory();
+
+	const std::vector<QPoint> &get_trade_route_tiles() const
+	{
+		return this->trade_route_tiles;
+	}
+
+	void add_trade_route_tile(const QPoint &tile_pos)
+	{
+		this->trade_route_tiles.push_back(tile_pos);
+	}
+
+	void clear_trade_route_tiles()
+	{
+		this->trade_route_tiles.clear();
+	}
 
 	const std::vector<faction *> &get_cores() const
 	{
@@ -315,6 +336,7 @@ private:
 	const CMapLayer *map_layer = nullptr;
 	std::vector<QPoint> border_tiles; //the tiles for this settlement which border the territory of another settlement
 	QRect territory_rect; //the territory rectangle of the site
+	std::vector<QPoint> trade_route_tiles; //the tiles containing a trade route in this settlement's territory
 
 	friend static int ::CclDefineSite(lua_State *l);
 };
