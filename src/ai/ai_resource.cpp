@@ -2123,7 +2123,7 @@ static bool build_pathway_for_pos(const QPoint &pathway_pos, const CMapLayer *ma
 			continue;
 		}
 
-		if (!UnitTypeCanBeAt(*pathway_type, pathway_pos, unit.MapLayer->ID) || !CanBuildHere(nullptr, *pathway_type, pathway_pos, unit.MapLayer->ID)) {
+		if (!UnitTypeCanBeAt(*pathway_type, pathway_pos, map_layer->ID) || !CanBuildHere(nullptr, *pathway_type, pathway_pos, map_layer->ID)) {
 			continue;
 		}
 
@@ -2143,7 +2143,7 @@ static bool build_pathway_for_pos(const QPoint &pathway_pos, const CMapLayer *ma
 			// The type is available
 			//
 			if (AiPlayer->Player->GetUnitTypeAiActiveCount(builder_type)) {
-				if (AiBuildBuilding(*builder_type, *pathway_type, pathway_pos, unit.MapLayer->ID)) {
+				if (AiBuildBuilding(*builder_type, *pathway_type, pathway_pos, map_layer->ID)) {
 					return true;
 				}
 			}
@@ -2158,7 +2158,7 @@ static bool build_pathway_for_pos(const QPoint &pathway_pos, const CMapLayer *ma
 				}
 
 				if (AiPlayer->Player->GetUnitTypeAiActiveCount(builder_type)) {
-					if (AiBuildBuilding(*builder_type, *pathway_type, pathway_pos, unit.MapLayer->ID)) {
+					if (AiBuildBuilding(*builder_type, *pathway_type, pathway_pos, map_layer->ID)) {
 						return true;
 					}
 				}
