@@ -2197,7 +2197,8 @@ static void AiCheckPathwayConstruction()
 			continue;
 		}
 		
-		if (AiPlayer->NeededMask & AiPlayer->Player->GetUnitTypeCostsMask(unit_type)) { //don't request the pathway type if it is going to use up a resource that is currently needed
+		if (AiPlayer->NeededMask & AiPlayer->Player->GetUnitTypeCostsMask(unit_type)) {
+			//don't request the pathway type if it is going to use up a resource that is currently needed
 			continue;
 		}
 		
@@ -2243,6 +2244,7 @@ static void AiCheckPathwayConstruction()
 	//build roads around buildings
 	static constexpr int max_checked_buildings = 2;
 	int checked_buildings = 0;
+
 	for (int i = k; i < n; ++i) {
 		const CUnit &unit = AiPlayer->Player->GetUnit(i);
 
@@ -2250,7 +2252,7 @@ static void AiCheckPathwayConstruction()
 			continue;
 		}
 
-		// Building should have pathways but doesn't?
+		//building should have pathways but doesn't?
 
 		//only build pathways for buildings that have already been constructed
 		if (!unit.Type->BoolFlag[BUILDING_INDEX].value || unit.CurrentAction() == UnitAction::Built) {
@@ -2262,11 +2264,9 @@ static void AiCheckPathwayConstruction()
 			continue;
 		}
 
-		static constexpr int pathway_construction_range = 16;
-
 		std::vector<QPoint> pathway_tiles;
-		for (int x = unit.tilePos.x - pathway_construction_range; x < unit.tilePos.x + unit.Type->get_tile_width() + pathway_construction_range; ++x) {
-			for (int y = unit.tilePos.y - pathway_construction_range; y < unit.tilePos.y + unit.Type->get_tile_height() + pathway_construction_range; ++y) {
+		for (int x = unit.tilePos.x - 1; x < unit.tilePos.x + unit.Type->get_tile_width() + 1; ++x) {
+			for (int y = unit.tilePos.y - 1; y < unit.tilePos.y + unit.Type->get_tile_height() + 1; ++y) {
 				QPoint pathway_pos(x, y);
 
 				if (!CMap::Map.Info.IsPointOnMap(pathway_pos, unit.MapLayer)) {
@@ -2278,17 +2278,20 @@ static void AiCheckPathwayConstruction()
 					continue;
 				}
 
-				const bool horizontally_adjacent = (pathway_pos.x() >= (unit.tilePos.x - 1)) && (pathway_pos.x() <= (unit.tilePos.x + unit.Type->get_tile_width()));
-				const bool vertically_adjacent = (pathway_pos.y() >= (unit.tilePos.y - 1)) && (pathway_pos.y() <= (unit.tilePos.y + unit.Type->get_tile_height()));
-
-				//the tile must be either adjacent to the building, or on a trade route
-				if ((!horizontally_adjacent || !vertically_adjacent) && !tile->is_on_trade_route()) {
-					continue;
-				}
-
 				pathway_tiles.push_back(std::move(pathway_pos));
 			}
 		}
+
+		static constexpr int pathway_construction_range = 8;
+		const wyrmgus::site *settlement = unit.get_center_tile()->get_settlement();
+		if (settlement != nullptr) {
+			for (const QPoint &pathway_pos : settlement->get_trade_route_tiles()) {
+				if (unit.MapDistanceTo(pathway_pos, unit.MapLayer->ID) <= pathway_construction_range) {
+					pathway_tiles.push_back(pathway_pos);
+				}
+			}
+		}
+
 
 		std::sort(pathway_tiles.begin(), pathway_tiles.end(), [&unit](const QPoint &pos, const QPoint &other_pos) {
 			return unit.MapDistanceTo(pos, unit.MapLayer->ID) < unit.MapDistanceTo(other_pos, unit.MapLayer->ID);
@@ -2330,7 +2333,7 @@ void AiCheckSettlementConstruction()
 		return;
 	}
 
-	if (AiPlayer->Player->Faction == -1) {
+	if (AiPlayer->Player->get_faction() == nullptr) {
 		return;
 	}
 
