@@ -61,7 +61,6 @@ namespace wyrmgus {
 	class time_of_day;
 	class unique_item;
 	class unit_manager;
-	class unit_ref;
 	class unit_type;
 	class unit_type_variation;
 	enum class gender;

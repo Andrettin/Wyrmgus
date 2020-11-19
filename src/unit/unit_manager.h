@@ -40,7 +40,9 @@ public:
 	unit_manager();
 	~unit_manager();
 
-	void Init();
+	void init();
+
+	void clean_units();
 
 	CUnit *AllocUnit();
 	void ReleaseUnit(CUnit *unit);

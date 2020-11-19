@@ -8131,27 +8131,8 @@ bool CUnit::IsAttackRanged(CUnit *goal, const Vec2i &goalPos, int z)
 void InitUnits()
 {
 	if (!SaveGameLoading) {
-		wyrmgus::unit_manager::get()->Init();
+		wyrmgus::unit_manager::get()->init();
 	}
-}
-
-static void clean_unit(CUnit *unit)
-{
-	if (unit == nullptr) {
-		throw std::runtime_error("Error cleaning unit: unit is null.");
-	}
-
-	if (unit->Type == nullptr) {
-		throw std::runtime_error("Unit \"" + std::to_string(UnitNumber(*unit)) + "\"'s type is null.");
-	}
-
-	if (!unit->Destroyed) {
-		if (!unit->Removed) {
-			unit->Remove(nullptr);
-		}
-		UnitClearOrders(*unit);
-	}
-	unit->Release(true);
 }
 
 /**
@@ -8159,18 +8140,7 @@ static void clean_unit(CUnit *unit)
 */
 void CleanUnits()
 {
-	//  Free memory for all units in unit table.
-	const std::vector<CUnit *> units = wyrmgus::unit_manager::get()->get_units();
-
-	for (CUnit *unit : units) {
-		try {
-			clean_unit(unit);
-		} catch (const std::exception &exception) {
-			wyrmgus::exception::report(exception);
-		}
-	}
-
-	wyrmgus::unit_manager::get()->Init();
+	wyrmgus::unit_manager::get()->clean_units();
 
 	HelpMeLastCycle = 0;
 }

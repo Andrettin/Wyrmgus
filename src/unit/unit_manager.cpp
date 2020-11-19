@@ -30,10 +30,11 @@
 //Wyrmgus start
 #include "character.h"
 //Wyrmgus end
-#include "unit/unit_manager.h"
-#include "unit/unit.h"
 #include "iolib.h"
 #include "script.h"
+#include "unit/unit_manager.h"
+#include "unit/unit.h"
+#include "util/exception_util.h"
 
 namespace wyrmgus {
 
@@ -48,12 +49,50 @@ unit_manager::~unit_manager()
 /**
 **  Initial memory allocation for units.
 */
-void unit_manager::Init()
+void unit_manager::init()
 {
 	this->lastCreated = nullptr;
 	this->units.clear();
 	this->released_units.clear();
 	this->unit_slots.clear();
+}
+
+void unit_manager::clean_units()
+{
+	//copy the vector, as clearing the orders of units may cause one of them to be released, thus changing the vector
+	std::vector<CUnit *> units = this->get_units();
+
+	for (CUnit *unit : units) {
+		if (unit == nullptr) {
+			throw std::runtime_error("Error cleaning unit: unit is null.");
+		}
+
+		if (unit->Type == nullptr) {
+			throw std::runtime_error("Unit \"" + std::to_string(UnitNumber(*unit)) + "\"'s type is null.");
+		}
+
+		if (!unit->Destroyed) {
+			if (!unit->Removed) {
+				unit->Remove(nullptr);
+			}
+
+			//clear orders of all units, removing remaining references to existing units
+			UnitClearOrders(*unit);
+		}
+	}
+
+	//copy the vector, because releasing units can remove them from the list
+	units = this->get_units();
+
+	for (CUnit *unit : units) {
+		try {
+			unit->Release(true);
+		} catch (const std::exception &exception) {
+			exception::report(exception);
+		}
+	}
+
+	this->init();
 }
 
 /**
@@ -178,7 +217,7 @@ void unit_manager::Save(CFile &file) const
 
 void unit_manager::Load(lua_State *l)
 {
-	Init();
+	this->init();
 	if (lua_gettop(l) != 2) {
 		return;
 	}

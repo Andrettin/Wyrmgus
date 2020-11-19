@@ -2265,6 +2265,7 @@ static void AiCheckPathwayConstruction()
 		}
 
 		std::vector<QPoint> pathway_tiles;
+
 		for (int x = unit.tilePos.x - 1; x < unit.tilePos.x + unit.Type->get_tile_width() + 1; ++x) {
 			for (int y = unit.tilePos.y - 1; y < unit.tilePos.y + unit.Type->get_tile_height() + 1; ++y) {
 				QPoint pathway_pos(x, y);
@@ -2291,7 +2292,6 @@ static void AiCheckPathwayConstruction()
 				}
 			}
 		}
-
 
 		std::sort(pathway_tiles.begin(), pathway_tiles.end(), [&unit](const QPoint &pos, const QPoint &other_pos) {
 			return unit.MapDistanceTo(pos, unit.MapLayer->ID) < unit.MapDistanceTo(other_pos, unit.MapLayer->ID);

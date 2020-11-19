@@ -758,7 +758,7 @@ void stratagusMain(int argc, char **argv)
 
 	NumPlayers = 0;
 
-	wyrmgus::unit_manager::get()->Init();	// Units memory management
+	wyrmgus::unit_manager::get()->init();	// Units memory management
 	PreMenuSetup();		// Load everything needed for menus
 
 	try {
