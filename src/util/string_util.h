@@ -227,6 +227,8 @@ inline std::string get_plural_form(const std::string &str)
 	return result;
 }
 
+std::string get_indefinite_article(const std::string &str);
+
 inline std::string snake_case_to_pascal_case(const std::string &str)
 {
 	if (str.empty()) {
