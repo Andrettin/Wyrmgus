@@ -2333,7 +2333,12 @@ void CPlayer::on_available_quests_changed()
 			button->Hint = "Quest: " + quest->get_name();
 			button->Description = quest->get_description() + "\n \nObjectives:";
 			for (const auto &objective : quest->get_objectives()) {
-				button->Description += "\n- " + objective->get_objective_string();
+				button->Description += "\n- ";
+				if (!objective->get_objective_string().empty()) {
+					button->Description += objective->get_objective_string();
+				} else {
+					button->Description += objective->generate_objective_string(this);
+				}
 			}
 			for (const std::string &objective_string : quest->get_objective_strings()) {
 				button->Description += "\n" + objective_string;
@@ -2519,7 +2524,7 @@ bool CPlayer::can_accept_quest(const wyrmgus::quest *quest) const
 	int recruit_heroes_quantity = 0;
 	for (const auto &objective : quest->get_objectives()) {
 		if (objective->get_objective_type() == wyrmgus::objective_type::build_units) {
-			std::vector<wyrmgus::unit_type *> unit_types = objective->UnitTypes;
+			std::vector<const wyrmgus::unit_type *> unit_types = objective->UnitTypes;
 
 			for (const wyrmgus::unit_class *unit_class : objective->get_unit_classes()) {
 				wyrmgus::unit_type *unit_type = this->get_faction()->get_class_unit_type(unit_class);
@@ -2561,7 +2566,7 @@ bool CPlayer::can_accept_quest(const wyrmgus::quest *quest) const
 					}
 						
 					if (second_objective->get_objective_type() == wyrmgus::objective_type::build_units) {
-						std::vector<wyrmgus::unit_type *> unit_types = second_objective->UnitTypes;
+						std::vector<const wyrmgus::unit_type *> unit_types = second_objective->UnitTypes;
 
 						for (const wyrmgus::unit_class *unit_class : second_objective->get_unit_classes()) {
 							wyrmgus::unit_type *unit_type = this->get_faction()->get_class_unit_type(unit_class);
@@ -2689,7 +2694,7 @@ std::string CPlayer::check_quest_failure(const wyrmgus::quest *quest) const
 		}
 		if (quest_objective->get_objective_type() == wyrmgus::objective_type::build_units) {
 			if (objective->Counter < quest_objective->get_quantity()) {
-				std::vector<wyrmgus::unit_type *> unit_types = quest_objective->UnitTypes;
+				std::vector<const wyrmgus::unit_type *> unit_types = quest_objective->UnitTypes;
 
 				for (const wyrmgus::unit_class *unit_class : quest_objective->get_unit_classes()) {
 					wyrmgus::unit_type *unit_type = this->get_faction()->get_class_unit_type(unit_class);
@@ -2737,7 +2742,7 @@ std::string CPlayer::check_quest_failure(const wyrmgus::quest *quest) const
 						}
 						
 						if (second_quest_objective->get_objective_type() == wyrmgus::objective_type::build_units) {
-							std::vector<wyrmgus::unit_type *> unit_types = second_quest_objective->UnitTypes;
+							std::vector<const wyrmgus::unit_type *> unit_types = second_quest_objective->UnitTypes;
 
 							for (const wyrmgus::unit_class *unit_class : second_quest_objective->get_unit_classes()) {
 								wyrmgus::unit_type *unit_type = this->get_faction()->get_class_unit_type(unit_class);

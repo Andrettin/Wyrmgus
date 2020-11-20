@@ -27,6 +27,7 @@
 
 #pragma once
 
+class CPlayer;
 class CUpgrade;
 struct lua_State;
 
@@ -78,6 +79,9 @@ public:
 	{
 		return this->objective_string;
 	}
+
+	std::string generate_objective_string(const CPlayer *player) const;
+	std::string get_unit_type_objective_string(const unit_type *unit_type, const CPlayer *player, bool &first) const;
 
 	const std::vector<const unit_class *> &get_unit_classes() const
 	{

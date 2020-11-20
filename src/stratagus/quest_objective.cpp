@@ -35,6 +35,8 @@
 #include "objective_type.h"
 #include "quest.h"
 #include "unit/unit_class.h"
+#include "unit/unit_type.h"
+#include "util/string_util.h"
 
 namespace wyrmgus {
 
@@ -61,6 +63,12 @@ void quest_objective::process_sml_property(const sml_property &property)
 		this->faction = faction::get(value);
 	} else if (key == "character") {
 		this->character = character::get(value);
+	} else if (key == "unit_class") {
+		this->unit_classes.clear();
+		this->unit_classes.push_back(unit_class::get(value));
+	} else if (key == "unit_type") {
+		this->UnitTypes.clear();
+		this->UnitTypes.push_back(unit_type::get(value));
 	} else {
 		throw std::runtime_error("Invalid quest objective property: \"" + key + "\".");
 	}
@@ -85,6 +93,69 @@ void quest_objective::check() const
 	if (this->get_objective_type() == objective_type::build_units && this->UnitTypes.empty() && this->get_unit_classes().empty()) {
 		throw std::runtime_error("Build units quest objective has neither unit types nor unit classes set for it.");
 	}
+}
+
+std::string quest_objective::generate_objective_string(const CPlayer *player) const
+{
+	std::string objective_str;
+
+	switch (this->get_objective_type()) {
+		case objective_type::build_units: {
+			bool first = true;
+
+			for (const unit_class *unit_class : this->get_unit_classes()) {
+				const unit_type *unit_type = player->get_class_unit_type(unit_class);
+
+				if (unit_type == nullptr) {
+					continue;
+				}
+
+				objective_str += this->get_unit_type_objective_string(unit_type, player, first);
+			}
+
+			for (const unit_type *unit_type : this->UnitTypes) {
+				objective_str += this->get_unit_type_objective_string(unit_type, player, first);
+			}
+
+			if (this->get_settlement() != nullptr) {
+				objective_str += " in " + this->get_settlement()->get_current_cultural_name();
+			}
+
+			break;
+		}
+		default:
+			return std::string();
+	}
+
+	return objective_str;
+}
+
+std::string quest_objective::get_unit_type_objective_string(const unit_type *unit_type, const CPlayer *player, bool &first) const
+{
+	const std::string unit_type_name = unit_type->GetDefaultName(player);
+
+	std::string str;
+
+	if (first) {
+		str = unit_type->get_build_verb_string() + " ";
+		if (this->get_quantity() > 1) {
+			str += std::to_string(this->get_quantity());
+		} else {
+			str += string::get_indefinite_article(unit_type_name);
+		}
+		str += " ";
+		first = false;
+	} else {
+		str += "/";
+	}
+
+	if (this->get_quantity() > 1) {
+		str += string::get_plural_form(unit_type_name);
+	} else {
+		str += unit_type_name;
+	}
+
+	return str;
 }
 
 }

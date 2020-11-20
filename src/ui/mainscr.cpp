@@ -1450,7 +1450,13 @@ void MessagesDisplay::DrawMessages()
 					if (quest_objective->get_quest() != quest) {
 						continue;
 					}
-					std::string objective_string = "- " + std::string(_(quest_objective->get_objective_string().c_str()));
+
+					std::string objective_string = "- ";
+					if (!quest_objective->get_objective_string().empty()) {
+						objective_string += quest_objective->get_objective_string();
+					} else {
+						objective_string += quest_objective->generate_objective_string(CPlayer::GetThisPlayer());
+					}
 					if (quest_objective->get_quantity()) {
 						objective_string += " (" + std::to_string(objective->Counter) + "/" + std::to_string(quest_objective->get_quantity()) + ")";
 					}
