@@ -274,6 +274,15 @@ const std::string &site::get_cultural_name(const civilization *civilization) con
 	return this->get_name();
 }
 
+const std::string &site::get_current_cultural_name() const
+{
+	if (this->get_site_unit() != nullptr) {
+		return this->get_cultural_name(this->get_site_unit()->get_civilization());
+	}
+	
+	return this->get_name();
+}
+
 void site::set_site_unit(CUnit *unit)
 {
 	if (unit == this->get_site_unit()) {

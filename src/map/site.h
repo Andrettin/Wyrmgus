@@ -131,6 +131,7 @@ public:
 	}
 
 	const std::string &get_cultural_name(const civilization *civilization) const;
+	const std::string &get_current_cultural_name() const;
 
 	bool is_major() const
 	{

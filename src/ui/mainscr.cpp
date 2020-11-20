@@ -1236,11 +1236,7 @@ void DrawPopups()
 						button = std::make_unique<wyrmgus::button>();
 						button->Action = ButtonCmd::None;
 						button->Popup = "popup_settlement";
-						if (tile->get_owner() != nullptr) {
-							button->Hint = tile->get_settlement()->get_cultural_name(tile->get_owner()->get_civilization());
-						} else {
-							button->Hint = tile->get_settlement()->get_name();
-						}
+						button->Hint = tile->get_settlement()->get_current_cultural_name();
 					}
 					break;
 				default:
@@ -1458,6 +1454,7 @@ void MessagesDisplay::DrawMessages()
 					if (quest_objective->get_quantity()) {
 						objective_string += " (" + std::to_string(objective->Counter) + "/" + std::to_string(quest_objective->get_quantity()) + ")";
 					}
+
 					label.DrawClip(UI.MapArea.X + 8 * scale_factor, UI.MapArea.Y + 8 * scale_factor + z * (UI.MessageFont->Height() + 1 * scale_factor), objective_string);
 					++z;
 				}

@@ -1580,10 +1580,8 @@ std::string EvalString(const StringDesc *s)
 			}
 		case EString_UnitSettlementName: // name of the unit's settlement
 			unit = EvalUnit(s->D.Unit.get());
-			if (unit != nullptr && unit->settlement != nullptr && unit->settlement->get_site_unit() != nullptr) {
-				const CUnit *site_unit = unit->settlement->get_site_unit();
-				const wyrmgus::civilization *civilization = site_unit->get_civilization();
-				return unit->settlement->get_cultural_name(civilization);
+			if (unit != nullptr && unit->settlement != nullptr) {
+				return unit->settlement->get_current_cultural_name();
 			} else {
 				return std::string("");
 			}
@@ -1797,7 +1795,7 @@ std::string EvalString(const StringDesc *s)
 					if (!has_settlement) {
 						settlements_string += "~<";
 					}
-					settlements_string += core_settlement->get_cultural_name(CPlayer::GetThisPlayer()->Race != -1 ? wyrmgus::civilization::get_all()[CPlayer::GetThisPlayer()->Race] : nullptr);
+					settlements_string += core_settlement->get_current_cultural_name();
 					if (!has_settlement) {
 						settlements_string += "~>";
 					}

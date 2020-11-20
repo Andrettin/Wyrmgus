@@ -2567,12 +2567,6 @@ static int CclGetPlayerData(lua_State *l)
 		const wyrmgus::site *site = wyrmgus::site::get(site_ident);
 		lua_pushboolean(l, p->HasSettlement(site));
 		return 1;
-	} else if (!strcmp(data, "SettlementName")) {
-		LuaCheckArgs(l, 3);
-		std::string site_ident = LuaToString(l, 3);
-		const wyrmgus::site *site = wyrmgus::site::get(site_ident);
-		lua_pushstring(l, site->get_cultural_name(p->Race != -1 ? wyrmgus::civilization::get_all()[p->Race] : nullptr).c_str());
-		return 1;
 	//Wyrmgus end
 	} else if (!strcmp(data, "Currency")) {
 		const CCurrency *currency = p->GetCurrency();
