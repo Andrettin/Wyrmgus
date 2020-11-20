@@ -30,16 +30,8 @@
 
 #include "sound/sound.h"
 
-#include "action/action_resource.h"
 #include "civilization.h"
-#include "config.h"
 #include "database/defines.h"
-#include "faction.h"
-#include "map/map.h"
-#include "map/map_layer.h"
-#include "map/tile.h"
-#include "map/tileset.h"
-#include "mod.h"
 #include "missile.h"
 #include "sound/sound_server.h"
 #include "sound/unit_sound_type.h"
@@ -48,7 +40,6 @@
 #include "util/container_util.h"
 #include "util/vector_util.h"
 #include "video/video.h"
-#include "widgets.h"
 
 /**
 **  Various sounds used in game.
@@ -87,11 +78,11 @@ static wyrmgus::sample *SimpleChooseSample(const wyrmgus::sound &sound)
 /**
 **  Choose the sample to play
 */
-static wyrmgus::sample *ChooseSample(wyrmgus::sound *sound, bool selection, Origin &source)
+static wyrmgus::sample *ChooseSample(const wyrmgus::sound *sound, bool selection, Origin &source)
 {
 	wyrmgus::sample *result = nullptr;
 
-	if (!sound || !SoundEnabled()) {
+	if (sound == nullptr || !SoundEnabled()) {
 		return nullptr;
 	}
 
@@ -153,142 +144,40 @@ static wyrmgus::sample *ChooseSample(wyrmgus::sound *sound, bool selection, Orig
 **
 **  @return        Sound identifier
 */
-static wyrmgus::sound *ChooseUnitVoiceSound(const CUnit &unit, const wyrmgus::unit_sound_type unit_sound_type)
+static const wyrmgus::sound *ChooseUnitVoiceSound(const CUnit *unit, const wyrmgus::unit_sound_type unit_sound_type)
 {
-	const wyrmgus::tile &mf = *unit.MapLayer->Field(unit.tilePos);
+	const wyrmgus::sound *sound = unit->Type->MapSound.get_sound_for_unit(unit_sound_type, unit);
 
-	const wyrmgus::civilization *civilization = unit.get_civilization();
+	if (sound != nullptr) {
+		return sound;
+	}
+
+	const wyrmgus::civilization *civilization = unit->get_civilization();
 
 	switch (unit_sound_type) {
 		case wyrmgus::unit_sound_type::acknowledging:
-			if (unit.Type->MapSound.Acknowledgement.Sound) {
-				return unit.Type->MapSound.Acknowledgement.Sound;
-			} else if (unit.Type->BoolFlag[ORGANIC_INDEX].value && civilization != nullptr) {
-				return civilization->UnitSounds.Acknowledgement.Sound;
-			} else {
-				return nullptr;
-			}
 		case wyrmgus::unit_sound_type::attack:
-			if (unit.Type->MapSound.Attack.Sound) {
-				return unit.Type->MapSound.Attack.Sound;
-			} else if (unit.Type->BoolFlag[ORGANIC_INDEX].value && civilization != nullptr) {
-				if (civilization->UnitSounds.Attack.Sound) {
-					return civilization->UnitSounds.Attack.Sound;
-				}
-			}
-
-			return ChooseUnitVoiceSound(unit, wyrmgus::unit_sound_type::acknowledging);
-		case wyrmgus::unit_sound_type::idle:
-			return unit.Type->MapSound.Idle.Sound;
-		case wyrmgus::unit_sound_type::hit:
-			return unit.Type->MapSound.Hit.Sound;
-		case wyrmgus::unit_sound_type::miss:
-			if (unit.Type->MapSound.Miss.Sound) {
-				return unit.Type->MapSound.Miss.Sound;
-			} else {
-				return unit.Type->MapSound.Hit.Sound;
-			}
-		case wyrmgus::unit_sound_type::fire_missile:
-			return unit.Type->MapSound.FireMissile.Sound;
-		case wyrmgus::unit_sound_type::step:
-			if (unit.Type->MapSound.StepMud.Sound && ((mf.get_flags() & MapFieldMud) || (mf.get_flags() & MapFieldSnow))) {
-				return unit.Type->MapSound.StepMud.Sound;
-			} else if (unit.Type->MapSound.StepDirt.Sound && ((mf.get_flags() & MapFieldDirt) || (mf.get_flags() & MapFieldIce))) {
-				return unit.Type->MapSound.StepDirt.Sound;
-			} else if (unit.Type->MapSound.StepGravel.Sound && mf.get_flags() & MapFieldGravel) {
-				return unit.Type->MapSound.StepGravel.Sound;
-			} else if (unit.Type->MapSound.StepGrass.Sound && ((mf.get_flags() & MapFieldGrass) || (mf.get_flags() & MapFieldStumps))) {
-				return unit.Type->MapSound.StepGrass.Sound;
-			} else if (unit.Type->MapSound.StepStone.Sound && mf.get_flags() & MapFieldStoneFloor) {
-				return unit.Type->MapSound.StepStone.Sound;
-			} else {
-				return unit.Type->MapSound.Step.Sound;
-			}
-		case wyrmgus::unit_sound_type::used:
-			return unit.Type->MapSound.Used.Sound;
 		case wyrmgus::unit_sound_type::build:
-			if (unit.Type->MapSound.Build.Sound) {
-				return unit.Type->MapSound.Build.Sound;
-			} else if (unit.Type->BoolFlag[ORGANIC_INDEX].value && civilization != nullptr) {
-				if (civilization->UnitSounds.Build.Sound) {
-					return civilization->UnitSounds.Build.Sound;
-				}
-			}
-			
-			return ChooseUnitVoiceSound(unit, wyrmgus::unit_sound_type::acknowledging);
 		case wyrmgus::unit_sound_type::ready:
-			if (unit.Type->MapSound.Ready.Sound) {
-				return unit.Type->MapSound.Ready.Sound;
-			} else if (unit.Type->BoolFlag[ORGANIC_INDEX].value && civilization != nullptr) {
-				return civilization->UnitSounds.Ready.Sound;
-			} else {
-				return nullptr;
-			}
 		case wyrmgus::unit_sound_type::selected:
-			if (unit.Type->MapSound.Selected.Sound) {
-				return unit.Type->MapSound.Selected.Sound;
-			} else if (unit.Type->BoolFlag[ORGANIC_INDEX].value && civilization != nullptr) {
-				return civilization->UnitSounds.Selected.Sound;
-			} else {
-				return nullptr;
-			}
-		case wyrmgus::unit_sound_type::help:
-			if (unit.Type->MapSound.Help.Sound) {
-				return unit.Type->MapSound.Help.Sound;
-			} else if (civilization != nullptr) {
-				if (unit.Type->BoolFlag[BUILDING_INDEX].value && civilization->UnitSounds.HelpTown.Sound) {
-					return civilization->UnitSounds.HelpTown.Sound;
-				} else {
-					return civilization->UnitSounds.Help.Sound;
-				}
-			} else {
-				return nullptr;
-			}
 		case wyrmgus::unit_sound_type::dying:
-			if (unit.Type->MapSound.Dead[unit.DamagedType].Sound) {
-				return unit.Type->MapSound.Dead[unit.DamagedType].Sound;
-			} else if (unit.Type->MapSound.Dead[ANIMATIONS_DEATHTYPES].Sound) {
-				return unit.Type->MapSound.Dead[ANIMATIONS_DEATHTYPES].Sound;
-			} else if (unit.Type->BoolFlag[ORGANIC_INDEX].value && civilization != nullptr) {
-				if (civilization->UnitSounds.Dead[unit.DamagedType].Sound) {
-					return civilization->UnitSounds.Dead[unit.DamagedType].Sound;
-				} else {
-					return civilization->UnitSounds.Dead[ANIMATIONS_DEATHTYPES].Sound;
-				}
-			} else {
-				return nullptr;
-			}
-		case wyrmgus::unit_sound_type::work_completed:
-			return GameSounds.WorkComplete[CPlayer::GetThisPlayer()->Race].Sound;
-		case wyrmgus::unit_sound_type::construction:
-			return GameSounds.BuildingConstruction[CPlayer::GetThisPlayer()->Race].Sound;
-		case wyrmgus::unit_sound_type::docking:
-			return GameSounds.Docking.Sound;
 		case wyrmgus::unit_sound_type::repairing:
-			if (unit.Type->MapSound.Repair.Sound) {
-				return unit.Type->MapSound.Repair.Sound;
-			} else if (unit.Type->BoolFlag[ORGANIC_INDEX].value && civilization != nullptr) {
-				if (civilization->UnitSounds.Repair.Sound) {
-					return civilization->UnitSounds.Repair.Sound;
-				}
-			}
-			
-			return ChooseUnitVoiceSound(unit, wyrmgus::unit_sound_type::acknowledging);
 		case wyrmgus::unit_sound_type::harvesting:
-			for (size_t i = 0; i != unit.Orders.size(); ++i) {
-				if (unit.Orders[i]->Action == UnitAction::Resource) {
-					COrder_Resource &order = dynamic_cast<COrder_Resource &>(*unit.Orders[i]);
-					if (unit.Type->MapSound.Harvest[order.GetCurrentResource()].Sound) {
-						return unit.Type->MapSound.Harvest[order.GetCurrentResource()].Sound;
-					} else if (unit.Type->BoolFlag[ORGANIC_INDEX].value && civilization != nullptr) {
-						if (civilization->UnitSounds.Harvest[order.GetCurrentResource()].Sound) {
-							return civilization->UnitSounds.Harvest[order.GetCurrentResource()].Sound;
-						}
-					}
-
-					return ChooseUnitVoiceSound(unit, wyrmgus::unit_sound_type::acknowledging);
+		case wyrmgus::unit_sound_type::help_town:
+			if (unit->Type->BoolFlag[ORGANIC_INDEX].value && civilization != nullptr) {
+				return civilization->UnitSounds.get_sound_for_unit(unit_sound_type, unit);
+			}
+			break;
+		case wyrmgus::unit_sound_type::help:
+			if (civilization != nullptr) {
+				if (unit->Type->BoolFlag[BUILDING_INDEX].value) {
+					return civilization->UnitSounds.get_sound_for_unit(wyrmgus::unit_sound_type::help_town, unit);
+				} else {
+					return civilization->UnitSounds.get_sound_for_unit(unit_sound_type, unit);
 				}
 			}
+			break;
+		default:
 			break;
 	}
 
@@ -369,12 +258,12 @@ void PlayUnitSound(const CUnit &unit, const wyrmgus::unit_sound_type unit_sound_
 		return;
 	}
 	
-	wyrmgus::sound *sound = ChooseUnitVoiceSound(unit, unit_sound_type);
+	const wyrmgus::sound *sound = ChooseUnitVoiceSound(&unit, unit_sound_type);
 	if (!sound) {
 		return;
 	}
 
-	bool selection = (unit_sound_type == wyrmgus::unit_sound_type::selected || unit_sound_type == wyrmgus::unit_sound_type::construction);
+	const bool selection = (unit_sound_type == wyrmgus::unit_sound_type::selected || unit_sound_type == wyrmgus::unit_sound_type::construction);
 	Origin source = {&unit, unsigned(UnitNumber(unit))};
 	
 	//don't speak if already speaking

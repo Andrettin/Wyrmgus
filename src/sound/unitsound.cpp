@@ -31,18 +31,22 @@
 
 #include "sound/unitsound.h"
 
+#include "action/action_resource.h"
+#include "actions.h"
 #include "animation/animation_randomsound.h"
 #include "animation/animation_sound.h"
 #include "civilization.h"
-#include "map/map.h"
+#include "map/map_layer.h"
+#include "map/tile.h"
+#include "map/tileset.h"
 #include "player.h"
 #include "sound/sound.h"
 #include "sound/sound_server.h"
+#include "sound/unit_sound_type.h"
 #include "unit/unit.h"
 #include "unit/unit_type.h"
 #include "unit/unit_type_variation.h"
 #include "util/string_util.h"
-#include "video/video.h"
 
 bool SoundConfig::MapSound()
 {
@@ -161,6 +165,101 @@ void unit_sound_set::map_sounds()
 	for (int i = 0; i <= ANIMATIONS_DEATHTYPES; ++i) {
 		this->Dead[i].MapSound();
 	}
+}
+
+const sound *unit_sound_set::get_sound_for_unit(const unit_sound_type unit_sound_type, const CUnit *unit) const
+{
+	switch (unit_sound_type) {
+		case unit_sound_type::acknowledging:
+			return this->Acknowledgement.Sound;
+		case unit_sound_type::attack:
+			if (this->Attack.Sound != nullptr) {
+				return this->Attack.Sound;
+			}
+
+			return this->get_sound_for_unit(unit_sound_type::acknowledging, unit);
+		case unit_sound_type::idle:
+			return this->Idle.Sound;
+		case unit_sound_type::hit:
+			return this->Hit.Sound;
+		case unit_sound_type::miss:
+			if (this->Miss.Sound != nullptr) {
+				return this->Miss.Sound;
+			}
+
+			return this->get_sound_for_unit(unit_sound_type::hit, unit);
+		case unit_sound_type::fire_missile:
+			return this->FireMissile.Sound;
+		case unit_sound_type::step: {
+			const tile *tile = unit->MapLayer->Field(unit->tilePos);
+
+			if (this->StepMud.Sound && ((tile->get_flags() & MapFieldMud) || (tile->get_flags() & MapFieldSnow))) {
+				return this->StepMud.Sound;
+			} else if (this->StepDirt.Sound && ((tile->get_flags() & MapFieldDirt) || (tile->get_flags() & MapFieldIce))) {
+				return this->StepDirt.Sound;
+			} else if (this->StepGravel.Sound && tile->get_flags() & MapFieldGravel) {
+				return this->StepGravel.Sound;
+			} else if (this->StepGrass.Sound && ((tile->get_flags() & MapFieldGrass) || (tile->get_flags() & MapFieldStumps))) {
+				return this->StepGrass.Sound;
+			} else if (this->StepStone.Sound && tile->get_flags() & MapFieldStoneFloor) {
+				return this->StepStone.Sound;
+			} else {
+				return this->Step.Sound;
+			}
+		}
+		case unit_sound_type::used:
+			return this->Used.Sound;
+		case unit_sound_type::build:
+			if (this->Build.Sound != nullptr) {
+				return this->Build.Sound;
+			}
+
+			return this->get_sound_for_unit(unit_sound_type::acknowledging, unit);
+		case unit_sound_type::ready:
+			return this->Ready.Sound;
+		case unit_sound_type::selected:
+			return this->Selected.Sound;
+		case unit_sound_type::help:
+			return this->Help.Sound;
+		case unit_sound_type::help_town:
+			if (this->HelpTown.Sound != nullptr) {
+				return this->HelpTown.Sound;
+			}
+
+			return this->get_sound_for_unit(unit_sound_type::help, unit);
+		case unit_sound_type::dying:
+			if (this->Dead[unit->DamagedType].Sound != nullptr) {
+				return this->Dead[unit->DamagedType].Sound;
+			} else {
+				return this->Dead[ANIMATIONS_DEATHTYPES].Sound;
+			}
+		case unit_sound_type::work_completed:
+			return GameSounds.WorkComplete[CPlayer::GetThisPlayer()->Race].Sound;
+		case unit_sound_type::construction:
+			return GameSounds.BuildingConstruction[CPlayer::GetThisPlayer()->Race].Sound;
+		case unit_sound_type::docking:
+			return GameSounds.Docking.Sound;
+		case unit_sound_type::repairing:
+			if (this->Repair.Sound != nullptr) {
+				return this->Repair.Sound;
+			}
+
+			return this->get_sound_for_unit(unit_sound_type::acknowledging, unit);
+		case unit_sound_type::harvesting:
+			for (const std::unique_ptr<COrder> &order : unit->Orders) {
+				if (order->Action == UnitAction::Resource) {
+					const COrder_Resource *resource_order = dynamic_cast<const COrder_Resource *>(order.get());
+					if (this->Harvest[resource_order->GetCurrentResource()].Sound != nullptr) {
+						return this->Harvest[resource_order->GetCurrentResource()].Sound;
+					}
+
+					return this->get_sound_for_unit(unit_sound_type::acknowledging, unit);
+				}
+			}
+			break;
+	}
+
+	return nullptr;
 }
 
 }

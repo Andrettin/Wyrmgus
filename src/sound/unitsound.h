@@ -33,8 +33,11 @@
 #include "animation.h" //for the ANIMATIONS_DEATHTYPES constant
 #include "upgrade/upgrade_structs.h"
 
+class CUnit;
+
 namespace wyrmgus {
 	class sound;
+	enum class unit_sound_type;
 }
 
 /**
@@ -61,13 +64,15 @@ namespace wyrmgus {
 **
 **  Played for the various events.
 */
-class unit_sound_set
+class unit_sound_set final
 {
 public:
 	void process_sml_property(const sml_property &property);
 	void process_sml_scope(const sml_data &scope);
 
 	void map_sounds();
+
+	const sound *get_sound_for_unit(const unit_sound_type unit_sound_type, const CUnit *unit) const;
 
 	SoundConfig Selected;           /// selected by user
 	SoundConfig Acknowledgement;    /// acknowledge of use command

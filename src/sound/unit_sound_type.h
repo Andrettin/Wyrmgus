@@ -32,24 +32,25 @@ namespace wyrmgus {
 
 enum class unit_sound_type {
 	none = -1,
-	selected,          /// If selected
-	acknowledging,     /// Acknowledge command
-	ready,             /// Command completed
-	help,            /// If attacked
-	dying,             /// If killed
-	work_completed,     /// only worker, work completed
-	construction,          /// only for building under construction
-	docking,           /// only for transport reaching coast
-	repairing,         /// repairing
-	harvesting,        /// harvesting
-	attack,            /// Attack command
-	idle,				/// Idle sound
-	hit,				/// Hit another unit
-	miss,				/// Attacked another unit, but missed
-	fire_missile,		/// Fire a missile at another unit
-	step,				/// Stepped
-	used,				/// Used (for items)
-	build              /// worker goes to build a building
+	selected,		/// if selected
+	acknowledging,	/// acknowledge command
+	ready,			/// command completed
+	help,			/// if attacked
+	help_town,		/// if attacked (town)
+	dying,			/// if killed
+	work_completed,	/// only worker, work completed
+	construction,	/// only for building under construction
+	docking,		/// only for transport reaching coast
+	repairing,		/// repairing
+	harvesting,		/// harvesting
+	attack,			/// attack command
+	idle,			/// idle sound
+	hit,			/// hit another unit
+	miss,			/// attacked another unit, but missed
+	fire_missile,	/// fired a missile at another unit
+	step,			/// stepped
+	used,			/// used (for items)
+	build			/// worker goes to build a building
 };
 
 inline unit_sound_type string_to_unit_sound_type(const std::string &str)
@@ -62,6 +63,8 @@ inline unit_sound_type string_to_unit_sound_type(const std::string &str)
 		return unit_sound_type::ready;
 	} else if (str == "help") {
 		return unit_sound_type::help;
+	} else if (str == "help_town") {
+		return unit_sound_type::help_town;
 	} else if (str == "dead") {
 		return unit_sound_type::dying;
 	} else if (str == "work_completed") {
