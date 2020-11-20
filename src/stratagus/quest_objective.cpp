@@ -46,7 +46,7 @@ quest_objective::quest_objective(const wyrmgus::objective_type objective_type, c
 	}
 }
 
-void quest_objective::process_sml_property(const wyrmgus::sml_property &property)
+void quest_objective::process_sml_property(const sml_property &property)
 {
 	const std::string &key = property.get_key();
 	const std::string &value = property.get_value();
@@ -56,27 +56,34 @@ void quest_objective::process_sml_property(const wyrmgus::sml_property &property
 	} else if (key == "objective_string") {
 		this->objective_string = value;
 	} else if (key == "settlement") {
-		this->settlement = wyrmgus::site::get(value);
+		this->settlement = site::get(value);
 	} else if (key == "faction") {
-		this->faction = wyrmgus::faction::get(value);
+		this->faction = faction::get(value);
 	} else if (key == "character") {
-		this->character = wyrmgus::character::get(value);
+		this->character = character::get(value);
 	} else {
 		throw std::runtime_error("Invalid quest objective property: \"" + key + "\".");
 	}
 }
 
-void quest_objective::process_sml_scope(const wyrmgus::sml_data &scope)
+void quest_objective::process_sml_scope(const sml_data &scope)
 {
 	const std::string &tag = scope.get_tag();
 	const std::vector<std::string> &values = scope.get_values();
 
 	if (tag == "unit_classes") {
 		for (const std::string &value : values) {
-			this->unit_classes.push_back(wyrmgus::unit_class::get(value));
+			this->unit_classes.push_back(unit_class::get(value));
 		}
 	} else {
 		throw std::runtime_error("Invalid quest objective scope: \"" + scope.get_tag() + "\".");
+	}
+}
+
+void quest_objective::check() const
+{
+	if (this->get_objective_type() == objective_type::build_units && this->UnitTypes.empty() && this->get_unit_classes().empty()) {
+		throw std::runtime_error("Build units quest objective has neither unit types nor unit classes set for it.");
 	}
 }
 

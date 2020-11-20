@@ -141,6 +141,10 @@ void quest::check() const
 	if (this->get_completion_effects() != nullptr) {
 		this->get_completion_effects()->check();
 	}
+
+	for (const std::unique_ptr<quest_objective> &objective : objectives) {
+		objective->check();
+	}
 }
 
 std::string quest::get_rewards_string() const

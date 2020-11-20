@@ -52,13 +52,14 @@ public:
 
 	void process_sml_property(const wyrmgus::sml_property &property);
 	void process_sml_scope(const wyrmgus::sml_data &scope);
+	void check() const;
 
 	objective_type get_objective_type() const
 	{
 		return this->objective_type;
 	}
 
-	const wyrmgus::quest *get_quest() const
+	const quest *get_quest() const
 	{
 		return this->quest;
 	}
@@ -78,22 +79,22 @@ public:
 		return this->objective_string;
 	}
 
-	const std::vector<const wyrmgus::unit_class *> &get_unit_classes() const
+	const std::vector<const unit_class *> &get_unit_classes() const
 	{
 		return this->unit_classes;
 	}
 
-	const wyrmgus::site *get_settlement() const
+	const site *get_settlement() const
 	{
 		return this->settlement;
 	}
 
-	const wyrmgus::faction *get_faction() const
+	const faction *get_faction() const
 	{
 		return this->faction;
 	}
 
-	const wyrmgus::character *get_character() const
+	const character *get_character() const
 	{
 		return this->character;
 	}
@@ -107,22 +108,22 @@ public:
 	int Resource = -1;
 private:
 	std::string objective_string;
-	std::vector<const wyrmgus::unit_class *> unit_classes;
+	std::vector<const unit_class *> unit_classes;
 public:
-	std::vector<wyrmgus::unit_type *> UnitTypes;
+	std::vector<const unit_type *> UnitTypes;
 	const CUpgrade *Upgrade = nullptr;
 private:
 	const wyrmgus::character *character = nullptr;
 public:
 	const unique_item *Unique = nullptr;
 private:
-	const wyrmgus::site *settlement = nullptr;
+	const site *settlement = nullptr;
 	const wyrmgus::faction *faction = nullptr;
 
 	friend static int ::CclDefineQuest(lua_State *l);
 };
 
-class player_quest_objective
+class player_quest_objective final
 {
 public:
 	explicit player_quest_objective(const quest_objective *quest_objective) : quest_objective(quest_objective)
