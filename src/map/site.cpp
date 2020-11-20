@@ -226,6 +226,12 @@ void site::initialize()
 		}
 
 		this->pos = this->get_map_template()->get_geocoordinate_pos(this->get_geocoordinate());
+	} else if (this->pos_reference_site != nullptr) {
+		if (!this->pos_reference_site->is_initialized()) {
+			this->pos_reference_site->initialize();
+		}
+
+		this->pos = this->pos_reference_site->get_pos() + this->pos;
 	}
 
 	//if a settlement has no color assigned to it, assign a random one instead

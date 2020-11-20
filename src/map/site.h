@@ -60,6 +60,7 @@ class site final : public named_data_entry, public data_type<site>, public CData
 	Q_PROPERTY(bool major MEMBER major READ is_major)
 	Q_PROPERTY(wyrmgus::map_template* map_template MEMBER map_template READ get_map_template)
 	Q_PROPERTY(QPoint pos MEMBER pos READ get_pos)
+	Q_PROPERTY(wyrmgus::site* pos_reference_site MEMBER pos_reference_site)
 	Q_PROPERTY(QGeoCoordinate geocoordinate MEMBER geocoordinate READ get_geocoordinate)
 	Q_PROPERTY(wyrmgus::site* geocoordinate_reference_site MEMBER geocoordinate_reference_site)
 	Q_PROPERTY(int longitude_scale MEMBER longitude_scale)
@@ -312,6 +313,7 @@ private:
 	bool major = false; //whether the site is a major one; major sites have settlement sites, and as such can have town halls
 	wyrmgus::map_template *map_template = nullptr;
 	QPoint pos = QPoint(-1, -1); /// Position of the site in its map template
+	site *pos_reference_site = nullptr; //the site's reference position site, used as an offset for its position
 	QGeoCoordinate geocoordinate; //the site's position as a geocoordinate
 	site *geocoordinate_reference_site = nullptr; //the site's reference geocoordinate site, used as an offset for its geocoordinate
 	int longitude_scale = 100;

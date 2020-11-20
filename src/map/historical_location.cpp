@@ -53,6 +53,8 @@ void historical_location::process_sml_property(const sml_property &property)
 		this->Date = CDate::FromString(value);
 	} else if (key == "map_template") {
 		this->map_template = map_template::get(value);
+	} else if (key == "pos_reference_site") {
+		this->pos_reference_site = site::get(value);
 	} else if (key == "site") {
 		this->site = site::get(value);
 	} else {
@@ -103,6 +105,9 @@ void historical_location::initialize()
 		this->pos = this->site->get_pos();
 	} else if (this->map_template != nullptr && this->geocoordinate.isValid()) {
 		this->pos = this->map_template->get_geocoordinate_pos(this->geocoordinate);
+	} else if (this->pos_reference_site != nullptr) {
+		this->map_template = this->pos_reference_site->get_map_template();
+		this->pos = this->pos_reference_site->get_pos() + this->pos;
 	}
 }
 
