@@ -88,7 +88,11 @@ void civilization::process_sml_scope(const sml_data &scope)
 			}
 		});
 	} else if (tag == "unit_sounds") {
-		database::process_sml_data(this->UnitSounds, scope);
+		if (scope.get_operator() == sml_operator::assignment || (scope.get_operator() == sml_operator::addition && this->unit_sound_set == nullptr)) {
+			this->unit_sound_set = std::make_unique<wyrmgus::unit_sound_set>();
+		}
+
+		database::process_sml_data(this->unit_sound_set, scope);
 	} else if (tag == "title_names") {
 		faction::process_title_names(this->title_names, scope);
 	} else if (tag == "character_title_names") {
@@ -241,70 +245,43 @@ void civilization::initialize()
 		}
 
 		//unit sounds
-		if (this->UnitSounds.Selected.Name.empty()) {
-			this->UnitSounds.Selected = parent_civilization->UnitSounds.Selected;
-		}
-		if (this->UnitSounds.Acknowledgement.Name.empty()) {
-			this->UnitSounds.Acknowledgement = parent_civilization->UnitSounds.Acknowledgement;
-		}
-		if (this->UnitSounds.Attack.Name.empty()) {
-			this->UnitSounds.Attack = parent_civilization->UnitSounds.Attack;
-		}
-		if (this->UnitSounds.Idle.Name.empty()) {
-			this->UnitSounds.Idle = parent_civilization->UnitSounds.Idle;
-		}
-		if (this->UnitSounds.Hit.Name.empty()) {
-			this->UnitSounds.Hit = parent_civilization->UnitSounds.Hit;
-		}
-		if (this->UnitSounds.Miss.Name.empty()) {
-			this->UnitSounds.Miss = parent_civilization->UnitSounds.Miss;
-		}
-		if (this->UnitSounds.FireMissile.Name.empty()) {
-			this->UnitSounds.FireMissile = parent_civilization->UnitSounds.FireMissile;
-		}
-		if (this->UnitSounds.Step.Name.empty()) {
-			this->UnitSounds.Step = parent_civilization->UnitSounds.Step;
-		}
-		if (this->UnitSounds.StepDirt.Name.empty()) {
-			this->UnitSounds.StepDirt = parent_civilization->UnitSounds.StepDirt;
-		}
-		if (this->UnitSounds.StepGrass.Name.empty()) {
-			this->UnitSounds.StepGrass = parent_civilization->UnitSounds.StepGrass;
-		}
-		if (this->UnitSounds.StepGravel.Name.empty()) {
-			this->UnitSounds.StepGravel = parent_civilization->UnitSounds.StepGravel;
-		}
-		if (this->UnitSounds.StepMud.Name.empty()) {
-			this->UnitSounds.StepMud = parent_civilization->UnitSounds.StepMud;
-		}
-		if (this->UnitSounds.StepStone.Name.empty()) {
-			this->UnitSounds.StepStone = parent_civilization->UnitSounds.StepStone;
-		}
-		if (this->UnitSounds.Used.Name.empty()) {
-			this->UnitSounds.Used = parent_civilization->UnitSounds.Used;
-		}
-		if (this->UnitSounds.Build.Name.empty()) {
-			this->UnitSounds.Build = parent_civilization->UnitSounds.Build;
-		}
-		if (this->UnitSounds.Ready.Name.empty()) {
-			this->UnitSounds.Ready = parent_civilization->UnitSounds.Ready;
-		}
-		if (this->UnitSounds.Repair.Name.empty()) {
-			this->UnitSounds.Repair = parent_civilization->UnitSounds.Repair;
-		}
-		for (unsigned int j = 0; j < MaxCosts; ++j) {
-			if (this->UnitSounds.Harvest[j].Name.empty()) {
-				this->UnitSounds.Harvest[j] = parent_civilization->UnitSounds.Harvest[j];
+		if (parent_civilization->unit_sound_set != nullptr) {
+			if (this->unit_sound_set == nullptr) {
+				this->unit_sound_set = std::make_unique<wyrmgus::unit_sound_set>();
 			}
-		}
-		if (this->UnitSounds.Help.Name.empty()) {
-			this->UnitSounds.Help = parent_civilization->UnitSounds.Help;
-		}
-		if (this->UnitSounds.HelpTown.Name.empty()) {
-			this->UnitSounds.HelpTown = parent_civilization->UnitSounds.HelpTown;
-		}
-		if (this->UnitSounds.Dead[ANIMATIONS_DEATHTYPES].Name.empty()) {
-			this->UnitSounds.Dead[ANIMATIONS_DEATHTYPES] = parent_civilization->UnitSounds.Dead[ANIMATIONS_DEATHTYPES];
+
+			if (this->unit_sound_set->Selected.Name.empty()) {
+				this->unit_sound_set->Selected = parent_civilization->unit_sound_set->Selected;
+			}
+			if (this->unit_sound_set->Acknowledgement.Name.empty()) {
+				this->unit_sound_set->Acknowledgement = parent_civilization->unit_sound_set->Acknowledgement;
+			}
+			if (this->unit_sound_set->Attack.Name.empty()) {
+				this->unit_sound_set->Attack = parent_civilization->unit_sound_set->Attack;
+			}
+			if (this->unit_sound_set->Build.Name.empty()) {
+				this->unit_sound_set->Build = parent_civilization->unit_sound_set->Build;
+			}
+			if (this->unit_sound_set->Ready.Name.empty()) {
+				this->unit_sound_set->Ready = parent_civilization->unit_sound_set->Ready;
+			}
+			if (this->unit_sound_set->Repair.Name.empty()) {
+				this->unit_sound_set->Repair = parent_civilization->unit_sound_set->Repair;
+			}
+			for (unsigned int j = 0; j < MaxCosts; ++j) {
+				if (this->unit_sound_set->Harvest[j].Name.empty()) {
+					this->unit_sound_set->Harvest[j] = parent_civilization->unit_sound_set->Harvest[j];
+				}
+			}
+			if (this->unit_sound_set->Help.Name.empty()) {
+				this->unit_sound_set->Help = parent_civilization->unit_sound_set->Help;
+			}
+			if (this->unit_sound_set->HelpTown.Name.empty()) {
+				this->unit_sound_set->HelpTown = parent_civilization->unit_sound_set->HelpTown;
+			}
+			if (this->unit_sound_set->Dead[ANIMATIONS_DEATHTYPES].Name.empty()) {
+				this->unit_sound_set->Dead[ANIMATIONS_DEATHTYPES] = parent_civilization->unit_sound_set->Dead[ANIMATIONS_DEATHTYPES];
+			}
 		}
 	}
 
@@ -366,6 +343,10 @@ void civilization::initialize()
 		button_definition += "\tForUnit = {\"" + this->get_identifier() + "-group\"},\n";
 		button_definition += "})";
 		CclCommand(button_definition);
+	}
+
+	if (this->unit_sound_set != nullptr) {
+		this->unit_sound_set->map_sounds();
 	}
 
 	data_entry::initialize();

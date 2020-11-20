@@ -32,13 +32,13 @@
 #include "animation.h"
 #include "sound/unitsound.h"
 
-class CAnimation_Sound : public CAnimation
+class CAnimation_Sound final : public CAnimation
 {
 public:
 	CAnimation_Sound() : CAnimation(AnimationSound) {}
 
-	virtual void Action(CUnit &unit, int &move, int scale) const;
-	virtual void Init(const char *s, lua_State *l);
+	virtual void Action(CUnit &unit, int &move, int scale) const override;
+	virtual void Init(const char *s, lua_State *l) override;
 
 	void MapSound();
 

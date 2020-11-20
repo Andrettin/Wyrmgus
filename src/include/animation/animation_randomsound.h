@@ -32,15 +32,16 @@
 #include "animation.h"
 #include "sound/unitsound.h"
 
-class CAnimation_RandomSound : public CAnimation
+class CAnimation_RandomSound final : public CAnimation
 {
 public:
 	CAnimation_RandomSound() : CAnimation(AnimationRandomSound) {}
 
-	virtual void Action(CUnit &unit, int &move, int scale) const;
-	virtual void Init(const char *s, lua_State *l);
+	virtual void Action(CUnit &unit, int &move, int scale) const override;
+	virtual void Init(const char *s, lua_State *l) override;
 
 	void MapSound();
+
 private:
 	std::vector<SoundConfig> sounds;
 };

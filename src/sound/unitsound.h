@@ -46,15 +46,15 @@ namespace wyrmgus {
 class SoundConfig
 {
 public:
-	SoundConfig() : Sound(nullptr) {}
-	SoundConfig(std::string name) : Name(name), Sound(nullptr) {}
+	SoundConfig() {}
+	SoundConfig(const std::string &name) : Name(name) {}
 
 	bool MapSound();
 	void SetSoundRange(unsigned char range);
 
 public:
 	std::string Name;     /// config sound name
-	wyrmgus::sound *Sound;        /// identifier send to sound server
+	wyrmgus::sound *Sound = nullptr;        /// identifier send to sound server
 };
 
 namespace wyrmgus {

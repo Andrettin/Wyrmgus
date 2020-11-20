@@ -29,7 +29,6 @@
 
 #pragma once
 
-#include "sound/unitsound.h"
 #include "ui/icon.h"
 #include "vec2i.h"
 

@@ -671,76 +671,85 @@ int WriteMapSetup(const char *mapSetup, CMap &map, int writeTerrain, bool is_mod
 				f->printf("\tButtonHint = \"%s\",\n", unit_type->ButtonHint.c_str());
 			}
 			
-			f->printf("\tSounds = {\n");
-			if (!unit_type->Sound.Selected.Name.empty() && (!unit_type->Parent || unit_type->Sound.Selected.Name != unit_type->Parent->Sound.Selected.Name)) {
-				f->printf("\t\t\"selected\", \"%s\",\n", unit_type->Sound.Selected.Name.c_str());
-			}
-			if (!unit_type->Sound.Acknowledgement.Name.empty() && (!unit_type->Parent || unit_type->Sound.Acknowledgement.Name != unit_type->Parent->Sound.Acknowledgement.Name)) {
-				f->printf("\t\t\"acknowledge\", \"%s\",\n", unit_type->Sound.Acknowledgement.Name.c_str());
-			}
-			if (!unit_type->Sound.Attack.Name.empty() && (!unit_type->Parent || unit_type->Sound.Attack.Name != unit_type->Parent->Sound.Attack.Name)) {
-				f->printf("\t\t\"attack\", \"%s\",\n", unit_type->Sound.Attack.Name.c_str());
-			}
-			if (!unit_type->Sound.Idle.Name.empty() && (!unit_type->Parent || unit_type->Sound.Idle.Name != unit_type->Parent->Sound.Idle.Name)) {
-				f->printf("\t\t\"idle\", \"%s\",\n", unit_type->Sound.Idle.Name.c_str());
-			}
-			if (!unit_type->Sound.Hit.Name.empty() && (!unit_type->Parent || unit_type->Sound.Hit.Name != unit_type->Parent->Sound.Hit.Name)) {
-				f->printf("\t\t\"hit\", \"%s\",\n", unit_type->Sound.Hit.Name.c_str());
-			}
-			if (!unit_type->Sound.Miss.Name.empty() && (!unit_type->Parent || unit_type->Sound.Miss.Name != unit_type->Parent->Sound.Miss.Name)) {
-				f->printf("\t\t\"miss\", \"%s\",\n", unit_type->Sound.Miss.Name.c_str());
-			}
-			if (!unit_type->Sound.FireMissile.Name.empty() && (!unit_type->Parent || unit_type->Sound.FireMissile.Name != unit_type->Parent->Sound.FireMissile.Name)) {
-				f->printf("\t\t\"fire-missile\", \"%s\",\n", unit_type->Sound.FireMissile.Name.c_str());
-			}
-			if (!unit_type->Sound.Step.Name.empty() && (!unit_type->Parent || unit_type->Sound.Step.Name != unit_type->Parent->Sound.Step.Name)) {
-				f->printf("\t\t\"step\", \"%s\",\n", unit_type->Sound.Step.Name.c_str());
-			}
-			if (!unit_type->Sound.StepDirt.Name.empty() && (!unit_type->Parent || unit_type->Sound.StepDirt.Name != unit_type->Parent->Sound.StepDirt.Name)) {
-				f->printf("\t\t\"step-dirt\", \"%s\",\n", unit_type->Sound.StepDirt.Name.c_str());
-			}
-			if (!unit_type->Sound.StepGrass.Name.empty() && (!unit_type->Parent || unit_type->Sound.StepGrass.Name != unit_type->Parent->Sound.StepGrass.Name)) {
-				f->printf("\t\t\"step-grass\", \"%s\",\n", unit_type->Sound.StepGrass.Name.c_str());
-			}
-			if (!unit_type->Sound.StepGravel.Name.empty() && (!unit_type->Parent || unit_type->Sound.StepGravel.Name != unit_type->Parent->Sound.StepGravel.Name)) {
-				f->printf("\t\t\"step-gravel\", \"%s\",\n", unit_type->Sound.StepGravel.Name.c_str());
-			}
-			if (!unit_type->Sound.StepMud.Name.empty() && (!unit_type->Parent || unit_type->Sound.StepMud.Name != unit_type->Parent->Sound.StepMud.Name)) {
-				f->printf("\t\t\"step-mud\", \"%s\",\n", unit_type->Sound.StepMud.Name.c_str());
-			}
-			if (!unit_type->Sound.StepStone.Name.empty() && (!unit_type->Parent || unit_type->Sound.StepStone.Name != unit_type->Parent->Sound.StepStone.Name)) {
-				f->printf("\t\t\"step-stone\", \"%s\",\n", unit_type->Sound.StepStone.Name.c_str());
-			}
-			if (!unit_type->Sound.Used.Name.empty() && (!unit_type->Parent || unit_type->Sound.Used.Name != unit_type->Parent->Sound.Used.Name)) {
-				f->printf("\t\t\"used\", \"%s\",\n", unit_type->Sound.Used.Name.c_str());
-			}
-			if (!unit_type->Sound.Build.Name.empty() && (!unit_type->Parent || unit_type->Sound.Build.Name != unit_type->Parent->Sound.Build.Name)) {
-				f->printf("\t\t\"build\", \"%s\",\n", unit_type->Sound.Build.Name.c_str());
-			}
-			if (!unit_type->Sound.Ready.Name.empty() && (!unit_type->Parent || unit_type->Sound.Ready.Name != unit_type->Parent->Sound.Ready.Name)) {
-				f->printf("\t\t\"ready\", \"%s\",\n", unit_type->Sound.Ready.Name.c_str());
-			}
-			if (!unit_type->Sound.Repair.Name.empty() && (!unit_type->Parent || unit_type->Sound.Repair.Name != unit_type->Parent->Sound.Repair.Name)) {
-				f->printf("\t\t\"repair\", \"%s\",\n", unit_type->Sound.Repair.Name.c_str());
-			}
-			for (unsigned int j = 0; j < MaxCosts; ++j) {
-				if (!unit_type->Sound.Harvest[j].Name.empty() && (!unit_type->Parent || unit_type->Sound.Harvest[j].Name != unit_type->Parent->Sound.Harvest[j].Name)) {
-					f->printf("\t\t\"harvest\", \"%s\", \"%s\",\n", DefaultResourceNames[j].c_str(), unit_type->Sound.Harvest[j].Name.c_str());
+			const wyrmgus::unit_sound_set *sound_set = unit_type->get_sound_set();
+			if (sound_set != nullptr) {
+				f->printf("\tSounds = {\n");
+
+				const wyrmgus::unit_sound_set *parent_sound_set = nullptr;
+				if (unit_type->Parent != nullptr) {
+					parent_sound_set = unit_type->Parent->get_sound_set();
 				}
-			}
-			if (!unit_type->Sound.Help.Name.empty() && (!unit_type->Parent || unit_type->Sound.Help.Name != unit_type->Parent->Sound.Help.Name)) {
-				f->printf("\t\t\"help\", \"%s\",\n", unit_type->Sound.Help.Name.c_str());
-			}
-			if (!unit_type->Sound.Dead[ANIMATIONS_DEATHTYPES].Name.empty() && (!unit_type->Parent || unit_type->Sound.Dead[ANIMATIONS_DEATHTYPES].Name != unit_type->Parent->Sound.Dead[ANIMATIONS_DEATHTYPES].Name)) {
-				f->printf("\t\t\"dead\", \"%s\",\n", unit_type->Sound.Dead[ANIMATIONS_DEATHTYPES].Name.c_str());
-			}
-			int death;
-			for (death = 0; death < ANIMATIONS_DEATHTYPES; ++death) {
-				if (!unit_type->Sound.Dead[death].Name.empty() && (!unit_type->Parent || unit_type->Sound.Dead[death].Name != unit_type->Parent->Sound.Dead[death].Name)) {
-					f->printf("\t\t\"dead\", \"%s\", \"%s\",\n", ExtraDeathTypes[death].c_str(), unit_type->Sound.Dead[death].Name.c_str());
+
+				if (!sound_set->Selected.Name.empty() && (parent_sound_set == nullptr || sound_set->Selected.Name != parent_sound_set->Selected.Name)) {
+					f->printf("\t\t\"selected\", \"%s\",\n", sound_set->Selected.Name.c_str());
 				}
+				if (!sound_set->Acknowledgement.Name.empty() && (parent_sound_set == nullptr || sound_set->Acknowledgement.Name != parent_sound_set->Acknowledgement.Name)) {
+					f->printf("\t\t\"acknowledge\", \"%s\",\n", sound_set->Acknowledgement.Name.c_str());
+				}
+				if (!sound_set->Attack.Name.empty() && (parent_sound_set == nullptr || sound_set->Attack.Name != parent_sound_set->Attack.Name)) {
+					f->printf("\t\t\"attack\", \"%s\",\n", sound_set->Attack.Name.c_str());
+				}
+				if (!sound_set->Idle.Name.empty() && (parent_sound_set == nullptr || sound_set->Idle.Name != parent_sound_set->Idle.Name)) {
+					f->printf("\t\t\"idle\", \"%s\",\n", sound_set->Idle.Name.c_str());
+				}
+				if (!sound_set->Hit.Name.empty() && (parent_sound_set == nullptr || sound_set->Hit.Name != parent_sound_set->Hit.Name)) {
+					f->printf("\t\t\"hit\", \"%s\",\n", sound_set->Hit.Name.c_str());
+				}
+				if (!sound_set->Miss.Name.empty() && (parent_sound_set == nullptr || sound_set->Miss.Name != parent_sound_set->Miss.Name)) {
+					f->printf("\t\t\"miss\", \"%s\",\n", sound_set->Miss.Name.c_str());
+				}
+				if (!sound_set->FireMissile.Name.empty() && (parent_sound_set == nullptr || sound_set->FireMissile.Name != parent_sound_set->FireMissile.Name)) {
+					f->printf("\t\t\"fire-missile\", \"%s\",\n", sound_set->FireMissile.Name.c_str());
+				}
+				if (!sound_set->Step.Name.empty() && (parent_sound_set == nullptr || sound_set->Step.Name != parent_sound_set->Step.Name)) {
+					f->printf("\t\t\"step\", \"%s\",\n", sound_set->Step.Name.c_str());
+				}
+				if (!sound_set->StepDirt.Name.empty() && (parent_sound_set == nullptr || sound_set->StepDirt.Name != parent_sound_set->StepDirt.Name)) {
+					f->printf("\t\t\"step-dirt\", \"%s\",\n", sound_set->StepDirt.Name.c_str());
+				}
+				if (!sound_set->StepGrass.Name.empty() && (parent_sound_set == nullptr || sound_set->StepGrass.Name != parent_sound_set->StepGrass.Name)) {
+					f->printf("\t\t\"step-grass\", \"%s\",\n", sound_set->StepGrass.Name.c_str());
+				}
+				if (!sound_set->StepGravel.Name.empty() && (parent_sound_set == nullptr || sound_set->StepGravel.Name != parent_sound_set->StepGravel.Name)) {
+					f->printf("\t\t\"step-gravel\", \"%s\",\n", sound_set->StepGravel.Name.c_str());
+				}
+				if (!sound_set->StepMud.Name.empty() && (parent_sound_set == nullptr || sound_set->StepMud.Name != parent_sound_set->StepMud.Name)) {
+					f->printf("\t\t\"step-mud\", \"%s\",\n", sound_set->StepMud.Name.c_str());
+				}
+				if (!sound_set->StepStone.Name.empty() && (parent_sound_set == nullptr || sound_set->StepStone.Name != parent_sound_set->StepStone.Name)) {
+					f->printf("\t\t\"step-stone\", \"%s\",\n", sound_set->StepStone.Name.c_str());
+				}
+				if (!sound_set->Used.Name.empty() && (parent_sound_set == nullptr || sound_set->Used.Name != parent_sound_set->Used.Name)) {
+					f->printf("\t\t\"used\", \"%s\",\n", sound_set->Used.Name.c_str());
+				}
+				if (!sound_set->Build.Name.empty() && (parent_sound_set == nullptr || sound_set->Build.Name != parent_sound_set->Build.Name)) {
+					f->printf("\t\t\"build\", \"%s\",\n", sound_set->Build.Name.c_str());
+				}
+				if (!sound_set->Ready.Name.empty() && (parent_sound_set == nullptr || sound_set->Ready.Name != parent_sound_set->Ready.Name)) {
+					f->printf("\t\t\"ready\", \"%s\",\n", sound_set->Ready.Name.c_str());
+				}
+				if (!sound_set->Repair.Name.empty() && (parent_sound_set == nullptr || sound_set->Repair.Name != parent_sound_set->Repair.Name)) {
+					f->printf("\t\t\"repair\", \"%s\",\n", sound_set->Repair.Name.c_str());
+				}
+				for (unsigned int j = 0; j < MaxCosts; ++j) {
+					if (!sound_set->Harvest[j].Name.empty() && (parent_sound_set == nullptr || sound_set->Harvest[j].Name != parent_sound_set->Harvest[j].Name)) {
+						f->printf("\t\t\"harvest\", \"%s\", \"%s\",\n", DefaultResourceNames[j].c_str(), sound_set->Harvest[j].Name.c_str());
+					}
+				}
+				if (!sound_set->Help.Name.empty() && (parent_sound_set == nullptr || sound_set->Help.Name != parent_sound_set->Help.Name)) {
+					f->printf("\t\t\"help\", \"%s\",\n", sound_set->Help.Name.c_str());
+				}
+				if (!sound_set->Dead[ANIMATIONS_DEATHTYPES].Name.empty() && (parent_sound_set == nullptr || sound_set->Dead[ANIMATIONS_DEATHTYPES].Name != parent_sound_set->Dead[ANIMATIONS_DEATHTYPES].Name)) {
+					f->printf("\t\t\"dead\", \"%s\",\n", sound_set->Dead[ANIMATIONS_DEATHTYPES].Name.c_str());
+				}
+				int death;
+				for (death = 0; death < ANIMATIONS_DEATHTYPES; ++death) {
+					if (!sound_set->Dead[death].Name.empty() && (parent_sound_set == nullptr || sound_set->Dead[death].Name != parent_sound_set->Dead[death].Name)) {
+						f->printf("\t\t\"dead\", \"%s\", \"%s\",\n", ExtraDeathTypes[death].c_str(), sound_set->Dead[death].Name.c_str());
+					}
+				}
+				f->printf("\t},\n");
 			}
-			f->printf("\t},\n");
 			
 			f->printf("\tMod = \"%s\"\n", mod_file.c_str());
 			f->printf("})\n\n");

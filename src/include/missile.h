@@ -279,7 +279,6 @@
 #include "database/data_type.h"
 #include "data_type.h"
 #include "missileconfig.h"
-#include "sound/unitsound.h"
 #include "unit/unit_ref.h"
 #include "vec2i.h"
 
@@ -288,6 +287,7 @@ class CUnit;
 class CViewport;
 class CFile;
 class LuaCallback;
+struct lua_State;
 struct NumberDesc;
 
 /*----------------------------------------------------------------------------

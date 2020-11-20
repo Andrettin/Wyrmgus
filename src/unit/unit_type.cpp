@@ -779,7 +779,11 @@ void unit_type::process_sml_scope(const sml_data &scope)
 			}
 		});
 	} else if (tag == "sounds") {
-		database::process_sml_data(this->Sound, scope);
+		if (scope.get_operator() == sml_operator::assignment || (scope.get_operator() == sml_operator::addition && this->sound_set == nullptr)) {
+			this->sound_set = std::make_unique<unit_sound_set>();
+		}
+
+		database::process_sml_data(this->sound_set, scope);
 	} else if (tag == "preconditions") {
 		this->preconditions = std::make_unique<and_condition>();
 		database::process_sml_data(this->preconditions, scope);
@@ -1065,64 +1069,68 @@ void unit_type::ProcessConfigData(const CConfigData *config_data)
 				this->DefaultEquipment[item_slot] = item;
 			}
 		} else if (child_config_data->Tag == "sounds") {
+			if (this->sound_set == nullptr) {
+				this->sound_set = std::make_unique<unit_sound_set>();
+			}
+
 			for (size_t j = 0; j < child_config_data->Properties.size(); ++j) {
 				std::string key = child_config_data->Properties[j].first;
 				std::string value = child_config_data->Properties[j].second;
 				
 				if (key == "selected") {
-					this->Sound.Selected.Name = value;
+					this->sound_set->Selected.Name = value;
 				} else if (key == "acknowledge") {
-					this->Sound.Acknowledgement.Name = value;
+					this->sound_set->Acknowledgement.Name = value;
 				} else if (key == "attack") {
-					this->Sound.Attack.Name = value;
+					this->sound_set->Attack.Name = value;
 				} else if (key == "idle") {
-					this->Sound.Idle.Name = value;
+					this->sound_set->Idle.Name = value;
 				} else if (key == "hit") {
-					this->Sound.Hit.Name = value;
+					this->sound_set->Hit.Name = value;
 				} else if (key == "miss") {
-					this->Sound.Miss.Name = value;
+					this->sound_set->Miss.Name = value;
 				} else if (key == "fire_missile") {
-					this->Sound.FireMissile.Name = value;
+					this->sound_set->FireMissile.Name = value;
 				} else if (key == "step") {
-					this->Sound.Step.Name = value;
+					this->sound_set->Step.Name = value;
 				} else if (key == "step_dirt") {
-					this->Sound.StepDirt.Name = value;
+					this->sound_set->StepDirt.Name = value;
 				} else if (key == "step_grass") {
-					this->Sound.StepGrass.Name = value;
+					this->sound_set->StepGrass.Name = value;
 				} else if (key == "step_gravel") {
-					this->Sound.StepGravel.Name = value;
+					this->sound_set->StepGravel.Name = value;
 				} else if (key == "step_mud") {
-					this->Sound.StepMud.Name = value;
+					this->sound_set->StepMud.Name = value;
 				} else if (key == "step_stone") {
-					this->Sound.StepStone.Name = value;
+					this->sound_set->StepStone.Name = value;
 				} else if (key == "used") {
-					this->Sound.Used.Name = value;
+					this->sound_set->Used.Name = value;
 				} else if (key == "build") {
-					this->Sound.Build.Name = value;
+					this->sound_set->Build.Name = value;
 				} else if (key == "ready") {
-					this->Sound.Ready.Name = value;
+					this->sound_set->Ready.Name = value;
 				} else if (key == "repair") {
-					this->Sound.Repair.Name = value;
+					this->sound_set->Repair.Name = value;
 				} else if (key.find("harvest_") != std::string::npos) {
 					std::string resource_ident = FindAndReplaceString(key, "harvest_", "");
 					resource_ident = FindAndReplaceString(resource_ident, "_", "-");
 					const int res = GetResourceIdByName(resource_ident.c_str());
 					if (res != -1) {
-						this->Sound.Harvest[res].Name = value;
+						this->sound_set->Harvest[res].Name = value;
 					} else {
 						fprintf(stderr, "Invalid resource: \"%s\".\n", resource_ident.c_str());
 					}
 				} else if (key == "help") {
-					this->Sound.Help.Name = value;
+					this->sound_set->Help.Name = value;
 				} else if (key == "dead") {
-					this->Sound.Dead[ANIMATIONS_DEATHTYPES].Name = value;
+					this->sound_set->Dead[ANIMATIONS_DEATHTYPES].Name = value;
 				} else if (key.find("dead_") != std::string::npos) {
 					std::string death_type_ident = FindAndReplaceString(key, "dead_", "");
 					death_type_ident = FindAndReplaceString(death_type_ident, "_", "-");
 					int death;
 					for (death = 0; death < ANIMATIONS_DEATHTYPES; ++death) {
 						if (death_type_ident == ExtraDeathTypes[death]) {
-							this->Sound.Dead[death].Name = value;
+							this->sound_set->Dead[death].Name = value;
 							break;
 						}
 					}
@@ -1531,7 +1539,10 @@ void unit_type::set_parent(const unit_type *parent_type)
 	this->PoisonDrain = parent_type->PoisonDrain;
 	this->AutoBuildRate = parent_type->AutoBuildRate;
 	this->animation_set = parent_type->animation_set;
-	this->Sound = parent_type->Sound;
+	if (parent_type->sound_set != nullptr) {
+		this->sound_set = std::make_unique<unit_sound_set>();
+		*this->sound_set = *parent_type->sound_set;
+	}
 	this->NumDirections = parent_type->NumDirections;
 	this->NeutralMinimapColorRGB = parent_type->NeutralMinimapColorRGB;
 	this->RandomMovementProbability = parent_type->RandomMovementProbability;
@@ -1984,74 +1995,79 @@ void UpdateUnitStats(wyrmgus::unit_type &type, int reset)
 			type.Stats[player] = type.MapDefaultStat;
 		}
 		
-		type.MapSound = type.Sound;
+		type.MapSound = std::make_unique<wyrmgus::unit_sound_set>();
+
+		if (type.get_sound_set() != nullptr) {
+			*type.MapSound = *type.get_sound_set();
+		}
+
 		for (std::map<std::string, wyrmgus::unit_sound_set>::iterator iterator = type.ModSounds.begin(); iterator != type.ModSounds.end(); ++iterator) {
 			if (!iterator->second.Selected.Name.empty()) {
-				type.MapSound.Selected = iterator->second.Selected;
+				type.MapSound->Selected = iterator->second.Selected;
 			}
 			if (!iterator->second.Acknowledgement.Name.empty()) {
-				type.MapSound.Acknowledgement = iterator->second.Acknowledgement;
+				type.MapSound->Acknowledgement = iterator->second.Acknowledgement;
 			}
 			if (!iterator->second.Attack.Name.empty()) {
-				type.MapSound.Attack = iterator->second.Attack;
+				type.MapSound->Attack = iterator->second.Attack;
 			}
 			if (!iterator->second.Idle.Name.empty()) {
-				type.MapSound.Idle = iterator->second.Idle;
+				type.MapSound->Idle = iterator->second.Idle;
 			}
 			if (!iterator->second.Hit.Name.empty()) {
-				type.MapSound.Hit = iterator->second.Hit;
+				type.MapSound->Hit = iterator->second.Hit;
 			}
 			if (!iterator->second.Miss.Name.empty()) {
-				type.MapSound.Miss = iterator->second.Miss;
+				type.MapSound->Miss = iterator->second.Miss;
 			}
 			if (!iterator->second.FireMissile.Name.empty()) {
-				type.MapSound.FireMissile = iterator->second.FireMissile;
+				type.MapSound->FireMissile = iterator->second.FireMissile;
 			}
 			if (!iterator->second.Step.Name.empty()) {
-				type.MapSound.Step = iterator->second.Step;
+				type.MapSound->Step = iterator->second.Step;
 			}
 			if (!iterator->second.StepDirt.Name.empty()) {
-				type.MapSound.StepDirt = iterator->second.StepDirt;
+				type.MapSound->StepDirt = iterator->second.StepDirt;
 			}
 			if (!iterator->second.StepGrass.Name.empty()) {
-				type.MapSound.StepGrass = iterator->second.StepGrass;
+				type.MapSound->StepGrass = iterator->second.StepGrass;
 			}
 			if (!iterator->second.StepGravel.Name.empty()) {
-				type.MapSound.StepGravel = iterator->second.StepGravel;
+				type.MapSound->StepGravel = iterator->second.StepGravel;
 			}
 			if (!iterator->second.StepMud.Name.empty()) {
-				type.MapSound.StepMud = iterator->second.StepMud;
+				type.MapSound->StepMud = iterator->second.StepMud;
 			}
 			if (!iterator->second.StepStone.Name.empty()) {
-				type.MapSound.StepStone = iterator->second.StepStone;
+				type.MapSound->StepStone = iterator->second.StepStone;
 			}
 			if (!iterator->second.Used.Name.empty()) {
-				type.MapSound.Used = iterator->second.Used;
+				type.MapSound->Used = iterator->second.Used;
 			}
 			if (!iterator->second.Build.Name.empty()) {
-				type.MapSound.Build = iterator->second.Build;
+				type.MapSound->Build = iterator->second.Build;
 			}
 			if (!iterator->second.Ready.Name.empty()) {
-				type.MapSound.Ready = iterator->second.Ready;
+				type.MapSound->Ready = iterator->second.Ready;
 			}
 			if (!iterator->second.Repair.Name.empty()) {
-				type.MapSound.Repair = iterator->second.Repair;
+				type.MapSound->Repair = iterator->second.Repair;
 			}
 			for (unsigned int j = 0; j < MaxCosts; ++j) {
 				if (!iterator->second.Harvest[j].Name.empty()) {
-					type.MapSound.Harvest[j] = iterator->second.Harvest[j];
+					type.MapSound->Harvest[j] = iterator->second.Harvest[j];
 				}
 			}
 			if (!iterator->second.Help.Name.empty()) {
-				type.MapSound.Help = iterator->second.Help;
+				type.MapSound->Help = iterator->second.Help;
 			}
 			if (!iterator->second.Dead[ANIMATIONS_DEATHTYPES].Name.empty()) {
-				type.MapSound.Dead[ANIMATIONS_DEATHTYPES] = iterator->second.Dead[ANIMATIONS_DEATHTYPES];
+				type.MapSound->Dead[ANIMATIONS_DEATHTYPES] = iterator->second.Dead[ANIMATIONS_DEATHTYPES];
 			}
 			int death;
 			for (death = 0; death < ANIMATIONS_DEATHTYPES; ++death) {
 				if (!iterator->second.Dead[death].Name.empty()) {
-					type.MapSound.Dead[death] = iterator->second.Dead[death];
+					type.MapSound->Dead[death] = iterator->second.Dead[death];
 				}
 			}
 		}

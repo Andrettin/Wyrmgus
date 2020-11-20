@@ -355,14 +355,10 @@ void MapUnitSounds()
 		return;
 	}
 
-	for (wyrmgus::civilization *civilization : wyrmgus::civilization::get_all()) {
-		civilization->UnitSounds.map_sounds();
-	}
-
 	// Parse all units sounds.
 	for (wyrmgus::unit_type *unit_type : wyrmgus::unit_type::get_all()) {
 		MapAnimSounds(*unit_type);
 
-		unit_type->MapSound.map_sounds();
+		unit_type->MapSound->map_sounds();
 	}
 }

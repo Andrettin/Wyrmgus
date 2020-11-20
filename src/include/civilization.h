@@ -54,6 +54,7 @@ class language;
 class quest;
 class species;
 class unit_class;
+class unit_sound_set;
 class upgrade_class;
 enum class character_title;
 enum class government_type;
@@ -179,6 +180,11 @@ public:
 		return this->playable;
 	}
 
+	const unit_sound_set *get_unit_sound_set() const
+	{
+		return this->unit_sound_set.get();
+	}
+
 	const std::vector<civilization *> &get_develops_from() const
 	{
 		return this->develops_from;
@@ -289,9 +295,7 @@ private:
 	std::string interface; //the string identifier for the civilization's interface
 	std::string default_color; //name of the civilization's default color (used for the encyclopedia, tech tree, etc.)
 	CUpgrade *upgrade = nullptr;
-public:
-	unit_sound_set UnitSounds;			/// sounds for unit events
-private:
+	std::unique_ptr<unit_sound_set> unit_sound_set;	/// sounds for unit events
 	language *language = nullptr;	/// the language used by the civilization
 	calendar *calendar = nullptr;	/// the calendar used by the civilization
 public:

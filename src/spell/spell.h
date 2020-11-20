@@ -33,7 +33,7 @@
 #include "data_type.h"
 #include "item/item_class.h"
 #include "luacallback.h"
-#include "sound/unitsound.h"
+#include "resource.h" //for MaxCosts
 #include "vec2i.h"
 
 #ifdef __MORPHOS__
@@ -44,13 +44,16 @@ class AutoCastInfo;
 class CMapLayer;
 class CPlayer;
 class CUnit;
+class CUpgrade;
 struct lua_State;
 
 static int CclDefineSpell(lua_State *l);
 static void CclSpellAutocast(lua_State *l, AutoCastInfo *autocast);
 
 namespace wyrmgus {
+	class civilization;
 	class faction;
+	class magic_domain;
 	class missile_type;
 	class sound;
 	class spell;

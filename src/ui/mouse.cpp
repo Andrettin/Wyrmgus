@@ -2109,10 +2109,10 @@ static void SendCommand(const Vec2i &tilePos)
 			//Wyrmgus end
 				//Wyrmgus start
 				/*
-				if (Selected[i]->Type->MapSound.Attack.Sound) {
+				if (Selected[i]->Type->MapSound->Attack.Sound) {
 					PlayUnitSound(*Selected[i], wyrmgus::unit_sound_type::attack);
 					break;
-				} else if (Selected[i]->Type->MapSound.Acknowledgement.Sound) {
+				} else if (Selected[i]->Type->MapSound->Acknowledgement.Sound) {
 					PlayUnitSound(*Selected[i], wyrmgus::unit_sound_type::acknowledging);
 					break;
 				}
@@ -2120,19 +2120,13 @@ static void SendCommand(const Vec2i &tilePos)
 				PlayUnitSound(*Selected[i], wyrmgus::unit_sound_type::attack);
 				break;
 				//Wyrmgus end
-			//Wyrmgus start
-//			} else if (CursorAction == ButtonCmd::Repair && Selected[i]->Type->MapSound.Repair.Sound) {
 			} else if (CursorAction == ButtonCmd::Repair) {
-			//Wyrmgus end
 				PlayUnitSound(*Selected[i], wyrmgus::unit_sound_type::repairing);
 				break;
 			} else if (CursorAction == ButtonCmd::Build || CursorAction == ButtonCmd::BuildClass) {
 				PlayUnitSound(*Selected[i], wyrmgus::unit_sound_type::build);
 				break;
-			//Wyrmgus start
-//			} else if (Selected[i]->Type->MapSound.Acknowledgement.Sound) {
 			} else {
-			//Wyrmgus end
 				PlayUnitSound(*Selected[i], wyrmgus::unit_sound_type::acknowledging);
 				break;
 			}

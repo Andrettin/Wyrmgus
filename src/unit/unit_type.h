@@ -27,12 +27,12 @@
 
 #pragma once
 
+#include "animation.h" //for the ANIMATIONS_DEATHTYPES constant
 #include "color.h"
 #include "database/detailed_data_entry.h"
 #include "database/data_type.h"
 #include "data_type.h"
 #include "missileconfig.h"
-#include "sound/unitsound.h"
 #include "ui/button_cmd.h"
 #include "ui/icon.h"
 #include "upgrade/upgrade_structs.h"
@@ -69,6 +69,7 @@ namespace wyrmgus {
 	class terrain_type;
 	class time_of_day;
 	class unit_class;
+	class unit_sound_set;
 	class unit_type;
 	class unit_type_variation;
 	class world;
@@ -996,6 +997,11 @@ public:
 		return this->variations;
 	}
 
+	const unit_sound_set *get_sound_set() const
+	{
+		return this->sound_set.get();
+	}
+
 	const std::unique_ptr<condition> &get_preconditions() const
 	{
 		return this->preconditions;
@@ -1206,8 +1212,10 @@ public:
 	std::vector< std::unique_ptr<CBuildRestriction>> AiBuildingRules; /// Rules list for for AI to build a building.
 	CColor NeutralMinimapColorRGB;   /// Minimap Color for Neutral Units.
 
-	unit_sound_set Sound;				/// Sounds for events
-	unit_sound_set MapSound;			/// Sounds for events, map-specific
+private:
+	std::unique_ptr<unit_sound_set> sound_set;			/// Sounds for events
+public:
+	std::unique_ptr<unit_sound_set> MapSound;			/// Sounds for events, map-specific
 	//Wyrmgus start
 	std::map<std::string, unit_sound_set> ModSounds;
 	//Wyrmgus end
