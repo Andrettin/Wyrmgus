@@ -45,7 +45,7 @@
 #include "map/tileset.h"
 #include "objective_type.h"
 #include "player.h"
-#include "quest.h"
+#include "quest_objective.h"
 #include "script.h"
 #include "script/condition/condition.h"
 #include "species/species.h"

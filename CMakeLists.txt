@@ -385,6 +385,7 @@ set(stratagusmain_SRCS
 	src/stratagus/player_color.cpp
 	src/stratagus/province.cpp
 	src/stratagus/quest.cpp
+	src/stratagus/quest_objective.cpp
 	src/stratagus/resource.cpp
 	src/stratagus/script.cpp
 	src/stratagus/script_player.cpp
@@ -984,6 +985,7 @@ set(stratagus_generic_HDRS
 	src/stratagus/magic_domain.h
 	src/stratagus/objective_type.h
 	src/stratagus/player_container.h
+	src/stratagus/quest_objective.h
 	src/stratagus/vassalage_type.h
 )
 

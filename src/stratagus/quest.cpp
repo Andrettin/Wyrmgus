@@ -30,22 +30,17 @@
 #include "quest.h"
 
 #include "achievement.h"
-#include "character.h"
 #include "civilization.h"
-#include "faction.h"
 #include "game.h"
 #include "iocompat.h"
 #include "iolib.h"
 #include "luacallback.h"
-#include "map/site.h"
 #include "objective_type.h"
 #include "parameters.h"
-#include "player.h"
-#include "player_color.h"
+#include "quest_objective.h"
 #include "script/condition/and_condition.h"
 #include "script/effect/effect_list.h"
 #include "script.h"
-#include "unit/unit_class.h"
 
 wyrmgus::quest *CurrentQuest = nullptr;
 
@@ -84,48 +79,6 @@ void SaveQuestCompletion()
 }
 
 namespace wyrmgus {
-
-quest_objective::quest_objective(const wyrmgus::objective_type objective_type, const wyrmgus::quest *quest)
-	: objective_type(objective_type), quest(quest), index(quest->get_objectives().size())
-{
-	if (objective_type == objective_type::hero_must_survive) {
-		this->quantity = 0;
-	}
-}
-
-void quest_objective::process_sml_property(const wyrmgus::sml_property &property)
-{
-	const std::string &key = property.get_key();
-	const std::string &value = property.get_value();
-
-	if (key == "quantity") {
-		this->quantity = std::stoi(value);
-	} else if (key == "objective_string") {
-		this->objective_string = value;
-	} else if (key == "settlement") {
-		this->settlement = wyrmgus::site::get(value);
-	} else if (key == "faction") {
-		this->faction = wyrmgus::faction::get(value);
-	} else if (key == "character") {
-		this->character = wyrmgus::character::get(value);
-	} else {
-		throw std::runtime_error("Invalid quest objective property: \"" + key + "\".");
-	}
-}
-
-void quest_objective::process_sml_scope(const wyrmgus::sml_data &scope)
-{
-	const std::string &tag = scope.get_tag();
-	const std::vector<std::string> &values = scope.get_values();
-
-	if (tag == "unit_classes") {
-		for (const std::string &value : values) {
-			this->unit_classes.push_back(wyrmgus::unit_class::get(value));
-		}
-	} else {
-		throw std::runtime_error("Invalid quest objective scope: \"" + scope.get_tag() + "\".");
-	}
-}
 
 quest::quest(const std::string &identifier) : detailed_data_entry(identifier)
 {

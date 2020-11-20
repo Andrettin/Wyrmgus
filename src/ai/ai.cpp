@@ -152,9 +152,8 @@
 #include "objective_type.h"
 #include "pathfinder.h"
 #include "player.h"
-//Wyrmgus start
 #include "quest.h"
-//Wyrmgus end
+#include "quest_objective.h"
 #include "script.h"
 #include "script/condition/condition.h"
 #include "unit/unit.h"

@@ -53,10 +53,8 @@
 #include "network.h"
 #include "plane.h"
 #include "player.h"
-//Wyrmgus start
-#include "province.h"
 #include "quest.h"
-//Wyrmgus end
+#include "quest_objective.h"
 #include "script.h"
 #include "script/trigger.h"
 #include "sound/sound.h"

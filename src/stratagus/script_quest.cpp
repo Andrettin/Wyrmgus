@@ -45,6 +45,7 @@
 #include "objective_type.h"
 #include "player.h"
 #include "player_color.h"
+#include "quest_objective.h"
 #include "script.h"
 #include "unit/unit_class.h"
 #include "unit/unit_type.h"

@@ -31,7 +31,6 @@
 #include "database/detailed_data_entry.h"
 
 class CPlayer;
-class CUpgrade;
 class LuaCallback;
 struct lua_State;
 
@@ -43,120 +42,19 @@ class character;
 class civilization;
 class condition;
 class dialogue;
-class faction;
 class icon;
 class player_color;
-class quest;
-class site;
-class unique_item;
-class unit_class;
-class unit_type;
-enum class objective_type;
+class quest_objective;
 
 template <typename scope_type>
 class effect_list;
-
-class quest_objective
-{
-public:
-	explicit quest_objective(const objective_type objective_type, const wyrmgus::quest *quest);
-
-	void process_sml_property(const wyrmgus::sml_property &property);
-	void process_sml_scope(const wyrmgus::sml_data &scope);
-
-	objective_type get_objective_type() const
-	{
-		return this->objective_type;
-	}
-
-	const wyrmgus::quest *get_quest() const
-	{
-		return this->quest;
-	}
-
-	int get_index() const
-	{
-		return this->index;
-	}
-
-	int get_quantity() const
-	{
-		return this->quantity;
-	}
-
-	const std::string &get_objective_string() const
-	{
-		return this->objective_string;
-	}
-
-	const std::vector<const wyrmgus::unit_class *> &get_unit_classes() const
-	{
-		return this->unit_classes;
-	}
-
-	const wyrmgus::site *get_settlement() const
-	{
-		return this->settlement;
-	}
-
-	const wyrmgus::faction *get_faction() const
-	{
-		return this->faction;
-	}
-
-	const wyrmgus::character *get_character() const
-	{
-		return this->character;
-	}
-
-private:
-	objective_type objective_type;
-	const wyrmgus::quest *quest = nullptr;
-	int index = -1;
-	int quantity = 1;
-public:
-	int Resource = -1;
-private:
-	std::string objective_string;
-	std::vector<const wyrmgus::unit_class *> unit_classes;
-public:
-	std::vector<wyrmgus::unit_type *> UnitTypes;
-	const CUpgrade *Upgrade = nullptr;
-private:
-	const wyrmgus::character *character = nullptr;
-public:
-	const unique_item *Unique = nullptr;
-private:
-	const wyrmgus::site *settlement = nullptr;
-	const wyrmgus::faction *faction = nullptr;
-
-	friend static int ::CclDefineQuest(lua_State *l);
-};
-
-class player_quest_objective
-{
-public:
-	player_quest_objective(const quest_objective *quest_objective) : quest_objective(quest_objective)
-	{
-	}
-
-	const quest_objective *get_quest_objective() const
-	{
-		return this->quest_objective;
-	}
-
-private:
-	const quest_objective *quest_objective = nullptr;
-public:
-	int Counter = 0;
-};
 
 class quest final : public detailed_data_entry, public data_type<quest>
 {
 	Q_OBJECT
 
-	Q_PROPERTY(wyrmgus::icon* icon MEMBER icon READ get_icon)
-	Q_PROPERTY(wyrmgus::player_color* player_color MEMBER player_color READ get_player_color)
+	Q_PROPERTY(wyrmgus::icon* icon MEMBER icon)
+	Q_PROPERTY(wyrmgus::player_color* player_color MEMBER player_color)
 	Q_PROPERTY(bool unobtainable MEMBER unobtainable READ is_unobtainable)
 	Q_PROPERTY(bool uncompleteable MEMBER uncompleteable READ is_uncompleteable)
 	Q_PROPERTY(bool unfailable MEMBER unfailable READ is_unfailable)
@@ -179,12 +77,12 @@ public:
 	virtual void initialize() override;
 	virtual void check() const override;
 
-	icon *get_icon() const
+	const icon *get_icon() const
 	{
 		return this->icon;
 	}
 
-	player_color *get_player_color() const
+	const player_color *get_player_color() const
 	{
 		return this->player_color;
 	}

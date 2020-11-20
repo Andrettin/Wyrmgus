@@ -67,9 +67,8 @@
 #include "pathfinder.h"
 #include "plane.h"
 #include "player.h"
-//Wyrmgus start
 #include "quest.h"
-//Wyrmgus end
+#include "quest_objective.h"
 #include "religion/deity.h"
 #include "script.h"
 #include "script/condition/condition.h"

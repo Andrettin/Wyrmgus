@@ -67,8 +67,9 @@
 #include "parameters.h"
 //Wyrmgus end
 #include "player_color.h"
-//Wyrmgus start
 #include "quest.h"
+#include "quest_objective.h"
+//Wyrmgus start
 #include "religion/deity.h"
 #include "religion/religion.h"
 //Wyrmgus end

@@ -46,7 +46,7 @@
 #include "objective_type.h"
 #include "pathfinder.h"
 #include "player.h"
-#include "quest.h"
+#include "quest_objective.h"
 #include "resource.h"
 #include "script.h"
 //Wyrmgus start
