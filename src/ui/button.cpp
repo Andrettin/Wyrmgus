@@ -596,16 +596,12 @@ std::string button::get_hint() const
 		if (unit_type != nullptr) {
 			if (this->Action == ButtonCmd::UpgradeTo || this->Action == ButtonCmd::UpgradeToClass) {
 				hint = "Upgrade to ";
-			} else if (unit_type->BoolFlag[BUILDING_INDEX].value) {
-				hint = "Build ";
 			} else {
-				const bool hire = unit_type->Stats[unit->Player->Index].GetUnitStock(unit_type) != 0;
-				if (hire) {
+				const bool hire = unit->Type->Stats[unit->Player->Index].GetUnitStock(unit_type) != 0;
+				if (hire && !unit_type->BoolFlag[BUILDING_INDEX].value) {
 					hint = "Hire ";
-				} else if (unit_type->BoolFlag[ORGANIC_INDEX].value) {
-					hint = "Train ";
 				} else {
-					hint = "Build ";
+					hint = unit_type->get_build_verb_string() + " ";
 				}
 			}
 

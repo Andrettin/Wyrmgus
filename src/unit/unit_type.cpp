@@ -1913,6 +1913,15 @@ gender unit_type::get_gender() const
 	return this->DefaultStat.get_gender();
 }
 
+std::string unit_type::get_build_verb_string() const
+{
+	if (this->BoolFlag[ORGANIC_INDEX].value) {
+		return "Train";
+	} else {
+		return "Build";
+	}
+}
+
 void resource_info::process_sml_property(const sml_property &property)
 {
 	const std::string &key = property.get_key();

@@ -183,7 +183,7 @@ void PlayerAi::check_quest_units_to_build()
 			continue;
 		}
 
-		wyrmgus::unit_type *unit_type_to_build = nullptr;
+		const wyrmgus::unit_type *unit_type_to_build = nullptr;
 		if (!quest_objective->UnitTypes.empty()) {
 			unit_type_to_build = quest_objective->UnitTypes.front();
 		} else {

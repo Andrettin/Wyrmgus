@@ -1010,6 +1010,8 @@ public:
 
 	gender get_gender() const;
 
+	std::string get_build_verb_string() const;
+
 public:
 	const unit_type *Parent = nullptr;				/// Parent unit type
 	//Wyrmgus start
