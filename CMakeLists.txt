@@ -868,6 +868,7 @@ set(stratagus_upgrade_HDRS
 )
 
 set(stratagus_util_HDRS
+	src/util/char_util.h
 	src/util/color_container.h
 	src/util/container_util.h
 	src/util/date_util.h
