@@ -779,7 +779,7 @@ void unit_type::process_sml_scope(const sml_data &scope)
 			}
 		});
 	} else if (tag == "sounds") {
-		if (scope.get_operator() == sml_operator::assignment || (scope.get_operator() == sml_operator::addition && this->sound_set == nullptr)) {
+		if (this->sound_set == nullptr) {
 			this->sound_set = std::make_unique<unit_sound_set>();
 		}
 
