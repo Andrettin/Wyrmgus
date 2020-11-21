@@ -2639,6 +2639,11 @@ bool CPlayer::can_accept_quest(const wyrmgus::quest *quest) const
 				}
 				break;
 			}
+			case wyrmgus::objective_type::hero_must_survive:
+				if (!this->HasHero(objective->get_character())) {
+					return false;
+				}
+				break;
 		}
 	}
 	
@@ -2684,18 +2689,8 @@ bool CPlayer::check_quest_completion(const wyrmgus::quest *quest) const
 //returns the reason for failure (empty if none)
 std::string CPlayer::check_quest_failure(const wyrmgus::quest *quest) const
 {
-	for (size_t i = 0; i < quest->HeroesMustSurvive.size(); ++i) { // put it here, because "unfailable" quests should also fail when a hero which should survive dies
-		if (!this->HasHero(quest->HeroesMustSurvive[i])) {
-			return "A hero necessary for the quest has died.";
-		}
-	}
-	
 	if (quest->CurrentCompleted) { // quest already completed by someone else
 		return "Another faction has completed the quest before you could.";
-	}
-
-	if (quest->is_unfailable()) {
-		return "";
 	}
 
 	for (const auto &objective : this->get_quest_objectives()) {
@@ -2704,6 +2699,10 @@ std::string CPlayer::check_quest_failure(const wyrmgus::quest *quest) const
 			continue;
 		}
 
+		//"unfailable" quests should also fail when a hero which should survive dies
+		if (quest->is_unfailable() && quest_objective->get_objective_type() != wyrmgus::objective_type::hero_must_survive) {
+			continue;
+		}
 
 		switch (quest_objective->get_objective_type()) {
 			case wyrmgus::objective_type::build_units: {
@@ -2834,6 +2833,13 @@ std::string CPlayer::check_quest_failure(const wyrmgus::quest *quest) const
 					return "A hero necessary for the quest has died.";
 				}
 				break;
+		}
+	}
+
+	//unfailable" quests should also fail when a hero which should survive dies
+	for (const wyrmgus::character *character : quest->HeroesMustSurvive) {
+		if (!this->HasHero(character)) {
+			return "A hero necessary for the quest has died.";
 		}
 	}
 
