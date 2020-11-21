@@ -51,6 +51,7 @@
 #include "quest.h"
 #include "religion/deity.h"
 #include "script/condition/and_condition.h"
+#include "sound/unitsound.h"
 #include "species/species.h"
 #include "spell/spell.h"
 #include "time/calendar.h"
@@ -145,6 +146,12 @@ void character::process_sml_scope(const sml_data &scope)
 			database::process_sml_data(item, child_scope);
 			this->add_item(std::move(item));
 		});
+	} else if (tag == "sounds") {
+		if (scope.get_operator() == sml_operator::assignment || (scope.get_operator() == sml_operator::addition && this->sound_set == nullptr)) {
+			this->sound_set = std::make_unique<unit_sound_set>();
+		}
+
+		database::process_sml_data(this->sound_set, scope);
 	} else {
 		data_entry::process_sml_scope(scope);
 	}
@@ -449,6 +456,10 @@ void character::initialize()
 
 	this->GenerateMissingDates();
 	this->UpdateAttributes();
+
+	if (this->sound_set != nullptr) {
+		this->sound_set->map_sounds();
+	}
 
 	for (const std::unique_ptr<historical_location> &location : this->HistoricalLocations) {
 		location->initialize();

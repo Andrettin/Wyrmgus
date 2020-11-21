@@ -60,6 +60,7 @@ namespace wyrmgus {
 	class quest;
 	class religion;
 	class site;
+	class unit_sound_set;
 	class unit_type;
 	enum class gender;
 }
@@ -356,6 +357,11 @@ public:
 
 	void remove_ability(const CUpgrade *ability);
 
+	const unit_sound_set *get_sound_set() const
+	{
+		return this->sound_set.get();
+	}
+
 	const std::unique_ptr<const and_condition> &get_conditions() const
 	{
 		return this->conditions;
@@ -414,6 +420,7 @@ public:
 	int Attributes[MaxAttributes];
 	std::vector<wyrmgus::unit_type *> ForbiddenUpgrades;	/// which unit types this character is forbidden to upgrade to
 private:
+	std::unique_ptr<unit_sound_set> sound_set;
 	std::unique_ptr<character_history> history;
 public:
 	std::vector<std::pair<CDate, wyrmgus::faction *>> HistoricalFactions;

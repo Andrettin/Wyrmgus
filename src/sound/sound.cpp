@@ -30,6 +30,7 @@
 
 #include "sound/sound.h"
 
+#include "character.h"
 #include "civilization.h"
 #include "database/defines.h"
 #include "missile.h"
@@ -146,7 +147,17 @@ static wyrmgus::sample *ChooseSample(const wyrmgus::sound *sound, bool selection
 */
 static const wyrmgus::sound *ChooseUnitVoiceSound(const CUnit *unit, const wyrmgus::unit_sound_type unit_sound_type)
 {
-	const wyrmgus::sound *sound = unit->Type->MapSound->get_sound_for_unit(unit_sound_type, unit);
+	const wyrmgus::sound *sound = nullptr;
+
+	if (unit->get_character() != nullptr && unit->get_character()->get_sound_set() != nullptr) {
+		sound = unit->get_character()->get_sound_set()->get_sound_for_unit(unit_sound_type, unit);
+
+		if (sound != nullptr) {
+			return sound;
+		}
+	}
+
+	sound = unit->Type->MapSound->get_sound_for_unit(unit_sound_type, unit);
 
 	if (sound != nullptr) {
 		return sound;
@@ -172,10 +183,9 @@ static const wyrmgus::sound *ChooseUnitVoiceSound(const CUnit *unit, const wyrmg
 			case wyrmgus::unit_sound_type::help:
 				if (unit->Type->BoolFlag[BUILDING_INDEX].value) {
 					return civilization->get_unit_sound_set()->get_sound_for_unit(wyrmgus::unit_sound_type::help_town, unit);
-				} else {
-					return civilization->get_unit_sound_set()->get_sound_for_unit(unit_sound_type, unit);
 				}
-				break;
+
+				return civilization->get_unit_sound_set()->get_sound_for_unit(unit_sound_type, unit);
 			default:
 				break;
 		}
