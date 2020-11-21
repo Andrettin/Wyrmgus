@@ -2492,7 +2492,7 @@ void CPlayer::fail_quest(wyrmgus::quest *quest, const std::string &fail_reason)
 			wyrmgus::defines::get()->get_campaign_defeat_dialogue()->call(this);
 		}
 
-		CclCommand("if (GenericDialog ~= nil) then GenericDialog(\"Quest Failed\", \"You have failed the " + quest->get_name() + " quest! " + fail_reason + "\", nil, \"" + (quest->get_icon() ? quest->get_icon()->get_identifier() : "") + "\", \"" + (quest->get_player_color() ? quest->get_player_color()->get_identifier() : "") + "\") end;");
+		CclCommand("if (GenericDialog ~= nil) then GenericDialog(\"Quest Failed\", \"You have failed the " + quest->get_name() + " quest! " + fail_reason + "\", nil, \"" + (quest->get_icon() ? quest->get_icon()->get_identifier() : "") + "\", \"" + (quest->get_player_color() ? quest->get_player_color()->get_identifier() : "") + "\", " + std::to_string(quest->get_icon() ? quest->get_icon()->get_frame() : 0) + ") end;");
 	}
 }
 
