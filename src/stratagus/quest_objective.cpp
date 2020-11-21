@@ -90,8 +90,19 @@ void quest_objective::process_sml_scope(const sml_data &scope)
 
 void quest_objective::check() const
 {
-	if (this->get_objective_type() == objective_type::build_units && this->UnitTypes.empty() && this->get_unit_classes().empty()) {
-		throw std::runtime_error("Build units quest objective has neither unit types nor unit classes set for it.");
+	switch (this->get_objective_type()) {
+		case objective_type::build_units:
+			if (this->UnitTypes.empty() && this->get_unit_classes().empty()) {
+				throw std::runtime_error("Build units quest objective has neither unit types nor unit classes set for it.");
+			}
+			break;
+		case objective_type::hero_must_survive:
+			if (this->get_character() == nullptr) {
+				throw std::runtime_error("Hero must survive quest objective has no character set for it.");
+			}
+			break;
+		default:
+			break;
 	}
 }
 
@@ -123,6 +134,8 @@ std::string quest_objective::generate_objective_string(const CPlayer *player) co
 
 			break;
 		}
+		case objective_type::hero_must_survive:
+			return this->get_character()->get_full_name() + " must survive";
 		default:
 			return std::string();
 	}
