@@ -467,7 +467,7 @@ void CUnit::Init()
 	Player = nullptr;
 	Stats = nullptr;
 	//Wyrmgus start
-	Character = nullptr;
+	this->character = nullptr;
 	this->settlement = nullptr;
 	this->site = nullptr;
 	this->Trait = nullptr;
@@ -606,7 +606,7 @@ void CUnit::Release(const bool final)
 	//
 
 	//Wyrmgus start
-	this->Character = nullptr;
+	this->character = nullptr;
 	this->settlement = nullptr;
 	if (this->site != nullptr && this->site->get_site_unit() == this) {
 		this->site->set_site_unit(nullptr);
@@ -756,13 +756,13 @@ void CUnit::IncreaseLevel(int level_quantity, bool automatic_learning)
 		if (((int) AiHelpers.ExperienceUpgrades.size()) > Type->Slot) {
 			std::vector<const wyrmgus::unit_type *> potential_upgrades;
 			
-			if ((this->Player->AiEnabled || this->Character == nullptr) && this->Type->BoolFlag[HARVESTER_INDEX].value && this->CurrentResource && AiHelpers.ExperienceUpgrades[Type->Slot].size() > 1) {
+			if ((this->Player->AiEnabled || this->get_character() == nullptr) && this->Type->BoolFlag[HARVESTER_INDEX].value && this->CurrentResource && AiHelpers.ExperienceUpgrades[Type->Slot].size() > 1) {
 				//if is a harvester who is currently gathering, try to upgrade to a unit type which is best for harvesting the current resource
 				unsigned int best_gathering_rate = 0;
 				for (size_t i = 0; i != AiHelpers.ExperienceUpgrades[Type->Slot].size(); ++i) {
 					const wyrmgus::unit_type *experience_upgrade_type = AiHelpers.ExperienceUpgrades[Type->Slot][i];
 					if (check_conditions(experience_upgrade_type, this, true)) {
-						if (this->Character == nullptr || std::find(this->Character->ForbiddenUpgrades.begin(), this->Character->ForbiddenUpgrades.end(), experience_upgrade_type) == this->Character->ForbiddenUpgrades.end()) {
+						if (this->get_character() == nullptr || !wyrmgus::vector::contains(this->get_character()->ForbiddenUpgrades, experience_upgrade_type)) {
 							if (!experience_upgrade_type->ResInfo[this->CurrentResource]) {
 								continue;
 							}
@@ -777,10 +777,10 @@ void CUnit::IncreaseLevel(int level_quantity, bool automatic_learning)
 						}
 					}
 				}
-			} else if (this->Player->AiEnabled || (this->Character == nullptr && AiHelpers.ExperienceUpgrades[Type->Slot].size() == 1)) {
+			} else if (this->Player->AiEnabled || (this->get_character() == nullptr && AiHelpers.ExperienceUpgrades[Type->Slot].size() == 1)) {
 				for (size_t i = 0; i != AiHelpers.ExperienceUpgrades[Type->Slot].size(); ++i) {
 					if (check_conditions(AiHelpers.ExperienceUpgrades[Type->Slot][i], this, true)) {
-						if (this->Character == nullptr || std::find(this->Character->ForbiddenUpgrades.begin(), this->Character->ForbiddenUpgrades.end(), AiHelpers.ExperienceUpgrades[Type->Slot][i]) == this->Character->ForbiddenUpgrades.end()) {
+						if (this->get_character() == nullptr || !wyrmgus::vector::contains(this->get_character()->ForbiddenUpgrades, AiHelpers.ExperienceUpgrades[Type->Slot][i])) {
 							potential_upgrades.push_back(AiHelpers.ExperienceUpgrades[Type->Slot][i]);
 						}
 					}
@@ -799,7 +799,7 @@ void CUnit::IncreaseLevel(int level_quantity, bool automatic_learning)
 			}
 		}
 			
-		if ((this->Player->AiEnabled || this->Character == nullptr) && this->Variable[LEVELUP_INDEX].Value) {
+		if ((this->Player->AiEnabled || this->get_character() == nullptr) && this->Variable[LEVELUP_INDEX].Value) {
 			if (((int) AiHelpers.LearnableAbilities.size()) > Type->Slot) {
 				std::vector<const CUpgrade *> potential_abilities;
 				for (size_t i = 0; i != AiHelpers.LearnableAbilities[Type->Slot].size(); ++i) {
@@ -842,8 +842,8 @@ void CUnit::Retrain()
 
 			int remove_count = upgrade_count;
 
-			if (this->Character != nullptr) {
-				for (const CUpgrade *base_ability : this->Character->get_base_abilities()) {
+			if (this->get_character() != nullptr) {
+				for (const CUpgrade *base_ability : this->get_character()->get_base_abilities()) {
 					if (base_ability == upgrade) {
 						remove_count--;
 					}
@@ -853,7 +853,7 @@ void CUnit::Retrain()
 			for (int i = 0; i < remove_count; ++i) {
 				AbilityLost(*this, upgrade);
 			}
-		} else if (upgrade->get_deity() != nullptr && this->Character && this->Character->Custom) { //allow changing the deity for custom heroes
+		} else if (upgrade->get_deity() != nullptr && this->get_character() != nullptr && this->get_character()->Custom) { //allow changing the deity for custom heroes
 			IndividualUpgradeLost(*this, upgrade, true);
 		}
 	}
@@ -861,8 +861,8 @@ void CUnit::Retrain()
 	const std::string unit_name = GetMessageName();
 
 	int base_level = 1;
-	if (this->Character != nullptr) {
-		base_level = this->Character->get_base_level();
+	if (this->get_character() != nullptr) {
+		base_level = this->get_character()->get_base_level();
 	}
 	
 	//now, revert the unit's type to the base level one
@@ -873,7 +873,7 @@ void CUnit::Retrain()
 				continue;
 			}
 
-			if (this->Character != nullptr && std::find(this->Character->ForbiddenUpgrades.begin(), this->Character->ForbiddenUpgrades.end(), unit_type) != this->Character->ForbiddenUpgrades.end()) {
+			if (this->get_character() != nullptr && wyrmgus::vector::contains(this->get_character()->ForbiddenUpgrades, unit_type)) {
 				continue;
 			}
 			if (((int) AiHelpers.ExperienceUpgrades.size()) > unit_type->Slot) {
@@ -883,10 +883,10 @@ void CUnit::Retrain()
 						this->Variable[LEVELUP_INDEX].Max = this->Variable[LEVELUP_INDEX].Value;
 						this->Variable[LEVELUP_INDEX].Enable = 1;
 						TransformUnitIntoType(*this, *unit_type);
-						if (!IsNetworkGame() && Character != nullptr) {	//save the unit-type experience upgrade for persistent characters
-							if (Character->get_unit_type() != unit_type) {
+						if (!IsNetworkGame() && this->get_character() != nullptr) {	//save the unit-type experience upgrade for persistent characters
+							if (this->get_character()->get_unit_type() != unit_type) {
 								if (this->Player == CPlayer::GetThisPlayer()) {
-									Character->set_unit_type(unit_type);
+									this->get_character()->set_unit_type(unit_type);
 									wyrmgus::achievement::check_achievements();
 								}
 							}
@@ -906,8 +906,8 @@ void CUnit::Retrain()
 	}
 
 	//save the retraining for persistent characters
-	if (!IsNetworkGame() && this->Character != nullptr && this->Player == CPlayer::GetThisPlayer()) {
-		SaveHero(this->Character);
+	if (!IsNetworkGame() && this->get_character() != nullptr && this->Player == CPlayer::GetThisPlayer()) {
+		SaveHero(this->get_character());
 	}
 
 	if (this->Player == CPlayer::GetThisPlayer()) {
@@ -952,29 +952,56 @@ void CUnit::set_character(wyrmgus::character *character)
 		return;
 	}
 
-	if (this->Character != nullptr) {
+	if (this->get_character() != nullptr) {
 		wyrmgus::vector::remove(this->Player->Heroes, this);
 
 		this->Variable[HERO_INDEX].Max = this->Variable[HERO_INDEX].Value = this->Variable[HERO_INDEX].Enable = 0;
 	}
 
-	this->Character = character;
+	this->character = character;
 
+	if (this->get_character() != nullptr) {
+		this->apply_character_properties();
+	}
+
+	this->ChooseVariation(); //choose a new variation now
+	for (int i = 0; i < MaxImageLayers; ++i) {
+		ChooseVariation(nullptr, false, i);
+	}
+	this->UpdateButtonIcons();
+	this->UpdateXPRequired();
+}
+
+void CUnit::SetCharacter(const std::string &character_ident, bool custom_hero)
+{
+	wyrmgus::character *character = nullptr;
+	if (!custom_hero) {
+		character = wyrmgus::character::get(character_ident);
+	} else {
+		character = GetCustomHero(character_ident);
+	}
+
+	this->set_character(character);
+}
+
+//apply the properties of the unit's character on it
+void CUnit::apply_character_properties()
+{
 	int old_mana_percent = 0;
 	if (this->Variable[MANA_INDEX].Max > 0) {
 		old_mana_percent = this->Variable[MANA_INDEX].Value * 100 / this->Variable[MANA_INDEX].Max;
 	}
 
-	this->Name = this->Character->get_name();
-	this->ExtraName = this->Character->ExtraName;
-	this->surname = this->Character->get_surname();
+	this->Name = this->get_character()->get_name();
+	this->ExtraName = this->get_character()->ExtraName;
+	this->surname = this->get_character()->get_surname();
 
-	if (this->Character->get_unit_type() != nullptr) {
-		if (this->Character->get_unit_type() != this->Type) { //set type to that of the character
-			TransformUnitIntoType(*this, *this->Character->get_unit_type());
+	if (this->get_character()->get_unit_type() != nullptr) {
+		if (this->get_character()->get_unit_type() != this->Type) { //set type to that of the character
+			TransformUnitIntoType(*this, *this->get_character()->get_unit_type());
 		}
 
-		this->Variable = this->Character->get_unit_type()->Stats[this->Player->Index].Variables;
+		this->Variable = this->get_character()->get_unit_type()->Stats[this->Player->Index].Variables;
 	} else {
 		fprintf(stderr, "Character \"%s\" has no unit type.\n", character->get_identifier().c_str());
 		return;
@@ -996,15 +1023,15 @@ void CUnit::set_character(wyrmgus::character *character)
 		}
 	}
 
-	if (this->Character->get_trait() != nullptr) { //set trait
-		TraitAcquire(*this, this->Character->get_trait());
+	if (this->get_character()->get_trait() != nullptr) { //set trait
+		TraitAcquire(*this, this->get_character()->get_trait());
 	} else if (Editor.Running == EditorNotRunning && this->Type->Traits.size() > 0) {
 		TraitAcquire(*this, this->Type->Traits[SyncRand(this->Type->Traits.size())]);
 	}
 
 	//load worshipped deities
-	for (size_t i = 0; i < this->Character->Deities.size(); ++i) {
-		const CUpgrade *deity_upgrade = this->Character->Deities[i]->get_upgrade();
+	for (size_t i = 0; i < this->get_character()->Deities.size(); ++i) {
+		const CUpgrade *deity_upgrade = this->get_character()->Deities[i]->get_upgrade();
 		if (deity_upgrade != nullptr) {
 			IndividualUpgradeAcquire(*this, deity_upgrade);
 		}
@@ -1017,12 +1044,12 @@ void CUnit::set_character(wyrmgus::character *character)
 	}
 
 	this->Variable[LEVEL_INDEX].Max = 100000; // because the code above sets the max level to the unit type stats' Level variable (which is the same as its value)
-	if (this->Variable[LEVEL_INDEX].Value < this->Character->get_level()) {
-		this->IncreaseLevel(this->Character->get_level() - this->Variable[LEVEL_INDEX].Value, false);
+	if (this->Variable[LEVEL_INDEX].Value < this->get_character()->get_level()) {
+		this->IncreaseLevel(this->get_character()->get_level() - this->Variable[LEVEL_INDEX].Value, false);
 	}
 
 	this->Variable[XP_INDEX].Enable = 1;
-	this->Variable[XP_INDEX].Value = this->Variable[XPREQUIRED_INDEX].Value * this->Character->ExperiencePercent / 100;
+	this->Variable[XP_INDEX].Value = this->Variable[XPREQUIRED_INDEX].Value * this->get_character()->ExperiencePercent / 100;
 	this->Variable[XP_INDEX].Max = this->Variable[XP_INDEX].Value;
 
 	if (this->Variable[MANA_INDEX].Max > 0) {
@@ -1031,36 +1058,36 @@ void CUnit::set_character(wyrmgus::character *character)
 
 	//load learned abilities
 	std::vector<const CUpgrade *> abilities_to_remove;
-	for (size_t i = 0; i < this->Character->get_abilities().size(); ++i) {
-		if (can_learn_ability(this->Character->get_abilities()[i])) {
-			AbilityAcquire(*this, this->Character->get_abilities()[i], false);
+	for (size_t i = 0; i < this->get_character()->get_abilities().size(); ++i) {
+		if (can_learn_ability(this->get_character()->get_abilities()[i])) {
+			AbilityAcquire(*this, this->get_character()->get_abilities()[i], false);
 		} else { //can't learn the ability? something changed in the game's code, remove it from persistent data and allow the hero to repick the ability
-			abilities_to_remove.push_back(this->Character->get_abilities()[i]);
+			abilities_to_remove.push_back(this->get_character()->get_abilities()[i]);
 		}
 	}
 
 	if (!abilities_to_remove.empty()) {
 		for (size_t i = 0; i < abilities_to_remove.size(); ++i) {
-			this->Character->remove_ability(abilities_to_remove[i]);
+			this->get_character()->remove_ability(abilities_to_remove[i]);
 		}
 
 		if (this->Player == CPlayer::GetThisPlayer()) {
-			SaveHero(this->Character);
+			SaveHero(this->get_character());
 		}
 	}
 
 	//load read works
-	for (size_t i = 0; i < this->Character->ReadWorks.size(); ++i) {
-		ReadWork(this->Character->ReadWorks[i], false);
+	for (size_t i = 0; i < this->get_character()->ReadWorks.size(); ++i) {
+		ReadWork(this->get_character()->ReadWorks[i], false);
 	}
 
 	//load consumed elixirs
-	for (size_t i = 0; i < this->Character->ConsumedElixirs.size(); ++i) {
-		ConsumeElixir(this->Character->ConsumedElixirs[i], false);
+	for (size_t i = 0; i < this->get_character()->ConsumedElixirs.size(); ++i) {
+		ConsumeElixir(this->get_character()->ConsumedElixirs[i], false);
 	}
 
 	//load items
-	for (const auto &persistent_item : this->Character->get_items()) {
+	for (const auto &persistent_item : this->get_character()->get_items()) {
 		CUnit *item = MakeUnitAndPlace(this->tilePos, *persistent_item->get_unit_type(), CPlayer::Players[PlayerNumNeutral], this->MapLayer->ID);
 		if (persistent_item->Prefix != nullptr) {
 			item->SetPrefix(persistent_item->Prefix);
@@ -1084,35 +1111,14 @@ void CUnit::set_character(wyrmgus::character *character)
 		item->Bound = persistent_item->is_bound();
 		item->Identified = persistent_item->is_identified();
 		item->Remove(this);
-		if (this->Character->is_item_equipped(persistent_item.get()) && this->can_equip_item(item)) {
+		if (this->get_character()->is_item_equipped(persistent_item.get()) && this->can_equip_item(item)) {
 			this->EquipItem(*item, false);
 		}
 	}
 
-	if (this->Character != nullptr) {
-		this->Player->Heroes.push_back(this);
-	}
+	this->Player->Heroes.push_back(this);
 
 	this->Variable[HERO_INDEX].Max = this->Variable[HERO_INDEX].Value = this->Variable[HERO_INDEX].Enable = 1;
-
-	this->ChooseVariation(); //choose a new variation now
-	for (int i = 0; i < MaxImageLayers; ++i) {
-		ChooseVariation(nullptr, false, i);
-	}
-	this->UpdateButtonIcons();
-	this->UpdateXPRequired();
-}
-
-void CUnit::SetCharacter(const std::string &character_ident, bool custom_hero)
-{
-	wyrmgus::character *character = nullptr;
-	if (!custom_hero) {
-		character = wyrmgus::character::get(character_ident);
-	} else {
-		character = GetCustomHero(character_ident);
-	}
-
-	this->set_character(character);
 }
 
 bool CUnit::CheckTerrainForVariation(const wyrmgus::unit_type_variation *variation) const
@@ -1176,14 +1182,14 @@ void CUnit::ChooseVariation(const wyrmgus::unit_type *new_type, bool ignore_old_
 {
 	std::string priority_variation;
 	if (image_layer == -1) {
-		if (this->Character != nullptr && !this->Character->get_variation().empty()) {
-			priority_variation = this->Character->get_variation();
+		if (this->get_character() != nullptr && !this->get_character()->get_variation().empty()) {
+			priority_variation = this->get_character()->get_variation();
 		} else if (this->GetVariation() != nullptr) {
 			priority_variation = this->GetVariation()->get_identifier();
 		}
 	} else {
-		if (image_layer == HairImageLayer && this->Character != nullptr && !this->Character->get_variation().empty()) {
-			priority_variation = this->Character->get_variation();
+		if (image_layer == HairImageLayer && this->get_character() != nullptr && !this->get_character()->get_variation().empty()) {
+			priority_variation = this->get_character()->get_variation();
 		} else if (this->GetLayerVariation(image_layer)) {
 			priority_variation = this->GetLayerVariation(image_layer)->get_identifier();
 		}
@@ -1548,17 +1554,17 @@ void CUnit::EquipItem(CUnit &item, bool affect_character)
 		}
 	}
 
-	if (!IsNetworkGame() && Character && this->Player == CPlayer::GetThisPlayer() && affect_character) {
-		wyrmgus::persistent_item *persistent_item = this->Character->get_item(item);
+	if (!IsNetworkGame() && this->get_character() != nullptr && this->Player == CPlayer::GetThisPlayer() && affect_character) {
+		const wyrmgus::persistent_item *persistent_item = this->get_character()->get_item(&item);
 		if (persistent_item != nullptr) {
-			if (!Character->is_item_equipped(persistent_item)) {
-				Character->EquippedItems[static_cast<int>(item_slot)].push_back(persistent_item);
-				SaveHero(Character);
+			if (!this->get_character()->is_item_equipped(persistent_item)) {
+				this->get_character()->EquippedItems[static_cast<int>(item_slot)].push_back(persistent_item);
+				SaveHero(this->get_character());
 			} else {
-				fprintf(stderr, "Item is not equipped by character \"%s\"'s unit, but is equipped by the character itself.\n", Character->Ident.c_str());
+				fprintf(stderr, "Item is not equipped by character \"%s\"'s unit, but is equipped by the character itself.\n", this->get_character()->get_identifier().c_str());
 			}
 		} else {
-			fprintf(stderr, "Item is present in the inventory of the character \"%s\"'s unit, but not in the character's inventory itself.\n", Character->Ident.c_str());
+			fprintf(stderr, "Item is present in the inventory of the character \"%s\"'s unit, but not in the character's inventory itself.\n", this->get_character()->get_identifier().c_str());
 		}
 	}
 	EquippedItems[static_cast<int>(item_slot)].push_back(&item);
@@ -1678,17 +1684,17 @@ void CUnit::DeequipItem(CUnit &item, bool affect_character)
 		return;
 	}
 	
-	if (!IsNetworkGame() && Character && this->Player == CPlayer::GetThisPlayer() && affect_character) {
-		wyrmgus::persistent_item *persistent_item = this->Character->get_item(item);
+	if (!IsNetworkGame() && this->get_character() != nullptr && this->Player == CPlayer::GetThisPlayer() && affect_character) {
+		const wyrmgus::persistent_item *persistent_item = this->get_character()->get_item(&item);
 		if (persistent_item != nullptr) {
-			if (Character->is_item_equipped(persistent_item)) {
-				wyrmgus::vector::remove(this->Character->EquippedItems[static_cast<int>(item_slot)], persistent_item);
-				SaveHero(Character);
+			if (get_character()->is_item_equipped(persistent_item)) {
+				wyrmgus::vector::remove(this->get_character()->EquippedItems[static_cast<int>(item_slot)], persistent_item);
+				SaveHero(this->get_character());
 			} else {
-				fprintf(stderr, "Item is equipped by character \"%s\"'s unit, but not by the character itself.\n", Character->Ident.c_str());
+				fprintf(stderr, "Item is equipped by character \"%s\"'s unit, but not by the character itself.\n", this->get_character()->get_identifier().c_str());
 			}
 		} else {
-			fprintf(stderr, "Item is present in the inventory of the character \"%s\"'s unit, but not in the character's inventory itself.\n", Character->Ident.c_str());
+			fprintf(stderr, "Item is present in the inventory of the character \"%s\"'s unit, but not in the character's inventory itself.\n", this->get_character()->get_identifier().c_str());
 		}
 	}
 	wyrmgus::vector::remove(this->EquippedItems[static_cast<int>(item_slot)], &item);
@@ -1786,10 +1792,10 @@ void CUnit::ReadWork(const CUpgrade *work, bool affect_character)
 {
 	IndividualUpgradeAcquire(*this, work);
 	
-	if (!IsNetworkGame() && Character && this->Player == CPlayer::GetThisPlayer() && affect_character) {
-		if (std::find(Character->ReadWorks.begin(), Character->ReadWorks.end(), work) == Character->ReadWorks.end()) {
-			Character->ReadWorks.push_back(work);
-			SaveHero(Character);
+	if (!IsNetworkGame() && this->get_character() != nullptr && this->Player == CPlayer::GetThisPlayer() && affect_character) {
+		if (!wyrmgus::vector::contains(this->get_character()->ReadWorks, work)) {
+			this->get_character()->ReadWorks.push_back(work);
+			SaveHero(this->get_character());
 		}
 	}
 }
@@ -1798,10 +1804,10 @@ void CUnit::ConsumeElixir(const CUpgrade *elixir, bool affect_character)
 {
 	IndividualUpgradeAcquire(*this, elixir);
 	
-	if (!IsNetworkGame() && Character && this->Player == CPlayer::GetThisPlayer() && affect_character) {
-		if (std::find(Character->ConsumedElixirs.begin(), Character->ConsumedElixirs.end(), elixir) == Character->ConsumedElixirs.end()) {
-			Character->ConsumedElixirs.push_back(elixir);
-			SaveHero(Character);
+	if (!IsNetworkGame() && this->get_character() != nullptr && this->Player == CPlayer::GetThisPlayer() && affect_character) {
+		if (!wyrmgus::vector::contains(this->get_character()->ConsumedElixirs, elixir)) {
+			this->get_character()->ConsumedElixirs.push_back(elixir);
+			SaveHero(this->get_character());
 		}
 	}
 }
@@ -1878,9 +1884,10 @@ void CUnit::SetPrefix(const CUpgrade *prefix)
 		this->Variable[MAGICLEVEL_INDEX].Value -= Prefix->get_magic_level();
 		this->Variable[MAGICLEVEL_INDEX].Max -= Prefix->get_magic_level();
 	}
-	if (!IsNetworkGame() && Container && Container->Character && Container->Player == CPlayer::GetThisPlayer() && Container->Character->get_item(*this) != nullptr && Container->Character->get_item(*this)->Prefix != prefix) { //update the persistent item, if applicable and if it hasn't been updated yet
-		Container->Character->get_item(*this)->Prefix = prefix;
-		SaveHero(Container->Character);
+	if (!IsNetworkGame() && this->Container != nullptr && this->Container->get_character() != nullptr && this->Container->Player == CPlayer::GetThisPlayer() && this->Container->get_character()->has_item(this) && this->Container->get_character()->get_item(this)->Prefix != prefix) {
+		//update the persistent item, if applicable and if it hasn't been updated yet
+		this->Container->get_character()->get_item(this)->Prefix = prefix;
+		SaveHero(this->Container->get_character());
 	}
 	Prefix = prefix;
 	if (Prefix != nullptr) {
@@ -1903,9 +1910,10 @@ void CUnit::SetSuffix(const CUpgrade *suffix)
 		this->Variable[MAGICLEVEL_INDEX].Value -= Suffix->get_magic_level();
 		this->Variable[MAGICLEVEL_INDEX].Max -= Suffix->get_magic_level();
 	}
-	if (!IsNetworkGame() && Container && Container->Character && Container->Player == CPlayer::GetThisPlayer() && Container->Character->get_item(*this) != nullptr && Container->Character->get_item(*this)->Suffix != suffix) { //update the persistent item, if applicable and if it hasn't been updated yet
-		Container->Character->get_item(*this)->Suffix = suffix;
-		SaveHero(Container->Character);
+	if (!IsNetworkGame() && Container && Container->get_character() != nullptr && Container->Player == CPlayer::GetThisPlayer() && Container->get_character()->has_item(this) && Container->get_character()->get_item(this)->Suffix != suffix) {
+		//update the persistent item, if applicable and if it hasn't been updated yet
+		this->Container->get_character()->get_item(this)->Suffix = suffix;
+		SaveHero(this->Container->get_character());
 	}
 	Suffix = suffix;
 	if (Suffix != nullptr) {
@@ -1921,9 +1929,9 @@ void CUnit::SetSuffix(const CUpgrade *suffix)
 
 void CUnit::SetSpell(const wyrmgus::spell *spell)
 {
-	if (!IsNetworkGame() && Container && Container->Character && Container->Player == CPlayer::GetThisPlayer() && Container->Character->get_item(*this) != nullptr && Container->Character->get_item(*this)->Spell != spell) { //update the persistent item, if applicable and if it hasn't been updated yet
-		Container->Character->get_item(*this)->Spell = spell;
-		SaveHero(Container->Character);
+	if (!IsNetworkGame() && Container && Container->get_character() != nullptr && Container->Player == CPlayer::GetThisPlayer() && Container->get_character()->has_item(this) && Container->get_character()->get_item(this)->Spell != spell) { //update the persistent item, if applicable and if it hasn't been updated yet
+		this->Container->get_character()->get_item(this)->Spell = spell;
+		SaveHero(this->Container->get_character());
 	}
 	Spell = spell;
 	
@@ -1937,9 +1945,9 @@ void CUnit::SetWork(const CUpgrade *work)
 		this->Variable[MAGICLEVEL_INDEX].Max -= this->Work->get_magic_level();
 	}
 	
-	if (!IsNetworkGame() && Container && Container->Character && Container->Player == CPlayer::GetThisPlayer() && Container->Character->get_item(*this) != nullptr && Container->Character->get_item(*this)->Work != work) { //update the persistent item, if applicable and if it hasn't been updated yet
-		Container->Character->get_item(*this)->Work = work;
-		SaveHero(Container->Character);
+	if (!IsNetworkGame() && Container && Container->get_character() != nullptr && Container->Player == CPlayer::GetThisPlayer() && Container->get_character()->has_item(this) && Container->get_character()->get_item(this)->Work != work) { //update the persistent item, if applicable and if it hasn't been updated yet
+		this->Container->get_character()->get_item(this)->Work = work;
+		SaveHero(Container->get_character());
 	}
 	
 	Work = work;
@@ -1959,9 +1967,9 @@ void CUnit::SetElixir(const CUpgrade *elixir)
 		this->Variable[MAGICLEVEL_INDEX].Max -= this->Elixir->get_magic_level();
 	}
 	
-	if (!IsNetworkGame() && Container && Container->Character && Container->Player == CPlayer::GetThisPlayer() && Container->Character->get_item(*this) != nullptr && Container->Character->get_item(*this)->Elixir != elixir) { //update the persistent item, if applicable and if it hasn't been updated yet
-		Container->Character->get_item(*this)->Elixir = elixir;
-		SaveHero(Container->Character);
+	if (!IsNetworkGame() && Container && Container->get_character() != nullptr && Container->Player == CPlayer::GetThisPlayer() && Container->get_character()->has_item(this) && Container->get_character()->get_item(this)->Elixir != elixir) { //update the persistent item, if applicable and if it hasn't been updated yet
+		this->Container->get_character()->get_item(this)->Elixir = elixir;
+		SaveHero(Container->get_character());
 	}
 	
 	Elixir = elixir;
@@ -2012,9 +2020,9 @@ void CUnit::set_unique(const wyrmgus::unique_item *unique)
 
 void CUnit::Identify()
 {
-	if (!IsNetworkGame() && Container && Container->Character && Container->Player == CPlayer::GetThisPlayer() && Container->Character->get_item(*this) != nullptr && Container->Character->get_item(*this)->is_identified() != true) { //update the persistent item, if applicable and if it hasn't been updated yet
-		Container->Character->get_item(*this)->set_identified(true);
-		SaveHero(Container->Character);
+	if (!IsNetworkGame() && Container && Container->get_character() != nullptr && Container->Player == CPlayer::GetThisPlayer() && Container->get_character()->has_item(this) && !this->Container->get_character()->get_item(this)->is_identified()) { //update the persistent item, if applicable and if it hasn't been updated yet
+		this->Container->get_character()->get_item(this)->set_identified(true);
+		SaveHero(this->Container->get_character());
 	}
 	
 	this->Identified = true;
@@ -2121,7 +2129,7 @@ void CUnit::GenerateDrop()
 		}
 	}
 	
-	if (this->Type->BoolFlag[ORGANIC_INDEX].value && !this->Character && !this->Type->BoolFlag[FAUNA_INDEX].value && base_based_mission) { //if the unit is organic and isn't a character (and isn't fauna) and this is a base-based mission, don't generate a drop
+	if (this->Type->BoolFlag[ORGANIC_INDEX].value && this->get_character() == nullptr && !this->Type->BoolFlag[FAUNA_INDEX].value && base_based_mission) { //if the unit is organic and isn't a character (and isn't fauna) and this is a base-based mission, don't generate a drop
 		return;
 	}
 	
@@ -2187,9 +2195,10 @@ void CUnit::GenerateSpecialProperties(CUnit *dropper, CPlayer *dropper_player, b
 	int magic_affix_chance = 10; //10% chance of the unit having a magic prefix or suffix
 	int unique_chance = 5; //0.5% chance of the unit being unique
 	if (dropper != nullptr) {
-		if (dropper->Character) { //if the dropper is a character, multiply the chances of the item being magic or unique by the character's level
-			magic_affix_chance *= dropper->Character->get_level();
-			unique_chance *= dropper->Character->get_level();
+		if (dropper->get_character() != nullptr) {
+			//if the dropper is a character, multiply the chances of the item being magic or unique by the character's level
+			magic_affix_chance *= dropper->get_character()->get_level();
+			unique_chance *= dropper->get_character()->get_level();
 		} else if (dropper->Type->BoolFlag[BUILDING_INDEX].value) { //if the dropper is a building, multiply the chances of the drop being magic or unique by a factor according to whether the building itself is magic/unique
 			int chance_multiplier = 2;
 			if (dropper->get_unique() != nullptr) {
@@ -2641,7 +2650,7 @@ void CUnit::SellUnit(CUnit *sold_unit, int player)
 		CPlayer::Players[player]->Ai->Force.RemoveDeadUnit();
 		CPlayer::Players[player]->Ai->Force.Assign(*sold_unit, -1, true);
 	}
-	if (sold_unit->Character) {
+	if (sold_unit->get_character() != nullptr) {
 		CPlayer::Players[player]->HeroCooldownTimer = HeroCooldownCycles;
 		sold_unit->Variable[MANA_INDEX].Value = 0; //start off with 0 mana
 	}
@@ -3008,7 +3017,7 @@ void CUnit::AssignToPlayer(CPlayer &player)
 		}
 		
 		//generate a personal name for the unit, if applicable
-		if (this->Character == nullptr) {
+		if (this->get_character() == nullptr) {
 			this->UpdatePersonalName();
 		}
 		
@@ -3474,7 +3483,7 @@ void CUnit::UpdatePersonalName(bool update_settlement_name)
 {
 	static constexpr bool surname_generation_enabled = false;
 
-	if (this->Character != nullptr) {
+	if (this->get_character() != nullptr) {
 		return;
 	} else if (this->Type->BoolFlag[ITEM_INDEX].value || this->get_unique() != nullptr || this->Prefix || this->Suffix) {
 		this->UpdateItemName();
@@ -3519,7 +3528,7 @@ void CUnit::UpdatePersonalName(bool update_settlement_name)
 
 void CUnit::UpdateExtraName()
 {
-	if (this->Character != nullptr || !this->Type->BoolFlag[ORGANIC_INDEX].value || this->Type->BoolFlag[FAUNA_INDEX].value) {
+	if (this->get_character() != nullptr || !this->Type->BoolFlag[ORGANIC_INDEX].value || this->Type->BoolFlag[FAUNA_INDEX].value) {
 		return;
 	}
 	
@@ -3657,12 +3666,12 @@ void CUnit::XPChanged()
 		this->IncreaseLevel(1);
 	}
 	
-	if (!IsNetworkGame() && this->Character != nullptr && this->Player == CPlayer::GetThisPlayer()) {
-		if (this->Variable[LEVEL_INDEX].Value > this->Character->get_level()) { //save level, if the unit has a persistent character
-			this->Character->set_level(this->Variable[LEVEL_INDEX].Value);
+	if (!IsNetworkGame() && this->get_character() != nullptr && this->Player == CPlayer::GetThisPlayer()) {
+		if (this->Variable[LEVEL_INDEX].Value > this->get_character()->get_level()) { //save level, if the unit has a persistent character
+			this->get_character()->set_level(this->Variable[LEVEL_INDEX].Value);
 		}
-		this->Character->ExperiencePercent = (this->Variable[XP_INDEX].Value * 100) / this->Variable[XPREQUIRED_INDEX].Value;
-		SaveHero(this->Character);
+		this->get_character()->ExperiencePercent = (this->Variable[XP_INDEX].Value * 100) / this->Variable[XPREQUIRED_INDEX].Value;
+		SaveHero(this->get_character());
 		wyrmgus::achievement::check_achievements(); // check achievements to see if any hero now has a high enough level for a particular achievement to be obtained
 	}
 }
@@ -5557,7 +5566,7 @@ int CUnit::GetAvailableLevelUpUpgrades(bool only_units) const
 	
 	if (((int) AiHelpers.ExperienceUpgrades.size()) > Type->Slot) {
 		for (size_t i = 0; i != AiHelpers.ExperienceUpgrades[Type->Slot].size(); ++i) {
-			if (this->Character == nullptr || std::find(this->Character->ForbiddenUpgrades.begin(), this->Character->ForbiddenUpgrades.end(), AiHelpers.ExperienceUpgrades[Type->Slot][i]) == this->Character->ForbiddenUpgrades.end()) {
+			if (this->get_character() == nullptr || !wyrmgus::vector::contains(this->get_character()->ForbiddenUpgrades, AiHelpers.ExperienceUpgrades[Type->Slot][i])) {
 				int local_upgrade_value = 1;
 				
 				if (!only_units) {
@@ -5843,7 +5852,7 @@ int CUnit::GetPrice() const
 	if (this->Elixir != nullptr) {
 		cost += this->Elixir->get_magic_level() * 1000;
 	}
-	if (this->Character) {
+	if (this->get_character() != nullptr) {
 		cost += (this->Variable[LEVEL_INDEX].Value - this->Type->Stats[this->Player->Index].Variables[LEVEL_INDEX].Value) * 250;
 	}
 	
@@ -6439,7 +6448,7 @@ bool CUnit::HasInventory() const
 	}
 	
 	if (!this->Type->BoolFlag[FAUNA_INDEX].value) {
-		if (this->Character != nullptr) {
+		if (this->get_character() != nullptr) {
 			return true;
 		}
 		
@@ -6455,10 +6464,10 @@ template <bool precondition>
 bool CUnit::can_learn_ability(const CUpgrade *ability) const
 {
 	if (ability->get_deity() != nullptr) { //if is a deity choice "ability", only allow for custom heroes (but display the icon for already-acquired deities for all heroes)
-		if (!this->Character) {
+		if (this->get_character() == nullptr) {
 			return false;
 		}
-		if (!this->Character->Custom && this->GetIndividualUpgrade(ability) == 0) {
+		if (!this->get_character()->Custom && this->GetIndividualUpgrade(ability) == 0) {
 			return false;
 		}
 
@@ -6636,10 +6645,10 @@ const wyrmgus::construction *CUnit::get_construction() const
 
 const wyrmgus::icon *CUnit::get_icon() const
 {
-	if (this->Character != nullptr && this->Character->get_level() >= 3 && this->Character->get_heroic_icon() != nullptr) {
-		return this->Character->get_heroic_icon();
-	} else if (this->Character != nullptr && this->Character->get_base_icon() != nullptr) {
-		return this->Character->get_base_icon();
+	if (this->get_character() != nullptr && this->get_character()->get_level() >= 3 && this->get_character()->get_heroic_icon() != nullptr) {
+		return this->get_character()->get_heroic_icon();
+	} else if (this->get_character() != nullptr && this->get_character()->get_base_icon() != nullptr) {
+		return this->get_character()->get_base_icon();
 	} else if (this->get_unique() != nullptr && this->get_unique()->get_icon() != nullptr) {
 		return this->get_unique()->get_icon();
 	}
@@ -6694,16 +6703,16 @@ const std::shared_ptr<CPlayerColorGraphic> &CUnit::GetLayerSprite(const int imag
 
 std::string CUnit::GetName() const
 {
-	if (GameRunning && this->Character && this->Character->get_deity()) {
+	if (GameRunning && this->get_character() != nullptr && this->get_character()->get_deity() != nullptr) {
 		if (CPlayer::GetThisPlayer()->Race >= 0) {
-			const std::string &cultural_name = this->Character->get_deity()->get_cultural_name(wyrmgus::civilization::get_all()[CPlayer::GetThisPlayer()->Race]);
+			const std::string &cultural_name = this->get_character()->get_deity()->get_cultural_name(CPlayer::GetThisPlayer()->get_civilization());
 			
 			if (!cultural_name.empty()) {
 				return cultural_name;
 			}
 		}
 		
-		return this->Character->get_deity()->get_name();
+		return this->get_character()->get_deity()->get_name();
 	}
 	
 	std::string name = this->Name;
@@ -6896,7 +6905,7 @@ void LetUnitDie(CUnit &unit, bool suicide)
 		unit.UnitInside
 		&& (
 			unit.Type->BoolFlag[SAVECARGO_INDEX].value
-			|| (unit.HasInventory() && unit.Character == nullptr)
+			|| (unit.HasInventory() && unit.get_character() == nullptr)
 		)
 	) {
 	//Wyrmgus end
@@ -6928,7 +6937,7 @@ void LetUnitDie(CUnit &unit, bool suicide)
 
 	//Wyrmgus start
 	//drop items upon death
-	if (!suicide && unit.CurrentAction() != UnitAction::Built && (unit.Character || unit.Type->BoolFlag[BUILDING_INDEX].value || SyncRand(100) >= 66)) { //66% chance nothing will be dropped, unless the unit is a character or building, in which it case it will always drop an item
+	if (!suicide && unit.CurrentAction() != UnitAction::Built && (unit.get_character() != nullptr || unit.Type->BoolFlag[BUILDING_INDEX].value || SyncRand(100) >= 66)) { //66% chance nothing will be dropped, unless the unit is a character or building, in which it case it will always drop an item
 		unit.GenerateDrop();
 	}
 	//Wyrmgus end
@@ -7202,7 +7211,7 @@ static void HitUnit_IncreaseScoreForKill(CUnit &attacker, CUnit &target)
 				&& (wyrmgus::vector::contains(quest_objective->UnitTypes, target.Type) || wyrmgus::vector::contains(quest_objective->get_unit_classes(), target.Type->get_unit_class()))
 				&& (quest_objective->get_settlement() == nullptr || quest_objective->get_settlement() == target.settlement)
 			)
-			|| (quest_objective->get_objective_type() == wyrmgus::objective_type::destroy_hero && target.Character && quest_objective->get_character() == target.Character)
+			|| (quest_objective->get_objective_type() == wyrmgus::objective_type::destroy_hero && target.get_character() != nullptr && quest_objective->get_character() == target.get_character())
 			|| (quest_objective->get_objective_type() == wyrmgus::objective_type::destroy_unique && target.get_unique() && quest_objective->Unique == target.get_unique())
 		) {
 			if (quest_objective->get_faction() == nullptr || quest_objective->get_faction()->ID == target.Player->Faction) {

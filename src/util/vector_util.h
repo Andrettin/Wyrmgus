@@ -64,8 +64,10 @@ inline void remove(std::vector<T> &vector, const typename std::vector<T>::value_
 }
 
 template <typename T>
-inline void remove(std::vector<std::unique_ptr<T>> &vector, const T *element)
+inline void remove(std::vector<std::unique_ptr<T>> &vector, T *element)
 {
+	//the element pointer parameter is not const so that those holding only a const pointer can't delete it this way
+
 	for (size_t i = 0; i < vector.size();) {
 		if (vector[i].get() == element) {
 			vector.erase(vector.begin() + i);

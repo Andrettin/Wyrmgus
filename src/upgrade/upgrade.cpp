@@ -1259,7 +1259,7 @@ static void ConvertUnitTypeTo(CPlayer &player, const wyrmgus::unit_type &src, wy
 		//  Convert already existing units to this type.
 		//Wyrmgus start
 //		if (unit.Type == &src) {
-		if (unit.Type == &src && !unit.Character) { //don't do this for persistent characters
+		if (unit.Type == &src && unit.get_character() == nullptr) { //don't do this for persistent characters
 		//Wyrmgus end
 			CommandTransformIntoType(unit, dst);
 			//  Convert trained units to this type.
@@ -1508,7 +1508,7 @@ static void ApplyUpgradeModifier(CPlayer &player, const wyrmgus::upgrade_modifie
 						continue;
 					}
 					
-					if (unit->Character && CUpgrade::get_all()[um->UpgradeId]->get_deity() != nullptr) {
+					if (unit->get_character() != nullptr && CUpgrade::get_all()[um->UpgradeId]->get_deity() != nullptr) {
 						//heroes choose their own deities
 						continue;
 					}
@@ -2012,7 +2012,7 @@ void ApplyIndividualUpgradeModifier(CUnit &unit, const wyrmgus::upgrade_modifier
 	if (um->ConvertTo) {
 		//Wyrmgus start
 		//CommandTransformIntoType(unit, *um->ConvertTo);
-		if (!unit.Character) { //don't do this for persistent characters
+		if (unit.get_character() == nullptr) { //don't do this for persistent characters
 			CommandTransformIntoType(unit, *um->ConvertTo);
 		}
 		//Wyrmgus end
@@ -2222,10 +2222,10 @@ void AbilityAcquire(CUnit &unit, const CUpgrade *upgrade, bool save)
 {
 	unit.Variable[LEVELUP_INDEX].Value -= 1;
 	unit.Variable[LEVELUP_INDEX].Max = unit.Variable[LEVELUP_INDEX].Value;
-	if (!IsNetworkGame() && unit.Character != nullptr && save) {
+	if (!IsNetworkGame() && unit.get_character() != nullptr && save) {
 		if (unit.Player == CPlayer::GetThisPlayer()) { //save ability learning, if unit has a character and it is persistent, and the character doesn't have the ability yet
-			unit.Character->add_ability(upgrade);
-			SaveHero(unit.Character);
+			unit.get_character()->add_ability(upgrade);
+			SaveHero(unit.get_character());
 		}
 	}
 	IndividualUpgradeAcquire(unit, upgrade);
@@ -2237,11 +2237,11 @@ void AbilityLost(CUnit &unit, CUpgrade *upgrade, bool lose_all)
 	unit.Variable[LEVELUP_INDEX].Value += 1;
 	unit.Variable[LEVELUP_INDEX].Max = unit.Variable[LEVELUP_INDEX].Value;
 	unit.Variable[LEVELUP_INDEX].Enable = 1;
-	if (!IsNetworkGame() && unit.Character != nullptr) {
-		if (wyrmgus::vector::contains(unit.Character->get_abilities(), upgrade)) {
+	if (!IsNetworkGame() && unit.get_character() != nullptr) {
+		if (wyrmgus::vector::contains(unit.get_character()->get_abilities(), upgrade)) {
 			if (unit.Player == CPlayer::GetThisPlayer()) { //save ability learning, if unit has a character and it is persistent, and the character doesn't have the ability yet
-				unit.Character->remove_ability(upgrade);
-				SaveHero(unit.Character);
+				unit.get_character()->remove_ability(upgrade);
+				SaveHero(unit.get_character());
 			}
 		}
 	}
@@ -2295,9 +2295,9 @@ void IndividualUpgradeAcquire(CUnit &unit, const CUpgrade *upgrade)
 				IndividualUpgradeAcquire(unit, domain_upgrade);
 			}
 		}
-		if (unit.Character && !wyrmgus::vector::contains(unit.Character->Deities, upgrade_deity) && unit.Player == CPlayer::GetThisPlayer()) {
-			unit.Character->Deities.push_back(upgrade_deity);
-			SaveHero(unit.Character);
+		if (unit.get_character() != nullptr && !wyrmgus::vector::contains(unit.get_character()->Deities, upgrade_deity) && unit.Player == CPlayer::GetThisPlayer()) {
+			unit.get_character()->Deities.push_back(upgrade_deity);
+			SaveHero(unit.get_character());
 		}
 	}
 
@@ -2349,9 +2349,9 @@ void IndividualUpgradeLost(CUnit &unit, const CUpgrade *upgrade, bool lose_all)
 				IndividualUpgradeLost(unit, domain_upgrade);
 			}
 		}
-		if (unit.Character && unit.Player == CPlayer::GetThisPlayer()) {
-			wyrmgus::vector::remove(unit.Character->Deities, upgrade_deity);
-			SaveHero(unit.Character);
+		if (unit.get_character() != nullptr && unit.Player == CPlayer::GetThisPlayer()) {
+			wyrmgus::vector::remove(unit.get_character()->Deities, upgrade_deity);
+			SaveHero(unit.get_character());
 		}
 	}
 

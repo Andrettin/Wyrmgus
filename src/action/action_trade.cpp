@@ -274,10 +274,10 @@ bool COrder_Trade::ParseSpecificData(lua_State *l, int &j, const char *value, co
 					goal->Remove(nullptr);
 					LetUnitDie(*goal);
 				} else {
-					if (!IsNetworkGame() && goal->Container->Character && goal->Container->Player == CPlayer::GetThisPlayer() && goal->Type->BoolFlag[ITEM_INDEX].value && goal->Container->HasInventory()) {
-						const wyrmgus::persistent_item *item = goal->Container->Character->get_item(*goal);
-						goal->Container->Character->remove_item(item);
-						SaveHero(goal->Container->Character);
+					if (!IsNetworkGame() && goal->Container->get_character() != nullptr && goal->Container->Player == CPlayer::GetThisPlayer() && goal->Type->BoolFlag[ITEM_INDEX].value && goal->Container->HasInventory()) {
+						wyrmgus::persistent_item *item = goal->Container->get_character()->get_item(goal);
+						goal->Container->get_character()->remove_item(item);
+						SaveHero(goal->Container->get_character());
 					}
 					UnitLost(*goal);
 					UnitClearOrders(*goal);

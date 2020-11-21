@@ -2490,8 +2490,8 @@ static void UIHandleButtonUp_OnButton(unsigned button)
 				} else if ((1 << button) == RightButton) {
 					std::string encyclopedia_ident = Selected[0]->Type->Ident;
 					std::string encyclopedia_state = "units";
-					if (Selected[0]->Character != nullptr && !Selected[0]->Character->Custom) {
-						encyclopedia_ident = Selected[0]->Character->Ident;
+					if (Selected[0]->get_character() != nullptr && !Selected[0]->get_character()->Custom) {
+						encyclopedia_ident = Selected[0]->get_character()->Ident;
 						encyclopedia_state = "heroes";
 					} else if (Selected[0]->get_unique() != nullptr) {
 						encyclopedia_ident = Selected[0]->get_unique()->get_identifier();

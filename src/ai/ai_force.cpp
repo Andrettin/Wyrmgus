@@ -778,7 +778,7 @@ bool AiForce::IsHeroOnlyForce() const
 	
 	for (size_t i = 0; i < this->Units.size(); ++i) {
 		CUnit *const unit = this->Units[i];
-		if (!unit->Character) {
+		if (unit->get_character() == nullptr) {
 			return false;
 		}
 	}
@@ -1211,7 +1211,7 @@ void AiAssignFreeUnitsToForce(int force)
 		CUnit &unit = AiPlayer->Player->GetUnit(i);
 
 		if (unit.Active && unit.GroupId == 0) {
-			AiPlayer->Force.Assign(unit, force, unit.Character != nullptr && !unit.Type->BoolFlag[HARVESTER_INDEX].value);
+			AiPlayer->Force.Assign(unit, force, unit.get_character() != nullptr && !unit.Type->BoolFlag[HARVESTER_INDEX].value);
 		}
 	}
 }

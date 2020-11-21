@@ -336,7 +336,7 @@ void SaveUnit(const CUnit &unit, CFile &file)
 
 	//Wyrmgus start
 //	if (unit.UnitInside) {
-	if (unit.UnitInside && !(unit.Character && unit.HasInventory())) { // don't save items for persistent heroes
+	if (unit.UnitInside && !(unit.get_character() != nullptr && unit.HasInventory())) { // don't save items for persistent heroes
 	//Wyrmgus end
 		file.printf("\n  \"units-contained\", {");
 		CUnit *uins = unit.UnitInside->PrevContained;
@@ -417,11 +417,11 @@ void SaveUnit(const CUnit &unit, CFile &file)
 		file.printf(",\n  \"rally_point\", %d, %d", unit.RallyPointPos.x, unit.RallyPointPos.y);
 		file.printf(",\n  \"rally_point_map_layer\", %d, ", unit.RallyPointMapLayer->ID);
 	}
-	if (unit.Character != nullptr && unit.CurrentAction() != UnitAction::Die && !unit.Destroyed) {
-		if (!unit.Character->Custom) {
-			file.printf(",\n  \"character\", \"%s\"", unit.Character->Ident.c_str());
+	if (unit.get_character() != nullptr && unit.CurrentAction() != UnitAction::Die && !unit.Destroyed) {
+		if (!unit.get_character()->Custom) {
+			file.printf(",\n  \"character\", \"%s\"", unit.get_character()->get_identifier().c_str());
 		} else {
-			file.printf(",\n  \"custom-hero\", \"%s\"", unit.Character->Ident.c_str());
+			file.printf(",\n  \"custom-hero\", \"%s\"", unit.get_character()->get_identifier().c_str());
 		}
 	}
 	//Wyrmgus end

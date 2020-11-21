@@ -47,8 +47,9 @@
 //Wyrmgus start
 #include "unit/unit_find.h"
 //Wyrmgus end
+#include "util/vector_util.h"
 
-/* virtual */ void Spell_Polymorph::Parse(lua_State *l, int startIndex, int endIndex)
+void Spell_Polymorph::Parse(lua_State *l, int startIndex, int endIndex)
 {
 	for (int j = startIndex; j < endIndex; ++j) {
 		const char *value = LuaToString(l, -1, j + 1);
@@ -124,9 +125,9 @@ int Spell_Polymorph::Cast(CUnit &caster, const wyrmgus::spell &spell, CUnit *tar
 			type = new_unit_type;
 		}
 	}
-	if (target->Character && target->Character->Custom && target->Character->get_civilization() && this->civilization != nullptr && this->civilization != target->Character->get_civilization() && target->Player == CPlayer::GetThisPlayer()) {
-		target->Character->civilization = this->civilization;
-		SaveHero(target->Character);
+	if (target->get_character() != nullptr && target->get_character()->Custom && target->get_character()->get_civilization() && this->civilization != nullptr && this->civilization != target->get_character()->get_civilization() && target->Player == CPlayer::GetThisPlayer()) {
+		target->get_character()->civilization = this->civilization;
+		SaveHero(target->get_character());
 	}
 	if (type == nullptr) {
 		return 0;
@@ -186,17 +187,17 @@ int Spell_Polymorph::Cast(CUnit &caster, const wyrmgus::spell &spell, CUnit *tar
 		//Wyrmgus end
 	}
 	//Wyrmgus start
-	if (target->Character && (this->PlayerNeutral == 1 || this->PlayerNeutral == 2)) {
-		target->Player->Heroes.erase(std::remove(target->Player->Heroes.begin(), target->Player->Heroes.end(), target), target->Player->Heroes.end());
-		target->Character = nullptr;
+	if (target->get_character() != nullptr && (this->PlayerNeutral == 1 || this->PlayerNeutral == 2)) {
+		wyrmgus::vector::remove(target->Player->Heroes, target);
+		target->set_character(nullptr);
 	}
 //	UnitLost(*target);
 //	UnitClearOrders(*target);
 //	target->Release();
-	if (!IsNetworkGame() && target->Character != nullptr && &caster == target) { //save persistent data
+	if (!IsNetworkGame() && target->get_character() != nullptr && &caster == target) { //save persistent data
 		if (target->Player == CPlayer::GetThisPlayer()) {
-			target->Character->set_unit_type(type);
-			SaveHero(target->Character);
+			target->get_character()->set_unit_type(type);
+			SaveHero(target->get_character());
 		}
 	}
 	//Wyrmgus end

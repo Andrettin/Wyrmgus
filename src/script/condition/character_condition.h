@@ -52,7 +52,7 @@ public:
 	{
 		Q_UNUSED(ignore_units)
 
-		return unit->Character == this->character;
+		return unit->get_character() == this->character;
 	}
 
 	virtual std::string get_string(const size_t indent) const override

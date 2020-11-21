@@ -252,10 +252,10 @@ static int UnloadUnit(CUnit &transporter, CUnit &unit, int landmass)
 		transporter.DeequipItem(unit);
 	}
 	
-	if (!IsNetworkGame() && transporter.Character && transporter.Player == CPlayer::GetThisPlayer() && unit.Type->BoolFlag[ITEM_INDEX].value) { //if the transporter has a character and the unit is an item, remove it from the character's item list
-		const wyrmgus::persistent_item *item = transporter.Character->get_item(unit);
-		transporter.Character->remove_item(item);
-		SaveHero(transporter.Character);
+	if (!IsNetworkGame() && transporter.get_character() != nullptr && transporter.Player == CPlayer::GetThisPlayer() && unit.Type->BoolFlag[ITEM_INDEX].value) { //if the transporter has a character and the unit is an item, remove it from the character's item list
+		wyrmgus::persistent_item *item = transporter.get_character()->get_item(&unit);
+		transporter.get_character()->remove_item(item);
+		SaveHero(transporter.get_character());
 	}
 	
 	//Wyrmgus start

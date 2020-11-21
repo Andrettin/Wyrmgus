@@ -2411,7 +2411,7 @@ static int CclGetPlayerData(lua_State *l)
 		lua_createtable(l, p->Heroes.size(), 0);
 		for (size_t i = 1; i <= p->Heroes.size(); ++i)
 		{
-			lua_pushstring(l, p->Heroes[i-1]->Character->Ident.c_str());
+			lua_pushstring(l, p->Heroes[i-1]->get_character()->get_identifier().c_str());
 			lua_rawseti(l, -2, i);
 		}
 		return 1;

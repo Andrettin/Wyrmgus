@@ -207,10 +207,10 @@ void COrder_PickUp::UpdatePathFinderData(PathFinderInput &input)
 			goal->TTL = 0; //remove item destruction timer when picked up
 			
 			goal->Remove(&unit);
-			if (!IsNetworkGame() && unit.Character && unit.Player == CPlayer::GetThisPlayer()) { //if the unit has a persistent character, store the item for it
-				auto item = std::make_unique<wyrmgus::persistent_item>(goal, unit.Character);
-				unit.Character->add_item(std::move(item));
-				SaveHero(unit.Character);
+			if (!IsNetworkGame() && unit.get_character() != nullptr && unit.Player == CPlayer::GetThisPlayer()) { //if the unit has a persistent character, store the item for it
+				auto item = std::make_unique<wyrmgus::persistent_item>(goal, unit.get_character());
+				unit.get_character()->add_item(std::move(item));
+				SaveHero(unit.get_character());
 			}
 			
 			if (!goal->Identified) {

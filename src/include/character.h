@@ -229,8 +229,15 @@ public:
 	}
 
 	void add_item(std::unique_ptr<persistent_item> &&item);
-	void remove_item(const persistent_item *item);
-	persistent_item *get_item(const CUnit &item_unit) const;
+	void remove_item(persistent_item *item);
+	persistent_item *get_item(const CUnit *item_unit);
+	const persistent_item *get_item(const CUnit *item_unit) const;
+
+	bool has_item(const CUnit *item_unit) const
+	{
+		return this->get_item(item_unit) != nullptr;
+	}
+
 	bool is_item_equipped(const persistent_item *item) const;
 
 	bool IsUsable() const;
@@ -386,7 +393,7 @@ public:
 private:
 	std::unique_ptr<const and_condition> conditions;
 public:
-	std::vector<persistent_item *> EquippedItems[static_cast<int>(wyrmgus::item_slot::count)]; //equipped items of the character, per slot
+	std::vector<const persistent_item *> EquippedItems[static_cast<int>(wyrmgus::item_slot::count)]; //equipped items of the character, per slot
 private:
 	site *home_settlement = nullptr; //the home settlement of this character, where they can preferentially be recruited
 	bool ai_active = true; //whether the character's AI is active

@@ -1038,11 +1038,11 @@ int WriteMapSetup(const char *mapSetup, CMap &map, int writeTerrain, bool is_mod
 				if (!unit->Active) { //Active is true by default
 					f->printf("SetUnitVariable(unit, \"Active\", false)\n");
 				}
-				if (unit->Character != nullptr) {
-					if (!unit->Character->Custom) {
-						f->printf("SetUnitVariable(unit, \"Character\", \"%s\")\n", unit->Character->Ident.c_str());
+				if (unit->get_character() != nullptr) {
+					if (!unit->get_character()->Custom) {
+						f->printf("SetUnitVariable(unit, \"Character\", \"%s\")\n", unit->get_character()->get_identifier().c_str());
 					} else {
-						f->printf("SetUnitVariable(unit, \"CustomHero\", \"%s\")\n", unit->Character->Ident.c_str());
+						f->printf("SetUnitVariable(unit, \"CustomHero\", \"%s\")\n", unit->get_character()->get_identifier().c_str());
 					}
 				} else {
 					if (!unit->Name.empty()) {

@@ -1681,13 +1681,13 @@ static int CclGetUnitVariable(lua_State *l)
 //		lua_pushstring(l, unit->Type->Name.c_str());
 		lua_pushstring(l, unit->GetName().c_str());
 	} else if (!strcmp(value, "Character")) {
-		if (unit->Character != nullptr) {
-			lua_pushstring(l, unit->Character->Ident.c_str());
+		if (unit->get_character() != nullptr) {
+			lua_pushstring(l, unit->get_character()->get_identifier().c_str());
 		} else {
 			lua_pushstring(l, "");
 		}
 	} else if (!strcmp(value, "CustomCharacter")) {
-		if (unit->Character != nullptr && unit->Character->Custom) {
+		if (unit->get_character() != nullptr && unit->get_character()->Custom) {
 			lua_pushboolean(l, true);
 		} else {
 			lua_pushboolean(l, false);

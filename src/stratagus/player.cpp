@@ -1263,7 +1263,7 @@ void CPlayer::SetFaction(const wyrmgus::faction *faction)
 				unit.UpdatePersonalName();
 			}
 		}
-		if (personal_names_changed && unit.Type->BoolFlag[ORGANIC_INDEX].value && !unit.Character && unit.Type->get_civilization() != nullptr && unit.Type->get_civilization()->get_species() == faction->get_civilization()->get_species() && unit.Type == faction->get_class_unit_type(unit.Type->get_unit_class())) {
+		if (personal_names_changed && unit.Type->BoolFlag[ORGANIC_INDEX].value && unit.get_character() == nullptr && unit.Type->get_civilization() != nullptr && unit.Type->get_civilization()->get_species() == faction->get_civilization()->get_species() && unit.Type == faction->get_class_unit_type(unit.Type->get_unit_class())) {
 			unit.UpdatePersonalName();
 		}
 		unit.UpdateSoldUnits();
@@ -3581,7 +3581,7 @@ void CPlayer::IncreaseCountsForUnit(CUnit *unit, bool type_change)
 	}
 	
 	if (!type_change) {
-		if (unit->Character != nullptr) {
+		if (unit->get_character() != nullptr) {
 			this->Heroes.push_back(unit);
 		}
 	}
@@ -3630,7 +3630,7 @@ void CPlayer::DecreaseCountsForUnit(CUnit *unit, bool type_change)
 	}
 	
 	if (!type_change) {
-		if (unit->Character != nullptr) {
+		if (unit->get_character() != nullptr) {
 			this->Heroes.erase(std::remove(this->Heroes.begin(), this->Heroes.end(), unit), this->Heroes.end());
 		}
 	}
@@ -4182,7 +4182,7 @@ bool CPlayer::HasHero(const wyrmgus::character *hero) const
 	}
 	
 	for (const CUnit *hero_unit : this->Heroes) {
-		if (hero_unit->Character == hero) {
+		if (hero_unit->get_character() == hero) {
 			return true;
 		}
 	}

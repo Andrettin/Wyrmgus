@@ -198,6 +198,7 @@ public:
 	void HealingItemAutoUse();
 	void set_character(wyrmgus::character *character);
 	void SetCharacter(const std::string &character_identifier, const bool custom_hero = false);
+	void apply_character_properties();
 	bool CheckTerrainForVariation(const wyrmgus::unit_type_variation *variation) const;
 	bool CheckSeasonForVariation(const wyrmgus::unit_type_variation *variation) const;
 	void ChooseVariation(const wyrmgus::unit_type *new_type = nullptr, bool ignore_old_variation = false, int image_layer = -1);
@@ -224,6 +225,16 @@ public:
 	}
 
 	void set_unique(const wyrmgus::unique_item *unique);
+
+	const wyrmgus::character *get_character() const
+	{
+		return this->character;
+	}
+
+	wyrmgus::character *get_character()
+	{
+		return this->character;
+	}
 
 	void Identify();
 	void CheckIdentification();
@@ -590,8 +601,8 @@ public:
 	std::string ExtraName;	/// Unit's "extra" name (i.e. a nickname)
 private:
 	std::string surname;	/// Unit's surname
+	wyrmgus::character *character = nullptr; //character represented by this unit
 public:
-	wyrmgus::character *Character;	/// Pointer to the character represented by this unit
 	wyrmgus::site *settlement;	/// Settlement (for if the unit is a town hall or a building associated to a settlement)
 	wyrmgus::site *site = nullptr; //the site to which the unit belongs, if it is a site unit (not necessarily the same as the settlement, e.g. if the site is a non-major one)
 	CUpgrade *Trait;	/// Unit's trait

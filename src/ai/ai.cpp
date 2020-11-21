@@ -313,7 +313,7 @@ static void AiCheckUnits()
 				}
 				
 				for (CUnit *hero : hero_recruiter->SoldUnits) {
-					if (!hero_recruiter->Player->is_character_available_for_recruitment(hero->Character, true)) {
+					if (!hero_recruiter->Player->is_character_available_for_recruitment(hero->get_character(), true)) {
 						continue;
 					}
 
@@ -344,7 +344,7 @@ static void AiCheckUnits()
 
 				if (AiPlayer->Player->Heroes.size() < PlayerHeroMax && AiPlayer->Player->HeroCooldownTimer == 0 && mercenary_building->Type->BoolFlag[RECRUITHEROES_INDEX].value && !IsNetworkGame() && CurrentQuest == nullptr) { //check if can hire any heroes at the mercenary camp
 					for (CUnit *mercenary_hero : mercenary_building->SoldUnits) {
-						if (!mercenary_building->Player->is_character_available_for_recruitment(mercenary_hero->Character, true)) {
+						if (!mercenary_building->Player->is_character_available_for_recruitment(mercenary_hero->get_character(), true)) {
 							continue;
 						}
 
