@@ -2523,110 +2523,121 @@ bool CPlayer::can_accept_quest(const wyrmgus::quest *quest) const
 	
 	int recruit_heroes_quantity = 0;
 	for (const auto &objective : quest->get_objectives()) {
-		if (objective->get_objective_type() == wyrmgus::objective_type::build_units) {
-			std::vector<const wyrmgus::unit_type *> unit_types = objective->UnitTypes;
+		switch (objective->get_objective_type()) {
+			case wyrmgus::objective_type::build_units: {
+				std::vector<const wyrmgus::unit_type *> unit_types = objective->UnitTypes;
 
-			for (const wyrmgus::unit_class *unit_class : objective->get_unit_classes()) {
-				wyrmgus::unit_type *unit_type = this->get_faction()->get_class_unit_type(unit_class);
-				if (unit_type == nullptr) {
-					continue;
-				}
-				unit_types.push_back(unit_type);
-			}
-
-			if (unit_types.empty()) {
-				return false;
-			}
-
-			bool validated = false;
-			for (const wyrmgus::unit_type *unit_type : unit_types) {
-				if (objective->get_settlement() != nullptr && !this->HasSettlement(objective->get_settlement()) && !unit_type->BoolFlag[TOWNHALL_INDEX].value) {
-					continue;
-				}
-
-				if (!this->HasUnitBuilder(unit_type, objective->get_settlement()) || !check_conditions(unit_type, this)) {
-					continue;
-				}
-
-				validated = true;
-			}
-
-			if (!validated) {
-				return false;
-			}
-		} else if (objective->get_objective_type() == wyrmgus::objective_type::research_upgrade) {
-			const CUpgrade *upgrade = objective->Upgrade;
-			
-			bool has_researcher = this->HasUpgradeResearcher(upgrade);
-				
-			if (!has_researcher) { //check if the quest includes an objective to build a researcher of the upgrade
-				for (const auto &second_objective : quest->get_objectives()) {
-					if (second_objective == objective) {
+				for (const wyrmgus::unit_class *unit_class : objective->get_unit_classes()) {
+					wyrmgus::unit_type *unit_type = this->get_faction()->get_class_unit_type(unit_class);
+					if (unit_type == nullptr) {
 						continue;
 					}
-						
-					if (second_objective->get_objective_type() == wyrmgus::objective_type::build_units) {
-						std::vector<const wyrmgus::unit_type *> unit_types = second_objective->UnitTypes;
+					unit_types.push_back(unit_type);
+				}
 
-						for (const wyrmgus::unit_class *unit_class : second_objective->get_unit_classes()) {
-							wyrmgus::unit_type *unit_type = this->get_faction()->get_class_unit_type(unit_class);
-							if (unit_type == nullptr) {
-								continue;
-							}
-							unit_types.push_back(unit_type);
-						}
+				if (unit_types.empty()) {
+					return false;
+				}
 
-						if (unit_types.empty()) {
+				bool validated = false;
+				for (const wyrmgus::unit_type *unit_type : unit_types) {
+					if (objective->get_settlement() != nullptr && !this->HasSettlement(objective->get_settlement()) && !unit_type->BoolFlag[TOWNHALL_INDEX].value) {
+						continue;
+					}
+
+					if (!this->HasUnitBuilder(unit_type, objective->get_settlement()) || !check_conditions(unit_type, this)) {
+						continue;
+					}
+
+					validated = true;
+				}
+
+				if (!validated) {
+					return false;
+				}
+				break;
+			}
+			case wyrmgus::objective_type::research_upgrade: {
+				const CUpgrade *upgrade = objective->Upgrade;
+
+				bool has_researcher = this->HasUpgradeResearcher(upgrade);
+
+				if (!has_researcher) { //check if the quest includes an objective to build a researcher of the upgrade
+					for (const auto &second_objective : quest->get_objectives()) {
+						if (second_objective == objective) {
 							continue;
 						}
 
-						for (const wyrmgus::unit_type *unit_type : unit_types) {
-							if (wyrmgus::vector::contains(AiHelpers.get_researchers(upgrade), unit_type) || wyrmgus::vector::contains(AiHelpers.get_researcher_classes(upgrade->get_upgrade_class()), unit_type->get_unit_class())) { //if the unit type of the other objective is a researcher of this upgrade
-								has_researcher = true;
+						if (second_objective->get_objective_type() == wyrmgus::objective_type::build_units) {
+							std::vector<const wyrmgus::unit_type *> unit_types = second_objective->UnitTypes;
+
+							for (const wyrmgus::unit_class *unit_class : second_objective->get_unit_classes()) {
+								wyrmgus::unit_type *unit_type = this->get_faction()->get_class_unit_type(unit_class);
+								if (unit_type == nullptr) {
+									continue;
+								}
+								unit_types.push_back(unit_type);
+							}
+
+							if (unit_types.empty()) {
+								continue;
+							}
+
+							for (const wyrmgus::unit_type *unit_type : unit_types) {
+								if (wyrmgus::vector::contains(AiHelpers.get_researchers(upgrade), unit_type) || wyrmgus::vector::contains(AiHelpers.get_researcher_classes(upgrade->get_upgrade_class()), unit_type->get_unit_class())) { //if the unit type of the other objective is a researcher of this upgrade
+									has_researcher = true;
+									break;
+								}
+							}
+
+							if (has_researcher) {
 								break;
 							}
 						}
-
-						if (has_researcher) {
-							break;
-						}
 					}
 				}
+
+				if (!has_researcher || this->Allow.Upgrades[upgrade->ID] != 'A' || !check_conditions(upgrade, this)) {
+					return false;
+				}
+				break;
 			}
-				
-			if (!has_researcher || this->Allow.Upgrades[upgrade->ID] != 'A' || !check_conditions(upgrade, this)) {
-				return false;
-			}
-		} else if (objective->get_objective_type() == wyrmgus::objective_type::recruit_hero) {
-			if (!this->is_character_available_for_recruitment(objective->get_character(), true)) {
-				return false;
-			}
-			recruit_heroes_quantity++;
-		} else if (objective->get_objective_type() == wyrmgus::objective_type::destroy_units || objective->get_objective_type() == wyrmgus::objective_type::destroy_hero || objective->get_objective_type() == wyrmgus::objective_type::destroy_unique) {
-			if (objective->get_faction() != nullptr) {
-				CPlayer *faction_player = GetFactionPlayer(objective->get_faction());
+			case wyrmgus::objective_type::recruit_hero:
+				if (!this->is_character_available_for_recruitment(objective->get_character(), true)) {
+					return false;
+				}
+				++recruit_heroes_quantity;
+				break;
+			case wyrmgus::objective_type::destroy_units:
+			case wyrmgus::objective_type::destroy_hero:
+			case wyrmgus::objective_type::destroy_unique:
+				if (objective->get_faction() != nullptr) {
+					CPlayer *faction_player = GetFactionPlayer(objective->get_faction());
+					if (faction_player == nullptr || !faction_player->is_alive()) {
+						return false;
+					}
+
+					if (objective->get_settlement() != nullptr && !faction_player->HasSettlement(objective->get_settlement())) {
+						return false;
+					}
+				}
+
+				if (objective->get_objective_type() == wyrmgus::objective_type::destroy_hero) {
+					if (objective->get_character()->CanAppear()) { //if the character "can appear" it doesn't already exist, and thus can't be destroyed
+						return false;
+					}
+				} else if (objective->get_objective_type() == wyrmgus::objective_type::destroy_unique) {
+					if (objective->Unique->can_drop()) { //if the unique "can drop" it doesn't already exist, and thus can't be destroyed
+						return false;
+					}
+				}
+				break;
+			case wyrmgus::objective_type::destroy_faction: {
+				const CPlayer *faction_player = GetFactionPlayer(objective->get_faction());
 				if (faction_player == nullptr || !faction_player->is_alive()) {
 					return false;
 				}
-				
-				if (objective->get_settlement() != nullptr && !faction_player->HasSettlement(objective->get_settlement())) {
-					return false;
-				}
-			}
-			
-			if (objective->get_objective_type() == wyrmgus::objective_type::destroy_hero) {
-				if (objective->get_character()->CanAppear()) { //if the character "can appear" it doesn't already exist, and thus can't be destroyed
-					return false;
-				}
-			} else if (objective->get_objective_type() == wyrmgus::objective_type::destroy_unique) {
-				if (objective->Unique->can_drop()) { //if the unique "can drop" it doesn't already exist, and thus can't be destroyed
-					return false;
-				}
-			}
-		} else if (objective->get_objective_type() == wyrmgus::objective_type::destroy_faction) {
-			CPlayer *faction_player = GetFactionPlayer(objective->get_faction());
-			if (faction_player == nullptr || !faction_player->is_alive()) {
-				return false;
+				break;
 			}
 		}
 	}
@@ -2692,123 +2703,140 @@ std::string CPlayer::check_quest_failure(const wyrmgus::quest *quest) const
 		if (quest_objective->get_quest() != quest) {
 			continue;
 		}
-		if (quest_objective->get_objective_type() == wyrmgus::objective_type::build_units) {
-			if (objective->Counter < quest_objective->get_quantity()) {
-				std::vector<const wyrmgus::unit_type *> unit_types = quest_objective->UnitTypes;
 
-				for (const wyrmgus::unit_class *unit_class : quest_objective->get_unit_classes()) {
-					wyrmgus::unit_type *unit_type = this->get_faction()->get_class_unit_type(unit_class);
-					if (unit_type == nullptr) {
-						continue;
-					}
-					unit_types.push_back(unit_type);
-				}
 
-				if (unit_types.empty()) {
-					return "You can no longer produce the required unit.";
-				}
+		switch (quest_objective->get_objective_type()) {
+			case wyrmgus::objective_type::build_units: {
+				if (objective->Counter < quest_objective->get_quantity()) {
+					std::vector<const wyrmgus::unit_type *> unit_types = quest_objective->UnitTypes;
 
-				bool validated = false;
-				std::string validation_error;
-				for (const wyrmgus::unit_type *unit_type : unit_types) {
-					if (quest_objective->get_settlement() != nullptr && !this->HasSettlement(quest_objective->get_settlement()) && !unit_type->BoolFlag[TOWNHALL_INDEX].value) {
-						validation_error = "You no longer hold the required settlement.";
-						continue;
-					}
-
-					if (!this->HasUnitBuilder(unit_type, quest_objective->get_settlement()) || !check_conditions(unit_type, this)) {
-						validation_error = "You can no longer produce the required unit.";
-						continue;
-					}
-
-					validated = true;
-				}
-
-				if (!validated) {
-					return validation_error;
-				}
-			}
-		} else if (quest_objective->get_objective_type() == wyrmgus::objective_type::research_upgrade) {
-			const CUpgrade *upgrade = quest_objective->Upgrade;
-			
-			if (this->Allow.Upgrades[upgrade->ID] != 'R') {
-				bool has_researcher = this->HasUpgradeResearcher(upgrade);
-				
-				if (!has_researcher) { //check if the quest includes an objective to build a researcher of the upgrade
-					for (const auto &second_objective : this->get_quest_objectives()) {
-						const wyrmgus::quest_objective *second_quest_objective = second_objective->get_quest_objective();
-						if (second_quest_objective->get_quest() != quest || second_objective == objective || second_objective->Counter >= second_quest_objective->get_quantity()) { //if the objective has been fulfilled, then there should be a researcher, if there isn't it is due to i.e. the researcher having been destroyed later on, or upgraded to another type, and then the quest should fail if the upgrade can no longer be researched
+					for (const wyrmgus::unit_class *unit_class : quest_objective->get_unit_classes()) {
+						wyrmgus::unit_type *unit_type = this->get_faction()->get_class_unit_type(unit_class);
+						if (unit_type == nullptr) {
 							continue;
 						}
-						
-						if (second_quest_objective->get_objective_type() == wyrmgus::objective_type::build_units) {
-							std::vector<const wyrmgus::unit_type *> unit_types = second_quest_objective->UnitTypes;
+						unit_types.push_back(unit_type);
+					}
 
-							for (const wyrmgus::unit_class *unit_class : second_quest_objective->get_unit_classes()) {
-								wyrmgus::unit_type *unit_type = this->get_faction()->get_class_unit_type(unit_class);
-								if (unit_type == nullptr) {
-									continue;
-								}
-								unit_types.push_back(unit_type);
-							}
+					if (unit_types.empty()) {
+						return "You can no longer produce the required unit.";
+					}
 
-							if (unit_types.empty()) {
+					bool validated = false;
+					std::string validation_error;
+					for (const wyrmgus::unit_type *unit_type : unit_types) {
+						if (quest_objective->get_settlement() != nullptr && !this->HasSettlement(quest_objective->get_settlement()) && !unit_type->BoolFlag[TOWNHALL_INDEX].value) {
+							validation_error = "You no longer hold the required settlement.";
+							continue;
+						}
+
+						if (!this->HasUnitBuilder(unit_type, quest_objective->get_settlement()) || !check_conditions(unit_type, this)) {
+							validation_error = "You can no longer produce the required unit.";
+							continue;
+						}
+
+						validated = true;
+					}
+
+					if (!validated) {
+						return validation_error;
+					}
+				}
+				break;
+			}
+			case wyrmgus::objective_type::research_upgrade: {
+				const CUpgrade *upgrade = quest_objective->Upgrade;
+
+				if (this->Allow.Upgrades[upgrade->ID] != 'R') {
+					bool has_researcher = this->HasUpgradeResearcher(upgrade);
+
+					if (!has_researcher) { //check if the quest includes an objective to build a researcher of the upgrade
+						for (const auto &second_objective : this->get_quest_objectives()) {
+							const wyrmgus::quest_objective *second_quest_objective = second_objective->get_quest_objective();
+							if (second_quest_objective->get_quest() != quest || second_objective == objective || second_objective->Counter >= second_quest_objective->get_quantity()) { //if the objective has been fulfilled, then there should be a researcher, if there isn't it is due to i.e. the researcher having been destroyed later on, or upgraded to another type, and then the quest should fail if the upgrade can no longer be researched
 								continue;
 							}
 
-							for (const wyrmgus::unit_type *unit_type : unit_types) {
-								if (wyrmgus::vector::contains(AiHelpers.get_researchers(upgrade), unit_type) || wyrmgus::vector::contains(AiHelpers.get_researcher_classes(upgrade->get_upgrade_class()), unit_type->get_unit_class())) { //if the unit type of the other objective is a researcher of this upgrade
-									has_researcher = true;
+							if (second_quest_objective->get_objective_type() == wyrmgus::objective_type::build_units) {
+								std::vector<const wyrmgus::unit_type *> unit_types = second_quest_objective->UnitTypes;
+
+								for (const wyrmgus::unit_class *unit_class : second_quest_objective->get_unit_classes()) {
+									wyrmgus::unit_type *unit_type = this->get_faction()->get_class_unit_type(unit_class);
+									if (unit_type == nullptr) {
+										continue;
+									}
+									unit_types.push_back(unit_type);
+								}
+
+								if (unit_types.empty()) {
+									continue;
+								}
+
+								for (const wyrmgus::unit_type *unit_type : unit_types) {
+									if (wyrmgus::vector::contains(AiHelpers.get_researchers(upgrade), unit_type) || wyrmgus::vector::contains(AiHelpers.get_researcher_classes(upgrade->get_upgrade_class()), unit_type->get_unit_class())) { //if the unit type of the other objective is a researcher of this upgrade
+										has_researcher = true;
+										break;
+									}
+								}
+
+								if (has_researcher) {
 									break;
 								}
 							}
-
-							if (has_researcher) {
-								break;
-							}
 						}
 					}
+
+					if (!has_researcher || this->Allow.Upgrades[upgrade->ID] != 'A' || !check_conditions(upgrade, this)) {
+						return "You can no longer research the required upgrade.";
+					}
 				}
-				
-				if (!has_researcher || this->Allow.Upgrades[upgrade->ID] != 'A' || !check_conditions(upgrade, this)) {
-					return "You can no longer research the required upgrade.";
-				}
+				break;
 			}
-		} else if (quest_objective->get_objective_type() == wyrmgus::objective_type::recruit_hero) {
-			if (!this->HasHero(quest_objective->get_character()) && !this->is_character_available_for_recruitment(quest_objective->get_character(), true)) {
-				return "The hero can no longer be recruited.";
-			}
-		} else if (quest_objective->get_objective_type() == wyrmgus::objective_type::destroy_units || quest_objective->get_objective_type() == wyrmgus::objective_type::destroy_hero || quest_objective->get_objective_type() == wyrmgus::objective_type::destroy_unique) {
-			if (quest_objective->get_faction() != nullptr && objective->Counter < quest_objective->get_quantity()) {
-				CPlayer *faction_player = GetFactionPlayer(quest_objective->get_faction());
-				if (faction_player == nullptr || !faction_player->is_alive()) {
-					return "The target no longer exists.";
+			case wyrmgus::objective_type::recruit_hero:
+				if (!this->HasHero(quest_objective->get_character()) && !this->is_character_available_for_recruitment(quest_objective->get_character(), true)) {
+					return "The hero can no longer be recruited.";
 				}
-				
-				if (quest_objective->get_settlement() != nullptr && !faction_player->HasSettlement(quest_objective->get_settlement())) {
-					return "The target no longer exists.";
+				break;
+			case wyrmgus::objective_type::destroy_units:
+			case wyrmgus::objective_type::destroy_hero:
+			case wyrmgus::objective_type::destroy_unique:
+				if (quest_objective->get_faction() != nullptr && objective->Counter < quest_objective->get_quantity()) {
+					CPlayer *faction_player = GetFactionPlayer(quest_objective->get_faction());
+					if (faction_player == nullptr || !faction_player->is_alive()) {
+						return "The target no longer exists.";
+					}
+
+					if (quest_objective->get_settlement() != nullptr && !faction_player->HasSettlement(quest_objective->get_settlement())) {
+						return "The target no longer exists.";
+					}
 				}
-			}
-			
-			if (quest_objective->get_objective_type() == wyrmgus::objective_type::destroy_hero) {
-				if (objective->Counter == 0 && quest_objective->get_character()->CanAppear()) {  // if is supposed to destroy a character, but it is nowhere to be found, fail the quest
-					return "The target no longer exists.";
+
+				if (quest_objective->get_objective_type() == wyrmgus::objective_type::destroy_hero) {
+					if (objective->Counter == 0 && quest_objective->get_character()->CanAppear()) {  // if is supposed to destroy a character, but it is nowhere to be found, fail the quest
+						return "The target no longer exists.";
+					}
+				} else if (quest_objective->get_objective_type() == wyrmgus::objective_type::destroy_unique) {
+					if (objective->Counter == 0 && quest_objective->Unique->can_drop()) {  // if is supposed to destroy a unique, but it is nowhere to be found, fail the quest
+						return "The target no longer exists.";
+					}
 				}
-			} else if (quest_objective->get_objective_type() == wyrmgus::objective_type::destroy_unique) {
-				if (objective->Counter == 0 && quest_objective->Unique->can_drop()) {  // if is supposed to destroy a unique, but it is nowhere to be found, fail the quest
-					return "The target no longer exists.";
+				break;
+			case wyrmgus::objective_type::destroy_faction:
+				if (objective->Counter == 0) {  // if is supposed to destroy a faction, but it is nowhere to be found, fail the quest
+					CPlayer *faction_player = GetFactionPlayer(quest_objective->get_faction());
+					if (faction_player == nullptr || !faction_player->is_alive()) {
+						return "The target no longer exists.";
+					}
 				}
-			}
-		} else if (quest_objective->get_objective_type() == wyrmgus::objective_type::destroy_faction) {
-			if (objective->Counter == 0) {  // if is supposed to destroy a faction, but it is nowhere to be found, fail the quest
-				CPlayer *faction_player = GetFactionPlayer(quest_objective->get_faction());
-				if (faction_player == nullptr || !faction_player->is_alive()) {
-					return "The target no longer exists.";
+				break;
+			case wyrmgus::objective_type::hero_must_survive:
+				if (!this->HasHero(quest_objective->get_character())) {
+					return "A hero necessary for the quest has died.";
 				}
-			}
+				break;
 		}
 	}
-	
+
 	return "";
 }
 
