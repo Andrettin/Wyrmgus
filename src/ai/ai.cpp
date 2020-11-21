@@ -184,8 +184,8 @@ void PlayerAi::check_quest_units_to_build()
 		}
 
 		const wyrmgus::unit_type *unit_type_to_build = nullptr;
-		if (!quest_objective->UnitTypes.empty()) {
-			unit_type_to_build = quest_objective->UnitTypes.front();
+		if (!quest_objective->get_unit_types().empty()) {
+			unit_type_to_build = quest_objective->get_unit_types().front();
 		} else {
 			unit_type_to_build = this->Player->get_class_unit_type(quest_objective->get_unit_classes().front());
 		}
@@ -201,7 +201,7 @@ void PlayerAi::check_quest_units_to_build()
 				continue;
 			}
 
-			if (!wyrmgus::vector::contains(quest_objective->UnitTypes, queue.Type) && !wyrmgus::vector::contains(quest_objective->get_unit_classes(), queue.Type->get_unit_class())) {
+			if (!wyrmgus::vector::contains(quest_objective->get_unit_types(), queue.Type) && !wyrmgus::vector::contains(quest_objective->get_unit_classes(), queue.Type->get_unit_class())) {
 				continue;
 			}
 

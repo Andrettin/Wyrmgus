@@ -100,5 +100,3 @@ inline std::string objective_type_to_string(const objective_type objective_type)
 }
 
 }
-
-Q_DECLARE_METATYPE(wyrmgus::objective_type)

@@ -67,8 +67,8 @@ void quest_objective::process_sml_property(const sml_property &property)
 		this->unit_classes.clear();
 		this->unit_classes.push_back(unit_class::get(value));
 	} else if (key == "unit_type") {
-		this->UnitTypes.clear();
-		this->UnitTypes.push_back(unit_type::get(value));
+		this->unit_types.clear();
+		this->unit_types.push_back(unit_type::get(value));
 	} else {
 		throw std::runtime_error("Invalid quest objective property: \"" + key + "\".");
 	}
@@ -92,7 +92,7 @@ void quest_objective::check() const
 {
 	switch (this->get_objective_type()) {
 		case objective_type::build_units:
-			if (this->UnitTypes.empty() && this->get_unit_classes().empty()) {
+			if (this->get_unit_types().empty() && this->get_unit_classes().empty()) {
 				throw std::runtime_error("Build units quest objective has neither unit types nor unit classes set for it.");
 			}
 			break;
@@ -124,7 +124,7 @@ std::string quest_objective::generate_objective_string(const CPlayer *player) co
 				objective_str += this->get_unit_type_objective_string(unit_type, player, first);
 			}
 
-			for (const unit_type *unit_type : this->UnitTypes) {
+			for (const unit_type *unit_type : this->get_unit_types()) {
 				objective_str += this->get_unit_type_objective_string(unit_type, player, first);
 			}
 

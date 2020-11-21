@@ -2963,7 +2963,7 @@ void CUnit::AssignToPlayer(CPlayer &player)
 						continue;
 					}
 
-					if (!wyrmgus::vector::contains(quest_objective->UnitTypes, &type) && !wyrmgus::vector::contains(quest_objective->get_unit_classes(), type.get_unit_class())) {
+					if (!wyrmgus::vector::contains(quest_objective->get_unit_types(), &type) && !wyrmgus::vector::contains(quest_objective->get_unit_classes(), type.get_unit_class())) {
 						continue;
 					}
 
@@ -7208,11 +7208,11 @@ static void HitUnit_IncreaseScoreForKill(CUnit &attacker, CUnit &target)
 		if (
 			(
 				quest_objective->get_objective_type() == wyrmgus::objective_type::destroy_units
-				&& (wyrmgus::vector::contains(quest_objective->UnitTypes, target.Type) || wyrmgus::vector::contains(quest_objective->get_unit_classes(), target.Type->get_unit_class()))
+				&& (wyrmgus::vector::contains(quest_objective->get_unit_types(), target.Type) || wyrmgus::vector::contains(quest_objective->get_unit_classes(), target.Type->get_unit_class()))
 				&& (quest_objective->get_settlement() == nullptr || quest_objective->get_settlement() == target.settlement)
 			)
 			|| (quest_objective->get_objective_type() == wyrmgus::objective_type::destroy_hero && target.get_character() != nullptr && quest_objective->get_character() == target.get_character())
-			|| (quest_objective->get_objective_type() == wyrmgus::objective_type::destroy_unique && target.get_unique() && quest_objective->Unique == target.get_unique())
+			|| (quest_objective->get_objective_type() == wyrmgus::objective_type::destroy_unique && target.get_unique() && quest_objective->get_unique() == target.get_unique())
 		) {
 			if (quest_objective->get_faction() == nullptr || quest_objective->get_faction()->ID == target.Player->Faction) {
 				objective->Counter = std::min(objective->Counter + 1, quest_objective->get_quantity());

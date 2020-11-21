@@ -168,34 +168,28 @@ static int CclDefineQuest(lua_State *l)
 					} else if (!strcmp(value, "quantity")) {
 						objective->quantity = LuaToNumber(l, -1, k + 1);
 					} else if (!strcmp(value, "resource")) {
-						int resource = GetResourceIdByName(LuaToString(l, -1, k + 1));
-						if (resource == -1) {
-							LuaError(l, "Resource doesn't exist.");
-						}
-						objective->Resource = resource;
+						const wyrmgus::resource *resource = wyrmgus::resource::get(LuaToString(l, -1, k + 1));
+						objective->resource = resource;
 					} else if (!strcmp(value, "unit-class")) {
 						const wyrmgus::unit_class *unit_class = wyrmgus::unit_class::get(LuaToString(l, -1, k + 1));
 						objective->unit_classes.push_back(unit_class);
 					} else if (!strcmp(value, "unit-type")) {
-						wyrmgus::unit_type *unit_type = wyrmgus::unit_type::get(LuaToString(l, -1, k + 1));
-						objective->UnitTypes.push_back(unit_type);
+						const wyrmgus::unit_type *unit_type = wyrmgus::unit_type::get(LuaToString(l, -1, k + 1));
+						objective->unit_types.push_back(unit_type);
 					} else if (!strcmp(value, "upgrade")) {
-						CUpgrade *upgrade = CUpgrade::get(LuaToString(l, -1, k + 1));
-						objective->Upgrade = upgrade;
+						const CUpgrade *upgrade = CUpgrade::get(LuaToString(l, -1, k + 1));
+						objective->upgrade = upgrade;
 					} else if (!strcmp(value, "character")) {
-						wyrmgus::character *character = wyrmgus::character::get(LuaToString(l, -1, k + 1));
+						const wyrmgus::character *character = wyrmgus::character::get(LuaToString(l, -1, k + 1));
 						objective->character = character;
 					} else if (!strcmp(value, "unique")) {
-						wyrmgus::unique_item *unique = wyrmgus::unique_item::get(LuaToString(l, -1, k + 1));
-						if (!unique) {
-							LuaError(l, "Unique doesn't exist.");
-						}
-						objective->Unique = unique;
+						const wyrmgus::unique_item *unique = wyrmgus::unique_item::get(LuaToString(l, -1, k + 1));
+						objective->unique = unique;
 					} else if (!strcmp(value, "settlement")) {
-						wyrmgus::site *site = wyrmgus::site::get(LuaToString(l, -1, k + 1));
+						const wyrmgus::site *site = wyrmgus::site::get(LuaToString(l, -1, k + 1));
 						objective->settlement = site;
 					} else if (!strcmp(value, "faction")) {
-						wyrmgus::faction *faction = wyrmgus::faction::get(LuaToString(l, -1, k + 1));
+						const wyrmgus::faction *faction = wyrmgus::faction::get(LuaToString(l, -1, k + 1));
 						objective->faction = faction;
 					} else {
 						printf("\n%s\n", quest->get_identifier().c_str());

@@ -188,7 +188,7 @@ static void Finish(COrder_Built &order, CUnit &unit)
 			continue;
 		}
 
-		if (!wyrmgus::vector::contains(quest_objective->UnitTypes, &type) && !wyrmgus::vector::contains(quest_objective->get_unit_classes(), type.get_unit_class())) {
+		if (!wyrmgus::vector::contains(quest_objective->get_unit_types(), &type) && !wyrmgus::vector::contains(quest_objective->get_unit_classes(), type.get_unit_class())) {
 			continue;
 		}
 

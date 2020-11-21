@@ -2378,10 +2378,10 @@ void CPlayer::update_current_quests()
 		const wyrmgus::quest_objective *quest_objective = objective->get_quest_objective();
 		switch (quest_objective->get_objective_type()) {
 			case wyrmgus::objective_type::have_resource:
-				objective->Counter = std::min(this->get_resource(wyrmgus::resource::get_all()[quest_objective->Resource], STORE_BOTH), quest_objective->get_quantity());
+				objective->Counter = std::min(this->get_resource(quest_objective->get_resource(), STORE_BOTH), quest_objective->get_quantity());
 				break;
 			case wyrmgus::objective_type::research_upgrade:
-				objective->Counter = UpgradeIdAllowed(*this, quest_objective->Upgrade->ID) == 'R' ? 1 : 0;
+				objective->Counter = UpgradeIdAllowed(*this, quest_objective->get_upgrade()->ID) == 'R' ? 1 : 0;
 				break;
 			case wyrmgus::objective_type::recruit_hero:
 				objective->Counter = this->HasHero(quest_objective->get_character()) ? 1 : 0;
@@ -2525,7 +2525,7 @@ bool CPlayer::can_accept_quest(const wyrmgus::quest *quest) const
 	for (const auto &objective : quest->get_objectives()) {
 		switch (objective->get_objective_type()) {
 			case wyrmgus::objective_type::build_units: {
-				std::vector<const wyrmgus::unit_type *> unit_types = objective->UnitTypes;
+				std::vector<const wyrmgus::unit_type *> unit_types = objective->get_unit_types();
 
 				for (const wyrmgus::unit_class *unit_class : objective->get_unit_classes()) {
 					wyrmgus::unit_type *unit_type = this->get_faction()->get_class_unit_type(unit_class);
@@ -2558,7 +2558,7 @@ bool CPlayer::can_accept_quest(const wyrmgus::quest *quest) const
 				break;
 			}
 			case wyrmgus::objective_type::research_upgrade: {
-				const CUpgrade *upgrade = objective->Upgrade;
+				const CUpgrade *upgrade = objective->get_upgrade();
 
 				bool has_researcher = this->HasUpgradeResearcher(upgrade);
 
@@ -2569,7 +2569,7 @@ bool CPlayer::can_accept_quest(const wyrmgus::quest *quest) const
 						}
 
 						if (second_objective->get_objective_type() == wyrmgus::objective_type::build_units) {
-							std::vector<const wyrmgus::unit_type *> unit_types = second_objective->UnitTypes;
+							std::vector<const wyrmgus::unit_type *> unit_types = second_objective->get_unit_types();
 
 							for (const wyrmgus::unit_class *unit_class : second_objective->get_unit_classes()) {
 								wyrmgus::unit_type *unit_type = this->get_faction()->get_class_unit_type(unit_class);
@@ -2627,7 +2627,7 @@ bool CPlayer::can_accept_quest(const wyrmgus::quest *quest) const
 						return false;
 					}
 				} else if (objective->get_objective_type() == wyrmgus::objective_type::destroy_unique) {
-					if (objective->Unique->can_drop()) { //if the unique "can drop" it doesn't already exist, and thus can't be destroyed
+					if (objective->get_unique()->can_drop()) { //if the unique "can drop" it doesn't already exist, and thus can't be destroyed
 						return false;
 					}
 				}
@@ -2707,7 +2707,7 @@ std::string CPlayer::check_quest_failure(const wyrmgus::quest *quest) const
 		switch (quest_objective->get_objective_type()) {
 			case wyrmgus::objective_type::build_units: {
 				if (objective->Counter < quest_objective->get_quantity()) {
-					std::vector<const wyrmgus::unit_type *> unit_types = quest_objective->UnitTypes;
+					std::vector<const wyrmgus::unit_type *> unit_types = quest_objective->get_unit_types();
 
 					for (const wyrmgus::unit_class *unit_class : quest_objective->get_unit_classes()) {
 						wyrmgus::unit_type *unit_type = this->get_faction()->get_class_unit_type(unit_class);
@@ -2744,7 +2744,7 @@ std::string CPlayer::check_quest_failure(const wyrmgus::quest *quest) const
 				break;
 			}
 			case wyrmgus::objective_type::research_upgrade: {
-				const CUpgrade *upgrade = quest_objective->Upgrade;
+				const CUpgrade *upgrade = quest_objective->get_upgrade();
 
 				if (this->Allow.Upgrades[upgrade->ID] != 'R') {
 					bool has_researcher = this->HasUpgradeResearcher(upgrade);
@@ -2757,7 +2757,7 @@ std::string CPlayer::check_quest_failure(const wyrmgus::quest *quest) const
 							}
 
 							if (second_quest_objective->get_objective_type() == wyrmgus::objective_type::build_units) {
-								std::vector<const wyrmgus::unit_type *> unit_types = second_quest_objective->UnitTypes;
+								std::vector<const wyrmgus::unit_type *> unit_types = second_quest_objective->get_unit_types();
 
 								for (const wyrmgus::unit_class *unit_class : second_quest_objective->get_unit_classes()) {
 									wyrmgus::unit_type *unit_type = this->get_faction()->get_class_unit_type(unit_class);
@@ -2815,7 +2815,7 @@ std::string CPlayer::check_quest_failure(const wyrmgus::quest *quest) const
 						return "The target no longer exists.";
 					}
 				} else if (quest_objective->get_objective_type() == wyrmgus::objective_type::destroy_unique) {
-					if (objective->Counter == 0 && quest_objective->Unique->can_drop()) {  // if is supposed to destroy a unique, but it is nowhere to be found, fail the quest
+					if (objective->Counter == 0 && quest_objective->get_unique()->can_drop()) {  // if is supposed to destroy a unique, but it is nowhere to be found, fail the quest
 						return "The target no longer exists.";
 					}
 				}

@@ -376,7 +376,7 @@ int TransformUnitIntoType(CUnit &unit, const wyrmgus::unit_type &newtype)
 					continue;
 				}
 
-				if (!wyrmgus::vector::contains(quest_objective->UnitTypes, &newtype) && !wyrmgus::vector::contains(quest_objective->get_unit_classes(), newtype.get_unit_class())) {
+				if (!wyrmgus::vector::contains(quest_objective->get_unit_types(), &newtype) && !wyrmgus::vector::contains(quest_objective->get_unit_classes(), newtype.get_unit_class())) {
 					continue;
 				}
 

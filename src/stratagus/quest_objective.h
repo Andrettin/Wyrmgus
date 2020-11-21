@@ -38,6 +38,7 @@ namespace wyrmgus {
 class character;
 class faction;
 class quest;
+class resource;
 class site;
 class sml_data;
 class sml_property;
@@ -83,9 +84,34 @@ public:
 	std::string generate_objective_string(const CPlayer *player) const;
 	std::string get_unit_type_objective_string(const unit_type *unit_type, const CPlayer *player, bool &first) const;
 
+	const resource *get_resource() const
+	{
+		return this->resource;
+	}
+
 	const std::vector<const unit_class *> &get_unit_classes() const
 	{
 		return this->unit_classes;
+	}
+
+	const std::vector<const unit_type *> &get_unit_types() const
+	{
+		return this->unit_types;
+	}
+
+	const CUpgrade *get_upgrade() const
+	{
+		return this->upgrade;
+	}
+
+	const character *get_character() const
+	{
+		return this->character;
+	}
+
+	const unique_item *get_unique() const
+	{
+		return this->unique;
 	}
 
 	const site *get_settlement() const
@@ -98,29 +124,18 @@ public:
 		return this->faction;
 	}
 
-	const character *get_character() const
-	{
-		return this->character;
-	}
-
 private:
 	objective_type objective_type;
 	const wyrmgus::quest *quest = nullptr;
 	int index = -1;
 	int quantity = 1;
-public:
-	int Resource = -1;
-private:
 	std::string objective_string;
+	const wyrmgus::resource *resource = nullptr;
 	std::vector<const unit_class *> unit_classes;
-public:
-	std::vector<const unit_type *> UnitTypes;
-	const CUpgrade *Upgrade = nullptr;
-private:
+	std::vector<const unit_type *> unit_types;
+	const CUpgrade *upgrade = nullptr;
 	const wyrmgus::character *character = nullptr;
-public:
-	const unique_item *Unique = nullptr;
-private:
+	const unique_item *unique = nullptr;
 	const site *settlement = nullptr;
 	const wyrmgus::faction *faction = nullptr;
 
