@@ -66,11 +66,6 @@ public:
 		return this->quest;
 	}
 
-	int get_index() const
-	{
-		return this->index;
-	}
-
 	int get_quantity() const
 	{
 		return this->quantity;
@@ -127,7 +122,6 @@ public:
 private:
 	objective_type objective_type;
 	const wyrmgus::quest *quest = nullptr;
-	int index = -1;
 	int quantity = 1;
 	std::string objective_string;
 	const wyrmgus::resource *resource = nullptr;

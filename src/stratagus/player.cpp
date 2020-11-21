@@ -759,7 +759,6 @@ void CPlayer::Save(CFile &file) const
 		}
 		file.printf("{");
 		file.printf("\"quest\", \"%s\",", objective->get_quest_objective()->get_quest()->get_identifier().c_str());
-		file.printf("\"objective-index\", %d,", objective->get_quest_objective()->get_index());
 		file.printf("\"counter\", %d,", objective->Counter);
 		file.printf("},");
 	}

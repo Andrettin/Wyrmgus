@@ -41,7 +41,7 @@
 namespace wyrmgus {
 
 quest_objective::quest_objective(const wyrmgus::objective_type objective_type, const wyrmgus::quest *quest)
-	: objective_type(objective_type), quest(quest), index(quest->get_objectives().size())
+	: objective_type(objective_type), quest(quest)
 {
 	if (objective_type == objective_type::hero_must_survive) {
 		this->quantity = 0;
@@ -82,6 +82,10 @@ void quest_objective::process_sml_scope(const sml_data &scope)
 	if (tag == "unit_classes") {
 		for (const std::string &value : values) {
 			this->unit_classes.push_back(unit_class::get(value));
+		}
+	} else if (tag == "unit_types") {
+		for (const std::string &value : values) {
+			this->unit_types.push_back(unit_type::get(value));
 		}
 	} else {
 		throw std::runtime_error("Invalid quest objective scope: \"" + scope.get_tag() + "\".");
