@@ -173,7 +173,7 @@ std::string quest::get_rewards_string() const
 	}
 
 	if (this->completion_effects != nullptr) {
-		return this->completion_effects->get_effects_string();
+		return this->completion_effects->get_effects_string(0, "- ");
 	}
 
 	return std::string();

@@ -74,7 +74,7 @@ void effect_list<scope_type>::do_effects(scope_type *scope) const
 }
 
 template <typename scope_type>
-std::string effect_list<scope_type>::get_effects_string(const size_t indent) const
+std::string effect_list<scope_type>::get_effects_string(const size_t indent, const std::string &prefix) const
 {
 	std::string effects_string;
 	bool first = true;
@@ -98,6 +98,7 @@ std::string effect_list<scope_type>::get_effects_string(const size_t indent) con
 			effects_string += std::string(indent, '\t');
 		}
 
+		effects_string += prefix;
 		effects_string += effect_string;
 	}
 	return effects_string;
