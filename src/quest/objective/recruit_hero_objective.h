@@ -44,6 +44,13 @@ public:
 		return objective_type::recruit_hero;
 	}
 
+	virtual std::string generate_objective_string(const CPlayer *player) const override
+	{
+		Q_UNUSED(player)
+
+		return "Recruit " + this->get_character()->get_full_name();
+	}
+
 	virtual bool is_quest_acceptance_allowed(const CPlayer *player) const override
 	{
 		if (!player->is_character_available_for_recruitment(this->get_character(), true)) {
