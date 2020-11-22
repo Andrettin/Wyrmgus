@@ -43,9 +43,7 @@ namespace wyrmgus {
 quest_objective::quest_objective(const wyrmgus::objective_type objective_type, const wyrmgus::quest *quest)
 	: objective_type(objective_type), quest(quest)
 {
-	if (objective_type == objective_type::hero_must_survive) {
-		this->quantity = 0;
-	}
+	this->quantity = get_objective_type_default_quantity(objective_type);
 }
 
 void quest_objective::process_sml_property(const sml_property &property)

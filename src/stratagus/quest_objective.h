@@ -122,7 +122,7 @@ public:
 private:
 	objective_type objective_type;
 	const wyrmgus::quest *quest = nullptr;
-	int quantity = 1;
+	int quantity = 0;
 	std::string objective_string;
 	const wyrmgus::resource *resource = nullptr;
 	std::vector<const unit_class *> unit_classes;
