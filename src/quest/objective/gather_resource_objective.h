@@ -28,9 +28,12 @@
 #pragma once
 
 #include "quest/objective_type.h"
+#include "quest/player_quest_objective.h"
 #include "quest/quest_objective.h"
 
 namespace wyrmgus {
+
+class resource;
 
 class gather_resource_objective final : public quest_objective
 {
@@ -42,6 +45,15 @@ public:
 	virtual objective_type get_objective_type() const override
 	{
 		return objective_type::gather_resource;
+	}
+
+	virtual void on_resource_gathered(const wyrmgus::resource *resource, const int quantity, player_quest_objective *player_quest_objective) const override
+	{
+		if (this->get_resource() != resource) {
+			return;
+		}
+
+		player_quest_objective->change_counter(quantity);
 	}
 };
 

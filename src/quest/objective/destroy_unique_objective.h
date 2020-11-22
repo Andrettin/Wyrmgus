@@ -64,6 +64,15 @@ public:
 
 		return destroy_unit_objective_base::check_failure(player);
 	}
+
+	virtual bool is_objective_unit(const CUnit *unit) const override
+	{
+		if (unit->get_unique() == nullptr || this->get_unique() != unit->get_unique()) {
+			return false;
+		}
+
+		return destroy_unit_objective_base::is_objective_unit(unit);
+	}
 };
 
 }

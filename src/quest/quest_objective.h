@@ -28,6 +28,7 @@
 #pragma once
 
 class CPlayer;
+class CUnit;
 class CUpgrade;
 struct lua_State;
 
@@ -37,6 +38,7 @@ namespace wyrmgus {
 
 class character;
 class faction;
+class player_quest_objective;
 class quest;
 class resource;
 class site;
@@ -123,6 +125,25 @@ public:
 		Q_UNUSED(player)
 
 		return std::make_pair(false, std::string());
+	}
+
+	virtual void on_unit_built(const CUnit *unit, player_quest_objective *player_quest_objective) const
+	{
+		Q_UNUSED(unit)
+		Q_UNUSED(player_quest_objective)
+	}
+
+	virtual void on_unit_destroyed(const CUnit *unit, player_quest_objective *player_quest_objective) const
+	{
+		Q_UNUSED(unit)
+		Q_UNUSED(player_quest_objective)
+	}
+
+	virtual void on_resource_gathered(const resource *resource, const int quantity, player_quest_objective *player_quest_objective) const
+	{
+		Q_UNUSED(resource)
+		Q_UNUSED(quantity)
+		Q_UNUSED(player_quest_objective)
 	}
 
 	const resource *get_resource() const

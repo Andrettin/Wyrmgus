@@ -65,85 +65,17 @@ void player_quest_objective::update_counter()
 
 void player_quest_objective::on_unit_built(const CUnit *unit)
 {
-	const wyrmgus::quest_objective *quest_objective = this->get_quest_objective();
-
-	if (quest_objective->get_objective_type() != objective_type::build_units) {
-		return;
-	}
-
-	if (!vector::contains(quest_objective->get_unit_types(), unit->Type) && !vector::contains(quest_objective->get_unit_classes(), unit->Type->get_unit_class())) {
-		return;
-	}
-
-	if (quest_objective->get_settlement() != nullptr && quest_objective->get_settlement() != unit->settlement) {
-		return;
-	}
-
-	this->increment_counter();
+	this->get_quest_objective()->on_unit_built(unit, this);
 }
 
 void player_quest_objective::on_unit_destroyed(const CUnit *unit)
 {
-	const wyrmgus::quest_objective *quest_objective = this->get_quest_objective();
-
-	switch (quest_objective->get_objective_type()) {
-		case objective_type::destroy_hero:
-		case objective_type::destroy_unique:
-		case objective_type::destroy_units:
-			if (quest_objective->get_faction() != nullptr && quest_objective->get_faction() != unit->Player->get_faction()) {
-				break;
-			}
-
-			if (quest_objective->get_objective_type() == objective_type::destroy_units) {
-				if (
-					(!vector::contains(quest_objective->get_unit_types(), unit->Type) && !vector::contains(quest_objective->get_unit_classes(), unit->Type->get_unit_class()))
-					|| (quest_objective->get_settlement() != nullptr && quest_objective->get_settlement() != unit->settlement)
-				) {
-					break;
-				}
-			} else if (quest_objective->get_objective_type() == objective_type::destroy_hero) {
-				if (unit->get_character() == nullptr || quest_objective->get_character() != unit->get_character()) {
-					break;
-				}
-			} else if (quest_objective->get_objective_type() == objective_type::destroy_unique) {
-				if (unit->get_unique() == nullptr || quest_objective->get_unique() != unit->get_unique()) {
-					break;
-				}
-			}
-
-			this->increment_counter();
-			break;
-		case objective_type::destroy_faction: {
-			const CPlayer *faction_player = GetFactionPlayer(quest_objective->get_faction());
-
-			if (faction_player != nullptr) {
-				int dying_faction_units = faction_player == unit->Player ? 1 : 0;
-				dying_faction_units += unit->GetTotalInsideCount(faction_player, true, true);
-
-				if (dying_faction_units > 0 && faction_player->GetUnitCount() <= dying_faction_units) {
-					this->increment_counter();
-				}
-			}
-			break;
-		}
-		default:
-			break;
-	}
+	this->get_quest_objective()->on_unit_destroyed(unit, this);
 }
 
 void player_quest_objective::on_resource_gathered(const resource *resource, const int quantity)
 {
-	const wyrmgus::quest_objective *quest_objective = this->get_quest_objective();
-
-	if (quest_objective->get_objective_type() != objective_type::gather_resource) {
-		return;
-	}
-
-	if (quest_objective->get_resource() != resource) {
-		return;
-	}
-
-	this->change_counter(quantity);
+	this->get_quest_objective()->on_resource_gathered(resource, quantity, this);
 }
 
 }

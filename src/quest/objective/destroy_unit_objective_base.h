@@ -28,7 +28,9 @@
 #pragma once
 
 #include "quest/objective_type.h"
+#include "quest/player_quest_objective.h"
 #include "quest/quest_objective.h"
+#include "unit/unit.h"
 
 namespace wyrmgus {
 
@@ -73,6 +75,24 @@ public:
 		}
 
 		return quest_objective::check_failure(player);
+	}
+
+	virtual bool is_objective_unit(const CUnit *unit) const
+	{
+		if (this->get_faction() != nullptr && this->get_faction() != unit->Player->get_faction()) {
+			return false;
+		}
+
+		return true;
+	}
+
+	virtual void on_unit_destroyed(const CUnit *unit, player_quest_objective *player_quest_objective) const override final
+	{
+		if (!this->is_objective_unit(unit)) {
+			return;
+		}
+
+		player_quest_objective->increment_counter();
 	}
 };
 

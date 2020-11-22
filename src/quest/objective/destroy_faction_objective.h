@@ -68,6 +68,24 @@ public:
 
 		return quest_objective::check_failure(player);
 	}
+
+	virtual void on_unit_destroyed(const CUnit *unit, player_quest_objective *player_quest_objective) const override
+	{
+		const CPlayer *faction_player = GetFactionPlayer(this->get_faction());
+
+		if (faction_player == nullptr) {
+			return;
+		}
+
+		int dying_faction_units = (faction_player == unit->Player) ? 1 : 0;
+		dying_faction_units += unit->GetTotalInsideCount(faction_player, true, true);
+
+		if (dying_faction_units == 0 || faction_player->GetUnitCount() > dying_faction_units) {
+			return;
+		}
+
+		player_quest_objective->increment_counter();
+	}
 };
 
 }

@@ -28,9 +28,12 @@
 #pragma once
 
 #include "quest/objective_type.h"
+#include "quest/player_quest_objective.h"
 #include "quest/quest_objective.h"
 #include "script/condition/condition.h"
+#include "unit/unit.h"
 #include "unit/unit_type.h"
+#include "util/vector_util.h"
 
 namespace wyrmgus {
 
@@ -153,6 +156,19 @@ public:
 		}
 
 		return quest_objective::check_failure(player);
+	}
+
+	virtual void on_unit_built(const CUnit *unit, player_quest_objective *player_quest_objective) const override
+	{
+		if (!vector::contains(this->get_unit_types(), unit->Type) && !vector::contains(this->get_unit_classes(), unit->Type->get_unit_class())) {
+			return;
+		}
+
+		if (this->get_settlement() != nullptr && this->get_settlement() != unit->settlement) {
+			return;
+		}
+
+		player_quest_objective->increment_counter();
 	}
 };
 
