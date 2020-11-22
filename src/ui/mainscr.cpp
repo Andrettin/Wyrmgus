@@ -53,6 +53,7 @@
 #include "network.h"
 #include "plane.h"
 #include "player.h"
+#include "player_quest_objective.h"
 #include "quest.h"
 #include "quest_objective.h"
 #include "script.h"

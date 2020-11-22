@@ -67,6 +67,7 @@
 #include "parameters.h"
 //Wyrmgus end
 #include "player_color.h"
+#include "player_quest_objective.h"
 #include "quest.h"
 #include "quest_objective.h"
 //Wyrmgus start

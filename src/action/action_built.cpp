@@ -47,6 +47,7 @@
 #include "map/tileset.h"
 #include "objective_type.h"
 #include "player.h"
+#include "player_quest_objective.h"
 #include "quest_objective.h"
 #include "script.h"
 #include "sound/sound.h"

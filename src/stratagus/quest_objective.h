@@ -136,22 +136,4 @@ private:
 	friend static int ::CclDefineQuest(lua_State *l);
 };
 
-class player_quest_objective final
-{
-public:
-	explicit player_quest_objective(const quest_objective *quest_objective) : quest_objective(quest_objective)
-	{
-	}
-
-	const quest_objective *get_quest_objective() const
-	{
-		return this->quest_objective;
-	}
-
-private:
-	const quest_objective *quest_objective = nullptr;
-public:
-	int Counter = 0;
-};
-
 }

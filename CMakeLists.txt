@@ -987,6 +987,7 @@ set(stratagus_generic_HDRS
 	src/stratagus/magic_domain.h
 	src/stratagus/objective_type.h
 	src/stratagus/player_container.h
+	src/stratagus/player_quest_objective.h
 	src/stratagus/quest_objective.h
 	src/stratagus/vassalage_type.h
 )

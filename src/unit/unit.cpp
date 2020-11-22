@@ -67,6 +67,7 @@
 #include "pathfinder.h"
 #include "plane.h"
 #include "player.h"
+#include "player_quest_objective.h"
 #include "quest.h"
 #include "quest_objective.h"
 #include "religion/deity.h"

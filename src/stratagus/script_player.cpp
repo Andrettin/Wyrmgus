@@ -53,6 +53,7 @@
 #include "map/site.h"
 #include "plane.h"
 #include "player_color.h"
+#include "player_quest_objective.h"
 #include "quest.h"
 #include "quest_objective.h"
 #include "religion/deity.h"
