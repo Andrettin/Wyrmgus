@@ -2487,6 +2487,10 @@ void CPlayer::fail_quest(wyrmgus::quest *quest, const std::string &fail_reason)
 		quest->FailEffects->run();
 	}
 	
+	if (quest->get_failure_effects() != nullptr) {
+		quest->get_failure_effects()->do_effects(this);
+	}
+
 	if (this == CPlayer::GetThisPlayer()) {
 		const wyrmgus::campaign *current_campaign = wyrmgus::game::get()->get_current_campaign();
 		if (current_campaign != nullptr && current_campaign->get_quest() == quest) {

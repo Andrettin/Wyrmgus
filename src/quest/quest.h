@@ -122,6 +122,11 @@ public:
 		return this->completion_effects;
 	}
 
+	const std::unique_ptr<effect_list<CPlayer>> &get_failure_effects() const
+	{
+		return this->failure_effects;
+	}
+
 	const std::vector<std::unique_ptr<quest_objective>> &get_objectives() const
 	{
 		return this->objectives;
@@ -177,6 +182,7 @@ private:
 	std::unique_ptr<condition> conditions;
 	std::unique_ptr<effect_list<CPlayer>> accept_effects;
 	std::unique_ptr<effect_list<CPlayer>> completion_effects;
+	std::unique_ptr<effect_list<CPlayer>> failure_effects;
 	std::vector<std::unique_ptr<quest_objective>> objectives;
 	std::vector<std::string> objective_strings; //display-only objective strings for the quest
 public:

@@ -111,6 +111,9 @@ void quest::process_sml_scope(const sml_data &scope)
 	} else if (tag == "completion_effects") {
 		this->completion_effects = std::make_unique<effect_list<CPlayer>>();
 		database::process_sml_data(this->completion_effects, scope);
+	} else if (tag == "failure_effects") {
+		this->failure_effects = std::make_unique<effect_list<CPlayer>>();
+		database::process_sml_data(this->failure_effects, scope);
 	} else {
 		data_entry::process_sml_scope(scope);
 	}
@@ -137,6 +140,10 @@ void quest::check() const
 
 	if (this->get_completion_effects() != nullptr) {
 		this->get_completion_effects()->check();
+	}
+
+	if (this->get_failure_effects() != nullptr) {
+		this->get_failure_effects()->check();
 	}
 
 	for (const std::unique_ptr<quest_objective> &objective : objectives) {
