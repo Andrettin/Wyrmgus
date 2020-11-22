@@ -35,8 +35,10 @@ namespace wyrmgus {
 class recruit_hero_objective final : public quest_objective
 {
 public:
-	explicit recruit_hero_objective(const wyrmgus::quest *quest) : quest_objective(quest)
+	explicit recruit_hero_objective(const std::string &character_identifier, const wyrmgus::quest *quest)
+		: quest_objective(quest)
 	{
+		this->character = character::get(character_identifier);
 	}
 
 	virtual objective_type get_objective_type() const override
@@ -74,6 +76,14 @@ public:
 		const int count = player_quest_objective->get_player()->HasHero(this->get_character()) ? 1 : 0;
 		player_quest_objective->set_counter(count);
 	}
+
+	const character *get_character() const
+	{
+		return this->character;
+	}
+
+private:
+	const wyrmgus::character *character = nullptr;
 };
 
 }

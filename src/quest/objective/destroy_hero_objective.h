@@ -35,8 +35,10 @@ namespace wyrmgus {
 class destroy_hero_objective final : public destroy_unit_objective_base
 {
 public:
-	explicit destroy_hero_objective(const wyrmgus::quest *quest) : destroy_unit_objective_base(quest)
+	explicit destroy_hero_objective(const std::string &character_identifier, const wyrmgus::quest *quest)
+		: destroy_unit_objective_base(quest)
 	{
+		this->character = character::get(character_identifier);
 	}
 
 	virtual objective_type get_objective_type() const override
@@ -79,6 +81,14 @@ public:
 
 		return destroy_unit_objective_base::is_objective_unit(unit);
 	}
+
+	const character *get_character() const
+	{
+		return this->character;
+	}
+
+private:
+	const wyrmgus::character *character = nullptr;
 };
 
 }

@@ -179,12 +179,6 @@ static int CclDefineQuest(lua_State *l)
 					} else if (!strcmp(value, "upgrade")) {
 						const CUpgrade *upgrade = CUpgrade::get(LuaToString(l, -1, k + 1));
 						objective->upgrade = upgrade;
-					} else if (!strcmp(value, "character")) {
-						const wyrmgus::character *character = wyrmgus::character::get(LuaToString(l, -1, k + 1));
-						objective->character = character;
-					} else if (!strcmp(value, "unique")) {
-						const wyrmgus::unique_item *unique = wyrmgus::unique_item::get(LuaToString(l, -1, k + 1));
-						objective->unique = unique;
 					} else if (!strcmp(value, "settlement")) {
 						const wyrmgus::site *site = wyrmgus::site::get(LuaToString(l, -1, k + 1));
 						objective->settlement = site;

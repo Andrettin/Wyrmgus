@@ -56,8 +56,6 @@ std::unique_ptr<quest_objective> quest_objective::try_from_identifier(const std:
 		return std::make_unique<build_units_objective>(quest);
 	} else if (identifier == "destroy_faction") {
 		return std::make_unique<destroy_faction_objective>(quest);
-	} else if (identifier == "destroy_unique") {
-		return std::make_unique<destroy_unique_objective>(quest);
 	} else if (identifier == "destroy_units") {
 		return std::make_unique<destroy_units_objective>(quest);
 	} else if (identifier == "gather_resource") {
@@ -77,17 +75,13 @@ std::unique_ptr<quest_objective> quest_objective::from_sml_property(const sml_pr
 	const std::string &value = property.get_value();
 
 	if (key == "destroy_hero") {
-		auto objective = std::make_unique<destroy_hero_objective>(quest);
-		objective->character = character::get(value);
-		return objective;
+		return std::make_unique<destroy_hero_objective>(value, quest);
+	} else if (key == "destroy_unique") {
+		return std::make_unique<destroy_unique_objective>(value, quest);
 	} else if (key == "hero_must_survive") {
-		auto objective = std::make_unique<hero_must_survive_objective>(quest);
-		objective->character = character::get(value);
-		return objective;
+		return std::make_unique<hero_must_survive_objective>(value, quest);
 	} else if (key == "recruit_hero") {
-		auto objective = std::make_unique<recruit_hero_objective>(quest);
-		objective->character = character::get(value);
-		return objective;
+		return std::make_unique<recruit_hero_objective>(value, quest);
 	} else {
 		throw std::runtime_error("Invalid quest objective property: \"" + key + "\".");
 	}
@@ -126,8 +120,6 @@ void quest_objective::process_sml_property(const sml_property &property)
 		this->settlement = site::get(value);
 	} else if (key == "faction") {
 		this->faction = faction::get(value);
-	} else if (key == "character") {
-		this->character = character::get(value);
 	} else if (key == "unit_class") {
 		this->unit_classes.clear();
 		this->unit_classes.push_back(unit_class::get(value));

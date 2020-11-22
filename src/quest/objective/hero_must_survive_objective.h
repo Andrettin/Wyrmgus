@@ -27,6 +27,7 @@
 
 #pragma once
 
+#include "character.h"
 #include "quest/objective_type.h"
 #include "quest/quest_objective.h"
 
@@ -35,8 +36,10 @@ namespace wyrmgus {
 class hero_must_survive_objective final : public quest_objective
 {
 public:
-	explicit hero_must_survive_objective(const wyrmgus::quest *quest) : quest_objective(quest)
+	explicit hero_must_survive_objective(const std::string &character_identifier, const wyrmgus::quest *quest)
+		: quest_objective(quest)
 	{
+		this->character = character::get(character_identifier);
 	}
 
 	virtual void check() const override
@@ -81,6 +84,14 @@ public:
 
 		return quest_objective::check_failure(player);
 	}
+
+	const character *get_character() const
+	{
+		return this->character;
+	}
+
+private:
+	const wyrmgus::character *character = nullptr;
 };
 
 }

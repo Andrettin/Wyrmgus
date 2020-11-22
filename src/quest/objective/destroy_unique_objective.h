@@ -36,8 +36,10 @@ namespace wyrmgus {
 class destroy_unique_objective final : public destroy_unit_objective_base
 {
 public:
-	explicit destroy_unique_objective(const wyrmgus::quest *quest) : destroy_unit_objective_base(quest)
+	explicit destroy_unique_objective(const std::string &unique_identifier, const wyrmgus::quest *quest)
+		: destroy_unit_objective_base(quest)
 	{
+		this->unique = unique_item::get(unique_identifier);
 	}
 
 	virtual objective_type get_objective_type() const override
@@ -73,6 +75,14 @@ public:
 
 		return destroy_unit_objective_base::is_objective_unit(unit);
 	}
+
+	const unique_item *get_unique() const
+	{
+		return this->unique;
+	}
+
+private:
+	const unique_item *unique = nullptr;
 };
 
 }

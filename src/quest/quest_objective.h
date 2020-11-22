@@ -36,7 +36,6 @@ static int CclDefineQuest(lua_State *l);
 
 namespace wyrmgus {
 
-class character;
 class faction;
 class player_quest_objective;
 class quest;
@@ -44,7 +43,6 @@ class resource;
 class site;
 class sml_data;
 class sml_property;
-class unique_item;
 class unit_class;
 class unit_type;
 enum class objective_type;
@@ -171,16 +169,6 @@ public:
 		return this->upgrade;
 	}
 
-	const character *get_character() const
-	{
-		return this->character;
-	}
-
-	const unique_item *get_unique() const
-	{
-		return this->unique;
-	}
-
 	const site *get_settlement() const
 	{
 		return this->settlement;
@@ -200,8 +188,6 @@ private:
 	std::vector<const unit_class *> unit_classes;
 	std::vector<const unit_type *> unit_types;
 	const CUpgrade *upgrade = nullptr;
-	const wyrmgus::character *character = nullptr;
-	const unique_item *unique = nullptr;
 	const site *settlement = nullptr;
 	const wyrmgus::faction *faction = nullptr;
 
