@@ -448,11 +448,11 @@ void CPlayer::Load(lua_State *l)
 						quest = wyrmgus::quest::get(LuaToString(l, -1, n + 1));
 					} else if (!strcmp(value, "objective-index")) {
 						const int objective_index = LuaToNumber(l, -1, n + 1);
-						auto objective_unique_ptr = std::make_unique<wyrmgus::player_quest_objective>(quest->get_objectives()[objective_index].get());
+						auto objective_unique_ptr = std::make_unique<wyrmgus::player_quest_objective>(quest->get_objectives()[objective_index].get(), this);
 						objective = objective_unique_ptr.get();
 						this->quest_objectives.push_back(std::move(objective_unique_ptr));
 					} else if (!strcmp(value, "counter")) {
-						objective->Counter = LuaToNumber(l, -1, n + 1);
+						objective->set_counter(LuaToNumber(l, -1, n + 1));
 					} else {
 						LuaError(l, "Invalid quest objective property.");
 					}

@@ -295,6 +295,7 @@ source_group(pathfinder FILES ${pathfinder_SRCS})
 set(quest_SRCS
 	src/quest/achievement.cpp
 	src/quest/campaign.cpp
+	src/quest/player_quest_objective.cpp
 	src/quest/quest.cpp
 	src/quest/quest_objective.cpp
 	src/quest/script_quest.cpp

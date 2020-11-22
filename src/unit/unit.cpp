@@ -2970,7 +2970,7 @@ void CUnit::AssignToPlayer(CPlayer &player)
 
 					//only buildings can belong to settlements, so we don't need to check to see whether the settlement is correct here
 
-					objective->Counter = std::min(objective->Counter + 1, quest_objective->get_quantity());
+					objective->increment_counter();
 				}
 			}
 		}
@@ -7216,7 +7216,7 @@ static void HitUnit_IncreaseScoreForKill(CUnit &attacker, CUnit &target)
 			|| (quest_objective->get_objective_type() == wyrmgus::objective_type::destroy_unique && target.get_unique() && quest_objective->get_unique() == target.get_unique())
 		) {
 			if (quest_objective->get_faction() == nullptr || quest_objective->get_faction()->ID == target.Player->Faction) {
-				objective->Counter = std::min(objective->Counter + 1, quest_objective->get_quantity());
+				objective->increment_counter();
 			}
 		} else if (quest_objective->get_objective_type() == wyrmgus::objective_type::destroy_faction) {
 			const CPlayer *faction_player = GetFactionPlayer(quest_objective->get_faction());
@@ -7226,7 +7226,7 @@ static void HitUnit_IncreaseScoreForKill(CUnit &attacker, CUnit &target)
 				dying_faction_units += target.GetTotalInsideCount(faction_player, true, true);
 				
 				if (dying_faction_units > 0 && faction_player->GetUnitCount() <= dying_faction_units) {
-					objective->Counter = 1;
+					objective->increment_counter();
 				}
 			}
 		}

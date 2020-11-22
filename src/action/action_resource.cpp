@@ -1361,9 +1361,9 @@ int COrder_Resource::MoveToDepot(CUnit &unit)
 		const wyrmgus::quest_objective *quest_objective = objective->get_quest_objective();
 		if (quest_objective->get_objective_type() == wyrmgus::objective_type::gather_resource) {
 			if (quest_objective->get_resource() == resource) {
-				objective->Counter = std::min(objective->Counter + processed_resource_change, quest_objective->get_quantity());
+				objective->change_counter(processed_resource_change);
 			} else if (quest_objective->get_resource()->get_index() == this->CurrentResource) {
-				objective->Counter = std::min(objective->Counter + unit.ResourcesHeld, quest_objective->get_quantity());
+				objective->change_counter(unit.ResourcesHeld);
 			}
 		}
 	}

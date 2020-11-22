@@ -385,7 +385,7 @@ int TransformUnitIntoType(CUnit &unit, const wyrmgus::unit_type &newtype)
 					continue;
 				}
 
-				objective->Counter = std::min(objective->Counter + 1, quest_objective->get_quantity());
+				objective->increment_counter();
 			}
 		}
 	}

@@ -432,7 +432,7 @@ public:
 	CUpgradeTimers UpgradeTimers; /// Timer for the upgrades
 
 	/// Get a resource of the player
-	int get_resource(const wyrmgus::resource *resource, const int type);
+	int get_resource(const wyrmgus::resource *resource, const int type) const;
 	/// Adds/subtracts some resources to/from the player store
 	void change_resource(const wyrmgus::resource *resource, const int value, const bool store = false);
 	/// Set a resource of the player

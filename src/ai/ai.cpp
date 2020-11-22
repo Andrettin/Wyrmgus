@@ -195,7 +195,7 @@ void PlayerAi::check_quest_units_to_build()
 			continue; //town hall construction can't be handled by requests
 		}
 
-		int units_to_build = quest_objective->get_quantity() - objective->Counter;
+		int units_to_build = quest_objective->get_quantity() - objective->get_counter();
 
 		for (const AiBuildQueue &queue : this->UnitTypeBuilt) { //count transport capacity under construction to see if should request more
 			if (quest_objective->get_settlement() != nullptr && quest_objective->get_settlement() != queue.settlement) {

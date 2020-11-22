@@ -1459,7 +1459,7 @@ void MessagesDisplay::DrawMessages()
 						objective_string += quest_objective->generate_objective_string(CPlayer::GetThisPlayer());
 					}
 					if (quest_objective->get_quantity() != 0) {
-						objective_string += " (" + std::to_string(objective->Counter) + "/" + std::to_string(quest_objective->get_quantity()) + ")";
+						objective_string += " (" + std::to_string(objective->get_counter()) + "/" + std::to_string(quest_objective->get_quantity()) + ")";
 					}
 
 					label.DrawClip(UI.MapArea.X + 8 * scale_factor, UI.MapArea.Y + 8 * scale_factor + z * (UI.MessageFont->Height() + 1 * scale_factor), objective_string);

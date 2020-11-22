@@ -761,7 +761,7 @@ void CPlayer::Save(CFile &file) const
 		file.printf("{");
 		file.printf("\"quest\", \"%s\",", objective->get_quest_objective()->get_quest()->get_identifier().c_str());
 		file.printf("\"objective-index\", %d,", objective->get_quest_objective()->get_index());
-		file.printf("\"counter\", %d,", objective->Counter);
+		file.printf("\"counter\", %d,", objective->get_counter());
 		file.printf("},");
 	}
 	file.printf("},");
@@ -2376,20 +2376,7 @@ void CPlayer::on_available_quests_changed()
 void CPlayer::update_current_quests()
 {
 	for (const auto &objective : this->get_quest_objectives()) {
-		const wyrmgus::quest_objective *quest_objective = objective->get_quest_objective();
-		switch (quest_objective->get_objective_type()) {
-			case wyrmgus::objective_type::have_resource:
-				objective->Counter = std::min(this->get_resource(quest_objective->get_resource(), STORE_BOTH), quest_objective->get_quantity());
-				break;
-			case wyrmgus::objective_type::research_upgrade:
-				objective->Counter = UpgradeIdAllowed(*this, quest_objective->get_upgrade()->ID) == 'R' ? 1 : 0;
-				break;
-			case wyrmgus::objective_type::recruit_hero:
-				objective->Counter = this->HasHero(quest_objective->get_character()) ? 1 : 0;
-				break;
-			default:
-				break;
-		}
+		objective->update_counter();
 	}
 	
 	for (int i = (this->current_quests.size()  - 1); i >= 0; --i) {
@@ -2413,7 +2400,7 @@ void CPlayer::accept_quest(wyrmgus::quest *quest)
 	this->current_quests.push_back(quest);
 	
 	for (const auto &quest_objective : quest->get_objectives()) {
-		auto objective = std::make_unique<wyrmgus::player_quest_objective>(quest_objective.get());
+		auto objective = std::make_unique<wyrmgus::player_quest_objective>(quest_objective.get(), this);
 		this->quest_objectives.push_back(std::move(objective));
 	}
 	
@@ -2683,7 +2670,7 @@ bool CPlayer::check_quest_completion(const wyrmgus::quest *quest) const
 		if (quest_objective->get_quest() != quest) {
 			continue;
 		}
-		if (quest_objective->get_quantity() > 0 && objective->Counter < quest_objective->get_quantity()) {
+		if (quest_objective->get_quantity() > 0 && objective->get_counter() < quest_objective->get_quantity()) {
 			return false;
 		}
 	}
@@ -2711,7 +2698,7 @@ std::string CPlayer::check_quest_failure(const wyrmgus::quest *quest) const
 
 		switch (quest_objective->get_objective_type()) {
 			case wyrmgus::objective_type::build_units: {
-				if (objective->Counter < quest_objective->get_quantity()) {
+				if (objective->get_counter() < quest_objective->get_quantity()) {
 					std::vector<const wyrmgus::unit_type *> unit_types = quest_objective->get_unit_types();
 
 					for (const wyrmgus::unit_class *unit_class : quest_objective->get_unit_classes()) {
@@ -2757,7 +2744,7 @@ std::string CPlayer::check_quest_failure(const wyrmgus::quest *quest) const
 					if (!has_researcher) { //check if the quest includes an objective to build a researcher of the upgrade
 						for (const auto &second_objective : this->get_quest_objectives()) {
 							const wyrmgus::quest_objective *second_quest_objective = second_objective->get_quest_objective();
-							if (second_quest_objective->get_quest() != quest || second_objective == objective || second_objective->Counter >= second_quest_objective->get_quantity()) { //if the objective has been fulfilled, then there should be a researcher, if there isn't it is due to i.e. the researcher having been destroyed later on, or upgraded to another type, and then the quest should fail if the upgrade can no longer be researched
+							if (second_quest_objective->get_quest() != quest || second_objective == objective || second_objective->get_counter() >= second_quest_objective->get_quantity()) { //if the objective has been fulfilled, then there should be a researcher, if there isn't it is due to i.e. the researcher having been destroyed later on, or upgraded to another type, and then the quest should fail if the upgrade can no longer be researched
 								continue;
 							}
 
@@ -2804,7 +2791,7 @@ std::string CPlayer::check_quest_failure(const wyrmgus::quest *quest) const
 			case wyrmgus::objective_type::destroy_units:
 			case wyrmgus::objective_type::destroy_hero:
 			case wyrmgus::objective_type::destroy_unique:
-				if (quest_objective->get_faction() != nullptr && objective->Counter < quest_objective->get_quantity()) {
+				if (quest_objective->get_faction() != nullptr && objective->get_counter() < quest_objective->get_quantity()) {
 					CPlayer *faction_player = GetFactionPlayer(quest_objective->get_faction());
 					if (faction_player == nullptr || !faction_player->is_alive()) {
 						return "The target no longer exists.";
@@ -2816,17 +2803,17 @@ std::string CPlayer::check_quest_failure(const wyrmgus::quest *quest) const
 				}
 
 				if (quest_objective->get_objective_type() == wyrmgus::objective_type::destroy_hero) {
-					if (objective->Counter == 0 && quest_objective->get_character()->CanAppear()) {  // if is supposed to destroy a character, but it is nowhere to be found, fail the quest
+					if (objective->get_counter() == 0 && quest_objective->get_character()->CanAppear()) {  // if is supposed to destroy a character, but it is nowhere to be found, fail the quest
 						return "The target no longer exists.";
 					}
 				} else if (quest_objective->get_objective_type() == wyrmgus::objective_type::destroy_unique) {
-					if (objective->Counter == 0 && quest_objective->get_unique()->can_drop()) {  // if is supposed to destroy a unique, but it is nowhere to be found, fail the quest
+					if (objective->get_counter() == 0 && quest_objective->get_unique()->can_drop()) {  // if is supposed to destroy a unique, but it is nowhere to be found, fail the quest
 						return "The target no longer exists.";
 					}
 				}
 				break;
 			case wyrmgus::objective_type::destroy_faction:
-				if (objective->Counter == 0) {  // if is supposed to destroy a faction, but it is nowhere to be found, fail the quest
+				if (objective->get_counter() == 0) {  // if is supposed to destroy a faction, but it is nowhere to be found, fail the quest
 					CPlayer *faction_player = GetFactionPlayer(quest_objective->get_faction());
 					if (faction_player == nullptr || !faction_player->is_alive()) {
 						return "The target no longer exists.";
@@ -2946,7 +2933,7 @@ int CPlayer::GetUnitCount() const
 **
 **  @note Storing types: 0 - overall store, 1 - store buildings, 2 - both
 */
-int CPlayer::get_resource(const wyrmgus::resource *resource, const int type)
+int CPlayer::get_resource(const wyrmgus::resource *resource, const int type) const
 {
 	switch (type) {
 		case STORE_OVERALL:

@@ -197,7 +197,7 @@ static void Finish(COrder_Built &order, CUnit &unit)
 			continue;
 		}
 
-		objective->Counter = std::min(objective->Counter + 1, quest_objective->get_quantity());
+		objective->increment_counter();
 	}
 
 	if (unit.site != nullptr && unit.site->get_site_unit() == &unit) {

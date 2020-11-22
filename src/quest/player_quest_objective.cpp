@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-//      (c) Copyright 2015-2020 by Andrettin
+//      (c) Copyright 2020 by Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -25,51 +25,39 @@
 //      02111-1307, USA.
 //
 
-#pragma once
+#include "stratagus.h"
 
-class CPlayer;
+#include "quest/player_quest_objective.h"
+
+#include "player.h"
+#include "quest/objective_type.h"
+#include "quest/quest_objective.h"
+#include "upgrade/upgrade.h"
 
 namespace wyrmgus {
 
-class quest_objective;
-
-class player_quest_objective final
+void player_quest_objective::change_counter(const int change)
 {
-public:
-	explicit player_quest_objective(const quest_objective *quest_objective, const CPlayer *player)
-		: quest_objective(quest_objective), player(player)
-	{
+	this->counter = std::min(this->get_counter() + change, this->get_quest_objective()->get_quantity());
+}
+
+void player_quest_objective::update_counter()
+{
+	const wyrmgus::quest_objective *quest_objective = this->get_quest_objective();
+
+	switch (quest_objective->get_objective_type()) {
+		case objective_type::have_resource:
+			this->counter = std::min(this->player->get_resource(quest_objective->get_resource(), STORE_BOTH), quest_objective->get_quantity());
+			break;
+		case objective_type::research_upgrade:
+			this->counter = UpgradeIdAllowed(*this->player, quest_objective->get_upgrade()->ID) == 'R' ? 1 : 0;
+			break;
+		case objective_type::recruit_hero:
+			this->counter = this->player->HasHero(quest_objective->get_character()) ? 1 : 0;
+			break;
+		default:
+			break;
 	}
-
-	const quest_objective *get_quest_objective() const
-	{
-		return this->quest_objective;
-	}
-
-	int get_counter() const
-	{
-		return this->counter;
-	}
-	
-	//necessary for loading saved games
-	void set_counter(const int value)
-	{
-		this->counter = value;
-	}
-
-	void change_counter(const int change);
-
-	void increment_counter()
-	{
-		this->change_counter(1);
-	}
-
-	void update_counter();
-
-private:
-	const quest_objective *quest_objective = nullptr;
-	const CPlayer *player = nullptr;
-	int counter = 0;
-};
+}
 
 }
