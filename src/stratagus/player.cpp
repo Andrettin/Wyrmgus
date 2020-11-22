@@ -2348,8 +2348,8 @@ void CPlayer::on_available_quests_changed()
 			if (!rewards_string.empty()) {
 				button->Description += "\n \nRewards:\n" + rewards_string;
 			}
-			if (!quest->Hint.empty()) {
-				button->Description += "\n \nHint: " + quest->Hint;
+			if (!quest->get_hint().empty()) {
+				button->Description += "\n \nHint: " + quest->get_hint();
 			}
 			if (quest->HighestCompletedDifficulty > DifficultyNoDifficulty) {
 				std::string highest_completed_difficulty;

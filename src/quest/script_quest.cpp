@@ -101,7 +101,7 @@ static int CclDefineQuest(lua_State *l)
 		} else if (!strcmp(value, "Rewards")) {
 			quest->rewards_string = LuaToString(l, -1);
 		} else if (!strcmp(value, "Hint")) {
-			quest->Hint = LuaToString(l, -1);
+			quest->hint = LuaToString(l, -1);
 		} else if (!strcmp(value, "Civilization")) {
 			wyrmgus::civilization *civilization = wyrmgus::civilization::get(LuaToString(l, -1));
 			quest->civilization = civilization;

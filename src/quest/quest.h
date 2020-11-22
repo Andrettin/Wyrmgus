@@ -74,6 +74,7 @@ public:
 	explicit quest(const std::string &identifier);
 	~quest();
 	
+	virtual void process_sml_property(const sml_property &property) override;
 	virtual void process_sml_scope(const sml_data &scope) override;
 	virtual void initialize() override;
 	virtual void check() const override;
@@ -145,6 +146,11 @@ public:
 
 	std::string get_rewards_string() const;
 
+	const std::string &get_hint() const
+	{
+		return this->hint;
+	}
+
 	std::string World;				/// Which world the quest belongs to
 	std::string Map;				/// What map the quest is played on
 	std::string Scenario;			/// Which scenario file is to be loaded for the quest
@@ -161,8 +167,8 @@ public:
 	std::string CompletionSpeech;	/// Speech given by the quest giver when the quest is completed
 private:
 	std::string rewards_string;		/// Description of the quest's rewards
+	std::string hint;				/// Quest hint
 public:
-	std::string Hint;				/// Quest hint
 	int ID = -1;
 	civilization *civilization = nullptr; //civilization to which civilization the quest belongs to
 private:
