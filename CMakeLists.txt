@@ -292,6 +292,15 @@ set(pathfinder_SRCS
 )
 source_group(pathfinder FILES ${pathfinder_SRCS})
 
+set(quest_SRCS
+	src/quest/achievement.cpp
+	src/quest/campaign.cpp
+	src/quest/quest.cpp
+	src/quest/quest_objective.cpp
+	src/quest/script_quest.cpp
+)
+source_group(quest FILES ${quest_SRCS})
+
 set(religion_SRCS
 	src/religion/deity.cpp
 	src/religion/religion.cpp
@@ -353,9 +362,7 @@ set(spell_SRCS
 source_group(spell FILES ${spell_SRCS})
 
 set(stratagusmain_SRCS
-	src/stratagus/achievement.cpp
 	src/stratagus/age.cpp
-	src/stratagus/campaign.cpp
 	src/stratagus/character.cpp
 	src/stratagus/character_history.cpp
 	src/stratagus/civilization.cpp
@@ -384,16 +391,13 @@ set(stratagusmain_SRCS
 	src/stratagus/player.cpp
 	src/stratagus/player_color.cpp
 	src/stratagus/province.cpp
-	src/stratagus/quest.cpp
-	src/stratagus/quest_objective.cpp
 	src/stratagus/resource.cpp
 	src/stratagus/script.cpp
-	src/stratagus/script_player.cpp
 	src/stratagus/script_character.cpp
 	src/stratagus/script_grand_strategy.cpp
 	src/stratagus/script_literary_text.cpp
+	src/stratagus/script_player.cpp
 	src/stratagus/script_province.cpp
-	src/stratagus/script_quest.cpp
 	src/stratagus/selection.cpp
 	src/stratagus/stratagus.cpp
 	src/stratagus/title.cpp
@@ -550,6 +554,7 @@ set(stratagus_SRCS
 	${network_SRCS}
 	${particle_SRCS}
 	${pathfinder_SRCS}
+	${quest_SRCS}
 	${religion_SRCS}
 	${script_SRCS}
 	${script_condition_SRCS}
@@ -720,6 +725,15 @@ set(stratagus_map_HDRS
 
 set(stratagus_missile_HDRS
 	src/missile/missile_class.h
+)
+
+set(stratagus_quest_HDRS
+	src/quest/achievement.h
+	src/quest/campaign.h
+	src/quest/objective_type.h
+	src/quest/player_quest_objective.h
+	src/quest/quest.h
+	src/quest/quest_objective.h
 )
 
 set(stratagus_religion_HDRS
@@ -918,7 +932,6 @@ set(stratagus_generic_HDRS
 	src/include/age.h
 	src/include/ai.h
 	src/include/animation.h
-	src/include/campaign.h
 	src/include/character.h
 	src/include/civilization.h
 	src/include/color.h
@@ -951,7 +964,6 @@ set(stratagus_generic_HDRS
 	src/include/player.h
 	src/include/player_color.h
 	src/include/province.h
-	src/include/quest.h
 	src/include/replay.h
 	src/include/resource.h
 	src/include/results.h
@@ -967,7 +979,6 @@ set(stratagus_generic_HDRS
 	src/include/widgets.h
 	src/include/world.h
 	src/include/SetupConsole_win32.h
-	src/stratagus/achievement.h
 	src/stratagus/civilization_base.h
 	src/stratagus/character_history.h
 	src/stratagus/civilization_history.h
@@ -985,10 +996,7 @@ set(stratagus_generic_HDRS
 	src/stratagus/government_type.h
 	src/stratagus/literary_text.h
 	src/stratagus/magic_domain.h
-	src/stratagus/objective_type.h
 	src/stratagus/player_container.h
-	src/stratagus/player_quest_objective.h
-	src/stratagus/quest_objective.h
 	src/stratagus/vassalage_type.h
 )
 
@@ -1001,6 +1009,7 @@ source_group(item FILES ${stratagus_item_HDRS})
 source_group(language FILES ${stratagus_language_HDRS})
 source_group(map FILES ${stratagus_map_HDRS})
 source_group(missile FILES ${stratagus_missile_HDRS})
+source_group(quest FILES ${stratagus_quest_HDRS})
 source_group(religion FILES ${stratagus_religion_HDRS})
 source_group(script FILES ${stratagus_script_HDRS})
 source_group(script\\condition FILES ${stratagus_script_condition_HDRS})
@@ -1027,6 +1036,7 @@ set(stratagus_HDRS
 	${stratagus_language_HDRS}
 	${stratagus_map_HDRS}
 	${stratagus_missile_HDRS}
+	${stratagus_quest_HDRS}
 	${stratagus_religion_HDRS}
 	${stratagus_script_HDRS}
 	${stratagus_script_condition_HDRS}
