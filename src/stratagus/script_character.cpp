@@ -43,7 +43,6 @@
 #include "map/site.h"
 #include "player.h"
 #include "province.h"
-#include "quest.h"
 #include "religion/deity.h"
 #include "script.h"
 #include "spell/spell.h"

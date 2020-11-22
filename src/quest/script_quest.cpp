@@ -27,10 +27,8 @@
 
 #include "stratagus.h"
 
-#include "quest.h"
+#include "quest/quest.h"
 
-#include "achievement.h"
-#include "campaign.h"
 #include "character.h"
 #include "civilization.h"
 #include "dialogue.h"
@@ -42,10 +40,12 @@
 #include "map/map.h"
 #include "map/map_template.h"
 #include "map/site.h"
-#include "objective_type.h"
 #include "player.h"
 #include "player_color.h"
-#include "quest_objective.h"
+#include "quest/achievement.h"
+#include "quest/campaign.h"
+#include "quest/objective_type.h"
+#include "quest/quest_objective.h"
 #include "script.h"
 #include "unit/unit_class.h"
 #include "unit/unit_type.h"

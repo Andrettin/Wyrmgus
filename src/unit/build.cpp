@@ -41,7 +41,6 @@
 #include "map/tile.h"
 #include "map/tileset.h"
 #include "player.h"
-#include "quest.h"
 #include "unit/unit.h"
 #include "unit/unit_class.h"
 #include "unit/unit_find.h"

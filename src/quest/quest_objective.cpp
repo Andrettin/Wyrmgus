@@ -27,13 +27,13 @@
 
 #include "stratagus.h"
 
-#include "quest_objective.h"
+#include "quest/quest_objective.h"
 
 #include "character.h"
 #include "faction.h"
 #include "map/site.h"
-#include "objective_type.h"
-#include "quest.h"
+#include "quest/objective_type.h"
+#include "quest/quest.h"
 #include "unit/unit_class.h"
 #include "unit/unit_type.h"
 #include "util/string_util.h"

@@ -149,12 +149,12 @@
 //Wyrmgus start
 #include "network.h"
 //Wyrmgus end
-#include "objective_type.h"
 #include "pathfinder.h"
 #include "player.h"
-#include "player_quest_objective.h"
-#include "quest.h"
-#include "quest_objective.h"
+#include "quest/objective_type.h"
+#include "quest/player_quest_objective.h"
+#include "quest/quest.h"
+#include "quest/quest_objective.h"
 #include "script.h"
 #include "script/condition/condition.h"
 #include "unit/unit.h"

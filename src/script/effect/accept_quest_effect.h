@@ -28,7 +28,7 @@
 #pragma once
 
 #include "player.h"
-#include "quest.h"
+#include "quest/quest.h"
 #include "script/effect/effect.h"
 #include "util/string_util.h"
 

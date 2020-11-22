@@ -29,7 +29,7 @@
 
 #include "database/data_type.h"
 #include "database/detailed_data_entry.h"
-#include "data_type.h"
+#include "include/data_type.h"
 #include "time/date.h"
 #include "vec2i.h"
 
@@ -48,7 +48,7 @@ class quest;
 class species;
 class timeline;
 
-class campaign : public detailed_data_entry, public data_type<campaign>, public CDataType
+class campaign final : public detailed_data_entry, public data_type<campaign>, public CDataType
 {
 	Q_OBJECT
 

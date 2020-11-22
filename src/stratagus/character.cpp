@@ -48,7 +48,6 @@
 #include "parameters.h"
 #include "player.h"
 #include "province.h"
-#include "quest.h"
 #include "religion/deity.h"
 #include "script/condition/and_condition.h"
 #include "sound/unitsound.h"

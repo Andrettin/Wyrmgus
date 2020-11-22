@@ -27,17 +27,17 @@
 
 #include "stratagus.h"
 
-#include "quest.h"
+#include "quest/quest.h"
 
-#include "achievement.h"
 #include "civilization.h"
 #include "game.h"
 #include "iocompat.h"
 #include "iolib.h"
 #include "luacallback.h"
-#include "objective_type.h"
 #include "parameters.h"
-#include "quest_objective.h"
+#include "quest/achievement.h"
+#include "quest/objective_type.h"
+#include "quest/quest_objective.h"
 #include "script/condition/and_condition.h"
 #include "script/effect/effect_list.h"
 #include "script.h"

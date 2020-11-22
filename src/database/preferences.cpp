@@ -27,11 +27,11 @@
 
 #include "database/preferences.h"
 
-#include "campaign.h"
 #include "database/database.h"
 #include "database/defines.h"
 #include "database/sml_data.h"
 #include "database/sml_parser.h"
+#include "quest/campaign.h"
 #include "util/exception_util.h"
 
 namespace wyrmgus {

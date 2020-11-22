@@ -40,9 +40,7 @@
 //Wyrmgus end
 #include "net_message.h"
 #include "network.h"
-//Wyrmgus start
-#include "quest.h"
-//Wyrmgus end
+#include "quest/quest.h"
 #include "replay.h"
 #include "spell/spell.h"
 #include "unit/unit.h"

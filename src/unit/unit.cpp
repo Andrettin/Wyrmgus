@@ -29,7 +29,6 @@
 
 #include "unit/unit.h"
 
-#include "achievement.h"
 #include "action/action_attack.h"
 //Wyrmgus start
 #include "action/action_resource.h"
@@ -63,13 +62,14 @@
 #include "map/tileset.h"
 #include "missile.h"
 #include "network.h"
-#include "objective_type.h"
 #include "pathfinder.h"
 #include "plane.h"
 #include "player.h"
-#include "player_quest_objective.h"
-#include "quest.h"
-#include "quest_objective.h"
+#include "quest/achievement.h"
+#include "quest/objective_type.h"
+#include "quest/player_quest_objective.h"
+#include "quest/quest.h"
+#include "quest/quest_objective.h"
 #include "religion/deity.h"
 #include "script.h"
 #include "script/condition/condition.h"

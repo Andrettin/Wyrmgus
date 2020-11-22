@@ -46,7 +46,6 @@
 #include "missile.h"
 #include "particle.h"
 #include "pathfinder.h"
-#include "quest.h"
 #include "replay.h"
 #include "script.h"
 #include "script/condition/condition.h"

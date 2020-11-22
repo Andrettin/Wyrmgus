@@ -35,7 +35,6 @@
 #include "age.h"
 #include "ai.h"
 #include "ai/ai_local.h" //for using AiHelpers
-#include "campaign.h"
 #include "civilization.h"
 #include "commands.h" //for faction setting
 #include "currency.h"
@@ -62,14 +61,15 @@
 #include "map/site.h"
 #include "network.h"
 #include "netconnect.h"
-#include "objective_type.h"
 //Wyrmgus start
 #include "parameters.h"
 //Wyrmgus end
 #include "player_color.h"
-#include "player_quest_objective.h"
-#include "quest.h"
-#include "quest_objective.h"
+#include "quest/campaign.h"
+#include "quest/objective_type.h"
+#include "quest/player_quest_objective.h"
+#include "quest/quest.h"
+#include "quest/quest_objective.h"
 //Wyrmgus start
 #include "religion/deity.h"
 #include "religion/religion.h"

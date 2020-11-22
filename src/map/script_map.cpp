@@ -31,7 +31,6 @@
 
 #include "map/map.h"
 
-#include "campaign.h"
 #include "character.h"
 #include "civilization.h"
 #include "database/defines.h"
@@ -51,8 +50,8 @@
 //Wyrmgus start
 #include "plane.h"
 #include "province.h"
-#include "quest.h"
 //Wyrmgus end
+#include "quest/campaign.h"
 #include "script.h"
 //Wyrmgus start
 #include "settings.h"

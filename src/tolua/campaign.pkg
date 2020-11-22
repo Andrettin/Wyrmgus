@@ -1,4 +1,4 @@
-$#include "campaign.h"
+$#include "quest/campaign.h"
 
 extern void SetCurrentCampaign(std::string campaign_ident);
 extern std::string GetCurrentCampaign();

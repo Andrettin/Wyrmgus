@@ -27,7 +27,7 @@
 
 #pragma once
 
-#include "quest.h"
+#include "quest/quest.h"
 #include "script/condition/condition.h"
 
 namespace wyrmgus {

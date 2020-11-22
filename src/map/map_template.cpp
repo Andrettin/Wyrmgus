@@ -29,7 +29,6 @@
 
 #include "map/map_template.h"
 
-#include "campaign.h"
 #include "character.h"
 #include "character_history.h"
 #include "civilization.h"
@@ -56,7 +55,7 @@
 #include "map/tileset.h"
 #include "plane.h"
 #include "player.h"
-#include "quest.h"
+#include "quest/campaign.h"
 #include "settings.h"
 #include "time/calendar.h"
 #include "time/season_schedule.h"

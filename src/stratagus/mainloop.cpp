@@ -30,7 +30,6 @@
 #include "stratagus.h"
 
 #include "actions.h"
-#include "campaign.h"
 #include "character.h"
 #include "civilization.h"
 #include "commands.h"
@@ -52,8 +51,9 @@
 #include "network.h"
 #include "particle.h"
 #include "plane.h"
+#include "quest/campaign.h"
 //Wyrmgus start
-#include "quest.h"
+#include "quest/quest.h"
 //Wyrmgus end
 #include "replay.h"
 #include "results.h"

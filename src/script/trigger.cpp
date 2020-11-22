@@ -29,7 +29,6 @@
 
 #include "script/trigger.h"
 
-#include "campaign.h"
 #include "config.h"
 #include "game.h"
 #include "iolib.h"
@@ -39,7 +38,7 @@
 #include "map/map.h"
 #include "player.h"
 //Wyrmgus start
-#include "quest.h" // for saving quests
+#include "quest/quest.h" // for saving quests
 //Wyrmgus end
 #include "results.h"
 #include "script.h"

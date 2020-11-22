@@ -27,7 +27,7 @@
 
 #include "stratagus.h"
 
-#include "campaign.h"
+#include "quest/campaign.h"
 
 #include "civilization.h"
 #include "config.h"
@@ -36,7 +36,7 @@
 #include "game.h"
 #include "map/map_template.h"
 #include "player.h"
-#include "quest.h"
+#include "quest/quest.h"
 #include "species/species.h"
 #include "time/calendar.h"
 #include "time/timeline.h"

@@ -46,9 +46,6 @@
 #include "map/tileset.h"
 #include "missile.h"
 #include "player.h"
-//Wyrmgus start
-#include "quest.h"
-//Wyrmgus end
 #include "script.h"
 #include "settings.h"
 //Wyrmgus start

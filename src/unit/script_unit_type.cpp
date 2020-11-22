@@ -29,7 +29,6 @@
 
 #include "unit/unit_type.h"
 
-#include "achievement.h"
 #include "actions.h"
 #include "animation.h"
 //Wyrmgus start
@@ -52,7 +51,6 @@
 #include "player.h"
 //Wyrmgus start
 #include "province.h"
-#include "quest.h" //for updating levels
 //Wyrmgus end
 #include "script.h"
 #include "sound/sound.h"

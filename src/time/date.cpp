@@ -34,7 +34,6 @@
 #include "civilization.h"
 #include "game.h"
 #include "player.h"
-#include "quest.h"
 #include "time/calendar.h"
 #include "time/timeline.h"
 #include "util/string_util.h"

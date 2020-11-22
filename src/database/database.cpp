@@ -29,7 +29,6 @@
 
 #include "age.h"
 #include "animation.h"
-#include "campaign.h"
 #include "character.h"
 #include "civilization.h"
 #include "civilization_group.h"
@@ -68,7 +67,8 @@
 #include "missile.h"
 #include "plane.h"
 #include "player_color.h"
-#include "quest.h"
+#include "quest/campaign.h"
+#include "quest/quest.h"
 #include "religion/deity.h"
 #include "religion/pantheon.h"
 #include "religion/religion.h"

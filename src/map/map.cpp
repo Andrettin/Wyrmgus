@@ -48,7 +48,6 @@
 #include "player.h"
 //Wyrmgus start
 #include "province.h"
-#include "quest.h"
 //Wyrmgus end
 #include "script.h"
 //Wyrmgus start

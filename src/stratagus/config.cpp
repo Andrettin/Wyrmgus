@@ -30,7 +30,6 @@
 #include "config.h"
 
 #include "animation.h"
-#include "campaign.h"
 #include "character.h"
 #include "currency.h"
 #include "game.h"
@@ -41,6 +40,7 @@
 #include "map/terrain_type.h"
 #include "missile.h"
 #include "plane.h"
+#include "quest/campaign.h"
 #include "script/trigger.h"
 #include "sound/sound.h"
 #include "time/season_schedule.h"
