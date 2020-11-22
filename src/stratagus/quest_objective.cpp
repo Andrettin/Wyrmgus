@@ -41,7 +41,7 @@
 namespace wyrmgus {
 
 quest_objective::quest_objective(const wyrmgus::objective_type objective_type, const wyrmgus::quest *quest)
-	: objective_type(objective_type), quest(quest)
+	: objective_type(objective_type), quest(quest), index(quest->get_objectives().size())
 {
 	this->quantity = get_objective_type_default_quantity(objective_type);
 }
