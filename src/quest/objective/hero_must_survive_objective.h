@@ -28,8 +28,8 @@
 #pragma once
 
 #include "character.h"
+#include "quest/objective/quest_objective.h"
 #include "quest/objective_type.h"
-#include "quest/quest_objective.h"
 
 namespace wyrmgus {
 

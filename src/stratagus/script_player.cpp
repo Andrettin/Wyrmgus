@@ -55,7 +55,6 @@
 #include "player_color.h"
 #include "quest/player_quest_objective.h"
 #include "quest/quest.h"
-#include "quest/quest_objective.h"
 #include "religion/deity.h"
 #include "religion/pantheon.h"
 #include "religion/religion.h"

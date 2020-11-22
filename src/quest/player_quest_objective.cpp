@@ -31,8 +31,8 @@
 
 #include "faction.h"
 #include "player.h"
+#include "quest/objective/quest_objective.h"
 #include "quest/objective_type.h"
-#include "quest/quest_objective.h"
 #include "unit/unit.h"
 #include "upgrade/upgrade.h"
 #include "util/vector_util.h"

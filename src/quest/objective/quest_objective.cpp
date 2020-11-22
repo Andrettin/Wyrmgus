@@ -27,7 +27,7 @@
 
 #include "stratagus.h"
 
-#include "quest/quest_objective.h"
+#include "quest/objective/quest_objective.h"
 
 #include "character.h"
 #include "faction.h"

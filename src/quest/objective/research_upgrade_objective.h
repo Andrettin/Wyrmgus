@@ -28,10 +28,10 @@
 #pragma once
 
 #include "ai/ai_local.h"
+#include "quest/objective/quest_objective.h"
 #include "quest/objective_type.h"
 #include "quest/player_quest_objective.h"
 #include "quest/quest.h"
-#include "quest/quest_objective.h"
 #include "upgrade/upgrade.h"
 #include "util/vector_util.h"
 

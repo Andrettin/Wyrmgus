@@ -47,7 +47,6 @@
 #include "player.h"
 #include "quest/objective_type.h"
 #include "quest/player_quest_objective.h"
-#include "quest/quest_objective.h"
 #include "resource.h"
 #include "script.h"
 //Wyrmgus start

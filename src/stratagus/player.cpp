@@ -66,10 +66,10 @@
 //Wyrmgus end
 #include "player_color.h"
 #include "quest/campaign.h"
+#include "quest/objective/quest_objective.h"
 #include "quest/objective_type.h"
 #include "quest/player_quest_objective.h"
 #include "quest/quest.h"
-#include "quest/quest_objective.h"
 //Wyrmgus start
 #include "religion/deity.h"
 #include "religion/religion.h"
