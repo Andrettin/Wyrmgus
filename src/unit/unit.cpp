@@ -2958,19 +2958,7 @@ void CUnit::AssignToPlayer(CPlayer &player)
 				player.TotalUnits++;
 				
 				for (const auto &objective : player.get_quest_objectives()) {
-					const wyrmgus::quest_objective *quest_objective = objective->get_quest_objective();
-
-					if (quest_objective->get_objective_type() != wyrmgus::objective_type::build_units) {
-						continue;
-					}
-
-					if (!wyrmgus::vector::contains(quest_objective->get_unit_types(), &type) && !wyrmgus::vector::contains(quest_objective->get_unit_classes(), type.get_unit_class())) {
-						continue;
-					}
-
-					//only buildings can belong to settlements, so we don't need to check to see whether the settlement is correct here
-
-					objective->increment_counter();
+					objective->on_unit_built(this);
 				}
 			}
 		}

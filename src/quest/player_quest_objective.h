@@ -68,6 +68,7 @@ public:
 
 	void update_counter();
 
+	void on_unit_built(const CUnit *unit);
 	void on_unit_destroyed(const CUnit *unit);
 	void on_resource_gathered(const resource *resource, const int quantity);
 

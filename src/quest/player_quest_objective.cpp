@@ -63,6 +63,25 @@ void player_quest_objective::update_counter()
 	}
 }
 
+void player_quest_objective::on_unit_built(const CUnit *unit)
+{
+	const wyrmgus::quest_objective *quest_objective = this->get_quest_objective();
+
+	if (quest_objective->get_objective_type() != objective_type::build_units) {
+		return;
+	}
+
+	if (!vector::contains(quest_objective->get_unit_types(), unit->Type) && !vector::contains(quest_objective->get_unit_classes(), unit->Type->get_unit_class())) {
+		return;
+	}
+
+	if (quest_objective->get_settlement() != nullptr && quest_objective->get_settlement() != unit->settlement) {
+		return;
+	}
+
+	this->increment_counter();
+}
+
 void player_quest_objective::on_unit_destroyed(const CUnit *unit)
 {
 	const wyrmgus::quest_objective *quest_objective = this->get_quest_objective();
@@ -116,11 +135,15 @@ void player_quest_objective::on_resource_gathered(const resource *resource, cons
 {
 	const wyrmgus::quest_objective *quest_objective = this->get_quest_objective();
 
-	if (quest_objective->get_objective_type() == wyrmgus::objective_type::gather_resource) {
-		if (quest_objective->get_resource() == resource) {
-			this->change_counter(quantity);
-		}
+	if (quest_objective->get_objective_type() != objective_type::gather_resource) {
+		return;
 	}
+
+	if (quest_objective->get_resource() != resource) {
+		return;
+	}
+
+	this->change_counter(quantity);
 }
 
 }

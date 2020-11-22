@@ -371,21 +371,7 @@ int TransformUnitIntoType(CUnit &unit, const wyrmgus::unit_type &newtype)
 		
 		if (!unit.UnderConstruction) {
 			for (const auto &objective : player.get_quest_objectives()) {
-				const wyrmgus::quest_objective *quest_objective = objective->get_quest_objective();
-
-				if (quest_objective->get_objective_type() != wyrmgus::objective_type::build_units) {
-					continue;
-				}
-
-				if (!wyrmgus::vector::contains(quest_objective->get_unit_types(), &newtype) && !wyrmgus::vector::contains(quest_objective->get_unit_classes(), newtype.get_unit_class())) {
-					continue;
-				}
-
-				if (quest_objective->get_settlement() != nullptr && quest_objective->get_settlement() != unit.settlement) {
-					continue;
-				}
-
-				objective->increment_counter();
+				objective->on_unit_built(&unit);
 			}
 		}
 	}

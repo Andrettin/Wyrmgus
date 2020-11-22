@@ -183,21 +183,7 @@ static void Finish(COrder_Built &order, CUnit &unit)
 	player.IncreaseCountsForUnit(&unit);
 	
 	for (const auto &objective : player.get_quest_objectives()) {
-		const wyrmgus::quest_objective *quest_objective = objective->get_quest_objective();
-
-		if (quest_objective->get_objective_type() != wyrmgus::objective_type::build_units) {
-			continue;
-		}
-
-		if (!wyrmgus::vector::contains(quest_objective->get_unit_types(), &type) && !wyrmgus::vector::contains(quest_objective->get_unit_classes(), type.get_unit_class())) {
-			continue;
-		}
-
-		if (quest_objective->get_settlement() != nullptr && quest_objective->get_settlement() != unit.settlement) {
-			continue;
-		}
-
-		objective->increment_counter();
+		objective->on_unit_built(&unit);
 	}
 
 	if (unit.site != nullptr && unit.site->get_site_unit() == &unit) {
