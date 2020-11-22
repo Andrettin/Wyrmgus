@@ -112,4 +112,15 @@ void player_quest_objective::on_unit_destroyed(const CUnit *unit)
 	}
 }
 
+void player_quest_objective::on_resource_gathered(const resource *resource, const int quantity)
+{
+	const wyrmgus::quest_objective *quest_objective = this->get_quest_objective();
+
+	if (quest_objective->get_objective_type() == wyrmgus::objective_type::gather_resource) {
+		if (quest_objective->get_resource() == resource) {
+			this->change_counter(quantity);
+		}
+	}
+}
+
 }

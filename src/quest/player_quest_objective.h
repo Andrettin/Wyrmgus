@@ -33,6 +33,7 @@ class CUnit;
 namespace wyrmgus {
 
 class quest_objective;
+class resource;
 
 class player_quest_objective final
 {
@@ -68,6 +69,7 @@ public:
 	void update_counter();
 
 	void on_unit_destroyed(const CUnit *unit);
+	void on_resource_gathered(const resource *resource, const int quantity);
 
 private:
 	const quest_objective *quest_objective = nullptr;

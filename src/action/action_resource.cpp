@@ -1332,7 +1332,7 @@ int COrder_Resource::MoveToDepot(CUnit &unit)
 	}
 
 	// Update resource.
-	const wyrmgus::resource *resource = wyrmgus::resource::get_all()[this->CurrentResource]->get_final_resource();
+	const wyrmgus::resource *final_resource = wyrmgus::resource::get_all()[this->CurrentResource]->get_final_resource();
 	const int resource_change = unit.ResourcesHeld * wyrmgus::resource::get_all()[this->CurrentResource]->get_final_resource_conversion_rate() / 100;
 	int processed_resource_change = (resource_change * player.Incomes[this->CurrentResource]) / 100;
 	
@@ -1347,9 +1347,9 @@ int COrder_Resource::MoveToDepot(CUnit &unit)
 		}
 	}
 	
-	player.change_resource(resource, processed_resource_change, true);
-	player.TotalResources[resource->get_index()] += processed_resource_change;
-	player.pay_overlord_tax(resource, processed_resource_change);
+	player.change_resource(final_resource, processed_resource_change, true);
+	player.TotalResources[final_resource->get_index()] += processed_resource_change;
+	player.pay_overlord_tax(final_resource, processed_resource_change);
 	
 	//give XP to the worker according to how much was gathered, based on their base price in relation to gold
 	int xp_gained = unit.ResourcesHeld;
@@ -1358,13 +1358,9 @@ int COrder_Resource::MoveToDepot(CUnit &unit)
 	
 	//update quests
 	for (const auto &objective : player.get_quest_objectives()) {
-		const wyrmgus::quest_objective *quest_objective = objective->get_quest_objective();
-		if (quest_objective->get_objective_type() == wyrmgus::objective_type::gather_resource) {
-			if (quest_objective->get_resource() == resource) {
-				objective->change_counter(processed_resource_change);
-			} else if (quest_objective->get_resource()->get_index() == this->CurrentResource) {
-				objective->change_counter(unit.ResourcesHeld);
-			}
+		objective->on_resource_gathered(final_resource, processed_resource_change);
+		if (final_resource->get_index() != this->CurrentResource) {
+			objective->on_resource_gathered(wyrmgus::resource::get_all()[this->CurrentResource], unit.ResourcesHeld);
 		}
 	}
 	
