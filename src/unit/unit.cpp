@@ -7205,31 +7205,7 @@ static void HitUnit_IncreaseScoreForKill(CUnit &attacker, CUnit &target)
 	
 	//Wyrmgus start
 	for (const auto &objective : attacker.Player->get_quest_objectives()) {
-		const wyrmgus::quest_objective *quest_objective = objective->get_quest_objective();
-		if (
-			(
-				quest_objective->get_objective_type() == wyrmgus::objective_type::destroy_units
-				&& (wyrmgus::vector::contains(quest_objective->get_unit_types(), target.Type) || wyrmgus::vector::contains(quest_objective->get_unit_classes(), target.Type->get_unit_class()))
-				&& (quest_objective->get_settlement() == nullptr || quest_objective->get_settlement() == target.settlement)
-			)
-			|| (quest_objective->get_objective_type() == wyrmgus::objective_type::destroy_hero && target.get_character() != nullptr && quest_objective->get_character() == target.get_character())
-			|| (quest_objective->get_objective_type() == wyrmgus::objective_type::destroy_unique && target.get_unique() && quest_objective->get_unique() == target.get_unique())
-		) {
-			if (quest_objective->get_faction() == nullptr || quest_objective->get_faction()->ID == target.Player->Faction) {
-				objective->increment_counter();
-			}
-		} else if (quest_objective->get_objective_type() == wyrmgus::objective_type::destroy_faction) {
-			const CPlayer *faction_player = GetFactionPlayer(quest_objective->get_faction());
-			
-			if (faction_player) {
-				int dying_faction_units = faction_player == target.Player ? 1 : 0;
-				dying_faction_units += target.GetTotalInsideCount(faction_player, true, true);
-				
-				if (dying_faction_units > 0 && faction_player->GetUnitCount() <= dying_faction_units) {
-					objective->increment_counter();
-				}
-			}
-		}
+		objective->on_unit_destroyed(&target);
 	}
 	
 	//also increase score for units inside the target that will be destroyed when the target dies

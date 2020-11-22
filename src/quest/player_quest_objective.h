@@ -28,6 +28,7 @@
 #pragma once
 
 class CPlayer;
+class CUnit;
 
 namespace wyrmgus {
 
@@ -65,6 +66,8 @@ public:
 	}
 
 	void update_counter();
+
+	void on_unit_destroyed(const CUnit *unit);
 
 private:
 	const quest_objective *quest_objective = nullptr;
