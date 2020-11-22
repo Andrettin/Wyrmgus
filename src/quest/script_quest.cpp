@@ -111,7 +111,7 @@ static int CclDefineQuest(lua_State *l)
 		} else if (!strcmp(value, "Hidden")) {
 			quest->Hidden = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "Competitive")) {
-			quest->Competitive = LuaToBoolean(l, -1);
+			quest->competitive = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "Unobtainable")) {
 			quest->unobtainable = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "Uncompleteable")) {
@@ -307,7 +307,7 @@ static int CclGetQuestData(lua_State *l)
 		lua_pushboolean(l, quest->Completed);
 		return 1;
 	} else if (!strcmp(data, "Competitive")) {
-		lua_pushboolean(l, quest->Competitive);
+		lua_pushboolean(l, quest->is_competitive());
 		return 1;
 	} else if (!strcmp(data, "HighestCompletedDifficulty")) {
 		lua_pushnumber(l, quest->HighestCompletedDifficulty);

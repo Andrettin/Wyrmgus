@@ -55,6 +55,7 @@ class quest final : public detailed_data_entry, public data_type<quest>
 
 	Q_PROPERTY(wyrmgus::icon* icon MEMBER icon)
 	Q_PROPERTY(wyrmgus::player_color* player_color MEMBER player_color)
+	Q_PROPERTY(bool competitive MEMBER competitive READ is_competitive)
 	Q_PROPERTY(bool unobtainable MEMBER unobtainable READ is_unobtainable)
 	Q_PROPERTY(bool uncompleteable MEMBER uncompleteable READ is_uncompleteable)
 	Q_PROPERTY(bool unfailable MEMBER unfailable READ is_unfailable)
@@ -85,6 +86,11 @@ public:
 	const player_color *get_player_color() const
 	{
 		return this->player_color;
+	}
+
+	bool is_competitive() const
+	{
+		return this->competitive;
 	}
 
 	bool is_unobtainable() const
@@ -165,8 +171,8 @@ private:
 public:
 	int HighestCompletedDifficulty = -1;
 	bool Hidden = false;				/// Whether the quest is hidden
-	bool Competitive = false;			/// Whether a player completing the quest causes it to fail for others
 private:
+	bool competitive = false;			/// Whether a player completing the quest causes it to fail for others
 	bool unobtainable = false;			/// Whether the quest can be obtained normally (or only through triggers)
 	bool uncompleteable = false;		/// Whether the quest can be completed normally (or only through triggers)
 	bool unfailable = false;			/// Whether the quest can fail normally

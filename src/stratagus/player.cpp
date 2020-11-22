@@ -2442,7 +2442,7 @@ void CPlayer::complete_quest(wyrmgus::quest *quest)
 	this->remove_current_quest(quest);
 	
 	this->completed_quests.push_back(quest);
-	if (quest->Competitive) {
+	if (quest->is_competitive()) {
 		quest->CurrentCompleted = true;
 	}
 	

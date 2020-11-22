@@ -424,7 +424,7 @@ void CPlayer::Load(lua_State *l)
 			for (int k = 0; k < subargs; ++k) {
 				wyrmgus::quest *quest = wyrmgus::quest::get(LuaToString(l, j + 1, k + 1));
 				this->completed_quests.push_back(quest);
-				if (quest->Competitive) {
+				if (quest->is_competitive()) {
 					quest->CurrentCompleted = true;
 				}
 			}
