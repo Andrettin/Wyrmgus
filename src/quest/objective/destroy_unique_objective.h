@@ -45,6 +45,16 @@ public:
 		return objective_type::destroy_unique;
 	}
 
+	virtual bool is_quest_acceptance_allowed(const CPlayer *player) const override
+	{
+		if (this->get_unique()->can_drop()) {
+			//if the unique "can drop" it doesn't already exist, and thus can't be destroyed
+			return false;
+		}
+
+		return destroy_unit_objective_base::is_quest_acceptance_allowed(player);
+	}
+
 	virtual std::pair<bool, std::string> check_failure(const CPlayer *player) const override
 	{
 		if (this->get_unique()->can_drop()) {

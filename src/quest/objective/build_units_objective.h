@@ -79,6 +79,43 @@ public:
 		return objective_str;
 	}
 
+	virtual bool is_quest_acceptance_allowed(const CPlayer *player) const override
+	{
+		std::vector<const unit_type *> unit_types = this->get_unit_types();
+
+		for (const unit_class *unit_class : this->get_unit_classes()) {
+			const unit_type *unit_type = player->get_faction()->get_class_unit_type(unit_class);
+			if (unit_type == nullptr) {
+				continue;
+			}
+			unit_types.push_back(unit_type);
+		}
+
+		if (unit_types.empty()) {
+			return false;
+		}
+
+		bool validated = false;
+		for (const unit_type *unit_type : unit_types) {
+			if (this->get_settlement() != nullptr && !player->HasSettlement(this->get_settlement()) && !unit_type->BoolFlag[TOWNHALL_INDEX].value) {
+				continue;
+			}
+
+			if (!player->HasUnitBuilder(unit_type, this->get_settlement()) || !check_conditions(unit_type, player)) {
+				continue;
+			}
+
+			validated = true;
+			break;
+		}
+
+		if (!validated) {
+			return false;
+		}
+
+		return true;
+	}
+
 	virtual std::pair<bool, std::string> check_failure(const CPlayer *player) const override
 	{
 		std::vector<const unit_type *> unit_types = this->get_unit_types();

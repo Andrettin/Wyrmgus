@@ -44,8 +44,22 @@ public:
 		return objective_type::destroy_faction;
 	}
 
+	virtual bool is_quest_acceptance_allowed(const CPlayer *player) const override
+	{
+		Q_UNUSED(player)
+
+		const CPlayer *faction_player = GetFactionPlayer(this->get_faction());
+		if (faction_player == nullptr || !faction_player->is_alive()) {
+			return false;
+		}
+
+		return true;
+	}
+
 	virtual std::pair<bool, std::string> check_failure(const CPlayer *player) const override
 	{
+		Q_UNUSED(player)
+
 		//if is supposed to destroy a faction, but it is nowhere to be found, fail the quest
 		const CPlayer *faction_player = GetFactionPlayer(this->get_faction());
 		if (faction_player == nullptr || !faction_player->is_alive()) {

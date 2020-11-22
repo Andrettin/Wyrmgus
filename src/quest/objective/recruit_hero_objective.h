@@ -44,6 +44,15 @@ public:
 		return objective_type::recruit_hero;
 	}
 
+	virtual bool is_quest_acceptance_allowed(const CPlayer *player) const override
+	{
+		if (!player->is_character_available_for_recruitment(this->get_character(), true)) {
+			return false;
+		}
+
+		return true;
+	}
+
 	virtual std::pair<bool, std::string> check_failure(const CPlayer *player) const override
 	{
 		if (!player->HasHero(this->get_character()) && !player->is_character_available_for_recruitment(this->get_character(), true)) {

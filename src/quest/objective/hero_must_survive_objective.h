@@ -64,6 +64,15 @@ public:
 		return this->get_character()->get_full_name() + " must survive";
 	}
 
+	virtual bool is_quest_acceptance_allowed(const CPlayer *player) const override
+	{
+		if (!player->HasHero(this->get_character())) {
+			return false;
+		}
+
+		return true;
+	}
+
 	virtual std::pair<bool, std::string> check_failure(const CPlayer *player) const override
 	{
 		if (!player->HasHero(this->get_character())) {

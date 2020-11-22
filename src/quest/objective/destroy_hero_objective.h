@@ -51,6 +51,16 @@ public:
 		return "Kill " + this->get_character()->get_full_name();
 	}
 
+	virtual bool is_quest_acceptance_allowed(const CPlayer *player) const override
+	{
+		if (this->get_character()->CanAppear()) {
+			//if the character "can appear" it doesn't already exist, and thus can't be destroyed
+			return false;
+		}
+
+		return destroy_unit_objective_base::is_quest_acceptance_allowed(player);
+	}
+
 	virtual std::pair<bool, std::string> check_failure(const CPlayer *player) const override
 	{
 		if (this->get_character()->CanAppear()) {
