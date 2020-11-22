@@ -99,14 +99,4 @@ inline std::string objective_type_to_string(const objective_type objective_type)
 	throw std::runtime_error("Invalid objective type: \"" + std::to_string(static_cast<int>(objective_type)) + "\".");
 }
 
-inline int get_objective_type_default_quantity(const objective_type objective_type)
-{
-	switch (objective_type) {
-		case objective_type::hero_must_survive:
-			return 0;
-		default:
-			return 1;
-	}
-}
-
 }

@@ -158,9 +158,9 @@ static int CclDefineQuest(lua_State *l)
 					value = LuaToString(l, -1, k + 1);
 					++k;
 					if (!strcmp(value, "objective-type")) {
-						const wyrmgus::objective_type objective_type = wyrmgus::string_to_objective_type(LuaToString(l, -1, k + 1));
+						const std::string objective_type_str = LuaToString(l, -1, k + 1);
 
-						auto objective_unique_ptr = std::make_unique<wyrmgus::quest_objective>(objective_type, quest);
+						auto objective_unique_ptr = wyrmgus::quest_objective::from_identifier(objective_type_str, quest);
 						objective = objective_unique_ptr.get();
 						quest->objectives.push_back(std::move(objective_unique_ptr));
 					} else if (!strcmp(value, "objective-string")) {

@@ -736,6 +736,19 @@ set(stratagus_quest_HDRS
 	src/quest/quest_objective.h
 )
 
+set(stratagus_quest_objective_HDRS
+	src/quest/objective/build_units_objective.h
+	src/quest/objective/destroy_faction_objective.h
+	src/quest/objective/destroy_hero_objective.h
+	src/quest/objective/destroy_unique_objective.h
+	src/quest/objective/destroy_units_objective.h
+	src/quest/objective/gather_resource_objective.h
+	src/quest/objective/have_resource_objective.h
+	src/quest/objective/hero_must_survive_objective.h
+	src/quest/objective/recruit_hero_objective.h
+	src/quest/objective/research_upgrade_objective.h
+)
+
 set(stratagus_religion_HDRS
 	src/include/religion/deity.h
 	src/include/religion/pantheon.h
@@ -1010,6 +1023,7 @@ source_group(language FILES ${stratagus_language_HDRS})
 source_group(map FILES ${stratagus_map_HDRS})
 source_group(missile FILES ${stratagus_missile_HDRS})
 source_group(quest FILES ${stratagus_quest_HDRS})
+source_group(quest\\objective FILES ${stratagus_quest_objective_HDRS})
 source_group(religion FILES ${stratagus_religion_HDRS})
 source_group(script FILES ${stratagus_script_HDRS})
 source_group(script\\condition FILES ${stratagus_script_condition_HDRS})
@@ -1037,6 +1051,7 @@ set(stratagus_HDRS
 	${stratagus_map_HDRS}
 	${stratagus_missile_HDRS}
 	${stratagus_quest_HDRS}
+	${stratagus_quest_objective_HDRS}
 	${stratagus_religion_HDRS}
 	${stratagus_script_HDRS}
 	${stratagus_script_condition_HDRS}

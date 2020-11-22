@@ -47,19 +47,28 @@ class unit_class;
 class unit_type;
 enum class objective_type;
 
-class quest_objective final
+class quest_objective
 {
 public:
-	explicit quest_objective(const objective_type objective_type, const wyrmgus::quest *quest);
+	static std::unique_ptr<quest_objective> from_identifier(const std::string &identifier, const quest *quest);
+	static std::unique_ptr<quest_objective> from_sml_scope(const sml_data &scope, const quest *quest);
+
+protected:
+	explicit quest_objective(const wyrmgus::quest *quest);
+
+public:
+	virtual ~quest_objective()
+	{
+	}
 
 	void process_sml_property(const wyrmgus::sml_property &property);
 	void process_sml_scope(const wyrmgus::sml_data &scope);
-	void check() const;
 
-	objective_type get_objective_type() const
+	virtual void check() const
 	{
-		return this->objective_type;
 	}
+
+	virtual objective_type get_objective_type() const = 0;
 
 	const quest *get_quest() const
 	{
@@ -69,6 +78,11 @@ public:
 	int get_index() const
 	{
 		return this->index;
+	}
+
+	virtual int get_default_quantity() const
+	{
+		return 1;
 	}
 
 	int get_quantity() const
@@ -81,7 +95,13 @@ public:
 		return this->objective_string;
 	}
 
-	std::string generate_objective_string(const CPlayer *player) const;
+	virtual std::string generate_objective_string(const CPlayer *player) const
+	{
+		Q_UNUSED(player)
+
+		return std::string();
+	}
+
 	std::string get_unit_type_objective_string(const unit_type *unit_type, const CPlayer *player, bool &first) const;
 
 	const resource *get_resource() const
@@ -125,7 +145,6 @@ public:
 	}
 
 private:
-	objective_type objective_type;
 	const wyrmgus::quest *quest = nullptr;
 	int index = -1;
 	int quantity = 0;

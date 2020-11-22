@@ -95,10 +95,7 @@ void quest::process_sml_scope(const sml_data &scope)
 
 	if (tag == "objectives") {
 		scope.for_each_child([&](const sml_data &child_scope) {
-			const objective_type objective_type = string_to_objective_type(child_scope.get_tag());
-
-			auto objective = std::make_unique<quest_objective>(objective_type, this);
-			database::process_sml_data(objective, child_scope);
+			auto objective = quest_objective::from_sml_scope(child_scope, this);
 			this->objectives.push_back(std::move(objective));
 		});
 	} else if (tag == "objective_strings") {

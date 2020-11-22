@@ -32,6 +32,16 @@
 #include "character.h"
 #include "faction.h"
 #include "map/site.h"
+#include "quest/objective/build_units_objective.h"
+#include "quest/objective/destroy_faction_objective.h"
+#include "quest/objective/destroy_hero_objective.h"
+#include "quest/objective/destroy_unique_objective.h"
+#include "quest/objective/destroy_units_objective.h"
+#include "quest/objective/gather_resource_objective.h"
+#include "quest/objective/have_resource_objective.h"
+#include "quest/objective/hero_must_survive_objective.h"
+#include "quest/objective/recruit_hero_objective.h"
+#include "quest/objective/research_upgrade_objective.h"
 #include "quest/objective_type.h"
 #include "quest/quest.h"
 #include "unit/unit_class.h"
@@ -40,10 +50,47 @@
 
 namespace wyrmgus {
 
-quest_objective::quest_objective(const wyrmgus::objective_type objective_type, const wyrmgus::quest *quest)
-	: objective_type(objective_type), quest(quest), index(quest->get_objectives().size())
+std::unique_ptr<quest_objective> quest_objective::from_identifier(const std::string &identifier, const wyrmgus::quest *quest)
 {
-	this->quantity = get_objective_type_default_quantity(objective_type);
+	if (identifier == "build_units") {
+		return std::make_unique<build_units_objective>(quest);
+	} else if (identifier == "destroy_faction") {
+		return std::make_unique<destroy_faction_objective>(quest);
+	} else if (identifier == "destroy_hero") {
+		return std::make_unique<destroy_hero_objective>(quest);
+	} else if (identifier == "destroy_unique") {
+		return std::make_unique<destroy_unique_objective>(quest);
+	} else if (identifier == "destroy_units") {
+		return std::make_unique<destroy_units_objective>(quest);
+	} else if (identifier == "gather_resource") {
+		return std::make_unique<gather_resource_objective>(quest);
+	} else if (identifier == "have_resource") {
+		return std::make_unique<have_resource_objective>(quest);
+	} else if (identifier == "hero_must_survive") {
+		return std::make_unique<hero_must_survive_objective>(quest);
+	} else if (identifier == "recruit_hero") {
+		return std::make_unique<recruit_hero_objective>(quest);
+	} else if (identifier == "research_upgrade") {
+		return std::make_unique<research_upgrade_objective>(quest);
+	} else {
+		throw std::runtime_error("Invalid quest objective type: \"" + identifier + "\".");
+	}
+}
+
+std::unique_ptr<quest_objective> quest_objective::from_sml_scope(const sml_data &scope, const wyrmgus::quest *quest)
+{
+	const std::string &tag = scope.get_tag();
+	std::unique_ptr<quest_objective> objective = quest_objective::from_identifier(tag, quest);
+
+	database::process_sml_data(objective, scope);
+
+	return objective;
+}
+
+quest_objective::quest_objective(const wyrmgus::quest *quest)
+	: quest(quest), index(quest->get_objectives().size())
+{
+	this->quantity = this->get_default_quantity();
 }
 
 void quest_objective::process_sml_property(const sml_property &property)
@@ -88,61 +135,6 @@ void quest_objective::process_sml_scope(const sml_data &scope)
 	} else {
 		throw std::runtime_error("Invalid quest objective scope: \"" + scope.get_tag() + "\".");
 	}
-}
-
-void quest_objective::check() const
-{
-	switch (this->get_objective_type()) {
-		case objective_type::build_units:
-			if (this->get_unit_types().empty() && this->get_unit_classes().empty()) {
-				throw std::runtime_error("Build units quest objective has neither unit types nor unit classes set for it.");
-			}
-			break;
-		case objective_type::hero_must_survive:
-			if (this->get_character() == nullptr) {
-				throw std::runtime_error("Hero must survive quest objective has no character set for it.");
-			}
-			break;
-		default:
-			break;
-	}
-}
-
-std::string quest_objective::generate_objective_string(const CPlayer *player) const
-{
-	std::string objective_str;
-
-	switch (this->get_objective_type()) {
-		case objective_type::build_units: {
-			bool first = true;
-
-			for (const unit_class *unit_class : this->get_unit_classes()) {
-				const unit_type *unit_type = player->get_class_unit_type(unit_class);
-
-				if (unit_type == nullptr) {
-					continue;
-				}
-
-				objective_str += this->get_unit_type_objective_string(unit_type, player, first);
-			}
-
-			for (const unit_type *unit_type : this->get_unit_types()) {
-				objective_str += this->get_unit_type_objective_string(unit_type, player, first);
-			}
-
-			if (this->get_settlement() != nullptr) {
-				objective_str += " in " + this->get_settlement()->get_current_cultural_name();
-			}
-
-			break;
-		}
-		case objective_type::hero_must_survive:
-			return this->get_character()->get_full_name() + " must survive";
-		default:
-			return std::string();
-	}
-
-	return objective_str;
 }
 
 std::string quest_objective::get_unit_type_objective_string(const unit_type *unit_type, const CPlayer *player, bool &first) const
