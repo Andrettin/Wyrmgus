@@ -73,16 +73,30 @@ std::unique_ptr<quest_objective> quest_objective::try_from_identifier(const std:
 	return nullptr;
 }
 
+std::unique_ptr<quest_objective> quest_objective::from_sml_property(const sml_property &property, const wyrmgus::quest *quest)
+{
+	const std::string &key = property.get_key();
+	const std::string &value = property.get_value();
+
+	if (key == "destroy_hero") {
+		auto objective = std::make_unique<destroy_hero_objective>(quest);
+		objective->character = character::get(value);
+		return objective;
+	} else if (key == "hero_must_survive") {
+		auto objective = std::make_unique<hero_must_survive_objective>(quest);
+		objective->character = character::get(value);
+		return objective;
+	} else {
+		throw std::runtime_error("Invalid quest objective property: \"" + key + "\".");
+	}
+}
+
 std::unique_ptr<quest_objective> quest_objective::from_sml_scope(const sml_data &scope, const wyrmgus::quest *quest)
 {
 	const std::string &tag = scope.get_tag();
 	std::unique_ptr<quest_objective> objective;
 
 	if (objective = quest_objective::try_from_identifier(tag, quest)) {
-	} else if (tag == "destroy_hero") {
-		objective = std::make_unique<destroy_hero_objective>(quest);
-	} else if (tag == "hero_must_survive") {
-		objective = std::make_unique<hero_must_survive_objective>(quest);
 	} else {
 		throw std::runtime_error("Invalid quest objective scope: \"" + tag + "\".");
 	}

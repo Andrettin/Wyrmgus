@@ -61,6 +61,7 @@ public:
 		return objective;
 	}
 
+	static std::unique_ptr<quest_objective> from_sml_property(const sml_property &property, const quest *quest);
 	static std::unique_ptr<quest_objective> from_sml_scope(const sml_data &scope, const quest *quest);
 
 protected:

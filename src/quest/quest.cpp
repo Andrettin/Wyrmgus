@@ -94,7 +94,10 @@ void quest::process_sml_scope(const sml_data &scope)
 	const std::vector<std::string> &values = scope.get_values();
 
 	if (tag == "objectives") {
-		scope.for_each_child([&](const sml_data &child_scope) {
+		scope.for_each_element([&](const sml_property &property) {
+			auto objective = quest_objective::from_sml_property(property, this);
+			this->objectives.push_back(std::move(objective));
+		}, [&](const sml_data &child_scope) {
 			auto objective = quest_objective::from_sml_scope(child_scope, this);
 			this->objectives.push_back(std::move(objective));
 		});

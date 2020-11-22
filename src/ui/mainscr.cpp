@@ -1458,7 +1458,7 @@ void MessagesDisplay::DrawMessages()
 					} else {
 						objective_string += quest_objective->generate_objective_string(CPlayer::GetThisPlayer());
 					}
-					if (quest_objective->get_quantity()) {
+					if (quest_objective->get_quantity() != 0) {
 						objective_string += " (" + std::to_string(objective->Counter) + "/" + std::to_string(quest_objective->get_quantity()) + ")";
 					}
 
