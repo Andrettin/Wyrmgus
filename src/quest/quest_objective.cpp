@@ -109,7 +109,6 @@ std::unique_ptr<quest_objective> quest_objective::from_sml_scope(const sml_data 
 quest_objective::quest_objective(const wyrmgus::quest *quest)
 	: quest(quest), index(quest->get_objectives().size())
 {
-	this->quantity = this->get_default_quantity();
 }
 
 void quest_objective::process_sml_property(const sml_property &property)

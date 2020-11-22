@@ -91,12 +91,7 @@ public:
 		return this->index;
 	}
 
-	virtual int get_default_quantity() const
-	{
-		return 1;
-	}
-
-	int get_quantity() const
+	virtual int get_quantity() const
 	{
 		return this->quantity;
 	}
@@ -158,7 +153,7 @@ public:
 private:
 	const wyrmgus::quest *quest = nullptr;
 	int index = -1;
-	int quantity = 0;
+	int quantity = 1;
 	std::string objective_string;
 	const wyrmgus::resource *resource = nullptr;
 	std::vector<const unit_class *> unit_classes;

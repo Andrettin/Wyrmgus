@@ -51,8 +51,9 @@ public:
 		return objective_type::hero_must_survive;
 	}
 
-	virtual int get_default_quantity() const override
+	virtual int get_quantity() const override
 	{
+		//always 0
 		return 0;
 	}
 
