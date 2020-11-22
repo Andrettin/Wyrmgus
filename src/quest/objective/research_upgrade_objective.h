@@ -32,6 +32,7 @@
 #include "quest/player_quest_objective.h"
 #include "quest/quest.h"
 #include "quest/quest_objective.h"
+#include "upgrade/upgrade.h"
 #include "util/vector_util.h"
 
 namespace wyrmgus {
@@ -145,6 +146,12 @@ public:
 		}
 
 		return quest_objective::check_failure(player);
+	}
+
+	virtual void update_counter(player_quest_objective *player_quest_objective) const override
+	{
+		const int count = UpgradeIdAllowed(*player_quest_objective->get_player(), this->get_upgrade()->ID) == 'R' ? 1 : 0;
+		player_quest_objective->set_counter(count);
 	}
 };
 

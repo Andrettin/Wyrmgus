@@ -48,18 +48,22 @@ public:
 		return this->quest_objective;
 	}
 
+	const CPlayer *get_player() const
+	{
+		return this->player;
+	}
+
 	int get_counter() const
 	{
 		return this->counter;
 	}
 	
-	//necessary for loading saved games
-	void set_counter(const int value)
-	{
-		this->counter = value;
-	}
+	void set_counter(const int value);
 
-	void change_counter(const int change);
+	void change_counter(const int change)
+	{
+		this->set_counter(this->get_counter() + change);
+	}
 
 	void increment_counter()
 	{
@@ -67,7 +71,6 @@ public:
 	}
 
 	void update_counter();
-
 	void on_unit_built(const CUnit *unit);
 	void on_unit_destroyed(const CUnit *unit);
 	void on_resource_gathered(const resource *resource, const int quantity);

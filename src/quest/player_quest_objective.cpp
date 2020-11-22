@@ -39,28 +39,14 @@
 
 namespace wyrmgus {
 
-void player_quest_objective::change_counter(const int change)
+void player_quest_objective::set_counter(const int value)
 {
-	this->counter = std::min(this->get_counter() + change, this->get_quest_objective()->get_quantity());
+	this->counter = std::min(value, this->get_quest_objective()->get_quantity());
 }
 
 void player_quest_objective::update_counter()
 {
-	const wyrmgus::quest_objective *quest_objective = this->get_quest_objective();
-
-	switch (quest_objective->get_objective_type()) {
-		case objective_type::have_resource:
-			this->counter = std::min(this->player->get_resource(quest_objective->get_resource(), STORE_BOTH), quest_objective->get_quantity());
-			break;
-		case objective_type::research_upgrade:
-			this->counter = UpgradeIdAllowed(*this->player, quest_objective->get_upgrade()->ID) == 'R' ? 1 : 0;
-			break;
-		case objective_type::recruit_hero:
-			this->counter = this->player->HasHero(quest_objective->get_character()) ? 1 : 0;
-			break;
-		default:
-			break;
-	}
+	this->get_quest_objective()->update_counter(this);
 }
 
 void player_quest_objective::on_unit_built(const CUnit *unit)

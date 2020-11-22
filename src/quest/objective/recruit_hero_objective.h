@@ -61,6 +61,12 @@ public:
 
 		return quest_objective::check_failure(player);
 	}
+
+	virtual void update_counter(player_quest_objective *player_quest_objective) const override
+	{
+		const int count = player_quest_objective->get_player()->HasHero(this->get_character()) ? 1 : 0;
+		player_quest_objective->set_counter(count);
+	}
 };
 
 }

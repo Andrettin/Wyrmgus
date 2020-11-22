@@ -127,6 +127,11 @@ public:
 		return std::make_pair(false, std::string());
 	}
 
+	virtual void update_counter(player_quest_objective *player_quest_objective) const
+	{
+		Q_UNUSED(player_quest_objective)
+	}
+
 	virtual void on_unit_built(const CUnit *unit, player_quest_objective *player_quest_objective) const
 	{
 		Q_UNUSED(unit)

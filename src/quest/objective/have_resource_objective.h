@@ -43,6 +43,12 @@ public:
 	{
 		return objective_type::have_resource;
 	}
+
+	virtual void update_counter(player_quest_objective *player_quest_objective) const override
+	{
+		const int resource_quantity = player_quest_objective->get_player()->get_resource(this->get_resource(), STORE_BOTH);
+		player_quest_objective->set_counter(resource_quantity);
+	}
 };
 
 }
