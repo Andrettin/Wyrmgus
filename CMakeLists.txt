@@ -297,10 +297,14 @@ set(quest_SRCS
 	src/quest/campaign.cpp
 	src/quest/player_quest_objective.cpp
 	src/quest/quest.cpp
-	src/quest/quest_objective.cpp
 	src/quest/script_quest.cpp
 )
 source_group(quest FILES ${quest_SRCS})
+
+set(quest_objective_SRCS
+	src/quest/objective/quest_objective.cpp
+)
+source_group(quest\\objective FILES ${quest_objective_SRCS})
 
 set(religion_SRCS
 	src/religion/deity.cpp
@@ -556,6 +560,7 @@ set(stratagus_SRCS
 	${particle_SRCS}
 	${pathfinder_SRCS}
 	${quest_SRCS}
+	${quest_objective_SRCS}
 	${religion_SRCS}
 	${script_SRCS}
 	${script_condition_SRCS}
@@ -734,7 +739,6 @@ set(stratagus_quest_HDRS
 	src/quest/objective_type.h
 	src/quest/player_quest_objective.h
 	src/quest/quest.h
-	src/quest/quest_objective.h
 )
 
 set(stratagus_quest_objective_HDRS
@@ -747,6 +751,7 @@ set(stratagus_quest_objective_HDRS
 	src/quest/objective/gather_resource_objective.h
 	src/quest/objective/have_resource_objective.h
 	src/quest/objective/hero_must_survive_objective.h
+	src/quest/objective/quest_objective.h
 	src/quest/objective/recruit_hero_objective.h
 	src/quest/objective/research_upgrade_objective.h
 )
