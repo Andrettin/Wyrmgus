@@ -43,6 +43,13 @@ public:
 	{
 		return objective_type::destroy_hero;
 	}
+
+	virtual std::string generate_objective_string(const CPlayer *player) const override
+	{
+		Q_UNUSED(player)
+
+		return "Kill " + this->get_character()->get_full_name();
+	}
 };
 
 }
