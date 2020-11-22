@@ -50,7 +50,17 @@ enum class objective_type;
 class quest_objective
 {
 public:
-	static std::unique_ptr<quest_objective> from_identifier(const std::string &identifier, const quest *quest);
+	static std::unique_ptr<quest_objective> try_from_identifier(const std::string &identifier, const quest *quest);
+
+	static std::unique_ptr<quest_objective> from_identifier(const std::string &identifier, const quest *quest)
+	{
+		std::unique_ptr<quest_objective> objective = quest_objective::try_from_identifier(identifier, quest);
+		if (objective == nullptr) {
+			throw std::runtime_error("Invalid quest objective type: \"" + identifier + "\".");
+		}
+		return objective;
+	}
+
 	static std::unique_ptr<quest_objective> from_sml_scope(const sml_data &scope, const quest *quest);
 
 protected:

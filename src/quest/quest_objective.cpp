@@ -50,14 +50,12 @@
 
 namespace wyrmgus {
 
-std::unique_ptr<quest_objective> quest_objective::from_identifier(const std::string &identifier, const wyrmgus::quest *quest)
+std::unique_ptr<quest_objective> quest_objective::try_from_identifier(const std::string &identifier, const wyrmgus::quest *quest)
 {
 	if (identifier == "build_units") {
 		return std::make_unique<build_units_objective>(quest);
 	} else if (identifier == "destroy_faction") {
 		return std::make_unique<destroy_faction_objective>(quest);
-	} else if (identifier == "destroy_hero") {
-		return std::make_unique<destroy_hero_objective>(quest);
 	} else if (identifier == "destroy_unique") {
 		return std::make_unique<destroy_unique_objective>(quest);
 	} else if (identifier == "destroy_units") {
@@ -66,21 +64,28 @@ std::unique_ptr<quest_objective> quest_objective::from_identifier(const std::str
 		return std::make_unique<gather_resource_objective>(quest);
 	} else if (identifier == "have_resource") {
 		return std::make_unique<have_resource_objective>(quest);
-	} else if (identifier == "hero_must_survive") {
-		return std::make_unique<hero_must_survive_objective>(quest);
 	} else if (identifier == "recruit_hero") {
 		return std::make_unique<recruit_hero_objective>(quest);
 	} else if (identifier == "research_upgrade") {
 		return std::make_unique<research_upgrade_objective>(quest);
-	} else {
-		throw std::runtime_error("Invalid quest objective type: \"" + identifier + "\".");
 	}
+
+	return nullptr;
 }
 
 std::unique_ptr<quest_objective> quest_objective::from_sml_scope(const sml_data &scope, const wyrmgus::quest *quest)
 {
 	const std::string &tag = scope.get_tag();
-	std::unique_ptr<quest_objective> objective = quest_objective::from_identifier(tag, quest);
+	std::unique_ptr<quest_objective> objective;
+
+	if (objective = quest_objective::try_from_identifier(tag, quest)) {
+	} else if (tag == "destroy_hero") {
+		objective = std::make_unique<destroy_hero_objective>(quest);
+	} else if (tag == "hero_must_survive") {
+		objective = std::make_unique<hero_must_survive_objective>(quest);
+	} else {
+		throw std::runtime_error("Invalid quest objective scope: \"" + tag + "\".");
+	}
 
 	database::process_sml_data(objective, scope);
 
