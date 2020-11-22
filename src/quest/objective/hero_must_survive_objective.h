@@ -63,6 +63,15 @@ public:
 
 		return this->get_character()->get_full_name() + " must survive";
 	}
+
+	virtual std::pair<bool, std::string> check_failure(const CPlayer *player) const override
+	{
+		if (!player->HasHero(this->get_character())) {
+			return std::make_pair(true, "A hero necessary for the quest has died.");
+		}
+
+		return quest_objective::check_failure(player);
+	}
 };
 
 }

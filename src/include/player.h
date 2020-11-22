@@ -261,7 +261,7 @@ public:
 	void remove_current_quest(wyrmgus::quest *quest);
 	bool can_accept_quest(const wyrmgus::quest *quest) const;
 	bool check_quest_completion(const wyrmgus::quest *quest) const;
-	std::string check_quest_failure(const wyrmgus::quest *quest) const;
+	std::pair<bool, std::string> check_quest_failure(const wyrmgus::quest *quest) const;
 	bool has_quest(const wyrmgus::quest *quest) const;
 	bool is_quest_completed(const wyrmgus::quest *quest) const;
 	void AddModifier(CUpgrade *modifier, int cycles);

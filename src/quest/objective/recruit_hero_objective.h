@@ -43,6 +43,15 @@ public:
 	{
 		return objective_type::recruit_hero;
 	}
+
+	virtual std::pair<bool, std::string> check_failure(const CPlayer *player) const override
+	{
+		if (!player->HasHero(this->get_character()) && !player->is_character_available_for_recruitment(this->get_character(), true)) {
+			return std::make_pair(true, "The hero can no longer be recruited.");
+		}
+
+		return quest_objective::check_failure(player);
+	}
 };
 
 }

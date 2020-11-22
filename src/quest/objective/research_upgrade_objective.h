@@ -27,8 +27,11 @@
 
 #pragma once
 
+#include "ai/ai_local.h"
 #include "quest/objective_type.h"
+#include "quest/player_quest_objective.h"
 #include "quest/quest_objective.h"
+#include "util/vector_util.h"
 
 namespace wyrmgus {
 
@@ -42,6 +45,57 @@ public:
 	virtual objective_type get_objective_type() const override
 	{
 		return objective_type::research_upgrade;
+	}
+
+	virtual std::pair<bool, std::string> check_failure(const CPlayer *player) const override
+	{
+		const CUpgrade *upgrade = this->get_upgrade();
+
+		if (player->Allow.Upgrades[upgrade->ID] != 'R') {
+			bool has_researcher = player->HasUpgradeResearcher(upgrade);
+
+			if (!has_researcher) { //check if the quest includes an objective to build a researcher of the upgrade
+				for (const auto &other_objective : player->get_quest_objectives()) {
+					const quest_objective *other_quest_objective = other_objective->get_quest_objective();
+					if (other_quest_objective->get_quest() != this->get_quest() || other_quest_objective == this || other_objective->get_counter() >= other_quest_objective->get_quantity()) { //if the objective has been fulfilled, then there should be a researcher, if there isn't it is due to i.e. the researcher having been destroyed later on, or upgraded to another type, and then the quest should fail if the upgrade can no longer be researched
+						continue;
+					}
+
+					if (other_quest_objective->get_objective_type() == objective_type::build_units) {
+						std::vector<const unit_type *> unit_types = other_quest_objective->get_unit_types();
+
+						for (const unit_class *unit_class : other_quest_objective->get_unit_classes()) {
+							const unit_type *unit_type = player->get_faction()->get_class_unit_type(unit_class);
+							if (unit_type == nullptr) {
+								continue;
+							}
+							unit_types.push_back(unit_type);
+						}
+
+						if (unit_types.empty()) {
+							continue;
+						}
+
+						for (const unit_type *unit_type : unit_types) {
+							if (vector::contains(AiHelpers.get_researchers(upgrade), unit_type) || vector::contains(AiHelpers.get_researcher_classes(upgrade->get_upgrade_class()), unit_type->get_unit_class())) { //if the unit type of the other objective is a researcher of this upgrade
+								has_researcher = true;
+								break;
+							}
+						}
+
+						if (has_researcher) {
+							break;
+						}
+					}
+				}
+			}
+
+			if (!has_researcher || player->Allow.Upgrades[upgrade->ID] != 'A' || !check_conditions(upgrade, player)) {
+				return std::make_pair(true, "You can no longer research the required upgrade.");
+			}
+		}
+
+		return quest_objective::check_failure(player);
 	}
 };
 

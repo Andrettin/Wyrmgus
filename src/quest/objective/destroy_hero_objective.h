@@ -27,15 +27,15 @@
 
 #pragma once
 
+#include "quest/objective/destroy_unit_objective_base.h"
 #include "quest/objective_type.h"
-#include "quest/quest_objective.h"
 
 namespace wyrmgus {
 
-class destroy_hero_objective final : public quest_objective
+class destroy_hero_objective final : public destroy_unit_objective_base
 {
 public:
-	explicit destroy_hero_objective(const wyrmgus::quest *quest) : quest_objective(quest)
+	explicit destroy_hero_objective(const wyrmgus::quest *quest) : destroy_unit_objective_base(quest)
 	{
 	}
 
@@ -49,6 +49,16 @@ public:
 		Q_UNUSED(player)
 
 		return "Kill " + this->get_character()->get_full_name();
+	}
+
+	virtual std::pair<bool, std::string> check_failure(const CPlayer *player) const override
+	{
+		if (this->get_character()->CanAppear()) {
+			//if is supposed to destroy a character, but it is nowhere to be found, fail the quest
+			return std::make_pair(true, "The target no longer exists.");
+		}
+
+		return destroy_unit_objective_base::check_failure(player);
 	}
 };
 

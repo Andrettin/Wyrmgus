@@ -110,6 +110,13 @@ public:
 
 	std::string get_unit_type_objective_string(const unit_type *unit_type, const CPlayer *player, bool &first) const;
 
+	virtual std::pair<bool, std::string> check_failure(const CPlayer *player) const
+	{
+		Q_UNUSED(player)
+
+		return std::make_pair(false, std::string());
+	}
+
 	const resource *get_resource() const
 	{
 		return this->resource;

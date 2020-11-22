@@ -32,24 +32,24 @@
 
 namespace wyrmgus {
 
-class destroy_faction_objective final : public quest_objective
+class destroy_unit_objective_base : public quest_objective
 {
 public:
-	explicit destroy_faction_objective(const wyrmgus::quest *quest) : quest_objective(quest)
+	explicit destroy_unit_objective_base(const wyrmgus::quest *quest) : quest_objective(quest)
 	{
-	}
-
-	virtual objective_type get_objective_type() const override
-	{
-		return objective_type::destroy_faction;
 	}
 
 	virtual std::pair<bool, std::string> check_failure(const CPlayer *player) const override
 	{
-		//if is supposed to destroy a faction, but it is nowhere to be found, fail the quest
-		const CPlayer *faction_player = GetFactionPlayer(this->get_faction());
-		if (faction_player == nullptr || !faction_player->is_alive()) {
-			return std::make_pair(true, "The target no longer exists.");
+		if (this->get_faction() != nullptr) {
+			const CPlayer *faction_player = GetFactionPlayer(this->get_faction());
+			if (faction_player == nullptr || !faction_player->is_alive()) {
+				return std::make_pair(true, "The target no longer exists.");
+			}
+
+			if (this->get_settlement() != nullptr && !faction_player->HasSettlement(this->get_settlement())) {
+				return std::make_pair(true, "The target no longer exists.");
+			}
 		}
 
 		return quest_objective::check_failure(player);

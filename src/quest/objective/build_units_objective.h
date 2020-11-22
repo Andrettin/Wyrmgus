@@ -29,6 +29,8 @@
 
 #include "quest/objective_type.h"
 #include "quest/quest_objective.h"
+#include "script/condition/condition.h"
+#include "unit/unit_type.h"
 
 namespace wyrmgus {
 
@@ -75,6 +77,45 @@ public:
 		}
 
 		return objective_str;
+	}
+
+	virtual std::pair<bool, std::string> check_failure(const CPlayer *player) const override
+	{
+		std::vector<const unit_type *> unit_types = this->get_unit_types();
+
+		for (const unit_class *unit_class : this->get_unit_classes()) {
+			const unit_type *unit_type = player->get_faction()->get_class_unit_type(unit_class);
+			if (unit_type == nullptr) {
+				continue;
+			}
+			unit_types.push_back(unit_type);
+		}
+
+		if (unit_types.empty()) {
+			return std::make_pair(true, "You can no longer produce the required unit.");
+		}
+
+		bool validated = false;
+		std::string validation_error;
+		for (const unit_type *unit_type : unit_types) {
+			if (this->get_settlement() != nullptr && !player->HasSettlement(this->get_settlement()) && !unit_type->BoolFlag[TOWNHALL_INDEX].value) {
+				validation_error = "You no longer hold the required settlement.";
+				continue;
+			}
+
+			if (!player->HasUnitBuilder(unit_type, this->get_settlement()) || !check_conditions(unit_type, player)) {
+				validation_error = "You can no longer produce the required unit.";
+				continue;
+			}
+
+			validated = true;
+		}
+
+		if (!validated) {
+			return std::make_pair(true, validation_error);
+		}
+
+		return quest_objective::check_failure(player);
 	}
 };
 

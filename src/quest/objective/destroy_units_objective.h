@@ -27,15 +27,15 @@
 
 #pragma once
 
+#include "quest/objective/destroy_unit_objective_base.h"
 #include "quest/objective_type.h"
-#include "quest/quest_objective.h"
 
 namespace wyrmgus {
 
-class destroy_units_objective final : public quest_objective
+class destroy_units_objective final : public destroy_unit_objective_base
 {
 public:
-	explicit destroy_units_objective(const wyrmgus::quest *quest) : quest_objective(quest)
+	explicit destroy_units_objective(const wyrmgus::quest *quest) : destroy_unit_objective_base(quest)
 	{
 	}
 

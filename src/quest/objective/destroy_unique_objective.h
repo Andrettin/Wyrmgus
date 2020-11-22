@@ -27,21 +27,32 @@
 
 #pragma once
 
+#include "item/unique_item.h"
+#include "quest/objective/destroy_unit_objective_base.h"
 #include "quest/objective_type.h"
-#include "quest/quest_objective.h"
 
 namespace wyrmgus {
 
-class destroy_unique_objective final : public quest_objective
+class destroy_unique_objective final : public destroy_unit_objective_base
 {
 public:
-	explicit destroy_unique_objective(const wyrmgus::quest *quest) : quest_objective(quest)
+	explicit destroy_unique_objective(const wyrmgus::quest *quest) : destroy_unit_objective_base(quest)
 	{
 	}
 
 	virtual objective_type get_objective_type() const override
 	{
 		return objective_type::destroy_unique;
+	}
+
+	virtual std::pair<bool, std::string> check_failure(const CPlayer *player) const override
+	{
+		if (this->get_unique()->can_drop()) {
+			//if is supposed to destroy a unique, but it is nowhere to be found, fail the quest
+			return std::make_pair(true, "The target no longer exists.");
+		}
+
+		return destroy_unit_objective_base::check_failure(player);
 	}
 };
 
