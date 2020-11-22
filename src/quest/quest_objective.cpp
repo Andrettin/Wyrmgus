@@ -64,8 +64,6 @@ std::unique_ptr<quest_objective> quest_objective::try_from_identifier(const std:
 		return std::make_unique<gather_resource_objective>(quest);
 	} else if (identifier == "have_resource") {
 		return std::make_unique<have_resource_objective>(quest);
-	} else if (identifier == "recruit_hero") {
-		return std::make_unique<recruit_hero_objective>(quest);
 	} else if (identifier == "research_upgrade") {
 		return std::make_unique<research_upgrade_objective>(quest);
 	}
@@ -84,6 +82,10 @@ std::unique_ptr<quest_objective> quest_objective::from_sml_property(const sml_pr
 		return objective;
 	} else if (key == "hero_must_survive") {
 		auto objective = std::make_unique<hero_must_survive_objective>(quest);
+		objective->character = character::get(value);
+		return objective;
+	} else if (key == "recruit_hero") {
+		auto objective = std::make_unique<recruit_hero_objective>(quest);
 		objective->character = character::get(value);
 		return objective;
 	} else {
