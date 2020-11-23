@@ -33,7 +33,6 @@ enum class gender {
 	none,
 	male,
 	female,
-	asexual, //e.g. slimes
 
 	count
 };
@@ -46,8 +45,6 @@ inline gender try_string_to_gender(const std::string &str)
 		return gender::male;
 	} else if (str == "female") {
 		return gender::female;
-	} else if (str == "asexual") {
-		return gender::asexual;
 	}
 
 	return gender::none;
@@ -61,8 +58,6 @@ inline gender string_to_gender(const std::string &str)
 		return gender::male;
 	} else if (str == "female") {
 		return gender::female;
-	} else if (str == "asexual") {
-		return gender::asexual;
 	}
 
 	throw std::runtime_error("Invalid gender: \"" + str + "\".");
@@ -77,8 +72,6 @@ inline std::string gender_to_string(const gender gender)
 			return "male";
 		case gender::female:
 			return "female";
-		case gender::asexual:
-			return "asexual";
 		default:
 			break;
 	}
