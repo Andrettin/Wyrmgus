@@ -949,7 +949,7 @@ public:
 	std::string GetNamePlural() const;
 	std::string generate_personal_name(const faction *faction, const gender gender) const;
 	bool is_personal_name_valid(const std::string &name, const faction *faction, const gender gender) const;
-	std::vector<std::string> get_potential_personal_names(const faction *faction, const gender gender) const;
+	const std::vector<std::string> &get_potential_personal_names(const faction *faction, const gender gender) const;
 	//Wyrmgus end
 
 	item_class get_item_class() const

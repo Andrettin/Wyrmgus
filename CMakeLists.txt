@@ -391,6 +391,7 @@ set(stratagusmain_SRCS
 	src/stratagus/main.cpp
 	src/stratagus/mainloop.cpp
 	src/stratagus/mod.cpp
+	src/stratagus/name_generator.cpp
 	src/stratagus/parameters.cpp
 	src/stratagus/plane.cpp
 	src/stratagus/player.cpp
@@ -1016,6 +1017,7 @@ set(stratagus_generic_HDRS
 	src/stratagus/government_type.h
 	src/stratagus/literary_text.h
 	src/stratagus/magic_domain.h
+	src/stratagus/name_generator.h
 	src/stratagus/player_container.h
 	src/stratagus/vassalage_type.h
 )

@@ -1843,7 +1843,7 @@ std::string unit_type::generate_personal_name(const wyrmgus::faction *faction, c
 		return "";
 	}
 	
-	const std::vector<std::string> potential_names = this->get_potential_personal_names(faction, gender);
+	const std::vector<std::string> &potential_names = this->get_potential_personal_names(faction, gender);
 	
 	if (!potential_names.empty()) {
 		return vector::get_random(potential_names);
@@ -1858,16 +1858,15 @@ bool unit_type::is_personal_name_valid(const std::string &name, const wyrmgus::f
 		return false;
 	}
 	
-	const std::vector<std::string> potential_names = this->get_potential_personal_names(faction, gender);
+	const std::vector<std::string> &potential_names = this->get_potential_personal_names(faction, gender);
 	
 	return vector::contains(potential_names, name);
 }
 
-std::vector<std::string> unit_type::get_potential_personal_names(const wyrmgus::faction *faction, const gender gender) const
+const std::vector<std::string> &unit_type::get_potential_personal_names(const wyrmgus::faction *faction, const gender gender) const
 {
-	std::vector<std::string> potential_names;
-	
 	const wyrmgus::species *species = this->get_species();
+
 	if (species != nullptr) {
 		return species->get_specimen_names(gender);
 	} else if (this->get_civilization() != nullptr) {
@@ -1880,17 +1879,7 @@ std::vector<std::string> unit_type::get_potential_personal_names(const wyrmgus::
 		}
 
 		if (this->BoolFlag[ORGANIC_INDEX].value) {
-			auto find_iterator = civilization->get_personal_names().find(gender::none);
-			if (find_iterator != civilization->get_personal_names().end()) {
-				vector::merge(potential_names, find_iterator->second);
-			}
-
-			if (gender != gender::none) {
-				find_iterator = civilization->get_personal_names().find(gender);
-				if (find_iterator != civilization->get_personal_names().end()) {
-					vector::merge(potential_names, find_iterator->second);
-				}
-			}
+			return civilization->get_personal_names(gender);
 		} else {
 			if (this->get_unit_class() != nullptr) {
 				const std::vector<std::string> &unit_class_names = civilization->get_unit_class_names(this->get_unit_class());
@@ -1911,7 +1900,7 @@ std::vector<std::string> unit_type::get_potential_personal_names(const wyrmgus::
 		}
 	}
 	
-	return potential_names;
+	return vector::empty_string_vector;
 }
 
 bool unit_type::is_ship() const

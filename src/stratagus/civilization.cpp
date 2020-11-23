@@ -349,7 +349,7 @@ void civilization::initialize()
 		this->unit_sound_set->map_sounds();
 	}
 
-	data_entry::initialize();
+	civilization_base::initialize();
 }
 
 void civilization::check() const

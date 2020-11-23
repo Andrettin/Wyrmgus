@@ -31,6 +31,7 @@
 
 #include "database/sml_data.h"
 #include "gender.h"
+#include "name_generator.h"
 #include "species/taxon.h"
 #include "util/vector_util.h"
 
@@ -66,6 +67,8 @@ void taxon_base::initialize()
 
 		this->get_supertaxon()->add_specimen_names_from(this);
 	}
+
+	name_generator::propagate_ungendered_names(this->specimen_names);
 
 	data_entry::initialize();
 }
@@ -104,34 +107,34 @@ bool taxon_base::is_subtaxon_of(const taxon *other_taxon) const
 	return this->get_supertaxon()->is_subtaxon_of(other_taxon);
 }
 
-std::vector<std::string> taxon_base::get_specimen_names(const gender gender) const
+const std::vector<std::string> &taxon_base::get_specimen_names(const gender gender) const
 {
 	static constexpr size_t minimum_name_count = 10;
 
-	std::vector<std::string> potential_names;
-
-	auto find_iterator = this->specimen_names.find(gender::none);
-	if (find_iterator != this->specimen_names.end()) {
-		vector::merge(potential_names, find_iterator->second);
+	const auto find_iterator = this->specimen_names.find(gender);
+	if (find_iterator != this->specimen_names.end() && find_iterator->second.size() >= minimum_name_count) {
+		return find_iterator->second;
 	}
 
-	if (gender != gender::none) {
-		find_iterator = this->specimen_names.find(gender);
-		if (find_iterator != this->specimen_names.end()) {
-			vector::merge(potential_names, find_iterator->second);
-		}
-	}
-
-	if (potential_names.size() < minimum_name_count && this->get_supertaxon() != nullptr) {
+	if (this->get_supertaxon() != nullptr) {
 		return this->get_supertaxon()->get_specimen_names(gender);
 	}
 
-	return potential_names;
+	if (find_iterator != this->specimen_names.end()) {
+		return find_iterator->second;
+	}
+
+	return vector::empty_string_vector;
 }
 
 void taxon_base::add_specimen_name(const gender gender, const std::string &name)
 {
 	this->specimen_names[gender].push_back(name);
+
+	if (gender == gender::none) {
+		this->specimen_names[gender::male].push_back(name);
+		this->specimen_names[gender::female].push_back(name);
+	}
 
 	if (this->get_supertaxon() != nullptr) {
 		this->get_supertaxon()->add_specimen_name(gender, name);
@@ -143,6 +146,8 @@ void taxon_base::add_specimen_names_from(const taxon_base *other)
 	for (const auto &kv_pair : other->specimen_names) {
 		vector::merge(this->specimen_names[kv_pair.first], kv_pair.second);
 	}
+
+	name_generator::propagate_ungendered_names(other->specimen_names, this->specimen_names);
 
 	if (this->get_supertaxon() != nullptr) {
 		this->get_supertaxon()->add_specimen_names_from(other);

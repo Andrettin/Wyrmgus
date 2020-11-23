@@ -30,6 +30,7 @@
 #include "database/sml_data.h"
 #include "database/sml_operator.h"
 #include "gender.h"
+#include "name_generator.h"
 #include "unit/unit_class.h"
 #include "util/container_util.h"
 #include "util/vector_util.h"
@@ -66,15 +67,33 @@ void civilization_base::process_sml_scope(const sml_data &scope)
 	}
 }
 
+void civilization_base::initialize()
+{
+	name_generator::propagate_ungendered_names(this->personal_names);
+
+	data_entry::initialize();
+}
+
 const std::vector<std::string> &civilization_base::get_personal_names(const gender gender) const
 {
-	auto find_iterator = this->personal_names.find(gender);
+	const auto find_iterator = this->personal_names.find(gender);
 	if (find_iterator != this->personal_names.end()) {
 		return find_iterator->second;
 	}
 
 	return vector::empty_string_vector;
 }
+
+void civilization_base::add_personal_name(const gender gender, const std::string &name)
+{
+	this->personal_names[gender].push_back(name);
+
+	if (gender == gender::none) {
+		this->personal_names[gender::male].push_back(name);
+		this->personal_names[gender::female].push_back(name);
+	}
+}
+
 
 const std::vector<std::string> &civilization_base::get_unit_class_names(const unit_class *unit_class) const
 {
@@ -101,6 +120,8 @@ void civilization_base::add_names_from(const civilization_base *other)
 	for (const auto &kv_pair : other->personal_names) {
 		vector::merge(this->personal_names[kv_pair.first], kv_pair.second);
 	}
+
+	name_generator::propagate_ungendered_names(other->personal_names, this->personal_names);
 
 	vector::merge(this->surnames, other->surnames);
 

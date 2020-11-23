@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-//      (c) Copyright 2019-2020 by Andrettin
+//      (c) Copyright 2020 by Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -27,18 +27,21 @@
 
 #pragma once
 
-#include "util/random.h"
-
-#include <boost/random.hpp>
-
 namespace wyrmgus {
 
-int random::generate_in_range(const int min_value, const int max_value)
+enum class gender;
+
+class name_generator final
 {
-	//we have to use the Boost number distribution here since it is portable (has the same result with different compilers), which the standard library's isn't
-	boost::random::uniform_int_distribution<int> distribution(min_value, max_value);
-	int result = distribution(this->engine);
-	return result;
-}
+public:
+	static void propagate_ungendered_names(const std::map<gender, std::vector<std::string>> &source_name_map, std::map<gender, std::vector<std::string>> &target_name_map);
+
+	static void propagate_ungendered_names(std::map<gender, std::vector<std::string>> &name_map)
+	{
+		name_generator::propagate_ungendered_names(name_map, name_map);
+	}
+
+	name_generator() = delete;
+};
 
 }

@@ -48,6 +48,7 @@ protected:
 
 public:
 	virtual void process_sml_scope(const sml_data &scope) override;
+	virtual void initialize() override;
 
 	species *get_species() const
 	{
@@ -60,11 +61,7 @@ public:
 	}
 
 	const std::vector<std::string> &get_personal_names(const gender gender) const;
-
-	void add_personal_name(const gender gender, const std::string &name)
-	{
-		this->personal_names[gender].push_back(name);
-	}
+	void add_personal_name(const gender gender, const std::string &name);
 
 	const std::vector<std::string> &get_surnames() const
 	{
