@@ -204,7 +204,7 @@ public:
 	void generate_settlement_territories(const int z);
 	wyrmgus::point_set expand_settlement_territories(std::vector<QPoint> &&seeds, const int z, const int block_flags = 0, const int same_flags = 0);
 	void calculate_settlement_territory_tiles(const int z);
-	void GenerateNeutralUnits(wyrmgus::unit_type *unit_type, int quantity, const Vec2i &min_pos, const Vec2i &max_pos, bool grouped, int z);
+	void generate_neutral_units(const wyrmgus::unit_type *unit_type, const int quantity, const QPoint &min_pos, const QPoint &max_pos, const bool grouped, const int z);
 	//Wyrmgus end
 
 	void ClearOverlayTile(const Vec2i &pos, int z);
@@ -228,7 +228,7 @@ public:
 	const CUnitCache &get_tile_unit_cache(const QPoint &pos, int z);
 
 	//Wyrmgus start
-	Vec2i GenerateUnitLocation(const wyrmgus::unit_type *unit_type, const wyrmgus::faction *faction, const Vec2i &min_pos, const Vec2i &max_pos, const int z) const;
+	QPoint generate_unit_location(const wyrmgus::unit_type *unit_type, const wyrmgus::faction *faction, const QPoint &min_pos, const QPoint &max_pos, const int z) const;
 	//Wyrmgus end
 
 	/// Mark a tile as seen by the player.

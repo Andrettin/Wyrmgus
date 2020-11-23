@@ -27,8 +27,9 @@
 
 #include "stratagus.h"
 
-#include "database/defines.h"
 #include "resource.h"
+
+#include "database/defines.h"
 #include "video/video.h"
 
 namespace wyrmgus {

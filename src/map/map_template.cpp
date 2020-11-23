@@ -1049,14 +1049,14 @@ void map_template::apply(const QPoint &template_start_pos, const QPoint &map_sta
 		
 		if (CPlayer::Players[i]->NumTownHalls > 0 || CPlayer::Players[i]->Index == CPlayer::GetThisPlayer()->Index) {
 			for (size_t j = 0; j < this->PlayerLocationGeneratedNeutralUnits.size(); ++j) {
-				CMap::Map.GenerateNeutralUnits(this->PlayerLocationGeneratedNeutralUnits[j].first, this->PlayerLocationGeneratedNeutralUnits[j].second, CPlayer::Players[i]->StartPos - Vec2i(8, 8), CPlayer::Players[i]->StartPos + Vec2i(8, 8), true, z);
+				CMap::Map.generate_neutral_units(this->PlayerLocationGeneratedNeutralUnits[j].first, this->PlayerLocationGeneratedNeutralUnits[j].second, CPlayer::Players[i]->StartPos - QPoint(8, 8), CPlayer::Players[i]->StartPos + QPoint(8, 8), true, z);
 			}
 		}
 	}
 	
 	for (size_t i = 0; i < this->GeneratedNeutralUnits.size(); ++i) {
 		const bool grouped = this->GeneratedNeutralUnits[i].first->get_given_resource() != nullptr && this->GeneratedNeutralUnits[i].first->get_tile_width() == 1 && this->GeneratedNeutralUnits[i].first->get_tile_height() == 1; // group small resources
-		CMap::Map.GenerateNeutralUnits(this->GeneratedNeutralUnits[i].first, this->GeneratedNeutralUnits[i].second, map_start_pos, map_end - Vec2i(1, 1), grouped, z);
+		CMap::Map.generate_neutral_units(this->GeneratedNeutralUnits[i].first, this->GeneratedNeutralUnits[i].second, map_start_pos, map_end - Vec2i(1, 1), grouped, z);
 	}
 
 	//this has to be done at the end, so that it doesn't prevent the application from working properly, due to the map template code thinking that its own area belongs to another map template
@@ -1228,7 +1228,7 @@ void map_template::apply_sites(const QPoint &template_start_pos, const QPoint &m
 				continue;
 			}
 			if (base_unit_type != nullptr) {
-				site_pos = CMap::Map.GenerateUnitLocation(base_unit_type, nullptr, map_start_pos, map_end - Vec2i(1, 1), z);
+				site_pos = CMap::Map.generate_unit_location(base_unit_type, nullptr, map_start_pos, map_end - QPoint(1, 1), z);
 				site_pos += unit_offset;
 			}
 		} else {
@@ -1588,7 +1588,7 @@ void map_template::ApplyConnectors(const QPoint &template_start_pos, const QPoin
 			if (unit_raw_pos.x != -1 || unit_raw_pos.y != -1) {
 				continue;
 			}
-			unit_pos = CMap::Map.GenerateUnitLocation(type, nullptr, map_start_pos, map_end - Vec2i(1, 1), z);
+			unit_pos = CMap::Map.generate_unit_location(type, nullptr, map_start_pos, map_end - QPoint(1, 1), z);
 			unit_pos += unit_offset;
 		}
 		if (!CMap::Map.Info.IsPointOnMap(unit_pos, z) || unit_pos.x < map_start_pos.x() || unit_pos.y < map_start_pos.y()) {
@@ -1631,7 +1631,7 @@ void map_template::ApplyConnectors(const QPoint &template_start_pos, const QPoin
 			if (unit_raw_pos.x != -1 || unit_raw_pos.y != -1) {
 				continue;
 			}
-			unit_pos = CMap::Map.GenerateUnitLocation(type, nullptr, map_start_pos, map_end - Vec2i(1, 1), z);
+			unit_pos = CMap::Map.generate_unit_location(type, nullptr, map_start_pos, map_end - QPoint(1, 1), z);
 			unit_pos += unit_offset;
 		}
 		if (!CMap::Map.Info.IsPointOnMap(unit_pos, z) || unit_pos.x < map_start_pos.x() || unit_pos.y < map_start_pos.y()) {
@@ -1683,7 +1683,7 @@ void map_template::ApplyUnits(const QPoint &template_start_pos, const QPoint &ma
 			if (unit_raw_pos.x != -1 || unit_raw_pos.y != -1) {
 				continue;
 			}
-			unit_pos = CMap::Map.GenerateUnitLocation(type, std::get<2>(this->Units[i]), map_start_pos, map_end - Vec2i(1, 1), z);
+			unit_pos = CMap::Map.generate_unit_location(type, std::get<2>(this->Units[i]), map_start_pos, map_end - QPoint(1, 1), z);
 			unit_pos += unit_offset;
 		}
 		if (!CMap::Map.Info.IsPointOnMap(unit_pos, z) || unit_pos.x < map_start_pos.x() || unit_pos.y < map_start_pos.y()) {
@@ -1737,7 +1737,7 @@ void map_template::ApplyUnits(const QPoint &template_start_pos, const QPoint &ma
 			if (unit_raw_pos.x != -1 || unit_raw_pos.y != -1) {
 				continue;
 			}
-			unit_pos = CMap::Map.GenerateUnitLocation(hero->get_unit_type(), std::get<2>(this->Heroes[i]), map_start_pos, map_end - Vec2i(1, 1), z);
+			unit_pos = CMap::Map.generate_unit_location(hero->get_unit_type(), std::get<2>(this->Heroes[i]), map_start_pos, map_end - QPoint(1, 1), z);
 			unit_pos += unit_offset;
 		}
 		if (!CMap::Map.Info.IsPointOnMap(unit_pos, z) || unit_pos.x < map_start_pos.x() || unit_pos.y < map_start_pos.y()) {
@@ -1896,7 +1896,7 @@ void map_template::apply_historical_unit(const historical_unit *historical_unit,
 		unit_pos = this->get_location_map_position(unit_location, template_start_pos, map_start_pos, true);
 
 		if (unit_pos.x() == -1 && unit_pos.y() == -1) {
-			unit_pos = CMap::Map.GenerateUnitLocation(unit_type, unit_faction, map_start_pos, map_end - Vec2i(1, 1), z);
+			unit_pos = CMap::Map.generate_unit_location(unit_type, unit_faction, map_start_pos, map_end - QPoint(1, 1), z);
 			if (unit_pos.x() != -1 && unit_pos.y() != -1) {
 				unit_pos += unit_type->get_tile_center_pos_offset();
 			}
@@ -1988,7 +1988,7 @@ void map_template::apply_character(character *character, const QPoint &template_
 		unit_pos = this->get_location_map_position(character_location, template_start_pos, map_start_pos, true);
 
 		if (unit_pos.x() == -1 && unit_pos.y() == -1) {
-			unit_pos = CMap::Map.GenerateUnitLocation(unit_type, unit_faction, map_start_pos, map_end - Vec2i(1, 1), z);
+			unit_pos = CMap::Map.generate_unit_location(unit_type, unit_faction, map_start_pos, map_end - QPoint(1, 1), z);
 			if (unit_pos.x() != -1 && unit_pos.y() != -1) {
 				unit_pos += unit_type->get_tile_center_pos_offset();
 			}

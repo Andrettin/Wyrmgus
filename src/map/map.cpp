@@ -306,67 +306,71 @@ const CUnitCache &CMap::get_tile_unit_cache(const QPoint &pos, int z)
 	return this->Field(pos, z)->UnitCache;
 }
 
-Vec2i CMap::GenerateUnitLocation(const wyrmgus::unit_type *unit_type, const wyrmgus::faction *faction, const Vec2i &min_pos, const Vec2i &max_pos, const int z) const
+QPoint CMap::generate_unit_location(const wyrmgus::unit_type *unit_type, const wyrmgus::faction *faction, const QPoint &min_pos, const QPoint &max_pos, const int z) const
 {
 	if (SaveGameLoading) {
-		return Vec2i(-1, -1);
+		return QPoint(-1, -1);
 	}
 	
 	CPlayer *player = GetFactionPlayer(faction);
 	
-	Vec2i random_pos(-1, -1);
+	QPoint random_pos(-1, -1);
 	
 	std::vector<const wyrmgus::terrain_type *> allowed_terrains;
 	if (unit_type->BoolFlag[FAUNA_INDEX].value && unit_type->get_species() != nullptr) { //if the unit is a fauna one, it has to start on terrain it is native to
 		allowed_terrains = unit_type->get_species()->get_native_terrain_types();
 	}
 	
-	for (size_t i = 0; i < unit_type->SpawnUnits.size(); ++i) {
-		wyrmgus::unit_type *spawned_type = unit_type->SpawnUnits[i];
+	for (const wyrmgus::unit_type *spawned_type : unit_type->SpawnUnits) {
 		if (spawned_type->BoolFlag[FAUNA_INDEX].value && spawned_type->get_species()) {
 			wyrmgus::vector::merge(allowed_terrains, spawned_type->get_species()->get_native_terrain_types());
 		}
 	}
 
-	std::vector<Vec2i> potential_positions;
-	for (int x = min_pos.x; x <= (max_pos.x - (unit_type->get_tile_width() - 1)); ++x) {
-		for (int y = min_pos.y; y <= (max_pos.y - (unit_type->get_tile_height() - 1)); ++y) {
-			potential_positions.push_back(Vec2i(x, y));
+	const CUnitStats &stats = player != nullptr ? unit_type->Stats[player->get_index()] : unit_type->MapDefaultStat;
+
+	std::vector<QPoint> potential_positions;
+	for (int x = min_pos.x(); x <= (max_pos.x() - (unit_type->get_tile_width() - 1)); ++x) {
+		for (int y = min_pos.y(); y <= (max_pos.y() - (unit_type->get_tile_height() - 1)); ++y) {
+			potential_positions.push_back(QPoint(x, y));
 		}
 	}
 	
 	while (!potential_positions.empty()) {
-		random_pos = potential_positions[SyncRand(potential_positions.size())];
-		wyrmgus::vector::remove(potential_positions, random_pos);
+		random_pos = wyrmgus::vector::take_random(potential_positions);
 		
 		if (!this->Info.IsPointOnMap(random_pos, z) || (this->is_point_in_a_subtemplate_area(random_pos, z) && GameCycle == 0)) {
 			continue;
 		}
 		
-		if (allowed_terrains.size() > 0 && std::find(allowed_terrains.begin(), allowed_terrains.end(), GetTileTopTerrain(random_pos, false, z)) == allowed_terrains.end()) { //if the unit is a fauna one, it has to start on terrain it is native to
+		const wyrmgus::tile *tile = this->Field(random_pos, z);
+
+		if (!allowed_terrains.empty() && !wyrmgus::vector::contains(allowed_terrains, tile->get_top_terrain())) {
+			//if the unit is a fauna one, it has to start on terrain it is native to
 			continue;
 		}
 		
 		std::vector<CUnit *> table;
 		if (player != nullptr) {
-			Select(random_pos - Vec2i(32, 32), random_pos + Vec2i(unit_type->get_tile_width() - 1, unit_type->get_tile_height() - 1) + Vec2i(32, 32), table, z, MakeAndPredicate(HasNotSamePlayerAs(*player), HasNotSamePlayerAs(*CPlayer::Players[PlayerNumNeutral])));
+			Select(random_pos - QPoint(32, 32), random_pos + QPoint(unit_type->get_tile_width() - 1, unit_type->get_tile_height() - 1) + QPoint(32, 32), table, z, MakeAndPredicate(HasNotSamePlayerAs(*player), HasNotSamePlayerAs(*CPlayer::Players[PlayerNumNeutral])));
 		} else if (unit_type->get_given_resource() == nullptr) {
 			if (unit_type->BoolFlag[NEUTRAL_HOSTILE_INDEX].value || unit_type->BoolFlag[PREDATOR_INDEX].value || (unit_type->BoolFlag[PEOPLEAVERSION_INDEX].value && (unit_type->UnitType == UnitTypeType::Fly || unit_type->UnitType == UnitTypeType::Space))) {
-				Select(random_pos - Vec2i(16, 16), random_pos + Vec2i(unit_type->get_tile_width() - 1, unit_type->get_tile_height() - 1) + Vec2i(16, 16), table, z, MakeOrPredicate(HasNotSamePlayerAs(*CPlayer::Players[PlayerNumNeutral]), HasSameTypeAs(*settlement_site_unit_type)));
+				Select(random_pos - QPoint(16, 16), random_pos + QPoint(unit_type->get_tile_width() - 1, unit_type->get_tile_height() - 1) + QPoint(16, 16), table, z, MakeOrPredicate(HasNotSamePlayerAs(*CPlayer::Players[PlayerNumNeutral]), HasSameTypeAs(*settlement_site_unit_type)));
 			} else {
-				Select(random_pos - Vec2i(8, 8), random_pos + Vec2i(unit_type->get_tile_width() - 1, unit_type->get_tile_height() - 1) + Vec2i(8, 8), table, z, HasNotSamePlayerAs(*CPlayer::Players[PlayerNumNeutral]));
+				Select(random_pos - QPoint(8, 8), random_pos + QPoint(unit_type->get_tile_width() - 1, unit_type->get_tile_height() - 1) + QPoint(8, 8), table, z, HasNotSamePlayerAs(*CPlayer::Players[PlayerNumNeutral]));
 			}
 		} else if (unit_type->get_given_resource() != nullptr && !unit_type->BoolFlag[BUILDING_INDEX].value) { //for non-building resources (i.e. wood piles), place them within a certain distance of player units, to prevent them from blocking the way
-			Select(random_pos - Vec2i(4, 4), random_pos + Vec2i(unit_type->get_tile_width() - 1, unit_type->get_tile_height() - 1) + Vec2i(4, 4), table, z, HasNotSamePlayerAs(*CPlayer::Players[PlayerNumNeutral]));
+			Select(random_pos - QPoint(4, 4), random_pos + QPoint(unit_type->get_tile_width() - 1, unit_type->get_tile_height() - 1) + QPoint(4, 4), table, z, HasNotSamePlayerAs(*CPlayer::Players[PlayerNumNeutral]));
 		}
 		
 		if (!table.empty()) {
 			continue;
 		}
 
-		bool passable_surroundings = true; //check if the unit won't be placed next to unpassable terrain
-		for (int x = random_pos.x - 1; x < random_pos.x + unit_type->get_tile_width() + 1; ++x) {
-			for (int y = random_pos.y - 1; y < random_pos.y + unit_type->get_tile_height() + 1; ++y) {
+		//check if the unit won't be placed next to unpassable terrain
+		bool passable_surroundings = true;
+		for (int x = random_pos.x() - 1; x < random_pos.x() + unit_type->get_tile_width() + 1; ++x) {
+			for (int y = random_pos.y() - 1; y < random_pos.y() + unit_type->get_tile_height() + 1; ++y) {
 				if (Map.Info.IsPointOnMap(x, y, z) && Map.Field(x, y, z)->CheckMask(MapFieldUnpassable)) {
 					passable_surroundings = false;
 					break;
@@ -385,7 +389,7 @@ Vec2i CMap::GenerateUnitLocation(const wyrmgus::unit_type *unit_type, const wyrm
 		}
 	}
 	
-	return Vec2i(-1, -1);
+	return QPoint(-1, -1);
 }
 //Wyrmgus end
 
@@ -3370,17 +3374,17 @@ void CMap::calculate_settlement_territory_tiles(const int z)
 	}
 }
 
-void CMap::GenerateNeutralUnits(wyrmgus::unit_type *unit_type, int quantity, const Vec2i &min_pos, const Vec2i &max_pos, bool grouped, int z)
+void CMap::generate_neutral_units(const wyrmgus::unit_type *unit_type, const int quantity, const QPoint &min_pos, const QPoint &max_pos, const bool grouped, const int z)
 {
 	if (SaveGameLoading) {
 		return;
 	}
 	
-	Vec2i unit_pos(-1, -1);
+	QPoint unit_pos(-1, -1);
 	
 	for (int i = 0; i < quantity; ++i) {
 		if (i == 0 || !grouped) {
-			unit_pos = GenerateUnitLocation(unit_type, nullptr, min_pos, max_pos, z);
+			unit_pos = this->generate_unit_location(unit_type, nullptr, min_pos, max_pos, z);
 		}
 		if (!this->Info.IsPointOnMap(unit_pos, z)) {
 			continue;
