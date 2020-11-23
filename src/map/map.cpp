@@ -349,6 +349,11 @@ QPoint CMap::generate_unit_location(const wyrmgus::unit_type *unit_type, const w
 			//if the unit is a fauna one, it has to start on terrain it is native to
 			continue;
 		}
+
+		//do not generate organic units on deserts if they would die from that
+		if ((tile->get_flags() & MapFieldDesert) && unit_type->BoolFlag[ORGANIC_INDEX].value && stats.Variables[DEHYDRATIONIMMUNITY_INDEX].Value <= 0) {
+			continue;
+		}
 		
 		std::vector<CUnit *> table;
 		if (player != nullptr) {
