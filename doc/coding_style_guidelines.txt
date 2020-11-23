@@ -10,7 +10,7 @@ Coding Style Guidelines for Wyrmgus
 
 5. Header files are included in the following order: first the header which corresponds to the current source file, then the other Wyrmgus headers, then headers for third-party libraries, then Qt headers, and finally standard library headers.
 
-6. Class definitions should be ordered in the following fashion: first, any macros which define a portion of the class (e.g. the Q_OBJECT macro). Then, aliases, followed by enumerations, constant expressions, static methods, static variables, constructors/destructor, instance methods and finally instance variables. Within each of these, public ones are to be followed by protected members, and finally private ones.
+6. Class definitions should be ordered in the following fashion: first, any macros which define a portion of the class (e.g. the Q_OBJECT macro). Then, aliases, followed by enumerations, constant expressions, static methods, static variables, constructors/destructor, instance methods and finally instance variables.
 
 7. The precompiled headers should include all library/third party headers used by the engine, but no headers belonging to Wyrmgus itself. This way, compile times are reduced substantially, without unnecessarily causing a full recompilation.
 
