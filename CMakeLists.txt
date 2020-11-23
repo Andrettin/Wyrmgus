@@ -406,6 +406,7 @@ set(stratagusmain_SRCS
 	src/stratagus/script_province.cpp
 	src/stratagus/selection.cpp
 	src/stratagus/stratagus.cpp
+	src/stratagus/text_processor.cpp
 	src/stratagus/title.cpp
 	src/stratagus/translate.cpp
 	src/stratagus/world.cpp
@@ -1019,6 +1020,7 @@ set(stratagus_generic_HDRS
 	src/stratagus/magic_domain.h
 	src/stratagus/name_generator.h
 	src/stratagus/player_container.h
+	src/stratagus/text_processor.h
 	src/stratagus/vassalage_type.h
 )
 

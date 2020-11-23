@@ -53,6 +53,7 @@
 #include "sound/unitsound.h"
 #include "species/species.h"
 #include "spell/spell.h"
+#include "text_processor.h"
 #include "time/calendar.h"
 #include "unit/unit.h"
 #include "unit/unit_class.h"
@@ -462,6 +463,12 @@ void character::initialize()
 
 	for (const std::unique_ptr<historical_location> &location : this->HistoricalLocations) {
 		location->initialize();
+	}
+
+	//process the description text for the character
+	if (!this->get_description().empty()) {
+		const text_processor text_processor(this->get_default_faction());
+		this->set_description(text_processor.process_text(this->get_description()));
 	}
 
 	data_entry::initialize();
