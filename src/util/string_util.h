@@ -49,22 +49,39 @@ inline size_t ci_find(const std::string &str, const std::string &find)
 	return iterator - str.begin();
 }
 
-inline std::vector<std::string> split(const std::string &str, const char delimiter)
+template <typename string_list_type = std::vector<std::string>>
+inline string_list_type split(const std::string &str, const char delimiter)
 {
-	std::vector<std::string> string_list;
+	string_list_type string_list;
 
 	size_t start_pos = 0;
 	size_t find_pos = 0;
 	while ((find_pos = str.find(delimiter, start_pos)) != std::string::npos) {
 		std::string string_element = str.substr(start_pos, find_pos - start_pos);
-		string_list.push_back(string_element);
+
+		if constexpr (std::is_same_v<string_list_type, std::queue<std::string>>) {
+			string_list.push(std::move(string_element));
+		} else {
+			string_list.push_back(std::move(string_element));
+		}
+
 		start_pos = find_pos + 1;
 	}
 
 	std::string string_element = str.substr(start_pos, str.length() - start_pos);
-	string_list.push_back(string_element);
+
+	if constexpr (std::is_same_v<string_list_type, std::queue<std::string>>) {
+		string_list.push(std::move(string_element));
+	} else {
+		string_list.push_back(std::move(string_element));
+	}
 
 	return string_list;
+}
+
+inline std::queue<std::string> split_to_queue(const std::string &str, const char delimiter)
+{
+	return string::split<std::queue<std::string>>(str, delimiter);
 }
 
 inline void replace(std::string &str, const std::string &find, const std::string &replace)
