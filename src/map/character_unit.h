@@ -63,7 +63,7 @@ public:
 
 private:
 	std::vector<const unit_type *> unit_types;
-	bool ai_active = false;
+	bool ai_active = true;
 };
 
 }
