@@ -76,6 +76,7 @@
 #include "sound/sound_server.h"
 #include "sound/unitsound.h"
 #include "sound/unit_sound_type.h"
+#include "species/species.h"
 #include "spell/spell.h"
 #include "time/time_of_day.h"
 #include "translate.h"
@@ -2998,9 +2999,10 @@ void CUnit::AssignToPlayer(CPlayer &player)
 	//Wyrmgus start
 	if (!SaveGameLoading) {
 		//assign a gender to the unit
-		if (this->get_gender() == wyrmgus::gender::none && this->Type->BoolFlag[ORGANIC_INDEX].value) { // Gender: 0 = Not Set, 1 = Male, 2 = Female, 3 = Asexual
-			this->Variable[GENDER_INDEX].Value = SyncRand(2) + 1;
-			this->Variable[GENDER_INDEX].Max = static_cast<int>(wyrmgus::gender::count);
+		if (this->get_gender() == wyrmgus::gender::none && this->Type->BoolFlag[ORGANIC_INDEX].value && this->get_species() != nullptr && !this->get_species()->is_asexual()) {
+			//Gender: 0 = Not Set, 1 = Male, 2 = Female
+			this->Variable[GENDER_INDEX].Value = wyrmgus::random::get()->generate(2) + 1;
+			this->Variable[GENDER_INDEX].Max = static_cast<int>(wyrmgus::gender::count) - 1;
 			this->Variable[GENDER_INDEX].Enable = 1;
 		}
 		
