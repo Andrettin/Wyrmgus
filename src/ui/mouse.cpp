@@ -3006,8 +3006,7 @@ void UIHandleButtonUp(unsigned button)
 				} else if (Selected[0]->Burning) {
 					// FIXME: use GameSounds.Burning
 					PlayGameSound(wyrmgus::sound::get("burning"), MaxSampleVolume);
-				} else if (Selected[0]->Player == CPlayer::GetThisPlayer() || CPlayer::GetThisPlayer()->IsTeamed(*Selected[0])
-						   || CPlayer::GetThisPlayer()->HasBuildingAccess(*Selected[0]->Player)) {
+				} else if (Selected[0]->Player == CPlayer::GetThisPlayer() || CPlayer::GetThisPlayer()->IsTeamed(*Selected[0]) || CPlayer::GetThisPlayer()->HasBuildingAccess(*Selected[0]->Player) || (Selected[0]->Player->get_index() == PlayerNumNeutral && !Selected[0]->Type->BoolFlag[NEUTRAL_HOSTILE_INDEX].value)) {
 					PlayUnitSound(*Selected[0], wyrmgus::unit_sound_type::selected);
 				} else {
 					PlayGameSound(GameSounds.Click.Sound, MaxSampleVolume);
