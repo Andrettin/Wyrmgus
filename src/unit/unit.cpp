@@ -3034,6 +3034,22 @@ const wyrmgus::player_color *CUnit::get_player_color() const
 	return nullptr;
 }
 
+const wyrmgus::species *CUnit::get_species() const
+{
+	if (this->Type->get_species() != nullptr) {
+		return this->Type->get_species();
+	}
+
+	if (this->Type->BoolFlag[ORGANIC_INDEX].value) {
+		const wyrmgus::civilization *civilization = this->get_civilization();
+		if (civilization != nullptr) {
+			return civilization->get_species();
+		}
+	}
+
+	return nullptr;
+}
+
 const wyrmgus::civilization *CUnit::get_civilization() const
 {
 	return this->Type->get_player_civilization(this->Player);

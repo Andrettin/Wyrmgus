@@ -144,6 +144,7 @@ public:
 
 	const wyrmgus::player_color *get_player_color() const;
 
+	const wyrmgus::species *get_species() const;
 	const wyrmgus::civilization *get_civilization() const;
 
 	/// Draw a single unit
