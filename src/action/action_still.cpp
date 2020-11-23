@@ -214,7 +214,8 @@ static bool MoveRandomly(CUnit &unit)
 	//move if possible
 	if (pos != unit.tilePos) {
 		UnmarkUnitFieldFlags(unit);
-		if (UnitCanBeAt(unit, pos, unit.MapLayer->ID)) {
+
+		if (UnitCanBeAt(unit, pos, unit.MapLayer->ID) && CheckObstaclesBetweenTiles(unit.tilePos, pos, unit.Type->MovementMask, unit.MapLayer->ID)) {
 			MarkUnitFieldFlags(unit);
 			//Wyrmgus start
 			//prefer terrains which this unit's species is native to; only go to other ones if is already in a non-native terrain type
