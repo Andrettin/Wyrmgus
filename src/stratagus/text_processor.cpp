@@ -99,6 +99,8 @@ std::string text_processor::process_faction_tokens(const wyrmgus::faction *facti
 
 	if (token == "name") {
 		return faction->get_name();
+	} else if (token == "titled_name") {
+		return faction->get_default_titled_name();
 	}
 
 	throw std::runtime_error("Failed to process faction token \"" + token + "\".");

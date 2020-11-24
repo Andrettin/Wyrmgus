@@ -1895,12 +1895,10 @@ std::string CPlayer::get_full_name() const
 	if (!IsNetworkGame()) {
 		const wyrmgus::faction *faction = this->get_faction();
 
-		if (faction != nullptr && !faction->uses_simple_name()) {
-			if (faction->uses_short_name()) {
-				return faction->Adjective + " " + std::string(this->get_faction_title_name());
-			} else {
-				return std::string(this->get_faction_title_name()) + " of " + this->Name;
-			}
+		if (faction != nullptr) {
+			const wyrmgus::government_type government_type = this->get_government_type();
+			const wyrmgus::faction_tier tier = this->get_faction_tier();
+			return faction->get_titled_name(government_type, tier);
 		}
 	}
 
