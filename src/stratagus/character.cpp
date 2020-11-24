@@ -568,7 +568,7 @@ religion *character::get_religion() const
 	return nullptr;
 }
 
-language *character::get_language() const
+const language *character::get_language() const
 {
 	if (this->civilization != nullptr) {
 		return this->civilization->get_language();

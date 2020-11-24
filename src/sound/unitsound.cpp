@@ -40,6 +40,7 @@
 #include "map/tile.h"
 #include "map/tileset.h"
 #include "player.h"
+#include "sound/game_sound_set.h"
 #include "sound/sound.h"
 #include "sound/sound_server.h"
 #include "sound/unit_sound_type.h"
@@ -234,11 +235,14 @@ const sound *unit_sound_set::get_sound_for_unit(const unit_sound_type unit_sound
 				return this->Dead[ANIMATIONS_DEATHTYPES].Sound;
 			}
 		case unit_sound_type::work_completed:
-			return GameSounds.WorkComplete[CPlayer::GetThisPlayer()->Race].Sound;
+			if (CPlayer::GetThisPlayer()->get_civilization() != nullptr) {
+				return CPlayer::GetThisPlayer()->get_civilization()->get_work_complete_sound();
+			}
+			break;
 		case unit_sound_type::construction:
-			return GameSounds.BuildingConstruction[CPlayer::GetThisPlayer()->Race].Sound;
+			return game_sound_set::get()->get_building_construction_sound();
 		case unit_sound_type::docking:
-			return GameSounds.Docking.Sound;
+			return game_sound_set::get()->get_docking_sound();
 		case unit_sound_type::repairing:
 			if (this->Repair.Sound != nullptr) {
 				return this->Repair.Sound;

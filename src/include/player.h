@@ -778,7 +778,7 @@ class PlayerRace
 {
 public:
 	//Wyrmgus start
-	std::string TranslateName(const std::string &name, wyrmgus::language *language);
+	std::string TranslateName(const std::string &name, const wyrmgus::language *language);
 	//Wyrmgus end
 
 public:

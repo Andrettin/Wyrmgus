@@ -62,6 +62,7 @@
 #include "quest/achievement.h"
 #include "script/condition/condition.h"
 #include "script/trigger.h"
+#include "sound/game_sound_set.h"
 #include "sound/sound.h"
 #include "sound/unit_sound_type.h"
 #include "spell/spell.h"
@@ -1772,7 +1773,7 @@ void CButtonPanel::DoClicked_SpellCast(int button)
 	const wyrmgus::spell *spell = wyrmgus::spell::get_all()[spell_id];
 	if (KeyModifiers & ModifierControl) {
 		if (spell->get_autocast_info() == nullptr) {
-			PlayGameSound(GameSounds.PlacementError[CPlayer::GetThisPlayer()->Race].Sound, MaxSampleVolume);
+			PlayGameSound(wyrmgus::game_sound_set::get()->get_placement_error_sound(), MaxSampleVolume);
 			return;
 		}
 
@@ -1944,7 +1945,7 @@ void CButtonPanel::DoClicked_Train(const std::unique_ptr<wyrmgus::button> &butto
 		bool has_adjacent_rail = Selected[best_training_place]->HasAdjacentRailForUnitType(unit_type);
 		if (!has_adjacent_rail) {
 			CPlayer::GetThisPlayer()->Notify(NotifyYellow, Selected[best_training_place]->tilePos, Selected[best_training_place]->MapLayer->ID, "%s", _("The unit requires railroads to be placed on"));
-			PlayGameSound(GameSounds.PlacementError[CPlayer::GetThisPlayer()->Race].Sound, MaxSampleVolume);
+			PlayGameSound(wyrmgus::game_sound_set::get()->get_placement_error_sound(), MaxSampleVolume);
 			return;
 		}
 	}
@@ -1963,8 +1964,8 @@ void CButtonPanel::DoClicked_Train(const std::unique_ptr<wyrmgus::button> &butto
 			UI.StatusLine.Clear();
 			UI.StatusLine.ClearCosts();
 		} else if (CPlayer::GetThisPlayer()->CheckLimits(*unit_type) == -3) {
-			if (GameSounds.NotEnoughFood[CPlayer::GetThisPlayer()->Race].Sound) {
-				PlayGameSound(GameSounds.NotEnoughFood[CPlayer::GetThisPlayer()->Race].Sound, MaxSampleVolume);
+			if (CPlayer::GetThisPlayer()->get_civilization() != nullptr && CPlayer::GetThisPlayer()->get_civilization()->get_not_enough_food_sound() != nullptr) {
+				PlayGameSound(CPlayer::GetThisPlayer()->get_civilization()->get_not_enough_food_sound(), MaxSampleVolume);
 			}
 			return;
 		}
@@ -2095,8 +2096,8 @@ void CButtonPanel::DoClicked_Buy(int button)
 			SelectedUnitChanged();
 		}
 	} else if (CPlayer::GetThisPlayer()->CheckLimits(*wyrmgus::unit_manager::get()->GetSlotUnit(CurrentButtons[button]->Value).Type) == -3) {
-		if (GameSounds.NotEnoughFood[CPlayer::GetThisPlayer()->Race].Sound) {
-			PlayGameSound(GameSounds.NotEnoughFood[CPlayer::GetThisPlayer()->Race].Sound, MaxSampleVolume);
+		if (CPlayer::GetThisPlayer()->get_civilization() != nullptr && CPlayer::GetThisPlayer()->get_civilization()->get_not_enough_food_sound() != nullptr) {
+			PlayGameSound(CPlayer::GetThisPlayer()->get_civilization()->get_not_enough_food_sound(), MaxSampleVolume);
 		}
 	}
 }
@@ -2217,18 +2218,18 @@ void CButtonPanel::DoClicked(int button)
 		} else {
 			CPlayer::GetThisPlayer()->Notify(NotifyYellow, Selected[0]->tilePos, Selected[0]->MapLayer->ID, "%s", _("The requirements have not been fulfilled"));
 		}
-		PlayGameSound(GameSounds.PlacementError[CPlayer::GetThisPlayer()->Race].Sound, MaxSampleVolume);
+		PlayGameSound(wyrmgus::game_sound_set::get()->get_placement_error_sound(), MaxSampleVolume);
 		return;
 	}
 
 	if (GetButtonCooldown(*Selected[0], *CurrentButtons[button]) > 0) {
 		CPlayer::GetThisPlayer()->Notify(NotifyYellow, Selected[0]->tilePos, Selected[0]->MapLayer->ID, "%s", _("The cooldown is active"));
-		PlayGameSound(GameSounds.PlacementError[CPlayer::GetThisPlayer()->Race].Sound, MaxSampleVolume);
+		PlayGameSound(wyrmgus::game_sound_set::get()->get_placement_error_sound(), MaxSampleVolume);
 		return;
 	}
 	//Wyrmgus end
 
-	PlayGameSound(GameSounds.Click.Sound, MaxSampleVolume);
+	PlayGameSound(wyrmgus::game_sound_set::get()->get_click_sound(), MaxSampleVolume);
 	if (CurrentButtons[button]->CommentSound.Sound) {
 		PlayGameSound(CurrentButtons[button]->CommentSound.Sound, MaxSampleVolume);
 	}

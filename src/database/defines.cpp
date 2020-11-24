@@ -31,6 +31,7 @@
 #include "database/preferences.h"
 #include "database/sml_data.h"
 #include "database/sml_parser.h"
+#include "sound/game_sound_set.h"
 #include "video/video.h"
 
 namespace wyrmgus {
@@ -76,7 +77,13 @@ void defines::process_sml_property(const sml_property &property)
 
 void defines::process_sml_scope(const sml_data &scope)
 {
-	database::process_sml_scope_for_object(this, scope);
+	const std::string &tag = scope.get_tag();
+
+	if (tag == "game_sound_set") {
+		database::process_sml_data(game_sound_set::get(), scope);
+	} else {
+		database::process_sml_scope_for_object(this, scope);
+	}
 }
 
 void defines::initialize()

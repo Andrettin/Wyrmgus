@@ -47,6 +47,7 @@
 #include "script.h"
 #include "settings.h"
 #include "spell/spell.h"
+#include "sound/game_sound_set.h"
 #include "sound/sound.h"
 #include "translate.h"
 #include "ui/interface.h"
@@ -925,7 +926,7 @@ static void DoNextReplay()
 		}
 	} else if (!strcmp(action, "chat")) {
 		SetMessage("%s", val);
-		PlayGameSound(GameSounds.ChatMessage.Sound, MaxSampleVolume);
+		PlayGameSound(wyrmgus::game_sound_set::get()->get_chat_message_sound(), MaxSampleVolume);
 	} else if (!strcmp(action, "quit")) {
 		CommandQuit(arg1);
 	} else {

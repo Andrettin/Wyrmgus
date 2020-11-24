@@ -33,6 +33,7 @@
 
 #include "ai.h"
 #include "animation.h"
+#include "civilization.h"
 #include "iolib.h"
 #include "map/map_layer.h"
 #include "script.h"
@@ -156,13 +157,11 @@ bool COrder_Research::ParseSpecificData(lua_State *l, int &j, const char *value,
 			player.Notify(NotifyGreen, unit.tilePos, unit.MapLayer->ID, _("%s: research complete"), upgrade.get_name().c_str());
 		}
 		if (&player == CPlayer::GetThisPlayer()) {
-			//Wyrmgus start
-//			wyrmgus::sound *sound = GameSounds.ResearchComplete[player.Race].Sound;
-			wyrmgus::sound *sound = GameSounds.ResearchComplete[unit.Player->Race].Sound;
-			if (sound == nullptr) {
-				sound = GameSounds.WorkComplete[unit.Player->Race].Sound;
+			const wyrmgus::civilization *civilization = unit.Player->get_civilization();
+			const wyrmgus::sound *sound = nullptr;
+			if (civilization != nullptr) {
+				sound = civilization->get_research_complete_sound();
 			}
-			//Wyrmgus end
 
 			if (sound != nullptr) {
 				PlayGameSound(sound, MaxSampleVolume);

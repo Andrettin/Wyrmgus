@@ -44,25 +44,6 @@ extern void SetSoundRange(wyrmgus::sound *sound, unsigned char range);
 constexpr int MaxSampleVolume = 255;  /// Maximum sample volume
 
 /**
-**  Global game sounds, not associated to any unit-type
-*/
-class GameSound
-{
-public:
-	SoundConfig PlacementError[MAX_RACES];        /// used by ui
-	SoundConfig PlacementSuccess[MAX_RACES];      /// used by ui
-	SoundConfig Click;                            /// used by ui
-	SoundConfig Docking;                          /// ship reaches coast
-	SoundConfig BuildingConstruction[MAX_RACES];  /// building under construction
-	SoundConfig WorkComplete[MAX_RACES];          /// building ready
-	SoundConfig Rescue[MAX_RACES];                /// rescue units
-	SoundConfig ChatMessage;                      /// chat message
-	SoundConfig ResearchComplete[MAX_RACES];      /// research complete message
-	SoundConfig NotEnoughRes[MAX_RACES][MaxCosts];/// not enough resources message
-	SoundConfig NotEnoughFood[MAX_RACES];         /// not enough food message
-};
-
-/**
 ** A possible value for Number in the Sound struct: means a simple sound
 */
 constexpr int ONE_SOUND = 0;
@@ -168,8 +149,6 @@ struct Origin {
 	unsigned Id;        /// unique identifier (if the pointer has been shared)
 };
 
-extern GameSound GameSounds;  /// Game sound configuration
-
 extern bool CallbackMusic;  /// flag true callback ccl if stops
 
 /// global range control (max cut off distance for sound)
@@ -184,7 +163,7 @@ extern void PlayUnitSound(const CUnit &unit, wyrmgus::sound *sound);
 /// Play a missile sound
 extern void PlayMissileSound(const Missile &missile, wyrmgus::sound *sound);
 /// Play a game sound
-extern void PlayGameSound(wyrmgus::sound *sound, unsigned char volume, bool always = false);
+extern void PlayGameSound(const wyrmgus::sound *sound, unsigned char volume, const bool always = false);
 
 /// Modify the range of a given sound.
 extern void SetSoundRange(wyrmgus::sound *sound, unsigned char range);

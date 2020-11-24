@@ -1324,8 +1324,8 @@ static int CclGetCivilizationData(lua_State *l)
 		}
 		return 1;
 	} else if (!strcmp(data, "Language")) {
-		wyrmgus::language *language = civilization->get_language();
-		if (language) {
+		const wyrmgus::language *language = civilization->get_language();
+		if (language != nullptr) {
 			lua_pushstring(l, language->get_identifier().c_str());
 		} else {
 			lua_pushstring(l, "");

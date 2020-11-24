@@ -50,8 +50,8 @@ class defines final : public QObject, public singleton<defines>
 {
 	Q_OBJECT
 
-	Q_PROPERTY(wyrmgus::font* small_font MEMBER small_font READ get_small_font)
-	Q_PROPERTY(wyrmgus::font* game_font MEMBER game_font READ get_game_font)
+	Q_PROPERTY(wyrmgus::font* small_font MEMBER small_font)
+	Q_PROPERTY(wyrmgus::font* game_font MEMBER game_font)
 	Q_PROPERTY(wyrmgus::font_color* default_font_color MEMBER default_font_color READ get_default_font_color)
 	Q_PROPERTY(wyrmgus::font_color* default_highlight_font_color MEMBER default_highlight_font_color READ get_default_highlight_font_color)
 	Q_PROPERTY(wyrmgus::font_color* ally_font_color MEMBER ally_font_color READ get_ally_font_color)
@@ -88,12 +88,12 @@ public:
 	void process_sml_scope(const sml_data &scope);
 	void initialize();
 
-	font *get_small_font() const
+	const font *get_small_font() const
 	{
 		return this->small_font;
 	}
 
-	font *get_game_font() const
+	const font *get_game_font() const
 	{
 		return this->game_font;
 	}

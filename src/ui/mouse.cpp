@@ -55,6 +55,7 @@
 //Wyrmgus end
 #include "script.h"
 #include "script/condition/condition.h"
+#include "sound/game_sound_set.h"
 #include "sound/sound.h"
 #include "sound/unitsound.h"
 #include "sound/unit_sound_type.h"
@@ -2302,7 +2303,7 @@ static void UIHandleButtonDown_OnMap(unsigned button)
 			if (CanBuildUnitType(Selected[0], *CursorBuilding, tilePos, 0, false, UI.CurrentMapLayer->ID) && (explored || ReplayRevealMap)) {
 			//Wyrmgus end
 				const int flush = !(KeyModifiers & ModifierShift);
-				PlayGameSound(GameSounds.PlacementSuccess[CPlayer::GetThisPlayer()->Race].Sound, MaxSampleVolume);
+				PlayGameSound(wyrmgus::game_sound_set::get()->get_placement_success_sound(), MaxSampleVolume);
 				PlayUnitSound(*Selected[0], wyrmgus::unit_sound_type::build);
 				for (size_t i = 0; i != Selected.size(); ++i) {
 					//Wyrmgus start
@@ -2317,7 +2318,7 @@ static void UIHandleButtonDown_OnMap(unsigned button)
 				if (UI.CurrentMapLayer->ID != CPlayer::GetThisPlayer()->StartMapLayer && (UI.CurrentMapLayer->plane != CMap::Map.MapLayers[CPlayer::GetThisPlayer()->StartMapLayer]->plane || UI.CurrentMapLayer->world != CMap::Map.MapLayers[CPlayer::GetThisPlayer()->StartMapLayer]->world)) {
 					CPlayer::GetThisPlayer()->Notify("%s", _("Cannot build in another plane or world"));
 				}
-				PlayGameSound(GameSounds.PlacementError[CPlayer::GetThisPlayer()->Race].Sound, MaxSampleVolume);
+				PlayGameSound(wyrmgus::game_sound_set::get()->get_placement_error_sound(), MaxSampleVolume);
 			}
 		} else {
 			CancelBuildingMode();
@@ -2410,7 +2411,7 @@ static void UIHandleButtonDown_OnButton(unsigned button)
 //				&& !GameMenuButtonClicked) {
 				&& !UI.MenuButton.Clicked) {
 				//Wyrmgus end
-				PlayGameSound(GameSounds.Click.Sound, MaxSampleVolume);
+				PlayGameSound(wyrmgus::game_sound_set::get()->get_click_sound(), MaxSampleVolume);
 				//Wyrmgus start
 //				GameMenuButtonClicked = true;
 				UI.MenuButton.Clicked = true;
@@ -2419,7 +2420,7 @@ static void UIHandleButtonDown_OnButton(unsigned button)
 //			} else if (ButtonUnderCursor == ButtonUnderNetworkDiplomacy && !GameDiplomacyButtonClicked) {
 			} else if (ButtonUnderCursor == ButtonUnderNetworkDiplomacy && !UI.NetworkDiplomacyButton.Clicked) {
 			//Wyrmgus end
-				PlayGameSound(GameSounds.Click.Sound, MaxSampleVolume);
+				PlayGameSound(wyrmgus::game_sound_set::get()->get_click_sound(), MaxSampleVolume);
 				//Wyrmgus start
 //				GameDiplomacyButtonClicked = true;
 				UI.NetworkDiplomacyButton.Clicked = true;
@@ -2430,7 +2431,7 @@ static void UIHandleButtonDown_OnButton(unsigned button)
 				CUIButton &world_button = UI.WorldButtons[i];
 
 				if (i == static_cast<size_t>(ButtonUnderCursor) && !world_button.Clicked) {
-					PlayGameSound(GameSounds.Click.Sound, MaxSampleVolume);
+					PlayGameSound(wyrmgus::game_sound_set::get()->get_click_sound(), MaxSampleVolume);
 					world_button.Clicked = true;
 				}
 			}
@@ -2440,7 +2441,7 @@ static void UIHandleButtonDown_OnButton(unsigned button)
 				CUIUserButton &user_button = UI.UserButtons[i];
 
 				if (i == static_cast<size_t>(ButtonUnderCursor) && !user_button.Clicked) {
-					PlayGameSound(GameSounds.Click.Sound, MaxSampleVolume);
+					PlayGameSound(wyrmgus::game_sound_set::get()->get_click_sound(), MaxSampleVolume);
 					user_button.Clicked = true;
 				}
 			}
@@ -2458,7 +2459,7 @@ static void UIHandleButtonDown_OnButton(unsigned button)
 		/*
 		//  clicked on info panel - single unit shown
 		if (ButtonAreaUnderCursor == ButtonAreaSelected && ButtonUnderCursor == 0 && Selected.size() == 1) {
-			PlayGameSound(GameSounds.Click.Sound, MaxSampleVolume);
+			PlayGameSound(wyrmgus::game_sound_set::get()->get_click_sound(), MaxSampleVolume);
 			if (UI.SelectedViewport->Unit == Selected[0]) {
 				UI.SelectedViewport->Unit = nullptr;
 			} else {
@@ -2481,7 +2482,7 @@ static void UIHandleButtonUp_OnButton(unsigned button)
 		if (ButtonAreaUnderCursor == ButtonAreaSelected) {
 			//  clicked on single unit shown
 			if (ButtonUnderCursor == 0 && Selected.size() == 1) {
-				PlayGameSound(GameSounds.Click.Sound, MaxSampleVolume);
+				PlayGameSound(wyrmgus::game_sound_set::get()->get_click_sound(), MaxSampleVolume);
 				if ((1 << button) == LeftButton) {
 					if (Selected[0]->MapLayer != UI.CurrentMapLayer) {
 						ChangeCurrentMapLayer(Selected[0]->MapLayer->ID);
@@ -2636,16 +2637,16 @@ static void UIHandleButtonUp_OnButton(unsigned button)
 		//Wyrmgus start
 		} else if (ButtonAreaUnderCursor == ButtonAreaIdleWorker) {
 			if (ButtonUnderCursor == 0) {
-				PlayGameSound(GameSounds.Click.Sound, MaxSampleVolume);
+				PlayGameSound(wyrmgus::game_sound_set::get()->get_click_sound(), MaxSampleVolume);
 				UiFindIdleWorker();
 			}
 		} else if (ButtonAreaUnderCursor == ButtonAreaLevelUpUnit) {
 			if (ButtonUnderCursor == 0) {
-				PlayGameSound(GameSounds.Click.Sound, MaxSampleVolume);
+				PlayGameSound(wyrmgus::game_sound_set::get()->get_click_sound(), MaxSampleVolume);
 				UiFindLevelUpUnit();
 			}
 		} else if (ButtonAreaUnderCursor == ButtonAreaHeroUnit) {
-			PlayGameSound(GameSounds.Click.Sound, MaxSampleVolume);
+			PlayGameSound(wyrmgus::game_sound_set::get()->get_click_sound(), MaxSampleVolume);
 			UiFindHeroUnit(ButtonUnderCursor);
 		//Wyrmgus end
 		}
@@ -3009,7 +3010,7 @@ void UIHandleButtonUp(unsigned button)
 				} else if (Selected[0]->Player == CPlayer::GetThisPlayer() || CPlayer::GetThisPlayer()->IsTeamed(*Selected[0]) || CPlayer::GetThisPlayer()->HasBuildingAccess(*Selected[0]->Player) || (Selected[0]->Player->get_index() == PlayerNumNeutral && !Selected[0]->Type->BoolFlag[NEUTRAL_HOSTILE_INDEX].value)) {
 					PlayUnitSound(*Selected[0], wyrmgus::unit_sound_type::selected);
 				} else {
-					PlayGameSound(GameSounds.Click.Sound, MaxSampleVolume);
+					PlayGameSound(wyrmgus::game_sound_set::get()->get_click_sound(), MaxSampleVolume);
 				}
 				//Wyrmgus start
 				/*

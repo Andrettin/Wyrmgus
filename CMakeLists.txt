@@ -329,6 +329,7 @@ set(script_effect_SRCS
 source_group(script\\effect FILES ${script_effect_SRCS})
 
 set(sound_SRCS
+	src/sound/game_sound_set.cpp
 	src/sound/music.cpp
 	src/sound/ogg.cpp
 	src/sound/script_sound.cpp
@@ -816,6 +817,7 @@ set(stratagus_script_effect_HDRS
 )
 
 set(stratagus_sound_HDRS
+	src/sound/game_sound_set.h
 	src/sound/music.h
 	src/sound/script_sound.h
 	src/sound/sound.h

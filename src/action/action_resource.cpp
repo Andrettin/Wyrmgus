@@ -34,6 +34,7 @@
 #include "ai.h"
 #include "ai/ai_local.h"
 #include "animation.h"
+#include "civilization.h"
 //Wyrmgus start
 #include "commands.h"
 //Wyrmgus end
@@ -635,8 +636,11 @@ int COrder_Resource::StartGathering(CUnit &unit)
 		const char *input_name = DefaultResourceNames[input_resource].c_str();
 		const char *input_action_name = wyrmgus::resource::get_all()[input_resource]->get_action_name().c_str();
 		unit.Player->Notify(_("Not enough %s... %s more %s."), _(input_name), _(input_action_name), _(input_name)); //added extra space to look better
-		if (unit.Player == CPlayer::GetThisPlayer() && GameSounds.NotEnoughRes[unit.Player->Race][input_resource].Sound) {
-			PlayGameSound(GameSounds.NotEnoughRes[unit.Player->Race][input_resource].Sound, MaxSampleVolume);
+		if (unit.Player == CPlayer::GetThisPlayer() && unit.Player->get_civilization() != nullptr) {
+			const wyrmgus::sound *sound = unit.Player->get_civilization()->get_not_enough_resource_sound(wyrmgus::resource::get_all()[input_resource]);
+			if (sound != nullptr) {
+				PlayGameSound(sound, MaxSampleVolume);
+			}
 		}
 		this->Finished = true;
 		return 0;
@@ -1010,9 +1014,12 @@ int COrder_Resource::GatherResource(CUnit &unit)
 					if (!addload) {
 						const char *input_name = DefaultResourceNames[input_resource].c_str();
 						const char *input_action_name = wyrmgus::resource::get_all()[input_resource]->get_action_name().c_str();
-						unit.Player->Notify(_("Not enough %s... %s more %s."), _(input_name), _(input_action_name), _(input_name)); //added extra space to look better
-						if (unit.Player == CPlayer::GetThisPlayer() && GameSounds.NotEnoughRes[unit.Player->Race][input_resource].Sound) {
-							PlayGameSound(GameSounds.NotEnoughRes[unit.Player->Race][input_resource].Sound, MaxSampleVolume);
+						unit.Player->Notify(_("Not enough %s... %s more %s."), _(input_name), _(input_action_name), _(input_name));
+						if (unit.Player == CPlayer::GetThisPlayer() && unit.Player->get_civilization() != nullptr) {
+							const wyrmgus::sound *sound = unit.Player->get_civilization()->get_not_enough_resource_sound(wyrmgus::resource::get_all()[input_resource]);
+							if (sound != nullptr) {
+								PlayGameSound(sound, MaxSampleVolume);
+							}
 						}
 
 						if (unit.Container) {

@@ -38,6 +38,7 @@
 #include "government_type.h"
 #include "player.h"
 #include "script.h"
+#include "sound/sound.h"
 #include "time/calendar.h"
 #include "ui/button.h"
 #include "ui/cursor.h"
@@ -93,6 +94,15 @@ void civilization::process_sml_scope(const sml_data &scope)
 		}
 
 		database::process_sml_data(this->unit_sound_set, scope);
+	} else if (tag == "not_enough_resource_sounds") {
+		scope.for_each_property([&](const wyrmgus::sml_property &property) {
+			const std::string &key = property.get_key();
+			const std::string &value = property.get_value();
+
+			const resource *resource = resource::get(key);
+			const sound *sound = sound::get(value);
+			this->not_enough_resource_sounds[resource] = sound;
+		});
 	} else if (tag == "title_names") {
 		faction::process_title_names(this->title_names, scope);
 	} else if (tag == "character_title_names") {
@@ -281,6 +291,24 @@ void civilization::initialize()
 			}
 			if (this->unit_sound_set->Dead[ANIMATIONS_DEATHTYPES].Name.empty()) {
 				this->unit_sound_set->Dead[ANIMATIONS_DEATHTYPES] = parent_civilization->unit_sound_set->Dead[ANIMATIONS_DEATHTYPES];
+			}
+		}
+
+		if (this->work_complete_sound == nullptr) {
+			this->work_complete_sound = parent_civilization->work_complete_sound;
+		}
+
+		if (this->research_complete_sound == nullptr) {
+			this->research_complete_sound = parent_civilization->research_complete_sound;
+		}
+
+		if (this->not_enough_food_sound == nullptr) {
+			this->not_enough_food_sound = parent_civilization->not_enough_food_sound;
+		}
+
+		for (const auto &kv_pair : parent_civilization->not_enough_resource_sounds) {
+			if (!this->not_enough_resource_sounds.contains(kv_pair.first)) {
+				this->not_enough_resource_sounds[kv_pair.first] = kv_pair.second;
 			}
 		}
 	}

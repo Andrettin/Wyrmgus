@@ -10,8 +10,8 @@
 //
 /**@name unitsound.h - The unit sounds headerfile. */
 //
-//      (c) Copyright 1999-2005 by Lutz Sammer, Fabrice Rossi,
-//                                 and Jimmy Salmon
+//      (c) Copyright 1999-2020 by Lutz Sammer, Fabrice Rossi,
+//                                 Jimmy Salmon and Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -43,7 +43,7 @@ namespace wyrmgus {
 /**
 **  Sound definition
 */
-class SoundConfig
+class SoundConfig final
 {
 public:
 	SoundConfig() {}

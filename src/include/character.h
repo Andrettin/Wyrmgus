@@ -221,7 +221,7 @@ public:
 	int GetMartialAttribute() const;
 	int GetAttributeModifier(int attribute) const;
 	religion *get_religion() const;
-	language *get_language() const;
+	const language *get_language() const;
 	calendar *get_calendar() const;
 
 	const std::vector<std::unique_ptr<persistent_item>> &get_items() const

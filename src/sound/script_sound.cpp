@@ -208,95 +208,6 @@ static int CclPlaySound(lua_State *l)
 	return 0;
 }
 
-static void SetSoundConfigRace(lua_State *l, int j, SoundConfig soundConfigs[])
-{
-	if (!lua_istable(l, j + 1) || lua_rawlen(l, j + 1) != 2) {
-		LuaError(l, "incorrect argument");
-	}
-	const char *civilization_ident = LuaToString(l, j + 1, 1);
-	const wyrmgus::civilization *civilization = wyrmgus::civilization::get(civilization_ident);
-	lua_rawgeti(l, j + 1, 2);
-	LuaUserData *data = nullptr;
-	if (!lua_isuserdata(l, -1)
-		|| (data = (LuaUserData *)lua_touserdata(l, -1))->Type != LuaSoundType) {
-		LuaError(l, "Sound id expected");
-	}
-	lua_pop(l, 1);
-	soundConfigs[civilization->ID].Sound = static_cast<wyrmgus::sound *>(data->Data);
-}
-
-/**
-**  Glue between c and scheme. Allows to specify some global game sounds
-**  in a ccl file.
-**
-**  @param l  Lua state.
-*/
-static int CclDefineGameSounds(lua_State *l)
-{
-	//FIXME: should allow to define ALL the game sounds
-
-	const int args = lua_gettop(l);
-	for (int j = 0; j < args; ++j) {
-		const char *value = LuaToString(l, j + 1);
-		++j;
-
-		LuaUserData *data = nullptr;
-
-		// let's handle now the different cases
-		if (!strcmp(value, "click")) {
-			if (!lua_isuserdata(l, j + 1)
-				|| (data = (LuaUserData *)lua_touserdata(l, j + 1))->Type != LuaSoundType) {
-				LuaError(l, "Sound id expected");
-			}
-			GameSounds.Click.Sound = static_cast<wyrmgus::sound *>(data->Data);
-		} else if (!strcmp(value, "transport-docking")) {
-			if (!lua_isuserdata(l, j + 1)
-				|| (data = (LuaUserData *)lua_touserdata(l, j + 1))->Type != LuaSoundType) {
-				LuaError(l, "Sound id expected");
-			}
-			GameSounds.Docking.Sound = static_cast<wyrmgus::sound *>(data->Data);
-		} else if (!strcmp(value, "placement-error")) {
-			SetSoundConfigRace(l, j, GameSounds.PlacementError);
-		} else if (!strcmp(value, "placement-success")) {
-			SetSoundConfigRace(l, j, GameSounds.PlacementSuccess);
-		} else if (!strcmp(value, "work-complete")) {
-			SetSoundConfigRace(l, j, GameSounds.WorkComplete);
-		} else if (!strcmp(value, "research-complete")) {
-			SetSoundConfigRace(l, j, GameSounds.ResearchComplete);
-		} else if (!strcmp(value, "not-enough-res")) {
-			if (!lua_istable(l, j + 1) || lua_rawlen(l, j + 1) != 3) {
-				LuaError(l, "incorrect argument");
-			}
-			const char *resName = LuaToString(l, j + 1, 1);
-			const int resId = GetResourceIdByName(l, resName);
-			const char *civilization_ident = LuaToString(l, j + 1, 2);
-			const wyrmgus::civilization *civilization = wyrmgus::civilization::get(civilization_ident);
-			lua_rawgeti(l, j + 1, 3);
-			if (!lua_isuserdata(l, -1)
-				|| (data = (LuaUserData *)lua_touserdata(l, -1))->Type != LuaSoundType) {
-				LuaError(l, "Sound id expected");
-			}
-			lua_pop(l, 1);
-			GameSounds.NotEnoughRes[civilization->ID][resId].Sound = static_cast<wyrmgus::sound *>(data->Data);
-		} else if (!strcmp(value, "not-enough-food")) {
-			SetSoundConfigRace(l, j, GameSounds.NotEnoughFood);
-		} else if (!strcmp(value, "rescue")) {
-			SetSoundConfigRace(l, j, GameSounds.Rescue);
-		} else if (!strcmp(value, "building-construction")) {
-			SetSoundConfigRace(l, j, GameSounds.BuildingConstruction);
-		} else if (!strcmp(value, "chat-message")) {
-			if (!lua_isuserdata(l, j + 1)
-				|| (data = (LuaUserData *)lua_touserdata(l, j + 1))->Type != LuaSoundType) {
-				LuaError(l, "Sound id expected");
-			}
-			GameSounds.ChatMessage.Sound = static_cast<wyrmgus::sound *>(data->Data);
-		} else {
-			LuaError(l, "Unsupported tag: %s" _C_ value);
-		}
-	}
-	return 0;
-}
-
 /**
 **  Set the cut off distance.
 **
@@ -374,7 +285,6 @@ static int CclGetSounds(lua_State *l)
 void SoundCclRegister()
 {
 	lua_register(Lua, "SetGlobalSoundRange", CclSetGlobalSoundRange);
-	lua_register(Lua, "DefineGameSounds", CclDefineGameSounds);
 	lua_register(Lua, "MapSound", CclMapSound);
 	lua_register(Lua, "SoundForName", CclSoundForName);
 	lua_register(Lua, "SetSoundRange", CclSetSoundRange);

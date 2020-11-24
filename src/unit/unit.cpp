@@ -72,6 +72,7 @@
 #include "religion/deity.h"
 #include "script.h"
 #include "script/condition/condition.h"
+#include "sound/game_sound_set.h"
 #include "sound/sound.h"
 #include "sound/sound_server.h"
 #include "sound/unitsound.h"
@@ -3499,7 +3500,7 @@ void CUnit::UpdatePersonalName(bool update_settlement_name)
 	const wyrmgus::civilization *civilization = this->get_civilization();
 	const wyrmgus::faction *faction = this->Player->get_faction();
 	
-	wyrmgus::language *language = civilization ? civilization->get_language() : nullptr;
+	const wyrmgus::language *language = civilization ? civilization->get_language() : nullptr;
 	
 	if (this->Name.empty()) { //this is the first time the unit receives a name
 		if (!this->Type->BoolFlag[FAUNA_INDEX].value && this->Trait != nullptr && this->Trait->Epithets.size() > 0 && SyncRand(4) == 0) { // 25% chance to give the unit an epithet based on their trait
@@ -4838,7 +4839,7 @@ void CUnit::ChangeOwner(CPlayer &newplayer, bool show_change)
 	//Wyrmgus start
 	if (newplayer.Index == CPlayer::GetThisPlayer()->Index && show_change) {
 		this->Blink = 5;
-		PlayGameSound(GameSounds.Rescue[newplayer.Race].Sound, MaxSampleVolume);
+		PlayGameSound(wyrmgus::game_sound_set::get()->get_rescue_sound(), MaxSampleVolume);
 	}
 	//Wyrmgus end
 }
@@ -4990,7 +4991,7 @@ void RescueUnits()
 //						unit.ChangeOwner(*around[i]->Player);
 						unit.ChangeOwner(*around[i]->Player, true);
 //						unit.Blink = 5;
-//						PlayGameSound(GameSounds.Rescue[unit.Player->Race].Sound, MaxSampleVolume);
+//						PlayGameSound(wyrmgus::game_sound_set::get()->get_rescue_sound(), MaxSampleVolume);
 						//Wyrmgus end
 						break;
 					}

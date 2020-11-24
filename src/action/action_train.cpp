@@ -41,6 +41,7 @@
 #include "map/tile.h"
 #include "player.h"
 #include "script.h"
+#include "sound/game_sound_set.h"
 #include "sound/sound.h"
 #include "sound/unitsound.h"
 #include "sound/unit_sound_type.h"
@@ -286,7 +287,7 @@ static void AnimateActionTrain(CUnit &unit)
 	if (nType.BoolFlag[RAIL_INDEX].value && !unit.HasAdjacentRailForUnitType(&nType)) {
 		if (&player == CPlayer::GetThisPlayer()) {
 			CPlayer::GetThisPlayer()->Notify(NotifyYellow, unit.tilePos, unit.MapLayer->ID, "%s", _("The unit requires railroads to be placed on"));
-			PlayGameSound(GameSounds.PlacementError[CPlayer::GetThisPlayer()->Race].Sound, MaxSampleVolume);
+			PlayGameSound(wyrmgus::game_sound_set::get()->get_placement_error_sound(), MaxSampleVolume);
 		}
 		unit.Wait = CYCLES_PER_SECOND * 10;
 		return;

@@ -51,6 +51,7 @@
 #include "replay.h"
 #include "script.h"
 #include "settings.h"
+#include "sound/game_sound_set.h"
 #include "sound/sound.h"
 #include "sound/sound_server.h"
 #include "translate.h"
@@ -1609,7 +1610,7 @@ static void EditorCallbackButtonDown(unsigned button)
 //		(MouseButtons & LeftButton) && !GameMenuButtonClicked) {
 		(MouseButtons & LeftButton) && !UI.MenuButton.Clicked) {
 		//Wyrmgus end
-		PlayGameSound(GameSounds.Click.Sound, MaxSampleVolume);
+		PlayGameSound(wyrmgus::game_sound_set::get()->get_click_sound(), MaxSampleVolume);
 		//Wyrmgus start
 //		GameMenuButtonClicked = true;
 		UI.MenuButton.Clicked = true;
@@ -1748,15 +1749,13 @@ static void EditorCallbackButtonDown(unsigned button)
 			} else if (Editor.State == EditorEditUnit) {
 				if (!UnitPlacedThisPress && CursorBuilding) {
 					if (CanBuildUnitType(nullptr, *CursorBuilding, tilePos, 1, true, UI.CurrentMapLayer->ID)) {
-						PlayGameSound(GameSounds.PlacementSuccess[CPlayer::GetThisPlayer()->Race].Sound,
-									  MaxSampleVolume);
+						PlayGameSound(wyrmgus::game_sound_set::get()->get_placement_success_sound(), MaxSampleVolume);
 						EditorPlaceUnit(tilePos, *CursorBuilding, CPlayer::Players[Editor.SelectedPlayer]);
 						UnitPlacedThisPress = true;
 						UI.StatusLine.Clear();
 					} else {
 						UI.StatusLine.Set(_("Unit cannot be placed here."));
-						PlayGameSound(GameSounds.PlacementError[CPlayer::GetThisPlayer()->Race].Sound,
-									  MaxSampleVolume);
+						PlayGameSound(wyrmgus::game_sound_set::get()->get_placement_error_sound(), MaxSampleVolume);
 					}
 				}
 			} else if (Editor.State == EditorSetStartLocation) {

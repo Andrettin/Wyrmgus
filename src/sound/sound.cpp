@@ -43,11 +43,6 @@
 #include "video/video.h"
 
 /**
-**  Various sounds used in game.
-*/
-GameSound GameSounds;
-
-/**
 **  Selection handling
 */
 struct SelectionHandling {
@@ -373,7 +368,7 @@ void PlayMissileSound(const Missile &missile, wyrmgus::sound *sound)
 **  @param sound   Sound to play
 **  @param volume  Volume level to play the sound
 */
-void PlayGameSound(wyrmgus::sound *sound, unsigned char volume, bool always)
+void PlayGameSound(const wyrmgus::sound *sound, unsigned char volume, const bool always)
 {
 	if (!sound) {
 		return;
@@ -482,65 +477,9 @@ void InitSoundClient()
 	if (!SoundEnabled()) { // No sound enabled
 		return;
 	}
-	// let's map game sounds, look if already setup in ccl.
 
-	for (size_t i = 0; i < wyrmgus::civilization::get_all().size(); ++i) {
-		if (!GameSounds.PlacementError[i].Sound) {
-			GameSounds.PlacementError[i].MapSound();
-		}
-	}
-
-	for (size_t i = 0; i < wyrmgus::civilization::get_all().size(); ++i) {
-		if (!GameSounds.PlacementSuccess[i].Sound) {
-			GameSounds.PlacementSuccess[i].MapSound();
-		}
-	}
-
-	if (!GameSounds.Click.Sound) {
-		GameSounds.Click.MapSound();
-	}
-	if (!GameSounds.Docking.Sound) {
-		GameSounds.Docking.MapSound();
-	}
-
-	for (size_t i = 0; i < wyrmgus::civilization::get_all().size(); ++i) {
-		if (!GameSounds.BuildingConstruction[i].Sound) {
-			GameSounds.BuildingConstruction[i].MapSound();
-		}
-	}
-	for (size_t i = 0; i < wyrmgus::civilization::get_all().size(); ++i) {
-		if (!GameSounds.WorkComplete[i].Sound) {
-			GameSounds.WorkComplete[i].MapSound();
-		}
-	}
-	for (size_t i = 0; i < wyrmgus::civilization::get_all().size(); ++i) {
-		if (!GameSounds.ResearchComplete[i].Sound) {
-			GameSounds.ResearchComplete[i].MapSound();
-		}
-	}
-	for (size_t i = 0; i < wyrmgus::civilization::get_all().size(); ++i) {
-		for (unsigned int j = 0; j < MaxCosts; ++j) {
-			if (!GameSounds.NotEnoughRes[i][j].Sound) {
-				GameSounds.NotEnoughRes[i][j].MapSound();
-			}
-		}
-	}
-	for (size_t i = 0; i < wyrmgus::civilization::get_all().size(); ++i) {
-		if (!GameSounds.NotEnoughFood[i].Sound) {
-			GameSounds.NotEnoughFood[i].MapSound();
-		}
-	}
-	for (size_t i = 0; i < wyrmgus::civilization::get_all().size(); ++i) {
-		if (!GameSounds.Rescue[i].Sound) {
-			GameSounds.Rescue[i].MapSound();
-		}
-	}
-	if (!GameSounds.ChatMessage.Sound) {
-		GameSounds.ChatMessage.MapSound();
-	}
-
-	int MapWidth = (UI.MapArea.EndX - UI.MapArea.X + wyrmgus::defines::get()->get_scaled_tile_width()) / wyrmgus::defines::get()->get_scaled_tile_width();
-	int MapHeight = (UI.MapArea.EndY - UI.MapArea.Y + wyrmgus::defines::get()->get_scaled_tile_height()) / wyrmgus::defines::get()->get_scaled_tile_height();
+	const int MapWidth = (UI.MapArea.EndX - UI.MapArea.X + wyrmgus::defines::get()->get_scaled_tile_width()) / wyrmgus::defines::get()->get_scaled_tile_width();
+	const int MapHeight = (UI.MapArea.EndY - UI.MapArea.Y + wyrmgus::defines::get()->get_scaled_tile_height()) / wyrmgus::defines::get()->get_scaled_tile_height();
 	DistanceSilent = 3 * std::max<int>(MapWidth, MapHeight);
 	ViewPointOffset = std::max<int>(MapWidth / 2, MapHeight / 2);
 }

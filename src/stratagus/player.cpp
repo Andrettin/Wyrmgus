@@ -354,7 +354,7 @@ bool NoRescueCheck; //disable rescue check
 /**
 **  "Translate" (that is, adapt) a proper name from one culture (civilization) to another.
 */
-std::string PlayerRace::TranslateName(const std::string &name, wyrmgus::language *language)
+std::string PlayerRace::TranslateName(const std::string &name, const wyrmgus::language *language)
 {
 	std::string new_name;
 	
@@ -363,8 +363,9 @@ std::string PlayerRace::TranslateName(const std::string &name, wyrmgus::language
 	}
 
 	// try to translate the entire name, as a particular translation for it may exist
-	if (language->NameTranslations.find(name) != language->NameTranslations.end()) {
-		return language->NameTranslations[name][SyncRand(language->NameTranslations[name].size())];
+	const auto find_iterator = language->NameTranslations.find(name);
+	if (find_iterator != language->NameTranslations.end()) {
+		return find_iterator->second[SyncRand(find_iterator->second.size())];
 	}
 	
 	//if adapting the entire name failed, try to match prefixes and suffixes
@@ -376,9 +377,11 @@ std::string PlayerRace::TranslateName(const std::string &name, wyrmgus::language
 			
 	//			fprintf(stdout, "Trying to match prefix \"%s\" and suffix \"%s\" for translating name \"%s\" to the \"%s\" language.\n", name_prefix.c_str(), name_suffix.c_str(), name.c_str(), language->Ident.c_str());
 			
-				if (language->NameTranslations.find(name_prefix) != language->NameTranslations.end() && language->NameTranslations.find(name_suffix) != language->NameTranslations.end()) { // if both a prefix and suffix have been matched
-					name_prefix = language->NameTranslations[name_prefix][SyncRand(language->NameTranslations[name_prefix].size())];
-					name_suffix = language->NameTranslations[name_suffix][SyncRand(language->NameTranslations[name_suffix].size())];
+				const auto prefix_find_iterator = language->NameTranslations.find(name_prefix);
+				const auto suffix_find_iterator = language->NameTranslations.find(name_suffix);
+				if (prefix_find_iterator != language->NameTranslations.end() && suffix_find_iterator != language->NameTranslations.end()) { // if both a prefix and suffix have been matched
+					name_prefix = prefix_find_iterator->second[SyncRand(prefix_find_iterator->second.size())];
+					name_suffix = suffix_find_iterator->second[SyncRand(suffix_find_iterator->second.size())];
 					name_suffix = DecapitalizeString(name_suffix);
 					if (name_prefix.substr(name_prefix.size() - 2, 2) == "gs" && name_suffix.substr(0, 1) == "g") { //if the last two characters of the prefix are "gs", and the first character of the suffix is "g", then remove the final "s" from the prefix (as in "Königgrätz")
 						name_prefix = FindAndReplaceStringEnding(name_prefix, "gs", "g");
@@ -1464,11 +1467,8 @@ void CPlayer::ShareUpgradeProgress(CPlayer &player, CUnit &unit)
 		if (!chosen_upgrade->get_name().empty()) {
 			player.Notify(NotifyGreen, unit.tilePos, unit.MapLayer->ID, _("%s acquired through contact with %s"), chosen_upgrade->get_name().c_str(), this->Name.c_str());
 		}
-		if (&player == CPlayer::GetThisPlayer()) {
-			wyrmgus::sound *sound = GameSounds.ResearchComplete[player.Race].Sound;
-			if (sound == nullptr) {
-				sound = GameSounds.WorkComplete[player.Race].Sound;
-			}
+		if (&player == CPlayer::GetThisPlayer() && player.get_civilization() != nullptr) {
+			const wyrmgus::sound *sound = player.get_civilization()->get_research_complete_sound();
 
 			if (sound != nullptr) {
 				PlayGameSound(sound, MaxSampleVolume);
@@ -3037,10 +3037,9 @@ int CPlayer::CheckLimits(const wyrmgus::unit_type &type) const
 */
 int CPlayer::CheckCosts(const int *costs, bool notify) const
 {
-	//Wyrmgus start
 	bool sound_played = false;
-	//Wyrmgus end
 	int err = 0;
+
 	for (int i = 1; i < MaxCosts; ++i) {
 		if (this->Resources[i] + this->StoredResources[i] >= costs[i]) {
 			continue;
@@ -3051,16 +3050,17 @@ int CPlayer::CheckCosts(const int *costs, bool notify) const
 
 			Notify(_("Not enough %s... %s more %s."), _(name), _(action_name), _(name));
 
-			//Wyrmgus start
-//			if (this == CPlayer::GetThisPlayer() && GameSounds.NotEnoughRes[this->Race][i].Sound) {
-			if (this == CPlayer::GetThisPlayer() && GameSounds.NotEnoughRes[this->Race][i].Sound && !sound_played) {
-				sound_played = true;
-			//Wyrmgus end
-				PlayGameSound(GameSounds.NotEnoughRes[this->Race][i].Sound, MaxSampleVolume);
+			if (this == CPlayer::GetThisPlayer() && this->get_civilization() != nullptr && !sound_played ) {
+				const wyrmgus::sound *sound = this->get_civilization()->get_not_enough_resource_sound(wyrmgus::resource::get_all()[i]);
+				if (sound != nullptr) {
+					sound_played = true;
+					PlayGameSound(sound, MaxSampleVolume);
+				}
 			}
 		}
 		err |= 1 << i;
 	}
+
 	return err;
 }
 

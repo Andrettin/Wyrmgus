@@ -213,10 +213,6 @@
 ** Warn other users that we leave.
 */
 
-//----------------------------------------------------------------------------
-//  Includes
-//----------------------------------------------------------------------------
-
 #include "stratagus.h"
 
 #include <stddef.h>
@@ -232,6 +228,7 @@
 #include "parameters.h"
 #include "player.h"
 #include "replay.h"
+#include "sound/game_sound_set.h"
 #include "sound/sound.h"
 #include "translate.h"
 #include "ui/interface.h"
@@ -943,7 +940,7 @@ static void NetworkExecCommand_Chat(const CNetworkCommandQueue &ncq)
 	nc.Deserialize(&ncq.Data[0]);
 
 	SetMessage("%s", nc.Text.c_str());
-	PlayGameSound(GameSounds.ChatMessage.Sound, MaxSampleVolume);
+	PlayGameSound(wyrmgus::game_sound_set::get()->get_chat_message_sound(), MaxSampleVolume);
 	CommandLog("chat", NoUnitP, FlushCommands, -1, -1, NoUnitP, nc.Text.c_str(), -1);
 }
 

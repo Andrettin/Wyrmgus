@@ -52,6 +52,8 @@ class civilization_supergroup;
 class deity;
 class language;
 class quest;
+class resource;
+class sound;
 class species;
 class unit_class;
 class unit_sound_set;
@@ -70,7 +72,10 @@ class civilization final : public civilization_base, public data_type<civilizati
 	Q_PROPERTY(QString interface READ get_interface_qstring)
 	Q_PROPERTY(QString default_color READ get_default_color_qstring)
 	Q_PROPERTY(CUpgrade* upgrade MEMBER upgrade READ get_upgrade)
-	Q_PROPERTY(wyrmgus::language* language MEMBER language READ get_language)
+	Q_PROPERTY(wyrmgus::language* language MEMBER language)
+	Q_PROPERTY(wyrmgus::sound* work_complete_sound MEMBER work_complete_sound)
+	Q_PROPERTY(wyrmgus::sound* research_complete_sound MEMBER research_complete_sound)
+	Q_PROPERTY(wyrmgus::sound* not_enough_food_sound MEMBER not_enough_food_sound)
 
 public:
 	static constexpr const char *class_identifier = "civilization";
@@ -162,7 +167,7 @@ public:
 		return this->upgrade;
 	}
 
-	language *get_language() const
+	const language *get_language() const
 	{
 		return this->language;
 	}
@@ -183,6 +188,35 @@ public:
 	const unit_sound_set *get_unit_sound_set() const
 	{
 		return this->unit_sound_set.get();
+	}
+
+	const sound *get_work_complete_sound() const
+	{
+		return this->work_complete_sound;
+	}
+
+	const sound *get_research_complete_sound() const
+	{
+		if (this->research_complete_sound != nullptr) {
+			return this->research_complete_sound;
+		}
+
+		return this->get_work_complete_sound();
+	}
+
+	const sound *get_not_enough_food_sound() const
+	{
+		return this->not_enough_food_sound;
+	}
+
+	const sound *get_not_enough_resource_sound(const resource *resource) const
+	{
+		const auto find_iterator = this->not_enough_resource_sounds.find(resource);
+		if (find_iterator != this->not_enough_resource_sounds.end()) {
+			return find_iterator->second;
+		}
+
+		return nullptr;
 	}
 
 	const std::vector<civilization *> &get_develops_from() const
@@ -295,7 +329,6 @@ private:
 	std::string interface; //the string identifier for the civilization's interface
 	std::string default_color; //name of the civilization's default color (used for the encyclopedia, tech tree, etc.)
 	CUpgrade *upgrade = nullptr;
-	std::unique_ptr<unit_sound_set> unit_sound_set;	/// sounds for unit events
 	language *language = nullptr;	/// the language used by the civilization
 	calendar *calendar = nullptr;	/// the calendar used by the civilization
 public:
@@ -303,6 +336,11 @@ public:
 private:
 	bool visible = true; //whether the civilization is visible e.g. in the map editor
 	bool playable = true; //civilizations are playable by default
+	std::unique_ptr<unit_sound_set> unit_sound_set;	/// sounds for unit events
+	sound *work_complete_sound = nullptr;
+	sound *research_complete_sound = nullptr;
+	sound *not_enough_food_sound = nullptr;
+	std::map<const resource *, const sound *> not_enough_resource_sounds;
 	std::vector<civilization *> develops_from; //from which civilizations this civilization develops
 	std::vector<civilization *> develops_to; //to which civilizations this civilization develops
 	std::map<cursor_type, cursor *> cursors;
