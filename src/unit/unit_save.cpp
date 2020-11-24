@@ -268,7 +268,7 @@ void SaveUnit(const CUnit &unit, CFile &file)
 	}
 	file.printf("\"ttl\", %lu,\n  ", unit.TTL);
 	file.printf("\"threshold\", %d,\n  ", unit.Threshold);
-	file.printf("\"step-count\", %d,\n  ", unit.StepCount);
+	file.printf("\"step-count\", %d,\n  ", unit.get_step_count());
 
 	//Wyrmgus start
 //	for (size_t i = 0; i < UnitTypeVar.GetNumberVariable(); ++i) {

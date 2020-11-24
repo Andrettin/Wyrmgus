@@ -174,13 +174,8 @@ private:
 
 	FireMissile(unit, goal, goal->tilePos, goal->MapLayer->ID);
 	UnHideUnit(unit);
-	unit.StepCount = 0;
+	unit.reset_step_count();
 }
-
-
-/*----------------------------------------------------------------------------
---  Functions
-----------------------------------------------------------------------------*/
 
 void UnHideUnit(CUnit &unit)
 {
@@ -530,7 +525,7 @@ bool AutoAttack(CUnit &unit)
 			if (SyncRand(100000) == 0) {
 				PlayUnitSound(unit, wyrmgus::unit_sound_type::idle);
 			}
-			unit.StepCount = 0;
+			unit.reset_step_count();
 			break;
 		case SUB_STILL_ATTACK: // attacking unit in attack range.
 			AnimateActionAttack(unit, *this);

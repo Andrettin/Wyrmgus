@@ -303,7 +303,7 @@ bool COrder_Attack::ParseSpecificData(lua_State *l, int &j, const char *value, c
 	FireMissile(unit, this->get_goal(), this->goalPos, this->MapLayer);
 	//Wyrmgus end
 	UnHideUnit(unit); // unit is invisible until attacks
-	unit.StepCount = 0;
+	unit.reset_step_count();
 }
 
 /* virtual */ bool COrder_Attack::OnAiHitUnit(CUnit &unit, CUnit *attacker, int /*damage*/)

@@ -154,7 +154,7 @@ bool COrder::OnAiHitUnit(CUnit &unit, CUnit *attacker, int /*damage*/)
 		FireMissile(unit, goal, invalidPos, goal->MapLayer->ID);
 		UnHideUnit(unit); // unit is invisible until attacks
 	}
-	unit.StepCount = 0;
+	unit.reset_step_count();
 	// Fixme : Auto select position to attack ?
 }
 

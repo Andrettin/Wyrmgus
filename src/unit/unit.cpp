@@ -529,7 +529,7 @@ void CUnit::Init()
 	memset(&WaitBackup, 0, sizeof(WaitBackup));
 	GivesResource = 0;
 	CurrentResource = 0;
-	StepCount = 0;
+	this->reset_step_count();
 	this->Orders.clear();
 	this->SavedOrder.reset();
 	this->NewOrder.reset();

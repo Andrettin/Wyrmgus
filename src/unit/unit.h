@@ -116,6 +116,8 @@ static constexpr int NextDirection = 32;        /// Next direction N->NE->E...
 class CUnit final
 {
 public:
+	static constexpr unsigned char max_step_count = 10;
+
 	CUnit();
 	~CUnit();
 
@@ -536,6 +538,22 @@ public:
 
 	wyrmgus::gender get_gender() const;
 
+	unsigned char get_step_count() const
+	{
+		return this->step_count;
+	}
+
+	void increment_step_count()
+	{
+		++this->step_count;
+		this->step_count = std::min(this->get_step_count(), CUnit::max_step_count);
+	}
+
+	void reset_step_count()
+	{
+		this->step_count = 0;
+	}
+
 public:
 	class CUnitManagerData final
 	{
@@ -682,8 +700,10 @@ public:
 	unsigned int Wait;          /// action counter
 	int Threshold;              /// The counter while ai unit couldn't change target.
 	
-	unsigned char StepCount;	/// How many steps the unit has taken without stopping (maximum 10)
+private:
+	unsigned char step_count = 0;	/// How many steps the unit has taken without stopping (maximum 10)
 
+public:
 	struct _unit_anim_ {
 		const CAnimation *Anim;      /// Anim
 		const CAnimation *CurrAnim;  /// CurrAnim
