@@ -54,6 +54,7 @@
 #include "sound/unitsound.h"
 #include "species/species.h"
 #include "spell/spell.h"
+#include "text_processor.h"
 #include "translate.h"
 #include "ui/button.h"
 #include "ui/button_level.h"
@@ -1325,6 +1326,12 @@ void unit_type::initialize()
 
 	CclCommand("if not (GetArrayIncludes(Units, \"" + this->get_identifier() + "\")) then table.insert(Units, \"" + this->get_identifier() + "\") end"); //FIXME: needed at present to make unit type data files work without scripting being necessary, but it isn't optimal to interact with a scripting table like "Units" in this manner (that table should probably be replaced with getting a list of unit types from the engine)
 
+	//process the description text for the unit type
+	if (!this->get_description().empty()) {
+		const text_processor text_processor(this->get_faction());
+		this->set_description(text_processor.process_text(this->get_description()));
+	}
+
 	data_entry::initialize();
 }
 
@@ -1361,6 +1368,16 @@ void unit_type::set_unit_class(wyrmgus::unit_class *unit_class)
 		this->get_unit_class()->add_unit_type(this);
 	}
 }
+
+const faction *unit_type::get_faction() const
+{
+	if (this->Faction != -1) {
+		return faction::get_all()[this->Faction];
+	}
+
+	return nullptr;
+}
+
 
 const civilization *unit_type::get_faction_civilization(const wyrmgus::faction *faction) const
 {

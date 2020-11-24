@@ -822,6 +822,8 @@ public:
 	const civilization *get_faction_civilization(const wyrmgus::faction *faction) const;
 	const civilization *get_player_civilization(const CPlayer *player) const;
 
+	const faction *get_faction() const;
+
 	const QSize &get_tile_size() const
 	{
 		return this->tile_size;
