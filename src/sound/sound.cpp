@@ -170,14 +170,13 @@ static const wyrmgus::sound *ChooseUnitVoiceSound(const CUnit *unit, const wyrmg
 			case wyrmgus::unit_sound_type::dying:
 			case wyrmgus::unit_sound_type::repairing:
 			case wyrmgus::unit_sound_type::harvesting:
-			case wyrmgus::unit_sound_type::help_town:
 				if (unit->Type->BoolFlag[ORGANIC_INDEX].value) {
 					return civilization->get_unit_sound_set()->get_sound_for_unit(unit_sound_type, unit);
 				}
 				break;
 			case wyrmgus::unit_sound_type::help:
-				if (unit->Type->BoolFlag[BUILDING_INDEX].value) {
-					return civilization->get_unit_sound_set()->get_sound_for_unit(wyrmgus::unit_sound_type::help_town, unit);
+				if (unit->Type->BoolFlag[BUILDING_INDEX].value && civilization->get_help_town_sound() != nullptr) {
+					return civilization->get_help_town_sound();
 				}
 
 				return civilization->get_unit_sound_set()->get_sound_for_unit(unit_sound_type, unit);

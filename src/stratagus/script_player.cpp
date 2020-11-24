@@ -912,8 +912,6 @@ static int CclDefineCivilization(lua_State *l)
 					civilization->unit_sound_set->Harvest[resId].Name = LuaToString(l, -1, k + 1);
 				} else if (!strcmp(value, "help")) {
 					civilization->unit_sound_set->Help.Name = LuaToString(l, -1, k + 1);
-				} else if (!strcmp(value, "help-town")) {
-					civilization->unit_sound_set->HelpTown.Name = LuaToString(l, -1, k + 1);
 				} else {
 					LuaError(l, "Unsupported sound tag: %s" _C_ value);
 				}

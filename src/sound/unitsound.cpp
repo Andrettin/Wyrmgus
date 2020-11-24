@@ -112,8 +112,6 @@ void unit_sound_set::process_sml_property(const sml_property &property)
 		this->Harvest[resource->get_index()].Name = value;
 	} else if (key == "help") {
 		this->Help.Name = value;
-	} else if (key == "help_town") {
-		this->HelpTown.Name = value;
 	} else if (key == "dead") {
 		this->Dead[ANIMATIONS_DEATHTYPES].Name = value;
 	} else if (key.find("dead_") != std::string::npos) {
@@ -162,7 +160,6 @@ void unit_sound_set::map_sounds()
 		this->Harvest[i].MapSound();
 	}
 	this->Help.MapSound();
-	this->HelpTown.MapSound();
 	for (int i = 0; i <= ANIMATIONS_DEATHTYPES; ++i) {
 		this->Dead[i].MapSound();
 	}
@@ -222,12 +219,6 @@ const sound *unit_sound_set::get_sound_for_unit(const unit_sound_type unit_sound
 			return this->Selected.Sound;
 		case unit_sound_type::help:
 			return this->Help.Sound;
-		case unit_sound_type::help_town:
-			if (this->HelpTown.Sound != nullptr) {
-				return this->HelpTown.Sound;
-			}
-
-			return this->get_sound_for_unit(unit_sound_type::help, unit);
 		case unit_sound_type::dying:
 			if (this->Dead[unit->DamagedType].Sound != nullptr) {
 				return this->Dead[unit->DamagedType].Sound;

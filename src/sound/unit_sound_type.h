@@ -36,7 +36,6 @@ enum class unit_sound_type {
 	acknowledging,	/// acknowledge command
 	ready,			/// command completed
 	help,			/// if attacked
-	help_town,		/// if attacked (town)
 	dying,			/// if killed
 	work_completed,	/// only worker, work completed
 	construction,	/// only for building under construction
@@ -63,8 +62,6 @@ inline unit_sound_type string_to_unit_sound_type(const std::string &str)
 		return unit_sound_type::ready;
 	} else if (str == "help") {
 		return unit_sound_type::help;
-	} else if (str == "help_town") {
-		return unit_sound_type::help_town;
 	} else if (str == "dead") {
 		return unit_sound_type::dying;
 	} else if (str == "work_completed") {

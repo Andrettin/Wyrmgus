@@ -73,6 +73,7 @@ class civilization final : public civilization_base, public data_type<civilizati
 	Q_PROPERTY(QString default_color READ get_default_color_qstring)
 	Q_PROPERTY(CUpgrade* upgrade MEMBER upgrade READ get_upgrade)
 	Q_PROPERTY(wyrmgus::language* language MEMBER language)
+	Q_PROPERTY(wyrmgus::sound* help_town_sound MEMBER help_town_sound)
 	Q_PROPERTY(wyrmgus::sound* work_complete_sound MEMBER work_complete_sound)
 	Q_PROPERTY(wyrmgus::sound* research_complete_sound MEMBER research_complete_sound)
 	Q_PROPERTY(wyrmgus::sound* not_enough_food_sound MEMBER not_enough_food_sound)
@@ -188,6 +189,11 @@ public:
 	const unit_sound_set *get_unit_sound_set() const
 	{
 		return this->unit_sound_set.get();
+	}
+
+	const sound *get_help_town_sound() const
+	{
+		return this->help_town_sound;
 	}
 
 	const sound *get_work_complete_sound() const
@@ -337,6 +343,7 @@ private:
 	bool visible = true; //whether the civilization is visible e.g. in the map editor
 	bool playable = true; //civilizations are playable by default
 	std::unique_ptr<unit_sound_set> unit_sound_set;	/// sounds for unit events
+	sound *help_town_sound = nullptr;
 	sound *work_complete_sound = nullptr;
 	sound *research_complete_sound = nullptr;
 	sound *not_enough_food_sound = nullptr;

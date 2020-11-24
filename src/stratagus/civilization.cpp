@@ -89,7 +89,7 @@ void civilization::process_sml_scope(const sml_data &scope)
 			}
 		});
 	} else if (tag == "unit_sounds") {
-		if (scope.get_operator() == sml_operator::assignment || (scope.get_operator() == sml_operator::addition && this->unit_sound_set == nullptr)) {
+		if (this->unit_sound_set == nullptr) {
 			this->unit_sound_set = std::make_unique<wyrmgus::unit_sound_set>();
 		}
 
@@ -286,12 +286,13 @@ void civilization::initialize()
 			if (this->unit_sound_set->Help.Name.empty()) {
 				this->unit_sound_set->Help = parent_civilization->unit_sound_set->Help;
 			}
-			if (this->unit_sound_set->HelpTown.Name.empty()) {
-				this->unit_sound_set->HelpTown = parent_civilization->unit_sound_set->HelpTown;
-			}
 			if (this->unit_sound_set->Dead[ANIMATIONS_DEATHTYPES].Name.empty()) {
 				this->unit_sound_set->Dead[ANIMATIONS_DEATHTYPES] = parent_civilization->unit_sound_set->Dead[ANIMATIONS_DEATHTYPES];
 			}
+		}
+
+		if (this->help_town_sound == nullptr) {
+			this->help_town_sound = parent_civilization->help_town_sound;
 		}
 
 		if (this->work_complete_sound == nullptr) {
