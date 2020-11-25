@@ -31,6 +31,7 @@
 
 #include "unit/unit_cache.h"
 #include "unit/unit_class_container.h"
+#include "unit/unit_ref.h"
 #include "unit/unit_type_container.h"
 #include "upgrade/upgrade_structs.h" // MaxCost
 #include "vec2i.h"
@@ -47,6 +48,7 @@ enum class ForceType;
 namespace wyrmgus {
 	class site;
 	class unit_class;
+	class unit_ref;
 	class unit_type;
 	class upgrade_class;
 }
@@ -112,9 +114,8 @@ constexpr int AI_WAIT_ON_RALLY_POINT = 60; /// Max seconds AI units will wait on
 **
 **  A force is a group of units belonging together.
 */
-class AiForce
+class AiForce final
 {
-	friend class AiForceManager;
 public:
 	AiForce() :
 		Completed(false), Defending(false), Attacking(false),
@@ -128,17 +129,28 @@ public:
 		HomePos.x = HomePos.y = GoalPos.x = GoalPos.y = -1;
 	}
 
-	void Remove(CUnit &unit)
+	const std::vector<wyrmgus::unit_ref> &get_units() const
 	{
-		if (Units.Remove(&unit)) {
-			InternalRemoveUnit(&unit);
+		return this->units;
+	}
+
+	wyrmgus::unit_ref take_last_unit();
+
+	void Remove(CUnit *unit)
+	{
+		for (size_t i = 0; i < this->get_units().size(); ++i) {
+			if (this->get_units()[i] == unit) {
+				AiForce::InternalRemoveUnit(unit);
+				this->units.erase(this->units.begin() + i);
+				return;
+			}
 		}
 	}
 
 	/**
 	**  Reset the force. But don't change its role and its demand.
 	*/
-	void Reset(bool types = false)
+	void Reset(const bool types = false)
 	{
 		FormerForce = -1;
 		Completed = false;
@@ -151,17 +163,28 @@ public:
 		} else {
 			State = AiForceAttackingState::Waiting;
 		}
-		Units.for_each(InternalRemoveUnit);
-		Units.clear();
+
+		for (const wyrmgus::unit_ref &unit : this->get_units()) {
+			AiForce::InternalRemoveUnit(unit);
+		}
+		this->units.clear();
+
 		HomePos.x = HomePos.y = GoalPos.x = GoalPos.y = -1;
 		//Wyrmgus start
 		HomeMapLayer = 0;
 		GoalMapLayer = 0;
 		//Wyrmgus end
 	}
-	inline size_t Size() const { return Units.size(); }
 
-	inline bool IsAttacking() const { return (!Defending && Attacking); }
+	size_t Size() const
+	{
+		return this->get_units().size();
+	}
+
+	bool IsAttacking() const
+	{
+		return (!Defending && Attacking);
+	}
 
 	ForceType GetForceType() const;
 	bool IsNaval() const;
@@ -172,7 +195,7 @@ public:
 //	void Attack(const Vec2i &pos);
 	void Attack(const Vec2i &pos, int z);
 	//Wyrmgus end
-	void RemoveDeadUnit();
+	void remove_dead_units();
 	int PlanAttack();
 
 	void ReturnToHome();
@@ -181,7 +204,12 @@ public:
 	bool NewRallyPoint(const Vec2i &startPos, Vec2i *resultPos, int z);
 	bool CheckTransporters(const Vec2i &pos, int z);
 	//Wyrmgus end
-	void Insert(CUnit &unit);
+	void Insert(wyrmgus::unit_ref &&unit);
+
+	void Insert(CUnit *unit)
+	{
+		this->Insert(wyrmgus::unit_ref(unit));
+	}
 
 private:
 	void CountTypes(unsigned int *counter, const size_t len);
@@ -198,8 +226,10 @@ public:
 	AiForceRole Role;  /// Role of the force
 
 	std::vector<AiUnitType> UnitTypes; /// Count and types of unit-type
-	CUnitCache Units;  /// Units in the force
+private:
+	std::vector<wyrmgus::unit_ref> units;  /// Units in the force
 
+public:
 	// If attacking
 	int FormerForce;             /// Original force number
 	AiForceAttackingState State; /// Attack state
@@ -210,6 +240,8 @@ public:
 	int HomeMapLayer;
 	//Wyrmgus end
 	int WaitOnRallyPoint; /// Counter for waiting on rally point
+
+	friend class AiForceManager;
 };
 
 // forces
@@ -252,7 +284,7 @@ public:
 	}
 
 	int GetForce(const CUnit &unit);
-	void RemoveDeadUnit();
+	void remove_dead_units();
 	//Wyrmgus start
 //	bool Assign(CUnit &unit, int force = -1);
 	bool Assign(CUnit &unit, int force = -1, bool hero = false);
@@ -705,7 +737,7 @@ extern bool AiFindBuildingPlace(const CUnit &worker, const wyrmgus::unit_type &t
 // Forces
 //
 /// Cleanup units in force
-extern void AiRemoveDeadUnitInForces();
+extern void AiRemoveDeadUnitsInForces();
 /// Assign a new unit to a force
 extern bool AiAssignToForce(CUnit &unit);
 /// Assign a free units to a force

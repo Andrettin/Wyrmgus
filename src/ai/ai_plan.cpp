@@ -197,30 +197,30 @@ int AiFindWall(AiForce *force)
 {
 	// Find a unit to use.  Best choice is a land unit with range 1.
 	// Next best choice is any land unit.  Otherwise just use the first.
-	CUnit *unit = force->Units[0];
-	for (unsigned int i = 0; i < force->Units.size(); ++i) {
-		CUnit *aiunit = force->Units[i];
-		if (aiunit->Type->UnitType == UnitTypeType::Land) {
-			unit = aiunit;
-			if (aiunit->GetMissile().Missile->get_range() == 1) {
+	CUnit *unit = force->get_units()[0];
+	for (const wyrmgus::unit_ref &ai_unit : force->get_units()) {
+		if (ai_unit->Type->UnitType == UnitTypeType::Land) {
+			unit = ai_unit;
+			if (ai_unit->GetMissile().Missile->get_range() == 1) {
 				break;
 			}
 		}
 	}
-	const int maxRange = 1000;
+
+	static constexpr int maxRange = 1000;
+
 	Vec2i wallPos;
 
 	if (FindWall(*unit, maxRange, &wallPos)) {
 		force->State = AiForceAttackingState::Waiting;
-		for (unsigned int i = 0; i < force->Units.size(); ++i) {
-			CUnit &aiunit = *force->Units[i];
+		for (const wyrmgus::unit_ref &ai_unit : force->get_units()) {
 			//Wyrmgus start
-//			if (aiunit.Type->CanAttack) {
-			if (aiunit.CanAttack()) {
+//			if (ai_unit->Type->CanAttack) {
+			if (ai_unit->CanAttack()) {
 			//Wyrmgus end
-				CommandAttack(aiunit, wallPos, nullptr, FlushCommands, aiunit.MapLayer->ID);
+				CommandAttack(*ai_unit, wallPos, nullptr, FlushCommands, ai_unit->MapLayer->ID);
 			} else {
-				CommandMove(aiunit, wallPos, FlushCommands, aiunit.MapLayer->ID);
+				CommandMove(*ai_unit, wallPos, FlushCommands, ai_unit->MapLayer->ID);
 			}
 		}
 		return 1;
@@ -335,25 +335,19 @@ static bool AiFindTarget(const CUnit &unit, const TerrainTraversal &terrainTrans
 	return terrainTraversal.Run(enemyFinderWithTransporter);
 }
 
-class IsAFreeTransporter
+static bool is_a_free_transporter(const CUnit *unit)
 {
-public:
-	bool operator()(const CUnit *unit) const
-	{
-		return unit->Type->CanMove() && unit->BoardCount < unit->Type->MaxOnBoard;
-	}
-};
+	return unit->Type->CanMove() && unit->BoardCount < unit->Type->MaxOnBoard;
+}
 
 template <typename ITERATOR>
 int GetTotalBoardCapacity(ITERATOR begin, ITERATOR end)
 {
 	int totalBoardCapacity = 0;
-	IsAFreeTransporter isAFreeTransporter;
-
 	for (ITERATOR it = begin; it != end; ++it) {
 		const CUnit *unit = *it;
 
-		if (isAFreeTransporter(unit)) {
+		if (is_a_free_transporter(unit)) {
 			totalBoardCapacity += unit->Type->MaxOnBoard - unit->BoardCount;
 		}
 	}
@@ -385,13 +379,18 @@ int AiForce::PlanAttack()
 	//Wyrmgus end
 	transporterTerrainTraversal.Init();
 
-	CUnit *transporter = Units.find(IsAFreeTransporter());
+	CUnit *transporter = nullptr;
+
+	const auto transporter_it = std::find_if(this->get_units().begin(), this->get_units().end(), is_a_free_transporter);
+	if (transporter_it != this->get_units().end()) {
+		transporter = *transporter_it;
+	}
 
 	if (transporter != nullptr) {
 		DebugPrint("%d: Transporter #%d\n" _C_ player.Index _C_ UnitNumber(*transporter));
 		MarkReacheableTerrainType(*transporter, &transporterTerrainTraversal);
 	} else {
-		std::vector<CUnit *>::iterator it = std::find_if(player.UnitBegin(), player.UnitEnd(), IsAFreeTransporter());
+		std::vector<CUnit *>::iterator it = std::find_if(player.UnitBegin(), player.UnitEnd(), is_a_free_transporter);
 		if (it != player.UnitEnd()) {
 			transporter = *it;
 			MarkReacheableTerrainType(*transporter, &transporterTerrainTraversal);
@@ -403,11 +402,13 @@ int AiForce::PlanAttack()
 
 	// Find a land unit of the force.
 	// FIXME: if force is split over different places -> broken
-	CUnit *landUnit = Units.find(CUnitTypeFinder(UnitTypeType::Land));
-	if (landUnit == nullptr) {
+	const auto land_unit_it = std::find_if(this->get_units().begin(), this->get_units().end(), CUnitTypeFinder(UnitTypeType::Land));
+	if (land_unit_it == this->get_units().end()) {
 		DebugPrint("%d: No land unit in force\n" _C_ player.Index);
 		return 0;
 	}
+
+	CUnit *landUnit = *land_unit_it;
 
 	Vec2i pos = this->GoalPos;
 
@@ -418,32 +419,30 @@ int AiForce::PlanAttack()
 			DebugPrint("%d: Assign any transporter #%d\n" _C_ player.Index _C_ UnitNumber(*transporter));
 
 			if (transporter->GroupId) {
-				transporter->Player->Ai->Force[transporter->GroupId - 1].Remove(*transporter);
+				transporter->Player->Ai->Force[transporter->GroupId - 1].Remove(transporter);
 			}
-			Insert(*transporter);
+			this->Insert(transporter);
 			transporter->GroupId = forceIndex;
 		}
 
-		int totalBoardCapacity = GetTotalBoardCapacity(Units.begin(), Units.end());
+		int totalBoardCapacity = GetTotalBoardCapacity(this->get_units().begin(), this->get_units().end());
 
 		// Verify we have enough transporter.
 		// @note: Minimal check for unitType (flyers...)
-		for (unsigned int i = 0; i < Size(); ++i) {
-			CUnit &unit = *Units[i];
-
-			if (CanTransport(*transporter, unit)) {
-				totalBoardCapacity -= unit.Type->BoardSize;
+		for (const wyrmgus::unit_ref &unit : this->get_units()) {
+			if (CanTransport(*transporter, *unit)) {
+				totalBoardCapacity -= unit->Type->BoardSize;
 			}
 		}
+
 		if (totalBoardCapacity < 0) { // Not enough transporter.
-			IsAFreeTransporter isAFreeTransporter;
 			// Add all other idle transporter.
 			for (int i = 0; i < player.GetUnitCount(); ++i) {
 				CUnit &unit = player.GetUnit(i);
 
-				if (isAFreeTransporter(&unit) && unit.GroupId == 0 && unit.IsIdle()) {
+				if (is_a_free_transporter(&unit) && unit.GroupId == 0 && unit.IsIdle()) {
 					DebugPrint("%d: Assign any transporter #%d\n" _C_ player.Index _C_ UnitNumber(unit));
-					Insert(unit);
+					this->Insert(&unit);
 					unit.GroupId = forceIndex;
 					totalBoardCapacity += unit.Type->MaxOnBoard - unit.BoardCount;
 					if (totalBoardCapacity >= 0) {

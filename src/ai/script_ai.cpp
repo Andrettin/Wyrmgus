@@ -44,6 +44,7 @@
 #include "unit/unit.h"
 #include "unit/unit_class.h"
 #include "unit/unit_manager.h"
+#include "unit/unit_ref.h"
 #include "unit/unit_type.h"
 #include "unit/unit_type_type.h"
 #include "upgrade/upgrade.h"
@@ -1112,11 +1113,6 @@ static int CclAiReleaseForce(lua_State *l)
 	}
 	for (int i = AI_MAX_FORCE_INTERNAL; i < AI_MAX_FORCES; ++i) {
 		if (AiPlayer->Force[i].FormerForce != -1 && AiPlayer->Force[i].FormerForce == force) {
-			while (AiPlayer->Force[i].Size()) {
-				CUnit &aiunit = *AiPlayer->Force[i].Units[AiPlayer->Force[i].Size() - 1];
-				aiunit.GroupId = 0;
-				AiPlayer->Force[i].Units.Remove(&aiunit);
-			}
 			AiPlayer->Force[i].Reset(false);
 		}
 	}
@@ -1649,7 +1645,7 @@ static int CclDefineAiPlayer(lua_State *l)
 						const char *ident = LuaToString(l, -1, subk + 1);
 						UNUSED(ident);
 #endif
-						ai->Force[forceIdx].Units.Insert(&wyrmgus::unit_manager::get()->GetSlotUnit(num));
+						ai->Force[forceIdx].Insert(&wyrmgus::unit_manager::get()->GetSlotUnit(num));
 					}
 					lua_pop(l, 1);
 				} else if (!strcmp(secondary_value, "state")) {

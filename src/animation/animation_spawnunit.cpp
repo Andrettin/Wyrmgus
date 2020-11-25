@@ -10,7 +10,7 @@
 //
 /**@name animation_spawnunit.cpp - The animation SpawnUnit. */
 //
-//      (c) Copyright 2012 by Joris Dauphin
+//      (c) Copyright 2012-2020 by Joris Dauphin and Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -36,8 +36,9 @@
 #include "map/map.h"
 #include "map/map_layer.h"
 #include "unit/unit.h"
+#include "unit/unit_ref.h"
 
-/* virtual */ void CAnimation_SpawnUnit::Action(CUnit &unit, int &/*move*/, int /*scale*/) const
+void CAnimation_SpawnUnit::Action(CUnit &unit, int &/*move*/, int /*scale*/) const
 {
 	Assert(unit.Anim.Anim == this);
 
@@ -64,7 +65,7 @@
 			if ((flags & SU_JoinToAIForce) && unit.Player->AiEnabled) {
 				int force = unit.Player->Ai->Force.GetForce(unit);
 				if (force != -1) {
-					unit.Player->Ai->Force[force].Insert(*target);
+					unit.Player->Ai->Force[force].Insert(target);
 					target->GroupId = unit.GroupId;
 					CommandDefend(*target, unit, FlushCommands);
 				}
@@ -79,7 +80,7 @@
 /*
 **  s = "unitType offX offY range player [flags]"
 */
-/* virtual */ void CAnimation_SpawnUnit::Init(const char *s, lua_State *)
+void CAnimation_SpawnUnit::Init(const char *s, lua_State *)
 {
 	const std::string str(s);
 	const size_t len = str.size();

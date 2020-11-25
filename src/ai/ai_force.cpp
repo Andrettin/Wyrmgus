@@ -48,6 +48,7 @@
 #include "unit/unit_find.h"
 #include "unit/unit_type.h"
 #include "unit/unit_type_type.h"
+#include "util/vector_util.h"
 
 static constexpr int AIATTACK_RANGE = 0;
 static constexpr int AIATTACK_ALLMAP = 1;
@@ -170,7 +171,7 @@ public:
 	{
 		Assert(enemy != nullptr);
 		*enemy = nullptr;
-		AiPlayer->Force[force].Units.for_each_if(*this);
+		wyrmgus::vector::for_each_unless(AiPlayer->Force[force].get_units(), *this);
 	}
 
 	//Wyrmgus start
@@ -180,7 +181,7 @@ public:
 	{
 		Assert(enemy != nullptr);
 		*enemy = nullptr;
-		force.Units.for_each_if(*this);
+		wyrmgus::vector::for_each_unless(force.get_units(), *this);
 	}
 
 	bool found() const { return *enemy != nullptr; }
@@ -389,34 +390,38 @@ int AiFindAvailableUnitTypeEquiv(const wyrmgus::unit_type &unittype, int *usable
 
 /* =========================== FORCES ========================== */
 
-class AiForceCounter
+class AiForceCounter final
 {
 public:
-	AiForceCounter(CUnitCache &units, unsigned int *d, const size_t len) : data(d)
+	explicit AiForceCounter(const std::vector<wyrmgus::unit_ref> &units, unsigned int *d, const size_t len) : data(d)
 	{
 		memset(data, 0, len);
-		units.for_each(*this);
+		for (const wyrmgus::unit_ref &unit : units) {
+			(*this)(unit);
+		}
 	}
-	inline void operator()(const CUnit *const unit) const
+
+	void operator()(const CUnit *const unit) const
 	{
-		data[UnitTypeEquivs[unit->Type->Slot]]++;
+		this->data[UnitTypeEquivs[unit->Type->Slot]]++;
 		
 		const wyrmgus::unit_class *unit_class = unit->Type->get_unit_class();
 		if (unit_class != nullptr) {
 			for (const wyrmgus::unit_type *class_unit_type : unit_class->get_unit_types()) {
 				if (class_unit_type != unit->Type) {
-					data[UnitTypeEquivs[class_unit_type->Slot]]++; //also increases for other units of the class; shouldn't be a problem because we assume that only one unit type per class would be requested
+					this->data[UnitTypeEquivs[class_unit_type->Slot]]++; //also increases for other units of the class; shouldn't be a problem because we assume that only one unit type per class would be requested
 				}
 			}
 		}
 	}
+
 private:
 	unsigned int *data;//[UnitTypeMax + 1];
 };
 
 void AiForce::CountTypes(unsigned int *counter, const size_t len)
 {
-	AiForceCounter(Units, counter, len);
+	AiForceCounter(this->get_units(), counter, len);
 }
 
 /**
@@ -454,31 +459,28 @@ bool AiForce::IsBelongsTo(const wyrmgus::unit_type &type)
 	return flag;
 }
 
-void AiForce::Insert(CUnit &unit)
+void AiForce::Insert(wyrmgus::unit_ref &&unit)
 {
-	Units.Insert(&unit);
-	unit.RefsIncrease();
+	this->units.push_back(std::move(unit));
 }
 
-/* static */ void AiForce::InternalRemoveUnit(CUnit *unit)
+void AiForce::InternalRemoveUnit(CUnit *unit)
 {
 	unit->GroupId = 0;
-	unit->RefsDecrease();
 }
-
 
 /**
 **  Ai clean units in a force.
 */
-void AiForce::RemoveDeadUnit()
+void AiForce::remove_dead_units()
 {
 	// Release all killed units.
-	for (unsigned int i = 0; i != Units.size();) {
-		CUnit &aiunit = *Units[i];
+	for (size_t i = 0; i != this->get_units().size();) {
+		CUnit *ai_unit = this->get_units()[i];
 
-		if (!aiunit.IsAlive()) {
-			InternalRemoveUnit(&aiunit);
-			Units.Remove(i);
+		if (!ai_unit->IsAlive()) {
+			AiForce::InternalRemoveUnit(ai_unit);
+			this->units.erase(this->units.begin() + i);
 			continue;
 		}
 		++i;
@@ -568,8 +570,8 @@ VisitResult AiForceRallyPointFinder::Visit(TerrainTraversal &terrainTraversal, c
 bool AiForce::NewRallyPoint(const Vec2i &startPos, Vec2i *resultPos, int z)
 //Wyrmgus end
 {
-	Assert(this->Units.size() > 0);
-	const CUnit &leader = *(this->Units[0]);
+	Assert(!this->get_units().empty());
+	const CUnit &leader = *(this->get_units().front());
 	//Wyrmgus start
 //	const int distance = leader.MapDistanceTo(startPos);
 	const int distance = leader.MapDistanceTo(startPos, z);
@@ -616,17 +618,16 @@ bool AiForce::CheckTransporters(const Vec2i &pos, int z)
 	int transport_capacity = AiGetTransportCapacity(water_landmass);
 	
 	int transport_capacity_needed = 0;
-	for (size_t i = 0; i != this->Units.size(); ++i) {
-		const CUnit &ai_unit = *this->Units[i];
-		if (ai_unit.Removed) { //already in a transporter
+	for (const wyrmgus::unit_ref &ai_unit : this->get_units()) {
+		if (ai_unit->Removed) { //already in a transporter
 			continue;
 		}
 		
-		if (CMap::Map.GetTileLandmass(ai_unit.tilePos, ai_unit.MapLayer->ID) == goal_landmass) { //already unloaded to the enemy's landmass
+		if (CMap::Map.GetTileLandmass(ai_unit->tilePos, ai_unit->MapLayer->ID) == goal_landmass) { //already unloaded to the enemy's landmass
 			continue;
 		}
 		
-		transport_capacity_needed += ai_unit.Type->BoardSize;
+		transport_capacity_needed += ai_unit->Type->BoardSize;
 	}
 	
 	int net_transport_capacity_needed = transport_capacity_needed - transport_capacity;
@@ -660,37 +661,37 @@ bool AiForce::CheckTransporters(const Vec2i &pos, int z)
 	}
 		
 	bool has_unboarded_unit = false;
-	for (size_t i = 0; i != this->Units.size(); ++i) {
-		CUnit &ai_unit = *this->Units[i];
+	for (size_t i = 0; i != this->get_units().size(); ++i) {
+		const wyrmgus::unit_ref &ai_unit = this->get_units()[i];
 		
-		if (ai_unit.Removed) { //already in a transporter
+		if (ai_unit->Removed) { //already in a transporter
 			continue;
 		}
 		
-		if (CMap::Map.GetTileLandmass(ai_unit.tilePos, ai_unit.MapLayer->ID) == goal_landmass) { //already unloaded to the enemy's landmass
+		if (CMap::Map.GetTileLandmass(ai_unit->tilePos, ai_unit->MapLayer->ID) == goal_landmass) { //already unloaded to the enemy's landmass
 			continue;
 		}
 		
 		has_unboarded_unit = true;
 		
-		if (!ai_unit.IsIdle()) { //if the unit isn't idle, don't give it the order to board (it may already be boarding a transporter)
+		if (!ai_unit->IsIdle()) { //if the unit isn't idle, don't give it the order to board (it may already be boarding a transporter)
 			continue;
 		}
 		
 		const int delay = i; // To avoid lot of CPU consuption, send them with a small time difference.
-		ai_unit.Wait += delay;
+		ai_unit->Wait += delay;
 
 		for (size_t j = 0; j != transporters.size(); ++j) {
 			CUnit *ai_transporter = transporters[j];
 			
-			if ((ai_transporter->Type->MaxOnBoard - ai_transporter->BoardCount) < ai_unit.Type->BoardSize) { //the unit's board size is too big to fit in the transporter
+			if ((ai_transporter->Type->MaxOnBoard - ai_transporter->BoardCount) < ai_unit->Type->BoardSize) { //the unit's board size is too big to fit in the transporter
 				continue;
 			}
 			
 			ai_transporter->Wait += delay;
 		
-			CommandBoard(ai_unit, *ai_transporter, FlushCommands);
-			CommandFollow(*ai_transporter, ai_unit, FlushCommands);
+			CommandBoard(*ai_unit, *ai_transporter, FlushCommands);
+			CommandFollow(*ai_transporter, *ai_unit, FlushCommands);
 			transporters.erase(std::remove(transporters.begin(), transporters.end(), ai_transporter), transporters.end()); //only tell one unit to board a particular transporter at a single time, to avoid units getting in the way of one another
 			break;
 		}
@@ -702,29 +703,29 @@ bool AiForce::CheckTransporters(const Vec2i &pos, int z)
 	
 	//everyone is already boarded, time to move to the enemy shores!
 	bool has_loaded_unit = false;
-	for (size_t i = 0; i != this->Units.size(); ++i) {
-		CUnit &ai_unit = *this->Units[i];
+	for (size_t i = 0; i != this->get_units().size(); ++i) {
+		const wyrmgus::unit_ref &ai_unit = this->get_units()[i];
 		
-		if (CMap::Map.GetTileLandmass(ai_unit.tilePos, ai_unit.MapLayer->ID) == goal_landmass) { //already unloaded to the enemy's landmass
+		if (CMap::Map.GetTileLandmass(ai_unit->tilePos, ai_unit->MapLayer->ID) == goal_landmass) { //already unloaded to the enemy's landmass
 			continue;
 		}
 
 		has_loaded_unit = true;
 
-		if (ai_unit.Container) { //in a transporter
-			if (!ai_unit.Container->IsIdle()) { //already moving (presumably to unload)
+		if (ai_unit->Container) { //in a transporter
+			if (!ai_unit->Container->IsIdle()) { //already moving (presumably to unload)
 				continue;
 			}
 			
-			if (ai_unit.Container->Type->MaxOnBoard > ai_unit.Container->BoardCount && has_unboarded_unit) { //send the transporter to unload units if it is full, or if all of the force's units are already boarded
+			if (ai_unit->Container->Type->MaxOnBoard > ai_unit->Container->BoardCount && has_unboarded_unit) { //send the transporter to unload units if it is full, or if all of the force's units are already boarded
 				//sending a transporter that is full to unload, even if all of the force's units aren't boarded yet, is useful to prevent transporter congestion
 				continue;
 			}
 			
 			const int delay = i; // To avoid lot of CPU consuption, send them with a small time difference.
-			ai_unit.Container->Wait += delay;
+			ai_unit->Container->Wait += delay;
 			//tell the transporter to unload to the goal pos
-			CommandUnload(*ai_unit.Container, pos, nullptr, FlushCommands, z, goal_landmass);
+			CommandUnload(*ai_unit->Container, pos, nullptr, FlushCommands, z, goal_landmass);
 		}
 	}
 	
@@ -736,16 +737,23 @@ bool AiForce::CheckTransporters(const Vec2i &pos, int z)
 }
 //Wyrmgus end
 
+wyrmgus::unit_ref AiForce::take_last_unit()
+{
+	wyrmgus::unit_ref unit = wyrmgus::vector::take_back(this->units);
+
+	AiForce::InternalRemoveUnit(unit);
+
+	return unit;
+}
+
 ForceType AiForce::GetForceType() const
 {
-	if (this->Units.size() == 0) {
+	if (this->get_units().empty()) {
 		return ForceType::Land;
 	}
 	
 	ForceType force_type = ForceType::Space;
-	for (size_t i = 0; i != this->Units.size(); ++i) {
-		CUnit *const unit = this->Units[i];
-		
+	for (const wyrmgus::unit_ref &unit : this->get_units()) {
 		if (unit->Type->UnitType == UnitTypeType::Naval && unit->CanAttack() && !unit->Type->CanTransport()) { //one naval unit that can attack makes this a naval force
 			return ForceType::Naval;
 		}
@@ -772,12 +780,11 @@ bool AiForce::IsAirForce() const
 
 bool AiForce::IsHeroOnlyForce() const
 {
-	if (this->Units.size() == 0) {
+	if (this->get_units().empty()) {
 		return false;
 	}
 	
-	for (size_t i = 0; i < this->Units.size(); ++i) {
-		CUnit *const unit = this->Units[i];
+	for (const wyrmgus::unit_ref &unit : this->get_units()) {
 		if (unit->get_character() == nullptr) {
 			return false;
 		}
@@ -792,9 +799,9 @@ void AiForce::Attack(const Vec2i &pos, int z)
 //Wyrmgus end
 {
 	bool isDefenceForce = false;
-	RemoveDeadUnit();
+	this->remove_dead_units();
 
-	if (Units.size() == 0) {
+	if (this->get_units().empty()) {
 		this->Attacking = false;
 		//Wyrmgus start
 		AiPlayer->Scouting = false;
@@ -802,6 +809,7 @@ void AiForce::Attack(const Vec2i &pos, int z)
 		this->State = AiForceAttackingState::Waiting;
 		return;
 	}
+
 	//Wyrmgus start
 	if (AiPlayer->Scouting) {
 		return;
@@ -811,8 +819,8 @@ void AiForce::Attack(const Vec2i &pos, int z)
 		// Remember the original force position so we can return there after attack
 		if (this->Role == AiForceRole::Defend
 			|| (this->Role == AiForceRole::Attack && this->State == AiForceAttackingState::Waiting)) {
-			this->HomePos = this->Units[this->Units.size() - 1]->tilePos;
-			this->HomeMapLayer = this->Units[this->Units.size() - 1]->MapLayer->ID;
+			this->HomePos = this->get_units().back()->tilePos;
+			this->HomeMapLayer = this->get_units().back()->MapLayer->ID;
 		}
 		this->Attacking = true;
 	}
@@ -820,8 +828,7 @@ void AiForce::Attack(const Vec2i &pos, int z)
 
 	bool isNaval = this->IsNaval();
 	bool isTransporter = false;
-	for (size_t i = 0; i != this->Units.size(); ++i) {
-		CUnit *const unit = this->Units[i];
+	for (const wyrmgus::unit_ref &unit : this->get_units()) {
 		//Wyrmgus start
 //		if (unit->Type->CanTransport() && unit->IsAgressive() == false) {
 		if (unit->Type->CanTransport()) {
@@ -877,15 +884,16 @@ void AiForce::Attack(const Vec2i &pos, int z)
 	} else {
 		isDefenceForce = true;
 	}
+
 	//Wyrmgus start
 	//if one of the force's units is being used as a scout, stop its function as a scout when the force is used to attack
-	for (size_t i = 0; i != this->Units.size(); ++i) {
-		CUnit *unit = this->Units[i];
-		if (std::find(AiPlayer->Scouts.begin(), AiPlayer->Scouts.end(), unit) != AiPlayer->Scouts.end()) {
-			AiPlayer->Scouts.erase(std::remove(AiPlayer->Scouts.begin(), AiPlayer->Scouts.end(), unit), AiPlayer->Scouts.end());
+	for (const wyrmgus::unit_ref &unit : this->get_units()) {
+		if (wyrmgus::vector::contains(AiPlayer->Scouts, unit)) {
+			wyrmgus::vector::remove(AiPlayer->Scouts, unit);
 		}
 	}
 	//Wyrmgus end
+
 	if (CMap::Map.Info.IsPointOnMap(goalPos, z) == false || isTransporter) {
 		DebugPrint("%d: Need to plan an attack with transporter\n" _C_ AiPlayer->Player->Index);
 		if (State == AiForceAttackingState::Waiting && !PlanAttack()) {
@@ -898,9 +906,7 @@ void AiForce::Attack(const Vec2i &pos, int z)
 	//Wyrmgus start
 	if (!isTransporter && !isNaval) {
 		bool needs_transport = false;
-		for (size_t i = 0; i != this->Units.size(); ++i) {
-			CUnit *const unit = this->Units[i];
-
+		for (const wyrmgus::unit_ref &unit : this->get_units()) {
 			if (unit->Type->UnitType != UnitTypeType::Fly && unit->Type->UnitType != UnitTypeType::FlyLow && unit->Type->UnitType != UnitTypeType::Space && CMap::Map.GetTileLandmass(unit->tilePos, unit->MapLayer->ID) != CMap::Map.GetTileLandmass(goalPos, z)) {
 				needs_transport = true;
 				break;
@@ -941,17 +947,15 @@ void AiForce::Attack(const Vec2i &pos, int z)
 	//  Send all units in the force to enemy.
 	
 	CUnit *leader = nullptr;
-	for (size_t i = 0; i != this->Units.size(); ++i) {
-		CUnit *const unit = this->Units[i];
-
+	for (const wyrmgus::unit_ref &unit : this->get_units()) {
 		if (unit->IsAgressive()) {
 			leader = unit;
 			break;
 		}
 	}
 
-	for (size_t i = 0; i != this->Units.size(); ++i) {
-		CUnit *const unit = this->Units[i];
+	for (size_t i = 0; i != this->get_units().size(); ++i) {
+		const wyrmgus::unit_ref &unit = this->get_units()[i];
 		
 		//Wyrmgus start
 		if (!unit->IsIdle()) {
@@ -991,21 +995,20 @@ void AiForce::Attack(const Vec2i &pos, int z)
 void AiForce::ReturnToHome()
 {
 	if (CMap::Map.Info.IsPointOnMap(this->HomePos, this->HomeMapLayer)) {
-		for (size_t i = 0; i != this->Units.size(); ++i) {
-			CUnit &unit = *this->Units[i];
-			
+		for (const wyrmgus::unit_ref &unit : this->get_units()) {
 			//Wyrmgus start
-			if (!unit.IsIdle()) {
+			if (!unit->IsIdle()) {
 				continue;
 			}
 			//Wyrmgus end
 		
 			//Wyrmgus start
-//			CommandMove(unit, this->HomePos, FlushCommands);
-			CommandMove(unit, this->HomePos, FlushCommands, this->HomeMapLayer);
+//			CommandMove(*unit, this->HomePos, FlushCommands);
+			CommandMove(*unit, this->HomePos, FlushCommands, this->HomeMapLayer);
 			//Wyrmgus end
 		}
 	}
+
 	const Vec2i invalidPos(-1, -1);
 
 	this->HomePos = invalidPos;
@@ -1061,26 +1064,25 @@ unsigned int AiForceManager::FindFreeForce(const AiForceRole role, int begin, bo
 int AiForceManager::GetForce(const CUnit &unit)
 {
 	for (unsigned int i = 0; i < forces.size(); ++i) {
-		AiForce &force = forces[i];
+		const AiForce &force = forces[i];
 
-		for (unsigned int j = 0; j < force.Units.size(); ++j) {
-			CUnit &aiunit = *force.Units[j];
-
-			if (UnitNumber(unit) == UnitNumber(aiunit)) {
+		for (const wyrmgus::unit_ref &ai_unit : force.get_units()) {
+			if (UnitNumber(unit) == UnitNumber(*ai_unit)) {
 				return i;
 			}
 		}
 	}
+
 	return -1;
 }
 
 /**
 **  Cleanup units in forces.
 */
-void AiForceManager::RemoveDeadUnit()
+void AiForceManager::remove_dead_units()
 {
 	for (unsigned int i = 0; i < forces.size(); ++i) {
-		forces[i].RemoveDeadUnit();
+		forces[i].remove_dead_units();
 	}
 }
 
@@ -1103,10 +1105,11 @@ bool AiForceManager::Assign(CUnit &unit, int force, bool hero)
 //		if (f.IsBelongsTo(*unit.Type)) {
 		if (f.IsBelongsTo(*unit.Type) || hero) {
 		//Wyrmgus end
-			if (hero && f.Units.size() > 0) { //make heroes move to where the rest of the force is
-				CommandMove(unit, f.Units[0]->tilePos, FlushCommands, f.Units[0]->MapLayer->ID);
+			if (hero && !f.get_units().empty()) {
+				//make heroes move to where the rest of the force is
+				CommandMove(unit, f.get_units().front()->tilePos, FlushCommands, f.get_units().front()->MapLayer->ID);
 			}
-			f.Insert(unit);
+			f.Insert(&unit);
 			unit.GroupId = force + 1;
 			return true;
 		}
@@ -1137,8 +1140,7 @@ void AiForceManager::CheckUnits(int *counter)
 		const AiForce &force = forces[i];
 
 		if (force.State > AiForceAttackingState::Free && force.IsAttacking()) {
-			for (unsigned int j = 0; j < force.Size(); ++j) {
-				const CUnit *unit = force.Units[j];
+			for (const wyrmgus::unit_ref &unit : force.get_units()) {
 				attacking[unit->Type->Slot]++;
 			}
 		}
@@ -1184,9 +1186,9 @@ void AiForceManager::CheckUnits(int *counter)
 /**
 **  Cleanup units in forces.
 */
-void AiRemoveDeadUnitInForces()
+void AiRemoveDeadUnitsInForces()
 {
-	AiPlayer->Force.RemoveDeadUnit();
+	AiPlayer->Force.remove_dead_units();
 }
 
 /**
@@ -1206,7 +1208,7 @@ void AiAssignFreeUnitsToForce(int force)
 {
 	const int n = AiPlayer->Player->GetUnitCount();
 
-	AiRemoveDeadUnitInForces();
+	AiRemoveDeadUnitsInForces();
 	for (int i = 0; i < n; ++i) {
 		CUnit &unit = AiPlayer->Player->GetUnit(i);
 
@@ -1272,10 +1274,9 @@ void AiAttackWithForce(unsigned int force)
 		AiPlayer->Force[f].Role = AiPlayer->Force[intForce].Role;
 
 		while (AiPlayer->Force[intForce].Size()) {
-			CUnit &aiunit = *AiPlayer->Force[intForce].Units[AiPlayer->Force[intForce].Size() - 1];
-			aiunit.GroupId = f + 1;
-			AiPlayer->Force[intForce].Units.Remove(&aiunit);
-			AiPlayer->Force[f].Units.Insert(&aiunit);
+			wyrmgus::unit_ref ai_unit = AiPlayer->Force[intForce].take_last_unit();
+			ai_unit->GroupId = f + 1;
+			AiPlayer->Force[f].Insert(std::move(ai_unit));
 		}
 
 		while (AiPlayer->Force[intForce].UnitTypes.size()) {
@@ -1291,8 +1292,8 @@ void AiAttackWithForce(unsigned int force)
 	const Vec2i invalidPos(-1, -1);
 	//Wyrmgus start
 	int z = AiPlayer->Player->StartMapLayer;
-	if (AiPlayer->Force[force].Units.size() > 0) {
-		z = AiPlayer->Force[force].Units[0]->MapLayer->ID;
+	if (!AiPlayer->Force[force].get_units().empty()) {
+		z = AiPlayer->Force[force].get_units()[0]->MapLayer->ID;
 	}
 	
 //	AiPlayer->Force[force].Attack(invalidPos);
@@ -1325,22 +1326,23 @@ void AiAttackWithForces(int *forces)
 			AiPlayer->Force[f].Role = AiPlayer->Force[force].Role;
 
 			while (AiPlayer->Force[force].Size()) {
-				CUnit &aiunit = *AiPlayer->Force[force].Units[AiPlayer->Force[force].Size() - 1];
-				aiunit.GroupId = f + 1;
-				AiPlayer->Force[force].Units.Remove(&aiunit);
-				AiPlayer->Force[f].Units.Insert(&aiunit);
+				wyrmgus::unit_ref ai_unit = AiPlayer->Force[force].take_last_unit();
+				ai_unit->GroupId = f + 1;
+				AiPlayer->Force[f].Insert(std::move(ai_unit));
 			}
+
 			while (AiPlayer->Force[force].UnitTypes.size()) {
 				top = AiPlayer->Force[force].UnitTypes.size() - 1;
 				AiPlayer->Force[f].UnitTypes.push_back(AiPlayer->Force[force].UnitTypes[top]);
 				AiPlayer->Force[force].UnitTypes.pop_back();
 			}
+
 			AiPlayer->Force[force].Reset();
 		} else {
 			//Wyrmgus start
 			int z = AiPlayer->Player->StartMapLayer;
-			if (AiPlayer->Force[force].Units.size() > 0) {
-				z = AiPlayer->Force[force].Units[0]->MapLayer->ID;
+			if (!AiPlayer->Force[force].get_units().empty()) {
+				z = AiPlayer->Force[force].get_units()[0]->MapLayer->ID;
 			}
 			
 //			AiPlayer->Force[force].Attack(invalidPos);
@@ -1352,8 +1354,8 @@ void AiAttackWithForces(int *forces)
 		AiPlayer->Force[f].Completed = true;
 		//Wyrmgus start
 		int z = AiPlayer->Player->StartMapLayer;
-		if (AiPlayer->Force[f].Units.size() > 0) {
-			z = AiPlayer->Force[f].Units[0]->MapLayer->ID;
+		if (!AiPlayer->Force[f].get_units().empty()) {
+			z = AiPlayer->Force[f].get_units()[0]->MapLayer->ID;
 		}
 			
 //		AiPlayer->Force[f].Attack(invalidPos);
@@ -1378,50 +1380,52 @@ static void AiGroupAttackerForTransport(AiForce &aiForce)
 	unsigned int transporterIndex = 0;
 	bool forceIsReady = true;
 
-	for (; transporterIndex < aiForce.Size(); ++transporterIndex) {
-		const CUnit &unit = *aiForce.Units[transporterIndex];
+	for (; transporterIndex < aiForce.get_units().size(); ++transporterIndex) {
+		const CUnit *unit = aiForce.get_units()[transporterIndex];
 
-		if (unit.Type->CanTransport() && unit.Type->MaxOnBoard - unit.BoardCount > 0) {
-			nbToTransport = unit.Type->MaxOnBoard - unit.BoardCount;
+		if (unit->Type->CanTransport() && unit->Type->MaxOnBoard - unit->BoardCount > 0) {
+			nbToTransport = unit->Type->MaxOnBoard - unit->BoardCount;
 			break;
 		}
 	}
+
 	if (transporterIndex == aiForce.Size()) {
 		aiForce.State = AiForceAttackingState::AttackingWithTransporter;
-		return ;
+		return;
 	}
-	for (unsigned int i = 0; i < aiForce.Size(); ++i) {
-		const CUnit &unit = *aiForce.Units[i];
-		const CUnit &transporter = *aiForce.Units[transporterIndex];
 
-		if (CanTransport(transporter, unit) && unit.Container == nullptr) {
+	for (const wyrmgus::unit_ref &unit : aiForce.get_units()) {
+		const wyrmgus::unit_ref &transporter = aiForce.get_units()[transporterIndex];
+
+		if (CanTransport(*transporter, *unit) && unit->Container == nullptr) {
 			forceIsReady = false;
 			break;
 		}
 	}
+
 	if (forceIsReady == true) {
 		aiForce.State = AiForceAttackingState::AttackingWithTransporter;
-		return ;
+		return;
 	}
-	for (unsigned int i = 0; i < aiForce.Size(); ++i) {
-		CUnit &unit = *aiForce.Units[i];
-		CUnit &transporter = *aiForce.Units[transporterIndex];
 
-		if (unit.CurrentAction() == UnitAction::Board
-			&& static_cast<COrder_Board *>(unit.CurrentOrder())->get_goal() == &transporter) {
-			CommandFollow(transporter, unit, 0);
+	for (const wyrmgus::unit_ref &unit : aiForce.get_units()) {
+		const wyrmgus::unit_ref &transporter = aiForce.get_units()[transporterIndex];
+
+		if (unit->CurrentAction() == UnitAction::Board
+			&& static_cast<COrder_Board *>(unit->CurrentOrder())->get_goal() == transporter) {
+			CommandFollow(*transporter, *unit, 0);
 		}
-		if (CanTransport(transporter, unit) && (unit.IsIdle() 
-			|| (unit.CurrentAction() == UnitAction::Board && !unit.Moving
-			&& static_cast<COrder_Board *>(unit.CurrentOrder())->get_goal() != &transporter)) && unit.Container == nullptr) {
-				CommandBoard(unit, transporter, FlushCommands);
-				CommandFollow(transporter, unit, 0);
+		if (CanTransport(*transporter, *unit) && (unit->IsIdle()
+			|| (unit->CurrentAction() == UnitAction::Board && !unit->Moving
+			&& static_cast<COrder_Board *>(unit->CurrentOrder())->get_goal() != transporter)) && unit->Container == nullptr) {
+				CommandBoard(*unit, *transporter, FlushCommands);
+				CommandFollow(*transporter, *unit, 0);
 				if (--nbToTransport == 0) { // full : next transporter.
-					for (++transporterIndex; transporterIndex < aiForce.Size(); ++transporterIndex) {
-						const CUnit &nextTransporter = *aiForce.Units[transporterIndex];
+					for (++transporterIndex; transporterIndex < aiForce.get_units().size(); ++transporterIndex) {
+						const wyrmgus::unit_ref &nextTransporter = aiForce.get_units()[transporterIndex];
 
-						if (nextTransporter.Type->CanTransport()) {
-							nbToTransport = nextTransporter.Type->MaxOnBoard - nextTransporter.BoardCount;
+						if (nextTransporter->Type->CanTransport()) {
+							nbToTransport = nextTransporter->Type->MaxOnBoard - nextTransporter->BoardCount;
 							break ;
 						}
 					}
@@ -1450,27 +1454,29 @@ void AiForce::Update()
 		}
 		return;
 	}
+
 	//Wyrmgus start
 	if (AiPlayer->Scouting) {
 		return;
 	}
 	//Wyrmgus end
+
 	//Wyrmgus start
 	//if one of the force's units is being used as a scout, stop its function as a scout when the force is used to attack
-	for (size_t i = 0; i != this->Units.size(); ++i) {
-		CUnit *unit = this->Units[i];
-		if (std::find(AiPlayer->Scouts.begin(), AiPlayer->Scouts.end(), unit) != AiPlayer->Scouts.end()) {
-			AiPlayer->Scouts.erase(std::remove(AiPlayer->Scouts.begin(), AiPlayer->Scouts.end(), unit), AiPlayer->Scouts.end());
+	for (const wyrmgus::unit_ref &unit : this->get_units()) {
+		if (wyrmgus::vector::contains(AiPlayer->Scouts, unit)) {
+			wyrmgus::vector::remove(AiPlayer->Scouts, unit);
 		}
 	}
 	//Wyrmgus end
+
 	//if force still has no goal, run its Attack function again to get a target
 	if (CMap::Map.Info.IsPointOnMap(GoalPos, GoalMapLayer) == false) {
 		const Vec2i invalidPos(-1, -1);
 		//Wyrmgus start
 		int z = AiPlayer->Player->StartMapLayer;
-		if (Units.size() > 0) {
-			z = Units[0]->MapLayer->ID;
+		if (!this->get_units().empty()) {
+			z = this->get_units()[0]->MapLayer->ID;
 		}
 			
 //		Attack(invalidPos);
@@ -1480,10 +1486,8 @@ void AiForce::Update()
 	}
 	//Wyrmgus end
 	Attacking = false;
-	for (unsigned int i = 0; i < Size(); ++i) {
-		CUnit *aiunit = Units[i];
-
-		if (aiunit->Type->CanAttack) {
+	for (const wyrmgus::unit_ref &ai_unit : this->get_units()) {
+		if (ai_unit->Type->CanAttack) {
 			Attacking = true;
 			break;
 		}
@@ -1516,16 +1520,16 @@ void AiForce::Update()
 		// Move transporters to goalpos
 		std::vector<CUnit *> transporters;
 		bool emptyTrans = true;
-		for (unsigned int i = 0; i != Size(); ++i) {
-			CUnit &aiunit = *Units[i];
-			
-			if (aiunit.CanMove() && aiunit.Type->MaxOnBoard) {
-				transporters.push_back(&aiunit);
-				if (aiunit.BoardCount > 0) {
+
+		for (const wyrmgus::unit_ref &ai_unit : this->get_units()) {
+			if (ai_unit->CanMove() && ai_unit->Type->MaxOnBoard) {
+				transporters.push_back(ai_unit);
+				if (ai_unit->BoardCount > 0) {
 					emptyTrans = false;
 				}
 			}
 		}
+
 		if (transporters.empty()) {
 			// Our transporters have been destroyed
 			DebugPrint("%d: Attack force #%lu has lost all agresive units, giving up\n"
@@ -1554,9 +1558,7 @@ void AiForce::Update()
 	
 	//Wyrmgus start
 	bool needs_transport = false;
-	for (size_t i = 0; i != this->Units.size(); ++i) {
-		CUnit *const unit = this->Units[i];
-
+	for (const wyrmgus::unit_ref &unit : this->get_units()) {
 		if (unit->Type->UnitType != UnitTypeType::Fly && unit->Type->UnitType != UnitTypeType::FlyLow && unit->Type->UnitType != UnitTypeType::Space && unit->Type->UnitType != UnitTypeType::Naval && CMap::Map.GetTileLandmass(unit->tilePos, unit->MapLayer->ID) != CMap::Map.GetTileLandmass(this->GoalPos, this->GoalMapLayer)) {
 			needs_transport = true;
 			break;
@@ -1571,33 +1573,31 @@ void AiForce::Update()
 	//Wyrmgus end
 	
 	CUnit *leader = nullptr;
-	for (unsigned int i = 0; i != Size(); ++i) {
-		CUnit &aiunit = *Units[i];
-
-		if (aiunit.IsAgressive()) {
-			leader = &aiunit;
+	for (const wyrmgus::unit_ref &ai_unit : this->get_units()) {
+		if (ai_unit->IsAgressive()) {
+			leader = ai_unit;
 			break;
 		}
 	}
 
 	//Wyrmgus start
 //	const int thresholdDist = 5; // Hard coded value
-	const int thresholdDist = std::max(5, (int) Units.size() / 8);
+	const int thresholdDist = std::max(5, static_cast<int>(this->get_units().size()) / 8);
 	//Wyrmgus end
 	Assert(CMap::Map.Info.IsPointOnMap(GoalPos, GoalMapLayer));
 	const bool include_neutral = AiPlayer->Player->AtPeace() && GameCycle >= PlayerAi::enforced_peace_cycle_count;
 	if (State == AiForceAttackingState::GoingToRallyPoint) {
 		// Check if we are near the goalpos
 		//Wyrmgus start
-//		int minDist = Units[0]->MapDistanceTo(this->GoalPos);
-		int minDist = Units[0]->MapDistanceTo(this->GoalPos, this->GoalMapLayer);
+//		int minDist = this->get_units()[0]->MapDistanceTo(this->GoalPos);
+		int minDist = this->get_units()[0]->MapDistanceTo(this->GoalPos, this->GoalMapLayer);
 		//Wyrmgus end
 		int maxDist = minDist;
 
-		for (size_t i = 0; i != Size(); ++i) {
+		for (const wyrmgus::unit_ref &unit : this->get_units()) {
 			//Wyrmgus start
-//			const int distance = Units[i]->MapDistanceTo(this->GoalPos);
-			const int distance = Units[i]->MapDistanceTo(this->GoalPos, this->GoalMapLayer);
+//			const int distance = unit->MapDistanceTo(this->GoalPos);
+			const int distance = unit->MapDistanceTo(this->GoalPos, this->GoalMapLayer);
 			//Wyrmgus end
 			minDist = std::min(minDist, distance);
 			maxDist = std::max(maxDist, distance);
@@ -1657,11 +1657,11 @@ void AiForce::Update()
 			}
 			
 			State = AiForceAttackingState::Attacking;
-			for (size_t i = 0; i != this->Size(); ++i) {
-				CUnit &aiunit = *this->Units[i];
+			for (size_t i = 0; i != this->get_units().size(); ++i) {
+				const wyrmgus::unit_ref &ai_unit = this->get_units()[i];
 				
 				//Wyrmgus start
-				if (!aiunit.IsIdle()) {
+				if (!ai_unit->IsIdle()) {
 					continue;
 				}
 				//Wyrmgus end
@@ -1672,18 +1672,19 @@ void AiForce::Update()
 				//Wyrmgus end
 
 				//Wyrmgus start
-//				aiunit.Wait = delay;
-				aiunit.Wait += delay;
+//				ai_unit->Wait = delay;
+				ai_unit->Wait += delay;
 				//Wyrmgus end
-				if (aiunit.IsAgressive()) {
-					CommandAttack(aiunit, this->GoalPos, nullptr, FlushCommands, this->GoalMapLayer);
+
+				if (ai_unit->IsAgressive()) {
+					CommandAttack(*ai_unit, this->GoalPos, nullptr, FlushCommands, this->GoalMapLayer);
 				} else {
 					if (leader) {
-						CommandDefend(aiunit, *leader, FlushCommands);
+						CommandDefend(*ai_unit, *leader, FlushCommands);
 					} else {
 						//Wyrmgus start
-//						CommandMove(aiunit, this->GoalPos, FlushCommands);
-						CommandMove(aiunit, this->GoalPos, FlushCommands, this->GoalMapLayer);
+//						CommandMove(*ai_unit, this->GoalPos, FlushCommands);
+						CommandMove(*ai_unit, this->GoalPos, FlushCommands, this->GoalMapLayer);
 						//Wyrmgus end
 					}
 				}
@@ -1692,11 +1693,9 @@ void AiForce::Update()
 	}
 
 	std::vector<CUnit *> idleUnits;
-	for (unsigned int i = 0; i != Size(); ++i) {
-		CUnit &aiunit = *Units[i];
-
-		if (aiunit.IsIdle()) {
-			idleUnits.push_back(&aiunit);
+	for (const wyrmgus::unit_ref &ai_unit : this->get_units()) {
+		if (ai_unit->IsIdle()) {
+			idleUnits.push_back(ai_unit);
 		}
 	}
 
@@ -1830,7 +1829,7 @@ void AiForceManager::CheckForceRecruitment()
 	
 	for (unsigned int f = 0; f < forces.size(); ++f) {
 		AiForce &force = forces[f];
-		if (force.Completed && force.Units.size() > 0) {
+		if (force.Completed && !force.get_units().empty()) {
 			if (!force.IsHeroOnlyForce()) {
 				completed_forces++;
 				force_type_count[static_cast<int>(force.GetForceType())]++;
@@ -1838,7 +1837,7 @@ void AiForceManager::CheckForceRecruitment()
 			//attack with forces that are completed, but aren't attacking or defending
 			if (!force.Attacking && !force.Defending) {
 				const Vec2i invalidPos(-1, -1);
-				int z = force.Units[0]->MapLayer->ID;
+				int z = force.get_units()[0]->MapLayer->ID;
 				
 				force.Attack(invalidPos, z);
 			}
@@ -1855,8 +1854,7 @@ void AiForceManager::CheckForceRecruitment()
 		for (size_t f = 0; f < forces.size(); ++f) {
 			AiForce &force = forces[f];
 			if (force.Completed) {
-				for (size_t j = 0; j < force.Units.size(); ++j) {
-					CUnit *force_unit = force.Units[j];
+				for (const wyrmgus::unit_ref &force_unit : force.get_units()) {
 					completed_force_pop += force_unit->Variable[DEMAND_INDEX].Value;
 				}
 			}
@@ -1944,7 +1942,7 @@ void AiForceManager::Update()
 		//  Look if our defenders still have enemies in range.
 
 		if (force.Defending) {
-			force.RemoveDeadUnit();
+			force.remove_dead_units();
 
 			if (force.Size() == 0) {
 				force.Attacking = false;
@@ -1958,10 +1956,10 @@ void AiForceManager::Update()
 				force.ReturnToHome();
 			} else {
 				//  Check if some unit from force reached goal point
-				for (unsigned int i = 0; i != force.Size(); ++i) {
+				for (const wyrmgus::unit_ref &unit : force.get_units()) {
 					//Wyrmgus start
-//					if (force.Units[i]->MapDistanceTo(force.GoalPos) <= nearDist) {
-					if (force.Units[i]->MapDistanceTo(force.GoalPos, force.GoalMapLayer) <= nearDist) {
+//					if (unit->MapDistanceTo(force.GoalPos) <= nearDist) {
+					if (unit->MapDistanceTo(force.GoalPos, force.GoalMapLayer) <= nearDist) {
 					//Wyrmgus end
 						//  Look if still enemies in attack range.
 						const CUnit *dummy = nullptr;
@@ -1989,13 +1987,13 @@ void AiForceManager::Update()
 						//Wyrmgus start
 						force.GoalMapLayer,
 						//Wyrmgus end
-					   IsAnAlliedUnitOf(*force.Units[0]->Player));
+					   IsAnAlliedUnitOf(*force.get_units()[0]->Player));
 				if (nearGoal.empty()) {
 					force.ReturnToHome();
 				} else {
 					std::vector<CUnit *> idleUnits;
 					for (unsigned int i = 0; i != force.Size(); ++i) {
-						CUnit &aiunit = *force.Units[i];
+						CUnit &aiunit = *force.get_units()[i];
 
 						if (aiunit.IsIdle() && aiunit.IsAliveOnMap()) {
 							idleUnits.push_back(&aiunit);
@@ -2027,7 +2025,7 @@ void AiForceManager::Update()
 				}
 			}
 		} else if (force.Attacking) {
-			force.RemoveDeadUnit();
+			force.remove_dead_units();
 			force.Update();
 		}
 	}

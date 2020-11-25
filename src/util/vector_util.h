@@ -96,4 +96,46 @@ inline std::optional<size_t> find_index(const std::vector<T> &vector, const T &e
 	return static_cast<size_t>(find_iterator - vector.begin());
 }
 
+template <typename T>
+T take(std::vector<T> &vector, const size_t index)
+{
+	T value = std::move(vector[index]);
+	vector.erase(vector.begin() + index);
+	return value;
+}
+
+template <typename T>
+T take_front(std::vector<T> &vector)
+{
+	return vector::take(vector, 0);
+}
+
+template <typename T>
+T take_back(std::vector<T> &vector)
+{
+	return vector::take(vector, vector.size() - 1);
+}
+
+template <typename T, typename function_type>
+void for_each_until(const std::vector<T> &vector, function_type &function)
+{
+	//loops through a vector, calling a function, until the function returns true
+	for (const T &element : vector) {
+		if (function(element) == true) {
+			break;
+		}
+	}
+}
+
+template <typename T, typename function_type>
+void for_each_unless(const std::vector<T> &vector, function_type &function)
+{
+	//loops through a vector, calling a function, until the function returns false
+	for (const T &element : vector) {
+		if (function(element) == false) {
+			break;
+		}
+	}
+}
+
 }

@@ -166,7 +166,7 @@ int spell_action_summon::Cast(CUnit &caster, const spell &spell, CUnit *target, 
 			if (this->JoinToAiForce && caster.Player->AiEnabled) {
 				int force = caster.Player->Ai->Force.GetForce(caster);
 				if (force != -1) {
-					caster.Player->Ai->Force[force].Insert(*target);
+					caster.Player->Ai->Force[force].Insert(target);
 					target->GroupId = caster.GroupId;
 					CommandDefend(*target, caster, FlushCommands);
 				}

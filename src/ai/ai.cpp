@@ -480,11 +480,8 @@ static void SaveAiPlayer(CFile &file, int plynr, const PlayerAi &ai)
 			file.printf("%d, \"%s\", ", aut.Want, aut.Type->Ident.c_str());
 		}
 		file.printf("},\n    \"units\", {");
-		const size_t unitsCount = ai.Force[i].Units.size();
-		for (size_t j = 0; j != unitsCount; ++j) {
-			const CUnit &aiunit = *ai.Force[i].Units[j];
-			file.printf(" %d, \"%s\",", UnitNumber(aiunit),
-						aiunit.Type->Ident.c_str());
+		for (const wyrmgus::unit_ref &ai_unit : ai.Force[i].get_units()) {
+			file.printf(" %d, \"%s\",", UnitNumber(*ai_unit), ai_unit->Type->get_identifier().c_str());
 		}
 		file.printf("},\n    \"state\", %d, \"goalx\", %d, \"goaly\", %d,",
 					ai.Force[i].State, ai.Force[i].GoalPos.x, ai.Force[i].GoalPos.y);
@@ -1153,7 +1150,7 @@ void AiUnitKilled(CUnit &unit)
 	if (unit.GroupId) {
 		AiForce &force = unit.Player->Ai->Force[unit.GroupId - 1];
 
-		force.Remove(unit);
+		force.Remove(&unit);
 		if (force.Size() == 0) {
 			force.Attacking = false;
 			if (!force.Defending && force.State > AiForceAttackingState::Waiting) {
@@ -1416,7 +1413,7 @@ void AiTrainingComplete(CUnit &unit, CUnit &what)
 	//Wyrmgus end
 
 	//Wyrmgus start
-	what.Player->Ai->Force.RemoveDeadUnit();
+	what.Player->Ai->Force.remove_dead_units();
 	what.Player->Ai->Force.Assign(what, -1);
 	
 	if (what.Player->Ai->Force.GetForce(what) == -1) { // if the unit hasn't been assigned to a force, see if it is a transporter, and assign it accordingly
