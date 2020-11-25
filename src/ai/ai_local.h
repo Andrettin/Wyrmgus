@@ -255,7 +255,7 @@ constexpr int AI_MAX_COMPLETED_FORCE_POP = 90; /// How much population the AI co
 **
 **  A Forces container for the force manager to handle
 */
-class AiForceManager
+class AiForceManager final
 {
 public:
 	AiForceManager();
@@ -342,7 +342,7 @@ public:
 /**
 **  AI variables.
 */
-class PlayerAi
+class PlayerAi final
 {
 public:
 	static constexpr int enforced_peace_cycle_count = CYCLES_PER_MINUTE * 20;

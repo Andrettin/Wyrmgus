@@ -30,6 +30,7 @@
 #include "item/item_slot.h"
 #include "player.h"
 #include "player_container.h"
+#include "unit/unit_ref.h"
 #include "unit/unit_type.h"
 #include "unit/unit_variable.h"
 #include "vec2i.h"
@@ -584,11 +585,9 @@ public:
 	CUnit *NextContained; /// Next unit in the container.
 	CUnit *PrevContained; /// Previous unit in the container.
 
-	CUnit *NextWorker; //pointer to next assigned worker to "Goal" resource.
 	struct {
-		CUnit *Workers; /// pointer to first assigned worker to this resource.
-		int Assigned; /// how many units are assigned to harvesting from the resource.
-		int Active; /// how many units are harvesting from the resource.
+		std::vector<wyrmgus::unit_ref> Workers; ///references to the workers assigned to this resource.
+		int Active = 0; /// how many units are harvesting from the resource.
 	} Resource; /// Resource still
 
 	//Wyrmgus start

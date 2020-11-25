@@ -586,8 +586,9 @@ void ResourceUnitFinder::ResourceUnitFinder_Cost::SetFrom(const CUnit &mine, con
 		distance *= 8;
 	}
 	//Wyrmgus end
+
 	if (check_usage) {
-		assigned = mine.Resource.Assigned - mine.Type->MaxOnBoard;
+		assigned = static_cast<int>(mine.Resource.Workers.size()) - mine.Type->MaxOnBoard;
 		waiting = GetNumWaitingWorkers(mine);
 	} else {
 		assigned = 0;

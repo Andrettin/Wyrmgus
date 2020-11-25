@@ -1081,8 +1081,8 @@ int AiForceManager::GetForce(const CUnit &unit)
 */
 void AiForceManager::remove_dead_units()
 {
-	for (unsigned int i = 0; i < forces.size(); ++i) {
-		forces[i].remove_dead_units();
+	for (unsigned int i = 0; i < this->forces.size(); ++i) {
+		this->forces[i].remove_dead_units();
 	}
 }
 

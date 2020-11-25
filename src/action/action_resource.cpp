@@ -1049,8 +1049,7 @@ int COrder_Resource::GatherResource(CUnit &unit)
 
 				// Improved version of DropOutAll that makes workers go to the depot.
 				LoseResource(unit, *source);
-				for (CUnit *uins = source->Resource.Workers;
-					 uins; uins = uins->NextWorker) {
+				for (const wyrmgus::unit_ref &uins : source->Resource.Workers) {
 					if (uins != &unit && uins->CurrentOrder()->Action == UnitAction::Resource) {
 						COrder_Resource &order = *static_cast<COrder_Resource *>(uins->CurrentOrder());
 						if (!uins->Anim.Unbreakable && order.State == SUB_GATHER_RESOURCE) {
@@ -1058,6 +1057,7 @@ int COrder_Resource::GatherResource(CUnit &unit)
 						}
 					}
 				}
+
 				// Don't destroy the resource twice.
 				// This only happens when it's empty.
 				if (!dead) {
@@ -1103,17 +1103,16 @@ int COrder_Resource::GatherResource(CUnit &unit)
 int GetNumWaitingWorkers(const CUnit &mine)
 {
 	int ret = 0;
-	CUnit *worker = mine.Resource.Workers;
 
-	for (int i = 0; nullptr != worker; worker = worker->NextWorker, ++i) {
+	for (const wyrmgus::unit_ref &worker : mine.Resource.Workers) {
 		Assert(worker->CurrentAction() == UnitAction::Resource);
 		COrder_Resource &order = *static_cast<COrder_Resource *>(worker->CurrentOrder());
 
 		if (order.IsGatheringWaiting()) {
 			ret++;
 		}
-		Assert(i <= mine.Resource.Assigned);
 	}
+
 	return ret;
 }
 
@@ -1160,9 +1159,8 @@ int COrder_Resource::StopGathering(CUnit &unit)
 
 		if (source->Type->MaxOnBoard) {
 			int count = 0;
-			CUnit *worker = source->Resource.Workers;
 			CUnit *next = nullptr;
-			for (; nullptr != worker; worker = worker->NextWorker) {
+			for (const wyrmgus::unit_ref &worker : source->Resource.Workers) {
 				Assert(worker->CurrentAction() == UnitAction::Resource);
 				COrder_Resource &order = *static_cast<COrder_Resource *>(worker->CurrentOrder());
 				if (worker != &unit && order.IsGatheringWaiting()) {
@@ -1176,12 +1174,12 @@ int COrder_Resource::StopGathering(CUnit &unit)
 					}
 				}
 			}
-			if (next) {
+			if (next != nullptr) {
 				if (!unit.Player->AiEnabled) {
 					DebugPrint("%d: Worker %d report: Unfreez resource gathering of %d <Wait %d> on %d [Assigned: %d Waiting %d].\n"
 							   _C_ unit.Player->Index _C_ UnitNumber(unit)
 							   _C_ UnitNumber(*next) _C_ next->Wait
-							   _C_ UnitNumber(*source) _C_ source->Resource.Assigned
+							   _C_ UnitNumber(*source) _C_ source->Resource.Workers.size()
 							   _C_ count);
 				}
 				next->Wait = 0;

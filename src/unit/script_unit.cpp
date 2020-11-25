@@ -582,20 +582,23 @@ static int CclUnit(lua_State *l)
 		} else if (!strcmp(value, "boarded")) {
 			unit->Boarded = 1;
 			--j;
-		} else if (!strcmp(value, "next-worker")) {
-			lua_rawgeti(l, 2, j + 1);
-			lua_pushvalue(l, -1);
-			unit->NextWorker = CclGetUnitFromRef(l);
-			lua_pop(l, 1);
 		} else if (!strcmp(value, "resource-workers")) {
+			int subargs;
+			int k;
 			lua_rawgeti(l, 2, j + 1);
-			lua_pushvalue(l, -1);
-			unit->Resource.Workers = CclGetUnitFromRef(l);
-			lua_pop(l, 1);
-		} else if (!strcmp(value, "resource-assigned")) {
-			lua_rawgeti(l, 2, j + 1);
-			lua_pushvalue(l, -1);
-			unit->Resource.Assigned = LuaToNumber(l, -1);
+			if (!lua_istable(l, -1)) {
+				LuaError(l, "incorrect argument");
+			}
+			subargs = lua_rawlen(l, -1);
+			for (k = 0; k < subargs; ++k) {
+				lua_rawgeti(l, -1, k + 1);
+				CUnit *u = CclGetUnitFromRef(l);
+				lua_pop(l, 1);
+
+				Assert(u != nullptr);
+
+				unit->Resource.Workers.push_back(wyrmgus::unit_ref(u));
+			}
 			lua_pop(l, 1);
 		} else if (!strcmp(value, "resource-active")) {
 			lua_rawgeti(l, 2, j + 1);

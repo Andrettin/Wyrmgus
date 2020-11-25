@@ -315,22 +315,26 @@ void SaveUnit(const CUnit &unit, CFile &file)
 		file.printf(" \"auto-repair\",");
 	}
 
-	if (unit.NextWorker) {
-		if (unit.NextWorker->Destroyed) {
-			/* this unit is destroyed so it's not in the global unit
-			 * array - this means it won't be saved!!! */
-			printf("FIXME: storing destroyed Worker - loading will fail.\n");
-		}
-		file.printf(" \"next-worker\", \"%s\",", UnitReference(unit.NextWorker).c_str());
-	}
-
-	if (unit.Resource.Workers != nullptr) {
+	if (!unit.Resource.Workers.empty()) {
 		file.printf(" \"resource-active\", %d,", unit.Resource.Active);
-		file.printf(" \"resource-assigned\", %d,", unit.Resource.Assigned);
-		file.printf(" \"resource-workers\", \"%s\",", UnitReference(unit.Resource.Workers).c_str());
+		file.printf("\n  \"resource-workers\", {");
+		for (size_t i = 0; i < unit.Resource.Workers.size(); ++i) {
+			const wyrmgus::unit_ref &worker = unit.Resource.Workers[i];
+
+			if (worker->Destroyed) {
+				/* this unit is destroyed so it's not in the global unit
+				 * array - this means it won't be saved!!! */
+				printf("FIXME: storing destroyed Worker - loading will fail.\n");
+			}
+
+			file.printf("\"%s\"", UnitReference(worker).c_str());
+			if (i > 1) {
+				file.printf(", ");
+			}
+		}
+		file.printf("},\n  ");
 	} else {
 		Assert(unit.Resource.Active == 0);
-		Assert(unit.Resource.Assigned == 0);
 	}
 	file.printf(" \"units-boarded-count\", %d,", unit.BoardCount);
 

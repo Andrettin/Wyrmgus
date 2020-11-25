@@ -59,6 +59,8 @@ void unit_manager::init()
 
 void unit_manager::clean_units()
 {
+	this->units_seen_under_fog.clear();
+
 	//copy the vector, as clearing the orders of units may cause one of them to be released, thus changing the vector
 	std::vector<CUnit *> units = this->get_units();
 
@@ -78,6 +80,8 @@ void unit_manager::clean_units()
 
 			//clear orders of all units, removing remaining references to existing units
 			UnitClearOrders(*unit);
+
+			unit->Resource.Workers.clear();
 		}
 	}
 

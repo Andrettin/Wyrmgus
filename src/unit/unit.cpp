@@ -445,11 +445,9 @@ void CUnit::Init()
 	Container = nullptr;
 	NextContained = nullptr;
 	PrevContained = nullptr;
-	NextWorker = nullptr;
 
-	Resource.Workers = nullptr;
-	Resource.Assigned = 0;
-	Resource.Active = 0;
+	this->Resource.Workers.clear();
+	this->Resource.Active = 0;
 	
 	for (int i = 0; i < static_cast<int>(wyrmgus::item_slot::count); ++i) {
 		this->EquippedItems[i].clear();
@@ -582,9 +580,7 @@ void CUnit::Release(const bool final)
 			RemoveUnitFromContainer(*this);
 		}
 
-		while (Resource.Workers) {
-			Resource.Workers->DeAssignWorkerFromMine(*this);
-		}
+		this->Resource.Workers.clear();
 
 		if (this->Refs == 0) {
 			throw std::runtime_error("Unit is having its reference count decremented for release, despite it already being at 0.");
@@ -2684,12 +2680,10 @@ void CUnit::ProduceResource(const int resource)
 	}
 	
 	if (old_resource != 0) {
-		if (this->Resource.Workers) {
-			for (CUnit *uins = this->Resource.Workers; uins; uins = uins->NextWorker) {
-				if (uins->Container == this) {
-					uins->CurrentOrder()->Finished = true;
-					DropOutOnSide(*uins, LookingW, this);
-				}
+		for (const wyrmgus::unit_ref &uins : this->Resource.Workers) {
+			if (uins->Container == this) {
+				uins->CurrentOrder()->Finished = true;
+				DropOutOnSide(*uins, LookingW, this);
 			}
 		}
 		this->Resource.Active = 0;
@@ -4456,8 +4450,9 @@ void UnitGoesUnderFog(CUnit &unit, const CPlayer &player)
 {
 	if (unit.Type->BoolFlag[VISIBLEUNDERFOG_INDEX].value) {
 		if (player.Type == PlayerPerson && !unit.Destroyed) {
-			unit.RefsIncrease();
+			wyrmgus::unit_manager::get()->add_unit_seen_under_fog(&unit);
 		}
+
 		//
 		// Icky yucky icky Seen.Destroyed trickery.
 		// We track for each player if he's seen the unit as destroyed.
@@ -4499,8 +4494,8 @@ void UnitGoesOutOfFog(CUnit &unit, const CPlayer &player)
 		return;
 	}
 	if (unit.is_seen_by_player(&player)) {
-		if ((player.Type == PlayerPerson) && !unit.is_seen_destroyed_by_player(&player)) {
-			unit.RefsDecrease();
+		if (player.Type == PlayerPerson && !unit.is_seen_destroyed_by_player(&player)) {
+			wyrmgus::unit_manager::get()->remove_unit_seen_under_fog(&unit);
 		}
 	} else {
 		unit.Seen.by_player.insert(player.Index);
@@ -4845,25 +4840,23 @@ void CUnit::ChangeOwner(CPlayer &newplayer, bool show_change)
 	//Wyrmgus end
 }
 
-static bool IsMineAssignedBy(const CUnit &mine, const CUnit &worker)
+static bool IsMineAssignedBy(const CUnit *mine, const CUnit *worker)
 {
-	for (CUnit *it = mine.Resource.Workers; it; it = it->NextWorker) {
-		if (it == &worker) {
+	for (const wyrmgus::unit_ref &unit : mine->Resource.Workers) {
+		if (unit == worker) {
 			return true;
 		}
 	}
+	
 	return false;
 }
 
-
 void CUnit::AssignWorkerToMine(CUnit &mine)
 {
-	if (IsMineAssignedBy(mine, *this) == true) {
+	if (IsMineAssignedBy(&mine, this) == true) {
 		return;
 	}
-	Assert(this->NextWorker == nullptr);
 
-	CUnit *head = mine.Resource.Workers;
 #if 0
 	DebugPrint("%d: Worker [%d] is adding into %s [%d] on %d pos\n"
 			   _C_ this->Player->Index _C_ this->Slot
@@ -4871,18 +4864,16 @@ void CUnit::AssignWorkerToMine(CUnit &mine)
 			   _C_ mine.Slot
 			   _C_ mine.Data.Resource.Assigned);
 #endif
-	this->RefsIncrease();
-	this->NextWorker = head;
-	mine.Resource.Workers = this;
-	mine.Resource.Assigned++;
+
+	mine.Resource.Workers.push_back(wyrmgus::unit_ref(this));
 }
 
 void CUnit::DeAssignWorkerFromMine(CUnit &mine)
 {
-	if (IsMineAssignedBy(mine, *this) == false) {
-		return ;
+	if (IsMineAssignedBy(&mine, this) == false) {
+		return;
 	}
-	CUnit *prev = nullptr, *worker = mine.Resource.Workers;
+
 #if 0
 	DebugPrint("%d: Worker [%d] is removing from %s [%d] left %d units assigned\n"
 			   _C_ this->Player->Index _C_ this->Slot
@@ -4890,24 +4881,15 @@ void CUnit::DeAssignWorkerFromMine(CUnit &mine)
 			   _C_ mine.Slot
 			   _C_ mine.CurrentOrder()->Data.Resource.Assigned);
 #endif
-	for (int i = 0; nullptr != worker; worker = worker->NextWorker, ++i) {
+
+	for (size_t i = 0; i < mine.Resource.Workers.size(); ++i) {
+		CUnit *worker = mine.Resource.Workers[i];
+
 		if (worker == this) {
-			CUnit *next = worker->NextWorker;
-			worker->NextWorker = nullptr;
-			if (prev) {
-				prev->NextWorker = next;
-			}
-			if (worker == mine.Resource.Workers) {
-				mine.Resource.Workers = next;
-			}
-			worker->RefsDecrease();
+			mine.Resource.Workers.erase(mine.Resource.Workers.begin() + i);
 			break;
 		}
-		prev = worker;
-		Assert(i <= mine.Resource.Assigned);
 	}
-	mine.Resource.Assigned--;
-	Assert(mine.Resource.Assigned >= 0);
 }
 
 
@@ -6845,9 +6827,7 @@ void LetUnitDie(CUnit &unit, bool suicide)
 
 	const wyrmgus::unit_type *type = unit.Type;
 
-	while (unit.Resource.Workers) {
-		unit.Resource.Workers->DeAssignWorkerFromMine(unit);
-	}
+	unit.Resource.Workers.clear();
 
 	// removed units,  just remove.
 	if (unit.Removed) {

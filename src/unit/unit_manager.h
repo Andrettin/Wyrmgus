@@ -26,6 +26,7 @@
 
 #pragma once
 
+#include "unit/unit_ref.h"
 #include "util/singleton.h"
 
 class CUnit;
@@ -64,6 +65,16 @@ public:
 	CUnit &GetSlotUnit(int index) const;
 	unsigned int GetUsedSlotCount() const;
 
+	void add_unit_seen_under_fog(CUnit *unit)
+	{
+		this->units_seen_under_fog[unit] = unit_ref(unit);
+	}
+
+	void remove_unit_seen_under_fog(CUnit *unit)
+	{
+		this->units_seen_under_fog.erase(unit);
+	}
+
 private:
 	//units currently in use
 	std::vector<CUnit *> units;
@@ -73,6 +84,9 @@ private:
 
 	std::list<CUnit *> released_units;
 	CUnit *lastCreated = nullptr;
+
+	//units seen under fog, which we need to keep references to in order to prevent them from being released
+	std::map<const CUnit *, wyrmgus::unit_ref> units_seen_under_fog;
 };
 
 }
