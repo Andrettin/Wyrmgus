@@ -44,6 +44,7 @@
 #include "pathfinder.h"
 #include "player.h"
 #include "spell/spell.h"
+#include "unit/unit_ref.h"
 #include "unit/unit_type.h"
 
 /**
@@ -119,7 +120,6 @@ void SaveUnit(const CUnit &unit, CFile &file)
 	file.printf("\"tile\", {%d, %d}, ", unit.tilePos.x, unit.tilePos.y);
 	file.printf("\"seen-tile\", {%d, %d}, ", unit.Seen.tilePos.x, unit.Seen.tilePos.y);
 
-	file.printf("\"refs\", %d, ", unit.Refs);
 #if 0
 	// latimerius: why is this so complex?
 	// JOHNS: An unit can be owned by a new player and have still the old stats
@@ -319,7 +319,8 @@ void SaveUnit(const CUnit &unit, CFile &file)
 		file.printf(" \"resource-active\", %d,", unit.Resource.Active);
 		file.printf("\n  \"resource-workers\", {");
 		for (size_t i = 0; i < unit.Resource.Workers.size(); ++i) {
-			const wyrmgus::unit_ref &worker = unit.Resource.Workers[i];
+			const std::shared_ptr<wyrmgus::unit_ref> &worker_ref = unit.Resource.Workers[i];
+			const CUnit *worker = worker_ref->get();
 
 			if (worker->Destroyed) {
 				/* this unit is destroyed so it's not in the global unit

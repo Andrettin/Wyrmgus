@@ -29,8 +29,11 @@
 
 #pragma once
 
-#include "unit/unit_ref.h"
 #include "vec2i.h"
+
+namespace wyrmgus {
+	class unit_ref;
+}
 
 /**
 **  All possible unit actions.
@@ -137,10 +140,7 @@ public:
 		return this->goal != nullptr;
 	}
 
-	const wyrmgus::unit_ref &get_goal() const
-	{
-		return this->goal;
-	}
+	CUnit *get_goal() const;
 
 	void set_goal(CUnit *const new_goal);
 	void clear_goal();
@@ -198,7 +198,7 @@ protected:
 	void UpdatePathFinderData_NotCalled(PathFinderInput &input);
 
 private:
-	wyrmgus::unit_ref goal;
+	std::shared_ptr<wyrmgus::unit_ref> goal;
 public:
 	const UnitAction Action;   /// global action
 	bool Finished = false; /// true when order is finished

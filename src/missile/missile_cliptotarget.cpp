@@ -43,13 +43,13 @@ void MissileClipToTarget::Action()
 {
 	this->Wait = this->Type->get_sleep();
 
-	if (this->TargetUnit != nullptr) {
-		this->position.x = this->TargetUnit->tilePos.x * wyrmgus::defines::get()->get_tile_width() + this->TargetUnit->get_pixel_offset().x();
-		this->position.y = this->TargetUnit->tilePos.y * wyrmgus::defines::get()->get_tile_height() + this->TargetUnit->get_pixel_offset().y();
+	if (this->get_target_unit() != nullptr) {
+		this->position.x = this->get_target_unit()->tilePos.x * wyrmgus::defines::get()->get_tile_width() + this->get_target_unit()->get_pixel_offset().x();
+		this->position.y = this->get_target_unit()->tilePos.y * wyrmgus::defines::get()->get_tile_height() + this->get_target_unit()->get_pixel_offset().y();
 	}
 
 	if (this->NextMissileFrame(1, 0)) {
-		if (this->SourceUnit && this->SourceUnit->IsAliveOnMap() && this->TargetUnit->IsAliveOnMap()) {
+		if (this->get_source_unit() && this->get_source_unit()->IsAliveOnMap() && this->get_target_unit()->IsAliveOnMap()) {
 			this->MissileHit();
 		}
 		this->TTL = 0;

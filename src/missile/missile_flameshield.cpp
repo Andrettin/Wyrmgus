@@ -57,7 +57,7 @@ void MissileFlameShield::Action()
 	const int index = this->TTL % 36;  // 36 positions on the circle
 	const int dx = fs_dc[index * 2];
 	const int dy = fs_dc[index * 2 + 1];
-	CUnit *unit = this->TargetUnit;
+	CUnit *unit = this->get_target_unit();
 	//
 	// Show around the top most unit.
 	// FIXME: conf, do we hide if the unit is contained or not?
@@ -92,7 +92,7 @@ void MissileFlameShield::Action()
 	SelectAroundUnit(*unit, 1, table);
 	for (size_t i = 0; i != table.size(); ++i) {
 		if (table[i]->CurrentAction() != UnitAction::Die) {
-			HitUnit(this->SourceUnit, *table[i], this->Damage);
+			HitUnit(this->get_source_unit(), *table[i], this->Damage);
 		}
 	}
 }

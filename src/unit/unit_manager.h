@@ -26,7 +26,6 @@
 
 #pragma once
 
-#include "unit/unit_ref.h"
 #include "util/singleton.h"
 
 class CUnit;
@@ -34,6 +33,8 @@ class CFile;
 struct lua_State;
 
 namespace wyrmgus {
+
+class unit_ref;
 
 class unit_manager final : public singleton<unit_manager>
 {
@@ -65,15 +66,8 @@ public:
 	CUnit &GetSlotUnit(int index) const;
 	unsigned int GetUsedSlotCount() const;
 
-	void add_unit_seen_under_fog(CUnit *unit)
-	{
-		this->units_seen_under_fog[unit] = unit_ref(unit);
-	}
-
-	void remove_unit_seen_under_fog(CUnit *unit)
-	{
-		this->units_seen_under_fog.erase(unit);
-	}
+	void add_unit_seen_under_fog(CUnit *unit);
+	void remove_unit_seen_under_fog(CUnit *unit);
 
 private:
 	//units currently in use
@@ -86,7 +80,7 @@ private:
 	CUnit *lastCreated = nullptr;
 
 	//units seen under fog, which we need to keep references to in order to prevent them from being released
-	std::map<const CUnit *, wyrmgus::unit_ref> units_seen_under_fog;
+	std::map<const CUnit *, std::shared_ptr<unit_ref>> units_seen_under_fog;
 };
 
 }

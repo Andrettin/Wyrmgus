@@ -284,7 +284,10 @@ OrPredicate<Pred1, Pred2> MakeOrPredicate(Pred1 pred1, Pred2 pred2) { return OrP
 class CUnitTypeFinder
 {
 public:
-	explicit CUnitTypeFinder(const UnitTypeType t) : unitTypeType(t) {}
+	explicit CUnitTypeFinder(const UnitTypeType t) : unitTypeType(t)
+	{
+	}
+
 	bool operator()(const CUnit *const unit) const
 	{
 		if (!unit) {
@@ -303,6 +306,8 @@ public:
 		}
 		return true;
 	}
+
+	bool operator()(const std::shared_ptr<wyrmgus::unit_ref> &unit_ref);
 
 private:
 	const UnitTypeType unitTypeType;

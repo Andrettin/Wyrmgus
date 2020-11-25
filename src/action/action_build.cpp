@@ -58,6 +58,7 @@
 //Wyrmgus start
 #include "unit/unit_find.h"
 //Wyrmgus end
+#include "unit/unit_ref.h"
 #include "unit/unit_type.h"
 #include "unit/unit_type_type.h"
 #include "video/video.h"
@@ -97,6 +98,15 @@ std::unique_ptr<COrder> COrder::NewActionBuild(const CUnit &builder, const Vec2i
 	return order;
 }
 
+COrder_Build::COrder_Build() : COrder(UnitAction::Build)
+{
+	goalPos.x = -1;
+	goalPos.y = -1;
+}
+
+COrder_Build::~COrder_Build()
+{
+}
 
 void COrder_Build::Save(CFile &file, const CUnit &unit) const
 {
@@ -116,8 +126,8 @@ void COrder_Build::Save(CFile &file, const CUnit &unit) const
 	}
 	//Wyrmgus end
 
-	if (this->BuildingUnit != nullptr) {
-		file.printf(" \"building\", \"%s\",", UnitReference(this->BuildingUnit).c_str());
+	if (this->get_building_unit() != nullptr) {
+		file.printf(" \"building\", \"%s\",", UnitReference(this->get_building_unit()).c_str());
 	}
 	file.printf(" \"type\", \"%s\",", this->Type->Ident.c_str());
 	file.printf(" \"state\", %d", this->State);
@@ -131,7 +141,7 @@ bool COrder_Build::ParseSpecificData(lua_State *l, int &j, const char *value, co
 	if (!strcmp(value, "building")) {
 		++j;
 		lua_rawgeti(l, -1, j + 1);
-		this->BuildingUnit = wyrmgus::unit_ref(CclGetUnitFromRef(l));
+		this->BuildingUnit = CclGetUnitFromRef(l)->acquire_ref();
 		lua_pop(l, 1);
 	} else if (!strcmp(value, "range")) {
 		++j;
@@ -161,12 +171,12 @@ bool COrder_Build::ParseSpecificData(lua_State *l, int &j, const char *value, co
 	return true;
 }
 
-/* virtual */ bool COrder_Build::IsValid() const
+bool COrder_Build::IsValid() const
 {
 	return true;
 }
 
-/* virtual */ PixelPos COrder_Build::Show(const CViewport &vp, const PixelPos &lastScreenPos) const
+PixelPos COrder_Build::Show(const CViewport &vp, const PixelPos &lastScreenPos) const
 {
 	//Wyrmgus start
 	if (this->MapLayer != UI.CurrentMapLayer->ID) {
@@ -464,7 +474,7 @@ bool COrder_Build::StartBuilding(CUnit &unit, CUnit &ontop)
 		}
 	} else {
 		this->State = State_BuildFromOutside;
-		this->BuildingUnit = wyrmgus::unit_ref(build);
+		this->BuildingUnit = build->acquire_ref();
 		//Wyrmgus start
 //		unit.Direction = DirectionToHeading(build->tilePos - unit.tilePos);
 //		UnitUpdateHeading(unit);
@@ -507,20 +517,20 @@ bool COrder_Build::BuildFromOutside(CUnit &unit) const
 {
 	AnimateActionBuild(unit);
 
-	if (this->BuildingUnit == nullptr) {
+	if (this->get_building_unit() == nullptr) {
 		return false;
 	}
 
-	if (this->BuildingUnit->CurrentAction() == UnitAction::Built) {
-		COrder_Built &target_order = *static_cast<COrder_Built *>(this->BuildingUnit->CurrentOrder());
-		CUnit &goal = *this->BuildingUnit;
+	if (this->get_building_unit()->CurrentAction() == UnitAction::Built) {
+		COrder_Built &target_order = *static_cast<COrder_Built *>(this->get_building_unit()->CurrentOrder());
+		CUnit &goal = *this->get_building_unit();
 
 		target_order.ProgressHp(goal, 100);
 	}
 	if (unit.Anim.Unbreakable) {
 		return false;
 	}
-	return this->BuildingUnit->CurrentAction() != UnitAction::Built;
+	return this->get_building_unit()->CurrentAction() != UnitAction::Built;
 }
 
 void COrder_Build::Execute(CUnit &unit)
@@ -606,10 +616,19 @@ void COrder_Build::Execute(CUnit &unit)
 //		if (this->BuildFromOutside(unit)) {
 //			this->Finished = true;
 //		}
-		if (this->BuildingUnit != nullptr) {
-			this->HelpBuild(unit, *this->BuildingUnit);
+		if (this->get_building_unit() != nullptr) {
+			this->HelpBuild(unit, *this->get_building_unit());
 		}
 		this->Finished = true;
 		//Wyrmgus end
 	}
+}
+
+CUnit *COrder_Build::get_building_unit() const
+{
+	if (this->BuildingUnit == nullptr) {
+		return nullptr;
+	}
+
+	return this->BuildingUnit->get();
 }

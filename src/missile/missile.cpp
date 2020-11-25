@@ -57,6 +57,7 @@
 #include "ui/ui.h"
 #include "unit/unit.h"
 #include "unit/unit_find.h"
+#include "unit/unit_ref.h"
 #include "unit/unit_type.h"
 #include "unit/unit_type_type.h"
 #include "util/string_util.h"
@@ -202,7 +203,7 @@ void LoadMissileSprites()
 */
 Missile::Missile() :
 	Type(nullptr), SpriteFrame(0), State(0), AnimWait(0), Wait(0),
-	Delay(0), SourceUnit(), TargetUnit(), Damage(0), LightningDamage(0),
+	Delay(0), Damage(0), LightningDamage(0),
 	TTL(-1), Hidden(0), DestroyMissile(0),
 	CurrentStep(0), TotalStep(0),
 	//Wyrmgus start
@@ -868,9 +869,9 @@ void FireMissile(CUnit &unit, CUnit *goal, const Vec2i &goalPos, int z)
 	// Damage of missile
 	//
 	if (goal) {
-		missile->TargetUnit = wyrmgus::unit_ref(goal);
+		missile->TargetUnit = goal->acquire_ref();
 	}
-	missile->SourceUnit = wyrmgus::unit_ref(&unit);
+	missile->SourceUnit = unit.acquire_ref();
 
 	//for pierce missiles, make them continue up to the limits of the attacker's range
 	if (missile->Type->Pierce) {
@@ -991,7 +992,7 @@ void missile_type::DrawMissileType(int frame, const PixelPos &pos) const
 void Missile::DrawMissile(const CViewport &vp) const
 {
 	Assert(this->Type);
-	CUnit *sunit = this->SourceUnit;
+	CUnit *sunit = this->get_source_unit();
 	// FIXME: I should copy SourcePlayer for second level missiles.
 	if (sunit && sunit->Player) {
 #ifdef DYNAMIC_LOAD
@@ -1093,6 +1094,24 @@ void Missile::MissileNewHeadingFromXY(const PixelPos &delta)
 	}
 }
 
+CUnit *Missile::get_source_unit() const
+{
+	if (this->SourceUnit == nullptr) {
+		return nullptr;
+	}
+
+	return this->SourceUnit->get();
+}
+
+CUnit *Missile::get_target_unit() const
+{
+	if (this->TargetUnit == nullptr) {
+		return nullptr;
+	}
+
+	return this->TargetUnit->get();
+}
+
 /**
 **  Init the move.
 **
@@ -1139,12 +1158,12 @@ void MissileHandlePierce(Missile &missile, const Vec2i &pos)
 		CUnit &unit = **it;
 
 		if (unit.IsAliveOnMap()
-			&& (missile.Type->FriendlyFire == true || unit.IsEnemy(*missile.SourceUnit))
-			&& missile.SourceUnit != &unit //don't hit the source unit, otherwise it will be hit by pierce as soon as it fires the missile
+			&& (missile.Type->FriendlyFire == true || unit.IsEnemy(*missile.get_source_unit()))
+			&& missile.get_source_unit() != &unit //don't hit the source unit, otherwise it will be hit by pierce as soon as it fires the missile
 			&& (!missile.Type->PierceOnce || !IsPiercedUnit(missile, unit))
-			&& CanTarget(*missile.SourceUnit->Type, *unit.Type)
+			&& CanTarget(*missile.get_source_unit()->Type, *unit.Type)
 			&& !unit.Type->BoolFlag[DECORATION_INDEX].value
-			&& (!missile.Type->PierceIgnoreBeforeGoal || !missile.TargetUnit || IsPiercedUnit(missile, *missile.TargetUnit) || missile.TargetUnit == &unit)
+			&& (!missile.Type->PierceIgnoreBeforeGoal || !missile.get_target_unit() || IsPiercedUnit(missile, *missile.get_target_unit()) || missile.get_target_unit() == &unit)
 		) {
 			missile.MissileHit(&unit);
 		}
@@ -1154,9 +1173,9 @@ void MissileHandlePierce(Missile &missile, const Vec2i &pos)
 bool MissileHandleBlocking(Missile &missile, const PixelPos &position)
 {
 	const wyrmgus::missile_type &mtype = *missile.Type;
-	if (missile.SourceUnit) {
+	if (missile.get_source_unit() != nullptr) {
 		bool shouldHit = false;
-		if (missile.TargetUnit && missile.SourceUnit->Type->UnitType == missile.TargetUnit->Type->UnitType) {
+		if (missile.get_target_unit() && missile.get_source_unit()->Type->UnitType == missile.get_target_unit()->Type->UnitType) {
 			shouldHit = true;
 		}
 		if (mtype.get_range() && mtype.CorrectSphashDamage) {
@@ -1170,12 +1189,12 @@ bool MissileHandleBlocking(Missile &missile, const PixelPos &position)
 			for (std::vector<CUnit *>::iterator it = blockingUnits.begin();	it != blockingUnits.end(); ++it) {
 				CUnit &unit = **it;
 				// If land unit shoots at land unit, missile can be blocked by Wall units
-				if (!missile.Type->IgnoreWalls && missile.SourceUnit->Type->UnitType == UnitTypeType::Land) {
-					if (!missile.TargetUnit || missile.TargetUnit->Type->UnitType == UnitTypeType::Land) {
-						if (&unit != missile.SourceUnit && unit.Type->BoolFlag[WALL_INDEX].value
-							&& unit.Player != missile.SourceUnit->Player && unit.IsAllied(*missile.SourceUnit) == false) {
-							if (missile.TargetUnit) {
-								missile.TargetUnit = wyrmgus::unit_ref(&unit);
+				if (!missile.Type->IgnoreWalls && missile.get_source_unit()->Type->UnitType == UnitTypeType::Land) {
+					if (!missile.get_target_unit() || missile.get_target_unit()->Type->UnitType == UnitTypeType::Land) {
+						if (&unit != missile.get_source_unit() && unit.Type->BoolFlag[WALL_INDEX].value
+							&& unit.Player != missile.get_source_unit()->Player && unit.IsAllied(*missile.get_source_unit()) == false) {
+							if (missile.get_target_unit()) {
+								missile.TargetUnit = unit.acquire_ref();
 								if (unit.Type->get_tile_width() == 1 || unit.Type->get_tile_height() == 1) {
 									missile.position = CMap::Map.tile_pos_to_map_pixel_pos_top_left(unit.tilePos);
 								}
@@ -1188,16 +1207,16 @@ bool MissileHandleBlocking(Missile &missile, const PixelPos &position)
 					}
 				}
 				// missile can kill any unit on it's way
-				if (missile.Type->KillFirstUnit && &unit != missile.SourceUnit) {
+				if (missile.Type->KillFirstUnit && &unit != missile.get_source_unit()) {
 					// can't kill non-solid or dead units
 					if (unit.IsAliveOnMap() == false || unit.Type->BoolFlag[NONSOLID_INDEX].value) {
 						continue;
 					}
 					//Wyrmgus start
-//					if (missile.Type->FriendlyFire == false || unit.IsEnemy(*missile.SourceUnit->Player)) {
-					if (missile.Type->FriendlyFire == true || unit.IsEnemy(*missile.SourceUnit)) {
+//					if (missile.Type->FriendlyFire == false || unit.IsEnemy(*missile.get_source_unit()->Player)) {
+					if (missile.Type->FriendlyFire == true || unit.IsEnemy(*missile.get_source_unit())) {
 					//Wyrmgus end
-						missile.TargetUnit = wyrmgus::unit_ref(&unit);
+						missile.TargetUnit = unit.acquire_ref();
 						if (unit.Type->get_tile_width() == 1 || unit.Type->get_tile_height() == 1) {
 							missile.position = CMap::Map.tile_pos_to_map_pixel_pos_top_left(unit.tilePos);
 						}
@@ -1309,7 +1328,7 @@ bool PointToPointMissile(Missile &missile)
 */
 static void MissileHitsGoal(const Missile &missile, CUnit &goal, int splash)
 {
-	if (!missile.Type->CanHitOwner && missile.SourceUnit == &goal) {
+	if (!missile.Type->CanHitOwner && missile.get_source_unit() == &goal) {
 		return;
 	}
 	
@@ -1319,7 +1338,7 @@ static void MissileHitsGoal(const Missile &missile, CUnit &goal, int splash)
 			return;
 		}
 		
-		if (!missile.AlwaysHits && CalculateHit(*missile.SourceUnit, *goal.Stats, &goal) == false) {
+		if (!missile.AlwaysHits && CalculateHit(*missile.get_source_unit(), *goal.Stats, &goal) == false) {
 			if (splash == 1 && missile.Type->SplashFactor <= 0) {
 				return;
 			} else if (splash == 1 && missile.Type->SplashFactor > 0) {
@@ -1331,19 +1350,19 @@ static void MissileHitsGoal(const Missile &missile, CUnit &goal, int splash)
 		int damage;
 
 		if (missile.Type->Damage) {   // custom formula
-			Assert(missile.SourceUnit != nullptr);
+			Assert(missile.get_source_unit() != nullptr);
 			//Wyrmgus start
-//			damage = CalculateDamage(*missile.SourceUnit, goal, missile.Type->Damage) / splash;
-			damage = CalculateDamage(*missile.SourceUnit, goal, missile.Type->Damage.get(), &missile) / splash;
+//			damage = CalculateDamage(*missile.get_source_unit(), goal, missile.Type->Damage) / splash;
+			damage = CalculateDamage(*missile.get_source_unit(), goal, missile.Type->Damage.get(), &missile) / splash;
 			//Wyrmgus end
 		} else if (missile.Damage || missile.LightningDamage) {  // direct damage, spells mostly
 			damage = missile.Damage / splash;
 			damage += missile.LightningDamage * (100 - goal.Variable[LIGHTNINGRESISTANCE_INDEX].Value) / 100 / splash;
 		} else {
-			Assert(missile.SourceUnit != nullptr);
+			Assert(missile.get_source_unit() != nullptr);
 			//Wyrmgus start
-//			damage = CalculateDamage(*missile.SourceUnit, goal, Damage) / splash;
-			damage = CalculateDamage(*missile.SourceUnit, goal, Damage.get(), &missile) / splash;
+//			damage = CalculateDamage(*missile.get_source_unit(), goal, Damage) / splash;
+			damage = CalculateDamage(*missile.get_source_unit(), goal, Damage.get(), &missile) / splash;
 			//Wyrmgus end
 		}
 		if (missile.Type->Pierce && !missile.PiercedUnits.empty()) {  // Handle pierce factor
@@ -1352,23 +1371,23 @@ static void MissileHitsGoal(const Missile &missile, CUnit &goal, int splash)
 			}
 		}
 
-		HitUnit(missile.SourceUnit, goal, damage, &missile);
+		HitUnit(missile.get_source_unit(), goal, damage, &missile);
 		//Wyrmgus start
 		if (missile.Type->Damage == 0 && missile.Damage == 0 && missile.LightningDamage == 0 && goal.IsAlive()) {
-			HitUnit_NormalHitSpecialDamageEffects(*missile.SourceUnit, goal);
+			HitUnit_NormalHitSpecialDamageEffects(*missile.get_source_unit(), goal);
 		}
 		//Wyrmgus end
 		
 		//Wyrmgus start
 		//apply Thorns damage if attacker is at melee range
-		if (goal.Variable[THORNSDAMAGE_INDEX].Value && missile.SourceUnit->MapDistanceTo(goal) <= 1) {
-			int thorns_damage = std::max<int>(goal.Variable[THORNSDAMAGE_INDEX].Value - missile.SourceUnit->Variable[ARMOR_INDEX].Value, 1);
+		if (goal.Variable[THORNSDAMAGE_INDEX].Value && missile.get_source_unit()->MapDistanceTo(goal) <= 1) {
+			int thorns_damage = std::max<int>(goal.Variable[THORNSDAMAGE_INDEX].Value - missile.get_source_unit()->Variable[ARMOR_INDEX].Value, 1);
 			if (GameSettings.NoRandomness) {
 				thorns_damage -= ((thorns_damage + 2) / 2) / 2; //if no randomness setting is used, then the damage will always return what would have been the average damage with randomness
 			} else {
 				thorns_damage -= SyncRand((thorns_damage + 2) / 2);
 			}
-			HitUnit(&goal, *missile.SourceUnit, thorns_damage);
+			HitUnit(&goal, *missile.get_source_unit(), thorns_damage);
 		}
 		//Wyrmgus end
 	}
@@ -1403,10 +1422,10 @@ static void MissileHitsWall(const Missile &missile, const Vec2i &tilePos, int sp
 		return;
 	}
 
-	Assert(missile.SourceUnit != nullptr);
+	Assert(missile.get_source_unit() != nullptr);
 
 	//Wyrmgus start
-	if (!missile.AlwaysHits && CalculateHit(*missile.SourceUnit, *stats, nullptr) == false) {
+	if (!missile.AlwaysHits && CalculateHit(*missile.get_source_unit(), *stats, nullptr) == false) {
 		if (splash == 1 && missile.Type->SplashFactor <= 0) {
 			return;
 		} else if (splash == 1 && missile.Type->SplashFactor > 0) {
@@ -1416,8 +1435,8 @@ static void MissileHitsWall(const Missile &missile, const Vec2i &tilePos, int sp
 	//Wyrmgus end
 
 	//Wyrmgus start
-//	CMap::Map.HitWall(tilePos, CalculateDamageStats(*missile.SourceUnit->Stats, *stats, 0) / splash);
-	CMap::Map.HitWall(tilePos, CalculateDamageStats(*missile.SourceUnit, *stats, nullptr, &missile) / splash, missile.MapLayer);
+//	CMap::Map.HitWall(tilePos, CalculateDamageStats(*missile.get_source_unit()->Stats, *stats, 0) / splash);
+	CMap::Map.HitWall(tilePos, CalculateDamageStats(*missile.get_source_unit(), *stats, nullptr, &missile) / splash, missile.MapLayer);
 	//Wyrmgus end
 }
 
@@ -1475,7 +1494,7 @@ void Missile::MissileHit(CUnit *unit)
 		mtype.ImpactParticle->run();
 	}
 
-	if (!this->SourceUnit) {  // no owner - green-cross ...
+	if (!this->get_source_unit()) {  // no owner - green-cross ...
 		return;
 	}
 
@@ -1509,17 +1528,17 @@ void Missile::MissileHit(CUnit *unit)
 	}
 	if (!mtype.get_range()) {
 		//Wyrmgus start
-//		if (this->TargetUnit && (mtype.FriendlyFire == false
-		if (this->TargetUnit && (mtype.FriendlyFire == true
+//		if (this->get_target_unit() && (mtype.FriendlyFire == false
+		if (this->get_target_unit() && (mtype.FriendlyFire == true
 		//Wyrmgus end
 								//Wyrmgus start
-//								 || this->TargetUnit->Player->Index != this->SourceUnit->Player->Index)) {
-								 || this->TargetUnit->IsEnemy(*this->SourceUnit))) {
+//								 || this->get_target_unit()->Player->Index != this->get_source_unit()->Player->Index)) {
+								 || this->get_target_unit()->IsEnemy(*this->get_source_unit()))) {
 								//Wyrmgus end
 			//
 			// Missiles without range only hits the goal always.
 			//
-			CUnit &goal = *this->TargetUnit;
+			CUnit &goal = *this->get_target_unit();
 			if (mtype.Pierce && mtype.PierceOnce) {
 				if (IsPiercedUnit(*this, goal)) {
 					return;
@@ -1555,7 +1574,7 @@ void Missile::MissileHit(CUnit *unit)
 //		Select(pos - range, pos + range, table);
 		Select(pos - range, pos + range, table, this->MapLayer);
 		//Wyrmgus end
-		Assert(this->SourceUnit != nullptr);
+		Assert(this->get_source_unit() != nullptr);
 		for (size_t i = 0; i != table.size(); ++i) {
 			CUnit &goal = *table[i];
 			//
@@ -1563,10 +1582,10 @@ void Missile::MissileHit(CUnit *unit)
 			// NOTE: perhaps this should be come a property of the missile.
 			// Also check CorrectSphashDamage so land explosions can't hit the air units
 			//
-			if (CanTarget(*this->SourceUnit->Type, *goal.Type)
+			if (CanTarget(*this->get_source_unit()->Type, *goal.Type)
 				//Wyrmgus start
-//				&& (mtype.FriendlyFire == false || goal.Player->Index != this->SourceUnit->Player->Index)) {
-				&& (mtype.FriendlyFire == true || goal.IsEnemy(*this->SourceUnit))) {
+//				&& (mtype.FriendlyFire == false || goal.Player->Index != this->get_source_unit()->Player->Index)) {
+				&& (mtype.FriendlyFire == true || goal.IsEnemy(*this->get_source_unit()))) {
 				//Wyrmgus end
 				bool shouldHit = true;
 
@@ -1580,9 +1599,9 @@ void Missile::MissileHit(CUnit *unit)
 
 				if (mtype.CorrectSphashDamage == true) {
 					bool isPosition = false;
-					if (this->TargetUnit == nullptr) {
-						if (this->SourceUnit->CurrentAction() == UnitAction::SpellCast) {
-							const COrder_SpellCast &order = *static_cast<COrder_SpellCast *>(this->SourceUnit->CurrentOrder());
+					if (this->get_target_unit() == nullptr) {
+						if (this->get_source_unit()->CurrentAction() == UnitAction::SpellCast) {
+							const COrder_SpellCast &order = *static_cast<COrder_SpellCast *>(this->get_source_unit()->CurrentOrder());
 							if (order.GetSpell().get_target() == wyrmgus::spell_target_type::position) {
 								isPosition = true;
 							}
@@ -1590,12 +1609,12 @@ void Missile::MissileHit(CUnit *unit)
 							isPosition = true;
 						}
 					}
-					if (isPosition || this->SourceUnit->CurrentAction() == UnitAction::AttackGround) {
-						if (goal.Type->UnitType != this->SourceUnit->Type->UnitType) {
+					if (isPosition || this->get_source_unit()->CurrentAction() == UnitAction::AttackGround) {
+						if (goal.Type->UnitType != this->get_source_unit()->Type->UnitType) {
 							shouldHit = false;
 						}
 					} else {
-						if (this->TargetUnit == nullptr || goal.Type->UnitType != this->TargetUnit->Type->UnitType) {
+						if (this->get_target_unit() == nullptr || goal.Type->UnitType != this->get_target_unit()->Type->UnitType) {
 							shouldHit = false;
 						}
 					}
@@ -1833,11 +1852,11 @@ void Missile::SaveMissile(CFile &file) const
 	SavePixelPos(file, this->destination);
 	file.printf(",\n  \"frame\", %d, \"state\", %d, \"anim-wait\", %d, \"wait\", %d, \"delay\", %d,\n ",
 				this->SpriteFrame, this->State, this->AnimWait, this->Wait, this->Delay);
-	if (this->SourceUnit != nullptr) {
-		file.printf(" \"source\", \"%s\",", UnitReference(this->SourceUnit).c_str());
+	if (this->get_source_unit() != nullptr) {
+		file.printf(" \"source\", \"%s\",", UnitReference(this->get_source_unit()).c_str());
 	}
-	if (this->TargetUnit != nullptr) {
-		file.printf(" \"target\", \"%s\",", UnitReference(this->TargetUnit).c_str());
+	if (this->get_target_unit() != nullptr) {
+		file.printf(" \"target\", \"%s\",", UnitReference(this->get_target_unit()).c_str());
 	}
 	file.printf(" \"damage\", %d,", this->Damage);
 	file.printf(" \"lightning-damage\", %d,", this->LightningDamage);

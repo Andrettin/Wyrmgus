@@ -40,7 +40,7 @@
 */
 void MissileFire::Action()
 {
-	CUnit &unit = *this->SourceUnit;
+	CUnit &unit = *this->get_source_unit();
 
 	this->Wait = this->Type->get_sleep();
 	if (unit.IsAlive() == false) {

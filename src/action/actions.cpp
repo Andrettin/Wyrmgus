@@ -73,14 +73,24 @@
 #include "unit/unit.h"
 #include "unit/unit_find.h"
 #include "unit/unit_manager.h"
+#include "unit/unit_ref.h"
 #include "unit/unit_type.h"
 #include "util/random.h"
 
 unsigned SyncHash; /// Hash calculated to find sync failures
 
+CUnit *COrder::get_goal() const
+{
+	if (this->goal == nullptr) {
+		return nullptr;
+	}
+
+	return this->goal->get();
+}
+
 void COrder::set_goal(CUnit *const new_goal)
 {
-	this->goal = wyrmgus::unit_ref(new_goal);
+	this->goal = new_goal->acquire_ref();
 }
 
 void COrder::clear_goal()
@@ -161,7 +171,7 @@ bool COrder::OnAiHitUnit(CUnit &unit, CUnit *attacker, int /*damage*/)
 /**
 **  Get goal position
 */
-/* virtual */ const Vec2i COrder::GetGoalPos() const
+const Vec2i COrder::GetGoalPos() const
 {
 	const Vec2i invalidPos(-1, -1);
 	if (this->has_goal()) {
@@ -174,7 +184,7 @@ bool COrder::OnAiHitUnit(CUnit &unit, CUnit *attacker, int /*damage*/)
 /**
 **  Get goal map layer
 */
-/* virtual */ const int COrder::GetGoalMapLayer() const
+const int COrder::GetGoalMapLayer() const
 {
 	if (this->has_goal()) {
 		return this->get_goal()->MapLayer->ID;
@@ -610,7 +620,7 @@ static void DumpUnitInfo(CUnit &unit)
 	fprintf(logf, "%d %s %d P%d Refs %d: %X %d,%d %d,%d\n",
 			UnitNumber(unit), unit.Type ? unit.Type->Ident.c_str() : "unit-killed",
 			!unit.Orders.empty() ? static_cast<int>(unit.CurrentAction()) : -1,
-			unit.Player ? unit.Player->Index : -1, unit.Refs, wyrmgus::random::get()->get_seed(),
+			unit.Player ? unit.Player->Index : -1, unit.get_ref_count(), wyrmgus::random::get()->get_seed(),
 			unit.tilePos.x, unit.tilePos.y, unit.get_pixel_offset().x(), unit.get_pixel_offset().y());
 #if 0
 	SaveUnit(unit, logf);
@@ -659,7 +669,7 @@ static void UnitActionsEachCycle(UNITP_ITERATOR begin, UNITP_ITERATOR end)
 		// Calculate some hash.
 		SyncHash = (SyncHash << 5) | (SyncHash >> 27);
 		SyncHash ^= unit.Orders.empty() == false ? static_cast<int>(unit.CurrentAction()) << 18 : 0;
-		SyncHash ^= unit.Refs << 3;
+		SyncHash ^= unit.get_ref_count() << 3;
 	}
 }
 

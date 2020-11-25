@@ -41,6 +41,7 @@
 #include "pathfinder.h"
 #include "unit/unit.h"
 #include "unit/unit_find.h"
+#include "unit/unit_ref.h"
 #include "unit/unit_type.h"
 #include "unit/unit_type_type.h"
 
@@ -197,8 +198,9 @@ int AiFindWall(AiForce *force)
 {
 	// Find a unit to use.  Best choice is a land unit with range 1.
 	// Next best choice is any land unit.  Otherwise just use the first.
-	CUnit *unit = force->get_units()[0];
-	for (const wyrmgus::unit_ref &ai_unit : force->get_units()) {
+	CUnit *unit = *force->get_units()[0];
+	for (const std::shared_ptr<wyrmgus::unit_ref> &unit_ref : force->get_units()) {
+		CUnit *ai_unit = unit_ref->get();
 		if (ai_unit->Type->UnitType == UnitTypeType::Land) {
 			unit = ai_unit;
 			if (ai_unit->GetMissile().Missile->get_range() == 1) {
@@ -213,7 +215,8 @@ int AiFindWall(AiForce *force)
 
 	if (FindWall(*unit, maxRange, &wallPos)) {
 		force->State = AiForceAttackingState::Waiting;
-		for (const wyrmgus::unit_ref &ai_unit : force->get_units()) {
+		for (const std::shared_ptr<wyrmgus::unit_ref> &unit_ref : force->get_units()) {
+			CUnit *ai_unit = unit_ref->get();
 			//Wyrmgus start
 //			if (ai_unit->Type->CanAttack) {
 			if (ai_unit->CanAttack()) {
@@ -340,12 +343,18 @@ static bool is_a_free_transporter(const CUnit *unit)
 	return unit->Type->CanMove() && unit->BoardCount < unit->Type->MaxOnBoard;
 }
 
+static bool is_a_free_transporter_ref(const std::shared_ptr<wyrmgus::unit_ref> &unit_ref)
+{
+	return is_a_free_transporter(unit_ref->get());
+}
+
 template <typename ITERATOR>
 int GetTotalBoardCapacity(ITERATOR begin, ITERATOR end)
 {
 	int totalBoardCapacity = 0;
 	for (ITERATOR it = begin; it != end; ++it) {
-		const CUnit *unit = *it;
+		const std::shared_ptr<wyrmgus::unit_ref> &unit_ref = *it;
+		const CUnit *unit = unit_ref->get();
 
 		if (is_a_free_transporter(unit)) {
 			totalBoardCapacity += unit->Type->MaxOnBoard - unit->BoardCount;
@@ -381,9 +390,9 @@ int AiForce::PlanAttack()
 
 	CUnit *transporter = nullptr;
 
-	const auto transporter_it = std::find_if(this->get_units().begin(), this->get_units().end(), is_a_free_transporter);
+	const auto transporter_it = std::find_if(this->get_units().begin(), this->get_units().end(), is_a_free_transporter_ref);
 	if (transporter_it != this->get_units().end()) {
-		transporter = *transporter_it;
+		transporter = **transporter_it;
 	}
 
 	if (transporter != nullptr) {
@@ -408,7 +417,7 @@ int AiForce::PlanAttack()
 		return 0;
 	}
 
-	CUnit *landUnit = *land_unit_it;
+	CUnit *landUnit = **land_unit_it;
 
 	Vec2i pos = this->GoalPos;
 
@@ -429,7 +438,8 @@ int AiForce::PlanAttack()
 
 		// Verify we have enough transporter.
 		// @note: Minimal check for unitType (flyers...)
-		for (const wyrmgus::unit_ref &unit : this->get_units()) {
+		for (const std::shared_ptr<wyrmgus::unit_ref> &unit_ref : this->get_units()) {
+			CUnit *unit = unit_ref->get();
 			if (CanTransport(*transporter, *unit)) {
 				totalBoardCapacity -= unit->Type->BoardSize;
 			}

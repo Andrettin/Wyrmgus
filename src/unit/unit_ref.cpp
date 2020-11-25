@@ -33,21 +33,14 @@
 
 namespace wyrmgus {
 
-void unit_ref::set_unit(CUnit *unit)
+unit_ref::~unit_ref()
 {
-	if (unit == this->unit) {
-		return;
-	}
+	if (this->unit != nullptr) {
+		if (!this->unit->Destroyed) {
+			throw std::runtime_error("A unit's reference count has reached 0, despite it not being destroyed (unit type: \"" + this->unit->Type->get_identifier() + "\").");
+		}
 
-	CUnit *old_unit = this->unit;
-	if (old_unit != nullptr) {
-		old_unit->RefsDecrease();
-	}
-
-	this->unit = unit;
-
-	if (unit != nullptr) {
-		unit->RefsIncrease();
+		this->unit->Release();
 	}
 }
 

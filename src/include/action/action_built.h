@@ -34,10 +34,10 @@
 class COrder_Built final : public COrder
 {
 	friend std::unique_ptr<COrder> COrder::NewActionBuilt(CUnit &builder, CUnit &unit);
+
 public:
-	COrder_Built() : COrder(UnitAction::Built)
-	{
-	}
+	COrder_Built();
+	virtual ~COrder_Built() override;
 
 	virtual std::unique_ptr<COrder> Clone() const override
 	{
@@ -65,15 +65,15 @@ public:
 	void ProgressHp(CUnit &unit, int amount);
 
 	const wyrmgus::construction_frame *get_frame() const { return this->frame; }
-	const wyrmgus::unit_ref &GetWorker() const { return Worker; }
-	CUnit *GetWorkerPtr() { return Worker; }
+
+	CUnit *get_worker() const;
 
 private:
 	void Boost(CUnit &building, int amount, int varIndex) const;
 	void UpdateConstructionFrame(CUnit &unit);
 
 private:
-	wyrmgus::unit_ref Worker;                  /// Worker building this unit
+	std::shared_ptr<wyrmgus::unit_ref> Worker;                  /// Worker building this unit
 	int ProgressCounter = 0;          /// Progress counter, in 1/100 cycles.
 	bool IsCancelled = false;         /// Cancel construction
 	const wyrmgus::construction_frame *frame = nullptr; /// Construction frame

@@ -260,7 +260,7 @@ static const CUnit *GetUnitRef(const CUnit &unit, EnumUnit e)
 			//Wyrmgus end
 				COrder_Built &order = *static_cast<COrder_Built *>(unit.CurrentOrder());
 
-				return order.GetWorkerPtr();
+				return order.get_worker();
 			} else {
 				return nullptr;
 			}

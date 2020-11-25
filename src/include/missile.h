@@ -279,7 +279,6 @@
 #include "database/data_type.h"
 #include "data_type.h"
 #include "missileconfig.h"
-#include "unit/unit_ref.h"
 #include "vec2i.h"
 
 class CGraphic;
@@ -297,6 +296,7 @@ struct NumberDesc;
 namespace wyrmgus {
 
 class sound;
+class unit_ref;
 enum class missile_class;
 
 /// Base structure of missile-types
@@ -502,6 +502,8 @@ public:
 	void NextMissileFrameCycle();
 	void MissileNewHeadingFromXY(const PixelPos &delta);
 
+	CUnit *get_source_unit() const;
+	CUnit *get_target_unit() const;
 
 	//private:
 	PixelPos source; /// Missile source position
@@ -517,8 +519,8 @@ public:
 	int MapLayer;	  /// map layer the missile is in
 	//Wyrmgus end
 
-	wyrmgus::unit_ref SourceUnit;  /// unit that fires (could be killed)
-	wyrmgus::unit_ref TargetUnit;  /// target unit, used for spells
+	std::shared_ptr<wyrmgus::unit_ref> SourceUnit;  /// unit that fires (could be killed)
+	std::shared_ptr<wyrmgus::unit_ref> TargetUnit;  /// target unit, used for spells
 
 	std::vector<CUnit *> PiercedUnits;	/// Units which are already pierced by this missile
 

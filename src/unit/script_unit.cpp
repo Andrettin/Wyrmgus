@@ -385,8 +385,6 @@ static int CclUnit(lua_State *l)
 		//Wyrmgus end
 		} else if (!strcmp(value, "current-sight-range")) {
 			unit->CurrentSightRange = LuaToNumber(l, 2, j + 1);
-		} else if (!strcmp(value, "refs")) {
-			unit->Refs = LuaToNumber(l, 2, j + 1);
 		} else if (!strcmp(value, "host-info")) {
 			lua_rawgeti(l, 2, j + 1);
 			//Wyrmgus start
@@ -597,7 +595,7 @@ static int CclUnit(lua_State *l)
 
 				Assert(u != nullptr);
 
-				unit->Resource.Workers.push_back(wyrmgus::unit_ref(u));
+				unit->Resource.Workers.push_back(u->acquire_ref());
 			}
 			lua_pop(l, 1);
 		} else if (!strcmp(value, "resource-active")) {

@@ -55,6 +55,7 @@
 #include "unit/construction.h"
 #include "unit/unit.h"
 #include "unit/unit_find.h"
+#include "unit/unit_ref.h"
 #include "unit/unit_type.h"
 #include "util/vector_util.h"
 
@@ -76,11 +77,18 @@ std::unique_ptr<COrder> COrder::NewActionBuilt(CUnit &builder, CUnit &unit)
 	order->UpdateConstructionFrame(unit);
 
 	if (unit.Type->BoolFlag[BUILDEROUTSIDE_INDEX].value == false) {
-		order->Worker = wyrmgus::unit_ref(&builder);
+		order->Worker = builder.acquire_ref();
 	}
 	return order;
 }
 
+COrder_Built::COrder_Built() : COrder(UnitAction::Built)
+{
+}
+
+COrder_Built::~COrder_Built()
+{
+}
 
 void COrder_Built::Save(CFile &file, const CUnit &unit) const
 {
@@ -96,8 +104,8 @@ void COrder_Built::Save(CFile &file, const CUnit &unit) const
 		cframe = cframe->get_next();
 		++frame;
 	}
-	if (this->Worker != nullptr) {
-		file.printf("\"worker\", \"%s\", ", UnitReference(this->Worker).c_str());
+	if (this->get_worker() != nullptr) {
+		file.printf("\"worker\", \"%s\", ", UnitReference(this->get_worker()).c_str());
 	}
 	file.printf("\"progress\", %d, \"frame\", %d", this->ProgressCounter, frame);
 	if (this->IsCancelled) {
@@ -106,12 +114,12 @@ void COrder_Built::Save(CFile &file, const CUnit &unit) const
 	file.printf("}");
 }
 
-/* virtual */ bool COrder_Built::ParseSpecificData(lua_State *l, int &j, const char *value, const CUnit &unit)
+bool COrder_Built::ParseSpecificData(lua_State *l, int &j, const char *value, const CUnit &unit)
 {
 	if (!strcmp(value, "worker")) {
 		++j;
 		lua_rawgeti(l, -1, j + 1);
-		this->Worker = wyrmgus::unit_ref(CclGetUnitFromRef(l));
+		this->Worker = CclGetUnitFromRef(l)->acquire_ref();
 		lua_pop(l, 1);
 	} else if (!strcmp(value, "progress")) {
 		++j;
@@ -134,12 +142,12 @@ void COrder_Built::Save(CFile &file, const CUnit &unit) const
 	return true;
 }
 
-/* virtual */ bool COrder_Built::IsValid() const
+bool COrder_Built::IsValid() const
 {
 	return true;
 }
 
-/* virtual */ PixelPos COrder_Built::Show(const CViewport &, const PixelPos &lastScreenPos) const
+PixelPos COrder_Built::Show(const CViewport &, const PixelPos &lastScreenPos) const
 {
 	return lastScreenPos;
 }
@@ -148,7 +156,7 @@ void COrder_Built::Save(CFile &file, const CUnit &unit) const
 static void CancelBuilt(COrder_Built &order, CUnit &unit)
 {
 	Assert(unit.CurrentOrder() == &order);
-	CUnit *worker = order.GetWorkerPtr();
+	CUnit *worker = order.get_worker();
 
 	// Drop out unit
 	if (worker != nullptr) {
@@ -199,7 +207,7 @@ static void Finish(COrder_Built &order, CUnit &unit)
 	} else {
 		unit.Frame = 0;
 	}
-	CUnit *worker = order.GetWorkerPtr();
+	CUnit *worker = order.get_worker();
 	
 	//Wyrmgus start
 	int worker_count = 0;
@@ -502,6 +510,14 @@ void COrder_Built::ProgressHp(CUnit &unit, int amount)
 	UpdateConstructionFrame(unit);
 }
 
+CUnit *COrder_Built::get_worker() const
+{
+	if (this->Worker == nullptr) {
+		return nullptr;
+	}
+
+	return this->Worker->get();
+}
 
 void COrder_Built::Boost(CUnit &building, int amount, int varIndex) const
 {

@@ -41,11 +41,8 @@ class COrder_Resource final : public COrder
 	friend std::unique_ptr<COrder> COrder::NewActionReturnGoods(CUnit &harvester, CUnit *depot);
 
 public:
-	explicit COrder_Resource(CUnit &harvester) : COrder(UnitAction::Resource), worker(&harvester)
-	{
-	}
-
-	~COrder_Resource();
+	explicit COrder_Resource(CUnit &harvester);
+	virtual ~COrder_Resource() override;
 
 	virtual std::unique_ptr<COrder> Clone() const override
 	{
@@ -86,17 +83,22 @@ private:
 	bool FindAnotherResource(CUnit &unit);
 	bool ActionResourceInit(CUnit &unit);
 
+	CUnit *get_worker() const;
+	CUnit *get_depot() const;
+
 private:
-	wyrmgus::unit_ref worker; /// unit that own this order.
+	std::shared_ptr<wyrmgus::unit_ref> worker; /// unit that own this order.
 	unsigned char CurrentResource = 0;
-	struct {
-		Vec2i Pos = Vec2i(-1, -1);; /// position for terrain resource.
+	struct Resource {
+		CUnit *get_mine() const;
+
+		Vec2i Pos = Vec2i(-1, -1); /// position for terrain resource.
 		//Wyrmgus start
 		int MapLayer = -1;
 		//Wyrmgus end
-		wyrmgus::unit_ref Mine;
+		std::shared_ptr<wyrmgus::unit_ref> Mine;
 	} Resource;
-	wyrmgus::unit_ref Depot;
+	std::shared_ptr<wyrmgus::unit_ref> Depot;
 	int State = 0;
 	int TimeToHarvest = 0;          /// how much time until we harvest some more.
 	bool DoneHarvesting = false;  /// Harvesting done, wait for action to break.

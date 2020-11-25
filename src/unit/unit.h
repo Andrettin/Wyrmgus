@@ -30,7 +30,6 @@
 #include "item/item_slot.h"
 #include "player.h"
 #include "player_container.h"
-#include "unit/unit_ref.h"
 #include "unit/unit_type.h"
 #include "unit/unit_variable.h"
 #include "vec2i.h"
@@ -62,6 +61,7 @@ namespace wyrmgus {
 	class time_of_day;
 	class unique_item;
 	class unit_manager;
+	class unit_ref;
 	class unit_type;
 	class unit_type_variation;
 	enum class gender;
@@ -124,6 +124,13 @@ public:
 
 	void Init();
 
+	std::shared_ptr<wyrmgus::unit_ref> acquire_ref();
+
+	int get_ref_count() const
+	{
+		return this->ref.use_count();
+	}
+
 	COrder *CurrentOrder() const
 	{
 		return this->Orders.front().get();
@@ -134,11 +141,6 @@ public:
 	bool IsIdle() const;
 
 	void ClearAction();
-
-	/// Increase a unit's reference count
-	void RefsIncrease();
-	/// Decrease a unit's reference count
-	void RefsDecrease();
 
 	/// Initialize unit structure with default values
 	void Init(const wyrmgus::unit_type &type);
@@ -580,9 +582,11 @@ public:
 		friend class wyrmgus::unit_manager;
 	};
 
+private:
+	std::shared_ptr<wyrmgus::unit_ref> base_ref; //base reference for the unit
+	std::weak_ptr<wyrmgus::unit_ref> ref; //the handle to the unit's reference object
 public:
 	// @note int is faster than shorts
-	unsigned int     Refs;         /// Reference counter
 	unsigned int     ReleaseCycle; /// When this unit could be recycled
 	CUnitManagerData UnitManagerData;
 	size_t PlayerSlot;  /// index in Player->Units
@@ -595,7 +599,7 @@ public:
 	CUnit *PrevContained; /// Previous unit in the container.
 
 	struct {
-		std::vector<wyrmgus::unit_ref> Workers; ///references to the workers assigned to this resource.
+		std::vector<std::shared_ptr<wyrmgus::unit_ref>> Workers; ///references to the workers assigned to this resource.
 		int Active = 0; /// how many units are harvesting from the resource.
 	} Resource; /// Resource still
 

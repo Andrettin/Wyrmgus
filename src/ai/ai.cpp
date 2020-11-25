@@ -163,6 +163,7 @@
 #include "unit/unit_find.h"
 //Wyrmgus end
 #include "unit/unit_manager.h"
+#include "unit/unit_ref.h"
 #include "unit/unit_type.h"
 #include "unit/unit_type_type.h"
 #include "upgrade/upgrade.h"
@@ -480,7 +481,8 @@ static void SaveAiPlayer(CFile &file, int plynr, const PlayerAi &ai)
 			file.printf("%d, \"%s\", ", aut.Want, aut.Type->Ident.c_str());
 		}
 		file.printf("},\n    \"units\", {");
-		for (const wyrmgus::unit_ref &ai_unit : ai.Force[i].get_units()) {
+		for (const std::shared_ptr<wyrmgus::unit_ref> &ai_unit_ref : ai.Force[i].get_units()) {
+			const CUnit *ai_unit = ai_unit_ref->get();
 			file.printf(" %d, \"%s\",", UnitNumber(*ai_unit), ai_unit->Type->get_identifier().c_str());
 		}
 		file.printf("},\n    \"state\", %d, \"goalx\", %d, \"goaly\", %d,",

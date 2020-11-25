@@ -112,7 +112,7 @@ int Spell_AreaBombardment::Cast(CUnit &caster, const wyrmgus::spell &, CUnit *, 
 			mis->Damage = damage;
 			// FIXME: not correct -- blizzard should continue even if mage is
 			//    destroyed (though it will be quite short time...)
-			mis->SourceUnit = wyrmgus::unit_ref(&caster);
+			mis->SourceUnit = caster.acquire_ref();
 		}
 	}
 	return 1;

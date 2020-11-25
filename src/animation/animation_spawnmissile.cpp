@@ -129,11 +129,11 @@
 			missile->MissileNewHeadingFromXY(posd);
 		}
 		if (flags & SM_Damage) {
-			missile->SourceUnit = wyrmgus::unit_ref(&unit);
+			missile->SourceUnit = unit.acquire_ref();
 		}
 		CUnit *target = goal->CurrentOrder()->get_goal();
 		if (flags & SM_ToTarget && target && target->IsAlive()) {
-			missile->TargetUnit = wyrmgus::unit_ref(target);
+			missile->TargetUnit = target->acquire_ref();
 		}
 	}
 }

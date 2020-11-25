@@ -39,11 +39,8 @@ class COrder_Repair final : public COrder
 	friend std::unique_ptr<COrder> COrder::NewActionRepair(const Vec2i &pos, int z);
 	//Wyrmgus end
 public:
-	COrder_Repair() : COrder(UnitAction::Repair)
-	{
-		goalPos.x = -1;
-		goalPos.y = -1;
-	}
+	COrder_Repair();
+	virtual ~COrder_Repair() override;
 
 	virtual std::unique_ptr<COrder> Clone() const override
 	{
@@ -59,12 +56,13 @@ public:
 	virtual PixelPos Show(const CViewport &vp, const PixelPos &lastScreenPos) const override;
 	virtual void UpdatePathFinderData(PathFinderInput &input) override;
 
-	const wyrmgus::unit_ref &GetReparableTarget() const { return ReparableTarget; }
+	CUnit *get_reparable_target() const;
+
 private:
 	bool RepairUnit(const CUnit &unit, CUnit &goal);
 
 private:
-	wyrmgus::unit_ref ReparableTarget;
+	std::shared_ptr<wyrmgus::unit_ref> ReparableTarget;
 	unsigned int State = 0;
 	unsigned int RepairCycle = 0;
 	Vec2i goalPos;

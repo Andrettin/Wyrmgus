@@ -575,7 +575,7 @@ static void DrawDecoration(const CUnit &unit, const wyrmgus::unit_type &type, co
 	int y = screenPos.y;
 #ifdef DEBUG
 	// Show the number of references.
-	CLabel(wyrmgus::defines::get()->get_game_font()).DrawClip(x + 1, y + 1, unit.Refs);
+	CLabel(wyrmgus::defines::get()->get_game_font()).DrawClip(x + 1, y + 1, unit.get_ref_count());
 #endif
 
 	UpdateUnitVariables(const_cast<CUnit &>(unit));
@@ -834,7 +834,7 @@ static void DrawInformations(const CUnit &unit, const wyrmgus::unit_type &type, 
 	sprintf(buf, "%d%c%c%d", unit.VisCount[ThisPlayer->Index],
 			unit.is_seen_by_player(ThisPlayer) ? 'Y' : 'N',
 			unit.is_seen_destroyed_by_player(ThisPlayer) ? 'Y' : 'N',
-			unit.Refs);
+			unit.get_ref_count());
 	CLabel(GetSmallFont()).Draw(screenPos.x + 10, screenPos.y + 10, buf);
 #endif
 

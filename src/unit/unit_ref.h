@@ -37,53 +37,38 @@ namespace wyrmgus {
 class unit_ref final
 {
 public:
-	unit_ref()
+	explicit unit_ref(CUnit *unit) : unit(unit)
 	{
+		if (unit == nullptr) {
+			throw std::runtime_error("Tried to construct a unit ref from a null unit pointer.");
+		}
 	}
 
-	explicit unit_ref(CUnit *u)
+	~unit_ref();
+
+	CUnit *get() const
 	{
-		this->set_unit(u);
+		return this->unit;
 	}
 
-	unit_ref(const unit_ref &other)
+	operator CUnit *()
 	{
-		this->set_unit(other.unit);
+		return this->unit;
 	}
 
-	unit_ref(unit_ref &&other)
+	operator CUnit *() const
 	{
-		this->unit = other.unit;
-		other.unit = nullptr;
+		return this->unit;
 	}
 
-	~unit_ref()
+	CUnit &operator*()
 	{
-		this->reset();
+		return *this->unit;
 	}
 
-	void reset()
+	CUnit *operator->() const
 	{
-		this->set_unit(nullptr);
-	}
-
-	operator CUnit *() { return unit; }
-	operator CUnit *() const { return unit; }
-
-	CUnit &operator*() { return *unit; }
-	CUnit *operator->() const { return unit; }
-
-	unit_ref &operator= (const unit_ref &other)
-	{
-		this->set_unit(other.unit);
-		return *this;
-	}
-
-	unit_ref &operator= (unit_ref &&other)
-	{
-		this->unit = other.unit;
-		other.unit = nullptr;
-		return *this;
+		return this->unit;
 	}
 
 	bool operator== (const unit_ref &other) const
@@ -107,8 +92,6 @@ public:
 	}
 
 private:
-	void set_unit(CUnit *unit);
-
 	CUnit *unit = nullptr;
 };
 

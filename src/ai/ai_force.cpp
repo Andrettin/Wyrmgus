@@ -46,6 +46,7 @@
 #include "unit/unit.h"
 #include "unit/unit_class.h"
 #include "unit/unit_find.h"
+#include "unit/unit_ref.h"
 #include "unit/unit_type.h"
 #include "unit/unit_type_type.h"
 #include "util/vector_util.h"
@@ -259,6 +260,12 @@ public:
 		}
 		return *enemy == nullptr;
 	}
+
+	bool operator()(const std::shared_ptr<wyrmgus::unit_ref> &unit_ref)
+	{
+		return (*this)(unit_ref->get());
+	}
+
 private:
 	const CUnit **enemy;
 	//Wyrmgus start
@@ -393,11 +400,11 @@ int AiFindAvailableUnitTypeEquiv(const wyrmgus::unit_type &unittype, int *usable
 class AiForceCounter final
 {
 public:
-	explicit AiForceCounter(const std::vector<wyrmgus::unit_ref> &units, unsigned int *d, const size_t len) : data(d)
+	explicit AiForceCounter(const std::vector<std::shared_ptr<wyrmgus::unit_ref>> &units, unsigned int *d, const size_t len) : data(d)
 	{
 		memset(data, 0, len);
-		for (const wyrmgus::unit_ref &unit : units) {
-			(*this)(unit);
+		for (const std::shared_ptr<wyrmgus::unit_ref> &unit : units) {
+			(*this)(*unit);
 		}
 	}
 
@@ -459,9 +466,14 @@ bool AiForce::IsBelongsTo(const wyrmgus::unit_type &type)
 	return flag;
 }
 
-void AiForce::Insert(wyrmgus::unit_ref &&unit)
+void AiForce::Insert(std::shared_ptr<wyrmgus::unit_ref> &&unit)
 {
 	this->units.push_back(std::move(unit));
+}
+
+void AiForce::Insert(CUnit *unit)
+{
+	this->Insert(unit->acquire_ref());
 }
 
 void AiForce::InternalRemoveUnit(CUnit *unit)
@@ -476,7 +488,7 @@ void AiForce::remove_dead_units()
 {
 	// Release all killed units.
 	for (size_t i = 0; i != this->get_units().size();) {
-		CUnit *ai_unit = this->get_units()[i];
+		CUnit *ai_unit = *this->get_units()[i];
 
 		if (!ai_unit->IsAlive()) {
 			AiForce::InternalRemoveUnit(ai_unit);
@@ -565,13 +577,29 @@ VisitResult AiForceRallyPointFinder::Visit(TerrainTraversal &terrainTraversal, c
 	//Wyrmgus end
 }
 
+AiForce::AiForce() :
+	Completed(false), Defending(false), Attacking(false),
+	//Wyrmgus start
+	HomeMapLayer(0),
+	GoalMapLayer(0),
+	//Wyrmgus end
+	Role(AiForceRole::Default), FormerForce(-1), State(AiForceAttackingState::Free),
+	WaitOnRallyPoint(AI_WAIT_ON_RALLY_POINT)
+{
+	HomePos.x = HomePos.y = GoalPos.x = GoalPos.y = -1;
+}
+
+AiForce::~AiForce()
+{
+}
+
 //Wyrmgus start
 //bool AiForce::NewRallyPoint(const Vec2i &startPos, Vec2i *resultPos)
 bool AiForce::NewRallyPoint(const Vec2i &startPos, Vec2i *resultPos, int z)
 //Wyrmgus end
 {
 	Assert(!this->get_units().empty());
-	const CUnit &leader = *(this->get_units().front());
+	const CUnit &leader = **(this->get_units().front());
 	//Wyrmgus start
 //	const int distance = leader.MapDistanceTo(startPos);
 	const int distance = leader.MapDistanceTo(startPos, z);
@@ -618,7 +646,8 @@ bool AiForce::CheckTransporters(const Vec2i &pos, int z)
 	int transport_capacity = AiGetTransportCapacity(water_landmass);
 	
 	int transport_capacity_needed = 0;
-	for (const wyrmgus::unit_ref &ai_unit : this->get_units()) {
+	for (const std::shared_ptr<wyrmgus::unit_ref> &unit_ref : this->get_units()) {
+		CUnit *ai_unit = unit_ref->get();
 		if (ai_unit->Removed) { //already in a transporter
 			continue;
 		}
@@ -662,7 +691,7 @@ bool AiForce::CheckTransporters(const Vec2i &pos, int z)
 		
 	bool has_unboarded_unit = false;
 	for (size_t i = 0; i != this->get_units().size(); ++i) {
-		const wyrmgus::unit_ref &ai_unit = this->get_units()[i];
+		CUnit *ai_unit = *this->get_units()[i];
 		
 		if (ai_unit->Removed) { //already in a transporter
 			continue;
@@ -704,7 +733,7 @@ bool AiForce::CheckTransporters(const Vec2i &pos, int z)
 	//everyone is already boarded, time to move to the enemy shores!
 	bool has_loaded_unit = false;
 	for (size_t i = 0; i != this->get_units().size(); ++i) {
-		const wyrmgus::unit_ref &ai_unit = this->get_units()[i];
+		CUnit *ai_unit = *this->get_units()[i];
 		
 		if (CMap::Map.GetTileLandmass(ai_unit->tilePos, ai_unit->MapLayer->ID) == goal_landmass) { //already unloaded to the enemy's landmass
 			continue;
@@ -737,13 +766,53 @@ bool AiForce::CheckTransporters(const Vec2i &pos, int z)
 }
 //Wyrmgus end
 
-wyrmgus::unit_ref AiForce::take_last_unit()
+std::shared_ptr<wyrmgus::unit_ref> AiForce::take_last_unit()
 {
-	wyrmgus::unit_ref unit = wyrmgus::vector::take_back(this->units);
+	std::shared_ptr<wyrmgus::unit_ref> unit_ref = wyrmgus::vector::take_back(this->units);
 
-	AiForce::InternalRemoveUnit(unit);
+	AiForce::InternalRemoveUnit(unit_ref->get());
 
-	return unit;
+	return unit_ref;
+}
+
+void AiForce::Remove(CUnit *unit)
+{
+	for (size_t i = 0; i < this->get_units().size(); ++i) {
+		if (*this->get_units()[i] == unit) {
+			AiForce::InternalRemoveUnit(unit);
+			this->units.erase(this->units.begin() + i);
+			return;
+		}
+	}
+}
+
+/**
+**  Reset the force. But don't change its role and its demand.
+*/
+void AiForce::Reset(const bool types)
+{
+	FormerForce = -1;
+	Completed = false;
+	Defending = false;
+	Attacking = false;
+	WaitOnRallyPoint = AI_WAIT_ON_RALLY_POINT;
+	if (types) {
+		UnitTypes.clear();
+		State = AiForceAttackingState::Free;
+	} else {
+		State = AiForceAttackingState::Waiting;
+	}
+
+	for (const std::shared_ptr<wyrmgus::unit_ref> &unit : this->get_units()) {
+		AiForce::InternalRemoveUnit(*unit);
+	}
+	this->units.clear();
+
+	HomePos.x = HomePos.y = GoalPos.x = GoalPos.y = -1;
+	//Wyrmgus start
+	HomeMapLayer = 0;
+	GoalMapLayer = 0;
+	//Wyrmgus end
 }
 
 ForceType AiForce::GetForceType() const
@@ -753,7 +822,8 @@ ForceType AiForce::GetForceType() const
 	}
 	
 	ForceType force_type = ForceType::Space;
-	for (const wyrmgus::unit_ref &unit : this->get_units()) {
+	for (const std::shared_ptr<wyrmgus::unit_ref> &unit_ref : this->get_units()) {
+		CUnit *unit = unit_ref->get();
 		if (unit->Type->UnitType == UnitTypeType::Naval && unit->CanAttack() && !unit->Type->CanTransport()) { //one naval unit that can attack makes this a naval force
 			return ForceType::Naval;
 		}
@@ -784,7 +854,8 @@ bool AiForce::IsHeroOnlyForce() const
 		return false;
 	}
 	
-	for (const wyrmgus::unit_ref &unit : this->get_units()) {
+	for (const std::shared_ptr<wyrmgus::unit_ref> &unit_ref : this->get_units()) {
+		CUnit *unit = unit_ref->get();
 		if (unit->get_character() == nullptr) {
 			return false;
 		}
@@ -819,8 +890,8 @@ void AiForce::Attack(const Vec2i &pos, int z)
 		// Remember the original force position so we can return there after attack
 		if (this->Role == AiForceRole::Defend
 			|| (this->Role == AiForceRole::Attack && this->State == AiForceAttackingState::Waiting)) {
-			this->HomePos = this->get_units().back()->tilePos;
-			this->HomeMapLayer = this->get_units().back()->MapLayer->ID;
+			this->HomePos = (*this->get_units().back())->tilePos;
+			this->HomeMapLayer = (*this->get_units().back())->MapLayer->ID;
 		}
 		this->Attacking = true;
 	}
@@ -828,7 +899,8 @@ void AiForce::Attack(const Vec2i &pos, int z)
 
 	bool isNaval = this->IsNaval();
 	bool isTransporter = false;
-	for (const wyrmgus::unit_ref &unit : this->get_units()) {
+	for (const std::shared_ptr<wyrmgus::unit_ref> &unit_ref : this->get_units()) {
+		CUnit *unit = unit_ref->get();
 		//Wyrmgus start
 //		if (unit->Type->CanTransport() && unit->IsAgressive() == false) {
 		if (unit->Type->CanTransport()) {
@@ -887,7 +959,8 @@ void AiForce::Attack(const Vec2i &pos, int z)
 
 	//Wyrmgus start
 	//if one of the force's units is being used as a scout, stop its function as a scout when the force is used to attack
-	for (const wyrmgus::unit_ref &unit : this->get_units()) {
+	for (const std::shared_ptr<wyrmgus::unit_ref> &unit_ref : this->get_units()) {
+		CUnit *unit = unit_ref->get();
 		if (wyrmgus::vector::contains(AiPlayer->Scouts, unit)) {
 			wyrmgus::vector::remove(AiPlayer->Scouts, unit);
 		}
@@ -906,7 +979,8 @@ void AiForce::Attack(const Vec2i &pos, int z)
 	//Wyrmgus start
 	if (!isTransporter && !isNaval) {
 		bool needs_transport = false;
-		for (const wyrmgus::unit_ref &unit : this->get_units()) {
+		for (const std::shared_ptr<wyrmgus::unit_ref> &unit_ref : this->get_units()) {
+			CUnit *unit = unit_ref->get();
 			if (unit->Type->UnitType != UnitTypeType::Fly && unit->Type->UnitType != UnitTypeType::FlyLow && unit->Type->UnitType != UnitTypeType::Space && CMap::Map.GetTileLandmass(unit->tilePos, unit->MapLayer->ID) != CMap::Map.GetTileLandmass(goalPos, z)) {
 				needs_transport = true;
 				break;
@@ -947,7 +1021,8 @@ void AiForce::Attack(const Vec2i &pos, int z)
 	//  Send all units in the force to enemy.
 	
 	CUnit *leader = nullptr;
-	for (const wyrmgus::unit_ref &unit : this->get_units()) {
+	for (const std::shared_ptr<wyrmgus::unit_ref> &unit_ref : this->get_units()) {
+		CUnit *unit = unit_ref->get();
 		if (unit->IsAgressive()) {
 			leader = unit;
 			break;
@@ -955,7 +1030,7 @@ void AiForce::Attack(const Vec2i &pos, int z)
 	}
 
 	for (size_t i = 0; i != this->get_units().size(); ++i) {
-		const wyrmgus::unit_ref &unit = this->get_units()[i];
+		CUnit *unit = *this->get_units()[i];
 		
 		//Wyrmgus start
 		if (!unit->IsIdle()) {
@@ -995,7 +1070,8 @@ void AiForce::Attack(const Vec2i &pos, int z)
 void AiForce::ReturnToHome()
 {
 	if (CMap::Map.Info.IsPointOnMap(this->HomePos, this->HomeMapLayer)) {
-		for (const wyrmgus::unit_ref &unit : this->get_units()) {
+		for (const std::shared_ptr<wyrmgus::unit_ref> &unit_ref : this->get_units()) {
+			CUnit *unit = unit_ref->get();
 			//Wyrmgus start
 			if (!unit->IsIdle()) {
 				continue;
@@ -1066,7 +1142,8 @@ int AiForceManager::GetForce(const CUnit &unit)
 	for (unsigned int i = 0; i < forces.size(); ++i) {
 		const AiForce &force = forces[i];
 
-		for (const wyrmgus::unit_ref &ai_unit : force.get_units()) {
+		for (const std::shared_ptr<wyrmgus::unit_ref> &unit_ref : force.get_units()) {
+			CUnit *ai_unit = unit_ref->get();
 			if (UnitNumber(unit) == UnitNumber(*ai_unit)) {
 				return i;
 			}
@@ -1107,7 +1184,7 @@ bool AiForceManager::Assign(CUnit &unit, int force, bool hero)
 		//Wyrmgus end
 			if (hero && !f.get_units().empty()) {
 				//make heroes move to where the rest of the force is
-				CommandMove(unit, f.get_units().front()->tilePos, FlushCommands, f.get_units().front()->MapLayer->ID);
+				CommandMove(unit, (*f.get_units().front())->tilePos, FlushCommands, (*f.get_units().front())->MapLayer->ID);
 			}
 			f.Insert(&unit);
 			unit.GroupId = force + 1;
@@ -1140,7 +1217,8 @@ void AiForceManager::CheckUnits(int *counter)
 		const AiForce &force = forces[i];
 
 		if (force.State > AiForceAttackingState::Free && force.IsAttacking()) {
-			for (const wyrmgus::unit_ref &unit : force.get_units()) {
+			for (const std::shared_ptr<wyrmgus::unit_ref> &unit_ref : force.get_units()) {
+				const CUnit *unit = unit_ref->get();
 				attacking[unit->Type->Slot]++;
 			}
 		}
@@ -1274,8 +1352,8 @@ void AiAttackWithForce(unsigned int force)
 		AiPlayer->Force[f].Role = AiPlayer->Force[intForce].Role;
 
 		while (AiPlayer->Force[intForce].Size()) {
-			wyrmgus::unit_ref ai_unit = AiPlayer->Force[intForce].take_last_unit();
-			ai_unit->GroupId = f + 1;
+			std::shared_ptr<wyrmgus::unit_ref> ai_unit = AiPlayer->Force[intForce].take_last_unit();
+			(*ai_unit)->GroupId = f + 1;
 			AiPlayer->Force[f].Insert(std::move(ai_unit));
 		}
 
@@ -1293,7 +1371,7 @@ void AiAttackWithForce(unsigned int force)
 	//Wyrmgus start
 	int z = AiPlayer->Player->StartMapLayer;
 	if (!AiPlayer->Force[force].get_units().empty()) {
-		z = AiPlayer->Force[force].get_units()[0]->MapLayer->ID;
+		z = (*AiPlayer->Force[force].get_units()[0])->MapLayer->ID;
 	}
 	
 //	AiPlayer->Force[force].Attack(invalidPos);
@@ -1326,8 +1404,8 @@ void AiAttackWithForces(int *forces)
 			AiPlayer->Force[f].Role = AiPlayer->Force[force].Role;
 
 			while (AiPlayer->Force[force].Size()) {
-				wyrmgus::unit_ref ai_unit = AiPlayer->Force[force].take_last_unit();
-				ai_unit->GroupId = f + 1;
+				std::shared_ptr<wyrmgus::unit_ref> ai_unit = AiPlayer->Force[force].take_last_unit();
+				(*ai_unit)->GroupId = f + 1;
 				AiPlayer->Force[f].Insert(std::move(ai_unit));
 			}
 
@@ -1342,7 +1420,7 @@ void AiAttackWithForces(int *forces)
 			//Wyrmgus start
 			int z = AiPlayer->Player->StartMapLayer;
 			if (!AiPlayer->Force[force].get_units().empty()) {
-				z = AiPlayer->Force[force].get_units()[0]->MapLayer->ID;
+				z = (*AiPlayer->Force[force].get_units()[0])->MapLayer->ID;
 			}
 			
 //			AiPlayer->Force[force].Attack(invalidPos);
@@ -1355,7 +1433,7 @@ void AiAttackWithForces(int *forces)
 		//Wyrmgus start
 		int z = AiPlayer->Player->StartMapLayer;
 		if (!AiPlayer->Force[f].get_units().empty()) {
-			z = AiPlayer->Force[f].get_units()[0]->MapLayer->ID;
+			z = (*AiPlayer->Force[f].get_units()[0])->MapLayer->ID;
 		}
 			
 //		AiPlayer->Force[f].Attack(invalidPos);
@@ -1381,7 +1459,7 @@ static void AiGroupAttackerForTransport(AiForce &aiForce)
 	bool forceIsReady = true;
 
 	for (; transporterIndex < aiForce.get_units().size(); ++transporterIndex) {
-		const CUnit *unit = aiForce.get_units()[transporterIndex];
+		const CUnit *unit = *aiForce.get_units()[transporterIndex];
 
 		if (unit->Type->CanTransport() && unit->Type->MaxOnBoard - unit->BoardCount > 0) {
 			nbToTransport = unit->Type->MaxOnBoard - unit->BoardCount;
@@ -1394,8 +1472,9 @@ static void AiGroupAttackerForTransport(AiForce &aiForce)
 		return;
 	}
 
-	for (const wyrmgus::unit_ref &unit : aiForce.get_units()) {
-		const wyrmgus::unit_ref &transporter = aiForce.get_units()[transporterIndex];
+	for (const std::shared_ptr<wyrmgus::unit_ref> &unit_ref : aiForce.get_units()) {
+		const CUnit *unit = unit_ref->get();
+		const CUnit *transporter = *aiForce.get_units()[transporterIndex];
 
 		if (CanTransport(*transporter, *unit) && unit->Container == nullptr) {
 			forceIsReady = false;
@@ -1408,8 +1487,9 @@ static void AiGroupAttackerForTransport(AiForce &aiForce)
 		return;
 	}
 
-	for (const wyrmgus::unit_ref &unit : aiForce.get_units()) {
-		const wyrmgus::unit_ref &transporter = aiForce.get_units()[transporterIndex];
+	for (const std::shared_ptr<wyrmgus::unit_ref> &unit_ref : aiForce.get_units()) {
+		CUnit *unit = unit_ref->get();
+		CUnit *transporter = *aiForce.get_units()[transporterIndex];
 
 		if (unit->CurrentAction() == UnitAction::Board
 			&& static_cast<COrder_Board *>(unit->CurrentOrder())->get_goal() == transporter) {
@@ -1422,7 +1502,7 @@ static void AiGroupAttackerForTransport(AiForce &aiForce)
 				CommandFollow(*transporter, *unit, 0);
 				if (--nbToTransport == 0) { // full : next transporter.
 					for (++transporterIndex; transporterIndex < aiForce.get_units().size(); ++transporterIndex) {
-						const wyrmgus::unit_ref &nextTransporter = aiForce.get_units()[transporterIndex];
+						const CUnit *nextTransporter = *aiForce.get_units()[transporterIndex];
 
 						if (nextTransporter->Type->CanTransport()) {
 							nbToTransport = nextTransporter->Type->MaxOnBoard - nextTransporter->BoardCount;
@@ -1463,7 +1543,8 @@ void AiForce::Update()
 
 	//Wyrmgus start
 	//if one of the force's units is being used as a scout, stop its function as a scout when the force is used to attack
-	for (const wyrmgus::unit_ref &unit : this->get_units()) {
+	for (const std::shared_ptr<wyrmgus::unit_ref> &unit_ref : this->get_units()) {
+		CUnit *unit = unit_ref->get();
 		if (wyrmgus::vector::contains(AiPlayer->Scouts, unit)) {
 			wyrmgus::vector::remove(AiPlayer->Scouts, unit);
 		}
@@ -1476,7 +1557,7 @@ void AiForce::Update()
 		//Wyrmgus start
 		int z = AiPlayer->Player->StartMapLayer;
 		if (!this->get_units().empty()) {
-			z = this->get_units()[0]->MapLayer->ID;
+			z = (*this->get_units()[0])->MapLayer->ID;
 		}
 			
 //		Attack(invalidPos);
@@ -1486,7 +1567,9 @@ void AiForce::Update()
 	}
 	//Wyrmgus end
 	Attacking = false;
-	for (const wyrmgus::unit_ref &ai_unit : this->get_units()) {
+
+	for (const std::shared_ptr<wyrmgus::unit_ref> &unit_ref : this->get_units()) {
+		CUnit *ai_unit = unit_ref->get();
 		if (ai_unit->Type->CanAttack) {
 			Attacking = true;
 			break;
@@ -1521,7 +1604,8 @@ void AiForce::Update()
 		std::vector<CUnit *> transporters;
 		bool emptyTrans = true;
 
-		for (const wyrmgus::unit_ref &ai_unit : this->get_units()) {
+		for (const std::shared_ptr<wyrmgus::unit_ref> &unit_ref : this->get_units()) {
+			CUnit *ai_unit = unit_ref->get();
 			if (ai_unit->CanMove() && ai_unit->Type->MaxOnBoard) {
 				transporters.push_back(ai_unit);
 				if (ai_unit->BoardCount > 0) {
@@ -1558,7 +1642,8 @@ void AiForce::Update()
 	
 	//Wyrmgus start
 	bool needs_transport = false;
-	for (const wyrmgus::unit_ref &unit : this->get_units()) {
+	for (const std::shared_ptr<wyrmgus::unit_ref> &unit_ref : this->get_units()) {
+		CUnit *unit = unit_ref->get();
 		if (unit->Type->UnitType != UnitTypeType::Fly && unit->Type->UnitType != UnitTypeType::FlyLow && unit->Type->UnitType != UnitTypeType::Space && unit->Type->UnitType != UnitTypeType::Naval && CMap::Map.GetTileLandmass(unit->tilePos, unit->MapLayer->ID) != CMap::Map.GetTileLandmass(this->GoalPos, this->GoalMapLayer)) {
 			needs_transport = true;
 			break;
@@ -1573,7 +1658,8 @@ void AiForce::Update()
 	//Wyrmgus end
 	
 	CUnit *leader = nullptr;
-	for (const wyrmgus::unit_ref &ai_unit : this->get_units()) {
+	for (const std::shared_ptr<wyrmgus::unit_ref> &unit_ref : this->get_units()) {
+		CUnit *ai_unit = unit_ref->get();
 		if (ai_unit->IsAgressive()) {
 			leader = ai_unit;
 			break;
@@ -1590,11 +1676,12 @@ void AiForce::Update()
 		// Check if we are near the goalpos
 		//Wyrmgus start
 //		int minDist = this->get_units()[0]->MapDistanceTo(this->GoalPos);
-		int minDist = this->get_units()[0]->MapDistanceTo(this->GoalPos, this->GoalMapLayer);
+		int minDist = (*this->get_units()[0])->MapDistanceTo(this->GoalPos, this->GoalMapLayer);
 		//Wyrmgus end
 		int maxDist = minDist;
 
-		for (const wyrmgus::unit_ref &unit : this->get_units()) {
+		for (const std::shared_ptr<wyrmgus::unit_ref> &unit_ref : this->get_units()) {
+			CUnit *unit = unit_ref->get();
 			//Wyrmgus start
 //			const int distance = unit->MapDistanceTo(this->GoalPos);
 			const int distance = unit->MapDistanceTo(this->GoalPos, this->GoalMapLayer);
@@ -1658,7 +1745,7 @@ void AiForce::Update()
 			
 			State = AiForceAttackingState::Attacking;
 			for (size_t i = 0; i != this->get_units().size(); ++i) {
-				const wyrmgus::unit_ref &ai_unit = this->get_units()[i];
+				CUnit *ai_unit = *this->get_units()[i];
 				
 				//Wyrmgus start
 				if (!ai_unit->IsIdle()) {
@@ -1693,7 +1780,8 @@ void AiForce::Update()
 	}
 
 	std::vector<CUnit *> idleUnits;
-	for (const wyrmgus::unit_ref &ai_unit : this->get_units()) {
+	for (const std::shared_ptr<wyrmgus::unit_ref> &unit_ref : this->get_units()) {
+		CUnit *ai_unit = unit_ref->get();
 		if (ai_unit->IsIdle()) {
 			idleUnits.push_back(ai_unit);
 		}
@@ -1837,7 +1925,7 @@ void AiForceManager::CheckForceRecruitment()
 			//attack with forces that are completed, but aren't attacking or defending
 			if (!force.Attacking && !force.Defending) {
 				const Vec2i invalidPos(-1, -1);
-				int z = force.get_units()[0]->MapLayer->ID;
+				const int z = (*force.get_units()[0])->MapLayer->ID;
 				
 				force.Attack(invalidPos, z);
 			}
@@ -1854,7 +1942,8 @@ void AiForceManager::CheckForceRecruitment()
 		for (size_t f = 0; f < forces.size(); ++f) {
 			AiForce &force = forces[f];
 			if (force.Completed) {
-				for (const wyrmgus::unit_ref &force_unit : force.get_units()) {
+				for (const std::shared_ptr<wyrmgus::unit_ref> &force_unit_ref : force.get_units()) {
+					const CUnit *force_unit = force_unit_ref->get();
 					completed_force_pop += force_unit->Variable[DEMAND_INDEX].Value;
 				}
 			}
@@ -1956,7 +2045,8 @@ void AiForceManager::Update()
 				force.ReturnToHome();
 			} else {
 				//  Check if some unit from force reached goal point
-				for (const wyrmgus::unit_ref &unit : force.get_units()) {
+				for (const std::shared_ptr<wyrmgus::unit_ref> &unit_ref : force.get_units()) {
+					const CUnit *unit = unit_ref->get();
 					//Wyrmgus start
 //					if (unit->MapDistanceTo(force.GoalPos) <= nearDist) {
 					if (unit->MapDistanceTo(force.GoalPos, force.GoalMapLayer) <= nearDist) {
@@ -1987,13 +2077,13 @@ void AiForceManager::Update()
 						//Wyrmgus start
 						force.GoalMapLayer,
 						//Wyrmgus end
-					   IsAnAlliedUnitOf(*force.get_units()[0]->Player));
+					   IsAnAlliedUnitOf(*(*force.get_units()[0])->Player));
 				if (nearGoal.empty()) {
 					force.ReturnToHome();
 				} else {
 					std::vector<CUnit *> idleUnits;
 					for (unsigned int i = 0; i != force.Size(); ++i) {
-						CUnit &aiunit = *force.get_units()[i];
+						CUnit &aiunit = **force.get_units()[i];
 
 						if (aiunit.IsIdle() && aiunit.IsAliveOnMap()) {
 							idleUnits.push_back(&aiunit);

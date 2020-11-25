@@ -52,8 +52,8 @@ static bool TracerMissile(Missile &missile)
 
 	Assert(missile.Type != nullptr);
 	Assert(missile.TotalStep != 0);
-	if (missile.TargetUnit) {
-		missile.destination = missile.TargetUnit->get_map_pixel_pos_top_left();
+	if (missile.get_target_unit()) {
+		missile.destination = missile.get_target_unit()->get_map_pixel_pos_top_left();
 	}
 
 	const PixelPos diff = (missile.destination - missile.source);

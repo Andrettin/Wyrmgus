@@ -258,4 +258,14 @@ void unit_manager::Load(lua_State *l)
 	}
 }
 
+void unit_manager::add_unit_seen_under_fog(CUnit *unit)
+{
+	this->units_seen_under_fog[unit] = unit->acquire_ref();
+}
+
+void unit_manager::remove_unit_seen_under_fog(CUnit *unit)
+{
+	this->units_seen_under_fog.erase(unit);
+}
+
 }

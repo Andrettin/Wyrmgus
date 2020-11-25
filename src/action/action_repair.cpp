@@ -52,6 +52,7 @@
 //Wyrmgus start
 #include "unit/unit_find.h"
 //Wyrmgus end
+#include "unit/unit_ref.h"
 #include "unit/unit_type.h"
 #include "unit/unit_type_type.h"
 #include "video/video.h"
@@ -65,7 +66,7 @@ std::unique_ptr<COrder> COrder::NewActionRepair(CUnit &target)
 		order->MapLayer = target.MapLayer->ID;
 	} else {
 		order->set_goal(&target);
-		order->ReparableTarget = wyrmgus::unit_ref(&target);
+		order->ReparableTarget = target.acquire_ref();
 	}
 	return order;
 }
@@ -86,6 +87,16 @@ std::unique_ptr<COrder> COrder::NewActionRepair(const Vec2i &pos, int z)
 	return order;
 }
 
+COrder_Repair::COrder_Repair() : COrder(UnitAction::Repair)
+{
+	this->goalPos.x = -1;
+	this->goalPos.y = -1;
+}
+
+COrder_Repair::~COrder_Repair()
+{
+}
+
 void COrder_Repair::Save(CFile &file, const CUnit &unit) const
 {
 	Q_UNUSED(unit)
@@ -103,8 +114,8 @@ void COrder_Repair::Save(CFile &file, const CUnit &unit) const
 	file.printf(" \"map-layer\", %d,", this->MapLayer);
 	//Wyrmgus end
 
-	if (this->ReparableTarget != nullptr) {
-		file.printf(" \"repair-target\", \"%s\",", UnitReference(this->GetReparableTarget()).c_str());
+	if (this->get_reparable_target() != nullptr) {
+		file.printf(" \"repair-target\", \"%s\",", UnitReference(this->get_reparable_target()).c_str());
 	}
 
 	file.printf(" \"repaircycle\", %d,", this->RepairCycle);
@@ -123,7 +134,7 @@ bool COrder_Repair::ParseSpecificData(lua_State *l, int &j, const char *value, c
 	} else if (!strcmp("repair-target", value)) {
 		++j;
 		lua_rawgeti(l, -1, j + 1);
-		this->ReparableTarget = wyrmgus::unit_ref(CclGetUnitFromRef(l));
+		this->ReparableTarget = CclGetUnitFromRef(l)->acquire_ref();
 		lua_pop(l, 1);
 	} else if (!strcmp("state", value)) {
 		++j;
@@ -153,11 +164,11 @@ bool COrder_Repair::ParseSpecificData(lua_State *l, int &j, const char *value, c
 {
 	PixelPos targetPos;
 
-	if (this->ReparableTarget != nullptr) {
-		if (this->ReparableTarget->MapLayer != UI.CurrentMapLayer) {
+	if (this->get_reparable_target() != nullptr) {
+		if (this->get_reparable_target()->MapLayer != UI.CurrentMapLayer) {
 			return lastScreenPos;
 		}
-		targetPos = vp.scaled_map_to_screen_pixel_pos(this->ReparableTarget->get_scaled_map_pixel_pos_center());
+		targetPos = vp.scaled_map_to_screen_pixel_pos(this->get_reparable_target()->get_scaled_map_pixel_pos_center());
 	} else {
 		if (this->MapLayer != UI.CurrentMapLayer->ID) {
 			return lastScreenPos;
@@ -179,12 +190,12 @@ bool COrder_Repair::ParseSpecificData(lua_State *l, int &j, const char *value, c
 	const CUnit &unit = *input.GetUnit();
 
 	input.SetMinRange(0);
-	input.SetMaxRange(ReparableTarget != nullptr ? unit.Type->RepairRange : 0);
+	input.SetMaxRange(this->get_reparable_target() != nullptr ? unit.Type->RepairRange : 0);
 
 	Vec2i tileSize;
-	if (ReparableTarget != nullptr) {
-		tileSize = ReparableTarget->GetTileSize();
-		input.SetGoal(ReparableTarget->tilePos, tileSize, ReparableTarget->MapLayer->ID);
+	if (this->get_reparable_target() != nullptr) {
+		tileSize = this->get_reparable_target()->GetTileSize();
+		input.SetGoal(this->get_reparable_target()->tilePos, tileSize, this->get_reparable_target()->MapLayer->ID);
 	} else {
 		tileSize.x = 0;
 		tileSize.y = 0;
@@ -216,6 +227,15 @@ bool SubRepairCosts(const CUnit &unit, CPlayer &player, CUnit &goal)
 	// Subtract the resources
 	player.SubCosts(RepairCosts);
 	return false;
+}
+
+CUnit *COrder_Repair::get_reparable_target() const
+{
+	if (this->ReparableTarget == nullptr) {
+		return nullptr;
+	}
+
+	return this->ReparableTarget->get();
 }
 
 /**
@@ -279,7 +299,7 @@ static void AnimateActionRepair(CUnit &unit)
 
 void COrder_Repair::Execute(CUnit &unit)
 {
-	Assert(this->ReparableTarget == this->get_goal());
+	Assert(this->get_reparable_target() == this->get_goal());
 
 	switch (this->State) {
 		case 0:

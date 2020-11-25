@@ -72,7 +72,7 @@ std::unique_ptr<COrder> COrder::NewActionSpellCast(const wyrmgus::spell &spell, 
 	if (target) {
 		// Destination could be killed.
 		// Should be handled in action, but is not possible!
-		// Unit::Refs is used as timeout counter.
+		// Unit::get_ref_count() is used as timeout counter.
 		if (target->Destroyed) {
 			// FIXME: where check if spell needs a unit as destination?
 			// FIXME: target->Type is now set to 0. maybe we shouldn't bother.

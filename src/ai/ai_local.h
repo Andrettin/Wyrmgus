@@ -31,7 +31,6 @@
 
 #include "unit/unit_cache.h"
 #include "unit/unit_class_container.h"
-#include "unit/unit_ref.h"
 #include "unit/unit_type_container.h"
 #include "upgrade/upgrade_structs.h" // MaxCost
 #include "vec2i.h"
@@ -117,64 +116,18 @@ constexpr int AI_WAIT_ON_RALLY_POINT = 60; /// Max seconds AI units will wait on
 class AiForce final
 {
 public:
-	AiForce() :
-		Completed(false), Defending(false), Attacking(false),
-		//Wyrmgus start
-		HomeMapLayer(0),
-		GoalMapLayer(0),
-		//Wyrmgus end
-		Role(AiForceRole::Default), FormerForce(-1), State(AiForceAttackingState::Free),
-		WaitOnRallyPoint(AI_WAIT_ON_RALLY_POINT)
-	{
-		HomePos.x = HomePos.y = GoalPos.x = GoalPos.y = -1;
-	}
+	AiForce();
+	~AiForce();
 
-	const std::vector<wyrmgus::unit_ref> &get_units() const
+	const std::vector<std::shared_ptr<wyrmgus::unit_ref>> &get_units() const
 	{
 		return this->units;
 	}
 
-	wyrmgus::unit_ref take_last_unit();
+	std::shared_ptr<wyrmgus::unit_ref> take_last_unit();
 
-	void Remove(CUnit *unit)
-	{
-		for (size_t i = 0; i < this->get_units().size(); ++i) {
-			if (this->get_units()[i] == unit) {
-				AiForce::InternalRemoveUnit(unit);
-				this->units.erase(this->units.begin() + i);
-				return;
-			}
-		}
-	}
-
-	/**
-	**  Reset the force. But don't change its role and its demand.
-	*/
-	void Reset(const bool types = false)
-	{
-		FormerForce = -1;
-		Completed = false;
-		Defending = false;
-		Attacking = false;
-		WaitOnRallyPoint = AI_WAIT_ON_RALLY_POINT;
-		if (types) {
-			UnitTypes.clear();
-			State = AiForceAttackingState::Free;
-		} else {
-			State = AiForceAttackingState::Waiting;
-		}
-
-		for (const wyrmgus::unit_ref &unit : this->get_units()) {
-			AiForce::InternalRemoveUnit(unit);
-		}
-		this->units.clear();
-
-		HomePos.x = HomePos.y = GoalPos.x = GoalPos.y = -1;
-		//Wyrmgus start
-		HomeMapLayer = 0;
-		GoalMapLayer = 0;
-		//Wyrmgus end
-	}
+	void Remove(CUnit *unit);
+	void Reset(const bool types = false);
 
 	size_t Size() const
 	{
@@ -204,12 +157,8 @@ public:
 	bool NewRallyPoint(const Vec2i &startPos, Vec2i *resultPos, int z);
 	bool CheckTransporters(const Vec2i &pos, int z);
 	//Wyrmgus end
-	void Insert(wyrmgus::unit_ref &&unit);
-
-	void Insert(CUnit *unit)
-	{
-		this->Insert(wyrmgus::unit_ref(unit));
-	}
+	void Insert(std::shared_ptr<wyrmgus::unit_ref> &&unit);
+	void Insert(CUnit *unit);
 
 private:
 	void CountTypes(unsigned int *counter, const size_t len);
@@ -227,7 +176,7 @@ public:
 
 	std::vector<AiUnitType> UnitTypes; /// Count and types of unit-type
 private:
-	std::vector<wyrmgus::unit_ref> units;  /// Units in the force
+	std::vector<std::shared_ptr<wyrmgus::unit_ref>> units;  /// Units in the force
 
 public:
 	// If attacking

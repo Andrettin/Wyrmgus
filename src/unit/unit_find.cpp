@@ -43,6 +43,7 @@
 #include "spell/spell.h"
 #include "unit/unit.h"
 #include "unit/unit_manager.h"
+#include "unit/unit_ref.h"
 #include "unit/unit_type.h"
 #include "unit/unit_type_type.h"
 #include "util/vector_util.h"
@@ -54,6 +55,11 @@
 bool IsBuiltUnit::operator()(const CUnit *unit) const
 {
 	return unit->CurrentAction() != UnitAction::Built;
+}
+
+bool CUnitTypeFinder::operator()(const std::shared_ptr<wyrmgus::unit_ref> &unit_ref)
+{
+	return (*this)(unit_ref->get());
 }
 
 CUnit *UnitFinder::FindUnitAtPos(const Vec2i &pos) const

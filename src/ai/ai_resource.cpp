@@ -666,7 +666,7 @@ CUnit *AiGetSuitableDepot(const CUnit &worker, const CUnit &oldDepot, CUnit **re
 		if (&oldDepot == &unit) {
 			continue;
 		}
-		if (unit.Refs > tooManyWorkers) {
+		if (unit.get_ref_count() > tooManyWorkers) {
 			continue;
 		}
 		if (AiEnemyUnitsInDistance(worker, range, worker.MapLayer->ID)) {
@@ -2082,7 +2082,7 @@ static void AiCheckRepair()
 				if (order->Action == UnitAction::Repair) {
 					COrder_Repair &orderRepair = *static_cast<COrder_Repair *>(order);
 
-					if (orderRepair.GetReparableTarget() == &unit) {
+					if (orderRepair.get_reparable_target() == &unit) {
 						break;
 					}
 				}

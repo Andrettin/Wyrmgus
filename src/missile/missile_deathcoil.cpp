@@ -51,8 +51,8 @@ void MissileDeathCoil::Action()
 	if (this->NextMissileFrame(1, 0) == false) {
 		return;
 	}
-	Assert(this->SourceUnit != nullptr);
-	CUnit &source = *this->SourceUnit;
+	Assert(this->get_source_unit() != nullptr);
+	CUnit &source = *this->get_source_unit();
 
 	if (source.Destroyed) {
 		return;
@@ -61,8 +61,8 @@ void MissileDeathCoil::Action()
 	//
 	// Target unit still exists and casted on a special target
 	//
-	if (this->TargetUnit && this->TargetUnit->IsAlive()) {
-		HitUnit(&source, *this->TargetUnit, this->Damage);
+	if (this->get_target_unit() && this->get_target_unit()->IsAlive()) {
+		HitUnit(&source, *this->get_target_unit(), this->Damage);
 		if (source.CurrentAction() != UnitAction::Die) {
 			source.Variable[HP_INDEX].Value += this->Damage;
 			//Wyrmgus start

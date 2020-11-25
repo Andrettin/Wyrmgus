@@ -68,7 +68,7 @@ std::unique_ptr<COrder> COrder::NewActionTrade(CUnit &dest, CUnit &home_market)
 
 	// Destination could be killed.
 	// Should be handled in action, but is not possible!
-	// Unit::Refs is used as timeout counter.
+	// Unit::get_ref_count() is used as timeout counter.
 	if (dest.Destroyed) {
 		order->goalPos = dest.tilePos + dest.GetHalfTileSize();
 		order->MapLayer = dest.MapLayer->ID;

@@ -86,6 +86,7 @@
 #include "ui/ui.h"
 #include "unit/unit_find.h"
 #include "unit/unit_manager.h"
+#include "unit/unit_ref.h"
 #include "unit/unit_type.h"
 #include "unit/unit_type_type.h"
 #include "unit/unit_type_variation.h"
@@ -383,48 +384,6 @@ static void RemoveUnitFromContainer(CUnit &unit);
 
 extern int ExtraDeathIndex(const char *death);
 
-/**
-**  Increase a unit's reference count.
-*/
-void CUnit::RefsIncrease()
-{
-	if (this->Refs == 0) {
-		throw std::runtime_error("Unit is having its reference count incremented, despite it being at 0.");
-	}
-
-	if (this->Destroyed) {
-		throw std::runtime_error("Unit is having its reference count incremented, despite the unit already having been destroyed.");
-	}
-
-	if (!SaveGameLoading) {
-		++this->Refs;
-	}
-}
-
-/**
-**  Decrease a unit's reference count.
-*/
-void CUnit::RefsDecrease()
-{
-	if (this->Refs == 0) {
-		throw std::runtime_error("Unit is having its reference count decremented, despite it already being at 0.");
-	}
-
-	if (!SaveGameLoading) {
-		if (this->Destroyed) {
-			if (!--this->Refs) {
-				this->Release();
-			}
-		} else {
-			--this->Refs;
-
-			if (this->Refs == 0) {
-				throw std::runtime_error("CUnit::RefsDecrease caused the unit's reference count to reach 0, despite it not being destroyed (unit type: \"" + this->Type->get_identifier() + "\").");
-			}
-		}
-	}
-}
-
 CUnit::CUnit()
 {
 	this->Init();
@@ -436,15 +395,19 @@ CUnit::~CUnit()
 
 void CUnit::Init()
 {
-	Refs = 0;
-	ReleaseCycle = 0;
-	PlayerSlot = static_cast<size_t>(-1);
-	InsideCount = 0;
-	BoardCount = 0;
-	UnitInside = nullptr;
-	Container = nullptr;
-	NextContained = nullptr;
-	PrevContained = nullptr;
+	if (this->base_ref != nullptr) {
+		throw std::runtime_error("Unit being initialized has a base reference.");
+	}
+
+	this->ref.reset();
+	this->ReleaseCycle = 0;
+	this->PlayerSlot = static_cast<size_t>(-1);
+	this->InsideCount = 0;
+	this->BoardCount = 0;
+	this->UnitInside = nullptr;
+	this->Container = nullptr;
+	this->NextContained = nullptr;
+	this->PrevContained = nullptr;
 
 	this->Resource.Workers.clear();
 	this->Resource.Active = 0;
@@ -581,19 +544,19 @@ void CUnit::Release(const bool final)
 		this->Resource.Workers.clear();
 		this->clear_all_orders();
 
-		if (this->Refs == 0) {
-			throw std::runtime_error("Unit is having its reference count decremented for release, despite it already being at 0.");
+		if (this->get_ref_count() == 0) {
+			throw std::runtime_error("Unit is having its base reference cleared for release, despite its reference count already being 0.");
 		}
 
-		--this->Refs;
+		this->base_ref.reset();
 
-		if (this->Refs > 0) {
+		if (this->get_ref_count() > 0) {
 			return;
 		}
 	}
 
-	if (this->Refs != 0) {
-		throw std::runtime_error("Unit of type \"" + this->Type->get_identifier() + "\" being released despite there still being " + std::to_string(this->Refs) + " references to it.");
+	if (this->get_ref_count() != 0) {
+		throw std::runtime_error("Unit of type \"" + this->Type->get_identifier() + "\" being released despite there still being " + std::to_string(this->get_ref_count()) + " references to it.");
 	}
 
 	//
@@ -628,6 +591,19 @@ void CUnit::Release(const bool final)
 
 	// Remove the unit from the global units table.
 	wyrmgus::unit_manager::get()->ReleaseUnit(this);
+}
+
+std::shared_ptr<wyrmgus::unit_ref> CUnit::acquire_ref()
+{
+	if (this->base_ref == nullptr) {
+		throw std::runtime_error("Tried to acquire a reference to a unit which already had its base reference cleared.");
+	}
+
+	if (this->Destroyed) {
+		throw std::runtime_error("Tried to acquire a reference to a unit which has already been destroyed.");
+	}
+
+	return this->base_ref;
 }
 
 //Wyrmgus start
@@ -2677,7 +2653,8 @@ void CUnit::ProduceResource(const int resource)
 	}
 	
 	if (old_resource != 0) {
-		for (const wyrmgus::unit_ref &uins : this->Resource.Workers) {
+		for (const std::shared_ptr<wyrmgus::unit_ref> &uins_ref : this->Resource.Workers) {
+			CUnit *uins = uins_ref->get();
 			if (uins->Container == this) {
 				uins->CurrentOrder()->Finished = true;
 				DropOutOnSide(*uins, LookingW, this);
@@ -2776,7 +2753,6 @@ void CUnit::ClearAction()
 	}
 }
 
-
 bool CUnit::IsIdle() const
 {
 	//Wyrmgus start
@@ -2805,7 +2781,8 @@ int CUnit::GetDrawLevel() const
 void CUnit::Init(const wyrmgus::unit_type &type)
 {
 	//  Set refs to 1. This is the "I am alive ref", lost in ReleaseUnit.
-	this->Refs = 1;
+	this->base_ref = std::make_unique<wyrmgus::unit_ref>(this);
+	this->ref = this->base_ref;
 
 	//  Build all unit table
 	wyrmgus::unit_manager::get()->Add(this);
@@ -4842,7 +4819,8 @@ void CUnit::ChangeOwner(CPlayer &newplayer, bool show_change)
 
 static bool IsMineAssignedBy(const CUnit *mine, const CUnit *worker)
 {
-	for (const wyrmgus::unit_ref &unit : mine->Resource.Workers) {
+	for (const std::shared_ptr<wyrmgus::unit_ref> &unit_ref : mine->Resource.Workers) {
+		const CUnit *unit = unit_ref->get();
 		if (unit == worker) {
 			return true;
 		}
@@ -4865,7 +4843,7 @@ void CUnit::AssignWorkerToMine(CUnit &mine)
 			   _C_ mine.Data.Resource.Assigned);
 #endif
 
-	mine.Resource.Workers.push_back(wyrmgus::unit_ref(this));
+	mine.Resource.Workers.push_back(this->acquire_ref());
 }
 
 void CUnit::DeAssignWorkerFromMine(CUnit &mine)
@@ -4883,7 +4861,7 @@ void CUnit::DeAssignWorkerFromMine(CUnit &mine)
 #endif
 
 	for (size_t i = 0; i < mine.Resource.Workers.size(); ++i) {
-		CUnit *worker = mine.Resource.Workers[i];
+		const CUnit *worker = *mine.Resource.Workers[i];
 
 		if (worker == this) {
 			mine.Resource.Workers.erase(mine.Resource.Workers.begin() + i);
@@ -7332,7 +7310,7 @@ static void HitUnit_Burning(CUnit &target)
 		const PixelDiff offset(0, -wyrmgus::defines::get()->get_tile_height());
 		Missile *missile = MakeMissile(*fire, targetPixelCenter + offset, targetPixelCenter + offset, target.MapLayer->ID);
 
-		missile->SourceUnit = wyrmgus::unit_ref(&target);
+		missile->SourceUnit = target.acquire_ref();
 		target.Burning = 1;
 	}
 }

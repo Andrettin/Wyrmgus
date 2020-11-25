@@ -39,11 +39,8 @@ class COrder_Build final : public COrder
 {
 	friend std::unique_ptr<COrder> COrder::NewActionBuild(const CUnit &builder, const Vec2i &pos, const wyrmgus::unit_type &building, int z, const wyrmgus::site *settlement);
 public:
-	COrder_Build() : COrder(UnitAction::Build)
-	{
-		goalPos.x = -1;
-		goalPos.y = -1;
-	}
+	COrder_Build();
+	virtual ~COrder_Build() override;
 
 	virtual std::unique_ptr<COrder> Clone() const override
 	{
@@ -78,9 +75,11 @@ private:
 	bool BuildFromOutside(CUnit &unit) const;
 	void HelpBuild(CUnit &unit, CUnit &building);
 
+	CUnit *get_building_unit() const;
+
 private:
 	const wyrmgus::unit_type *Type = nullptr;        /// build a unit of this unit-type
-	wyrmgus::unit_ref BuildingUnit;  /// unit builded.
+	std::shared_ptr<wyrmgus::unit_ref> BuildingUnit;  /// unit builded.
 	int State = 0;
 	int Range = 0;
 	Vec2i goalPos;
