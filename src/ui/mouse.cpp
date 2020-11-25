@@ -105,6 +105,17 @@ CUnit *GetUnitUnderCursor()
 	return UnitUnderCursor;
 }
 
+int GetUnitUnderCursorNumber()
+{
+	const CUnit *unit = GetUnitUnderCursor();
+
+	if (unit == nullptr) {
+		return -1;
+	}
+
+	return UnitNumber(*unit);
+}
+
 /**
 **  Cancel building cursor mode.
 */

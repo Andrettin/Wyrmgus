@@ -4,17 +4,6 @@ class Vec2i
 	short int y;
 };
 
-
-class CUnit
-{
-	tolua_readonly Vec2i tilePos;
-
-	tolua_readonly CPlayer *Player;
-	CUnit *Goal;
-	bool Active;
-	int ResourcesHeld;
-};
-
 class CPreference
 {
 	bool ShowSightRange;
@@ -48,5 +37,4 @@ class CPreference
 
 CPreference Preference;
 
-CUnit *GetUnitUnderCursor();
-int UnitNumber(CUnit &unit);
+int GetUnitUnderCursorNumber();

@@ -1985,6 +1985,8 @@ static int CclSetUnitVariable(lua_State *l)
 	} else if (!strcmp(name, "Identified")) {
 		unit->Identified = LuaToBoolean(l, 3);
 	//Wyrmgus end
+	} else if (!strcmp(name, "ResourcesHeld")) {
+		unit->ResourcesHeld = LuaToNumber(l, 3);
 	} else {
 		const int index = UnitTypeVar.VariableNameLookup[name];// User variables
 		if (index == -1) {

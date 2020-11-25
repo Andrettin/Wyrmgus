@@ -190,6 +190,7 @@ extern int DoubleClickDelay;
 extern int HoldClickDelay;
 
 extern CUnit *GetUnitUnderCursor();
+extern int GetUnitUnderCursorNumber();
 
 //
 // in mouse.cpp
