@@ -61,16 +61,15 @@ bool COrder_Die::ParseSpecificData(lua_State *l, int &j, const char *value, cons
 	return false;
 }
 
-/* virtual */ bool COrder_Die::IsValid() const
+bool COrder_Die::IsValid() const
 {
 	return true;
 }
 
-/* virtual */ PixelPos COrder_Die::Show(const CViewport &, const PixelPos &lastScreenPos) const
+PixelPos COrder_Die::Show(const CViewport &, const PixelPos &lastScreenPos) const
 {
 	return lastScreenPos;
 }
-
 
 static bool AnimateActionDie(CUnit &unit)
 {
@@ -89,8 +88,7 @@ static bool AnimateActionDie(CUnit &unit)
 	return false;
 }
 
-
-/* virtual */ void COrder_Die::Execute(CUnit &unit)
+void COrder_Die::Execute(CUnit &unit)
 {
 	// Show death animation
 	if (AnimateActionDie(unit) == false) {

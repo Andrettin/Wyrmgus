@@ -419,7 +419,7 @@ void CUnit::RefsDecrease()
 			--this->Refs;
 
 			if (this->Refs == 0) {
-				throw std::runtime_error("CUnit::RefsDecrease caused the unit's reference count to reach 0, despite it not being destroyed.");
+				throw std::runtime_error("CUnit::RefsDecrease caused the unit's reference count to reach 0, despite it not being destroyed (unit type: \"" + this->Type->get_identifier() + "\").");
 			}
 		}
 	}
@@ -579,6 +579,7 @@ void CUnit::Release(const bool final)
 		}
 
 		this->Resource.Workers.clear();
+		this->clear_all_orders();
 
 		if (this->Refs == 0) {
 			throw std::runtime_error("Unit is having its reference count decremented for release, despite it already being at 0.");

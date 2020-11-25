@@ -44,7 +44,6 @@
 #include "unit/unit.h"
 #include "unit/unit_class.h"
 #include "unit/unit_manager.h"
-#include "unit/unit_ref.h"
 #include "unit/unit_type.h"
 #include "unit/unit_type_type.h"
 #include "upgrade/upgrade.h"
