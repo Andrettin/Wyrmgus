@@ -393,7 +393,7 @@ void CUnit::RefsIncrease()
 	}
 
 	if (this->Destroyed) {
-		throw std::runtime_error("Unit is having its reference count incremented, despite the unit having been destroyed.");
+		throw std::runtime_error("Unit is having its reference count incremented, despite the unit already having been destroyed.");
 	}
 
 	if (!SaveGameLoading) {
@@ -568,7 +568,7 @@ void CUnit::Release(const bool final)
 		DebugPrint("%d: First release %d\n" _C_ Player->Index _C_ UnitNumber(*this));
 
 		// Are more references remaining?
-		Destroyed = 1; // mark as destroyed
+		this->Destroyed = 1; // mark as destroyed
 
 		if (Container && !final) {
 			if (Boarded) {
