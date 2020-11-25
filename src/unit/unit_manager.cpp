@@ -79,7 +79,7 @@ void unit_manager::clean_units()
 			}
 
 			//clear orders of all units, removing remaining references to existing units
-			UnitClearOrders(*unit);
+			unit->clear_all_orders();
 
 			unit->Resource.Workers.clear();
 		}

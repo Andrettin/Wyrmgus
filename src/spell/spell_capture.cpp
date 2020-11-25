@@ -113,7 +113,7 @@ int Spell_Capture::Cast(CUnit &caster, const wyrmgus::spell &spell, CUnit *targe
 		caster.Variable[KILL_INDEX].Enable = 1;
 	}
 	target->ChangeOwner(*caster.Player);
-	UnitClearOrders(*target);
+	target->clear_orders();
 	if (this->JoinToAIForce && caster.Player->AiEnabled) {
 		int force = caster.Player->Ai->Force.GetForce(caster);
 		if (force != -1) {

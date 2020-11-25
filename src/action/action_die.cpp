@@ -106,7 +106,7 @@ static bool AnimateActionDie(CUnit &unit)
 	if (type.get_corpse_type() == nullptr) {
 		unit.Remove(nullptr);
 		//Wyrmgus start
-		UnitClearOrders(unit);
+		unit.clear_orders();
 		//Wyrmgus end
 		unit.Release();
 		return;

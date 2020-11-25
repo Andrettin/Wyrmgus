@@ -280,7 +280,7 @@ bool COrder_Trade::ParseSpecificData(lua_State *l, int &j, const char *value, co
 						SaveHero(goal->Container->get_character());
 					}
 					UnitLost(*goal);
-					UnitClearOrders(*goal);
+					goal->clear_orders();
 					goal->Release();
 				}
 			}

@@ -329,7 +329,7 @@ static void Finish(COrder_Built &order, CUnit &unit)
 		//Wyrmgus end
 		unit.Remove(nullptr);
 		UnitLost(unit);
-		UnitClearOrders(unit);
+		unit.clear_orders();
 		unit.Release();
 		return;
 	}

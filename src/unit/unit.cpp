@@ -529,15 +529,13 @@ void CUnit::Init()
 	CurrentResource = 0;
 	this->reset_step_count();
 	this->Orders.clear();
-	this->SavedOrder.reset();
-	this->NewOrder.reset();
-	this->CriticalOrder.reset();
+	this->clear_special_orders();
 	this->autocast_spells.clear();
 	this->spell_autocast.clear();
 	this->SpellCoolDownTimers.reset();
-	AutoRepair = 0;
-	Goal = nullptr;
-	IndividualUpgrades.clear();
+	this->AutoRepair = 0;
+	this->Goal = nullptr;
+	this->IndividualUpgrades.clear();
 }
 
 /**
@@ -625,9 +623,7 @@ void CUnit::Release(const bool final)
 	this->SpellCoolDownTimers.reset();
 	this->Variable.clear();
 	this->Orders.clear();
-	this->SavedOrder.reset();
-	this->NewOrder.reset();
-	this->CriticalOrder.reset();
+	this->clear_special_orders();
 
 	// Remove the unit from the global units table.
 	wyrmgus::unit_manager::get()->ReleaseUnit(this);
@@ -692,7 +688,7 @@ void CUnit::ReplaceOnTop(CUnit &replaced_unit)
 	
 	replaced_unit.Remove(nullptr); // Destroy building beneath
 	UnitLost(replaced_unit);
-	UnitClearOrders(replaced_unit);
+	replaced_unit.clear_orders();
 	replaced_unit.Release();
 }
 
@@ -2923,6 +2919,20 @@ bool CUnit::CanStoreOrder(COrder *order)
 	return true;
 }
 
+void CUnit::clear_orders()
+{
+	this->Orders.clear();
+	this->Orders.push_back(COrder::NewActionStill());
+}
+
+void CUnit::clear_special_orders()
+{
+	//reset the unit's specially-stored orders
+	this->SavedOrder.reset();
+	this->NewOrder.reset();
+	this->CriticalOrder.reset();
+}
+
 /**
 **  Assigns a unit to a player, adjusting buildings, food and totals
 **
@@ -4271,17 +4281,6 @@ void UnitLost(CUnit &unit)
 		//Wyrmgus end
 		}
 	}
-}
-
-/**
-**  Removes all orders from a unit.
-**
-**  @param unit  The unit that will have all its orders cleared
-*/
-void UnitClearOrders(CUnit &unit)
-{
-	unit.Orders.clear();
-	unit.Orders.push_back(COrder::NewActionStill());
 }
 
 /**
@@ -6836,7 +6835,7 @@ void LetUnitDie(CUnit &unit, bool suicide)
 			DestroyAllInside(unit);
 		}
 		UnitLost(unit);
-		UnitClearOrders(unit);
+		unit.clear_orders();
 		unit.Release();
 		return;
 	}
@@ -6873,7 +6872,7 @@ void LetUnitDie(CUnit &unit, bool suicide)
 	if (type->BoolFlag[TELEPORTER_INDEX].value && unit.Goal) {
 		unit.Goal->Remove(nullptr);
 		UnitLost(*unit.Goal);
-		UnitClearOrders(*unit.Goal);
+		unit.Goal->clear_orders();
 		unit.Goal->Release();
 		unit.Goal = nullptr;
 	}
@@ -6916,7 +6915,7 @@ void LetUnitDie(CUnit &unit, bool suicide)
 				PlayUnitSound(*table[i], wyrmgus::unit_sound_type::dying);
 				table[i]->Remove(nullptr);
 				UnitLost(*table[i]);
-				UnitClearOrders(*table[i]);
+				table[i]->clear_orders();
 				table[i]->Release();
 			}
 		}
@@ -6942,7 +6941,7 @@ void LetUnitDie(CUnit &unit, bool suicide)
 
 	unit.Remove(nullptr);
 	UnitLost(unit);
-	UnitClearOrders(unit);
+	unit.clear_orders();
 
 
 	// Unit has death animation.
@@ -7009,7 +7008,7 @@ void DestroyAllInside(CUnit &source)
 			DestroyAllInside(*unit);
 		}
 		UnitLost(*unit);
-		UnitClearOrders(*unit);
+		unit->clear_orders();
 		unit->Release();
 	}
 }

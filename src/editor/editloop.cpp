@@ -574,7 +574,7 @@ void EditorActionRemoveUnit(CUnit &unit, bool display)
 {
 	unit.Remove(nullptr);
 	UnitLost(unit);
-	UnitClearOrders(unit);
+	unit.clear_orders();
 	unit.Release();
 	if (display) {
 		UI.StatusLine.Set(_("Unit deleted"));

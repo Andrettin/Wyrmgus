@@ -447,7 +447,7 @@ static void EditorDestroyAllUnits()
 
 		unit.Remove(nullptr);
 		UnitLost(unit);
-		UnitClearOrders(unit);
+		unit.clear_orders();
 		unit.Release();
 	}
 }

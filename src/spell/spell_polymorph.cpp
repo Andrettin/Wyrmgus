@@ -192,7 +192,7 @@ int Spell_Polymorph::Cast(CUnit &caster, const wyrmgus::spell &spell, CUnit *tar
 		target->set_character(nullptr);
 	}
 //	UnitLost(*target);
-//	UnitClearOrders(*target);
+//	target->clear_orders();
 //	target->Release();
 	if (!IsNetworkGame() && target->get_character() != nullptr && &caster == target) { //save persistent data
 		if (target->Player == CPlayer::GetThisPlayer()) {

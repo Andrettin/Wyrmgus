@@ -275,7 +275,7 @@ bool COrder_Use::ParseSpecificData(lua_State *l, int &j, const char *value, cons
 						SaveHero(goal->Container->get_character());
 					}
 					UnitLost(*goal);
-					UnitClearOrders(*goal);
+					goal->clear_orders();
 					goal->Release();
 				}
 			}

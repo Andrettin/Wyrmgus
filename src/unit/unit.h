@@ -262,6 +262,15 @@ public:
 	bool RestoreOrder();
 	bool CanStoreOrder(COrder *order);
 
+	void clear_orders();
+	void clear_special_orders();
+
+	void clear_all_orders()
+	{
+		this->clear_orders();
+		this->clear_special_orders();
+	}
+
 	// Cowards and invisible units don't attack unless ordered.
 	bool IsAgressive() const
 	{
@@ -819,8 +828,6 @@ extern CUnit *CreateResourceUnit(const Vec2i &pos, const wyrmgus::unit_type &typ
 void FindNearestDrop(const wyrmgus::unit_type &type, const Vec2i &goalPos, Vec2i &resPos, int heading, int z, bool no_bordering_building = false, bool ignore_construction_requirements = false, const wyrmgus::site *settlement = nullptr);
 /// Handle the loss of a unit (food,...)
 extern void UnitLost(CUnit &unit);
-/// Remove the Orders of a Unit
-extern void UnitClearOrders(CUnit &unit);
 /// @todo more docu
 extern void UpdateForNewUnit(const CUnit &unit, int upgrade);
 /// @todo more docu
