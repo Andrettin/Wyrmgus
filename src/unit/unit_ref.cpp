@@ -37,7 +37,7 @@ unit_ref::~unit_ref()
 {
 	if (this->unit != nullptr) {
 		if (!this->unit->Destroyed) {
-			throw std::runtime_error("A unit's reference count has reached 0, despite it not being destroyed (unit type: \"" + this->unit->Type->get_identifier() + "\").");
+			std::cerr << "A unit's reference count has reached 0, despite it not being destroyed (unit type: \"" << this->unit->Type->get_identifier() << "\")." << std::endl;
 		}
 
 		this->unit->Release();

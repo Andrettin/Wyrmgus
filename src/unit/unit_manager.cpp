@@ -110,6 +110,15 @@ CUnit *unit_manager::AllocUnit()
 	// Can use released unit?
 	if (!this->released_units.empty() && this->released_units.front()->ReleaseCycle < GameCycle) {
 		CUnit *unit = list::take_front(this->released_units);
+
+		if (!unit->Destroyed) {
+			throw std::runtime_error("Fetched a non-destroyed unit from the released units list.");
+		}
+
+		if (unit->ReleaseCycle == 0) {
+			throw std::runtime_error("Fetched a non-released unit from the released units list.");
+		}
+
 		const int slot = unit->UnitManagerData.slot;
 		unit->Init();
 		unit->UnitManagerData.slot = slot;
@@ -151,6 +160,10 @@ void unit_manager::ReleaseUnit(CUnit *unit)
 		this->units[unit->UnitManagerData.unitSlot] = temp;
 		unit->UnitManagerData.unitSlot = -1;
 		this->units.pop_back();
+	}
+
+	if (!unit->Destroyed) {
+		throw std::runtime_error("Adding a non-destroyed unit to the released units list.");
 	}
 
 	this->released_units.push_back(unit);
