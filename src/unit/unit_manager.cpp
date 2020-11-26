@@ -35,6 +35,7 @@
 #include "unit/unit_manager.h"
 #include "unit/unit.h"
 #include "util/exception_util.h"
+#include "util/list_util.h"
 
 namespace wyrmgus {
 
@@ -108,8 +109,7 @@ CUnit *unit_manager::AllocUnit()
 {
 	// Can use released unit?
 	if (!this->released_units.empty() && this->released_units.front()->ReleaseCycle < GameCycle) {
-		CUnit *unit = this->released_units.front();
-		this->released_units.pop_front();
+		CUnit *unit = list::take_front(this->released_units);
 		const int slot = unit->UnitManagerData.slot;
 		unit->Init();
 		unit->UnitManagerData.slot = slot;

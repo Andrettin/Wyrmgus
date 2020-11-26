@@ -919,6 +919,7 @@ set(stratagus_util_HDRS
 	src/util/georectangle_util.h
 	src/util/geoshape_util.h
 	src/util/image_util.h
+	src/util/list_util.h
 	src/util/map_util.h
 	src/util/number_util.h
 	src/util/point_container.h
