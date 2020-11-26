@@ -549,10 +549,7 @@ void CUnit::Release(const bool final)
 		}
 
 		this->base_ref.reset();
-
-		if (this->get_ref_count() > 0) {
-			return;
-		}
+		return;
 	}
 
 	if (this->get_ref_count() != 0) {
