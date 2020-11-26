@@ -345,6 +345,17 @@ void spell::process_sml_scope(const sml_data &scope)
 	}
 }
 
+void spell::delete_lua_callbacks()
+{
+	if (this->autocast != nullptr) {
+		this->autocast->PositionAutoCast.reset();
+	}
+
+	if (this->ai_cast != nullptr) {
+		this->ai_cast->PositionAutoCast.reset();
+	}
+}
+
 /**
 **	@brief	Get the autocast info for the spell
 **

@@ -33,7 +33,6 @@
 #include "currency.h"
 #include "database/database.h"
 #include "dialogue.h"
-#include "faction.h"
 //Wyrmgus start
 #include "grand_strategy.h"
 //Wyrmgus end
@@ -46,12 +45,14 @@
 #include "missile.h"
 #include "particle.h"
 #include "pathfinder.h"
+#include "quest/quest.h"
 #include "replay.h"
 #include "script.h"
 #include "script/condition/condition.h"
 #include "script/trigger.h"
 #include "sound/sound.h"
 #include "sound/sound_server.h"
+#include "spell/spell.h"
 #include "time/season_schedule.h"
 #include "time/time_of_day_schedule.h"
 #include "ui/button.h"
@@ -69,6 +70,49 @@
 #include "world.h"
 
 bool SaveGameLoading;                 /// If a Saved Game is Loading
+
+static void delete_lua_callbacks()
+{
+	for (wyrmgus::character *character : wyrmgus::character::get_all()) {
+		character->Conditions.reset();
+	}
+
+	for (wyrmgus::dialogue *dialogue : wyrmgus::dialogue::get_all()) {
+		dialogue->delete_lua_callbacks();
+	}
+
+	for (wyrmgus::missile_type *missile_type : wyrmgus::missile_type::get_all()) {
+		missile_type->ImpactParticle.reset();
+		missile_type->SmokeParticle.reset();
+		missile_type->OnImpact.reset();
+	}
+
+	for (wyrmgus::quest *quest : wyrmgus::quest::get_all()) {
+		quest->Conditions.reset();
+		quest->AcceptEffects.reset();
+		quest->CompletionEffects.reset();
+		quest->FailEffects.reset();
+	}
+
+	for (wyrmgus::spell *spell : wyrmgus::spell::get_all()) {
+		spell->delete_lua_callbacks();
+	}
+
+	for (wyrmgus::trigger *trigger : wyrmgus::trigger::get_all()) {
+		trigger->Conditions.reset();
+		trigger->Effects.reset();
+	}
+
+	for (wyrmgus::unit_type *unit_type : wyrmgus::unit_type::get_all()) {
+		unit_type->DeathExplosion.reset();
+		unit_type->OnHit.reset();
+		unit_type->OnEachCycle.reset();
+		unit_type->OnEachSecond.reset();
+		unit_type->OnInit.reset();
+		unit_type->TeleportEffectIn.reset();
+		unit_type->TeleportEffectOut.reset();
+	}
+}
 
 /**
 **  Cleanup modules.
@@ -107,19 +151,7 @@ void CleanModules()
 	FreePathfinder();
 
 	//delete lua callbacks, as that needs to be done before closing the Lua state, and database clearing is done in the Qt main thread
-	for (wyrmgus::unit_type *unit_type : wyrmgus::unit_type::get_all()) {
-		unit_type->DeathExplosion.reset();
-		unit_type->OnHit.reset();
-		unit_type->OnEachCycle.reset();
-		unit_type->OnEachSecond.reset();
-		unit_type->OnInit.reset();
-		unit_type->TeleportEffectIn.reset();
-		unit_type->TeleportEffectOut.reset();
-	}
-
-	for (wyrmgus::dialogue *dialogue : wyrmgus::dialogue::get_all()) {
-		dialogue->delete_lua_callbacks();
-	}
+	delete_lua_callbacks();
 
 	wyrmgus::database::get()->clear();
 

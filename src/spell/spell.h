@@ -214,6 +214,8 @@ public:
 	virtual void process_sml_property(const sml_property &property) override;
 	virtual void process_sml_scope(const sml_data &scope) override;
 
+	void delete_lua_callbacks();
+
 	const std::vector<const magic_domain *> &get_magic_domains() const
 	{
 		return this->magic_domains;
