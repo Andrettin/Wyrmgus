@@ -63,4 +63,14 @@ inline void index_to_image_palette(QImage &image, const QImage &other_image)
 	image::index_to_palette(image, image::get_colors(other_image));
 }
 
+template <typename function_type>
+inline void for_each_pixel_pos(const QImage &image, const function_type &function)
+{
+	for (int y = 0; y < image.height(); ++y) {
+		for (int x = 0; x < image.width(); ++x) {
+			function(x, y);
+		}
+	}
+}
+
 }
