@@ -403,17 +403,7 @@ void map_template::initialize()
 	}
 
 	if (this->outputs_terrain_image()) {
-		terrain_geodata_map terrain_data;
-
-		if (this->get_world() != nullptr) {
-			terrain_data = this->get_world()->parse_terrain_geojson_folder();
-		}
-
-		const std::string filename = this->get_identifier() + ".png";
-		const std::string overlay_filename = this->get_identifier() + "_overlay.png";
-
-		this->save_terrain_image(filename, false, terrain_data);
-		this->save_terrain_image(overlay_filename, true, terrain_data);
+		this->save_terrain_images();
 	}
 
 	if (this->outputs_territory_image()) {
@@ -2657,30 +2647,73 @@ QPoint map_template::get_geocoordinate_pos(const QGeoCoordinate &geocoordinate) 
 	return geocoordinate::to_point(geocoordinate, this->get_georectangle(), this->get_size());
 }
 
-void map_template::save_terrain_image(const std::string &filename, const bool overlay, const terrain_geodata_map &terrain_data) const
+void map_template::save_terrain_images() const
 {
-	bool use_terrain_file = true;
-	std::filesystem::path terrain_file;
-	if (overlay) {
-		terrain_file = this->get_overlay_terrain_file();
-	} else {
-		terrain_file = this->get_terrain_file();
+	terrain_geodata_map terrain_data;
+
+	if (this->get_world() != nullptr) {
+		terrain_data = this->get_world()->parse_terrain_geojson_folder();
 	}
 
-	if (terrain_file.empty()) {
-		use_terrain_file = false;
+	terrain_geodata_ptr_map base_terrain_data;
+	terrain_geodata_ptr_map overlay_terrain_data;
+	terrain_geodata_ptr_map trade_route_terrain_data;
+
+	for (const auto &kv_pair : terrain_data) {
+		const terrain_type *terrain = nullptr;
+		const terrain_feature *terrain_feature = nullptr;
+
+		if (std::holds_alternative<const wyrmgus::terrain_feature *>(kv_pair.first)) {
+			terrain_feature = std::get<const wyrmgus::terrain_feature *>(kv_pair.first);
+			terrain = terrain_feature->get_terrain_type();
+		} else {
+			terrain = std::get<const terrain_type *>(kv_pair.first);
+		}
+
+		terrain_geodata_ptr_map *terrain_data_ptr = nullptr;
+
+		if (terrain_feature != nullptr && terrain_feature->is_trade_route()) {
+			terrain_data_ptr = &trade_route_terrain_data;
+		} else if (terrain->is_overlay()) {
+			terrain_data_ptr = &overlay_terrain_data;
+		} else {
+			terrain_data_ptr = &base_terrain_data;
+		}
+
+		for (const auto &geoshape : kv_pair.second) {
+			(*terrain_data_ptr)[kv_pair.first].push_back(geoshape.get());
+		}
 	}
 
-	std::filesystem::path terrain_image;
-	if (overlay) {
-		terrain_image = this->get_overlay_terrain_image_file();
-	} else {
-		terrain_image = this->get_terrain_image_file();
+	point_map<const terrain_type *> base_terrain_map;
+	point_map<const terrain_type *> overlay_terrain_map;
+
+	for (const auto &kv_pair : this->get_tile_terrains()) {
+		const QPoint &tile_pos = kv_pair.first;
+		const terrain_type *terrain = kv_pair.second;
+
+		if (terrain->is_overlay()) {
+			overlay_terrain_map[tile_pos] = terrain;
+		} else {
+			base_terrain_map[tile_pos] = terrain;
+		}
 	}
 
+	const std::string filename = this->get_identifier() + ".png";
+	const std::string overlay_filename = this->get_identifier() + "_overlay.png";
+	const std::string trade_route_filename = this->get_identifier() + "_trade_routes.png";
+
+	this->save_terrain_image(filename, this->get_terrain_image_file(), this->get_terrain_file(), base_terrain_data, base_terrain_map);
+	this->save_terrain_image(overlay_filename, this->get_overlay_terrain_image_file(), this->get_overlay_terrain_file(), overlay_terrain_data, overlay_terrain_map);
+	this->save_terrain_image(trade_route_filename, this->get_trade_route_image_file(), std::filesystem::path(), trade_route_terrain_data, point_map<const terrain_type *>());
+}
+
+void map_template::save_terrain_image(const std::string &filename, const std::filesystem::path &image_filepath, const std::filesystem::path &terrain_filepath, const terrain_geodata_ptr_map &terrain_data, const point_map<const terrain_type *> &terrain_map) const
+{
 	QImage image;
-	if (!terrain_image.empty()) {
-		image = QImage(QString::fromStdString(terrain_image.string()));
+
+	if (!image_filepath.empty()) {
+		image = QImage(QString::fromStdString(image_filepath.string()));
 
 		if (image.size() != this->get_size()) {
 			throw std::runtime_error("Invalid terrain image size for map template \"" + this->get_identifier() + "\".");
@@ -2690,95 +2723,82 @@ void map_template::save_terrain_image(const std::string &filename, const bool ov
 		image.fill(Qt::transparent);
 	}
 
-	if (use_terrain_file) {
-		const std::string terrain_filename = LibraryFileName(terrain_file.string().c_str());
-
-		if (!CanAccessFile(terrain_filename.c_str())) {
-			fprintf(stderr, "File \"%s\" not found.\n", terrain_filename.c_str());
-		}
-
-		std::ifstream is_map(terrain_filename);
-
-		std::string line_str;
-		int y = 0;
-		while (std::getline(is_map, line_str))
-		{
-			int x = 0;
-
-			for (unsigned int i = 0; i < line_str.length(); ++i) {
-				const char terrain_character = line_str.at(i);
-				const wyrmgus::terrain_type *terrain = wyrmgus::terrain_type::try_get_by_character(terrain_character);
-
-				QColor color(0, 0, 0);
-				if (terrain != nullptr) {
-					color = terrain->get_color();
-				}
-
-				image.setPixelColor(x, y, color);
-
-				++x;
-			}
-
-			++y;
-		}
+	if (!terrain_filepath.empty()) {
+		this->create_terrain_image_from_file(image, terrain_filepath);
+	} else if (!terrain_data.empty()) {
+		this->create_terrain_image_from_geodata(image, terrain_data, filename);
 	} else {
-		const QGeoRectangle georectangle = this->get_georectangle();
-
-		for (const auto &kv_pair : terrain_data) {
-			const terrain_type *terrain = nullptr;
-			const terrain_feature *terrain_feature = nullptr;
-
-			QColor color;
-			if (std::holds_alternative<const wyrmgus::terrain_feature *>(kv_pair.first)) {
-				terrain_feature = std::get<const wyrmgus::terrain_feature *>(kv_pair.first);
-				terrain = terrain_feature->get_terrain_type();
-				color = terrain_feature->get_color();
-			} else {
-				terrain = std::get<const terrain_type *>(kv_pair.first);
-				color = terrain->get_color();
-			}
-
-			bool terrain_overlay = false;
-			if (terrain_feature != nullptr && terrain_feature->is_trade_route()) {
-				terrain_overlay = true;
-			} else {
-				terrain_overlay = terrain->is_overlay();
-			}
-
-			if (terrain_overlay != overlay) {
-				continue;
-			}
-
-			for (const auto &geoshape : kv_pair.second) {
-				geoshape::write_to_image(*geoshape, image, color, georectangle, filename);
-			}
-		}
-
-		wyrmgus::point_map<const wyrmgus::terrain_type *> terrain_map;
-
-		for (const auto &kv_pair : this->get_tile_terrains()) {
-			const QPoint &tile_pos = kv_pair.first;
-			const wyrmgus::terrain_type *terrain = kv_pair.second;
-
-			if (terrain->is_overlay() == overlay) {
-				terrain_map[tile_pos] = terrain;
-			}
-		}
-
-		for (int x = 0; x < this->get_width(); ++x) {
-			for (int y = 0; y < this->get_height(); ++y) {
-				const QPoint tile_pos(x, y);
-
-				auto find_iterator = terrain_map.find(tile_pos);
-				if (find_iterator != terrain_map.end()) {
-					const wyrmgus::terrain_type *terrain = find_iterator->second;
-					image.setPixelColor(tile_pos, terrain->get_color());
-				}
-			}
-		}
+		this->create_terrain_image_from_map(image, terrain_map);
 	}
 
 	image.save(QString::fromStdString(filename));
+}
+
+void map_template::create_terrain_image_from_file(QImage &image, const std::filesystem::path &filepath) const
+{
+	const std::string terrain_filename = LibraryFileName(filepath.string().c_str());
+
+	if (!CanAccessFile(terrain_filename.c_str())) {
+		throw std::runtime_error("File \"" + terrain_filename + "\" not found.");
+	}
+
+	std::ifstream is_map(terrain_filename);
+
+	std::string line_str;
+	int y = 0;
+	while (std::getline(is_map, line_str))
+	{
+		int x = 0;
+
+		for (unsigned int i = 0; i < line_str.length(); ++i) {
+			const char terrain_character = line_str.at(i);
+			const terrain_type *terrain = terrain_type::try_get_by_character(terrain_character);
+
+			QColor color(0, 0, 0);
+			if (terrain != nullptr) {
+				color = terrain->get_color();
+			}
+
+			image.setPixelColor(x, y, color);
+
+			++x;
+		}
+
+		++y;
+	}
+}
+
+void map_template::create_terrain_image_from_geodata(QImage &image, const terrain_geodata_ptr_map &terrain_data, const std::string &image_checkpoint_save_filename) const
+{
+	const QGeoRectangle georectangle = this->get_georectangle();
+
+	for (const auto &kv_pair : terrain_data) {
+		const terrain_type *terrain = nullptr;
+		const terrain_feature *terrain_feature = nullptr;
+
+		QColor color;
+		if (std::holds_alternative<const wyrmgus::terrain_feature *>(kv_pair.first)) {
+			terrain_feature = std::get<const wyrmgus::terrain_feature *>(kv_pair.first);
+			terrain = terrain_feature->get_terrain_type();
+			color = terrain_feature->get_color();
+		} else {
+			terrain = std::get<const terrain_type *>(kv_pair.first);
+			color = terrain->get_color();
+		}
+
+		for (const auto &geoshape : kv_pair.second) {
+			geoshape::write_to_image(*geoshape, image, color, georectangle, image_checkpoint_save_filename);
+		}
+	}
+}
+
+void map_template::create_terrain_image_from_map(QImage &image, const point_map<const terrain_type *> &terrain_map) const
+{
+	for (const auto &kv_pair : terrain_map) {
+		const QPoint &tile_pos = kv_pair.first;
+		const terrain_type *terrain = kv_pair.second;
+		image.setPixelColor(tile_pos, terrain->get_color());
+	}
 }
 
 void map_template::save_territory_image(const std::string &filename, const std::map<const site *, std::vector<std::unique_ptr<QGeoShape>>> &territory_data) const

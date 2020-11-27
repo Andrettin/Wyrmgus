@@ -40,5 +40,6 @@ struct terrain_geodata_map_compare
 };
 
 using terrain_geodata_map = std::map<terrain_geodata_key, std::vector<std::unique_ptr<QGeoShape>>, terrain_geodata_map_compare>;
+using terrain_geodata_ptr_map = std::map<terrain_geodata_key, std::vector<const QGeoShape *>, terrain_geodata_map_compare>;
 
 }
