@@ -67,7 +67,7 @@ class defines final : public QObject, public singleton<defines>
 	Q_PROPERTY(int minimap_color_index MEMBER minimap_color_index READ get_minimap_color_index)
 	Q_PROPERTY(int minimap_non_land_territory_alpha MEMBER minimap_non_land_territory_alpha READ get_minimap_non_land_territory_alpha)
 	Q_PROPERTY(wyrmgus::time_of_day* underground_time_of_day MEMBER underground_time_of_day READ get_underground_time_of_day)
-	Q_PROPERTY(wyrmgus::terrain_type* border_terrain_type MEMBER border_terrain_type READ get_border_terrain_type)
+	Q_PROPERTY(wyrmgus::terrain_type* border_terrain_type MEMBER border_terrain_type)
 	Q_PROPERTY(wyrmgus::dialogue* campaign_victory_dialogue MEMBER campaign_victory_dialogue READ get_campaign_victory_dialogue)
 	Q_PROPERTY(wyrmgus::dialogue* campaign_defeat_dialogue MEMBER campaign_defeat_dialogue READ get_campaign_defeat_dialogue)
 	Q_PROPERTY(wyrmgus::button_level* inventory_button_level MEMBER inventory_button_level READ get_inventory_button_level)
@@ -208,7 +208,7 @@ public:
 		return this->underground_time_of_day;
 	}
 
-	terrain_type *get_border_terrain_type() const
+	const terrain_type *get_border_terrain_type() const
 	{
 		return this->border_terrain_type;
 	}

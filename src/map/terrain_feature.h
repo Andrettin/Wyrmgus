@@ -47,7 +47,7 @@ class terrain_feature final : public named_data_entry, public data_type<terrain_
 	Q_OBJECT
 
 	Q_PROPERTY(QColor color READ get_color WRITE set_color)
-	Q_PROPERTY(wyrmgus::terrain_type* terrain_type MEMBER terrain_type READ get_terrain_type)
+	Q_PROPERTY(wyrmgus::terrain_type* terrain_type MEMBER terrain_type)
 	Q_PROPERTY(bool trade_route MEMBER trade_route READ is_trade_route)
 	Q_PROPERTY(bool major_river MEMBER major_river READ is_major_river)
 	Q_PROPERTY(bool minor_river MEMBER minor_river READ is_minor_river)
@@ -56,9 +56,9 @@ public:
 	static constexpr const char *class_identifier = "terrain_feature";
 	static constexpr const char *database_folder = "terrain_features";
 
-	static terrain_feature *get_by_color(const QColor &color)
+	static const terrain_feature *get_by_color(const QColor &color)
 	{
-		terrain_feature *feature = terrain_feature::try_get_by_color(color);
+		const terrain_feature *feature = terrain_feature::try_get_by_color(color);
 
 		if (feature == nullptr) {
 			throw std::runtime_error("No terrain feature found for color: (" + std::to_string(color.red()) + ", " + std::to_string(color.green()) + ", " + std::to_string(color.blue()) + ").");
@@ -67,9 +67,9 @@ public:
 		return feature;
 	}
 
-	static terrain_feature *try_get_by_color(const QColor &color)
+	static const terrain_feature *try_get_by_color(const QColor &color)
 	{
-		auto find_iterator = terrain_feature::terrain_features_by_color.find(color);
+		const auto find_iterator = terrain_feature::terrain_features_by_color.find(color);
 		if (find_iterator != terrain_feature::terrain_features_by_color.end()) {
 			return find_iterator->second;
 		}
@@ -84,7 +84,7 @@ public:
 	}
 
 private:
-	static inline color_map<terrain_feature *> terrain_features_by_color;
+	static inline color_map<const terrain_feature *> terrain_features_by_color;
 
 public:
 	explicit terrain_feature(const std::string &identifier) : named_data_entry(identifier)
@@ -107,7 +107,7 @@ public:
 
 	void set_color(const QColor &color);
 
-	terrain_type *get_terrain_type() const
+	const terrain_type *get_terrain_type() const
 	{
 		return this->terrain_type;
 	}
