@@ -70,6 +70,7 @@
 #include "util/geocoordinate_util.h"
 #include "util/georectangle_util.h"
 #include "util/geoshape_util.h"
+#include "util/image_util.h"
 #include "util/point_util.h"
 #include "util/size_util.h"
 #include "util/string_util.h"
@@ -2175,10 +2176,34 @@ void map_template::set_overlay_terrain_image_file(const std::filesystem::path &f
 	this->overlay_terrain_image_file = database::get_maps_path(this->get_module()) / filepath;
 }
 
+void map_template::set_trade_route_image_file(const std::filesystem::path &filepath)
+{
+	if (filepath == this->get_trade_route_image_file()) {
+		return;
+	}
+
+	this->trade_route_image_file = database::get_maps_path(this->get_module()) / filepath;
+}
+
+QImage map_template::load_terrain_image_file(const std::filesystem::path &filepath)
+{
+	const std::string terrain_filename = LibraryFileName(filepath.string().c_str());
+
+	if (!CanAccessFile(terrain_filename.c_str())) {
+		throw std::runtime_error("The terrain image file \"" + terrain_filename + "\" for map template \"" + this->get_identifier() + "\" does not exist.");
+	}
+
+	QImage terrain_image(terrain_filename.c_str());
+
+	if (terrain_image.size() != this->get_size()) {
+		throw std::runtime_error("The terrain image for map template \"" + this->get_identifier() + "\" has a different size " + size::to_string(terrain_image.size()) + " than that of the map template itself " + size::to_string(this->get_size()) + ".");
+	}
+
+	return terrain_image;
+}
+
 void map_template::load_terrain_image(const bool overlay)
 {
-	using namespace std::string_literals;
-
 	QImage &terrain_image = overlay ? this->overlay_terrain_image : this->terrain_image;
 	if (!terrain_image.isNull()) {
 		//already loaded
@@ -2192,16 +2217,46 @@ void map_template::load_terrain_image(const bool overlay)
 		terrain_file = this->get_terrain_image_file();
 	}
 
-	const std::string terrain_filename = LibraryFileName(terrain_file.string().c_str());
+	terrain_image = this->load_terrain_image_file(terrain_file);
 
-	if (!CanAccessFile(terrain_filename.c_str())) {
-		throw std::runtime_error("The "s + (overlay ? "overlay " : "") + "terrain image file \"" + terrain_filename + "\" for map template \"" + this->get_identifier() + "\" does not exist.");
-	}
+	if (overlay && !this->get_trade_route_image_file().empty()) {
+		const QImage trade_route_image = this->load_terrain_image_file(this->get_trade_route_image_file());
 
-	terrain_image = QImage(terrain_filename.c_str());
+		image::for_each_pixel_pos(trade_route_image, [&trade_route_image, &terrain_image](const int x, const int y) {
+			const QColor color = trade_route_image.pixelColor(x, y);
 
-	if (terrain_image.size() != this->get_size()) {
-		throw std::runtime_error("The "s + (overlay ? "overlay " : "") + "terrain image for map template \"" + this->get_identifier() + "\" has a different size " + size::to_string(terrain_image.size()) + " than that of the map template itself " + size::to_string(this->get_size()) + ".");
+			if (color.alpha() == 0) {
+				//ignore fully transparent pixels
+				return;
+			}
+
+			if (color == terrain_type::none_color) {
+				//ignore black pixels in the trade route image, as they are there only to prevent trade route pixels from being generated in certain positions
+				return;
+			}
+
+			const QColor old_color = terrain_image.pixelColor(x, y);
+
+			if (old_color.alpha() != 0) {
+				const terrain_type *terrain = nullptr;
+				const terrain_feature *terrain_feature = terrain_feature::try_get_by_color(old_color);
+				if (terrain_feature != nullptr) {
+					terrain = terrain_feature->get_terrain_type();
+				} else {
+					terrain = terrain_type::try_get_by_color(old_color);
+				}
+
+				if (terrain != nullptr && terrain->is_water()) {
+					if (terrain_feature == nullptr || !terrain_feature->is_river()) {
+						//do not replace non-river water pixels with trade route ones
+						return;
+					}
+				}
+			}
+
+			//apply the trade route pixel to the overlay image
+			terrain_image.setPixelColor(x, y, color);
+		});
 	}
 }
 
