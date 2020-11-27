@@ -572,8 +572,8 @@ void map_template::apply_terrain_image(const bool overlay, const QPoint &templat
 				continue;
 			}
 
-			terrain_type *terrain = nullptr;
-			terrain_feature *terrain_feature = terrain_feature::try_get_by_color(color);
+			const terrain_type *terrain = nullptr;
+			const terrain_feature *terrain_feature = terrain_feature::try_get_by_color(color);
 			if (terrain_feature != nullptr) {
 				terrain = terrain_feature->get_terrain_type();
 			} else {
@@ -589,17 +589,20 @@ void map_template::apply_terrain_image(const bool overlay, const QPoint &templat
 				continue;
 			}
 
-			if (terrain) {
-				CMap::Map.Field(real_pos, z)->SetTerrain(terrain);
+			tile *tile = CMap::Map.Field(real_pos, z);
+
+			if (terrain != nullptr) {
+				tile->SetTerrain(terrain);
 
 				if (terrain_feature != nullptr) {
-					CMap::Map.Field(real_pos, z)->set_terrain_feature(terrain_feature);
+					tile->set_terrain_feature(terrain_feature);
 				}
 			} else {
-				if (terrain_feature == nullptr && (color.red() != 0 || color.green() != 0 || color.blue() != 0 || !overlay)) { //fully black pixels represent areas in overlay terrain files that don't have any overlays
+				if (terrain_feature == nullptr && (color != terrain_type::none_color || !overlay)) {
+					//fully black pixels represent areas in overlay terrain files that don't have any overlays
 					throw std::runtime_error("Invalid map terrain: (" + std::to_string(x) + ", " + std::to_string(y) + ") (RGB: " + std::to_string(color.red()) + "/" + std::to_string(color.green()) + "/" + std::to_string(color.blue()) + ").");
-				} else if (overlay && CMap::Map.Field(real_pos, z)->get_overlay_terrain() != nullptr) { //fully black pixel or trade route on overlay terrain map = no overlay
-					CMap::Map.Field(real_pos, z)->RemoveOverlayTerrain();
+				} else if (overlay && tile->get_overlay_terrain() != nullptr) { //fully black pixel or trade route on overlay terrain map = no overlay
+					tile->RemoveOverlayTerrain();
 				}
 			}
 		}
