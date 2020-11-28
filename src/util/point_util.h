@@ -101,6 +101,24 @@ inline bool is_cardinally_adjacent_to(const QPoint &point, const QPoint &other_p
 	return point::is_horizontally_adjacent_to(point, other_point) || point::is_vertically_adjacent_to(point, other_point);
 }
 
+template <typename function_type>
+inline std::vector<QPoint> get_diagonally_adjacent_if(const QPoint &point, const function_type &function)
+{
+	std::vector<QPoint> adjacent_points;
+
+	for (int x_offset = -1; x_offset <= 1; x_offset += 2) { // +2 so that only diagonals are used
+		for (int y_offset = -1; y_offset <= 1; y_offset += 2) {
+			QPoint adjacent_point = point + QPoint(x_offset, y_offset);
+			const QPoint &adjacent_point_ref = adjacent_point;
+			if (function(adjacent_point_ref)) {
+				adjacent_points.push_back(std::move(adjacent_point));
+			}
+		}
+	}
+
+	return adjacent_points;
+}
+
 inline std::string to_string(const QPoint &point)
 {
 	return "(" + std::to_string(point.x()) + ", " + std::to_string(point.y()) + ")";

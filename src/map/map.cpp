@@ -3028,52 +3028,48 @@ void CMap::generate_missing_terrain(const QRect &rect, const int z)
 			overlay_terrain_type = nullptr; //don't expand overlay terrain to tiles with empty terrain if the overlay is a constructed one
 		}
 
-		std::vector<QPoint> adjacent_positions;
+		const std::vector<QPoint> adjacent_positions = wyrmgus::point::get_diagonally_adjacent_if(seed_pos, [&](const QPoint &diagonal_pos) {
+			const QPoint vertical_pos(seed_pos.x(), diagonal_pos.y());
+			const QPoint horizontal_pos(diagonal_pos.x(), seed_pos.y());
 
-		for (int sub_x = -1; sub_x <= 1; sub_x += 2) { // +2 so that only diagonals are used
-			for (int sub_y = -1; sub_y <= 1; sub_y += 2) {
-				const QPoint diagonal_pos(seed_pos.x() + sub_x, seed_pos.y() + sub_y);
-				const QPoint vertical_pos(seed_pos.x(), seed_pos.y() + sub_y);
-				const QPoint horizontal_pos(seed_pos.x() + sub_x, seed_pos.y());
-				if (!this->Info.IsPointOnMap(diagonal_pos, z) || diagonal_pos.x() < min_pos.x() || diagonal_pos.y() < min_pos.y() || diagonal_pos.x() > max_pos.x() || diagonal_pos.y() > max_pos.y()) {
-					continue;
-				}
-
-				if ( //must either be able to generate on the tiles, or they must already have the generated terrain type
-					!this->CanTileBePartOfMissingTerrainGeneration(this->Field(diagonal_pos, z), terrain_type, overlay_terrain_type)
-					|| !this->CanTileBePartOfMissingTerrainGeneration(this->Field(vertical_pos, z), terrain_type, overlay_terrain_type)
-					|| !this->CanTileBePartOfMissingTerrainGeneration(this->Field(horizontal_pos, z), terrain_type, overlay_terrain_type)
-					) {
-					continue;
-				}
-
-				const wyrmgus::terrain_type *diagonal_tile_top_terrain = this->GetTileTopTerrain(diagonal_pos, false, z);
-				const wyrmgus::terrain_type *vertical_tile_top_terrain = this->GetTileTopTerrain(vertical_pos, false, z);
-				const wyrmgus::terrain_type *horizontal_tile_top_terrain = this->GetTileTopTerrain(horizontal_pos, false, z);
-
-				if (diagonal_tile_top_terrain == nullptr && this->TileBordersTerrainIncompatibleWithTerrainPair(diagonal_pos, terrain_type, overlay_terrain_type, z)) {
-					continue;
-				}
-				if (vertical_tile_top_terrain == nullptr && this->TileBordersTerrainIncompatibleWithTerrainPair(vertical_pos, terrain_type, overlay_terrain_type, z)) {
-					continue;
-				}
-				if (horizontal_tile_top_terrain == nullptr && this->TileBordersTerrainIncompatibleWithTerrainPair(horizontal_pos, terrain_type, overlay_terrain_type, z)) {
-					continue;
-				}
-
-				if (diagonal_tile_top_terrain != nullptr && vertical_tile_top_terrain != nullptr && horizontal_tile_top_terrain != nullptr) { //at least one of the tiles being expanded to must have null terrain
-					continue;
-				}
-
-				if (overlay_terrain_type != nullptr) {
-					if (this->TileHasUnitsIncompatibleWithTerrain(diagonal_pos, overlay_terrain_type, z) || this->TileHasUnitsIncompatibleWithTerrain(vertical_pos, overlay_terrain_type, z) || this->TileHasUnitsIncompatibleWithTerrain(horizontal_pos, overlay_terrain_type, z)) {
-						continue;
-					}
-				}
-
-				adjacent_positions.push_back(diagonal_pos);
+			if (!this->Info.IsPointOnMap(diagonal_pos, z) || diagonal_pos.x() < min_pos.x() || diagonal_pos.y() < min_pos.y() || diagonal_pos.x() > max_pos.x() || diagonal_pos.y() > max_pos.y()) {
+				return false;
 			}
-		}
+
+			if ( //must either be able to generate on the tiles, or they must already have the generated terrain type
+				!this->CanTileBePartOfMissingTerrainGeneration(this->Field(diagonal_pos, z), terrain_type, overlay_terrain_type)
+				|| !this->CanTileBePartOfMissingTerrainGeneration(this->Field(vertical_pos, z), terrain_type, overlay_terrain_type)
+				|| !this->CanTileBePartOfMissingTerrainGeneration(this->Field(horizontal_pos, z), terrain_type, overlay_terrain_type)
+			) {
+				return false;
+			}
+
+			const wyrmgus::terrain_type *diagonal_tile_top_terrain = this->GetTileTopTerrain(diagonal_pos, false, z);
+			const wyrmgus::terrain_type *vertical_tile_top_terrain = this->GetTileTopTerrain(vertical_pos, false, z);
+			const wyrmgus::terrain_type *horizontal_tile_top_terrain = this->GetTileTopTerrain(horizontal_pos, false, z);
+
+			if (diagonal_tile_top_terrain == nullptr && this->TileBordersTerrainIncompatibleWithTerrainPair(diagonal_pos, terrain_type, overlay_terrain_type, z)) {
+				return false;
+			}
+			if (vertical_tile_top_terrain == nullptr && this->TileBordersTerrainIncompatibleWithTerrainPair(vertical_pos, terrain_type, overlay_terrain_type, z)) {
+				return false;
+			}
+			if (horizontal_tile_top_terrain == nullptr && this->TileBordersTerrainIncompatibleWithTerrainPair(horizontal_pos, terrain_type, overlay_terrain_type, z)) {
+				return false;
+			}
+
+			if (diagonal_tile_top_terrain != nullptr && vertical_tile_top_terrain != nullptr && horizontal_tile_top_terrain != nullptr) { //at least one of the tiles being expanded to must have null terrain
+				return false;
+			}
+
+			if (overlay_terrain_type != nullptr) {
+				if (this->TileHasUnitsIncompatibleWithTerrain(diagonal_pos, overlay_terrain_type, z) || this->TileHasUnitsIncompatibleWithTerrain(vertical_pos, overlay_terrain_type, z) || this->TileHasUnitsIncompatibleWithTerrain(horizontal_pos, overlay_terrain_type, z)) {
+					return false;
+				}
+			}
+
+			return true;
+		});
 
 		if (adjacent_positions.size() > 0) {
 			if (adjacent_positions.size() > 1) {
@@ -3179,19 +3175,19 @@ void CMap::generate_settlement_territories(const int z)
 
 	const QRect rect = this->get_rect(z);
 
-	wyrmgus::rect::for_each_point(rect, [&](QPoint &&tile_pos) {
-		wyrmgus::tile *tile = this->Field(tile_pos, z);
+	seeds = wyrmgus::rect::find_point_set_if(rect, [&](const QPoint &tile_pos) {
+		const wyrmgus::tile *tile = this->Field(tile_pos, z);
 
 		const wyrmgus::site *settlement = tile->get_settlement();
 		if (settlement == nullptr) {
-			return;
+			return false;
 		}
 
 		if (!this->tile_borders_other_settlement_territory(tile_pos, z)) {
-			return;
+			return false;
 		}
 
-		seeds.insert(std::move(tile_pos));
+		return true;
 	});
 
 	seeds = this->expand_settlement_territories(wyrmgus::container::to_vector(seeds), z, (MapFieldUnpassable | MapFieldCoastAllowed | MapFieldSpace), MapFieldWaterAllowed | MapFieldUnderground);
@@ -3276,42 +3272,38 @@ wyrmgus::point_set CMap::expand_settlement_territories(std::vector<QPoint> &&see
 		wyrmgus::site *settlement = seed_tile->get_settlement();
 		const wyrmgus::tile *settlement_tile = this->Field(settlement->get_site_unit()->get_center_tile_pos(), z);
 
-		std::vector<QPoint> adjacent_positions;
-		for (int sub_x = -1; sub_x <= 1; sub_x += 2) { // +2 so that only diagonals are used
-			for (int sub_y = -1; sub_y <= 1; sub_y += 2) {
-				const QPoint diagonal_pos(seed_pos.x() + sub_x, seed_pos.y() + sub_y);
-				const QPoint vertical_pos(seed_pos.x(), seed_pos.y() + sub_y);
-				const QPoint horizontal_pos(seed_pos.x() + sub_x, seed_pos.y());
+		const std::vector<QPoint> adjacent_positions = wyrmgus::point::get_diagonally_adjacent_if(seed_pos, [&](const QPoint &diagonal_pos) {
+			const QPoint vertical_pos(seed_pos.x(), diagonal_pos.y());
+			const QPoint horizontal_pos(diagonal_pos.x(), seed_pos.y());
 
-				if (!this->Info.IsPointOnMap(diagonal_pos, z)) {
-					continue;
-				}
-
-				wyrmgus::tile *diagonal_tile = this->Field(diagonal_pos, z);
-				wyrmgus::tile *vertical_tile = this->Field(vertical_pos, z);
-				wyrmgus::tile *horizontal_tile = this->Field(horizontal_pos, z);
-
-				if ( //the tiles must either have no settlement, or have the settlement we want to assign
-					(diagonal_tile->get_settlement() != nullptr && diagonal_tile->get_settlement() != settlement)
-					|| (vertical_tile->get_settlement() != nullptr && vertical_tile->get_settlement() != settlement)
-					|| (horizontal_tile->get_settlement() != nullptr && horizontal_tile->get_settlement() != settlement)
-					) {
-					continue;
-				}
-
-				if (diagonal_tile->get_settlement() != nullptr && vertical_tile->get_settlement() != nullptr && horizontal_tile->get_settlement() != nullptr) { //at least one of the tiles being expanded to must have no assigned settlement
-					continue;
-				}
-
-				//the same flags function similarly to the block flags, but block only if the tile does not contain the same same_flags as the settlement's original tile, and they block expansion to the tile itself, not just expansion from it
-				if ((diagonal_tile->Flags & same_flags) != (settlement_tile->Flags & same_flags) || (vertical_tile->Flags & same_flags) != (settlement_tile->Flags & same_flags) || (horizontal_tile->Flags & same_flags) != (settlement_tile->Flags & same_flags)) {
-					blocked_seeds.insert(seed_pos);
-					continue;
-				}
-
-				adjacent_positions.push_back(diagonal_pos);
+			if (!this->Info.IsPointOnMap(diagonal_pos, z)) {
+				return false;
 			}
-		}
+
+			const wyrmgus::tile *diagonal_tile = this->Field(diagonal_pos, z);
+			const wyrmgus::tile *vertical_tile = this->Field(vertical_pos, z);
+			const wyrmgus::tile *horizontal_tile = this->Field(horizontal_pos, z);
+
+			if ( //the tiles must either have no settlement, or have the settlement we want to assign
+				(diagonal_tile->get_settlement() != nullptr && diagonal_tile->get_settlement() != settlement)
+				|| (vertical_tile->get_settlement() != nullptr && vertical_tile->get_settlement() != settlement)
+				|| (horizontal_tile->get_settlement() != nullptr && horizontal_tile->get_settlement() != settlement)
+			) {
+				return false;
+			}
+
+			if (diagonal_tile->get_settlement() != nullptr && vertical_tile->get_settlement() != nullptr && horizontal_tile->get_settlement() != nullptr) { //at least one of the tiles being expanded to must have no assigned settlement
+				return false;
+			}
+
+			//the same flags function similarly to the block flags, but block only if the tile does not contain the same same_flags as the settlement's original tile, and they block expansion to the tile itself, not just expansion from it
+			if ((diagonal_tile->Flags & same_flags) != (settlement_tile->Flags & same_flags) || (vertical_tile->Flags & same_flags) != (settlement_tile->Flags & same_flags) || (horizontal_tile->Flags & same_flags) != (settlement_tile->Flags & same_flags)) {
+				blocked_seeds.insert(seed_pos);
+				return false;
+			}
+
+			return true;
+		});
 
 		if (adjacent_positions.size() > 0) {
 			if (adjacent_positions.size() > 1) {

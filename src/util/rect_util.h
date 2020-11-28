@@ -31,6 +31,8 @@
 
 #pragma once
 
+#include "util/point_container.h"
+
 namespace wyrmgus::rect {
 
 template <typename function_type>
@@ -44,6 +46,34 @@ inline void for_each_point(const QRect &rect, const function_type &function)
 			function(QPoint(x, y));
 		}
 	}
+}
+
+template <typename function_type>
+inline std::vector<QPoint> find_points_if(const QRect &rect, const function_type &function)
+{
+	std::vector<QPoint> points;
+
+	rect::for_each_point(rect, [&](QPoint &&point) {
+		if (function(point)) {
+			points.push_back(std::move(point));
+		}
+	});
+
+	return points;
+}
+
+template <typename function_type>
+inline point_set find_point_set_if(const QRect &rect, const function_type &function)
+{
+	point_set points;
+
+	rect::for_each_point(rect, [&](QPoint &&point) {
+		if (function(point)) {
+			points.insert(std::move(point));
+		}
+	});
+
+	return points;
 }
 
 }
