@@ -240,8 +240,16 @@ public:
 
 	static void load_history_database()
 	{
-		for (T *instance : T::get_all()) {
-			instance->load_history();
+		try {
+			for (T *instance : T::get_all()) {
+				try {
+					instance->load_history();
+				} catch (...) {
+					std::throw_with_nested(std::runtime_error("Error loading history for the " + std::string(T::class_identifier) + " instance \"" + instance->get_identifier() + "\"."));
+				}
+			}
+		} catch (...) {
+			std::throw_with_nested(std::runtime_error("Error loading history for the " + std::string(T::class_identifier) + " class."));
 		}
 	}
 

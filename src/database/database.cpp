@@ -619,12 +619,16 @@ void database::load_defines()
 
 void database::load_history()
 {
-	civilization::load_history_database();
-	faction::load_history_database();
-	site::load_history_database();
-	character::load_history_database();
-	historical_unit::load_history_database();
-	map_template::load_history_database();
+	try {
+		civilization::load_history_database();
+		faction::load_history_database();
+		site::load_history_database();
+		character::load_history_database();
+		historical_unit::load_history_database();
+		map_template::load_history_database();
+	} catch (...) {
+		std::throw_with_nested(std::runtime_error("Error loading history."));
+	}
 }
 
 void database::initialize()

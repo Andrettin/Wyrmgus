@@ -68,13 +68,23 @@ void data_entry::process_sml_scope(const sml_data &scope)
 void data_entry::process_sml_dated_property(const sml_property &property, const QDateTime &date)
 {
 	Q_UNUSED(date)
-	this->get_history_base()->process_sml_property(property);
+
+	try {
+		this->get_history_base()->process_sml_property(property);
+	} catch (...) {
+		std::throw_with_nested(std::runtime_error("Error processing history property \"" + property.get_key() + "\"."));
+	}
 }
 
 void data_entry::process_sml_dated_scope(const sml_data &scope, const QDateTime &date)
 {
 	Q_UNUSED(date)
-	this->get_history_base()->process_sml_scope(scope);
+
+	try {
+		this->get_history_base()->process_sml_scope(scope);
+	} catch (...) {
+		std::throw_with_nested(std::runtime_error("Error processing history scope \"" + scope.get_tag() + "\"."));
+	}
 }
 
 void data_entry::load_history()
