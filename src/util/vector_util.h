@@ -81,7 +81,13 @@ inline void remove(std::vector<std::unique_ptr<T>> &vector, T *element)
 template <typename T>
 inline void remove_one(std::vector<T> &vector, const T &element)
 {
-	vector.erase(std::find(vector.begin(), vector.end(), element));
+	const auto find_iterator = std::find(vector.begin(), vector.end(), element);
+
+	if (find_iterator == vector.end()) {
+		throw std::runtime_error("Cannot remove element from vector, as it is not present in it.");
+	}
+
+	vector.erase(find_iterator);
 }
 
 template <typename T>
