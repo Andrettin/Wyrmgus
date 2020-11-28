@@ -2982,19 +2982,19 @@ bool CMap::CanTileBePartOfMissingTerrainGeneration(const wyrmgus::tile *tile, co
 	return false;
 }
 
-void CMap::generate_missing_terrain(const Vec2i &min_pos, const Vec2i &max_pos, const int z)
+void CMap::generate_missing_terrain(const QPoint &min_pos, const QPoint &max_pos, const int z)
 {
 	if (SaveGameLoading) {
 		return;
 	}
 
-	std::vector<Vec2i> seeds;
+	std::vector<QPoint> seeds;
 
 	//use tiles that have a terrain as seeds for the terrain generation
 	bool has_tile_with_missing_terrain = false;
-	for (int x = min_pos.x; x <= max_pos.x; ++x) {
-		for (int y = min_pos.y; y <= max_pos.y; ++y) {
-			const QPoint tile_pos(x, y);
+	for (int x = min_pos.x(); x <= max_pos.x(); ++x) {
+		for (int y = min_pos.y(); y <= max_pos.y(); ++y) {
+			QPoint tile_pos(x, y);
 			const wyrmgus::tile *tile = this->Field(x, y, z);
 
 			if (tile->get_top_terrain() == nullptr) {
@@ -3006,7 +3006,7 @@ void CMap::generate_missing_terrain(const Vec2i &min_pos, const Vec2i &max_pos, 
 				continue; //the seed must border a tile with null terrain
 			}
 
-			seeds.push_back(tile_pos);
+			seeds.push_back(std::move(tile_pos));
 		}
 	}
 
@@ -3016,8 +3016,7 @@ void CMap::generate_missing_terrain(const Vec2i &min_pos, const Vec2i &max_pos, 
 
 	//expand seeds
 	while (!seeds.empty()) {
-		Vec2i seed_pos = seeds[SyncRand(seeds.size())];
-		wyrmgus::vector::remove(seeds, seed_pos);
+		const QPoint seed_pos = wyrmgus::vector::take_random(seeds);
 
 		const wyrmgus::tile *seed_tile = this->Field(seed_pos, z);
 
@@ -3029,13 +3028,14 @@ void CMap::generate_missing_terrain(const Vec2i &min_pos, const Vec2i &max_pos, 
 			overlay_terrain_type = nullptr; //don't expand overlay terrain to tiles with empty terrain if the overlay is a constructed one
 		}
 
-		std::vector<Vec2i> adjacent_positions;
+		std::vector<QPoint> adjacent_positions;
+
 		for (int sub_x = -1; sub_x <= 1; sub_x += 2) { // +2 so that only diagonals are used
 			for (int sub_y = -1; sub_y <= 1; sub_y += 2) {
-				Vec2i diagonal_pos(seed_pos.x + sub_x, seed_pos.y + sub_y);
-				Vec2i vertical_pos(seed_pos.x, seed_pos.y + sub_y);
-				Vec2i horizontal_pos(seed_pos.x + sub_x, seed_pos.y);
-				if (!this->Info.IsPointOnMap(diagonal_pos, z) || diagonal_pos.x < min_pos.x || diagonal_pos.y < min_pos.y || diagonal_pos.x > max_pos.x || diagonal_pos.y > max_pos.y) {
+				const QPoint diagonal_pos(seed_pos.x() + sub_x, seed_pos.y() + sub_y);
+				const QPoint vertical_pos(seed_pos.x(), seed_pos.y() + sub_y);
+				const QPoint horizontal_pos(seed_pos.x() + sub_x, seed_pos.y());
+				if (!this->Info.IsPointOnMap(diagonal_pos, z) || diagonal_pos.x() < min_pos.x() || diagonal_pos.y() < min_pos.y() || diagonal_pos.x() > max_pos.x() || diagonal_pos.y() > max_pos.y()) {
 					continue;
 				}
 
@@ -3080,9 +3080,9 @@ void CMap::generate_missing_terrain(const Vec2i &min_pos, const Vec2i &max_pos, 
 				seeds.push_back(seed_pos); //push the seed back again for another try, since it may be able to generate further terrain in the future
 			}
 
-			Vec2i adjacent_pos = adjacent_positions[SyncRand(adjacent_positions.size())];
-			Vec2i adjacent_pos_horizontal(adjacent_pos.x, seed_pos.y);
-			Vec2i adjacent_pos_vertical(seed_pos.x, adjacent_pos.y);
+			const QPoint &adjacent_pos = wyrmgus::vector::get_random(adjacent_positions);
+			const QPoint adjacent_pos_horizontal(adjacent_pos.x(), seed_pos.y());
+			const QPoint adjacent_pos_vertical(seed_pos.x(), adjacent_pos.y());
 
 			if (this->GetTileTopTerrain(adjacent_pos, false, z) == nullptr) {
 				this->Field(adjacent_pos, z)->SetTerrain(terrain_type);
@@ -3114,9 +3114,9 @@ void CMap::generate_missing_terrain(const Vec2i &min_pos, const Vec2i &max_pos, 
 	}
 
 	//set the terrain of the remaining tiles without any to their most-neighbored terrain/overlay terrain pair
-	for (int x = min_pos.x; x <= max_pos.x; ++x) {
-		for (int y = min_pos.y; y <= max_pos.y; ++y) {
-			const Vec2i tile_pos(x, y);
+	for (int x = min_pos.x(); x <= max_pos.x(); ++x) {
+		for (int y = min_pos.y(); y <= max_pos.y(); ++y) {
+			const QPoint tile_pos(x, y);
 
 			wyrmgus::tile *tile = this->Field(x, y, z);
 
@@ -3132,7 +3132,7 @@ void CMap::generate_missing_terrain(const Vec2i &min_pos, const Vec2i &max_pos, 
 						continue;
 					}
 
-					Vec2i adjacent_pos(tile_pos.x + x_offset, tile_pos.y + y_offset);
+					const QPoint adjacent_pos(tile_pos.x() + x_offset, tile_pos.y() + y_offset);
 
 					if (!this->Info.IsPointOnMap(adjacent_pos, z)) {
 						continue;
