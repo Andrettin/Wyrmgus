@@ -197,7 +197,6 @@ public:
 	void calculate_tile_solid_tile(const QPoint &pos, const bool overlay, const int z);
 	void CalculateTileTransitions(const Vec2i &pos, bool overlay, int z);
 	void CalculateTileLandmass(const Vec2i &pos, int z);
-	void calculate_tile_terrain_feature(const Vec2i &pos, int z);
 	void CalculateTileOwnershipTransition(const Vec2i &pos, int z);
 	void AdjustMap();
 	void AdjustTileMapIrregularities(const bool overlay, const Vec2i &min_pos, const Vec2i &max_pos, const int z);
@@ -206,6 +205,7 @@ public:
 	void GenerateTerrain(const std::unique_ptr<wyrmgus::generated_terrain> &generated_terrain, const Vec2i &min_pos, const Vec2i &max_pos, const bool preserve_coastline, const int z);
 	bool CanTileBePartOfMissingTerrainGeneration(const wyrmgus::tile *tile, const wyrmgus::terrain_type *terrain_type, const wyrmgus::terrain_type *overlay_terrain_type) const;
 	void generate_missing_terrain(const QRect &rect, const int z);
+	void expand_terrain_features_to_same_terrain(const int z);
 	void generate_settlement_territories(const int z);
 	wyrmgus::point_set expand_settlement_territories(std::vector<QPoint> &&seeds, const int z, const int block_flags = 0, const int same_flags = 0);
 	void calculate_settlement_territory_tiles(const int z);
@@ -264,6 +264,7 @@ public:
 	bool TileBordersTerrain(const Vec2i &pos, const wyrmgus::terrain_type *terrain_type, const int z) const;
 	bool TileBordersOnlySameTerrain(const Vec2i &pos, const wyrmgus::terrain_type *new_terrain, const int z) const;
 	bool TileBordersFlag(const Vec2i &pos, int z, int flag, bool reverse = false) const; // reverse means that it returns true if the tile borders one tile without the flag
+	bool tile_borders_other_terrain_feature(const QPoint &pos, const int z) const;
 	bool tile_borders_same_settlement_territory(const QPoint &pos, const int z, const bool diagonal_allowed) const;
 	bool tile_borders_other_settlement_territory(const QPoint &pos, const int z) const;
 	bool tile_borders_other_player_territory(const QPoint &pos, const int z, const int range = 0) const;

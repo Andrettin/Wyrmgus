@@ -102,6 +102,68 @@ inline bool is_cardinally_adjacent_to(const QPoint &point, const QPoint &other_p
 }
 
 template <typename function_type>
+inline void for_each_adjacent(const QPoint &point, const function_type &function)
+{
+	for (int x_offset = -1; x_offset <= 1; ++x_offset) {
+		for (int y_offset = -1; y_offset <= 1; ++y_offset) {
+			if (x_offset == 0 && y_offset == 0) {
+				continue;
+			}
+
+			function(QPoint(point.x() + x_offset, point.y() + y_offset));
+		}
+	}
+}
+
+template <typename function_type>
+inline void for_each_adjacent_until(const QPoint &point, const function_type &function)
+{
+	for (int x_offset = -1; x_offset <= 1; ++x_offset) {
+		for (int y_offset = -1; y_offset <= 1; ++y_offset) {
+			if (x_offset == 0 && y_offset == 0) {
+				continue;
+			}
+
+			const QPoint adjacent_point(point.x() + x_offset, point.y() + y_offset);
+			if (function(adjacent_point)) {
+				return;
+			}
+		}
+	}
+}
+
+template <typename function_type>
+inline std::optional<QPoint> find_adjacent_if(const QPoint &point, const function_type &function)
+{
+	std::optional<QPoint> result;
+
+	wyrmgus::point::for_each_adjacent_until(point, [&](const QPoint &adjacent_point) {
+		if (function(adjacent_point)) {
+			result = adjacent_point;
+			return true;
+		}
+
+		return false;
+	});
+
+	return result;
+}
+
+template <typename function_type>
+inline std::vector<QPoint> get_adjacent_if(const QPoint &point, const function_type &function)
+{
+	std::vector<QPoint> adjacent_points;
+
+	wyrmgus::point::for_each_adjacent(point, [&](QPoint &&adjacent_point) {
+		if (function(adjacent_point)) {
+			adjacent_points.push_back(std::move(adjacent_point));
+		}
+	});
+
+	return adjacent_points;
+}
+
+template <typename function_type>
 inline std::vector<QPoint> get_diagonally_adjacent_if(const QPoint &point, const function_type &function)
 {
 	std::vector<QPoint> adjacent_points;

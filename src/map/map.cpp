@@ -546,6 +546,22 @@ bool CMap::TileBordersFlag(const Vec2i &pos, int z, int flag, bool reverse) cons
 	return false;
 }
 
+bool CMap::tile_borders_other_terrain_feature(const QPoint &pos, const int z) const
+{
+	const wyrmgus::terrain_feature *tile_terrain_feature = this->Field(pos, z)->get_terrain_feature();
+
+	std::optional<QPoint> result = wyrmgus::point::find_adjacent_if(pos, [&](const QPoint &adjacent_pos) {
+		if (!this->Info.IsPointOnMap(adjacent_pos, z)) {
+			return false;
+		}
+
+		const wyrmgus::terrain_feature *adjacent_terrain_feature = this->Field(adjacent_pos, z)->get_terrain_feature();
+		return tile_terrain_feature != adjacent_terrain_feature;
+	});
+
+	return result.has_value();
+}
+
 bool CMap::tile_borders_same_settlement_territory(const QPoint &pos, const int z, const bool diagonal_allowed) const
 {
 	const wyrmgus::site *tile_settlement = this->Field(pos, z)->get_settlement();
@@ -575,21 +591,16 @@ bool CMap::tile_borders_other_settlement_territory(const QPoint &pos, const int 
 {
 	const wyrmgus::site *tile_settlement = this->Field(pos, z)->get_settlement();
 
-	for (int sub_x = -1; sub_x <= 1; ++sub_x) {
-		for (int sub_y = -1; sub_y <= 1; ++sub_y) {
-			const QPoint adjacent_pos(pos.x() + sub_x, pos.y() + sub_y);
-			if (!this->Info.IsPointOnMap(adjacent_pos, z) || (sub_x == 0 && sub_y == 0)) {
-				continue;
-			}
-
-			const wyrmgus::site *adjacent_tile_settlement = this->Field(adjacent_pos, z)->get_settlement();
-			if (tile_settlement != adjacent_tile_settlement) {
-				return true;
-			}
+	std::optional<QPoint> result = wyrmgus::point::find_adjacent_if(pos, [&](const QPoint &adjacent_pos) {
+		if (!this->Info.IsPointOnMap(adjacent_pos, z)) {
+			return false;
 		}
-	}
 
-	return false;
+		const wyrmgus::site *adjacent_tile_settlement = this->Field(adjacent_pos, z)->get_settlement();
+		return tile_settlement != adjacent_tile_settlement;
+	});
+
+	return result.has_value();
 }
 
 bool CMap::tile_borders_other_player_territory(const QPoint &pos, const int z, const int range) const
@@ -1178,6 +1189,8 @@ void PreprocessMap()
 			}
 		}
 
+		CMap::Map.expand_terrain_features_to_same_terrain(z);
+
 		//settlement territories need to be generated after tile transitions are calculated, so that the coast map field has been set
 		CMap::Map.generate_settlement_territories(z);
 
@@ -1187,7 +1200,6 @@ void PreprocessMap()
 				wyrmgus::tile &mf = *CMap::Map.Field(tile_pos, z);
 				CMap::Map.CalculateTileLandmass(tile_pos, z);
 				CMap::Map.CalculateTileOwnershipTransition(tile_pos, z);
-				CMap::Map.calculate_tile_terrain_feature(tile_pos, z);
 				mf.UpdateSeenTile();
 				UI.get_minimap()->UpdateXY(tile_pos, z);
 				UI.get_minimap()->update_territory_xy(tile_pos, z);
@@ -1816,7 +1828,6 @@ void CMap::SetTileTerrain(const Vec2i &pos, const wyrmgus::terrain_type *terrain
 	}
 	this->CalculateTileTransitions(pos, false, z); 
 	this->CalculateTileTransitions(pos, true, z);
-	this->calculate_tile_terrain_feature(pos, z);
 	
 	if (mf.player_info->IsTeamVisible(*CPlayer::GetThisPlayer())) {
 		MarkSeenTile(mf);
@@ -1858,7 +1869,6 @@ void CMap::RemoveTileOverlayTerrain(const Vec2i &pos, int z)
 	mf.RemoveOverlayTerrain();
 	
 	this->CalculateTileTransitions(pos, true, z);
-	this->calculate_tile_terrain_feature(pos, z);
 	
 	if (mf.player_info->IsTeamVisible(*CPlayer::GetThisPlayer())) {
 		MarkSeenTile(mf);
@@ -2337,40 +2347,6 @@ void CMap::CalculateTileLandmass(const Vec2i &pos, int z)
 							this->BorderLandmasses[mf.Landmass].push_back(adjacent_mf.Landmass);
 							this->BorderLandmasses[adjacent_mf.Landmass].push_back(mf.Landmass);
 						}
-					}
-				}
-			}
-		}
-	}
-}
-
-void CMap::calculate_tile_terrain_feature(const Vec2i &pos, int z)
-{
-	if (!this->Info.IsPointOnMap(pos, z)) {
-		return;
-	}
-	
-	if (Editor.Running != EditorNotRunning) { //no need to assign terrain features while in the editor
-		return;
-	}
-	
-	wyrmgus::tile &mf = *this->Field(pos, z);
-
-	if (mf.get_terrain_feature() != nullptr) {
-		return; //already has a terrain feature
-	}
-
-	//if any adjacent tile has the same top terrain as this one, and has a terrain feature, then use that
-	for (int x_offset = -1; x_offset <= 1; ++x_offset) {
-		for (int y_offset = -1; y_offset <= 1; ++y_offset) {
-			if ((x_offset != 0 || y_offset != 0) && !(x_offset != 0 && y_offset != 0)) { //only directly adjacent tiles (no diagonal ones, and not the same tile)
-				Vec2i adjacent_pos(pos.x + x_offset, pos.y + y_offset);
-				if (Map.Info.IsPointOnMap(adjacent_pos, z)) {
-					wyrmgus::tile &adjacent_mf = *this->Field(adjacent_pos, z);
-
-					if (adjacent_mf.get_terrain_feature() != nullptr && adjacent_mf.get_terrain_feature()->get_terrain_type() == GetTileTopTerrain(pos, false, z)) {
-						mf.set_terrain_feature(adjacent_mf.get_terrain_feature());
-						return;
 					}
 				}
 			}
@@ -3165,17 +3141,76 @@ void CMap::generate_missing_terrain(const QRect &rect, const int z)
 	});
 }
 
+void CMap::expand_terrain_features_to_same_terrain(const int z)
+{
+	if (Editor.Running != EditorNotRunning) { //no need to assign terrain features while in the editor
+		return;
+	}
+
+	//expand terrain features to neighboring tiles with the same terrain
+	const QRect rect = this->get_rect(z);
+
+	std::vector<QPoint> seeds = wyrmgus::rect::find_points_if(rect, [&](const QPoint &tile_pos) {
+		const wyrmgus::tile *tile = this->Field(tile_pos, z);
+
+		const wyrmgus::terrain_feature *terrain_feature = tile->get_terrain_feature();
+		if (terrain_feature == nullptr) {
+			return false;
+		}
+
+		if (!this->tile_borders_other_terrain_feature(tile_pos, z)) {
+			return false;
+		}
+
+		return true;
+	});
+
+	//expand seeds
+	wyrmgus::vector::process_randomly(seeds, [&](const QPoint &seed_pos) {
+		const wyrmgus::tile *seed_tile = this->Field(seed_pos, z);
+
+		const wyrmgus::terrain_feature *terrain_feature = seed_tile->get_terrain_feature();
+
+		const std::vector<QPoint> adjacent_positions = wyrmgus::point::get_adjacent_if(seed_pos, [&](const QPoint &adjacent_pos) {
+			if (!this->Info.IsPointOnMap(adjacent_pos, z)) {
+				return false;
+			}
+
+			const wyrmgus::tile *adjacent_tile = this->Field(adjacent_pos, z);
+
+			if (adjacent_tile->get_top_terrain() != terrain_feature->get_terrain_type()) {
+				return false;
+			}
+
+			if (adjacent_tile->get_terrain_feature() != nullptr) {
+				return false;
+			}
+
+			return true;
+		});
+
+		if (adjacent_positions.size() > 0) {
+			if (adjacent_positions.size() > 1) {
+				//push the seed back again for another try, since it may be able to further expand the terrain feature in the future
+				seeds.push_back(seed_pos);
+			}
+
+			QPoint adjacent_pos = wyrmgus::vector::get_random(adjacent_positions);
+			this->Field(adjacent_pos, z)->set_terrain_feature(terrain_feature);
+			seeds.push_back(std::move(adjacent_pos));
+		}
+	});
+}
+
 void CMap::generate_settlement_territories(const int z)
 {
 	if (SaveGameLoading) {
 		return;
 	}
 
-	wyrmgus::point_set seeds;
-
 	const QRect rect = this->get_rect(z);
 
-	seeds = wyrmgus::rect::find_point_set_if(rect, [&](const QPoint &tile_pos) {
+	wyrmgus::point_set seeds = wyrmgus::rect::find_point_set_if(rect, [&](const QPoint &tile_pos) {
 		const wyrmgus::tile *tile = this->Field(tile_pos, z);
 
 		const wyrmgus::site *settlement = tile->get_settlement();
