@@ -928,6 +928,7 @@ set(stratagus_util_HDRS
 	src/util/queue_util.h
 	src/util/qunique_ptr.h
 	src/util/random.h
+	src/util/rect_util.h
 	src/util/singleton.h
 	src/util/size_operators.h
 	src/util/size_util.h
