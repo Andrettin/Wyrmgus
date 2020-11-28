@@ -183,6 +183,11 @@ public:
 	void CleanFogOfWar();
 	/// Clear the map layers
 	void ClearMapLayers();
+
+	QRect get_rect(const int z) const
+	{
+		return QRect(QPoint (0, 0), QPoint(this->Info.MapWidths[z] - 1, this->Info.MapHeights[z] - 1));
+	}
 	
 	//Wyrmgus start
 	void SetTileTerrain(const Vec2i &pos, const wyrmgus::terrain_type *terrain, int z);
@@ -200,7 +205,7 @@ public:
 	void adjust_territory_irregularities(const QPoint &min_pos, const QPoint &max_pos, const int z);
 	void GenerateTerrain(const std::unique_ptr<wyrmgus::generated_terrain> &generated_terrain, const Vec2i &min_pos, const Vec2i &max_pos, const bool preserve_coastline, const int z);
 	bool CanTileBePartOfMissingTerrainGeneration(const wyrmgus::tile *tile, const wyrmgus::terrain_type *terrain_type, const wyrmgus::terrain_type *overlay_terrain_type) const;
-	void generate_missing_terrain(const QPoint &min_pos, const QPoint &max_pos, const int z);
+	void generate_missing_terrain(const QRect &rect, const int z);
 	void generate_settlement_territories(const int z);
 	wyrmgus::point_set expand_settlement_territories(std::vector<QPoint> &&seeds, const int z, const int block_flags = 0, const int same_flags = 0);
 	void calculate_settlement_territory_tiles(const int z);

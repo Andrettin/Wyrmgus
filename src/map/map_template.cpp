@@ -892,7 +892,7 @@ void map_template::apply(const QPoint &template_start_pos, const QPoint &map_sta
 	}
 
 	if (!this->IsSubtemplateArea()) {
-		CMap::Map.generate_missing_terrain(map_start_pos, map_end - Vec2i(1, 1), z);
+		CMap::Map.generate_missing_terrain(QRect(map_start_pos, map_end - QPoint(1, 1)), z);
 	}
 	
 	if (!has_base_map) {

@@ -75,6 +75,7 @@
 //Wyrmgus end
 #include "util/container_util.h"
 #include "util/point_util.h"
+#include "util/rect_util.h"
 #include "util/size_util.h"
 #include "util/vector_random_util.h"
 #include "util/vector_util.h"
@@ -2982,7 +2983,7 @@ bool CMap::CanTileBePartOfMissingTerrainGeneration(const wyrmgus::tile *tile, co
 	return false;
 }
 
-void CMap::generate_missing_terrain(const QPoint &min_pos, const QPoint &max_pos, const int z)
+void CMap::generate_missing_terrain(const QRect &rect, const int z)
 {
 	if (SaveGameLoading) {
 		return;
@@ -2992,32 +2993,31 @@ void CMap::generate_missing_terrain(const QPoint &min_pos, const QPoint &max_pos
 
 	//use tiles that have a terrain as seeds for the terrain generation
 	bool has_tile_with_missing_terrain = false;
-	for (int x = min_pos.x(); x <= max_pos.x(); ++x) {
-		for (int y = min_pos.y(); y <= max_pos.y(); ++y) {
-			QPoint tile_pos(x, y);
-			const wyrmgus::tile *tile = this->Field(x, y, z);
 
-			if (tile->get_top_terrain() == nullptr) {
-				has_tile_with_missing_terrain = true;
-				continue;
-			}
+	wyrmgus::rect::for_each_point(rect, [&](QPoint &&tile_pos) {
+		const wyrmgus::tile *tile = this->Field(tile_pos, z);
 
-			if (!this->TileBordersTerrain(tile_pos, nullptr, z)) {
-				continue; //the seed must border a tile with null terrain
-			}
-
-			seeds.push_back(std::move(tile_pos));
+		if (tile->get_top_terrain() == nullptr) {
+			has_tile_with_missing_terrain = true;
+			return;
 		}
-	}
+
+		if (!this->TileBordersTerrain(tile_pos, nullptr, z)) {
+			return; //the seed must border a tile with null terrain
+		}
+
+		seeds.push_back(std::move(tile_pos));
+	});
 
 	if (!has_tile_with_missing_terrain) {
 		return;
 	}
 
-	//expand seeds
-	while (!seeds.empty()) {
-		const QPoint seed_pos = wyrmgus::vector::take_random(seeds);
+	const QPoint min_pos = rect.topLeft();
+	const QPoint max_pos = rect.bottomRight();
 
+	//expand seeds
+	wyrmgus::vector::process_randomly(seeds, [&](const QPoint &seed_pos) {
 		const wyrmgus::tile *seed_tile = this->Field(seed_pos, z);
 
 		const wyrmgus::terrain_type *terrain_type = seed_tile->get_terrain();
@@ -3111,66 +3111,62 @@ void CMap::generate_missing_terrain(const QPoint &min_pos, const QPoint &max_pos
 				seeds.push_back(adjacent_pos_vertical);
 			}
 		}
-	}
+	});
 
 	//set the terrain of the remaining tiles without any to their most-neighbored terrain/overlay terrain pair
-	for (int x = min_pos.x(); x <= max_pos.x(); ++x) {
-		for (int y = min_pos.y(); y <= max_pos.y(); ++y) {
-			const QPoint tile_pos(x, y);
+	wyrmgus::rect::for_each_point(rect, [&](const QPoint &tile_pos) {
+		wyrmgus::tile *tile = this->Field(tile_pos, z);
 
-			wyrmgus::tile *tile = this->Field(x, y, z);
-
-			if (tile->get_top_terrain() != nullptr) {
-				continue;
-			}
-
-			std::map<std::pair<const wyrmgus::terrain_type *, const wyrmgus::terrain_type *>, int> terrain_type_pair_neighbor_count;
-
-			for (int x_offset = -1; x_offset <= 1; ++x_offset) {
-				for (int y_offset = -1; y_offset <= 1; ++y_offset) {
-					if (x_offset == 0 && y_offset == 0) {
-						continue;
-					}
-
-					const QPoint adjacent_pos(tile_pos.x() + x_offset, tile_pos.y() + y_offset);
-
-					if (!this->Info.IsPointOnMap(adjacent_pos, z)) {
-						continue;
-					}
-
-					const wyrmgus::tile *adjacent_tile = this->Field(adjacent_pos, z);
-					const wyrmgus::terrain_type *adjacent_terrain_type = adjacent_tile->get_terrain();
-					const wyrmgus::terrain_type *adjacent_overlay_terrain_type = adjacent_tile->get_overlay_terrain();
-
-					if (adjacent_terrain_type == nullptr) {
-						continue;
-					}
-
-					std::pair<const wyrmgus::terrain_type *, const wyrmgus::terrain_type *> terrain_type_pair(adjacent_terrain_type, adjacent_overlay_terrain_type);
-
-					auto find_iterator = terrain_type_pair_neighbor_count.find(terrain_type_pair);
-					if (find_iterator == terrain_type_pair_neighbor_count.end()) {
-						terrain_type_pair_neighbor_count[terrain_type_pair] = 1;
-					} else {
-						find_iterator->second++;
-					}
-				}
-			}
-
-			std::pair<const wyrmgus::terrain_type *, const wyrmgus::terrain_type *> best_terrain_type_pair(nullptr, nullptr);
-			int best_terrain_type_neighbor_count = 0;
-			for (const auto &element : terrain_type_pair_neighbor_count) {
-				if (element.second > best_terrain_type_neighbor_count) {
-					best_terrain_type_pair = element.first;
-					best_terrain_type_neighbor_count = element.second;
-				}
-			}
-
-			//set the terrain and overlay terrain to the same as the most-neighbored one
-			tile->SetTerrain(best_terrain_type_pair.first);
-			tile->SetTerrain(best_terrain_type_pair.second);
+		if (tile->get_top_terrain() != nullptr) {
+			return;
 		}
-	}
+
+		std::map<std::pair<const wyrmgus::terrain_type *, const wyrmgus::terrain_type *>, int> terrain_type_pair_neighbor_count;
+
+		for (int x_offset = -1; x_offset <= 1; ++x_offset) {
+			for (int y_offset = -1; y_offset <= 1; ++y_offset) {
+				if (x_offset == 0 && y_offset == 0) {
+					continue;
+				}
+
+				const QPoint adjacent_pos(tile_pos.x() + x_offset, tile_pos.y() + y_offset);
+
+				if (!this->Info.IsPointOnMap(adjacent_pos, z)) {
+					continue;
+				}
+
+				const wyrmgus::tile *adjacent_tile = this->Field(adjacent_pos, z);
+				const wyrmgus::terrain_type *adjacent_terrain_type = adjacent_tile->get_terrain();
+				const wyrmgus::terrain_type *adjacent_overlay_terrain_type = adjacent_tile->get_overlay_terrain();
+
+				if (adjacent_terrain_type == nullptr) {
+					continue;
+				}
+
+				std::pair<const wyrmgus::terrain_type *, const wyrmgus::terrain_type *> terrain_type_pair(adjacent_terrain_type, adjacent_overlay_terrain_type);
+
+				auto find_iterator = terrain_type_pair_neighbor_count.find(terrain_type_pair);
+				if (find_iterator == terrain_type_pair_neighbor_count.end()) {
+					terrain_type_pair_neighbor_count[terrain_type_pair] = 1;
+				} else {
+					find_iterator->second++;
+				}
+			}
+		}
+
+		std::pair<const wyrmgus::terrain_type *, const wyrmgus::terrain_type *> best_terrain_type_pair(nullptr, nullptr);
+		int best_terrain_type_neighbor_count = 0;
+		for (const auto &element : terrain_type_pair_neighbor_count) {
+			if (element.second > best_terrain_type_neighbor_count) {
+				best_terrain_type_pair = element.first;
+				best_terrain_type_neighbor_count = element.second;
+			}
+		}
+
+		//set the terrain and overlay terrain to the same as the most-neighbored one
+		tile->SetTerrain(best_terrain_type_pair.first);
+		tile->SetTerrain(best_terrain_type_pair.second);
+	});
 }
 
 void CMap::generate_settlement_territories(const int z)
@@ -3181,24 +3177,22 @@ void CMap::generate_settlement_territories(const int z)
 
 	wyrmgus::point_set seeds;
 
-	for (int x = 0; x < this->Info.MapWidths[z]; ++x) {
-		for (int y = 0; y < this->Info.MapHeights[z]; ++y) {
-			QPoint tile_pos(x, y);
+	const QRect rect = this->get_rect(z);
 
-			wyrmgus::tile *tile = this->Field(tile_pos, z);
+	wyrmgus::rect::for_each_point(rect, [&](QPoint &&tile_pos) {
+		wyrmgus::tile *tile = this->Field(tile_pos, z);
 
-			const wyrmgus::site *settlement = tile->get_settlement();
-			if (settlement == nullptr) {
-				continue;
-			}
-
-			if (!this->tile_borders_other_settlement_territory(tile_pos, z)) {
-				continue;
-			}
-
-			seeds.insert(std::move(tile_pos));
+		const wyrmgus::site *settlement = tile->get_settlement();
+		if (settlement == nullptr) {
+			return;
 		}
-	}
+
+		if (!this->tile_borders_other_settlement_territory(tile_pos, z)) {
+			return;
+		}
+
+		seeds.insert(std::move(tile_pos));
+	});
 
 	seeds = this->expand_settlement_territories(wyrmgus::container::to_vector(seeds), z, (MapFieldUnpassable | MapFieldCoastAllowed | MapFieldSpace), MapFieldWaterAllowed | MapFieldUnderground);
 	seeds = this->expand_settlement_territories(wyrmgus::container::to_vector(seeds), z, (MapFieldCoastAllowed | MapFieldSpace), MapFieldWaterAllowed | MapFieldUnderground);
@@ -3207,54 +3201,50 @@ void CMap::generate_settlement_territories(const int z)
 	this->expand_settlement_territories(wyrmgus::container::to_vector(seeds), z);
 
 	//set the settlement of the remaining tiles without any to their most-neighbored settlement
-	for (int x = 0; x < this->Info.MapWidths[z]; ++x) {
-		for (int y = 0; y < this->Info.MapHeights[z]; ++y) {
-			const QPoint tile_pos(x, y);
+	wyrmgus::rect::for_each_point(rect, [&](const QPoint &tile_pos) {
+		wyrmgus::tile *tile = this->Field(tile_pos, z);
 
-			wyrmgus::tile *tile = this->Field(x, y, z);
-
-			if (tile->get_settlement() != nullptr) {
-				continue;
-			}
-
-			std::map<wyrmgus::site *, int> settlement_neighbor_count;
-
-			for (int x_offset = -1; x_offset <= 1; ++x_offset) {
-				for (int y_offset = -1; y_offset <= 1; ++y_offset) {
-					if (x_offset == 0 && y_offset == 0) {
-						continue;
-					}
-
-					QPoint adjacent_pos(tile_pos.x() + x_offset, tile_pos.y() + y_offset);
-
-					if (!this->Info.IsPointOnMap(adjacent_pos, z)) {
-						continue;
-					}
-
-					const wyrmgus::tile *adjacent_tile = this->Field(adjacent_pos, z);
-					wyrmgus::site *adjacent_settlement = adjacent_tile->get_settlement();
-
-					if (adjacent_settlement == nullptr) {
-						continue;
-					}
-
-					settlement_neighbor_count[adjacent_settlement]++;
-				}
-			}
-
-			wyrmgus::site *best_settlement = nullptr;
-			int best_settlement_neighbor_count = 0;
-			for (const auto &kv_pair : settlement_neighbor_count) {
-				if (kv_pair.second > best_settlement_neighbor_count) {
-					best_settlement = kv_pair.first;
-					best_settlement_neighbor_count = kv_pair.second;
-				}
-			}
-
-			//set the settlement to the same as the most-neighbored one
-			tile->set_settlement(best_settlement);
+		if (tile->get_settlement() != nullptr) {
+			return;
 		}
-	}
+
+		std::map<wyrmgus::site *, int> settlement_neighbor_count;
+
+		for (int x_offset = -1; x_offset <= 1; ++x_offset) {
+			for (int y_offset = -1; y_offset <= 1; ++y_offset) {
+				if (x_offset == 0 && y_offset == 0) {
+					continue;
+				}
+
+				const QPoint adjacent_pos(tile_pos.x() + x_offset, tile_pos.y() + y_offset);
+
+				if (!this->Info.IsPointOnMap(adjacent_pos, z)) {
+					continue;
+				}
+
+				const wyrmgus::tile *adjacent_tile = this->Field(adjacent_pos, z);
+				wyrmgus::site *adjacent_settlement = adjacent_tile->get_settlement();
+
+				if (adjacent_settlement == nullptr) {
+					continue;
+				}
+
+				settlement_neighbor_count[adjacent_settlement]++;
+			}
+		}
+
+		wyrmgus::site *best_settlement = nullptr;
+		int best_settlement_neighbor_count = 0;
+		for (const auto &kv_pair : settlement_neighbor_count) {
+			if (kv_pair.second > best_settlement_neighbor_count) {
+				best_settlement = kv_pair.first;
+				best_settlement_neighbor_count = kv_pair.second;
+			}
+		}
+
+		//set the settlement to the same as the most-neighbored one
+		tile->set_settlement(best_settlement);
+	});
 
 	this->calculate_settlement_territory_tiles(z);
 
@@ -3274,16 +3264,13 @@ wyrmgus::point_set CMap::expand_settlement_territories(std::vector<QPoint> &&see
 	wyrmgus::point_set blocked_seeds;
 
 	//expand seeds
-	while (!seeds.empty()) {
-		const QPoint seed_pos = seeds[SyncRand(seeds.size())];
-		wyrmgus::vector::remove(seeds, seed_pos);
-
+	wyrmgus::vector::process_randomly(seeds, [&](const QPoint &seed_pos) {
 		const wyrmgus::tile *seed_tile = this->Field(seed_pos, z);
 
 		//tiles with a block flag can be expanded to, but they can't serve as a basis for further expansion
 		if (seed_tile->CheckMask(block_flags)) {
 			blocked_seeds.insert(seed_pos);
-			continue;
+			return;
 		}
 
 		wyrmgus::site *settlement = seed_tile->get_settlement();
@@ -3339,11 +3326,11 @@ wyrmgus::point_set CMap::expand_settlement_territories(std::vector<QPoint> &&see
 			this->Field(adjacent_pos_horizontal, z)->set_settlement(settlement);
 			this->Field(adjacent_pos_vertical, z)->set_settlement(settlement);
 
-			seeds.push_back(adjacent_pos);
-			seeds.push_back(adjacent_pos_horizontal);
-			seeds.push_back(adjacent_pos_vertical);
+			seeds.push_back(std::move(adjacent_pos));
+			seeds.push_back(std::move(adjacent_pos_horizontal));
+			seeds.push_back(std::move(adjacent_pos_vertical));
 		}
-	}
+	});
 
 	return blocked_seeds;
 }
