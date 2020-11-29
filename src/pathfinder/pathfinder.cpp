@@ -106,7 +106,7 @@ void TerrainTraversal::PushPos(const Vec2i &pos)
 
 void TerrainTraversal::push_pos_if_passable(const QPoint &pos, int z, const unsigned long passability_mask)
 {
-	if (!CanMoveToMask(pos, passability_mask, z)) {
+	if (!CMap::get()->Info.IsPointOnMap(pos, z) || !CanMoveToMask(pos, passability_mask, z)) {
 		return;
 	}
 
