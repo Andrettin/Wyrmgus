@@ -39,6 +39,7 @@
 #include "unit/unit.h"
 #include "unit/unit_find.h"
 #include "unit/unit_type_type.h"
+#include "util/number_util.h"
 
 #include "pathfinder.h"
 
@@ -58,17 +59,11 @@ struct Open {
 	//Wyrmgus end
 };
 
-//for 32 bit signed int
-static int MyAbs(int x)
-{
-	return (x ^ (x >> 31)) - (x >> 31);
-}
-
 /// heuristic cost function for a*
 static int AStarCosts(const Vec2i &pos, const Vec2i &goalPos)
 {
 	const Vec2i diff = pos - goalPos;
-	return std::max<int>(MyAbs(diff.x), MyAbs(diff.y));
+	return std::max<int>(wyrmgus::number::fast_abs(diff.x), wyrmgus::number::fast_abs(diff.y));
 }
 
 //  Convert heading into direction.
@@ -535,7 +530,7 @@ static inline int AStarAddNode(const Vec2i &pos, int o, int costs, int z)
 //	const int costToGoal = AStarMatrix[o].CostToGoal;
 	const int costToGoal = AStarMatrix[z][o].CostToGoal;
 	//Wyrmgus end
-	const int dist = MyAbs(pos.x - AStarGoalX) + MyAbs(pos.y - AStarGoalY);
+	const int dist = wyrmgus::number::fast_abs(pos.x - AStarGoalX) + wyrmgus::number::fast_abs(pos.y - AStarGoalY);
 
 	// find where we should insert this node.
 	// binary search where to insert the new node
@@ -550,7 +545,7 @@ static inline int AStarAddNode(const Vec2i &pos, int o, int costs, int z)
 //		midCostToGoal = AStarMatrix[open->O].CostToGoal;
 		midCostToGoal = AStarMatrix[z][open->O].CostToGoal;
 		//Wyrmgus end
-		midDist = MyAbs(open->pos.x - AStarGoalX) + MyAbs(open->pos.y - AStarGoalY);
+		midDist = wyrmgus::number::fast_abs(open->pos.x - AStarGoalX) + wyrmgus::number::fast_abs(open->pos.y - AStarGoalY);
 		if (costs > midcost || (costs == midcost
 								&& (costToGoal > midCostToGoal || (costToGoal == midCostToGoal
 																   && dist > midDist)))) {
@@ -1251,8 +1246,8 @@ static int AStarFindSimplePath(const Vec2i &startPos, const Vec2i &goal, int gw,
 	}
 
 	//Wyrmgus start
-//	if (MyAbs(diff.x) <= 1 && MyAbs(diff.y) <= 1) {
-	if (minrange <= distance && MyAbs(diff.x) <= 1 && MyAbs(diff.y) <= 1 && (allow_diagonal || diff.x == 0 || diff.y == 0)) {
+//	if (wyrmgus::number::fast_abs(diff.x) <= 1 && wyrmgus::number::fast_abs(diff.y) <= 1) {
+	if (minrange <= distance && wyrmgus::number::fast_abs(diff.x) <= 1 && wyrmgus::number::fast_abs(diff.y) <= 1 && (allow_diagonal || diff.x == 0 || diff.y == 0)) {
 	//Wyrmgus end
 		// Move to adjacent cell
 		//Wyrmgus start

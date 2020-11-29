@@ -49,4 +49,10 @@ inline std::string to_signed_string(const int number)
 	return number_str;
 }
 
+inline int fast_abs(const int value)
+{
+	const int temp = value >> 31;
+	return (value ^ temp) - temp;
+}
+
 }
