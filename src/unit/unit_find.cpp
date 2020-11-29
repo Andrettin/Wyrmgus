@@ -606,18 +606,22 @@ VisitResult ResourceUnitFinder::Visit(TerrainTraversal &terrainTraversal, const 
 {
 	Q_UNUSED(from)
 
+	const wyrmgus::tile *tile = worker.MapLayer->Field(pos);
+
 	//Wyrmgus start
-//	if (!worker.Player->AiEnabled && !Map.Field(pos)->player_info->IsExplored(*worker.Player)) {
-	if (!worker.MapLayer->Field(pos)->player_info->IsTeamExplored(*worker.Player) && !ignore_exploration) {
+//	if (!worker.Player->AiEnabled && !tile->player_info->IsExplored(*worker.Player)) {
+	if (!tile->player_info->IsTeamExplored(*worker.Player) && !ignore_exploration) {
 	//Wyrmgus end
 		return VisitResult::DeadEnd;
 	}
 
 	//Wyrmgus start
-//	CUnit *mine = Map.Field(pos)->UnitCache.find(res_finder);
-	CUnit *mine = worker.MapLayer->Field(pos)->UnitCache.find(res_finder);
+//	CUnit *mine = tile->UnitCache.find(res_finder);
+	CUnit *mine = tile->UnitCache.find(res_finder);
+
+	const CPlayer *tile_owner = tile->get_owner();
 	
-	if (worker.MapLayer->Field(pos)->get_owner() != nullptr && worker.MapLayer->Field(pos)->get_owner() != worker.Player && !worker.MapLayer->Field(pos)->get_owner()->has_neutral_faction_type() && !worker.Player->has_neutral_faction_type() && (!mine || mine->Type->get_given_resource()->get_index() != TradeCost)) {
+	if (tile_owner != nullptr && tile_owner != worker.Player && !tile_owner->has_neutral_faction_type() && !worker.Player->has_neutral_faction_type() && (mine == nullptr || mine->Type->get_given_resource() == nullptr || mine->Type->get_given_resource()->get_index() != TradeCost)) {
 		return VisitResult::DeadEnd;
 	}
 	//Wyrmgus end
@@ -626,7 +630,7 @@ VisitResult ResourceUnitFinder::Visit(TerrainTraversal &terrainTraversal, const 
 //	if (mine && mine != *resultMine && MineIsUsable(*mine)) {
 	if (
 		mine && mine != *resultMine && MineIsUsable(*mine)
-		&& (mine->Type->BoolFlag[CANHARVEST_INDEX].value || worker.MapLayer->Field(pos)->get_owner() == nullptr || worker.MapLayer->Field(pos)->get_owner() == worker.Player) //this is needed to prevent neutral factions from trying to build mines in others' territory
+		&& (mine->Type->BoolFlag[CANHARVEST_INDEX].value || tile_owner == nullptr || tile_owner == worker.Player) //this is needed to prevent neutral factions from trying to build mines in others' territory
 	) {
 	//Wyrmgus end
 		ResourceUnitFinder::ResourceUnitFinder_Cost cost;
@@ -644,6 +648,7 @@ VisitResult ResourceUnitFinder::Visit(TerrainTraversal &terrainTraversal, const 
 			bestCost = cost;
 		}
 	}
+
 	if (CanMoveToMask(pos, movemask, worker.MapLayer->ID)) { // reachable
 		if (terrainTraversal.Get(pos) < maxRange) {
 			return VisitResult::Ok;
