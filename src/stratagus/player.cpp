@@ -1762,6 +1762,11 @@ bool CPlayer::can_found_faction(const wyrmgus::faction *faction) const
 		return false;
 	}
 	
+	const CUpgrade *faction_type_upgrade = wyrmgus::defines::get()->get_faction_type_upgrade(faction->get_type());
+	if (faction_type_upgrade != nullptr && !check_conditions<preconditions_only>(faction_type_upgrade, this, false)) {
+		return false;
+	}
+
 	if (!faction->FactionUpgrade.empty()) {
 		const CUpgrade *faction_upgrade = CUpgrade::get(faction->FactionUpgrade);
 		if (!check_conditions<preconditions_only>(faction_upgrade, this, false)) {
