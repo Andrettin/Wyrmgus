@@ -31,7 +31,9 @@
 #include "database/preferences.h"
 #include "database/sml_data.h"
 #include "database/sml_parser.h"
+#include "faction_type.h"
 #include "sound/game_sound_set.h"
+#include "upgrade/upgrade_structs.h"
 #include "video/video.h"
 
 namespace wyrmgus {
@@ -81,6 +83,13 @@ void defines::process_sml_scope(const sml_data &scope)
 
 	if (tag == "game_sound_set") {
 		database::process_sml_data(game_sound_set::get(), scope);
+	} else if (tag == "faction_type_upgrades") {
+		scope.for_each_property([&](const sml_property &property) {
+			const faction_type faction_type = string_to_faction_type(property.get_key());
+			const CUpgrade *upgrade = CUpgrade::get(property.get_value());
+
+			this->faction_type_upgrades[faction_type] = upgrade;
+		});
 	} else {
 		database::process_sml_scope_for_object(this, scope);
 	}

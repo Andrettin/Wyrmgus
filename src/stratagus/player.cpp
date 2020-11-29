@@ -44,6 +44,7 @@
 #include "dynasty.h"
 #include "editor.h"
 #include "faction.h"
+#include "faction_type.h"
 //Wyrmgus start
 #include "game.h"
 #include "grand_strategy.h"
@@ -1116,9 +1117,9 @@ void CPlayer::SetFaction(const wyrmgus::faction *faction)
 			UpgradeLost(*this, CUpgrade::get(this->get_faction()->FactionUpgrade)->ID);
 		}
 
-		const int faction_type_upgrade_id = UpgradeIdByIdent("upgrade-" + GetFactionTypeNameById(this->get_faction()->Type));
-		if (faction_type_upgrade_id != -1 && this->Allow.Upgrades[faction_type_upgrade_id] == 'R') {
-			UpgradeLost(*this, faction_type_upgrade_id);
+		const CUpgrade *faction_type_upgrade = wyrmgus::defines::get()->get_faction_type_upgrade(this->get_faction()->get_type());
+		if (faction_type_upgrade != nullptr && this->Allow.Upgrades[faction_type_upgrade->ID] == 'R') {
+			UpgradeLost(*this, faction_type_upgrade->ID);
 		}
 	}
 
@@ -1248,12 +1249,12 @@ void CPlayer::SetFaction(const wyrmgus::faction *faction)
 			}
 		}
 		
-		int faction_type_upgrade_id = UpgradeIdByIdent("upgrade-" + GetFactionTypeNameById(this->get_faction()->Type));
-		if (faction_type_upgrade_id != -1 && this->Allow.Upgrades[faction_type_upgrade_id] != 'R') {
+		const CUpgrade *faction_type_upgrade = wyrmgus::defines::get()->get_faction_type_upgrade(this->get_faction()->get_type());
+		if (faction_type_upgrade != nullptr && this->Allow.Upgrades[faction_type_upgrade->ID] != 'R') {
 			if (GameEstablishing) {
-				AllowUpgradeId(*this, faction_type_upgrade_id, 'R');
+				AllowUpgradeId(*this, faction_type_upgrade->ID, 'R');
 			} else {
-				UpgradeAcquire(*this, CUpgrade::get_all()[faction_type_upgrade_id]);
+				UpgradeAcquire(*this, faction_type_upgrade);
 			}
 		}
 	} else {
@@ -1289,18 +1290,20 @@ void CPlayer::SetRandomFaction()
 		if (faction->get_civilization() != this->get_civilization()) {
 			continue;
 		}
+
 		if (!faction->Playable) {
 			continue;
 		}
+
 		if (!this->can_found_faction(faction)) {
 			continue;
 		}
 
-		int faction_type = faction->Type;
+		const wyrmgus::faction_type faction_type = faction->get_type();
 		const bool has_writing = this->has_upgrade_class(wyrmgus::upgrade_class::get("writing"));
 		if (
-			!(faction_type == FactionTypeTribe && !has_writing)
-			&& !(faction_type == FactionTypePolity && has_writing)
+			!(faction_type == wyrmgus::faction_type::tribe && !has_writing)
+			&& !(faction_type == wyrmgus::faction_type::polity && has_writing)
 		) {
 			continue;
 		}
@@ -1619,7 +1622,7 @@ wyrmgus::site *CPlayer::GetNearestSettlement(const Vec2i &pos, int z, const Vec2
 		if (!settlement_unit || !settlement_unit->IsAliveOnMap() || !settlement_unit->Type->BoolFlag[TOWNHALL_INDEX].value || z != settlement_unit->MapLayer->ID) {
 			continue;
 		}
-		if (!this->HasNeutralFactionType() && this != settlement_unit->Player) {
+		if (!this->has_neutral_faction_type() && this != settlement_unit->Player) {
 			continue;
 		}
 		int distance = MapDistance(size, pos, z, settlement_unit->Type->get_tile_size(), settlement_unit->tilePos, settlement_unit->MapLayer->ID);
@@ -1760,7 +1763,7 @@ bool CPlayer::can_found_faction(const wyrmgus::faction *faction) const
 	}
 	
 	if (!faction->FactionUpgrade.empty()) {
-		CUpgrade *faction_upgrade = CUpgrade::get(faction->FactionUpgrade);
+		const CUpgrade *faction_upgrade = CUpgrade::get(faction->FactionUpgrade);
 		if (!check_conditions<preconditions_only>(faction_upgrade, this, false)) {
 			return false;
 		}
@@ -3844,7 +3847,7 @@ bool CPlayer::IsEnemy(const CUnit &unit) const
 		return true;
 	}
 	
-	if (unit.Player->Index != this->Index && this->Type != PlayerNeutral && unit.Type->BoolFlag[HIDDENOWNERSHIP_INDEX].value && unit.IsAgressive() && !this->HasNeutralFactionType()) {
+	if (unit.Player->Index != this->Index && this->Type != PlayerNeutral && unit.Type->BoolFlag[HIDDENOWNERSHIP_INDEX].value && unit.IsAgressive() && !this->has_neutral_faction_type()) {
 		return true;
 	}
 	
@@ -3921,12 +3924,12 @@ bool CPlayer::HasContactWith(const CPlayer &player) const
 /**
 **  Check if the player's faction type is a neutral one
 */
-bool CPlayer::HasNeutralFactionType() const
+bool CPlayer::has_neutral_faction_type() const
 {
 	if (
 		this->get_civilization() != nullptr
 		&& this->get_faction() != nullptr
-		&& (this->get_faction()->Type == FactionTypeMercenaryCompany || this->get_faction()->Type == FactionTypeHolyOrder || this->get_faction()->Type == FactionTypeTradingCompany)
+		&& (is_faction_type_neutral(this->get_faction()->get_type()))
 	) {
 		return true;
 	}
@@ -3952,10 +3955,10 @@ bool CPlayer::HasBuildingAccess(const CPlayer &player, const ButtonCmd button_ac
 	}
 	
 	if (
-		player.HasNeutralFactionType()
+		player.has_neutral_faction_type()
 		&& (player.get_overlord() == nullptr || this->is_any_overlord_of(&player) || player.get_overlord()->IsAllied(*this))
 	) {
-		if (player.get_faction()->Type != FactionTypeHolyOrder || (button_action != ButtonCmd::Train && button_action != ButtonCmd::TrainClass && button_action != ButtonCmd::Buy) || wyrmgus::vector::contains(this->Deities, player.get_faction()->get_holy_order_deity())) { //if the faction is a holy order, the player must have chosen its respective deity
+		if (player.get_faction()->get_type() != wyrmgus::faction_type::holy_order || (button_action != ButtonCmd::Train && button_action != ButtonCmd::TrainClass && button_action != ButtonCmd::Buy) || wyrmgus::vector::contains(this->Deities, player.get_faction()->get_holy_order_deity())) { //if the faction is a holy order, the player must have chosen its respective deity
 			return true;
 		}
 	}
@@ -3983,44 +3986,6 @@ void NetworkSetFaction(int player, const std::string &faction_name)
 	const wyrmgus::faction *faction = wyrmgus::faction::try_get(faction_name);
 	int faction_id = faction ? faction->ID : -1;
 	SendCommandSetFaction(player, faction_id);
-}
-
-std::string GetFactionTypeNameById(int faction_type)
-{
-	if (faction_type == FactionTypeNoFactionType) {
-		return "no-faction-type";
-	} else if (faction_type == FactionTypeTribe) {
-		return "tribe";
-	} else if (faction_type == FactionTypePolity) {
-		return "polity";
-	} else if (faction_type == FactionTypeMercenaryCompany) {
-		return "mercenary-company";
-	} else if (faction_type == FactionTypeHolyOrder) {
-		return "holy_order";
-	} else if (faction_type == FactionTypeTradingCompany) {
-		return "trading-company";
-	}
-
-	return "";
-}
-
-int GetFactionTypeIdByName(const std::string &faction_type)
-{
-	if (faction_type == "no-faction-type") {
-		return FactionTypeNoFactionType;
-	} else if (faction_type == "tribe") {
-		return FactionTypeTribe;
-	} else if (faction_type == "polity") {
-		return FactionTypePolity;
-	} else if (faction_type == "mercenary-company") {
-		return FactionTypeMercenaryCompany;
-	} else if (faction_type == "holy_order") {
-		return FactionTypeHolyOrder;
-	} else if (faction_type == "trading-company") {
-		return FactionTypeTradingCompany;
-	}
-
-	return -1;
 }
 
 std::string GetForceTypeNameById(const ForceType force_type)

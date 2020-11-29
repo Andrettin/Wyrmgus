@@ -199,7 +199,7 @@ VisitResult BuildingPlaceFinder::Visit(TerrainTraversal &terrainTraversal, const
 		return VisitResult::DeadEnd;
 	}
 	
-	if (tile->get_owner() != nullptr && tile->get_owner() != worker.Player && !tile->get_owner()->HasNeutralFactionType() && !worker.Player->HasNeutralFactionType()) { //buildings cannot be built on other players' land; we return dead end instead of ok because we don't want units to go over another player's territory to build structures elsewhere, resulting in a lot of exclaves; the exception are neutral factions, which should be composed largely of enclaves and exclaves
+	if (tile->get_owner() != nullptr && tile->get_owner() != worker.Player && !tile->get_owner()->has_neutral_faction_type() && !worker.Player->has_neutral_faction_type()) { //buildings cannot be built on other players' land; we return dead end instead of ok because we don't want units to go over another player's territory to build structures elsewhere, resulting in a lot of exclaves; the exception are neutral factions, which should be composed largely of enclaves and exclaves
 		return VisitResult::DeadEnd;
 	}
 	
@@ -372,7 +372,7 @@ VisitResult HallPlaceFinder::Visit(TerrainTraversal &terrainTraversal, const Vec
 	}
 	//Wyrmgus end
 	//Wyrmgus start
-	if (CMap::Map.Field(pos, z)->get_owner() != nullptr && CMap::Map.Field(pos, z)->get_owner() != worker.Player && !CMap::Map.Field(pos, z)->get_owner()->HasNeutralFactionType() && !worker.Player->HasNeutralFactionType()) {
+	if (CMap::Map.Field(pos, z)->get_owner() != nullptr && CMap::Map.Field(pos, z)->get_owner() != worker.Player && !CMap::Map.Field(pos, z)->get_owner()->has_neutral_faction_type() && !worker.Player->has_neutral_faction_type()) {
 		return VisitResult::DeadEnd;
 	}
 	
@@ -515,7 +515,7 @@ VisitResult LumberMillPlaceFinder::Visit(TerrainTraversal &terrainTraversal, con
 	//Wyrmgus start
 
 
-	if (tile->get_owner() != nullptr && tile->get_owner() != worker.Player && !tile->get_owner()->HasNeutralFactionType() && !worker.Player->HasNeutralFactionType()) {
+	if (tile->get_owner() != nullptr && tile->get_owner() != worker.Player && !tile->get_owner()->has_neutral_faction_type() && !worker.Player->has_neutral_faction_type()) {
 		return VisitResult::DeadEnd;
 	}
 

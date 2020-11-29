@@ -58,6 +58,7 @@ class upgrade_class;
 enum class character_title;
 enum class diplomacy_state;
 enum class faction_tier;
+enum class faction_type;
 enum class government_type;
 
 class faction final : public detailed_data_entry, public data_type<faction>
@@ -65,6 +66,7 @@ class faction final : public detailed_data_entry, public data_type<faction>
 	Q_OBJECT
 
 	Q_PROPERTY(wyrmgus::civilization* civilization MEMBER civilization READ get_civilization)
+	Q_PROPERTY(wyrmgus::faction_type type MEMBER type READ get_type)
 	Q_PROPERTY(wyrmgus::faction* parent_faction MEMBER parent_faction)
 	Q_PROPERTY(wyrmgus::icon* icon MEMBER icon READ get_icon)
 	Q_PROPERTY(wyrmgus::player_color* color MEMBER color READ get_color)
@@ -118,6 +120,11 @@ public:
 	civilization *get_civilization() const
 	{
 		return this->civilization;
+	}
+
+	faction_type get_type() const
+	{
+		return this->type;
 	}
 
 	const faction *get_parent_faction() const
@@ -310,9 +317,7 @@ public:
 	int ID = -1;														/// faction ID
 private:
 	wyrmgus::civilization *civilization = nullptr;
-public:
-	int Type = FactionTypeNoFactionType;								/// faction type (i.e. tribe or polity)
-private:
+	faction_type type; //faction type (i.e. tribe or polity)
 	faction *parent_faction = nullptr;
 	faction_tier default_tier;
 	faction_tier min_tier;

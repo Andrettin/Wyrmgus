@@ -41,6 +41,7 @@
 #include "dynasty.h"
 #include "editor.h"
 #include "faction.h"
+#include "faction_type.h"
 #include "government_type.h"
 #include "grand_strategy.h"
 #include "language/language.h"
@@ -968,7 +969,7 @@ static int CclDefineCivilization(lua_State *l)
 				++k;
 				const wyrmgus::faction_tier tier = wyrmgus::string_to_faction_tier(LuaToString(l, -1, k + 1));
 				++k;
-				civilization->character_title_names[title][FactionTypeNoFactionType][government_type][tier][gender] = LuaToString(l, -1, k + 1);
+				civilization->character_title_names[title][wyrmgus::faction_type::none][government_type][tier][gender] = LuaToString(l, -1, k + 1);
 			}
 		} else if (!strcmp(value, "HistoricalUpgrades")) {
 			if (!lua_istable(l, -1)) {
@@ -1521,13 +1522,8 @@ static int CclDefineFaction(lua_State *l)
 		} else if (!strcmp(value, "Adjective")) {
 			faction->Adjective = LuaToString(l, -1);
 		} else if (!strcmp(value, "Type")) {
-			std::string faction_type_name = LuaToString(l, -1);
-			int faction_type = GetFactionTypeIdByName(faction_type_name);
-			if (faction_type != -1) {
-				faction->Type = faction_type;
-			} else {
-				LuaError(l, "Faction type \"%s\" doesn't exist." _C_ faction_type_name.c_str());
-			}
+			const std::string faction_type_name = LuaToString(l, -1);
+			faction->type = wyrmgus::string_to_faction_type(faction_type_name);
 		} else if (!strcmp(value, "Color")) {
 			faction->color = wyrmgus::player_color::get(LuaToString(l, -1));
 		} else if (!strcmp(value, "DefaultTier")) {
@@ -2136,15 +2132,15 @@ static int CclGetFactions(lua_State *l)
 		civilization = wyrmgus::civilization::try_get(LuaToString(l, 1));
 	}
 	
-	int faction_type = -1;
+	wyrmgus::faction_type faction_type = wyrmgus::faction_type::none;
 	if (lua_gettop(l) >= 2) {
-		faction_type = GetFactionTypeIdByName(LuaToString(l, 2));
+		faction_type = wyrmgus::string_to_faction_type(LuaToString(l, 2));
 	}
 	
 	std::vector<std::string> factions;
 	if (civilization != nullptr) {
 		for (wyrmgus::faction *faction : wyrmgus::faction::get_all()) {
-			if (faction_type != -1 && faction->Type != faction_type) {
+			if (faction_type != wyrmgus::faction_type::none && faction->get_type() != faction_type) {
 				continue;
 			}
 			if (faction->get_civilization() == civilization) {
@@ -2153,7 +2149,7 @@ static int CclGetFactions(lua_State *l)
 		}
 	} else {
 		for (wyrmgus::faction *faction : wyrmgus::faction::get_all()) {
-			if (faction_type != -1 && faction->Type != faction_type) {
+			if (faction_type != wyrmgus::faction_type::none && faction->get_type() != faction_type) {
 				continue;
 			}
 			factions.push_back(faction->get_identifier());
@@ -2220,7 +2216,7 @@ static int CclGetFactionData(lua_State *l)
 		}
 		return 1;
 	} else if (!strcmp(data, "Type")) {
-		lua_pushstring(l, GetFactionTypeNameById(faction->Type).c_str());
+		lua_pushstring(l, wyrmgus::faction_type_to_string(faction->get_type()).c_str());
 		return 1;
 	} else if (!strcmp(data, "Civilization")) {
 		if (faction->get_civilization() != nullptr) {

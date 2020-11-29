@@ -305,7 +305,7 @@ static void AiCheckUnits()
 	}
 	
 	//Wyrmgus start
-	if (AiPlayer->Player->NumTownHalls > 0 && !AiPlayer->Player->HasNeutralFactionType()) {
+	if (AiPlayer->Player->NumTownHalls > 0 && !AiPlayer->Player->has_neutral_faction_type()) {
 		//check if can hire any heroes
 		if (AiPlayer->Player->Heroes.size() < PlayerHeroMax && AiPlayer->Player->HeroCooldownTimer == 0 && !IsNetworkGame() && CurrentQuest == nullptr) {
 			for (int i = 0; i < AiPlayer->Player->GetUnitCount(); ++i) {

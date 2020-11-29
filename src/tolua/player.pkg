@@ -75,9 +75,6 @@ class CPlayer
 	bool has_shared_vision_with(const CPlayer &player) const;
 	bool has_mutual_shared_vision_with(const CPlayer &player) const;
 	bool IsTeamed(const CPlayer &player) const;
-	//Wyrmgus start
-	bool HasNeutralFactionType() const;
-	//Wyrmgus end
 };
 
 //Wyrmgus start

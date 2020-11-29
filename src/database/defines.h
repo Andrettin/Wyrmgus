@@ -30,6 +30,7 @@
 #include "util/singleton.h"
 
 class CGraphic;
+class CUpgrade;
 
 namespace wyrmgus {
 
@@ -45,6 +46,7 @@ class sml_property;
 class terrain_type;
 class time_of_day;
 class unit_class;
+enum class faction_type;
 
 class defines final : public QObject, public singleton<defines>
 {
@@ -243,6 +245,16 @@ public:
 		return this->default_population_class;
 	}
 
+	const CUpgrade *get_faction_type_upgrade(const faction_type faction_type)
+	{
+		const auto find_iterator = this->faction_type_upgrades.find(faction_type);
+		if (find_iterator != this->faction_type_upgrades.end()) {
+			return find_iterator->second;
+		}
+
+		return nullptr;
+	}
+
 	const std::shared_ptr<CGraphic> &get_icon_frame_graphics() const
 	{
 		return this->icon_frame_graphics;
@@ -324,6 +336,7 @@ private:
 	button_level *cancel_button_level = nullptr;
 	unit_class *town_hall_class = nullptr;
 	unit_class *default_population_class = nullptr;
+	std::map<faction_type, const CUpgrade *> faction_type_upgrades;
 	std::shared_ptr<CGraphic> icon_frame_graphics;
 	std::shared_ptr<CGraphic> pressed_icon_frame_graphics;
 	std::shared_ptr<CGraphic> command_button_frame_graphics;

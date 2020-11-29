@@ -1861,7 +1861,7 @@ static void InfoPanel_draw_no_selection()
 
 		for (int i = 0; i < PlayerMax - 1; ++i) {
 			const CPlayer *player = CPlayer::Players[i];
-			if (player->Type != PlayerNobody && !player->HasNeutralFactionType() && CPlayer::GetThisPlayer()->HasContactWith(*player) && player->GetUnitCount() > 0) {
+			if (player->Type != PlayerNobody && !player->has_neutral_faction_type() && CPlayer::GetThisPlayer()->HasContactWith(*player) && player->GetUnitCount() > 0) {
 				listed_players.push_back(player);
 			}
 		}

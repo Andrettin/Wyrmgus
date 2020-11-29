@@ -3607,7 +3607,7 @@ void CUnit::UpdateSettlement()
 
 		const wyrmgus::tile *tile = this->get_center_tile();
 
-		if (tile->get_owner() == this->Player || (this->Player->HasNeutralFactionType() && tile->get_owner() != nullptr)) {
+		if (tile->get_owner() == this->Player || (this->Player->has_neutral_faction_type() && tile->get_owner() != nullptr)) {
 			this->settlement = tile->get_settlement();
 		} else {
 			this->settlement = this->Player->GetNearestSettlement(this->tilePos, this->MapLayer->ID, this->Type->get_tile_size());
@@ -3626,7 +3626,7 @@ void CUnit::UpdateBuildingSettlementAssignment(const wyrmgus::site *old_settleme
 	}
 		
 	for (const CPlayer *player : CPlayer::Players) {
-		if (!player->HasNeutralFactionType() && this->Player->Index != player->Index) {
+		if (!player->has_neutral_faction_type() && this->Player->Index != player->Index) {
 			continue;
 		}
 
@@ -7934,7 +7934,7 @@ bool CUnit::IsEnemy(const CUnit &unit) const
 				}
 
 				if (
-					unit.Player->Type != PlayerNeutral && !this->Player->HasBuildingAccess(*unit.Player) && !this->Player->HasNeutralFactionType()
+					unit.Player->Type != PlayerNeutral && !this->Player->HasBuildingAccess(*unit.Player) && !this->Player->has_neutral_faction_type()
 					&& ((this->Type->BoolFlag[HIDDENOWNERSHIP_INDEX].value && this->IsAgressive()) || (unit.Type->BoolFlag[HIDDENOWNERSHIP_INDEX].value && unit.IsAgressive()))
 				) {
 					return true;

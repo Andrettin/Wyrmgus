@@ -59,6 +59,7 @@ class unit_class;
 class unit_sound_set;
 class upgrade_class;
 enum class character_title;
+enum class faction_type;
 enum class government_type;
 
 class civilization final : public civilization_base, public data_type<civilization>
@@ -247,7 +248,7 @@ public:
 	}
 
 	std::string_view get_title_name(const government_type government_type, const faction_tier tier) const;
-	std::string_view get_character_title_name(const character_title title_type, const int faction_type, const government_type government_type, const faction_tier tier, const gender gender) const;
+	std::string_view get_character_title_name(const character_title title_type, const faction_type faction_type, const government_type government_type, const faction_tier tier, const gender gender) const;
 	void process_character_title_name_scope(const sml_data &scope);
 	void process_character_title_name_scope(const character_title title_type, const sml_data &scope);
 
@@ -369,7 +370,7 @@ public:
 	std::vector<site *> sites; //sites used for this civilization if a randomly-generated one is required
 private:
 	std::map<government_type, std::map<faction_tier, std::string>> title_names;
-	std::map<character_title, std::map<int, std::map<government_type, std::map<faction_tier, std::map<gender, std::string>>>>> character_title_names;
+	std::map<character_title, std::map<faction_type, std::map<government_type, std::map<faction_tier, std::map<gender, std::string>>>>> character_title_names;
 	std::unique_ptr<civilization_history> history;
 public:
 	std::map<std::string, std::map<CDate, bool>> HistoricalUpgrades;	/// historical upgrades of the faction, with the date of change

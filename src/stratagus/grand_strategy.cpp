@@ -33,6 +33,7 @@
 #include "civilization.h"
 #include "database/defines.h"
 #include "faction.h"
+#include "faction_type.h"
 #include "game.h"	// for loading screen elements
 #include "iolib.h"
 #include "luacallback.h"
@@ -745,7 +746,7 @@ void CGrandStrategyFaction::MinisterSuccession(const wyrmgus::character_title ti
 {
 	if (
 		this->Ministers[title] != nullptr
-		&& (wyrmgus::faction::get_all()[this->Faction]->Type == FactionTypeTribe || this->government_type == wyrmgus::government_type::monarchy)
+		&& (wyrmgus::faction::get_all()[this->Faction]->get_type() == wyrmgus::faction_type::tribe || this->government_type == wyrmgus::government_type::monarchy)
 		&& title == wyrmgus::character_title::head_of_state
 	) { //if is a tribe or a monarchical polity, try to perform ruler succession by descent
 		for (size_t i = 0; i < this->Ministers[title]->Children.size(); ++i) {
@@ -831,7 +832,7 @@ bool CGrandStrategyFaction::HasTechnologyClass(std::string technology_class_name
 
 bool CGrandStrategyFaction::CanHaveSuccession(const wyrmgus::character_title title, bool family_inheritance)
 {
-	if (!this->IsAlive() && (title != wyrmgus::character_title::head_of_state || !family_inheritance || wyrmgus::faction::get_all()[this->Faction]->Type == FactionTypeTribe || this->government_type != wyrmgus::government_type::monarchy)) { // head of state titles can be inherited even if their respective factions have no provinces, but if the line dies out then the title becomes extinct; tribal titles cannot be titular-only
+	if (!this->IsAlive() && (title != wyrmgus::character_title::head_of_state || !family_inheritance || wyrmgus::faction::get_all()[this->Faction]->get_type() == wyrmgus::faction_type::tribe || this->government_type != wyrmgus::government_type::monarchy)) { // head of state titles can be inherited even if their respective factions have no provinces, but if the line dies out then the title becomes extinct; tribal titles cannot be titular-only
 		return false;
 	}
 	
@@ -840,7 +841,7 @@ bool CGrandStrategyFaction::CanHaveSuccession(const wyrmgus::character_title tit
 
 bool CGrandStrategyFaction::IsConquestDesirable(CGrandStrategyProvince *province)
 {
-	if (this->OwnedProvinces.size() == 1 && province->Owner == nullptr && wyrmgus::faction::get_all()[this->Faction]->Type == FactionTypeTribe) {
+	if (this->OwnedProvinces.size() == 1 && province->Owner == nullptr && wyrmgus::faction::get_all()[this->Faction]->get_type() == wyrmgus::faction_type::tribe) {
 		if (province->GetDesirabilityRating() <= GrandStrategyGame.Provinces[this->OwnedProvinces[0]]->GetDesirabilityRating()) { // if conquering the province would trigger a migration, the conquest is only desirable if the province is worth more
 			return false;
 		}
@@ -866,9 +867,9 @@ int CGrandStrategyFaction::GetTroopCostModifier()
 
 std::string CGrandStrategyFaction::get_full_name()
 {
-	if (wyrmgus::faction::get_all()[this->Faction]->Type == FactionTypeTribe) {
+	if (wyrmgus::faction::get_all()[this->Faction]->get_type() == wyrmgus::faction_type::tribe) {
 		return wyrmgus::faction::get_all()[this->Faction]->get_name();
-	} else if (wyrmgus::faction::get_all()[this->Faction]->Type == FactionTypePolity) {
+	} else if (wyrmgus::faction::get_all()[this->Faction]->get_type() == wyrmgus::faction_type::polity) {
 //		return this->GetTitle() + " of " + wyrmgus::faction::get_all()[this->Faction]->Name;
 	}
 	

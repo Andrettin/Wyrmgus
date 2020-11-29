@@ -385,7 +385,7 @@ static void Finish(COrder_Built &order, CUnit &unit)
 		amount = 100;
 	}
 	//Wyrmgus start
-	if (!amount && unit.Player->HasNeutralFactionType()) { //trading companies and etc. get their buildings constructed automatically, since they aren't supposed to have workers
+	if (!amount && unit.Player->has_neutral_faction_type()) { //trading companies and etc. get their buildings constructed automatically, since they aren't supposed to have workers
 		amount = 100;
 	}
 	//Wyrmgus end

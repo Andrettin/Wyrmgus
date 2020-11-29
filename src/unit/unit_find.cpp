@@ -135,7 +135,7 @@ VisitResult TerrainFinder::Visit(TerrainTraversal &terrainTraversal, const Vec2i
 	}
 	
 	//Wyrmgus start
-	if (CMap::Map.Field(pos, z)->get_owner() != nullptr && CMap::Map.Field(pos, z)->get_owner() != &player && !CMap::Map.Field(pos, z)->get_owner()->HasNeutralFactionType() && !player.HasNeutralFactionType()) {
+	if (CMap::Map.Field(pos, z)->get_owner() != nullptr && CMap::Map.Field(pos, z)->get_owner() != &player && !CMap::Map.Field(pos, z)->get_owner()->has_neutral_faction_type() && !player.has_neutral_faction_type()) {
 		return VisitResult::DeadEnd;
 	}
 	//Wyrmgus end
@@ -617,7 +617,7 @@ VisitResult ResourceUnitFinder::Visit(TerrainTraversal &terrainTraversal, const 
 //	CUnit *mine = Map.Field(pos)->UnitCache.find(res_finder);
 	CUnit *mine = worker.MapLayer->Field(pos)->UnitCache.find(res_finder);
 	
-	if (worker.MapLayer->Field(pos)->get_owner() != nullptr && worker.MapLayer->Field(pos)->get_owner() != worker.Player && !worker.MapLayer->Field(pos)->get_owner()->HasNeutralFactionType() && !worker.Player->HasNeutralFactionType() && (!mine || mine->Type->get_given_resource()->get_index() != TradeCost)) {
+	if (worker.MapLayer->Field(pos)->get_owner() != nullptr && worker.MapLayer->Field(pos)->get_owner() != worker.Player && !worker.MapLayer->Field(pos)->get_owner()->has_neutral_faction_type() && !worker.Player->has_neutral_faction_type() && (!mine || mine->Type->get_given_resource()->get_index() != TradeCost)) {
 		return VisitResult::DeadEnd;
 	}
 	//Wyrmgus end

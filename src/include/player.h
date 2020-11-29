@@ -607,7 +607,7 @@ public:
 
 	//Wyrmgus start
 	bool HasContactWith(const CPlayer &player) const;
-	bool HasNeutralFactionType() const;
+	bool has_neutral_faction_type() const;
 	bool HasBuildingAccess(const CPlayer &player, const ButtonCmd button_action = ButtonCmd::None) const;
 	bool HasHero(const wyrmgus::character *hero) const;
 	//Wyrmgus end
@@ -688,17 +688,6 @@ private:
 };
 
 //Wyrmgus start
-enum FactionTypes {
-	FactionTypeNoFactionType,
-	FactionTypeTribe,
-	FactionTypePolity,
-	FactionTypeMercenaryCompany,
-	FactionTypeHolyOrder,
-	FactionTypeTradingCompany,
-	
-	MaxFactionTypes
-};
-
 enum class ForceType {
 	None = -1,
 	Land,
@@ -709,7 +698,7 @@ enum class ForceType {
 	Count
 };
 
-class CForceTemplate
+class CForceTemplate final
 {
 public:
 	const std::vector<std::pair<const wyrmgus::unit_class *, int>> &get_units() const
@@ -730,7 +719,7 @@ private:
 	std::vector<std::pair<const wyrmgus::unit_class *, int>> units;	/// vector containing each unit class belonging to the force template, and the respective quantity
 };
 
-class CAiBuildingTemplate
+class CAiBuildingTemplate final
 {
 public:
 	const wyrmgus::unit_class *get_unit_class() const
@@ -895,8 +884,6 @@ inline bool CanSelectMultipleUnits(const CPlayer &player)
 
 //Wyrmgus start
 extern void NetworkSetFaction(int player, const std::string &faction_name);
-extern std::string GetFactionTypeNameById(int faction_type);
-extern int GetFactionTypeIdByName(const std::string &faction_type);
 extern std::string GetForceTypeNameById(const ForceType force_type);
 extern ForceType GetForceTypeIdByName(const std::string &force_type);
 extern bool IsNameValidForWord(const std::string &word_name);

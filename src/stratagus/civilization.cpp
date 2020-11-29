@@ -35,6 +35,7 @@
 #include "civilization_supergroup.h"
 #include "database/defines.h"
 #include "faction.h"
+#include "faction_type.h"
 #include "government_type.h"
 #include "player.h"
 #include "script.h"
@@ -533,13 +534,13 @@ std::string_view civilization::get_title_name(const government_type government_t
 	return string::empty_str;
 }
 
-std::string_view civilization::get_character_title_name(const character_title title_type, const int faction_type, wyrmgus::government_type government_type, const faction_tier tier, const gender gender) const
+std::string_view civilization::get_character_title_name(const character_title title_type, const faction_type faction_type, wyrmgus::government_type government_type, const faction_tier tier, const gender gender) const
 {
 	auto find_iterator = this->character_title_names.find(title_type);
 	if (find_iterator != this->character_title_names.end()) {
 		auto secondary_find_iterator = find_iterator->second.find(faction_type);
 		if (secondary_find_iterator == find_iterator->second.end()) {
-			secondary_find_iterator = find_iterator->second.find(FactionTypeNoFactionType);
+			secondary_find_iterator = find_iterator->second.find(faction_type::none);
 		}
 
 		if (secondary_find_iterator != find_iterator->second.end()) {
@@ -571,13 +572,13 @@ std::string_view civilization::get_character_title_name(const character_title ti
 	switch (title_type) {
 		case character_title::head_of_state:
 			switch (faction_type) {
-				case FactionTypeTribe:
+				case faction_type::tribe:
 					if (gender == gender::female) {
 						return "Chieftess";
 					} else {
 						return "Chieftain";
 					}
-				case FactionTypePolity:
+				case faction_type::polity:
 					switch (government_type) {
 						case government_type::monarchy:
 							switch (tier) {
@@ -696,7 +697,7 @@ void civilization::process_character_title_name_scope(const sml_data &scope)
 void civilization::process_character_title_name_scope(const character_title title_type, const sml_data &scope)
 {
 	const std::string &tag = scope.get_tag();
-	const int faction_type = GetFactionTypeIdByName(tag);
+	const faction_type faction_type = string_to_faction_type(tag);
 
 	scope.for_each_child([&](const sml_data &child_scope) {
 		faction::process_character_title_name_scope(this->character_title_names[title_type][faction_type], child_scope);

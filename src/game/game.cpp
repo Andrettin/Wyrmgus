@@ -49,6 +49,7 @@
 #include "editor.h"
 #include "faction.h"
 #include "faction_history.h"
+#include "faction_type.h"
 //Wyrmgus start
 #include "grand_strategy.h"
 //Wyrmgus end
@@ -573,8 +574,8 @@ int WriteMapSetup(const char *mapSetup, CMap &map, int writeTerrain, bool is_mod
 			f->printf("DefineFaction(\"%s\", {\n", faction->get_identifier().c_str());
 			f->printf("\tName = \"%s\",\n", faction->get_name().c_str());
 			f->printf("\tCivilization = \"%s\",\n", faction->get_civilization()->get_identifier().c_str());
-			if (faction->Type != FactionTypeNoFactionType) {
-				f->printf("\tType = \"%s\",\n", GetFactionTypeNameById(faction->Type).c_str());
+			if (faction->get_type() != wyrmgus::faction_type::none) {
+				f->printf("\tType = \"%s\",\n", wyrmgus::faction_type_to_string(faction->get_type()).c_str());
 			}
 			if (faction->get_parent_faction() != nullptr) {
 				f->printf("\tParentFaction = \"%s\",\n", faction->get_parent_faction()->get_identifier().c_str());
@@ -1243,12 +1244,12 @@ int GetGameSpeed()
 static void GameTypeMelee()
 {
 	for (int i = 0; i < PlayerMax - 1; ++i) {
-		if (CPlayer::Players[i]->HasNeutralFactionType()) {
+		if (CPlayer::Players[i]->has_neutral_faction_type()) {
 			continue;
 		}
 
 		for (int j = i + 1; j < PlayerMax - 1; ++j) {
-			if (CPlayer::Players[j]->HasNeutralFactionType()) {
+			if (CPlayer::Players[j]->has_neutral_faction_type()) {
 				continue;
 			}
 
@@ -1272,12 +1273,12 @@ static void GameTypeMelee()
 static void GameTypeFreeForAll()
 {
 	for (int i = 0; i < PlayerMax - 1; ++i) {
-		if (CPlayer::Players[i]->HasNeutralFactionType()) {
+		if (CPlayer::Players[i]->has_neutral_faction_type()) {
 			continue;
 		}
 
 		for (int j = i + 1; j < PlayerMax - 1; ++j) {
-			if (CPlayer::Players[j]->HasNeutralFactionType()) {
+			if (CPlayer::Players[j]->has_neutral_faction_type()) {
 				continue;
 			}
 			
@@ -1295,14 +1296,14 @@ static void GameTypeTopVsBottom()
 	const int middle = CMap::Map.Info.MapHeight / 2;
 
 	for (int i = 0; i < PlayerMax - 1; ++i) {
-		if (CPlayer::Players[i]->HasNeutralFactionType()) {
+		if (CPlayer::Players[i]->has_neutral_faction_type()) {
 			continue;
 		}
 
 		const bool top_i = CPlayer::Players[i]->StartPos.y <= middle;
 
 		for (int j = i + 1; j < PlayerMax - 1; ++j) {
-			if (CPlayer::Players[j]->HasNeutralFactionType()) {
+			if (CPlayer::Players[j]->has_neutral_faction_type()) {
 				continue;
 			}
 
@@ -1329,14 +1330,14 @@ static void GameTypeLeftVsRight()
 	const int middle = CMap::Map.Info.MapWidth / 2;
 
 	for (int i = 0; i < PlayerMax - 1; ++i) {
-		if (CPlayer::Players[i]->HasNeutralFactionType()) {
+		if (CPlayer::Players[i]->has_neutral_faction_type()) {
 			continue;
 		}
 
 		const bool left_i = CPlayer::Players[i]->StartPos.x <= middle;
 		
 		for (int j = i + 1; j < PlayerMax - 1; ++j) {
-			if (CPlayer::Players[j]->HasNeutralFactionType()) {
+			if (CPlayer::Players[j]->has_neutral_faction_type()) {
 				continue;
 			}
 		
@@ -1364,7 +1365,7 @@ static void GameTypeManVsMachine()
 		if (CPlayer::Players[i]->Type != PlayerPerson && CPlayer::Players[i]->Type != PlayerComputer) {
 			continue;
 		}
-		if (CPlayer::Players[i]->HasNeutralFactionType()) {
+		if (CPlayer::Players[i]->has_neutral_faction_type()) {
 			continue;
 		}
 
@@ -1372,7 +1373,7 @@ static void GameTypeManVsMachine()
 			if (CPlayer::Players[j]->Type != PlayerPerson && CPlayer::Players[j]->Type != PlayerComputer) {
 				continue;
 			}
-			if (CPlayer::Players[j]->HasNeutralFactionType()) {
+			if (CPlayer::Players[j]->has_neutral_faction_type()) {
 				continue;
 			}
 
@@ -1398,12 +1399,12 @@ static void GameTypeManTeamVsMachine()
 		if (CPlayer::Players[i]->Type != PlayerPerson && CPlayer::Players[i]->Type != PlayerComputer) {
 			continue;
 		}
-		if (CPlayer::Players[i]->HasNeutralFactionType()) {
+		if (CPlayer::Players[i]->has_neutral_faction_type()) {
 			continue;
 		}
 
 		for (int j = 0; j < PlayerMax - 1; ++j) {
-			if (CPlayer::Players[j]->HasNeutralFactionType()) {
+			if (CPlayer::Players[j]->has_neutral_faction_type()) {
 				continue;
 			}
 

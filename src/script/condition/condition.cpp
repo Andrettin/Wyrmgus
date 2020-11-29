@@ -31,6 +31,7 @@
 #include "script/condition/condition.h"
 
 #include "config.h"
+#include "faction_type.h"
 #include "map/map.h"
 #include "map/map_layer.h"
 #include "player.h"
@@ -312,7 +313,7 @@ bool check_special_conditions(const CUpgrade *target, const CPlayer *player, con
 	}
 
 	const faction *player_faction = player->get_faction();
-	if (player_faction != nullptr && player_faction->Type == FactionTypeHolyOrder) { // if the player is a holy order, and the upgrade is incompatible with its deity, don't allow it
+	if (player_faction != nullptr && player_faction->get_type() == faction_type::holy_order) { // if the player is a holy order, and the upgrade is incompatible with its deity, don't allow it
 		if (player_faction->get_holy_order_deity() != nullptr) {
 			const CUpgrade *deity_upgrade = player_faction->get_holy_order_deity()->get_upgrade();
 			if (deity_upgrade != nullptr) {

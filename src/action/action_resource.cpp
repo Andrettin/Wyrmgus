@@ -102,7 +102,7 @@ VisitResult NearReachableTerrainFinder::Visit(TerrainTraversal &terrainTraversal
 	}
 
 	//Wyrmgus start
-	if (CMap::Map.Field(pos, z)->get_owner() != nullptr && CMap::Map.Field(pos, z)->get_owner() != &player && !CMap::Map.Field(pos, z)->get_owner()->HasNeutralFactionType() && !player.HasNeutralFactionType()) {
+	if (CMap::Map.Field(pos, z)->get_owner() != nullptr && CMap::Map.Field(pos, z)->get_owner() != &player && !CMap::Map.Field(pos, z)->get_owner()->has_neutral_faction_type() && !player.has_neutral_faction_type()) {
 		return VisitResult::DeadEnd;
 	}
 	//Wyrmgus end

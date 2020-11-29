@@ -34,6 +34,7 @@
 #include "diplomacy_state.h"
 #include "faction_history.h"
 #include "faction_tier.h"
+#include "faction_type.h"
 #include "government_type.h"
 #include "luacallback.h"
 #include "player_color.h"
@@ -113,7 +114,7 @@ void faction::process_character_title_name_scope(std::map<faction_tier, std::map
 }
 
 faction::faction(const std::string &identifier)
-	: detailed_data_entry(identifier), default_tier(faction_tier::barony), min_tier(faction_tier::none), max_tier(faction_tier::none), default_government_type(government_type::monarchy)
+	: detailed_data_entry(identifier), type(faction_type::none), default_tier(faction_tier::barony), min_tier(faction_tier::none), max_tier(faction_tier::none), default_government_type(government_type::monarchy)
 {
 }
 
@@ -128,13 +129,6 @@ void faction::process_sml_property(const sml_property &property)
 
 	if (key == "adjective") {
 		this->Adjective = value;
-	} else if (key == "type") {
-		const int faction_type = GetFactionTypeIdByName(value);
-		if (faction_type != -1) {
-			this->Type = faction_type;
-		} else {
-			throw std::runtime_error("Faction type \"" + value + "\" doesn't exist.");
-		}
 	} else if (key == "faction_upgrade") {
 		this->FactionUpgrade = value;
 	} else {
@@ -174,7 +168,7 @@ void faction::process_sml_scope(const sml_data &scope)
 
 void faction::initialize()
 {
-	if (this->Type == FactionTypeTribe) {
+	if (this->get_type() == faction_type::tribe) {
 		this->definite_article = true;
 	}
 
@@ -226,6 +220,10 @@ void faction::check() const
 		throw std::runtime_error("Faction \"" + this->get_identifier() + "\" has no civilization.");
 	}
 
+	if (this->get_type() == faction_type::none) {
+		throw std::runtime_error("Faction \"" + this->get_identifier() + "\" has no type.");
+	}
+
 	if (this->get_preconditions() != nullptr) {
 		this->get_preconditions()->check_validity();
 	}
@@ -247,7 +245,7 @@ void faction::reset_history()
 
 std::string_view faction::get_title_name(const wyrmgus::government_type government_type, const faction_tier tier) const
 {
-	if (this->Type != FactionTypePolity) {
+	if (this->get_type() != faction_type::polity) {
 		return string::empty_str;
 	}
 
@@ -290,7 +288,7 @@ std::string_view faction::get_character_title_name(const character_title title_t
 		}
 	}
 
-	return this->get_civilization()->get_character_title_name(title_type, this->Type, government_type, tier, gender);
+	return this->get_civilization()->get_character_title_name(title_type, this->get_type(), government_type, tier, gender);
 }
 
 int faction::GetUpgradePriority(const CUpgrade *upgrade) const
@@ -338,7 +336,7 @@ CCurrency *faction::GetCurrency() const
 
 bool faction::uses_simple_name() const
 {
-	return this->simple_name || this->Type != FactionTypePolity;
+	return this->simple_name || this->get_type() != faction_type::polity;
 }
 
 const std::vector<std::unique_ptr<CForceTemplate>> &faction::GetForceTemplates(const ForceType force_type) const

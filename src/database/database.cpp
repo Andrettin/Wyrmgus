@@ -46,6 +46,7 @@
 #include "dynasty.h"
 #include "faction.h"
 #include "faction_tier.h"
+#include "faction_type.h"
 #include "gender.h"
 #include "government_type.h"
 #include "item/item_class.h"
@@ -231,6 +232,8 @@ QVariant database::process_sml_property_value(const sml_property &property, cons
 			new_property_value = QVariant::fromValue(faction::get(property.get_value()));
 		} else if (property_class_name == "wyrmgus::faction_tier") {
 			new_property_value = QVariant::fromValue(string_to_faction_tier(property.get_value()));
+		} else if (property_class_name == "wyrmgus::faction_type") {
+			new_property_value = QVariant::fromValue(string_to_faction_type(property.get_value()));
 		} else if (property_class_name == "wyrmgus::font*") {
 			new_property_value = QVariant::fromValue(font::get(property.get_value()));
 		} else if (property_class_name == "wyrmgus::font_color*") {
