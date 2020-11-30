@@ -428,6 +428,10 @@ void character::initialize()
 		this->civilization->add_character(this);
 	}
 
+	if (this->default_faction != nullptr) {
+		this->default_faction->add_character(this);
+	}
+
 	for (const std::unique_ptr<persistent_item> &default_item : this->default_items) {
 		default_item->initialize();
 	}
