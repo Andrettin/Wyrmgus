@@ -101,8 +101,8 @@ class character : public detailed_data_entry, public data_type<character>, publi
 	Q_PROPERTY(wyrmgus::icon* icon READ get_base_icon WRITE set_base_icon)
 	Q_PROPERTY(wyrmgus::icon* heroic_icon MEMBER heroic_icon READ get_heroic_icon)
 	Q_PROPERTY(wyrmgus::unit_type* unit_type MEMBER unit_type WRITE set_unit_type)
-	Q_PROPERTY(wyrmgus::civilization* civilization MEMBER civilization READ get_civilization)
-	Q_PROPERTY(wyrmgus::faction* default_faction MEMBER default_faction READ get_default_faction)
+	Q_PROPERTY(wyrmgus::civilization* civilization MEMBER civilization)
+	Q_PROPERTY(wyrmgus::faction* default_faction MEMBER default_faction)
 	Q_PROPERTY(wyrmgus::gender gender READ get_gender WRITE set_gender)
 	Q_PROPERTY(wyrmgus::site* home_settlement MEMBER home_settlement)
 	Q_PROPERTY(wyrmgus::character* father READ get_father WRITE set_father)
@@ -178,12 +178,12 @@ public:
 		return this->trait;
 	}
 
-	civilization *get_civilization() const
+	const civilization *get_civilization() const
 	{
 		return this->civilization;
 	}
 
-	faction *get_default_faction() const
+	const faction *get_default_faction() const
 	{
 		return this->default_faction;
 	}

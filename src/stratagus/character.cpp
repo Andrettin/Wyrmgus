@@ -424,8 +424,8 @@ void character::initialize()
 		this->home_settlement->add_character(this);
 	}
 
-	if (this->get_civilization() != nullptr) {
-		this->get_civilization()->add_character(this);
+	if (this->civilization != nullptr) {
+		this->civilization->add_character(this);
 	}
 
 	for (const std::unique_ptr<persistent_item> &default_item : this->default_items) {
@@ -499,7 +499,7 @@ void character::reset_history()
 	//use the home settlement as the default location
 	const site *default_location_site = this->home_settlement;
 
-	this->history = std::make_unique<character_history>(this->get_default_faction(), default_location_site);
+	this->history = std::make_unique<character_history>(this->default_faction, default_location_site);
 }
 
 void character::GenerateMissingDates()
