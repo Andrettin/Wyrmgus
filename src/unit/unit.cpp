@@ -5581,11 +5581,36 @@ int CUnit::GetModifiedVariable(const int index, const VariableAttribute variable
 			}
 			value = std::min<int>(this->CurrentSightRange, value); // if the unit's current sight range is smaller than its attack range, use it instead
 			break;
-		case SPEED_INDEX:
-			if (this->MapLayer != nullptr && this->Type->UnitType != UnitTypeType::Fly && this->Type->UnitType != UnitTypeType::FlyLow && this->Type->UnitType != UnitTypeType::Space) {
-				value += DefaultTileMovementCost - this->MapLayer->Field(this->Offset)->get_movement_cost();
+		case SPEED_INDEX: {
+			const wyrmgus::unit_type *unit_type = this->Type;
+
+			if (!unit_type->CanMove()) {
+				break;
+			}
+
+			const CMapLayer *map_layer = this->MapLayer;
+
+			if (map_layer == nullptr) {
+				break;
+			}
+
+			const UnitTypeType unit_type_type = unit_type->UnitType;
+			if (unit_type_type != UnitTypeType::Fly && unit_type_type != UnitTypeType::FlyLow && unit_type_type != UnitTypeType::Space) {
+				int movement_cost = 0;
+
+				for (int x = 0; x < unit_type->get_tile_width(); ++x) {
+					for (int y = 0; y < unit_type->get_tile_height(); ++y) {
+						movement_cost += map_layer->Field(this->tilePos + Vec2i(x, y))->get_movement_cost();
+					}
+				}
+
+				const int tile_count = unit_type->get_tile_width() * unit_type->get_tile_height();
+				movement_cost /= tile_count;
+
+				value += DefaultTileMovementCost - movement_cost;
 			}
 			break;
+		}
 		default:
 			break;
 	}
