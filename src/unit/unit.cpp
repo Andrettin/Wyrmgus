@@ -2492,6 +2492,7 @@ void CUnit::GenerateUnique(CUnit *dropper, CPlayer *dropper_player)
 void CUnit::UpdateSoldUnits()
 {
 	static constexpr int recruitable_hero_max = 4;
+	static constexpr int sold_item_max = 15;
 
 	if (!this->Type->BoolFlag[RECRUITHEROES_INDEX].value && this->Type->SoldUnits.empty() && this->SoldUnits.empty()) {
 		return;
@@ -2507,7 +2508,7 @@ void CUnit::UpdateSoldUnits()
 	}
 	this->SoldUnits.clear();
 	
-	std::vector<wyrmgus::unit_type *> potential_items;
+	std::vector<const wyrmgus::unit_type *> potential_items;
 	std::vector<wyrmgus::character *> potential_heroes;
 	if (this->Type->BoolFlag[RECRUITHEROES_INDEX].value && !IsNetworkGame()) { // allow heroes to be recruited at town halls
 		const wyrmgus::civilization *civilization = this->get_civilization();
@@ -2524,8 +2525,7 @@ void CUnit::UpdateSoldUnits()
 				std::vector<wyrmgus::character *> potential_faction_heroes = this->Player->get_recruitable_heroes_from_list(faction->get_characters());
 
 				while (!potential_faction_heroes.empty() && static_cast<int>(potential_heroes.size()) < recruitable_hero_max) {
-					wyrmgus::character *hero = potential_faction_heroes[SyncRand(potential_faction_heroes.size())];
-					wyrmgus::vector::remove(potential_faction_heroes, hero);
+					wyrmgus::character *hero = wyrmgus::vector::take_random(potential_faction_heroes);
 
 					if (wyrmgus::vector::contains(potential_heroes, hero)) {
 						continue;
@@ -2540,8 +2540,7 @@ void CUnit::UpdateSoldUnits()
 				std::vector<wyrmgus::character *> potential_civilization_heroes = this->Player->get_recruitable_heroes_from_list(civilization->get_characters());
 
 				while (!potential_civilization_heroes.empty() && static_cast<int>(potential_heroes.size()) < recruitable_hero_max) {
-					wyrmgus::character *hero = potential_civilization_heroes[SyncRand(potential_civilization_heroes.size())];
-					wyrmgus::vector::remove(potential_civilization_heroes, hero);
+					wyrmgus::character *hero = wyrmgus::vector::take_random(potential_civilization_heroes);
 
 					if (wyrmgus::vector::contains(potential_heroes, hero)) {
 						continue;
@@ -2553,19 +2552,20 @@ void CUnit::UpdateSoldUnits()
 		}
 
 		if (this->Player == CPlayer::GetThisPlayer()) {
-			for (std::map<std::string, wyrmgus::character *>::iterator iterator = CustomHeroes.begin(); iterator != CustomHeroes.end(); ++iterator) {
+			for (const auto &kv_pair : CustomHeroes) {
+				wyrmgus::character *custom_hero = kv_pair.second;
 				if (
-					(iterator->second->get_civilization() && iterator->second->get_civilization() == civilization || iterator->second->get_unit_type() == civilization->get_class_unit_type(iterator->second->get_unit_type()->get_unit_class()))
-					&& check_conditions(iterator->second->get_unit_type(), this, true) && iterator->second->CanAppear()
+					(custom_hero->get_civilization() != nullptr && custom_hero->get_civilization() == civilization || custom_hero->get_unit_type() == civilization->get_class_unit_type(custom_hero->get_unit_type()->get_unit_class()))
+					&& check_conditions(custom_hero->get_unit_type(), this, true) && custom_hero->CanAppear()
 				) {
-					potential_heroes.push_back(iterator->second);
+					potential_heroes.push_back(custom_hero);
 				}
 			}
 		}
 	} else {
-		for (size_t i = 0; i < this->Type->SoldUnits.size(); ++i) {
-			if (check_conditions(this->Type->SoldUnits[i], this)) {
-				potential_items.push_back(this->Type->SoldUnits[i]);
+		for (const wyrmgus::unit_type *sold_unit_type : this->Type->SoldUnits) {
+			if (check_conditions(sold_unit_type, this)) {
+				potential_items.push_back(sold_unit_type);
 			}
 		}
 	}
@@ -2576,18 +2576,17 @@ void CUnit::UpdateSoldUnits()
 	
 	int sold_unit_max = recruitable_hero_max;
 	if (!potential_items.empty()) {
-		sold_unit_max = 15;
+		sold_unit_max = sold_item_max;
 	}
 	
 	for (int i = 0; i < sold_unit_max; ++i) {
 		CUnit *new_unit = nullptr;
 		if (!potential_heroes.empty()) {
-			wyrmgus::character *chosen_hero = potential_heroes[SyncRand(potential_heroes.size())];
+			wyrmgus::character *chosen_hero = wyrmgus::vector::take_random(potential_heroes);
 			new_unit = MakeUnitAndPlace(this->tilePos, *chosen_hero->get_unit_type(), CPlayer::Players[PlayerNumNeutral], this->MapLayer->ID);
 			new_unit->set_character(chosen_hero);
-			wyrmgus::vector::remove(potential_heroes, chosen_hero);
 		} else {
-			wyrmgus::unit_type *chosen_unit_type = potential_items[SyncRand(potential_items.size())];
+			const wyrmgus::unit_type *chosen_unit_type = wyrmgus::vector::get_random(potential_items);
 			new_unit = MakeUnitAndPlace(this->tilePos, *chosen_unit_type, CPlayer::Players[PlayerNumNeutral], this->MapLayer->ID);
 			new_unit->GenerateSpecialProperties(this, this->Player, true, true);
 			new_unit->Identified = true;
@@ -2601,6 +2600,7 @@ void CUnit::UpdateSoldUnits()
 			break;
 		}
 	}
+
 	if (IsOnlySelected(*this)) {
 		UI.ButtonPanel.Update();
 	}
