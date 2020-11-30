@@ -1871,6 +1871,10 @@ void map_template::apply_historical_unit(const historical_unit *historical_unit,
 
 	const historical_location *unit_location = unit_history->get_location();
 
+	if (unit_location == nullptr) {
+		throw std::runtime_error("Historical unit \"" + historical_unit->get_identifier() + "\" has no historical location.");
+	}
+
 	const bool in_another_map_template = unit_location->get_map_template() != this;
 	if (in_another_map_template) {
 		return;
@@ -1963,6 +1967,11 @@ void map_template::apply_character(character *character, const QPoint &template_
 	}
 
 	const historical_location *character_location = character_history->get_location();
+
+	if (character_location == nullptr) {
+		throw std::runtime_error("Character \"" + character->get_identifier() + "\" has no historical location.");
+	}
+
 	const bool in_another_map_template = character_location->get_map_template() != this;
 	if (in_another_map_template) {
 		return;
