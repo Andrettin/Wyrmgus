@@ -167,9 +167,6 @@ static int CclDefineQuest(lua_State *l)
 						objective->objective_string = LuaToString(l, -1, k + 1);
 					} else if (!strcmp(value, "quantity")) {
 						objective->quantity = LuaToNumber(l, -1, k + 1);
-					} else if (!strcmp(value, "resource")) {
-						const wyrmgus::resource *resource = wyrmgus::resource::get(LuaToString(l, -1, k + 1));
-						objective->resource = resource;
 					} else if (!strcmp(value, "unit-class")) {
 						const wyrmgus::unit_class *unit_class = wyrmgus::unit_class::get(LuaToString(l, -1, k + 1));
 						objective->unit_classes.push_back(unit_class);

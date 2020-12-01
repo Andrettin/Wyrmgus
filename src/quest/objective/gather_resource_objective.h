@@ -30,6 +30,7 @@
 #include "quest/objective/quest_objective.h"
 #include "quest/objective_type.h"
 #include "quest/player_quest_objective.h"
+#include "resource.h"
 
 namespace wyrmgus {
 
@@ -47,14 +48,43 @@ public:
 		return objective_type::gather_resource;
 	}
 
+	virtual void process_sml_property(const wyrmgus::sml_property &property) override
+	{
+		const std::string &key = property.get_key();
+		const std::string &value = property.get_value();
+
+		if (key == "resource") {
+			this->resource = resource::get(value);
+		} else {
+			quest_objective::process_sml_property(property);
+		}
+	}
+
+	virtual void check() const override
+	{
+		if (this->resource == nullptr) {
+			throw std::runtime_error("Gather resource quest objective has no resource set for it.");
+		}
+	}
+
+	virtual std::string generate_objective_string(const CPlayer *player) const override
+	{
+		Q_UNUSED(player)
+
+		return "Gather " + std::to_string(this->get_quantity()) + " " + this->resource->get_name();
+	}
+
 	virtual void on_resource_gathered(const wyrmgus::resource *resource, const int quantity, player_quest_objective *player_quest_objective) const override
 	{
-		if (this->get_resource() != resource) {
+		if (this->resource != resource) {
 			return;
 		}
 
 		player_quest_objective->change_counter(quantity);
 	}
+
+private:
+	const wyrmgus::resource *resource = nullptr;
 };
 
 }

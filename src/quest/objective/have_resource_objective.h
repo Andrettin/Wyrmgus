@@ -44,11 +44,40 @@ public:
 		return objective_type::have_resource;
 	}
 
+	virtual void process_sml_property(const wyrmgus::sml_property &property) override
+	{
+		const std::string &key = property.get_key();
+		const std::string &value = property.get_value();
+
+		if (key == "resource") {
+			this->resource = resource::get(value);
+		} else {
+			quest_objective::process_sml_property(property);
+		}
+	}
+
+	virtual void check() const override
+	{
+		if (this->resource == nullptr) {
+			throw std::runtime_error("Have resource quest objective has no resource set for it.");
+		}
+	}
+
+	virtual std::string generate_objective_string(const CPlayer *player) const override
+	{
+		Q_UNUSED(player)
+
+		return "Have " + std::to_string(this->get_quantity()) + " " + this->resource->get_name();
+	}
+
 	virtual void update_counter(player_quest_objective *player_quest_objective) const override
 	{
-		const int resource_quantity = player_quest_objective->get_player()->get_resource(this->get_resource(), STORE_BOTH);
+		const int resource_quantity = player_quest_objective->get_player()->get_resource(this->resource, STORE_BOTH);
 		player_quest_objective->set_counter(resource_quantity);
 	}
+
+private:
+	const wyrmgus::resource *resource = nullptr;
 };
 
 }

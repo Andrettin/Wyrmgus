@@ -72,7 +72,7 @@ public:
 	{
 	}
 
-	void process_sml_property(const wyrmgus::sml_property &property);
+	virtual void process_sml_property(const wyrmgus::sml_property &property);
 	void process_sml_scope(const wyrmgus::sml_data &scope);
 
 	virtual void check() const
@@ -149,11 +149,6 @@ public:
 		Q_UNUSED(player_quest_objective)
 	}
 
-	const resource *get_resource() const
-	{
-		return this->resource;
-	}
-
 	const std::vector<const unit_class *> &get_unit_classes() const
 	{
 		return this->unit_classes;
@@ -184,7 +179,6 @@ private:
 	int index = -1;
 	int quantity = 1;
 	std::string objective_string;
-	const wyrmgus::resource *resource = nullptr;
 	std::vector<const unit_class *> unit_classes;
 	std::vector<const unit_type *> unit_types;
 	const CUpgrade *upgrade = nullptr;
