@@ -30,6 +30,7 @@
 #include "text_processor.h"
 
 #include "faction.h"
+#include "language/word.h"
 #include "unit/unit_type.h"
 #include "util/queue_util.h"
 #include "util/string_util.h"
@@ -88,6 +89,13 @@ std::string text_processor::process_tokens(std::queue<std::string> &&tokens) con
 		}
 
 		return this->process_unit_type_tokens(unit_type, std::move(tokens));
+	} else if (front_subtoken == "word") {
+		const wyrmgus::word *word = nullptr;
+		if (!subtokens.empty()) {
+			word = word::get(queue::take(subtokens));
+		}
+
+		return this->process_word_tokens(word, std::move(tokens));
 	}
 
 	throw std::runtime_error("Failed to process token \"" + token + "\".");
@@ -139,6 +147,56 @@ std::string text_processor::process_unit_type_tokens(const wyrmgus::unit_type *u
 	}
 
 	throw std::runtime_error("Failed to process unit type token \"" + token + "\".");
+}
+
+std::string text_processor::process_word_tokens(const wyrmgus::word *word, std::queue<std::string> &&tokens) const
+{
+	if (word == nullptr) {
+		throw std::runtime_error("No word provided when processing word tokens.");
+	}
+
+	if (tokens.empty()) {
+		throw std::runtime_error("No tokens provided when processing word tokens.");
+	}
+
+	const std::string token = queue::take(tokens);
+	const size_t remaining_tokens_count = tokens.size();
+
+	switch (remaining_tokens_count) {
+		case 0:
+			if (token == "name") {
+				return word->get_name();
+			}
+			break;
+		case 1:
+			if (token == "meanings") {
+				return string::to_lower(this->process_word_meaning_tokens(word, std::move(tokens)));
+			}
+			break;
+		default:
+			throw std::runtime_error("Too many tokens provided when processing word token \"" + token + "\".");
+	}
+
+	throw std::runtime_error("Failed to process word token \"" + token + "\".");
+}
+
+std::string text_processor::process_word_meaning_tokens(const wyrmgus::word *word, std::queue<std::string> &&tokens) const
+{
+	if (word == nullptr) {
+		throw std::runtime_error("No word provided when processing word meaning tokens.");
+	}
+
+	if (tokens.empty()) {
+		throw std::runtime_error("No tokens provided when processing word meaning tokens.");
+	}
+
+	const std::string token = queue::take(tokens);
+
+	if (!tokens.empty()) {
+		throw std::runtime_error("Too many tokens provided when processing word meaning token \"" + token + "\".");
+	}
+
+	return word->get_meanings().at(std::stoi(token) - 1);
 }
 
 }
