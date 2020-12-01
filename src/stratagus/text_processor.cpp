@@ -30,6 +30,7 @@
 #include "text_processor.h"
 
 #include "faction.h"
+#include "unit/unit_type.h"
 #include "util/queue_util.h"
 #include "util/string_util.h"
 
@@ -80,6 +81,13 @@ std::string text_processor::process_tokens(std::queue<std::string> &&tokens) con
 		}
 
 		return this->process_faction_tokens(faction, std::move(tokens));
+	} else if (front_subtoken == "unit_type") {
+		const wyrmgus::unit_type *unit_type = nullptr;
+		if (!subtokens.empty()) {
+			unit_type = unit_type::get(queue::take(subtokens));
+		}
+
+		return this->process_unit_type_tokens(unit_type, std::move(tokens));
 	}
 
 	throw std::runtime_error("Failed to process token \"" + token + "\".");
@@ -87,6 +95,10 @@ std::string text_processor::process_tokens(std::queue<std::string> &&tokens) con
 
 std::string text_processor::process_faction_tokens(const wyrmgus::faction *faction, std::queue<std::string> &&tokens) const
 {
+	if (faction == nullptr) {
+		throw std::runtime_error("No faction provided when processing faction tokens.");
+	}
+
 	if (tokens.empty()) {
 		throw std::runtime_error("No tokens provided when processing faction tokens.");
 	}
@@ -104,6 +116,29 @@ std::string text_processor::process_faction_tokens(const wyrmgus::faction *facti
 	}
 
 	throw std::runtime_error("Failed to process faction token \"" + token + "\".");
+}
+
+std::string text_processor::process_unit_type_tokens(const wyrmgus::unit_type *unit_type, std::queue<std::string> &&tokens) const
+{
+	if (unit_type == nullptr) {
+		throw std::runtime_error("No unit type provided when processing unit type tokens.");
+	}
+
+	if (tokens.empty()) {
+		throw std::runtime_error("No tokens provided when processing unit type tokens.");
+	}
+
+	const std::string token = queue::take(tokens);
+
+	if (!tokens.empty()) {
+		throw std::runtime_error("Too many tokens provided when processing unit type token \"" + token + "\".");
+	}
+
+	if (token == "name") {
+		return unit_type->get_name();
+	}
+
+	throw std::runtime_error("Failed to process unit type token \"" + token + "\".");
 }
 
 }

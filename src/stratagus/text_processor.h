@@ -30,6 +30,7 @@
 namespace wyrmgus {
 
 class faction;
+class unit_type;
 
 class text_processor final
 {
@@ -41,6 +42,7 @@ public:
 	std::string process_text(const std::string &text) const;
 	std::string process_tokens(std::queue<std::string> &&tokens) const;
 	std::string process_faction_tokens(const faction *faction, std::queue<std::string> &&tokens) const;
+	std::string process_unit_type_tokens(const unit_type *unit_type, std::queue<std::string> &&tokens) const;
 
 private:
 	const wyrmgus::faction *faction = nullptr;
