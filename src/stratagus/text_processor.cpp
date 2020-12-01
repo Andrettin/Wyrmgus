@@ -37,26 +37,30 @@
 
 namespace wyrmgus {
 
-std::string text_processor::process_text(const std::string &text) const
+std::string text_processor::process_text(std::string &&text) const
 {
-	std::string result = text;
-
 	size_t find_pos = 0;
-	while ((find_pos = result.find('[', find_pos)) != std::string::npos) {
-		const size_t end_pos = result.find(']', find_pos);
+	while ((find_pos = text.find('[', find_pos)) != std::string::npos) {
+		const size_t end_pos = text.find(']', find_pos);
 		if (end_pos == std::string::npos) {
-			return result;
+			return text;
 		}
 
-		const std::string substring = result.substr(find_pos + 1, end_pos - (find_pos + 1));
+		const std::string substring = text.substr(find_pos + 1, end_pos - (find_pos + 1));
 		std::queue<std::string> tokens = string::split_to_queue(substring, '.');
 		const std::string replacement_str = this->process_tokens(std::move(tokens));
-		result.replace(find_pos, end_pos + 1 - find_pos, replacement_str);
+		text.replace(find_pos, end_pos + 1 - find_pos, replacement_str);
 
 		++find_pos;
 	}
 
-	return result;
+	return text;
+}
+
+std::string text_processor::process_text(const std::string &text) const
+{
+	std::string result = text;
+	return this->process_text(std::move(result));
 }
 
 std::string text_processor::process_tokens(std::queue<std::string> &&tokens) const

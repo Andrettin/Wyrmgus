@@ -38,7 +38,7 @@ void detailed_data_entry::initialize()
 	//process the description text for the detailed data entry
 	if (!this->description.empty()) {
 		const text_processor text_processor = this->create_text_processor();
-		this->description = text_processor.process_text(this->description);
+		this->description = text_processor.process_text(std::move(this->description));
 	}
 
 	data_entry::initialize();

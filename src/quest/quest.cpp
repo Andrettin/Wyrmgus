@@ -144,7 +144,7 @@ void quest::initialize()
 	//process the hint text for the quest
 	if (!this->hint.empty()) {
 		const text_processor text_processor = this->create_text_processor();
-		this->hint = text_processor.process_text(this->hint);
+		this->hint = text_processor.process_text(std::move(this->hint));
 	}
 
 	detailed_data_entry::initialize();
