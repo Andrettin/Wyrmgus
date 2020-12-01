@@ -35,6 +35,8 @@
 
 namespace wyrmgus {
 
+class text_processor;
+
 //a data entry with description, quote and background, i.e. a data entry that can be shown in the encyclopedia
 class detailed_data_entry : public named_data_entry
 {
@@ -51,6 +53,8 @@ public:
 	}
 
 	virtual ~detailed_data_entry() {}
+
+	virtual void initialize() override;
 
 	const std::string &get_notes() const
 	{
@@ -111,6 +115,8 @@ public:
 	{
 		return QString::fromStdString(this->get_background());
 	}
+
+	virtual text_processor create_text_processor() const;
 
 private:
 	std::string notes; //gameplay-related notes about the data entry

@@ -70,7 +70,7 @@ void taxon_base::initialize()
 
 	name_generator::propagate_ungendered_names(this->specimen_names);
 
-	data_entry::initialize();
+	detailed_data_entry::initialize();
 }
 
 const taxon *taxon_base::get_supertaxon_of_rank(const taxonomic_rank rank) const

@@ -367,6 +367,8 @@ public:
 		return this->conditions;
 	}
 
+	virtual text_processor create_text_processor() const override;
+
 	CUnit *get_unit() const;
 
 	CDate BirthDate;			/// Date in which the character was born

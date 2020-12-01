@@ -25,25 +25,28 @@
 //      02111-1307, USA.
 //
 
-#include "civilization_group.h"
+#include "stratagus.h"
 
-#include "civilization_supergroup.h"
+#include "database/detailed_data_entry.h"
+
+#include "text_processor.h"
 
 namespace wyrmgus {
 
-void civilization_group::initialize()
+void detailed_data_entry::initialize()
 {
-	if (this->get_supergroup() == nullptr) {
-		throw std::runtime_error("Civilization group \"" + this->get_identifier() + "\" has no civilization supergroup.");
+	//process the description text for the detailed data entry
+	if (!this->description.empty()) {
+		const text_processor text_processor = this->create_text_processor();
+		this->description = text_processor.process_text(this->description);
 	}
 
-	if (this->get_species() == nullptr) {
-		this->set_species(this->get_supergroup()->get_species());
-	}
+	data_entry::initialize();
+}
 
-	this->get_supergroup()->add_names_from(this);
-
-	civilization_base::initialize();
+text_processor detailed_data_entry::create_text_processor() const
+{
+	return text_processor(nullptr);
 }
 
 }

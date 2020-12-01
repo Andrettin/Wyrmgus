@@ -163,7 +163,7 @@ void campaign::initialize()
 		this->start_date_calendar = nullptr;
 	}
 
-	data_entry::initialize();
+	detailed_data_entry::initialize();
 }
 
 const species *campaign::get_species() const

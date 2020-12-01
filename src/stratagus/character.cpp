@@ -469,13 +469,7 @@ void character::initialize()
 		location->initialize();
 	}
 
-	//process the description text for the character
-	if (!this->get_description().empty()) {
-		const text_processor text_processor(this->get_default_faction());
-		this->set_description(text_processor.process_text(this->get_description()));
-	}
-
-	data_entry::initialize();
+	detailed_data_entry::initialize();
 }
 
 void character::check() const
@@ -758,6 +752,11 @@ void character::UpdateAttributes()
 void character::remove_ability(const CUpgrade *ability)
 {
 	vector::remove(this->abilities, ability);
+}
+
+text_processor character::create_text_processor() const
+{
+	return text_processor(this->get_default_faction());
 }
 
 CUnit *character::get_unit() const

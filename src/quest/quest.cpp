@@ -140,7 +140,7 @@ void quest::initialize()
 		this->civilization->Quests.push_back(this);
 	}
 
-	data_entry::initialize();
+	detailed_data_entry::initialize();
 }
 
 void quest::check() const

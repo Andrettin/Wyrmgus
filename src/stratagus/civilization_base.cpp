@@ -71,7 +71,7 @@ void civilization_base::initialize()
 {
 	name_generator::propagate_ungendered_names(this->personal_names);
 
-	data_entry::initialize();
+	detailed_data_entry::initialize();
 }
 
 const std::vector<std::string> &civilization_base::get_personal_names(const gender gender) const

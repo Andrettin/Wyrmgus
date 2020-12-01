@@ -211,7 +211,7 @@ void faction::initialize()
 		this->max_tier = this->get_default_tier();
 	}
 
-	data_entry::initialize();
+	detailed_data_entry::initialize();
 }
 
 void faction::check() const
