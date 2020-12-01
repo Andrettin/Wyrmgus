@@ -41,6 +41,7 @@
 #include "script/condition/and_condition.h"
 #include "script/effect/effect_list.h"
 #include "script.h"
+#include "text_processor.h"
 
 wyrmgus::quest *CurrentQuest = nullptr;
 
@@ -138,6 +139,12 @@ void quest::initialize()
 {
 	if (!this->Hidden && this->civilization != nullptr && std::find(this->civilization->Quests.begin(), this->civilization->Quests.end(), this) == this->civilization->Quests.end()) {
 		this->civilization->Quests.push_back(this);
+	}
+
+	//process the hint text for the quest
+	if (!this->hint.empty()) {
+		const text_processor text_processor = this->create_text_processor();
+		this->hint = text_processor.process_text(this->hint);
 	}
 
 	detailed_data_entry::initialize();
