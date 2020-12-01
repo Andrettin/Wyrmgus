@@ -44,7 +44,7 @@ public:
 
 	virtual void check() const override
 	{
-		if (this->get_character() == nullptr) {
+		if (this->character == nullptr) {
 			throw std::runtime_error("Hero must survive quest objective has no character set for it.");
 		}
 	}
@@ -64,12 +64,12 @@ public:
 	{
 		Q_UNUSED(player)
 
-		return this->get_character()->get_full_name() + " must survive";
+		return this->character->get_full_name() + " must survive";
 	}
 
 	virtual bool is_quest_acceptance_allowed(const CPlayer *player) const override
 	{
-		if (!player->HasHero(this->get_character())) {
+		if (!player->HasHero(this->character)) {
 			return false;
 		}
 
@@ -78,16 +78,11 @@ public:
 
 	virtual std::pair<bool, std::string> check_failure(const CPlayer *player) const override
 	{
-		if (!player->HasHero(this->get_character())) {
+		if (!player->HasHero(this->character)) {
 			return std::make_pair(true, "A hero necessary for the quest has died.");
 		}
 
 		return quest_objective::check_failure(player);
-	}
-
-	const character *get_character() const
-	{
-		return this->character;
 	}
 
 private:

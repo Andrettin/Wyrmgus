@@ -50,12 +50,12 @@ public:
 	{
 		Q_UNUSED(player)
 
-		return "Kill " + this->get_character()->get_full_name();
+		return "Kill " + this->character->get_full_name();
 	}
 
 	virtual bool is_quest_acceptance_allowed(const CPlayer *player) const override
 	{
-		if (this->get_character()->CanAppear()) {
+		if (this->character->CanAppear()) {
 			//if the character "can appear" it doesn't already exist, and thus can't be destroyed
 			return false;
 		}
@@ -65,7 +65,7 @@ public:
 
 	virtual std::pair<bool, std::string> check_failure(const CPlayer *player) const override
 	{
-		if (this->get_character()->CanAppear()) {
+		if (this->character->CanAppear()) {
 			//if is supposed to destroy a character, but it is nowhere to be found, fail the quest
 			return std::make_pair(true, "The target no longer exists.");
 		}
@@ -75,16 +75,11 @@ public:
 
 	virtual bool is_objective_unit(const CUnit *unit) const override
 	{
-		if (unit->get_character() == nullptr || this->get_character() != unit->get_character()) {
+		if (unit->get_character() == nullptr || this->character != unit->get_character()) {
 			return false;
 		}
 
 		return destroy_unit_objective_base::is_objective_unit(unit);
-	}
-
-	const character *get_character() const
-	{
-		return this->character;
 	}
 
 private:

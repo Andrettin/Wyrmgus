@@ -50,12 +50,12 @@ public:
 	{
 		Q_UNUSED(player)
 
-		return "Recruit " + this->get_character()->get_full_name();
+		return "Recruit " + this->character->get_full_name();
 	}
 
 	virtual bool is_quest_acceptance_allowed(const CPlayer *player) const override
 	{
-		if (!player->is_character_available_for_recruitment(this->get_character(), true)) {
+		if (!player->is_character_available_for_recruitment(this->character, true)) {
 			return false;
 		}
 
@@ -64,7 +64,7 @@ public:
 
 	virtual std::pair<bool, std::string> check_failure(const CPlayer *player) const override
 	{
-		if (!player->HasHero(this->get_character()) && !player->is_character_available_for_recruitment(this->get_character(), true)) {
+		if (!player->HasHero(this->character) && !player->is_character_available_for_recruitment(this->character, true)) {
 			return std::make_pair(true, "The hero can no longer be recruited.");
 		}
 
@@ -73,13 +73,8 @@ public:
 
 	virtual void update_counter(player_quest_objective *player_quest_objective) const override
 	{
-		const int count = player_quest_objective->get_player()->HasHero(this->get_character()) ? 1 : 0;
+		const int count = player_quest_objective->get_player()->HasHero(this->character) ? 1 : 0;
 		player_quest_objective->set_counter(count);
-	}
-
-	const character *get_character() const
-	{
-		return this->character;
 	}
 
 private:
