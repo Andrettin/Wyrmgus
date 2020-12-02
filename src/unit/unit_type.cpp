@@ -1325,7 +1325,7 @@ void unit_type::initialize()
 
 	CclCommand("if not (GetArrayIncludes(Units, \"" + this->get_identifier() + "\")) then table.insert(Units, \"" + this->get_identifier() + "\") end"); //FIXME: needed at present to make unit type data files work without scripting being necessary, but it isn't optimal to interact with a scripting table like "Units" in this manner (that table should probably be replaced with getting a list of unit types from the engine)
 
-	detailed_data_entry::initialize();
+	data_entry::initialize();
 }
 
 void unit_type::check() const

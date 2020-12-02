@@ -272,6 +272,17 @@ public:
 		}
 	}
 
+	static void process_all_text()
+	{
+		for (T *instance : T::get_all()) {
+			try {
+				instance->process_text();
+			} catch (...) {
+				std::throw_with_nested(std::runtime_error("Failed to process text for the " + std::string(T::class_identifier) + " instance \"" + instance->get_identifier() + "\"."));
+			}
+		}
+	}
+
 	static void check_all()
 	{
 		for (const T *instance : T::get_all()) {
@@ -287,7 +298,7 @@ private:
 	static inline bool initialize_class()
 	{
 		//initialize the metadata (including database parsing/processing functions) for this data type
-		auto metadata = std::make_unique<data_type_metadata>(T::class_identifier, T::database_dependencies, T::parse_database, T::process_database, T::initialize_all, T::check_all, T::clear);
+		auto metadata = std::make_unique<data_type_metadata>(T::class_identifier, T::database_dependencies, T::parse_database, T::process_database, T::initialize_all, T::process_all_text, T::check_all, T::clear);
 		database::get()->register_metadata(std::move(metadata));
 
 		return true;

@@ -33,7 +33,7 @@
 
 namespace wyrmgus {
 
-void detailed_data_entry::initialize()
+void detailed_data_entry::process_text()
 {
 	//process the description text for the detailed data entry
 	if (!this->description.empty()) {
@@ -41,7 +41,7 @@ void detailed_data_entry::initialize()
 		this->description = text_processor.process_text(std::move(this->description));
 	}
 
-	data_entry::initialize();
+	data_entry::process_text();
 }
 
 text_processor detailed_data_entry::create_text_processor() const

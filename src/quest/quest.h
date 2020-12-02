@@ -77,6 +77,7 @@ public:
 	virtual void process_sml_property(const sml_property &property) override;
 	virtual void process_sml_scope(const sml_data &scope) override;
 	virtual void initialize() override;
+	virtual void process_text() override;
 	virtual void check() const override;
 
 	const icon *get_icon() const

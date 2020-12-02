@@ -95,7 +95,7 @@ void deity::initialize()
 		}
 	}
 
-	detailed_data_entry::initialize();
+	data_entry::initialize();
 }
 
 const std::string &deity::get_cultural_name(const civilization *civilization) const

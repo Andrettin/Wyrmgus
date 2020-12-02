@@ -54,7 +54,7 @@ public:
 
 	virtual ~detailed_data_entry() {}
 
-	virtual void initialize() override;
+	virtual void process_text() override;
 
 	const std::string &get_notes() const
 	{

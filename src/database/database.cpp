@@ -647,6 +647,15 @@ void database::initialize()
 		}
 	}
 
+	//process text for data entries for each data type
+	for (const std::unique_ptr<data_type_metadata> &metadata : this->metadata) {
+		try {
+			metadata->get_text_processing_function()();
+		} catch (...) {
+			std::throw_with_nested(std::runtime_error("Error processing text for the instances of the " + metadata->get_class_identifier() + " class."));
+		}
+	}
+
 	this->initialized = true;
 
 	//check if data entries are valid for each data type

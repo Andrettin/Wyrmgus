@@ -98,7 +98,13 @@ public:
 		this->initialized = true;
 	}
 
-	virtual void check() const {}
+	virtual void process_text()
+	{
+	}
+
+	virtual void check() const
+	{
+	}
 
 	const data_module *get_module() const
 	{

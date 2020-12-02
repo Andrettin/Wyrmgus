@@ -469,7 +469,7 @@ void character::initialize()
 		location->initialize();
 	}
 
-	detailed_data_entry::initialize();
+	data_entry::initialize();
 }
 
 void character::check() const

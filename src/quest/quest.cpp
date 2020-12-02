@@ -42,6 +42,7 @@
 #include "script/effect/effect_list.h"
 #include "script.h"
 #include "text_processor.h"
+#include "util/vector_util.h"
 
 wyrmgus::quest *CurrentQuest = nullptr;
 
@@ -137,17 +138,22 @@ void quest::process_sml_scope(const sml_data &scope)
 
 void quest::initialize()
 {
-	if (!this->Hidden && this->civilization != nullptr && std::find(this->civilization->Quests.begin(), this->civilization->Quests.end(), this) == this->civilization->Quests.end()) {
+	if (!this->Hidden && this->civilization != nullptr && !vector::contains(this->civilization->Quests, this)) {
 		this->civilization->Quests.push_back(this);
 	}
 
+	data_entry::initialize();
+}
+
+void quest::process_text()
+{
 	//process the hint text for the quest
 	if (!this->hint.empty()) {
 		const text_processor text_processor = this->create_text_processor();
 		this->hint = text_processor.process_text(std::move(this->hint));
 	}
 
-	detailed_data_entry::initialize();
+	detailed_data_entry::process_text();
 }
 
 void quest::check() const
