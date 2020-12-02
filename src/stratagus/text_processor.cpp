@@ -123,6 +123,8 @@ std::string text_processor::process_string_tokens(std::string &&str, std::queue<
 
 	if (token == "lowered") {
 		string::to_lower(str);
+	} else if (token == "normalized") {
+		string::normalize(str);
 	} else {
 		throw std::runtime_error("Failed to process string token \"" + token + "\".");
 	}

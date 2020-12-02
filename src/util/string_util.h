@@ -84,12 +84,20 @@ inline std::queue<std::string> split_to_queue(const std::string &str, const char
 	return string::split<std::queue<std::string>>(str, delimiter);
 }
 
-inline void replace(std::string &str, const std::string &find, const std::string &replace)
+inline void replace(std::string &str, const std::string_view &find, const std::string_view &replace)
 {
 	size_t pos = 0;
 	while ((pos = str.find(find, pos)) != std::string::npos) {
 		str.replace(pos, find.length(), replace);
 		pos += replace.length();
+	}
+}
+
+inline void replace(std::string &str, const char find, const char replace)
+{
+	size_t pos = 0;
+	while ((pos = str.find(find, pos)) != std::string::npos) {
+		str.at(pos) = replace;
 	}
 }
 
@@ -138,6 +146,23 @@ inline void capitalize(std::string &str)
 	}
 
 	str[0] = toupper(str[0]);
+}
+
+inline void normalize(std::string &str)
+{
+	//remove special characters from the string that shouldn't be displayed even in strings for which accented characters are acceptable
+
+	//remove macrons
+	string::replace(str, "Ā", "A");
+	string::replace(str, "ā", "a");
+	string::replace(str, "Ē", "E");
+	string::replace(str, "ē", "e");
+	string::replace(str, "Ī", "I");
+	string::replace(str, "ī", "i");
+	string::replace(str, "Ō", "O");
+	string::replace(str, "ō", "o");
+	string::replace(str, "Ū", "U");
+	string::replace(str, "ū", "u");
 }
 
 inline bool to_bool(const std::string &str)
