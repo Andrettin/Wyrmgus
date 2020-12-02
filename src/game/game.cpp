@@ -445,7 +445,9 @@ static void LoadStratagusMap(const std::string &smpname, const std::string &mapn
 	if (LcmPreventRecurse) {
 		throw std::runtime_error("Recursive use of load map!");
 	}
+
 	InitPlayers();
+
 	LcmPreventRecurse = 1;
 	if (LuaLoadFile(mapfull) == -1) {
 		throw std::runtime_error("Can't load lua file: " + std::string(mapfull));
@@ -1615,7 +1617,7 @@ void CreateGame(const std::string &filename, CMap *map, bool is_mod)
 	}
 
 	InitPlayers();
-	
+
 	//Wyrmgus start
 	if (IsNetworkGame()) { // if is a network game, it is necessary to reinitialize the syncrand variables before beginning to load the map, due to random map generation
 		SyncHash = 0;

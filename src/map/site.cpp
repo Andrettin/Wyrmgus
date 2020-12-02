@@ -256,6 +256,9 @@ void site::initialize()
 		this->map_template->sites.push_back(this);
 	}
 
+	//create the site's game data object
+	this->reset_game_data();
+
 	data_entry::initialize();
 }
 
