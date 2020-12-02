@@ -115,9 +115,9 @@ public:
 		return this->trade_route_tiles;
 	}
 
-	void clear_trade_route_tiles()
+	bool is_coastal() const
 	{
-		this->trade_route_tiles.clear();
+		return this->coastal;
 	}
 
 private:
@@ -129,6 +129,7 @@ private:
 	std::vector<QPoint> border_tiles; //the tiles for the settlement which border the territory of another settlement
 	QRect territory_rect; //the territory rectangle of the site
 	std::vector<QPoint> trade_route_tiles; //the tiles containing a trade route in the settlement's territory
+	bool coastal = false;
 };
 
 }

@@ -95,6 +95,10 @@ void site_game_data::process_territory_tile(const tile *tile, const QPoint &tile
 	if (tile->is_on_trade_route()) {
 		this->trade_route_tiles.push_back(tile_pos);
 	}
+
+	if (!this->is_coastal() && tile->is_coastal_water() && !tile->is_river()) {
+		this->coastal = true;
+	}
 }
 
 void site_game_data::update_border_tiles()
