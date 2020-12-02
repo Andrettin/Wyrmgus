@@ -27,21 +27,26 @@
 
 #include "stratagus.h"
 
-#include "database/detailed_data_entry.h"
+#include "database/named_data_entry.h"
 
 #include "text_processor.h"
 
 namespace wyrmgus {
 
-void detailed_data_entry::process_text()
+void named_data_entry::process_text()
 {
-	//process the description text for the detailed data entry
-	if (!this->description.empty()) {
+	//process the name for the named data entry
+	if (!this->name.empty()) {
 		const text_processor text_processor = this->create_text_processor();
-		this->description = text_processor.process_text(std::move(this->description));
+		this->name = text_processor.process_text(std::move(this->name));
 	}
 
-	named_data_entry::process_text();
+	data_entry::process_text();
+}
+
+text_processor named_data_entry::create_text_processor() const
+{
+	return text_processor(nullptr);
 }
 
 }

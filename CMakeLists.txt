@@ -137,6 +137,7 @@ set(database_SRCS
 	src/database/database.cpp
 	src/database/defines.cpp
 	src/database/detailed_data_entry.cpp
+	src/database/named_data_entry.cpp
 	src/database/predefines.cpp
 	src/database/preferences.cpp
 	src/database/sml_data.cpp

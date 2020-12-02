@@ -35,6 +35,8 @@
 
 namespace wyrmgus {
 
+class text_processor;
+
 class named_data_entry : public data_entry
 {
 	Q_OBJECT
@@ -47,6 +49,8 @@ public:
 	}
 
 	virtual ~named_data_entry() {}
+
+	virtual void process_text() override;
 
 	const std::string &get_name() const
 	{
@@ -62,6 +66,8 @@ public:
 	{
 		return QString::fromStdString(this->get_name());
 	}
+
+	virtual text_processor create_text_processor() const;
 
 private:
 	std::string name;
