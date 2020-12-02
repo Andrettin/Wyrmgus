@@ -108,6 +108,8 @@ public:
 		return std::string();
 	}
 
+	std::string get_unit_name_objective_string(const std::string &unit_name, const unit_type *unit_type, bool &first) const;
+	std::string get_unit_class_objective_string(const unit_class *unit_class, bool &first) const;
 	std::string get_unit_type_objective_string(const unit_type *unit_type, const CPlayer *player, bool &first) const;
 
 	//check whether the objective's quest can be accepted

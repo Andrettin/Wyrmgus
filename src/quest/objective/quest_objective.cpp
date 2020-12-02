@@ -149,18 +149,22 @@ void quest_objective::process_sml_scope(const sml_data &scope)
 	}
 }
 
-std::string quest_objective::get_unit_type_objective_string(const unit_type *unit_type, const CPlayer *player, bool &first) const
+std::string quest_objective::get_unit_name_objective_string(const std::string &unit_name, const unit_type *unit_type, bool &first) const
 {
-	const std::string unit_type_name = unit_type->GetDefaultName(player);
-
 	std::string str;
 
 	if (first) {
-		str = unit_type->get_build_verb_string() + " ";
+		if (this->get_objective_type() == objective_type::destroy_units) {
+			str = unit_type->get_destroy_verb_string();
+		} else {
+			str = unit_type->get_build_verb_string();
+		}
+		str += " ";
+
 		if (this->get_quantity() > 1) {
 			str += std::to_string(this->get_quantity());
 		} else {
-			str += string::get_indefinite_article(unit_type_name);
+			str += string::get_indefinite_article(unit_name);
 		}
 		str += " ";
 		first = false;
@@ -169,12 +173,29 @@ std::string quest_objective::get_unit_type_objective_string(const unit_type *uni
 	}
 
 	if (this->get_quantity() > 1) {
-		str += string::get_plural_form(unit_type_name);
+		str += string::get_plural_form(unit_name);
 	} else {
-		str += unit_type_name;
+		str += unit_name;
 	}
 
 	return str;
+}
+
+std::string quest_objective::get_unit_class_objective_string(const unit_class *unit_class, bool &first) const
+{
+	if (unit_class->get_unit_types().empty()) {
+		throw std::runtime_error("Tried to generate an objective string for a unit class which has no unit types attached to it.");
+	}
+
+	const std::string &unit_class_name = unit_class->get_name();
+	const unit_type *unit_type = unit_class->get_unit_types().front();
+	return this->get_unit_name_objective_string(unit_class_name, unit_type, first);
+}
+
+std::string quest_objective::get_unit_type_objective_string(const unit_type *unit_type, const CPlayer *player, bool &first) const
+{
+	const std::string &unit_type_name = unit_type->GetDefaultName(player);
+	return this->get_unit_name_objective_string(unit_type_name, unit_type, first);
 }
 
 }

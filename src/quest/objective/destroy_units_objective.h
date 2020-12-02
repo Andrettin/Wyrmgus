@@ -45,6 +45,28 @@ public:
 		return objective_type::destroy_units;
 	}
 
+	virtual std::string generate_objective_string(const CPlayer *player) const override
+	{
+		Q_UNUSED(player)
+
+		std::string objective_str;
+		bool first = true;
+
+		for (const unit_class *unit_class : this->get_unit_classes()) {
+			objective_str += this->get_unit_class_objective_string(unit_class, first);
+		}
+
+		for (const unit_type *unit_type : this->get_unit_types()) {
+			objective_str += this->get_unit_type_objective_string(unit_type, nullptr, first);
+		}
+
+		if (this->get_settlement() != nullptr) {
+			objective_str += " in " + this->get_settlement()->get_game_data()->get_current_cultural_name();
+		}
+
+		return objective_str;
+	}
+
 	virtual bool is_objective_unit(const CUnit *unit) const override
 	{
 		if (

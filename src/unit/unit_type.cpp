@@ -1741,7 +1741,7 @@ const unit_type_variation *unit_type::GetDefaultVariation(const CPlayer *player,
 	for (const auto &variation : variation_list) {
 		bool upgrades_check = true;
 		for (const CUpgrade *required_upgrade : variation->UpgradesRequired) {
-			if (UpgradeIdentAllowed(*player, required_upgrade->get_identifier().c_str()) != 'R') {
+			if (player == nullptr || UpgradeIdentAllowed(*player, required_upgrade->get_identifier().c_str()) != 'R') {
 				upgrades_check = false;
 				break;
 			}
@@ -1749,7 +1749,7 @@ const unit_type_variation *unit_type::GetDefaultVariation(const CPlayer *player,
 		
 		if (upgrades_check) {
 			for (const CUpgrade *forbidden_upgrade : variation->UpgradesForbidden) {
-				if (UpgradeIdentAllowed(*player, forbidden_upgrade->get_identifier().c_str()) == 'R') {
+				if (player != nullptr && UpgradeIdentAllowed(*player, forbidden_upgrade->get_identifier().c_str()) == 'R') {
 					upgrades_check = false;
 					break;
 				}
@@ -1926,6 +1926,15 @@ std::string unit_type::get_build_verb_string() const
 		return "Train";
 	} else {
 		return "Build";
+	}
+}
+
+std::string unit_type::get_destroy_verb_string() const
+{
+	if (this->BoolFlag[ORGANIC_INDEX].value) {
+		return "Kill";
+	} else {
+		return "Destroy";
 	}
 }
 
