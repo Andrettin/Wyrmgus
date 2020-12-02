@@ -3554,9 +3554,9 @@ void CUnit::UpdateSettlement()
 				faction = wyrmgus::faction::get_all()[faction_id];
 			}
 
-			std::vector<wyrmgus::site *> potential_settlements;
+			std::vector<const wyrmgus::site *> potential_settlements;
 			if (civilization) {
-				for (wyrmgus::site *site : civilization->sites) {
+				for (const wyrmgus::site *site : civilization->sites) {
 					if (!site->can_be_randomly_generated()) {
 						continue;
 					}
@@ -3568,7 +3568,7 @@ void CUnit::UpdateSettlement()
 			}
 			
 			if (potential_settlements.empty() && faction) {
-				for (wyrmgus::site *site : faction->sites) {
+				for (const wyrmgus::site *site : faction->sites) {
 					if (!site->can_be_randomly_generated()) {
 						continue;
 					}
@@ -3580,7 +3580,7 @@ void CUnit::UpdateSettlement()
 			}
 			
 			if (potential_settlements.empty()) {
-				for (wyrmgus::site *site : wyrmgus::site::get_all()) {
+				for (const wyrmgus::site *site : wyrmgus::site::get_all()) {
 					if (!site->can_be_randomly_generated()) {
 						continue;
 					}

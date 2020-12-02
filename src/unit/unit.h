@@ -634,8 +634,8 @@ private:
 	std::string surname;	/// Unit's surname
 	wyrmgus::character *character = nullptr; //character represented by this unit
 public:
-	wyrmgus::site *settlement;	/// Settlement (for if the unit is a town hall or a building associated to a settlement)
-	wyrmgus::site *site = nullptr; //the site to which the unit belongs, if it is a site unit (not necessarily the same as the settlement, e.g. if the site is a non-major one)
+	const wyrmgus::site *settlement = nullptr;	/// Settlement (for if the unit is a town hall or a building associated to a settlement)
+	const wyrmgus::site *site = nullptr; //the site to which the unit belongs, if it is a site unit (not necessarily the same as the settlement, e.g. if the site is a non-major one)
 	CUpgrade *Trait;	/// Unit's trait
 	int Variation;      /// Which of the variations of its unit type this unit has
 	int LayerVariation[MaxImageLayers];	/// Which layer variations this unit has

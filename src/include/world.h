@@ -30,6 +30,7 @@
 #include "database/data_type.h"
 #include "database/detailed_data_entry.h"
 #include "data_type.h"
+#include "map/site_container.h"
 #include "map/terrain_geodata_map.h"
 
 class CProvince;
@@ -72,7 +73,7 @@ public:
 
 	std::vector<QVariantList> parse_geojson_folder(const std::string_view &folder) const;
 	terrain_geodata_map parse_terrain_geojson_folder() const;
-	std::map<const site *, std::vector<std::unique_ptr<QGeoShape>>> parse_territories_geojson_folder() const;
+	site_map<std::vector<std::unique_ptr<QGeoShape>>> parse_territories_geojson_folder() const;
 
 	const std::vector<const species *> &get_native_species() const
 	{

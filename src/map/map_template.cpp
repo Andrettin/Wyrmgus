@@ -408,7 +408,7 @@ void map_template::initialize()
 	}
 
 	if (this->outputs_territory_image()) {
-		std::map<const site *, std::vector<std::unique_ptr<QGeoShape>>> territory_data;
+		site_map<std::vector<std::unique_ptr<QGeoShape>>> territory_data;
 
 		if (this->get_world() != nullptr) {
 			territory_data = this->get_world()->parse_territories_geojson_folder();
@@ -1199,7 +1199,7 @@ void map_template::apply_sites(const QPoint &template_start_pos, const QPoint &m
 		start_date = current_campaign->get_start_date();
 	}
 
-	for (site *site : this->sites) {
+	for (const site *site : this->sites) {
 		const QPoint site_raw_pos = site->get_pos();
 		Vec2i site_pos(map_start_pos + site_raw_pos - template_start_pos);
 
@@ -1240,7 +1240,7 @@ void map_template::apply_sites(const QPoint &template_start_pos, const QPoint &m
 			continue;
 		}
 
-		wyrmgus::site_game_data *site_game_data = site->get_game_data();
+		site_game_data *site_game_data = site->get_game_data();
 
 		site_game_data->set_map_pos(site_pos);
 		site_game_data->set_map_layer(CMap::Map.MapLayers[z].get());
@@ -1318,7 +1318,7 @@ void map_template::apply_sites(const QPoint &template_start_pos, const QPoint &m
 		const faction *site_owner = site_history->get_owner();
 		if (site_owner == nullptr) {
 			//fall back to the old historical owners functionality
-			for (std::map<CDate, const faction *>::reverse_iterator owner_iterator = site->HistoricalOwners.rbegin(); owner_iterator != site->HistoricalOwners.rend(); ++owner_iterator) {
+			for (std::map<CDate, const faction *>::const_reverse_iterator owner_iterator = site->HistoricalOwners.rbegin(); owner_iterator != site->HistoricalOwners.rend(); ++owner_iterator) {
 				if (start_date.ContainsDate(owner_iterator->first)) { // set the owner to the latest historical owner given the scenario's start date
 					site_owner = owner_iterator->second;
 					break;
@@ -2815,7 +2815,7 @@ void map_template::create_terrain_image_from_map(QImage &image, const point_map<
 	}
 }
 
-void map_template::save_territory_image(const std::string &filename, const std::map<const site *, std::vector<std::unique_ptr<QGeoShape>>> &territory_data) const
+void map_template::save_territory_image(const std::string &filename, const site_map<std::vector<std::unique_ptr<QGeoShape>>> &territory_data) const
 {
 	const std::filesystem::path territory_image = this->get_territory_image_file();
 

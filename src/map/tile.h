@@ -312,12 +312,12 @@ public:
 		this->ownership_border_tile = tile;
 	}
 
-	site *get_settlement() const
+	const site *get_settlement() const
 	{
 		return this->settlement;
 	}
 
-	void set_settlement(site *settlement)
+	void set_settlement(const site *settlement)
 	{
 		if (settlement == this->get_settlement()) {
 			return;
@@ -353,7 +353,7 @@ public:
 	int Landmass = 0; //to which "landmass" (can also be water) does this map field belong (if any); a "landmass" is a collection of adjacent land tiles, or a collection of adjacent water tiles; 0 means none has been set yet
 private:
 	short ownership_border_tile = -1; //the transition type of the border between this tile's owner, and other players' tiles, if applicable)
-	site *settlement = nullptr;
+	const site *settlement = nullptr;
 public:
 	CUnitCache UnitCache;      /// a unit on the map field.
 

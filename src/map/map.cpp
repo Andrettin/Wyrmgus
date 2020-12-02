@@ -40,6 +40,7 @@
 #include "map/map_template.h"
 #include "map/minimap.h"
 #include "map/site.h"
+#include "map/site_container.h"
 #include "map/site_game_data.h"
 #include "map/terrain_feature.h"
 #include "map/terrain_type.h"
@@ -3243,7 +3244,7 @@ void CMap::generate_settlement_territories(const int z)
 			return;
 		}
 
-		std::map<wyrmgus::site *, int> settlement_neighbor_count;
+		wyrmgus::site_map<int> settlement_neighbor_count;
 
 		for (int x_offset = -1; x_offset <= 1; ++x_offset) {
 			for (int y_offset = -1; y_offset <= 1; ++y_offset) {
@@ -3258,7 +3259,7 @@ void CMap::generate_settlement_territories(const int z)
 				}
 
 				const wyrmgus::tile *adjacent_tile = this->Field(adjacent_pos, z);
-				wyrmgus::site *adjacent_settlement = adjacent_tile->get_settlement();
+				const wyrmgus::site *adjacent_settlement = adjacent_tile->get_settlement();
 
 				if (adjacent_settlement == nullptr) {
 					continue;
@@ -3268,7 +3269,7 @@ void CMap::generate_settlement_territories(const int z)
 			}
 		}
 
-		wyrmgus::site *best_settlement = nullptr;
+		const wyrmgus::site *best_settlement = nullptr;
 		int best_settlement_neighbor_count = 0;
 		for (const auto &kv_pair : settlement_neighbor_count) {
 			if (kv_pair.second > best_settlement_neighbor_count) {
@@ -3308,7 +3309,7 @@ wyrmgus::point_set CMap::expand_settlement_territories(std::vector<QPoint> &&see
 			return;
 		}
 
-		wyrmgus::site *settlement = seed_tile->get_settlement();
+		const wyrmgus::site *settlement = seed_tile->get_settlement();
 		const wyrmgus::tile *settlement_tile = this->Field(settlement->get_game_data()->get_site_unit()->get_center_tile_pos(), z);
 
 		const std::vector<QPoint> adjacent_positions = wyrmgus::point::get_diagonally_adjacent_if(seed_pos, [&](const QPoint &diagonal_pos) {

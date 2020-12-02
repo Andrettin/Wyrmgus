@@ -203,7 +203,7 @@ public:
 
 	bool HasSettlement(const wyrmgus::site *settlement) const;
 	bool HasSettlementNearWaterZone(int water_zone) const;
-	wyrmgus::site *GetNearestSettlement(const Vec2i &pos, int z, const Vec2i &size) const;
+	const wyrmgus::site *GetNearestSettlement(const Vec2i &pos, int z, const Vec2i &size) const;
 	void update_building_settlement_assignment(const wyrmgus::site *old_settlement, const int z) const;
 	bool HasUnitBuilder(const wyrmgus::unit_type *type, const wyrmgus::site *settlement = nullptr) const;
 	bool HasUpgradeResearcher(const CUpgrade *upgrade) const;

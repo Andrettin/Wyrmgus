@@ -30,6 +30,7 @@
 #include "database/data_type.h"
 #include "database/named_data_entry.h"
 #include "data_type.h"
+#include "map/site_container.h"
 #include "map/terrain_geodata_map.h"
 #include "time/date.h"
 #include "util/point_container.h"
@@ -667,7 +668,7 @@ public:
 	void create_terrain_image_from_file(QImage &image, const std::filesystem::path &filepath) const;
 	void create_terrain_image_from_geodata(QImage &image, const terrain_geodata_ptr_map &terrain_data, const std::string &image_checkpoint_save_filename) const;
 	void create_terrain_image_from_map(QImage &image, const point_map<const terrain_type *> &terrain_map) const;
-	void save_territory_image(const std::string &filename, const std::map<const site *, std::vector<std::unique_ptr<QGeoShape>>> &territory_data) const;
+	void save_territory_image(const std::string &filename, const site_map<std::vector<std::unique_ptr<QGeoShape>>> &territory_data) const;
 
 	QPoint pos_to_map_pos(const QPoint &pos) const
 	{

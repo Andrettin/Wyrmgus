@@ -157,9 +157,9 @@ terrain_geodata_map world::parse_terrain_geojson_folder() const
 	return terrain_data;
 }
 
-std::map<const site *, std::vector<std::unique_ptr<QGeoShape>>> world::parse_territories_geojson_folder() const
+site_map<std::vector<std::unique_ptr<QGeoShape>>> world::parse_territories_geojson_folder() const
 {
-	std::map<const site *, std::vector<std::unique_ptr<QGeoShape>>> territory_data;
+	site_map<std::vector<std::unique_ptr<QGeoShape>>> territory_data;
 
 	const std::vector<QVariantList> geojson_data_list = this->parse_geojson_folder(world::territories_map_folder);
 

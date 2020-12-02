@@ -2638,7 +2638,7 @@ static void AiCheckMinecartConstruction()
 		return;
 	}
 	
-	std::vector<wyrmgus::site *> potential_settlements;
+	std::vector<const wyrmgus::site *> potential_settlements;
 		
 	for (size_t res = 0; res < wyrmgus::resource::get_all().size(); ++res) {
 		if (res >= (int) AiHelpers.Mines.size()) {
@@ -2656,7 +2656,7 @@ static void AiCheckMinecartConstruction()
 					
 			for (size_t j = 0; j < mine_table.size(); ++j) {
 				const CUnit *mine_unit = mine_table[j];
-				wyrmgus::site *mine_settlement = mine_unit->settlement;
+				const wyrmgus::site *mine_settlement = mine_unit->settlement;
 						
 				if (mine_settlement == nullptr) {
 					continue;
