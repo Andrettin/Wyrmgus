@@ -40,6 +40,7 @@
 #include "map/map_template.h"
 #include "map/minimap.h"
 #include "map/site.h"
+#include "map/site_game_data.h"
 #include "map/terrain_feature.h"
 #include "map/terrain_type.h"
 #include "map/tile.h"
@@ -2580,12 +2581,15 @@ void CMap::adjust_territory_irregularities(const QPoint &min_pos, const QPoint &
 			for (int y = min_pos.y(); y <= max_pos.y(); ++y) {
 				const QPoint tile_pos(x, y);
 				wyrmgus::tile *tile = this->Field(tile_pos, z);
+				const wyrmgus::site *settlement = tile->get_settlement();
 
-				if (tile->get_settlement() == nullptr) {
+				if (settlement == nullptr) {
 					continue;
 				}
 
-				if (tile->get_settlement()->get_site_unit() == nullptr) {
+				const wyrmgus::site_game_data *settlement_game_data = settlement->get_game_data();
+
+				if (settlement_game_data->get_site_unit() == nullptr) {
 					tile->set_settlement(nullptr);
 					no_irregularities_found = false;
 					continue;
@@ -3305,7 +3309,7 @@ wyrmgus::point_set CMap::expand_settlement_territories(std::vector<QPoint> &&see
 		}
 
 		wyrmgus::site *settlement = seed_tile->get_settlement();
-		const wyrmgus::tile *settlement_tile = this->Field(settlement->get_site_unit()->get_center_tile_pos(), z);
+		const wyrmgus::tile *settlement_tile = this->Field(settlement->get_game_data()->get_site_unit()->get_center_tile_pos(), z);
 
 		const std::vector<QPoint> adjacent_positions = wyrmgus::point::get_diagonally_adjacent_if(seed_pos, [&](const QPoint &diagonal_pos) {
 			const QPoint vertical_pos(seed_pos.x(), diagonal_pos.y());
@@ -3369,25 +3373,27 @@ void CMap::calculate_settlement_territory_tiles(const int z)
 			continue;
 		}
 
-		site_unit->settlement->clear_tiles();
+		site_unit->settlement->get_game_data()->clear_tiles();
 	}
 
 	for (int x = 0; x < this->Info.MapWidths[z]; ++x) {
 		for (int y = 0; y < this->Info.MapHeights[z]; ++y) {
 			const QPoint tile_pos(x, y);
 			const wyrmgus::tile *tile = this->Field(x, y, z);
-			wyrmgus::site *settlement = tile->get_settlement();
+			const wyrmgus::site *settlement = tile->get_settlement();
 
 			if (settlement == nullptr) {
 				continue;
 			}
 
+			wyrmgus::site_game_data *settlement_game_data = settlement->get_game_data();
+
 			if (this->tile_borders_other_settlement_territory(tile_pos, z)) {
-				settlement->add_border_tile(tile_pos);
+				settlement_game_data->add_border_tile(tile_pos);
 			}
 
 			if (tile->is_on_trade_route()) {
-				settlement->add_trade_route_tile(tile_pos);
+				settlement_game_data->add_trade_route_tile(tile_pos);
 			}
 		}
 	}

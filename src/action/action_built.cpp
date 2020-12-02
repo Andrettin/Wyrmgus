@@ -42,6 +42,7 @@
 #include "map/map.h"
 #include "map/map_layer.h"
 #include "map/site.h"
+#include "map/site_game_data.h"
 #include "map/terrain_type.h"
 #include "map/tile.h"
 #include "map/tileset.h"
@@ -193,11 +194,15 @@ static void Finish(COrder_Built &order, CUnit &unit)
 		objective->on_unit_built(&unit);
 	}
 
-	if (unit.site != nullptr && unit.site->get_site_unit() == &unit) {
-		if (player.Index != PlayerNumNeutral) {
-			unit.site->set_owner(&player);
-		} else {
-			unit.site->set_owner(nullptr);
+	if (unit.site != nullptr) {
+		wyrmgus::site_game_data *site_game_data = unit.site->get_game_data();
+
+		if (site_game_data->get_site_unit() == &unit) {
+			if (player.Index != PlayerNumNeutral) {
+				site_game_data->set_owner(&player);
+			} else {
+				site_game_data->set_owner(nullptr);
+			}
 		}
 	}
 

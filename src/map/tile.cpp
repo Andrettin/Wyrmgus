@@ -35,6 +35,7 @@
 #include "iolib.h"
 #include "map/map.h"
 #include "map/site.h"
+#include "map/site_game_data.h"
 #include "map/terrain_feature.h"
 #include "map/terrain_type.h"
 #include "map/tileset.h"
@@ -699,7 +700,7 @@ CPlayer *tile::get_owner() const
 		return nullptr;
 	}
 
-	return this->get_settlement()->get_owner();
+	return this->get_settlement()->get_game_data()->get_owner();
 }
 
 CPlayer *tile::get_realm_owner() const
@@ -708,7 +709,7 @@ CPlayer *tile::get_realm_owner() const
 		return nullptr;
 	}
 
-	return this->get_settlement()->get_realm_owner();
+	return this->get_settlement()->get_game_data()->get_realm_owner();
 }
 
 bool tile::is_on_trade_route() const

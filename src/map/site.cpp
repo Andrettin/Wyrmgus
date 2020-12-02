@@ -39,6 +39,7 @@
 #include "map/map_template.h"
 #include "map/minimap.h"
 #include "map/region.h"
+#include "map/site_game_data.h"
 #include "map/site_history.h"
 #include "map/tile.h"
 #include "player.h" //for factions
@@ -188,16 +189,6 @@ void site::ProcessConfigData(const CConfigData *config_data)
 	}
 }
 
-data_entry_history *site::get_history_base()
-{
-	return this->history.get();
-}
-
-void site::reset_history()
-{
-	this->history = std::make_unique<site_history>(this);
-}
-
 void site::initialize()
 {
 	if (this->get_geocoordinate().isValid()) {
@@ -268,6 +259,21 @@ void site::initialize()
 	data_entry::initialize();
 }
 
+data_entry_history *site::get_history_base()
+{
+	return this->history.get();
+}
+
+void site::reset_history()
+{
+	this->history = std::make_unique<site_history>(this);
+}
+
+void site::reset_game_data()
+{
+	this->game_data = std::make_unique<site_game_data>(this);
+}
+
 const std::string &site::get_cultural_name(const civilization *civilization) const
 {
 	if (civilization != nullptr) {
@@ -278,104 +284,6 @@ const std::string &site::get_cultural_name(const civilization *civilization) con
 	}
 	
 	return this->get_name();
-}
-
-const std::string &site::get_current_cultural_name() const
-{
-	if (this->get_site_unit() != nullptr) {
-		return this->get_cultural_name(this->get_site_unit()->get_civilization());
-	}
-	
-	return this->get_name();
-}
-
-void site::set_site_unit(CUnit *unit)
-{
-	if (unit == this->get_site_unit()) {
-		return;
-	}
-
-	this->site_unit = unit;
-
-	if (this->site_unit != nullptr && this->site_unit->Player != nullptr && this->site_unit->Player->Index != PlayerNumNeutral && !this->site_unit->UnderConstruction) {
-		this->set_owner(this->site_unit->Player);
-	} else {
-		this->set_owner(nullptr);
-	}
-}
-
-void site::set_owner(CPlayer *player)
-{
-	if (player == this->get_owner()) {
-		return;
-	}
-
-	this->owner = player;
-
-	if (this->is_major() && GameCycle > 0) {
-		this->update_border_tiles();
-		this->update_minimap_territory();
-	}
-}
-
-CPlayer *site::get_realm_owner() const
-{
-	if (this->get_owner() != nullptr) {
-		return this->get_owner()->get_realm_player();
-	}
-
-	return nullptr;
-}
-
-void site::update_border_tiles()
-{
-	if (this->get_site_unit() == nullptr) {
-		return;
-	}
-
-	const int z = this->get_site_unit()->MapLayer->ID;
-	for (const QPoint &tile_pos : this->border_tiles) {
-		CMap::Map.CalculateTileOwnershipTransition(tile_pos, z);
-
-		//update adjacent tiles with different settlements as well
-		for (int x_offset = -1; x_offset <= 1; ++x_offset) {
-			for (int y_offset = -1; y_offset <= 1; ++y_offset) {
-				if (x_offset == 0 && y_offset == 0) {
-					continue;
-				}
-
-				const QPoint adjacent_pos(tile_pos.x() + x_offset, tile_pos.y() + y_offset);
-				if (!CMap::Map.Info.IsPointOnMap(adjacent_pos, z)) {
-					continue;
-				}
-
-				tile *adjacent_tile = CMap::Map.Field(adjacent_pos, z);
-				if (adjacent_tile->get_settlement() != nullptr && adjacent_tile->get_settlement() != this) {
-					CMap::Map.CalculateTileOwnershipTransition(adjacent_pos, z);
-				}
-			}
-		}
-	}
-}
-
-void site::update_minimap_territory()
-{
-	if (this->get_site_unit() == nullptr) {
-		return;
-	}
-
-	const int z = this->get_site_unit()->MapLayer->ID;
-
-	for (int x = this->territory_rect.x(); x <= this->territory_rect.right(); ++x) {
-		for (int y = this->territory_rect.y(); y <= this->territory_rect.bottom(); ++y) {
-			const QPoint tile_pos(x, y);
-			const tile *tile = CMap::Map.Field(tile_pos, z);
-
-			if (tile->get_settlement() == this) {
-				UI.get_minimap()->update_territory_xy(tile_pos, z);
-			}
-		}
-	}
 }
 
 QVariantList site::get_cores_qvariant_list() const

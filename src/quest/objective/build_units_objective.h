@@ -27,6 +27,7 @@
 
 #pragma once
 
+#include "map/site_game_data.h"
 #include "quest/objective/quest_objective.h"
 #include "quest/objective_type.h"
 #include "quest/player_quest_objective.h"
@@ -76,7 +77,7 @@ public:
 		}
 
 		if (this->get_settlement() != nullptr) {
-			objective_str += " in " + this->get_settlement()->get_current_cultural_name();
+			objective_str += " in " + this->get_settlement()->get_game_data()->get_current_cultural_name();
 		}
 
 		return objective_str;

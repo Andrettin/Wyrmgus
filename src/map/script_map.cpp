@@ -43,6 +43,7 @@
 #include "map/map_template.h"
 #include "map/region.h"
 #include "map/site.h"
+#include "map/site_game_data.h"
 #include "map/terrain_feature.h"
 #include "map/terrain_type.h"
 #include "map/tile.h"
@@ -1839,6 +1840,8 @@ static int CclGetSiteData(lua_State *l)
 	const wyrmgus::site *site = wyrmgus::site::get(site_ident);
 	const char *data = LuaToString(l, 2);
 
+	const wyrmgus::site_game_data *site_game_data = site->get_game_data();
+
 	if (!strcmp(data, "Name")) {
 		lua_pushstring(l, site->get_name().c_str());
 		return 1;
@@ -1849,45 +1852,45 @@ static int CclGetSiteData(lua_State *l)
 		lua_pushnumber(l, site->get_pos().y());
 		return 1;
 	} else if (!strcmp(data, "MapPosX")) {
-		if (site->get_site_unit() != nullptr) {
-			lua_pushnumber(l, site->get_site_unit()->tilePos.x);
+		if (site_game_data->get_site_unit() != nullptr) {
+			lua_pushnumber(l, site_game_data->get_site_unit()->tilePos.x);
 		} else {
-			lua_pushnumber(l, site->get_map_pos().x());
+			lua_pushnumber(l, site_game_data->get_map_pos().x());
 		}
 		return 1;
 	} else if (!strcmp(data, "MapPosY")) {
-		if (site->get_site_unit() != nullptr) {
-			lua_pushnumber(l, site->get_site_unit()->tilePos.y);
+		if (site_game_data->get_site_unit() != nullptr) {
+			lua_pushnumber(l, site_game_data->get_site_unit()->tilePos.y);
 		} else {
-			lua_pushnumber(l, site->get_map_pos().y());
+			lua_pushnumber(l, site_game_data->get_map_pos().y());
 		}
 		return 1;
 	} else if (!strcmp(data, "MapCenterPosX")) {
-		if (site->get_site_unit() != nullptr) {
-			lua_pushnumber(l, site->get_site_unit()->get_center_tile_pos().x());
+		if (site_game_data->get_site_unit() != nullptr) {
+			lua_pushnumber(l, site_game_data->get_site_unit()->get_center_tile_pos().x());
 		} else {
-			lua_pushnumber(l, site->get_map_pos().x());
+			lua_pushnumber(l, site_game_data->get_map_pos().x());
 		}
 		return 1;
 	} else if (!strcmp(data, "MapCenterPosY")) {
-		if (site->get_site_unit() != nullptr) {
-			lua_pushnumber(l, site->get_site_unit()->get_center_tile_pos().y());
+		if (site_game_data->get_site_unit() != nullptr) {
+			lua_pushnumber(l, site_game_data->get_site_unit()->get_center_tile_pos().y());
 		} else {
-			lua_pushnumber(l, site->get_map_pos().y());
+			lua_pushnumber(l, site_game_data->get_map_pos().y());
 		}
 		return 1;
 	} else if (!strcmp(data, "MapLayer")) {
-		if (site->get_site_unit() != nullptr && site->get_site_unit()->MapLayer != nullptr) {
-			lua_pushnumber(l, site->get_site_unit()->MapLayer->ID);
-		} else if (site->get_map_layer() != nullptr) {
-			lua_pushnumber(l, site->get_map_layer()->ID);
+		if (site_game_data->get_site_unit() != nullptr && site_game_data->get_site_unit()->MapLayer != nullptr) {
+			lua_pushnumber(l, site_game_data->get_site_unit()->MapLayer->ID);
+		} else if (site_game_data->get_map_layer() != nullptr) {
+			lua_pushnumber(l, site_game_data->get_map_layer()->ID);
 		} else {
 			lua_pushnumber(l, -1);
 		}
 		return 1;
 	} else if (!strcmp(data, "SiteUnit")) {
-		if (site->get_site_unit() != nullptr) {
-			lua_pushnumber(l, UnitNumber(*site->get_site_unit()));
+		if (site_game_data->get_site_unit() != nullptr) {
+			lua_pushnumber(l, UnitNumber(*site_game_data->get_site_unit()));
 		} else {
 			lua_pushnumber(l, -1);
 		}

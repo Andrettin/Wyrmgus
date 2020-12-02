@@ -48,6 +48,7 @@ class faction;
 class map_template;
 class player_color;
 class region;
+class site_game_data;
 class site_history;
 class unique_item;
 class unit_class;
@@ -122,17 +123,13 @@ public:
 
 	virtual void reset_history() override;
 
-	void reset_game_data()
+	void reset_game_data();
+	site_game_data *get_game_data() const
 	{
-		this->owner = nullptr;
-		this->site_unit = nullptr;
-		this->clear_tiles();
-		this->map_pos = QPoint(-1, -1);
-		this->map_layer = nullptr;
+		return this->game_data.get();
 	}
 
 	const std::string &get_cultural_name(const civilization *civilization) const;
-	const std::string &get_current_cultural_name() const;
 
 	bool is_major() const
 	{
@@ -169,95 +166,9 @@ public:
 		return this->get_connection_destination() != nullptr;
 	}
 
-	CUnit *get_site_unit() const
-	{
-		return this->site_unit;
-	}
-
-	void set_site_unit(CUnit *unit);
-
-	CPlayer *get_owner() const
-	{
-		return this->owner;
-	}
-
-	void set_owner(CPlayer *player);
-
-	CPlayer *get_realm_owner() const;
-
 	bool can_be_randomly_generated() const
 	{
 		return !this->get_name().empty() && !this->is_connector();
-	}
-
-	const QPoint &get_map_pos() const
-	{
-		return this->map_pos;
-	}
-
-	void set_map_pos(const QPoint &pos)
-	{
-		this->map_pos = pos;
-	}
-
-	const CMapLayer *get_map_layer() const
-	{
-		return this->map_layer;
-	}
-
-	void set_map_layer(const CMapLayer *map_layer)
-	{
-		this->map_layer = map_layer;
-	}
-
-	void clear_tiles()
-	{
-		this->clear_border_tiles();
-		this->clear_trade_route_tiles();
-	}
-
-	void add_border_tile(const QPoint &tile_pos)
-	{
-		this->border_tiles.push_back(tile_pos);
-
-		if (this->territory_rect.isNull()) {
-			this->territory_rect = QRect(tile_pos, QSize(1, 1));
-		} else {
-			if (tile_pos.x() < this->territory_rect.x()) {
-				this->territory_rect.setX(tile_pos.x());
-			} else if (tile_pos.x() > this->territory_rect.right()) {
-				this->territory_rect.setRight(tile_pos.x());
-			}
-			if (tile_pos.y() < this->territory_rect.y()) {
-				this->territory_rect.setY(tile_pos.y());
-			} else if (tile_pos.y() > this->territory_rect.bottom()) {
-				this->territory_rect.setBottom(tile_pos.y());
-			}
-		}
-	}
-
-	void clear_border_tiles()
-	{
-		this->border_tiles.clear();
-		this->territory_rect = QRect();
-	}
-
-	void update_border_tiles();
-	void update_minimap_territory();
-
-	const std::vector<QPoint> &get_trade_route_tiles() const
-	{
-		return this->trade_route_tiles;
-	}
-
-	void add_trade_route_tile(const QPoint &tile_pos)
-	{
-		this->trade_route_tiles.push_back(tile_pos);
-	}
-
-	void clear_trade_route_tiles()
-	{
-		this->trade_route_tiles.clear();
 	}
 
 	const std::vector<faction *> &get_cores() const
@@ -320,26 +231,19 @@ private:
 	int latitude_scale = 100;
 	unit_type *base_unit_type = nullptr;
 	site *connection_destination = nullptr;
-	CPlayer *owner = nullptr;
-	CUnit *site_unit = nullptr; //unit which represents this site
 	std::vector<region *> regions; //regions where this site is located
 	std::vector<faction *> cores; //factions which have this site as a core
 	std::map<const civilization *, std::string> cultural_names;	/// Names for the site for each different culture/civilization
 	QColor color; //color used to represent the site on the minimap, and to identify its territory on territory images
 	std::vector<character *> characters; //characters which can be recruited at this site
 	std::unique_ptr<site_history> history;
+	std::unique_ptr<site_game_data> game_data;
 public:
 	std::map<CDate, const faction *> HistoricalOwners;			/// Historical owners of the site
 	std::map<CDate, int> HistoricalPopulation;					/// Historical population
 	std::vector<std::tuple<CDate, CDate, const unit_type *, int, const faction *>> HistoricalUnits;	/// Historical quantity of a particular unit type (number of people for units representing a person)
 	std::vector<std::tuple<CDate, CDate, const unit_class *, unique_item *, const faction *>> HistoricalBuildings; /// Historical buildings, with start and end date
 	std::vector<std::tuple<CDate, CDate, const unit_type *, unique_item *, int>> HistoricalResources; /// Historical resources, with start and end date; the integer at the end is the resource quantity
-private:
-	QPoint map_pos = QPoint(-1, -1);
-	const CMapLayer *map_layer = nullptr;
-	std::vector<QPoint> border_tiles; //the tiles for this settlement which border the territory of another settlement
-	QRect territory_rect; //the territory rectangle of the site
-	std::vector<QPoint> trade_route_tiles; //the tiles containing a trade route in this settlement's territory
 
 	friend static int ::CclDefineSite(lua_State *l);
 };

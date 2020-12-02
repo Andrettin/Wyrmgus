@@ -52,6 +52,7 @@
 #include "item/unique_item.h"
 #include "map/map.h"
 #include "map/site.h"
+#include "map/site_game_data.h"
 #include "parameters.h"
 #include "player.h"
 #include "script/trigger.h"
@@ -1582,7 +1583,7 @@ std::string EvalString(const StringDesc *s)
 		case EString_UnitSettlementName: // name of the unit's settlement
 			unit = EvalUnit(s->D.Unit.get());
 			if (unit != nullptr && unit->settlement != nullptr) {
-				return unit->settlement->get_current_cultural_name();
+				return unit->settlement->get_game_data()->get_current_cultural_name();
 			} else {
 				return std::string("");
 			}
@@ -1787,16 +1788,23 @@ std::string EvalString(const StringDesc *s)
 				std::string settlements_string;
 				bool first = true;
 				for (const wyrmgus::site *core_settlement : (**faction).get_core_settlements()) {
+					const wyrmgus::site_game_data *core_settlement_game_data = core_settlement->get_game_data();
 					if (!first) {
 						settlements_string += "\n";
 					} else {
 						first = false;
 					}
-					bool has_settlement = core_settlement->get_site_unit() && core_settlement->get_site_unit()->Player == CPlayer::GetThisPlayer() && core_settlement->get_site_unit()->CurrentAction() != UnitAction::Built;
+
+					const CUnit *site_unit = core_settlement_game_data->get_site_unit();
+
+					const bool has_settlement = site_unit != nullptr && site_unit->Player == CPlayer::GetThisPlayer() && site_unit->CurrentAction() != UnitAction::Built;
+
 					if (!has_settlement) {
 						settlements_string += "~<";
 					}
-					settlements_string += core_settlement->get_current_cultural_name();
+
+					settlements_string += core_settlement_game_data->get_current_cultural_name();
+
 					if (!has_settlement) {
 						settlements_string += "~>";
 					}

@@ -44,6 +44,7 @@
 #include "map/map.h"
 #include "map/map_layer.h"
 #include "map/site.h"
+#include "map/site_game_data.h"
 #include "pathfinder.h"
 #include "player.h"
 #include "script.h"
@@ -326,7 +327,7 @@ static int CclUnit(lua_State *l)
 		} else if (!strcmp(value, "site")) {
 			unit->site = wyrmgus::site::get(LuaToString(l, 2, j + 1));
 			if (unit->site->is_major()) {
-				unit->site->set_site_unit(unit);
+				unit->site->get_game_data()->set_site_unit(unit);
 				CMap::Map.add_settlement_unit(unit);
 			}
 		} else if (!strcmp(value, "settlement")) {

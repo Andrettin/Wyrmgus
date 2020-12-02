@@ -48,6 +48,7 @@
 #include "map/map_layer.h"
 #include "map/map_template_history.h"
 #include "map/site.h"
+#include "map/site_game_data.h"
 #include "map/site_history.h"
 #include "map/terrain_feature.h"
 #include "map/terrain_type.h"
@@ -1239,8 +1240,10 @@ void map_template::apply_sites(const QPoint &template_start_pos, const QPoint &m
 			continue;
 		}
 
-		site->set_map_pos(site_pos);
-		site->set_map_layer(CMap::Map.MapLayers[z].get());
+		wyrmgus::site_game_data *site_game_data = site->get_game_data();
+
+		site_game_data->set_map_pos(site_pos);
+		site_game_data->set_map_layer(CMap::Map.MapLayers[z].get());
 
 		if (base_unit_type != nullptr) {
 			if (!is_position_shift_acceptable && !UnitTypeCanBeAt(*base_unit_type, site_pos - unit_offset, z) && CMap::Map.Info.IsPointOnMap(site_pos - unit_offset, z) && CMap::Map.Info.IsPointOnMap(site_pos - unit_offset + Vec2i(base_unit_type->get_tile_size() - QSize(1, 1)), z)) {
@@ -1253,7 +1256,7 @@ void map_template::apply_sites(const QPoint &template_start_pos, const QPoint &m
 				unit->settlement = site;
 			}
 
-			site->set_site_unit(unit);
+			site_game_data->set_site_unit(unit);
 
 			if (site->is_major()) {
 				CMap::Map.add_settlement_unit(unit);
@@ -1269,9 +1272,11 @@ void map_template::apply_sites(const QPoint &template_start_pos, const QPoint &m
 			if (site->get_connection_destination() != nullptr) {
 				CMap::Map.MapLayers[z]->LayerConnectors.push_back(unit);
 
-				if (site->get_connection_destination()->get_site_unit() != nullptr) {
-					site->get_connection_destination()->get_site_unit()->ConnectingDestination = unit;
-					unit->ConnectingDestination = site->get_connection_destination()->get_site_unit();
+				wyrmgus::site_game_data *destination_site_game_data = site->get_connection_destination()->get_game_data();
+
+				if (destination_site_game_data->get_site_unit() != nullptr) {
+					destination_site_game_data->get_site_unit()->ConnectingDestination = unit;
+					unit->ConnectingDestination = destination_site_game_data->get_site_unit();
 				}
 			}
 		}
@@ -2619,8 +2624,8 @@ Vec2i map_template::get_best_location_map_position(const std::vector<std::unique
 				if (historical_location->get_pos().x() != -1 && historical_location->get_pos().y() != -1) { //historical unit position, could also have been inherited from a site with a fixed position
 					pos = map_start_pos + historical_location->get_pos() - template_start_pos;
 				} else if (random) {
-					if (historical_location->get_site() != nullptr && historical_location->get_site()->get_site_unit() != nullptr) { //sites with random positions will have no valid stored fixed position, but will have had a site unit randomly placed; use that site unit's position instead for this unit then
-						pos = historical_location->get_site()->get_site_unit()->get_center_tile_pos();
+					if (historical_location->get_site() != nullptr && historical_location->get_site()->get_game_data()->get_site_unit() != nullptr) { //sites with random positions will have no valid stored fixed position, but will have had a site unit randomly placed; use that site unit's position instead for this unit then
+						pos = historical_location->get_site()->get_game_data()->get_site_unit()->get_center_tile_pos();
 					}
 				}
 			} else {
@@ -2642,8 +2647,8 @@ QPoint map_template::get_location_map_position(const historical_location *histor
 		if (historical_location->get_pos().x() != -1 && historical_location->get_pos().y() != -1) { //historical unit position, could also have been inherited from a site with a fixed position
 			return map_start_pos + historical_location->get_pos() - template_start_pos;
 		} else if (random) {
-			if (historical_location->get_site() != nullptr && historical_location->get_site()->get_site_unit() != nullptr) { //sites with random positions will have no valid stored fixed position, but will have had a site unit randomly placed; use that site unit's position instead for this unit then
-				return historical_location->get_site()->get_site_unit()->get_center_tile_pos();
+			if (historical_location->get_site() != nullptr && historical_location->get_site()->get_game_data()->get_site_unit() != nullptr) { //sites with random positions will have no valid stored fixed position, but will have had a site unit randomly placed; use that site unit's position instead for this unit then
+				return historical_location->get_site()->get_game_data()->get_site_unit()->get_center_tile_pos();
 			}
 		}
 	}

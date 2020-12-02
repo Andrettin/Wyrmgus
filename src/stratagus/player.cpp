@@ -60,6 +60,7 @@
 #include "map/map_layer.h"
 #include "map/minimap.h"
 #include "map/site.h"
+#include "map/site_game_data.h"
 #include "network.h"
 #include "netconnect.h"
 //Wyrmgus start
@@ -1506,7 +1507,7 @@ void CPlayer::update_minimap_territory()
 		}
 
 		for (const CUnit *town_hall : kv_pair.second) {
-			town_hall->settlement->update_minimap_territory();
+			town_hall->settlement->get_game_data()->update_minimap_territory();
 		}
 	}
 
@@ -1559,11 +1560,13 @@ bool CPlayer::has_upgrade_class(const wyrmgus::upgrade_class *upgrade_class) con
 
 bool CPlayer::HasSettlement(const wyrmgus::site *settlement) const
 {
-	if (!settlement) {
+	if (settlement == nullptr) {
 		return false;
 	}
-	
-	if (settlement->get_site_unit() && settlement->get_site_unit()->Player == this) {
+
+	const wyrmgus::site_game_data *settlement_game_data = settlement->get_game_data();
+
+	if (settlement_game_data->get_site_unit() && settlement_game_data->get_site_unit()->Player == this) {
 		return true;
 	}
 
@@ -1789,7 +1792,9 @@ bool CPlayer::can_found_faction(const wyrmgus::faction *faction) const
 		//check if the required core settlements are owned by the player
 		if (wyrmgus::game::get()->get_current_campaign() != nullptr) { //only check for settlements in the Scenario mode
 			for (const wyrmgus::site *core_settlement : faction->get_core_settlements()) {
-				if (!core_settlement->get_site_unit() || core_settlement->get_site_unit()->Player != this || core_settlement->get_site_unit()->CurrentAction() == UnitAction::Built) {
+				const wyrmgus::site_game_data *settlement_game_data = core_settlement->get_game_data();
+
+				if (settlement_game_data->get_site_unit() == nullptr || settlement_game_data->get_site_unit()->Player != this || settlement_game_data->get_site_unit()->CurrentAction() == UnitAction::Built) {
 					return false;
 				}
 			}

@@ -46,6 +46,7 @@
 #include "map/minimap.h"
 #include "map/minimap_mode.h"
 #include "map/site.h"
+#include "map/site_game_data.h"
 #include "map/terrain_feature.h"
 #include "map/tile.h"
 #include "map/tileset.h"
@@ -1232,14 +1233,24 @@ void DrawPopups()
 						button = get_territory_tooltip_button(tile->get_realm_owner());
 					}
 					break;
-				case wyrmgus::minimap_mode::settlements:
-					if (tile->get_settlement() != nullptr && is_tile_water == (tile->get_settlement()->get_site_unit()->get_center_tile()->is_water() && !tile->get_settlement()->get_site_unit()->get_center_tile()->is_river()) && is_tile_space == tile->get_settlement()->get_site_unit()->get_center_tile()->is_space()) {
+				case wyrmgus::minimap_mode::settlements: {
+					const wyrmgus::site *settlement = tile->get_settlement();
+					if (tile->get_settlement() == nullptr) {
+						break;
+					}
+
+					const wyrmgus::site_game_data *settlement_game_data = settlement->get_game_data();
+					const CUnit *site_unit = settlement_game_data->get_site_unit();
+					const wyrmgus::tile *site_center_tile = site_unit->get_center_tile();
+
+					if (is_tile_water == (site_center_tile->is_water() && !site_center_tile->is_river()) && is_tile_space == site_center_tile->is_space()) {
 						button = std::make_unique<wyrmgus::button>();
 						button->Action = ButtonCmd::None;
 						button->Popup = "popup_settlement";
-						button->Hint = tile->get_settlement()->get_current_cultural_name();
+						button->Hint = settlement_game_data->get_current_cultural_name();
 					}
 					break;
+				}
 				default:
 					break;
 			}

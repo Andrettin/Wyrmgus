@@ -32,6 +32,7 @@
 #include "map/map_layer.h"
 #include "map/map_template.h"
 #include "map/site.h"
+#include "map/site_game_data.h"
 #include "player.h"
 #include "script/effect/effect.h"
 #include "unit/unit.h"
@@ -150,10 +151,12 @@ public:
 	QPoint get_tile_pos(const CPlayer *player) const
 	{
 		if (this->site != nullptr) {
-			if (this->site->get_site_unit() != nullptr) {
-				return this->site->get_site_unit()->get_center_tile_pos();
+			const site_game_data *site_game_data = this->site->get_game_data();
+
+			if (site_game_data->get_site_unit() != nullptr) {
+				return site_game_data->get_site_unit()->get_center_tile_pos();
 			} else {
-				return this->site->get_map_pos();
+				return site_game_data->get_map_pos();
 			}
 		}
 
@@ -167,10 +170,12 @@ public:
 	int get_map_layer_index(const CPlayer *player) const
 	{
 		if (this->site != nullptr) {
-			if (this->site->get_site_unit() != nullptr) {
-				return this->site->get_site_unit()->MapLayer->ID;
-			} else if (this->site->get_map_layer() != nullptr) {
-				return this->site->get_map_layer()->ID;
+			const site_game_data *site_game_data = this->site->get_game_data();
+
+			if (site_game_data->get_site_unit() != nullptr) {
+				return site_game_data->get_site_unit()->MapLayer->ID;
+			} else if (site_game_data->get_map_layer() != nullptr) {
+				return site_game_data->get_map_layer()->ID;
 			}
 		}
 

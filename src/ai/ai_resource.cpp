@@ -41,6 +41,7 @@
 #include "map/map.h"
 #include "map/map_layer.h"
 #include "map/site.h"
+#include "map/site_game_data.h"
 #include "map/terrain_type.h"
 #include "map/tile.h"
 #include "map/tileset.h"
@@ -1235,16 +1236,21 @@ static void AiCheckingWork()
 	for (int i = 0; i < sz; ++i) {
 		AiBuildQueue *queuep = &AiPlayer->UnitTypeBuilt[AiPlayer->UnitTypeBuilt.size() - sz + i];
 		const wyrmgus::unit_type &type = *queuep->Type;
+
+		const wyrmgus::site *settlement = queuep->settlement;
 		
-		if ( //if has a build request specific to a settlement, but the player doesn't own the settlement, remove the order
-			queuep->settlement != nullptr
-			&& (
-				(!type.BoolFlag[TOWNHALL_INDEX].value && queuep->settlement->get_site_unit()->Player != AiPlayer->Player)
-				|| (type.BoolFlag[TOWNHALL_INDEX].value && queuep->settlement->get_site_unit()->Player->Index != PlayerNumNeutral)
-			)
-		) {
-			AiPlayer->UnitTypeBuilt.erase(AiPlayer->UnitTypeBuilt.begin() + (AiPlayer->UnitTypeBuilt.size() - sz + i));
-			continue;
+		if (settlement != nullptr) {
+			//if has a build request specific to a settlement, but the player doesn't own the settlement, remove the order
+
+			const wyrmgus::site_game_data *settlement_game_data = settlement->get_game_data();
+
+			if (
+				(!type.BoolFlag[TOWNHALL_INDEX].value && settlement_game_data->get_site_unit()->Player != AiPlayer->Player)
+				|| (type.BoolFlag[TOWNHALL_INDEX].value && settlement_game_data->get_site_unit()->Player->Index != PlayerNumNeutral)
+			) {
+				AiPlayer->UnitTypeBuilt.erase(AiPlayer->UnitTypeBuilt.begin() + (AiPlayer->UnitTypeBuilt.size() - sz + i));
+				continue;
+			}
 		}
 
 		// FIXME: must check if requirements are fulfilled.
@@ -2286,7 +2292,7 @@ static void AiCheckPathwayConstruction()
 		static constexpr int pathway_construction_range = 8;
 		const wyrmgus::site *settlement = unit.get_center_tile()->get_settlement();
 		if (settlement != nullptr) {
-			for (const QPoint &pathway_pos : settlement->get_trade_route_tiles()) {
+			for (const QPoint &pathway_pos : settlement->get_game_data()->get_trade_route_tiles()) {
 				if (unit.MapDistanceTo(pathway_pos, unit.MapLayer->ID) <= pathway_construction_range) {
 					pathway_tiles.push_back(pathway_pos);
 				}
@@ -2652,11 +2658,11 @@ static void AiCheckMinecartConstruction()
 				const CUnit *mine_unit = mine_table[j];
 				wyrmgus::site *mine_settlement = mine_unit->settlement;
 						
-				if (!mine_settlement) {
+				if (mine_settlement == nullptr) {
 					continue;
 				}
 						
-				const CUnit *town_hall_unit = mine_settlement->get_site_unit();
+				const CUnit *town_hall_unit = mine_settlement->get_game_data()->get_site_unit();
 				
 				if (!town_hall_unit) {
 					continue;

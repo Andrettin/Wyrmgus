@@ -35,6 +35,7 @@
 #include "map/map_layer.h"
 #include "map/minimap_mode.h"
 #include "map/site.h"
+#include "map/site_game_data.h"
 #include "map/terrain_type.h"
 #include "map/tile.h"
 #include "map/tileset.h"
@@ -395,7 +396,7 @@ void minimap::update_territory_pixel(const int mx, const int my, const int z)
 			}
 		}
 
-		const CUnit *settlement_unit = settlement->get_site_unit();
+		const CUnit *settlement_unit = settlement->get_game_data()->get_site_unit();
 		if (settlement_unit == nullptr) {
 			throw std::runtime_error("Settlement \"" + settlement->get_identifier() + "\" has territory, but no settlement unit.");
 		}
