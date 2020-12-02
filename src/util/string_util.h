@@ -93,26 +93,42 @@ inline void replace(std::string &str, const std::string &find, const std::string
 	}
 }
 
-inline std::string to_lower(const std::string &str)
+inline void to_lower(std::string &str)
 {
-	std::string result(str);
-
-	std::transform(result.begin(), result.end(), result.begin(), [](const char c) {
+	std::transform(str.begin(), str.end(), str.begin(), [](const char c) {
 		return std::tolower(c);
 	});
-
-	return result;
 }
 
-inline std::string to_upper(const std::string &str)
+inline std::string lowered(std::string &&str)
+{
+	string::to_lower(str);
+	return str;
+}
+
+inline std::string lowered(const std::string &str)
 {
 	std::string result(str);
+	return string::lowered(std::move(result));
+}
 
-	std::transform(result.begin(), result.end(), result.begin(), [](const char c) {
+inline void to_upper(std::string &str)
+{
+	std::transform(str.begin(), str.end(), str.begin(), [](const char c) {
 		return std::toupper(c);
 	});
+}
 
-	return result;
+inline std::string uppered(std::string &&str)
+{
+	string::to_upper(str);
+	return str;
+}
+
+inline std::string uppered(const std::string &str)
+{
+	std::string result(str);
+	return string::uppered(std::move(result));
 }
 
 inline void capitalize(std::string &str)

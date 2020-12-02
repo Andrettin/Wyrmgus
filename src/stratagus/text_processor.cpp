@@ -79,33 +79,62 @@ std::string text_processor::process_tokens(std::queue<std::string> &&tokens) con
 
 	const std::string front_subtoken = queue::take(subtokens);
 
+	std::string str;
+
 	if (front_subtoken == "faction") {
 		const wyrmgus::faction *faction = this->faction;
 		if (!subtokens.empty()) {
 			faction = faction::get(queue::take(subtokens));
 		}
 
-		return this->process_faction_tokens(faction, std::move(tokens));
+		str = this->process_faction_tokens(faction, tokens);
 	} else if (front_subtoken == "unit_type") {
 		const wyrmgus::unit_type *unit_type = nullptr;
 		if (!subtokens.empty()) {
 			unit_type = unit_type::get(queue::take(subtokens));
 		}
 
-		return this->process_unit_type_tokens(unit_type, std::move(tokens));
+		str = this->process_unit_type_tokens(unit_type, tokens);
 	} else if (front_subtoken == "word") {
 		const wyrmgus::word *word = nullptr;
 		if (!subtokens.empty()) {
 			word = word::get(queue::take(subtokens));
 		}
 
-		return this->process_word_tokens(word, std::move(tokens));
+		str = this->process_word_tokens(word, tokens);
+	} else {
+		throw std::runtime_error("Failed to process token \"" + token + "\".");
 	}
 
-	throw std::runtime_error("Failed to process token \"" + token + "\".");
+	if (!tokens.empty()) {
+		return this->process_string_tokens(std::move(str), std::move(tokens));
+	}
+
+	return str;
 }
 
-std::string text_processor::process_faction_tokens(const wyrmgus::faction *faction, std::queue<std::string> &&tokens) const
+std::string text_processor::process_string_tokens(std::string &&str, std::queue<std::string> &&tokens) const
+{
+	if (tokens.empty()) {
+		throw std::runtime_error("No tokens provided when processing string tokens.");
+	}
+
+	const std::string token = queue::take(tokens);
+
+	if (token == "lowered") {
+		string::to_lower(str);
+	} else {
+		throw std::runtime_error("Failed to process string token \"" + token + "\".");
+	}
+
+	if (!tokens.empty()) {
+		return this->process_string_tokens(std::move(str), std::move(tokens));
+	}
+
+	return str;
+}
+
+std::string text_processor::process_faction_tokens(const wyrmgus::faction *faction, std::queue<std::string> &tokens) const
 {
 	if (faction == nullptr) {
 		throw std::runtime_error("No faction provided when processing faction tokens.");
@@ -117,10 +146,6 @@ std::string text_processor::process_faction_tokens(const wyrmgus::faction *facti
 
 	const std::string token = queue::take(tokens);
 
-	if (!tokens.empty()) {
-		throw std::runtime_error("Too many tokens provided when processing faction token \"" + token + "\".");
-	}
-
 	if (token == "name") {
 		return faction->get_name();
 	} else if (token == "titled_name") {
@@ -130,7 +155,7 @@ std::string text_processor::process_faction_tokens(const wyrmgus::faction *facti
 	throw std::runtime_error("Failed to process faction token \"" + token + "\".");
 }
 
-std::string text_processor::process_unit_type_tokens(const wyrmgus::unit_type *unit_type, std::queue<std::string> &&tokens) const
+std::string text_processor::process_unit_type_tokens(const wyrmgus::unit_type *unit_type, std::queue<std::string> &tokens) const
 {
 	if (unit_type == nullptr) {
 		throw std::runtime_error("No unit type provided when processing unit type tokens.");
@@ -142,10 +167,6 @@ std::string text_processor::process_unit_type_tokens(const wyrmgus::unit_type *u
 
 	const std::string token = queue::take(tokens);
 
-	if (!tokens.empty()) {
-		throw std::runtime_error("Too many tokens provided when processing unit type token \"" + token + "\".");
-	}
-
 	if (token == "name") {
 		return unit_type->get_name();
 	}
@@ -153,7 +174,7 @@ std::string text_processor::process_unit_type_tokens(const wyrmgus::unit_type *u
 	throw std::runtime_error("Failed to process unit type token \"" + token + "\".");
 }
 
-std::string text_processor::process_word_tokens(const wyrmgus::word *word, std::queue<std::string> &&tokens) const
+std::string text_processor::process_word_tokens(const wyrmgus::word *word, std::queue<std::string> &tokens) const
 {
 	if (word == nullptr) {
 		throw std::runtime_error("No word provided when processing word tokens.");
@@ -164,27 +185,17 @@ std::string text_processor::process_word_tokens(const wyrmgus::word *word, std::
 	}
 
 	const std::string token = queue::take(tokens);
-	const size_t remaining_tokens_count = tokens.size();
 
-	switch (remaining_tokens_count) {
-		case 0:
-			if (token == "name") {
-				return word->get_name();
-			}
-			break;
-		case 1:
-			if (token == "meanings") {
-				return string::to_lower(this->process_word_meaning_tokens(word, std::move(tokens)));
-			}
-			break;
-		default:
-			throw std::runtime_error("Too many tokens provided when processing word token \"" + token + "\".");
+	if (token == "name") {
+		return word->get_name();
+	} else if (token == "meanings") {
+		return this->process_word_meaning_tokens(word, tokens);
 	}
 
 	throw std::runtime_error("Failed to process word token \"" + token + "\".");
 }
 
-std::string text_processor::process_word_meaning_tokens(const wyrmgus::word *word, std::queue<std::string> &&tokens) const
+std::string text_processor::process_word_meaning_tokens(const wyrmgus::word *word, std::queue<std::string> &tokens) const
 {
 	if (word == nullptr) {
 		throw std::runtime_error("No word provided when processing word meaning tokens.");
@@ -195,10 +206,6 @@ std::string text_processor::process_word_meaning_tokens(const wyrmgus::word *wor
 	}
 
 	const std::string token = queue::take(tokens);
-
-	if (!tokens.empty()) {
-		throw std::runtime_error("Too many tokens provided when processing word meaning token \"" + token + "\".");
-	}
 
 	return word->get_meanings().at(std::stoi(token) - 1);
 }
