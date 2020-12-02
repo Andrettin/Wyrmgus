@@ -83,7 +83,7 @@ public:
 		}
 
 		if (this->settlement != nullptr) {
-			if (!player->HasSettlement(this->settlement)) {
+			if (!player->has_settlement(this->settlement)) {
 				return false;
 			}
 

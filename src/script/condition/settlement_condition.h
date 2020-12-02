@@ -73,10 +73,10 @@ public:
 				return false;
 			}
 
-			return faction_player->HasSettlement(this->settlement);
+			return faction_player->has_settlement(this->settlement);
 		}
 
-		return player->HasSettlement(this->settlement);
+		return player->has_settlement(this->settlement);
 	}
 
 	virtual std::string get_string(const size_t indent) const override

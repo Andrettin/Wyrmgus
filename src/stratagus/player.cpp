@@ -1558,7 +1558,7 @@ bool CPlayer::has_upgrade_class(const wyrmgus::upgrade_class *upgrade_class) con
 	return false;
 }
 
-bool CPlayer::HasSettlement(const wyrmgus::site *settlement) const
+bool CPlayer::has_settlement(const wyrmgus::site *settlement) const
 {
 	if (settlement == nullptr) {
 		return false;

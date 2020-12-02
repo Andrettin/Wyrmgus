@@ -101,7 +101,7 @@ public:
 
 		bool validated = false;
 		for (const unit_type *unit_type : unit_types) {
-			if (this->get_settlement() != nullptr && !player->HasSettlement(this->get_settlement()) && !unit_type->BoolFlag[TOWNHALL_INDEX].value) {
+			if (this->get_settlement() != nullptr && !player->has_settlement(this->get_settlement()) && !unit_type->BoolFlag[TOWNHALL_INDEX].value) {
 				continue;
 			}
 
@@ -139,7 +139,7 @@ public:
 		bool validated = false;
 		std::string validation_error;
 		for (const unit_type *unit_type : unit_types) {
-			if (this->get_settlement() != nullptr && !player->HasSettlement(this->get_settlement()) && !unit_type->BoolFlag[TOWNHALL_INDEX].value) {
+			if (this->get_settlement() != nullptr && !player->has_settlement(this->get_settlement()) && !unit_type->BoolFlag[TOWNHALL_INDEX].value) {
 				validation_error = "You no longer hold the required settlement.";
 				continue;
 			}

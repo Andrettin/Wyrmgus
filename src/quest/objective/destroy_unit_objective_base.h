@@ -51,7 +51,7 @@ public:
 				return false;
 			}
 
-			if (this->get_settlement() != nullptr && !faction_player->HasSettlement(this->get_settlement())) {
+			if (this->get_settlement() != nullptr && !faction_player->has_settlement(this->get_settlement())) {
 				return false;
 			}
 		}
@@ -69,7 +69,7 @@ public:
 				return std::make_pair(true, "The target no longer exists.");
 			}
 
-			if (this->get_settlement() != nullptr && !faction_player->HasSettlement(this->get_settlement())) {
+			if (this->get_settlement() != nullptr && !faction_player->has_settlement(this->get_settlement())) {
 				return std::make_pair(true, "The target no longer exists.");
 			}
 		}

@@ -2561,9 +2561,9 @@ static int CclGetPlayerData(lua_State *l)
 		return 1;
 	} else if (!strcmp(data, "HasSettlement")) {
 		LuaCheckArgs(l, 3);
-		std::string site_ident = LuaToString(l, 3);
-		const wyrmgus::site *site = wyrmgus::site::get(site_ident);
-		lua_pushboolean(l, p->HasSettlement(site));
+		const std::string site_identifier = LuaToString(l, 3);
+		const wyrmgus::site *site = wyrmgus::site::get(site_identifier);
+		lua_pushboolean(l, p->has_settlement(site));
 		return 1;
 	//Wyrmgus end
 	} else if (!strcmp(data, "Currency")) {
