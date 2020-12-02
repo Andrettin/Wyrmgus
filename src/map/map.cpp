@@ -3369,14 +3369,6 @@ wyrmgus::point_set CMap::expand_settlement_territories(std::vector<QPoint> &&see
 
 void CMap::calculate_settlement_territory_tiles(const int z)
 {
-	for (const CUnit *site_unit : this->settlement_units) {
-		if (site_unit->MapLayer->ID != z) {
-			continue;
-		}
-
-		site_unit->settlement->get_game_data()->clear_tiles();
-	}
-
 	for (int x = 0; x < this->Info.MapWidths[z]; ++x) {
 		for (int y = 0; y < this->Info.MapHeights[z]; ++y) {
 			const QPoint tile_pos(x, y);
@@ -3388,14 +3380,7 @@ void CMap::calculate_settlement_territory_tiles(const int z)
 			}
 
 			wyrmgus::site_game_data *settlement_game_data = settlement->get_game_data();
-
-			if (this->tile_borders_other_settlement_territory(tile_pos, z)) {
-				settlement_game_data->add_border_tile(tile_pos);
-			}
-
-			if (tile->is_on_trade_route()) {
-				settlement_game_data->add_trade_route_tile(tile_pos);
-			}
+			settlement_game_data->process_territory_tile(tile, tile_pos, z);
 		}
 	}
 }

@@ -38,6 +38,7 @@ class CUnit;
 namespace wyrmgus {
 
 class site;
+class tile;
 
 class site_game_data final
 {
@@ -84,11 +85,7 @@ public:
 		this->map_layer = map_layer;
 	}
 
-	void clear_tiles()
-	{
-		this->clear_border_tiles();
-		this->clear_trade_route_tiles();
-	}
+	void process_territory_tile(const tile *tile, const QPoint &tile_pos, const int z);
 
 	void add_border_tile(const QPoint &tile_pos)
 	{
@@ -110,23 +107,12 @@ public:
 		}
 	}
 
-	void clear_border_tiles()
-	{
-		this->border_tiles.clear();
-		this->territory_rect = QRect();
-	}
-
 	void update_border_tiles();
 	void update_minimap_territory();
 
 	const std::vector<QPoint> &get_trade_route_tiles() const
 	{
 		return this->trade_route_tiles;
-	}
-
-	void add_trade_route_tile(const QPoint &tile_pos)
-	{
-		this->trade_route_tiles.push_back(tile_pos);
 	}
 
 	void clear_trade_route_tiles()

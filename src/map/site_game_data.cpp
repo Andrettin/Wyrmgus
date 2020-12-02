@@ -86,6 +86,17 @@ CPlayer *site_game_data::get_realm_owner() const
 	return nullptr;
 }
 
+void site_game_data::process_territory_tile(const tile *tile, const QPoint &tile_pos, const int z)
+{
+	if (CMap::get()->tile_borders_other_settlement_territory(tile_pos, z)) {
+		this->add_border_tile(tile_pos);
+	}
+
+	if (tile->is_on_trade_route()) {
+		this->trade_route_tiles.push_back(tile_pos);
+	}
+}
+
 void site_game_data::update_border_tiles()
 {
 	if (this->get_site_unit() == nullptr) {
@@ -94,7 +105,7 @@ void site_game_data::update_border_tiles()
 
 	const int z = this->get_site_unit()->MapLayer->ID;
 	for (const QPoint &tile_pos : this->border_tiles) {
-		CMap::Map.CalculateTileOwnershipTransition(tile_pos, z);
+		CMap::get()->CalculateTileOwnershipTransition(tile_pos, z);
 
 		//update adjacent tiles with different settlements as well
 		for (int x_offset = -1; x_offset <= 1; ++x_offset) {
@@ -104,13 +115,13 @@ void site_game_data::update_border_tiles()
 				}
 
 				const QPoint adjacent_pos(tile_pos.x() + x_offset, tile_pos.y() + y_offset);
-				if (!CMap::Map.Info.IsPointOnMap(adjacent_pos, z)) {
+				if (!CMap::get()->Info.IsPointOnMap(adjacent_pos, z)) {
 					continue;
 				}
 
-				tile *adjacent_tile = CMap::Map.Field(adjacent_pos, z);
+				tile *adjacent_tile = CMap::get()->Field(adjacent_pos, z);
 				if (adjacent_tile->get_settlement() != nullptr && adjacent_tile->get_settlement() != this->site) {
-					CMap::Map.CalculateTileOwnershipTransition(adjacent_pos, z);
+					CMap::get()->CalculateTileOwnershipTransition(adjacent_pos, z);
 				}
 			}
 		}
@@ -128,7 +139,7 @@ void site_game_data::update_minimap_territory()
 	for (int x = this->territory_rect.x(); x <= this->territory_rect.right(); ++x) {
 		for (int y = this->territory_rect.y(); y <= this->territory_rect.bottom(); ++y) {
 			const QPoint tile_pos(x, y);
-			const tile *tile = CMap::Map.Field(tile_pos, z);
+			const tile *tile = CMap::get()->Field(tile_pos, z);
 
 			if (tile->get_settlement() == this->site) {
 				UI.get_minimap()->update_territory_xy(tile_pos, z);
