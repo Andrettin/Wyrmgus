@@ -29,7 +29,9 @@
 
 namespace wyrmgus {
 
+class civilization;
 class faction;
+class unit_class;
 class unit_type;
 class word;
 
@@ -44,7 +46,9 @@ public:
 	std::string process_text(const std::string &text) const;
 	std::string process_tokens(std::queue<std::string> &&tokens) const;
 	std::string process_string_tokens(std::string &&str, std::queue<std::string> &&tokens) const;
+	std::string process_civilization_tokens(const civilization *civilization, std::queue<std::string> &tokens) const;
 	std::string process_faction_tokens(const faction *faction, std::queue<std::string> &tokens) const;
+	std::string process_unit_class_tokens(const unit_class *unit_class, std::queue<std::string> &tokens) const;
 	std::string process_unit_type_tokens(const unit_type *unit_type, std::queue<std::string> &tokens) const;
 	std::string process_word_tokens(const word *word, std::queue<std::string> &tokens) const;
 	std::string process_word_meaning_tokens(const word *word, std::queue<std::string> &tokens) const;

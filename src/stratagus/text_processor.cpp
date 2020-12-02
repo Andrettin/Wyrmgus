@@ -29,8 +29,10 @@
 
 #include "text_processor.h"
 
+#include "civilization.h"
 #include "faction.h"
 #include "language/word.h"
+#include "unit/unit_class.h"
 #include "unit/unit_type.h"
 #include "util/queue_util.h"
 #include "util/string_util.h"
@@ -81,13 +83,27 @@ std::string text_processor::process_tokens(std::queue<std::string> &&tokens) con
 
 	std::string str;
 
-	if (front_subtoken == "faction") {
+	if (front_subtoken == "civilization") {
+		const wyrmgus::civilization *civilization = nullptr;
+		if (!subtokens.empty()) {
+			civilization = civilization::get(queue::take(subtokens));
+		}
+
+		str = this->process_civilization_tokens(civilization, tokens);
+	} else if (front_subtoken == "faction") {
 		const wyrmgus::faction *faction = this->faction;
 		if (!subtokens.empty()) {
 			faction = faction::get(queue::take(subtokens));
 		}
 
 		str = this->process_faction_tokens(faction, tokens);
+	} else if (front_subtoken == "unit_class") {
+		const wyrmgus::unit_class *unit_class = nullptr;
+		if (!subtokens.empty()) {
+			unit_class = unit_class::get(queue::take(subtokens));
+		}
+
+		str = this->process_unit_class_tokens(unit_class, tokens);
 	} else if (front_subtoken == "unit_type") {
 		const wyrmgus::unit_type *unit_type = nullptr;
 		if (!subtokens.empty()) {
@@ -136,6 +152,42 @@ std::string text_processor::process_string_tokens(std::string &&str, std::queue<
 	return str;
 }
 
+std::string text_processor::process_civilization_tokens(const civilization *civilization, std::queue<std::string> &tokens) const
+{
+	if (civilization == nullptr) {
+		throw std::runtime_error("No civilization provided when processing civilization tokens.");
+	}
+
+	if (tokens.empty()) {
+		throw std::runtime_error("No tokens provided when processing civilization tokens.");
+	}
+
+	const std::string token = queue::take(tokens);
+
+	std::queue<std::string> subtokens = string::split_to_queue(token, ':');
+
+	if (subtokens.size() > 2) {
+		throw std::runtime_error("There can only be at most 2 subtokens.");
+	}
+
+	const std::string front_subtoken = queue::take(subtokens);
+
+	if (front_subtoken == "name") {
+		return civilization->get_name();
+	} else if (front_subtoken == "class_unit_type") {
+		if (subtokens.empty()) {
+			throw std::runtime_error("No unit class specified for the civilization \"class_unit_type\" token.");
+		}
+
+		const unit_class *unit_class = unit_class::get(queue::take(subtokens));
+		const unit_type *unit_type = civilization->get_class_unit_type(unit_class);
+
+		return this->process_unit_type_tokens(unit_type, tokens);
+	}
+
+	throw std::runtime_error("Failed to process civilization token \"" + front_subtoken + "\".");
+}
+
 std::string text_processor::process_faction_tokens(const wyrmgus::faction *faction, std::queue<std::string> &tokens) const
 {
 	if (faction == nullptr) {
@@ -148,16 +200,52 @@ std::string text_processor::process_faction_tokens(const wyrmgus::faction *facti
 
 	const std::string token = queue::take(tokens);
 
-	if (token == "name") {
-		return faction->get_name();
-	} else if (token == "titled_name") {
-		return faction->get_default_titled_name();
+	std::queue<std::string> subtokens = string::split_to_queue(token, ':');
+
+	if (subtokens.size() > 2) {
+		throw std::runtime_error("There can only be at most 2 subtokens.");
 	}
 
-	throw std::runtime_error("Failed to process faction token \"" + token + "\".");
+	const std::string front_subtoken = queue::take(subtokens);
+
+	if (front_subtoken == "name") {
+		return faction->get_name();
+	} else if (front_subtoken == "titled_name") {
+		return faction->get_default_titled_name();
+	} else if (front_subtoken == "class_unit_type") {
+		if (subtokens.empty()) {
+			throw std::runtime_error("No unit class specified for the faction \"class_unit_type\" token.");
+		}
+
+		const unit_class *unit_class = unit_class::get(queue::take(subtokens));
+		const unit_type *unit_type = faction->get_class_unit_type(unit_class);
+
+		return this->process_unit_type_tokens(unit_type, tokens);
+	}
+
+	throw std::runtime_error("Failed to process faction token \"" + front_subtoken + "\".");
 }
 
-std::string text_processor::process_unit_type_tokens(const wyrmgus::unit_type *unit_type, std::queue<std::string> &tokens) const
+std::string text_processor::process_unit_class_tokens(const unit_class *unit_class, std::queue<std::string> &tokens) const
+{
+	if (unit_class == nullptr) {
+		throw std::runtime_error("No unit class provided when processing unit class tokens.");
+	}
+
+	if (tokens.empty()) {
+		throw std::runtime_error("No tokens provided when processing unit class tokens.");
+	}
+
+	const std::string token = queue::take(tokens);
+
+	if (token == "name") {
+		return unit_class->get_name();
+	}
+
+	throw std::runtime_error("Failed to process unit class token \"" + token + "\".");
+}
+
+std::string text_processor::process_unit_type_tokens(const unit_type *unit_type, std::queue<std::string> &tokens) const
 {
 	if (unit_type == nullptr) {
 		throw std::runtime_error("No unit type provided when processing unit type tokens.");
