@@ -575,7 +575,11 @@ void database::load(const bool initial_definition)
 				return true;
 			}
 
-			return a->get_database_dependency_count() < b->get_database_dependency_count();
+			if (a->get_database_dependency_count() != b->get_database_dependency_count()) {
+				return a->get_database_dependency_count() < b->get_database_dependency_count();
+			}
+
+			return a->get_class_identifier() < b->get_class_identifier();
 		});
 
 		this->load_predefines();
