@@ -1558,6 +1558,34 @@ bool CPlayer::has_upgrade_class(const wyrmgus::upgrade_class *upgrade_class) con
 	return false;
 }
 
+std::vector<CUnit *> CPlayer::get_town_hall_units() const
+{
+	std::vector<CUnit *> town_hall_units;
+
+	for (const auto &kv_pair : this->get_units_by_type()) {
+		const wyrmgus::unit_type *unit_type = kv_pair.first;
+		if (!unit_type->BoolFlag[TOWNHALL_INDEX].value) {
+			continue;
+		}
+
+		FindPlayerUnitsByType(*this, *unit_type, town_hall_units, true);
+	}
+
+	return town_hall_units;
+}
+
+std::vector<const wyrmgus::site *> CPlayer::get_settlements() const
+{
+	std::vector<const wyrmgus::site *> settlements;
+
+	const std::vector<CUnit *> town_hall_units = this->get_town_hall_units();
+	for (const CUnit *town_hall_unit : town_hall_units) {
+		settlements.push_back(town_hall_unit->settlement);
+	}
+
+	return settlements;
+}
+
 bool CPlayer::has_settlement(const wyrmgus::site *settlement) const
 {
 	if (settlement == nullptr) {
@@ -1573,37 +1601,31 @@ bool CPlayer::has_settlement(const wyrmgus::site *settlement) const
 	return false;
 }
 
+bool CPlayer::has_coastal_settlement() const
+{
+	const std::vector<const wyrmgus::site *> settlements = this->get_settlements();
+
+	for (const wyrmgus::site *settlement : settlements) {
+		if (settlement->get_game_data()->is_coastal()) {
+			return true;
+		}
+	}
+
+	return false;
+}
+
 bool CPlayer::HasSettlementNearWaterZone(int water_zone) const
 {
-	std::vector<CUnit *> settlement_unit_table;
-	
-	const wyrmgus::unit_type *town_hall_type = this->get_faction()->get_class_unit_type(wyrmgus::defines::get()->get_town_hall_class());
-	if (town_hall_type == nullptr) {
-		return false;
-	}
-	
-	FindPlayerUnitsByType(*this, *town_hall_type, settlement_unit_table, true);
+	const std::vector<CUnit *> settlement_unit_table = this->get_town_hall_units();
 
-	std::vector<const wyrmgus::unit_type *> additional_town_hall_types;
-
-	for (const wyrmgus::unit_class *additional_town_hall_class : wyrmgus::unit_class::get_town_hall_classes()) {
-		const wyrmgus::unit_type *additional_town_hall_type = this->get_faction()->get_class_unit_type(additional_town_hall_class);
-
-		if (additional_town_hall_type == nullptr) {
-			continue;
-		}
-
-		FindPlayerUnitsByType(*this, *additional_town_hall_type, settlement_unit_table, true); //add e.g. strongholds and fortresses to the table
-	}
-
-	for (size_t i = 0; i < settlement_unit_table.size(); ++i) {
-		CUnit *settlement_unit = settlement_unit_table[i];
+	for (const CUnit *settlement_unit : settlement_unit_table) {
 		if (!settlement_unit->IsAliveOnMap()) {
 			continue;
 		}
 		
-		int settlement_landmass = CMap::Map.GetTileLandmass(settlement_unit->tilePos, settlement_unit->MapLayer->ID);
-		if (std::find(CMap::Map.BorderLandmasses[settlement_landmass].begin(), CMap::Map.BorderLandmasses[settlement_landmass].end(), water_zone) == CMap::Map.BorderLandmasses[settlement_landmass].end()) { //settlement's landmass doesn't even border the water zone, continue
+		const int settlement_landmass = CMap::Map.GetTileLandmass(settlement_unit->tilePos, settlement_unit->MapLayer->ID);
+		if (!wyrmgus::vector::contains(CMap::Map.BorderLandmasses[settlement_landmass], water_zone)) {
+			//settlement's landmass doesn't even border the water zone, continue
 			continue;
 		}
 		

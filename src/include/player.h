@@ -201,7 +201,10 @@ public:
 	CUpgrade *get_class_upgrade(const wyrmgus::upgrade_class *upgrade_class) const;
 	bool has_upgrade_class(const wyrmgus::upgrade_class *upgrade_class) const;
 
+	std::vector<CUnit *> get_town_hall_units() const;
+	std::vector<const wyrmgus::site *> get_settlements() const;
 	bool has_settlement(const wyrmgus::site *settlement) const;
+	bool has_coastal_settlement() const;
 	bool HasSettlementNearWaterZone(int water_zone) const;
 	const wyrmgus::site *GetNearestSettlement(const Vec2i &pos, int z, const Vec2i &size) const;
 	void update_building_settlement_assignment(const wyrmgus::site *old_settlement, const int z) const;
