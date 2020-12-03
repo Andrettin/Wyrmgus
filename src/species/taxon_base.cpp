@@ -68,6 +68,8 @@ void taxon_base::initialize()
 		this->get_supertaxon()->add_specimen_names_from(this);
 	}
 
+	name_generator::get()->add_specimen_names(this->specimen_names);
+
 	name_generator::propagate_ungendered_names(this->specimen_names);
 
 	data_entry::initialize();
@@ -109,10 +111,8 @@ bool taxon_base::is_subtaxon_of(const taxon *other_taxon) const
 
 const std::vector<std::string> &taxon_base::get_specimen_names(const gender gender) const
 {
-	static constexpr size_t minimum_name_count = 10;
-
 	const auto find_iterator = this->specimen_names.find(gender);
-	if (find_iterator != this->specimen_names.end() && find_iterator->second.size() >= minimum_name_count) {
+	if (find_iterator != this->specimen_names.end() && find_iterator->second.size() >= name_generator::minimum_name_count) {
 		return find_iterator->second;
 	}
 

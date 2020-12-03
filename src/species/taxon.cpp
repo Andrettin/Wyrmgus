@@ -48,7 +48,7 @@ void taxon::check() const
 	}
 
 	if (this->get_supertaxon() != nullptr && this->get_rank() >= this->get_supertaxon()->get_rank()) {
-		throw std::runtime_error("The rank of taxon \"" + this->get_identifier() + "\" is greater than or equal to the rank of its supertaxon.");
+		throw std::runtime_error("The rank of taxon \"" + this->get_identifier() + "\" is greater than or equal to that of its supertaxon.");
 	}
 }
 

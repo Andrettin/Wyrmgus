@@ -43,4 +43,69 @@ void name_generator::propagate_ungendered_names(const std::map<gender, std::vect
 	}
 }
 
+const std::vector<std::string> &name_generator::get_specimen_names(const gender gender) const
+{
+	const auto find_iterator = this->specimen_names.find(gender);
+	if (find_iterator != this->specimen_names.end()) {
+		return find_iterator->second;
+	}
+
+	return vector::empty_string_vector;
+}
+
+void name_generator::add_specimen_names(const std::map<gender, std::vector<std::string>> &specimen_names)
+{
+	for (const auto &kv_pair : specimen_names) {
+		vector::merge(this->specimen_names[kv_pair.first], kv_pair.second);
+	}
+
+	name_generator::propagate_ungendered_names(specimen_names, this->specimen_names);
+}
+
+const std::vector<std::string> &name_generator::get_personal_names(const gender gender) const
+{
+	const auto find_iterator = this->personal_names.find(gender);
+	if (find_iterator != this->personal_names.end()) {
+		return find_iterator->second;
+	}
+
+	return vector::empty_string_vector;
+}
+
+void name_generator::add_personal_names(const std::map<gender, std::vector<std::string>> &personal_names)
+{
+	for (const auto &kv_pair : personal_names) {
+		vector::merge(this->personal_names[kv_pair.first], kv_pair.second);
+	}
+
+	name_generator::propagate_ungendered_names(personal_names, this->personal_names);
+}
+
+void name_generator::add_surnames(const std::vector<std::string> &surnames)
+{
+	vector::merge(this->surnames, surnames);
+}
+
+const std::vector<std::string> &name_generator::get_unit_class_names(const unit_class *unit_class) const
+{
+	const auto find_iterator = this->unit_class_names.find(unit_class);
+	if (find_iterator != this->unit_class_names.end()) {
+		return find_iterator->second;
+	}
+
+	return vector::empty_string_vector;
+}
+
+void name_generator::add_unit_class_names(const unit_class_map<std::vector<std::string>> &unit_class_names)
+{
+	for (const auto &kv_pair : unit_class_names) {
+		vector::merge(this->unit_class_names[kv_pair.first], kv_pair.second);
+	}
+}
+
+void name_generator::add_ship_names(const std::vector<std::string> &ship_names)
+{
+	vector::merge(this->ship_names, ship_names);
+}
+
 }

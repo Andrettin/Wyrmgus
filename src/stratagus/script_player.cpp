@@ -738,7 +738,7 @@ static int CclDefineCivilization(lua_State *l)
 		} else if (!strcmp(value, "Species")) {
 			civilization->set_species(wyrmgus::species::get(LuaToString(l, -1)));
 		} else if (!strcmp(value, "Group")) {
-			civilization->group = wyrmgus::civilization_group::get(LuaToString(l, -1));
+			civilization->set_group(wyrmgus::civilization_group::get(LuaToString(l, -1)));
 		} else if (!strcmp(value, "ParentCivilization")) {
 			civilization->parent_civilization = wyrmgus::civilization::get(LuaToString(l, -1));
 		} else if (!strcmp(value, "Language")) {

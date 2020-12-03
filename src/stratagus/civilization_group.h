@@ -32,29 +32,29 @@
 
 namespace wyrmgus {
 
-class civilization_supergroup;
+enum class civilization_group_rank;
 
 class civilization_group final : public civilization_base, public data_type<civilization_group>
 {
 	Q_OBJECT
 
-	Q_PROPERTY(wyrmgus::civilization_supergroup* supergroup MEMBER supergroup READ get_supergroup)
+	Q_PROPERTY(wyrmgus::civilization_group_rank rank MEMBER rank READ get_rank)
 
 public:
 	static constexpr const char *class_identifier = "civilization_group";
 	static constexpr const char *database_folder = "civilization_groups";
 
-	civilization_group(const std::string &identifier) : civilization_base(identifier) {}
+	explicit civilization_group(const std::string &identifier);
 
-	virtual void initialize() override;
+	virtual void check() const override;
 
-	civilization_supergroup *get_supergroup() const
+	civilization_group_rank get_rank() const
 	{
-		return this->supergroup;
+		return this->rank;
 	}
 
 private:
-	civilization_supergroup *supergroup = nullptr;
+	civilization_group_rank rank;
 };
 
 }

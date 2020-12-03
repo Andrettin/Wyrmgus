@@ -27,23 +27,24 @@
 
 #include "civilization_group.h"
 
-#include "civilization_supergroup.h"
+#include "civilization_group_rank.h"
 
 namespace wyrmgus {
 
-void civilization_group::initialize()
+civilization_group::civilization_group(const std::string &identifier)
+	: civilization_base(identifier), rank(civilization_group_rank::none)
 {
-	if (this->get_supergroup() == nullptr) {
-		throw std::runtime_error("Civilization group \"" + this->get_identifier() + "\" has no civilization supergroup.");
+}
+
+void civilization_group::check() const
+{
+	if (this->get_rank() == civilization_group_rank::none) {
+		throw std::runtime_error("Civilization group \"" + this->get_identifier() + "\" has no rank.");
 	}
 
-	if (this->get_species() == nullptr) {
-		this->set_species(this->get_supergroup()->get_species());
+	if (this->get_group() != nullptr && this->get_rank() >= this->get_group()->get_rank()) {
+		throw std::runtime_error("The rank of civilization group \"" + this->get_identifier() + "\" is greater than or equal to that of its upper group.");
 	}
-
-	this->get_supergroup()->add_names_from(this);
-
-	civilization_base::initialize();
 }
 
 }

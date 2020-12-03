@@ -32,7 +32,7 @@
 #include "character.h"
 #include "civilization.h"
 #include "civilization_group.h"
-#include "civilization_supergroup.h"
+#include "civilization_group_rank.h"
 #include "database/data_module.h"
 #include "database/data_module_container.h"
 #include "database/data_type_metadata.h"
@@ -214,8 +214,8 @@ QVariant database::process_sml_property_value(const sml_property &property, cons
 			new_property_value = QVariant::fromValue(civilization::get(property.get_value()));
 		} else if (property_class_name == "wyrmgus::civilization_group*") {
 			new_property_value = QVariant::fromValue(civilization_group::get(property.get_value()));
-		} else if (property_class_name == "wyrmgus::civilization_supergroup*") {
-			new_property_value = QVariant::fromValue(civilization_supergroup::get(property.get_value()));
+		} else if (property_class_name == "wyrmgus::civilization_group_rank") {
+			new_property_value = QVariant::fromValue(string_to_civilization_group_rank(property.get_value()));
 		} else if (property_class_name == "wyrmgus::construction*") {
 			new_property_value = QVariant::fromValue(construction::get(property.get_value()));
 		} else if (property_class_name == "wyrmgus::cursor*") {

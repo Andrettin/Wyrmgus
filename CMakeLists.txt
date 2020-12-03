@@ -1016,7 +1016,7 @@ set(stratagus_generic_HDRS
 	src/stratagus/character_history.h
 	src/stratagus/civilization_history.h
 	src/stratagus/civilization_group.h
-	src/stratagus/civilization_supergroup.h
+	src/stratagus/civilization_group_rank.h
 	src/stratagus/dialogue.h
 	src/stratagus/dialogue_node.h
 	src/stratagus/dialogue_option.h

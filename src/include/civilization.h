@@ -46,9 +46,7 @@ static int CclDefineCivilization(lua_State *l);
 namespace wyrmgus {
 
 class calendar;
-class civilization_group;
 class civilization_history;
-class civilization_supergroup;
 class deity;
 class language;
 class quest;
@@ -67,7 +65,6 @@ class civilization final : public civilization_base, public data_type<civilizati
 	Q_OBJECT
 
 	Q_PROPERTY(wyrmgus::civilization* parent_civilization MEMBER parent_civilization READ get_parent_civilization)
-	Q_PROPERTY(wyrmgus::civilization_group* group MEMBER group READ get_group)
 	Q_PROPERTY(bool visible MEMBER visible READ is_visible)
 	Q_PROPERTY(bool playable MEMBER playable READ is_playable)
 	Q_PROPERTY(QString interface READ get_interface_qstring)
@@ -111,7 +108,7 @@ public:
 		return this->parent_civilization;
 	}
 	
-	wyrmgus::species *get_species() const
+	const wyrmgus::species *get_species() const
 	{
 		if (civilization_base::get_species() != nullptr) {
 			return civilization_base::get_species();
@@ -124,13 +121,6 @@ public:
 		return nullptr;
 	}
 	
-	civilization_group *get_group() const
-	{
-		return this->group;
-	}
-
-	civilization_supergroup *get_supergroup() const;
-
 	int GetUpgradePriority(const CUpgrade *upgrade) const;
 	int GetForceTypeWeight(const ForceType force_type) const;
 
@@ -255,12 +245,6 @@ public:
 	const std::vector<std::unique_ptr<CForceTemplate>> &GetForceTemplates(const ForceType force_type) const;
 	const std::vector<std::unique_ptr<CAiBuildingTemplate>> &GetAiBuildingTemplates() const;
 
-	const std::map<gender, std::vector<std::string>> &get_personal_names() const;
-	const std::vector<std::string> &get_personal_names(const gender gender) const;
-	const std::vector<std::string> &get_surnames() const;
-	const std::vector<std::string> &get_unit_class_names(const unit_class *unit_class) const;
-	const std::vector<std::string> &get_ship_names() const;
-
 	unit_type *get_class_unit_type(const unit_class *unit_class) const;
 
 	void set_class_unit_type(const unit_class *unit_class, unit_type *unit_type)
@@ -329,7 +313,6 @@ public:
 	int ID = -1;
 private:
 	civilization *parent_civilization = nullptr;
-	civilization_group *group = nullptr;
 public:
 	std::string Adjective;			/// adjective pertaining to the civilization
 private:

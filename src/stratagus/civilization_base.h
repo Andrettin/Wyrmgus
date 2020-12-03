@@ -32,6 +32,7 @@
 
 namespace wyrmgus {
 
+class civilization_group;
 class species;
 class unit_class;
 enum class gender;
@@ -40,8 +41,8 @@ class civilization_base : public detailed_data_entry
 {
 	Q_OBJECT
 
-	Q_PROPERTY(wyrmgus::species* species MEMBER species READ get_species)
-	Q_PROPERTY(QStringList ship_names READ get_ship_names_qstring_list)
+	Q_PROPERTY(wyrmgus::species* species MEMBER species)
+	Q_PROPERTY(wyrmgus::civilization_group* group MEMBER group)
 
 protected:
 	explicit civilization_base(const std::string &identifier) : detailed_data_entry(identifier) {}
@@ -50,49 +51,27 @@ public:
 	virtual void process_sml_scope(const sml_data &scope) override;
 	virtual void initialize() override;
 
-	species *get_species() const
+	const species *get_species() const
 	{
 		return this->species;
 	}
 
-	const std::map<gender, std::vector<std::string>> &get_personal_names() const
+	const civilization_group *get_group() const
 	{
-		return this->personal_names;
+		return this->group;
 	}
 
 	const std::vector<std::string> &get_personal_names(const gender gender) const;
 	void add_personal_name(const gender gender, const std::string &name);
 
-	const std::vector<std::string> &get_surnames() const
-	{
-		return this->surnames;
-	}
-
-	void add_surname(const std::string &surname)
-	{
-		this->surnames.push_back(surname);
-	}
+	const std::vector<std::string> &get_surnames() const;
+	void add_surname(const std::string &surname);
 
 	const std::vector<std::string> &get_unit_class_names(const unit_class *unit_class) const;
+	void add_unit_class_name(const unit_class *unit_class, const std::string &name);
 
-	void add_unit_class_name(const unit_class *unit_class, const std::string &name)
-	{
-		this->unit_class_names[unit_class].push_back(name);
-	}
-
-	const std::vector<std::string> &get_ship_names() const
-	{
-		return this->ship_names;
-	}
-
-	QStringList get_ship_names_qstring_list() const;
-
-	Q_INVOKABLE void add_ship_name(const std::string &ship_name)
-	{
-		this->ship_names.push_back(ship_name);
-	}
-
-	Q_INVOKABLE void remove_ship_name(const std::string &ship_name);
+	const std::vector<std::string> &get_ship_names() const;
+	void add_ship_name(const std::string &ship_name);
 
 	void add_names_from(const civilization_base *other);
 
@@ -102,8 +81,14 @@ protected:
 		this->species = species;
 	}
 
+	void set_group(civilization_group *group)
+	{
+		this->group = group;
+	}
+
 private:
 	species *species = nullptr;
+	civilization_group *group = nullptr;
 	std::map<gender, std::vector<std::string>> personal_names; //personal names for the civilization, mapped to the gender they pertain to (use gender::none for names which should be available for both genders)
 	std::vector<std::string> surnames; //surnames for the civilization
 	unit_class_map<std::vector<std::string>> unit_class_names;	/// Unit class names for the civilization, mapped to the unit class they pertain to, used for mechanical units, and buildings

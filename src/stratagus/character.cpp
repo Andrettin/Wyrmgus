@@ -32,8 +32,6 @@
 #include "ai/ai_local.h" //for using AiHelpers
 #include "character_history.h"
 #include "civilization.h"
-#include "civilization_group.h"
-#include "civilization_supergroup.h"
 #include "config.h"
 #include "faction.h"
 #include "game.h"
@@ -379,13 +377,9 @@ void character::initialize()
 
 		if (!this->get_name().empty()) {
 			this->civilization->add_personal_name(this->get_gender(), this->get_name());
-			this->civilization->get_group()->add_personal_name(this->get_gender(), this->get_name());
-			this->civilization->get_supergroup()->add_personal_name(this->get_gender(), this->get_name());
 		}
 		if (!this->get_surname().empty()) {
 			this->civilization->add_surname(this->get_surname());
-			this->civilization->get_group()->add_surname(this->get_surname());
-			this->civilization->get_supergroup()->add_surname(this->get_surname());
 		}
 	}
 

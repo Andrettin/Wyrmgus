@@ -27,13 +27,18 @@
 
 #pragma once
 
+#include "unit/unit_class_container.h"
+#include "util/singleton.h"
+
 namespace wyrmgus {
 
 enum class gender;
 
-class name_generator final
+class name_generator final : public singleton<name_generator>
 {
 public:
+	static constexpr size_t minimum_name_count = 10;
+
 	static void propagate_ungendered_names(const std::map<gender, std::vector<std::string>> &source_name_map, std::map<gender, std::vector<std::string>> &target_name_map);
 
 	static void propagate_ungendered_names(std::map<gender, std::vector<std::string>> &name_map)
@@ -41,7 +46,37 @@ public:
 		name_generator::propagate_ungendered_names(name_map, name_map);
 	}
 
-	name_generator() = delete;
+	const std::vector<std::string> &get_specimen_names(const gender gender) const;
+	void add_specimen_names(const std::map<gender, std::vector<std::string>> &specimen_names);
+
+	const std::vector<std::string> &get_personal_names(const gender gender) const;
+	void add_personal_names(const std::map<gender, std::vector<std::string>> &personal_names);
+
+	const std::vector<std::string> &get_surnames() const
+	{
+		return this->surnames;
+	}
+
+	void add_surnames(const std::vector<std::string> &surnames);
+
+	const std::vector<std::string> &get_unit_class_names(const unit_class *unit_class) const;
+
+	void add_unit_class_names(const unit_class_map<std::vector<std::string>> &unit_class_names);
+
+	const std::vector<std::string> &get_ship_names() const
+	{
+		return this->ship_names;
+	}
+
+	void add_ship_names(const std::vector<std::string> &ship_names);
+
+private:
+	//name generation lists containing all names (i.e. from each civilization, species and etc.)
+	std::map<gender, std::vector<std::string>> specimen_names;
+	std::map<gender, std::vector<std::string>> personal_names;
+	std::vector<std::string> surnames;
+	unit_class_map<std::vector<std::string>> unit_class_names;
+	std::vector<std::string> ship_names;
 };
 
 }
