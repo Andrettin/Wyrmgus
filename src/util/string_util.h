@@ -165,6 +165,18 @@ inline void normalize(std::string &str)
 	string::replace(str, "ū", "u");
 }
 
+inline std::string normalized(std::string &&str)
+{
+	string::normalize(str);
+	return str;
+}
+
+inline std::string normalized(const std::string &str)
+{
+	std::string result(str);
+	return string::normalized(std::move(result));
+}
+
 inline bool to_bool(const std::string &str)
 {
 	if (str == "true" || str == "yes" || str == "1") {
