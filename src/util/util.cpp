@@ -618,11 +618,11 @@ int GetFileLastModified(const std::string &file_name)
 std::string TransliterateText(const std::string &text) //convert special characters into ones more legible for English-speakers
 {
 	std::string result(text);
+
+	string::normalize(result);
 	
 	result = FindAndReplaceString(result, "Ā́", "A");
 	result = FindAndReplaceString(result, "ā́", "a");
-	result = FindAndReplaceString(result, "Ā", "A");
-	result = FindAndReplaceString(result, "ā", "a");
 	result = FindAndReplaceString(result, "Ấ", "A");
 	result = FindAndReplaceString(result, "ấ", "a");
 	result = FindAndReplaceString(result, "Ȧ́", "A");
@@ -635,8 +635,6 @@ std::string TransliterateText(const std::string &text) //convert special charact
 	result = FindAndReplaceString(result, "ã", "a");
 	result = FindAndReplaceString(result, "Ä", "A");
 	result = FindAndReplaceString(result, "ä", "a");
-	result = FindAndReplaceString(result, "Ā", "A");
-	result = FindAndReplaceString(result, "ā", "a");
 	result = FindAndReplaceString(result, "Â", "A");
 	result = FindAndReplaceString(result, "â", "a");
 	result = FindAndReplaceString(result, "Ą", "A");
@@ -679,8 +677,6 @@ std::string TransliterateText(const std::string &text) //convert special charact
 	result = FindAndReplaceString(result, "é", "e");
 	result = FindAndReplaceString(result, "È", "E");
 	result = FindAndReplaceString(result, "è", "e");
-	result = FindAndReplaceString(result, "Ē", "E");
-	result = FindAndReplaceString(result, "ē", "e");
 	result = FindAndReplaceString(result, "Ê", "E");
 	result = FindAndReplaceString(result, "ê", "e");
 	result = FindAndReplaceString(result, "Ě", "E");
@@ -706,16 +702,12 @@ std::string TransliterateText(const std::string &text) //convert special charact
 	result = FindAndReplaceString(result, "î́", "i");
 	result = FindAndReplaceString(result, "Ī́", "I");
 	result = FindAndReplaceString(result, "ī́", "i");
-	result = FindAndReplaceString(result, "Ī", "I");
-	result = FindAndReplaceString(result, "ī", "i");
 	result = FindAndReplaceString(result, "I̊", "I");
 	result = FindAndReplaceString(result, "i̊", "i");
 	result = FindAndReplaceString(result, "Í", "I");
 	result = FindAndReplaceString(result, "í", "i");
 	result = FindAndReplaceString(result, "Ì", "I");
 	result = FindAndReplaceString(result, "ì", "i");
-	result = FindAndReplaceString(result, "Ī", "I");
-	result = FindAndReplaceString(result, "ī", "i");
 	result = FindAndReplaceString(result, "Î", "I");
 	result = FindAndReplaceString(result, "î", "i");
 	result = FindAndReplaceString(result, "Ĭ", "I");
@@ -748,8 +740,6 @@ std::string TransliterateText(const std::string &text) //convert special charact
 	result = FindAndReplaceString(result, "ó", "o");
 	result = FindAndReplaceString(result, "Ò", "O");
 	result = FindAndReplaceString(result, "ò", "o");
-	result = FindAndReplaceString(result, "Ō", "O");
-	result = FindAndReplaceString(result, "ō", "o");
 	result = FindAndReplaceString(result, "Ô", "O");
 	result = FindAndReplaceString(result, "ô", "o");
 	result = FindAndReplaceString(result, "Ǒ", "O");
@@ -795,8 +785,6 @@ std::string TransliterateText(const std::string &text) //convert special charact
 	result = FindAndReplaceString(result, "ú", "u");
 	result = FindAndReplaceString(result, "Ù", "U");
 	result = FindAndReplaceString(result, "ù", "u");
-	result = FindAndReplaceString(result, "Ū", "U");
-	result = FindAndReplaceString(result, "ū", "u");
 	result = FindAndReplaceString(result, "Û", "U");
 	result = FindAndReplaceString(result, "û", "u");
 	result = FindAndReplaceString(result, "Ŭ", "U");
