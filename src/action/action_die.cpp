@@ -121,6 +121,7 @@ void COrder_Die::Execute(CUnit &unit)
 //	unit.Remove(nullptr);
 	MapUnmarkUnitSight(unit);
 	//Wyrmgus end
+	unit.ChooseVariation(corpse_type);
 	unit.Type = corpse_type;
 	unit.Stats = &corpse_type->Stats[unit.Player->Index];
 	//Wyrmgus start
