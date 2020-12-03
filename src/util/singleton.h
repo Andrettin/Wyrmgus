@@ -36,11 +36,12 @@ namespace wyrmgus {
 template <typename T>
 class singleton
 {
-public:
+protected:
 	singleton() = default;
 	singleton(const singleton &other) = delete;
 	singleton &operator =(const singleton &other) = delete;
 
+public:
 	static T *get()
 	{
 		static std::unique_ptr<T> instance = T::create();
