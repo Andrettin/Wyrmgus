@@ -3978,30 +3978,39 @@ bool CPlayer::has_neutral_faction_type() const
 /**
 **  Check if the player can use the buildings of another, for neutral building functions (i.e. unit training)
 */
-bool CPlayer::HasBuildingAccess(const CPlayer &player, const ButtonCmd button_action) const
+bool CPlayer::has_building_access(const CPlayer *player, const ButtonCmd button_action) const
 {
-	if (player.IsEnemy(*this)) {
+	if (player->IsEnemy(*this)) {
 		return false;
 	}
 
-	if (player.get_faction() == nullptr) {
-		return false;
-	}
-
-	if (player.Type == PlayerNeutral) {
+	if (player->Type == PlayerNeutral) {
 		return true;
 	}
-	
+
+	if (player->get_faction() == nullptr) {
+		return false;
+	}
+
 	if (
-		player.has_neutral_faction_type()
-		&& (player.get_overlord() == nullptr || this->is_any_overlord_of(&player) || player.get_overlord()->IsAllied(*this))
+		player->has_neutral_faction_type()
+		&& (player->get_overlord() == nullptr || this->is_any_overlord_of(player) || player->get_overlord()->IsAllied(*this))
 	) {
-		if (player.get_faction()->get_type() != wyrmgus::faction_type::holy_order || (button_action != ButtonCmd::Train && button_action != ButtonCmd::TrainClass && button_action != ButtonCmd::Buy) || wyrmgus::vector::contains(this->Deities, player.get_faction()->get_holy_order_deity())) { //if the faction is a holy order, the player must have chosen its respective deity
+		if (player->get_faction()->get_type() != wyrmgus::faction_type::holy_order || (button_action != ButtonCmd::Train && button_action != ButtonCmd::TrainClass && button_action != ButtonCmd::Buy) || wyrmgus::vector::contains(this->Deities, player->get_faction()->get_holy_order_deity())) { //if the faction is a holy order, the player must have chosen its respective deity
 			return true;
 		}
 	}
 
 	return false;
+}
+
+bool CPlayer::has_building_access(const CUnit *unit, const ButtonCmd button_action) const
+{
+	if (unit->IsEnemy(*this)) {
+		return false;
+	}
+
+	return this->has_building_access(unit->Player, button_action);
 }
 
 bool CPlayer::HasHero(const wyrmgus::character *hero) const

@@ -401,7 +401,7 @@ static void AnimateActionTrain(CUnit &unit)
 		DropOutOnSide(*newUnit, LookingW, &unit);
 
 		//Wyrmgus start
-		if (this->Player != unit.Player->Index && unit.Player->Type != PlayerNeutral && CPlayer::Players[this->Player]->HasBuildingAccess(*unit.Player)) { //if the player who gave the order is different from the owner of the building, and the latter is non-neutral (i.e. if the owner of the building is a mercenary company), provide the owner of the building with appropriate recompensation
+		if (this->Player != unit.Player->Index && unit.Player->Type != PlayerNeutral && CPlayer::Players[this->Player]->has_building_access(unit.Player)) { //if the player who gave the order is different from the owner of the building, and the latter is non-neutral (i.e. if the owner of the building is a mercenary company), provide the owner of the building with appropriate recompensation
 			unit.Player->change_resource(wyrmgus::resource::get_all()[CopperCost], newUnit->GetPrice(), true);
 		}
 		//Wyrmgus end

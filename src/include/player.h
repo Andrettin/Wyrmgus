@@ -611,7 +611,8 @@ public:
 	//Wyrmgus start
 	bool HasContactWith(const CPlayer &player) const;
 	bool has_neutral_faction_type() const;
-	bool HasBuildingAccess(const CPlayer &player, const ButtonCmd button_action = ButtonCmd::None) const;
+	bool has_building_access(const CPlayer *player, const ButtonCmd button_action = ButtonCmd::None) const;
+	bool has_building_access(const CUnit *unit, const ButtonCmd button_action = ButtonCmd::None) const;
 	bool HasHero(const wyrmgus::character *hero) const;
 	//Wyrmgus end
 

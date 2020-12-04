@@ -102,7 +102,7 @@ VisitResult EnemyUnitFinder::Visit(TerrainTraversal &terrainTraversal, const Vec
 			tile_owner != nullptr
 			&& (
 				unit.IsEnemy(*tile_owner)
-				|| (include_neutral && !unit.IsAllied(*tile_owner) && unit.Player != tile_owner && !unit.Player->HasBuildingAccess(*tile_owner))
+				|| (include_neutral && !unit.IsAllied(*tile_owner) && unit.Player != tile_owner && !unit.Player->has_building_access(tile_owner))
 			)
 		) {
 			*result_enemy_wall_pos = pos;
@@ -137,7 +137,7 @@ VisitResult EnemyUnitFinder::Visit(TerrainTraversal &terrainTraversal, const Vec
 		if (
 			(
 				!unit.IsEnemy(*dest) // a friend or neutral
-				&& (!include_neutral || unit.IsAllied(*dest) || unit.Player->Index == dest->Player->Index || unit.Player->HasBuildingAccess(*dest->Player))
+				&& (!include_neutral || unit.IsAllied(*dest) || unit.Player->Index == dest->Player->Index || unit.Player->has_building_access(dest->Player))
 			)
 			|| !CanTarget(*unit.Type, dtype)
 		) {

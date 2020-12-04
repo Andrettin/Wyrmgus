@@ -978,7 +978,7 @@ void CButtonPanel::Draw()
 			!button->is_always_shown()
 			&& Selected[0]->Player != CPlayer::GetThisPlayer()
 			&& !CPlayer::GetThisPlayer()->IsTeamed(*Selected[0])
-			&& CPlayer::GetThisPlayer()->HasBuildingAccess(*Selected[0]->Player, button->Action)
+			&& CPlayer::GetThisPlayer()->has_building_access(Selected[0], button->Action)
 			&& !IsNeutralUsableButtonAction(button->Action)
 		) {
 			continue;
@@ -1070,7 +1070,7 @@ void CButtonPanel::Draw()
 
 				//Wyrmgus start
 				//if is accessing a building of another player, set color to that of the person player (i.e. for training buttons)
-				if (CPlayer::GetThisPlayer()->HasBuildingAccess(*Selected[0]->Player, button->Action)) {
+				if (CPlayer::GetThisPlayer()->has_building_access(Selected[0]->Player, button->Action)) {
 					player_color = CPlayer::GetThisPlayer()->get_player_color();
 				}
 				//Wyrmgus end
@@ -1164,7 +1164,7 @@ bool IsButtonAllowed(const CUnit &unit, const wyrmgus::button &buttonaction)
 	}
 	
 	//Wyrmgus start
-	if (!CPlayer::GetThisPlayer()->IsTeamed(*Selected[0]) && (!CPlayer::GetThisPlayer()->HasBuildingAccess(*Selected[0]->Player, buttonaction.Action) || !IsNeutralUsableButtonAction(buttonaction.Action))) {
+	if (!CPlayer::GetThisPlayer()->IsTeamed(*Selected[0]) && (!CPlayer::GetThisPlayer()->has_building_access(Selected[0], buttonaction.Action) || !IsNeutralUsableButtonAction(buttonaction.Action))) {
 		return false;
 	}
 	//Wyrmgus end
@@ -1636,7 +1636,7 @@ void CButtonPanel::Update()
 	// foreign unit
 	//Wyrmgus start
 //	if (unit.Player != CPlayer::GetThisPlayer() && !CPlayer::GetThisPlayer()->IsTeamed(unit)) {
-	if (unit.Player != CPlayer::GetThisPlayer() && !CPlayer::GetThisPlayer()->IsTeamed(unit) && !CPlayer::GetThisPlayer()->HasBuildingAccess(*unit.Player)) {
+	if (unit.Player != CPlayer::GetThisPlayer() && !CPlayer::GetThisPlayer()->IsTeamed(unit) && !CPlayer::GetThisPlayer()->has_building_access(&unit)) {
 	//Wyrmgus end
 		CurrentButtons.clear();
 		return;
@@ -2199,7 +2199,7 @@ void CButtonPanel::DoClicked(int button)
 	//
 	//Wyrmgus start
 //	if (CurrentButtons[button]->get_pos() == -1 || !ThisPlayer->IsTeamed(*Selected[0])) {
-	if (CurrentButtons[button]->get_pos() == -1 || (!CurrentButtons[button]->is_always_shown() && !CPlayer::GetThisPlayer()->IsTeamed(*Selected[0]) && !CPlayer::GetThisPlayer()->HasBuildingAccess(*Selected[0]->Player, CurrentButtons[button]->Action)) || (!CurrentButtons[button]->is_always_shown() && !CPlayer::GetThisPlayer()->IsTeamed(*Selected[0]) && CPlayer::GetThisPlayer()->HasBuildingAccess(*Selected[0]->Player, CurrentButtons[button]->Action) && !IsNeutralUsableButtonAction(CurrentButtons[button]->Action))) { //allow neutral units to be used (but only for training or as transporters)
+	if (CurrentButtons[button]->get_pos() == -1 || (!CurrentButtons[button]->is_always_shown() && !CPlayer::GetThisPlayer()->IsTeamed(*Selected[0]) && !CPlayer::GetThisPlayer()->has_building_access(Selected[0], CurrentButtons[button]->Action)) || (!CurrentButtons[button]->is_always_shown() && !CPlayer::GetThisPlayer()->IsTeamed(*Selected[0]) && CPlayer::GetThisPlayer()->has_building_access(Selected[0], CurrentButtons[button]->Action) && !IsNeutralUsableButtonAction(CurrentButtons[button]->Action))) { //allow neutral units to be used (but only for training or as transporters)
 	//Wyrmgus end
 		return;
 	}

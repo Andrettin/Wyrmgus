@@ -7901,8 +7901,14 @@ bool CanPickUp(const CUnit &picker, const CUnit &unit)
 
 bool CUnit::IsEnemy(const CPlayer &player) const
 {
+	if (this->Player->Type == PlayerNeutral) {
+		if (this->Type->BoolFlag[NEUTRAL_HOSTILE_INDEX].value && player.Type != PlayerNeutral) {
+			return true;
+		}
+	}
+
 	//Wyrmgus start
-	if (this->Player->Index != player.Index && player.Type != PlayerNeutral && !this->Player->HasBuildingAccess(player) && this->Type->BoolFlag[HIDDENOWNERSHIP_INDEX].value && this->IsAgressive()) {
+	if (this->Player->Index != player.Index && player.Type != PlayerNeutral && !this->Player->has_building_access(&player) && this->Type->BoolFlag[HIDDENOWNERSHIP_INDEX].value && this->IsAgressive()) {
 		return true;
 	}
 	//Wyrmgus end
@@ -7914,10 +7920,6 @@ bool CUnit::IsEnemy(const CUnit &unit) const
 {
 	switch (this->Player->Type) {
 		case PlayerNeutral:
-			if (this->Type->BoolFlag[NEUTRAL_HOSTILE_INDEX].value && unit.Player->Type != PlayerNeutral) {
-				return true;
-			}
-
 			if (
 				this->Type->BoolFlag[FAUNA_INDEX].value
 				&& this->Type->BoolFlag[ORGANIC_INDEX].value
@@ -7960,7 +7962,7 @@ bool CUnit::IsEnemy(const CUnit &unit) const
 				}
 
 				if (
-					unit.Player->Type != PlayerNeutral && !this->Player->HasBuildingAccess(*unit.Player) && !this->Player->has_neutral_faction_type()
+					unit.Player->Type != PlayerNeutral && !this->Player->has_building_access(unit.Player) && !this->Player->has_neutral_faction_type()
 					&& ((this->Type->BoolFlag[HIDDENOWNERSHIP_INDEX].value && this->IsAgressive()) || (unit.Type->BoolFlag[HIDDENOWNERSHIP_INDEX].value && unit.IsAgressive()))
 				) {
 					return true;
@@ -7969,7 +7971,7 @@ bool CUnit::IsEnemy(const CUnit &unit) const
 			break;
 	}
 		
-	return IsEnemy(*unit.Player);
+	return this->IsEnemy(*unit.Player);
 }
 
 /**

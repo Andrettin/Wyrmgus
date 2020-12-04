@@ -335,7 +335,7 @@ static void AiCheckUnits()
 			if (i == AiPlayer->Player->Index) {
 				continue;
 			}
-			if (CPlayer::Players[i]->Type != PlayerComputer || !AiPlayer->Player->HasBuildingAccess(*CPlayer::Players[i])) {
+			if (CPlayer::Players[i]->Type != PlayerComputer || !AiPlayer->Player->has_building_access(CPlayer::Players[i])) {
 				continue;
 			}
 			for (int j = 0; j < CPlayer::Players[i]->GetUnitCount(); ++j) {
