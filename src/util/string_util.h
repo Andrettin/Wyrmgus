@@ -157,8 +157,8 @@ inline void normalize(std::string &str)
 	string::replace(str, "ā", "a");
 	string::replace(str, "Ē", "E");
 	string::replace(str, "ē", "e");
-	string::replace(str, "Ī", "I");
-	string::replace(str, "ī", "i");
+	string::replace(str, "Ī", "I");
+	string::replace(str, "ī", "i");
 	string::replace(str, "Ō", "O");
 	string::replace(str, "ō", "o");
 	string::replace(str, "Ū", "U");
