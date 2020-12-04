@@ -1341,23 +1341,23 @@ int COrder_Resource::MoveToDepot(CUnit &unit)
 
 	// Update resource.
 	const wyrmgus::resource *final_resource = wyrmgus::resource::get_all()[this->CurrentResource]->get_final_resource();
-	const int resource_change = unit.ResourcesHeld * wyrmgus::resource::get_all()[this->CurrentResource]->get_final_resource_conversion_rate() / 100;
-	int processed_resource_change = (resource_change * player.Incomes[this->CurrentResource]) / 100;
+	const int processed_resource_change = unit.ResourcesHeld * player.Incomes[this->CurrentResource] / 100;
+	int final_resource_change = processed_resource_change * wyrmgus::resource::get_all()[this->CurrentResource]->get_final_resource_conversion_rate() / 100;
 	
 	if (player.AiEnabled) {
 		if (GameSettings.Difficulty == DifficultyEasy) {
-			processed_resource_change /= 2;
+			final_resource_change /= 2;
 		} else if (GameSettings.Difficulty == DifficultyHard) {
-			processed_resource_change *= 3;
-			processed_resource_change /= 4;
+			final_resource_change *= 3;
+			final_resource_change /= 4;
 		} else if (GameSettings.Difficulty == DifficultyBrutal) {
-			processed_resource_change *= 2;
+			final_resource_change *= 2;
 		}
 	}
 	
-	player.change_resource(final_resource, processed_resource_change, true);
-	player.TotalResources[final_resource->get_index()] += processed_resource_change;
-	player.pay_overlord_tax(final_resource, processed_resource_change);
+	player.change_resource(final_resource, final_resource_change, true);
+	player.TotalResources[final_resource->get_index()] += final_resource_change;
+	player.pay_overlord_tax(final_resource, final_resource_change);
 	
 	//give XP to the worker according to how much was gathered, based on their base price in relation to gold
 	int xp_gained = unit.ResourcesHeld;
@@ -1366,9 +1366,9 @@ int COrder_Resource::MoveToDepot(CUnit &unit)
 	
 	//update quests
 	for (const auto &objective : player.get_quest_objectives()) {
-		objective->on_resource_gathered(final_resource, processed_resource_change);
+		objective->on_resource_gathered(final_resource, final_resource_change);
 		if (final_resource->get_index() != this->CurrentResource) {
-			objective->on_resource_gathered(wyrmgus::resource::get_all()[this->CurrentResource], unit.ResourcesHeld);
+			objective->on_resource_gathered(wyrmgus::resource::get_all()[this->CurrentResource], processed_resource_change);
 		}
 	}
 	
