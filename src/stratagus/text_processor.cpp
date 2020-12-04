@@ -34,6 +34,8 @@
 #include "language/word.h"
 #include "unit/unit_class.h"
 #include "unit/unit_type.h"
+#include "upgrade/upgrade_class.h"
+#include "upgrade/upgrade_structs.h"
 #include "util/queue_util.h"
 #include "util/string_util.h"
 
@@ -103,14 +105,28 @@ std::string text_processor::process_tokens(std::queue<std::string> &&tokens) con
 			unit_class = unit_class::get(queue::take(subtokens));
 		}
 
-		str = this->process_unit_class_tokens(unit_class, tokens);
+		str = this->process_named_data_entry_tokens(unit_class, tokens);
 	} else if (front_subtoken == "unit_type") {
 		const wyrmgus::unit_type *unit_type = nullptr;
 		if (!subtokens.empty()) {
 			unit_type = unit_type::get(queue::take(subtokens));
 		}
 
-		str = this->process_unit_type_tokens(unit_type, tokens);
+		str = this->process_named_data_entry_tokens(unit_type, tokens);
+	} else if (front_subtoken == "upgrade") {
+		const CUpgrade *upgrade = nullptr;
+		if (!subtokens.empty()) {
+			upgrade = CUpgrade::get(queue::take(subtokens));
+		}
+
+		str = this->process_named_data_entry_tokens(upgrade, tokens);
+	} else if (front_subtoken == "upgrade_class") {
+		const wyrmgus::upgrade_class *upgrade_class = nullptr;
+		if (!subtokens.empty()) {
+			upgrade_class = upgrade_class::get(queue::take(subtokens));
+		}
+
+		str = this->process_named_data_entry_tokens(upgrade_class, tokens);
 	} else if (front_subtoken == "word") {
 		const wyrmgus::word *word = nullptr;
 		if (!subtokens.empty()) {
@@ -152,6 +168,33 @@ std::string text_processor::process_string_tokens(std::string &&str, std::queue<
 	return str;
 }
 
+std::string text_processor::process_named_data_entry_token(const named_data_entry *data_entry, const std::string &token) const
+{
+	if (data_entry == nullptr) {
+		throw std::runtime_error("No data entry provided when processing a named data entry token.");
+	}
+
+	if (token == "name") {
+		return data_entry->get_name();
+	}
+
+	throw std::runtime_error("Failed to process named data entry token \"" + token + "\".");
+}
+
+std::string text_processor::process_named_data_entry_tokens(const named_data_entry *data_entry, std::queue<std::string> &tokens) const
+{
+	if (data_entry == nullptr) {
+		throw std::runtime_error("No data entry provided when processing named data entry tokens.");
+	}
+
+	if (tokens.empty()) {
+		throw std::runtime_error("No tokens provided when processing named data entry tokens.");
+	}
+
+	const std::string token = queue::take(tokens);
+	return this->process_named_data_entry_token(data_entry, token);
+}
+
 std::string text_processor::process_civilization_tokens(const civilization *civilization, std::queue<std::string> &tokens) const
 {
 	if (civilization == nullptr) {
@@ -172,9 +215,7 @@ std::string text_processor::process_civilization_tokens(const civilization *civi
 
 	const std::string front_subtoken = queue::take(subtokens);
 
-	if (front_subtoken == "name") {
-		return civilization->get_name();
-	} else if (front_subtoken == "class_unit_type") {
+	if (front_subtoken == "class_unit_type") {
 		if (subtokens.empty()) {
 			throw std::runtime_error("No unit class specified for the civilization \"class_unit_type\" token.");
 		}
@@ -182,7 +223,18 @@ std::string text_processor::process_civilization_tokens(const civilization *civi
 		const unit_class *unit_class = unit_class::get(queue::take(subtokens));
 		const unit_type *unit_type = civilization->get_class_unit_type(unit_class);
 
-		return this->process_unit_type_tokens(unit_type, tokens);
+		return this->process_named_data_entry_tokens(unit_type, tokens);
+	} else if (front_subtoken == "class_upgrade") {
+		if (subtokens.empty()) {
+			throw std::runtime_error("No unit class specified for the civilization \"class_upgrade\" token.");
+		}
+
+		const upgrade_class *upgrade_class = upgrade_class::get(queue::take(subtokens));
+		const CUpgrade *upgrade = civilization->get_class_upgrade(upgrade_class);
+
+		return this->process_named_data_entry_tokens(upgrade, tokens);
+	} else {
+		return this->process_named_data_entry_token(civilization, front_subtoken);
 	}
 
 	throw std::runtime_error("Failed to process civilization token \"" + front_subtoken + "\".");
@@ -208,9 +260,7 @@ std::string text_processor::process_faction_tokens(const wyrmgus::faction *facti
 
 	const std::string front_subtoken = queue::take(subtokens);
 
-	if (front_subtoken == "name") {
-		return faction->get_name();
-	} else if (front_subtoken == "titled_name") {
+	if (front_subtoken == "titled_name") {
 		return faction->get_default_titled_name();
 	} else if (front_subtoken == "class_unit_type") {
 		if (subtokens.empty()) {
@@ -220,48 +270,21 @@ std::string text_processor::process_faction_tokens(const wyrmgus::faction *facti
 		const unit_class *unit_class = unit_class::get(queue::take(subtokens));
 		const unit_type *unit_type = faction->get_class_unit_type(unit_class);
 
-		return this->process_unit_type_tokens(unit_type, tokens);
+		return this->process_named_data_entry_tokens(unit_type, tokens);
+	} else if (front_subtoken == "class_upgrade") {
+		if (subtokens.empty()) {
+			throw std::runtime_error("No unit class specified for the civilization \"class_upgrade\" token.");
+		}
+
+		const upgrade_class *upgrade_class = upgrade_class::get(queue::take(subtokens));
+		const CUpgrade *upgrade = faction->get_class_upgrade(upgrade_class);
+
+		return this->process_named_data_entry_tokens(upgrade, tokens);
+	} else {
+		return this->process_named_data_entry_token(faction, front_subtoken);
 	}
 
 	throw std::runtime_error("Failed to process faction token \"" + front_subtoken + "\".");
-}
-
-std::string text_processor::process_unit_class_tokens(const unit_class *unit_class, std::queue<std::string> &tokens) const
-{
-	if (unit_class == nullptr) {
-		throw std::runtime_error("No unit class provided when processing unit class tokens.");
-	}
-
-	if (tokens.empty()) {
-		throw std::runtime_error("No tokens provided when processing unit class tokens.");
-	}
-
-	const std::string token = queue::take(tokens);
-
-	if (token == "name") {
-		return unit_class->get_name();
-	}
-
-	throw std::runtime_error("Failed to process unit class token \"" + token + "\".");
-}
-
-std::string text_processor::process_unit_type_tokens(const unit_type *unit_type, std::queue<std::string> &tokens) const
-{
-	if (unit_type == nullptr) {
-		throw std::runtime_error("No unit type provided when processing unit type tokens.");
-	}
-
-	if (tokens.empty()) {
-		throw std::runtime_error("No tokens provided when processing unit type tokens.");
-	}
-
-	const std::string token = queue::take(tokens);
-
-	if (token == "name") {
-		return unit_type->get_name();
-	}
-
-	throw std::runtime_error("Failed to process unit type token \"" + token + "\".");
 }
 
 std::string text_processor::process_word_tokens(const wyrmgus::word *word, std::queue<std::string> &tokens) const
@@ -276,10 +299,10 @@ std::string text_processor::process_word_tokens(const wyrmgus::word *word, std::
 
 	const std::string token = queue::take(tokens);
 
-	if (token == "name") {
-		return word->get_name();
-	} else if (token == "meanings") {
+	if (token == "meanings") {
 		return this->process_word_meaning_tokens(word, tokens);
+	} else {
+		return this->process_named_data_entry_token(word, token);
 	}
 
 	throw std::runtime_error("Failed to process word token \"" + token + "\".");
