@@ -33,6 +33,7 @@
 #include "quest/player_quest_objective.h"
 #include "quest/quest.h"
 #include "upgrade/upgrade.h"
+#include "upgrade/upgrade_class.h"
 #include "util/vector_util.h"
 
 namespace wyrmgus {
@@ -49,9 +50,58 @@ public:
 		return objective_type::research_upgrade;
 	}
 
+	virtual void process_sml_property(const wyrmgus::sml_property &property) override
+	{
+		const std::string &key = property.get_key();
+		const std::string &value = property.get_value();
+
+		if (key == "upgrade_class") {
+			this->upgrade_class = upgrade_class::get(value);
+		} else {
+			quest_objective::process_sml_property(property);
+		}
+	}
+
+	virtual void check() const override
+	{
+		if (this->get_upgrade() == nullptr && this->upgrade_class == nullptr) {
+			throw std::runtime_error("Research upgrade quest objective has neither an upgrade nor an upgrade class set for it.");
+		}
+	}
+
+	const CUpgrade *get_player_upgrade(const CPlayer *player) const
+	{
+		if (this->get_upgrade() != nullptr) {
+			return this->get_upgrade();
+		} else if (this->upgrade_class != nullptr) {
+			return player->get_class_upgrade(this->upgrade_class);
+		}
+
+		return nullptr;
+	}
+
+	virtual std::string generate_objective_string(const CPlayer *player) const override
+	{
+		std::string objective_str = "Research ";
+
+		const CUpgrade *upgrade = this->get_player_upgrade(player);
+		
+		if (upgrade != nullptr) {
+			objective_str += upgrade->get_name();
+		} else {
+			objective_str += this->upgrade_class->get_name();
+		}
+
+		return objective_str;
+	}
+
 	virtual bool is_quest_acceptance_allowed(const CPlayer *player) const override
 	{
-		const CUpgrade *upgrade = this->get_upgrade();
+		const CUpgrade *upgrade = this->get_player_upgrade(player);
+
+		if (upgrade == nullptr) {
+			return false;
+		}
 
 		bool has_researcher = player->HasUpgradeResearcher(upgrade);
 
@@ -99,7 +149,11 @@ public:
 
 	virtual std::pair<bool, std::string> check_failure(const CPlayer *player) const override
 	{
-		const CUpgrade *upgrade = this->get_upgrade();
+		const CUpgrade *upgrade = this->get_player_upgrade(player);
+
+		if (upgrade == nullptr) {
+			return std::make_pair(true, "You can no longer research the required upgrade.");
+		}
 
 		if (player->Allow.Upgrades[upgrade->ID] != 'R') {
 			bool has_researcher = player->HasUpgradeResearcher(upgrade);
@@ -150,9 +204,19 @@ public:
 
 	virtual void update_counter(player_quest_objective *player_quest_objective) const override
 	{
-		const int count = UpgradeIdAllowed(*player_quest_objective->get_player(), this->get_upgrade()->ID) == 'R' ? 1 : 0;
+		const CUpgrade *upgrade = this->get_player_upgrade(player_quest_objective->get_player());
+
+		if (upgrade == nullptr) {
+			player_quest_objective->set_counter(0);
+			return;
+		}
+
+		const int count = UpgradeIdAllowed(*player_quest_objective->get_player(), upgrade->ID) == 'R' ? 1 : 0;
 		player_quest_objective->set_counter(count);
 	}
+
+private:
+	wyrmgus::upgrade_class *upgrade_class = nullptr;
 };
 
 }
