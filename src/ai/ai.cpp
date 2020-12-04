@@ -813,7 +813,7 @@ static void AiRemoveFromBuilt(PlayerAi *pai, const wyrmgus::unit_type &type, int
 		DebugPrint("My guess is that you built something under ai me. naughty boy!\n");
 		return;
 	}
-	fprintf(stderr, "Can't reduce %s from build list.\n", type.Ident.c_str());
+	fprintf(stderr, "Can't remove %s from build list.\n", type.Ident.c_str());
 }
 
 /**
@@ -881,7 +881,7 @@ void AiReduceMadeInBuilt(PlayerAi &pai, const wyrmgus::unit_type &type, int land
 		DebugPrint("My guess is that you built something under ai me. naughty boy!\n");
 		return;
 	}
-	fprintf(stderr, "Can't reduce %s from build list.\n", type.Ident.c_str());
+	fprintf(stderr, "Can't reduce made for %s from build list.\n", type.Ident.c_str());
 }
 
 /*----------------------------------------------------------------------------
