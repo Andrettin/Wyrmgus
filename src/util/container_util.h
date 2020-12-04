@@ -33,6 +33,20 @@
 
 namespace wyrmgus::container {
 
+template <typename T, typename U>
+inline bool intersects_with(const T &container, const U &other_container)
+{
+	for (const typename T::value_type &element : container) {
+		for (const typename U::value_type &other_element : other_container) {
+			if (element == other_element) {
+				return true;
+			}
+		}
+	}
+
+	return false;
+}
+
 template <typename T>
 inline QVariantList to_qvariant_list(const T &container)
 {
