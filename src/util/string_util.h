@@ -163,6 +163,9 @@ inline void normalize(std::string &str)
 	string::replace(str, "ō", "o");
 	string::replace(str, "Ū", "U");
 	string::replace(str, "ū", "u");
+
+	//replace superscript versions of characters with their normal versions
+	string::replace(str, "ʷ", "w");
 }
 
 inline std::string normalized(std::string &&str)
