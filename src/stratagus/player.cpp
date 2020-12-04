@@ -2560,6 +2560,12 @@ bool CPlayer::can_accept_quest(const wyrmgus::quest *quest) const
 	if (recruit_heroes_quantity > 0 && (this->Heroes.size() + recruit_heroes_quantity) > PlayerHeroMax) {
 		return false;
 	}
+
+	for (const wyrmgus::quest *current_quest : this->current_quests) {
+		if (quest->overlaps_with(current_quest)) {
+			return false;
+		}
+	}
 	
 	for (const wyrmgus::character *hero : quest->HeroesMustSurvive) {
 		if (!this->HasHero(hero)) {

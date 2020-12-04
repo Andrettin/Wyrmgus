@@ -120,6 +120,8 @@ public:
 		return true;
 	}
 
+	bool overlaps_with(const quest_objective *other_objective) const;
+
 	virtual std::pair<bool, std::string> check_failure(const CPlayer *player) const
 	{
 		Q_UNUSED(player)

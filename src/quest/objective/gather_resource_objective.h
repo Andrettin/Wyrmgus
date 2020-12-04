@@ -74,6 +74,11 @@ public:
 		return "Gather " + std::to_string(this->get_quantity()) + " " + this->resource->get_name();
 	}
 
+	bool overlaps_with(const gather_resource_objective *other_objective) const
+	{
+		return this->resource == other_objective->resource;
+	}
+
 	virtual void on_resource_gathered(const wyrmgus::resource *resource, const int quantity, player_quest_objective *player_quest_objective) const override
 	{
 		if (this->resource != resource) {

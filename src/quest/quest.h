@@ -152,6 +152,8 @@ public:
 		return this->hint;
 	}
 
+	bool overlaps_with(const quest *other_quest) const;
+
 	std::string World;				/// Which world the quest belongs to
 	std::string Map;				/// What map the quest is played on
 	std::string Scenario;			/// Which scenario file is to be loaded for the quest

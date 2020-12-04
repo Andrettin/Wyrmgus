@@ -198,4 +198,24 @@ std::string quest_objective::get_unit_type_objective_string(const unit_type *uni
 	return this->get_unit_name_objective_string(unit_type_name, unit_type, first);
 }
 
+bool quest_objective::overlaps_with(const quest_objective *other_objective) const
+{
+	if (this->get_objective_type() != other_objective->get_objective_type()) {
+		return false;
+	}
+
+	switch (this->get_objective_type()) {
+		case objective_type::build_units:
+			return static_cast<const build_units_objective *>(this)->overlaps_with(static_cast<const build_units_objective *>(other_objective));
+		case objective_type::destroy_units:
+			return static_cast<const destroy_units_objective *>(this)->overlaps_with(static_cast<const destroy_units_objective *>(other_objective));
+		case objective_type::gather_resource:
+			return static_cast<const gather_resource_objective *>(this)->overlaps_with(static_cast<const gather_resource_objective *>(other_objective));
+		default:
+			//don't consider objectives which when fulfilled would necessarily invalidate the other (like destroy hero, recruit hero or destroy faction) to be overlapping; it is preferable in this case to allow different quests with the same objective to be accepted
+			//don't consider passive quest objectives (like hero must survive) to be overlapping
+			return false;
+	}
+}
+
 }

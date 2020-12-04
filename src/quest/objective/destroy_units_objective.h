@@ -67,6 +67,41 @@ public:
 		return objective_str;
 	}
 
+	bool overlaps_with(const destroy_units_objective *other_objective) const
+	{
+		if (container::intersects_with(this->get_unit_classes(), other_objective->get_unit_classes())) {
+			return true;
+		}
+
+		if (container::intersects_with(this->get_unit_types(), other_objective->get_unit_types())) {
+			return true;
+		}
+
+		//also check whether one objective's unit type belongs to the other's unit class
+
+		for (const unit_type *unit_type : this->get_unit_types()) {
+			if (unit_type->get_unit_class() == nullptr) {
+				continue;
+			}
+
+			if (vector::contains(other_objective->get_unit_classes(), unit_type->get_unit_class())) {
+				return true;
+			}
+		}
+
+		for (const unit_type *other_unit_type : other_objective->get_unit_types()) {
+			if (other_unit_type->get_unit_class() == nullptr) {
+				continue;
+			}
+
+			if (vector::contains(this->get_unit_classes(), other_unit_type->get_unit_class())) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
 	virtual bool is_objective_unit(const CUnit *unit) const override
 	{
 		if (

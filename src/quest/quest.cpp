@@ -174,7 +174,7 @@ void quest::check() const
 		this->get_failure_effects()->check();
 	}
 
-	for (const std::unique_ptr<quest_objective> &objective : objectives) {
+	for (const std::unique_ptr<quest_objective> &objective : this->get_objectives()) {
 		objective->check();
 	}
 }
@@ -190,6 +190,19 @@ std::string quest::get_rewards_string() const
 	}
 
 	return std::string();
+}
+
+bool quest::overlaps_with(const quest *other_quest) const
+{
+	for (const std::unique_ptr<quest_objective> &objective : this->get_objectives()) {
+		for (const std::unique_ptr<quest_objective> &other_objective : other_quest->get_objectives()) {
+			if (objective->overlaps_with(other_objective.get())) {
+				return true;
+			}
+		}
+	}
+
+	return false;
 }
 
 }

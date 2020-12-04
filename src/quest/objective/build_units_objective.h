@@ -34,6 +34,7 @@
 #include "script/condition/condition.h"
 #include "unit/unit.h"
 #include "unit/unit_type.h"
+#include "util/container_util.h"
 #include "util/vector_util.h"
 
 namespace wyrmgus {
@@ -118,6 +119,41 @@ public:
 		}
 
 		return true;
+	}
+
+	bool overlaps_with(const build_units_objective *other_objective) const
+	{
+		if (container::intersects_with(this->get_unit_classes(), other_objective->get_unit_classes())) {
+			return true;
+		}
+
+		if (container::intersects_with(this->get_unit_types(), other_objective->get_unit_types())) {
+			return true;
+		}
+
+		//also check whether one objective's unit type belongs to the other's unit class
+
+		for (const unit_type *unit_type : this->get_unit_types()) {
+			if (unit_type->get_unit_class() == nullptr) {
+				continue;
+			}
+
+			if (vector::contains(other_objective->get_unit_classes(), unit_type->get_unit_class())) {
+				return true;
+			}
+		}
+
+		for (const unit_type *other_unit_type : other_objective->get_unit_types()) {
+			if (other_unit_type->get_unit_class() == nullptr) {
+				continue;
+			}
+
+			if (vector::contains(this->get_unit_classes(), other_unit_type->get_unit_class())) {
+				return true;
+			}
+		}
+
+		return false;
 	}
 
 	virtual std::pair<bool, std::string> check_failure(const CPlayer *player) const override
