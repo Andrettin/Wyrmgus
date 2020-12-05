@@ -1058,8 +1058,8 @@ static int CclDefineLanguageWord(lua_State *l)
 			}
 			lua_pop(l, 1);
 			
-			if (derives_from_language) {
-				std::string derives_from_word = LuaToString(l, -1, j + 1);
+			if (derives_from_language != nullptr) {
+				const std::string derives_from_word = LuaToString(l, -1, j + 1);
 				wyrmgus::word *etymon = derives_from_language->GetWord(derives_from_word, derives_from_word_type, word_meanings);
 				
 				if (etymon != nullptr) {

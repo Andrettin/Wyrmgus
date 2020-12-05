@@ -120,7 +120,7 @@ class language final : public named_data_entry, public data_type<language>
 {
 	Q_OBJECT
 
-	Q_PROPERTY(wyrmgus::language_family* family MEMBER family READ get_family)
+	Q_PROPERTY(wyrmgus::language_family* family MEMBER family)
 
 public:
 	static constexpr const char *class_identifier = "language";
@@ -130,7 +130,7 @@ public:
 	{
 	}
 
-	language_family *get_family() const
+	const language_family *get_family() const
 	{
 		return this->family;
 	}
@@ -151,7 +151,7 @@ public:
 	std::string NounEndings[MaxGrammaticalNumbers][MaxGrammaticalCases][MaxWordJunctionTypes];
 	std::string AdjectiveEndings[MaxArticleTypes][MaxGrammaticalCases][MaxGrammaticalNumbers][static_cast<int>(grammatical_gender::count)];
 	bool used_by_civilization_or_faction = false;
-	language *DialectOf = nullptr; /// Of which language this is a dialect of (if at all); dialects inherit the words from the parent language unless specified otherwise
+	language *DialectOf = nullptr; ///of which language this is a dialect of (if at all); dialects inherit the words from the parent language unless specified otherwise
 	std::vector<language *> Dialects;							/// Dialects of this language
 private:
 	std::vector<word *> words;
