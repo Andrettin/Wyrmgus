@@ -27,36 +27,36 @@
 
 #pragma once
 
-#include "character.h"
 #include "script/condition/condition.h"
+#include "script/condition/scripted_condition.h"
 
 namespace wyrmgus {
 
-class character_exists_condition final : public condition
+class scripted_condition_condition final : public condition
 {
 public:
-	explicit character_exists_condition(const std::string &value)
+	explicit scripted_condition_condition(const std::string &value)
 	{
-		this->character = character::get(value);
+		this->scripted_condition = scripted_condition::get(value);
 	}
 
 	virtual bool check(const CPlayer *player, const bool ignore_units) const override
 	{
-		Q_UNUSED(player)
-		Q_UNUSED(ignore_units)
+		return this->scripted_condition->get_conditions()->check(player, ignore_units);
+	}
 
-		return this->character->get_unit() != nullptr;
+	virtual bool check(const CUnit *unit, const bool ignore_units) const override
+	{
+		return this->scripted_condition->get_conditions()->check(unit, ignore_units);
 	}
 
 	virtual std::string get_string(const size_t indent) const override
 	{
-		Q_UNUSED(indent)
-
-		return this->character->get_full_name() + " exists";
+		return this->scripted_condition->get_conditions()->get_string(indent);
 	}
 
 private:
-	const wyrmgus::character *character = nullptr;
+	const wyrmgus::scripted_condition *scripted_condition = nullptr;
 };
 
 }

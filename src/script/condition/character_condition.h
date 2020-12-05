@@ -63,7 +63,7 @@ public:
 	}
 
 private:
-	const character *character = nullptr;
+	const wyrmgus::character *character = nullptr;
 };
 
 }

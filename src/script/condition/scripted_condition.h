@@ -27,36 +27,35 @@
 
 #pragma once
 
-#include "character.h"
-#include "script/condition/condition.h"
+#include "database/data_entry.h"
+#include "database/data_type.h"
 
 namespace wyrmgus {
 
-class character_exists_condition final : public condition
+class and_condition;
+
+//the class for a predefined, reusable scripted condition
+class scripted_condition final : public data_entry, public data_type<scripted_condition>
 {
+	Q_OBJECT
+
 public:
-	explicit character_exists_condition(const std::string &value)
+	static constexpr const char *class_identifier = "scripted_condition";
+	static constexpr const char *database_folder = "scripted_conditions";
+
+	explicit scripted_condition(const std::string &identifier);
+
+	virtual void process_sml_property(const sml_property &property) override;
+	virtual void process_sml_scope(const sml_data &scope) override;
+	virtual void check() const override;
+
+	const and_condition *get_conditions() const
 	{
-		this->character = character::get(value);
-	}
-
-	virtual bool check(const CPlayer *player, const bool ignore_units) const override
-	{
-		Q_UNUSED(player)
-		Q_UNUSED(ignore_units)
-
-		return this->character->get_unit() != nullptr;
-	}
-
-	virtual std::string get_string(const size_t indent) const override
-	{
-		Q_UNUSED(indent)
-
-		return this->character->get_full_name() + " exists";
+		return this->conditions.get();
 	}
 
 private:
-	const wyrmgus::character *character = nullptr;
+	std::unique_ptr<and_condition> conditions;
 };
 
 }

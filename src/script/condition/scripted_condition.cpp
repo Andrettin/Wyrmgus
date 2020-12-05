@@ -25,38 +25,32 @@
 //      02111-1307, USA.
 //
 
-#pragma once
+#include "stratagus.h"
 
-#include "character.h"
-#include "script/condition/condition.h"
+#include "script/condition/scripted_condition.h"
+
+#include "script/condition/and_condition.h"
 
 namespace wyrmgus {
 
-class character_exists_condition final : public condition
+scripted_condition::scripted_condition(const std::string &identifier) : data_entry(identifier)
 {
-public:
-	explicit character_exists_condition(const std::string &value)
-	{
-		this->character = character::get(value);
-	}
+	this->conditions = std::make_unique<and_condition>();
+}
 
-	virtual bool check(const CPlayer *player, const bool ignore_units) const override
-	{
-		Q_UNUSED(player)
-		Q_UNUSED(ignore_units)
+void scripted_condition::process_sml_property(const sml_property &property)
+{
+	this->conditions->process_sml_property(property);
+}
 
-		return this->character->get_unit() != nullptr;
-	}
+void scripted_condition::process_sml_scope(const sml_data &scope)
+{
+	this->conditions->process_sml_scope(scope);
+}
 
-	virtual std::string get_string(const size_t indent) const override
-	{
-		Q_UNUSED(indent)
-
-		return this->character->get_full_name() + " exists";
-	}
-
-private:
-	const wyrmgus::character *character = nullptr;
-};
+void scripted_condition::check() const
+{
+	this->get_conditions()->check_validity();
+}
 
 }
