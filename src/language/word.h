@@ -71,15 +71,7 @@ public:
 		return this->language;
 	}
 
-	void set_language(language *language)
-	{
-		if (language == this->get_language()) {
-			return;
-		}
-
-		this->language = language;
-		language->add_word(this);
-	}
+	void set_language(language *language);
 
 	word_type get_type() const
 	{

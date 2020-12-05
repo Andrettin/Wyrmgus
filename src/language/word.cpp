@@ -30,6 +30,7 @@
 #include "language/word.h"
 
 #include "language/grammatical_gender.h"
+#include "language/language.h"
 #include "language/word_type.h"
 #include "util/container_util.h"
 #include "util/vector_util.h"
@@ -55,6 +56,17 @@ void word::process_sml_scope(const sml_data &scope)
 		data_entry::process_sml_scope(scope);
 	}
 }
+
+void word::set_language(wyrmgus::language *language)
+{
+	if (language == this->get_language()) {
+		return;
+	}
+
+	this->language = language;
+	language->add_word(this);
+}
+
 
 QStringList word::get_meanings_qstring_list() const
 {
