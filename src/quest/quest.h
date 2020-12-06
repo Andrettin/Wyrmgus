@@ -38,9 +38,9 @@ static int CclDefineQuest(lua_State *l);
 
 namespace wyrmgus {
 
+class and_condition;
 class character;
 class civilization;
-class condition;
 class dialogue;
 class icon;
 class player_color;
@@ -115,9 +115,9 @@ public:
 		return this->Completed;
 	}
 
-	const std::unique_ptr<condition> &get_conditions() const
+	const and_condition *get_conditions() const
 	{
-		return this->conditions;
+		return this->conditions.get();
 	}
 
 	const std::unique_ptr<effect_list<CPlayer>> &get_accept_effects() const
@@ -154,6 +154,7 @@ public:
 
 	bool overlaps_with(const quest *other_quest) const;
 
+	int ID = -1;
 	std::string World;				/// Which world the quest belongs to
 	std::string Map;				/// What map the quest is played on
 	std::string Scenario;			/// Which scenario file is to be loaded for the quest
@@ -172,8 +173,7 @@ private:
 	std::string rewards_string;		/// Description of the quest's rewards
 	std::string hint;				/// Quest hint
 public:
-	int ID = -1;
-	civilization *civilization = nullptr; //civilization to which civilization the quest belongs to
+	civilization *civilization = nullptr; //the civilization to which the quest belongs
 private:
 	icon *icon = nullptr;
 	player_color *player_color = nullptr;		/// Player color used for the quest's icon
@@ -194,7 +194,7 @@ public:
 	std::unique_ptr<LuaCallback> CompletionEffects;
 	std::unique_ptr<LuaCallback> FailEffects;
 private:
-	std::unique_ptr<condition> conditions;
+	std::unique_ptr<and_condition> conditions;
 	std::unique_ptr<effect_list<CPlayer>> accept_effects;
 	std::unique_ptr<effect_list<CPlayer>> completion_effects;
 	std::unique_ptr<effect_list<CPlayer>> failure_effects;

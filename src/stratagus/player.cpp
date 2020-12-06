@@ -3565,8 +3565,8 @@ void PlayersEachSecond(int playerIdx)
 	player->UpdateFreeWorkers();
 	//Wyrmgus start
 	player->PerformResourceTrade();
-	player->update_current_quests();
 	//Wyrmgus end
+	player->update_current_quests();
 }
 
 /**
