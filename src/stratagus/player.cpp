@@ -3581,8 +3581,6 @@ void PlayersEachHalfMinute(int playerIdx)
 	if (player->AiEnabled) {
 		AiEachHalfMinute(*player);
 	}
-
-	player->update_quest_pool(); // every half minute, update the quest pool
 }
 
 /**
@@ -3597,6 +3595,8 @@ void PlayersEachMinute(int playerIdx)
 	if (player->AiEnabled) {
 		AiEachMinute(*player);
 	}
+
+	player->update_quest_pool();
 }
 
 /**
