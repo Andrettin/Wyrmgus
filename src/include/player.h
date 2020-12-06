@@ -87,7 +87,7 @@ namespace wyrmgus {
 class CPlayer
 {
 public:
-	static constexpr int max_quest_pool = 15;
+	static constexpr int max_quest_pool = 4;
 
 	static void SetThisPlayer(CPlayer *player);
 	static CPlayer *GetThisPlayer();

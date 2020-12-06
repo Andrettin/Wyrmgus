@@ -2338,12 +2338,6 @@ void CPlayer::update_quest_pool()
 		this->available_quests.push_back(quest);
 	}
 
-	//sort quests by index, so that if the same quests are chosen again, the ordering of the player's quest buttons won't change
-	std::sort(this->available_quests.begin(), this->available_quests.end(), [](const wyrmgus::quest *quest, const wyrmgus::quest *other_quest) {
-		return quest->get_index() < other_quest->get_index();
-	});
-
-
 	this->on_available_quests_changed();
 
 	// notify the player when new quests are available (but only if the player has already exausted the quests available to him, so that they aren't bothered if they choose not to engage with the quest system)
