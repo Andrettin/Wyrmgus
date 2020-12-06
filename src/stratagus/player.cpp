@@ -2329,15 +2329,21 @@ void CPlayer::update_quest_pool()
 		}
 	}
 	
-	for (int i = 0; i < CPlayer::max_quest_pool; ++i) { // fill the quest pool with up to three quests
-		if (potential_quests.size() == 0) {
+	for (int i = 0; i < CPlayer::max_quest_pool; ++i) { //fill the quest pool with quests up to the max quantity
+		if (potential_quests.empty()) {
 			break;
 		}
-		wyrmgus::quest *quest = wyrmgus::vector::get_random(potential_quests);
+
+		wyrmgus::quest *quest = wyrmgus::vector::take_random(potential_quests);
 		this->available_quests.push_back(quest);
-		wyrmgus::vector::remove(potential_quests, quest);
 	}
-	
+
+	//sort quests by index, so that if the same quests are chosen again, the ordering of the player's quest buttons won't change
+	std::sort(this->available_quests.begin(), this->available_quests.end(), [](const wyrmgus::quest *quest, const wyrmgus::quest *other_quest) {
+		return quest->get_index() < other_quest->get_index();
+	});
+
+
 	this->on_available_quests_changed();
 
 	// notify the player when new quests are available (but only if the player has already exausted the quests available to him, so that they aren't bothered if they choose not to engage with the quest system)

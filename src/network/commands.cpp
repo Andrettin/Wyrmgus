@@ -164,7 +164,7 @@ void SendCommandQuest(CUnit &unit, wyrmgus::quest *quest)
 		CommandLog("quest", &unit, 0, 0, 0, NoUnitP, quest->get_identifier().c_str(), -1);
 		CommandQuest(unit, quest);
 	} else {
-		NetworkSendCommand(MessageCommandQuest, unit, quest->ID, 0, NoUnitP, nullptr, 0);
+		NetworkSendCommand(MessageCommandQuest, unit, quest->get_index(), 0, NoUnitP, nullptr, 0);
 	}
 }
 

@@ -67,7 +67,7 @@ public:
 	static quest *add(const std::string &identifier, const wyrmgus::data_module *data_module)
 	{
 		quest *quest = data_type::add(identifier, data_module);
-		quest->ID = quest::get_all().size() - 1;
+		quest->index = quest::get_all().size() - 1;
 		return quest;
 	}
 
@@ -79,6 +79,11 @@ public:
 	virtual void initialize() override;
 	virtual void process_text() override;
 	virtual void check() const override;
+
+	int get_index() const
+	{
+		return this->index;
+	}
 
 	const icon *get_icon() const
 	{
@@ -154,7 +159,11 @@ public:
 
 	bool overlaps_with(const quest *other_quest) const;
 
-	int ID = -1;
+private:
+	int index = -1;
+	wyrmgus::icon *icon = nullptr;
+	wyrmgus::player_color *player_color = nullptr; //the player color used for the quest's icon
+public:
 	std::string World;				/// Which world the quest belongs to
 	std::string Map;				/// What map the quest is played on
 	std::string Scenario;			/// Which scenario file is to be loaded for the quest
@@ -174,10 +183,6 @@ private:
 	std::string hint;				/// Quest hint
 public:
 	civilization *civilization = nullptr; //the civilization to which the quest belongs
-private:
-	icon *icon = nullptr;
-	player_color *player_color = nullptr;		/// Player color used for the quest's icon
-public:
 	int HighestCompletedDifficulty = -1;
 	bool Hidden = false;				/// Whether the quest is hidden
 private:
