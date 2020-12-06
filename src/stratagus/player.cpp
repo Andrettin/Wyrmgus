@@ -2348,6 +2348,10 @@ void CPlayer::update_quest_pool()
 	if (this->AiEnabled) { // if is an AI player, accept all quests that it can
 		int available_quest_quantity = this->available_quests.size();
 		for (int i = (available_quest_quantity  - 1); i >= 0; --i) {
+			if (this->get_current_quests().size() >= CPlayer::max_current_quests) {
+				break;
+			}
+
 			if (this->can_accept_quest(this->available_quests[i])) { // something may have changed, so recheck if the player is able to accept the quest
 				this->accept_quest(this->available_quests[i]);
 			}

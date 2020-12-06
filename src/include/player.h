@@ -88,6 +88,7 @@ class CPlayer
 {
 public:
 	static constexpr int max_quest_pool = 4;
+	static constexpr size_t max_current_quests = 6;
 
 	static void SetThisPlayer(CPlayer *player);
 	static CPlayer *GetThisPlayer();
