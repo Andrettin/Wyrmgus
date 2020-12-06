@@ -2218,7 +2218,7 @@ static void AiCheckPathwayConstruction()
 	}
 
 	//give priority to pathways that improve movement more, and then to railroad ones
-	std::sort(pathway_types.begin(), pathway_types.begin(), [](const wyrmgus::unit_type *type, const wyrmgus::unit_type *other_type) {
+	std::sort(pathway_types.begin(), pathway_types.end(), [](const wyrmgus::unit_type *type, const wyrmgus::unit_type *other_type) {
 		const wyrmgus::terrain_type *terrain_type = type->TerrainType;
 		const wyrmgus::terrain_type *other_terrain_type = other_type->TerrainType;
 
