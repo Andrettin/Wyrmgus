@@ -416,6 +416,11 @@ public:
 	QPoint get_center_tile_pos() const;
 	const wyrmgus::tile *get_center_tile() const;
 
+	QRect get_tile_rect() const
+	{
+		return QRect(this->tilePos, this->get_bottom_right_tile_pos());
+	}
+
 	const QPoint &get_pixel_offset() const
 	{
 		return this->pixel_offset;
