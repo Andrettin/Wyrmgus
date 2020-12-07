@@ -306,6 +306,8 @@ static int CclStratagusMap(lua_State *l)
 	}
 	
 	for (size_t z = 0; z < CMap::Map.MapLayers.size(); ++z) {
+		CMap::get()->process_settlement_territory_tiles(z);
+
 		for (int ix = 0; ix < CMap::Map.Info.MapWidths[z]; ++ix) {
 			for (int iy = 0; iy < CMap::Map.Info.MapHeights[z]; ++iy) {
 				const QPoint tile_pos(ix, iy);
