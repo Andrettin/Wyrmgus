@@ -3282,7 +3282,7 @@ void CMap::generate_settlement_territories(const int z)
 		tile->set_settlement(best_settlement);
 	});
 
-	this->calculate_settlement_territory_tiles(z);
+	this->process_settlement_territory_tiles(z);
 
 	//update the settlement of all buildings, as settlement territories have changed
 	for (const CPlayer *player : CPlayer::Players) {
@@ -3367,7 +3367,7 @@ wyrmgus::point_set CMap::expand_settlement_territories(std::vector<QPoint> &&see
 	return blocked_seeds;
 }
 
-void CMap::calculate_settlement_territory_tiles(const int z)
+void CMap::process_settlement_territory_tiles(const int z)
 {
 	for (int x = 0; x < this->Info.MapWidths[z]; ++x) {
 		for (int y = 0; y < this->Info.MapHeights[z]; ++y) {
