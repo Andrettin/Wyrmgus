@@ -120,6 +120,30 @@ public:
 		return this->coastal;
 	}
 
+	int get_resource_tile_count(const resource *resource) const
+	{
+		const auto find_iterator = this->resource_tile_counts.find(resource);
+		if (find_iterator != this->resource_tile_counts.end()) {
+			return find_iterator->second;
+		}
+
+		return 0;
+	}
+
+	void increment_resource_tile_count(const resource *resource)
+	{
+		++this->resource_tile_counts[resource];
+	}
+
+	void decrement_resource_tile_count(const resource *resource)
+	{
+		const int quantity = --this->resource_tile_counts[resource];
+
+		if (quantity <= 0) {
+			this->resource_tile_counts.erase(resource);
+		}
+	}
+
 private:
 	const wyrmgus::site *site = nullptr;
 	CUnit *site_unit = nullptr; //unit which represents the site
@@ -130,6 +154,7 @@ private:
 	QRect territory_rect; //the territory rectangle of the site
 	std::vector<QPoint> trade_route_tiles; //the tiles containing a trade route in the settlement's territory
 	bool coastal = false;
+	std::map<const resource *, int> resource_tile_counts; //resource tile counts in the settlement's territory
 };
 
 }

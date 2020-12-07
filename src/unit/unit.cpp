@@ -3789,7 +3789,7 @@ void CUnit::Place(const Vec2i &pos, int z)
 		if (this->Type->BoolFlag[BUILDING_INDEX].value) {
 			this->UpdateSettlement(); // update the settlement name of a building when placing it
 		}
-		
+
 		//remove pathways, destroyed walls and decoration units under buildings
 		if (this->Type->BoolFlag[BUILDING_INDEX].value && !this->Type->TerrainType) {
 			for (int x = this->tilePos.x; x < this->tilePos.x + this->Type->get_tile_width(); ++x) {
@@ -4205,10 +4205,7 @@ void UnitLost(CUnit &unit)
 	const CBuildRestrictionOnTop *b = OnTopDetails(*unit.Type, nullptr);
 	//Wyrmgus end
 	if (b != nullptr) {
-		//Wyrmgus start
-//		if (b->ReplaceOnDie && (type.GivesResource && unit.ResourcesHeld != 0)) {
 		if (b->ReplaceOnDie && (type.get_given_resource() == nullptr || unit.ResourcesHeld != 0)) {
-		//Wyrmgus end
 			CUnit *temp = MakeUnitAndPlace(unit.tilePos, *b->Parent, CPlayer::Players[PlayerNumNeutral], unit.MapLayer->ID);
 			if (temp == nullptr) {
 				DebugPrint("Unable to allocate Unit");

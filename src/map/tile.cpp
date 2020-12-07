@@ -217,6 +217,15 @@ void tile::RemoveOverlayTerrain()
 		return;
 	}
 
+	if (this->get_resource() != nullptr && this->get_settlement() != nullptr) {
+		//decrement the resource tile count for the tile's settlement
+		//forest tiles aren't decremented on overlay destruction, since they can regrow, so we need to decrement them now even if the overlay terrain has already been destroyed
+		const bool already_decremented = this->OverlayTerrainDestroyed && !(this->get_overlay_terrain()->Flags & MapFieldForest);
+		if (!already_decremented) {
+			this->get_settlement()->get_game_data()->decrement_resource_tile_count(this->get_resource());
+		}
+	}
+
 	this->value = 0;
 	this->Flags &= ~(this->get_overlay_terrain()->Flags);
 
@@ -254,6 +263,14 @@ void tile::SetOverlayTerrainDestroyed(bool destroyed)
 {
 	if (this->get_overlay_terrain() == nullptr || this->OverlayTerrainDestroyed == destroyed) {
 		return;
+	}
+
+	if (this->get_resource() != nullptr && this->get_settlement() != nullptr) {
+		//decrement the resource tile count for the tile's settlement
+		//forest tiles aren't decremented on overlay destruction, since they can regrow
+		if (!(this->get_overlay_terrain()->Flags & MapFieldForest)) {
+			this->get_settlement()->get_game_data()->decrement_resource_tile_count(this->get_resource());
+		}
 	}
 
 	this->OverlayTerrainDestroyed = destroyed;

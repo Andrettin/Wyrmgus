@@ -99,6 +99,11 @@ void site_game_data::process_territory_tile(const tile *tile, const QPoint &tile
 	if (!this->coastal && tile->is_coastal_water() && !tile->is_river()) {
 		this->coastal = true;
 	}
+
+	const resource *tile_resource = tile->get_resource();
+	if (tile_resource != nullptr) {
+		this->increment_resource_tile_count(tile_resource);
+	}
 }
 
 void site_game_data::update_border_tiles()
