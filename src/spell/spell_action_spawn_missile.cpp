@@ -279,7 +279,9 @@ int spell_action_spawn_missile::Cast(CUnit &caster, const spell &, CUnit *target
 		missile->AlwaysCritical = this->AlwaysCritical;
 		//Wyrmgus end
 
-		missile->TargetUnit = target->acquire_ref();
+		if (target != nullptr) {
+			missile->TargetUnit = target->acquire_ref();
+		}
 	}
 
 	return 1;
