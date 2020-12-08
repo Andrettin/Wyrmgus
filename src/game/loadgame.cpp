@@ -40,6 +40,8 @@
 #include "map/map.h"
 #include "map/map_layer.h"
 #include "map/minimap.h"
+#include "map/site.h"
+#include "map/site_game_data.h"
 #include "map/terrain_type.h"
 #include "map/tileset.h"
 #include "missile.h"
@@ -284,6 +286,15 @@ void LoadGame(const std::string &filename)
 	wyrmgus::random::get()->set_seed(syncrand);
 	SyncHash = synchash;
 	SelectionChanged();
+
+	//set owners for settlements
+	for (const CUnit *settlement_unit : CMap::get()->get_settlement_units()) {
+		if (settlement_unit->Player->is_neutral_player()) {
+			continue;
+		}
+
+		settlement_unit->settlement->get_game_data()->set_owner(settlement_unit->Player);
+	}
 
 	CMap::get()->calculate_settlement_resource_units();
 }
