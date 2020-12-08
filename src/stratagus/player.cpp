@@ -1638,6 +1638,19 @@ bool CPlayer::HasSettlementNearWaterZone(int water_zone) const
 	return false;
 }
 
+bool CPlayer::has_settlement_with_resource_source(const wyrmgus::resource *resource) const
+{
+	const std::vector<const wyrmgus::site *> settlements = this->get_settlements();
+
+	for (const wyrmgus::site *settlement : settlements) {
+		if (settlement->get_game_data()->has_resource_source(resource)) {
+			return true;
+		}
+	}
+
+	return false;
+}
+
 const wyrmgus::site *CPlayer::GetNearestSettlement(const Vec2i &pos, int z, const Vec2i &size) const
 {
 	CUnit *best_hall = nullptr;

@@ -121,6 +121,8 @@ public:
 		return this->coastal;
 	}
 
+	bool has_resource_source(const resource *resource) const;
+
 	int get_resource_tile_count(const resource *resource) const
 	{
 		const auto find_iterator = this->resource_tile_counts.find(resource);

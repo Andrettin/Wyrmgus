@@ -27,7 +27,7 @@
 
 #pragma once
 
-#include "civilization.h"
+#include "player.h"
 #include "script/condition/condition.h"
 #include "util/string_util.h"
 
@@ -52,7 +52,7 @@ public:
 	{
 		Q_UNUSED(indent)
 
-		return "Has a Coastal Settlement";
+		return "Has a coastal settlement";
 	}
 
 private:

@@ -74,6 +74,11 @@ public:
 		return "Gather " + std::to_string(this->get_quantity()) + " " + this->resource->get_name();
 	}
 
+	virtual bool is_quest_acceptance_allowed(const CPlayer *player) const override
+	{
+		return player->has_settlement_with_resource_source(this->resource);
+	}
+
 	bool overlaps_with(const gather_resource_objective *other_objective) const
 	{
 		return this->resource == other_objective->resource;

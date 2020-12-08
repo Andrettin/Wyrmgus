@@ -110,7 +110,7 @@ enum _directions_ {
 	LookingNW = 7 * 32       /// Unit looking north west
 };
 
-static constexpr int NextDirection = 32;        /// Next direction N->NE->E...
+constexpr int NextDirection = 32;        /// Next direction N->NE->E...
 #define UnitNotSeen 0x7fffffff  /// Unit not seen, used by CUnit::SeenFrame
 
 /// The big unit structure

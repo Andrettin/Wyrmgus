@@ -158,6 +158,21 @@ void site_game_data::update_minimap_territory()
 	}
 }
 
+bool site_game_data::has_resource_source(const resource *resource) const
+{
+	if (this->get_resource_tile_count(resource) > 0 || !this->get_resource_units(resource).empty()) {
+		return true;
+	}
+
+	for (const wyrmgus::resource *child_resource : resource->ChildResources) {
+		if (this->get_resource_tile_count(child_resource) > 0 || !this->get_resource_units(child_resource).empty()) {
+			return true;
+		}
+	}
+
+	return false;
+}
+
 void site_game_data::add_resource_unit(CUnit *unit)
 {
 	const resource *unit_resource = unit->Type->get_given_resource();
