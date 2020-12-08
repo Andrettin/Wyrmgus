@@ -358,6 +358,11 @@ void StartMap(const std::string &filename, bool clean)
 	//	SetMessage("%s", _("Do it! Do it now!"));
 		//Wyrmgus end
 
+		//update the quest pool for all players
+		for (size_t i = 0; i < PlayerNumNeutral; ++i) {
+			CPlayer::Players[i]->update_quest_pool();
+		}
+
 		if (CPlayer::GetThisPlayer()->StartMapLayer < static_cast<int>(CMap::Map.MapLayers.size())) {
 			UI.CurrentMapLayer = CMap::Map.MapLayers[CPlayer::GetThisPlayer()->StartMapLayer].get();
 		}
@@ -1784,7 +1789,7 @@ void CreateGame(const std::string &filename, CMap *map, bool is_mod)
 	} catch (...) {
 		std::throw_with_nested(std::runtime_error("Failed to preprocess map."));
 	}
-	
+
 	//Wyrmgus start
 	//update the sight of all units
 	for (CUnit *unit : wyrmgus::unit_manager::get()->get_units()) {
