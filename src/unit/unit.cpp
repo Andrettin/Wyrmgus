@@ -3825,6 +3825,13 @@ void CUnit::Place(const Vec2i &pos, int z)
 				this->ChooseVariation();
 			}
 		}
+
+		if (this->Type->get_given_resource() != nullptr) {
+			const wyrmgus::tile *tile = this->get_center_tile();
+			if (tile->get_settlement() != nullptr) {
+				tile->get_settlement()->get_game_data()->add_resource_unit(this);
+			}
+		}
 	}
 	//Wyrmgus end
 }
@@ -4021,6 +4028,14 @@ void CUnit::Remove(CUnit *host)
 		DebugPrint("unit '%s(%d)' already removed\n" _C_ Type->Ident.c_str() _C_ UnitNumber(*this));
 		return;
 	}
+
+	if (this->Type->get_given_resource() != nullptr) {
+		const wyrmgus::tile *tile = this->get_center_tile();
+		if (tile->get_settlement() != nullptr) {
+			tile->get_settlement()->get_game_data()->remove_resource_unit(this);
+		}
+	}
+
 	CMap::Map.Remove(*this);
 	MapUnmarkUnitSight(*this);
 	UnmarkUnitFieldFlags(*this);

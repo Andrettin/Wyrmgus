@@ -36,6 +36,7 @@
 #include "map/tile.h"
 #include "player.h"
 #include "unit/unit.h"
+#include "util/vector_util.h"
 
 namespace wyrmgus {
 
@@ -154,6 +155,23 @@ void site_game_data::update_minimap_territory()
 				UI.get_minimap()->update_territory_xy(tile_pos, z);
 			}
 		}
+	}
+}
+
+void site_game_data::add_resource_unit(CUnit *unit)
+{
+	const resource *unit_resource = unit->Type->get_given_resource();
+	this->resource_units[unit_resource].push_back(unit);
+}
+
+void site_game_data::remove_resource_unit(CUnit *unit)
+{
+	const resource *unit_resource = unit->Type->get_given_resource();
+	std::vector<CUnit *> &resource_units = this->resource_units[unit_resource];
+	vector::remove(resource_units, unit);
+
+	if (resource_units.empty()) {
+		this->resource_units.erase(unit_resource);
 	}
 }
 

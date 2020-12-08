@@ -145,6 +145,26 @@ public:
 		}
 	}
 
+	const std::vector<CUnit *> &get_resource_units(const resource *resource) const
+	{
+		static std::vector<CUnit *> empty_vector;
+
+		const auto find_iterator = this->resource_units.find(resource);
+		if (find_iterator != this->resource_units.end()) {
+			return find_iterator->second;
+		}
+
+		return empty_vector;
+	}
+
+	void add_resource_unit(CUnit *unit);
+	void remove_resource_unit(CUnit *unit);
+
+	void clear_resource_units()
+	{
+		this->resource_units.clear();
+	}
+
 private:
 	const wyrmgus::site *site = nullptr;
 	CUnit *site_unit = nullptr; //unit which represents the site
@@ -156,6 +176,7 @@ private:
 	std::vector<QPoint> trade_route_tiles; //the tiles containing a trade route in the settlement's territory
 	bool coastal = false;
 	std::map<const resource *, int> resource_tile_counts; //resource tile counts in the settlement's territory
+	std::map<const resource *, std::vector<CUnit *>> resource_units; //resource units in the settlement's territory
 };
 
 }

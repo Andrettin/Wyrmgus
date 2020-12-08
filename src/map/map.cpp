@@ -1212,6 +1212,9 @@ void PreprocessMap()
 		}
 	}
 	//Wyrmgus end
+
+	CMap::get()->calculate_settlement_resource_units();
+
 	//Wyrmgus start
 	/*
 	// it is required for fixing the wood that all tiles are marked as seen!
@@ -3381,6 +3384,30 @@ void CMap::process_settlement_territory_tiles(const int z)
 
 			wyrmgus::site_game_data *settlement_game_data = settlement->get_game_data();
 			settlement_game_data->process_territory_tile(tile, tile_pos, z);
+		}
+	}
+}
+
+void CMap::calculate_settlement_resource_units()
+{
+	for (const wyrmgus::site *site : wyrmgus::site::get_all()) {
+		site->get_game_data()->clear_resource_units();
+	}
+
+	//add resource units to the settlement resource unit lists
+	for (CUnit *unit : wyrmgus::unit_manager::get()->get_units()) {
+		if (!unit->IsAliveOnMap()) {
+			continue;
+		}
+
+		const wyrmgus::resource *unit_resource = unit->Type->get_given_resource();
+		if (unit_resource == nullptr) {
+			continue;
+		}
+		
+		const wyrmgus::tile *tile = unit->get_center_tile();
+		if (tile->get_settlement() != nullptr) {
+			tile->get_settlement()->get_game_data()->add_resource_unit(unit);
 		}
 	}
 }
