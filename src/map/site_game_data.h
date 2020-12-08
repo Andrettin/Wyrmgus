@@ -37,6 +37,7 @@ class CUnit;
 
 namespace wyrmgus {
 
+class resource;
 class site;
 class tile;
 
