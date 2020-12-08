@@ -42,13 +42,11 @@
 #include "character.h"
 //Wyrmgus end
 #include "civilization.h"
-#include "civilization_history.h"
 #include "commands.h"
 #include "database/defines.h"
 #include "diplomacy_state.h"
 #include "editor.h"
 #include "faction.h"
-#include "faction_history.h"
 #include "faction_type.h"
 //Wyrmgus start
 #include "grand_strategy.h"
@@ -147,10 +145,10 @@ game::~game()
 
 void game::apply_player_history()
 {
-	const CDate start_date = current_campaign->get_start_date();
+	const CDate start_date = this->get_current_campaign()->get_start_date();
 
 	for (CPlayer *player : CPlayer::Players) {
-		if (player->Type == PlayerNobody || player->Race == -1 || player->Faction == -1) {
+		if (player->Type == PlayerNobody || player->get_civilization() == nullptr || player->get_faction() == nullptr) {
 			continue;
 		}
 
@@ -158,104 +156,7 @@ void game::apply_player_history()
 			continue;
 		}
 
-		const civilization *civilization = player->get_civilization();
-		const civilization_history *civilization_history = civilization->get_history();
-
-		const faction *faction = player->get_faction();
-		const faction_history *faction_history = faction->get_history();
-
-		player->set_faction_tier(faction_history->get_tier());
-		player->set_government_type(faction_history->get_government_type());
-		player->set_dynasty(faction_history->get_dynasty());
-
-		for (const auto &kv_pair : civilization->HistoricalUpgrades) {
-			const CUpgrade *upgrade = CUpgrade::get(kv_pair.first);
-			for (std::map<CDate, bool>::const_reverse_iterator second_iterator = kv_pair.second.rbegin(); second_iterator != kv_pair.second.rend(); ++second_iterator) {
-				if (second_iterator->first.Year == 0 || start_date.ContainsDate(second_iterator->first)) {
-					if (second_iterator->second && UpgradeIdentAllowed(*player, kv_pair.first.c_str()) != 'R') {
-						UpgradeAcquire(*player, upgrade);
-					} else if (!second_iterator->second) {
-						break;
-					}
-				}
-			}
-		}
-
-		for (const auto &kv_pair : faction->HistoricalUpgrades) {
-			const CUpgrade *upgrade = CUpgrade::get(kv_pair.first);
-			for (std::map<CDate, bool>::const_reverse_iterator second_iterator = kv_pair.second.rbegin(); second_iterator != kv_pair.second.rend(); ++second_iterator) {
-				if (second_iterator->first.Year == 0 || start_date.ContainsDate(second_iterator->first)) {
-					if (second_iterator->second && UpgradeIdentAllowed(*player, kv_pair.first.c_str()) != 'R') {
-						UpgradeAcquire(*player, upgrade);
-					} else if (!second_iterator->second) {
-						break;
-					}
-				}
-			}
-		}
-
-		for (const CUpgrade *upgrade : civilization_history->get_acquired_upgrades()) {
-			if (UpgradeIdAllowed(*player, upgrade->ID) != 'R') {
-				UpgradeAcquire(*player, upgrade);
-			}
-		}
-
-		for (const CUpgrade *upgrade : faction_history->get_acquired_upgrades()) {
-			if (UpgradeIdAllowed(*player, upgrade->ID) != 'R') {
-				UpgradeAcquire(*player, upgrade);
-			}
-		}
-
-		for (const auto &kv_pair : faction->HistoricalDiplomacyStates) { //set the appropriate historical diplomacy states to other factions
-			if (kv_pair.first.first.Year == 0 || start_date.ContainsDate(kv_pair.first.first)) {
-				CPlayer *diplomacy_state_player = GetFactionPlayer(kv_pair.first.second);
-				if (diplomacy_state_player) {
-					CommandDiplomacy(player->Index, kv_pair.second, diplomacy_state_player->Index);
-					CommandDiplomacy(diplomacy_state_player->Index, kv_pair.second, player->Index);
-					if (kv_pair.second == diplomacy_state::allied) {
-						CommandSharedVision(player->Index, true, diplomacy_state_player->Index);
-						CommandSharedVision(diplomacy_state_player->Index, true, player->Index);
-					}
-				}
-			}
-		}
-
-		for (const auto &kv_pair : faction_history->get_diplomacy_states()) {
-			const wyrmgus::faction *other_faction = kv_pair.first;
-			const diplomacy_state state = kv_pair.second;
-
-			CPlayer *diplomacy_state_player = GetFactionPlayer(other_faction);
-			if (diplomacy_state_player != nullptr) {
-				switch (state) {
-					case diplomacy_state::overlord:
-					case diplomacy_state::personal_union_overlord:
-					case diplomacy_state::vassal:
-					case diplomacy_state::personal_union_vassal:
-						CommandDiplomacy(player->Index, state, diplomacy_state_player->Index);
-						break;
-					case diplomacy_state::allied:
-						CommandSharedVision(player->Index, true, diplomacy_state_player->Index);
-						CommandSharedVision(diplomacy_state_player->Index, true, player->Index);
-						//fallthrough
-					default:
-						CommandDiplomacy(player->Index, state, diplomacy_state_player->Index);
-						CommandDiplomacy(diplomacy_state_player->Index, state, player->Index);
-						break;
-				}
-			}
-		}
-
-		for (const auto &kv_pair : faction->HistoricalResources) { //set the appropriate historical resource quantities
-			if (kv_pair.first.first.Year == 0 || start_date.ContainsDate(kv_pair.first.first)) {
-				player->set_resource(resource::get_all()[kv_pair.first.second], kv_pair.second);
-			}
-		}
-
-		for (const auto &kv_pair : faction_history->get_resources()) {
-			const resource *resource = kv_pair.first;
-			const int quantity = kv_pair.second;
-			player->set_resource(resource, quantity);
-		}
+		player->apply_history(start_date);
 	}
 }
 

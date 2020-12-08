@@ -36,6 +36,7 @@
 #include "ai.h"
 #include "ai/ai_local.h" //for using AiHelpers
 #include "civilization.h"
+#include "civilization_history.h"
 #include "commands.h" //for faction setting
 #include "currency.h"
 #include "database/defines.h"
@@ -44,6 +45,7 @@
 #include "dynasty.h"
 #include "editor.h"
 #include "faction.h"
+#include "faction_history.h"
 #include "faction_type.h"
 //Wyrmgus start
 #include "game.h"
@@ -1038,6 +1040,113 @@ void CPlayer::Init(/* PlayerTypes */ int type)
 	}
 	this->revealed = false;
 	++NumPlayers;
+}
+
+void CPlayer::apply_history(const CDate &start_date)
+{
+	const wyrmgus::civilization *civilization = this->get_civilization();
+	const wyrmgus::civilization_history *civilization_history = civilization->get_history();
+
+	const wyrmgus::faction *faction = this->get_faction();
+	const wyrmgus::faction_history *faction_history = faction->get_history();
+
+	this->set_faction_tier(faction_history->get_tier());
+	this->set_government_type(faction_history->get_government_type());
+	this->set_dynasty(faction_history->get_dynasty());
+
+	for (const auto &kv_pair : civilization->HistoricalUpgrades) {
+		const CUpgrade *upgrade = CUpgrade::get(kv_pair.first);
+		for (std::map<CDate, bool>::const_reverse_iterator second_iterator = kv_pair.second.rbegin(); second_iterator != kv_pair.second.rend(); ++second_iterator) {
+			if (second_iterator->first.Year == 0 || start_date.ContainsDate(second_iterator->first)) {
+				if (second_iterator->second && UpgradeIdentAllowed(*this, kv_pair.first.c_str()) != 'R') {
+					UpgradeAcquire(*this, upgrade);
+				} else if (!second_iterator->second) {
+					break;
+				}
+			}
+		}
+	}
+
+	for (const auto &kv_pair : faction->HistoricalUpgrades) {
+		const CUpgrade *upgrade = CUpgrade::get(kv_pair.first);
+		for (std::map<CDate, bool>::const_reverse_iterator second_iterator = kv_pair.second.rbegin(); second_iterator != kv_pair.second.rend(); ++second_iterator) {
+			if (second_iterator->first.Year == 0 || start_date.ContainsDate(second_iterator->first)) {
+				if (second_iterator->second && UpgradeIdentAllowed(*this, kv_pair.first.c_str()) != 'R') {
+					UpgradeAcquire(*this, upgrade);
+				} else if (!second_iterator->second) {
+					break;
+				}
+			}
+		}
+	}
+
+	this->apply_civilization_history(civilization_history);
+
+	for (const CUpgrade *upgrade : faction_history->get_acquired_upgrades()) {
+		if (UpgradeIdAllowed(*this, upgrade->ID) != 'R') {
+			UpgradeAcquire(*this, upgrade);
+		}
+	}
+
+	for (const auto &kv_pair : faction->HistoricalDiplomacyStates) { //set the appropriate historical diplomacy states to other factions
+		if (kv_pair.first.first.Year == 0 || start_date.ContainsDate(kv_pair.first.first)) {
+			CPlayer *diplomacy_state_player = GetFactionPlayer(kv_pair.first.second);
+			if (diplomacy_state_player) {
+				CommandDiplomacy(this->Index, kv_pair.second, diplomacy_state_player->Index);
+				CommandDiplomacy(diplomacy_state_player->Index, kv_pair.second, this->Index);
+				if (kv_pair.second == wyrmgus::diplomacy_state::allied) {
+					CommandSharedVision(this->Index, true, diplomacy_state_player->Index);
+					CommandSharedVision(diplomacy_state_player->Index, true, this->Index);
+				}
+			}
+		}
+	}
+
+	for (const auto &kv_pair : faction_history->get_diplomacy_states()) {
+		const wyrmgus::faction *other_faction = kv_pair.first;
+		const wyrmgus::diplomacy_state state = kv_pair.second;
+
+		CPlayer *diplomacy_state_player = GetFactionPlayer(other_faction);
+		if (diplomacy_state_player != nullptr) {
+			switch (state) {
+				case wyrmgus::diplomacy_state::overlord:
+				case wyrmgus::diplomacy_state::personal_union_overlord:
+				case wyrmgus::diplomacy_state::vassal:
+				case wyrmgus::diplomacy_state::personal_union_vassal:
+					CommandDiplomacy(this->Index, state, diplomacy_state_player->Index);
+					break;
+				case wyrmgus::diplomacy_state::allied:
+					CommandSharedVision(this->Index, true, diplomacy_state_player->Index);
+					CommandSharedVision(diplomacy_state_player->Index, true, this->Index);
+					//fallthrough
+				default:
+					CommandDiplomacy(this->Index, state, diplomacy_state_player->Index);
+					CommandDiplomacy(diplomacy_state_player->Index, state, this->Index);
+					break;
+			}
+		}
+	}
+
+	for (const auto &kv_pair : faction->HistoricalResources) { //set the appropriate historical resource quantities
+		if (kv_pair.first.first.Year == 0 || start_date.ContainsDate(kv_pair.first.first)) {
+			this->set_resource(wyrmgus::resource::get_all()[kv_pair.first.second], kv_pair.second);
+		}
+	}
+
+	for (const auto &kv_pair : faction_history->get_resources()) {
+		const wyrmgus::resource *resource = kv_pair.first;
+		const int quantity = kv_pair.second;
+		this->set_resource(resource, quantity);
+	}
+}
+
+void CPlayer::apply_civilization_history(const wyrmgus::civilization_history *civilization_history)
+{
+	for (const CUpgrade *upgrade : civilization_history->get_acquired_upgrades()) {
+		if (UpgradeIdAllowed(*this, upgrade->ID) != 'R') {
+			UpgradeAcquire(*this, upgrade);
+		}
+	}
 }
 
 bool CPlayer::is_neutral_player() const

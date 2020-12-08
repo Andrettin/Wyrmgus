@@ -47,6 +47,7 @@ constexpr int SPEEDUP_FACTOR = 100;
 constexpr int DefaultTradeCost = 30;
 
 class CCurrency;
+class CDate;
 class CFile;
 class CGraphic;
 class CProvince;
@@ -65,6 +66,7 @@ namespace wyrmgus {
 	class calendar;
 	class character;
 	class civilization;
+	class civilization_history;
 	class deity;
 	class dynasty;
 	class language;
@@ -682,6 +684,9 @@ public:
 	void Init(/* PlayerTypes */ int type);
 	void Save(CFile &file) const;
 	void Load(lua_State *l);
+
+	void apply_history(const CDate &start_date);
+	void apply_civilization_history(const wyrmgus::civilization_history *civilization_history);
 
 private:
 	std::vector<CUnit *> Units; /// units of this player
