@@ -2354,7 +2354,7 @@ void CPlayer::update_quest_pool()
 	this->on_available_quests_changed();
 
 	// notify the player when new quests are available (but only if the player has already exausted the quests available to him, so that they aren't bothered if they choose not to engage with the quest system)
-	if (this == CPlayer::GetThisPlayer() && GameCycle >= CYCLES_PER_MINUTE && this->available_quests.size() > 0 && exausted_available_quests && this->NumTownHalls > 0) {
+	if (this == CPlayer::GetThisPlayer() && GameCycle >= CYCLES_PER_MINUTE && this->available_quests.size() > 0 && exausted_available_quests && this->NumTownHalls > 0 && this->get_current_quests().size() < CPlayer::max_current_quests) {
 		CPlayer::GetThisPlayer()->Notify("%s", _("New quests available"));
 	}
 	
