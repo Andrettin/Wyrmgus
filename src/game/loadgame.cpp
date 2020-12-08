@@ -284,4 +284,6 @@ void LoadGame(const std::string &filename)
 	wyrmgus::random::get()->set_seed(syncrand);
 	SyncHash = synchash;
 	SelectionChanged();
+
+	CMap::get()->calculate_settlement_resource_units();
 }
