@@ -37,13 +37,30 @@ class CUpgrade;
 
 namespace wyrmgus {
 
+class upgrade_class;
+
 class civilization_history final : public data_entry_history
 {
 	Q_OBJECT
 
+	Q_PROPERTY(QVariantList acquired_upgrade_classes READ get_acquired_upgrade_classes_qstring_list)
 	Q_PROPERTY(QVariantList acquired_upgrades READ get_acquired_upgrades_qstring_list)
 
 public:
+	const std::vector<upgrade_class *> &get_acquired_upgrade_classes() const
+	{
+		return this->acquired_upgrade_classes;
+	}
+
+	QVariantList get_acquired_upgrade_classes_qstring_list() const;
+
+	Q_INVOKABLE void add_acquired_upgrade_class(upgrade_class *upgrade_class)
+	{
+		this->acquired_upgrade_classes.push_back(upgrade_class);
+	}
+
+	Q_INVOKABLE void remove_acquired_upgrade_class(upgrade_class *upgrade_class);
+
 	const std::vector<CUpgrade *> &get_acquired_upgrades() const
 	{
 		return this->acquired_upgrades;
@@ -59,6 +76,7 @@ public:
 	Q_INVOKABLE void remove_acquired_upgrade(CUpgrade *upgrade);
 
 private:
+	std::vector<upgrade_class *> acquired_upgrade_classes;
 	std::vector<CUpgrade *> acquired_upgrades;
 };
 

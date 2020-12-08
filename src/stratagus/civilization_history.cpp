@@ -29,11 +29,22 @@
 
 #include "civilization_history.h"
 
+#include "upgrade/upgrade_class.h"
 #include "upgrade/upgrade_structs.h"
 #include "util/container_util.h"
 #include "util/vector_util.h"
 
 namespace wyrmgus {
+
+QVariantList civilization_history::get_acquired_upgrade_classes_qstring_list() const
+{
+	return container::to_qvariant_list(this->get_acquired_upgrade_classes());
+}
+
+void civilization_history::remove_acquired_upgrade_class(upgrade_class *upgrade_class)
+{
+	vector::remove(this->acquired_upgrade_classes, upgrade_class);
+}
 
 QVariantList civilization_history::get_acquired_upgrades_qstring_list() const
 {

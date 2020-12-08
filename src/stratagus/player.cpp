@@ -1148,6 +1148,20 @@ void CPlayer::apply_civilization_history(const wyrmgus::civilization_base *civil
 
 	const wyrmgus::civilization_history *civilization_history = civilization->get_history();
 
+	const wyrmgus::faction *faction = this->get_faction();
+
+	for (const wyrmgus::upgrade_class *upgrade_class : civilization_history->get_acquired_upgrade_classes()) {
+		const CUpgrade *upgrade = faction->get_class_upgrade(upgrade_class);
+
+		if (upgrade == nullptr) {
+			continue;
+		}
+
+		if (UpgradeIdAllowed(*this, upgrade->ID) != 'R') {
+			UpgradeAcquire(*this, upgrade);
+		}
+	}
+
 	for (const CUpgrade *upgrade : civilization_history->get_acquired_upgrades()) {
 		if (UpgradeIdAllowed(*this, upgrade->ID) != 'R') {
 			UpgradeAcquire(*this, upgrade);

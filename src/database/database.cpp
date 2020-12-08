@@ -473,6 +473,9 @@ void database::modify_list_property_for_object(QObject *object, const std::strin
 	} else if (property_name == "upgrades" || property_name == "acquired_upgrades") {
 		CUpgrade *upgrade_value = CUpgrade::get(value);
 		success = QMetaObject::invokeMethod(object, method_name.c_str(), Qt::ConnectionType::DirectConnection, Q_ARG(CUpgrade *, upgrade_value));
+	} else if (property_name == "upgrade_classes" || property_name == "acquired_upgrade_classes") {
+		upgrade_class *upgrade_class_value = upgrade_class::get(value);
+		success = QMetaObject::invokeMethod(object, method_name.c_str(), Qt::ConnectionType::DirectConnection, Q_ARG(upgrade_class *, upgrade_class_value));
 	} else if (property_type == QVariant::Type::StringList) {
 		success = QMetaObject::invokeMethod(object, method_name.c_str(), Qt::ConnectionType::DirectConnection, Q_ARG(const std::string &, value));
 	} else {
