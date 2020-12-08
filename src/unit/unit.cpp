@@ -2778,9 +2778,10 @@ int CUnit::GetDrawLevel() const
 */
 void CUnit::Init(const wyrmgus::unit_type &type)
 {
-	//  Set refs to 1. This is the "I am alive ref", lost in ReleaseUnit.
-	this->base_ref = std::make_unique<wyrmgus::unit_ref>(this);
-	this->ref = this->base_ref;
+	if (!SaveGameLoading) {
+		//  Set refs to 1. This is the "I am alive ref", lost in ReleaseUnit.
+		this->initialize_base_reference();
+	}
 
 	//  Build all unit table
 	wyrmgus::unit_manager::get()->Add(this);
@@ -2849,6 +2850,12 @@ void CUnit::Init(const wyrmgus::unit_type &type)
 	SavedOrder = nullptr;
 	Assert(CriticalOrder == nullptr);
 	CriticalOrder = nullptr;
+}
+
+void CUnit::initialize_base_reference()
+{
+	this->base_ref = std::make_unique<wyrmgus::unit_ref>(this);
+	this->ref = this->base_ref;
 }
 
 /**

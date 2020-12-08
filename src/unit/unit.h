@@ -144,6 +144,8 @@ public:
 
 	/// Initialize unit structure with default values
 	void Init(const wyrmgus::unit_type &type);
+	void initialize_base_reference();
+
 	/// Assign unit to player
 	void AssignToPlayer(CPlayer &player);
 

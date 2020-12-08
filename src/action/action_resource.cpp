@@ -1046,7 +1046,7 @@ int COrder_Resource::GatherResource(CUnit &unit)
 					return 0;
 				}
 				DebugPrint("%d: Worker %d report: Resource is destroyed\n" _C_ unit.Player->Index _C_ UnitNumber(unit));
-				bool dead = source->IsAlive() == false;
+				const bool dead = source->IsAlive() == false;
 
 				// Improved version of DropOutAll that makes workers go to the depot.
 				LoseResource(unit, *source);

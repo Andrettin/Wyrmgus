@@ -247,6 +247,7 @@ void unit_manager::Load(lua_State *l)
 		unit->UnitManagerData.slot = i;
 		this->unit_slots.push_back(std::move(unit));
 	}
+
 	const unsigned int args = lua_rawlen(l, 2);
 	for (unsigned int i = 0; i < args; i++) {
 		lua_rawgeti(l, 2, i + 1);
@@ -265,9 +266,19 @@ void unit_manager::Load(lua_State *l)
 			}
 		}
 		Assert(unit_index != -1 && cycle != static_cast<unsigned long>(-1));
+		this->unit_slots[unit_index]->Destroyed = 1;
 		this->ReleaseUnit(this->unit_slots[unit_index].get());
 		this->unit_slots[unit_index]->ReleaseCycle = cycle;
 		lua_pop(l, 1);
+	}
+
+	//initialize the base reference for all non-destroyed units
+	for (const std::unique_ptr<CUnit> &unit : this->unit_slots) {
+		if (unit->Destroyed) {
+			continue;
+		}
+
+		unit->initialize_base_reference();
 	}
 }
 
