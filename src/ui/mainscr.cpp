@@ -1206,58 +1206,60 @@ void DrawPopups()
 		if (CMap::Map.Info.IsPointOnMap(minimap_tile_pos, UI.CurrentMapLayer->ID)) {
 			const wyrmgus::tile *tile = UI.CurrentMapLayer->Field(minimap_tile_pos);
 
-			//hackish way to make the popup appear correctly
-			std::unique_ptr<wyrmgus::button> button;
-			const bool is_tile_water = tile->is_water() && !tile->is_river();
-			const bool is_tile_space = tile->is_space();
-			const bool is_tile_non_land = is_tile_water || is_tile_space;
+			if (tile->player_info->IsTeamExplored(*CPlayer::GetThisPlayer())) {
+				//hackish way to make the popup appear correctly
+				std::unique_ptr<wyrmgus::button> button;
+				const bool is_tile_water = tile->is_water() && !tile->is_river();
+				const bool is_tile_space = tile->is_space();
+				const bool is_tile_non_land = is_tile_water || is_tile_space;
 
-			switch (UI.get_minimap()->get_mode()) {
-				case wyrmgus::minimap_mode::territories:
-					if (tile->get_owner() != nullptr && !is_tile_non_land) {
-						button = get_territory_tooltip_button(tile->get_owner());
-					}
-					break;
-				case wyrmgus::minimap_mode::territories_with_non_land:
-					if (tile->get_owner() != nullptr) {
-						button = get_territory_tooltip_button(tile->get_owner());
-					}
-					break;
-				case wyrmgus::minimap_mode::realms:
-					if (tile->get_realm_owner() != nullptr && !is_tile_non_land) {
-						button = get_territory_tooltip_button(tile->get_realm_owner());
-					}
-					break;
-				case wyrmgus::minimap_mode::realms_with_non_land:
-					if (tile->get_realm_owner() != nullptr) {
-						button = get_territory_tooltip_button(tile->get_realm_owner());
-					}
-					break;
-				case wyrmgus::minimap_mode::settlements: {
-					const wyrmgus::site *settlement = tile->get_settlement();
-					if (tile->get_settlement() == nullptr) {
+				switch (UI.get_minimap()->get_mode()) {
+					case wyrmgus::minimap_mode::territories:
+						if (tile->get_owner() != nullptr && !is_tile_non_land) {
+							button = get_territory_tooltip_button(tile->get_owner());
+						}
+						break;
+					case wyrmgus::minimap_mode::territories_with_non_land:
+						if (tile->get_owner() != nullptr) {
+							button = get_territory_tooltip_button(tile->get_owner());
+						}
+						break;
+					case wyrmgus::minimap_mode::realms:
+						if (tile->get_realm_owner() != nullptr && !is_tile_non_land) {
+							button = get_territory_tooltip_button(tile->get_realm_owner());
+						}
+						break;
+					case wyrmgus::minimap_mode::realms_with_non_land:
+						if (tile->get_realm_owner() != nullptr) {
+							button = get_territory_tooltip_button(tile->get_realm_owner());
+						}
+						break;
+					case wyrmgus::minimap_mode::settlements: {
+						const wyrmgus::site *settlement = tile->get_settlement();
+						if (tile->get_settlement() == nullptr) {
+							break;
+						}
+
+						const wyrmgus::site_game_data *settlement_game_data = settlement->get_game_data();
+						const CUnit *site_unit = settlement_game_data->get_site_unit();
+						const wyrmgus::tile *site_center_tile = site_unit->get_center_tile();
+
+						if (is_tile_water == (site_center_tile->is_water() && !site_center_tile->is_river()) && is_tile_space == site_center_tile->is_space()) {
+							button = std::make_unique<wyrmgus::button>();
+							button->Action = ButtonCmd::None;
+							button->Popup = "popup_settlement";
+							button->Hint = settlement_game_data->get_current_cultural_name();
+						}
 						break;
 					}
-
-					const wyrmgus::site_game_data *settlement_game_data = settlement->get_game_data();
-					const CUnit *site_unit = settlement_game_data->get_site_unit();
-					const wyrmgus::tile *site_center_tile = site_unit->get_center_tile();
-
-					if (is_tile_water == (site_center_tile->is_water() && !site_center_tile->is_river()) && is_tile_space == site_center_tile->is_space()) {
-						button = std::make_unique<wyrmgus::button>();
-						button->Action = ButtonCmd::None;
-						button->Popup = "popup_settlement";
-						button->Hint = settlement_game_data->get_current_cultural_name();
-					}
-					break;
+					default:
+						break;
 				}
-				default:
-					break;
-			}
 
-			if (button != nullptr) {
-				DrawPopup(*button, CursorScreenPos.x, CursorScreenPos.y);
-				LastDrawnButtonPopup = nullptr;
+				if (button != nullptr) {
+					DrawPopup(*button, CursorScreenPos.x, CursorScreenPos.y);
+					LastDrawnButtonPopup = nullptr;
+				}
 			}
 		}
 	}
