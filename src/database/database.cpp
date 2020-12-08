@@ -628,6 +628,7 @@ void database::load_history()
 {
 	try {
 		civilization::load_history_database();
+		civilization_group::load_history_database();
 		faction::load_history_database();
 		site::load_history_database();
 		character::load_history_database();

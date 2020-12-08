@@ -28,6 +28,7 @@
 #include "civilization_base.h"
 
 #include "civilization_group.h"
+#include "civilization_history.h"
 #include "database/sml_data.h"
 #include "database/sml_operator.h"
 #include "gender.h"
@@ -37,6 +38,14 @@
 #include "util/vector_util.h"
 
 namespace wyrmgus {
+
+civilization_base::civilization_base(const std::string &identifier) : detailed_data_entry(identifier)
+{
+}
+
+civilization_base::~civilization_base()
+{
+}
 
 void civilization_base::process_sml_scope(const sml_data &scope)
 {
@@ -92,6 +101,16 @@ void civilization_base::initialize()
 	name_generator::propagate_ungendered_names(this->personal_names);
 
 	data_entry::initialize();
+}
+
+data_entry_history *civilization_base::get_history_base()
+{
+	return this->history.get();
+}
+
+void civilization_base::reset_history()
+{
+	this->history = std::make_unique<civilization_history>();
 }
 
 const std::vector<std::string> &civilization_base::get_personal_names(const gender gender) const

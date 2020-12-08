@@ -36,6 +36,7 @@
 #include "ai.h"
 #include "ai/ai_local.h" //for using AiHelpers
 #include "civilization.h"
+#include "civilization_group.h"
 #include "civilization_history.h"
 #include "commands.h" //for faction setting
 #include "currency.h"
@@ -1045,7 +1046,8 @@ void CPlayer::Init(/* PlayerTypes */ int type)
 void CPlayer::apply_history(const CDate &start_date)
 {
 	const wyrmgus::civilization *civilization = this->get_civilization();
-	const wyrmgus::civilization_history *civilization_history = civilization->get_history();
+
+	this->apply_civilization_history(civilization);
 
 	const wyrmgus::faction *faction = this->get_faction();
 	const wyrmgus::faction_history *faction_history = faction->get_history();
@@ -1079,8 +1081,6 @@ void CPlayer::apply_history(const CDate &start_date)
 			}
 		}
 	}
-
-	this->apply_civilization_history(civilization_history);
 
 	for (const CUpgrade *upgrade : faction_history->get_acquired_upgrades()) {
 		if (UpgradeIdAllowed(*this, upgrade->ID) != 'R') {
@@ -1140,8 +1140,14 @@ void CPlayer::apply_history(const CDate &start_date)
 	}
 }
 
-void CPlayer::apply_civilization_history(const wyrmgus::civilization_history *civilization_history)
+void CPlayer::apply_civilization_history(const wyrmgus::civilization_base *civilization)
 {
+	if (civilization->get_group() != nullptr) {
+		this->apply_civilization_history(civilization->get_group());
+	}
+
+	const wyrmgus::civilization_history *civilization_history = civilization->get_history();
+
 	for (const CUpgrade *upgrade : civilization_history->get_acquired_upgrades()) {
 		if (UpgradeIdAllowed(*this, upgrade->ID) != 'R') {
 			UpgradeAcquire(*this, upgrade);

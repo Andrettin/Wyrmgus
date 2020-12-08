@@ -31,7 +31,6 @@
 
 #include "character.h"
 #include "civilization_group.h"
-#include "civilization_history.h"
 #include "database/defines.h"
 #include "faction.h"
 #include "faction_type.h"
@@ -381,16 +380,6 @@ void civilization::check() const
 	}
 
 	data_entry::check();
-}
-
-data_entry_history *civilization::get_history_base()
-{
-	return this->history.get();
-}
-
-void civilization::reset_history()
-{
-	this->history = std::make_unique<civilization_history>();
 }
 
 int civilization::GetUpgradePriority(const CUpgrade *upgrade) const

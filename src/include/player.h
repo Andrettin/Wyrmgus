@@ -66,7 +66,7 @@ namespace wyrmgus {
 	class calendar;
 	class character;
 	class civilization;
-	class civilization_history;
+	class civilization_base;
 	class deity;
 	class dynasty;
 	class language;
@@ -686,7 +686,7 @@ public:
 	void Load(lua_State *l);
 
 	void apply_history(const CDate &start_date);
-	void apply_civilization_history(const wyrmgus::civilization_history *civilization_history);
+	void apply_civilization_history(const wyrmgus::civilization_base *civilization);
 
 private:
 	std::vector<CUnit *> Units; /// units of this player

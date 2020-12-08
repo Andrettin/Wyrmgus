@@ -46,7 +46,6 @@ static int CclDefineCivilization(lua_State *l);
 namespace wyrmgus {
 
 class calendar;
-class civilization_history;
 class deity;
 class language;
 class quest;
@@ -88,20 +87,12 @@ public:
 	}
 
 	explicit civilization(const std::string &identifier);
-	~civilization();
+	virtual ~civilization() override;
 
 	virtual void process_sml_property(const sml_property &property) override;
 	virtual void process_sml_scope(const sml_data &scope) override;
 	virtual void initialize() override;
 	virtual void check() const override;
-	virtual data_entry_history *get_history_base() override;
-
-	const civilization_history *get_history() const
-	{
-		return this->history.get();
-	}
-
-	virtual void reset_history() override;
 
 	civilization *get_parent_civilization() const
 	{
@@ -354,7 +345,6 @@ public:
 private:
 	std::map<government_type, std::map<faction_tier, std::string>> title_names;
 	std::map<character_title, std::map<faction_type, std::map<government_type, std::map<faction_tier, std::map<gender, std::string>>>>> character_title_names;
-	std::unique_ptr<civilization_history> history;
 public:
 	std::map<std::string, std::map<CDate, bool>> HistoricalUpgrades;	/// historical upgrades of the faction, with the date of change
 

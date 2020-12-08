@@ -33,6 +33,7 @@
 namespace wyrmgus {
 
 class civilization_group;
+class civilization_history;
 class species;
 class unit_class;
 enum class gender;
@@ -45,11 +46,20 @@ class civilization_base : public detailed_data_entry
 	Q_PROPERTY(wyrmgus::civilization_group* group MEMBER group)
 
 protected:
-	explicit civilization_base(const std::string &identifier) : detailed_data_entry(identifier) {}
+	explicit civilization_base(const std::string &identifier);
+	virtual ~civilization_base() override;
 
 public:
 	virtual void process_sml_scope(const sml_data &scope) override;
 	virtual void initialize() override;
+	virtual data_entry_history *get_history_base() override;
+
+	const civilization_history *get_history() const
+	{
+		return this->history.get();
+	}
+
+	virtual void reset_history() override;
 
 	const species *get_species() const
 	{
@@ -91,8 +101,9 @@ private:
 	civilization_group *group = nullptr;
 	std::map<gender, std::vector<std::string>> personal_names; //personal names for the civilization, mapped to the gender they pertain to (use gender::none for names which should be available for both genders)
 	std::vector<std::string> surnames; //surnames for the civilization
-	unit_class_map<std::vector<std::string>> unit_class_names;	/// Unit class names for the civilization, mapped to the unit class they pertain to, used for mechanical units, and buildings
-	std::vector<std::string> ship_names;			/// Ship names for the civilization
+	unit_class_map<std::vector<std::string>> unit_class_names; //unit class names for the civilization, mapped to the unit class they pertain to, used for mechanical units, and buildings
+	std::vector<std::string> ship_names;
+	std::unique_ptr<civilization_history> history;
 };
 
 }
