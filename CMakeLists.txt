@@ -824,6 +824,8 @@ set(stratagus_script_effect_HDRS
 	src/script/effect/resource_effect.h
 	src/script/effect/scope_effect.h
 	src/script/effect/scope_effect_base.h
+	src/script/effect/scripted_effect.h
+	src/script/effect/scripted_effect_effect.h
 )
 
 set(stratagus_sound_HDRS

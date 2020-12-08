@@ -41,6 +41,7 @@
 #include "script/effect/remove_character_effect.h"
 #include "script/effect/remove_unit_effect.h"
 #include "script/effect/resource_effect.h"
+#include "script/effect/scripted_effect_effect.h"
 
 namespace wyrmgus {
 
@@ -67,6 +68,10 @@ std::unique_ptr<effect<scope_type>> effect<scope_type>::from_sml_property(const 
 		if (key == "remove_unit") {
 			return std::make_unique<remove_unit_effect>(value, effect_operator);
 		}
+	}
+
+	if (key == "scripted_effect") {
+		return std::make_unique<scripted_effect_effect<scope_type>>(value, effect_operator);
 	}
 
 	throw std::runtime_error("Invalid property effect: \"" + key + "\".");
