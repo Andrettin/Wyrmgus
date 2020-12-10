@@ -144,11 +144,11 @@ void effect<scope_type>::do_effect(scope_type *scope) const
 }
 
 template <typename scope_type>
-std::string effect<scope_type>::get_string(const size_t indent) const
+std::string effect<scope_type>::get_string(const size_t indent, const std::string &prefix) const
 {
 	switch (this->effect_operator) {
 		case sml_operator::assignment:
-			return this->get_assignment_string(indent);
+			return this->get_assignment_string(indent, prefix);
 		case sml_operator::addition:
 			return this->get_addition_string();
 		case sml_operator::subtraction:

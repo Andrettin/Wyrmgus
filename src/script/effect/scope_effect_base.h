@@ -65,10 +65,10 @@ public:
 
 	virtual std::string get_scope_name() const = 0;
 
-	std::string get_assignment_string(const size_t indent) const override final
+	std::string get_assignment_string(const size_t indent, const std::string &prefix) const override final
 	{
 		std::string str = this->get_scope_name() + ":\n";
-		str += this->effects.get_effects_string(indent + 1);
+		str += this->effects.get_effects_string(indent + 1, prefix);
 		return str;
 	}
 

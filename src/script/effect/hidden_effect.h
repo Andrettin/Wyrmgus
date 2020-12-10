@@ -61,10 +61,8 @@ public:
 		this->effects.do_effects(scope);
 	}
 
-	virtual std::string get_assignment_string(const size_t indent) const override
+	virtual std::string get_assignment_string() const override
 	{
-		Q_UNUSED(indent)
-
 		return std::string();
 	}
 

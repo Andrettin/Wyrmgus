@@ -72,12 +72,12 @@ public:
 		this->effects.do_effects(scope);
 	}
 
-	virtual std::string get_assignment_string(const size_t indent) const override
+	virtual std::string get_assignment_string(const size_t indent, const std::string &prefix) const override
 	{
 		std::string str = "If:\n";
 		str += this->conditions.get_conditions_string(indent + 1);
 		str += "\n" + std::string(indent, '\t') + "Then:\n";
-		return str + this->effects.get_effects_string(indent + 1);
+		return str + this->effects.get_effects_string(indent + 1, prefix);
 	}
 
 private:

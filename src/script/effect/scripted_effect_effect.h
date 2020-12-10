@@ -61,9 +61,9 @@ public:
 		this->scripted_effect->get_effects().do_effects(scope);
 	}
 
-	virtual std::string get_assignment_string(const size_t indent) const override
+	virtual std::string get_assignment_string(const size_t indent, const std::string &prefix) const override
 	{
-		return this->scripted_effect->get_effects().get_effects_string(indent);
+		return this->scripted_effect->get_effects().get_effects_string(indent, prefix);
 	}
 
 private:

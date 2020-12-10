@@ -83,16 +83,17 @@ public:
 		throw std::runtime_error("The subtraction operator is not supported for \"" + this->get_class_identifier() + "\" effects.");
 	}
 
-	std::string get_string(const size_t indent) const;
+	std::string get_string(const size_t indent, const std::string &prefix) const;
 
 	virtual std::string get_assignment_string() const
 	{
 		throw std::runtime_error("The assignment operator is not supported for \"" + this->get_class_identifier() + "\" effects.");
 	}
 
-	virtual std::string get_assignment_string(const size_t indent) const
+	virtual std::string get_assignment_string(const size_t indent, const std::string &prefix) const
 	{
 		Q_UNUSED(indent)
+		Q_UNUSED(prefix)
 
 		return this->get_assignment_string();
 	}

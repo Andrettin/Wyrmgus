@@ -83,7 +83,7 @@ std::string effect_list<scope_type>::get_effects_string(const size_t indent, con
 			continue;
 		}
 
-		const std::string effect_string = effect->get_string(indent);
+		const std::string effect_string = effect->get_string(indent, prefix);
 		if (effect_string.empty()) {
 			continue;
 		}
@@ -98,7 +98,10 @@ std::string effect_list<scope_type>::get_effects_string(const size_t indent, con
 			effects_string += std::string(indent, '\t');
 		}
 
-		effects_string += prefix;
+		if (!effect_string.starts_with(prefix)) {
+			//add prefix if not already prefixed
+			effects_string += prefix;
+		}
 		effects_string += effect_string;
 	}
 	return effects_string;
