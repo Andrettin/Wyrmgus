@@ -1701,7 +1701,7 @@ void CButtonPanel::Update()
 						if (!unit.SoldUnits[sold_unit_count]->Name.empty()) {
 							button->Hint = "Buy " + unit.SoldUnits[sold_unit_count]->GetName();
 						} else {
-							button->Hint = "Buy " + unit.SoldUnits[sold_unit_count]->GetTypeName();
+							button->Hint = "Buy " + unit.SoldUnits[sold_unit_count]->get_type_name();
 						}
 					}
 				}

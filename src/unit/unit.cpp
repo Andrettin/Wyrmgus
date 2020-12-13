@@ -1456,7 +1456,7 @@ void CUnit::EquipItem(CUnit &item, bool affect_character)
 	const wyrmgus::item_slot item_slot = wyrmgus::get_item_class_slot(item_class);
 	
 	if (item_slot == wyrmgus::item_slot::none) {
-		fprintf(stderr, "Trying to equip item of type \"%s\", which has no item slot.\n", item.GetTypeName().c_str());
+		fprintf(stderr, "Trying to equip item of type \"%s\", which has no item slot.\n", item.get_type_name().c_str());
 		return;
 	}
 	
@@ -1649,7 +1649,7 @@ void CUnit::DeequipItem(CUnit &item, bool affect_character)
 	const wyrmgus::item_slot item_slot = wyrmgus::get_item_class_slot(item_class);
 	
 	if (item_slot == wyrmgus::item_slot::none) {
-		fprintf(stderr, "Trying to de-equip item of type \"%s\", which has no item slot.\n", item.GetTypeName().c_str());
+		fprintf(stderr, "Trying to de-equip item of type \"%s\", which has no item slot.\n", item.get_type_name().c_str());
 		return;
 	}
 	
@@ -2076,7 +2076,7 @@ void CUnit::UpdateItemName()
 	if (this->Work != nullptr) {
 		this->Name += _(this->Work->get_name().c_str());
 	} else {
-		this->Name += GetTypeName();
+		this->Name += this->get_type_name();
 	}
 	if (this->Suffix != nullptr) {
 		this->Name += " ";
@@ -6742,32 +6742,42 @@ std::string CUnit::GetName() const
 	return name;
 }
 
-std::string CUnit::GetTypeName() const
+const std::string &CUnit::get_base_type_name() const
 {
 	const wyrmgus::unit_type_variation *variation = this->GetVariation();
-	if (variation && !variation->TypeName.empty()) {
-		return _(variation->TypeName.c_str());
+	if (variation != nullptr && !variation->TypeName.empty()) {
+		return variation->TypeName;
 	} else {
-		return _(this->Type->get_name().c_str());
+		return this->Type->get_name();
 	}
+}
+
+std::string CUnit::get_type_name() const
+{
+	const wyrmgus::civilization *civilization = this->get_civilization();
+	if (civilization != nullptr && civilization != this->Player->get_civilization() && civilization->get_name() != this->get_base_type_name()) {
+		return civilization->get_name() + " " + this->get_base_type_name();
+	}
+
+	return this->get_base_type_name();
 }
 
 std::string CUnit::GetMessageName() const
 {
-	std::string name = GetName();
+	std::string name = this->GetName();
 	if (name.empty()) {
-		return GetTypeName();
+		return this->get_type_name();
 	}
 	
 	if (!this->Identified) {
-		return GetTypeName() + " (" + _("Unidentified") + ")";
+		return this->get_type_name() + " (" + _("Unidentified") + ")";
 	}
 	
 	if (this->get_unique() == nullptr && this->Work == nullptr && (this->Prefix != nullptr || this->Suffix != nullptr || this->Spell != nullptr)) {
 		return name;
 	}
 	
-	return name + " (" + GetTypeName() + ")";
+	return name + " (" + this->get_type_name() + ")";
 }
 //Wyrmgus end
 
@@ -7908,7 +7918,7 @@ bool CanPickUp(const CUnit &picker, const CUnit &unit)
 	}
 	if (picker.HasInventory() && unit.Type->BoolFlag[ITEM_INDEX].value && picker.InsideCount >= ((int) UI.InventoryButtons.size())) { // full
 		if (picker.Player == CPlayer::GetThisPlayer()) {
-			std::string picker_name = picker.Name + "'s (" + picker.GetTypeName() + ")";
+			std::string picker_name = picker.Name + "'s (" + picker.get_type_name() + ")";
 			picker.Player->Notify(NotifyRed, picker.tilePos, picker.MapLayer->ID, _("%s inventory is full."), picker_name.c_str());
 		}
 		return false;

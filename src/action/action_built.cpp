@@ -401,7 +401,7 @@ static void Finish(COrder_Built &order, CUnit &unit)
 	if (this->IsCancelled || this->ProgressCounter < 0) {
 		//Wyrmgus start
 //		DebugPrint("%d: %s canceled.\n" _C_ unit.Player->Index _C_ unit.Type->Name.c_str());
-		DebugPrint("%d: %s canceled.\n" _C_ unit.Player->Index _C_ unit.GetTypeName().c_str());
+		DebugPrint("%d: %s canceled.\n" _C_ unit.Player->Index _C_ unit.get_type_name().c_str());
 		//Wyrmgus end
 
 		CancelBuilt(*this, unit);

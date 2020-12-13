@@ -100,7 +100,7 @@ CContentTypeText::~CContentTypeText()
 	if (this->ShowName) {
 		//Wyrmgus start
 //		label.DrawCentered(x, y, unit.Type->Name);
-		label.DrawCentered(x, y, unit.GetTypeName());
+		label.DrawCentered(x, y, unit.get_type_name());
 		//Wyrmgus end
 		return;
 	}

@@ -3035,14 +3035,14 @@ void UIHandleButtonUp(unsigned button)
 								 Selected[0]->Player->GetUnitTypeCount(Selected[0]->Type),
 								//Wyrmgus start
 //								 Selected[0]->Type->Name.c_str());
-								 Selected[0]->GetTypeName().c_str());
+								 Selected[0]->get_type_name().c_str());
 								//Wyrmgus end
 					} else {
 						snprintf(buf, sizeof(buf), _("You have ~<%d~> %s(s)"),
 								 Selected[0]->Player->GetUnitTypeCount(Selected[0]->Type),
 								//Wyrmgus start
 //								 Selected[0]->Type->Name.c_str());
-								 Selected[0]->GetTypeName().c_str());
+								 Selected[0]->get_type_name().c_str());
 								//Wyrmgus end
 					}
 					UI.StatusLine.Set(buf);

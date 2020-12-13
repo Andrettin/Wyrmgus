@@ -527,7 +527,8 @@ public:
 	MissileConfig GetMissile() const;
 	const std::shared_ptr<CPlayerColorGraphic> &GetLayerSprite(int image_layer) const;
 	std::string GetName() const;
-	std::string GetTypeName() const;
+	const std::string &get_base_type_name() const;
+	std::string get_type_name() const;
 	std::string GetMessageName() const;
 	//Wyrmgus end
 

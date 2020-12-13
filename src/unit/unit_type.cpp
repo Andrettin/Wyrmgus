@@ -1194,8 +1194,8 @@ void unit_type::initialize()
 		if (unit_class != nullptr) {
 			if (this->Faction != -1) {
 				faction::get_all()[this->Faction]->set_class_unit_type(unit_class, this);
-			} else if (this->get_civilization() != nullptr) {
-				this->get_civilization()->set_class_unit_type(unit_class, this);
+			} else if (this->civilization != nullptr) {
+				this->civilization->set_class_unit_type(unit_class, this);
 			}
 		}
 	}
@@ -1794,7 +1794,7 @@ std::string unit_type::GetRandomVariationIdent(int image_layer) const
 const std::string &unit_type::GetDefaultName(const CPlayer *player) const
 {
 	const unit_type_variation *variation = this->GetDefaultVariation(player);
-	if (variation && !variation->TypeName.empty()) {
+	if (variation != nullptr && !variation->TypeName.empty()) {
 		return variation->TypeName;
 	} else {
 		return this->get_name();

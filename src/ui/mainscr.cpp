@@ -977,12 +977,12 @@ void DrawPopups()
 					std::string unit_name;
 					if (UnitUnderCursor->get_unique() != nullptr || UnitUnderCursor->Prefix != nullptr || UnitUnderCursor->Suffix != nullptr || UnitUnderCursor->Work != nullptr || UnitUnderCursor->Spell != nullptr || UnitUnderCursor->get_character() != nullptr) {
 						if (!UnitUnderCursor->Identified) {
-							unit_name = UnitUnderCursor->GetTypeName() + " (" + _("Unidentified") + ")";
+							unit_name = UnitUnderCursor->get_type_name() + " (" + _("Unidentified") + ")";
 						} else {
 							unit_name = UnitUnderCursor->GetName();
 						}
 					} else {
-						unit_name = UnitUnderCursor->GetTypeName();
+						unit_name = UnitUnderCursor->get_type_name();
 					}
 					if (UnitUnderCursor->Player->Index != PlayerNumNeutral && !UnitUnderCursor->Type->BoolFlag[HIDDENOWNERSHIP_INDEX].value) {
 						unit_name += " (" + UnitUnderCursor->Player->Name + ")";
@@ -1049,7 +1049,7 @@ void DrawPopups()
 					if (!uins->Name.empty() && uins->Identified) {
 						ba.Hint = uins->Name;
 					} else {
-						ba.Hint = uins->GetTypeName();
+						ba.Hint = uins->get_type_name();
 						if (!uins->Identified) {
 							ba.Hint += " (Unidentified)";
 						}

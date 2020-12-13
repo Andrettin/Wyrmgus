@@ -418,14 +418,14 @@ static void ShowUnitName(const CViewport &vp, PixelPos pos, CUnit *unit, bool hi
 		}
 		//Wyrmgus start
 //		width = font->getWidth(unit->Type->Name) + 10;
-		width = font->getWidth(unit->GetTypeName()) + 10;
+		width = font->getWidth(unit->get_type_name()) + 10;
 		//Wyrmgus end
 		x = std::min<int>(GameCursor->get_graphics()->Width + pos.x, vp.BottomRightPos.x - 1 - width);
 		Video.FillTransRectangle(backgroundColor, x, y, width, height, 128);
 		Video.DrawRectangle(ColorWhite, x, y, width, height);
 		//Wyrmgus start
 //		label.DrawCentered(x + width / 2, y + 3, unit->Type->Name);
-		label.DrawCentered(x + width / 2, y + 3, unit->GetTypeName());
+		label.DrawCentered(x + width / 2, y + 3, unit->get_type_name());
 		//Wyrmgus end
 	} else if (hidden) {
 		const std::string str("Unrevealed terrain");
