@@ -39,10 +39,13 @@
 #undef Wait
 #endif
 
+class AiHelper;
 class CUnit;
 class CUpgrade;
 class CPlayer;
 enum class ForceType;
+
+static void InitAiHelper(AiHelper &aiHelper);
 
 namespace wyrmgus {
 	class site;
@@ -627,7 +630,7 @@ public:
 	*/
 	std::vector<const wyrmgus::unit_type *> NavalTransporters;
 
-	friend static void InitAiHelper(AiHelper &aiHelper);
+	friend void InitAiHelper(AiHelper &aiHelper);
 };
 
 extern std::vector<std::unique_ptr<CAiType>> AiTypes;   /// List of all AI types

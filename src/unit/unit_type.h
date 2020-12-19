@@ -1251,9 +1251,9 @@ public:
 	std::string Mod;							/// To which mod (or map), if any, this unit type belongs
 	//Wyrmgus end
 
-	friend static int ::CclDefineUnitType(lua_State *l);
-	friend static int ::CclDefineDependency(lua_State *l);
-	friend static int ::CclDefinePredependency(lua_State *l);
+	friend int ::CclDefineUnitType(lua_State *l);
+	friend int ::CclDefineDependency(lua_State *l);
+	friend int ::CclDefinePredependency(lua_State *l);
 };
 
 }

@@ -166,8 +166,8 @@ public:
 	bool Hidden = false;
 	std::vector<resource *> ChildResources; //resources (other than this one) that have this resource as their final resource
 
-	friend static int ::CclDefineDefaultResourceNames(lua_State *l);
-	friend static int ::CclDefineResource(lua_State *l);
+	friend int ::CclDefineDefaultResourceNames(lua_State *l);
+	friend int ::CclDefineResource(lua_State *l);
 };
 
 }

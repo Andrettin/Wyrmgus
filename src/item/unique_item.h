@@ -118,7 +118,7 @@ private:
 	CUpgrade *work = nullptr;
 	CUpgrade *elixir = nullptr;
 
-	friend static int ::CclDefineUniqueItem(lua_State *l);
+	friend int ::CclDefineUniqueItem(lua_State *l);
 };
 
 }

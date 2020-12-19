@@ -209,7 +209,7 @@ public:
 	std::vector<std::string> BriefingSounds;	/// The briefing sounds of this quest
 	std::vector<character *> HeroesMustSurvive;	/// Which heroes must survive or this quest fails
 
-	friend static int ::CclDefineQuest(lua_State *l);
+	friend int ::CclDefineQuest(lua_State *l);
 };
 
 }

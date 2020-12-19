@@ -245,7 +245,7 @@ public:
 	std::vector<std::tuple<CDate, CDate, const unit_class *, unique_item *, const faction *>> HistoricalBuildings; /// Historical buildings, with start and end date
 	std::vector<std::tuple<CDate, CDate, const unit_type *, unique_item *, int>> HistoricalResources; /// Historical resources, with start and end date; the integer at the end is the resource quantity
 
-	friend static int ::CclDefineSite(lua_State *l);
+	friend int ::CclDefineSite(lua_State *l);
 };
 
 }

@@ -154,7 +154,7 @@ private:
 	std::vector<const species *> pre_evolutions; //species from which this one can evolve
 	std::vector<const species *> evolutions; //species to which this one can evolve
 
-	friend static int ::CclDefineSpecies(lua_State *l);
+	friend int ::CclDefineSpecies(lua_State *l);
 };
 
 }

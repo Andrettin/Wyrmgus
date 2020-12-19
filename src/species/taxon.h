@@ -85,11 +85,11 @@ private:
 	std::string common_name;
 	taxonomic_rank rank;
 
-	friend static int ::CclDefineSpeciesGenus(lua_State *l);
-	friend static int ::CclDefineSpeciesFamily(lua_State *l);
-	friend static int ::CclDefineSpeciesOrder(lua_State *l);
-	friend static int ::CclDefineSpeciesClass(lua_State *l);
-	friend static int ::CclDefineSpeciesPhylum(lua_State *l);
+	friend int ::CclDefineSpeciesGenus(lua_State *l);
+	friend int ::CclDefineSpeciesFamily(lua_State *l);
+	friend int ::CclDefineSpeciesOrder(lua_State *l);
+	friend int ::CclDefineSpeciesClass(lua_State *l);
+	friend int ::CclDefineSpeciesPhylum(lua_State *l);
 };
 
 }

@@ -163,7 +163,7 @@ private:
 	bool minor_river = false;
 	std::map<const civilization *, std::string> cultural_names; //names for the terrain feature for each different culture/civilization
 
-	friend static int ::CclDefineTerrainFeature(lua_State *l);
+	friend int ::CclDefineTerrainFeature(lua_State *l);
 };
 
 }

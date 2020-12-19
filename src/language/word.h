@@ -164,7 +164,7 @@ public:
 	//numeral-specific variables
 	int Number = -1;
 
-	friend static int ::CclDefineLanguageWord(lua_State *l);
+	friend int ::CclDefineLanguageWord(lua_State *l);
 };
 
 }

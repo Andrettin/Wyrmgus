@@ -87,7 +87,7 @@ private:
 	std::vector<std::unique_ptr<dialogue_option>> options;
 	std::vector<const dialogue_option *> option_pointers;
 
-	friend static int ::CclDefineDialogue(lua_State *l);
+	friend int ::CclDefineDialogue(lua_State *l);
 };
 
 }

@@ -176,7 +176,7 @@ private:
 	std::vector<const spell *> spells; //abilities linked to this deity
 	std::map<const civilization *, std::string> cultural_names;	//names of the deity in different cultures (for example, Odin is known as Hroptatyr by the dwarves)
 
-	friend static int ::CclDefineDeity(lua_State *l);
+	friend int ::CclDefineDeity(lua_State *l);
 };
 
 }

@@ -49,6 +49,8 @@ enum class UnitAction : char;
 enum class VariableAttribute;
 struct lua_State;
 
+static int CclUnit(lua_State *l);
+
 namespace wyrmgus {
 	class animation_set;
 	class character;
@@ -746,7 +748,7 @@ public:
 
 	CUnit *Goal; /// Generic/Teleporter goal pointer
 
-	friend static int CclUnit(lua_State *l);
+	friend int CclUnit(lua_State *l);
 };
 
 #define NoUnitP (CUnit *)0        /// return value: for no unit found

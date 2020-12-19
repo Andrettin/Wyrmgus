@@ -189,7 +189,7 @@ private:
 	const site *settlement = nullptr;
 	const wyrmgus::faction *faction = nullptr;
 
-	friend static int ::CclDefineQuest(lua_State *l);
+	friend int ::CclDefineQuest(lua_State *l);
 };
 
 }

@@ -111,7 +111,7 @@ public:
 private:
 	player_color *conversible_player_color = nullptr;
 
-	friend static int ::CclDefineIcon(lua_State *l);
+	friend int ::CclDefineIcon(lua_State *l);
 };
 
 }

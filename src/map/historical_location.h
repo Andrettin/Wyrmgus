@@ -86,7 +86,7 @@ private:
 	QGeoCoordinate geocoordinate; //the historical location's position as a geocoordinate
 	const wyrmgus::site *site = nullptr; //the historical location's site (if any)
 
-	friend static int ::CclDefineCharacter(lua_State *l);
+	friend int ::CclDefineCharacter(lua_State *l);
 };
 
 }

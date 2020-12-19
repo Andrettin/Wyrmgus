@@ -160,7 +160,7 @@ public:
 	std::string Popup;          /// Popup screen used for button
 	std::string Mod;			/// Mod to which this button belongs to
 
-	friend static int ::CclDefineButton(lua_State *l);
+	friend int ::CclDefineButton(lua_State *l);
 };
 
 }

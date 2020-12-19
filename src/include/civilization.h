@@ -348,7 +348,7 @@ private:
 public:
 	std::map<std::string, std::map<CDate, bool>> HistoricalUpgrades;	/// historical upgrades of the faction, with the date of change
 
-	friend static int ::CclDefineCivilization(lua_State *l);
+	friend int ::CclDefineCivilization(lua_State *l);
 };
 
 }

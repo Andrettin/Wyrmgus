@@ -183,7 +183,7 @@ public:
 	// Position autocast callback
 	std::unique_ptr<LuaCallback> PositionAutoCast;
 
-	friend static void ::CclSpellAutocast(lua_State *l, AutoCastInfo *autocast);
+	friend void ::CclSpellAutocast(lua_State *l, AutoCastInfo *autocast);
 };
 
 namespace wyrmgus {
@@ -332,7 +332,7 @@ public:
 private:
 	bool force_use_animation = false;
 
-	friend static int ::CclDefineSpell(lua_State *l);
+	friend int ::CclDefineSpell(lua_State *l);
 };
 
 }

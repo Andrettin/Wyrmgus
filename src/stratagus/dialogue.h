@@ -88,7 +88,7 @@ private:
 	std::map<std::string, const dialogue_node *> nodes_by_identifier;
 	std::map<std::string, const dialogue_option *> options_by_identifier;
 
-	friend static int ::CclDefineDialogue(lua_State *l);
+	friend int ::CclDefineDialogue(lua_State *l);
 };
 
 }

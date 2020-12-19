@@ -78,12 +78,12 @@ private:
 	taxon *supertaxon = nullptr;
 	std::map<gender, std::vector<std::string>> specimen_names; //specimen names, mapped to the gender they pertain to (use gender::none for names which should be available for both genders)
 
-	friend static int ::CclDefineSpecies(lua_State *l);
-	friend static int ::CclDefineSpeciesGenus(lua_State *l);
-	friend static int ::CclDefineSpeciesFamily(lua_State *l);
-	friend static int ::CclDefineSpeciesOrder(lua_State *l);
-	friend static int ::CclDefineSpeciesClass(lua_State *l);
-	friend static int ::CclDefineSpeciesPhylum(lua_State *l);
+	friend int ::CclDefineSpecies(lua_State *l);
+	friend int ::CclDefineSpeciesGenus(lua_State *l);
+	friend int ::CclDefineSpeciesFamily(lua_State *l);
+	friend int ::CclDefineSpeciesOrder(lua_State *l);
+	friend int ::CclDefineSpeciesClass(lua_State *l);
+	friend int ::CclDefineSpeciesPhylum(lua_State *l);
 };
 
 }

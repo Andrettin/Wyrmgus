@@ -138,8 +138,8 @@ private:
 	character *owner = nullptr;
 	bool equipped = false; //used for initialization only
 
-	friend static int ::CclDefineCharacter(lua_State *l);
-	friend static int ::CclDefineCustomHero(lua_State *l);
+	friend int ::CclDefineCharacter(lua_State *l);
+	friend int ::CclDefineCustomHero(lua_State *l);
 };
 
 }

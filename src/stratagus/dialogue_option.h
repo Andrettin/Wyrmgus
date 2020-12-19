@@ -88,7 +88,7 @@ private:
 	std::unique_ptr<LuaCallback> lua_effects;
 	std::string tooltip;
 
-	friend static int ::CclDefineDialogue(lua_State *l);
+	friend int ::CclDefineDialogue(lua_State *l);
 };
 
 }

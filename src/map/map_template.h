@@ -772,7 +772,7 @@ private:
 	std::vector<std::unique_ptr<character_substitution>> character_substitutions; //substitutions applied to the terrain character map, in order
 	std::unique_ptr<map_template_history> history;
 
-	friend static int ::CclDefineMapTemplate(lua_State *l);
+	friend int ::CclDefineMapTemplate(lua_State *l);
 };
 
 }

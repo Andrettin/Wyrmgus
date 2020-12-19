@@ -432,8 +432,8 @@ public:
 
 	friend ::Spell_Polymorph;
 	friend void ::ChangeCustomHeroCivilization(const std::string &hero_full_name, const std::string &civilization_name, const std::string &new_hero_name, const std::string &new_hero_family_name);
-	friend static int ::CclDefineCharacter(lua_State *l);
-	friend static int ::CclDefineCustomHero(lua_State *l);
+	friend int ::CclDefineCharacter(lua_State *l);
+	friend int ::CclDefineCustomHero(lua_State *l);
 };
 
 }

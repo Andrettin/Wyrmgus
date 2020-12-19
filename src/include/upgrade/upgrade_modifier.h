@@ -105,7 +105,7 @@ public:
 	std::vector<CUpgrade *> RemoveUpgrades;	/// Upgrades to be removed when this upgrade modifier is implented
 	//Wyrmgus end
 
-	friend static int ::CclDefineModifier(lua_State *l);
+	friend int ::CclDefineModifier(lua_State *l);
 };
 
 }

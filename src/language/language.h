@@ -158,7 +158,7 @@ private:
 public:
 	std::map<std::string, std::vector<std::string>> NameTranslations;	/// Name translations; possible translations mapped to the name to be translated
 
-	friend static int ::CclDefineLanguage(lua_State *l);
+	friend int ::CclDefineLanguage(lua_State *l);
 };
 
 }

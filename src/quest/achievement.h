@@ -121,7 +121,7 @@ public:
 private:
 	bool obtained = false;
 
-	friend static int ::CclDefineAchievement(lua_State *l);
+	friend int ::CclDefineAchievement(lua_State *l);
 };
 
 }
