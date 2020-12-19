@@ -137,7 +137,7 @@ private:
 	std::set<std::string> aliases;
 	bool defined = false; //whether the data entry's definition has been concluded (with its data having been processed)
 	bool initialized = false;
-	const data_module *data_module = nullptr; //the module to which the data entry belongs, if any
+	const wyrmgus::data_module *data_module = nullptr; //the module to which the data entry belongs, if any
 	std::vector<sml_data> history_data;
 };
 

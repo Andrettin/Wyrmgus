@@ -376,10 +376,10 @@ public:
 	CDate DeathDate;			/// Date in which the character historically died
 private:
 	wyrmgus::dynasty *dynasty = nullptr;
-	civilization *civilization = nullptr;	/// Culture to which the character belongs
+	wyrmgus::civilization *civilization = nullptr;	/// Culture to which the character belongs
 	faction *default_faction = nullptr;	//the default faction to which the character belongs
-	const deity *deity = nullptr; //the deity which the character is (if it is a deity)
-	gender gender;				/// Character's gender
+	const wyrmgus::deity *deity = nullptr; //the deity which the character is (if it is a deity)
+	wyrmgus::gender gender;				/// Character's gender
 	int base_level = 1; //the level that the character starts with
 	int level = 0; //the character's current level
 public:
