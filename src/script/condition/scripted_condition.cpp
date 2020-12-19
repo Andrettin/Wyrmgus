@@ -38,6 +38,10 @@ scripted_condition::scripted_condition(const std::string &identifier) : data_ent
 	this->conditions = std::make_unique<and_condition>();
 }
 
+scripted_condition::~scripted_condition()
+{
+}
+
 void scripted_condition::process_sml_property(const sml_property &property)
 {
 	this->conditions->process_sml_property(property);

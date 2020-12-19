@@ -44,6 +44,7 @@ public:
 	static constexpr const char *database_folder = "scripted_conditions";
 
 	explicit scripted_condition(const std::string &identifier);
+	~scripted_condition();
 
 	virtual void process_sml_property(const sml_property &property) override;
 	virtual void process_sml_scope(const sml_data &scope) override;
