@@ -1197,7 +1197,7 @@ option(WITH_PHYSFS "Compile Stratagus with PhysFS support" OFF)
 option(WITH_OGGVORBIS "Compile Stratagus with OGG/Vorbis sound library" ON)
 option(WITH_THEORA "Compile Stratagus with Theroa video library" ON)
 option(WITH_OAML "Compile Stratagus with OAML library" ON)
-option(OAML_FORCE_STATIC "Link the OAML library statically" OFF)
+option(OAML_FORCE_STATIC "Link the OAML library statically" ON)
 option(WITH_STACKTRACE "Compile Stratagus with StackTrace library" OFF)
 
 option(WITH_X11 "Compile Stratagus with X11 clipboard pasting support" ON)
