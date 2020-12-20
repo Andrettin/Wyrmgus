@@ -25,8 +25,6 @@
 //      02111-1307, USA.
 //
 
-#pragma once
-
 #include "stratagus.h"
 
 #include "upgrade/upgrade_class.h"
