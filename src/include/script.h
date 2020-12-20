@@ -197,7 +197,7 @@ enum class VariableAttribute {
 /**
 **  Enumeration of unit
 */
-enum EnumUnit {
+enum EnumUnit : int {
 	UnitRefItSelf = 0,      /// unit.
 	UnitRefInside,          /// unit->Inside.
 	UnitRefContainer,       /// Unit->Container.
