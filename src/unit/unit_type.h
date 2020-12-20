@@ -33,7 +33,6 @@
 #include "database/data_type.h"
 #include "data_type.h"
 #include "missileconfig.h"
-#include "ui/button_cmd.h"
 #include "ui/icon.h"
 #include "upgrade/upgrade_structs.h"
 #include "vec2i.h"
@@ -45,9 +44,10 @@
 class CFile;
 class CPlayer;
 class CPlayerColorGraphic;
-struct lua_State;
 class LuaCallback;
+enum class ButtonCmd;
 enum class UnitTypeType;
+struct lua_State;
 
 static int CclDefineDependency(lua_State *l);
 static int CclDefinePredependency(lua_State *l);
@@ -938,7 +938,7 @@ public:
 	
 	//Wyrmgus start
 	void set_parent(const unit_type *parent_type);
-	void RemoveButtons(const ButtonCmd button_action = ButtonCmd::None, const std::string &mod_file = "");
+	void RemoveButtons(const ButtonCmd button_action, const std::string &mod_file = "");
 	void UpdateDefaultBoolFlags();
 	int GetAvailableLevelUpUpgrades() const;
 	int GetResourceStep(const int resource, const int player) const;

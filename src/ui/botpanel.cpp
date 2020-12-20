@@ -68,6 +68,7 @@
 #include "spell/spell.h"
 #include "translate.h"
 #include "ui/button.h"
+#include "ui/button_cmd.h"
 #include "ui/button_level.h"
 #include "ui/cursor.h"
 #include "ui/cursor_type.h"

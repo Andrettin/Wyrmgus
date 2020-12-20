@@ -40,6 +40,7 @@
 #include "sound/sound.h"
 #include "time/calendar.h"
 #include "ui/button.h"
+#include "ui/button_cmd.h"
 #include "ui/cursor.h"
 #include "unit/unit_class.h"
 #include "unit/unit_type.h"

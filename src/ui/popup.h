@@ -28,12 +28,12 @@
 #pragma once
 
 #include "color.h"
-#include "ui/button_cmd.h"
 #include "unit/unit_type_type.h"
 #include "vec2i.h"
 
 class CPopup;
 class CUpgrade;
+enum class ButtonCmd;
 struct StringDesc;
 
 namespace wyrmgus {
@@ -64,7 +64,7 @@ public:
 	bool settlement_name = false;	/// check if the button's unit has a settlement name.
 	bool CanActiveHarvest = false;	/// check if the active unit can harvest the button's unit.
 	//Wyrmgus end
-	ButtonCmd ButtonAction = ButtonCmd::None;	/// action type of button
+	ButtonCmd ButtonAction;	/// action type of button
 	//Wyrmgus start
 	::UnitTypeType UnitTypeType = UnitTypeType::None;	/// unit type type (i.e. land, fly, etc.) of the button's unit type
 	const wyrmgus::unit_class *unit_class = nullptr; /// unit type class of the button's unit type

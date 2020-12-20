@@ -28,7 +28,6 @@
 #pragma once
 
 #include "player_container.h"
-#include "ui/button_cmd.h"
 #include "ui/icon.h"
 //Wyrmgus start
 #include "ui/ui.h" // for the UI fillers
@@ -57,6 +56,7 @@ class PlayerAi;
 class CFiller;
 class LuaCallback;
 //Wyrmgus end
+enum class ButtonCmd;
 enum class DiplomacyState;
 enum class ForceType;
 struct lua_State;
@@ -615,8 +615,10 @@ public:
 	//Wyrmgus start
 	bool HasContactWith(const CPlayer &player) const;
 	bool has_neutral_faction_type() const;
-	bool has_building_access(const CPlayer *player, const ButtonCmd button_action = ButtonCmd::None) const;
-	bool has_building_access(const CUnit *unit, const ButtonCmd button_action = ButtonCmd::None) const;
+	bool has_building_access(const CPlayer *player, const ButtonCmd button_action) const;
+	bool has_building_access(const CPlayer *player) const;
+	bool has_building_access(const CUnit *unit, const ButtonCmd) const;
+	bool has_building_access(const CUnit *unit) const;
 	bool HasHero(const wyrmgus::character *hero) const;
 	//Wyrmgus end
 

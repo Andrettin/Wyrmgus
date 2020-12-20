@@ -34,6 +34,7 @@
 #include "faction.h"
 #include "script/trigger.h"
 #include "spell/spell.h"
+#include "ui/button_cmd.h"
 #include "ui/button_level.h"
 #include "ui/interface.h"
 #include "unit/unit.h"
@@ -171,6 +172,11 @@ void button::add_button_key_to_name(std::string &name, const std::string &key)
 		name += " (~!" + button_key + ")";
 	}
 }
+
+button::button(const std::string &identifier) : data_entry(identifier), Action(ButtonCmd::Move)
+{
+}
+
 
 void button::process_sml_property(const sml_property &property)
 {

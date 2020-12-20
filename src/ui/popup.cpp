@@ -43,6 +43,7 @@
 #include "translate.h"
 //Wyrmgus end
 #include "ui/button.h"
+#include "ui/button_cmd.h"
 #include "ui/resource_icon.h"
 #include "ui/ui.h"
 //Wyrmgus start
@@ -59,7 +60,7 @@
 #include "video/font_color.h"
 #include "video/video.h"
 
-PopupConditionPanel::PopupConditionPanel() : item_class(wyrmgus::item_class::none)
+PopupConditionPanel::PopupConditionPanel() : ButtonAction(ButtonCmd::None), item_class(wyrmgus::item_class::none)
 {
 }
 

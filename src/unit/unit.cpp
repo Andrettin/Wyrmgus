@@ -83,6 +83,7 @@
 #include "time/time_of_day.h"
 #include "translate.h"
 #include "ui/button.h"
+#include "ui/button_cmd.h"
 #include "ui/interface.h"
 #include "ui/ui.h"
 #include "unit/unit_find.h"

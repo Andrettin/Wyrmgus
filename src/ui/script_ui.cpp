@@ -40,6 +40,7 @@
 #include "title.h"
 #include "util/util.h"
 #include "ui/button.h"
+#include "ui/button_cmd.h"
 #include "ui/button_level.h"
 #include "ui/contenttype.h"
 #include "ui/cursor.h"

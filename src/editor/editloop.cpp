@@ -56,6 +56,7 @@
 #include "sound/sound_server.h"
 #include "translate.h"
 #include "ui/button.h"
+#include "ui/button_cmd.h"
 #include "ui/cursor.h"
 #include "ui/cursor_type.h"
 #include "ui/interface.h"

@@ -36,6 +36,7 @@
 #include "mod.h"
 #include "time/season.h"
 #include "ui/button.h"
+#include "ui/button_cmd.h"
 #include "unit/construction.h"
 #include "video/video.h"
 

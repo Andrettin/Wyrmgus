@@ -40,6 +40,7 @@
 #include "player.h"
 #include "script.h"
 #include "ui/button.h"
+#include "ui/button_cmd.h"
 #include "ui/interface.h"
 #include "unit/unit.h"
 #include "unit/unit_class.h"

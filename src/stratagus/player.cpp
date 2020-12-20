@@ -90,6 +90,7 @@
 #include "time/time_of_day.h"
 #include "translate.h"
 #include "ui/button.h"
+#include "ui/button_cmd.h"
 #include "ui/ui.h"
 #include "unit/unit.h"
 //Wyrmgus start
@@ -4150,6 +4151,11 @@ bool CPlayer::has_building_access(const CPlayer *player, const ButtonCmd button_
 	return false;
 }
 
+bool CPlayer::has_building_access(const CPlayer *player) const
+{
+	return this->has_building_access(player, ButtonCmd::None);
+}
+
 bool CPlayer::has_building_access(const CUnit *unit, const ButtonCmd button_action) const
 {
 	if (unit->IsEnemy(*this)) {
@@ -4157,6 +4163,11 @@ bool CPlayer::has_building_access(const CUnit *unit, const ButtonCmd button_acti
 	}
 
 	return this->has_building_access(unit->Player, button_action);
+}
+
+bool CPlayer::has_building_access(const CUnit *unit) const
+{
+	return this->has_building_access(unit, ButtonCmd::None);
 }
 
 bool CPlayer::HasHero(const wyrmgus::character *hero) const

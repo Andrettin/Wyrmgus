@@ -60,6 +60,7 @@
 #include "time/timeline.h"
 #include "translate.h"
 #include "ui/button.h"
+#include "ui/button_cmd.h"
 #include "ui/ui.h"
 #include "unit/unit.h"
 #include "unit/unit_class.h"

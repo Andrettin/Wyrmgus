@@ -62,6 +62,7 @@
 #include "spell/spell.h"
 #include "time/season.h"
 #include "ui/button.h"
+#include "ui/button_cmd.h"
 #include "ui/button_level.h"
 #include "ui/ui.h"
 #include "unit/construction.h"

@@ -67,6 +67,7 @@
 #include "time/time_of_day.h"
 #include "translate.h"
 #include "ui/button.h"
+#include "ui/button_cmd.h"
 #include "ui/button_level.h"
 #include "ui/contenttype.h"
 #include "ui/cursor.h"

@@ -30,10 +30,10 @@
 #include "database/data_entry.h"
 #include "database/data_type.h"
 #include "sound/unitsound.h"
-#include "ui/button_cmd.h"
 #include "ui/icon.h"
 
 class CUnit;
+enum class ButtonCmd;
 struct lua_State;
 
 static int CclDefineButton(lua_State *l);
@@ -62,9 +62,7 @@ public:
 
 	static void add_button_key_to_name(std::string &value_name, const std::string &button_key);
 
-	button(const std::string &identifier = "") : data_entry(identifier)
-	{
-	}
+	button(const std::string &identifier = "");
 
 	button &operator =(const button &other_button)
 	{
@@ -141,7 +139,7 @@ public:
 private:
 	bool always_show = false;			/// button is always shown but drawn grayscale if not available
 public:
-	ButtonCmd Action = ButtonCmd::Move;	/// command on button press
+	ButtonCmd Action;	/// command on button press
 	int Value = 0;					/// extra value for command
 	void *Payload = nullptr;
 	std::string ValueStr;		/// keep original value string

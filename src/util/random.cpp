@@ -25,8 +25,6 @@
 //      02111-1307, USA.
 //
 
-#pragma once
-
 #include "util/random.h"
 
 #include <boost/random.hpp>
