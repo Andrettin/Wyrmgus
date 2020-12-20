@@ -68,7 +68,7 @@ inline QVariantList to_qvariant_list(const T &container)
 template <typename T>
 QStringList to_qstring_list(const T &string_container)
 {
-	static_assert(std::is_same_v<T::value_type, std::string>);
+	static_assert(std::is_same_v<typename T::value_type, std::string>);
 
 	QStringList qstring_list;
 	for (const std::string &str : string_container) {
