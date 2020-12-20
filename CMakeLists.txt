@@ -1759,7 +1759,7 @@ if(ENABLE_DOC AND DOXYGEN_FOUND)
 		COMMAND ${DOXYGEN_EXECUTABLE} ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile
 		DEPENDS ${doxygen_FILES}
 		WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-		COMMENT "Generating Stratagus souce code documentation with Doxygen"
+		COMMENT "Generating Stratagus source code documentation with Doxygen"
 		VERBATIM
 	)
 	add_custom_target(doc ALL DEPENDS doxygen/index.html)
