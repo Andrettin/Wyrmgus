@@ -500,8 +500,6 @@ void PrintOnStdOut(const char *format, ...)
 }
 
 //Wyrmgus start
-#include "iocompat.h" //for getting a file's last modified date
-#include "iolib.h" //for getting a file's last modified date
 #include "unit/unit_type.h" //for personal name generation
 
 std::string FindAndReplaceString(const std::string &text, const std::string &find, const std::string &replace)
@@ -539,19 +537,6 @@ std::string FindAndReplaceStringBeginning(const std::string &text, const std::st
 	}
 	
 	return result;
-}
-
-int GetFileLastModified(const std::string &file_name)
-{
-	std::string library_file_name = LibraryFileName(file_name.c_str());
-	
-	struct stat tmp;
-	
-	stat(library_file_name.c_str(), &tmp);
-	
-	int date = tmp.st_mtime;	
-	
-	return date;
 }
 
 std::string TransliterateText(const std::string &text) //convert special characters into ones more legible for English-speakers

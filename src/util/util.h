@@ -181,7 +181,6 @@ int UTF8GetPrev(const std::string &text, int curpos);
 extern std::string FindAndReplaceString(const std::string &text, const std::string &find, const std::string &replace);
 extern std::string FindAndReplaceStringEnding(const std::string &text, const std::string &find, const std::string &replace);
 extern std::string FindAndReplaceStringBeginning(const std::string &text, const std::string &find, const std::string &replace);
-extern int GetFileLastModified(const std::string &file_name);
 extern std::string TransliterateText(const std::string &text);			/// Convert special characters into ones more legible for English-speakers
 extern std::string CapitalizeString(const std::string &text);			/// Make the string become capitalized
 extern std::string DecapitalizeString(const std::string &text);			/// Make the string lose capitalization
