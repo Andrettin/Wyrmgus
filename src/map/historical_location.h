@@ -82,7 +82,7 @@ public:
 private:
 	const wyrmgus::map_template *map_template = nullptr; //the historical location's map template (overwritten by the site's map template if the site is given)
 	QPoint pos = QPoint(-1, -1); //the historical location's position in its map layer, or as an offset from its pos reference site
-	const site *pos_reference_site = nullptr;
+	const wyrmgus::site *pos_reference_site = nullptr;
 	QGeoCoordinate geocoordinate; //the historical location's position as a geocoordinate
 	const wyrmgus::site *site = nullptr; //the historical location's site (if any)
 
