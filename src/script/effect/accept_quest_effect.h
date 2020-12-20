@@ -60,7 +60,7 @@ public:
 	}
 
 private:
-	quest *quest = nullptr;
+	wyrmgus::quest *quest = nullptr;
 };
 
 }

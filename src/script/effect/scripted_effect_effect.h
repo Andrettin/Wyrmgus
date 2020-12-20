@@ -41,12 +41,12 @@ class scripted_effect_effect final : public effect<scope_type>
 public:
 	explicit scripted_effect_effect(const std::string &effect_identifier, const sml_operator effect_operator) : effect<scope_type>(effect_operator)
 	{
+		static_assert(std::is_same_v<scope_type, CPlayer> || std::is_same_v<scope_type, CUnit>);
+
 		if constexpr (std::is_same_v<scope_type, CPlayer>) {
 			this->scripted_effect = player_scripted_effect::get(effect_identifier);
 		} else if constexpr (std::is_same_v<scope_type, CUnit>) {
 			this->scripted_effect = unit_scripted_effect::get(effect_identifier);
-		} else {
-			static_assert(false);
 		}
 	}
 

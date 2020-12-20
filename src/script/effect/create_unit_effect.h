@@ -139,7 +139,7 @@ public:
 		return str;
 	}
 
-	const unit_type *get_unit_type() const
+	const wyrmgus::unit_type *get_unit_type() const
 	{
 		if (this->character != nullptr) {
 			return this->character->get_unit_type();

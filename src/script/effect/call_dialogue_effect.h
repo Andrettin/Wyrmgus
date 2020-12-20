@@ -65,7 +65,7 @@ public:
 	}
 
 private:
-	const dialogue *dialogue = nullptr;
+	const wyrmgus::dialogue *dialogue = nullptr;
 };
 
 }
