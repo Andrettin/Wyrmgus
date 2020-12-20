@@ -49,7 +49,8 @@ enum class item_slot;
 class persistent_item final
 {
 public:
-	explicit persistent_item(const unit_type *unit_type, character *owner) : unit_type(unit_type), owner(owner)
+	explicit persistent_item(const wyrmgus::unit_type *unit_type, character *owner)
+		: unit_type(unit_type), owner(owner)
 	{
 		if (unit_type == nullptr) {
 			throw std::runtime_error("Cannot create a persistent item with a null type.");
@@ -79,7 +80,7 @@ public:
 	void ProcessConfigData(const CConfigData *config_data);
 	void initialize();
 
-	const unit_type *get_unit_type() const
+	const wyrmgus::unit_type *get_unit_type() const
 	{
 		return this->unit_type;
 	}
@@ -123,7 +124,7 @@ public:
 	}
 
 private:
-	const unit_type *unit_type = nullptr; //the item type of the item
+	const wyrmgus::unit_type *unit_type = nullptr; //the item type of the item
 	const unique_item *unique = nullptr;
 	std::string name;
 	bool bound = false; //whether the item is bound to its owner and can't be dropped
