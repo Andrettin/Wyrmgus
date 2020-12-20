@@ -61,7 +61,7 @@ public:
 
 	virtual void reset_history() override;
 
-	const species *get_species() const
+	const wyrmgus::species *get_species() const
 	{
 		return this->species;
 	}
@@ -86,7 +86,7 @@ public:
 	void add_names_from(const civilization_base *other);
 
 protected:
-	void set_species(species *species)
+	void set_species(wyrmgus::species *species)
 	{
 		this->species = species;
 	}
@@ -97,7 +97,7 @@ protected:
 	}
 
 private:
-	species *species = nullptr;
+	wyrmgus::species *species = nullptr;
 	civilization_group *group = nullptr;
 	std::map<gender, std::vector<std::string>> personal_names; //personal names for the civilization, mapped to the gender they pertain to (use gender::none for names which should be available for both genders)
 	std::vector<std::string> surnames; //surnames for the civilization

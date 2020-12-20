@@ -722,7 +722,7 @@ public:
 		this->units.push_back(std::pair<const wyrmgus::unit_class *, int>(unit_class, quantity));
 	}
 
-	ForceType ForceType = ForceType::None;
+	::ForceType ForceType = ::ForceType::None;
 	int Priority = 100;
 	int Weight = 1;
 

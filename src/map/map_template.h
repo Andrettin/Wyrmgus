@@ -102,8 +102,8 @@ class map_template final : public named_data_entry, public data_type<map_templat
 	Q_PROPERTY(QPoint max_subtemplate_pos MEMBER max_subtemplate_pos READ get_max_subtemplate_pos)
 	Q_PROPERTY(QGeoCoordinate min_subtemplate_geocoordinate MEMBER min_subtemplate_geocoordinate)
 	Q_PROPERTY(QGeoCoordinate max_subtemplate_geocoordinate MEMBER max_subtemplate_geocoordinate)
-	Q_PROPERTY(wyrmgus::plane* plane MEMBER plane READ get_plane)
-	Q_PROPERTY(wyrmgus::world* world READ get_world WRITE set_world)
+	Q_PROPERTY(wyrmgus::plane* plane MEMBER plane)
+	Q_PROPERTY(wyrmgus::world* world WRITE set_world)
 	Q_PROPERTY(wyrmgus::map_template* main_template READ get_main_template WRITE set_main_template)
 	Q_PROPERTY(QString terrain_file READ get_terrain_file_qstring)
 	Q_PROPERTY(QString overlay_terrain_file READ get_overlay_terrain_file_qstring)
@@ -370,17 +370,17 @@ public:
 		return true;
 	}
 
-	plane *get_plane() const
+	const wyrmgus::plane *get_plane() const
 	{
 		return this->plane;
 	}
 
-	world *get_world() const
+	const wyrmgus::world *get_world() const
 	{
 		return this->world;
 	}
 
-	void set_world(world *world);
+	void set_world(wyrmgus::world *world);
 
 	map_template *get_main_template() const
 	{
@@ -736,8 +736,8 @@ public:
 	std::vector<const map_template *> EastOfTemplates; //map templates to which this one is to the east of
 private:
 	std::vector<const map_template *> dependency_templates; //the other templates on which this one depends on to be applied as a subtemplate, e.g. its adjacent templates, north of templates, etc.
-	plane *plane = nullptr;
-	world *world = nullptr;
+	wyrmgus::plane *plane = nullptr;
+	wyrmgus::world *world = nullptr;
 	terrain_type *base_terrain_type = nullptr;
 	terrain_type *base_overlay_terrain_type = nullptr;
 	terrain_type *border_terrain_type = nullptr;

@@ -162,8 +162,8 @@ public:
 	CScheduledSeason *Season = nullptr;			/// the current season for the map layer
 	CSeasonSchedule *SeasonSchedule = nullptr;	/// the season schedule for the map layer
 	int RemainingSeasonHours = 0;				/// the quantity of hours remaining for the current season to end
-	wyrmgus::plane *plane = nullptr;			/// the plane pointer (if any) for the map layer
-	wyrmgus::world *world = nullptr;			/// the world pointer (if any) for the map layer
+	const wyrmgus::plane *plane = nullptr;			/// the plane pointer (if any) for the map layer
+	const wyrmgus::world *world = nullptr;			/// the world pointer (if any) for the map layer
 	std::vector<CUnit *> LayerConnectors;		/// connectors in the map layer which lead to other map layers
 	wyrmgus::map_template_map<QRect> subtemplate_areas;
 	std::vector<QPoint> destroyed_overlay_terrain_tiles; /// destroyed overlay terrain tiles (excluding trees)

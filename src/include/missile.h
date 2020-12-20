@@ -333,7 +333,7 @@ public:
 
 	void Load(lua_State *l);
 
-	missile_class get_missile_class() const
+	wyrmgus::missile_class get_missile_class() const
 	{
 		return this->missile_class;
 	}
@@ -442,7 +442,7 @@ public:
 	//Wyrmgus end
 
 private:
-	missile_class missile_class; /// missile class
+	wyrmgus::missile_class missile_class; /// missile class
 public:
 	int NumBounces;            /// number of bounces
 	int MaxBounceSize;		   /// if the unit has a size greater than this, the missile won't bounce further

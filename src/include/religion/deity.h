@@ -52,7 +52,7 @@ class deity final : public detailed_data_entry, public data_type<deity>
 {
 	Q_OBJECT
 
-	Q_PROPERTY(wyrmgus::pantheon* pantheon MEMBER pantheon READ get_pantheon)
+	Q_PROPERTY(wyrmgus::pantheon* pantheon MEMBER pantheon)
 	Q_PROPERTY(wyrmgus::icon* icon READ get_icon WRITE set_icon)
 	Q_PROPERTY(wyrmgus::gender gender READ get_gender WRITE set_gender)
 	Q_PROPERTY(bool major MEMBER major READ is_major)
@@ -79,12 +79,12 @@ public:
 
 	const std::string &get_cultural_name(const civilization *civilization) const;
 
-	pantheon *get_pantheon() const
+	const wyrmgus::pantheon *get_pantheon() const
 	{
 		return this->pantheon;
 	}
 
-	character *get_character() const
+	wyrmgus::character *get_character() const
 	{
 		return this->character;
 	}
@@ -105,11 +105,11 @@ public:
 		return this->home_plane;
 	}
 
-	character *get_father() const;
-	void set_father(character *character);
+	wyrmgus::character *get_father() const;
+	void set_father(wyrmgus::character *character);
 
-	character *get_mother() const;
-	void set_mother(character *character);
+	wyrmgus::character *get_mother() const;
+	void set_mother(wyrmgus::character *character);
 
 	CUpgrade *get_upgrade() const
 	{
@@ -162,8 +162,8 @@ public:
 	}
 
 private:
-	pantheon *pantheon = nullptr;
-	character *character = nullptr;
+	wyrmgus::pantheon *pantheon = nullptr;
+	wyrmgus::character *character = nullptr;
 	bool major = false;
 	plane *home_plane = nullptr;
 	CUpgrade *upgrade = nullptr; //the deity's upgrade applied to a player that worships it

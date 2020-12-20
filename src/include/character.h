@@ -96,10 +96,10 @@ class character : public detailed_data_entry, public data_type<character>, publi
 {
 	Q_OBJECT
 
-	Q_PROPERTY(wyrmgus::dynasty* dynasty MEMBER dynasty READ get_dynasty)
+	Q_PROPERTY(wyrmgus::dynasty* dynasty MEMBER dynasty)
 	Q_PROPERTY(QString surname READ get_surname_qstring)
-	Q_PROPERTY(wyrmgus::icon* icon READ get_base_icon WRITE set_base_icon)
-	Q_PROPERTY(wyrmgus::icon* heroic_icon MEMBER heroic_icon READ get_heroic_icon)
+	Q_PROPERTY(wyrmgus::icon* icon MEMBER icon WRITE set_base_icon)
+	Q_PROPERTY(wyrmgus::icon* heroic_icon MEMBER heroic_icon)
 	Q_PROPERTY(wyrmgus::unit_type* unit_type MEMBER unit_type WRITE set_unit_type)
 	Q_PROPERTY(wyrmgus::civilization* civilization MEMBER civilization)
 	Q_PROPERTY(wyrmgus::faction* default_faction MEMBER default_faction)
@@ -139,7 +139,7 @@ public:
 
 	virtual void reset_history() override;
 
-	dynasty *get_dynasty() const
+	const wyrmgus::dynasty *get_dynasty() const
 	{
 		return this->dynasty;
 	}
@@ -159,12 +159,12 @@ public:
 		return QString::fromStdString(this->get_surname());
 	}
 
-	const unit_type *get_unit_type() const
+	const wyrmgus::unit_type *get_unit_type() const
 	{
 		return this->unit_type;
 	}
 
-	void set_unit_type(unit_type *unit_type)
+	void set_unit_type(wyrmgus::unit_type *unit_type)
 	{
 		if (unit_type == this->get_unit_type()) {
 			return;
@@ -178,7 +178,7 @@ public:
 		return this->trait;
 	}
 
-	const civilization *get_civilization() const
+	const wyrmgus::civilization *get_civilization() const
 	{
 		return this->civilization;
 	}
@@ -188,12 +188,12 @@ public:
 		return this->default_faction;
 	}
 
-	const deity *get_deity() const
+	const wyrmgus::deity *get_deity() const
 	{
 		return this->deity;
 	}
 
-	void set_deity(const deity *deity)
+	void set_deity(const wyrmgus::deity *deity)
 	{
 		this->deity = deity;
 	}
@@ -203,12 +203,12 @@ public:
 		return this->get_deity() != nullptr;
 	}
 
-	gender get_gender() const
+	wyrmgus::gender get_gender() const
 	{
 		return this->gender;
 	}
 
-	void set_gender(const gender gender)
+	void set_gender(const wyrmgus::gender gender)
 	{
 		if (gender == this->get_gender()) {
 			return;
@@ -262,12 +262,12 @@ public:
 		return QString::fromStdString(this->get_variation());
 	}
 
-	icon *get_base_icon() const
+	wyrmgus::icon *get_base_icon() const
 	{
 		return this->icon;
 	}
 
-	void set_base_icon(icon *icon)
+	void set_base_icon(wyrmgus::icon *icon)
 	{
 		if (icon == this->get_icon()) {
 			return;
@@ -276,12 +276,12 @@ public:
 		this->icon = icon;
 	}
 
-	icon *get_heroic_icon() const
+	const wyrmgus::icon *get_heroic_icon() const
 	{
 		return this->heroic_icon;
 	}
 
-	const icon *get_icon() const;
+	const wyrmgus::icon *get_icon() const;
 
 	void UpdateAttributes();
 

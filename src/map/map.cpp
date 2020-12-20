@@ -1075,7 +1075,7 @@ void CMap::SetCurrentWorld(wyrmgus::world *world)
 	}
 }
 
-wyrmgus::plane *CMap::GetCurrentPlane() const
+const wyrmgus::plane *CMap::GetCurrentPlane() const
 {
 	if (UI.CurrentMapLayer) {
 		return UI.CurrentMapLayer->plane;
@@ -1084,7 +1084,7 @@ wyrmgus::plane *CMap::GetCurrentPlane() const
 	}
 }
 
-wyrmgus::world *CMap::GetCurrentWorld() const
+const wyrmgus::world *CMap::GetCurrentWorld() const
 {
 	if (UI.CurrentMapLayer) {
 		return UI.CurrentMapLayer->world;

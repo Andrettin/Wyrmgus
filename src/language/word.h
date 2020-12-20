@@ -66,12 +66,12 @@ public:
 		}
 	}
 
-	const language *get_language() const
+	const wyrmgus::language *get_language() const
 	{
 		return this->language;
 	}
 
-	void set_language(language *language);
+	void set_language(wyrmgus::language *language);
 
 	word_type get_type() const
 	{
@@ -129,7 +129,7 @@ public:
 	const std::string &GetParticiple(int grammatical_tense);
 
 private:
-	language *language = nullptr;
+	wyrmgus::language *language = nullptr;
 	word_type type;
 	grammatical_gender gender; //what is the gender of the word, if it is a noun or article
 public:

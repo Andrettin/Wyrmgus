@@ -150,12 +150,12 @@ public:
 		return this->upgrade;
 	}
 
-	const language *get_language() const
+	const wyrmgus::language *get_language() const
 	{
 		return this->language;
 	}
 
-	calendar *get_calendar() const;
+	wyrmgus::calendar *get_calendar() const;
 	CCurrency *GetCurrency() const;
 
 	bool is_visible() const
@@ -168,7 +168,7 @@ public:
 		return this->playable;
 	}
 
-	const unit_sound_set *get_unit_sound_set() const
+	const wyrmgus::unit_sound_set *get_unit_sound_set() const
 	{
 		return this->unit_sound_set.get();
 	}
@@ -310,14 +310,14 @@ private:
 	std::string interface; //the string identifier for the civilization's interface
 	std::string default_color; //name of the civilization's default color (used for the encyclopedia, tech tree, etc.)
 	CUpgrade *upgrade = nullptr;
-	language *language = nullptr;	/// the language used by the civilization
-	calendar *calendar = nullptr;	/// the calendar used by the civilization
+	wyrmgus::language *language = nullptr;	/// the language used by the civilization
+	wyrmgus::calendar *calendar = nullptr;	/// the calendar used by the civilization
 public:
 	CCurrency *Currency = nullptr;	/// the currency used by the civilization
 private:
 	bool visible = true; //whether the civilization is visible e.g. in the map editor
 	bool playable = true; //civilizations are playable by default
-	std::unique_ptr<unit_sound_set> unit_sound_set;	/// sounds for unit events
+	std::unique_ptr<wyrmgus::unit_sound_set> unit_sound_set;	/// sounds for unit events
 	sound *help_town_sound = nullptr;
 	sound *work_complete_sound = nullptr;
 	sound *research_complete_sound = nullptr;

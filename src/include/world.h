@@ -48,7 +48,7 @@ class world final : public detailed_data_entry, public data_type<world>, public 
 {
 	Q_OBJECT
 
-	Q_PROPERTY(wyrmgus::plane* plane MEMBER plane READ get_plane)
+	Q_PROPERTY(wyrmgus::plane* plane MEMBER plane)
 
 public:
 	static constexpr const char *class_identifier = "world";
@@ -66,7 +66,7 @@ public:
 
 	virtual void ProcessConfigData(const CConfigData *config_data) override;
 
-	plane *get_plane() const
+	wyrmgus::plane *get_plane() const
 	{
 		return this->plane;
 	}
@@ -90,7 +90,7 @@ public:
 
 	int ID = -1;
 private:
-	plane *plane = nullptr;
+	wyrmgus::plane *plane = nullptr;
 public:
 	CTimeOfDaySchedule *TimeOfDaySchedule = nullptr;					/// this world's time of day schedule
 	CSeasonSchedule *SeasonSchedule = nullptr;							/// this world's season schedule

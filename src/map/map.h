@@ -289,8 +289,8 @@ public:
 	
 	void SetCurrentPlane(wyrmgus::plane *plane);
 	void SetCurrentWorld(wyrmgus::world *world);
-	wyrmgus::plane *GetCurrentPlane() const;
-	wyrmgus::world *GetCurrentWorld() const;
+	const wyrmgus::plane *GetCurrentPlane() const;
+	const wyrmgus::world *GetCurrentWorld() const;
 	//Wyrmgus end
 
 	//UnitCache

@@ -335,10 +335,10 @@ void map_template::initialize()
 		}
 
 		if (this->get_main_template()->get_plane() != nullptr) {
-			this->plane = this->get_main_template()->get_plane();
+			this->plane = this->get_main_template()->plane;
 		}
 		if (this->get_main_template()->get_world() != nullptr) {
-			this->world = this->get_main_template()->get_world();
+			this->world = this->get_main_template()->world;
 		}
 
 		if (this->min_subtemplate_geocoordinate.isValid()) {
