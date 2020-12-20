@@ -1129,6 +1129,10 @@ set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules ${CMAKE_MODULE_P
 
 find_package(Boost 1.69.0 REQUIRED)
 
+if(UNIX)
+	set(CMAKE_PREFIX_PATH $ENV{HOME}/Qt/5.14.2/gcc_64)
+endif()
+
 #Qt5 modules
 #different modules have different licenses, make sure all modules used here are compatible with the GPL 2.0
 set(CMAKE_AUTOMOC ON)
