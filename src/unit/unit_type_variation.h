@@ -129,7 +129,7 @@ public:
 		return this->button_key;
 	}
 	
-	const construction *get_construction() const
+	const wyrmgus::construction *get_construction() const
 	{
 		return this->construction;
 	}
