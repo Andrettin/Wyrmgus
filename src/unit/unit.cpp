@@ -6498,7 +6498,7 @@ bool CUnit::can_learn_ability(const CUpgrade *ability) const
 		}
 	}
 	
-	if (!check_conditions<precondition>(ability, this, false)) {
+	if (!wyrmgus::check_conditions<precondition>(ability, this, false)) {
 		return false;
 	}
 	
