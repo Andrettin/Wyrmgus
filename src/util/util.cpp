@@ -205,11 +205,6 @@ std::vector<std::string> SplitString(const std::string &str, const char *separat
 	return output;
 }
 
-bool IsStringBool(const std::string &str)
-{
-	return str == "true" || str == "false";
-}
-
 static std::map<unsigned, std::string> RomanConversionTable = {{1000, "M"}, {900, "CM"}, {500, "D"}, {400, "CD"}, {100, "C"}, {90, "XC"}, {50, "L"}, {40, "XL"}, {10, "X"}, {9, "IX"}, {5, "V"}, {4, "IV"}, {1, "I"}};
 
 std::string NumberToRomanNumeral(unsigned number)

@@ -180,6 +180,11 @@ inline std::string normalized(const std::string &str)
 	return string::normalized(std::move(result));
 }
 
+inline bool is_bool(const std::string &str)
+{
+	return str == "true" || str == "false";
+}
+
 inline bool to_bool(const std::string &str)
 {
 	if (str == "true" || str == "yes" || str == "1") {

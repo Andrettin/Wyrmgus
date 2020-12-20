@@ -629,7 +629,7 @@ void unit_type::process_sml_property(const sml_property &property)
 				this->DefaultStat.Variables[index].Enable = 1;
 				this->DefaultStat.Variables[index].Value = std::stoi(value);
 				this->DefaultStat.Variables[index].Max = std::stoi(value);
-			} else if (IsStringBool(value)) {
+			} else if (string::is_bool(value)) {
 				this->DefaultStat.Variables[index].Enable = string::to_bool(value);
 			} else { // error
 				fprintf(stderr, "Invalid value (\"%s\") for variable \"%s\" when defining unit type \"%s\".\n", value.c_str(), key.c_str(), this->get_identifier().c_str());
@@ -983,7 +983,7 @@ void unit_type::ProcessConfigData(const CConfigData *config_data)
 					this->DefaultStat.Variables[index].Enable = 1;
 					this->DefaultStat.Variables[index].Value = std::stoi(value);
 					this->DefaultStat.Variables[index].Max = std::stoi(value);
-				} else if (IsStringBool(value)) {
+				} else if (string::is_bool(value)) {
 					this->DefaultStat.Variables[index].Enable = string::to_bool(value);
 				} else { // error
 					fprintf(stderr, "Invalid value (\"%s\") for variable \"%s\" when defining unit type \"%s\".\n", value.c_str(), key.c_str(), this->Ident.c_str());
