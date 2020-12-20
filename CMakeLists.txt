@@ -1383,10 +1383,10 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 # Stratagus needs to have char by default signed
 # No idea how to tell this to other compilers
 if(CMAKE_COMPILER_IS_GNUCXX)
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fsigned-char")
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fsigned-char -fpermissive")
 endif()
 if(CMAKE_COMPILER_IS_GNUC)
-	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fsigned-char")
+	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fsigned-char -fpermissive")
 endif()
 # TODO: Add support for other compilers
 
