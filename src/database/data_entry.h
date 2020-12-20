@@ -106,12 +106,12 @@ public:
 	{
 	}
 
-	const data_module *get_module() const
+	const wyrmgus::data_module *get_module() const
 	{
 		return this->data_module;
 	}
 
-	void set_module(const data_module *data_module)
+	void set_module(const wyrmgus::data_module *data_module)
 	{
 		if (data_module == this->get_module()) {
 			return;

@@ -764,7 +764,7 @@ class unit_type final : public detailed_data_entry, public data_type<unit_type>,
 	Q_PROPERTY(wyrmgus::unit_class* unit_class READ get_unit_class WRITE set_unit_class)
 	Q_PROPERTY(bool template MEMBER template_type READ is_template)
 	Q_PROPERTY(wyrmgus::civilization* civilization MEMBER civilization)
-	Q_PROPERTY(wyrmgus::animation_set* animation_set MEMBER animation_set READ get_animation_set)
+	Q_PROPERTY(wyrmgus::animation_set* animation_set MEMBER animation_set)
 	Q_PROPERTY(QSize tile_size MEMBER tile_size READ get_tile_size)
 	Q_PROPERTY(QSize box_size MEMBER box_size READ get_box_size)
 	Q_PROPERTY(QString image_file READ get_image_file_qstring)
@@ -964,7 +964,7 @@ public:
 		return this->species;
 	}
 
-	animation_set *get_animation_set() const
+	const wyrmgus::animation_set *get_animation_set() const
 	{
 		return this->animation_set;
 	}
