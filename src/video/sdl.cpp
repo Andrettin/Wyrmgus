@@ -501,33 +501,6 @@ void InitVideoSdl()
 		for (size_t i = 0; i < ApplicationNameL.size(); ++i) {
 			ApplicationNameL[i] = tolower(ApplicationNameL[i]);
 		}
-
-		std::vector <std::string> pixmaps;
-		pixmaps.push_back(std::string() + PIXMAPS + "/" + FullGameName + ".png");
-		pixmaps.push_back(std::string() + PIXMAPS + "/" + FullGameNameL + ".png");
-		pixmaps.push_back(std::string() + "/usr/share/pixmaps" + "/" + FullGameName + ".png");
-		pixmaps.push_back(std::string() + "/usr/share/pixmaps" + "/" + FullGameNameL + ".png");
-		pixmaps.push_back(std::string() + PIXMAPS + "/" + ApplicationName + ".png");
-		pixmaps.push_back(std::string() + PIXMAPS + "/" + ApplicationNameL + ".png");
-		pixmaps.push_back(std::string() + "/usr/share/pixmaps" + "/" + ApplicationName + ".png");
-		pixmaps.push_back(std::string() + "/usr/share/pixmaps" + "/" + ApplicationNameL + ".png");
-		pixmaps.push_back(std::string() + PIXMAPS + "/" + "Stratagus" + ".png");
-		pixmaps.push_back(std::string() + PIXMAPS + "/" + "stratagus" + ".png");
-		pixmaps.push_back(std::string() + "/usr/share/pixmaps" + "/" + "Stratagus" + ".png");
-		pixmaps.push_back(std::string() + "/usr/share/pixmaps" + "/" + "stratagus" + ".png");
-
-		for (size_t i = 0; i < pixmaps.size(); ++i) {
-			if (stat(pixmaps[i].c_str(), &st) == 0) {
-				g = CGraphic::New(pixmaps[i].c_str());
-				g->Load();
-				icon = g->Surface;
-				if (icon) { break; }
-			}
-		}
-
-		if (icon) {
-			SDL_WM_SetIcon(icon, 0);
-		}
 #endif
 		
 #endif
