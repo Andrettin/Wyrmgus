@@ -36,15 +36,14 @@
 
 class CAiBuildingTemplate;
 class CCurrency;
-class CForceTemplate;
 class CUpgrade;
-enum class ForceType;
 struct lua_State;
 
 static int CclDefineCivilization(lua_State *l);
 
 namespace wyrmgus {
 
+class ai_force_template;
 class calendar;
 class deity;
 class language;
@@ -55,6 +54,7 @@ class species;
 class unit_class;
 class unit_sound_set;
 class upgrade_class;
+enum class ai_force_type;
 enum class character_title;
 enum class faction_type;
 enum class government_type;
@@ -113,7 +113,7 @@ public:
 	}
 	
 	int GetUpgradePriority(const CUpgrade *upgrade) const;
-	int GetForceTypeWeight(const ForceType force_type) const;
+	int get_force_type_weight(const ai_force_type force_type) const;
 
 	const std::string &get_interface() const
 	{
@@ -233,7 +233,7 @@ public:
 	void process_character_title_name_scope(const sml_data &scope);
 	void process_character_title_name_scope(const character_title title_type, const sml_data &scope);
 
-	const std::vector<std::unique_ptr<CForceTemplate>> &GetForceTemplates(const ForceType force_type) const;
+	const std::vector<std::unique_ptr<ai_force_template>> &get_ai_force_templates(const ai_force_type force_type) const;
 	const std::vector<std::unique_ptr<CAiBuildingTemplate>> &GetAiBuildingTemplates() const;
 
 	unit_type *get_class_unit_type(const unit_class *unit_class) const;
@@ -329,8 +329,10 @@ private:
 public:
 	std::vector<quest *> Quests;	/// quests belonging to this civilization
 	std::map<const CUpgrade *, int> UpgradePriorities;		/// Priority for each upgrade
-	std::map<ForceType, std::vector<std::unique_ptr<CForceTemplate>>> ForceTemplates;	/// Force templates, mapped to each force type
-	std::map<ForceType, int> ForceTypeWeights;	/// Weights for each force type
+private:
+	std::map<ai_force_type, std::vector<std::unique_ptr<ai_force_template>>> ai_force_templates;	/// Force templates, mapped to each force type
+	std::map<ai_force_type, int> ai_force_type_weights;	/// Weights for each force type
+public:
 	std::vector<std::unique_ptr<CAiBuildingTemplate>> AiBuildingTemplates;	/// AI building templates
 public:
 	std::vector<std::string> ProvinceNames;		/// Province names for the civilization

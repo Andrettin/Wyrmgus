@@ -34,6 +34,8 @@
 #include "actions.h"
 #include "action/action_attack.h"
 #include "action/action_board.h"
+#include "ai/ai_force_template.h"
+#include "ai/ai_force_type.h"
 #include "commands.h"
 #include "faction.h"
 #include "game.h"
@@ -49,6 +51,7 @@
 #include "unit/unit_ref.h"
 #include "unit/unit_type.h"
 #include "unit/unit_type_type.h"
+#include "util/vector_random_util.h"
 #include "util/vector_util.h"
 
 static constexpr int AIATTACK_RANGE = 0;
@@ -815,23 +818,23 @@ void AiForce::Reset(const bool types)
 	//Wyrmgus end
 }
 
-ForceType AiForce::GetForceType() const
+wyrmgus::ai_force_type AiForce::get_force_type() const
 {
 	if (this->get_units().empty()) {
-		return ForceType::Land;
+		return wyrmgus::ai_force_type::land;
 	}
 	
-	ForceType force_type = ForceType::Space;
+	wyrmgus::ai_force_type force_type = wyrmgus::ai_force_type::space;
 	for (const std::shared_ptr<wyrmgus::unit_ref> &unit_ref : this->get_units()) {
 		CUnit *unit = unit_ref->get();
 		if (unit->Type->UnitType == UnitTypeType::Naval && unit->CanAttack() && !unit->Type->CanTransport()) { //one naval unit that can attack makes this a naval force
-			return ForceType::Naval;
+			return wyrmgus::ai_force_type::naval;
 		}
 		
 		if (unit->Type->UnitType != UnitTypeType::Fly && unit->Type->UnitType != UnitTypeType::Space) { //all units must be of UnitTypeType::Fly for it to be considered an air force
-			force_type = ForceType::Land;
+			force_type = wyrmgus::ai_force_type::land;
 		} else if (unit->Type->UnitType != UnitTypeType::Space) {
-			force_type = ForceType::Air;
+			force_type = wyrmgus::ai_force_type::air;
 		}
 	}
 	
@@ -840,12 +843,12 @@ ForceType AiForce::GetForceType() const
 
 bool AiForce::IsNaval() const
 {
-	return this->GetForceType() == ForceType::Naval;
+	return this->get_force_type() == wyrmgus::ai_force_type::naval;
 }
 
 bool AiForce::IsAirForce() const
 {
-	return this->GetForceType() == ForceType::Air;
+	return this->get_force_type() == wyrmgus::ai_force_type::air;
 }
 
 bool AiForce::IsHeroOnlyForce() const
@@ -1912,7 +1915,7 @@ void AiForceManager::CheckForceRecruitment()
 
 	bool all_forces_completed = true;
 	int completed_forces = 0;
-	int force_type_count[static_cast<int>(ForceType::Count)];
+	int force_type_count[static_cast<int>(wyrmgus::ai_force_type::count)];
 	memset(force_type_count, 0, sizeof(force_type_count));
 	
 	for (unsigned int f = 0; f < forces.size(); ++f) {
@@ -1920,7 +1923,7 @@ void AiForceManager::CheckForceRecruitment()
 		if (force.Completed && !force.get_units().empty()) {
 			if (!force.IsHeroOnlyForce()) {
 				completed_forces++;
-				force_type_count[static_cast<int>(force.GetForceType())]++;
+				force_type_count[static_cast<int>(force.get_force_type())]++;
 			}
 			//attack with forces that are completed, but aren't attacking or defending
 			if (!force.Attacking && !force.Defending) {
@@ -1951,32 +1954,32 @@ void AiForceManager::CheckForceRecruitment()
 	}
 	
 	if (all_forces_completed && AiPlayer->Player->Race != -1 && AiPlayer->Player->Faction != -1 && completed_forces < AI_MAX_COMPLETED_FORCES && completed_force_pop < AI_MAX_COMPLETED_FORCE_POP) { //all current forces completed and not too many forces are in existence, create a new one
-		int force_type_weights[static_cast<int>(ForceType::Count)];
-		for (int i = 0; i < static_cast<int>(ForceType::Count); ++i) {
-			force_type_weights[i] = AiPlayer->Player->get_faction()->GetForceTypeWeight(static_cast<ForceType>(i));
+		int force_type_weights[static_cast<int>(wyrmgus::ai_force_type::count)];
+		for (int i = 0; i < static_cast<int>(wyrmgus::ai_force_type::count); ++i) {
+			force_type_weights[i] = AiPlayer->Player->get_faction()->get_force_type_weight(static_cast<wyrmgus::ai_force_type>(i));
 		}
 		
-		std::vector<ForceType> force_types;
-		while ((int) force_types.size() < static_cast<int>(ForceType::Count)) {
-			for (int i = 0; i < static_cast<int>(ForceType::Count); ++i) {
+		std::vector<wyrmgus::ai_force_type> force_types;
+		while (static_cast<int>(force_types.size()) < static_cast<int>(wyrmgus::ai_force_type::count)) {
+			for (int i = 0; i < static_cast<int>(wyrmgus::ai_force_type::count); ++i) {
 				if (force_type_count[i] <= 0) {
-					force_types.push_back(static_cast<ForceType>(i));
+					force_types.push_back(static_cast<wyrmgus::ai_force_type>(i));
 				}
 				force_type_count[i] -= force_type_weights[i];
 			}
 		}
 
 		for (size_t k = 0; k < force_types.size(); ++k) {
-			const std::vector<std::unique_ptr<CForceTemplate>> &faction_force_templates = AiPlayer->Player->get_faction()->GetForceTemplates(force_types[k]);
-			std::vector<CForceTemplate *> potential_force_templates;
+			const std::vector<std::unique_ptr<wyrmgus::ai_force_template>> &faction_force_templates = AiPlayer->Player->get_faction()->get_ai_force_templates(force_types[k]);
+			std::vector<wyrmgus::ai_force_template *> potential_force_templates;
 			int priority = 0;
-			for (size_t i = 0; i < faction_force_templates.size(); ++i) {
-				if (faction_force_templates[i]->Priority < priority) {
+			for (const std::unique_ptr<wyrmgus::ai_force_template> &force_template : faction_force_templates) {
+				if (force_template->get_priority() < priority) {
 					break; //force templates are ordered by priority, so there is no need to go further
 				}
 				bool valid = true;
-				for (size_t j = 0; j < faction_force_templates[i]->get_units().size(); ++j) {
-					const wyrmgus::unit_class *unit_class = faction_force_templates[i]->get_units()[j].first;
+				for (size_t j = 0; j < force_template->get_units().size(); ++j) {
+					const wyrmgus::unit_class *unit_class = force_template->get_units()[j].first;
 					const wyrmgus::unit_type *unit_type = AiPlayer->Player->get_faction()->get_class_unit_type(unit_class);
 					if (unit_type == nullptr || !AiRequestedTypeAllowed(*AiPlayer->Player, *unit_type)) {
 						valid = false;
@@ -1989,17 +1992,20 @@ void AiForceManager::CheckForceRecruitment()
 					}
 				}
 				if (valid) {
-					if (faction_force_templates[i]->Priority > priority) {
-						priority = faction_force_templates[i]->Priority;
+					if (force_template->get_priority() > priority) {
+						priority = force_template->get_priority();
 						potential_force_templates.clear();
 					}
-					for (int j = 0; j < faction_force_templates[i]->Weight; ++j) {
-						potential_force_templates.push_back(faction_force_templates[i].get());
+					for (int j = 0; j < force_template->get_weight(); ++j) {
+						potential_force_templates.push_back(force_template.get());
 					}
 				}
 			}
 			
-			CForceTemplate *force_template = potential_force_templates.size() ? potential_force_templates[SyncRand(potential_force_templates.size())] : nullptr;
+			wyrmgus::ai_force_template *force_template = nullptr;
+			if (!potential_force_templates.empty()) {
+				force_template = wyrmgus::vector::get_random(potential_force_templates);
+			}
 		
 			if (force_template) {
 				unsigned int new_force_id = this->FindFreeForce(AiForceRole::Default, 1, true);

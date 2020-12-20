@@ -58,7 +58,6 @@ class LuaCallback;
 //Wyrmgus end
 enum class ButtonCmd;
 enum class DiplomacyState;
-enum class ForceType;
 struct lua_State;
 
 namespace wyrmgus {
@@ -79,6 +78,7 @@ namespace wyrmgus {
 	class unit_class;
 	class unit_type;
 	class upgrade_class;
+	enum class ai_force_type;
 	enum class character_title;
 	enum class faction_tier;
 	enum class government_type;
@@ -701,37 +701,6 @@ private:
 };
 
 //Wyrmgus start
-enum class ForceType {
-	None = -1,
-	Land,
-	Naval,
-	Air,
-	Space,
-	
-	Count
-};
-
-class CForceTemplate final
-{
-public:
-	const std::vector<std::pair<const wyrmgus::unit_class *, int>> &get_units() const
-	{
-		return this->units;
-	}
-
-	void add_unit(const wyrmgus::unit_class *unit_class, const int quantity)
-	{
-		this->units.push_back(std::pair<const wyrmgus::unit_class *, int>(unit_class, quantity));
-	}
-
-	::ForceType ForceType = ::ForceType::None;
-	int Priority = 100;
-	int Weight = 1;
-
-private:
-	std::vector<std::pair<const wyrmgus::unit_class *, int>> units;	/// vector containing each unit class belonging to the force template, and the respective quantity
-};
-
 class CAiBuildingTemplate final
 {
 public:
@@ -897,6 +866,4 @@ inline bool CanSelectMultipleUnits(const CPlayer &player)
 
 //Wyrmgus start
 extern void NetworkSetFaction(int player, const std::string &faction_name);
-extern std::string GetForceTypeNameById(const ForceType force_type);
-extern ForceType GetForceTypeIdByName(const std::string &force_type);
 extern bool IsNameValidForWord(const std::string &word_name);

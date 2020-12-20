@@ -4192,36 +4192,6 @@ void NetworkSetFaction(int player, const std::string &faction_name)
 	SendCommandSetFaction(player, faction_id);
 }
 
-std::string GetForceTypeNameById(const ForceType force_type)
-{
-	if (force_type == ForceType::Land) {
-		return "land-force";
-	} else if (force_type == ForceType::Naval) {
-		return "naval-force";
-	} else if (force_type == ForceType::Air) {
-		return "air-force";
-	} else if (force_type == ForceType::Space) {
-		return "space-force";
-	}
-
-	return "";
-}
-
-ForceType GetForceTypeIdByName(const std::string &force_type)
-{
-	if (force_type == "land-force" || force_type == "land_force") {
-		return ForceType::Land;
-	} else if (force_type == "naval-force" || force_type == "naval_force") {
-		return ForceType::Naval;
-	} else if (force_type == "air-force" || force_type == "air_force") {
-		return ForceType::Air;
-	} else if (force_type == "space-force" || force_type == "space_force") {
-		return ForceType::Space;
-	}
-
-	throw std::runtime_error("Invalid force type: " + force_type + ".");
-}
-
 bool IsNameValidForWord(const std::string &word_name)
 {
 	if (word_name.empty()) {

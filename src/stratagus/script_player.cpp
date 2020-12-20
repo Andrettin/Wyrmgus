@@ -32,6 +32,8 @@
 #include "actions.h"
 #include "age.h"
 #include "ai.h"
+#include "ai/ai_force_template.h"
+#include "ai/ai_force_type.h"
 #include "character.h"
 #include "civilization.h"
 #include "civilization_group.h"
@@ -790,19 +792,19 @@ static int CclDefineCivilization(lua_State *l)
 				LuaError(l, "incorrect argument");
 			}
 			
-			civilization->ForceTypeWeights.clear();
+			civilization->ai_force_type_weights.clear();
 			
 			const int subargs = lua_rawlen(l, -1);
 			for (int j = 0; j < subargs; ++j) {
-				const ForceType force_type = GetForceTypeIdByName(LuaToString(l, -1, j + 1));
+				const wyrmgus::ai_force_type force_type = wyrmgus::string_to_ai_force_type(LuaToString(l, -1, j + 1));
 				++j;
-				civilization->ForceTypeWeights[force_type] = LuaToNumber(l, -1, j + 1);
+				civilization->ai_force_type_weights[force_type] = LuaToNumber(l, -1, j + 1);
 			}
 		} else if (!strcmp(value, "ForceTemplates")) {
 			const int args = lua_rawlen(l, -1);
 			for (int j = 0; j < args; ++j) {
 				lua_rawgeti(l, -1, j + 1);
-				auto force = std::make_unique<CForceTemplate>();
+				auto force = std::make_unique<wyrmgus::ai_force_template>();
 				if (!lua_istable(l, -1)) {
 					LuaError(l, "incorrect argument (expected table for force templates)");
 				}
@@ -811,14 +813,11 @@ static int CclDefineCivilization(lua_State *l)
 					value = LuaToString(l, -1, k + 1);
 					++k;
 					if (!strcmp(value, "force-type")) {
-						force->ForceType = GetForceTypeIdByName(LuaToString(l, -1, k + 1));
-						if (force->ForceType == ForceType::None) {
-							LuaError(l, "Force type doesn't exist.");
-						}
+						force->force_type = wyrmgus::string_to_ai_force_type(LuaToString(l, -1, k + 1));
 					} else if (!strcmp(value, "priority")) {
-						force->Priority = LuaToNumber(l, -1, k + 1);
+						force->priority = LuaToNumber(l, -1, k + 1);
 					} else if (!strcmp(value, "weight")) {
-						force->Weight = LuaToNumber(l, -1, k + 1);
+						force->weight = LuaToNumber(l, -1, k + 1);
 					} else if (!strcmp(value, "unit-class")) {
 						const wyrmgus::unit_class *unit_class = wyrmgus::unit_class::get(LuaToString(l, -1, k + 1));
 						++k;
@@ -830,7 +829,7 @@ static int CclDefineCivilization(lua_State *l)
 					}
 				}
 				lua_pop(l, 1);
-				civilization->ForceTemplates[force->ForceType].push_back(std::move(force));
+				civilization->ai_force_templates[force->force_type].push_back(std::move(force));
 			}
 		} else if (!strcmp(value, "AiBuildingTemplates")) {
 			const int args = lua_rawlen(l, -1);
@@ -1620,19 +1619,19 @@ static int CclDefineFaction(lua_State *l)
 				LuaError(l, "incorrect argument");
 			}
 			
-			faction->ForceTypeWeights.clear();
+			faction->ai_force_type_weights.clear();
 			
 			const int subargs = lua_rawlen(l, -1);
 			for (int j = 0; j < subargs; ++j) {
-				const ForceType force_type = GetForceTypeIdByName(LuaToString(l, -1, j + 1));
+				const wyrmgus::ai_force_type force_type = wyrmgus::string_to_ai_force_type(LuaToString(l, -1, j + 1));
 				++j;
-				faction->ForceTypeWeights[force_type] = LuaToNumber(l, -1, j + 1);
+				faction->ai_force_type_weights[force_type] = LuaToNumber(l, -1, j + 1);
 			}
 		} else if (!strcmp(value, "ForceTemplates")) {
 			const int args = lua_rawlen(l, -1);
 			for (int j = 0; j < args; ++j) {
 				lua_rawgeti(l, -1, j + 1);
-				auto force = std::make_unique<CForceTemplate>();
+				auto force = std::make_unique<wyrmgus::ai_force_template>();
 				if (!lua_istable(l, -1)) {
 					LuaError(l, "incorrect argument (expected table for force templates)");
 				}
@@ -1641,14 +1640,11 @@ static int CclDefineFaction(lua_State *l)
 					value = LuaToString(l, -1, k + 1);
 					++k;
 					if (!strcmp(value, "force-type")) {
-						force->ForceType = GetForceTypeIdByName(LuaToString(l, -1, k + 1));
-						if (force->ForceType == ForceType::None) {
-							LuaError(l, "Force type doesn't exist.");
-						}
+						force->force_type = wyrmgus::string_to_ai_force_type(LuaToString(l, -1, k + 1));
 					} else if (!strcmp(value, "priority")) {
-						force->Priority = LuaToNumber(l, -1, k + 1);
+						force->priority = LuaToNumber(l, -1, k + 1);
 					} else if (!strcmp(value, "weight")) {
-						force->Weight = LuaToNumber(l, -1, k + 1);
+						force->weight = LuaToNumber(l, -1, k + 1);
 					} else if (!strcmp(value, "unit-class")) {
 						const wyrmgus::unit_class *unit_class = wyrmgus::unit_class::get(LuaToString(l, -1, k + 1));
 						++k;
@@ -1659,7 +1655,7 @@ static int CclDefineFaction(lua_State *l)
 						LuaError(l, "Unsupported tag: %s" _C_ value);
 					}
 				}
-				faction->ForceTemplates[force->ForceType].push_back(std::move(force));
+				faction->ai_force_templates[force->force_type].push_back(std::move(force));
 				lua_pop(l, 1);
 			}
 		} else if (!strcmp(value, "AiBuildingTemplates")) {

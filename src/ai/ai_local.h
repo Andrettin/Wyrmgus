@@ -43,7 +43,6 @@ class AiHelper;
 class CUnit;
 class CUpgrade;
 class CPlayer;
-enum class ForceType;
 
 static void InitAiHelper(AiHelper &aiHelper);
 
@@ -53,6 +52,7 @@ namespace wyrmgus {
 	class unit_ref;
 	class unit_type;
 	class upgrade_class;
+	enum class ai_force_type;
 }
 
 /**
@@ -142,7 +142,7 @@ public:
 		return (!Defending && Attacking);
 	}
 
-	ForceType GetForceType() const;
+	wyrmgus::ai_force_type get_force_type() const;
 	bool IsNaval() const;
 	bool IsAirForce() const;
 	bool IsHeroOnlyForce() const;

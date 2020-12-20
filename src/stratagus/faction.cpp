@@ -29,6 +29,8 @@
 
 #include "faction.h"
 
+#include "ai/ai_force_template.h"
+#include "ai/ai_force_type.h"
 #include "character.h"
 #include "civilization.h"
 #include "diplomacy_state.h"
@@ -176,9 +178,9 @@ void faction::initialize()
 		return a->get_priority() > b->get_priority();
 	});
 
-	for (auto &kv_pair : this->ForceTemplates) {
-		std::sort(kv_pair.second.begin(), kv_pair.second.end(), [](const std::unique_ptr<CForceTemplate> &a, const std::unique_ptr<CForceTemplate> &b) {
-			return a->Priority > b->Priority;
+	for (auto &kv_pair : this->ai_force_templates) {
+		std::sort(kv_pair.second.begin(), kv_pair.second.end(), [](const std::unique_ptr<ai_force_template> &a, const std::unique_ptr<ai_force_template> &b) {
+			return a->get_priority() > b->get_priority();
 		});
 	}
 
@@ -222,6 +224,12 @@ void faction::check() const
 
 	if (this->get_type() == faction_type::none) {
 		throw std::runtime_error("Faction \"" + this->get_identifier() + "\" has no type.");
+	}
+
+	for (const auto &kv_pair : this->ai_force_templates) {
+		for (const std::unique_ptr<ai_force_template> &force_template : kv_pair.second) {
+			force_template->check();
+		}
 	}
 
 	if (this->get_preconditions() != nullptr) {
@@ -304,21 +312,22 @@ int faction::GetUpgradePriority(const CUpgrade *upgrade) const
 	return this->civilization->GetUpgradePriority(upgrade);
 }
 
-int faction::GetForceTypeWeight(const ForceType force_type) const
+int faction::get_force_type_weight(const ai_force_type force_type) const
 {
-	if (force_type == ForceType::None) {
-		fprintf(stderr, "Error in faction::GetForceTypeWeight: the force_type is -1.\n");
+	if (force_type == ai_force_type::none) {
+		throw std::runtime_error("Error in faction::get_force_type_weight: the force_type is none.");
 	}
 	
-	if (this->ForceTypeWeights.find(force_type) != this->ForceTypeWeights.end()) {
-		return this->ForceTypeWeights.find(force_type)->second;
+	const auto find_iterator = this->ai_force_type_weights.find(force_type);
+	if (find_iterator != this->ai_force_type_weights.end()) {
+		return find_iterator->second;
 	}
 	
 	if (this->get_parent_faction() != nullptr) {
-		return this->get_parent_faction()->GetForceTypeWeight(force_type);
+		return this->get_parent_faction()->get_force_type_weight(force_type);
 	}
 	
-	return this->civilization->GetForceTypeWeight(force_type);
+	return this->civilization->get_force_type_weight(force_type);
 }
 
 CCurrency *faction::GetCurrency() const
@@ -339,21 +348,22 @@ bool faction::uses_simple_name() const
 	return this->simple_name || this->get_type() != faction_type::polity;
 }
 
-const std::vector<std::unique_ptr<CForceTemplate>> &faction::GetForceTemplates(const ForceType force_type) const
+const std::vector<std::unique_ptr<ai_force_template>> &faction::get_ai_force_templates(const ai_force_type force_type) const
 {
-	if (force_type == ForceType::None) {
-		fprintf(stderr, "Error in faction::GetForceTemplates: the force_type is -1.\n");
+	if (force_type == ai_force_type::none) {
+		throw std::runtime_error("Error in faction::get_ai_force_templates: the force_type is none.");
 	}
 	
-	if (this->ForceTemplates.find(force_type) != this->ForceTemplates.end()) {
-		return this->ForceTemplates.find(force_type)->second;
+	const auto find_iterator = this->ai_force_templates.find(force_type);
+	if (find_iterator != this->ai_force_templates.end()) {
+		return find_iterator->second;
 	}
 	
 	if (this->get_parent_faction() != nullptr) {
-		return this->get_parent_faction()->GetForceTemplates(force_type);
+		return this->get_parent_faction()->get_ai_force_templates(force_type);
 	}
 	
-	return this->civilization->GetForceTemplates(force_type);
+	return this->civilization->get_ai_force_templates(force_type);
 }
 
 const std::vector<std::unique_ptr<CAiBuildingTemplate>> &faction::GetAiBuildingTemplates() const

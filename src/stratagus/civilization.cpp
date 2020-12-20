@@ -29,6 +29,8 @@
 
 #include "civilization.h"
 
+#include "ai/ai_force_template.h"
+#include "ai/ai_force_type.h"
 #include "character.h"
 #include "civilization_group.h"
 #include "database/defines.h"
@@ -126,45 +128,20 @@ void civilization::process_sml_scope(const sml_data &scope)
 			this->ui_fillers.push_back(std::move(filler));
 		});
 	} else if (tag == "force_type_weights") {
-		this->ForceTypeWeights.clear();
+		this->ai_force_type_weights.clear();
 
 		scope.for_each_property([&](const sml_property &property) {
 			const std::string &key = property.get_key();
 			const std::string &value = property.get_value();
 
-			const ForceType force_type = GetForceTypeIdByName(key);
-			this->ForceTypeWeights[force_type] = std::stoi(value);
+			const ai_force_type force_type = string_to_ai_force_type(key);
+			this->ai_force_type_weights[force_type] = std::stoi(value);
 		});
 	} else if (tag == "force_templates") {
 		scope.for_each_child([&](const sml_data &child_scope) {
-			auto force = std::make_unique<CForceTemplate>();
-
-			child_scope.for_each_element([&](const sml_property &property) {
-				if (property.get_key() == "force_type") {
-					force->ForceType = GetForceTypeIdByName(property.get_value());
-				} else if (property.get_key() == "priority") {
-					force->Priority = std::stoi(property.get_value());
-				} else if (property.get_key() == "weight") {
-					force->Weight = std::stoi(property.get_value());
-				} else {
-					throw std::runtime_error("Invalid force template property: " + property.get_key() + ".");
-				}
-			}, [&](const sml_data &grandchild_scope) {
-				if (grandchild_scope.get_tag() == "units") {
-					grandchild_scope.for_each_property([&](const sml_property &property) {
-						const std::string &key = property.get_key();
-						const std::string &value = property.get_value();
-
-						const unit_class *unit_class = unit_class::get(key);
-						const int unit_quantity = std::stoi(value);
-						force->add_unit(unit_class, unit_quantity);
-					});
-				} else {
-					throw std::runtime_error("Invalid force template property: " + grandchild_scope.get_tag() + ".");
-				}
-			});
-
-			this->ForceTemplates[force->ForceType].push_back(std::move(force));
+			auto force_template = std::make_unique<ai_force_template>();
+			database::process_sml_data(force_template, child_scope);
+			this->ai_force_templates[force_template->get_force_type()].push_back(std::move(force_template));
 		});
 	} else if (tag == "ai_building_templates") {
 		scope.for_each_child([&](const sml_data &child_scope) {
@@ -205,9 +182,9 @@ void civilization::initialize()
 		return a->get_priority() > b->get_priority();
 	});
 
-	for (auto &kv_pair : this->ForceTemplates) {
-		std::sort(kv_pair.second.begin(), kv_pair.second.end(), [](const std::unique_ptr<CForceTemplate> &a, const std::unique_ptr<CForceTemplate> &b) {
-			return a->Priority > b->Priority;
+	for (auto &kv_pair : this->ai_force_templates) {
+		std::sort(kv_pair.second.begin(), kv_pair.second.end(), [](const std::unique_ptr<ai_force_template> &a, const std::unique_ptr<ai_force_template> &b) {
+			return a->get_priority() > b->get_priority();
 		});
 	}
 
@@ -380,6 +357,12 @@ void civilization::check() const
 		}
 	}
 
+	for (const auto &kv_pair : this->ai_force_templates) {
+		for (const std::unique_ptr<ai_force_template> &force_template : kv_pair.second) {
+			force_template->check();
+		}
+	}
+
 	data_entry::check();
 }
 
@@ -396,18 +379,19 @@ int civilization::GetUpgradePriority(const CUpgrade *upgrade) const
 	return 100;
 }
 
-int civilization::GetForceTypeWeight(const ForceType force_type) const
+int civilization::get_force_type_weight(const ai_force_type force_type) const
 {
-	if (force_type == ForceType::None) {
-		fprintf(stderr, "Error in civilization::GetForceTypeWeight: the force_type is -1.\n");
+	if (force_type == ai_force_type::none) {
+		throw std::runtime_error("Error in civilization::get_force_type_weight: the force_type is none.");
 	}
 	
-	if (this->ForceTypeWeights.find(force_type) != this->ForceTypeWeights.end()) {
-		return this->ForceTypeWeights.find(force_type)->second;
+	const auto find_iterator = this->ai_force_type_weights.find(force_type);
+	if (find_iterator != this->ai_force_type_weights.end()) {
+		return find_iterator->second;
 	}
 	
-	if (this->parent_civilization) {
-		return this->parent_civilization->GetForceTypeWeight(force_type);
+	if (this->parent_civilization != nullptr) {
+		return this->parent_civilization->get_force_type_weight(force_type);
 	}
 	
 	return 1;
@@ -674,20 +658,21 @@ void civilization::process_character_title_name_scope(const character_title titl
 	});
 }
 
-const std::vector<std::unique_ptr<CForceTemplate>> &civilization::GetForceTemplates(const ForceType force_type) const
+const std::vector<std::unique_ptr<ai_force_template>> &civilization::get_ai_force_templates(const ai_force_type force_type) const
 {
-	static const std::vector<std::unique_ptr<CForceTemplate>> empty_vector;
+	static const std::vector<std::unique_ptr<ai_force_template>> empty_vector;
 
-	if (force_type == ForceType::None) {
-		fprintf(stderr, "Error in civilization::GetForceTemplates: the force_type is -1.\n");
+	if (force_type == ai_force_type::none) {
+		throw std::runtime_error("Error in civilization::get_ai_force_templates: the force_type is none.");
 	}
 	
-	if (this->ForceTemplates.find(force_type) != this->ForceTemplates.end()) {
-		return this->ForceTemplates.find(force_type)->second;
+	const auto find_iterator = this->ai_force_templates.find(force_type);
+	if (find_iterator != this->ai_force_templates.end()) {
+		return find_iterator->second;
 	}
 	
-	if (this->parent_civilization) {
-		return this->parent_civilization->GetForceTemplates(force_type);
+	if (this->parent_civilization != nullptr) {
+		return this->parent_civilization->get_ai_force_templates(force_type);
 	}
 	
 	return empty_vector;

@@ -117,6 +117,7 @@ set(ai_SRCS
 	src/ai/ai_building.cpp
 	src/ai/ai.cpp
 	src/ai/ai_force.cpp
+	src/ai/ai_force_template.cpp
 	src/ai/ai_magic.cpp
 	src/ai/ai_plan.cpp
 	src/ai/ai_resource.cpp
@@ -656,6 +657,12 @@ set(stratagus_action_HDRS
 	src/include/action/action_use.h
 )
 
+set(stratagus_ai_HDRS
+	src/ai/ai_force_template.h
+	src/ai/ai_force_type.h
+	src/ai/ai_local.h
+)
+
 set(stratagus_animation_HDRS
 	src/include/animation/animation_attack.h
 	src/include/animation/animation_die.h
@@ -965,7 +972,6 @@ set(stratagus_xbrz_HDRS
 )
 
 set(stratagus_generic_HDRS
-	src/ai/ai_local.h
 	src/include/actions.h
 	src/include/age.h
 	src/include/ai.h
@@ -1042,6 +1048,7 @@ set(stratagus_generic_HDRS
 
 source_group(stratagus FILES ${stratagus_generic_HDRS})
 source_group(action FILES ${stratagus_action_HDRS})
+source_group(ai FILES ${stratagus_ai_HDRS})
 source_group(animation FILES ${stratagus_animation_HDRS})
 source_group(database FILES ${stratagus_database_HDRS})
 source_group(guichan FILES ${stratagus_guichan_HDRS})
@@ -1070,6 +1077,7 @@ source_group(xbrz FILES ${stratagus_xbrz_HDRS})
 set(stratagus_HDRS
 	${stratagus_generic_HDRS}
 	${stratagus_action_HDRS}
+	${stratagus_ai_HDRS}
 	${stratagus_animation_HDRS}
 	${stratagus_database_HDRS}
 	${stratagus_guichan_HDRS}

@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-//      (c) Copyright 2020 by Andrettin
+//      (c) Copyright 2015-2020 by Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -29,46 +29,31 @@
 
 namespace wyrmgus {
 
-enum class government_type {
-	none,
-	monarchy,
-	republic,
-	theocracy
+enum class ai_force_type {
+	none = -1,
+	land,
+	naval,
+	air,
+	space,
+
+	count
 };
 
-inline government_type string_to_government_type(const std::string &str)
+inline ai_force_type string_to_ai_force_type(const std::string &str)
 {
-	if (str == "none") {
-		return government_type::none;
-	} else if (str == "monarchy") {
-		return government_type::monarchy;
-	} else if (str == "republic") {
-		return government_type::republic;
-	} else if (str == "theocracy") {
-		return government_type::theocracy;
+	if (str == "land") {
+		return ai_force_type::land;
+	} else if (str == "naval") {
+		return ai_force_type::naval;
+	} else if (str == "air") {
+		return ai_force_type::air;
+	} else if (str == "space") {
+		return ai_force_type::space;
 	}
 
-	throw std::runtime_error("Invalid government type: \"" + str + "\".");
-}
-
-inline std::string government_type_to_string(const government_type government_type)
-{
-	switch (government_type) {
-		case government_type::none:
-			return "none";
-		case government_type::monarchy:
-			return "monarchy";
-		case government_type::republic:
-			return "republic";
-		case government_type::theocracy:
-			return "theocracy";
-		default:
-			break;
-	}
-
-	throw std::runtime_error("Invalid government type: \"" + std::to_string(static_cast<int>(government_type)) + "\".");
+	throw std::runtime_error("Invalid AI force type: \"" + str + "\".");
 }
 
 }
 
-Q_DECLARE_METATYPE(wyrmgus::government_type)
+Q_DECLARE_METATYPE(wyrmgus::ai_force_type)

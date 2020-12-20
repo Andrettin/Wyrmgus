@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-//      (c) Copyright 2020 by Andrettin
+//      (c) Copyright 2015-2020 by Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -27,48 +27,61 @@
 
 #pragma once
 
+struct lua_State;
+
+static int CclDefineCivilization(lua_State *l);
+static int CclDefineFaction(lua_State *l);
+
 namespace wyrmgus {
 
-enum class government_type {
-	none,
-	monarchy,
-	republic,
-	theocracy
+class sml_data;
+class sml_property;
+class unit_class;
+enum class ai_force_type;
+
+class ai_force_template final
+{
+public:
+	ai_force_template();
+
+	void process_sml_property(const sml_property &property);
+	void process_sml_scope(const sml_data &scope);
+	void check() const;
+
+	ai_force_type get_force_type() const
+	{
+		return this->force_type;
+	}
+
+	int get_priority() const
+	{
+		return this->priority;
+	}
+
+	int get_weight() const
+	{
+		return this->weight;
+	}
+
+	const std::vector<std::pair<const unit_class *, int>> &get_units() const
+	{
+		return this->units;
+	}
+
+	void add_unit(const unit_class *unit_class, const int quantity)
+	{
+		this->units.push_back(std::pair<const wyrmgus::unit_class *, int>(unit_class, quantity));
+	}
+
+private:
+	ai_force_type force_type;
+	int priority = 100;
+	int weight = 1;
+	std::vector<std::pair<const unit_class *, int>> units;	/// vector containing each unit class belonging to the force template, and the respective quantity
+
+	friend int ::CclDefineCivilization(lua_State *l);
+	friend int ::CclDefineFaction(lua_State *l);
 };
 
-inline government_type string_to_government_type(const std::string &str)
-{
-	if (str == "none") {
-		return government_type::none;
-	} else if (str == "monarchy") {
-		return government_type::monarchy;
-	} else if (str == "republic") {
-		return government_type::republic;
-	} else if (str == "theocracy") {
-		return government_type::theocracy;
-	}
-
-	throw std::runtime_error("Invalid government type: \"" + str + "\".");
-}
-
-inline std::string government_type_to_string(const government_type government_type)
-{
-	switch (government_type) {
-		case government_type::none:
-			return "none";
-		case government_type::monarchy:
-			return "monarchy";
-		case government_type::republic:
-			return "republic";
-		case government_type::theocracy:
-			return "theocracy";
-		default:
-			break;
-	}
-
-	throw std::runtime_error("Invalid government type: \"" + std::to_string(static_cast<int>(government_type)) + "\".");
-}
 
 }
-
-Q_DECLARE_METATYPE(wyrmgus::government_type)
