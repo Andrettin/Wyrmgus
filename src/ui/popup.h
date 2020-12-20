@@ -66,7 +66,7 @@ public:
 	//Wyrmgus end
 	ButtonCmd ButtonAction = ButtonCmd::None;	/// action type of button
 	//Wyrmgus start
-	UnitTypeType UnitTypeType = UnitTypeType::None;	/// unit type type (i.e. land, fly, etc.) of the button's unit type
+	::UnitTypeType UnitTypeType = UnitTypeType::None;	/// unit type type (i.e. land, fly, etc.) of the button's unit type
 	const wyrmgus::unit_class *unit_class = nullptr; /// unit type class of the button's unit type
 	wyrmgus::item_class item_class;				/// item class of the button's item
 	int CanStore = -1;			/// whether the button's unit type can store a particular resource
