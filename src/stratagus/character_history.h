@@ -44,10 +44,10 @@ class character_history final : public data_entry_history
 	Q_OBJECT
 
 	Q_PROPERTY(bool active MEMBER active READ is_active)
-	Q_PROPERTY(wyrmgus::faction *faction MEMBER faction)
+	Q_PROPERTY(wyrmgus::faction* faction MEMBER faction)
 
 public:
-	explicit character_history(faction *default_faction, const site *default_location_site);
+	explicit character_history(wyrmgus::faction *default_faction, const site *default_location_site);
 	~character_history();
 
 	virtual void process_sml_property(const sml_property &property) override;
@@ -58,7 +58,7 @@ public:
 		return this->active;
 	}
 
-	const faction *get_faction() const
+	const wyrmgus::faction *get_faction() const
 	{
 		return this->faction;
 	}
@@ -70,7 +70,7 @@ public:
 
 private:
 	bool active = false; //whether the character is active, i.e. should be applied to the map
-	faction *faction = nullptr;
+	wyrmgus::faction *faction = nullptr;
 	std::unique_ptr<historical_location> location; //the character's location
 };
 

@@ -56,7 +56,7 @@ class faction_history final : public data_entry_history
 	Q_PROPERTY(QVariantList acquired_upgrades READ get_acquired_upgrades_qstring_list)
 
 public:
-	explicit faction_history(const faction_tier default_tier, const government_type default_government_type, site *default_capital)
+	explicit faction_history(const faction_tier default_tier, const wyrmgus::government_type default_government_type, site *default_capital)
 		: tier(default_tier), government_type(default_government_type), capital(default_capital)
 	{
 	}
@@ -68,7 +68,7 @@ public:
 		return this->tier;
 	}
 
-	government_type get_government_type() const
+	wyrmgus::government_type get_government_type() const
 	{
 		return this->government_type;
 	}
@@ -78,7 +78,7 @@ public:
 		return this->capital;
 	}
 
-	const dynasty *get_dynasty() const
+	const wyrmgus::dynasty *get_dynasty() const
 	{
 		return this->dynasty;
 	}
@@ -109,7 +109,7 @@ public:
 
 private:
 	faction_tier tier;
-	government_type government_type;
+	wyrmgus::government_type government_type;
 	site *capital = nullptr;
 	wyrmgus::dynasty *dynasty = nullptr;
 	std::map<const resource *, int> resources;

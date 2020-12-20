@@ -1351,14 +1351,14 @@ void unit_type::set_unit_class(wyrmgus::unit_class *unit_class)
 		return;
 	}
 
-	if (this->get_unit_class() != nullptr) {
-		this->get_unit_class()->remove_unit_type(this);
+	if (this->unit_class != nullptr) {
+		this->unit_class->remove_unit_type(this);
 	}
 
 	this->unit_class = unit_class;
 
-	if (this->get_unit_class() != nullptr && !this->get_unit_class()->has_unit_type(this)) {
-		this->get_unit_class()->add_unit_type(this);
+	if (this->unit_class != nullptr && !this->unit_class->has_unit_type(this)) {
+		this->unit_class->add_unit_type(this);
 	}
 }
 
@@ -1491,7 +1491,7 @@ void unit_type::set_parent(const unit_type *parent_type)
 	if (this->get_name().empty()) {
 		this->set_name(parent_type->get_name());
 	}
-	this->set_unit_class(parent_type->get_unit_class());
+	this->set_unit_class(parent_type->unit_class);
 	this->draw_level = parent_type->draw_level;
 	this->image_file = parent_type->image_file;
 	this->frame_size = parent_type->frame_size;

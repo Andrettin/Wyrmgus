@@ -85,12 +85,12 @@ public:
 		return this->index;
 	}
 
-	const icon *get_icon() const
+	const wyrmgus::icon *get_icon() const
 	{
 		return this->icon;
 	}
 
-	const player_color *get_player_color() const
+	const wyrmgus::player_color *get_player_color() const
 	{
 		return this->player_color;
 	}
@@ -182,7 +182,7 @@ private:
 	std::string rewards_string;		/// Description of the quest's rewards
 	std::string hint;				/// Quest hint
 public:
-	civilization *civilization = nullptr; //the civilization to which the quest belongs
+	wyrmgus::civilization *civilization = nullptr; //the civilization to which the quest belongs
 	int HighestCompletedDifficulty = -1;
 	bool Hidden = false;				/// Whether the quest is hidden
 private:

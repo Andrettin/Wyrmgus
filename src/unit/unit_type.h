@@ -56,6 +56,7 @@ static int CclDefineUnitType(lua_State *l);
 namespace wyrmgus {
 	class animation_set;
 	class button_level;
+	class civilization;
 	class condition;
 	class construction;
 	class faction;
@@ -113,12 +114,12 @@ namespace wyrmgus {
 class resource_info final
 {
 public:
-	explicit resource_info(const unit_type *unit_type, const resource *resource)
+	explicit resource_info(const wyrmgus::unit_type *unit_type, const wyrmgus::resource *resource)
 		: unit_type(unit_type), resource(resource)
 	{
 	}
 
-	std::unique_ptr<resource_info> duplicate(const unit_type *unit_type) const
+	std::unique_ptr<resource_info> duplicate(const wyrmgus::unit_type *unit_type) const
 	{
 		auto duplicate = std::make_unique<resource_info>(unit_type, this->get_resource());
 
@@ -136,12 +137,12 @@ public:
 	void process_sml_property(const sml_property &property);
 	void process_sml_scope(const sml_data &scope);
 
-	const unit_type *get_unit_type() const
+	const wyrmgus::unit_type *get_unit_type() const
 	{
 		return this->unit_type;
 	}
 
-	const resource *get_resource() const
+	const wyrmgus::resource *get_resource() const
 	{
 		return this->resource;
 	}
@@ -157,8 +158,8 @@ public:
 	}
 
 private:
-	const unit_type *unit_type = nullptr; //the unit type to which the resource info belongs
-	const resource *resource = nullptr;        /// the resource harvested. Redundant.
+	const wyrmgus::unit_type *unit_type = nullptr; //the unit type to which the resource info belongs
+	const wyrmgus::resource *resource = nullptr;        /// the resource harvested. Redundant.
 	std::filesystem::path image_file;      /// Change the graphic when the unit is empty.
 	std::filesystem::path loaded_image_file;     /// Change the graphic when the unit is loaded.
 public:
@@ -761,7 +762,7 @@ class unit_type final : public detailed_data_entry, public data_type<unit_type>,
 {
 	Q_OBJECT
 
-	Q_PROPERTY(wyrmgus::unit_class* unit_class READ get_unit_class WRITE set_unit_class)
+	Q_PROPERTY(wyrmgus::unit_class* unit_class MEMBER unit_class WRITE set_unit_class)
 	Q_PROPERTY(bool template MEMBER template_type READ is_template)
 	Q_PROPERTY(wyrmgus::civilization* civilization MEMBER civilization)
 	Q_PROPERTY(wyrmgus::animation_set* animation_set MEMBER animation_set)
@@ -802,25 +803,25 @@ public:
 		return this->Slot;
 	}
 	
-	unit_class *get_unit_class() const
+	const wyrmgus::unit_class *get_unit_class() const
 	{
 		return this->unit_class;
 	}
 
-	void set_unit_class(unit_class *unit_class);
+	void set_unit_class(wyrmgus::unit_class *unit_class);
 
 	bool is_template() const
 	{
 		return this->template_type;
 	}
 
-	const civilization *get_civilization() const
+	const wyrmgus::civilization *get_civilization() const
 	{
 		return this->civilization;
 	}
 
-	const civilization *get_faction_civilization(const wyrmgus::faction *faction) const;
-	const civilization *get_player_civilization(const CPlayer *player) const;
+	const wyrmgus::civilization *get_faction_civilization(const wyrmgus::faction *faction) const;
+	const wyrmgus::civilization *get_player_civilization(const CPlayer *player) const;
 
 	const faction *get_faction() const;
 
@@ -954,12 +955,12 @@ public:
 	const std::vector<std::string> &get_potential_personal_names(const faction *faction, const gender gender) const;
 	//Wyrmgus end
 
-	item_class get_item_class() const
+	wyrmgus::item_class get_item_class() const
 	{
 		return this->item_class;
 	}
 
-	species *get_species() const
+	wyrmgus::species *get_species() const
 	{
 		return this->species;
 	}

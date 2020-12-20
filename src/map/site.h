@@ -59,7 +59,7 @@ class site final : public named_data_entry, public data_type<site>, public CData
 	Q_OBJECT
 
 	Q_PROPERTY(bool major MEMBER major READ is_major)
-	Q_PROPERTY(wyrmgus::map_template* map_template MEMBER map_template READ get_map_template)
+	Q_PROPERTY(wyrmgus::map_template* map_template MEMBER map_template)
 	Q_PROPERTY(QPoint pos MEMBER pos READ get_pos)
 	Q_PROPERTY(wyrmgus::site* pos_reference_site MEMBER pos_reference_site)
 	Q_PROPERTY(QGeoCoordinate geocoordinate MEMBER geocoordinate READ get_geocoordinate)
@@ -136,7 +136,7 @@ public:
 		return this->major;
 	}
 
-	map_template *get_map_template() const
+	const wyrmgus::map_template *get_map_template() const
 	{
 		return this->map_template;
 	}

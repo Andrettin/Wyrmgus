@@ -876,7 +876,7 @@ void map_template::apply(const QPoint &template_start_pos, const QPoint &map_sta
 	}
 	
 	if (current_campaign) {
-		faction *current_faction = current_campaign->get_faction();
+		const faction *current_faction = current_campaign->get_faction();
 		if (current_faction != nullptr && !this->IsSubtemplateArea() && CPlayer::GetThisPlayer()->Faction != current_faction->ID) {
 			CPlayer::GetThisPlayer()->set_civilization(current_faction->get_civilization());
 			CPlayer::GetThisPlayer()->SetFaction(current_faction);

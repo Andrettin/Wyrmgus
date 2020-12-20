@@ -57,7 +57,7 @@ public:
 		return this->active;
 	}
 
-	const faction *get_faction() const
+	const wyrmgus::faction *get_faction() const
 	{
 		return this->faction;
 	}

@@ -298,7 +298,7 @@ public:
 		return this->hidden;
 	}
 
-	const resource *get_resource() const
+	const wyrmgus::resource *get_resource() const
 	{
 		return this->resource;
 	}
@@ -412,7 +412,7 @@ public:
 	int ID = -1;
 	int SolidAnimationFrames = 0;
 private:
-	resource *resource = nullptr;
+	wyrmgus::resource *resource = nullptr;
 public:
 	unsigned long Flags = 0;
 private:

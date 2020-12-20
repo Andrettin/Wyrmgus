@@ -43,7 +43,7 @@ class dynasty final : public detailed_data_entry, public data_type<dynasty>
 	Q_OBJECT
 
 	Q_PROPERTY(CUpgrade* upgrade READ get_upgrade WRITE set_upgrade)
-	Q_PROPERTY(wyrmgus::icon* icon MEMBER icon READ get_icon)
+	Q_PROPERTY(wyrmgus::icon* icon MEMBER icon)
 	Q_PROPERTY(QVariantList factions READ get_factions_qvariant_list)
 
 public:
@@ -75,7 +75,7 @@ public:
 
 	void set_upgrade(CUpgrade *upgrade);
 
-	icon *get_icon() const
+	wyrmgus::icon *get_icon() const
 	{
 		return this->icon;
 	}
@@ -103,7 +103,7 @@ public:
 private:
 	int index = -1;
 	CUpgrade *upgrade = nullptr; //dynasty upgrade applied when the dynasty is set
-	icon *icon = nullptr;
+	wyrmgus::icon *icon = nullptr;
 	std::vector<faction *> factions; //to which factions is this dynasty available
 	std::unique_ptr<condition> preconditions;
 	std::unique_ptr<condition> conditions;

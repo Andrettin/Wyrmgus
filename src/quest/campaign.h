@@ -54,9 +54,9 @@ class campaign final : public detailed_data_entry, public data_type<campaign>, p
 
 	Q_PROPERTY(QDateTime start_date MEMBER start_date READ get_start_date)
 	Q_PROPERTY(wyrmgus::calendar* start_date_calendar MEMBER start_date_calendar)
-	Q_PROPERTY(wyrmgus::timeline* timeline MEMBER timeline READ get_timeline)
-	Q_PROPERTY(wyrmgus::faction* faction MEMBER faction READ get_faction)
-	Q_PROPERTY(wyrmgus::quest* quest MEMBER quest READ get_quest)
+	Q_PROPERTY(wyrmgus::timeline* timeline MEMBER timeline)
+	Q_PROPERTY(wyrmgus::faction* faction MEMBER faction)
+	Q_PROPERTY(wyrmgus::quest* quest MEMBER quest)
 	Q_PROPERTY(QVariantList map_templates READ get_map_templates_qvariant_list)
 	Q_PROPERTY(bool hidden MEMBER hidden READ is_hidden)
 
@@ -80,17 +80,17 @@ public:
 		return this->start_date;
 	}
 
-	timeline *get_timeline() const
+	const wyrmgus::timeline *get_timeline() const
 	{
 		return this->timeline;
 	}
 	
-	faction *get_faction() const
+	const wyrmgus::faction *get_faction() const
 	{
 		return this->faction;
 	}
 
-	quest *get_quest() const
+	wyrmgus::quest *get_quest() const
 	{
 		return this->quest;
 	}
@@ -104,9 +104,9 @@ public:
 
 	bool IsAvailable() const;
 
-	bool contains_timeline_date(const timeline *timeline, const QDateTime &date) const;
+	bool contains_timeline_date(const wyrmgus::timeline *timeline, const QDateTime &date) const;
 
-	const std::vector<quest *> &get_required_quests() const
+	const std::vector<wyrmgus::quest *> &get_required_quests() const
 	{
 		return this->required_quests;
 	}
@@ -128,12 +128,12 @@ public:
 private:
 	QDateTime start_date; //the starting date for the campaign
 	calendar *start_date_calendar = nullptr; //the calendar for the start date
-	timeline *timeline = nullptr; //the timeline in which the campaign is set
+	wyrmgus::timeline *timeline = nullptr; //the timeline in which the campaign is set
 	bool hidden = false; //whether the campaign is hidden
 	bool Sandbox = false;			/// Whether the campaign is a sandbox one
-	std::vector<quest *> required_quests;		/// Quests required by the campaign
-	faction *faction = nullptr;	//which faction the player plays as in the campaign
-	quest *quest = nullptr; //the quest which is acquired when the campaign starts, and which when completed means that the campaign has been completed as well
+	std::vector<wyrmgus::quest *> required_quests;		/// Quests required by the campaign
+	wyrmgus::faction *faction = nullptr;	//which faction the player plays as in the campaign
+	wyrmgus::quest *quest = nullptr; //the quest which is acquired when the campaign starts, and which when completed means that the campaign has been completed as well
 	std::vector<map_template *> map_templates; //map templates used by the campaign
 public:
 	std::vector<Vec2i> MapSizes;				/// Map sizes

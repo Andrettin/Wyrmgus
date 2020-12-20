@@ -65,10 +65,10 @@ class faction final : public detailed_data_entry, public data_type<faction>
 {
 	Q_OBJECT
 
-	Q_PROPERTY(wyrmgus::civilization* civilization MEMBER civilization READ get_civilization)
+	Q_PROPERTY(wyrmgus::civilization* civilization MEMBER civilization)
 	Q_PROPERTY(wyrmgus::faction_type type MEMBER type READ get_type)
 	Q_PROPERTY(wyrmgus::faction* parent_faction MEMBER parent_faction)
-	Q_PROPERTY(wyrmgus::icon* icon MEMBER icon READ get_icon)
+	Q_PROPERTY(wyrmgus::icon* icon MEMBER icon)
 	Q_PROPERTY(wyrmgus::player_color* color MEMBER color READ get_color)
 	Q_PROPERTY(wyrmgus::faction_tier default_tier MEMBER default_tier READ get_default_tier)
 	Q_PROPERTY(wyrmgus::faction_tier min_tier MEMBER min_tier READ get_min_tier)
@@ -117,7 +117,7 @@ public:
 
 	virtual void reset_history() override;
 
-	civilization *get_civilization() const
+	wyrmgus::civilization *get_civilization() const
 	{
 		return this->civilization;
 	}
@@ -132,7 +132,7 @@ public:
 		return this->parent_faction;
 	}
 
-	icon *get_icon() const
+	const wyrmgus::icon *get_icon() const
 	{
 		return this->icon;
 	}
@@ -326,7 +326,7 @@ private:
 public:
 	bool Playable = true;												/// faction playability
 private:
-	icon *icon = nullptr;
+	wyrmgus::icon *icon = nullptr;
 public:
 	CCurrency *Currency = nullptr;										/// The faction's currency
 private:

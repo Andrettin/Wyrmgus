@@ -114,12 +114,12 @@ public:
 		return this->asexual;
 	}
 
-	const unit_type *get_unit_type() const
+	const wyrmgus::unit_type *get_unit_type() const
 	{
 		return this->unit_type;
 	}
 
-	void set_unit_type(const unit_type *unit_type)
+	void set_unit_type(const wyrmgus::unit_type *unit_type)
 	{
 		this->unit_type = unit_type;
 	}
@@ -149,7 +149,7 @@ private:
 	world *homeworld = nullptr;
 	bool sapient = false;
 	bool asexual = false;
-	const unit_type *unit_type = nullptr;
+	const wyrmgus::unit_type *unit_type = nullptr;
 	std::vector<const terrain_type *> native_terrain_types; //in which terrains does this species live
 	std::vector<const species *> pre_evolutions; //species from which this one can evolve
 	std::vector<const species *> evolutions; //species to which this one can evolve

@@ -46,7 +46,7 @@ class cursor final : public data_entry, public data_type<cursor>
 	Q_OBJECT
 
 	Q_PROPERTY(wyrmgus::cursor_type type MEMBER type READ get_type)
-	Q_PROPERTY(wyrmgus::civilization* civilization MEMBER civilization READ get_civilization)
+	Q_PROPERTY(wyrmgus::civilization* civilization MEMBER civilization)
 	Q_PROPERTY(QString file READ get_file_qstring)
 	Q_PROPERTY(QPoint hot_pos MEMBER hot_pos READ get_hot_pos)
 	Q_PROPERTY(QSize frame_size MEMBER frame_size READ get_frame_size)
@@ -91,7 +91,7 @@ public:
 		return this->type;
 	}
 
-	civilization *get_civilization() const
+	const wyrmgus::civilization *get_civilization() const
 	{
 		return this->civilization;
 	}

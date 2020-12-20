@@ -94,8 +94,8 @@ void cursor::initialize()
 	this->graphics = CGraphic::New(this->get_file().string(), this->get_frame_size());
 	this->graphics->Load(false, wyrmgus::defines::get()->get_scale_factor());
 
-	if (this->get_civilization() != nullptr) {
-		this->get_civilization()->set_cursor(this->get_type(), this);
+	if (this->civilization != nullptr) {
+		this->civilization->set_cursor(this->get_type(), this);
 	} else {
 		cursor::map_cursor(this->get_type(), this);
 	}

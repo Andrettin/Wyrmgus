@@ -107,7 +107,7 @@ public:
 
 	void set_color(const QColor &color);
 
-	const terrain_type *get_terrain_type() const
+	const wyrmgus::terrain_type *get_terrain_type() const
 	{
 		return this->terrain_type;
 	}

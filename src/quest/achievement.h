@@ -46,8 +46,8 @@ class achievement final : public named_data_entry, public data_type<achievement>
 {
 	Q_OBJECT
 
-	Q_PROPERTY(wyrmgus::icon* icon MEMBER icon READ get_icon)
-	Q_PROPERTY(wyrmgus::player_color* player_color MEMBER player_color READ get_player_color)
+	Q_PROPERTY(wyrmgus::icon* icon MEMBER icon)
+	Q_PROPERTY(wyrmgus::player_color* player_color MEMBER player_color)
 	Q_PROPERTY(bool hidden MEMBER hidden READ is_hidden)
 	Q_PROPERTY(bool unobtainable MEMBER unobtainable)
 	Q_PROPERTY(wyrmgus::character* character MEMBER character)
@@ -74,7 +74,7 @@ public:
 		}
 	}
 
-	icon *get_icon() const
+	const wyrmgus::icon *get_icon() const
 	{
 		return this->icon;
 	}
@@ -84,7 +84,7 @@ public:
 		return this->description;
 	}
 
-	player_color *get_player_color() const
+	const wyrmgus::player_color *get_player_color() const
 	{
 		return this->player_color;
 	}
