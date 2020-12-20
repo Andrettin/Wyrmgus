@@ -76,7 +76,7 @@ public:
 	}
 
 private:
-	const upgrade_class *upgrade_class = nullptr;
+	const wyrmgus::upgrade_class *upgrade_class = nullptr;
 };
 
 }

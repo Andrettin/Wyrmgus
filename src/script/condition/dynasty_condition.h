@@ -55,7 +55,7 @@ public:
 	}
 
 private:
-	const dynasty *dynasty = nullptr;
+	const wyrmgus::dynasty *dynasty = nullptr;
 };
 
 }

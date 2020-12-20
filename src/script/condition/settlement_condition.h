@@ -88,7 +88,7 @@ public:
 
 private:
 	const site *settlement = nullptr;
-	const faction *faction = nullptr;
+	const wyrmgus::faction *faction = nullptr;
 	bool enemy = false;
 };
 
