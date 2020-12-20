@@ -39,7 +39,7 @@
 --  Random
 ----------------------------------------------------------------------------*/
 
-extern int SyncRand(int max);           /// Syncron rand
+extern int SyncRand(const int max);           /// Syncron rand
 
 ///  rand only used on this computer.
 extern int MyRand();
@@ -48,10 +48,55 @@ extern int MyRand();
 --  Math
 ----------------------------------------------------------------------------*/
 
-/// Compute a square root using ints
-extern constexpr long isqrt(long num);
+/**
+**  Compute a square root using ints
+**
+**  Uses John Halleck's method, see
+**  http://www.cc.utah.edu/~nahaj/factoring/isqrt.legalize.c.html
+**
+**  @param num  Calculate the square root of this number
+**
+**  @return     The integer square root.
+*/
+inline constexpr long isqrt(const long num)
+{
+	long squaredbit = 0;
+	long remainder = 0;
+	long root = 0;
 
-inline int square(int v)
+	if (num < 1) {
+		return 0;
+	}
+
+	//
+	//  Load the binary constant 01 00 00 ... 00, where the number
+	//  of zero bits to the right of the single one bit
+	//  is even, and the one bit is as far left as is consistent
+	//  with that condition.)
+	//
+	//  This portable load replaces the loop that used to be
+	//  here, and was donated by  legalize@xmission.com
+	//
+	squaredbit = (long) ((((unsigned long) ~0L) >> 1) & ~(((unsigned long) ~0L) >> 2));
+
+	// Form bits of the answer.
+	remainder = num;
+	root = 0;
+	while (squaredbit > 0) {
+		if (remainder >= (squaredbit | root)) {
+			remainder -= (squaredbit | root);
+			root >>= 1;
+			root |= squaredbit;
+		} else {
+			root >>= 1;
+		}
+		squaredbit >>= 2;
+	}
+
+	return root;
+}
+
+inline int square(const int v)
 {
 	return v * v;
 }
