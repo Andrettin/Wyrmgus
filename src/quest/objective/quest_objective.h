@@ -81,7 +81,7 @@ public:
 
 	virtual objective_type get_objective_type() const = 0;
 
-	const quest *get_quest() const
+	const wyrmgus::quest *get_quest() const
 	{
 		return this->quest;
 	}
@@ -173,7 +173,7 @@ public:
 		return this->settlement;
 	}
 
-	const faction *get_faction() const
+	const wyrmgus::faction *get_faction() const
 	{
 		return this->faction;
 	}
