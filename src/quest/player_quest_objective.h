@@ -38,12 +38,12 @@ class resource;
 class player_quest_objective final
 {
 public:
-	explicit player_quest_objective(const quest_objective *quest_objective, const CPlayer *player)
+	explicit player_quest_objective(const wyrmgus::quest_objective *quest_objective, const CPlayer *player)
 		: quest_objective(quest_objective), player(player)
 	{
 	}
 
-	const quest_objective *get_quest_objective() const
+	const wyrmgus::quest_objective *get_quest_objective() const
 	{
 		return this->quest_objective;
 	}
@@ -76,7 +76,7 @@ public:
 	void on_resource_gathered(const resource *resource, const int quantity);
 
 private:
-	const quest_objective *quest_objective = nullptr;
+	const wyrmgus::quest_objective *quest_objective = nullptr;
 	const CPlayer *player = nullptr;
 	int counter = 0;
 };
