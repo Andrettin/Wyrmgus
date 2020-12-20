@@ -1930,13 +1930,13 @@ bool CPlayer::can_found_faction(const wyrmgus::faction *faction) const
 	}
 	
 	const CUpgrade *faction_type_upgrade = wyrmgus::defines::get()->get_faction_type_upgrade(faction->get_type());
-	if (faction_type_upgrade != nullptr && !check_conditions<preconditions_only>(faction_type_upgrade, this, false)) {
+	if (faction_type_upgrade != nullptr && !wyrmgus::check_conditions<preconditions_only>(faction_type_upgrade, this, false)) {
 		return false;
 	}
 
 	if (!faction->FactionUpgrade.empty()) {
 		const CUpgrade *faction_upgrade = CUpgrade::get(faction->FactionUpgrade);
-		if (!check_conditions<preconditions_only>(faction_upgrade, this, false)) {
+		if (!wyrmgus::check_conditions<preconditions_only>(faction_upgrade, this, false)) {
 			return false;
 		}
 	}
@@ -1986,11 +1986,11 @@ bool CPlayer::can_choose_dynasty(const wyrmgus::dynasty *dynasty) const
 		return false;
 	}
 
-	if (!check_conditions<preconditions_only>(dynasty->get_upgrade(), this, false)) {
+	if (!wyrmgus::check_conditions<preconditions_only>(dynasty->get_upgrade(), this, false)) {
 		return false;
 	}
 
-	return check_conditions<preconditions_only>(dynasty, this, false);
+	return wyrmgus::check_conditions<preconditions_only>(dynasty, this, false);
 }
 
 template bool CPlayer::can_choose_dynasty<false>(const wyrmgus::dynasty *dynasty) const;
