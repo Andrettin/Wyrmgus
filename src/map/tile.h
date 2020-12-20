@@ -239,12 +239,12 @@ public:
 
 	bool IsSeenTileCorrect() const;
 	
-	const terrain_feature *get_terrain_feature() const
+	const wyrmgus::terrain_feature *get_terrain_feature() const
 	{
 		return this->terrain_feature;
 	}
 
-	void set_terrain_feature(const terrain_feature *terrain_feature)
+	void set_terrain_feature(const wyrmgus::terrain_feature *terrain_feature)
 	{
 		this->terrain_feature = terrain_feature;
 	}
