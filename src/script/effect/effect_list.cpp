@@ -25,8 +25,6 @@
 //      02111-1307, USA.
 //
 
-#pragma once
-
 #include "script/effect/effect_list.h"
 
 #include "database/sml_data.h"
