@@ -42,7 +42,7 @@ std::vector<QVariantList> parse_folder(const std::filesystem::path &path)
 			continue;
 		}
 
-		std::ifstream ifstream(dir_entry);
+		std::ifstream ifstream(dir_entry.path());
 
 		if (!ifstream) {
 			throw std::runtime_error("Failed to open file: " + dir_entry.path().string());
