@@ -103,7 +103,7 @@ class map_template final : public named_data_entry, public data_type<map_templat
 	Q_PROPERTY(QGeoCoordinate min_subtemplate_geocoordinate MEMBER min_subtemplate_geocoordinate)
 	Q_PROPERTY(QGeoCoordinate max_subtemplate_geocoordinate MEMBER max_subtemplate_geocoordinate)
 	Q_PROPERTY(wyrmgus::plane* plane MEMBER plane)
-	Q_PROPERTY(wyrmgus::world* world WRITE set_world)
+	Q_PROPERTY(wyrmgus::world* world MEMBER world WRITE set_world)
 	Q_PROPERTY(wyrmgus::map_template* main_template READ get_main_template WRITE set_main_template)
 	Q_PROPERTY(QString terrain_file READ get_terrain_file_qstring)
 	Q_PROPERTY(QString overlay_terrain_file READ get_overlay_terrain_file_qstring)
