@@ -1093,7 +1093,7 @@ void CUnit::apply_character_properties()
 
 bool CUnit::CheckTerrainForVariation(const wyrmgus::unit_type_variation *variation) const
 {
-	//if the variation has one or more terrain set as a precondition, then all tiles underneath the unit must match at least one of those terrains
+	//if the variation has one or more terrain types set as a precondition, then all tiles underneath the unit must match at least one of those terrains
 	if (variation->Terrains.size() > 0) {
 		if (!CMap::Map.Info.IsPointOnMap(this->tilePos, this->MapLayer)) {
 			return false;
@@ -1148,6 +1148,102 @@ bool CUnit::CheckSeasonForVariation(const wyrmgus::unit_type_variation *variatio
 	return true;
 }
 
+bool CUnit::can_have_variation(const wyrmgus::unit_type_variation *variation) const
+{
+	if (variation->ResourceMin && this->ResourcesHeld < variation->ResourceMin) {
+		return false;
+	}
+	if (variation->ResourceMax && this->ResourcesHeld > variation->ResourceMax) {
+		return false;
+	}
+
+	if (!this->CheckSeasonForVariation(variation)) {
+		return false;
+	}
+
+	if (!this->CheckTerrainForVariation(variation)) {
+		return false;
+	}
+
+	bool upgrades_check = true;
+	bool requires_weapon = false;
+	bool found_weapon = false;
+	bool requires_shield = false;
+	bool found_shield = false;
+	for (const CUpgrade *required_upgrade : variation->UpgradesRequired) {
+		if (required_upgrade->is_weapon()) {
+			requires_weapon = true;
+			if (UpgradeIdentAllowed(*this->Player, required_upgrade->get_identifier().c_str()) == 'R' || this->GetIndividualUpgrade(required_upgrade)) {
+				found_weapon = true;
+			}
+		} else if (required_upgrade->is_shield()) {
+			requires_shield = true;
+			if (UpgradeIdentAllowed(*this->Player, required_upgrade->get_identifier().c_str()) == 'R' || this->GetIndividualUpgrade(required_upgrade)) {
+				found_shield = true;
+			}
+		} else if (UpgradeIdentAllowed(*this->Player, required_upgrade->get_identifier().c_str()) != 'R' && this->GetIndividualUpgrade(required_upgrade) == false) {
+			upgrades_check = false;
+			break;
+		}
+	}
+
+	if (upgrades_check) {
+		for (const CUpgrade *forbidden_upgrade : variation->UpgradesForbidden) {
+			if (UpgradeIdentAllowed(*this->Player, forbidden_upgrade->get_identifier().c_str()) == 'R' || this->GetIndividualUpgrade(forbidden_upgrade)) {
+				upgrades_check = false;
+				break;
+			}
+		}
+	}
+
+	for (const wyrmgus::item_class item_class_not_equipped : variation->item_classes_not_equipped) {
+		if (this->is_item_class_equipped(item_class_not_equipped)) {
+			upgrades_check = false;
+			break;
+		}
+	}
+	for (size_t j = 0; j < variation->ItemsNotEquipped.size(); ++j) {
+		if (this->IsItemTypeEquipped(variation->ItemsNotEquipped[j])) {
+			upgrades_check = false;
+			break;
+		}
+	}
+	if (upgrades_check == false) {
+		return false;
+	}
+	for (const wyrmgus::item_class item_class_equipped : variation->item_classes_equipped) {
+		if (wyrmgus::get_item_class_slot(item_class_equipped) == wyrmgus::item_slot::weapon) {
+			requires_weapon = true;
+			if (is_item_class_equipped(item_class_equipped)) {
+				found_weapon = true;
+			}
+		} else if (wyrmgus::get_item_class_slot(item_class_equipped) == wyrmgus::item_slot::shield) {
+			requires_shield = true;
+			if (is_item_class_equipped(item_class_equipped)) {
+				found_shield = true;
+			}
+		}
+	}
+	for (const wyrmgus::unit_type *item_type_equipped : variation->ItemsEquipped) {
+		if (wyrmgus::get_item_class_slot(item_type_equipped->get_item_class()) == wyrmgus::item_slot::weapon) {
+			requires_weapon = true;
+			if (this->IsItemTypeEquipped(item_type_equipped)) {
+				found_weapon = true;
+			}
+		} else if (wyrmgus::get_item_class_slot(item_type_equipped->get_item_class()) == wyrmgus::item_slot::shield) {
+			requires_shield = true;
+			if (this->IsItemTypeEquipped(item_type_equipped)) {
+				found_shield = true;
+			}
+		}
+	}
+	if ((requires_weapon && !found_weapon) || (requires_shield && !found_shield)) {
+		return false;
+	}
+
+	return true;
+}
+
 void CUnit::ChooseVariation(const wyrmgus::unit_type *new_type, bool ignore_old_variation, int image_layer)
 {
 	std::string priority_variation;
@@ -1170,96 +1266,10 @@ void CUnit::ChooseVariation(const wyrmgus::unit_type *new_type, bool ignore_old_
 	
 	bool found_similar = false;
 	for (const auto &variation : variation_list) {
-		if (variation->ResourceMin && this->ResourcesHeld < variation->ResourceMin) {
+		if (!this->can_have_variation(variation.get())) {
 			continue;
 		}
-		if (variation->ResourceMax && this->ResourcesHeld > variation->ResourceMax) {
-			continue;
-		}
-		
-		if (!this->CheckSeasonForVariation(variation.get())) {
-			continue;
-		}
-		
-		if (!this->CheckTerrainForVariation(variation.get())) {
-			continue;
-		}
-		
-		bool upgrades_check = true;
-		bool requires_weapon = false;
-		bool found_weapon = false;
-		bool requires_shield = false;
-		bool found_shield = false;
-		for (const CUpgrade *required_upgrade : variation->UpgradesRequired) {
-			if (required_upgrade->is_weapon()) {
-				requires_weapon = true;
-				if (UpgradeIdentAllowed(*this->Player, required_upgrade->get_identifier().c_str()) == 'R' || this->GetIndividualUpgrade(required_upgrade)) {
-					found_weapon = true;
-				}
-			} else if (required_upgrade->is_shield()) {
-				requires_shield = true;
-				if (UpgradeIdentAllowed(*this->Player, required_upgrade->get_identifier().c_str()) == 'R' || this->GetIndividualUpgrade(required_upgrade)) {
-					found_shield = true;
-				}
-			} else if (UpgradeIdentAllowed(*this->Player, required_upgrade->get_identifier().c_str()) != 'R' && this->GetIndividualUpgrade(required_upgrade) == false) {
-				upgrades_check = false;
-				break;
-			}
-		}
-		
-		if (upgrades_check) {
-			for (const CUpgrade *forbidden_upgrade : variation->UpgradesForbidden) {
-				if (UpgradeIdentAllowed(*this->Player, forbidden_upgrade->get_identifier().c_str()) == 'R' || this->GetIndividualUpgrade(forbidden_upgrade)) {
-					upgrades_check = false;
-					break;
-				}
-			}
-		}
-		
-		for (const wyrmgus::item_class item_class_not_equipped : variation->item_classes_not_equipped) {
-			if (this->is_item_class_equipped(item_class_not_equipped)) {
-				upgrades_check = false;
-				break;
-			}
-		}
-		for (size_t j = 0; j < variation->ItemsNotEquipped.size(); ++j) {
-			if (this->IsItemTypeEquipped(variation->ItemsNotEquipped[j])) {
-				upgrades_check = false;
-				break;
-			}
-		}
-		if (upgrades_check == false) {
-			continue;
-		}
-		for (const wyrmgus::item_class item_class_equipped : variation->item_classes_equipped) {
-			if (wyrmgus::get_item_class_slot(item_class_equipped) == wyrmgus::item_slot::weapon) {
-				requires_weapon = true;
-				if (is_item_class_equipped(item_class_equipped)) {
-					found_weapon = true;
-				}
-			} else if (wyrmgus::get_item_class_slot(item_class_equipped) == wyrmgus::item_slot::shield) {
-				requires_shield = true;
-				if (is_item_class_equipped(item_class_equipped)) {
-					found_shield = true;
-				}
-			}
-		}
-		for (size_t j = 0; j < variation->ItemsEquipped.size(); ++j) {
-			if (wyrmgus::get_item_class_slot(variation->ItemsEquipped[j]->get_item_class()) == wyrmgus::item_slot::weapon) {
-				requires_weapon = true;
-				if (this->IsItemTypeEquipped(variation->ItemsEquipped[j])) {
-					found_weapon = true;
-				}
-			} else if (wyrmgus::get_item_class_slot(variation->ItemsEquipped[j]->get_item_class()) == wyrmgus::item_slot::shield) {
-				requires_shield = true;
-				if (this->IsItemTypeEquipped(variation->ItemsEquipped[j])) {
-					found_shield = true;
-				}
-			}
-		}
-		if ((requires_weapon && !found_weapon) || (requires_shield && !found_shield)) {
-			continue;
-		}
+
 		if (!ignore_old_variation && !priority_variation.empty() && (variation->get_identifier().find(priority_variation) != std::string::npos || priority_variation.find(variation->get_identifier()) != std::string::npos)) { // if the priority variation's ident is included in that of a new viable variation (or vice-versa), give priority to the new variation over others
 			if (!found_similar) {
 				found_similar = true;
@@ -1270,6 +1280,7 @@ void CUnit::ChooseVariation(const wyrmgus::unit_type *new_type, bool ignore_old_
 				continue;
 			}
 		}
+
 		for (int j = 0; j < variation->Weight; ++j) {
 			type_variations.push_back(variation.get());
 		}

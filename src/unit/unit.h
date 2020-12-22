@@ -211,6 +211,7 @@ public:
 	void apply_character_properties();
 	bool CheckTerrainForVariation(const wyrmgus::unit_type_variation *variation) const;
 	bool CheckSeasonForVariation(const wyrmgus::unit_type_variation *variation) const;
+	bool can_have_variation(const wyrmgus::unit_type_variation *variation) const;
 	void ChooseVariation(const wyrmgus::unit_type *new_type = nullptr, bool ignore_old_variation = false, int image_layer = -1);
 	void SetVariation(const wyrmgus::unit_type_variation *new_variation, int image_layer = -1);
 	const wyrmgus::unit_type_variation *GetVariation() const;
