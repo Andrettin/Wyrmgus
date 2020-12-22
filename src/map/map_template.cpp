@@ -190,7 +190,7 @@ void map_template::ProcessConfigData(const CConfigData *config_data)
 			this->plane = plane;
 		} else if (key == "world") {
 			wyrmgus::world *world = world::get(value);
-			this->set_world(world);
+			this->world = world;
 		} else if (key == "terrain_file") {
 			this->terrain_file = value;
 		} else if (key == "overlay_terrain_file") {
@@ -324,6 +324,10 @@ void map_template::check() const
 
 void map_template::initialize()
 {
+	if (this->plane == nullptr && this->world != nullptr) {
+		this->plane = this->world->get_plane();
+	}
+
 	if (this->get_subtemplate_top_left_pos().x() == -1 && this->get_subtemplate_top_left_pos().y() == -1 && this->get_subtemplate_center_pos().x() == -1 && this->get_subtemplate_center_pos().y() == -1) {
 		const QPoint subtemplate_offset = size::to_point(this->get_applied_size()) - QPoint(1, 1) / 2;
 		this->subtemplate_top_left_pos = this->get_subtemplate_center_pos() - subtemplate_offset;
@@ -2074,16 +2078,6 @@ QSize map_template::get_applied_size() const
 	}
 
 	return applied_size;
-}
-
-void map_template::set_world(wyrmgus::world *world)
-{
-	if (world == this->get_world()) {
-		return;
-	}
-
-	this->world = world;
-	this->plane = this->world->get_plane();
 }
 
 void map_template::set_terrain_file(const std::filesystem::path &filepath)
