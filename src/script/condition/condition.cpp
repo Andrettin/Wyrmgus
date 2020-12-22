@@ -95,6 +95,8 @@ std::unique_ptr<const condition> condition::from_sml_property(const sml_property
 		return std::make_unique<quest_condition>(value);
 	} else if (key == "scripted_condition") {
 		return std::make_unique<scripted_condition_condition>(value);
+	} else if (key == "season") {
+		return std::make_unique<season_condition>(value);
 	} else if (key == "settlement") {
 		return std::make_unique<settlement_condition>(value);
 	} else if (key == "trigger") {
@@ -141,8 +143,6 @@ std::unique_ptr<const condition> condition::from_sml_scope(const sml_data &scope
 		condition = std::make_unique<unit_class_condition>();
 	} else if (tag == "unit_type") {
 		condition = std::make_unique<unit_type_condition>();
-	} else if (tag == "season") {
-		condition = std::make_unique<season_condition>();
 	} else if (tag == "settlement") {
 		condition = std::make_unique<settlement_condition>();
 	} else {
@@ -201,8 +201,6 @@ void and_condition::ProcessConfigDataSection(const CConfigData *section)
 		condition = std::make_unique<or_condition>();
 	} else if (section->Tag == "upgrade") {
 		condition = std::make_unique<upgrade_condition>();
-	} else if (section->Tag == "season") {
-		condition = std::make_unique<season_condition>();
 	} else {
 		throw std::runtime_error("Invalid and condition property: \"" + section->Tag + "\".");
 	}
@@ -261,8 +259,6 @@ void or_condition::ProcessConfigDataSection(const CConfigData *section)
 		condition = std::make_unique<or_condition>();
 	} else if (section->Tag == "upgrade") {
 		condition = std::make_unique<upgrade_condition>();
-	} else if (section->Tag == "season") {
-		condition = std::make_unique<season_condition>();
 	} else {
 		fprintf(stderr, "Invalid or condition property: \"%s\".\n", section->Tag.c_str());
 		return;
@@ -279,18 +275,6 @@ void upgrade_condition::ProcessConfigDataProperty(const std::pair<std::string, s
 		this->upgrade = CUpgrade::get(value);
 	} else {
 		fprintf(stderr, "Invalid upgrade condition property: \"%s\".\n", key.c_str());
-	}
-}
-
-void season_condition::ProcessConfigDataProperty(const std::pair<std::string, std::string> &property)
-{
-	const std::string &key = property.first;
-	const std::string &value = property.second;
-
-	if (key == "season") {
-		this->Season = season::get(value);
-	} else {
-		fprintf(stderr, "Invalid season condition property: \"%s\".\n", key.c_str());
 	}
 }
 
