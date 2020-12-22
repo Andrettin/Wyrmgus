@@ -1241,7 +1241,7 @@ bool CUnit::can_have_variation(const wyrmgus::unit_type_variation *variation) co
 		return false;
 	}
 
-	if (variation->get_conditions() != nullptr && variation->get_conditions()->check(this)) {
+	if (variation->get_conditions() != nullptr && !variation->get_conditions()->check(this)) {
 		return false;
 	}
 
