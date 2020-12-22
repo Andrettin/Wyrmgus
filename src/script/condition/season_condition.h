@@ -30,6 +30,7 @@
 #include "script/condition/condition.h"
 #include "time/season.h"
 #include "unit/unit.h"
+#include "util/string_util.h"
 
 namespace wyrmgus {
 
@@ -38,31 +39,34 @@ class season;
 class season_condition final : public condition
 {
 public:
-	virtual void ProcessConfigDataProperty(const std::pair<std::string, std::string> &property) override;
+	explicit season_condition(const std::string &value)
+	{
+		this->season = season::get(value);
+	}
 
 	virtual bool check(const CPlayer *player, const bool ignore_units) const override
 	{
 		Q_UNUSED(ignore_units)
 
-		return CMap::Map.MapLayers[player->StartMapLayer]->GetSeason() == this->Season;
+		return CMap::Map.MapLayers[player->StartMapLayer]->GetSeason() == this->season;
 	}
 
 	virtual bool check(const CUnit *unit, const bool ignore_units) const override
 	{
 		Q_UNUSED(ignore_units)
 
-		return unit->MapLayer->GetSeason() == this->Season;
+		return unit->MapLayer->GetSeason() == this->season;
 	}
 
 	virtual std::string get_string(const size_t indent) const override
 	{
 		Q_UNUSED(indent)
 
-		return this->Season->get_name() + " season";
+		return string::highlight(this->season->get_name()) + " season";
 	}
 
 private:
-	const season *Season = nullptr;
+	const wyrmgus::season *season = nullptr;
 };
 
 }
