@@ -38,6 +38,7 @@ int CclDefineUnitType(lua_State *l);
 
 namespace wyrmgus {
 
+class and_condition;
 class animation_set;
 class construction;
 class season;
@@ -45,23 +46,10 @@ class terrain_type;
 class unit_type;
 enum class item_class;
 
-class unit_type_variation
+class unit_type_variation final
 {
 public:
-	unit_type_variation(const std::string &identifier, const unit_type *unit_type, const int image_layer = -1)
-		: identifier(identifier), unit_type(unit_type), ImageLayer(image_layer)
-	{
-		if (image_layer == -1) {
-			this->index = static_cast<int>(unit_type->get_variations().size());
-		} else {
-			this->index = unit_type->LayerVariations[image_layer].size();
-		}
-
-		memset(LayerSprites, 0, sizeof(LayerSprites));
-		memset(SpriteWhenLoaded, 0, sizeof(SpriteWhenLoaded));
-		memset(SpriteWhenEmpty, 0, sizeof(SpriteWhenEmpty));
-	}
-	
+	explicit unit_type_variation(const std::string &identifier, const unit_type *unit_type, const int image_layer = -1);
 	~unit_type_variation();
 
 	std::unique_ptr<unit_type_variation> duplicate(const unit_type *unit_type) const
@@ -96,6 +84,7 @@ public:
 			variation->LayerFiles[i] = this->LayerFiles[i];
 		}
 		variation->ButtonIcons = this->ButtonIcons;
+		variation->conditions_ptr = this->conditions_ptr;
 
 		return variation;
 	}
@@ -103,6 +92,7 @@ public:
 	void process_sml_property(const sml_property &property);
 	void process_sml_scope(const sml_data &scope);
 	void ProcessConfigData(const CConfigData *config_data);
+	void check() const;
 
 	const std::string &get_identifier() const
 	{
@@ -134,6 +124,11 @@ public:
 		return this->construction;
 	}
 	
+	const and_condition *get_conditions() const
+	{
+		return this->conditions_ptr;
+	}
+
 private:
 	std::string identifier;
 	int index = -1;					//the variation's index within the appropriate variation vector of its unit type
@@ -182,6 +177,10 @@ public:
 	std::shared_ptr<CPlayerColorGraphic> SpriteWhenEmpty[MaxCosts];  /// The graphic corresponding to FileWhenEmpty
 	
 	std::map<ButtonCmd, IconConfig> ButtonIcons;				/// icons for button actions
+
+private:
+	std::unique_ptr<const and_condition> conditions;
+	const and_condition *conditions_ptr = nullptr;
 
 	friend int ::CclDefineUnitType(lua_State *l);
 	friend class unit_type;

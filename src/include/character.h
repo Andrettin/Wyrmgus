@@ -362,9 +362,9 @@ public:
 		return this->sound_set.get();
 	}
 
-	const std::unique_ptr<const and_condition> &get_conditions() const
+	const and_condition *get_conditions() const
 	{
-		return this->conditions;
+		return this->conditions.get();
 	}
 
 	virtual text_processor create_text_processor() const override;

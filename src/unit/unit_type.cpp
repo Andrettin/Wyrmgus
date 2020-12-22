@@ -1344,6 +1344,10 @@ void unit_type::check() const
 	if (this->get_conditions() != nullptr) {
 		this->get_conditions()->check_validity();
 	}
+
+	for (const auto &variation : this->get_variations()) {
+		variation->check();
+	}
 }
 
 void unit_type::set_unit_class(wyrmgus::unit_class *unit_class)

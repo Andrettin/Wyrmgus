@@ -72,7 +72,7 @@
 #include "quest/quest.h"
 #include "religion/deity.h"
 #include "script.h"
-#include "script/condition/condition.h"
+#include "script/condition/and_condition.h"
 #include "sound/game_sound_set.h"
 #include "sound/sound.h"
 #include "sound/sound_server.h"
@@ -1238,6 +1238,10 @@ bool CUnit::can_have_variation(const wyrmgus::unit_type_variation *variation) co
 		}
 	}
 	if ((requires_weapon && !found_weapon) || (requires_shield && !found_shield)) {
+		return false;
+	}
+
+	if (variation->get_conditions() != nullptr && variation->get_conditions()->check(this)) {
 		return false;
 	}
 

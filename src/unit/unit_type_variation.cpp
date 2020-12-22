@@ -34,6 +34,7 @@
 #include "item/item_class.h"
 #include "map/terrain_type.h"
 #include "mod.h"
+#include "script/condition/and_condition.h"
 #include "time/season.h"
 #include "ui/button.h"
 #include "ui/button_cmd.h"
@@ -41,6 +42,19 @@
 #include "video/video.h"
 
 namespace wyrmgus {
+
+unit_type_variation::unit_type_variation(const std::string &identifier, const wyrmgus::unit_type *unit_type, const int image_layer) : identifier(identifier), unit_type(unit_type), ImageLayer(image_layer)
+{
+	if (image_layer == -1) {
+		this->index = static_cast<int>(unit_type->get_variations().size());
+	} else {
+		this->index = unit_type->LayerVariations[image_layer].size();
+	}
+
+	memset(LayerSprites, 0, sizeof(LayerSprites));
+	memset(SpriteWhenLoaded, 0, sizeof(SpriteWhenLoaded));
+	memset(SpriteWhenEmpty, 0, sizeof(SpriteWhenEmpty));
+}
 
 unit_type_variation::~unit_type_variation()
 {
@@ -81,6 +95,11 @@ void unit_type_variation::process_sml_scope(const sml_data &scope)
 		for (const std::string &value : values) {
 			this->ForbiddenSeasons.push_back(season::get(value));
 		}
+	} else if (tag == "conditions") {
+		auto conditions = std::make_unique<and_condition>();
+		database::process_sml_data(conditions, scope);
+		this->conditions = std::move(conditions);
+		this->conditions_ptr = this->conditions.get();
 	} else {
 		throw std::runtime_error("Invalid unit type variation scope: \"" + tag + "\".");
 	}
@@ -275,6 +294,13 @@ void unit_type_variation::ProcessConfigData(const CConfigData *config_data)
 		} else {
 			fprintf(stderr, "Invalid unit type variation property: \"%s\".\n", child_config_data->Tag.c_str());
 		}
+	}
+}
+
+void unit_type_variation::check() const
+{
+	if (this->get_conditions() != nullptr) {
+		this->get_conditions()->check_validity();
 	}
 }
 
