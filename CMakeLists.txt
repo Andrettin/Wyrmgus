@@ -491,6 +491,7 @@ set(util_SRCS
 	src/util/georectangle_util.cpp
 	src/util/geoshape_util.cpp
 	src/util/image_util.cpp
+	src/util/number_util.cpp
 	src/util/point_container.cpp
 	src/util/point_util.cpp
 	src/util/random.cpp
