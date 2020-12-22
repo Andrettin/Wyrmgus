@@ -73,7 +73,7 @@ inline QPointF to_unsigned_geocoordinate(const QPoint &point, const QSize &area_
 
 extern QGeoCoordinate to_geocoordinate(const QPoint &point, const QSize &area_size, const QRectF &unsigned_georectangle);
 
-extern constexpr int distance_to(const QPoint &point, const QPoint &other_point);
+extern int distance_to(const QPoint &point, const QPoint &other_point);
 
 inline bool is_horizontally_adjacent_to(const QPoint &point, const QPoint &other_point)
 {

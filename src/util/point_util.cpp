@@ -38,7 +38,7 @@ QGeoCoordinate to_geocoordinate(const QPoint &point, const QSize &area_size, con
 	return geocoordinate::from_unsigned_geocoordinate(unsigned_geocoordinate);
 }
 
-constexpr int distance_to(const QPoint &point, const QPoint &other_point)
+int distance_to(const QPoint &point, const QPoint &other_point)
 {
 	const int dx = point.x() - other_point.x();
 	const int dy = point.y() - other_point.y();
