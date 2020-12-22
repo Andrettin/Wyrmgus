@@ -77,25 +77,8 @@ void unit_type_variation::process_sml_property(const sml_property &property)
 void unit_type_variation::process_sml_scope(const sml_data &scope)
 {
 	const std::string &tag = scope.get_tag();
-	const std::vector<std::string> &values = scope.get_values();
 
-	if (tag == "terrain_types") {
-		for (const std::string &value : values) {
-			this->Terrains.push_back(terrain_type::get(value));
-		}
-	} else if (tag == "forbidden_terrain_types") {
-		for (const std::string &value : values) {
-			this->TerrainsForbidden.push_back(terrain_type::get(value));
-		}
-	} else if (tag == "seasons") {
-		for (const std::string &value : values) {
-			this->Seasons.push_back(season::get(value));
-		}
-	} else if (tag == "forbidden_seasons") {
-		for (const std::string &value : values) {
-			this->ForbiddenSeasons.push_back(season::get(value));
-		}
-	} else if (tag == "conditions") {
+	if (tag == "conditions") {
 		auto conditions = std::make_unique<and_condition>();
 		database::process_sml_data(conditions, scope);
 		this->conditions = std::move(conditions);
