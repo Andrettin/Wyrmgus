@@ -477,7 +477,7 @@ void CMapLayer::SetSeason(CScheduledSeason *season)
 	for (CUnit *unit : wyrmgus::unit_manager::get()->get_units()) {
 		if (unit->IsAlive() && unit->MapLayer == this) {
 			const wyrmgus::unit_type_variation *variation = unit->GetVariation();
-			if (variation && !unit->CheckSeasonForVariation(variation)) {
+			if (variation != nullptr && !unit->can_have_variation(variation)) {
 				unit->ChooseVariation(); //choose a new variation, as the old one has become invalid due to the season change
 			}
 		}

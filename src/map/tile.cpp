@@ -176,7 +176,7 @@ void tile::SetTerrain(const terrain_type *terrain_type)
 				this->Flags |= MapFieldAirUnpassable;
 			}
 			const unit_type_variation *variation = unit.GetVariation();
-			if (variation && !unit.CheckTerrainForVariation(variation)) { // if a unit that is on the tile has a terrain-dependent variation that is not compatible with the current variation, repick the unit's variation
+			if (variation != nullptr && !unit.can_have_variation(variation)) { // if a unit that is on the tile has a terrain-dependent variation that is not compatible with the current variation, repick the unit's variation
 				unit.ChooseVariation();
 			}
 		}

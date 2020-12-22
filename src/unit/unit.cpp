@@ -3842,9 +3842,9 @@ void CUnit::Place(const Vec2i &pos, int z)
 		}
 		
 		const wyrmgus::unit_type_variation *variation = this->GetVariation();
-		if (variation) {
+		if (variation != nullptr) {
 			// if a unit that is on the tile has a terrain-dependent or season-dependent variation that is not compatible with the new tile, or if this is the first position the unit is being placed in, repick the unit's variation
-			if (!old_map_layer || !this->CheckTerrainForVariation(variation) || !this->CheckSeasonForVariation(variation)) {
+			if (old_map_layer == nullptr || !this->can_have_variation(variation)) {
 				this->ChooseVariation();
 			}
 		}
