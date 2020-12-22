@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-//      (c) Copyright 2019-2020 by Andrettin
+//      (c) Copyright 2020 by Andrettin
 //
 //      Permission is hereby granted, free of charge, to any person obtaining a
 //      copy of this software and associated documentation files (the
@@ -31,24 +31,8 @@
 
 #pragma once
 
-namespace wyrmgus::number {
+namespace wyrmgus::locale {
 
-extern std::string to_formatted_string(const int number);
-
-inline std::string to_signed_string(const int number)
-{
-	std::string number_str;
-	if (number >= 0) {
-		number_str += "+";
-	}
-	number_str += number::to_formatted_string(number);
-	return number_str;
-}
-
-inline int fast_abs(const int value)
-{
-	const int temp = value >> 31;
-	return (value ^ temp) - temp;
-}
+static const QLocale english_locale(QLocale::English);
 
 }
