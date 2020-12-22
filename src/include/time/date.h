@@ -29,8 +29,6 @@
 
 #include "stratagus.h"
 
-class QCalendar;
-
 namespace wyrmgus {
 	class calendar;
 	class timeline;

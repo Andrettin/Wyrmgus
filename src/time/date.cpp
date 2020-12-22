@@ -38,8 +38,6 @@
 #include "time/timeline.h"
 #include "util/string_util.h"
 
-#include <QCalendar>
-
 unsigned long long CDate::CurrentTotalHours = 0;
 QCalendar CDate::calendar;
 

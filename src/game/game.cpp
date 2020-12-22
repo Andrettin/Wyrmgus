@@ -110,8 +110,6 @@
 #include "video/video.h"
 #include "widgets.h"
 
-#include <QCalendar>
-
 extern void CleanGame();
 
 Settings GameSettings;					/// Game Settings
