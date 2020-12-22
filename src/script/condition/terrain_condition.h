@@ -54,16 +54,20 @@ public:
 	{
 		Q_UNUSED(ignore_units)
 
-		const tile *center_tile = unit->get_center_tile();
-		if (center_tile != nullptr) {
-			if (this->terrain->is_overlay()) {
-				return this->terrain == center_tile->get_overlay_terrain();
-			} else {
-				return this->terrain == center_tile->get_terrain();
-			}
+		if (unit->MapLayer == nullptr) {
+			return false;
 		}
 
-		return false;
+		const tile *center_tile = unit->get_center_tile();
+		if (center_tile == nullptr) {
+			return false;
+		}
+
+		if (this->terrain->is_overlay()) {
+			return this->terrain == center_tile->get_overlay_terrain();
+		} else {
+			return this->terrain == center_tile->get_terrain();
+		}
 	}
 
 	virtual std::string get_string(const size_t indent) const override

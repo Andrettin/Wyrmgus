@@ -55,6 +55,10 @@ public:
 	{
 		Q_UNUSED(ignore_units)
 
+		if (unit->MapLayer == nullptr) {
+			return false;
+		}
+
 		return unit->MapLayer->GetSeason() == this->season;
 	}
 
