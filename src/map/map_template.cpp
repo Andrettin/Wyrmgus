@@ -2655,6 +2655,12 @@ QPoint map_template::get_geocoordinate_pos(const QGeoCoordinate &geocoordinate) 
 	return geocoordinate::to_point(geocoordinate, this->get_georectangle(), this->get_size());
 }
 
+QGeoCoordinate map_template::get_pos_geocoordinate(const QPoint &pos) const
+{
+	const QRectF unsigned_georectangle = georectangle::to_unsigned_georectangle(this->get_georectangle());
+	return point::to_geocoordinate(pos, this->get_size(), unsigned_georectangle);
+}
+
 void map_template::save_terrain_images() const
 {
 	terrain_geodata_map terrain_data;
