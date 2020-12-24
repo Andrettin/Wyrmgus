@@ -31,7 +31,7 @@
 
 namespace wyrmgus::number {
 
-inline std::string to_formatted_string(const int number)
+std::string to_formatted_string(const int number)
 {
 	return locale::english_locale.toString(number).toStdString();
 }
