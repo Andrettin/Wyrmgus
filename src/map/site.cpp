@@ -221,6 +221,12 @@ void site::initialize()
 		if (!this->geocoordinate.isValid()) {
 			throw std::runtime_error("The application of a geocoordinate offset to a reference site's geocoordinate resulted in no valid geocoordinate for site \"" + this->get_identifier() + "\".");
 		}
+	} else if (this->pos_reference_site != nullptr) {
+		if (!this->pos_reference_site->is_initialized()) {
+			this->pos_reference_site->initialize();
+		}
+
+		this->pos = this->pos_reference_site->get_pos() + this->pos;
 	}
 
 	if (this->get_geocoordinate().isValid()) {
