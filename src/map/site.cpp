@@ -199,45 +199,45 @@ void site::initialize()
 		if (!this->geocoordinate_reference_site->is_initialized()) {
 			this->geocoordinate_reference_site->initialize();
 		}
+	}
 
-		if (this->get_geocoordinate().isValid()) {
-			double lon = this->get_geocoordinate().longitude();
-			double lat = this->get_geocoordinate().latitude();
+	if (this->get_geocoordinate().isValid()) {
+		double lon = this->get_geocoordinate().longitude();
+		double lat = this->get_geocoordinate().latitude();
 
-			if (this->longitude_scale != 100) {
-				lon *= this->longitude_scale;
-				lon /= 100;
-			}
+		if (this->longitude_scale != 100) {
+			lon *= this->longitude_scale;
+			lon /= 100;
+		}
 
-			if (this->latitude_scale != 100) {
-				lat *= this->latitude_scale;
-				lat /= 100;
-			}
+		if (this->latitude_scale != 100) {
+			lat *= this->latitude_scale;
+			lat /= 100;
+		}
 
+		if (this->geocoordinate_reference_site != nullptr) {
 			lon += this->geocoordinate_reference_site->get_geocoordinate().longitude();
 			lat += this->geocoordinate_reference_site->get_geocoordinate().latitude();
-
-			this->geocoordinate = QGeoCoordinate(lat, lon);
-
-			this->pos = this->get_map_template()->get_geocoordinate_pos(this->get_geocoordinate());
-		} else if (this->pos != QPoint(-1, -1)) {
-			QPoint pos_offset = this->pos;
-
-			if (this->x_scale != 100) {
-				pos_offset.setX(pos_offset.x() * this->x_scale / 100);
-			}
-
-			if (this->y_scale != 100) {
-				pos_offset.setY(pos_offset.y() * this->y_scale / 100);
-			}
-
-			this->pos = this->get_map_template()->get_geocoordinate_pos(this->geocoordinate_reference_site->get_geocoordinate()) + pos_offset;
-
-			//also set the geocoordinate for this point, since it used a geocoordinate as its own reference, so that it can be further used as a geocoordinate reference for others
-			this->geocoordinate = this->get_map_template()->get_pos_geocoordinate(this->pos);
-		} else {
-			throw std::runtime_error("Site \"" + this->get_identifier() + "\" has a geocoordinate reference site, but contains neither geocoordinate nor position offset information.");
 		}
+
+		this->geocoordinate = QGeoCoordinate(lat, lon);
+
+		this->pos = this->get_map_template()->get_geocoordinate_pos(this->get_geocoordinate());
+	} else if (this->geocoordinate_reference_site != nullptr && this->pos != QPoint(-1, -1)) {
+		QPoint pos_offset = this->pos;
+
+		if (this->x_scale != 100) {
+			pos_offset.setX(pos_offset.x() * this->x_scale / 100);
+		}
+
+		if (this->y_scale != 100) {
+			pos_offset.setY(pos_offset.y() * this->y_scale / 100);
+		}
+
+		this->pos = this->get_map_template()->get_geocoordinate_pos(this->geocoordinate_reference_site->get_geocoordinate()) + pos_offset;
+
+		//also set the geocoordinate for this point, since it used a geocoordinate as its own reference, so that it can be further used as a geocoordinate reference for others
+		this->geocoordinate = this->get_map_template()->get_pos_geocoordinate(this->pos);
 	} else if (this->pos_reference_site != nullptr) {
 		if (!this->pos_reference_site->is_initialized()) {
 			this->pos_reference_site->initialize();
