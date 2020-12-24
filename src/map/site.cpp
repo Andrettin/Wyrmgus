@@ -70,7 +70,11 @@ void site::process_sml_property(const sml_property &property)
 	const std::string &key = property.get_key();
 	const std::string &value = property.get_value();
 
-	if (key == "geocoordinate_scale") {
+	if (key == "pos_scale") {
+		const int scale = std::stoi(value);
+		this->x_scale = scale;
+		this->y_scale = scale;
+	} else if (key == "geocoordinate_scale") {
 		const int scale = std::stoi(value);
 		this->longitude_scale = scale;
 		this->latitude_scale = scale;
@@ -191,12 +195,12 @@ void site::ProcessConfigData(const CConfigData *config_data)
 
 void site::initialize()
 {
-	if (this->get_geocoordinate().isValid()) {
-		if (this->geocoordinate_reference_site != nullptr) {
-			if (!this->geocoordinate_reference_site->is_initialized()) {
-				this->geocoordinate_reference_site->initialize();
-			}
+	if (this->geocoordinate_reference_site != nullptr) {
+		if (!this->geocoordinate_reference_site->is_initialized()) {
+			this->geocoordinate_reference_site->initialize();
+		}
 
+		if (this->get_geocoordinate().isValid()) {
 			double lon = this->get_geocoordinate().longitude();
 			double lat = this->get_geocoordinate().latitude();
 
@@ -214,15 +218,42 @@ void site::initialize()
 			lat += this->geocoordinate_reference_site->get_geocoordinate().latitude();
 
 			this->geocoordinate = QGeoCoordinate(lat, lon);
-		}
 
-		this->pos = this->get_map_template()->get_geocoordinate_pos(this->get_geocoordinate());
+			this->pos = this->get_map_template()->get_geocoordinate_pos(this->get_geocoordinate());
+		} else if (this->pos != QPoint(-1, -1)) {
+			QPoint pos_offset = this->pos;
+
+			if (this->x_scale != 100) {
+				pos_offset.setX(pos_offset.x() * this->x_scale / 100);
+			}
+
+			if (this->y_scale != 100) {
+				pos_offset.setY(pos_offset.y() * this->y_scale / 100);
+			}
+
+			this->pos = this->get_map_template()->get_geocoordinate_pos(this->geocoordinate_reference_site->get_geocoordinate()) + pos_offset;
+
+			//also set the geocoordinate for this point, since it used a geocoordinate as its own reference, so that it can be further used as a geocoordinate reference for others
+			this->geocoordinate = this->get_map_template()->get_pos_geocoordinate(this->pos);
+		} else {
+			throw std::runtime_error("Site \"" + this->get_identifier() + "\" has a geocoordinate reference site, but contains neither geocoordinate nor position offset information.");
+		}
 	} else if (this->pos_reference_site != nullptr) {
 		if (!this->pos_reference_site->is_initialized()) {
 			this->pos_reference_site->initialize();
 		}
 
-		this->pos = this->pos_reference_site->get_pos() + this->pos;
+		QPoint pos_offset = this->pos;
+
+		if (this->x_scale != 100) {
+			pos_offset.setX(pos_offset.x() * this->x_scale / 100);
+		}
+
+		if (this->y_scale != 100) {
+			pos_offset.setY(pos_offset.y() * this->y_scale / 100);
+		}
+
+		this->pos = this->pos_reference_site->get_pos() + pos_offset;
 	}
 
 	//if a settlement has no color assigned to it, assign a random one instead
