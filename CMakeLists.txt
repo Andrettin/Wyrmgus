@@ -1235,6 +1235,9 @@ if(NOT WITH_RENDERER)
 	endif()
 endif()
 
+# Binary name
+set(BINARY_NAME "wyrmgus" CACHE PATH "Sets the name of the binary.")
+
 # Install paths
 set(BINDIR "bin" CACHE PATH "Where to install user binaries")
 set(SBINDIR "sbin" CACHE PATH "Where to install system binaries")
@@ -1693,7 +1696,7 @@ if(stratagus_LIBS_DEBUG)
 	target_link_libraries(stratagus ${stratagus_LIBS_DEBUG})
 endif()
 
-set_target_properties(stratagus PROPERTIES OUTPUT_NAME wyrmsun)
+set_target_properties(stratagus PROPERTIES OUTPUT_NAME ${BINARY_NAME})
 
 if(WIN32 AND MINGW AND ENABLE_STATIC)
 	set_target_properties(stratagus PROPERTIES LINK_FLAGS "${LINK_FLAGS} -static-libgcc -static-libstdc++ -Wl,--stack,10485760")
