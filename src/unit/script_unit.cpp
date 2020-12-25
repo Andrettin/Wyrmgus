@@ -1486,9 +1486,11 @@ static int CclGetUnits(lua_State *l)
 	lua_newtable(l);
 	if (plynr == -1) {
 		int i = 0;
-		for (const CUnit *unit : wyrmgus::unit_manager::get()->get_units()) {
+		const std::vector<CUnit *> &units = wyrmgus::unit_manager::get()->get_units();
+		for (const CUnit *unit : units) {
 			lua_pushnumber(l, UnitNumber(*unit));
 			lua_rawseti(l, -2, i + 1);
+			++i;
 		}
 	} else {
 		for (int i = 0; i < CPlayer::Players[plynr]->GetUnitCount(); ++i) {
