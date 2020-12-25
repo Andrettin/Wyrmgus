@@ -328,10 +328,10 @@ void SaveUnit(const CUnit &unit, CFile &file)
 				printf("FIXME: storing destroyed Worker - loading will fail.\n");
 			}
 
-			file.printf("\"%s\"", UnitReference(worker).c_str());
-			if (i > 1) {
+			if (i > 0) {
 				file.printf(", ");
 			}
+			file.printf("\"%s\"", UnitReference(worker).c_str());
 		}
 		file.printf("},\n  ");
 	} else {
