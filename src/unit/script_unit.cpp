@@ -1484,18 +1484,28 @@ static int CclGetUnits(lua_State *l)
 	const int plynr = TriggerGetPlayer(l);
 
 	lua_newtable(l);
+	int index = 0;
 	if (plynr == -1) {
-		int i = 0;
 		const std::vector<CUnit *> &units = wyrmgus::unit_manager::get()->get_units();
 		for (const CUnit *unit : units) {
+			if (!unit->IsAlive()) {
+				continue;
+			}
+
 			lua_pushnumber(l, UnitNumber(*unit));
-			lua_rawseti(l, -2, i + 1);
-			++i;
+			lua_rawseti(l, -2, index + 1);
+			++index;
 		}
 	} else {
 		for (int i = 0; i < CPlayer::Players[plynr]->GetUnitCount(); ++i) {
-			lua_pushnumber(l, UnitNumber(CPlayer::Players[plynr]->GetUnit(i)));
-			lua_rawseti(l, -2, i + 1);
+			const CUnit &unit = CPlayer::Players[plynr]->GetUnit(i);
+			if (!unit.IsAlive()) {
+				continue;
+			}
+
+			lua_pushnumber(l, UnitNumber(unit));
+			lua_rawseti(l, -2, index + 1);
+			++index;
 		}
 	}
 	return 1;
