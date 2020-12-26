@@ -216,6 +216,7 @@ enum {
 	WALL_INDEX,						/// Use special logic for Direction field.
 	NORANDOMPLACING_INDEX,			/// Don't use random frame rotation
 	ORGANIC_INDEX,					/// Organic unit (used for death coil spell)
+	UNDEAD_INDEX,
 	SIDEATTACK_INDEX,
 	NOFRIENDLYFIRE_INDEX,           /// Unit accepts friendly fire for splash attacks
 	//Wyrmgus start
