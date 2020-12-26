@@ -68,6 +68,15 @@ void character_substitution::process_sml_scope(const sml_data &scope)
 		for (const std::string &value : values) {
 			this->target_characters.push_back(string::to_character(value));
 		}
+
+		scope.for_each_property([&](const sml_property &property) {
+			const char c = string::to_character(property.get_key());
+			const int weight = std::stoi(property.get_value());
+
+			for (int i = 0; i < weight; ++i) {
+				this->target_characters.push_back(c);
+			}
+		});
 	} else if (tag == "shuffle_character_sets") {
 		for (const std::string &value : values) {
 			this->shuffle_character_sets.push_back({ string::to_character(value) });
