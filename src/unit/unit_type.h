@@ -1015,6 +1015,7 @@ public:
 		return this->conditions;
 	}
 
+	bool can_gain_experience() const;
 	bool is_ship() const;
 
 	gender get_gender() const;

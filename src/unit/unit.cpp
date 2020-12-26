@@ -677,7 +677,7 @@ void CUnit::ChangeExperience(int amount, int around_range)
 	
 	amount /= 1 + table.size();
 
-	if (this->Type->BoolFlag[ORGANIC_INDEX].value) {
+	if (this->Type->can_gain_experience()) {
 		this->Variable[XP_INDEX].Max += amount;
 		this->Variable[XP_INDEX].Value = this->Variable[XP_INDEX].Max;
 		this->XPChanged();
@@ -685,7 +685,7 @@ void CUnit::ChangeExperience(int amount, int around_range)
 
 	if (around_range > 0) {
 		for (size_t i = 0; i != table.size(); ++i) {
-			if (table[i]->Type->BoolFlag[ORGANIC_INDEX].value) {
+			if (table[i]->Type->can_gain_experience()) {
 				table[i]->Variable[XP_INDEX].Max += amount;
 				table[i]->Variable[XP_INDEX].Value = table[i]->Variable[XP_INDEX].Max;
 				table[i]->XPChanged();
@@ -3476,7 +3476,7 @@ void CUnit::UpdateContainerAttackRange()
 
 void CUnit::UpdateXPRequired()
 {
-	if (!this->Type->BoolFlag[ORGANIC_INDEX].value) {
+	if (!this->Type->can_gain_experience()) {
 		return;
 	}
 	
@@ -3660,7 +3660,7 @@ void CUnit::UpdateBuildingSettlementAssignment(const wyrmgus::site *old_settleme
 
 void CUnit::XPChanged()
 {
-	if (!this->Type->BoolFlag[ORGANIC_INDEX].value || this->Type->BoolFlag[BUILDING_INDEX].value) {
+	if (!this->Type->can_gain_experience()) {
 		return;
 	}
 	

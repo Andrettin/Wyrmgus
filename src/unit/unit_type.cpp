@@ -1915,6 +1915,11 @@ const std::vector<std::string> &unit_type::get_potential_personal_names(const wy
 	return vector::empty_string_vector;
 }
 
+bool unit_type::can_gain_experience() const
+{
+	return this->BoolFlag[ORGANIC_INDEX].value;
+}
+
 bool unit_type::is_ship() const
 {
 	return this->UnitType == UnitTypeType::Naval && !this->BoolFlag[ORGANIC_INDEX].value;
