@@ -250,7 +250,7 @@ class BestDepotFinder
 				if (worker->Container != nullptr) {
 					UnmarkUnitFieldFlags(*first_container);
 				}
-				const int travel_distance = UnitReachable(*worker, *dest, 1);
+				const int travel_distance = UnitReachable(*worker, *dest, 1, 0, true);
 				if (worker->Container != nullptr) {
 					MarkUnitFieldFlags(*first_container);
 				}
