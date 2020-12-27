@@ -578,6 +578,8 @@ void unit_type::process_sml_property(const sml_property &property)
 		this->DefaultStat.Variables[TRANSPORT_INDEX].Enable = 1;
 	} else if (key == "annoy_computer_factor") {
 		this->AnnoyComputerFactor = std::stoi(value);
+	} else if (key == "can_attack") {
+		this->CanAttack = string::to_bool(value);
 	} else if (key == "can_target_land") {
 		const bool can_target_land = string::to_bool(value);
 		if (can_target_land) {
@@ -1218,7 +1220,7 @@ void unit_type::initialize()
 
 	// FIXME: try to simplify/combine the flags instead
 	if (this->MouseAction == MouseActionAttack && !this->CanAttack) {
-		fprintf(stderr, "Unit-type '%s': right-attack is set, but can-attack is not.\n", this->get_name().c_str());
+		throw std::runtime_error("Unit type \"" + this->get_identifier() + "\": right-attack is set, but can-attack is not.");
 	}
 	this->UpdateDefaultBoolFlags();
 	if (GameRunning || Editor.Running == EditorEditing) {
