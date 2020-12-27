@@ -598,8 +598,10 @@ std::shared_ptr<wyrmgus::unit_ref> CUnit::acquire_ref()
 		throw std::runtime_error("Tried to acquire a reference to a unit which already had its base reference cleared.");
 	}
 
-	if (this->Destroyed) {
-		throw std::runtime_error("Tried to acquire a reference to a unit which has already been destroyed.");
+	if (!SaveGameLoading) {
+		if (this->Destroyed) {
+			throw std::runtime_error("Tried to acquire a reference to a unit which has already been destroyed.");
+		}
 	}
 
 	return this->base_ref;
