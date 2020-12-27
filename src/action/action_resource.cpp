@@ -1122,11 +1122,11 @@ int GetNumWaitingWorkers(const CUnit &mine)
 /**
 **  Stop gathering from the resource, go home.
 **
-**  @param unit  Poiner to unit.
+**  @param unit  Pointer to unit.
 **
-**  @return      TRUE if ready, otherwise FALSE.
+**  @return      True if ready, or false otherwise.
 */
-int COrder_Resource::StopGathering(CUnit &unit)
+bool COrder_Resource::StopGathering(CUnit &unit)
 {
 	CUnit *source = nullptr;
 
@@ -1136,60 +1136,66 @@ int COrder_Resource::StopGathering(CUnit &unit)
 	//Wyrmgus end
 		//Wyrmgus start
 //		if (resinfo.HarvestFromOutside) {
-		if (this->get_goal() && this->get_goal()->Type->BoolFlag[HARVESTFROMOUTSIDE_INDEX].value) {
+		if (this->get_goal() != nullptr && this->get_goal()->Type->BoolFlag[HARVESTFROMOUTSIDE_INDEX].value) {
 		//Wyrmgus end
-			source = this->get_goal();
+			if (this->get_goal()->IsAlive()) {
+				source = this->get_goal();
+			}
+
 			this->clear_goal();
 		} else {
 			source = unit.Container;
 		}
-		source->Resource.Active--;
-		Assert(source->Resource.Active >= 0);
-		//Store resource position.
-		this->Resource.Mine = source->acquire_ref();
-		
-		if (Preference.MineNotifications && unit.Player->Index == CPlayer::GetThisPlayer()->Index
-			&& source->IsAlive()
-			&& !source->MineLow
-			&& source->ResourcesHeld * 100 / source->Variable[GIVERESOURCE_INDEX].Max <= 10
-			&& source->Variable[GIVERESOURCE_INDEX].Max > (wyrmgus::resource::get_all()[this->CurrentResource]->get_default_income() * 10)) {
+
+		if (source != nullptr) {
+			source->Resource.Active--;
+			Assert(source->Resource.Active >= 0);
+			//Store resource position.
+			this->Resource.Mine = source->acquire_ref();
+
+			if (Preference.MineNotifications && unit.Player->Index == CPlayer::GetThisPlayer()->Index
+				&& source->IsAlive()
+				&& !source->MineLow
+				&& source->ResourcesHeld * 100 / source->Variable[GIVERESOURCE_INDEX].Max <= 10
+				&& source->Variable[GIVERESOURCE_INDEX].Max > (wyrmgus::resource::get_all()[this->CurrentResource]->get_default_income() * 10)) {
 				//Wyrmgus start
 //				unit.Player->Notify(NotifyYellow, source->tilePos, _("%s is running low!"), source->Type->Name.c_str());
 				unit.Player->Notify(NotifyYellow, source->tilePos, source->MapLayer->ID, _("Our %s is nearing depletion!"), source->Type->get_name().c_str());
 				//Wyrmgus end
 				source->MineLow = 1;
-		}
+			}
 
-		if (source->Type->MaxOnBoard) {
-			int count = 0;
-			CUnit *next = nullptr;
-			for (const std::shared_ptr<wyrmgus::unit_ref> &worker_ref : source->Resource.Workers) {
-				CUnit *worker = worker_ref->get();
-				Assert(worker->CurrentAction() == UnitAction::Resource);
-				COrder_Resource &order = *static_cast<COrder_Resource *>(worker->CurrentOrder());
-				if (worker != &unit && order.IsGatheringWaiting()) {
-					count++;
-					if (next) {
-						if (next->Wait > worker->Wait) {
+			if (source->Type->MaxOnBoard) {
+				int count = 0;
+				CUnit *next = nullptr;
+				for (const std::shared_ptr<wyrmgus::unit_ref> &worker_ref : source->Resource.Workers) {
+					CUnit *worker = worker_ref->get();
+					Assert(worker->CurrentAction() == UnitAction::Resource);
+					COrder_Resource &order = *static_cast<COrder_Resource *>(worker->CurrentOrder());
+					if (worker != &unit && order.IsGatheringWaiting()) {
+						count++;
+						if (next) {
+							if (next->Wait > worker->Wait) {
+								next = worker;
+							}
+						} else {
 							next = worker;
 						}
-					} else {
-						next = worker;
 					}
 				}
-			}
-			if (next != nullptr) {
-				if (!unit.Player->AiEnabled) {
-					DebugPrint("%d: Worker %d report: Unfreez resource gathering of %d <Wait %d> on %d [Assigned: %d Waiting %d].\n"
-							   _C_ unit.Player->Index _C_ UnitNumber(unit)
-							   _C_ UnitNumber(*next) _C_ next->Wait
-							   _C_ UnitNumber(*source) _C_ source->Resource.Workers.size()
-							   _C_ count);
+				if (next != nullptr) {
+					if (!unit.Player->AiEnabled) {
+						DebugPrint("%d: Worker %d report: Unfreez resource gathering of %d <Wait %d> on %d [Assigned: %d Waiting %d].\n"
+							_C_ unit.Player->Index _C_ UnitNumber(unit)
+							_C_ UnitNumber(*next) _C_ next->Wait
+							_C_ UnitNumber(*source) _C_ source->Resource.Workers.size()
+							_C_ count);
+					}
+					next->Wait = 0;
+					//source->Data.Resource.Waiting = count - 1;
+					//Assert(source->Data.Resource.Assigned >= source->Data.Resource.Waiting);
+					//StartGathering(next);
 				}
-				next->Wait = 0;
-				//source->Data.Resource.Waiting = count - 1;
-				//Assert(source->Data.Resource.Assigned >= source->Data.Resource.Waiting);
-				//StartGathering(next);
 			}
 		}
 	} else {
@@ -1225,7 +1231,7 @@ int COrder_Resource::StopGathering(CUnit &unit)
 		DebugPrint("%d: Worker %d report: Can't find a resource [%d] deposit.\n"
 				   _C_ unit.Player->Index _C_ UnitNumber(unit) _C_ unit.CurrentResource);
 		this->Finished = true;
-		return 0;
+		return false;
 	} else {
 		//Wyrmgus start
 //		if (!(resinfo.HarvestFromOutside || resinfo.TerrainHarvester)) {
@@ -1236,12 +1242,12 @@ int COrder_Resource::StopGathering(CUnit &unit)
 		}
 		UnitGotoGoal(unit, depot, SUB_MOVE_TO_DEPOT);
 	}
+
 	if (IsOnlySelected(unit)) {
 		SelectedUnitChanged();
 	}
-#if 1
-	return 1;
-#endif
+
+	return true;
 }
 
 /**

@@ -75,7 +75,7 @@ private:
 	int StartGathering(CUnit &unit);
 	void LoseResource(CUnit &unit, CUnit &source);
 	int GatherResource(CUnit &unit);
-	int StopGathering(CUnit &unit);
+	bool StopGathering(CUnit &unit);
 	int MoveToDepot(CUnit &unit);
 	bool WaitInDepot(CUnit &unit);
 	void DropResource(CUnit &unit);
