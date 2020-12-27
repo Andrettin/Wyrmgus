@@ -869,6 +869,13 @@ static int CclSetMapTemplateLayerConnector(lua_State *l)
 	return 1;
 }
 
+void ApplyMapTemplate(const std::string &map_template_ident, int template_start_x, int template_start_y, int map_start_x, int map_start_y, int z)
+{
+	wyrmgus::map_template *map_template = wyrmgus::map_template::get(map_template_ident);
+
+	map_template->apply(Vec2i(template_start_x, template_start_y), Vec2i(map_start_x, map_start_y), z);
+}
+
 void ApplyCampaignMap(const std::string &campaign_ident)
 {
 	wyrmgus::database::load_history();
