@@ -1988,7 +1988,11 @@ static int CclGetUnitTypeData(lua_State *l)
 		lua_pushstring(l, type->GetNamePlural().c_str());
 		return 1;
 	} else if (!strcmp(data, "Parent")) {
-		lua_pushstring(l, type->Parent->Ident.c_str());
+		if (type->Parent != nullptr) {
+			lua_pushstring(l, type->Parent->get_identifier().c_str());
+		} else {
+			lua_pushstring(l, "");
+		}
 		return 1;
 	} else if (!strcmp(data, "Class")) {
 		if (type->get_item_class() != wyrmgus::item_class::none) {
