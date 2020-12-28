@@ -29,6 +29,7 @@
 
 #include "map/site_game_data.h"
 
+#include "ai/ai_local.h"
 #include "map/map.h"
 #include "map/map_layer.h"
 #include "map/minimap.h"
@@ -176,17 +177,38 @@ bool site_game_data::has_resource_source(const resource *resource) const
 void site_game_data::add_resource_unit(CUnit *unit)
 {
 	const resource *unit_resource = unit->Type->get_given_resource();
-	this->resource_units[unit_resource].push_back(unit);
+	this->add_resource_unit(unit, unit_resource);
+
+	for (const resource *produced_resource : AiHelpers.get_produced_resources(unit->Type)) {
+		if (produced_resource == unit_resource) {
+			continue;
+		}
+
+		this->add_resource_unit(unit, produced_resource);
+	}
+}
+
+void site_game_data::remove_resource_unit(CUnit *unit, const resource *resource)
+{
+	std::vector<CUnit *> &resource_units = this->resource_units[resource];
+	vector::remove(resource_units, unit);
+
+	if (resource_units.empty()) {
+		this->resource_units.erase(resource);
+	}
 }
 
 void site_game_data::remove_resource_unit(CUnit *unit)
 {
 	const resource *unit_resource = unit->Type->get_given_resource();
-	std::vector<CUnit *> &resource_units = this->resource_units[unit_resource];
-	vector::remove(resource_units, unit);
+	this->remove_resource_unit(unit, unit_resource);
 
-	if (resource_units.empty()) {
-		this->resource_units.erase(unit_resource);
+	for (const resource *produced_resource : AiHelpers.get_produced_resources(unit->Type)) {
+		if (produced_resource == unit_resource) {
+			continue;
+		}
+
+		this->remove_resource_unit(unit, produced_resource);
 	}
 }
 

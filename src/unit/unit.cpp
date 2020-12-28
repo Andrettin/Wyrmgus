@@ -3852,7 +3852,7 @@ void CUnit::Place(const Vec2i &pos, int z)
 			}
 		}
 
-		if (this->Type->get_given_resource() != nullptr) {
+		if (this->Type->can_produce_a_resource()) {
 			const wyrmgus::tile *tile = this->get_center_tile();
 			if (tile->get_settlement() != nullptr) {
 				tile->get_settlement()->get_game_data()->add_resource_unit(this);
@@ -4055,7 +4055,7 @@ void CUnit::Remove(CUnit *host)
 		return;
 	}
 
-	if (this->Type->get_given_resource() != nullptr) {
+	if (this->Type->can_produce_a_resource()) {
 		const wyrmgus::tile *tile = this->get_center_tile();
 		if (tile->get_settlement() != nullptr) {
 			tile->get_settlement()->get_game_data()->remove_resource_unit(this);

@@ -1917,6 +1917,11 @@ const std::vector<std::string> &unit_type::get_potential_personal_names(const wy
 	return vector::empty_string_vector;
 }
 
+bool unit_type::can_produce_a_resource() const
+{
+	return this->get_given_resource() != nullptr || !AiHelpers.get_produced_resources(this).empty();
+}
+
 bool unit_type::can_gain_experience() const
 {
 	return this->BoolFlag[ORGANIC_INDEX].value;

@@ -30,6 +30,7 @@
 
 #include "map/map.h"
 
+#include "ai/ai_local.h"
 #include "database/defines.h"
 //Wyrmgus start
 #include "editor.h"
@@ -3400,8 +3401,7 @@ void CMap::calculate_settlement_resource_units()
 			continue;
 		}
 
-		const wyrmgus::resource *unit_resource = unit->Type->get_given_resource();
-		if (unit_resource == nullptr) {
+		if (!unit->Type->can_produce_a_resource()) {
 			continue;
 		}
 		

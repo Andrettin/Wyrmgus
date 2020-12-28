@@ -159,7 +159,13 @@ public:
 		return empty_vector;
 	}
 
+	void add_resource_unit(CUnit *unit, const resource *resource)
+	{
+		this->resource_units[resource].push_back(unit);
+	}
+
 	void add_resource_unit(CUnit *unit);
+	void remove_resource_unit(CUnit *unit, const resource *resource);
 	void remove_resource_unit(CUnit *unit);
 
 	void clear_resource_units()

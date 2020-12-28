@@ -996,6 +996,8 @@ public:
 		return this->given_resource;
 	}
 
+	bool can_produce_a_resource() const;
+
 	const std::vector<std::unique_ptr<unit_type_variation>> &get_variations() const
 	{
 		return this->variations;
