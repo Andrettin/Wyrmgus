@@ -2652,16 +2652,17 @@ void CUnit::SellUnit(CUnit *sold_unit, int player)
 **
 **  @param resource  Resource to be produced.
 */
-void CUnit::ProduceResource(const int resource)
+void CUnit::ProduceResource(const wyrmgus::resource *resource)
 {
-	if (resource == this->GivesResource) {
+	const int resource_index = resource ? resource->get_index() : 0;
+	if (resource_index == this->GivesResource) {
 		return;
 	}
 	
-	int old_resource = this->GivesResource;
+	const int old_resource = this->GivesResource;
 	
-	if (resource != 0) {
-		this->GivesResource = resource;
+	if (resource != nullptr) {
+		this->GivesResource = resource->get_index();
 		this->ResourcesHeld = 10000;
 	} else {
 		this->GivesResource = 0;

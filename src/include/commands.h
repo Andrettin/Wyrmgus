@@ -37,6 +37,7 @@ class CUpgrade;
 namespace wyrmgus {
 	class dynasty;
 	class quest;
+	class resource;
 	class site;
 	class spell;
 	class unit_type;
@@ -77,7 +78,7 @@ extern void CommandQuest(CUnit &unit, wyrmgus::quest *quest);
 /// Prepare command buy
 extern void CommandBuy(CUnit &unit, CUnit *sold_unit, int player);
 /// Prepare command produce resource
-extern void CommandProduceResource(CUnit &unit, int resource);
+extern void CommandProduceResource(CUnit &unit, const wyrmgus::resource *resource);
 /// Prepare command sell resource
 extern void CommandSellResource(CUnit &unit, int resource, int player);
 /// Prepare command buy resource
@@ -190,7 +191,7 @@ extern void SendCommandQuest(CUnit &unit, wyrmgus::quest *quest);
 /// Send buy command
 extern void SendCommandBuy(CUnit &unit, CUnit *sold_unit, int player);
 /// Send produce resource command
-extern void SendCommandProduceResource(CUnit &unit, int resource);
+extern void SendCommandProduceResource(CUnit &unit, const wyrmgus::resource *resource);
 /// Send sell resource command
 extern void SendCommandSellResource(CUnit &unit, int resource, int player);
 /// Send buy resource command

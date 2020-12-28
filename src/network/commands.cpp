@@ -187,13 +187,13 @@ void SendCommandBuy(CUnit &unit, CUnit *sold_unit, int player)
 /**
 ** Send command: Produce a resource.
 */
-void SendCommandProduceResource(CUnit &unit, int resource)
+void SendCommandProduceResource(CUnit &unit, const wyrmgus::resource *resource)
 {
 	if (!IsNetworkGame()) {
-		CommandLog("produce-resource", &unit, 0, 0, -1, NoUnitP, nullptr, resource);
+		CommandLog("produce-resource", &unit, 0, 0, -1, NoUnitP, nullptr, resource ? resource->get_index() : 0);
 		CommandProduceResource(unit, resource);
 	} else {
-		NetworkSendCommand(MessageCommandProduceResource, unit, resource, 0, NoUnitP, nullptr, 0);
+		NetworkSendCommand(MessageCommandProduceResource, unit, resource ? resource->get_index() : 0, 0, NoUnitP, nullptr, 0);
 	}
 }
 
@@ -1050,7 +1050,7 @@ void ExecCommand(unsigned char msgnr, UnitRef unum,
 		}
 		case MessageCommandProduceResource: {
 			CommandLog("produce-resource", &unit, 0, 0, -1, NoUnitP, nullptr, arg1);
-			CommandProduceResource(unit, arg1);
+			CommandProduceResource(unit, arg1 != 0 ? wyrmgus::resource::get_all()[arg1] : nullptr);
 			break;
 		}
 		case MessageCommandSellResource: {

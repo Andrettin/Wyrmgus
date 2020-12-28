@@ -1491,7 +1491,8 @@ static void AiProduceResources()
 	const int n = AiPlayer->Player->GetUnitCount();
 	for (int i = 0; i < n; ++i) {
 		CUnit &unit = AiPlayer->Player->GetUnit(i);
-		if (unit.Type->Slot >= ((int) AiHelpers.ProducedResources.size()) || AiHelpers.ProducedResources[unit.Type->Slot].size() == 0 || !unit.Active) {
+		const std::vector<const wyrmgus::resource *> &produced_resources = AiHelpers.get_produced_resources(unit.Type);
+		if (produced_resources.empty() || !unit.Active) {
 			continue;
 		}
 		
@@ -1499,26 +1500,24 @@ static void AiProduceResources()
 			continue;
 		}
 
-		int chosen_resource = 0;
+		const wyrmgus::resource *chosen_resource = nullptr;
 		int best_value = 0;
-		for (size_t j = 0; j != AiHelpers.ProducedResources[unit.Type->Slot].size(); ++j) {
-			int resource = AiHelpers.ProducedResources[unit.Type->Slot][j];
-			
-			if (!wyrmgus::resource::get_all()[resource]->LuxuryResource && AiCanSellResource(resource)) {
+		for (const wyrmgus::resource *resource : produced_resources) {
+			if (!resource->LuxuryResource && AiCanSellResource(resource->get_index())) {
 				continue;
 			}
 			
-			if (wyrmgus::resource::get_all()[resource]->LuxuryResource && !market_unit) {
+			if (resource->LuxuryResource && !market_unit) {
 				continue;
 			}
 			
-			int input_resource = wyrmgus::resource::get_all()[resource]->InputResource;
+			const int input_resource = resource->InputResource;
 
-			if (input_resource && !AiCanSellResource(input_resource) && !(input_resource == CopperCost && wyrmgus::resource::get_all()[resource]->LuxuryResource)) { //if the resource is a luxury resource and the input is copper skip this check, the AI should produce it as long as its price is greater than that of copper
+			if (input_resource && !AiCanSellResource(input_resource) && !(input_resource == CopperCost && resource->LuxuryResource)) { //if the resource is a luxury resource and the input is copper skip this check, the AI should produce it as long as its price is greater than that of copper
 				continue;
 			}
 			
-			int resource_value = AiPlayer->Player->GetEffectiveResourceSellPrice(resource);
+			int resource_value = AiPlayer->Player->GetEffectiveResourceSellPrice(resource->get_index());
 			if (input_resource) {
 				resource_value -= AiPlayer->Player->GetEffectiveResourceSellPrice(input_resource);
 			}
@@ -1529,7 +1528,7 @@ static void AiProduceResources()
 			}
 		}
 
-		if (!chosen_resource && unit.Type->get_given_resource() != nullptr) { // don't toggle off resource production if a building should always have a resource produced
+		if (chosen_resource == nullptr && unit.Type->get_given_resource() != nullptr) { // don't toggle off resource production if a building should always have a resource produced
 			continue;
 		}
 

@@ -260,7 +260,7 @@ public:
 	void GenerateUnique(CUnit *dropper, CPlayer *dropper_player);
 	void UpdateSoldUnits();
 	void SellUnit(CUnit *sold_unit, int player);
-	void ProduceResource(const int resource);
+	void ProduceResource(const wyrmgus::resource *resource);
 	void SellResource(const int resource, const int player);
 	void BuyResource(const int resource, const int player);
 	void Scout();

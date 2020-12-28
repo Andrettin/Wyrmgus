@@ -455,10 +455,10 @@ void CommandBuy(CUnit &unit, CUnit *sold_unit, int player)
 **  @param unit   pointer to unit.
 **  @param resource  index of the resource.
 */
-void CommandProduceResource(CUnit &unit, int resource)
+void CommandProduceResource(CUnit &unit, const wyrmgus::resource *resource)
 {
 	if (IsUnitValidForNetwork(unit) == false) {
-		return ;
+		return;
 	}
 	unit.ProduceResource(resource);
 }

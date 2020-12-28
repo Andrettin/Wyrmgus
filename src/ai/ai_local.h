@@ -47,6 +47,7 @@ class CPlayer;
 static void InitAiHelper(AiHelper &aiHelper);
 
 namespace wyrmgus {
+	class resource;
 	class site;
 	class unit_class;
 	class unit_ref;
@@ -373,7 +374,7 @@ public:
 		this->Depots.clear();
 		this->SellMarkets.clear();
 		this->BuyMarkets.clear();
-		this->ProducedResources.clear();
+		this->produced_resources.clear();
 		this->researched_upgrades.clear();
 		this->researched_upgrade_classes.clear();
 		this->ExperienceUpgrades.clear();
@@ -501,6 +502,18 @@ public:
 		return empty_vector;
 	}
 
+	const std::vector<const wyrmgus::resource *> &get_produced_resources(const wyrmgus::unit_type *unit_type) const
+	{
+		static std::vector<const wyrmgus::resource *> empty_vector;
+
+		auto find_iterator = this->produced_resources.find(unit_type);
+		if (find_iterator != this->produced_resources.end()) {
+			return find_iterator->second;
+		}
+
+		return empty_vector;
+	}
+
 	const std::vector<const CUpgrade *> &get_researched_upgrades(const wyrmgus::unit_type *unit_type) const
 	{
 		static std::vector<const CUpgrade *> empty_vector;
@@ -599,13 +612,10 @@ public:
 	*/
 	std::vector<std::vector<const wyrmgus::unit_type *>> BuyMarkets;
 
-	/**
-	** The index is the unit type id, giving a table of all
-	** resources it can choose to produce.
-	*/
-	std::vector<std::vector<int>> ProducedResources;
-
 private:
+	//lists of resources, mapped to the unit types that can produce them
+	wyrmgus::unit_type_map<std::vector<const wyrmgus::resource *>> produced_resources;
+
 	//unit types associated with lists of upgrades which they can research
 	wyrmgus::unit_type_map<std::vector<const CUpgrade *>> researched_upgrades;
 
