@@ -550,7 +550,7 @@ void CUnit::Release(const bool final)
 			throw std::runtime_error("Unit is having its base reference cleared for release, despite its reference count already being 0.");
 		}
 
-		this->base_ref.reset();
+		this->clear_base_reference();
 		return;
 	}
 
@@ -2875,6 +2875,11 @@ void CUnit::initialize_base_reference()
 {
 	this->base_ref = std::make_unique<wyrmgus::unit_ref>(this);
 	this->ref = this->base_ref;
+}
+
+void CUnit::clear_base_reference()
+{
+	this->base_ref.reset();
 }
 
 /**
@@ -6878,7 +6883,7 @@ void LetUnitDie(CUnit &unit, bool suicide)
 
 	unit.Resource.Workers.clear();
 
-	// removed units,  just remove.
+	// removed units, just remove.
 	if (unit.Removed) {
 		DebugPrint("Killing a removed unit?\n");
 		if (unit.UnitInside) {

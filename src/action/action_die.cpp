@@ -92,11 +92,11 @@ void COrder_Die::Execute(CUnit &unit)
 {
 	// Show death animation
 	if (AnimateActionDie(unit) == false) {
-		// some units has no death animation
+		// some units have no death animation
 		unit.Anim.Unbreakable = 0;
 	}
 	if (unit.Anim.Unbreakable) {
-		return ;
+		return;
 	}
 	const wyrmgus::unit_type &type = *unit.Type;
 

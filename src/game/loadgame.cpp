@@ -271,6 +271,20 @@ void LoadGame(const std::string &filename)
 	LuaLoadFile(filename);
 	LuaGarbageCollect();
 
+	//clear the base reference for destroyed units
+	const std::vector<CUnit *> units = wyrmgus::unit_manager::get()->get_units();
+	for (CUnit *unit : units) {
+		if (!unit->Destroyed) {
+			continue;
+		}
+
+		if (unit->get_ref_count() <= 1) {
+			std::cerr << "Destroyed unit has a reference count less than or equal to 1 before having its base reference cleared when loading a game, which means that no other unit refers to it, in which case it should not have been part of the unit manager's units vector, as it should have been fully released already." << std::endl;
+		}
+
+		unit->clear_base_reference();
+	}
+
 	PlaceUnits();
 
 	const unsigned long game_cycle = GameCycle;
