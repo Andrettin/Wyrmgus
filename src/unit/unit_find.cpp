@@ -254,6 +254,7 @@ class BestDepotFinder
 				if (worker->Container != nullptr) {
 					MarkUnitFieldFlags(*first_container);
 				}
+
 				//
 				// Take this depot?
 				//
@@ -538,7 +539,6 @@ private:
 	bool include_luxury;
 	bool only_same;
 	bool check_reachable;
-	bool from_outside_container;
 	//Wyrmgus end
 	CResourceFinder res_finder;
 	ResourceUnitFinder_Cost bestCost;
@@ -675,12 +675,12 @@ VisitResult ResourceUnitFinder::Visit(TerrainTraversal &terrainTraversal, const 
 */
 CUnit *UnitFindResource(const CUnit &unit, const CUnit &start_unit, const int range, const int resource,
 						//Wyrmgus start
-//						bool check_usage, const CUnit *deposit)
-						const bool check_usage, const CUnit *deposit, const bool only_harvestable, const bool ignore_exploration, const bool only_unsettled_area, const bool include_luxury, const bool only_same)
+//						bool check_usage, const CUnit *depot)
+						const bool check_usage, const CUnit *depot, const bool only_harvestable, const bool ignore_exploration, const bool only_unsettled_area, const bool include_luxury, const bool only_same)
 						//Wyrmgus end
 {
-	if (!deposit) { // Find the nearest depot
-		deposit = FindDepositNearLoc(*unit.Player, start_unit.tilePos, range, resource, start_unit.MapLayer->ID);
+	if (!depot) { // Find the nearest depot
+		depot = FindDepositNearLoc(*unit.Player, start_unit.tilePos, range, resource, start_unit.MapLayer->ID);
 	}
 
 	TerrainTraversal terrainTraversal;
@@ -703,8 +703,8 @@ CUnit *UnitFindResource(const CUnit &unit, const CUnit &start_unit, const int ra
 	CUnit *resultMine = nullptr;
 
 	//Wyrmgus start
-//	ResourceUnitFinder resourceUnitFinder(unit, deposit, resource, range, check_usage, &resultMine);
-	ResourceUnitFinder resourceUnitFinder(unit, deposit, resource, range, check_usage, &resultMine, only_harvestable, ignore_exploration, only_unsettled_area, include_luxury, only_same);
+//	ResourceUnitFinder resourceUnitFinder(unit, depot, resource, range, check_usage, &resultMine);
+	ResourceUnitFinder resourceUnitFinder(unit, depot, resource, range, check_usage, &resultMine, only_harvestable, ignore_exploration, only_unsettled_area, include_luxury, only_same);
 	//Wyrmgus end
 
 	terrainTraversal.Run(resourceUnitFinder);

@@ -690,7 +690,7 @@ static int CostMoveToCallBack_Default(unsigned int index, const CUnit &unit, int
 #endif
 	int cost = 0;
 	const int mask = unit.Type->MovementMask;
-	const CUnitTypeFinder unit_finder((UnitTypeType)unit.Type->UnitType);
+	const CUnitTypeFinder unit_finder(unit.Type->UnitType);
 
 	// verify each tile of the unit.
 	int h = unit.Type->get_tile_height();
