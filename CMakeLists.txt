@@ -36,7 +36,7 @@ set(STRATAGUS_MINOR_VERSION 0)
 # Stratagus patch level (maximum 99)
 set(STRATAGUS_PATCH_LEVEL 0)
 # Stratagus patch level 2
-set(STRATAGUS_PATCH_LEVEL2 5)
+set(STRATAGUS_PATCH_LEVEL2 6)
 #########################
 
 project(stratagus)
