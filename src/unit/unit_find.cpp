@@ -688,7 +688,7 @@ CUnit *UnitFindResource(const CUnit &unit, const CUnit &start_unit, const int ra
 	//Wyrmgus end
 	terrainTraversal.Init();
 
-	if (&unit != &start_unit) {
+	if (&unit != &start_unit || start_unit.Container != nullptr) {
 		terrainTraversal.push_unit_pos_and_neighbor_if_passable(start_unit, unit.Type->MovementMask);
 	} else {
 		terrainTraversal.PushUnitPosAndNeighbor(start_unit);
