@@ -614,7 +614,7 @@ void CUnit::SetResourcesHeld(int quantity)
 	
 	const wyrmgus::unit_type_variation *variation = this->GetVariation();
 	if (
-		variation
+		variation != nullptr
 		&& (
 			(variation->ResourceMin && this->ResourcesHeld < variation->ResourceMin)
 			|| (variation->ResourceMax && this->ResourcesHeld > variation->ResourceMax)

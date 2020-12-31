@@ -1579,30 +1579,15 @@ static void ApplyUpgradeModifier(CPlayer &player, const wyrmgus::upgrade_modifie
 				
 				//change variation if current one becomes forbidden
 				const wyrmgus::unit_type_variation *current_variation = unit.GetVariation();
-				if (current_variation) {
-					bool upgrade_forbidden = false;
-					for (const CUpgrade *forbidden_upgrade : current_variation->UpgradesForbidden) {
-						if (um->UpgradeId == forbidden_upgrade->ID) {
-							upgrade_forbidden = true;
-							break;
-						}
-					}
-					if (upgrade_forbidden == true) {
+				if (current_variation != nullptr) {
+					if (!unit.can_have_variation(current_variation)) {
 						unit.ChooseVariation();
 					}
 				}
 				for (int i = 0; i < MaxImageLayers; ++i) {
 					const wyrmgus::unit_type_variation *current_layer_variation = unit.GetLayerVariation(i);
-					if (current_layer_variation) {
-						bool upgrade_forbidden = false;
-						for (const CUpgrade *forbidden_upgrade : current_layer_variation->UpgradesForbidden) {
-							if (um->UpgradeId == forbidden_upgrade->ID) {
-								upgrade_forbidden = true;
-								break;
-							}
-						}
-
-						if (upgrade_forbidden == true) {
+					if (current_layer_variation != nullptr) {
+						if (!unit.can_have_variation(current_layer_variation)) {
 							unit.ChooseVariation(nullptr, false, i);
 						}
 					}
@@ -1873,29 +1858,15 @@ static void RemoveUpgradeModifier(CPlayer &player, const wyrmgus::upgrade_modifi
 				
 				//change variation if current one becomes forbidden
 				const wyrmgus::unit_type_variation *current_variation = unit.GetVariation();
-				if (current_variation) {
-					bool upgrade_required = false;
-					for (const CUpgrade *required_upgrade : current_variation->UpgradesRequired) {
-						if (um->UpgradeId == required_upgrade->ID) {
-							upgrade_required = true;
-							break;
-						}
-					}
-					if (upgrade_required == true) {
+				if (current_variation != nullptr) {
+					if (!unit.can_have_variation(current_variation)) {
 						unit.ChooseVariation();
 					}
 				}
 				for (int i = 0; i < MaxImageLayers; ++i) {
 					const wyrmgus::unit_type_variation *current_layer_variation = unit.GetLayerVariation(i);
-					if (current_layer_variation) {
-						bool upgrade_required = false;
-						for (const CUpgrade *required_upgrade : current_layer_variation->UpgradesRequired) {
-							if (um->UpgradeId == required_upgrade->ID) {
-								upgrade_required = true;
-								break;
-							}
-						}
-						if (upgrade_required == true) {
+					if (current_layer_variation != nullptr) {
+						if (!unit.can_have_variation(current_layer_variation)) {
 							unit.ChooseVariation(nullptr, false, i);
 						}
 					}
@@ -1979,29 +1950,15 @@ void ApplyIndividualUpgradeModifier(CUnit &unit, const wyrmgus::upgrade_modifier
 	//Wyrmgus start
 	//change variation if current one becomes forbidden
 	const wyrmgus::unit_type_variation *current_variation = unit.GetVariation();
-	if (current_variation) {
-		bool upgrade_forbidden = false;
-		for (const CUpgrade *forbidden_upgrade : current_variation->UpgradesForbidden) {
-			if (um->UpgradeId == forbidden_upgrade->ID) {
-				upgrade_forbidden = true;
-				break;
-			}
-		}
-		if (upgrade_forbidden == true) {
+	if (current_variation != nullptr) {
+		if (!unit.can_have_variation(current_variation)) {
 			unit.ChooseVariation();
 		}
 	}
 	for (int i = 0; i < MaxImageLayers; ++i) {
 		const wyrmgus::unit_type_variation *current_layer_variation = unit.GetLayerVariation(i);
-		if (current_layer_variation) {
-			bool upgrade_forbidden = false;
-			for (const CUpgrade *forbidden_upgrade : current_layer_variation->UpgradesForbidden) {
-				if (um->UpgradeId == forbidden_upgrade->ID) {
-					upgrade_forbidden = true;
-					break;
-				}
-			}
-			if (upgrade_forbidden == true) {
+		if (current_layer_variation != nullptr) {
+			if (!unit.can_have_variation(current_layer_variation)) {
 				unit.ChooseVariation(nullptr, false, i);
 			}
 		}
@@ -2075,29 +2032,15 @@ void RemoveIndividualUpgradeModifier(CUnit &unit, const wyrmgus::upgrade_modifie
 	//Wyrmgus start
 	//change variation if current one becomes forbidden
 	const wyrmgus::unit_type_variation *current_variation = unit.GetVariation();
-	if (current_variation) {
-		bool upgrade_required = false;
-		for (const CUpgrade *required_upgrade : current_variation->UpgradesRequired) {
-			if (um->UpgradeId == required_upgrade->ID) {
-				upgrade_required = true;
-				break;
-			}
-		}
-		if (upgrade_required == true) {
+	if (current_variation != nullptr) {
+		if (!unit.can_have_variation(current_variation)) {
 			unit.ChooseVariation();
 		}
 	}
 	for (int i = 0; i < MaxImageLayers; ++i) {
 		const wyrmgus::unit_type_variation *current_layer_variation = unit.GetLayerVariation(i);
-		if (current_layer_variation) {
-			bool upgrade_required = false;
-			for (const CUpgrade *required_upgrade : current_layer_variation->UpgradesRequired) {
-				if (um->UpgradeId == required_upgrade->ID) {
-					upgrade_required = true;
-					break;
-				}
-			}
-			if (upgrade_required == true) {
+		if (current_layer_variation != nullptr) {
+			if (!unit.can_have_variation(current_layer_variation)) {
 				unit.ChooseVariation(nullptr, false, i);
 			}
 		}
