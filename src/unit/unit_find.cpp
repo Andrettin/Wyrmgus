@@ -479,7 +479,7 @@ public:
 		worker(worker),
 		resinfo(*worker.Type->ResInfo[resource]),
 		deposit(deposit),
-		movemask(worker.Type->MovementMask & ~(MapFieldLandUnit | MapFieldAirUnit | MapFieldSeaUnit)),
+		movemask(worker.Type->MovementMask),
 		maxRange(maxRange),
 		check_usage(check_usage),
 		//Wyrmgus start
@@ -695,7 +695,7 @@ CUnit *UnitFindResource(const CUnit &unit, const CUnit &start_unit, const int ra
 	terrainTraversal.Init();
 
 	if (&unit != &start_unit) {
-		terrainTraversal.push_unit_pos_and_neighbor_if_passable(start_unit, unit.Type->MovementMask & ~(MapFieldLandUnit | MapFieldAirUnit | MapFieldSeaUnit));
+		terrainTraversal.push_unit_pos_and_neighbor_if_passable(start_unit, unit.Type->MovementMask);
 	} else {
 		terrainTraversal.PushUnitPosAndNeighbor(start_unit);
 	}
