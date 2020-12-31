@@ -313,6 +313,12 @@ int PlaceReachable(const CUnit &src, const Vec2i &goalPos, int w, int h, int min
 				if (!CMap::Map.Info.IsPointOnMap(it, src.Container->MapLayer)) {
 					continue;
 				}
+
+				if (!CanMoveToMask(it, src.Type->MovementMask, z)) {
+					//ignore tiles to which the unit cannot be dropped from its container
+					continue;
+				}
+
 				temp_i = AStarFindPath(it, goalPos, w, h,
 						  src.Type->get_tile_width(), src.Type->get_tile_height(),
 						  minrange, range, nullptr, 0, src, max_length, z);
