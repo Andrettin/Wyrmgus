@@ -1464,11 +1464,22 @@ bool COrder_Resource::WaitInDepot(CUnit &unit)
 
 		// If goal is not null, then we got it in AiGetSuitableDepot
 		if (!goal) {
-			//Wyrmgus start
-//			goal = UnitFindResource(unit, newdepot ? *newdepot : (mine ? *mine : unit), mine ? range : 1000,
-//									this->CurrentResource, unit.Player->AiEnabled, newdepot ? newdepot : depot);
-			goal = UnitFindResource(unit, newdepot ? *newdepot : ((mine && mine->Type) ? *mine : unit), (mine && mine->Type) ? range : 1000, this->CurrentResource, true, newdepot ? newdepot : depot, true, false, false, false, true);
-			//Wyrmgus end
+			if (mine != nullptr && mine->IsAlive() && mine->GivesResource == this->CurrentResource) {
+				goal = mine;
+			} else {
+				const CUnit *start_unit = nullptr;
+				if (newdepot != nullptr) {
+					start_unit = newdepot;
+				} else if (depot != nullptr) {
+					start_unit = depot;
+				}
+
+				//Wyrmgus start
+	//			goal = UnitFindResource(unit, newdepot ? *newdepot : (mine ? *mine : unit), mine ? range : 1000,
+	//									this->CurrentResource, unit.Player->AiEnabled, newdepot ? newdepot : depot);
+				goal = UnitFindResource(unit, start_unit ? *start_unit : unit, 1000, this->CurrentResource, true, newdepot ? newdepot : depot, true, false, false, false, true);
+				//Wyrmgus end
+			}
 		}
 
 		if (goal) {
