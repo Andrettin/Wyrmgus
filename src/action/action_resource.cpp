@@ -1437,7 +1437,7 @@ bool COrder_Resource::WaitInDepot(CUnit &unit)
 			return false;
 		}
 	} else {
-		const unsigned int tooManyWorkers = 15;
+		static constexpr unsigned int too_many_workers = 15;
 		CUnit *mine = this->Resource.get_mine();
 		const int range = 15;
 		CUnit *newdepot = nullptr;
@@ -1451,8 +1451,8 @@ bool COrder_Resource::WaitInDepot(CUnit &unit)
 			// If the depot is overused, we need first to try to switch into another depot
 			// Use depot's ref counter for that
 			//Wyrmgus start
-//			if (longWay || !mine || (depot->get_ref_count() > tooManyWorkers)) {
-			if (longWay || !mine || mine->Type == nullptr || (depot->get_ref_count() > tooManyWorkers)) {
+//			if (longWay || !mine || (depot->get_ref_count() > too_many_workers)) {
+			if (longWay || !mine || mine->Type == nullptr || (depot->get_ref_count() > too_many_workers)) {
 			//Wyrmgus end
 				newdepot = AiGetSuitableDepot(unit, *depot, &goal);
 				if (newdepot == nullptr && longWay && unit.Player->NumTownHalls > 0) {

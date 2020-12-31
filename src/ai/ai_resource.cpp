@@ -661,13 +661,13 @@ CUnit *AiGetSuitableDepot(const CUnit &worker, const CUnit &oldDepot, CUnit **re
 	for (std::vector<CUnit *>::iterator it = depots.begin(); it != depots.end(); ++it) {
 		CUnit &unit = **it;
 
-		const unsigned int tooManyWorkers = 15;
+		static constexpr unsigned int too_many_workers = 15;
 		const int range = 15;
 
 		if (&oldDepot == &unit) {
 			continue;
 		}
-		if (unit.get_ref_count() > tooManyWorkers) {
+		if (unit.get_ref_count() > too_many_workers) {
 			continue;
 		}
 		if (AiEnemyUnitsInDistance(worker, range, worker.MapLayer->ID)) {
