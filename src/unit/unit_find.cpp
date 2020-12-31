@@ -247,13 +247,7 @@ class BestDepotFinder
 				}
 				
 				//calculate real travel distance
-				if (worker->Container != nullptr) {
-					UnmarkUnitFieldFlags(*first_container);
-				}
 				const int travel_distance = UnitReachable(*worker, *dest, 1, 0, true);
-				if (worker->Container != nullptr) {
-					MarkUnitFieldFlags(*first_container);
-				}
 
 				//
 				// Take this depot?
