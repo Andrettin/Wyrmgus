@@ -916,11 +916,11 @@ void DrawAge()
 	const wyrmgus::resource_icon *icon = age->get_icon();
 	icon->get_graphics()->DrawFrameClip(icon->get_frame(), UI.AgePanel.IconX, UI.AgePanel.IconY);
 	
-	if (UI.AgePanel.TextX != -1 && !UI.AgePanel.Text.empty()) {
+	if (UI.AgePanel.TextX != -1) {
 		UI.AgePanel.Font = wyrmgus::defines::get()->get_game_font();
 		
 		CLabel label(UI.AgePanel.Font);
-		label.Draw(UI.AgePanel.TextX, UI.AgePanel.TextY, UI.AgePanel.Text);
+		label.Draw(UI.AgePanel.TextX, UI.AgePanel.TextY, age->get_name());
 	}
 }
 
@@ -1186,15 +1186,22 @@ void DrawPopups()
 	
 	//commented out as right now the popup is a bit pointless, as it only shows the same text as what's already written in the HUD; the popup should be restored when they are able to show more text
 	/*
+	const wyrmgus::age *age = nullptr;
+	if (CPlayer::GetThisPlayer() != nullptr) {
+		age = CPlayer::GetThisPlayer()->get_age();
+	} else {
+		age = wyrmgus::age::current_age;
+	}
+
 	if (
 		UI.AgePanel.TextX != -1
-		&& !UI.AgePanel.Text.empty()
+		&& age != nullptr
 		&& CursorScreenPos.x >= UI.AgePanel.TextX
-		&& CursorScreenPos.x < (UI.AgePanel.TextX + UI.AgePanel.Font->Width(UI.AgePanel.Text))
+		&& CursorScreenPos.x < (UI.AgePanel.TextX + UI.AgePanel.Font->Width(age->get_name()))
 		&& CursorScreenPos.y >= UI.AgePanel.TextY
 		&& CursorScreenPos.y < (UI.AgePanel.TextY + UI.AgePanel.Font->Height())
 	) {
-		DrawGenericPopup(_(UI.AgePanel.Text.c_str()), UI.AgePanel.TextX, UI.AgePanel.TextY + 16 * wyrmgus::defines::get()->get_scale_factor() + GameCursor->G->getHeight() / 2, "", "", false);
+		DrawGenericPopup(_(age->get_name().c_str()), UI.AgePanel.TextX, UI.AgePanel.TextY + 16 * wyrmgus::defines::get()->get_scale_factor() + GameCursor->G->getHeight() / 2, "", "", false);
 	}
 	*/
 	

@@ -1529,14 +1529,10 @@ void CPlayer::set_age(const wyrmgus::age *age)
 	this->age = age;
 	
 	if (this == CPlayer::GetThisPlayer()) {
-		if (this->age) {
-			UI.AgePanel.Text = this->age->get_name();
-			
+		if (this->age != nullptr) {
 			if (GameCycle > 0 && !SaveGameLoading) {
 				this->Notify(_("The %s has dawned upon us."), _(this->age->get_name().c_str()));
 			}
-		} else {
-			UI.AgePanel.Text.clear();
 		}
 	}
 	
