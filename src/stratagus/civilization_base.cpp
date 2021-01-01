@@ -143,8 +143,11 @@ void civilization_base::reset_history()
 const name_generator *civilization_base::get_personal_name_generator(const gender gender) const
 {
 	const auto find_iterator = this->personal_name_generators.find(gender);
-	if (find_iterator != this->personal_name_generators.end() && find_iterator->second->get_name_count() >= name_generator::minimum_name_count) {
-		return find_iterator->second.get();
+	if (find_iterator != this->personal_name_generators.end()) {
+		const size_t name_count = find_iterator->second->get_name_count();
+		if (name_count >= name_generator::minimum_name_count) {
+			return find_iterator->second.get();
+		}
 	}
 
 	if (this->get_group() != nullptr) {
