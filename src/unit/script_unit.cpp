@@ -704,10 +704,9 @@ static int CclUnit(lua_State *l)
 			int rally_point_x = LuaToNumber(l, 2, j + 1);
 			++j;
 			int rally_point_y = LuaToNumber(l, 2, j + 1);
-			unit->RallyPointPos.x = rally_point_x;
-			unit->RallyPointPos.y = rally_point_y;
+			unit->rally_point_pos = QPoint(rally_point_x, rally_point_y);
 		} else if (!strcmp(value, "rally_point_map_layer")) {
-			unit->RallyPointMapLayer = CMap::Map.MapLayers[LuaToNumber(l, 2, j + 1)].get();
+			unit->rally_point_map_layer = CMap::Map.MapLayers[LuaToNumber(l, 2, j + 1)].get();
 		//Wyrmgus end
 		} else {
 			const int index = UnitTypeVar.VariableNameLookup[value];// User variables

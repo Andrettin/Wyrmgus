@@ -556,8 +556,8 @@ void CViewport::Draw() const
 	//better to not show it all the time, so that there's no clutter
 	/*
 	for (size_t i = 0; i != Selected.size(); ++i) {
-		if (!Selected[i]Destroyed && !Selected[i]Removed && Selected[i]->RallyPointPos.x != -1 && Selected[i]->RallyPointPos.y != -1) {
-			Video.FillCircleClip(ColorGreen, CurrentViewport->TilePosToScreen_Center(Selected[i]->RallyPointPos), 3);
+		if (!Selected[i]Destroyed && !Selected[i]Removed && Selected[i]->get_rally_point_pos().x() != -1 && Selected[i]->get_rally_point_pos().y() != -1) {
+			Video.FillCircleClip(ColorGreen, CurrentViewport->TilePosToScreen_Center(Selected[i]->get_rally_point_pos()), 3);
 		}
 	}
 	*/

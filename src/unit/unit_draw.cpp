@@ -812,8 +812,8 @@ void ShowOrder(const CUnit &unit)
 	
 	//Wyrmgus start
 	//if unit has rally point, show it
-	if (unit.RallyPointPos.x != -1 && unit.RallyPointPos.y != -1 && unit.RallyPointMapLayer && unit.RallyPointMapLayer == UI.CurrentMapLayer) {
-		Video.FillCircleClip(ColorGreen, CurrentViewport->TilePosToScreen_Center(unit.RallyPointPos), 3);
+	if (unit.get_rally_point_pos().x() != -1 && unit.get_rally_point_pos().y() != -1 && unit.get_rally_point_map_layer() != nullptr && unit.get_rally_point_map_layer() == UI.CurrentMapLayer) {
+		Video.FillCircleClip(ColorGreen, CurrentViewport->TilePosToScreen_Center(unit.get_rally_point_pos()), 3);
 	}
 	//Wyrmgus end
 }

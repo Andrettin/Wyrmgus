@@ -418,9 +418,9 @@ void SaveUnit(const CUnit &unit, CFile &file)
 			file.printf(",\n  \"individual-upgrade\", \"%s\", %d", upgrade->get_identifier().c_str(), unit.GetIndividualUpgrade(upgrade));
 		}
 	}
-	if (unit.RallyPointPos.x != -1 && unit.RallyPointPos.y != -1 && unit.RallyPointMapLayer) {
-		file.printf(",\n  \"rally_point\", %d, %d", unit.RallyPointPos.x, unit.RallyPointPos.y);
-		file.printf(",\n  \"rally_point_map_layer\", %d, ", unit.RallyPointMapLayer->ID);
+	if (unit.get_rally_point_pos().x() != -1 && unit.get_rally_point_pos().y() != -1 && unit.get_rally_point_map_layer() != nullptr) {
+		file.printf(",\n  \"rally_point\", %d, %d", unit.get_rally_point_pos().x(), unit.get_rally_point_pos().y());
+		file.printf(",\n  \"rally_point_map_layer\", %d, ", unit.get_rally_point_map_layer()->ID);
 	}
 	if (unit.get_character() != nullptr && unit.CurrentAction() != UnitAction::Die && !unit.Destroyed) {
 		if (!unit.get_character()->Custom) {

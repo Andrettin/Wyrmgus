@@ -437,6 +437,22 @@ public:
 	
 	CUnit *GetFirstContainer() const;
 
+	const QPoint &get_rally_point_pos() const
+	{
+		return this->rally_point_pos;
+	}
+
+	const CMapLayer *get_rally_point_map_layer() const
+	{
+		return this->rally_point_map_layer;
+	}
+
+	void set_rally_point(const QPoint &pos, const CMapLayer *map_layer)
+	{
+		this->rally_point_pos = pos;
+		this->rally_point_map_layer = map_layer;
+	}
+
 	void SetIndividualUpgrade(const CUpgrade *upgrade, int quantity);
 	int GetIndividualUpgrade(const CUpgrade *upgrade) const;
 	int GetAvailableLevelUpUpgrades(bool only_units = false) const;
@@ -622,12 +638,16 @@ public:
 	//Wyrmgus end
 	
 	Vec2i tilePos = Vec2i(-1, -1); /// Map position X
+private:
+	QPoint rally_point_pos = QPoint(-1, -1); //used for storing the rally point position (where units trained by this unit will be sent to)
+public:
 	//Wyrmgus start
-	Vec2i RallyPointPos = Vec2i(-1, -1);			/// used for storing the rally point position (where units trained by this unit will be sent to)
 	CMapLayer *MapLayer = nullptr;			/// in which map layer the unit is
-	CMapLayer *RallyPointMapLayer = nullptr;	/// in which map layer the unit's rally point is
+private:
+	const CMapLayer *rally_point_map_layer = nullptr; //in which map layer the unit's rally point is
 	//Wyrmgus end
 
+public:
 	unsigned int Offset;/// Map position as flat index offset (x + y * w)
 
 	const wyrmgus::unit_type *Type;        /// Pointer to unit-type (peon,...)

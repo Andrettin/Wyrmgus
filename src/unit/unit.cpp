@@ -422,10 +422,9 @@ void CUnit::Init()
 	tilePos.x = 0;
 	tilePos.y = 0;
 	//Wyrmgus start
-	RallyPointPos.x = -1;
-	RallyPointPos.y = -1;
-	MapLayer = nullptr;
-	RallyPointMapLayer = nullptr;
+	this->rally_point_pos = QPoint(-1, -1);
+	this->MapLayer = nullptr;
+	this->rally_point_map_layer = nullptr;
 	//Wyrmgus end
 	Offset = 0;
 	this->Type = nullptr;

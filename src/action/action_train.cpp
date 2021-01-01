@@ -431,16 +431,16 @@ static void AnimateActionTrain(CUnit &unit)
 		}
 		*/
 		
-		if (unit.RallyPointPos.x != -1 && unit.RallyPointPos.y != -1 && unit.RallyPointMapLayer && newUnit->CanMove()) {
+		if (unit.get_rally_point_pos().x() != -1 && unit.get_rally_point_pos().y() != -1 && unit.get_rally_point_map_layer() != nullptr && newUnit->CanMove()) {
 			bool command_found = false;
 			std::vector<CUnit *> table;
-			Select(unit.RallyPointPos, unit.RallyPointPos, table, unit.RallyPointMapLayer->ID);
+			Select(unit.get_rally_point_pos(), unit.get_rally_point_pos(), table, unit.get_rally_point_map_layer()->ID);
 			for (size_t j = 0; j != table.size(); ++j) {
 				if (!table[j]->IsAliveOnMap() || table[j]->Type->BoolFlag[DECORATION_INDEX].value) {
 					continue;
 				}
 				if (newUnit->Type->RepairRange && table[j]->Type->RepairHP && table[j]->Variable[HP_INDEX].Value < table[j]->GetModifiedVariable(HP_INDEX, VariableAttribute::Max) && (table[j]->Player == newUnit->Player || newUnit->IsAllied(*table[j]))) { //see if can repair
-					CommandRepair(*newUnit, unit.RallyPointPos, table[j], FlushCommands, unit.RallyPointMapLayer->ID);
+					CommandRepair(*newUnit, unit.get_rally_point_pos(), table[j], FlushCommands, unit.get_rally_point_map_layer()->ID);
 					command_found = true;
 				} else if (newUnit->CanHarvest(table[j])) { // see if can harvest
 					CommandResource(*newUnit, *table[j], FlushCommands);
@@ -464,10 +464,10 @@ static void AnimateActionTrain(CUnit &unit)
 				}
 			}
 			
-			if (!command_found && unit.RallyPointMapLayer->Field(unit.RallyPointPos)->player_info->IsTeamExplored(*newUnit->Player)) { // see if can harvest terrain
+			if (!command_found && unit.get_rally_point_map_layer()->Field(unit.get_rally_point_pos())->player_info->IsTeamExplored(*newUnit->Player)) { // see if can harvest terrain
 				for (const wyrmgus::resource *resource : wyrmgus::resource::get_all()) {
-					if (newUnit->Type->ResInfo[resource->get_index()] && CMap::Map.Field(unit.RallyPointPos, unit.RallyPointMapLayer->ID)->get_resource() == resource) {
-						CommandResourceLoc(*newUnit, unit.RallyPointPos, FlushCommands, unit.RallyPointMapLayer->ID);
+					if (newUnit->Type->ResInfo[resource->get_index()] && CMap::Map.Field(unit.get_rally_point_pos(), unit.get_rally_point_map_layer()->ID)->get_resource() == resource) {
+						CommandResourceLoc(*newUnit, unit.get_rally_point_pos(), FlushCommands, unit.get_rally_point_map_layer()->ID);
 						command_found = true;
 						break;
 					}
@@ -475,7 +475,7 @@ static void AnimateActionTrain(CUnit &unit)
 			}
 			
 			if (!command_found) {
-				CommandMove(*newUnit, unit.RallyPointPos, FlushCommands, unit.RallyPointMapLayer->ID);
+				CommandMove(*newUnit, unit.get_rally_point_pos(), FlushCommands, unit.get_rally_point_map_layer()->ID);
 			}
 		}
 	}

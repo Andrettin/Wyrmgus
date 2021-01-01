@@ -289,8 +289,8 @@ static int UnloadUnit(CUnit &transporter, CUnit &unit, int landmass)
 	
 	//Wyrmgus start
 	//if transporter has a rally point (useful for towers), send the unloaded unit there
-	if (transporter.RallyPointPos.x != -1 && transporter.RallyPointPos.y != -1 && unit.CanMove()) {
-		CommandMove(unit, transporter.RallyPointPos, FlushCommands, transporter.RallyPointMapLayer->ID);
+	if (transporter.get_rally_point_pos().x() != -1 && transporter.get_rally_point_pos().y() != -1 && unit.CanMove()) {
+		CommandMove(unit, transporter.get_rally_point_pos(), FlushCommands, transporter.get_rally_point_map_layer()->ID);
 	}
 	//Wyrmgus end
 	return true;

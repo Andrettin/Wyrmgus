@@ -386,8 +386,7 @@ void CommandRallyPoint(CUnit &unit, const Vec2i &pos, int z)
 	if (IsUnitValidForNetwork(unit) == false) {
 		return ;
 	}
-	unit.RallyPointPos = pos;
-	unit.RallyPointMapLayer = CMap::Map.MapLayers[z].get();
+	unit.set_rally_point(pos, CMap::Map.MapLayers[z].get());
 }
 
 /**
