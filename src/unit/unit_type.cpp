@@ -972,7 +972,6 @@ void unit_type::ProcessConfigData(const CConfigData *config_data)
 		} else if (key == "autocast_active") {
 			if (value == "false") {
 				this->autocast_spells.clear();
-				this->spell_autocast.clear();
 			} else {
 				const spell *spell = spell::get(value);
 				this->add_autocast_spell(spell);
@@ -1440,19 +1439,11 @@ void unit_type::set_image_file(const std::filesystem::path &filepath)
 
 bool unit_type::is_autocast_spell(const spell *spell) const
 {
-	if (static_cast<size_t>(spell->Slot) < this->spell_autocast.size()) {
-		return this->spell_autocast[spell->Slot];
-	}
-
-	return false;
+	return vector::contains(this->get_autocast_spells(), spell);
 }
 
 void unit_type::add_autocast_spell(const spell *spell)
 {
-	if (static_cast<size_t>(spell->Slot) >= this->spell_autocast.size()) {
-		this->spell_autocast.resize(spell->Slot + 1, false);
-	}
-	this->spell_autocast[spell->Slot] = true;
 	this->autocast_spells.push_back(spell);
 }
 
@@ -1572,7 +1563,7 @@ void unit_type::set_parent(const unit_type *parent_type)
 		this->Icon.Load();
 	}
 	this->Spells = parent_type->Spells;
-	this->spell_autocast = parent_type->spell_autocast;
+	this->autocast_spells = parent_type->autocast_spells;
 
 	for (unsigned int i = 0; i < MaxCosts; ++i) {
 		this->DefaultStat.Costs[i] = parent_type->DefaultStat.Costs[i];

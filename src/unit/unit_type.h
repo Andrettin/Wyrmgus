@@ -923,11 +923,6 @@ public:
 	bool is_autocast_spell(const spell *spell) const;
 	void add_autocast_spell(const spell *spell);
 
-	const std::vector<bool> &get_spell_autocast() const
-	{
-		return this->spell_autocast;
-	}
-
 	bool CheckUserBoolFlags(const char *BoolFlags) const;
 	//Wyrmgus start
 //	bool CanTransport() const { return MaxOnBoard > 0 && !GivesResource; }
@@ -1139,7 +1134,6 @@ public:
 	std::vector<spell *> Spells;	/// Spells the unit is able to cast.
 private:
 	std::vector<const spell *> autocast_spells; //the list of autocast spells
-	std::vector<bool> spell_autocast; //the default value for the autocast, mapped to spell indexes
 public:
 	int AutoBuildRate = 0;			/// The rate at which the building builds itself
 	int RandomMovementProbability = 0;  /// Probability to move randomly.

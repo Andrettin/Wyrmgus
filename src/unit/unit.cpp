@@ -496,7 +496,6 @@ void CUnit::Init()
 	this->Orders.clear();
 	this->clear_special_orders();
 	this->autocast_spells.clear();
-	this->spell_autocast.clear();
 	this->SpellCoolDownTimers.reset();
 	this->AutoRepair = 0;
 	this->Goal = nullptr;
@@ -582,7 +581,6 @@ void CUnit::Release(const bool final)
 
 	this->pathFinderData.reset();
 	this->autocast_spells.clear();
-	this->spell_autocast.clear();
 	this->SpellCoolDownTimers.reset();
 	this->Variable.clear();
 	this->Orders.clear();
@@ -2836,10 +2834,7 @@ void CUnit::Init(const wyrmgus::unit_type &type)
 	//Wyrmgus end
 		SpellCoolDownTimers = std::make_unique<int[]>(wyrmgus::spell::get_all().size());
 		memset(SpellCoolDownTimers.get(), 0, wyrmgus::spell::get_all().size() * sizeof(int));
-		this->spell_autocast = this->Type->get_spell_autocast();
-		for (size_t i = 0; i < this->spell_autocast.size(); ++i) {
-			this->autocast_spells.push_back(wyrmgus::spell::get_all()[i]);
-		}
+		this->autocast_spells = this->Type->get_autocast_spells();
 	//Wyrmgus start
 //	}
 	//Wyrmgus end
@@ -6193,25 +6188,16 @@ bool CUnit::CanCastAnySpell() const
 
 bool CUnit::is_autocast_spell(const wyrmgus::spell *spell) const
 {
-	if (static_cast<size_t>(spell->Slot) < this->spell_autocast.size()) {
-		return this->spell_autocast[spell->Slot];
-	}
-
-	return false;
+	return wyrmgus::vector::contains(this->get_autocast_spells(), spell);
 }
 
 void CUnit::add_autocast_spell(const wyrmgus::spell *spell)
 {
-	if (static_cast<size_t>(spell->Slot) >= this->spell_autocast.size()) {
-		this->spell_autocast.resize(spell->Slot + 1, false);
-	}
-	this->spell_autocast[spell->Slot] = true;
 	this->autocast_spells.push_back(spell);
 }
 
 void CUnit::remove_autocast_spell(const wyrmgus::spell *spell)
 {
-	this->spell_autocast[spell->Slot] = false;
 	wyrmgus::vector::remove(this->autocast_spells, spell);
 }
 

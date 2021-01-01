@@ -1450,7 +1450,6 @@ static int CclDefineUnitType(lua_State *l)
 			const int subargs = lua_rawlen(l, -1);
 			if (subargs == 0) {
 				type->autocast_spells.clear();
-				type->spell_autocast.clear();
 			}
 			for (int k = 0; k < subargs; ++k) {
 				value = LuaToString(l, -1, k + 1);

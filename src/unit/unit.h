@@ -744,7 +744,6 @@ public:
 
 private:
 	std::vector<const wyrmgus::spell *> autocast_spells; //the list of autocast spells
-	std::vector<bool> spell_autocast; //spells to auto cast, mapped to their spell IDs
 
 public:
 	std::unique_ptr<int[]> SpellCoolDownTimers;   /// how much time unit need to wait before spell will be ready

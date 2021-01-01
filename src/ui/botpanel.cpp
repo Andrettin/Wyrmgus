@@ -225,7 +225,7 @@ static int GetButtonStatus(const wyrmgus::button &button, int UnderCursor)
 
 			// Autocast
 			for (i = 0; i < Selected.size(); ++i) {
-				if (Selected[i]->is_autocast_spell(wyrmgus::spell::get_all()[button.Value]) != true) {
+				if (!Selected[i]->is_autocast_spell(wyrmgus::spell::get_all()[button.Value])) {
 					break;
 				}
 			}
