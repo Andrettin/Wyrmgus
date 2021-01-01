@@ -144,27 +144,6 @@ static void AiHelperInsert(std::vector<std::vector<const CUpgrade *> > &table,
 	}
 	table[n].push_back(base);
 }
-
-/**
-**  Insert new index element.
-**
-**  @param table  Table with elements.
-**  @param n      Index to insert new into table
-**  @param base   Base index to insert into table.
-*/
-static void AiHelperInsert(std::vector<std::vector<int> > &table,
-						   unsigned int n, int base)
-{
-	if (n >= table.size()) {
-		table.resize(n + 1);
-	}
-	// Look if already known
-	std::vector<int>::const_iterator it = std::find(table[n].begin(), table[n].end(), base);
-	if (it != table[n].end()) {
-		return;
-	}
-	table[n].push_back(base);
-}
 //Wyrmgus end
 
 /**
