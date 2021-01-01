@@ -73,6 +73,13 @@ inline QPointF to_unsigned_geocoordinate(const QPoint &point, const QSize &area_
 
 extern QGeoCoordinate to_geocoordinate(const QPoint &point, const QSize &area_size, const QRectF &unsigned_georectangle);
 
+inline int square_distance_to(const QPoint &point, const QPoint &other_point)
+{
+	const int dx = point.x() - other_point.x();
+	const int dy = point.y() - other_point.y();
+	return dx * dx + dy * dy;
+}
+
 extern int distance_to(const QPoint &point, const QPoint &other_point);
 
 inline bool is_horizontally_adjacent_to(const QPoint &point, const QPoint &other_point)
