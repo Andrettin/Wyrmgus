@@ -27,56 +27,45 @@
 
 #pragma once
 
-#include "unit/unit_class_container.h"
-#include "util/singleton.h"
-
 namespace wyrmgus {
 
 enum class gender;
 
-class name_generator final : public singleton<name_generator>
+class name_generator final
 {
 public:
 	static constexpr size_t minimum_name_count = 10;
 
-	static void propagate_ungendered_names(const std::map<gender, std::vector<std::string>> &source_name_map, std::map<gender, std::vector<std::string>> &target_name_map);
+	static void propagate_ungendered_names(const std::map<gender, std::unique_ptr<name_generator>> &source_name_map, std::map<gender, std::unique_ptr<name_generator>> &target_name_map);
 
-	static void propagate_ungendered_names(std::map<gender, std::vector<std::string>> &name_map)
+	static void propagate_ungendered_names(std::map<gender, std::unique_ptr<name_generator>> &name_map)
 	{
 		name_generator::propagate_ungendered_names(name_map, name_map);
 	}
 
-	const std::vector<std::string> &get_specimen_names(const gender gender) const;
-	void add_specimen_names(const std::map<gender, std::vector<std::string>> &specimen_names);
-
-	const std::vector<std::string> &get_personal_names(const gender gender) const;
-	void add_personal_names(const std::map<gender, std::vector<std::string>> &personal_names);
-
-	const std::vector<std::string> &get_surnames() const
+	const std::vector<std::string> &get_names() const
 	{
-		return this->surnames;
+		return this->names;
 	}
 
-	void add_surnames(const std::vector<std::string> &surnames);
-
-	const std::vector<std::string> &get_unit_class_names(const unit_class *unit_class) const;
-
-	void add_unit_class_names(const unit_class_map<std::vector<std::string>> &unit_class_names);
-
-	const std::vector<std::string> &get_ship_names() const
+	size_t get_name_count() const
 	{
-		return this->ship_names;
+		return this->names.size();
 	}
 
-	void add_ship_names(const std::vector<std::string> &ship_names);
+	bool is_name_valid(const std::string &name) const;
+
+	void add_name(const std::string &name)
+	{
+		this->names.push_back(name);
+	}
+
+	void add_names(const std::vector<std::string> &names);
+
+	std::string generate_name() const;
 
 private:
-	//name generation lists containing all names (i.e. from each civilization, species and etc.)
-	std::map<gender, std::vector<std::string>> specimen_names;
-	std::map<gender, std::vector<std::string>> personal_names;
-	std::vector<std::string> surnames;
-	unit_class_map<std::vector<std::string>> unit_class_names;
-	std::vector<std::string> ship_names;
+	std::vector<std::string> names; //name list for generation
 };
 
 }

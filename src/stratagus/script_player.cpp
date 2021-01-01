@@ -1712,12 +1712,6 @@ static int CclDefineFaction(lua_State *l)
 			for (int j = 0; j < args; ++j) {
 				faction->ProvinceNames.push_back(LuaToString(l, -1, j + 1));
 			}
-		} else if (!strcmp(value, "ShipNames")) {
-			faction->ship_names.clear();
-			const int args = lua_rawlen(l, -1);
-			for (int j = 0; j < args; ++j) {
-				faction->ship_names.push_back(LuaToString(l, -1, j + 1));
-			}
 		} else if (!strcmp(value, "HistoricalUpgrades")) {
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument");

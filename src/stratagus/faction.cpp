@@ -39,6 +39,7 @@
 #include "faction_type.h"
 #include "government_type.h"
 #include "luacallback.h"
+#include "name_generator.h"
 #include "player_color.h"
 #include "script/condition/and_condition.h"
 #include "unit/unit_type.h"
@@ -163,6 +164,12 @@ void faction::process_sml_scope(const sml_data &scope)
 		auto conditions = std::make_unique<and_condition>();
 		database::process_sml_data(conditions, scope);
 		this->conditions = std::move(conditions);
+	} else if (tag == "ship_names") {
+		if (this->ship_name_generator == nullptr) {
+			this->ship_name_generator = std::make_unique<name_generator>();
+		}
+
+		this->ship_name_generator->add_names(values);
 	} else {
 		data_entry::process_sml_scope(scope);
 	}
@@ -379,27 +386,17 @@ const std::vector<std::unique_ptr<CAiBuildingTemplate>> &faction::GetAiBuildingT
 	return this->civilization->GetAiBuildingTemplates();
 }
 
-const std::vector<std::string> &faction::get_ship_names() const
+const name_generator *faction::get_ship_name_generator() const
 {
-	if (this->ship_names.size() > 0) {
-		return this->ship_names;
+	if (this->ship_name_generator != nullptr) {
+		return this->ship_name_generator.get();
 	}
 	
 	if (this->get_parent_faction() != nullptr) {
-		return this->get_parent_faction()->get_ship_names();
+		return this->get_parent_faction()->get_ship_name_generator();
 	}
 	
-	return this->civilization->get_ship_names();
-}
-
-QStringList faction::get_ship_names_qstring_list() const
-{
-	return container::to_qstring_list(this->get_ship_names());
-}
-
-void faction::remove_ship_name(const std::string &ship_name)
-{
-	vector::remove_one(this->ship_names, ship_name);
+	return this->civilization->get_ship_name_generator();
 }
 
 unit_type *faction::get_class_unit_type(const unit_class *unit_class) const

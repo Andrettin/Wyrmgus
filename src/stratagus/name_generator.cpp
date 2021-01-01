@@ -31,81 +31,39 @@
 
 #include "gender.h"
 #include "util/vector_util.h"
+#include "util/vector_random_util.h"
 
 namespace wyrmgus {
 
-void name_generator::propagate_ungendered_names(const std::map<gender, std::vector<std::string>> &source_name_map, std::map<gender, std::vector<std::string>> &target_name_map)
+void name_generator::propagate_ungendered_names(const std::map<gender, std::unique_ptr<name_generator>> &source_name_map, std::map<gender, std::unique_ptr<name_generator>> &target_name_map)
 {
 	const auto find_iterator = source_name_map.find(gender::none);
 	if (find_iterator != source_name_map.end()) {
-		vector::merge(target_name_map[gender::male], find_iterator->second);
-		vector::merge(target_name_map[gender::female], find_iterator->second);
+		if (target_name_map.find(gender::male) == target_name_map.end()) {
+			target_name_map[gender::male] = std::make_unique<name_generator>();
+		}
+		target_name_map[gender::male]->add_names(find_iterator->second->get_names());
+
+		if (target_name_map.find(gender::female) == target_name_map.end()) {
+			target_name_map[gender::female] = std::make_unique<name_generator>();
+		}
+		target_name_map[gender::female]->add_names(find_iterator->second->get_names());
 	}
 }
 
-const std::vector<std::string> &name_generator::get_specimen_names(const gender gender) const
+bool name_generator::is_name_valid(const std::string &name) const
 {
-	const auto find_iterator = this->specimen_names.find(gender);
-	if (find_iterator != this->specimen_names.end()) {
-		return find_iterator->second;
-	}
-
-	return vector::empty_string_vector;
+	return vector::contains(this->names, name);
 }
 
-void name_generator::add_specimen_names(const std::map<gender, std::vector<std::string>> &specimen_names)
+void name_generator::add_names(const std::vector<std::string> &names)
 {
-	for (const auto &kv_pair : specimen_names) {
-		vector::merge(this->specimen_names[kv_pair.first], kv_pair.second);
-	}
-
-	name_generator::propagate_ungendered_names(specimen_names, this->specimen_names);
+	vector::merge(this->names, names);
 }
 
-const std::vector<std::string> &name_generator::get_personal_names(const gender gender) const
+std::string name_generator::generate_name() const
 {
-	const auto find_iterator = this->personal_names.find(gender);
-	if (find_iterator != this->personal_names.end()) {
-		return find_iterator->second;
-	}
-
-	return vector::empty_string_vector;
-}
-
-void name_generator::add_personal_names(const std::map<gender, std::vector<std::string>> &personal_names)
-{
-	for (const auto &kv_pair : personal_names) {
-		vector::merge(this->personal_names[kv_pair.first], kv_pair.second);
-	}
-
-	name_generator::propagate_ungendered_names(personal_names, this->personal_names);
-}
-
-void name_generator::add_surnames(const std::vector<std::string> &surnames)
-{
-	vector::merge(this->surnames, surnames);
-}
-
-const std::vector<std::string> &name_generator::get_unit_class_names(const unit_class *unit_class) const
-{
-	const auto find_iterator = this->unit_class_names.find(unit_class);
-	if (find_iterator != this->unit_class_names.end()) {
-		return find_iterator->second;
-	}
-
-	return vector::empty_string_vector;
-}
-
-void name_generator::add_unit_class_names(const unit_class_map<std::vector<std::string>> &unit_class_names)
-{
-	for (const auto &kv_pair : unit_class_names) {
-		vector::merge(this->unit_class_names[kv_pair.first], kv_pair.second);
-	}
-}
-
-void name_generator::add_ship_names(const std::vector<std::string> &ship_names)
-{
-	vector::merge(this->ship_names, ship_names);
+	return vector::get_random(this->names);
 }
 
 }

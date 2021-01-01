@@ -389,6 +389,7 @@ set(stratagusmain_SRCS
 	src/stratagus/dynasty.cpp
 	src/stratagus/faction.cpp
 	src/stratagus/faction_history.cpp
+	src/stratagus/fallback_name_generator.cpp
 	src/stratagus/grand_strategy.cpp
 	src/stratagus/groups.cpp
 	src/stratagus/iolib.cpp
@@ -1040,6 +1041,7 @@ set(stratagus_generic_HDRS
 	src/stratagus/faction.h
 	src/stratagus/faction_history.h
 	src/stratagus/faction_tier.h
+	src/stratagus/fallback_name_generator.h
 	src/stratagus/gender.h
 	src/stratagus/government_type.h
 	src/stratagus/literary_text.h

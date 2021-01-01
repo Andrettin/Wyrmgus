@@ -62,6 +62,7 @@ namespace wyrmgus {
 	class faction;
 	class font;
 	class missile_type;
+	class name_generator;
 	class plane;
 	class player_color;
 	class resource;
@@ -948,7 +949,7 @@ public:
 	std::string GetNamePlural() const;
 	std::string generate_personal_name(const faction *faction, const gender gender) const;
 	bool is_personal_name_valid(const std::string &name, const faction *faction, const gender gender) const;
-	const std::vector<std::string> &get_potential_personal_names(const faction *faction, const gender gender) const;
+	const name_generator *get_name_generator(const faction *faction, const gender gender) const;
 	//Wyrmgus end
 
 	wyrmgus::item_class get_item_class() const

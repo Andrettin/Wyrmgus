@@ -47,6 +47,7 @@
 #include "map/tileset.h"
 #include "missile.h"
 #include "mod.h"
+#include "name_generator.h"
 #include "player.h"
 #include "script.h"
 #include "script/condition/and_condition.h"
@@ -1848,10 +1849,10 @@ std::string unit_type::generate_personal_name(const wyrmgus::faction *faction, c
 		return "";
 	}
 	
-	const std::vector<std::string> &potential_names = this->get_potential_personal_names(faction, gender);
+	const name_generator *name_generator = this->get_name_generator(faction, gender);
 	
-	if (!potential_names.empty()) {
-		return vector::get_random(potential_names);
+	if (name_generator != nullptr) {
+		return name_generator->generate_name();
 	}
 
 	return "";
@@ -1863,17 +1864,21 @@ bool unit_type::is_personal_name_valid(const std::string &name, const wyrmgus::f
 		return false;
 	}
 	
-	const std::vector<std::string> &potential_names = this->get_potential_personal_names(faction, gender);
-	
-	return vector::contains(potential_names, name);
+	const name_generator *name_generator = this->get_name_generator(faction, gender);
+
+	if (name_generator == nullptr) {
+		return false;
+	}
+
+	return name_generator->is_name_valid(name);
 }
 
-const std::vector<std::string> &unit_type::get_potential_personal_names(const wyrmgus::faction *faction, const gender gender) const
+const name_generator *unit_type::get_name_generator(const wyrmgus::faction *faction, const gender gender) const
 {
 	const wyrmgus::species *species = this->get_species();
 
 	if (species != nullptr) {
-		return species->get_specimen_names(gender);
+		return species->get_specimen_name_generator(gender);
 	} else if (this->get_civilization() != nullptr) {
 		const wyrmgus::civilization *civilization = this->get_faction_civilization(faction);
 		if (faction != nullptr && faction->get_civilization() != civilization) {
@@ -1884,28 +1889,28 @@ const std::vector<std::string> &unit_type::get_potential_personal_names(const wy
 		}
 
 		if (this->BoolFlag[ORGANIC_INDEX].value) {
-			return civilization->get_personal_names(gender);
+			return civilization->get_personal_name_generator(gender);
 		} else {
 			if (this->get_unit_class() != nullptr) {
-				const std::vector<std::string> &unit_class_names = civilization->get_unit_class_names(this->get_unit_class());
-				if (!unit_class_names.empty()) {
-					return unit_class_names;
+				const name_generator *unit_class_name_generator = civilization->get_unit_class_name_generator(this->get_unit_class());
+				if (unit_class_name_generator != nullptr) {
+					return unit_class_name_generator;
 				}
 			}
 
 			if (this->UnitType == UnitTypeType::Naval) { // if is a ship
-				if (faction != nullptr && !faction->get_ship_names().empty()) {
-					return faction->get_ship_names();
+				if (faction != nullptr && faction->get_ship_name_generator() != nullptr) {
+					return faction->get_ship_name_generator();
 				}
 
-				if (!civilization->get_ship_names().empty()) {
-					return civilization->get_ship_names();
+				if (civilization->get_ship_name_generator() != nullptr) {
+					return civilization->get_ship_name_generator();
 				}
 			}
 		}
 	}
 	
-	return vector::empty_string_vector;
+	return nullptr;
 }
 
 bool unit_type::can_produce_a_resource() const

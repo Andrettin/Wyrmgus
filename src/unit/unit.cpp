@@ -62,6 +62,7 @@
 #include "map/tile.h"
 #include "map/tileset.h"
 #include "missile.h"
+#include "name_generator.h"
 #include "network.h"
 #include "pathfinder.h"
 #include "plane.h"
@@ -3515,7 +3516,7 @@ void CUnit::UpdatePersonalName(bool update_settlement_name)
 	}
 	
 	if (!this->Type->is_personal_name_valid(this->Name, faction, this->get_gender())) {
-		// first see if can translate the current personal name
+		//first see if can translate the current personal name
 		std::string new_personal_name = PlayerRaces.TranslateName(this->Name, language);
 		if (!new_personal_name.empty()) {
 			this->Name = new_personal_name;
@@ -3526,10 +3527,10 @@ void CUnit::UpdatePersonalName(bool update_settlement_name)
 
 	if constexpr (surname_generation_enabled) {
 		if (civilization != nullptr && this->Type->BoolFlag[ORGANIC_INDEX].value) {
-			const std::vector<std::string> &surnames = civilization->get_surnames();
+			const wyrmgus::name_generator *surname_generator = civilization->get_surname_generator();
 
-			if (!surnames.empty() && (this->get_surname().empty() || !wyrmgus::vector::contains(surnames, this->get_surname()))) {
-				this->surname = wyrmgus::vector::get_random(surnames);
+			if (surname_generator != nullptr && (this->get_surname().empty() || !surname_generator->is_name_valid(this->get_surname()))) {
+				this->surname = surname_generator->generate_name();
 			}
 		}
 	}

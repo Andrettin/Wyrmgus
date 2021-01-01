@@ -1275,7 +1275,7 @@ void CPlayer::SetFaction(const wyrmgus::faction *faction)
 	bool personal_names_changed = true;
 	bool ship_names_changed = true;
 	if (this->get_faction() != nullptr && faction != nullptr) {
-		ship_names_changed = this->get_faction()->get_ship_names() != faction->get_ship_names();
+		ship_names_changed = this->get_faction()->get_ship_name_generator() != faction->get_ship_name_generator();
 		personal_names_changed = false; // setting to a faction of the same civilization
 	}
 	

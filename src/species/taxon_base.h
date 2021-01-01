@@ -40,6 +40,7 @@ static int CclDefineSpeciesPhylum(lua_State *l);
 
 namespace wyrmgus {
 
+class name_generator;
 class taxon;
 enum class gender;
 enum class taxonomic_rank;
@@ -51,9 +52,8 @@ class taxon_base : public detailed_data_entry
 	Q_PROPERTY(wyrmgus::taxon* supertaxon MEMBER supertaxon READ get_supertaxon)
 
 protected:
-	explicit taxon_base(const std::string &identifier) : detailed_data_entry(identifier)
-	{
-	}
+	explicit taxon_base(const std::string &identifier);
+	~taxon_base();
 
 public:
 	virtual void process_sml_scope(const sml_data &scope) override;
@@ -69,14 +69,14 @@ public:
 	const taxon *get_supertaxon_of_rank(const taxonomic_rank rank) const;
 	bool is_subtaxon_of(const taxon *other_taxon) const;
 
-	const std::vector<std::string> &get_specimen_names(const gender gender) const;
+	const name_generator *get_specimen_name_generator(const gender gender) const;
 
 	void add_specimen_name(const gender gender, const std::string &name);
 	void add_specimen_names_from(const taxon_base *other);
 
 private:
 	taxon *supertaxon = nullptr;
-	std::map<gender, std::vector<std::string>> specimen_names; //specimen names, mapped to the gender they pertain to (use gender::none for names which should be available for both genders)
+	std::map<gender, std::unique_ptr<name_generator>> specimen_name_generators; //specimen names, mapped to the gender they pertain to (use gender::none for names which should be available for both genders)
 
 	friend int ::CclDefineSpecies(lua_State *l);
 	friend int ::CclDefineSpeciesGenus(lua_State *l);

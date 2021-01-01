@@ -31,6 +31,7 @@
 #include "civilization_history.h"
 #include "database/sml_data.h"
 #include "database/sml_operator.h"
+#include "fallback_name_generator.h"
 #include "gender.h"
 #include "name_generator.h"
 #include "unit/unit_class.h"
@@ -54,26 +55,48 @@ void civilization_base::process_sml_scope(const sml_data &scope)
 
 	if (tag == "personal_names") {
 		if (!values.empty()) {
-			vector::merge(this->personal_names[gender::none], values);
+			if (this->personal_name_generators.find(gender::none) == this->personal_name_generators.end()) {
+				this->personal_name_generators[gender::none] = std::make_unique<name_generator>();
+			}
+
+			this->personal_name_generators[gender::none]->add_names(values);
 		}
 
 		scope.for_each_child([&](const sml_data &child_scope) {
 			const std::string &tag = child_scope.get_tag();
 
 			const wyrmgus::gender gender = string_to_gender(tag);
-			vector::merge(this->personal_names[gender], child_scope.get_values());
+
+			if (this->personal_name_generators.find(gender) == this->personal_name_generators.end()) {
+				this->personal_name_generators[gender] = std::make_unique<name_generator>();
+			}
+
+			this->personal_name_generators[gender]->add_names(child_scope.get_values());
 		});
 	} else if (tag == "surnames") {
-		vector::merge(this->surnames, values);
+		if (this->surname_generator == nullptr) {
+			this->surname_generator = std::make_unique<name_generator>();
+		}
+
+		this->surname_generator->add_names(values);
 	} else if (tag == "unit_class_names") {
 		scope.for_each_child([&](const sml_data &child_scope) {
 			const std::string &tag = child_scope.get_tag();
 
 			const unit_class *unit_class = unit_class::get(tag);
-			vector::merge(this->unit_class_names[unit_class], child_scope.get_values());
+
+			if (this->unit_class_name_generators.find(unit_class) == this->unit_class_name_generators.end()) {
+				this->unit_class_name_generators[unit_class] = std::make_unique<name_generator>();
+			}
+
+			this->unit_class_name_generators[unit_class]->add_names(child_scope.get_values());
 		});
 	} else if (tag == "ship_names") {
-		vector::merge(this->ship_names, values);
+		if (this->ship_name_generator == nullptr) {
+			this->ship_name_generator = std::make_unique<name_generator>();
+		}
+
+		this->ship_name_generator->add_names(values);
 	} else {
 		data_entry::process_sml_scope(scope);
 	}
@@ -93,12 +116,16 @@ void civilization_base::initialize()
 		this->group->add_names_from(this);
 	}
 
-	name_generator::get()->add_personal_names(this->personal_names);
-	name_generator::get()->add_surnames(this->surnames);
-	name_generator::get()->add_unit_class_names(this->unit_class_names);
-	name_generator::get()->add_ship_names(this->ship_names);
+	fallback_name_generator::get()->add_personal_names(this->personal_name_generators);
+	if (this->surname_generator != nullptr) {
+		fallback_name_generator::get()->add_surnames(this->surname_generator->get_names());
+	}
+	fallback_name_generator::get()->add_unit_class_names(this->unit_class_name_generators);
+	if (this->ship_name_generator != nullptr) {
+		fallback_name_generator::get()->add_surnames(this->ship_name_generator->get_names());
+	}
 
-	name_generator::propagate_ungendered_names(this->personal_names);
+	name_generator::propagate_ungendered_names(this->personal_name_generators);
 
 	data_entry::initialize();
 }
@@ -113,31 +140,42 @@ void civilization_base::reset_history()
 	this->history = std::make_unique<civilization_history>();
 }
 
-const std::vector<std::string> &civilization_base::get_personal_names(const gender gender) const
+const name_generator *civilization_base::get_personal_name_generator(const gender gender) const
 {
-	const auto find_iterator = this->personal_names.find(gender);
-	if (find_iterator != this->personal_names.end() && find_iterator->second.size() >= name_generator::minimum_name_count) {
-		return find_iterator->second;
+	const auto find_iterator = this->personal_name_generators.find(gender);
+	if (find_iterator != this->personal_name_generators.end() && find_iterator->second->get_name_count() >= name_generator::minimum_name_count) {
+		return find_iterator->second.get();
 	}
 
 	if (this->get_group() != nullptr) {
-		return this->get_group()->get_personal_names(gender);
+		return this->get_group()->get_personal_name_generator(gender);
 	}
 
-	if (find_iterator != this->personal_names.end()) {
-		return find_iterator->second;
+	if (find_iterator != this->personal_name_generators.end()) {
+		return find_iterator->second.get();
 	}
 
-	return vector::empty_string_vector;
+	return nullptr;
 }
 
 void civilization_base::add_personal_name(const gender gender, const std::string &name)
 {
-	this->personal_names[gender].push_back(name);
+	if (this->personal_name_generators.find(gender) == this->personal_name_generators.end()) {
+		this->personal_name_generators[gender] = std::make_unique<name_generator>();
+	}
+
+	this->personal_name_generators[gender]->add_name(name);
 
 	if (gender == gender::none) {
-		this->personal_names[gender::male].push_back(name);
-		this->personal_names[gender::female].push_back(name);
+		if (this->personal_name_generators.find(gender::male) == this->personal_name_generators.end()) {
+			this->personal_name_generators[gender::male] = std::make_unique<name_generator>();
+		}
+		this->personal_name_generators[gender::male]->add_name(name);
+
+		if (this->personal_name_generators.find(gender::female) == this->personal_name_generators.end()) {
+			this->personal_name_generators[gender::female] = std::make_unique<name_generator>();
+		}
+		this->personal_name_generators[gender::female]->add_name(name);
 	}
 
 	if (this->group != nullptr) {
@@ -145,67 +183,79 @@ void civilization_base::add_personal_name(const gender gender, const std::string
 	}
 }
 
-const std::vector<std::string> &civilization_base::get_surnames() const
+const name_generator *civilization_base::get_surname_generator() const
 {
-	if (this->surnames.size() >= name_generator::minimum_name_count) {
-		return this->surnames;
+	if (this->surname_generator != nullptr && this->surname_generator->get_name_count() >= name_generator::minimum_name_count) {
+		return this->surname_generator.get();
 	}
 
 	if (this->get_group() != nullptr) {
-		return this->get_group()->get_surnames();
+		return this->get_group()->get_surname_generator();
 	}
 
-	return this->surnames;
+	return nullptr;
 }
 
 void civilization_base::add_surname(const std::string &surname)
 {
-	this->surnames.push_back(surname);
+	if (this->surname_generator == nullptr) {
+		this->surname_generator = std::make_unique<name_generator>();
+	}
+
+	this->surname_generator->add_name(surname);
 
 	if (this->group != nullptr) {
 		this->group->add_surname(surname);
 	}
 }
 
-const std::vector<std::string> &civilization_base::get_unit_class_names(const unit_class *unit_class) const
+const name_generator *civilization_base::get_unit_class_name_generator(const unit_class *unit_class) const
 {
-	const auto find_iterator = this->unit_class_names.find(unit_class);
-	if (find_iterator != this->unit_class_names.end() && find_iterator->second.size() >= name_generator::minimum_name_count) {
-		return find_iterator->second;
+	const auto find_iterator = this->unit_class_name_generators.find(unit_class);
+	if (find_iterator != this->unit_class_name_generators.end() && find_iterator->second->get_name_count() >= name_generator::minimum_name_count) {
+		return find_iterator->second.get();
 	}
 
 	if (this->get_group() != nullptr) {
-		return this->get_group()->get_unit_class_names(unit_class);
+		return this->get_group()->get_unit_class_name_generator(unit_class);
 	}
 
-	return name_generator::get()->get_unit_class_names(unit_class);
+	return fallback_name_generator::get()->get_unit_class_name_generator(unit_class);
 }
 
 void civilization_base::add_unit_class_name(const unit_class *unit_class, const std::string &name)
 {
-	this->unit_class_names[unit_class].push_back(name);
+	if (this->unit_class_name_generators.find(unit_class) == this->unit_class_name_generators.end()) {
+		this->unit_class_name_generators[unit_class] = std::make_unique<name_generator>();
+	}
+
+	this->unit_class_name_generators[unit_class]->add_name(name);
 
 	if (this->group != nullptr) {
 		this->group->add_unit_class_name(unit_class, name);
 	}
 }
 
-const std::vector<std::string> &civilization_base::get_ship_names() const
+const name_generator *civilization_base::get_ship_name_generator() const
 {
-	if (this->ship_names.size() >= name_generator::minimum_name_count) {
-		return this->ship_names;
+	if (this->ship_name_generator != nullptr && this->ship_name_generator->get_name_count() >= name_generator::minimum_name_count) {
+		return this->ship_name_generator.get();
 	}
 
 	if (this->get_group() != nullptr) {
-		return this->get_group()->get_ship_names();
+		return this->get_group()->get_ship_name_generator();
 	}
 
-	return name_generator::get()->get_ship_names();
+	return fallback_name_generator::get()->get_ship_name_generator();
 }
 
 void civilization_base::add_ship_name(const std::string &ship_name)
 {
-	this->ship_names.push_back(ship_name);
+	if (this->ship_name_generator == nullptr) {
+		this->ship_name_generator = std::make_unique<name_generator>();
+	}
+
+	this->ship_name_generator->add_name(ship_name);
 
 	if (this->group != nullptr) {
 		this->group->add_ship_name(ship_name);
@@ -214,19 +264,39 @@ void civilization_base::add_ship_name(const std::string &ship_name)
 
 void civilization_base::add_names_from(const civilization_base *other)
 {
-	for (const auto &kv_pair : other->personal_names) {
-		vector::merge(this->personal_names[kv_pair.first], kv_pair.second);
+	for (const auto &kv_pair : other->personal_name_generators) {
+		if (this->personal_name_generators.find(kv_pair.first) == this->personal_name_generators.end()) {
+			this->personal_name_generators[kv_pair.first] = std::make_unique<name_generator>();
+		}
+
+		this->personal_name_generators[kv_pair.first]->add_names(kv_pair.second->get_names());
 	}
 
-	name_generator::propagate_ungendered_names(other->personal_names, this->personal_names);
+	name_generator::propagate_ungendered_names(other->personal_name_generators, this->personal_name_generators);
 
-	vector::merge(this->surnames, other->surnames);
+	if (other->surname_generator != nullptr) {
+		if (this->surname_generator == nullptr) {
+			this->surname_generator = std::make_unique<name_generator>();
+		}
 
-	for (const auto &kv_pair : other->unit_class_names) {
-		vector::merge(this->unit_class_names[kv_pair.first], kv_pair.second);
+		this->surname_generator->add_names(other->surname_generator->get_names());
 	}
 
-	vector::merge(this->ship_names, other->ship_names);
+	for (const auto &kv_pair : other->unit_class_name_generators) {
+		if (this->unit_class_name_generators.find(kv_pair.first) == this->unit_class_name_generators.end()) {
+			this->unit_class_name_generators[kv_pair.first] = std::make_unique<name_generator>();
+		}
+
+		this->unit_class_name_generators[kv_pair.first]->add_names(kv_pair.second->get_names());
+	}
+
+	if (other->ship_name_generator != nullptr) {
+		if (this->ship_name_generator == nullptr) {
+			this->ship_name_generator = std::make_unique<name_generator>();
+		}
+
+		this->ship_name_generator->add_names(other->ship_name_generator->get_names());
+	}
 
 	if (this->group != nullptr) {
 		this->group->add_names_from(other);

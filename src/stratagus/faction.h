@@ -51,6 +51,7 @@ class deity;
 class dynasty;
 class faction_history;
 class icon;
+class name_generator;
 class resource;
 class unit_class;
 class unit_type;
@@ -80,7 +81,6 @@ class faction final : public detailed_data_entry, public data_type<faction>
 	Q_PROPERTY(bool short_name MEMBER short_name READ uses_short_name)
 	Q_PROPERTY(bool definite_article MEMBER definite_article READ uses_definite_article)
 	Q_PROPERTY(wyrmgus::deity* holy_order_deity MEMBER holy_order_deity READ get_holy_order_deity)
-	Q_PROPERTY(QStringList ship_names READ get_ship_names_qstring_list)
 
 public:
 	using title_name_map = std::map<government_type, std::map<faction_tier, std::string>>;
@@ -213,16 +213,7 @@ public:
 	int get_force_type_weight(const ai_force_type force_type) const;
 	const std::vector<std::unique_ptr<ai_force_template>> &get_ai_force_templates(const ai_force_type force_type) const;
 	const std::vector<std::unique_ptr<CAiBuildingTemplate>> &GetAiBuildingTemplates() const;
-	const std::vector<std::string> &get_ship_names() const;
-
-	QStringList get_ship_names_qstring_list() const;
-
-	Q_INVOKABLE void add_ship_name(const std::string &ship_name)
-	{
-		this->ship_names.push_back(ship_name);
-	}
-
-	Q_INVOKABLE void remove_ship_name(const std::string &ship_name);
+	const name_generator *get_ship_name_generator() const;
 
 	unit_type *get_class_unit_type(const unit_class *unit_class) const;
 
@@ -352,7 +343,7 @@ private:
 public:
 	std::vector<std::string> ProvinceNames;								/// Province names for the faction
 private:
-	std::vector<std::string> ship_names;								/// Ship names for the faction
+	std::unique_ptr<name_generator> ship_name_generator; //ship names for the faction
 	std::vector<CFiller> ui_fillers;
 	std::unique_ptr<const and_condition> preconditions;
 	std::unique_ptr<const and_condition> conditions;

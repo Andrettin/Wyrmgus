@@ -30,12 +30,21 @@
 #include "species/taxon_base.h"
 
 #include "database/sml_data.h"
+#include "fallback_name_generator.h"
 #include "gender.h"
 #include "name_generator.h"
 #include "species/taxon.h"
 #include "util/vector_util.h"
 
 namespace wyrmgus {
+
+taxon_base::taxon_base(const std::string &identifier) : detailed_data_entry(identifier)
+{
+}
+
+taxon_base::~taxon_base()
+{
+}
 
 void taxon_base::process_sml_scope(const sml_data &scope)
 {
@@ -44,14 +53,23 @@ void taxon_base::process_sml_scope(const sml_data &scope)
 
 	if (tag == "specimen_names") {
 		if (!values.empty()) {
-			vector::merge(this->specimen_names[gender::none], values);
+			if (this->specimen_name_generators.find(gender::none) == this->specimen_name_generators.end()) {
+				this->specimen_name_generators[gender::none] = std::make_unique<name_generator>();
+			}
+
+			this->specimen_name_generators[gender::none]->add_names(values);
 		}
 
 		scope.for_each_child([&](const sml_data &child_scope) {
 			const std::string &tag = child_scope.get_tag();
 
 			const wyrmgus::gender gender = string_to_gender(tag);
-			vector::merge(this->specimen_names[gender], child_scope.get_values());
+
+			if (this->specimen_name_generators.find(gender) == this->specimen_name_generators.end()) {
+				this->specimen_name_generators[gender] = std::make_unique<name_generator>();
+			}
+
+			this->specimen_name_generators[gender]->add_names(child_scope.get_values());
 		});
 	} else {
 		data_entry::process_sml_scope(scope);
@@ -68,9 +86,9 @@ void taxon_base::initialize()
 		this->get_supertaxon()->add_specimen_names_from(this);
 	}
 
-	name_generator::get()->add_specimen_names(this->specimen_names);
+	fallback_name_generator::get()->add_specimen_names(this->specimen_name_generators);
 
-	name_generator::propagate_ungendered_names(this->specimen_names);
+	name_generator::propagate_ungendered_names(this->specimen_name_generators);
 
 	data_entry::initialize();
 }
@@ -109,31 +127,41 @@ bool taxon_base::is_subtaxon_of(const taxon *other_taxon) const
 	return this->get_supertaxon()->is_subtaxon_of(other_taxon);
 }
 
-const std::vector<std::string> &taxon_base::get_specimen_names(const gender gender) const
+const name_generator *taxon_base::get_specimen_name_generator(const gender gender) const
 {
-	const auto find_iterator = this->specimen_names.find(gender);
-	if (find_iterator != this->specimen_names.end() && find_iterator->second.size() >= name_generator::minimum_name_count) {
-		return find_iterator->second;
+	const auto find_iterator = this->specimen_name_generators.find(gender);
+	if (find_iterator != this->specimen_name_generators.end() && find_iterator->second->get_name_count() >= name_generator::minimum_name_count) {
+		return find_iterator->second.get();
 	}
 
 	if (this->get_supertaxon() != nullptr) {
-		return this->get_supertaxon()->get_specimen_names(gender);
+		return this->get_supertaxon()->get_specimen_name_generator(gender);
 	}
 
-	if (find_iterator != this->specimen_names.end()) {
-		return find_iterator->second;
+	if (find_iterator != this->specimen_name_generators.end()) {
+		return find_iterator->second.get();
 	}
 
-	return vector::empty_string_vector;
+	return nullptr;
 }
 
 void taxon_base::add_specimen_name(const gender gender, const std::string &name)
 {
-	this->specimen_names[gender].push_back(name);
+	if (this->specimen_name_generators.find(gender) == this->specimen_name_generators.end()) {
+		this->specimen_name_generators[gender] = std::make_unique<name_generator>();
+	}
+	this->specimen_name_generators[gender]->add_name(name);
 
 	if (gender == gender::none) {
-		this->specimen_names[gender::male].push_back(name);
-		this->specimen_names[gender::female].push_back(name);
+		if (this->specimen_name_generators.find(gender::male) == this->specimen_name_generators.end()) {
+			this->specimen_name_generators[gender::male] = std::make_unique<name_generator>();
+		}
+		this->specimen_name_generators[gender::male]->add_name(name);
+
+		if (this->specimen_name_generators.find(gender::female) == this->specimen_name_generators.end()) {
+			this->specimen_name_generators[gender::female] = std::make_unique<name_generator>();
+		}
+		this->specimen_name_generators[gender::female]->add_name(name);
 	}
 
 	if (this->get_supertaxon() != nullptr) {
@@ -143,11 +171,15 @@ void taxon_base::add_specimen_name(const gender gender, const std::string &name)
 
 void taxon_base::add_specimen_names_from(const taxon_base *other)
 {
-	for (const auto &kv_pair : other->specimen_names) {
-		vector::merge(this->specimen_names[kv_pair.first], kv_pair.second);
+	for (const auto &kv_pair : other->specimen_name_generators) {
+		if (this->specimen_name_generators.find(kv_pair.first) == this->specimen_name_generators.end()) {
+			this->specimen_name_generators[kv_pair.first] = std::make_unique<name_generator>();
+		}
+
+		this->specimen_name_generators[kv_pair.first]->add_names(kv_pair.second->get_names());
 	}
 
-	name_generator::propagate_ungendered_names(other->specimen_names, this->specimen_names);
+	name_generator::propagate_ungendered_names(other->specimen_name_generators, this->specimen_name_generators);
 
 	if (this->get_supertaxon() != nullptr) {
 		this->get_supertaxon()->add_specimen_names_from(other);
