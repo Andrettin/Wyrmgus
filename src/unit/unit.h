@@ -437,6 +437,11 @@ public:
 	
 	CUnit *GetFirstContainer() const;
 
+	bool has_rally_point() const
+	{
+		return this->get_rally_point_pos().x() != -1 && this->get_rally_point_pos().y() != -1;
+	}
+
 	const QPoint &get_rally_point_pos() const
 	{
 		return this->rally_point_pos;

@@ -398,7 +398,11 @@ static void AnimateActionTrain(CUnit &unit)
 		}
 		*/
 
-		DropOutOnSide(*newUnit, LookingW, &unit);
+		if (unit.has_rally_point() && unit.get_rally_point_map_layer() == unit.MapLayer) {
+			DropOutNearest(*newUnit, unit.get_rally_point_pos(), &unit);
+		} else {
+			DropOutOnSide(*newUnit, LookingW, &unit);
+		}
 
 		//Wyrmgus start
 		if (this->Player != unit.Player->Index && unit.Player->Type != PlayerNeutral && CPlayer::Players[this->Player]->has_building_access(unit.Player)) { //if the player who gave the order is different from the owner of the building, and the latter is non-neutral (i.e. if the owner of the building is a mercenary company), provide the owner of the building with appropriate recompensation
@@ -431,7 +435,7 @@ static void AnimateActionTrain(CUnit &unit)
 		}
 		*/
 		
-		if (unit.get_rally_point_pos().x() != -1 && unit.get_rally_point_pos().y() != -1 && unit.get_rally_point_map_layer() != nullptr && newUnit->CanMove()) {
+		if (unit.has_rally_point() && newUnit->CanMove()) {
 			bool command_found = false;
 			std::vector<CUnit *> table;
 			Select(unit.get_rally_point_pos(), unit.get_rally_point_pos(), table, unit.get_rally_point_map_layer()->ID);
