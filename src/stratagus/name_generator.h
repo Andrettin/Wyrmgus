@@ -29,14 +29,12 @@
 
 namespace wyrmgus {
 
-class markov_chain_name_generator;
 enum class gender;
 
 class name_generator final
 {
 public:
 	static constexpr size_t minimum_name_count = 10;
-	static constexpr size_t markov_chain_name_threshold = 50;
 
 	static void propagate_ungendered_names(const std::map<gender, std::unique_ptr<name_generator>> &source_name_map, std::map<gender, std::unique_ptr<name_generator>> &target_name_map);
 
@@ -45,30 +43,29 @@ public:
 		name_generator::propagate_ungendered_names(name_map, name_map);
 	}
 
-	name_generator();
-	~name_generator();
-
-	bool uses_markov_chain_generation() const
-	{
-		return this->names.size() < name_generator::markov_chain_name_threshold;
-	}
-
 	const std::vector<std::string> &get_names() const
 	{
 		return this->names;
 	}
 
-	size_t get_name_count() const;
+	size_t get_name_count() const
+	{
+		return this->names.size();
+	}
+
 	bool is_name_valid(const std::string &name) const;
 
-	void add_name(const std::string &name);
+	void add_name(const std::string &name)
+	{
+		this->names.push_back(name);
+	}
+
 	void add_names(const std::vector<std::string> &names);
 
 	std::string generate_name() const;
 
 private:
 	std::vector<std::string> names; //name list for generation
-	std::unique_ptr<markov_chain_name_generator> markov_chain_generator;
 };
 
 }

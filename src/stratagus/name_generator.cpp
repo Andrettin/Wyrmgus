@@ -30,7 +30,6 @@
 #include "name_generator.h"
 
 #include "gender.h"
-#include "markov_chain_name_generator.h"
 #include "util/vector_util.h"
 #include "util/vector_random_util.h"
 
@@ -52,66 +51,18 @@ void name_generator::propagate_ungendered_names(const std::map<gender, std::uniq
 	}
 }
 
-name_generator::name_generator()
-{
-	this->markov_chain_generator = std::make_unique<markov_chain_name_generator>(markov_chain_name_generator::default_chain_size);
-}
-
-name_generator::~name_generator()
-{
-}
-
-size_t name_generator::get_name_count() const
-{
-	if (this->uses_markov_chain_generation()) {
-		if (!this->markov_chain_generator->is_initialized()) {
-			this->markov_chain_generator->initialize();
-		}
-
-		return this->markov_chain_generator->get_name_count();
-	}
-
-	return this->names.size();
-}
-
-
 bool name_generator::is_name_valid(const std::string &name) const
 {
-	if (this->uses_markov_chain_generation()) {
-		if (!this->markov_chain_generator->is_initialized()) {
-			this->markov_chain_generator->initialize();
-		}
-
-		return this->markov_chain_generator->is_name_valid(name);
-	}
-
 	return vector::contains(this->names, name);
 }
 
-void name_generator::add_name(const std::string &name)
-{
-	this->names.push_back(name);
-	this->markov_chain_generator->add_name(name);
-}
-
-
 void name_generator::add_names(const std::vector<std::string> &names)
 {
-	for (const std::string &name : names) {
-		this->add_name(name);
-	}
+	vector::merge(this->names, names);
 }
 
 std::string name_generator::generate_name() const
 {
-	if (this->uses_markov_chain_generation()) {
-		if (!this->markov_chain_generator->is_initialized()) {
-			this->markov_chain_generator->initialize();
-		}
-
-		return this->markov_chain_generator->generate_name();
-	}
-
 	return vector::get_random(this->names);
 }
 
