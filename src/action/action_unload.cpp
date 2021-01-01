@@ -47,6 +47,7 @@
 #include "unit/unit.h"
 #include "unit/unit_type.h"
 #include "unit/unit_type_type.h"
+#include "util/point_util.h"
 #include "video/video.h"
 
 std::unique_ptr<COrder> COrder::NewActionUnload(const Vec2i &pos, CUnit *what, int z, int landmass)
@@ -165,7 +166,7 @@ bool COrder_Unload::ParseSpecificData(lua_State *l, int &j, const char *value, c
 */
 //Wyrmgus start
 //static bool FindUnloadPosition(const CUnit &transporter, const CUnit &unit, const Vec2i startPos, int maxRange, Vec2i *res)
-static bool FindUnloadPosition(const CUnit &transporter, const CUnit &unit, const Vec2i startPos, int maxRange, Vec2i *res, int z, int landmass = 0)
+static bool FindUnloadPosition(const CUnit &transporter, const CUnit &unit, const Vec2i startPos, int maxRange, Vec2i *res, int z, int landmass = 0, const std::optional<QPoint> &target_pos = std::nullopt)
 //Wyrmgus end
 {
 	Vec2i pos = startPos;
@@ -174,6 +175,9 @@ static bool FindUnloadPosition(const CUnit &transporter, const CUnit &unit, cons
 	int addx = transporter.Type->get_tile_width() + unit.Type->get_tile_width() - 1;
 	int addy = transporter.Type->get_tile_height() + unit.Type->get_tile_height() - 1;
 
+	bool found = false;
+	int best_distance = INT_MAX;
+
 	--pos.x;
 	for (int range = 0; range < maxRange; ++range) {
 		for (int i = addy; i--; ++pos.y) {
@@ -181,8 +185,17 @@ static bool FindUnloadPosition(const CUnit &transporter, const CUnit &unit, cons
 //			if (UnitCanBeAt(unit, pos)) {
 			if (UnitCanBeAt(unit, pos, z) && (!landmass || CMap::Map.GetTileLandmass(pos, z) == landmass)) {
 			//Wyrmgus end
-				*res = pos;
-				return true;
+				if (target_pos.has_value()) {
+					const int distance = wyrmgus::point::square_distance_to(pos, target_pos.value());
+					if (distance < best_distance) {
+						best_distance = distance;
+						*res = pos;
+						found = true;
+					}
+				} else {
+					*res = pos;
+					return true;
+				}
 			}
 		}
 		++addx;
@@ -192,8 +205,17 @@ static bool FindUnloadPosition(const CUnit &transporter, const CUnit &unit, cons
 //			if (UnitCanBeAt(unit, pos)) {
 			if (UnitCanBeAt(unit, pos, z) && (!landmass || CMap::Map.GetTileLandmass(pos, z) == landmass)) {
 			//Wyrmgus end
-				*res = pos;
-				return true;
+				if (target_pos.has_value()) {
+					const int distance = wyrmgus::point::square_distance_to(pos, target_pos.value());
+					if (distance < best_distance) {
+						best_distance = distance;
+						*res = pos;
+						found = true;
+					}
+				} else {
+					*res = pos;
+					return true;
+				}
 			}
 		}
 		++addy;
@@ -203,8 +225,17 @@ static bool FindUnloadPosition(const CUnit &transporter, const CUnit &unit, cons
 //			if (UnitCanBeAt(unit, pos)) {
 			if (UnitCanBeAt(unit, pos, z) && (!landmass || CMap::Map.GetTileLandmass(pos, z) == landmass)) {
 			//Wyrmgus end
-				*res = pos;
-				return true;
+				if (target_pos.has_value()) {
+					const int distance = wyrmgus::point::square_distance_to(pos, target_pos.value());
+					if (distance < best_distance) {
+						best_distance = distance;
+						*res = pos;
+						found = true;
+					}
+				} else {
+					*res = pos;
+					return true;
+				}
 			}
 		}
 		++addx;
@@ -214,13 +245,23 @@ static bool FindUnloadPosition(const CUnit &transporter, const CUnit &unit, cons
 //			if (UnitCanBeAt(unit, pos)) {
 			if (UnitCanBeAt(unit, pos, z) && (!landmass || CMap::Map.GetTileLandmass(pos, z) == landmass)) {
 			//Wyrmgus end
-				*res = pos;
-				return true;
+				if (target_pos.has_value()) {
+					const int distance = wyrmgus::point::square_distance_to(pos, target_pos.value());
+					if (distance < best_distance) {
+						best_distance = distance;
+						*res = pos;
+						found = true;
+					}
+				} else {
+					*res = pos;
+					return true;
+				}
 			}
 		}
 		++addy;
 	}
-	return false;
+
+	return found;
 }
 
 /**
@@ -237,13 +278,18 @@ static bool FindUnloadPosition(const CUnit &transporter, const CUnit &unit, cons
 static int UnloadUnit(CUnit &transporter, CUnit &unit, int landmass)
 //Wyrmgus end
 {
-	const int maxRange = 1;
+	static constexpr int max_range = 1;
 	Vec2i pos;
+
+	std::optional<QPoint> target_unload_pos;
+	if (transporter.has_rally_point() && transporter.get_rally_point_map_layer() == transporter.MapLayer) {
+		target_unload_pos = transporter.get_rally_point_pos();
+	}
 
 	Assert(unit.Removed);
 	//Wyrmgus start
-//	if (!FindUnloadPosition(transporter, unit, transporter.tilePos, maxRange, &pos)) {
-	if (!FindUnloadPosition(transporter, unit, transporter.tilePos, maxRange, &pos, transporter.MapLayer->ID, landmass)) {
+//	if (!FindUnloadPosition(transporter, unit, transporter.tilePos, max_range, &pos)) {
+	if (!FindUnloadPosition(transporter, unit, transporter.tilePos, max_range, &pos, transporter.MapLayer->ID, landmass, target_unload_pos)) {
 	//Wyrmgus end
 		return false;
 	}
@@ -289,7 +335,7 @@ static int UnloadUnit(CUnit &transporter, CUnit &unit, int landmass)
 	
 	//Wyrmgus start
 	//if transporter has a rally point (useful for towers), send the unloaded unit there
-	if (transporter.get_rally_point_pos().x() != -1 && transporter.get_rally_point_pos().y() != -1 && unit.CanMove()) {
+	if (transporter.has_rally_point() && unit.CanMove()) {
 		CommandMove(unit, transporter.get_rally_point_pos(), FlushCommands, transporter.get_rally_point_map_layer()->ID);
 	}
 	//Wyrmgus end
