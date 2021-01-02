@@ -50,6 +50,51 @@ std::unique_ptr<oamlApi> oaml;
 bool enableOAML = false;
 #endif
 
+namespace wyrmgus {
+
+music::music(const std::string &identifier) : data_entry(identifier)
+{
+}
+
+music::~music()
+{
+}
+
+void music::process_sml_property(const sml_property &property)
+{
+	const std::string &key = property.get_key();
+	const std::string &value = property.get_value();
+
+	if (key == "file") {
+		this->file = value;
+	} else {
+		data_entry::process_sml_property(property);
+	}
+}
+
+void music::process_sml_scope(const sml_data &scope)
+{
+	const std::string &tag = scope.get_tag();
+	const std::vector<std::string> &values = scope.get_values();
+
+	if (tag == "submusic") {
+		for (const std::string &value : values) {
+			this->submusic.push_back(music::get(value));
+		}
+	} else {
+		data_entry::process_sml_scope(scope);
+	}
+}
+
+void music::check() const
+{
+	if (this->file.empty() && this->get_submusic().empty()) {
+		throw std::runtime_error("Music \"" + this->get_identifier() + "\" has neither a file nor submusic.");
+	}
+}
+
+}
+
 /**
 **  Callback for when music has finished
 **  Note: we are in the sdl audio thread

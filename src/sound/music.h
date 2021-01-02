@@ -25,9 +25,64 @@
 //      02111-1307, USA.
 //
 
+#include "database/data_entry.h"
+#include "database/data_type.h"
+
 #ifdef USE_OAML
 class oamlApi;
 
 extern std::unique_ptr<oamlApi> oaml;
 extern bool enableOAML;
 #endif
+
+namespace wyrmgus {
+
+class sample;
+
+class music final : public data_entry, public data_type<music>
+{
+	Q_OBJECT
+
+	Q_PROPERTY(int volume_percent MEMBER volume_percent READ get_volume_percent)
+	Q_PROPERTY(bool intro MEMBER intro READ is_intro)
+
+public:
+	static constexpr const char *class_identifier = "music";
+	static constexpr const char *database_folder = "music";
+
+	explicit music(const std::string &identifier);
+	virtual ~music() override;
+
+	virtual void process_sml_property(const sml_property &property) override;
+	virtual void process_sml_scope(const sml_data &scope) override;
+	virtual void check() const override;
+
+	const wyrmgus::sample *get_sample() const
+	{
+		return this->sample.get();
+	}
+
+	int get_volume_percent() const
+	{
+		return this->volume_percent;
+	}
+
+	const std::vector<const music *> &get_submusic() const
+	{
+		return this->submusic;
+	}
+
+	bool is_intro() const
+	{
+		return this->intro;
+	}
+
+private:
+	std::filesystem::path file;
+	std::unique_ptr<wyrmgus::sample> sample;
+	int volume_percent = 100;
+	std::vector<const music *> submusic; //the music pieces grouped under this one
+	bool intro = false; //if this is a submusic piece, whether it is an introduction one
+};
+
+}

@@ -78,7 +78,7 @@ public:
 
 	static void initialize_all();
 
-	sound(const std::string &identifier);
+	explicit sound(const std::string &identifier);
 	virtual ~sound() override;
 
 	virtual void initialize() override;
