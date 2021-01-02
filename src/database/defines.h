@@ -39,6 +39,7 @@ class civilization;
 class dialogue;
 class font;
 class font_color;
+class music;
 class player_color;
 class resource_icon;
 class sml_data;
@@ -310,6 +311,11 @@ public:
 		return this->destroyed_overlay_terrain_decay_threshold;
 	}
 
+	const std::vector<const music *> &get_menu_music() const
+	{
+		return this->menu_music;
+	}
+
 private:
 	font *small_font = nullptr;
 	font *game_font = nullptr;
@@ -348,6 +354,7 @@ private:
 	resource_icon *mana_icon = nullptr;
 	int forest_regeneration_threshold = 0;
 	int destroyed_overlay_terrain_decay_threshold = 0;
+	std::vector<const music *> menu_music;
 };
 
 }

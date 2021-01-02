@@ -33,6 +33,7 @@
 #include "database/sml_parser.h"
 #include "faction_type.h"
 #include "sound/game_sound_set.h"
+#include "sound/music.h"
 #include "upgrade/upgrade_structs.h"
 #include "video/video.h"
 
@@ -80,6 +81,7 @@ void defines::process_sml_property(const sml_property &property)
 void defines::process_sml_scope(const sml_data &scope)
 {
 	const std::string &tag = scope.get_tag();
+	const std::vector<std::string> &values = scope.get_values();
 
 	if (tag == "game_sound_set") {
 		database::process_sml_data(game_sound_set::get(), scope);
@@ -90,6 +92,10 @@ void defines::process_sml_scope(const sml_data &scope)
 
 			this->faction_type_upgrades[faction_type] = upgrade;
 		});
+	} else if (tag == "menu_music") {
+		for (const std::string &value : values) {
+			this->menu_music.push_back(music::get(value));
+		}
 	} else {
 		database::process_sml_scope_for_object(this, scope);
 	}
