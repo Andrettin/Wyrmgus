@@ -41,7 +41,6 @@ std::vector<TitleScreen> TitleScreens;			/// Title screens to show at startup
 static bool WaitNoEvent;			/// Flag got an event
 extern std::string CliMapName;
 
-
 /**
 **  Callback for input.
 */
@@ -92,7 +91,6 @@ static void WaitCallbackMouse(const PixelPos &)
 static void WaitCallbackExit()
 {
 }
-
 
 void TitleScreen::ShowLabels() const
 {
@@ -186,7 +184,6 @@ void ShowTitleScreens()
 		Video.ClearScreen();
 	}
 }
-
 
 void ShowFullImage(const std::string &filename, unsigned int timeOutInSecond)
 {

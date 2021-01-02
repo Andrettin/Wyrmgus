@@ -31,11 +31,69 @@
 
 #include <QQmlApplicationEngine>
 
+static void write_qt_message(QtMsgType type, const QMessageLogContext &context, const QString &msg)
+{
+	std::ostream *ostream = nullptr;
+
+	switch (type) {
+		case QtDebugMsg:
+		case QtInfoMsg:
+			ostream = &std::cout;
+			break;
+		case QtWarningMsg:
+		case QtCriticalMsg:
+		case QtFatalMsg:
+			ostream = &std::cerr;
+			break;
+	}
+
+	switch (type) {
+		case QtDebugMsg:
+			*ostream << "Debug: ";
+			break;
+		case QtInfoMsg:
+			*ostream << "Info: ";
+			break;
+		case QtWarningMsg:
+			*ostream << "Warning: ";
+			break;
+		case QtCriticalMsg:
+			*ostream << "Critical: ";
+			break;
+		case QtFatalMsg:
+			*ostream << "Fatal: ";
+			break;
+	}
+
+	*ostream << msg.toStdString();
+
+	if (context.file != nullptr) {
+		*ostream << " (" << context.file << ": " << context.line;
+
+		if (context.function != nullptr) {
+			*ostream << ", " << context.function;
+		}
+
+		*ostream << ")";
+	}
+
+	switch (type) {
+		case QtCriticalMsg:
+		case QtFatalMsg:
+			*ostream << std::endl;
+			break;
+		default:
+			*ostream << '\n';
+			break;
+	}
+}
+
 int main(int argc, char **argv)
 {
 	using namespace wyrmgus;
 
 	try {
+		qInstallMessageHandler(write_qt_message);
 		QApplication app(argc, argv);
 
 		std::thread stratagus_thread([argc, argv]() {
