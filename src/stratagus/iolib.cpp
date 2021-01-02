@@ -668,6 +668,19 @@ static void LibraryFileName(const char *file, char(&buffer)[PATH_MAX])
 		return;
 	}
 	#endif
+
+	// Support for music in the default music dir.
+	snprintf(buffer, PATH_MAX, "music/%s", file);
+	if (FindFileWithExtension(buffer)) {
+		return;
+	}
+	#ifndef __MORPHOS__	
+	snprintf(buffer, PATH_MAX, "%s/music/%s", StratagusLibPath.c_str(), file);
+	if (FindFileWithExtension(buffer)) {
+		return;
+	}
+	#endif
+
 	// Support for scripts in default scripts dir.
 	sprintf(buffer, "scripts/%s", file);
 	if (FindFileWithExtension(buffer)) {
