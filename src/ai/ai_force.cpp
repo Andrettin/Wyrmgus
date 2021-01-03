@@ -913,7 +913,7 @@ void AiForce::Attack(const Vec2i &pos, int z)
 		}
 	}
 	if (CMap::Map.Info.IsPointOnMap(goalPos, z) == false) {
-		const bool include_neutral = AiPlayer->Player->AtPeace() && GameCycle >= PlayerAi::enforced_peace_cycle_count;
+		const bool include_neutral = !AiPlayer->Player->at_war() && GameCycle >= PlayerAi::enforced_peace_cycle_count;
 
 		/* Search in entire map */
 		const CUnit *enemy = nullptr;
@@ -1674,7 +1674,7 @@ void AiForce::Update()
 	const int thresholdDist = std::max(5, static_cast<int>(this->get_units().size()) / 8);
 	//Wyrmgus end
 	Assert(CMap::Map.Info.IsPointOnMap(GoalPos, GoalMapLayer));
-	const bool include_neutral = AiPlayer->Player->AtPeace() && GameCycle >= PlayerAi::enforced_peace_cycle_count;
+	const bool include_neutral = !AiPlayer->Player->at_war() && GameCycle >= PlayerAi::enforced_peace_cycle_count;
 	if (State == AiForceAttackingState::GoingToRallyPoint) {
 		// Check if we are near the goalpos
 		//Wyrmgus start

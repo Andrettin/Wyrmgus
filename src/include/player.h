@@ -273,7 +273,8 @@ public:
 	bool is_quest_completed(const wyrmgus::quest *quest) const;
 	void AddModifier(CUpgrade *modifier, int cycles);
 	void RemoveModifier(CUpgrade *modifier);
-	bool AtPeace() const;
+
+	bool at_war() const;
 
 	int Index = 0;          /// player as number
 	std::string Name;   /// name of non computer

@@ -2820,18 +2820,31 @@ void CPlayer::RemoveModifier(CUpgrade *modifier)
 			}
 		}
 	}
-	
 }
 
-bool CPlayer::AtPeace() const
+bool CPlayer::at_war() const
 {
 	for (int i = 0; i < PlayerNumNeutral; ++i) {
-		if (this->IsEnemy(*CPlayer::Players[i]) && this->HasContactWith(*CPlayer::Players[i]) && CPlayer::Players[i]->is_alive()) {
-			return false;
+		const CPlayer *other_player = CPlayer::Players[i];
+
+		if (other_player == this) {
+			continue;
+		}
+
+		if (!this->HasContactWith(*other_player)) {
+			continue;
+		}
+
+		if (!other_player->is_alive()) {
+			continue;
+		}
+
+		if (this->IsEnemy(*other_player)) {
+			return true;
 		}
 	}
 	
-	return true;
+	return false;
 }
 //Wyrmgus end
 
