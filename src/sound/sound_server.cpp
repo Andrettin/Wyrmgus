@@ -41,6 +41,8 @@
 #include "player.h" //for playing faction music
 //Wyrmgus end
 #include "sound/music.h"
+#include "sound/sample.h"
+#include "sound/sound.h"
 #include "sound/unit_sound_type.h"
 //Wyrmgus start
 #include "ui/interface.h" //for player faction music

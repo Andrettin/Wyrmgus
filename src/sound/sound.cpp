@@ -35,6 +35,7 @@
 #include "database/defines.h"
 #include "iolib.h"
 #include "missile.h"
+#include "sound/sample.h"
 #include "sound/sound_server.h"
 #include "sound/unit_sound_type.h"
 #include "ui/ui.h"

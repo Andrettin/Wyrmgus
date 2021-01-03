@@ -36,6 +36,7 @@
 #include "iocompat.h"
 #include "iolib.h"
 #include "network.h"
+#include "sound/sample.h"
 #include "sound/sound.h"
 #include "sound/sound_server.h"
 #include "video/video.h"

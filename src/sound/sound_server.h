@@ -30,94 +30,15 @@
 
 #pragma once
 
-#include "sound/sound.h"
+struct Origin;
+
+namespace wyrmgus {
+	class sample;
+	enum class unit_sound_type;
+}
 
 constexpr int MaxVolume = 255;
 constexpr int SOUND_BUFFER_SIZE = 65536;
-
-namespace wyrmgus {
-
-enum class unit_sound_type;
-
-/**
-**  RAW samples.
-*/
-class sample final
-{
-public:
-	static constexpr int channel_count = 2;
-	static constexpr int sample_size = 16;
-	static constexpr int frequency = 44100;
-
-	explicit sample(const std::filesystem::path &filepath) : filepath(filepath)
-	{
-		if (!std::filesystem::exists(filepath)) {
-			throw std::runtime_error("Sound file \"" + filepath.string() + "\" does not exist.");
-		}
-	}
-
-	~sample()
-	{
-		Mix_FreeChunk(this->chunk);
-	}
-
-	bool is_loaded() const
-	{
-		return this->chunk != nullptr;
-	}
-
-	void load()
-	{
-		this->chunk = Mix_LoadWAV(this->filepath.string().c_str());
-		if (this->chunk == nullptr) {
-			throw std::runtime_error("Failed to decode audio file \"" + this->filepath.string() + "\": " + std::string(SDL_GetError()));
-		}
-	}
-
-	virtual int Read(void *buf, int len)
-	{
-		Q_UNUSED(buf)
-		Q_UNUSED(len)
-
-		return 0;
-	}
-
-	const uint8_t *get_buffer() const
-	{
-		return this->chunk->abuf;
-	}
-
-	int get_length() const
-	{
-		return static_cast<int>(this->chunk->alen);
-	}
-
-	int get_channel_count() const
-	{
-		return sample::channel_count;
-	}
-
-	int get_sample_size() const
-	{
-		return sample::sample_size;
-	}
-
-	int get_frequency() const
-	{
-		return sample::frequency;
-	}
-
-	Mix_Chunk *get_chunk() const
-	{
-		return this->chunk;
-	}
-
-private:
-	std::filesystem::path filepath;
-	Mix_Chunk *chunk = nullptr; //sample buffer
-};
-
-}
 
 /// Set the channel volume
 extern int SetChannelVolume(int channel, int volume);

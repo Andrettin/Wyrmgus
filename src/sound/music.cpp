@@ -30,10 +30,11 @@
 
 #include "music.h"
 
-#include "sound/music_type.h"
-#include "sound/sound_server.h"
-#include "script.h"
 #include "iolib.h"
+#include "script.h"
+#include "sound/music_type.h"
+#include "sound/sample.h"
+#include "sound/sound_server.h"
 
 static constexpr int SoundFrequency = 44100; // sample rate of dsp
 

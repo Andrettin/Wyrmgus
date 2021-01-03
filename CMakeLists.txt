@@ -844,6 +844,7 @@ set(stratagus_sound_HDRS
 	src/sound/game_sound_set.h
 	src/sound/music.h
 	src/sound/music_type.h
+	src/sound/sample.h
 	src/sound/script_sound.h
 	src/sound/sound.h
 	src/sound/sound_server.h
