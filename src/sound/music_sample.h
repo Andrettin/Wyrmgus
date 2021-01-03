@@ -8,8 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-//      (c) Copyright 1998-2020 by Lutz Sammer, Fabrice Rossi,
-//                                 Jimmy Salmon and Andrettin
+//      (c) Copyright 2020 by Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -30,82 +29,37 @@
 
 namespace wyrmgus {
 
-/**
-**  RAW samples.
-*/
-class sample final
+class music_sample final
 {
 public:
-	static constexpr int channel_count = 2;
-	static constexpr int sample_size = 16;
-	static constexpr int frequency = 44100;
-
-	explicit sample(const std::filesystem::path &filepath) : filepath(filepath)
+	explicit music_sample(const std::filesystem::path &filepath) : filepath(filepath)
 	{
 		if (!std::filesystem::exists(filepath)) {
-			throw std::runtime_error("Sound file \"" + filepath.string() + "\" does not exist.");
+			throw std::runtime_error("Music file \"" + filepath.string() + "\" does not exist.");
 		}
 	}
 
-	~sample()
+	~music_sample()
 	{
-		Mix_FreeChunk(this->chunk);
+		Mix_FreeMusic(this->data);
 	}
 
 	bool is_loaded() const
 	{
-		return this->chunk != nullptr;
+		return this->data != nullptr;
 	}
 
 	void load()
 	{
-		this->chunk = Mix_LoadWAV(this->filepath.string().c_str());
-		if (this->chunk == nullptr) {
-			throw std::runtime_error("Failed to decode audio file \"" + this->filepath.string() + "\": " + std::string(Mix_GetError()));
+		this->data = Mix_LoadMUS(this->filepath.string().c_str());
+		if (this->data == nullptr) {
+			throw std::runtime_error("Failed to decode music file \"" + this->filepath.string() + "\": " + std::string(Mix_GetError()));
 		}
-	}
-
-	virtual int Read(void *buf, int len)
-	{
-		Q_UNUSED(buf)
-		Q_UNUSED(len)
-
-		return 0;
-	}
-
-	const uint8_t *get_buffer() const
-	{
-		return this->chunk->abuf;
-	}
-
-	int get_length() const
-	{
-		return static_cast<int>(this->chunk->alen);
-	}
-
-	int get_channel_count() const
-	{
-		return sample::channel_count;
-	}
-
-	int get_sample_size() const
-	{
-		return sample::sample_size;
-	}
-
-	int get_frequency() const
-	{
-		return sample::frequency;
-	}
-
-	Mix_Chunk *get_chunk() const
-	{
-		return this->chunk;
 	}
 
 private:
 	std::filesystem::path filepath;
-	Mix_Chunk *chunk = nullptr; //sample buffer
+	Mix_Music *data = nullptr;
 };
 
 }

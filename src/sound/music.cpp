@@ -32,11 +32,9 @@
 
 #include "iolib.h"
 #include "script.h"
+#include "sound/music_sample.h"
 #include "sound/music_type.h"
-#include "sound/sample.h"
 #include "sound/sound_server.h"
-
-static constexpr int SoundFrequency = 44100; // sample rate of dsp
 
 static bool MusicFinished;                /// Music ended and we need a new file
 
@@ -93,7 +91,7 @@ void music::initialize()
 
 	if (!this->file.empty()) {
 		const std::string filename = LibraryFileName(this->file.string().c_str());
-		this->sample = std::make_unique<wyrmgus::sample>(filename);
+		this->sample = std::make_unique<wyrmgus::music_sample>(filename);
 	}
 
 	data_entry::initialize();

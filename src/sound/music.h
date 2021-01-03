@@ -37,7 +37,7 @@ extern bool enableOAML;
 
 namespace wyrmgus {
 
-class sample;
+class music_sample;
 enum class music_type;
 
 class music final : public data_entry, public data_type<music>
@@ -76,7 +76,7 @@ public:
 	virtual void initialize() override;
 	virtual void check() const override;
 
-	wyrmgus::sample *get_sample() const
+	wyrmgus::music_sample *get_sample() const
 	{
 		return this->sample.get();
 	}
@@ -99,7 +99,7 @@ public:
 private:
 	music_type type;
 	std::filesystem::path file;
-	std::unique_ptr<wyrmgus::sample> sample;
+	std::unique_ptr<wyrmgus::music_sample> sample;
 	int volume_percent = 100;
 	std::vector<const music *> submusic; //the music pieces grouped under this one
 	bool intro = false; //if this is a submusic piece, whether it is an introduction one
