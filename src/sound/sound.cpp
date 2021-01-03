@@ -438,7 +438,6 @@ wyrmgus::sound *RegisterSound(const std::string &identifier, const std::vector<s
 	wyrmgus::sound *id = wyrmgus::sound::add(identifier, nullptr);
 
 	id->files = files;
-	id->initialize();
 
 	return id;
 }
@@ -484,16 +483,6 @@ void InitSoundClient()
 }
 
 namespace wyrmgus {
-
-void sound::initialize_all()
-{
-	sample::initialize_decoding_loop();
-
-	data_type::initialize_all();
-
-	sample::run_decoding_loop();
-	sample::clear_decoders();
-}
 
 sound::sound(const std::string &identifier) : data_entry(identifier)
 {

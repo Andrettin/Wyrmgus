@@ -38,7 +38,6 @@
 
 static constexpr int SoundFrequency = 44100; // sample rate of dsp
 
-static SDL_mutex *MusicFinishedMutex;     /// Mutex for MusicFinished
 static bool MusicFinished;                /// Music ended and we need a new file
 
 bool CallbackMusic;                       /// flag true callback ccl if stops
@@ -101,9 +100,7 @@ void music::check() const
 */
 static void MusicFinishedCallback()
 {
-	SDL_LockMutex(MusicFinishedMutex);
 	MusicFinished = true;
-	SDL_UnlockMutex(MusicFinishedMutex);
 }
 
 /**
@@ -113,10 +110,8 @@ void CheckMusicFinished(bool force)
 {
 	bool proceed;
 
-	SDL_LockMutex(MusicFinishedMutex);
 	proceed = MusicFinished;
 	MusicFinished = false;
-	SDL_UnlockMutex(MusicFinishedMutex);
 
 	if ((proceed || force) && SoundEnabled() && IsMusicEnabled() && CallbackMusic) {
 		lua_getglobal(Lua, "MusicStopped");
@@ -135,7 +130,6 @@ void CheckMusicFinished(bool force)
 void InitMusic()
 {
 	MusicFinished = false;
-	MusicFinishedMutex = SDL_CreateMutex();
 	SetMusicFinishedCallback(MusicFinishedCallback);
 }
 

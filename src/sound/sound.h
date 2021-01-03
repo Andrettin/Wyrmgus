@@ -76,8 +76,6 @@ public:
 	static constexpr int max_range = 254;
 	static constexpr int infinite_range = 255; //the range value that makes a sound volume distance independent
 
-	static void initialize_all();
-
 	explicit sound(const std::string &identifier);
 	virtual ~sound() override;
 

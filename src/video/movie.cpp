@@ -215,7 +215,7 @@ int PlayMovie(const std::string &name)
 	StopMusic();
 	std::unique_ptr<wyrmgus::sample> sample = LoadSample(filename);
 	if (sample != nullptr) {
-		if ((sample->get_format().channelCount() != 1 && sample->get_format().channelCount() != 2) || sample->get_format().sampleSize() != 16) {
+		if ((sample->get_channel_count() != 1 && sample->get_channel_count() != 2) || sample->get_sample_size() != 16) {
 			fprintf(stderr, "Unsupported sound format in movie\n");
 			SDL_FreeYUVOverlay(yuv_overlay);
 			OggFree(&data);

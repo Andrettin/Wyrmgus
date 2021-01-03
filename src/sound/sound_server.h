@@ -32,9 +32,6 @@
 
 #include "sound/sound.h"
 
-#include <QAudioBuffer>
-#include <QAudioDecoder>
-
 constexpr int MaxVolume = 255;
 constexpr int SOUND_BUFFER_SIZE = 65536;
 
@@ -48,52 +45,31 @@ enum class unit_sound_type;
 class sample final
 {
 public:
-	static constexpr int max_concurrent_decoders = 128;
+	static constexpr int channel_count = 2;
+	static constexpr int sample_size = 16;
+	static constexpr int frequency = 44100;
 
-	static void initialize_decoding_loop()
+	explicit sample(const std::filesystem::path &filepath)
 	{
-		sample::decoding_loop = std::make_unique<QEventLoop>();
+		if (!std::filesystem::exists(filepath)) {
+			throw std::runtime_error("Sound file \"" + filepath.string() + "\" does not exist.");
+		}
+
+		this->decode(filepath);
 	}
 
-	static void run_decoding_loop()
+	~sample()
 	{
-		sample::decoding_loop->exec();
-		sample::decoding_loop.reset();
+		Mix_FreeChunk(this->chunk);
 	}
 
-	static void queue_decoder(std::unique_ptr<QAudioDecoder> &&decoder)
+	void decode(const std::filesystem::path &filepath)
 	{
-		if (sample::decoding_loop_counter < sample::max_concurrent_decoders) {
-			sample::start_decoder(std::move(decoder));
-		} else {
-			sample::queued_decoders.push(std::move(decoder));
+		this->chunk = Mix_LoadWAV(filepath.string().c_str());
+		if (this->chunk == nullptr) {
+			throw std::runtime_error("Failed to decode audio file \"" + filepath.string() + "\": " + std::string(SDL_GetError()));
 		}
 	}
-
-	static void start_decoder(std::unique_ptr<QAudioDecoder> &&decoder)
-	{
-		sample::decoding_loop_counter++;
-		decoder->start();
-		sample::active_decoders.push_back(std::move(decoder));
-	}
-
-	static void decrement_decoding_loop_counter();
-
-	static void clear_decoders()
-	{
-		sample::active_decoders.clear();
-	}
-
-private:
-	static inline std::unique_ptr<QEventLoop> decoding_loop;
-	static inline int decoding_loop_counter = 0;
-	static inline std::vector<std::unique_ptr<QAudioDecoder>> active_decoders;
-	static inline std::queue<std::unique_ptr<QAudioDecoder>> queued_decoders;
-
-public:
-	explicit sample(const std::filesystem::path &filepath);
-
-	void decode(const std::filesystem::path &filepath);
 
 	virtual int Read(void *buf, int len)
 	{
@@ -103,27 +79,38 @@ public:
 		return 0;
 	}
 
-	void read_audio_buffer(const QAudioBuffer &buffer);
-
-	const unsigned char *get_buffer() const
+	const uint8_t *get_buffer() const
 	{
-		return this->buffer.data();
+		return this->chunk->abuf;
 	}
 
 	int get_length() const
 	{
-		return this->length;
+		return static_cast<int>(this->chunk->alen);
 	}
 
-	const QAudioFormat &get_format() const
+	int get_channel_count() const
 	{
-		return this->format;
+		return sample::channel_count;
+	}
+
+	int get_sample_size() const
+	{
+		return sample::sample_size;
+	}
+
+	int get_frequency() const
+	{
+		return sample::frequency;
+	}
+
+	Mix_Chunk *get_chunk() const
+	{
+		return this->chunk;
 	}
 
 private:
-	std::vector<unsigned char> buffer; //sample buffer
-	int length = 0; //length of the filled buffer
-	QAudioFormat format;
+	Mix_Chunk *chunk = nullptr; //sample buffer
 };
 
 }
@@ -138,8 +125,6 @@ extern void SetChannelVoiceGroup(int channel, const wyrmgus::unit_sound_type uni
 //Wyrmgus end
 /// Set the channel's callback for when a sound finishes playing
 extern void SetChannelFinishedCallback(int channel, void (*callback)(int channel));
-/// Get the sample playing on a channel
-extern wyrmgus::sample *GetChannelSample(int channel);
 /// Stop a channel
 extern void StopChannel(int channel);
 /// Stop all channels
@@ -148,11 +133,11 @@ extern void StopAllChannels();
 /// Check if this unit plays some sound
 extern bool UnitSoundIsPlaying(Origin *origin);
 /// Check, if this sample is already playing
-extern bool SampleIsPlaying(wyrmgus::sample *sample);
+extern bool SampleIsPlaying(const wyrmgus::sample *sample);
 /// Load a sample
 extern std::unique_ptr<wyrmgus::sample> LoadSample(const std::filesystem::path &filepath);
 /// Play a sample
-extern int PlaySample(wyrmgus::sample *sample, Origin *origin = nullptr);
+extern int PlaySample(const wyrmgus::sample *sample, Origin *origin = nullptr);
 
 /// Set effects volume
 extern void SetEffectsVolume(int volume);

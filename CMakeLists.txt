@@ -1161,6 +1161,7 @@ find_package(Qt5 5.14 COMPONENTS Quick REQUIRED) #licensed under the GPL 2.0 (as
 find_package(Lua51 REQUIRED)
 find_package(PNG REQUIRED)
 find_package(SDL REQUIRED)
+find_package(SDL_mixer REQUIRED)
 find_package(Tolua++ REQUIRED)
 find_package(ZLIB REQUIRED)
 
@@ -1258,9 +1259,9 @@ endif()
 # Stratagus definitions
 
 add_definitions(${PNG_DEFINITIONS} -DUSE_ZLIB -DPIXMAPS=\"${PIXMAPSDIRABS}\")
-include_directories(${LUA_INCLUDE_DIR} ${PNG_INCLUDE_DIR} ${SDL_INCLUDE_DIR} ${TOLUA++_INCLUDE_DIR} ${ZLIB_INCLUDE_DIRS})
+include_directories(${LUA_INCLUDE_DIR} ${PNG_INCLUDE_DIR} ${SDL_INCLUDE_DIR} ${SDL_MIXER_INCLUDE_DIR} ${TOLUA++_INCLUDE_DIR} ${ZLIB_INCLUDE_DIRS})
 set(QT_LIBRARIES Qt5::Core Qt5::Gui Qt5::Widgets Qt5::Multimedia Qt5::Location Qt5::LocationPrivate Qt5::Qml Qt5::Quick)
-set(stratagus_LIBS ${LUA_LIBRARIES} ${PNG_LIBRARIES} ${SDL_LIBRARY} ${TOLUA++_LIBRARY} ${ZLIB_LIBRARIES} ${QT_LIBRARIES})
+set(stratagus_LIBS ${LUA_LIBRARIES} ${PNG_LIBRARIES} ${SDL_LIBRARY} ${SDL_MIXER_LIBRARY} ${TOLUA++_LIBRARY} ${ZLIB_LIBRARIES} ${QT_LIBRARIES})
 
 if(WIN32 AND NOT ENABLE_STDIO_REDIRECT)
 	add_definitions(-DNO_STDIO_REDIRECT)
@@ -1665,7 +1666,6 @@ target_precompile_headers(stratagus PRIVATE
 	<variant>
 	<vector>
 	<QApplication>
-	<QAudioFormat>
 	<QCalendar>
 	<QColor>
 	<QDateTime>
@@ -1686,6 +1686,7 @@ target_precompile_headers(stratagus PRIVATE
 	<QVariant>
 	<QVariantList>
 	<SDL.h>
+	<SDL_mixer.h>
 	src/util/point_operators.h #to ensure the / operator with an int as RHS is used instead of the Qt one with qreal (which uses rounding)
 	src/util/size_operators.h #as above
 )

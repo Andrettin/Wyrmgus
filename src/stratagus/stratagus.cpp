@@ -737,7 +737,7 @@ void stratagusMain(int argc, char **argv)
 	// Setup video display
 	InitVideo();
 
-	// Setup sound card
+	//setup sound
 	if (!InitSound()) {
 		InitMusic();
 	}
