@@ -78,6 +78,8 @@ void SetMusicFinishedCallback(void (*callback)());
 
 extern void play_menu_music();
 extern void play_credits_music();
+extern void play_loading_music();
+extern void play_map_music();
 
 /// Play a music file
 extern int PlayMusic(std::unique_ptr<wyrmgus::sample> &&sample);

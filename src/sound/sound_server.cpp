@@ -399,6 +399,16 @@ void play_credits_music()
 	wyrmgus::music_player::get()->play_music_type(wyrmgus::music_type::credits);
 }
 
+void play_loading_music()
+{
+	wyrmgus::music_player::get()->play_music_type(wyrmgus::music_type::loading);
+}
+
+void play_map_music()
+{
+	wyrmgus::music_player::get()->play_music_type(wyrmgus::music_type::map);
+}
+
 void PlayMusicName(const std::string &name) {
 	if (!IsMusicEnabled()) {
 		return;
