@@ -29,6 +29,8 @@
 
 #include "music_player.h"
 
+#include "player.h"
+#include "script/condition/and_condition.h"
 #include "sound/music.h"
 #include "sound/music_sample.h"
 #include "sound/music_type.h"
@@ -126,6 +128,10 @@ const music *music_player::get_next_music() const
 	std::vector<const music *> music_list;
 
 	for (const music *music : potential_music_list) {
+		if (music->get_conditions() != nullptr && !music->get_conditions()->check(CPlayer::GetThisPlayer())) {
+			continue;
+		}
+
 		if (music == this->current_music && !music_list.empty()) {
 			//don't play the same music twice if that can be avoided
 			continue;
@@ -149,17 +155,29 @@ const music *music_player::get_next_submusic() const
 	std::vector<const music *> submusic_list;
 
 	for (const music *intro_music : this->current_music->get_intro_music()) {
-		if (!this->played_submusic.contains(intro_music)) {
-			submusic_list.push_back(intro_music);
+		if (this->played_submusic.contains(intro_music)) {
+			continue;
 		}
+
+		if (intro_music->get_conditions() != nullptr && !intro_music->get_conditions()->check(CPlayer::GetThisPlayer())) {
+			continue;
+		}
+
+		submusic_list.push_back(intro_music);
 	}
 
 	if (submusic_list.empty()) {
 		//no intro available, or all intro submusic played, now go forward to the main music
 		for (const music *submusic : this->current_music->get_submusic()) {
-			if (!this->played_submusic.contains(submusic)) {
-				submusic_list.push_back(submusic);
+			if (this->played_submusic.contains(submusic)) {
+				continue;
 			}
+
+			if (submusic->get_conditions() != nullptr && !submusic->get_conditions()->check(CPlayer::GetThisPlayer())) {
+				continue;
+			}
+
+			submusic_list.push_back(submusic);
 		}
 	}
 

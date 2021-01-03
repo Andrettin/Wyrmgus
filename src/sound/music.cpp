@@ -32,6 +32,7 @@
 
 #include "iolib.h"
 #include "script.h"
+#include "script/condition/and_condition.h"
 #include "sound/music_player.h"
 #include "sound/music_sample.h"
 #include "sound/music_type.h"
@@ -83,6 +84,9 @@ void music::process_sml_scope(const sml_data &scope)
 		for (const std::string &value : values) {
 			this->submusic.push_back(music::get(value));
 		}
+	} else if (tag == "conditions") {
+		this->conditions = std::make_unique<and_condition>();
+		database::process_sml_data(this->conditions, scope);
 	} else {
 		data_entry::process_sml_scope(scope);
 	}
@@ -106,6 +110,10 @@ void music::check() const
 {
 	if (this->file.empty() && this->get_intro_music().empty() && this->get_submusic().empty()) {
 		throw std::runtime_error("Music \"" + this->get_identifier() + "\" has neither a file nor submusic.");
+	}
+
+	if (this->get_conditions() != nullptr) {
+		this->get_conditions()->check_validity();
 	}
 }
 

@@ -37,6 +37,7 @@ extern bool enableOAML;
 
 namespace wyrmgus {
 
+class and_condition;
 class music_sample;
 enum class music_type;
 
@@ -97,6 +98,11 @@ public:
 		return this->submusic;
 	}
 
+	const and_condition *get_conditions() const
+	{
+		return this->conditions.get();
+	}
+
 private:
 	music_type type;
 	std::filesystem::path file;
@@ -104,6 +110,7 @@ private:
 	int volume_percent = 100;
 	std::vector<const music *> intro_music; //intro submusic
 	std::vector<const music *> submusic; //the music pieces grouped under this one
+	std::unique_ptr<and_condition> conditions;
 };
 
 }
