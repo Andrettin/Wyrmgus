@@ -128,8 +128,10 @@ const music *music_player::get_next_music() const
 	std::vector<const music *> music_list;
 
 	for (const music *music : potential_music_list) {
-		if (music->get_conditions() != nullptr && !music->get_conditions()->check(CPlayer::GetThisPlayer())) {
-			continue;
+		if (music->get_conditions() != nullptr) {
+			if (CPlayer::GetThisPlayer() == nullptr || !music->get_conditions()->check(CPlayer::GetThisPlayer())) {
+				continue;
+			}
 		}
 
 		if (music == this->current_music && !music_list.empty()) {
@@ -159,8 +161,10 @@ const music *music_player::get_next_submusic() const
 			continue;
 		}
 
-		if (intro_music->get_conditions() != nullptr && !intro_music->get_conditions()->check(CPlayer::GetThisPlayer())) {
-			continue;
+		if (intro_music->get_conditions() != nullptr) {
+			if (CPlayer::GetThisPlayer() == nullptr || !intro_music->get_conditions()->check(CPlayer::GetThisPlayer())) {
+				continue;
+			}
 		}
 
 		submusic_list.push_back(intro_music);
@@ -173,8 +177,10 @@ const music *music_player::get_next_submusic() const
 				continue;
 			}
 
-			if (submusic->get_conditions() != nullptr && !submusic->get_conditions()->check(CPlayer::GetThisPlayer())) {
-				continue;
+			if (submusic->get_conditions() != nullptr) {
+				if (CPlayer::GetThisPlayer() == nullptr || !submusic->get_conditions()->check(CPlayer::GetThisPlayer())) {
+					continue;
+				}
 			}
 
 			submusic_list.push_back(submusic);
