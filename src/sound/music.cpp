@@ -30,11 +30,10 @@
 
 #include "music.h"
 
+#include "sound/music_type.h"
 #include "sound/sound_server.h"
 #include "script.h"
 #include "iolib.h"
-
-#include "SDL.h"
 
 static constexpr int SoundFrequency = 44100; // sample rate of dsp
 
@@ -87,6 +86,10 @@ void music::process_sml_scope(const sml_data &scope)
 
 void music::initialize()
 {
+	if (this->type != music_type::none) {
+		music::music_by_type[this->type].push_back(this);
+	}
+
 	if (!this->file.empty()) {
 		const std::string filename = LibraryFileName(this->file.string().c_str());
 		this->sample = std::make_unique<wyrmgus::sample>(filename);

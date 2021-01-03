@@ -74,6 +74,7 @@
 #include "religion/pantheon.h"
 #include "religion/religion.h"
 #include "resource.h"
+#include "sound/music_type.h"
 #include "sound/sound.h"
 #include "species/geological_era.h"
 #include "species/species.h"
@@ -266,6 +267,8 @@ QVariant database::process_sml_property_value(const sml_property &property, cons
 			new_property_value = QVariant::fromValue(missile_type::get(property.get_value()));
 		} else if (property_class_name == "wyrmgus::module*") {
 			new_property_value = QVariant::fromValue(database::get()->get_module(property.get_value()));
+		} else if (property_class_name == "wyrmgus::music_type") {
+			new_property_value = QVariant::fromValue(string_to_music_type(property.get_value()));
 		} else if (property_class_name == "wyrmgus::pantheon*") {
 			new_property_value = QVariant::fromValue(pantheon::get(property.get_value()));
 		} else if (property_class_name == "wyrmgus::plane*") {

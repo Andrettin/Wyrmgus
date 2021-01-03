@@ -38,11 +38,13 @@ extern bool enableOAML;
 namespace wyrmgus {
 
 class sample;
+enum class music_type;
 
 class music final : public data_entry, public data_type<music>
 {
 	Q_OBJECT
 
+	Q_PROPERTY(wyrmgus::music_type type MEMBER type)
 	Q_PROPERTY(int volume_percent MEMBER volume_percent READ get_volume_percent)
 	Q_PROPERTY(bool intro MEMBER intro READ is_intro)
 
@@ -50,6 +52,22 @@ public:
 	static constexpr const char *class_identifier = "music";
 	static constexpr const char *database_folder = "music";
 
+	static const std::vector<const music *> &get_all_of_type(const music_type type)
+	{
+		static std::vector<const music *> empty_vector;
+
+		const auto find_iterator = music::music_by_type.find(type);
+		if (find_iterator != music::music_by_type.end()) {
+			return find_iterator->second;
+		}
+
+		return empty_vector;
+	}
+
+private:
+	static inline std::map<music_type, std::vector<const music *>> music_by_type;
+
+public:
 	explicit music(const std::string &identifier);
 	virtual ~music() override;
 
@@ -79,6 +97,7 @@ public:
 	}
 
 private:
+	music_type type;
 	std::filesystem::path file;
 	std::unique_ptr<wyrmgus::sample> sample;
 	int volume_percent = 100;
