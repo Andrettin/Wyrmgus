@@ -46,7 +46,6 @@ class music final : public data_entry, public data_type<music>
 
 	Q_PROPERTY(wyrmgus::music_type type MEMBER type)
 	Q_PROPERTY(int volume_percent MEMBER volume_percent READ get_volume_percent)
-	Q_PROPERTY(bool intro MEMBER intro READ is_intro)
 
 public:
 	static constexpr const char *class_identifier = "music";
@@ -87,14 +86,14 @@ public:
 		return this->volume_percent;
 	}
 
+	const std::vector<const music *> &get_intro_music() const
+	{
+		return this->intro_music;
+	}
+
 	const std::vector<const music *> &get_submusic() const
 	{
 		return this->submusic;
-	}
-
-	bool is_intro() const
-	{
-		return this->intro;
 	}
 
 private:
@@ -102,8 +101,8 @@ private:
 	std::filesystem::path file;
 	std::unique_ptr<wyrmgus::music_sample> sample;
 	int volume_percent = 100;
+	std::vector<const music *> intro_music; //intro submusic
 	std::vector<const music *> submusic; //the music pieces grouped under this one
-	bool intro = false; //if this is a submusic piece, whether it is an introduction one
 };
 
 }

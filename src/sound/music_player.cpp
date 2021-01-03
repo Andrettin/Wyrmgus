@@ -52,6 +52,18 @@ void music_player::play(const music_type type)
 
 void music_player::play()
 {
+	if (this->current_music != nullptr) {
+		if (this->current_submusic != nullptr) {
+			this->played_submusic.insert(this->current_submusic);
+		}
+
+		const music *submusic = this->get_next_submusic();
+		if (submusic != nullptr) {
+			this->play_submusic(submusic);
+			return;
+		}
+	}
+
 	this->play_music(this->get_next_music());
 }
 
@@ -62,7 +74,24 @@ void music_player::play_music(const music *music)
 		return;
 	}
 
-	this->play_sample(music->get_sample());
+	this->current_submusic = nullptr;
+	this->played_submusic.clear();
+
+	if (music->get_sample() != nullptr) {
+		this->play_sample(music->get_sample());
+	} else {
+		const wyrmgus::music *submusic = this->get_next_submusic();
+		if (submusic == nullptr) {
+			throw std::runtime_error("Music \"" + music->get_identifier() + "\" has neither a sample nor submusic.");
+		}
+		this->play_submusic(submusic);
+	}
+}
+
+void music_player::play_submusic(const music *submusic)
+{
+	this->current_submusic = submusic;
+	this->play_sample(submusic->get_sample());
 }
 
 void music_player::play_sample(music_sample *sample)
@@ -98,6 +127,32 @@ const music *music_player::get_next_music() const
 
 	if (!music_list.empty()) {
 		return vector::get_random_async(music_list);
+	} else {
+		return nullptr;
+	}
+}
+
+const music *music_player::get_next_submusic() const
+{
+	std::vector<const music *> submusic_list;
+
+	for (const music *intro_music : this->current_music->get_intro_music()) {
+		if (!this->played_submusic.contains(intro_music)) {
+			submusic_list.push_back(intro_music);
+		}
+	}
+
+	if (submusic_list.empty()) {
+		//no intro available, or all intro submusic played, now go forward to the main music
+		for (const music *submusic : this->current_music->get_submusic()) {
+			if (!this->played_submusic.contains(submusic)) {
+				submusic_list.push_back(submusic);
+			}
+		}
+	}
+
+	if (!submusic_list.empty()) {
+		return vector::get_random_async(submusic_list);
 	} else {
 		return nullptr;
 	}

@@ -341,7 +341,7 @@ bool IsEffectsEnabled()
 */
 void SetMusicFinishedCallback(void (*callback)())
 {
-	MusicChannel.FinishedCallback = callback;
+	Mix_HookMusicFinished(callback);
 }
 
 /**
@@ -523,9 +523,6 @@ void StopMusic()
 #endif
 
 	Mix_FadeOutMusic(200);
-	if (MusicChannel.Sample) {
-		MusicChannel.Sample.reset();
-	}
 }
 
 /**

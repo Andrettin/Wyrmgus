@@ -32,6 +32,7 @@
 
 #include "iolib.h"
 #include "script.h"
+#include "sound/music_player.h"
 #include "sound/music_sample.h"
 #include "sound/music_type.h"
 #include "sound/sound_server.h"
@@ -74,7 +75,11 @@ void music::process_sml_scope(const sml_data &scope)
 	const std::string &tag = scope.get_tag();
 	const std::vector<std::string> &values = scope.get_values();
 
-	if (tag == "submusic") {
+	if (tag == "intro_music") {
+		for (const std::string &value : values) {
+			this->intro_music.push_back(music::get(value));
+		}
+	} else if (tag == "submusic") {
 		for (const std::string &value : values) {
 			this->submusic.push_back(music::get(value));
 		}
@@ -99,7 +104,7 @@ void music::initialize()
 
 void music::check() const
 {
-	if (this->file.empty() && this->get_submusic().empty()) {
+	if (this->file.empty() && this->get_intro_music().empty() && this->get_submusic().empty()) {
 		throw std::runtime_error("Music \"" + this->get_identifier() + "\" has neither a file nor submusic.");
 	}
 }
@@ -123,21 +128,13 @@ static void MusicFinishedCallback()
 /**
 **  Check if music is finished and play the next song
 */
-void CheckMusicFinished(bool force)
+void CheckMusicFinished()
 {
-	bool proceed;
-
-	proceed = MusicFinished;
+	const bool proceed = MusicFinished;
 	MusicFinished = false;
 
-	if ((proceed || force) && SoundEnabled() && IsMusicEnabled() && CallbackMusic) {
-		lua_getglobal(Lua, "MusicStopped");
-		if (!lua_isfunction(Lua, -1)) {
-			fprintf(stderr, "No MusicStopped function in Lua\n");
-			StopMusic();
-		} else {
-			LuaCall(0, 1);
-		}
+	if (proceed && SoundEnabled() && IsMusicEnabled() && CallbackMusic) {
+		wyrmgus::music_player::get()->play();
 	}
 }
 

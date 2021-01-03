@@ -42,12 +42,16 @@ public:
 	void play(const music_type type);
 	void play();
 	void play_music(const music *music);
+	void play_submusic(const music *submusic);
 	void play_sample(music_sample *sample);
 	const music *get_next_music() const;
+	const music *get_next_submusic() const;
 
 private:
 	music_type current_music_type;
 	const music *current_music = nullptr;
+	const music *current_submusic = nullptr;
+	std::set<const music *> played_submusic;
 };
 
 }
