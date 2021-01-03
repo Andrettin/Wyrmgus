@@ -699,6 +699,14 @@ void QuitSound()
 	}
 #endif
 
+	for (wyrmgus::sound *sound : wyrmgus::sound::get_all()) {
+		sound->clear_samples();
+	}
+
+	for (wyrmgus::music *music : wyrmgus::music::get_all()) {
+		music->clear_sample();
+	}
+
 	Mix_CloseAudio();
 	Mix_Quit();
 

@@ -115,14 +115,6 @@ static void delete_lua_callbacks()
 		unit_type->TeleportEffectIn.reset();
 		unit_type->TeleportEffectOut.reset();
 	}
-
-	for (wyrmgus::sound *sound : wyrmgus::sound::get_all()) {
-		sound->clear_samples();
-	}
-
-	for (wyrmgus::music *music : wyrmgus::music::get_all()) {
-		music->clear_sample();
-	}
 }
 
 /**
