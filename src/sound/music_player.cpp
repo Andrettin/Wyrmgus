@@ -106,6 +106,7 @@ void music_player::play_sample(music_sample *sample)
 		sample->load();
 	}
 
+	Mix_VolumeMusic(GetMusicVolume() * this->current_volume_modifier / 100 * MIX_MAX_VOLUME / MaxVolume);
 	Mix_PlayMusic(sample->get_data(), 0);
 }
 
