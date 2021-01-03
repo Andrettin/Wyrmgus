@@ -388,6 +388,11 @@ wyrmgus::time_of_day *CMapLayer::GetTimeOfDay() const
 wyrmgus::time_of_day *CMapLayer::get_tile_time_of_day(const QPoint &tile_pos) const
 {
 	const wyrmgus::tile *tile = this->Field(tile_pos);
+
+	if (tile->Flags & MapFieldSpace) {
+		return nullptr;
+	}
+
 	if (tile->Flags & MapFieldUnderground) {
 		return wyrmgus::defines::get()->get_underground_time_of_day();
 	}

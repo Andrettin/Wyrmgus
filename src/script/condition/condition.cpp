@@ -61,6 +61,7 @@
 #include "script/condition/season_condition.h"
 #include "script/condition/settlement_condition.h"
 #include "script/condition/terrain_condition.h"
+#include "script/condition/time_of_day_condition.h"
 #include "script/condition/trigger_condition.h"
 #include "script/condition/unit_class_condition.h"
 #include "script/condition/unit_type_condition.h"
@@ -109,6 +110,8 @@ std::unique_ptr<const condition> condition::from_sml_property(const sml_property
 		return std::make_unique<settlement_condition>(value);
 	} else if (key == "terrain") {
 		return std::make_unique<terrain_condition>(value);
+	} else if (key == "time_of_day") {
+		return std::make_unique<time_of_day_condition>(value);
 	} else if (key == "trigger") {
 		return std::make_unique<trigger_condition>(value);
 	} else if (key == "unit_class") {
