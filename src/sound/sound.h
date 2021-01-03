@@ -81,6 +81,8 @@ public:
 
 	virtual void initialize() override;
 
+	void clear_samples();
+
 	const std::vector<std::filesystem::path> &get_files() const
 	{
 		return this->files;

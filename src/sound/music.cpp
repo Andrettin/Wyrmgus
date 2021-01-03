@@ -104,6 +104,11 @@ void music::check() const
 	}
 }
 
+void music::clear_sample()
+{
+	this->sample.reset();
+}
+
 }
 
 /**

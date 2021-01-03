@@ -52,6 +52,7 @@
 #include "script.h"
 #include "script/condition/condition.h"
 #include "script/trigger.h"
+#include "sound/music.h"
 #include "sound/sound.h"
 #include "sound/sound_server.h"
 #include "spell/spell.h"
@@ -113,6 +114,14 @@ static void delete_lua_callbacks()
 		unit_type->OnInit.reset();
 		unit_type->TeleportEffectIn.reset();
 		unit_type->TeleportEffectOut.reset();
+	}
+
+	for (wyrmgus::sound *sound : wyrmgus::sound::get_all()) {
+		sound->clear_samples();
+	}
+
+	for (wyrmgus::music *music : wyrmgus::music::get_all()) {
+		music->clear_sample();
 	}
 }
 

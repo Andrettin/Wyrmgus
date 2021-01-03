@@ -516,6 +516,11 @@ void sound::initialize()
 	data_entry::initialize();
 }
 
+void sound::clear_samples()
+{
+	this->samples.clear();
+}
+
 QVariantList sound::get_files_qvariant_list() const
 {
 	return container::to_qvariant_list(this->get_files());

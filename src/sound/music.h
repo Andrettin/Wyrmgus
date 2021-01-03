@@ -75,6 +75,7 @@ public:
 	virtual void process_sml_scope(const sml_data &scope) override;
 	virtual void initialize() override;
 	virtual void check() const override;
+	void clear_sample();
 
 	wyrmgus::music_sample *get_sample() const
 	{
