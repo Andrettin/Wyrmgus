@@ -47,6 +47,7 @@ void music_player::play_music_type(const music_type type)
 		return;
 	}
 
+	StopMusic();
 	this->current_music_type = type;
 
 	if (SoundEnabled() && IsMusicEnabled()) {
