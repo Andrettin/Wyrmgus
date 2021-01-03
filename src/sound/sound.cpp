@@ -33,6 +33,7 @@
 #include "character.h"
 #include "civilization.h"
 #include "database/defines.h"
+#include "iolib.h"
 #include "missile.h"
 #include "sound/sound_server.h"
 #include "sound/unit_sound_type.h"
@@ -506,7 +507,9 @@ void sound::initialize()
 	}
 
 	for (const std::filesystem::path &filepath : this->get_files()) {
-		this->samples.push_back(LoadSample(filepath));
+		const std::string filename = LibraryFileName(filepath.string().c_str());
+		auto sample = std::make_unique<wyrmgus::sample>(filename);
+		this->samples.push_back(std::move(sample));
 	}
 
 	data_entry::initialize();

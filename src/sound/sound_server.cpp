@@ -267,11 +267,15 @@ std::unique_ptr<wyrmgus::sample> LoadSample(const std::filesystem::path &filepat
 **
 **  @return        Channel number, -1 for error
 */
-int PlaySample(const wyrmgus::sample *sample, Origin *origin)
+int PlaySample(wyrmgus::sample *sample, Origin *origin)
 {
 	int channel = -1;
 
 	if (SoundEnabled() && EffectsEnabled && sample != nullptr) {
+		if (!sample->is_loaded()) {
+			sample->load();
+		}
+
 		channel = Mix_PlayChannel(-1, sample->get_chunk(), 0);
 		Mix_Volume(channel, EffectsVolume * MIX_MAX_VOLUME / MaxVolume);
 

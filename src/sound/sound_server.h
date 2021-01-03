@@ -49,13 +49,11 @@ public:
 	static constexpr int sample_size = 16;
 	static constexpr int frequency = 44100;
 
-	explicit sample(const std::filesystem::path &filepath)
+	explicit sample(const std::filesystem::path &filepath) : filepath(filepath)
 	{
 		if (!std::filesystem::exists(filepath)) {
 			throw std::runtime_error("Sound file \"" + filepath.string() + "\" does not exist.");
 		}
-
-		this->decode(filepath);
 	}
 
 	~sample()
@@ -63,11 +61,16 @@ public:
 		Mix_FreeChunk(this->chunk);
 	}
 
-	void decode(const std::filesystem::path &filepath)
+	bool is_loaded() const
 	{
-		this->chunk = Mix_LoadWAV(filepath.string().c_str());
+		return this->chunk != nullptr;
+	}
+
+	void load()
+	{
+		this->chunk = Mix_LoadWAV(this->filepath.string().c_str());
 		if (this->chunk == nullptr) {
-			throw std::runtime_error("Failed to decode audio file \"" + filepath.string() + "\": " + std::string(SDL_GetError()));
+			throw std::runtime_error("Failed to decode audio file \"" + this->filepath.string() + "\": " + std::string(SDL_GetError()));
 		}
 	}
 
@@ -110,6 +113,7 @@ public:
 	}
 
 private:
+	std::filesystem::path filepath;
 	Mix_Chunk *chunk = nullptr; //sample buffer
 };
 
@@ -137,7 +141,7 @@ extern bool SampleIsPlaying(const wyrmgus::sample *sample);
 /// Load a sample
 extern std::unique_ptr<wyrmgus::sample> LoadSample(const std::filesystem::path &filepath);
 /// Play a sample
-extern int PlaySample(const wyrmgus::sample *sample, Origin *origin = nullptr);
+extern int PlaySample(wyrmgus::sample *sample, Origin *origin = nullptr);
 
 /// Set effects volume
 extern void SetEffectsVolume(int volume);
