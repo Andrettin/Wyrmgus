@@ -409,6 +409,16 @@ void play_map_music()
 	wyrmgus::music_player::get()->play_music_type(wyrmgus::music_type::map);
 }
 
+void play_victory_music()
+{
+	wyrmgus::music_player::get()->play_music_type(wyrmgus::music_type::victory);
+}
+
+void play_defeat_music()
+{
+	wyrmgus::music_player::get()->play_music_type(wyrmgus::music_type::defeat);
+}
+
 void PlayMusicName(const std::string &name) {
 	if (!IsMusicEnabled()) {
 		return;

@@ -34,7 +34,9 @@ enum class music_type {
 	menu,
 	credits,
 	loading,
-	map
+	map,
+	victory,
+	defeat
 };
 
 inline music_type string_to_music_type(const std::string &str)
@@ -47,6 +49,10 @@ inline music_type string_to_music_type(const std::string &str)
 		return music_type::loading;
 	} else if (str == "map") {
 		return music_type::map;
+	} else if (str == "victory") {
+		return music_type::victory;
+	} else if (str == "defeat") {
+		return music_type::defeat;
 	}
 
 	throw std::runtime_error("Invalid music type: \"" + str + "\".");
@@ -63,6 +69,10 @@ inline std::string music_type_to_string(const music_type type)
 			return "loading";
 		case music_type::map:
 			return "map";
+		case music_type::victory:
+			return "victory";
+		case music_type::defeat:
+			return "defeat";
 		default:
 			break;
 	}

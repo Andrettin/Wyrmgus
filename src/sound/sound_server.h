@@ -80,6 +80,8 @@ extern void play_menu_music();
 extern void play_credits_music();
 extern void play_loading_music();
 extern void play_map_music();
+extern void play_victory_music();
+extern void play_defeat_music();
 
 /// Play a music file
 extern int PlayMusic(std::unique_ptr<wyrmgus::sample> &&sample);
