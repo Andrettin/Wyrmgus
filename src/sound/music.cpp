@@ -38,8 +38,6 @@
 #include "sound/music_type.h"
 #include "sound/sound_server.h"
 
-static bool MusicFinished;                /// Music ended and we need a new file
-
 bool CallbackMusic;                       /// flag true callback ccl if stops
 
 #ifdef USE_OAML
@@ -145,7 +143,6 @@ void music::clear_sample()
 */
 static void MusicFinishedCallback()
 {
-	MusicFinished = true;
 }
 
 /**
@@ -153,10 +150,9 @@ static void MusicFinishedCallback()
 */
 void CheckMusicFinished()
 {
-	const bool proceed = MusicFinished;
-	MusicFinished = false;
+	const bool finished = !IsMusicPlaying();
 
-	if (proceed && SoundEnabled() && IsMusicEnabled() && CallbackMusic) {
+	if (finished && SoundEnabled() && IsMusicEnabled() && CallbackMusic) {
 		wyrmgus::music_player::get()->play();
 	}
 }
@@ -166,7 +162,6 @@ void CheckMusicFinished()
 */
 void InitMusic()
 {
-	MusicFinished = false;
 	SetMusicFinishedCallback(MusicFinishedCallback);
 }
 
