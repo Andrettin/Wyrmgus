@@ -27,44 +27,27 @@
 
 #pragma once
 
+#include "util/singleton.h"
+
 namespace wyrmgus {
 
-class music_sample final
+class music;
+class music_sample;
+enum class music_type;
+
+class music_player final : public singleton<music_player>
 {
 public:
-	explicit music_sample(const std::filesystem::path &filepath) : filepath(filepath)
-	{
-		if (!std::filesystem::exists(filepath)) {
-			throw std::runtime_error("Music file \"" + filepath.string() + "\" does not exist.");
-		}
-	}
-
-	~music_sample()
-	{
-		Mix_FreeMusic(this->data);
-	}
-
-	bool is_loaded() const
-	{
-		return this->data != nullptr;
-	}
-
-	void load()
-	{
-		this->data = Mix_LoadMUS(this->filepath.string().c_str());
-		if (this->data == nullptr) {
-			throw std::runtime_error("Failed to decode music file \"" + this->filepath.string() + "\": " + std::string(Mix_GetError()));
-		}
-	}
-
-	Mix_Music *get_data() const
-	{
-		return this->data;
-	}
+	music_player();
+	void play(const music_type type);
+	void play();
+	void play_music(const music *music);
+	void play_sample(music_sample *sample);
+	const music *get_next_music() const;
 
 private:
-	std::filesystem::path filepath;
-	Mix_Music *data = nullptr;
+	music_type current_music_type;
+	const music *current_music = nullptr;
 };
 
 }

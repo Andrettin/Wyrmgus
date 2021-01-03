@@ -8,6 +8,7 @@ extern bool IsEffectsEnabled(void);
 extern void SetMusicEnabled(bool enabled);
 extern bool IsMusicEnabled(void);
 
+extern void play_menu_music();
 extern int PlayMusic(const std::string name);
 extern void PlayMusicName(const std::string name);
 extern void PlayMusicByGroupRandom(const std::string group);

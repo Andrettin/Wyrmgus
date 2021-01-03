@@ -41,6 +41,8 @@
 #include "player.h" //for playing faction music
 //Wyrmgus end
 #include "sound/music.h"
+#include "sound/music_player.h"
+#include "sound/music_type.h"
 #include "sound/sample.h"
 #include "sound/sound.h"
 #include "sound/unit_sound_type.h"
@@ -59,7 +61,6 @@
 #endif
 
 static bool SoundInitialized;    /// is sound initialized
-static bool MusicPlaying;        /// flag true if playing music
 
 static int EffectsVolume = 128;  /// effects sound volume
 static int MusicVolume = 128;    /// music volume
@@ -355,7 +356,6 @@ int PlayMusic(std::unique_ptr<wyrmgus::sample> &&sample)
 	if (sample) {
 		StopMusic();
 		MusicChannel.Sample = std::move(sample);
-		MusicPlaying = true;
 		return 0;
 	} else {
 		DebugPrint("Could not play sample\n");
@@ -382,12 +382,16 @@ int PlayMusic(const std::string &file)
 	if (sample != nullptr) {
 		StopMusic();
 		MusicChannel.Sample = std::move(sample);
-		MusicPlaying = true;
 		return 0;
 	} else {
 		DebugPrint("Could not play %s\n" _C_ file.c_str());
 		return -1;
 	}
+}
+
+void play_menu_music()
+{
+	wyrmgus::music_player::get()->play(wyrmgus::music_type::menu);
 }
 
 void PlayMusicName(const std::string &name) {
@@ -518,12 +522,9 @@ void StopMusic()
 	}
 #endif
 
-	if (MusicPlaying) {
-		MusicPlaying = false;
-		Mix_FadeOutMusic(200);
-		if (MusicChannel.Sample) {
-			MusicChannel.Sample.reset();
-		}
+	Mix_FadeOutMusic(200);
+	if (MusicChannel.Sample) {
+		MusicChannel.Sample.reset();
 	}
 }
 
@@ -542,6 +543,8 @@ void SetMusicVolume(int volume)
 		oaml->SetVolume(MusicVolume / 255.f);
 	}
 #endif
+
+	Mix_VolumeMusic(volume * MIX_MAX_VOLUME / MaxVolume);
 }
 
 /**
@@ -559,6 +562,7 @@ void SetMusicEnabled(bool enabled)
 {
 	if (enabled) {
 		MusicEnabled = true;
+		wyrmgus::music_player::get()->play();
 	} else {
 		MusicEnabled = false;
 		StopMusic();
@@ -586,7 +590,7 @@ bool IsMusicPlaying()
 	}
 #endif
 
-	return MusicPlaying;
+	return Mix_PlayingMusic() == 1;
 }
 
 /**
