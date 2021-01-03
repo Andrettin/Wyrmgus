@@ -391,7 +391,12 @@ int PlayMusic(const std::string &file)
 
 void play_menu_music()
 {
-	wyrmgus::music_player::get()->play(wyrmgus::music_type::menu);
+	wyrmgus::music_player::get()->play_music_type(wyrmgus::music_type::menu);
+}
+
+void play_credits_music()
+{
+	wyrmgus::music_player::get()->play_music_type(wyrmgus::music_type::credits);
 }
 
 void PlayMusicName(const std::string &name) {

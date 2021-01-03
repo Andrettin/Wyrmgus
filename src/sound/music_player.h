@@ -39,7 +39,8 @@ class music_player final : public singleton<music_player>
 {
 public:
 	music_player();
-	void play(const music_type type);
+
+	void play_music_type(const music_type type);
 	void play();
 	void play_music(const music *music);
 	void play_submusic(const music *submusic);

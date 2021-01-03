@@ -32,6 +32,7 @@ namespace wyrmgus {
 enum class music_type {
 	none,
 	menu,
+	credits,
 	loading,
 	map
 };
@@ -40,6 +41,8 @@ inline music_type string_to_music_type(const std::string &str)
 {
 	if (str == "menu") {
 		return music_type::menu;
+	} else if (str == "credits") {
+		return music_type::credits;
 	} else if (str == "loading") {
 		return music_type::loading;
 	} else if (str == "map") {
@@ -54,6 +57,8 @@ inline std::string music_type_to_string(const music_type type)
 	switch (type) {
 		case music_type::menu:
 			return "menu";
+		case music_type::credits:
+			return "credits";
 		case music_type::loading:
 			return "loading";
 		case music_type::map:

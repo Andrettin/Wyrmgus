@@ -41,8 +41,12 @@ music_player::music_player() : current_music_type(music_type::none)
 {
 }
 
-void music_player::play(const music_type type)
+void music_player::play_music_type(const music_type type)
 {
+	if (type == this->current_music_type) {
+		return;
+	}
+
 	this->current_music_type = type;
 
 	if (SoundEnabled() && IsMusicEnabled()) {
