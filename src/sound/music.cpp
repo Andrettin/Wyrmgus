@@ -85,6 +85,16 @@ void music::process_sml_scope(const sml_data &scope)
 	}
 }
 
+void music::initialize()
+{
+	if (!this->file.empty()) {
+		const std::string filename = LibraryFileName(this->file.string().c_str());
+		this->sample = std::make_unique<wyrmgus::sample>(filename);
+	}
+
+	data_entry::initialize();
+}
+
 void music::check() const
 {
 	if (this->file.empty() && this->get_submusic().empty()) {

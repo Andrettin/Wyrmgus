@@ -55,9 +55,10 @@ public:
 
 	virtual void process_sml_property(const sml_property &property) override;
 	virtual void process_sml_scope(const sml_data &scope) override;
+	virtual void initialize() override;
 	virtual void check() const override;
 
-	const wyrmgus::sample *get_sample() const
+	wyrmgus::sample *get_sample() const
 	{
 		return this->sample.get();
 	}
