@@ -48,11 +48,17 @@ public:
 	const music *get_next_music() const;
 	const music *get_next_submusic() const;
 
+	int get_current_volume_modifier() const
+	{
+		return this->current_volume_modifier;
+	}
+
 private:
 	music_type current_music_type;
 	const music *current_music = nullptr;
 	const music *current_submusic = nullptr;
 	std::set<const music *> played_submusic;
+	int current_volume_modifier = 100;
 };
 
 }

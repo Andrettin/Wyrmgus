@@ -546,7 +546,7 @@ void SetMusicVolume(int volume)
 	}
 #endif
 
-	Mix_VolumeMusic(volume * MIX_MAX_VOLUME / MaxVolume);
+	Mix_VolumeMusic(volume * wyrmgus::music_player::get()->get_current_volume_modifier() / 100 * MIX_MAX_VOLUME / MaxVolume);
 }
 
 /**

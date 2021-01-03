@@ -82,6 +82,7 @@ void music_player::play_music(const music *music)
 	this->played_submusic.clear();
 
 	if (music->get_sample() != nullptr) {
+		this->current_volume_modifier = music->get_volume_percent();
 		this->play_sample(music->get_sample());
 	} else {
 		const wyrmgus::music *submusic = this->get_next_submusic();
@@ -95,6 +96,7 @@ void music_player::play_music(const music *music)
 void music_player::play_submusic(const music *submusic)
 {
 	this->current_submusic = submusic;
+	this->current_volume_modifier = submusic->get_volume_percent();
 	this->play_sample(submusic->get_sample());
 }
 
