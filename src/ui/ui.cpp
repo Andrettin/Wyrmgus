@@ -44,6 +44,7 @@
 #include "map/map_layer.h"
 #include "map/minimap.h"
 #include "menus.h"
+#include "sound/sound.h"
 #include "title.h"
 #include "translate.h"
 #include "ui/contenttype.h"
@@ -79,6 +80,7 @@ void ShowLoadProgress(const char *fmt, ...)
 	}
 	lastProgressUpdate = SDL_GetTicks();
 
+	CheckMusicFinished(); //update music
 	UpdateLoadProgress();
 	
 	va_list va;
