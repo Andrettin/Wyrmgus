@@ -38,6 +38,12 @@ inline const T &get_random(const std::vector<T> &vector)
 }
 
 template <typename T>
+inline const T &get_random_async(const std::vector<T> &vector)
+{
+	return vector[random::get()->generate_async(vector.size())];
+}
+
+template <typename T>
 inline T take_random(std::vector<T> &vector)
 {
 	const size_t index = random::get()->generate(vector.size());

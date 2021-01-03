@@ -39,4 +39,11 @@ int random::generate_in_range(const int min_value, const int max_value)
 	return result;
 }
 
+int random::generate_in_range_async(const int min_value, const int max_value)
+{
+	boost::random::uniform_int_distribution<int> distribution(min_value, max_value);
+	int result = distribution(this->async_engine);
+	return result;
+}
+
 }

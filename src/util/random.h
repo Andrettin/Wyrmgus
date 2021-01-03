@@ -39,6 +39,7 @@ public:
 	random()
 	{
 		this->reset_seed(false);
+		this->async_engine.seed(this->random_device());
 	}
 
 	unsigned get_seed() const
@@ -46,7 +47,7 @@ public:
 		return this->seed;
 	}
 
-	void set_seed(unsigned seed)
+	void set_seed(const unsigned seed)
 	{
 		this->seed = seed;
 		this->engine.seed(seed);
@@ -74,10 +75,23 @@ public:
 
 	int generate_in_range(const int min_value, const int max_value);
 
+	int generate_async()
+	{
+		return this->async_engine();
+	}
+
+	int generate_async(const int modulo)
+	{
+		return this->generate_in_range_async(0, modulo - 1);
+	}
+
+	int generate_in_range_async(const int min_value, const int max_value);
+
 private:
 	std::random_device random_device;
 	std::mt19937 engine;
 	unsigned seed = random::default_seed;
+	std::mt19937 async_engine;
 };
 
 }
