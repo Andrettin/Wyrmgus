@@ -109,6 +109,21 @@ void music::check() const
 	}
 }
 
+void music::load() const
+{
+	if (this->sample != nullptr && !this->sample->is_loaded()) {
+		this->sample->load();
+	}
+
+	for (const music *intro_music : this->intro_music) {
+		intro_music->load();
+	}
+
+	for (const music *submusic : this->submusic) {
+		submusic->load();
+	}
+}
+
 void music::clear_sample()
 {
 	this->sample.reset();

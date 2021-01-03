@@ -47,8 +47,9 @@ void music_player::play_music_type(const music_type type)
 		return;
 	}
 
-	StopMusic();
 	this->current_music_type = type;
+	StopMusic();
+	this->current_music = nullptr;
 
 	if (SoundEnabled() && IsMusicEnabled()) {
 		this->play();
@@ -81,6 +82,9 @@ void music_player::play_music(const music *music)
 
 	this->current_submusic = nullptr;
 	this->played_submusic.clear();
+
+	//preload the music with all its submusic, so that transition between them is seamless
+	this->current_music->load();
 
 	if (music->get_sample() != nullptr) {
 		this->current_volume_modifier = music->get_volume_percent();
