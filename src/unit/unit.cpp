@@ -1556,14 +1556,8 @@ void CUnit::EquipItem(CUnit &item, bool affect_character)
 	
 	//change variation, if the current one has become forbidden
 	const wyrmgus::unit_type_variation *variation = this->GetVariation();
-	if (
-		variation
-		&& (
-			variation->item_classes_not_equipped.contains(item.Type->get_item_class())
-			|| std::find(variation->ItemsNotEquipped.begin(), variation->ItemsNotEquipped.end(), item.Type) != variation->ItemsNotEquipped.end()
-		)
-	) {
-		ChooseVariation(); //choose a new variation now
+	if (variation != nullptr && !this->can_have_variation(variation)) {
+		this->ChooseVariation(); //choose a new variation now
 	}
 	for (int i = 0; i < MaxImageLayers; ++i) {
 		const wyrmgus::unit_type_variation *layer_variation = this->GetLayerVariation(i);
@@ -1739,14 +1733,8 @@ void CUnit::DeequipItem(CUnit &item, bool affect_character)
 	
 	//change variation, if the current one has become forbidden
 	const wyrmgus::unit_type_variation *variation = this->GetVariation();
-	if (
-		variation
-		&& (
-			variation->item_classes_equipped.contains(item.Type->get_item_class())
-			|| std::find(variation->ItemsEquipped.begin(), variation->ItemsEquipped.end(), item.Type) != variation->ItemsEquipped.end()
-		)
-	) {
-		ChooseVariation(); //choose a new variation now
+	if (variation != nullptr && !this->can_have_variation(variation)) {
+		this->ChooseVariation(); //choose a new variation now
 	}
 	for (int i = 0; i < MaxImageLayers; ++i) {
 		const wyrmgus::unit_type_variation *layer_variation = this->GetLayerVariation(i);
