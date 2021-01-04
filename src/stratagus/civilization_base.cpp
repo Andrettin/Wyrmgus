@@ -140,6 +140,24 @@ void civilization_base::reset_history()
 	this->history = std::make_unique<civilization_history>();
 }
 
+bool civilization_base::is_part_of_group(const civilization_group *group) const
+{
+	if (this->get_group() == nullptr) {
+		return false;
+	}
+
+	if (this->get_group() == group) {
+		return true;
+	}
+
+	//not the same group, and has a rank lesser than or equal to that of our group, so it can't be an upper group of ours
+	if (group->get_rank() <= this->get_group()->get_rank()) {
+		return false;
+	}
+
+	return this->get_group()->is_part_of_group(group);
+}
+
 const name_generator *civilization_base::get_personal_name_generator(const gender gender) const
 {
 	const auto find_iterator = this->personal_name_generators.find(gender);

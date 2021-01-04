@@ -797,6 +797,7 @@ set(stratagus_script_condition_HDRS
 	src/script/condition/character_condition.h
 	src/script/condition/character_exists_condition.h
 	src/script/condition/civilization_condition.h
+	src/script/condition/civilization_group_condition.h
 	src/script/condition/coastal_condition.h
 	src/script/condition/condition.h
 	src/script/condition/dynasty_condition.h

@@ -47,6 +47,7 @@
 #include "script/condition/character_condition.h"
 #include "script/condition/character_exists_condition.h"
 #include "script/condition/civilization_condition.h"
+#include "script/condition/civilization_group_condition.h"
 #include "script/condition/coastal_condition.h"
 #include "script/condition/dynasty_condition.h"
 #include "script/condition/faction_condition.h"
@@ -90,6 +91,8 @@ std::unique_ptr<const condition> condition::from_sml_property(const sml_property
 		return std::make_unique<character_exists_condition>(value);
 	} else if (key == "civilization") {
 		return std::make_unique<civilization_condition>(value);
+	} else if (key == "civilization_group") {
+		return std::make_unique<civilization_group_condition>(value);
 	} else if (key == "coastal") {
 		return std::make_unique<coastal_condition>(value);
 	} else if (key == "dynasty") {

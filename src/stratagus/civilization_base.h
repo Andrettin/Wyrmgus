@@ -72,6 +72,8 @@ public:
 		return this->group;
 	}
 
+	bool is_part_of_group(const civilization_group *group) const;
+
 	const name_generator *get_personal_name_generator(const gender gender) const;
 	void add_personal_name(const gender gender, const std::string &name);
 
