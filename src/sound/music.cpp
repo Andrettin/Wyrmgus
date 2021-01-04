@@ -63,7 +63,7 @@ void music::process_sml_property(const sml_property &property)
 	const std::string &value = property.get_value();
 
 	if (key == "file") {
-		this->file = value;
+		this->file = database::get_music_path(this->get_module()) / value;
 	} else {
 		data_entry::process_sml_property(property);
 	}
