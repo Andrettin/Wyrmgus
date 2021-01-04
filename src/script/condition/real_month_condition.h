@@ -47,8 +47,9 @@ public:
 		Q_UNUSED(ignore_units)
 
 		const QDateTime current_date = QDateTime::currentDateTimeUtc();
+		const int current_month = current_date.date().month();
 
-		return static_cast<int>(this->month) == current_date.date().month();
+		return static_cast<int>(this->month) == current_month;
 	}
 
 	virtual std::string get_string(const size_t indent) const override

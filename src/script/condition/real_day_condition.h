@@ -45,8 +45,9 @@ public:
 		Q_UNUSED(ignore_units)
 
 		const QDateTime current_date = QDateTime::currentDateTimeUtc();
+		const int current_day = current_date.date().day();
 
-		return this->day >= current_date.date().day();
+		return current_day >= this->day;
 	}
 
 	virtual std::string get_string(const size_t indent) const override
