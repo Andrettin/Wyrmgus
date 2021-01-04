@@ -172,9 +172,6 @@ public:
 	std::string Area;				/// The area where the quest is set
 	std::string Briefing;			/// Briefing text of the quest
 	std::string BriefingBackground;	/// Image file for the briefing's background
-	std::string BriefingMusic;		/// Music file image to play during the briefing
-	std::string LoadingMusic;		/// Music to play during the loading
-	std::string MapMusic;			/// Music to play during quest
 	std::string StartSpeech;		/// Speech given by the quest giver when offering the quest
 	std::string InProgressSpeech;	/// Speech given by the quest giver while the quest is in progress
 	std::string CompletionSpeech;	/// Speech given by the quest giver when the quest is completed

@@ -86,12 +86,6 @@ static int CclDefineQuest(lua_State *l)
 			quest->Briefing = LuaToString(l, -1);
 		} else if (!strcmp(value, "BriefingBackground")) {
 			quest->BriefingBackground = LuaToString(l, -1);
-		} else if (!strcmp(value, "BriefingMusic")) {
-			quest->BriefingMusic = LuaToString(l, -1);
-		} else if (!strcmp(value, "LoadingMusic")) {
-			quest->LoadingMusic = LuaToString(l, -1);
-		} else if (!strcmp(value, "MapMusic")) {
-			quest->MapMusic = LuaToString(l, -1);
 		} else if (!strcmp(value, "StartSpeech")) {
 			quest->StartSpeech = LuaToString(l, -1);
 		} else if (!strcmp(value, "InProgressSpeech")) {
@@ -258,15 +252,6 @@ static int CclGetQuestData(lua_State *l)
 		return 1;
 	} else if (!strcmp(data, "BriefingBackground")) {
 		lua_pushstring(l, quest->BriefingBackground.c_str());
-		return 1;
-	} else if (!strcmp(data, "BriefingMusic")) {
-		lua_pushstring(l, quest->BriefingMusic.c_str());
-		return 1;
-	} else if (!strcmp(data, "LoadingMusic")) {
-		lua_pushstring(l, quest->LoadingMusic.c_str());
-		return 1;
-	} else if (!strcmp(data, "MapMusic")) {
-		lua_pushstring(l, quest->MapMusic.c_str());
 		return 1;
 	} else if (!strcmp(data, "StartSpeech")) {
 		lua_pushstring(l, quest->StartSpeech.c_str());
