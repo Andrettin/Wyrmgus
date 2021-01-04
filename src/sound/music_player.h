@@ -48,6 +48,10 @@ public:
 	const music *get_next_music() const;
 	const music *get_next_submusic() const;
 
+	bool are_music_conditions_fulfilled(const music *music) const;
+	bool are_current_music_conditions_fulfilled() const;
+	void check_current_music();
+
 	int get_current_volume_modifier() const
 	{
 		return this->current_volume_modifier;

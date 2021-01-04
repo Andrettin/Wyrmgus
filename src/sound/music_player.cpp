@@ -128,10 +128,8 @@ const music *music_player::get_next_music() const
 	std::vector<const music *> music_list;
 
 	for (const music *music : potential_music_list) {
-		if (music->get_conditions() != nullptr) {
-			if (CPlayer::GetThisPlayer() == nullptr || !music->get_conditions()->check(CPlayer::GetThisPlayer())) {
-				continue;
-			}
+		if (!this->are_music_conditions_fulfilled(music)) {
+			continue;
 		}
 
 		if (music == this->current_music && !music_list.empty()) {
@@ -161,10 +159,8 @@ const music *music_player::get_next_submusic() const
 			continue;
 		}
 
-		if (intro_music->get_conditions() != nullptr) {
-			if (CPlayer::GetThisPlayer() == nullptr || !intro_music->get_conditions()->check(CPlayer::GetThisPlayer())) {
-				continue;
-			}
+		if (!this->are_music_conditions_fulfilled(intro_music)) {
+			continue;
 		}
 
 		submusic_list.push_back(intro_music);
@@ -177,10 +173,8 @@ const music *music_player::get_next_submusic() const
 				continue;
 			}
 
-			if (submusic->get_conditions() != nullptr) {
-				if (CPlayer::GetThisPlayer() == nullptr || !submusic->get_conditions()->check(CPlayer::GetThisPlayer())) {
-					continue;
-				}
+			if (!this->are_music_conditions_fulfilled(submusic)) {
+				continue;
 			}
 
 			submusic_list.push_back(submusic);
@@ -191,6 +185,44 @@ const music *music_player::get_next_submusic() const
 		return vector::get_random_async(submusic_list);
 	} else {
 		return nullptr;
+	}
+}
+
+bool music_player::are_music_conditions_fulfilled(const music *music) const
+{
+	if (music->get_conditions() == nullptr) {
+		return true;
+	}
+
+	if (CPlayer::GetThisPlayer() == nullptr) {
+		return false;
+	}
+
+	if (!music->get_conditions()->check(CPlayer::GetThisPlayer())) {
+		return false;
+	}
+
+	return true;
+}
+
+bool music_player::are_current_music_conditions_fulfilled() const
+{
+	if (this->current_music != nullptr && !this->are_music_conditions_fulfilled(this->current_music)) {
+		return false;
+	}
+
+	if (this->current_submusic != nullptr && !this->are_music_conditions_fulfilled(this->current_submusic)) {
+		return false;
+	}
+
+	return true;
+}
+
+void music_player::check_current_music()
+{
+	//check whether the current music or submusic still fulfill their conditions, and if not stop the currently-playing sample, so that a new one will be picked
+	if (!this->are_current_music_conditions_fulfilled()) {
+		StopMusic();
 	}
 }
 
