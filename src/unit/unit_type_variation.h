@@ -170,8 +170,8 @@ public:
 	std::vector<const season *> ForbiddenSeasons;
 
 	std::string LayerFiles[MaxImageLayers];	/// Variation's layer graphics.
-	std::string FileWhenLoaded[MaxCosts];     /// Change the graphic when the unit is loaded.
-	std::string FileWhenEmpty[MaxCosts];      /// Change the graphic when the unit is empty.
+	std::filesystem::path FileWhenLoaded[MaxCosts];     /// Change the graphic when the unit is loaded.
+	std::filesystem::path FileWhenEmpty[MaxCosts];      /// Change the graphic when the unit is empty.
 	std::shared_ptr<CPlayerColorGraphic> LayerSprites[MaxImageLayers];	/// The graphics corresponding to LayerFiles.
 	std::shared_ptr<CPlayerColorGraphic> SpriteWhenLoaded[MaxCosts]; /// The graphic corresponding to FileWhenLoaded.
 	std::shared_ptr<CPlayerColorGraphic> SpriteWhenEmpty[MaxCosts];  /// The graphic corresponding to FileWhenEmpty
