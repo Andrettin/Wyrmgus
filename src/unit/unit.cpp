@@ -1203,7 +1203,7 @@ bool CUnit::can_have_variation(const wyrmgus::unit_type_variation *variation) co
 		}
 	}
 	for (size_t j = 0; j < variation->ItemsNotEquipped.size(); ++j) {
-		if (this->IsItemTypeEquipped(variation->ItemsNotEquipped[j])) {
+		if (this->is_item_type_equipped(variation->ItemsNotEquipped[j])) {
 			upgrades_check = false;
 			break;
 		}
@@ -1227,12 +1227,12 @@ bool CUnit::can_have_variation(const wyrmgus::unit_type_variation *variation) co
 	for (const wyrmgus::unit_type *item_type_equipped : variation->ItemsEquipped) {
 		if (wyrmgus::get_item_class_slot(item_type_equipped->get_item_class()) == wyrmgus::item_slot::weapon) {
 			requires_weapon = true;
-			if (this->IsItemTypeEquipped(item_type_equipped)) {
+			if (this->is_item_type_equipped(item_type_equipped)) {
 				found_weapon = true;
 			}
 		} else if (wyrmgus::get_item_class_slot(item_type_equipped->get_item_class()) == wyrmgus::item_slot::shield) {
 			requires_shield = true;
-			if (this->IsItemTypeEquipped(item_type_equipped)) {
+			if (this->is_item_type_equipped(item_type_equipped)) {
 				found_shield = true;
 			}
 		}
@@ -6253,7 +6253,7 @@ bool CUnit::is_item_class_equipped(const wyrmgus::item_class item_class) const
 	return false;
 }
 
-bool CUnit::IsItemTypeEquipped(const wyrmgus::unit_type *item_type) const
+bool CUnit::is_item_type_equipped(const wyrmgus::unit_type *item_type) const
 {
 	const wyrmgus::item_slot item_slot = wyrmgus::get_item_class_slot(item_type->get_item_class());
 	

@@ -527,7 +527,7 @@ public:
 	bool CanAutoCastSpell(const wyrmgus::spell *spell) const;
 	bool IsItemEquipped(const CUnit *item) const;
 	bool is_item_class_equipped(const wyrmgus::item_class item_class) const;
-	bool IsItemTypeEquipped(const wyrmgus::unit_type *item_type) const;
+	bool is_item_type_equipped(const wyrmgus::unit_type *item_type) const;
 	bool IsUniqueItemEquipped(const wyrmgus::unique_item *unique) const;
 	bool can_equip_item(const CUnit *item) const;
 	bool can_equip_item_class(const wyrmgus::item_class item_class) const;
