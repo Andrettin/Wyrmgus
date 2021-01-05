@@ -115,7 +115,7 @@ int main(int argc, char **argv)
 
 		QCommandLineParser cmd_parser;
 
-		QCommandLineOption data_path_option("d", "Specify a custom Data path.");
+		QCommandLineOption data_path_option("d", "Specify a custom data path.", "data path");
 		cmd_parser.addOption(data_path_option);
 
 		cmd_parser.process(app);
