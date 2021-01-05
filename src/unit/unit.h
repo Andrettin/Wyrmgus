@@ -145,7 +145,7 @@ public:
 	void ClearAction();
 
 	/// Initialize unit structure with default values
-	void Init(const wyrmgus::unit_type &type);
+	void Init(const wyrmgus::unit_type &type, const bool loading_saved_unit);
 	void initialize_base_reference();
 	void clear_base_reference();
 

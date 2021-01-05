@@ -312,7 +312,7 @@ static int CclUnit(lua_State *l)
 			// until we parsed at least Unit::Orders[].
 			Assert(type);
 			unit = &wyrmgus::unit_manager::get()->GetSlotUnit(slot);
-			unit->Init(*type);
+			unit->Init(*type, true);
 			unit->Seen.Type = seentype;
 			unit->Active = 0;
 			unit->Removed = 0;

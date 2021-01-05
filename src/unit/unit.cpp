@@ -2781,9 +2781,9 @@ int CUnit::GetDrawLevel() const
 **
 **  @param type    Unit-type
 */
-void CUnit::Init(const wyrmgus::unit_type &type)
+void CUnit::Init(const wyrmgus::unit_type &type, const bool loading_saved_unit)
 {
-	if (!SaveGameLoading) {
+	if (!loading_saved_unit) {
 		//  Set refs to 1. This is the "I am alive ref", lost in ReleaseUnit.
 		this->initialize_base_reference();
 	}
@@ -3067,7 +3067,7 @@ CUnit *MakeUnit(const wyrmgus::unit_type &type, CPlayer *player)
 	if (unit == nullptr) {
 		return nullptr;
 	}
-	unit->Init(type);
+	unit->Init(type, false);
 	// Only Assign if a Player was specified
 	if (player) {
 		unit->AssignToPlayer(*player);
