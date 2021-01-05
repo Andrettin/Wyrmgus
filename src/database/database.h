@@ -86,10 +86,7 @@ public:
 	static void modify_list_property_for_object(QObject *object, const std::string &property_name, const sml_operator sml_operator, const std::string &value);
 	static void modify_list_property_for_object(QObject *object, const std::string &property_name, const sml_operator sml_operator, const sml_data &scope);
 
-	static std::filesystem::path get_root_path()
-	{
-		return std::filesystem::current_path();
-	}
+	static std::filesystem::path get_root_path();
 
 	static std::filesystem::path get_modules_path()
 	{

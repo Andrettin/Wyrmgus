@@ -25,6 +25,8 @@
 //      02111-1307, USA.
 //
 
+#include "stratagus.h"
+
 #include "database/defines.h"
 
 #include "database/database.h"

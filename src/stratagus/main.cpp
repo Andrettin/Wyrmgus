@@ -29,6 +29,7 @@
 
 #include "util/exception_util.h"
 
+#include <QCommandLineParser>
 #include <QQmlApplicationEngine>
 
 static void write_qt_message(QtMsgType type, const QMessageLogContext &context, const QString &msg)
@@ -96,6 +97,37 @@ int main(int argc, char **argv)
 		qInstallMessageHandler(write_qt_message);
 		QApplication app(argc, argv);
 
+		//  Setup some defaults.
+#ifndef MAC_BUNDLE
+		StratagusLibPath = ".";
+#else
+		freopen("/tmp/stdout.txt", "w", stdout);
+		freopen("/tmp/stderr.txt", "w", stderr);
+		// Look for the specified data set inside the application bundle
+		// This should be a subdir of the Resources directory
+		CFURLRef pluginRef = CFBundleCopyResourceURL(CFBundleGetMainBundle(),
+			CFSTR(MAC_BUNDLE_DATADIR), nullptr, nullptr);
+		CFStringRef macPath = CFURLCopyFileSystemPath(pluginRef, kCFURLPOSIXPathStyle);
+		const char *pathPtr = CFStringGetCStringPtr(macPath, CFStringGetSystemEncoding());
+		Assert(pathPtr);
+		StratagusLibPath = pathPtr;
+#endif
+
+		QCommandLineParser cmd_parser;
+
+		QCommandLineOption data_path_option("d", "Specify a custom Data path.");
+		cmd_parser.addOption(data_path_option);
+
+		cmd_parser.process(app);
+
+		if (cmd_parser.isSet(data_path_option)) {
+			StratagusLibPath = cmd_parser.value(data_path_option).toStdString();
+			size_t index;
+			while ((index = StratagusLibPath.find('\\')) != std::string::npos) {
+				StratagusLibPath[index] = '/';
+			}
+		}
+
 		std::thread stratagus_thread([argc, argv]() {
 			try {
 				stratagusMain(argc, argv);
@@ -106,9 +138,9 @@ int main(int argc, char **argv)
 		});
 
 		QQmlApplicationEngine engine;
-		engine.addImportPath("./libraries/qml");
+		engine.addImportPath(QString::fromStdString(StratagusLibPath + "/libraries/qml"));
 
-		const QUrl url(QStringLiteral("./interface/Main.qml"));
+		const QUrl url = QString::fromStdString(StratagusLibPath + "/interface/Main.qml");
 		QObject::connect(&engine, &QQmlApplicationEngine::objectCreated, &app, [url](QObject *obj, const QUrl &objUrl) {
 			if (!obj && url == objUrl) {
 				QCoreApplication::exit(-1);

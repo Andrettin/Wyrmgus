@@ -503,7 +503,7 @@ static void RedirectOutput()
 }
 #endif
 
-void ParseCommandLine(int argc, char **argv, Parameters &parameters)
+static void ParseCommandLine(int argc, char **argv, Parameters &parameters)
 {
 	for (;;) {
 		switch (getopt(argc, argv, "ac:d:D:eE:FG:hiI:lN:oOP:ps:S:u:v:Wx:Z?-")) {
@@ -518,11 +518,6 @@ void ParseCommandLine(int argc, char **argv, Parameters &parameters)
 				}
 				continue;
 			case 'd': {
-				StratagusLibPath = optarg;
-				size_t index;
-				while ((index = StratagusLibPath.find('\\')) != std::string::npos) {
-					StratagusLibPath[index] = '/';
-				}
 				continue;
 			}
 			case 'D':
@@ -676,21 +671,6 @@ void stratagusMain(int argc, char **argv)
 #endif
 #if defined(USE_WIN32) && ! defined(REDIRECT_OUTPUT)
 	SetupConsole();
-#endif
-	//  Setup some defaults.
-#ifndef MAC_BUNDLE
-	StratagusLibPath = ".";
-#else
-	freopen("/tmp/stdout.txt", "w", stdout);
-	freopen("/tmp/stderr.txt", "w", stderr);
-	// Look for the specified data set inside the application bundle
-	// This should be a subdir of the Resources directory
-	CFURLRef pluginRef = CFBundleCopyResourceURL(CFBundleGetMainBundle(),
-												 CFSTR(MAC_BUNDLE_DATADIR), nullptr, nullptr);
-	CFStringRef macPath = CFURLCopyFileSystemPath(pluginRef,  kCFURLPOSIXPathStyle);
-	const char *pathPtr = CFStringGetCStringPtr(macPath, CFStringGetSystemEncoding());
-	Assert(pathPtr);
-	StratagusLibPath = pathPtr;
 #endif
 
 #ifdef USE_PHYSFS

@@ -25,6 +25,8 @@
 //      02111-1307, USA.
 //
 
+#include "stratagus.h"
+
 #include "database/database.h"
 
 #include "age.h"
@@ -523,6 +525,15 @@ void database::modify_list_property_for_object(QObject *object, const std::strin
 	if (!success) {
 		throw std::runtime_error("Failed to add or remove value for list property \"" + property_name + "\".");
 	}
+}
+
+std::filesystem::path database::get_root_path()
+{
+	if (StratagusLibPath != ".") {
+		return StratagusLibPath;
+	}
+
+	return std::filesystem::current_path();
 }
 
 std::filesystem::path database::get_base_path(const data_module *data_module)
