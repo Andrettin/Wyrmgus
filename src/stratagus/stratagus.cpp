@@ -238,8 +238,6 @@ unsigned long __stack = 1000000;
 __attribute__ ((section(".text"))) UBYTE VString[] = "$VER: Wyrmsun " VERSION "\r\n";
 #endif
 
-std::string StratagusLibPath;		/// Path for data directory
-
 /// Name, Version, Copyright
 const char NameLine[] = NAME " v" VERSION ", " COPYRIGHT;
 
@@ -460,7 +458,7 @@ static void Usage()
 		"\t  \t\tPass -1 to force old-school nearest neighbour scaling without shaders\n"\
 		"\t-Z\t\tUse OpenGL to scale the screen to the viewport (retro-style). Implies -O.\n"
 #endif
-		"map is relative to StratagusLibPath=datapath, use ./map for relative to cwd\n",
+		"map is relative to the root data path, use ./map for relative to cwd\n",
 		Parameters::Instance.applicationName.c_str());
 }
 

@@ -66,7 +66,7 @@ void unit_type_variation::process_sml_property(const sml_property &property)
 	const std::string &value = property.get_value();
 
 	if (key == "image_file") {
-		this->image_file = database::get_graphics_path(this->unit_type->get_module()) / value;
+		this->image_file = database::get()->get_graphics_path(this->unit_type->get_module()) / value;
 	} else if (key == "icon") {
 		this->Icon.Name = value;
 	} else {
@@ -81,12 +81,12 @@ void unit_type_variation::process_sml_scope(const sml_data &scope)
 	if (tag == "resource_image_files") {
 		scope.for_each_property([&](const sml_property &property) {
 			const resource *resource = resource::get(property.get_key());
-			this->FileWhenEmpty[resource->get_index()] = database::get_graphics_path(this->get_unit_type()->get_module()) / property.get_value();
+			this->FileWhenEmpty[resource->get_index()] = database::get()->get_graphics_path(this->get_unit_type()->get_module()) / property.get_value();
 		});
 	} else if (tag == "resource_loaded_image_files") {
 		scope.for_each_property([&](const sml_property &property) {
 			const resource *resource = resource::get(property.get_key());
-			this->FileWhenLoaded[resource->get_index()] = database::get_graphics_path(this->get_unit_type()->get_module()) / property.get_value();
+			this->FileWhenLoaded[resource->get_index()] = database::get()->get_graphics_path(this->get_unit_type()->get_module()) / property.get_value();
 		});
 	} else if (tag == "conditions") {
 		auto conditions = std::make_unique<and_condition>();

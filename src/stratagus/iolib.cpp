@@ -32,6 +32,7 @@
 
 #include "iolib.h"
 
+#include "database/database.h"
 #include "game.h"
 #include "iocompat.h"
 #include "map/map.h"
@@ -595,6 +596,8 @@ static void LibraryFileName(const char *file, char(&buffer)[PATH_MAX])
 		return;
 	}
 
+	const std::string root_path_str = wyrmgus::database::get()->get_root_path().string();
+
 	// Try in map directory
 	if (*CurrentMapPath) {
 		if (*CurrentMapPath == '.' || *CurrentMapPath == '/') {
@@ -605,7 +608,7 @@ static void LibraryFileName(const char *file, char(&buffer)[PATH_MAX])
 			}
 			strcat_s(buffer, PATH_MAX, file);
 		} else {
-			strcpy_s(buffer, PATH_MAX, StratagusLibPath.c_str());
+			strcpy_s(buffer, PATH_MAX, root_path_str.c_str());
 			if (*buffer) {
 				strcat_s(buffer, PATH_MAX, "/");
 			}
@@ -636,7 +639,7 @@ static void LibraryFileName(const char *file, char(&buffer)[PATH_MAX])
 		
 	// In global shared directory
 	#ifndef __MORPHOS__
-	snprintf(buffer, PATH_MAX, "%s/%s", StratagusLibPath.c_str(), file);
+	snprintf(buffer, PATH_MAX, "%s/%s", root_path_str.c_str(), file);
 	if (FindFileWithExtension(buffer)) {
 		return;
 	}
@@ -649,7 +652,7 @@ static void LibraryFileName(const char *file, char(&buffer)[PATH_MAX])
 		return;
 	}
 	#ifndef __MORPHOS__	
-	snprintf(buffer, PATH_MAX, "%s/graphics/%s", StratagusLibPath.c_str(), file);
+	snprintf(buffer, PATH_MAX, "%s/graphics/%s", root_path_str.c_str(), file);
 	if (FindFileWithExtension(buffer)) {
 		return;
 	}
@@ -663,7 +666,7 @@ static void LibraryFileName(const char *file, char(&buffer)[PATH_MAX])
 		return;
 	}
 	#ifndef __MORPHOS__	
-	snprintf(buffer, PATH_MAX, "%s/sounds/%s", StratagusLibPath.c_str(), file);
+	snprintf(buffer, PATH_MAX, "%s/sounds/%s", root_path_str.c_str(), file);
 	if (FindFileWithExtension(buffer)) {
 		return;
 	}
@@ -675,7 +678,7 @@ static void LibraryFileName(const char *file, char(&buffer)[PATH_MAX])
 		return;
 	}
 	#ifndef __MORPHOS__	
-	snprintf(buffer, PATH_MAX, "%s/music/%s", StratagusLibPath.c_str(), file);
+	snprintf(buffer, PATH_MAX, "%s/music/%s", root_path_str.c_str(), file);
 	if (FindFileWithExtension(buffer)) {
 		return;
 	}
@@ -687,7 +690,7 @@ static void LibraryFileName(const char *file, char(&buffer)[PATH_MAX])
 		return;
 	}
 	#ifndef __MORPHOS__	
-	sprintf(buffer, "%s/scripts/%s", StratagusLibPath.c_str(), file);
+	sprintf(buffer, "%s/scripts/%s", root_path_str.c_str(), file);
 	if (FindFileWithExtension(buffer)) {
 		return;
 	}

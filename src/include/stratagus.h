@@ -189,7 +189,6 @@ constexpr int DefaultTileMovementCost = 8;
 --  stratagus.cpp
 ----------------------------------------------------------------------------*/
 
-extern std::string StratagusLibPath;        /// Location of stratagus data
 extern std::string MenuRace;
 //Wyrmgus start
 extern std::string PlayerFaction;

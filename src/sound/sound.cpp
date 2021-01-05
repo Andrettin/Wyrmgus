@@ -528,7 +528,7 @@ QVariantList sound::get_files_qvariant_list() const
 
 void sound::add_file(const std::filesystem::path &filepath)
 {
-	this->files.push_back(database::get_sounds_path(this->get_module()) / filepath);
+	this->files.push_back(database::get()->get_sounds_path(this->get_module()) / filepath);
 }
 
 void sound::remove_file(const std::filesystem::path &filepath)

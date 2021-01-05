@@ -2086,7 +2086,7 @@ void map_template::set_terrain_file(const std::filesystem::path &filepath)
 		return;
 	}
 
-	this->terrain_file = database::get_maps_path(this->get_module()) / filepath;
+	this->terrain_file = database::get()->get_maps_path(this->get_module()) / filepath;
 }
 
 void map_template::set_overlay_terrain_file(const std::filesystem::path &filepath)
@@ -2095,7 +2095,7 @@ void map_template::set_overlay_terrain_file(const std::filesystem::path &filepat
 		return;
 	}
 
-	this->overlay_terrain_file = database::get_maps_path(this->get_module()) / filepath;
+	this->overlay_terrain_file = database::get()->get_maps_path(this->get_module()) / filepath;
 }
 
 void map_template::load_terrain_character_map(const bool overlay)
@@ -2162,7 +2162,7 @@ void map_template::set_terrain_image_file(const std::filesystem::path &filepath)
 		return;
 	}
 
-	this->terrain_image_file = database::get_maps_path(this->get_module()) / filepath;
+	this->terrain_image_file = database::get()->get_maps_path(this->get_module()) / filepath;
 }
 
 void map_template::set_overlay_terrain_image_file(const std::filesystem::path &filepath)
@@ -2171,7 +2171,7 @@ void map_template::set_overlay_terrain_image_file(const std::filesystem::path &f
 		return;
 	}
 
-	this->overlay_terrain_image_file = database::get_maps_path(this->get_module()) / filepath;
+	this->overlay_terrain_image_file = database::get()->get_maps_path(this->get_module()) / filepath;
 }
 
 void map_template::set_trade_route_image_file(const std::filesystem::path &filepath)
@@ -2180,7 +2180,7 @@ void map_template::set_trade_route_image_file(const std::filesystem::path &filep
 		return;
 	}
 
-	this->trade_route_image_file = database::get_maps_path(this->get_module()) / filepath;
+	this->trade_route_image_file = database::get()->get_maps_path(this->get_module()) / filepath;
 }
 
 QImage map_template::load_terrain_image_file(const std::filesystem::path &filepath)
@@ -2264,7 +2264,7 @@ void map_template::set_territory_image_file(const std::filesystem::path &filepat
 		return;
 	}
 
-	this->territory_image_file = database::get_maps_path(this->get_module()) / filepath;
+	this->territory_image_file = database::get()->get_maps_path(this->get_module()) / filepath;
 }
 
 bool map_template::is_dependent_on(const map_template *other_template) const

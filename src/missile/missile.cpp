@@ -157,7 +157,7 @@ void missile_type::set_image_file(const std::filesystem::path &filepath)
 		return;
 	}
 
-	this->image_file = database::get_graphics_path(this->get_module()) / filepath;
+	this->image_file = database::get()->get_graphics_path(this->get_module()) / filepath;
 }
 
 /**

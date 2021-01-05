@@ -86,11 +86,19 @@ public:
 	static void modify_list_property_for_object(QObject *object, const std::string &property_name, const sml_operator sml_operator, const std::string &value);
 	static void modify_list_property_for_object(QObject *object, const std::string &property_name, const sml_operator sml_operator, const sml_data &scope);
 
-	static std::filesystem::path get_root_path();
-
-	static std::filesystem::path get_modules_path()
+	const std::filesystem::path &get_root_path() const
 	{
-		return database::get_root_path() / "modules";
+		return this->root_path;
+	}
+
+	void set_root_path(const std::filesystem::path &path)
+	{
+		this->root_path = path;
+	}
+
+	std::filesystem::path get_modules_path() const
+	{
+		return this->get_root_path() / "modules";
 	}
 
 	static std::filesystem::path get_documents_modules_path()
@@ -109,26 +117,26 @@ public:
 		return documents_path;
 	}
 
-	static std::filesystem::path get_base_path(const data_module *data_module);
+	const std::filesystem::path &get_base_path(const data_module *data_module) const;
 
-	static std::filesystem::path get_graphics_path(const data_module *data_module)
+	std::filesystem::path get_graphics_path(const data_module *data_module) const
 	{
-		return database::get_base_path(data_module) / database::graphics_folder;
+		return this->get_base_path(data_module) / database::graphics_folder;
 	}
 
-	static std::filesystem::path get_maps_path(const data_module *data_module)
+	std::filesystem::path get_maps_path(const data_module *data_module) const
 	{
-		return database::get_base_path(data_module) / database::maps_folder;
+		return this->get_base_path(data_module) / database::maps_folder;
 	}
 
-	static std::filesystem::path get_music_path(const data_module *data_module)
+	std::filesystem::path get_music_path(const data_module *data_module)
 	{
-		return database::get_base_path(data_module) / database::music_folder;
+		return this->get_base_path(data_module) / database::music_folder;
 	}
 
-	static std::filesystem::path get_sounds_path(const data_module *data_module)
+	std::filesystem::path get_sounds_path(const data_module *data_module)
 	{
-		return database::get_base_path(data_module) / database::sounds_folder;
+		return this->get_base_path(data_module) / database::sounds_folder;
 	}
 
 	static void parse_folder(const std::filesystem::path &path, std::vector<sml_data> &sml_data_list);
@@ -171,7 +179,7 @@ public:
 	std::vector<std::filesystem::path> get_base_paths() const
 	{
 		std::vector<std::filesystem::path> base_paths;
-		base_paths.push_back(database::get_root_path());
+		base_paths.push_back(this->get_root_path());
 
 		std::vector<std::filesystem::path> module_paths = this->get_module_paths();
 		base_paths.insert(base_paths.end(), module_paths.begin(), module_paths.end());
@@ -182,7 +190,7 @@ public:
 	std::vector<std::pair<std::filesystem::path, const data_module *>> get_base_paths_with_module() const
 	{
 		std::vector<std::pair<std::filesystem::path, const data_module *>> base_paths;
-		base_paths.emplace_back(database::get_root_path(), nullptr);
+		base_paths.emplace_back(this->get_root_path(), nullptr);
 
 		std::vector<std::pair<std::filesystem::path, const data_module *>> module_paths = this->get_module_paths_with_module();
 		base_paths.insert(base_paths.end(), module_paths.begin(), module_paths.end());
@@ -192,7 +200,7 @@ public:
 
 	std::filesystem::path get_data_path() const
 	{
-		return database::get_root_path() / database::data_folder;
+		return this->get_root_path() / database::data_folder;
 	}
 
 	std::vector<std::filesystem::path> get_data_paths() const
@@ -241,6 +249,7 @@ public:
 	}
 
 private:
+	std::filesystem::path root_path = std::filesystem::current_path();
 	std::vector<std::unique_ptr<data_type_metadata>> metadata;
 	std::vector<qunique_ptr<data_module>> modules;
 	std::map<std::string, data_module *> modules_by_identifier;

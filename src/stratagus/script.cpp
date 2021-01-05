@@ -3001,7 +3001,7 @@ static void AliasRegister()
 */
 static int CclStratagusLibraryPath(lua_State *l)
 {
-	lua_pushstring(l, StratagusLibPath.c_str());
+	lua_pushstring(l, wyrmgus::database::get()->get_root_path().string().c_str());
 	return 1;
 }
 
@@ -3047,7 +3047,7 @@ static int CclFilteredListDirectory(lua_State *l, int type, int mask, int sortmo
 		lua_pop(l, 1);
 	} else {
 		#ifndef __MORPHOS__
-		snprintf(directory, sizeof(directory), "%s/%s", StratagusLibPath.c_str(), userdir);
+		snprintf(directory, sizeof(directory), "%s/%s", wyrmgus::database::get()->get_root_path().string().c_str(), userdir);
 		#else
 		snprintf(directory, sizeof(directory), "%s",  userdir);
 		#endif

@@ -2532,7 +2532,7 @@ int EditorSaveMap(const std::string &file, bool is_mod)
 //Wyrmgus end
 {
 	std::string fullName;
-	fullName = StratagusLibPath + "/" + file;
+	fullName = wyrmgus::database::get()->get_root_path().string() + "/" + file;
 	//Wyrmgus start
 	if (is_mod) { // if is a mod, save the file in a folder of the same name as the file's name
 		std::string file_name;

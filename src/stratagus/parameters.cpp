@@ -31,7 +31,9 @@
 
 #include "parameters.h"
 
-/* static */ Parameters Parameters::Instance;
+#include "database/database.h"
+
+Parameters Parameters::Instance;
 
 
 void Parameters::SetDefaultValues()
@@ -45,7 +47,7 @@ void Parameters::SetDefaultValues()
 void Parameters::SetDefaultUserDirectory()
 {
 #ifdef USE_GAME_DIR
-	userDirectory = StratagusLibPath;
+	userDirectory = wyrmgus::database::get()->get_root_path().string();
 #elif USE_WIN32
 	userDirectory = getenv("APPDATA");
 #elif __MORPHOS__

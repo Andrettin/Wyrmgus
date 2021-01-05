@@ -317,8 +317,8 @@ static void LoadStratagusMap(const std::string &smpname, const std::string &mapn
 	strcpy_s(p, sizeof(mapfull) - (p - mapfull), mapname.c_str());
 
 	if (file.open(mapfull, CL_OPEN_READ) == -1) {
-		// Not found, try StratagusLibPath and the smp's dir
-		strcpy_s(mapfull, sizeof(mapfull), StratagusLibPath.c_str());
+		// Not found, try the root path and the smp's dir
+		strcpy_s(mapfull, sizeof(mapfull), wyrmgus::database::get()->get_root_path().string().c_str());
 		strcat_s(mapfull, sizeof(mapfull), "/");
 		strcat_s(mapfull, sizeof(mapfull), smpname.c_str());
 		char *p2 = strrchr(mapfull, '/');
@@ -329,8 +329,8 @@ static void LoadStratagusMap(const std::string &smpname, const std::string &mapn
 		}
 		strcpy_s(p2, sizeof(mapfull) - (p2 - mapfull), mapname.c_str());
 		if (file.open(mapfull, CL_OPEN_READ) == -1) {
-			// Not found again, try StratagusLibPath
-			strcpy_s(mapfull, sizeof(mapfull), StratagusLibPath.c_str());
+			// Not found again, try the root path
+			strcpy_s(mapfull, sizeof(mapfull), wyrmgus::database::get()->get_root_path().string().c_str());
 			strcat_s(mapfull, sizeof(mapfull), "/");
 			strcat_s(mapfull, sizeof(mapfull), mapname.c_str());
 			if (file.open(mapfull, CL_OPEN_READ) == -1) {
@@ -470,7 +470,7 @@ int WriteMapSetup(const char *mapSetup, CMap &map, int writeTerrain, bool is_mod
 		
 		//Wyrmgus start
 		std::string mod_file(mapSetup);
-		mod_file = FindAndReplaceStringBeginning(mod_file, StratagusLibPath + "/", "");
+		mod_file = FindAndReplaceStringBeginning(mod_file, wyrmgus::database::get()->get_root_path().string() + "/", "");
 		
 		for (const wyrmgus::faction *faction : wyrmgus::faction::get_all()) {
 			if (faction->Mod != CMap::Map.Info.Filename) {
@@ -2192,7 +2192,7 @@ static int CclSavedGameInfo(lua_State *l)
 			if (strcpy_s(CurrentMapPath, sizeof(CurrentMapPath), LuaToString(l, -1)) != 0) {
 				LuaError(l, "SaveFile too long");
 			}
-			std::string buf = StratagusLibPath;
+			std::string buf = wyrmgus::database::get()->get_root_path().string();
 			buf += "/";
 			buf += LuaToString(l, -1);
 			if (LuaLoadFile(buf) == -1) {

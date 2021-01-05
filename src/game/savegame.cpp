@@ -33,6 +33,7 @@
 #include "age.h"
 #include "ai.h"
 #include "character.h"
+#include "database/database.h"
 #include "iocompat.h"
 #include "iolib.h"
 #include "map/map.h"
@@ -64,7 +65,7 @@ void ExpandPath(std::string &newpath, const std::string &path)
 		}
 		newpath += "/" + path.substr(1);
 	} else {
-		newpath = StratagusLibPath + "/" + path;
+		newpath = wyrmgus::database::get()->get_root_path().string() + "/" + path;
 	}
 }
 

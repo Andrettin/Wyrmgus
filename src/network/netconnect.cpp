@@ -747,7 +747,7 @@ void CClient::Parse_Map(const unsigned char *buf)
 		return;
 	}
 	NetworkMapName = std::string(msg.MapPath, sizeof(msg.MapPath));
-	const std::string mappath = StratagusLibPath + "/" + NetworkMapName;
+	const std::string mappath = wyrmgus::database::get()->get_root_path().string() + "/" + NetworkMapName;
 	LoadStratagusMapInfo(mappath);
 	if (msg.MapUID != CMap::Map.Info.MapUID) {
 		networkState.State = ccs_badmap;

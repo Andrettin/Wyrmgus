@@ -527,22 +527,13 @@ void database::modify_list_property_for_object(QObject *object, const std::strin
 	}
 }
 
-std::filesystem::path database::get_root_path()
-{
-	if (StratagusLibPath != ".") {
-		return StratagusLibPath;
-	}
-
-	return std::filesystem::current_path();
-}
-
-std::filesystem::path database::get_base_path(const data_module *data_module)
+const std::filesystem::path &database::get_base_path(const data_module *data_module) const
 {
 	if (data_module != nullptr) {
 		return data_module->get_path();
 	}
 
-	return database::get_root_path();
+	return this->get_root_path();
 }
 
 void database::parse_folder(const std::filesystem::path &path, std::vector<sml_data> &sml_data_list)
@@ -707,8 +698,8 @@ void database::register_metadata(std::unique_ptr<data_type_metadata> &&metadata)
 
 void database::process_modules()
 {
-	if (std::filesystem::exists(database::get_modules_path())) {
-		this->process_modules_at_dir(database::get_modules_path());
+	if (std::filesystem::exists(this->get_modules_path())) {
+		this->process_modules_at_dir(this->get_modules_path());
 	}
 
 	if (predefines::get()->is_documents_modules_loading_enabled() && std::filesystem::exists(database::get_documents_modules_path())) {

@@ -27,6 +27,7 @@
 
 #include "stratagus.h"
 
+#include "database/database.h"
 #include "util/exception_util.h"
 
 #include <QCommandLineParser>
@@ -98,9 +99,7 @@ int main(int argc, char **argv)
 		QApplication app(argc, argv);
 
 		//  Setup some defaults.
-#ifndef MAC_BUNDLE
-		StratagusLibPath = ".";
-#else
+#ifdef MAC_BUNDLE
 		freopen("/tmp/stdout.txt", "w", stdout);
 		freopen("/tmp/stderr.txt", "w", stderr);
 		// Look for the specified data set inside the application bundle
@@ -110,7 +109,7 @@ int main(int argc, char **argv)
 		CFStringRef macPath = CFURLCopyFileSystemPath(pluginRef, kCFURLPOSIXPathStyle);
 		const char *pathPtr = CFStringGetCStringPtr(macPath, CFStringGetSystemEncoding());
 		Assert(pathPtr);
-		StratagusLibPath = pathPtr;
+		database::get()->set_root_path(pathPtr);
 #endif
 
 		QCommandLineParser cmd_parser;
@@ -121,11 +120,7 @@ int main(int argc, char **argv)
 		cmd_parser.process(app);
 
 		if (cmd_parser.isSet(data_path_option)) {
-			StratagusLibPath = cmd_parser.value(data_path_option).toStdString();
-			size_t index;
-			while ((index = StratagusLibPath.find('\\')) != std::string::npos) {
-				StratagusLibPath[index] = '/';
-			}
+			database::get()->set_root_path(cmd_parser.value(data_path_option).toStdString());
 		}
 
 		std::thread stratagus_thread([argc, argv]() {
@@ -138,9 +133,9 @@ int main(int argc, char **argv)
 		});
 
 		QQmlApplicationEngine engine;
-		engine.addImportPath(QString::fromStdString(StratagusLibPath + "/libraries/qml"));
+		engine.addImportPath(QString::fromStdString(database::get()->get_root_path().string() + "/libraries/qml"));
 
-		const QUrl url = "file:///" + QString::fromStdString(StratagusLibPath + "/interface/Main.qml");
+		const QUrl url = "file:///" + QString::fromStdString(database::get()->get_root_path().string() + "/interface/Main.qml");
 		QObject::connect(&engine, &QQmlApplicationEngine::objectCreated, &app, [url](QObject *obj, const QUrl &objUrl) {
 			if (!obj && url == objUrl) {
 				QCoreApplication::exit(-1);
