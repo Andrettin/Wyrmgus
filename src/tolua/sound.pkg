@@ -14,18 +14,8 @@ extern void play_loading_music();
 extern void play_map_music();
 extern void play_victory_music();
 extern void play_defeat_music();
-extern int PlayMusic(const std::string name);
-extern void PlayMusicName(const std::string name);
-extern void PlayMusicByGroupRandom(const std::string group);
-extern void PlayMusicByGroupAndSubgroupRandom(const std::string group, const std::string subgroup);
-extern void PlayMusicByGroupAndFactionRandom(const std::string group, const std::string civilization_name, const std::string faction_name);
-extern void SetMusicCondition(int id, int value);
-extern void SetMusicLayerGain(const std::string layer, float gain);
 extern void StopMusic(void);
 extern bool IsMusicPlaying();
-extern void InitMusicOAML();
-extern void LoadOAMLDefinitionsFile(std::string file_path);
-extern void ShutdownMusicOAML();
 
 extern int SetChannelVolume(int channel, int volume);
 extern int SetChannelStereo(int channel, int stereo);

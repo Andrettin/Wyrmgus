@@ -83,10 +83,6 @@
 
 #include <guichan.h>
 
-#ifdef USE_OAML
-#include <oaml.h>
-#endif
-
 void DrawGuichanWidgets();
 
 /// variable set when we are scrolling via keyboard
@@ -306,13 +302,6 @@ static void GameLogicLoop()
 	// Can't find a better place.
 	// FIXME: We need to find a better place!
 	SaveGameLoading = false;
-
-#ifdef USE_OAML
-	if (enableOAML && oaml && UI.CurrentMapLayer->GetTimeOfDay()) {
-		// Time of day can change our main music loop, if the current playing track is set for this
-		SetMusicCondition(OAML_CONDID_MAIN_LOOP, UI.CurrentMapLayer->GetTimeOfDay()->ID);
-	}
-#endif
 
 	//
 	// Game logic part

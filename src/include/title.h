@@ -56,7 +56,6 @@ private:
 
 public:
 	std::string File;
-	std::string Music;
 	bool StretchImage = true;
 	int Timeout = 0;
 	int Iterations = 0;

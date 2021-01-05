@@ -56,10 +56,6 @@
 #include "util/queue_util.h"
 #include "util/qunique_ptr.h"
 
-#ifdef USE_OAML
-#include <oaml.h>
-#endif
-
 static bool SoundInitialized;    /// is sound initialized
 
 static int EffectsVolume = 128;  /// effects sound volume
@@ -85,12 +81,6 @@ static struct {
 } MusicChannel;
 
 static void ChannelFinished(int channel);
-
-#ifdef USE_OAML
-#ifndef SDL_AUDIO_BITSIZE
-#define SDL_AUDIO_BITSIZE(x) (x&0xFF)
-#endif
-#endif
 
 /*----------------------------------------------------------------------------
 --  Effects
@@ -344,51 +334,6 @@ void SetMusicFinishedCallback(void (*callback)())
 	Mix_HookMusicFinished(callback);
 }
 
-/**
-**  Play a music file.
-**
-**  @param sample  Music sample.
-**
-**  @return        0 if music is playing, -1 if not.
-*/
-int PlayMusic(std::unique_ptr<wyrmgus::sample> &&sample)
-{
-	if (sample) {
-		StopMusic();
-		MusicChannel.Sample = std::move(sample);
-		return 0;
-	} else {
-		DebugPrint("Could not play sample\n");
-		return -1;
-	}
-}
-
-/**
-**  Play a music file.
-**
-**  @param file  Name of music file, format is automatically detected.
-**
-**  @return      0 if music is playing, -1 if not.
-*/
-int PlayMusic(const std::string &file)
-{
-	if (!SoundEnabled() || !IsMusicEnabled()) {
-		return -1;
-	}
-	const std::string name = LibraryFileName(file.c_str());
-	DebugPrint("play music %s\n" _C_ name.c_str());
-	std::unique_ptr<wyrmgus::sample> sample = LoadSample(name);
-
-	if (sample != nullptr) {
-		StopMusic();
-		MusicChannel.Sample = std::move(sample);
-		return 0;
-	} else {
-		DebugPrint("Could not play %s\n" _C_ file.c_str());
-		return -1;
-	}
-}
-
 void play_menu_music()
 {
 	wyrmgus::music_player::get()->play_music_type(wyrmgus::music_type::menu);
@@ -419,134 +364,11 @@ void play_defeat_music()
 	wyrmgus::music_player::get()->play_music_type(wyrmgus::music_type::defeat);
 }
 
-void PlayMusicName(const std::string &name) {
-	if (!IsMusicEnabled()) {
-		return;
-	}
-	
-#ifdef USE_OAML
-	if (enableOAML == false || oaml == nullptr) {
-		return;
-	}
-
-	oaml->PlayTrack(name.c_str());
-#endif
-}
-
-void PlayMusicByGroupRandom(const std::string &group) {
-	if (!IsMusicEnabled()) {
-		return;
-	}
-	
-#ifdef USE_OAML
-	if (enableOAML == false || oaml == nullptr) {
-		return;
-	}
-
-	oaml->PlayTrackByGroupRandom(group.c_str());
-#endif
-}
-
-void PlayMusicByGroupAndSubgroupRandom(const std::string &group, const std::string &subgroup) {
-	if (!IsMusicEnabled()) {
-		return;
-	}
-	
-#ifdef USE_OAML
-	if (enableOAML == false || oaml == nullptr) {
-		return;
-	}
-
-	if (oaml->PlayTrackByGroupAndSubgroupRandom(group.c_str(), subgroup.c_str()) != OAML_OK) {
-		oaml->PlayTrackByGroupRandom(group.c_str());
-	}
-#endif
-}
-
-void PlayMusicByGroupAndFactionRandom(const std::string &group, const std::string &civilization_name, const std::string &faction_name) {
-	if (!IsMusicEnabled()) {
-		return;
-	}
-
-#ifdef USE_OAML
-	if (enableOAML == false || oaml == nullptr) {
-		return;
-	}
-
-	if (oaml->PlayTrackByGroupAndSubgroupRandom(group.c_str(), faction_name.c_str()) != OAML_OK) {
-		const wyrmgus::civilization *civilization = wyrmgus::civilization::try_get(civilization_name);
-		const wyrmgus::faction *faction = wyrmgus::faction::try_get(faction_name);
-		const wyrmgus::faction *parent_faction = nullptr;
-		bool found_music = false;
-		if (faction != nullptr) {
-			while (true) {
-				parent_faction = faction->get_parent_faction();
-				if (parent_faction == nullptr) {
-					break;
-				}
-				faction = parent_faction;
-				
-				if (oaml->PlayTrackByGroupAndSubgroupRandom(group.c_str(), faction->get_identifier().c_str()) == OAML_OK) {
-					found_music = true;
-					break;
-				}
-			}
-		}
-		if (!found_music && oaml->PlayTrackByGroupAndSubgroupRandom(group.c_str(), civilization_name.c_str()) != OAML_OK) {
-			const wyrmgus::civilization *parent_civilization = nullptr;
-			if (civilization) {
-				while (true) {
-					parent_civilization = civilization->get_parent_civilization();
-					if (!parent_civilization) {
-						break;
-					}
-					civilization = parent_civilization;
-					
-					if (oaml->PlayTrackByGroupAndSubgroupRandom(group.c_str(), civilization->get_identifier().c_str()) == OAML_OK) {
-						found_music = true;
-						break;
-					}
-				}
-			}
-			if (!found_music) {
-				oaml->PlayTrackByGroupRandom(group.c_str());
-			}
-		}
-	}
-#endif
-}
-
-void SetMusicCondition(int id, int value) {
-#ifdef USE_OAML
-	if (enableOAML == false || oaml == nullptr) {
-		return;
-	}
-
-	oaml->SetCondition(id, value);
-#endif
-}
-
-void SetMusicLayerGain(const std::string &layer, float gain) {
-#ifdef USE_OAML
-	if (enableOAML == false || oaml == nullptr) {
-		return;
-	}
-
-	oaml->SetLayerGain(layer.c_str(), gain);
-#endif
-}
-
 /**
 **  Stop the current playing music.
 */
 void StopMusic()
 {
-#ifdef USE_OAML
-	if (enableOAML && oaml) {
-		oaml->StopPlaying();
-	}
-#endif
-
 	Mix_FadeOutMusic(200);
 }
 
@@ -559,12 +381,6 @@ void SetMusicVolume(int volume)
 {
 	clamp(&volume, 0, MaxVolume);
 	MusicVolume = volume;
-
-#ifdef USE_OAML
-	if (enableOAML && oaml) {
-		oaml->SetVolume(MusicVolume / 255.f);
-	}
-#endif
 
 	Mix_VolumeMusic(volume * wyrmgus::music_player::get()->get_current_volume_modifier() / 100 * MIX_MAX_VOLUME / MaxVolume);
 }
@@ -604,14 +420,6 @@ bool IsMusicEnabled()
 */
 bool IsMusicPlaying()
 {
-#ifdef USE_OAML
-	if (enableOAML && oaml) {
-		if (oaml->IsPlaying()) {
-			return true;
-		}
-	}
-#endif
-
 	return Mix_PlayingMusic() == 1;
 }
 
@@ -620,13 +428,8 @@ bool IsMusicPlaying()
 */
 void AddMusicTension(int value)
 {
-#ifdef USE_OAML
-	if (enableOAML == false || oaml == nullptr) {
-		return;
-	}
-
-	oaml->AddTension(value);
-#endif
+	Q_UNUSED(value)
+	//FIXME: keep a counter with music tension to use for scripted conditions?
 }
 
 /*----------------------------------------------------------------------------
@@ -712,13 +515,6 @@ int InitSound()
 */
 void QuitSound()
 {
-#ifdef USE_OAML
-	if (oaml) {
-		oaml->Shutdown();
-		oaml.reset();
-	}
-#endif
-
 	for (wyrmgus::sound *sound : wyrmgus::sound::get_all()) {
 		sound->clear_samples();
 	}

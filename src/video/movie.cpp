@@ -213,19 +213,6 @@ int PlayMovie(const std::string &name)
 		return 0;
 	}
 
-	StopMusic();
-	std::unique_ptr<wyrmgus::sample> sample = LoadSample(filename);
-	if (sample != nullptr) {
-		if ((sample->get_channel_count() != 1 && sample->get_channel_count() != 2) || sample->get_sample_size() != 16) {
-			fprintf(stderr, "Unsupported sound format in movie\n");
-			SDL_FreeYUVOverlay(yuv_overlay);
-			OggFree(&data);
-			f.close();
-			return 0;
-		}
-		PlayMusic(std::move(sample));
-	}
-
 	EventCallback callbacks;
 
 	callbacks.ButtonPressed = MovieCallbackButtonPressed;

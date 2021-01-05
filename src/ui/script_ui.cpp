@@ -314,8 +314,6 @@ static int CclSetTitleScreens(lua_State *l)
 			const char *value = LuaToString(l, -2);
 			if (!strcmp(value, "Image")) {
 				title_screen.File = LuaToString(l, -1);
-			} else if (!strcmp(value, "Music")) {
-				title_screen.Music = LuaToString(l, -1);
 			} else if (!strcmp(value, "Timeout")) {
 				title_screen.Timeout = LuaToNumber(l, -1);
 			} else if (!strcmp(value, "Iterations")) {

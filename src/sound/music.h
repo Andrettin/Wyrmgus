@@ -28,13 +28,6 @@
 #include "database/data_entry.h"
 #include "database/data_type.h"
 
-#ifdef USE_OAML
-class oamlApi;
-
-extern std::unique_ptr<oamlApi> oaml;
-extern bool enableOAML;
-#endif
-
 namespace wyrmgus {
 
 class and_condition;

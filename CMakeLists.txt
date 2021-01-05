@@ -1192,7 +1192,6 @@ find_package(Sqlite)
 find_package(Doxygen)
 find_package(SelfPackers)
 find_package(PhysFS)
-find_package(OAML)
 
 include(CheckTypeSize)
 include(CheckFunctionExists)
@@ -1224,8 +1223,6 @@ option(WITH_BZIP2 "Compile Stratagus with BZip2 compression support" OFF)
 option(WITH_PHYSFS "Compile Stratagus with PhysFS support" OFF)
 option(WITH_OGGVORBIS "Compile Stratagus with OGG/Vorbis sound library" ON)
 option(WITH_THEORA "Compile Stratagus with Theroa video library" ON)
-option(WITH_OAML "Compile Stratagus with OAML library" ON)
-option(OAML_FORCE_STATIC "Link the OAML library statically" OFF)
 option(WITH_STACKTRACE "Compile Stratagus with StackTrace library" OFF)
 
 option(WITH_X11 "Compile Stratagus with X11 clipboard pasting support" ON)
@@ -1303,45 +1300,6 @@ if(WITH_THEORA AND THEORA_FOUND)
 	add_definitions(-DUSE_THEORA)
 	include_directories(${THEORA_INCLUDE_DIR})
 	set(stratagus_LIBS ${stratagus_LIBS} ${THEORA_LIBRARY})
-endif()
-
-if(WITH_OAML)
-	if(NOT OAML_FOUND)
-		# Build embedded copy statically
-		set(OAML_EMBEDDED ON)
-		set(OAML_FORCE_STATIC ON)
-		set(OAML_EMBEDDED_PATH "${CMAKE_SOURCE_DIR}/src/oaml")
-		include(ExternalProject)
-		ExternalProject_Add(oaml
-			SOURCE_DIR ${OAML_EMBEDDED_PATH}
-			PREFIX ${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_FILES_DIRECTORY}/oaml.dir
-			BUILD_IN_SOURCE 1
-			CMAKE_ARGS -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
-			CMAKE_ARGS -DENABLE_SHARED=OFF
-			CMAKE_ARGS -DENABLE_UNITYPLUGIN=OFF
-			CMAKE_ARGS -DENABLE_RTAUDIO=OFF
-			INSTALL_COMMAND ""
-		)
-
-		set(OAML_INCLUDE_DIRS "${OAML_EMBEDDED_PATH}/include")
-		set(OAML_LIBRARIES_STATIC "${OAML_EMBEDDED_PATH}/liboaml.a" ${OGG_LIBRARY} ${VORBIS_LIBRARY} ${VORBISFILE_LIBRARIES})
-		# Readd '_d' suffix if added in the OAML build system (GH-85)
-		set(OAML_LIBRARIES_STATIC_DEBUG "${OAML_EMBEDDED_PATH}/liboaml.a" ${OGG_LIBRARY} ${VORBIS_LIBRARY} ${VORBISFILE_LIBRARIES})
-	endif()
-
-	add_definitions(-DUSE_OAML)
-	include_directories(${OAML_INCLUDE_DIRS})
-	if(ENABLE_STATIC OR OAML_FORCE_STATIC)
-		set(stratagus_LIBS_RELEASE ${stratagus_LIBS_RELEASE} optimized ${OAML_LIBRARIES_STATIC})
-		if (OAML_LIBRARY_STATIC_DEBUG)
-			set(stratagus_LIBS_DEBUG ${stratagus_LIBS_DEBUG} debug ${OAML_LIBRARIES_STATIC_DEBUG})
-		endif()
-	else()
-		set(stratagus_LIBS_RELEASE ${stratagus_LIBS_RELEASE} optimized ${OAML_LIBRARIES_SHARED})
-		if (OAML_LIBRARY_SHARED_DEBUG)
-			set(stratagus_LIBS_DEBUG ${stratagus_LIBS_DEBUG} debug ${OAML_LIBRARIES_SHARED_DEBUG})
-		endif()
-	endif()
 endif()
 
 if(WITH_STACKTRACE AND STACKTRACE_FOUND)
@@ -1609,7 +1567,6 @@ log_package("PhysFS" "PHYSFS")
 log_package("Ogg/Vorbis" "OGGVORBIS")
 log_package("StackTrace" "STACKTRACE")
 log_package("Theora" "THEORA")
-log_package("OAML" "OAML")
 log_package("X11" "X11")
 
 if(WITH_RENDERER STREQUAL "OpenGL" AND OPENGL_FOUND)

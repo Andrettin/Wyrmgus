@@ -171,12 +171,6 @@ void ShowTitleScreens()
 			continue;
 		}
 
-		if (!title_screen.Music.empty()) {
-			if (title_screen.Music == "none" || PlayMusic(title_screen.Music) == -1) {
-				StopMusic();
-			}
-		}
-
 		if (!title_screen.File.empty() && PlayMovie(title_screen.File)) {
 			title_screen.ShowTitleImage();
 		}

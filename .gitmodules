@@ -1,3 +1,0 @@
-[submodule "src/oaml"]
-	path = src/oaml
-	url = https://github.com/oamldev/oaml

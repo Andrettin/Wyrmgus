@@ -83,24 +83,8 @@ extern void play_map_music();
 extern void play_victory_music();
 extern void play_defeat_music();
 
-/// Play a music file
-extern int PlayMusic(std::unique_ptr<wyrmgus::sample> &&sample);
-/// Play a music file
-extern int PlayMusic(const std::string &file);
-/// Play a music track
-extern void PlayMusicName(const std::string &name);
-/// Play a music track
-extern void PlayMusicByGroupRandom(const std::string &group);
-/// Play a music track
-extern void PlayMusicByGroupAndSubgroupRandom(const std::string &group, const std::string &subgroup);
-/// Play a music track
-extern void PlayMusicByGroupAndFactionRandom(const std::string &group, const std::string &civilization_name, const std::string &faction_name);
-/// Set a condition for music
-extern void SetMusicCondition(int id, int value);
 /// Increase tension value for the music
 extern void AddMusicTension(int value);
-/// Set gain of a music layer
-extern void SetMusicLayerGain(const std::string &layer, float gain);
 /// Stop music playing
 extern void StopMusic();
 /// Set music volume

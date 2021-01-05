@@ -40,13 +40,6 @@
 
 bool CallbackMusic;                       /// flag true callback ccl if stops
 
-#ifdef USE_OAML
-#include <oaml.h>
-
-std::unique_ptr<oamlApi> oaml;
-bool enableOAML = false;
-#endif
-
 namespace wyrmgus {
 
 music::music(const std::string &identifier) : data_entry(identifier)
@@ -168,84 +161,3 @@ void InitMusic()
 {
 	SetMusicFinishedCallback(MusicFinishedCallback);
 }
-
-#ifdef USE_OAML
-static void* oamlOpen(const char *filename) {
-	auto f = std::make_unique<CFile>();
-	const std::string name = LibraryFileName(filename);
-	if (f->open(name.c_str(), CL_OPEN_READ) == -1) {
-		return nullptr;
-	}
-	return f.release();
-}
-
-static size_t oamlRead(void *ptr, size_t size, size_t nitems, void *fd) {
-	CFile *f = (CFile*)fd;
-	return f->read(ptr, size*nitems);
-}
-
-static int oamlSeek(void *fd, long offset, int whence) {
-	CFile *f = (CFile*)fd;
-	return f->seek(offset, whence);
-}
-
-static long oamlTell(void *fd) {
-	CFile *f = (CFile*)fd;
-	return f->tell();
-}
-
-static int oamlClose(void *fd) {
-	CFile *f = reinterpret_cast<CFile *>(fd);
-	int ret = f->close();
-	delete f;
-	return ret;
-}
-
-static oamlFileCallbacks fileCbs = {
-	&oamlOpen,
-	&oamlRead,
-	&oamlSeek,
-	&oamlTell,
-	&oamlClose
-};
-
-void InitMusicOAML()
-{
-	const std::string filename = LibraryFileName("oaml.defs");
-	oaml = std::make_unique<oamlApi>();
-	oaml->SetFileCallbacks(&fileCbs);
-	oaml->Init(filename.c_str());
-
-	enableOAML = true;
-	SetMusicVolume(GetMusicVolume());
-}
-
-#endif
-void LoadOAMLDefinitionsFile(const std::string &file_path)
-{
-#ifdef USE_OAML
-	const std::string filename = LibraryFileName(file_path.c_str());
-	oaml->ReadDefsFile(filename.c_str());
-#endif
-}
-
-#ifdef USE_OAML
-void ShutdownMusicOAML()
-{
-	if (oaml) {
-		oaml->Shutdown();
-		oaml.reset();
-	}
-	enableOAML = false;
-}
-#else
-
-void InitMusicOAML()
-{
-}
-
-void ShutdownMusicOAML()
-{
-}
-
-#endif
