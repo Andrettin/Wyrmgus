@@ -702,6 +702,10 @@ void database::process_modules()
 		this->process_modules_at_dir(this->get_modules_path());
 	}
 
+	if (std::filesystem::exists(this->get_dlcs_path())) {
+		this->process_modules_at_dir(this->get_dlcs_path());
+	}
+
 	if (predefines::get()->is_documents_modules_loading_enabled() && std::filesystem::exists(database::get_documents_modules_path())) {
 		this->process_modules_at_dir(database::get_documents_modules_path());
 	}

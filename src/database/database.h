@@ -101,6 +101,11 @@ public:
 		return this->get_root_path() / "modules";
 	}
 
+	std::filesystem::path get_dlcs_path() const
+	{
+		return this->get_root_path() / "dlcs";
+	}
+
 	static std::filesystem::path get_documents_modules_path()
 	{
 		return database::get_documents_path() / "modules";
