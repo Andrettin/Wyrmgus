@@ -140,7 +140,7 @@ int main(int argc, char **argv)
 		QQmlApplicationEngine engine;
 		engine.addImportPath(QString::fromStdString(StratagusLibPath + "/libraries/qml"));
 
-		const QUrl url = QString::fromStdString(StratagusLibPath + "/interface/Main.qml");
+		const QUrl url = "file:///" + QString::fromStdString(StratagusLibPath + "/interface/Main.qml");
 		QObject::connect(&engine, &QQmlApplicationEngine::objectCreated, &app, [url](QObject *obj, const QUrl &objUrl) {
 			if (!obj && url == objUrl) {
 				QCoreApplication::exit(-1);
