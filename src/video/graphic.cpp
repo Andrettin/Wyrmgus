@@ -53,6 +53,13 @@
 #include "video/video.h"
 #include "xbrz.h"
 
+#ifdef USE_OPENGL
+#ifdef __APPLE__
+#define GL_GLEXT_PROTOTYPES 1
+#endif
+#include <SDL_opengl.h>
+#endif
+
 std::map<std::string, std::weak_ptr<CGraphic>> CGraphic::graphics_by_filepath;
 std::list<CGraphic *> CGraphic::graphics;
 
@@ -728,12 +735,12 @@ static void ConvertImageToMap(SDL_Surface *Surface, int Width, int Height)
 	SDL_LockSurface(Surface);
 	const SDL_PixelFormat *f = Surface->format;
 	const int bpp = Surface->format->BytesPerPixel;
-	Uint8 r, g, b;
+	uint8_t r, g, b;
 
 	for (int j = 0; j < Height; ++j) {
 		for (int i = 0; i < Width; ++i) {
-			Uint32 c = *reinterpret_cast<Uint32 *>(&reinterpret_cast<Uint8 *>(Surface->pixels)[i * 4 + j * Surface->pitch]);
-			Uint8 a;
+			uint32_t c = *reinterpret_cast<uint32_t *>(&reinterpret_cast<uint8_t *>(Surface->pixels)[i * 4 + j * Surface->pitch]);
+			uint8_t a;
 
 			CVideo::GetRGBA(c, Surface->format, &r, &g, &b, &a);
 			if (a >= 128) {

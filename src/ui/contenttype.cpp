@@ -313,9 +313,9 @@ static const CUnit *GetUnitRef(const CUnit &unit, EnumUnit e)
 		return;
 	}
 
-	Uint32 color;
+	uint32_t color;
 	//Wyrmgus start
-	Uint32 lighter_color;
+	uint32_t lighter_color;
 //	int f = (100 * unit.Variable[this->Index].Value) / unit.Variable[this->Index].Max;
 	int f = (100 * unit.Variable[this->Index].Value) / max;
 	//Wyrmgus end
@@ -430,11 +430,11 @@ static const CUnit *GetUnitRef(const CUnit &unit, EnumUnit e)
 	int h = this->height * scale_factor;
 	Assert(w > 0);
 	Assert(h > 4);
-	const Uint32 colors[] = {ColorRed, ColorYellow, ColorGreen, ColorLightGray,
+	const uint32_t colors[] = {ColorRed, ColorYellow, ColorGreen, ColorLightGray,
 							 ColorGray, ColorDarkGray, ColorWhite, ColorOrange,
 							 ColorLightBlue, ColorBlue, ColorDarkGreen, ColorBlack
 							};
-	const Uint32 color = (colorIndex != -1) ? colors[colorIndex] : UI.CompletedBarColor;
+	const uint32_t color = (colorIndex != -1) ? colors[colorIndex] : UI.CompletedBarColor;
 	//Wyrmgus start
 //	const int f = (100 * unit.Variable[this->varIndex].Value) / unit.Variable[this->varIndex].Max;
 	const int f = (100 * unit.GetModifiedVariable(this->varIndex, VariableAttribute::Value)) / unit.GetModifiedVariable(this->varIndex, VariableAttribute::Max);

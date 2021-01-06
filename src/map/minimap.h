@@ -30,15 +30,10 @@
 #include "color.h"
 #include "vec2i.h"
 
-#ifdef USE_OPENGL
-#ifdef __APPLE__
-#define GL_GLEXT_PROTOTYPES 1
-#endif
-#include "SDL_opengl.h"
-#endif
-
 class CUnit;
 class CViewport;
+
+typedef unsigned int GLuint;
 
 namespace wyrmgus {
 

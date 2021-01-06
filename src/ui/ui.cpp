@@ -57,6 +57,8 @@
 #include "video/video.h"
 #include "world.h"
 
+#include <SDL.h>
+
 bool RightButtonAttacks;                   /// right button attacks
 
 static ViewportModeType NewViewportMode = VIEWPORT_SINGLE;

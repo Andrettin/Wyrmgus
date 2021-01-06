@@ -30,24 +30,16 @@
 
 #pragma once
 
-#include "SDL.h"
-
-#ifdef USE_GLES
-#include "GLES/gl.h"
-#endif
-
-#ifdef USE_OPENGL
-#ifdef __APPLE__
-#define GL_GLEXT_PROTOTYPES 1
-#endif
-#include "SDL_opengl.h"
-#include "shaders.h"
-#endif
-
 #include "guichan.h"
 
 #include "color.h"
 #include "vec2i.h"
+
+struct SDL_Cursor;
+struct SDL_Surface;
+typedef float GLfloat;
+typedef int GLint;
+typedef unsigned int GLuint;
 
 namespace wyrmgus {
 	class font;
@@ -57,7 +49,6 @@ namespace wyrmgus {
 }
 
 extern bool ZoomNoResize;
-extern bool GLShaderPipelineSupported;
 
 class CGraphic : public gcn::Image
 {
@@ -327,27 +318,6 @@ struct EventCallback {
 
 };
 
-#if SDL_BYTEORDER == SDL_LIL_ENDIAN
-#define RSHIFT  0
-#define GSHIFT  8
-#define BSHIFT  16
-#define ASHIFT  24
-#define RMASK   0x000000ff
-#define GMASK   0x0000ff00
-#define BMASK   0x00ff0000
-#define AMASK   0xff000000
-#else
-#define RSHIFT  24
-#define GSHIFT  16
-#define BSHIFT  8
-#define ASHIFT  0
-#define RMASK   0xff000000
-#define GMASK   0x00ff0000
-#define BMASK   0x0000ff00
-#define AMASK   0x000000ff
-#endif
-
-
 class CVideo
 {
 public:
@@ -356,98 +326,75 @@ public:
 	void ClearScreen();
 	bool ResizeScreen(int width, int height);
 
-	void DrawPixelClip(Uint32 color, int x, int y);
-	void DrawTransPixelClip(Uint32 color, int x, int y, unsigned char alpha);
+	void DrawPixelClip(uint32_t color, int x, int y);
+	void DrawTransPixelClip(uint32_t color, int x, int y, unsigned char alpha);
 
-	void DrawVLine(Uint32 color, int x, int y, int height);
-	void DrawTransVLine(Uint32 color, int x, int y, int height, unsigned char alpha);
-	void DrawVLineClip(Uint32 color, int x, int y, int height);
-	void DrawTransVLineClip(Uint32 color, int x, int y, int height, unsigned char alpha);
+	void DrawVLine(uint32_t color, int x, int y, int height);
+	void DrawTransVLine(uint32_t color, int x, int y, int height, unsigned char alpha);
+	void DrawVLineClip(uint32_t color, int x, int y, int height);
+	void DrawTransVLineClip(uint32_t color, int x, int y, int height, unsigned char alpha);
 
-	void DrawHLine(Uint32 color, int x, int y, int width);
-	void DrawTransHLine(Uint32 color, int x, int y, int width, unsigned char alpha);
-	void DrawHLineClip(Uint32 color, int x, int y, int width);
-	void DrawTransHLineClip(Uint32 color, int x, int y, int width, unsigned char alpha);
+	void DrawHLine(uint32_t color, int x, int y, int width);
+	void DrawTransHLine(uint32_t color, int x, int y, int width, unsigned char alpha);
+	void DrawHLineClip(uint32_t color, int x, int y, int width);
+	void DrawTransHLineClip(uint32_t color, int x, int y, int width, unsigned char alpha);
 
-	void DrawLine(Uint32 color, int sx, int sy, int dx, int dy);
-	void DrawTransLine(Uint32 color, int sx, int sy, int dx, int dy, unsigned char alpha);
-	void DrawLineClip(Uint32 color, const PixelPos &pos1, const PixelPos &pos2);
-	void DrawTransLineClip(Uint32 color, int sx, int sy, int dx, int dy, unsigned char alpha);
+	void DrawLine(uint32_t color, int sx, int sy, int dx, int dy);
+	void DrawTransLine(uint32_t color, int sx, int sy, int dx, int dy, unsigned char alpha);
+	void DrawLineClip(uint32_t color, const PixelPos &pos1, const PixelPos &pos2);
+	void DrawTransLineClip(uint32_t color, int sx, int sy, int dx, int dy, unsigned char alpha);
 
-	void DrawRectangle(Uint32 color, int x, int y, int w, int h);
-	void DrawTransRectangle(Uint32 color, int x, int y, int w, int h, unsigned char alpha);
-	void DrawRectangleClip(Uint32 color, int x, int y, int w, int h);
-	void DrawTransRectangleClip(Uint32 color, int x, int y, int w, int h, unsigned char alpha);
+	void DrawRectangle(uint32_t color, int x, int y, int w, int h);
+	void DrawTransRectangle(uint32_t color, int x, int y, int w, int h, unsigned char alpha);
+	void DrawRectangleClip(uint32_t color, int x, int y, int w, int h);
+	void DrawTransRectangleClip(uint32_t color, int x, int y, int w, int h, unsigned char alpha);
 
-	void FillRectangle(Uint32 color, int x, int y, int w, int h);
-	void FillTransRectangle(Uint32 color, int x, int y, int w, int h, unsigned char alpha);
-	void FillRectangleClip(Uint32 color, int x, int y, int w, int h);
-	void FillTransRectangleClip(Uint32 color, int x, int y, int w, int h, unsigned char alpha);
+	void FillRectangle(uint32_t color, int x, int y, int w, int h);
+	void FillTransRectangle(uint32_t color, int x, int y, int w, int h, unsigned char alpha);
+	void FillRectangleClip(uint32_t color, int x, int y, int w, int h);
+	void FillTransRectangleClip(uint32_t color, int x, int y, int w, int h, unsigned char alpha);
 
-	void DrawCircle(Uint32 color, int x, int y, int r);
-	void DrawTransCircle(Uint32 color, int x, int y, int r, unsigned char alpha);
-	void DrawCircleClip(Uint32 color, int x, int y, int r);
-	void DrawTransCircleClip(Uint32 color, int x, int y, int r, unsigned char alpha);
+	void DrawCircle(uint32_t color, int x, int y, int r);
+	void DrawTransCircle(uint32_t color, int x, int y, int r, unsigned char alpha);
+	void DrawCircleClip(uint32_t color, int x, int y, int r);
+	void DrawTransCircleClip(uint32_t color, int x, int y, int r, unsigned char alpha);
 
-	void FillCircle(Uint32 color, int x, int y, int radius);
-	void FillTransCircle(Uint32 color, int x, int y, int radius, unsigned char alpha);
-	void FillCircleClip(Uint32 color, const PixelPos &screenPos, int radius);
-	void FillTransCircleClip(Uint32 color, int x, int y, int radius, unsigned char alpha);
+	void FillCircle(uint32_t color, int x, int y, int radius);
+	void FillTransCircle(uint32_t color, int x, int y, int radius, unsigned char alpha);
+	void FillCircleClip(uint32_t color, const PixelPos &screenPos, int radius);
+	void FillTransCircleClip(uint32_t color, int x, int y, int radius, unsigned char alpha);
 
-	static Uint32 MapRGB(Uint8 r, Uint8 g, Uint8 b)
+	static uint32_t MapRGB(uint8_t r, uint8_t g, uint8_t b)
 	{
 		return CVideo::MapRGBA(r, g, b, 0xFF);
 	}
 
-	static Uint32 MapRGB(const CColor &color)
+	static uint32_t MapRGB(const CColor &color)
 	{
 		return CVideo::MapRGB(color.R, color.G, color.B);
 	}
 
-	static Uint32 MapRGB(const QColor &color)
+	static uint32_t MapRGB(const QColor &color)
 	{
 		return CVideo::MapRGB(color.red(), color.green(), color.blue());
 	}
 
-	static Uint32 MapRGBA(Uint8 r, Uint8 g, Uint8 b, Uint8 a)
-	{
-		return ((r << RSHIFT) | (g << GSHIFT) | (b << BSHIFT) | (a << ASHIFT));
-	}
+	static uint32_t MapRGBA(uint8_t r, uint8_t g, uint8_t b, uint8_t a);
 
-	static Uint32 MapRGBA(const CColor &color)
+	static uint32_t MapRGBA(const CColor &color)
 	{
 		return CVideo::MapRGBA(color.R, color.G, color.B, color.A);
 	}
 
-	static Uint32 MapRGBA(const QColor &color)
+	static uint32_t MapRGBA(const QColor &color)
 	{
 		return CVideo::MapRGBA(color.red(), color.green(), color.blue(), color.alpha());
 	}
 
-	static void GetRGB(Uint32 c, Uint8 *r, Uint8 *g, Uint8 *b)
-	{
-		*r = (c >> RSHIFT) & 0xff;
-		*g = (c >> GSHIFT) & 0xff;
-		*b = (c >> BSHIFT) & 0xff;
-	}
+	static void GetRGB(uint32_t c, uint8_t *r, uint8_t *g, uint8_t *b);
+	static void GetRGBA(uint32_t c, uint8_t *r, uint8_t *g, uint8_t *b, uint8_t *a);
 
-	static void GetRGBA(Uint32 c, Uint8 *r, Uint8 *g, Uint8 *b, Uint8 *a)
-	{
-		*r = (c >> RSHIFT) & 0xff;
-		*g = (c >> GSHIFT) & 0xff;
-		*b = (c >> BSHIFT) & 0xff;
-		*a = (c >> ASHIFT) & 0xff;
-	}
-
-	inline QColor GetRGBA(const Uint32 c) const
-	{
-		QColor color;
-		color.setRed((c >> RSHIFT) & 0xff);
-		color.setGreen((c >> GSHIFT) & 0xff);
-		color.setBlue((c >> BSHIFT) & 0xff);
-		color.setAlpha((c >> ASHIFT) & 0xff);
-		return color;
-	}
+	static QColor GetRGBA(const uint32_t c);
 
 	int Width;
 	int Height;
@@ -595,34 +542,22 @@ extern void ToggleGrabMouse(int mode);
 extern EventCallback GameCallbacks;   /// Game callbacks
 extern EventCallback EditorCallbacks; /// Editor callbacks
 
-extern Uint32 ColorBlack;
-extern Uint32 ColorDarkGreen;
-extern Uint32 ColorLightBlue;
-extern Uint32 ColorBlue;
-extern Uint32 ColorOrange;
-extern Uint32 ColorWhite;
-extern Uint32 ColorLightGray;
-extern Uint32 ColorGray;
-extern Uint32 ColorDarkGray;
-extern Uint32 ColorRed;
-extern Uint32 ColorGreen;
-extern Uint32 ColorYellow;
+extern uint32_t ColorBlack;
+extern uint32_t ColorDarkGreen;
+extern uint32_t ColorLightBlue;
+extern uint32_t ColorBlue;
+extern uint32_t ColorOrange;
+extern uint32_t ColorWhite;
+extern uint32_t ColorLightGray;
+extern uint32_t ColorGray;
+extern uint32_t ColorDarkGray;
+extern uint32_t ColorRed;
+extern uint32_t ColorGreen;
+extern uint32_t ColorYellow;
 
 #if defined(USE_OPENGL) || defined(USE_GLES)
 void DrawTexture(const CGraphic *g, const GLuint *textures, int sx, int sy,
 				 int ex, int ey, int x, int y, int flip);
-#endif
-
-
-// ARB_texture_compression
-#if defined(USE_OPENGL) && !defined(__APPLE__)
-extern PFNGLCOMPRESSEDTEXIMAGE3DARBPROC    glCompressedTexImage3DARB;
-extern PFNGLCOMPRESSEDTEXIMAGE2DARBPROC    glCompressedTexImage2DARB;
-extern PFNGLCOMPRESSEDTEXIMAGE1DARBPROC    glCompressedTexImage1DARB;
-extern PFNGLCOMPRESSEDTEXSUBIMAGE3DARBPROC glCompressedTexSubImage3DARB;
-extern PFNGLCOMPRESSEDTEXSUBIMAGE2DARBPROC glCompressedTexSubImage2DARB;
-extern PFNGLCOMPRESSEDTEXSUBIMAGE1DARBPROC glCompressedTexSubImage1DARB;
-extern PFNGLGETCOMPRESSEDTEXIMAGEARBPROC   glGetCompressedTexImageARB;
 #endif
 
 //

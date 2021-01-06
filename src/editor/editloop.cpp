@@ -822,7 +822,7 @@ static void DrawPlayers()
 #if 0
 extern void DrawPopupUnitInfo(const wyrmgus::unit_type *type,
 							  int player_index, wyrmgus::font *font,
-							  Uint32 backgroundColor, int buttonX, int buttonY);
+							  uint32_t backgroundColor, int buttonX, int buttonY);
 
 static void DrawPopup()
 {
@@ -929,7 +929,7 @@ static void DrawTileIcon(const wyrmgus::terrain_type *terrain, unsigned x, unsig
 {
 	//Wyrmgus start
 	/*
-	Uint32 color = (flags & IconActive) ? ColorGray : ColorBlack;
+	uint32_t color = (flags & IconActive) ? ColorGray : ColorBlack;
 
 	Video.DrawRectangleClip(color, x, y, wyrmgus::defines::get()->get_scaled_tile_width() + 7, wyrmgus::defines::get()->get_scaled_tile_height() + 7);
 	Video.DrawRectangleClip(ColorBlack, x + 1, y + 1, wyrmgus::defines::get()->get_scaled_tile_width() + 5, wyrmgus::defines::get()->get_scaled_tile_height() + 5);
@@ -950,7 +950,7 @@ static void DrawTileIcon(const wyrmgus::terrain_type *terrain, unsigned x, unsig
 	Video.DrawHLine(ColorGray, x + 5 - 1, y + wyrmgus::defines::get()->get_scaled_tile_height() + 4 - 1, wyrmgus::defines::get()->get_scaled_tile_width() + 1 - 1);
 	Video.DrawHLine(ColorGray, x + 5 - 1, y + wyrmgus::defines::get()->get_scaled_tile_height() + 5 - 1, wyrmgus::defines::get()->get_scaled_tile_width() + 1 - 1);
 
-	Uint32 color = (flags & IconClicked) ? ColorGray : ColorWhite;
+	uint32_t color = (flags & IconClicked) ? ColorGray : ColorWhite;
 	Video.DrawHLine(color, x + 5 - 1, y + 3 - 1, wyrmgus::defines::get()->get_scaled_tile_width() + 1 - 1);
 	Video.DrawHLine(color, x + 5 - 1, y + 4 - 1, wyrmgus::defines::get()->get_scaled_tile_width() + 1 - 1);
 	Video.DrawVLine(color, x + 3 - 1, y + 3 - 1, wyrmgus::defines::get()->get_scaled_tile_height() + 3 - 1);
@@ -1208,7 +1208,7 @@ static void DrawEditorPanel_StartIcon()
 		const PixelPos lb(x, y + IconHeight - 3 * scale_factor);
 		const PixelPos rt(x + IconHeight - 3 * scale_factor, y);
 		const PixelPos rb(x + IconHeight - 2 * scale_factor, y + IconHeight - 2 * scale_factor);
-		const Uint32 color = CVideo::MapRGB(CPlayer::Players[Editor.SelectedPlayer]->get_minimap_color());
+		const uint32_t color = CVideo::MapRGB(CPlayer::Players[Editor.SelectedPlayer]->get_minimap_color());
 
 		Video.DrawLineClip(color, lt, rb);
 		Video.DrawLineClip(color, rt, lb);
@@ -1327,7 +1327,7 @@ static void DrawMapCursor()
 	}
 }
 
-static void DrawCross(const PixelPos &topleft_pos, const QSize &size, Uint32 color)
+static void DrawCross(const PixelPos &topleft_pos, const QSize &size, uint32_t color)
 {
 	const PixelPos lt = topleft_pos;
 	const PixelPos lb(topleft_pos.x, topleft_pos.y + size.height());

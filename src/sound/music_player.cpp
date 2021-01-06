@@ -37,6 +37,8 @@
 #include "sound/sound_server.h"
 #include "util/vector_random_util.h"
 
+#include <SDL_mixer.h>
+
 namespace wyrmgus {
 
 music_player::music_player() : current_music_type(music_type::none)

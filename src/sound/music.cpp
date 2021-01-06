@@ -38,6 +38,8 @@
 #include "sound/music_type.h"
 #include "sound/sound_server.h"
 
+#include <SDL_mixer.h>
+
 bool CallbackMusic;                       /// flag true callback ccl if stops
 
 namespace wyrmgus {

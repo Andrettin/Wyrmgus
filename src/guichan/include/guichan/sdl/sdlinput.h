@@ -54,7 +54,7 @@
 
 #pragma once
 
-#include "SDL.h"
+#include <SDL.h>
 
 #include "guichan/input.h"
 #include "guichan/key.h"

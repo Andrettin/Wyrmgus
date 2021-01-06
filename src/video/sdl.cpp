@@ -39,8 +39,8 @@
 #include <sys/stat.h>
 #endif
 
-#include "SDL.h"
-#include "SDL_syswm.h"
+#include <SDL.h>
+#include <SDL_syswm.h>
 
 #ifdef USE_GLES_EGL
 #include "EGL/egl.h"
@@ -51,8 +51,7 @@
 #endif
 
 #ifdef USE_OPENGL
-#include "SDL_opengl.h"
-#include "shaders.h"
+#include <SDL_opengl.h>
 #endif
 
 #ifdef USE_BEOS
@@ -116,13 +115,13 @@ bool IsSDLWindowVisible = true;
 
 // ARB_texture_compression
 #ifdef USE_OPENGL
-PFNGLCOMPRESSEDTEXIMAGE3DARBPROC    glCompressedTexImage3DARB;
-PFNGLCOMPRESSEDTEXIMAGE2DARBPROC    glCompressedTexImage2DARB;
-PFNGLCOMPRESSEDTEXIMAGE1DARBPROC    glCompressedTexImage1DARB;
-PFNGLCOMPRESSEDTEXSUBIMAGE3DARBPROC glCompressedTexSubImage3DARB;
-PFNGLCOMPRESSEDTEXSUBIMAGE2DARBPROC glCompressedTexSubImage2DARB;
-PFNGLCOMPRESSEDTEXSUBIMAGE1DARBPROC glCompressedTexSubImage1DARB;
-PFNGLGETCOMPRESSEDTEXIMAGEARBPROC   glGetCompressedTexImageARB;
+static PFNGLCOMPRESSEDTEXIMAGE3DARBPROC    glCompressedTexImage3DARB;
+static PFNGLCOMPRESSEDTEXIMAGE2DARBPROC    glCompressedTexImage2DARB;
+static PFNGLCOMPRESSEDTEXIMAGE1DARBPROC    glCompressedTexImage1DARB;
+static PFNGLCOMPRESSEDTEXSUBIMAGE3DARBPROC glCompressedTexSubImage3DARB;
+static PFNGLCOMPRESSEDTEXSUBIMAGE2DARBPROC glCompressedTexSubImage2DARB;
+static PFNGLCOMPRESSEDTEXSUBIMAGE1DARBPROC glCompressedTexSubImage1DARB;
+static PFNGLGETCOMPRESSEDTEXIMAGEARBPROC   glGetCompressedTexImageARB;
 #endif
 
 /*----------------------------------------------------------------------------
@@ -229,11 +228,8 @@ static void InitOpenGLExtensions()
 		} else {
 			GLTextureCompressionSupported = false;
 		}
-		
-		GLShaderPipelineSupported = GLShaderPipelineSupported && LoadShaderExtensions();
 	} else {
 		GLTextureCompressionSupported = false;
-		GLShaderPipelineSupported = false;
 	}
 #else
 	GLTextureCompressionSupported = false;
@@ -260,11 +256,7 @@ static void InitOpenGL()
 #endif
 
 #ifdef USE_OPENGL
-	if (!GLShaderPipelineSupported) {
-		glOrtho(0, Video.Width, Video.Height, 0, -1, 1);
-	} else {
-		glOrtho(0, Video.ViewportWidth, Video.ViewportHeight, 0, -1, 1);
-	}
+	glOrtho(0, Video.Width, Video.Height, 0, -1, 1);
 #endif
 
 	glMatrixMode(GL_MODELVIEW);
@@ -282,10 +274,6 @@ static void InitOpenGL()
 
 #ifdef USE_OPENGL
 	glClearDepth(1.0f);
-	
-	if (GLShaderPipelineSupported) {
-		SetupFramebuffer();
-	}
 #endif
 
 	glShadeModel(GL_FLAT);
@@ -759,15 +747,6 @@ static void SdlDoEvent(const EventCallback &callbacks, SDL_Event &event)
 			break;
 
 		case SDL_KEYDOWN:
-#if (defined(USE_OPENGL) || defined(USE_GLES))
-			if (GLShaderPipelineSupported
-				&& event.key.keysym.sym == SDLK_SLASH
-				&& event.key.keysym.mod & KMOD_ALT
-				&& event.key.keysym.mod & KMOD_CTRL) {
-				LoadShaders();
-				break;
-			}
-#endif
 			InputKeyButtonPress(callbacks, SDL_GetTicks(),
 								event.key.keysym.sym, event.key.keysym.unicode);
 			break;
@@ -897,11 +876,7 @@ void RealizeVideoMemory()
 	eglSwapBuffers(eglDisplay, eglSurface);
 #endif
 #if defined(USE_OPENGL) || defined(USE_GLES_NATIVE)
-	if (GLShaderPipelineSupported) {
-		RenderFramebufferToScreen();
-	} else {
-		SDL_GL_SwapBuffers();
-	}
+	SDL_GL_SwapBuffers();
 #endif
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }

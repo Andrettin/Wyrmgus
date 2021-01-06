@@ -64,10 +64,6 @@ static constexpr int WEAK_TARGET = 2; //weak target, could be changed
 static constexpr int MOVE_TO_TARGET = 4; ///move to target state
 static constexpr int ATTACK_TARGET = 5; //attack target state
 
-/*----------------------------------------------------------------------------
---  Functions
-----------------------------------------------------------------------------*/
-
 /**
 **  Animate unit attack!
 **

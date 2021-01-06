@@ -285,7 +285,7 @@ void DrawBuildingCursor()
 		int w = w0;
 		while (w--) {
 			const Vec2i posIt(mpos.x + w, mpos.y + h);
-			Uint32 color;
+			uint32_t color;
 
 			if (f && (ontop ||
 					  CanBuildOn(posIt, MapFogFilterFlags(*CPlayer::GetThisPlayer(), posIt,

@@ -734,15 +734,6 @@ void CPlayer::Save(CFile &file) const
 	file.printf("\n  \"speed-research\", %d,", p.SpeedResearch);
 	
 	//Wyrmgus start
-	/*
-	Uint8 r, g, b;
-
-	SDL_GetRGB(p.Color, TheScreen->format, &r, &g, &b);
-	file.printf("\n  \"color\", { %d, %d, %d },", r, g, b);
-	*/
-	//Wyrmgus end
-
-	//Wyrmgus start
 	file.printf("\n  \"current-quests\", {");
 	for (size_t j = 0; j < p.current_quests.size(); ++j) {
 		if (j) {
@@ -3785,7 +3776,7 @@ void CPlayer::Notify(int type, const Vec2i &pos, int z, const char *fmt, ...) co
 {
 	Assert(CMap::Map.Info.IsPointOnMap(pos, z));
 	char temp[128];
-	Uint32 color;
+	uint32_t color;
 	va_list va;
 
 	// Notify me, and my TEAM members

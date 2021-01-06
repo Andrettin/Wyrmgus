@@ -31,7 +31,15 @@
 #if defined(USE_OPENGL) || defined(USE_GLES)
 
 #include "stratagus.h"
+
 #include "video/video.h"
+
+#ifdef USE_OPENGL
+#ifdef __APPLE__
+#define GL_GLEXT_PROTOTYPES 1
+#endif
+#include <SDL_opengl.h>
+#endif
 
 /** Draw a rectangular part of a CGraphic to the screen.
 **

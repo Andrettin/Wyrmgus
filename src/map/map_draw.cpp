@@ -577,7 +577,7 @@ void CViewport::DrawBorder() const
 		return;
 	}
 
-	Uint32 color = ColorBlack;
+	uint32_t color = ColorBlack;
 	if (this == UI.SelectedViewport) {
 		color = ColorOrange;
 	}

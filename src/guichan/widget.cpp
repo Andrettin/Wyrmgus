@@ -62,7 +62,7 @@
 #include "guichan/widget.h"
 
 #include "guichan/sdl/sdlinput.h"
-#include "SDL.h"
+#include <SDL.h>
 extern int Str2SdlKey(const char *str);
 
 int convertKey(const char *key)

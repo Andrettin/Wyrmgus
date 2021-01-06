@@ -49,7 +49,7 @@
 
 
 int FogOfWarOpacity;                 /// Fog of war Opacity.
-Uint32 FogOfWarColorSDL;
+uint32_t FogOfWarColorSDL;
 CColor FogOfWarColor;
 
 std::shared_ptr<CGraphic> CMap::FogGraphics;

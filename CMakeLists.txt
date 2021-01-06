@@ -509,7 +509,6 @@ set(video_SRCS
 	src/video/linedraw.cpp
 	src/video/png.cpp
 	src/video/sdl.cpp
-	src/video/shaders.cpp
 	src/video/sprite.cpp
 	src/video/video.cpp
 )
@@ -974,7 +973,6 @@ set(stratagus_video_HDRS
 	src/video/font.h
 	src/video/font_color.h
 	src/video/intern_video.h
-	src/video/renderer.h
 	src/video/video.h
 )
 
@@ -1024,7 +1022,6 @@ set(stratagus_generic_HDRS
 	src/include/results.h
 	src/include/script.h
 	src/include/settings.h
-	src/include/shaders.h
 	src/include/stratagus.h
 	src/include/title.h
 	src/include/translate.h
@@ -1612,8 +1609,6 @@ target_precompile_headers(stratagus PRIVATE
 	<QThread>
 	<QVariant>
 	<QVariantList>
-	<SDL.h>
-	<SDL_mixer.h>
 	src/util/point_operators.h #to ensure the / operator with an int as RHS is used instead of the Qt one with qreal (which uses rounding)
 	src/util/size_operators.h #as above
 )

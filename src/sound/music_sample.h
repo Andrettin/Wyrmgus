@@ -27,6 +27,8 @@
 
 #pragma once
 
+#include <SDL_mixer.h>
+
 namespace wyrmgus {
 
 class music_sample final

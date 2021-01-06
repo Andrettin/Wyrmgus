@@ -90,7 +90,38 @@
 #include "util/image_util.h"
 #include "video/font.h"
 
-#include "SDL.h"
+#include <SDL.h>
+
+#ifdef USE_GLES
+#include "GLES/gl.h"
+#endif
+
+#ifdef USE_OPENGL
+#ifdef __APPLE__
+#define GL_GLEXT_PROTOTYPES 1
+#endif
+#include <SDL_opengl.h>
+#endif
+
+#if SDL_BYTEORDER == SDL_LIL_ENDIAN
+#define RSHIFT  0
+#define GSHIFT  8
+#define BSHIFT  16
+#define ASHIFT  24
+#define RMASK   0x000000ff
+#define GMASK   0x0000ff00
+#define BMASK   0x00ff0000
+#define AMASK   0xff000000
+#else
+#define RSHIFT  24
+#define GSHIFT  16
+#define BSHIFT  8
+#define ASHIFT  0
+#define RMASK   0xff000000
+#define GMASK   0x00ff0000
+#define BMASK   0x0000ff00
+#define AMASK   0x000000ff
+#endif
 
 /**
 **  Structure of pushed clippings.
@@ -152,8 +183,6 @@ std::unique_ptr<CColorCycling> CColorCycling::s_instance;
 //Wyrmgus start
 //bool ZoomNoResize;
 bool ZoomNoResize = false;
-//bool GLShaderPipelineSupported = true;
-bool GLShaderPipelineSupported = false;
 //Wyrmgus end
 
 char VideoForceFullScreen;           /// fullscreen set from commandline
@@ -172,18 +201,18 @@ static std::vector<Clip> Clips;
 int VideoSyncSpeed = 100;            /// 0 disable interrupts
 int SkipFrames;                      /// Skip this frames
 
-Uint32 ColorBlack;
-Uint32 ColorDarkGreen;
-Uint32 ColorLightBlue;
-Uint32 ColorBlue;
-Uint32 ColorOrange;
-Uint32 ColorWhite;
-Uint32 ColorLightGray;
-Uint32 ColorGray;
-Uint32 ColorDarkGray;
-Uint32 ColorRed;
-Uint32 ColorGreen;
-Uint32 ColorYellow;
+uint32_t ColorBlack;
+uint32_t ColorDarkGreen;
+uint32_t ColorLightBlue;
+uint32_t ColorBlue;
+uint32_t ColorOrange;
+uint32_t ColorWhite;
+uint32_t ColorLightGray;
+uint32_t ColorGray;
+uint32_t ColorDarkGray;
+uint32_t ColorRed;
+uint32_t ColorGreen;
+uint32_t ColorYellow;
 
 /**
 **  Set clipping for graphic routines.
@@ -272,6 +301,36 @@ bool CVideo::ResizeScreen(int w, int h)
 		return true;
 	}
 	return false;
+}
+
+uint32_t CVideo::MapRGBA(uint8_t r, uint8_t g, uint8_t b, uint8_t a)
+{
+	return ((r << RSHIFT) | (g << GSHIFT) | (b << BSHIFT) | (a << ASHIFT));
+}
+
+void CVideo::GetRGB(uint32_t c, uint8_t *r, uint8_t *g, uint8_t *b)
+{
+	*r = (c >> RSHIFT) & 0xff;
+	*g = (c >> GSHIFT) & 0xff;
+	*b = (c >> BSHIFT) & 0xff;
+}
+
+void CVideo::GetRGBA(uint32_t c, uint8_t *r, uint8_t *g, uint8_t *b, uint8_t *a)
+{
+	*r = (c >> RSHIFT) & 0xff;
+	*g = (c >> GSHIFT) & 0xff;
+	*b = (c >> BSHIFT) & 0xff;
+	*a = (c >> ASHIFT) & 0xff;
+}
+
+QColor CVideo::GetRGBA(const uint32_t c)
+{
+	QColor color;
+	color.setRed((c >> RSHIFT) & 0xff);
+	color.setGreen((c >> GSHIFT) & 0xff);
+	color.setBlue((c >> BSHIFT) & 0xff);
+	color.setAlpha((c >> ASHIFT) & 0xff);
+	return color;
 }
 
 /**

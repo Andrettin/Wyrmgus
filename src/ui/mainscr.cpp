@@ -199,9 +199,9 @@ static void UiDrawLifeBar(const CUnit &unit, int x, int y)
 	//Wyrmgus end
 
 	if (unit.Variable[HP_INDEX].Value) {
-		Uint32 color;
+		uint32_t color;
 		//Wyrmgus start
-		Uint32 lighter_color;
+		uint32_t lighter_color;
 //		int f = (100 * unit.Variable[HP_INDEX].Value) / unit.Variable[HP_INDEX].Max;
 		int f = (100 * unit.Variable[HP_INDEX].Value) / unit.GetModifiedVariable(HP_INDEX, VariableAttribute::Max);
 		//Wyrmgus end
@@ -1386,7 +1386,7 @@ void MessagesDisplay::DrawMessages()
 			// background so the text is easier to read
 			if (MessagesCount) {
 				int textHeight = MessagesCount * (UI.MessageFont->Height() + 1 * scale_factor);
-				Uint32 color = CVideo::MapRGB(38, 38, 78);
+				uint32_t color = CVideo::MapRGB(38, 38, 78);
 				//Wyrmgus start
 				/*
 				Video.FillTransRectangleClip(color, UI.MapArea.X + 7, UI.MapArea.Y + 7,

@@ -38,7 +38,6 @@ class FileException
 {
 };
 
-
 /**
 **  Abstract class representing files one can write to.
 */

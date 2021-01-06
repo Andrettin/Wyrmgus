@@ -44,6 +44,13 @@
 #include "iolib.h"
 #include "iocompat.h"
 
+#ifdef USE_OPENGL
+#ifdef __APPLE__
+#define GL_GLEXT_PROTOTYPES 1
+#endif
+#include <SDL_opengl.h>
+#endif
+
 class AutoPng_read_structp
 {
 public:
@@ -155,18 +162,10 @@ void SaveScreenshotPNG(const char *name)
 
 	glPixelStorei(GL_PACK_ALIGNMENT, 1); //allows screenshots of resolution widths that aren't multiples of 4
 	unsigned char* pixels = new unsigned char[Video.ViewportWidth * Video.ViewportHeight * 3];
-	if (GLShaderPipelineSupported) {
-		// switch to real display
-		glBindFramebuffer(GL_FRAMEBUFFER_EXT, 0);
-	}
 #ifdef USE_OPENGL
 	glReadBuffer(GL_FRONT);
 #endif
 	glReadPixels(0, 0, Video.ViewportWidth, Video.ViewportHeight, GL_RGB, GL_UNSIGNED_BYTE, pixels);
-	if (GLShaderPipelineSupported) {
-		// switch back to framebuffer
-		glBindFramebuffer(GL_FRAMEBUFFER_EXT, fullscreenFramebuffer);
-	}
 	for (int i = 0; i < Video.ViewportHeight; ++i) {
 		png_write_row(png_ptr, &pixels[(Video.ViewportHeight - 1 - i) * Video.ViewportWidth * 3]);
 	}

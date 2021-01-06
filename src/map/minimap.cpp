@@ -50,6 +50,13 @@
 #include "video/video.h"
 #include "world.h"
 
+#ifdef USE_OPENGL
+#ifdef __APPLE__
+#define GL_GLEXT_PROTOTYPES 1
+#endif
+#include <SDL_opengl.h>
+#endif
+
 static constexpr int MINIMAP_FAC = 16 * 3;  /// integer scale factor
 
 /// unit attacked are shown red for at least this amount of cycles
@@ -78,7 +85,7 @@ static constexpr int MAX_MINIMAP_EVENTS = 8;
 struct MinimapEvent {
 	PixelPos pos;
 	int Size;
-	Uint32 Color;
+	uint32_t Color;
 } MinimapEvents[MAX_MINIMAP_EVENTS];
 int NumMinimapEvents;
 

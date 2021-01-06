@@ -88,8 +88,6 @@
 ** @see sound.h @see sound.cpp
 ** @see script_sound.cpp @see sound_id.cpp @see sound_server.cpp
 ** @see unitsound.cpp
-** @see sdl_audio.cpp
-** @see ogg.cpp @see wav.cpp
 **
 ** @subsection Video Video
 **
@@ -164,8 +162,6 @@ extern void beos_init(int argc, char **argv);
 #include <Carbon/Carbon.h>
 #undef Button
 #endif
-
-#include "SDL.h"
 
 #include "stratagus.h"
 
@@ -585,16 +581,6 @@ static void ParseCommandLine(int argc, char **argv, Parameters &parameters)
 				Video.FullScreen = 0;
 				continue;
 #if defined(USE_OPENGL) || defined(USE_GLES)
-			case 'x':
-				ShaderIndex = atoi(optarg) % MAX_SHADERS;
-				if (atoi(optarg) == -1) {
-					GLShaderPipelineSupported = false;
-				//Wyrmgus start
-				} else {
-					GLShaderPipelineSupported = true;
-				//Wyrmgus end
-				}
-				continue;
 			case 'Z':
 				ZoomNoResize = 1;
 				Video.ViewportHeight = Video.Height;

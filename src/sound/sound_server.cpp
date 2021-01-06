@@ -56,6 +56,8 @@
 #include "util/queue_util.h"
 #include "util/qunique_ptr.h"
 
+#include <SDL_mixer.h>
+
 static bool SoundInitialized;    /// is sound initialized
 
 static int EffectsVolume = 128;  /// effects sound volume
