@@ -462,7 +462,7 @@ extern void VideoCclRegister();
 /// initialize the video part
 extern void InitVideo();
 
-/// deinitliaize the video part
+/// deinitialize the video part
 void DeInitVideo();
 
 /// Check if a resolution is valid
