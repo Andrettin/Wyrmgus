@@ -14,8 +14,6 @@ extern void play_loading_music();
 extern void play_map_music();
 extern void play_victory_music();
 extern void play_defeat_music();
-extern void StopMusic(void);
-extern bool IsMusicPlaying();
 
 extern int SetChannelVolume(int channel, int volume);
 extern int SetChannelStereo(int channel, int stereo);
