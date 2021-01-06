@@ -540,13 +540,22 @@ void database::parse_folder(const std::filesystem::path &path, std::vector<sml_d
 {
 	std::filesystem::recursive_directory_iterator dir_iterator(path);
 
+	std::map<int, std::vector<std::filesystem::path>> filepaths_by_depth;
+
 	for (const std::filesystem::directory_entry &dir_entry : dir_iterator) {
 		if (!dir_entry.is_regular_file() || dir_entry.path().extension() != ".txt") {
 			continue;
 		}
 
-		sml_parser parser(dir_entry.path());
-		sml_data_list.push_back(parser.parse());
+		//ensure that files with a lower depth will be processed earlier than those with a higher one
+		filepaths_by_depth[dir_iterator.depth()].push_back(dir_entry.path());
+	}
+
+	for (const auto &kv_pair : filepaths_by_depth) {
+		for (const std::filesystem::path &filepath : kv_pair.second) {
+			sml_parser parser(filepath);
+			sml_data_list.push_back(parser.parse());
+		}
 	}
 }
 
