@@ -857,7 +857,7 @@ void unit_type::ProcessConfigData(const CConfigData *config_data)
 			this->civilization = civilization;
 		} else if (key == "faction") {
 			wyrmgus::faction *faction = faction::get(value);
-			this->Faction = faction->ID;
+			this->faction = faction;
 		} else if (key == "animations") {
 			this->animation_set = animation_set::get(value);
 		} else if (key == "icon") {
@@ -1205,8 +1205,8 @@ void unit_type::initialize()
 
 		const wyrmgus::unit_class *unit_class = this->get_unit_class();
 		if (unit_class != nullptr) {
-			if (this->Faction != -1) {
-				faction::get_all()[this->Faction]->set_class_unit_type(unit_class, this);
+			if (this->faction != nullptr) {
+				this->faction->set_class_unit_type(unit_class, this);
 			} else if (this->civilization != nullptr) {
 				this->civilization->set_class_unit_type(unit_class, this);
 			}
@@ -1378,16 +1378,6 @@ void unit_type::set_unit_class(wyrmgus::unit_class *unit_class)
 		this->unit_class->add_unit_type(this);
 	}
 }
-
-const faction *unit_type::get_faction() const
-{
-	if (this->Faction != -1) {
-		return faction::get_all()[this->Faction];
-	}
-
-	return nullptr;
-}
-
 
 const civilization *unit_type::get_faction_civilization(const wyrmgus::faction *faction) const
 {
@@ -1894,8 +1884,8 @@ const name_generator *unit_type::get_name_generator(const wyrmgus::faction *fact
 		if (faction != nullptr && faction->get_civilization() != civilization) {
 			faction = nullptr;
 		}
-		if (this->Faction != -1 && faction == nullptr) {
-			faction = faction::get_all()[this->Faction];
+		if (this->faction != nullptr && faction == nullptr) {
+			faction = this->faction;
 		}
 
 		if (this->BoolFlag[ORGANIC_INDEX].value) {

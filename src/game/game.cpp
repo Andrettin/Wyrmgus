@@ -511,8 +511,8 @@ int WriteMapSetup(const char *mapSetup, CMap &map, int writeTerrain, bool is_mod
 			if (unit_type->get_civilization() != nullptr) {
 				f->printf("\tCivilization = \"%s\",\n", unit_type->get_civilization()->get_identifier().c_str());
 			}
-			if (unit_type->Faction != -1) {
-				f->printf("\tFaction = \"%s\",\n", wyrmgus::faction::get_all()[unit_type->Faction]->get_identifier().c_str());
+			if (unit_type->get_faction() != nullptr) {
+				f->printf("\tFaction = \"%s\",\n", unit_type->get_faction()->get_identifier().c_str());
 			}
 			if (unit_type->get_unit_class() != nullptr) {
 				f->printf("\tClass = \"%s\",\n", unit_type->get_unit_class()->get_identifier().c_str());

@@ -118,7 +118,7 @@ int Spell_Polymorph::Cast(CUnit &caster, const wyrmgus::spell &spell, CUnit *tar
 		} else if (this->civilization != nullptr && this->civilization != target->Type->get_civilization()) {
 			new_unit_type = this->civilization->get_class_unit_type(target->Type->get_unit_class());
 		}
-		if (this->Detachment && target->Type->get_civilization() != nullptr && target->Type->Faction != -1) {
+		if (this->Detachment && target->Type->get_civilization() != nullptr && target->Type->get_faction() != nullptr) {
 			new_unit_type = target->Type->get_civilization()->get_class_unit_type(target->Type->get_unit_class());
 		}
 		if (new_unit_type != nullptr) {

@@ -825,7 +825,10 @@ public:
 	const wyrmgus::civilization *get_faction_civilization(const wyrmgus::faction *faction) const;
 	const wyrmgus::civilization *get_player_civilization(const CPlayer *player) const;
 
-	const faction *get_faction() const;
+	const wyrmgus::faction *get_faction() const
+	{
+		return this->faction;
+	}
 
 	const QSize &get_tile_size() const
 	{
@@ -947,9 +950,9 @@ public:
 	const std::string &get_default_button_key(const CPlayer *player) const;
 	bool CanExperienceUpgradeTo(const unit_type *type) const;
 	std::string GetNamePlural() const;
-	std::string generate_personal_name(const faction *faction, const gender gender) const;
+	std::string generate_personal_name(const wyrmgus::faction *faction, const gender gender) const;
 	bool is_personal_name_valid(const std::string &name, const faction *faction, const gender gender) const;
-	const name_generator *get_name_generator(const faction *faction, const gender gender) const;
+	const name_generator *get_name_generator(const wyrmgus::faction *faction, const gender gender) const;
 	//Wyrmgus end
 
 	wyrmgus::item_class get_item_class() const
@@ -1029,8 +1032,8 @@ private:
 	wyrmgus::unit_class *unit_class = nullptr; //unit class (e.g. infantry, archer, etc.)
 	bool template_type = false;
 	wyrmgus::civilization *civilization = nullptr; //which civilization this unit belongs to, if any
+	wyrmgus::faction *faction = nullptr; //which faction this unit belongs to, if any
 public:
-	int Faction = -1;				/// Which faction this unit belongs to, if any
 	std::string RequirementsString;	/// Requirements string of the unit type
 	std::string ExperienceRequirementsString;	/// Experience requirements string of the unit type
 	std::string BuildingRulesString;	/// Building rules string of the unit type

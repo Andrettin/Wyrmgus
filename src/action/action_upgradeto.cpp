@@ -246,8 +246,8 @@ int TransformUnitIntoType(CUnit &unit, const wyrmgus::unit_type &newtype)
 			unit.SetIndividualUpgrade(civilization_upgrade, 0);
 		}
 	}
-	if (oldtype.get_civilization() != nullptr && oldtype.Faction != -1 && !wyrmgus::faction::get_all()[oldtype.Faction]->FactionUpgrade.empty()) {
-		CUpgrade *faction_upgrade = CUpgrade::try_get(wyrmgus::faction::get_all()[oldtype.Faction]->FactionUpgrade);
+	if (oldtype.get_civilization() != nullptr && oldtype.get_faction() != nullptr && !oldtype.get_faction()->FactionUpgrade.empty()) {
+		CUpgrade *faction_upgrade = CUpgrade::try_get(oldtype.get_faction()->FactionUpgrade);
 		if (faction_upgrade) {
 			unit.SetIndividualUpgrade(faction_upgrade, 0);
 		}
@@ -258,8 +258,8 @@ int TransformUnitIntoType(CUnit &unit, const wyrmgus::unit_type &newtype)
 			unit.SetIndividualUpgrade(civilization_upgrade, 1);
 		}
 	}
-	if (newtype.get_civilization() != nullptr && newtype.Faction != -1 && !wyrmgus::faction::get_all()[newtype.Faction]->FactionUpgrade.empty()) {
-		CUpgrade *faction_upgrade = CUpgrade::try_get(wyrmgus::faction::get_all()[newtype.Faction]->FactionUpgrade);
+	if (newtype.get_civilization() != nullptr && newtype.get_faction() != nullptr && !newtype.get_faction()->FactionUpgrade.empty()) {
+		CUpgrade *faction_upgrade = CUpgrade::try_get(newtype.get_faction()->FactionUpgrade);
 		if (faction_upgrade) {
 			unit.SetIndividualUpgrade(faction_upgrade, 1);
 		}

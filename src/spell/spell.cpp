@@ -214,7 +214,7 @@ static bool PassCondition(const CUnit &caster, const wyrmgus::spell &spell, cons
 		}
 	}
 	if (condition->FactionUnit != CONDITION_TRUE) {
-		if ((condition->FactionUnit == CONDITION_ONLY) ^ (caster.Type->Faction != -1)) {
+		if ((condition->FactionUnit == CONDITION_ONLY) ^ (caster.Type->get_faction() != nullptr)) {
 			return false;
 		}
 	}

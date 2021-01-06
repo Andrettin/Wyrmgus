@@ -1583,9 +1583,9 @@ static int CclDefineUnitType(lua_State *l)
 			wyrmgus::civilization *civilization = wyrmgus::civilization::get(civilization_name);
 			type->civilization = civilization;
 		} else if (!strcmp(value, "Faction")) {
-			std::string faction_name = LuaToString(l, -1);
+			const std::string faction_name = LuaToString(l, -1);
 			wyrmgus::faction *faction = wyrmgus::faction::get(faction_name);
-			type->Faction = faction->ID;
+			type->faction = faction;
 		} else if (!strcmp(value, "Notes")) {
 			type->set_notes(LuaToString(l, -1));
 		} else if (!strcmp(value, "Description")) {
@@ -2010,8 +2010,8 @@ static int CclGetUnitTypeData(lua_State *l)
 		}
 		return 1;
 	} else if (!strcmp(data, "Faction")) {
-		if (type->Faction != -1) {
-			lua_pushstring(l, wyrmgus::faction::get_all()[type->Faction]->get_identifier().c_str());
+		if (type->get_faction() != nullptr) {
+			lua_pushstring(l, type->get_faction()->get_identifier().c_str());
 		} else {
 			lua_pushstring(l, "");
 		}

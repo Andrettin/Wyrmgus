@@ -986,9 +986,9 @@ void CUnit::apply_character_properties()
 			this->SetIndividualUpgrade(civilization_upgrade, 1);
 		}
 	}
-	if (this->Type->Faction != -1 && !wyrmgus::faction::get_all()[this->Type->Faction]->FactionUpgrade.empty()) {
-		CUpgrade *faction_upgrade = CUpgrade::try_get(wyrmgus::faction::get_all()[this->Type->Faction]->FactionUpgrade);
-		if (faction_upgrade) {
+	if (this->Type->get_faction() != nullptr && !this->Type->get_faction()->FactionUpgrade.empty()) {
+		const CUpgrade *faction_upgrade = CUpgrade::try_get(this->Type->get_faction()->FactionUpgrade);
+		if (faction_upgrade != nullptr) {
 			this->SetIndividualUpgrade(faction_upgrade, 1);
 		}
 	}
@@ -1446,14 +1446,14 @@ void CUnit::ChooseButtonIcon(const ButtonCmd button_action)
 	
 	if (this->Type->get_civilization() != nullptr) {
 		const wyrmgus::civilization *civilization = this->Type->get_civilization();
-		int faction = this->Type->Faction;
+		const wyrmgus::faction *faction = this->Type->get_faction();
 		
-		if (faction == -1 && this->Player->Race == civilization->ID) {
-			faction = this->Player->Faction;
+		if (faction == nullptr && this->Player->get_civilization() == civilization) {
+			faction = this->Player->get_faction();
 		}
 		
-		if (faction != -1 && wyrmgus::faction::get_all()[faction]->ButtonIcons.find(button_action) != wyrmgus::faction::get_all()[faction]->ButtonIcons.end()) {
-			this->ButtonIcons[button_action] = wyrmgus::faction::get_all()[faction]->ButtonIcons[button_action].Icon;
+		if (faction != nullptr && faction->ButtonIcons.find(button_action) != faction->ButtonIcons.end()) {
+			this->ButtonIcons[button_action] = faction->ButtonIcons.find(button_action)->second.Icon;
 			return;
 		} else if (PlayerRaces.ButtonIcons[civilization->ID].find(button_action) != PlayerRaces.ButtonIcons[civilization->ID].end()) {
 			this->ButtonIcons[button_action] = PlayerRaces.ButtonIcons[civilization->ID][button_action].Icon;
@@ -3085,14 +3085,14 @@ CUnit *MakeUnit(const wyrmgus::unit_type &type, CPlayer *player)
 	//Wyrmgus start
 	// grant the unit the civilization/faction upgrades of its respective civilization/faction, so that it is able to pursue its upgrade line in experience upgrades even if it changes hands
 	if (unit->Type->get_civilization() != nullptr) {
-		CUpgrade *civilization_upgrade = unit->Type->get_civilization()->get_upgrade();
+		const CUpgrade *civilization_upgrade = unit->Type->get_civilization()->get_upgrade();
 		if (civilization_upgrade != nullptr) {
 			unit->SetIndividualUpgrade(civilization_upgrade, 1);
 		}
 	}
-	if (unit->Type->Faction != -1 && !wyrmgus::faction::get_all()[unit->Type->Faction]->FactionUpgrade.empty()) {
-		CUpgrade *faction_upgrade = CUpgrade::try_get(wyrmgus::faction::get_all()[unit->Type->Faction]->FactionUpgrade);
-		if (faction_upgrade) {
+	if (unit->Type->get_faction() != nullptr && !unit->Type->get_faction()->FactionUpgrade.empty()) {
+		const CUpgrade *faction_upgrade = CUpgrade::try_get(unit->Type->get_faction()->FactionUpgrade);
+		if (faction_upgrade != nullptr) {
 			unit->SetIndividualUpgrade(faction_upgrade, 1);
 		}
 	}
@@ -3559,17 +3559,13 @@ void CUnit::UpdateSettlement()
 		if (!this->settlement) {
 			const wyrmgus::civilization *civilization = this->get_civilization();
 			
-			int faction_id = this->Type->Faction;
+			const wyrmgus::faction *faction = this->Type->get_faction();
 			if (this->Player->get_faction() != nullptr && this->Player->get_civilization() == civilization && this->Type == this->Player->get_faction()->get_class_unit_type(this->Type->get_unit_class())) {
-				faction_id = this->Player->Faction;
-			}
-			const wyrmgus::faction *faction = nullptr;
-			if (faction_id != -1) {
-				faction = wyrmgus::faction::get_all()[faction_id];
+				faction = this->Player->get_faction();
 			}
 
 			std::vector<const wyrmgus::site *> potential_settlements;
-			if (civilization) {
+			if (civilization != nullptr) {
 				for (const wyrmgus::site *site : civilization->sites) {
 					if (!site->can_be_randomly_generated()) {
 						continue;
