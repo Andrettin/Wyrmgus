@@ -1,7 +1,5 @@
-$extern void InitVideo();
 $extern void ShowFullImage(const std::string& name, unsigned int timeOutInSecond);
 
-void InitVideo();
 extern void ShowFullImage(const std::string name, unsigned int timeOutInSecond);
 
 class CVideo
