@@ -16,7 +16,6 @@ $#include "item/unique_item.h"
 $#include "map/map.h"
 $#include "map/minimap.h"
 $#include "mod.h"
-$#include "movie.h"
 $#include "netconnect.h"
 $#include "player.h"
 //Wyrmgus start

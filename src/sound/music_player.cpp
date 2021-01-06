@@ -113,8 +113,15 @@ void music_player::play_sample(music_sample *sample)
 		sample->load();
 	}
 
-	Mix_VolumeMusic(GetMusicVolume() * this->current_volume_modifier / 100 * MIX_MAX_VOLUME / MaxVolume);
-	Mix_PlayMusic(sample->get_data(), 0);
+	const int volume = Mix_VolumeMusic(GetMusicVolume() * this->current_volume_modifier / 100 * MIX_MAX_VOLUME / MaxVolume);
+	if (volume == 0 && GetMusicVolume() != 0) {
+		std::cerr << "Failed to set volume for playing music." << std::endl;
+	}
+
+	const int result = Mix_PlayMusic(sample->get_data(), 0);
+	if (result == -1) {
+		std::cerr << "Failed to play music file \"" + sample->get_filepath().string() + "\"." << std::endl;
+	}
 }
 
 const music *music_player::get_next_music() const

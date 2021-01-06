@@ -338,7 +338,6 @@ set(sound_SRCS
 	src/sound/game_sound_set.cpp
 	src/sound/music.cpp
 	src/sound/music_player.cpp
-	src/sound/ogg.cpp
 	src/sound/script_sound.cpp
 	src/sound/sound.cpp
 	src/sound/sound_id.cpp
@@ -508,7 +507,6 @@ set(video_SRCS
 	src/video/font_color.cpp
 	src/video/graphic.cpp
 	src/video/linedraw.cpp
-	src/video/movie.cpp
 	src/video/png.cpp
 	src/video/sdl.cpp
 	src/video/shaders.cpp
@@ -1008,7 +1006,6 @@ set(stratagus_generic_HDRS
 	src/include/missile.h
 	src/include/missileconfig.h
 	src/include/mod.h
-	src/include/movie.h
 	src/include/myendian.h
 	src/include/net_lowlevel.h
 	src/include/net_message.h
@@ -1180,8 +1177,6 @@ endif()
 
 find_package(BZip2)
 find_package(StackTrace)
-find_package(OggVorbis)
-find_package(Theora)
 
 find_package(X11)
 find_package(OpenGL)
@@ -1221,8 +1216,6 @@ option(ENABLE_TOUCHSCREEN "Use touchscreen input" OFF)
 
 option(WITH_BZIP2 "Compile Stratagus with BZip2 compression support" OFF)
 option(WITH_PHYSFS "Compile Stratagus with PhysFS support" OFF)
-option(WITH_OGGVORBIS "Compile Stratagus with OGG/Vorbis sound library" ON)
-option(WITH_THEORA "Compile Stratagus with Theroa video library" ON)
 option(WITH_STACKTRACE "Compile Stratagus with StackTrace library" OFF)
 
 option(WITH_X11 "Compile Stratagus with X11 clipboard pasting support" ON)
@@ -1288,18 +1281,6 @@ if(WITH_PHYSFS AND PHYSFS_FOUND)
 	add_definitions(-DPHYSFS_DATAFILE="data.zip")
 	include_directories(${PHYSFS_INCLUDE_DIR})
 	set(stratagus_LIBS ${stratagus_LIBS} ${PHYSFS_LIBRARY})
-endif()
-
-if(WITH_OGGVORBIS AND OGGVORBIS_FOUND)
-	add_definitions(-DUSE_VORBIS)
-	include_directories(${OGGVORBIS_INCLUDE_DIR})
-	set(stratagus_LIBS ${stratagus_LIBS} ${OGG_LIBRARY} ${VORBIS_LIBRARY})
-endif()
-
-if(WITH_THEORA AND THEORA_FOUND)
-	add_definitions(-DUSE_THEORA)
-	include_directories(${THEORA_INCLUDE_DIR})
-	set(stratagus_LIBS ${stratagus_LIBS} ${THEORA_LIBRARY})
 endif()
 
 if(WITH_STACKTRACE AND STACKTRACE_FOUND)
@@ -1564,9 +1545,7 @@ endif()
 
 log_package("Bzip2" "BZIP2")
 log_package("PhysFS" "PHYSFS")
-log_package("Ogg/Vorbis" "OGGVORBIS")
 log_package("StackTrace" "STACKTRACE")
-log_package("Theora" "THEORA")
 log_package("X11" "X11")
 
 if(WITH_RENDERER STREQUAL "OpenGL" AND OPENGL_FOUND)

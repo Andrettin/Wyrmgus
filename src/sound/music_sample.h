@@ -57,6 +57,11 @@ public:
 		}
 	}
 
+	const std::filesystem::path &get_filepath() const
+	{
+		return this->filepath;
+	}
+
 	Mix_Music *get_data() const
 	{
 		return this->data;

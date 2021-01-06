@@ -304,12 +304,6 @@ static void PrintHeader()
 #ifdef USE_BZ2LIB
 		"BZ2LIB "
 #endif
-#ifdef USE_VORBIS
-		"VORBIS "
-#endif
-#ifdef USE_THEORA
-		"THEORA "
-#endif
 #ifdef USE_OPENGL
 		"OPENGL "
 #endif

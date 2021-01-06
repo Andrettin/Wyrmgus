@@ -31,7 +31,6 @@
 
 #include "title.h"
 
-#include "movie.h"
 #include "sound/sound_server.h"
 #include "editor.h"
 #include "video/font.h"
@@ -171,7 +170,7 @@ void ShowTitleScreens()
 			continue;
 		}
 
-		if (!title_screen.File.empty() && PlayMovie(title_screen.File)) {
+		if (!title_screen.File.empty()) {
 			title_screen.ShowTitleImage();
 		}
 
