@@ -753,6 +753,16 @@ void unit_type::process_sml_scope(const sml_data &scope)
 			database::process_sml_data(res_info_ptr, child_scope);
 		});
 	} else if (tag == "variations") {
+		if (scope.get_operator() == sml_operator::assignment) {
+			//remove previously defined variations, if any
+			this->variations.clear();
+
+			//remove previously defined layer variations, if any
+			for (int i = 0; i < MaxImageLayers; ++i) {
+				this->LayerVariations[i].clear();
+			}
+		}
+
 		this->DefaultStat.Variables[VARIATION_INDEX].Enable = 1;
 		this->DefaultStat.Variables[VARIATION_INDEX].Value = 0;
 
