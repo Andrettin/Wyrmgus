@@ -33,8 +33,6 @@
 #include <QCommandLineParser>
 #include <QQmlApplicationEngine>
 
-#include <SDL.h>
-
 static void write_qt_message(QtMsgType type, const QMessageLogContext &context, const QString &msg)
 {
 	std::ostream *ostream = nullptr;

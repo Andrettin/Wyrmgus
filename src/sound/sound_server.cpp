@@ -56,6 +56,9 @@
 #include "util/queue_util.h"
 #include "util/qunique_ptr.h"
 
+#include <QAudioDeviceInfo>
+#include <QAudioFormat>
+
 #include <SDL_mixer.h>
 
 static bool SoundInitialized;    /// is sound initialized
@@ -457,20 +460,44 @@ static void InitSdlSound()
 		throw std::runtime_error("Error in Mix_Init: " + std::string(Mix_GetError()));
 	}
 
+	const QAudioDeviceInfo info = QAudioDeviceInfo::defaultOutputDevice();
+	const QAudioFormat format = info.preferredFormat();
+
 	//open the audio device, forcing the desired format
-	uint16_t format = 0;
-	switch (wyrmgus::sample::sample_size) {
+	uint16_t sdl_audio_format = 0;
+
+	switch (format.sampleSize()) {
 		case 8:
-			format = AUDIO_U8;
+			sdl_audio_format |= 0x0008;
 			break;
 		case 16:
-			format = AUDIO_S16SYS;
+			sdl_audio_format |= 0x0010;
+
+			switch (format.byteOrder()) {
+				case QAudioFormat::LittleEndian:
+					break;
+				case QAudioFormat::BigEndian:
+					sdl_audio_format |= 0x1000;
+					break;
+				default:
+					throw std::runtime_error("Unexpected byte order: " + std::to_string(format.byteOrder()));
+			}
 			break;
 		default:
-			throw std::runtime_error("Unexpected sample size: " + std::to_string(wyrmgus::sample::sample_size));
+			throw std::runtime_error("Unexpected sample size: " + std::to_string(format.sampleSize()));
 	}
 
-	result = Mix_OpenAudio(wyrmgus::sample::frequency, format, wyrmgus::sample::channel_count, 1024);
+	switch (format.sampleType()) {
+		case QAudioFormat::UnSignedInt:
+			break;
+		case QAudioFormat::SignedInt:
+			sdl_audio_format |= 0x8000;
+			break;
+		default:
+			throw std::runtime_error("Unexpected sample type: " + std::to_string(format.sampleType()));
+	}
+
+	result = Mix_OpenAudio(format.sampleRate(), sdl_audio_format, format.channelCount(), 1024);
 	if (result == -1) {
 		throw std::runtime_error("Error in Mix_OpenAudio: " + std::string(Mix_GetError()));
 	}
@@ -493,6 +520,7 @@ int InitSound()
 	// pre-start menus!
 	// initialize channels
 	Mix_AllocateChannels(MaxChannels);
+
 	Mix_ChannelFinished(ChannelFinished);
 
 	for (int i = 0; i < MaxChannels; ++i) {
