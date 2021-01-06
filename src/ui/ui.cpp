@@ -75,12 +75,17 @@ CUserInterface &UI = *CUserInterface::get();
 */
 void ShowLoadProgress(const char *fmt, ...)
 {
+	if (SDL_WasInit(SDL_INIT_VIDEO) == 0) {
+		return;
+	}
+
 	static unsigned int lastProgressUpdate = SDL_GetTicks();
-	if (SDL_GetTicks() < lastProgressUpdate + 16) {
+	const uint32_t ticks = SDL_GetTicks();
+	if (ticks < lastProgressUpdate + 16) {
 		// Only show progress updates every c. 1/60th of a second, otherwise we're waiting for the screen too much
 		return;
 	}
-	lastProgressUpdate = SDL_GetTicks();
+	lastProgressUpdate = ticks;
 
 	CheckMusicFinished(); //update music
 	UpdateLoadProgress();
