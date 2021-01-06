@@ -38,10 +38,6 @@ namespace wyrmgus {
 class sample final
 {
 public:
-	static constexpr int channel_count = 2;
-	static constexpr int sample_size = 16;
-	static constexpr int frequency = 44100;
-
 	explicit sample(const std::filesystem::path &filepath) : filepath(filepath)
 	{
 		if (!std::filesystem::exists(filepath)) {
@@ -83,21 +79,6 @@ public:
 	int get_length() const
 	{
 		return static_cast<int>(this->chunk->alen);
-	}
-
-	int get_channel_count() const
-	{
-		return sample::channel_count;
-	}
-
-	int get_sample_size() const
-	{
-		return sample::sample_size;
-	}
-
-	int get_frequency() const
-	{
-		return sample::frequency;
 	}
 
 	Mix_Chunk *get_chunk() const
