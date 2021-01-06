@@ -454,7 +454,7 @@ bool SoundEnabled()
 */
 static void InitSdlSound()
 {
-	static constexpr int init_flags = 0;
+	static constexpr int init_flags = MIX_INIT_OGG;
 	int result = Mix_Init(init_flags);
 	if (result != init_flags) {
 		throw std::runtime_error("Error in Mix_Init: " + std::string(Mix_GetError()));
