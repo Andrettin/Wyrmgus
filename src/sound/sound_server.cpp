@@ -75,11 +75,6 @@ static constexpr int MaxChannels = 64; //how many channels are supported
 
 static SoundChannel Channels[MaxChannels];
 
-static struct {
-	std::unique_ptr<wyrmgus::sample> Sample;       /// Music sample
-	void (*FinishedCallback)(); /// Callback for when music finishes playing
-} MusicChannel;
-
 static void ChannelFinished(int channel);
 
 /*----------------------------------------------------------------------------
