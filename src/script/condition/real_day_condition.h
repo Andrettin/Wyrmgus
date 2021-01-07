@@ -27,6 +27,7 @@
 
 #pragma once
 
+#include "network.h"
 #include "script/condition/condition.h"
 
 namespace wyrmgus {
@@ -43,6 +44,11 @@ public:
 	{
 		Q_UNUSED(player)
 		Q_UNUSED(ignore_units)
+
+		if (IsNetworkGame()) {
+			//always false in multiplayer games, to prevent desyncs if the real day changes during a game
+			return false;
+		}
 
 		const QDateTime current_date = QDateTime::currentDateTimeUtc();
 		const int current_day = current_date.date().day();
