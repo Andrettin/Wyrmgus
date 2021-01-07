@@ -40,6 +40,8 @@ class music_player final : public singleton<music_player>
 public:
 	music_player();
 
+	bool is_playing() const;
+
 	void play_music_type(const music_type type);
 	void play();
 	void play_music(const music *music);

@@ -145,11 +145,11 @@ static void MusicFinishedCallback()
 */
 void CheckMusicFinished()
 {
-	if (IsMusicPlaying() && Mix_FadingMusic() != MIX_FADING_OUT) {
+	if (wyrmgus::music_player::get()->is_playing() && Mix_FadingMusic() != MIX_FADING_OUT) {
 		wyrmgus::music_player::get()->check_current_music();
 	}
 
-	const bool finished = !IsMusicPlaying();
+	const bool finished = !wyrmgus::music_player::get()->is_playing();
 
 	if (finished && SoundEnabled() && IsMusicEnabled() && CallbackMusic) {
 		wyrmgus::music_player::get()->play();

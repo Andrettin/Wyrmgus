@@ -95,8 +95,6 @@ extern int GetMusicVolume();
 extern void SetMusicEnabled(bool enabled);
 /// Check if music is enabled
 extern bool IsMusicEnabled();
-/// Check if music is playing
-extern bool IsMusicPlaying();
 
 /// Check if sound is enabled
 extern bool SoundEnabled();

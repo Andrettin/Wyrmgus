@@ -416,14 +416,6 @@ bool IsMusicEnabled()
 }
 
 /**
-**  Check if music is playing
-*/
-bool IsMusicPlaying()
-{
-	return Mix_PlayingMusic() == 1;
-}
-
-/**
 **  Add tension to music
 */
 void AddMusicTension(int value)
@@ -460,8 +452,8 @@ static void InitSdlSound()
 		throw std::runtime_error("Error in Mix_Init: " + std::string(Mix_GetError()));
 	}
 
-	const QAudioDeviceInfo info = QAudioDeviceInfo::defaultOutputDevice();
-	const QAudioFormat format = info.preferredFormat();
+	const QAudioDeviceInfo device_info = QAudioDeviceInfo::defaultOutputDevice();
+	const QAudioFormat format = device_info.preferredFormat();
 
 	//open the audio device, forcing the desired format
 	uint16_t sdl_audio_format = 0;
