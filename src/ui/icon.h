@@ -78,11 +78,8 @@ public:
 	static constexpr const char *class_identifier = "icon";
 	static constexpr const char *database_folder = "icons";
 
-	//needed by scripts via tolua++ for now
-	static icon *Get(const std::string &ident)
-	{
-		return icon::get(ident);
-	}
+	static int get_to_load_count();
+	static void load_all();
 
 	explicit icon(const std::string &identifier);
 

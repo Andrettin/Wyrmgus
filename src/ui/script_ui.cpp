@@ -1245,11 +1245,17 @@ static int CclGetIconData(lua_State *l)
 	if (lua_gettop(l) < 2) {
 		LuaError(l, "incorrect argument");
 	}
-	std::string icon_ident = LuaToString(l, 1);
+
+	const std::string icon_ident = LuaToString(l, 1);
 	const wyrmgus::icon *icon = wyrmgus::icon::get(icon_ident);
 	const char *data = LuaToString(l, 2);
 
 	if (!strcmp(data, "File")) {
+		if (!icon->is_loaded()) {
+			//ensure that the icon is loaded if its graphics will be used by a widget
+			icon->load();
+		}
+
 		lua_pushstring(l, icon->get_file().string().c_str());
 		return 1;
 	} if (!strcmp(data, "Frame")) {

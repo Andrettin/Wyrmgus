@@ -41,6 +41,15 @@ public:
 	static constexpr const char *database_folder = "resource_icons";
 	static constexpr QSize size = QSize(14, 14);
 
+	static void load_all()
+	{
+		for (resource_icon *resource_icon : resource_icon::get_all()) {
+			if (!resource_icon->is_loaded()) {
+				resource_icon->load();
+			}
+		}
+	}
+
 	explicit resource_icon(const std::string &identifier) : icon_base(identifier)
 	{
 	}

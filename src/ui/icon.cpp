@@ -40,6 +40,33 @@
 
 namespace wyrmgus {
 
+int icon::get_to_load_count()
+{
+	int count = 0;
+
+	for (const icon *icon : icon::get_all()) {
+		if (!icon->is_loaded()) {
+			++count;
+		}
+	}
+
+	return count;
+}
+
+void icon::load_all()
+{
+	ShowLoadProgress("%s", _("Loading Icons"));
+
+	for (icon *icon : icon::get_all()) {
+		if (!icon->is_loaded()) {
+			UpdateLoadProgress();
+			icon->load();
+			IncItemsLoaded();
+		}
+	}
+}
+
+
 icon::icon(const std::string &identifier) : icon_base(identifier)
 {
 }
@@ -254,10 +281,8 @@ bool IconConfig::LoadNoLog()
 */
 bool IconConfig::Load()
 {
-	bool res = LoadNoLog();
-	if (res == true) {
-		UpdateLoadProgress();
-	} else {
+	const bool res = LoadNoLog();
+	if (!res) {
 		throw std::runtime_error("Can't find icon \"" + this->Name + "\".");
 	}
 	return res;

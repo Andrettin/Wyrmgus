@@ -303,7 +303,6 @@ void CPlayerColorGraphic::DrawPlayerColorFrameClip(const wyrmgus::player_color *
 //Wyrmgus start
 void CPlayerColorGraphic::DrawPlayerColorFrameClipTrans(const wyrmgus::player_color *player_color, unsigned frame, int x, int y, int alpha, const wyrmgus::time_of_day *time_of_day, int show_percent)
 {
-#if defined(USE_OPENGL) || defined(USE_GLES)
 	if (time_of_day == nullptr || !time_of_day->HasColorModification()) {
 		if (this->get_textures(player_color) == nullptr) {
 			MakePlayerColorTexture(this, player_color, nullptr);
@@ -322,7 +321,6 @@ void CPlayerColorGraphic::DrawPlayerColorFrameClipTrans(const wyrmgus::player_co
 		DoDrawFrameClip(this->get_textures(player_color, time_of_day->ColorModification), frame, x, y, show_percent);
 	}
 	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
-#endif
 }
 
 void CPlayerColorGraphic::DrawPlayerColorFrameClipTransX(const wyrmgus::player_color *player_color, unsigned frame, int x, int y, int alpha, const wyrmgus::time_of_day *time_of_day)

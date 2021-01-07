@@ -56,6 +56,9 @@ public:
 		}
 	}
 
+	bool is_loaded() const;
+	void load() const;
+
 	virtual const QSize &get_size() const = 0;
 
 	virtual bool is_grayscale_enabled() const

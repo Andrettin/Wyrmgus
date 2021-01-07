@@ -61,6 +61,8 @@
 #include "ui/button.h"
 #include "ui/button_level.h"
 #include "ui/cursor.h"
+#include "ui/icon.h"
+#include "ui/resource_icon.h"
 #include "ui/ui.h"
 #include "unit/construction.h"
 #include "unit/unit.h"
@@ -203,6 +205,8 @@ void LoadModules()
 	//Wyrmgus start
 	wyrmgus::terrain_type::LoadTerrainTypeGraphics();
 	//Wyrmgus end
+	wyrmgus::resource_icon::load_all();
+	wyrmgus::icon::load_all();
 #ifndef DYNAMIC_LOAD
 	LoadMissileSprites();
 #endif

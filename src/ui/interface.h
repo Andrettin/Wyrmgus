@@ -29,7 +29,6 @@
 
 #pragma once
 
-#include "ui/icon.h"
 #include "vec2i.h"
 
 class CUIButton;

@@ -91,7 +91,9 @@
 #include "translate.h"
 #include "ui/button.h"
 #include "ui/cursor.h"
+#include "ui/icon.h"
 #include "ui/interface.h"
+#include "ui/resource_icon.h"
 #include "ui/ui.h"
 #include "unit/construction.h"
 #include "unit/unit.h"
@@ -1410,6 +1412,7 @@ void CalculateItemsToLoad()
 		if (CPlayer::GetThisPlayer()) {
 			itemsToLoad+= GetCursorsCount();
 		}
+		itemsToLoad += wyrmgus::icon::get_to_load_count();
 		itemsToLoad += GetUnitTypesCount();
 		itemsToLoad += GetDecorationsCount();
 		itemsToLoad += GetConstructionsCount();
@@ -1669,6 +1672,8 @@ void CreateGame(const std::string &filename, CMap *map, bool is_mod)
 	//Wyrmgus start
 	wyrmgus::terrain_type::LoadTerrainTypeGraphics();
 	//Wyrmgus end
+	wyrmgus::resource_icon::load_all();
+	wyrmgus::icon::load_all();
 	InitMissileTypes();
 #ifndef DYNAMIC_LOAD
 	LoadMissileSprites();

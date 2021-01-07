@@ -50,13 +50,25 @@ void icon_base::initialize()
 		throw std::runtime_error("Icon \"" + this->get_identifier() + "\" has no graphics.");
 	}
 
+	data_entry::initialize();
+}
+
+bool icon_base::is_loaded() const
+{
+	return this->graphics->IsLoaded();
+}
+
+void icon_base::load() const
+{
+	if (this->is_loaded()) {
+		return;
+	}
+
 	this->graphics->Load(this->is_grayscale_enabled(), defines::get()->get_scale_factor());
 
 	if (this->get_frame() >= this->graphics->NumFrames) {
 		throw std::runtime_error("Invalid icon frame: \"" + this->get_identifier() + "\" - " + std::to_string(this->get_frame()));
 	}
-
-	data_entry::initialize();
 }
 
 void icon_base::set_file(const std::filesystem::path &filepath)
