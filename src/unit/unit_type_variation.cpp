@@ -69,6 +69,8 @@ void unit_type_variation::process_sml_property(const sml_property &property)
 		this->image_file = database::get()->get_graphics_path(this->unit_type->get_module()) / value;
 	} else if (key == "icon") {
 		this->Icon.Name = value;
+	} else if (key == "weight") {
+		this->Weight = std::stoi(value);
 	} else {
 		throw std::runtime_error("Invalid unit type variation property: \"" + key + "\".");
 	}
