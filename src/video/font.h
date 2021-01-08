@@ -48,23 +48,29 @@ public:
 	static constexpr const char *class_identifier = "font";
 	static constexpr const char *database_folder = "fonts";
 
+	//this function is kept since it is still used in tolua++
+	static font *Get(const std::string &identifier)
+	{
+		font *font = font::get(identifier);
+
+		return font;
+	}
+
 	explicit font(const std::string &ident);
 	virtual ~font();
 
 	virtual void process_sml_property(const sml_property &property) override;
 	virtual void initialize() override;
 
-	static font *Get(const std::string &identifier)
-	{
-		return font::get(identifier);
-	}
+	bool is_loaded() const;
+	void load();
 
-	int Height() const;
-	int Width(const std::string &text) const;
-	int Width(const int number) const;
+	int Height();
+	int Width(const std::string &text);
+	int Width(const int number);
 
-	virtual int getHeight() const override { return Height(); }
-	virtual int getWidth(const std::string &text) const override { return Width(text); }
+	virtual int getHeight() override { return Height(); }
+	virtual int getWidth(const std::string &text) override { return Width(text); }
 	//Wyrmgus start
 //	virtual void drawString(gcn::Graphics *graphics, const std::string &text, int x, int y);
 	virtual void drawString(gcn::Graphics *graphics, const std::string &text, int x, int y, bool is_normal = true) override;
@@ -75,15 +81,13 @@ public:
 	void FreeOpenGL();
 #endif
 
-	CGraphic *GetFontColorGraphic(const wyrmgus::font_color &fontColor) const;
+	CGraphic *get_font_color_graphic(const wyrmgus::font_color *font_color);
 
 	template<bool CLIP>
 	unsigned int DrawChar(CGraphic &g, int utf8, int x, int y) const;
 
 private:
-#if defined(USE_OPENGL) || defined(USE_GLES)
-	void make_font_color_textures();
-#endif
+	void make_font_color_texture(const wyrmgus::font_color *fc);
 	void MeasureWidths();
 
 private:
@@ -97,7 +101,7 @@ private:
 }
 
 ///  Return the 'line' line of the string 's'.
-extern std::string GetLineFont(unsigned int line, const std::string &s, unsigned int maxlen, const wyrmgus::font *font);
+extern std::string GetLineFont(unsigned int line, const std::string &s, unsigned int maxlen, wyrmgus::font *font);
 
 /// Get the hot key from a string
 extern int GetHotKey(const std::string &text);
@@ -112,12 +116,15 @@ extern void ReloadFonts();
 class CLabel
 {
 public:
-	explicit CLabel(const wyrmgus::font *f, const wyrmgus::font_color *nc, const wyrmgus::font_color *rc);
-	explicit CLabel(const wyrmgus::font *f);
+	explicit CLabel(wyrmgus::font *f, const wyrmgus::font_color *nc, const wyrmgus::font_color *rc);
+	explicit CLabel(wyrmgus::font *f);
 
 	int Height() const { return font->Height(); }
 
-	void SetFont(const wyrmgus::font *f) { font = f; }
+	void SetFont(wyrmgus::font *f)
+	{
+		this->font = f;
+	}
 
 	void SetNormalColor(const wyrmgus::font_color *nc);
 
@@ -150,5 +157,5 @@ private:
 private:
 	const wyrmgus::font_color *normal;
 	const wyrmgus::font_color *reverse;
-	const wyrmgus::font *font;
+	wyrmgus::font *font;
 };

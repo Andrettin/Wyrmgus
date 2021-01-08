@@ -41,5 +41,5 @@ public:
 public:
 	int X = 0;
 	int Y = 0;
-	const wyrmgus::font *Font = nullptr;
+	wyrmgus::font *Font = nullptr;
 };

@@ -52,7 +52,7 @@ public:
 	virtual ~CContentType();
 
 	/// Tell how show the variable Index.
-	virtual void Draw(const CUnit &unit, const wyrmgus::font *defaultfont) const = 0;
+	virtual void Draw(const CUnit &unit, wyrmgus::font *defaultfont) const = 0;
 
 	virtual void Parse(lua_State *l) = 0;
 
@@ -72,12 +72,12 @@ public:
 	CContentTypeText();
 	virtual ~CContentTypeText();
 
-	virtual void Draw(const CUnit &unit, const wyrmgus::font *defaultfont) const override;
+	virtual void Draw(const CUnit &unit, wyrmgus::font *defaultfont) const override;
 	virtual void Parse(lua_State *l) override;
 
 private:
 	std::unique_ptr<StringDesc> Text;  /// Text to display.
-	const wyrmgus::font *Font = nullptr; /// Font to use.
+	wyrmgus::font *Font = nullptr; /// Font to use.
 	char Centered = 0;           /// if true, center the display.
 	int Index = -1;              /// Index of the variable to show, -1 if not.
 	VariableAttribute Component; /// Component of the variable.
@@ -94,12 +94,12 @@ public:
 	CContentTypeFormattedText();
 	virtual ~CContentTypeFormattedText() {}
 
-	virtual void Draw(const CUnit &unit, const wyrmgus::font *defaultfont) const override;
+	virtual void Draw(const CUnit &unit, wyrmgus::font *defaultfont) const override;
 	virtual void Parse(lua_State *l) override;
 
 private:
 	std::string Format;          /// Text to display
-	const wyrmgus::font *Font = nullptr; /// Font to use.
+	wyrmgus::font *Font = nullptr; /// Font to use.
 	bool Centered = false;       /// if true, center the display.
 	int Index = -1;              /// Index of the variable to show.
 	VariableAttribute Component; /// Component of the variable.
@@ -114,12 +114,12 @@ public:
 	CContentTypeFormattedText2();
 	virtual ~CContentTypeFormattedText2() {}
 
-	virtual void Draw(const CUnit &unit, const wyrmgus::font *defaultfont) const override;
+	virtual void Draw(const CUnit &unit, wyrmgus::font *defaultfont) const override;
 	virtual void Parse(lua_State *l) override;
 
 private:
 	std::string Format;          /// Text to display
-	const wyrmgus::font *Font = nullptr; /// Font to use.
+	wyrmgus::font *Font = nullptr; /// Font to use.
 	bool Centered = false;       /// if true, center the display.
 	int Index1 = -1;             /// Index of the variable1 to show.
 	VariableAttribute Component1; /// Component of the variable1.
@@ -133,7 +133,7 @@ private:
 class CContentTypeIcon : public CContentType
 {
 public:
-	virtual void Draw(const CUnit &unit, const wyrmgus::font *defaultfont) const override;
+	virtual void Draw(const CUnit &unit, wyrmgus::font *defaultfont) const override;
 	virtual void Parse(lua_State *l) override;
 
 private:
@@ -148,7 +148,7 @@ class CContentTypeLifeBar : public CContentType
 public:
 	CContentTypeLifeBar() : Index(-1), Width(0), Height(0) {}
 
-	virtual void Draw(const CUnit &unit, const wyrmgus::font *defaultfont) const override;
+	virtual void Draw(const CUnit &unit, wyrmgus::font *defaultfont) const override;
 	virtual void Parse(lua_State *l) override;
 
 private:
@@ -169,7 +169,7 @@ class CContentTypeCompleteBar : public CContentType
 public:
 	CContentTypeCompleteBar() : varIndex(-1), width(0), height(0), hasBorder(false), colorIndex(-1) {}
 
-	virtual void Draw(const CUnit &unit, const wyrmgus::font *defaultfont) const override;
+	virtual void Draw(const CUnit &unit, wyrmgus::font *defaultfont) const override;
 	virtual void Parse(lua_State *l) override;
 
 private:

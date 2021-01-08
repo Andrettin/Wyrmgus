@@ -484,7 +484,7 @@ public:
 	/// function to draw the decorations.
 	virtual void Draw(int x, int y, const wyrmgus::unit_type &type, const wyrmgus::unit_variable &var) const override;
 
-	const wyrmgus::font *Font = nullptr;  /// Font to use to display value.
+	wyrmgus::font *Font = nullptr;  /// Font to use to display value.
 	// FIXME : Add Color, format
 };
 

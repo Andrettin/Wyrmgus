@@ -397,7 +397,7 @@ void CViewport::DrawMapBackgroundInViewport() const
 */
 static void ShowUnitName(const CViewport &vp, PixelPos pos, CUnit *unit, bool hidden = false)
 {
-	const wyrmgus::font *font = wyrmgus::defines::get()->get_small_font();
+	wyrmgus::font *font = wyrmgus::defines::get()->get_small_font();
 	int width;
 	int height = font->Height() + 6;
 	CLabel label(font, wyrmgus::defines::get()->get_default_font_color(), wyrmgus::defines::get()->get_default_highlight_font_color());

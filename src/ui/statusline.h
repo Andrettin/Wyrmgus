@@ -55,7 +55,7 @@ public:
 	int Width = 0;
 	int TextX = 0;
 	int TextY = 0;
-	const wyrmgus::font *Font = nullptr;
+	wyrmgus::font *Font = nullptr;
 	int Costs[ManaResCost + 1];
 
 private:

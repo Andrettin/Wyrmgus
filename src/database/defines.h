@@ -91,12 +91,12 @@ public:
 	void process_sml_scope(const sml_data &scope);
 	void initialize();
 
-	const font *get_small_font() const
+	font *get_small_font() const
 	{
 		return this->small_font;
 	}
 
-	const font *get_game_font() const
+	font *get_game_font() const
 	{
 		return this->game_font;
 	}

@@ -66,7 +66,7 @@ PopupConditionPanel::PopupConditionPanel() : ButtonAction(ButtonCmd::None), item
 
 int CPopupContentTypeButtonInfo::GetWidth(const wyrmgus::button &button, int *) const
 {
-	const wyrmgus::font *font = this->Font ? this->Font : wyrmgus::defines::get()->get_small_font();
+	wyrmgus::font *font = this->Font ? this->Font : wyrmgus::defines::get()->get_small_font();
 	std::string draw("");
 	switch (this->InfoType) {
 		case PopupButtonInfo_Hint:
@@ -104,7 +104,7 @@ int CPopupContentTypeButtonInfo::GetWidth(const wyrmgus::button &button, int *) 
 
 int CPopupContentTypeButtonInfo::GetHeight(const wyrmgus::button &button, int *) const
 {
-	const wyrmgus::font *font = this->Font ? this->Font : wyrmgus::defines::get()->get_small_font();
+	wyrmgus::font *font = this->Font ? this->Font : wyrmgus::defines::get()->get_small_font();
 	std::string draw;
 	const int scale_factor = wyrmgus::defines::get()->get_scale_factor();
 
@@ -131,7 +131,7 @@ int CPopupContentTypeButtonInfo::GetHeight(const wyrmgus::button &button, int *)
 
 void CPopupContentTypeButtonInfo::Draw(int x, int y, const CPopup &popup, const unsigned int popupWidth, const wyrmgus::button &button, int *) const
 {
-	const wyrmgus::font *font = this->Font ? this->Font : wyrmgus::defines::get()->get_small_font();
+	wyrmgus::font *font = this->Font ? this->Font : wyrmgus::defines::get()->get_small_font();
 	CLabel label(font, this->TextColor, this->HighlightColor);
 	std::string draw("");
 	const int scale_factor = wyrmgus::defines::get()->get_scale_factor();
@@ -189,7 +189,7 @@ void CPopupContentTypeButtonInfo::Parse(lua_State *l)
 
 int CPopupContentTypeText::GetWidth(const wyrmgus::button &button, int *) const
 {
-	const wyrmgus::font *font = this->Font ? this->Font : wyrmgus::defines::get()->get_small_font();
+	wyrmgus::font *font = this->Font ? this->Font : wyrmgus::defines::get()->get_small_font();
 	//Wyrmgus start
 	button.SetTriggerData();
 	const int resource = button.Value;
@@ -229,7 +229,7 @@ int CPopupContentTypeText::GetWidth(const wyrmgus::button &button, int *) const
 
 int CPopupContentTypeText::GetHeight(const wyrmgus::button &button, int *) const
 {
-	const wyrmgus::font *font = this->Font ? this->Font : wyrmgus::defines::get()->get_small_font();
+	wyrmgus::font *font = this->Font ? this->Font : wyrmgus::defines::get()->get_small_font();
 	const int scale_factor = wyrmgus::defines::get()->get_scale_factor();
 
 	//Wyrmgus start
@@ -258,7 +258,7 @@ CPopupContentTypeText::~CPopupContentTypeText()
 
 void CPopupContentTypeText::Draw(int x, int y, const CPopup &popup, const unsigned int popupWidth, const wyrmgus::button &button, int *) const
 {
-	const wyrmgus::font *font = this->Font ? this->Font : wyrmgus::defines::get()->get_small_font();
+	wyrmgus::font *font = this->Font ? this->Font : wyrmgus::defines::get()->get_small_font();
 	const int scale_factor = wyrmgus::defines::get()->get_scale_factor();
 
 	//Wyrmgus start
@@ -311,7 +311,7 @@ void CPopupContentTypeText::Parse(lua_State *l)
 int CPopupContentTypeCosts::GetWidth(const wyrmgus::button &button, int *Costs) const
 {
 	int popupWidth = 0;
-	const wyrmgus::font *font = this->Font ? this->Font : wyrmgus::defines::get()->get_small_font();
+	wyrmgus::font *font = this->Font ? this->Font : wyrmgus::defines::get()->get_small_font();
 	const int scale_factor = wyrmgus::defines::get()->get_scale_factor();
 
 	for (unsigned int i = 1; i <= MaxCosts; ++i) {
@@ -375,7 +375,7 @@ int CPopupContentTypeCosts::GetHeight(const wyrmgus::button &button, int *Costs)
 	Q_UNUSED(button)
 
 	int popupHeight = 0;
-	const wyrmgus::font *font = this->Font ? this->Font : wyrmgus::defines::get()->get_small_font();
+	wyrmgus::font *font = this->Font ? this->Font : wyrmgus::defines::get()->get_small_font();
 
 	for (unsigned int i = 1; i <= ManaResCost; ++i) {
 		const wyrmgus::resource_icon *icon = nullptr;
@@ -407,7 +407,7 @@ int CPopupContentTypeCosts::GetHeight(const wyrmgus::button &button, int *Costs)
 
 void CPopupContentTypeCosts::Draw(int x, int y, const CPopup &, const unsigned int, const wyrmgus::button &button, int *Costs) const
 {
-	const wyrmgus::font *font = this->Font ? this->Font : wyrmgus::defines::get()->get_small_font();
+	wyrmgus::font *font = this->Font ? this->Font : wyrmgus::defines::get()->get_small_font();
 	CLabel label(font, this->TextColor, this->HighlightColor);
 	const int scale_factor = wyrmgus::defines::get()->get_scale_factor();
 
@@ -538,7 +538,7 @@ void CPopupContentTypeLine::Parse(lua_State *l)
 
 int CPopupContentTypeVariable::GetWidth(const wyrmgus::button &button, int *) const
 {
-	const wyrmgus::font *font = this->Font ? this->Font : wyrmgus::defines::get()->get_small_font();
+	wyrmgus::font *font = this->Font ? this->Font : wyrmgus::defines::get()->get_small_font();
 	//Wyrmgus start
 //	TriggerData.Type = UnitTypes[button.Value];
 	button.SetTriggerData();
@@ -557,7 +557,7 @@ int CPopupContentTypeVariable::GetWidth(const wyrmgus::button &button, int *) co
 
 int CPopupContentTypeVariable::GetHeight(const wyrmgus::button &, int *) const
 {
-	const wyrmgus::font *font = this->Font ? this->Font : wyrmgus::defines::get()->get_small_font();
+	wyrmgus::font *font = this->Font ? this->Font : wyrmgus::defines::get()->get_small_font();
 	return font->Height();
 }
 
@@ -567,7 +567,7 @@ CPopupContentTypeVariable::~CPopupContentTypeVariable()
 
 void CPopupContentTypeVariable::Draw(int x, int y, const CPopup &, const unsigned int, const wyrmgus::button &button, int *) const
 {
-	const wyrmgus::font *font = this->Font ? this->Font : wyrmgus::defines::get()->get_small_font(); // Font to use.
+	wyrmgus::font *font = this->Font ? this->Font : wyrmgus::defines::get()->get_small_font(); // Font to use.
 
 	Assert(this->Index == -1 || ((unsigned int) this->Index < UnitTypeVar.GetNumberVariable()));
 

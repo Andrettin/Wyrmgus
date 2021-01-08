@@ -81,14 +81,14 @@ namespace gcn
          * @param text the string to return the width of.
          * @return the width of a string.
          */
-        virtual int getWidth(const std::string& text) const = 0;
+        virtual int getWidth(const std::string& text) = 0;
 
         /**
          * Gets the height of the glyphs in the font.
          *
          * @return the height of the glyphs int the font.
          */
-        virtual int getHeight() const = 0;
+        virtual int getHeight() = 0;
 
         /**
          * Gets a string index in a string providing an x coordinate.

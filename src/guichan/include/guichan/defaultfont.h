@@ -96,9 +96,9 @@ namespace gcn
         virtual void drawString(Graphics* graphics, const std::string& text, int x, int y, bool is_normal = true);
 		//Wyrmgus end
 
-        virtual int getWidth(const std::string& text) const;
+        virtual int getWidth(const std::string& text);
 
-        virtual int getHeight() const;
+        virtual int getHeight();
 
         virtual int getStringIndexAt(const std::string& text, int x);
     };

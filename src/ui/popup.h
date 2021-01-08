@@ -168,7 +168,7 @@ public:
 private:
 	int InfoType = 0;                /// Type of information to show.
 	unsigned int MaxWidth = 0;       /// Maximum width of multilined information.
-	const wyrmgus::font *Font = nullptr;                 /// Font to use.
+	wyrmgus::font *Font = nullptr;                 /// Font to use.
 };
 
 class CPopupContentTypeText final : public CPopupContentType
@@ -192,7 +192,7 @@ private:
 	std::unique_ptr<StringDesc> Text;  /// Text to display.
 	//Wyrmgus end
 	unsigned int MaxWidth = 0;   /// Maximum width of multilined text.
-	const wyrmgus::font *Font = nullptr; /// Font to use.
+	wyrmgus::font *Font = nullptr; /// Font to use.
 };
 
 class CPopupContentTypeCosts final : public CPopupContentType
@@ -206,7 +206,7 @@ public:
 	virtual void Parse(lua_State *l) override;
 
 private:
-	const wyrmgus::font *Font = nullptr; /// Font to use.
+	wyrmgus::font *Font = nullptr; /// Font to use.
 	char Centered = 0;               /// if true, center the display.
 };
 
@@ -242,7 +242,7 @@ public:
 
 private:
 	std::unique_ptr<StringDesc> Text;            /// Text to display.
-	const wyrmgus::font *Font = nullptr;   /// Font to use.
+	wyrmgus::font *Font = nullptr;   /// Font to use.
 	char Centered = 0;                /// if true, center the display.
 	int Index = -1;                   /// Index of the variable to show, -1 if not.
 };

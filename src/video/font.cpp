@@ -195,8 +195,12 @@ static bool GetUTF8(const char text[], const size_t len, size_t &pos, int &utf8)
 
 namespace wyrmgus {
 
-int font::Height() const
+int font::Height()
 {
+	if (!this->is_loaded()) {
+		this->load();
+	}
+
 	return G->Height;
 }
 
@@ -207,8 +211,12 @@ int font::Height() const
 **
 **  @return      The width in pixels of the text.
 */
-int font::Width(const int number) const
+int font::Width(const int number)
 {
+	if (!this->is_loaded()) {
+		this->load();
+	}
+
 	int width = 0;
 #if 0
 	bool isformat = false;
@@ -231,8 +239,12 @@ int font::Width(const int number) const
 **
 **  @return      The width in pixels of the text.
 */
-int font::Width(const std::string &text) const
+int font::Width(const std::string &text)
 {
+	if (!this->is_loaded()) {
+		this->load();
+	}
+
 	int width = 0;
 	bool isformat = false;
 	int utf8;
@@ -347,18 +359,20 @@ unsigned int font::DrawChar(CGraphic &g, int utf8, int x, int y) const
 	return w + 1;
 }
 
-CGraphic *font::GetFontColorGraphic(const wyrmgus::font_color &fontColor) const
+CGraphic *font::get_font_color_graphic(const wyrmgus::font_color *font_color)
 {
-	auto find_iterator = this->font_color_graphics.find(&fontColor);
+	if (!this->font_color_graphics.contains(font_color)) {
+		//load the font color graphics on demand
+		this->make_font_color_texture(font_color);
+	}
+
+	const auto find_iterator = this->font_color_graphics.find(font_color);
 
 	if (find_iterator != this->font_color_graphics.end()) {
 		return find_iterator->second.get();
 	}
 
-#ifdef DEBUG
-	fprintf(stderr, "Could not load font color %s for font %s\n", fontColor.Ident.c_str(), this->Ident.c_str());
-#endif
-	return this->G.get();
+	throw std::runtime_error("Could not load font color \"" + font_color->get_identifier()  + "\" for font \"" + this->get_identifier() + "\".");
 }
 
 }
@@ -392,8 +406,8 @@ int CLabel::DoDrawText(int x, int y,
 	const wyrmgus::font_color *backup = fc;
 	bool isColor = false;
 	//Wyrmgus start
-//	CGraphic *g = font->GetFontColorGraphic(*FontColor);
-	CGraphic *g = font->GetFontColorGraphic(*fc);
+//	CGraphic *g = font->get_font_color_graphic(FontColor);
+	CGraphic *g = this->font->get_font_color_graphic(fc);
 	//Wyrmgus end
 
 	while (GetUTF8(text, len, pos, utf8)) {
@@ -414,7 +428,7 @@ int CLabel::DoDrawText(int x, int y,
 				case '!':
 					if (fc != reverse) {
 						fc = reverse;
-						g = font->GetFontColorGraphic(*fc);
+						g = font->get_font_color_graphic(fc);
 					}
 					++pos;
 					continue;
@@ -423,7 +437,7 @@ int CLabel::DoDrawText(int x, int y,
 					if (fc != reverse) {
 						isColor = true;
 						fc = reverse;
-						g = font->GetFontColorGraphic(*fc);
+						g = font->get_font_color_graphic(fc);
 					}
 					++pos;
 					continue;
@@ -431,7 +445,7 @@ int CLabel::DoDrawText(int x, int y,
 					if (fc != LastTextColor) {
 						std::swap(fc, LastTextColor);
 						isColor = false;
-						g = font->GetFontColorGraphic(*fc);
+						g = font->get_font_color_graphic(fc);
 					}
 					++pos;
 					continue;
@@ -454,7 +468,7 @@ int CLabel::DoDrawText(int x, int y,
 					if (fc_tmp) {
 						isColor = true;
 						fc = fc_tmp;
-						g = font->GetFontColorGraphic(*fc);
+						g = font->get_font_color_graphic(fc);
 					}
 					continue;
 				}
@@ -470,21 +484,24 @@ int CLabel::DoDrawText(int x, int y,
 
 		if (isColor == false && fc != backup) {
 			fc = backup;
-			g = font->GetFontColorGraphic(*fc);
+			g = font->get_font_color_graphic(fc);
 		}
 	}
 	return widths;
 }
 
-CLabel::CLabel(const wyrmgus::font *f, const wyrmgus::font_color *nc, const wyrmgus::font_color *rc) : font(f)
+CLabel::CLabel(wyrmgus::font *f, const wyrmgus::font_color *nc, const wyrmgus::font_color *rc) : font(f)
 {
+	if (!f->is_loaded()) {
+		f->load();
+	}
+
 	normal = nc;
 	reverse = rc;
 }
 
-CLabel::CLabel(const wyrmgus::font *f)
-	: normal(wyrmgus::defines::get()->get_default_font_color()),
-	reverse(wyrmgus::defines::get()->get_default_highlight_font_color()), font(f)
+CLabel::CLabel(wyrmgus::font *f)
+	: CLabel(f, wyrmgus::defines::get()->get_default_font_color(), wyrmgus::defines::get()->get_default_highlight_font_color())
 {
 }
 
@@ -596,7 +613,7 @@ int CLabel::DrawReverseCentered(int x, int y, const std::string &text) const
 **
 **  @return computed value.
 */
-static int strchrlen(const std::string &s, char c, unsigned int maxlen, const wyrmgus::font *font)
+static int strchrlen(const std::string &s, char c, unsigned int maxlen, wyrmgus::font *font)
 {
 	if (s.empty()) {
 		return 0;
@@ -643,7 +660,7 @@ static int strchrlen(const std::string &s, char c, unsigned int maxlen, const wy
 **
 **  @return computed value.
 */
-std::string GetLineFont(unsigned int line, const std::string &s, unsigned int maxlen, const wyrmgus::font *font)
+std::string GetLineFont(unsigned int line, const std::string &s, unsigned int maxlen, wyrmgus::font *font)
 {
 	unsigned int res;
 	std::string s1 = s;
@@ -709,39 +726,38 @@ void font::MeasureWidths()
 	}
 }
 
-#if defined(USE_OPENGL) || defined(USE_GLES)
-
-void font::make_font_color_textures()
+void font::make_font_color_texture(const wyrmgus::font_color *fc)
 {
-	if (!this->font_color_graphics.empty()) {
+	if (this->font_color_graphics.contains(fc)) {
 		// already loaded
 		return;
 	}
 
+	if (!this->is_loaded()) {
+		this->load();
+	}
+
 	const CGraphic &g = *this->G;
 
-	for (const wyrmgus::font_color *fc : wyrmgus::font_color::get_all()) {
-		auto newg = std::make_unique<CGraphic>(g.get_filepath());
+	auto newg = std::make_unique<CGraphic>(g.get_filepath());
 
-		newg->Width = g.Width;
-		newg->Height = g.Height;
-		newg->NumFrames = g.NumFrames;
-		newg->GraphicWidth = g.GraphicWidth;
-		newg->GraphicHeight = g.GraphicHeight;
-		newg->image = g.get_image();
-		newg->original_size = g.get_original_size();
-		newg->original_frame_size = g.get_original_frame_size();
+	newg->Width = g.Width;
+	newg->Height = g.Height;
+	newg->NumFrames = g.NumFrames;
+	newg->GraphicWidth = g.GraphicWidth;
+	newg->GraphicHeight = g.GraphicHeight;
+	newg->image = g.get_image();
+	newg->original_size = g.get_original_size();
+	newg->original_frame_size = g.get_original_frame_size();
 
-		for (int j = 0; j < newg->image.colorCount(); ++j) {
-			newg->image.setColor(j, qRgba(fc->get_colors()[j].red(), fc->get_colors()[j].green(), fc->get_colors()[j].blue(), j == 0 ? 0 : 255));
-		}
-
-		MakeTexture(newg.get(), false, nullptr);
-
-		this->font_color_graphics[fc] = std::move(newg);
+	for (int j = 0; j < newg->image.colorCount(); ++j) {
+		newg->image.setColor(j, qRgba(fc->get_colors()[j].red(), fc->get_colors()[j].green(), fc->get_colors()[j].blue(), j == 0 ? 0 : 255));
 	}
+
+	MakeTexture(newg.get(), false, nullptr);
+
+	this->font_color_graphics[fc] = std::move(newg);
 }
-#endif
 
 void font::process_sml_property(const sml_property &property)
 {
@@ -758,11 +774,23 @@ void font::process_sml_property(const sml_property &property)
 void font::initialize()
 {
 	this->G = CGraphic::New(this->filepath, this->size);
-	this->G->Load(false, wyrmgus::defines::get()->get_scale_factor());
-	this->MeasureWidths();
-	this->make_font_color_textures();
 
 	data_entry::initialize();
+}
+
+bool font::is_loaded() const
+{
+	return this->G->IsLoaded();
+}
+
+void font::load()
+{
+	if (this->is_loaded()) {
+		return;
+	}
+
+	this->G->Load(false, wyrmgus::defines::get()->get_scale_factor());
+	this->MeasureWidths();
 }
 
 #if defined(USE_OPENGL) || defined(USE_GLES)
@@ -783,7 +811,6 @@ void font::Reload()
 {
 	if (this->G != nullptr) {
 		this->font_color_graphics.clear();
-		this->make_font_color_textures();
 	}
 }
 

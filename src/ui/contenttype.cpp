@@ -70,12 +70,12 @@ CContentTypeText::~CContentTypeText()
 **  @param unit         unit with variable to show.
 **  @param defaultfont  default font if no specific font in extra data.
 */
-/* virtual */ void CContentTypeText::Draw(const CUnit &unit, const wyrmgus::font *defaultfont) const
+void CContentTypeText::Draw(const CUnit &unit, wyrmgus::font *defaultfont) const
 {
 	std::string text;       // Optional text to display.
 	int x = this->Pos.x;
 	int y = this->Pos.y;
-	const wyrmgus::font *font = this->Font ? this->Font : defaultfont;
+	wyrmgus::font *font = this->Font ? this->Font : defaultfont;
 
 	Assert(font);
 	Assert(this->Index == -1 || ((unsigned int) this->Index < UnitTypeVar.GetNumberVariable()));
@@ -151,12 +151,12 @@ CContentTypeFormattedText::CContentTypeFormattedText() : Component(VariableAttri
 **  @note text must have exactly 1 %d.
 **  @bug if text format is incorrect.
 */
-void CContentTypeFormattedText::Draw(const CUnit &unit, const wyrmgus::font *defaultfont) const
+void CContentTypeFormattedText::Draw(const CUnit &unit, wyrmgus::font *defaultfont) const
 {
 	char buf[256];
 	UStrInt usi1;
 
-	const wyrmgus::font *font = this->Font ? this->Font : defaultfont;
+	wyrmgus::font *font = this->Font ? this->Font : defaultfont;
 	Assert(font);
 
 	//Wyrmgus start
@@ -197,12 +197,12 @@ CContentTypeFormattedText2::CContentTypeFormattedText2() : Component1(VariableAt
 **  @note text must have exactly 2 %d.
 **  @bug if text format is incorrect.
 */
-void CContentTypeFormattedText2::Draw(const CUnit &unit, const wyrmgus::font *defaultfont) const
+void CContentTypeFormattedText2::Draw(const CUnit &unit, wyrmgus::font *defaultfont) const
 {
 	char buf[256];
 	UStrInt usi1, usi2;
 
-	const wyrmgus::font *font = this->Font ? this->Font : defaultfont;
+	wyrmgus::font *font = this->Font ? this->Font : defaultfont;
 	Assert(font);
 	//Wyrmgus start
 //	CLabel label(font);
@@ -278,7 +278,7 @@ static const CUnit *GetUnitRef(const CUnit &unit, EnumUnit e)
 **  @param unit         unit with icon to show.
 **  @param defaultfont  unused.
 */
-/* virtual */ void CContentTypeIcon::Draw(const CUnit &unit, const wyrmgus::font *) const
+/* virtual */ void CContentTypeIcon::Draw(const CUnit &unit, wyrmgus::font *) const
 {
 	const CUnit *unitToDraw = GetUnitRef(unit, this->UnitRef);
 
@@ -297,7 +297,7 @@ static const CUnit *GetUnitRef(const CUnit &unit, EnumUnit e)
 **
 **  @todo Color and percent value Parametrisation.
 */
-/* virtual */ void CContentTypeLifeBar::Draw(const CUnit &unit, const wyrmgus::font *) const
+/* virtual */ void CContentTypeLifeBar::Draw(const CUnit &unit, wyrmgus::font *) const
 {
 	Assert((unsigned int) this->Index < UnitTypeVar.GetNumberVariable());
 	//Wyrmgus start
@@ -412,7 +412,7 @@ static const CUnit *GetUnitRef(const CUnit &unit, EnumUnit e)
 **
 **  @todo Color and percent value Parametrisation.
 */
-/* virtual */ void CContentTypeCompleteBar::Draw(const CUnit &unit, const wyrmgus::font *) const
+/* virtual */ void CContentTypeCompleteBar::Draw(const CUnit &unit, wyrmgus::font *) const
 {
 	Assert((unsigned int) this->varIndex < UnitTypeVar.GetNumberVariable());
 	//Wyrmgus start

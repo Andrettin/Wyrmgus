@@ -61,12 +61,12 @@
 
 namespace gcn
 {
-    int DefaultFont::getHeight() const
+    int DefaultFont::getHeight()
     {
         return 8;
     }
 
-    int DefaultFont::getWidth(const std::string& text) const
+    int DefaultFont::getWidth(const std::string& text)
     {
         return 8*text.size();
     }

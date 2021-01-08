@@ -832,7 +832,7 @@ void DrawPopup(const wyrmgus::button &button, int x, int y, bool above)
 */
 void DrawGenericPopup(const std::string &popup_text, int x, int y, const wyrmgus::font_color *text_color, const wyrmgus::font_color *highlight_color, bool above)
 {
-	const wyrmgus::font *font = wyrmgus::defines::get()->get_game_font();
+	wyrmgus::font *font = wyrmgus::defines::get()->get_game_font();
 	
 	const int scale_factor = wyrmgus::defines::get()->get_scale_factor();
 	int MaxWidth = std::max(512 * scale_factor, Video.Width / 5);
