@@ -3588,10 +3588,6 @@ void DisableMod(const std::string &mod_file)
 
 void SetDLCFileEquivalency(const std::string dlc_file, const std::string replacement_file)
 {
-	if (!std::filesystem::exists(LibraryFileName(dlc_file.c_str()))) {
-		throw std::runtime_error("Tried to set a replacement for DLC file \"" + dlc_file + "\", which does not exist.");
-	}
-
 	if (!std::filesystem::exists(LibraryFileName(replacement_file.c_str()))) {
 		throw std::runtime_error("DLC replacement file \"" + replacement_file + "\" does not exist.");
 	}
