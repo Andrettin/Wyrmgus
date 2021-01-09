@@ -459,7 +459,7 @@ void minimap::DrawUnitOn(const CUnit *unit, int red_phase)
 
 	uint32_t color;
 	if (unit->GetDisplayPlayer() == PlayerNumNeutral) {
-		color = CVideo::MapRGB(type->NeutralMinimapColorRGB);
+		color = CVideo::MapRGB(type->get_neutral_minimap_color());
 	} else if (unit->Player == CPlayer::GetThisPlayer() && !Editor.Running) {
 		if (unit->Attacked && unit->Attacked + ATTACK_BLINK_DURATION > GameCycle &&
 			(red_phase || unit->Attacked + ATTACK_RED_DURATION > GameCycle)) {

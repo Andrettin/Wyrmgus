@@ -292,7 +292,7 @@
 **    Information about resource harvesting. If null, it can't
 **    harvest it.
 **
-**  unit_type::NeutralMinimapColorRGB
+**  unit_type::neutral_minimap_color
 **
 **    Says what color a unit will have when it's neutral and
 **    is displayed on the minimap.
@@ -1550,7 +1550,7 @@ void unit_type::set_parent(const unit_type *parent_type)
 		*this->sound_set = *parent_type->sound_set;
 	}
 	this->NumDirections = parent_type->NumDirections;
-	this->NeutralMinimapColorRGB = parent_type->NeutralMinimapColorRGB;
+	this->neutral_minimap_color = parent_type->neutral_minimap_color;
 	this->RandomMovementProbability = parent_type->RandomMovementProbability;
 	this->RandomMovementDistance = parent_type->RandomMovementDistance;
 	this->given_resource = parent_type->given_resource;

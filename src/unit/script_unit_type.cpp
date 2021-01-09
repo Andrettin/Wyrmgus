@@ -1099,7 +1099,9 @@ static int CclDefineUnitType(lua_State *l)
 			CclGetPos(l, &tile_size.x, &tile_size.y);
 			type->tile_size = tile_size;
 		} else if (!strcmp(value, "NeutralMinimapColor")) {
-			type->NeutralMinimapColorRGB.Parse(l);
+			CColor color;
+			color.Parse(l);
+			type->neutral_minimap_color = QColor(color.R, color.G, color.B);
 		} else if (!strcmp(value, "BoxSize")) {
 			Vec2i box_size;
 			CclGetPos(l, &box_size.x, &box_size.y);

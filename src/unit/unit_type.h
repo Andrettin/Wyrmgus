@@ -706,11 +706,6 @@ public:
 class CBuildRestrictionSurroundedBy final : public CBuildRestriction
 {
 public:
-	CBuildRestrictionSurroundedBy()
-		: Count(0), Distance(0), DistanceType(DistanceTypeType::Equal), CountType(DistanceTypeType::Equal), RestrictType(nullptr), CheckBuilder(false)
-	{
-	}
-
 	virtual std::unique_ptr<CBuildRestriction> duplicate() const override
 	{
 		auto b = std::make_unique<CBuildRestrictionSurroundedBy>();
@@ -728,14 +723,14 @@ public:
 	virtual void Init() override;
 	virtual bool Check(const CUnit *builder, const wyrmgus::unit_type &type, const Vec2i &pos, CUnit *&ontoptarget, int z) const override;
 	
-	int Distance;
-	DistanceTypeType DistanceType;
-	int Count;
-	DistanceTypeType CountType;
+	int Distance = 0;
+	DistanceTypeType DistanceType = DistanceTypeType::Equal;
+	int Count = 0;
+	DistanceTypeType CountType = DistanceTypeType::Equal;
 	std::string RestrictTypeName;
 	std::string RestrictTypeOwner;
-	wyrmgus::unit_type *RestrictType;
-	bool CheckBuilder;
+	wyrmgus::unit_type *RestrictType = nullptr;
+	bool CheckBuilder = false;
 };
 
 class CBuildRestrictionTerrain final : public CBuildRestriction
@@ -780,6 +775,7 @@ class unit_type final : public detailed_data_entry, public data_type<unit_type>,
 	Q_PROPERTY(wyrmgus::unit_type* corpse_type MEMBER corpse_type READ get_corpse_type)
 	Q_PROPERTY(wyrmgus::construction* construction MEMBER construction READ get_construction)
 	Q_PROPERTY(wyrmgus::resource* given_resource MEMBER given_resource)
+	Q_PROPERTY(QColor neutral_minimap_color MEMBER neutral_minimap_color READ get_neutral_minimap_color)
 
 public:
 	static constexpr const char *class_identifier = "unit_type";
@@ -1003,6 +999,11 @@ public:
 		return this->variations;
 	}
 
+	const QColor &get_neutral_minimap_color() const
+	{
+		return this->neutral_minimap_color;
+	}
+
 	const unit_sound_set *get_sound_set() const
 	{
 		return this->sound_set.get();
@@ -1217,9 +1218,9 @@ public:
 	//Wyrmgus end
 	std::vector<std::unique_ptr<CBuildRestriction>> BuildingRules;   /// Rules list for building a building.
 	std::vector< std::unique_ptr<CBuildRestriction>> AiBuildingRules; /// Rules list for for AI to build a building.
-	CColor NeutralMinimapColorRGB;   /// Minimap Color for Neutral Units.
-
 private:
+	QColor neutral_minimap_color; //minimap color for neutral units
+
 	std::unique_ptr<unit_sound_set> sound_set;			/// Sounds for events
 public:
 	std::unique_ptr<unit_sound_set> MapSound;			/// Sounds for events, map-specific
