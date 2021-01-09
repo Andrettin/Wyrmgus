@@ -27,8 +27,6 @@
 //      02111-1307, USA.
 //
 
-#include <png.h>
-
 #include "stratagus.h"
 
 #include "database/defines.h"
@@ -50,17 +48,6 @@
 #endif
 #include <SDL_opengl.h>
 #endif
-
-class AutoPng_read_structp
-{
-public:
-	explicit AutoPng_read_structp(png_structp png_ptr) : png_ptr(png_ptr), info_ptr(nullptr) {}
-	~AutoPng_read_structp() { png_destroy_read_struct(&png_ptr, info_ptr ? &info_ptr : (png_infopp)0, (png_infopp)0); }
-	void setInfo(png_infop info_ptr) { this->info_ptr = info_ptr; }
-private:
-	png_structp png_ptr;
-	png_infop info_ptr;
-};
 
 /**
 **  Load a png graphic file.
@@ -121,59 +108,17 @@ int LoadGraphicPNG(CGraphic *g, const int scale_factor)
 */
 void SaveScreenshotPNG(const char *name)
 {
-	FILE *fp = fopen(name, "wb");
-	if (fp == nullptr) {
-		return;
-	}
-
-	png_structp png_ptr = png_create_write_struct(PNG_LIBPNG_VER_STRING, nullptr, nullptr, nullptr);
-	if (png_ptr == nullptr) {
-		fclose(fp);
-		return;
-	}
-
-	png_infop info_ptr = png_create_info_struct(png_ptr);
-	if (info_ptr == nullptr) {
-		fclose(fp);
-		png_destroy_write_struct(&png_ptr, nullptr);
-		return;
-	}
-
-	if (setjmp(png_jmpbuf(png_ptr))) {
-		/* If we get here, we had a problem reading the file */
-		fclose(fp);
-		png_destroy_write_struct(&png_ptr, &info_ptr);
-		return;
-	}
-
-	/* set up the output control if you are using standard C streams */
-	png_init_io(png_ptr, fp);
-
-	int pngw, pngh;
-
-	pngw = Video.ViewportWidth;
-	pngh = Video.ViewportHeight;
-
-	png_set_IHDR(png_ptr, info_ptr, pngw, pngh, 8,
-				 PNG_COLOR_TYPE_RGB, PNG_INTERLACE_NONE, PNG_COMPRESSION_TYPE_DEFAULT,
-				 PNG_FILTER_TYPE_DEFAULT);
-
-	png_write_info(png_ptr, info_ptr);
+	QImage image(Video.ViewportWidth, Video.ViewportHeight, QImage::Format_RGB888);
+	image.fill(Qt::transparent);
 
 	glPixelStorei(GL_PACK_ALIGNMENT, 1); //allows screenshots of resolution widths that aren't multiples of 4
-	unsigned char* pixels = new unsigned char[Video.ViewportWidth * Video.ViewportHeight * 3];
 #ifdef USE_OPENGL
 	glReadBuffer(GL_FRONT);
 #endif
-	glReadPixels(0, 0, Video.ViewportWidth, Video.ViewportHeight, GL_RGB, GL_UNSIGNED_BYTE, pixels);
-	for (int i = 0; i < Video.ViewportHeight; ++i) {
-		png_write_row(png_ptr, &pixels[(Video.ViewportHeight - 1 - i) * Video.ViewportWidth * 3]);
-	}
+	glReadPixels(0, 0, image.width(), image.height(), GL_RGB, GL_UNSIGNED_BYTE, image.bits());
 
-	png_write_end(png_ptr, info_ptr);
+	//we need to flip the image vertically, as glReadPixels returns a vertically-inverted image
+	const QImage screenshot_image = image.mirrored(false, true);
 
-	/* clean up after the write, and free any memory allocated */
-	png_destroy_write_struct(&png_ptr, &info_ptr);
-
-	fclose(fp);
+	screenshot_image.save(name);
 }
