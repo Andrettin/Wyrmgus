@@ -71,6 +71,10 @@ public:
 		if (filepath.empty()) {
 			throw std::runtime_error("Tried to create a CGraphic instance with an empty filepath.");
 		}
+
+		if (!std::filesystem::exists(filepath)) {
+			throw std::runtime_error("Tried to create a CGraphic instance with a filepath to a non-existing file: \"" + filepath.string() + "\".");
+		}
 	}
 
 	virtual ~CGraphic();
@@ -364,7 +368,7 @@ public:
 	void FillCircleClip(uint32_t color, const PixelPos &screenPos, int radius);
 	void FillTransCircleClip(uint32_t color, int x, int y, int radius, unsigned char alpha);
 
-	static uint32_t MapRGB(uint8_t r, uint8_t g, uint8_t b)
+	static uint32_t MapRGB(const uint8_t r, const uint8_t g, const uint8_t b)
 	{
 		return CVideo::MapRGBA(r, g, b, 0xFF);
 	}
