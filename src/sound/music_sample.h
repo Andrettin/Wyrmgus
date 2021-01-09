@@ -43,7 +43,9 @@ public:
 
 	~music_sample()
 	{
-		Mix_FreeMusic(this->data);
+		if (this->is_loaded()) {
+			this->unload();
+		}
 	}
 
 	bool is_loaded() const
@@ -57,6 +59,16 @@ public:
 		if (this->data == nullptr) {
 			throw std::runtime_error("Failed to decode music file \"" + this->filepath.string() + "\": " + std::string(Mix_GetError()));
 		}
+	}
+
+	void unload()
+	{
+		if (!this->is_loaded()) {
+			return;
+		}
+
+		Mix_FreeMusic(this->data);
+		this->data = nullptr;
 	}
 
 	const std::filesystem::path &get_filepath() const

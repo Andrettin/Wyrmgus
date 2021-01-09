@@ -532,13 +532,8 @@ int InitSound()
 */
 void QuitSound()
 {
-	for (wyrmgus::sound *sound : wyrmgus::sound::get_all()) {
-		sound->clear_samples();
-	}
-
-	for (wyrmgus::music *music : wyrmgus::music::get_all()) {
-		music->clear_sample();
-	}
+	wyrmgus::sound::unload_all();
+	wyrmgus::music::unload_all();
 
 	Mix_CloseAudio();
 	Mix_Quit();

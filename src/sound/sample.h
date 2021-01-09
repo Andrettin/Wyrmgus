@@ -47,7 +47,7 @@ public:
 
 	~sample()
 	{
-		Mix_FreeChunk(this->chunk);
+		this->unload();
 	}
 
 	bool is_loaded() const
@@ -61,6 +61,16 @@ public:
 		if (this->chunk == nullptr) {
 			throw std::runtime_error("Failed to decode audio file \"" + this->filepath.string() + "\": " + std::string(Mix_GetError()));
 		}
+	}
+
+	void unload()
+	{
+		if (!this->is_loaded()) {
+			return;
+		}
+
+		Mix_FreeChunk(this->chunk);
+		this->chunk = nullptr;
 	}
 
 	virtual int Read(void *buf, int len)

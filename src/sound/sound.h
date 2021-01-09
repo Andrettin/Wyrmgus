@@ -76,12 +76,19 @@ public:
 	static constexpr int max_range = 254;
 	static constexpr int infinite_range = 255; //the range value that makes a sound volume distance independent
 
+	static void unload_all()
+	{
+		for (sound *sound : sound::get_all()) {
+			sound->unload();
+		}
+	}
+
 	explicit sound(const std::string &identifier);
 	virtual ~sound() override;
 
 	virtual void initialize() override;
 
-	void clear_samples();
+	void unload();
 
 	const std::vector<std::filesystem::path> &get_files() const
 	{

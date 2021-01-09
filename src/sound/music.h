@@ -57,6 +57,13 @@ public:
 		return empty_vector;
 	}
 
+	static void unload_all()
+	{
+		for (music *music : music::get_all()) {
+			music->unload();
+		}
+	}
+
 private:
 	static inline std::map<music_type, std::vector<const music *>> music_by_type;
 
@@ -69,7 +76,7 @@ public:
 	virtual void initialize() override;
 	virtual void check() const override;
 	void load() const;
-	void clear_sample();
+	void unload();
 
 	wyrmgus::music_sample *get_sample() const
 	{

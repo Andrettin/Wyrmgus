@@ -516,9 +516,13 @@ void sound::initialize()
 	data_entry::initialize();
 }
 
-void sound::clear_samples()
+void sound::unload()
 {
-	this->samples.clear();
+	for (const std::unique_ptr<sample> &sample : this->samples) {
+		if (sample->is_loaded()) {
+			sample->unload();
+		}
+	}
 }
 
 QVariantList sound::get_files_qvariant_list() const

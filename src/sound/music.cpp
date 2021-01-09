@@ -125,9 +125,11 @@ void music::load() const
 	}
 }
 
-void music::clear_sample()
+void music::unload()
 {
-	this->sample.reset();
+	if (this->sample != nullptr && this->sample->is_loaded()) {
+		this->sample->unload();
+	}
 }
 
 }

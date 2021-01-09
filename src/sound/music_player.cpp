@@ -60,6 +60,9 @@ void music_player::play_music_type(const music_type type)
 	StopMusic();
 	this->current_music = nullptr;
 
+	//clear all loaded data when the music type changes, to prevent music from causing too much memory consumption
+	music::unload_all();
+
 	if (SoundEnabled() && IsMusicEnabled()) {
 		this->play();
 	}
