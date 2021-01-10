@@ -1028,7 +1028,7 @@ private:
 		const CPlayer &player = *attacker->Player;
 		const wyrmgus::unit_type &type = *attacker->Type;
 		const wyrmgus::unit_type &dtype = *dest->Type;
-		int attackrange = attacker->GetModifiedVariable(ATTACKRANGE_INDEX);
+		int attackrange = attacker->get_best_attack_range();
 
 		//Wyrmgus start
 //		if (!player.IsEnemy(*dest) // a friend or neutral
@@ -1279,7 +1279,7 @@ public:
 					d = attacker->MapDistanceTo(*dest);
 				}
 
-				int attackrange = attacker->GetModifiedVariable(ATTACKRANGE_INDEX);
+				int attackrange = attacker->get_best_attack_range();
 				
 				//Wyrmgus start
 //				if (d <= attackrange ||
@@ -1601,7 +1601,7 @@ CUnit *AttackUnitsInDistance(const CUnit &unit, int range, bool circle, bool inc
 CUnit *AttackUnitsInRange(const CUnit &unit, CUnitFilter pred)
 {
 	Assert(unit.CanAttack());
-	return AttackUnitsInDistance(unit, unit.GetModifiedVariable(ATTACKRANGE_INDEX), pred);
+	return AttackUnitsInDistance(unit, unit.get_best_attack_range(), pred);
 }
 
 CUnit *AttackUnitsInRange(const CUnit &unit)

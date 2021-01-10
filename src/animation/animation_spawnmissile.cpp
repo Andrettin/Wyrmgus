@@ -42,7 +42,7 @@
 #include "pathfinder.h"
 #include "unit/unit.h"
 
-/* virtual */ void CAnimation_SpawnMissile::Action(CUnit &unit, int &/*move*/, int /*scale*/) const
+void CAnimation_SpawnMissile::Action(CUnit &unit, int &/*move*/, int /*scale*/) const
 {
 	Assert(unit.Anim.Anim == this);
 

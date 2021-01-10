@@ -959,7 +959,7 @@ void AiHelpMe(CUnit *attacker, CUnit &defender)
 					if (oldGoal == nullptr || (ThreatCalculate(defender, *attacker) < ThreatCalculate(defender, *oldGoal)
 											//Wyrmgus start
 //											&& aiunit.MapDistanceTo(defender) <= aiunit.Stats->Variables[ATTACKRANGE_INDEX].Max)) {
-											&& aiunit.MapDistanceTo(defender) <= aiunit.GetModifiedVariable(ATTACKRANGE_INDEX))) {
+											&& aiunit.MapDistanceTo(defender) <= aiunit.get_best_attack_range())) {
 											//Wyrmgus end
 						shouldAttack = true;
 					}
@@ -1049,7 +1049,7 @@ void AiHelpMe(CUnit *attacker, CUnit &defender)
 						if (oldGoal == nullptr || (ThreatCalculate(defender, *attacker) < ThreatCalculate(defender, *oldGoal)
 												//Wyrmgus start
 	//											&& aiunit.MapDistanceTo(defender) <= aiunit.Stats->Variables[ATTACKRANGE_INDEX].Max)) {
-												&& aiunit.MapDistanceTo(defender) <= aiunit.GetModifiedVariable(ATTACKRANGE_INDEX))) {
+												&& aiunit.MapDistanceTo(defender) <= aiunit.get_best_attack_range())) {
 												//Wyrmgus end
 							shouldAttack = true;
 						}
@@ -1119,7 +1119,7 @@ void AiHelpMe(CUnit *attacker, CUnit &defender)
 					const CUnit *oldGoal = orderAttack.get_goal();
 
 					if (oldGoal == nullptr || (ThreatCalculate(defender, *attacker) < ThreatCalculate(defender, *oldGoal)
-											&& aiunit.MapDistanceTo(defender) <= aiunit.GetModifiedVariable(ATTACKRANGE_INDEX))) {
+											&& aiunit.MapDistanceTo(defender) <= aiunit.get_best_attack_range())) {
 						shouldAttack = true;
 					}
 				}

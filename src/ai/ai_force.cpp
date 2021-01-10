@@ -67,7 +67,7 @@ public:
 	//Wyrmgus end
 		unit(unit),
 		movemask(unit.Type->MovementMask & ~(MapFieldLandUnit | MapFieldAirUnit | MapFieldSeaUnit)),
-		attackrange(unit.GetModifiedVariable(ATTACKRANGE_INDEX)),
+		attackrange(unit.get_best_attack_range()),
 		find_type(find_type),
 		include_neutral(include_neutral),
 		allow_water(allow_water),

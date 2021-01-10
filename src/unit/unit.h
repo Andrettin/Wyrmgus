@@ -495,6 +495,8 @@ public:
 	int GetModifiedVariable(const int index, const VariableAttribute variable_type) const;
 	int GetModifiedVariable(const int index) const;
 
+	int get_best_attack_range() const;
+
 	int GetReactionRange() const;
 	unsigned get_item_slot_quantity(const wyrmgus::item_slot item_slot) const;
 	wyrmgus::item_class GetCurrentWeaponClass() const;
@@ -752,6 +754,7 @@ public:
 	
 private:
 	unsigned char step_count = 0;	/// How many steps the unit has taken without stopping (maximum 10)
+	int best_contained_unit_attack_range = 0;
 
 public:
 	struct _unit_anim_ {

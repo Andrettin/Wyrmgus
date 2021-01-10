@@ -866,7 +866,7 @@ static void DrawInformations(const CUnit &unit, const wyrmgus::unit_type &type, 
 			if (Preference.ShowAttackRange) {
 				//Wyrmgus start
 //				const int value = stats.Variables[ATTACKRANGE_INDEX].Max;
-				const int value = unit.GetModifiedVariable(ATTACKRANGE_INDEX);
+				const int value = unit.get_best_attack_range();
 				
 				//Wyrmgus end
 				const int radius = value * wyrmgus::defines::get()->get_scaled_tile_width() + (type.get_tile_width() - 1) * wyrmgus::defines::get()->get_scaled_tile_width() / 2;

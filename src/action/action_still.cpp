@@ -149,8 +149,7 @@ public:
 private:
 	bool IsDistanceCorrect(int distance) const
 	{
-		return attacker->Type->MinAttackRange < distance
-			   && distance <= attacker->GetModifiedVariable(ATTACKRANGE_INDEX);
+		return attacker->Type->MinAttackRange < distance && distance <= attacker->get_best_attack_range();
 	}
 private:
 	const CUnit *attacker;
@@ -435,10 +434,10 @@ bool COrder_Still::AutoAttackStand(CUnit &unit)
 	}
 	// If unit is removed, use container's x and y
 	const CUnit *firstContainer = unit.GetFirstContainer();
-	if (firstContainer->MapDistanceTo(*autoAttackUnit) > unit.GetModifiedVariable(ATTACKRANGE_INDEX)) {
+	if (firstContainer->MapDistanceTo(*autoAttackUnit) > unit.get_best_attack_range()) {
 		return false;
 	}
-	if (unit.GetModifiedVariable(ATTACKRANGE_INDEX) > 1 && CheckObstaclesBetweenTiles(unit.tilePos, autoAttackUnit->tilePos, MapFieldAirUnpassable, autoAttackUnit->MapLayer->ID) == false) {
+	if (unit.get_best_attack_range() > 1 && CheckObstaclesBetweenTiles(unit.tilePos, autoAttackUnit->tilePos, MapFieldAirUnpassable, autoAttackUnit->MapLayer->ID) == false) {
 		return false;
 	}
 	this->State = SUB_STILL_ATTACK; // Mark attacking.
