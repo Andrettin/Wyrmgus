@@ -146,6 +146,11 @@ int SetChannelVolume(int channel, int volume)
 		return -1;
 	}
 
+	//apply the effects volume to the channel volume
+	volume *= GetEffectsVolume();
+	volume /= MaxVolume;
+
+	//ensure the volume is within proper bounds
 	volume = std::max(0, volume);
 	volume = std::min(MaxVolume, volume);
 
