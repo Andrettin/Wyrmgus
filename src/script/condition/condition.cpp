@@ -403,7 +403,7 @@ std::string PrintConditions(const wyrmgus::button &button)
 	//
 	//  first have to check, if target is allowed itself
 	//
-	if (!strncmp(button.ValueStr.c_str(), "unit-", 5)) {
+	if (!strncmp(button.ValueStr.c_str(), "unit", 4)) {
 		// target string refers to unit-XXX
 		const wyrmgus::unit_type *unit_type = wyrmgus::unit_type::get(button.ValueStr);
 		rules = unit_type->get_conditions()->get_string(0);
@@ -461,7 +461,7 @@ static int CclDefineDependency(lua_State *l)
 			}
 			wyrmgus::condition *condition = nullptr;
 			
-			if (!strncmp(required, "unit-", 5)) {
+			if (!strncmp(required, "unit", 4)) {
 				const wyrmgus::unit_type *unit_type = wyrmgus::unit_type::get(required);
 				condition = new wyrmgus::unit_type_condition(unit_type, count > 0 ? count : 1);
 			} else if (!strncmp(required, "upgrade", 7)) {
@@ -497,7 +497,7 @@ static int CclDefineDependency(lua_State *l)
 		condition = std::make_unique<wyrmgus::and_condition>(std::move(and_conditions));
 	}
 	
-	if (!strncmp(target, "unit-", 5)) {
+	if (!strncmp(target, "unit", 4)) {
 		wyrmgus::unit_type *unit_type = wyrmgus::unit_type::get(target);
 		unit_type->conditions = std::move(condition);
 	} else if (!strncmp(target, "upgrade", 7)) {
@@ -540,7 +540,7 @@ static int CclDefinePredependency(lua_State *l)
 			}
 			wyrmgus::condition *condition = nullptr;
 			
-			if (!strncmp(required, "unit-", 5)) {
+			if (!strncmp(required, "unit", 4)) {
 				const wyrmgus::unit_type *unit_type = wyrmgus::unit_type::get(required);
 				condition = new wyrmgus::unit_type_condition(unit_type, count > 0 ? count : 1);
 			} else if (!strncmp(required, "upgrade", 7)) {
@@ -576,7 +576,7 @@ static int CclDefinePredependency(lua_State *l)
 		condition = std::make_unique<wyrmgus::and_condition>(std::move(and_conditions));
 	}
 	
-	if (!strncmp(target, "unit-", 5)) {
+	if (!strncmp(target, "unit", 4)) {
 		wyrmgus::unit_type *unit_type = wyrmgus::unit_type::get(target);
 		unit_type->preconditions = std::move(condition);
 	} else if (!strncmp(target, "upgrade", 7)) {
@@ -609,7 +609,7 @@ static int CclCheckDependency(lua_State *l)
 	}
 	const CPlayer *player = CPlayer::Players[plynr];
 	
-	if (!strncmp(object, "unit-", 5)) {
+	if (!strncmp(object, "unit", 4)) {
 		const wyrmgus::unit_type *unit_type = wyrmgus::unit_type::get(object);
 		lua_pushboolean(l, check_conditions(unit_type, player));
 	} else if (!strncmp(object, "upgrade", 7)) {

@@ -903,7 +903,7 @@ static int CclAiWait(lua_State *l)
 	}
 
 	const char *ident = LuaToString(l, 1);
-	if (!strncmp(ident, "unit-", 5)) {
+	if (!strncmp(ident, "unit", 4)) {
 		const wyrmgus::unit_type *type = wyrmgus::unit_type::get(ident);
 		const AiRequestType *autt = FindInUnitTypeRequests(type);
 		if (!autt) {

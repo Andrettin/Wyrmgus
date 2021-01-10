@@ -2503,7 +2503,7 @@ static int CclGetPlayerData(lua_State *l)
 	} else if (!strcmp(data, "Allow")) {
 		LuaCheckArgs(l, 3);
 		const char *ident = LuaToString(l, 3);
-		if (!strncmp(ident, "unit-", 5)) {
+		if (!strncmp(ident, "unit", 4)) {
 			int id = UnitTypeIdByIdent(ident);
 			if (UnitIdAllowed(*CPlayer::Players[p->Index], id) > 0) {
 				lua_pushstring(l, "A");
@@ -2691,7 +2691,7 @@ static int CclSetPlayerData(lua_State *l)
 				AllowUpgradeId(*p, UpgradeIdByIdent(ident), acquire[0]);
 			}
 		//Wyrmgus start
-		} else if (!strncmp(ident, "unit-", 5)) {
+		} else if (!strncmp(ident, "unit", 4)) {
 			const int UnitMax = 65536; /// How many units supported
 			int id = UnitTypeIdByIdent(ident);
 			if (acquire == "A" || acquire == "R") {

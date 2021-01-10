@@ -738,7 +738,7 @@ static int CclDefineModifier(lua_State *l)
 		} else if (!strcmp(key, "allow-unit")) {
 			const char *value = LuaToString(l, j + 1, 2);
 
-			if (!strncmp(value, "unit-", 5)) {
+			if (!strncmp(value, "unit", 4)) {
 				um->ChangeUnits[UnitTypeIdByIdent(value)] = LuaToNumber(l, j + 1, 3);
 			} else {
 				LuaError(l, "unit expected");
@@ -818,7 +818,7 @@ static int CclDefineUnitAllow(lua_State *l)
 
 	const char *ident = LuaToString(l, 0 + 1);
 
-	if (strncmp(ident, "unit-", 5)) {
+	if (strncmp(ident, "unit", 4)) {
 		DebugPrint(" wrong ident %s\n" _C_ ident);
 		return 0;
 	}
@@ -851,7 +851,7 @@ static int CclDefineAllow(lua_State *l)
 			n = PlayerMax;
 		}
 
-		if (!strncmp(ident, "unit-", 5)) {
+		if (!strncmp(ident, "unit", 4)) {
 			int id = UnitTypeIdByIdent(ident);
 			for (int i = 0; i < n; ++i) {
 				if (ids[i] == 'A') {
