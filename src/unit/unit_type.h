@@ -776,6 +776,7 @@ class unit_type final : public detailed_data_entry, public data_type<unit_type>,
 	Q_PROPERTY(wyrmgus::unit_type* corpse_type MEMBER corpse_type READ get_corpse_type)
 	Q_PROPERTY(wyrmgus::construction* construction MEMBER construction READ get_construction)
 	Q_PROPERTY(wyrmgus::resource* given_resource MEMBER given_resource)
+	Q_PROPERTY(int random_movement_probability MEMBER random_movement_probability READ get_random_movement_probability)
 	Q_PROPERTY(QColor neutral_minimap_color MEMBER neutral_minimap_color READ get_neutral_minimap_color)
 
 public:
@@ -995,6 +996,11 @@ public:
 
 	bool can_produce_a_resource() const;
 
+	int get_random_movement_probability() const
+	{
+		return this->random_movement_probability;
+	}
+
 	const std::vector<std::unique_ptr<unit_type_variation>> &get_variations() const
 	{
 		return this->variations;
@@ -1143,7 +1149,9 @@ private:
 	std::vector<const spell *> autocast_spells; //the list of autocast spells
 public:
 	int AutoBuildRate = 0;			/// The rate at which the building builds itself
-	int RandomMovementProbability = 0;  /// Probability to move randomly.
+private:
+	int random_movement_probability = 0;  /// Probability to move randomly.
+public:
 	int RandomMovementDistance = 1;  /// Quantity of tiles to move randomly.
 	int ClicksToExplode = 0;		/// Number of consecutive clicks until unit suicides.
 	int MaxOnBoard = 0;				/// Number of Transporter slots.

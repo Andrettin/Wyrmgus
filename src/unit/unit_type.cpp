@@ -254,7 +254,7 @@
 **
 **    Death explosion animated
 **
-**  unit_type::RandomMovementProbability
+**  unit_type::random_movement_probability
 **
 **    When the unit is idle this is the probability that it will
 **    take a step in a random direction, in percents.
@@ -686,6 +686,10 @@ void unit_type::process_sml_scope(const sml_data &scope)
 		for (const std::string &value : values) {
 			this->WeaponClasses.push_back(string_to_item_class(value));
 		}
+	} else if (tag == "drops") {
+		for (const std::string &value : values) {
+			this->Drops.push_back(unit_type::get(value));
+		}
 	} else if (tag == "ai_drops") {
 		for (const std::string &value : values) {
 			this->AiDrops.push_back(unit_type::get(value));
@@ -974,7 +978,7 @@ void unit_type::ProcessConfigData(const CConfigData *config_data)
 				this->CanTarget &= ~CanTargetAir;
 			}
 		} else if (key == "random_movement_probability") {
-			this->RandomMovementProbability = std::stoi(value);
+			this->random_movement_probability = std::stoi(value);
 		} else if (key == "random_movement_distance") {
 			this->RandomMovementDistance = std::stoi(value);
 		} else if (key == "can_cast_spell") {
@@ -1551,7 +1555,7 @@ void unit_type::set_parent(const unit_type *parent_type)
 	}
 	this->NumDirections = parent_type->NumDirections;
 	this->neutral_minimap_color = parent_type->neutral_minimap_color;
-	this->RandomMovementProbability = parent_type->RandomMovementProbability;
+	this->random_movement_probability = parent_type->random_movement_probability;
 	this->RandomMovementDistance = parent_type->RandomMovementDistance;
 	this->given_resource = parent_type->given_resource;
 	this->RequirementsString = parent_type->RequirementsString;

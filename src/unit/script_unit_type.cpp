@@ -1325,7 +1325,7 @@ static int CclDefineUnitType(lua_State *l)
 		*/
 		//Wyrmgus end
 		} else if (!strcmp(value, "RandomMovementProbability")) {
-			type->RandomMovementProbability = LuaToNumber(l, -1);
+			type->random_movement_probability = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "RandomMovementDistance")) {
 			type->RandomMovementDistance = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "ClicksToExplode")) {

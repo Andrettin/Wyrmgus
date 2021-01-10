@@ -189,7 +189,7 @@ void UnHideUnit(CUnit &unit)
 */
 static bool MoveRandomly(CUnit &unit)
 {
-	if (!unit.Type->RandomMovementProbability || SyncRand(100) > unit.Type->RandomMovementProbability) {
+	if (!unit.Type->get_random_movement_probability() || SyncRand(100) > unit.Type->get_random_movement_probability()) {
 		return false;
 	}
 
