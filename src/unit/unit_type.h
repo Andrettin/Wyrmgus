@@ -772,6 +772,7 @@ class unit_type final : public detailed_data_entry, public data_type<unit_type>,
 	Q_PROPERTY(wyrmgus::player_color* conversible_player_color MEMBER conversible_player_color READ get_conversible_player_color)
 	Q_PROPERTY(int draw_level MEMBER draw_level READ get_draw_level)
 	Q_PROPERTY(wyrmgus::item_class item_class MEMBER item_class READ get_item_class)
+	Q_PROPERTY(wyrmgus::species* species MEMBER species)
 	Q_PROPERTY(wyrmgus::unit_type* corpse_type MEMBER corpse_type READ get_corpse_type)
 	Q_PROPERTY(wyrmgus::construction* construction MEMBER construction READ get_construction)
 	Q_PROPERTY(wyrmgus::resource* given_resource MEMBER given_resource)
