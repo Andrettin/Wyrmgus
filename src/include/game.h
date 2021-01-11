@@ -33,6 +33,7 @@
 namespace wyrmgus {
 
 class campaign;
+class delayed_effect_instance;
 class trigger;
 
 class game final : public singleton<game>
@@ -69,10 +70,14 @@ public:
 	void remove_local_trigger(trigger *local_trigger);
 	void clear_local_triggers();
 
+	void process_delayed_effects();
+	void add_delayed_effect(std::unique_ptr<delayed_effect_instance> &&delayed_effect);
+
 private:
 	campaign *current_campaign = nullptr;
 	QDateTime current_date;
 	std::vector<std::unique_ptr<trigger>> local_triggers; //triggers "local" to the current game
+	std::vector<std::unique_ptr<delayed_effect_instance>> delayed_effects;
 };
 
 }

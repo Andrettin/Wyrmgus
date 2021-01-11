@@ -80,6 +80,7 @@
 #include "script.h"
 //Wyrmgus end
 #include "script/condition/condition.h"
+#include "script/effect/delayed_effect_instance.h"
 #include "script/trigger.h"
 #include "settings.h"
 #include "sound/sound.h"
@@ -184,6 +185,26 @@ void game::remove_local_trigger(trigger *local_trigger)
 void game::clear_local_triggers()
 {
 	this->local_triggers.clear();
+}
+
+void game::process_delayed_effects()
+{
+	for (size_t i = 0; i < this->delayed_effects.size();) {
+		const std::unique_ptr<delayed_effect_instance> &delayed_effect = this->delayed_effects[i];
+		delayed_effect->decrement_remaining_cycles();
+
+		if (delayed_effect->get_remaining_cycles() <= 0) {
+			delayed_effect->do_effects();
+			this->delayed_effects.erase(this->delayed_effects.begin() + i);
+		} else {
+			++i;
+		}
+	}
+}
+
+void game::add_delayed_effect(std::unique_ptr<delayed_effect_instance> &&delayed_effect)
+{
+	this->delayed_effects.push_back(std::move(delayed_effect));
 }
 
 }

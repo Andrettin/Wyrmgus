@@ -35,6 +35,7 @@
 #include "script/effect/any_unit_of_type_effect.h"
 #include "script/effect/call_dialogue_effect.h"
 #include "script/effect/create_unit_effect.h"
+#include "script/effect/delayed_effect.h"
 #include "script/effect/hidden_effect.h"
 #include "script/effect/if_effect.h"
 #include "script/effect/neutral_player_effect.h"
@@ -95,6 +96,8 @@ std::unique_ptr<effect<scope_type>> effect<scope_type>::from_sml_scope(const sml
 				effect = std::make_unique<any_unit_of_type_effect>(scope.get_operator());
 			} else if (effect_identifier == "create_unit") {
 				effect = std::make_unique<create_unit_effect>(scope.get_operator());
+			} else if (effect_identifier == "delayed") {
+				effect = std::make_unique<delayed_effect<scope_type>>(scope.get_operator());
 			}
 		}
 	}

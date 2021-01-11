@@ -329,6 +329,7 @@ set(script_condition_SRCS
 source_group(script\\condition FILES ${script_condition_SRCS})
 
 set(script_effect_SRCS
+	src/script/effect/delayed_effect_instance.cpp
 	src/script/effect/effect.cpp
 	src/script/effect/effect_list.cpp
 )
@@ -830,6 +831,8 @@ set(stratagus_script_effect_HDRS
 	src/script/effect/any_unit_of_type_effect.h
 	src/script/effect/call_dialogue_effect.h
 	src/script/effect/create_unit_effect.h
+	src/script/effect/delayed_effect.h
+	src/script/effect/delayed_effect_instance.h
 	src/script/effect/effect.h
 	src/script/effect/effect_list.h
 	src/script/effect/hidden_effect.h

@@ -542,6 +542,8 @@ void TriggersEachCycle()
 		return;
 	}
 
+	wyrmgus::game::get()->process_delayed_effects();
+
 	// go to the next trigger
 	if (wyrmgus::trigger::CurrentTriggerId < wyrmgus::trigger::ActiveTriggers.size()) {
 		wyrmgus::trigger *current_trigger = wyrmgus::trigger::ActiveTriggers[wyrmgus::trigger::CurrentTriggerId];
