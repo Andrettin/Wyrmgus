@@ -58,6 +58,8 @@ void dialogue::process_sml_scope(const sml_data &scope)
 		//add an effect to call this dialogue to the trigger
 		auto dialogue_effect = std::make_unique<call_dialogue_effect>(this, sml_operator::assignment);
 		trigger->add_effect(std::move(dialogue_effect));
+
+		trigger->Type = trigger::TriggerType::PlayerTrigger;
 	} else {
 		auto node = std::make_unique<dialogue_node>(this);
 		node->ID = this->nodes.size();

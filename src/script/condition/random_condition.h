@@ -46,7 +46,8 @@ public:
 		Q_UNUSED(player)
 		Q_UNUSED(ignore_units)
 
-		return this->chance > random::get()->generate(10000);
+		const int random_number = random::get()->generate(10000);
+		return this->chance > random_number;
 	}
 
 	virtual std::string get_string(const size_t indent) const override
