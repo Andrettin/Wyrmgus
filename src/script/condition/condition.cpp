@@ -57,6 +57,7 @@
 #include "script/condition/not_condition.h"
 #include "script/condition/or_condition.h"
 #include "script/condition/quest_condition.h"
+#include "script/condition/random_condition.h"
 #include "script/condition/real_day_condition.h"
 #include "script/condition/real_month_condition.h"
 #include "script/condition/scripted_condition_condition.h"
@@ -74,7 +75,6 @@
 #include "ui/button.h"
 #include "ui/interface.h"
 #include "upgrade/upgrade_modifier.h"
-#include "util/string_util.h"
 #include "util/vector_util.h"
 
 namespace wyrmgus {
@@ -104,6 +104,8 @@ std::unique_ptr<const condition> condition::from_sml_property(const sml_property
 		return std::make_unique<faction_condition>(value);
 	} else if (key == "quest") {
 		return std::make_unique<quest_condition>(value);
+	} else if (key == "random") {
+		return std::make_unique<random_condition>(value);
 	} else if (key == "real_day") {
 		return std::make_unique<real_day_condition>(value);
 	} else if (key == "real_month") {

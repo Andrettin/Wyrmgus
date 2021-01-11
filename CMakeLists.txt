@@ -806,6 +806,7 @@ set(stratagus_script_condition_HDRS
 	src/script/condition/not_condition.h
 	src/script/condition/or_condition.h
 	src/script/condition/quest_condition.h
+	src/script/condition/random_condition.h
 	src/script/condition/real_day_condition.h
 	src/script/condition/real_month_condition.h
 	src/script/condition/scope_condition.h
