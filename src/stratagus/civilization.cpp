@@ -47,6 +47,7 @@
 #include "unit/unit_class.h"
 #include "unit/unit_type.h"
 #include "util/string_util.h"
+#include "util/string_conversion_util.h"
 #include "video/video.h"
 
 namespace wyrmgus {

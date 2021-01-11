@@ -36,7 +36,7 @@
 #include "dialogue_node.h"
 #include "luacallback.h"
 #include "script/effect/effect_list.h"
-#include "util/string_util.h"
+#include "util/string_conversion_util.h"
 
 namespace wyrmgus {
 

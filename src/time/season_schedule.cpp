@@ -31,7 +31,7 @@
 
 #include "config.h"
 #include "time/season.h"
-#include "util/string_util.h"
+#include "util/string_conversion_util.h"
 
 std::vector<CSeasonSchedule *> CSeasonSchedule::SeasonSchedules;
 std::map<std::string, CSeasonSchedule *> CSeasonSchedule::SeasonSchedulesByIdent;

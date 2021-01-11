@@ -42,6 +42,7 @@
 #include "unit/unit_manager.h"
 #include "upgrade/upgrade.h"
 #include "upgrade/upgrade_class.h"
+#include "util/string_conversion_util.h"
 #include "util/string_util.h"
 #include "video/font.h"
 #include "video/video.h"

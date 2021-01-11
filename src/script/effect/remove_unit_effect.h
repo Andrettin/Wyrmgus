@@ -29,7 +29,7 @@
 
 #include "script/effect/effect.h"
 #include "unit/unit.h"
-#include "util/string_util.h"
+#include "util/string_conversion_util.h"
 
 namespace wyrmgus {
 

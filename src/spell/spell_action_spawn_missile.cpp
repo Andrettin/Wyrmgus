@@ -37,7 +37,7 @@
 #include "script.h"
 #include "unit/unit.h"
 #include "unit/unit_find.h"
-#include "util/string_util.h"
+#include "util/string_conversion_util.h"
 
 struct CompareUnitDistance {
 	const CUnit *referenceunit;

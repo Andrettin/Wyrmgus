@@ -83,7 +83,6 @@
 #include "unit/unit_type_variation.h"
 #include "upgrade/upgrade_class.h"
 #include "upgrade/upgrade_modifier.h"
-#include "util/string_util.h"
 #include "util/util.h"
 #include "util/vector_util.h"
 

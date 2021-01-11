@@ -32,7 +32,7 @@
 #include "config.h"
 #include "time/season.h"
 #include "time/time_of_day.h"
-#include "util/string_util.h"
+#include "util/string_conversion_util.h"
 
 std::vector<CTimeOfDaySchedule *> CTimeOfDaySchedule::TimeOfDaySchedules;
 std::map<std::string, CTimeOfDaySchedule *> CTimeOfDaySchedule::TimeOfDaySchedulesByIdent;

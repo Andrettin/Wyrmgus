@@ -57,6 +57,7 @@
 #include "unit/unit.h"
 #include "unit/unit_find.h"
 #include "upgrade/upgrade.h"
+#include "util/string_conversion_util.h"
 #include "util/string_util.h"
 
 // ****************************************************************************

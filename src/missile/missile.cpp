@@ -60,7 +60,7 @@
 #include "unit/unit_ref.h"
 #include "unit/unit_type.h"
 #include "unit/unit_type_type.h"
-#include "util/string_util.h"
+#include "util/string_conversion_util.h"
 #include "video/font.h"
 #include "video/video.h"
 

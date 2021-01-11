@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-//      (c) Copyright 2020 by Andrettin
+//      (c) Copyright 2019-2020 by Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -25,38 +25,44 @@
 //      02111-1307, USA.
 //
 
-#pragma once
-
-#include "player.h"
-#include "script/condition/condition.h"
 #include "util/string_conversion_util.h"
 
-namespace wyrmgus {
+#include "util/string_util.h"
 
-class coastal_condition final : public condition
+namespace string {
+
+QDateTime to_date(const std::string &date_str)
 {
-public:
-	explicit coastal_condition(const std::string &value)
-	{
-		this->coastal = string::to_bool(value);
+	const std::vector<std::string> date_string_list = string::split(date_str, '.');
+
+	int years = 0;
+	int months = 1;
+	int days = 1;
+	int hours = 12;
+
+	if (date_string_list.size() >= 1) {
+		years = std::stoi(date_string_list[0]);
+
+		if (date_string_list.size() >= 2) {
+			months = std::stoi(date_string_list[1]);
+
+			if (date_string_list.size() >= 3) {
+				days = std::stoi(date_string_list[2]);
+
+				if (date_string_list.size() >= 4) {
+					hours = std::stoi(date_string_list[3]);
+				}
+			}
+		}
 	}
 
-	virtual bool check(const CPlayer *player, const bool ignore_units) const override
-	{
-		Q_UNUSED(ignore_units)
+	QDateTime date(QDate(years, months, days), QTime(hours, 0), Qt::UTC);
 
-		return player->has_coastal_settlement();
+	if (!date.isValid()) {
+		throw std::runtime_error("Date \"" + date_str + "\" is not a valid date.");
 	}
 
-	virtual std::string get_string(const size_t indent) const override
-	{
-		Q_UNUSED(indent)
-
-		return "Has a coastal settlement";
-	}
-
-private:
-	bool coastal = false;
-};
+	return date;
+}
 
 }

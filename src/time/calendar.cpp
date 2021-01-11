@@ -30,7 +30,6 @@
 #include "time/calendar.h"
 
 #include "config.h"
-#include "util/string_util.h"
 
 namespace wyrmgus {
 

@@ -41,7 +41,7 @@
 #include "time/calendar.h"
 #include "time/timeline.h"
 #include "util/container_util.h"
-#include "util/string_util.h"
+#include "util/string_conversion_util.h"
 #include "util/vector_util.h"
 
 namespace wyrmgus {

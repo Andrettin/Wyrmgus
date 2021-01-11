@@ -58,7 +58,6 @@
 #include "unit/unit_type_variation.h"
 #include "upgrade/upgrade.h"
 #include "upgrade/upgrade_modifier.h"
-#include "util/string_util.h"
 #include "util/vector_util.h"
 
 std::map<std::string, wyrmgus::character *> CustomHeroes;

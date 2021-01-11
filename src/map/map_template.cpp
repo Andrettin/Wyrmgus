@@ -74,7 +74,7 @@
 #include "util/image_util.h"
 #include "util/point_util.h"
 #include "util/size_util.h"
-#include "util/string_util.h"
+#include "util/string_conversion_util.h"
 #include "util/vector_util.h"
 #include "video/video.h"
 #include "world.h"

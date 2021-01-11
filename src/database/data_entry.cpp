@@ -35,7 +35,7 @@
 #include "quest/campaign.h"
 #include "time/calendar.h"
 #include "time/timeline.h"
-#include "util/string_util.h"
+#include "util/string_conversion_util.h"
 
 namespace wyrmgus {
 

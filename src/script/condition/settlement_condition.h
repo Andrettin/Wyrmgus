@@ -29,7 +29,7 @@
 
 #include "map/site.h"
 #include "script/condition/condition.h"
-#include "util/string_util.h"
+#include "util/string_conversion_util.h"
 
 namespace wyrmgus {
 

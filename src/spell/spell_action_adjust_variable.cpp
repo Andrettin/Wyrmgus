@@ -36,6 +36,7 @@
 #include "config.h"
 #include "script.h"
 #include "unit/unit.h"
+#include "util/string_conversion_util.h"
 #include "util/string_util.h"
 
 namespace wyrmgus {

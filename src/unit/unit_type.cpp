@@ -65,6 +65,7 @@
 #include "unit/unit_type_variation.h"
 #include "upgrade/upgrade.h"
 #include "util/size_util.h"
+#include "util/string_conversion_util.h"
 #include "util/string_util.h"
 #include "util/util.h"
 #include "util/vector_util.h"

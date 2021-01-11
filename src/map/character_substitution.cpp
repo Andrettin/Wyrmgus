@@ -33,7 +33,7 @@
 #include "database/sml_property.h"
 #include "util/container_util.h"
 #include "util/queue_util.h"
-#include "util/string_util.h"
+#include "util/string_conversion_util.h"
 #include "util/vector_random_util.h"
 #include "util/vector_util.h"
 

@@ -496,6 +496,7 @@ set(util_SRCS
 	src/util/point_container.cpp
 	src/util/point_util.cpp
 	src/util/random.cpp
+	src/util/string_conversion_util.cpp
 	src/util/string_util.cpp
 	src/util/util.cpp
 )
@@ -962,6 +963,7 @@ set(stratagus_util_HDRS
 	src/util/singleton.h
 	src/util/size_operators.h
 	src/util/size_util.h
+	src/util/string_conversion_util.h
 	src/util/string_util.h
 	src/util/type_traits.h
 	src/util/util.h

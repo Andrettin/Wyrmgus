@@ -52,7 +52,7 @@
 #include "util/geocoordinate_util.h"
 #include "util/point_util.h"
 #include "util/random.h"
-#include "util/string_util.h"
+#include "util/string_conversion_util.h"
 #include "util/vector_util.h"
 
 namespace wyrmgus {

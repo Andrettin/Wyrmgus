@@ -33,7 +33,7 @@
 #include "database/sml_property.h"
 #include "unit/unit.h"
 #include "unit/unit_type.h"
-#include "util/string_util.h"
+#include "util/string_conversion_util.h"
 #include "util/vector_random_util.h"
 
 namespace wyrmgus {

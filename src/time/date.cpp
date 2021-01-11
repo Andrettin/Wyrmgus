@@ -8,8 +8,6 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name date.cpp - The date source file. */
-//
 //      (c) Copyright 2018-2020 by Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
@@ -36,6 +34,7 @@
 #include "player.h"
 #include "time/calendar.h"
 #include "time/timeline.h"
+#include "util/string_conversion_util.h"
 #include "util/string_util.h"
 
 unsigned long long CDate::CurrentTotalHours = 0;
