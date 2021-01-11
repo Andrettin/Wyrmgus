@@ -45,6 +45,9 @@ namespace wyrmgus {
 	class unit_type;
 
 	template <typename scope_type>
+	class effect;
+
+	template <typename scope_type>
 	class effect_list;
 }
 
@@ -125,6 +128,8 @@ public:
 	{
 		return this->effects;
 	}
+
+	void add_effect(std::unique_ptr<effect<CPlayer>> &&effect);
 
 	TriggerType Type = TriggerType::GlobalTrigger;
 	bool Local = false;

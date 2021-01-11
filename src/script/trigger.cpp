@@ -728,6 +728,15 @@ void trigger::check() const
 	}
 }
 
+void trigger::add_effect(std::unique_ptr<effect<CPlayer>> &&effect)
+{
+	if (this->effects == nullptr) {
+		this->effects = std::make_unique<effect_list<CPlayer>>();
+	}
+
+	this->effects->add_effect(std::move(effect));
+}
+
 }
 
 /**

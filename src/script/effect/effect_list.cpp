@@ -105,6 +105,12 @@ std::string effect_list<scope_type>::get_effects_string(const size_t indent, con
 	return effects_string;
 }
 
+template <typename scope_type>
+void effect_list<scope_type>::add_effect(std::unique_ptr<effect<scope_type>> &&effect)
+{
+	this->effects.push_back(std::move(effect));
+}
+
 template class effect_list<CPlayer>;
 template class effect_list<CUnit>;
 

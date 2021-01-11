@@ -38,9 +38,14 @@ class call_dialogue_effect final : public effect<CPlayer>
 {
 public:
 	explicit call_dialogue_effect(const std::string &dialogue_identifier, const sml_operator effect_operator)
+		: call_dialogue_effect(dialogue::get(dialogue_identifier), effect_operator)
+	{
+	}
+
+	explicit call_dialogue_effect(const wyrmgus::dialogue *dialogue, const sml_operator effect_operator)
 		: effect(effect_operator)
 	{
-		this->dialogue = dialogue::get(dialogue_identifier);
+		this->dialogue = dialogue;
 	}
 
 	virtual const std::string &get_class_identifier() const override

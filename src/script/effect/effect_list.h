@@ -50,6 +50,7 @@ public:
 	void check() const;
 	void do_effects(scope_type *scope) const;
 	std::string get_effects_string(const size_t indent = 0, const std::string &prefix = "") const;
+	void add_effect(std::unique_ptr<effect<scope_type>> &&effect);
 
 private:
 	std::vector<std::unique_ptr<effect<scope_type>>> effects;

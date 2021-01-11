@@ -33,6 +33,8 @@
 #include "dialogue_option.h"
 #include "player.h"
 #include "script.h"
+#include "script/effect/call_dialogue_effect.h"
+#include "script/trigger.h"
 
 namespace wyrmgus {
 
@@ -48,15 +50,25 @@ void dialogue::process_sml_scope(const sml_data &scope)
 {
 	const std::string &tag = scope.get_tag();
 
-	auto node = std::make_unique<dialogue_node>(this);
-	node->ID = this->nodes.size();
-	database::process_sml_data(node, scope);
+	if (tag == "trigger") {
+		//create the trigger for this dialogue
+		wyrmgus::trigger *trigger = trigger::add(this->get_identifier(), this->get_module());
+		database::process_sml_data(trigger, scope);
 
-	if (!tag.empty()) {
-		this->nodes_by_identifier[tag] = node.get();
+		//add an effect to call this dialogue to the trigger
+		auto dialogue_effect = std::make_unique<call_dialogue_effect>(this, sml_operator::assignment);
+		trigger->add_effect(std::move(dialogue_effect));
+	} else {
+		auto node = std::make_unique<dialogue_node>(this);
+		node->ID = this->nodes.size();
+		database::process_sml_data(node, scope);
+
+		if (!tag.empty()) {
+			this->nodes_by_identifier[tag] = node.get();
+		}
+
+		this->nodes.push_back(std::move(node));
 	}
-
-	this->nodes.push_back(std::move(node));
 }
 
 void dialogue::initialize()
