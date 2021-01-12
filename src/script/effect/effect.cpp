@@ -39,6 +39,7 @@
 #include "script/effect/hidden_effect.h"
 #include "script/effect/if_effect.h"
 #include "script/effect/neutral_player_effect.h"
+#include "script/effect/random_effect.h"
 #include "script/effect/remove_character_effect.h"
 #include "script/effect/remove_unit_effect.h"
 #include "script/effect/resource_effect.h"
@@ -90,6 +91,8 @@ std::unique_ptr<effect<scope_type>> effect<scope_type>::from_sml_scope(const sml
 		effect = std::make_unique<if_effect<scope_type>>(scope.get_operator());
 	} else if (effect_identifier == "neutral_player") {
 		effect = std::make_unique<neutral_player_effect<scope_type>>(scope.get_operator());
+	} else if (effect_identifier == "random") {
+		effect = std::make_unique<random_effect<scope_type>>(scope.get_operator());
 	} else {
 		if constexpr (std::is_same_v<scope_type, CPlayer>) {
 			if (effect_identifier == "any_unit_of_type") {
