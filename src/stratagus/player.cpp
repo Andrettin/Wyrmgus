@@ -2272,6 +2272,8 @@ void CPlayer::AddUnit(CUnit &unit)
 	this->Units.push_back(&unit);
 	unit.Player = this;
 	Assert(this->Units[unit.PlayerSlot] == &unit);
+
+	this->last_created_unit = &unit;
 }
 
 void CPlayer::RemoveUnit(CUnit &unit)
@@ -2284,6 +2286,10 @@ void CPlayer::RemoveUnit(CUnit &unit)
 	}
 	//Wyrmgus end
 	Assert(this->Units[unit.PlayerSlot] == &unit);
+
+	if (&unit == this->last_created_unit) {
+		this->last_created_unit = nullptr;
+	}
 
 	//	unit.Player = nullptr; // we can remove dying unit...
 	CUnit *last = this->Units.back();

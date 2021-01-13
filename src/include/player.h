@@ -243,7 +243,7 @@ public:
 
 	CUnit *get_last_created_unit() const
 	{
-		return this->Units.back();
+		return this->last_created_unit;
 	}
 
 	void UpdateFreeWorkers();
@@ -699,6 +699,7 @@ public:
 
 private:
 	std::vector<CUnit *> Units; /// units of this player
+	CUnit *last_created_unit = nullptr;
 	wyrmgus::player_index_set enemies; //enemies for this player
 	wyrmgus::player_index_set allies; //allies for this player
 	wyrmgus::player_index_set shared_vision; //set of player indexes that this player has shared vision with
