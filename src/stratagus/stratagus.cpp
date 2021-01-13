@@ -202,6 +202,7 @@ extern void beos_init(int argc, char **argv);
 #include "video/video.h"
 #include "widgets.h"
 #include "util/exception_util.h"
+#include "util/log_util.h"
 #include "util/util.h"
 
 #include "missile.h" //for FreeBurningBuildingFrames
@@ -481,10 +482,15 @@ static void RedirectOutput()
 	stdoutFile = path + "\\stdout.txt";
 	stderrFile = path + "\\stderr.txt";
 
+	//if the log file is larger than the max log size, delete it before opening it for writing
+	if (std::filesystem::exists(stderrFile) && std::filesystem::file_size(stderrFile) > wyrmgus::log::max_size) {
+		std::filesystem::remove(stderrFile);
+	}
+
 	if (!freopen(stdoutFile.c_str(), "w", stdout)) {
 		printf("freopen stdout failed");
 	}
-	if (!freopen(stderrFile.c_str(), "w", stderr)) {
+	if (!freopen(stderrFile.c_str(), "a", stderr)) {
 		printf("freopen stderr failed");
 	}
 	atexit(CleanupOutput);
