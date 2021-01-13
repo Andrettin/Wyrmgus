@@ -1063,6 +1063,7 @@ set(stratagus_generic_HDRS
 	src/stratagus/magic_domain.h
 	src/stratagus/name_generator.h
 	src/stratagus/player_container.h
+	src/stratagus/text_processing_context.h
 	src/stratagus/text_processor.h
 	src/stratagus/vassalage_type.h
 )

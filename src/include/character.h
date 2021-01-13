@@ -367,7 +367,7 @@ public:
 		return this->conditions.get();
 	}
 
-	virtual text_processor create_text_processor() const override;
+	virtual text_processing_context get_text_processing_context() const override;
 
 	CUnit *get_unit() const;
 

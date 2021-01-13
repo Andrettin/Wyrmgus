@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-//      (c) Copyright 2020 by Andrettin
+//      (c) Copyright 2021 by Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -27,40 +27,16 @@
 
 #pragma once
 
-#include "text_processing_context.h"
-
-class CUpgrade;
+class CPlayer;
 
 namespace wyrmgus {
 
-class civilization;
 class faction;
-class named_data_entry;
-class unit_class;
-class unit_type;
-class upgrade_class;
-class word;
 
-class text_processor final
+struct text_processing_context final
 {
-public:
-	explicit text_processor(text_processing_context &&ctx) : context(std::move(ctx))
-	{
-	}
-
-	std::string process_text(std::string &&text) const;
-	std::string process_text(const std::string &text) const;
-	std::string process_tokens(std::queue<std::string> &&tokens) const;
-	std::string process_string_tokens(std::string &&str, std::queue<std::string> &&tokens) const;
-	std::string process_named_data_entry_token(const named_data_entry *data_entry, const std::string &token) const;
-	std::string process_named_data_entry_tokens(const named_data_entry *data_entry, std::queue<std::string> &tokens) const;
-	std::string process_civilization_tokens(const civilization *civilization, std::queue<std::string> &tokens) const;
-	std::string process_faction_tokens(const faction *faction, std::queue<std::string> &tokens) const;
-	std::string process_word_tokens(const word *word, std::queue<std::string> &tokens) const;
-	std::string process_word_meaning_tokens(const word *word, std::queue<std::string> &tokens) const;
-
-private:
-	const text_processing_context context;
+	const wyrmgus::faction *faction = nullptr;
+	const CPlayer *player = nullptr;
 };
 
 }

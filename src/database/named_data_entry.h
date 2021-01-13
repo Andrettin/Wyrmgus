@@ -36,6 +36,7 @@
 namespace wyrmgus {
 
 class text_processor;
+struct text_processing_context;
 
 class named_data_entry : public data_entry
 {
@@ -67,7 +68,8 @@ public:
 		return QString::fromStdString(this->get_name());
 	}
 
-	virtual text_processor create_text_processor() const;
+	virtual text_processing_context get_text_processing_context() const;
+	text_processor create_text_processor() const;
 
 private:
 	std::string name;

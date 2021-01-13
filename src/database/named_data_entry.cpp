@@ -44,9 +44,14 @@ void named_data_entry::process_text()
 	data_entry::process_text();
 }
 
+text_processing_context named_data_entry::get_text_processing_context() const
+{
+	return text_processing_context();
+}
+
 text_processor named_data_entry::create_text_processor() const
 {
-	return text_processor(nullptr);
+	return text_processor(this->get_text_processing_context());
 }
 
 }

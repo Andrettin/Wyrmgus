@@ -93,7 +93,7 @@ std::string text_processor::process_tokens(std::queue<std::string> &&tokens) con
 
 		str = this->process_civilization_tokens(civilization, tokens);
 	} else if (front_subtoken == "faction") {
-		const wyrmgus::faction *faction = this->faction;
+		const wyrmgus::faction *faction = this->context.faction;
 		if (!subtokens.empty()) {
 			faction = faction::get(queue::take(subtokens));
 		}
