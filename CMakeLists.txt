@@ -784,6 +784,7 @@ set(stratagus_religion_HDRS
 
 set(stratagus_script_HDRS
 	src/script/context.h
+	src/script/factor_modifier.h
 	src/script/trigger.h
 )
 
