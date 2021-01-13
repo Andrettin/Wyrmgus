@@ -841,6 +841,7 @@ set(stratagus_script_effect_HDRS
 	src/script/effect/effect_list.h
 	src/script/effect/hidden_effect.h
 	src/script/effect/if_effect.h
+	src/script/effect/last_created_unit_effect.h
 	src/script/effect/neutral_player_effect.h
 	src/script/effect/random_effect.h
 	src/script/effect/random_list_effect.h

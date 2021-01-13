@@ -38,6 +38,7 @@
 #include "script/effect/delayed_effect.h"
 #include "script/effect/hidden_effect.h"
 #include "script/effect/if_effect.h"
+#include "script/effect/last_created_unit_effect.h"
 #include "script/effect/neutral_player_effect.h"
 #include "script/effect/random_effect.h"
 #include "script/effect/random_list_effect.h"
@@ -86,7 +87,9 @@ std::unique_ptr<effect<scope_type>> effect<scope_type>::from_sml_scope(const sml
 	const std::string &effect_identifier = scope.get_tag();
 	std::unique_ptr<effect> effect;
 
-	if (effect_identifier == "hidden") {
+	if (effect_identifier == "delayed") {
+		effect = std::make_unique<delayed_effect<scope_type>>(scope.get_operator());
+	} else if (effect_identifier == "hidden") {
 		effect = std::make_unique<hidden_effect<scope_type>>(scope.get_operator());
 	} else if (effect_identifier == "if") {
 		effect = std::make_unique<if_effect<scope_type>>(scope.get_operator());
@@ -102,8 +105,8 @@ std::unique_ptr<effect<scope_type>> effect<scope_type>::from_sml_scope(const sml
 				effect = std::make_unique<any_unit_of_type_effect>(scope.get_operator());
 			} else if (effect_identifier == "create_unit") {
 				effect = std::make_unique<create_unit_effect>(scope.get_operator());
-			} else if (effect_identifier == "delayed") {
-				effect = std::make_unique<delayed_effect<scope_type>>(scope.get_operator());
+			} else if (effect_identifier == "last_created_unit") {
+				effect = std::make_unique<last_created_unit_effect>(scope.get_operator());
 			}
 		}
 	}
