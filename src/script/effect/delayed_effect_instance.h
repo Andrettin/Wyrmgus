@@ -34,6 +34,8 @@ class CUnit;
 
 namespace wyrmgus {
 
+class unit_ref;
+
 template <typename scope_type>
 class effect_list;
 
@@ -41,10 +43,12 @@ template <typename scope_type>
 class delayed_effect_instance final
 {
 public:
-	explicit delayed_effect_instance(const effect_list<scope_type> *effects, scope_type *scope, const context &ctx, const int cycles)
-		: effects(effects), scope(scope), context(ctx), remaining_cycles(cycles)
-	{
-	}
+	//use a unit ref if this is a unit, to ensure it remains valid
+	using scope_ptr = std::conditional_t<std::is_same_v<scope_type, CUnit>, std::shared_ptr<unit_ref>, scope_type *>;
+
+	explicit delayed_effect_instance(const effect_list<scope_type> *effects, scope_type *scope, const context &ctx, const int cycles);
+
+	scope_type *get_scope() const;
 
 	int get_remaining_cycles() const
 	{
@@ -60,7 +64,7 @@ public:
 
 private:
 	const effect_list<scope_type> *effects = nullptr;
-	scope_type *scope = nullptr;
+	scope_ptr scope = nullptr;
 	wyrmgus::context context;
 	int remaining_cycles = 0;
 };

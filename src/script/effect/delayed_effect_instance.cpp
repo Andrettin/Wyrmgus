@@ -25,16 +25,50 @@
 //      02111-1307, USA.
 //
 
+#include "stratagus.h"
+
 #include "script/effect/delayed_effect_instance.h"
 
 #include "script/effect/effect_list.h"
+#include "unit/unit.h"
+#include "unit/unit_ref.h"
 
 namespace wyrmgus {
 
 template <typename scope_type>
+delayed_effect_instance<scope_type>::delayed_effect_instance(const effect_list<scope_type> *effects, scope_type *scope, const wyrmgus::context &ctx, const int cycles)
+	: effects(effects), context(ctx), remaining_cycles(cycles)
+{
+	if constexpr (std::is_same_v<scope_type, CUnit>) {
+		this->scope = scope->acquire_ref();
+	} else {
+		this->scope = scope;
+	}
+}
+
+template <typename scope_type>
+scope_type *delayed_effect_instance<scope_type>::get_scope() const
+{
+	if constexpr (std::is_same_v<scope_type, CUnit>) {
+		return this->scope->get();
+	} else {
+		return this->scope;
+	}
+}
+
+template <typename scope_type>
 void delayed_effect_instance<scope_type>::do_effects()
 {
-	this->effects->do_effects(this->scope, this->context);
+	scope_type *scope = this->get_scope();
+
+	if constexpr (std::is_same_v<scope_type, CUnit>) {
+		//ignore the effects if the unit has been destroyed in the meantime
+		if (scope->Destroyed) {
+			return;
+		}
+	}
+
+	this->effects->do_effects(scope, this->context);
 }
 
 template class delayed_effect_instance<CPlayer>;
