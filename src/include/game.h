@@ -29,11 +29,16 @@
 
 #include "util/singleton.h"
 
+class CPlayer;
+class CUnit;
+
 namespace wyrmgus {
 
 class campaign;
-class delayed_effect_instance;
 class trigger;
+
+template <typename scope_type>
+class delayed_effect_instance;
 
 class game final : public singleton<game>
 {
@@ -70,13 +75,34 @@ public:
 	void clear_local_triggers();
 
 	void process_delayed_effects();
-	void add_delayed_effect(std::unique_ptr<delayed_effect_instance> &&delayed_effect);
+
+private:
+	template <typename scope_type>
+	void process_delayed_effects(std::vector<std::unique_ptr<delayed_effect_instance<scope_type>>> &delayed_effects)
+	{
+		for (size_t i = 0; i < delayed_effects.size();) {
+			const std::unique_ptr<delayed_effect_instance<scope_type>> &delayed_effect = delayed_effects[i];
+			delayed_effect->decrement_remaining_cycles();
+
+			if (delayed_effect->get_remaining_cycles() <= 0) {
+				delayed_effect->do_effects();
+				delayed_effects.erase(delayed_effects.begin() + i);
+			} else {
+				++i;
+			}
+		}
+	}
+
+public:
+	void add_delayed_effect(std::unique_ptr<delayed_effect_instance<CPlayer>> &&delayed_effect);
+	void add_delayed_effect(std::unique_ptr<delayed_effect_instance<CUnit>> &&delayed_effect);
 
 private:
 	campaign *current_campaign = nullptr;
 	QDateTime current_date;
 	std::vector<std::unique_ptr<trigger>> local_triggers; //triggers "local" to the current game
-	std::vector<std::unique_ptr<delayed_effect_instance>> delayed_effects;
+	std::vector<std::unique_ptr<delayed_effect_instance<CPlayer>>> player_delayed_effects;
+	std::vector<std::unique_ptr<delayed_effect_instance<CUnit>>> unit_delayed_effects;
 };
 
 }

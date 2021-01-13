@@ -31,9 +31,13 @@
 
 namespace wyrmgus {
 
-void delayed_effect_instance::do_effects()
+template <typename scope_type>
+void delayed_effect_instance<scope_type>::do_effects()
 {
-	this->effects->do_effects(this->player, this->context);
+	this->effects->do_effects(this->scope, this->context);
 }
+
+template class delayed_effect_instance<CPlayer>;
+template class delayed_effect_instance<CUnit>;
 
 }

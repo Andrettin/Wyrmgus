@@ -67,7 +67,7 @@ public:
 
 	virtual void do_assignment_effect(scope_type *scope, const context &ctx) const override
 	{
-		auto delayed_effect = std::make_unique<delayed_effect_instance>(&this->effects, scope, ctx, this->delay);
+		auto delayed_effect = std::make_unique<delayed_effect_instance<scope_type>>(&this->effects, scope, ctx, this->delay);
 		game::get()->add_delayed_effect(std::move(delayed_effect));
 	}
 

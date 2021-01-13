@@ -30,17 +30,19 @@
 #include "script/context.h"
 
 class CPlayer;
+class CUnit;
 
 namespace wyrmgus {
 
 template <typename scope_type>
 class effect_list;
 
+template <typename scope_type>
 class delayed_effect_instance final
 {
 public:
-	explicit delayed_effect_instance(const effect_list<CPlayer> *effects, CPlayer *player, const context &ctx, const int cycles)
-		: effects(effects), player(player), context(ctx), remaining_cycles(cycles)
+	explicit delayed_effect_instance(const effect_list<scope_type> *effects, scope_type *scope, const context &ctx, const int cycles)
+		: effects(effects), scope(scope), context(ctx), remaining_cycles(cycles)
 	{
 	}
 
@@ -57,10 +59,13 @@ public:
 	void do_effects();
 
 private:
-	const effect_list<CPlayer> *effects = nullptr;
-	CPlayer *player = nullptr;
+	const effect_list<scope_type> *effects = nullptr;
+	scope_type *scope = nullptr;
 	wyrmgus::context context;
 	int remaining_cycles = 0;
 };
+
+extern template class delayed_effect_instance<CPlayer>;
+extern template class delayed_effect_instance<CUnit>;
 
 }

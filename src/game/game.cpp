@@ -189,22 +189,18 @@ void game::clear_local_triggers()
 
 void game::process_delayed_effects()
 {
-	for (size_t i = 0; i < this->delayed_effects.size();) {
-		const std::unique_ptr<delayed_effect_instance> &delayed_effect = this->delayed_effects[i];
-		delayed_effect->decrement_remaining_cycles();
-
-		if (delayed_effect->get_remaining_cycles() <= 0) {
-			delayed_effect->do_effects();
-			this->delayed_effects.erase(this->delayed_effects.begin() + i);
-		} else {
-			++i;
-		}
-	}
+	this->process_delayed_effects(this->player_delayed_effects);
+	this->process_delayed_effects(this->unit_delayed_effects);
 }
 
-void game::add_delayed_effect(std::unique_ptr<delayed_effect_instance> &&delayed_effect)
+void game::add_delayed_effect(std::unique_ptr<delayed_effect_instance<CPlayer>> &&delayed_effect)
 {
-	this->delayed_effects.push_back(std::move(delayed_effect));
+	this->player_delayed_effects.push_back(std::move(delayed_effect));
+}
+
+void game::add_delayed_effect(std::unique_ptr<delayed_effect_instance<CUnit>> &&delayed_effect)
+{
+	this->unit_delayed_effects.push_back(std::move(delayed_effect));
 }
 
 }
