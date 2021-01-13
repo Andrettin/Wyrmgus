@@ -674,7 +674,7 @@ void trigger::ClearActiveTriggers()
 		quest->CurrentCompleted = false;
 	}
 	//Wyrmgus end
-	
+
 	GameTimer.Reset();
 }
 

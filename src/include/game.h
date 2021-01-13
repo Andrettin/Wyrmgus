@@ -97,6 +97,8 @@ public:
 	void add_delayed_effect(std::unique_ptr<delayed_effect_instance<CPlayer>> &&delayed_effect);
 	void add_delayed_effect(std::unique_ptr<delayed_effect_instance<CUnit>> &&delayed_effect);
 
+	void clear_delayed_effects();
+
 private:
 	campaign *current_campaign = nullptr;
 	QDateTime current_date;

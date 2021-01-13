@@ -203,6 +203,12 @@ void game::add_delayed_effect(std::unique_ptr<delayed_effect_instance<CUnit>> &&
 	this->unit_delayed_effects.push_back(std::move(delayed_effect));
 }
 
+void game::clear_delayed_effects()
+{
+	this->player_delayed_effects.clear();
+	this->unit_delayed_effects.clear();
+}
+
 }
 
 /**
@@ -1821,6 +1827,7 @@ void CleanGame()
 
 	CleanGame_Lua();
 	wyrmgus::trigger::ClearActiveTriggers();
+	wyrmgus::game::get()->clear_delayed_effects();
 	CleanAi();
 	CleanGroups();
 	CleanMissiles();
