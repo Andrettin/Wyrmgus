@@ -69,7 +69,7 @@ public:
 		if constexpr (std::is_same_v<scope_type, CPlayer>) {
 			player = scope;
 		} else if constexpr (std::is_same_v<scope_type, CUnit>) {
-			dialogue_ctx.current_unit = scope;
+			dialogue_ctx.current_unit = scope->acquire_ref();
 			player = scope->Player;
 		}
 

@@ -37,6 +37,7 @@
 #include "player.h"
 #include "unit/unit.h"
 #include "unit/unit_class.h"
+#include "unit/unit_ref.h"
 #include "unit/unit_type.h"
 #include "upgrade/upgrade_class.h"
 #include "upgrade/upgrade_structs.h"
@@ -108,9 +109,9 @@ std::string text_processor::process_tokens(std::queue<std::string> &&tokens) con
 	} else if (front_subtoken == "source_player") {
 		str = this->process_player_tokens(this->context.script_context.source_player, tokens);
 	} else if (front_subtoken == "source_unit") {
-		str = this->process_unit_tokens(this->context.script_context.source_unit, tokens);
+		str = this->process_unit_tokens(this->context.script_context.source_unit->get(), tokens);
 	} else if (front_subtoken == "unit") {
-		str = this->process_unit_tokens(this->context.script_context.current_unit, tokens);
+		str = this->process_unit_tokens(this->context.script_context.current_unit->get(), tokens);
 	} else if (front_subtoken == "unit_class") {
 		const wyrmgus::unit_class *unit_class = nullptr;
 		if (!subtokens.empty()) {

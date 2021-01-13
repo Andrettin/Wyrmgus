@@ -32,17 +32,18 @@ class CUnit;
 
 namespace wyrmgus {
 
+class unit_ref;
+
 //script context for e.g. events
 template <bool read_only>
 struct context_base
 {
 	using player_ptr = std::conditional_t<read_only, const CPlayer *, CPlayer *>;
-	using unit_ptr = std::conditional_t<read_only, const CUnit *, CUnit *>;
 
 	player_ptr source_player = nullptr;
 	player_ptr current_player = nullptr;
-	unit_ptr source_unit = nullptr;
-	unit_ptr current_unit = nullptr;
+	std::shared_ptr<unit_ref> source_unit;
+	std::shared_ptr<unit_ref> current_unit;
 };
 
 struct context final : context_base<false>
