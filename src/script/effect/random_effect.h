@@ -66,20 +66,20 @@ public:
 		this->effects.process_sml_scope(scope);
 	}
 
-	virtual void do_assignment_effect(scope_type *scope) const override
+	virtual void do_assignment_effect(scope_type *scope, const context &ctx) const override
 	{
 		const int random_number = random::get()->generate(10000);
 		if (this->chance <= random_number) {
 			return;
 		}
 
-		this->effects.do_effects(scope);
+		this->effects.do_effects(scope, ctx);
 	}
 
-	virtual std::string get_assignment_string(const size_t indent, const std::string &prefix) const override
+	virtual std::string get_assignment_string(const scope_type *scope, const read_only_context &ctx, const size_t indent, const std::string &prefix) const override
 	{
 		std::string str = number::to_centesimal_string(this->chance) + "% chance:\n";
-		return str + this->effects.get_effects_string(indent + 1, prefix);
+		return str + this->effects.get_effects_string(scope, ctx, indent + 1, prefix);
 	}
 
 private:

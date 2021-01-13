@@ -39,6 +39,7 @@ class dialogue;
 class dialogue_node;
 class sml_data;
 class sml_property;
+struct context;
 
 template <typename scope_type>
 class effect_list;
@@ -73,8 +74,8 @@ public:
 		return this->end_dialogue;
 	}
 
-	void do_effects(CPlayer *player) const;
-	std::string get_tooltip() const;
+	void do_effects(CPlayer *player, const context &ctx) const;
+	std::string get_tooltip(CPlayer *player) const;
 
 	void delete_lua_callbacks();
 

@@ -39,6 +39,7 @@
 #include "quest/objective/quest_objective.h"
 #include "quest/objective_type.h"
 #include "script/condition/and_condition.h"
+#include "script/context.h"
 #include "script/effect/effect_list.h"
 #include "script.h"
 #include "text_processor.h"
@@ -179,14 +180,16 @@ void quest::check() const
 	}
 }
 
-std::string quest::get_rewards_string() const
+std::string quest::get_rewards_string(const CPlayer *player) const
 {
 	if (!this->rewards_string.empty()) {
 		return "- " + this->rewards_string;
 	}
 
 	if (this->completion_effects != nullptr) {
-		return this->completion_effects->get_effects_string(0, "- ");
+		read_only_context ctx;
+		ctx.current_player = player;
+		return this->completion_effects->get_effects_string(player, ctx, 0, "- ");
 	}
 
 	return std::string();

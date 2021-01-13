@@ -36,6 +36,7 @@
 #include "luacallback.h"
 #include "script.h"
 #include "script/condition/and_condition.h"
+#include "script/context.h"
 #include "unit/unit_find.h"
 #include "unit/unit_type.h"
 #include "util/string_util.h"
@@ -198,7 +199,7 @@ void dialogue_node::call(CPlayer *player) const
 	lua_command += "nil, nil, nil, ";
 
 	lua_command += "{";
-	if (!this->option_pointers.empty() && !this->option_pointers.front()->get_tooltip().empty()) {
+	if (!this->option_pointers.empty() && !this->option_pointers.front()->get_tooltip(player).empty()) {
 		lua_command += "OptionTooltips = {";
 		bool first = true;
 		for (const dialogue_option *option : this->option_pointers) {
@@ -207,7 +208,7 @@ void dialogue_node::call(CPlayer *player) const
 			} else {
 				first = false;
 			}
-			std::string tooltip = string::to_tooltip(option->get_tooltip());
+			std::string tooltip = string::to_tooltip(option->get_tooltip(player));
 			string::replace(tooltip, "\n", "\\n");
 			string::replace(tooltip, "\t", "\\t");
 			lua_command += "\"" + tooltip + "\"";
@@ -225,7 +226,11 @@ void dialogue_node::option_effect(const int option_index, CPlayer *player) const
 {
 	if (option_index < static_cast<int>(this->option_pointers.size())) {
 		const dialogue_option *option = this->option_pointers[option_index];
-		option->do_effects(player);
+
+		context ctx;
+		ctx.current_player = player;
+		option->do_effects(player, ctx);
+
 		if (option->ends_dialogue()) {
 			return;
 		} else if (option->get_next_node() != nullptr) {

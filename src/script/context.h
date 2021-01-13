@@ -27,47 +27,36 @@
 
 #pragma once
 
-#include "script/effect/effect.h"
-#include "script/effect/scripted_effect.h"
+class CPlayer;
 
 namespace wyrmgus {
 
-template <typename scope_type>
-class scripted_effect_base;
+//script context for e.g. events
+template <bool read_only>
+struct context_base
+{
+	using player_ptr = std::conditional_t<read_only, const CPlayer *, CPlayer *>;
 
-template <typename scope_type>
-class scripted_effect_effect final : public effect<scope_type>
+	player_ptr source_player = nullptr;
+	player_ptr current_player = nullptr;
+};
+
+struct context final : context_base<false>
+{
+};
+
+struct read_only_context final : context_base<true>
 {
 public:
-	explicit scripted_effect_effect(const std::string &effect_identifier, const sml_operator effect_operator) : effect<scope_type>(effect_operator)
+	read_only_context()
 	{
-		static_assert(std::is_same_v<scope_type, CPlayer> || std::is_same_v<scope_type, CUnit>);
-
-		if constexpr (std::is_same_v<scope_type, CPlayer>) {
-			this->scripted_effect = player_scripted_effect::get(effect_identifier);
-		} else if constexpr (std::is_same_v<scope_type, CUnit>) {
-			this->scripted_effect = unit_scripted_effect::get(effect_identifier);
-		}
 	}
 
-	virtual const std::string &get_class_identifier() const override
+	read_only_context(const context &ctx)
 	{
-		static const std::string class_identifier = "scripted_effect";
-		return class_identifier;
+		this->source_player = ctx.source_player;
+		this->current_player = ctx.current_player;
 	}
-
-	virtual void do_assignment_effect(scope_type *scope, const context &ctx) const override
-	{
-		this->scripted_effect->get_effects().do_effects(scope, ctx);
-	}
-
-	virtual std::string get_assignment_string(const scope_type *scope, const read_only_context &ctx, const size_t indent, const std::string &prefix) const override
-	{
-		return this->scripted_effect->get_effects().get_effects_string(scope, ctx, indent, prefix);
-	}
-
-private:
-	const scripted_effect_base<scope_type> *scripted_effect = nullptr;
 };
 
 }

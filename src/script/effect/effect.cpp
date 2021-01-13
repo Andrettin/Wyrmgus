@@ -132,11 +132,11 @@ void effect<scope_type>::process_sml_scope(const sml_data &scope)
 }
 
 template <typename scope_type>
-void effect<scope_type>::do_effect(scope_type *scope) const
+void effect<scope_type>::do_effect(scope_type *scope, const context &ctx) const
 {
 	switch (this->effect_operator) {
 		case sml_operator::assignment:
-			this->do_assignment_effect(scope);
+			this->do_assignment_effect(scope, ctx);
 			break;
 		case sml_operator::addition:
 			this->do_addition_effect(scope);
@@ -150,11 +150,11 @@ void effect<scope_type>::do_effect(scope_type *scope) const
 }
 
 template <typename scope_type>
-std::string effect<scope_type>::get_string(const size_t indent, const std::string &prefix) const
+std::string effect<scope_type>::get_string(const scope_type *scope, const read_only_context &ctx, const size_t indent, const std::string &prefix) const
 {
 	switch (this->effect_operator) {
 		case sml_operator::assignment:
-			return this->get_assignment_string(indent, prefix);
+			return this->get_assignment_string(scope, ctx, indent, prefix);
 		case sml_operator::addition:
 			return this->get_addition_string();
 		case sml_operator::subtraction:

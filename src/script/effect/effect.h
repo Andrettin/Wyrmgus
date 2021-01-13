@@ -36,6 +36,10 @@ class dialogue;
 class sml_data;
 class sml_property;
 enum class sml_operator;
+struct context;
+struct read_only_context;
+
+static constexpr const char *no_effect_string = "No effect";
 
 //a scripted effect
 template <typename scope_type>
@@ -60,13 +64,20 @@ public:
 	{
 	}
 
-	void do_effect(scope_type *scope) const;
+	void do_effect(scope_type *scope, const context &ctx) const;
 
 	virtual void do_assignment_effect(scope_type *scope) const
 	{
 		Q_UNUSED(scope)
 
 		throw std::runtime_error("The assignment operator is not supported for \"" + this->get_class_identifier() + "\" effects.");
+	}
+
+	virtual void do_assignment_effect(scope_type *scope, const context &ctx) const
+	{
+		Q_UNUSED(ctx)
+
+		this->do_assignment_effect(scope);
 	}
 
 	virtual void do_addition_effect(scope_type *scope) const
@@ -83,15 +94,17 @@ public:
 		throw std::runtime_error("The subtraction operator is not supported for \"" + this->get_class_identifier() + "\" effects.");
 	}
 
-	std::string get_string(const size_t indent, const std::string &prefix) const;
+	std::string get_string(const scope_type *scope, const read_only_context &ctx, const size_t indent, const std::string &prefix) const;
 
 	virtual std::string get_assignment_string() const
 	{
 		throw std::runtime_error("The assignment operator is not supported for \"" + this->get_class_identifier() + "\" effects.");
 	}
 
-	virtual std::string get_assignment_string(const size_t indent, const std::string &prefix) const
+	virtual std::string get_assignment_string(const scope_type *scope, const read_only_context &ctx, const size_t indent, const std::string &prefix) const
 	{
+		Q_UNUSED(scope)
+		Q_UNUSED(ctx)
 		Q_UNUSED(indent)
 		Q_UNUSED(prefix)
 

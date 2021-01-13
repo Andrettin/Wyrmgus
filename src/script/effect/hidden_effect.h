@@ -56,9 +56,9 @@ public:
 		this->effects.process_sml_scope(scope);
 	}
 
-	virtual void do_assignment_effect(scope_type *scope) const override
+	virtual void do_assignment_effect(scope_type *scope, const context &ctx) const override
 	{
-		this->effects.do_effects(scope);
+		this->effects.do_effects(scope, ctx);
 	}
 
 	virtual std::string get_assignment_string() const override

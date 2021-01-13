@@ -35,6 +35,7 @@
 #include "dialogue.h"
 #include "dialogue_node.h"
 #include "luacallback.h"
+#include "script/context.h"
 #include "script/effect/effect_list.h"
 #include "util/string_conversion_util.h"
 
@@ -104,10 +105,10 @@ dialogue *dialogue_option::get_dialogue() const
 	return this->node->get_dialogue();
 }
 
-void dialogue_option::do_effects(CPlayer *player) const
+void dialogue_option::do_effects(CPlayer *player, const context &ctx) const
 {
 	if (this->effects != nullptr) {
-		this->effects->do_effects(player);
+		this->effects->do_effects(player, ctx);
 	}
 
 	if (this->lua_effects != nullptr) {
@@ -116,14 +117,16 @@ void dialogue_option::do_effects(CPlayer *player) const
 	}
 }
 
-std::string dialogue_option::get_tooltip() const
+std::string dialogue_option::get_tooltip(CPlayer *player) const
 {
 	if (!this->tooltip.empty()) {
 		return this->tooltip;
 	}
 
 	if (this->effects != nullptr) {
-		return this->effects->get_effects_string();
+		read_only_context ctx;
+		ctx.current_player = player;
+		return this->effects->get_effects_string(player, ctx);
 	}
 
 	return std::string();

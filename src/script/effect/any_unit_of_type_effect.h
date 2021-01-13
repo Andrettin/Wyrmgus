@@ -69,7 +69,7 @@ public:
 		scope_effect_base::check();
 	}
 
-	virtual void do_assignment_effect(CPlayer *player) const override
+	virtual void do_assignment_effect(CPlayer *player, const context &ctx) const override
 	{
 		//copy the unit list, as the effects could change the player's list (e.g. by removing a unit)
 		const std::vector<CUnit *> type_units = player->get_type_units(this->unit_type);
@@ -79,7 +79,7 @@ public:
 				continue;
 			}
 
-			this->do_scope_effect(unit);
+			this->do_scope_effect(unit, ctx);
 		}
 	}
 

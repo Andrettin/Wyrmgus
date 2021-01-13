@@ -63,21 +63,21 @@ public:
 		}
 	}
 
-	virtual void do_assignment_effect(scope_type *scope) const override
+	virtual void do_assignment_effect(scope_type *scope, const context &ctx) const override
 	{
 		if (!this->conditions.check(scope)) {
 			return;
 		}
 
-		this->effects.do_effects(scope);
+		this->effects.do_effects(scope, ctx);
 	}
 
-	virtual std::string get_assignment_string(const size_t indent, const std::string &prefix) const override
+	virtual std::string get_assignment_string(const scope_type *scope, const read_only_context &ctx, const size_t indent, const std::string &prefix) const override
 	{
 		std::string str = "If:\n";
 		str += this->conditions.get_conditions_string(indent + 1);
 		str += "\n" + std::string(indent, '\t') + "Then:\n";
-		return str + this->effects.get_effects_string(indent + 1, prefix);
+		return str + this->effects.get_effects_string(scope, ctx, indent + 1, prefix);
 	}
 
 private:

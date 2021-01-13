@@ -64,15 +64,15 @@ void effect_list<scope_type>::check() const
 }
 
 template <typename scope_type>
-void effect_list<scope_type>::do_effects(scope_type *scope) const
+void effect_list<scope_type>::do_effects(scope_type *scope, const context &ctx) const
 {
 	for (const std::unique_ptr<effect<scope_type>> &effect : this->effects) {
-		effect->do_effect(scope);
+		effect->do_effect(scope, ctx);
 	}
 }
 
 template <typename scope_type>
-std::string effect_list<scope_type>::get_effects_string(const size_t indent, const std::string &prefix) const
+std::string effect_list<scope_type>::get_effects_string(const scope_type *scope, const read_only_context &ctx, const size_t indent, const std::string &prefix) const
 {
 	std::string effects_string;
 	bool first = true;
@@ -81,7 +81,7 @@ std::string effect_list<scope_type>::get_effects_string(const size_t indent, con
 			continue;
 		}
 
-		const std::string effect_string = effect->get_string(indent, prefix);
+		const std::string effect_string = effect->get_string(scope, ctx, indent, prefix);
 		if (effect_string.empty()) {
 			continue;
 		}

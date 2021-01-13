@@ -43,6 +43,7 @@
 #include "results.h"
 #include "script.h"
 #include "script/condition/and_condition.h"
+#include "script/context.h"
 #include "script/effect/effect.h"
 #include "script/effect/effect_list.h"
 #include "ui/interface.h"
@@ -578,7 +579,9 @@ void TriggersEachCycle()
 			if (current_trigger->Type == wyrmgus::trigger::TriggerType::GlobalTrigger) {
 				if (check_conditions(current_trigger, CPlayer::Players[PlayerNumNeutral])) {
 					triggered = true;
-					current_trigger->get_effects()->do_effects(CPlayer::Players[PlayerNumNeutral]);
+					wyrmgus::context ctx;
+					ctx.current_player = CPlayer::Players[PlayerNumNeutral];
+					current_trigger->get_effects()->do_effects(CPlayer::Players[PlayerNumNeutral], ctx);
 				}
 			} else if (current_trigger->Type == wyrmgus::trigger::TriggerType::PlayerTrigger) {
 				for (int i = 0; i < PlayerNumNeutral; ++i) {
@@ -590,7 +593,9 @@ void TriggersEachCycle()
 						continue;
 					}
 					triggered = true;
-					current_trigger->get_effects()->do_effects(player);
+					wyrmgus::context ctx;
+					ctx.current_player = player;
+					current_trigger->get_effects()->do_effects(player, ctx);
 					if (current_trigger->fires_only_once()) {
 						break;
 					}

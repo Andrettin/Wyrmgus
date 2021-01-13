@@ -27,6 +27,8 @@
 
 #pragma once
 
+#include "script/context.h"
+
 class CPlayer;
 
 namespace wyrmgus {
@@ -37,8 +39,8 @@ class effect_list;
 class delayed_effect_instance final
 {
 public:
-	explicit delayed_effect_instance(const effect_list<CPlayer> *effects, CPlayer *player, const int cycles)
-		: effects(effects), player(player), remaining_cycles(cycles)
+	explicit delayed_effect_instance(const effect_list<CPlayer> *effects, CPlayer *player, const context &ctx, const int cycles)
+		: effects(effects), player(player), context(ctx), remaining_cycles(cycles)
 	{
 	}
 
@@ -57,6 +59,7 @@ public:
 private:
 	const effect_list<CPlayer> *effects = nullptr;
 	CPlayer *player = nullptr;
+	wyrmgus::context context;
 	int remaining_cycles = 0;
 };
 

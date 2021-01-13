@@ -33,7 +33,7 @@ namespace wyrmgus {
 
 void delayed_effect_instance::do_effects()
 {
-	this->effects->do_effects(this->player);
+	this->effects->do_effects(this->player, this->context);
 }
 
 }

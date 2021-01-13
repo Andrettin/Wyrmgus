@@ -65,16 +65,16 @@ public:
 		this->effects.process_sml_scope(scope);
 	}
 
-	virtual void do_assignment_effect(scope_type *scope) const override
+	virtual void do_assignment_effect(scope_type *scope, const context &ctx) const override
 	{
-		auto delayed_effect = std::make_unique<delayed_effect_instance>(&this->effects, scope, this->delay);
+		auto delayed_effect = std::make_unique<delayed_effect_instance>(&this->effects, scope, ctx, this->delay);
 		game::get()->add_delayed_effect(std::move(delayed_effect));
 	}
 
-	virtual std::string get_assignment_string(const size_t indent, const std::string &prefix) const override
+	virtual std::string get_assignment_string(const scope_type *scope, const read_only_context &ctx, const size_t indent, const std::string &prefix) const override
 	{
 		std::string str = "In " + std::to_string(this->delay) + " cycles:\n";
-		return str + this->effects.get_effects_string(indent + 1, prefix);
+		return str + this->effects.get_effects_string(scope, ctx, indent + 1, prefix);
 	}
 
 private:

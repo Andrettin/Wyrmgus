@@ -58,17 +58,24 @@ public:
 		this->effects.check();
 	}
 
-	void do_scope_effect(scope_type *scope) const
+	void do_scope_effect(scope_type *scope, const context &ctx) const
 	{
-		this->effects.do_effects(scope);
+		this->effects.do_effects(scope, ctx);
 	}
 
 	virtual std::string get_scope_name() const = 0;
 
-	std::string get_assignment_string(const size_t indent, const std::string &prefix) const override final
+	virtual const scope_type *get_effects_string_scope(const upper_scope_type *upper_scope) const
+	{
+		Q_UNUSED(upper_scope)
+
+		return nullptr;
+	}
+
+	std::string get_assignment_string(const upper_scope_type *upper_scope, const read_only_context &ctx, const size_t indent, const std::string &prefix) const override final
 	{
 		std::string str = this->get_scope_name() + ":\n";
-		str += this->effects.get_effects_string(indent + 1, prefix);
+		str += this->effects.get_effects_string(this->get_effects_string_scope(upper_scope), ctx, indent + 1, prefix);
 		return str;
 	}
 

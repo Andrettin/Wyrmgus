@@ -150,7 +150,7 @@ public:
 		return this->objective_strings;
 	}
 
-	std::string get_rewards_string() const;
+	std::string get_rewards_string(const CPlayer *player) const;
 
 	const std::string &get_hint() const
 	{

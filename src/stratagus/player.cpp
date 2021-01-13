@@ -81,6 +81,7 @@
 //Wyrmgus end
 #include "script.h"
 #include "script/condition/and_condition.h"
+#include "script/context.h"
 #include "script/effect/effect_list.h"
 //Wyrmgus start
 #include "settings.h"
@@ -2511,7 +2512,7 @@ void CPlayer::on_available_quests_changed()
 			for (const std::string &objective_string : quest->get_objective_strings()) {
 				button->Description += "\n" + objective_string;
 			}
-			const std::string rewards_string = quest->get_rewards_string();
+			const std::string rewards_string = quest->get_rewards_string(this);
 			if (!rewards_string.empty()) {
 				button->Description += "\n \nRewards:\n" + rewards_string;
 			}
@@ -2579,7 +2580,9 @@ void CPlayer::accept_quest(wyrmgus::quest *quest)
 	}
 
 	if (quest->get_accept_effects() != nullptr) {
-		quest->get_accept_effects()->do_effects(this);
+		wyrmgus::context ctx;
+		ctx.current_player = this;
+		quest->get_accept_effects()->do_effects(this, ctx);
 	}
 
 	this->on_available_quests_changed();
@@ -2608,7 +2611,9 @@ void CPlayer::complete_quest(wyrmgus::quest *quest)
 	}
 
 	if (quest->get_completion_effects() != nullptr) {
-		quest->get_completion_effects()->do_effects(this);
+		wyrmgus::context ctx;
+		ctx.current_player = this;
+		quest->get_completion_effects()->do_effects(this, ctx);
 	}
 	
 	if (this == CPlayer::GetThisPlayer()) {
@@ -2620,7 +2625,7 @@ void CPlayer::complete_quest(wyrmgus::quest *quest)
 			wyrmgus::defines::get()->get_campaign_victory_dialogue()->call(this);
 		}
 
-		std::string rewards_string = quest->get_rewards_string();
+		std::string rewards_string = quest->get_rewards_string(this);
 		if (!rewards_string.empty()) {
 			string::replace(rewards_string, "\n", "\\n");
 			string::replace(rewards_string, "\t", "\\t");
@@ -2642,7 +2647,9 @@ void CPlayer::fail_quest(wyrmgus::quest *quest, const std::string &fail_reason)
 	}
 	
 	if (quest->get_failure_effects() != nullptr) {
-		quest->get_failure_effects()->do_effects(this);
+		wyrmgus::context ctx;
+		ctx.current_player = this;
+		quest->get_failure_effects()->do_effects(this, ctx);
 	}
 
 	if (this == CPlayer::GetThisPlayer()) {
