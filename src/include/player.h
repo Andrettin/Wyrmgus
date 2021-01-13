@@ -527,8 +527,8 @@ public:
 		return 0;
 	}
 
-	void IncreaseCountsForUnit(CUnit *unit, bool type_change = false);
-	void DecreaseCountsForUnit(CUnit *unit, bool type_change = false);
+	void IncreaseCountsForUnit(CUnit *unit, const bool type_change = false);
+	void DecreaseCountsForUnit(CUnit *unit, const bool type_change = false);
 	//Wyrmgus end
 
 	/// Does the player have units of a given type

@@ -1012,6 +1012,7 @@ void CPlayer::Init(/* PlayerTypes */ int type)
 	this->units_by_type.clear();
 	this->units_by_class.clear();
 	this->AiActiveUnitsByType.clear();
+	this->last_created_unit = nullptr;
 	//Wyrmgus end
 
 	this->Supply = 0;
@@ -2209,6 +2210,8 @@ void CPlayer::Clear()
 	this->units_by_type.clear();
 	this->units_by_class.clear();
 	this->AiActiveUnitsByType.clear();
+	this->last_created_unit = nullptr;
+
 	this->available_quests.clear();
 	this->current_quests.clear();
 	this->completed_quests.clear();
@@ -2272,8 +2275,6 @@ void CPlayer::AddUnit(CUnit &unit)
 	this->Units.push_back(&unit);
 	unit.Player = this;
 	Assert(this->Units[unit.PlayerSlot] == &unit);
-
-	this->last_created_unit = &unit;
 }
 
 void CPlayer::RemoveUnit(CUnit &unit)
@@ -2286,10 +2287,6 @@ void CPlayer::RemoveUnit(CUnit &unit)
 	}
 	//Wyrmgus end
 	Assert(this->Units[unit.PlayerSlot] == &unit);
-
-	if (&unit == this->last_created_unit) {
-		this->last_created_unit = nullptr;
-	}
 
 	//	unit.Player = nullptr; // we can remove dying unit...
 	CUnit *last = this->Units.back();
@@ -3545,7 +3542,7 @@ int CPlayer::GetUnitTypeAiActiveCount(const wyrmgus::unit_type *type) const
 	}
 }
 
-void CPlayer::IncreaseCountsForUnit(CUnit *unit, bool type_change)
+void CPlayer::IncreaseCountsForUnit(CUnit *unit, const bool type_change)
 {
 	const wyrmgus::unit_type *type = unit->Type;
 
@@ -3577,10 +3574,12 @@ void CPlayer::IncreaseCountsForUnit(CUnit *unit, bool type_change)
 		if (unit->get_character() != nullptr) {
 			this->Heroes.push_back(unit);
 		}
+
+		this->last_created_unit = unit;
 	}
 }
 
-void CPlayer::DecreaseCountsForUnit(CUnit *unit, bool type_change)
+void CPlayer::DecreaseCountsForUnit(CUnit *unit, const bool type_change)
 {
 	const wyrmgus::unit_type *type = unit->Type;
 
@@ -3625,6 +3624,10 @@ void CPlayer::DecreaseCountsForUnit(CUnit *unit, bool type_change)
 	if (!type_change) {
 		if (unit->get_character() != nullptr) {
 			this->Heroes.erase(std::remove(this->Heroes.begin(), this->Heroes.end(), unit), this->Heroes.end());
+		}
+
+		if (unit == this->last_created_unit) {
+			this->last_created_unit = nullptr;
 		}
 	}
 }
