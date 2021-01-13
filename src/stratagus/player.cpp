@@ -2799,6 +2799,63 @@ bool CPlayer::is_quest_completed(const wyrmgus::quest *quest) const
 	return wyrmgus::vector::contains(this->completed_quests, quest);
 }
 
+void CPlayer::on_unit_built(const CUnit *unit)
+{
+	bool counter_changed = false;
+
+	for (const auto &objective : this->get_quest_objectives()) {
+		const int old_counter = objective->get_counter();
+		objective->on_unit_built(unit);
+		const int new_counter = objective->get_counter();
+
+		if (old_counter != new_counter) {
+			counter_changed = true;
+		}
+	}
+
+	if (counter_changed) {
+		this->update_current_quests();
+	}
+}
+
+void CPlayer::on_unit_destroyed(const CUnit *unit)
+{
+	bool counter_changed = false;
+
+	for (const auto &objective : this->get_quest_objectives()) {
+		const int old_counter = objective->get_counter();
+		objective->on_unit_destroyed(unit);
+		const int new_counter = objective->get_counter();
+
+		if (old_counter != new_counter) {
+			counter_changed = true;
+		}
+	}
+
+	if (counter_changed) {
+		this->update_current_quests();
+	}
+}
+
+void CPlayer::on_resource_gathered(const wyrmgus::resource *resource, const int quantity)
+{
+	bool counter_changed = false;
+
+	for (const auto &objective : this->get_quest_objectives()) {
+		const int old_counter = objective->get_counter();
+		objective->on_resource_gathered(resource, quantity);
+		const int new_counter = objective->get_counter();
+
+		if (old_counter != new_counter) {
+			counter_changed = true;
+		}
+	}
+
+	if (counter_changed) {
+		this->update_current_quests();
+	}
+}
+
 void CPlayer::AddModifier(CUpgrade *modifier, int cycles)
 {
 	if (this->Allow.Upgrades[modifier->ID] == 'R') {

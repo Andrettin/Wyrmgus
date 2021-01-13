@@ -1371,11 +1371,9 @@ int COrder_Resource::MoveToDepot(CUnit &unit)
 	unit.ChangeExperience(xp_gained);
 	
 	//update quests
-	for (const auto &objective : player.get_quest_objectives()) {
-		objective->on_resource_gathered(final_resource, final_resource_change);
-		if (final_resource->get_index() != this->CurrentResource) {
-			objective->on_resource_gathered(wyrmgus::resource::get_all()[this->CurrentResource], processed_resource_change);
-		}
+	player.on_resource_gathered(final_resource, final_resource_change);
+	if (final_resource->get_index() != this->CurrentResource) {
+		player.on_resource_gathered(wyrmgus::resource::get_all()[this->CurrentResource], processed_resource_change);
 	}
 	
 	//Wyrmgus start

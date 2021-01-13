@@ -369,9 +369,7 @@ int TransformUnitIntoType(CUnit &unit, const wyrmgus::unit_type &newtype)
 		}
 		
 		if (!unit.UnderConstruction) {
-			for (const auto &objective : player.get_quest_objectives()) {
-				objective->on_unit_built(&unit);
-			}
+			player.on_unit_built(&unit);
 		}
 	}
 

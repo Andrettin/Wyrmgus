@@ -189,10 +189,7 @@ static void Finish(COrder_Built &order, CUnit &unit)
 	//Wyrmgus end
 
 	player.IncreaseCountsForUnit(&unit);
-	
-	for (const auto &objective : player.get_quest_objectives()) {
-		objective->on_unit_built(&unit);
-	}
+	player.on_unit_built(&unit);
 
 	if (unit.site != nullptr) {
 		wyrmgus::site_game_data *site_game_data = unit.site->get_game_data();

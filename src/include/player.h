@@ -277,6 +277,11 @@ public:
 	std::pair<bool, std::string> check_quest_failure(const wyrmgus::quest *quest) const;
 	bool has_quest(const wyrmgus::quest *quest) const;
 	bool is_quest_completed(const wyrmgus::quest *quest) const;
+
+	void on_unit_built(const CUnit *unit);
+	void on_unit_destroyed(const CUnit *unit);
+	void on_resource_gathered(const wyrmgus::resource *resource, const int quantity);
+
 	void AddModifier(CUpgrade *modifier, int cycles);
 	void RemoveModifier(CUpgrade *modifier);
 

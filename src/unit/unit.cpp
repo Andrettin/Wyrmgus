@@ -2954,9 +2954,7 @@ void CUnit::AssignToPlayer(CPlayer &player)
 			} else {
 				player.TotalUnits++;
 				
-				for (const auto &objective : player.get_quest_objectives()) {
-					objective->on_unit_built(this);
-				}
+				player.on_unit_built(this);
 			}
 		}
 		
@@ -7227,11 +7225,9 @@ static void HitUnit_IncreaseScoreForKill(CUnit &attacker, CUnit &target)
 	attacker.Variable[KILL_INDEX].Max++;
 	attacker.Variable[KILL_INDEX].Enable = 1;
 	
+	attacker.Player->on_unit_destroyed(&target);
+
 	//Wyrmgus start
-	for (const auto &objective : attacker.Player->get_quest_objectives()) {
-		objective->on_unit_destroyed(&target);
-	}
-	
 	//also increase score for units inside the target that will be destroyed when the target dies
 	if (
 		target.UnitInside
