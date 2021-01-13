@@ -747,9 +747,11 @@ void character::remove_ability(const CUpgrade *ability)
 	vector::remove(this->abilities, ability);
 }
 
-text_processor character::create_text_processor() const
+text_processing_context character::get_text_processing_context() const
 {
-	return text_processor(this->get_default_faction());
+	text_processing_context ctx;
+	ctx.faction = this->get_default_faction();
+	return ctx;
 }
 
 CUnit *character::get_unit() const
