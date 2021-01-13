@@ -240,6 +240,12 @@ public:
 
 	void AddUnit(CUnit &unit);
 	void RemoveUnit(CUnit &unit);
+
+	CUnit *get_last_created_unit() const
+	{
+		return this->Units.back();
+	}
+
 	void UpdateFreeWorkers();
 	//Wyrmgus start
 	void PerformResourceTrade();

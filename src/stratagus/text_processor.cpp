@@ -32,6 +32,10 @@
 #include "civilization.h"
 #include "faction.h"
 #include "language/word.h"
+#include "map/site.h"
+#include "map/site_game_data.h"
+#include "player.h"
+#include "unit/unit.h"
 #include "unit/unit_class.h"
 #include "unit/unit_type.h"
 #include "upgrade/upgrade_class.h"
@@ -99,6 +103,8 @@ std::string text_processor::process_tokens(std::queue<std::string> &&tokens) con
 		}
 
 		str = this->process_faction_tokens(faction, tokens);
+	} else if (front_subtoken == "player") {
+		str = this->process_player_tokens(this->context.player, tokens);
 	} else if (front_subtoken == "unit_class") {
 		const wyrmgus::unit_class *unit_class = nullptr;
 		if (!subtokens.empty()) {
@@ -285,6 +291,89 @@ std::string text_processor::process_faction_tokens(const wyrmgus::faction *facti
 	}
 
 	throw std::runtime_error("Failed to process faction token \"" + front_subtoken + "\".");
+}
+
+std::string text_processor::process_player_tokens(const CPlayer *player, std::queue<std::string> &tokens) const
+{
+	if (player == nullptr) {
+		throw std::runtime_error("No player provided when processing player tokens.");
+	}
+
+	if (tokens.empty()) {
+		throw std::runtime_error("No tokens provided when processing player tokens.");
+	}
+
+	const std::string token = queue::take(tokens);
+
+	std::queue<std::string> subtokens = string::split_to_queue(token, ':');
+
+	if (subtokens.size() > 2) {
+		throw std::runtime_error("There can only be at most 2 subtokens.");
+	}
+
+	const std::string front_subtoken = queue::take(subtokens);
+
+	if (front_subtoken == "last_created_unit") {
+		return this->process_unit_tokens(player->get_last_created_unit(), tokens);
+	}
+
+	throw std::runtime_error("Failed to process player token \"" + front_subtoken + "\".");
+}
+
+std::string text_processor::process_site_tokens(const wyrmgus::site *site, std::queue<std::string> &tokens) const
+{
+	if (site == nullptr) {
+		throw std::runtime_error("No site provided when processing site tokens.");
+	}
+
+	if (tokens.empty()) {
+		throw std::runtime_error("No tokens provided when processing site tokens.");
+	}
+
+	const std::string token = queue::take(tokens);
+
+	std::queue<std::string> subtokens = string::split_to_queue(token, ':');
+
+	if (subtokens.size() > 2) {
+		throw std::runtime_error("There can only be at most 2 subtokens.");
+	}
+
+	const std::string front_subtoken = queue::take(subtokens);
+
+	if (front_subtoken == "current_cultural_name") {
+		return site->get_game_data()->get_current_cultural_name();
+	} else {
+		return this->process_named_data_entry_token(site, front_subtoken);
+	}
+
+	throw std::runtime_error("Failed to process site token \"" + front_subtoken + "\".");
+}
+
+std::string text_processor::process_unit_tokens(const CUnit *unit, std::queue<std::string> &tokens) const
+{
+	if (unit == nullptr) {
+		throw std::runtime_error("No unit provided when processing unit tokens.");
+	}
+
+	if (tokens.empty()) {
+		throw std::runtime_error("No tokens provided when processing unit tokens.");
+	}
+
+	const std::string token = queue::take(tokens);
+
+	std::queue<std::string> subtokens = string::split_to_queue(token, ':');
+
+	if (subtokens.size() > 2) {
+		throw std::runtime_error("There can only be at most 2 subtokens.");
+	}
+
+	const std::string front_subtoken = queue::take(subtokens);
+
+	if (front_subtoken == "settlement") {
+		return this->process_site_tokens(unit->settlement, tokens);
+	}
+
+	throw std::runtime_error("Failed to process unit token \"" + front_subtoken + "\".");
 }
 
 std::string text_processor::process_word_tokens(const wyrmgus::word *word, std::queue<std::string> &tokens) const
