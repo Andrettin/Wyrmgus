@@ -488,6 +488,7 @@ source_group(upgrade FILES ${upgrade_SRCS})
 set(util_SRCS
 	src/util/color_container.cpp
 	src/util/date_util.cpp
+	src/util/exception_util.cpp
 	src/util/geocoordinate_util.cpp
 	src/util/geojson_util.cpp
 	src/util/geopath_util.cpp
@@ -962,6 +963,7 @@ set(stratagus_util_HDRS
 	src/util/geoshape_util.h
 	src/util/image_util.h
 	src/util/list_util.h
+	src/util/log_util.h
 	src/util/map_util.h
 	src/util/number_util.h
 	src/util/point_container.h

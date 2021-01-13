@@ -69,6 +69,7 @@
 #include "unit/unit_manager.h"
 #include "unit/unit_type.h"
 #include "upgrade/upgrade.h"
+#include "util/log_util.h"
 #include "util/random.h"
 #include "video/font.h"
 #include "video/video.h"
@@ -284,7 +285,7 @@ void LoadGame(const std::string &filename)
 		}
 
 		if (unit->get_ref_count() <= 1) {
-			std::cerr << "Destroyed unit has a reference count less than or equal to 1 before having its base reference cleared when loading a game, which means that no other unit refers to it, in which case it should not have been part of the unit manager's units vector, as it should have been fully released already." << std::endl;
+			wyrmgus::log::log_error("Destroyed unit has a reference count less than or equal to 1 before having its base reference cleared when loading a game, which means that no other unit refers to it, in which case it should not have been part of the unit manager's units vector, as it should have been fully released already.");
 		}
 
 		unit->clear_base_reference();

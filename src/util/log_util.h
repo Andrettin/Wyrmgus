@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-//      (c) Copyright 2019-2021 by Andrettin
+//      (c) Copyright 2021 by Andrettin
 //
 //      Permission is hereby granted, free of charge, to any person obtaining a
 //      copy of this software and associated documentation files (the
@@ -31,8 +31,18 @@
 
 #pragma once
 
-namespace wyrmgus::exception {
+namespace wyrmgus::log {
 
-extern void report(const std::exception &exception);
+constexpr const char *date_string_format = "yyyy.MM.dd hh:mm:ss";
+
+inline void log(const std::string_view &message)
+{
+	std::cout << "[" << QDateTime::currentDateTime().toString(date_string_format).toStdString() << "] " << message << '\n';
+}
+
+inline void log_error(const std::string_view &error_message)
+{
+	std::cerr << "[" << QDateTime::currentDateTime().toString(date_string_format).toStdString() << "] " << error_message << std::endl;
+}
 
 }

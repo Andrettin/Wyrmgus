@@ -49,6 +49,7 @@
 #include "time/timeline.h"
 #include "unit/unit_type.h"
 #include "upgrade/upgrade.h"
+#include "util/log_util.h"
 #include "util/vector_util.h"
 
 static int CclDefineCharacter(lua_State *l)
@@ -63,7 +64,7 @@ static int CclDefineCharacter(lua_State *l)
 	bool redefinition = false;
 	if (!character) {
 		if (LoadingPersistentHeroes) {
-			fprintf(stderr, "Character \"%s\" has persistent data, but doesn't exist.\n", character_ident.c_str());
+			wyrmgus::log::log_error("Character \"" + character_ident + "\" has persistent data, but doesn't exist.");
 			return 0;
 		}
 		character = wyrmgus::character::get_or_add(character_ident, nullptr);

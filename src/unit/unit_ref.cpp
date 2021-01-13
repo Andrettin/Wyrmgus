@@ -30,6 +30,7 @@
 #include "unit/unit_ref.h"
 
 #include "unit/unit.h"
+#include "util/log_util.h"
 
 namespace wyrmgus {
 
@@ -37,7 +38,7 @@ unit_ref::~unit_ref()
 {
 	if (this->unit != nullptr) {
 		if (!this->unit->Destroyed) {
-			std::cerr << "A unit's reference count has reached 0, despite it not being destroyed (unit type: \"" << this->unit->Type->get_identifier() << "\")." << std::endl;
+			log::log_error("A unit's reference count has reached 0, despite it not being destroyed (unit type: \"" + this->unit->Type->get_identifier() + "\").");
 		}
 
 		this->unit->Release();

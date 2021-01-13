@@ -35,6 +35,7 @@
 #include "sound/music_sample.h"
 #include "sound/music_type.h"
 #include "sound/sound_server.h"
+#include "util/log_util.h"
 #include "util/vector_random_util.h"
 
 #include <SDL_mixer.h>
@@ -125,12 +126,12 @@ void music_player::play_sample(music_sample *sample)
 
 	const int volume = Mix_VolumeMusic(GetMusicVolume() * this->current_volume_modifier / 100 * MIX_MAX_VOLUME / MaxVolume);
 	if (volume == 0 && GetMusicVolume() != 0) {
-		std::cerr << "Failed to set volume for playing music." << std::endl;
+		log::log_error("Failed to set volume for playing music.");
 	}
 
 	const int result = Mix_PlayMusic(sample->get_data(), 0);
 	if (result == -1) {
-		std::cerr << "Failed to play music file \"" + sample->get_filepath().string() + "\"." << std::endl;
+		log::log_error("Failed to play music file \"" + sample->get_filepath().string() + "\".");
 	}
 }
 

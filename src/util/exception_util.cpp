@@ -29,10 +29,21 @@
 //      TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 //      SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#pragma once
+#include "util/exception_util.h"
+
+#include "util/log_util.h"
 
 namespace wyrmgus::exception {
 
-extern void report(const std::exception &exception);
+void report(const std::exception &exception)
+{
+	try {
+		std::rethrow_if_nested(exception);
+	} catch (const std::exception &nested_exception) {
+		exception::report(nested_exception);
+	}
+
+	log::log_error(exception.what());
+}
 
 }

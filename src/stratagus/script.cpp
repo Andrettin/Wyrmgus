@@ -68,6 +68,7 @@
 #include "unit/unit_manager.h" //for checking units of a custom unit type and deleting them if the unit type has been removed
 #include "unit/unit_type.h"
 //Wyrmgus end
+#include "util/log_util.h"
 #include "util/number_util.h"
 #include "video/font.h"
 
@@ -144,7 +145,7 @@ static int report(int status, bool exitOnError)
 		if (exitOnError) {
 			throw std::runtime_error(msg);
 		} else {
-			std::cerr << msg << std::endl;
+			wyrmgus::log::log_error(msg);
 		}
 	}
 	return status;

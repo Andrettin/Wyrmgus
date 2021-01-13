@@ -29,65 +29,64 @@
 
 #include "database/database.h"
 #include "util/exception_util.h"
+#include "util/log_util.h"
 
 #include <QCommandLineParser>
 #include <QQmlApplicationEngine>
 
+namespace wyrmgus {
+
 static void write_qt_message(QtMsgType type, const QMessageLogContext &context, const QString &msg)
 {
-	std::ostream *ostream = nullptr;
+	std::string log_message;
 
 	switch (type) {
 		case QtDebugMsg:
+			log_message += "Debug: ";
+			break;
 		case QtInfoMsg:
-			ostream = &std::cout;
+			log_message += "Info: ";
 			break;
 		case QtWarningMsg:
+			log_message += "Warning: ";
+			break;
 		case QtCriticalMsg:
+			log_message += "Critical: ";
+			break;
 		case QtFatalMsg:
-			ostream = &std::cerr;
+			log_message += "Fatal: ";
 			break;
 	}
 
-	switch (type) {
-		case QtDebugMsg:
-			*ostream << "Debug: ";
-			break;
-		case QtInfoMsg:
-			*ostream << "Info: ";
-			break;
-		case QtWarningMsg:
-			*ostream << "Warning: ";
-			break;
-		case QtCriticalMsg:
-			*ostream << "Critical: ";
-			break;
-		case QtFatalMsg:
-			*ostream << "Fatal: ";
-			break;
-	}
-
-	*ostream << msg.toStdString();
+	log_message += msg.toStdString();
 
 	if (context.file != nullptr) {
-		*ostream << " (" << context.file << ": " << context.line;
+		log_message += " (";
+		log_message += context.file;
+		log_message += ": ";
+		log_message += context.line;
 
 		if (context.function != nullptr) {
-			*ostream << ", " << context.function;
+			log_message += ", ";
+			log_message += context.function;
 		}
 
-		*ostream << ")";
+		log_message += ")";
 	}
 
 	switch (type) {
+		case QtDebugMsg:
+		case QtInfoMsg:
+			log::log(log_message);
+			break;
+		case QtWarningMsg:
 		case QtCriticalMsg:
 		case QtFatalMsg:
-			*ostream << std::endl;
-			break;
-		default:
-			*ostream << '\n';
+			log::log_error(log_message);
 			break;
 	}
+}
+
 }
 
 int main(int argc, char **argv)
