@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-//      (c) Copyright 2020 by Andrettin
+//      (c) Copyright 2020-2021 by Andrettin
 //
 //      Permission is hereby granted, free of charge, to any person obtaining a
 //      copy of this software and associated documentation files (the
