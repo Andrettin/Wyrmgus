@@ -33,10 +33,10 @@
 
 namespace wyrmgus {
 
-class quest_condition final : public condition
+class completed_quest_condition final : public condition
 {
 public:
-	explicit quest_condition(const std::string &value)
+	explicit completed_quest_condition(const std::string &value)
 	{
 		this->quest = quest::get(value);
 	}
@@ -45,14 +45,14 @@ public:
 	{
 		Q_UNUSED(ignore_units)
 
-		return player->has_quest(this->quest);
+		return player->is_quest_completed(this->quest);
 	}
 
 	virtual std::string get_string(const size_t indent) const override
 	{
 		Q_UNUSED(indent)
 
-		return "Has the " + string::highlight(this->quest->get_name()) + " quest";
+		return "Completed the " + string::highlight(this->quest->get_name()) + " quest";
 	}
 
 private:
