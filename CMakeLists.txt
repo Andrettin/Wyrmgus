@@ -318,6 +318,7 @@ set(religion_SRCS
 source_group(religion FILES ${religion_SRCS})
 
 set(script_SRCS
+	src/script/factor_modifier.cpp
 	src/script/trigger.cpp
 )
 source_group(script FILES ${script_SRCS})
@@ -840,6 +841,7 @@ set(stratagus_script_effect_HDRS
 	src/script/effect/if_effect.h
 	src/script/effect/neutral_player_effect.h
 	src/script/effect/random_effect.h
+	src/script/effect/random_list_effect.h
 	src/script/effect/remove_character_effect.h
 	src/script/effect/remove_unit_effect.h
 	src/script/effect/resource_effect.h

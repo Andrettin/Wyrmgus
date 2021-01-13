@@ -27,46 +27,45 @@
 
 #pragma once
 
-#include "script/condition/condition.h"
+class CPlayer;
+class CUnit;
 
 namespace wyrmgus {
 
-class and_condition final : public condition
+class and_condition;
+class sml_data;
+class sml_property;
+
+//a modifier for a factor, e.g. a random chance or weight
+template <typename scope_type>
+class factor_modifier
 {
 public:
-	and_condition() {}
+	factor_modifier();
+	~factor_modifier();
 
-	explicit and_condition(std::vector<std::unique_ptr<const condition>> &&conditions)
-		: conditions(std::move(conditions))
+	void process_sml_property(const sml_property &property);
+	void process_sml_scope(const sml_data &scope);
+
+	int get_factor() const
 	{
+		return this->factor;
 	}
 
-	virtual void ProcessConfigDataSection(const CConfigData *section) override;
-	virtual void process_sml_property(const sml_property &property) override;
-	virtual void process_sml_scope(const sml_data &scope) override;
-	virtual void check_validity() const override;
-	virtual bool check(const CPlayer *player, bool ignore_units = false) const override;
-	virtual bool check(const CUnit *unit, bool ignore_units = false) const override;
-
-	virtual std::string get_string(const size_t indent) const override
+	bool is_additive() const
 	{
-		std::string str = "All of these must be true:\n";
-		str += this->get_conditions_string(indent + 1);
-		return str;
+		return this->additive;
 	}
 
-	std::string get_conditions_string(const size_t indent) const
-	{
-		return condition::get_conditions_string(this->conditions, indent);
-	}
-
-	void add_condition(std::unique_ptr<const condition> &&condition)
-	{
-		this->conditions.push_back(std::move(condition));
-	}
+	bool check_conditions(const scope_type *scope) const;
 
 private:
-	std::vector<std::unique_ptr<const condition>> conditions; //the conditions of which all should be true
+	int factor = 0; //the factor of the modifier itself
+	bool additive = false; //whether the modifier is additive instead of multiplicative
+	std::unique_ptr<and_condition> conditions; //conditions for whether the modifier is to be applied
 };
+
+extern template class factor_modifier<CPlayer>;
+extern template class factor_modifier<CUnit>;
 
 }
