@@ -37,6 +37,7 @@
 #include "script.h"
 #include "script/condition/and_condition.h"
 #include "script/context.h"
+#include "text_processor.h"
 #include "unit/unit_find.h"
 #include "unit/unit_type.h"
 #include "util/string_util.h"
@@ -157,7 +158,15 @@ void dialogue_node::call(CPlayer *player) const
 		lua_command += "\"" + this->speaker_name + "\", ";
 	}
 
-	lua_command += "\"" + FindAndReplaceString(FindAndReplaceString(this->text, "\"", "\\\""), "\n", "\\n") + "\", ";
+	text_processing_context ctx;
+	ctx.player = player;
+	const text_processor text_processor(std::move(ctx));
+
+	std::string text = text_processor.process_text(this->text);
+	string::replace(text, "\"", "\\\"");
+	string::replace(text, "\n", "\\n");
+
+	lua_command += "\"" + std::move(text) + "\", ";
 	lua_command += std::to_string(player->Index) + ", ";
 
 	lua_command += "{";
