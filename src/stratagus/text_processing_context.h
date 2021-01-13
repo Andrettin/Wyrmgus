@@ -27,6 +27,8 @@
 
 #pragma once
 
+#include "script/context.h"
+
 class CPlayer;
 
 namespace wyrmgus {
@@ -35,8 +37,16 @@ class faction;
 
 struct text_processing_context final
 {
+	text_processing_context()
+	{
+	}
+
+	explicit text_processing_context(const read_only_context &ctx) : script_context(ctx)
+	{
+	}
+
 	const wyrmgus::faction *faction = nullptr;
-	const CPlayer *player = nullptr;
+	read_only_context script_context;
 };
 
 }

@@ -39,6 +39,7 @@ namespace wyrmgus {
 
 class dialogue_node;
 class dialogue_option;
+struct context;
 
 class dialogue final : public data_entry, public data_type<dialogue>
 {
@@ -77,9 +78,9 @@ public:
 
 	void map_option(const dialogue_option *option, const std::string &identifier);
 
-	void call(CPlayer *player) const;
-	void call_node(const int node_index, CPlayer *player) const;
-	void call_node_option_effect(const int node_index, const int option_index, CPlayer *player) const;
+	void call(CPlayer *player, const context &ctx) const;
+	void call_node(const int node_index, CPlayer *player, const context &ctx) const;
+	void call_node_option_effect(const int node_index, const int option_index, CPlayer *player, const context &ctx) const;
 
 	void delete_lua_callbacks();
 	

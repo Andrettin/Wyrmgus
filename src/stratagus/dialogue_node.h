@@ -43,6 +43,7 @@ class faction;
 class sml_data;
 class sml_property;
 class unit_type;
+struct context;
 
 class dialogue_node final
 {
@@ -66,8 +67,8 @@ public:
 		this->options.push_back(std::move(option));
 	}
 
-	void call(CPlayer *player) const;
-	void option_effect(const int option_index, CPlayer *player) const;
+	void call(CPlayer *player, const context &ctx) const;
+	void option_effect(const int option_index, CPlayer *player, const context &ctx) const;
 
 	void delete_lua_callbacks();
 

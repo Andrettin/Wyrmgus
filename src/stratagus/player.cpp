@@ -2628,7 +2628,9 @@ void CPlayer::complete_quest(wyrmgus::quest *quest)
 
 		const wyrmgus::campaign *current_campaign = wyrmgus::game::get()->get_current_campaign();
 		if (current_campaign != nullptr && current_campaign->get_quest() == quest) {
-			wyrmgus::defines::get()->get_campaign_victory_dialogue()->call(this);
+			wyrmgus::context ctx;
+			ctx.current_player = this;
+			wyrmgus::defines::get()->get_campaign_victory_dialogue()->call(this, ctx);
 		}
 
 		std::string rewards_string = quest->get_rewards_string(this);
@@ -2661,7 +2663,9 @@ void CPlayer::fail_quest(wyrmgus::quest *quest, const std::string &fail_reason)
 	if (this == CPlayer::GetThisPlayer()) {
 		const wyrmgus::campaign *current_campaign = wyrmgus::game::get()->get_current_campaign();
 		if (current_campaign != nullptr && current_campaign->get_quest() == quest) {
-			wyrmgus::defines::get()->get_campaign_defeat_dialogue()->call(this);
+			wyrmgus::context ctx;
+			ctx.current_player = this;
+			wyrmgus::defines::get()->get_campaign_defeat_dialogue()->call(this, ctx);
 		}
 
 		CclCommand("if (GenericDialog ~= nil) then GenericDialog(\"Quest Failed\", \"You have failed the " + quest->get_name() + " quest! " + fail_reason + "\", nil, \"" + (quest->get_icon() ? quest->get_icon()->get_identifier() : "") + "\", \"" + (quest->get_player_color() ? quest->get_player_color()->get_identifier() : "") + "\", " + std::to_string(quest->get_icon() ? quest->get_icon()->get_frame() : 0) + ") end;");

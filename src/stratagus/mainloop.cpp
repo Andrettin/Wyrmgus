@@ -58,6 +58,7 @@
 #include "replay.h"
 #include "results.h"
 #include "script.h"
+#include "script/context.h"
 #include "script/trigger.h"
 //Wyrmgus start
 #include "settings.h"
@@ -546,7 +547,9 @@ void GameMainLoop()
 		}
 		
 		if (CurrentQuest != nullptr && CurrentQuest->IntroductionDialogue != nullptr) {
-			CurrentQuest->IntroductionDialogue->call(CPlayer::GetThisPlayer());
+			wyrmgus::context ctx;
+			ctx.current_player = CPlayer::GetThisPlayer();
+			CurrentQuest->IntroductionDialogue->call(CPlayer::GetThisPlayer(), ctx);
 		}
 
 		if (current_campaign != nullptr && current_campaign->get_quest() != nullptr) {

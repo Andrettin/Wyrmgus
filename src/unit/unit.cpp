@@ -6788,6 +6788,16 @@ const wyrmgus::time_of_day *CUnit::get_center_tile_time_of_day() const
 	return this->MapLayer->get_tile_time_of_day(this->get_center_tile_pos());
 }
 
+const wyrmgus::site *CUnit::get_center_tile_settlement() const
+{
+	if (this->MapLayer == nullptr) {
+		return nullptr;
+	}
+
+	//get the settlement for the unit's tile
+	return this->get_center_tile()->get_settlement();
+}
+
 bool CUnit::is_seen_by_player(const CPlayer *player) const
 {
 	return this->is_seen_by_player(player->Index);

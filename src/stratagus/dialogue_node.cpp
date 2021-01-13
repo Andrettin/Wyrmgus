@@ -108,11 +108,11 @@ void dialogue_node::check() const
 	}
 }
 
-void dialogue_node::call(CPlayer *player) const
+void dialogue_node::call(CPlayer *player, const context &ctx) const
 {
 	if (this->conditions != nullptr) {
 		if (!this->conditions->check(player)) {
-			this->get_dialogue()->call_node(this->ID + 1, player);
+			this->get_dialogue()->call_node(this->ID + 1, player, ctx);
 			return;
 		}
 	}
@@ -121,7 +121,7 @@ void dialogue_node::call(CPlayer *player) const
 		this->Conditions->pushPreamble();
 		this->Conditions->run(1);
 		if (this->Conditions->popBoolean() == false) {
-			this->get_dialogue()->call_node(this->ID + 1, player);
+			this->get_dialogue()->call_node(this->ID + 1, player, ctx);
 			return;
 		}
 	}
@@ -158,9 +158,8 @@ void dialogue_node::call(CPlayer *player) const
 		lua_command += "\"" + this->speaker_name + "\", ";
 	}
 
-	text_processing_context ctx;
-	ctx.player = player;
-	const text_processor text_processor(std::move(ctx));
+	text_processing_context text_ctx(ctx);
+	const text_processor text_processor(std::move(text_ctx));
 
 	std::string text = text_processor.process_text(this->text);
 	string::replace(text, "\"", "\\\"");
@@ -231,24 +230,22 @@ void dialogue_node::call(CPlayer *player) const
 	CclCommand(lua_command);
 }
 
-void dialogue_node::option_effect(const int option_index, CPlayer *player) const
+void dialogue_node::option_effect(const int option_index, CPlayer *player, const context &ctx) const
 {
 	if (option_index < static_cast<int>(this->option_pointers.size())) {
 		const dialogue_option *option = this->option_pointers[option_index];
 
-		context ctx;
-		ctx.current_player = player;
 		option->do_effects(player, ctx);
 
 		if (option->ends_dialogue()) {
 			return;
 		} else if (option->get_next_node() != nullptr) {
-			option->get_next_node()->call(player);
+			option->get_next_node()->call(player, ctx);
 			return;
 		}
 	}
 
-	this->get_dialogue()->call_node(this->ID + 1, player);
+	this->get_dialogue()->call_node(this->ID + 1, player, ctx);
 }
 
 void dialogue_node::delete_lua_callbacks()

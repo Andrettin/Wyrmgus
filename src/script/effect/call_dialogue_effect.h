@@ -28,13 +28,17 @@
 #pragma once
 
 #include "dialogue.h"
-#include "player.h"
+#include "script/context.h"
 #include "script/effect/effect.h"
 #include "util/string_util.h"
 
+class CPlayer;
+class CUnit;
+
 namespace wyrmgus {
 
-class call_dialogue_effect final : public effect<CPlayer>
+template <typename scope_type>
+class call_dialogue_effect final : public effect<scope_type>
 {
 public:
 	explicit call_dialogue_effect(const std::string &dialogue_identifier, const sml_operator effect_operator)
@@ -43,7 +47,7 @@ public:
 	}
 
 	explicit call_dialogue_effect(const wyrmgus::dialogue *dialogue, const sml_operator effect_operator)
-		: effect(effect_operator)
+		: effect<scope_type>(effect_operator)
 	{
 		this->dialogue = dialogue;
 	}
@@ -54,9 +58,24 @@ public:
 		return class_identifier;
 	}
 
-	virtual void do_assignment_effect(CPlayer *player) const override
+	virtual void do_assignment_effect(scope_type *scope, const context &ctx) const override
 	{
-		this->dialogue->call(player);
+		CPlayer *player = nullptr;
+
+		context dialogue_ctx;
+		dialogue_ctx.source_player = ctx.current_player;
+		dialogue_ctx.source_unit = ctx.current_unit;
+
+		if constexpr (std::is_same_v<scope_type, CPlayer>) {
+			player = scope;
+		} else if constexpr (std::is_same_v<scope_type, CUnit>) {
+			dialogue_ctx.current_unit = scope;
+			player = scope->Player;
+		}
+
+		dialogue_ctx.current_player = player;
+
+		this->dialogue->call(player, dialogue_ctx);
 	}
 
 	virtual std::string get_assignment_string() const override

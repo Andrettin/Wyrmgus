@@ -59,8 +59,6 @@ std::unique_ptr<effect<scope_type>> effect<scope_type>::from_sml_property(const 
 	if constexpr (std::is_same_v<scope_type, CPlayer>) {
 		if (key == "accept_quest") {
 			return std::make_unique<accept_quest_effect>(value, effect_operator);
-		} else if (key == "call_dialogue") {
-			return std::make_unique<call_dialogue_effect>(value, effect_operator);
 		} else if (key == "create_unit") {
 			return std::make_unique<create_unit_effect>(value, effect_operator);
 		} else if (key == "remove_character") {
@@ -74,7 +72,9 @@ std::unique_ptr<effect<scope_type>> effect<scope_type>::from_sml_property(const 
 		}
 	}
 
-	if (key == "scripted_effect") {
+	if (key == "call_dialogue") {
+		return std::make_unique<call_dialogue_effect<scope_type>>(value, effect_operator);
+	} else if (key == "scripted_effect") {
 		return std::make_unique<scripted_effect_effect<scope_type>>(value, effect_operator);
 	}
 

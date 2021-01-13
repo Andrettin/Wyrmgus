@@ -33,6 +33,7 @@
 #include "dialogue_option.h"
 #include "player.h"
 #include "script.h"
+#include "script/context.h"
 #include "script/effect/call_dialogue_effect.h"
 #include "script/trigger.h"
 
@@ -56,7 +57,7 @@ void dialogue::process_sml_scope(const sml_data &scope)
 		database::process_sml_data(trigger, scope);
 
 		//add an effect to call this dialogue to the trigger
-		auto dialogue_effect = std::make_unique<call_dialogue_effect>(this, sml_operator::assignment);
+		auto dialogue_effect = std::make_unique<call_dialogue_effect<CPlayer>>(this, sml_operator::assignment);
 		trigger->add_effect(std::move(dialogue_effect));
 
 		trigger->Type = trigger::TriggerType::PlayerTrigger;
@@ -98,32 +99,32 @@ void dialogue::map_option(const dialogue_option *option, const std::string &iden
 	this->options_by_identifier[identifier] = option;
 }
 
-void dialogue::call(CPlayer *player) const
+void dialogue::call(CPlayer *player, const context &ctx) const
 {
 	if (this->nodes.empty()) {
 		return;
 	}
 	
-	this->nodes.front()->call(player);
+	this->nodes.front()->call(player, ctx);
 }
 
-void dialogue::call_node(const int node_index, CPlayer *player) const
+void dialogue::call_node(const int node_index, CPlayer *player, const context &ctx) const
 {
 	if (node_index >= static_cast<int>(this->nodes.size())) {
 		return;
 	}
 
-	this->nodes[node_index]->call(player);
+	this->nodes[node_index]->call(player, ctx);
 }
 
-void dialogue::call_node_option_effect(const int node_index, const int option_index, CPlayer *player) const
+void dialogue::call_node_option_effect(const int node_index, const int option_index, CPlayer *player, const context &ctx) const
 {
 	if (node_index >= static_cast<int>(this->nodes.size())) {
 		return;
 	}
 
 	CclCommand("trigger_player = " + std::to_string(player->Index) + ";");
-	this->nodes[node_index]->option_effect(option_index, player);
+	this->nodes[node_index]->option_effect(option_index, player, ctx);
 }
 
 void dialogue::delete_lua_callbacks()
@@ -135,20 +136,35 @@ void dialogue::delete_lua_callbacks()
 
 }
 
-void CallDialogue(const std::string &dialogue_ident, int player)
+void CallDialogue(const std::string &dialogue_ident, int player_index)
 {
 	const wyrmgus::dialogue *dialogue = wyrmgus::dialogue::get(dialogue_ident);
-	dialogue->call(CPlayer::Players.at(player));
+
+	CPlayer *player = CPlayer::Players.at(player_index);
+	wyrmgus::context ctx;
+	ctx.current_player = player;
+
+	dialogue->call(player, ctx);
 }
 
-void CallDialogueNode(const std::string &dialogue_ident, int node, int player)
+void CallDialogueNode(const std::string &dialogue_ident, int node, int player_index)
 {
 	const wyrmgus::dialogue *dialogue = wyrmgus::dialogue::get(dialogue_ident);
-	dialogue->call_node(node, CPlayer::Players.at(player));
+
+	CPlayer *player = CPlayer::Players.at(player_index);
+	wyrmgus::context ctx;
+	ctx.current_player = player;
+
+	dialogue->call_node(node, player, ctx);
 }
 
-void CallDialogueNodeOptionEffect(const std::string &dialogue_ident, int node, int option, int player)
+void CallDialogueNodeOptionEffect(const std::string &dialogue_ident, int node, int option, int player_index)
 {
 	const wyrmgus::dialogue *dialogue = wyrmgus::dialogue::get(dialogue_ident);
-	dialogue->call_node_option_effect(node, option, CPlayer::Players.at(player));
+
+	CPlayer *player = CPlayer::Players.at(player_index);
+	wyrmgus::context ctx;
+	ctx.current_player = player;
+
+	dialogue->call_node_option_effect(node, option, player, ctx);
 }

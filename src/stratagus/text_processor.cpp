@@ -104,7 +104,13 @@ std::string text_processor::process_tokens(std::queue<std::string> &&tokens) con
 
 		str = this->process_faction_tokens(faction, tokens);
 	} else if (front_subtoken == "player") {
-		str = this->process_player_tokens(this->context.player, tokens);
+		str = this->process_player_tokens(this->context.script_context.current_player, tokens);
+	} else if (front_subtoken == "source_player") {
+		str = this->process_player_tokens(this->context.script_context.source_player, tokens);
+	} else if (front_subtoken == "source_unit") {
+		str = this->process_unit_tokens(this->context.script_context.source_unit, tokens);
+	} else if (front_subtoken == "unit") {
+		str = this->process_unit_tokens(this->context.script_context.current_unit, tokens);
 	} else if (front_subtoken == "unit_class") {
 		const wyrmgus::unit_class *unit_class = nullptr;
 		if (!subtokens.empty()) {
@@ -370,7 +376,12 @@ std::string text_processor::process_unit_tokens(const CUnit *unit, std::queue<st
 	const std::string front_subtoken = queue::take(subtokens);
 
 	if (front_subtoken == "settlement") {
-		return this->process_site_tokens(unit->settlement, tokens);
+		const site *settlement = unit->settlement;
+
+		if (settlement == nullptr) {
+			settlement = unit->get_center_tile_settlement();
+		}
+		return this->process_site_tokens(settlement, tokens);
 	}
 
 	throw std::runtime_error("Failed to process unit token \"" + front_subtoken + "\".");

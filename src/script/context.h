@@ -28,6 +28,7 @@
 #pragma once
 
 class CPlayer;
+class CUnit;
 
 namespace wyrmgus {
 
@@ -36,9 +37,12 @@ template <bool read_only>
 struct context_base
 {
 	using player_ptr = std::conditional_t<read_only, const CPlayer *, CPlayer *>;
+	using unit_ptr = std::conditional_t<read_only, const CUnit *, CUnit *>;
 
 	player_ptr source_player = nullptr;
 	player_ptr current_player = nullptr;
+	unit_ptr source_unit = nullptr;
+	unit_ptr current_unit = nullptr;
 };
 
 struct context final : context_base<false>
@@ -56,6 +60,8 @@ public:
 	{
 		this->source_player = ctx.source_player;
 		this->current_player = ctx.current_player;
+		this->source_unit = ctx.source_unit;
+		this->current_unit = ctx.current_unit;
 	}
 };
 

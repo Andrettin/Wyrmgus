@@ -58,6 +58,7 @@ namespace wyrmgus {
 	class construction_frame;
 	class map_template;
 	class player_color;
+	class site;
 	class spell;
 	class tile;
 	class time_of_day;
@@ -566,6 +567,7 @@ public:
 	}
 
 	const wyrmgus::time_of_day *get_center_tile_time_of_day() const;
+	const wyrmgus::site *get_center_tile_settlement() const;
 
 	bool is_seen_by_player(const CPlayer *player) const;
 
