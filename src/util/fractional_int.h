@@ -31,63 +31,71 @@
 
 #pragma once
 
-namespace wyrmgus::number {
+#include "util/number_util.h"
+#include "util/string_conversion_util.h"
 
-extern std::string to_formatted_string(const int number);
+namespace wyrmgus {
 
-inline std::string to_signed_string(const int number)
+//a fractional number with fixed decimal precision, implemented via an underlying integer
+template <int N>
+class fractional_int final
 {
-	std::string number_str;
-	if (number >= 0) {
-		number_str += "+";
-	}
-	number_str += number::to_formatted_string(number);
-	return number_str;
-}
+	static constexpr int divisor = number::pow(10, N);
 
-inline std::string to_centesimal_rest_string(const int rest)
-{
-	std::string rest_str;
-	const int abs_rest = std::abs(rest);
-	if (abs_rest > 0) {
-		rest_str += ".";
-		if (abs_rest < 10) {
-			rest_str += "0";
-		}
-		rest_str += std::to_string(abs_rest);
-	}
-	return rest_str;
-}
-
-inline std::string to_centesimal_string(const int number)
-{
-	std::string number_str = std::to_string(number / 100);
-	number_str += number::to_centesimal_rest_string(number % 100);
-	return number_str;
-}
-
-inline std::string to_signed_centesimal_string(const int number)
-{
-	std::string number_str = number::to_signed_string(number / 100);
-	number_str += number::to_centesimal_rest_string(number % 100);
-	return number_str;
-}
-
-inline int fast_abs(const int value)
-{
-	const int temp = value >> 31;
-	return (value ^ temp) - temp;
-}
-
-inline constexpr int pow(const int base, const int exp)
-{
-	int value = 1;
-
-	for (int i = 0; i < exp; ++i) {
-		value *= base;
+	explicit constexpr fractional_int(const std::string &str)
+	{
+		this->value = string::fractional_number_string_to_int<N>(str);
 	}
 
-	return value;
-}
+	template <int N2>
+	constexpr const fractional_int<N> &operator *=(const fractional_int<N2> &other)
+	{
+		this->value *= other.value;
+		this->value /= fractional_int<N2>::divisor;
+		return *this;
+	}
+
+	constexpr const fractional_int<N> &operator *=(const int other)
+	{
+		this->value *= other;
+		return *this;
+	}
+
+	template <int N2>
+	constexpr fractional_int<N> operator *(const fractional_int<N2> &other) const
+	{
+		fractional_int res(*this);
+		res *= other;
+		return res;
+	}
+
+	constexpr fractional_int<N> operator *(const int other) const
+	{
+		fractional_int res(*this);
+		res *= other;
+		return res;
+	}
+
+	friend constexpr const int &operator *=(int &lhs, const fractional_int<N> &rhs)
+	{
+		lhs *= rhs.value;
+		lhs /= fractional_int<N>::divisor;
+		return lhs;
+	}
+
+	friend constexpr int operator *(const int lhs, const fractional_int<N> &rhs)
+	{
+		int res = lhs;
+		res *= rhs;
+		return res;
+	}
+
+private:
+	int value = 0;
+};
+
+using decimal_int = fractional_int<1>;
+using centesimal_int = fractional_int<2>;
+using millesimal_int = fractional_int<3>;
 
 }
