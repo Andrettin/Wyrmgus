@@ -32,6 +32,7 @@ class CUnit;
 
 namespace wyrmgus {
 
+class sml_data;
 class unit_ref;
 
 //script context for e.g. events
@@ -40,11 +41,16 @@ struct context_base
 {
 	using player_ptr = std::conditional_t<read_only, const CPlayer *, CPlayer *>;
 
+	sml_data to_sml_data() const;
+
 	player_ptr source_player = nullptr;
 	player_ptr current_player = nullptr;
 	std::shared_ptr<unit_ref> source_unit;
 	std::shared_ptr<unit_ref> current_unit;
 };
+
+extern template struct context_base<false>;
+extern template struct context_base<true>;
 
 struct context final : context_base<false>
 {

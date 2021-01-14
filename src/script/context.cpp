@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-//      (c) Copyright 2020-2021 by Andrettin
+//      (c) Copyright 2021 by Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -25,54 +25,42 @@
 //      02111-1307, USA.
 //
 
-#pragma once
+#include "stratagus.h"
 
 #include "script/context.h"
 
-class CPlayer;
-class CUnit;
+#include "database/sml_data.h"
+#include "player.h"
+#include "unit/unit.h"
+#include "unit/unit_ref.h"
 
 namespace wyrmgus {
 
-class sml_data;
-class unit_ref;
-
-template <typename scope_type>
-class effect_list;
-
-template <typename scope_type>
-class delayed_effect_instance final
+template <bool read_only>
+sml_data context_base<read_only>::to_sml_data() const
 {
-public:
-	//use a unit ref if this is a unit, to ensure it remains valid
-	using scope_ptr = std::conditional_t<std::is_same_v<scope_type, CUnit>, std::shared_ptr<unit_ref>, scope_type *>;
+	sml_data data;
 
-	explicit delayed_effect_instance(const effect_list<scope_type> *effects, scope_type *scope, const context &ctx, const int cycles);
-
-	scope_type *get_scope() const;
-
-	int get_remaining_cycles() const
-	{
-		return this->remaining_cycles;
+	if (this->source_player != nullptr) {
+		data.add_property("source_player", std::to_string(this->source_player->get_index()));
 	}
 
-	void decrement_remaining_cycles()
-	{
-		--this->remaining_cycles;
+	if (this->current_player != nullptr) {
+		data.add_property("current_player", std::to_string(this->current_player->get_index()));
 	}
 
-	void do_effects();
+	if (this->source_unit != nullptr) {
+		data.add_property("source_unit", std::to_string(UnitNumber(*this->source_unit->get())));
+	}
 
-	sml_data to_sml_data() const;
+	if (this->current_unit != nullptr) {
+		data.add_property("current_unit", std::to_string(UnitNumber(*this->current_unit->get())));
+	}
 
-private:
-	const effect_list<scope_type> *effects = nullptr;
-	scope_ptr scope = nullptr;
-	wyrmgus::context context;
-	int remaining_cycles = 0;
-};
+	return data;
+}
 
-extern template class delayed_effect_instance<CPlayer>;
-extern template class delayed_effect_instance<CUnit>;
+template struct context_base<false>;
+template struct context_base<true>;
 
 }

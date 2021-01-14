@@ -318,6 +318,7 @@ set(religion_SRCS
 source_group(religion FILES ${religion_SRCS})
 
 set(script_SRCS
+	src/script/context.cpp
 	src/script/factor_modifier.cpp
 	src/script/trigger.cpp
 )

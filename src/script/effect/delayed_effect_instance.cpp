@@ -29,6 +29,7 @@
 
 #include "script/effect/delayed_effect_instance.h"
 
+#include "database/sml_data.h"
 #include "script/effect/effect_list.h"
 #include "unit/unit.h"
 #include "unit/unit_ref.h"
@@ -69,6 +70,27 @@ void delayed_effect_instance<scope_type>::do_effects()
 	}
 
 	this->effects->do_effects(scope, this->context);
+}
+
+template <typename scope_type>
+sml_data delayed_effect_instance<scope_type>::to_sml_data() const
+{
+	sml_data data;
+
+	//FIXME: write a way to refer to the effects, perhaps requiring that delayed effects are pre-scripted ones
+	std::string scope;
+	if constexpr (std::is_same_v<scope_type, CPlayer>) {
+		scope = std::to_string(this->scope->get_index());
+	} else {
+		scope = std::to_string(UnitNumber(*this->scope->get()));
+	}
+	data.add_property("scope", std::move(scope));
+
+	data.add_property("remaining_cycles", std::to_string(this->get_remaining_cycles()));
+
+	data.add_child(this->context.to_sml_data());
+
+	return data;
 }
 
 template class delayed_effect_instance<CPlayer>;
