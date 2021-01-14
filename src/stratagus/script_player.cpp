@@ -71,6 +71,7 @@
 #include "unit/unit.h"
 #include "unit/unit_class.h"
 #include "unit/unit_find.h"
+#include "unit/unit_manager.h"
 #include "unit/unit_type.h"
 #include "upgrade/upgrade.h"
 #include "upgrade/upgrade_class.h"
@@ -341,6 +342,8 @@ void CPlayer::Load(lua_State *l)
 		} else if (!strcmp(value, "hero-cooldown-timer")) {
 			this->HeroCooldownTimer = LuaToNumber(l, j + 1);
 		//Wyrmgus end
+		} else if (!strcmp(value, "last-created-unit")) {
+			this->last_created_unit = &wyrmgus::unit_manager::get()->GetSlotUnit(LuaToNumber(l, j + 1));
 		} else if (!strcmp(value, "total-resources")) {
 			if (!lua_istable(l, j + 1)) {
 				LuaError(l, "incorrect argument");
