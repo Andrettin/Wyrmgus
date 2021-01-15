@@ -27,10 +27,13 @@
 
 #pragma once
 
+#include "dialogue.h"
 #include "game.h"
 #include "script/effect/delayed_effect_instance.h"
 #include "script/effect/effect.h"
 #include "script/effect/effect_list.h"
+#include "script/effect/scripted_effect.h"
+#include "util/string_util.h"
 
 namespace wyrmgus {
 
@@ -53,33 +56,56 @@ public:
 		const std::string &key = property.get_key();
 		const std::string &value = property.get_value();
 
-		if (key == "cycles") {
+		if (key == "scripted_effect") {
+			if constexpr (std::is_same_v<scope_type, CPlayer>) {
+				this->scripted_effect = player_scripted_effect::get(value);
+			} else {
+				this->scripted_effect = unit_scripted_effect::get(value);
+			}
+		} else if (key == "dialogue") {
+			this->dialogue = dialogue::get(value);
+		} else if (key == "cycles") {
 			this->delay = std::stoi(value);
 		} else {
-			this->effects.process_sml_property(property);
+			effect<scope_type>::process_sml_property(property);
 		}
 	}
 
-	virtual void process_sml_scope(const sml_data &scope) override
+	virtual void check() const override
 	{
-		this->effects.process_sml_scope(scope);
+		if (this->scripted_effect == nullptr && this->dialogue == nullptr) {
+			throw std::runtime_error("\"delayed\" effect has neither a scripted effect nor a dialogue set for it.");
+		}
 	}
 
 	virtual void do_assignment_effect(scope_type *scope, const context &ctx) const override
 	{
-		auto delayed_effect = std::make_unique<delayed_effect_instance<scope_type>>(&this->effects, scope, ctx, this->delay);
+		std::unique_ptr<delayed_effect_instance<scope_type>> delayed_effect;
+		if (this->scripted_effect != nullptr) {
+			delayed_effect = std::make_unique<delayed_effect_instance<scope_type>>(this->scripted_effect, scope, ctx, this->delay);
+		} else {
+			delayed_effect = std::make_unique<delayed_effect_instance<scope_type>>(this->dialogue, scope, ctx, this->delay);
+		}
 		game::get()->add_delayed_effect(std::move(delayed_effect));
 	}
 
 	virtual std::string get_assignment_string(const scope_type *scope, const read_only_context &ctx, const size_t indent, const std::string &prefix) const override
 	{
 		std::string str = "In " + std::to_string(this->delay) + " cycles:\n";
-		return str + this->effects.get_effects_string(scope, ctx, indent + 1, prefix);
+
+		if (this->scripted_effect != nullptr) {
+			str += this->scripted_effect->get_effects().get_effects_string(scope, ctx, indent + 1, prefix);
+		} else {
+			str += std::string(indent + 1, '\t') + "Trigger the " + string::highlight(this->dialogue->get_identifier()) + " dialogue";
+		}
+
+		return str;
 	}
 
 private:
+	const wyrmgus::scripted_effect_base<scope_type> *scripted_effect = nullptr;
+	const wyrmgus::dialogue *dialogue = nullptr;
 	int delay = 0;
-	effect_list<scope_type> effects;
 };
 
 }

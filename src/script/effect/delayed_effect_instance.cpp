@@ -30,15 +30,30 @@
 #include "script/effect/delayed_effect_instance.h"
 
 #include "database/sml_data.h"
-#include "script/effect/effect_list.h"
+#include "dialogue.h"
+#include "script/effect/scripted_effect.h"
 #include "unit/unit.h"
 #include "unit/unit_ref.h"
 
 namespace wyrmgus {
 
 template <typename scope_type>
-delayed_effect_instance<scope_type>::delayed_effect_instance(const effect_list<scope_type> *effects, scope_type *scope, const wyrmgus::context &ctx, const int cycles)
-	: effects(effects), context(ctx), remaining_cycles(cycles)
+delayed_effect_instance<scope_type>::delayed_effect_instance(const scripted_effect_base<scope_type> *scripted_effect, scope_type *scope, const wyrmgus::context &ctx, const int cycles)
+	: delayed_effect_instance(scope, ctx, cycles)
+{
+	this->scripted_effect = scripted_effect;
+}
+
+template <typename scope_type>
+delayed_effect_instance<scope_type>::delayed_effect_instance(const wyrmgus::dialogue *dialogue, scope_type *scope, const wyrmgus::context &ctx, const int cycles)
+	: delayed_effect_instance(scope, ctx, cycles)
+{
+	this->dialogue = dialogue;
+}
+
+template <typename scope_type>
+delayed_effect_instance<scope_type>::delayed_effect_instance(scope_type *scope, const wyrmgus::context &ctx, const int cycles)
+	: context(ctx), remaining_cycles(cycles)
 {
 	if constexpr (std::is_same_v<scope_type, CUnit>) {
 		this->scope = scope->acquire_ref();
@@ -69,7 +84,26 @@ void delayed_effect_instance<scope_type>::do_effects()
 		}
 	}
 
-	this->effects->do_effects(scope, this->context);
+	if (this->scripted_effect != nullptr) {
+		this->scripted_effect->get_effects().do_effects(scope, this->context);
+	} else {
+		CPlayer *player = nullptr;
+
+		wyrmgus::context dialogue_ctx;
+		dialogue_ctx.source_player = this->context.current_player;
+		dialogue_ctx.source_unit = this->context.current_unit;
+
+		if constexpr (std::is_same_v<scope_type, CPlayer>) {
+			player = this->scope;
+		} else if constexpr (std::is_same_v<scope_type, CUnit>) {
+			dialogue_ctx.current_unit = this->scope;
+			player = this->scope->get()->Player;
+		}
+
+		dialogue_ctx.current_player = player;
+
+		this->dialogue->call(player, dialogue_ctx);
+	}
 }
 
 template <typename scope_type>
@@ -77,7 +111,19 @@ sml_data delayed_effect_instance<scope_type>::to_sml_data() const
 {
 	sml_data data;
 
-	//FIXME: write a way to refer to the effects, perhaps requiring that delayed effects are pre-scripted ones
+	if (this->scripted_effect != nullptr) {
+		std::string scripted_effect_identifier;
+		if constexpr (std::is_same_v<scope_type, CPlayer>) {
+			scripted_effect_identifier = static_cast<const player_scripted_effect *>(this->scripted_effect)->get_identifier();
+		} else {
+			scripted_effect_identifier = static_cast<const unit_scripted_effect *>(this->scripted_effect)->get_identifier();
+		}
+		data.add_property("scripted_effect", scripted_effect_identifier);
+	} else {
+		data.add_property("dialogue", this->dialogue->get_identifier());
+	}
+
+
 	std::string scope;
 	if constexpr (std::is_same_v<scope_type, CPlayer>) {
 		scope = std::to_string(this->scope->get_index());

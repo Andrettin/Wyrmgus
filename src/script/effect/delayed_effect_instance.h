@@ -34,11 +34,12 @@ class CUnit;
 
 namespace wyrmgus {
 
+class dialogue;
 class sml_data;
 class unit_ref;
 
 template <typename scope_type>
-class effect_list;
+class scripted_effect_base;
 
 template <typename scope_type>
 class delayed_effect_instance final
@@ -47,8 +48,13 @@ public:
 	//use a unit ref if this is a unit, to ensure it remains valid
 	using scope_ptr = std::conditional_t<std::is_same_v<scope_type, CUnit>, std::shared_ptr<unit_ref>, scope_type *>;
 
-	explicit delayed_effect_instance(const effect_list<scope_type> *effects, scope_type *scope, const context &ctx, const int cycles);
+	explicit delayed_effect_instance(const scripted_effect_base<scope_type> *scripted_effect, scope_type *scope, const context &ctx, const int cycles);
+	explicit delayed_effect_instance(const dialogue *dialogue, scope_type *scope, const context &ctx, const int cycles);
 
+private:
+	explicit delayed_effect_instance(scope_type *scope, const context &ctx, const int cycles);
+
+public:
 	scope_type *get_scope() const;
 
 	int get_remaining_cycles() const
@@ -66,7 +72,8 @@ public:
 	sml_data to_sml_data() const;
 
 private:
-	const effect_list<scope_type> *effects = nullptr;
+	const scripted_effect_base<scope_type> *scripted_effect = nullptr;
+	const wyrmgus::dialogue *dialogue = nullptr;
 	scope_ptr scope = nullptr;
 	wyrmgus::context context;
 	int remaining_cycles = 0;
