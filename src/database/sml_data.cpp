@@ -51,43 +51,43 @@ void sml_data::add_property(std::string &&key, const sml_operator sml_operator, 
 	this->elements.push_back(sml_property(std::move(key), sml_operator, std::move(value)));
 }
 
-void sml_data::print(std::ofstream &ofstream, const size_t indentation, const bool new_line) const
+void sml_data::print(std::ostream &ostream, const size_t indentation, const bool new_line) const
 {
 	if (new_line) {
-		ofstream << std::string(indentation, '\t');
+		ostream << std::string(indentation, '\t');
 	} else {
-		ofstream << " ";
+		ostream << " ";
 	}
 	if (!this->get_tag().empty()) {
-		ofstream << this->get_tag() << " ";
+		ostream << this->get_tag() << " ";
 		switch (this->get_operator()) {
 			case sml_operator::assignment:
-				ofstream << "=";
+				ostream << "=";
 				break;
 			case sml_operator::addition:
-				ofstream << "+=";
+				ostream << "+=";
 				break;
 			case sml_operator::subtraction:
-				ofstream << "-=";
+				ostream << "-=";
 				break;
 			case sml_operator::none:
 				throw std::runtime_error("Cannot print the SML \"none\" operator.");
 		}
-		ofstream << " ";
+		ostream << " ";
 	}
-	ofstream << "{";
+	ostream << "{";
 	if (!this->is_minor()) {
-		ofstream << "\n";
+		ostream << "\n";
 	}
 
-	this->print_components(ofstream, indentation + 1);
+	this->print_components(ostream, indentation + 1);
 
 	if (!this->is_minor()) {
-		ofstream << std::string(indentation, '\t');
+		ostream << std::string(indentation, '\t');
 	}
-	ofstream << "}";
+	ostream << "}";
 	if (!this->is_minor()) {
-		ofstream << "\n";
+		ostream << "\n";
 	}
 }
 

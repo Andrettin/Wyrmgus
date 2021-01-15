@@ -41,7 +41,7 @@ namespace wyrmgus {
 class sml_parser;
 
 //stratagus markup language data
-class sml_data
+class sml_data final
 {
 public:
 	template <typename point_type>
@@ -291,33 +291,33 @@ public:
 		this->print_components(ofstream);
 	}
 
-	void print(std::ofstream &ofstream, const size_t indentation, const bool new_line) const;
+	void print(std::ostream &ofstream, const size_t indentation = 0, const bool new_line = true) const;
 
-	void print_components(std::ofstream &ofstream, const size_t indentation = 0) const
+	void print_components(std::ostream &ostream, const size_t indentation = 0) const
 	{
 		if (!this->get_values().empty()) {
 			if (this->is_minor()) {
-				ofstream << " ";
+				ostream << " ";
 			} else {
-				ofstream << std::string(indentation, '\t');
+				ostream << std::string(indentation, '\t');
 			}
 		}
 		for (const std::string &value : this->get_values()) {
-			ofstream << value << " ";
+			ostream << value << " ";
 		}
 		if (!this->get_values().empty()) {
 			if (!this->is_minor()) {
-				ofstream << "\n";
+				ostream << "\n";
 			}
 		}
 
 		this->for_each_property([&](const sml_property &property) {
-			property.print(ofstream, indentation);
+			property.print(ostream, indentation);
 		});
 
 		bool new_line = true;
 		this->for_each_child([&](const sml_data &child_data) {
-			child_data.print(ofstream, indentation, new_line);
+			child_data.print(ostream, indentation, new_line);
 			if (new_line && child_data.is_minor()) {
 				new_line = false;
 			}
@@ -325,7 +325,7 @@ public:
 
 		//if the last child data was minor and did not print a new line, print one now
 		if (!new_line) {
-			ofstream << "\n";
+			ostream << "\n";
 		}
 	}
 

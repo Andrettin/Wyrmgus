@@ -35,15 +35,15 @@ namespace wyrmgus {
 
 enum class sml_operator;
 
-class sml_property
+class sml_property final
 {
 public:
-	sml_property(std::string &&key, const sml_operator property_operator, std::string &&value)
+	explicit sml_property(std::string &&key, const sml_operator property_operator, std::string &&value)
 		: key(std::move(key)), property_operator(property_operator), value(std::move(value))
 	{
 	}
 
-	sml_property(const std::string &key, const sml_operator property_operator, const std::string &value)
+	explicit sml_property(const std::string &key, const sml_operator property_operator, const std::string &value)
 		: key(key), property_operator(property_operator), value(value)
 	{
 	}
@@ -63,7 +63,7 @@ public:
 		return this->value;
 	}
 
-	void print(std::ofstream &ofstream, const size_t indentation) const;
+	void print(std::ostream &ostream, const size_t indentation) const;
 
 private:
 	std::string key;

@@ -35,25 +35,25 @@
 
 namespace wyrmgus {
 
-void sml_property::print(std::ofstream &ofstream, const size_t indentation) const
+void sml_property::print(std::ostream &ostream, const size_t indentation) const
 {
-	ofstream << std::string(indentation, '\t') << this->get_key() << " ";
+	ostream << std::string(indentation, '\t') << this->get_key() << " ";
 
 	switch (this->get_operator()) {
 		case sml_operator::assignment:
-			ofstream << "=";
+			ostream << "=";
 			break;
 		case sml_operator::addition:
-			ofstream << "+=";
+			ostream << "+=";
 			break;
 		case sml_operator::subtraction:
-			ofstream << "-=";
+			ostream << "-=";
 			break;
 		case sml_operator::none:
 			throw std::runtime_error("Cannot print the SML \"none\" operator.");
 	}
 
-	ofstream << " " << this->get_value() << "\n";
+	ostream << " " << this->get_value() << "\n";
 }
 
 }
