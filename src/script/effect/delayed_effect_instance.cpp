@@ -29,10 +29,13 @@
 
 #include "script/effect/delayed_effect_instance.h"
 
+#include "database/database.h"
 #include "database/sml_data.h"
+#include "database/sml_property.h"
 #include "dialogue.h"
 #include "script/effect/scripted_effect.h"
 #include "unit/unit.h"
+#include "unit/unit_manager.h"
 #include "unit/unit_ref.h"
 
 namespace wyrmgus {
@@ -59,6 +62,47 @@ delayed_effect_instance<scope_type>::delayed_effect_instance(scope_type *scope, 
 		this->scope = scope->acquire_ref();
 	} else {
 		this->scope = scope;
+	}
+}
+
+template <typename scope_type>
+void delayed_effect_instance<scope_type>::process_sml_property(const sml_property &property)
+{
+	const std::string &key = property.get_key();
+	const std::string &value = property.get_value();
+
+	if (key == "scripted_effect") {
+		if constexpr (std::is_same_v<scope_type, CPlayer>) {
+			this->scripted_effect = player_scripted_effect::get(value);
+		} else {
+			this->scripted_effect = unit_scripted_effect::get(value);
+		}
+	} else if (key == "dialogue") {
+		this->dialogue = dialogue::get(value);
+	} else if (key == "scope") {
+		const int scope_index = std::stoi(value);
+		if constexpr (std::is_same_v<scope_type, CPlayer>) {
+			this->scope = CPlayer::Players[scope_index];
+		} else {
+			this->scope = unit_manager::get()->GetSlotUnit(scope_index).acquire_ref();
+		}
+	} else if (key == "remaining_cycles") {
+		this->remaining_cycles = std::stoi(value);
+	} else {
+		throw std::runtime_error("Invalid delayed effect instance property: \"" + key + "\".");
+	}
+}
+
+template <typename scope_type>
+void delayed_effect_instance<scope_type>::process_sml_scope(const sml_data &scope)
+{
+	const std::string &tag = scope.get_tag();
+
+	if (tag == "context") {
+		this->context = wyrmgus::context();
+		database::process_sml_data(this->context, scope);
+	} else {
+		throw std::runtime_error("Invalid delayed effect instance scope: \"" + scope.get_tag() + "\".");
 	}
 }
 

@@ -33,6 +33,7 @@ class CUnit;
 namespace wyrmgus {
 
 class sml_data;
+class sml_property;
 class unit_ref;
 
 //script context for e.g. events
@@ -41,6 +42,8 @@ struct context_base
 {
 	using player_ptr = std::conditional_t<read_only, const CPlayer *, CPlayer *>;
 
+	void process_sml_property(const sml_property &property);
+	void process_sml_scope(const sml_data &scope);
 	sml_data to_sml_data() const;
 
 	player_ptr source_player = nullptr;

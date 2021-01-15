@@ -36,6 +36,7 @@ namespace wyrmgus {
 
 class dialogue;
 class sml_data;
+class sml_property;
 class unit_ref;
 
 template <typename scope_type>
@@ -48,6 +49,10 @@ public:
 	//use a unit ref if this is a unit, to ensure it remains valid
 	using scope_ptr = std::conditional_t<std::is_same_v<scope_type, CUnit>, std::shared_ptr<unit_ref>, scope_type *>;
 
+	delayed_effect_instance()
+	{
+	}
+
 	explicit delayed_effect_instance(const scripted_effect_base<scope_type> *scripted_effect, scope_type *scope, const context &ctx, const int cycles);
 	explicit delayed_effect_instance(const dialogue *dialogue, scope_type *scope, const context &ctx, const int cycles);
 
@@ -55,6 +60,9 @@ private:
 	explicit delayed_effect_instance(scope_type *scope, const context &ctx, const int cycles);
 
 public:
+	void process_sml_property(const sml_property &property);
+	void process_sml_scope(const sml_data &scope);
+
 	scope_type *get_scope() const;
 
 	int get_remaining_cycles() const

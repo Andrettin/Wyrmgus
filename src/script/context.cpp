@@ -32,9 +32,39 @@
 #include "database/sml_data.h"
 #include "player.h"
 #include "unit/unit.h"
+#include "unit/unit_manager.h"
 #include "unit/unit_ref.h"
 
 namespace wyrmgus {
+
+template <bool read_only>
+void context_base<read_only>::process_sml_property(const sml_property &property)
+{
+	const std::string &key = property.get_key();
+	const std::string &value = property.get_value();
+
+	if (key == "source_player") {
+		const int index = std::stoi(value);
+		this->source_player = CPlayer::Players[index];
+	} else if (key == "current_player") {
+		const int index = std::stoi(value);
+		this->current_player = CPlayer::Players[index];
+	} else if (key == "source_unit") {
+		const int slot = std::stoi(value);
+		this->source_unit = unit_manager::get()->GetSlotUnit(slot).acquire_ref();
+	} else if (key == "current_unit") {
+		const int slot = std::stoi(value);
+		this->current_unit = unit_manager::get()->GetSlotUnit(slot).acquire_ref();
+	} else {
+		throw std::runtime_error("Invalid context property: \"" + key + "\".");
+	}
+}
+
+template <bool read_only>
+void context_base<read_only>::process_sml_scope(const sml_data &scope)
+{
+	throw std::runtime_error("Invalid context scope: \"" + scope.get_tag() + "\".");
+}
 
 template <bool read_only>
 sml_data context_base<read_only>::to_sml_data() const
