@@ -180,6 +180,28 @@ inline std::string normalized(const std::string &str)
 	return string::normalized(std::move(result));
 }
 
+inline void escape(std::string &str)
+{
+	//escape special characters
+	string::replace(str, "\n", "\\n");
+	string::replace(str, "\t", "\\t");
+	string::replace(str, "\"", "\\\"");
+}
+
+inline std::string escaped(std::string &&str)
+{
+	string::escape(str);
+	return str;
+
+}
+
+inline std::string escaped(const std::string &str)
+{
+	std::string result(str);
+	return string::escaped(std::move(result));
+
+}
+
 inline bool is_bool(const std::string &str)
 {
 	return str == "true" || str == "false";
