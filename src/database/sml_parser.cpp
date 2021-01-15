@@ -36,42 +36,65 @@
 
 namespace wyrmgus {
 
-sml_parser::sml_parser(const std::filesystem::path &filepath)
-	: filepath(filepath), current_property_operator(sml_operator::none)
+sml_parser::sml_parser() : current_property_operator(sml_operator::none)
 {
 }
 
-sml_data sml_parser::parse()
+sml_data sml_parser::parse(const std::filesystem::path &filepath)
 {
-	if (!std::filesystem::exists(this->filepath)) {
-		throw std::runtime_error("File \"" + this->filepath.string() + "\" not found.");
+	if (!std::filesystem::exists(filepath)) {
+		throw std::runtime_error("File \"" + filepath.string() + "\" not found.");
 	}
 
-	std::ifstream ifstream(this->filepath);
+	std::ifstream ifstream(filepath);
 
 	if (!ifstream) {
-		throw std::runtime_error("Failed to open file: " + this->filepath.string());
+		throw std::runtime_error("Failed to open file: " + filepath.string());
 	}
 
-	sml_data file_sml_data(this->filepath.stem().string());
-
-	std::string line;
-	int line_index = 1;
-	this->current_sml_data = &file_sml_data;
+	sml_data file_sml_data(filepath.stem().string());
 
 	try {
-		while (std::getline(ifstream, line)) {
+		this->parse(ifstream, file_sml_data);
+	} catch (...) {
+		std::throw_with_nested(std::runtime_error("Error parsing data file \"" + filepath.string() + "\"."));
+	}
+
+	return file_sml_data;
+}
+
+sml_data sml_parser::parse(const std::string &sml_string)
+{
+	std::istringstream istream(sml_string);
+
+	sml_data sml_data;
+
+	try {
+		this->parse(istream, sml_data);
+	} catch (...) {
+		std::throw_with_nested(std::runtime_error("Error parsing data string: \"" + sml_string + "\"."));
+	}
+
+	return sml_data;
+}
+
+void sml_parser::parse(std::istream &istream, sml_data &sml_data)
+{
+	std::string line;
+	int line_index = 1;
+	this->current_sml_data = &sml_data;
+
+	try {
+		while (std::getline(istream, line)) {
 			this->parse_line(line);
 			this->parse_tokens();
 			++line_index;
 		}
-	} catch (std::exception &exception) {
-		throw std::runtime_error("Error parsing data file \"" + this->filepath.string() + "\", line " + std::to_string(line_index) + ": " + exception.what());
+	} catch (...) {
+		std::throw_with_nested(std::runtime_error("Error parsing line " + std::to_string(line_index) + "."));
 	}
 
 	this->reset();
-
-	return file_sml_data;
 }
 
 void sml_parser::parse_line(const std::string &line)

@@ -39,18 +39,19 @@ enum class sml_operator;
 class sml_parser
 {
 public:
-	sml_parser(const std::filesystem::path &filepath);
+	explicit sml_parser();
 
-	sml_data parse();
+	sml_data parse(const std::filesystem::path &filepath);
+	sml_data parse(const std::string &sml_string);
 
 private:
+	void parse(std::istream &istream, sml_data &sml_data);
 	void parse_line(const std::string &line);
 	bool parse_escaped_character(std::string &current_string, const char c);
 	void parse_tokens();
 	void reset();
 
 private:
-	std::filesystem::path filepath;
 	std::vector<std::string> tokens;
 	sml_data *current_sml_data = nullptr;
 	std::string current_key;

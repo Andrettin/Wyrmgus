@@ -43,8 +43,8 @@ void predefines::load(const std::filesystem::path &data_path)
 		return;
 	}
 
-	sml_parser parser(predefines_path);
-	const sml_data data = parser.parse();
+	sml_parser parser;
+	const sml_data data = parser.parse(predefines_path);
 	database::process_sml_data(this, data);
 }
 

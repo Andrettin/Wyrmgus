@@ -51,8 +51,8 @@ void preferences::load()
 		return;
 	}
 
-	sml_parser parser(preferences_path);
-	const sml_data data = parser.parse();
+	sml_parser parser;
+	const sml_data data = parser.parse(preferences_path);
 	database::process_sml_data(this, data);
 }
 

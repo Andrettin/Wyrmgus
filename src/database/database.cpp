@@ -554,8 +554,8 @@ void database::parse_folder(const std::filesystem::path &path, std::vector<sml_d
 
 	for (const auto &kv_pair : filepaths_by_depth) {
 		for (const std::filesystem::path &filepath : kv_pair.second) {
-			sml_parser parser(filepath);
-			sml_data_list.push_back(parser.parse());
+			sml_parser parser;
+			sml_data_list.push_back(parser.parse(filepath));
 		}
 	}
 }
@@ -724,8 +724,8 @@ void database::process_modules()
 		const std::filesystem::path module_filepath = data_module->get_path() / "module.txt";
 
 		if (std::filesystem::exists(module_filepath)) {
-			sml_parser parser(module_filepath);
-			database::process_sml_data(data_module, parser.parse());
+			sml_parser parser;
+			database::process_sml_data(data_module, parser.parse(module_filepath));
 		}
 	}
 
