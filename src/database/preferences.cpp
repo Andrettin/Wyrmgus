@@ -72,7 +72,11 @@ void preferences::save() const
 		data.add_property("selected_campaign", this->get_selected_campaign()->get_identifier());
 	}
 
-	data.print_to_dir(preferences_path.parent_path());
+	try {
+		data.print_to_file(preferences_path);
+	} catch (...) {
+		std::throw_with_nested(std::runtime_error("Failed to save preferences file."));
+	}
 }
 
 void preferences::process_sml_property(const sml_property &property)

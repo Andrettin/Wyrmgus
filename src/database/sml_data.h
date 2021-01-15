@@ -284,14 +284,24 @@ public:
 		return QGeoCoordinate(latitude, longitude);
 	}
 
-	void print_to_dir(const std::filesystem::path &directory) const
+	void print_to_file(const std::filesystem::path &filepath) const
 	{
-		std::filesystem::path filepath(directory / (this->get_tag() + ".txt"));
 		std::ofstream ofstream(filepath);
+
+		if (!ofstream) {
+			throw std::runtime_error("Failed to open file \"" + filepath.string() + "\" for printing SML data to.");
+		}
+
 		this->print_components(ofstream);
 	}
 
-	void print(std::ostream &ofstream, const size_t indentation = 0, const bool new_line = true) const;
+	void print_to_dir(const std::filesystem::path &directory) const
+	{
+		const std::filesystem::path filepath = directory / (this->get_tag() + ".txt");
+		this->print_to_file(filepath);
+	}
+
+	void print(std::ostream &ostream, const size_t indentation = 0, const bool new_line = true) const;
 
 	void print_components(std::ostream &ostream, const size_t indentation = 0) const
 	{
