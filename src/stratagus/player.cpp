@@ -713,10 +713,6 @@ void CPlayer::Save(CFile &file) const
 	}
 	//Wyrmgus end
 
-	if (p.get_last_created_unit() != nullptr) {
-		file.printf("\n  \"last-created-unit\", %d,", UnitNumber(*p.get_last_created_unit()));
-	}
-
 	file.printf("\n  \"speed-resource-harvest\", {");
 	for (int j = 0; j < MaxCosts; ++j) {
 		if (j) {

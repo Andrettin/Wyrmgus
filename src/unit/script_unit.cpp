@@ -708,6 +708,9 @@ static int CclUnit(lua_State *l)
 		} else if (!strcmp(value, "rally_point_map_layer")) {
 			unit->rally_point_map_layer = CMap::Map.MapLayers[LuaToNumber(l, 2, j + 1)].get();
 		//Wyrmgus end
+		} else if (!strcmp(value, "last_created_player_unit")) {
+			unit->Player->last_created_unit = unit;
+			--j;
 		} else {
 			const int index = UnitTypeVar.VariableNameLookup[value];// User variables
 			if (index != -1) { // Valid index

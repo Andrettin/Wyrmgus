@@ -431,5 +431,9 @@ void SaveUnit(const CUnit &unit, CFile &file)
 	}
 	//Wyrmgus end
 
+	if (unit.Player->get_last_created_unit() == &unit) {
+		file.printf(",\n  \"last_created_player_unit\"");
+	}
+
 	file.printf("})\n");
 }
