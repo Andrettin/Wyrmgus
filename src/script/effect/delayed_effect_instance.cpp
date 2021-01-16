@@ -178,7 +178,7 @@ sml_data delayed_effect_instance<scope_type>::to_sml_data() const
 
 	data.add_property("remaining_cycles", std::to_string(this->get_remaining_cycles()));
 
-	data.add_child(this->context.to_sml_data());
+	data.add_child(this->context.to_sml_data("context"));
 
 	return data;
 }

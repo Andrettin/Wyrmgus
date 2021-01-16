@@ -67,9 +67,9 @@ void context_base<read_only>::process_sml_scope(const sml_data &scope)
 }
 
 template <bool read_only>
-sml_data context_base<read_only>::to_sml_data() const
+sml_data context_base<read_only>::to_sml_data(const std::string &tag) const
 {
-	sml_data data;
+	sml_data data(tag);
 
 	if (this->source_player != nullptr) {
 		data.add_property("source_player", std::to_string(this->source_player->get_index()));

@@ -44,7 +44,7 @@ struct context_base
 
 	void process_sml_property(const sml_property &property);
 	void process_sml_scope(const sml_data &scope);
-	sml_data to_sml_data() const;
+	sml_data to_sml_data(const std::string &tag) const;
 
 	player_ptr source_player = nullptr;
 	player_ptr current_player = nullptr;
