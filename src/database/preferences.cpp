@@ -35,6 +35,7 @@
 #include "database/sml_parser.h"
 #include "quest/campaign.h"
 #include "util/exception_util.h"
+#include "util/log_util.h"
 
 namespace wyrmgus {
 
@@ -74,8 +75,9 @@ void preferences::save() const
 
 	try {
 		data.print_to_file(preferences_path);
-	} catch (...) {
-		std::throw_with_nested(std::runtime_error("Failed to save preferences file."));
+	} catch (const std::exception &exception) {
+		exception::report(exception);
+		log::log_error("Failed to save preferences file.");
 	}
 }
 
