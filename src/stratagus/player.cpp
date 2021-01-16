@@ -2458,7 +2458,7 @@ void CPlayer::update_quest_pool()
 	
 	std::vector<wyrmgus::quest *> potential_quests;
 	for (wyrmgus::quest *quest : wyrmgus::quest::get_all()) {
-		if (this->can_accept_quest(quest)) {
+		if (this->can_quest_be_available(quest)) {
 			potential_quests.push_back(quest);
 		}
 	}
@@ -2680,9 +2680,18 @@ void CPlayer::remove_current_quest(wyrmgus::quest *quest)
 	}
 }
 
+bool CPlayer::can_quest_be_available(const wyrmgus::quest *quest) const
+{
+	if (quest->Hidden || quest->is_unobtainable()) {
+		return false;
+	}
+
+	return this->can_accept_quest(quest);
+}
+
 bool CPlayer::can_accept_quest(const wyrmgus::quest *quest) const
 {
-	if (quest->Hidden || quest->CurrentCompleted || quest->is_unobtainable()) {
+	if (quest->CurrentCompleted) {
 		return false;
 	}
 	

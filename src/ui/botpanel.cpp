@@ -1326,7 +1326,7 @@ bool IsButtonAllowed(const CUnit &unit, const wyrmgus::button &buttonaction)
 			}
 			break;
 		case ButtonCmd::Quest:
-			res = buttonaction.Value < static_cast<int>(unit.Player->get_available_quests().size()) && unit.Player->get_current_quests().size() < CPlayer::max_current_quests &&unit.Player->can_accept_quest(unit.Player->get_available_quests().at(buttonaction.Value));
+			res = buttonaction.Value < static_cast<int>(unit.Player->get_available_quests().size()) && unit.Player->get_current_quests().size() < CPlayer::max_current_quests && unit.Player->can_accept_quest(unit.Player->get_available_quests().at(buttonaction.Value));
 			break;
 		case ButtonCmd::Buy:
 			res = (buttonaction.Value != -1) && (&wyrmgus::unit_manager::get()->GetSlotUnit(buttonaction.Value) != nullptr);

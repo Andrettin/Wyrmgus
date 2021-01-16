@@ -274,6 +274,7 @@ public:
 	void complete_quest(wyrmgus::quest *quest);
 	void fail_quest(wyrmgus::quest *quest, const std::string &fail_reason = "");
 	void remove_current_quest(wyrmgus::quest *quest);
+	bool can_quest_be_available(const wyrmgus::quest *quest) const;
 	bool can_accept_quest(const wyrmgus::quest *quest) const;
 	bool check_quest_completion(const wyrmgus::quest *quest) const;
 	std::pair<bool, std::string> check_quest_failure(const wyrmgus::quest *quest) const;

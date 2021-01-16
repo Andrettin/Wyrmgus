@@ -113,5 +113,4 @@ void preferences::set_scale_factor(const int factor)
 	defines::get()->set_scale_factor(factor);
 }
 
-
 }
