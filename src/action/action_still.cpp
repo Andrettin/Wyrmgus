@@ -43,6 +43,7 @@
 #include "iolib.h"
 #include "map/map.h"
 #include "map/map_layer.h"
+#include "map/tile.h"
 #include "map/tileset.h"
 #include "missile.h"
 #include "player.h"
@@ -220,6 +221,13 @@ static bool MoveRandomly(CUnit &unit)
 			}
 			
 			if (unit.Type->BoolFlag[PEOPLEAVERSION_INDEX].value) {
+				//if the unit is people-averse, and is in a non-settled region, don't move to a settled region owned by a different player
+				const CPlayer *unit_tile_owner = unit.get_center_tile()->get_owner();
+				const CPlayer *target_tile_owner = unit.MapLayer->Field(pos)->get_owner();
+				if ((unit_tile_owner == nullptr || unit_tile_owner == unit.Player) && target_tile_owner != nullptr && target_tile_owner != unit.Player) {
+					return false;
+				}
+
 				std::vector<CUnit *> table;
 				SelectAroundUnit(unit, std::max(6, unit.Type->RandomMovementDistance), table, HasNotSamePlayerAs(*unit.Player));
 
