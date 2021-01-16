@@ -301,7 +301,14 @@ public:
 		this->print_to_file(filepath);
 	}
 
-	void print(std::ostream &ostream, const size_t indentation = 0, const bool new_line = true) const;
+	std::string print_to_string() const
+	{
+		std::ostringstream ostream;
+		this->print_components(ostream);
+		return ostream.str();
+	}
+
+	void print(std::ostream &ostream, const size_t indentation, const bool new_line) const;
 
 	void print_components(std::ostream &ostream, const size_t indentation = 0) const
 	{
