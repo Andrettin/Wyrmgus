@@ -41,7 +41,10 @@
 //Wyrmgus end
 #include "civilization.h"
 #include "commands.h"
+#include "database/database.h"
 #include "database/defines.h"
+#include "database/sml_data.h"
+#include "database/sml_parser.h"
 #include "diplomacy_state.h"
 #include "editor.h"
 #include "faction.h"
@@ -102,6 +105,7 @@
 #include "upgrade/upgrade.h"
 #include "util/exception_util.h"
 #include "util/random.h"
+#include "util/string_util.h"
 //Wyrmgus start
 #include "util/util.h"
 //Wyrmgus end
@@ -209,6 +213,65 @@ void game::clear_delayed_effects()
 	this->unit_delayed_effects.clear();
 }
 
+void game::save_delayed_effects(CFile &file) const
+{
+	if (!this->player_delayed_effects.empty()) {
+		this->save_delayed_effects(file, this->player_delayed_effects);
+	}
+
+	if (!this->unit_delayed_effects.empty()) {
+		this->save_delayed_effects(file, this->unit_delayed_effects);
+	}
+}
+
+template <typename scope_type>
+void game::save_delayed_effects(CFile &file, const std::vector<std::unique_ptr<delayed_effect_instance<scope_type>>> &delayed_effects) const
+{
+	sml_data delayed_effects_data;
+	for (const auto &delayed_effect : delayed_effects) {
+		delayed_effects_data.add_child(delayed_effect->to_sml_data());
+	}
+
+	std::string str = "load_";
+
+	if constexpr (std::is_same_v<scope_type, CPlayer>) {
+		str += "player";
+	} else {
+		str += "unit";
+	}
+
+	str += "_delayed_effects(\"" + string::escaped(delayed_effects_data.print_to_string()) + "\")\n";
+	file.printf(str.c_str());
+}
+
+template <typename scope_type>
+void game::load_delayed_effects(const sml_data &data)
+{
+	data.for_each_child([&](const sml_data &delayed_effect_data) {
+		auto delayed_effect = std::make_unique<delayed_effect_instance<scope_type>>();
+		database::process_sml_data(delayed_effect, delayed_effect_data);
+		this->add_delayed_effect(std::move(delayed_effect));
+	});
+}
+
+template void game::save_delayed_effects<CPlayer>(CFile &file, const std::vector<std::unique_ptr<delayed_effect_instance<CPlayer>>> &delayed_effects) const;
+template void game::save_delayed_effects<CUnit>(CFile &file, const std::vector<std::unique_ptr<delayed_effect_instance<CUnit>>> &delayed_effects) const;
+
+template void game::load_delayed_effects<CPlayer>(const sml_data &data);
+template void game::load_delayed_effects<CUnit>(const sml_data &data);
+
+}
+
+void load_player_delayed_effects(const std::string &sml_string)
+{
+	wyrmgus::sml_parser parser;
+	wyrmgus::game::get()->load_delayed_effects<CPlayer>(parser.parse(sml_string));
+}
+
+void load_unit_delayed_effects(const std::string &sml_string)
+{
+	wyrmgus::sml_parser parser;
+	wyrmgus::game::get()->load_delayed_effects<CUnit>(parser.parse(sml_string));
 }
 
 /**

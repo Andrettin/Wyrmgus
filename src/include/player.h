@@ -60,6 +60,8 @@ enum class ButtonCmd;
 enum class DiplomacyState;
 struct lua_State;
 
+static int CclUnit(lua_State *l);
+
 namespace wyrmgus {
 	class age;
 	class calendar;
@@ -711,6 +713,7 @@ private:
 
 	friend void CleanPlayers();
 	friend void SetPlayersPalette();
+	friend int ::CclUnit(lua_State *l);
 };
 
 //Wyrmgus start
