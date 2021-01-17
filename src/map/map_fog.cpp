@@ -482,12 +482,10 @@ void MapSight(const CPlayer &player, const Vec2i &pos, int w, int h, int range, 
 		const int maxx = std::min(CMap::Map.Info.MapWidths[z], pos.x + w + offsetx);
 		//Wyrmgus end
 		Vec2i mpos(minx, pos.y + offsety);
-#ifdef MARKER_ON_INDEX
 		//Wyrmgus start
 //		const unsigned int index = mpos.y * CMap::Map.Info.MapWidth;
 		const unsigned int index = mpos.y * CMap::Map.Info.MapWidths[z];
 		//Wyrmgus end
-#endif
 
 		for (mpos.x = minx; mpos.x < maxx; ++mpos.x) {
 			bool obstacle_check = false;
@@ -506,17 +504,10 @@ void MapSight(const CPlayer &player, const Vec2i &pos, int w, int h, int range, 
 				continue;
 			}
 
-#ifdef MARKER_ON_INDEX
 			//Wyrmgus start
 //			marker(player, mpos.x + index);
 			marker(player, mpos.x + index, z);
 			//Wyrmgus end
-#else
-			//Wyrmgus start
-//			marker(player, mpos);
-			marker(player, mpos, z);
-			//Wyrmgus end
-#endif
 		}
 	}
 	for (int offsety = 0; offsety < h; ++offsety) {
@@ -526,12 +517,10 @@ void MapSight(const CPlayer &player, const Vec2i &pos, int w, int h, int range, 
 		const int maxx = std::min(CMap::Map.Info.MapWidths[z], pos.x + w + range);
 		//Wyrmgus end
 		Vec2i mpos(minx, pos.y + offsety);
-#ifdef MARKER_ON_INDEX
 		//Wyrmgus start
 //		const unsigned int index = mpos.y * CMap::Map.Info.MapWidth;
 		const unsigned int index = mpos.y * CMap::Map.Info.MapWidths[z];
 		//Wyrmgus end
-#endif
 
 		for (mpos.x = minx; mpos.x < maxx; ++mpos.x) {
 			bool obstacle_check = false;
@@ -550,17 +539,10 @@ void MapSight(const CPlayer &player, const Vec2i &pos, int w, int h, int range, 
 				continue;
 			}
 
-#ifdef MARKER_ON_INDEX
 			//Wyrmgus start
 //			marker(player, mpos.x + index);
 			marker(player, mpos.x + index, z);
 			//Wyrmgus end
-#else
-			//Wyrmgus start
-//			marker(player, mpos);
-			marker(player, mpos, z);
-			//Wyrmgus end
-#endif
 		}
 	}
 	// bottom hemi-cycle
@@ -576,12 +558,10 @@ void MapSight(const CPlayer &player, const Vec2i &pos, int w, int h, int range, 
 		const int maxx = std::min(CMap::Map.Info.MapWidths[z], pos.x + w + offsetx);
 		//Wyrmgus end
 		Vec2i mpos(minx, pos.y + h + offsety);
-#ifdef MARKER_ON_INDEX
 		//Wyrmgus start
 //		const unsigned int index = mpos.y * CMap::Map.Info.MapWidth;
 		const unsigned int index = mpos.y * CMap::Map.Info.MapWidths[z];
 		//Wyrmgus end
-#endif
 
 		for (mpos.x = minx; mpos.x < maxx; ++mpos.x) {
 			bool obstacle_check = false;
@@ -600,17 +580,10 @@ void MapSight(const CPlayer &player, const Vec2i &pos, int w, int h, int range, 
 				continue;
 			}
 
-#ifdef MARKER_ON_INDEX
 			//Wyrmgus start
 //			marker(player, mpos.x + index);
 			marker(player, mpos.x + index, z);
 			//Wyrmgus end
-#else
-			//Wyrmgus start
-//			marker(player, mpos);
-			marker(player, mpos, z);
-			//Wyrmgus end
-#endif
 		}
 	}
 }
