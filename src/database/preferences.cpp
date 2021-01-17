@@ -109,8 +109,6 @@ void preferences::set_scale_factor(const int factor)
 	}
 
 	this->scale_factor = factor;
-
-	defines::get()->set_scale_factor(factor);
 }
 
 }

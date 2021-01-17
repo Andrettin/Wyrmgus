@@ -47,6 +47,11 @@ defines::~defines()
 
 void defines::load(const std::filesystem::path &data_path)
 {
+	//set the scale factor to that of the preferences on load
+	if (preferences::get()->get_scale_factor() != this->get_scale_factor()) {
+		this->scale_factor = preferences::get()->get_scale_factor();
+	}
+
 	std::filesystem::path defines_path(data_path / "defines.txt");
 
 	if (!std::filesystem::exists(defines_path)) {

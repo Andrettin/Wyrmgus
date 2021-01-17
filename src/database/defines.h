@@ -161,11 +161,6 @@ public:
 		return this->scale_factor;
 	}
 
-	void set_scale_factor(const int factor)
-	{
-		this->scale_factor = factor;
-	}
-
 	QSize get_scaled_tile_size() const
 	{
 		return this->get_tile_size() * this->get_scale_factor();
