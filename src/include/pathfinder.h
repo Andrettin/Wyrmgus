@@ -219,8 +219,8 @@ extern int AStarUnknownTerrainCost;
 //
 //  Convert heading into direction.
 //  N NE  E SE  S SW  W NW
-extern const int Heading2X[9];
-extern const int Heading2Y[9];
+constexpr std::array<int, 9> Heading2X = { 0, +1, +1, +1, 0, -1, -1, -1, 0 };
+constexpr std::array<int, 9> Heading2Y = { -1, -1, 0, +1, +1, +1, 0, -1, 0 };
 extern const int XY2Heading[3][3];
 
 /*----------------------------------------------------------------------------

@@ -66,13 +66,9 @@ static int AStarCosts(const Vec2i &pos, const Vec2i &goalPos)
 	return std::max<int>(wyrmgus::number::fast_abs(diff.x), wyrmgus::number::fast_abs(diff.y));
 }
 
-//  Convert heading into direction.
-//                      //  N NE  E SE  S SW  W NW
-const int Heading2X[9] = {  0, +1, +1, +1, 0, -1, -1, -1, 0 };
-const int Heading2Y[9] = { -1, -1, 0, +1, +1, +1, 0, -1, 0 };
 //Wyrmgus start
 //int Heading2O[9];//heading to offset
-std::vector<int> Heading2O[9];//heading to offset
+std::array<std::vector<int>, 9> Heading2O;//heading to offset
 //Wyrmgus end
 const int XY2Heading[3][3] = { {7, 6, 5}, {0, 0, 4}, {1, 2, 3}};
 
