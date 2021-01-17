@@ -414,58 +414,58 @@ private:
 	std::filesystem::path image_file;
 	QSize frame_size = QSize(0, 0); //the missile frame size in pixels
 public:
-	int Transparency;          /// missile transparency
+	int Transparency = 0;          /// missile transparency
 private:
 	int draw_level = 0; //level to draw missile at
 	int frames = 0; //number of sprite frames in the graphic
 	int num_directions = 1; //number of directions missile can face
 public:
-	int ChangeVariable;        /// variable to change
-	int ChangeAmount;          /// how many to change
-	bool ChangeMax;            /// modify the max, if value will exceed it
+	int ChangeVariable = -1;   /// variable to change
+	int ChangeAmount = 0;      /// how many to change
+	bool ChangeMax = false;    /// modify the max, if value will exceed it
 private:
 	sound *fired_sound = nullptr; //fired sound
 	sound *impact_sound = nullptr; //impact sound for this missile-type
 public:
-	bool CorrectSphashDamage;  /// restricts the radius damage depending on land, air, naval
+	bool CorrectSphashDamage = false;  /// restricts the radius damage depending on land, air, naval
 	bool Flip;                 /// flip image when facing left
-	bool CanHitOwner;          /// missile can hit the owner
+	bool CanHitOwner = false;          /// missile can hit the owner
 	bool FriendlyFire;         /// missile can't hit own units
-	bool AlwaysFire;           /// missile will always fire (even if target is dead)
-	bool Pierce;               /// missile will hit every unit on his way
-	bool PierceOnce;           /// pierce every target only once
-	bool PierceIgnoreBeforeGoal;	/// only pierce targets after the goal
-	bool IgnoreWalls;          /// missile ignores Wall units on it's way
-	bool KillFirstUnit;        /// missile kills first unit blocking it's way
+	bool AlwaysFire = false;           /// missile will always fire (even if target is dead)
+	bool Pierce = false;               /// missile will hit every unit on his way
+	bool PierceOnce = false;           /// pierce every target only once
+	bool PierceIgnoreBeforeGoal = false;	/// only pierce targets after the goal
+	bool IgnoreWalls = true;          /// missile ignores Wall units on it's way
+	bool KillFirstUnit = false;        /// missile kills first unit blocking it's way
 	//Wyrmgus start
-	bool AlwaysHits;		   /// missile never misses
+	bool AlwaysHits = false;		   /// missile never misses
 	//Wyrmgus end
 
 private:
 	wyrmgus::missile_class missile_class; /// missile class
 public:
-	int NumBounces;            /// number of bounces
-	int MaxBounceSize;		   /// if the unit has a size greater than this, the missile won't bounce further
-	int ParabolCoefficient;    /// parabol coefficient in parabolic missile
-	int StartDelay;            /// missile start delay
+	int NumBounces = 0;            /// number of bounces
+	int MaxBounceSize = 0;		   /// if the unit has a size greater than this, the missile won't bounce further
+	int ParabolCoefficient = 2048;    /// parabol coefficient in parabolic missile
+	int StartDelay = 0;            /// missile start delay
 private:
 	int sleep = 0; //missile sleep
 	int speed = 0; //missile speed
 public:
-	int BlizzardSpeed;         /// speed for blizzard shards
+	int BlizzardSpeed = 0;         /// speed for blizzard shards
 	//Wyrmgus start
-	int AttackSpeed;		   /// attack speed; used by whirlwind missiles
+	int AttackSpeed = 10;		   /// attack speed; used by whirlwind missiles
 	//Wyrmgus end
-	int TTL;                   /// missile time-to-live
-	int ReduceFactor;          /// Multiplier for reduce or increase damage dealt to the next unit
-	int SmokePrecision;        /// How frequently the smoke missile will generate itself
-	int MissileStopFlags;      /// On which terrain types missile won't fly
+	int TTL = -1;                   /// missile time-to-live
+	int ReduceFactor = 100;          /// Multiplier for reduce or increase damage dealt to the next unit
+	int SmokePrecision = 0;        /// How frequently the smoke missile will generate itself
+	int MissileStopFlags = 0;      /// On which terrain types missile won't fly
 	std::unique_ptr<NumberDesc> Damage;        /// missile damage (used for non-direct missiles, e.g. impacts)
 
 private:
 	int range = 0; //missile damage range
 public:
-	int SplashFactor;                      /// missile splash divisor
+	int SplashFactor = 100;             /// missile splash divisor
 	std::vector<MissileConfig> Impact;  /// missile produces an impact
 	MissileConfig Smoke;                   /// trailing missile
 	std::unique_ptr<LuaCallback> ImpactParticle;           /// impact particle

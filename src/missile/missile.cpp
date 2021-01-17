@@ -1914,22 +1914,11 @@ void InitMissileTypes()
 namespace wyrmgus {
 
 missile_type::missile_type(const std::string &identifier) : data_entry(identifier), CDataType(identifier),
-	Transparency(0),
-	ChangeVariable(-1), ChangeAmount(0), ChangeMax(false),
 	//Wyrmgus start
-//	CorrectSphashDamage(false), Flip(false), CanHitOwner(false), FriendlyFire(false),
-	CorrectSphashDamage(false), Flip(true), CanHitOwner(false), FriendlyFire(true),
+//	Flip(false), FriendlyFire(false),
+	Flip(true), FriendlyFire(true),
 	//Wyrmgus end
-	AlwaysFire(false), Pierce(false), PierceOnce(false), PierceIgnoreBeforeGoal(false), IgnoreWalls(true), KillFirstUnit(false),
-	//Wyrmgus start
-	AlwaysHits(false),
-	//Wyrmgus end
-	missile_class(missile_class::none), NumBounces(0),	MaxBounceSize(0), ParabolCoefficient(2048), StartDelay(0),
-	//Wyrmgus start
-//	BlizzardSpeed(0), TTL(-1), ReduceFactor(100), SmokePrecision(0),
-	BlizzardSpeed(0), AttackSpeed(10), TTL(-1), ReduceFactor(100), SmokePrecision(0),
-	//Wyrmgus end
-	MissileStopFlags(0), SplashFactor(100)
+	missile_class(missile_class::none)
 {
 }
 
