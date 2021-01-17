@@ -36,7 +36,7 @@ void write_to_image(const QGeoPath &geopath, QImage &image, const QColor &color,
 {
 	QPoint previous_pixel_pos(-1, -1);
 	for (const QGeoCoordinate &geocoordinate : geopath.path()) {
-		const QPoint pixel_pos = geocoordinate::to_point(geocoordinate, georectangle, image.size());
+		const QPoint pixel_pos = qgeocoordinate::to_point(geocoordinate, georectangle, image.size());
 
 		const bool pos_in_image = georectangle.contains(geocoordinate);
 

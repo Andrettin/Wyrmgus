@@ -31,7 +31,7 @@ namespace wyrmgus {
 	class degree_scaling;
 }
 
-namespace wyrmgus::geocoordinate {
+namespace wyrmgus::qgeocoordinate {
 
 constexpr int longitude_size = 360;
 constexpr int latitude_size = 180;
@@ -39,31 +39,31 @@ constexpr int min_longitude = longitude_size / 2 * -1;
 constexpr int max_longitude = longitude_size / 2;
 constexpr int min_latitude = latitude_size / 2 * -1;
 constexpr int max_latitude = latitude_size / 2;
-static const QGeoCoordinate min_geocoordinate(geocoordinate::min_latitude, geocoordinate::min_longitude);
-static const QGeoCoordinate max_geocoordinate(geocoordinate::max_latitude, geocoordinate::max_longitude);
+static const QGeoCoordinate min_geocoordinate(qgeocoordinate::min_latitude, qgeocoordinate::min_longitude);
+static const QGeoCoordinate max_geocoordinate(qgeocoordinate::max_latitude, qgeocoordinate::max_longitude);
 
 inline double longitude_to_unsigned_longitude(const double longitude)
 {
-	return longitude + (geocoordinate::longitude_size / 2);
+	return longitude + (qgeocoordinate::longitude_size / 2);
 }
 
 inline double latitude_to_unsigned_latitude(const double latitude)
 {
-	return latitude * -1 + (geocoordinate::latitude_size / 2);
+	return latitude * -1 + (qgeocoordinate::latitude_size / 2);
 }
 
 inline QPointF to_unsigned_geocoordinate(const QGeoCoordinate &geocoordinate)
 {
 	//converts a geocoordinate into a (floating) coordinate point, having x values from 0 to 360, and y values from 0 to 180 (top to bottom, contrary to geocoordinates, which work south to north)
-	const double x = geocoordinate::longitude_to_unsigned_longitude(geocoordinate.longitude());
-	const double y = geocoordinate::latitude_to_unsigned_latitude(geocoordinate.latitude());
+	const double x = qgeocoordinate::longitude_to_unsigned_longitude(geocoordinate.longitude());
+	const double y = qgeocoordinate::latitude_to_unsigned_latitude(geocoordinate.latitude());
 	return QPointF(x, y);
 }
 
 inline QGeoCoordinate from_unsigned_geocoordinate(const QPointF &unsigned_geocoordinate)
 {
-	const double lon = unsigned_geocoordinate.x() - (geocoordinate::longitude_size / 2);
-	const double lat = (unsigned_geocoordinate.y() - (geocoordinate::latitude_size / 2)) * -1;
+	const double lon = unsigned_geocoordinate.x() - (qgeocoordinate::longitude_size / 2);
+	const double lat = (unsigned_geocoordinate.y() - (qgeocoordinate::latitude_size / 2)) * -1;
 	return QGeoCoordinate(lat, lon);
 }
 
@@ -81,14 +81,14 @@ inline int unsigned_latitude_to_y(const double latitude, const double lat_per_pi
 
 inline int longitude_to_x(const double longitude, const double lon_per_pixel)
 {
-	const double x = geocoordinate::longitude_to_unsigned_longitude(longitude);
-	return geocoordinate::unsigned_longitude_to_x(x, lon_per_pixel);
+	const double x = qgeocoordinate::longitude_to_unsigned_longitude(longitude);
+	return qgeocoordinate::unsigned_longitude_to_x(x, lon_per_pixel);
 }
 
 inline int latitude_to_y(const double latitude, const double lat_per_pixel)
 {
-	const double y = geocoordinate::latitude_to_unsigned_latitude(latitude);
-	return geocoordinate::unsigned_latitude_to_y(y, lat_per_pixel);
+	const double y = qgeocoordinate::latitude_to_unsigned_latitude(latitude);
+	return qgeocoordinate::unsigned_latitude_to_y(y, lat_per_pixel);
 }
 
 inline double longitude_per_pixel(const double lon_size, const QSize &size)
@@ -107,8 +107,8 @@ extern double latitude_to_scaled_latitude(const double latitude, const std::vect
 inline QPointF to_scaled_geocoordinate(const QGeoCoordinate &geocoordinate, const std::vector<std::unique_ptr<degree_scaling>> &longitude_scalings, const std::vector<std::unique_ptr<degree_scaling>> &latitude_scalings)
 {
 	//converts a geocoordinate into an unsigned scaled geocoordinate
-	const double x = geocoordinate::longitude_to_scaled_longitude(geocoordinate.longitude(), longitude_scalings);
-	const double y = geocoordinate::latitude_to_scaled_latitude(geocoordinate.latitude(), latitude_scalings);
+	const double x = qgeocoordinate::longitude_to_scaled_longitude(geocoordinate.longitude(), longitude_scalings);
+	const double y = qgeocoordinate::latitude_to_scaled_latitude(geocoordinate.latitude(), latitude_scalings);
 	return QPointF(x, y);
 }
 
@@ -117,17 +117,17 @@ extern double scaled_latitude_size(const QGeoRectangle &georectangle, const std:
 
 inline QPoint to_point(const QGeoCoordinate &geocoordinate, const double lon_per_pixel, const double lat_per_pixel)
 {
-	const int x = geocoordinate::longitude_to_x(geocoordinate.longitude(), lon_per_pixel);
-	const int y = geocoordinate::latitude_to_y(geocoordinate.latitude(), lat_per_pixel);
+	const int x = qgeocoordinate::longitude_to_x(geocoordinate.longitude(), lon_per_pixel);
+	const int y = qgeocoordinate::latitude_to_y(geocoordinate.latitude(), lat_per_pixel);
 	return QPoint(x, y);
 }
 
 inline QPoint to_point(const QGeoCoordinate &geocoordinate, const QGeoRectangle &georectangle, const QSize &area_size)
 {
-	const double lon_per_pixel = geocoordinate::longitude_per_pixel(georectangle.width(), area_size);
-	const double lat_per_pixel = geocoordinate::latitude_per_pixel(georectangle.height(), area_size);
-	const QPoint geocoordinate_offset = geocoordinate::to_point(georectangle.topLeft(), lon_per_pixel, lat_per_pixel);
-	return geocoordinate::to_point(geocoordinate, lon_per_pixel, lat_per_pixel) - geocoordinate_offset;
+	const double lon_per_pixel = qgeocoordinate::longitude_per_pixel(georectangle.width(), area_size);
+	const double lat_per_pixel = qgeocoordinate::latitude_per_pixel(georectangle.height(), area_size);
+	const QPoint geocoordinate_offset = qgeocoordinate::to_point(georectangle.topLeft(), lon_per_pixel, lat_per_pixel);
+	return qgeocoordinate::to_point(geocoordinate, lon_per_pixel, lat_per_pixel) - geocoordinate_offset;
 }
 
 }

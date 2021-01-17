@@ -38,6 +38,7 @@
 
 namespace wyrmgus {
 
+class geocoordinate;
 class sml_parser;
 
 //stratagus markup language data
@@ -273,7 +274,9 @@ public:
 		return QSize(width, height);
 	}
 
-	QGeoCoordinate to_geocoordinate() const
+	geocoordinate to_geocoordinate() const;
+
+	QGeoCoordinate to_qgeocoordinate() const
 	{
 		if (this->get_values().size() != 2) {
 			throw std::runtime_error("Geocoordinate scopes need to contain exactly two values.");

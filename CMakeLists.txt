@@ -959,6 +959,7 @@ set(stratagus_util_HDRS
 	src/util/degree_scaling.h
 	src/util/exception_util.h
 	src/util/fractional_int.h
+	src/util/geocoordinate.h
 	src/util/geocoordinate_util.h
 	src/util/geojson_util.h
 	src/util/geopath_util.h

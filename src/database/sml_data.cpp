@@ -33,6 +33,7 @@
 
 #include "database/sml_operator.h"
 #include "database/sml_property_visitor.h"
+#include "util/geocoordinate.h"
 
 namespace wyrmgus {
 
@@ -49,6 +50,17 @@ void sml_data::add_property(const std::string &key, const std::string &value)
 void sml_data::add_property(std::string &&key, const sml_operator sml_operator, std::string &&value)
 {
 	this->elements.push_back(sml_property(std::move(key), sml_operator, std::move(value)));
+}
+
+geocoordinate sml_data::to_geocoordinate() const
+{
+	if (this->get_values().size() != 2) {
+		throw std::runtime_error("Geocoordinate scopes need to contain exactly two values.");
+	}
+
+	geocoordinate::number_type longitude = geocoordinate::number_type(this->get_values()[0]);
+	geocoordinate::number_type latitude = geocoordinate::number_type(this->get_values()[1]);
+	return geocoordinate(std::move(longitude), std::move(latitude));
 }
 
 void sml_data::print(std::ostream &ostream, const size_t indentation, const bool new_line) const

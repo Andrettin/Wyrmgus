@@ -32,6 +32,7 @@
 #include "data_type.h"
 #include "time/date.h"
 #include "util/color_container.h"
+#include "util/geocoordinate.h"
 
 class CMapLayer;
 class CPlayer;
@@ -62,8 +63,8 @@ class site final : public named_data_entry, public data_type<site>, public CData
 	Q_PROPERTY(wyrmgus::map_template* map_template MEMBER map_template)
 	Q_PROPERTY(QPoint pos MEMBER pos READ get_pos)
 	Q_PROPERTY(wyrmgus::site* pos_reference_site MEMBER pos_reference_site)
-	Q_PROPERTY(QGeoCoordinate geocoordinate MEMBER geocoordinate READ get_geocoordinate)
-	Q_PROPERTY(QPointF geocoordinate_offset MEMBER geocoordinate_offset)
+	Q_PROPERTY(wyrmgus::geocoordinate geocoordinate MEMBER geocoordinate READ get_geocoordinate)
+	Q_PROPERTY(wyrmgus::geocoordinate geocoordinate_offset MEMBER geocoordinate_offset)
 	Q_PROPERTY(wyrmgus::site* geocoordinate_reference_site MEMBER geocoordinate_reference_site)
 	Q_PROPERTY(int longitude_scale MEMBER longitude_scale)
 	Q_PROPERTY(int latitude_scale MEMBER latitude_scale)
@@ -147,7 +148,7 @@ public:
 		return this->pos;
 	}
 
-	const QGeoCoordinate &get_geocoordinate() const
+	const wyrmgus::geocoordinate &get_geocoordinate() const
 	{
 		return this->geocoordinate;
 	}
@@ -226,8 +227,8 @@ private:
 	wyrmgus::map_template *map_template = nullptr;
 	QPoint pos = QPoint(-1, -1); //position of the site in its map template
 	site *pos_reference_site = nullptr; //the site's reference position site, used as an offset for its position
-	QGeoCoordinate geocoordinate; //the site's position as a geocoordinate
-	QPointF geocoordinate_offset = QPointF(0, 0);
+	wyrmgus::geocoordinate geocoordinate; //the site's position as a geocoordinate
+	wyrmgus::geocoordinate geocoordinate_offset;
 	site *geocoordinate_reference_site = nullptr; //the site's reference geocoordinate site, used as an offset for its geocoordinate
 	int longitude_scale = 100;
 	int latitude_scale = 100;

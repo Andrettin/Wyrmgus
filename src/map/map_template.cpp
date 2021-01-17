@@ -83,8 +83,8 @@ namespace wyrmgus {
 
 map_template::map_template(const std::string &identifier)
 	: named_data_entry(identifier), CDataType(identifier),
-	min_longitude(geocoordinate::min_longitude), max_longitude(geocoordinate::max_longitude),
-	min_latitude(geocoordinate::min_latitude), max_latitude(geocoordinate::max_latitude)
+	min_longitude(qgeocoordinate::min_longitude), max_longitude(qgeocoordinate::max_longitude),
+	min_latitude(qgeocoordinate::min_latitude), max_latitude(qgeocoordinate::max_latitude)
 {
 }
 
@@ -1220,7 +1220,7 @@ void map_template::apply_sites(const QPoint &template_start_pos, const QPoint &m
 		}
 
 		//it is acceptable sites with geocoordinate to have their positions shifted, e.g. if it was coastal to shift it enough inland to give space for the building to be placed
-		const bool is_position_shift_acceptable = site->get_geocoordinate().isValid();
+		const bool is_position_shift_acceptable = !site->get_geocoordinate().is_null();
 			
 		if (random) {
 			if (site_raw_pos.x() != -1 || site_raw_pos.y() != -1) {
@@ -2650,9 +2650,17 @@ QPoint map_template::get_location_map_position(const historical_location *histor
 	return QPoint(-1, -1);
 }
 
+QPoint map_template::get_geocoordinate_pos(const geocoordinate &geocoordinate) const
+{
+	const QPoint top_left(this->get_min_longitude(), this->get_min_latitude());
+	const QPoint bottom_right(this->get_max_longitude(), this->get_max_latitude());
+	const QRect rect(top_left, bottom_right);
+	return geocoordinate.to_point(rect, this->get_size());
+}
+
 QPoint map_template::get_geocoordinate_pos(const QGeoCoordinate &geocoordinate) const
 {
-	return geocoordinate::to_point(geocoordinate, this->get_georectangle(), this->get_size());
+	return qgeocoordinate::to_point(geocoordinate, this->get_georectangle(), this->get_size());
 }
 
 QGeoCoordinate map_template::get_pos_geocoordinate(const QPoint &pos) const

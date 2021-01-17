@@ -29,11 +29,11 @@
 
 #include "util/degree_scaling.h"
 
-namespace wyrmgus::geocoordinate {
+namespace wyrmgus::qgeocoordinate {
 
 double longitude_to_scaled_longitude(const double longitude, const std::vector<std::unique_ptr<degree_scaling>> &degree_scalings)
 {
-	const double unsigned_longitude = geocoordinate::longitude_to_unsigned_longitude(longitude);
+	const double unsigned_longitude = qgeocoordinate::longitude_to_unsigned_longitude(longitude);
 
 	double scaled_longitude = unsigned_longitude;
 
@@ -56,7 +56,7 @@ double longitude_to_scaled_longitude(const double longitude, const std::vector<s
 
 double latitude_to_scaled_latitude(const double latitude, const std::vector<std::unique_ptr<degree_scaling>> &degree_scalings)
 {
-	const double unsigned_latitude = geocoordinate::latitude_to_unsigned_latitude(latitude);
+	const double unsigned_latitude = qgeocoordinate::latitude_to_unsigned_latitude(latitude);
 
 	double scaled_latitude = unsigned_latitude;
 

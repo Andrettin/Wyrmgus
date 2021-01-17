@@ -65,10 +65,6 @@ extern int AStarFindPath(const Vec2i &startPos, const Vec2i &goalPos, int gw, in
 */
 //Wyrmgus end
 
-/*----------------------------------------------------------------------------
---  Variables
-----------------------------------------------------------------------------*/
-
 void TerrainTraversal::SetSize(unsigned int width, unsigned int height)
 {
 	m_values.resize((width + 2) * (height + 2));

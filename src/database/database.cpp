@@ -98,6 +98,7 @@
 #include "unit/unit_type.h"
 #include "upgrade/upgrade_class.h"
 #include "upgrade/upgrade_structs.h"
+#include "util/geocoordinate.h"
 #include "util/qunique_ptr.h"
 #include "util/string_util.h"
 #include "util/string_conversion_util.h"
@@ -385,7 +386,7 @@ QVariant database::process_sml_scope_value(const sml_data &scope, const QMetaPro
 {
 	const std::string class_name = meta_property.enclosingMetaObject()->className();
 	const char *property_name = meta_property.name();
-	const std::string property_class_name = meta_property.typeName();
+	const std::string property_type_name = meta_property.typeName();
 	const QVariant::Type property_type = meta_property.type();
 
 	QVariant new_property_value;
@@ -413,7 +414,13 @@ QVariant database::process_sml_scope_value(const sml_data &scope, const QMetaPro
 		}
 
 		new_property_value = scope.to_size();
-	} else if (property_class_name == "QGeoCoordinate") {
+	} else if (property_type_name == "QGeoCoordinate") {
+		if (scope.get_operator() != sml_operator::assignment) {
+			throw std::runtime_error("Only the assignment operator is available for geocoordinate properties.");
+		}
+
+		new_property_value = QVariant::fromValue(scope.to_qgeocoordinate());
+	} else if (property_type_name == "wyrmgus::geocoordinate") {
 		if (scope.get_operator() != sml_operator::assignment) {
 			throw std::runtime_error("Only the assignment operator is available for geocoordinate properties.");
 		}

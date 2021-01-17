@@ -49,6 +49,7 @@
 #include "unit/unit_class.h"
 #include "unit/unit_type.h"
 #include "util/container_util.h"
+#include "util/geocoordinate.h"
 #include "util/geocoordinate_util.h"
 #include "util/point_util.h"
 #include "util/random.h"
@@ -196,12 +197,12 @@ void site::initialize()
 			this->geocoordinate_reference_site->initialize();
 		}
 
-		if (this->geocoordinate_offset == QPointF(0, 0)) {
+		if (this->geocoordinate_offset.is_null()) {
 			throw std::runtime_error("Site \"" + this->get_identifier() + "\" has a geocoordinate reference site, but no geocoordinate offset.");
 		}
 
-		double lon = this->geocoordinate_offset.x();
-		double lat = this->geocoordinate_offset.y();
+		longitude lon = this->geocoordinate_offset.get_longitude();
+		latitude lat = this->geocoordinate_offset.get_latitude();
 
 		if (this->longitude_scale != 100) {
 			lon *= this->longitude_scale;
@@ -213,12 +214,12 @@ void site::initialize()
 			lat /= 100;
 		}
 
-		lon += this->geocoordinate_reference_site->get_geocoordinate().longitude();
-		lat += this->geocoordinate_reference_site->get_geocoordinate().latitude();
+		lon += this->geocoordinate_reference_site->get_geocoordinate().get_longitude();
+		lat += this->geocoordinate_reference_site->get_geocoordinate().get_latitude();
 
-		this->geocoordinate = QGeoCoordinate(lat, lon);
+		this->geocoordinate = wyrmgus::geocoordinate(lon, lat);
 
-		if (!this->geocoordinate.isValid()) {
+		if (!this->geocoordinate.is_valid()) {
 			throw std::runtime_error("The application of a geocoordinate offset to a reference site's geocoordinate resulted in no valid geocoordinate for site \"" + this->get_identifier() + "\".");
 		}
 	} else if (this->pos_reference_site != nullptr) {
@@ -229,7 +230,7 @@ void site::initialize()
 		this->pos = this->pos_reference_site->get_pos() + this->pos;
 	}
 
-	if (this->get_geocoordinate().isValid()) {
+	if (!this->get_geocoordinate().is_null()) {
 		this->pos = this->get_map_template()->get_geocoordinate_pos(this->get_geocoordinate());
 	}
 

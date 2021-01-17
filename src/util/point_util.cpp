@@ -35,7 +35,7 @@ namespace wyrmgus::point {
 QGeoCoordinate to_geocoordinate(const QPoint &point, const QSize &area_size, const QRectF &unsigned_georectangle)
 {
 	const QPointF unsigned_geocoordinate = point::to_unsigned_geocoordinate(point, area_size, unsigned_georectangle);
-	return geocoordinate::from_unsigned_geocoordinate(unsigned_geocoordinate);
+	return qgeocoordinate::from_unsigned_geocoordinate(unsigned_geocoordinate);
 }
 
 int distance_to(const QPoint &point, const QPoint &other_point)
