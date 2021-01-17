@@ -129,15 +129,6 @@ class terrain_type;
 class tile_player_info final
 {
 public:
-	tile_player_info()
-	{
-		memset(Visible, 0, sizeof(Visible));
-		memset(VisCloak, 0, sizeof(VisCloak));
-		memset(VisEthereal, 0, sizeof(VisEthereal));
-		memset(Radar, 0, sizeof(Radar));
-		memset(RadarJammer, 0, sizeof(RadarJammer));
-	}
-
 	/// Check if a field for the user is explored.
 	bool IsExplored(const CPlayer &player) const;
 	//Wyrmgus start
@@ -167,11 +158,11 @@ public:
 	std::vector<std::pair<const wyrmgus::terrain_type *, short>> SeenTransitionTiles;			/// Transition tiles; the pair contains the terrain type and the tile index
 	std::vector<std::pair<const wyrmgus::terrain_type *, short>> SeenOverlayTransitionTiles;		/// Overlay transition tiles; the pair contains the terrain type and the tile index
 	//Wyrmgus end
-	unsigned short Visible[PlayerMax];    /// Seen counter 0 unexplored
-	unsigned char VisCloak[PlayerMax];    /// Visiblity for cloaking.
-	unsigned char VisEthereal[PlayerMax];    /// Visiblity for ethereal.
-	unsigned char Radar[PlayerMax];       /// Visiblity for radar.
-	unsigned char RadarJammer[PlayerMax]; /// Jamming capabilities.
+	std::array<unsigned short, PlayerMax> Visible = {};    /// Seen counter 0 unexplored
+	std::array<unsigned char, PlayerMax> VisCloak = {};    /// Visiblity for cloaking.
+	std::array<unsigned char, PlayerMax> VisEthereal = {};    /// Visiblity for ethereal.
+	std::array<unsigned char, PlayerMax> Radar = {};       /// Visiblity for radar.
+	std::array<unsigned char, PlayerMax> RadarJammer = {}; /// Jamming capabilities.
 };
 
 /// Describes a field of the map

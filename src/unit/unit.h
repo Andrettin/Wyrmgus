@@ -731,7 +731,7 @@ public:
 	CPlayer *RescuedFrom;        /// The original owner of a rescued unit.
 	/// null if the unit was not rescued.
 	/* Seen stuff. */
-	int VisCount[PlayerMax];     /// Unit visibility counts
+	std::array<int, PlayerMax> VisCount;     /// Unit visibility counts
 	struct _seen_stuff_ {
 		const wyrmgus::construction_frame *cframe = nullptr; /// Seen construction frame
 		int Frame = 0; /// last seen frame/stage of buildings

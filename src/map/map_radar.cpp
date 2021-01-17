@@ -45,8 +45,8 @@ static inline unsigned char IsTileRadarVisible(const CPlayer &pradar, const CPla
 
 	const int p = pradar.Index;
 	if (pradar.IsVisionSharing()) {
-		const unsigned char *const radar = mfp.Radar;
-		const unsigned char *const jamming = mfp.RadarJammer;
+		const std::array<unsigned char, PlayerMax> &radar = mfp.Radar;
+		const std::array<unsigned char, PlayerMax> &jamming = mfp.RadarJammer;
 		unsigned char radarvision = 0;
 
 		// Check jamming first, if we are jammed, exit

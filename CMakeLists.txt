@@ -1572,6 +1572,7 @@ endif()
 
 target_precompile_headers(stratagus PRIVATE
 	<algorithm>
+	<array>
 	<cassert>
 	<cctype>
 	<cerrno>

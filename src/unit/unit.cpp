@@ -473,7 +473,7 @@ void CUnit::Init()
 	Active = 0;
 	Boarded = 0;
 	RescuedFrom = nullptr;
-	memset(VisCount, 0, sizeof(VisCount));
+	this->VisCount.fill(0);
 	this->Seen = _seen_stuff_();
 	this->Variable.clear();
 	TTL = 0;
@@ -3137,7 +3137,8 @@ CUnit *MakeUnit(const wyrmgus::unit_type &type, CPlayer *player)
 template <wyrmgus::map_marker_func_ptr sight_marker, wyrmgus::map_marker_func_ptr detect_cloak_marker, wyrmgus::map_marker_func_ptr ethereal_vision_marker>
 static void MapMarkUnitSightRec(const CUnit &unit, const Vec2i &pos, int width, int height)
 {
-	Assert(sight_marker);
+	static_assert(sight_marker != nullptr);
+
 	//Wyrmgus start
 	/*
 	MapSight<sight_marker>(*unit.Player, pos, width, height,
