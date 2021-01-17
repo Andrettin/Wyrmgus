@@ -40,11 +40,72 @@ namespace wyrmgus {
 template <int N>
 class fractional_int final
 {
-	static constexpr int divisor = number::pow(10, N);
+public:
+	static constexpr int64_t divisor = number::pow(10, N);
+
+	constexpr fractional_int()
+	{
+	}
 
 	explicit constexpr fractional_int(const std::string &str)
 	{
 		this->value = string::fractional_number_string_to_int<N>(str);
+	}
+
+	explicit constexpr fractional_int(const int n)
+	{
+		this->value = n * fractional_int::divisor;
+	}
+
+	constexpr int to_int() const
+	{
+		return static_cast<int>(this->value / fractional_int::divisor);
+	}
+
+	constexpr double to_double() const
+	{
+		return static_cast<double>(this->value) / fractional_int::divisor;
+	}
+
+	constexpr bool operator ==(const fractional_int<N> &other) const
+	{
+		return this->value == other.value;
+	}
+
+	constexpr bool operator ==(const int other) const
+	{
+		return (this->value / fractional_int::divisor) == other && (this->value % fractional_int::divisor) == 0;
+	}
+
+	constexpr bool operator !=(const fractional_int<N> &other) const
+	{
+		return this->value != other.value;
+	}
+
+	constexpr bool operator <(const fractional_int<N> &other) const
+	{
+		return this->value < other.value;
+	}
+
+	constexpr bool operator <=(const fractional_int<N> &other) const
+	{
+		return this->value <= other.value;
+	}
+
+	constexpr bool operator >(const fractional_int<N> &other) const
+	{
+		return this->value > other.value;
+	}
+
+	constexpr bool operator >=(const fractional_int<N> &other) const
+	{
+		return this->value >= other.value;
+	}
+
+	constexpr const fractional_int<N> &operator +=(const fractional_int<N> &other)
+	{
+		this->value += other.value;
+		return *this;
 	}
 
 	template <int N2>
@@ -62,6 +123,27 @@ class fractional_int final
 	}
 
 	template <int N2>
+	constexpr const fractional_int<N> &operator /=(const fractional_int<N2> &other)
+	{
+		this->value *= fractional_int<N2>::divisor;
+		this->value /= other.value;
+		return *this;
+	}
+
+	constexpr const fractional_int<N> &operator /=(const int other)
+	{
+		this->value /= other;
+		return *this;
+	}
+
+	constexpr fractional_int<N> operator +(const fractional_int<N> &other) const
+	{
+		fractional_int res(*this);
+		res += other;
+		return res;
+	}
+
+	template <int N2>
 	constexpr fractional_int<N> operator *(const fractional_int<N2> &other) const
 	{
 		fractional_int res(*this);
@@ -76,22 +158,37 @@ class fractional_int final
 		return res;
 	}
 
-	friend constexpr const int &operator *=(int &lhs, const fractional_int<N> &rhs)
+	template <int N2>
+	constexpr fractional_int<N> operator /(const fractional_int<N2> &other) const
 	{
-		lhs *= rhs.value;
-		lhs /= fractional_int<N>::divisor;
-		return lhs;
+		fractional_int res(*this);
+		res /= other;
+		return res;
+	}
+
+	constexpr fractional_int<N> operator /(const int other) const
+	{
+		fractional_int res(*this);
+		res /= other;
+		return res;
+	}
+
+	friend constexpr const fractional_int<N> &operator *=(int &lhs, const fractional_int<N> &rhs)
+	{
+		fractional_int res(rhs);
+		res *= lhs;
+		return res;
 	}
 
 	friend constexpr int operator *(const int lhs, const fractional_int<N> &rhs)
 	{
-		int res = lhs;
-		res *= rhs;
+		fractional_int res(rhs);
+		res *= lhs;
 		return res;
 	}
 
 private:
-	int value = 0;
+	int64_t value = 0;
 };
 
 using decimal_int = fractional_int<1>;
