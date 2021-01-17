@@ -1549,20 +1549,16 @@ static void AiCollectResources()
 		return;
 	}
 	
-	std::vector<CUnit *> units_assigned[MaxCosts]; // Worker assigned to resource
-	std::vector<CUnit *> units_unassigned[MaxCosts]; // Unassigned workers
-	int num_units_with_resource[MaxCosts];
-	int num_units_assigned[MaxCosts];
-	int num_units_unassigned[MaxCosts];
-	int percent[MaxCosts];
-	int priority_resource[MaxCosts];
-	int priority_needed[MaxCosts];
-	int wanted[MaxCosts];
+	std::array<std::vector<CUnit *>, MaxCosts> units_assigned; // Worker assigned to resource
+	std::array<std::vector<CUnit *>, MaxCosts> units_unassigned; // Unassigned workers
+	std::array<int, MaxCosts> num_units_with_resource{};
+	std::array<int, MaxCosts> num_units_assigned{};
+	std::array<int, MaxCosts> num_units_unassigned{};
+	std::array<int, MaxCosts> percent{};
+	std::array<int, MaxCosts> priority_resource{};
+	std::array<int, MaxCosts> priority_needed{};
+	std::array<int, MaxCosts> wanted{};
 	int total_harvester = 0;
-
-	memset(num_units_with_resource, 0, sizeof(num_units_with_resource));
-	memset(num_units_unassigned, 0, sizeof(num_units_unassigned));
-	memset(num_units_assigned, 0, sizeof(num_units_assigned));
 
 	// Collect statistics about the current assignment
 	const int n = AiPlayer->Player->GetUnitCount();
@@ -1627,8 +1623,6 @@ static void AiCollectResources()
 	if (!total_harvester) {
 		return;
 	}
-
-	memset(wanted, 0, sizeof(wanted));
 
 	int percent_total = 100;
 	for (int c = 1; c < MaxCosts; ++c) {
