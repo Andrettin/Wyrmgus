@@ -4971,6 +4971,17 @@ void RescueUnits()
 --  Unit headings
 ----------------------------------------------------------------------------*/
 
+static std::array<unsigned char, 2608> create_atan_table()
+{
+	std::array<unsigned char, 2608> atan_table{};
+
+	for (size_t i = 0; i < atan_table.size(); ++i) {
+		atan_table[i] = (unsigned char) (atan((double) i / 64) * (64 * 4 / 6.2831853));
+	}
+
+	return atan_table;
+}
+
 /**
 **  Fast arc tangent function.
 **
@@ -4980,17 +4991,10 @@ void RescueUnits()
 */
 static int myatan(int val)
 {
-	static int init;
-	static unsigned char atan_table[2608];
+	static const std::array<unsigned char, 2608> atan_table = create_atan_table();
 
 	if (val >= 2608) {
 		return 63;
-	}
-	if (!init) {
-		for (; init < 2608; ++init) {
-			atan_table[init] =
-				(unsigned char)(atan((double)init / 64) * (64 * 4 / 6.2831853));
-		}
 	}
 
 	return atan_table[val];
