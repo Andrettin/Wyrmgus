@@ -4500,7 +4500,7 @@ void UnitCountSeen(CUnit &unit)
 
 	//  Store old values in oldv[p]. This store if the player could see the
 	//  unit before this calc.
-	int oldv[PlayerMax];
+	std::array<int, PlayerMax> oldv{};
 	for (int p = 0; p < PlayerMax; ++p) {
 		if (CPlayer::Players[p]->Type != PlayerNobody) {
 			oldv[p] = unit.IsVisible(*CPlayer::Players[p]);
