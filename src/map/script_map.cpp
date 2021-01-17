@@ -91,7 +91,7 @@ static int CclStratagusMap(lua_State *l)
 			const char *version = LuaToString(l, j + 1);
 			strncpy(buf, VERSION, sizeof(buf));
 			if (strcmp(buf, version)) {
-				fprintf(stderr, "Warning not saved with this version.\n");
+				fprintf(stderr, "Warning: not saved with this version.\n");
 			}
 		} else if (!strcmp(value, "uid")) {
 			CMap::Map.Info.MapUID = LuaToNumber(l, j + 1);

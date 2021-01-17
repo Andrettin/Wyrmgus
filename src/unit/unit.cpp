@@ -3134,35 +3134,32 @@ CUnit *MakeUnit(const wyrmgus::unit_type &type, CPlayer *player)
 **  @param f       Function to (un)mark for normal vision.
 **  @param f2        Function to (un)mark for cloaking vision.
 */
-static void MapMarkUnitSightRec(const CUnit &unit, const Vec2i &pos, int width, int height,
-								//Wyrmgus start
-//								MapMarkerFunc *f, MapMarkerFunc *f2)
-								MapMarkerFunc *f, MapMarkerFunc *f2, MapMarkerFunc *f3)
-								//Wyrmgus end
+template <wyrmgus::map_marker_func_ptr sight_marker, wyrmgus::map_marker_func_ptr detect_cloak_marker, wyrmgus::map_marker_func_ptr ethereal_vision_marker>
+static void MapMarkUnitSightRec(const CUnit &unit, const Vec2i &pos, int width, int height)
 {
-	Assert(f);
+	Assert(sight_marker);
 	//Wyrmgus start
 	/*
-	MapSight(*unit.Player, pos, width, height,
-			 unit.GetFirstContainer()->CurrentSightRange, f);
+	MapSight<sight_marker>(*unit.Player, pos, width, height,
+			 unit.GetFirstContainer()->CurrentSightRange);
 
-	if (unit.Type && unit.Type->BoolFlag[DETECTCLOAK_INDEX].value && f2) {
-		MapSight(*unit.Player, pos, width, height,
-				 unit.GetFirstContainer()->CurrentSightRange, f2);
+	if (unit.Type && unit.Type->BoolFlag[DETECTCLOAK_INDEX].value && detect_cloak_marker) {
+		MapSight<detect_cloak_marker>(*unit.Player, pos, width, height,
+				 unit.GetFirstContainer()->CurrentSightRange);
 	}
 	*/
 
-	MapSight(*unit.Player, pos, width, height,
-			 unit.Container && unit.Container->CurrentSightRange >= unit.CurrentSightRange ? unit.Container->CurrentSightRange : unit.CurrentSightRange, f, unit.MapLayer->ID);
+	MapSight<sight_marker>(*unit.Player, pos, width, height,
+			 unit.Container && unit.Container->CurrentSightRange >= unit.CurrentSightRange ? unit.Container->CurrentSightRange : unit.CurrentSightRange, unit.MapLayer->ID);
 
-	if (unit.Type && unit.Type->BoolFlag[DETECTCLOAK_INDEX].value && f2) {
-		MapSight(*unit.Player, pos, width, height,
-				 unit.Container && unit.Container->CurrentSightRange >= unit.CurrentSightRange ? unit.Container->CurrentSightRange : unit.CurrentSightRange, f2, unit.MapLayer->ID);
+	if (unit.Type && unit.Type->BoolFlag[DETECTCLOAK_INDEX].value && detect_cloak_marker) {
+		MapSight<detect_cloak_marker>(*unit.Player, pos, width, height,
+				 unit.Container && unit.Container->CurrentSightRange >= unit.CurrentSightRange ? unit.Container->CurrentSightRange : unit.CurrentSightRange, unit.MapLayer->ID);
 	}
 	
-	if (unit.Variable[ETHEREALVISION_INDEX].Value && f3) {
-		MapSight(*unit.Player, pos, width, height,
-				 unit.Container && unit.Container->CurrentSightRange >= unit.CurrentSightRange ? unit.Container->CurrentSightRange : unit.CurrentSightRange, f3, unit.MapLayer->ID);
+	if (unit.Variable[ETHEREALVISION_INDEX].Value && ethereal_vision_marker) {
+		MapSight<ethereal_vision_marker>(*unit.Player, pos, width, height,
+				 unit.Container && unit.Container->CurrentSightRange >= unit.CurrentSightRange ? unit.Container->CurrentSightRange : unit.CurrentSightRange, unit.MapLayer->ID);
 	}
 	//Wyrmgus end
 
@@ -3170,7 +3167,7 @@ static void MapMarkUnitSightRec(const CUnit &unit, const Vec2i &pos, int width, 
 	for (int i = unit.InsideCount; i--; unit_inside = unit_inside->NextContained) {
 		//Wyrmgus start
 //		MapMarkUnitSightRec(*unit_inside, pos, width, height, f, f2);
-		MapMarkUnitSightRec(*unit_inside, pos, width, height, f, f2, f3);
+		MapMarkUnitSightRec<sight_marker, detect_cloak_marker, ethereal_vision_marker>(*unit_inside, pos, width, height);
 		//Wyrmgus end
 	}
 }
@@ -3205,11 +3202,7 @@ void MapMarkUnitSight(CUnit &unit)
 	CUnit *container = unit.GetFirstContainer(); //first container of the unit.
 	Assert(container->Type);
 
-	MapMarkUnitSightRec(unit, container->tilePos, container->Type->get_tile_width(), container->Type->get_tile_height(),
-						//Wyrmgus start
-//						MapMarkTileSight, MapMarkTileDetectCloak);
-						MapMarkTileSight, MapMarkTileDetectCloak, MapMarkTileDetectEthereal);
-						//Wyrmgus end
+	MapMarkUnitSightRec<MapMarkTileSight, MapMarkTileDetectCloak, MapMarkTileDetectEthereal>(unit, container->tilePos, container->Type->get_tile_width(), container->Type->get_tile_height());
 
 	// Never mark radar, except if the top unit, and unit is usable
 	if (&unit == container && !unit.IsUnusable()) {
@@ -3237,12 +3230,7 @@ void MapUnmarkUnitSight(CUnit &unit)
 
 	CUnit *container = unit.GetFirstContainer();
 	Assert(container->Type);
-	MapMarkUnitSightRec(unit,
-						container->tilePos, container->Type->get_tile_width(), container->Type->get_tile_height(),
-						//Wyrmgus start
-//						MapUnmarkTileSight, MapUnmarkTileDetectCloak);
-						MapUnmarkTileSight, MapUnmarkTileDetectCloak, MapUnmarkTileDetectEthereal);
-						//Wyrmgus end
+	MapMarkUnitSightRec<MapUnmarkTileSight, MapUnmarkTileDetectCloak, MapUnmarkTileDetectEthereal>(unit, container->tilePos, container->Type->get_tile_width(), container->Type->get_tile_height());
 
 	// Never mark radar, except if the top unit?
 	if (&unit == container && !unit.IsUnusable()) {

@@ -458,9 +458,10 @@ void MapUnmarkTileDetectEthereal(const CPlayer &player, const Vec2i &pos, int z)
 **  @param range   Radius to mark.
 **  @param marker  Function to mark or unmark sight
 */
+template <wyrmgus::map_marker_func_ptr marker>
 //Wyrmgus start
-//void MapSight(const CPlayer &player, const Vec2i &pos, int w, int h, int range, MapMarkerFunc *marker)
-void MapSight(const CPlayer &player, const Vec2i &pos, int w, int h, int range, MapMarkerFunc *marker, int z)
+//void MapSight(const CPlayer &player, const Vec2i &pos, int w, int h, int range)
+void MapSight(const CPlayer &player, const Vec2i &pos, int w, int h, int range, int z)
 //Wyrmgus end
 {
 	// Units under construction have no sight range.
@@ -587,6 +588,17 @@ void MapSight(const CPlayer &player, const Vec2i &pos, int w, int h, int range, 
 		}
 	}
 }
+
+template void MapSight<MapMarkTileSight>(const CPlayer &player, const Vec2i &pos, const int w, const int h, const int range, const int z);
+template void MapSight<MapUnmarkTileSight>(const CPlayer &player, const Vec2i &pos, const int w, const int h, const int range, const int z);
+template void MapSight<MapMarkTileDetectCloak>(const CPlayer &player, const Vec2i &pos, const int w, const int h, const int range, const int z);
+template void MapSight<MapUnmarkTileDetectCloak>(const CPlayer &player, const Vec2i &pos, const int w, const int h, const int range, const int z);
+template void MapSight<MapMarkTileDetectEthereal>(const CPlayer &player, const Vec2i &pos, const int w, const int h, const int range, const int z);
+template void MapSight<MapUnmarkTileDetectEthereal>(const CPlayer &player, const Vec2i &pos, const int w, const int h, const int range, const int z);
+template void MapSight<MapMarkTileRadar>(const CPlayer &player, const Vec2i &pos, const int w, const int h, const int range, const int z);
+template void MapSight<MapUnmarkTileRadar>(const CPlayer &player, const Vec2i &pos, const int w, const int h, const int range, const int z);
+template void MapSight<MapMarkTileRadarJammer>(const CPlayer &player, const Vec2i &pos, const int w, const int h, const int range, const int z);
+template void MapSight<MapUnmarkTileRadarJammer>(const CPlayer &player, const Vec2i &pos, const int w, const int h, const int range, const int z);
 
 /**
 **  Update fog of war.

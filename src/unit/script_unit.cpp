@@ -406,24 +406,24 @@ static int CclUnit(lua_State *l)
 //			pos.y = LuaToNumber(l, -1, 2);
 //			w = LuaToNumber(l, -1, 3);
 //			h = LuaToNumber(l, -1, 4);
-//			MapSight(*player, pos, w, h, unit->CurrentSightRange, MapMarkTileSight);
+//			MapSight<MapMarkTileSight>(*player, pos, w, h, unit->CurrentSightRange);
 			z = LuaToNumber(l, -1, 1);
 			pos.x = LuaToNumber(l, -1, 2);
 			pos.y = LuaToNumber(l, -1, 3);
 			w = LuaToNumber(l, -1, 4);
 			h = LuaToNumber(l, -1, 5);
-			MapSight(*player, pos, w, h, unit->CurrentSightRange, MapMarkTileSight, z);
+			MapSight<MapMarkTileSight>(*player, pos, w, h, unit->CurrentSightRange, z);
 			//Wyrmgus end
 			// Detectcloak works in container
 			if (unit->Type->BoolFlag[DETECTCLOAK_INDEX].value) {
 				//Wyrmgus start
-//				MapSight(*player, pos, w, h, unit->CurrentSightRange, MapMarkTileDetectCloak);
-				MapSight(*player, pos, w, h, unit->CurrentSightRange, MapMarkTileDetectCloak, z);
+//				MapSight<MapMarkTileDetectCloak>(*player, pos, w, h, unit->CurrentSightRange);
+				MapSight<MapMarkTileDetectCloak>(*player, pos, w, h, unit->CurrentSightRange, z);
 				//Wyrmgus end
 			}
 			//Wyrmgus start
 			if (unit->Variable[ETHEREALVISION_INDEX].Value) {
-				MapSight(*player, pos, w, h, unit->CurrentSightRange, MapMarkTileDetectEthereal, z);
+				MapSight<MapMarkTileDetectEthereal>(*player, pos, w, h, unit->CurrentSightRange, z);
 			}
 			//Wyrmgus end
 			// Radar(Jammer) not.

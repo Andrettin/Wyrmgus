@@ -378,51 +378,70 @@ extern int FlagRevealMap;
 /// Flag must reveal map when in replay
 extern int ReplayRevealMap;
 
-//
-// in map_fog.c
-//
 /// Function to (un)mark the vision table.
 typedef void MapMarkerFunc(const CPlayer &player, const unsigned int index, const int z);
 
-/// Filter map flags through fog
-extern int MapFogFilterFlags(CPlayer &player, const Vec2i &pos, int mask, int z);
-extern int MapFogFilterFlags(CPlayer &player, const unsigned int index, int mask, int z);
-/// Mark a tile for normal sight
-extern MapMarkerFunc MapMarkTileSight;
-/// Unmark a tile for normal sight
-extern MapMarkerFunc MapUnmarkTileSight;
-/// Mark a tile for cloak detection
-extern MapMarkerFunc MapMarkTileDetectCloak;
-/// Unmark a tile for cloak detection
-extern MapMarkerFunc MapUnmarkTileDetectCloak;
-//Wyrmgus start
-/// Mark a tile for ethereal detection
-extern MapMarkerFunc MapMarkTileDetectEthereal;
-/// Unmark a tile for ethereal detection
-extern MapMarkerFunc MapUnmarkTileDetectEthereal;
-//Wyrmgus end
+namespace wyrmgus {
 
-/// Mark sight changes
-extern void MapSight(const CPlayer &player, const Vec2i &pos, int w,
-					 int h, int range, MapMarkerFunc *marker, int z);
-/// Update fog of war
-extern void UpdateFogOfWarChange();
+using map_marker_func_ptr = void(*)(const CPlayer &player, const unsigned int index, const int z);
+
+}
 
 //
 // in map_radar.c
 //
 
-/// Mark a tile as radar visible, or incrase radar vision
-extern MapMarkerFunc MapMarkTileRadar;
+/// Mark a tile as radar visible, or increase radar vision
+extern void MapMarkTileRadar(const CPlayer &player, const unsigned int index, const int z);
 
 /// Unmark a tile as radar visible, decrease is visible by other radar
-extern MapMarkerFunc MapUnmarkTileRadar;
+extern void MapUnmarkTileRadar(const CPlayer &player, const unsigned int index, const int z);
 
 /// Mark a tile as radar jammed, or incrase radar jamming'ness
-extern MapMarkerFunc MapMarkTileRadarJammer;
+extern void MapMarkTileRadarJammer(const CPlayer &player, const unsigned int index, const int z);
 
 /// Unmark a tile as jammed, decrease is jamming'ness
-extern MapMarkerFunc MapUnmarkTileRadarJammer;
+extern void MapUnmarkTileRadarJammer(const CPlayer &player, const unsigned int index, const int z);
+
+//
+// in map_fog.c
+//
+/// Filter map flags through fog
+extern int MapFogFilterFlags(CPlayer &player, const Vec2i &pos, int mask, int z);
+extern int MapFogFilterFlags(CPlayer &player, const unsigned int index, int mask, int z);
+
+/// Mark a tile for normal sight
+extern void MapMarkTileSight(const CPlayer &player, const unsigned int index, const int z);
+/// Unmark a tile for normal sight
+extern void MapUnmarkTileSight(const CPlayer &player, const unsigned int index, const int z);
+/// Mark a tile for cloak detection
+extern void MapMarkTileDetectCloak(const CPlayer &player, const unsigned int index, const int z);
+/// Unmark a tile for cloak detection
+extern void MapUnmarkTileDetectCloak(const CPlayer &player, const unsigned int index, const int z);
+//Wyrmgus start
+/// Mark a tile for ethereal detection
+extern void MapMarkTileDetectEthereal(const CPlayer &player, const unsigned int index, const int z);
+/// Unmark a tile for ethereal detection
+extern void MapUnmarkTileDetectEthereal(const CPlayer &player, const unsigned int index, const int z);
+//Wyrmgus end
+
+/// Mark sight changes
+template <wyrmgus::map_marker_func_ptr marker>
+extern void MapSight(const CPlayer &player, const Vec2i &pos, const int w, const int h, const int range, const int z);
+
+extern template void MapSight<MapMarkTileSight>(const CPlayer &player, const Vec2i &pos, const int w, const int h, const int range, const int z);
+extern template void MapSight<MapUnmarkTileSight>(const CPlayer &player, const Vec2i &pos, const int w, const int h, const int range, const int z);
+extern template void MapSight<MapMarkTileDetectCloak>(const CPlayer &player, const Vec2i &pos, const int w, const int h, const int range, const int z);
+extern template void MapSight<MapUnmarkTileDetectCloak>(const CPlayer &player, const Vec2i &pos, const int w, const int h, const int range, const int z);
+extern template void MapSight<MapMarkTileDetectEthereal>(const CPlayer &player, const Vec2i &pos, const int w, const int h, const int range, const int z);
+extern template void MapSight<MapUnmarkTileDetectEthereal>(const CPlayer &player, const Vec2i &pos, const int w, const int h, const int range, const int z);
+extern template void MapSight<MapMarkTileRadar>(const CPlayer &player, const Vec2i &pos, const int w, const int h, const int range, const int z);
+extern template void MapSight<MapUnmarkTileRadar>(const CPlayer &player, const Vec2i &pos, const int w, const int h, const int range, const int z);
+extern template void MapSight<MapMarkTileRadarJammer>(const CPlayer &player, const Vec2i &pos, const int w, const int h, const int range, const int z);
+extern template void MapSight<MapUnmarkTileRadarJammer>(const CPlayer &player, const Vec2i &pos, const int w, const int h, const int range, const int z);
+
+/// Update fog of war
+extern void UpdateFogOfWarChange();
 
 //
 // in map_wall.c
@@ -509,18 +528,18 @@ extern bool CanMoveToMask(const Vec2i &pos, int mask, int z);
 /// Handle Marking and Unmarking of radar vision
 inline void MapMarkRadar(const CPlayer &player, const Vec2i &pos, int w, int h, int range, int z)
 {
-	MapSight(player, pos, w, h, range, MapMarkTileRadar, z);
+	MapSight<MapMarkTileRadar>(player, pos, w, h, range, z);
 }
 inline void MapUnmarkRadar(const CPlayer &player, const Vec2i &pos, int w, int h, int range, int z)
 {
-	MapSight(player, pos, w, h, range, MapUnmarkTileRadar, z);
+	MapSight<MapUnmarkTileRadar>(player, pos, w, h, range, z);
 }
 /// Handle Marking and Unmarking of radar vision
 inline void MapMarkRadarJammer(const CPlayer &player, const Vec2i &pos, int w, int h, int range, int z)
 {
-	MapSight(player, pos, w, h, range, MapMarkTileRadarJammer, z);
+	MapSight<MapMarkTileRadarJammer>(player, pos, w, h, range, z);
 }
 inline void MapUnmarkRadarJammer(const CPlayer &player, const Vec2i &pos, int w, int h, int range, int z)
 {
-	MapSight(player, pos, w, h, range, MapUnmarkTileRadarJammer, z);
+	MapSight<MapUnmarkTileRadarJammer>(player, pos, w, h, range, z);
 }
