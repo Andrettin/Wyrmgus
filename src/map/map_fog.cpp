@@ -123,12 +123,12 @@ int MapFogFilterFlags(CPlayer &player, const Vec2i &pos, int mask, int z)
 }
 
 template<bool MARK>
-class _TileSeen
+class _TileSeen final
 {
 public:
 	//Wyrmgus start
-//	_TileSeen(const CPlayer &p , int c) : player(&p), cloak(c)
-	_TileSeen(const CPlayer &p , int c, int e) : player(&p), cloak(c), ethereal(e)
+//	explicit _TileSeen(const CPlayer &p , int c) : player(&p), cloak(c)
+	explicit _TileSeen(const CPlayer &p , int c, int e) : player(&p), cloak(c), ethereal(e)
 	//Wyrmgus end
 	{}
 
@@ -147,7 +147,7 @@ public:
 			return ;
 		}
 		const int p = player->Index;
-		if (MARK) {
+		if constexpr (MARK) {
 			//  If the unit goes out of fog, this can happen for any player that
 			//  this player shares vision with, and can't YET see the unit.
 			//  It will be able to see the unit after the Unit->VisCount ++
@@ -284,7 +284,7 @@ void MapMarkTileSight(const CPlayer &player, const Vec2i &pos, int z)
 **  Unmark a tile's sight. (Explore and make visible.)
 **
 **  @param player  Player to mark sight.
-**  @param indexx  tile to mark.
+**  @param index   tile to mark.
 */
 //Wyrmgus start
 //void MapUnmarkTileSight(const CPlayer &player, const unsigned int index)
