@@ -751,7 +751,13 @@ void font::make_font_color_texture(const wyrmgus::font_color *fc)
 	newg->original_frame_size = g.get_original_frame_size();
 
 	for (int j = 0; j < newg->image.colorCount(); ++j) {
-		newg->image.setColor(j, qRgba(fc->get_colors()[j].red(), fc->get_colors()[j].green(), fc->get_colors()[j].blue(), j == 0 ? 0 : 255));
+		if (static_cast<size_t>(j) >= fc->get_colors().size()) {
+			break;
+		}
+
+		const QColor &color = fc->get_colors()[j];
+
+		newg->image.setColor(j, qRgba(color.red(), color.green(), color.blue(), j == 0 ? 0 : 255));
 	}
 
 	MakeTexture(newg.get(), false, nullptr);
