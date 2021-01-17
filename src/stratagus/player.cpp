@@ -2479,7 +2479,7 @@ void CPlayer::update_quest_pool()
 		CPlayer::GetThisPlayer()->Notify("%s", _("New quests available"));
 	}
 	
-	if (this->AiEnabled) { // if is an AI player, accept all quests that it can
+	if (this->AiEnabled && this->NumTownHalls > 0) { // if is an AI player, accept all quests that it can
 		int available_quest_quantity = this->available_quests.size();
 		for (int i = (available_quest_quantity  - 1); i >= 0; --i) {
 			if (this->get_current_quests().size() >= CPlayer::max_current_quests) {
