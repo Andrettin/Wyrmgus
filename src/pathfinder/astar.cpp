@@ -40,14 +40,15 @@
 #include "unit/unit_find.h"
 #include "unit/unit_type_type.h"
 #include "util/number_util.h"
+#include "util/vector_util.h"
 
 #include "pathfinder.h"
 
 struct Node {
-	int CostFromStart;  /// Real costs to reach this point
-	short int CostToGoal;     /// Estimated cost to goal
-	char InGoal;        /// is this point in the goal
-	char Direction;     /// Direction for trace back
+	int CostFromStart = 0;  /// Real costs to reach this point
+	short int CostToGoal = 0;     /// Estimated cost to goal
+	char InGoal = 0;        /// is this point in the goal
+	char Direction = 0;     /// Direction for trace back
 };
 
 struct Open {
@@ -75,7 +76,7 @@ static const int XY2Heading[3][3] = { {7, 6, 5}, {0, 0, 4}, {1, 2, 3}};
 /// cost matrix
 //Wyrmgus start
 //static Node *AStarMatrix;
-static std::vector<std::unique_ptr<Node[]>> AStarMatrix;
+static std::vector<std::vector<Node>> AStarMatrix;
 //Wyrmgus end
 
 /// a list of close nodes, helps to speed up the matrix cleaning
@@ -84,12 +85,10 @@ static std::vector<std::unique_ptr<Node[]>> AStarMatrix;
 //static int CloseSetSize;
 //static int Threshold;
 //static int OpenSetMaxSize;
-//static int AStarMatrixSize;
 static std::vector<std::unique_ptr<int[]>> CloseSet;
 static std::vector<int> CloseSetSize;
 static std::vector<int> Threshold;
 static std::vector<int> OpenSetMaxSize;
-static std::vector<int> AStarMatrixSize;
 //Wyrmgus end
 static constexpr int MAX_CLOSE_SET_RATIO = 4;
 static constexpr int MAX_OPEN_SET_RATIO = 8; // 10,16 to small
@@ -271,9 +270,8 @@ void InitAStar()
 	AStarMapWidth = mapWidth;
 	AStarMapHeight = mapHeight;
 
-	AStarMatrixSize = sizeof(Node) * AStarMapWidth * AStarMapHeight;
 	AStarMatrix = new Node[AStarMapWidth * AStarMapHeight];
-	memset(AStarMatrix, 0, AStarMatrixSize);
+	memset(AStarMatrix, 0, AStarMapWidth * AStarMapHeight);
 
 	Threshold = AStarMapWidth * AStarMapHeight / MAX_CLOSE_SET_RATIO;
 	CloseSet = new int[Threshold];
@@ -295,9 +293,7 @@ void InitAStar()
 		AStarMapWidth.push_back(CMap::Map.Info.MapWidths[z]);
 		AStarMapHeight.push_back(CMap::Map.Info.MapHeights[z]);
 		
-		AStarMatrixSize.push_back(sizeof(Node) * AStarMapWidth[z] * AStarMapHeight[z]);
-		AStarMatrix.push_back(std::make_unique<Node[]>(AStarMapWidth[z] * AStarMapHeight[z]));
-		memset(AStarMatrix[z].get(), 0, AStarMatrixSize[z]);
+		AStarMatrix.push_back(std::vector<Node>(AStarMapWidth[z] * AStarMapHeight[z]));
 
 		Threshold.push_back(AStarMapWidth[z] * AStarMapHeight[z] / MAX_CLOSE_SET_RATIO);
 		CloseSet.push_back(std::make_unique<int[]>(Threshold[z]));
@@ -341,7 +337,6 @@ void FreeAStar()
 	CostMoveToCache = nullptr;
 	*/
 	AStarMatrix.clear();
-	AStarMatrixSize.clear();
 	Threshold.clear();
 	CloseSet.clear();
 	CloseSetSize.clear();
@@ -367,8 +362,8 @@ static void AStarPrepare(int z)
 //Wyrmgus end
 {
 	//Wyrmgus start
-//	memset(AStarMatrix, 0, AStarMatrixSize);
-	memset(AStarMatrix[z].get(), 0, AStarMatrixSize[z]);
+//	wyrmgus::vector::fill(AStarMatrix, Node());
+	wyrmgus::vector::fill(AStarMatrix[z], Node());
 	//Wyrmgus end
 }
 
@@ -1593,11 +1588,8 @@ static std::unique_ptr<StatsNode[]> AStarGetStats(const int z)
 	auto stats = std::make_unique<StatsNode[]>(AStarMapWidth[z] * AStarMapHeight[z]);
 	//Wyrmgus end
 	StatsNode *s = stats.get();
-	//Wyrmgus start
-//	Node *m = AStarMatrix;
-	Node *m = AStarMatrix[z].get();
-	//Wyrmgus end
 
+	int index = 0;
 	//Wyrmgus start
 //	for (int j = 0; j < AStarMapHeight; ++j) {
 	for (int j = 0; j < AStarMapHeight[z]; ++j) {
@@ -1606,12 +1598,16 @@ static std::unique_ptr<StatsNode[]> AStarGetStats(const int z)
 //		for (int i = 0; i < AStarMapWidth; ++i) {
 		for (int i = 0; i < AStarMapWidth[z]; ++i) {
 		//Wyrmgus end
-			s->Direction = m->Direction;
-			s->InGoal = m->InGoal;
-			s->CostFromStart = m->CostFromStart;
-			s->CostToGoal = m->CostToGoal;
+			//Wyrmgus start
+			//const Node &m = AStarMatrix[index];
+			const Node &m = AStarMatrix[z][index];
+			//Wyrmgus end
+			s->Direction = m.Direction;
+			s->InGoal = m.InGoal;
+			s->CostFromStart = m.CostFromStart;
+			s->CostToGoal = m.CostToGoal;
 			++s;
-			++m;
+			++index;
 		}
 	}
 
