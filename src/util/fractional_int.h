@@ -108,6 +108,12 @@ public:
 		return *this;
 	}
 
+	constexpr const fractional_int<N> &operator -=(const fractional_int<N> &other)
+	{
+		this->value -= other.value;
+		return *this;
+	}
+
 	template <int N2>
 	constexpr const fractional_int<N> &operator *=(const fractional_int<N2> &other)
 	{
@@ -140,6 +146,13 @@ public:
 	{
 		fractional_int res(*this);
 		res += other;
+		return res;
+	}
+
+	constexpr fractional_int<N> operator -(const fractional_int<N> &other) const
+	{
+		fractional_int res(*this);
+		res -= other;
 		return res;
 	}
 
