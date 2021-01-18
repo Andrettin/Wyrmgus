@@ -35,12 +35,6 @@ namespace wyrmgus::qgeocoordinate {
 
 constexpr int longitude_size = 360;
 constexpr int latitude_size = 180;
-constexpr int min_longitude = longitude_size / 2 * -1;
-constexpr int max_longitude = longitude_size / 2;
-constexpr int min_latitude = latitude_size / 2 * -1;
-constexpr int max_latitude = latitude_size / 2;
-static const QGeoCoordinate min_geocoordinate(qgeocoordinate::min_latitude, qgeocoordinate::min_longitude);
-static const QGeoCoordinate max_geocoordinate(qgeocoordinate::max_latitude, qgeocoordinate::max_longitude);
 
 inline double longitude_to_unsigned_longitude(const double longitude)
 {

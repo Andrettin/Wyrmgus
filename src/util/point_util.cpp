@@ -46,7 +46,7 @@ geocoordinate to_geocoordinate(const QPoint &point, const QSize &area_size, cons
 	return geocoordinate::from_unsigned_geocoordinate(unsigned_geocoordinate);
 }
 
-QGeoCoordinate to_geocoordinate(const QPoint &point, const QSize &area_size, const QRectF &unsigned_georectangle)
+QGeoCoordinate to_qgeocoordinate(const QPoint &point, const QSize &area_size, const QRectF &unsigned_georectangle)
 {
 	const QPointF unsigned_geocoordinate = point::to_unsigned_geocoordinate(point, area_size, unsigned_georectangle);
 	return qgeocoordinate::from_unsigned_geocoordinate(unsigned_geocoordinate);

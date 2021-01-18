@@ -69,7 +69,7 @@ void historical_location::process_sml_scope(const sml_data &scope)
 	if (tag == "pos") {
 		this->pos = scope.to_point();
 	} else if (tag == "geocoordinate") {
-		this->geocoordinate = scope.to_qgeocoordinate();
+		this->geocoordinate = scope.to_geocoordinate();
 	} else {
 		throw std::runtime_error("Invalid historical location scope: \"" + scope.get_tag() + "\".");
 	}
@@ -103,7 +103,7 @@ void historical_location::initialize()
 	if (this->site != nullptr) {
 		this->map_template = this->site->get_map_template();
 		this->pos = this->site->get_pos();
-	} else if (this->map_template != nullptr && this->geocoordinate.isValid()) {
+	} else if (this->map_template != nullptr && !this->geocoordinate.is_null()) {
 		this->pos = this->map_template->get_geocoordinate_pos(this->geocoordinate);
 	} else if (this->pos_reference_site != nullptr) {
 		this->map_template = this->pos_reference_site->get_map_template();

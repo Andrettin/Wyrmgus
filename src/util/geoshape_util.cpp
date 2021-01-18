@@ -85,7 +85,7 @@ void write_to_image(const QGeoShape &geoshape, QImage &image, const QColor &colo
 	for (int x = start_x; x <= end_x; ++x) {
 		for (int y = start_y; y <= end_y; ++y) {
 			const QPoint pixel_pos(x, y);
-			const QGeoCoordinate coordinate = point::to_geocoordinate(pixel_pos, image.size(), unsigned_georectangle);
+			const QGeoCoordinate coordinate = point::to_qgeocoordinate(pixel_pos, image.size(), unsigned_georectangle);
 
 			if (image.pixelColor(pixel_pos).alpha() != 0) {
 				continue; //ignore already-written pixels

@@ -28,6 +28,7 @@
 #pragma once
 
 #include "time/date.h"
+#include "util/geocoordinate.h"
 
 class CConfigData;
 struct lua_State;
@@ -83,7 +84,7 @@ private:
 	const wyrmgus::map_template *map_template = nullptr; //the historical location's map template (overwritten by the site's map template if the site is given)
 	QPoint pos = QPoint(-1, -1); //the historical location's position in its map layer, or as an offset from its pos reference site
 	const wyrmgus::site *pos_reference_site = nullptr;
-	QGeoCoordinate geocoordinate; //the historical location's position as a geocoordinate
+	wyrmgus::geocoordinate geocoordinate; //the historical location's position as a geocoordinate
 	const wyrmgus::site *site = nullptr; //the historical location's site (if any)
 
 	friend int ::CclDefineCharacter(lua_State *l);

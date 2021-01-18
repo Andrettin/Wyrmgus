@@ -33,6 +33,7 @@
 #include "map/site_container.h"
 #include "map/terrain_geodata_map.h"
 #include "time/date.h"
+#include "util/geocoordinate.h"
 #include "util/point_container.h"
 #include "vec2i.h"
 
@@ -100,8 +101,8 @@ class map_template final : public named_data_entry, public data_type<map_templat
 	Q_PROPERTY(QPoint subtemplate_center_pos MEMBER subtemplate_center_pos READ get_subtemplate_center_pos)
 	Q_PROPERTY(QPoint min_subtemplate_pos MEMBER min_subtemplate_pos READ get_min_subtemplate_pos)
 	Q_PROPERTY(QPoint max_subtemplate_pos MEMBER max_subtemplate_pos READ get_max_subtemplate_pos)
-	Q_PROPERTY(QGeoCoordinate min_subtemplate_geocoordinate MEMBER min_subtemplate_geocoordinate)
-	Q_PROPERTY(QGeoCoordinate max_subtemplate_geocoordinate MEMBER max_subtemplate_geocoordinate)
+	Q_PROPERTY(wyrmgus::geocoordinate min_subtemplate_geocoordinate MEMBER min_subtemplate_geocoordinate)
+	Q_PROPERTY(wyrmgus::geocoordinate max_subtemplate_geocoordinate MEMBER max_subtemplate_geocoordinate)
 	Q_PROPERTY(wyrmgus::plane* plane MEMBER plane)
 	Q_PROPERTY(wyrmgus::world* world MEMBER world)
 	Q_PROPERTY(wyrmgus::map_template* main_template READ get_main_template WRITE set_main_template)
@@ -121,10 +122,10 @@ class map_template final : public named_data_entry, public data_type<map_templat
 	Q_PROPERTY(wyrmgus::terrain_type* surrounding_overlay_terrain_type MEMBER surrounding_overlay_terrain_type READ get_surrounding_overlay_terrain_type)
 	Q_PROPERTY(bool output_terrain_image MEMBER output_terrain_image READ outputs_terrain_image)
 	Q_PROPERTY(bool output_territory_image MEMBER output_territory_image READ outputs_territory_image)
-	Q_PROPERTY(double min_longitude MEMBER min_longitude READ get_min_longitude)
-	Q_PROPERTY(double max_longitude MEMBER max_longitude READ get_max_longitude)
-	Q_PROPERTY(double min_latitude MEMBER min_latitude READ get_min_latitude)
-	Q_PROPERTY(double max_latitude MEMBER max_latitude READ get_max_latitude)
+	Q_PROPERTY(int min_longitude MEMBER min_longitude READ get_min_longitude)
+	Q_PROPERTY(int max_longitude MEMBER max_longitude READ get_max_longitude)
+	Q_PROPERTY(int min_latitude MEMBER min_latitude READ get_min_latitude)
+	Q_PROPERTY(int max_latitude MEMBER max_latitude READ get_max_latitude)
 
 public:
 	using terrain_character_map_type = std::vector<std::vector<char>>;
@@ -634,22 +635,22 @@ public:
 		this->tile_terrains[tile_pos] = terrain;
 	}
 
-	double get_min_longitude() const
+	int get_min_longitude() const
 	{
 		return this->min_longitude;
 	}
 
-	double get_max_longitude() const
+	int get_max_longitude() const
 	{
 		return this->max_longitude;
 	}
 
-	double get_min_latitude() const
+	int get_min_latitude() const
 	{
 		return this->min_latitude;
 	}
 
-	double get_max_latitude() const
+	int get_max_latitude() const
 	{
 		return this->max_latitude;
 	}
@@ -667,7 +668,6 @@ public:
 	}
 
 	QPoint get_geocoordinate_pos(const geocoordinate &geocoordinate) const;
-	QPoint get_geocoordinate_pos(const QGeoCoordinate &geocoordinate) const;
 	geocoordinate get_pos_geocoordinate(const QPoint &pos) const;
 
 	void save_terrain_images() const;
@@ -722,8 +722,8 @@ private:
 	QPoint subtemplate_center_pos = QPoint(-1, -1); //this template's position as a subtemplate in its main template; the position is relative to the subtemplate's center
 	QPoint min_subtemplate_pos = QPoint(-1, -1); //the minimum position this subtemplate can be applied to in its main template; the position is relative to the subtemplate's center
 	QPoint max_subtemplate_pos = QPoint(-1, -1); //the maximum position this subtemplate can be applied to in its main template; the position is relative to the subtemplate's center
-	QGeoCoordinate min_subtemplate_geocoordinate;
-	QGeoCoordinate max_subtemplate_geocoordinate;
+	wyrmgus::geocoordinate min_subtemplate_geocoordinate;
+	wyrmgus::geocoordinate max_subtemplate_geocoordinate;
 	QPoint start_pos = QPoint(0, 0); //the start position within the map template to be applied when it is used
 	QPoint end_pos = QPoint(-1, -1); //the end position within the map template to be applied when it is used
 private:
@@ -771,10 +771,10 @@ private:
 public:
 	std::vector<std::tuple<Vec2i, terrain_type *, CDate>> HistoricalTerrains; //terrain changes
 private:
-	double min_longitude;
-	double max_longitude;
-	double min_latitude;
-	double max_latitude;
+	int min_longitude = 0;
+	int max_longitude = 0;
+	int min_latitude = 0;
+	int max_latitude = 0;
 	std::map<char, std::unique_ptr<character_unit>> character_units;
 	std::vector<std::unique_ptr<character_substitution>> character_substitutions; //substitutions applied to the terrain character map, in order
 	std::unique_ptr<map_template_history> history;

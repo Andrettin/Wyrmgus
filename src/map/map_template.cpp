@@ -83,8 +83,8 @@ namespace wyrmgus {
 
 map_template::map_template(const std::string &identifier)
 	: named_data_entry(identifier), CDataType(identifier),
-	min_longitude(qgeocoordinate::min_longitude), max_longitude(qgeocoordinate::max_longitude),
-	min_latitude(qgeocoordinate::min_latitude), max_latitude(qgeocoordinate::max_latitude)
+	min_longitude(geocoordinate::min_longitude.to_int()), max_longitude(geocoordinate::max_longitude.to_int()),
+	min_latitude(geocoordinate::min_latitude.to_int()), max_latitude(geocoordinate::max_latitude.to_int())
 {
 }
 
@@ -345,7 +345,7 @@ void map_template::initialize()
 			this->world = this->get_main_template()->world;
 		}
 
-		if (this->min_subtemplate_geocoordinate.isValid()) {
+		if (!this->min_subtemplate_geocoordinate.is_null()) {
 			this->min_subtemplate_pos = this->get_main_template()->get_geocoordinate_pos(this->min_subtemplate_geocoordinate);
 
 			this->min_subtemplate_pos.setX(std::max(this->min_subtemplate_pos.x(), 0));
@@ -355,7 +355,7 @@ void map_template::initialize()
 			this->min_subtemplate_pos.setY(std::min(this->min_subtemplate_pos.y(), this->get_main_template()->get_height() - 1));
 		}
 
-		if (this->max_subtemplate_geocoordinate.isValid()) {
+		if (!this->max_subtemplate_geocoordinate.is_null()) {
 			this->max_subtemplate_pos = this->get_main_template()->get_geocoordinate_pos(this->max_subtemplate_geocoordinate);
 
 			this->max_subtemplate_pos.setX(std::max(this->max_subtemplate_pos.x(), 0));
@@ -2653,11 +2653,6 @@ QPoint map_template::get_location_map_position(const historical_location *histor
 QPoint map_template::get_geocoordinate_pos(const geocoordinate &geocoordinate) const
 {
 	return geocoordinate.to_point(this->get_georectangle(), this->get_size());
-}
-
-QPoint map_template::get_geocoordinate_pos(const QGeoCoordinate &geocoordinate) const
-{
-	return qgeocoordinate::to_point(geocoordinate, this->get_qgeorectangle(), this->get_size());
 }
 
 geocoordinate map_template::get_pos_geocoordinate(const QPoint &pos) const

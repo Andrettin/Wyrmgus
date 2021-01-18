@@ -79,7 +79,7 @@ inline QPointF to_unsigned_geocoordinate(const QPoint &point, const QSize &area_
 
 extern geocoordinate to_geocoordinate(const QPoint &point, const QSize &area_size, const QRect &unsigned_georectangle);
 
-extern QGeoCoordinate to_geocoordinate(const QPoint &point, const QSize &area_size, const QRectF &unsigned_georectangle);
+extern QGeoCoordinate to_qgeocoordinate(const QPoint &point, const QSize &area_size, const QRectF &unsigned_georectangle);
 
 inline int square_distance_to(const QPoint &point, const QPoint &other_point)
 {
