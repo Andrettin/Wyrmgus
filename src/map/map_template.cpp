@@ -2080,6 +2080,27 @@ QSize map_template::get_applied_size() const
 	return applied_size;
 }
 
+bool map_template::is_pos_usable(const QPoint &pos) const
+{
+	if (this->is_circle()) {
+		const QPoint start_pos(0, 0);
+		const QPoint end_pos = QPoint(this->get_applied_width() - 1, this->get_applied_height() - 1);
+
+		const decimillesimal_int middle_x = decimillesimal_int(end_pos.x() + start_pos.x()) / 2;
+		const decimillesimal_int middle_y = decimillesimal_int(end_pos.y() + start_pos.y()) / 2;
+		const decimillesimal_int radius = ((middle_x - start_pos.x()) + (middle_y - start_pos.y())) / 2;
+
+		const decimillesimal_int rel_x = pos.x() - middle_x;
+		const decimillesimal_int rel_y = pos.y() - middle_y;
+		const decimillesimal_int my = radius * radius - rel_x * rel_x;
+		if ((rel_y * rel_y) > my) {
+			return false;
+		}
+	}
+
+	return true;
+}
+
 void map_template::set_terrain_file(const std::filesystem::path &filepath)
 {
 	if (filepath == this->get_terrain_file()) {

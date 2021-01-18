@@ -350,26 +350,7 @@ public:
 	}
 
 	//whether a position relative to the map template itself is a usable part of it
-	bool is_pos_usable(const QPoint &pos) const
-	{
-		if (this->is_circle()) {
-			const QPoint start_pos(0, 0);
-			const QPoint end_pos = QPoint(this->get_applied_width() - 1, this->get_applied_height() - 1);
-
-			const double middle_x = (end_pos.x() + start_pos.x()) / 2.0;
-			const double middle_y = (end_pos.y() + start_pos.y()) / 2.0;
-			const double radius = ((middle_x - start_pos.x()) + (middle_y - start_pos.y())) / 2.0;
-
-			const double rel_x = pos.x() - middle_x;
-			const double rel_y = pos.y() - middle_y;
-			const double my = radius * radius - rel_x * rel_x;
-			if ((rel_y * rel_y) > my) {
-				return false;
-			}
-		}
-
-		return true;
-	}
+	bool is_pos_usable(const QPoint &pos) const;
 
 	const wyrmgus::plane *get_plane() const
 	{

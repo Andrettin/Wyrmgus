@@ -182,9 +182,21 @@ public:
 		return *this;
 	}
 
+	constexpr const fractional_int<N> &operator +=(const int other)
+	{
+		this->value += other * fractional_int<N>::divisor;
+		return *this;
+	}
+
 	constexpr const fractional_int<N> &operator -=(const fractional_int<N> &other)
 	{
 		this->value -= other.value;
+		return *this;
+	}
+
+	constexpr const fractional_int<N> &operator -=(const int other)
+	{
+		this->value -= other * fractional_int<N>::divisor;
 		return *this;
 	}
 
@@ -223,7 +235,21 @@ public:
 		return res;
 	}
 
+	constexpr fractional_int<N> operator +(const int other) const
+	{
+		fractional_int res(*this);
+		res += other;
+		return res;
+	}
+
 	constexpr fractional_int<N> operator -(const fractional_int<N> &other) const
+	{
+		fractional_int res(*this);
+		res -= other;
+		return res;
+	}
+
+	constexpr fractional_int<N> operator -(const int other) const
 	{
 		fractional_int res(*this);
 		res -= other;
@@ -267,7 +293,14 @@ public:
 		return res;
 	}
 
-	friend constexpr int operator *(const int lhs, const fractional_int<N> &rhs)
+	friend constexpr fractional_int<N> operator -(const int lhs, const fractional_int<N> &rhs)
+	{
+		fractional_int res(lhs);
+		res -= rhs;
+		return res;
+	}
+
+	friend constexpr fractional_int<N> operator *(const int lhs, const fractional_int<N> &rhs)
 	{
 		fractional_int res(rhs);
 		res *= lhs;
