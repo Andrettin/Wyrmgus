@@ -209,7 +209,7 @@ int DoActionMove(CUnit &unit)
 		//Wyrmgus end
 
 		UnmarkUnitFieldFlags(unit);
-		d = NextPathElement(unit, &posd.x, &posd.y);
+		d = NextPathElement(unit, posd.x, posd.y);
 		MarkUnitFieldFlags(unit);
 		switch (d) {
 			case PF_UNREACHABLE: // Can't reach, stop

@@ -509,7 +509,7 @@ static int NewPath(PathFinderInput &input, PathFinderOutput &output)
 **  @return >0 remaining path length, 0 wait for path, -1
 **  reached goal, -2 can't reach the goal.
 */
-int NextPathElement(CUnit &unit, short int *pxd, short int *pyd)
+int NextPathElement(CUnit &unit, short int &pxd, short int &pyd)
 {
 	PathFinderInput &input = unit.pathFinderData->input;
 	PathFinderOutput &output = unit.pathFinderData->output;
@@ -517,8 +517,8 @@ int NextPathElement(CUnit &unit, short int *pxd, short int *pyd)
 	unit.CurrentOrder()->UpdatePathFinderData(input);
 	// Attempt to use path cache
 	// FIXME: If there is a goal, it may have moved, ruining the cache
-	*pxd = 0;
-	*pyd = 0;
+	pxd = 0;
+	pyd = 0;
 
 	// Goal has moved, need to recalculate path or no cached path
 	if (output.Length <= 0 || input.IsRecalculateNeeded()) {
@@ -533,9 +533,9 @@ int NextPathElement(CUnit &unit, short int *pxd, short int *pyd)
 		}
 	}
 
-	*pxd = Heading2X[(int)output.Path[(int)output.Length - 1]];
-	*pyd = Heading2Y[(int)output.Path[(int)output.Length - 1]];
-	const Vec2i dir(*pxd, *pyd);
+	pxd = Heading2X[(int)output.Path[(int)output.Length - 1]];
+	pyd = Heading2Y[(int)output.Path[(int)output.Length - 1]];
+	const Vec2i dir(pxd, pyd);
 	int result = output.Length;
 	output.Length--;
 	if (!UnitCanBeAt(unit, unit.tilePos + dir, unit.MapLayer->ID)) {
@@ -553,13 +553,13 @@ int NextPathElement(CUnit &unit, short int *pxd, short int *pyd)
 			AstarDebugPrint("WAIT expired\n");
 			result = NewPath(input, output);
 			if (result > 0) {
-				*pxd = Heading2X[(int)output.Path[(int)output.Length - 1]];
-				*pyd = Heading2Y[(int)output.Path[(int)output.Length - 1]];
+				pxd = Heading2X[(int)output.Path[(int)output.Length - 1]];
+				pyd = Heading2Y[(int)output.Path[(int)output.Length - 1]];
 				if (!UnitCanBeAt(unit, unit.tilePos + dir, unit.MapLayer->ID)) {
 					// There may be unit in the way, Astar may allow you to walk onto it.
 					result = PF_UNREACHABLE;
-					*pxd = 0;
-					*pyd = 0;
+					pxd = 0;
+					pyd = 0;
 				} else {
 					result = output.Length;
 					output.Length--;
