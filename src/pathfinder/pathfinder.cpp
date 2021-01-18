@@ -111,9 +111,7 @@ void TerrainTraversal::push_pos_if_passable(const QPoint &pos, int z, const unsi
 
 void TerrainTraversal::PushNeighbor(const Vec2i &pos)
 {
-	const Vec2i offsets[] = {Vec2i(0, -1), Vec2i(-1, 0), Vec2i(1, 0), Vec2i(0, 1),
-							 Vec2i(-1, -1), Vec2i(1, -1), Vec2i(-1, 1), Vec2i(1, 1)
-							};
+	static constexpr std::array<Vec2i, 8> offsets = { Vec2i(0, -1), Vec2i(-1, 0), Vec2i(1, 0), Vec2i(0, 1), Vec2i(-1, -1), Vec2i(1, -1), Vec2i(-1, 1), Vec2i(1, 1) };
 
 	int offsets_size = allow_diagonal ? 8 : 4;
 	for (int i = 0; i != offsets_size; ++i) {

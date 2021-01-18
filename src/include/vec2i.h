@@ -30,29 +30,29 @@
 #pragma once
 
 template <typename T>
-class Vec2T
+class Vec2T final
 {
 public:
-	Vec2T() : x(0), y(0) {}
-	Vec2T(T x, T y) : x(x), y(y) {}
+	constexpr Vec2T() : x(0), y(0) {}
+	constexpr Vec2T(T x, T y) : x(x), y(y) {}
 
 	template <typename T2>
-	Vec2T(Vec2T<T2> v) : x(v.x), y(v.y) {}
+	constexpr Vec2T(Vec2T<T2> v) : x(v.x), y(v.y) {}
 
-	Vec2T(const QPoint &point) : x(point.x()), y(point.y())
+	constexpr Vec2T(const QPoint &point) : x(point.x()), y(point.y())
 	{
 	}
 
-	Vec2T(const QSize &size) : x(size.width()), y(size.height())
+	constexpr Vec2T(const QSize &size) : x(size.width()), y(size.height())
 	{
 	}
 
-	operator QPoint() const
+	constexpr operator QPoint() const
 	{
 		return QPoint(this->x, this->y);
 	}
 
-	operator QSize() const
+	constexpr operator QSize() const
 	{
 		return QSize(this->x, this->y);
 	}
