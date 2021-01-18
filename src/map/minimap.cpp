@@ -855,6 +855,7 @@ bool minimap::is_terrain_visible() const
 bool minimap::are_units_visible() const
 {
 	switch (this->get_mode()) {
+		case minimap_mode::terrain_only:
 		case minimap_mode::territories:
 		case minimap_mode::territories_with_non_land:
 		case minimap_mode::realms:

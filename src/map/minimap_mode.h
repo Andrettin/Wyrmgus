@@ -33,6 +33,7 @@ enum class minimap_mode
 {
 	terrain, //terrain and units
 	units, //only units
+	terrain_only, //only terrain (no units)
 	territories, //territories (no units)
 	territories_with_non_land, //territories (with non-land tiles, no units)
 	realms, //realm territories (i.e. vassals being colored the same color as their top overlord) (no units)
@@ -49,6 +50,8 @@ inline const char *get_minimap_mode_name(const minimap_mode mode)
 			return "Terrain Minimap Mode";
 		case minimap_mode::units:
 			return "Units Minimap Mode";
+		case minimap_mode::terrain_only:
+			return "Terrain Only Minimap Mode";
 		case minimap_mode::territories:
 			return "Territories Minimap Mode";
 		case minimap_mode::territories_with_non_land:
