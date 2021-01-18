@@ -105,22 +105,21 @@ private:
 	bool isRecalculatePathNeeded;
 };
 
-class PathFinderOutput
+class PathFinderOutput final
 {
 public:
 	enum {MAX_PATH_LENGTH = 28}; /// max length of precalculated path
 public:
-	PathFinderOutput();
 	void Save(CFile &file) const;
 	void Load(lua_State *l);
 public:
-	unsigned short int Cycles;  /// how much Cycles we move.
-	char Fast;                  /// Flag fast move (one step)
-	char Length;                /// stored path length
-	char Path[MAX_PATH_LENGTH]; /// directions of stored path
+	unsigned short int Cycles = 0;  /// how much Cycles we move.
+	char Fast = 0;                  /// Flag fast move (one step)
+	char Length = 0;                /// stored path length
+	std::array<char, MAX_PATH_LENGTH> Path{}; /// directions of stored path
 };
 
-class PathFinderData
+class PathFinderData final
 {
 public:
 	PathFinderInput input;
@@ -221,7 +220,6 @@ extern int AStarUnknownTerrainCost;
 //  N NE  E SE  S SW  W NW
 constexpr std::array<int, 9> Heading2X = { 0, +1, +1, +1, 0, -1, -1, -1, 0 };
 constexpr std::array<int, 9> Heading2Y = { -1, -1, 0, +1, +1, +1, 0, -1, 0 };
-extern const int XY2Heading[3][3];
 
 /*----------------------------------------------------------------------------
 --  Functions
@@ -264,8 +262,8 @@ extern int GetAStarUnknownTerrainCost();
 extern int AStarFindPath(const Vec2i &startPos, const Vec2i &goalPos, int gw, int gh,
 						 int tilesizex, int tilesizey, int minrange,
 						 //Wyrmgus start
-//						 int maxrange, char *path, int pathlen, const CUnit &unit);
-						 int maxrange, char *path, int pathlen, const CUnit &unit, int max_length, int z, bool allow_diagonal = true);
+//						 int maxrange, std::array<char, PathFinderOutput::MAX_PATH_LENGTH> *path, const CUnit &unit);
+						 int maxrange, std::array<char, PathFinderOutput::MAX_PATH_LENGTH> *path, const CUnit &unit, int max_length, int z, bool allow_diagonal = true);
 						 //Wyrmgus end
 //Wyrmgus end
 

@@ -295,7 +295,7 @@ int PlaceReachable(const CUnit &src, const Vec2i &goalPos, int w, int h, int min
 	if (!src.Container || !from_outside_container) {
 		i = AStarFindPath(src.tilePos, goalPos, w, h,
 						  src.Type->get_tile_width(), src.Type->get_tile_height(),
-						  minrange, range, nullptr, 0, src, max_length, z);
+						  minrange, range, nullptr, src, max_length, z);
 	} else {
 		const Vec2i offset(1, 1);
 		const Vec2i extra_tile_size(src.Container->Type->get_tile_size() - QSize(1, 1));
@@ -317,7 +317,7 @@ int PlaceReachable(const CUnit &src, const Vec2i &goalPos, int w, int h, int min
 
 				temp_i = AStarFindPath(it, goalPos, w, h,
 						  src.Type->get_tile_width(), src.Type->get_tile_height(),
-						  minrange, range, nullptr, 0, src, max_length, z);
+						  minrange, range, nullptr, src, max_length, z);
 						  
 				if (temp_i > i && i < PF_REACHED) {
 					i = temp_i;
@@ -459,12 +459,6 @@ void PathFinderInput::PathRacalculated()
 	isRecalculatePathNeeded = false;
 }
 
-
-PathFinderOutput::PathFinderOutput()
-{
-	memset(this, 0, sizeof(*this));
-}
-
 /**
 **  Find new path.
 **
@@ -480,13 +474,12 @@ PathFinderOutput::PathFinderOutput()
 */
 static int NewPath(PathFinderInput &input, PathFinderOutput &output)
 {
-	char *path = output.Path;
 	int i = AStarFindPath(input.GetUnitPos(),
 						  input.GetGoalPos(),
 						  input.GetGoalSize().x, input.GetGoalSize().y,
 						  input.GetUnitSize().x, input.GetUnitSize().y,
 						  input.GetMinRange(), input.GetMaxRange(),
-						  path, PathFinderOutput::MAX_PATH_LENGTH,
+						  &output.Path,
 						  //Wyrmgus start
 //						  *input.GetUnit());
 						  *input.GetUnit(), 0, input.GetGoalMapLayer());
@@ -498,12 +491,11 @@ static int NewPath(PathFinderInput &input, PathFinderOutput &output)
 
 	// Update path if it was requested. Otherwise we may only want
 	// to know if there exists a path.
-	if (path != nullptr) {
-		output.Length = std::min<int>(i, PathFinderOutput::MAX_PATH_LENGTH);
-		if (output.Length == 0) {
-			++output.Length;
-		}
+	output.Length = std::min<int>(i, PathFinderOutput::MAX_PATH_LENGTH);
+	if (output.Length == 0) {
+		++output.Length;
 	}
+
 	return i;
 }
 

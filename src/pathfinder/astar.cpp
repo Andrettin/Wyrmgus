@@ -70,7 +70,7 @@ static int AStarCosts(const Vec2i &pos, const Vec2i &goalPos)
 //int Heading2O[9];//heading to offset
 std::array<std::vector<int>, 9> Heading2O;//heading to offset
 //Wyrmgus end
-const int XY2Heading[3][3] = { {7, 6, 5}, {0, 0, 4}, {1, 2, 3}};
+static const int XY2Heading[3][3] = { {7, 6, 5}, {0, 0, 4}, {1, 2, 3}};
 
 /// cost matrix
 //Wyrmgus start
@@ -499,9 +499,10 @@ static inline int AStarAddNode(const Vec2i &pos, int o, int costs, int z)
 {
 	ProfileBegin("AStarAddNode");
 
+	int bigi = 0;
 	//Wyrmgus start
-//	int bigi = 0, smalli = OpenSetSize;
-	int bigi = 0, smalli = OpenSetSize[z];
+//	int smalli = OpenSetSize;
+	int smalli = OpenSetSize[z];
 	//Wyrmgus end
 	int midcost;
 	int midi;
@@ -619,7 +620,6 @@ static void AStarReplaceNode(int pos, int z)
 	//Wyrmgus end
 	ProfileEnd("AStarReplaceNode");
 }
-
 
 /**
 **  Check if a node is already in the open set.
@@ -820,12 +820,13 @@ static inline int CostMoveTo(unsigned int index, const CUnit &unit, int z)
 	return *c;
 }
 
-class AStarGoalMarker
+class AStarGoalMarker final
 {
 public:
-	AStarGoalMarker(const CUnit &unit, bool *goal_reachable) :
-		unit(unit), goal_reachable(goal_reachable)
-	{}
+	explicit AStarGoalMarker(const CUnit &unit, bool *goal_reachable)
+		: unit(unit), goal_reachable(goal_reachable)
+	{
+	}
 
 	//Wyrmgus start
 //	void operator()(int offset) const
@@ -1143,8 +1144,8 @@ static int AStarMarkGoal(const Vec2i &goal, int gw, int gh,
 **  @return  The length of the path
 */
 //Wyrmgus start
-//static int AStarSavePath(const Vec2i &startPos, const Vec2i &endPos, char *path, int pathLen)
-static int AStarSavePath(const Vec2i &startPos, const Vec2i &endPos, char *path, int pathLen, int z)
+//static int AStarSavePath(const Vec2i &startPos, const Vec2i &endPos, std::array<char, PathFinderOutput::MAX_PATH_LENGTH> *path)
+static int AStarSavePath(const Vec2i &startPos, const Vec2i &endPos, std::array<char, PathFinderOutput::MAX_PATH_LENGTH> *path, int z)
 //Wyrmgus end
 {
 	ProfileBegin("AStarSavePath");
@@ -1175,8 +1176,8 @@ static int AStarSavePath(const Vec2i &startPos, const Vec2i &endPos, char *path,
 	}
 
 	// Save as much of the path as we can
-	if (path) {
-		pathLen = std::min<int>(fullPathLength, pathLen);
+	if (path != nullptr) {
+		const int path_len = std::min<int>(fullPathLength, path->size());
 		pathPos = fullPathLength;
 		curr = endPos;
 		//Wyrmgus start
@@ -1195,8 +1196,8 @@ static int AStarSavePath(const Vec2i &startPos, const Vec2i &endPos, char *path,
 			currO -= Heading2O[direction][z];
 			//Wyrmgus end
 			--pathPos;
-			if (pathPos < pathLen) {
-				path[pathLen - pathPos - 1] = direction;
+			if (pathPos < path_len) {
+				(*path)[path_len - pathPos - 1] = direction;
 			}
 		}
 	}
@@ -1212,8 +1213,8 @@ static int AStarSavePath(const Vec2i &startPos, const Vec2i &endPos, char *path,
 static int AStarFindSimplePath(const Vec2i &startPos, const Vec2i &goal, int gw, int gh,
 							   int, int, int minrange, int maxrange,
 							   //Wyrmgus start
-//							   char *path, const CUnit &unit)
-							   char *path, const CUnit &unit, int z, bool allow_diagonal)
+//							   std::array<char, PathFinderOutput::MAX_PATH_LENGTH> *path, const CUnit &unit)
+							   std::array<char, PathFinderOutput::MAX_PATH_LENGTH> *path, const CUnit &unit, int z, bool allow_diagonal)
 							   //Wyrmgus end
 {
 	ProfileBegin("AStarFindSimplePath");
@@ -1254,8 +1255,8 @@ static int AStarFindSimplePath(const Vec2i &startPos, const Vec2i &goal, int gw,
 			return PF_UNREACHABLE;
 		}
 
-		if (path) {
-			path[0] = XY2Heading[diff.x + 1][diff.y + 1];
+		if (path != nullptr) {
+			(*path)[0] = XY2Heading[diff.x + 1][diff.y + 1];
 		}
 		ProfileEnd("AStarFindSimplePath");
 		return 1;
@@ -1271,8 +1272,8 @@ static int AStarFindSimplePath(const Vec2i &startPos, const Vec2i &goal, int gw,
 int AStarFindPath(const Vec2i &startPos, const Vec2i &goalPos, int gw, int gh,
 				  int tilesizex, int tilesizey, int minrange, int maxrange,
 				  //Wyrmgus start
-//				  char *path, int pathlen, const CUnit &unit)
-				  char *path, int pathlen, const CUnit &unit, int max_length, int z, bool allow_diagonal)
+//				  std::array<char, PathFinderOutput::MAX_PATH_LENGTH> *path, const CUnit &unit)
+                  std::array<char, PathFinderOutput::MAX_PATH_LENGTH> *path, const CUnit &unit, int max_length, int z, bool allow_diagonal)
 				  //Wyrmgus end
 {
 	Assert(CMap::Map.Info.IsPointOnMap(startPos, z));
@@ -1564,8 +1565,8 @@ int AStarFindPath(const Vec2i &startPos, const Vec2i &goalPos, int gw, int gh,
 	}
 
 	//Wyrmgus start
-//	const int path_length = AStarSavePath(startPos, endPos, path, pathlen);
-	const int path_length = AStarSavePath(startPos, endPos, path, pathlen, z);
+//	const int path_length = AStarSavePath(startPos, endPos, path);
+	const int path_length = AStarSavePath(startPos, endPos, path, z);
 	//Wyrmgus end
 
 	ret = path_length;
