@@ -144,4 +144,13 @@ void for_each_unless(const std::vector<T> &vector, function_type &function)
 	}
 }
 
+template <typename T>
+void fill(std::vector<T> &vector, const T &value)
+{
+	//set all values in the vector to the desired value
+	for (T &element : vector) {
+		element = value;
+	}
+}
+
 }
