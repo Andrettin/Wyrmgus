@@ -27,10 +27,24 @@
 
 #include "util/point_util.h"
 
+#include "util/geocoordinate.h"
 #include "util/geocoordinate_util.h"
 #include "util/util.h"
 
 namespace wyrmgus::point {
+
+geocoordinate to_unsigned_geocoordinate(const QPoint &point, const QSize &area_size, const QRect &unsigned_georectangle)
+{
+	const longitude lon = longitude(point.x()) * unsigned_georectangle.width() / area_size.width() + longitude(unsigned_georectangle.x());
+	const latitude lat = latitude(point.y()) * unsigned_georectangle.height() / area_size.height() + latitude(unsigned_georectangle.y());
+	return geocoordinate(lon, lat);
+}
+
+geocoordinate to_geocoordinate(const QPoint &point, const QSize &area_size, const QRect &unsigned_georectangle)
+{
+	const geocoordinate unsigned_geocoordinate = point::to_unsigned_geocoordinate(point, area_size, unsigned_georectangle);
+	return geocoordinate::from_unsigned_geocoordinate(unsigned_geocoordinate);
+}
 
 QGeoCoordinate to_geocoordinate(const QPoint &point, const QSize &area_size, const QRectF &unsigned_georectangle)
 {

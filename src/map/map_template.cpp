@@ -2652,20 +2652,17 @@ QPoint map_template::get_location_map_position(const historical_location *histor
 
 QPoint map_template::get_geocoordinate_pos(const geocoordinate &geocoordinate) const
 {
-	const QPoint top_left(this->get_min_longitude(), this->get_min_latitude());
-	const QPoint bottom_right(this->get_max_longitude(), this->get_max_latitude());
-	const QRect rect(top_left, bottom_right);
-	return geocoordinate.to_point(rect, this->get_size());
+	return geocoordinate.to_point(this->get_georectangle(), this->get_size());
 }
 
 QPoint map_template::get_geocoordinate_pos(const QGeoCoordinate &geocoordinate) const
 {
-	return qgeocoordinate::to_point(geocoordinate, this->get_georectangle(), this->get_size());
+	return qgeocoordinate::to_point(geocoordinate, this->get_qgeorectangle(), this->get_size());
 }
 
-QGeoCoordinate map_template::get_pos_geocoordinate(const QPoint &pos) const
+geocoordinate map_template::get_pos_geocoordinate(const QPoint &pos) const
 {
-	const QRectF unsigned_georectangle = georectangle::to_unsigned_georectangle(this->get_georectangle());
+	const QRect unsigned_georectangle = georectangle::to_unsigned_georectangle(this->get_georectangle());
 	return point::to_geocoordinate(pos, this->get_size(), unsigned_georectangle);
 }
 
@@ -2792,7 +2789,7 @@ void map_template::create_terrain_image_from_file(QImage &image, const std::file
 
 void map_template::create_terrain_image_from_geodata(QImage &image, const terrain_geodata_ptr_map &terrain_data, const std::string &image_checkpoint_save_filename) const
 {
-	const QGeoRectangle georectangle = this->get_georectangle();
+	const QGeoRectangle georectangle = this->get_qgeorectangle();
 
 	for (const auto &kv_pair : terrain_data) {
 		const terrain_type *terrain = nullptr;
@@ -2839,7 +2836,7 @@ void map_template::save_territory_image(const std::string &filename, const site_
 		image.fill(Qt::transparent);
 	}
 
-	const QGeoRectangle georectangle = this->get_georectangle();
+	const QGeoRectangle georectangle = this->get_qgeorectangle();
 
 	for (const auto &kv_pair : territory_data) {
 		const site *settlement = kv_pair.first;

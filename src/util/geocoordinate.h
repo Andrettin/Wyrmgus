@@ -44,6 +44,13 @@ public:
 	static constexpr number_type min_latitude = number_type(geocoordinate::latitude_size / 2 * -1);
 	static constexpr number_type max_latitude = number_type(geocoordinate::latitude_size / 2);
 
+	static constexpr geocoordinate from_unsigned_geocoordinate(const geocoordinate &unsigned_geocoordinate)
+	{
+		const number_type lon = unsigned_geocoordinate.get_longitude() - number_type(geocoordinate::longitude_size / 2);
+		const number_type lat = (unsigned_geocoordinate.get_latitude() - number_type(geocoordinate::latitude_size / 2)) * -1;
+		return geocoordinate(lon, lat);
+	}
+
 	static constexpr number_type longitude_per_pixel(const int lon_size, const QSize &size)
 	{
 		return number_type(lon_size) / size.width();
@@ -125,6 +132,14 @@ public:
 		return this->get_latitude() * -1 + number_type(geocoordinate::latitude_size / 2);
 	}
 
+	geocoordinate to_unsigned_geocoordinate() const
+	{
+		//converts a geocoordinate into an unsigned one, i.e. having x values from 0 to 360, and y values from 0 to 180 (top to bottom, contrary to geocoordinates, which work south to north)
+		const number_type x = this->longitude_to_unsigned_longitude();
+		const number_type y = this->latitude_to_unsigned_latitude();
+		return geocoordinate(x, y);
+	}
+
 	constexpr int longitude_to_x(const number_type &lon_per_pixel) const
 	{
 		const number_type x = this->longitude_to_unsigned_longitude();
@@ -135,6 +150,11 @@ public:
 	{
 		const number_type y = this->latitude_to_unsigned_latitude();
 		return geocoordinate::unsigned_latitude_to_y(y, lat_per_pixel);
+	}
+
+	constexpr QPoint to_point() const
+	{
+		return QPoint(this->get_longitude().to_int(), this->get_latitude().to_int());
 	}
 
 	constexpr QPoint to_point(const number_type &lon_per_pixel, const number_type &lat_per_pixel) const

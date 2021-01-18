@@ -654,14 +654,21 @@ public:
 		return this->max_latitude;
 	}
 
-	QGeoRectangle get_georectangle() const
+	QRect get_georectangle() const
+	{
+		const QPoint top_left(this->get_min_longitude(), this->get_min_latitude());
+		const QPoint bottom_right(this->get_max_longitude(), this->get_max_latitude());
+		return QRect(top_left, bottom_right);
+	}
+
+	QGeoRectangle get_qgeorectangle() const
 	{
 		return QGeoRectangle(QGeoCoordinate(this->get_max_latitude(), this->get_min_longitude()), QGeoCoordinate(this->get_min_latitude(), this->get_max_longitude()));
 	}
 
 	QPoint get_geocoordinate_pos(const geocoordinate &geocoordinate) const;
 	QPoint get_geocoordinate_pos(const QGeoCoordinate &geocoordinate) const;
-	QGeoCoordinate get_pos_geocoordinate(const QPoint &pos) const;
+	geocoordinate get_pos_geocoordinate(const QPoint &pos) const;
 
 	void save_terrain_images() const;
 	void save_terrain_image(const std::string &filename, const std::filesystem::path &image_filepath, const std::filesystem::path &terrain_filepath, const terrain_geodata_ptr_map &terrain_data, const point_map<const terrain_type *> &terrain_map) const;

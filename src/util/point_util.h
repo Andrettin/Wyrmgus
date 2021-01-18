@@ -27,6 +27,10 @@
 
 #pragma once
 
+namespace wyrmgus {
+	class geocoordinate;
+}
+
 namespace wyrmgus::point {
 
 inline constexpr int to_index(const int x, const int y, const int width)
@@ -64,12 +68,16 @@ inline constexpr QSize to_size(const QPoint &point)
 	return QSize(point.x(), point.y());
 }
 
+extern geocoordinate to_unsigned_geocoordinate(const QPoint &point, const QSize &area_size, const QRect &unsigned_georectangle);
+
 inline QPointF to_unsigned_geocoordinate(const QPoint &point, const QSize &area_size, const QRectF &unsigned_georectangle)
 {
 	const double lon = point.x() * unsigned_georectangle.width() / area_size.width() + unsigned_georectangle.x();
 	const double lat = point.y() * unsigned_georectangle.height() / area_size.height() + unsigned_georectangle.y();
 	return QPointF(lon, lat);
 }
+
+extern geocoordinate to_geocoordinate(const QPoint &point, const QSize &area_size, const QRect &unsigned_georectangle);
 
 extern QGeoCoordinate to_geocoordinate(const QPoint &point, const QSize &area_size, const QRectF &unsigned_georectangle);
 

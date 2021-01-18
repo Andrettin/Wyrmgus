@@ -27,9 +27,15 @@
 
 #include "util/georectangle_util.h"
 
+#include "util/geocoordinate.h"
 #include "util/geocoordinate_util.h"
 
 namespace wyrmgus::georectangle {
+
+QRect to_unsigned_georectangle(const QRect &georectangle)
+{
+	return QRect(geocoordinate(georectangle.topLeft()).to_unsigned_geocoordinate().to_point(), geocoordinate(georectangle.bottomRight()).to_unsigned_geocoordinate().to_point());
+}
 
 QRectF to_unsigned_georectangle(const QGeoRectangle &georectangle)
 {
