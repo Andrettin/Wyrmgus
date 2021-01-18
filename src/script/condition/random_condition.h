@@ -28,8 +28,8 @@
 #pragma once
 
 #include "script/condition/condition.h"
+#include "util/fractional_int.h"
 #include "util/random.h"
-#include "util/string_conversion_util.h"
 
 namespace wyrmgus {
 
@@ -38,7 +38,7 @@ class random_condition final : public condition
 public:
 	explicit random_condition(const std::string &value)
 	{
-		this->chance = string::centesimal_number_string_to_int(value);
+		this->chance = decimillesimal_int(value);
 	}
 
 	virtual bool check(const CPlayer *player, const bool ignore_units) const override
@@ -46,8 +46,8 @@ public:
 		Q_UNUSED(player)
 		Q_UNUSED(ignore_units)
 
-		const int random_number = random::get()->generate(10000);
-		return this->chance > random_number;
+		const int random_number = random::get()->generate(decimillesimal_int::divisor);
+		return this->chance.get_value() > random_number;
 	}
 
 	virtual std::string get_string(const size_t indent) const override
@@ -63,7 +63,7 @@ public:
 	}
 
 private:
-	int chance = 0;
+	decimillesimal_int chance;
 };
 
 }

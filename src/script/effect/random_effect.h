@@ -29,9 +29,9 @@
 
 #include "script/effect/effect.h"
 #include "script/effect/effect_list.h"
+#include "util/fractional_int.h"
 #include "util/number_util.h"
 #include "util/random.h"
-#include "util/string_conversion_util.h"
 
 namespace wyrmgus {
 
@@ -55,7 +55,7 @@ public:
 		const std::string &value = property.get_value();
 
 		if (key == "chance") {
-			this->chance = string::centesimal_number_string_to_int(value);
+			this->chance = decimillesimal_int(value);
 		} else {
 			this->effects.process_sml_property(property);
 		}
@@ -68,8 +68,8 @@ public:
 
 	virtual void do_assignment_effect(scope_type *scope, const context &ctx) const override
 	{
-		const int random_number = random::get()->generate(10000);
-		if (this->chance <= random_number) {
+		const int random_number = random::get()->generate(decimillesimal_int::divisor);
+		if (this->chance.get_value() <= random_number) {
 			return;
 		}
 
@@ -78,12 +78,12 @@ public:
 
 	virtual std::string get_assignment_string(const scope_type *scope, const read_only_context &ctx, const size_t indent, const std::string &prefix) const override
 	{
-		std::string str = number::to_centesimal_string(this->chance) + "% chance:\n";
+		std::string str = this->chance.to_percent_string() + "% chance:\n";
 		return str + this->effects.get_effects_string(scope, ctx, indent + 1, prefix);
 	}
 
 private:
-	int chance = 0;
+	decimillesimal_int chance;
 	effect_list<scope_type> effects;
 };
 

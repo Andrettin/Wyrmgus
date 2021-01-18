@@ -32,7 +32,6 @@
 #pragma once
 
 #include "util/number_util.h"
-#include "util/string_conversion_util.h"
 
 namespace wyrmgus {
 
@@ -43,18 +42,76 @@ class fractional_int final
 public:
 	static constexpr int64_t divisor = number::pow(10, N);
 
-	constexpr fractional_int()
+	static std::string to_rest_string(int rest)
 	{
+		std::string rest_str;
+		rest_str.resize(N);
+
+		rest = std::abs(rest);
+		if (rest > 0) {
+			rest_str += ".";
+			int divisor = fractional_int::divisor;
+			for (int i = 0; i < N; ++i) {
+				if (rest == 0) {
+					break;
+				}
+
+				rest_str += std::to_string(rest / divisor);
+				rest %= divisor;
+				divisor /= 10;
+			}
+		}
+
+		return rest_str;
 	}
 
-	explicit constexpr fractional_int(const std::string &str)
+	constexpr fractional_int()
 	{
-		this->value = string::fractional_number_string_to_int<N>(str);
 	}
 
 	explicit constexpr fractional_int(const int n)
 	{
 		this->value = n * fractional_int::divisor;
+	}
+
+	explicit fractional_int(const std::string &str)
+	{
+		try {
+			size_t decimal_point_pos = str.find('.');
+			int integer = 0;
+			int fraction = 0;
+			if (decimal_point_pos != std::string::npos) {
+				integer = std::stoi(str.substr(0, decimal_point_pos));
+				const size_t decimal_pos = decimal_point_pos + 1;
+				const size_t decimal_places = std::min(str.length() - decimal_pos, static_cast<size_t>(N));
+				fraction = std::stoi(str.substr(decimal_pos, decimal_places));
+				if (decimal_places < N) {
+					for (int i = static_cast<int>(decimal_places); i < N; ++i) {
+						fraction *= 10;
+					}
+				}
+				const bool negative = str.front() == '-';
+				if (negative) {
+					fraction *= -1;
+				}
+			} else {
+				integer = std::stoi(str);
+			}
+
+			for (int i = 0; i < N; ++i) {
+				integer *= 10;
+			}
+			integer += fraction;
+
+			this->value = integer;
+		} catch (...) {
+			std::throw_with_nested(std::runtime_error("Failed to convert the fractional number string \"" + str + "\" to an int."));
+		}
+	}
+
+	constexpr int get_value() const
+	{
+		return this->value;
 	}
 
 	constexpr int to_int() const
@@ -65,6 +122,23 @@ public:
 	constexpr double to_double() const
 	{
 		return static_cast<double>(this->value) / fractional_int::divisor;
+	}
+
+	std::string to_string() const
+	{
+		std::string number_str = std::to_string(this->value / fractional_int::divisor);
+		number_str += fractional_int::to_rest_string(this->value % fractional_int::divisor);
+		return number_str;
+	}
+
+	std::string to_percent_string() const
+	{
+		static constexpr int N2 = (N > 2) ? (N - 2) : 0;
+
+		const int percent_value = this->value * 100;
+		std::string number_str = std::to_string(percent_value / fractional_int<N2>::divisor);
+		number_str += fractional_int<N2>::to_rest_string(percent_value % fractional_int<N2>::divisor);
+		return number_str;
 	}
 
 	constexpr bool operator ==(const fractional_int<N> &other) const
@@ -207,5 +281,6 @@ private:
 using decimal_int = fractional_int<1>;
 using centesimal_int = fractional_int<2>;
 using millesimal_int = fractional_int<3>;
+using decimillesimal_int = fractional_int<4>;
 
 }

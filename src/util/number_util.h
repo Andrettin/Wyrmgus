@@ -45,34 +45,6 @@ inline std::string to_signed_string(const int number)
 	return number_str;
 }
 
-inline std::string to_centesimal_rest_string(const int rest)
-{
-	std::string rest_str;
-	const int abs_rest = std::abs(rest);
-	if (abs_rest > 0) {
-		rest_str += ".";
-		if (abs_rest < 10) {
-			rest_str += "0";
-		}
-		rest_str += std::to_string(abs_rest);
-	}
-	return rest_str;
-}
-
-inline std::string to_centesimal_string(const int number)
-{
-	std::string number_str = std::to_string(number / 100);
-	number_str += number::to_centesimal_rest_string(number % 100);
-	return number_str;
-}
-
-inline std::string to_signed_centesimal_string(const int number)
-{
-	std::string number_str = number::to_signed_string(number / 100);
-	number_str += number::to_centesimal_rest_string(number % 100);
-	return number_str;
-}
-
 inline int fast_abs(const int value)
 {
 	const int temp = value >> 31;
