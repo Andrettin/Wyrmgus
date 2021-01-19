@@ -117,8 +117,8 @@ static std::vector<std::vector<Open>> OpenSet;
 //Wyrmgus end
 
 //Wyrmgus start
-//static int *CostMoveToCache;
-static std::vector<std::unique_ptr<int[]>> CostMoveToCache;
+//static std::vector<int> CostMoveToCache;
+static std::vector<std::vector<int>> CostMoveToCache;
 //Wyrmgus end
 static constexpr int CacheNotSet = -5;
 
@@ -241,10 +241,6 @@ inline void ProfilePrint()
 #define ProfilePrint()
 #endif
 
-/*----------------------------------------------------------------------------
---  Functions
-----------------------------------------------------------------------------*/
-
 /**
 **  Init A* data structures
 */
@@ -295,7 +291,7 @@ void InitAStar()
 		OpenSet.emplace_back();
 		OpenSet.back().reserve(open_set_max_size);
 
-		CostMoveToCache.push_back(std::make_unique<int[]>(AStarMapWidth[z] * AStarMapHeight[z]));
+		CostMoveToCache.push_back(std::vector<int>(AStarMapWidth[z] * AStarMapHeight[z], CacheNotSet));
 
 		for (int i = 0; i < 9; ++i) {
 			Heading2O[i].push_back(Heading2Y[i] * AStarMapWidth[z]);
@@ -319,8 +315,6 @@ void FreeAStar()
 	/*
 	delete[] AStarMatrix;
 	AStarMatrix = nullptr;
-	delete[] CostMoveToCache;
-	CostMoveToCache = nullptr;
 	*/
 	AStarMatrix.clear();
 	Threshold.clear();
@@ -383,53 +377,9 @@ static void CostMoveToCacheCleanUp(int z)
 //Wyrmgus end
 {
 	ProfileBegin("CostMoveToCacheCleanUp");
-	//Wyrmgus start
-//	int AStarMapMax =  AStarMapWidth * AStarMapHeight;
-	int AStarMapMax =  AStarMapWidth[z] * AStarMapHeight[z];
-	//Wyrmgus end
-#if 1
-	//Wyrmgus start
-//	int *ptr = CostMoveToCache;
-	int *ptr = CostMoveToCache[z].get();
-	//Wyrmgus end
-#ifdef __x86_64__
-	union {
-		intptr_t d;
-		int i[2];
-	} conv;
-	conv.i[0] = CacheNotSet;
-	conv.i[1] = CacheNotSet;
 
-	if (((uintptr_t)ptr) & 4) {
-		*ptr++ = CacheNotSet;
-		--AStarMapMax;
-	}
-#endif
-	while (AStarMapMax > 3) {
-#ifdef __x86_64__
-		*((intptr_t *)ptr) = conv.d;
-		*((intptr_t *)(ptr + 2)) = conv.d;
-		ptr += 4;
-#else
-		*ptr++ = CacheNotSet;
-		*ptr++ = CacheNotSet;
-		*ptr++ = CacheNotSet;
-		*ptr++ = CacheNotSet;
-#endif
-		AStarMapMax -= 4;
-	};
-	while (AStarMapMax) {
-		*ptr++ = CacheNotSet;
-		--AStarMapMax;
-	}
-#else
-	for (int i = 0; i < AStarMapMax; ++i) {
-		//Wyrmgus start
-//		CostMoveToCache[i] = CacheNotSet;
-		CostMoveToCache[z][i] = CacheNotSet;
-		//Wyrmgus end
-	}
-#endif
+	wyrmgus::vector::fill(CostMoveToCache[z], CacheNotSet);
+
 	ProfileEnd("CostMoveToCacheCleanUp");
 }
 
@@ -748,23 +698,23 @@ static inline int CostMoveTo(unsigned int index, const CUnit &unit, int z)
 	}
 	//Wyrmgus end
 	//Wyrmgus start
-//	int *c = &CostMoveToCache[index];
-	int *c = &CostMoveToCache[z][index];
+//	int c = CostMoveToCache[index];
+	int c = CostMoveToCache[z][index];
 	//Wyrmgus end
-	if (*c != CacheNotSet) {
-		return *c;
+	if (c != CacheNotSet) {
+		return c;
 	}
 	//Wyrmgus start
-//	*c = CostMoveToCallBack_Default(index, unit);
-	*c = CostMoveToCallBack_Default(index, unit, z);
+//	c = CostMoveToCallBack_Default(index, unit);
+	c = CostMoveToCallBack_Default(index, unit, z);
 	//Wyrmgus end
-	return *c;
+	return c;
 }
 
 class AStarGoalMarker final
 {
 public:
-	explicit AStarGoalMarker(const CUnit &unit, bool *goal_reachable)
+	explicit AStarGoalMarker(const CUnit &unit, bool &goal_reachable)
 		: unit(unit), goal_reachable(goal_reachable)
 	{
 	}
@@ -782,7 +732,7 @@ public:
 //			AStarMatrix[offset].InGoal = 1;
 			AStarMatrix[z][offset].InGoal = 1;
 			//Wyrmgus end
-			*goal_reachable = true;
+			goal_reachable = true;
 		}
 		//Wyrmgus start
 //		AStarAddToClose(offset);
@@ -791,7 +741,7 @@ public:
 	}
 private:
 	const CUnit &unit;
-	bool *goal_reachable;
+	bool &goal_reachable;
 };
 
 
@@ -1059,7 +1009,7 @@ static int AStarMarkGoal(const Vec2i &goal, int gw, int gh,
 	gw = std::max(gw, 1);
 	gh = std::max(gh, 1);
 
-	AStarGoalMarker aStarGoalMarker(unit, &goal_reachable);
+	AStarGoalMarker aStarGoalMarker(unit, goal_reachable);
 	MinMaxRangeVisitor<AStarGoalMarker> visitor(aStarGoalMarker);
 
 	const Vec2i goalBottomRigth(goal.x + gw - 1, goal.y + gh - 1);
