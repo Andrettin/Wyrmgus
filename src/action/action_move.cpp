@@ -341,8 +341,7 @@ int DoActionMove(CUnit &unit)
 	return d;
 }
 
-
-/* virtual */ void COrder_Move::Execute(CUnit &unit)
+void COrder_Move::Execute(CUnit &unit)
 {
 	Assert(unit.CanMove());
 

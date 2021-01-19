@@ -62,13 +62,13 @@
 #include "unit/unit_type.h"
 
 struct LabelsStruct {
-	CAnimation *Anim;
+	CAnimation *Anim = nullptr;
 	std::string Name;
 };
 static std::vector<LabelsStruct> Labels;
 
 struct LabelsLaterStruct {
-	CAnimation **Anim;
+	CAnimation **Anim = nullptr;
 	std::string Name;
 };
 static std::vector<LabelsLaterStruct> LabelsLater;

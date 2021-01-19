@@ -122,125 +122,6 @@ static std::vector<std::vector<int>> CostMoveToCache;
 //Wyrmgus end
 static constexpr int CacheNotSet = -5;
 
-/*----------------------------------------------------------------------------
---  Profile
-----------------------------------------------------------------------------*/
-
-#ifdef ASTAR_PROFILE
-
-#ifdef USE_WIN32
-#include <windows.h>
-#else
-
-union LARGE_INTEGER {
-	uint64_t QuadPart;
-	uint32_t DoublePart[2];
-};
-inline int QueryPerformanceCounter(LARGE_INTEGER *ptr)
-{
-	unsigned int lo, hi;
-	__asm__ __volatile__(       // serialize
-		"xorl %%eax,%%eax \n        cpuid"
-		::: "%rax", "%rbx", "%rcx", "%rdx");
-	/* We cannot use "=A", since this would use %rax on x86_64 */
-	__asm__ __volatile__("rdtsc" : "=a"(lo), "=d"(hi));
-	ptr->DoublePart[0] = lo;
-	ptr->DoublePart[1] = hi;
-	return 1;
-};
-
-inline int QueryPerformanceFrequency(LARGE_INTEGER *ptr)
-{
-	ptr->QuadPart = 1000;
-	return 1;
-}
-
-#endif
-
-#undef max
-#undef min
-static std::map<const char *const, LARGE_INTEGER> functionTimerMap;
-struct ProfileData {
-	unsigned long Calls;
-	unsigned long TotalTime;
-};
-static std::map<const char *const, ProfileData> functionProfiles;
-
-inline void ProfileInit()
-{
-	functionTimerMap.clear();
-	functionProfiles.clear();
-}
-
-inline void ProfileBegin(const char *const function)
-{
-	LARGE_INTEGER counter;
-	if (!QueryPerformanceCounter(&counter)) {
-		return;
-	}
-	functionTimerMap[function] = counter;
-}
-
-inline void ProfileEnd(const char *const function)
-{
-	LARGE_INTEGER counter;
-	if (!QueryPerformanceCounter(&counter)) {
-		return;
-	}
-	unsigned long time = (unsigned long)(counter.QuadPart - functionTimerMap[function].QuadPart);
-	ProfileData *data = &functionProfiles[function];
-	data->Calls++;
-	data->TotalTime += time;
-}
-
-static bool compProfileData(const ProfileData *lhs, const ProfileData *rhs)
-{
-	return (lhs->TotalTime > rhs->TotalTime);
-}
-
-
-inline void ProfilePrint()
-{
-	LARGE_INTEGER frequency;
-	if (!QueryPerformanceFrequency(&frequency)) {
-		return;
-	}
-	std::vector<ProfileData *> prof;
-	for (std::map<const char *const, ProfileData>::iterator i = functionProfiles.begin();
-		 i != functionProfiles.end(); ++i) {
-		ProfileData *data = &i->second;
-		prof.insert(std::upper_bound(prof.begin(), prof.end(), data, compProfileData), data);
-	}
-
-	FILE *fd = fopen("profile.txt", "wb");
-	fprintf(fd, "    total\t    calls\t      per\tname\n");
-
-	for (std::vector<ProfileData *>::iterator i = prof.begin(); i != prof.end(); ++i) {
-		ProfileData *data = (*i);
-		fprintf(fd, "%9.3f\t%9lu\t%9.3f\t",
-				(double)data->TotalTime / frequency.QuadPart * 1000.0,
-				data->Calls,
-				(double)data->TotalTime / frequency.QuadPart * 1000.0 / data->Calls);
-		for (std::map<const char *const, ProfileData>::iterator j =
-				 functionProfiles.begin(); j != functionProfiles.end(); ++j) {
-			ProfileData *data2 = &j->second;
-			if (data == data2) {
-				fprintf(fd, "%s\n", j->first);
-			}
-		}
-
-	}
-
-	fclose(fd);
-}
-
-#else
-#define ProfileInit()
-#define ProfileBegin(f)
-#define ProfileEnd(f)
-#define ProfilePrint()
-#endif
-
 /**
 **  Init A* data structures
 */
@@ -298,8 +179,6 @@ void InitAStar()
 		}
 	}
 	//Wyrmgus end
-
-	ProfileInit();
 }
 
 /**
@@ -326,8 +205,6 @@ void FreeAStar()
 		Heading2O[i].clear();
 	}
 	//Wyrmgus end
-
-	ProfilePrint();
 }
 
 /**
@@ -352,8 +229,6 @@ static void AStarPrepare(int z)
 static void AStarCleanUp(int z)
 //Wyrmgus end
 {
-	ProfileBegin("AStarCleanUp");
-
 	//Wyrmgus start
 //	if (CloseSet.size() >= Threshold) {
 	if (CloseSet[z].size() >= Threshold[z]) {
@@ -368,7 +243,6 @@ static void AStarCleanUp(int z)
 			AStarMatrix[z][close].InGoal = 0;
 		}
 	}
-	ProfileEnd("AStarCleanUp");
 }
 
 //Wyrmgus start
@@ -376,11 +250,7 @@ static void AStarCleanUp(int z)
 static void CostMoveToCacheCleanUp(int z)
 //Wyrmgus end
 {
-	ProfileBegin("CostMoveToCacheCleanUp");
-
 	wyrmgus::vector::fill(CostMoveToCache[z], CacheNotSet);
-
-	ProfileEnd("CostMoveToCacheCleanUp");
 }
 
 /**
@@ -420,12 +290,10 @@ static void AStarRemoveMinimum(int pos, int z)
 **  @return  0 or PF_FAILED
 */
 //Wyrmgus start
-//static inline int AStarAddNode(const Vec2i &pos, int o, int costs)
-static inline int AStarAddNode(const Vec2i &pos, int o, int costs, int z)
+//static inline int AStarAddNode(const Vec2i &pos, const int o, const int costs)
+static inline int AStarAddNode(const Vec2i &pos, const int o, const int costs, const int z)
 //Wyrmgus end
 {
-	ProfileBegin("AStarAddNode");
-
 	int bigi = 0;
 	//Wyrmgus start
 //	int smalli = OpenSetSize;
@@ -435,7 +303,6 @@ static inline int AStarAddNode(const Vec2i &pos, int o, int costs, int z)
 	int midi;
 	int midCostToGoal;
 	int midDist;
-	const Open *open = nullptr;
 
 	//Wyrmgus start
 //	const int costToGoal = AStarMatrix[o].CostToGoal;
@@ -448,15 +315,15 @@ static inline int AStarAddNode(const Vec2i &pos, int o, int costs, int z)
 	while (bigi < smalli) {
 		midi = (smalli + bigi) >> 1;
 		//Wyrmgus start
-//		open = &OpenSet[midi];
-		open = &OpenSet[z][midi];
+//		const Open &open = OpenSet[midi];
+		const Open &open = OpenSet[z][midi];
 		//Wyrmgus end
-		midcost = open->Costs;
+		midcost = open.Costs;
 		//Wyrmgus start
-//		midCostToGoal = AStarMatrix[open->O].CostToGoal;
-		midCostToGoal = AStarMatrix[z][open->O].CostToGoal;
+//		midCostToGoal = AStarMatrix[open.O].CostToGoal;
+		midCostToGoal = AStarMatrix[z][open.O].CostToGoal;
 		//Wyrmgus end
-		midDist = wyrmgus::number::fast_abs(open->pos.x - AStarGoalX) + wyrmgus::number::fast_abs(open->pos.y - AStarGoalY);
+		midDist = wyrmgus::number::fast_abs(open.pos.x - AStarGoalX) + wyrmgus::number::fast_abs(open.pos.y - AStarGoalY);
 		if (costs > midcost || (costs == midcost
 								&& (costToGoal > midCostToGoal || (costToGoal == midCostToGoal
 																   && dist > midDist)))) {
@@ -485,8 +352,6 @@ static inline int AStarAddNode(const Vec2i &pos, int o, int costs, int z)
 	OpenSet[z].insert(OpenSet[z].begin() + bigi, std::move(node));
 	//Wyrmgus end
 
-	ProfileEnd("AStarAddNode");
-
 	return 0;
 }
 
@@ -500,8 +365,6 @@ static inline int AStarAddNode(const Vec2i &pos, int o, int costs, int z)
 static void AStarReplaceNode(int pos, int z)
 //Wyrmgus end
 {
-	ProfileBegin("AStarReplaceNode");
-
 	Open node = wyrmgus::vector::take(OpenSet[z], static_cast<size_t>(pos));
 
 	// Re-add the node with the new cost
@@ -509,7 +372,6 @@ static void AStarReplaceNode(int pos, int z)
 //	AStarAddNode(node.pos, node.O, node.Costs);
 	AStarAddNode(node.pos, node.O, node.Costs, z);
 	//Wyrmgus end
-	ProfileEnd("AStarReplaceNode");
 }
 
 /**
@@ -522,8 +384,6 @@ static void AStarReplaceNode(int pos, int z)
 static int AStarFindNode(int eo, int z)
 //Wyrmgus end
 {
-	ProfileBegin("AStarFindNode");
-
 	//Wyrmgus start
 //	for (size_t i = 0; i < OpenSet.size(); ++i) {
 	for (size_t i = 0; i < OpenSet[z].size(); ++i) {
@@ -532,11 +392,10 @@ static int AStarFindNode(int eo, int z)
 //		if (OpenSet[i].O == eo) {
 		if (OpenSet[z][i].O == eo) {
 		//Wyrmgus end
-			ProfileEnd("AStarFindNode");
 			return static_cast<int>(i);
 		}
 	}
-	ProfileEnd("AStarFindNode");
+
 	return -1;
 }
 
@@ -976,14 +835,11 @@ static int AStarMarkGoal(const Vec2i &goal, int gw, int gh,
 						 int tilesizex, int tilesizey, int minrange, int maxrange, const CUnit &unit, int z)
 						 //Wyrmgus end
 {
-	ProfileBegin("AStarMarkGoal");
-
 	if (minrange == 0 && maxrange == 0 && gw == 0 && gh == 0) {
 		//Wyrmgus start
 //		if (goal.x + tilesizex > AStarMapWidth || goal.y + tilesizey > AStarMapHeight) {
 		if (goal.x + tilesizex - 1 > AStarMapWidth[z] || goal.y + tilesizey - 1 > AStarMapHeight[z]) {
 		//Wyrmgus end
-			ProfileEnd("AStarMarkGoal");
 			return 0;
 		}
 		//Wyrmgus start
@@ -996,10 +852,8 @@ static int AStarMarkGoal(const Vec2i &goal, int gw, int gh,
 //			AStarMatrix[offset].InGoal = 1;
 			AStarMatrix[z][offset].InGoal = 1;
 			//Wyrmgus end
-			ProfileEnd("AStarMarkGoal");
 			return 1;
 		} else {
-			ProfileEnd("AStarMarkGoal");
 			return 0;
 		}
 	}
@@ -1025,7 +879,6 @@ static int AStarMarkGoal(const Vec2i &goal, int gw, int gh,
 
 	visitor.Visit();
 
-	ProfileEnd("AStarMarkGoal");
 	return goal_reachable;
 }
 
@@ -1039,8 +892,6 @@ static int AStarMarkGoal(const Vec2i &goal, int gw, int gh,
 static int AStarSavePath(const Vec2i &startPos, const Vec2i &endPos, std::array<char, PathFinderOutput::MAX_PATH_LENGTH> *path, int z)
 //Wyrmgus end
 {
-	ProfileBegin("AStarSavePath");
-
 	int fullPathLength;
 	int pathPos;
 	int direction;
@@ -1093,7 +944,6 @@ static int AStarSavePath(const Vec2i &startPos, const Vec2i &endPos, std::array<
 		}
 	}
 
-	ProfileEnd("AStarSavePath");
 	return fullPathLength;
 }
 
@@ -1108,19 +958,14 @@ static int AStarFindSimplePath(const Vec2i &startPos, const Vec2i &goal, int gw,
 							   std::array<char, PathFinderOutput::MAX_PATH_LENGTH> *path, const CUnit &unit, int z, bool allow_diagonal)
 							   //Wyrmgus end
 {
-	ProfileBegin("AStarFindSimplePath");
 	// At exact destination point already
 	if (goal == startPos && minrange == 0) {
-		ProfileEnd("AStarFindSimplePath");
 		return PF_REACHED;
 	}
 
 	// Don't allow unit inside destination area
 	if (goal.x <= startPos.x && startPos.x <= goal.x + gw - 1
 		&& goal.y <= startPos.y && startPos.y <= goal.y + gh - 1) {
-		//Wyrmgus start
-		ProfileEnd("AStarFindSimplePath"); // seems like this should be here
-		//Wyrmgus end
 		return PF_FAILED;
 	}
 
@@ -1129,7 +974,6 @@ static int AStarFindSimplePath(const Vec2i &startPos, const Vec2i &goal, int gw,
 
 	// Within range of destination
 	if (minrange <= distance && distance <= maxrange) {
-		ProfileEnd("AStarFindSimplePath");
 		return PF_REACHED;
 	}
 
@@ -1142,18 +986,15 @@ static int AStarFindSimplePath(const Vec2i &startPos, const Vec2i &goal, int gw,
 //		if (CostMoveTo(GetIndex(goal.x, goal.y), unit) == -1) {
 		if (CostMoveTo(GetIndex(goal.x, goal.y, z), unit, z) == -1) {
 		//Wyrmgus end
-			ProfileEnd("AStarFindSimplePath");
 			return PF_UNREACHABLE;
 		}
 
 		if (path != nullptr) {
 			(*path)[0] = XY2Heading[diff.x + 1][diff.y + 1];
 		}
-		ProfileEnd("AStarFindSimplePath");
 		return 1;
 	}
 
-	ProfileEnd("AStarFindSimplePath");
 	return PF_FAILED;
 }
 
@@ -1177,8 +1018,6 @@ int AStarFindPath(const Vec2i &startPos, const Vec2i &goalPos, int gw, int gh,
 	allow_diagonal = allow_diagonal && !unit.Type->BoolFlag[RAIL_INDEX].value; //rail units cannot move diagonally
 	//Wyrmgus end
 
-	ProfileBegin("AStarFindPath");
-
 	AStarGoalX = goalPos.x;
 	AStarGoalY = goalPos.y;
 
@@ -1189,7 +1028,6 @@ int AStarFindPath(const Vec2i &startPos, const Vec2i &goalPos, int gw, int gh,
 								  minrange, maxrange, path, unit, z, allow_diagonal);
 								  //Wyrmgus end
 	if (ret != PF_FAILED) {
-		ProfileEnd("AStarFindPath");
 		return ret;
 	}
 
@@ -1214,7 +1052,6 @@ int AStarFindPath(const Vec2i &startPos, const Vec2i &goalPos, int gw, int gh,
 	//Wyrmgus end
 		// goal is not reachable
 		ret = PF_UNREACHABLE;
-		ProfileEnd("AStarFindPath");
 		return ret;
 	}
 
@@ -1243,7 +1080,6 @@ int AStarFindPath(const Vec2i &startPos, const Vec2i &goalPos, int gw, int gh,
 	if (AStarAddNode(startPos, eo, 1 + costToGoal, z) == PF_FAILED) {
 	//Wyrmgus end
 		ret = PF_FAILED;
-		ProfileEnd("AStarFindPath");
 		return ret;
 	}
 	//Wyrmgus start
@@ -1253,7 +1089,6 @@ int AStarFindPath(const Vec2i &startPos, const Vec2i &goalPos, int gw, int gh,
 	if (AStarMatrix[z][eo].InGoal) {
 	//Wyrmgus end
 		ret = PF_REACHED;
-		ProfileEnd("AStarFindPath");
 		return ret;
 	}
 	Vec2i endPos;
@@ -1267,7 +1102,6 @@ int AStarFindPath(const Vec2i &startPos, const Vec2i &goalPos, int gw, int gh,
 		//Wyrmgus start
 		if (max_length != 0 && length > max_length) {
 			ret = PF_FAILED;
-			ProfileEnd("AStarFindPath");
 			return ret;
 		}
 		//Wyrmgus end
@@ -1392,7 +1226,6 @@ int AStarFindPath(const Vec2i &startPos, const Vec2i &goalPos, int gw, int gh,
 				if (AStarAddNode(endPos, eo, AStarMatrix[z][eo].CostFromStart + costToGoal, z) == PF_FAILED) {
 				//Wyrmgus end
 					ret = PF_FAILED;
-					ProfileEnd("AStarFindPath");
 					return ret;
 				}
 				// we add the point to the close set
@@ -1426,7 +1259,6 @@ int AStarFindPath(const Vec2i &startPos, const Vec2i &goalPos, int gw, int gh,
 					if (AStarAddNode(endPos, eo, AStarMatrix[z][eo].CostFromStart + costToGoal, z) == PF_FAILED) {
 					//Wyrmgus end
 						ret = PF_FAILED;
-						ProfileEnd("AStarFindPath");
 						return ret;
 					}
 				} else {
@@ -1446,7 +1278,6 @@ int AStarFindPath(const Vec2i &startPos, const Vec2i &goalPos, int gw, int gh,
 		if (OpenSet[z].size() <= 0) { // no new nodes generated
 		//Wyrmgus end
 			ret = PF_UNREACHABLE;
-			ProfileEnd("AStarFindPath");
 			return ret;
 		}
 		
@@ -1462,7 +1293,6 @@ int AStarFindPath(const Vec2i &startPos, const Vec2i &goalPos, int gw, int gh,
 
 	ret = path_length;
 
-	ProfileEnd("AStarFindPath");
 	return ret;
 }
 
@@ -1473,48 +1303,6 @@ struct StatsNode {
 	int Costs = 0;
 	int CostToGoal = 0;
 };
-
-//Wyrmgus start
-//std::vector<StatsNode> AStarGetStats()
-static std::vector<StatsNode> AStarGetStats(const int z)
-//Wyrmgus end
-{
-	//Wyrmgus start
-//	std::vector<StatsNode> stats(AStarMapWidth * AStarMapHeight);
-	std::vector<StatsNode> stats(AStarMapWidth[z] * AStarMapHeight[z]);
-	//Wyrmgus end
-
-	int index = 0;
-	//Wyrmgus start
-//	for (int j = 0; j < AStarMapHeight; ++j) {
-	for (int j = 0; j < AStarMapHeight[z]; ++j) {
-	//Wyrmgus end
-		//Wyrmgus start
-//		for (int i = 0; i < AStarMapWidth; ++i) {
-		for (int i = 0; i < AStarMapWidth[z]; ++i) {
-		//Wyrmgus end
-			//Wyrmgus start
-			//const Node &m = AStarMatrix[index];
-			const Node &m = AStarMatrix[z][index];
-			//Wyrmgus end
-			StatsNode &s = stats[index];
-			s.Direction = m.Direction;
-			s.InGoal = m.InGoal;
-			s.CostFromStart = m.CostFromStart;
-			s.CostToGoal = m.CostToGoal;
-			++index;
-		}
-	}
-
-	//Wyrmgus start
-//	for (const Open &open : OpenSet) {
-	for (const Open &open : OpenSet[z]) {
-	//Wyrmgus end
-		stats[open.O].Costs = open.Costs;
-	}
-
-	return stats;
-}
 
 /*----------------------------------------------------------------------------
 --  Configurable costs

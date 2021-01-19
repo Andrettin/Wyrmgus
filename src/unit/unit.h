@@ -760,8 +760,8 @@ private:
 
 public:
 	struct _unit_anim_ {
-		const CAnimation *Anim;      /// Anim
-		const CAnimation *CurrAnim;  /// CurrAnim
+		const CAnimation *Anim = nullptr;      /// Anim
+		const CAnimation *CurrAnim = nullptr;  /// CurrAnim
 		int Wait;                    /// Wait
 		int Unbreakable;             /// Unbreakable
 	} Anim, WaitBackup;
