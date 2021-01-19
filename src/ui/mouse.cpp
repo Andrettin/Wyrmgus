@@ -1386,10 +1386,10 @@ void UIHandleMouseMove(const PixelPos &cursorPos)
 
 	// Restrict mouse to minimap when dragging
 	if (OldCursorOn == cursor_on::minimap && CursorOn != cursor_on::minimap && (MouseButtons & LeftButton)) {
-		const Vec2i cursorPos = UI.get_minimap()->screen_to_tile_pos(CursorScreenPos);
+		const Vec2i cursor_tile_pos = UI.get_minimap()->screen_to_tile_pos(CursorScreenPos);
 
 		RestrictCursorToMinimap();
-		UI.SelectedViewport->Center(CMap::Map.tile_pos_to_scaled_map_pixel_pos_center(cursorPos));
+		UI.SelectedViewport->Center(CMap::Map.tile_pos_to_scaled_map_pixel_pos_center(cursor_tile_pos));
 		return;
 	}
 
@@ -1426,18 +1426,18 @@ void UIHandleMouseMove(const PixelPos &cursorPos)
 			if (CursorBuilding && (MouseButtons & LeftButton) && Selected.at(0)
 				&& (KeyModifiers & (ModifierAlt | ModifierShift))) {
 				const CUnit &unit = *Selected[0];
-				const Vec2i tilePos = UI.MouseViewport->ScreenToTilePos(CursorScreenPos);
-				bool explored = CanBuildOnArea(*Selected[0], tilePos);
+				const Vec2i cursor_tile_pos = UI.MouseViewport->ScreenToTilePos(CursorScreenPos);
+				bool explored = CanBuildOnArea(*Selected[0], cursor_tile_pos);
 
 				// We now need to check if there are another build commands on this build spot
 				bool buildable = true;
 				for (const std::unique_ptr<COrder> &order : unit.Orders) {
 					if (order->Action == UnitAction::Build) {
 						const COrder_Build *build = dynamic_cast<const COrder_Build *>(order.get());
-						if (tilePos.x >= build->GetGoalPos().x
-							&& tilePos.x < build->GetGoalPos().x + build->GetUnitType().get_tile_width()
-							&& tilePos.y >= build->GetGoalPos().y
-							&& tilePos.y < build->GetGoalPos().y + build->GetUnitType().get_tile_height()) {
+						if (cursor_tile_pos.x >= build->GetGoalPos().x
+							&& cursor_tile_pos.x < build->GetGoalPos().x + build->GetUnitType().get_tile_width()
+							&& cursor_tile_pos.y >= build->GetGoalPos().y
+							&& cursor_tile_pos.y < build->GetGoalPos().y + build->GetUnitType().get_tile_height()) {
 							buildable = false;
 							break;
 						}
@@ -1446,14 +1446,14 @@ void UIHandleMouseMove(const PixelPos &cursorPos)
 
 				// 0 Test build, don't really build
 				//Wyrmgus start
-//				if (CanBuildUnitType(Selected[0], *CursorBuilding, tilePos, 0) && buildable && (explored || ReplayRevealMap)) {
-				if (CanBuildUnitType(Selected[0], *CursorBuilding, tilePos, 0, false, UI.CurrentMapLayer->ID) && buildable && (explored || ReplayRevealMap)) {
+//				if (CanBuildUnitType(Selected[0], *CursorBuilding, cursor_tile_pos, 0) && buildable && (explored || ReplayRevealMap)) {
+				if (CanBuildUnitType(Selected[0], *CursorBuilding, cursor_tile_pos, 0, false, UI.CurrentMapLayer->ID) && buildable && (explored || ReplayRevealMap)) {
 				//Wyrmgus end
 					const int flush = !(KeyModifiers & ModifierShift);
 					for (size_t i = 0; i != Selected.size(); ++i) {
 						//Wyrmgus start
-//						SendCommandBuildBuilding(*Selected[i], tilePos, *CursorBuilding, flush);
-						SendCommandBuildBuilding(*Selected[i], tilePos, *CursorBuilding, flush, UI.CurrentMapLayer->ID);
+//						SendCommandBuildBuilding(*Selected[i], cursor_tile_pos, *CursorBuilding, flush);
+						SendCommandBuildBuilding(*Selected[i], cursor_tile_pos, *CursorBuilding, flush, UI.CurrentMapLayer->ID);
 						//Wyrmgus end
 					}
 					if (!(KeyModifiers & (ModifierAlt | ModifierShift))) {
@@ -1489,14 +1489,14 @@ void UIHandleMouseMove(const PixelPos &cursorPos)
 		//Wyrmgus start
 		if (show && Selected.size() >= 1 && Selected[0]->Player == CPlayer::GetThisPlayer()) {
 			bool has_terrain_resource = false;
-			const CViewport &vp = *UI.MouseViewport;
-			const Vec2i tilePos = vp.ScreenToTilePos(cursorPos);
+			const CViewport &cursor_vp = *UI.MouseViewport;
+			const Vec2i cursor_tile_pos = cursor_vp.ScreenToTilePos(cursorPos);
 			for (const wyrmgus::resource *resource : wyrmgus::resource::get_all()) {
 				if (Selected[0]->Type->ResInfo[resource->get_index()]
 					//Wyrmgus start
 //					&& Selected[0]->Type->ResInfo[res]->TerrainHarvester
 					//Wyrmgus end
-					&& UI.CurrentMapLayer->Field(tilePos)->get_resource() == resource
+					&& UI.CurrentMapLayer->Field(cursor_tile_pos)->get_resource() == resource
 				) {
 					has_terrain_resource = true;
 				}
@@ -1538,9 +1538,9 @@ void UIHandleMouseMove(const PixelPos &cursorPos)
 				}
 			}
 			if (CursorOn == cursor_on::minimap && (MouseButtons & RightButton)) {
-				const Vec2i cursorPos = UI.get_minimap()->screen_to_tile_pos(CursorScreenPos);
+				const Vec2i cursor_tile_pos = UI.get_minimap()->screen_to_tile_pos(CursorScreenPos);
 				//  Minimap move viewpoint
-				UI.SelectedViewport->Center(CMap::Map.tile_pos_to_scaled_map_pixel_pos_center(cursorPos));
+				UI.SelectedViewport->Center(CMap::Map.tile_pos_to_scaled_map_pixel_pos_center(cursor_tile_pos));
 			}
 		}
 		// FIXME: must move minimap if right button is down !

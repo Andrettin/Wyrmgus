@@ -7824,7 +7824,7 @@ int CanTarget(const wyrmgus::unit_type &source, const wyrmgus::unit_type &dest)
 	}
 	//Wyrmgus start
 	if (dest.UnitType == UnitTypeType::FlyLow) {
-		return (source.CanTarget & CanTargetLand) || (source.CanTarget & CanTargetAir) || (source.CanTarget & CanTargetSea);
+		return source.CanTarget & (CanTargetLand | CanTargetAir | CanTargetSea);
 	}
 	//Wyrmgus end
 	if (dest.UnitType == UnitTypeType::Naval) {

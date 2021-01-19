@@ -433,7 +433,7 @@ void minimap::update_territory_pixel(const int mx, const int my, const int z)
 /**
 **  Draw a unit on the minimap.
 */
-void minimap::DrawUnitOn(const CUnit *unit, int red_phase)
+void minimap::DrawUnitOn(const CUnit *unit, const bool red_phase)
 {
 	const int z = UI.CurrentMapLayer->ID;
 	const int texture_width = this->get_texture_width(z);
@@ -499,9 +499,9 @@ void minimap::DrawUnitOn(const CUnit *unit, int red_phase)
 */
 void minimap::Update()
 {
-	static int red_phase;
+	static bool red_phase = false;
 
-	int red_phase_changed = red_phase != (int)((FrameCounter / FRAMES_PER_SECOND) & 1);
+	const bool red_phase_changed = red_phase != static_cast<bool>((FrameCounter / FRAMES_PER_SECOND) & 1);
 	if (red_phase_changed) {
 		red_phase = !red_phase;
 	}

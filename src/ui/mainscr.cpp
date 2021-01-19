@@ -340,7 +340,7 @@ struct UStrInt {
 */
 UStrInt GetComponent(const CUnit &unit, const int index, const VariableAttribute e, const int t)
 {
-	UStrInt val;
+	UStrInt val{};
 	const wyrmgus::unit_variable *var = nullptr;
 
 	Assert((unsigned int) index < UnitTypeVar.GetNumberVariable());
@@ -432,7 +432,7 @@ UStrInt GetComponent(const CUnit &unit, const int index, const VariableAttribute
 
 UStrInt GetComponent(const wyrmgus::unit_type &type, const int index, const VariableAttribute e, const int t)
 {
-	UStrInt val;
+	UStrInt val{};
 	const wyrmgus::unit_variable *var = nullptr;
 
 	Assert((unsigned int) index < UnitTypeVar.GetNumberVariable());

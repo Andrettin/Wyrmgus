@@ -65,7 +65,7 @@ public:
 	void Draw() const;
 	void draw_texture(const GLuint &texture, const unsigned char *texture_data, const int z) const;
 	void DrawViewportArea(const CViewport &viewport) const;
-	void DrawUnitOn(const CUnit *unit, int red_phase);
+	void DrawUnitOn(const CUnit *unit, const bool red_phase);
 	void AddEvent(const Vec2i &pos, int z, IntColor color);
 	void draw_events() const;
 

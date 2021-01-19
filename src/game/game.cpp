@@ -1440,7 +1440,7 @@ static int CclLoadingBarSetTips(lua_State *l)
 		LuaError(l, "incorrect argument (expected table)");
 	}
 
-	const char *str;
+	const char *str = nullptr;
 	int i = 1;
 	do {
 		lua_pushinteger(l, i++);
@@ -1464,7 +1464,7 @@ static int CclLoadingBarSetBackgrounds(lua_State *l)
 		LuaError(l, "incorrect argument (expected table)");
 	}
 
-	const char *str;
+	const char *str = nullptr;
 	int i = 1;
 	do {
 		lua_pushinteger(l, i++);
