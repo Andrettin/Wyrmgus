@@ -2247,13 +2247,19 @@ void CUnit::GeneratePrefix(CUnit *dropper, CPlayer *dropper_player)
 	std::vector<CUpgrade *> potential_prefixes;
 
 	for (CUpgrade *affix : this->Type->Affixes) {
-		if ((this->Type->get_item_class() == wyrmgus::item_class::none && affix->is_magic_prefix()) || (this->Type->get_item_class() != wyrmgus::item_class::none && affix->has_affixed_item_class(Type->get_item_class()))) {
-			potential_prefixes.push_back(affix);
+		if (!affix->is_magic_prefix()) {
+			continue;
 		}
+
+		potential_prefixes.push_back(affix);
 	}
 
 	if (dropper_player != nullptr) {
 		for (CUpgrade *upgrade : CUpgrade::get_all()) {
+			if (!upgrade->is_magic_prefix()) {
+				continue;
+			}
+
 			if (this->Type->get_item_class() == wyrmgus::item_class::none || !upgrade->has_affixed_item_class(Type->get_item_class())) {
 				continue;
 			}
@@ -2282,16 +2288,22 @@ void CUnit::GenerateSuffix(CUnit *dropper, CPlayer *dropper_player)
 	std::vector<CUpgrade *> potential_suffixes;
 
 	for (CUpgrade *affix : this->Type->Affixes) {
-		if ((this->Type->get_item_class() == wyrmgus::item_class::none && affix->is_magic_suffix()) || (this->Type->get_item_class() != wyrmgus::item_class::none && affix->has_affixed_item_class(Type->get_item_class()))) {
-			if (Prefix == nullptr || !affix->IncompatibleAffixes[Prefix->ID]) { //don't allow a suffix incompatible with the prefix to appear
-				potential_suffixes.push_back(affix);
-			}
+		if (!affix->is_magic_suffix()) {
+			continue;
+		}
+
+		if (this->Prefix == nullptr || !affix->IncompatibleAffixes[this->Prefix->ID]) { //don't allow a suffix incompatible with the prefix to appear
+			potential_suffixes.push_back(affix);
 		}
 	}
 
 	if (dropper_player != nullptr) {
 		for (CUpgrade *upgrade : CUpgrade::get_all()) {
-			if (this->Type->get_item_class() == wyrmgus::item_class::none || !upgrade->has_affixed_item_class(Type->get_item_class())) {
+			if (!upgrade->is_magic_suffix()) {
+				continue;
+			}
+
+			if (this->Type->get_item_class() == wyrmgus::item_class::none || !upgrade->has_affixed_item_class(this->Type->get_item_class())) {
 				continue;
 			}
 
