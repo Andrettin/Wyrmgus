@@ -71,23 +71,21 @@ static int AStarCosts(const Vec2i &pos, const Vec2i &goalPos)
 //int Heading2O[9];//heading to offset
 std::array<std::vector<int>, 9> Heading2O;//heading to offset
 //Wyrmgus end
-static const int XY2Heading[3][3] = { {7, 6, 5}, {0, 0, 4}, {1, 2, 3}};
+static constexpr int XY2Heading[3][3] = { {7, 6, 5}, {0, 0, 4}, {1, 2, 3}};
 
 /// cost matrix
 //Wyrmgus start
-//static Node *AStarMatrix;
+//static std::vector<Node> AStarMatrix;
 static std::vector<std::vector<Node>> AStarMatrix;
 //Wyrmgus end
 
 /// a list of close nodes, helps to speed up the matrix cleaning
 //Wyrmgus start
-//static int *CloseSet;
-//static int CloseSetSize;
-//static int Threshold;
+//static std::vector<int> CloseSet;
+//static size_t Threshold = 0;
 //static int OpenSetMaxSize;
-static std::vector<std::unique_ptr<int[]>> CloseSet;
-static std::vector<int> CloseSetSize;
-static std::vector<int> Threshold;
+static std::vector<std::vector<int>> CloseSet;
+static std::vector<size_t> Threshold;
 static std::vector<int> OpenSetMaxSize;
 //Wyrmgus end
 static constexpr int MAX_CLOSE_SET_RATIO = 4;
@@ -295,9 +293,8 @@ void InitAStar()
 		
 		AStarMatrix.push_back(std::vector<Node>(AStarMapWidth[z] * AStarMapHeight[z]));
 
-		Threshold.push_back(AStarMapWidth[z] * AStarMapHeight[z] / MAX_CLOSE_SET_RATIO);
-		CloseSet.push_back(std::make_unique<int[]>(Threshold[z]));
-		CloseSetSize.push_back(0);
+		Threshold.push_back(static_cast<size_t>(AStarMapWidth[z] * AStarMapHeight[z] / MAX_CLOSE_SET_RATIO));
+		CloseSet.push_back(std::vector<int>());
 
 		OpenSetMaxSize.push_back(AStarMapWidth[z] * AStarMapHeight[z] / MAX_OPEN_SET_RATIO);
 		OpenSet.push_back(std::make_unique<Open[]>(OpenSetMaxSize[z]));
@@ -329,7 +326,6 @@ void FreeAStar()
 	AStarMatrix = nullptr;
 	delete[] CloseSet;
 	CloseSet = nullptr;
-	CloseSetSize = 0;
 	delete[] OpenSet;
 	OpenSet = nullptr;
 	OpenSetSize = 0;
@@ -339,7 +335,6 @@ void FreeAStar()
 	AStarMatrix.clear();
 	Threshold.clear();
 	CloseSet.clear();
-	CloseSetSize.clear();
 	OpenSet.clear();
 	OpenSetSize.clear();
 	OpenSetMaxSize.clear();
@@ -378,21 +373,17 @@ static void AStarCleanUp(int z)
 	ProfileBegin("AStarCleanUp");
 
 	//Wyrmgus start
-//	if (CloseSetSize >= Threshold) {
-	if (CloseSetSize[z] >= Threshold[z]) {
+//	if (CloseSet.size() >= Threshold) {
+	if (CloseSet[z].size() >= Threshold[z]) {
 	//Wyrmgus end
 		//Wyrmgus start
 //		AStarPrepare();
 		AStarPrepare(z);
 		//Wyrmgus end
 	} else {
-		for (int i = 0; i < CloseSetSize[z]; ++i) {
-			//Wyrmgus start
-//			AStarMatrix[CloseSet[i]].CostFromStart = 0;
-//			AStarMatrix[CloseSet[i]].InGoal = 0;
-			AStarMatrix[z][CloseSet[z][i]].CostFromStart = 0;
-			AStarMatrix[z][CloseSet[z][i]].InGoal = 0;
-			//Wyrmgus end
+		for (const int close : CloseSet[z]) {
+			AStarMatrix[z][close].CostFromStart = 0;
+			AStarMatrix[z][close].InGoal = 0;
 		}
 	}
 	ProfileEnd("AStarCleanUp");
@@ -653,12 +644,12 @@ static void AStarAddToClose(int node, int z)
 //Wyrmgus end
 {
 	//Wyrmgus start
-//	if (CloseSetSize < Threshold) {
-	if (CloseSetSize[z] < Threshold[z]) {
+//	if (CloseSet.size() < Threshold) {
+	if (CloseSet[z].size() < Threshold[z]) {
 	//Wyrmgus end
 		//Wyrmgus start
-//		CloseSet[CloseSetSize++] = node;
-		CloseSet[z][CloseSetSize[z]++] = node;
+//		CloseSet.push_back(node);
+		CloseSet[z].push_back(node);
 		//Wyrmgus end
 	}
 }
@@ -1307,9 +1298,9 @@ int AStarFindPath(const Vec2i &startPos, const Vec2i &goalPos, int gw, int gh,
 
 	//Wyrmgus start
 //	OpenSetSize = 0;
-//	CloseSetSize = 0;
+//	CloseSet.clear();
 	OpenSetSize[z] = 0;
-	CloseSetSize[z] = 0;
+	CloseSet[z].clear();
 	//Wyrmgus end
 
 	//Wyrmgus start
@@ -1579,15 +1570,14 @@ struct StatsNode {
 };
 
 //Wyrmgus start
-//StatsNode *AStarGetStats()
-static std::unique_ptr<StatsNode[]> AStarGetStats(const int z)
+//std::vector<StatsNode> AStarGetStats()
+static std::vector<StatsNode> AStarGetStats(const int z)
 //Wyrmgus end
 {
 	//Wyrmgus start
-//	StatsNode *stats = new StatsNode[AStarMapWidth * AStarMapHeight];
-	auto stats = std::make_unique<StatsNode[]>(AStarMapWidth[z] * AStarMapHeight[z]);
+//	std::vector<StatsNode> stats(AStarMapWidth * AStarMapHeight);
+	std::vector<StatsNode> stats(AStarMapWidth[z] * AStarMapHeight[z]);
 	//Wyrmgus end
-	StatsNode *s = stats.get();
 
 	int index = 0;
 	//Wyrmgus start
@@ -1602,11 +1592,11 @@ static std::unique_ptr<StatsNode[]> AStarGetStats(const int z)
 			//const Node &m = AStarMatrix[index];
 			const Node &m = AStarMatrix[z][index];
 			//Wyrmgus end
-			s->Direction = m.Direction;
-			s->InGoal = m.InGoal;
-			s->CostFromStart = m.CostFromStart;
-			s->CostToGoal = m.CostToGoal;
-			++s;
+			StatsNode &s = stats[index];
+			s.Direction = m.Direction;
+			s.InGoal = m.InGoal;
+			s.CostFromStart = m.CostFromStart;
+			s.CostToGoal = m.CostToGoal;
 			++index;
 		}
 	}
