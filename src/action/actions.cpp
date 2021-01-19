@@ -358,11 +358,11 @@ static void HandleBuffsEachCycle(CUnit &unit)
 		}
 	}
 	
-	const int SpellEffects[] = {BLOODLUST_INDEX, HASTE_INDEX, SLOW_INDEX, INVISIBLE_INDEX, UNHOLYARMOR_INDEX, POISON_INDEX, STUN_INDEX, BLEEDING_INDEX, LEADERSHIP_INDEX, BLESSING_INDEX, INSPIRE_INDEX, PRECISION_INDEX, REGENERATION_INDEX, BARKSKIN_INDEX, INFUSION_INDEX, TERROR_INDEX, WITHER_INDEX, DEHYDRATION_INDEX, HYDRATING_INDEX};
+	static constexpr std::array SpellEffects = {BLOODLUST_INDEX, HASTE_INDEX, SLOW_INDEX, INVISIBLE_INDEX, UNHOLYARMOR_INDEX, POISON_INDEX, STUN_INDEX, BLEEDING_INDEX, LEADERSHIP_INDEX, BLESSING_INDEX, INSPIRE_INDEX, PRECISION_INDEX, REGENERATION_INDEX, BARKSKIN_INDEX, INFUSION_INDEX, TERROR_INDEX, WITHER_INDEX, DEHYDRATION_INDEX, HYDRATING_INDEX};
 	//  decrease spells effects time.
-	for (unsigned int i = 0; i < sizeof(SpellEffects) / sizeof(int); ++i) {
-		unit.Variable[SpellEffects[i]].Increase = -1;
-		IncreaseVariable(unit, SpellEffects[i]);
+	for (const auto spell_effect : SpellEffects) {
+		unit.Variable[spell_effect].Increase = -1;
+		IncreaseVariable(unit, spell_effect);
 	}
 	
 	const bool lastStatusIsHidden = unit.Variable[INVISIBLE_INDEX].Value > 0;
