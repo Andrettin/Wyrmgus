@@ -172,6 +172,13 @@ public:
 		return this->to_point(lon_per_pixel, lat_per_pixel) - geocoordinate_offset;
 	}
 
+	constexpr QPoint to_circle_point() const
+	{
+		return QPoint(this->get_longitude().get_value(), this->get_latitude().get_value() * 2 * -1);
+	}
+
+	QPoint to_circle_edge_point() const;
+
 	constexpr bool operator ==(const geocoordinate &other) const
 	{
 		return this->get_longitude() == other.get_longitude() && this->get_latitude() == other.get_latitude();

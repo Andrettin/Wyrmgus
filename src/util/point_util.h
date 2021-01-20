@@ -116,6 +116,15 @@ inline bool is_cardinally_adjacent_to(const QPoint &point, const QPoint &other_p
 	return point::is_horizontally_adjacent_to(point, other_point) || point::is_vertically_adjacent_to(point, other_point);
 }
 
+inline QPoint get_circle_point(const QPoint &point, const int64_t source_radius, const int64_t target_radius)
+{
+	const int64_t x = point.x() * target_radius / source_radius;
+	const int64_t y = point.y() * target_radius / source_radius;
+	return QPoint(static_cast<int>(x), static_cast<int>(y));
+}
+
+extern QPoint get_nearest_circle_edge_point(const QPoint &point, const int64_t radius);
+
 template <typename function_type>
 inline void for_each_adjacent(const QPoint &point, const function_type &function)
 {

@@ -67,6 +67,8 @@ class site final : public named_data_entry, public data_type<site>, public CData
 	Q_PROPERTY(wyrmgus::site* geocoordinate_reference_site MEMBER geocoordinate_reference_site)
 	Q_PROPERTY(int longitude_scale MEMBER longitude_scale)
 	Q_PROPERTY(int latitude_scale MEMBER latitude_scale)
+	Q_PROPERTY(wyrmgus::geocoordinate astrocoordinate MEMBER astrocoordinate READ get_astrocoordinate)
+	Q_PROPERTY(wyrmgus::centesimal_int astrodistance MEMBER astrodistance READ get_astrodistance)
 	Q_PROPERTY(wyrmgus::unit_type* base_unit_type MEMBER base_unit_type)
 	Q_PROPERTY(wyrmgus::site* connection_destination MEMBER connection_destination)
 	Q_PROPERTY(QVariantList cores READ get_cores_qvariant_list)
@@ -115,6 +117,7 @@ public:
 	virtual void process_sml_scope(const sml_data &scope) override;
 	virtual void ProcessConfigData(const CConfigData *config_data) override;
 	virtual void initialize() override;
+	virtual void check() const override;
 	virtual data_entry_history *get_history_base() override;
 
 	const site_history *get_history() const
@@ -147,6 +150,16 @@ public:
 	const wyrmgus::geocoordinate &get_geocoordinate() const
 	{
 		return this->geocoordinate;
+	}
+
+	const wyrmgus::geocoordinate &get_astrocoordinate() const
+	{
+		return this->astrocoordinate;
+	}
+
+	const centesimal_int &get_astrodistance() const
+	{
+		return this->astrodistance;
 	}
 
 	const unit_type *get_base_unit_type() const
@@ -227,6 +240,8 @@ private:
 	site *geocoordinate_reference_site = nullptr; //the site's reference geocoordinate site, used as an offset for its geocoordinate
 	int longitude_scale = 100;
 	int latitude_scale = 100;
+	wyrmgus::geocoordinate astrocoordinate; //the site's position as an astrocoordinate
+	centesimal_int astrodistance; //the site's distance from its map template's center (in light-years)
 	unit_type *base_unit_type = nullptr;
 	site *connection_destination = nullptr;
 	std::vector<region *> regions; //regions where this site is located

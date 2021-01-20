@@ -490,6 +490,7 @@ set(util_SRCS
 	src/util/color_container.cpp
 	src/util/date_util.cpp
 	src/util/exception_util.cpp
+	src/util/geocoordinate.cpp
 	src/util/geocoordinate_util.cpp
 	src/util/geojson_util.cpp
 	src/util/geopath_util.cpp

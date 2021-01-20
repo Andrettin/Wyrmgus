@@ -232,6 +232,16 @@ void site::initialize()
 
 	if (!this->get_geocoordinate().is_null()) {
 		this->pos = this->get_map_template()->get_geocoordinate_pos(this->get_geocoordinate());
+	} else if (!this->get_astrocoordinate().is_null()) {
+		QPoint direction_pos = this->get_astrocoordinate().to_circle_edge_point();
+		int64_t astrodistance_value = this->get_astrodistance().get_value();
+		astrodistance_value = isqrt(astrodistance_value);
+		const int64_t x = direction_pos.x() * astrodistance_value / geocoordinate::number_type::divisor / centesimal_int::divisor;
+		const int64_t y = direction_pos.y() * astrodistance_value / geocoordinate::number_type::divisor / centesimal_int::divisor;
+
+		const QPoint relative_pos(x, y);
+		//apply the relative position of the celestial body to the map template's center
+		this->pos = QPoint(this->get_map_template()->get_width() / 2 - 1, this->get_map_template()->get_height() / 2 - 1) + relative_pos;
 	}
 
 	//if a settlement has no color assigned to it, assign a random one instead
@@ -269,6 +279,17 @@ void site::initialize()
 	this->reset_game_data();
 
 	data_entry::initialize();
+}
+
+void site::check() const
+{
+	if (!this->get_geocoordinate().is_null() && !this->get_astrocoordinate().is_null()) {
+		throw std::runtime_error("Site \"" + this->get_identifier() + "\" has both a geocoordinate and an astrocoordinate.");
+	}
+
+	if (!this->get_astrocoordinate().is_null() && this->get_astrodistance() == 0) {
+		throw std::runtime_error("Site \"" + this->get_identifier() + "\" has an astrocoordinate, but its astrodistance is zero.");
+	}
 }
 
 data_entry_history *site::get_history_base()
