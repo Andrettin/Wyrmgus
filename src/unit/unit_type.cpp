@@ -1654,16 +1654,16 @@ void unit_type::UpdateDefaultBoolFlags()
 
 void unit_type::calculate_movement_mask()
 {
-	// Non-solid units can always be entered and they don't block anything
+	this->MovementMask = 0;
+
+	//non-solid units can always be entered and they don't block anything
 	if (this->BoolFlag[NONSOLID_INDEX].value) {
 		if (this->BoolFlag[BUILDING_INDEX].value) {
 			this->MovementMask = MapFieldLandUnit |
 				MapFieldSeaUnit |
 				MapFieldBuilding |
-				//Wyrmgus start
 				MapFieldItem |
 				MapFieldBridge |
-				//Wyrmgus end
 				MapFieldCoastAllowed |
 				MapFieldWaterAllowed |
 				MapFieldNoBuilding |
@@ -1677,150 +1677,71 @@ void unit_type::calculate_movement_mask()
 		return;
 	}
 
-	//  As side effect we calculate the movement flags/mask here.
 	switch (this->UnitType) {
 		case UnitTypeType::Land:                              // on land
-			//Wyrmgus start
-			/*
 			this->MovementMask =
-				MapFieldLandUnit |
-				MapFieldSeaUnit |
 				MapFieldBuilding | // already occuppied
 				MapFieldCoastAllowed |
 				MapFieldWaterAllowed | // can't move on this
-				MapFieldUnpassable;
-			*/
-			if (this->BoolFlag[DIMINUTIVE_INDEX].value) { // diminutive units can enter tiles occupied by other units and vice-versa
-				this->MovementMask =
-					MapFieldBuilding | // already occuppied
-					MapFieldCoastAllowed |
-					MapFieldWaterAllowed | // can't move on this
-					MapFieldUnpassable |
-					MapFieldSpace;
-			} else {
-				this->MovementMask =
-					MapFieldLandUnit |
-					MapFieldSeaUnit |
-					MapFieldBuilding | // already occuppied
-					MapFieldCoastAllowed |
-					MapFieldWaterAllowed | // can't move on this
-					MapFieldUnpassable |
-					MapFieldSpace;
+				MapFieldUnpassable |
+				MapFieldSpace;
+
+			if (!this->BoolFlag[DIMINUTIVE_INDEX].value) {
+				// diminutive units can enter tiles occupied by other units and vice-versa
+				this->MovementMask |= MapFieldLandUnit | MapFieldSeaUnit;
 			}
 
 			if (this->BoolFlag[RAIL_INDEX].value) { //rail units can only move over railroads
 				this->MovementMask |= MapFieldNoRail;
 			}
-			//Wyrmgus end
 			break;
 		case UnitTypeType::Fly:                               // in air
-			//Wyrmgus start
-			/*
-			this->MovementMask = MapFieldAirUnit; // already occuppied
-				MapFieldAirUnit | // already occuppied
-				MapFieldAirUnpassable;
-			*/
-			if (this->BoolFlag[DIMINUTIVE_INDEX].value) {
-				this->MovementMask =
-					MapFieldAirUnpassable |
-					MapFieldSpace;
-			} else {
-				this->MovementMask =
-					MapFieldAirUnit | // already occuppied
-					MapFieldAirUnpassable |
-					MapFieldSpace;
+			this->MovementMask = MapFieldAirUnpassable | MapFieldSpace;
+
+			if (!this->BoolFlag[DIMINUTIVE_INDEX].value) {
+				this->MovementMask |= MapFieldAirUnit; // already occuppied
 			}
-			//Wyrmgus end
 			break;
-			//Wyrmgus start
 		case UnitTypeType::FlyLow:                               // in low air
-			if (this->BoolFlag[DIMINUTIVE_INDEX].value) {
-				this->MovementMask =
-					MapFieldBuilding |
-					MapFieldUnpassable |
-					MapFieldAirUnpassable |
-					MapFieldSpace;
-			} else {
-				this->MovementMask =
-					MapFieldLandUnit |
-					MapFieldSeaUnit |
-					MapFieldBuilding |
-					MapFieldUnpassable |
-					MapFieldAirUnpassable |
-					MapFieldSpace;
+			this->MovementMask =
+				MapFieldBuilding |
+				MapFieldUnpassable |
+				MapFieldAirUnpassable |
+				MapFieldSpace;
+
+			if (!this->BoolFlag[DIMINUTIVE_INDEX].value) {
+				this->MovementMask |= MapFieldLandUnit | MapFieldSeaUnit;
 			}
 			break;
 		case UnitTypeType::Naval: // on water
-			//Wyrmgus start
-			/*
-			if (this->CanTransport()) {
-				this->MovementMask =
-					MapFieldLandUnit |
-					MapFieldSeaUnit |
-					MapFieldBuilding | // already occuppied
-					//Wyrmgus start
-					MapFieldBridge |
-					//Wyrmgus end
-					MapFieldLandAllowed; // can't move on this
-				// Johns: MapFieldUnpassable only for land units?
-			*/
-			if (this->BoolFlag[CANDOCK_INDEX].value) {
-				this->MovementMask =
-					MapFieldLandUnit |
-					MapFieldSeaUnit |
-					MapFieldBuilding | // already occuppied
-					//Wyrmgus start
-					MapFieldBridge |
-					//Wyrmgus end
-					MapFieldLandAllowed | // can't move on this
-					MapFieldUnpassable |
-					MapFieldSpace;
-			} else if (this->BoolFlag[CANDOCK_INDEX].value && this->BoolFlag[DIMINUTIVE_INDEX].value) { //should add case for when is a transporter and is diminutive?
-				this->MovementMask =
-					MapFieldBuilding | // already occuppied
-					MapFieldBridge |
-					MapFieldLandAllowed | // can't move on this
-					MapFieldUnpassable |
-					MapFieldSpace;
-			} else if (this->BoolFlag[DIMINUTIVE_INDEX].value) { //should add case for when is a transporter and is diminutive?
-				this->MovementMask =
-					MapFieldBuilding | // already occuppied
-					MapFieldBridge |
-					MapFieldCoastAllowed |
-					MapFieldLandAllowed | // can't move on this
-					MapFieldUnpassable |
-					MapFieldSpace;
-				//Wyrmgus end
-			} else {
-				this->MovementMask =
-					MapFieldLandUnit |
-					MapFieldSeaUnit |
-					MapFieldBuilding | // already occuppied
-					//Wyrmgus start
-					MapFieldBridge |
-					//Wyrmgus end
-					MapFieldCoastAllowed |
-					MapFieldLandAllowed | // can't move on this
-					MapFieldUnpassable |
-					MapFieldSpace;
+			this->MovementMask =
+				MapFieldBuilding | // already occuppied
+				MapFieldBridge |
+				MapFieldLandAllowed | // can't move on this
+				MapFieldUnpassable |
+				MapFieldSpace;
+
+			if (!this->BoolFlag[CANDOCK_INDEX].value) {
+				this->MovementMask |= MapFieldCoastAllowed;
+			}
+
+			if (!this->BoolFlag[DIMINUTIVE_INDEX].value) {
+				this->MovementMask |= MapFieldLandUnit | MapFieldSeaUnit;
 			}
 			break;
 		case UnitTypeType::Space:
-			if (this->BoolFlag[DIMINUTIVE_INDEX].value) {
-				this->MovementMask =
-					MapFieldAirUnpassable;
-			} else {
-				this->MovementMask =
-					MapFieldAirUnit | // already occuppied
-					MapFieldAirUnpassable;
+			this->MovementMask = MapFieldAirUnpassable;
+
+			if (!this->BoolFlag[DIMINUTIVE_INDEX].value) {
+				this->MovementMask |= MapFieldAirUnit; // already occuppied
 			}
-			//Wyrmgus end
 			break;
 		default:
 			DebugPrint("Where moves this unit?\n");
 			this->MovementMask = 0;
 			break;
 	}
+
 	if (this->BoolFlag[BUILDING_INDEX].value || this->BoolFlag[SHOREBUILDING_INDEX].value) {
 		// Shore building is something special.
 		if (this->BoolFlag[SHOREBUILDING_INDEX].value) {
@@ -1828,14 +1749,11 @@ void unit_type::calculate_movement_mask()
 				MapFieldLandUnit |
 				MapFieldSeaUnit |
 				MapFieldBuilding | // already occuppied
-				//Wyrmgus start
 				MapFieldBridge |
-				//Wyrmgus end
 				MapFieldLandAllowed | // can't build on this
 				MapFieldSpace;
 		}
 		this->MovementMask |= MapFieldNoBuilding;
-		//Wyrmgus start
 		this->MovementMask |= MapFieldItem;
 
 		if (this->TerrainType != nullptr) {
@@ -1844,11 +1762,6 @@ void unit_type::calculate_movement_mask()
 			}
 		}
 
-		if (this->BoolFlag[AIRUNPASSABLE_INDEX].value) { // for air unpassable units (i.e. doors)
-			this->FieldFlags |= MapFieldUnpassable;
-			this->FieldFlags |= MapFieldAirUnpassable;
-		}
-		//Wyrmgus end
 		//
 		// A little chaos, buildings without HP can be entered.
 		// The oil-patch is a very special case.
@@ -1858,7 +1771,6 @@ void unit_type::calculate_movement_mask()
 		} else {
 			this->FieldFlags = MapFieldNoBuilding;
 		}
-		//Wyrmgus start
 	} else if (this->BoolFlag[ITEM_INDEX].value || this->BoolFlag[POWERUP_INDEX].value || this->BoolFlag[TRAP_INDEX].value) {
 		this->MovementMask = MapFieldLandUnit |
 			MapFieldSeaUnit |
@@ -1877,51 +1789,35 @@ void unit_type::calculate_movement_mask()
 			MapFieldSpace |
 			MapFieldBridge;
 		this->FieldFlags = MapFieldBridge;
-		//Wyrmgus end
-		//Wyrmgus start
-	//	} else {
 	} else if (!this->BoolFlag[DIMINUTIVE_INDEX].value) {
-		//Wyrmgus end
 		switch (this->UnitType) {
 			case UnitTypeType::Land: // on land
 				this->FieldFlags = MapFieldLandUnit;
-				//Wyrmgus start
-				if (this->BoolFlag[AIRUNPASSABLE_INDEX].value) { // for air unpassable units (i.e. doors)
-					this->FieldFlags |= MapFieldUnpassable;
-					this->FieldFlags |= MapFieldAirUnpassable;
-				}
+
 				if (this->BoolFlag[GRAVEL_INDEX].value) {
 					this->FieldFlags |= MapFieldGravel;
 				}
-				//Wyrmgus end
 				break;
 			case UnitTypeType::Fly: // in air
 			case UnitTypeType::Space:
 				this->FieldFlags = MapFieldAirUnit;
 				break;
-				//Wyrmgus start
 			case UnitTypeType::FlyLow: // in low air
 				this->FieldFlags = MapFieldLandUnit;
-				if (this->BoolFlag[AIRUNPASSABLE_INDEX].value) { // for air unpassable units (i.e. doors)
-					this->FieldFlags |= MapFieldUnpassable;
-					this->FieldFlags |= MapFieldAirUnpassable;
-				}
 				break;
-				//Wyrmgus end
 			case UnitTypeType::Naval: // on water
 				this->FieldFlags = MapFieldSeaUnit;
-				//Wyrmgus start
-				if (this->BoolFlag[AIRUNPASSABLE_INDEX].value) { // for air unpassable units (i.e. doors)
-					this->FieldFlags |= MapFieldUnpassable;
-					this->FieldFlags |= MapFieldAirUnpassable;
-				}
-				//Wyrmgus end
 				break;
 			default:
 				DebugPrint("Where moves this unit?\n");
 				this->FieldFlags = 0;
 				break;
 		}
+	}
+
+	if (this->BoolFlag[AIRUNPASSABLE_INDEX].value) { // for air unpassable units (i.e. doors)
+		this->FieldFlags |= MapFieldUnpassable;
+		this->FieldFlags |= MapFieldAirUnpassable;
 	}
 }
 
@@ -2369,6 +2265,7 @@ void UpdateUnitStats(wyrmgus::unit_type &type, int reset)
 		}
 	}
 
+	//as a side effect we calculate the movement flags/mask here
 	type.calculate_movement_mask();
 }
 
