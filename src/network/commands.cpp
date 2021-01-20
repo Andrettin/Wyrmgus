@@ -1083,12 +1083,13 @@ void ExecCommand(unsigned char msgnr, UnitRef unum,
 	}
 }
 
-static const char *GetDiplomacyName(wyrmgus::diplomacy_state e)
+static const char *GetDiplomacyName(const wyrmgus::diplomacy_state e)
 {
-	Assert(static_cast<int>(e) < 4);
-	const char *diplomacyNames[] = {"allied", "neutral", "enemy", "crazy"};
+	static constexpr std::array<const char *, 4> diplomacy_names = { "allied", "neutral", "enemy", "crazy" };
 
-	return diplomacyNames[static_cast<int>(e)];
+	Assert(static_cast<size_t>(e) < diplomacy_names.size());
+
+	return diplomacy_names[static_cast<size_t>(e)];
 }
 
 /**

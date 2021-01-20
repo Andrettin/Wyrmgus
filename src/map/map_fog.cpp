@@ -57,7 +57,7 @@ std::shared_ptr<CGraphic> CMap::FogGraphics;
 /**
 **  Mapping for fog of war tiles.
 */
-static const int FogTable[16] = {
+static constexpr std::array<int, 16> FogTable = {
 	//Wyrmgus start
 //	0, 11, 10, 2,  13, 6, 14, 3,  12, 15, 4, 1,  8, 9, 7, 0,
 	0, 11, 10, 2,  13, 6, 14, 3,  12, 15, 4, 1,  8, 9, 7, 16,

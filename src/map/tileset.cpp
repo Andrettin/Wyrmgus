@@ -351,7 +351,7 @@ int CTileset::getTileIndex(unsigned char baseTerrain, unsigned char mixTerrain, 
 		}
 	}
 	//                       0  1  2  3   4  5  6  7   8  9  A   B  C   D  E  F
-	const char table[16] = { 0, 7, 3, 11, 1, 9, 5, 13, 0, 8, 4, 12, 2, 10, 6, 0 };
+	static constexpr std::array<const char, 16> table = { 0, 7, 3, 11, 1, 9, 5, 13, 0, 8, 4, 12, 2, 10, 6, 0 };
 	return base | (table[direction] << 4);
 }
 
@@ -487,7 +487,7 @@ int CTileset::tileFromQuad(unsigned fixed, unsigned quad) const
 		}
 	}
 	//                       0  1  2  3   4  5  6  7   8  9  A   B  C   D  E  F
-	const char table[16] = { 0, 7, 3, 11, 1, 9, 5, 13, 0, 8, 4, 12, 2, 10, 6, 0 };
+	static constexpr std::array<const char, 16> table = { 0, 7, 3, 11, 1, 9, 5, 13, 0, 8, 4, 12, 2, 10, 6, 0 };
 	return base | (table[direction] << 4);
 }
 

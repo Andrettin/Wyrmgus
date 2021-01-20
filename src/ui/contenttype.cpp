@@ -412,7 +412,7 @@ static const CUnit *GetUnitRef(const CUnit &unit, EnumUnit e)
 **
 **  @todo Color and percent value Parametrisation.
 */
-/* virtual */ void CContentTypeCompleteBar::Draw(const CUnit &unit, wyrmgus::font *) const
+void CContentTypeCompleteBar::Draw(const CUnit &unit, wyrmgus::font *) const
 {
 	Assert((unsigned int) this->varIndex < UnitTypeVar.GetNumberVariable());
 	//Wyrmgus start
@@ -430,7 +430,7 @@ static const CUnit *GetUnitRef(const CUnit &unit, EnumUnit e)
 	int h = this->height * scale_factor;
 	Assert(w > 0);
 	Assert(h > 4);
-	const uint32_t colors[] = {ColorRed, ColorYellow, ColorGreen, ColorLightGray,
+	const std::array<uint32_t, 12> colors = {ColorRed, ColorYellow, ColorGreen, ColorLightGray,
 							 ColorGray, ColorDarkGray, ColorWhite, ColorOrange,
 							 ColorLightBlue, ColorBlue, ColorDarkGreen, ColorBlack
 							};
@@ -463,7 +463,7 @@ static const CUnit *GetUnitRef(const CUnit &unit, EnumUnit e)
 	}
 }
 
-/* virtual */ void CContentTypeText::Parse(lua_State *l)
+void CContentTypeText::Parse(lua_State *l)
 {
 	Assert(lua_istable(l, -1) || lua_isstring(l, -1));
 
@@ -645,12 +645,12 @@ static EnumUnit Str2EnumUnit(lua_State *l, const char *s)
 static int GetColorIndexByName(const char *colorName)
 {
 	//FIXME: need more general way
-	const char *names[] = {
+	static constexpr std::array<const char *, 12> names = {
 		"red", "yellow", "green", "light-gray", "gray", "dark-gray",
 		"white", "orange", "light-blue", "blue", "dark-green", "black"
 	};
 
-	for (unsigned int i = 0; i != sizeof(names) / sizeof(names[0]); ++i) {
+	for (size_t i = 0; i < names.size(); ++i) {
 		if (!strcmp(colorName, names[i])) {
 			return i;
 		}

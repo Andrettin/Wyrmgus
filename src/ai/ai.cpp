@@ -1229,8 +1229,9 @@ void AiCanNotReach(CUnit &unit, const wyrmgus::unit_type &what, int landmass, co
 */
 static void AiMoveUnitInTheWay(CUnit &unit)
 {
-	static Vec2i dirs[8] = {Vec2i(-1, -1), Vec2i(-1, 0), Vec2i(-1, 1), Vec2i(0, 1), Vec2i(1, 1), Vec2i(1, 0), Vec2i(1, -1), Vec2i(0, -1)};
-	CUnit *movableunits[16];
+	static constexpr std::array<Vec2i, 8> dirs = {Vec2i(-1, -1), Vec2i(-1, 0), Vec2i(-1, 1), Vec2i(0, 1), Vec2i(1, 1), Vec2i(1, 0), Vec2i(1, -1), Vec2i(0, -1)};
+
+	CUnit *movableunits[16]{};
 	Vec2i movablepos[16];
 	int movablenb;
 

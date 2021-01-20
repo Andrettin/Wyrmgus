@@ -462,11 +462,9 @@ static void LoadStratagusMap(const std::string &smpname, const std::string &mapn
 static int WriteMapPresentation(const std::string &mapname, CMap &map, bool is_mod)
 //Wyrmgus end
 {
-	std::unique_ptr<FileWriter> f;
+	static constexpr std::array<const char *, 8> type = {"", "", "neutral", "nobody", "computer", "person", "rescue-passive", "rescue-active" };
 
-	const char *type[] = {"", "", "neutral", "nobody",
-						  "computer", "person", "rescue-passive", "rescue-active"
-						 };
+	std::unique_ptr<FileWriter> f;
 
 	int numplayers = 0;
 	int topplayer = PlayerMax - 2;

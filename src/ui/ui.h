@@ -285,10 +285,11 @@ public:
 	int X[9];            /// X position of the pies
 	int Y[9];            /// Y position of the pies
 
-	void SetRadius(int radius)
+	void SetRadius(const int radius)
 	{
-		const int coeffX[] = {    0,  193, 256, 193,   0, -193, -256, -193, 0};
-		const int coeffY[] = { -256, -193,   0, 193, 256,  193,    0, -193, 0};
+		static constexpr std::array<int, 9> coeffX = {    0,  193, 256, 193,   0, -193, -256, -193, 0};
+		static constexpr std::array<int, 9> coeffY = { -256, -193,   0, 193, 256,  193,    0, -193, 0};
+
 		for (int i = 0; i < 9; ++i) {
 			this->X[i] = (coeffX[i] * radius) >> 8;
 			this->Y[i] = (coeffY[i] * radius) >> 8;
