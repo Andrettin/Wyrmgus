@@ -544,6 +544,10 @@ void unit_type::process_sml_property(const sml_property &property)
 	} else if (key == "fire_missile") {
 		this->FireMissile.Name = value;
 		this->FireMissile.Missile = nullptr;
+	} else if (key == "explode_when_killed") {
+		this->ExplodeWhenKilled = 1;
+		this->Explosion.Name = value;
+		this->Explosion.Missile = nullptr;
 	} else if (key == "priority") {
 		this->DefaultStat.Variables[PRIORITY_INDEX].Value = std::stoi(value);
 		this->DefaultStat.Variables[PRIORITY_INDEX].Max = std::stoi(value);
