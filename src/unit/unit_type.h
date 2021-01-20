@@ -935,10 +935,12 @@ public:
 
 	bool CanSelect(GroupSelectionMode mode = GroupSelectionMode::SELECTABLE_BY_RECTANGLE_ONLY) const;
 	
-	//Wyrmgus start
 	void set_parent(const unit_type *parent_type);
 	void RemoveButtons(const ButtonCmd button_action, const std::string &mod_file = "");
+
 	void UpdateDefaultBoolFlags();
+	void calculate_movement_mask();
+
 	int GetAvailableLevelUpUpgrades() const;
 	int GetResourceStep(const int resource, const int player) const;
 	const unit_type_variation *GetDefaultVariation(const CPlayer *player, const int image_layer = -1) const;
@@ -952,7 +954,6 @@ public:
 	std::string generate_personal_name(const wyrmgus::faction *faction, const gender gender) const;
 	bool is_personal_name_valid(const std::string &name, const faction *faction, const gender gender) const;
 	const name_generator *get_name_generator(const wyrmgus::faction *faction, const gender gender) const;
-	//Wyrmgus end
 
 	wyrmgus::item_class get_item_class() const
 	{
