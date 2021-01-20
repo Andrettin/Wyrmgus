@@ -1245,6 +1245,8 @@ void map_template::apply_sites(const QPoint &template_start_pos, const QPoint &m
 		site_game_data->set_map_pos(site_pos);
 		site_game_data->set_map_layer(CMap::Map.MapLayers[z].get());
 
+		bool first_building = true;
+
 		if (base_unit_type != nullptr) {
 			if (!is_position_shift_acceptable && !UnitTypeCanBeAt(*base_unit_type, site_pos - unit_offset, z) && CMap::Map.Info.IsPointOnMap(site_pos - unit_offset, z) && CMap::Map.Info.IsPointOnMap(site_pos - unit_offset + Vec2i(base_unit_type->get_tile_size() - QSize(1, 1)), z)) {
 				fprintf(stderr, "The site for \"%s\" should be placed on (%d, %d), but it cannot be there.\n", site->Ident.c_str(), site_raw_pos.x(), site_raw_pos.y());
@@ -1254,6 +1256,9 @@ void map_template::apply_sites(const QPoint &template_start_pos, const QPoint &m
 
 			if (site->is_settlement()) {
 				unit->settlement = site;
+			} else {
+				unit->Name = site->get_name();
+				first_building = false;
 			}
 
 			site_game_data->set_site_unit(unit);
@@ -1372,7 +1377,6 @@ void map_template::apply_sites(const QPoint &template_start_pos, const QPoint &m
 			}
 		}
 		
-		bool first_building = true;
 		for (const unit_class *building_class : site_history->get_building_classes()) {
 			const unit_type *unit_type = site_owner->get_class_unit_type(building_class);
 
