@@ -451,9 +451,6 @@ void ImageButton::draw(gcn::Graphics *graphics)
 		img = disabledImage ? disabledImage : normalImage;
 	} else if (isPressed()) {
 		img = pressedImage ? pressedImage : normalImage;
-	} else if (0 && hasMouse()) {
-		// FIXME: add mouse-over image
-		img = nullptr;
 	} else {
 		img = normalImage;
 	}
@@ -680,9 +677,6 @@ void PlayerColorImageButton::draw(gcn::Graphics *graphics)
 		img = disabledImage ? disabledImage : normalImage;
 	} else if (isPressed()) {
 		img = pressedImage ? pressedImage : normalImage;
-	} else if (0 && hasMouse()) {
-		// FIXME: add mouse-over image
-		img = nullptr;
 	} else {
 		img = normalImage;
 	}
