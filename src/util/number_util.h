@@ -51,11 +51,14 @@ inline int fast_abs(const int value)
 	return (value ^ temp) - temp;
 }
 
-inline constexpr int pow(const int base, const int exp)
+template <typename number_type>
+inline constexpr number_type pow(const number_type base, const number_type exp)
 {
-	int value = 1;
+	static_assert(std::is_integral_v<number_type>);
 
-	for (int i = 0; i < exp; ++i) {
+	number_type value = 1;
+
+	for (number_type i = 0; i < exp; ++i) {
 		value *= base;
 	}
 
