@@ -32,4 +32,4 @@ sed -i -e 's/liblua5.1.so/liblua5.1.a/g' CMakeCache.txt
 NCPUS_MAX=`/usr/bin/getconf _NPROCESSORS_ONLN`
 make -j$NCPUS_MAX
 
-mv -f stratagus $binname
+mv -f wyrmgus $binname
