@@ -109,7 +109,7 @@ public:
 		}
 	}
 
-	constexpr int get_value() const
+	constexpr int64_t get_value() const
 	{
 		return this->value;
 	}
@@ -317,3 +317,5 @@ using millesimal_int = fractional_int<3>;
 using decimillesimal_int = fractional_int<4>;
 
 }
+
+Q_DECLARE_METATYPE(wyrmgus::centesimal_int)

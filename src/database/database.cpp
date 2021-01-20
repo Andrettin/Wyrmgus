@@ -213,6 +213,8 @@ QVariant database::process_sml_property_value(const sml_property &property, cons
 			new_property_value = QVariant::fromValue(calendar::get(property.get_value()));
 		} else if (property_class_name == "wyrmgus::campaign*") {
 			new_property_value = QVariant::fromValue(campaign::get(property.get_value()));
+		} else if (property_class_name == "wyrmgus::centesimal_int") {
+			new_property_value = QVariant::fromValue(centesimal_int(property.get_value()));
 		} else if (property_class_name == "wyrmgus::character*") {
 			new_property_value = QVariant::fromValue(character::get(property.get_value()));
 		} else if (property_class_name == "wyrmgus::civilization*") {
