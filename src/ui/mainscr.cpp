@@ -982,6 +982,8 @@ void DrawPopups()
 						} else {
 							unit_name = UnitUnderCursor->GetName();
 						}
+					} else if (UnitUnderCursor->Type->BoolFlag[CELESTIAL_BODY_INDEX].value) {
+						unit_name = UnitUnderCursor->GetName() + " (" + UnitUnderCursor->get_type_name() + ")";
 					} else {
 						unit_name = UnitUnderCursor->get_type_name();
 					}
