@@ -326,7 +326,7 @@ static int CclUnit(lua_State *l)
 			unit->surname = LuaToString(l, 2, j + 1);
 		} else if (!strcmp(value, "site")) {
 			unit->site = wyrmgus::site::get(LuaToString(l, 2, j + 1));
-			if (unit->site->is_major()) {
+			if (unit->site->is_settlement()) {
 				unit->site->get_game_data()->set_site_unit(unit);
 				CMap::Map.add_settlement_unit(unit);
 			}

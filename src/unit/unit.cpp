@@ -652,7 +652,7 @@ void CUnit::ReplaceOnTop(CUnit &replaced_unit)
 		this->site = replaced_unit.site;
 		replaced_unit.site->get_game_data()->set_site_unit(this);
 
-		if (replaced_unit.site->is_major()) {
+		if (replaced_unit.site->is_settlement()) {
 			CMap::Map.remove_settlement_unit(&replaced_unit);
 			CMap::Map.add_settlement_unit(this);
 		}
@@ -4256,7 +4256,7 @@ void UnitLost(CUnit &unit)
 					temp->site = unit.site;
 					temp->site->get_game_data()->set_site_unit(temp);
 
-					if (unit.site->is_major()) {
+					if (unit.site->is_settlement()) {
 						temp->settlement = unit.settlement;
 						CMap::Map.remove_settlement_unit(&unit);
 						CMap::Map.add_settlement_unit(temp);

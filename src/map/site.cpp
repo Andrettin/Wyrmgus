@@ -102,8 +102,8 @@ void site::ProcessConfigData(const CConfigData *config_data)
 		
 		if (key == "name") {
 			this->set_name(value);
-		} else if (key == "major") {
-			this->major = string::to_bool(value);
+		} else if (key == "base_unit_type") {
+			this->base_unit_type = unit_type::get(value);
 		} else if (key == "position_x") {
 			this->pos.setX(std::stoi(value));
 		} else if (key == "position_y") {
@@ -235,7 +235,7 @@ void site::initialize()
 	}
 
 	//if a settlement has no color assigned to it, assign a random one instead
-	if (this->is_major() && !this->get_color().isValid()) {
+	if (this->is_settlement() && !this->get_color().isValid()) {
 		this->color = QColor(random::get()->generate(256), random::get()->generate(256), random::get()->generate(256));
 	}
 
@@ -243,7 +243,7 @@ void site::initialize()
 		core_faction->get_civilization()->sites.push_back(this);
 	}
 
-	if (this->is_major()) { 
+	if (this->is_settlement()) { 
 		for (faction *core_faction : this->get_cores()) {
 			core_faction->add_core_settlement(this);
 		}
@@ -296,6 +296,15 @@ const std::string &site::get_cultural_name(const civilization *civilization) con
 	}
 	
 	return this->get_name();
+}
+
+bool site::is_settlement() const
+{
+	if (this->get_base_unit_type() == nullptr) {
+		return false;
+	}
+
+	return this->get_base_unit_type() == settlement_site_unit_type;
 }
 
 QVariantList site::get_cores_qvariant_list() const

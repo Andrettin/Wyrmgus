@@ -398,9 +398,9 @@ void map_template::initialize()
 	if (!this->sites.empty()) {
 		//sort sites to change their order of application
 		std::sort(this->sites.begin(), this->sites.end(), [](const wyrmgus::site *site, const wyrmgus::site *other_site) {
-			if (site->is_major() != other_site->is_major()) {
-				//give priority to major sites
-				return site->is_major();
+			if (site->is_settlement() != other_site->is_settlement()) {
+				//give priority to settlement sites
+				return site->is_settlement();
 			}
 
 			return site->get_identifier() < other_site->get_identifier();
@@ -1211,10 +1211,6 @@ void map_template::apply_sites(const QPoint &template_start_pos, const QPoint &m
 
 		const unit_type *base_unit_type = site->get_base_unit_type();
 
-		if (site->is_major() && settlement_site_unit_type != nullptr) { //add a settlement site for major sites
-			base_unit_type = settlement_site_unit_type;
-		}
-
 		if (base_unit_type != nullptr) {
 			unit_offset = (base_unit_type->get_tile_size() - QSize(1, 1)) / 2;
 		}
@@ -1256,13 +1252,13 @@ void map_template::apply_sites(const QPoint &template_start_pos, const QPoint &m
 			CUnit *unit = CreateUnit(site_pos - unit_offset, *base_unit_type, CPlayer::Players[PlayerNumNeutral], z, true, site);
 			unit->site = site;
 
-			if (site->is_major()) {
+			if (site->is_settlement()) {
 				unit->settlement = site;
 			}
 
 			site_game_data->set_site_unit(unit);
 
-			if (site->is_major()) {
+			if (site->is_settlement()) {
 				CMap::Map.add_settlement_unit(unit);
 				for (int x = unit->tilePos.x; x < (unit->tilePos.x + unit->Type->get_tile_width()); ++x) {
 					for (int y = unit->tilePos.y; y < (unit->tilePos.y + unit->Type->get_tile_height()); ++y) {
@@ -1388,8 +1384,8 @@ void map_template::apply_sites(const QPoint &template_start_pos, const QPoint &m
 				throw std::runtime_error("A terrain type building (e.g. a wall) cannot be applied from the list of historical building classes of a site.");
 			}
 
-			if (unit_type->BoolFlag[TOWNHALL_INDEX].value && !site->is_major()) {
-				throw std::runtime_error("Site \"" + site->get_identifier() + "\" has a town hall, but isn't set as a major one.");
+			if (unit_type->BoolFlag[TOWNHALL_INDEX].value && !site->is_settlement()) {
+				throw std::runtime_error("Site \"" + site->get_identifier() + "\" has a town hall, but isn't set as a settlement one.");
 			}
 
 			const QPoint building_unit_offset = unit_type->get_tile_center_pos_offset();
@@ -1399,10 +1395,10 @@ void map_template::apply_sites(const QPoint &template_start_pos, const QPoint &m
 				}
 			}
 
-			CUnit *unit = CreateUnit(site_pos - building_unit_offset, *unit_type, player, z, true, site->is_major() ? site : nullptr);
+			CUnit *unit = CreateUnit(site_pos - building_unit_offset, *unit_type, player, z, true, site->is_settlement() ? site : nullptr);
 
 			if (first_building) {
-				if (!unit_type->BoolFlag[TOWNHALL_INDEX].value && !site->get_name().empty()) { //if one building is representing a minor site, make it have the site's name
+				if (!site->is_settlement() && !site->get_name().empty()) { //if one building is representing a non-settlement site, make it have the site's name
 					unit->Name = site->get_cultural_name(site_owner->get_civilization());
 				}
 				first_building = false;
@@ -1451,8 +1447,8 @@ void map_template::apply_sites(const QPoint &template_start_pos, const QPoint &m
 				if (unit_type->TerrainType) {
 					continue;
 				}
-				if (unit_type->BoolFlag[TOWNHALL_INDEX].value && !site->is_major()) {
-					fprintf(stderr, "Error in CMap::apply_sites (site ident \"%s\"): site has a town hall, but isn't set as a major one.\n", site->Ident.c_str());
+				if (unit_type->BoolFlag[TOWNHALL_INDEX].value && !site->is_settlement()) {
+					fprintf(stderr, "Error in CMap::apply_sites (site ident \"%s\"): site has a town hall, but isn't set as a settlement one.\n", site->Ident.c_str());
 					continue;
 				}
 				const Vec2i building_unit_offset((unit_type->get_tile_size() - QSize(1, 1)) / 2);
@@ -1470,9 +1466,9 @@ void map_template::apply_sites(const QPoint &template_start_pos, const QPoint &m
 					if (building_player->StartPos.x == 0 && building_player->StartPos.y == 0) {
 						building_player->SetStartView(site_pos - building_unit_offset, z);
 					}
-					unit = CreateUnit(site_pos - building_unit_offset, *unit_type, building_player, z, true, site->is_major() ? site : nullptr);
+					unit = CreateUnit(site_pos - building_unit_offset, *unit_type, building_player, z, true, site->is_settlement() ? site : nullptr);
 				} else {
-					unit = CreateUnit(site_pos - building_unit_offset, *unit_type, player, z, true, site->is_major() ? site : nullptr);
+					unit = CreateUnit(site_pos - building_unit_offset, *unit_type, player, z, true, site->is_settlement() ? site : nullptr);
 				}
 				if (std::get<3>(site->HistoricalBuildings[j])) {
 					unit->set_unique(std::get<3>(site->HistoricalBuildings[j]));
@@ -1514,12 +1510,12 @@ void map_template::apply_sites(const QPoint &template_start_pos, const QPoint &m
 			const unit_class *unit_class = kv_pair.first;
 			const int group_population = kv_pair.second;
 
-			this->apply_population_unit(unit_class, group_population, site_pos, z, player, site->is_major() ? site : nullptr);
+			this->apply_population_unit(unit_class, group_population, site_pos, z, player, site->is_settlement() ? site : nullptr);
 			population -= group_population;
 		}
 
 		if (population != 0) { //remaining population after subtracting the amount of population specified to belong to particular groups
-			this->apply_population_unit(defines::get()->get_default_population_class(), population, site_pos, z, player, site->is_major() ? site : nullptr);
+			this->apply_population_unit(defines::get()->get_default_population_class(), population, site_pos, z, player, site->is_settlement() ? site : nullptr);
 		}
 		
 		for (size_t j = 0; j < site->HistoricalUnits.size(); ++j) {
@@ -1551,7 +1547,7 @@ void map_template::apply_sites(const QPoint &template_start_pos, const QPoint &m
 					const Vec2i historical_unit_offset((type->get_tile_size() - QSize(1, 1)) / 2);
 
 					for (int k = 0; k < unit_quantity; ++k) {
-						CUnit *unit = CreateUnit(site_pos - historical_unit_offset, *type, unit_player, z, false, site->is_major() ? site : nullptr);
+						CUnit *unit = CreateUnit(site_pos - historical_unit_offset, *type, unit_player, z, false, site->is_settlement() ? site : nullptr);
 						if (!type->BoolFlag[HARVESTER_INDEX].value) { // make non-worker units not have an active AI
 							unit->Active = 0;
 							unit_player->ChangeUnitTypeAiActiveCount(type, -1);

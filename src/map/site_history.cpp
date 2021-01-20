@@ -59,8 +59,8 @@ QVariantList site_history::get_building_classes_qvariant_list() const
 void site_history::add_building_class(unit_class *building_class)
 {
 	if (building_class->is_town_hall()) {
-		if (!this->site->is_major()) {
-			throw std::runtime_error("Tried to add a settlement head building to a non-major site.");
+		if (!this->site->is_settlement()) {
+			throw std::runtime_error("Tried to add a settlement head building to a non-settlement site.");
 		}
 
 		//remove other settlement head buildings (there can be only one at a time for a given settlement)

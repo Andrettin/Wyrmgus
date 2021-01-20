@@ -59,7 +59,6 @@ class site final : public named_data_entry, public data_type<site>, public CData
 {
 	Q_OBJECT
 
-	Q_PROPERTY(bool major MEMBER major READ is_major)
 	Q_PROPERTY(wyrmgus::map_template* map_template MEMBER map_template)
 	Q_PROPERTY(QPoint pos MEMBER pos READ get_pos)
 	Q_PROPERTY(wyrmgus::site* pos_reference_site MEMBER pos_reference_site)
@@ -133,10 +132,7 @@ public:
 
 	const std::string &get_cultural_name(const civilization *civilization) const;
 
-	bool is_major() const
-	{
-		return this->major;
-	}
+	bool is_settlement() const;
 
 	const wyrmgus::map_template *get_map_template() const
 	{
@@ -223,7 +219,6 @@ public:
 	}
 
 private:
-	bool major = false; //whether the site is a major one; major sites have settlement sites, and as such can have town halls
 	wyrmgus::map_template *map_template = nullptr;
 	QPoint pos = QPoint(-1, -1); //position of the site in its map template
 	site *pos_reference_site = nullptr; //the site's reference position site, used as an offset for its position

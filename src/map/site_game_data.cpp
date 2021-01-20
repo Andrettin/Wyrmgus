@@ -73,7 +73,7 @@ void site_game_data::set_owner(CPlayer *player)
 
 	this->owner = player;
 
-	if (this->site->is_major() && GameCycle > 0) {
+	if (this->site->is_settlement() && GameCycle > 0) {
 		this->update_border_tiles();
 		this->update_minimap_territory();
 	}

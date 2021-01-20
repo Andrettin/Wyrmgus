@@ -1531,8 +1531,8 @@ static int CclDefineSite(lua_State *l)
 		
 		if (!strcmp(value, "Name")) {
 			site->set_name(LuaToString(l, -1));
-		} else if (!strcmp(value, "Major")) {
-			site->major = LuaToBoolean(l, -1);
+		} else if (!strcmp(value, "BaseUnitType")) {
+			site->base_unit_type = wyrmgus::unit_type::get(LuaToString(l, -1));
 		} else if (!strcmp(value, "Position")) {
 			Vec2i pos;
 			CclGetPos(l, &pos.x, &pos.y);
