@@ -58,11 +58,4 @@ int distance_to(const QPoint &point, const QPoint &other_point)
 	return isqrt(point::square_distance_to(point, other_point));
 }
 
-QPoint get_nearest_circle_edge_point(const QPoint &point, const int64_t radius)
-{
-	const int64_t x = radius * point.x() / isqrt(number::pow<int64_t>(point.x(), 2) + number::pow<int64_t>(point.y(), 2));
-	const int64_t y = radius * point.y() / isqrt(number::pow<int64_t>(point.x(), 2) + number::pow<int64_t>(point.y(), 2));
-	return QPoint(static_cast<int>(x), static_cast<int>(y));
-}
-
 }

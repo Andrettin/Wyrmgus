@@ -123,7 +123,10 @@ inline QPoint get_circle_point(const QPoint &point, const int64_t source_radius,
 	return QPoint(static_cast<int>(x), static_cast<int>(y));
 }
 
-extern QPoint get_nearest_circle_edge_point(const QPoint &point, const int64_t radius);
+inline QPoint get_nearest_circle_edge_point(const QPoint &point, const int64_t radius)
+{
+	return point::get_circle_point(point, point::distance_to(point, QPoint(0, 0)), radius);
+}
 
 template <typename function_type>
 inline void for_each_adjacent(const QPoint &point, const function_type &function)

@@ -34,8 +34,7 @@ namespace wyrmgus {
 QPoint geocoordinate::to_circle_edge_point() const
 {
 	const QPoint circle_point = this->to_circle_point();
-	const QPoint circle_edge_point = point::get_nearest_circle_edge_point(circle_point, 180 * number_type::divisor);
-	return point::get_circle_point(circle_edge_point, 180 * number_type::divisor, 1 * number_type::divisor);
+	return point::get_nearest_circle_edge_point(circle_point, 1 * number_type::divisor);
 }
 
 }

@@ -126,6 +126,8 @@ class map_template final : public named_data_entry, public data_type<map_templat
 	Q_PROPERTY(int max_longitude MEMBER max_longitude READ get_max_longitude)
 	Q_PROPERTY(int min_latitude MEMBER min_latitude READ get_min_latitude)
 	Q_PROPERTY(int max_latitude MEMBER max_latitude READ get_max_latitude)
+	Q_PROPERTY(int astrodistance_multiplier MEMBER astrodistance_multiplier READ get_astrodistance_multiplier)
+	Q_PROPERTY(int astrodistance_additive_modifier MEMBER astrodistance_additive_modifier READ get_astrodistance_additive_modifier)
 
 public:
 	using terrain_character_map_type = std::vector<std::vector<char>>;
@@ -636,6 +638,16 @@ public:
 		return this->max_latitude;
 	}
 
+	int get_astrodistance_multiplier() const
+	{
+		return this->astrodistance_multiplier;
+	}
+
+	int get_astrodistance_additive_modifier() const
+	{
+		return this->astrodistance_additive_modifier;
+	}
+
 	QRect get_georectangle() const
 	{
 		const QPoint top_left(this->get_min_longitude(), this->get_min_latitude());
@@ -756,6 +768,8 @@ private:
 	int max_longitude = 0;
 	int min_latitude = 0;
 	int max_latitude = 0;
+	int astrodistance_multiplier = 1;
+	int astrodistance_additive_modifier = 0;
 	std::map<char, std::unique_ptr<character_unit>> character_units;
 	std::vector<std::unique_ptr<character_substitution>> character_substitutions; //substitutions applied to the terrain character map, in order
 	std::unique_ptr<map_template_history> history;
