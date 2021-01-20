@@ -234,12 +234,12 @@ void site::initialize()
 		this->pos = this->get_map_template()->get_geocoordinate_pos(this->get_geocoordinate());
 	} else if (!this->get_astrocoordinate().is_null()) {
 		QPoint direction_pos = this->get_astrocoordinate().to_circle_edge_point();
-		int64_t astrodistance_value = this->get_astrodistance().get_value();
+		int64_t astrodistance_value = this->get_astrodistance().to_int();
 		astrodistance_value = isqrt(astrodistance_value);
 		astrodistance_value *= this->get_map_template()->get_astrodistance_multiplier();
 		astrodistance_value += this->get_map_template()->get_astrodistance_additive_modifier();
-		const int64_t x = direction_pos.x() * astrodistance_value / geocoordinate::number_type::divisor / centesimal_int::divisor;
-		const int64_t y = direction_pos.y() * astrodistance_value / geocoordinate::number_type::divisor / centesimal_int::divisor;
+		const int64_t x = direction_pos.x() * astrodistance_value / geocoordinate::number_type::divisor;
+		const int64_t y = direction_pos.y() * astrodistance_value / geocoordinate::number_type::divisor;
 
 		const QPoint relative_pos(x, y);
 		//apply the relative position of the celestial body to the map template's center

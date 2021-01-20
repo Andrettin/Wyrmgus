@@ -174,7 +174,7 @@ public:
 
 	constexpr QPoint to_circle_point() const
 	{
-		return QPoint(this->get_longitude().get_value(), this->get_latitude().get_value() * 2 * -1);
+		return QPoint(this->get_longitude().to_int(), this->get_latitude().to_int() * 2 * -1);
 	}
 
 	QPoint to_circle_edge_point() const;
