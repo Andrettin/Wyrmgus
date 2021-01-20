@@ -1282,7 +1282,6 @@ public:
 
 	template <const unsigned int SIZE>
 	struct CKeys {
-
 		struct DataKey {
 			static bool key_pred(const DataKey &lhs,
 								 const DataKey &rhs)
@@ -1290,20 +1289,18 @@ public:
 				return ((lhs.keylen == rhs.keylen) ?
 						(strcmp(lhs.key, rhs.key) < 0) : (lhs.keylen < rhs.keylen));
 			}
-			int offset;
-			unsigned int keylen;
-			const char *key;
+			int offset = 0;
+			unsigned int keylen = 0;
+			const char *key = nullptr;
 		};
 
-		CKeys(): TotalKeys(SIZE) {}
-
-		DataKey buildin[SIZE];
+		std::array<DataKey, SIZE> buildin;
 		std::map<std::string, int> user;
-		unsigned int TotalKeys;
+		unsigned int TotalKeys = SIZE;
 
 		void Init()
 		{
-			std::sort(buildin, buildin + SIZE, DataKey::key_pred);
+			std::sort(buildin.begin(), buildin.end(), DataKey::key_pred);
 		}
 
 		const char *operator[](int index)
@@ -1332,14 +1329,12 @@ public:
 		*/
 		int operator[](const char *const key)
 		{
-			DataKey k;
+			DataKey k{};
 			k.key = key;
 			k.keylen = strlen(key);
-			const DataKey *p = std::lower_bound(buildin, buildin + SIZE,
-												k, DataKey::key_pred);
-			if ((p != buildin + SIZE) && p->keylen == k.keylen &&
-				0 == strcmp(p->key, key)) {
-				return p->offset;
+			const auto it = std::lower_bound(buildin.begin(), buildin.end(), k, DataKey::key_pred);
+			if (it != buildin.end() && it->keylen == k.keylen && 0 == strcmp(it->key, key)) {
+				return it->offset;
 			} else {
 				std::map<std::string, int>::iterator
 				ret(user.find(key));
@@ -1347,6 +1342,7 @@ public:
 					return (*ret).second;
 				}
 			}
+
 			return -1;
 		}
 
