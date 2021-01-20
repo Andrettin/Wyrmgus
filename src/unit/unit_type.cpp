@@ -1739,6 +1739,11 @@ void unit_type::calculate_movement_mask()
 			if (!this->BoolFlag[DIMINUTIVE_INDEX].value) {
 				this->MovementMask |= MapFieldAirUnit; // already occuppied
 			}
+
+			if (this->BoolFlag[BUILDING_INDEX].value) {
+				//space buildings must be on space itself, they cannot be on land or water
+				this->MovementMask |= MapFieldLandAllowed | MapFieldCoastAllowed | MapFieldWaterAllowed;
+			}
 			break;
 		default:
 			DebugPrint("Where moves this unit?\n");
