@@ -71,7 +71,7 @@ static int AStarCosts(const Vec2i &pos, const Vec2i &goalPos)
 //int Heading2O[9];//heading to offset
 std::array<std::vector<int>, 9> Heading2O;//heading to offset
 //Wyrmgus end
-static constexpr int XY2Heading[3][3] = { {7, 6, 5}, {0, 0, 4}, {1, 2, 3}};
+static constexpr std::array<std::array<int, 3>, 3> XY2Heading = { { {7, 6, 5}, {0, 0, 4}, {1, 2, 3} } };
 
 /// cost matrix
 //Wyrmgus start
