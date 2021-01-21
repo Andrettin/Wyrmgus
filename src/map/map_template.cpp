@@ -1216,7 +1216,7 @@ void map_template::apply_sites(const QPoint &template_start_pos, const QPoint &m
 		}
 
 		//it is acceptable sites with geocoordinate to have their positions shifted, e.g. if it was coastal to shift it enough inland to give space for the building to be placed
-		const bool is_position_shift_acceptable = !site->get_geocoordinate().is_null();
+		const bool is_position_shift_acceptable = !site->get_geocoordinate().is_null() || !site->get_astrocoordinate().is_null();
 			
 		if (random) {
 			if (site_raw_pos.x() != -1 || site_raw_pos.y() != -1) {
