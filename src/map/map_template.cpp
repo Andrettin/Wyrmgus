@@ -75,6 +75,7 @@
 #include "util/point_util.h"
 #include "util/size_util.h"
 #include "util/string_conversion_util.h"
+#include "util/vector_random_util.h"
 #include "util/vector_util.h"
 #include "video/video.h"
 #include "world.h"
@@ -2398,8 +2399,7 @@ QPoint map_template::generate_subtemplate_position(map_template *subtemplate, co
 	}
 
 	while (!potential_positions.empty()) {
-		const QPoint subtemplate_pos = potential_positions[SyncRand(potential_positions.size())];
-		vector::remove(potential_positions, subtemplate_pos);
+		const QPoint subtemplate_pos = vector::take_random(potential_positions);
 
 		//include the offsets relevant for the templates dependent on this one's position (e.g. templates that have to be to the north of this one), so that there is enough space for them to be generated there
 		const int north_offset = subtemplate->GetDependentTemplatesNorthOffset();
