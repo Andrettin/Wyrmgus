@@ -2441,18 +2441,8 @@ QPoint map_template::generate_subtemplate_position(map_template *subtemplate, co
 			}
 		}
 
-		if (on_usable_area) {
-			//there must be no units in the position where the subtemplate would be applied, and on bordering tiles
-			std::vector<CUnit *> table;
-			const bool select_circle = subtemplate->is_circle();
-			Select(subtemplate_pos - QPoint(1, 1), subtemplate_pos + size::to_point(subtemplate->get_applied_size()), table, z, select_circle);
-			if (!table.empty()) {
-				on_usable_area = false;
-			}
-		}
-
 		if (on_usable_area && subtemplate->is_constructed_only()) {
-			if (!this->is_constructed_subtemplate_compatible_with_terrain(subtemplate, subtemplate_pos, z)) {
+			if (!this->is_constructed_subtemplate_suitable_for_pos(subtemplate, subtemplate_pos, z)) {
 				on_usable_area = false;
 			}
 		}
@@ -2465,6 +2455,18 @@ QPoint map_template::generate_subtemplate_position(map_template *subtemplate, co
 	}
 
 	return QPoint(-1, -1);
+}
+
+bool map_template::is_constructed_subtemplate_suitable_for_pos(map_template *subtemplate, const QPoint &map_start_pos, const int z) const
+{
+	//there must be no units in the position where the subtemplate would be applied
+	std::vector<CUnit *> table;
+	Select(map_start_pos, map_start_pos + size::to_point(subtemplate->get_applied_size()) - QPoint(1, 1), table, z);
+	if (!table.empty()) {
+		return false;
+	}
+
+	return this->is_constructed_subtemplate_compatible_with_terrain(subtemplate, map_start_pos, z);
 }
 
 bool map_template::is_constructed_subtemplate_compatible_with_terrain(map_template *subtemplate, const QPoint &map_start_pos, const int z) const

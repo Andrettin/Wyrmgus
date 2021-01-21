@@ -549,6 +549,7 @@ public:
 	}
 
 	QPoint generate_subtemplate_position(map_template *subtemplate, const QPoint &template_start_pos, const QPoint &map_start_pos, const QPoint &map_end, int z, const QPoint &max_adjacent_template_distance, bool &adjacency_restriction_occurred) const;
+	bool is_constructed_subtemplate_suitable_for_pos(map_template *subtemplate, const QPoint &map_start_pos, int z) const;
 	bool is_constructed_subtemplate_compatible_with_terrain(map_template *subtemplate, const QPoint &map_start_pos, int z) const;
 	bool is_constructed_subtemplate_compatible_with_terrain_file(map_template *subtemplate, const QPoint &map_start_pos, int z) const;
 	bool is_constructed_subtemplate_compatible_with_terrain_image(map_template *subtemplate, const QPoint &map_start_pos, int z) const;
