@@ -593,10 +593,6 @@ set(stratagus_SRCS
 	${CMAKE_CURRENT_BINARY_DIR}/tolua.cpp
 )
 
-set(stratagus_main_SRCS
-	src/stratagus/main.cpp
-)
-
 set(stratagus_guichan_HDRS
 	src/guichan/include/guichan/actionlistener.h
 	src/guichan/include/guichan/allegro.h
@@ -1106,7 +1102,6 @@ source_group(util FILES ${stratagus_util_HDRS})
 source_group(video FILES ${stratagus_video_HDRS})
 source_group(xbrz FILES ${stratagus_xbrz_HDRS})
 
-
 set(stratagus_HDRS
 	${stratagus_generic_HDRS}
 	${stratagus_action_HDRS}
@@ -1134,6 +1129,14 @@ set(stratagus_HDRS
 	${stratagus_util_HDRS}
 	${stratagus_video_HDRS}
 	${stratagus_xbrz_HDRS}
+)
+
+set(stratagus_main_SRCS
+	src/stratagus/main.cpp
+)
+
+set(stratagus_test_SRCS
+	test/main.cpp
 )
 
 # Configuration types
@@ -1571,11 +1574,12 @@ add_custom_command(OUTPUT tolua.cpp
 
 add_library(stratagus STATIC ${stratagus_SRCS} ${stratagus_HDRS})
 add_executable(stratagus_main WIN32 ${stratagus_main_SRCS})
-
+add_executable(stratagus_test ${stratagus_test_SRCS})
 
 if (MSVC)
 	target_compile_options(stratagus PRIVATE /W4 /w44800 /wd4458)
 	target_compile_options(stratagus_main PRIVATE /W4 /w44800 /wd4458)
+	target_compile_options(stratagus_test PRIVATE /W4 /w44800 /wd4458)
 endif()
 
 target_precompile_headers(stratagus PRIVATE
@@ -1660,15 +1664,18 @@ endif()
 target_link_libraries(stratagus ${stratagus_LIBS})
 
 target_precompile_headers(stratagus_main REUSE_FROM stratagus)
+target_precompile_headers(stratagus_test REUSE_FROM stratagus)
 
 set_target_properties(stratagus_main PROPERTIES OUTPUT_NAME ${BINARY_NAME})
 
 if (MSVC)
 	#ignore linker warning due to missing .pdb files, as otherwise a stream of warnings comes from linking external libraries
 	set_target_properties(stratagus_main PROPERTIES LINK_FLAGS "/ignore:4099")
+	set_target_properties(stratagus_test PROPERTIES LINK_FLAGS "/ignore:4099")
 endif()
 
 target_link_libraries(stratagus_main LINK_PUBLIC stratagus)
+target_link_libraries(stratagus_test LINK_PUBLIC stratagus)
 
 ########### next target ###############
 
