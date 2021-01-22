@@ -4257,7 +4257,7 @@ void UnitLost(CUnit &unit)
 	const CBuildRestrictionOnTop *b = OnTopDetails(*unit.Type, nullptr);
 	//Wyrmgus end
 	if (b != nullptr) {
-		if (b->ReplaceOnDie && (type.get_given_resource() == nullptr || unit.ResourcesHeld != 0)) {
+		if (b->ReplaceOnDie && (type.get_given_resource() == nullptr || unit.ResourcesHeld != 0) && unit.MapLayer != nullptr) {
 			CUnit *temp = MakeUnitAndPlace(unit.tilePos, *b->Parent, CPlayer::Players[PlayerNumNeutral], unit.MapLayer->ID);
 			if (temp == nullptr) {
 				DebugPrint("Unable to allocate Unit");
