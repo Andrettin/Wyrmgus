@@ -62,6 +62,7 @@
 #include "unit/unit_manager.h"
 #include "unit/unit_type.h"
 #include "upgrade/upgrade.h"
+#include "util/exception_util.h"
 
 /// Get resource by name
 extern unsigned CclGetResourceByName(lua_State *l);
@@ -869,7 +870,18 @@ static int CclCreateUnit(lua_State *l)
 			const int heading = SyncRand(256);
 
 			Vec2i res_pos;
-			FindNearestDrop(*unit->Type, ipos, res_pos, heading, z, unit->Type->BoolFlag[BUILDING_INDEX].value && GameCycle > 0, GameCycle == 0); //place buildings with a certain distance of each other, if the game cycle is greater than 0 (so if they weren't intentionally placed side-by-side for a map)
+			try {
+				FindNearestDrop(*unit->Type, ipos, res_pos, heading, z, unit->Type->BoolFlag[BUILDING_INDEX].value && GameCycle > 0, GameCycle == 0); //place buildings with a certain distance of each other, if the game cycle is greater than 0 (so if they weren't intentionally placed side-by-side for a map)
+			} catch (const std::exception &exception) {
+				wyrmgus::exception::report(exception);
+
+				//no suitable location found
+				unit->Remove(nullptr);
+				LetUnitDie(*unit);
+				lua_pushnumber(l, 0);
+				return 1;
+			}
+
 			unit->Place(res_pos, z);
 		}
 		UpdateForNewUnit(*unit, 0);
