@@ -58,14 +58,11 @@ extern int MyRand();
 **
 **  @return     The integer square root.
 */
-template <typename number_type>
-inline constexpr number_type isqrt(const number_type num)
+inline constexpr long isqrt(const long num)
 {
-	static_assert(std::is_integral_v<number_type>);
-
-	number_type squaredbit = 0;
-	number_type remainder = 0;
-	number_type root = 0;
+	long squaredbit = 0;
+	long remainder = 0;
+	long root = 0;
 
 	if (num < 1) {
 		return 0;
@@ -80,7 +77,7 @@ inline constexpr number_type isqrt(const number_type num)
 	//  This portable load replaces the loop that used to be
 	//  here, and was donated by  legalize@xmission.com
 	//
-	squaredbit = (number_type) ((((unsigned long) ~0L) >> 1) & ~(((unsigned long) ~0L) >> 2));
+	squaredbit = (long) ((((unsigned long) ~0L) >> 1) & ~(((unsigned long) ~0L) >> 2));
 
 	// Form bits of the answer.
 	remainder = num;
