@@ -399,7 +399,6 @@ set(stratagusmain_SRCS
 	src/stratagus/literary_text.cpp
 	src/stratagus/luacallback.cpp
 	src/stratagus/magic_domain.cpp
-	src/stratagus/main.cpp
 	src/stratagus/mainloop.cpp
 	src/stratagus/mod.cpp
 	src/stratagus/name_generator.cpp
@@ -592,6 +591,10 @@ set(stratagus_SRCS
 	${video_SRCS}
 	${xbrz_SRCS}
 	${CMAKE_CURRENT_BINARY_DIR}/tolua.cpp
+)
+
+set(stratagus_main_SRCS
+	src/stratagus/main.cpp
 )
 
 set(stratagus_guichan_HDRS
@@ -1322,7 +1325,7 @@ endif()
 
 if(WIN32)
 	add_definitions(-DUSE_WIN32)
-	set(stratagus_SRCS ${stratagus_SRCS} ${win32_SRCS})
+	set(stratagus_main_SRCS ${stratagus_main_SRCS} ${win32_SRCS})
 	set(stratagus_LIBS ${stratagus_LIBS} dsound winmm ws2_32 dbghelp)
 endif()
 
@@ -1566,10 +1569,13 @@ add_custom_command(OUTPUT tolua.cpp
 	VERBATIM
 )
 
-add_executable(stratagus WIN32 ${stratagus_SRCS} ${stratagus_HDRS})
+add_library(stratagus STATIC ${stratagus_SRCS} ${stratagus_HDRS})
+add_executable(stratagus_main WIN32 ${stratagus_main_SRCS})
+
 
 if (MSVC)
 	target_compile_options(stratagus PRIVATE /W4 /w44800 /wd4458)
+	target_compile_options(stratagus_main PRIVATE /W4 /w44800 /wd4458)
 endif()
 
 target_precompile_headers(stratagus PRIVATE
@@ -1642,20 +1648,27 @@ if(stratagus_LIBS_DEBUG)
 	target_link_libraries(stratagus ${stratagus_LIBS_DEBUG})
 endif()
 
-set_target_properties(stratagus PROPERTIES OUTPUT_NAME ${BINARY_NAME})
-
 if(WIN32 AND MINGW AND ENABLE_STATIC)
 	set_target_properties(stratagus PROPERTIES LINK_FLAGS "${LINK_FLAGS} -static-libgcc -static-libstdc++ -Wl,--stack,10485760")
-endif()
-
-if (MSVC)
-	#ignore linker warning due to missing .pdb files, as otherwise a stream of warnings comes from linking external libraries
-	set_target_properties(stratagus PROPERTIES LINK_FLAGS "/ignore:4099")
+	set_target_properties(stratagus_main PROPERTIES LINK_FLAGS "${LINK_FLAGS} -static-libgcc -static-libstdc++ -Wl,--stack,10485760")
 endif()
 
 if(APPLE)
 	set_target_properties(stratagus PROPERTIES LINK_FLAGS "${LINK_FLAGS} -lSDLmain")
 endif()
+
+target_link_libraries(stratagus ${stratagus_LIBS})
+
+target_precompile_headers(stratagus_main REUSE_FROM stratagus)
+
+set_target_properties(stratagus_main PROPERTIES OUTPUT_NAME ${BINARY_NAME})
+
+if (MSVC)
+	#ignore linker warning due to missing .pdb files, as otherwise a stream of warnings comes from linking external libraries
+	set_target_properties(stratagus_main PROPERTIES LINK_FLAGS "/ignore:4099")
+endif()
+
+target_link_libraries(stratagus_main LINK_PUBLIC stratagus)
 
 ########### next target ###############
 
