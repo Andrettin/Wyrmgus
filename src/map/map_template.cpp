@@ -589,6 +589,11 @@ void map_template::apply_terrain_image(const bool overlay, const QPoint &templat
 			tile *tile = CMap::Map.Field(real_pos, z);
 
 			if (terrain != nullptr) {
+				//if we are setting base terrain and the tile already has an overlay terrain set to it, remove it, so that when subtemplates are applied on top of base terrain they remove overlays (e.g. space terrain)
+				if (!overlay && tile->get_overlay_terrain() != nullptr) {
+					tile->RemoveOverlayTerrain();
+				}
+
 				tile->SetTerrain(terrain);
 
 				if (terrain_feature != nullptr) {
