@@ -8,9 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name main.cpp - The main file for unittest. */
-//
-//      (c) Copyright 2013 by Joris Dauphin
+//      (c) Copyright 2021 by Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -27,18 +25,6 @@
 //      02111-1307, USA.
 //
 
-#include <UnitTest++.h>
-#include <TestReporterStdout.h>
-
-#include <SDL.h>
-
-int main(int argc, char* argv[])
-{
-#if 0
-	UnitTest::TestReporterStdout reporter;
-
-	return UnitTest::RunAllTests(reporter, UnitTest::Test::GetTestList(), "TESTME");
-#else
-	return UnitTest::RunAllTests();
-#endif
-}
+#define BOOST_TEST_MAIN
+#define BOOST_TEST_MODULE header-only multiunit test
+#include <boost/test/included/unit_test.hpp>
