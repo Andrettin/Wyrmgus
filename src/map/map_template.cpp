@@ -894,19 +894,6 @@ void map_template::apply(const QPoint &template_start_pos, const QPoint &map_sta
 	if (!this->get_subtemplates().empty()) {
 		ShowLoadProgress(_("Applying \"%s\" Subtemplates"), this->get_name().c_str());
 		this->apply_subtemplates(template_start_pos, map_start_pos, map_end, z, false, false);
-		this->apply_subtemplates(template_start_pos, map_start_pos, map_end, z, true, false);
-	}
-
-	if (!this->IsSubtemplateArea()) {
-		CMap::Map.generate_missing_terrain(QRect(map_start_pos, map_end - QPoint(1, 1)), z);
-	}
-	
-	if (!has_base_map) {
-		ShowLoadProgress(_("Generating \"%s\" Map Template Random Terrain"), this->get_name().c_str());
-		
-		for (const auto &generated_terrain : this->generated_terrains) {
-			CMap::Map.GenerateTerrain(generated_terrain, map_start_pos, map_end - Vec2i(1, 1), has_base_map, z);
-		}
 	}
 	
 	if (!this->IsSubtemplateArea()) {
@@ -964,22 +951,20 @@ void map_template::apply(const QPoint &template_start_pos, const QPoint &map_sta
 	this->ApplyUnits(template_start_pos, map_start_pos, map_end, z);
 
 	if (!this->get_subtemplates().empty()) {
-		ShowLoadProgress(_("Applying \"%s\" Constructed Subtemplates"), this->get_name().c_str());
-		this->apply_subtemplates(template_start_pos, map_start_pos, map_end, z, false, true);
-		this->apply_subtemplates(template_start_pos, map_start_pos, map_end, z, true, true);
+		ShowLoadProgress(_("Applying \"%s\" Random Subtemplates"), this->get_name().c_str());
+		this->apply_subtemplates(template_start_pos, map_start_pos, map_end, z, true, false);
 	}
 
-	bool generated_random_terrain = false;
-	if (has_base_map) {
-		ShowLoadProgress(_("Generating \"%s\" Map Template Random Terrain"), this->get_name().c_str());
-		
-		for (const auto &generated_terrain : this->generated_terrains) {
-			CMap::Map.GenerateTerrain(generated_terrain, map_start_pos, map_end - Vec2i(1, 1), has_base_map, z);
-			generated_random_terrain = true;
-		}
+	if (!this->IsSubtemplateArea()) {
+		CMap::Map.generate_missing_terrain(QRect(map_start_pos, map_end - QPoint(1, 1)), z);
 	}
-	
-	if (!this->IsSubtemplateArea() && generated_random_terrain) {
+
+	ShowLoadProgress(_("Generating \"%s\" Map Template Random Terrain"), this->get_name().c_str());
+	for (const auto &generated_terrain : this->generated_terrains) {
+		CMap::Map.GenerateTerrain(generated_terrain, map_start_pos, map_end - Vec2i(1, 1), has_base_map, z);
+	}
+
+	if (!this->IsSubtemplateArea()) {
 		ShowLoadProgress(_("Readjusting \"%s\" Map Template Terrain"), this->get_name().c_str());
 		CMap::Map.AdjustTileMapIrregularities(false, map_start_pos, map_end, z);
 		CMap::Map.AdjustTileMapIrregularities(true, map_start_pos, map_end, z);
@@ -987,7 +972,13 @@ void map_template::apply(const QPoint &template_start_pos, const QPoint &map_sta
 		CMap::Map.AdjustTileMapIrregularities(false, map_start_pos, map_end, z);
 		CMap::Map.AdjustTileMapIrregularities(true, map_start_pos, map_end, z);
 	}
-	
+
+	if (!this->get_subtemplates().empty()) {
+		ShowLoadProgress(_("Applying \"%s\" Constructed Subtemplates"), this->get_name().c_str());
+		this->apply_subtemplates(template_start_pos, map_start_pos, map_end, z, false, true);
+		this->apply_subtemplates(template_start_pos, map_start_pos, map_end, z, true, true);
+	}
+
 	ShowLoadProgress(_("Generating \"%s\" Map Template Random Units"), this->get_name().c_str());
 
 	// now, generate the units and heroes that were set to be generated at a random position (by having their position set to {-1, -1})

@@ -2528,13 +2528,23 @@ void CMap::AdjustTileMapTransitions(const Vec2i &min_pos, const Vec2i &max_pos, 
 		for (int y = min_pos.y; y < max_pos.y; ++y) {
 			wyrmgus::tile &mf = *this->Field(x, y, z);
 
+			if (mf.get_terrain() == nullptr) {
+				continue;
+			}
+
 			for (int sub_x = -1; sub_x <= 1; ++sub_x) {
 				for (int sub_y = -1; sub_y <= 1; ++sub_y) {
 					if ((x + sub_x) < min_pos.x || (x + sub_x) >= max_pos.x || (y + sub_y) < min_pos.y || (y + sub_y) >= max_pos.y || (sub_x == 0 && sub_y == 0)) {
 						continue;
 					}
+
 					const wyrmgus::terrain_type *tile_terrain = GetTileTerrain(Vec2i(x + sub_x, y + sub_y), false, z);
 					const wyrmgus::terrain_type *tile_top_terrain = GetTileTopTerrain(Vec2i(x + sub_x, y + sub_y), false, z);
+
+					if (tile_terrain == nullptr) {
+						continue;
+					}
+
 					if (
 						mf.get_terrain() != tile_terrain
 						&& tile_top_terrain->is_overlay()
@@ -2553,12 +2563,22 @@ void CMap::AdjustTileMapTransitions(const Vec2i &min_pos, const Vec2i &max_pos, 
 		for (int y = min_pos.y; y < max_pos.y; ++y) {
 			wyrmgus::tile &mf = *this->Field(x, y, z);
 
+			if (mf.get_terrain() == nullptr) {
+				continue;
+			}
+
 			for (int sub_x = -1; sub_x <= 1; ++sub_x) {
 				for (int sub_y = -1; sub_y <= 1; ++sub_y) {
 					if ((x + sub_x) < min_pos.x || (x + sub_x) >= max_pos.x || (y + sub_y) < min_pos.y || (y + sub_y) >= max_pos.y || (sub_x == 0 && sub_y == 0)) {
 						continue;
 					}
+
 					const wyrmgus::terrain_type *tile_terrain = GetTileTerrain(Vec2i(x + sub_x, y + sub_y), false, z);
+
+					if (tile_terrain == nullptr) {
+						continue;
+					}
+
 					if (mf.get_terrain() != tile_terrain && !wyrmgus::vector::contains(mf.get_terrain()->BorderTerrains, tile_terrain)) {
 						for (wyrmgus::terrain_type *border_terrain : mf.get_terrain()->BorderTerrains) {
 							if (wyrmgus::vector::contains(border_terrain->BorderTerrains, mf.get_terrain()) && wyrmgus::vector::contains(border_terrain->BorderTerrains, tile_terrain)) {
