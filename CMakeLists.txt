@@ -1137,6 +1137,7 @@ set(stratagus_main_SRCS
 
 set(stratagus_test_SRCS
 	test/main.cpp
+	test/util/geocoordinate_test.cpp
 )
 
 # Configuration types
