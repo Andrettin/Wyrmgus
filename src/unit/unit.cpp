@@ -3944,6 +3944,7 @@ void FindNearestDrop(const wyrmgus::unit_type &type, const Vec2i &goalPos, Vec2i
 	int addx = 0;
 	int addy = 0;
 	Vec2i pos = goalPos;
+	bool searched_any_tile_inside_map = true;
 
 	if (heading < LookingNE || heading > LookingNW) {
 		goto starts;
@@ -3955,10 +3956,16 @@ void FindNearestDrop(const wyrmgus::unit_type &type, const Vec2i &goalPos, Vec2i
 		goto starte;
 	}
 
-	// FIXME: don't search outside of the map
 	for (;;) {
+		searched_any_tile_inside_map = false;
 startw:
 		for (int i = addy; i--; ++pos.y) {
+			if (CMap::Map.Info.IsPointOnMap(pos, z)) {
+				searched_any_tile_inside_map = true;
+			} else {
+				continue;
+			}
+
 			//Wyrmgus start
 //			if (UnitTypeCanBeAt(type, pos)) {
 			if (
@@ -3973,6 +3980,12 @@ startw:
 		++addx;
 starts:
 		for (int i = addx; i--; ++pos.x) {
+			if (CMap::Map.Info.IsPointOnMap(pos, z)) {
+				searched_any_tile_inside_map = true;
+			} else {
+				continue;
+			}
+
 			//Wyrmgus start
 //			if (UnitTypeCanBeAt(type, pos)) {
 			if (
@@ -3987,6 +4000,12 @@ starts:
 		++addy;
 starte:
 		for (int i = addy; i--; --pos.y) {
+			if (CMap::Map.Info.IsPointOnMap(pos, z)) {
+				searched_any_tile_inside_map = true;
+			} else {
+				continue;
+			}
+
 			//Wyrmgus start
 //			if (UnitTypeCanBeAt(type, pos)) {
 			if (
@@ -4001,6 +4020,12 @@ starte:
 		++addx;
 startn:
 		for (int i = addx; i--; --pos.x) {
+			if (CMap::Map.Info.IsPointOnMap(pos, z)) {
+				searched_any_tile_inside_map = true;
+			} else {
+				continue;
+			}
+
 			//Wyrmgus start
 //			if (UnitTypeCanBeAt(type, pos)) {
 			if (
@@ -4013,6 +4038,11 @@ startn:
 			}
 		}
 		++addy;
+
+		if (!searched_any_tile_inside_map) {
+			//we are already fully searching outside the map, so there's no hope of finding a valid position for the unit anymore
+			throw std::runtime_error("Failed to find position for unit of type \"" + type.get_identifier() + "\" in FindNearestDrop().");
+		}
 	}
 
 found:
