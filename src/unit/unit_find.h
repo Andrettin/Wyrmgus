@@ -36,6 +36,7 @@
 #include "unit/unit.h"
 #include "unit/unit_cache.h"
 #include "unit/unit_type.h"
+#include "util/fractional_int.h"
 
 class CPlayer;
 class CUnit;
@@ -345,29 +346,26 @@ inline void SelectFixed(const Vec2i &ltPos, const Vec2i &rbPos, std::vector<CUni
 	Assert(CMap::Map.Info.IsPointOnMap(rbPos, z));
 	Assert(units.empty());
 	
-	//Wyrmgus start
-	double middle_x = 0;
-	double middle_y = 0;
-	double radius = 0;
+	wyrmgus::decimillesimal_int middle_x;
+	wyrmgus::decimillesimal_int middle_y;
+	wyrmgus::decimillesimal_int radius;
+
 	if constexpr (circle) {
-		middle_x = (rbPos.x + ltPos.x) / 2;
-		middle_y = (rbPos.y + ltPos.y) / 2;
+		middle_x = wyrmgus::decimillesimal_int(rbPos.x + ltPos.x) / 2;
+		middle_y = wyrmgus::decimillesimal_int(rbPos.y + ltPos.y) / 2;
 		radius = ((middle_x - ltPos.x) + (middle_y - ltPos.y)) / 2;
 	}
-	//Wyrmgus end
 
 	for (Vec2i posIt = ltPos; posIt.y != rbPos.y + 1; ++posIt.y) {
 		for (posIt.x = ltPos.x; posIt.x != rbPos.x + 1; ++posIt.x) {
-			//Wyrmgus start
 			if constexpr (circle) {
-				const double rel_x = posIt.x - middle_x;
-				const double rel_y = posIt.y - middle_y;
-				const double my = radius * radius - rel_x * rel_x;
+				const wyrmgus::decimillesimal_int rel_x = posIt.x - middle_x;
+				const wyrmgus::decimillesimal_int rel_y = posIt.y - middle_y;
+				const wyrmgus::decimillesimal_int my = radius * radius - rel_x * rel_x;
 				if ((rel_y * rel_y) > my) {
 					continue;
 				}
 			}
-			//Wyrmgus end
 
 			const CUnitCache &cache = CMap::Map.get_tile_unit_cache(posIt, z);
 
