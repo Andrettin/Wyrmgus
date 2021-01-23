@@ -2438,10 +2438,10 @@ QPoint map_template::generate_subtemplate_position(map_template *subtemplate, co
 		}
 
 		if (on_usable_area) {
-			//there must be no units in the position where the subtemplate would be applied, and on bordering tiles
+			//there must be no units in the position where the subtemplate would be applied, and nearby tiles
 			std::vector<CUnit *> table;
 			const bool select_circle = subtemplate->is_circle();
-			Select(subtemplate_pos - QPoint(1, 1), subtemplate_pos + size::to_point(subtemplate->get_applied_size()), table, z, select_circle);
+			Select(subtemplate_pos - subtemplate->get_min_adjacent_template_distance(), subtemplate_pos + size::to_point(subtemplate->get_applied_size()) - QPoint(1, 1) + subtemplate->get_min_adjacent_template_distance(), table, z, select_circle);
 			if (!table.empty()) {
 				on_usable_area = false;
 			}
