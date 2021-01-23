@@ -75,6 +75,11 @@ public:
 
 	int generate_in_range(const int min_value, const int max_value);
 
+	QPoint generate_circle_point()
+	{
+		return QPoint(this->generate(360) - 180, this->generate(360) - 180);
+	}
+
 	QColor generate_color()
 	{
 		return QColor(this->generate(256), this->generate(256), this->generate(256));
