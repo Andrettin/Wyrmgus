@@ -1363,8 +1363,10 @@ void CPlayer::SetFaction(const wyrmgus::faction *faction)
 
 		this->player_color = player_color;
 
-		//update the territory on the minimap for the new color
-		this->update_minimap_territory();
+		if (Editor.Running == EditorNotRunning) {
+			//update the territory on the minimap for the new color
+			this->update_minimap_territory();
+		}
 
 		if (!this->get_faction()->FactionUpgrade.empty()) {
 			CUpgrade *faction_upgrade = CUpgrade::try_get(this->get_faction()->FactionUpgrade);
