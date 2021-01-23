@@ -1230,6 +1230,10 @@ wyrmgus::faction *CPlayer::get_faction() const
 
 void CPlayer::SetFaction(const wyrmgus::faction *faction)
 {
+	if (faction == this->get_faction()) {
+		return;
+	}
+
 	const int old_faction_id = this->Faction;
 	
 	if (faction != nullptr && faction->get_civilization() != this->get_civilization()) {
