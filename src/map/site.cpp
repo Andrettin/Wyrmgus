@@ -248,7 +248,7 @@ void site::initialize()
 
 	//if a settlement has no color assigned to it, assign a random one instead
 	if (this->is_settlement() && !this->get_color().isValid()) {
-		this->color = QColor(random::get()->generate(256), random::get()->generate(256), random::get()->generate(256));
+		this->color = random::get()->generate_color();
 	}
 
 	for (faction *core_faction : this->get_cores()) {

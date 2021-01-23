@@ -75,6 +75,11 @@ public:
 
 	int generate_in_range(const int min_value, const int max_value);
 
+	QColor generate_color()
+	{
+		return QColor(this->generate(256), this->generate(256), this->generate(256));
+	}
+
 	int generate_async()
 	{
 		return this->async_engine();
