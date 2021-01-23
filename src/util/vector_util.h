@@ -122,6 +122,15 @@ T take_back(std::vector<T> &vector)
 	return vector::take(vector, vector.size() - 1);
 }
 
+template <typename T, typename U>
+void fill(std::vector<T> &vector, const U &value)
+{
+	//set all values in the vector to the desired value
+	for (T &element : vector) {
+		element = value;
+	}
+}
+
 template <typename T, typename function_type>
 void for_each_until(const std::vector<T> &vector, function_type &function)
 {
@@ -141,15 +150,6 @@ void for_each_unless(const std::vector<T> &vector, function_type &function)
 		if (function(element) == false) {
 			break;
 		}
-	}
-}
-
-template <typename T>
-void fill(std::vector<T> &vector, const T &value)
-{
-	//set all values in the vector to the desired value
-	for (T &element : vector) {
-		element = value;
 	}
 }
 

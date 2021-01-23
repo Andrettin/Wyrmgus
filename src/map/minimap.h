@@ -49,7 +49,7 @@ private:
 	void update_territories(const int z);
 
 public:
-	void UpdateXY(const Vec2i &pos, int z);
+	void UpdateXY(const Vec2i &pos, const int z);
 	void UpdateSeenXY(const Vec2i &) {}
 	void update_territory_xy(const QPoint &pos, const int z);
 	void update_territory_pixel(const int mx, const int my, const int z);
@@ -147,12 +147,12 @@ private:
 	std::vector<GLuint> overlay_textures;
 
 	// Minimap surface with terrain only (for OpenGL)
-	std::vector<std::unique_ptr<unsigned char[]>> terrain_texture_data;
+	std::vector<std::vector<unsigned char>> terrain_texture_data;
 
-	std::map<minimap_mode, std::vector<std::unique_ptr<unsigned char[]>>> mode_overlay_texture_data;
+	std::map<minimap_mode, std::vector<std::vector<unsigned char>>> mode_overlay_texture_data;
 
 	//texture data for the overlay with units and unexplored terrain
-	std::vector<std::unique_ptr<unsigned char[]>> overlay_texture_data;
+	std::vector<std::vector<unsigned char>> overlay_texture_data;
 };
 
 }

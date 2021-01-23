@@ -386,11 +386,8 @@ template <bool circle = false, typename Pred>
 inline void SelectAroundUnit(const CUnit &unit, const int range, std::vector<CUnit *> &around, Pred pred)
 {
 	const Vec2i offset(range, range);
-	//Wyrmgus start
-//	const Vec2i typeSize(unit.Type->get_tile_width() - 1, unit.Type->get_tile_height() - 1);
 	const CUnit *firstContainer = unit.GetFirstContainer();
 	const Vec2i typeSize(firstContainer->Type->get_tile_size() - QSize(1, 1));
-	//Wyrmgus end
 
 	Select<circle>(unit.tilePos - offset,
 		   unit.tilePos + typeSize + offset, around,
@@ -421,7 +418,7 @@ template <bool circle = false>
 inline void Select(const Vec2i &ltPos, const Vec2i &rbPos, std::vector<CUnit *> &units, const int z)
 {
 	//Wyrmgus start
-//	Select(ltPos, rbPos, units, NoFilter());
+//	Select<circle>(ltPos, rbPos, units, NoFilter());
 	Select<circle>(ltPos, rbPos, units, z, NoFilter());
 	//Wyrmgus end
 }
@@ -439,7 +436,7 @@ template <bool circle = false>
 inline void SelectFixed(const Vec2i &ltPos, const Vec2i &rbPos, std::vector<CUnit *> &units, const int z)
 {
 	//Wyrmgus start
-//	Select(ltPos, rbPos, units, NoFilter());
+//	Select<circle>(ltPos, rbPos, units, NoFilter());
 	Select<circle>(ltPos, rbPos, units, z, NoFilter());
 	//Wyrmgus end
 }

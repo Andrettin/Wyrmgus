@@ -47,6 +47,7 @@
 #include "unit/unit.h"
 #include "unit/unit_manager.h"
 #include "unit/unit_type.h"
+#include "util/vector_util.h"
 #include "video/video.h"
 #include "world.h"
 
@@ -69,10 +70,10 @@ static constexpr int SCALE_PRECISION = 100;
 static std::vector<int> MinimapTextureWidth;
 static std::vector<int> MinimapTextureHeight;
 
-static std::vector<std::unique_ptr<int[]>> Minimap2MapX;                  /// fast conversion table
-static std::vector<std::unique_ptr<int[]>> Minimap2MapY;                  /// fast conversion table
-static std::vector<std::unique_ptr<int[]>> Map2MinimapX;      /// fast conversion table
-static std::vector<std::unique_ptr<int[]>> Map2MinimapY;     /// fast conversion table
+static std::vector<std::vector<int>> Minimap2MapX;                  /// fast conversion table
+static std::vector<std::vector<int>> Minimap2MapY;                  /// fast conversion table
+static std::vector<std::vector<int>> Map2MinimapX;      /// fast conversion table
+static std::vector<std::vector<int>> Map2MinimapY;     /// fast conversion table
 
 // MinimapScale:
 // 32x32 64x64 96x96 128x128 256x256 512x512 ...
@@ -97,8 +98,8 @@ minimap::minimap() : mode(minimap_mode::terrain)
 
 void minimap::create_textures(const int z)
 {
-	this->create_texture(this->terrain_textures[z], this->terrain_texture_data[z].get(), z);
-	this->create_texture(this->overlay_textures[z], this->overlay_texture_data[z].get(), z);
+	this->create_texture(this->terrain_textures[z], this->terrain_texture_data[z].data(), z);
+	this->create_texture(this->overlay_textures[z], this->overlay_texture_data[z].data(), z);
 }
 
 void minimap::create_texture(GLuint &texture, const unsigned char *texture_data, const int z)
@@ -147,20 +148,16 @@ void minimap::Create()
 		//
 		// Calculate minimap fast lookup tables.
 		//
-		Minimap2MapX.push_back(std::make_unique<int[]>(texture_width * texture_height));
-		memset(Minimap2MapX[z].get(), 0, texture_width * texture_height * sizeof(int));
-		Minimap2MapY.push_back(std::make_unique<int[]>(texture_width * texture_height));
-		memset(Minimap2MapY[z].get(), 0, texture_width * texture_height * sizeof(int));
+		Minimap2MapX.push_back(std::vector<int>(texture_width * texture_height, 0));
+		Minimap2MapY.push_back(std::vector<int>(texture_width * texture_height, 0));
 		for (int i = XOffset[z]; i < texture_width - XOffset[z]; ++i) {
 			Minimap2MapX[z][i] = ((i - XOffset[z]) * MINIMAP_FAC) / MinimapScaleX[z];
 		}
 		for (int i = YOffset[z]; i < texture_height - YOffset[z]; ++i) {
 			Minimap2MapY[z][i] = (((i - YOffset[z]) * MINIMAP_FAC) / MinimapScaleY[z]) * CMap::Map.Info.MapWidths[z];
 		}
-		Map2MinimapX.push_back(std::make_unique<int[]>(CMap::Map.Info.MapWidths[z]));
-		memset(Map2MinimapX[z].get(), 0, CMap::Map.Info.MapWidths[z] * sizeof(int));
-		Map2MinimapY.push_back(std::make_unique<int[]>(CMap::Map.Info.MapHeights[z]));
-		memset(Map2MinimapY[z].get(), 0, CMap::Map.Info.MapHeights[z] * sizeof(int));
+		Map2MinimapX.push_back(std::vector<int>(CMap::Map.Info.MapWidths[z], 0));
+		Map2MinimapY.push_back(std::vector<int>(CMap::Map.Info.MapHeights[z], 0));
 		for (int i = 0; i < CMap::Map.Info.MapWidths[z]; ++i) {
 			Map2MinimapX[z][i] = (i * MinimapScaleX[z]) / MINIMAP_FAC;
 		}
@@ -174,19 +171,16 @@ void minimap::Create()
 		for (MinimapTextureHeight[z] = 1; MinimapTextureHeight[z] < texture_height; MinimapTextureHeight[z] <<= 1) {
 		}
 
-		this->terrain_texture_data.push_back(std::make_unique<unsigned char[]>(MinimapTextureWidth[z] * MinimapTextureHeight[z] * 4));
-		memset(this->terrain_texture_data[z].get(), 0, MinimapTextureWidth[z] * MinimapTextureHeight[z] * 4);
+		this->terrain_texture_data.push_back(std::vector<unsigned char>(MinimapTextureWidth[z] * MinimapTextureHeight[z] * 4, 0));
 
 		for (int i = 0; i < static_cast<int>(minimap_mode::count); ++i) {
 			const minimap_mode mode = static_cast<minimap_mode>(i);
 			if (minimap_mode_has_overlay(mode)) {
-				this->mode_overlay_texture_data[mode].push_back(std::make_unique<unsigned char[]>(MinimapTextureWidth[z] * MinimapTextureHeight[z] * 4));
-				memset(this->mode_overlay_texture_data[mode][z].get(), 0, MinimapTextureWidth[z] * MinimapTextureHeight[z] * 4);
+				this->mode_overlay_texture_data[mode].push_back(std::vector<unsigned char>(MinimapTextureWidth[z] * MinimapTextureHeight[z] * 4, 0));
 			}
 		}
 
-		this->overlay_texture_data.push_back(std::make_unique<unsigned char[]>(MinimapTextureWidth[z] * MinimapTextureHeight[z] * 4));
-		memset(this->overlay_texture_data[z].get(), 0, MinimapTextureWidth[z] * MinimapTextureHeight[z] * 4);
+		this->overlay_texture_data.push_back(std::vector<unsigned char>(MinimapTextureWidth[z] * MinimapTextureHeight[z] * 4, 0));
 
 		this->create_textures(z);
 
@@ -274,9 +268,9 @@ void minimap::update_territories(const int z)
 **	@param	pos	The map position to update in the minimap
 **	@param	z	The map layer of the tile to update
 */
-void minimap::UpdateXY(const Vec2i &pos, int z)
+void minimap::UpdateXY(const Vec2i &pos, const int z)
 {
-	if (z >= (int) this->terrain_texture_data.size() || !this->terrain_texture_data[z]) {
+	if (z >= static_cast<int>(this->terrain_texture_data.size())) {
 		return;
 	}
 
@@ -510,11 +504,11 @@ void minimap::Update()
 
 	//clear Minimap background if not transparent
 	if (!Transparent) {
-		memset(this->overlay_texture_data[z].get(), 0, MinimapTextureWidth[z] * MinimapTextureHeight[z] * 4);
+		vector::fill(this->overlay_texture_data[z], 0);
 	}
 
 	if (minimap_mode_has_overlay(this->get_mode())) {
-		memcpy(this->overlay_texture_data[z].get(), this->mode_overlay_texture_data[this->get_mode()][z].get(), MinimapTextureWidth[z] * MinimapTextureHeight[z] * 4);
+		this->overlay_texture_data[z] = this->mode_overlay_texture_data[this->get_mode()][z];
 	}
 
 	const int texture_width = this->get_texture_width(z);
@@ -597,10 +591,10 @@ void minimap::Draw() const
 	const int z = UI.CurrentMapLayer->ID;
 
 	if (this->is_terrain_visible()) {
-		this->draw_texture(this->terrain_textures[z], this->terrain_texture_data[z].get(), z);
+		this->draw_texture(this->terrain_textures[z], this->terrain_texture_data[z].data(), z);
 	}
 
-	this->draw_texture(this->overlay_textures[z], this->overlay_texture_data[z].get(), z);
+	this->draw_texture(this->overlay_textures[z], this->overlay_texture_data[z].data(), z);
 	this->draw_events();
 }
 
@@ -723,9 +717,7 @@ QPoint minimap::tile_to_screen_pos(const QPoint &tile_pos) const
 void minimap::Destroy()
 {
 	for (size_t z = 0; z < this->terrain_texture_data.size(); ++z) {
-		if (this->terrain_texture_data[z] != nullptr) {
-			glDeleteTextures(1, &this->terrain_textures[z]);
-		}
+		glDeleteTextures(1, &this->terrain_textures[z]);
 	}
 	this->terrain_texture_data.clear();
 	this->terrain_textures.clear();
@@ -733,9 +725,7 @@ void minimap::Destroy()
 	this->mode_overlay_texture_data.clear();
 
 	for (size_t z = 0; z < this->overlay_texture_data.size(); ++z) {
-		if (this->overlay_texture_data[z] != nullptr) {
-			glDeleteTextures(1, &this->overlay_textures[z]);
-		}
+		glDeleteTextures(1, &this->overlay_textures[z]);
 	}
 	this->overlay_texture_data.clear();
 	this->overlay_textures.clear();
