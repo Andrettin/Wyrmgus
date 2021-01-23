@@ -427,7 +427,8 @@ void minimap::update_territory_pixel(const int mx, const int my, const int z)
 /**
 **  Draw a unit on the minimap.
 */
-void minimap::DrawUnitOn(const CUnit *unit, const bool red_phase)
+template <bool center_tile_only>
+void minimap::draw_unit_on(const CUnit *unit, const bool red_phase)
 {
 	const int z = UI.CurrentMapLayer->ID;
 	const int texture_width = this->get_texture_width(z);
@@ -467,8 +468,18 @@ void minimap::DrawUnitOn(const CUnit *unit, const bool red_phase)
 		color = CVideo::MapRGB(unit->Player->get_minimap_color());
 	}
 
-	int mx = 1 + this->XOffset[z] + Map2MinimapX[z][unit->tilePos.x];
-	int my = 1 + this->YOffset[z] + Map2MinimapY[z][unit->tilePos.y];
+	if constexpr (center_tile_only) {
+		const QPoint center_pos = unit->get_center_tile_pos();
+		const int x = 1 + this->XOffset[z] + Map2MinimapX[z][center_pos.x()];
+		const int y = 1 + this->YOffset[z] + Map2MinimapY[z][center_pos.y()];
+
+		*(uint32_t *) &(this->overlay_texture_data[z][(x + y * MinimapTextureWidth[z]) * 4]) = color;
+
+		return;
+	}
+
+	const int mx = 1 + this->XOffset[z] + Map2MinimapX[z][unit->tilePos.x];
+	const int my = 1 + this->YOffset[z] + Map2MinimapY[z][unit->tilePos.y];
 	int w = Map2MinimapX[z][type->get_tile_width()];
 
 	if (mx + w >= texture_width) { // clip right side
@@ -554,7 +565,18 @@ void minimap::Update()
 		//draw units on the map
 		for (const CUnit *unit : unit_manager::get()->get_units()) {
 			if (unit->IsVisibleOnMinimap()) {
-				this->DrawUnitOn(unit, red_phase);
+				this->draw_unit_on<false>(unit, red_phase);
+			}
+		}
+	} else if (this->get_mode() == minimap_mode::terrain_only) {
+		//when drawing only terrain, draw celestial body units on their center tile
+		for (const CUnit *unit : unit_manager::get()->get_units()) {
+			if (!unit->Type->BoolFlag[CELESTIAL_BODY_INDEX].value) {
+				continue;
+			}
+
+			if (unit->IsVisibleOnMinimap()) {
+				this->draw_unit_on<true>(unit, red_phase);
 			}
 		}
 	}
