@@ -742,7 +742,7 @@ void RecalculateShownUnits()
 static void DrawPlayers()
 {
 	const int scale_factor = wyrmgus::defines::get()->get_scale_factor();
-	char buf[256];
+	std::array<char, 256> buf{};
 	CLabel label(wyrmgus::defines::get()->get_small_font());
 
 	//Wyrmgus start
@@ -777,9 +777,9 @@ static void DrawPlayers()
 		}
 		//Wyrmgus start
 //		sprintf(buf, "%d", i);
-		sprintf(buf, "%d", (i == PlayerNumNeutral) ? 16 : i + 1);
+		sprintf(buf.data(), "%d", (i == PlayerNumNeutral) ? 16 : i + 1);
 		//Wyrmgus end
-		label.DrawCentered(x + i % 8 * rectangle_size + 10 * scale_factor, y + 7 * scale_factor, buf);
+		label.DrawCentered(x + i % 8 * rectangle_size + 10 * scale_factor, y + 7 * scale_factor, buf.data());
 	}
 
 	//Wyrmgus start
@@ -789,33 +789,33 @@ static void DrawPlayers()
 	y += (18 * 1 + 4) * scale_factor;
 	if (Editor.SelectedPlayer != -1) {
 		//Wyrmgus start
-//		snprintf(buf, sizeof(buf), "Plyr %d %s ", Editor.SelectedPlayer,
+//		snprintf(buf.data(), buf.size(), "Plyr %d %s ", Editor.SelectedPlayer,
 //				 PlayerRaces.Name[Players[Editor.SelectedPlayer].Race].c_str());
 		std::string civ_str = wyrmgus::civilization::get_all()[CPlayer::Players[Editor.SelectedPlayer]->Race]->get_identifier().c_str();
 		civ_str[0] = toupper(civ_str[0]);
-		snprintf(buf, sizeof(buf), "Player %d %s ", (Editor.SelectedPlayer == PlayerNumNeutral) ? 16 : Editor.SelectedPlayer + 1, civ_str.c_str());
+		snprintf(buf.data(), buf.size(), "Player %d %s ", (Editor.SelectedPlayer == PlayerNumNeutral) ? 16 : Editor.SelectedPlayer + 1, civ_str.c_str());
 		//Wyrmgus end
 		// Players[SelectedPlayer].RaceName);
 
 		switch (CMap::Map.Info.PlayerType[Editor.SelectedPlayer]) {
 			case PlayerNeutral:
-				strcat_s(buf, sizeof(buf), "Neutral");
+				strcat_s(buf.data(), buf.size(), "Neutral");
 				break;
 			case PlayerNobody:
 			default:
-				strcat_s(buf, sizeof(buf), "Nobody");
+				strcat_s(buf.data(), buf.size(), "Nobody");
 				break;
 			case PlayerPerson:
-				strcat_s(buf, sizeof(buf), "Person");
+				strcat_s(buf.data(), buf.size(), "Person");
 				break;
 			case PlayerComputer:
 			case PlayerRescuePassive:
 			case PlayerRescueActive:
-				strcat_s(buf, sizeof(buf), "Computer");
+				strcat_s(buf.data(), buf.size(), "Computer");
 				break;
 		}
 		label.SetFont(wyrmgus::defines::get()->get_game_font());
-		label.Draw(x, y, buf);
+		label.Draw(x, y, buf.data());
 	}
 }
 
@@ -1582,9 +1582,9 @@ static void EditorCallbackButtonUp(unsigned button)
 					Editor.SelectedUnitIndex = -1;
 					Editor.CursorUnitIndex = -1;
 					CursorBuilding = nullptr;
-					char buf[256];
-					snprintf(buf, sizeof(buf), "if (EditorCreateUnitType() ~= nil) then EditorCreateUnitType() end;");
-					CclCommand(buf);
+					std::array<char, 256> buf{};
+					snprintf(buf.data(), buf.size(), "if (EditorCreateUnitType() ~= nil) then EditorCreateUnitType() end;");
+					CclCommand(buf.data());
 					return;
 				}
 			}
@@ -1704,10 +1704,10 @@ static void EditorCallbackButtonDown(unsigned button)
 					CursorBuilding = Editor.ShownUnitTypes[Editor.CursorUnitIndex];
 					return;
 				} else if (MouseButtons & RightButton) {
-					char buf[256];
-					snprintf(buf, sizeof(buf), "if (EditUnitTypeProperties ~= nil) then EditUnitTypeProperties(\"%s\") end;", Editor.ShownUnitTypes[Editor.CursorUnitIndex]->Ident.c_str());
+					std::array<char, 256> buf{};
+					snprintf(buf.data(), buf.size(), "if (EditUnitTypeProperties ~= nil) then EditUnitTypeProperties(\"%s\") end;", Editor.ShownUnitTypes[Editor.CursorUnitIndex]->Ident.c_str());
 					Editor.CursorUnitIndex = -1;
-					CclCommand(buf);
+					CclCommand(buf.data());
 					return;
 				}
 			}
@@ -2002,12 +2002,12 @@ static bool EditorCallbackMouse_EditUnitArea(const PixelPos &screenPos)
 		}
 		if (bx < screenPos.x && screenPos.x < bx + 20 * scale_factor && by < screenPos.y && screenPos.y < by + 20 * scale_factor) {
 			if (CMap::Map.Info.PlayerType[i] != PlayerNobody) {
-				char buf[256];
+				std::array<char, 256> buf{};
 				//Wyrmgus start
-//				snprintf(buf, sizeof(buf), _("Select Player #%d"), i);
-				snprintf(buf, sizeof(buf), _("Select Player #%d"), (i == PlayerNumNeutral) ? 16 : i + 1);
+//				snprintf(buf.data(), buf.size(), _("Select Player #%d"), i);
+				snprintf(buf.data(), buf.size(), _("Select Player #%d"), (i == PlayerNumNeutral) ? 16 : i + 1);
 				//Wyrmgus end
-				UI.StatusLine.Set(buf);
+				UI.StatusLine.Set(buf.data());
 			} else {
 				UI.StatusLine.Clear();
 			}
@@ -2128,8 +2128,8 @@ static bool EditorCallbackMouse_EditTileArea(const PixelPos &screenPos)
 */
 static void EditorCallbackMouse(const PixelPos &pos)
 {
-	static int LastMapX;
-	static int LastMapY;
+	static int LastMapX = 0;
+	static int LastMapY = 0;
 
 	const int scale_factor = wyrmgus::defines::get()->get_scale_factor();
 

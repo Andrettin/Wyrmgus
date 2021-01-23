@@ -894,11 +894,11 @@ void CPlayer::Init(/* PlayerTypes */ int type)
 	}
 
 	if (NumPlayers == PlayerMax) {
-		static int already_warned;
+		static bool already_warned = false;
 
 		if (!already_warned) {
 			DebugPrint("Too many players\n");
-			already_warned = 1;
+			already_warned = true;
 		}
 		return;
 	}
@@ -3869,7 +3869,7 @@ void SetPlayersPalette()
 void CPlayer::Notify(int type, const Vec2i &pos, int z, const char *fmt, ...) const
 {
 	Assert(CMap::Map.Info.IsPointOnMap(pos, z));
-	char temp[128];
+	std::array<char, 128> temp{};
 	uint32_t color;
 	va_list va;
 
@@ -3879,8 +3879,8 @@ void CPlayer::Notify(int type, const Vec2i &pos, int z, const char *fmt, ...) co
 	}
 
 	va_start(va, fmt);
-	temp[sizeof(temp) - 1] = '\0';
-	vsnprintf(temp, sizeof(temp) - 1, fmt, va);
+	temp[temp.size() - 1] = '\0';
+	vsnprintf(temp.data(), temp.size() - 1, fmt, va);
 	va_end(va);
 	switch (type) {
 		case NotifyRed:
@@ -3899,13 +3899,13 @@ void CPlayer::Notify(int type, const Vec2i &pos, int z, const char *fmt, ...) co
 
 	if (this == CPlayer::GetThisPlayer()) {
 		//Wyrmgus start
-//		SetMessageEvent(pos, "%s", temp);
-		SetMessageEvent(pos, z, "%s", temp);
+//		SetMessageEvent(pos, "%s", temp.data());
+		SetMessageEvent(pos, z, "%s", temp.data());
 		//Wyrmgus end
 	} else {
 		//Wyrmgus start
-//		SetMessageEvent(pos, "(%s): %s", Name.c_str(), temp);
-		SetMessageEvent(pos, z, "(%s): %s", Name.c_str(), temp);
+//		SetMessageEvent(pos, "(%s): %s", Name.c_str(), temp.data());
+		SetMessageEvent(pos, z, "(%s): %s", Name.c_str(), temp.data());
 		//Wyrmgus end
 	}
 }
@@ -3926,17 +3926,17 @@ void CPlayer::Notify(const char *fmt, ...) const
 	if (this != CPlayer::GetThisPlayer() && !IsTeamed(*CPlayer::GetThisPlayer())) {
 		return;
 	}
-	char temp[128];
+	std::array<char, 128> temp{};
 	va_list va;
 
 	va_start(va, fmt);
-	temp[sizeof(temp) - 1] = '\0';
-	vsnprintf(temp, sizeof(temp) - 1, fmt, va);
+	temp[temp.size() - 1] = '\0';
+	vsnprintf(temp.data(), temp.size() - 1, fmt, va);
 	va_end(va);
 	if (this == CPlayer::GetThisPlayer()) {
-		SetMessage("%s", temp);
+		SetMessage("%s", temp.data());
 	} else {
-		SetMessage("(%s): %s", Name.c_str(), temp);
+		SetMessage("(%s): %s", Name.c_str(), temp.data());
 	}
 }
 
