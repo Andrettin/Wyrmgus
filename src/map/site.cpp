@@ -302,6 +302,10 @@ void site::check() const
 	if (!this->get_astrocoordinate().is_null() && this->get_astrodistance() == 0) {
 		throw std::runtime_error("Site \"" + this->get_identifier() + "\" has an astrocoordinate, but its astrodistance is zero.");
 	}
+
+	if (this->orbit_center != nullptr && this->get_map_template() != nullptr) {
+		throw std::runtime_error("Site \"" + this->get_identifier() + "\" has an orbit center and is assigned to a map template. It should not be assigned to a map template if it is a satellite, as it will be applied in its orbit center's map template.");
+	}
 }
 
 data_entry_history *site::get_history_base()
