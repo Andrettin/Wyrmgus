@@ -61,7 +61,6 @@ public:
 		return number_type(lat_size) / size.height();
 	}
 
-
 	static constexpr int unsigned_longitude_to_x(const number_type &unsigned_longitude, const number_type &lon_per_pixel)
 	{
 		const number_type x = unsigned_longitude / lon_per_pixel;

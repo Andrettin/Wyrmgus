@@ -497,7 +497,7 @@ static void HandleBuffsEachSecond(CUnit &unit)
 	//Wyrmgus start
 	if (unit.Variable[TERROR_INDEX].Value > 0) { // if unit is terrified, flee at the sight of enemies
 		std::vector<CUnit *> table;
-		SelectAroundUnit(unit, unit.CurrentSightRange, table, IsAggresiveUnit(), true);
+		SelectAroundUnit<true>(unit, unit.CurrentSightRange, table, IsAggresiveUnit());
 		for (size_t i = 0; i != table.size(); ++i) {
 			if (unit.IsEnemy(*table[i])) {
 				HitUnit_RunAway(unit, *table[i]);

@@ -1799,13 +1799,13 @@ void CUnit::ApplyAura(int aura_index)
 	//apply aura to all appropriate nearby units
 	int aura_range = AuraRange - (this->Type->get_tile_width() - 1);
 	std::vector<CUnit *> table;
-	SelectAroundUnit(*this, aura_range, table, MakeOrPredicate(HasSamePlayerAs(*this->Player), IsAlliedWith(*this->Player)), true);
+	SelectAroundUnit<true>(*this, aura_range, table, MakeOrPredicate(HasSamePlayerAs(*this->Player), IsAlliedWith(*this->Player)));
 	for (size_t i = 0; i != table.size(); ++i) {
 		table[i]->ApplyAuraEffect(aura_index);
 	}
 	
 	table.clear();
-	SelectAroundUnit(*this, aura_range, table, MakeOrPredicate(MakeOrPredicate(HasSamePlayerAs(*this->Player), IsAlliedWith(*this->Player)), HasSamePlayerAs(*CPlayer::Players[PlayerNumNeutral])), true);
+	SelectAroundUnit<true>(*this, aura_range, table, MakeOrPredicate(MakeOrPredicate(HasSamePlayerAs(*this->Player), IsAlliedWith(*this->Player)), HasSamePlayerAs(*CPlayer::Players[PlayerNumNeutral])));
 	for (size_t i = 0; i != table.size(); ++i) {
 		if (table[i]->UnitInside) {
 			CUnit *uins = table[i]->UnitInside;

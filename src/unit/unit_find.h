@@ -281,7 +281,7 @@ OrPredicate<Pred1, Pred2> MakeOrPredicate(Pred1 pred1, Pred2 pred2) { return OrP
 //Wyrmgus end
 
 //unit_find
-class CUnitTypeFinder
+class CUnitTypeFinder final
 {
 public:
 	explicit CUnitTypeFinder(const UnitTypeType t) : unitTypeType(t)
@@ -313,28 +313,32 @@ private:
 	const UnitTypeType unitTypeType;
 };
 
-
-class UnitFinder
+class UnitFinder final
 {
 public:
-	UnitFinder(const CPlayer &player, const std::vector<CUnit *> &units, int maxDist, int movemask, CUnit **unitP, int z) :
-		player(player), units(units), maxDist(maxDist), movemask(movemask), unitP(unitP), z(z) {}
+	explicit UnitFinder(const CPlayer &player, const std::vector<CUnit *> &units, const int maxDist, const int movemask, CUnit **unitP, const int z)
+		: player(player), units(units), maxDist(maxDist), movemask(movemask), unitP(unitP), z(z) 
+	{
+	}
+
 	VisitResult Visit(TerrainTraversal &terrainTraversal, const Vec2i &pos, const Vec2i &from);
+
 private:
 	CUnit *FindUnitAtPos(const Vec2i &pos) const;
+
 private:
 	const CPlayer &player;
 	const std::vector<CUnit *> &units;
-	int maxDist;
-	int movemask;
-	CUnit **unitP;
-	int z;
+	int maxDist = 0;
+	int movemask = 0;
+	CUnit **unitP = nullptr;
+	int z = 0;
 };
 
-template <typename Pred>
+template <bool circle, typename Pred>
 //Wyrmgus start
-//void SelectFixed(const Vec2i &ltPos, const Vec2i &rbPos, std::vector<CUnit *> &units, Pred pred)
-void SelectFixed(const Vec2i &ltPos, const Vec2i &rbPos, std::vector<CUnit *> &units, int z, Pred pred, bool circle = false)
+//inline void SelectFixed(const Vec2i &ltPos, const Vec2i &rbPos, std::vector<CUnit *> &units, Pred pred)
+inline void SelectFixed(const Vec2i &ltPos, const Vec2i &rbPos, std::vector<CUnit *> &units, const int z, Pred pred)
 //Wyrmgus end
 {
 	Assert(CMap::Map.Info.IsPointOnMap(ltPos, z));
@@ -345,7 +349,7 @@ void SelectFixed(const Vec2i &ltPos, const Vec2i &rbPos, std::vector<CUnit *> &u
 	double middle_x = 0;
 	double middle_y = 0;
 	double radius = 0;
-	if (circle) {
+	if constexpr (circle) {
 		middle_x = (rbPos.x + ltPos.x) / 2;
 		middle_y = (rbPos.y + ltPos.y) / 2;
 		radius = ((middle_x - ltPos.x) + (middle_y - ltPos.y)) / 2;
@@ -355,7 +359,7 @@ void SelectFixed(const Vec2i &ltPos, const Vec2i &rbPos, std::vector<CUnit *> &u
 	for (Vec2i posIt = ltPos; posIt.y != rbPos.y + 1; ++posIt.y) {
 		for (posIt.x = ltPos.x; posIt.x != rbPos.x + 1; ++posIt.x) {
 			//Wyrmgus start
-			if (circle) {
+			if constexpr (circle) {
 				const double rel_x = posIt.x - middle_x;
 				const double rel_y = posIt.y - middle_y;
 				const double my = radius * radius - rel_x * rel_x;
@@ -380,11 +384,8 @@ void SelectFixed(const Vec2i &ltPos, const Vec2i &rbPos, std::vector<CUnit *> &u
 	}
 }
 
-template <typename Pred>
-//Wyrmgus start
-//void SelectAroundUnit(const CUnit &unit, int range, std::vector<CUnit *> &around, Pred pred)
-void SelectAroundUnit(const CUnit &unit, int range, std::vector<CUnit *> &around, Pred pred, bool circle = false)
-//Wyrmgus end
+template <bool circle = false, typename Pred>
+inline void SelectAroundUnit(const CUnit &unit, const int range, std::vector<CUnit *> &around, Pred pred)
 {
 	const Vec2i offset(range, range);
 	//Wyrmgus start
@@ -393,19 +394,18 @@ void SelectAroundUnit(const CUnit &unit, int range, std::vector<CUnit *> &around
 	const Vec2i typeSize(firstContainer->Type->get_tile_size() - QSize(1, 1));
 	//Wyrmgus end
 
-	Select(unit.tilePos - offset,
+	Select<circle>(unit.tilePos - offset,
 		   unit.tilePos + typeSize + offset, around,
 		   //Wyrmgus start
 		   unit.MapLayer->ID,
-//		   MakeAndPredicate(IsNotTheSameUnitAs(unit), pred));
-		   MakeAndPredicate(IsNotTheSameUnitAs(unit), pred), circle);
 		   //Wyrmgus end
+		   MakeAndPredicate(IsNotTheSameUnitAs(unit), pred));
 }
 
-template <typename Pred>
+template <bool circle = false, typename Pred>
 //Wyrmgus start
-//void Select(const Vec2i &ltPos, const Vec2i &rbPos, std::vector<CUnit *> &units, Pred pred)
-void Select(const Vec2i &ltPos, const Vec2i &rbPos, std::vector<CUnit *> &units, int z, Pred pred, bool circle = false)
+//inline void Select(const Vec2i &ltPos, const Vec2i &rbPos, std::vector<CUnit *> &units, Pred pred)
+inline void Select(const Vec2i &ltPos, const Vec2i &rbPos, std::vector<CUnit *> &units, const int z, Pred pred)
 //Wyrmgus end
 {
 	Vec2i minPos = ltPos;
@@ -415,29 +415,41 @@ void Select(const Vec2i &ltPos, const Vec2i &rbPos, std::vector<CUnit *> &units,
 //	CMap::Map.FixSelectionArea(minPos, maxPos);
 //	SelectFixed(minPos, maxPos, units, pred);
 	CMap::Map.FixSelectionArea(minPos, maxPos, z);
-	SelectFixed(minPos, maxPos, units, z, pred, circle);
+	SelectFixed<circle>(minPos, maxPos, units, z, pred);
 	//Wyrmgus end
 }
 
-inline void Select(const Vec2i &ltPos, const Vec2i &rbPos, std::vector<CUnit *> &units, int z, bool circle = false)
+template <bool circle = false>
+inline void Select(const Vec2i &ltPos, const Vec2i &rbPos, std::vector<CUnit *> &units, const int z)
 {
 	//Wyrmgus start
 //	Select(ltPos, rbPos, units, NoFilter());
-	Select(ltPos, rbPos, units, z, NoFilter(), circle);
+	Select<circle>(ltPos, rbPos, units, z, NoFilter());
 	//Wyrmgus end
 }
 
-inline void SelectFixed(const Vec2i &ltPos, const Vec2i &rbPos, std::vector<CUnit *> &units, int z, bool circle = false)
+inline void Select(const Vec2i &ltPos, const Vec2i &rbPos, std::vector<CUnit *> &units, const int z, const bool circle)
+{
+	if (circle) {
+		Select<true>(ltPos, rbPos, units, z, NoFilter());
+	} else {
+		Select<false>(ltPos, rbPos, units, z, NoFilter());
+	}
+}
+
+template <bool circle = false>
+inline void SelectFixed(const Vec2i &ltPos, const Vec2i &rbPos, std::vector<CUnit *> &units, const int z)
 {
 	//Wyrmgus start
 //	Select(ltPos, rbPos, units, NoFilter());
-	Select(ltPos, rbPos, units, z, NoFilter(), circle);
+	Select<circle>(ltPos, rbPos, units, z, NoFilter());
 	//Wyrmgus end
 }
 
-inline void SelectAroundUnit(const CUnit &unit, int range, std::vector<CUnit *> &around, bool circle = false)
+template <bool circle = false>
+inline void SelectAroundUnit(const CUnit &unit, const int range, std::vector<CUnit *> &around)
 {
-	SelectAroundUnit(unit, range, around, NoFilter(), circle);
+	SelectAroundUnit<circle>(unit, range, around, NoFilter());
 }
 
 template <typename Pred>
@@ -522,8 +534,17 @@ extern bool CheckObstaclesBetweenTiles(const Vec2i &unitPos, const Vec2i &goalPo
 //Wyrmgus start
 //extern CUnit *AttackUnitsInDistance(const CUnit &unit, int range, CUnitFilter pred);
 //extern CUnit *AttackUnitsInDistance(const CUnit &unit, int range);
-extern CUnit *AttackUnitsInDistance(const CUnit &unit, int range, CUnitFilter pred, bool circle = false, bool include_neutral = false);
-extern CUnit *AttackUnitsInDistance(const CUnit &unit, int range, bool circle = false, bool include_neutral = false);
+template <bool circle = false>
+extern CUnit *AttackUnitsInDistance(const CUnit &unit, int range, CUnitFilter pred, bool include_neutral = false);
+
+extern template CUnit *AttackUnitsInDistance<false>(const CUnit &unit, int range, CUnitFilter pred, bool include_neutral);
+extern template CUnit *AttackUnitsInDistance<true>(const CUnit &unit, int range, CUnitFilter pred, bool include_neutral);
+
+template <bool circle>
+extern CUnit *AttackUnitsInDistance(const CUnit &unit, const int range, const bool include_neutral = false);
+
+extern template CUnit *AttackUnitsInDistance<false>(const CUnit &unit, const int range, const bool include_neutral);
+extern template CUnit *AttackUnitsInDistance<true>(const CUnit &unit, const int range, const bool include_neutral);
 //Wyrmgus end
 
 /// Find best enemy in attack range to attack

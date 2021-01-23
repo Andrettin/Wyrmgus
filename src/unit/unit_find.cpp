@@ -514,9 +514,9 @@ private:
 		bool IsMin() const { return assigned == 0 && waiting == 0 && distance == 0; }
 
 	public:
-		unsigned int assigned;
-		unsigned int waiting;
-		unsigned int distance;
+		unsigned int assigned = 0;
+		unsigned int waiting = 0;
+		unsigned int distance = 0;
 	};
 
 private:
@@ -1529,8 +1529,9 @@ bool CheckObstaclesBetweenTiles(const Vec2i &unitPos, const Vec2i &goalPos, unsi
 **  @return       Unit to be attacked.
 */
 //Wyrmgus start
-//CUnit *AttackUnitsInDistance(const CUnit &unit, int range, CUnitFilter pred)
-CUnit *AttackUnitsInDistance(const CUnit &unit, int range, CUnitFilter pred, bool circle, bool include_neutral)
+template <bool circle>
+//CUnit *AttackUnitsInDistance(const CUnit &unit, const int range, CUnitFilter pred)
+CUnit *AttackUnitsInDistance(const CUnit &unit, const int range, CUnitFilter pred, const bool include_neutral)
 //Wyrmgus end
 {
 	// if necessary, take possible damage on allied units into account...
@@ -1546,10 +1547,10 @@ CUnit *AttackUnitsInDistance(const CUnit &unit, int range, CUnitFilter pred, boo
 		// If unit is removed, use containers x and y
 		const CUnit *firstContainer = unit.GetFirstContainer();
 		std::vector<CUnit *> table;
-		SelectAroundUnit(*firstContainer, missile_range, table,
+		SelectAroundUnit<circle>(*firstContainer, missile_range, table,
 			//Wyrmgus start
 //			MakeAndPredicate(HasNotSamePlayerAs(*CPlayer::Players[PlayerNumNeutral]), pred));
-			pred, circle);
+			pred);
 			//Wyrmgus end
 
 		if (table.empty() == false) {
@@ -1564,10 +1565,10 @@ CUnit *AttackUnitsInDistance(const CUnit &unit, int range, CUnitFilter pred, boo
 		const CUnit *firstContainer = unit.GetFirstContainer();
 		std::vector<CUnit *> table;
 
-		SelectAroundUnit(*firstContainer, range, table,
+		SelectAroundUnit<circle>(*firstContainer, range, table,
 			//Wyrmgus start
 //			MakeAndPredicate(HasNotSamePlayerAs(*CPlayer::Players[PlayerNumNeutral]), pred));
-			pred, circle);
+			pred);
 			//Wyrmgus end
 
 		const int n = static_cast<int>(table.size());
@@ -1583,13 +1584,20 @@ CUnit *AttackUnitsInDistance(const CUnit &unit, int range, CUnitFilter pred, boo
 	}
 }
 
-CUnit *AttackUnitsInDistance(const CUnit &unit, int range, bool circle, bool include_neutral)
+template CUnit *AttackUnitsInDistance<false>(const CUnit &unit, int range, CUnitFilter pred, bool include_neutral = false);
+template CUnit *AttackUnitsInDistance<true>(const CUnit &unit, int range, CUnitFilter pred, bool include_neutral = false);
+
+template <bool circle>
+CUnit *AttackUnitsInDistance(const CUnit &unit, const int range, const bool include_neutral)
 {
 	//Wyrmgus start
 //	return AttackUnitsInDistance(unit, range, NoFilter());
-	return AttackUnitsInDistance(unit, range, NoFilter(), circle, include_neutral);
+	return AttackUnitsInDistance<circle>(unit, range, NoFilter(), include_neutral);
 	//Wyrmgus end
 }
+
+template CUnit *AttackUnitsInDistance<false>(const CUnit &unit, const int range, const bool include_neutral);
+template CUnit *AttackUnitsInDistance<true>(const CUnit &unit, const int range, const bool include_neutral);
 
 /**
 **  Attack units in attack range.
@@ -1618,16 +1626,14 @@ CUnit *AttackUnitsInRange(const CUnit &unit)
 */
 //Wyrmgus start
 //CUnit *AttackUnitsInReactRange(const CUnit &unit, CUnitFilter pred)
-CUnit *AttackUnitsInReactRange(const CUnit &unit, CUnitFilter pred, bool include_neutral)
+CUnit *AttackUnitsInReactRange(const CUnit &unit, CUnitFilter pred, const bool include_neutral)
 //Wyrmgus end
 {
-	//Wyrmgus start
-//	Assert(unit.Type->CanAttack);
 	Assert(unit.CanAttack());
-//	const int range = unit.Player->Type == PlayerPerson ? unit.Type->ReactRangePerson : unit.Type->ReactRangeComputer;
-//	return AttackUnitsInDistance(unit, range, pred);
 	const int range = unit.GetReactionRange();
-	return AttackUnitsInDistance(unit, range, pred, true, include_neutral);
+	//Wyrmgus start
+//	return AttackUnitsInDistance<true>(unit, range, pred);
+	return AttackUnitsInDistance<true>(unit, range, pred, include_neutral);
 	//Wyrmgus end
 }
 
