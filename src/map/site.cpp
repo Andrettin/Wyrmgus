@@ -246,6 +246,16 @@ void site::initialize()
 		this->pos = QPoint(this->get_map_template()->get_width() / 2 - 1, this->get_map_template()->get_height() / 2 - 1) + relative_pos;
 	}
 
+	if (!this->satellites.empty()) {
+		std::sort(this->satellites.begin(), this->satellites.end(), [](const site *a, const site *b) {
+			if (a->distance_from_orbit_center == 0 || b->distance_from_orbit_center == 0) {
+				return a->distance_from_orbit_center != 0; //place satellites without a predefined distance from orbit center last
+			}
+
+			return a->distance_from_orbit_center < b->distance_from_orbit_center;
+		});
+	}
+
 	//if a settlement has no color assigned to it, assign a random one instead
 	if (this->is_settlement() && !this->get_color().isValid()) {
 		this->color = random::get()->generate_color();
@@ -328,6 +338,23 @@ bool site::is_settlement() const
 	}
 
 	return this->get_base_unit_type() == settlement_site_unit_type;
+}
+
+void site::set_orbit_center(site *orbit_center)
+{
+	if (orbit_center == this->orbit_center) {
+		return;
+	}
+
+	if (this->orbit_center != nullptr) {
+		vector::remove(this->orbit_center->satellites, this);
+	}
+
+	this->orbit_center = orbit_center;
+
+	if (orbit_center != nullptr) {
+		orbit_center->satellites.push_back(this);
+	}
 }
 
 QVariantList site::get_cores_qvariant_list() const

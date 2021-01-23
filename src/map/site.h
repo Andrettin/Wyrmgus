@@ -69,6 +69,9 @@ class site final : public named_data_entry, public data_type<site>, public CData
 	Q_PROPERTY(int latitude_scale MEMBER latitude_scale)
 	Q_PROPERTY(wyrmgus::geocoordinate astrocoordinate MEMBER astrocoordinate READ get_astrocoordinate)
 	Q_PROPERTY(wyrmgus::centesimal_int astrodistance MEMBER astrodistance READ get_astrodistance)
+	Q_PROPERTY(wyrmgus::site* orbit_center MEMBER orbit_center WRITE set_orbit_center)
+	Q_PROPERTY(int distance_from_orbit_center MEMBER distance_from_orbit_center)
+	Q_PROPERTY(int distance_from_orbit_center_au READ get_distance_from_orbit_center_au WRITE set_distance_from_orbit_center_au)
 	Q_PROPERTY(wyrmgus::unit_type* base_unit_type MEMBER base_unit_type)
 	Q_PROPERTY(wyrmgus::site* connection_destination MEMBER connection_destination)
 	Q_PROPERTY(QVariantList cores READ get_cores_qvariant_list)
@@ -78,6 +81,7 @@ class site final : public named_data_entry, public data_type<site>, public CData
 public:
 	static constexpr const char *class_identifier = "site";
 	static constexpr const char *database_folder = "sites";
+	static constexpr int million_km_per_au = 150;
 
 	static site *get_by_color(const QColor &color)
 	{
@@ -162,6 +166,23 @@ public:
 		return this->astrodistance;
 	}
 
+	void set_orbit_center(site *orbit_center);
+
+	const std::vector<site *> &get_satellites() const
+	{
+		return this->satellites;
+	}
+
+	int get_distance_from_orbit_center_au() const
+	{
+		return this->distance_from_orbit_center / site::million_km_per_au;
+	}
+
+	void set_distance_from_orbit_center_au(const int distance_au)
+	{
+		this->distance_from_orbit_center = distance_au * site::million_km_per_au;
+	}
+
 	const unit_type *get_base_unit_type() const
 	{
 		return this->base_unit_type;
@@ -242,6 +263,9 @@ private:
 	int latitude_scale = 100;
 	wyrmgus::geocoordinate astrocoordinate; //the site's position as an astrocoordinate
 	centesimal_int astrodistance; //the site's distance from its map template's center (in light-years)
+	site *orbit_center = nullptr;
+	int distance_from_orbit_center = 0; //in kilometers
+	std::vector<site *> satellites;
 	unit_type *base_unit_type = nullptr;
 	site *connection_destination = nullptr;
 	std::vector<region *> regions; //regions where this site is located

@@ -1322,6 +1322,35 @@ void map_template::apply_site(const site *site, const QPoint &site_pos, const in
 		}
 	}
 
+	static constexpr int base_orbit_distance_increment = 2;
+
+	if (!site->get_satellites().empty()) {
+		int orbit_distance = 0;
+		if (site->get_base_unit_type() != nullptr) {
+			orbit_distance += site->get_base_unit_type()->get_tile_width() / 2;
+		}
+		orbit_distance += base_orbit_distance_increment;
+
+		for (const wyrmgus::site *satellite : site->get_satellites()) {
+			const QPoint orbit_circle_pos = random::get()->generate_circle_point();
+
+			if (satellite->get_base_unit_type() != nullptr) {
+				orbit_distance += satellite->get_base_unit_type()->get_tile_width() / 2;
+			}
+
+			QPoint orbit_pos = point::get_nearest_circle_edge_point(orbit_circle_pos, orbit_distance);
+
+			this->apply_site(satellite, site_pos + orbit_pos, z);
+
+			if (satellite->get_base_unit_type() != nullptr) {
+				//decrease the half-size and then add the full size, to ensure that the full size has been added for the next satellite (as for odd sizes the half-size faces integer rounding-down)
+				orbit_distance -= satellite->get_base_unit_type()->get_tile_width() / 2;
+				orbit_distance += satellite->get_base_unit_type()->get_tile_width();
+			}
+			orbit_distance += base_orbit_distance_increment;
+		}
+	}
+
 	if (current_campaign == nullptr) {
 		return;
 	}
