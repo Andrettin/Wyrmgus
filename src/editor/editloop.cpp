@@ -1377,15 +1377,17 @@ static void DrawEditorInfo()
 		pos = UI.MouseViewport->ScreenToTilePos(CursorScreenPos);
 	}
 
-	char buf[256];
-	snprintf(buf, sizeof(buf), _("Editor (%d %d)"), pos.x, pos.y);
-	CLabel(wyrmgus::defines::get()->get_game_font()).Draw(UI.StatusLine.TextX + 2, UI.StatusLine.TextY - 12, buf);
+	const int scale_factor = wyrmgus::defines::get()->get_scale_factor();
+
+	std::array<char, 256> buf{};
+	snprintf(buf.data(), buf.size(), _("Editor (%d %d)"), pos.x, pos.y);
+	CLabel(wyrmgus::defines::get()->get_game_font()).Draw(UI.StatusLine.TextX + 2 * scale_factor, UI.StatusLine.TextY - 12 * scale_factor, buf.data());
 	const wyrmgus::tile &mf = *UI.CurrentMapLayer->Field(pos);
 	//
 	// Flags info
 	//
 	const unsigned flag = mf.get_flags();
-	sprintf(buf, "%02X|%04X|%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c",
+	sprintf(buf.data(), "%02X|%04X|%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c",
 			mf.get_value(), flag,
 			flag & MapFieldUnpassable   ? 'u' : '-',
 			flag & MapFieldAirUnpassable   ? 'A' : '-',
@@ -1405,7 +1407,7 @@ static void DrawEditorInfo()
 			flag & MapFieldGravel       ? 'g' : '-',
 			flag & MapFieldBridge       ? 'B' : '-');
 
-	CLabel(wyrmgus::defines::get()->get_game_font()).Draw(UI.StatusLine.TextX + 118, UI.StatusLine.TextY - 12, buf);
+	CLabel(wyrmgus::defines::get()->get_game_font()).Draw(UI.StatusLine.TextX + 118 * scale_factor, UI.StatusLine.TextY - 12 * scale_factor, buf.data());
 
 	//Wyrmgus start
 //	const int index = tileset.findTileIndexByTile(mf.getGraphicTile());
@@ -1417,7 +1419,7 @@ static void DrawEditorInfo()
 	const char *baseTerrainStr = tileset.getTerrainName(baseTerrainIdx).c_str();
 	const int mixTerrainIdx = tileset.tiles[index].tileinfo.MixTerrain;
 	const char *mixTerrainStr = mixTerrainIdx ? tileset.getTerrainName(mixTerrainIdx).c_str() : "";
-	snprintf(buf, sizeof(buf), "%s %s", baseTerrainStr, mixTerrainStr);
+	snprintf(buf.data(), buf.size(), "%s %s", baseTerrainStr, mixTerrainStr);
 	*/
 	std::string terrain_name;
 	if (mf.get_terrain() != nullptr) {
@@ -1427,11 +1429,11 @@ static void DrawEditorInfo()
 			terrain_name = mf.get_terrain()->get_name();
 		}
 	}
-	snprintf(buf, sizeof(buf), "%s", terrain_name.c_str());
+	snprintf(buf.data(), buf.size(), "%s", terrain_name.c_str());
 	//Wyrmgus end
 	//Wyrmgus start
 //	CLabel(wyrmgus::defines::get()->get_game_font()).Draw(UI.StatusLine.TextX + 250, UI.StatusLine.TextY - 16, buf);
-	CLabel(wyrmgus::defines::get()->get_game_font()).Draw(UI.StatusLine.TextX + 298, UI.StatusLine.TextY - 12, buf);
+	CLabel(wyrmgus::defines::get()->get_game_font()).Draw(UI.StatusLine.TextX + 298 * scale_factor, UI.StatusLine.TextY - 12 * scale_factor, buf.data());
 	//Wyrmgus end
 #endif
 }
