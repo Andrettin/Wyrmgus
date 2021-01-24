@@ -405,10 +405,17 @@ void minimap::update_territory_pixel(const int mx, const int my, const int z)
 		const tile *settlement_center_tile = settlement_unit->get_center_tile();
 		const bool is_settlement_water = settlement_center_tile->is_water() && !settlement_center_tile->is_river();
 		const bool is_settlement_space = settlement_center_tile->is_space();
+
+		const QColor settlement_color = settlement->get_color();
+		QColor settlement_with_non_land_color = settlement_color;
+
 		if (is_tile_water == is_settlement_water && is_tile_space == is_settlement_space) {
-			const QColor settlement_color = settlement->get_color();
 			*(uint32_t *) &(this->mode_overlay_texture_data[minimap_mode::settlements][z][pixel_index]) = CVideo::MapRGBA(settlement_color);
+		} else {
+			settlement_with_non_land_color.setAlpha(non_land_territory_alpha);
 		}
+
+		*(uint32_t *) &(this->mode_overlay_texture_data[minimap_mode::settlements_with_non_land][z][pixel_index]) = CVideo::MapRGBA(settlement_with_non_land_color);
 	}
 
 	const uint32_t c = CVideo::MapRGBA(color);
@@ -873,6 +880,7 @@ bool minimap::are_units_visible() const
 		case minimap_mode::realms:
 		case minimap_mode::realms_with_non_land:
 		case minimap_mode::settlements:
+		case minimap_mode::settlements_with_non_land:
 			return false;
 		default:
 			return true;
@@ -887,6 +895,7 @@ bool minimap::is_fog_of_war_visible() const
 		case minimap_mode::realms:
 		case minimap_mode::realms_with_non_land:
 		case minimap_mode::settlements:
+		case minimap_mode::settlements_with_non_land:
 			return false;
 		default:
 			return true;

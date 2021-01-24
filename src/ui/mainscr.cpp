@@ -1244,7 +1244,9 @@ void DrawPopups()
 							button = get_territory_tooltip_button(tile->get_realm_owner());
 						}
 						break;
-					case wyrmgus::minimap_mode::settlements: {
+					case wyrmgus::minimap_mode::settlements:
+					case wyrmgus::minimap_mode::settlements_with_non_land:
+					{
 						const wyrmgus::site *settlement = tile->get_settlement();
 						if (tile->get_settlement() == nullptr) {
 							break;
@@ -1254,7 +1256,9 @@ void DrawPopups()
 						const CUnit *site_unit = settlement_game_data->get_site_unit();
 						const wyrmgus::tile *site_center_tile = site_unit->get_center_tile();
 
-						if (is_tile_water == (site_center_tile->is_water() && !site_center_tile->is_river()) && is_tile_space == site_center_tile->is_space()) {
+						const bool is_same_tile_type_as_settlement = (is_tile_water == (site_center_tile->is_water() && !site_center_tile->is_river()) && is_tile_space == site_center_tile->is_space());
+
+						if (UI.get_minimap()->get_mode() == wyrmgus::minimap_mode::settlements_with_non_land || is_same_tile_type_as_settlement) {
 							button = std::make_unique<wyrmgus::button>();
 							button->Action = ButtonCmd::None;
 							button->Popup = "popup_settlement";
