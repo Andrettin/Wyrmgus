@@ -158,8 +158,8 @@ void SaveUnit(const CUnit &unit, CFile &file)
 	if (!unit.get_surname().empty()) {
 		file.printf("\"surname\", \"%s\", ", unit.get_surname().c_str());
 	}
-	if (unit.site != nullptr) {
-		file.printf("\"site\", \"%s\", ", unit.site->get_identifier().c_str());
+	if (unit.get_site() != nullptr) {
+		file.printf("\"site\", \"%s\", ", unit.get_site()->get_identifier().c_str());
 	}
 	if (unit.settlement != nullptr) {
 		file.printf("\"settlement\", \"%s\", ", unit.settlement->get_identifier().c_str());

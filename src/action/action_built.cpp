@@ -191,8 +191,8 @@ static void Finish(COrder_Built &order, CUnit &unit)
 	player.IncreaseCountsForUnit(&unit);
 	player.on_unit_built(&unit);
 
-	if (unit.site != nullptr) {
-		wyrmgus::site_game_data *site_game_data = unit.site->get_game_data();
+	if (unit.get_site() != nullptr) {
+		wyrmgus::site_game_data *site_game_data = unit.get_site()->get_game_data();
 
 		if (site_game_data->get_site_unit() == &unit) {
 			if (player.Index != PlayerNumNeutral) {

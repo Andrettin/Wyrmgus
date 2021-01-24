@@ -1254,7 +1254,7 @@ void map_template::apply_site(const site *site, const QPoint &site_pos, const in
 			fprintf(stderr, "The site for \"%s\" should be placed on (%d, %d), but it cannot be there.\n", site->Ident.c_str(), site->get_pos().x(), site->get_pos().y());
 		}
 		CUnit *unit = CreateUnit(site_pos - unit_offset, *base_unit_type, CPlayer::Players[PlayerNumNeutral], z, true, site);
-		unit->site = site;
+		unit->set_site(site);
 
 		if (site->is_settlement()) {
 			unit->settlement = site;
@@ -1262,8 +1262,6 @@ void map_template::apply_site(const site *site, const QPoint &site_pos, const in
 			unit->Name = site->get_name();
 			first_building = false;
 		}
-
-		site_game_data->set_site_unit(unit);
 
 		if (site->is_settlement()) {
 			CMap::Map.add_settlement_unit(unit);

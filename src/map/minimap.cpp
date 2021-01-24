@@ -466,7 +466,6 @@ uint32_t minimap::get_unit_minimap_color(const CUnit *unit, const unit_type *typ
 uint32_t minimap::get_terrain_unit_minimap_color(const CUnit *unit, const unit_type *type, const bool red_phase) const
 {
 	if (this->get_mode() == minimap_mode::terrain_only) {
-		const unit_type *type = this->get_unit_minimap_type(unit);
 		return this->get_unit_minimap_color(unit, type, red_phase);
 	}
 
