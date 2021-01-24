@@ -6765,6 +6765,11 @@ std::string CUnit::get_name() const
 		
 		return this->get_character()->get_deity()->get_name();
 	}
+
+	if (this->site != nullptr && !this->site->is_settlement() && this->site->get_game_data() != nullptr) {
+		//if this unit represents a non-settlement site, use the site's name for the unit
+		return this->site->get_game_data()->get_current_cultural_name();
+	}
 	
 	std::string name = this->Name;
 	

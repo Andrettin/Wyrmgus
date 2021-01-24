@@ -43,8 +43,19 @@ namespace wyrmgus {
 
 const std::string &site_game_data::get_current_cultural_name() const
 {
-	if (this->get_site_unit() != nullptr) {
-		return this->site->get_cultural_name(this->get_site_unit()->get_civilization());
+	const CUnit *unit = this->get_site_unit();
+
+	if (unit != nullptr) {
+		const civilization *name_civilization = unit->get_civilization();
+
+		if (name_civilization == nullptr && unit->Player->get_index() == PlayerNumNeutral) {
+			const CPlayer *unit_tile_owner = unit->get_center_tile_owner();
+			if (unit_tile_owner != nullptr) {
+				name_civilization = unit_tile_owner->get_civilization();
+			}
+		}
+
+		return this->site->get_cultural_name(name_civilization);
 	}
 
 	return this->site->get_name();

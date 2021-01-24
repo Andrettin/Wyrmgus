@@ -982,7 +982,7 @@ void DrawPopups()
 						} else {
 							unit_name = UnitUnderCursor->get_name();
 						}
-					} else if (UnitUnderCursor->Type->BoolFlag[CELESTIAL_BODY_INDEX].value) {
+					} else if (UnitUnderCursor->get_site() != nullptr && !UnitUnderCursor->get_site()->is_settlement()) {
 						unit_name = UnitUnderCursor->get_name() + " (" + UnitUnderCursor->get_type_name() + ")";
 					} else {
 						unit_name = UnitUnderCursor->get_type_name();
