@@ -980,10 +980,10 @@ void DrawPopups()
 						if (!UnitUnderCursor->Identified) {
 							unit_name = UnitUnderCursor->get_type_name() + " (" + _("Unidentified") + ")";
 						} else {
-							unit_name = UnitUnderCursor->GetName();
+							unit_name = UnitUnderCursor->get_name();
 						}
 					} else if (UnitUnderCursor->Type->BoolFlag[CELESTIAL_BODY_INDEX].value) {
-						unit_name = UnitUnderCursor->GetName() + " (" + UnitUnderCursor->get_type_name() + ")";
+						unit_name = UnitUnderCursor->get_name() + " (" + UnitUnderCursor->get_type_name() + ")";
 					} else {
 						unit_name = UnitUnderCursor->get_type_name();
 					}

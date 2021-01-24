@@ -1706,7 +1706,7 @@ static int CclGetUnitVariable(lua_State *l)
 	} else if (!strcmp(value, "Name")) {
 	//Wyrmgus start
 //		lua_pushstring(l, unit->Type->Name.c_str());
-		lua_pushstring(l, unit->GetName().c_str());
+		lua_pushstring(l, unit->get_name().c_str());
 	} else if (!strcmp(value, "Character")) {
 		if (unit->get_character() != nullptr) {
 			lua_pushstring(l, unit->get_character()->get_identifier().c_str());

@@ -6752,7 +6752,7 @@ const std::shared_ptr<CPlayerColorGraphic> &CUnit::GetLayerSprite(const int imag
 	}
 }
 
-std::string CUnit::GetName() const
+std::string CUnit::get_name() const
 {
 	if (GameRunning && this->get_character() != nullptr && this->get_character()->get_deity() != nullptr) {
 		if (CPlayer::GetThisPlayer()->Race >= 0) {
@@ -6805,7 +6805,7 @@ std::string CUnit::get_type_name() const
 
 std::string CUnit::GetMessageName() const
 {
-	std::string name = this->GetName();
+	std::string name = this->get_name();
 	if (name.empty()) {
 		return this->get_type_name();
 	}

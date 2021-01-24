@@ -1259,7 +1259,6 @@ void map_template::apply_site(const site *site, const QPoint &site_pos, const in
 		if (site->is_settlement()) {
 			unit->settlement = site;
 		} else {
-			unit->Name = site->get_name();
 			first_building = false;
 		}
 
