@@ -40,6 +40,7 @@
 #include "text_processor.h"
 #include "unit/unit_find.h"
 #include "unit/unit_type.h"
+#include "util/exception_util.h"
 #include "util/string_util.h"
 #include "util/vector_random_util.h"
 
@@ -161,7 +162,13 @@ void dialogue_node::call(CPlayer *player, const context &ctx) const
 	text_processing_context text_ctx(ctx);
 	const text_processor text_processor(std::move(text_ctx));
 
-	std::string text = text_processor.process_text(this->text);
+	std::string text;
+	try {
+		text = text_processor.process_text(this->text);
+	} catch (const std::exception &exception) {
+		exception::report(exception);
+		text = this->text;
+	}
 	string::replace(text, "\"", "\\\"");
 	string::replace(text, "\n", "\\n");
 
