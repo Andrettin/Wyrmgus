@@ -945,10 +945,6 @@ void map_template::apply(const QPoint &template_start_pos, const QPoint &map_sta
 		this->apply_territory_image(template_start_pos, map_start_pos, z);
 	}
 
-	if (!this->IsSubtemplateArea()) {
-		CMap::Map.adjust_territory_irregularities(map_start_pos, map_end - QPoint(1, 1), z);
-	}
-
 	if (current_campaign != nullptr) {
 		this->ApplyConnectors(template_start_pos, map_start_pos, map_end, z);
 	}
@@ -1053,6 +1049,10 @@ void map_template::apply(const QPoint &template_start_pos, const QPoint &map_sta
 	for (size_t i = 0; i < this->GeneratedNeutralUnits.size(); ++i) {
 		const bool grouped = this->GeneratedNeutralUnits[i].first->get_given_resource() != nullptr && this->GeneratedNeutralUnits[i].first->get_tile_width() == 1 && this->GeneratedNeutralUnits[i].first->get_tile_height() == 1; // group small resources
 		CMap::Map.generate_neutral_units(this->GeneratedNeutralUnits[i].first, this->GeneratedNeutralUnits[i].second, map_start_pos, map_end - Vec2i(1, 1), grouped, z);
+	}
+
+	if (!this->IsSubtemplateArea()) {
+		CMap::Map.adjust_territory_irregularities(map_start_pos, map_end - QPoint(1, 1), z);
 	}
 
 	//this has to be done at the end, so that it doesn't prevent the application from working properly, due to the map template code thinking that its own area belongs to another map template
