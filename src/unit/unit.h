@@ -574,6 +574,7 @@ public:
 
 	const wyrmgus::time_of_day *get_center_tile_time_of_day() const;
 	const wyrmgus::site *get_center_tile_settlement() const;
+	const CPlayer *get_center_tile_owner() const;
 
 	bool is_seen_by_player(const CPlayer *player) const;
 

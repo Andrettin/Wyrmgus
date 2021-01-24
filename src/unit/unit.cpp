@@ -6842,6 +6842,16 @@ const wyrmgus::site *CUnit::get_center_tile_settlement() const
 	return this->get_center_tile()->get_settlement();
 }
 
+const CPlayer *CUnit::get_center_tile_owner() const
+{
+	if (this->MapLayer == nullptr) {
+		return nullptr;
+	}
+
+	//get the owner for the unit's tile
+	return this->get_center_tile()->get_owner();
+}
+
 bool CUnit::is_seen_by_player(const CPlayer *player) const
 {
 	return this->is_seen_by_player(player->Index);
