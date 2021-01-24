@@ -431,59 +431,101 @@ void minimap::update_territory_pixel(const int mx, const int my, const int z)
 	*(uint32_t *) &(this->mode_overlay_texture_data[minimap_mode::realms_with_non_land][z][pixel_index]) = realm_with_non_land_c;
 }
 
+const unit_type *minimap::get_unit_minimap_type(const CUnit *unit) const
+{
+	if (Editor.Running || ReplayRevealMap || unit->IsVisible(*CPlayer::GetThisPlayer())) {
+		return unit->Type;
+	}
+
+	//the unit's seen type can be null for radar if the unit has not been seen and we have it on radar.
+	if (unit->Seen.Type != nullptr) {
+		return unit->Seen.Type;
+	}
+
+	return unit->Type;
+}
+
+uint32_t minimap::get_unit_minimap_color(const CUnit *unit, const unit_type *type, const bool red_phase) const
+{
+	if (unit->GetDisplayPlayer() == PlayerNumNeutral) {
+		return CVideo::MapRGB(type->get_neutral_minimap_color());
+	} else if (unit->Player == CPlayer::GetThisPlayer() && !Editor.Running) {
+		if (unit->Attacked && unit->Attacked + ATTACK_BLINK_DURATION > GameCycle &&
+			(red_phase || unit->Attacked + ATTACK_RED_DURATION > GameCycle)) {
+			return ColorRed;
+		} else if (this->ShowSelected && unit->Selected) {
+			return ColorWhite;
+		} else {
+			return ColorGreen;
+		}
+	}
+
+	return CVideo::MapRGB(unit->Player->get_minimap_color());
+}
+
+uint32_t minimap::get_terrain_unit_minimap_color(const CUnit *unit, const unit_type *type, const bool red_phase) const
+{
+	if (this->get_mode() == minimap_mode::terrain_only) {
+		const unit_type *type = this->get_unit_minimap_type(unit);
+		return this->get_unit_minimap_color(unit, type, red_phase);
+	}
+
+	const tile *center_tile = unit->get_center_tile();
+
+	QColor color;
+
+	switch (this->get_mode()) {
+		case minimap_mode::territories:
+		case minimap_mode::territories_with_non_land:
+			if (center_tile->get_owner() != nullptr) {
+				color = center_tile->get_owner()->get_minimap_color();
+			} else {
+				color = CPlayer::Players[PlayerNumNeutral]->get_minimap_color();
+			}
+			break;
+		case minimap_mode::realms:
+		case minimap_mode::realms_with_non_land:
+			if (center_tile->get_realm_owner() != nullptr) {
+				color = center_tile->get_realm_owner()->get_minimap_color();
+			} else {
+				color = CPlayer::Players[PlayerNumNeutral]->get_minimap_color();
+			}
+			break;
+		case minimap_mode::settlements:
+		case minimap_mode::settlements_with_non_land:
+			if (center_tile->get_settlement() != nullptr) {
+				color = center_tile->get_settlement()->get_color();
+			}
+			break;
+		default:
+			throw std::runtime_error("Unexpected minimap mode: " + std::to_string(static_cast<int>(this->get_mode())) + ".");
+	}
+
+	if (!color.isValid()) {
+		return 0;
+	}
+
+	return Video.MapRGBA(color);
+}
+
 /**
 **  Draw a unit on the minimap.
 */
-template <bool center_tile_only>
 void minimap::draw_unit_on(const CUnit *unit, const bool red_phase)
 {
 	const int z = UI.CurrentMapLayer->ID;
-	const int texture_width = this->get_texture_width(z);
-	const int texture_height = this->get_texture_height(z);
 
-	const unit_type *type;
-
-	if (Editor.Running || ReplayRevealMap || unit->IsVisible(*CPlayer::GetThisPlayer())) {
-		type = unit->Type;
-	} else {
-		type = unit->Seen.Type;
-		// This will happen for radar if the unit has not been seen and we
-		// have it on radar.
-		if (!type) {
-			type = unit->Type;
-		}
-	}
+	const unit_type *type = this->get_unit_minimap_type(unit);
 
 	//don't draw decorations or diminutive fauna units on the minimap
 	if (type->BoolFlag[DECORATION_INDEX].value || (type->BoolFlag[DIMINUTIVE_INDEX].value && type->BoolFlag[FAUNA_INDEX].value)) {
 		return;
 	}
 
-	uint32_t color;
-	if (unit->GetDisplayPlayer() == PlayerNumNeutral) {
-		color = CVideo::MapRGB(type->get_neutral_minimap_color());
-	} else if (unit->Player == CPlayer::GetThisPlayer() && !Editor.Running) {
-		if (unit->Attacked && unit->Attacked + ATTACK_BLINK_DURATION > GameCycle &&
-			(red_phase || unit->Attacked + ATTACK_RED_DURATION > GameCycle)) {
-			color = ColorRed;
-		} else if (this->ShowSelected && unit->Selected) {
-			color = ColorWhite;
-		} else {
-			color = ColorGreen;
-		}
-	} else {
-		color = CVideo::MapRGB(unit->Player->get_minimap_color());
-	}
+	const uint32_t color = this->get_unit_minimap_color(unit, type, red_phase);
 
-	if constexpr (center_tile_only) {
-		const QPoint center_pos = unit->get_center_tile_pos();
-		const int x = 1 + this->XOffset[z] + Map2MinimapX[z][center_pos.x()];
-		const int y = 1 + this->YOffset[z] + Map2MinimapY[z][center_pos.y()];
-
-		*(uint32_t *) &(this->overlay_texture_data[z][(x + y * MinimapTextureWidth[z]) * 4]) = color;
-
-		return;
-	}
+	const int texture_width = this->get_texture_width(z);
+	const int texture_height = this->get_texture_height(z);
 
 	const int mx = 1 + this->XOffset[z] + Map2MinimapX[z][unit->tilePos.x];
 	const int my = 1 + this->YOffset[z] + Map2MinimapY[z][unit->tilePos.y];
@@ -504,6 +546,21 @@ void minimap::draw_unit_on(const CUnit *unit, const bool red_phase)
 			*(uint32_t *) &(this->overlay_texture_data[z][((mx + w) + (my + h) * MinimapTextureWidth[z]) * 4]) = color;
 		}
 	}
+}
+
+//draw a unit as terrain, on its center tile
+void minimap::draw_terrain_unit_on(const CUnit *unit, const bool red_phase)
+{
+	const unit_type *type = this->get_unit_minimap_type(unit);
+	const uint32_t color = this->get_terrain_unit_minimap_color(unit, type, red_phase);
+
+	const int z = UI.CurrentMapLayer->ID;
+	const QPoint center_pos = unit->get_center_tile_pos();
+
+	const int x = 1 + this->XOffset[z] + Map2MinimapX[z][center_pos.x()];
+	const int y = 1 + this->YOffset[z] + Map2MinimapY[z][center_pos.y()];
+
+	*(uint32_t *) &(this->overlay_texture_data[z][(x + y * MinimapTextureWidth[z]) * 4]) = color;
 }
 
 /**
@@ -572,19 +629,21 @@ void minimap::Update()
 		//draw units on the map
 		for (const CUnit *unit : unit_manager::get()->get_units()) {
 			if (unit->IsVisibleOnMinimap()) {
-				this->draw_unit_on<false>(unit, red_phase);
+				this->draw_unit_on(unit, red_phase);
 			}
 		}
-	} else if (this->get_mode() == minimap_mode::terrain_only) {
+	} else {
 		//when drawing only terrain, draw celestial body units on their center tile
 		for (const CUnit *unit : unit_manager::get()->get_units()) {
 			if (!unit->Type->BoolFlag[CELESTIAL_BODY_INDEX].value) {
 				continue;
 			}
 
-			if (unit->IsVisibleOnMinimap()) {
-				this->draw_unit_on<true>(unit, red_phase);
+			if (!unit->IsVisibleOnMinimap()) {
+				continue;
 			}
+
+			this->draw_terrain_unit_on(unit, red_phase);
 		}
 	}
 }

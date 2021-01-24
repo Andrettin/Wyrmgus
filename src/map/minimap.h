@@ -37,6 +37,7 @@ typedef unsigned int GLuint;
 
 namespace wyrmgus {
 
+class unit_type;
 enum class minimap_mode;
 
 class minimap final
@@ -67,8 +68,12 @@ public:
 	void DrawViewportArea(const CViewport &viewport) const;
 
 private:
-	template <bool center_tile_only>
+	const unit_type *get_unit_minimap_type(const CUnit *unit) const;
+	uint32_t get_unit_minimap_color(const CUnit *unit, const unit_type *type, const bool red_phase) const;
+	uint32_t get_terrain_unit_minimap_color(const CUnit *unit, const unit_type *type, const bool red_phase) const;
+
 	void draw_unit_on(const CUnit *unit, const bool red_phase);
+	void draw_terrain_unit_on(const CUnit *unit, const bool red_phase);
 
 public:
 	void AddEvent(const Vec2i &pos, int z, IntColor color);
