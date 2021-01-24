@@ -1504,16 +1504,18 @@ int GetButtonCooldownPercent(const CUnit &unit, const wyrmgus::button &buttonact
 */
 static void UpdateButtonPanelMultipleUnits(const std::vector<std::unique_ptr<wyrmgus::button>> &buttonActions)
 {
-	char unit_ident[128];
+	std::array<char, 128> unit_ident{};
 	//Wyrmgus start
-	char individual_unit_ident[200][128]; // the 200 there is the max selectable quantity; not nice to hardcode it like this, should be changed in the future
+	std::vector<std::array<char, 128>> individual_unit_ident;
 	//Wyrmgus end
 
-	sprintf(unit_ident, ",%s-group,", wyrmgus::civilization::get_all()[CPlayer::GetThisPlayer()->Race]->get_identifier().c_str());
+	sprintf(unit_ident.data(), ",%s-group,", wyrmgus::civilization::get_all()[CPlayer::GetThisPlayer()->Race]->get_identifier().c_str());
 	
 	//Wyrmgus start
 	for (size_t i = 0; i != Selected.size(); ++i) {
-		sprintf(individual_unit_ident[i], ",%s,", Selected[i]->Type->Ident.c_str());
+		std::array<char, 128> ident_array{};
+		sprintf(ident_array.data(), ",%s,", Selected[i]->Type->Ident.c_str());
+		individual_unit_ident.push_back(std::move(ident_array));
 	}
 	//Wyrmgus end
 
@@ -1525,7 +1527,7 @@ static void UpdateButtonPanelMultipleUnits(const std::vector<std::unique_ptr<wyr
 		//Wyrmgus start
 		bool used_by_all = true;
 		for (size_t i = 0; i != Selected.size(); ++i) {
-			if (!strstr(button->UnitMask.c_str(), individual_unit_ident[i]) && !wyrmgus::vector::contains(button->get_unit_classes(), Selected[i]->Type->get_unit_class())) {
+			if (!strstr(button->UnitMask.c_str(), individual_unit_ident[i].data()) && !wyrmgus::vector::contains(button->get_unit_classes(), Selected[i]->Type->get_unit_class())) {
 				used_by_all = false;
 				break;
 			}
@@ -1534,7 +1536,7 @@ static void UpdateButtonPanelMultipleUnits(const std::vector<std::unique_ptr<wyr
 		
 		// any unit or unit in list
 		if (button->UnitMask[0] != '*'
-			&& !strstr(button->UnitMask.c_str(), unit_ident) && !used_by_all) {
+			&& !strstr(button->UnitMask.c_str(), unit_ident.data()) && !used_by_all) {
 			continue;
 		}
 
