@@ -345,6 +345,16 @@ bool site::is_settlement() const
 	return this->get_base_unit_type() == settlement_site_unit_type;
 }
 
+centesimal_int site::get_astrodistance_pc() const
+{
+	return astronomy::ly_to_pc(this->get_astrodistance());
+}
+
+void site::set_astrodistance_pc(const centesimal_int &astrodistance_pc)
+{
+	this->astrodistance = astronomy::pc_to_ly(astrodistance_pc);
+}
+
 void site::set_orbit_center(site *orbit_center)
 {
 	if (orbit_center == this->orbit_center) {

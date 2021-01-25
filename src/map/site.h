@@ -69,6 +69,7 @@ class site final : public named_data_entry, public data_type<site>, public CData
 	Q_PROPERTY(int latitude_scale MEMBER latitude_scale)
 	Q_PROPERTY(wyrmgus::geocoordinate astrocoordinate MEMBER astrocoordinate READ get_astrocoordinate)
 	Q_PROPERTY(wyrmgus::centesimal_int astrodistance MEMBER astrodistance READ get_astrodistance)
+	Q_PROPERTY(wyrmgus::centesimal_int astrodistance_pc READ get_astrodistance_pc WRITE set_astrodistance_pc)
 	Q_PROPERTY(wyrmgus::site* orbit_center MEMBER orbit_center WRITE set_orbit_center)
 	Q_PROPERTY(int distance_from_orbit_center MEMBER distance_from_orbit_center)
 	Q_PROPERTY(int distance_from_orbit_center_au READ get_distance_from_orbit_center_au WRITE set_distance_from_orbit_center_au)
@@ -164,6 +165,9 @@ public:
 	{
 		return this->astrodistance;
 	}
+
+	centesimal_int get_astrodistance_pc() const;
+	void set_astrodistance_pc(const centesimal_int &astrodistance_pc);
 
 	void set_orbit_center(site *orbit_center);
 
