@@ -952,6 +952,7 @@ set(stratagus_upgrade_HDRS
 )
 
 set(stratagus_util_HDRS
+	src/util/astronomy_util.h
 	src/util/char_util.h
 	src/util/color_container.h
 	src/util/container_util.h

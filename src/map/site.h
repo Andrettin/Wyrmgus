@@ -81,7 +81,6 @@ class site final : public named_data_entry, public data_type<site>, public CData
 public:
 	static constexpr const char *class_identifier = "site";
 	static constexpr const char *database_folder = "sites";
-	static constexpr int million_km_per_au = 150;
 
 	static site *get_by_color(const QColor &color)
 	{
@@ -173,15 +172,8 @@ public:
 		return this->satellites;
 	}
 
-	int get_distance_from_orbit_center_au() const
-	{
-		return this->distance_from_orbit_center / site::million_km_per_au;
-	}
-
-	void set_distance_from_orbit_center_au(const int distance_au)
-	{
-		this->distance_from_orbit_center = distance_au * site::million_km_per_au;
-	}
+	int get_distance_from_orbit_center_au() const;
+	void set_distance_from_orbit_center_au(const int distance_au);
 
 	const unit_type *get_base_unit_type() const
 	{
@@ -264,7 +256,7 @@ private:
 	wyrmgus::geocoordinate astrocoordinate; //the site's position as an astrocoordinate
 	centesimal_int astrodistance; //the site's distance from its map template's center (in light-years)
 	site *orbit_center = nullptr;
-	int distance_from_orbit_center = 0; //in kilometers
+	int distance_from_orbit_center = 0; //in gigameters (millions of kilometers)
 	std::vector<site *> satellites;
 	unit_type *base_unit_type = nullptr;
 	site *connection_destination = nullptr;

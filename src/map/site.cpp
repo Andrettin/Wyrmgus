@@ -48,6 +48,7 @@
 #include "unit/unit.h"
 #include "unit/unit_class.h"
 #include "unit/unit_type.h"
+#include "util/astronomy_util.h"
 #include "util/container_util.h"
 #include "util/geocoordinate.h"
 #include "util/geocoordinate_util.h"
@@ -359,6 +360,16 @@ void site::set_orbit_center(site *orbit_center)
 	if (orbit_center != nullptr) {
 		orbit_center->satellites.push_back(this);
 	}
+}
+
+int site::get_distance_from_orbit_center_au() const
+{
+	return astronomy::gm_to_au(this->distance_from_orbit_center);
+}
+
+void site::set_distance_from_orbit_center_au(const int distance_au)
+{
+	this->distance_from_orbit_center = astronomy::au_to_gm(distance_au);
 }
 
 QVariantList site::get_cores_qvariant_list() const
