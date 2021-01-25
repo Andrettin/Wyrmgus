@@ -1137,9 +1137,15 @@ set(stratagus_main_SRCS
 	src/stratagus/main.cpp
 )
 
-set(stratagus_test_SRCS
-	test/main.cpp
+set(util_test_SRCS
+	test/util/astronomy_test.cpp
 	test/util/geocoordinate_test.cpp
+)
+source_group(util FILES ${util_test_SRCS})
+
+set(stratagus_test_SRCS
+	${util_test_SRCS}
+	test/main.cpp
 )
 
 # Configuration types
