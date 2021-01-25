@@ -912,7 +912,6 @@ static int GetPlayerData(const int player_index, const char *prop, const char *a
 	} else {
 		throw std::runtime_error("Invalid field: \"" + std::string(prop) + "\".");
 	}
-	return 0;
 }
 
 /**

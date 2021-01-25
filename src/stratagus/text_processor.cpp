@@ -249,8 +249,6 @@ std::string text_processor::process_civilization_tokens(const civilization *civi
 	} else {
 		return this->process_named_data_entry_token(civilization, front_subtoken);
 	}
-
-	throw std::runtime_error("Failed to process civilization token \"" + front_subtoken + "\".");
 }
 
 std::string text_processor::process_faction_tokens(const wyrmgus::faction *faction, std::queue<std::string> &tokens) const
@@ -296,8 +294,6 @@ std::string text_processor::process_faction_tokens(const wyrmgus::faction *facti
 	} else {
 		return this->process_named_data_entry_token(faction, front_subtoken);
 	}
-
-	throw std::runtime_error("Failed to process faction token \"" + front_subtoken + "\".");
 }
 
 std::string text_processor::process_player_tokens(const CPlayer *player, std::queue<std::string> &tokens) const
@@ -352,8 +348,6 @@ std::string text_processor::process_site_tokens(const wyrmgus::site *site, std::
 	} else {
 		return this->process_named_data_entry_token(site, front_subtoken);
 	}
-
-	throw std::runtime_error("Failed to process site token \"" + front_subtoken + "\".");
 }
 
 std::string text_processor::process_unit_tokens(const CUnit *unit, std::queue<std::string> &tokens) const
@@ -405,8 +399,6 @@ std::string text_processor::process_word_tokens(const wyrmgus::word *word, std::
 	} else {
 		return this->process_named_data_entry_token(word, token);
 	}
-
-	throw std::runtime_error("Failed to process word token \"" + token + "\".");
 }
 
 std::string text_processor::process_word_meaning_tokens(const wyrmgus::word *word, std::queue<std::string> &tokens) const
