@@ -486,6 +486,7 @@ set(upgrade_SRCS
 source_group(upgrade FILES ${upgrade_SRCS})
 
 set(util_SRCS
+	src/util/astronomy_util.cpp
 	src/util/color_container.cpp
 	src/util/date_util.cpp
 	src/util/exception_util.cpp

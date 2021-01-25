@@ -25,36 +25,26 @@
 //      02111-1307, USA.
 //
 
-#pragma once
+#include "util/astronomy_util.h"
 
-namespace wyrmgus {
-	template <int N>
-	class fractional_int;
-
-	using centesimal_int = fractional_int<2>;
-}
+#include "util/fractional_int.h"
 
 namespace wyrmgus::astronomy {
 
-constexpr int ly_per_100_pc = 326; //light-years per parsecs; 1 parsec = 3.26 light years
-constexpr int gm_per_au = 150; //gigameters per astronomical units
-
-//light-years to parsecs
-extern centesimal_int ly_to_pc(const centesimal_int &light_years);
-
-//parsecs to light-years
-extern centesimal_int pc_to_ly(const centesimal_int &parsecs);
-
-//gigameters to astronomical units
-inline int gm_to_au(const int gm)
+centesimal_int ly_to_pc(const centesimal_int &light_years)
 {
-	return gm / astronomy::gm_per_au;
+	centesimal_int parsecs = light_years;
+	parsecs *= 100;
+	parsecs /= astronomy::ly_per_100_pc;
+	return parsecs;
 }
 
-//astronomical units to gigameters
-inline int au_to_gm(const int au)
+centesimal_int pc_to_ly(const centesimal_int &parsecs)
 {
-	return au * astronomy::gm_per_au;
+	centesimal_int light_years = parsecs;
+	light_years *= astronomy::ly_per_100_pc;
+	light_years /= 100;
+	return light_years;
 }
 
 }
