@@ -46,6 +46,6 @@ BOOST_AUTO_TEST_CASE(geocoordinate_to_circle_edge_point_test_2)
     const geocoordinate geocoordinate(-90, 45);
     const QPoint direction_pos = geocoordinate.to_circle_edge_point();
 
-    const QPoint expected_result(-7086, -7086);
+    const QPoint expected_result(-7071, -7071);
     BOOST_TEST((direction_pos == expected_result), "direction_pos " + point::to_string(direction_pos) + " does not equal " + point::to_string(expected_result));
 }

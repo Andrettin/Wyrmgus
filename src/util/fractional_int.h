@@ -69,6 +69,16 @@ public:
 	{
 	}
 
+	template <int N2>
+	explicit constexpr const fractional_int(const fractional_int<N2> &other)
+	{
+		this->value = other.get_value();
+		if constexpr (N != N2) {
+			this->value *= fractional_int<N>::divisor;
+			this->value /= fractional_int<N2>::divisor;
+		}
+	}
+
 	explicit constexpr fractional_int(const int n)
 	{
 		this->value = n * fractional_int::divisor;
