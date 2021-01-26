@@ -65,8 +65,7 @@ public:
 		}
 		variation->ShadowFile = this->ShadowFile;
 		variation->LightFile = this->LightFile;
-		variation->FrameWidth = this->FrameWidth;
-		variation->FrameHeight = this->FrameHeight;
+		variation->frame_size = this->frame_size;
 		variation->ResourceMin = this->ResourceMin;
 		variation->ResourceMax = this->ResourceMax;
 		variation->Weight = this->Weight;
@@ -113,6 +112,11 @@ public:
 	{
 		return this->image_file;
 	}
+
+	const QSize &get_frame_size() const
+	{
+		return this->frame_size;
+	}
 	
 	const std::string &get_button_key() const
 	{
@@ -137,6 +141,7 @@ public:
 	int ImageLayer = -1;			/// The image layer to which the variation belongs (if any)
 private:
 	std::filesystem::path image_file;
+	QSize frame_size = QSize(0, 0);
 public:
 	std::string TypeName;			/// Type name.
 private:
@@ -144,8 +149,6 @@ private:
 public:
 	std::string ShadowFile;			/// Variation's shadow graphics.
 	std::string LightFile;			/// Variation's light graphics.
-	int FrameWidth = 0;
-	int FrameHeight = 0;
 	int ResourceMin = 0;
 	int ResourceMax = 0;
 	int Weight = 1;							/// The weight for when randomly choosing a variation

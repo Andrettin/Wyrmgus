@@ -131,9 +131,9 @@ void DrawUnitSelection(const CViewport &vp, const CUnit &unit)
 	int sprite_width = (type.Sprite ? type.Sprite->Width : 0);
 	int sprite_height = (type.Sprite ? type.Sprite->Height : 0);
 	const wyrmgus::unit_type_variation *variation = unit.GetVariation();
-	if (variation && variation->FrameWidth && variation->FrameHeight) {
-		frame_width = variation->FrameWidth * scale_factor;
-		frame_height = variation->FrameHeight * scale_factor;
+	if (variation != nullptr && variation->get_frame_size() != QSize(0, 0)) {
+		frame_width = variation->get_frame_size().width() * scale_factor;
+		frame_height = variation->get_frame_size().height() * scale_factor;
 		sprite_width = (variation->Sprite ? variation->Sprite->Width : 0);
 		sprite_height = (variation->Sprite ? variation->Sprite->Height : 0);
 	}
@@ -979,9 +979,9 @@ static void DrawConstruction(const int player, const wyrmgus::construction_frame
 		int frame_width = type.get_frame_width();
 		int frame_height = type.get_frame_height();
 		const wyrmgus::unit_type_variation *variation = unit.GetVariation();
-		if (variation && variation->FrameWidth && variation->FrameHeight) {
-			frame_width = variation->FrameWidth;
-			frame_height = variation->FrameHeight;
+		if (variation != nullptr && variation->get_frame_size() != QSize(0, 0)) {
+			frame_width = variation->get_frame_size().width();
+			frame_height = variation->get_frame_size().height();
 		}
 		frame_width *= scale_factor;
 		frame_height *= scale_factor;

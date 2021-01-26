@@ -2592,14 +2592,12 @@ void LoadUnitTypeSprite(wyrmgus::unit_type &type)
 
 	//Wyrmgus start
 	for (const auto &variation : type.get_variations()) {
-		int frame_width = type.get_frame_size().width();
-		int frame_height = type.get_frame_size().height();
-		if (variation->FrameWidth && variation->FrameHeight) {
-			frame_width = variation->FrameWidth;
-			frame_height = variation->FrameHeight;
+		QSize frame_size = type.get_frame_size();
+		if (variation->get_frame_size() != QSize(0, 0)) {
+			frame_size = variation->get_frame_size();
 		}
 		if (!variation->get_image_file().empty()) {
-			variation->Sprite = CPlayerColorGraphic::New(variation->get_image_file().string(), QSize(frame_width, frame_height), type.get_conversible_player_color());
+			variation->Sprite = CPlayerColorGraphic::New(variation->get_image_file().string(), frame_size, type.get_conversible_player_color());
 			variation->Sprite->Load(false, wyrmgus::defines::get()->get_scale_factor());
 		}
 		if (!variation->ShadowFile.empty()) {
@@ -2607,23 +2605,23 @@ void LoadUnitTypeSprite(wyrmgus::unit_type &type)
 			variation->ShadowSprite->Load(false, wyrmgus::defines::get()->get_scale_factor());
 		}
 		if (!variation->LightFile.empty()) {
-			variation->LightSprite = CGraphic::New(variation->LightFile, frame_width, frame_height);
+			variation->LightSprite = CGraphic::New(variation->LightFile, frame_size);
 			variation->LightSprite->Load(false, wyrmgus::defines::get()->get_scale_factor());
 		}
 		for (int j = 0; j < MaxImageLayers; ++j) {
 			if (!variation->LayerFiles[j].empty()) {
-				variation->LayerSprites[j] = CPlayerColorGraphic::New(variation->LayerFiles[j], QSize(frame_width, frame_height), type.get_conversible_player_color());
+				variation->LayerSprites[j] = CPlayerColorGraphic::New(variation->LayerFiles[j], frame_size, type.get_conversible_player_color());
 				variation->LayerSprites[j]->Load(false, wyrmgus::defines::get()->get_scale_factor());
 			}
 		}
 	
 		for (int j = 0; j < MaxCosts; ++j) {
 			if (!variation->FileWhenLoaded[j].empty()) {
-				variation->SpriteWhenLoaded[j] = CPlayerColorGraphic::New(variation->FileWhenLoaded[j], QSize(frame_width, frame_height), type.get_conversible_player_color());
+				variation->SpriteWhenLoaded[j] = CPlayerColorGraphic::New(variation->FileWhenLoaded[j], frame_size, type.get_conversible_player_color());
 				variation->SpriteWhenLoaded[j]->Load(false, wyrmgus::defines::get()->get_scale_factor());
 			}
 			if (!variation->FileWhenEmpty[j].empty()) {
-				variation->SpriteWhenEmpty[j] = CPlayerColorGraphic::New(variation->FileWhenEmpty[j], QSize(frame_width, frame_height), type.get_conversible_player_color());
+				variation->SpriteWhenEmpty[j] = CPlayerColorGraphic::New(variation->FileWhenEmpty[j], frame_size, type.get_conversible_player_color());
 				variation->SpriteWhenEmpty[j]->Load(false, wyrmgus::defines::get()->get_scale_factor());
 			}
 		}

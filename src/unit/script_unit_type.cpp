@@ -738,8 +738,10 @@ static int CclDefineUnitType(lua_State *l)
 						variation->LayerFiles[layer_file_image_layer] = LuaToString(l, -1, k + 1);
 					} else if (!strcmp(value, "frame-size")) {
 						lua_rawgeti(l, -1, k + 1);
-						CclGetPos(l, &variation->FrameWidth, &variation->FrameHeight);
+						Vec2i frame_size(0, 0);
+						CclGetPos(l, &frame_size.x, &frame_size.y);
 						lua_pop(l, 1);
+						variation->frame_size = frame_size;
 					} else if (!strcmp(value, "icon")) {
 						variation->Icon.Name = LuaToString(l, -1, k + 1);
 						variation->Icon.Icon = nullptr;

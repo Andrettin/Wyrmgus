@@ -80,7 +80,9 @@ void unit_type_variation::process_sml_scope(const sml_data &scope)
 {
 	const std::string &tag = scope.get_tag();
 
-	if (tag == "resource_image_files") {
+	if (tag == "frame_size") {
+		this->frame_size = scope.to_size();
+	} else if (tag == "resource_image_files") {
 		scope.for_each_property([&](const sml_property &property) {
 			const resource *resource = resource::get(property.get_key());
 			this->FileWhenEmpty[resource->get_index()] = database::get()->get_graphics_path(this->get_unit_type()->get_module()) / property.get_value();
@@ -115,9 +117,9 @@ void unit_type_variation::ProcessConfigData(const CConfigData *config_data)
 		} else if (key == "light_file") {
 			this->LightFile = CMod::GetCurrentModPath() + value;
 		} else if (key == "frame_width") {
-			this->FrameWidth = std::stoi(value);
+			this->frame_size.setWidth(std::stoi(value));
 		} else if (key == "frame_height") {
-			this->FrameHeight = std::stoi(value);
+			this->frame_size.setHeight(std::stoi(value));
 		} else if (key == "icon") {
 			value = FindAndReplaceString(value, "_", "-");
 			this->Icon.Name = value;

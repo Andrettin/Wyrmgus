@@ -4701,9 +4701,9 @@ bool CUnit::IsVisibleInViewport(const CViewport &vp) const
 	int frame_width = this->Type->get_frame_width();
 	int frame_height = this->Type->get_frame_height();
 	const wyrmgus::unit_type_variation *variation = this->GetVariation();
-	if (variation && variation->FrameWidth && variation->FrameHeight) {
-		frame_width = variation->FrameWidth;
-		frame_height = variation->FrameHeight;
+	if (variation != nullptr && variation->get_frame_size() != QSize(0, 0)) {
+		frame_width = variation->get_frame_size().width();
+		frame_height = variation->get_frame_size().height();
 	}
 	frame_width *= scale_factor;
 	frame_height *= scale_factor;
@@ -5431,11 +5431,11 @@ CUnit *UnitOnScreen(int x, int y)
 //		unitSpritePos.y = unitSpritePos.y - type.BoxHeight / 2 -
 //						  (type.Height - type.Sprite->Height) / 2 + type.BoxOffsetY;
 		const wyrmgus::unit_type_variation *variation = unit->GetVariation();
-		if (variation && variation->FrameWidth && variation->FrameHeight && !variation->get_image_file().empty()) {
+		if (variation != nullptr && variation->get_frame_size() != QSize(0, 0) && !variation->get_image_file().empty()) {
 			unitSpritePos.x = unitSpritePos.x - type.get_box_width() * scale_factor / 2 -
-							  (variation->FrameWidth * scale_factor - variation->Sprite->Width) / 2 + type.BoxOffsetX * scale_factor;
+							  (variation->get_frame_size().width() * scale_factor - variation->Sprite->Width) / 2 + type.BoxOffsetX * scale_factor;
 			unitSpritePos.y = unitSpritePos.y - type.get_box_height() * scale_factor / 2 -
-							  (variation->FrameHeight * scale_factor - variation->Sprite->Height) / 2 + type.BoxOffsetY * scale_factor;
+							  (variation->get_frame_size().height() * scale_factor - variation->Sprite->Height) / 2 + type.BoxOffsetY * scale_factor;
 		} else {
 			unitSpritePos.x = unitSpritePos.x - type.get_box_width() * scale_factor / 2 -
 							  (type.get_frame_width() * scale_factor - type.Sprite->Width) / 2 + type.BoxOffsetX * scale_factor;
