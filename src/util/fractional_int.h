@@ -342,3 +342,4 @@ using decimillesimal_int = fractional_int<4>;
 }
 
 Q_DECLARE_METATYPE(wyrmgus::centesimal_int)
+Q_DECLARE_METATYPE(wyrmgus::decimillesimal_int)

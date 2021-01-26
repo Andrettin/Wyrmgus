@@ -198,6 +198,12 @@ QVariant database::process_sml_property_value(const sml_property &property, cons
 		}
 
 		new_property_value = string::to_date(property.get_value());
+	} else if (property_type == QVariant::Time) {
+		if (property.get_operator() != sml_operator::assignment) {
+			throw std::runtime_error("Only the assignment operator is available for date-time properties.");
+		}
+
+		new_property_value = string::to_time(property.get_value());
 	} else if (property_type == QVariant::Type::UserType) {
 		if (property.get_operator() != sml_operator::assignment) {
 			throw std::runtime_error("Only the assignment operator is available for object reference properties.");
@@ -229,6 +235,8 @@ QVariant database::process_sml_property_value(const sml_property &property, cons
 			new_property_value = QVariant::fromValue(cursor::get(property.get_value()));
 		} else if (property_class_name == "wyrmgus::cursor_type") {
 			new_property_value = QVariant::fromValue(string_to_cursor_type(property.get_value()));
+		} else if (property_class_name == "wyrmgus::decimillesimal_int") {
+			new_property_value = QVariant::fromValue(decimillesimal_int(property.get_value()));
 		} else if (property_class_name == "wyrmgus::deity*") {
 			new_property_value = QVariant::fromValue(deity::get(property.get_value()));
 		} else if (property_class_name == "wyrmgus::dialogue*") {
