@@ -573,7 +573,7 @@ void TriggersEachCycle()
 			}
 		}
 		
-		if (current_trigger->get_effects() != nullptr) {
+		if (!removed_trigger && current_trigger->get_effects() != nullptr) {
 			bool triggered = false;
 			
 			if (current_trigger->Type == wyrmgus::trigger::TriggerType::GlobalTrigger) {
