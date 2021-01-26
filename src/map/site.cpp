@@ -55,6 +55,7 @@
 #include "util/point_util.h"
 #include "util/random.h"
 #include "util/string_conversion_util.h"
+#include "util/time_util.h"
 #include "util/vector_util.h"
 
 namespace wyrmgus {
@@ -343,6 +344,19 @@ bool site::is_settlement() const
 	}
 
 	return this->get_base_unit_type() == settlement_site_unit_type;
+}
+
+QTime site::get_right_ascension() const
+{
+	const decimillesimal_int lon = this->get_astrocoordinate().get_longitude();
+	const decimillesimal_int ra = astronomy::lon_to_ra(lon);
+	return ra.to_time();
+}
+
+void site::set_right_ascension(const QTime &ra)
+{
+	const decimillesimal_int lon = astronomy::ra_to_lon(time::to_number(ra));
+	this->astrocoordinate.set_longitude(lon);
 }
 
 centesimal_int site::get_astrodistance_pc() const

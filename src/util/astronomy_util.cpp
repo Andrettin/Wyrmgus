@@ -58,4 +58,17 @@ decimillesimal_int ra_to_lon(const decimillesimal_int &ra)
 	return res * 15;
 }
 
+decimillesimal_int lon_to_ra(const decimillesimal_int &lon)
+{
+	decimillesimal_int res(lon);
+
+	res /= 15;
+
+	if (lon < 0) {
+		res += 24;
+	}
+
+	return res;
+}
+
 }

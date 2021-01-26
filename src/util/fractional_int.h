@@ -141,6 +141,19 @@ public:
 		return static_cast<double>(this->value) / fractional_int::divisor;
 	}
 
+	constexpr QTime to_time() const
+	{
+		const int hours = this->to_int();
+		int64_t rest = this->get_value() % fractional_int::divisor;
+		const int minutes = rest * 60 / fractional_int::divisor;
+		rest -= minutes * fractional_int::divisor / 60;
+		const int seconds = rest * 60 * 60 / fractional_int::divisor;
+		rest -= seconds * fractional_int::divisor / 60 / 60;
+		const int milliseconds = rest * 60 * 60 / (fractional_int::divisor / 1000);
+
+		return QTime(hours, minutes, seconds, milliseconds);
+	}
+
 	std::string to_string() const
 	{
 		std::string number_str = std::to_string(this->value / fractional_int::divisor);
@@ -176,6 +189,11 @@ public:
 	constexpr bool operator <(const fractional_int<N> &other) const
 	{
 		return this->value < other.value;
+	}
+
+	constexpr bool operator <(const int other) const
+	{
+		return this->to_int() < other;
 	}
 
 	constexpr bool operator <=(const fractional_int<N> &other) const

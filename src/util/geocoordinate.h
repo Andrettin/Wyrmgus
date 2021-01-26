@@ -101,9 +101,19 @@ public:
 		return this->longitude;
 	}
 
+	constexpr void set_longitude(const number_type &lon)
+	{
+		this->longitude = lon;
+	}
+
 	constexpr const number_type &get_latitude() const
 	{
 		return this->latitude;
+	}
+
+	constexpr void set_latitude(const number_type &lat)
+	{
+		this->latitude = lat;
 	}
 
 	constexpr bool is_valid() const

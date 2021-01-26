@@ -61,4 +61,7 @@ inline int au_to_gm(const int au)
 //right ascension to longitude
 extern decimillesimal_int ra_to_lon(const decimillesimal_int &ra);
 
+//longitude to right ascension
+extern decimillesimal_int lon_to_ra(const decimillesimal_int &lon);
+
 }
