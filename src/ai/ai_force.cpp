@@ -1965,8 +1965,8 @@ void AiForceManager::CheckForceRecruitment()
 	}
 	
 	if (all_forces_completed && AiPlayer->Player->Race != -1 && AiPlayer->Player->Faction != -1 && completed_forces < AI_MAX_COMPLETED_FORCES && completed_force_pop < AI_MAX_COMPLETED_FORCE_POP) { //all current forces completed and not too many forces are in existence, create a new one
-		int force_type_weights[static_cast<int>(wyrmgus::ai_force_type::count)];
-		for (int i = 0; i < static_cast<int>(wyrmgus::ai_force_type::count); ++i) {
+		std::array<int, static_cast<int>(wyrmgus::ai_force_type::count)> force_type_weights{};
+		for (size_t i = 0; i < force_type_weights.size(); ++i) {
 			force_type_weights[i] = AiPlayer->Player->get_faction()->get_force_type_weight(static_cast<wyrmgus::ai_force_type>(i));
 		}
 		
