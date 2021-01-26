@@ -64,3 +64,21 @@ BOOST_AUTO_TEST_CASE(gm_to_au_test)
 
     BOOST_CHECK(au == 5);
 }
+
+BOOST_AUTO_TEST_CASE(ra_to_lon_test_1)
+{
+    const decimillesimal_int ra("6.4792");
+
+    const decimillesimal_int lon = astronomy::ra_to_lon(ra);
+
+    BOOST_CHECK(lon == decimillesimal_int("97.188"));
+}
+
+BOOST_AUTO_TEST_CASE(ra_to_lon_test_2)
+{
+    const decimillesimal_int ra("19.6682");
+
+    const decimillesimal_int lon = astronomy::ra_to_lon(ra);
+
+    BOOST_CHECK(lon == decimillesimal_int("-64.977"));
+}

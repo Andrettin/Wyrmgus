@@ -47,4 +47,15 @@ centesimal_int pc_to_ly(const centesimal_int &parsecs)
 	return light_years;
 }
 
+decimillesimal_int ra_to_lon(const decimillesimal_int &ra)
+{
+	decimillesimal_int res(ra);
+
+	if (ra > 12) {
+		res -= 24;
+	}
+
+	return res * 15;
+}
+
 }

@@ -32,6 +32,7 @@ namespace wyrmgus {
 	class fractional_int;
 
 	using centesimal_int = fractional_int<2>;
+	using decimillesimal_int = fractional_int<4>;
 }
 
 namespace wyrmgus::astronomy {
@@ -56,5 +57,8 @@ inline int au_to_gm(const int au)
 {
 	return au * astronomy::gm_per_au;
 }
+
+//right ascension to longitude
+extern decimillesimal_int ra_to_lon(const decimillesimal_int &ra);
 
 }
