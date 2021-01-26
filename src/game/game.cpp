@@ -241,7 +241,7 @@ void game::save_delayed_effects(CFile &file, const std::vector<std::unique_ptr<d
 	}
 
 	str += "_delayed_effects(\"" + string::escaped(delayed_effects_data.print_to_string()) + "\")\n";
-	file.printf(str.c_str());
+	file.printf("%s", str.c_str());
 }
 
 template <typename scope_type>

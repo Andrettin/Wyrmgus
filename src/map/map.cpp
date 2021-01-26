@@ -1313,7 +1313,7 @@ void SetTimeOfDay(const std::string &time_of_day_ident, int z)
 void SetTimeOfDaySchedule(const std::string &time_of_day_schedule_ident, const int z)
 {
 	if (z >= static_cast<int>(CMap::Map.MapLayers.size())) {
-		fprintf(stderr, "Error in CMap::SetTimeOfDaySchedule: the given map layer index (%d) is not valid given the map layer quantity (%d).\n", z, CMap::Map.MapLayers.size());
+		fprintf(stderr, "Error in CMap::SetTimeOfDaySchedule: the given map layer index (%d) is not valid given the map layer quantity (%ld).\n", z, CMap::Map.MapLayers.size());
 		return;
 	}
 
