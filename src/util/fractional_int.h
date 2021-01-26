@@ -77,7 +77,7 @@ public:
 	}
 
 	template <int N2>
-	explicit constexpr const fractional_int(const fractional_int<N2> &other)
+	explicit constexpr fractional_int(const fractional_int<N2> &other)
 	{
 		this->value = other.get_value();
 		if constexpr (N != N2) {
