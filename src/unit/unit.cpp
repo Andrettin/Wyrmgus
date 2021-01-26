@@ -6791,8 +6791,8 @@ std::string CUnit::get_name() const
 const std::string &CUnit::get_base_type_name() const
 {
 	const wyrmgus::unit_type_variation *variation = this->GetVariation();
-	if (variation != nullptr && !variation->TypeName.empty()) {
-		return variation->TypeName;
+	if (variation != nullptr && !variation->get_type_name().empty()) {
+		return variation->get_type_name();
 	} else {
 		return this->Type->get_name();
 	}

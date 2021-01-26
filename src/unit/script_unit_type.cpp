@@ -715,7 +715,7 @@ static int CclDefineUnitType(lua_State *l)
 						const std::string variation_identifier = LuaToString(l, -1, k + 1);
 						variation = std::make_unique<wyrmgus::unit_type_variation>(variation_identifier, type, image_layer);
 					} else if (!strcmp(value, "type-name")) {
-						variation->TypeName = LuaToString(l, -1, k + 1);
+						variation->type_name = LuaToString(l, -1, k + 1);
 					} else if (!strcmp(value, "button-key")) {
 						variation->button_key = LuaToString(l, -1, k + 1);
 					} else if (!strcmp(value, "file")) {

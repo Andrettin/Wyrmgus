@@ -56,7 +56,7 @@ public:
 	{
 		auto variation = std::make_unique<unit_type_variation>(this->identifier, unit_type, this->ImageLayer);
 
-		variation->TypeName = this->TypeName;
+		variation->type_name = this->type_name;
 		variation->button_key = this->button_key;
 		variation->image_file = this->image_file;
 		for (unsigned int i = 0; i < MaxCosts; ++i) {
@@ -118,6 +118,11 @@ public:
 		return this->frame_size;
 	}
 	
+	const std::string &get_type_name() const
+	{
+		return this->type_name;
+	}
+	
 	const std::string &get_button_key() const
 	{
 		return this->button_key;
@@ -142,9 +147,7 @@ public:
 private:
 	std::filesystem::path image_file;
 	QSize frame_size = QSize(0, 0);
-public:
-	std::string TypeName;			/// Type name.
-private:
+	std::string type_name;			/// Type name.
 	std::string button_key;
 public:
 	std::string ShadowFile;			/// Variation's shadow graphics.

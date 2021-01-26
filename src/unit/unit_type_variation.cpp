@@ -65,7 +65,9 @@ void unit_type_variation::process_sml_property(const sml_property &property)
 	const std::string &key = property.get_key();
 	const std::string &value = property.get_value();
 
-	if (key == "image_file") {
+	if (key == "type_name") {
+		this->type_name = value;
+	} else if (key == "image_file") {
 		this->image_file = database::get()->get_graphics_path(this->unit_type->get_module()) / value;
 	} else if (key == "icon") {
 		this->Icon.Name = value;
@@ -109,7 +111,7 @@ void unit_type_variation::ProcessConfigData(const CConfigData *config_data)
 		std::string value = config_data->Properties[i].second;
 		
 		if (key == "type_name") {
-			this->TypeName = value;
+			this->type_name = value;
 		} else if (key == "button_key") {
 			this->button_key = value;
 		} else if (key == "shadow_file") {
