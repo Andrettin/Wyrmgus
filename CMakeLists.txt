@@ -503,6 +503,7 @@ set(util_SRCS
 	src/util/random.cpp
 	src/util/string_conversion_util.cpp
 	src/util/string_util.cpp
+	src/util/time_util.cpp
 	src/util/util.cpp
 )
 source_group(util FILES ${util_SRCS})
@@ -984,6 +985,7 @@ set(stratagus_util_HDRS
 	src/util/size_util.h
 	src/util/string_conversion_util.h
 	src/util/string_util.h
+	src/util/time_util.h
 	src/util/type_traits.h
 	src/util/util.h
 	src/util/vector_random_util.h
@@ -1141,6 +1143,7 @@ set(util_test_SRCS
 	test/util/astronomy_test.cpp
 	test/util/geocoordinate_test.cpp
 	test/util/string_conversion_test.cpp
+	test/util/time_test.cpp
 )
 source_group(util FILES ${util_test_SRCS})
 
@@ -1648,6 +1651,7 @@ target_precompile_headers(stratagus PRIVATE
 	<QStandardPaths>
 	<QString>
 	<QThread>
+	<QTime>
 	<QVariant>
 	<QVariantList>
 	src/util/point_operators.h #to ensure the / operator with an int as RHS is used instead of the Qt one with qreal (which uses rounding)
