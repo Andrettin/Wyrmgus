@@ -543,7 +543,7 @@ std::string TransliterateText(const std::string &text) //convert special charact
 {
 	std::string result(text);
 
-	string::normalize(result);
+	wyrmgus::string::normalize(result);
 	
 	result = FindAndReplaceString(result, "Ā́", "A");
 	result = FindAndReplaceString(result, "ā́", "a");
@@ -990,7 +990,7 @@ std::string FullyDecapitalizeString(const std::string &text)
 
 std::string GetPluralForm(const std::string &name)
 {
-	return string::get_plural_form(name);
+	return wyrmgus::string::get_plural_form(name);
 }
 
 std::string IdentToName(const std::string &text)

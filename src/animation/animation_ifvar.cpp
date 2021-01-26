@@ -85,7 +85,7 @@ void CAnimation_IfVar::Action(CUnit &unit, int &/*move*/, int /*scale*/) const
 */
 void CAnimation_IfVar::Init(const char *s, lua_State *)
 {
-	const std::vector<std::string> str_list = string::split(s, ' ');
+	const std::vector<std::string> str_list = wyrmgus::string::split(s, ' ');
 
 	this->leftVar = str_list.at(0);
 

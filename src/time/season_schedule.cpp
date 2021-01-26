@@ -116,7 +116,7 @@ void CSeasonSchedule::ProcessConfigData(const CConfigData *config_data)
 		if (key == "name") {
 			this->Name = value;
 		} else if (key == "default_schedule") {
-			const bool is_default_schedule = string::to_bool(value);
+			const bool is_default_schedule = wyrmgus::string::to_bool(value);
 			if (is_default_schedule) {
 				CSeasonSchedule::DefaultSeasonSchedule = this;
 			}

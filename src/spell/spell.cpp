@@ -799,7 +799,7 @@ void ConditionInfo::process_sml_property(const wyrmgus::sml_property &property)
 	} else if (key == "faction_equivalent") {
 		this->FactionEquivalent = wyrmgus::faction::get(value);
 	} else {
-		const std::string pascal_case_key = string::snake_case_to_pascal_case(key);
+		const std::string pascal_case_key = wyrmgus::string::snake_case_to_pascal_case(key);
 
 		int index = UnitTypeVar.VariableNameLookup[pascal_case_key.c_str()];
 		if (index != -1) {
@@ -828,7 +828,7 @@ void ConditionInfo::process_sml_scope(const wyrmgus::sml_data &scope)
 {
 	const std::string &tag = scope.get_tag();
 
-	const std::string pascal_case_tag = string::snake_case_to_pascal_case(tag);
+	const std::string pascal_case_tag = wyrmgus::string::snake_case_to_pascal_case(tag);
 
 	const int index = UnitTypeVar.VariableNameLookup[pascal_case_tag.c_str()];
 	if (index != -1) {
@@ -855,7 +855,7 @@ void ConditionInfo::process_sml_scope(const wyrmgus::sml_data &scope)
 			} else if (key == "max_value_percent") {
 				this->Variable[index].MaxValuePercent = std::stoi(value);
 			} else if (key == "condition_apply_on_caster") {
-				this->Variable[index].ConditionApplyOnCaster = string::to_bool(value);
+				this->Variable[index].ConditionApplyOnCaster = wyrmgus::string::to_bool(value);
 			} else {
 				throw std::runtime_error("Invalid adjust variable spell action variable property: \"" + key + "\".");
 			}
@@ -899,7 +899,7 @@ void AutoCastInfo::process_sml_scope(const wyrmgus::sml_data &scope)
 				if (value == "distance") {
 					index = ACP_DISTANCE;
 				} else {
-					const std::string pascal_case_value = string::snake_case_to_pascal_case(value);
+					const std::string pascal_case_value = wyrmgus::string::snake_case_to_pascal_case(value);
 					index = UnitTypeVar.VariableNameLookup[pascal_case_value.c_str()];
 				}
 
@@ -909,7 +909,7 @@ void AutoCastInfo::process_sml_scope(const wyrmgus::sml_data &scope)
 					throw std::runtime_error("Invalid autocast priority variable value: \"" + value + "\".");
 				}
 			} else if (key == "reverse_sort") {
-				this->ReverseSort = string::to_bool(value);
+				this->ReverseSort = wyrmgus::string::to_bool(value);
 			} else {
 				throw std::runtime_error("Invalid autocast priority property: \"" + key + "\".");
 			}

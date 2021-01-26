@@ -29,7 +29,7 @@
 
 #include "util/char_util.h"
 
-namespace string {
+namespace wyrmgus::string {
 
 std::string get_indefinite_article(const std::string &str)
 {

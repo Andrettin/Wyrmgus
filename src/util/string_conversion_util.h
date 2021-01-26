@@ -31,7 +31,7 @@
 
 #pragma once
 
-namespace string {
+namespace wyrmgus::string {
 
 inline bool to_bool(const std::string &str)
 {

@@ -1014,7 +1014,7 @@ static int CclDefineLanguageWord(lua_State *l)
 	static unsigned definition_count = 0;
 
 	const std::string word_name = LuaToString(l, 1);
-	wyrmgus::word *word = wyrmgus::word::add(string::lowered(word_name) + "_" + std::to_string(definition_count), nullptr);
+	wyrmgus::word *word = wyrmgus::word::add(wyrmgus::string::lowered(word_name) + "_" + std::to_string(definition_count), nullptr);
 	word->set_name(word_name);
 	++definition_count;
 	

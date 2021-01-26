@@ -29,7 +29,7 @@
 
 #include "util/string_util.h"
 
-namespace string {
+namespace wyrmgus::string {
 
 QDateTime to_date(const std::string &date_str)
 {

@@ -31,7 +31,7 @@
 
 #pragma once
 
-namespace string {
+namespace wyrmgus::string {
 
 static inline const std::string empty_str;
 
@@ -52,7 +52,7 @@ inline size_t ci_find(const std::string &str, const std::string &find)
 template <typename string_list_type = std::vector<std::string>>
 inline string_list_type split(const std::string &str, const char delimiter)
 {
-	string_list_type string_list;
+	string_list_type string_list{};
 
 	size_t start_pos = 0;
 	size_t find_pos = 0;

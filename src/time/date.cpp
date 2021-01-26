@@ -49,7 +49,7 @@ CDate CDate::FromString(const std::string &date_str)
 	wyrmgus::calendar *calendar = nullptr;
 	size_t offset = 0;
 	
-	if (date_vector.size() >= 1 && !string::is_number(date_vector[0])) {
+	if (date_vector.size() >= 1 && !wyrmgus::string::is_number(date_vector[0])) {
 		calendar = wyrmgus::calendar::try_get(date_vector[0]);
 		if (calendar) {
 			offset += 1;
@@ -58,7 +58,7 @@ CDate CDate::FromString(const std::string &date_str)
 		}
 	}
 	
-	if (date_vector.size() >= (1 + offset) && !string::is_number(date_vector[0 + offset])) {
+	if (date_vector.size() >= (1 + offset) && !wyrmgus::string::is_number(date_vector[0 + offset])) {
 		wyrmgus::timeline *timeline = wyrmgus::timeline::get(date_vector[0 + offset]);
 		offset += 1;
 	}
@@ -272,11 +272,11 @@ unsigned long long CDate::GetTotalHours() const
 	unsigned long long hours = this->Hour;
 	
 	unsigned long long days = 0;
-	days += (this->Year - 1 + BaseCalendarYearOffsetForHours) * CDate::days_per_year;
+	days += (static_cast<unsigned long long>(this->Year) + BaseCalendarYearOffsetForHours - 1) * CDate::days_per_year;
 	for (int i = 1; i <= this->Month; ++i) {
 		days += calendar.daysInMonth(i);
 	}
-	days += this->Day - 1;
+	days += static_cast<unsigned long long>(this->Day) - 1;
 	hours += days * CDate::hours_per_day;
 	
 	return hours;
@@ -290,7 +290,7 @@ unsigned long long CDate::GetTotalHours() const
 */
 void SetCurrentDate(const std::string &date_string)
 {
-	wyrmgus::game::get()->set_current_date(string::to_date(date_string));
+	wyrmgus::game::get()->set_current_date(wyrmgus::string::to_date(date_string));
 }
 
 /**

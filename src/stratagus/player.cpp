@@ -1492,7 +1492,7 @@ const std::string &CPlayer::get_interface() const
 		return civilization->get_interface();
 	}
 
-	return string::empty_str;
+	return wyrmgus::string::empty_str;
 }
 
 /**
@@ -2081,7 +2081,7 @@ std::string CPlayer::get_full_name() const
 std::string_view CPlayer::get_faction_title_name() const
 {
 	if (this->get_civilization() == nullptr || this->get_faction() == nullptr) {
-		return string::empty_str;
+		return wyrmgus::string::empty_str;
 	}
 	
 	const wyrmgus::faction *faction = this->get_faction();
@@ -2094,7 +2094,7 @@ std::string_view CPlayer::get_faction_title_name() const
 std::string_view CPlayer::GetCharacterTitleName(const wyrmgus::character_title title_type, const wyrmgus::gender gender) const
 {
 	if (this->get_faction() == nullptr || title_type == wyrmgus::character_title::none || gender == wyrmgus::gender::none) {
-		return string::empty_str;
+		return wyrmgus::string::empty_str;
 	}
 	
 	const wyrmgus::faction *faction = this->get_faction();
@@ -2638,8 +2638,8 @@ void CPlayer::complete_quest(wyrmgus::quest *quest)
 
 		std::string rewards_string = quest->get_rewards_string(this);
 		if (!rewards_string.empty()) {
-			string::replace(rewards_string, "\n", "\\n");
-			string::replace(rewards_string, "\t", "\\t");
+			wyrmgus::string::replace(rewards_string, "\n", "\\n");
+			wyrmgus::string::replace(rewards_string, "\t", "\\t");
 			rewards_string = "Rewards:\\n" + rewards_string;
 		}
 		CclCommand("if (GenericDialog ~= nil) then GenericDialog(\"Quest Completed\", \"You have completed the " + quest->get_name() + " quest!\\n\\n" + rewards_string + "\", nil, \"" + (quest->get_icon() ? quest->get_icon()->get_identifier() : "") + "\", \"" + (quest->get_player_color() ? quest->get_player_color()->get_identifier() : "") + "\", " + std::to_string(quest->get_icon() ? quest->get_icon()->get_frame() : 0) + ") end;");
