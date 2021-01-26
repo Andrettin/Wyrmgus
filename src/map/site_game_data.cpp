@@ -30,6 +30,7 @@
 #include "map/site_game_data.h"
 
 #include "ai/ai_local.h"
+#include "database/sml_data.h"
 #include "map/map.h"
 #include "map/map_layer.h"
 #include "map/minimap.h"
@@ -40,6 +41,44 @@
 #include "util/vector_util.h"
 
 namespace wyrmgus {
+
+void site_game_data::process_sml_property(const sml_property &property)
+{
+	const std::string &key = property.get_key();
+	const std::string &value = property.get_value();
+
+	if (key == "map_layer") {
+		this->map_layer = CMap::get()->MapLayers[std::stoi(value)].get();
+	} else {
+		throw std::runtime_error("Invalid site game data property: \"" + key + "\".");
+	}
+}
+
+void site_game_data::process_sml_scope(const sml_data &scope)
+{
+	const std::string &tag = scope.get_tag();
+
+	if (tag == "map_pos") {
+		this->map_pos = scope.to_point();
+	} else {
+		throw std::runtime_error("Invalid site game data scope: \"" + scope.get_tag() + "\".");
+	}
+}
+
+sml_data site_game_data::to_sml_data() const
+{
+	sml_data data(this->site->get_identifier());
+
+	if (this->get_map_pos() != QPoint(-1, -1)) {
+		data.add_child(sml_data::from_point(this->get_map_pos(), "map_pos"));
+	}
+
+	if (this->get_map_layer() != nullptr) {
+		data.add_property("map_layer", std::to_string(this->get_map_layer()->ID));
+	}
+
+	return data;
+}
 
 const std::string &site_game_data::get_current_cultural_name() const
 {
@@ -152,7 +191,7 @@ void site_game_data::update_border_tiles()
 
 void site_game_data::update_minimap_territory()
 {
-	if (this->get_site_unit() == nullptr) {
+	if (this->get_site_unit() == nullptr || !this->site->is_settlement()) {
 		return;
 	}
 

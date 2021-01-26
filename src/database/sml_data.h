@@ -45,8 +45,7 @@ class sml_parser;
 class sml_data final
 {
 public:
-	template <typename point_type>
-	static sml_data from_point(const point_type &point, const std::string &tag = std::string())
+	static sml_data from_point(const QPoint &point, const std::string &tag = std::string())
 	{
 		sml_data point_data(tag);
 		point_data.add_value(std::to_string(point.x()));

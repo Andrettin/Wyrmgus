@@ -794,7 +794,7 @@ void SaveTriggers(CFile &file)
 	file.printf("if (Triggers ~= nil) then assert(loadstring(Triggers))() end\n");
 	file.printf("\n");
 
-	wyrmgus::game::get()->save_delayed_effects(file);
+	wyrmgus::game::get()->save(file);
 	
 	//Wyrmgus start
 	if (CurrentQuest != nullptr) {

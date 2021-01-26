@@ -121,8 +121,7 @@ $pfile "unit_type.pkg"
 $pfile "upgrade.pkg"
 $pfile "video.pkg"
 
-extern void load_player_delayed_effects(const std::string sml_string);
-extern void load_unit_delayed_effects(const std::string sml_string);
+extern void load_game_data(const std::string sml_string);
 
 extern int SaveGame(const std::string filename);
 extern void DeleteSaveGame(const std::string filename);

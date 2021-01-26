@@ -37,6 +37,7 @@ namespace wyrmgus {
 
 class campaign;
 class sml_data;
+class sml_property;
 class trigger;
 
 template <typename scope_type>
@@ -72,6 +73,11 @@ public:
 
 	void do_cycle();
 
+	void process_sml_property(const sml_property &property);
+	void process_sml_scope(const sml_data &scope);
+
+	void save(CFile &file) const;
+
 	void add_local_trigger(std::unique_ptr<trigger> &&local_trigger);
 	void remove_local_trigger(trigger *local_trigger);
 	void clear_local_triggers();
@@ -100,15 +106,6 @@ public:
 	void add_delayed_effect(std::unique_ptr<delayed_effect_instance<CUnit>> &&delayed_effect);
 
 	void clear_delayed_effects();
-	void save_delayed_effects(CFile &file) const;
-
-private:
-	template <typename scope_type>
-	void save_delayed_effects(CFile &file, const std::vector<std::unique_ptr<delayed_effect_instance<scope_type>>> &delayed_effects) const;
-
-public:
-	template <typename scope_type>
-	void load_delayed_effects(const sml_data &data);
 
 private:
 	campaign *current_campaign = nullptr;
@@ -118,12 +115,6 @@ private:
 	std::vector<std::unique_ptr<delayed_effect_instance<CUnit>>> unit_delayed_effects;
 };
 
-extern template void game::save_delayed_effects<CPlayer>(CFile &file, const std::vector<std::unique_ptr<delayed_effect_instance<CPlayer>>> &delayed_effects) const;
-extern template void game::save_delayed_effects<CUnit>(CFile &file, const std::vector<std::unique_ptr<delayed_effect_instance<CUnit>>> &delayed_effects) const;
-
-extern template void game::load_delayed_effects<CPlayer>(const sml_data &data);
-extern template void game::load_delayed_effects<CUnit>(const sml_data &data);
-
 }
 
 class CFile;
@@ -131,8 +122,7 @@ class CFile;
 class CGraphic;
 //Wyrmgus end
 
-extern void load_player_delayed_effects(const std::string &sml_string);
-extern void load_unit_delayed_effects(const std::string &sml_string);
+extern void load_game_data(const std::string &sml_string);
 
 extern void LoadGame(const std::string &filename); /// Load saved game
 extern int SaveGame(const std::string &filename); /// Save game

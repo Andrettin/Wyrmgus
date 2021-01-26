@@ -31,6 +31,7 @@
 
 #pragma once
 
+class CFile;
 class CMapLayer;
 class CPlayer;
 class CUnit;
@@ -39,6 +40,8 @@ namespace wyrmgus {
 
 class resource;
 class site;
+class sml_data;
+class sml_property;
 class tile;
 
 class site_game_data final
@@ -47,6 +50,11 @@ public:
 	explicit site_game_data(const site *site) : site(site)
 	{
 	}
+
+	void process_sml_property(const sml_property &property);
+	void process_sml_scope(const sml_data &scope);
+
+	sml_data to_sml_data() const;
 
 	const std::string &get_current_cultural_name() const;
 

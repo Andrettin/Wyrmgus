@@ -59,6 +59,8 @@
 #include "map/map.h"
 #include "map/map_layer.h"
 #include "map/minimap.h"
+#include "map/site.h"
+#include "map/site_game_data.h"
 #include "map/terrain_type.h"
 #include "map/tile.h"
 #include "map/tileset.h"
@@ -176,6 +178,82 @@ void game::do_cycle()
 	}
 }
 
+void game::process_sml_property(const sml_property &property)
+{
+	const std::string &key = property.get_key();
+
+	throw std::runtime_error("Invalid game data property: \"" + key + "\".");
+}
+
+void game::process_sml_scope(const sml_data &scope)
+{
+	const std::string &tag = scope.get_tag();
+
+	if (tag == "player_delayed_effects") {
+		scope.for_each_child([&](const sml_data &delayed_effect_data) {
+			auto delayed_effect = std::make_unique<delayed_effect_instance<CPlayer>>();
+			database::process_sml_data(delayed_effect, delayed_effect_data);
+			this->add_delayed_effect(std::move(delayed_effect));
+		});
+	} else if (tag == "unit_delayed_effects") {
+		scope.for_each_child([&](const sml_data &delayed_effect_data) {
+			auto delayed_effect = std::make_unique<delayed_effect_instance<CUnit>>();
+			database::process_sml_data(delayed_effect, delayed_effect_data);
+			this->add_delayed_effect(std::move(delayed_effect));
+		});
+	} else if (tag == "site_data") {
+		scope.for_each_child([&](const sml_data &child_scope) {
+			const site *site = site::get(child_scope.get_tag());
+			database::process_sml_data(site->get_game_data(), child_scope);
+		});
+	} else {
+		throw std::runtime_error("Invalid game data scope: \"" + scope.get_tag() + "\".");
+	}
+}
+
+void game::save(CFile &file) const
+{
+	sml_data game_data;
+
+	if (!this->player_delayed_effects.empty()) {
+		sml_data delayed_effects_data("player_delayed_effects");
+		for (const auto &delayed_effect : this->player_delayed_effects) {
+			delayed_effects_data.add_child(delayed_effect->to_sml_data());
+		}
+		game_data.add_child(std::move(delayed_effects_data));
+	}
+
+	if (!this->unit_delayed_effects.empty()) {
+		sml_data delayed_effects_data("unit_delayed_effects");
+		for (const auto &delayed_effect : this->unit_delayed_effects) {
+			delayed_effects_data.add_child(delayed_effect->to_sml_data());
+		}
+		game_data.add_child(std::move(delayed_effects_data));
+	}
+
+	sml_data site_game_data("site_data");
+	for (const site *site : site::get_all()) {
+		if (site->get_game_data() == nullptr) {
+			continue;
+		}
+
+		sml_data site_data = site->get_game_data()->to_sml_data();
+
+		if (site_data.is_empty()) {
+			continue;
+		}
+
+		site_game_data.add_child(std::move(site_data));
+	}
+
+	if (!site_game_data.is_empty()) {
+		game_data.add_child(std::move(site_game_data));
+	}
+
+	const std::string str = "load_game_data(\"" + string::escaped(game_data.print_to_string()) + "\")\n";
+	file.printf("%s", str.c_str());
+}
+
 void game::add_local_trigger(std::unique_ptr<trigger> &&local_trigger)
 {
 	this->local_triggers.push_back(std::move(local_trigger));
@@ -213,65 +291,12 @@ void game::clear_delayed_effects()
 	this->unit_delayed_effects.clear();
 }
 
-void game::save_delayed_effects(CFile &file) const
-{
-	if (!this->player_delayed_effects.empty()) {
-		this->save_delayed_effects(file, this->player_delayed_effects);
-	}
-
-	if (!this->unit_delayed_effects.empty()) {
-		this->save_delayed_effects(file, this->unit_delayed_effects);
-	}
 }
 
-template <typename scope_type>
-void game::save_delayed_effects(CFile &file, const std::vector<std::unique_ptr<delayed_effect_instance<scope_type>>> &delayed_effects) const
-{
-	sml_data delayed_effects_data;
-	for (const auto &delayed_effect : delayed_effects) {
-		delayed_effects_data.add_child(delayed_effect->to_sml_data());
-	}
-
-	std::string str = "load_";
-
-	if constexpr (std::is_same_v<scope_type, CPlayer>) {
-		str += "player";
-	} else {
-		str += "unit";
-	}
-
-	str += "_delayed_effects(\"" + string::escaped(delayed_effects_data.print_to_string()) + "\")\n";
-	file.printf("%s", str.c_str());
-}
-
-template <typename scope_type>
-void game::load_delayed_effects(const sml_data &data)
-{
-	data.for_each_child([&](const sml_data &delayed_effect_data) {
-		auto delayed_effect = std::make_unique<delayed_effect_instance<scope_type>>();
-		database::process_sml_data(delayed_effect, delayed_effect_data);
-		this->add_delayed_effect(std::move(delayed_effect));
-	});
-}
-
-template void game::save_delayed_effects<CPlayer>(CFile &file, const std::vector<std::unique_ptr<delayed_effect_instance<CPlayer>>> &delayed_effects) const;
-template void game::save_delayed_effects<CUnit>(CFile &file, const std::vector<std::unique_ptr<delayed_effect_instance<CUnit>>> &delayed_effects) const;
-
-template void game::load_delayed_effects<CPlayer>(const sml_data &data);
-template void game::load_delayed_effects<CUnit>(const sml_data &data);
-
-}
-
-void load_player_delayed_effects(const std::string &sml_string)
+void load_game_data(const std::string &sml_string)
 {
 	wyrmgus::sml_parser parser;
-	wyrmgus::game::get()->load_delayed_effects<CPlayer>(parser.parse(sml_string));
-}
-
-void load_unit_delayed_effects(const std::string &sml_string)
-{
-	wyrmgus::sml_parser parser;
-	wyrmgus::game::get()->load_delayed_effects<CUnit>(parser.parse(sml_string));
+	wyrmgus::database::process_sml_data(wyrmgus::game::get(), parser.parse(sml_string));
 }
 
 /**
