@@ -1811,7 +1811,7 @@ endif()
 
 ########### install files ###############
 
-install(TARGETS stratagus DESTINATION ${GAMEDIR})
+install(TARGETS stratagus_main DESTINATION ${GAMEDIR})
 
 if(ENABLE_METASERVER)
 	install(TARGETS metaserver DESTINATION ${SBINDIR})
