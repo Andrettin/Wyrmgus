@@ -46,6 +46,7 @@
 #include "unit/unit_ref.h"
 #include "unit/unit_type.h"
 #include "unit/unit_type_type.h"
+#include "util/log_util.h"
 #include "util/vector_util.h"
 
 /*----------------------------------------------------------------------------
@@ -1138,7 +1139,7 @@ public:
 	*/
 	//Wyrmgus start
 //	BestRangeTargetFinder(const CUnit &a, const int r) : attacker(&a), range(r),
-	BestRangeTargetFinder(const CUnit &a, const int r, const bool i_n) : attacker(&a), range(r), include_neutral(i_n),
+	explicit BestRangeTargetFinder(const CUnit &a, const int r, const bool i_n) : attacker(&a), range(r), include_neutral(i_n),
 	//Wyrmgus end
 		size((a.GetMissile().Missile->get_range() + r) * 2)
 	{
@@ -1151,7 +1152,7 @@ public:
 	public:
 		//Wyrmgus start
 //		FillBadGood(const CUnit &a, int r, std::vector<int> *g, std::vector<int> *b, int s):
-		FillBadGood(const CUnit &a, int r, std::vector<int> &g, std::vector<int> &b, int s, bool i_n):
+		explicit FillBadGood(const CUnit &a, int r, std::vector<int> &g, std::vector<int> &b, const int s, const bool i_n):
 		//Wyrmgus end
 			attacker(&a), range(r), size(s),
 			//Wyrmgus start
@@ -1310,10 +1311,7 @@ public:
 				for (int xx = 0; xx < dtype.get_tile_width(); ++xx) {
 					int pos = (y + yy) * (size / 2) + (x + xx);
 					if (pos >= (int) good.size()) {
-						printf("BUG: RangeTargetFinder::FillBadGood.Compute out of range. "\
-							"size: %d, pos: %d, " \
-							"x: %d, xx: %d, y: %d, yy: %d",
-							size, pos, x, xx, y, yy);
+						wyrmgus::log::log_error("Error: RangeTargetFinder::FillBadGood. Compute out of range. Size: " + std::to_string(size) + ", pos: " + std::to_string(pos) + ", x: " + std::to_string(x) + ", xx: " + std::to_string(xx) + ", y: " + std::to_string(y) + ", yy: " + std::to_string(yy) + ".");
 						break;
 					}
 					if (cost < 0) {
@@ -1408,10 +1406,7 @@ private:
 				int pos = (y + yy) * (size / 2) + (x + xx);
 				int localFactor = (!xx && !yy) ? 1 : splashFactor;
 				if (pos >= (int) good.size()) {
-					printf("BUG: RangeTargetFinder.Compute out of range. " \
-						"size: %d, pos: %d, "	\
-						"x: %d, xx: %d, y: %d, yy: %d",
-						size, pos, x, xx, y, yy);
+					wyrmgus::log::log_error("Error: RangeTargetFinder. Compute out of range. Size: " + std::to_string(size) + ", pos: " + std::to_string(pos) + ", x: " + std::to_string(x) + ", xx: " + std::to_string(xx) + ", y: " + std::to_string(y) + ", yy: " + std::to_string(yy) + ".");
 					break;
 				}
 				sbad += bad.at(pos) / localFactor;
@@ -1433,15 +1428,15 @@ private:
 	}
 
 private:
-	const CUnit *attacker;
-	const int range;
+	const CUnit *attacker = nullptr;
+	const int range = 0;
 	CUnit *best_unit = nullptr;
 	int best_cost = INT_MIN;
 	std::vector<int> good;
 	std::vector<int> bad;
-	const int size;
+	const int size = 0;
 	//Wyrmgus start
-	const bool include_neutral;
+	const bool include_neutral = false;
 	//Wyrmgus end
 };
 
