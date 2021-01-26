@@ -65,4 +65,38 @@ QDateTime to_date(const std::string &date_str)
 	return date;
 }
 
+QTime to_time(const std::string &time_str)
+{
+	const std::vector<std::string> time_string_list = string::split(time_str, '.');
+
+	int hours = 0;
+	int minutes = 0;
+	int seconds = 0;
+	int milliseconds = 0;
+
+	if (time_string_list.size() >= 1) {
+		hours = std::stoi(time_string_list[0]);
+
+		if (time_string_list.size() >= 2) {
+			minutes = std::stoi(time_string_list[1]);
+
+			if (time_string_list.size() >= 3) {
+				seconds = std::stoi(time_string_list[2]);
+
+				if (time_string_list.size() >= 4) {
+					milliseconds = std::stoi(time_string_list[3]);
+				}
+			}
+		}
+	}
+
+	QTime time(hours, minutes, seconds, milliseconds);
+
+	if (!time.isValid()) {
+		throw std::runtime_error("Time \"" + time_str + "\" is not a valid time.");
+	}
+
+	return time;
+}
+
 }

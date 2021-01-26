@@ -54,5 +54,6 @@ inline char to_character(const std::string &str)
 }
 
 extern QDateTime to_date(const std::string &date_str);
+extern QTime to_time(const std::string &time_str);
 
 }
