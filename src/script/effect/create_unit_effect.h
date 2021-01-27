@@ -113,7 +113,7 @@ public:
 		const QPoint unit_top_left_pos = this->get_tile_pos(player) - unit_type->get_tile_center_pos_offset();
 		const int map_layer = this->get_map_layer_index(player);
 
-		CUnit *unit = MakeUnitAndPlace(unit_top_left_pos, *unit_type, player, map_layer);
+		CUnit *unit = CreateUnit(unit_top_left_pos, *unit_type, player, map_layer);
 		if (this->character != nullptr) {
 			unit->set_character(this->character);
 		}
