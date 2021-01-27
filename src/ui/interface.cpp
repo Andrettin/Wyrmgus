@@ -47,6 +47,7 @@
 #include "player_color.h"
 #include "replay.h"
 #include "script.h"
+#include "script/cheat.h"
 #include "sound/sound.h"
 #include "sound/sound_server.h"
 #include "sound/unit_sound_type.h"
@@ -1007,10 +1008,16 @@ static bool CommandKey(int key)
 /**
 **  Handle cheats
 **
-**  @return  1 if a cheat was handled, 0 otherwise
+**  @return  True if a cheat was handled, false otherwise
 */
-int HandleCheats(const std::string &input)
+bool HandleCheats(const std::string &input)
 {
+	const wyrmgus::cheat *cheat = wyrmgus::cheat::try_get_by_code(input);
+	if (cheat != nullptr) {
+		cheat->do_effects();
+		return true;
+	}
+
 #if defined(DEBUG) || defined(PROF)
 	if (input == "ai me") {
 		if (ThisPlayer->AiEnabled) {
@@ -1032,24 +1039,25 @@ int HandleCheats(const std::string &input)
 			}
 			SetMessage("I'm the BORG, resistance is futile!");
 		}
-		return 1;
+		return true;
 	}
 #endif
+
 	int base = lua_gettop(Lua);
 	lua_getglobal(Lua, "HandleCheats");
 	if (!lua_isfunction(Lua, -1)) {
 		DebugPrint("No HandleCheats function in lua.\n");
-		return 0;
+		return false;
 	}
 	lua_pushstring(Lua, input.c_str());
 	LuaCall(1, 0, false);
 	if (lua_gettop(Lua) - base == 1) {
-		int ret = LuaToBoolean(Lua, -1);
+		const bool ret = LuaToBoolean(Lua, -1);
 		lua_pop(Lua, 1);
 		return ret;
 	} else {
 		DebugPrint("HandleCheats must return a boolean");
-		return 0;
+		return false;
 	}
 }
 

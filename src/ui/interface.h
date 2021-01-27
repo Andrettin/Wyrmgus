@@ -272,7 +272,7 @@ extern std::string GetCurrentButtonValueStr();
 //Wyrmgus end
 
 /// Handle cheats
-extern int HandleCheats(const std::string &input);
+extern bool HandleCheats(const std::string &input);
 
 /// Call the lua function HandleCommandKey
 bool HandleCommandKey(int key);

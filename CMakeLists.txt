@@ -318,6 +318,7 @@ set(religion_SRCS
 source_group(religion FILES ${religion_SRCS})
 
 set(script_SRCS
+	src/script/cheat.cpp
 	src/script/context.cpp
 	src/script/factor_modifier.cpp
 	src/script/trigger.cpp
@@ -787,6 +788,7 @@ set(stratagus_religion_HDRS
 )
 
 set(stratagus_script_HDRS
+	src/script/cheat.h
 	src/script/context.h
 	src/script/factor_modifier.h
 	src/script/trigger.h
