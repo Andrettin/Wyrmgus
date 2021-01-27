@@ -313,3 +313,5 @@ inline std::string to_tooltip(const std::string &str)
 }
 
 }
+
+Q_DECLARE_METATYPE(std::string)
