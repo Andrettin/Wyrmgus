@@ -7596,7 +7596,7 @@ void HitUnit(CUnit *attacker, CUnit &target, int damage, const Missile *missile,
 	//Wyrmgus start
 //	HitUnit_LastAttack(attacker, target);
 	//Wyrmgus end
-	if (attacker) {
+	if (attacker != nullptr) {
 		//Wyrmgus start
 		HitUnit_LastAttack(attacker, target); //only trigger the help me notification and AI code if there is actually an attacker
 		//Wyrmgus end

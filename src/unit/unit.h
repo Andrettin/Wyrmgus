@@ -792,7 +792,7 @@ public:
 	friend int CclUnit(lua_State *l);
 };
 
-#define NoUnitP (CUnit *)0        /// return value: for no unit found
+constexpr CUnit *NoUnitP = nullptr;        /// return value: for no unit found
 
 /**
 **  Returns unit number (unique to this unit)

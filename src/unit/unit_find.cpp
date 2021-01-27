@@ -1414,7 +1414,7 @@ private:
 			}
 		}
 
-		if (sgood > 0 && attacker->Type->BoolFlag[NOFRIENDLYFIRE_INDEX].value) {
+		if (sgood > 0 && type.BoolFlag[NOFRIENDLYFIRE_INDEX].value) {
 			return;
 		}
 		

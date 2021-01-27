@@ -60,7 +60,9 @@ CDate CDate::FromString(const std::string &date_str)
 	
 	if (date_vector.size() >= (1 + offset) && !wyrmgus::string::is_number(date_vector[0 + offset])) {
 		wyrmgus::timeline *timeline = wyrmgus::timeline::get(date_vector[0 + offset]);
-		offset += 1;
+		if (timeline) {
+			offset += 1;
+		}
 	}
 	
 	if (date_vector.size() >= (1 + offset)) {
