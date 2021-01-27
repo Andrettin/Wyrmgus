@@ -72,6 +72,7 @@
 #include "unit/unit_find.h"
 #include "unit/unit_type.h"
 #include "unit/unit_type_type.h"
+#include "util/log_util.h"
 #include "util/vector_util.h"
 #include "video/font.h"
 #include "video/video.h"
@@ -1346,6 +1347,117 @@ static void MouseScrollMap(const PixelPos &pos)
 	UI.MouseWarpPos = CursorStartScreenPos;
 }
 
+static void handle_mouse_move_on_map(const PixelPos &cursor_pos)
+{
+	if (UI.MouseViewport == nullptr) {
+		wyrmgus::log::log_error("Mouse viewport pointer is null.");
+		return;
+	}
+
+	if (!UI.MouseViewport->IsInsideMapArea(CursorScreenPos)) {
+		return;
+	}
+
+	const CViewport &vp = *UI.MouseViewport;
+	const Vec2i tilePos = vp.ScreenToTilePos(cursor_pos);
+
+	try {
+		if (CursorBuilding && (MouseButtons & LeftButton) && Selected.at(0)
+			&& (KeyModifiers & (ModifierAlt | ModifierShift))) {
+			const CUnit &unit = *Selected[0];
+			const Vec2i cursor_tile_pos = UI.MouseViewport->ScreenToTilePos(CursorScreenPos);
+			bool explored = CanBuildOnArea(*Selected[0], cursor_tile_pos);
+
+			// We now need to check if there are another build commands on this build spot
+			bool buildable = true;
+			for (const std::unique_ptr<COrder> &order : unit.Orders) {
+				if (order->Action == UnitAction::Build) {
+					const COrder_Build *build = dynamic_cast<const COrder_Build *>(order.get());
+					if (cursor_tile_pos.x >= build->GetGoalPos().x
+						&& cursor_tile_pos.x < build->GetGoalPos().x + build->GetUnitType().get_tile_width()
+						&& cursor_tile_pos.y >= build->GetGoalPos().y
+						&& cursor_tile_pos.y < build->GetGoalPos().y + build->GetUnitType().get_tile_height()) {
+						buildable = false;
+						break;
+					}
+				}
+			}
+
+			// 0 Test build, don't really build
+			//Wyrmgus start
+//				if (CanBuildUnitType(Selected[0], *CursorBuilding, cursor_tile_pos, 0) && buildable && (explored || ReplayRevealMap)) {
+			if (CanBuildUnitType(Selected[0], *CursorBuilding, cursor_tile_pos, 0, false, UI.CurrentMapLayer->ID) && buildable && (explored || ReplayRevealMap)) {
+				//Wyrmgus end
+				const int flush = !(KeyModifiers & ModifierShift);
+				for (size_t i = 0; i != Selected.size(); ++i) {
+					//Wyrmgus start
+//						SendCommandBuildBuilding(*Selected[i], cursor_tile_pos, *CursorBuilding, flush);
+					SendCommandBuildBuilding(*Selected[i], cursor_tile_pos, *CursorBuilding, flush, UI.CurrentMapLayer->ID);
+					//Wyrmgus end
+				}
+				if (!(KeyModifiers & (ModifierAlt | ModifierShift))) {
+					CancelBuildingMode();
+				}
+			}
+		}
+	} catch (const std::out_of_range &oor) {
+		DebugPrint("Selected is empty: %s\n" _C_ oor.what());
+	}
+	if (Preference.ShowNameDelay) {
+		ShowNameDelay = GameCycle + Preference.ShowNameDelay;
+		ShowNameTime = GameCycle + Preference.ShowNameDelay + Preference.ShowNameTime;
+	}
+
+	bool show = ReplayRevealMap ? true : false;
+	if (show == false) {
+		const wyrmgus::tile &mf = *UI.CurrentMapLayer->Field(tilePos);
+		for (int i = 0; i < PlayerMax; ++i) {
+			if (mf.player_info->IsTeamExplored(*CPlayer::Players[i])
+				&& (i == CPlayer::GetThisPlayer()->Index || CPlayer::Players[i]->has_mutual_shared_vision_with(*CPlayer::GetThisPlayer()) || CPlayer::Players[i]->is_revealed())) {
+				show = true;
+				break;
+			}
+		}
+	}
+
+	if (show) {
+		const PixelPos mapPixelPos = vp.screen_to_scaled_map_pixel_pos(cursor_pos);
+		UnitUnderCursor = UnitOnScreen(mapPixelPos.x, mapPixelPos.y);
+	}
+
+	//Wyrmgus start
+	if (show && Selected.size() >= 1 && Selected[0]->Player == CPlayer::GetThisPlayer()) {
+		bool has_terrain_resource = false;
+		const CViewport &cursor_vp = *UI.MouseViewport;
+		const Vec2i cursor_tile_pos = cursor_vp.ScreenToTilePos(cursor_pos);
+		for (const wyrmgus::resource *resource : wyrmgus::resource::get_all()) {
+			if (Selected[0]->Type->ResInfo[resource->get_index()]
+				//Wyrmgus start
+//					&& Selected[0]->Type->ResInfo[res]->TerrainHarvester
+					//Wyrmgus end
+				&& UI.CurrentMapLayer->Field(cursor_tile_pos)->get_resource() == resource
+				) {
+				has_terrain_resource = true;
+			}
+		}
+		if (has_terrain_resource) {
+			GameCursor = UI.get_cursor(wyrmgus::cursor_type::yellow_hair);
+		}
+	}
+	//Wyrmgus end
+}
+
+static void handle_mouse_move_on_minimap(const PixelPos &cursor_pos)
+{
+	const Vec2i tile_pos = UI.get_minimap()->screen_to_tile_pos(cursor_pos);
+
+	if (UI.get_minimap()->are_units_visible()) {
+		if (UI.CurrentMapLayer->Field(tile_pos)->player_info->IsTeamExplored(*CPlayer::GetThisPlayer()) || ReplayRevealMap) {
+			UnitUnderCursor = UnitOnMapTile(tile_pos, UnitTypeType::None, UI.CurrentMapLayer->ID);
+		}
+	}
+}
+
 /**
 **  Handle movement of the cursor.
 **
@@ -1414,106 +1526,15 @@ void UIHandleMouseMove(const PixelPos &cursorPos)
 
 	// This is forbidden for unexplored and not visible space
 	// FIXME: This must done new, moving units, scrolling...
-	if (UI.MouseViewport == nullptr) {
-		fprintf(stderr, "Mouse viewport pointer is null.\n");
-	}
-	
-	if (CursorOn == cursor_on::map && UI.MouseViewport && UI.MouseViewport->IsInsideMapArea(CursorScreenPos)) {
-		const CViewport &vp = *UI.MouseViewport;
-		const Vec2i tilePos = vp.ScreenToTilePos(cursorPos);
-
-		try {
-			if (CursorBuilding && (MouseButtons & LeftButton) && Selected.at(0)
-				&& (KeyModifiers & (ModifierAlt | ModifierShift))) {
-				const CUnit &unit = *Selected[0];
-				const Vec2i cursor_tile_pos = UI.MouseViewport->ScreenToTilePos(CursorScreenPos);
-				bool explored = CanBuildOnArea(*Selected[0], cursor_tile_pos);
-
-				// We now need to check if there are another build commands on this build spot
-				bool buildable = true;
-				for (const std::unique_ptr<COrder> &order : unit.Orders) {
-					if (order->Action == UnitAction::Build) {
-						const COrder_Build *build = dynamic_cast<const COrder_Build *>(order.get());
-						if (cursor_tile_pos.x >= build->GetGoalPos().x
-							&& cursor_tile_pos.x < build->GetGoalPos().x + build->GetUnitType().get_tile_width()
-							&& cursor_tile_pos.y >= build->GetGoalPos().y
-							&& cursor_tile_pos.y < build->GetGoalPos().y + build->GetUnitType().get_tile_height()) {
-							buildable = false;
-							break;
-						}
-					}
-				}
-
-				// 0 Test build, don't really build
-				//Wyrmgus start
-//				if (CanBuildUnitType(Selected[0], *CursorBuilding, cursor_tile_pos, 0) && buildable && (explored || ReplayRevealMap)) {
-				if (CanBuildUnitType(Selected[0], *CursorBuilding, cursor_tile_pos, 0, false, UI.CurrentMapLayer->ID) && buildable && (explored || ReplayRevealMap)) {
-				//Wyrmgus end
-					const int flush = !(KeyModifiers & ModifierShift);
-					for (size_t i = 0; i != Selected.size(); ++i) {
-						//Wyrmgus start
-//						SendCommandBuildBuilding(*Selected[i], cursor_tile_pos, *CursorBuilding, flush);
-						SendCommandBuildBuilding(*Selected[i], cursor_tile_pos, *CursorBuilding, flush, UI.CurrentMapLayer->ID);
-						//Wyrmgus end
-					}
-					if (!(KeyModifiers & (ModifierAlt | ModifierShift))) {
-						CancelBuildingMode();
-					}
-				}
-			}
-		} catch (const std::out_of_range &oor) {
-			DebugPrint("Selected is empty: %s\n" _C_ oor.what());
-		}
-		if (Preference.ShowNameDelay) {
-			ShowNameDelay = GameCycle + Preference.ShowNameDelay;
-			ShowNameTime = GameCycle + Preference.ShowNameDelay + Preference.ShowNameTime;
-		}
-
-		bool show = ReplayRevealMap ? true : false;
-		if (show == false) {
-			const wyrmgus::tile &mf = *UI.CurrentMapLayer->Field(tilePos);
-			for (int i = 0; i < PlayerMax; ++i) {
-				if (mf.player_info->IsTeamExplored(*CPlayer::Players[i])
-					&& (i == CPlayer::GetThisPlayer()->Index || CPlayer::Players[i]->has_mutual_shared_vision_with(*CPlayer::GetThisPlayer()) || CPlayer::Players[i]->is_revealed())) {
-					show = true;
-					break;
-				}
-			}
-		}
-
-		if (show) {
-			const PixelPos mapPixelPos = vp.screen_to_scaled_map_pixel_pos(cursorPos);
-			UnitUnderCursor = UnitOnScreen(mapPixelPos.x, mapPixelPos.y);
-		}
-		
-		//Wyrmgus start
-		if (show && Selected.size() >= 1 && Selected[0]->Player == CPlayer::GetThisPlayer()) {
-			bool has_terrain_resource = false;
-			const CViewport &cursor_vp = *UI.MouseViewport;
-			const Vec2i cursor_tile_pos = cursor_vp.ScreenToTilePos(cursorPos);
-			for (const wyrmgus::resource *resource : wyrmgus::resource::get_all()) {
-				if (Selected[0]->Type->ResInfo[resource->get_index()]
-					//Wyrmgus start
-//					&& Selected[0]->Type->ResInfo[res]->TerrainHarvester
-					//Wyrmgus end
-					&& UI.CurrentMapLayer->Field(cursor_tile_pos)->get_resource() == resource
-				) {
-					has_terrain_resource = true;
-				}
-			}
-			if (has_terrain_resource) {
-				GameCursor = UI.get_cursor(wyrmgus::cursor_type::yellow_hair);
-			}
-		}
-		//Wyrmgus end
-	} else if (CursorOn == cursor_on::minimap) {
-		const Vec2i tilePos = UI.get_minimap()->screen_to_tile_pos(cursorPos);
-
-		if (UI.get_minimap()->are_units_visible()) {
-			if (UI.CurrentMapLayer->Field(tilePos)->player_info->IsTeamExplored(*CPlayer::GetThisPlayer()) || ReplayRevealMap) {
-				UnitUnderCursor = UnitOnMapTile(tilePos, UnitTypeType::None, UI.CurrentMapLayer->ID);
-			}
-		}
+	switch (CursorOn) {
+		case cursor_on::map:
+			handle_mouse_move_on_map(cursorPos);
+			break;
+		case cursor_on::minimap:
+			handle_mouse_move_on_minimap(cursorPos);
+			break;
+		default:
+			break;
 	}
 
 	// NOTE: If unit is not selectable as a goal, you can't get a cursor hint
