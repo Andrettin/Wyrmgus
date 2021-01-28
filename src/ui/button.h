@@ -74,7 +74,7 @@ public:
 		this->Payload = other_button.Payload;
 		this->ValueStr = other_button.ValueStr;
 		this->Allowed = other_button.Allowed;
-		this->AllowStr = other_button.AllowStr;
+		this->allow_strings = other_button.allow_strings;
 		this->UnitMask = other_button.UnitMask;
 		this->unit_classes = other_button.unit_classes;
 		this->Icon = other_button.Icon;
@@ -145,7 +145,7 @@ public:
 	std::string ValueStr;		/// keep original value string
 
 	button_check_func Allowed = nullptr;    /// Check if this button is allowed
-	std::string AllowStr;       /// argument for allowed
+	std::vector<std::string> allow_strings; //arguments for allowed
 	std::string UnitMask;       //for which units is it available
 private:
 	std::vector<unit_class *> unit_classes; //unit classes for which the button is available

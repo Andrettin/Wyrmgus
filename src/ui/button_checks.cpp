@@ -87,13 +87,13 @@ bool ButtonCheckFalse(const CUnit &, const wyrmgus::button &)
 bool ButtonCheckUpgrade(const CUnit &unit, const wyrmgus::button &button)
 {
 	const CPlayer *player = unit.Player;
-	std::unique_ptr<char[]> buf = new_strdup(button.AllowStr.c_str());
 
-	for (const char *s = strtok(buf.get(), ","); s; s = strtok(nullptr, ",")) {
-		if (UpgradeIdentAllowed(*player, s) != 'R') {
+	for (const std::string &str : button.allow_strings) {
+		if (UpgradeIdentAllowed(*player, str) != 'R') {
 			return false;
 		}
 	}
+
 	return true;
 }
 
@@ -121,13 +121,13 @@ bool ButtonCheckUpgradeNot(const CUnit &unit, const wyrmgus::button &button)
 bool ButtonCheckUpgradeOr(const CUnit &unit, const wyrmgus::button &button)
 {
 	const CPlayer *player = unit.Player;
-	std::unique_ptr<char[]> buf = new_strdup(button.AllowStr.c_str());
 
-	for (const char *s = strtok(buf.get(), ","); s; s = strtok(nullptr, ",")) {
-		if (UpgradeIdentAllowed(*player, s) == 'R') {
+	for (const std::string &str : button.allow_strings) {
+		if (UpgradeIdentAllowed(*player, str) == 'R') {
 			return true;
 		}
 	}
+
 	return false;
 }
 
@@ -141,10 +141,8 @@ bool ButtonCheckUpgradeOr(const CUnit &unit, const wyrmgus::button &button)
 */
 bool ButtonCheckIndividualUpgrade(const CUnit &unit, const wyrmgus::button &button)
 {
-	std::unique_ptr<char[]> buf = new_strdup(button.AllowStr.c_str());
-
-	for (const char *s = strtok(buf.get(), ","); s; s = strtok(nullptr, ",")) {
-		if (unit.GetIndividualUpgrade(CUpgrade::get(s)) == 0) {
+	for (const std::string &str : button.allow_strings) {
+		if (unit.GetIndividualUpgrade(CUpgrade::get(str)) == 0) {
 			return false;
 		}
 	}
@@ -161,10 +159,8 @@ bool ButtonCheckIndividualUpgrade(const CUnit &unit, const wyrmgus::button &butt
 */
 bool ButtonCheckIndividualUpgradeOr(const CUnit &unit, const wyrmgus::button &button)
 {
-	std::unique_ptr<char[]> buf = new_strdup(button.AllowStr.c_str());
-
-	for (const char *s = strtok(buf.get(), ","); s; s = strtok(nullptr, ",")) {
-		if (unit.GetIndividualUpgrade(CUpgrade::get(s)) > 0) {
+	for (const std::string &str : button.allow_strings) {
+		if (unit.GetIndividualUpgrade(CUpgrade::get(str)) > 0) {
 			return true;
 		}
 	}
@@ -181,58 +177,60 @@ bool ButtonCheckIndividualUpgradeOr(const CUnit &unit, const wyrmgus::button &bu
 */
 bool ButtonCheckUnitVariable(const CUnit &unit, const wyrmgus::button &button)
 {
-	std::unique_ptr<char[]> buf = new_strdup(button.AllowStr.c_str());
-
-	for (const char *var = strtok(buf.get(), ","); var; var = strtok(nullptr, ",")) {
-		const char *type = strtok(nullptr, ",");
-		const char *binop = strtok(nullptr, ",");
-		const char *value = strtok(nullptr, ",");
-		const int index = UnitTypeVar.VariableNameLookup[var];// User variables
+	for (size_t i = 0; i < button.allow_strings.size(); ++i) {
+		const std::string &var = button.allow_strings[i];
+		++i;
+		const std::string &type = button.allow_strings[i];
+		++i;
+		const std::string &binop = button.allow_strings[i];
+		++i;
+		const std::string &value = button.allow_strings[i];
+		const int index = UnitTypeVar.VariableNameLookup[var.c_str()];// User variables
 		if (index == -1) {
-			throw std::runtime_error("Bad variable name \"" + std::string(var) + "\".");
+			throw std::runtime_error("Bad variable name \"" + var + "\".");
 		}
 		int varValue;
-		if (!strcmp(type, "Value")) {
+		if (type == "Value") {
 			//Wyrmgus start
 //			varValue = unit.Variable[index].Value;
 			varValue = unit.GetModifiedVariable(index, VariableAttribute::Value);
 			//Wyrmgus end
-		} else if (!strcmp(type, "Max")) {
+		} else if (type == "Max") {
 			//Wyrmgus start
 //			varValue = unit.Variable[index].Max;
 			varValue = unit.GetModifiedVariable(index, VariableAttribute::Max);
 			//Wyrmgus end
-		} else if (!strcmp(type, "Increase")) {
+		} else if (type == "Increase") {
 			//Wyrmgus start
 //			varValue = unit.Variable[index].Increase;
 			varValue = unit.GetModifiedVariable(index, VariableAttribute::Increase);
 			//Wyrmgus end
-		} else if (!strcmp(type, "Enable")) {
+		} else if (type == "Enable") {
 			varValue = unit.Variable[index].Enable;
-		} else if (!strcmp(type, "Percent")) {
+		} else if (type == "Percent") {
 			//Wyrmgus start
 //			varValue = unit.Variable[index].Value * 100 / unit.Variable[index].Max;
 			varValue = unit.GetModifiedVariable(index, VariableAttribute::Value) * 100 / unit.GetModifiedVariable(index, VariableAttribute::Max);
 			//Wyrmgus end
 		} else {
-			throw std::runtime_error("Bad variable type \"" + std::string(type) + "\".");
+			throw std::runtime_error("Bad variable type \"" + type + "\".");
 		}
-		const int cmpValue = atoi(value);
+		const int cmpValue = std::stoi(value);
 		bool cmpResult = false;
-		if (!strcmp(binop, ">")) {
+		if (binop == ">") {
 			cmpResult = varValue > cmpValue;
-		} else if (!strcmp(binop, ">=")) {
+		} else if (binop == ">=") {
 			cmpResult = varValue >= cmpValue;
-		} else if (!strcmp(binop, "<")) {
+		} else if (binop == "<") {
 			cmpResult = varValue < cmpValue;
-		} else if (!strcmp(binop, "<=")) {
+		} else if (binop == "<=") {
 			cmpResult = varValue <= cmpValue;
-		} else if (!strcmp(binop, "==")) {
+		} else if (binop == "==") {
 			cmpResult = varValue == cmpValue;
-		} else if (!strcmp(binop, "!=")) {
+		} else if (binop == "!=") {
 			cmpResult = varValue != cmpValue;
 		} else {
-			throw std::runtime_error("Bad compare type \"" + std::string(binop) + "\".");
+			throw std::runtime_error("Bad compare type \"" + binop + "\".");
 		}
 		if (cmpResult == false) {
 			return false;
@@ -251,11 +249,10 @@ bool ButtonCheckUnitVariable(const CUnit &unit, const wyrmgus::button &button)
 */
 bool ButtonCheckUnitsOr(const CUnit &unit, const wyrmgus::button &button)
 {
-	CPlayer *player = unit.Player;
-	std::unique_ptr<char[]> buf = new_strdup(button.AllowStr.c_str());
+	const CPlayer *player = unit.Player;
 
-	for (const char *s = strtok(buf.get(), ","); s; s = strtok(nullptr, ",")) {
-		const wyrmgus::unit_type *unit_type = wyrmgus::unit_type::try_get(s);
+	for (const std::string &str : button.allow_strings) {
+		const wyrmgus::unit_type *unit_type = wyrmgus::unit_type::try_get(str);
 		if (unit_type != nullptr && player->has_unit_type(unit_type)) {
 			return true;
 		}
@@ -273,11 +270,10 @@ bool ButtonCheckUnitsOr(const CUnit &unit, const wyrmgus::button &button)
 */
 bool ButtonCheckUnitsAnd(const CUnit &unit, const wyrmgus::button &button)
 {
-	CPlayer *player = unit.Player;
-	std::unique_ptr<char[]> buf = new_strdup(button.AllowStr.c_str());
+	const CPlayer *player = unit.Player;
 
-	for (const char *s = strtok(buf.get(), ","); s; s = strtok(nullptr, ",")) {
-		const wyrmgus::unit_type *unit_type = wyrmgus::unit_type::try_get(s);
+	for (const std::string &str : button.allow_strings) {
+		const wyrmgus::unit_type *unit_type = wyrmgus::unit_type::try_get(str);
 		if (unit_type != nullptr && player->has_unit_type(unit_type)) {
 			return false;
 		}

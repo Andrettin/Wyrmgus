@@ -998,17 +998,13 @@ static int CclDefineButton(lua_State *l)
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument");
 			}
-			std::string allowstr;
+
 			const unsigned int subargs = lua_rawlen(l, -1);
 
+			button->allow_strings.clear();
 			for (unsigned int k = 0; k < subargs; ++k) {
-				const char *s2 = LuaToString(l, -1, k + 1);
-				allowstr += s2;
-				if (k != subargs - 1) {
-					allowstr += ",";
-				}
+				button->allow_strings.push_back(LuaToString(l, -1, k + 1));
 			}
-			button->AllowStr = allowstr;
 		} else if (!strcmp(value, "Key")) {
 			std::string key(LuaToString(l, -1));
 			button->Key = GetHotKey(key);

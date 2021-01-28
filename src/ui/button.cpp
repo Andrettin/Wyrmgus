@@ -128,12 +128,6 @@ void button::ProcessConfigData(const CConfigData *config_data)
 			} else {
 				fprintf(stderr, "Invalid button check: \"%s\".\n", value.c_str());
 			}
-		} else if (key == "allow_arg") {
-			value = FindAndReplaceString(value, "_", "-");
-			if (!button->AllowStr.empty()) {
-				button->AllowStr += ",";
-			}
-			button->AllowStr += value;
 		} else if (key == "key") {
 			button->Key = GetHotKey(value);
 		} else if (key == "hint") {
@@ -272,15 +266,7 @@ void button::process_sml_scope(const sml_data &scope)
 			this->unit_classes.push_back(unit_class::get(value));
 		}
 	} else if (tag == "allow_arg") {
-		this->AllowStr.clear();
-
-		for (size_t i = 0; i < values.size(); ++i) {
-			const std::string &value = values[i];
-			this->AllowStr += value;
-			if (i != (values.size() - 1)) {
-				this->AllowStr += ",";
-			}
-		}
+		this->allow_strings = values;
 	} else {
 		data_entry::process_sml_scope(scope);
 	}

@@ -122,14 +122,6 @@ extern void PrintOnStdOut(const char *format, ...);
 
 #include "util/util.h"
 
-inline std::unique_ptr<char[]> new_strdup(const char *str)
-{
-	int len = strlen(str) + 1;
-	auto newstr = std::make_unique<char[]>(len);
-	strcpy_s(newstr.get(), len, str);
-	return newstr;
-}
-
 /*----------------------------------------------------------------------------
 --  General
 ----------------------------------------------------------------------------*/
