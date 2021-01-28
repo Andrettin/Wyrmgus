@@ -4369,8 +4369,8 @@ void NearestOfUnit(const CUnit &unit, const Vec2i &pos, Vec2i *dpos)
 	const int y = unit.tilePos.y;
 
 	*dpos = pos;
-	clamp<short int>(&dpos->x, x, x + unit.Type->get_tile_width() - 1);
-	clamp<short int>(&dpos->y, y, y + unit.Type->get_tile_height() - 1);
+	dpos->x = std::clamp<short int>(dpos->x, x, x + unit.Type->get_tile_width() - 1);
+	dpos->y = std::clamp<short int>(dpos->y, y, y + unit.Type->get_tile_height() - 1);
 }
 
 /**
@@ -7305,7 +7305,7 @@ static void HitUnit_ApplyDamage(CUnit *attacker, CUnit &target, int damage)
 						   : 0;
 		if (shieldDamage) {
 			target.Variable[SHIELD_INDEX].Value -= shieldDamage;
-			clamp(&target.Variable[SHIELD_INDEX].Value, 0, target.Variable[SHIELD_INDEX].Max);
+			target.Variable[SHIELD_INDEX].Value = std::clamp(target.Variable[SHIELD_INDEX].Value, 0, target.Variable[SHIELD_INDEX].Max);
 		}
 		target.Variable[HP_INDEX].Value -= damage - shieldDamage;
 	}

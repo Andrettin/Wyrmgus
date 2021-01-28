@@ -101,19 +101,6 @@ inline int square(const int v)
 	return v * v;
 }
 
-template <typename T>
-void clamp(T *value, T minValue, T maxValue)
-{
-	Assert(minValue <= maxValue);
-
-	if (*value < minValue) {
-		*value = minValue;
-	} else if (maxValue < *value) {
-		*value = maxValue;
-	}
-}
-
-
 /*----------------------------------------------------------------------------
 --  Strings
 ----------------------------------------------------------------------------*/

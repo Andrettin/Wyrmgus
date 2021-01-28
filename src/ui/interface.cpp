@@ -1516,8 +1516,8 @@ bool HandleMouseScrollArea(const PixelPos &mousePos)
 void HandleCursorMove(int *x, int *y)
 {
 	//  Reduce coordinates to window-size.
-	clamp(x, 0, Video.Width - 1);
-	clamp(y, 0, Video.Height - 1);
+	*x = std::clamp(*x, 0, Video.Width - 1);
+	*y = std::clamp(*y, 0, Video.Height - 1);
 	CursorScreenPos.x = *x;
 	CursorScreenPos.y = *y;
 }

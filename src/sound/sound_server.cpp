@@ -299,7 +299,7 @@ int PlaySample(wyrmgus::sample *sample, Origin *origin)
 */
 void SetEffectsVolume(int volume)
 {
-	clamp(&volume, 0, MaxVolume);
+	volume = std::clamp(volume, 0, MaxVolume);
 	EffectsVolume = volume;
 }
 
@@ -384,7 +384,7 @@ void StopMusic()
 */
 void SetMusicVolume(int volume)
 {
-	clamp(&volume, 0, MaxVolume);
+	volume = std::clamp(volume, 0, MaxVolume);
 	MusicVolume = volume;
 
 	Mix_VolumeMusic(volume * wyrmgus::music_player::get()->get_current_volume_modifier() / 100 * MIX_MAX_VOLUME / MaxVolume);

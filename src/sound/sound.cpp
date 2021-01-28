@@ -242,7 +242,7 @@ static char CalculateStereo(const CUnit &unit)
 	int stereo = ((unit.tilePos.x * wyrmgus::defines::get()->get_scaled_tile_width() + unit.Type->get_tile_width() * wyrmgus::defines::get()->get_scaled_tile_width() / 2 +
 				   unit.get_scaled_pixel_offset().x() - UI.SelectedViewport->MapPos.x * wyrmgus::defines::get()->get_scaled_tile_width()) * 256 /
 				  ((UI.SelectedViewport->MapWidth - 1) * wyrmgus::defines::get()->get_scaled_tile_width())) - 128;
-	clamp(&stereo, -128, 127);
+	stereo = std::clamp(stereo, -128, 127);
 	return stereo;
 }
 
@@ -346,7 +346,7 @@ void PlayMissileSound(const Missile &missile, wyrmgus::sound *sound)
 	int stereo = ((missile.position.x + (missile.Type->G ? missile.Type->G->Width / 2 : 0) +
 				   UI.SelectedViewport->MapPos.x * wyrmgus::defines::get()->get_tile_width()) * 256 /
 				  ((UI.SelectedViewport->MapWidth - 1) * wyrmgus::defines::get()->get_tile_width())) - 128;
-	clamp(&stereo, -128, 127);
+	stereo = std::clamp(stereo, -128, 127);
 
 	Origin source = {nullptr, 0};
 	const int volume = CalculateVolume(false, ViewPointDistanceToMissile(missile), sound->get_range()) * sound->VolumePercent / 100;

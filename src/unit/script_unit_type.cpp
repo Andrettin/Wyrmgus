@@ -3165,7 +3165,7 @@ void UpdateUnitVariables(CUnit &unit)
 //					   _C_ unit.Variable[i].Value _C_ unit.Variable[i].Max);
 					   _C_ unit.Variable[i].Value _C_ unit.GetModifiedVariable(i, VariableAttribute::Max));
 					   //Wyrmgus end
-			clamp(&unit.Variable[i].Value, 0, unit.Variable[i].Max);
+			unit.Variable[i].Value = std::clamp(unit.Variable[i].Value, 0, unit.Variable[i].Max);
 		}
 	}
 }

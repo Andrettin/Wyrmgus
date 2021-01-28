@@ -1463,9 +1463,9 @@ static void ApplyUpgradeModifier(CPlayer &player, const wyrmgus::upgrade_modifie
 
 				stat.Variables[j].Max = std::max(stat.Variables[j].Max, 0);
 				//Wyrmgus start
-//				clamp(&stat.Variables[j].Value, 0, stat.Variables[j].Max);
+//				stat.Variables[j].Value = std::clamp(stat.Variables[j].Value, 0, stat.Variables[j].Max);
 				if (stat.Variables[j].Max > 0) {
-					clamp(&stat.Variables[j].Value, 0, stat.Variables[j].Max);
+					stat.Variables[j].Value = std::clamp(stat.Variables[j].Value, 0, stat.Variables[j].Max);
 				}
 				//Wyrmgus end
 			}
@@ -1530,7 +1530,7 @@ static void ApplyUpgradeModifier(CPlayer &player, const wyrmgus::upgrade_modifie
 						unit->Variable[j].Max += um->Modifier.Variables[j].Max;
 						unit->Variable[j].Max = std::max(unit->Variable[j].Max, 0);
 						if (unit->Variable[j].Max > 0) {
-							clamp(&unit->Variable[j].Value, 0, unit->Variable[j].Max);
+							unit->Variable[j].Value = std::clamp(unit->Variable[j].Value, 0, unit->Variable[j].Max);
 						}
 						//Wyrmgus start
 						if (j == ATTACKRANGE_INDEX && unit->Container) {
@@ -1741,9 +1741,9 @@ static void RemoveUpgradeModifier(CPlayer &player, const wyrmgus::upgrade_modifi
 
 				stat.Variables[j].Max = std::max(stat.Variables[j].Max, 0);
 				//Wyrmgus start
-//				clamp(&stat.Variables[j].Value, 0, stat.Variables[j].Max);
+//				stat.Variables[j].Value = std::clamp(stat.Variables[j].Value, 0, stat.Variables[j].Max);
 				if (stat.Variables[j].Max > 0) {
-					clamp(&stat.Variables[j].Value, 0, stat.Variables[j].Max);
+					stat.Variables[j].Value = std::clamp(stat.Variables[j].Value, 0, stat.Variables[j].Max);
 				}
 				//Wyrmgus end
 			}
@@ -1808,7 +1808,7 @@ static void RemoveUpgradeModifier(CPlayer &player, const wyrmgus::upgrade_modifi
 						unit->Variable[j].Max = std::max(unit->Variable[j].Max, 0);
 
 						if (unit->Variable[j].Max > 0) {
-							clamp(&unit->Variable[j].Value, 0, unit->Variable[j].Max);
+							unit->Variable[j].Value = std::clamp(unit->Variable[j].Value, 0, unit->Variable[j].Max);
 						}
 
 						//Wyrmgus start
@@ -1919,7 +1919,7 @@ void ApplyIndividualUpgradeModifier(CUnit &unit, const wyrmgus::upgrade_modifier
 		unit.Variable[j].Max += um->Modifier.Variables[j].Max;
 		unit.Variable[j].Max = std::max(unit.Variable[j].Max, 0);
 		if (unit.Variable[j].Max > 0) {
-			clamp(&unit.Variable[j].Value, 0, unit.Variable[j].Max);
+			unit.Variable[j].Value = std::clamp(unit.Variable[j].Value, 0, unit.Variable[j].Max);
 		}
 		//Wyrmgus start
 		if (j == ATTACKRANGE_INDEX && unit.Container && !SaveGameLoading) {
@@ -2001,7 +2001,7 @@ void RemoveIndividualUpgradeModifier(CUnit &unit, const wyrmgus::upgrade_modifie
 		unit.Variable[j].Max -= um->Modifier.Variables[j].Max;
 		unit.Variable[j].Max = std::max(unit.Variable[j].Max, 0);
 		if (unit.Variable[j].Max > 0) {
-			clamp(&unit.Variable[j].Value, 0, unit.Variable[j].Max);
+			unit.Variable[j].Value = std::clamp(unit.Variable[j].Value, 0, unit.Variable[j].Max);
 		}
 		//Wyrmgus start
 		if (j == ATTACKRANGE_INDEX && unit.Container) {

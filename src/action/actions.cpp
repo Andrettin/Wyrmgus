@@ -282,14 +282,14 @@ std::unique_ptr<COrder> CclParseOrder(lua_State *l, CUnit &unit)
 static inline void IncreaseVariable(CUnit &unit, int index)
 {
 	unit.change_variable_value(index, unit.get_variable_increase(index));
-	clamp(&unit.Variable[index].Value, 0, unit.Variable[index].Max);
+	unit.Variable[index].Value = std::clamp(unit.Variable[index].Value, 0, unit.Variable[index].Max);
 	
 	//Wyrmgus start
 	if (index == HP_INDEX && unit.Variable[index].Increase < 0 && unit.HasInventory()) {
 		unit.HealingItemAutoUse();
 	} else if (index == GIVERESOURCE_INDEX && !unit.Type->BoolFlag[INEXHAUSTIBLE_INDEX].value) {
 		unit.ChangeResourcesHeld(unit.Variable[index].Increase);
-		clamp(&unit.ResourcesHeld, 0, unit.GetModifiedVariable(index, VariableAttribute::Max));
+		unit.ResourcesHeld = std::clamp(unit.ResourcesHeld, 0, unit.GetModifiedVariable(index, VariableAttribute::Max));
 	}
 	//Wyrmgus end
 
@@ -430,7 +430,7 @@ static void HandleBuffsEachSecond(CUnit &unit)
 		//Wyrmgus start
 		if (i == HP_INDEX && unit.Variable[REGENERATION_INDEX].Value > 0) {
 			unit.Variable[i].Value += 1;
-			clamp(&unit.Variable[i].Value, 0, unit.GetModifiedVariable(i, VariableAttribute::Max));
+			unit.Variable[i].Value = std::clamp(unit.Variable[i].Value, 0, unit.GetModifiedVariable(i, VariableAttribute::Max));
 		}
 		//Wyrmgus end
 		if (unit.Variable[i].Enable && unit.Variable[i].Increase) {

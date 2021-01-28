@@ -235,7 +235,7 @@ static int CclSetSoundRange(lua_State *l)
 	LuaCheckArgs(l, 2);
 
 	int tmp = LuaToNumber(l, 2);
-	clamp(&tmp, 0, 255);
+	tmp = std::clamp(tmp, 0, 255);
 	const unsigned char theRange = static_cast<unsigned char>(tmp);
 
 	lua_pushvalue(l, 1);

@@ -806,13 +806,13 @@ void DrawPopup(const wyrmgus::button &button, int x, int y, bool above)
 	}
 
 	x = std::min<int>(x, Video.Width - 1 - popupWidth);
-	clamp<int>(&x, 0, Video.Width - 1);
+	x = std::clamp(x, 0, Video.Width - 1);
 	if (above) {
 		y = y - popupHeight - 10 * scale_factor;
 	} else { //below
 		y = y + 10 * scale_factor;
 	}
-	clamp<int>(&y, 0, Video.Height - 1);
+	y = std::clamp(y, 0, Video.Height - 1);
 
 	// Background
 	Video.FillTransRectangle(popup->BackgroundColor, x, y, popupWidth, popupHeight, popup->BackgroundColor >> ASHIFT);
@@ -900,13 +900,13 @@ void DrawGenericPopup(const std::string &popup_text, int x, int y, const wyrmgus
 	popupHeight = std::max(popupHeight, 0);
 
 	x = std::min<int>(x, Video.Width - 1 - popupWidth);
-	clamp<int>(&x, 0, Video.Width - 1);
+	x = std::clamp(x, 0, Video.Width - 1);
 	if (above) {
 		y = y - popupHeight - 10 * scale_factor;
 	} else { //below
 		y = y + 10 * scale_factor;
 	}
-	clamp<int>(&y, 0, Video.Height - 1);
+	y = std::clamp(y, 0, Video.Height - 1);
 
 	// Background
 	const IntColor BackgroundColor = CVideo::MapRGBA(28, 28, 28, 208);

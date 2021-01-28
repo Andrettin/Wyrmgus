@@ -162,11 +162,11 @@ int spell_action_adjust_vitals::Cast(CUnit &caster, const spell &spell, CUnit *t
 	}
 	target->Variable[MANA_INDEX].Value += castcount * mana;
 	//Wyrmgus start
-//	clamp(&target->Variable[MANA_INDEX].Value, 0, target->Variable[MANA_INDEX].Max);
-	clamp(&target->Variable[MANA_INDEX].Value, 0, target->GetModifiedVariable(MANA_INDEX, VariableAttribute::Max));
+//	target->Variable[MANA_INDEX].Value = std::clamp(target->Variable[MANA_INDEX].Value, 0, target->Variable[MANA_INDEX].Max);
+	target->Variable[MANA_INDEX].Value = std::clamp(target->Variable[MANA_INDEX].Value, 0, target->GetModifiedVariable(MANA_INDEX, VariableAttribute::Max));
 	//Wyrmgus end
 	target->Variable[SHIELD_INDEX].Value += castcount * shield;
-	clamp(&target->Variable[SHIELD_INDEX].Value, 0, target->Variable[SHIELD_INDEX].Max);
+	target->Variable[SHIELD_INDEX].Value = std::clamp(target->Variable[SHIELD_INDEX].Value, 0, target->Variable[SHIELD_INDEX].Max);
 
 	if (spell.repeats_cast()) {
 		return 1;
