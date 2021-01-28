@@ -661,7 +661,7 @@ int COrder_Resource::StartGathering(CUnit &unit)
 #endif
 		UnitHeadingFromDeltaXY(unit, this->goalPos - unit.tilePos);
 		if (resinfo->WaitAtResource) {
-			this->TimeToHarvest = std::max<int>(1, resinfo->WaitAtResource * SPEEDUP_FACTOR / unit.Player->SpeedResourcesHarvest[this->CurrentResource]);
+			this->TimeToHarvest = std::max<int>(1, resinfo->WaitAtResource * SPEEDUP_FACTOR / std::max(1, unit.Player->SpeedResourcesHarvest[this->CurrentResource]));
 		} else {
 			this->TimeToHarvest = 1;
 		}
@@ -758,9 +758,9 @@ int COrder_Resource::StartGathering(CUnit &unit)
 //		this->TimeToHarvest = std::max<int>(1, resinfo.WaitAtResource * SPEEDUP_FACTOR / unit.Player->SpeedResourcesHarvest[resinfo.ResourceId]);
 		int wait_at_resource = resinfo->WaitAtResource;
 		if (!goal->Type->BoolFlag[HARVESTFROMOUTSIDE_INDEX].value) {
-			wait_at_resource = resinfo->WaitAtResource * 100 / unit.GetResourceStep(this->CurrentResource);
+			wait_at_resource = resinfo->WaitAtResource * 100 / std::max(1, unit.GetResourceStep(this->CurrentResource));
 		}
-		this->TimeToHarvest = std::max<int>(1, wait_at_resource * SPEEDUP_FACTOR / (unit.Player->SpeedResourcesHarvest[resinfo->get_resource()->get_index()] + goal->Variable[TIMEEFFICIENCYBONUS_INDEX].Value));
+		this->TimeToHarvest = std::max<int>(1, wait_at_resource * SPEEDUP_FACTOR / std::max(1, unit.Player->SpeedResourcesHarvest[resinfo->get_resource()->get_index()] + goal->Variable[TIMEEFFICIENCYBONUS_INDEX].Value));
 		//Wyrmgus end
 	} else {
 		this->TimeToHarvest = 1;
@@ -930,12 +930,12 @@ int COrder_Resource::GatherResource(CUnit &unit)
 			int wait_at_resource = resinfo->WaitAtResource;
 			int resource_harvest_speed = unit.Player->SpeedResourcesHarvest[resinfo->get_resource()->get_index()];
 			if (!CMap::Map.Info.IsPointOnMap(this->goalPos, this->MapLayer) && !harvest_from_outside) {
-				wait_at_resource = resinfo->WaitAtResource * 100 / unit.GetResourceStep(this->CurrentResource);
+				wait_at_resource = resinfo->WaitAtResource * 100 / std::max(1, unit.GetResourceStep(this->CurrentResource));
 			}
 			if (this->get_goal()) {
 				resource_harvest_speed += this->get_goal()->Variable[TIMEEFFICIENCYBONUS_INDEX].Value;
 			}
-			this->TimeToHarvest += std::max<int>(1, wait_at_resource * SPEEDUP_FACTOR / resource_harvest_speed);
+			this->TimeToHarvest += std::max<int>(1, wait_at_resource * SPEEDUP_FACTOR / std::max(1, resource_harvest_speed));
 			//Wyrmgus end
 		} else {
 			this->TimeToHarvest += 1;
@@ -1156,6 +1156,7 @@ bool COrder_Resource::StopGathering(CUnit &unit)
 			if (Preference.MineNotifications && unit.Player->Index == CPlayer::GetThisPlayer()->Index
 				&& source->IsAlive()
 				&& !source->MineLow
+				&& source->Variable[GIVERESOURCE_INDEX].Max > 0
 				&& source->ResourcesHeld * 100 / source->Variable[GIVERESOURCE_INDEX].Max <= 10
 				&& source->Variable[GIVERESOURCE_INDEX].Max > (wyrmgus::resource::get_all()[this->CurrentResource]->get_default_income() * 10)) {
 				//Wyrmgus start

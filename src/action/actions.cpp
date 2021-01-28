@@ -378,7 +378,7 @@ static void HandleBuffsEachCycle(CUnit &unit)
 */
 static bool HandleBurnAndPoison(CUnit &unit)
 {
-	if (unit.Removed || unit.Destroyed || unit.Variable[HP_INDEX].Max == 0
+	if (unit.Removed || unit.Destroyed || unit.GetModifiedVariable(HP_INDEX, VariableAttribute::Max) == 0
 		|| unit.CurrentAction() == UnitAction::Built
 		|| unit.CurrentAction() == UnitAction::Die) {
 		return false;

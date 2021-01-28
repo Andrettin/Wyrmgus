@@ -58,6 +58,7 @@
 #include "unit/unit_find.h"
 #include "unit/unit_ref.h"
 #include "unit/unit_type.h"
+#include "util/log_util.h"
 #include "util/vector_util.h"
 
 /// How many resources the player gets back if canceling building
@@ -271,9 +272,11 @@ static void Finish(COrder_Built &order, CUnit &unit)
 	}
 
 	//Wyrmgus start
-	for (size_t i = 0; i != table.size(); ++i) { // also give experience to all other workers who helped build the structure
-		if (table[i]->CurrentAction() == UnitAction::Repair && table[i]->CurrentOrder()->get_goal() == &unit) {
-			table[i]->ChangeExperience(xp_gained / worker_count);
+	if (worker_count > 0) {
+		for (size_t i = 0; i != table.size(); ++i) { // also give experience to all other workers who helped build the structure
+			if (table[i]->CurrentAction() == UnitAction::Repair && table[i]->CurrentOrder()->get_goal() == &unit) {
+				table[i]->ChangeExperience(xp_gained / worker_count);
+			}
 		}
 	}
 			
@@ -473,7 +476,16 @@ static const wyrmgus::construction_frame *FindCFramePercent(const wyrmgus::const
 void COrder_Built::UpdateConstructionFrame(CUnit &unit)
 {
 	const wyrmgus::unit_type &type = *unit.Type;
-	const int percent = this->ProgressCounter / (type.Stats[unit.Player->Index].Costs[TimeCost] * 6);
+
+	const int time_cost = type.Stats[unit.Player->Index].Costs[TimeCost];
+
+	if (time_cost == 0) {
+		wyrmgus::log::log_error("Error in COrder_Built::UpdateConstructionFrame(): the unit's time cost is 0.");
+		return;
+	}
+
+	const int progress_max = (time_cost * 6);
+	const int percent = this->ProgressCounter / progress_max;
 
 	const wyrmgus::construction_frame *cframe = FindCFramePercent(unit.get_construction()->get_initial_frame(), percent);
 
@@ -488,7 +500,6 @@ void COrder_Built::UpdateConstructionFrame(CUnit &unit)
 		}
 	}
 }
-
 
 void COrder_Built::Progress(CUnit &unit, int amount)
 {
@@ -526,7 +537,13 @@ void COrder_Built::Boost(CUnit &building, int amount, int varIndex) const
 {
 	Assert(building.CurrentOrder() == this);
 
-	const int costs = building.Stats->Costs[TimeCost] * 600;
+	const int time_cost = building.Stats->Costs[TimeCost];
+	if (time_cost == 0) {
+		wyrmgus::log::log_error("Error in COrder_Built::Boost(): the unit's time cost is 0.");
+	}
+
+	const int costs = time_cost * 600;
+
 	const int progress = this->ProgressCounter;
 	//Wyrmgus start
 //	const int newProgress = progress + std::max(1, amount * building.Player->SpeedBuild / SPEEDUP_FACTOR);
@@ -536,8 +553,18 @@ void COrder_Built::Boost(CUnit &building, int amount, int varIndex) const
 
 	int &currentValue = building.Variable[varIndex].Value;
 
+	if ((costs - currentValue) == 0) {
+		wyrmgus::log::log_error("Error in COrder_Built::Boost(): costs - currentValue equals 0.");
+		return;
+	}
+
 	// damageValue is the current damage taken by the unit.
 	const int damageValue = (progress * maxValue) / costs - currentValue;
+
+	if ((costs - damageValue) == 0) {
+		wyrmgus::log::log_error("Error in COrder_Built::Boost(): costs - damageValue equals 0.");
+		return;
+	}
 
 	// Keep the same level of damage while increasing Value.
 	currentValue = (newProgress * maxValue) / costs - damageValue;
