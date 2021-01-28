@@ -329,13 +329,7 @@ static void HandleBuffsEachCycle(CUnit &unit)
 		unit.Threshold = 0;
 	}
 
-	// decrease spell countdown timers
-	for (size_t i = 0; i < unit.Type->Spells.size(); ++i) {
-		int spell_id = unit.Type->Spells[i]->Slot;
-		if (unit.SpellCoolDownTimers[spell_id] > 0) {
-			--unit.SpellCoolDownTimers[spell_id];
-		}
-	}
+	unit.decrement_spell_cooldown_timers();
 
 	for (const auto &kv_pair : unit.Type->Stats[unit.Player->Index].UnitStock) {
 		wyrmgus::unit_type *unit_type = wyrmgus::unit_type::get_all()[kv_pair.first];

@@ -285,14 +285,6 @@ int TransformUnitIntoType(CUnit &unit, const wyrmgus::unit_type &newtype)
 	}
 	//Wyrmgus end
 
-	//Wyrmgus start
-//	if (newtype.CanCastSpell && unit.AutoCastSpell.empty()) {
-	if (unit.SpellCoolDownTimers == nullptr) { //to avoid crashes with spell items for units who cannot ordinarily cast spells
-	//Wyrmgus end
-		unit.SpellCoolDownTimers = std::make_unique<int[]>(wyrmgus::spell::get_all().size());
-		memset(unit.SpellCoolDownTimers.get(), 0, wyrmgus::spell::get_all().size() * sizeof(int));
-	}
-
 	//remove active autocast spells which are active by default for the old type but not for the new type
 	for (const wyrmgus::spell *spell : unit.get_autocast_spells()) {
 		if (oldtype.is_autocast_spell(spell) && !newtype.is_autocast_spell(spell)) {

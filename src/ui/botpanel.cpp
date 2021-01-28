@@ -1013,10 +1013,10 @@ void CButtonPanel::Draw()
 				gray = true;
 				break;
 			} else if (button->Action == ButtonCmd::SpellCast
-					   && (*Selected[j]).SpellCoolDownTimers[wyrmgus::spell::get_all()[button->Value]->Slot]) {
+				&& (*Selected[j]).get_spell_cooldown_timer(wyrmgus::spell::get_all()[button->Value]) > 0) {
 				Assert(wyrmgus::spell::get_all()[button->Value]->get_cooldown() > 0);
 				cooldownSpell = true;
-				maxCooldown = std::max(maxCooldown, (*Selected[j]).SpellCoolDownTimers[wyrmgus::spell::get_all()[button->Value]->Slot]);
+				maxCooldown = std::max(maxCooldown, (*Selected[j]).get_spell_cooldown_timer(wyrmgus::spell::get_all()[button->Value]));
 			}
 		}
 		//

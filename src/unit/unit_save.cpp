@@ -380,13 +380,16 @@ void SaveUnit(const CUnit &unit, CFile &file)
 	for (const wyrmgus::spell *spell : unit.get_autocast_spells()) {
 		file.printf(",\n  \"auto-cast\", \"%s\"", spell->get_identifier().c_str());
 	}
-	if (unit.SpellCoolDownTimers != nullptr) {
+	if (!unit.get_spell_cooldown_timers().empty()) {
 		file.printf(",\n  \"spell-cooldown\", {");
-		for (size_t i = 0; i < wyrmgus::spell::get_all().size(); ++i) {
-			if (i) {
+		bool first = true;
+		for (const auto &kv_pair : unit.get_spell_cooldown_timers()) {
+			if (first) {
+				first = false;
+			} else {
 				file.printf(" ,");
 			}
-			file.printf("%d", unit.SpellCoolDownTimers[i]);
+			file.printf("\"%s\", %d", kv_pair.first->get_identifier().c_str(), kv_pair.second);
 		}
 		file.printf("}");
 	}

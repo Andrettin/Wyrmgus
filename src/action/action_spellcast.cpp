@@ -409,7 +409,7 @@ bool COrder_SpellCast::SpellMoveToTarget(CUnit &unit)
 //										unit.Type->Name.c_str(), spell.Name.c_str());
 										unit.GetMessageName().c_str(), spell.get_name().c_str());
 										//Wyrmgus end
-				} else if (unit.SpellCoolDownTimers[spell.Slot]) {
+				} else if (unit.get_spell_cooldown_timer(&spell) > 0) {
 					unit.Player->Notify(NotifyYellow, unit.tilePos,
 										//Wyrmgus start
 										unit.MapLayer->ID,

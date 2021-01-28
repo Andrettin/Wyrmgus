@@ -99,7 +99,7 @@ static bool PassCondition(const CUnit &caster, const wyrmgus::spell &spell, cons
 		return false;
 	}
 	// check countdown timer
-	if (caster.SpellCoolDownTimers[spell.Slot]) { // Check caster mana.
+	if (caster.get_spell_cooldown_timer(&spell) > 0) { // Check caster mana.
 		return false;
 	}
 	// Check caster's resources
@@ -728,7 +728,9 @@ int SpellCast(CUnit &caster, const wyrmgus::spell &spell, CUnit *target, const V
 			caster.Variable[MANA_INDEX].Value -= spell.get_mana_cost();
 		}
 		caster.Player->SubCosts(spell.Costs);
-		caster.SpellCoolDownTimers[spell.Slot] = spell.get_cooldown();
+		if (spell.get_cooldown() > 0) {
+			caster.set_spell_cooldown_timer(&spell, spell.get_cooldown());
+		}
 		//
 		// Spells like blizzard are casted again.
 		// This is sort of confusing, we do the test again, to

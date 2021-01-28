@@ -30,6 +30,7 @@
 #include "item/item_slot.h"
 #include "player.h"
 #include "player_container.h"
+#include "spell/spell_container.h"
 #include "unit/unit_type.h"
 #include "unit/unit_variable.h"
 #include "vec2i.h"
@@ -534,6 +535,45 @@ public:
 	void add_autocast_spell(const wyrmgus::spell *spell);
 	void remove_autocast_spell(const wyrmgus::spell *spell);
 	bool CanAutoCastSpell(const wyrmgus::spell *spell) const;
+
+	const wyrmgus::spell_map<int> &get_spell_cooldown_timers() const
+	{
+		return this->spell_cooldown_timers;
+	}
+
+	int get_spell_cooldown_timer(const wyrmgus::spell *spell) const
+	{
+		const auto find_iterator = this->spell_cooldown_timers.find(spell);
+		if (find_iterator != this->spell_cooldown_timers.end()) {
+			return find_iterator->second;
+		}
+
+		return 0;
+	}
+
+	void set_spell_cooldown_timer(const wyrmgus::spell *spell, const int cooldown)
+	{
+		this->spell_cooldown_timers[spell] = cooldown;
+	}
+
+	void decrement_spell_cooldown_timers()
+	{
+		std::vector<const wyrmgus::spell *> spells_to_remove;
+
+		for (auto &kv_pair : this->spell_cooldown_timers) {
+			int &cooldown = kv_pair.second;
+			--cooldown;
+
+			if (cooldown <= 0) {
+				spells_to_remove.push_back(kv_pair.first);
+			}
+		}
+
+		for (const wyrmgus::spell *spell : spells_to_remove) {
+			this->spell_cooldown_timers.erase(spell);
+		}
+	}
+
 	bool IsItemEquipped(const CUnit *item) const;
 	bool is_item_class_equipped(const wyrmgus::item_class item_class) const;
 	bool is_item_type_equipped(const wyrmgus::unit_type *item_type) const;
@@ -783,10 +823,9 @@ public:
 
 private:
 	std::vector<const wyrmgus::spell *> autocast_spells; //the list of autocast spells
+	wyrmgus::spell_map<int> spell_cooldown_timers;   /// how much time unit need to wait before spell will be ready
 
 public:
-	std::unique_ptr<int[]> SpellCoolDownTimers;   /// how much time unit need to wait before spell will be ready
-
 	CUnit *Goal; /// Generic/Teleporter goal pointer
 
 	friend int CclUnit(lua_State *l);

@@ -660,15 +660,17 @@ static int CclUnit(lua_State *l)
 			unit->add_autocast_spell(wyrmgus::spell::get(s));
 		} else if (!strcmp(value, "spell-cooldown")) {
 			lua_rawgeti(l, 2, j + 1);
-			if (!lua_istable(l, -1) || lua_rawlen(l, -1) != wyrmgus::spell::get_all().size()) {
+			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument");
 			}
-			if (!unit->SpellCoolDownTimers) {
-				unit->SpellCoolDownTimers = std::make_unique<int[]>(wyrmgus::spell::get_all().size());
-				memset(unit->SpellCoolDownTimers.get(), 0, wyrmgus::spell::get_all().size() * sizeof(int));
-			}
-			for (size_t k = 0; k < wyrmgus::spell::get_all().size(); ++k) {
-				unit->SpellCoolDownTimers[k] = LuaToNumber(l, -1, k + 1);
+			const size_t subargs = lua_rawlen(l, -1);
+			for (size_t k = 0; k < subargs; ++k) {
+				const wyrmgus::spell *spell = wyrmgus::spell::get(LuaToString(l, -1, k + 1));
+				++k;
+				const int cooldown = LuaToNumber(l, -1, k + 1);
+				if (cooldown > 0) {
+					unit->set_spell_cooldown_timer(spell, cooldown);
+				}
 			}
 			lua_pop(l, 1);
 		//Wyrmgus start
