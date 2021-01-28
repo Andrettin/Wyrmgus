@@ -80,6 +80,7 @@
 #include "util/point_util.h"
 #include "util/rect_util.h"
 #include "util/size_util.h"
+#include "util/util.h"
 #include "util/vector_random_util.h"
 #include "util/vector_util.h"
 #include "version.h"

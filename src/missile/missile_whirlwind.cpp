@@ -33,6 +33,7 @@
 
 #include "database/defines.h"
 #include "map/map.h"
+#include "util/util.h"
 
 /**
 **  Whirlwind controller

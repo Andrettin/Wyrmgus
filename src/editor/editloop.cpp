@@ -64,6 +64,7 @@
 #include "unit/unit.h"
 #include "unit/unit_find.h"
 #include "unit/unit_type.h"
+#include "util/util.h"
 #include "util/vector_util.h"
 #include "video/font.h"
 #include "video/video.h"

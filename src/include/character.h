@@ -252,10 +252,7 @@ public:
 		return this->variation;
 	}
 
-	Q_INVOKABLE void set_variation(const std::string &variation)
-	{
-		this->variation = FindAndReplaceString(variation, "_", "-");
-	}
+	Q_INVOKABLE void set_variation(const std::string &variation);
 
 	QString get_variation_qstring() const
 	{

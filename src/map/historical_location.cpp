@@ -34,6 +34,7 @@
 #include "map/map_template.h"
 #include "map/site.h"
 #include "util/geocoordinate_util.h"
+#include "util/util.h"
 
 namespace wyrmgus {
 

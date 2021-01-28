@@ -27,10 +27,6 @@
 //      02111-1307, USA.
 //
 
-/*----------------------------------------------------------------------------
---  Documentation
-----------------------------------------------------------------------------*/
-
 /**
 **  @class CTileset tileset.h
 **
@@ -179,6 +175,8 @@
 
 #include "map/tileset.h"
 
+#include "util/util.h"
+#include "util/vector_random_util.h"
 #include "video/video.h"
 
 void CTileset::clear()
@@ -285,6 +283,16 @@ bool CTileset::isARockTile(unsigned tile) const
 	}
 	//Wyrmgus end
 	return false;
+}
+
+unsigned CTileset::getRemovedRockTile() const
+{
+	return removedRockTiles.size() > 0 ? wyrmgus::vector::get_random(removedRockTiles) : -1;
+}
+
+unsigned CTileset::getRemovedTreeTile() const
+{
+	return removedTreeTiles.size() > 0 ? wyrmgus::vector::get_random(removedTreeTiles) : -1;
 }
 
 unsigned int CTileset::getOrAddSolidTileIndexByName(const std::string &name)

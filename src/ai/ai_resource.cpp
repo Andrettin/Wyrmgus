@@ -55,6 +55,7 @@
 #include "unit/unit_type.h"
 #include "upgrade/upgrade.h"
 #include "upgrade/upgrade_modifier.h"
+#include "util/util.h"
 #include "util/vector_util.h"
 
 static constexpr int COLLECT_RESOURCES_INTERVAL = 4;

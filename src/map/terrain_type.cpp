@@ -39,6 +39,7 @@
 #include "upgrade/upgrade_structs.h"
 #include "util/container_util.h"
 #include "util/string_conversion_util.h"
+#include "util/util.h"
 #include "util/vector_util.h"
 #include "video/video.h"
 

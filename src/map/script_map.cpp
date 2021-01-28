@@ -66,6 +66,7 @@
 #include "unit/unit.h"
 #include "unit/unit_class.h"
 #include "util/point_util.h"
+#include "util/util.h"
 #include "version.h"
 #include "video/video.h"
 #include "world.h"

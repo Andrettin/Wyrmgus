@@ -34,8 +34,9 @@
 #include "map/map.h"
 #include "sound/sound.h"
 #include "unit/unit.h"
+#include "util/util.h"
 
-/* virtual */ void CAnimation_RandomSound::Action(CUnit &unit, int &/*move*/, int /*scale*/) const
+void CAnimation_RandomSound::Action(CUnit &unit, int &/*move*/, int /*scale*/) const
 {
 	Assert(unit.Anim.Anim == this);
 

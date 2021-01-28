@@ -75,6 +75,7 @@
 #include "util/point_util.h"
 #include "util/size_util.h"
 #include "util/string_conversion_util.h"
+#include "util/util.h"
 #include "util/vector_random_util.h"
 #include "util/vector_util.h"
 #include "video/video.h"

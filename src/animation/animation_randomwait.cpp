@@ -33,6 +33,7 @@
 
 #include "unit/unit.h"
 #include "util/string_util.h"
+#include "util/util.h"
 
 void CAnimation_RandomWait::Action(CUnit &unit, int &/*move*/, int /*scale*/) const
 {

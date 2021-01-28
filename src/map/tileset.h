@@ -222,8 +222,8 @@ public:
 	//Wyrmgus start
 //	unsigned getRemovedRockTile() const { return removedRockTile; }
 //	unsigned getRemovedTreeTile() const { return removedTreeTile; }
-	unsigned getRemovedRockTile() const { return removedRockTiles.size() > 0 ? removedRockTiles[SyncRand(removedRockTiles.size())] : -1; }
-	unsigned getRemovedTreeTile() const { return removedTreeTiles.size() > 0 ? removedTreeTiles[SyncRand(removedTreeTiles.size())] : -1; }
+	unsigned getRemovedRockTile() const;
+	unsigned getRemovedTreeTile() const;
 	//Wyrmgus end
 	unsigned getBottomOneTreeTile() const { return botOneTreeTile; }
 	unsigned getTopOneTreeTile() const { return topOneTreeTile; }

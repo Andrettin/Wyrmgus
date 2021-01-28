@@ -58,6 +58,7 @@
 #include "unit/unit_type_variation.h"
 #include "upgrade/upgrade.h"
 #include "upgrade/upgrade_modifier.h"
+#include "util/util.h"
 #include "util/vector_util.h"
 
 std::map<std::string, wyrmgus::character *> CustomHeroes;
@@ -690,6 +691,11 @@ std::string character::get_full_name() const
 		full_name += " " + this->get_surname();
 	}
 	return full_name;
+}
+
+void character::set_variation(const std::string &variation)
+{
+	this->variation = FindAndReplaceString(variation, "_", "-");
 }
 
 const icon *character::get_icon() const

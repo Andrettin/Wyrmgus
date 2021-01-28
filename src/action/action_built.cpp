@@ -59,6 +59,7 @@
 #include "unit/unit_ref.h"
 #include "unit/unit_type.h"
 #include "util/log_util.h"
+#include "util/vector_random_util.h"
 #include "util/vector_util.h"
 
 /// How many resources the player gets back if canceling building
@@ -287,7 +288,7 @@ static void Finish(COrder_Built &order, CUnit &unit)
 		//Wyrmgus start
 //		unit.ResourcesHeld = type.StartingResources[SyncRand(type.StartingResources.size())];
 		if (type.StartingResources.size() > 0) {
-			unit.SetResourcesHeld(type.StartingResources[SyncRand(type.StartingResources.size())]);
+			unit.SetResourcesHeld(wyrmgus::vector::get_random(type.StartingResources));
 		}
 		unit.GivesResource = type.get_given_resource()->get_index();
 		//Wyrmgus end
@@ -356,7 +357,7 @@ static void Finish(COrder_Built &order, CUnit &unit)
 			CorrectWallDirections(unit);
 			CorrectWallNeighBours(unit);
 		} else {
-			unit.Direction = SyncRand(256); // random heading
+			unit.Direction = wyrmgus::random::get()->generate(256); // random heading
 		}
 		UnitUpdateHeading(unit);
 	}

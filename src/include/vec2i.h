@@ -29,6 +29,8 @@
 
 #pragma once
 
+#include "util/util.h"
+
 template <typename T>
 class Vec2T final
 {

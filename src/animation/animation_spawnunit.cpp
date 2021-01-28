@@ -36,6 +36,7 @@
 #include "map/map.h"
 #include "map/map_layer.h"
 #include "unit/unit.h"
+#include "util/util.h"
 
 void CAnimation_SpawnUnit::Action(CUnit &unit, int &/*move*/, int /*scale*/) const
 {

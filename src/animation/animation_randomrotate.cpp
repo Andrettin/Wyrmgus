@@ -33,6 +33,7 @@
 
 #include "animation/animation_rotate.h"
 #include "unit/unit.h"
+#include "util/util.h"
 
 void CAnimation_RandomRotate::Action(CUnit &unit, int &/*move*/, int /*scale*/) const
 {

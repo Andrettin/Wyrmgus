@@ -28,7 +28,10 @@
 //
 
 #include "stratagus.h"
+
 #include "particle.h"
+
+#include "util/util.h"
 
 //Wyrmgus start
 //CRadialParticle::CRadialParticle(CPosition position, GraphicAnimation *animation, int maxSpeed, int drawlevel) :

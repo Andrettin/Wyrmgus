@@ -43,6 +43,7 @@
 #include "script.h"
 #include "unit/unit.h"
 #include "unit/unit_manager.h"
+#include "util/util.h"
 #include "util/vector_util.h"
 
 namespace wyrmgus {

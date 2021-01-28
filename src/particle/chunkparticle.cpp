@@ -31,9 +31,10 @@
 
 #include "particle.h"
 
+#include "util/util.h"
 #include "video/video.h"
 
-static const int gravity = 32 * 12;
+static constexpr int gravity = 32 * 12;
 
 static inline float deg2rad(int degrees)
 {
