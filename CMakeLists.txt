@@ -369,6 +369,7 @@ set(spell_SRCS
 	src/spell/spell_areaadjustvital.cpp
 	src/spell/spell_areabombardment.cpp
 	src/spell/spell_capture.cpp
+	src/spell/spell_container.cpp
 	src/spell/spell_demolish.cpp
 	src/spell/spell_polymorph.cpp
 	src/spell/spell_retrain.cpp
@@ -893,6 +894,7 @@ set(stratagus_spell_HDRS
 	src/spell/spell_areaadjustvital.h
 	src/spell/spell_areabombardment.h
 	src/spell/spell_capture.h
+	src/spell/spell_container.h
 	src/spell/spell_demolish.h
 	src/spell/spell_polymorph.h
 	src/spell/spell_retrain.h
