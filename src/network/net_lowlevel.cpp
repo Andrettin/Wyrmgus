@@ -480,9 +480,9 @@ int NetConnectTCP(Socket sockfd, unsigned long addr, int port)
 */
 int NetSocketReady(Socket sockfd, int timeout)
 {
-	int retval;
-	struct timeval tv;
-	fd_set mask;
+	int retval = 0;
+	struct timeval tv {};
+	fd_set mask{};
 
 	// Check the file descriptors for available data
 	do {
@@ -514,8 +514,8 @@ int NetSocketReady(Socket sockfd, int timeout)
 */
 int SocketSet::Select(int timeout)
 {
-	int retval;
-	fd_set mask;
+	int retval = 0;
+	fd_set mask{};
 
 	// Check the file descriptors for available data
 	do {
@@ -526,7 +526,7 @@ int SocketSet::Select(int timeout)
 		}
 
 		// Set up the timeout
-		struct timeval tv;
+		struct timeval tv{};
 		tv.tv_sec = timeout / 1000;
 		tv.tv_usec = (timeout % 1000) * 1000;
 
@@ -574,14 +574,14 @@ int SocketSet::HasDataToRead(Socket socket) const
 **
 **  @return Number of bytes placed in buffer, or -1 if failure.
 */
-int NetRecvUDP(Socket sockfd, void *buf, int len, unsigned long *hostFrom, int *portFrom)
+int NetRecvUDP(Socket sockfd, std::array<unsigned char, 1024> &buf, int len, unsigned long *hostFrom, int *portFrom)
 {
-	struct sockaddr_in sock_addr;
+	struct sockaddr_in sock_addr{};
 	socklen_t n = sizeof(struct sockaddr_in);
 	#ifdef __MORPHOS__
 	const int l = recvfrom(sockfd, (UBYTE*)buf, len, 0, (struct sockaddr *)&sock_addr, (LONG*)&n);
 	#else
-	const int l = recvfrom(sockfd, (recvfrombuftype)buf, len, 0, (struct sockaddr *)&sock_addr, &n);
+	const int l = recvfrom(sockfd, (recvfrombuftype)buf.data(), len, 0, (struct sockaddr *)&sock_addr, &n);
 	#endif
 	
 	if (l < 0) {
@@ -645,7 +645,7 @@ int NetRecvTCP(Socket sockfd, void *buf, int len)
 int NetSendUDP(Socket sockfd, unsigned long host, int port,
 			   const void *buf, int len)
 {
-	struct sockaddr_in sock_addr;
+	struct sockaddr_in sock_addr{};
 
 	const int n = sizeof(struct sockaddr_in);
 	sock_addr.sin_addr.s_addr = host;
@@ -699,7 +699,7 @@ int NetListenTCP(Socket sockfd)
 */
 Socket NetAcceptTCP(Socket sockfd, unsigned long *clientHost, int *clientPort)
 {
-	struct sockaddr_in sa;
+	struct sockaddr_in sa{};
 	socklen_t len = sizeof(struct sockaddr_in);
 	#ifdef __MORPHOS__
 	Socket socket = accept(sockfd, (struct sockaddr *)&sa, (LONG*)&len);

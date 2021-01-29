@@ -57,7 +57,7 @@ public:
 	bool Open(const CHost &host);
 	void Close();
 	void Send(const CHost &host, const void *buf, unsigned int len);
-	int Recv(void *buf, int len, CHost *hostFrom);
+	int Recv(std::array<unsigned char, 1024> &buf, int len, CHost *hostFrom);
 	void SetNonBlocking();
 	//
 	int HasDataToRead(int timeout);

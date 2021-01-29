@@ -411,7 +411,7 @@ void InitNetwork1()
 #endif
 
 #if 0 // FIXME: need a working interface check
-	unsigned long ips[10];
+	std::array<unsigned long, 10> ips{};
 	int networkNumInterfaces = NetSocketAddr(NetworkFildes, ips, 10);
 	if (networkNumInterfaces) {
 		DebugPrint("Num IP: %d\n" _C_ networkNumInterfaces);
@@ -756,11 +756,11 @@ static bool IsAValidCommand(const CNetworkPacket &packet, int index, const int p
 	// FIXME: not all values in nc have been validated
 }
 
-static void NetworkParseInGameEvent(const unsigned char *buf, int len, const CHost &host)
+static void NetworkParseInGameEvent(const std::array<unsigned char, 1024> &buf, int len, const CHost &host)
 {
 	CNetworkPacket packet;
 	int commands;
-	packet.Deserialize(buf, len, &commands);
+	packet.Deserialize(buf.data(), len, &commands);
 	
 	int player = packet.Header.OrigPlayer;
 	if (player == 255) {
@@ -844,9 +844,9 @@ void NetworkEvent()
 		return;
 	}
 	// Read the packet.
-	unsigned char buf[1024];
+	std::array<unsigned char, 1024> buf{};
 	CHost host;
-	int len = NetworkFildes.Recv(&buf, sizeof(buf), &host);
+	int len = NetworkFildes.Recv(buf, sizeof(buf), &host);
 	if (len < 0) {
 		DebugPrint("Server/Client gone?\n");
 		// just hope for an automatic recover right now..

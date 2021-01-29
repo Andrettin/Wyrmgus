@@ -125,7 +125,7 @@ public:
 	void Init(const std::string &name, CUDPSocket *socket, CServerSetup *serverSetup, CServerSetup *localSetup, unsigned long tick);
 	void SetServerHost(const CHost &host) { serverHost = host; }
 
-	bool Parse(const unsigned char *buf);
+	bool Parse(const std::array<unsigned char, 1024> &buf);
 	bool Update(unsigned long tick);
 
 	void DetachFromServer();
@@ -625,10 +625,10 @@ void CClient::SetConfig(const CInitMessage_Config &msg)
 #endif
 }
 
-bool CClient::Parse(const unsigned char *buf)
+bool CClient::Parse(const std::array<unsigned char, 1024> &buf)
 {
 	CInitMessage_Header header;
-	header.Deserialize(buf);
+	header.Deserialize(buf.data());
 
 	if (header.GetType() != MessageInit_FromServer) {
 		return true;
@@ -657,11 +657,11 @@ bool CClient::Parse(const unsigned char *buf)
 			break;
 		}
 		case ICMEngineMismatch: { // Stratagus engine version doesn't match
-			Parse_EngineMismatch(buf);
+			Parse_EngineMismatch(buf.data());
 			return false;
 		}
 		case ICMProtocolMismatch: { // Network protocol version doesn't match
-			Parse_ProtocolMismatch(buf);
+			Parse_ProtocolMismatch(buf.data());
 			return false;
 		}
 		case ICMGameFull: { // Game is full - server rejected connnection
@@ -669,23 +669,23 @@ bool CClient::Parse(const unsigned char *buf)
 			return false;
 		}
 		case ICMWelcome: { // Server has accepted us
-			Parse_Welcome(buf);
+			Parse_Welcome(buf.data());
 			break;
 		}
 		case ICMMap: { // Server has sent us new map info
-			Parse_Map(buf);
+			Parse_Map(buf.data());
 			break;
 		}
 		case ICMState: {
-			Parse_State(buf);
+			Parse_State(buf.data());
 			break;
 		}
 		case ICMConfig: { // Server gives the go ahead.. - start game
-			Parse_Config(buf);
+			Parse_Config(buf.data());
 			break;
 		}
 		case ICMResync: { // Server has resynced with us and sends resync data
-			Parse_Resync(buf);
+			Parse_Resync(buf.data());
 			break;
 		}
 		case ICMGo: { // Server's final go ..
@@ -1374,12 +1374,12 @@ void CServer::Parse(unsigned long frameCounter, const unsigned char *buf, const 
 **
 **  @return 1 if packet is an InitConfig message, 0 otherwise
 */
-int NetworkParseSetupEvent(const unsigned char *buf, const CHost &host)
+int NetworkParseSetupEvent(const std::array<unsigned char, 1024> &buf, const CHost &host)
 {
 	Assert(NetConnectRunning != 0);
 
 	CInitMessage_Header header;
-	header.Deserialize(buf);
+	header.Deserialize(buf.data());
 	const unsigned char msgtype = header.GetType();
 	if ((msgtype == MessageInit_FromClient && NetConnectRunning != 1)
 		|| (msgtype == MessageInit_FromServer && NetConnectRunning != 2)) {
@@ -1403,7 +1403,7 @@ int NetworkParseSetupEvent(const unsigned char *buf, const CHost &host)
 			NetConnectRunning = 0;
 		}
 	} else if (NetConnectRunning == 1) { // server
-		Server.Parse(FrameCounter, buf, host);
+		Server.Parse(FrameCounter, buf.data(), host);
 	}
 	return 1;
 }
@@ -1472,8 +1472,8 @@ void NetworkServerStartGame()
 	LocalSetupState = ServerSetupState;
 
 	// Make a list of the available player slots.
-	int num[PlayerMax];
-	int rev[PlayerMax];
+	std::array<int, PlayerMax> num{};
+	std::array<int, PlayerMax> rev{};
 	int h = 0;
 	for (int i = 0; i < PlayerMax; ++i) {
 		if (CMap::Map.Info.PlayerType[i] == PlayerPerson) {
@@ -1511,7 +1511,7 @@ void NetworkServerStartGame()
 	}
 #endif
 
-	int org[PlayerMax];
+	std::array<int, PlayerMax> org{};
 	// Reverse to assign slots to menu setup state positions.
 	for (int i = 0; i < PlayerMax; ++i) {
 		org[i] = -1;
@@ -1651,7 +1651,7 @@ breakout:
 		}
 
 		// Wait for acknowledge
-		unsigned char buf[1024];
+		std::array<unsigned char, 1024> buf{};
 		while (j && NetworkFildes.HasDataToRead(1000)) {
 			CHost host;
 			const int len = NetworkFildes.Recv(buf, sizeof(buf), &host);
@@ -1663,7 +1663,7 @@ breakout:
 				continue;
 			}
 			CInitMessage_Header header;
-			header.Deserialize(buf);
+			header.Deserialize(buf.data());
 			const unsigned char type = header.GetType();
 			const unsigned char subtype = header.GetSubType();
 
@@ -1809,8 +1809,8 @@ void NetworkGamePrepareGameSettings()
 #endif
 
 	// Make a list of the available player slots.
-	int num[PlayerMax];
-	int comp[PlayerMax];
+	std::array<int, PlayerMax> num{};
+	std::array<int, PlayerMax> comp{};
 	int c = 0;
 	int h = 0;
 	for (int i = 0; i < PlayerMax; i++) {

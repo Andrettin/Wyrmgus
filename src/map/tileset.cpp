@@ -200,7 +200,7 @@ void CTileset::clear()
 //	removedTreeTile = 0;
 	removedTreeTiles.clear();
 	//Wyrmgus end
-	memset(woodTable, 0, sizeof(woodTable));
+	woodTable.fill(0);
 	mixedLookupTable.clear();
 	topOneRockTile = 0;
 	midOneRockTile = 0;
@@ -209,9 +209,9 @@ void CTileset::clear()
 //	removedRockTile = 0;
 	removedRockTiles.clear();
 	//Wyrmgus end
-	memset(rockTable, 0, sizeof(rockTable));
-	memset(humanWallTable, 0, sizeof(humanWallTable));
-	memset(orcWallTable, 0, sizeof(orcWallTable));
+	rockTable.fill(0);
+	humanWallTable.fill(0);
+	orcWallTable.fill(0);
 }
 
 unsigned int CTileset::getDefaultTileIndex() const
@@ -563,11 +563,7 @@ int CTileset::getTileBySurrounding(unsigned short type,
 	//Wyrmgus end
 
 	Assert(type == MapFieldForest || type == MapFieldRocks);
-#ifdef _MSC_VER
-	const int *lookuptable = (type == MapFieldForest) ? woodTable : rockTable;
-#else
-	const int (&lookuptable)[20] = (type == MapFieldForest) ? woodTable : rockTable;
-#endif
+	const std::array<int, 20> &lookuptable = (type == MapFieldForest) ? woodTable : rockTable;
 	tile = lookuptable[tile];
 
 	//Wyrmgus start

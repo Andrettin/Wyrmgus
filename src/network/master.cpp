@@ -144,15 +144,15 @@ int CMetaClient::Recv()
 		return -1;
 	}
 
-	char buf[1024];
-	memset(&buf, 0, sizeof(buf));
+	std::array<char, 1024> buf{};
+
 	int n = metaSocket.Recv(&buf, sizeof(buf));
 	if (n == -1) {
 		return n;
 	}
 	// We know we now have the whole command.
 	// Convert to standard notation
-	std::string cmd(buf, strlen(buf));
+	std::string cmd(buf.data(), strlen(buf.data()));
 	cmd += '\n';
 	cmd += '\0';
 	auto log = std::make_unique<CClientLog>();

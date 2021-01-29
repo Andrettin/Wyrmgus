@@ -73,8 +73,8 @@ void LoadPO(const char *file)
 		return;
 	}
 	enum { MSGNONE, MSGID, MSGSTR } state = MSGNONE;
-	char msgid[16 * 1024];
-	char msgstr[16 * 1024];
+	std::array<char, 16 * 1024> msgid{};
+	std::array<char, 16 * 1024> msgstr{};
 	char *currmsg = nullptr;
 
 	msgid[0] = msgstr[0] = '\0';
@@ -100,12 +100,12 @@ void LoadPO(const char *file)
 		if (!strncmp(s, "msgid ", 6)) {
 			if (state == MSGSTR) {
 				*currmsg = '\0';
-				if (*msgid != '\0') {
-					AddTranslation(msgid, msgstr);
+				if (msgid.front() != '\0') {
+					AddTranslation(msgid.data(), msgstr.data());
 				}
 			}
 			state = MSGID;
-			currmsg = msgid;
+			currmsg = msgid.data();
 			*currmsg = '\0';
 			s += 6;
 			while (*s == ' ') { ++s; }
@@ -114,7 +114,7 @@ void LoadPO(const char *file)
 				*currmsg = '\0';
 			}
 			state = MSGSTR;
-			currmsg = msgstr;
+			currmsg = msgstr.data();
 			*currmsg = '\0';
 			s += 7;
 			while (*s == ' ') { ++s; }
@@ -153,7 +153,7 @@ void LoadPO(const char *file)
 	}
 	if (state == MSGSTR) {
 		*currmsg = '\0';
-		AddTranslation(msgid, msgstr);
+		AddTranslation(msgid.data(), msgstr.data());
 	}
 
 	fclose(fd);

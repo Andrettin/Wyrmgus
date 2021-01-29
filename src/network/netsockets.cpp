@@ -77,7 +77,8 @@ public:
 	bool Open(const CHost &host) { socket = NetOpenUDP(host.getIp(), host.getPort()); return socket != INVALID_SOCKET; }
 	void Close() { NetCloseUDP(socket); socket = Socket(-1); }
 	void Send(const CHost &host, const void *buf, unsigned int len) { NetSendUDP(socket, host.getIp(), host.getPort(), buf, len); }
-	int Recv(void *buf, int len, CHost *hostFrom)
+
+	int Recv(std::array<unsigned char, 1024> &buf, int len, CHost *hostFrom)
 	{
 		unsigned long ip;
 		int port;
@@ -85,6 +86,7 @@ public:
 		*hostFrom = CHost(ip, port);
 		return res;
 	}
+
 	void SetNonBlocking() { NetSetNonBlocking(socket); }
 	int HasDataToRead(int timeout) { return NetSocketReady(socket, timeout); }
 	bool IsValid() const { return socket != Socket(-1); }
@@ -146,7 +148,7 @@ void CUDPSocket::Send(const CHost &host, const void *buf, unsigned int len)
 	m_impl->Send(host, buf, len);
 }
 
-int CUDPSocket::Recv(void *buf, int len, CHost *hostFrom)
+int CUDPSocket::Recv(std::array<unsigned char, 1024> &buf, int len, CHost *hostFrom)
 {
 	const int res = m_impl->Recv(buf, len, hostFrom);
 #ifdef DEBUG

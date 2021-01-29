@@ -311,16 +311,16 @@ private:
 	//Wyrmgus start
 //	unsigned removedTreeTile;  /// Tile placed where trees are gone
 	//Wyrmgus end
-	int woodTable[20];     /// Table for tree removable
+	std::array<int, 20> woodTable{};     /// Table for tree removable
 	unsigned topOneRockTile;   /// Tile for one rock top
 	unsigned midOneRockTile;   /// Tile for one rock middle
 	unsigned botOneRockTile;   /// Tile for one rock bottom
 	//Wyrmgus start
 //	unsigned removedRockTile;  /// Tile placed where rocks are gone
 	//Wyrmgus end
-	int rockTable[20];     /// Removed rock placement table
-	unsigned humanWallTable[16];  /// Human wall placement table
-	unsigned orcWallTable[16];    /// Orc wall placement table
+	std::array<int, 20> rockTable{};     /// Removed rock placement table
+	std::array<unsigned, 16> humanWallTable{};  /// Human wall placement table
+	std::array<unsigned, 16> orcWallTable{};    /// Orc wall placement table
 #endif
 };
 
