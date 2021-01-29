@@ -107,7 +107,6 @@ set(animation_SRCS
 	src/animation/animation_setvar.cpp
 	src/animation/animation_sound.cpp
 	src/animation/animation_spawnmissile.cpp
-	src/animation/animation_spawnunit.cpp
 	src/animation/animation_unbreakable.cpp
 	src/animation/animation_wait.cpp
 )
@@ -689,7 +688,6 @@ set(stratagus_animation_HDRS
 	src/include/animation/animation_setvar.h
 	src/include/animation/animation_sound.h
 	src/include/animation/animation_spawnmissile.h
-	src/include/animation/animation_spawnunit.h
 	src/include/animation/animation_unbreakable.h
 	src/include/animation/animation_wait.h
 )

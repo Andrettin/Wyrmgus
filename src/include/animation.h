@@ -66,7 +66,6 @@ enum AnimationType {
 	AnimationGoto,
 	AnimationRandomGoto,
 	AnimationSpawnMissile,
-	AnimationSpawnUnit,
 	AnimationIfVar,
 	AnimationSetVar,
 	AnimationSetPlayerVar,

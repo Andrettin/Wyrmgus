@@ -48,7 +48,6 @@
 #include "animation/animation_setvar.h"
 #include "animation/animation_sound.h"
 #include "animation/animation_spawnmissile.h"
-#include "animation/animation_spawnunit.h"
 #include "animation/animation_unbreakable.h"
 #include "animation/animation_wait.h"
 
@@ -264,17 +263,6 @@ int ParseAnimFlags(const CUnit &unit, const char *parseflag)
 				flags |= SM_Ranged;
 			}  else if (!strcmp(cur, "setdirection")) {
 				flags |= SM_SetDirection;
-			} else {
-				throw std::runtime_error("Unknown animation flag: \"" + std::string(cur) + "\".");
-			}
-		} else if (unit.Anim.Anim->Type == AnimationSpawnUnit) {
-			if (!strcmp(cur, "none")) {
-				flags = SU_None;
-				return flags;
-			} else if (!strcmp(cur, "summoned")) {
-				flags |= SU_Summoned;
-			} else if (!strcmp(cur, "jointoai")) {
-				flags |= SU_JoinToAIForce;
 			} else {
 				throw std::runtime_error("Unknown animation flag: \"" + std::string(cur) + "\".");
 			}
@@ -496,8 +484,6 @@ void animation_set::process_sml_scope(const sml_data &scope)
 				anim = std::make_unique<CAnimation_Attack>();
 			} else if (key == "spawn-missile") {
 				anim = std::make_unique<CAnimation_SpawnMissile>();
-			} else if (key == "spawn-unit") {
-				anim = std::make_unique<CAnimation_SpawnUnit>();
 			} else if (key == "if-var") {
 				anim = std::make_unique<CAnimation_IfVar>();
 			} else if (key == "set-var") {
@@ -680,8 +666,6 @@ static std::unique_ptr<CAnimation> ParseAnimationFrame(lua_State *l, const char 
 		anim = std::make_unique<CAnimation_Attack>();
 	} else if (op1 == "spawn-missile") {
 		anim = std::make_unique<CAnimation_SpawnMissile>();
-	} else if (op1 == "spawn-unit") {
-		anim = std::make_unique<CAnimation_SpawnUnit>();
 	} else if (op1 == "if-var") {
 		anim = std::make_unique<CAnimation_IfVar>();
 	} else if (op1 == "set-var") {
