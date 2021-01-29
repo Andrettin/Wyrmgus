@@ -34,14 +34,15 @@
 class CAnimation_SetVar : public CAnimation
 {
 public:
-	CAnimation_SetVar() : CAnimation(AnimationSetVar) {}
+	CAnimation_SetVar() : CAnimation(AnimationSetVar)
+	{
+	}
 
-	virtual void Action(CUnit &unit, int &move, int scale) const;
-	virtual void Init(const char *s, lua_State *l);
+	virtual void Action(CUnit &unit, int &move, int scale) const override;
+	virtual void Init(const char *s, lua_State *l) override;
 
 private:
 	SetVar_ModifyTypes mod;
-	std::string varStr;
-	std::string valueStr;
-	std::string unitSlotStr;
+	std::string var_str;
+	int value = 0;
 };
