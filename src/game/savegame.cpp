@@ -146,7 +146,7 @@ int SaveGame(const std::string &filename)
 				StratagusMajorVersion, StratagusMinorVersion, StratagusPatchLevel);
 	file.printf("  SyncHash = %d, \n", SyncHash);
 	file.printf("  SyncRandSeed = %d, \n", wyrmgus::random::get()->get_seed());
-	file.printf("  SaveFile = \"%s\"\n", CurrentMapPath);
+	file.printf("  SaveFile = \"%s\"\n", CurrentMapPath.c_str());
 	file.printf("\n---  \"preview\", \"%s.pam\",\n", filename.c_str());
 	file.printf("} )\n\n");
 

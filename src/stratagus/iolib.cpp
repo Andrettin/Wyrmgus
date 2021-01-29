@@ -599,9 +599,9 @@ static void LibraryFileName(const char *file, char(&buffer)[PATH_MAX])
 	const std::string root_path_str = wyrmgus::database::get()->get_root_path().string();
 
 	// Try in map directory
-	if (*CurrentMapPath) {
-		if (*CurrentMapPath == '.' || *CurrentMapPath == '/') {
-			strcpy_s(buffer, PATH_MAX, CurrentMapPath);
+	if (!CurrentMapPath.empty()) {
+		if (CurrentMapPath.front() == '.' || CurrentMapPath.front() == '/') {
+			strcpy_s(buffer, PATH_MAX, CurrentMapPath.c_str());
 			char *s = strrchr(buffer, '/');
 			if (s) {
 				s[1] = '\0';
@@ -612,7 +612,7 @@ static void LibraryFileName(const char *file, char(&buffer)[PATH_MAX])
 			if (*buffer) {
 				strcat_s(buffer, PATH_MAX, "/");
 			}
-			strcat_s(buffer, PATH_MAX, CurrentMapPath);
+			strcat_s(buffer, PATH_MAX, CurrentMapPath.c_str());
 			char *s = strrchr(buffer, '/');
 			if (s) {
 				s[1] = '\0';

@@ -2394,7 +2394,7 @@ void CEditor::Init()
 
 	//Wyrmgus start
 //	if (!*CurrentMapPath) { // new map!
-	if (!*CurrentMapPath || IsMod) { // new map or is a mod
+	if (CurrentMapPath.empty() || IsMod) { // new map or is a mod
 	//Wyrmgus end
 		InitUnitTypes(1);
 		//
@@ -2450,7 +2450,7 @@ void CEditor::Init()
 		//Wyrmgus end
 	//Wyrmgus start
 	}
-	if (!*CurrentMapPath) {
+	if (CurrentMapPath.empty()) {
 		CreateGame("", &CMap::Map, IsMod);
 	//Wyrmgus end
 	} else {
@@ -2716,20 +2716,17 @@ void EditorMainLoop()
 **  @param filename  Map to load, null to create a new map
 */
 //Wyrmgus start
-//void StartEditor(const char *filename)
-void StartEditor(const char *filename, bool is_mod)
+//void StartEditor(const std::string &filename)
+void StartEditor(const std::string &filename, bool is_mod)
 //Wyrmgus end
 {
 	std::string nc, rc;
 
-	if (filename) {
-		if (strcpy_s(CurrentMapPath, sizeof(CurrentMapPath), filename) != 0) {
-			filename = nullptr;
-		}
-	}
-	if (!filename) {
+	if (!filename.empty()) {
+		CurrentMapPath = filename;
+	} else {
 		// new map, choose some default values
-		strcpy_s(CurrentMapPath, sizeof(CurrentMapPath), "");
+		CurrentMapPath.clear();
 		// Map.Info.Description.clear();
 		// Map.Info.MapWidth = 64;
 		// Map.Info.MapHeight = 64;

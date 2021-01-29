@@ -1679,7 +1679,7 @@ void CreateGame(const std::string &filename, CMap *map, bool is_mod)
 
 	if (!filename.empty()) {
 		if (CurrentMapPath != filename) {
-			strcpy_s(CurrentMapPath, sizeof(CurrentMapPath), filename.c_str());
+			CurrentMapPath = filename;
 		}
 
 		//
@@ -2302,9 +2302,7 @@ static int CclSavedGameInfo(lua_State *l)
 		const char *value = LuaToString(l, -2);
 
 		if (!strcmp(value, "SaveFile")) {
-			if (strcpy_s(CurrentMapPath, sizeof(CurrentMapPath), LuaToString(l, -1)) != 0) {
-				LuaError(l, "SaveFile too long");
-			}
+			CurrentMapPath = LuaToString(l, -1);
 			std::string buf = wyrmgus::database::get()->get_root_path().string();
 			buf += "/";
 			buf += LuaToString(l, -1);

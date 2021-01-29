@@ -116,8 +116,8 @@ extern char TileToolRandom;
 
 /// Start the editor
 //Wyrmgus start
-//extern void StartEditor(const char *filename);
-extern void StartEditor(const char *filename, bool is_mod = false);
+//extern void StartEditor(const std::string &filename);
+extern void StartEditor(const std::string &filename, const bool is_mod = false);
 //Wyrmgus end
 
 /// Editor main event loop

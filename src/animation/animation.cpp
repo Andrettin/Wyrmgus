@@ -98,7 +98,6 @@ int UnitShowAnimation(CUnit &unit, const CAnimation *anim)
 **
 **  @return  The parsed value.
 */
-
 static int ParseAnimPlayer(const CUnit &unit, const std::string &parseint)
 {
 	if (parseint == "this") {
@@ -106,7 +105,6 @@ static int ParseAnimPlayer(const CUnit &unit, const std::string &parseint)
 	}
 	return ParseAnimInt(unit, parseint);
 }
-
 
 /**
 **  Parse integer in animation frame.

@@ -90,7 +90,7 @@
 CMap CMap::Map; //the current map
 int FlagRevealMap; //flag must reveal the map
 int ReplayRevealMap; //reveal Map is replay
-char CurrentMapPath[1024]; //path of the current map
+std::string CurrentMapPath; //path of the current map
 
 /*----------------------------------------------------------------------------
 --  Visible and explored handling

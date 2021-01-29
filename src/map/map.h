@@ -367,7 +367,7 @@ public:
 	CMapInfo Info;             /// descriptive information
 };
 
-extern char CurrentMapPath[1024]; /// Path to the current map
+extern std::string CurrentMapPath; /// Path to the current map
 
 /// Contrast of fog of war
 extern int FogOfWarOpacity;

@@ -258,9 +258,7 @@ static void ApplyReplaySettings()
 		GameSettings.Presets[i].Type = CurrentReplay->Players[i].Type;
 	}
 
-	if (strcpy_s(CurrentMapPath, sizeof(CurrentMapPath), CurrentReplay->MapPath.c_str()) != 0) {
-		throw std::runtime_error("Replay map path is too long.");
-	}
+	CurrentMapPath = CurrentReplay->MapPath;
 	GameSettings.Resources = CurrentReplay->Resource;
 	GameSettings.NumUnits = CurrentReplay->NumUnits;
 	GameSettings.Difficulty = CurrentReplay->Difficulty;
@@ -425,7 +423,6 @@ void CommandLog(const char *action, const CUnit *unit, int flush,
 	//
 	if (!LogFile) {
 		struct stat tmp;
-		char buf[16];
 		std::string path(Parameters::Instance.GetUserDirectory());
 		if (!GameName.empty()) {
 			path += "/";
@@ -437,10 +434,8 @@ void CommandLog(const char *action, const CUnit *unit, int flush,
 			makedir(path.c_str(), 0777);
 		}
 
-		snprintf(buf, sizeof(buf), "%d", CPlayer::GetThisPlayer()->Index);
-
 		path += "/log_of_stratagus_";
-		path += buf;
+		path += std::to_string(CPlayer::GetThisPlayer()->Index);
 		path += ".log";
 
 		LogFile = std::make_unique<CFile>();
