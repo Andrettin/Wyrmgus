@@ -855,9 +855,8 @@ static bool AiRequestSupply()
 	int counter[UnitTypeMax];
 
 	AiGetBuildRequestsCount(*AiPlayer, counter);
-	struct cnode cache[16];
 
-	memset(cache, 0, sizeof(cache));
+	std::array<cnode, 16> cache;
 
 	//
 	// Check if we can build this?

@@ -1231,8 +1231,8 @@ static void AiMoveUnitInTheWay(CUnit &unit)
 {
 	static constexpr std::array<Vec2i, 8> dirs = {Vec2i(-1, -1), Vec2i(-1, 0), Vec2i(-1, 1), Vec2i(0, 1), Vec2i(1, 1), Vec2i(1, 0), Vec2i(1, -1), Vec2i(0, -1)};
 
-	CUnit *movableunits[16]{};
-	Vec2i movablepos[16];
+	std::array<CUnit *, 16> movableunits{};
+	std::array<Vec2i, 16> movablepos;
 	int movablenb;
 
 	AiPlayer = unit.Player->Ai.get();
