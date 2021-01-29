@@ -830,7 +830,7 @@ void ShowOrder(const CUnit &unit)
 static void DrawInformations(const CUnit &unit, const wyrmgus::unit_type &type, const PixelPos &screenPos)
 {
 #if 0 && DEBUG // This is for showing vis counts and refs.
-	char buf[10];
+	std::array<char, 10> buf{};
 	sprintf(buf, "%d%c%c%d", unit.VisCount[ThisPlayer->Index],
 			unit.is_seen_by_player(ThisPlayer) ? 'Y' : 'N',
 			unit.is_seen_destroyed_by_player(ThisPlayer) ? 'Y' : 'N',

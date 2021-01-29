@@ -89,9 +89,6 @@ static EGLSurface eglSurface;
 
 SDL_Surface *TheScreen; /// Internal screen
 
-static SDL_Rect Rects[100];
-static int NumRects;
-
 #if defined(USE_OPENGL) || defined(USE_GLES)
 GLint GLMaxTextureSize = 256;   /// Max texture size supported on the video card
 GLint GLMaxTextureSizeOverride;     /// User-specified limit for ::GLMaxTextureSize
@@ -337,7 +334,7 @@ static void InitKey2Str()
 	}
 
 	int i;
-	char str[20];
+	std::array<char, 20> str{};
 
 	Key2Str[SDLK_BACKSPACE] = "backspace";
 	Key2Str[SDLK_TAB] = "tab";
@@ -364,7 +361,7 @@ static void InitKey2Str()
 	str[1] = '\0';
 	for (i = SDLK_0; i <= SDLK_9; ++i) {
 		str[0] = i;
-		Key2Str[i] = str;
+		Key2Str[i] = str.data();
 	}
 
 	Key2Str[SDLK_COLON] = ":";
@@ -382,14 +379,14 @@ static void InitKey2Str()
 	str[1] = '\0';
 	for (i = SDLK_a; i <= SDLK_z; ++i) {
 		str[0] = i;
-		Key2Str[i] = str;
+		Key2Str[i] = str.data();
 	}
 
 	Key2Str[SDLK_DELETE] = "delete";
 
 	for (i = SDLK_KP0; i <= SDLK_KP9; ++i) {
-		snprintf(str, sizeof(str), "kp_%d", i - SDLK_KP0);
-		Key2Str[i] = str;
+		snprintf(str.data(), sizeof(str), "kp_%d", i - SDLK_KP0);
+		Key2Str[i] = str.data();
 	}
 
 	Key2Str[SDLK_KP_PERIOD] = "kp_period";
@@ -410,10 +407,10 @@ static void InitKey2Str()
 	Key2Str[SDLK_PAGEDOWN] = "pagedown";
 
 	for (i = SDLK_F1; i <= SDLK_F15; ++i) {
-		snprintf(str, sizeof(str), "f%d", i - SDLK_F1 + 1);
-		Key2Str[i] = str;
-		snprintf(str, sizeof(str), "F%d", i - SDLK_F1 + 1);
-		Str2Key[str] = i;
+		snprintf(str.data(), sizeof(str), "f%d", i - SDLK_F1 + 1);
+		Key2Str[i] = str.data();
+		snprintf(str.data(), sizeof(str), "F%d", i - SDLK_F1 + 1);
+		Str2Key[str.data()] = i;
 	}
 
 	Key2Str[SDLK_HELP] = "help";
@@ -495,7 +492,7 @@ void InitVideoSdl()
 #ifdef USE_WIN32
 		HWND hwnd = nullptr;
 		HICON hicon = nullptr;
-		SDL_SysWMinfo info;
+		SDL_SysWMinfo info{};
 		SDL_VERSION(&info.version);
 
 		if (SDL_GetWMInfo(&info)) {
