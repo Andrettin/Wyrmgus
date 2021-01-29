@@ -60,6 +60,7 @@
 #include "spell/spell.h"
 #include "unit/unit.h"
 #include "unit/unit_type.h"
+#include "util/string_util.h"
 
 struct LabelsStruct {
 	CAnimation *Anim = nullptr;
@@ -99,9 +100,9 @@ int UnitShowAnimation(CUnit &unit, const CAnimation *anim)
 **  @return  The parsed value.
 */
 
-static int ParseAnimPlayer(const CUnit &unit, char *parseint)
+static int ParseAnimPlayer(const CUnit &unit, const std::string &parseint)
 {
-	if (!strcmp(parseint, "this")) {
+	if (parseint == "this") {
 		return unit.Player->Index;
 	}
 	return ParseAnimInt(unit, parseint);
@@ -117,70 +118,72 @@ static int ParseAnimPlayer(const CUnit &unit, char *parseint)
 **  @return  The parsed value.
 */
 
-int ParseAnimInt(const CUnit &unit, const char *parseint)
+int ParseAnimInt(const CUnit &unit, const std::string &parseint)
 {
-	char s[100];
 	const CUnit *goal = &unit;
 
-	if (!strlen(parseint)) {
+	if (parseint.empty()) {
 		return 0;
 	}
 
-	strcpy(s, parseint);
-	char *cur = &s[2];
-	if (s[0] == 'v' || s[0] == 't') { //unit variable detected
-		if (s[0] == 't') {
+	const std::vector<std::string> str_list = wyrmgus::string::split(parseint, '.');
+
+	const std::string &cur = str_list[1];
+
+	if (parseint[0] == 'v' || parseint[0] == 't') { //unit variable detected
+		if (parseint[0] == 't') {
 			if (unit.CurrentOrder()->has_goal()) {
 				goal = unit.CurrentOrder()->get_goal();
 			} else {
 				return 0;
 			}
 		}
-		char *next = strchr(cur, '.');
-		if (next == nullptr) {
-			throw std::runtime_error("Need also specify the variable \"" + std::string(cur) + "\" tag.");
-		} else {
-			*next = '\0';
+
+		if (str_list.size() < 3) {
+			throw std::runtime_error("Need also specify the variable for the \"" + cur + "\" tag.");
 		}
-		const int index = UnitTypeVar.VariableNameLookup[cur];// User variables
+
+		const std::string &next = str_list[2];
+
+		const int index = UnitTypeVar.VariableNameLookup[cur]; //user variables
 		if (index == -1) {
-			if (!strcmp(cur, "ResourcesHeld")) {
+			if (cur == "ResourcesHeld") {
 				return goal->ResourcesHeld;
-			} else if (!strcmp(cur, "ResourceActive")) {
+			} else if (cur == "ResourceActive") {
 				return goal->Resource.Active;
-			} else if (!strcmp(cur, "InsideCount")) {
+			} else if (cur == "InsideCount") {
 				return goal->InsideCount;
-			} else if (!strcmp(cur, "_Distance")) {
+			} else if (cur == "_Distance") {
 				return unit.MapDistanceTo(*goal);
 			}
-			throw std::runtime_error("Bad variable name \"" + std::string(cur) + "\".");
+			throw std::runtime_error("Bad variable name \"" + cur + "\".");
 		}
-		if (!strcmp(next + 1, "Value")) {
+		if (next == "Value") {
 			//Wyrmgus start
 //			return goal->Variable[index].Value;
 			return goal->GetModifiedVariable(index, VariableAttribute::Value);
 			//Wyrmgus end
-		} else if (!strcmp(next + 1, "Max")) {
+		} else if (next == "Max") {
 			//Wyrmgus start
 //			return goal->Variable[index].Max;
 			return goal->GetModifiedVariable(index, VariableAttribute::Max);
 			//Wyrmgus end
-		} else if (!strcmp(next + 1, "Increase")) {
+		} else if (next == "Increase") {
 			//Wyrmgus start
 //			return goal->Variable[index].Increase;
 			return goal->GetModifiedVariable(index, VariableAttribute::Increase);
 			//Wyrmgus end
-		} else if (!strcmp(next + 1, "Enable")) {
+		} else if (next == "Enable") {
 			return goal->Variable[index].Enable;
-		} else if (!strcmp(next + 1, "Percent")) {
+		} else if (next == "Percent") {
 			//Wyrmgus start
 //			return goal->Variable[index].Value * 100 / goal->Variable[index].Max;
 			return goal->GetModifiedVariable(index, VariableAttribute::Value) * 100 / goal->GetModifiedVariable(index, VariableAttribute::Max);
 			//Wyrmgus end
 		}
 		return 0;
-	} else if (s[0] == 'b' || s[0] == 'g') { //unit bool flag detected
-		if (s[0] == 'g') {
+	} else if (parseint[0] == 'b' || parseint[0] == 'g') { //unit bool flag detected
+		if (parseint[0] == 'g') {
 			if (unit.CurrentOrder()->has_goal()) {
 				goal = unit.CurrentOrder()->get_goal();
 			} else {
@@ -189,39 +192,38 @@ int ParseAnimInt(const CUnit &unit, const char *parseint)
 		}
 		const int index = UnitTypeVar.BoolFlagNameLookup[cur];// User bool flags
 		if (index == -1) {
-			throw std::runtime_error("Bad bool-flag name \"" + std::string(cur) + "\".");
+			throw std::runtime_error("Bad bool-flag name \"" + cur + "\".");
 		}
 		return goal->Type->BoolFlag[index].value;
-	} else if (s[0] == 's') { //spell type detected
+	} else if (parseint[0] == 's') { //spell type detected
 		Assert(goal->CurrentAction() == UnitAction::SpellCast);
 		const COrder_SpellCast &order = *static_cast<COrder_SpellCast *>(goal->CurrentOrder());
 		const wyrmgus::spell &spell = order.GetSpell();
-		if (!strcmp(spell.get_identifier().c_str(), cur)) {
+		if (spell.get_identifier() == cur) {
 			return 1;
 		}
 		return 0;
-	} else if (s[0] == 'S') { // check if autocast for this spell available
+	} else if (parseint[0] == 'S') { // check if autocast for this spell available
 		const wyrmgus::spell *spell = wyrmgus::spell::get(cur);
 		if (unit.is_autocast_spell(spell)) {
 			return 1;
 		}
 		return 0;
-	} else if (s[0] == 'r') { //random value
-		char *next = strchr(cur, '.');
-		if (next == nullptr) {
-			return SyncRand(atoi(cur) + 1);
+	} else if (parseint[0] == 'r') { //random value
+		if (str_list.size() >= 3) {
+			const std::string &next = str_list[2];
+			const int min = std::stoi(cur);
+			return min + SyncRand(std::stoi(next) - min + 1);
 		} else {
-			*next = '\0';
-			const int min = atoi(cur);
-			return min + SyncRand(atoi(next + 1) - min + 1);
+			return SyncRand(std::stoi(cur) + 1);
 		}
-	} else if (s[0] == 'l') { //player number
-		return ParseAnimPlayer(unit, cur);
-
+	} else if (parseint[0] == 'l') { //player number
+		return ParseAnimPlayer(unit, std::string(cur));
 	}
-	// Check if we trying to parse a number
-	Assert(isdigit(s[0]) || s[0] == '-');
-	return atoi(parseint);
+
+	//check if we are trying to parse a number
+	Assert(isdigit(parseint[0]) || parseint[0] == '-');
+	return std::stoi(parseint);
 }
 
 /**

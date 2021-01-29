@@ -82,12 +82,12 @@ public:
 			return nullptr;
 		}
 
-		auto find_iterator = data_type::instances_by_identifier.find(identifier);
+		const auto find_iterator = data_type::instances_by_identifier.find(identifier);
 		if (find_iterator != data_type::instances_by_identifier.end()) {
 			return find_iterator->second.get();
 		}
 
-		auto alias_find_iterator = data_type::instances_by_alias.find(identifier);
+		const auto alias_find_iterator = data_type::instances_by_alias.find(identifier);
 		if (alias_find_iterator != data_type::instances_by_alias.end()) {
 			return alias_find_iterator->second;
 		}

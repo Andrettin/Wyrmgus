@@ -1352,11 +1352,6 @@ public:
 			return (*this)[key.c_str()];
 		}
 
-		int operator[](const std::string_view &key) const
-		{
-			return (*this)[key.data()];
-		}
-
 		int AddKey(const char *const key)
 		{
 			int index = this->operator[](key);

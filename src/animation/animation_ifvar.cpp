@@ -71,8 +71,8 @@ void CAnimation_IfVar::Action(CUnit &unit, int &/*move*/, int /*scale*/) const
 {
 	Assert(unit.Anim.Anim == this);
 
-	const int lop = ParseAnimInt(unit, this->leftVar.c_str());
-	const int rop = ParseAnimInt(unit, this->rightVar.c_str());
+	const int lop = ParseAnimInt(unit, this->leftVar);
+	const int rop = ParseAnimInt(unit, this->rightVar);
 	const bool cond = this->binOpFunc(lop, rop);
 
 	if (cond) {
