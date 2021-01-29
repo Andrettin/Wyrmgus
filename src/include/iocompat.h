@@ -42,9 +42,9 @@
 #include <fcntl.h>
 #include <direct.h>
 
-#define R_OK 4
-#define F_OK 0
-#define PATH_MAX _MAX_PATH
+constexpr int R_OK = 4;
+constexpr int F_OK = 0;
+constexpr int PATH_MAX = _MAX_PATH;
 #define S_ISDIR(x) ((x) & _S_IFDIR)
 #define S_ISREG(x) ((x) & _S_IFREG)
 

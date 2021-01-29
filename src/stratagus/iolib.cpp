@@ -539,9 +539,9 @@ long CFile::PImpl::tell()
 **
 **  @return true if the file has been found.
 */
-static bool FindFileWithExtension(char(&file)[PATH_MAX])
+static bool FindFileWithExtension(std::array<char, PATH_MAX> &file)
 {
-	const std::filesystem::path filepath = file;
+	const std::filesystem::path filepath = file.data();
 
 	if (std::filesystem::exists(filepath)) {
 		return true;
@@ -552,7 +552,7 @@ static bool FindFileWithExtension(char(&file)[PATH_MAX])
 	filepath_gz += ".gz";
 
 	if (std::filesystem::exists(filepath_gz)) {
-		strcpy_s(file, PATH_MAX, filepath_gz.string().c_str());
+		strcpy_s(file.data(), PATH_MAX, filepath_gz.string().c_str());
 		return true;
 	}
 #endif
@@ -562,7 +562,7 @@ static bool FindFileWithExtension(char(&file)[PATH_MAX])
 	filepath_bz2 += ".bz2";
 
 	if (std::filesystem::exists(filepath_bz2)) {
-		strcpy_s(file, PATH_MAX, filepath_bz2.string().c_str());
+		strcpy_s(file.data(), PATH_MAX, filepath_bz2.string().c_str());
 		return true;
 	}
 #endif
@@ -585,11 +585,11 @@ static bool FindFileWithExtension(char(&file)[PATH_MAX])
 **  @param file        Filename to open.
 **  @param buffer      Allocated buffer for generated filename.
 */
-static void LibraryFileName(const char *file, char(&buffer)[PATH_MAX])
+static void LibraryFileName(const char *file, std::array<char, PATH_MAX> &buffer)
 {
 	// Absolute path or in current directory.
-	strcpy_s(buffer, PATH_MAX, file);
-	if (*buffer == '/') {
+	strcpy_s(buffer.data(), PATH_MAX, file);
+	if (buffer.front() == '/') {
 		return;
 	}
 	if (FindFileWithExtension(buffer)) {
@@ -601,23 +601,23 @@ static void LibraryFileName(const char *file, char(&buffer)[PATH_MAX])
 	// Try in map directory
 	if (!CurrentMapPath.empty()) {
 		if (CurrentMapPath.front() == '.' || CurrentMapPath.front() == '/') {
-			strcpy_s(buffer, PATH_MAX, CurrentMapPath.c_str());
-			char *s = strrchr(buffer, '/');
+			strcpy_s(buffer.data(), PATH_MAX, CurrentMapPath.c_str());
+			char *s = strrchr(buffer.data(), '/');
 			if (s) {
 				s[1] = '\0';
 			}
-			strcat_s(buffer, PATH_MAX, file);
+			strcat_s(buffer.data(), PATH_MAX, file);
 		} else {
-			strcpy_s(buffer, PATH_MAX, root_path_str.c_str());
-			if (*buffer) {
-				strcat_s(buffer, PATH_MAX, "/");
+			strcpy_s(buffer.data(), PATH_MAX, root_path_str.c_str());
+			if (buffer.front() != 0) {
+				strcat_s(buffer.data(), PATH_MAX, "/");
 			}
-			strcat_s(buffer, PATH_MAX, CurrentMapPath.c_str());
-			char *s = strrchr(buffer, '/');
+			strcat_s(buffer.data(), PATH_MAX, CurrentMapPath.c_str());
+			char *s = strrchr(buffer.data(), '/');
 			if (s) {
 				s[1] = '\0';
 			}
-			strcat_s(buffer, PATH_MAX, file);
+			strcat_s(buffer.data(), PATH_MAX, file);
 		}
 		if (FindFileWithExtension(buffer)) {
 			return;
@@ -626,20 +626,20 @@ static void LibraryFileName(const char *file, char(&buffer)[PATH_MAX])
 
 	// In user home directory
 	if (!GameName.empty()) {
-		snprintf(buffer, PATH_MAX, "%s/%s/%s", Parameters::Instance.GetUserDirectory().c_str(), GameName.c_str(), file);
+		snprintf(buffer.data(), PATH_MAX, "%s/%s/%s", Parameters::Instance.GetUserDirectory().c_str(), GameName.c_str(), file);
 		if (FindFileWithExtension(buffer)) {
 			return;
 		}
 	}
 
-	snprintf(buffer, PATH_MAX, "%s/%s", Parameters::Instance.GetUserDirectory().c_str(), file);
+	snprintf(buffer.data(), PATH_MAX, "%s/%s", Parameters::Instance.GetUserDirectory().c_str(), file);
 	if (FindFileWithExtension(buffer)) {
 		return;
 	}
 		
 	// In global shared directory
 	#ifndef __MORPHOS__
-	snprintf(buffer, PATH_MAX, "%s/%s", root_path_str.c_str(), file);
+	snprintf(buffer.data(), PATH_MAX, "%s/%s", root_path_str.c_str(), file);
 	if (FindFileWithExtension(buffer)) {
 		return;
 	}
@@ -647,12 +647,12 @@ static void LibraryFileName(const char *file, char(&buffer)[PATH_MAX])
 	// Support for graphics in default graphics dir.
 	// They could be anywhere now, but check if they haven't
 	// got full paths.
-	snprintf(buffer, PATH_MAX, "graphics/%s", file);
+	snprintf(buffer.data(), PATH_MAX, "graphics/%s", file);
 	if (FindFileWithExtension(buffer)) {
 		return;
 	}
 	#ifndef __MORPHOS__	
-	snprintf(buffer, PATH_MAX, "%s/graphics/%s", root_path_str.c_str(), file);
+	snprintf(buffer.data(), PATH_MAX, "%s/graphics/%s", root_path_str.c_str(), file);
 	if (FindFileWithExtension(buffer)) {
 		return;
 	}
@@ -661,36 +661,36 @@ static void LibraryFileName(const char *file, char(&buffer)[PATH_MAX])
 	// Support for sounds in default sounds dir.
 	// They could be anywhere now, but check if they haven't
 	// got full paths.
-	snprintf(buffer, PATH_MAX, "sounds/%s", file);
+	snprintf(buffer.data(), PATH_MAX, "sounds/%s", file);
 	if (FindFileWithExtension(buffer)) {
 		return;
 	}
 	#ifndef __MORPHOS__	
-	snprintf(buffer, PATH_MAX, "%s/sounds/%s", root_path_str.c_str(), file);
+	snprintf(buffer.data(), PATH_MAX, "%s/sounds/%s", root_path_str.c_str(), file);
 	if (FindFileWithExtension(buffer)) {
 		return;
 	}
 	#endif
 
 	// Support for music in the default music dir.
-	snprintf(buffer, PATH_MAX, "music/%s", file);
+	snprintf(buffer.data(), PATH_MAX, "music/%s", file);
 	if (FindFileWithExtension(buffer)) {
 		return;
 	}
 	#ifndef __MORPHOS__	
-	snprintf(buffer, PATH_MAX, "%s/music/%s", root_path_str.c_str(), file);
+	snprintf(buffer.data(), PATH_MAX, "%s/music/%s", root_path_str.c_str(), file);
 	if (FindFileWithExtension(buffer)) {
 		return;
 	}
 	#endif
 
 	// Support for scripts in default scripts dir.
-	sprintf(buffer, "scripts/%s", file);
+	sprintf(buffer.data(), "scripts/%s", file);
 	if (FindFileWithExtension(buffer)) {
 		return;
 	}
 	#ifndef __MORPHOS__	
-	sprintf(buffer, "%s/scripts/%s", root_path_str.c_str(), file);
+	sprintf(buffer.data(), "%s/scripts/%s", root_path_str.c_str(), file);
 	if (FindFileWithExtension(buffer)) {
 		return;
 	}
@@ -703,27 +703,27 @@ static void LibraryFileName(const char *file, char(&buffer)[PATH_MAX])
 	//Wyrmgus end
 
 	DebugPrint("File '%s' not found\n" _C_ file);
-	strcpy_s(buffer, PATH_MAX, file);
+	strcpy_s(buffer.data(), PATH_MAX, file);
 }
 
 extern std::string LibraryFileName(const char *file)
 {
-	char buffer[PATH_MAX];
+	std::array<char, PATH_MAX> buffer{};
 	LibraryFileName(file, buffer);
-	return buffer;
+	return buffer.data();
 }
 
 bool CanAccessFile(const char *filename)
 {
 	if (filename && filename[0] != '\0') {
-		char name[PATH_MAX];
+		std::array<char, PATH_MAX> name{};
 		name[0] = '\0';
 		LibraryFileName(filename, name);
 		if (name[0] == '\0') {
 			return false;
 		}
 
-		const std::filesystem::path filepath = name;
+		const std::filesystem::path filepath = name.data();
 		if (std::filesystem::exists(filepath)) {
 			return true;
 		}
@@ -779,14 +779,14 @@ std::vector<FileList> ReadDataDirectory(const std::filesystem::path &dir_path, c
 void FileWriter::printf(const char *format, ...)
 {
 	// FIXME: hardcoded size
-	char buf[1024];
+	std::array<char, 1024> buf{};
 
 	va_list ap;
 	va_start(ap, format);
 	buf[sizeof(buf) - 1] = '\0';
-	vsnprintf(buf, sizeof(buf) - 1, format, ap);
+	vsnprintf(buf.data(), sizeof(buf) - 1, format, ap);
 	va_end(ap);
-	write(buf, strlen(buf));
+	write(buf.data(), strlen(buf.data()));
 }
 
 
