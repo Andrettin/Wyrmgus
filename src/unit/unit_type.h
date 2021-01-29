@@ -1304,14 +1304,14 @@ public:
 			std::sort(buildin.begin(), buildin.end(), DataKey::key_pred);
 		}
 
-		const char *operator[](int index)
+		const char *operator[](int index) const
 		{
 			for (unsigned int i = 0; i < SIZE; ++i) {
 				if (buildin[i].offset == index) {
 					return buildin[i].key;
 				}
 			}
-			for (std::map<std::string, int>::iterator
+			for (std::map<std::string, int>::const_iterator
 				 it(user.begin()), end(user.end());
 				 it != end; ++it) {
 				if ((*it).second == index) {
@@ -1328,7 +1328,7 @@ public:
 		**
 		**  @return Index of the variable, -1 if not found.
 		*/
-		int operator[](const char *const key)
+		int operator[](const char *const key) const
 		{
 			DataKey k{};
 			k.key = key;
@@ -1337,7 +1337,7 @@ public:
 			if (it != buildin.end() && it->keylen == k.keylen && 0 == strcmp(it->key, key)) {
 				return it->offset;
 			} else {
-				std::map<std::string, int>::iterator
+				std::map<std::string, int>::const_iterator
 				ret(user.find(key));
 				if (ret != user.end()) {
 					return (*ret).second;
@@ -1345,6 +1345,16 @@ public:
 			}
 
 			return -1;
+		}
+
+		int operator[](const std::string &key) const
+		{
+			return (*this)[key.c_str()];
+		}
+
+		int operator[](const std::string_view &key) const
+		{
+			return (*this)[key.data()];
 		}
 
 		int AddKey(const char *const key)
