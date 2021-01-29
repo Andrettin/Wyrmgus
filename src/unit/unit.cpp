@@ -652,6 +652,8 @@ void CUnit::ReplaceOnTop(CUnit &replaced_unit)
 			CMap::Map.remove_settlement_unit(&replaced_unit);
 			CMap::Map.add_settlement_unit(this);
 		}
+
+		replaced_unit.set_site(nullptr);
 	}
 
 	this->SetResourcesHeld(replaced_unit.ResourcesHeld); // We capture the value of what is beneath.
@@ -4293,6 +4295,8 @@ void UnitLost(CUnit &unit)
 						CMap::Map.remove_settlement_unit(&unit);
 						CMap::Map.add_settlement_unit(temp);
 					}
+
+					unit.set_site(nullptr);
 				}
 				if (type.get_given_resource() != nullptr && unit.ResourcesHeld != 0) {
 					temp->SetResourcesHeld(unit.ResourcesHeld);
