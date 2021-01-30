@@ -41,9 +41,7 @@ namespace wyrmgus {
 
 std::filesystem::path preferences::get_path() const
 {
-	std::filesystem::path path = database::get_documents_path() / "preferences.txt";
-	path.make_preferred();
-	return path;
+	return database::get_documents_path() / "preferences.txt";
 }
 
 void preferences::load()
@@ -61,11 +59,6 @@ void preferences::load()
 
 void preferences::save() const
 {
-	//create the documents path if necessary
-	if (!std::filesystem::exists(database::get_documents_path())) {
-		std::filesystem::create_directories(database::get_documents_path());
-	}
-
 	const std::filesystem::path preferences_path = this->get_path();
 
 	sml_data data(preferences_path.filename().stem().string());

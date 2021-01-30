@@ -113,13 +113,37 @@ public:
 
 	static std::filesystem::path get_documents_path()
 	{
-		std::string documents_path_str = QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation).toStdString();
-		if (documents_path_str.empty()) {
+		std::filesystem::path documents_path = QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation).toStdString();
+		if (documents_path.empty()) {
 			throw std::runtime_error("No writable documents path found.");
 		}
 
-		std::filesystem::path documents_path(documents_path_str +  "/Wyrmsun");
+		documents_path /= "Wyrmsun";
+		documents_path.make_preferred();
+
+		//ensure that the documents path exists and is writable
+		database::ensure_writable_path(documents_path);
+
 		return documents_path;
+	}
+
+	static void ensure_writable_path(const std::filesystem::path &path)
+	{
+		//create the path if necessary
+		if (!std::filesystem::exists(path)) {
+			const bool success = std::filesystem::create_directories(path);
+			if (!success) {
+				throw std::runtime_error("Failed to create path for Wyrmsun: \"" + path.string() + "\".");
+			}
+		}
+
+		//ensure that the path is writable
+		const std::filesystem::perms permissions = std::filesystem::status(path).permissions();
+
+		if ((permissions & std::filesystem::perms::owner_read) == std::filesystem::perms::none || (permissions & std::filesystem::perms::owner_write) == std::filesystem::perms::none) {
+			//set the required permissions
+			std::filesystem::permissions(path, std::filesystem::perms::owner_read | std::filesystem::perms::owner_write, std::filesystem::perm_options::add);
+		}
 	}
 
 	const std::filesystem::path &get_base_path(const data_module *data_module) const;
