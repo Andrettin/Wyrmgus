@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-//      (c) Copyright 2019-2021 by Andrettin
+//      (c) Copyright 2021 by Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -23,14 +23,20 @@
 //      along with this program; if not, write to the Free Software
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
+//
 
 #pragma once
 
-template<typename T, template<typename...> class T2>
-struct is_specialization_of : std::false_type {};
+namespace wyrmgus::size {
 
-template<template<typename...> class T, typename ...A>
-struct is_specialization_of<T<A...>, T> : std::true_type {};
+inline constexpr QPoint to_point(const QSize &size)
+{
+	return QPoint(size.width(), size.height());
+}
 
-template<typename T, template<typename...> class T2>
-inline constexpr bool is_specialization_of_v = is_specialization_of<T, T2>::value;
+inline std::string to_string(const QSize &size)
+{
+	return "(" + std::to_string(size.width()) + ", " + std::to_string(size.height()) + ")";
+}
+
+}
