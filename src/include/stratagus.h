@@ -239,3 +239,5 @@ extern void load_database(const bool initial_definition);
 extern void load_defines();
 extern void initialize_database();
 extern void save_preferences();
+
+using namespace wyrmgus;
