@@ -1204,9 +1204,9 @@ void CPlayer::set_civilization(const wyrmgus::civilization *civilization)
 		//if the civilization of the person player changed, update the UI
 		if ((CPlayer::GetThisPlayer() && CPlayer::GetThisPlayer()->Index == this->Index) || (!CPlayer::GetThisPlayer() && this->Index == 0)) {
 			//load proper UI
-			char buf[256];
-			snprintf(buf, sizeof(buf), "if (LoadCivilizationUI ~= nil) then LoadCivilizationUI(\"%s\") end;", this->get_civilization()->get_identifier().c_str());
-			CclCommand(buf);
+			std::array<char, 256> buf{};
+			snprintf(buf.data(), sizeof(buf), "if (LoadCivilizationUI ~= nil) then LoadCivilizationUI(\"%s\") end;", this->get_civilization()->get_identifier().c_str());
+			CclCommand(buf.data());
 
 			UI.Load();
 		}

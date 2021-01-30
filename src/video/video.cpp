@@ -431,17 +431,17 @@ void SetColorCycleAll(bool value)
 static void ColorCycleSurface(SDL_Surface &surface)
 {
 	SDL_Color *palcolors = surface.format->palette->colors;
-	SDL_Color colors[256];
+	std::array<SDL_Color, 256> colors{};
 	CColorCycling &colorCycling = CColorCycling::GetInstance();
 
-	memcpy(colors, palcolors, sizeof(colors));
+	memcpy(colors.data(), palcolors, sizeof(colors));
 	for (std::vector<ColorIndexRange>::const_iterator it = colorCycling.ColorIndexRanges.begin(); it != colorCycling.ColorIndexRanges.end(); ++it) {
 		const ColorIndexRange &range = *it;
 
-		memcpy(colors + range.begin, palcolors + range.begin + 1, (range.end - range.begin) * sizeof(SDL_Color));
+		memcpy(colors.data() + range.begin, palcolors + range.begin + 1, (range.end - range.begin) * sizeof(SDL_Color));
 		colors[range.end] = palcolors[range.begin];
 	}
-	SDL_SetPalette(&surface, SDL_LOGPAL | SDL_PHYSPAL, colors, 0, 256);
+	SDL_SetPalette(&surface, SDL_LOGPAL | SDL_PHYSPAL, colors.data(), 0, 256);
 }
 
 /**
@@ -452,17 +452,17 @@ static void ColorCycleSurface_Reverse(SDL_Surface &surface, unsigned int count)
 {
 	for (unsigned int i = 0; i != count; ++i) {
 		SDL_Color *palcolors = surface.format->palette->colors;
-		SDL_Color colors[256];
+		std::array<SDL_Color, 256> colors{};
 		CColorCycling &colorCycling = CColorCycling::GetInstance();
 
-		memcpy(colors, palcolors, sizeof(colors));
+		memcpy(colors.data(), palcolors, sizeof(colors));
 		for (std::vector<ColorIndexRange>::const_iterator it = colorCycling.ColorIndexRanges.begin(); it != colorCycling.ColorIndexRanges.end(); ++it) {
 			const ColorIndexRange &range = *it;
 
-			memcpy(colors + range.begin + 1, palcolors + range.begin, (range.end - range.begin) * sizeof(SDL_Color));
+			memcpy(colors.data() + range.begin + 1, palcolors + range.begin, (range.end - range.begin) * sizeof(SDL_Color));
 			colors[range.begin] = palcolors[range.end];
 		}
-		SDL_SetPalette(&surface, SDL_LOGPAL | SDL_PHYSPAL, colors, 0, 256);
+		SDL_SetPalette(&surface, SDL_LOGPAL | SDL_PHYSPAL, colors.data(), 0, 256);
 	}
 }
 

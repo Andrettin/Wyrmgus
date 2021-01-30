@@ -1446,21 +1446,12 @@ static void DrawEditorInfo()
 */
 static void ShowUnitInfo(const CUnit &unit)
 {
-	char buf[256];
+	std::string str = "#" + std::to_string(UnitNumber(unit)) + " '" + unit.get_type_name() + "' Player: #" + std::to_string((unit.Player->Index == PlayerNumNeutral) ? 16 : unit.Player->Index + 1) + " " + (unit.Active ? "active" : "passive");
 
-	//Wyrmgus start
-//	int n = sprintf(buf, _("#%d '%s' Player:#%d %s"), UnitNumber(unit),
-	int n = sprintf(buf, _("#%d '%s' Player: #%d %s"), UnitNumber(unit),
-	//Wyrmgus end
-					//Wyrmgus start
-//					unit.Type->Name.c_str(), unit.Player->Index,
-					unit.get_type_name().c_str(), (unit.Player->Index == PlayerNumNeutral) ? 16 : unit.Player->Index + 1,
-					//Wyrmgus end
-					unit.Active ? "active" : "passive");
 	if (unit.Type->get_given_resource() != nullptr) {
-		sprintf(buf + n, _(" Amount %d"), unit.ResourcesHeld);
+		str += " Amount " + std::to_string(unit.ResourcesHeld);
 	}
-	UI.StatusLine.Set(buf);
+	UI.StatusLine.Set(str);
 }
 
 /**

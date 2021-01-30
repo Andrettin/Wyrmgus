@@ -596,11 +596,11 @@ static void DumpUnitInfo(CUnit &unit)
 
 	if (!logf) {
 		time_t now;
-		char buf[256];
+		std::array<char, 256> buf{};
 
 		//TODO should the filename be changed to reflect the new engine name?
-		snprintf(buf, sizeof(buf), "log_of_stratagus_%d.log", CPlayer::GetThisPlayer()->Index);
-		logf = fopen(buf, "wb");
+		snprintf(buf.data(), sizeof(buf), "log_of_stratagus_%d.log", CPlayer::GetThisPlayer()->Index);
+		logf = fopen(buf.data(), "wb");
 		if (!logf) {
 			return ;
 		}

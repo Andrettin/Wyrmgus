@@ -525,9 +525,9 @@ void GameMainLoop()
 		
 		//if the person player has no faction, bring up the faction choice interface
 		if (CPlayer::GetThisPlayer() && CPlayer::GetThisPlayer()->Faction == -1) {
-			char buf[256];
-			snprintf(buf, sizeof(buf), "if (ChooseFaction ~= nil) then ChooseFaction(\"%s\", \"%s\") end", CPlayer::GetThisPlayer()->Race != -1 ? wyrmgus::civilization::get_all()[CPlayer::GetThisPlayer()->Race]->get_identifier().c_str() : "", "");
-			CclCommand(buf);
+			std::array<char, 256> buf{};
+			snprintf(buf.data(), sizeof(buf), "if (ChooseFaction ~= nil) then ChooseFaction(\"%s\", \"%s\") end", CPlayer::GetThisPlayer()->Race != -1 ? wyrmgus::civilization::get_all()[CPlayer::GetThisPlayer()->Race]->get_identifier().c_str() : "", "");
+			CclCommand(buf.data());
 		}
 		
 		if (!IsNetworkGame() && CPlayer::GetThisPlayer() && CurrentCustomHero != nullptr) {

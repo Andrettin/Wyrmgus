@@ -486,9 +486,9 @@ bool ButtonCheckHasSubButtons(const CUnit &unit, const wyrmgus::button &button)
 			continue;
 		}
 
-		char unit_ident[128];
-		sprintf(unit_ident, ",%s,", unit.Type->Ident.c_str());
-		if (other_button->UnitMask[0] != '*' && !strstr(other_button->UnitMask.c_str(), unit_ident) && !wyrmgus::vector::contains(other_button->get_unit_classes(), unit.Type->get_unit_class())) {
+		std::array<char, 128> unit_ident{};
+		sprintf(unit_ident.data(), ",%s,", unit.Type->Ident.c_str());
+		if (other_button->UnitMask[0] != '*' && !strstr(other_button->UnitMask.c_str(), unit_ident.data()) && !wyrmgus::vector::contains(other_button->get_unit_classes(), unit.Type->get_unit_class())) {
 			continue;
 		}
 		

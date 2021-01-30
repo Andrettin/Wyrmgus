@@ -193,7 +193,7 @@ pqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"); @endcode
     protected:
         void addGlyph(unsigned char c, int &x, int &y, const Color& separator);
 
-        Rectangle mGlyph[256];
+        std::array<Rectangle, 256> mGlyph{};
         int mHeight;
         int mGlyphSpacing;
         int mRowSpacing;
