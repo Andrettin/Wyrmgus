@@ -68,6 +68,7 @@
 #include "unit/unit_manager.h" //for checking units of a custom unit type and deleting them if the unit type has been removed
 #include "unit/unit_type.h"
 //Wyrmgus end
+#include "util/exception_util.h"
 #include "util/log_util.h"
 #include "util/number_util.h"
 #include "video/font.h"
@@ -143,9 +144,9 @@ static int report(int status, bool exitOnError)
 		lua_pop(Lua, 1);
 
 		if (exitOnError) {
-			throw std::runtime_error(msg);
+			exception::throw_with_trace(std::runtime_error(msg));
 		} else {
-			wyrmgus::log::log_error(msg);
+			log::log_error(msg);
 		}
 	}
 	return status;
@@ -910,7 +911,7 @@ static int GetPlayerData(const int player_index, const char *prop, const char *a
 		}
 		return -1;
 	} else {
-		throw std::runtime_error("Invalid field: \"" + std::string(prop) + "\".");
+		exception::throw_with_trace(std::runtime_error("Invalid field: \"" + std::string(prop) + "\"."));
 	}
 }
 
@@ -3589,7 +3590,7 @@ void DisableMod(const std::string &mod_file)
 void SetDLCFileEquivalency(const std::string dlc_file, const std::string replacement_file)
 {
 	if (!std::filesystem::exists(LibraryFileName(replacement_file.c_str()))) {
-		throw std::runtime_error("DLC replacement file \"" + replacement_file + "\" does not exist.");
+		exception::throw_with_trace(std::runtime_error("DLC replacement file \"" + replacement_file + "\" does not exist."));
 	}
 
 	DLCFileEquivalency[dlc_file] = replacement_file;
@@ -3605,7 +3606,7 @@ void LoadCcl(const std::string &filename, const std::string &luaArgStr)
 	CclInConfigFile = 1;
 	const std::string name = LibraryFileName(filename.c_str());
 	if (CanAccessFile(name.c_str()) == 0) {
-		throw std::runtime_error("Maybe you need to specify another gamepath with '-d /path/to/datadir'?");
+		exception::throw_with_trace(std::runtime_error("Maybe you need to specify another gamepath with '-d /path/to/datadir'?"));
 	}
 
 	ShowLoadProgress(_("Loading Script \"%s\"\n"), name.c_str());

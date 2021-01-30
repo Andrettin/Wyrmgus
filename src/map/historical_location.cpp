@@ -33,7 +33,7 @@
 #include "map/map.h"
 #include "map/map_template.h"
 #include "map/site.h"
-#include "util/geocoordinate_util.h"
+#include "util/exception_util.h"
 #include "util/util.h"
 
 namespace wyrmgus {
@@ -59,7 +59,7 @@ void historical_location::process_sml_property(const sml_property &property)
 	} else if (key == "site") {
 		this->site = site::get(value);
 	} else {
-		throw std::runtime_error("Invalid historical location property: \"" + key + "\".");
+		exception::throw_with_trace(std::runtime_error("Invalid historical location property: \"" + key + "\"."));
 	}
 }
 
@@ -72,7 +72,7 @@ void historical_location::process_sml_scope(const sml_data &scope)
 	} else if (tag == "geocoordinate") {
 		this->geocoordinate = scope.to_geocoordinate();
 	} else {
-		throw std::runtime_error("Invalid historical location scope: \"" + scope.get_tag() + "\".");
+		exception::throw_with_trace(std::runtime_error("Invalid historical location scope: \"" + scope.get_tag() + "\"."));
 	}
 }
 
@@ -115,7 +115,7 @@ void historical_location::initialize()
 void historical_location::check() const
 {
 	if (this->map_template == nullptr) {
-		throw std::runtime_error("Historical location has no map template.");
+		exception::throw_with_trace(std::runtime_error("Historical location has no map template."));
 	}
 }
 

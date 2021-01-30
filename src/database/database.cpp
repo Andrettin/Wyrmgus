@@ -98,6 +98,7 @@
 #include "unit/unit_type.h"
 #include "upgrade/upgrade_class.h"
 #include "upgrade/upgrade_structs.h"
+#include "util/exception_util.h"
 #include "util/geocoordinate.h"
 #include "util/qunique_ptr.h"
 #include "util/string_util.h"
@@ -134,7 +135,7 @@ void database::process_sml_property_for_object(QObject *object, const sml_proper
 			return;
 		} else if (property_type == QVariant::String) {
 			if (property.get_operator() != sml_operator::assignment) {
-				throw std::runtime_error("Only the assignment operator is available for string properties.");
+				exception::throw_with_trace(std::runtime_error("Only the assignment operator is available for string properties."));
 			}
 
 			const std::string method_name = "set_" + property.get_key();
@@ -142,20 +143,20 @@ void database::process_sml_property_for_object(QObject *object, const sml_proper
 			const bool success = QMetaObject::invokeMethod(object, method_name.c_str(), Qt::ConnectionType::DirectConnection, Q_ARG(const std::string &, property.get_value()));
 
 			if (!success) {
-				throw std::runtime_error("Failed to set value for string property \"" + property.get_key() + "\".");
+				exception::throw_with_trace(std::runtime_error("Failed to set value for string property \"" + property.get_key() + "\"."));
 			}
 			return;
 		} else {
 			QVariant new_property_value = database::process_sml_property_value(property, meta_property, object);
 			bool success = object->setProperty(property_name, new_property_value);
 			if (!success) {
-				throw std::runtime_error("Failed to set value for property \"" + std::string(property_name) + "\".");
+				exception::throw_with_trace(std::runtime_error("Failed to set value for property \"" + std::string(property_name) + "\"."));
 			}
 			return;
 		}
 	}
 
-	throw std::runtime_error("Invalid " + std::string(meta_object->className()) + " property: \"" + property.get_key() + "\".");
+	exception::throw_with_trace(std::runtime_error("Invalid " + std::string(meta_object->className()) + " property: \"" + property.get_key() + "\"."));
 }
 
 QVariant database::process_sml_property_value(const sml_property &property, const QMetaProperty &meta_property, const QObject *object)
@@ -168,7 +169,7 @@ QVariant database::process_sml_property_value(const sml_property &property, cons
 	QVariant new_property_value;
 	if (property_type == QVariant::Bool) {
 		if (property.get_operator() != sml_operator::assignment) {
-			throw std::runtime_error("Only the assignment operator is available for boolean properties.");
+			exception::throw_with_trace(std::runtime_error("Only the assignment operator is available for boolean properties."));
 		}
 
 		new_property_value = string::to_bool(property.get_value());
@@ -194,19 +195,19 @@ QVariant database::process_sml_property_value(const sml_property &property, cons
 		new_property_value = value;
 	} else if (property_type == QVariant::DateTime) {
 		if (property.get_operator() != sml_operator::assignment) {
-			throw std::runtime_error("Only the assignment operator is available for date-time properties.");
+			exception::throw_with_trace(std::runtime_error("Only the assignment operator is available for date-time properties."));
 		}
 
 		new_property_value = string::to_date(property.get_value());
 	} else if (property_type == QVariant::Time) {
 		if (property.get_operator() != sml_operator::assignment) {
-			throw std::runtime_error("Only the assignment operator is available for date-time properties.");
+			exception::throw_with_trace(std::runtime_error("Only the assignment operator is available for date-time properties."));
 		}
 
 		new_property_value = string::to_time(property.get_value());
 	} else if (property_type == QVariant::Type::UserType) {
 		if (property.get_operator() != sml_operator::assignment) {
-			throw std::runtime_error("Only the assignment operator is available for object reference properties.");
+			exception::throw_with_trace(std::runtime_error("Only the assignment operator is available for object reference properties."));
 		}
 
 		if (property_class_name == "std::string") {
@@ -340,10 +341,10 @@ QVariant database::process_sml_property_value(const sml_property &property, cons
 		} else if (property_class_name == "wyrmgus::world*") {
 			new_property_value = QVariant::fromValue(world::get(property.get_value()));
 		} else {
-			throw std::runtime_error("Unknown type (\"" + property_class_name + "\") for object reference property \"" + std::string(property_name) + "\" (\"" + property_class_name + "\").");
+			exception::throw_with_trace(std::runtime_error("Unknown type (\"" + property_class_name + "\") for object reference property \"" + std::string(property_name) + "\" (\"" + property_class_name + "\")."));
 		}
 	} else {
-		throw std::runtime_error("Invalid type for property \"" + std::string(property_name) + "\": \"" + std::string(meta_property.typeName()) + "\".");
+		exception::throw_with_trace(std::runtime_error("Invalid type for property \"" + std::string(property_name) + "\": \"" + std::string(meta_property.typeName()) + "\"."));
 	}
 
 	return new_property_value;
@@ -386,12 +387,12 @@ void database::process_sml_scope_for_object(QObject *object, const sml_data &sco
 		QVariant new_property_value = database::process_sml_scope_value(scope, meta_property);
 		const bool success = object->setProperty(property_name, new_property_value);
 		if (!success) {
-			throw std::runtime_error("Failed to set value for scope property \"" + std::string(property_name) + "\".");
+			exception::throw_with_trace(std::runtime_error("Failed to set value for scope property \"" + std::string(property_name) + "\"."));
 		}
 		return;
 	}
 
-	throw std::runtime_error("Invalid " + std::string(meta_object->className()) + " scope property: \"" + scope.get_tag() + "\".");
+	exception::throw_with_trace(std::runtime_error("Invalid " + std::string(meta_object->className()) + " scope property: \"" + scope.get_tag() + "\"."));
 }
 
 QVariant database::process_sml_scope_value(const sml_data &scope, const QMetaProperty &meta_property)
@@ -404,36 +405,36 @@ QVariant database::process_sml_scope_value(const sml_data &scope, const QMetaPro
 	QVariant new_property_value;
 	if (property_type == QVariant::Color) {
 		if (scope.get_operator() != sml_operator::assignment) {
-			throw std::runtime_error("Only the assignment operator is available for color properties.");
+			exception::throw_with_trace(std::runtime_error("Only the assignment operator is available for color properties."));
 		}
 
 		new_property_value = scope.to_color();
 	} else if (property_type == QVariant::Point) {
 		if (scope.get_operator() != sml_operator::assignment) {
-			throw std::runtime_error("Only the assignment operator is available for point properties.");
+			exception::throw_with_trace(std::runtime_error("Only the assignment operator is available for point properties."));
 		}
 
 		new_property_value = scope.to_point();
 	} else if (property_type == QVariant::PointF) {
 		if (scope.get_operator() != sml_operator::assignment) {
-			throw std::runtime_error("Only the assignment operator is available for point properties.");
+			exception::throw_with_trace(std::runtime_error("Only the assignment operator is available for point properties."));
 		}
 
 		new_property_value = scope.to_pointf();
 	} else if (property_type == QVariant::Size) {
 		if (scope.get_operator() != sml_operator::assignment) {
-			throw std::runtime_error("Only the assignment operator is available for size properties.");
+			exception::throw_with_trace(std::runtime_error("Only the assignment operator is available for size properties."));
 		}
 
 		new_property_value = scope.to_size();
 	} else if (property_type_name == "wyrmgus::geocoordinate") {
 		if (scope.get_operator() != sml_operator::assignment) {
-			throw std::runtime_error("Only the assignment operator is available for geocoordinate properties.");
+			exception::throw_with_trace(std::runtime_error("Only the assignment operator is available for geocoordinate properties."));
 		}
 
 		new_property_value = QVariant::fromValue(scope.to_geocoordinate());
 	} else {
-		throw std::runtime_error("Invalid type for scope property \"" + std::string(property_name) + "\": \"" + std::string(meta_property.typeName()) + "\".");
+		exception::throw_with_trace(std::runtime_error("Invalid type for scope property \"" + std::string(property_name) + "\": \"" + std::string(meta_property.typeName()) + "\"."));
 	}
 
 	return new_property_value;
@@ -448,7 +449,7 @@ void database::modify_list_property_for_object(QObject *object, const std::strin
 	const QVariant::Type property_type = meta_property.type();
 
 	if (sml_operator == sml_operator::assignment) {
-		throw std::runtime_error("The assignment operator is not available for list properties.");
+		exception::throw_with_trace(std::runtime_error("The assignment operator is not available for list properties."));
 	}
 
 	std::string method_name;
@@ -498,11 +499,11 @@ void database::modify_list_property_for_object(QObject *object, const std::strin
 	} else if (property_type == QVariant::Type::StringList) {
 		success = QMetaObject::invokeMethod(object, method_name.c_str(), Qt::ConnectionType::DirectConnection, Q_ARG(const std::string &, value));
 	} else {
-		throw std::runtime_error("Unknown type for list property \"" + property_name + "\" (in class \"" + class_name + "\").");
+		exception::throw_with_trace(std::runtime_error("Unknown type for list property \"" + property_name + "\" (in class \"" + class_name + "\")."));
 	}
 
 	if (!success) {
-		throw std::runtime_error("Failed to add or remove value for list property \"" + property_name + "\".");
+		exception::throw_with_trace(std::runtime_error("Failed to add or remove value for list property \"" + property_name + "\"."));
 	}
 }
 
@@ -515,7 +516,7 @@ void database::modify_list_property_for_object(QObject *object, const std::strin
 	const QVariant::Type property_type = meta_property.type();
 
 	if (sml_operator == sml_operator::assignment) {
-		throw std::runtime_error("The assignment operator is not available for list properties.");
+		exception::throw_with_trace(std::runtime_error("The assignment operator is not available for list properties."));
 	}
 
 	std::string method_name;
@@ -533,11 +534,11 @@ void database::modify_list_property_for_object(QObject *object, const std::strin
 		const QColor color = scope.to_color();
 		success = QMetaObject::invokeMethod(object, method_name.c_str(), Qt::ConnectionType::DirectConnection, Q_ARG(QColor, color));
 	} else {
-		throw std::runtime_error("Unknown type for list property \"" + property_name + "\" (in class \"" + class_name + "\").");
+		exception::throw_with_trace(std::runtime_error("Unknown type for list property \"" + property_name + "\" (in class \"" + class_name + "\")."));
 	}
 
 	if (!success) {
-		throw std::runtime_error("Failed to add or remove value for list property \"" + property_name + "\".");
+		exception::throw_with_trace(std::runtime_error("Failed to add or remove value for list property \"" + property_name + "\"."));
 	}
 }
 

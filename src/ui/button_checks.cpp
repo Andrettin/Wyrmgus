@@ -46,6 +46,7 @@
 #include "unit/unit.h"
 #include "unit/unit_type.h"
 #include "upgrade/upgrade.h"
+#include "util/exception_util.h"
 #include "util/vector_util.h"
 
 /**
@@ -187,9 +188,9 @@ bool ButtonCheckUnitVariable(const CUnit &unit, const wyrmgus::button &button)
 		const std::string &value = button.allow_strings[i];
 		const int index = UnitTypeVar.VariableNameLookup[var.c_str()];// User variables
 		if (index == -1) {
-			throw std::runtime_error("Bad variable name \"" + var + "\".");
+			exception::throw_with_trace(std::runtime_error("Bad variable name \"" + var + "\"."));
 		}
-		int varValue;
+		int varValue = 0;
 		if (type == "Value") {
 			//Wyrmgus start
 //			varValue = unit.Variable[index].Value;
@@ -213,7 +214,7 @@ bool ButtonCheckUnitVariable(const CUnit &unit, const wyrmgus::button &button)
 			varValue = unit.GetModifiedVariable(index, VariableAttribute::Value) * 100 / unit.GetModifiedVariable(index, VariableAttribute::Max);
 			//Wyrmgus end
 		} else {
-			throw std::runtime_error("Bad variable type \"" + type + "\".");
+			exception::throw_with_trace(std::runtime_error("Bad variable type \"" + type + "\"."));
 		}
 		const int cmpValue = std::stoi(value);
 		bool cmpResult = false;
@@ -230,7 +231,7 @@ bool ButtonCheckUnitVariable(const CUnit &unit, const wyrmgus::button &button)
 		} else if (binop == "!=") {
 			cmpResult = varValue != cmpValue;
 		} else {
-			throw std::runtime_error("Bad compare type \"" + binop + "\".");
+			exception::throw_with_trace(std::runtime_error("Bad compare type \"" + binop + "\"."));
 		}
 		if (cmpResult == false) {
 			return false;

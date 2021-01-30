@@ -38,6 +38,7 @@
 #include "script.h"
 #include "unit/unit.h"
 #include "unit/unit_manager.h"
+#include "util/exception_util.h"
 #include "util/string_util.h"
 
 void CAnimation_SetVar::Action(CUnit &unit, int &/*move*/, int /*scale*/) const
@@ -54,7 +55,7 @@ void CAnimation_SetVar::Action(CUnit &unit, int &/*move*/, int /*scale*/) const
 
 	const int index = UnitTypeVar.VariableNameLookup[str_list[0]]; //user variables
 	if (index == -1) {
-		throw std::runtime_error("Bad variable name \"" + str_list[0] + "\".");
+		exception::throw_with_trace(std::runtime_error("Bad variable name \"" + str_list[0] + "\"."));
 	}
 
 	const int rop = this->value;

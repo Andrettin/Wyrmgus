@@ -77,6 +77,7 @@
 #include "upgrade/upgrade.h"
 //Wyrmgus end
 #include "util/container_util.h"
+#include "util/exception_util.h"
 #include "util/point_util.h"
 #include "util/rect_util.h"
 #include "util/size_util.h"
@@ -2129,7 +2130,7 @@ void CMap::calculate_tile_solid_tile(const QPoint &pos, const bool overlay, cons
 	}
 
 	if (terrain_type == nullptr) {
-		throw std::runtime_error("Failed to calculate solid tile for tile " + wyrmgus::point::to_string(pos) + ", map layer " + std::to_string(z) + ": " + (overlay ? "overlay " : "") + "terrain is null.");
+		exception::throw_with_trace(std::runtime_error("Failed to calculate solid tile for tile " + wyrmgus::point::to_string(pos) + ", map layer " + std::to_string(z) + ": " + (overlay ? "overlay " : "") + "terrain is null."));
 	}
 
 	if (terrain_type->has_tiled_background()) {

@@ -32,6 +32,7 @@
 #include "luacallback.h"
 
 #include "script.h"
+#include "util/exception_util.h"
 
 /**
 **  LuaCallback constructor
@@ -157,7 +158,7 @@ void LuaCallback::run(int results)
 
 		lua_pop(luastate, 1);
 
-		throw std::runtime_error(msg);
+		exception::throw_with_trace(std::runtime_error(msg));
 	}
 	rescount = results;
 }

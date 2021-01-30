@@ -28,6 +28,7 @@
 #include "util/image_util.h"
 
 #include "util/container_util.h"
+#include "util/exception_util.h"
 #include "util/point_util.h"
 #include "util/size_util.h"
 #include "xbrz.h"
@@ -69,7 +70,7 @@ QImage scale(const QImage &src_image, const int scale_factor, const QSize &old_f
 	QImage result_image(result_size, QImage::Format_RGBA8888);
 
 	if (result_image.isNull()) {
-		throw std::runtime_error("Failed to allocate image to be scaled.");
+		exception::throw_with_trace(std::runtime_error("Failed to allocate image to be scaled."));
 	}
 
 	unsigned char *dst_data = result_image.bits();
@@ -121,7 +122,7 @@ std::set<QRgb> get_rgbs(const QImage &image)
 	static constexpr int alpha_index = 3;
 
 	if (image.format() != QImage::Format_RGBA8888 && image.format() != QImage::Format_RGB888) {
-		throw std::runtime_error("Invalid image format for image::get_rgbs: \"" + std::to_string(image.format()) + "\".");
+		exception::throw_with_trace(std::runtime_error("Invalid image format for image::get_rgbs: \"" + std::to_string(image.format()) + "\"."));
 	}
 
 	if (bpp == 4) {
@@ -202,7 +203,7 @@ void pack_folder(const std::filesystem::path &dir_path, const frame_order frame_
 			frame_size = frame_image.size();
 		} else {
 			if (frame_image.size() != frame_size) {
-				throw std::runtime_error("Inconsistent frame size when packing image files in directory \"" + dir_path.string() + "\": the frame size of the first image file is " + size::to_string(frame_size) + ", but that of image file \"" + dir_entry.path().string() + "\" is " + size::to_string(frame_image.size()) + ".");
+				exception::throw_with_trace(std::runtime_error("Inconsistent frame size when packing image files in directory \"" + dir_path.string() + "\": the frame size of the first image file is " + size::to_string(frame_size) + ", but that of image file \"" + dir_entry.path().string() + "\" is " + size::to_string(frame_image.size()) + "."));
 			}
 		}
 	}

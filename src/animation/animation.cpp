@@ -59,6 +59,7 @@
 #include "spell/spell.h"
 #include "unit/unit.h"
 #include "unit/unit_type.h"
+#include "util/exception_util.h"
 #include "util/string_util.h"
 
 struct LabelsStruct {
@@ -137,7 +138,7 @@ int ParseAnimInt(const CUnit &unit, const std::string &parseint)
 		}
 
 		if (str_list.size() < 3) {
-			throw std::runtime_error("Need also specify the variable for the \"" + cur + "\" tag.");
+			exception::throw_with_trace(std::runtime_error("Need also specify the variable for the \"" + cur + "\" tag."));
 		}
 
 		const std::string &next = str_list[2];
@@ -153,7 +154,7 @@ int ParseAnimInt(const CUnit &unit, const std::string &parseint)
 			} else if (cur == "_Distance") {
 				return unit.MapDistanceTo(*goal);
 			}
-			throw std::runtime_error("Bad variable name \"" + cur + "\".");
+			exception::throw_with_trace(std::runtime_error("Bad variable name \"" + cur + "\"."));
 		}
 		if (next == "Value") {
 			//Wyrmgus start
@@ -189,7 +190,7 @@ int ParseAnimInt(const CUnit &unit, const std::string &parseint)
 		}
 		const int index = UnitTypeVar.BoolFlagNameLookup[cur];// User bool flags
 		if (index == -1) {
-			throw std::runtime_error("Bad bool-flag name \"" + cur + "\".");
+			exception::throw_with_trace(std::runtime_error("Bad bool-flag name \"" + cur + "\"."));
 		}
 		return goal->Type->BoolFlag[index].value;
 	} else if (parseint[0] == 's') { //spell type detected
@@ -262,7 +263,7 @@ int ParseAnimFlags(const CUnit &unit, const char *parseflag)
 			}  else if (!strcmp(cur, "setdirection")) {
 				flags |= SM_SetDirection;
 			} else {
-				throw std::runtime_error("Unknown animation flag: \"" + std::string(cur) + "\".");
+				exception::throw_with_trace(std::runtime_error("Unknown animation flag: \"" + std::string(cur) + "\"."));
 			}
 		}
 		cur = next;
@@ -501,7 +502,7 @@ void animation_set::process_sml_scope(const sml_data &scope)
 			} else if (key == "random-goto") {
 				anim = std::make_unique<CAnimation_RandomGoto>();
 			} else {
-				throw std::runtime_error("Invalid animation property: \"" + key + "\".");
+				exception::throw_with_trace(std::runtime_error("Invalid animation property: \"" + key + "\"."));
 			}
 
 			if (anim) {

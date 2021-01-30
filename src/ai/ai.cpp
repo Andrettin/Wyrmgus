@@ -167,6 +167,7 @@
 #include "unit/unit_type.h"
 #include "unit/unit_type_type.h"
 #include "upgrade/upgrade.h"
+#include "util/exception_util.h"
 #include "util/vector_random_util.h"
 #include "util/vector_util.h"
 
@@ -654,7 +655,7 @@ void AiInit(CPlayer &player)
 	auto pai = std::make_unique<PlayerAi>();
 
 	if (!pai) {
-		throw std::runtime_error("Out of memory.");
+		exception::throw_with_trace(std::runtime_error("Out of memory."));
 	}
 
 	pai->Player = &player;
@@ -664,7 +665,7 @@ void AiInit(CPlayer &player)
 
 	//  Search correct AI type.
 	if (AiTypes.empty()) {
-		throw std::runtime_error("AI: Got no scripts at all! You need at least one dummy fallback script. See the DefineAi() documentation.");
+		exception::throw_with_trace(std::runtime_error("AI: Got no scripts at all! You need at least one dummy fallback script. See the DefineAi() documentation."));
 	}
 
 	CAiType *ait = nullptr;
@@ -680,7 +681,7 @@ void AiInit(CPlayer &player)
 		break;
 	}
 	if (ait == nullptr) {
-		throw std::runtime_error("AI: Found no matching ai scripts at all!");
+		exception::throw_with_trace(std::runtime_error("AI: Found no matching ai scripts at all!"));
 	}
 	if (player.AiName.empty()) {
 		DebugPrint("AI: not found!!!!!!!!!!\n");

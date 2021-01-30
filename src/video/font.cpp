@@ -32,6 +32,7 @@
 
 #include "database/defines.h"
 #include "intern_video.h"
+#include "util/exception_util.h"
 #include "util/image_util.h"
 #include "util/util.h"
 #include "video/font_color.h"
@@ -372,7 +373,7 @@ CGraphic *font::get_font_color_graphic(const wyrmgus::font_color *font_color)
 		return find_iterator->second.get();
 	}
 
-	throw std::runtime_error("Could not load font color \"" + font_color->get_identifier()  + "\" for font \"" + this->get_identifier() + "\".");
+	exception::throw_with_trace(std::runtime_error("Could not load font color \"" + font_color->get_identifier()  + "\" for font \"" + this->get_identifier() + "\"."));
 }
 
 }

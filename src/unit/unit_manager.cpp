@@ -65,11 +65,11 @@ void unit_manager::clean_units()
 
 	for (CUnit *unit : units) {
 		if (unit == nullptr) {
-			throw std::runtime_error("Error cleaning unit: unit is null.");
+			exception::throw_with_trace(std::runtime_error("Error cleaning unit: unit is null."));
 		}
 
 		if (unit->Type == nullptr) {
-			throw std::runtime_error("Unit \"" + std::to_string(UnitNumber(*unit)) + "\"'s type is null.");
+			exception::throw_with_trace(std::runtime_error("Unit \"" + std::to_string(UnitNumber(*unit)) + "\"'s type is null."));
 		}
 
 		if (!unit->Destroyed) {
@@ -112,11 +112,11 @@ CUnit *unit_manager::AllocUnit()
 		CUnit *unit = list::take_front(this->released_units);
 
 		if (!unit->Destroyed) {
-			throw std::runtime_error("Fetched a non-destroyed unit from the released units list.");
+			exception::throw_with_trace(std::runtime_error("Fetched a non-destroyed unit from the released units list."));
 		}
 
 		if (unit->ReleaseCycle == 0) {
-			throw std::runtime_error("Fetched a non-released unit from the released units list.");
+			exception::throw_with_trace(std::runtime_error("Fetched a non-released unit from the released units list."));
 		}
 
 		const int slot = unit->UnitManagerData.slot;
@@ -143,7 +143,7 @@ CUnit *unit_manager::AllocUnit()
 void unit_manager::ReleaseUnit(CUnit *unit)
 {
 	if (unit == nullptr) {
-		throw std::runtime_error("Tried to call the unit manager's release unit function for a null unit.");
+		exception::throw_with_trace(std::runtime_error("Tried to call the unit manager's release unit function for a null unit."));
 	}
 
 	if (this->lastCreated == unit) {
@@ -152,7 +152,7 @@ void unit_manager::ReleaseUnit(CUnit *unit)
 
 	if (unit->UnitManagerData.unitSlot != -1) { // == -1 when loading.
 		if (this->units[unit->UnitManagerData.unitSlot] != unit) {
-			throw std::runtime_error("Unit has index \"" + std::to_string(unit->UnitManagerData.unitSlot) + "\" in the unit manager's units vector, but another unit is present there at that index.");
+			exception::throw_with_trace(std::runtime_error("Unit has index \"" + std::to_string(unit->UnitManagerData.unitSlot) + "\" in the unit manager's units vector, but another unit is present there at that index."));
 		}
 
 		CUnit *temp = this->units.back();
@@ -163,7 +163,7 @@ void unit_manager::ReleaseUnit(CUnit *unit)
 	}
 
 	if (!unit->Destroyed) {
-		throw std::runtime_error("Adding a non-destroyed unit to the released units list.");
+		exception::throw_with_trace(std::runtime_error("Adding a non-destroyed unit to the released units list."));
 	}
 
 	this->released_units.push_back(unit);

@@ -32,12 +32,13 @@
 #include "animation/animation_die.h"
 
 #include "unit/unit.h"
+#include "util/exception_util.h"
 
-/* virtual */ void CAnimation_Die::Action(CUnit &unit, int &/*move*/, int /*scale*/) const
+void CAnimation_Die::Action(CUnit &unit, int &/*move*/, int /*scale*/) const
 {
 	Assert(unit.Anim.Anim == this);
 	if (unit.Anim.Unbreakable) {
-		throw std::runtime_error("Can't call \"die\" action in unbreakable section.");
+		exception::throw_with_trace(std::runtime_error("Can't call \"die\" action in unbreakable section."));
 	}
 	if (this->DeathType.empty() == false) {
 		unit.DamagedType = ExtraDeathIndex(this->DeathType.c_str());
