@@ -34,67 +34,13 @@
 #include <QCommandLineParser>
 #include <QQmlApplicationEngine>
 
-namespace wyrmgus {
-
-static void write_qt_message(QtMsgType type, const QMessageLogContext &context, const QString &msg)
-{
-	std::string log_message;
-
-	switch (type) {
-		case QtDebugMsg:
-			log_message += "Debug: ";
-			break;
-		case QtInfoMsg:
-			log_message += "Info: ";
-			break;
-		case QtWarningMsg:
-			log_message += "Warning: ";
-			break;
-		case QtCriticalMsg:
-			log_message += "Critical: ";
-			break;
-		case QtFatalMsg:
-			log_message += "Fatal: ";
-			break;
-	}
-
-	log_message += msg.toStdString();
-
-	if (context.file != nullptr) {
-		log_message += " (";
-		log_message += context.file;
-		log_message += ": ";
-		log_message += context.line;
-
-		if (context.function != nullptr) {
-			log_message += ", ";
-			log_message += context.function;
-		}
-
-		log_message += ")";
-	}
-
-	switch (type) {
-		case QtDebugMsg:
-		case QtInfoMsg:
-			log::log(log_message);
-			break;
-		case QtWarningMsg:
-		case QtCriticalMsg:
-		case QtFatalMsg:
-			log::log_error(log_message);
-			break;
-	}
-}
-
-}
 
 int main(int argc, char **argv)
 {
 	using namespace wyrmgus;
 
 	try {
-		qInstallMessageHandler(write_qt_message);
+		qInstallMessageHandler(log::log_qt_message);
 		QApplication app(argc, argv);
 
 		//  Setup some defaults.

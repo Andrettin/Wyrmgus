@@ -84,7 +84,7 @@ static constexpr int SCROLL_LEFT = 7;
 #define SCROLL_RIGHT  (Video.Width - 7)
 //Wyrmgus end
 
-static Vec2i SavedMapPosition[3];				/// Saved map position
+static std::array<Vec2i, 3> SavedMapPosition;				/// Saved map position
 static char Input[80];							/// line input for messages/long commands
 static int InputIndex;							/// current index into input
 static char InputStatusLine[99];				/// Last input status line
