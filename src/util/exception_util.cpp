@@ -28,7 +28,12 @@
 
 #include "util/log_util.h"
 
+#include <boost/exception/all.hpp>
+#include <boost/stacktrace.hpp>
+
 namespace wyrmgus::exception {
+
+using traced = boost::error_info<struct tag_stacktrace, boost::stacktrace::stacktrace>;
 
 void report(const std::exception &exception)
 {
@@ -39,6 +44,16 @@ void report(const std::exception &exception)
 	}
 
 	log::log_error(exception.what());
+
+	const boost::stacktrace::stacktrace *stacktrace = boost::get_error_info<traced>(exception);
+	if (stacktrace != nullptr) {
+		std::cerr << *stacktrace;
+	}
+}
+
+void throw_with_trace(const std::exception &exception)
+{
+	throw boost::enable_error_info(exception) << traced(boost::stacktrace::stacktrace());
 }
 
 }

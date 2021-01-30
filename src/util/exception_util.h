@@ -29,5 +29,6 @@
 namespace wyrmgus::exception {
 
 extern void report(const std::exception &exception);
+extern void throw_with_trace(const std::exception &exception);
 
 }

@@ -1686,7 +1686,8 @@ set_target_properties(stratagus_main PROPERTIES OUTPUT_NAME ${BINARY_NAME})
 
 if (MSVC)
 	#ignore linker warning due to missing .pdb files, as otherwise a stream of warnings comes from linking external libraries
-	set_target_properties(stratagus_main PROPERTIES LINK_FLAGS "/ignore:4099")
+	#/PDBALTPATH:%_PDB% is necessary so that Boost.Stacktrace uses the PDB in the same directory as the executable; ${BINARY_NAME}.pdb is used instead of %_PDB% as the latter becomes "%%_PDB%%"
+	set_target_properties(stratagus_main PROPERTIES LINK_FLAGS "/ignore:4099 /PDBALTPATH:${BINARY_NAME}.pdb")
 	set_target_properties(stratagus_test PROPERTIES LINK_FLAGS "/ignore:4099")
 endif()
 
