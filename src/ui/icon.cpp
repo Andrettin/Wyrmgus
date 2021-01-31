@@ -36,6 +36,7 @@
 #include "translate.h"
 #include "ui/ui.h"
 #include "unit/unit.h"
+#include "util/exception_util.h"
 #include "video/video.h"
 
 namespace wyrmgus {
@@ -289,7 +290,7 @@ bool IconConfig::Load()
 {
 	const bool res = LoadNoLog();
 	if (!res) {
-		throw std::runtime_error("Can't find icon \"" + this->Name + "\".");
+		exception::throw_with_trace(std::runtime_error("Can't find icon \"" + this->Name + "\"."));
 	}
 	return res;
 }

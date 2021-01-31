@@ -31,6 +31,7 @@
 
 #include "database/database.h"
 #include "database/defines.h"
+#include "util/exception_util.h"
 #include "video/video.h"
 
 namespace wyrmgus {
@@ -47,7 +48,7 @@ void icon_base::initialize()
 	}
 
 	if (this->graphics == nullptr) {
-		throw std::runtime_error("Icon \"" + this->get_identifier() + "\" has no graphics.");
+		exception::throw_with_trace(std::runtime_error("Icon \"" + this->get_identifier() + "\" has no graphics."));
 	}
 
 	data_entry::initialize();
@@ -67,7 +68,7 @@ void icon_base::load() const
 	this->graphics->Load(this->is_grayscale_enabled(), defines::get()->get_scale_factor());
 
 	if (this->get_frame() >= this->graphics->NumFrames) {
-		throw std::runtime_error("Invalid icon frame: \"" + this->get_identifier() + "\" - " + std::to_string(this->get_frame()));
+		exception::throw_with_trace(std::runtime_error("Invalid icon frame: \"" + this->get_identifier() + "\" - " + std::to_string(this->get_frame())));
 	}
 }
 

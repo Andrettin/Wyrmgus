@@ -78,6 +78,7 @@
 #include "unit/unit.h"
 #include "unit/unit_type.h"
 #include "unit/unit_type_variation.h"
+#include "util/exception_util.h"
 #include "util/point_util.h"
 #include "util/util.h"
 #include "upgrade/upgrade.h"
@@ -425,7 +426,7 @@ UStrInt GetComponent(const CUnit &unit, const int index, const VariableAttribute
 			break;
 		//Wyrmgus end
 		default:
-			throw std::runtime_error("Invalid variable attribute: " + std::to_string(static_cast<int>(e)));
+			exception::throw_with_trace(std::runtime_error("Invalid variable attribute: " + std::to_string(static_cast<int>(e))));
 	}
 	return val;
 }
@@ -494,7 +495,7 @@ UStrInt GetComponent(const wyrmgus::unit_type &type, const int index, const Vari
 			break;
 		//Wyrmgus end
 		default:
-			throw std::runtime_error("Invalid variable attribute: " + std::to_string(static_cast<int>(e)));
+			exception::throw_with_trace(std::runtime_error("Invalid variable attribute: " + std::to_string(static_cast<int>(e))));
 	}
 
 	return val;

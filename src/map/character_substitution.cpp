@@ -32,6 +32,7 @@
 #include "database/sml_data.h"
 #include "database/sml_property.h"
 #include "util/container_util.h"
+#include "util/exception_util.h"
 #include "util/queue_util.h"
 #include "util/string_conversion_util.h"
 #include "util/vector_random_util.h"
@@ -51,7 +52,7 @@ void character_substitution::process_sml_property(const sml_property &property)
 		this->target_characters.clear();
 		this->target_characters.push_back(string::to_character(value));
 	} else {
-		throw std::runtime_error("Invalid character substitution property: \"" + key + "\".");
+		exception::throw_with_trace(std::runtime_error("Invalid character substitution property: \"" + key + "\"."));
 	}
 }
 
@@ -92,7 +93,7 @@ void character_substitution::process_sml_scope(const sml_data &scope)
 			this->shuffle_character_sets.push_back(std::move(character_set));
 		});
 	} else {
-		throw std::runtime_error("Invalid character substitution scope: \"" + tag + "\".");
+		exception::throw_with_trace(std::runtime_error("Invalid character substitution scope: \"" + tag + "\"."));
 	}
 }
 

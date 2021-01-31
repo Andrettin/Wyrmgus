@@ -47,6 +47,7 @@
 #include "unit/unit.h"
 #include "unit/unit_type.h"
 #include "unit/unit_type_variation.h"
+#include "util/exception_util.h"
 #include "util/string_util.h"
 
 bool SoundConfig::MapSound()
@@ -125,16 +126,16 @@ void unit_sound_set::process_sml_property(const sml_property &property)
 			}
 		}
 		if (death == ANIMATIONS_DEATHTYPES) {
-			throw std::runtime_error("Invalid death type: \"" + death_type_identifier + "\".");
+			exception::throw_with_trace(std::runtime_error("Invalid death type: \"" + death_type_identifier + "\"."));
 		}
 	} else {
-		throw std::runtime_error("Invalid unit sound set property: \"" + key + "\".");
+		exception::throw_with_trace(std::runtime_error("Invalid unit sound set property: \"" + key + "\"."));
 	}
 }
 
 void unit_sound_set::process_sml_scope(const sml_data &scope)
 {
-	throw std::runtime_error("Invalid unit sound set scope: \"" + scope.get_tag() + "\".");
+	exception::throw_with_trace(std::runtime_error("Invalid unit sound set scope: \"" + scope.get_tag() + "\"."));
 }
 
 void unit_sound_set::map_sounds()
@@ -313,7 +314,7 @@ static void MapAnimSounds(wyrmgus::unit_type &type)
 	//Wyrmgus start
 	for (const auto &variation : type.get_variations()) {
 		if (!variation) {
-			throw std::runtime_error("Unit type \"" + type.get_identifier() + "\" has an null variation.");
+			exception::throw_with_trace(std::runtime_error("Unit type \"" + type.get_identifier() + "\" has an null variation."));
 		}
 		if (!variation->Animations) {
 			continue;

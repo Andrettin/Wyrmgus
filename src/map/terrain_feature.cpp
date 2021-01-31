@@ -31,6 +31,7 @@
 
 #include "civilization.h"
 #include "map/terrain_type.h"
+#include "util/exception_util.h"
 
 namespace wyrmgus {
 
@@ -55,9 +56,9 @@ void terrain_feature::set_color(const QColor &color)
 	}
 
 	if (terrain_feature::try_get_by_color(color) != nullptr) {
-		throw std::runtime_error("Color is already used by another terrain feature.");
+		exception::throw_with_trace(std::runtime_error("Color is already used by another terrain feature."));
 	} else if (terrain_type::try_get_by_color(color) != nullptr) {
-		throw std::runtime_error("Color is already used by a terrain type.");
+		exception::throw_with_trace(std::runtime_error("Color is already used by a terrain type."));
 	}
 
 	this->color = color;

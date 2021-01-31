@@ -27,6 +27,8 @@
 
 #include "util/geojson_util.h"
 
+#include "util/exception_util.h"
+
 #include <QtLocation/private/qgeojson_p.h>
 
 namespace wyrmgus::geojson {
@@ -45,7 +47,7 @@ std::vector<QVariantList> parse_folder(const std::filesystem::path &path)
 		std::ifstream ifstream(dir_entry.path());
 
 		if (!ifstream) {
-			throw std::runtime_error("Failed to open file: " + dir_entry.path().string());
+			exception::throw_with_trace(std::runtime_error("Failed to open file: " + dir_entry.path().string()));
 		}
 
 		const std::string raw_geojson_data(std::istreambuf_iterator<char>{ifstream}, std::istreambuf_iterator<char>{});
@@ -55,7 +57,7 @@ std::vector<QVariantList> parse_folder(const std::filesystem::path &path)
 		const QJsonDocument json = QJsonDocument::fromJson(raw_geojson_byte_array, &json_error);
 
 		if (json.isNull()) {
-			throw std::runtime_error("JSON parsing failed: " + json_error.errorString().toStdString() + ".");
+			exception::throw_with_trace(std::runtime_error("JSON parsing failed: " + json_error.errorString().toStdString() + "."));
 		}
 
 		QVariantList geojson_data = QGeoJson::importGeoJson(json);

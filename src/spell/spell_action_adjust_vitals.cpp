@@ -33,6 +33,7 @@
 #include "script.h"
 #include "spell/spell.h"
 #include "unit/unit.h"
+#include "util/exception_util.h"
 
 namespace wyrmgus {
 
@@ -50,7 +51,7 @@ void spell_action_adjust_vitals::process_sml_property(const sml_property &proper
 	} else if (key == "max_multi_cast") {
 		this->MaxMultiCast = std::stoi(value);
 	} else {
-		throw std::runtime_error("Invalid adjust vitals spell action property: \"" + key + "\".");
+		exception::throw_with_trace(std::runtime_error("Invalid adjust vitals spell action property: \"" + key + "\"."));
 	}
 }
 

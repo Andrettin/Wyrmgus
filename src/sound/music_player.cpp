@@ -35,6 +35,7 @@
 #include "sound/music_sample.h"
 #include "sound/music_type.h"
 #include "sound/sound_server.h"
+#include "util/exception_util.h"
 #include "util/log_util.h"
 #include "util/vector_random_util.h"
 
@@ -105,7 +106,7 @@ void music_player::play_music(const music *music)
 	} else {
 		const wyrmgus::music *submusic = this->get_next_submusic();
 		if (submusic == nullptr) {
-			throw std::runtime_error("Music \"" + music->get_identifier() + "\" has neither a sample nor submusic.");
+			exception::throw_with_trace(std::runtime_error("Music \"" + music->get_identifier() + "\" has neither a sample nor submusic."));
 		}
 		this->play_submusic(submusic);
 	}

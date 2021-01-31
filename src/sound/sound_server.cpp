@@ -53,6 +53,7 @@
 //Wyrmgus start
 #include "unit/unit_manager.h"
 //Wyrmgus end
+#include "util/exception_util.h"
 #include "util/queue_util.h"
 #include "util/qunique_ptr.h"
 
@@ -454,7 +455,7 @@ static void InitSdlSound()
 	static constexpr int init_flags = MIX_INIT_OGG;
 	int result = Mix_Init(init_flags);
 	if (result != init_flags) {
-		throw std::runtime_error("Error in Mix_Init: " + std::string(Mix_GetError()));
+		exception::throw_with_trace(std::runtime_error("Error in Mix_Init: " + std::string(Mix_GetError())));
 	}
 
 	const QAudioDeviceInfo device_info = QAudioDeviceInfo::defaultOutputDevice();
@@ -477,11 +478,11 @@ static void InitSdlSound()
 					sdl_audio_format |= 0x1000;
 					break;
 				default:
-					throw std::runtime_error("Unexpected byte order: " + std::to_string(format.byteOrder()));
+					exception::throw_with_trace(std::runtime_error("Unexpected byte order: " + std::to_string(format.byteOrder())));
 			}
 			break;
 		default:
-			throw std::runtime_error("Unexpected sample size: " + std::to_string(format.sampleSize()));
+			exception::throw_with_trace(std::runtime_error("Unexpected sample size: " + std::to_string(format.sampleSize())));
 	}
 
 	switch (format.sampleType()) {
@@ -491,12 +492,12 @@ static void InitSdlSound()
 			sdl_audio_format |= 0x8000;
 			break;
 		default:
-			throw std::runtime_error("Unexpected sample type: " + std::to_string(format.sampleType()));
+			exception::throw_with_trace(std::runtime_error("Unexpected sample type: " + std::to_string(format.sampleType())));
 	}
 
 	result = Mix_OpenAudio(format.sampleRate(), sdl_audio_format, format.channelCount(), 1024);
 	if (result == -1) {
-		throw std::runtime_error("Error in Mix_OpenAudio: " + std::string(Mix_GetError()));
+		exception::throw_with_trace(std::runtime_error("Error in Mix_OpenAudio: " + std::string(Mix_GetError())));
 	}
 }
 

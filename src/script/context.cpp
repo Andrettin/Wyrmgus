@@ -34,6 +34,7 @@
 #include "unit/unit.h"
 #include "unit/unit_manager.h"
 #include "unit/unit_ref.h"
+#include "util/exception_util.h"
 
 namespace wyrmgus {
 
@@ -56,14 +57,14 @@ void context_base<read_only>::process_sml_property(const sml_property &property)
 		const int slot = std::stoi(value);
 		this->current_unit = unit_manager::get()->GetSlotUnit(slot).acquire_ref();
 	} else {
-		throw std::runtime_error("Invalid context property: \"" + key + "\".");
+		exception::throw_with_trace(std::runtime_error("Invalid context property: \"" + key + "\"."));
 	}
 }
 
 template <bool read_only>
 void context_base<read_only>::process_sml_scope(const sml_data &scope)
 {
-	throw std::runtime_error("Invalid context scope: \"" + scope.get_tag() + "\".");
+	exception::throw_with_trace(std::runtime_error("Invalid context scope: \"" + scope.get_tag() + "\"."));
 }
 
 template <bool read_only>

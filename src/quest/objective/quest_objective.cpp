@@ -46,6 +46,7 @@
 #include "quest/quest.h"
 #include "unit/unit_class.h"
 #include "unit/unit_type.h"
+#include "util/exception_util.h"
 #include "util/string_util.h"
 
 namespace wyrmgus {
@@ -83,7 +84,7 @@ std::unique_ptr<quest_objective> quest_objective::from_sml_property(const sml_pr
 	} else if (key == "recruit_hero") {
 		return std::make_unique<recruit_hero_objective>(value, quest);
 	} else {
-		throw std::runtime_error("Invalid quest objective property: \"" + key + "\".");
+		exception::throw_with_trace(std::runtime_error("Invalid quest objective property: \"" + key + "\"."));
 	}
 }
 
@@ -94,7 +95,7 @@ std::unique_ptr<quest_objective> quest_objective::from_sml_scope(const sml_data 
 
 	if (objective = quest_objective::try_from_identifier(tag, quest)) {
 	} else {
-		throw std::runtime_error("Invalid quest objective scope: \"" + tag + "\".");
+		exception::throw_with_trace(std::runtime_error("Invalid quest objective scope: \"" + tag + "\"."));
 	}
 
 	database::process_sml_data(objective, scope);
@@ -127,7 +128,7 @@ void quest_objective::process_sml_property(const sml_property &property)
 		this->unit_types.clear();
 		this->unit_types.push_back(unit_type::get(value));
 	} else {
-		throw std::runtime_error("Invalid quest objective property: \"" + key + "\".");
+		exception::throw_with_trace(std::runtime_error("Invalid quest objective property: \"" + key + "\"."));
 	}
 }
 
@@ -145,7 +146,7 @@ void quest_objective::process_sml_scope(const sml_data &scope)
 			this->unit_types.push_back(unit_type::get(value));
 		}
 	} else {
-		throw std::runtime_error("Invalid quest objective scope: \"" + scope.get_tag() + "\".");
+		exception::throw_with_trace(std::runtime_error("Invalid quest objective scope: \"" + scope.get_tag() + "\"."));
 	}
 }
 
@@ -184,7 +185,7 @@ std::string quest_objective::get_unit_name_objective_string(const std::string &u
 std::string quest_objective::get_unit_class_objective_string(const unit_class *unit_class, bool &first) const
 {
 	if (unit_class->get_unit_types().empty()) {
-		throw std::runtime_error("Tried to generate an objective string for a unit class which has no unit types attached to it.");
+		exception::throw_with_trace(std::runtime_error("Tried to generate an objective string for a unit class which has no unit types attached to it."));
 	}
 
 	const std::string &unit_class_name = unit_class->get_name();

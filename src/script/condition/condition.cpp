@@ -77,6 +77,7 @@
 #include "ui/button.h"
 #include "ui/interface.h"
 #include "upgrade/upgrade_modifier.h"
+#include "util/exception_util.h"
 #include "util/vector_util.h"
 
 namespace wyrmgus {
@@ -139,7 +140,7 @@ std::unique_ptr<const condition> condition::from_sml_property(const sml_property
 	} else if (key == "war") {
 		return std::make_unique<war_condition>(value);
 	} else {
-		throw std::runtime_error("Invalid condition property: \"" + key + "\".");
+		exception::throw_with_trace(std::runtime_error("Invalid condition property: \"" + key + "\"."));
 	}
 }
 
@@ -175,7 +176,7 @@ std::unique_ptr<const condition> condition::from_sml_scope(const sml_data &scope
 	} else if (tag == "settlement") {
 		condition = std::make_unique<settlement_condition>();
 	} else {
-		throw std::runtime_error("Invalid condition scope: \"" + tag + "\".");
+		exception::throw_with_trace(std::runtime_error("Invalid condition scope: \"" + tag + "\"."));
 	}
 
 	database::process_sml_data(condition, scope);
@@ -206,12 +207,12 @@ void condition::ProcessConfigDataSection(const CConfigData *section)
 
 void condition::process_sml_property(const sml_property &property)
 {
-	throw std::runtime_error("Invalid condition property: \"" + property.get_key() + "\".");
+	exception::throw_with_trace(std::runtime_error("Invalid condition property: \"" + property.get_key() + "\"."));
 }
 
 void condition::process_sml_scope(const sml_data &scope)
 {
-	throw std::runtime_error("Invalid condition scope: \"" + scope.get_tag() + "\".");
+	exception::throw_with_trace(std::runtime_error("Invalid condition scope: \"" + scope.get_tag() + "\"."));
 }
 
 bool condition::check(const CUnit *unit, const bool ignore_units) const
@@ -231,7 +232,7 @@ void and_condition::ProcessConfigDataSection(const CConfigData *section)
 	} else if (section->Tag == "upgrade") {
 		condition = std::make_unique<upgrade_condition>();
 	} else {
-		throw std::runtime_error("Invalid and condition property: \"" + section->Tag + "\".");
+		exception::throw_with_trace(std::runtime_error("Invalid and condition property: \"" + section->Tag + "\"."));
 	}
 
 	condition->ProcessConfigData(section);

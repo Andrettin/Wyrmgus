@@ -57,6 +57,7 @@
 #include "unit/unit.h"
 #include "unit/unit_find.h"
 #include "upgrade/upgrade.h"
+#include "util/exception_util.h"
 #include "util/string_conversion_util.h"
 #include "util/string_util.h"
 
@@ -757,7 +758,7 @@ char StringToCondition(const std::string &str)
 	} else if (str == "only") {
 		return CONDITION_ONLY;
 	} else {
-		throw std::runtime_error("Bad condition result: \"" + str + "\".");
+		exception::throw_with_trace(std::runtime_error("Bad condition result: \"" + str + "\"."));
 	}
 }
 
@@ -812,7 +813,7 @@ void ConditionInfo::process_sml_property(const wyrmgus::sml_property &property)
 					this->Variable[index].ExactValue = std::stoi(value);
 					break;
 				default:
-					throw std::runtime_error("Invalid operator for variable property: \"" + std::to_string(static_cast<int>(property_operator)) + "\".");
+					exception::throw_with_trace(std::runtime_error("Invalid operator for variable property: \"" + std::to_string(static_cast<int>(property_operator)) + "\"."));
 			}
 			return;
 		}
@@ -821,7 +822,7 @@ void ConditionInfo::process_sml_property(const wyrmgus::sml_property &property)
 		if (index != -1) {
 			this->BoolFlag[index] = StringToCondition(value);
 		} else {
-			throw std::runtime_error("Invalid spell condition property: \"" + key + "\".");
+			exception::throw_with_trace(std::runtime_error("Invalid spell condition property: \"" + key + "\"."));
 		}
 	}
 }
@@ -859,11 +860,11 @@ void ConditionInfo::process_sml_scope(const wyrmgus::sml_data &scope)
 			} else if (key == "condition_apply_on_caster") {
 				this->Variable[index].ConditionApplyOnCaster = wyrmgus::string::to_bool(value);
 			} else {
-				throw std::runtime_error("Invalid adjust variable spell action variable property: \"" + key + "\".");
+				exception::throw_with_trace(std::runtime_error("Invalid adjust variable spell action variable property: \"" + key + "\"."));
 			}
 		});
 	} else {
-		throw std::runtime_error("Invalid spell condition scope: \"" + tag + "\".");
+		exception::throw_with_trace(std::runtime_error("Invalid spell condition scope: \"" + tag + "\"."));
 	}
 }
 
@@ -883,7 +884,7 @@ void AutoCastInfo::process_sml_property(const wyrmgus::sml_property &property)
 	} else if (key == "corpse") {
 		this->Corpse = StringToCondition(value);
 	} else {
-		throw std::runtime_error("Invalid autocast info property: \"" + key + "\".");
+		exception::throw_with_trace(std::runtime_error("Invalid autocast info property: \"" + key + "\"."));
 	}
 }
 
@@ -908,12 +909,12 @@ void AutoCastInfo::process_sml_scope(const wyrmgus::sml_data &scope)
 				if (index != -1) {
 					this->PriorityVar = index;
 				} else {
-					throw std::runtime_error("Invalid autocast priority variable value: \"" + value + "\".");
+					exception::throw_with_trace(std::runtime_error("Invalid autocast priority variable value: \"" + value + "\"."));
 				}
 			} else if (key == "reverse_sort") {
 				this->ReverseSort = wyrmgus::string::to_bool(value);
 			} else {
-				throw std::runtime_error("Invalid autocast priority property: \"" + key + "\".");
+				exception::throw_with_trace(std::runtime_error("Invalid autocast priority property: \"" + key + "\"."));
 			}
 		});
 	} else if (tag == "cast_conditions") {
@@ -922,6 +923,6 @@ void AutoCastInfo::process_sml_scope(const wyrmgus::sml_data &scope)
 		}
 		wyrmgus::database::process_sml_data(this->cast_conditions, scope);
 	} else {
-		throw std::runtime_error("Invalid autocast info scope: \"" + tag + "\".");
+		exception::throw_with_trace(std::runtime_error("Invalid autocast info scope: \"" + tag + "\"."));
 	}
 }

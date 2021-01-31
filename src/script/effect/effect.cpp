@@ -46,6 +46,7 @@
 #include "script/effect/remove_unit_effect.h"
 #include "script/effect/resource_effect.h"
 #include "script/effect/scripted_effect_effect.h"
+#include "util/exception_util.h"
 
 namespace wyrmgus {
 
@@ -78,7 +79,7 @@ std::unique_ptr<effect<scope_type>> effect<scope_type>::from_sml_property(const 
 		return std::make_unique<scripted_effect_effect<scope_type>>(value, effect_operator);
 	}
 
-	throw std::runtime_error("Invalid property effect: \"" + key + "\".");
+	exception::throw_with_trace(std::runtime_error("Invalid property effect: \"" + key + "\"."));
 }
 
 template <typename scope_type>
@@ -112,7 +113,7 @@ std::unique_ptr<effect<scope_type>> effect<scope_type>::from_sml_scope(const sml
 	}
 
 	if (effect == nullptr) {
-		throw std::runtime_error("Invalid scope effect: \"" + effect_identifier + "\".");
+		exception::throw_with_trace(std::runtime_error("Invalid scope effect: \"" + effect_identifier + "\"."));
 	}
 
 	database::process_sml_data(effect, scope);
@@ -128,13 +129,13 @@ effect<scope_type>::effect(const sml_operator effect_operator) : effect_operator
 template <typename scope_type>
 void effect<scope_type>::process_sml_property(const sml_property &property)
 {
-	throw std::runtime_error("Invalid property for \"" + this->get_class_identifier() + "\" effect: \"" + property.get_key() + "\".");
+	exception::throw_with_trace(std::runtime_error("Invalid property for \"" + this->get_class_identifier() + "\" effect: \"" + property.get_key() + "\"."));
 }
 
 template <typename scope_type>
 void effect<scope_type>::process_sml_scope(const sml_data &scope)
 {
-	throw std::runtime_error("Invalid scope for \"" + this->get_class_identifier() + "\" effect: \"" + scope.get_tag() + "\".");
+	exception::throw_with_trace(std::runtime_error("Invalid scope for \"" + this->get_class_identifier() + "\" effect: \"" + scope.get_tag() + "\"."));
 }
 
 template <typename scope_type>
@@ -151,7 +152,7 @@ void effect<scope_type>::do_effect(scope_type *scope, const context &ctx) const
 			this->do_subtraction_effect(scope);
 			break;
 		default:
-			throw std::runtime_error("Invalid effect operator: \"" + std::to_string(static_cast<int>(this->effect_operator)) + "\".");
+			exception::throw_with_trace(std::runtime_error("Invalid effect operator: \"" + std::to_string(static_cast<int>(this->effect_operator)) + "\"."));
 	}
 }
 
@@ -166,7 +167,7 @@ std::string effect<scope_type>::get_string(const scope_type *scope, const read_o
 		case sml_operator::subtraction:
 			return this->get_subtraction_string();
 		default:
-			throw std::runtime_error("Invalid effect operator: \"" + std::to_string(static_cast<int>(this->effect_operator)) + "\".");
+			exception::throw_with_trace(std::runtime_error("Invalid effect operator: \"" + std::to_string(static_cast<int>(this->effect_operator)) + "\"."));
 	}
 }
 

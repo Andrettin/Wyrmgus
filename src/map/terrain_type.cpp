@@ -38,6 +38,7 @@
 #include "time/season.h"
 #include "upgrade/upgrade_structs.h"
 #include "util/container_util.h"
+#include "util/exception_util.h"
 #include "util/string_conversion_util.h"
 #include "util/util.h"
 #include "util/vector_util.h"
@@ -131,7 +132,7 @@ unsigned long terrain_type::GetTerrainFlagByName(const std::string &flag_name)
 	} else if (flag_name == "space") {
 		return MapFieldSpace;
 	} else {
-		throw std::runtime_error("Flag \"" + flag_name + "\" doesn't exist.");
+		exception::throw_with_trace(std::runtime_error("Flag \"" + flag_name + "\" doesn't exist."));
 	}
 }
 
@@ -395,7 +396,7 @@ void terrain_type::initialize()
 void terrain_type::check() const
 {
 	if (this->movement_bonus >= DefaultTileMovementCost) {
-		throw std::runtime_error("The movement bonus for terrain type \"" + this->get_identifier() + "\" is greater than or equal to the default tile movement cost.");
+		exception::throw_with_trace(std::runtime_error("The movement bonus for terrain type \"" + this->get_identifier() + "\" is greater than or equal to the default tile movement cost."));
 	}
 }
 
@@ -412,7 +413,7 @@ void terrain_type::set_character(const char character)
 void terrain_type::map_to_character(const char character)
 {
 	if (terrain_type::try_get_by_character(character) != nullptr) {
-		throw std::runtime_error("Character \"" + std::string(1, character) + "\" is already used by another terrain type.");
+		exception::throw_with_trace(std::runtime_error("Character \"" + std::string(1, character) + "\" is already used by another terrain type."));
 	}
 
 	terrain_type::terrain_types_by_character[character] = this;
@@ -425,9 +426,9 @@ void terrain_type::set_color(const QColor &color)
 	}
 
 	if (terrain_type::try_get_by_color(color) != nullptr) {
-		throw std::runtime_error("Color is already used by another terrain type.");
+		exception::throw_with_trace(std::runtime_error("Color is already used by another terrain type."));
 	} else if (terrain_feature::try_get_by_color(color) != nullptr) {
-		throw std::runtime_error("Color is already used by a terrain feature.");
+		exception::throw_with_trace(std::runtime_error("Color is already used by a terrain feature."));
 	}
 
 	this->color = color;
@@ -484,7 +485,7 @@ void terrain_type::calculate_minimap_color(const season *season)
 	}
 
 	if (pixel_count == 0) {
-		throw std::runtime_error("No valid pixels for calculating the minimap color for terrain type \"" + this->get_identifier() + "\".");
+		exception::throw_with_trace(std::runtime_error("No valid pixels for calculating the minimap color for terrain type \"" + this->get_identifier() + "\"."));
 	}
 
 	red /= pixel_count;
@@ -503,7 +504,7 @@ void terrain_type::calculate_minimap_color(const season *season)
 void terrain_type::map_to_tile_number(const int tile_number)
 {
 	if (terrain_type::try_get_by_tile_number(tile_number) != nullptr) {
-		throw std::runtime_error("Tile number \"" + std::to_string(tile_number) + "\" is already used by another terrain type.");
+		exception::throw_with_trace(std::runtime_error("Tile number \"" + std::to_string(tile_number) + "\" is already used by another terrain type."));
 	}
 
 	terrain_type::terrain_types_by_tile_number[tile_number] = this;

@@ -34,6 +34,7 @@
 #include "species/geological_era.h"
 #include "species/taxon.h"
 #include "species/taxonomic_rank.h"
+#include "util/exception_util.h"
 #include "util/vector_random_util.h"
 #include "util/vector_util.h"
 #include "world.h"
@@ -177,12 +178,12 @@ void species::initialize()
 void species::check() const
 {
 	if (this->get_supertaxon() == nullptr) {
-		throw std::runtime_error("Species \"" + this->get_identifier() + "\" has no supertaxon.");
+		exception::throw_with_trace(std::runtime_error("Species \"" + this->get_identifier() + "\" has no supertaxon."));
 	}
 
 	for (const species *pre_evolution : this->get_pre_evolutions()) {
 		if (this->get_era() != geological_era::none && pre_evolution->get_era() != geological_era::none && this->get_era() <= pre_evolution->get_era()) {
-			throw std::runtime_error("Species \"" + this->get_identifier() + "\" is set to evolve from \"" + pre_evolution->get_identifier() + "\", but is from the same or an earlier era than the latter.");
+			exception::throw_with_trace(std::runtime_error("Species \"" + this->get_identifier() + "\" is set to evolve from \"" + pre_evolution->get_identifier() + "\", but is from the same or an earlier era than the latter."));
 		}
 	}
 }
@@ -195,11 +196,11 @@ taxonomic_rank species::get_rank() const
 std::string species::get_scientific_name() const
 {
 	if (this->get_supertaxon() == nullptr) {
-		throw std::runtime_error("Cannot get the scientific name for species \"" + this->get_identifier() + "\", as it has no supertaxon.");
+		exception::throw_with_trace(std::runtime_error("Cannot get the scientific name for species \"" + this->get_identifier() + "\", as it has no supertaxon."));
 	}
 
 	if (this->get_supertaxon()->get_rank() != taxonomic_rank::genus) {
-		throw std::runtime_error("Cannot get the scientific name for species \"" + this->get_identifier() + "\", as its supertaxon is not a genus.");
+		exception::throw_with_trace(std::runtime_error("Cannot get the scientific name for species \"" + this->get_identifier() + "\", as its supertaxon is not a genus."));
 	}
 
 	if (!this->get_specific_name().empty()) {

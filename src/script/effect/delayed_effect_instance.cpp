@@ -37,6 +37,7 @@
 #include "unit/unit.h"
 #include "unit/unit_manager.h"
 #include "unit/unit_ref.h"
+#include "util/exception_util.h"
 
 namespace wyrmgus {
 
@@ -89,7 +90,7 @@ void delayed_effect_instance<scope_type>::process_sml_property(const sml_propert
 	} else if (key == "remaining_cycles") {
 		this->remaining_cycles = std::stoi(value);
 	} else {
-		throw std::runtime_error("Invalid delayed effect instance property: \"" + key + "\".");
+		exception::throw_with_trace(std::runtime_error("Invalid delayed effect instance property: \"" + key + "\"."));
 	}
 }
 
@@ -102,7 +103,7 @@ void delayed_effect_instance<scope_type>::process_sml_scope(const sml_data &scop
 		this->context = wyrmgus::context();
 		database::process_sml_data(this->context, scope);
 	} else {
-		throw std::runtime_error("Invalid delayed effect instance scope: \"" + scope.get_tag() + "\".");
+		exception::throw_with_trace(std::runtime_error("Invalid delayed effect instance scope: \"" + scope.get_tag() + "\"."));
 	}
 }
 

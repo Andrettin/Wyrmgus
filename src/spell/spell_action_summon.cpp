@@ -39,6 +39,7 @@
 #include "spell/spell.h"
 #include "unit/unit.h"
 #include "unit/unit_find.h"
+#include "util/exception_util.h"
 #include "util/string_conversion_util.h"
 
 namespace wyrmgus {
@@ -57,14 +58,14 @@ void spell_action_summon::process_sml_property(const sml_property &property)
 	} else if (key == "join_to_ai_force") {
 		this->JoinToAiForce = string::to_bool(value);
 	} else {
-		throw std::runtime_error("Invalid adjust vitals spell action property: \"" + key + "\".");
+		exception::throw_with_trace(std::runtime_error("Invalid adjust vitals spell action property: \"" + key + "\"."));
 	}
 }
 
 void spell_action_summon::check() const
 {
 	if (this->UnitType == nullptr) {
-		throw std::runtime_error("Summon spell action has no unit type.");
+		exception::throw_with_trace(std::runtime_error("Summon spell action has no unit type."));
 	}
 }
 

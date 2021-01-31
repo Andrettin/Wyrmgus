@@ -38,6 +38,7 @@
 #include "unit/unit_type.h"
 #include "upgrade/upgrade.h"
 #include "upgrade/upgrade_modifier.h"
+#include "util/exception_util.h"
 #include "util/string_conversion_util.h"
 
 namespace wyrmgus {
@@ -123,13 +124,13 @@ void persistent_item::process_sml_property(const sml_property &property)
 	} else if (key == "equipped") {
 		this->equipped = true;
 	} else {
-		throw std::runtime_error("Invalid persistent item property: \"" + key + "\".");
+		exception::throw_with_trace(std::runtime_error("Invalid persistent item property: \"" + key + "\"."));
 	}
 }
 
 void persistent_item::process_sml_scope(const sml_data &scope)
 {
-	throw std::runtime_error("Invalid persistent item scope: \"" + scope.get_tag() + "\".");
+	exception::throw_with_trace(std::runtime_error("Invalid persistent item scope: \"" + scope.get_tag() + "\"."));
 }
 
 void persistent_item::ProcessConfigData(const CConfigData *config_data)

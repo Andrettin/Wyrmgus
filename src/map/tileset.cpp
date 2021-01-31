@@ -175,6 +175,7 @@
 
 #include "map/tileset.h"
 
+#include "util/exception_util.h"
 #include "util/util.h"
 #include "util/vector_random_util.h"
 #include "video/video.h"
@@ -880,7 +881,7 @@ std::string GetTransitionTypeNameById(const wyrmgus::tile_transition_type transi
 		return "southeast-outer-northwest-inner";
 	}
 
-	throw std::runtime_error("Invalid tile transition type: \"" + std::to_string(static_cast<int>(transition_type)) + "\".");
+	exception::throw_with_trace(std::runtime_error("Invalid tile transition type: \"" + std::to_string(static_cast<int>(transition_type)) + "\"."));
 }
 
 wyrmgus::tile_transition_type GetTransitionTypeIdByName(const std::string &transition_type)
@@ -979,5 +980,5 @@ wyrmgus::tile_transition_type GetTransitionTypeIdByName(const std::string &trans
 		return wyrmgus::tile_transition_type::southeast_outer_northwest_inner;
 	}
 
-	throw std::runtime_error("Invalid tile transition type: \"" + transition_type + "\".");
+	exception::throw_with_trace(std::runtime_error("Invalid tile transition type: \"" + transition_type + "\"."));
 }

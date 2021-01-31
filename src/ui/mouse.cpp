@@ -72,6 +72,7 @@
 #include "unit/unit_find.h"
 #include "unit/unit_type.h"
 #include "unit/unit_type_type.h"
+#include "util/exception_util.h"
 #include "util/log_util.h"
 #include "util/vector_util.h"
 #include "video/font.h"
@@ -2014,7 +2015,7 @@ static int SendSpellCast(const Vec2i &tilePos, int flush)
 		// CursorValue here holds the spell type id
 		const wyrmgus::spell *spell = wyrmgus::spell::get_all().at(CursorValue);
 		if (!spell) {
-			throw std::runtime_error("Unknown spell-id: " + std::to_string(CursorValue));
+			exception::throw_with_trace(std::runtime_error("Unknown spell-id: " + std::to_string(CursorValue)));
 		}
 		
 		if (std::find(unit.Type->Spells.begin(), unit.Type->Spells.end(), spell) == unit.Type->Spells.end()) {

@@ -36,6 +36,7 @@
 #include "config.h"
 #include "script.h"
 #include "unit/unit.h"
+#include "util/exception_util.h"
 #include "util/string_conversion_util.h"
 #include "util/string_util.h"
 
@@ -89,10 +90,10 @@ void spell_action_adjust_variable::process_sml_property(const sml_property &prop
 			this->Var[index].Max = number_value;
 			this->Var[index].ModifMax = true;
 		} else {
-			throw std::runtime_error("Invalid value (\"" + value + "\") for variable \"" + key + "\" when defining an adjust variable spell action.");
+			exception::throw_with_trace(std::runtime_error("Invalid value (\"" + value + "\") for variable \"" + key + "\" when defining an adjust variable spell action."));
 		}
 	} else {
-		throw std::runtime_error("Invalid adjust variable spell action property: \"" + key + "\".");
+		exception::throw_with_trace(std::runtime_error("Invalid adjust variable spell action property: \"" + key + "\"."));
 	}
 }
 
@@ -136,14 +137,14 @@ void spell_action_adjust_variable::process_sml_scope(const sml_data &scope)
 				} else if (value == "target") {
 					this->Var[index].TargetIsCaster = false;
 				} else {
-					throw std::runtime_error("Invalid target_is_caster value: \"" + value + "\".");
+					exception::throw_with_trace(std::runtime_error("Invalid target_is_caster value: \"" + value + "\"."));
 				}
 			} else {
-				throw std::runtime_error("Invalid adjust variable spell action variable property: \"" + key + "\".");
+				exception::throw_with_trace(std::runtime_error("Invalid adjust variable spell action variable property: \"" + key + "\"."));
 			}
 		});
 	} else {
-		throw std::runtime_error("Invalid adjust variable spell action scope: \"" + tag + "\".");
+		exception::throw_with_trace(std::runtime_error("Invalid adjust variable spell action scope: \"" + tag + "\"."));
 	}
 }
 

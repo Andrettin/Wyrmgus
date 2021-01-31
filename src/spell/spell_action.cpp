@@ -36,6 +36,7 @@
 #include "spell/spell_action_adjust_vitals.h"
 #include "spell/spell_action_spawn_missile.h"
 #include "spell/spell_action_summon.h"
+#include "util/exception_util.h"
 
 namespace wyrmgus {
 
@@ -53,7 +54,7 @@ std::unique_ptr<spell_action> spell_action::from_sml_scope(const sml_data &scope
 	} else if (action_identifier == "summon") {
 		action = std::make_unique<spell_action_summon>();
 	} else {
-		throw std::runtime_error("Invalid scope spell action: \"" + action_identifier + "\".");
+		exception::throw_with_trace(std::runtime_error("Invalid scope spell action: \"" + action_identifier + "\"."));
 	}
 
 	database::process_sml_data(action, scope);
@@ -64,12 +65,12 @@ std::unique_ptr<spell_action> spell_action::from_sml_scope(const sml_data &scope
 
 void spell_action::process_sml_property(const sml_property &property)
 {
-	throw std::runtime_error("Invalid property for \"" + this->get_class_identifier() + "\" effect: \"" + property.get_key() + "\".");
+	exception::throw_with_trace(std::runtime_error("Invalid property for \"" + this->get_class_identifier() + "\" effect: \"" + property.get_key() + "\"."));
 }
 
 void spell_action::process_sml_scope(const sml_data &scope)
 {
-	throw std::runtime_error("Invalid scope for \"" + this->get_class_identifier() + "\" effect: \"" + scope.get_tag() + "\".");
+	exception::throw_with_trace(std::runtime_error("Invalid scope for \"" + this->get_class_identifier() + "\" effect: \"" + scope.get_tag() + "\"."));
 }
 
 }

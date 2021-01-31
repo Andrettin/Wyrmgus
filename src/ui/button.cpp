@@ -42,6 +42,7 @@
 #include "unit/unit_manager.h"
 #include "upgrade/upgrade.h"
 #include "upgrade/upgrade_class.h"
+#include "util/exception_util.h"
 #include "util/string_conversion_util.h"
 #include "util/string_util.h"
 #include "video/font.h"
@@ -183,7 +184,7 @@ void button::process_sml_property(const sml_property &property)
 		if (button_action_id != ButtonCmd::None) {
 			this->Action = button_action_id;
 		} else {
-			throw std::runtime_error("Invalid button action: \"" + value + "\".");
+			exception::throw_with_trace(std::runtime_error("Invalid button action: \"" + value + "\"."));
 		}
 	} else if (key == "value") {
 		this->ValueStr = value;
@@ -241,7 +242,7 @@ void button::process_sml_property(const sml_property &property)
 		} else if (value == "check_has_sub_buttons") {
 			this->Allowed = ButtonCheckHasSubButtons;
 		} else {
-			throw std::runtime_error("Invalid button check: \"" + value + "\".");
+			exception::throw_with_trace(std::runtime_error("Invalid button check: \"" + value + "\"."));
 		}
 	} else {
 		data_entry::process_sml_property(property);
@@ -336,7 +337,7 @@ void button::initialize()
 	if (!this->Popup.empty()) {
 		CPopup *popup = PopupByIdent(this->Popup);
 		if (!popup) {
-			throw std::runtime_error("Popup \"" + this->Popup + "\" hasn't defined.");
+			exception::throw_with_trace(std::runtime_error("Popup \"" + this->Popup + "\" hasn't defined."));
 		}
 	}
 
@@ -714,7 +715,7 @@ std::string GetButtonActionNameById(const ButtonCmd button_action)
 			return "cancel-build";
 	}
 
-	throw std::runtime_error("Invalid button action enum value: " + std::to_string(static_cast<int>(button_action)));
+	exception::throw_with_trace(std::runtime_error("Invalid button action enum value: " + std::to_string(static_cast<int>(button_action))));
 }
 
 ButtonCmd GetButtonActionIdByName(const std::string &button_action)

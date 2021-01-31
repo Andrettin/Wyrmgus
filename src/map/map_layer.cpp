@@ -43,15 +43,16 @@
 #include "time/time_of_day_schedule.h"
 #include "unit/unit.h"
 #include "unit/unit_manager.h"
+#include "util/exception_util.h"
 
 CMapLayer::CMapLayer(const QSize &size) : size(size)
 {
 	if (size.width() > MaxMapWidth) {
-		throw std::runtime_error("Tried to create a map layer with width (" + std::to_string(size.width()) + ") greater than the maximum (" + std::to_string(MaxMapWidth) + ").");
+		exception::throw_with_trace(std::runtime_error("Tried to create a map layer with width (" + std::to_string(size.width()) + ") greater than the maximum (" + std::to_string(MaxMapWidth) + ")."));
 	}
 
 	if (size.height() > MaxMapHeight) {
-		throw std::runtime_error("Tried to create a map layer with height (" + std::to_string(size.height()) + ") greater than the maximum (" + std::to_string(MaxMapHeight) + ").");
+		exception::throw_with_trace(std::runtime_error("Tried to create a map layer with height (" + std::to_string(size.height()) + ") greater than the maximum (" + std::to_string(MaxMapHeight) + ")."));
 	}
 
 	const int max_tile_index = size.width() * size.height();
@@ -141,7 +142,7 @@ void CMapLayer::handle_destroyed_overlay_terrain()
 void CMapLayer::decay_destroyed_overlay_terrain_tile(const QPoint &pos)
 {
 	if (!CMap::Map.Info.IsPointOnMap(pos, this->ID)) {
-		throw std::runtime_error("Tried to decay a destroyed overlay terrain tile for an invalid tile position.");
+		exception::throw_with_trace(std::runtime_error("Tried to decay a destroyed overlay terrain tile for an invalid tile position."));
 	}
 
 	wyrmgus::tile &mf = *this->Field(pos);
@@ -177,7 +178,7 @@ void CMapLayer::regenerate_forests()
 void CMapLayer::regenerate_tree_tile(const QPoint &pos)
 {
 	if (!CMap::Map.Info.IsPointOnMap(pos, this->ID)) {
-		throw std::runtime_error("Tried to regenerate a tree tile for an invalid tile position.");
+		exception::throw_with_trace(std::runtime_error("Tried to regenerate a tree tile for an invalid tile position."));
 	}
 	
 	wyrmgus::tile &mf = *this->Field(pos);

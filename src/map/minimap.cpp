@@ -47,6 +47,7 @@
 #include "unit/unit.h"
 #include "unit/unit_manager.h"
 #include "unit/unit_type.h"
+#include "util/exception_util.h"
 #include "util/vector_util.h"
 #include "video/video.h"
 #include "world.h"
@@ -399,7 +400,7 @@ void minimap::update_territory_pixel(const int mx, const int my, const int z)
 
 		const CUnit *settlement_unit = settlement->get_game_data()->get_site_unit();
 		if (settlement_unit == nullptr) {
-			throw std::runtime_error("Settlement \"" + settlement->get_identifier() + "\" has territory, but no settlement unit.");
+			exception::throw_with_trace(std::runtime_error("Settlement \"" + settlement->get_identifier() + "\" has territory, but no settlement unit."));
 		}
 
 		const tile *settlement_center_tile = settlement_unit->get_center_tile();
@@ -497,7 +498,7 @@ uint32_t minimap::get_terrain_unit_minimap_color(const CUnit *unit, const unit_t
 			}
 			break;
 		default:
-			throw std::runtime_error("Unexpected minimap mode: " + std::to_string(static_cast<int>(this->get_mode())) + ".");
+			exception::throw_with_trace(std::runtime_error("Unexpected minimap mode: " + std::to_string(static_cast<int>(this->get_mode())) + "."));
 	}
 
 	if (!color.isValid()) {
