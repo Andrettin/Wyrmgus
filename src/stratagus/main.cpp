@@ -41,7 +41,9 @@ int main(int argc, char **argv)
 
 	try {
 		qInstallMessageHandler(log::log_qt_message);
+
 		QApplication app(argc, argv);
+		app.setApplicationName("Wyrmsun");
 
 		//  Setup some defaults.
 #ifdef MAC_BUNDLE
