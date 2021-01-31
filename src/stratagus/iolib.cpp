@@ -50,10 +50,6 @@
 #include <bzlib.h>
 #endif
 
-#ifdef USE_PHYSFS
-#include <physfs.h>
-#endif
-
 #ifdef __MORPHOS__
 #undef tell
 #endif
@@ -85,9 +81,6 @@ private:
 #ifdef USE_BZ2LIB
 	BZFILE *cl_bz;   /// bzip2 file pointer
 #endif // !USE_BZ2LIB
-#ifdef USE_PHYSFS
-	PHYSFS_File *cl_pf;
-#endif
 };
 
 CFile::CFile() : pimpl(std::make_unique<CFile::PImpl>())
@@ -295,16 +288,6 @@ int CFile::PImpl::open(const char *name, long openflags)
 					cl_type = CLF_TYPE_PLAIN;
 				}
 	} else {
-#ifdef USE_PHYSFS
-		if (PHYSFS_isInit()) {
-			cl_pf = PHYSFS_openRead(name);
-			if (cl_pf) {
-				cl_type = CLF_TYPE_PHYSFS;
-				return 0;
-			}
-		}
-#endif
-
 		if (!(cl_plain = fopen(name, openstring))) { // try plain first
 #ifdef USE_ZLIB
 			if ((cl_gz = gzopen(strcat(strcpy(buf, name), ".gz"), "rb"))) {
@@ -380,11 +363,6 @@ int CFile::PImpl::close()
 			ret = 0;
 		}
 #endif // USE_BZ2LIB
-#ifdef USE_PHYSFS
-		if (PHYSFS_isInit() && tp == CLF_TYPE_PHYSFS) {
-			ret = PHYSFS_close(cl_pf);
-		}
-#endif // USE_PHYSFS
 	} else {
 		errno = EBADF;
 	}
@@ -410,11 +388,6 @@ int CFile::PImpl::read(void *buf, size_t len)
 			ret = BZ2_bzread(cl_bz, buf, len);
 		}
 #endif // USE_BZ2LIB
-#ifdef USE_PHYSFS
-		if (PHYSFS_isInit() && cl_type == CLF_TYPE_PHYSFS) {
-			ret = PHYSFS_read(cl_pf, buf, 1, len);
-		}
-#endif
 	} else {
 		errno = EBADF;
 	}
@@ -487,11 +460,6 @@ int CFile::PImpl::seek(long offset, int whence)
 			ret = 0;
 		}
 #endif // USE_BZ2LIB
-#ifdef USE_PHYSFS
-		if (PHYSFS_isInit() && tp == CLF_TYPE_PHYSFS) {
-			ret = PHYSFS_seek(cl_pf, whence == SEEK_CUR ? PHYSFS_tell(cl_pf)+offset : offset);
-		}
-#endif
 	} else {
 		errno = EBADF;
 	}
@@ -518,11 +486,6 @@ long CFile::PImpl::tell()
 			ret = -1;
 		}
 #endif // USE_BZ2LIB
-#ifdef USE_PHYSFS
-		if (PHYSFS_isInit() && tp == CLF_TYPE_PHYSFS) {
-			ret = PHYSFS_tell(cl_pf);
-		}
-#endif
 	} else {
 		errno = EBADF;
 	}
@@ -563,12 +526,6 @@ static bool FindFileWithExtension(std::array<char, PATH_MAX> &file)
 
 	if (std::filesystem::exists(filepath_bz2)) {
 		strcpy_s(file.data(), PATH_MAX, filepath_bz2.string().c_str());
-		return true;
-	}
-#endif
-
-#ifdef USE_PHYSFS
-	if (PHYSFS_isInit() && PHYSFS_exists(file)) {
 		return true;
 	}
 #endif
@@ -727,12 +684,6 @@ bool CanAccessFile(const char *filename)
 		if (std::filesystem::exists(filepath)) {
 			return true;
 		}
-
-#ifdef USE_PHYSFS
-		if (PHYSFS_isInit() && PHYSFS_exists(name)) {
-			return true;
-		}
-#endif
 	}
 
 	return false;

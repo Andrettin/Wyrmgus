@@ -212,10 +212,6 @@ extern void beos_init(int argc, char **argv);
 #include <dbghelp.h>
 #endif
 
-#ifdef USE_PHYSFS
-#include <physfs.h>
-#endif
-
 #if defined(USE_WIN32) && ! defined(NO_STDIO_REDIRECT)
 #include "windows.h"
 #define REDIRECT_OUTPUT
@@ -380,11 +376,6 @@ void Exit(int err)
 	lua_close(Lua);
 	Lua = nullptr;
 	DeInitVideo();
-#ifdef USE_PHYSFS
-	if (PHYSFS_isInit()) {
-		PHYSFS_deinit();
-	}
-#endif
 
 	fprintf(stdout, "%s", _("Thanks for playing " NAME ".\n"));
 
@@ -648,12 +639,6 @@ void stratagusMain(int argc, char **argv)
 #endif
 #if defined(USE_WIN32) && ! defined(REDIRECT_OUTPUT)
 	SetupConsole();
-#endif
-
-#ifdef USE_PHYSFS
-	if (PHYSFS_init(argv[0])) {
-		PHYSFS_mount(PHYSFS_DATAFILE, "/", 0);
-	}
 #endif
 
 	Parameters &parameters = Parameters::Instance;
