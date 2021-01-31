@@ -406,6 +406,11 @@ void map_template::initialize()
 				return site->is_settlement();
 			}
 
+			if (site->get_satellites().size() != other_site->get_satellites().size()) {
+				//give priority to sites with more satellites (e.g. stars with more planets in their systems)
+				return site->get_satellites().size() > other_site->get_satellites().size();
+			}
+
 			return site->get_identifier() < other_site->get_identifier();
 		});
 	}
