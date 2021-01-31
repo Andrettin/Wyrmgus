@@ -498,6 +498,7 @@ set(util_SRCS
 	src/util/georectangle_util.cpp
 	src/util/geoshape_util.cpp
 	src/util/image_util.cpp
+	src/util/log_util.cpp
 	src/util/number_util.cpp
 	src/util/point_container.cpp
 	src/util/point_util.cpp
@@ -1214,7 +1215,6 @@ if(WIN32)
 endif()
 
 find_package(BZip2)
-find_package(StackTrace)
 
 find_package(X11)
 find_package(OpenGL)
@@ -1253,7 +1253,6 @@ option(ENABLE_TOUCHSCREEN "Use touchscreen input" OFF)
 
 option(WITH_BZIP2 "Compile Stratagus with BZip2 compression support" OFF)
 option(WITH_PHYSFS "Compile Stratagus with PhysFS support" OFF)
-option(WITH_STACKTRACE "Compile Stratagus with StackTrace library" OFF)
 
 option(WITH_X11 "Compile Stratagus with X11 clipboard pasting support" ON)
 
@@ -1316,12 +1315,6 @@ if(WITH_PHYSFS AND PHYSFS_FOUND)
 	add_definitions(-DPHYSFS_DATAFILE="data.zip")
 	include_directories(${PHYSFS_INCLUDE_DIR})
 	set(stratagus_LIBS ${stratagus_LIBS} ${PHYSFS_LIBRARY})
-endif()
-
-if(WITH_STACKTRACE AND STACKTRACE_FOUND)
-	add_definitions(-DUSE_STACKTRACE ${STACKTRACE_DEFINITIONS})
-	include_directories(${STACKTRACE_PROJECT_DIR})
-	set(stratagus_LIBS ${stratagus_LIBS} ${STACKTRACE_LIBRARY})
 endif()
 
 if(WITH_X11 AND X11_FOUND)
@@ -1567,7 +1560,6 @@ endif()
 
 log_package("Bzip2" "BZIP2")
 log_package("PhysFS" "PHYSFS")
-log_package("StackTrace" "STACKTRACE")
 log_package("X11" "X11")
 
 if(WITH_RENDERER STREQUAL "OpenGL" AND OPENGL_FOUND)

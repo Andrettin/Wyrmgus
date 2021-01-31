@@ -26,6 +26,8 @@
 
 #pragma once
 
+#include <boost/stacktrace/stacktrace_fwd.hpp>
+
 namespace wyrmgus::log {
 
 constexpr const char *date_string_format = "yyyy.MM.dd hh:mm:ss";
@@ -33,12 +35,12 @@ constexpr std::uintmax_t max_size = 1000000; //1 MB
 
 inline void log(const std::string_view &message)
 {
-	std::cout << "[" << QDateTime::currentDateTime().toString(date_string_format).toStdString() << "] " << message << '\n';
+	std::cout << "[" << QDateTime::currentDateTime().toString(log::date_string_format).toStdString() << "] " << message << '\n';
 }
 
 inline void log_error(const std::string_view &error_message)
 {
-	std::cerr << "[" << QDateTime::currentDateTime().toString(date_string_format).toStdString() << "] " << error_message << std::endl;
+	std::cerr << "[" << QDateTime::currentDateTime().toString(log::date_string_format).toStdString() << "] " << error_message << std::endl;
 }
 
 inline void log_qt_message(QtMsgType type, const QMessageLogContext &context, const QString &msg)
@@ -93,5 +95,8 @@ inline void log_qt_message(QtMsgType type, const QMessageLogContext &context, co
 			break;
 	}
 }
+
+extern void log_stacktrace(const boost::stacktrace::stacktrace &stacktrace);
+extern void log_stacktrace();
 
 }

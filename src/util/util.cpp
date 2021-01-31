@@ -34,6 +34,7 @@
 //Wyrmgus start
 #include "network.h"
 //Wyrmgus end
+#include "util/log_util.h"
 #include "util/random.h"
 #include "util/string_util.h"
 
@@ -41,11 +42,6 @@
 
 #ifdef WIN32
 #include <windows.h>
-#endif
-
-#ifdef USE_STACKTRACE
-#include <stacktrace/call_stack.hpp>
-#include <stacktrace/stack_exception.hpp>
 #endif
 
 #ifdef USE_X11
@@ -480,11 +476,8 @@ void AbortAt(const char *file, int line, const char *funcName, const char *condi
 {
 	std::array<char, 1024> buf{};
 	snprintf(buf.data(), 1024, "Assertion failed at %s:%d: %s: %s\n", file, line, funcName, conditionStr);
-#ifdef USE_STACKTRACE
-	throw stacktrace::stack_runtime_error((const char*)buf);
-#else
 	fprintf(stderr, "%s\n", buf.data());
-#endif
+	log::log_stacktrace();
 	fflush(stdout);
 	fflush(stderr);
 	abort();

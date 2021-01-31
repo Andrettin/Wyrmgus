@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-//      (c) Copyright 2019-2021 by Andrettin
+//      (c) Copyright 2021 by Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -23,37 +23,22 @@
 //      along with this program; if not, write to the Free Software
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
-
-#include "util/exception_util.h"
+//
 
 #include "util/log_util.h"
 
-#include <boost/exception/all.hpp>
 #include <boost/stacktrace.hpp>
 
-namespace wyrmgus::exception {
+namespace wyrmgus::log {
 
-using traced = boost::error_info<struct tag_stacktrace, boost::stacktrace::stacktrace>;
-
-void report(const std::exception &exception)
+void log_stacktrace(const boost::stacktrace::stacktrace &stacktrace)
 {
-	try {
-		std::rethrow_if_nested(exception);
-	} catch (const std::exception &nested_exception) {
-		exception::report(nested_exception);
-	}
-
-	log::log_error(exception.what());
-
-	const boost::stacktrace::stacktrace *stacktrace = boost::get_error_info<traced>(exception);
-	if (stacktrace != nullptr) {
-		log::log_stacktrace(*stacktrace);
-	}
+	std::cerr << stacktrace << std::flush;
 }
 
-void throw_with_trace(const std::exception &exception)
+void log_stacktrace()
 {
-	throw boost::enable_error_info(exception) << traced(boost::stacktrace::stacktrace());
+	log::log_stacktrace(boost::stacktrace::stacktrace());
 }
 
 }

@@ -207,11 +207,6 @@ extern void beos_init(int argc, char **argv);
 
 #include "missile.h" //for FreeBurningBuildingFrames
 
-#ifdef USE_STACKTRACE
-#include <stacktrace/call_stack.hpp>
-#include <stacktrace/stack_exception.hpp>
-#endif
-
 #ifdef USE_WIN32
 #include <windows.h>
 #include <dbghelp.h>
@@ -404,9 +399,7 @@ void Exit(int err)
 */
 void ExitFatal(int err)
 {
-#ifdef USE_STACKTRACE
-	throw stacktrace::stack_runtime_error((const char*)err);
-#endif
+	log::log_stacktrace();
 	exit(err);
 }
 
@@ -663,9 +656,6 @@ void stratagusMain(int argc, char **argv)
 	}
 #endif
 
-#ifdef USE_STACKTRACE
-	try {
-#endif
 	Parameters &parameters = Parameters::Instance;
 	parameters.SetDefaultValues();
 	parameters.SetLocalPlayerNameFromEnv();
@@ -735,16 +725,6 @@ void stratagusMain(int argc, char **argv)
 	}
 
 	Exit(0);
-#ifdef USE_STACKTRACE
-	} catch (const std::exception &e) {
-		fprintf(stderr, "" NAME " crashed!\n");
-		fprintf(stderr, "Please send this call stack to our bug tracker: " HOMEPAGE "/issues\n");
-		fprintf(stderr, "and tell us what caused this bug to occur.\n");
-		fprintf(stderr, " === exception state traceback === \n");
-		fprintf(stderr, "%s", e.what());
-		exit(1);
-	}
-#endif
 }
 
 //Wyrmgus start
