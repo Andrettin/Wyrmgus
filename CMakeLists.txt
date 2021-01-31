@@ -1339,6 +1339,11 @@ if (WIN32 AND MINGW)
 	set(stratagus_LIBS ${stratagus_LIBS} dxguid)
 endif()
 
+if (UNIX)
+	#linking with libdl is necessary for Boost.Stacktrace
+	set(stratagus_LIBS ${stratagus_LIBS} dl)
+endif()
+
 if(APPLE)
 	add_definitions(-DUSE_MAC)
 	set(SDL_LIBRARY ${SDL_LIBRARY} SDLmain)	
