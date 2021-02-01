@@ -1259,7 +1259,7 @@ option(ENABLE_DEV "Install Stratagus game development headers files" OFF)
 option(ENABLE_UPX "Compress Stratagus executable binary with UPX packer" OFF)
 option(ENABLE_STRIP "Strip all symbols from executables" OFF)
 option(ENABLE_USEGAMEDIR "Place all files created by Stratagus(logs, savegames) in game directory(old behavior), otherwise place everything in user directory(new behavior)" ON)
-option(ENABLE_MULTIBUILD "Compile Stratagus on all CPU cores simltaneously in MSVC" ON)
+option(ENABLE_MULTIBUILD "Compile Stratagus on all CPU cores simultaneously in MSVC" ON)
 option(WITH_GEOJSON "Compile with support for generating map data from GeoJSON files" ON)
 
 if(NOT WITH_RENDERER)
