@@ -15,15 +15,8 @@ binname=wyrmsun$archsuffix
 cmake \
       -DENABLE_STATIC=OFF \
       -DWITH_BZIP2=OFF \
-      -DWITH_FLUIDSYNTH=OFF \
-      -DWITH_MIKMOD=ON \
-      -DWITH_MNG=OFF \
-      -DWITH_OGGVORBIS=ON \
-      -DWITH_THEORA=OFF \
-      -DWITH_STACKTRACE=OFF \
       -DWITH_X11=ON \
-      -DWITH_OAML=ON \
-      -DOAML_FORCE_STATIC=ON \
+      -DWITH_GEOJSON=OFF \
       $@
 
 # Hack to link lua 5.1 statically
