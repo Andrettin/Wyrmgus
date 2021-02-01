@@ -181,6 +181,7 @@ extern TriggerDataType TriggerData;
 extern int TriggerGetPlayer(lua_State *l);/// get player number.
 extern const wyrmgus::unit_type *TriggerGetUnitType(lua_State *l); /// get the unit-type
 extern void TriggersEachCycle();    /// test triggers
+extern void call_trigger(const std::string &identifier);
 
 extern void TriggerCclRegister();   /// Register ccl features
 extern void SaveTriggers(CFile &file); /// Save the trigger module

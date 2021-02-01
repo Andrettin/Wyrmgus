@@ -746,6 +746,18 @@ void trigger::add_effect(std::unique_ptr<effect<CPlayer>> &&effect)
 
 }
 
+void call_trigger(const std::string &identifier)
+{
+	const trigger *trigger = trigger::try_get(identifier);
+	if (trigger != nullptr) {
+		if (trigger->get_effects() != nullptr) {
+			context ctx;
+			ctx.current_player = CPlayer::GetThisPlayer();
+			trigger->get_effects()->do_effects(CPlayer::GetThisPlayer(), ctx);
+		}
+	}
+}
+
 /**
 **  Register CCL features for triggers.
 */

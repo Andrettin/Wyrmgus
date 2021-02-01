@@ -1,3 +1,5 @@
+$#include "script/trigger.h"
+
 $int GetNumOpponents(int player);
 int GetNumOpponents(int player);
 
@@ -20,3 +22,5 @@ void ActionStopTimer();
 
 $void SetCurrentTriggerId(unsigned int trigger_id);
 void SetCurrentTriggerId(unsigned int trigger_id);
+
+extern void call_trigger(std::string identifier);
