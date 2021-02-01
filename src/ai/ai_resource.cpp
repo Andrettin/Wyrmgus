@@ -104,6 +104,10 @@ static int AiCheckCosts(const int *costs)
 	const int *storedresources = AiPlayer->Player->StoredResources;
 	const int *reserve = AiPlayer->Reserve;
 	for (int i = 1; i < MaxCosts; ++i) {
+		if (costs[i] == 0) {
+			continue;
+		}
+
 		if (resources[i] + storedresources[i] - used[i] < costs[i] - reserve[i]) {
 			err |= 1 << i;
 		}

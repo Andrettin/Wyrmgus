@@ -3314,6 +3314,10 @@ int CPlayer::CheckCosts(const int *costs, bool notify) const
 	int err = 0;
 
 	for (int i = 1; i < MaxCosts; ++i) {
+		if (costs[i] == 0) {
+			continue;
+		}
+
 		if (this->Resources[i] + this->StoredResources[i] >= costs[i]) {
 			continue;
 		}
