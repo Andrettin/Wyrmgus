@@ -43,7 +43,9 @@ class preferences final : public QObject, public singleton<preferences>
 	Q_PROPERTY(wyrmgus::campaign* selected_campaign READ get_selected_campaign WRITE set_selected_campaign)
 
 public:
-	std::filesystem::path get_path() const;
+	static std::filesystem::path get_path();
+	static std::filesystem::path get_fallback_path();
+
 	void load();
 	void save() const;
 	void process_sml_property(const sml_property &property);

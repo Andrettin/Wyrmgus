@@ -542,6 +542,43 @@ void database::modify_list_property_for_object(QObject *object, const std::strin
 	}
 }
 
+std::filesystem::path database::get_documents_path()
+{
+	std::filesystem::path documents_path = QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation).toStdString();
+	if (documents_path.empty()) {
+		exception::throw_with_trace(std::runtime_error("No documents path found."));
+	}
+
+	documents_path /= QApplication::applicationName().toStdString();
+
+	return documents_path;
+}
+
+std::filesystem::path database::get_user_data_path()
+{
+	const std::filesystem::path path = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation).toStdString();
+	if (path.empty()) {
+		exception::throw_with_trace(std::runtime_error("No user data path found."));
+	}
+
+	//ensure that the user data path exists
+	database::ensure_path_exists(path);
+
+	return path;
+}
+
+void database::ensure_path_exists(const std::filesystem::path &path)
+{
+	//create the path if necessary
+	if (!std::filesystem::exists(path)) {
+		const bool success = std::filesystem::create_directories(path);
+		if (!success) {
+			exception::throw_with_trace(std::runtime_error("Failed to create path for Wyrmsun: \"" + path.string() + "\"."));
+		}
+	}
+}
+
+
 const std::filesystem::path &database::get_base_path(const data_module *data_module) const
 {
 	if (data_module != nullptr) {

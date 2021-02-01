@@ -39,17 +39,26 @@
 
 namespace wyrmgus {
 
-std::filesystem::path preferences::get_path() const
+std::filesystem::path preferences::get_path()
+{
+	return database::get_user_data_path() / "preferences.txt";
+}
+
+std::filesystem::path preferences::get_fallback_path()
 {
 	return database::get_documents_path() / "preferences.txt";
 }
 
 void preferences::load()
 {
-	const std::filesystem::path preferences_path = this->get_path();
+	std::filesystem::path preferences_path = preferences::get_path();
 
 	if (!std::filesystem::exists(preferences_path)) {
-		return;
+		preferences_path = preferences::get_fallback_path();
+
+		if (!std::filesystem::exists(preferences_path)) {
+			return;
+		}
 	}
 
 	sml_parser parser;
@@ -59,7 +68,7 @@ void preferences::load()
 
 void preferences::save() const
 {
-	const std::filesystem::path preferences_path = this->get_path();
+	const std::filesystem::path preferences_path = preferences::get_path();
 
 	sml_data data(preferences_path.filename().stem().string());
 
