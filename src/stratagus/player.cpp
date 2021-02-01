@@ -3023,12 +3023,12 @@ void CPlayer::set_resource(const wyrmgus::resource *resource, const int value, c
 			this->Resources[resource->get_index()] = std::max(0, toRes);
 			this->StoredResources[resource->get_index()] = std::min(value - toRes, this->MaxResources[resource->get_index()]);
 		} else {
-			this->Resources[resource->get_index()] = value;
+			this->Resources[resource->get_index()] = std::max(0, value);
 		}
 	} else if (type == STORE_BUILDING && this->MaxResources[resource->get_index()] != -1) {
 		this->StoredResources[resource->get_index()] = std::min(value, this->MaxResources[resource->get_index()]);
 	} else if (type == STORE_OVERALL) {
-		this->Resources[resource->get_index()] = value;
+		this->Resources[resource->get_index()] = std::max(0, value);
 	}
 }
 
