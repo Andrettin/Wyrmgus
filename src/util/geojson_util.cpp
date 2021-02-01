@@ -29,12 +29,15 @@
 
 #include "util/exception_util.h"
 
+#ifdef USE_GEOJSON
 #include <QtLocation/private/qgeojson_p.h>
+#endif
 
 namespace wyrmgus::geojson {
 
 std::vector<QVariantList> parse_folder(const std::filesystem::path &path)
 {
+#ifdef USE_GEOJSON
 	std::vector<QVariantList> geojson_data_list;
 
 	std::filesystem::recursive_directory_iterator dir_iterator(path);
@@ -65,6 +68,9 @@ std::vector<QVariantList> parse_folder(const std::filesystem::path &path)
 	}
 
 	return geojson_data_list;
+#else
+	exception::throw_with_trace(std::runtime_error("GeoJSON support not enabled."));
+#endif
 }
 
 }
