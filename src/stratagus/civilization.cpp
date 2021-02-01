@@ -213,13 +213,6 @@ void civilization::initialize()
 			}
 		}
 
-		//inherit historical upgrades from the parent civilization, if no historical data is given for that upgrade for this civilization
-		for (std::map<std::string, std::map<CDate, bool>>::const_iterator iterator = parent_civilization->HistoricalUpgrades.begin(); iterator != parent_civilization->HistoricalUpgrades.end(); ++iterator) {
-			if (this->HistoricalUpgrades.find(iterator->first) == this->HistoricalUpgrades.end()) {
-				this->HistoricalUpgrades[iterator->first] = iterator->second;
-			}
-		}
-
 		//unit sounds
 		if (parent_civilization->unit_sound_set != nullptr) {
 			if (this->unit_sound_set == nullptr) {

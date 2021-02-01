@@ -347,8 +347,6 @@ public:
 private:
 	std::map<government_type, std::map<faction_tier, std::string>> title_names;
 	std::map<character_title, std::map<faction_type, std::map<government_type, std::map<faction_tier, std::map<gender, std::string>>>>> character_title_names;
-public:
-	std::map<std::string, std::map<CDate, bool>> HistoricalUpgrades;	/// historical upgrades of the faction, with the date of change
 
 	friend int ::CclDefineCivilization(lua_State *l);
 };

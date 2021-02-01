@@ -1051,32 +1051,6 @@ void CPlayer::apply_history(const CDate &start_date)
 	this->set_government_type(faction_history->get_government_type());
 	this->set_dynasty(faction_history->get_dynasty());
 
-	for (const auto &kv_pair : civilization->HistoricalUpgrades) {
-		const CUpgrade *upgrade = CUpgrade::get(kv_pair.first);
-		for (std::map<CDate, bool>::const_reverse_iterator second_iterator = kv_pair.second.rbegin(); second_iterator != kv_pair.second.rend(); ++second_iterator) {
-			if (second_iterator->first.Year == 0 || start_date.ContainsDate(second_iterator->first)) {
-				if (second_iterator->second && UpgradeIdentAllowed(*this, kv_pair.first.c_str()) != 'R') {
-					UpgradeAcquire(*this, upgrade);
-				} else if (!second_iterator->second) {
-					break;
-				}
-			}
-		}
-	}
-
-	for (const auto &kv_pair : faction->HistoricalUpgrades) {
-		const CUpgrade *upgrade = CUpgrade::get(kv_pair.first);
-		for (std::map<CDate, bool>::const_reverse_iterator second_iterator = kv_pair.second.rbegin(); second_iterator != kv_pair.second.rend(); ++second_iterator) {
-			if (second_iterator->first.Year == 0 || start_date.ContainsDate(second_iterator->first)) {
-				if (second_iterator->second && UpgradeIdentAllowed(*this, kv_pair.first.c_str()) != 'R') {
-					UpgradeAcquire(*this, upgrade);
-				} else if (!second_iterator->second) {
-					break;
-				}
-			}
-		}
-	}
-
 	for (const CUpgrade *upgrade : faction_history->get_acquired_upgrades()) {
 		if (UpgradeIdAllowed(*this, upgrade->ID) != 'R') {
 			UpgradeAcquire(*this, upgrade);

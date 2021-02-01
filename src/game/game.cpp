@@ -1648,7 +1648,7 @@ void CreateGame(const std::string &filename, CMap *map, bool is_mod)
 		const int hour = SyncRand(CDate::hours_per_day);
 		QDate date(year, month, day);;
 		QDateTime date_time(date, QTime(hour, 0));
-		wyrmgus::game::get()->set_current_date(date_time);
+		game::get()->set_current_date(date_time);
 	}
 	
 	CDate::CurrentTotalHours = CDate(wyrmgus::game::get()->get_current_date()).GetTotalHours();

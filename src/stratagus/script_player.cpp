@@ -972,25 +972,6 @@ static int CclDefineCivilization(lua_State *l)
 				++k;
 				civilization->character_title_names[title][wyrmgus::faction_type::none][government_type][tier][gender] = LuaToString(l, -1, k + 1);
 			}
-		} else if (!strcmp(value, "HistoricalUpgrades")) {
-			if (!lua_istable(l, -1)) {
-				LuaError(l, "incorrect argument");
-			}
-			const int subargs = lua_rawlen(l, -1);
-			for (int j = 0; j < subargs; ++j) {
-				CDate date;
-				lua_rawgeti(l, -1, j + 1);
-				CclGetDate(l, &date);
-				lua_pop(l, 1);
-				++j;
-
-				std::string technology_ident = LuaToString(l, -1, j + 1);
-				++j;
-				
-				bool has_upgrade = LuaToBoolean(l, -1, j + 1);
-
-				civilization->HistoricalUpgrades[technology_ident][date] = has_upgrade;
-			}
 		} else {
 			LuaError(l, "Unsupported tag: %s" _C_ value);
 		}
@@ -1712,25 +1693,6 @@ static int CclDefineFaction(lua_State *l)
 			const int args = lua_rawlen(l, -1);
 			for (int j = 0; j < args; ++j) {
 				faction->ProvinceNames.push_back(LuaToString(l, -1, j + 1));
-			}
-		} else if (!strcmp(value, "HistoricalUpgrades")) {
-			if (!lua_istable(l, -1)) {
-				LuaError(l, "incorrect argument");
-			}
-			const int subargs = lua_rawlen(l, -1);
-			for (int j = 0; j < subargs; ++j) {
-				CDate date;
-				lua_rawgeti(l, -1, j + 1);
-				CclGetDate(l, &date);
-				lua_pop(l, 1);
-				++j;
-
-				std::string technology_ident = LuaToString(l, -1, j + 1);
-				++j;
-				
-				bool has_upgrade = LuaToBoolean(l, -1, j + 1);
-
-				faction->HistoricalUpgrades[technology_ident][date] = has_upgrade;
 			}
 		} else if (!strcmp(value, "HistoricalTiers")) {
 			if (!lua_istable(l, -1)) {

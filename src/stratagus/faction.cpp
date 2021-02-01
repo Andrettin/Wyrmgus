@@ -205,12 +205,6 @@ void faction::initialize()
 				this->ButtonIcons[iterator->first] = iterator->second;
 			}
 		}
-
-		for (std::map<std::string, std::map<CDate, bool>>::const_iterator iterator = parent_faction->HistoricalUpgrades.begin(); iterator != parent_faction->HistoricalUpgrades.end(); ++iterator) {
-			if (this->HistoricalUpgrades.find(iterator->first) == this->HistoricalUpgrades.end()) {
-				this->HistoricalUpgrades[iterator->first] = iterator->second;
-			}
-		}
 	}
 
 	if (this->get_min_tier() == faction_tier::none) {
