@@ -42,8 +42,6 @@ public:
 
 	static CDate FromString(const std::string &date_str);
 	
-	static QCalendar calendar;
-
 public:
 	CDate()
 	{

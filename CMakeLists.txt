@@ -1628,7 +1628,6 @@ target_precompile_headers(stratagus PRIVATE
 	<variant>
 	<vector>
 	<QApplication>
-	<QCalendar>
 	<QColor>
 	<QDateTime>
 	<QDebug>
