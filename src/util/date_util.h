@@ -55,9 +55,9 @@ inline std::string to_string(const QDateTime &date_time)
 	return date::to_string(date) + '.' + std::to_string(time.hour());
 }
 
-inline int get_days_in_month(const int month)
+inline int get_days_in_month(const int month, const int year)
 {
-	return QDate(1500, month, 1).daysInMonth();
+	return QDate(year, month, 1).daysInMonth();
 }
 
 }

@@ -1645,7 +1645,7 @@ void CreateGame(const std::string &filename, CMap *map, bool is_mod)
 	} else {
 		const int year = 1;
 		const int month = random::get()->generate(date::months_per_year) + 1;
-		const int day = random::get()->generate(date::get_days_in_month(month)) + 1;
+		const int day = random::get()->generate(date::get_days_in_month(month, year)) + 1;
 		const int hour = random::get()->generate(date::hours_per_day);
 		QDate date(year, month, day);
 		QDateTime date_time(date, QTime(hour, 0));
