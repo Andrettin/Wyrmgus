@@ -105,6 +105,7 @@
 #include "unit/unit_manager.h"
 #include "unit/unit_type.h"
 #include "upgrade/upgrade.h"
+#include "util/date_util.h"
 #include "util/exception_util.h"
 #include "util/random.h"
 #include "util/string_util.h"
@@ -295,8 +296,8 @@ void game::clear_delayed_effects()
 
 void load_game_data(const std::string &sml_string)
 {
-	wyrmgus::sml_parser parser;
-	wyrmgus::database::process_sml_data(wyrmgus::game::get(), parser.parse(sml_string));
+	sml_parser parser;
+	database::process_sml_data(game::get(), parser.parse(sml_string));
 }
 
 /**
@@ -390,7 +391,7 @@ void StartMap(const std::string &filename, bool clean)
 		current_interface_state = interface_state::menu;
 
 		Gui->setTop(oldTop);
-		wyrmgus::vector::remove(Containers, container);
+		vector::remove(Containers, container);
 	} catch (...) {
 		std::throw_with_nested(std::runtime_error("Error running map."));
 	}
@@ -429,7 +430,7 @@ static void LoadStratagusMap(const std::string &smpname, const std::string &mapn
 
 	if (file.open(mapfull, CL_OPEN_READ) == -1) {
 		// Not found, try the root path and the smp's dir
-		strcpy_s(mapfull, sizeof(mapfull), wyrmgus::database::get()->get_root_path().string().c_str());
+		strcpy_s(mapfull, sizeof(mapfull), database::get()->get_root_path().string().c_str());
 		strcat_s(mapfull, sizeof(mapfull), "/");
 		strcat_s(mapfull, sizeof(mapfull), smpname.c_str());
 		char *p2 = strrchr(mapfull, '/');
@@ -441,7 +442,7 @@ static void LoadStratagusMap(const std::string &smpname, const std::string &mapn
 		strcpy_s(p2, sizeof(mapfull) - (p2 - mapfull), mapname.c_str());
 		if (file.open(mapfull, CL_OPEN_READ) == -1) {
 			// Not found again, try the root path
-			strcpy_s(mapfull, sizeof(mapfull), wyrmgus::database::get()->get_root_path().string().c_str());
+			strcpy_s(mapfull, sizeof(mapfull), database::get()->get_root_path().string().c_str());
 			strcat_s(mapfull, sizeof(mapfull), "/");
 			strcat_s(mapfull, sizeof(mapfull), mapname.c_str());
 			if (file.open(mapfull, CL_OPEN_READ) == -1) {
@@ -579,9 +580,9 @@ int WriteMapSetup(const char *mapSetup, CMap &map, int writeTerrain, bool is_mod
 		
 		//Wyrmgus start
 		std::string mod_file(mapSetup);
-		mod_file = FindAndReplaceStringBeginning(mod_file, wyrmgus::database::get()->get_root_path().string() + "/", "");
+		mod_file = FindAndReplaceStringBeginning(mod_file, database::get()->get_root_path().string() + "/", "");
 		
-		for (const wyrmgus::faction *faction : wyrmgus::faction::get_all()) {
+		for (const faction *faction : faction::get_all()) {
 			if (faction->Mod != CMap::Map.Info.Filename) {
 				continue;
 			}
@@ -589,8 +590,8 @@ int WriteMapSetup(const char *mapSetup, CMap &map, int writeTerrain, bool is_mod
 			f->printf("DefineFaction(\"%s\", {\n", faction->get_identifier().c_str());
 			f->printf("\tName = \"%s\",\n", faction->get_name().c_str());
 			f->printf("\tCivilization = \"%s\",\n", faction->get_civilization()->get_identifier().c_str());
-			if (faction->get_type() != wyrmgus::faction_type::none) {
-				f->printf("\tType = \"%s\",\n", wyrmgus::faction_type_to_string(faction->get_type()).c_str());
+			if (faction->get_type() != faction_type::none) {
+				f->printf("\tType = \"%s\",\n", faction_type_to_string(faction->get_type()).c_str());
 			}
 			if (faction->get_parent_faction() != nullptr) {
 				f->printf("\tParentFaction = \"%s\",\n", faction->get_parent_faction()->get_identifier().c_str());
@@ -605,7 +606,7 @@ int WriteMapSetup(const char *mapSetup, CMap &map, int writeTerrain, bool is_mod
 			f->printf("})\n\n");
 		}
 		
-		for (const wyrmgus::unit_type *unit_type : wyrmgus::unit_type::get_all()) {
+		for (const unit_type *unit_type : unit_type::get_all()) {
 			if (unit_type->Mod != CMap::Map.Info.Filename) {
 				continue;
 			}
@@ -654,7 +655,7 @@ int WriteMapSetup(const char *mapSetup, CMap &map, int writeTerrain, bool is_mod
 			f->printf("},\n");
 			f->printf("\tUnitStock = {");
 			for (const auto &kv_pair : unit_type->DefaultStat.UnitStock) {
-				const wyrmgus::unit_type *other_unit_type = wyrmgus::unit_type::get_all()[kv_pair.first];
+				const wyrmgus::unit_type *other_unit_type = unit_type::get_all()[kv_pair.first];
 				const int unit_stock = kv_pair.second;
 
 				if (unit_stock != 0 && (!unit_type->Parent || unit_stock != unit_type->Parent->DefaultStat.GetUnitStock(other_unit_type))) {
@@ -689,11 +690,11 @@ int WriteMapSetup(const char *mapSetup, CMap &map, int writeTerrain, bool is_mod
 				f->printf("\tButtonHint = \"%s\",\n", unit_type->ButtonHint.c_str());
 			}
 			
-			const wyrmgus::unit_sound_set *sound_set = unit_type->get_sound_set();
+			const unit_sound_set *sound_set = unit_type->get_sound_set();
 			if (sound_set != nullptr) {
 				f->printf("\tSounds = {\n");
 
-				const wyrmgus::unit_sound_set *parent_sound_set = nullptr;
+				const unit_sound_set *parent_sound_set = nullptr;
 				if (unit_type->Parent != nullptr) {
 					parent_sound_set = unit_type->Parent->get_sound_set();
 				}
@@ -774,7 +775,7 @@ int WriteMapSetup(const char *mapSetup, CMap &map, int writeTerrain, bool is_mod
 		}
 		
 		//save the definition of trained unit types separately, to avoid issues like a trained unit being defined after the unit that trains it
-		for (const wyrmgus::unit_type *unit_type : wyrmgus::unit_type::get_all()) {
+		for (const unit_type *unit_type : unit_type::get_all()) {
 			if (unit_type->Mod != CMap::Map.Info.Filename) {
 				continue;
 			}
@@ -792,7 +793,7 @@ int WriteMapSetup(const char *mapSetup, CMap &map, int writeTerrain, bool is_mod
 			}
 		}		
 
-		for (const wyrmgus::unit_type *unit_type : wyrmgus::unit_type::get_all()) {
+		for (const unit_type *unit_type : unit_type::get_all()) {
 			const auto mod_trains_find_iterator = unit_type->ModTrains.find(CMap::Map.Info.Filename);
 			if (mod_trains_find_iterator != unit_type->ModTrains.end()) {
 				f->printf("SetModTrains(\"%s\", \"%s\", {", mod_file.c_str(), unit_type->Ident.c_str());
@@ -862,7 +863,7 @@ int WriteMapSetup(const char *mapSetup, CMap &map, int writeTerrain, bool is_mod
 						  i, DefaultResourceNames[StoneCost].c_str(),
 						  CPlayer::Players[i]->Resources[StoneCost]);
 				f->printf("SetPlayerData(%d, \"RaceName\", \"%s\")\n",
-						  i, wyrmgus::civilization::get_all()[CPlayer::Players[i]->Race]->get_identifier().c_str());
+						  i, civilization::get_all()[CPlayer::Players[i]->Race]->get_identifier().c_str());
 				if (CPlayer::Players[i]->Faction != -1) {
 					f->printf("SetPlayerData(%d, \"Faction\", \"%s\")\n",
 							  i, CPlayer::Players[i]->get_faction()->get_identifier().c_str());
@@ -884,7 +885,7 @@ int WriteMapSetup(const char *mapSetup, CMap &map, int writeTerrain, bool is_mod
 				for (int y = 0; y < map_layer->get_height(); ++y) {
 					for (int x = 0; x < map_layer->get_width(); ++x) {
 						//Wyrmgus start
-						const wyrmgus::tile &mf = *map_layer->Field(x, y);
+						const tile &mf = *map_layer->Field(x, y);
 	//					const int tile = mf.getGraphicTile();
 	//					const int n = map.Tileset->findTileIndexByTile(tile);
 						//Wyrmgus end
@@ -903,7 +904,7 @@ int WriteMapSetup(const char *mapSetup, CMap &map, int writeTerrain, bool is_mod
 		}
 			
 		f->printf("\n-- set map default stat and map sound for unit types\n");
-		for (wyrmgus::unit_type *unit_type : wyrmgus::unit_type::get_all()) {
+		for (unit_type *unit_type : unit_type::get_all()) {
 			if (unit_type->ModDefaultStats.find(CMap::Map.Info.Filename) != unit_type->ModDefaultStats.end()) {
 				for (unsigned int j = 0; j < MaxCosts; ++j) {
 					if (unit_type->ModDefaultStats[CMap::Map.Info.Filename].Costs[j] != 0) {
@@ -917,7 +918,7 @@ int WriteMapSetup(const char *mapSetup, CMap &map, int writeTerrain, bool is_mod
 				}
 
 				for (const auto &kv_pair : unit_type->ModDefaultStats[CMap::Map.Info.Filename].UnitStock) {
-					const wyrmgus::unit_type *other_unit_type = wyrmgus::unit_type::get_all()[kv_pair.first];
+					const wyrmgus::unit_type *other_unit_type = unit_type::get_all()[kv_pair.first];
 					const int unit_stock = kv_pair.second;
 
 					if (unit_stock != 0) {
@@ -1018,7 +1019,7 @@ int WriteMapSetup(const char *mapSetup, CMap &map, int writeTerrain, bool is_mod
 		f->printf("\n-- place units\n");
 		f->printf("if (MapUnitsInit ~= nil) then MapUnitsInit() end\n");
 		std::vector<CUnit *> teleporters;
-		for (auto it = wyrmgus::unit_manager::get()->get_units().begin(); it != wyrmgus::unit_manager::get()->get_units().end(); ++it) {
+		for (auto it = unit_manager::get()->get_units().begin(); it != unit_manager::get()->get_units().end(); ++it) {
 			const CUnit &unit = **it;
 			f->printf("unit = CreateUnit(\"%s\", %d, {%d, %d})\n",
 					  unit.Type->Ident.c_str(),
@@ -1045,7 +1046,7 @@ int WriteMapSetup(const char *mapSetup, CMap &map, int writeTerrain, bool is_mod
 			f->printf("\n-- place units\n");
 			f->printf("if (MapUnitsInit ~= nil) then MapUnitsInit() end\n");
 			std::vector<const CUnit *> teleporters;
-			for (const CUnit *unit : wyrmgus::unit_manager::get()->get_units()) {
+			for (const CUnit *unit : unit_manager::get()->get_units()) {
 				f->printf("unit = CreateUnit(\"%s\", %d, {%d, %d})\n",
 						  unit->Type->Ident.c_str(),
 						  unit->Player->Index,
@@ -1269,13 +1270,13 @@ static void GameTypeMelee()
 			}
 
 			if (CPlayer::Players[i]->Type == PlayerComputer && CPlayer::Players[j]->Type == PlayerComputer) {
-				CommandDiplomacy(i, wyrmgus::diplomacy_state::allied, j);
+				CommandDiplomacy(i, diplomacy_state::allied, j);
 				CPlayer::Players[i]->ShareVisionWith(*CPlayer::Players[j]);
-				CommandDiplomacy(j, wyrmgus::diplomacy_state::allied, i);
+				CommandDiplomacy(j, diplomacy_state::allied, i);
 				CPlayer::Players[j]->ShareVisionWith(*CPlayer::Players[i]);
 			} else {
-				CommandDiplomacy(i, wyrmgus::diplomacy_state::enemy, j);
-				CommandDiplomacy(j, wyrmgus::diplomacy_state::enemy, i);
+				CommandDiplomacy(i, diplomacy_state::enemy, j);
+				CommandDiplomacy(j, diplomacy_state::enemy, i);
 			}
 		}
 	}
@@ -1297,8 +1298,8 @@ static void GameTypeFreeForAll()
 				continue;
 			}
 			
-			CommandDiplomacy(i, wyrmgus::diplomacy_state::enemy, j);
-			CommandDiplomacy(j, wyrmgus::diplomacy_state::enemy, i);
+			CommandDiplomacy(i, diplomacy_state::enemy, j);
+			CommandDiplomacy(j, diplomacy_state::enemy, i);
 		}
 	}
 }
@@ -1325,13 +1326,13 @@ static void GameTypeTopVsBottom()
 			const bool top_j = CPlayer::Players[j]->StartPos.y <= middle;
 
 			if (top_i == top_j) {
-				CommandDiplomacy(i, wyrmgus::diplomacy_state::allied, j);
+				CommandDiplomacy(i, diplomacy_state::allied, j);
 				CPlayer::Players[i]->ShareVisionWith(*CPlayer::Players[j]);
-				CommandDiplomacy(j, wyrmgus::diplomacy_state::allied, i);
+				CommandDiplomacy(j, diplomacy_state::allied, i);
 				CPlayer::Players[j]->ShareVisionWith(*CPlayer::Players[i]);
 			} else {
-				CommandDiplomacy(i, wyrmgus::diplomacy_state::enemy, j);
-				CommandDiplomacy(j, wyrmgus::diplomacy_state::enemy, i);
+				CommandDiplomacy(i, diplomacy_state::enemy, j);
+				CommandDiplomacy(j, diplomacy_state::enemy, i);
 			}
 		}
 	}
@@ -1359,13 +1360,13 @@ static void GameTypeLeftVsRight()
 			const bool left_j = CPlayer::Players[j]->StartPos.x <= middle;
 
 			if (left_i == left_j) {
-				CommandDiplomacy(i, wyrmgus::diplomacy_state::allied, j);
+				CommandDiplomacy(i, diplomacy_state::allied, j);
 				CPlayer::Players[i]->ShareVisionWith(*CPlayer::Players[j]);
-				CommandDiplomacy(j, wyrmgus::diplomacy_state::allied, i);
+				CommandDiplomacy(j, diplomacy_state::allied, i);
 				CPlayer::Players[j]->ShareVisionWith(*CPlayer::Players[i]);
 			} else {
-				CommandDiplomacy(i, wyrmgus::diplomacy_state::enemy, j);
-				CommandDiplomacy(j, wyrmgus::diplomacy_state::enemy, i);
+				CommandDiplomacy(i, diplomacy_state::enemy, j);
+				CommandDiplomacy(j, diplomacy_state::enemy, i);
 			}
 		}
 	}
@@ -1393,13 +1394,13 @@ static void GameTypeManVsMachine()
 			}
 
 			if (CPlayer::Players[i]->Type == CPlayer::Players[j]->Type) {
-				CommandDiplomacy(i, wyrmgus::diplomacy_state::allied, j);
+				CommandDiplomacy(i, diplomacy_state::allied, j);
 				CPlayer::Players[i]->ShareVisionWith(*CPlayer::Players[j]);
-				CommandDiplomacy(j, wyrmgus::diplomacy_state::allied, i);
+				CommandDiplomacy(j, diplomacy_state::allied, i);
 				CPlayer::Players[j]->ShareVisionWith(*CPlayer::Players[i]);
 			} else {
-				CommandDiplomacy(i, wyrmgus::diplomacy_state::enemy, j);
-				CommandDiplomacy(j, wyrmgus::diplomacy_state::enemy, i);
+				CommandDiplomacy(i, diplomacy_state::enemy, j);
+				CommandDiplomacy(j, diplomacy_state::enemy, i);
 			}
 		}
 	}
@@ -1425,10 +1426,10 @@ static void GameTypeManTeamVsMachine()
 
 			if (i != j) {
 				if (CPlayer::Players[i]->Type == CPlayer::Players[j]->Type) {
-					CommandDiplomacy(i, wyrmgus::diplomacy_state::allied, j);
+					CommandDiplomacy(i, diplomacy_state::allied, j);
 					CPlayer::Players[i]->ShareVisionWith(*CPlayer::Players[j]);
 				} else {
-					CommandDiplomacy(i, wyrmgus::diplomacy_state::enemy, j);
+					CommandDiplomacy(i, diplomacy_state::enemy, j);
 				}
 			}
 		}
@@ -1450,7 +1451,7 @@ static std::shared_ptr<CGraphic> loadingEmpty;
 static std::shared_ptr<CGraphic> loadingFull;
 static std::vector<std::string> loadingBackgrounds;
 std::shared_ptr<CGraphic> loadingBackground;
-static wyrmgus::font *loadingFont = nullptr;
+static font *loadingFont = nullptr;
 static std::vector<std::string> loadingTips;
 static std::vector<std::string> loadingTip;
 
@@ -1519,7 +1520,7 @@ void CalculateItemsToLoad()
 		if (CPlayer::GetThisPlayer()) {
 			itemsToLoad+= GetCursorsCount();
 		}
-		itemsToLoad += wyrmgus::icon::get_to_load_count();
+		itemsToLoad += icon::get_to_load_count();
 		itemsToLoad += GetUnitTypesCount();
 		itemsToLoad += GetDecorationsCount();
 		itemsToLoad += GetConstructionsCount();
@@ -1535,7 +1536,7 @@ void CalculateItemsToLoad()
 		std::string base_loadingTip = _(loadingTips[rand()%loadingTips.size()].c_str());
 		
 		int str_width_per_total_width = 1;
-		str_width_per_total_width += wyrmgus::defines::get()->get_game_font()->Width(base_loadingTip) / Video.Width;
+		str_width_per_total_width += defines::get()->get_game_font()->Width(base_loadingTip) / Video.Width;
 		
 	//	int line_length = Video.Width / GetGameFont().Width(1);
 		int line_length = base_loadingTip.size() / str_width_per_total_width;
@@ -1576,13 +1577,13 @@ void UpdateLoadingBar()
 	}
 
 	if (loadingFont == nullptr) {
-		loadingFont = wyrmgus::font::get("game");
+		loadingFont = font::get("game");
 	}
 
 	if (loadingFont != nullptr) {
 		CLabel label(loadingFont);
 		for (size_t i = 0; i < loadingTip.size(); ++i) {
-			label.DrawCentered(Video.Width/2, y + 10 + (wyrmgus::defines::get()->get_game_font()->Height() * i), loadingTip[i]);
+			label.DrawCentered(Video.Width/2, y + 10 + (defines::get()->get_game_font()->Height() * i), loadingTip[i]);
 		}
 	}
 }
@@ -1635,12 +1636,12 @@ void CreateGame(const std::string &filename, CMap *map, bool is_mod)
 	//Wyrmgus start
 	if (IsNetworkGame()) { // if is a network game, it is necessary to reinitialize the syncrand variables before beginning to load the map, due to random map generation
 		SyncHash = 0;
-		wyrmgus::random::get()->reset_seed(true);
+		random::get()->reset_seed(true);
 	}
 	
-	const wyrmgus::campaign *current_campaign = wyrmgus::game::get()->get_current_campaign();
+	const campaign *current_campaign = game::get()->get_current_campaign();
 	if (current_campaign) {
-		wyrmgus::game::get()->set_current_date(current_campaign->get_start_date());
+		game::get()->set_current_date(current_campaign->get_start_date());
 	} else {
 		const int year = 1;
 		const int month = random::get()->generate(date::months_per_year) + 1;
@@ -1654,7 +1655,7 @@ void CreateGame(const std::string &filename, CMap *map, bool is_mod)
 	const uint64_t total_hours = game::base_date.secsTo(game::get()->get_current_date()) / 60 / 60;
 	game::get()->set_current_total_hours(total_hours);
 
-	wyrmgus::age::current_age = nullptr;
+	age::current_age = nullptr;
 	//Wyrmgus end
 
 	if (CMap::Map.Info.Filename.empty() && !filename.empty()) {
@@ -1701,7 +1702,7 @@ void CreateGame(const std::string &filename, CMap *map, bool is_mod)
 	GameCycle = 0;
 	FastForwardCycle = 0;
 	SyncHash = 0;
-	wyrmgus::random::get()->reset_seed(IsNetworkGame());
+	random::get()->reset_seed(IsNetworkGame());
 
 	if (IsNetworkGame()) { // Prepare network play
 		NetworkOnStartGame();
@@ -1778,10 +1779,10 @@ void CreateGame(const std::string &filename, CMap *map, bool is_mod)
 	UnitUnderCursor = NoUnitP;
 
 	//Wyrmgus start
-	wyrmgus::terrain_type::LoadTerrainTypeGraphics();
+	terrain_type::LoadTerrainTypeGraphics();
 	//Wyrmgus end
-	wyrmgus::resource_icon::load_all();
-	wyrmgus::icon::load_all();
+	resource_icon::load_all();
+	icon::load_all();
 	InitMissileTypes();
 #ifndef DYNAMIC_LOAD
 	LoadMissileSprites();
@@ -1804,7 +1805,7 @@ void CreateGame(const std::string &filename, CMap *map, bool is_mod)
 
 	//Wyrmgus start
 	//update the sight of all units
-	for (CUnit *unit : wyrmgus::unit_manager::get()->get_units()) {
+	for (CUnit *unit : unit_manager::get()->get_units()) {
 		if (!unit->Destroyed) {
 			MapUnmarkUnitSight(*unit);
 			UpdateUnitSightRange(*unit);
@@ -1839,7 +1840,7 @@ void CreateGame(const std::string &filename, CMap *map, bool is_mod)
 	//
 	// Triggers
 	//
-	wyrmgus::trigger::InitActiveTriggers();
+	trigger::InitActiveTriggers();
 	
 #if 0
 	if (!UI.SelectedViewport) {
@@ -1913,8 +1914,8 @@ void CleanGame()
 	CleanMessages();
 
 	CleanGame_Lua();
-	wyrmgus::trigger::ClearActiveTriggers();
-	wyrmgus::game::get()->clear_delayed_effects();
+	trigger::ClearActiveTriggers();
+	game::get()->clear_delayed_effects();
 	CleanAi();
 	CleanGroups();
 	CleanMissiles();
@@ -2151,7 +2152,7 @@ static int CclDefineResource(lua_State *l)
 	if (resource_id == -1) {
 		LuaError(l, "Resource \"%s\" doesn't exist." _C_ resource_ident.c_str());
 	}
-	wyrmgus::resource *resource = wyrmgus::resource::get_all()[resource_id];
+	resource *resource = resource::get_all()[resource_id];
 	
 	//  Parse the list:
 	for (lua_pushnil(l); lua_next(l, 2); lua_pop(l, 1)) {
@@ -2169,7 +2170,7 @@ static int CclDefineResource(lua_State *l)
 			resource->action_name = LuaToString(l, -1);
 		} else if (!strcmp(value, "FinalResource")) {
 			const std::string final_resource_ident = LuaToString(l, -1);
-			resource->final_resource = wyrmgus::resource::get(final_resource_ident);
+			resource->final_resource = resource::get(final_resource_ident);
 		} else if (!strcmp(value, "FinalResourceConversionRate")) {
 			resource->final_resource_conversion_rate = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "LuxuryResource")) {
@@ -2211,11 +2212,11 @@ static int CclDefineDefaultResourceNames(lua_State *l)
 	for (unsigned int i = 0; i < MaxCosts && i < args; ++i) {
 		DefaultResourceNames[i] = LuaToString(l, i + 1);
 		
-		wyrmgus::resource *resource = wyrmgus::resource::get_or_add(DefaultResourceNames[i], nullptr);
+		resource *resource = resource::get_or_add(DefaultResourceNames[i], nullptr);
 		resource->index = i;
 	}
 
-	wyrmgus::resource::sort_instances([](const wyrmgus::resource *a, const wyrmgus::resource *b) {
+	resource::sort_instances([](const resource *a, const resource *b) {
 		return a->get_index() < b->get_index();
 	});
 
@@ -2304,7 +2305,7 @@ static int CclSavedGameInfo(lua_State *l)
 
 		if (!strcmp(value, "SaveFile")) {
 			CurrentMapPath = LuaToString(l, -1);
-			std::string buf = wyrmgus::database::get()->get_root_path().string();
+			std::string buf = database::get()->get_root_path().string();
 			buf += "/";
 			buf += LuaToString(l, -1);
 			if (LuaLoadFile(buf) == -1) {
@@ -2313,7 +2314,7 @@ static int CclSavedGameInfo(lua_State *l)
 		} else if (!strcmp(value, "SyncHash")) {
 			SyncHash = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "SyncRandSeed")) {
-			wyrmgus::random::get()->set_seed(LuaToNumber(l, -1));
+			random::get()->set_seed(LuaToNumber(l, -1));
 		} else {
 			LuaError(l, "Unsupported tag: %s" _C_ value);
 		}
