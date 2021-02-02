@@ -28,6 +28,10 @@
 
 namespace wyrmgus::date {
 
+static constexpr int months_per_year = 12;
+static constexpr int days_per_year = 365;
+static constexpr int hours_per_day = 24;
+
 extern std::string year_to_string(const int year);
 
 inline std::string to_string(const QDate &date)
@@ -49,6 +53,11 @@ inline std::string to_string(const QDateTime &date_time)
 	const QTime time = date_time.time();
 
 	return date::to_string(date) + '.' + std::to_string(time.hour());
+}
+
+inline int get_days_in_month(const int month)
+{
+	return QDate(1500, month, 1).daysInMonth();
 }
 
 }

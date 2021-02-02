@@ -569,7 +569,7 @@ void GameMainLoop()
 	EndReplayLog();
 
 	GameCycle = 0;//????
-	CDate::CurrentTotalHours = 0;
+	game::get()->set_current_total_hours(0);
 	CParticleManager::exit();
 	FlagRevealMap = 0;
 	ReplayRevealMap = 0;

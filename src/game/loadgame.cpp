@@ -33,6 +33,7 @@
 #include "currency.h"
 #include "database/database.h"
 #include "dialogue.h"
+#include "game.h"
 //Wyrmgus start
 #include "grand_strategy.h"
 //Wyrmgus end
@@ -172,7 +173,7 @@ void CleanModules()
 void InitModules()
 {
 	GameCycle = 0;
-	CDate::CurrentTotalHours = 0;
+	game::get()->set_current_total_hours(0);
 	FastForwardCycle = 0;
 	SyncHash = 0;
 
@@ -294,15 +295,15 @@ void LoadGame(const std::string &filename)
 	PlaceUnits();
 
 	const unsigned long game_cycle = GameCycle;
-	const unsigned long long current_total_hours = CDate::CurrentTotalHours;
-	const unsigned syncrand = wyrmgus::random::get()->get_seed();
+	const uint64_t current_total_hours = game::get()->get_current_total_hours();
+	const unsigned syncrand = random::get()->get_seed();
 	const unsigned synchash = SyncHash;
 
 	InitModules();
 	LoadModules();
 
 	GameCycle = game_cycle;
-	CDate::CurrentTotalHours = current_total_hours;
+	game::get()->set_current_total_hours(current_total_hours);
 	wyrmgus::random::get()->set_seed(syncrand);
 	SyncHash = synchash;
 	SelectionChanged();

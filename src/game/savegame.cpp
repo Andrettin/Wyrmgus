@@ -152,7 +152,7 @@ int SaveGame(const std::string &filename)
 
 	// FIXME: probably not the right place for this
 	file.printf("GameCycle = %lu\n", GameCycle);
-	file.printf("SetCurrentTotalHours(%llu)\n", CDate::CurrentTotalHours);
+	file.printf("SetCurrentTotalHours(%llu)\n", game::get()->get_current_total_hours());
 	const QDateTime &current_date = wyrmgus::game::get()->get_current_date();
 	if (current_date.isValid()) {
 		file.printf("SetCurrentDate(\"%s\")\n", wyrmgus::date::to_string(current_date).c_str());

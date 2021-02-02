@@ -731,7 +731,7 @@ void map_template::apply(const QPoint &template_start_pos, const QPoint &map_sta
 				CMap::Map.MapLayers[z]->SeasonSchedule = CSeasonSchedule::DefaultSeasonSchedule;
 			}
 			
-			CMap::Map.MapLayers[z]->SetSeasonByHours(CDate::CurrentTotalHours);
+			CMap::Map.MapLayers[z]->SetSeasonByHours(game::get()->get_current_total_hours());
 			
 			CMap::Map.MapLayers[z]->TimeOfDaySchedule = nullptr;
 			CMap::Map.MapLayers[z]->SetTimeOfDay(nullptr);
@@ -745,7 +745,7 @@ void map_template::apply(const QPoint &template_start_pos, const QPoint &map_sta
 					CMap::Map.MapLayers[z]->TimeOfDaySchedule = CTimeOfDaySchedule::DefaultTimeOfDaySchedule;
 				}
 				
-				CMap::Map.MapLayers[z]->SetTimeOfDayByHours(CDate::CurrentTotalHours);
+				CMap::Map.MapLayers[z]->SetTimeOfDayByHours(game::get()->get_current_total_hours());
 			}
 		}
 	}

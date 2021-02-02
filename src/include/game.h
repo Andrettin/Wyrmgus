@@ -46,6 +46,8 @@ class delayed_effect_instance;
 class game final : public singleton<game>
 {
 public:
+	static inline const QDateTime base_date = QDateTime(QDate(-10000, 1, 1)); //10,000 BC; base date from which to calculate the current total hours from the base date
+
 	game();
 	~game();
 
@@ -67,6 +69,21 @@ public:
 	void set_current_date(const QDateTime &date)
 	{
 		this->current_date = date;
+	}
+
+	uint64_t get_current_total_hours() const
+	{
+		return this->current_total_hours;
+	}
+
+	void set_current_total_hours(const uint64_t hours)
+	{
+		this->current_total_hours = hours;
+	}
+
+	void increment_current_total_hours()
+	{
+		++this->current_total_hours;
 	}
 
 	void apply_player_history();
@@ -110,6 +127,7 @@ public:
 private:
 	campaign *current_campaign = nullptr;
 	QDateTime current_date;
+	uint64_t current_total_hours = 0; //the total in-game hours
 	std::vector<std::unique_ptr<trigger>> local_triggers; //triggers "local" to the current game
 	std::vector<std::unique_ptr<delayed_effect_instance<CPlayer>>> player_delayed_effects;
 	std::vector<std::unique_ptr<delayed_effect_instance<CUnit>>> unit_delayed_effects;

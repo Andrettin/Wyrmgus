@@ -37,7 +37,6 @@
 #include "util/string_conversion_util.h"
 #include "util/string_util.h"
 
-unsigned long long CDate::CurrentTotalHours = 0;
 QCalendar CDate::calendar;
 
 CDate CDate::FromString(const std::string &date_str)
@@ -145,41 +144,6 @@ std::string CDate::ToDisplayString(const wyrmgus::calendar *calendar, const bool
 }
 
 /**
-**	@brief	Get the total amount of days counting from the date 1.1.1 of the calendar this date is presumed to use
-**
-**	@param	calendar	The calendar
-**
-**	@return	The amount of days
-*/
-int CDate::GetTotalDays() const
-{
-	int days = 0;
-	
-	days += (this->Year < 0 ? this->Year : this->Year - 1) * CDate::days_per_year;
-	for (int i = 1; i <= this->Month; ++i) {
-		days += CDate::calendar.daysInMonth(i);
-	}
-	days += this->Day - 1;
-	
-	return days;
-}
-
-unsigned long long CDate::GetTotalHours() const
-{
-	unsigned long long hours = this->Hour;
-	
-	unsigned long long days = 0;
-	days += (static_cast<unsigned long long>(this->Year) + BaseCalendarYearOffsetForHours - 1) * CDate::days_per_year;
-	for (int i = 1; i <= this->Month; ++i) {
-		days += calendar.daysInMonth(i);
-	}
-	days += static_cast<unsigned long long>(this->Day) - 1;
-	hours += days * CDate::hours_per_day;
-	
-	return hours;
-}
-
-/**
 **	@brief	Set the current date for a particular calendar
 **
 **	@param	calendar_ident	The calendar's string identifier
@@ -187,7 +151,7 @@ unsigned long long CDate::GetTotalHours() const
 */
 void SetCurrentDate(const std::string &date_string)
 {
-	wyrmgus::game::get()->set_current_date(wyrmgus::string::to_date(date_string));
+	game::get()->set_current_date(string::to_date(date_string));
 }
 
 /**
@@ -197,5 +161,5 @@ void SetCurrentDate(const std::string &date_string)
 */
 void SetCurrentTotalHours(const unsigned long long hours)
 {
-	CDate::CurrentTotalHours = hours;
+	game::get()->set_current_total_hours(hours);
 }

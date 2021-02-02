@@ -168,7 +168,7 @@ void game::apply_player_history()
 void game::do_cycle()
 {
 	if (GameCycle % CYCLES_PER_IN_GAME_HOUR == 0) {
-		CDate::CurrentTotalHours++;
+		game::get()->increment_current_total_hours();
 
 		this->current_date = this->current_date.addSecs(1 * 60 * 60 * DEFAULT_DAY_MULTIPLIER_PER_YEAR);
 
@@ -1643,15 +1643,16 @@ void CreateGame(const std::string &filename, CMap *map, bool is_mod)
 		wyrmgus::game::get()->set_current_date(current_campaign->get_start_date());
 	} else {
 		const int year = 1;
-		const int month = SyncRand(CDate::months_per_year) + 1;
-		const int day = SyncRand(CDate::calendar.daysInMonth(month - 1)) + 1;
-		const int hour = SyncRand(CDate::hours_per_day);
-		QDate date(year, month, day);;
+		const int month = random::get()->generate(date::months_per_year) + 1;
+		const int day = random::get()->generate(date::get_days_in_month(month)) + 1;
+		const int hour = random::get()->generate(date::hours_per_day);
+		QDate date(year, month, day);
 		QDateTime date_time(date, QTime(hour, 0));
 		game::get()->set_current_date(date_time);
 	}
 	
-	CDate::CurrentTotalHours = CDate(wyrmgus::game::get()->get_current_date()).GetTotalHours();
+	const uint64_t total_hours = game::base_date.secsTo(game::get()->get_current_date()) / 60 / 60;
+	game::get()->set_current_total_hours(total_hours);
 
 	wyrmgus::age::current_age = nullptr;
 	//Wyrmgus end

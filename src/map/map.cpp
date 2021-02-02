@@ -1518,11 +1518,11 @@ void CMap::Create()
 	
 	if (Editor.Running == EditorNotRunning) {
 		map_layer->SeasonSchedule = CSeasonSchedule::DefaultSeasonSchedule;
-		map_layer->SetSeasonByHours(CDate::CurrentTotalHours);
+		map_layer->SetSeasonByHours(game::get()->get_current_total_hours());
 		
 		if (!GameSettings.Inside && !GameSettings.NoTimeOfDay) {
 			map_layer->TimeOfDaySchedule = CTimeOfDaySchedule::DefaultTimeOfDaySchedule;
-			map_layer->SetTimeOfDayByHours(CDate::CurrentTotalHours);
+			map_layer->SetTimeOfDayByHours(game::get()->get_current_total_hours());
 		} else {
 			map_layer->TimeOfDaySchedule = nullptr;
 			map_layer->SetTimeOfDay(nullptr); // make indoors have no time of day setting until it is possible to make light sources change their surrounding "time of day" // indoors it is always dark (maybe would be better to allow a special setting to have bright indoor places?
