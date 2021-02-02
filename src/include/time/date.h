@@ -70,13 +70,7 @@ public:
 		return QDateTime(QDate(this->Year, this->Month, this->Day), QTime(this->Hour, 0));
 	}
 	
-	void Clear();
 	bool ContainsDate(const CDate &date) const;	/// whether this date "contains" another (i.e. if it is subsequent to another, and in an appropriate timeline)
-	void AddYears(const int years);
-	void AddMonths(const int months);
-	void AddDays(const int days, const int day_multiplier = 1);
-	void AddHours(const long long int hours, const int day_multiplier = 1);
-	CDate ToCalendar(wyrmgus::calendar *current_calendar, wyrmgus::calendar *new_calendar) const;
 	CDate ToBaseCalendar(wyrmgus::calendar *current_calendar) const;
 	std::string ToString() const;
 	std::string ToDisplayString(const wyrmgus::calendar *calendar, const bool year_only = false) const;
