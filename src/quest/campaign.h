@@ -30,7 +30,6 @@
 #include "database/data_type.h"
 #include "database/detailed_data_entry.h"
 #include "include/data_type.h"
-#include "time/date.h"
 #include "vec2i.h"
 
 class LuaCallback;

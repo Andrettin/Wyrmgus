@@ -30,7 +30,6 @@
 #include "database/data_type.h"
 #include "database/named_data_entry.h"
 #include "data_type.h"
-#include "time/date.h"
 
 namespace wyrmgus {
 

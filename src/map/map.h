@@ -70,7 +70,6 @@
 */
 
 #include "color.h"
-#include "time/date.h"
 #include "util/point_container.h"
 #include "vec2i.h"
 
