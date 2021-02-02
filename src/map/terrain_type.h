@@ -71,7 +71,7 @@ class terrain_type final : public named_data_entry, public data_type<terrain_typ
 public:
 	static constexpr const char *class_identifier = "terrain_type";
 	static constexpr const char *database_folder = "terrain_types";
-	static constexpr QColor none_color = QColor(0, 0, 0);
+	static inline const QColor none_color = QColor(0, 0, 0);
 
 	static terrain_type *get_by_character(const char character)
 	{
