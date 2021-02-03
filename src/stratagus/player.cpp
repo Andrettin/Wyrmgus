@@ -106,6 +106,7 @@
 #include "upgrade/upgrade_class.h"
 #include "upgrade/upgrade_modifier.h"
 #include "util/exception_util.h"
+#include "util/log_util.h"
 #include "util/string_util.h"
 #include "util/vector_util.h"
 #include "util/vector_random_util.h"
@@ -2263,7 +2264,7 @@ void CPlayer::RemoveUnit(CUnit &unit)
 	Assert(unit.Player == this);
 	//Wyrmgus start
 	if (unit.PlayerSlot == -1 || this->Units[unit.PlayerSlot] != &unit) {
-		fprintf(stderr, "Error in CPlayer::RemoveUnit: the unit's PlayerSlot doesn't match its position in the player's units array; Unit's PlayerSlot: %d, Unit Type: \"%s\".\n", unit.PlayerSlot, unit.Type ? unit.Type->Ident.c_str() : "");
+		log::log_error("Error in CPlayer::RemoveUnit: the unit's PlayerSlot doesn't match its position in the player's units array; Unit's PlayerSlot: " + std::to_string(unit.PlayerSlot) + ", Unit Type: \"" + (unit.Type ? unit.Type->Ident : "") + "\".");
 		return;
 	}
 	//Wyrmgus end
