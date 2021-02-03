@@ -1,27 +1,25 @@
 ---
 name: CMake
-on: []  # TODO Enable [push, pull_request]
+on: [push, pull_request]
 env:
   BUILD_DIR: "${{ github.workspace }}/build/"
   BUILD_TYPE: 'Release'
+  CMAKE_FLAGS: >-
+    -DENABLE_STATIC=OFF
+    -DWITH_BZIP2=OFF
+    -DWITH_GEOJSON=OFF
+    -DWITH_X11=ON
 
 jobs:
   build:
     runs-on: 'ubuntu-latest'
-    container: 'alpine:latest'  # TODO Custom image
-        # Deps:
-        # build-essential cmake libboost-dev
-        # libboost-dev liblua5.3-dev libsqlite3-dev
-        # libsdl1.2-dev libqt5gui5 libqt5widgets5 libqt5multimedia5 libqt5qml5
-        # libqt5location5 libqt5quick5 qtbase5-dev
-        #
-        # Qt must be at least 5.14
+    container: 'bergentroll/wyrmgus:latest'
     steps:
       - uses: actions/checkout@v2
-      - name: Create Build Environment
-        run: cmake -E make_directory "${{ github.workspace }}/build/"
       - name: Configure CMake
-        run: cmake -S "$GITHUB_WORKSPACE" -B "$BUILD_DIR" -DCMAKE_BUILD_TYPE="$BUILD_TYPE"
+        run: >-
+          cmake -S "$GITHUB_WORKSPACE" -B "$BUILD_DIR"
+          -D CMAKE_BUILD_TYPE="$BUILD_TYPE" $CMAKE_FLAGS
       - name: Build
         run: cmake --build "$BUILD_DIR" --config "$BUILD_TYPE"
       - name: Test
