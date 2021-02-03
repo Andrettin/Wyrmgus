@@ -54,6 +54,7 @@
 #include "unit/unit_manager.h"
 //Wyrmgus end
 #include "util/exception_util.h"
+#include "util/log_util.h"
 #include "util/queue_util.h"
 #include "util/qunique_ptr.h"
 
@@ -461,7 +462,13 @@ static void InitSdlSound()
 	const QAudioDeviceInfo device_info = QAudioDeviceInfo::defaultOutputDevice();
 	const QAudioFormat format = device_info.preferredFormat();
 
-	//open the audio device, forcing the desired format
+	//open the audio device, using the desired format
+	int frequency = format.sampleRate();
+	if (frequency == -1) {
+		log::log_error("Default output device's preferred format sample rate is -1, defaulting to MIX_DEFAULT_FREQUENCY.");
+		frequency = MIX_DEFAULT_FREQUENCY;
+	}
+
 	uint16_t sdl_audio_format = 0;
 
 	try {
@@ -501,7 +508,13 @@ static void InitSdlSound()
 		sdl_audio_format = MIX_DEFAULT_FORMAT;
 	}
 
-	result = Mix_OpenAudio(format.sampleRate(), sdl_audio_format, format.channelCount(), 1024);
+	int channel_count = format.channelCount();
+	if (channel_count == -1) {
+		log::log_error("Default output device's preferred format channel count is -1, defaulting to MIX_DEFAULT_CHANNELS.");
+		channel_count = MIX_DEFAULT_CHANNELS;
+	}
+
+	result = Mix_OpenAudio(frequency, sdl_audio_format, channel_count, 1024);
 	if (result == -1) {
 		exception::throw_with_trace(std::runtime_error("Error in Mix_OpenAudio: " + std::string(Mix_GetError())));
 	}
