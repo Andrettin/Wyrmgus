@@ -47,16 +47,10 @@ extern centesimal_int ly_to_pc(const centesimal_int &light_years);
 extern centesimal_int pc_to_ly(const centesimal_int &parsecs);
 
 //gigameters to astronomical units
-inline int gm_to_au(const int gm)
-{
-	return gm / astronomy::gm_per_au;
-}
+extern centesimal_int gm_to_au(const int gm);
 
 //astronomical units to gigameters
-inline int au_to_gm(const int au)
-{
-	return au * astronomy::gm_per_au;
-}
+extern int au_to_gm(const centesimal_int &au);
 
 //right ascension to longitude
 extern decimillesimal_int ra_to_lon(const decimillesimal_int &ra);

@@ -47,6 +47,16 @@ centesimal_int pc_to_ly(const centesimal_int &parsecs)
 	return light_years;
 }
 
+centesimal_int gm_to_au(const int gm)
+{
+	return centesimal_int(gm) / astronomy::gm_per_au;
+}
+
+int au_to_gm(const centesimal_int &au)
+{
+	return (au * astronomy::gm_per_au).to_int();
+}
+
 decimillesimal_int ra_to_lon(const decimillesimal_int &ra)
 {
 	decimillesimal_int res(ra);

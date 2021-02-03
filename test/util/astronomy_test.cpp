@@ -51,7 +51,7 @@ BOOST_AUTO_TEST_CASE(ly_to_pc_test)
 
 BOOST_AUTO_TEST_CASE(au_to_gm_test)
 {
-    const int au = 23;
+    const centesimal_int au(23);
     const int gm = astronomy::au_to_gm(au);
 
     BOOST_CHECK(gm == 3450);
@@ -60,9 +60,9 @@ BOOST_AUTO_TEST_CASE(au_to_gm_test)
 BOOST_AUTO_TEST_CASE(gm_to_au_test)
 {
     const int gm = 778;
-    const int au = astronomy::gm_to_au(gm);
+    const centesimal_int au = astronomy::gm_to_au(gm);
 
-    BOOST_CHECK(au == 5);
+    BOOST_CHECK(au == centesimal_int("5.18"));
 }
 
 BOOST_AUTO_TEST_CASE(ra_to_lon_test_1)

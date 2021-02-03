@@ -74,7 +74,7 @@ class site final : public named_data_entry, public data_type<site>, public CData
 	Q_PROPERTY(wyrmgus::centesimal_int astrodistance_pc READ get_astrodistance_pc WRITE set_astrodistance_pc)
 	Q_PROPERTY(wyrmgus::site* orbit_center MEMBER orbit_center WRITE set_orbit_center)
 	Q_PROPERTY(int distance_from_orbit_center MEMBER distance_from_orbit_center)
-	Q_PROPERTY(int distance_from_orbit_center_au READ get_distance_from_orbit_center_au WRITE set_distance_from_orbit_center_au)
+	Q_PROPERTY(wyrmgus::centesimal_int distance_from_orbit_center_au READ get_distance_from_orbit_center_au WRITE set_distance_from_orbit_center_au)
 	Q_PROPERTY(wyrmgus::unit_type* base_unit_type MEMBER base_unit_type)
 	Q_PROPERTY(wyrmgus::site* connection_destination MEMBER connection_destination)
 	Q_PROPERTY(QVariantList cores READ get_cores_qvariant_list)
@@ -191,8 +191,8 @@ public:
 		return this->satellites;
 	}
 
-	int get_distance_from_orbit_center_au() const;
-	void set_distance_from_orbit_center_au(const int distance_au);
+	centesimal_int get_distance_from_orbit_center_au() const;
+	void set_distance_from_orbit_center_au(const centesimal_int &distance_au);
 
 	const unit_type *get_base_unit_type() const
 	{

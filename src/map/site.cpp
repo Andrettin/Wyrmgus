@@ -387,12 +387,12 @@ void site::set_orbit_center(site *orbit_center)
 	}
 }
 
-int site::get_distance_from_orbit_center_au() const
+centesimal_int site::get_distance_from_orbit_center_au() const
 {
 	return astronomy::gm_to_au(this->distance_from_orbit_center);
 }
 
-void site::set_distance_from_orbit_center_au(const int distance_au)
+void site::set_distance_from_orbit_center_au(const centesimal_int &distance_au)
 {
 	this->distance_from_orbit_center = astronomy::au_to_gm(distance_au);
 }
