@@ -1575,6 +1575,7 @@ add_custom_command(OUTPUT tolua.cpp
 	WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/src/tolua
 	VERBATIM
 )
+set_property(SOURCE ${CMAKE_CURRENT_BINARY_DIR}/tolua.cpp PROPERTY SKIP_AUTOMOC ON)
 
 add_library(stratagus STATIC ${stratagus_SRCS} ${stratagus_HDRS})
 add_executable(stratagus_main WIN32 ${stratagus_main_SRCS})
