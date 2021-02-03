@@ -464,35 +464,41 @@ static void InitSdlSound()
 	//open the audio device, forcing the desired format
 	uint16_t sdl_audio_format = 0;
 
-	switch (format.sampleSize()) {
-		case 8:
-			sdl_audio_format |= 0x0008;
-			break;
-		case 16:
-			sdl_audio_format |= 0x0010;
+	try {
+		switch (format.sampleSize()) {
+			case 8:
+				sdl_audio_format |= 0x0008;
+				break;
+			case 16:
+				sdl_audio_format |= 0x0010;
 
-			switch (format.byteOrder()) {
-				case QAudioFormat::LittleEndian:
-					break;
-				case QAudioFormat::BigEndian:
-					sdl_audio_format |= 0x1000;
-					break;
-				default:
-					exception::throw_with_trace(std::runtime_error("Unexpected byte order: " + std::to_string(format.byteOrder())));
-			}
-			break;
-		default:
-			exception::throw_with_trace(std::runtime_error("Unexpected sample size: " + std::to_string(format.sampleSize())));
-	}
+				switch (format.byteOrder()) {
+					case QAudioFormat::LittleEndian:
+						break;
+					case QAudioFormat::BigEndian:
+						sdl_audio_format |= 0x1000;
+						break;
+					default:
+						exception::throw_with_trace(std::runtime_error("Unexpected byte order: " + std::to_string(format.byteOrder())));
+				}
+				break;
+			default:
+				exception::throw_with_trace(std::runtime_error("Unexpected sample size: " + std::to_string(format.sampleSize())));
+		}
 
-	switch (format.sampleType()) {
-		case QAudioFormat::UnSignedInt:
-			break;
-		case QAudioFormat::SignedInt:
-			sdl_audio_format |= 0x8000;
-			break;
-		default:
-			exception::throw_with_trace(std::runtime_error("Unexpected sample type: " + std::to_string(format.sampleType())));
+		switch (format.sampleType()) {
+			case QAudioFormat::UnSignedInt:
+				break;
+			case QAudioFormat::SignedInt:
+				sdl_audio_format |= 0x8000;
+				break;
+			default:
+				exception::throw_with_trace(std::runtime_error("Unexpected sample type: " + std::to_string(format.sampleType())));
+		}
+	} catch (const std::exception &exception) {
+		exception::report(exception);
+		//use the default format if we failed to derive information for one from the QAudioFormat
+		sdl_audio_format = MIX_DEFAULT_FORMAT;
 	}
 
 	result = Mix_OpenAudio(format.sampleRate(), sdl_audio_format, format.channelCount(), 1024);
