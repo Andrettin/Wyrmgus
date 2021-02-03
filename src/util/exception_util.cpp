@@ -51,9 +51,12 @@ void report(const std::exception &exception)
 	}
 }
 
-void throw_with_trace(const std::exception &exception)
+template <typename exception_type>
+void throw_with_trace(const exception_type &exception)
 {
 	throw boost::enable_error_info(exception) << traced(boost::stacktrace::stacktrace());
 }
+
+template void throw_with_trace<std::runtime_error>(const std::runtime_error &exception);
 
 }
