@@ -1,3 +1,6 @@
+![pipeline status](
+https://github.com/Andrettin/Wyrmgus/workflows/CMake/badge.svg?branch=master)
+
 # GitHub Actions for Wyrmgus
 
 Dirctory contains all necessary file for running CI processes on GitHub.
