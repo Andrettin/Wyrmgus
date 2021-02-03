@@ -1052,6 +1052,18 @@ void CPlayer::apply_history(const CDate &start_date)
 	this->set_government_type(faction_history->get_government_type());
 	this->set_dynasty(faction_history->get_dynasty());
 
+	for (const wyrmgus::upgrade_class *upgrade_class : faction_history->get_acquired_upgrade_classes()) {
+		const CUpgrade *upgrade = faction->get_class_upgrade(upgrade_class);
+
+		if (upgrade == nullptr) {
+			continue;
+		}
+
+		if (UpgradeIdAllowed(*this, upgrade->ID) != 'R') {
+			UpgradeAcquire(*this, upgrade);
+		}
+	}
+
 	for (const CUpgrade *upgrade : faction_history->get_acquired_upgrades()) {
 		if (UpgradeIdAllowed(*this, upgrade->ID) != 'R') {
 			UpgradeAcquire(*this, upgrade);

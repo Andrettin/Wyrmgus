@@ -32,6 +32,7 @@
 #include "database/sml_data.h"
 #include "diplomacy_state.h"
 #include "faction.h"
+#include "upgrade/upgrade_class.h"
 #include "upgrade/upgrade_structs.h"
 #include "util/container_util.h"
 #include "util/map_util.h"
@@ -101,12 +102,12 @@ void faction_history::process_sml_scope(const sml_data &scope)
 	}
 }
 
-QVariantList faction_history::get_acquired_upgrades_qstring_list() const
+void faction_history::remove_acquired_upgrade_class(const upgrade_class *upgrade_class)
 {
-	return container::to_qvariant_list(this->get_acquired_upgrades());
+	vector::remove(this->acquired_upgrade_classes, upgrade_class);
 }
 
-void faction_history::remove_acquired_upgrade(CUpgrade *upgrade)
+void faction_history::remove_acquired_upgrade(const CUpgrade *upgrade)
 {
 	vector::remove(this->acquired_upgrades, upgrade);
 }

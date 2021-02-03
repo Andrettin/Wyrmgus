@@ -94,3 +94,5 @@ private:
 };
 
 }
+
+Q_DECLARE_METATYPE(std::vector<const wyrmgus::upgrade_class *>)

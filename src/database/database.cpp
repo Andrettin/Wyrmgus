@@ -129,8 +129,9 @@ void database::process_sml_property_for_object(QObject *object, const sml_proper
 		}
 
 		const QVariant::Type property_type = meta_property.type();
+		const std::string property_class_name = meta_property.typeName();
 
-		if (property_type == QVariant::Type::List || property_type == QVariant::Type::StringList) {
+		if (property_type == QVariant::Type::List || property_type == QVariant::Type::StringList || (property_class_name.starts_with("std::vector<") && property_class_name.ends_with(">"))) {
 			database::modify_list_property_for_object(object, property_name, property.get_operator(), property.get_value());
 			return;
 		} else if (property_type == QVariant::String) {
@@ -447,6 +448,7 @@ void database::modify_list_property_for_object(QObject *object, const std::strin
 	const int property_index = meta_object->indexOfProperty(property_name.c_str());
 	QMetaProperty meta_property = meta_object->property(property_index);
 	const QVariant::Type property_type = meta_property.type();
+	const std::string property_class_name = meta_property.typeName();
 
 	if (sml_operator == sml_operator::assignment) {
 		exception::throw_with_trace(std::runtime_error("The assignment operator is not available for list properties."));
@@ -490,12 +492,15 @@ void database::modify_list_property_for_object(QObject *object, const std::strin
 	} else if (property_name == "unit_classes" || property_name == "building_classes") {
 		unit_class *unit_class_value = unit_class::get(value);
 		success = QMetaObject::invokeMethod(object, method_name.c_str(), Qt::ConnectionType::DirectConnection, Q_ARG(unit_class *, unit_class_value));
-	} else if (property_name == "upgrades" || property_name == "acquired_upgrades") {
+	} else if (property_name == "upgrades") {
 		CUpgrade *upgrade_value = CUpgrade::get(value);
 		success = QMetaObject::invokeMethod(object, method_name.c_str(), Qt::ConnectionType::DirectConnection, Q_ARG(CUpgrade *, upgrade_value));
-	} else if (property_name == "upgrade_classes" || property_name == "acquired_upgrade_classes") {
-		upgrade_class *upgrade_class_value = upgrade_class::get(value);
-		success = QMetaObject::invokeMethod(object, method_name.c_str(), Qt::ConnectionType::DirectConnection, Q_ARG(upgrade_class *, upgrade_class_value));
+	} else if (property_class_name == "std::vector<const CUpgrade*>") {
+		const CUpgrade *upgrade_value = CUpgrade::get(value);
+		success = QMetaObject::invokeMethod(object, method_name.c_str(), Qt::ConnectionType::DirectConnection, Q_ARG(const CUpgrade *, upgrade_value));
+	} else if (property_class_name == "std::vector<const wyrmgus::upgrade_class*>") {
+		const upgrade_class *upgrade_class_value = upgrade_class::get(value);
+		success = QMetaObject::invokeMethod(object, method_name.c_str(), Qt::ConnectionType::DirectConnection, Q_ARG(const upgrade_class *, upgrade_class_value));
 	} else if (property_type == QVariant::Type::StringList) {
 		success = QMetaObject::invokeMethod(object, method_name.c_str(), Qt::ConnectionType::DirectConnection, Q_ARG(const std::string &, value));
 	} else {

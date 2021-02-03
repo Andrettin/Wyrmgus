@@ -399,6 +399,8 @@ private:
 	friend int CclDefinePredependency(lua_State *l);
 };
 
+Q_DECLARE_METATYPE(std::vector<const CUpgrade *>)
+
 /**
 **  Allow what a player can do. Every #CPlayer has an own allow struct.
 **

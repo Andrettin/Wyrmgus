@@ -35,22 +35,12 @@
 
 namespace wyrmgus {
 
-QVariantList civilization_history::get_acquired_upgrade_classes_qstring_list() const
-{
-	return container::to_qvariant_list(this->get_acquired_upgrade_classes());
-}
-
-void civilization_history::remove_acquired_upgrade_class(upgrade_class *upgrade_class)
+void civilization_history::remove_acquired_upgrade_class(const upgrade_class *upgrade_class)
 {
 	vector::remove(this->acquired_upgrade_classes, upgrade_class);
 }
 
-QVariantList civilization_history::get_acquired_upgrades_qstring_list() const
-{
-	return container::to_qvariant_list(this->get_acquired_upgrades());
-}
-
-void civilization_history::remove_acquired_upgrade(CUpgrade *upgrade)
+void civilization_history::remove_acquired_upgrade(const CUpgrade *upgrade)
 {
 	vector::remove(this->acquired_upgrades, upgrade);
 }

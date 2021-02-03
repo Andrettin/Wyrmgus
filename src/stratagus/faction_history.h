@@ -36,6 +36,7 @@ class dynasty;
 class faction;
 class resource;
 class site;
+class upgrade_class;
 enum class diplomacy_state;
 enum class faction_tier;
 enum class government_type;
@@ -48,7 +49,8 @@ class faction_history final : public data_entry_history
 	Q_PROPERTY(wyrmgus::government_type government_type MEMBER government_type READ get_government_type)
 	Q_PROPERTY(wyrmgus::site* capital MEMBER capital)
 	Q_PROPERTY(wyrmgus::dynasty* dynasty MEMBER dynasty)
-	Q_PROPERTY(QVariantList acquired_upgrades READ get_acquired_upgrades_qstring_list)
+	Q_PROPERTY(std::vector<const wyrmgus::upgrade_class *> acquired_upgrade_classes READ get_acquired_upgrade_classes)
+	Q_PROPERTY(std::vector<const CUpgrade *> acquired_upgrades READ get_acquired_upgrades)
 
 public:
 	explicit faction_history(const faction_tier default_tier, const wyrmgus::government_type default_government_type, site *default_capital)
@@ -88,19 +90,29 @@ public:
 		return this->diplomacy_states;
 	}
 
-	const std::vector<CUpgrade *> &get_acquired_upgrades() const
+	const std::vector<const upgrade_class *> &get_acquired_upgrade_classes() const
+	{
+		return this->acquired_upgrade_classes;
+	}
+
+	Q_INVOKABLE void add_acquired_upgrade_class(const upgrade_class *upgrade_class)
+	{
+		this->acquired_upgrade_classes.push_back(upgrade_class);
+	}
+
+	Q_INVOKABLE void remove_acquired_upgrade_class(const upgrade_class *upgrade_class);
+
+	const std::vector<const CUpgrade *> &get_acquired_upgrades() const
 	{
 		return this->acquired_upgrades;
 	}
 
-	QVariantList get_acquired_upgrades_qstring_list() const;
-
-	Q_INVOKABLE void add_acquired_upgrade(CUpgrade *upgrade)
+	Q_INVOKABLE void add_acquired_upgrade(const CUpgrade *upgrade)
 	{
 		this->acquired_upgrades.push_back(upgrade);
 	}
 
-	Q_INVOKABLE void remove_acquired_upgrade(CUpgrade *upgrade);
+	Q_INVOKABLE void remove_acquired_upgrade(const CUpgrade *upgrade);
 
 private:
 	faction_tier tier;
@@ -109,7 +121,8 @@ private:
 	wyrmgus::dynasty *dynasty = nullptr;
 	std::map<const resource *, int> resources;
 	std::map<const faction *, diplomacy_state> diplomacy_states;
-	std::vector<CUpgrade *> acquired_upgrades;
+	std::vector<const upgrade_class *> acquired_upgrade_classes;
+	std::vector<const CUpgrade *> acquired_upgrades;
 };
 
 }
