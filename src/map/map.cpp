@@ -2140,7 +2140,7 @@ void CMap::calculate_tile_solid_tile(const QPoint &pos, const bool overlay, cons
 		solid_tile = terrain_graphics->get_frame_index(QPoint(solid_tile_frame_x, solid_tile_frame_y));
 	} else {
 		if (!terrain_type->get_solid_tiles().empty()) {
-			solid_tile = terrain_type->get_solid_tiles()[SyncRand(terrain_type->get_solid_tiles().size())];
+			solid_tile = vector::get_random(terrain_type->get_solid_tiles());
 		}
 	}
 

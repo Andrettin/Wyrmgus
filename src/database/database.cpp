@@ -365,9 +365,10 @@ void database::process_sml_scope_for_object(QObject *object, const sml_data &sco
 		}
 
 		const QVariant::Type property_type = meta_property.type();
+		const std::string property_class_name = meta_property.typeName();
 
 		if (scope.get_operator() == sml_operator::assignment) {
-			if ((property_type == QVariant::Type::List || property_type == QVariant::Type::StringList) && !scope.get_values().empty()) {
+			if ((property_type == QVariant::Type::List || property_type == QVariant::Type::StringList || (property_class_name.starts_with("std::vector<") && property_class_name.ends_with(">"))) && !scope.get_values().empty()) {
 				for (const std::string &value : scope.get_values()) {
 					database::modify_list_property_for_object(object, property_name, sml_operator::addition, value);
 				}

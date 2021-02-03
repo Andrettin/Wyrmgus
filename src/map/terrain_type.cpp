@@ -174,6 +174,15 @@ void terrain_type::process_sml_scope(const sml_data &scope)
 		for (const std::string &value : values) {
 			this->solid_tiles.push_back(std::stoi(value));
 		}
+
+		scope.for_each_property([&](const sml_property &property) {
+			const int tile = std::stoi(property.get_key());
+			const int weight = std::stoi(property.get_value());
+
+			for (int i = 0; i < weight; ++i) {
+				this->solid_tiles.push_back(tile);
+			}
+		});
 	} else if (tag == "damaged_tiles") {
 		for (const std::string &value : values) {
 			this->damaged_tiles.push_back(std::stoi(value));
