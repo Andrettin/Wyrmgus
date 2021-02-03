@@ -1341,8 +1341,9 @@ if (WIN32 AND MINGW)
 endif()
 
 if (UNIX)
-	#linking with libdl is necessary for Boost.Stacktrace
-	set(stratagus_LIBS ${stratagus_LIBS} dl)
+	#linking with libdl and libbacktrace is necessary for Boost.Stacktrace
+	add_definitions(-DBOOST_STACKTRACE_USE_BACKTRACE)
+	set(stratagus_LIBS ${stratagus_LIBS} dl backtrace)
 endif()
 
 if(APPLE)
