@@ -456,7 +456,7 @@ static void InitSdlSound()
 	static constexpr int init_flags = MIX_INIT_OGG;
 	int result = Mix_Init(init_flags);
 	if (result != init_flags) {
-		exception::throw_with_trace(std::runtime_error("Error in Mix_Init: " + std::string(Mix_GetError())));
+		throw std::runtime_error("Error in Mix_Init: " + std::string(Mix_GetError()));
 	}
 
 	const QAudioDeviceInfo device_info = QAudioDeviceInfo::defaultOutputDevice();
@@ -486,11 +486,11 @@ static void InitSdlSound()
 						sdl_audio_format |= 0x1000;
 						break;
 					default:
-						exception::throw_with_trace(std::runtime_error("Unexpected byte order: " + std::to_string(format.byteOrder())));
+						throw std::runtime_error("Unexpected byte order: " + std::to_string(format.byteOrder()));
 				}
 				break;
 			default:
-				exception::throw_with_trace(std::runtime_error("Unexpected sample size: " + std::to_string(format.sampleSize())));
+				throw std::runtime_error("Unexpected sample size: " + std::to_string(format.sampleSize()));
 		}
 
 		switch (format.sampleType()) {
@@ -500,7 +500,7 @@ static void InitSdlSound()
 				sdl_audio_format |= 0x8000;
 				break;
 			default:
-				exception::throw_with_trace(std::runtime_error("Unexpected sample type: " + std::to_string(format.sampleType())));
+				throw std::runtime_error("Unexpected sample type: " + std::to_string(format.sampleType()));
 		}
 	} catch (const std::exception &exception) {
 		exception::report(exception);
@@ -516,7 +516,7 @@ static void InitSdlSound()
 
 	result = Mix_OpenAudio(frequency, sdl_audio_format, channel_count, 1024);
 	if (result == -1) {
-		exception::throw_with_trace(std::runtime_error("Error in Mix_OpenAudio: " + std::string(Mix_GetError())));
+		throw std::runtime_error("Error in Mix_OpenAudio: " + std::string(Mix_GetError()));
 	}
 }
 

@@ -178,12 +178,12 @@ void species::initialize()
 void species::check() const
 {
 	if (this->get_supertaxon() == nullptr) {
-		exception::throw_with_trace(std::runtime_error("Species \"" + this->get_identifier() + "\" has no supertaxon."));
+		throw std::runtime_error("Species \"" + this->get_identifier() + "\" has no supertaxon.");
 	}
 
 	for (const species *pre_evolution : this->get_pre_evolutions()) {
 		if (this->get_era() != geological_era::none && pre_evolution->get_era() != geological_era::none && this->get_era() <= pre_evolution->get_era()) {
-			exception::throw_with_trace(std::runtime_error("Species \"" + this->get_identifier() + "\" is set to evolve from \"" + pre_evolution->get_identifier() + "\", but is from the same or an earlier era than the latter."));
+			throw std::runtime_error("Species \"" + this->get_identifier() + "\" is set to evolve from \"" + pre_evolution->get_identifier() + "\", but is from the same or an earlier era than the latter.");
 		}
 	}
 }

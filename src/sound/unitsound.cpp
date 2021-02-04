@@ -314,7 +314,7 @@ static void MapAnimSounds(wyrmgus::unit_type &type)
 	//Wyrmgus start
 	for (const auto &variation : type.get_variations()) {
 		if (!variation) {
-			exception::throw_with_trace(std::runtime_error("Unit type \"" + type.get_identifier() + "\" has an null variation."));
+			exception::throw_with_trace(std::runtime_error("Unit type \"" + type.get_identifier() + "\" has a null variation."));
 		}
 		if (!variation->Animations) {
 			continue;
