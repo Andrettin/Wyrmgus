@@ -104,14 +104,16 @@ VisitResult UnitFinder::Visit(TerrainTraversal &terrainTraversal, const Vec2i &p
 	}
 }
 
-class TerrainFinder
+class TerrainFinder final
 {
 public:
 	//Wyrmgus start
 //	TerrainFinder(const CPlayer &player, int maxDist, int movemask, int resmask, Vec2i *resPos) :
 //		player(player), maxDist(maxDist), movemask(movemask), resmask(resmask), resPos(resPos) {}
-	TerrainFinder(const CPlayer &player, int maxDist, int movemask, const wyrmgus::resource *resource, Vec2i *resPos, int z, int landmass) :
-		player(player), maxDist(maxDist), movemask(movemask), resource(resource), resPos(resPos), z(z), landmass(landmass) {}
+	explicit TerrainFinder(const CPlayer &player, int maxDist, int movemask, const wyrmgus::resource *resource, Vec2i *resPos, int z, const landmass *landmass) :
+		player(player), maxDist(maxDist), movemask(movemask), resource(resource), resPos(resPos), z(z), landmass(landmass)
+	{
+	}
 	//Wyrmgus end
 	VisitResult Visit(TerrainTraversal &terrainTraversal, const Vec2i &pos, const Vec2i &from);
 private:
@@ -122,7 +124,7 @@ private:
 //	int resmask;
 	const wyrmgus::resource *resource = nullptr;
 	int z;
-	int landmass;
+	const wyrmgus::landmass *landmass = nullptr;
 	//Wyrmgus end
 	Vec2i *resPos;
 };
@@ -144,7 +146,7 @@ VisitResult TerrainFinder::Visit(TerrainTraversal &terrainTraversal, const Vec2i
 	// Look if found what was required.
 	//Wyrmgus start
 //	if (Map.Field(pos)->CheckMask(resmask)) {
-	if ((!landmass || CMap::Map.GetTileLandmass(pos, z) == landmass) && (this->resource == nullptr || CMap::Map.Field(pos, z)->get_resource() == resource)) {
+	if ((!this->landmass || CMap::Map.get_tile_landmass(pos, z) == this->landmass) && (this->resource == nullptr || CMap::Map.Field(pos, z)->get_resource() == resource)) {
 	//Wyrmgus end
 		if (resPos) {
 			*resPos = pos;
@@ -183,7 +185,7 @@ VisitResult TerrainFinder::Visit(TerrainTraversal &terrainTraversal, const Vec2i
 bool FindTerrainType(int movemask, const wyrmgus::resource *resource, int range,
 					 //Wyrmgus start
 //					 const CPlayer &player, const Vec2i &startPos, Vec2i *terrainPos)
-					 const CPlayer &player, const Vec2i &startPos, Vec2i *terrainPos, int z, int landmass)
+					 const CPlayer &player, const Vec2i &startPos, Vec2i *terrainPos, int z, const landmass *landmass)
 					 //Wyrmgus end
 {
 	TerrainTraversal terrainTraversal;

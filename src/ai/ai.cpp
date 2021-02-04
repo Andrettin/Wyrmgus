@@ -142,6 +142,7 @@
 //Wyrmgus start
 #include "luacallback.h"
 //Wyrmgus end
+#include "map/landmass.h"
 #include "map/map.h"
 #include "map/map_layer.h"
 #include "map/site.h"
@@ -266,7 +267,7 @@ static void AiCheckUnits()
 		if (requested > 0) {  // Request it.
 			//Wyrmgus start
 //			AiAddUnitTypeRequest(*AiPlayer->UnitTypeRequests[i].Type, requested);
-			AiAddUnitTypeRequest(*AiPlayer->UnitTypeRequests[i].Type, requested, AiPlayer->UnitTypeRequests[i].Landmass);
+			AiAddUnitTypeRequest(*AiPlayer->UnitTypeRequests[i].Type, requested, AiPlayer->UnitTypeRequests[i].landmass);
 			//Wyrmgus end
 			counter[t] += requested;
 		}
@@ -378,7 +379,7 @@ static void AiCheckUnits()
 							if (
 								mercenary_type->get_unit_class() == queue.Type->get_unit_class()
 								&& queue.Want > queue.Made
-								&& (!queue.Landmass || queue.Landmass == CMap::Map.GetTileLandmass(mercenary_building->tilePos, mercenary_building->MapLayer->ID))
+								&& (!queue.landmass || queue.landmass == CMap::Map.get_tile_landmass(mercenary_building->tilePos, mercenary_building->MapLayer->ID))
 								&& (!queue.settlement || queue.settlement == mercenary_building->settlement)
 							) {
 								queue.Made++;
@@ -541,11 +542,11 @@ static void SaveAiPlayer(CFile &file, int plynr, const PlayerAi &ai)
 	file.printf("  \"unit-type\", {");
 	const size_t unitTypeRequestsCount = ai.UnitTypeRequests.size();
 	for (size_t i = 0; i != unitTypeRequestsCount; ++i) {
-		file.printf("\"%s\", ", ai.UnitTypeRequests[i].Type->Ident.c_str());
+		file.printf("\"%s\", ", ai.UnitTypeRequests[i].Type->get_identifier().c_str());
 		file.printf("%d, ", ai.UnitTypeRequests[i].Count);
-		//Wyrmgus start
-		file.printf("%d, ", ai.UnitTypeRequests[i].Landmass);
-		//Wyrmgus end
+
+		const int landmass_index = ai.UnitTypeRequests[i].landmass ? static_cast<int>(ai.UnitTypeRequests[i].landmass->get_index()) : -1;
+		file.printf("%d, ", landmass_index);
 	}
 	file.printf("},\n");
 
@@ -579,8 +580,8 @@ static void SaveAiPlayer(CFile &file, int plynr, const PlayerAi &ai)
 			file.printf("\"map-layer\", %d, ", queue.MapLayer);
 		}
 		
-		if (queue.Landmass != 0) {
-			file.printf("\"landmass\", %d, ", queue.Landmass);
+		if (queue.landmass != nullptr) {
+			file.printf("\"landmass\", %2d, ", queue.landmass->get_index());
 		}
 		
 		if (queue.settlement != nullptr) {
@@ -608,10 +609,10 @@ static void SaveAiPlayer(CFile &file, int plynr, const PlayerAi &ai)
 	
 	if (!ai.Transporters.empty()) {
 		file.printf("  \"transporters\", {");
-		for (std::map<int, std::vector<CUnit *>>::const_iterator iterator = ai.Transporters.begin(); iterator != ai.Transporters.end(); ++iterator) {
-			for (size_t i = 0; i != iterator->second.size(); ++i) {
-				const CUnit &aiunit = *iterator->second[i];
-				file.printf(" %d, %d,", iterator->first, UnitNumber(aiunit));
+		for (const auto &kv_pair : ai.Transporters) {
+			const landmass *landmass = kv_pair.first;
+			for (const CUnit *ai_unit : kv_pair.second) {
+				file.printf(" %2d, %d,", landmass->get_index(), UnitNumber(*ai_unit));
 			}
 		}
 		file.printf("},\n");
@@ -752,7 +753,7 @@ void FreeAi()
 **  @param type  Unit-type which is now available.
 **  @return      True, if unit-type was found in list.
 */
-static int AiRemoveFromBuilt2(PlayerAi *pai, const wyrmgus::unit_type &type, int landmass, const wyrmgus::site *settlement)
+static int AiRemoveFromBuilt2(PlayerAi *pai, const wyrmgus::unit_type &type, const landmass *landmass, const wyrmgus::site *settlement)
 {
 	std::vector<AiBuildQueue>::iterator i;
 
@@ -763,7 +764,7 @@ static int AiRemoveFromBuilt2(PlayerAi *pai, const wyrmgus::unit_type &type, int
 		if (
 			&type == (*i).Type
 			&& (*i).Made
-			&& (!(*i).Landmass || !landmass || (*i).Landmass == landmass)
+			&& (!(*i).landmass || !landmass || (*i).landmass == landmass)
 			&& (!(*i).settlement || !settlement || (*i).settlement == settlement)
 		) {
 		//Wyrmgus end
@@ -783,7 +784,7 @@ static int AiRemoveFromBuilt2(PlayerAi *pai, const wyrmgus::unit_type &type, int
 **  @param pai   Computer AI player.
 **  @param type  Unit-type which is now available.
 */
-static void AiRemoveFromBuilt(PlayerAi *pai, const wyrmgus::unit_type &type, int landmass, const wyrmgus::site *settlement)
+static void AiRemoveFromBuilt(PlayerAi *pai, const wyrmgus::unit_type &type, const landmass *landmass, const wyrmgus::site *settlement)
 {
 	//Wyrmgus start
 	if (
@@ -824,7 +825,7 @@ static void AiRemoveFromBuilt(PlayerAi *pai, const wyrmgus::unit_type &type, int
 **  @param type  Unit-type which is now available.
 **  @return      True if the unit-type could be reduced.
 */
-static bool AiReduceMadeInBuilt2(PlayerAi &pai, const wyrmgus::unit_type &type, int landmass, const wyrmgus::site *settlement)
+static bool AiReduceMadeInBuilt2(PlayerAi &pai, const wyrmgus::unit_type &type, const landmass *landmass, const wyrmgus::site *settlement)
 {
 	std::vector<AiBuildQueue>::iterator i;
 
@@ -834,7 +835,7 @@ static bool AiReduceMadeInBuilt2(PlayerAi &pai, const wyrmgus::unit_type &type, 
 		if (
 			&type == (*i).Type
 			&& (*i).Made
-			&& (!(*i).Landmass || !landmass || (*i).Landmass == landmass)
+			&& ((*i).landmass == nullptr || landmass == nullptr || (*i).landmass == landmass)
 			&& (!(*i).settlement || !settlement || (*i).settlement == settlement)
 		) {
 		//Wyrmgus end
@@ -851,7 +852,7 @@ static bool AiReduceMadeInBuilt2(PlayerAi &pai, const wyrmgus::unit_type &type, 
 **  @param pai   Computer AI player.
 **  @param type  Unit-type which is now available.
 */
-void AiReduceMadeInBuilt(PlayerAi &pai, const wyrmgus::unit_type &type, int landmass, const wyrmgus::site *settlement)
+void AiReduceMadeInBuilt(PlayerAi &pai, const wyrmgus::unit_type &type, const landmass *landmass, const wyrmgus::site *settlement)
 {
 	//Wyrmgus start
 	if (
@@ -1187,7 +1188,7 @@ void AiWorkComplete(CUnit *unit, CUnit &what)
 	Assert(what.Player->Type != PlayerPerson);
 	//Wyrmgus start
 //	AiRemoveFromBuilt(what.Player->Ai, *what.Type);
-	AiRemoveFromBuilt(what.Player->Ai.get(), *what.Type, CMap::Map.GetTileLandmass(what.tilePos, what.MapLayer->ID), what.settlement);
+	AiRemoveFromBuilt(what.Player->Ai.get(), *what.Type, CMap::Map.get_tile_landmass(what.tilePos, what.MapLayer->ID), what.settlement);
 	//Wyrmgus end
 }
 
@@ -1197,7 +1198,7 @@ void AiWorkComplete(CUnit *unit, CUnit &what)
 **  @param unit  Pointer to unit what builds the building.
 **  @param what  Pointer to unit-type.
 */
-void AiCanNotBuild(const CUnit &unit, const wyrmgus::unit_type &what, int landmass, const wyrmgus::site *settlement)
+void AiCanNotBuild(const CUnit &unit, const wyrmgus::unit_type &what, const landmass *landmass, const wyrmgus::site *settlement)
 {
 	DebugPrint("%d: %d(%s) Can't build %s at %d,%d\n" _C_
 			   unit.Player->Index _C_ UnitNumber(unit) _C_ unit.Type->Ident.c_str() _C_
@@ -1216,7 +1217,7 @@ void AiCanNotBuild(const CUnit &unit, const wyrmgus::unit_type &what, int landma
 **  @param unit  Pointer to unit what builds the building.
 **  @param what  Pointer to unit-type.
 */
-void AiCanNotReach(CUnit &unit, const wyrmgus::unit_type &what, int landmass, const wyrmgus::site *settlement)
+void AiCanNotReach(CUnit &unit, const wyrmgus::unit_type &what, const landmass *landmass, const wyrmgus::site *settlement)
 {
 	Assert(unit.Player->Type != PlayerPerson);
 	//Wyrmgus start
@@ -1407,11 +1408,11 @@ void AiTrainingComplete(CUnit &unit, CUnit &what)
 	//Wyrmgus start
 //	AiRemoveFromBuilt(unit.Player->Ai, *what.Type);
 	if (unit.Player == what.Player) {
-		AiRemoveFromBuilt(what.Player->Ai.get(), *what.Type, CMap::Map.GetTileLandmass(what.tilePos, what.MapLayer->ID), what.settlement);
+		AiRemoveFromBuilt(what.Player->Ai.get(), *what.Type, CMap::Map.get_tile_landmass(what.tilePos, what.MapLayer->ID), what.settlement);
 	} else { //remove the request of the unit the mercenary is substituting
 		wyrmgus::unit_type *requested_unit_type = what.Player->get_faction()->get_class_unit_type(what.Type->get_unit_class());
 		if (requested_unit_type != nullptr) {
-			AiRemoveFromBuilt(what.Player->Ai.get(), *requested_unit_type, CMap::Map.GetTileLandmass(what.tilePos, what.MapLayer->ID), what.settlement);
+			AiRemoveFromBuilt(what.Player->Ai.get(), *requested_unit_type, CMap::Map.get_tile_landmass(what.tilePos, what.MapLayer->ID), what.settlement);
 		}
 	}
 	//Wyrmgus end
@@ -1422,9 +1423,11 @@ void AiTrainingComplete(CUnit &unit, CUnit &what)
 	
 	if (what.Player->Ai->Force.GetForce(what) == -1) { // if the unit hasn't been assigned to a force, see if it is a transporter, and assign it accordingly
 		if (what.Type->CanTransport() && what.CanMove() && (what.Type->UnitType == UnitTypeType::Naval || what.Type->UnitType == UnitTypeType::Fly || what.Type->UnitType == UnitTypeType::FlyLow || what.Type->UnitType == UnitTypeType::Space)) {
-			int landmass = CMap::Map.GetTileLandmass(what.tilePos, what.MapLayer->ID);
+			const landmass *landmass = CMap::Map.get_tile_landmass(what.tilePos, what.MapLayer->ID);
 			
-			what.Player->Ai->Transporters[landmass].push_back(&what);
+			if (landmass != nullptr) {
+				what.Player->Ai->Transporters[landmass].push_back(&what);
+			}
 		}
 	}
 	//Wyrmgus end
@@ -1566,7 +1569,7 @@ void AiEachMinute(CPlayer &player)
 	AiForceManagerEachMinute();
 }
 
-int AiGetUnitTypeCount(const PlayerAi &pai, const wyrmgus::unit_type *type, const int landmass, const bool include_requests, const bool include_upgrades)
+int AiGetUnitTypeCount(const PlayerAi &pai, const wyrmgus::unit_type *type, const landmass *landmass, const bool include_requests, const bool include_upgrades)
 {
 	int count = 0;
 	
@@ -1578,7 +1581,7 @@ int AiGetUnitTypeCount(const PlayerAi &pai, const wyrmgus::unit_type *type, cons
 		for (size_t i = 0; i < table.size(); ++i) {
 			CUnit &unit = *table[i];
 					
-			if (CMap::Map.GetTileLandmass(unit.tilePos, unit.MapLayer->ID) == landmass) {
+			if (CMap::Map.get_tile_landmass(unit.tilePos, unit.MapLayer->ID) == landmass) {
 				count++;
 			}
 		}
@@ -1615,7 +1618,7 @@ int AiGetUnitTypeCount(const PlayerAi &pai, const wyrmgus::unit_type *type, cons
 	return count;
 }
 
-int AiGetUnitTypeRequestedCount(const PlayerAi &pai, const wyrmgus::unit_type *type, const int landmass, const wyrmgus::site *settlement)
+int AiGetUnitTypeRequestedCount(const PlayerAi &pai, const wyrmgus::unit_type *type, const landmass *landmass, const wyrmgus::site *settlement)
 {
 	int count = 0;
 	
@@ -1623,8 +1626,8 @@ int AiGetUnitTypeRequestedCount(const PlayerAi &pai, const wyrmgus::unit_type *t
 		const AiBuildQueue &queue = pai.UnitTypeBuilt[i];
 		if (
 			queue.Type == type
-			&& (!landmass || queue.Landmass == landmass)
-			&& (!settlement || queue.settlement == settlement)
+			&& (landmass == nullptr || queue.landmass == landmass)
+			&& (settlement == nullptr || queue.settlement == settlement)
 		) {
 			count += queue.Want;
 		}

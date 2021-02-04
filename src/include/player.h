@@ -27,6 +27,7 @@
 
 #pragma once
 
+#include "map/landmass_container.h"
 #include "player_container.h"
 #include "ui/icon.h"
 //Wyrmgus start
@@ -210,7 +211,7 @@ public:
 	std::vector<const wyrmgus::site *> get_settlements() const;
 	bool has_settlement(const wyrmgus::site *settlement) const;
 	bool has_coastal_settlement() const;
-	bool HasSettlementNearWaterZone(int water_zone) const;
+	bool HasSettlementNearWaterZone(const landmass *water_zone) const;
 	bool has_settlement_with_resource_source(const wyrmgus::resource *resource) const;
 	const wyrmgus::site *GetNearestSettlement(const Vec2i &pos, int z, const Vec2i &size) const;
 	void update_building_settlement_assignment(const wyrmgus::site *old_settlement, const int z) const;
@@ -228,8 +229,8 @@ public:
 	bool UpgradeRemovesExistingUpgrade(const CUpgrade *upgrade, bool ignore_lower_priority = false) const;
 	std::string get_full_name() const;
 	std::string_view get_faction_title_name() const;
-	std::string_view GetCharacterTitleName(const wyrmgus::character_title title_type, const wyrmgus::gender gender) const;
-	std::set<int> get_builder_landmasses(const wyrmgus::unit_type *building) const;	/// Builds a vector with builder landmasses; the building is the structure to be built by the builder in question
+	std::string_view GetCharacterTitleName(const character_title title_type, const wyrmgus::gender gender) const;
+	landmass_set get_builder_landmasses(const unit_type *building) const;	/// Builds a vector with builder landmasses; the building is the structure to be built by the builder in question
 	std::vector<const CUpgrade *> GetResearchableUpgrades();
 
 	const std::vector<CUnit *> &get_units() const

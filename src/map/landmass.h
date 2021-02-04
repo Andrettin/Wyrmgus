@@ -8,9 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name action_unload.h - The actions headerfile. */
-//
-//      (c) Copyright 1998-2012 by Lutz Sammer and Jimmy Salmon
+//      (c) Copyright 2021 by Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -25,50 +23,38 @@
 //      along with this program; if not, write to the Free Software
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
-//
 
 #pragma once
 
-#include "actions.h"
-
 namespace wyrmgus {
-	class landmass;
-}
 
-class COrder_Unload final : public COrder
+class landmass final
 {
-	//Wyrmgus start
-//	friend std::unique_ptr<COrder> COrder::NewActionUnload(const Vec2i &pos, CUnit *what);
-	friend std::unique_ptr<COrder> COrder::NewActionUnload(const Vec2i &pos, CUnit *what, int z, const landmass *landmass);
-	//WYrmgus end
 public:
-	COrder_Unload() : COrder(UnitAction::Unload)
+	explicit landmass(const size_t index) : index(index)
 	{
 	}
 
-	virtual std::unique_ptr<COrder> Clone() const override
+	size_t get_index() const
 	{
-		return std::make_unique<COrder_Unload>(*this);
+		return this->index;
 	}
 
-	virtual bool IsValid() const override;
+	const std::vector<const landmass *> &get_border_landmasses() const
+	{
+		return this->border_landmasses;
+	}
 
-	virtual void Save(CFile &file, const CUnit &unit) const override;
-	virtual bool ParseSpecificData(lua_State *l, int &j, const char *value, const CUnit &unit) override;
+	bool borders_landmass(const landmass *landmass) const;
 
-	virtual void Execute(CUnit &unit) override;
-	virtual PixelPos Show(const CViewport &vp, const PixelPos &lastScreenPos) const override;
-	virtual void UpdatePathFinderData(PathFinderInput &input) override;
+	void add_border_landmass(const landmass *landmass)
+	{
+		this->border_landmasses.push_back(landmass);
+	}
 
 private:
-	bool LeaveTransporter(CUnit &transporter);
-
-private:
-	int State = 0;
-	int Range = 0;
-	Vec2i goalPos = Vec2i(-1, -1);
-	//Wyrmgus start
-	int MapLayer = 0;
-	//Wyrmgus end
-	const wyrmgus::landmass *landmass = nullptr;
+	const size_t index = 0;
+	std::vector<const landmass *> border_landmasses;	//"landmasses" which border this one
 };
+
+}

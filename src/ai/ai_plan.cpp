@@ -749,18 +749,16 @@ void AiSendExplorers()
 //Wyrmgus start
 void AiCheckTransporters()
 {
-	for (std::map<int, std::vector<CUnit *>>::const_iterator iterator = AiPlayer->Transporters.begin(); iterator != AiPlayer->Transporters.end(); ++iterator) {
-		for (size_t i = 0; i != iterator->second.size(); ++i) {
-			CUnit &ai_transporter = *iterator->second[i];
-			
-			if (!ai_transporter.IsIdle()) {
+	for (const auto &kv_pair : AiPlayer->Transporters) {
+		for (CUnit *ai_transporter : kv_pair.second) {
+			if (!ai_transporter->IsIdle()) {
 				continue;
 			}
 			
-			CUnit *uins = ai_transporter.UnitInside;
-			for (int j = 0; j < ai_transporter.InsideCount; ++j, uins = uins->NextContained) {
+			CUnit *uins = ai_transporter->UnitInside;
+			for (int j = 0; j < ai_transporter->InsideCount; ++j, uins = uins->NextContained) {
 				if (uins->GroupId == 0) { //if the unit no longer is part of a force, then it likely has been reset and the attack through water has been cancelled, so unload it
-					CommandUnload(ai_transporter, ai_transporter.tilePos, uins, 0, ai_transporter.MapLayer->ID);
+					CommandUnload(*ai_transporter, ai_transporter->tilePos, uins, 0, ai_transporter->MapLayer->ID);
 				}
 			}
 		}
@@ -789,31 +787,36 @@ void AiCheckTransporters()
 			continue;
 		}
 		
-		int landmass = CMap::Map.GetTileLandmass(unit.tilePos, unit.MapLayer->ID);
+		const landmass *landmass = CMap::Map.get_tile_landmass(unit.tilePos, unit.MapLayer->ID);
 		
 		AiPlayer->Transporters[landmass].push_back(&unit);
 	}
 }
 
-int AiGetTransportCapacity(int water_landmass)
+int AiGetTransportCapacity(const landmass *water_landmass)
 {
-	int transport_capacity = 0;
+	const auto find_iterator = AiPlayer->Transporters.find(water_landmass);
+
+	if (find_iterator == AiPlayer->Transporters.end()) {
+		return 0;
+	}
 	
-	for (size_t i = 0; i < AiPlayer->Transporters[water_landmass].size(); ++i) {
-		const CUnit &ai_transporter = *AiPlayer->Transporters[water_landmass][i];
-		transport_capacity += ai_transporter.Type->MaxOnBoard - ai_transporter.BoardCount;
+	int transport_capacity = 0;
+
+	for (const CUnit *ai_transporter : find_iterator->second) {
+		transport_capacity += ai_transporter->Type->MaxOnBoard - ai_transporter->BoardCount;
 	}
 	
 	return transport_capacity;
 }
 
-int AiGetRequestedTransportCapacity(int water_landmass)
+int AiGetRequestedTransportCapacity(const landmass *water_landmass)
 {
 	int transport_capacity = 0;
 	
 	for (unsigned int i = 0; i < AiPlayer->UnitTypeBuilt.size(); ++i) { //count transport capacity under construction to see if should request more
 		const AiBuildQueue &queue = AiPlayer->UnitTypeBuilt[i];
-		if (queue.Landmass == water_landmass && queue.Type->CanTransport() && (queue.Type->UnitType == UnitTypeType::Naval || queue.Type->UnitType == UnitTypeType::Fly || queue.Type->UnitType == UnitTypeType::FlyLow || queue.Type->UnitType == UnitTypeType::Space)) {
+		if (queue.landmass == water_landmass && queue.Type->CanTransport() && (queue.Type->UnitType == UnitTypeType::Naval || queue.Type->UnitType == UnitTypeType::Fly || queue.Type->UnitType == UnitTypeType::FlyLow || queue.Type->UnitType == UnitTypeType::Space)) {
 			transport_capacity += queue.Want * queue.Type->MaxOnBoard;
 		}
 	}

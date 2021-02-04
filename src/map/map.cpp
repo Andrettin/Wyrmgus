@@ -37,6 +37,7 @@
 #include "game.h" // for the SaveGameLoading variable
 //Wyrmgus end
 #include "iolib.h"
+#include "map/landmass.h"
 #include "map/map_layer.h"
 #include "map/map_template.h"
 #include "map/minimap.h"
@@ -296,15 +297,15 @@ const wyrmgus::terrain_type *CMap::GetTileTopTerrain(const Vec2i &pos, const boo
 	return mf.get_top_terrain(seen, ignore_destroyed);
 }
 
-int CMap::GetTileLandmass(const Vec2i &pos, int z) const
+const landmass *CMap::get_tile_landmass(const QPoint &pos, const int z) const
 {
 	if (!Map.Info.IsPointOnMap(pos, z)) {
-		return 0;
+		return nullptr;
 	}
 	
-	wyrmgus::tile &mf = *this->Field(pos, z);
+	const wyrmgus::tile &mf = *this->Field(pos, z);
 	
-	return mf.Landmass;
+	return mf.get_landmass();
 }
 
 const CUnitCache &CMap::get_tile_unit_cache(const QPoint &pos, int z)
@@ -1548,7 +1549,7 @@ void CMap::Clean()
 {
 	UI.CurrentMapLayer = nullptr;
 	UI.PreviousMapLayer = nullptr;
-	this->Landmasses = 0;
+	this->landmasses.clear();
 
 	for (wyrmgus::site *site : wyrmgus::site::get_all()) {
 		site->reset_game_data();
@@ -1556,7 +1557,6 @@ void CMap::Clean()
 
 	//Wyrmgus start
 	this->ClearMapLayers();
-	this->BorderLandmasses.clear();
 	this->settlement_units.clear();
 	//Wyrmgus end
 
@@ -1618,10 +1618,10 @@ void CMap::Save(CFile &file) const
 	}
 	file.printf("  },\n");
 	file.printf("  \"landmasses\", {\n");
-	for (int i = 1; i <= this->Landmasses; ++i) {
+	for (const std::unique_ptr<landmass> &landmass : this->landmasses) {
 		file.printf("  {");
-		for (size_t j = 0; j < this->BorderLandmasses[i].size(); ++j) {
-			file.printf("%d, ", this->BorderLandmasses[i][j]);
+		for (const wyrmgus::landmass *border_landmass : landmass->get_border_landmasses()) {
+			file.printf("%d, ", border_landmass->get_index());
 		}
 		file.printf("},\n");
 	}
@@ -2313,7 +2313,7 @@ void CMap::CalculateTileLandmass(const Vec2i &pos, int z)
 	
 	wyrmgus::tile &mf = *this->Field(pos, z);
 
-	if (mf.Landmass != 0) {
+	if (mf.get_landmass() != nullptr) {
 		return; //already calculated
 	}
 	
@@ -2325,21 +2325,24 @@ void CMap::CalculateTileLandmass(const Vec2i &pos, int z)
 
 	const bool is_water = (mf.Flags & MapFieldWaterAllowed) || (mf.Flags & MapFieldCoastAllowed);
 
-	//doesn't have a landmass ID, and hasn't inherited one from another tile yet, so add a new one
-	mf.Landmass = this->Landmasses + 1;
-	this->Landmasses += 1;
-	this->BorderLandmasses.resize(this->Landmasses + 1);
-	//now, spread the new landmass ID to neighboring land tiles
+	//doesn't have a landmass, and hasn't inherited one from another tile, so add a new one
+	const size_t landmass_index = this->landmasses.size();
+	this->landmasses.push_back(std::make_unique<landmass>(landmass_index));
+	mf.set_landmass(this->landmasses.back().get());
+
+	//now, spread the new landmass to neighboring land tiles
 	std::vector<Vec2i> landmass_tiles;
 	landmass_tiles.push_back(pos);
-	//calculate the landmass of any neighboring land tiles with no set landmass as well
+
 	for (size_t i = 0; i < landmass_tiles.size(); ++i) {
 		for (int x_offset = -1; x_offset <= 1; ++x_offset) {
 			for (int y_offset = -1; y_offset <= 1; ++y_offset) {
 				if (x_offset != 0 || y_offset != 0) {
 					Vec2i adjacent_pos(landmass_tiles[i].x + x_offset, landmass_tiles[i].y + y_offset);
+
 					if (this->Info.IsPointOnMap(adjacent_pos, z)) {
 						wyrmgus::tile &adjacent_mf = *this->Field(adjacent_pos, z);
+
 						const bool adjacent_is_space = adjacent_mf.Flags & MapFieldSpace;
 
 						if (adjacent_is_space) {
@@ -2348,12 +2351,12 @@ void CMap::CalculateTileLandmass(const Vec2i &pos, int z)
 
 						const bool adjacent_is_water = (adjacent_mf.Flags & MapFieldWaterAllowed) || (adjacent_mf.Flags & MapFieldCoastAllowed);
 									
-						if (adjacent_is_water == is_water && adjacent_mf.Landmass == 0) {
-							adjacent_mf.Landmass = mf.Landmass;
+						if (adjacent_is_water == is_water && adjacent_mf.get_landmass() == nullptr) {
+							adjacent_mf.set_landmass(mf.get_landmass());
 							landmass_tiles.push_back(adjacent_pos);
-						} else if (adjacent_is_water != is_water && adjacent_mf.Landmass != 0 && std::find(this->BorderLandmasses[mf.Landmass].begin(), this->BorderLandmasses[mf.Landmass].end(), adjacent_mf.Landmass) == this->BorderLandmasses[mf.Landmass].end()) {
-							this->BorderLandmasses[mf.Landmass].push_back(adjacent_mf.Landmass);
-							this->BorderLandmasses[adjacent_mf.Landmass].push_back(mf.Landmass);
+						} else if (adjacent_is_water != is_water && adjacent_mf.get_landmass() != nullptr && !mf.get_landmass()->borders_landmass(adjacent_mf.get_landmass())) {
+							mf.get_landmass()->add_border_landmass(adjacent_mf.get_landmass());
+							adjacent_mf.get_landmass()->add_border_landmass(mf.get_landmass());
 						}
 					}
 				}
@@ -3551,9 +3554,14 @@ void CMap::handle_destroyed_overlay_terrain()
 	}
 }
 
+void CMap::add_landmass(std::unique_ptr<landmass> &&landmass)
+{
+	this->landmasses.push_back(std::move(landmass));
+}
+
 void CMap::remove_settlement_unit(CUnit *settlement_unit)
 {
-	wyrmgus::vector::remove(this->settlement_units, settlement_unit);
+	vector::remove(this->settlement_units, settlement_unit);
 }
 
 /**

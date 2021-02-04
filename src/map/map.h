@@ -84,6 +84,7 @@ class CUnitCache;
 namespace wyrmgus {
 	class faction;
 	class generated_terrain;
+	class landmass;
 	class map_template;
 	class plane;
 	class site;
@@ -227,7 +228,7 @@ public:
 	//Wyrmgus start
 	const wyrmgus::terrain_type *GetTileTerrain(const Vec2i &pos, const bool overlay, const int z) const;
 	const wyrmgus::terrain_type *GetTileTopTerrain(const Vec2i &pos, const bool seen, const int z, const bool ignore_destroyed = false) const;
-	int GetTileLandmass(const Vec2i &pos, int z) const;
+	const landmass *get_tile_landmass(const QPoint &pos, const int z) const;
 	//Wyrmgus end
 
 	const CUnitCache &get_tile_unit_cache(const QPoint &pos, int z);
@@ -322,6 +323,13 @@ public:
 		//Wyrmgus end
 	}
 
+	const std::vector<std::unique_ptr<landmass>> &get_landmasses() const
+	{
+		return this->landmasses;
+	}
+
+	void add_landmass(std::unique_ptr<landmass> &&landmass);
+
 	const std::vector<CUnit *> &get_settlement_units() const
 	{
 		return this->settlement_units;
@@ -354,11 +362,10 @@ public:
 	std::string TileModelsFileName; /// lua filename that loads all tilemodels
 	std::shared_ptr<CGraphic> TileGraphic;     /// graphic for all the tiles
 	static std::shared_ptr<CGraphic> FogGraphics; //graphics for fog of war
-	//Wyrmgus start
-	int Landmasses = 0;						/// how many landmasses are there
-	std::vector<std::vector<int>> BorderLandmasses;	/// "landmasses" which border the one to which each vector belongs
 private:
+	std::vector<std::unique_ptr<landmass>> landmasses;
 	std::vector<CUnit *> settlement_units;	/// the town hall / settlement site units
+	//Wyrmgus start
 public:
 	std::vector<std::unique_ptr<CMapLayer>> MapLayers;	/// the map layers composing the map
 	//Wyrmgus end

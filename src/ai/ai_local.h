@@ -29,6 +29,7 @@
 
 #pragma once
 
+#include "map/landmass_container.h"
 #include "unit/unit_cache.h"
 #include "unit/unit_class_container.h"
 #include "unit/unit_type_container.h"
@@ -47,6 +48,7 @@ class CPlayer;
 static void InitAiHelper(AiHelper &aiHelper);
 
 namespace wyrmgus {
+	class landmass;
 	class resource;
 	class site;
 	class unit_class;
@@ -77,8 +79,8 @@ class AiRequestType
 {
 public:
 	unsigned int Count = 0;  /// elements in table
-	wyrmgus::unit_type *Type = nullptr;     /// the type
-	int Landmass = 0;		 /// in which landmass the unit should be created
+	unit_type *Type = nullptr;     /// the type
+	const wyrmgus::landmass *landmass = nullptr; //in which landmass the unit should be created
 };
 
 /**
@@ -274,7 +276,7 @@ public:
 	Vec2i Pos;          /// build near pos on map
 	//Wyrmgus start
 	int MapLayer = 0;
-	int Landmass = 0;
+	const wyrmgus::landmass *landmass = nullptr;
 	const wyrmgus::site *settlement = nullptr;
 	//Wyrmgus end
 };
@@ -342,7 +344,7 @@ public:
 	//Wyrmgus start
 	int LastPathwayConstructionBuilding = 0;		/// Last building checked for pathway construction in this turn
 	std::vector<CUnit *> Scouts;				/// AI scouting units
-	std::map<int, std::vector<CUnit *>> Transporters;	/// AI transporters, mapped to the sea (water "landmass") they belong to
+	landmass_map<std::vector<CUnit *>> Transporters; //AI transporters, mapped to the sea (water "landmass") they belong to
 	//Wyrmgus end
 };
 
@@ -658,7 +660,7 @@ extern PlayerAi *AiPlayer; /// Current AI player
 //
 extern void AiCheckWorkers();
 /// Add unit-type request to resource manager
-extern void AiAddUnitTypeRequest(const wyrmgus::unit_type &type, const int count, const int landmass = 0, const wyrmgus::site *settlement = nullptr, const Vec2i pos = Vec2i(-1, -1), const int z = 0);
+extern void AiAddUnitTypeRequest(const wyrmgus::unit_type &type, const int count, const landmass *landmass = nullptr, const site *settlement = nullptr, const Vec2i &pos = Vec2i(-1, -1), const int z = 0);
 /// Add upgrade-to request to resource manager
 extern void AiAddUpgradeToRequest(wyrmgus::unit_type &type);
 /// Add research request to resource manager
@@ -682,7 +684,7 @@ extern void AiNewDepotRequest(CUnit &worker);
 extern CUnit *AiGetSuitableDepot(const CUnit &worker, const CUnit &oldDepot, CUnit **resUnit);
 
 //Wyrmgus start
-extern void AiTransportCapacityRequest(int capacity_needed, int landmass);
+extern void AiTransportCapacityRequest(const int capacity_needed, const landmass *landmass);
 extern void AiCheckSettlementConstruction();
 extern void AiCheckDockConstruction();
 extern void AiCheckUpgrades();
@@ -693,7 +695,7 @@ extern void AiCheckBuildings();
 // Buildings
 //
 /// Find nice building place
-extern bool AiFindBuildingPlace(const CUnit &worker, const wyrmgus::unit_type &type, const Vec2i &nearPos, Vec2i *resultPos, bool ignore_exploration, int z, int landmass = 0, const wyrmgus::site *settlement = nullptr);
+extern bool AiFindBuildingPlace(const CUnit &worker, const wyrmgus::unit_type &type, const Vec2i &nearPos, Vec2i *resultPos, bool ignore_exploration, int z, const landmass *landmass = nullptr, const wyrmgus::site *settlement = nullptr);
 
 //
 // Forces
@@ -712,7 +714,7 @@ extern void AiAttackWithForceAt(unsigned int force, int x, int y, int z);
 /// Attack with force
 extern void AiAttackWithForce(unsigned int force);
 /// Attack with forces in array
-extern void AiAttackWithForces(int *forces);
+extern void AiAttackWithForces(const std::array<int, AI_MAX_FORCE_INTERNAL + 1> &forces);
 
 /// Periodically called force manager handlers
 extern void AiForceManager();
@@ -731,13 +733,13 @@ extern void AiSendExplorers();
 /// Assign free transporters according to their water zone (water "landmass")
 extern void AiCheckTransporters();
 /// Get the current transport capacity of the AI for a given water zone
-extern int AiGetTransportCapacity(int water_landmass);
+extern int AiGetTransportCapacity(const landmass *water_landmass);
 /// Get the current requested transport capacity of the AI for a given water zone
-extern int AiGetRequestedTransportCapacity(int water_landmass);
+extern int AiGetRequestedTransportCapacity(const landmass *water_landmass);
 /// Get the quantity of units belonging to a particular type, possibly including requests
-extern int AiGetUnitTypeCount(const PlayerAi &pai, const wyrmgus::unit_type *type, const int landmass, const bool include_requests, const bool include_upgrades);
+extern int AiGetUnitTypeCount(const PlayerAi &pai, const wyrmgus::unit_type *type, const landmass *landmass, const bool include_requests, const bool include_upgrades);
 /// Get whether the AI has a particular upgrade, possibly including requests and currently under research upgrades
-extern int AiGetUnitTypeRequestedCount(const PlayerAi &pai, const wyrmgus::unit_type *type, const int landmass = 0, const wyrmgus::site *settlement = nullptr);
+extern int AiGetUnitTypeRequestedCount(const PlayerAi &pai, const wyrmgus::unit_type *type, const landmass *landmass = nullptr, const wyrmgus::site *settlement = nullptr);
 /// Get whether the AI has a particular upgrade, possibly including requests and currently under research upgrades
 extern bool AiHasUpgrade(const PlayerAi &pai, const CUpgrade *upgrade, bool include_requests);
 //Wyrmgus end

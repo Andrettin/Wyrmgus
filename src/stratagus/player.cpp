@@ -59,6 +59,7 @@
 //Wyrmgus start
 #include "luacallback.h"
 //Wyrmgus end
+#include "map/landmass.h"
 #include "map/map.h"
 #include "map/map_layer.h"
 #include "map/minimap.h"
@@ -1727,7 +1728,7 @@ bool CPlayer::has_coastal_settlement() const
 	return false;
 }
 
-bool CPlayer::HasSettlementNearWaterZone(int water_zone) const
+bool CPlayer::HasSettlementNearWaterZone(const landmass *water_zone) const
 {
 	const std::vector<CUnit *> settlement_unit_table = this->get_town_hall_units();
 
@@ -1736,8 +1737,8 @@ bool CPlayer::HasSettlementNearWaterZone(int water_zone) const
 			continue;
 		}
 		
-		const int settlement_landmass = CMap::Map.GetTileLandmass(settlement_unit->tilePos, settlement_unit->MapLayer->ID);
-		if (!wyrmgus::vector::contains(CMap::Map.BorderLandmasses[settlement_landmass], water_zone)) {
+		const landmass *settlement_landmass = CMap::Map.get_tile_landmass(settlement_unit->tilePos, settlement_unit->MapLayer->ID);
+		if (settlement_landmass == nullptr || !settlement_landmass->borders_landmass(water_zone)) {
 			//settlement's landmass doesn't even border the water zone, continue
 			continue;
 		}
@@ -2079,7 +2080,7 @@ std::string_view CPlayer::get_faction_title_name() const
 	return faction->get_title_name(government_type, tier);
 }
 
-std::string_view CPlayer::GetCharacterTitleName(const wyrmgus::character_title title_type, const wyrmgus::gender gender) const
+std::string_view CPlayer::GetCharacterTitleName(const character_title title_type, const wyrmgus::gender gender) const
 {
 	if (this->get_faction() == nullptr || title_type == wyrmgus::character_title::none || gender == wyrmgus::gender::none) {
 		return wyrmgus::string::empty_str;
@@ -2092,9 +2093,9 @@ std::string_view CPlayer::GetCharacterTitleName(const wyrmgus::character_title t
 	return faction->get_character_title_name(title_type, government_type, tier, gender);
 }
 
-std::set<int> CPlayer::get_builder_landmasses(const wyrmgus::unit_type *building) const
+landmass_set CPlayer::get_builder_landmasses(const wyrmgus::unit_type *building) const
 {
-	std::set<int> builder_landmasses;
+	landmass_set builder_landmasses;
 
 	for (const wyrmgus::unit_type *builder_type : AiHelpers.get_builders(building)) {
 		if (this->GetUnitTypeAiActiveCount(builder_type) > 0) {
@@ -2103,7 +2104,12 @@ std::set<int> CPlayer::get_builder_landmasses(const wyrmgus::unit_type *building
 			FindPlayerUnitsByType(*this, *builder_type, builder_table, true);
 
 			for (const CUnit *builder : builder_table) {
-				const int landmass = CMap::Map.GetTileLandmass(builder->tilePos, builder->MapLayer->ID);
+				const landmass *landmass = CMap::Map.get_tile_landmass(builder->tilePos, builder->MapLayer->ID);
+
+				if (landmass == nullptr) {
+					continue;
+				}
+
 				builder_landmasses.insert(landmass);
 			}
 		}
@@ -2119,7 +2125,12 @@ std::set<int> CPlayer::get_builder_landmasses(const wyrmgus::unit_type *building
 				FindPlayerUnitsByType(*this, *builder_type, builder_table, true);
 
 				for (const CUnit *builder : builder_table) {
-					const int landmass = CMap::Map.GetTileLandmass(builder->tilePos, builder->MapLayer->ID);
+					const landmass *landmass = CMap::Map.get_tile_landmass(builder->tilePos, builder->MapLayer->ID);
+
+					if (landmass == nullptr) {
+						continue;
+					}
+
 					builder_landmasses.insert(landmass);
 				}
 			}

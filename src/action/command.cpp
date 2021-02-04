@@ -799,7 +799,7 @@ void CommandBoard(CUnit &unit, CUnit &dest, int flush)
 */
 //Wyrmgus start
 //void CommandUnload(CUnit &unit, const Vec2i &pos, CUnit *what, int flush)
-void CommandUnload(CUnit &unit, const Vec2i &pos, CUnit *what, int flush, int z, int landmass)
+void CommandUnload(CUnit &unit, const Vec2i &pos, CUnit *what, int flush, int z, const landmass *landmass)
 //Wyrmgus end
 {
 	if (IsUnitValidForNetwork(unit) == false) {

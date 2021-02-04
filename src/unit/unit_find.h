@@ -494,7 +494,7 @@ extern CUnit *FindIdleWorker(const CPlayer &player, const CUnit *last);
 
 /// Find the neareast piece of terrain with specific flags.
 extern bool FindTerrainType(int movemask, const wyrmgus::resource *resource, int range,
-							const CPlayer &player, const Vec2i &startPos, Vec2i *pos, int z, int landmass = 0);
+							const CPlayer &player, const Vec2i &startPos, Vec2i *pos, int z, const landmass *landmass = nullptr);
 
 extern void FindUnitsByType(const wyrmgus::unit_type &type, std::vector<CUnit *> &units, bool everybody = false);
 

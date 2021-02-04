@@ -219,6 +219,8 @@ set(map_SRCS
 	src/map/character_substitution.cpp
 	src/map/character_unit.cpp
 	src/map/historical_location.cpp
+	src/map/landmass.cpp
+	src/map/landmass_container.cpp
 	src/map/map.cpp
 	src/map/map_draw.cpp
 	src/map/map_fog.cpp
@@ -735,6 +737,8 @@ set(stratagus_map_HDRS
 	src/map/character_substitution.h
 	src/map/character_unit.h
 	src/map/historical_location.h
+	src/map/landmass.h
+	src/map/landmass_container.h
 	src/map/map.h
 	src/map/map_layer.h
 	src/map/map_template.h

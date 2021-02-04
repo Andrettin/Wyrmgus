@@ -39,6 +39,7 @@
 #include "commands.h"
 #include "faction.h"
 #include "game.h"
+#include "map/landmass.h"
 #include "map/map.h"
 #include "map/map_layer.h"
 #include "map/tile.h"
@@ -634,17 +635,20 @@ bool AiForce::NewRallyPoint(const Vec2i &startPos, Vec2i *resultPos, int z)
 //Wyrmgus start
 bool AiForce::CheckTransporters(const Vec2i &pos, int z)
 {
-	int home_landmass = CMap::Map.GetTileLandmass(this->HomePos, this->HomeMapLayer);
-	int goal_landmass = CMap::Map.GetTileLandmass(pos, z);
-	int water_landmass = 0;
-	for (size_t i = 0; i != CMap::Map.BorderLandmasses[goal_landmass].size(); ++i) {
-		if (std::find(CMap::Map.BorderLandmasses[home_landmass].begin(), CMap::Map.BorderLandmasses[home_landmass].end(), CMap::Map.BorderLandmasses[goal_landmass][i]) != CMap::Map.BorderLandmasses[home_landmass].end()) {
-			water_landmass = CMap::Map.BorderLandmasses[goal_landmass][i];
-			break;
+	const landmass *home_landmass = CMap::Map.get_tile_landmass(this->HomePos, this->HomeMapLayer);
+	const landmass *goal_landmass = CMap::Map.get_tile_landmass(pos, z);
+
+	const landmass *water_landmass = nullptr;
+	if (home_landmass != nullptr && goal_landmass != nullptr) {
+		for (const landmass *border_landmass : goal_landmass->get_border_landmasses()) {
+			if (home_landmass->borders_landmass(border_landmass)) {
+				water_landmass = border_landmass;
+				break;
+			}
 		}
 	}
 	
-	if (!water_landmass) { //not optimal that this is possible, perhaps should give the closest water "landmass" on the way, even if it doesn't border the goal itself?
+	if (water_landmass == nullptr) { //not optimal that this is possible, perhaps should give the closest water "landmass" on the way, even if it doesn't border the goal itself?
 		return true;
 	}
 	
@@ -657,7 +661,7 @@ bool AiForce::CheckTransporters(const Vec2i &pos, int z)
 			continue;
 		}
 		
-		if (CMap::Map.GetTileLandmass(ai_unit->tilePos, ai_unit->MapLayer->ID) == goal_landmass) { //already unloaded to the enemy's landmass
+		if (CMap::Map.get_tile_landmass(ai_unit->tilePos, ai_unit->MapLayer->ID) == goal_landmass) { //already unloaded to the enemy's landmass
 			continue;
 		}
 		
@@ -677,9 +681,7 @@ bool AiForce::CheckTransporters(const Vec2i &pos, int z)
 	//has enough transporters, see then if all units are already boarded
 	//put the possible transporters in a vector
 	std::vector<CUnit *> transporters;
-	for (size_t i = 0; i != AiPlayer->Transporters[water_landmass].size(); ++i) {
-		CUnit *ai_transporter = AiPlayer->Transporters[water_landmass][i];
-		
+	for (CUnit *ai_transporter : AiPlayer->Transporters[water_landmass]) {
 		if (!ai_transporter->IsIdle()) { //is already moving, may be going to a unit to transport it
 			continue;
 		}
@@ -702,7 +704,7 @@ bool AiForce::CheckTransporters(const Vec2i &pos, int z)
 			continue;
 		}
 		
-		if (CMap::Map.GetTileLandmass(ai_unit->tilePos, ai_unit->MapLayer->ID) == goal_landmass) { //already unloaded to the enemy's landmass
+		if (CMap::Map.get_tile_landmass(ai_unit->tilePos, ai_unit->MapLayer->ID) == goal_landmass) { //already unloaded to the enemy's landmass
 			continue;
 		}
 		
@@ -715,9 +717,7 @@ bool AiForce::CheckTransporters(const Vec2i &pos, int z)
 		const int delay = i; // To avoid lot of CPU consuption, send them with a small time difference.
 		ai_unit->Wait += delay;
 
-		for (size_t j = 0; j != transporters.size(); ++j) {
-			CUnit *ai_transporter = transporters[j];
-			
+		for (CUnit *ai_transporter : transporters) {
 			if ((ai_transporter->Type->MaxOnBoard - ai_transporter->BoardCount) < ai_unit->Type->BoardSize) { //the unit's board size is too big to fit in the transporter
 				continue;
 			}
@@ -726,7 +726,7 @@ bool AiForce::CheckTransporters(const Vec2i &pos, int z)
 		
 			CommandBoard(*ai_unit, *ai_transporter, FlushCommands);
 			CommandFollow(*ai_transporter, *ai_unit, FlushCommands);
-			transporters.erase(std::remove(transporters.begin(), transporters.end(), ai_transporter), transporters.end()); //only tell one unit to board a particular transporter at a single time, to avoid units getting in the way of one another
+			vector::remove(transporters, ai_transporter); //only tell one unit to board a particular transporter at a single time, to avoid units getting in the way of one another
 			break;
 		}
 		
@@ -740,7 +740,7 @@ bool AiForce::CheckTransporters(const Vec2i &pos, int z)
 	for (size_t i = 0; i != this->get_units().size(); ++i) {
 		CUnit *ai_unit = *this->get_units()[i];
 		
-		if (CMap::Map.GetTileLandmass(ai_unit->tilePos, ai_unit->MapLayer->ID) == goal_landmass) { //already unloaded to the enemy's landmass
+		if (CMap::Map.get_tile_landmass(ai_unit->tilePos, ai_unit->MapLayer->ID) == goal_landmass) { //already unloaded to the enemy's landmass
 			continue;
 		}
 
@@ -990,7 +990,7 @@ void AiForce::Attack(const Vec2i &pos, int z)
 		bool needs_transport = false;
 		for (const std::shared_ptr<wyrmgus::unit_ref> &unit_ref : this->get_units()) {
 			CUnit *unit = unit_ref->get();
-			if (unit->Type->UnitType != UnitTypeType::Fly && unit->Type->UnitType != UnitTypeType::FlyLow && unit->Type->UnitType != UnitTypeType::Space && CMap::Map.GetTileLandmass(unit->tilePos, unit->MapLayer->ID) != CMap::Map.GetTileLandmass(goalPos, z)) {
+			if (unit->Type->UnitType != UnitTypeType::Fly && unit->Type->UnitType != UnitTypeType::FlyLow && unit->Type->UnitType != UnitTypeType::Space && CMap::Map.get_tile_landmass(unit->tilePos, unit->MapLayer->ID) != CMap::Map.get_tile_landmass(goalPos, z)) {
 				needs_transport = true;
 				break;
 			}
@@ -1395,7 +1395,7 @@ void AiAttackWithForce(unsigned int force)
 **
 **  @param forces  Array with Force numbers to attack with (array should be finished with -1).
 */
-void AiAttackWithForces(int *forces)
+void AiAttackWithForces(const std::array<int, AI_MAX_FORCE_INTERNAL + 1> &forces)
 {
 	const Vec2i invalidPos(-1, -1);
 	bool found = false;
@@ -1653,7 +1653,7 @@ void AiForce::Update()
 	bool needs_transport = false;
 	for (const std::shared_ptr<wyrmgus::unit_ref> &unit_ref : this->get_units()) {
 		CUnit *unit = unit_ref->get();
-		if (unit->Type->UnitType != UnitTypeType::Fly && unit->Type->UnitType != UnitTypeType::FlyLow && unit->Type->UnitType != UnitTypeType::Space && unit->Type->UnitType != UnitTypeType::Naval && CMap::Map.GetTileLandmass(unit->tilePos, unit->MapLayer->ID) != CMap::Map.GetTileLandmass(this->GoalPos, this->GoalMapLayer)) {
+		if (unit->Type->UnitType != UnitTypeType::Fly && unit->Type->UnitType != UnitTypeType::FlyLow && unit->Type->UnitType != UnitTypeType::Space && unit->Type->UnitType != UnitTypeType::Naval && CMap::Map.get_tile_landmass(unit->tilePos, unit->MapLayer->ID) != CMap::Map.get_tile_landmass(this->GoalPos, this->GoalMapLayer)) {
 			needs_transport = true;
 			break;
 		}

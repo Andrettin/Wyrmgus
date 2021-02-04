@@ -39,6 +39,7 @@
 #include "game.h"
 #include "iolib.h"
 #include "item/unique_item.h"
+#include "map/landmass.h"
 #include "map/map_layer.h"
 #include "map/map_template.h"
 #include "map/region.h"
@@ -225,18 +226,24 @@ static int CclStratagusMap(lua_State *l)
 					if (!lua_istable(l, -1)) {
 						LuaError(l, "incorrect argument for \"landmasses\"");
 					}
+
 					const int subsubargs = lua_rawlen(l, -1);
-					CMap::Map.Landmasses = subsubargs;
-					CMap::Map.BorderLandmasses.resize(CMap::Map.Landmasses + 1);
+
 					for (int z = 0; z < subsubargs; ++z) {
-						int landmass = z + 1;
+						auto landmass = std::make_unique<wyrmgus::landmass>(CMap::get()->get_landmasses().size());
+						CMap::get()->add_landmass(std::move(landmass));
+					}
+
+					for (int z = 0; z < subsubargs; ++z) {
+						const std::unique_ptr<landmass> &landmass = CMap::get()->get_landmasses()[z];
 						if (!lua_istable(l, -1)) {
 							LuaError(l, "incorrect argument for \"landmasses\"");
 						}
 						lua_rawgeti(l, -1, z + 1);
 						const int subsubsubargs = lua_rawlen(l, -1);
 						for (int n = 0; n < subsubsubargs; ++n) {
-							CMap::Map.BorderLandmasses[landmass].push_back(LuaToNumber(l, -1, n + 1));
+							const int border_landmass_index = LuaToNumber(l, -1, n + 1);
+							landmass->add_border_landmass(CMap::get()->get_landmasses()[border_landmass_index].get());
 						}
 						lua_pop(l, 1);
 					}

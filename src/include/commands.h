@@ -36,6 +36,7 @@ class CUpgrade;
 
 namespace wyrmgus {
 	class dynasty;
+	class landmass;
 	class quest;
 	class resource;
 	class site;
@@ -117,7 +118,7 @@ extern void CommandBoard(CUnit &unit, CUnit &dest, int flush);
 /// Prepare command unload
 //Wyrmgus start
 //extern void CommandUnload(CUnit &unit, const Vec2i &pos, CUnit *what, int flush);
-extern void CommandUnload(CUnit &unit, const Vec2i &pos, CUnit *what, int flush, int z = 0, int landmass = 0);
+extern void CommandUnload(CUnit &unit, const Vec2i &pos, CUnit *what, int flush, int z = 0, const landmass *landmass = nullptr);
 //Wyrmgus end
 /// Prepare command build
 extern void CommandBuildBuilding(CUnit &unit, const Vec2i &pos, const wyrmgus::unit_type &, int flush, int z = 0, const wyrmgus::site *settlement = nullptr);

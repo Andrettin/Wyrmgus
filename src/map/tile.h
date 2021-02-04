@@ -121,6 +121,7 @@ struct lua_State;
 
 namespace wyrmgus {
 
+class landmass;
 class resource;
 class site;
 class terrain_feature;
@@ -303,6 +304,16 @@ public:
 		this->ownership_border_tile = tile;
 	}
 
+	wyrmgus::landmass *get_landmass() const
+	{
+		return this->landmass;
+	}
+
+	void set_landmass(wyrmgus::landmass *landmass)
+	{
+		this->landmass = landmass;
+	}
+
 	const site *get_settlement() const
 	{
 		return this->settlement;
@@ -340,9 +351,7 @@ public:
 private:
 	unsigned char movement_cost = 0; //unit cost to move in this tile
 	short value = 0; //HP for walls/resource quantity/forest regeneration/destroyed wall and rock decay
-public:
-	int Landmass = 0; //to which "landmass" (can also be water) does this map field belong (if any); a "landmass" is a collection of adjacent land tiles, or a collection of adjacent water tiles; 0 means none has been set yet
-private:
+	wyrmgus::landmass *landmass = nullptr; //to which "landmass" (can also be water) does this map field belong (if any); a "landmass" is a collection of adjacent land tiles, or a collection of adjacent water tiles
 	short ownership_border_tile = -1; //the transition type of the border between this tile's owner, and other players' tiles, if applicable)
 	const site *settlement = nullptr;
 public:

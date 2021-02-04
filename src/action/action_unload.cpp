@@ -35,6 +35,7 @@
 #include "commands.h"
 //Wyrmgus end
 #include "iolib.h"
+#include "map/landmass.h"
 #include "map/map.h"
 #include "map/map_layer.h"
 //Wyrmgus start
@@ -50,14 +51,14 @@
 #include "util/point_util.h"
 #include "video/video.h"
 
-std::unique_ptr<COrder> COrder::NewActionUnload(const Vec2i &pos, CUnit *what, int z, int landmass)
+std::unique_ptr<COrder> COrder::NewActionUnload(const Vec2i &pos, CUnit *what, int z, const landmass *landmass)
 {
 	auto order = std::make_unique<COrder_Unload>();
 
 	order->goalPos = pos;
 	//Wyrmgus start
 	order->MapLayer = z;
-	order->Landmass = landmass;
+	order->landmass = landmass;
 	//Wyrmgus end
 	if (what && !what->Destroyed) {
 		order->set_goal(what);
@@ -81,9 +82,11 @@ void COrder_Unload::Save(CFile &file, const CUnit &unit) const
 	//Wyrmgus start
 	file.printf(" \"map-layer\", %d,", this->MapLayer);
 	//Wyrmgus end
-	//Wyrmgus start
-	file.printf(" \"landmass\", %d,", this->Landmass);
-	//Wyrmgus end
+
+	if (this->landmass != nullptr) {
+		file.printf(" \"landmass\", %2d,", this->landmass->get_index());
+	}
+
 	file.printf("\"state\", %d", this->State);
 	file.printf("}");
 }
@@ -109,7 +112,8 @@ bool COrder_Unload::ParseSpecificData(lua_State *l, int &j, const char *value, c
 		this->MapLayer = LuaToNumber(l, -1, j + 1);
 	} else if (!strcmp(value, "landmass")) {
 		++j;
-		this->Landmass = LuaToNumber(l, -1, j + 1);
+		const int landmass_index = LuaToNumber(l, -1, j + 1);
+		this->landmass = CMap::get()->get_landmasses()[landmass_index].get();
 	//Wyrmgus end
 	} else {
 		return false;
@@ -166,7 +170,7 @@ bool COrder_Unload::ParseSpecificData(lua_State *l, int &j, const char *value, c
 */
 //Wyrmgus start
 //static bool FindUnloadPosition(const CUnit &transporter, const CUnit &unit, const Vec2i startPos, int maxRange, Vec2i *res)
-static bool FindUnloadPosition(const CUnit &transporter, const CUnit &unit, const Vec2i startPos, int maxRange, Vec2i *res, int z, int landmass = 0, const std::optional<QPoint> &target_pos = std::nullopt)
+static bool FindUnloadPosition(const CUnit &transporter, const CUnit &unit, const Vec2i startPos, int maxRange, Vec2i *res, int z, const landmass *landmass = nullptr, const std::optional<QPoint> &target_pos = std::nullopt)
 //Wyrmgus end
 {
 	Vec2i pos = startPos;
@@ -183,7 +187,7 @@ static bool FindUnloadPosition(const CUnit &transporter, const CUnit &unit, cons
 		for (int i = addy; i--; ++pos.y) {
 			//Wyrmgus start
 //			if (UnitCanBeAt(unit, pos)) {
-			if (UnitCanBeAt(unit, pos, z) && (!landmass || CMap::Map.GetTileLandmass(pos, z) == landmass)) {
+			if (UnitCanBeAt(unit, pos, z) && (!landmass || CMap::Map.get_tile_landmass(pos, z) == landmass)) {
 			//Wyrmgus end
 				if (target_pos.has_value()) {
 					const int distance = wyrmgus::point::square_distance_to(pos, target_pos.value());
@@ -203,7 +207,7 @@ static bool FindUnloadPosition(const CUnit &transporter, const CUnit &unit, cons
 		for (int i = addx; i--; ++pos.x) {
 			//Wyrmgus start
 //			if (UnitCanBeAt(unit, pos)) {
-			if (UnitCanBeAt(unit, pos, z) && (!landmass || CMap::Map.GetTileLandmass(pos, z) == landmass)) {
+			if (UnitCanBeAt(unit, pos, z) && (!landmass || CMap::Map.get_tile_landmass(pos, z) == landmass)) {
 			//Wyrmgus end
 				if (target_pos.has_value()) {
 					const int distance = wyrmgus::point::square_distance_to(pos, target_pos.value());
@@ -223,7 +227,7 @@ static bool FindUnloadPosition(const CUnit &transporter, const CUnit &unit, cons
 		for (int i = addy; i--; --pos.y) {
 			//Wyrmgus start
 //			if (UnitCanBeAt(unit, pos)) {
-			if (UnitCanBeAt(unit, pos, z) && (!landmass || CMap::Map.GetTileLandmass(pos, z) == landmass)) {
+			if (UnitCanBeAt(unit, pos, z) && (!landmass || CMap::Map.get_tile_landmass(pos, z) == landmass)) {
 			//Wyrmgus end
 				if (target_pos.has_value()) {
 					const int distance = wyrmgus::point::square_distance_to(pos, target_pos.value());
@@ -243,7 +247,7 @@ static bool FindUnloadPosition(const CUnit &transporter, const CUnit &unit, cons
 		for (int i = addx; i--; --pos.x) {
 			//Wyrmgus start
 //			if (UnitCanBeAt(unit, pos)) {
-			if (UnitCanBeAt(unit, pos, z) && (!landmass || CMap::Map.GetTileLandmass(pos, z) == landmass)) {
+			if (UnitCanBeAt(unit, pos, z) && (!landmass || CMap::Map.get_tile_landmass(pos, z) == landmass)) {
 			//Wyrmgus end
 				if (target_pos.has_value()) {
 					const int distance = wyrmgus::point::square_distance_to(pos, target_pos.value());
@@ -275,7 +279,7 @@ static bool FindUnloadPosition(const CUnit &transporter, const CUnit &unit, cons
 */
 //Wyrmgus start
 //static int UnloadUnit(CUnit &transporter, CUnit &unit)
-static int UnloadUnit(CUnit &transporter, CUnit &unit, int landmass)
+static int UnloadUnit(CUnit &transporter, CUnit &unit, const landmass *landmass)
 //Wyrmgus end
 {
 	static constexpr int max_range = 1;
@@ -350,7 +354,7 @@ static int UnloadUnit(CUnit &transporter, CUnit &unit, int landmass)
 */
 //Wyrmgus start
 //static bool IsDropZonePossible(const CUnit &transporter, const Vec2i &pos)
-static bool IsDropZonePossible(const CUnit &transporter, const Vec2i &pos, int z, int landmass = 0, CUnit *goal = nullptr)
+static bool IsDropZonePossible(const CUnit &transporter, const Vec2i &pos, int z, const landmass *landmass = nullptr, CUnit *goal = nullptr)
 //Wyrmgus end
 {
 	const int maxUnloadRange = 1;
@@ -406,7 +410,7 @@ static bool IsDropZonePossible(const CUnit &transporter, const Vec2i &pos, int z
 */
 //Wyrmgus start
 //static bool ClosestFreeDropZone_internal(const CUnit &transporter, const Vec2i &startPos, int maxRange, Vec2i *resPos)
-static bool ClosestFreeDropZone_internal(const CUnit &transporter, const Vec2i &startPos, int maxRange, Vec2i *resPos, int z, int landmass, CUnit *goal)
+static bool ClosestFreeDropZone_internal(const CUnit &transporter, const Vec2i &startPos, int maxRange, Vec2i *resPos, int z, const landmass *landmass, CUnit *goal)
 //Wyrmgus end
 {
 	int addx = 0;
@@ -472,7 +476,7 @@ static bool ClosestFreeDropZone_internal(const CUnit &transporter, const Vec2i &
 */
 //Wyrmgus start
 //static int ClosestFreeDropZone(CUnit &transporter, const Vec2i &startPos, int maxRange, Vec2i *resPos)
-static int ClosestFreeDropZone(CUnit &transporter, const Vec2i &startPos, int maxRange, Vec2i *resPos, int z, int landmass, CUnit *goal)
+static int ClosestFreeDropZone(CUnit &transporter, const Vec2i &startPos, int maxRange, Vec2i *resPos, int z, const landmass *landmass, CUnit *goal)
 //Wyrmgus end
 {
 	// Check there are units onboard
@@ -554,7 +558,7 @@ bool COrder_Unload::LeaveTransporter(CUnit &transporter)
 		// Try to unload the unit. If it doesn't work there is no problem.
 		//Wyrmgus start
 //		if (UnloadUnit(transporter, goal)) {
-		if (UnloadUnit(transporter, goal, this->Landmass)) {
+		if (UnloadUnit(transporter, goal, this->landmass)) {
 		//Wyrmgus end
 			this->clear_goal();
 		} else {
@@ -567,7 +571,7 @@ bool COrder_Unload::LeaveTransporter(CUnit &transporter)
 			if (goal->Boarded) {
 				//Wyrmgus start
 //				if (!UnloadUnit(transporter, *goal)) {
-				if (!UnloadUnit(transporter, *goal, this->Landmass)) {
+				if (!UnloadUnit(transporter, *goal, this->landmass)) {
 				//Wyrmgus end
 					++stillonboard;
 				}
@@ -624,7 +628,7 @@ bool COrder_Unload::LeaveTransporter(CUnit &transporter)
 
 				//Wyrmgus start
 //				if (!ClosestFreeDropZone(unit, this->goalPos, maxSearchRange, &pos)) {
-				if (!ClosestFreeDropZone(unit, this->goalPos, maxSearchRange, &pos, this->MapLayer, this->Landmass, this->get_goal())) {
+				if (!ClosestFreeDropZone(unit, this->goalPos, maxSearchRange, &pos, this->MapLayer, this->landmass, this->get_goal())) {
 				//Wyrmgus end
 					this->Finished = true;
 					return ;

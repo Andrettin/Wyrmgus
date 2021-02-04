@@ -4173,9 +4173,9 @@ void UnitLost(CUnit &unit)
 						player.Ai->Scouting = false;
 					}
 				}
-				for (std::map<int, std::vector<CUnit *>>::iterator iterator = player.Ai->Transporters.begin(); iterator != player.Ai->Transporters.end(); ++iterator) {
-					if (std::find(iterator->second.begin(), iterator->second.end(), &unit) != iterator->second.end()) {
-						iterator->second.erase(std::remove(iterator->second.begin(), iterator->second.end(), &unit), iterator->second.end());
+				for (auto &kv_pair : player.Ai->Transporters) {
+					if (vector::contains(kv_pair.second, &unit)) {
+						vector::remove(kv_pair.second, &unit);
 					}
 				}
 			}

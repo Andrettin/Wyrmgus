@@ -33,6 +33,7 @@
 #include "editor.h"
 //Wyrmgus end
 #include "iolib.h"
+#include "map/landmass.h"
 #include "map/map.h"
 #include "map/site.h"
 #include "map/site_game_data.h"
@@ -351,7 +352,9 @@ void tile::Save(CFile &file) const
 {
 	const wyrmgus::terrain_feature *terrain_feature = this->get_terrain_feature();
 
-	file.printf("  {\"%s\", \"%s\", \"%s\", %s, %s, \"%s\", \"%s\", %d, %d, %d, %d, %2d, %2d, %2d, \"%s\"", (this->get_terrain() != nullptr ? this->get_terrain()->get_identifier().c_str() : ""), (this->get_overlay_terrain() != nullptr ? this->get_overlay_terrain()->get_identifier().c_str() : ""), (terrain_feature != nullptr ? terrain_feature->get_identifier().c_str() : ""), OverlayTerrainDamaged ? "true" : "false", OverlayTerrainDestroyed ? "true" : "false", player_info->SeenTerrain ? player_info->SeenTerrain->Ident.c_str() : "", player_info->SeenOverlayTerrain ? player_info->SeenOverlayTerrain->Ident.c_str() : "", SolidTile, OverlaySolidTile, player_info->SeenSolidTile, player_info->SeenOverlaySolidTile, this->get_value(), this->get_movement_cost(), Landmass, this->get_settlement() != nullptr ? this->get_settlement()->get_identifier().c_str() : "");
+	const int landmass_index = this->get_landmass() ? static_cast<int>(this->get_landmass()->get_index()) : -1;
+
+	file.printf("  {\"%s\", \"%s\", \"%s\", %s, %s, \"%s\", \"%s\", %d, %d, %d, %d, %2d, %2d, %2d, \"%s\"", (this->get_terrain() != nullptr ? this->get_terrain()->get_identifier().c_str() : ""), (this->get_overlay_terrain() != nullptr ? this->get_overlay_terrain()->get_identifier().c_str() : ""), (terrain_feature != nullptr ? terrain_feature->get_identifier().c_str() : ""), OverlayTerrainDamaged ? "true" : "false", OverlayTerrainDestroyed ? "true" : "false", player_info->SeenTerrain ? player_info->SeenTerrain->Ident.c_str() : "", player_info->SeenOverlayTerrain ? player_info->SeenOverlayTerrain->Ident.c_str() : "", SolidTile, OverlaySolidTile, player_info->SeenSolidTile, player_info->SeenOverlaySolidTile, this->get_value(), this->get_movement_cost(), landmass_index, this->get_settlement() != nullptr ? this->get_settlement()->get_identifier().c_str() : "");
 
 	for (size_t i = 0; i != TransitionTiles.size(); ++i) {
 		file.printf(", \"transition-tile\", \"%s\", %d", TransitionTiles[i].first->Ident.c_str(), TransitionTiles[i].second);
@@ -531,7 +534,12 @@ void tile::parse(lua_State *l)
 	this->player_info->SeenOverlaySolidTile = LuaToNumber(l, -1, 11);
 	this->value = LuaToNumber(l, -1, 12);
 	this->movement_cost = LuaToNumber(l, -1, 13);
-	this->Landmass = LuaToNumber(l, -1, 14);
+
+	const int landmass_index = LuaToNumber(l, -1, 14);
+	if (landmass_index != -1) {
+		this->landmass = CMap::get()->get_landmasses()[landmass_index].get();
+	}
+
 	const std::string settlement_identifier = LuaToString(l, -1, 15);
 	if (!settlement_identifier.empty()) {
 		this->settlement = site::get(settlement_identifier);

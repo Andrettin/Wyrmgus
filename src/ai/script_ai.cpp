@@ -1178,7 +1178,7 @@ static int CclAiWaitForces(lua_State *l)
 */
 static int CclAiAttackWithForces(lua_State *l)
 {
-	int Forces[AI_MAX_FORCE_INTERNAL + 1];
+	std::array<int, AI_MAX_FORCE_INTERNAL + 1> Forces{};
 
 	LuaCheckArgs(l, 1);
 	if (!lua_istable(l, 1)) {
@@ -1449,8 +1449,8 @@ static void CclParseBuildQueue(lua_State *l, PlayerAi *ai, int offset)
 	Vec2i pos(-1, -1);
 	//Wyrmgus start
 	int z = -1;
-	int landmass = 0;
-	wyrmgus::site *settlement = nullptr;
+	const landmass *landmass = nullptr;
+	const site *settlement = nullptr;
 	//Wyrmgus end
 
 	const int args = lua_rawlen(l, offset);
@@ -1466,9 +1466,10 @@ static void CclParseBuildQueue(lua_State *l, PlayerAi *ai, int offset)
 		} else if (!strcmp(value, "map-layer")) {
 			z = LuaToNumber(l, offset, k + 1);
 		} else if (!strcmp(value, "landmass")) {
-			landmass = LuaToNumber(l, offset, k + 1);
+			const int landmass_index = LuaToNumber(l, offset, k + 1);
+			landmass = CMap::get()->get_landmasses()[landmass_index].get();
 		} else if (!strcmp(value, "settlement")) {
-			settlement = wyrmgus::site::get(LuaToString(l, offset, k + 1));
+			settlement = site::get(LuaToString(l, offset, k + 1));
 		//Wyrmgus end
 		} else {
 			//ident = LuaToString(l, j + 1, k + 1);
@@ -1484,7 +1485,7 @@ static void CclParseBuildQueue(lua_State *l, PlayerAi *ai, int offset)
 			queue.Pos = pos;
 			//Wyrmgus start
 			queue.MapLayer = z;
-			queue.Landmass = landmass;
+			queue.landmass = landmass;
 			queue.settlement = settlement;
 			//Wyrmgus end
 
@@ -1493,7 +1494,7 @@ static void CclParseBuildQueue(lua_State *l, PlayerAi *ai, int offset)
 			pos.y = -1;
 			//Wyrmgus start
 			z = -1;
-			landmass = 0;
+			landmass = nullptr;
 			settlement = nullptr;
 			//Wyrmgus end
 		}
@@ -1721,15 +1722,13 @@ static int CclDefineAiPlayer(lua_State *l)
 				const char *ident = LuaToString(l, j + 1, k + 1);
 				++k;
 				const int count = LuaToNumber(l, j + 1, k + 1);
-				//Wyrmgus start
 				++k;
-				const int landmass = LuaToNumber(l, j + 1, k + 1);
-				//Wyrmgus end
+				const int landmass_index = LuaToNumber(l, j + 1, k + 1);
 				ai->UnitTypeRequests[i].Type = wyrmgus::unit_type::get(ident);
 				ai->UnitTypeRequests[i].Count = count;
-				//Wyrmgus start
-				ai->UnitTypeRequests[i].Landmass = landmass;
-				//Wyrmgus end
+				if (landmass_index != -1) {
+					ai->UnitTypeRequests[i].landmass = CMap::get()->get_landmasses()[landmass_index].get();
+				}
 				++i;
 			}
 		} else if (!strcmp(value, "upgrade")) {
@@ -1773,7 +1772,8 @@ static int CclDefineAiPlayer(lua_State *l)
 			}
 			const int subargs = lua_rawlen(l, j + 1);
 			for (int k = 0; k < subargs; ++k) {
-				int landmass = LuaToNumber(l, j + 1, k + 1);
+				const int landmass_index = LuaToNumber(l, j + 1, k + 1);
+				const landmass *landmass = CMap::get()->get_landmasses()[landmass_index].get();
 				++k;
 				const int num = LuaToNumber(l, j + 1, k + 1);
 				ai->Transporters[landmass].push_back(&wyrmgus::unit_manager::get()->GetSlotUnit(num));

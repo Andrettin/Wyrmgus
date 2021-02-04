@@ -35,6 +35,7 @@ class CUnit;
 class CUpgrade;
 
 namespace wyrmgus {
+	class landmass;
 	class site;
 	class unit_type;
 }
@@ -77,9 +78,9 @@ extern void AiNeedMoreSupply(const CPlayer &player);
 /// Called if AI unit has completed work
 extern void AiWorkComplete(CUnit *unit, CUnit &what);
 /// Called if AI unit can't build
-extern void AiCanNotBuild(const CUnit &unit, const wyrmgus::unit_type &what, int landmass = 0, const wyrmgus::site *settlement = nullptr);
+extern void AiCanNotBuild(const CUnit &unit, const wyrmgus::unit_type &what, const landmass *landmass = nullptr, const wyrmgus::site *settlement = nullptr);
 /// Called if AI unit can't reach building place
-extern void AiCanNotReach(CUnit &unit, const wyrmgus::unit_type &what, int landmass, const wyrmgus::site *settlement);
+extern void AiCanNotReach(CUnit &unit, const wyrmgus::unit_type &what, const landmass *landmass, const wyrmgus::site *settlement);
 /// Called if an AI unit can't move
 extern void AiCanNotMove(CUnit &unit);
 /// Called if AI unit has completed training

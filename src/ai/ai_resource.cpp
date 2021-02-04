@@ -38,6 +38,7 @@
 #include "commands.h"
 #include "database/defines.h"
 #include "faction.h"
+#include "map/landmass.h"
 #include "map/map.h"
 #include "map/map_layer.h"
 #include "map/site.h"
@@ -60,7 +61,7 @@
 
 static constexpr int COLLECT_RESOURCES_INTERVAL = 4;
 
-static int AiMakeUnit(const wyrmgus::unit_type &type, const Vec2i &nearPos, int z, int landmass = 0, const wyrmgus::site *settlement = nullptr);
+static int AiMakeUnit(const wyrmgus::unit_type &type, const Vec2i &nearPos, int z, const landmass *landmass = nullptr, const wyrmgus::site *settlement = nullptr);
 
 /**
 **  Check if the costs are available for the AI.
@@ -304,7 +305,7 @@ static bool IsAlreadyWorking(const CUnit &unit)
 **
 **  @note            We must check if the dependencies are fulfilled.
 */
-static int AiBuildBuilding(const wyrmgus::unit_type &type, const wyrmgus::unit_type &building, const Vec2i &nearPos, int z, int landmass = 0, const wyrmgus::site *settlement = nullptr)
+static int AiBuildBuilding(const wyrmgus::unit_type &type, const wyrmgus::unit_type &building, const Vec2i &nearPos, int z, const landmass *landmass = nullptr, const site *settlement = nullptr)
 {
 	std::vector<CUnit *> table;
 
@@ -321,9 +322,9 @@ static int AiBuildBuilding(const wyrmgus::unit_type &type, const wyrmgus::unit_t
 			continue;
 		}
 		
-		if (landmass) {
-			int worker_landmass = CMap::Map.GetTileLandmass(unit.tilePos, unit.MapLayer->ID);
-			if (worker_landmass != landmass && std::find(CMap::Map.BorderLandmasses[landmass].begin(), CMap::Map.BorderLandmasses[landmass].end(), worker_landmass) == CMap::Map.BorderLandmasses[landmass].end()) { //if the landmass is not the same as the worker's, and the worker isn't in an adjacent landmass, then the worker can't build the building at the appropriate location
+		if (landmass != nullptr) {
+			const wyrmgus::landmass *worker_landmass = CMap::Map.get_tile_landmass(unit.tilePos, unit.MapLayer->ID);
+			if (worker_landmass != landmass && !landmass->borders_landmass(worker_landmass)) { //if the landmass is not the same as the worker's, and the worker isn't in an adjacent landmass, then the worker can't build the building at the appropriate location
 				continue;
 			}
 		}
@@ -691,7 +692,7 @@ CUnit *AiGetSuitableDepot(const CUnit &worker, const CUnit &oldDepot, CUnit **re
 }
 
 //Wyrmgus start
-void AiTransportCapacityRequest(int capacity_needed, int landmass)
+void AiTransportCapacityRequest(const int capacity_needed, const landmass *landmass)
 {
 	if (AiPlayer->Player->Faction == -1) {
 		return;
@@ -745,7 +746,7 @@ void AiTransportCapacityRequest(int capacity_needed, int landmass)
 				for (size_t j = 0; j != builder_table.size(); ++j) {
 					CUnit &builder_unit = *builder_table[j];
 					
-					if (CMap::Map.GetTileLandmass(builder_unit.tilePos, builder_unit.MapLayer->ID) == landmass) {
+					if (CMap::Map.get_tile_landmass(builder_unit.tilePos, builder_unit.MapLayer->ID) == landmass) {
 						has_builder = true;
 						break;
 					}
@@ -772,7 +773,7 @@ void AiTransportCapacityRequest(int capacity_needed, int landmass)
 					for (size_t j = 0; j != builder_table.size(); ++j) {
 						CUnit &builder_unit = *builder_table[j];
 
-						if (CMap::Map.GetTileLandmass(builder_unit.tilePos, builder_unit.MapLayer->ID) == landmass) {
+						if (CMap::Map.get_tile_landmass(builder_unit.tilePos, builder_unit.MapLayer->ID) == landmass) {
 							has_builder = true;
 							break;
 						}
@@ -787,7 +788,7 @@ void AiTransportCapacityRequest(int capacity_needed, int landmass)
 		if (!has_builder) { //if doesn't have an already built builder, see if there's one in the requests already
 			for (unsigned int i = 0; i < AiPlayer->UnitTypeBuilt.size(); ++i) { //count transport capacity under construction to see if should request more
 				const AiBuildQueue &queue = AiPlayer->UnitTypeBuilt[i];
-				if (queue.Landmass != landmass) {
+				if (queue.landmass != landmass) {
 					continue;
 				}
 				
@@ -981,7 +982,7 @@ static bool AiRequestSupply()
 **
 **  @note        We must check if the dependencies are fulfilled.
 */
-static bool AiTrainUnit(const wyrmgus::unit_type &type, wyrmgus::unit_type &what, int landmass = 0, const wyrmgus::site *settlement = nullptr)
+static bool AiTrainUnit(const unit_type &type, unit_type &what, const landmass *landmass = nullptr, const site *settlement = nullptr)
 {
 	std::vector<CUnit *> table;
 
@@ -990,7 +991,7 @@ static bool AiTrainUnit(const wyrmgus::unit_type &type, wyrmgus::unit_type &what
 		CUnit &unit = *table[i];
 
 		//Wyrmgus start
-		if (landmass && CMap::Map.GetTileLandmass(unit.tilePos, unit.MapLayer->ID) != landmass) {
+		if (landmass && CMap::Map.get_tile_landmass(unit.tilePos, unit.MapLayer->ID) != landmass) {
 			continue;
 		}
 		
@@ -1019,7 +1020,7 @@ static bool AiTrainUnit(const wyrmgus::unit_type &type, wyrmgus::unit_type &what
 **
 **  @note        We must check if the dependencies are fulfilled.
 */
-static int AiMakeUnit(const wyrmgus::unit_type &typeToMake, const Vec2i &nearPos, int z, int landmass, const wyrmgus::site *settlement)
+static int AiMakeUnit(const unit_type &typeToMake, const Vec2i &nearPos, const int z, const landmass *landmass, const site *settlement)
 {
 	// Find equivalents unittypes.
 	int usableTypes[UnitTypeMax + 1];
@@ -1281,7 +1282,7 @@ static void AiCheckingWork()
 		} else if (queuep->Want > queuep->Made && queuep->Wait <= GameCycle) {
 			//Wyrmgus start
 //			if (AiMakeUnit(type, queuep->Pos)) {
-			if (AiMakeUnit(type, queuep->Pos, queuep->MapLayer, queuep->Landmass, queuep->settlement)) {
+			if (AiMakeUnit(type, queuep->Pos, queuep->MapLayer, queuep->landmass, queuep->settlement)) {
 			//Wyrmgus end
 				++queuep->Made;
 				queuep->Wait = 0;
@@ -2350,7 +2351,7 @@ void AiCheckSettlementConstruction()
 	}
 
 	//check in which landmasses this player has workers
-	const std::set<int> builder_landmasses = AiPlayer->Player->get_builder_landmasses(town_hall_type);
+	const landmass_set builder_landmasses = AiPlayer->Player->get_builder_landmasses(town_hall_type);
 	
 	//check settlement units to see if can build in one
 	for (CUnit *settlement_unit : CMap::Map.get_settlement_units()) {
@@ -2366,7 +2367,7 @@ void AiCheckSettlementConstruction()
 			continue;
 		}
 		
-		int settlement_landmass = CMap::Map.GetTileLandmass(settlement_unit->tilePos, settlement_unit->MapLayer->ID);
+		const landmass *settlement_landmass = CMap::Map.get_tile_landmass(settlement_unit->tilePos, settlement_unit->MapLayer->ID);
 		if (!builder_landmasses.contains(settlement_landmass)) {
 			continue;
 		}
@@ -2444,12 +2445,11 @@ void AiCheckDockConstruction()
 	}
 
 	//check in which landmasses this player has workers
-	const std::set<int> builder_landmasses = AiPlayer->Player->get_builder_landmasses(dock_type);
+	const landmass_set builder_landmasses = AiPlayer->Player->get_builder_landmasses(dock_type);
 
-	std::set<int> neighbor_water_landmasses; //water "landmasses" neighboring the landmasses where the player has workers
-	for (const int builder_landmass : builder_landmasses) {
-		for (size_t j = 0; j < CMap::Map.BorderLandmasses[builder_landmass].size(); ++j) {
-			int border_landmass = CMap::Map.BorderLandmasses[builder_landmass][j];
+	landmass_set neighbor_water_landmasses; //water "landmasses" neighboring the landmasses where the player has workers
+	for (const landmass *builder_landmass : builder_landmasses) {
+		for (const landmass *border_landmass : builder_landmass->get_border_landmasses()) {
 			neighbor_water_landmasses.insert(border_landmass);
 		}
 	}
@@ -2457,8 +2457,8 @@ void AiCheckDockConstruction()
 	std::vector<CUnit *> dock_table;
 	FindPlayerUnitsByType(*AiPlayer->Player, *dock_type, dock_table, true);
 	
-	for (const int water_landmass : neighbor_water_landmasses) {
-		if (CMap::Map.BorderLandmasses[water_landmass].size() < 2) { //if the water "landmass" only borders one landmass, then there is no need to build a dock on it, as it can lead to no other landmasses
+	for (const landmass *water_landmass : neighbor_water_landmasses) {
+		if (water_landmass->get_border_landmasses().size() < 2) { //if the water "landmass" only borders one landmass, then there is no need to build a dock on it, as it can lead to no other landmasses
 			continue;
 		}
 		
@@ -2471,7 +2471,7 @@ void AiCheckDockConstruction()
 		for (size_t j = 0; j < dock_table.size(); ++j) {
 			CUnit &dock_unit = *dock_table[j];
 					
-			if (CMap::Map.GetTileLandmass(dock_unit.tilePos, dock_unit.MapLayer->ID) == water_landmass) {
+			if (CMap::Map.get_tile_landmass(dock_unit.tilePos, dock_unit.MapLayer->ID) == water_landmass) {
 				has_dock = true;
 				break;
 			}
@@ -2480,7 +2480,7 @@ void AiCheckDockConstruction()
 		if (!has_dock) { //if doesn't have an already built dock, see if there's one in the requests already
 			for (size_t j = 0; j < AiPlayer->UnitTypeBuilt.size(); ++j) {
 				const AiBuildQueue &queue = AiPlayer->UnitTypeBuilt[j];
-				if (queue.Landmass == water_landmass && queue.Type == dock_type) {
+				if (queue.landmass == water_landmass && queue.Type == dock_type) {
 					has_dock = true;
 					break;
 				}
@@ -2757,14 +2757,14 @@ void AiCheckWorkers()
 **
 **  @todo         FIXME: should store the end of list and not search it.
 */
-void AiAddUnitTypeRequest(const wyrmgus::unit_type &type, const int count, const int landmass, const wyrmgus::site *settlement, const Vec2i pos, int z)
+void AiAddUnitTypeRequest(const wyrmgus::unit_type &type, const int count, const landmass *landmass, const site *settlement, const Vec2i &pos, const int z)
 {
 	AiBuildQueue queue;
 
 	queue.Type = &type;
 	queue.Want = count;
 	queue.Made = 0;
-	queue.Landmass = landmass;
+	queue.landmass = landmass;
 	queue.settlement = settlement;
 	queue.Pos = pos;
 	queue.MapLayer = z;
