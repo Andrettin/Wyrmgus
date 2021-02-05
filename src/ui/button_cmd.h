@@ -64,7 +64,8 @@ enum class ButtonCmd {
 	BuyResource,		/// buy a resource
 	Salvage,			/// salvage a building
 	EnterMapLayer,	/// enter a map layer
-	Unit,			/// used to display popups for inventory items and for units in transporters
+	Unit,			/// used to display popups for inventory items, units in transporters and the unit under the cursor
+	Tile,			/// used to display popups for the tile under the cursor
 	Player,			/// used to display player-related popups
 	EditorUnit,		/// used to display popups for editor unit type buttons
 	Cancel,         /// cancel

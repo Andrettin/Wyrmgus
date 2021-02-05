@@ -49,6 +49,7 @@ namespace wyrmgus {
 	class faction;
 	class font;
 	class resource;
+	class tile;
 	class unit_type;
 }
 
@@ -309,6 +310,7 @@ struct StringDesc {
 		const wyrmgus::faction **Faction = nullptr;	/// Which faction.
 		const wyrmgus::resource **Resource = nullptr;	/// Which resource
 		//Wyrmgus end
+		const wyrmgus::tile **tile = nullptr;
 		struct {
 			std::unique_ptr<NumberDesc> Cond;  /// Branch condition.
 			std::unique_ptr<StringDesc> BTrue;  /// String if Cond is true.
@@ -400,6 +402,7 @@ extern const wyrmgus::unit_type **CclParseTypeDesc(lua_State *l);   /// Parse a 
 extern const CUpgrade **CclParseUpgradeDesc(lua_State *l);   /// Parse an upgrade description.
 extern const wyrmgus::resource **CclParseResourceDesc(lua_State *l);   /// Parse a resource description.
 extern const wyrmgus::faction **CclParseFactionDesc(lua_State *l);   /// Parse a faction description.
+extern const tile **CclParseTileDesc(lua_State *l);
 //Wyrmgus end
 extern const CPlayer **CclParsePlayerDesc(lua_State *l);   /// Parse a faction description.
 std::unique_ptr<StringDesc> CclParseStringDesc(lua_State *l);        /// Parse a string description.

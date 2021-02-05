@@ -603,9 +603,23 @@ static const CPlayer **Str2PlayerRef(lua_State *l, const char *s)
 	if (!strcmp(s, "Player")) {
 		res = &TriggerData.player;
 	} else {
-		LuaError(l, "Invalid type reference '%s'\n" _C_ s);
+		LuaError(l, "Invalid player reference '%s'\n" _C_ s);
 	}
 	Assert(res); // Must check for error.
+	return res;
+}
+
+static const tile **Str2TileRef(lua_State *l, const char *s)
+{
+	const tile **res = nullptr; //result.
+
+	Assert(l);
+	if (!strcmp(s, "Tile")) {
+		res = &TriggerData.tile;
+	} else {
+		LuaError(l, "Invalid tile reference '%s'\n" _C_ s);
+	}
+	Assert(res); //check for error.
 	return res;
 }
 
@@ -712,6 +726,20 @@ const wyrmgus::faction **CclParseFactionDesc(lua_State *l)
 	return res;
 }
 //Wyrmgus end
+
+const tile **CclParseTileDesc(lua_State *l)
+{
+	const tile **res = nullptr;
+
+	if (lua_isstring(l, -1)) {
+		res = Str2TileRef(l, LuaToString(l, -1));
+		lua_pop(l, 1);
+	} else {
+		LuaError(l, "Parse Error in ParseTile\n");
+	}
+
+	return res;
+}
 
 const CPlayer **CclParsePlayerDesc(lua_State *l)
 {

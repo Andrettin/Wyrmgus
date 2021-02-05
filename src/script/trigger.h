@@ -42,6 +42,7 @@ namespace wyrmgus {
 	class dynasty;
 	class faction;
 	class resource;
+	class tile;
 	class unit_type;
 
 	template <typename scope_type>
@@ -167,6 +168,7 @@ struct TriggerDataType {
 	const wyrmgus::faction *faction = nullptr;		/// Faction used in trigger
 	const wyrmgus::dynasty *dynasty = nullptr;		/// Dynasty used in trigger
 	const CPlayer *player = nullptr;
+	const wyrmgus::tile *tile = nullptr;
 };
 
 extern CTimer GameTimer; /// the game timer

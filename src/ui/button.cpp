@@ -32,6 +32,8 @@
 #include "config.h"
 #include "dynasty.h"
 #include "faction.h"
+#include "map/map.h"
+#include "map/map_layer.h"
 #include "script/trigger.h"
 #include "spell/spell.h"
 #include "ui/button_cmd.h"
@@ -480,6 +482,9 @@ void button::SetTriggerData() const
 		case ButtonCmd::Player:
 			TriggerData.player = CPlayer::Players.at(this->Value);
 			break;
+		case ButtonCmd::Tile:
+			TriggerData.tile = CMap::get()->Field(this->Value, UI.CurrentMapLayer->ID);
+			break;
 		default:
 			TriggerData.Type = unit_type::get_all()[this->Value];
 			break;
@@ -495,6 +500,7 @@ void button::CleanTriggerData() const
 	TriggerData.faction = nullptr;
 	TriggerData.dynasty = nullptr;
 	TriggerData.player = nullptr;
+	TriggerData.tile = nullptr;
 }
 
 int button::GetLevelID() const
@@ -705,6 +711,8 @@ std::string GetButtonActionNameById(const ButtonCmd button_action)
 			return "unit";
 		case ButtonCmd::EditorUnit:
 			return "editor-unit";
+		case ButtonCmd::Tile:
+			return "tile";
 		case ButtonCmd::Cancel:
 			return "cancel";
 		case ButtonCmd::CancelUpgrade:
@@ -788,6 +796,8 @@ ButtonCmd GetButtonActionIdByName(const std::string &button_action)
 		return ButtonCmd::Unit;
 	} else if (button_action == "editor-unit") {
 		return ButtonCmd::EditorUnit;
+	} else if (button_action == "tile") {
+		return ButtonCmd::Tile;
 	} else if (button_action == "cancel") {
 		return ButtonCmd::Cancel;
 	} else if (button_action == "cancel-upgrade") {
