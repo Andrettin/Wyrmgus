@@ -372,11 +372,30 @@ void tile::Save(CFile &file) const
 		file.printf(", \"seen-overlay-transition-tile\", \"%s\", %d", player_info->SeenOverlayTransitionTiles[i].first->Ident.c_str(), player_info->SeenOverlayTransitionTiles[i].second);
 	}
 	//Wyrmgus end
+
+	//write an exploration mask for tiles, with each player being represented as one bit
+	std::string exploration_str;
+	exploration_str.resize(PlayerMax);
+	int last_explored_index = -1;
 	for (int i = 0; i != PlayerMax; ++i) {
 		if (player_info->Visible[i] == 1) {
-			file.printf(", \"explored\", %d", i);
+			exploration_str[i] = '1';
+			last_explored_index = i;
+		} else {
+			exploration_str[i] = '0';
 		}
 	}
+	if (last_explored_index == -1) {
+		exploration_str.clear();
+	} else {
+		//only store up to the last explored index, as the information is otherwise superfluous
+		exploration_str.resize(last_explored_index + 1);
+	}
+
+	if (!exploration_str.empty()) {
+		file.printf(", \"explored\", \"%s\"", exploration_str.c_str());
+	}
+
 	if (Flags & MapFieldLandAllowed) {
 		file.printf(", \"land\"");
 	}
@@ -578,7 +597,13 @@ void tile::parse(lua_State *l)
 		} else if (!strcmp(value, "explored")) {
 			//Wyrmgus end
 			++j;
-			this->player_info->Visible[LuaToNumber(l, -1, j + 1)] = 1;
+			const std::string exploration_str = LuaToString(l, -1, j + 1);
+
+			for (size_t p = 0; p < exploration_str.size(); ++p) {
+				if (exploration_str[p] == '1') {
+					this->player_info->Visible[p] = 1;
+				}
+			}
 		} else if (!strcmp(value, "land")) {
 			this->Flags |= MapFieldLandAllowed;
 		} else if (!strcmp(value, "coast")) {
