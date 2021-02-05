@@ -1627,7 +1627,7 @@ void CMap::save(CFile &file) const
 		map_data.add_child(std::move(landmasses_data));
 	}
 
-	const std::string str = "load_map_data(\"" + string::escaped(map_data.print_to_string()) + "\")\n";
+	const std::string str = "load_map_data(\"" + string::escaped(map_data.print_to_string()) + "\")\n\n";
 	file.printf("%s", str.c_str());
 
 	file.printf("StratagusMap(\n");
@@ -1656,15 +1656,6 @@ void CMap::save(CFile &file) const
 	file.printf("  \"layer-references\", {\n");
 	for (size_t z = 0; z < this->MapLayers.size(); ++z) {
 		file.printf("  {\"%s\", \"%s\"},\n", this->MapLayers[z]->plane ? this->MapLayers[z]->plane->Ident.c_str() : "", this->MapLayers[z]->world ? this->MapLayers[z]->world->Ident.c_str() : "");
-	}
-	file.printf("  },\n");
-	file.printf("  \"landmasses\", {\n");
-	for (const std::unique_ptr<landmass> &landmass : this->landmasses) {
-		file.printf("  {");
-		for (const wyrmgus::landmass *border_landmass : landmass->get_border_landmasses()) {
-			file.printf("%d, ", border_landmass->get_index());
-		}
-		file.printf("},\n");
 	}
 	file.printf("  },\n");
 	//Wyrmgus end
