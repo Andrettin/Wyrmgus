@@ -887,8 +887,8 @@ CUnit *UnitOnMapTile(const Vec2i &pos, const UnitTypeType type, int z)
 //Wyrmgus end
 {
 	//Wyrmgus start
-//	return UnitOnMapTile(CMap::Map.getIndex(pos), type);
-	return UnitOnMapTile(CMap::Map.getIndex(pos, z), type, z);
+//	return UnitOnMapTile(CMap::Map.get_pos_index(pos), type);
+	return UnitOnMapTile(CMap::Map.get_pos_index(pos, z), type, z);
 	//Wyrmgus end
 }
 

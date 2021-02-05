@@ -516,8 +516,8 @@ CUnit *CanBuildHere(const CUnit *unit, const wyrmgus::unit_type &type, const QPo
 
 		// Need at least one coast tile
 		//Wyrmgus start
-//		unsigned int index = CMap::Map.getIndex(pos);
-		unsigned int index = CMap::Map.getIndex(pos, z);
+//		unsigned int index = CMap::Map.get_pos_index(pos);
+		unsigned int index = CMap::Map.get_pos_index(pos, z);
 		//Wyrmgus end
 		do {
 			//Wyrmgus start

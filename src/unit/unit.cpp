@@ -3694,7 +3694,7 @@ static void UnitInXY(CUnit &unit, const Vec2i &pos, const int z)
 	CUnit *unit_inside = unit.UnitInside;
 
 	unit.tilePos = pos;
-	unit.Offset = CMap::Map.getIndex(pos, z);
+	unit.Offset = CMap::Map.get_pos_index(pos, z);
 	unit.MapLayer = CMap::Map.MapLayers[z].get();
 
 	const wyrmgus::time_of_day *new_time_of_day = unit.get_center_tile_time_of_day();

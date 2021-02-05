@@ -1468,14 +1468,14 @@ CMap::~CMap()
 {
 }
 
-unsigned int CMap::getIndex(int x, int y, int z) const
+int CMap::get_pos_index(const int x, const int y, const int z) const
 {
-	return x + y * this->Info.MapWidths[z];
+	return point::to_index(x, y, this->Info.MapWidths[z]);
 }
 
-unsigned int CMap::getIndex(const Vec2i &pos, int z) const
+int CMap::get_pos_index(const QPoint &pos, const int z) const
 {
-	return getIndex(pos.x, pos.y, z);
+	return point::to_index(pos, this->Info.MapWidths[z]);
 }
 
 /**

@@ -140,7 +140,7 @@ public:
 ----------------------------------------------------------------------------*/
 
 /// Describes the world map
-class CMap
+class CMap final
 {
 public:
 	static CMap *get()
@@ -153,12 +153,12 @@ public:
 	CMap();
 	~CMap();
 
-	unsigned int getIndex(int x, int y, int z) const;
-	unsigned int getIndex(const Vec2i &pos, int z) const;
+	int get_pos_index(const int x, const int y, const int z) const;
+	int get_pos_index(const QPoint &pos, const int z) const;
 	
-	wyrmgus::tile *Field(const unsigned int index, const int z) const;
+	tile *Field(const unsigned int index, const int z) const;
 	/// Get the map field at location x, y
-	wyrmgus::tile *Field(const int x, const int y, const int z) const;
+	tile *Field(const int x, const int y, const int z) const;
 	
 	/**
 	**	@brief	Get the map field at a given location
@@ -168,7 +168,7 @@ public:
 	**
 	**	@return	The map field
 	*/
-	wyrmgus::tile *Field(const Vec2i &pos, const int z) const
+	tile *Field(const Vec2i &pos, const int z) const
 	{
 		return this->Field(pos.x, pos.y, z);
 	}
@@ -287,10 +287,10 @@ public:
 	bool is_point_adjacent_to_non_subtemplate_area(const Vec2i &pos, const int z) const;
 	bool is_rect_in_settlement(const QRect &rect, const int z, const wyrmgus::site *settlement);
 	
-	void SetCurrentPlane(wyrmgus::plane *plane);
-	void SetCurrentWorld(wyrmgus::world *world);
-	const wyrmgus::plane *GetCurrentPlane() const;
-	const wyrmgus::world *GetCurrentWorld() const;
+	void SetCurrentPlane(plane *plane);
+	void SetCurrentWorld(world *world);
+	const plane *GetCurrentPlane() const;
+	const world *GetCurrentWorld() const;
 	//Wyrmgus end
 
 	//UnitCache

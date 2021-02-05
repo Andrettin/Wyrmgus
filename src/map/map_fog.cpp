@@ -118,7 +118,7 @@ int MapFogFilterFlags(CPlayer &player, const unsigned int index, int mask, int z
 int MapFogFilterFlags(CPlayer &player, const Vec2i &pos, int mask, int z)
 {
 	if (CMap::Map.Info.IsPointOnMap(pos, z)) {
-		return MapFogFilterFlags(player, CMap::Map.getIndex(pos, z), mask, z);
+		return MapFogFilterFlags(player, CMap::Map.get_pos_index(pos, z), mask, z);
 	}
 	return mask;
 }
@@ -278,7 +278,7 @@ void MapMarkTileSight(const CPlayer &player, const Vec2i &pos, int z)
 //Wyrmgus end
 {
 	Assert(CMap::Map.Info.IsPointOnMap(pos, z));
-	MapMarkTileSight(player, CMap::Map.getIndex(pos, z), z);
+	MapMarkTileSight(player, CMap::Map.get_pos_index(pos, z), z);
 }
 
 /**
@@ -326,7 +326,7 @@ void MapUnmarkTileSight(const CPlayer &player, const Vec2i &pos, int z)
 //Wyrmgus end
 {
 	Assert(CMap::Map.Info.IsPointOnMap(pos, z));
-	MapUnmarkTileSight(player, CMap::Map.getIndex(pos, z), z);
+	MapUnmarkTileSight(player, CMap::Map.get_pos_index(pos, z), z);
 }
 
 /**
@@ -361,8 +361,8 @@ void MapMarkTileDetectCloak(const CPlayer &player, const Vec2i &pos, int z)
 //Wyrmgus end
 {
 	//Wyrmgus start
-//	MapMarkTileDetectCloak(player, CMap::Map.getIndex(pos));
-	MapMarkTileDetectCloak(player, CMap::Map.getIndex(pos, z), z);
+//	MapMarkTileDetectCloak(player, CMap::Map.get_pos_index(pos));
+	MapMarkTileDetectCloak(player, CMap::Map.get_pos_index(pos, z), z);
 	//Wyrmgus end
 }
 
@@ -398,8 +398,8 @@ void MapUnmarkTileDetectCloak(const CPlayer &player, const Vec2i &pos, int z)
 //Wyrmgus end
 {
 	//Wyrmgus start
-//	MapUnmarkTileDetectCloak(player, CMap::Map.getIndex(pos));
-	MapUnmarkTileDetectCloak(player, CMap::Map.getIndex(pos, z), z);
+//	MapUnmarkTileDetectCloak(player, CMap::Map.get_pos_index(pos));
+	MapUnmarkTileDetectCloak(player, CMap::Map.get_pos_index(pos, z), z);
 	//Wyrmgus end
 }
 
@@ -423,7 +423,7 @@ void MapMarkTileDetectEthereal(const CPlayer &player, const unsigned int index, 
 
 void MapMarkTileDetectEthereal(const CPlayer &player, const Vec2i &pos, int z)
 {
-	MapMarkTileDetectEthereal(player, CMap::Map.getIndex(pos, z), z);
+	MapMarkTileDetectEthereal(player, CMap::Map.get_pos_index(pos, z), z);
 }
 
 /**
@@ -445,7 +445,7 @@ void MapUnmarkTileDetectEthereal(const CPlayer &player, const unsigned int index
 
 void MapUnmarkTileDetectEthereal(const CPlayer &player, const Vec2i &pos, int z)
 {
-	MapUnmarkTileDetectEthereal(player, CMap::Map.getIndex(pos, z), z);
+	MapUnmarkTileDetectEthereal(player, CMap::Map.get_pos_index(pos, z), z);
 }
 //Wyrmgus end
 

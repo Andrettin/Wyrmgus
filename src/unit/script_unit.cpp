@@ -434,7 +434,7 @@ static int CclUnit(lua_State *l)
 			lua_rawgeti(l, 2, j + 1);
 			CclGetPos(l, &unit->tilePos.x , &unit->tilePos.y, -1);
 			lua_pop(l, 1);
-			unit->Offset = CMap::Map.getIndex(unit->tilePos, unit->MapLayer->ID);
+			unit->Offset = CMap::Map.get_pos_index(unit->tilePos, unit->MapLayer->ID);
 		} else if (!strcmp(value, "seen-tile")) {
 			lua_rawgeti(l, 2, j + 1);
 			CclGetPos(l, &unit->Seen.tilePos.x , &unit->Seen.tilePos.y, -1);
