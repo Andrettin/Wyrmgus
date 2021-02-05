@@ -32,6 +32,7 @@
 
 #include "ai/ai_local.h"
 #include "database/defines.h"
+#include "database/sml_parser.h"
 //Wyrmgus start
 #include "editor.h"
 #include "game.h" // for the SaveGameLoading variable
@@ -82,6 +83,7 @@
 #include "util/point_util.h"
 #include "util/rect_util.h"
 #include "util/size_util.h"
+#include "util/string_util.h"
 #include "util/util.h"
 #include "util/vector_random_util.h"
 #include "util/vector_util.h"
@@ -1579,16 +1581,55 @@ void CMap::ClearMapLayers()
 	this->MapLayers.clear();
 }
 
-/**
-** Save the complete map.
-**
-** @param file Output file.
-*/
-void CMap::Save(CFile &file) const
+
+void CMap::process_sml_property(const sml_property &property)
+{
+	const std::string &key = property.get_key();
+
+	exception::throw_with_trace(std::runtime_error("Invalid map data property: \"" + key + "\"."));
+}
+
+void CMap::process_sml_scope(const sml_data &scope)
+{
+	const std::string &tag = scope.get_tag();
+
+	if (tag == "landmasses") {
+		//first, create all landmasses, as when they are processed they refer to each other
+		for (int i = 0; i < scope.get_children_count(); ++i) {
+			this->add_landmass(std::make_unique<landmass>(static_cast<size_t>(i)));
+		}
+
+		//now, process the data for each landmass
+		size_t current_index = 0;
+		scope.for_each_child([&](const sml_data &landmass_data) {
+			const std::unique_ptr<landmass> &landmass = this->get_landmasses()[current_index];
+			database::process_sml_data(landmass, landmass_data);
+			++current_index;
+		});
+	} else {
+		exception::throw_with_trace(std::runtime_error("Invalid map data scope: \"" + scope.get_tag() + "\"."));
+	}
+}
+
+void CMap::save(CFile &file) const
 {
 	file.printf("\n--- -----------------------------------------\n");
 	file.printf("--- MODULE: map\n");
 	file.printf("LoadTileModels(\"%s\")\n\n", this->TileModelsFileName.c_str());
+
+	sml_data map_data;
+
+	if (!this->get_landmasses().empty()) {
+		sml_data landmasses_data("landmasses");
+		for (const auto &landmass : this->get_landmasses()) {
+			landmasses_data.add_child(landmass->to_sml_data());
+		}
+		map_data.add_child(std::move(landmasses_data));
+	}
+
+	const std::string str = "load_map_data(\"" + string::escaped(map_data.print_to_string()) + "\")\n";
+	file.printf("%s", str.c_str());
+
 	file.printf("StratagusMap(\n");
 	file.printf("  \"version\", \"%s\",\n", VERSION);
 	file.printf("  \"description\", \"%s\",\n", this->Info.Description.c_str());
@@ -3580,4 +3621,10 @@ void LoadStratagusMapInfo(const std::string &mapname)
 
 	const std::string filename = LibraryFileName(mapname.c_str());
 	LuaLoadFile(filename);
+}
+
+void load_map_data(const std::string &sml_string)
+{
+	sml_parser parser;
+	database::process_sml_data(CMap::get(), parser.parse(sml_string));
 }

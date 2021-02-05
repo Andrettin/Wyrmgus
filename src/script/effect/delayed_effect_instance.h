@@ -63,6 +63,8 @@ public:
 	void process_sml_property(const sml_property &property);
 	void process_sml_scope(const sml_data &scope);
 
+	sml_data to_sml_data() const;
+
 	scope_type *get_scope() const;
 
 	int get_remaining_cycles() const
@@ -76,8 +78,6 @@ public:
 	}
 
 	void do_effects();
-
-	sml_data to_sml_data() const;
 
 private:
 	const scripted_effect_base<scope_type> *scripted_effect = nullptr;

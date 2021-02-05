@@ -85,14 +85,11 @@ static int CclStratagusMap(lua_State *l)
 		++j;
 
 		if (!strcmp(value, "version")) {
-			//Wyrmgus start
-//			char buf[32];
-			char buf[64];
-			//Wyrmgus end
+			std::array<char, 64> buf{};
 
 			const char *version = LuaToString(l, j + 1);
-			strncpy(buf, VERSION, sizeof(buf));
-			if (strcmp(buf, version)) {
+			strncpy(buf.data(), VERSION, sizeof(buf));
+			if (strcmp(buf.data(), version)) {
 				fprintf(stderr, "Warning: not saved with this version.\n");
 			}
 		} else if (!strcmp(value, "uid")) {
@@ -218,33 +215,6 @@ static int CclStratagusMap(lua_State *l)
 						lua_rawgeti(l, -1, z + 1);
 						CMap::Map.MapLayers[z]->plane = wyrmgus::plane::try_get(LuaToString(l, -1, 1));
 						CMap::Map.MapLayers[z]->world = wyrmgus::world::try_get(LuaToString(l, -1, 2));
-						lua_pop(l, 1);
-					}
-					lua_pop(l, 1);
-				} else if (!strcmp(subvalue, "landmasses")) {
-					lua_rawgeti(l, j + 1, k + 1);
-					if (!lua_istable(l, -1)) {
-						LuaError(l, "incorrect argument for \"landmasses\"");
-					}
-
-					const int subsubargs = lua_rawlen(l, -1);
-
-					for (int z = 0; z < subsubargs; ++z) {
-						auto landmass = std::make_unique<wyrmgus::landmass>(CMap::get()->get_landmasses().size());
-						CMap::get()->add_landmass(std::move(landmass));
-					}
-
-					for (int z = 0; z < subsubargs; ++z) {
-						const std::unique_ptr<landmass> &landmass = CMap::get()->get_landmasses()[z];
-						if (!lua_istable(l, -1)) {
-							LuaError(l, "incorrect argument for \"landmasses\"");
-						}
-						lua_rawgeti(l, -1, z + 1);
-						const int subsubsubargs = lua_rawlen(l, -1);
-						for (int n = 0; n < subsubsubargs; ++n) {
-							const int border_landmass_index = LuaToNumber(l, -1, n + 1);
-							landmass->add_border_landmass(CMap::get()->get_landmasses()[border_landmass_index].get());
-						}
 						lua_pop(l, 1);
 					}
 					lua_pop(l, 1);

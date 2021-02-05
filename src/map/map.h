@@ -88,6 +88,8 @@ namespace wyrmgus {
 	class map_template;
 	class plane;
 	class site;
+	class sml_data;
+	class sml_property;
 	class terrain_type;
 	class tile;
 	class unit_type;
@@ -247,8 +249,12 @@ public:
 //	void Reveal();
 	void Reveal(bool only_person_players = false);
 	//Wyrmgus end
-	/// Save the map.
-	void Save(CFile &file) const;
+
+	void process_sml_property(const sml_property &property);
+	void process_sml_scope(const sml_data &scope);
+
+	//save the map.
+	void save(CFile &file) const;
 
 	//
 	// Wall
@@ -520,6 +526,8 @@ extern void SetTimeOfDaySchedule(const std::string &time_of_day_schedule_ident, 
 extern void SetSeason(const std::string &season_ident, int z = 0);
 extern void SetSeasonSchedule(const std::string &season_schedule_ident, int z = 0);
 //Wyrmgus end
+
+extern void load_map_data(const std::string &sml_string);
 
 // in unit.c
 

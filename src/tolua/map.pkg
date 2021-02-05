@@ -40,3 +40,5 @@ void SetTileTerrain(std::string terrain_ident, int w, int h, int value = 0, int 
 extern void ApplyMapTemplate(std::string map_template_ident, int start_x = 0, int start_y = 0, int map_start_x = 0, int map_start_y = 0, int z = 0);
 extern void ApplyCampaignMap(std::string campaign_ident);
 //Wyrmgus end
+
+extern void load_map_data(const std::string sml_string);

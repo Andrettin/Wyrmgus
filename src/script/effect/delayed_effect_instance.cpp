@@ -108,6 +108,38 @@ void delayed_effect_instance<scope_type>::process_sml_scope(const sml_data &scop
 }
 
 template <typename scope_type>
+sml_data delayed_effect_instance<scope_type>::to_sml_data() const
+{
+	sml_data data;
+
+	if (this->scripted_effect != nullptr) {
+		std::string scripted_effect_identifier;
+		if constexpr (std::is_same_v<scope_type, CPlayer>) {
+			scripted_effect_identifier = static_cast<const player_scripted_effect *>(this->scripted_effect)->get_identifier();
+		} else {
+			scripted_effect_identifier = static_cast<const unit_scripted_effect *>(this->scripted_effect)->get_identifier();
+		}
+		data.add_property("scripted_effect", scripted_effect_identifier);
+	} else {
+		data.add_property("dialogue", this->dialogue->get_identifier());
+	}
+
+	std::string scope;
+	if constexpr (std::is_same_v<scope_type, CPlayer>) {
+		scope = std::to_string(this->scope->get_index());
+	} else {
+		scope = std::to_string(UnitNumber(*this->scope->get()));
+	}
+	data.add_property("scope", std::move(scope));
+
+	data.add_property("remaining_cycles", std::to_string(this->get_remaining_cycles()));
+
+	data.add_child(this->context.to_sml_data("context"));
+
+	return data;
+}
+
+template <typename scope_type>
 scope_type *delayed_effect_instance<scope_type>::get_scope() const
 {
 	if constexpr (std::is_same_v<scope_type, CUnit>) {
@@ -149,39 +181,6 @@ void delayed_effect_instance<scope_type>::do_effects()
 
 		this->dialogue->call(player, dialogue_ctx);
 	}
-}
-
-template <typename scope_type>
-sml_data delayed_effect_instance<scope_type>::to_sml_data() const
-{
-	sml_data data;
-
-	if (this->scripted_effect != nullptr) {
-		std::string scripted_effect_identifier;
-		if constexpr (std::is_same_v<scope_type, CPlayer>) {
-			scripted_effect_identifier = static_cast<const player_scripted_effect *>(this->scripted_effect)->get_identifier();
-		} else {
-			scripted_effect_identifier = static_cast<const unit_scripted_effect *>(this->scripted_effect)->get_identifier();
-		}
-		data.add_property("scripted_effect", scripted_effect_identifier);
-	} else {
-		data.add_property("dialogue", this->dialogue->get_identifier());
-	}
-
-
-	std::string scope;
-	if constexpr (std::is_same_v<scope_type, CPlayer>) {
-		scope = std::to_string(this->scope->get_index());
-	} else {
-		scope = std::to_string(UnitNumber(*this->scope->get()));
-	}
-	data.add_property("scope", std::move(scope));
-
-	data.add_property("remaining_cycles", std::to_string(this->get_remaining_cycles()));
-
-	data.add_child(this->context.to_sml_data("context"));
-
-	return data;
 }
 
 template class delayed_effect_instance<CPlayer>;

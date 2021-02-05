@@ -166,7 +166,7 @@ int SaveGame(const std::string &filename)
 	SaveUnitTypes(file);
 	SaveUpgrades(file);
 	SavePlayers(file);
-	CMap::get()->Save(file);
+	CMap::get()->save(file);
 	wyrmgus::unit_manager::get()->Save(file);
 	SaveUserInterface(file);
 	SaveAi(file);

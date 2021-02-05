@@ -28,9 +28,48 @@
 
 #include "map/landmass.h"
 
+#include "database/sml_data.h"
+#include "map/map.h"
 #include "util/vector_util.h"
 
 namespace wyrmgus {
+
+void landmass::process_sml_property(const sml_property &property)
+{
+	const std::string &key = property.get_key();
+		throw std::runtime_error("Invalid landmass property: \"" + key + "\".");
+}
+
+void landmass::process_sml_scope(const sml_data &scope)
+{
+	const std::string &tag = scope.get_tag();
+	const std::vector<std::string> &values = scope.get_values();
+
+	if (tag == "border_landmasses") {
+		for (const std::string &value : values) {
+			const size_t index = std::stoul(value);
+			const landmass *border_landmass = CMap::get()->get_landmasses()[index].get();
+			this->add_border_landmass(border_landmass);
+		}
+	} else {
+		throw std::runtime_error("Invalid landmass scope: \"" + scope.get_tag() + "\".");
+	}
+}
+
+sml_data landmass::to_sml_data() const
+{
+	sml_data data;
+
+	if (!this->get_border_landmasses().empty()) {
+		sml_data border_landmasses_data("border_landmasses");
+		for (const landmass *border_landmass : this->get_border_landmasses()) {
+			border_landmasses_data.add_value(std::to_string(border_landmass->get_index()));
+		}
+		data.add_child(std::move(border_landmasses_data));
+	}
+
+	return data;
+}
 
 bool landmass::borders_landmass(const landmass *landmass) const
 {

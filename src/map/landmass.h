@@ -28,6 +28,9 @@
 
 namespace wyrmgus {
 
+class sml_data;
+class sml_property;
+
 class landmass final
 {
 public:
@@ -39,6 +42,11 @@ public:
 	{
 		return this->index;
 	}
+
+	void process_sml_property(const sml_property &property);
+	void process_sml_scope(const sml_data &scope);
+
+	sml_data to_sml_data() const;
 
 	const std::vector<const landmass *> &get_border_landmasses() const
 	{
@@ -54,7 +62,7 @@ public:
 
 private:
 	const size_t index = 0;
-	std::vector<const landmass *> border_landmasses;	//"landmasses" which border this one
+	std::vector<const landmass *> border_landmasses; //"landmasses" which border this one
 };
 
 }
