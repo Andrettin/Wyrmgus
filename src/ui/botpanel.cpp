@@ -483,6 +483,15 @@ static bool CanShowPopupContent(const PopupConditionPanel *condition,
 		}
 	}
 
+	if (button.Action == ButtonCmd::Tile) {
+		if (condition->terrain_feature != CONDITION_TRUE) {
+			if ((condition->terrain_feature == CONDITION_ONLY) ^ (CMap::get()->Field(button.Value, UI.CurrentMapLayer->ID)->get_terrain_feature() != nullptr)) {
+				return false;
+			}
+		}
+
+	}
+
 	if (condition->ButtonAction != ButtonCmd::None && button.Action != condition->ButtonAction) {
 		return false;
 	}
@@ -758,22 +767,22 @@ void DrawPopup(const wyrmgus::button &button, int x, int y, bool above)
 	}
 
 	int popupWidth, popupHeight;
-	int Costs[ManaResCost + 1];
-	memset(Costs, 0, sizeof(Costs));
+	std::array<int, ManaResCost + 1> Costs{};
+	Costs.fill(0);
 
 	const wyrmgus::unit_type *unit_type = button.get_unit_type();
 	const CUpgrade *upgrade = button.get_value_upgrade();
 
-	int type_costs[MaxCosts];
+	std::array<int, MaxCosts> type_costs{};
 
 	switch (button.Action) {
 		case ButtonCmd::Research:
 		case ButtonCmd::ResearchClass:
 		case ButtonCmd::Dynasty:
-			CPlayer::GetThisPlayer()->GetUpgradeCosts(upgrade, Costs);
+			CPlayer::GetThisPlayer()->GetUpgradeCosts(upgrade, Costs.data());
 			break;
 		case ButtonCmd::SpellCast:
-			memcpy(Costs, wyrmgus::spell::get_all()[button.Value]->Costs, sizeof(wyrmgus::spell::get_all()[button.Value]->Costs));
+			memcpy(Costs.data(), wyrmgus::spell::get_all()[button.Value]->Costs, sizeof(wyrmgus::spell::get_all()[button.Value]->Costs));
 			Costs[ManaResCost] = wyrmgus::spell::get_all()[button.Value]->get_mana_cost();
 			break;
 		case ButtonCmd::Build:
@@ -782,8 +791,8 @@ void DrawPopup(const wyrmgus::button &button, int x, int y, bool above)
 		case ButtonCmd::TrainClass:
 		case ButtonCmd::UpgradeTo:
 		case ButtonCmd::UpgradeToClass:
-			CPlayer::GetThisPlayer()->GetUnitTypeCosts(unit_type, type_costs, Selected[0]->Type->Stats[Selected[0]->Player->Index].GetUnitStock(unit_type) != 0);
-			memcpy(Costs, type_costs, sizeof(type_costs));
+			CPlayer::GetThisPlayer()->GetUnitTypeCosts(unit_type, type_costs.data(), Selected[0]->Type->Stats[Selected[0]->Player->Index].GetUnitStock(unit_type) != 0);
+			memcpy(Costs.data(), type_costs.data(), sizeof(type_costs));
 			Costs[FoodCost] = unit_type->Stats[CPlayer::GetThisPlayer()->Index].Variables[DEMAND_INDEX].Value;
 			break;
 		case ButtonCmd::Buy:
@@ -798,7 +807,7 @@ void DrawPopup(const wyrmgus::button &button, int x, int y, bool above)
 		popupWidth = popupCache.popupWidth;
 		popupHeight = popupCache.popupHeight;
 	} else {
-		GetPopupSize(*popup, button, popupWidth, popupHeight, Costs);
+		GetPopupSize(*popup, button, popupWidth, popupHeight, Costs.data());
 		popupWidth = std::max(popupWidth, popup->MinWidth);
 		popupHeight = std::max(popupHeight, popup->MinHeight);
 		popupCache.popupWidth = popupWidth;
@@ -821,7 +830,7 @@ void DrawPopup(const wyrmgus::button &button, int x, int y, bool above)
 	// Contents
 	for (const std::unique_ptr<CPopupContentType> &content : popup->Contents) {
 		if (CanShowPopupContent(content->Condition.get(), button, unit_type)) {
-			content->Draw(x + content->pos.x, y + content->pos.y, *popup, popupWidth, button, Costs);
+			content->Draw(x + content->pos.x, y + content->pos.y, *popup, popupWidth, button, Costs.data());
 		}
 	}
 }
