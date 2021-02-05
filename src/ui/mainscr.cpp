@@ -969,7 +969,7 @@ void DrawPopups()
 		CViewport *vp = GetViewport(CursorScreenPos);
 		if (vp) {
 			const Vec2i tilePos = vp->ScreenToTilePos(CursorScreenPos);
-			const wyrmgus::tile &mf = *UI.CurrentMapLayer->Field(tilePos);
+			const tile &mf = *UI.CurrentMapLayer->Field(tilePos);
 			const bool isMapFieldVisible = mf.player_info->IsTeamVisible(*CPlayer::GetThisPlayer());
 
 			if (UI.MouseViewport && UI.MouseViewport->IsInsideMapArea(CursorScreenPos) && (isMapFieldVisible || ReplayRevealMap) && !(MouseButtons & MiddleButton)) { //don't display if in move map mode
@@ -999,13 +999,22 @@ void DrawPopups()
 					ba.Popup = "popup_unit_under_cursor";
 					DrawPopup(ba, unit_center_pos.x, unit_center_pos.y);
 					LastDrawnButtonPopup = nullptr;
-				} else if (mf.get_terrain_feature() != nullptr) {
+				} else if (mf.get_terrain_feature() != nullptr || mf.get_world() != nullptr) {
 					if (UI.get_tooltip_cycle_count() >= UI.get_tooltip_cycle_threshold()) {
 						PixelPos tile_center_pos = CMap::Map.tile_pos_to_scaled_map_pixel_pos_top_left(tilePos);
 						tile_center_pos = vp->scaled_map_to_screen_pixel_pos(tile_center_pos);
-						const wyrmgus::civilization *tile_owner_civilization = mf.get_owner() ? mf.get_owner()->get_civilization() : nullptr;
-						const std::string &terrain_feature_name = mf.get_terrain_feature()->get_cultural_name(tile_owner_civilization);
-						DrawGenericPopup(terrain_feature_name, tile_center_pos.x, tile_center_pos.y);
+
+						//hackish way to make the popup appear correctly for the tile under cursor
+						wyrmgus::button ba;
+						if (mf.get_terrain_feature() != nullptr) {
+							const wyrmgus::civilization *tile_owner_civilization = mf.get_owner() ? mf.get_owner()->get_civilization() : nullptr;
+							ba.Hint = mf.get_terrain_feature()->get_cultural_name(tile_owner_civilization);
+						}
+						ba.Action = ButtonCmd::Tile;
+						ba.Value = CMap::get()->get_pos_index(tilePos, UI.CurrentMapLayer->ID);
+						ba.Popup = "popup_tile_under_cursor";
+						DrawPopup(ba, tile_center_pos.x, tile_center_pos.y);
+						LastDrawnButtonPopup = nullptr;
 					} else {
 						UI.increment_tooltip_cycle_count();
 					}
