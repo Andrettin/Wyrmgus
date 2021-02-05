@@ -53,6 +53,8 @@
 #include "map/map.h"
 #include "map/site.h"
 #include "map/site_game_data.h"
+#include "map/terrain_feature.h"
+#include "map/tile.h"
 #include "parameters.h"
 #include "player.h"
 #include "script/trigger.h"
@@ -72,6 +74,7 @@
 #include "util/log_util.h"
 #include "util/number_util.h"
 #include "video/font.h"
+#include "world.h"
 
 lua_State *Lua;                       /// Structure to work with lua files.
 
@@ -1335,6 +1338,12 @@ std::unique_ptr<StringDesc> CclParseStringDesc(lua_State *l)
 		} else if (!strcmp(key, "PlayerFullName")) {
 			res->e = EString_PlayerFullName;
 			res->D.PlayerName = CclParseNumberDesc(l);
+		} else if (!strcmp(key, "TileTerrainFeatureName")) {
+			res->e = EString_TileTerrainFeatureName;
+			res->D.tile = CclParseTileDesc(l);
+		} else if (!strcmp(key, "TileWorldName")) {
+			res->e = EString_TileWorldName;
+			res->D.tile = CclParseTileDesc(l);
 		} else {
 			lua_pop(l, 1);
 			LuaError(l, "unknow condition '%s'" _C_ key);
@@ -1982,6 +1991,27 @@ std::string EvalString(const StringDesc *s)
 			} catch (...) {
 				std::throw_with_nested(std::runtime_error("Error getting the full player name for index " + std::to_string(player_index) + "."));
 			}
+		case EString_TileTerrainFeatureName: {
+			if (s->D.tile != nullptr) {
+				const tile *tile = *s->D.tile;
+				if (tile != nullptr && tile->get_terrain_feature() != nullptr) {
+					const civilization *tile_owner_civilization = tile->get_owner() ? tile->get_owner()->get_civilization() : nullptr;
+					return tile->get_terrain_feature()->get_cultural_name(tile_owner_civilization);
+				}
+			}
+
+			return std::string("");
+		}
+		case EString_TileWorldName: {
+			if (s->D.tile != nullptr) {
+				const tile *tile = *s->D.tile;
+				if (tile != nullptr && tile->get_world() != nullptr) {
+					return tile->get_world()->get_name();
+				}
+			}
+
+			return std::string("");
+		}
 	}
 	return std::string("");
 }
@@ -2780,6 +2810,18 @@ static int CclResourceImproveIncomes(lua_State *l)
 }
 //Wyrmgus end
 
+static int CclTileTerrainFeatureName(lua_State *l)
+{
+	LuaCheckArgs(l, 1);
+	return Alias(l, "TileTerrainFeatureName");
+}
+
+static int CclTileWorldName(lua_State *l)
+{
+	LuaCheckArgs(l, 1);
+	return Alias(l, "TileWorldName");
+}
+
 /**
 **  Return equivalent lua table for If.
 **  {"If", {arg1}}
@@ -3006,6 +3048,8 @@ static void AliasRegister()
 	lua_register(Lua, "ResourceConversionRates", CclResourceConversionRates);
 	lua_register(Lua, "ResourceImproveIncomes", CclResourceImproveIncomes);
 	//Wyrmgus end
+	lua_register(Lua, "TileTerrainFeatureName", CclTileTerrainFeatureName);
+	lua_register(Lua, "TileWorldName", CclTileWorldName);
 	lua_register(Lua, "SubString", CclSubString);
 	lua_register(Lua, "Line", CclLine);
 	lua_register(Lua, "GameInfo", CclGameInfo);

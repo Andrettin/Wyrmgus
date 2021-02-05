@@ -174,7 +174,9 @@ enum EString {
 	EString_SubString,    /// SubString.
 	EString_Line,         /// line n of the string.
 	EString_PlayerName,   /// player name.
-	EString_PlayerFullName //player full name
+	EString_PlayerFullName, //player full name
+	EString_TileTerrainFeatureName,
+	EString_TileWorldName
 	// add more...
 };
 
