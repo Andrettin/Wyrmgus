@@ -90,6 +90,19 @@ public:
 		return false;
 	}
 
+	int get_children_count() const
+	{
+		int count = 0;
+
+		for (const auto &element : this->get_elements()) {
+			if (std::holds_alternative<sml_data>(element)) {
+				++count;
+			}
+		}
+
+		return count;
+	}
+
 	const sml_data &get_child(const std::string &tag) const
 	{
 		for (const auto &element : this->get_elements()) {
