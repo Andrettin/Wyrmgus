@@ -92,6 +92,9 @@ void sml_data::print(std::ostream &ostream, const size_t indentation, const bool
 
 	if (!this->is_minor()) {
 		ostream << std::string(indentation, '\t');
+	} else if (this->is_empty()) {
+		//ensure that there is a white space between the braces of an empty SML data
+		ostream << " ";
 	}
 	ostream << "}";
 	if (!this->is_minor()) {
