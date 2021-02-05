@@ -832,6 +832,8 @@ static std::unique_ptr<PopupConditionPanel> ParsePopupConditions(lua_State *l)
 			condition->TopOverlord = Ccl2Condition(l, LuaToString(l, -1));
 		} else if (!strcmp(key, "terrain_feature")) {
 			condition->terrain_feature = Ccl2Condition(l, LuaToString(l, -1));
+		} else if (!strcmp(key, "world")) {
+			condition->world = Ccl2Condition(l, LuaToString(l, -1));
 		} else {
 			int index = UnitTypeVar.BoolFlagNameLookup[key];
 			if (index != -1) {

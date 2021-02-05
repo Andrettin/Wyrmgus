@@ -490,6 +490,11 @@ static bool CanShowPopupContent(const PopupConditionPanel *condition,
 			}
 		}
 
+		if (condition->world != CONDITION_TRUE) {
+			if ((condition->world == CONDITION_ONLY) ^ (CMap::get()->Field(button.Value, UI.CurrentMapLayer->ID)->get_world() != nullptr)) {
+				return false;
+			}
+		}
 	}
 
 	if (condition->ButtonAction != ButtonCmd::None && button.Action != condition->ButtonAction) {

@@ -114,6 +114,7 @@ public:
 	char Overlord = 0; //check whether the button's player has an overlord
 	char TopOverlord = 0; //check whether the button's player has a top overlord, and whether it is different from its overlord
 	char terrain_feature = 0; //check whether the popup's tile has a terrain feature
+	char world = 0; //check whether the popup's tile has a world
 	std::unique_ptr<char[]> BoolFlags;            /// array of condition about user flags.
 	std::unique_ptr<char[]> Variables;            /// array of variable to verify (enable and max > 0)
 };
