@@ -31,13 +31,20 @@
 #include "database/sml_data.h"
 #include "map/map.h"
 #include "util/vector_util.h"
+#include "world.h"
 
 namespace wyrmgus {
 
 void landmass::process_sml_property(const sml_property &property)
 {
 	const std::string &key = property.get_key();
+	const std::string &value = property.get_value();
+
+	if (key == "world") {
+		this->world = world::get(value);
+	} else {
 		throw std::runtime_error("Invalid landmass property: \"" + key + "\".");
+	}
 }
 
 void landmass::process_sml_scope(const sml_data &scope)
@@ -59,6 +66,10 @@ void landmass::process_sml_scope(const sml_data &scope)
 sml_data landmass::to_sml_data() const
 {
 	sml_data data;
+
+	if (this->get_world() != nullptr) {
+		data.add_property("world", this->get_world()->get_identifier());
+	}
 
 	if (!this->get_border_landmasses().empty()) {
 		sml_data border_landmasses_data("border_landmasses");

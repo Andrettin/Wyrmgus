@@ -30,11 +30,12 @@ namespace wyrmgus {
 
 class sml_data;
 class sml_property;
+class world;
 
 class landmass final
 {
 public:
-	explicit landmass(const size_t index) : index(index)
+	explicit landmass(const size_t index, const world *world = nullptr) : index(index), world(world)
 	{
 	}
 
@@ -60,9 +61,15 @@ public:
 		this->border_landmasses.push_back(landmass);
 	}
 
+	const wyrmgus::world *get_world() const
+	{
+		return this->world;
+	}
+
 private:
 	const size_t index = 0;
 	std::vector<const landmass *> border_landmasses; //"landmasses" which border this one
+	const wyrmgus::world *world = nullptr; //the world to which this landmass belongs
 };
 
 }

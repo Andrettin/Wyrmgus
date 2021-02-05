@@ -23,7 +23,6 @@
 //      along with this program; if not, write to the Free Software
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
-//
 
 #include "stratagus.h"
 
@@ -761,6 +760,15 @@ CPlayer *tile::get_realm_owner() const
 	}
 
 	return this->get_settlement()->get_game_data()->get_realm_owner();
+}
+
+const world *tile::get_world() const
+{
+	if (this->get_landmass() != nullptr) {
+		return this->get_landmass()->get_world();
+	}
+
+	return nullptr;
 }
 
 bool tile::is_on_trade_route() const

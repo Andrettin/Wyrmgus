@@ -126,6 +126,7 @@ class resource;
 class site;
 class terrain_feature;
 class terrain_type;
+class world;
 
 class tile_player_info final
 {
@@ -313,6 +314,8 @@ public:
 	{
 		this->landmass = landmass;
 	}
+
+	const world *get_world() const;
 
 	const site *get_settlement() const
 	{

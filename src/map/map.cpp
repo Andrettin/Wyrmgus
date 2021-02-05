@@ -997,6 +997,21 @@ bool CMap::is_point_adjacent_to_non_subtemplate_area(const Vec2i &pos, const int
 	return false;
 }
 
+std::vector<const map_template *> CMap::get_pos_subtemplates(const QPoint &pos, const int z) const
+{
+	std::vector<const map_template *> subtemplates;
+
+	for (const auto &kv_pair : this->MapLayers[z]->subtemplate_areas) {
+		const map_template *subtemplate = kv_pair.first;
+		const QRect &subtemplate_rect = kv_pair.second;
+		if (subtemplate_rect.contains(pos)) {
+			subtemplates.push_back(subtemplate);
+		}
+	}
+
+	return subtemplates;
+}
+
 bool CMap::is_rect_in_settlement(const QRect &rect, const int z, const wyrmgus::site *settlement)
 {
 	for (int x = rect.x(); x <= rect.right(); ++x) {
@@ -1021,6 +1036,25 @@ bool CMap::is_rect_in_settlement(const QRect &rect, const int z, const wyrmgus::
 	}
 
 	return true;
+}
+
+const world *CMap::calculate_pos_world(const QPoint &pos, const int z) const
+{
+	const std::vector<const map_template *> pos_subtemplates = this->get_pos_subtemplates(pos, z);
+
+	for (const map_template *subtemplate : pos_subtemplates) {
+		if (subtemplate->get_world() == nullptr) {
+			continue;
+		}
+
+		if (!subtemplate->is_map_pos_usable(pos)) {
+			continue;
+		}
+
+		return subtemplate->get_world();
+	}
+
+	return nullptr;
 }
 
 void CMap::SetCurrentPlane(wyrmgus::plane *plane)
@@ -2359,7 +2393,8 @@ void CMap::CalculateTileLandmass(const Vec2i &pos, int z)
 
 	//doesn't have a landmass, and hasn't inherited one from another tile, so add a new one
 	const size_t landmass_index = this->landmasses.size();
-	this->landmasses.push_back(std::make_unique<landmass>(landmass_index));
+	const world *landmass_world = this->calculate_pos_world(pos, z);
+	this->landmasses.push_back(std::make_unique<landmass>(landmass_index, landmass_world));
 	mf.set_landmass(this->landmasses.back().get());
 
 	//now, spread the new landmass to neighboring land tiles
