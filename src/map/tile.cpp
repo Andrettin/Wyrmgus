@@ -142,7 +142,7 @@ void tile::SetTerrain(const terrain_type *terrain_type)
 			}
 
 			if (terrain_type->Flags & MapFieldSpace) {
-				this->Flags &= ~(MapFieldCliff); // need to do this manually, since MapFieldCliff is added dynamically
+				this->Flags &= ~(MapFieldSpaceCliff); // need to do this manually, since MapFieldSpaceCliff is added dynamically
 			}
 		}
 		this->overlay_terrain = terrain_type;
@@ -153,7 +153,7 @@ void tile::SetTerrain(const terrain_type *terrain_type)
 		if (this->get_overlay_terrain() != nullptr && !vector::contains(this->get_overlay_terrain()->get_base_terrain_types(), terrain_type)) { //if the overlay terrain is incompatible with the new base terrain, remove the overlay
 			this->Flags &= ~(this->get_overlay_terrain()->Flags);
 			this->Flags &= ~(MapFieldCoastAllowed); // need to do this manually, since MapFieldCoast is added dynamically
-			this->Flags &= ~(MapFieldCliff); // need to do this manually, since MapFieldCliff is added dynamically
+			this->Flags &= ~(MapFieldSpaceCliff); // need to do this manually, since MapFieldSpaceCliff is added dynamically
 			this->overlay_terrain = nullptr;
 			this->OverlayTransitionTiles.clear();
 		}
@@ -238,7 +238,7 @@ void tile::RemoveOverlayTerrain()
 	this->Flags &= ~(this->get_overlay_terrain()->Flags);
 
 	this->Flags &= ~(MapFieldCoastAllowed); // need to do this manually, since MapFieldCoast is added dynamically
-	this->Flags &= ~(MapFieldCliff); // need to do this manually, since MapFieldCliff is added dynamically
+	this->Flags &= ~(MapFieldSpaceCliff); // need to do this manually, since MapFieldSpaceCliff is added dynamically
 	this->overlay_terrain = nullptr;
 	this->OverlayTerrainDestroyed = false;
 	this->OverlayTerrainDamaged = false;
@@ -436,8 +436,8 @@ void tile::Save(CFile &file) const
 	if (Flags & MapFieldForest) {
 		file.printf(", \"wood\"");
 	}
-	if (Flags & MapFieldCliff) {
-		file.printf(", \"cliff\"");
+	if (Flags & MapFieldSpaceCliff) {
+		file.printf(", \"space_cliff\"");
 	}
 	//Wyrmgus start
 	if (Flags & MapFieldAirUnpassable) {
@@ -633,8 +633,8 @@ void tile::parse(lua_State *l)
 			this->Flags |= MapFieldRocks;
 		} else if (!strcmp(value, "wood")) {
 			this->Flags |= MapFieldForest;
-		} else if (!strcmp(value, "cliff")) {
-			this->Flags |= MapFieldCliff;
+		} else if (!strcmp(value, "space_cliff")) {
+			this->Flags |= MapFieldSpaceCliff;
 		} else if (!strcmp(value, "ground")) {
 			this->Flags |= MapFieldLandUnit;
 		} else if (!strcmp(value, "air")) {

@@ -1674,7 +1674,7 @@ void unit_type::calculate_movement_mask()
 				MapFieldNoBuilding |
 				MapFieldUnpassable |
 				MapFieldSpace |
-				MapFieldCliff;
+				MapFieldSpaceCliff;
 			this->FieldFlags = MapFieldNoBuilding;
 		} else {
 			this->MovementMask = 0;
@@ -1691,7 +1691,7 @@ void unit_type::calculate_movement_mask()
 				MapFieldWaterAllowed | // can't move on this
 				MapFieldUnpassable |
 				MapFieldSpace |
-				MapFieldCliff;
+				MapFieldSpaceCliff;
 
 			if (!this->BoolFlag[DIMINUTIVE_INDEX].value) {
 				// diminutive units can enter tiles occupied by other units and vice-versa
@@ -1715,7 +1715,7 @@ void unit_type::calculate_movement_mask()
 				MapFieldUnpassable |
 				MapFieldAirUnpassable |
 				MapFieldSpace |
-				MapFieldCliff;
+				MapFieldSpaceCliff;
 
 			if (!this->BoolFlag[DIMINUTIVE_INDEX].value) {
 				this->MovementMask |= MapFieldLandUnit | MapFieldSeaUnit;
@@ -1728,7 +1728,7 @@ void unit_type::calculate_movement_mask()
 				MapFieldLandAllowed | // can't move on this
 				MapFieldUnpassable |
 				MapFieldSpace |
-				MapFieldCliff;
+				MapFieldSpaceCliff;
 
 			if (!this->BoolFlag[CANDOCK_INDEX].value) {
 				this->MovementMask |= MapFieldCoastAllowed;
@@ -1793,7 +1793,7 @@ void unit_type::calculate_movement_mask()
 			MapFieldWaterAllowed |
 			MapFieldUnpassable |
 			MapFieldSpace |
-			MapFieldCliff |
+			MapFieldSpaceCliff |
 			MapFieldItem;
 		this->FieldFlags = MapFieldItem;
 	} else if (this->BoolFlag[BRIDGE_INDEX].value) {
@@ -1802,7 +1802,7 @@ void unit_type::calculate_movement_mask()
 			MapFieldLandAllowed |
 			MapFieldUnpassable |
 			MapFieldSpace |
-			MapFieldCliff |
+			MapFieldSpaceCliff |
 			MapFieldBridge;
 		this->FieldFlags = MapFieldBridge;
 	} else if (!this->BoolFlag[DIMINUTIVE_INDEX].value) {

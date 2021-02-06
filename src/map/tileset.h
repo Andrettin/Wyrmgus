@@ -86,7 +86,7 @@ enum MapFieldFlag : uint64_t {
 
 	MapFieldUnderground = 1 << 28,	/// The terrain is an underground one; this is used to make it always be "night" there, for graphical purposes as well as for unit sight
 	MapFieldSpace = 1 << 29, //the terrain is a space one, only being passable by space units
-	MapFieldCliff = 1 << 30 //used for cliff terrain
+	MapFieldSpaceCliff = 1 << 30 //used for the transition between land/water and space
 };
 
 /**

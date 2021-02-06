@@ -51,7 +51,7 @@ static bool IsPosFree(const Vec2i &pos, const CUnit &exceptionUnit, int z)
 	if (std::find(unitCache.begin(), unitCache.end(), &exceptionUnit) != unitCache.end()) {
 		return true;
 	}
-	const unsigned int blockedFlag = (MapFieldUnpassable | MapFieldWall | MapFieldRocks | MapFieldForest | MapFieldBuilding | MapFieldCliff);
+	const unsigned int blockedFlag = (MapFieldUnpassable | MapFieldWall | MapFieldRocks | MapFieldForest | MapFieldBuilding | MapFieldSpaceCliff);
 	if (mf.Flags & blockedFlag) {
 		return false;
 	}

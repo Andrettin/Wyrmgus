@@ -2445,7 +2445,7 @@ void CMap::CalculateTileTransitions(const Vec2i &pos, bool overlay, int z)
 				if ((mf.Flags & MapFieldSpace) && (!adjacent_terrain || !(adjacent_terrain->Flags & MapFieldSpace))) {
 					//if this is a space tile adjacent to a non-space tile, replace the space flag with a cliff one
 					mf.Flags &= ~(MapFieldSpace);
-					mf.Flags |= MapFieldCliff;
+					mf.Flags |= MapFieldSpaceCliff;
 				}
 			}
 			
@@ -2510,11 +2510,11 @@ void CMap::CalculateTileLandmass(const Vec2i &pos, int z)
 	}
 
 	const bool is_water = (mf.Flags & MapFieldWaterAllowed) || (mf.Flags & MapFieldCoastAllowed);
-	const bool is_cliff = (mf.Flags & MapFieldCliff);
+	const bool is_space_cliff = (mf.Flags & MapFieldSpaceCliff);
 
 	//doesn't have a landmass, and hasn't inherited one from another tile, so add a new one
 	const size_t landmass_index = this->landmasses.size();
-	const world *landmass_world = this->calculate_pos_world(pos, z, is_cliff);
+	const world *landmass_world = this->calculate_pos_world(pos, z, is_space_cliff);
 	this->landmasses.push_back(std::make_unique<landmass>(landmass_index, landmass_world));
 	mf.set_landmass(this->landmasses.back().get());
 
@@ -2538,8 +2538,8 @@ void CMap::CalculateTileLandmass(const Vec2i &pos, int z)
 						}
 
 						const bool adjacent_is_water = (adjacent_mf.Flags & MapFieldWaterAllowed) || (adjacent_mf.Flags & MapFieldCoastAllowed);
-						const bool adjacent_is_cliff = (adjacent_mf.Flags & MapFieldCliff);
-						const bool adjacent_is_compatible = (adjacent_is_water == is_water) && (adjacent_is_cliff == is_cliff);
+						const bool adjacent_is_space_cliff = (adjacent_mf.Flags & MapFieldSpaceCliff);
+						const bool adjacent_is_compatible = (adjacent_is_water == is_water) && (adjacent_is_space_cliff == is_space_cliff);
 									
 						if (adjacent_is_compatible) {
 							if (adjacent_mf.get_landmass() == nullptr) {
@@ -3453,7 +3453,7 @@ void CMap::generate_settlement_territories(const int z)
 		return true;
 	});
 
-	seeds = this->expand_settlement_territories(wyrmgus::container::to_vector(seeds), z, (MapFieldUnpassable | MapFieldCoastAllowed | MapFieldSpace | MapFieldCliff), MapFieldWaterAllowed | MapFieldUnderground);
+	seeds = this->expand_settlement_territories(wyrmgus::container::to_vector(seeds), z, (MapFieldUnpassable | MapFieldCoastAllowed | MapFieldSpace | MapFieldSpaceCliff), MapFieldWaterAllowed | MapFieldUnderground);
 	seeds = this->expand_settlement_territories(wyrmgus::container::to_vector(seeds), z, (MapFieldCoastAllowed | MapFieldSpace), MapFieldWaterAllowed | MapFieldUnderground);
 	seeds = this->expand_settlement_territories(wyrmgus::container::to_vector(seeds), z, MapFieldSpace, MapFieldUnderground);
 	seeds = this->expand_settlement_territories(wyrmgus::container::to_vector(seeds), z, MapFieldSpace);
