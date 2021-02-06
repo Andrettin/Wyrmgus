@@ -183,8 +183,7 @@ void DrawBuildingCursor()
 	vp.SetClipping();
 
 	const QPoint center_tile_pos = mpos + CursorBuilding->get_tile_center_pos_offset();
-	const bool is_underground = UI.CurrentMapLayer->Field(center_tile_pos)->Flags & MapFieldUnderground;
-	const wyrmgus::time_of_day *time_of_day = is_underground ? wyrmgus::defines::get()->get_underground_time_of_day() : UI.CurrentMapLayer->GetTimeOfDay();
+	const wyrmgus::time_of_day *time_of_day = UI.CurrentMapLayer->get_tile_time_of_day(center_tile_pos);
 
 //	DrawShadow(*CursorBuilding, CursorBuilding->StillFrame, screenPos);
 	if (CursorBuilding->GetDefaultVariation(CPlayer::GetThisPlayer()) && CursorBuilding->GetDefaultVariation(CPlayer::GetThisPlayer())->ShadowSprite) {

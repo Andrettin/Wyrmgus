@@ -476,8 +476,8 @@ static void HandleBuffsEachSecond(CUnit &unit)
 			&& CMap::Map.Info.IsPointOnMap(unit.tilePos, unit.MapLayer)
 			&& (unit.MapLayer->Field(unit.tilePos)->Flags & MapFieldDesert)
 			&& unit.MapLayer->Field(unit.tilePos)->get_owner() != unit.Player
-			&& unit.MapLayer->GetTimeOfDay()
-			&& unit.MapLayer->GetTimeOfDay()->is_day()
+			&& unit.get_center_tile_time_of_day() != nullptr
+			&& unit.get_center_tile_time_of_day()->is_day()
 			&& unit.Variable[HYDRATING_INDEX].Value <= 0
 			&& unit.Variable[DEHYDRATIONIMMUNITY_INDEX].Value <= 0
 		) {
