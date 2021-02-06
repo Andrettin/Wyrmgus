@@ -50,9 +50,9 @@
 #include "map/terrain_feature.h"
 #include "map/tile.h"
 #include "map/tileset.h"
+#include "map/world.h"
 #include "menus.h"
 #include "network.h"
-#include "plane.h"
 #include "player.h"
 #include "quest/objective/quest_objective.h"
 #include "quest/player_quest_objective.h"
@@ -86,7 +86,6 @@
 #include "video/font.h"
 #include "video/font_color.h"
 #include "video/video.h"
-#include "world.h"
 
 /*----------------------------------------------------------------------------
 --  UI BUTTONS

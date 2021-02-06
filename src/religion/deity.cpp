@@ -34,7 +34,6 @@
 #include "faction.h"
 #include "gender.h"
 #include "magic_domain.h"
-#include "plane.h"
 #include "player.h"
 #include "province.h"
 #include "religion/pantheon.h"

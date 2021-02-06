@@ -55,6 +55,7 @@
 #include "map/site_game_data.h"
 #include "map/terrain_feature.h"
 #include "map/tile.h"
+#include "map/world.h"
 #include "parameters.h"
 #include "player.h"
 #include "script/trigger.h"
@@ -74,7 +75,6 @@
 #include "util/log_util.h"
 #include "util/number_util.h"
 #include "video/font.h"
-#include "world.h"
 
 lua_State *Lua;                       /// Structure to work with lua files.
 

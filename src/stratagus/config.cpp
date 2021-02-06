@@ -36,10 +36,11 @@
 #include "iocompat.h"
 #include "iolib.h"
 #include "map/map_template.h"
+#include "map/plane.h"
 #include "map/site.h"
 #include "map/terrain_type.h"
+#include "map/world.h"
 #include "missile.h"
-#include "plane.h"
 #include "quest/campaign.h"
 #include "script/trigger.h"
 #include "sound/sound.h"
@@ -48,7 +49,6 @@
 #include "ui/button.h"
 #include "unit/unit_type.h"
 #include "util/util.h"
-#include "world.h"
 
 #include <boost/tokenizer.hpp>
 

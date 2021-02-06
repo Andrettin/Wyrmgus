@@ -74,7 +74,6 @@
 #include "util/random.h"
 #include "video/font.h"
 #include "video/video.h"
-#include "world.h"
 
 bool SaveGameLoading;                 /// If a Saved Game is Loading
 

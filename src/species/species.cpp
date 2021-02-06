@@ -29,15 +29,15 @@
 
 #include "species/species.h"
 
+#include "map/plane.h"
 #include "map/terrain_type.h"
-#include "plane.h"
+#include "map/world.h"
 #include "species/geological_era.h"
 #include "species/taxon.h"
 #include "species/taxonomic_rank.h"
 #include "util/exception_util.h"
 #include "util/vector_random_util.h"
 #include "util/vector_util.h"
-#include "world.h"
 
 namespace wyrmgus {
 

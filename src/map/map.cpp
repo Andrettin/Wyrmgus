@@ -42,6 +42,7 @@
 #include "map/map_layer.h"
 #include "map/map_template.h"
 #include "map/minimap.h"
+#include "map/plane.h"
 #include "map/site.h"
 #include "map/site_container.h"
 #include "map/site_game_data.h"
@@ -49,7 +50,7 @@
 #include "map/terrain_type.h"
 #include "map/tile.h"
 #include "map/tileset.h"
-#include "plane.h"
+#include "map/world.h"
 #include "player.h"
 //Wyrmgus start
 #include "province.h"
@@ -89,7 +90,6 @@
 #include "util/vector_util.h"
 #include "version.h"
 #include "video/video.h"
-#include "world.h"
 
 CMap CMap::Map; //the current map
 int FlagRevealMap; //flag must reveal the map

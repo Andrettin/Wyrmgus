@@ -27,13 +27,13 @@
 
 #include "stratagus.h"
 
-#include "world.h"
+#include "map/world.h"
 
 #include "config.h"
+#include "map/plane.h"
 #include "map/site.h"
 #include "map/terrain_feature.h"
 #include "map/terrain_type.h"
-#include "plane.h"
 #include "province.h"
 #include "species/species.h"
 #include "time/season_schedule.h"

@@ -42,12 +42,13 @@
 #include "luacallback.h"
 #include "map/map.h"
 #include "map/map_layer.h"
+#include "map/plane.h"
 #include "map/terrain_type.h"
 #include "map/tileset.h"
+#include "map/world.h"
 //Wyrmgus start
 #include "network.h" //for updating levels
 //Wyrmgus end
-#include "plane.h"
 #include "player.h"
 //Wyrmgus start
 #include "province.h"
@@ -76,7 +77,6 @@
 //Wyrmgus end
 #include "video/font.h"
 #include "video/video.h"
-#include "world.h"
 
 CUnitTypeVar UnitTypeVar;    /// Variables for UnitType and unit.
 

@@ -62,13 +62,14 @@
 #include "language/word_type.h"
 #include "magic_domain.h"
 #include "map/map_template.h"
+#include "map/plane.h"
 #include "map/region.h"
 #include "map/site.h"
 #include "map/terrain_feature.h"
 #include "map/terrain_type.h"
+#include "map/world.h"
 #include "missile/missile_class.h"
 #include "missile.h"
-#include "plane.h"
 #include "player_color.h"
 #include "quest/campaign.h"
 #include "quest/quest.h"
@@ -105,7 +106,6 @@
 #include "util/string_conversion_util.h"
 #include "video/font.h"
 #include "video/font_color.h"
-#include "world.h"
 
 namespace wyrmgus {
 

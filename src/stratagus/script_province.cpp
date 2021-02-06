@@ -34,9 +34,10 @@
 #include "civilization.h"
 #include "faction.h"
 #include "iolib.h"
+#include "map/plane.h"
 #include "map/region.h"
 #include "map/tileset.h"
-#include "plane.h"
+#include "map/world.h"
 #include "player.h"
 #include "script.h"
 #include "species/species.h"
@@ -45,7 +46,6 @@
 #include "unit/unit_type.h"
 #include "upgrade/upgrade.h"
 #include "video/video.h"
-#include "world.h"
 
 /**
 **  Define a world map terrain type.

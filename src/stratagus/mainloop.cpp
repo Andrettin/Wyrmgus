@@ -50,7 +50,6 @@
 #include "missile.h"
 #include "network.h"
 #include "particle.h"
-#include "plane.h"
 #include "quest/campaign.h"
 //Wyrmgus start
 #include "quest/quest.h"
@@ -80,7 +79,6 @@
 //Wyrmgus end
 #include "video/font.h"
 #include "video/video.h"
-#include "world.h"
 
 #include <guichan.h>
 

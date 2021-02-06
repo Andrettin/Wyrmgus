@@ -47,6 +47,7 @@
 #include "map/map.h"
 #include "map/map_layer.h"
 #include "map/map_template_history.h"
+#include "map/plane.h"
 #include "map/site.h"
 #include "map/site_game_data.h"
 #include "map/site_history.h"
@@ -54,7 +55,7 @@
 #include "map/terrain_type.h"
 #include "map/tile.h"
 #include "map/tileset.h"
-#include "plane.h"
+#include "map/world.h"
 #include "player.h"
 #include "quest/campaign.h"
 #include "settings.h"
@@ -80,7 +81,6 @@
 #include "util/vector_random_util.h"
 #include "util/vector_util.h"
 #include "video/video.h"
-#include "world.h"
 
 namespace wyrmgus {
 

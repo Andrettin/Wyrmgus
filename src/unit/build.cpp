@@ -44,7 +44,6 @@
 #include "unit/unit.h"
 #include "unit/unit_class.h"
 #include "unit/unit_find.h"
-#include "world.h"
 
 /**
 **  Find the building restriction that gives me this unit built on top

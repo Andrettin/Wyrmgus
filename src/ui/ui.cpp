@@ -55,7 +55,6 @@
 #include "unit/unit.h"
 #include "video/font.h"
 #include "video/video.h"
-#include "world.h"
 
 #include <SDL.h>
 

@@ -42,6 +42,7 @@
 #include "map/landmass.h"
 #include "map/map_layer.h"
 #include "map/map_template.h"
+#include "map/plane.h"
 #include "map/region.h"
 #include "map/site.h"
 #include "map/site_game_data.h"
@@ -49,8 +50,8 @@
 #include "map/terrain_type.h"
 #include "map/tile.h"
 #include "map/tileset.h"
+#include "map/world.h"
 //Wyrmgus start
-#include "plane.h"
 #include "province.h"
 //Wyrmgus end
 #include "quest/campaign.h"
@@ -70,7 +71,6 @@
 #include "util/util.h"
 #include "version.h"
 #include "video/video.h"
-#include "world.h"
 
 /**
 **  Parse a map.

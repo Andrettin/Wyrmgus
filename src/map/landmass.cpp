@@ -30,8 +30,8 @@
 
 #include "database/sml_data.h"
 #include "map/map.h"
+#include "map/world.h"
 #include "util/vector_util.h"
-#include "world.h"
 
 namespace wyrmgus {
 

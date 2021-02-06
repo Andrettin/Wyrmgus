@@ -39,7 +39,6 @@
 #include "map/terrain_type.h"
 #include "map/tile.h"
 #include "map/tileset.h"
-#include "plane.h"
 #include "player.h"
 #include "player_color.h"
 #include "province.h"
@@ -50,7 +49,6 @@
 #include "util/exception_util.h"
 #include "util/vector_util.h"
 #include "video/video.h"
-#include "world.h"
 
 #ifdef USE_OPENGL
 #ifdef __APPLE__

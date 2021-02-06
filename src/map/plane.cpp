@@ -27,7 +27,7 @@
 
 #include "stratagus.h"
 
-#include "plane.h"
+#include "map/plane.h"
 
 #include "config.h"
 #include "magic_domain.h"

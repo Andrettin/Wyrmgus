@@ -114,7 +114,6 @@
 #include "vassalage_type.h"
 #include "video/font.h"
 #include "video/video.h"
-#include "world.h"
 
 /**
 **  @class CPlayer player.h

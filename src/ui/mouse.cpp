@@ -45,10 +45,10 @@
 #include "map/terrain_type.h"
 #include "map/tile.h"
 #include "map/tileset.h"
+#include "map/world.h"
 #include "menus.h"
 #include "missile.h"
 #include "network.h"
-#include "plane.h"
 #include "player.h"
 //Wyrmgus start
 #include "province.h"
@@ -78,7 +78,6 @@
 #include "video/font.h"
 #include "video/video.h"
 #include "widgets.h"
-#include "world.h"
 
 #define ICON_SIZE_X (UI.ButtonPanel.Buttons[0].Style->Width)
 #define ICON_SIZE_Y (UI.ButtonPanel.Buttons[0].Style->Height)

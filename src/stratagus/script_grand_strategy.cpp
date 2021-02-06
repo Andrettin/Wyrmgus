@@ -31,8 +31,8 @@
 
 #include "grand_strategy.h"
 #include "luacallback.h"
+#include "map/world.h"
 #include "script.h"
-#include "world.h"
 
 /**
 **  Get grand strategy province data.
