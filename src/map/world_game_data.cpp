@@ -43,6 +43,85 @@
 
 namespace wyrmgus {
 
+void world_game_data::process_sml_property(const sml_property &property)
+{
+	const std::string &key = property.get_key();
+	const std::string &value = property.get_value();
+
+	if (key == "map_layer") {
+		const size_t map_layer_index = std::stoul(value);
+
+		if (map_layer_index >= CMap::get()->MapLayers.size()) {
+			throw std::runtime_error("Invalid map layer index for world game data: \"" + std::to_string(map_layer_index) + "\".");
+		}
+
+		this->map_layer = CMap::get()->MapLayers[map_layer_index].get();
+	} else if (key == "time_of_day") {
+		this->time_of_day = this->world->get_time_of_day_schedule()->ScheduledTimesOfDay[std::stoi(value)];
+	} else if (key == "remaining_time_of_day_hours") {
+		this->remaining_time_of_day_hours = std::stoi(value);
+	} else if (key == "season") {
+		this->season = this->world->get_season_schedule()->ScheduledSeasons[std::stoi(value)];
+	} else if (key == "remaining_season_hours") {
+		this->remaining_season_hours = std::stoi(value);
+	} else {
+		throw std::runtime_error("Invalid site game data property: \"" + key + "\".");
+	}
+}
+
+void world_game_data::process_sml_scope(const sml_data &scope)
+{
+	const std::string &tag = scope.get_tag();
+
+	if (tag == "map_rect") {
+		this->map_rect = scope.to_rect();
+	} else {
+		throw std::runtime_error("Invalid site game data scope: \"" + scope.get_tag() + "\".");
+	}
+}
+
+sml_data world_game_data::to_sml_data() const
+{
+	sml_data data(this->world->get_identifier());
+
+	if (this->get_map_rect().isValid()) {
+		data.add_child(sml_data::from_rect(this->get_map_rect(), "map_rect"));
+	}
+
+	if (this->map_layer != nullptr) {
+		data.add_property("map_layer", std::to_string(this->map_layer->ID));
+	}
+
+	data.add_property("time_of_day", std::to_string(this->time_of_day->ID));
+	data.add_property("remaining_time_of_day_hours", std::to_string(this->remaining_time_of_day_hours));
+	data.add_property("season", std::to_string(this->season->ID));
+	data.add_property("remaining_season_hours", std::to_string(this->remaining_season_hours));
+
+	return data;
+}
+
+const std::string &world_game_data::get_current_cultural_name() const
+{
+	/*
+	const CUnit *unit = this->get_site_unit();
+
+	if (unit != nullptr) {
+		const civilization *name_civilization = unit->get_civilization();
+
+		if (name_civilization == nullptr && unit->Player->get_index() == PlayerNumNeutral) {
+			const CPlayer *unit_tile_owner = unit->get_center_tile_owner();
+			if (unit_tile_owner != nullptr) {
+				name_civilization = unit_tile_owner->get_civilization();
+			}
+		}
+
+		return this->site->get_cultural_name(name_civilization);
+	}
+	*/
+
+	return this->world->get_name();
+}
+
 void world_game_data::do_per_in_game_hour_loop()
 {
 	this->decrement_remaining_season_hours();

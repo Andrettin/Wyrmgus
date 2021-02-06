@@ -47,6 +47,11 @@ public:
 	{
 	}
 
+	void process_sml_property(const sml_property &property);
+	void process_sml_scope(const sml_data &scope);
+
+	sml_data to_sml_data() const;
+
 	bool is_on_map() const
 	{
 		return this->map_layer != nullptr && this->map_rect.isValid();
@@ -62,6 +67,8 @@ public:
 		this->map_rect = map_rect;
 		this->map_layer = map_layer;
 	}
+
+	const std::string &get_current_cultural_name() const;
 
 	void do_per_in_game_hour_loop();
 

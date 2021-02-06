@@ -1725,6 +1725,11 @@ void CMap::process_sml_scope(const sml_data &scope)
 			database::process_sml_data(landmass, landmass_data);
 			++current_index;
 		});
+	} else if (tag == "world_data") {
+		scope.for_each_child([&](const sml_data &child_scope) {
+			const world *world = world::get(child_scope.get_tag());
+			database::process_sml_data(world->get_game_data(), child_scope);
+		});
 	} else {
 		exception::throw_with_trace(std::runtime_error("Invalid map data scope: \"" + scope.get_tag() + "\"."));
 	}
@@ -1746,6 +1751,28 @@ void CMap::save(CFile &file) const
 			landmasses_data.add_child(landmass->to_sml_data());
 		}
 		map_data.add_child(std::move(landmasses_data));
+	}
+
+	sml_data world_game_data("world_data");
+	for (const world *world : world::get_all()) {
+		if (world->get_game_data() == nullptr) {
+			continue;
+		}
+
+		if (!world->get_game_data()->is_on_map()) {
+			continue;
+		}
+
+		sml_data world_data = world->get_game_data()->to_sml_data();
+
+		if (world_data.is_empty()) {
+			continue;
+		}
+
+		world_game_data.add_child(std::move(world_data));
+	}
+	if (!world_game_data.is_empty()) {
+		map_data.add_child(std::move(world_game_data));
 	}
 
 	const std::string str = "load_map_data(\"" + string::escaped(map_data.print_to_string()) + "\")\n\n";

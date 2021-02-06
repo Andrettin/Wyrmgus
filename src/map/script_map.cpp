@@ -108,25 +108,7 @@ static int CclStratagusMap(lua_State *l)
 				const char *subvalue = LuaToString(l, j + 1, k + 1);
 				++k;
 
-				if (!strcmp(subvalue, "size")) {
-					lua_rawgeti(l, j + 1, k + 1);
-					CclGetPos(l, &CMap::Map.Info.MapWidth, &CMap::Map.Info.MapHeight);
-					lua_pop(l, 1);
-
-					//Wyrmgus start
-//					delete[] Map.Fields;
-//					CMap::Map.Fields = new wyrmgus::tile[CMap::Map.Info.MapWidth * CMap::Map.Info.MapHeight];
-					CMap::Map.ClearMapLayers();
-					auto map_layer = std::make_unique<CMapLayer>(CMap::Map.Info.MapWidth, CMap::Map.Info.MapHeight);
-					map_layer->ID = CMap::Map.MapLayers.size();
-					CMap::Map.Info.MapWidths.clear();
-					CMap::Map.Info.MapWidths.push_back(CMap::Map.Info.MapWidth);
-					CMap::Map.Info.MapHeights.clear();
-					CMap::Map.Info.MapHeights.push_back(CMap::Map.Info.MapHeight);
-					CMap::Map.MapLayers.push_back(std::move(map_layer));
-					//Wyrmgus end
-					// FIXME: this should be CreateMap or InitMap?
-				} else if (!strcmp(subvalue, "fog-of-war")) {
+				if (!strcmp(subvalue, "fog-of-war")) {
 					CMap::Map.NoFogOfWar = false;
 					--k;
 				} else if (!strcmp(subvalue, "no-fog-of-war")) {
