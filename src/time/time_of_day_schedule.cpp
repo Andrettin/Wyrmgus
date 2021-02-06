@@ -55,6 +55,8 @@ void time_of_day_schedule::initialize()
 		total_hours += time_of_day->GetHours();
 	}
 	this->set_total_hours(total_hours);
+
+	data_entry::initialize();
 }
 
 /**

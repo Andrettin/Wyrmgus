@@ -54,6 +54,8 @@ void season_schedule::initialize()
 		total_hours += season->Hours;
 	}
 	this->set_total_hours(total_hours);
+
+	data_entry::initialize();
 }
 
 /**
