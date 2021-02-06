@@ -48,6 +48,21 @@ public:
 		return point_data;
 	}
 
+	static sml_data from_rect(const QRect &rect, const std::string &tag = std::string())
+	{
+		sml_data rect_data(tag);
+
+		const QPoint top_left = rect.topLeft();
+		rect_data.add_value(std::to_string(top_left.x()));
+		rect_data.add_value(std::to_string(top_left.y()));
+
+		const QPoint bottom_right = rect.bottomRight();
+		rect_data.add_value(std::to_string(bottom_right.x()));
+		rect_data.add_value(std::to_string(bottom_right.y()));
+
+		return rect_data;
+	}
+
 	explicit sml_data(std::string &&tag = std::string());
 
 	explicit sml_data(std::string &&tag, const sml_operator scope_operator)
@@ -282,6 +297,19 @@ public:
 	}
 
 	geocoordinate to_geocoordinate() const;
+
+	QRect to_rect() const
+	{
+		if (this->get_values().size() != 4) {
+			throw std::runtime_error("Rect scopes need to contain exactly four values.");
+		}
+
+		const int min_x = std::stoi(this->get_values()[0]);
+		const int min_y = std::stoi(this->get_values()[1]);
+		const int max_x = std::stoi(this->get_values()[2]);
+		const int max_y = std::stoi(this->get_values()[3]);
+		return QRect(QPoint(min_x, min_y), QPoint(max_x, max_y));
+	}
 
 	void print_to_file(const std::filesystem::path &filepath) const
 	{
