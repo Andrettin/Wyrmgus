@@ -1131,7 +1131,7 @@ bool CUnit::CheckSeasonForVariation(const wyrmgus::unit_type_variation *variatio
 {
 	if (
 		!variation->Seasons.empty()
-		&& (!this->MapLayer || std::find(variation->Seasons.begin(), variation->Seasons.end(), this->MapLayer->GetSeason()) == variation->Seasons.end())
+		&& (!this->MapLayer || !vector::contains(variation->Seasons, this->MapLayer->get_tile_season(this->get_center_tile_pos())))
 	) {
 		return false;
 	}
@@ -1139,7 +1139,7 @@ bool CUnit::CheckSeasonForVariation(const wyrmgus::unit_type_variation *variatio
 	if (
 		!variation->ForbiddenSeasons.empty()
 		&& this->MapLayer
-		&& std::find(variation->ForbiddenSeasons.begin(), variation->ForbiddenSeasons.end(), this->MapLayer->GetSeason()) != variation->ForbiddenSeasons.end()
+		&& vector::contains(variation->ForbiddenSeasons, this->MapLayer->get_tile_season(this->get_center_tile_pos()))
 	) {
 		return false;
 	}

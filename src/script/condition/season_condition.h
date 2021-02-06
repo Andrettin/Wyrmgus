@@ -48,7 +48,7 @@ public:
 	{
 		Q_UNUSED(ignore_units)
 
-		return CMap::Map.MapLayers[player->StartMapLayer]->GetSeason() == this->season;
+		return CMap::Map.MapLayers[player->StartMapLayer]->get_tile_season(player->StartPos) == this->season;
 	}
 
 	virtual bool check(const CUnit *unit, const bool ignore_units) const override
@@ -59,7 +59,9 @@ public:
 			return false;
 		}
 
-		return unit->MapLayer->GetSeason() == this->season;
+		const QPoint center_tile_pos = unit->get_center_tile_pos();
+
+		return unit->MapLayer->get_tile_season(center_tile_pos) == this->season;
 	}
 
 	virtual std::string get_string(const size_t indent) const override

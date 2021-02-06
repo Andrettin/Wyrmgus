@@ -147,7 +147,8 @@ public:
 	void SetTimeOfDay(const scheduled_time_of_day *time_of_day);
 
 	wyrmgus::time_of_day *GetTimeOfDay() const;
-	wyrmgus::time_of_day *get_tile_time_of_day(const QPoint &tile_pos) const;
+	const wyrmgus::time_of_day *get_tile_time_of_day(const int tile_index) const;
+	const wyrmgus::time_of_day *get_tile_time_of_day(const QPoint &tile_pos) const;
 
 	const wyrmgus::season_schedule *get_season_schedule() const
 	{
@@ -173,6 +174,8 @@ public:
 
 	void SetSeason(const scheduled_season *season);
 	wyrmgus::season *GetSeason() const;
+	const wyrmgus::season *get_tile_season(const int tile_index) const;
+	const wyrmgus::season *get_tile_season(const QPoint &tile_pos) const;
 
 	bool has_subtemplate_area(const wyrmgus::map_template *map_template) const
 	{

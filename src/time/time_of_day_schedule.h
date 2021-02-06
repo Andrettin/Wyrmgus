@@ -60,10 +60,12 @@ public:
 	static constexpr const char *class_identifier = "time_of_day_schedule";
 	static constexpr const char *database_folder = "time_of_day_schedules";
 
+	static time_of_day_schedule *DefaultTimeOfDaySchedule;
+
 	explicit time_of_day_schedule(const std::string &identifier);
 	~time_of_day_schedule();
-	
-	static time_of_day_schedule *DefaultTimeOfDaySchedule;
+
+	virtual void initialize() override;
 	
 	virtual void ProcessConfigData(const CConfigData *config_data) override;
 	virtual unsigned long GetDefaultTotalHours() const;

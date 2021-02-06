@@ -56,6 +56,7 @@
 #include "map/tile.h"
 #include "map/tileset.h"
 #include "map/world.h"
+#include "map/world_game_data.h"
 #include "player.h"
 #include "quest/campaign.h"
 #include "settings.h"
@@ -1064,7 +1065,14 @@ void map_template::apply(const QPoint &template_start_pos, const QPoint &map_sta
 
 	//this has to be done at the end, so that it doesn't prevent the application from working properly, due to the map template code thinking that its own area belongs to another map template
 	if (this->IsSubtemplateArea()) {
-		CMap::Map.MapLayers[z]->subtemplate_areas[this] = QRect(map_start_pos, map_end - Vec2i(1, 1));
+		const QRect map_rect(map_start_pos, map_end - Vec2i(1, 1));
+
+		CMap::Map.MapLayers[z]->subtemplate_areas[this] = map_rect;
+
+		//if this is the top subtemplate for a given world, set the world's map rect to this map template's map rect
+		if (this->get_world() != nullptr && this->get_world() != this->get_main_template()->get_world()) {
+			this->get_world()->get_game_data()->set_map_rect(map_rect, CMap::Map.MapLayers[z].get());
+		}
 	}
 
 	this->clear_application_data();

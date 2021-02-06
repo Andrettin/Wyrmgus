@@ -52,10 +52,13 @@ public:
 	static constexpr const char *class_identifier = "season_schedule";
 	static constexpr const char *database_folder = "season_schedules";
 
+	static season_schedule *DefaultSeasonSchedule;
+
 	explicit season_schedule(const std::string &identifier);
 	~season_schedule();
 
-	static season_schedule *DefaultSeasonSchedule;
+
+	virtual void initialize() override;
 
 	virtual void ProcessConfigData(const CConfigData *config_data) override;
 	virtual unsigned long GetDefaultTotalHours() const;

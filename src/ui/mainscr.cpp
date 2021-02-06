@@ -885,7 +885,7 @@ void DrawTime()
 			icon->get_graphics()->DrawFrameClip(icon->get_frame(), UI.TimeOfDayPanel.IconX, UI.TimeOfDayPanel.IconY);
 		}
 
-		const wyrmgus::season *season = UI.CurrentMapLayer->GetSeason();
+		const wyrmgus::season *season = UI.CurrentMapLayer->get_tile_season(tile_pos);
 		if (season != nullptr) {
 			const wyrmgus::resource_icon *icon = season->get_icon();
 			icon->get_graphics()->DrawFrameClip(icon->get_frame(), UI.SeasonPanel.IconX, UI.SeasonPanel.IconY);
@@ -1177,7 +1177,7 @@ void DrawPopups()
 		DrawGenericPopup(_(time_of_day->get_name().c_str()), UI.TimeOfDayPanel.IconX, UI.TimeOfDayPanel.IconY + 16 * wyrmgus::defines::get()->get_scale_factor() + GameCursor->get_graphics()->getHeight() / 2, nullptr, nullptr, false);
 	}
 	
-	const wyrmgus::season *season = UI.CurrentMapLayer->GetSeason();
+	const wyrmgus::season *season = UI.CurrentMapLayer->get_tile_season(tile_pos);
 	std::shared_ptr<const CGraphic> season_icon_graphics;
 	if (season != nullptr) {
 		season_icon_graphics = season->get_icon()->get_graphics();

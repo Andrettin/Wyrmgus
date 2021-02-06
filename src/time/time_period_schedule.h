@@ -42,7 +42,20 @@ public:
 	virtual int GetDefaultHourMultiplier() const = 0;
 	void CalculateHourMultiplier();
 
-	unsigned long TotalHours = 0; //the total amount of hours this time period schedule contains
+	unsigned long get_total_hours() const
+	{
+		return this->total_hours;
+	}
+
+protected:
+	void set_total_hours(const unsigned long hours)
+	{
+		this->total_hours = hours;
+	}
+
+private:
+	unsigned long total_hours = 0; //the total amount of hours this time period schedule contains
+public:
 	int HourMultiplier = 1; //the amount of hours that pass for this schedule for each in-game hour
 };
 

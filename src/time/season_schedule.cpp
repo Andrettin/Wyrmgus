@@ -47,6 +47,15 @@ season_schedule::~season_schedule()
 	}
 }
 
+void season_schedule::initialize()
+{
+	unsigned long total_hours = 0;
+	for (const scheduled_season *season : this->ScheduledSeasons) {
+		total_hours += season->Hours;
+	}
+	this->set_total_hours(total_hours);
+}
+
 /**
 **	@brief	Process data provided by a configuration file
 **
@@ -108,7 +117,6 @@ void season_schedule::ProcessConfigData(const CConfigData *config_data)
 			scheduled_season->ID = this->ScheduledSeasons.size();
 			scheduled_season->Schedule = this;
 			this->ScheduledSeasons.push_back(scheduled_season);
-			this->TotalHours += scheduled_season->Hours;
 		} else {
 			fprintf(stderr, "Invalid season schedule property: \"%s\".\n", child_config_data->Tag.c_str());
 		}

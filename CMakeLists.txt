@@ -244,6 +244,7 @@ set(map_SRCS
 	src/map/tile.cpp
 	src/map/tileset.cpp
 	src/map/world.cpp
+	src/map/world_game_data.cpp
 )
 source_group(map FILES ${map_SRCS})
 
@@ -758,6 +759,7 @@ set(stratagus_map_HDRS
 	src/map/tile.h
 	src/map/tileset.h
 	src/map/world.h
+	src/map/world_game_data.h
 )
 
 set(stratagus_missile_HDRS

@@ -267,7 +267,6 @@ void CViewport::DrawMapBackgroundInViewport() const
 	int sy = this->MapPos.y;
 	int dy = this->TopLeftPos.y - this->Offset.y;
 	const int map_max = UI.CurrentMapLayer->get_width() * UI.CurrentMapLayer->get_height();
-	const wyrmgus::season *season = CMap::Map.MapLayers[UI.CurrentMapLayer->ID]->GetSeason();
 
 	while (sy  < 0) {
 		sy++;
@@ -308,11 +307,10 @@ void CViewport::DrawMapBackgroundInViewport() const
 
 			bool is_unpassable = overlay_terrain && (overlay_terrain->Flags & MapFieldUnpassable) && !wyrmgus::vector::contains(overlay_terrain->get_destroyed_tiles(), overlay_solid_tile);
 			const bool is_space = terrain && terrain->Flags & MapFieldSpace;
-			const wyrmgus::time_of_day *time_of_day = nullptr;
-			if (!is_space) {
-				const bool is_underground = terrain && terrain->Flags & MapFieldUnderground;
-				time_of_day = is_underground ? wyrmgus::defines::get()->get_underground_time_of_day() : UI.CurrentMapLayer->GetTimeOfDay();
-			}
+
+			const wyrmgus::time_of_day *time_of_day = UI.CurrentMapLayer->get_tile_time_of_day(sx);
+			const wyrmgus::season *season = UI.CurrentMapLayer->get_tile_season(sx);
+
 			const wyrmgus::player_color *player_color = (mf.get_owner() != nullptr) ? mf.get_owner()->get_player_color() : CPlayer::Players[PlayerNumNeutral]->get_player_color();
 
 			if (terrain != nullptr) {

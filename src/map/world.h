@@ -41,6 +41,7 @@ class site;
 class species;
 class terrain_type;
 class time_of_day_schedule;
+class world_game_data;
 
 class world final : public detailed_data_entry, public data_type<world>
 {
@@ -58,11 +59,17 @@ public:
 
 	static world *add(const std::string &identifier, const wyrmgus::data_module *data_module);
 
-	explicit world(const std::string &identifier) : detailed_data_entry(identifier)
-	{
-	}
-
+	explicit world(const std::string &identifier);
 	~world();
+
+	virtual void initialize() override;
+
+	void reset_game_data();
+
+	world_game_data *get_game_data() const
+	{
+		return this->game_data.get();
+	}
 
 	wyrmgus::plane *get_plane() const
 	{
@@ -105,6 +112,7 @@ public:
 	std::vector<CProvince *> Provinces;									/// Provinces in this world
 private:
 	std::vector<const species *> native_species;
+	std::unique_ptr<world_game_data> game_data;
 };
 
 }

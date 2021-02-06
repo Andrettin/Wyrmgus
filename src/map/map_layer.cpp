@@ -35,6 +35,8 @@
 #include "map/terrain_type.h"
 #include "map/tile.h"
 #include "map/tileset.h"
+#include "map/world.h"
+#include "map/world_game_data.h"
 #include "sound/music.h"
 #include "sound/sound_server.h"
 #include "time/season.h"
@@ -44,6 +46,7 @@
 #include "unit/unit.h"
 #include "unit/unit_manager.h"
 #include "util/exception_util.h"
+#include "util/point_util.h"
 
 CMapLayer::CMapLayer(const QSize &size) : size(size)
 {
@@ -316,7 +319,7 @@ void CMapLayer::SetTimeOfDayByHours(const unsigned long long hours)
 		return;
 	}
 	
-	int remaining_hours = hours % this->get_time_of_day_schedule()->TotalHours;
+	int remaining_hours = hours % this->get_time_of_day_schedule()->get_total_hours();
 	this->SetTimeOfDay(this->get_time_of_day_schedule()->ScheduledTimesOfDay.front());
 	this->RemainingTimeOfDayHours = this->time_of_day->GetHours(this->GetSeason());
 	this->RemainingTimeOfDayHours -= remaining_hours;
@@ -375,9 +378,9 @@ wyrmgus::time_of_day *CMapLayer::GetTimeOfDay() const
 	return this->time_of_day->TimeOfDay;
 }
 
-wyrmgus::time_of_day *CMapLayer::get_tile_time_of_day(const QPoint &tile_pos) const
+const wyrmgus::time_of_day *CMapLayer::get_tile_time_of_day(const int tile_index) const
 {
-	const wyrmgus::tile *tile = this->Field(tile_pos);
+	const wyrmgus::tile *tile = this->Field(tile_index);
 
 	if (tile->Flags & MapFieldSpace) {
 		return nullptr;
@@ -387,7 +390,17 @@ wyrmgus::time_of_day *CMapLayer::get_tile_time_of_day(const QPoint &tile_pos) co
 		return wyrmgus::defines::get()->get_underground_time_of_day();
 	}
 
+	const wyrmgus::world *tile_world = tile->get_world();
+	if (tile_world != nullptr) {
+		return tile_world->get_game_data()->get_time_of_day();
+	}
+
 	return this->GetTimeOfDay();
+}
+
+const wyrmgus::time_of_day *CMapLayer::get_tile_time_of_day(const QPoint &tile_pos) const
+{
+	return this->get_tile_time_of_day(point::to_index(tile_pos, this->get_width()));
 }
 
 /**
@@ -432,7 +445,7 @@ void CMapLayer::SetSeasonByHours(const unsigned long long hours)
 		return;
 	}
 	
-	int remaining_hours = hours % this->get_season_schedule()->TotalHours;
+	int remaining_hours = hours % this->get_season_schedule()->get_total_hours();
 	this->SetSeason(this->get_season_schedule()->ScheduledSeasons.front());
 	this->RemainingSeasonHours = this->season->Hours;
 	this->RemainingSeasonHours -= remaining_hours;
@@ -491,4 +504,29 @@ wyrmgus::season *CMapLayer::GetSeason() const
 	}
 	
 	return this->season->Season;
+}
+
+const wyrmgus::season *CMapLayer::get_tile_season(const int tile_index) const
+{
+	const wyrmgus::tile *tile = this->Field(tile_index);
+
+	if (tile->Flags & MapFieldSpace) {
+		return nullptr;
+	}
+
+	if (tile->Flags & MapFieldUnderground) {
+		return nullptr;
+	}
+
+	const wyrmgus::world *tile_world = tile->get_world();
+	if (tile_world != nullptr) {
+		return tile_world->get_game_data()->get_season();
+	}
+
+	return this->GetSeason();
+}
+
+const wyrmgus::season *CMapLayer::get_tile_season(const QPoint &tile_pos) const
+{
+	return this->get_tile_season(point::to_index(tile_pos, this->get_width()));
 }

@@ -48,6 +48,15 @@ time_of_day_schedule::~time_of_day_schedule()
 	}
 }
 
+void time_of_day_schedule::initialize()
+{
+	unsigned long total_hours = 0;
+	for (const scheduled_time_of_day *time_of_day : this->ScheduledTimesOfDay) {
+		total_hours += time_of_day->GetHours();
+	}
+	this->set_total_hours(total_hours);
+}
+
 /**
 **	@brief	Process data provided by a configuration file
 **
@@ -121,9 +130,7 @@ void scheduled_time_of_day::ProcessConfigData(const CConfigData *config_data)
 		if (key == "time_of_day") {
 			this->TimeOfDay = wyrmgus::time_of_day::get(value);
 		} else if (key == "hours") {
-			this->Schedule->TotalHours -= this->Hours; //remove old amount of hours from the schedule, if it has already been defined before
 			this->Hours = std::stoi(value);
-			this->Schedule->TotalHours += this->Hours;
 		} else {
 			fprintf(stderr, "Invalid scheduled time of day property: \"%s\".\n", key.c_str());
 		}
@@ -181,7 +188,7 @@ void scheduled_time_of_day::ProcessConfigData(const CConfigData *config_data)
 */
 int scheduled_time_of_day::GetHours(const wyrmgus::season *season) const
 {
-	if (season) {
+	if (season != nullptr) {
 		auto find_iterator = this->SeasonHours.find(season);
 		
 		if (find_iterator != this->SeasonHours.end()) {

@@ -26,7 +26,6 @@
 
 #pragma once
 
-class CFile;
 class CMapLayer;
 class CPlayer;
 class CUnit;

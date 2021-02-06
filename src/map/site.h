@@ -23,7 +23,6 @@
 //      along with this program; if not, write to the Free Software
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
-//
 
 #pragma once
 
@@ -134,6 +133,7 @@ public:
 	virtual void reset_history() override;
 
 	void reset_game_data();
+
 	site_game_data *get_game_data() const
 	{
 		return this->game_data.get();

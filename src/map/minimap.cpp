@@ -230,17 +230,18 @@ void minimap::UpdateTerrain(int z)
 		scaley = 1;
 	}
 	
-	const season *season = CMap::Map.MapLayers[z]->GetSeason();
-
 	const CMapLayer *map_layer = CMap::Map.MapLayers[z].get();
 	const int texture_width = this->get_texture_width(z);
 	const int texture_height = this->get_texture_height(z);
 	
 	for (int my = YOffset[z]; my < texture_height - YOffset[z]; ++my) {
 		for (int mx = XOffset[z]; mx < texture_width - XOffset[z]; ++mx) {
-			const tile &mf = *map_layer->Field(Minimap2MapX[z][mx] + Minimap2MapY[z][my]);
+			const int tile_index = Minimap2MapX[z][mx] + Minimap2MapY[z][my];
+			const tile &mf = *map_layer->Field(tile_index);
 			const terrain_type *terrain = mf.get_top_terrain(true);
-	
+
+			const season *season = map_layer->get_tile_season(tile_index);
+
 			const QColor color = terrain ? terrain->get_minimap_color(season) : QColor(0, 0, 0);
 
 			const uint32_t c = CVideo::MapRGB(color);
@@ -282,7 +283,7 @@ void minimap::UpdateXY(const Vec2i &pos, const int z)
 		scaley = 1;
 	}
 
-	const season *season = CMap::Map.MapLayers[z]->GetSeason();
+	const season *season = CMap::Map.MapLayers[z]->get_tile_season(pos);
 
 	const int ty = pos.y * CMap::Map.Info.MapWidths[z];
 	const int tx = pos.x;

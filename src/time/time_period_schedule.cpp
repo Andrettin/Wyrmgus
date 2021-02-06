@@ -39,12 +39,12 @@ void time_period_schedule::CalculateHourMultiplier()
 {
 	int multiplier = 1;
 	
-	if (this->TotalHours > DEFAULT_HOURS_PER_DAY) {
+	if (this->get_total_hours() > DEFAULT_HOURS_PER_DAY) {
 		multiplier = this->GetDefaultHourMultiplier();
-		if (this->TotalHours > this->GetDefaultTotalHours()) {
-			multiplier += (this->TotalHours * 100 / this->GetDefaultTotalHours() - 100) * this->GetDefaultHourMultiplier() / HOUR_MULTIPLIER_DIVIDER / 100; //this makes duration increases effectively level off after the default number of days per year; at the same time, this formula also serves to calculate the hour multiplier for duration lengths greater than a week and smaller than a year
-		} else if (this->TotalHours < this->GetDefaultTotalHours()) {
-			long long int multiplier_modifier = this->TotalHours * 100 / this->GetDefaultTotalHours();
+		if (this->get_total_hours() > this->GetDefaultTotalHours()) {
+			multiplier += (this->get_total_hours() * 100 / this->GetDefaultTotalHours() - 100) * this->GetDefaultHourMultiplier() / HOUR_MULTIPLIER_DIVIDER / 100; //this makes duration increases effectively level off after the default number of days per year; at the same time, this formula also serves to calculate the hour multiplier for duration lengths greater than a week and smaller than a year
+		} else if (this->get_total_hours() < this->GetDefaultTotalHours()) {
+			long long int multiplier_modifier = static_cast<long long int>(this->get_total_hours()) * 100 / this->GetDefaultTotalHours();
 			multiplier_modifier -= 100;
 			multiplier_modifier *= this->GetDefaultHourMultiplier();
 			multiplier_modifier /= 100;

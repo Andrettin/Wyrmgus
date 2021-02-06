@@ -64,6 +64,8 @@
 #include "map/terrain_type.h"
 #include "map/tile.h"
 #include "map/tileset.h"
+#include "map/world.h"
+#include "map/world_game_data.h"
 #include "missile.h"
 #include "netconnect.h"
 #include "network.h"
@@ -175,6 +177,13 @@ void game::do_cycle()
 
 		for (const std::unique_ptr<CMapLayer> &map_layer : CMap::Map.MapLayers) {
 			map_layer->DoPerHourLoop();
+		}
+
+		for (const world *world : world::get_all()) {
+			world_game_data *game_data = world->get_game_data();
+			if (game_data->is_on_map()) {
+				game_data->do_per_in_game_hour_loop();
+			}
 		}
 	}
 }
