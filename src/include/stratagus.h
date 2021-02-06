@@ -154,9 +154,7 @@ constexpr int base_population_per_unit = 1000;		/// Number of people a unit repr
 }
 
 constexpr int DEFAULT_HOURS_PER_DAY = 24;
-constexpr int DEFAULT_DAYS_PER_MONTH = 30;
 constexpr int DEFAULT_DAYS_PER_YEAR = 365;
-constexpr int DEFAULT_DAYS_PER_WEEK = 7;
 //Wyrmgus end
 
 /// Frames per second to display (original 30-40)

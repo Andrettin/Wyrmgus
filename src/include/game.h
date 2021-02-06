@@ -46,7 +46,7 @@ class delayed_effect_instance;
 class game final : public singleton<game>
 {
 public:
-	static inline const QDateTime base_date = QDateTime(QDate(-10000, 1, 1)); //10,000 BC; base date from which to calculate the current total hours from the base date
+	static inline const QDateTime base_date = QDateTime(QDate(-100000, 1, 1)); //100,000 BC; base date from which to calculate the current total hours from the base date
 
 	game();
 	~game();

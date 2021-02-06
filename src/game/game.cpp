@@ -1660,7 +1660,9 @@ void CreateGame(const std::string &filename, CMap *map, bool is_mod)
 		game::get()->set_current_date(date_time);
 	}
 	
-	const uint64_t total_hours = game::base_date.secsTo(game::get()->get_current_date()) / 60 / 60;
+	uint64_t total_hours = static_cast<uint64_t>(std::abs(game::base_date.date().year() - game::get()->get_current_date().date().year())) * DEFAULT_DAYS_PER_YEAR * DEFAULT_HOURS_PER_DAY;
+	total_hours += QDate(1, 1, 1).daysTo(QDate(1, game::get()->get_current_date().date().month(), game::get()->get_current_date().date().day())) * DEFAULT_HOURS_PER_DAY;
+
 	game::get()->set_current_total_hours(total_hours);
 
 	age::current_age = nullptr;
