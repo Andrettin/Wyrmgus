@@ -909,14 +909,14 @@ set(stratagus_spell_HDRS
 )
 
 set(stratagus_time_HDRS
-	src/include/time/calendar.h
-	src/include/time/date.h
-	src/include/time/season.h
-	src/include/time/season_schedule.h
-	src/include/time/time_of_day.h
-	src/include/time/time_of_day_schedule.h
-	src/include/time/time_period_schedule.h
-	src/include/time/timeline.h
+	src/time/calendar.h
+	src/time/date.h
+	src/time/season.h
+	src/time/season_schedule.h
+	src/time/time_of_day.h
+	src/time/time_of_day_schedule.h
+	src/time/time_period_schedule.h
+	src/time/timeline.h
 )
 
 set(stratagus_ui_HDRS
