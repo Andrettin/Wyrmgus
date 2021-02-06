@@ -39,7 +39,6 @@
 #include "map/plane.h"
 #include "map/site.h"
 #include "map/terrain_type.h"
-#include "map/world.h"
 #include "missile.h"
 #include "quest/campaign.h"
 #include "script/trigger.h"
@@ -273,11 +272,6 @@ void CConfigData::ProcessConfigData(const std::vector<CConfigData *> &config_dat
 			wyrmgus::unit_type *unit_type = wyrmgus::unit_type::get_or_add(ident, nullptr);
 			if (!define_only) {
 				unit_type->ProcessConfigData(config_data);
-			}
-		} else if (config_data->Tag == "world") {
-			wyrmgus::world *world = wyrmgus::world::get_or_add(ident, nullptr);
-			if (!define_only) {
-				world->ProcessConfigData(config_data);
 			}
 		} else {
 			fprintf(stderr, "Invalid data type: \"%s\".\n", config_data->Tag.c_str());

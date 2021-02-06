@@ -23,13 +23,11 @@
 //      along with this program; if not, write to the Free Software
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
-//
 
 #pragma once
 
 #include "database/data_type.h"
 #include "database/detailed_data_entry.h"
-#include "data_type.h"
 #include "map/site_container.h"
 #include "map/terrain_geodata_map.h"
 
@@ -44,7 +42,7 @@ class site;
 class species;
 class terrain_type;
 
-class world final : public detailed_data_entry, public data_type<world>, public CDataType
+class world final : public detailed_data_entry, public data_type<world>
 {
 	Q_OBJECT
 
@@ -58,13 +56,11 @@ public:
 
 	static world *add(const std::string &identifier, const wyrmgus::data_module *data_module);
 
-	explicit world(const std::string &identifier) : detailed_data_entry(identifier), CDataType(identifier)
+	explicit world(const std::string &identifier) : detailed_data_entry(identifier)
 	{
 	}
 
 	~world();
-
-	virtual void ProcessConfigData(const CConfigData *config_data) override;
 
 	wyrmgus::plane *get_plane() const
 	{

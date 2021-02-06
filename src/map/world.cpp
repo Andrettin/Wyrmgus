@@ -23,21 +23,16 @@
 //      along with this program; if not, write to the Free Software
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
-//
 
 #include "stratagus.h"
 
 #include "map/world.h"
 
-#include "config.h"
-#include "map/plane.h"
 #include "map/site.h"
 #include "map/terrain_feature.h"
 #include "map/terrain_type.h"
 #include "province.h"
 #include "species/species.h"
-#include "time/season_schedule.h"
-#include "time/time_of_day_schedule.h"
 #include "ui/ui.h"
 #include "util/geojson_util.h"
 #include "util/vector_util.h"
@@ -58,34 +53,6 @@ world::~world()
 {
 	for (CProvince *province : this->Provinces) {
 		delete province;
-	}
-}
-
-void world::ProcessConfigData(const CConfigData *config_data)
-{
-	for (size_t i = 0; i < config_data->Properties.size(); ++i) {
-		std::string key = config_data->Properties[i].first;
-		std::string value = config_data->Properties[i].second;
-		
-		if (key == "name") {
-			this->set_name(value);
-		} else if (key == "description") {
-			this->set_description(value);
-		} else if (key == "background") {
-			this->set_background(value);
-		} else if (key == "quote") {
-			this->set_quote(value);
-		} else if (key == "plane") {
-			this->plane = plane::get(value);
-		} else if (key == "time_of_day_schedule") {
-			value = FindAndReplaceString(value, "_", "-");
-			this->TimeOfDaySchedule = CTimeOfDaySchedule::GetTimeOfDaySchedule(value);
-		} else if (key == "season_schedule") {
-			value = FindAndReplaceString(value, "_", "-");
-			this->SeasonSchedule = CSeasonSchedule::GetSeasonSchedule(value);
-		} else {
-			fprintf(stderr, "Invalid world property: \"%s\".\n", key.c_str());
-		}
 	}
 }
 
