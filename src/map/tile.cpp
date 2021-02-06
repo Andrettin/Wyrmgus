@@ -719,7 +719,7 @@ bool tile::is_river() const
 
 bool tile::is_space() const
 {
-	return this->Flags & MapFieldSpace;
+	return (this->Flags & MapFieldSpace) || (this->Flags & MapFieldSpaceCliff);
 }
 
 /// Returns true, if water on the map tile field
