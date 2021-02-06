@@ -37,6 +37,8 @@
 #include "map/terrain_type.h"
 #include "map/tile.h"
 #include "map/tileset.h"
+#include "map/world.h"
+#include "map/world_game_data.h"
 #include "missile.h"
 #include "particle.h"
 #include "pathfinder.h"
@@ -308,7 +310,16 @@ void CViewport::DrawMapBackgroundInViewport() const
 			bool is_unpassable = overlay_terrain && (overlay_terrain->Flags & MapFieldUnpassable) && !wyrmgus::vector::contains(overlay_terrain->get_destroyed_tiles(), overlay_solid_tile);
 			const bool is_space = terrain && terrain->Flags & MapFieldSpace;
 
-			const wyrmgus::time_of_day *time_of_day = UI.CurrentMapLayer->get_tile_time_of_day(sx);
+			const wyrmgus::time_of_day *time_of_day = nullptr;
+			if (!is_space) {
+				const bool is_underground = terrain && terrain->Flags & MapFieldUnderground;
+				if (is_underground) {
+					time_of_day = defines::get()->get_underground_time_of_day();
+				} else {
+					time_of_day = mf.get_world() ? mf.get_world()->get_game_data()->get_time_of_day() : UI.CurrentMapLayer->GetTimeOfDay();
+				}
+			}
+
 			const wyrmgus::season *season = UI.CurrentMapLayer->get_tile_season(sx);
 
 			const wyrmgus::player_color *player_color = (mf.get_owner() != nullptr) ? mf.get_owner()->get_player_color() : CPlayer::Players[PlayerNumNeutral]->get_player_color();
@@ -326,11 +337,18 @@ void CViewport::DrawMapBackgroundInViewport() const
 
 				if (transition_terrain_graphics != nullptr) {
 					const bool is_transition_space = transition_terrain && transition_terrain->Flags & MapFieldSpace;
+
 					const wyrmgus::time_of_day *transition_time_of_day = nullptr;
 					if (!is_transition_space) {
 						const bool is_transition_underground = transition_terrain->Flags & MapFieldUnderground;
-						transition_time_of_day = is_transition_underground ? wyrmgus::defines::get()->get_underground_time_of_day() : UI.CurrentMapLayer->GetTimeOfDay();
+
+						if (is_transition_underground) {
+							transition_time_of_day = defines::get()->get_underground_time_of_day();
+						} else {
+							transition_time_of_day = mf.get_world() ? mf.get_world()->get_game_data()->get_time_of_day() : UI.CurrentMapLayer->GetTimeOfDay();
+						}
 					}
+
 					transition_terrain_graphics->DrawFrameClip(transition_tiles[i].second, dx, dy, transition_time_of_day);
 				}
 			}
