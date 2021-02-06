@@ -30,13 +30,12 @@
 #include "database/detailed_data_entry.h"
 #include "data_type.h"
 
-class CSeasonSchedule;
-class CTimeOfDaySchedule;
-
 namespace wyrmgus {
 
 class magic_domain;
+class season_schedule;
 class species;
+class time_of_day_schedule;
 
 class plane final : public detailed_data_entry, public data_type<plane>, public CDataType
 {
@@ -52,6 +51,16 @@ public:
 
 	virtual void ProcessConfigData(const CConfigData *config_data) override;
 
+	const wyrmgus::time_of_day_schedule *get_time_of_day_schedule() const
+	{
+		return this->time_of_day_schedule;
+	}
+
+	const wyrmgus::season_schedule *get_season_schedule() const
+	{
+		return this->season_schedule;
+	}
+
 	const std::vector<const species *> &get_native_species() const
 	{
 		return this->native_species;
@@ -65,8 +74,10 @@ public:
 	std::vector<const species *> get_native_sapient_species() const;
 	std::vector<const species *> get_native_fauna_species() const;
 
-	CTimeOfDaySchedule *TimeOfDaySchedule = nullptr;
-	CSeasonSchedule *SeasonSchedule = nullptr;
+private:
+	wyrmgus::time_of_day_schedule *time_of_day_schedule = nullptr;
+	wyrmgus::season_schedule *season_schedule = nullptr;
+public:
 	std::vector<magic_domain *> EmpoweredMagicDomains; //magic domains empowered in this plane
 private:
 	std::vector<const species *> native_species; //species in this plane

@@ -30,17 +30,20 @@
 #include "map/map_template_container.h"
 #include "vec2i.h"
 
-class CScheduledSeason;
-class CScheduledTimeOfDay;
-class CSeasonSchedule;
-class CTimeOfDaySchedule;
 class CUnit;
+struct lua_State;
+
+static int CclStratagusMap(lua_State *l);
 
 namespace wyrmgus {
 	class plane;
+	class scheduled_season;
+	class scheduled_time_of_day;
 	class season;
+	class season_schedule;
 	class tile;
 	class time_of_day;
+	class time_of_day_schedule;
 	class world;
 }
 
@@ -118,20 +121,57 @@ public:
 	void decay_destroyed_overlay_terrain_tile(const QPoint &pos);
 	void regenerate_forests();
 	void regenerate_tree_tile(const QPoint &pos);
+
+	const wyrmgus::time_of_day_schedule *get_time_of_day_schedule() const
+	{
+		return this->time_of_day_schedule;
+	}
+
+	void set_time_of_day_schedule(const time_of_day_schedule *schedule)
+	{
+		this->time_of_day_schedule = schedule;
+	}
+
 private:
 	void DecrementRemainingTimeOfDayHours();
 	void IncrementTimeOfDay();
+
 public:
 	void SetTimeOfDayByHours(const unsigned long long hours);
-	void SetTimeOfDay(CScheduledTimeOfDay *time_of_day);
+
+	const scheduled_time_of_day *get_scheduled_time_of_day() const
+	{
+		return this->time_of_day;
+	}
+
+	void SetTimeOfDay(const scheduled_time_of_day *time_of_day);
+
 	wyrmgus::time_of_day *GetTimeOfDay() const;
 	wyrmgus::time_of_day *get_tile_time_of_day(const QPoint &tile_pos) const;
+
+	const wyrmgus::season_schedule *get_season_schedule() const
+	{
+		return this->season_schedule;
+	}
+
+	void set_season_schedule(const season_schedule *schedule)
+	{
+		this->season_schedule = schedule;
+	}
+
 private:
 	void DecrementRemainingSeasonHours();
 	void IncrementSeason();
+
 public:
 	void SetSeasonByHours(const unsigned long long hours);
-	void SetSeason(CScheduledSeason *season);
+
+	const scheduled_season *get_scheduled_season() const
+	{
+		return this->season;
+	}
+
+	void SetSeason(const scheduled_season *season);
 	wyrmgus::season *GetSeason() const;
 
 	bool has_subtemplate_area(const wyrmgus::map_template *map_template) const
@@ -155,12 +195,14 @@ public:
 private:
 	std::unique_ptr<wyrmgus::tile[]> Fields; //fields on the map layer
 	QSize size;									/// the size in tiles of the map layer
+	const scheduled_time_of_day *time_of_day = nullptr;	/// the time of day for the map layer
+	const wyrmgus::time_of_day_schedule *time_of_day_schedule = nullptr; //the time of day schedule for the map layer
 public:
-	CScheduledTimeOfDay *TimeOfDay = nullptr;	/// the time of day for the map layer
-	CTimeOfDaySchedule *TimeOfDaySchedule = nullptr;	/// the time of day schedule for the map layer
 	int RemainingTimeOfDayHours = 0;			/// the quantity of hours remaining for the current time of day to end
-	CScheduledSeason *Season = nullptr;			/// the current season for the map layer
-	CSeasonSchedule *SeasonSchedule = nullptr;	/// the season schedule for the map layer
+private:
+	const scheduled_season *season = nullptr;			/// the current season for the map layer
+	const wyrmgus::season_schedule *season_schedule = nullptr;	/// the season schedule for the map layer
+public:
 	int RemainingSeasonHours = 0;				/// the quantity of hours remaining for the current season to end
 	const wyrmgus::plane *plane = nullptr;			/// the plane pointer (if any) for the map layer
 	const wyrmgus::world *world = nullptr;			/// the world pointer (if any) for the map layer
@@ -168,4 +210,6 @@ public:
 	wyrmgus::map_template_map<QRect> subtemplate_areas;
 	std::vector<QPoint> destroyed_overlay_terrain_tiles; /// destroyed overlay terrain tiles (excluding trees)
 	std::vector<QPoint> destroyed_tree_tiles;	/// destroyed tree tiles; this list is used for forest regeneration
+
+	friend int CclStratagusMap(lua_State *l);
 };

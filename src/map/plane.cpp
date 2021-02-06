@@ -52,11 +52,9 @@ void plane::ProcessConfigData(const CConfigData *config_data)
 		} else if (key == "quote") {
 			this->set_quote(value);
 		} else if (key == "time_of_day_schedule") {
-			value = FindAndReplaceString(value, "_", "-");
-			this->TimeOfDaySchedule = CTimeOfDaySchedule::GetTimeOfDaySchedule(value);
+			this->time_of_day_schedule = time_of_day_schedule::get(value);
 		} else if (key == "season_schedule") {
-			value = FindAndReplaceString(value, "_", "-");
-			this->SeasonSchedule = CSeasonSchedule::GetSeasonSchedule(value);
+			this->season_schedule = season_schedule::get(value);
 		} else if (key == "empowered_magic_domain") {
 			magic_domain *domain = magic_domain::get(value);
 			this->EmpoweredMagicDomains.push_back(domain);

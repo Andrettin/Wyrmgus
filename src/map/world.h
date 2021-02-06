@@ -32,21 +32,23 @@
 #include "map/terrain_geodata_map.h"
 
 class CProvince;
-class CSeasonSchedule;
-class CTimeOfDaySchedule;
 
 namespace wyrmgus {
 
 class plane;
+class season_schedule;
 class site;
 class species;
 class terrain_type;
+class time_of_day_schedule;
 
 class world final : public detailed_data_entry, public data_type<world>
 {
 	Q_OBJECT
 
 	Q_PROPERTY(wyrmgus::plane* plane MEMBER plane)
+	Q_PROPERTY(wyrmgus::time_of_day_schedule* time_of_day_schedule MEMBER time_of_day_schedule)
+	Q_PROPERTY(wyrmgus::season_schedule* season_schedule MEMBER season_schedule)
 
 public:
 	static constexpr const char *class_identifier = "world";
@@ -65,6 +67,16 @@ public:
 	wyrmgus::plane *get_plane() const
 	{
 		return this->plane;
+	}
+
+	const wyrmgus::time_of_day_schedule *get_time_of_day_schedule() const
+	{
+		return this->time_of_day_schedule;
+	}
+
+	const wyrmgus::season_schedule *get_season_schedule() const
+	{
+		return this->season_schedule;
 	}
 
 	std::vector<QVariantList> parse_geojson_folder(const std::string_view &folder) const;
@@ -87,9 +99,9 @@ public:
 	int ID = -1;
 private:
 	wyrmgus::plane *plane = nullptr;
+	wyrmgus::time_of_day_schedule *time_of_day_schedule = nullptr;		/// this world's time of day schedule
+	wyrmgus::season_schedule *season_schedule = nullptr;				/// this world's season schedule
 public:
-	CTimeOfDaySchedule *TimeOfDaySchedule = nullptr;					/// this world's time of day schedule
-	CSeasonSchedule *SeasonSchedule = nullptr;							/// this world's season schedule
 	std::vector<CProvince *> Provinces;									/// Provinces in this world
 private:
 	std::vector<const species *> native_species;

@@ -150,8 +150,6 @@ void CleanModules()
 	CleanButtons();
 	CMap::get()->Clean();
 	CMap::get()->CleanFogOfWar();
-	CTimeOfDaySchedule::ClearTimeOfDaySchedules();
-	CSeasonSchedule::ClearSeasonSchedules();
 	CParticleManager::exit();
 	CleanReplayLog();
 	FreePathfinder();

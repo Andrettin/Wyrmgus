@@ -23,7 +23,6 @@
 //      along with this program; if not, write to the Free Software
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
-//
 
 #include "stratagus.h"
 
@@ -33,69 +32,15 @@
 #include "time/season.h"
 #include "util/string_conversion_util.h"
 
-std::vector<CSeasonSchedule *> CSeasonSchedule::SeasonSchedules;
-std::map<std::string, CSeasonSchedule *> CSeasonSchedule::SeasonSchedulesByIdent;
-CSeasonSchedule *CSeasonSchedule::DefaultSeasonSchedule = nullptr;
+namespace wyrmgus {
 
-/**
-**	@brief	Get a season schedule
-**
-**	@param	ident			The season schedule's string identifier
-**	@param	should_find		Whether it is an error if the season schedule could not be found; this is true by default
-**
-**	@return	The season schedule if found, or null otherwise
-*/
-CSeasonSchedule *CSeasonSchedule::GetSeasonSchedule(const std::string &ident, const bool should_find)
+season_schedule *season_schedule::DefaultSeasonSchedule = nullptr;
+
+season_schedule::season_schedule(const std::string &identifier) : time_period_schedule(identifier)
 {
-	std::map<std::string, CSeasonSchedule *>::const_iterator find_iterator = SeasonSchedulesByIdent.find(ident);
-	
-	if (find_iterator != SeasonSchedulesByIdent.end()) {
-		return find_iterator->second;
-	}
-	
-	if (should_find) {
-		fprintf(stderr, "Invalid season schedule: \"%s\".\n", ident.c_str());
-	}
-	
-	return nullptr;
 }
 
-/**
-**	@brief	Get or add a season schedule
-**
-**	@param	ident	The season schedule's string identifier
-**
-**	@return	The season schedule if found, or a newly-created one otherwise
-*/
-CSeasonSchedule *CSeasonSchedule::GetOrAddSeasonSchedule(const std::string &ident)
-{
-	CSeasonSchedule *season_schedule = GetSeasonSchedule(ident, false);
-	
-	if (!season_schedule) {
-		season_schedule = new CSeasonSchedule;
-		season_schedule->Ident = ident;
-		SeasonSchedules.push_back(season_schedule);
-		SeasonSchedulesByIdent[ident] = season_schedule;
-	}
-	
-	return season_schedule;
-}
-
-/**
-**	@brief	Remove the existing season schedules
-*/
-void CSeasonSchedule::ClearSeasonSchedules()
-{
-	for (size_t i = 0; i < SeasonSchedules.size(); ++i) {
-		delete SeasonSchedules[i];
-	}
-	SeasonSchedules.clear();
-}
-
-/**
-**	@brief	Destructor
-*/
-CSeasonSchedule::~CSeasonSchedule()
+season_schedule::~season_schedule()
 {
 	for (size_t i = 0; i < this->ScheduledSeasons.size(); ++i) {
 		delete this->ScheduledSeasons[i];
@@ -107,18 +52,18 @@ CSeasonSchedule::~CSeasonSchedule()
 **
 **	@param	config_data	The configuration data
 */
-void CSeasonSchedule::ProcessConfigData(const CConfigData *config_data)
+void season_schedule::ProcessConfigData(const CConfigData *config_data)
 {
 	for (size_t i = 0; i < config_data->Properties.size(); ++i) {
 		std::string key = config_data->Properties[i].first;
 		std::string value = config_data->Properties[i].second;
-		
+
 		if (key == "name") {
-			this->Name = value;
+			this->set_name(value);
 		} else if (key == "default_schedule") {
 			const bool is_default_schedule = wyrmgus::string::to_bool(value);
 			if (is_default_schedule) {
-				CSeasonSchedule::DefaultSeasonSchedule = this;
+				season_schedule::DefaultSeasonSchedule = this;
 			}
 		} else if (key == "hours_per_day") {
 			this->HoursPerDay = std::stoi(value);
@@ -126,16 +71,16 @@ void CSeasonSchedule::ProcessConfigData(const CConfigData *config_data)
 			fprintf(stderr, "Invalid season schedule property: \"%s\".\n", key.c_str());
 		}
 	}
-	
+
 	for (const CConfigData *child_config_data : config_data->Children) {
 		if (child_config_data->Tag == "scheduled_season") {
 			wyrmgus::season *season = nullptr;
 			unsigned hours = 0;
-				
+
 			for (size_t j = 0; j < child_config_data->Properties.size(); ++j) {
 				std::string key = child_config_data->Properties[j].first;
 				std::string value = child_config_data->Properties[j].second;
-				
+
 				if (key == "season") {
 					season = wyrmgus::season::get(value);
 				} else if (key == "days") {
@@ -146,18 +91,18 @@ void CSeasonSchedule::ProcessConfigData(const CConfigData *config_data)
 					fprintf(stderr, "Invalid scheduled season property: \"%s\".\n", key.c_str());
 				}
 			}
-			
+
 			if (!season) {
 				fprintf(stderr, "Scheduled season has no season.\n");
 				continue;
 			}
-			
+
 			if (hours <= 0) {
 				fprintf(stderr, "Scheduled season has no amount of time defined.\n");
 				continue;
 			}
-			
-			CScheduledSeason *scheduled_season = new CScheduledSeason;
+
+			scheduled_season *scheduled_season = new wyrmgus::scheduled_season;
 			scheduled_season->Season = season;
 			scheduled_season->Hours = hours;
 			scheduled_season->ID = this->ScheduledSeasons.size();
@@ -168,7 +113,7 @@ void CSeasonSchedule::ProcessConfigData(const CConfigData *config_data)
 			fprintf(stderr, "Invalid season schedule property: \"%s\".\n", child_config_data->Tag.c_str());
 		}
 	}
-	
+
 	this->CalculateHourMultiplier();
 }
 
@@ -177,7 +122,7 @@ void CSeasonSchedule::ProcessConfigData(const CConfigData *config_data)
 **
 **	@return	The default total hours
 */
-unsigned long CSeasonSchedule::GetDefaultTotalHours() const
+unsigned long season_schedule::GetDefaultTotalHours() const
 {
 	return DEFAULT_DAYS_PER_YEAR * DEFAULT_HOURS_PER_DAY;
 }
@@ -187,7 +132,9 @@ unsigned long CSeasonSchedule::GetDefaultTotalHours() const
 **
 **	@return	The default hour multiplier
 */
-int CSeasonSchedule::GetDefaultHourMultiplier() const
+int season_schedule::GetDefaultHourMultiplier() const
 {
 	return DEFAULT_DAY_MULTIPLIER_PER_YEAR;
+}
+
 }

@@ -643,7 +643,7 @@ static int CclGetProvinceData(lua_State *l)
 		return 1;
 	} else if (!strcmp(data, "World")) {
 		if (province->world != nullptr) {
-			lua_pushstring(l, province->world->Ident.c_str());
+			lua_pushstring(l, province->world->get_identifier().c_str());
 		} else {
 			lua_pushstring(l, "");
 		}
@@ -677,7 +677,7 @@ static int CclGetWorlds(lua_State *l)
 	lua_createtable(l, wyrmgus::world::get_all().size(), 0);
 	for (size_t i = 1; i <= wyrmgus::world::get_all().size(); ++i)
 	{
-		lua_pushstring(l, wyrmgus::world::get_all()[i-1]->Ident.c_str());
+		lua_pushstring(l, wyrmgus::world::get_all()[i-1]->get_identifier().c_str());
 		lua_rawseti(l, -2, i);
 	}
 	return 1;

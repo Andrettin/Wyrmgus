@@ -1329,10 +1329,10 @@ void SetTimeOfDay(const std::string &time_of_day_ident, int z)
 		CMap::Map.MapLayers[z]->SetTimeOfDay(nullptr);
 		CMap::Map.MapLayers[z]->RemainingTimeOfDayHours = 0;
 	} else {
-		CTimeOfDaySchedule *schedule = CMap::Map.MapLayers[z]->TimeOfDaySchedule;
-		if (schedule) {
+		const time_of_day_schedule *schedule = CMap::Map.MapLayers[z]->get_time_of_day_schedule();
+		if (schedule != nullptr) {
 			for (size_t i = 0; i < schedule->ScheduledTimesOfDay.size(); ++i) {
-				CScheduledTimeOfDay *time_of_day = schedule->ScheduledTimesOfDay[i];
+				scheduled_time_of_day *time_of_day = schedule->ScheduledTimesOfDay[i];
 				if (time_of_day->TimeOfDay->get_identifier() == time_of_day_ident)  {
 					CMap::Map.MapLayers[z]->SetTimeOfDay(time_of_day);
 					CMap::Map.MapLayers[z]->RemainingTimeOfDayHours = time_of_day->GetHours(CMap::Map.MapLayers[z]->GetSeason());
@@ -1357,15 +1357,15 @@ void SetTimeOfDaySchedule(const std::string &time_of_day_schedule_ident, const i
 	}
 
 	if (time_of_day_schedule_ident.empty()) {
-		CMap::Map.MapLayers[z]->TimeOfDaySchedule = nullptr;
+		CMap::Map.MapLayers[z]->set_time_of_day_schedule(nullptr);
 		CMap::Map.MapLayers[z]->SetTimeOfDay(nullptr);
 		CMap::Map.MapLayers[z]->RemainingTimeOfDayHours = 0;
 	} else {
-		CTimeOfDaySchedule *schedule = CTimeOfDaySchedule::GetTimeOfDaySchedule(time_of_day_schedule_ident);
-		if (schedule) {
-			CMap::Map.MapLayers[z]->TimeOfDaySchedule = schedule;
+		const time_of_day_schedule *schedule = time_of_day_schedule::try_get(time_of_day_schedule_ident);
+		if (schedule != nullptr) {
+			CMap::Map.MapLayers[z]->set_time_of_day_schedule(schedule);
 			CMap::Map.MapLayers[z]->SetTimeOfDay(schedule->ScheduledTimesOfDay.front());
-			CMap::Map.MapLayers[z]->RemainingTimeOfDayHours = CMap::Map.MapLayers[z]->TimeOfDay->GetHours(CMap::Map.MapLayers[z]->GetSeason());
+			CMap::Map.MapLayers[z]->RemainingTimeOfDayHours = CMap::Map.MapLayers[z]->get_scheduled_time_of_day()->GetHours(CMap::Map.MapLayers[z]->GetSeason());
 		}
 	}
 }
@@ -1382,10 +1382,10 @@ void SetSeason(const std::string &season_ident, int z)
 		CMap::Map.MapLayers[z]->SetSeason(nullptr);
 		CMap::Map.MapLayers[z]->RemainingSeasonHours = 0;
 	} else {
-		CSeasonSchedule *schedule = CMap::Map.MapLayers[z]->SeasonSchedule;
-		if (schedule) {
+		const season_schedule *schedule = CMap::Map.MapLayers[z]->get_season_schedule();
+		if (schedule != nullptr) {
 			for (size_t i = 0; i < schedule->ScheduledSeasons.size(); ++i) {
-				CScheduledSeason *season = schedule->ScheduledSeasons[i];
+				const scheduled_season *season = schedule->ScheduledSeasons[i];
 				if (season->Season->get_identifier() == season_ident)  {
 					CMap::Map.MapLayers[z]->SetSeason(season);
 					CMap::Map.MapLayers[z]->RemainingSeasonHours = season->Hours;
@@ -1405,15 +1405,15 @@ void SetSeason(const std::string &season_ident, int z)
 void SetSeasonSchedule(const std::string &season_schedule_ident, int z)
 {
 	if (season_schedule_ident.empty()) {
-		CMap::Map.MapLayers[z]->SeasonSchedule = nullptr;
+		CMap::Map.MapLayers[z]->set_season_schedule(nullptr);
 		CMap::Map.MapLayers[z]->SetSeason(nullptr);
 		CMap::Map.MapLayers[z]->RemainingSeasonHours = 0;
 	} else {
-		CSeasonSchedule *schedule = CSeasonSchedule::GetSeasonSchedule(season_schedule_ident);
-		if (schedule) {
-			CMap::Map.MapLayers[z]->SeasonSchedule = schedule;
+		const season_schedule *schedule = season_schedule::try_get(season_schedule_ident);
+		if (schedule != nullptr) {
+			CMap::Map.MapLayers[z]->set_season_schedule(schedule);
 			CMap::Map.MapLayers[z]->SetSeason(schedule->ScheduledSeasons.front());
-			CMap::Map.MapLayers[z]->RemainingSeasonHours = CMap::Map.MapLayers[z]->Season->Hours;
+			CMap::Map.MapLayers[z]->RemainingSeasonHours = CMap::Map.MapLayers[z]->get_scheduled_season()->Hours;
 		}
 	}
 }
@@ -1554,14 +1554,14 @@ void CMap::Create()
 	this->Info.MapHeights.push_back(this->Info.MapHeight);
 	
 	if (Editor.Running == EditorNotRunning) {
-		map_layer->SeasonSchedule = CSeasonSchedule::DefaultSeasonSchedule;
+		map_layer->set_season_schedule(season_schedule::DefaultSeasonSchedule);
 		map_layer->SetSeasonByHours(game::get()->get_current_total_hours());
 		
 		if (!GameSettings.Inside && !GameSettings.NoTimeOfDay) {
-			map_layer->TimeOfDaySchedule = CTimeOfDaySchedule::DefaultTimeOfDaySchedule;
+			map_layer->set_time_of_day_schedule(time_of_day_schedule::DefaultTimeOfDaySchedule);
 			map_layer->SetTimeOfDayByHours(game::get()->get_current_total_hours());
 		} else {
-			map_layer->TimeOfDaySchedule = nullptr;
+			map_layer->set_time_of_day_schedule(nullptr);
 			map_layer->SetTimeOfDay(nullptr); // make indoors have no time of day setting until it is possible to make light sources change their surrounding "time of day" // indoors it is always dark (maybe would be better to allow a special setting to have bright indoor places?
 		}
 	}
@@ -1679,17 +1679,17 @@ void CMap::save(CFile &file) const
 	file.printf("  },\n");
 	file.printf("  \"time-of-day\", {\n");
 	for (size_t z = 0; z < this->MapLayers.size(); ++z) {
-		file.printf("  {\"%s\", %d, %d},\n", this->MapLayers[z]->TimeOfDaySchedule ? this->MapLayers[z]->TimeOfDaySchedule->Ident.c_str() : "", this->MapLayers[z]->TimeOfDay ? this->MapLayers[z]->TimeOfDay->ID : 0, this->MapLayers[z]->RemainingTimeOfDayHours);
+		file.printf("  {\"%s\", %d, %d},\n", this->MapLayers[z]->get_time_of_day_schedule() ? this->MapLayers[z]->get_time_of_day_schedule()->get_identifier().c_str() : "", this->MapLayers[z]->get_scheduled_time_of_day() ? this->MapLayers[z]->get_scheduled_time_of_day()->ID : 0, this->MapLayers[z]->RemainingTimeOfDayHours);
 	}
 	file.printf("  },\n");
 	file.printf("  \"season\", {\n");
 	for (size_t z = 0; z < this->MapLayers.size(); ++z) {
-		file.printf("  {\"%s\", %d, %d},\n", this->MapLayers[z]->SeasonSchedule ? this->MapLayers[z]->SeasonSchedule->Ident.c_str() : "", this->MapLayers[z]->Season ? this->MapLayers[z]->Season->ID : 0, this->MapLayers[z]->RemainingSeasonHours);
+		file.printf("  {\"%s\", %d, %d},\n", this->MapLayers[z]->get_season_schedule() ? this->MapLayers[z]->get_season_schedule()->get_identifier().c_str() : "", this->MapLayers[z]->get_scheduled_season() ? this->MapLayers[z]->get_scheduled_season()->ID : 0, this->MapLayers[z]->RemainingSeasonHours);
 	}
 	file.printf("  },\n");
 	file.printf("  \"layer-references\", {\n");
 	for (size_t z = 0; z < this->MapLayers.size(); ++z) {
-		file.printf("  {\"%s\", \"%s\"},\n", this->MapLayers[z]->plane ? this->MapLayers[z]->plane->Ident.c_str() : "", this->MapLayers[z]->world ? this->MapLayers[z]->world->Ident.c_str() : "");
+		file.printf("  {\"%s\", \"%s\"},\n", this->MapLayers[z]->plane ? this->MapLayers[z]->plane->Ident.c_str() : "", this->MapLayers[z]->world ? this->MapLayers[z]->world->get_identifier().c_str() : "");
 	}
 	file.printf("  },\n");
 	//Wyrmgus end

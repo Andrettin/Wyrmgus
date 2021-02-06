@@ -25,16 +25,17 @@
 //      along with this program; if not, write to the Free Software
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
-//
 
 #include "stratagus.h"
 
 #include "time/time_period_schedule.h"
 
+namespace wyrmgus {
+
 /**
 **	@brief	Calculate the hour multiplier used to for the passage of in-game hours relating to this schedule
 */
-void CTimePeriodSchedule::CalculateHourMultiplier()
+void time_period_schedule::CalculateHourMultiplier()
 {
 	int multiplier = 1;
 	
@@ -52,4 +53,6 @@ void CTimePeriodSchedule::CalculateHourMultiplier()
 	}
 	
 	this->HourMultiplier = std::max(multiplier, 1);
+}
+
 }

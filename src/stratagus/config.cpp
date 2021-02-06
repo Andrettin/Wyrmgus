@@ -249,7 +249,7 @@ void CConfigData::ProcessConfigData(const std::vector<CConfigData *> &config_dat
 				plane->ProcessConfigData(config_data);
 			}
 		} else if (config_data->Tag == "season_schedule") {
-			CSeasonSchedule *season_schedule = CSeasonSchedule::GetOrAddSeasonSchedule(ident);
+			season_schedule *season_schedule = season_schedule::get_or_add(ident, nullptr);
 			if (!define_only) {
 				season_schedule->ProcessConfigData(config_data);
 			}
@@ -264,7 +264,7 @@ void CConfigData::ProcessConfigData(const std::vector<CConfigData *> &config_dat
 				terrain_type->ProcessConfigData(config_data);
 			}
 		} else if (config_data->Tag == "time_of_day_schedule") {
-			CTimeOfDaySchedule *time_of_day_schedule = CTimeOfDaySchedule::GetOrAddTimeOfDaySchedule(ident);
+			time_of_day_schedule *time_of_day_schedule = time_of_day_schedule::get_or_add(ident, nullptr);
 			if (!define_only) {
 				time_of_day_schedule->ProcessConfigData(config_data);
 			}

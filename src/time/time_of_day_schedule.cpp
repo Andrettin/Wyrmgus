@@ -23,7 +23,6 @@
 //      along with this program; if not, write to the Free Software
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
-//
 
 #include "stratagus.h"
 
@@ -34,69 +33,15 @@
 #include "time/time_of_day.h"
 #include "util/string_conversion_util.h"
 
-std::vector<CTimeOfDaySchedule *> CTimeOfDaySchedule::TimeOfDaySchedules;
-std::map<std::string, CTimeOfDaySchedule *> CTimeOfDaySchedule::TimeOfDaySchedulesByIdent;
-CTimeOfDaySchedule *CTimeOfDaySchedule::DefaultTimeOfDaySchedule = nullptr;
-	
-/**
-**	@brief	Get a time of day schedule
-**
-**	@param	ident			The time of day schedule's string identifier
-**	@param	should_find		Whether it is an error if the time of day schedule could not be found; this is true by default
-**
-**	@return	The time of day schedule if found, or null otherwise
-*/
-CTimeOfDaySchedule *CTimeOfDaySchedule::GetTimeOfDaySchedule(const std::string &ident, const bool should_find)
+namespace wyrmgus {
+
+time_of_day_schedule *time_of_day_schedule::DefaultTimeOfDaySchedule = nullptr;
+
+time_of_day_schedule::time_of_day_schedule(const std::string &identifier) : time_period_schedule(identifier)
 {
-	std::map<std::string, CTimeOfDaySchedule *>::const_iterator find_iterator = TimeOfDaySchedulesByIdent.find(ident);
-	
-	if (find_iterator != TimeOfDaySchedulesByIdent.end()) {
-		return find_iterator->second;
-	}
-	
-	if (should_find) {
-		fprintf(stderr, "Invalid time of day schedule: \"%s\".\n", ident.c_str());
-	}
-	
-	return nullptr;
 }
 
-/**
-**	@brief	Get or add a time of day schedule
-**
-**	@param	ident	The time of day schedule's string identifier
-**
-**	@return	The time of day schedule if found, or a newly-created one otherwise
-*/
-CTimeOfDaySchedule *CTimeOfDaySchedule::GetOrAddTimeOfDaySchedule(const std::string &ident)
-{
-	CTimeOfDaySchedule *time_of_day_schedule = GetTimeOfDaySchedule(ident, false);
-	
-	if (!time_of_day_schedule) {
-		time_of_day_schedule = new CTimeOfDaySchedule;
-		time_of_day_schedule->Ident = ident;
-		TimeOfDaySchedules.push_back(time_of_day_schedule);
-		TimeOfDaySchedulesByIdent[ident] = time_of_day_schedule;
-	}
-	
-	return time_of_day_schedule;
-}
-
-/**
-**	@brief	Remove the existing time of day schedules
-*/
-void CTimeOfDaySchedule::ClearTimeOfDaySchedules()
-{
-	for (size_t i = 0; i < TimeOfDaySchedules.size(); ++i) {
-		delete TimeOfDaySchedules[i];
-	}
-	TimeOfDaySchedules.clear();
-}
-
-/**
-**	@brief	Destructor
-*/
-CTimeOfDaySchedule::~CTimeOfDaySchedule()
+time_of_day_schedule::~time_of_day_schedule()
 {
 	for (size_t i = 0; i < this->ScheduledTimesOfDay.size(); ++i) {
 		delete this->ScheduledTimesOfDay[i];
@@ -108,18 +53,18 @@ CTimeOfDaySchedule::~CTimeOfDaySchedule()
 **
 **	@param	config_data	The configuration data
 */
-void CTimeOfDaySchedule::ProcessConfigData(const CConfigData *config_data)
+void time_of_day_schedule::ProcessConfigData(const CConfigData *config_data)
 {
 	for (size_t i = 0; i < config_data->Properties.size(); ++i) {
 		std::string key = config_data->Properties[i].first;
 		std::string value = config_data->Properties[i].second;
 		
 		if (key == "name") {
-			this->Name = value;
+			this->set_name(value);
 		} else if (key == "default_schedule") {
 			const bool is_default_schedule = wyrmgus::string::to_bool(value);
 			if (is_default_schedule) {
-				CTimeOfDaySchedule::DefaultTimeOfDaySchedule = this;
+				time_of_day_schedule::DefaultTimeOfDaySchedule = this;
 			}
 		} else {
 			fprintf(stderr, "Invalid time of day schedule property: \"%s\".\n", key.c_str());
@@ -128,7 +73,7 @@ void CTimeOfDaySchedule::ProcessConfigData(const CConfigData *config_data)
 	
 	for (const CConfigData *child_config_data : config_data->Children) {
 		if (child_config_data->Tag == "scheduled_time_of_day") {
-			CScheduledTimeOfDay *scheduled_time_of_day = new CScheduledTimeOfDay;
+			scheduled_time_of_day *scheduled_time_of_day = new wyrmgus::scheduled_time_of_day;
 			scheduled_time_of_day->ID = this->ScheduledTimesOfDay.size();
 			scheduled_time_of_day->Schedule = this;
 			this->ScheduledTimesOfDay.push_back(scheduled_time_of_day);
@@ -147,7 +92,7 @@ void CTimeOfDaySchedule::ProcessConfigData(const CConfigData *config_data)
 **
 **	@return	The default total hours
 */
-unsigned long CTimeOfDaySchedule::GetDefaultTotalHours() const
+unsigned long time_of_day_schedule::GetDefaultTotalHours() const
 {
 	return DEFAULT_HOURS_PER_DAY;
 }
@@ -157,7 +102,7 @@ unsigned long CTimeOfDaySchedule::GetDefaultTotalHours() const
 **
 **	@return	The default hour multiplier
 */
-int CTimeOfDaySchedule::GetDefaultHourMultiplier() const
+int time_of_day_schedule::GetDefaultHourMultiplier() const
 {
 	return 1;
 }
@@ -167,7 +112,7 @@ int CTimeOfDaySchedule::GetDefaultHourMultiplier() const
 **
 **	@param	config_data	The configuration data
 */
-void CScheduledTimeOfDay::ProcessConfigData(const CConfigData *config_data)
+void scheduled_time_of_day::ProcessConfigData(const CConfigData *config_data)
 {
 	for (size_t i = 0; i < config_data->Properties.size(); ++i) {
 		std::string key = config_data->Properties[i].first;
@@ -234,7 +179,7 @@ void CScheduledTimeOfDay::ProcessConfigData(const CConfigData *config_data)
 **
 **	@return	The amount of hours
 */
-int CScheduledTimeOfDay::GetHours(const wyrmgus::season *season) const
+int scheduled_time_of_day::GetHours(const wyrmgus::season *season) const
 {
 	if (season) {
 		auto find_iterator = this->SeasonHours.find(season);
@@ -245,4 +190,6 @@ int CScheduledTimeOfDay::GetHours(const wyrmgus::season *season) const
 	}
 	
 	return this->Hours;
+}
+
 }

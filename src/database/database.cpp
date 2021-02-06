@@ -86,7 +86,9 @@
 #include "spell/spell.h"
 #include "spell/spell_target_type.h"
 #include "time/calendar.h"
+#include "time/season_schedule.h"
 #include "time/time_of_day.h"
+#include "time/time_of_day_schedule.h"
 #include "time/timeline.h"
 #include "ui/button_level.h"
 #include "ui/cursor.h"
@@ -305,6 +307,8 @@ QVariant database::process_sml_property_value(const sml_property &property, cons
 			new_property_value = QVariant::fromValue(resource::get(property.get_value()));
 		} else if (property_class_name == "wyrmgus::resource_icon*") {
 			new_property_value = QVariant::fromValue(resource_icon::get(property.get_value()));
+		} else if (property_class_name == "wyrmgus::season_schedule*") {
+			new_property_value = QVariant::fromValue(season_schedule::get(property.get_value()));
 		} else if (property_class_name == "wyrmgus::site*") {
 			new_property_value = QVariant::fromValue(site::get(property.get_value()));
 		} else if (property_class_name == "wyrmgus::sound*") {
@@ -325,6 +329,8 @@ QVariant database::process_sml_property_value(const sml_property &property, cons
 			new_property_value = QVariant::fromValue(terrain_type::get(property.get_value()));
 		} else if (property_class_name == "wyrmgus::time_of_day*") {
 			new_property_value = QVariant::fromValue(time_of_day::get(property.get_value()));
+		} else if (property_class_name == "wyrmgus::time_of_day_schedule*") {
+			new_property_value = QVariant::fromValue(time_of_day_schedule::get(property.get_value()));
 		} else if (property_class_name == "wyrmgus::unique_item*") {
 			new_property_value = QVariant::fromValue(unique_item::get(property.get_value()));
 		} else if (property_class_name == "wyrmgus::unit_class*") {

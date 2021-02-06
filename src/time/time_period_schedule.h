@@ -23,19 +23,27 @@
 //      along with this program; if not, write to the Free Software
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
-//
 
 #pragma once
 
+#include "database/named_data_entry.h"
 #include "data_type.h"
 
-class CTimePeriodSchedule : public CDataType
+namespace wyrmgus {
+
+class time_period_schedule : public named_data_entry, public CDataType
 {
 public:
+	explicit time_period_schedule(const std::string &identifier) : named_data_entry(identifier), CDataType(identifier)
+	{
+	}
+
 	virtual unsigned long GetDefaultTotalHours() const = 0;
 	virtual int GetDefaultHourMultiplier() const = 0;
 	void CalculateHourMultiplier();
 
-	unsigned long TotalHours = 0;						/// The total amount of hours this time period schedule contains
-	int HourMultiplier = 1;								/// The amount of hours that pass for this schedule for each in-game hour
+	unsigned long TotalHours = 0; //the total amount of hours this time period schedule contains
+	int HourMultiplier = 1; //the amount of hours that pass for this schedule for each in-game hour
 };
+
+}

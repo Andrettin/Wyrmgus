@@ -23,22 +23,21 @@
 //      along with this program; if not, write to the Free Software
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
-//
 
 #pragma once
 
-#include "data_type.h"
+#include "database/data_type.h"
 #include "time/time_period_schedule.h"
 
 class CConfigData;
-class CTimeOfDaySchedule;
 
 namespace wyrmgus {
-	class season;
-	class time_of_day;
-}
 
-class CScheduledTimeOfDay
+class season;
+class time_of_day;
+class time_of_day_schedule;
+
+class scheduled_time_of_day final
 {
 public:
 	void ProcessConfigData(const CConfigData *config_data);
@@ -49,27 +48,28 @@ public:
 private:
 	int Hours = 0;								/// the amount of hours the scheduled time of day lasts
 public:
-	CTimeOfDaySchedule *Schedule = nullptr;		/// the schedule to which this time of day belongs
+	time_of_day_schedule *Schedule = nullptr;		/// the schedule to which this time of day belongs
 	std::map<const wyrmgus::season *, int> SeasonHours;	/// the amount of hours the scheduled time of day lasts in a given season
 };
 
-class CTimeOfDaySchedule : public CTimePeriodSchedule
+class time_of_day_schedule final : public time_period_schedule, public data_type<time_of_day_schedule>
 {
+	Q_OBJECT
+
 public:
-	~CTimeOfDaySchedule();
+	static constexpr const char *class_identifier = "time_of_day_schedule";
+	static constexpr const char *database_folder = "time_of_day_schedules";
+
+	explicit time_of_day_schedule(const std::string &identifier);
+	~time_of_day_schedule();
 	
-	static CTimeOfDaySchedule *GetTimeOfDaySchedule(const std::string &ident, const bool should_find = true);
-	static CTimeOfDaySchedule *GetOrAddTimeOfDaySchedule(const std::string &ident);
-	static void ClearTimeOfDaySchedules();
-	
-	static std::vector<CTimeOfDaySchedule *> TimeOfDaySchedules;		/// Time of day schedules
-	static std::map<std::string, CTimeOfDaySchedule *> TimeOfDaySchedulesByIdent;
-	static CTimeOfDaySchedule *DefaultTimeOfDaySchedule;
+	static time_of_day_schedule *DefaultTimeOfDaySchedule;
 	
 	virtual void ProcessConfigData(const CConfigData *config_data) override;
 	virtual unsigned long GetDefaultTotalHours() const;
 	virtual int GetDefaultHourMultiplier() const;
 
-	std::string Name;										/// Name of the time of day schedules
-	std::vector<CScheduledTimeOfDay *> ScheduledTimesOfDay;	/// The times of day that are scheduled
+	std::vector<scheduled_time_of_day *> ScheduledTimesOfDay;	/// The times of day that are scheduled
 };
+
+}

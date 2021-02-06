@@ -27,41 +27,42 @@
 
 #pragma once
 
+#include "database/data_type.h"
 #include "time/time_period_schedule.h"
 
-class CSeasonSchedule;
-
 namespace wyrmgus {
-	class season;
-}
 
-class CScheduledSeason
+class season;
+class season_schedule;
+
+class scheduled_season final
 {
 public:
 	unsigned ID = 0;						/// the scheduled season's ID within the season schedule
 	wyrmgus::season *Season = nullptr;				/// the season that is scheduled
 	unsigned Hours = 0;						/// the amount of hours the scheduled season lasts
-	CSeasonSchedule *Schedule = nullptr;	/// the schedule to which this season belongs
+	season_schedule *Schedule = nullptr;	/// the schedule to which this season belongs
 };
 
-class CSeasonSchedule : public CTimePeriodSchedule
+class season_schedule final : public time_period_schedule, public data_type<season_schedule>
 {
+	Q_OBJECT
+
 public:
-	~CSeasonSchedule();
-	
-	static CSeasonSchedule *GetSeasonSchedule(const std::string &ident, const bool should_find = true);
-	static CSeasonSchedule *GetOrAddSeasonSchedule(const std::string &ident);
-	static void ClearSeasonSchedules();
-	
-	static std::vector<CSeasonSchedule *> SeasonSchedules;		/// Season schedules
-	static std::map<std::string, CSeasonSchedule *> SeasonSchedulesByIdent;
-	static CSeasonSchedule *DefaultSeasonSchedule;
-	
+	static constexpr const char *class_identifier = "season_schedule";
+	static constexpr const char *database_folder = "season_schedules";
+
+	explicit season_schedule(const std::string &identifier);
+	~season_schedule();
+
+	static season_schedule *DefaultSeasonSchedule;
+
 	virtual void ProcessConfigData(const CConfigData *config_data) override;
 	virtual unsigned long GetDefaultTotalHours() const;
 	virtual int GetDefaultHourMultiplier() const;
 
-	std::string Name;									/// Name of the season schedule
 	unsigned HoursPerDay = DEFAULT_HOURS_PER_DAY;		/// The hours per each day for this season schedule
-	std::vector<CScheduledSeason *> ScheduledSeasons;	/// The seasons that are scheduled
+	std::vector<scheduled_season *> ScheduledSeasons;	/// The seasons that are scheduled
 };
+
+}

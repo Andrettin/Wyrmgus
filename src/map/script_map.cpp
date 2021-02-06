@@ -170,13 +170,13 @@ static int CclStratagusMap(lua_State *l)
 						lua_rawgeti(l, -1, z + 1);
 						std::string time_of_day_schedule_ident = LuaToString(l, -1, 1);
 						if (!time_of_day_schedule_ident.empty()) {
-							map_layer->TimeOfDaySchedule = CTimeOfDaySchedule::GetTimeOfDaySchedule(time_of_day_schedule_ident);
+							map_layer->set_time_of_day_schedule(time_of_day_schedule::get(time_of_day_schedule_ident));
 						} else {
-							map_layer->TimeOfDaySchedule = nullptr;
+							map_layer->set_time_of_day_schedule(nullptr);
 						}
 						unsigned time_of_day = LuaToNumber(l, -1, 2);
-						if (map_layer->TimeOfDaySchedule && time_of_day < map_layer->TimeOfDaySchedule->ScheduledTimesOfDay.size()) {
-							map_layer->TimeOfDay = map_layer->TimeOfDaySchedule->ScheduledTimesOfDay[time_of_day];
+						if (map_layer->get_time_of_day_schedule() != nullptr && time_of_day < map_layer->get_time_of_day_schedule()->ScheduledTimesOfDay.size()) {
+							map_layer->time_of_day = map_layer->get_time_of_day_schedule()->ScheduledTimesOfDay[time_of_day];
 						}
 						map_layer->RemainingTimeOfDayHours = LuaToNumber(l, -1, 3);
 						lua_pop(l, 1);
@@ -193,10 +193,10 @@ static int CclStratagusMap(lua_State *l)
 							LuaError(l, "incorrect argument for \"season\"");
 						}
 						lua_rawgeti(l, -1, z + 1);
-						CMap::Map.MapLayers[z]->SeasonSchedule = CSeasonSchedule::GetSeasonSchedule(LuaToString(l, -1, 1));
+						CMap::Map.MapLayers[z]->set_season_schedule(season_schedule::try_get(LuaToString(l, -1, 1)));
 						unsigned season = LuaToNumber(l, -1, 2);
-						if (CMap::Map.MapLayers[z]->SeasonSchedule && season < CMap::Map.MapLayers[z]->SeasonSchedule->ScheduledSeasons.size()) {
-							CMap::Map.MapLayers[z]->Season = CMap::Map.MapLayers[z]->SeasonSchedule->ScheduledSeasons[season];
+						if (CMap::Map.MapLayers[z]->get_season_schedule() && season < CMap::Map.MapLayers[z]->get_season_schedule()->ScheduledSeasons.size()) {
+							CMap::Map.MapLayers[z]->season = CMap::Map.MapLayers[z]->get_season_schedule()->ScheduledSeasons[season];
 						}
 						CMap::Map.MapLayers[z]->RemainingSeasonHours = LuaToNumber(l, -1, 3);
 						lua_pop(l, 1);
