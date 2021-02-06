@@ -51,6 +51,7 @@
 #include "map/tile.h"
 #include "map/tileset.h"
 #include "map/world.h"
+#include "map/world_game_data.h"
 #include "player.h"
 //Wyrmgus start
 #include "province.h"
@@ -1252,6 +1253,40 @@ void PreprocessMap()
 		}
 	}
 	//Wyrmgus end
+
+	//set the season and time of day for worlds
+	const world *main_world = nullptr;
+	int largest_world_area = 0;
+
+	for (const world *world : world::get_all()) {
+		const world_game_data *world_game_data = world->get_game_data();
+		if (!world_game_data->is_on_map()) {
+			continue;
+		}
+
+		const int map_area = world_game_data->get_map_rect().width() * world_game_data->get_map_rect().height();
+		if (map_area > largest_world_area) {
+			main_world = world;
+			largest_world_area = map_area;
+		}
+	}
+
+	for (const world *world : world::get_all()) {
+		world_game_data *world_game_data = world->get_game_data();
+		if (!world_game_data->is_on_map()) {
+			continue;
+		}
+
+		uint64_t hours = game::get()->get_current_total_hours();
+		if (world != main_world) {
+			//for the main world, just use the current total hours, but for other worlds, use a random offset for their schedules, so that they have different times of day and seasons than the main world
+			const unsigned total_schedule_hours = std::max(world->get_season_schedule()->get_total_hours(), world->get_time_of_day_schedule()->get_total_hours());
+			hours += random::get()->generate(total_schedule_hours);
+		}
+
+		world_game_data->set_season_by_hours(hours);
+		world_game_data->set_time_of_day_by_hours(hours);
+	}
 
 	CMap::get()->calculate_settlement_resource_units();
 
