@@ -307,7 +307,7 @@ void CViewport::DrawMapBackgroundInViewport() const
 			const std::vector<std::pair<const wyrmgus::terrain_type *, short>> &transition_tiles = ReplayRevealMap ? mf.TransitionTiles : mf.player_info->SeenTransitionTiles;
 			const std::vector<std::pair<const wyrmgus::terrain_type *, short>> &overlay_transition_tiles = ReplayRevealMap ? mf.OverlayTransitionTiles : mf.player_info->SeenOverlayTransitionTiles;
 
-			bool is_unpassable = overlay_terrain && (overlay_terrain->Flags & MapFieldUnpassable) && !wyrmgus::vector::contains(overlay_terrain->get_destroyed_tiles(), overlay_solid_tile);
+			const bool is_unpassable = overlay_terrain && (overlay_terrain->Flags & MapFieldUnpassable) && !vector::contains(overlay_terrain->get_destroyed_tiles(), overlay_solid_tile);
 			const bool is_space = terrain && terrain->Flags & MapFieldSpace;
 
 			const wyrmgus::time_of_day *time_of_day = nullptr;

@@ -1013,6 +1013,22 @@ std::vector<const map_template *> CMap::get_pos_subtemplates(const QPoint &pos, 
 	return subtemplates;
 }
 
+std::vector<const map_template *> CMap::get_rect_subtemplates(const QRect &rect, const int z) const
+{
+	std::vector<const map_template *> subtemplates;
+
+	for (const auto &kv_pair : this->MapLayers[z]->subtemplate_areas) {
+		const map_template *subtemplate = kv_pair.first;
+		const QRect &subtemplate_rect = kv_pair.second;
+
+		if (subtemplate_rect.intersects(rect)) {
+			subtemplates.push_back(subtemplate);
+		}
+	}
+
+	return subtemplates;
+}
+
 bool CMap::is_rect_in_settlement(const QRect &rect, const int z, const wyrmgus::site *settlement)
 {
 	for (int x = rect.x(); x <= rect.right(); ++x) {
@@ -1039,17 +1055,34 @@ bool CMap::is_rect_in_settlement(const QRect &rect, const int z, const wyrmgus::
 	return true;
 }
 
-const world *CMap::calculate_pos_world(const QPoint &pos, const int z) const
+const world *CMap::calculate_pos_world(const QPoint &pos, const int z, const bool include_adjacent) const
 {
-	const std::vector<const map_template *> pos_subtemplates = this->get_pos_subtemplates(pos, z);
+	std::vector<const map_template *> pos_subtemplates;
+
+	if (include_adjacent) {
+		pos_subtemplates = this->get_rect_subtemplates(QRect(pos - QPoint(1, 1), pos + QPoint(1, 1)), z);
+	} else {
+		pos_subtemplates = this->get_pos_subtemplates(pos, z);
+	}
 
 	for (const map_template *subtemplate : pos_subtemplates) {
 		if (subtemplate->get_world() == nullptr) {
 			continue;
 		}
 
-		if (!subtemplate->is_map_pos_usable(pos)) {
-			continue;
+		if (include_adjacent) {
+			//check if any adjacent point is in a usable part of the subtemplate
+			const std::optional<QPoint> find_pos = point::find_adjacent_if(pos, [&](const QPoint &adjacent_point) {
+				return subtemplate->is_map_pos_usable(adjacent_point);
+			});
+
+			if (!find_pos.has_value()) {
+				continue;
+			}
+		} else {
+			if (!subtemplate->is_map_pos_usable(pos)) {
+				continue;
+			}
 		}
 
 		return subtemplate->get_world();
@@ -2362,9 +2395,16 @@ void CMap::CalculateTileTransitions(const Vec2i &pos, bool overlay, int z)
 					}
 				}
 				
-				if ((mf.Flags & MapFieldWaterAllowed) && (!adjacent_terrain || !(adjacent_terrain->Flags & MapFieldWaterAllowed))) { //if this is a water tile adjacent to a non-water tile, replace the water flag with a coast one
+				if ((mf.Flags & MapFieldWaterAllowed) && (!adjacent_terrain || !(adjacent_terrain->Flags & MapFieldWaterAllowed))) {
+					//if this is a water tile adjacent to a non-water tile, replace the water flag with a coast one
 					mf.Flags &= ~(MapFieldWaterAllowed);
 					mf.Flags |= MapFieldCoastAllowed;
+				}
+				
+				if ((mf.Flags & MapFieldSpace) && (!adjacent_terrain || !(adjacent_terrain->Flags & MapFieldSpace))) {
+					//if this is a space tile adjacent to a non-space tile, replace the space flag with a cliff one
+					mf.Flags &= ~(MapFieldSpace);
+					mf.Flags |= MapFieldCliff;
 				}
 			}
 			
@@ -2429,10 +2469,11 @@ void CMap::CalculateTileLandmass(const Vec2i &pos, int z)
 	}
 
 	const bool is_water = (mf.Flags & MapFieldWaterAllowed) || (mf.Flags & MapFieldCoastAllowed);
+	const bool is_cliff = (mf.Flags & MapFieldCliff);
 
 	//doesn't have a landmass, and hasn't inherited one from another tile, so add a new one
 	const size_t landmass_index = this->landmasses.size();
-	const world *landmass_world = this->calculate_pos_world(pos, z);
+	const world *landmass_world = this->calculate_pos_world(pos, z, is_cliff);
 	this->landmasses.push_back(std::make_unique<landmass>(landmass_index, landmass_world));
 	mf.set_landmass(this->landmasses.back().get());
 
@@ -2456,13 +2497,19 @@ void CMap::CalculateTileLandmass(const Vec2i &pos, int z)
 						}
 
 						const bool adjacent_is_water = (adjacent_mf.Flags & MapFieldWaterAllowed) || (adjacent_mf.Flags & MapFieldCoastAllowed);
+						const bool adjacent_is_cliff = (adjacent_mf.Flags & MapFieldCliff);
+						const bool adjacent_is_compatible = (adjacent_is_water == is_water) && (adjacent_is_cliff == is_cliff);
 									
-						if (adjacent_is_water == is_water && adjacent_mf.get_landmass() == nullptr) {
-							adjacent_mf.set_landmass(mf.get_landmass());
-							landmass_tiles.push_back(adjacent_pos);
-						} else if (adjacent_is_water != is_water && adjacent_mf.get_landmass() != nullptr && !mf.get_landmass()->borders_landmass(adjacent_mf.get_landmass())) {
-							mf.get_landmass()->add_border_landmass(adjacent_mf.get_landmass());
-							adjacent_mf.get_landmass()->add_border_landmass(mf.get_landmass());
+						if (adjacent_is_compatible) {
+							if (adjacent_mf.get_landmass() == nullptr) {
+								adjacent_mf.set_landmass(mf.get_landmass());
+								landmass_tiles.push_back(adjacent_pos);
+							}
+						} else {
+							if (adjacent_mf.get_landmass() != nullptr && !mf.get_landmass()->borders_landmass(adjacent_mf.get_landmass())) {
+								mf.get_landmass()->add_border_landmass(adjacent_mf.get_landmass());
+								adjacent_mf.get_landmass()->add_border_landmass(mf.get_landmass());
+							}
 						}
 					}
 				}
@@ -3365,7 +3412,7 @@ void CMap::generate_settlement_territories(const int z)
 		return true;
 	});
 
-	seeds = this->expand_settlement_territories(wyrmgus::container::to_vector(seeds), z, (MapFieldUnpassable | MapFieldCoastAllowed | MapFieldSpace), MapFieldWaterAllowed | MapFieldUnderground);
+	seeds = this->expand_settlement_territories(wyrmgus::container::to_vector(seeds), z, (MapFieldUnpassable | MapFieldCoastAllowed | MapFieldSpace | MapFieldCliff), MapFieldWaterAllowed | MapFieldUnderground);
 	seeds = this->expand_settlement_territories(wyrmgus::container::to_vector(seeds), z, (MapFieldCoastAllowed | MapFieldSpace), MapFieldWaterAllowed | MapFieldUnderground);
 	seeds = this->expand_settlement_territories(wyrmgus::container::to_vector(seeds), z, MapFieldSpace, MapFieldUnderground);
 	seeds = this->expand_settlement_territories(wyrmgus::container::to_vector(seeds), z, MapFieldSpace);

@@ -1389,7 +1389,7 @@ static void DrawEditorInfo()
 	// Flags info
 	//
 	const unsigned flag = mf.get_flags();
-	sprintf(buf.data(), "%02X|%04X|%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c",
+	sprintf(buf.data(), "%02X|%04X|%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c",
 			mf.get_value(), flag,
 			flag & MapFieldUnpassable   ? 'u' : '-',
 			flag & MapFieldAirUnpassable   ? 'A' : '-',
@@ -1407,7 +1407,9 @@ static void DrawEditorInfo()
 			flag & MapFieldItem         ? 'i' : '-',
 			flag & MapFieldStumps       ? 't' : '-',
 			flag & MapFieldGravel       ? 'g' : '-',
-			flag & MapFieldBridge       ? 'B' : '-');
+			flag & MapFieldBridge       ? 'B' : '-',
+			flag & MapFieldSpace        ? 'S' : '-',
+			flag & MapFieldCliff        ? 'c' : '-');
 
 	CLabel(wyrmgus::defines::get()->get_game_font()).Draw(UI.StatusLine.TextX + 118 * scale_factor, UI.StatusLine.TextY - 12 * scale_factor, buf.data());
 

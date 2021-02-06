@@ -64,6 +64,7 @@ static bool ModifyFlag(const char *flagName, unsigned int *flag)
 		{"wall", MapFieldWall},
 		{"rock", MapFieldRocks},
 		{"forest", MapFieldForest},
+		{"cliff", MapFieldCliff},
 		{"land-unit", MapFieldLandUnit},
 		{"air-unit", MapFieldAirUnit},
 		{"sea-unit", MapFieldSeaUnit},

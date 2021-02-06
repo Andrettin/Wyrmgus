@@ -1142,6 +1142,8 @@ static int CclGetTileTerrainHasFlag(lua_State *l)
 		flag = MapFieldRocks;
 	} else if (!strcmp(flag_name, "forest")) {
 		flag = MapFieldForest;
+	} else if (!strcmp(flag_name, "cliff")) {
+		flag = MapFieldCliff;
 	}
 
 	//Wyrmgus start
@@ -1303,6 +1305,8 @@ static int CclDefineTerrainType(lua_State *l)
 					terrain->Flags |= MapFieldUnderground;
 				} else if (tile_flag == "space") {
 					terrain->Flags |= MapFieldSpace;
+				} else if (tile_flag == "cliff") {
+					terrain->Flags |= MapFieldCliff;
 				} else {
 					LuaError(l, "Flag \"%s\" doesn't exist." _C_ tile_flag.c_str());
 				}

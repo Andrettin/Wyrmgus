@@ -48,7 +48,7 @@ namespace wyrmgus {
 	class unit_type;
 }
 
-enum MapFieldFlag : unsigned long long {
+enum MapFieldFlag : uint64_t {
 	MapFieldSpeedMask = 1 << 0,		/// Move faster on this tile
 	
 	MapFieldLandAllowed = 1 << 1,	/// Land units allowed
@@ -85,7 +85,8 @@ enum MapFieldFlag : unsigned long long {
 	MapFieldStumps = 1 << 27,		/// Used for playing stumps step sounds and identifying removed forests
 
 	MapFieldUnderground = 1 << 28,	/// The terrain is an underground one; this is used to make it always be "night" there, for graphical purposes as well as for unit sight
-	MapFieldSpace = 1 << 29	//the terrain is a space one, only being passable by space units
+	MapFieldSpace = 1 << 29, //the terrain is a space one, only being passable by space units
+	MapFieldCliff = 1 << 30 //used for cliff terrain
 };
 
 /**

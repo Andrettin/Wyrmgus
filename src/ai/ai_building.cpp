@@ -51,7 +51,7 @@ static bool IsPosFree(const Vec2i &pos, const CUnit &exceptionUnit, int z)
 	if (std::find(unitCache.begin(), unitCache.end(), &exceptionUnit) != unitCache.end()) {
 		return true;
 	}
-	const unsigned int blockedFlag = (MapFieldUnpassable | MapFieldWall | MapFieldRocks | MapFieldForest | MapFieldBuilding);
+	const unsigned int blockedFlag = (MapFieldUnpassable | MapFieldWall | MapFieldRocks | MapFieldForest | MapFieldBuilding | MapFieldCliff);
 	if (mf.Flags & blockedFlag) {
 		return false;
 	}
@@ -143,7 +143,7 @@ static bool AiCheckSurrounding(const CUnit &worker, const wyrmgus::unit_type &ty
 	return obstacleCount == 0;
 }
 
-class BuildingPlaceFinder
+class BuildingPlaceFinder final
 {
 public:
 	explicit BuildingPlaceFinder(const CUnit &worker, const wyrmgus::unit_type &type, bool checkSurround, Vec2i *resultPos, bool ignore_exploration, int z, const landmass *landmass, const wyrmgus::site *settlement) :
@@ -269,10 +269,10 @@ static bool AiFindBuildingPlace2(const CUnit &worker, const wyrmgus::unit_type &
 	return CMap::Map.Info.IsPointOnMap(*resultPos, z);
 }
 
-class HallPlaceFinder
+class HallPlaceFinder final
 {
 public:
-	HallPlaceFinder(const CUnit &worker, const wyrmgus::unit_type &type, int resource, Vec2i *resultPos, bool ignore_exploration, int z) :
+	explicit HallPlaceFinder(const CUnit &worker, const wyrmgus::unit_type &type, int resource, Vec2i *resultPos, bool ignore_exploration, int z) :
 		worker(worker), type(type),
 		movemask(worker.Type->MovementMask
 			& ~((type.BoolFlag[SHOREBUILDING_INDEX].value ? (MapFieldCoastAllowed | MapFieldLandUnit | MapFieldAirUnit | MapFieldSeaUnit) 
