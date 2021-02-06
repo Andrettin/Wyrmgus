@@ -1699,7 +1699,20 @@ void CMap::process_sml_scope(const sml_data &scope)
 {
 	const std::string &tag = scope.get_tag();
 
-	if (tag == "landmasses") {
+	if (tag == "size") {
+		const QSize map_size = scope.to_size();
+		this->Info.MapWidth = map_size.width();
+		this->Info.MapHeight = map_size.height();
+
+		this->ClearMapLayers();
+		auto map_layer = std::make_unique<CMapLayer>(this->Info.MapWidth, this->Info.MapHeight);
+		map_layer->ID = this->MapLayers.size();
+		this->Info.MapWidths.clear();
+		this->Info.MapWidths.push_back(this->Info.MapWidth);
+		this->Info.MapHeights.clear();
+		this->Info.MapHeights.push_back(this->Info.MapHeight);
+		this->MapLayers.push_back(std::move(map_layer));
+	} else if (tag == "landmasses") {
 		//first, create all landmasses, as when they are processed they refer to each other
 		for (int i = 0; i < scope.get_children_count(); ++i) {
 			this->add_landmass(std::make_unique<landmass>(static_cast<size_t>(i)));
@@ -1725,6 +1738,8 @@ void CMap::save(CFile &file) const
 
 	sml_data map_data;
 
+	map_data.add_child(sml_data::from_size(this->MapLayers.front()->get_size(), "size"));
+
 	if (!this->get_landmasses().empty()) {
 		sml_data landmasses_data("landmasses");
 		for (const auto &landmass : this->get_landmasses()) {
@@ -1740,7 +1755,6 @@ void CMap::save(CFile &file) const
 	file.printf("  \"version\", \"%s\",\n", VERSION);
 	file.printf("  \"description\", \"%s\",\n", this->Info.Description.c_str());
 	file.printf("  \"the-map\", {\n");
-	file.printf("  \"size\", {%d, %d},\n", this->Info.MapWidth, this->Info.MapHeight);
 	file.printf("  \"%s\",\n", this->NoFogOfWar ? "no-fog-of-war" : "fog-of-war");
 	file.printf("  \"filename\", \"%s\",\n", this->Info.Filename.c_str());
 	//Wyrmgus start

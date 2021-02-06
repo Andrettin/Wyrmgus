@@ -48,6 +48,14 @@ public:
 		return point_data;
 	}
 
+	static sml_data from_size(const QSize &point, const std::string &tag = std::string())
+	{
+		sml_data point_data(tag);
+		point_data.add_value(std::to_string(point.width()));
+		point_data.add_value(std::to_string(point.height()));
+		return point_data;
+	}
+
 	static sml_data from_rect(const QRect &rect, const std::string &tag = std::string())
 	{
 		sml_data rect_data(tag);

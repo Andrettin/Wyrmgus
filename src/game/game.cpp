@@ -255,7 +255,6 @@ void game::save(CFile &file) const
 
 		site_game_data.add_child(std::move(site_data));
 	}
-
 	if (!site_game_data.is_empty()) {
 		game_data.add_child(std::move(site_game_data));
 	}
