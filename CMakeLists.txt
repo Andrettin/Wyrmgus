@@ -230,6 +230,7 @@ set(map_SRCS
 	src/map/map_template_container.cpp
 	src/map/map_wall.cpp
 	src/map/minimap.cpp
+	src/map/plane.cpp
 	src/map/region.cpp
 	src/map/script_map.cpp
 	src/map/script_tileset.cpp
@@ -242,6 +243,7 @@ set(map_SRCS
 	src/map/terrain_type.cpp
 	src/map/tile.cpp
 	src/map/tileset.cpp
+	src/map/world.cpp
 )
 source_group(map FILES ${map_SRCS})
 
@@ -406,7 +408,6 @@ set(stratagusmain_SRCS
 	src/stratagus/mod.cpp
 	src/stratagus/name_generator.cpp
 	src/stratagus/parameters.cpp
-	src/stratagus/plane.cpp
 	src/stratagus/player.cpp
 	src/stratagus/player_color.cpp
 	src/stratagus/province.cpp
@@ -422,7 +423,6 @@ set(stratagusmain_SRCS
 	src/stratagus/text_processor.cpp
 	src/stratagus/title.cpp
 	src/stratagus/translate.cpp
-	src/stratagus/world.cpp
 )
 source_group(stratagus FILES ${stratagusmain_SRCS})
 
@@ -746,6 +746,7 @@ set(stratagus_map_HDRS
 	src/map/map_template_history.h
 	src/map/minimap.h
 	src/map/minimap_mode.h
+	src/map/plane.h
 	src/map/region.h
 	src/map/site.h
 	src/map/site_container.h
@@ -756,6 +757,7 @@ set(stratagus_map_HDRS
 	src/map/terrain_type.h
 	src/map/tile.h
 	src/map/tileset.h
+	src/map/world.h
 )
 
 set(stratagus_missile_HDRS
@@ -1043,7 +1045,6 @@ set(stratagus_generic_HDRS
 	src/include/parameters.h
 	src/include/particle.h
 	src/include/pathfinder.h
-	src/include/plane.h
 	src/include/player.h
 	src/include/player_color.h
 	src/include/province.h
@@ -1059,7 +1060,6 @@ set(stratagus_generic_HDRS
 	src/include/version.h
 	src/include/viewport.h
 	src/include/widgets.h
-	src/include/world.h
 	src/include/SetupConsole_win32.h
 	src/stratagus/civilization_base.h
 	src/stratagus/character_history.h
