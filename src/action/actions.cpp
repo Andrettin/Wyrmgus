@@ -511,7 +511,12 @@ static void HandleUnitAction(CUnit &unit)
 	// If current action is breakable proceed with next one.
 	if (!unit.Anim.Unbreakable) {
 		if (unit.CriticalOrder != nullptr) {
-			unit.CriticalOrder->Execute(unit);
+			try {
+				unit.CriticalOrder->Execute(unit);
+			} catch (...) {
+				std::throw_with_nested(std::runtime_error("Error executing critical order of type \"" + std::to_string(static_cast<int>(unit.CriticalOrder->Action)) + "\" for unit of type \"" + unit.Type->get_identifier() + "\"."));
+			}
+
 			unit.CriticalOrder.reset();
 		}
 
@@ -542,7 +547,12 @@ static void HandleUnitAction(CUnit &unit)
 			}
 		}
 	}
-	unit.Orders[0]->Execute(unit);
+
+	try {
+		unit.Orders[0]->Execute(unit);
+	} catch (...) {
+		std::throw_with_nested(std::runtime_error("Error executing order of type \"" + std::to_string(static_cast<int>(unit.Orders[0]->Action)) + "\" for unit of type \"" + unit.Type->get_identifier() + "\"."));
+	}
 }
 
 template <typename UNITP_ITERATOR>

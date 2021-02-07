@@ -157,7 +157,7 @@ void LuaCallback::run(int results)
 
 		lua_pop(luastate, 1);
 
-		throw std::runtime_error(msg));
+		throw std::runtime_error(msg);
 	}
 	rescount = results;
 }
