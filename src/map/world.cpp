@@ -28,14 +28,13 @@
 
 #include "map/world.h"
 
+#include "database/defines.h"
 #include "map/site.h"
 #include "map/terrain_feature.h"
 #include "map/terrain_type.h"
 #include "map/world_game_data.h"
 #include "province.h"
 #include "species/species.h"
-#include "time/season_schedule.h"
-#include "time/time_of_day_schedule.h"
 #include "ui/ui.h"
 #include "util/geojson_util.h"
 #include "util/vector_util.h"
@@ -66,11 +65,11 @@ world::~world()
 void world::initialize()
 {
 	if (this->time_of_day_schedule == nullptr) {
-		this->time_of_day_schedule = time_of_day_schedule::DefaultTimeOfDaySchedule;
+		this->time_of_day_schedule = defines::get()->get_default_time_of_day_schedule();
 	}
 
 	if (this->season_schedule == nullptr) {
-		this->season_schedule = season_schedule::DefaultSeasonSchedule;
+		this->season_schedule = defines::get()->get_default_season_schedule();
 	}
 
 	//create the world's game data object

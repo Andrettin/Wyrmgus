@@ -42,10 +42,13 @@ class font_color;
 class music;
 class player_color;
 class resource_icon;
+class season;
+class season_schedule;
 class sml_data;
 class sml_property;
 class terrain_type;
 class time_of_day;
+class time_of_day_schedule;
 class unit_class;
 enum class faction_type;
 
@@ -69,7 +72,9 @@ class defines final : public QObject, public singleton<defines>
 	Q_PROPERTY(wyrmgus::civilization* neutral_civilization MEMBER neutral_civilization READ get_neutral_civilization)
 	Q_PROPERTY(int minimap_color_index MEMBER minimap_color_index READ get_minimap_color_index)
 	Q_PROPERTY(int minimap_non_land_territory_alpha MEMBER minimap_non_land_territory_alpha READ get_minimap_non_land_territory_alpha)
-	Q_PROPERTY(wyrmgus::time_of_day* underground_time_of_day MEMBER underground_time_of_day READ get_underground_time_of_day)
+	Q_PROPERTY(wyrmgus::time_of_day* underground_time_of_day MEMBER underground_time_of_day)
+	Q_PROPERTY(wyrmgus::time_of_day_schedule* default_time_of_day_schedule MEMBER default_time_of_day_schedule)
+	Q_PROPERTY(wyrmgus::season_schedule* default_season_schedule MEMBER default_season_schedule)
 	Q_PROPERTY(wyrmgus::terrain_type* border_terrain_type MEMBER border_terrain_type)
 	Q_PROPERTY(wyrmgus::dialogue* campaign_victory_dialogue MEMBER campaign_victory_dialogue READ get_campaign_victory_dialogue)
 	Q_PROPERTY(wyrmgus::dialogue* campaign_defeat_dialogue MEMBER campaign_defeat_dialogue READ get_campaign_defeat_dialogue)
@@ -201,9 +206,19 @@ public:
 		return this->minimap_non_land_territory_alpha;
 	}
 
-	time_of_day *get_underground_time_of_day() const
+	const time_of_day *get_underground_time_of_day() const
 	{
 		return this->underground_time_of_day;
+	}
+
+	time_of_day_schedule *get_default_time_of_day_schedule() const
+	{
+		return this->default_time_of_day_schedule;
+	}
+
+	season_schedule *get_default_season_schedule() const
+	{
+		return this->default_season_schedule;
 	}
 
 	const terrain_type *get_border_terrain_type() const
@@ -326,6 +341,8 @@ private:
 	int minimap_non_land_territory_alpha = 64;
 	terrain_type *border_terrain_type = nullptr;
 	time_of_day *underground_time_of_day = nullptr;
+	time_of_day_schedule *default_time_of_day_schedule = nullptr;
+	season_schedule *default_season_schedule = nullptr;
 	dialogue *campaign_victory_dialogue = nullptr;
 	dialogue *campaign_defeat_dialogue = nullptr;
 	button_level *inventory_button_level = nullptr;

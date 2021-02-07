@@ -729,7 +729,7 @@ void map_template::apply(const QPoint &template_start_pos, const QPoint &map_sta
 			} else if (this->get_world() == nullptr && this->get_plane() != nullptr && this->get_plane()->get_season_schedule() != nullptr) {
 				CMap::Map.MapLayers[z]->set_season_schedule(this->get_plane()->get_season_schedule());
 			} else {
-				CMap::Map.MapLayers[z]->set_season_schedule(season_schedule::DefaultSeasonSchedule);
+				CMap::Map.MapLayers[z]->set_season_schedule(defines::get()->get_default_season_schedule());
 			}
 			
 			CMap::Map.MapLayers[z]->SetSeasonByHours(game::get()->get_current_total_hours());
@@ -743,7 +743,7 @@ void map_template::apply(const QPoint &template_start_pos, const QPoint &map_sta
 				} else if (this->get_world() == nullptr && this->get_plane() != nullptr && this->get_plane()->get_time_of_day_schedule() != nullptr) {
 					CMap::Map.MapLayers[z]->set_time_of_day_schedule(this->get_plane()->get_time_of_day_schedule());
 				} else {
-					CMap::Map.MapLayers[z]->set_time_of_day_schedule(time_of_day_schedule::DefaultTimeOfDaySchedule);
+					CMap::Map.MapLayers[z]->set_time_of_day_schedule(defines::get()->get_default_time_of_day_schedule());
 				}
 				
 				CMap::Map.MapLayers[z]->SetTimeOfDayByHours(game::get()->get_current_total_hours());

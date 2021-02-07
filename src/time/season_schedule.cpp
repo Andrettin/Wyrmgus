@@ -34,8 +34,6 @@
 
 namespace wyrmgus {
 
-season_schedule *season_schedule::DefaultSeasonSchedule = nullptr;
-
 season_schedule::season_schedule(const std::string &identifier) : time_period_schedule(identifier)
 {
 }
@@ -58,11 +56,6 @@ void season_schedule::initialize()
 	data_entry::initialize();
 }
 
-/**
-**	@brief	Process data provided by a configuration file
-**
-**	@param	config_data	The configuration data
-*/
 void season_schedule::ProcessConfigData(const CConfigData *config_data)
 {
 	for (size_t i = 0; i < config_data->Properties.size(); ++i) {
@@ -71,11 +64,6 @@ void season_schedule::ProcessConfigData(const CConfigData *config_data)
 
 		if (key == "name") {
 			this->set_name(value);
-		} else if (key == "default_schedule") {
-			const bool is_default_schedule = wyrmgus::string::to_bool(value);
-			if (is_default_schedule) {
-				season_schedule::DefaultSeasonSchedule = this;
-			}
 		} else if (key == "hours_per_day") {
 			this->HoursPerDay = std::stoi(value);
 		} else {

@@ -35,8 +35,6 @@
 
 namespace wyrmgus {
 
-time_of_day_schedule *time_of_day_schedule::DefaultTimeOfDaySchedule = nullptr;
-
 time_of_day_schedule::time_of_day_schedule(const std::string &identifier) : time_period_schedule(identifier)
 {
 }
@@ -72,11 +70,6 @@ void time_of_day_schedule::ProcessConfigData(const CConfigData *config_data)
 		
 		if (key == "name") {
 			this->set_name(value);
-		} else if (key == "default_schedule") {
-			const bool is_default_schedule = wyrmgus::string::to_bool(value);
-			if (is_default_schedule) {
-				time_of_day_schedule::DefaultTimeOfDaySchedule = this;
-			}
 		} else {
 			fprintf(stderr, "Invalid time of day schedule property: \"%s\".\n", key.c_str());
 		}
