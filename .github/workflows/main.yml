@@ -6,6 +6,7 @@ env:
   BUILD_TYPE: 'Release'
   CMAKE_FLAGS: >-
     -DENABLE_STATIC=OFF
+    -DOpenGL_GL_PREFERENCE=GLVND
     -DWITH_BZIP2=OFF
     -DWITH_GEOJSON=OFF
     -DWITH_X11=ON
@@ -19,8 +20,19 @@ jobs:
       - name: Configure CMake
         run: >-
           cmake -S "$GITHUB_WORKSPACE" -B "$BUILD_DIR"
-          -D CMAKE_BUILD_TYPE="$BUILD_TYPE" $CMAKE_FLAGS
-      - name: Build
-        run: cmake --build "$BUILD_DIR" --config "$BUILD_TYPE"
+          -DCMAKE_BUILD_TYPE="$BUILD_TYPE" $CMAKE_FLAGS
+      - name: Workaround for tolua.cpp target on CMake 3.16.3
+        run: cmake -S "$GITHUB_WORKSPACE" -B "$BUILD_DIR"
+      - name: Build Wyrmgus
+        run: cmake --build "$BUILD_DIR" --target stratagus_main
+      - name: Build Wyrmgus test suite
+        run: cmake --build "$BUILD_DIR" --target stratagus_test
       - name: Test
-        run: cmake --build "$BUILD_DIR" --traget test
+        continue-on-error: true
+        run: cmake --build "$BUILD_DIR" --target test
+        #name: Clone Wyrmsun data
+        #run: git clone https://github.com/Andrettin/Wyrmsun
+        # TODO audio sync
+        # TODO stop
+        #- name: Run Wyrmsun
+        #  run: xvfb-run "${BUILD_DIR}/wyrmgus" -d Wyrmsun
