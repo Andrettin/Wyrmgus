@@ -5,6 +5,7 @@ RUN apt-get update
 RUN apt-get -y install \
   build-essential \
   cmake \
+  git \
   libboost-dev \
   libbz2-dev \
   liblua5.1-dev \

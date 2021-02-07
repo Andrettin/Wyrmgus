@@ -10,6 +10,7 @@ env:
     -DWITH_BZIP2=OFF
     -DWITH_GEOJSON=OFF
     -DWITH_X11=ON
+  DISPLAY: :0
 
 jobs:
   build:
@@ -30,9 +31,14 @@ jobs:
       - name: Test
         continue-on-error: true
         run: cmake --build "$BUILD_DIR" --target test
-        #name: Clone Wyrmsun data
-        #run: git clone https://github.com/Andrettin/Wyrmsun
-        # TODO audio sync
-        # TODO stop
-        #- name: Run Wyrmsun
-        #  run: xvfb-run "${BUILD_DIR}/wyrmgus" -d Wyrmsun
+      - name: Clone Wyrmsun data
+        run: git clone https://github.com/Andrettin/Wyrmsun
+      - name: Run background services
+        run: pulseaudio --exit-idle-time=-1 & Xvfb &
+      - name: Run Wyrmsun
+        # TODO Test bad exit code
+        run: >-
+          "${BUILD_DIR}/wyrmgus" -d "${BUILD_DIR}/Wyrmsun" & echo $! > PID
+        timeout-minutes: 10
+      - name: Stop Wyrmsun
+        run: sleep 120 && kill $(cat PID)
