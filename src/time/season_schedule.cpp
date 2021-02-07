@@ -98,16 +98,4 @@ int season_schedule::GetDefaultHourMultiplier() const
 	return DEFAULT_DAY_MULTIPLIER_PER_YEAR;
 }
 
-void scheduled_season::process_sml_property(const sml_property &property)
-{
-	const std::string &key = property.get_key();
-	const std::string &value = property.get_value();
-
-	if (key == "days") {
-		this->set_hours(std::stoi(value) * this->schedule->get_hours_per_day());
-	} else {
-		scheduled_time_period::process_sml_property(property);;
-	}
-}
-
 }

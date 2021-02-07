@@ -61,12 +61,6 @@ public:
 		return this->hours;
 	}
 
-protected:
-	void set_hours(const unsigned hours)
-	{
-		this->hours = hours;
-	}
-
 private:
 	size_t index = 0;
 	unsigned hours = 0; //the amount of hours the scheduled time period lasts

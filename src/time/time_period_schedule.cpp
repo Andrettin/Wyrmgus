@@ -32,6 +32,7 @@
 
 #include "database/sml_data.h"
 #include "database/sml_property.h"
+#include "util/date_util.h"
 
 namespace wyrmgus {
 
@@ -65,6 +66,8 @@ void scheduled_time_period::process_sml_property(const sml_property &property)
 
 	if (key == "hours") {
 		this->hours = std::stoi(value);
+	} else if (key == "days") {
+		this->hours = std::stoi(value) * date::hours_per_day;
 	} else {
 		throw std::runtime_error("Invalid scheduled time period scope: \"" + key + "\".");
 	}

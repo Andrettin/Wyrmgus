@@ -43,8 +43,6 @@ public:
 	{
 	}
 
-	virtual void process_sml_property(const sml_property &property) override;
-
 	virtual void check() const override
 	{
 		if (this->get_season() == nullptr) {
@@ -68,8 +66,6 @@ class season_schedule final : public time_period_schedule, public data_type<seas
 {
 	Q_OBJECT
 
-	Q_PROPERTY(unsigned hours_per_day MEMBER hours_per_day)
-
 public:
 	static constexpr const char *class_identifier = "season_schedule";
 	static constexpr const char *database_folder = "season_schedules";
@@ -81,11 +77,6 @@ public:
 	virtual void initialize() override;
 	virtual void check() const override;
 
-	unsigned get_hours_per_day() const
-	{
-		return this->hours_per_day;
-	}
-
 	virtual unsigned long GetDefaultTotalHours() const override;
 	virtual int GetDefaultHourMultiplier() const override;
 
@@ -95,7 +86,6 @@ public:
 	}
 
 private:
-	unsigned hours_per_day = DEFAULT_HOURS_PER_DAY; //the hours per each day for this season schedule
 	std::vector<std::unique_ptr<scheduled_season>> scheduled_seasons;
 };
 
