@@ -23,7 +23,6 @@
 //      along with this program; if not, write to the Free Software
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
-//
 
 #include "stratagus.h"
 
@@ -152,7 +151,7 @@ int SaveGame(const std::string &filename)
 
 	// FIXME: probably not the right place for this
 	file.printf("GameCycle = %lu\n", GameCycle);
-	file.printf("SetCurrentTotalHours(%llu)\n", game::get()->get_current_total_hours());
+	file.printf("SetCurrentTotalHours(%" PRIu64 ")\n", game::get()->get_current_total_hours());
 	const QDateTime &current_date = wyrmgus::game::get()->get_current_date();
 	if (current_date.isValid()) {
 		file.printf("SetCurrentDate(\"%s\")\n", wyrmgus::date::to_string(current_date).c_str());

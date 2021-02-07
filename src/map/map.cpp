@@ -24,7 +24,6 @@
 //      along with this program; if not, write to the Free Software
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
-//
 
 #include "stratagus.h"
 
@@ -1826,12 +1825,12 @@ void CMap::save(CFile &file) const
 	file.printf("  },\n");
 	file.printf("  \"time-of-day\", {\n");
 	for (size_t z = 0; z < this->MapLayers.size(); ++z) {
-		file.printf("  {\"%s\", %2d, %d},\n", this->MapLayers[z]->get_time_of_day_schedule() ? this->MapLayers[z]->get_time_of_day_schedule()->get_identifier().c_str() : "", this->MapLayers[z]->get_scheduled_time_of_day() ? this->MapLayers[z]->get_scheduled_time_of_day()->get_index() : 0, this->MapLayers[z]->RemainingTimeOfDayHours);
+		file.printf("  {\"%s\", %zu, %d},\n", this->MapLayers[z]->get_time_of_day_schedule() ? this->MapLayers[z]->get_time_of_day_schedule()->get_identifier().c_str() : "", this->MapLayers[z]->get_scheduled_time_of_day() ? this->MapLayers[z]->get_scheduled_time_of_day()->get_index() : 0, this->MapLayers[z]->RemainingTimeOfDayHours);
 	}
 	file.printf("  },\n");
 	file.printf("  \"season\", {\n");
 	for (size_t z = 0; z < this->MapLayers.size(); ++z) {
-		file.printf("  {\"%s\", %2d, %d},\n", this->MapLayers[z]->get_season_schedule() ? this->MapLayers[z]->get_season_schedule()->get_identifier().c_str() : "", this->MapLayers[z]->get_scheduled_season() ? this->MapLayers[z]->get_scheduled_season()->get_index() : 0, this->MapLayers[z]->RemainingSeasonHours);
+		file.printf("  {\"%s\", %zu, %d},\n", this->MapLayers[z]->get_season_schedule() ? this->MapLayers[z]->get_season_schedule()->get_identifier().c_str() : "", this->MapLayers[z]->get_scheduled_season() ? this->MapLayers[z]->get_scheduled_season()->get_index() : 0, this->MapLayers[z]->RemainingSeasonHours);
 	}
 	file.printf("  },\n");
 	file.printf("  \"layer-references\", {\n");

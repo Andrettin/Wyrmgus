@@ -1599,6 +1599,7 @@ target_precompile_headers(stratagus PRIVATE
 	<cassert>
 	<cctype>
 	<cerrno>
+	<cinttypes>
 	<climits>
 	<cmath>
 	<cstdarg>
