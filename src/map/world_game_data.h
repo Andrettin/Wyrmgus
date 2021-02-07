@@ -90,7 +90,7 @@ public:
 	}
 
 	void set_time_of_day(const scheduled_time_of_day *time_of_day);
-	const time_of_day *get_time_of_day() const;
+	const wyrmgus::time_of_day *get_time_of_day() const;
 
 private:
 	void decrement_remaining_season_hours();
