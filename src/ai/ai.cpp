@@ -472,7 +472,7 @@ static void SaveAiPlayer(CFile &file, int plynr, const PlayerAi &ai)
 				file.printf("\"defend\",");
 				break;
 			default:
-				file.printf("\"unknown-%d\",", ai.Force[i].Role);
+				file.printf("\"unknown-%d\",", static_cast<int>(ai.Force[i].Role));
 				break;
 		}
 
@@ -488,7 +488,7 @@ static void SaveAiPlayer(CFile &file, int plynr, const PlayerAi &ai)
 			file.printf(" %d, \"%s\",", UnitNumber(*ai_unit), ai_unit->Type->get_identifier().c_str());
 		}
 		file.printf("},\n    \"state\", %d, \"goalx\", %d, \"goaly\", %d,",
-					ai.Force[i].State, ai.Force[i].GoalPos.x, ai.Force[i].GoalPos.y);
+					static_cast<int>(ai.Force[i].State), ai.Force[i].GoalPos.x, ai.Force[i].GoalPos.y);
 		file.printf("},\n");
 	}
 
@@ -581,16 +581,15 @@ static void SaveAiPlayer(CFile &file, int plynr, const PlayerAi &ai)
 		}
 		
 		if (queue.landmass != nullptr) {
-			file.printf("\"landmass\", %2d, ", queue.landmass->get_index());
+			file.printf("\"landmass\", %zu, ", queue.landmass->get_index());
 		}
 		
 		if (queue.settlement != nullptr) {
-			file.printf("\"settlement\", \"%s\", ", queue.settlement->Ident.c_str());
+			file.printf("\"settlement\", \"%s\", ", queue.settlement->get_identifier().c_str());
 		}
 		//Wyrmgus end
-		/* */
 
-		file.printf("\"%s\", %d, %d", queue.Type->Ident.c_str(), queue.Made, queue.Want);
+		file.printf("\"%s\", %d, %d", queue.Type->get_identifier().c_str(), queue.Made, queue.Want);
 		if (i < UnitTypeBuiltCount - 1) {
 			file.printf(",\n");
 		}
@@ -612,7 +611,7 @@ static void SaveAiPlayer(CFile &file, int plynr, const PlayerAi &ai)
 		for (const auto &kv_pair : ai.Transporters) {
 			const landmass *landmass = kv_pair.first;
 			for (const CUnit *ai_unit : kv_pair.second) {
-				file.printf(" %2d, %d,", landmass->get_index(), UnitNumber(*ai_unit));
+				file.printf(" %zu, %d,", landmass->get_index(), UnitNumber(*ai_unit));
 			}
 		}
 		file.printf("},\n");

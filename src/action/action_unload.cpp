@@ -84,7 +84,7 @@ void COrder_Unload::Save(CFile &file, const CUnit &unit) const
 	//Wyrmgus end
 
 	if (this->landmass != nullptr) {
-		file.printf(" \"landmass\", %2d,", this->landmass->get_index());
+		file.printf(" \"landmass\", %zu,", this->landmass->get_index());
 	}
 
 	file.printf("\"state\", %d", this->State);

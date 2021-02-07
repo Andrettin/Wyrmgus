@@ -340,7 +340,7 @@ void animation_set::SaveUnitAnim(CFile &file, const CUnit &unit)
 	file.printf("\"anim-wait\", %d,", unit.Anim.Wait);
 	for (size_t i = 0; i < CAnimation::animation_list.size(); ++i) {
 		if (CAnimation::animation_list[i] == unit.Anim.CurrAnim) {
-			file.printf("\"curr-anim\", %d,", i);
+			file.printf("\"curr-anim\", %zu,", i);
 			file.printf("\"anim\", %d,", GetAdvanceIndex(unit.Anim.CurrAnim, unit.Anim.Anim));
 			break;
 		}
@@ -354,7 +354,7 @@ void animation_set::SaveUnitAnim(CFile &file, const CUnit &unit)
 	file.printf("\"anim-wait\", %d,", unit.WaitBackup.Wait);
 	for (size_t i = 0; i < CAnimation::animation_list.size(); ++i) {
 		if (CAnimation::animation_list[i] == unit.WaitBackup.CurrAnim) {
-			file.printf("\"curr-anim\", %d,", i);
+			file.printf("\"curr-anim\", %zu,", i);
 			file.printf("\"anim\", %d,", GetAdvanceIndex(unit.WaitBackup.CurrAnim, unit.WaitBackup.Anim));
 			break;
 		}
