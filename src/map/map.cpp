@@ -3252,6 +3252,11 @@ void CMap::generate_missing_terrain(const QRect &rect, const int z)
 			return; //the seed must border a tile with null terrain
 		}
 
+		if (top_terrain->Flags & MapFieldSpace) {
+			//space tiles cannot be used as seeds, or else missing terrain generation wouldn't work properly for world terrain circles
+			return;
+		}
+
 		seeds.push_back(std::move(tile_pos));
 	});
 
@@ -3388,6 +3393,12 @@ void CMap::generate_missing_terrain(const QRect &rect, const int z)
 				const wyrmgus::terrain_type *adjacent_overlay_terrain_type = adjacent_tile->get_overlay_terrain();
 
 				if (adjacent_terrain_type == nullptr) {
+					continue;
+				}
+
+				const wyrmgus::terrain_type *adjacent_top_terrain_type = adjacent_tile->get_top_terrain();
+				if (adjacent_top_terrain_type->Flags & MapFieldSpace) {
+					//space tiles cannot be used as seeds, or else missing terrain generation wouldn't work properly for world terrain circles
 					continue;
 				}
 
