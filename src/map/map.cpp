@@ -3028,10 +3028,18 @@ void CMap::GenerateTerrain(const std::unique_ptr<wyrmgus::generated_terrain> &ge
 			if (adjacent_positions.size() > 0) {
 				Vec2i adjacent_pos = adjacent_positions[SyncRand(adjacent_positions.size())];
 				if (!terrain_type->is_overlay()) {
-					this->Field(random_pos, z)->RemoveOverlayTerrain();
-					this->Field(adjacent_pos, z)->RemoveOverlayTerrain();
-					this->Field(Vec2i(random_pos.x, adjacent_pos.y), z)->RemoveOverlayTerrain();
-					this->Field(Vec2i(adjacent_pos.x, random_pos.y), z)->RemoveOverlayTerrain();
+					if (generated_terrain->CanRemoveTileOverlayTerrain(this->Field(random_pos, z))) {
+						this->Field(random_pos, z)->RemoveOverlayTerrain();
+					}
+					if (generated_terrain->CanRemoveTileOverlayTerrain(this->Field(adjacent_pos, z))) {
+						this->Field(adjacent_pos, z)->RemoveOverlayTerrain();
+					}
+					if (generated_terrain->CanRemoveTileOverlayTerrain(this->Field(Vec2i(random_pos.x, adjacent_pos.y), z))) {
+						this->Field(Vec2i(random_pos.x, adjacent_pos.y), z)->RemoveOverlayTerrain();
+					}
+					if (generated_terrain->CanRemoveTileOverlayTerrain(this->Field(Vec2i(adjacent_pos.x, random_pos.y), z))) {
+						this->Field(Vec2i(adjacent_pos.x, random_pos.y), z)->RemoveOverlayTerrain();
+					}
 				}
 				this->Field(random_pos, z)->SetTerrain(terrain_type);
 				this->Field(adjacent_pos, z)->SetTerrain(terrain_type);

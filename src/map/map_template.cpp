@@ -3069,7 +3069,7 @@ bool generated_terrain::CanTileBePartOfExpansion(const tile *tile) const
 */
 bool generated_terrain::CanRemoveTileOverlayTerrain(const tile *tile) const
 {
-	if (std::find(this->TargetTerrainTypes.begin(), this->TargetTerrainTypes.end(), tile->get_overlay_terrain()) == this->TargetTerrainTypes.end()) {
+	if (!vector::contains(this->TargetTerrainTypes, tile->get_overlay_terrain())) {
 		return false;
 	}
 	
