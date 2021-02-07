@@ -24,7 +24,6 @@
 //      along with this program; if not, write to the Free Software
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
-//
 
 #include "stratagus.h"
 
@@ -374,6 +373,11 @@ void PlayGameSound(const wyrmgus::sound *sound, unsigned char volume, const bool
 	if (!sound) {
 		return;
 	}
+
+	if (!SoundEnabled()) {
+		return;
+	}
+
 	Origin source = {nullptr, 0};
 
 	wyrmgus::sample *sample = ChooseSample(sound, false, source);
