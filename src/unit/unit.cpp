@@ -23,7 +23,6 @@
 //      along with this program; if not, write to the Free Software
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
-//
 
 #include "stratagus.h"
 
@@ -96,6 +95,7 @@
 #include "upgrade/upgrade.h"
 #include "upgrade/upgrade_modifier.h"
 #include "util/exception_util.h"
+#include "util/log_util.h"
 #include "util/size_util.h"
 //Wyrmgus start
 #include "util/util.h"
@@ -518,11 +518,9 @@ void CUnit::Release(const bool final)
 		exception::throw_with_trace(std::runtime_error("Unit being released has no type."));
 	}
 
-	//Wyrmgus start
-	if (Orders.size() > 1) {
-		fprintf(stderr, "Unit to be released has more than 1 order; Unit Type: \"%s\", Orders: %d, First Order Type: %d.\n", this->Type->Ident.c_str(), (int)Orders.size(), this->CurrentAction());
+	if (this->Orders.size() > 1) {
+		log::log_error("Unit to be released has more than 1 order; Unit Type: \"" + this->Type->get_identifier() + "\", Orders: " + std::to_string(this->Orders.size()) + ", First Order Type: " + std::to_string(static_cast<int>(this->CurrentAction())) + ".");
 	}
-	//Wyrmgus end
 
 	Assert(Orders.size() == 1);
 	// Must be removed before here
