@@ -120,6 +120,7 @@ class map_template final : public named_data_entry, public data_type<map_templat
 	Q_PROPERTY(wyrmgus::terrain_type* unusable_area_overlay_terrain_type MEMBER unusable_area_overlay_terrain_type READ get_unusable_area_overlay_terrain_type)
 	Q_PROPERTY(wyrmgus::terrain_type* surrounding_terrain_type MEMBER surrounding_terrain_type READ get_surrounding_terrain_type)
 	Q_PROPERTY(wyrmgus::terrain_type* surrounding_overlay_terrain_type MEMBER surrounding_overlay_terrain_type READ get_surrounding_overlay_terrain_type)
+	Q_PROPERTY(bool clear_terrain MEMBER clear_terrain)
 	Q_PROPERTY(bool output_terrain_image MEMBER output_terrain_image READ outputs_terrain_image)
 	Q_PROPERTY(bool output_territory_image MEMBER output_territory_image READ outputs_territory_image)
 	Q_PROPERTY(int min_longitude MEMBER min_longitude READ get_min_longitude)
@@ -144,8 +145,8 @@ public:
 	virtual void process_sml_property(const sml_property &property) override;
 	virtual void process_sml_scope(const sml_data &scope) override;
 	virtual void ProcessConfigData(const CConfigData *config_data) override;
-	virtual void check() const override;
 	virtual void initialize() override;
+	virtual void check() const override;
 	virtual data_entry_history *get_history_base() override;
 	virtual void reset_history() override;
 
@@ -746,6 +747,7 @@ private:
 	terrain_type *surrounding_overlay_terrain_type = nullptr;
 	terrain_type *unusable_area_terrain_type = nullptr; //the terrain type for the template's unusable area, e.g. the area outside its circle if the template is a circle
 	terrain_type *unusable_area_overlay_terrain_type = nullptr;
+	bool clear_terrain = false; //whether to clear terrain in the map template's area before applying
 	std::vector<map_template *> subtemplates;
 	std::vector<std::unique_ptr<generated_terrain>> generated_terrains; //terrains generated in the map template
 public:

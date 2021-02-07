@@ -314,18 +314,6 @@ void map_template::ProcessConfigData(const CConfigData *config_data)
 	}
 }
 
-void map_template::check() const
-{
-	for (const auto &kv_pair : this->character_units) {
-		const std::unique_ptr<character_unit> &character_unit = kv_pair.second;
-		character_unit->check();
-	}
-
-	for (const std::unique_ptr<character_substitution> &substitution : this->character_substitutions) {
-		substitution->check();
-	}
-}
-
 void map_template::initialize()
 {
 	if (this->plane == nullptr && this->world != nullptr) {
@@ -433,6 +421,22 @@ void map_template::initialize()
 	}
 
 	data_entry::initialize();
+}
+
+void map_template::check() const
+{
+	for (const auto &kv_pair : this->character_units) {
+		const std::unique_ptr<character_unit> &character_unit = kv_pair.second;
+		character_unit->check();
+	}
+
+	for (const std::unique_ptr<character_substitution> &substitution : this->character_substitutions) {
+		substitution->check();
+	}
+
+	if (this->clear_terrain && this->get_base_terrain_type() != nullptr && this->get_base_overlay_terrain_type() != nullptr) {
+		throw std::runtime_error("Map template \"" + this->get_identifier() + "\" is set to clear terrain in its area, but also has a base terrain type and an overlay base terrain type.");
+	}
 }
 
 data_entry_history *map_template::get_history_base()
@@ -761,7 +765,7 @@ void map_template::apply(const QPoint &template_start_pos, const QPoint &map_sta
 	
 	ShowLoadProgress(_("Applying \"%s\" Map Template Terrain"), this->get_name().c_str());
 	
-	if (this->get_base_terrain_type() != nullptr || this->get_border_terrain_type() != nullptr) {
+	if (this->get_base_terrain_type() != nullptr || this->get_border_terrain_type() != nullptr || this->clear_terrain) {
 		for (int x = map_start_pos.x(); x < map_end.x(); ++x) {
 			for (int y = map_start_pos.y(); y < map_end.y(); ++y) {
 				terrain_type *terrain = nullptr;
@@ -773,7 +777,7 @@ void map_template::apply(const QPoint &template_start_pos, const QPoint &map_sta
 				} else if (this->get_base_terrain_type() != nullptr) {
 					terrain = this->get_base_terrain_type();
 					overlay_terrain = this->get_base_overlay_terrain_type();
-				} else {
+				} else if (!this->clear_terrain) {
 					continue;
 				}
 
