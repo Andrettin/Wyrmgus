@@ -27,14 +27,55 @@
 #pragma once
 
 #include "database/named_data_entry.h"
-#include "data_type.h"
 
 namespace wyrmgus {
 
-class time_period_schedule : public named_data_entry, public CDataType
+class scheduled_time_period
 {
 public:
-	explicit time_period_schedule(const std::string &identifier) : named_data_entry(identifier), CDataType(identifier)
+	explicit scheduled_time_period(const size_t index) : index(index)
+	{
+	}
+
+	virtual ~scheduled_time_period()
+	{
+	}
+
+	virtual void process_sml_property(const sml_property &property);
+	virtual void process_sml_scope(const sml_data &scope);
+
+	virtual void check() const
+	{
+		if (this->get_hours() == 0) {
+			throw std::runtime_error("Scheduled time period has no amount of time defined.");
+		}
+	}
+
+	size_t get_index() const
+	{
+		return this->index;
+	}
+
+	unsigned get_hours() const
+	{
+		return this->hours;
+	}
+
+protected:
+	void set_hours(const unsigned hours)
+	{
+		this->hours = hours;
+	}
+
+private:
+	size_t index = 0;
+	unsigned hours = 0; //the amount of hours the scheduled time period lasts
+};
+
+class time_period_schedule : public named_data_entry
+{
+public:
+	explicit time_period_schedule(const std::string &identifier) : named_data_entry(identifier)
 	{
 	}
 

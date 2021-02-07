@@ -1399,11 +1399,10 @@ void SetTimeOfDay(const std::string &time_of_day_ident, int z)
 	} else {
 		const time_of_day_schedule *schedule = CMap::Map.MapLayers[z]->get_time_of_day_schedule();
 		if (schedule != nullptr) {
-			for (size_t i = 0; i < schedule->ScheduledTimesOfDay.size(); ++i) {
-				scheduled_time_of_day *time_of_day = schedule->ScheduledTimesOfDay[i];
-				if (time_of_day->TimeOfDay->get_identifier() == time_of_day_ident)  {
-					CMap::Map.MapLayers[z]->SetTimeOfDay(time_of_day);
-					CMap::Map.MapLayers[z]->RemainingTimeOfDayHours = time_of_day->GetHours(CMap::Map.MapLayers[z]->GetSeason());
+			for (const std::unique_ptr<scheduled_time_of_day> &time_of_day : schedule->get_scheduled_times_of_day()) {
+				if (time_of_day->get_time_of_day()->get_identifier() == time_of_day_ident)  {
+					CMap::Map.MapLayers[z]->SetTimeOfDay(time_of_day.get());
+					CMap::Map.MapLayers[z]->RemainingTimeOfDayHours = time_of_day->get_hours(CMap::Map.MapLayers[z]->GetSeason());
 					break;
 				}
 			}
@@ -1432,8 +1431,8 @@ void SetTimeOfDaySchedule(const std::string &time_of_day_schedule_ident, const i
 		const time_of_day_schedule *schedule = time_of_day_schedule::try_get(time_of_day_schedule_ident);
 		if (schedule != nullptr) {
 			CMap::Map.MapLayers[z]->set_time_of_day_schedule(schedule);
-			CMap::Map.MapLayers[z]->SetTimeOfDay(schedule->ScheduledTimesOfDay.front());
-			CMap::Map.MapLayers[z]->RemainingTimeOfDayHours = CMap::Map.MapLayers[z]->get_scheduled_time_of_day()->GetHours(CMap::Map.MapLayers[z]->GetSeason());
+			CMap::Map.MapLayers[z]->SetTimeOfDay(schedule->get_scheduled_times_of_day().front().get());
+			CMap::Map.MapLayers[z]->RemainingTimeOfDayHours = CMap::Map.MapLayers[z]->get_scheduled_time_of_day()->get_hours(CMap::Map.MapLayers[z]->GetSeason());
 		}
 	}
 }
@@ -1452,11 +1451,10 @@ void SetSeason(const std::string &season_ident, int z)
 	} else {
 		const season_schedule *schedule = CMap::Map.MapLayers[z]->get_season_schedule();
 		if (schedule != nullptr) {
-			for (size_t i = 0; i < schedule->ScheduledSeasons.size(); ++i) {
-				const scheduled_season *season = schedule->ScheduledSeasons[i];
-				if (season->Season->get_identifier() == season_ident)  {
-					CMap::Map.MapLayers[z]->SetSeason(season);
-					CMap::Map.MapLayers[z]->RemainingSeasonHours = season->Hours;
+			for (const std::unique_ptr<scheduled_season> &season : schedule->get_scheduled_seasons()) {
+				if (season->get_season()->get_identifier() == season_ident)  {
+					CMap::Map.MapLayers[z]->SetSeason(season.get());
+					CMap::Map.MapLayers[z]->RemainingSeasonHours = season->get_hours();
 					break;
 				}
 			}
@@ -1480,8 +1478,8 @@ void SetSeasonSchedule(const std::string &season_schedule_ident, int z)
 		const season_schedule *schedule = season_schedule::try_get(season_schedule_ident);
 		if (schedule != nullptr) {
 			CMap::Map.MapLayers[z]->set_season_schedule(schedule);
-			CMap::Map.MapLayers[z]->SetSeason(schedule->ScheduledSeasons.front());
-			CMap::Map.MapLayers[z]->RemainingSeasonHours = CMap::Map.MapLayers[z]->get_scheduled_season()->Hours;
+			CMap::Map.MapLayers[z]->SetSeason(schedule->get_scheduled_seasons().front().get());
+			CMap::Map.MapLayers[z]->RemainingSeasonHours = CMap::Map.MapLayers[z]->get_scheduled_season()->get_hours();
 		}
 	}
 }
@@ -1792,12 +1790,12 @@ void CMap::save(CFile &file) const
 	file.printf("  },\n");
 	file.printf("  \"time-of-day\", {\n");
 	for (size_t z = 0; z < this->MapLayers.size(); ++z) {
-		file.printf("  {\"%s\", %d, %d},\n", this->MapLayers[z]->get_time_of_day_schedule() ? this->MapLayers[z]->get_time_of_day_schedule()->get_identifier().c_str() : "", this->MapLayers[z]->get_scheduled_time_of_day() ? this->MapLayers[z]->get_scheduled_time_of_day()->ID : 0, this->MapLayers[z]->RemainingTimeOfDayHours);
+		file.printf("  {\"%s\", %2d, %d},\n", this->MapLayers[z]->get_time_of_day_schedule() ? this->MapLayers[z]->get_time_of_day_schedule()->get_identifier().c_str() : "", this->MapLayers[z]->get_scheduled_time_of_day() ? this->MapLayers[z]->get_scheduled_time_of_day()->get_index() : 0, this->MapLayers[z]->RemainingTimeOfDayHours);
 	}
 	file.printf("  },\n");
 	file.printf("  \"season\", {\n");
 	for (size_t z = 0; z < this->MapLayers.size(); ++z) {
-		file.printf("  {\"%s\", %d, %d},\n", this->MapLayers[z]->get_season_schedule() ? this->MapLayers[z]->get_season_schedule()->get_identifier().c_str() : "", this->MapLayers[z]->get_scheduled_season() ? this->MapLayers[z]->get_scheduled_season()->ID : 0, this->MapLayers[z]->RemainingSeasonHours);
+		file.printf("  {\"%s\", %2d, %d},\n", this->MapLayers[z]->get_season_schedule() ? this->MapLayers[z]->get_season_schedule()->get_identifier().c_str() : "", this->MapLayers[z]->get_scheduled_season() ? this->MapLayers[z]->get_scheduled_season()->get_index() : 0, this->MapLayers[z]->RemainingSeasonHours);
 	}
 	file.printf("  },\n");
 	file.printf("  \"layer-references\", {\n");

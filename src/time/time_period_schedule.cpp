@@ -30,6 +30,9 @@
 
 #include "time/time_period_schedule.h"
 
+#include "database/sml_data.h"
+#include "database/sml_property.h"
+
 namespace wyrmgus {
 
 /**
@@ -53,6 +56,23 @@ void time_period_schedule::CalculateHourMultiplier()
 	}
 	
 	this->HourMultiplier = std::max(multiplier, 1);
+}
+
+void scheduled_time_period::process_sml_property(const sml_property &property)
+{
+	const std::string &key = property.get_key();
+	const std::string &value = property.get_value();
+
+	if (key == "hours") {
+		this->hours = std::stoi(value);
+	} else {
+		throw std::runtime_error("Invalid scheduled time period scope: \"" + key + "\".");
+	}
+}
+
+void scheduled_time_period::process_sml_scope(const sml_data &scope)
+{
+	throw std::runtime_error("Invalid scheduled time period scope: \"" + scope.get_tag() + "\".");
 }
 
 }

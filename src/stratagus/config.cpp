@@ -43,8 +43,6 @@
 #include "quest/campaign.h"
 #include "script/trigger.h"
 #include "sound/sound.h"
-#include "time/season_schedule.h"
-#include "time/time_of_day_schedule.h"
 #include "ui/button.h"
 #include "unit/unit_type.h"
 #include "util/util.h"
@@ -248,11 +246,6 @@ void CConfigData::ProcessConfigData(const std::vector<CConfigData *> &config_dat
 			if (!define_only) {
 				plane->ProcessConfigData(config_data);
 			}
-		} else if (config_data->Tag == "season_schedule") {
-			season_schedule *season_schedule = season_schedule::get_or_add(ident, nullptr);
-			if (!define_only) {
-				season_schedule->ProcessConfigData(config_data);
-			}
 		} else if (config_data->Tag == "site") {
 			wyrmgus::site *site = wyrmgus::site::get_or_add(ident, nullptr);
 			if (!define_only) {
@@ -262,11 +255,6 @@ void CConfigData::ProcessConfigData(const std::vector<CConfigData *> &config_dat
 			wyrmgus::terrain_type *terrain_type = wyrmgus::terrain_type::get_or_add(ident, nullptr);
 			if (!define_only) {
 				terrain_type->ProcessConfigData(config_data);
-			}
-		} else if (config_data->Tag == "time_of_day_schedule") {
-			time_of_day_schedule *time_of_day_schedule = time_of_day_schedule::get_or_add(ident, nullptr);
-			if (!define_only) {
-				time_of_day_schedule->ProcessConfigData(config_data);
 			}
 		} else if (config_data->Tag == "unit_type") {
 			wyrmgus::unit_type *unit_type = wyrmgus::unit_type::get_or_add(ident, nullptr);

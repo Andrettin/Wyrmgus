@@ -28,10 +28,8 @@
 
 #include "time/time_of_day_schedule.h"
 
-#include "config.h"
 #include "time/season.h"
 #include "time/time_of_day.h"
-#include "util/string_conversion_util.h"
 
 namespace wyrmgus {
 
@@ -41,54 +39,44 @@ time_of_day_schedule::time_of_day_schedule(const std::string &identifier) : time
 
 time_of_day_schedule::~time_of_day_schedule()
 {
-	for (size_t i = 0; i < this->ScheduledTimesOfDay.size(); ++i) {
-		delete this->ScheduledTimesOfDay[i];
+}
+
+void time_of_day_schedule::process_sml_scope(const sml_data &scope)
+{
+	const std::string &tag = scope.get_tag();
+
+	if (tag == "scheduled_times_of_day") {
+		scope.for_each_child([&](const sml_data &child_scope) {
+			const std::string &child_tag = child_scope.get_tag();
+			const time_of_day *time_of_day = time_of_day::get(child_tag);
+			const size_t index = this->scheduled_times_of_day.size();
+			auto scheduled_season = std::make_unique<wyrmgus::scheduled_time_of_day>(index, time_of_day, this);
+			database::process_sml_data(scheduled_season, child_scope);
+			this->scheduled_times_of_day.push_back(std::move(scheduled_season));
+		});
+	} else {
+		data_entry::process_sml_scope(scope);
 	}
 }
 
 void time_of_day_schedule::initialize()
 {
 	unsigned long total_hours = 0;
-	for (const scheduled_time_of_day *time_of_day : this->ScheduledTimesOfDay) {
-		total_hours += time_of_day->GetHours();
+	for (const std::unique_ptr<scheduled_time_of_day> &time_of_day : this->get_scheduled_times_of_day()) {
+		total_hours += time_of_day->get_hours(nullptr);
 	}
 	this->set_total_hours(total_hours);
+
+	this->CalculateHourMultiplier();
 
 	data_entry::initialize();
 }
 
-/**
-**	@brief	Process data provided by a configuration file
-**
-**	@param	config_data	The configuration data
-*/
-void time_of_day_schedule::ProcessConfigData(const CConfigData *config_data)
+void time_of_day_schedule::check() const
 {
-	for (size_t i = 0; i < config_data->Properties.size(); ++i) {
-		std::string key = config_data->Properties[i].first;
-		std::string value = config_data->Properties[i].second;
-		
-		if (key == "name") {
-			this->set_name(value);
-		} else {
-			fprintf(stderr, "Invalid time of day schedule property: \"%s\".\n", key.c_str());
-		}
+	for (const std::unique_ptr<scheduled_time_of_day> &time_of_day : this->get_scheduled_times_of_day()) {
+		time_of_day->check();
 	}
-	
-	for (const CConfigData *child_config_data : config_data->Children) {
-		if (child_config_data->Tag == "scheduled_time_of_day") {
-			scheduled_time_of_day *scheduled_time_of_day = new wyrmgus::scheduled_time_of_day;
-			scheduled_time_of_day->ID = this->ScheduledTimesOfDay.size();
-			scheduled_time_of_day->Schedule = this;
-			this->ScheduledTimesOfDay.push_back(scheduled_time_of_day);
-			
-			scheduled_time_of_day->ProcessConfigData(child_config_data);
-		} else {
-			fprintf(stderr, "Invalid time of day schedule property: \"%s\".\n", child_config_data->Tag.c_str());
-		}
-	}
-	
-	this->CalculateHourMultiplier();
 }
 
 /**
@@ -111,66 +99,30 @@ int time_of_day_schedule::GetDefaultHourMultiplier() const
 	return 1;
 }
 
-/**
-**	@brief	Process data provided by a configuration file
-**
-**	@param	config_data	The configuration data
-*/
-void scheduled_time_of_day::ProcessConfigData(const CConfigData *config_data)
+void scheduled_time_of_day::process_sml_scope(const sml_data &scope)
 {
-	for (size_t i = 0; i < config_data->Properties.size(); ++i) {
-		std::string key = config_data->Properties[i].first;
-		std::string value = config_data->Properties[i].second;
-		
-		if (key == "time_of_day") {
-			this->TimeOfDay = wyrmgus::time_of_day::get(value);
-		} else if (key == "hours") {
-			this->Hours = std::stoi(value);
-		} else {
-			fprintf(stderr, "Invalid scheduled time of day property: \"%s\".\n", key.c_str());
-		}
-	}
-	
-	for (const CConfigData *child_config_data : config_data->Children) {
-		if (child_config_data->Tag == "season_hours") {
-			wyrmgus::season *season = nullptr;
-			int season_hours = 0;
-			
-			for (size_t j = 0; j < child_config_data->Properties.size(); ++j) {
-				std::string key = child_config_data->Properties[j].first;
-				std::string value = child_config_data->Properties[j].second;
-				
-				if (key == "season") {
-					season = wyrmgus::season::get(value);
-				} else if (key == "hours") {
-					season_hours = std::stoi(value);
-				} else {
-					fprintf(stderr, "Invalid season hours for scheduled time of day property: \"%s\".\n", key.c_str());
-				}
+	const std::string &tag = scope.get_tag();
+
+	if (tag == "season_hours") {
+		scope.for_each_property([&](const sml_property &property) {
+			const std::string &key = property.get_key();
+			const std::string &value = property.get_value();
+
+			const season *season = season::get(key);
+			const unsigned hours = std::stoul(value);
+
+			if (season == nullptr) {
+				throw std::runtime_error("Season hours for scheduled time of day has no valid season.");
 			}
-			
-			if (!season) {
-				fprintf(stderr, "Season hours for scheduled time of day has no valid season.\n");
-				continue;
+
+			if (hours == 0) {
+				throw std::runtime_error("Season hours for scheduled time of day has no valid amount of hours.");
 			}
-			
-			if (season_hours <= 0) {
-				fprintf(stderr, "Season hours for scheduled time of day has no valid amount of hours.\n");
-				continue;
-			}
-			
-			this->SeasonHours[season] = season_hours;
-		} else {
-			fprintf(stderr, "Invalid scheduled time of day property: \"%s\".\n", child_config_data->Tag.c_str());
-		}
-	}
-	
-	if (!this->TimeOfDay) {
-		fprintf(stderr, "Scheduled time of day has no valid time of day.\n");
-	}
-	
-	if (this->Hours <= 0) {
-		fprintf(stderr, "Scheduled time of day has no valid amount of hours.\n");
+
+			this->season_hours[season] = hours;
+		});
+	} else {
+		scheduled_time_period::process_sml_scope(scope);
 	}
 }
 
@@ -181,17 +133,17 @@ void scheduled_time_of_day::ProcessConfigData(const CConfigData *config_data)
 **
 **	@return	The amount of hours
 */
-int scheduled_time_of_day::GetHours(const wyrmgus::season *season) const
+unsigned scheduled_time_of_day::get_hours(const wyrmgus::season *season) const
 {
 	if (season != nullptr) {
-		auto find_iterator = this->SeasonHours.find(season);
+		const auto find_iterator = this->season_hours.find(season);
 		
-		if (find_iterator != this->SeasonHours.end()) {
+		if (find_iterator != this->season_hours.end()) {
 			return find_iterator->second;
 		}
 	}
 	
-	return this->Hours;
+	return scheduled_time_period::get_hours();
 }
 
 }

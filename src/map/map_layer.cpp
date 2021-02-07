@@ -298,14 +298,14 @@ void CMapLayer::DecrementRemainingTimeOfDayHours()
 */
 void CMapLayer::IncrementTimeOfDay()
 {
-	unsigned current_time_of_day_id = this->time_of_day->ID;
+	size_t current_time_of_day_id = this->time_of_day->get_index();
 	current_time_of_day_id++;
-	if (current_time_of_day_id >= this->get_time_of_day_schedule()->ScheduledTimesOfDay.size()) {
+	if (current_time_of_day_id >= this->get_time_of_day_schedule()->get_scheduled_times_of_day().size()) {
 		current_time_of_day_id = 0;
 	}
 	
-	this->SetTimeOfDay(this->get_time_of_day_schedule()->ScheduledTimesOfDay[current_time_of_day_id]);
-	this->RemainingTimeOfDayHours += this->time_of_day->GetHours(this->GetSeason());
+	this->SetTimeOfDay(this->get_time_of_day_schedule()->get_scheduled_times_of_day()[current_time_of_day_id].get());
+	this->RemainingTimeOfDayHours += this->time_of_day->get_hours(this->GetSeason());
 }
 
 /**
@@ -320,8 +320,8 @@ void CMapLayer::SetTimeOfDayByHours(const unsigned long long hours)
 	}
 	
 	int remaining_hours = hours % this->get_time_of_day_schedule()->get_total_hours();
-	this->SetTimeOfDay(this->get_time_of_day_schedule()->ScheduledTimesOfDay.front());
-	this->RemainingTimeOfDayHours = this->time_of_day->GetHours(this->GetSeason());
+	this->SetTimeOfDay(this->get_time_of_day_schedule()->get_scheduled_times_of_day().front().get());
+	this->RemainingTimeOfDayHours = this->time_of_day->get_hours(this->GetSeason());
 	this->RemainingTimeOfDayHours -= remaining_hours;
 	
 	while (this->RemainingTimeOfDayHours <= 0) {
@@ -343,8 +343,8 @@ void CMapLayer::SetTimeOfDay(const scheduled_time_of_day *time_of_day)
 	const scheduled_time_of_day *old_time_of_day = this->time_of_day;
 	this->time_of_day = time_of_day;
 	
-	const bool is_day_changed = (this->time_of_day && this->time_of_day->TimeOfDay->is_day()) != (old_time_of_day && old_time_of_day->TimeOfDay->is_day());
-	const bool is_night_changed = (this->time_of_day && this->time_of_day->TimeOfDay->is_night()) != (old_time_of_day && old_time_of_day->TimeOfDay->is_night());
+	const bool is_day_changed = (this->time_of_day && this->time_of_day->get_time_of_day()->is_day()) != (old_time_of_day && old_time_of_day->get_time_of_day()->is_day());
+	const bool is_night_changed = (this->time_of_day && this->time_of_day->get_time_of_day()->is_night()) != (old_time_of_day && old_time_of_day->get_time_of_day()->is_night());
 	
 	//update the sight of all units
 	if (is_day_changed || is_night_changed) {
@@ -369,13 +369,13 @@ void CMapLayer::SetTimeOfDay(const scheduled_time_of_day *time_of_day)
 **
 **	@return	The map layer's current time of day
 */
-wyrmgus::time_of_day *CMapLayer::GetTimeOfDay() const
+const wyrmgus::time_of_day *CMapLayer::GetTimeOfDay() const
 {
 	if (!this->time_of_day) {
 		return nullptr;
 	}
 	
-	return this->time_of_day->TimeOfDay;
+	return this->time_of_day->get_time_of_day();
 }
 
 const wyrmgus::time_of_day *CMapLayer::get_tile_time_of_day(const int tile_index) const
@@ -424,14 +424,14 @@ void CMapLayer::DecrementRemainingSeasonHours()
 */
 void CMapLayer::IncrementSeason()
 {
-	unsigned current_season_id = this->season->ID;
+	size_t current_season_id = this->season->get_index();
 	current_season_id++;
-	if (current_season_id >= this->get_season_schedule()->ScheduledSeasons.size()) {
+	if (current_season_id >= this->get_season_schedule()->get_scheduled_seasons().size()) {
 		current_season_id = 0;
 	}
 	
-	this->SetSeason(this->get_season_schedule()->ScheduledSeasons[current_season_id]);
-	this->RemainingSeasonHours += this->season->Hours;
+	this->SetSeason(this->get_season_schedule()->get_scheduled_seasons()[current_season_id].get());
+	this->RemainingSeasonHours += this->season->get_hours();
 }
 
 /**
@@ -446,8 +446,8 @@ void CMapLayer::SetSeasonByHours(const unsigned long long hours)
 	}
 	
 	int remaining_hours = hours % this->get_season_schedule()->get_total_hours();
-	this->SetSeason(this->get_season_schedule()->ScheduledSeasons.front());
-	this->RemainingSeasonHours = this->season->Hours;
+	this->SetSeason(this->get_season_schedule()->get_scheduled_seasons().front().get());
+	this->RemainingSeasonHours = this->season->get_hours();
 	this->RemainingSeasonHours -= remaining_hours;
 	
 	while (this->RemainingSeasonHours <= 0) {
@@ -461,8 +461,8 @@ void CMapLayer::SetSeason(const scheduled_season *season)
 		return;
 	}
 	
-	wyrmgus::season *old_season = this->season ? this->season->Season : nullptr;
-	wyrmgus::season *new_season = season ? season->Season : nullptr;
+	const wyrmgus::season *old_season = this->season ? this->season->get_season() : nullptr;
+	const wyrmgus::season *new_season = season ? season->get_season() : nullptr;
 	
 	this->season = season;
 	
@@ -497,13 +497,13 @@ void CMapLayer::SetSeason(const scheduled_season *season)
 **
 **	@return	The map layer's current season
 */
-wyrmgus::season *CMapLayer::GetSeason() const
+const wyrmgus::season *CMapLayer::GetSeason() const
 {
 	if (!this->season) {
 		return nullptr;
 	}
 	
-	return this->season->Season;
+	return this->season->get_season();
 }
 
 const wyrmgus::season *CMapLayer::get_tile_season(const int tile_index) const

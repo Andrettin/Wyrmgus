@@ -37,19 +37,36 @@ class season;
 class time_of_day;
 class time_of_day_schedule;
 
-class scheduled_time_of_day final
+class scheduled_time_of_day final : public scheduled_time_period
 {
 public:
-	void ProcessConfigData(const CConfigData *config_data);
-	int GetHours(const wyrmgus::season *season = nullptr) const;
-	
-	unsigned ID = 0;							/// the scheduled time of day's ID within the time of day schedule
-	wyrmgus::time_of_day *TimeOfDay = nullptr;	/// the time of day that is scheduled
+	explicit scheduled_time_of_day(const size_t index, const wyrmgus::time_of_day *time_of_day, const time_of_day_schedule *schedule)
+		: scheduled_time_period(index), time_of_day(time_of_day), schedule(schedule)
+	{
+	}
+
+	virtual void process_sml_scope(const sml_data &scope) override;
+
+	virtual void check() const override
+	{
+		if (this->get_time_of_day() == nullptr) {
+			throw std::runtime_error("Scheduled time of day has no time of day.");
+		}
+
+		scheduled_time_period::check();
+	}
+
+	const wyrmgus::time_of_day *get_time_of_day() const
+	{
+		return this->time_of_day;
+	}
+
+	unsigned get_hours(const wyrmgus::season *season) const;
+
 private:
-	int Hours = 0;								/// the amount of hours the scheduled time of day lasts
-public:
-	time_of_day_schedule *Schedule = nullptr;		/// the schedule to which this time of day belongs
-	std::map<const wyrmgus::season *, int> SeasonHours;	/// the amount of hours the scheduled time of day lasts in a given season
+	const wyrmgus::time_of_day *time_of_day = nullptr;
+	const time_of_day_schedule *schedule = nullptr;
+	std::map<const wyrmgus::season *, unsigned> season_hours; //the amount of hours the scheduled time of day lasts in a given season
 };
 
 class time_of_day_schedule final : public time_period_schedule, public data_type<time_of_day_schedule>
@@ -63,13 +80,20 @@ public:
 	explicit time_of_day_schedule(const std::string &identifier);
 	~time_of_day_schedule();
 
+	virtual void process_sml_scope(const sml_data &scope) override;
 	virtual void initialize() override;
-	
-	virtual void ProcessConfigData(const CConfigData *config_data) override;
+	virtual void check() const override;
+
 	virtual unsigned long GetDefaultTotalHours() const override;
 	virtual int GetDefaultHourMultiplier() const override;
 
-	std::vector<scheduled_time_of_day *> ScheduledTimesOfDay;	/// The times of day that are scheduled
+	const std::vector<std::unique_ptr<scheduled_time_of_day>> &get_scheduled_times_of_day() const
+	{
+		return this->scheduled_times_of_day;
+	}
+
+private:
+	std::vector<std::unique_ptr<scheduled_time_of_day>> scheduled_times_of_day;
 };
 
 }

@@ -28,9 +28,7 @@
 
 #include "time/season_schedule.h"
 
-#include "config.h"
 #include "time/season.h"
-#include "util/string_conversion_util.h"
 
 namespace wyrmgus {
 
@@ -40,79 +38,44 @@ season_schedule::season_schedule(const std::string &identifier) : time_period_sc
 
 season_schedule::~season_schedule()
 {
-	for (size_t i = 0; i < this->ScheduledSeasons.size(); ++i) {
-		delete this->ScheduledSeasons[i];
+}
+
+void season_schedule::process_sml_scope(const sml_data &scope)
+{
+	const std::string &tag = scope.get_tag();
+
+	if (tag == "scheduled_seasons") {
+		scope.for_each_child([&](const sml_data &child_scope) {
+			const std::string &child_tag = child_scope.get_tag();
+			const season *season = season::get(child_tag);
+			const size_t index = this->scheduled_seasons.size();
+			auto scheduled_season = std::make_unique<wyrmgus::scheduled_season>(index, season, this);
+			database::process_sml_data(scheduled_season, child_scope);
+			this->scheduled_seasons.push_back(std::move(scheduled_season));
+		});
+	} else {
+		data_entry::process_sml_scope(scope);
 	}
 }
 
 void season_schedule::initialize()
 {
 	unsigned long total_hours = 0;
-	for (const scheduled_season *season : this->ScheduledSeasons) {
-		total_hours += season->Hours;
+	for (const std::unique_ptr<scheduled_season> &season : this->get_scheduled_seasons()) {
+		total_hours += season->get_hours();
 	}
 	this->set_total_hours(total_hours);
+
+	this->CalculateHourMultiplier();
 
 	data_entry::initialize();
 }
 
-void season_schedule::ProcessConfigData(const CConfigData *config_data)
+void season_schedule::check() const
 {
-	for (size_t i = 0; i < config_data->Properties.size(); ++i) {
-		std::string key = config_data->Properties[i].first;
-		std::string value = config_data->Properties[i].second;
-
-		if (key == "name") {
-			this->set_name(value);
-		} else if (key == "hours_per_day") {
-			this->HoursPerDay = std::stoi(value);
-		} else {
-			fprintf(stderr, "Invalid season schedule property: \"%s\".\n", key.c_str());
-		}
+	for (const std::unique_ptr<scheduled_season> &season : this->get_scheduled_seasons()) {
+		season->check();
 	}
-
-	for (const CConfigData *child_config_data : config_data->Children) {
-		if (child_config_data->Tag == "scheduled_season") {
-			wyrmgus::season *season = nullptr;
-			unsigned hours = 0;
-
-			for (size_t j = 0; j < child_config_data->Properties.size(); ++j) {
-				std::string key = child_config_data->Properties[j].first;
-				std::string value = child_config_data->Properties[j].second;
-
-				if (key == "season") {
-					season = wyrmgus::season::get(value);
-				} else if (key == "days") {
-					hours = std::stoi(value) * this->HoursPerDay;
-				} else if (key == "hours") {
-					hours = std::stoi(value);
-				} else {
-					fprintf(stderr, "Invalid scheduled season property: \"%s\".\n", key.c_str());
-				}
-			}
-
-			if (!season) {
-				fprintf(stderr, "Scheduled season has no season.\n");
-				continue;
-			}
-
-			if (hours <= 0) {
-				fprintf(stderr, "Scheduled season has no amount of time defined.\n");
-				continue;
-			}
-
-			scheduled_season *scheduled_season = new wyrmgus::scheduled_season;
-			scheduled_season->Season = season;
-			scheduled_season->Hours = hours;
-			scheduled_season->ID = this->ScheduledSeasons.size();
-			scheduled_season->Schedule = this;
-			this->ScheduledSeasons.push_back(scheduled_season);
-		} else {
-			fprintf(stderr, "Invalid season schedule property: \"%s\".\n", child_config_data->Tag.c_str());
-		}
-	}
-
-	this->CalculateHourMultiplier();
 }
 
 /**
@@ -133,6 +96,18 @@ unsigned long season_schedule::GetDefaultTotalHours() const
 int season_schedule::GetDefaultHourMultiplier() const
 {
 	return DEFAULT_DAY_MULTIPLIER_PER_YEAR;
+}
+
+void scheduled_season::process_sml_property(const sml_property &property)
+{
+	const std::string &key = property.get_key();
+	const std::string &value = property.get_value();
+
+	if (key == "days") {
+		this->set_hours(std::stoi(value) * this->schedule->get_hours_per_day());
+	} else {
+		scheduled_time_period::process_sml_property(property);;
+	}
 }
 
 }

@@ -57,11 +57,11 @@ void world_game_data::process_sml_property(const sml_property &property)
 
 		this->map_layer = CMap::get()->MapLayers[map_layer_index].get();
 	} else if (key == "time_of_day") {
-		this->time_of_day = this->world->get_time_of_day_schedule()->ScheduledTimesOfDay[std::stoi(value)];
+		this->time_of_day = this->world->get_time_of_day_schedule()->get_scheduled_times_of_day()[std::stoi(value)].get();
 	} else if (key == "remaining_time_of_day_hours") {
 		this->remaining_time_of_day_hours = std::stoi(value);
 	} else if (key == "season") {
-		this->season = this->world->get_season_schedule()->ScheduledSeasons[std::stoi(value)];
+		this->season = this->world->get_season_schedule()->get_scheduled_seasons()[std::stoi(value)].get();
 	} else if (key == "remaining_season_hours") {
 		this->remaining_season_hours = std::stoi(value);
 	} else {
@@ -92,9 +92,9 @@ sml_data world_game_data::to_sml_data() const
 		data.add_property("map_layer", std::to_string(this->map_layer->ID));
 	}
 
-	data.add_property("time_of_day", std::to_string(this->time_of_day->ID));
+	data.add_property("time_of_day", std::to_string(this->time_of_day->get_index()));
 	data.add_property("remaining_time_of_day_hours", std::to_string(this->remaining_time_of_day_hours));
-	data.add_property("season", std::to_string(this->season->ID));
+	data.add_property("season", std::to_string(this->season->get_index()));
 	data.add_property("remaining_season_hours", std::to_string(this->remaining_season_hours));
 
 	return data;
@@ -143,14 +143,14 @@ void world_game_data::decrement_remaining_time_of_day_hours()
 
 void world_game_data::increment_time_of_day()
 {
-	unsigned current_time_of_day_id = this->time_of_day->ID;
+	size_t current_time_of_day_id = this->time_of_day->get_index();
 	current_time_of_day_id++;
-	if (current_time_of_day_id >= this->world->get_time_of_day_schedule()->ScheduledTimesOfDay.size()) {
+	if (current_time_of_day_id >= this->world->get_time_of_day_schedule()->get_scheduled_times_of_day().size()) {
 		current_time_of_day_id = 0;
 	}
 
-	this->set_time_of_day(this->world->get_time_of_day_schedule()->ScheduledTimesOfDay[current_time_of_day_id]);
-	this->remaining_time_of_day_hours += this->time_of_day->GetHours(this->get_season());
+	this->set_time_of_day(this->world->get_time_of_day_schedule()->get_scheduled_times_of_day()[current_time_of_day_id].get());
+	this->remaining_time_of_day_hours += this->time_of_day->get_hours(this->get_season());
 }
 
 /**
@@ -163,8 +163,8 @@ void world_game_data::set_time_of_day_by_hours(const unsigned long long hours)
 	}
 
 	int remaining_hours = hours % this->world->get_time_of_day_schedule()->get_total_hours();
-	this->set_time_of_day(this->world->get_time_of_day_schedule()->ScheduledTimesOfDay.front());
-	this->remaining_time_of_day_hours = this->time_of_day->GetHours(this->get_season());
+	this->set_time_of_day(this->world->get_time_of_day_schedule()->get_scheduled_times_of_day().front().get());
+	this->remaining_time_of_day_hours = this->time_of_day->get_hours(this->get_season());
 	this->remaining_time_of_day_hours -= remaining_hours;
 
 	while (this->remaining_time_of_day_hours <= 0) {
@@ -181,8 +181,8 @@ void world_game_data::set_time_of_day(const scheduled_time_of_day *time_of_day)
 	const scheduled_time_of_day *old_time_of_day = this->time_of_day;
 	this->time_of_day = time_of_day;
 
-	const bool is_day_changed = (this->time_of_day && this->time_of_day->TimeOfDay->is_day()) != (old_time_of_day && old_time_of_day->TimeOfDay->is_day());
-	const bool is_night_changed = (this->time_of_day && this->time_of_day->TimeOfDay->is_night()) != (old_time_of_day && old_time_of_day->TimeOfDay->is_night());
+	const bool is_day_changed = (this->time_of_day && this->time_of_day->get_time_of_day()->is_day()) != (old_time_of_day && old_time_of_day->get_time_of_day()->is_day());
+	const bool is_night_changed = (this->time_of_day && this->time_of_day->get_time_of_day()->is_night()) != (old_time_of_day && old_time_of_day->get_time_of_day()->is_night());
 
 	//update the sight of all units
 	if (is_day_changed || is_night_changed) {
@@ -218,7 +218,7 @@ const time_of_day *world_game_data::get_time_of_day() const
 		return nullptr;
 	}
 
-	return this->time_of_day->TimeOfDay;
+	return this->time_of_day->get_time_of_day();
 }
 
 void world_game_data::decrement_remaining_season_hours()
@@ -236,14 +236,14 @@ void world_game_data::decrement_remaining_season_hours()
 
 void world_game_data::increment_season()
 {
-	unsigned current_season_id = this->season->ID;
+	size_t current_season_id = this->season->get_index();
 	current_season_id++;
-	if (current_season_id >= this->world->get_season_schedule()->ScheduledSeasons.size()) {
+	if (current_season_id >= this->world->get_season_schedule()->get_scheduled_seasons().size()) {
 		current_season_id = 0;
 	}
 
-	this->set_season(this->world->get_season_schedule()->ScheduledSeasons[current_season_id]);
-	this->remaining_season_hours += this->season->Hours;
+	this->set_season(this->world->get_season_schedule()->get_scheduled_seasons()[current_season_id].get());
+	this->remaining_season_hours += this->season->get_hours();
 }
 
 /**
@@ -258,8 +258,8 @@ void world_game_data::set_season_by_hours(const unsigned long long hours)
 	}
 
 	int remaining_hours = hours % this->world->get_season_schedule()->get_total_hours();
-	this->set_season(this->world->get_season_schedule()->ScheduledSeasons.front());
-	this->remaining_season_hours = this->season->Hours;
+	this->set_season(this->world->get_season_schedule()->get_scheduled_seasons().front().get());
+	this->remaining_season_hours = this->season->get_hours();
 	this->remaining_season_hours -= remaining_hours;
 
 	while (this->remaining_season_hours <= 0) {
@@ -273,8 +273,8 @@ void world_game_data::set_season(const scheduled_season *season)
 		return;
 	}
 
-	wyrmgus::season *old_season = this->season ? this->season->Season : nullptr;
-	wyrmgus::season *new_season = season ? season->Season : nullptr;
+	const wyrmgus::season *old_season = this->season ? this->season->get_season() : nullptr;
+	const wyrmgus::season *new_season = season ? season->get_season() : nullptr;
 
 	this->season = season;
 
@@ -319,11 +319,11 @@ void world_game_data::set_season(const scheduled_season *season)
 
 const wyrmgus::season *world_game_data::get_season() const
 {
-	if (!this->season) {
+	if (this->season == nullptr) {
 		return nullptr;
 	}
 
-	return this->season->Season;
+	return this->season->get_season();
 }
 
 }

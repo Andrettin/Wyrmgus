@@ -35,18 +35,40 @@ namespace wyrmgus {
 class season;
 class season_schedule;
 
-class scheduled_season final
+class scheduled_season final : public scheduled_time_period
 {
 public:
-	unsigned ID = 0;						/// the scheduled season's ID within the season schedule
-	wyrmgus::season *Season = nullptr;				/// the season that is scheduled
-	unsigned Hours = 0;						/// the amount of hours the scheduled season lasts
-	season_schedule *Schedule = nullptr;	/// the schedule to which this season belongs
+	explicit scheduled_season(const size_t index, const wyrmgus::season *season, const season_schedule *schedule)
+		: scheduled_time_period(index), season(season), schedule(schedule)
+	{
+	}
+
+	virtual void process_sml_property(const sml_property &property) override;
+
+	virtual void check() const override
+	{
+		if (this->get_season() == nullptr) {
+			throw std::runtime_error("Scheduled season has no season.");
+		}
+
+		scheduled_time_period::check();
+	}
+
+	const wyrmgus::season *get_season() const
+	{
+		return this->season;
+	}
+
+private:
+	const wyrmgus::season *season = nullptr;
+	const season_schedule *schedule = nullptr;
 };
 
 class season_schedule final : public time_period_schedule, public data_type<season_schedule>
 {
 	Q_OBJECT
+
+	Q_PROPERTY(unsigned hours_per_day MEMBER hours_per_day)
 
 public:
 	static constexpr const char *class_identifier = "season_schedule";
@@ -55,15 +77,26 @@ public:
 	explicit season_schedule(const std::string &identifier);
 	~season_schedule();
 
-
+	virtual void process_sml_scope(const sml_data &scope) override;
 	virtual void initialize() override;
+	virtual void check() const override;
 
-	virtual void ProcessConfigData(const CConfigData *config_data) override;
-	virtual unsigned long GetDefaultTotalHours() const;
-	virtual int GetDefaultHourMultiplier() const;
+	unsigned get_hours_per_day() const
+	{
+		return this->hours_per_day;
+	}
 
-	unsigned HoursPerDay = DEFAULT_HOURS_PER_DAY;		/// The hours per each day for this season schedule
-	std::vector<scheduled_season *> ScheduledSeasons;	/// The seasons that are scheduled
+	virtual unsigned long GetDefaultTotalHours() const override;
+	virtual int GetDefaultHourMultiplier() const override;
+
+	const std::vector<std::unique_ptr<scheduled_season>> &get_scheduled_seasons() const
+	{
+		return this->scheduled_seasons;
+	}
+
+private:
+	unsigned hours_per_day = DEFAULT_HOURS_PER_DAY; //the hours per each day for this season schedule
+	std::vector<std::unique_ptr<scheduled_season>> scheduled_seasons;
 };
 
 }

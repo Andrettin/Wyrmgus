@@ -157,8 +157,8 @@ static int CclStratagusMap(lua_State *l)
 							map_layer->set_time_of_day_schedule(nullptr);
 						}
 						unsigned time_of_day = LuaToNumber(l, -1, 2);
-						if (map_layer->get_time_of_day_schedule() != nullptr && time_of_day < map_layer->get_time_of_day_schedule()->ScheduledTimesOfDay.size()) {
-							map_layer->time_of_day = map_layer->get_time_of_day_schedule()->ScheduledTimesOfDay[time_of_day];
+						if (map_layer->get_time_of_day_schedule() != nullptr && time_of_day < map_layer->get_time_of_day_schedule()->get_scheduled_times_of_day().size()) {
+							map_layer->time_of_day = map_layer->get_time_of_day_schedule()->get_scheduled_times_of_day()[time_of_day].get();
 						}
 						map_layer->RemainingTimeOfDayHours = LuaToNumber(l, -1, 3);
 						lua_pop(l, 1);
@@ -177,8 +177,8 @@ static int CclStratagusMap(lua_State *l)
 						lua_rawgeti(l, -1, z + 1);
 						CMap::Map.MapLayers[z]->set_season_schedule(season_schedule::try_get(LuaToString(l, -1, 1)));
 						unsigned season = LuaToNumber(l, -1, 2);
-						if (CMap::Map.MapLayers[z]->get_season_schedule() && season < CMap::Map.MapLayers[z]->get_season_schedule()->ScheduledSeasons.size()) {
-							CMap::Map.MapLayers[z]->season = CMap::Map.MapLayers[z]->get_season_schedule()->ScheduledSeasons[season];
+						if (CMap::Map.MapLayers[z]->get_season_schedule() && season < CMap::Map.MapLayers[z]->get_season_schedule()->get_scheduled_seasons().size()) {
+							CMap::Map.MapLayers[z]->season = CMap::Map.MapLayers[z]->get_season_schedule()->get_scheduled_seasons()[season].get();
 						}
 						CMap::Map.MapLayers[z]->RemainingSeasonHours = LuaToNumber(l, -1, 3);
 						lua_pop(l, 1);
