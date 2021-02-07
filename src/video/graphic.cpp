@@ -26,7 +26,6 @@
 //      along with this program; if not, write to the Free Software
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
-//
 
 #include "stratagus.h"
 
@@ -48,7 +47,6 @@
 //Wyrmgus start
 #include "unit/unit.h" //for using CPreference
 //Wyrmgus end
-#include "util/exception_util.h"
 #include "util/image_util.h"
 #include "util/point_util.h"
 #include "video/video.h"
@@ -478,7 +476,7 @@ std::shared_ptr<CGraphic> CGraphic::New(const std::string &filepath, const int w
 	std::unique_lock<std::shared_mutex> lock(CGraphic::mutex);
 
 	if (filepath.empty()) {
-		exception::throw_with_trace(std::runtime_error("CGraphic::New() called with an empty filepath."));
+		throw std::runtime_error("CGraphic::New() called with an empty filepath.");
 	}
 
 	const std::string library_filepath = LibraryFileName(filepath.c_str());
@@ -492,7 +490,7 @@ std::shared_ptr<CGraphic> CGraphic::New(const std::string &filepath, const int w
 
 	auto g = std::make_shared<CGraphic>(library_filepath);
 	if (!g) {
-		exception::throw_with_trace(std::runtime_error("Out of memory"));
+		throw std::runtime_error("Out of memory");
 	}
 
 	// FIXME: use a constructor for this
@@ -519,7 +517,7 @@ std::shared_ptr<CPlayerColorGraphic> CPlayerColorGraphic::New(const std::string 
 	std::unique_lock<std::shared_mutex> lock(CGraphic::mutex);
 
 	if (filepath.empty()) {
-		exception::throw_with_trace(std::runtime_error("CPlayerColorGraphic::New() called with an empty filepath."));
+		throw std::runtime_error("CPlayerColorGraphic::New() called with an empty filepath.");
 	}
 
 	const std::string file = LibraryFileName(filepath.c_str());
@@ -532,7 +530,7 @@ std::shared_ptr<CPlayerColorGraphic> CPlayerColorGraphic::New(const std::string 
 		auto pcg = std::dynamic_pointer_cast<CPlayerColorGraphic>(g);
 
 		if (pcg == nullptr) {
-			exception::throw_with_trace(std::runtime_error("Tried to create player color graphic \"" + file + "\", but it has already been created as a non-player color graphic."));
+			throw std::runtime_error("Tried to create player color graphic \"" + file + "\", but it has already been created as a non-player color graphic.");
 		}
 
 		return pcg;
@@ -540,7 +538,7 @@ std::shared_ptr<CPlayerColorGraphic> CPlayerColorGraphic::New(const std::string 
 
 	auto g = std::make_shared<CPlayerColorGraphic>(file, conversible_player_color);
 	if (!g) {
-		exception::throw_with_trace(std::runtime_error("Out of memory"));
+		throw std::runtime_error("Out of memory");
 	}
 
 	// FIXME: use a constructor for this
@@ -801,7 +799,7 @@ void CGraphic::Load(const bool create_grayscale_textures, const int scale_factor
 
 	// TODO: More formats?
 	if (LoadGraphicPNG(this, scale_factor) == -1) {
-		exception::throw_with_trace(std::runtime_error("Can't load the graphic \"" + this->get_filepath().string() + "\"."));
+		throw std::runtime_error("Can't load the graphic \"" + this->get_filepath().string() + "\".");
 	}
 
 	if (this->custom_scale_factor != 1) {
@@ -824,7 +822,7 @@ void CGraphic::Load(const bool create_grayscale_textures, const int scale_factor
 
 	if ((GraphicWidth / Width) * Width != GraphicWidth ||
 		(GraphicHeight / Height) * Height != GraphicHeight) {
-		exception::throw_with_trace(std::runtime_error("Invalid graphic (width, height) " + this->get_filepath().string() + "; Expected: (" + std::to_string(this->Width) + ", " + std::to_string(this->Height) + ")  Found: (" + std::to_string(this->GraphicWidth) + ", " + std::to_string(this->GraphicHeight) + ")"));
+		throw std::runtime_error("Invalid graphic (width, height) " + this->get_filepath().string() + "; Expected: (" + std::to_string(this->Width) + ", " + std::to_string(this->Height) + ")  Found: (" + std::to_string(this->GraphicWidth) + ", " + std::to_string(this->GraphicHeight) + ")");
 	}
 
 	NumFrames = GraphicWidth / Width * GraphicHeight / Height;
@@ -965,7 +963,7 @@ void MakeTextures2(const QImage &image, GLuint texture, const int ow, const int 
 
 	GLenum error_code = glGetError();
 	if (error_code != GL_NO_ERROR) {
-		exception::throw_with_trace(std::runtime_error("glBindTexture failed with error code " + std::to_string(error_code) + "."));
+		throw std::runtime_error("glBindTexture failed with error code " + std::to_string(error_code) + ".");
 	}
 
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
@@ -985,14 +983,14 @@ void MakeTextures2(const QImage &image, GLuint texture, const int ow, const int 
 	}
 
 	if (image.isNull()) {
-		exception::throw_with_trace(std::runtime_error("Cannot generate a texture for a null image."));
+		throw std::runtime_error("Cannot generate a texture for a null image.");
 	}
 
 	const int depth = image.depth();
 	const int bpp = depth / 8;
 
 	if (bpp != 4) {
-		exception::throw_with_trace(std::runtime_error("The image BPP must be 4 for generating textures."));
+		throw std::runtime_error("The image BPP must be 4 for generating textures.");
 	}
 
 	const unsigned char *image_data = image.constBits();
@@ -1040,7 +1038,7 @@ void MakeTextures2(const QImage &image, GLuint texture, const int ow, const int 
 
 	error_code = glGetError();
 	if (error_code != GL_NO_ERROR) {
-		exception::throw_with_trace(std::runtime_error("glTexImage2D failed with error code " + std::to_string(error_code) + "."));
+		throw std::runtime_error("glTexImage2D failed with error code " + std::to_string(error_code) + ".");
 	}
 }
 
@@ -1091,7 +1089,7 @@ static void MakeTextures(CGraphic *g, const bool grayscale, const wyrmgus::playe
 
 	const GLenum error_code = glGetError();
 	if (error_code != GL_NO_ERROR) {
-		exception::throw_with_trace(std::runtime_error("glGenTextures failed with error code " + std::to_string(error_code) + "."));
+		throw std::runtime_error("glGenTextures failed with error code " + std::to_string(error_code) + ".");
 	}
 
 	QImage image = g->get_image();
@@ -1109,7 +1107,7 @@ static void MakeTextures(CGraphic *g, const bool grayscale, const wyrmgus::playe
 		const int bpp = image.depth() / 8;
 
 		if (bpp < 3) {
-			exception::throw_with_trace(std::runtime_error("Image BPP must be at least 3."));
+			throw std::runtime_error("Image BPP must be at least 3.");
 		}
 
 		unsigned char *image_data = image.bits();
@@ -1316,7 +1314,7 @@ const wyrmgus::player_color *CGraphic::get_conversible_player_color() const
 CFiller &CFiller::operator =(const CFiller &other_filler)
 {
 	if (other_filler.G == nullptr) {
-		exception::throw_with_trace(std::runtime_error("Tried to create a copy of a UI filler which has no graphics."));
+		throw std::runtime_error("Tried to create a copy of a UI filler which has no graphics.");
 	}
 
 	this->G = other_filler.G;

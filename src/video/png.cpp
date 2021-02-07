@@ -25,7 +25,6 @@
 //      along with this program; if not, write to the Free Software
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
-//
 
 #include "stratagus.h"
 
@@ -38,7 +37,6 @@
 #include "map/tileset.h"
 //Wyrmgus end
 #include "ui/ui.h"
-#include "util/exception_util.h"
 #include "video/video.h"
 #include "iolib.h"
 #include "iocompat.h"
@@ -77,15 +75,15 @@ int LoadGraphicPNG(CGraphic *g, const int scale_factor)
 	g->set_filepath(filepath);
 	g->image = QImage(QString::fromStdString(filepath.string()));
 	if (g->get_image().isNull()) {
-		exception::throw_with_trace(std::runtime_error("Failed to load the \"" + filepath.string() + "\" image file."));
+		throw std::runtime_error("Failed to load the \"" + filepath.string() + "\" image file.");
 	}
 
 	if (g->get_image().width() == 0) {
-		exception::throw_with_trace(std::runtime_error("The \"" + filepath.string() + "\" image has no width."));
+		throw std::runtime_error("The \"" + filepath.string() + "\" image has no width.");
 	}
 
 	if (g->get_image().height() == 0) {
-		exception::throw_with_trace(std::runtime_error("The \"" + filepath.string() + "\" image has no width."));
+		throw std::runtime_error("The \"" + filepath.string() + "\" image has no width.");
 	}
 
 	const int bpp = g->image.depth() / 8;

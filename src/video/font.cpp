@@ -24,7 +24,6 @@
 //      along with this program; if not, write to the Free Software
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
-//
 
 #include "stratagus.h"
 
@@ -32,7 +31,6 @@
 
 #include "database/defines.h"
 #include "intern_video.h"
-#include "util/exception_util.h"
 #include "util/image_util.h"
 #include "util/util.h"
 #include "video/font_color.h"
@@ -373,7 +371,7 @@ CGraphic *font::get_font_color_graphic(const wyrmgus::font_color *font_color)
 		return find_iterator->second.get();
 	}
 
-	exception::throw_with_trace(std::runtime_error("Could not load font color \"" + font_color->get_identifier()  + "\" for font \"" + this->get_identifier() + "\"."));
+	throw std::runtime_error("Could not load font color \"" + font_color->get_identifier()  + "\" for font \"" + this->get_identifier() + "\".");
 }
 
 }

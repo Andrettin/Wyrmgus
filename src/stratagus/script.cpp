@@ -70,7 +70,6 @@
 #include "unit/unit_manager.h" //for checking units of a custom unit type and deleting them if the unit type has been removed
 #include "unit/unit_type.h"
 //Wyrmgus end
-#include "util/exception_util.h"
 #include "util/log_util.h"
 #include "util/number_util.h"
 #include "video/font.h"
@@ -146,7 +145,7 @@ static int report(int status, bool exitOnError)
 		lua_pop(Lua, 1);
 
 		if (exitOnError) {
-			exception::throw_with_trace(std::runtime_error(msg));
+			throw std::runtime_error(msg);
 		} else {
 			log::log_error(msg);
 		}
@@ -941,7 +940,7 @@ static int GetPlayerData(const int player_index, const char *prop, const char *a
 		}
 		return -1;
 	} else {
-		exception::throw_with_trace(std::runtime_error("Invalid field: \"" + std::string(prop) + "\"."));
+		throw std::runtime_error("Invalid field: \"" + std::string(prop) + "\".");
 	}
 }
 

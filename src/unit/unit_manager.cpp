@@ -23,7 +23,6 @@
 //      along with this program; if not, write to the Free Software
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
-//
 
 #include "stratagus.h"
 
@@ -65,11 +64,11 @@ void unit_manager::clean_units()
 
 	for (CUnit *unit : units) {
 		if (unit == nullptr) {
-			exception::throw_with_trace(std::runtime_error("Error cleaning unit: unit is null."));
+			throw std::runtime_error("Error cleaning unit: unit is null.");
 		}
 
 		if (unit->Type == nullptr) {
-			exception::throw_with_trace(std::runtime_error("Unit \"" + std::to_string(UnitNumber(*unit)) + "\"'s type is null."));
+			throw std::runtime_error("Unit \"" + std::to_string(UnitNumber(*unit)) + "\"'s type is null.");
 		}
 
 		if (!unit->Destroyed) {
@@ -112,11 +111,11 @@ CUnit *unit_manager::AllocUnit()
 		CUnit *unit = list::take_front(this->released_units);
 
 		if (!unit->Destroyed) {
-			exception::throw_with_trace(std::runtime_error("Fetched a non-destroyed unit from the released units list."));
+			throw std::runtime_error("Fetched a non-destroyed unit from the released units list.");
 		}
 
 		if (unit->ReleaseCycle == 0) {
-			exception::throw_with_trace(std::runtime_error("Fetched a non-released unit from the released units list."));
+			throw std::runtime_error("Fetched a non-released unit from the released units list.");
 		}
 
 		const int slot = unit->UnitManagerData.slot;
@@ -143,7 +142,7 @@ CUnit *unit_manager::AllocUnit()
 void unit_manager::ReleaseUnit(CUnit *unit)
 {
 	if (unit == nullptr) {
-		exception::throw_with_trace(std::runtime_error("Tried to call the unit manager's release unit function for a null unit."));
+		throw std::runtime_error("Tried to call the unit manager's release unit function for a null unit.");
 	}
 
 	if (this->lastCreated == unit) {
@@ -152,7 +151,7 @@ void unit_manager::ReleaseUnit(CUnit *unit)
 
 	if (unit->UnitManagerData.unitSlot != -1) { // == -1 when loading.
 		if (this->units[unit->UnitManagerData.unitSlot] != unit) {
-			exception::throw_with_trace(std::runtime_error("Unit has index \"" + std::to_string(unit->UnitManagerData.unitSlot) + "\" in the unit manager's units vector, but another unit is present there at that index."));
+			throw std::runtime_error("Unit has index \"" + std::to_string(unit->UnitManagerData.unitSlot) + "\" in the unit manager's units vector, but another unit is present there at that index.");
 		}
 
 		CUnit *temp = this->units.back();
@@ -163,7 +162,7 @@ void unit_manager::ReleaseUnit(CUnit *unit)
 	}
 
 	if (!unit->Destroyed) {
-		exception::throw_with_trace(std::runtime_error("Adding a non-destroyed unit to the released units list."));
+		throw std::runtime_error("Adding a non-destroyed unit to the released units list.");
 	}
 
 	this->released_units.push_back(unit);

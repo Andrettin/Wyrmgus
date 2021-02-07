@@ -94,7 +94,6 @@
 #include "unit/unit_type_variation.h"
 #include "upgrade/upgrade.h"
 #include "upgrade/upgrade_modifier.h"
-#include "util/exception_util.h"
 #include "util/log_util.h"
 #include "util/size_util.h"
 //Wyrmgus start
@@ -399,7 +398,7 @@ CUnit::~CUnit()
 void CUnit::Init()
 {
 	if (this->base_ref != nullptr) {
-		exception::throw_with_trace(std::runtime_error("Unit being initialized has a base reference."));
+		throw std::runtime_error("Unit being initialized has a base reference.");
 	}
 
 	this->ref.reset();
@@ -511,11 +510,11 @@ void CUnit::Init()
 void CUnit::Release(const bool final)
 {
 	if (this->ReleaseCycle != 0) {
-		exception::throw_with_trace(std::runtime_error("Unit already free."));
+		throw std::runtime_error("Unit already free.");
 	}
 
 	if (this->Type == nullptr) {
-		exception::throw_with_trace(std::runtime_error("Unit being released has no type."));
+		throw std::runtime_error("Unit being released has no type.");
 	}
 
 	if (this->Orders.size() > 1) {
@@ -545,7 +544,7 @@ void CUnit::Release(const bool final)
 		this->clear_all_orders();
 
 		if (this->get_ref_count() == 0) {
-			exception::throw_with_trace(std::runtime_error("Unit is having its base reference cleared for release, despite its reference count already being 0."));
+			throw std::runtime_error("Unit is having its base reference cleared for release, despite its reference count already being 0.");
 		}
 
 		this->clear_base_reference();
@@ -553,7 +552,7 @@ void CUnit::Release(const bool final)
 	}
 
 	if (this->get_ref_count() != 0) {
-		exception::throw_with_trace(std::runtime_error("Unit of type \"" + this->Type->get_identifier() + "\" being released despite there still being " + std::to_string(this->get_ref_count()) + " references to it."));
+		throw std::runtime_error("Unit of type \"" + this->Type->get_identifier() + "\" being released despite there still being " + std::to_string(this->get_ref_count()) + " references to it.");
 	}
 
 	//
@@ -589,12 +588,12 @@ void CUnit::Release(const bool final)
 std::shared_ptr<wyrmgus::unit_ref> CUnit::acquire_ref()
 {
 	if (this->base_ref == nullptr) {
-		exception::throw_with_trace(std::runtime_error("Tried to acquire a reference to a unit which already had its base reference cleared."));
+		throw std::runtime_error("Tried to acquire a reference to a unit which already had its base reference cleared.");
 	}
 
 	if (!SaveGameLoading) {
 		if (this->Destroyed) {
-			exception::throw_with_trace(std::runtime_error("Tried to acquire a reference to a unit which has already been destroyed."));
+			throw std::runtime_error("Tried to acquire a reference to a unit which has already been destroyed.");
 		}
 	}
 
@@ -4044,7 +4043,7 @@ startn:
 
 		if (!searched_any_tile_inside_map) {
 			//we are already fully searching outside the map, so there's no hope of finding a valid position for the unit anymore
-			exception::throw_with_trace(std::runtime_error("Failed to find position for unit of type \"" + type.get_identifier() + "\" in FindNearestDrop()."));
+			throw std::runtime_error("Failed to find position for unit of type \"" + type.get_identifier() + "\" in FindNearestDrop().");
 		}
 	}
 
@@ -5978,7 +5977,7 @@ void CUnit::ChangeUnitStockReplenishmentTimer(const wyrmgus::unit_type *unit_typ
 int CUnit::GetResourceStep(const int resource) const
 {
 	if (!this->Type->ResInfo[resource]) {
-		exception::throw_with_trace(std::runtime_error("Tried to get the resource step for resource \"" + std::to_string(resource) + "\" for a unit of type \"" + this->Type->get_identifier() + "\", which doesn't support gathering that resource."));
+		throw std::runtime_error("Tried to get the resource step for resource \"" + std::to_string(resource) + "\" for a unit of type \"" + this->Type->get_identifier() + "\", which doesn't support gathering that resource.");
 	}
 
 	int resource_step = this->Type->ResInfo[resource]->ResourceStep;
