@@ -97,12 +97,10 @@ bool tile::is_destroyed_tree_tile() const
 */
 void tile::SetTerrain(const terrain_type *terrain_type)
 {
-	if (!terrain_type) {
-		return;
-	}
+	const bool is_overlay = terrain_type != nullptr && terrain_type->is_overlay();
 
 	//remove the flags of the old terrain type
-	if (terrain_type->is_overlay()) {
+	if (is_overlay) {
 		if (this->get_overlay_terrain() == terrain_type) {
 			return;
 		}
@@ -129,7 +127,7 @@ void tile::SetTerrain(const terrain_type *terrain_type)
 		}
 	}
 
-	if (terrain_type->is_overlay()) {
+	if (is_overlay) {
 		if (this->get_terrain() == nullptr || !vector::contains(terrain_type->get_base_terrain_types(), this->get_terrain())) {
 			this->SetTerrain(terrain_type->get_base_terrain_types().front());
 		}
@@ -159,14 +157,14 @@ void tile::SetTerrain(const terrain_type *terrain_type)
 		}
 	}
 
-	if (Editor.Running == EditorNotRunning && terrain_type->SolidAnimationFrames > 0) {
-		if (terrain_type->is_overlay()) {
+	if (Editor.Running == EditorNotRunning && terrain_type != nullptr && terrain_type->SolidAnimationFrames > 0) {
+		if (is_overlay) {
 			this->OverlayAnimationFrame = SyncRand(terrain_type->SolidAnimationFrames);
 		} else {
 			this->AnimationFrame = SyncRand(terrain_type->SolidAnimationFrames);
 		}
 	} else {
-		if (terrain_type->is_overlay()) {
+		if (is_overlay) {
 			this->OverlayAnimationFrame = 0;
 		} else {
 			this->AnimationFrame = 0;
@@ -174,7 +172,10 @@ void tile::SetTerrain(const terrain_type *terrain_type)
 	}
 
 	//apply the flags from the new terrain type
-	this->Flags |= terrain_type->Flags;
+	if (terrain_type != nullptr) {
+		this->Flags |= terrain_type->Flags;
+	}
+
 	const CUnitCache &cache = this->UnitCache;
 	for (size_t i = 0; i != cache.size(); ++i) {
 		CUnit &unit = *cache[i];
@@ -198,22 +199,24 @@ void tile::SetTerrain(const terrain_type *terrain_type)
 		this->Flags |= MapFieldNoRail;
 	}
 
-	if (terrain_type->is_overlay() && (this->Flags & MapFieldUnderground) && (this->Flags & MapFieldWall)) {
+	if (is_overlay && (this->Flags & MapFieldUnderground) && (this->Flags & MapFieldWall)) {
 		//underground walls are not passable by air units
 		this->Flags |= MapFieldAirUnpassable;
 	}
 
 	//wood and rock tiles must always begin with the default value for their respective resource types
-	if (terrain_type->is_overlay() && terrain_type->get_resource() != nullptr) {
-		this->value = terrain_type->get_resource()->get_default_amount();
-	} else if ((terrain_type->Flags & MapFieldWall) && terrain_type->UnitType) {
-		this->value = terrain_type->UnitType->MapDefaultStat.Variables[HP_INDEX].Max;
+	if (is_overlay) {
+		if (terrain_type->get_resource() != nullptr) {
+			this->value = terrain_type->get_resource()->get_default_amount();
+		} else if ((terrain_type->Flags & MapFieldWall) && terrain_type->UnitType) {
+			this->value = terrain_type->UnitType->MapDefaultStat.Variables[HP_INDEX].Max;
+		}
 	}
 
 	//remove the terrain feature, unless it is a trade route and a pathway is being built over it
-	if (this->get_terrain_feature() != nullptr && (!this->get_terrain_feature()->is_trade_route() || !terrain_type->is_pathway())) {
+	if (this->get_terrain_feature() != nullptr && (!this->get_terrain_feature()->is_trade_route() || terrain_type == nullptr || !terrain_type->is_pathway())) {
 		//only remove the terrain feature if we are changing the top terrain type
-		if (terrain_type->is_overlay() || !this->get_terrain_feature()->get_terrain_type()->is_overlay()) {
+		if (is_overlay || !this->get_terrain_feature()->get_terrain_type()->is_overlay()) {
 			this->terrain_feature = nullptr;
 		}
 	}
@@ -754,7 +757,10 @@ bool tile::isAWall() const
 void tile::update_movement_cost()
 {
 	this->movement_cost = DefaultTileMovementCost; // default speed
-	this->movement_cost -= this->get_top_terrain(false, true)->get_movement_bonus();
+	const terrain_type *top_terrain = this->get_top_terrain(false, true);
+	if (top_terrain != nullptr) {
+		this->movement_cost -= top_terrain->get_movement_bonus();
+	}
 }
 
 CPlayer *tile::get_owner() const
