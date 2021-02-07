@@ -36,6 +36,13 @@
 
 namespace wyrmgus {
 
+void time_period_schedule::initialize()
+{
+	this->CalculateHourMultiplier();
+
+	data_entry::initialize();
+}
+
 /**
 **	@brief	Calculate the hour multiplier used to for the passage of in-game hours relating to this schedule
 */

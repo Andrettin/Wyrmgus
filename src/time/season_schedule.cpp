@@ -66,9 +66,7 @@ void season_schedule::initialize()
 	}
 	this->set_total_hours(total_hours);
 
-	this->CalculateHourMultiplier();
-
-	data_entry::initialize();
+	time_period_schedule::initialize();
 }
 
 void season_schedule::check() const

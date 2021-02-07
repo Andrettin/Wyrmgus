@@ -73,6 +73,8 @@ public:
 	{
 	}
 
+	virtual void initialize() override;
+
 	virtual unsigned long GetDefaultTotalHours() const = 0;
 	virtual int GetDefaultHourMultiplier() const = 0;
 	void CalculateHourMultiplier();
