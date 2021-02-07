@@ -26,7 +26,6 @@
 //      along with this program; if not, write to the Free Software
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
-//
 
 #include "stratagus.h"
 
@@ -46,7 +45,6 @@
 #include "unit/unit.h"
 #include "unit/unit_type.h"
 #include "upgrade/upgrade.h"
-#include "util/exception_util.h"
 #include "util/vector_util.h"
 
 /**
@@ -188,7 +186,7 @@ bool ButtonCheckUnitVariable(const CUnit &unit, const wyrmgus::button &button)
 		const std::string &value = button.allow_strings[i];
 		const int index = UnitTypeVar.VariableNameLookup[var.c_str()];// User variables
 		if (index == -1) {
-			exception::throw_with_trace(std::runtime_error("Bad variable name \"" + var + "\"."));
+			throw std::runtime_error("Bad variable name \"" + var + "\".");
 		}
 		int varValue = 0;
 		if (type == "Value") {
@@ -214,7 +212,7 @@ bool ButtonCheckUnitVariable(const CUnit &unit, const wyrmgus::button &button)
 			varValue = unit.GetModifiedVariable(index, VariableAttribute::Value) * 100 / unit.GetModifiedVariable(index, VariableAttribute::Max);
 			//Wyrmgus end
 		} else {
-			exception::throw_with_trace(std::runtime_error("Bad variable type \"" + type + "\"."));
+			throw std::runtime_error("Bad variable type \"" + type + "\".");
 		}
 		const int cmpValue = std::stoi(value);
 		bool cmpResult = false;
@@ -231,7 +229,7 @@ bool ButtonCheckUnitVariable(const CUnit &unit, const wyrmgus::button &button)
 		} else if (binop == "!=") {
 			cmpResult = varValue != cmpValue;
 		} else {
-			exception::throw_with_trace(std::runtime_error("Bad compare type \"" + binop + "\"."));
+			throw std::runtime_error("Bad compare type \"" + binop + "\".");
 		}
 		if (cmpResult == false) {
 			return false;

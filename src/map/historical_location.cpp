@@ -23,7 +23,6 @@
 //      along with this program; if not, write to the Free Software
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
-//
 
 #include "stratagus.h"
 
@@ -33,7 +32,6 @@
 #include "map/map.h"
 #include "map/map_template.h"
 #include "map/site.h"
-#include "util/exception_util.h"
 #include "util/util.h"
 
 namespace wyrmgus {
@@ -59,7 +57,7 @@ void historical_location::process_sml_property(const sml_property &property)
 	} else if (key == "site") {
 		this->site = site::get(value);
 	} else {
-		exception::throw_with_trace(std::runtime_error("Invalid historical location property: \"" + key + "\"."));
+		throw std::runtime_error("Invalid historical location property: \"" + key + "\".");
 	}
 }
 
@@ -72,7 +70,7 @@ void historical_location::process_sml_scope(const sml_data &scope)
 	} else if (tag == "geocoordinate") {
 		this->geocoordinate = scope.to_geocoordinate();
 	} else {
-		exception::throw_with_trace(std::runtime_error("Invalid historical location scope: \"" + scope.get_tag() + "\"."));
+		throw std::runtime_error("Invalid historical location scope: \"" + scope.get_tag() + "\".");
 	}
 }
 
@@ -115,7 +113,7 @@ void historical_location::initialize()
 void historical_location::check() const
 {
 	if (this->map_template == nullptr) {
-		exception::throw_with_trace(std::runtime_error("Historical location has no map template."));
+		throw std::runtime_error("Historical location has no map template.");
 	}
 }
 

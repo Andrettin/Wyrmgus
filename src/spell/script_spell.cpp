@@ -25,7 +25,6 @@
 //      along with this program; if not, write to the Free Software
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
-//
 
 #include "stratagus.h"
 
@@ -57,7 +56,6 @@
 #include "spell/spell_teleport.h"
 #include "unit/unit_type.h"
 #include "upgrade/upgrade.h"
-#include "util/exception_util.h"
 
 // **************************************************************************
 // Action parsers for spellAction
@@ -261,7 +259,7 @@ static void CclSpellAutocast(lua_State *l, AutoCastInfo *autocast)
 				if (!strcmp(var.c_str(), "Distance")) {
 					index = ACP_DISTANCE;
 				} else {
-					exception::throw_with_trace(std::runtime_error("Bad variable name \"" + var + "\"."));
+					throw std::runtime_error("Bad variable name \"" + var + "\".");
 				}
 			}
 			autocast->PriorityVar = index;

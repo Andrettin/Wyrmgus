@@ -23,7 +23,6 @@
 //      along with this program; if not, write to the Free Software
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
-//
 
 #include "stratagus.h"
 
@@ -46,7 +45,6 @@
 #include "unit/unit.h"
 #include "unit/unit_manager.h"
 #include "unit/unit_type.h"
-#include "util/exception_util.h"
 #include "util/vector_util.h"
 #include "video/video.h"
 
@@ -399,7 +397,7 @@ void minimap::update_territory_pixel(const int mx, const int my, const int z)
 
 		const CUnit *settlement_unit = settlement->get_game_data()->get_site_unit();
 		if (settlement_unit == nullptr) {
-			exception::throw_with_trace(std::runtime_error("Settlement \"" + settlement->get_identifier() + "\" has territory, but no settlement unit."));
+			throw std::runtime_error("Settlement \"" + settlement->get_identifier() + "\" has territory, but no settlement unit.");
 		}
 
 		const tile *settlement_center_tile = settlement_unit->get_center_tile();
@@ -497,7 +495,7 @@ uint32_t minimap::get_terrain_unit_minimap_color(const CUnit *unit, const unit_t
 			}
 			break;
 		default:
-			exception::throw_with_trace(std::runtime_error("Unexpected minimap mode: " + std::to_string(static_cast<int>(this->get_mode())) + "."));
+			throw std::runtime_error("Unexpected minimap mode: " + std::to_string(static_cast<int>(this->get_mode())) + ".");
 	}
 
 	if (!color.isValid()) {

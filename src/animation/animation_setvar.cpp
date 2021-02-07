@@ -25,7 +25,6 @@
 //      along with this program; if not, write to the Free Software
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
-//
 
 #include "stratagus.h"
 
@@ -38,7 +37,6 @@
 #include "script.h"
 #include "unit/unit.h"
 #include "unit/unit_manager.h"
-#include "util/exception_util.h"
 #include "util/string_util.h"
 
 void CAnimation_SetVar::Action(CUnit &unit, int &/*move*/, int /*scale*/) const
@@ -55,7 +53,7 @@ void CAnimation_SetVar::Action(CUnit &unit, int &/*move*/, int /*scale*/) const
 
 	const int index = UnitTypeVar.VariableNameLookup[str_list[0]]; //user variables
 	if (index == -1) {
-		exception::throw_with_trace(std::runtime_error("Bad variable name \"" + str_list[0] + "\"."));
+		throw std::runtime_error("Bad variable name \"" + str_list[0] + "\".");
 	}
 
 	const int rop = this->value;

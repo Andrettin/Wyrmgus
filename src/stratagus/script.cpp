@@ -25,7 +25,6 @@
 //      along with this program; if not, write to the Free Software
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
-//
 
 #include <csignal>
 
@@ -3662,7 +3661,7 @@ void DisableMod(const std::string &mod_file)
 void SetDLCFileEquivalency(const std::string dlc_file, const std::string replacement_file)
 {
 	if (!std::filesystem::exists(LibraryFileName(replacement_file.c_str()))) {
-		exception::throw_with_trace(std::runtime_error("DLC replacement file \"" + replacement_file + "\" does not exist."));
+		throw std::runtime_error("DLC replacement file \"" + replacement_file + "\" does not exist.");
 	}
 
 	DLCFileEquivalency[dlc_file] = replacement_file;
@@ -3678,7 +3677,7 @@ void LoadCcl(const std::string &filename, const std::string &luaArgStr)
 	CclInConfigFile = 1;
 	const std::string name = LibraryFileName(filename.c_str());
 	if (CanAccessFile(name.c_str()) == 0) {
-		exception::throw_with_trace(std::runtime_error("Maybe you need to specify another gamepath with '-d /path/to/datadir'?"));
+		throw std::runtime_error("Maybe you need to specify another gamepath with '-d /path/to/datadir'?");
 	}
 
 	ShowLoadProgress(_("Loading Script \"%s\"\n"), name.c_str());

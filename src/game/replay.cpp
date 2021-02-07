@@ -23,7 +23,6 @@
 //      along with this program; if not, write to the Free Software
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
-//
 
 #include "stratagus.h"
 
@@ -54,7 +53,6 @@
 #include "unit/unit.h"
 #include "unit/unit_manager.h"
 #include "unit/unit_type.h"
-#include "util/exception_util.h"
 #include "util/random.h"
 #include "version.h"
 
@@ -1022,7 +1020,7 @@ int SaveReplay(const std::string &filename)
 	}
 	auto buf = std::make_unique<char[]>(sb.st_size);
 	if (!buf) {
-		exception::throw_with_trace(std::runtime_error("Out of memory."));
+		throw std::runtime_error("Out of memory.");
 	}
 	fd = fopen(logfile.str().c_str(), "rb");
 	if (!fd) {

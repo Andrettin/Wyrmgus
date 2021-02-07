@@ -25,20 +25,18 @@
 //      along with this program; if not, write to the Free Software
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
-//
 
 #include "stratagus.h"
 
 #include "animation/animation_die.h"
 
 #include "unit/unit.h"
-#include "util/exception_util.h"
 
 void CAnimation_Die::Action(CUnit &unit, int &/*move*/, int /*scale*/) const
 {
 	Assert(unit.Anim.Anim == this);
 	if (unit.Anim.Unbreakable) {
-		exception::throw_with_trace(std::runtime_error("Can't call \"die\" action in unbreakable section."));
+		throw std::runtime_error("Can't call \"die\" action in unbreakable section.");
 	}
 	if (this->DeathType.empty() == false) {
 		unit.DamagedType = ExtraDeathIndex(this->DeathType.c_str());

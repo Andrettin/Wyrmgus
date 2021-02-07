@@ -25,7 +25,6 @@
 //      along with this program; if not, write to the Free Software
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
-//
 
 #include "stratagus.h"
 
@@ -38,7 +37,6 @@
 #include "unit/unit.h"
 #include "unit/unit_manager.h"
 #include "unit/unit_type.h"
-#include "util/exception_util.h"
 #include "video/video.h"
 
 namespace wyrmgus {
@@ -70,7 +68,7 @@ void missile_type::Load(lua_State *l)
 		} else if (!strcmp(value, "ChangeVariable")) {
 			const int index = UnitTypeVar.VariableNameLookup[LuaToString(l, -1)];// User variables
 			if (index == -1) {
-				exception::throw_with_trace(std::runtime_error("Bad variable name \"" + std::string(LuaToString(l, -1))  + "\"."));
+				throw std::runtime_error("Bad variable name \"" + std::string(LuaToString(l, -1))  + "\".");
 			}
 			this->ChangeVariable = index;
 		} else if (!strcmp(value, "ChangeAmount")) {

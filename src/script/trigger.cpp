@@ -23,7 +23,6 @@
 //      along with this program; if not, write to the Free Software
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
-//
 
 #include "stratagus.h"
 
@@ -50,7 +49,6 @@
 #include "unit/unit.h"
 #include "unit/unit_find.h"
 #include "unit/unit_type.h"
-#include "util/exception_util.h"
 #include "util/vector_util.h"
 
 CTimer GameTimer;               /// The game timer
@@ -698,7 +696,7 @@ void trigger::process_sml_property(const sml_property &property)
 		} else if (value == "player_trigger") {
 			this->Type = TriggerType::PlayerTrigger;
 		} else {
-			exception::throw_with_trace(std::runtime_error("Invalid trigger type: \"" + value + "\"."));
+			throw std::runtime_error("Invalid trigger type: \"" + value + "\".");
 		}
 	} else {
 		data_entry::process_sml_property(property);

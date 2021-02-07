@@ -28,7 +28,6 @@
 
 #include "database/sml_data.h"
 #include "database/sml_operator.h"
-#include "util/exception_util.h"
 
 namespace wyrmgus {
 
@@ -39,13 +38,13 @@ sml_parser::sml_parser() : current_property_operator(sml_operator::none)
 sml_data sml_parser::parse(const std::filesystem::path &filepath)
 {
 	if (!std::filesystem::exists(filepath)) {
-		exception::throw_with_trace(std::runtime_error("File \"" + filepath.string() + "\" not found."));
+		throw std::runtime_error("File \"" + filepath.string() + "\" not found.");
 	}
 
 	std::ifstream ifstream(filepath);
 
 	if (!ifstream) {
-		exception::throw_with_trace(std::runtime_error("Failed to open file: " + filepath.string()));
+		throw std::runtime_error("Failed to open file: " + filepath.string());
 	}
 
 	sml_data file_sml_data(filepath.stem().string());
@@ -188,11 +187,11 @@ void sml_parser::parse_tokens()
 				this->current_sml_data = &new_sml_data;
 			} else if (token == "}") { //closes current tag
 				if (this->current_sml_data == nullptr) {
-					exception::throw_with_trace(std::runtime_error("Tried closing tag before any tag had been opened."));
+					throw std::runtime_error("Tried closing tag before any tag had been opened.");
 				}
 
 				if (this->current_sml_data->get_parent() == nullptr) {
-					exception::throw_with_trace(std::runtime_error("Extra tag closing token!"));
+					throw std::runtime_error("An extra tag closing token is present.");
 				}
 
 				this->current_sml_data = this->current_sml_data->parent;
@@ -223,7 +222,7 @@ void sml_parser::parse_tokens()
 			} else if (token == ">=") {
 				this->current_property_operator = sml_operator::greater_than_or_equality;
 			} else {
-				exception::throw_with_trace(std::runtime_error("Tried using operator \"" + token + "\" for key \"" + this->current_key + "\", but it is not a valid operator."));
+				throw std::runtime_error("Tried using operator \"" + token + "\" for key \"" + this->current_key + "\", but it is not a valid operator.");
 			}
 
 			continue;
@@ -232,7 +231,7 @@ void sml_parser::parse_tokens()
 		//value
 		if (token == "{") { //opens tag
 			if (this->current_property_operator != sml_operator::assignment && this->current_property_operator != sml_operator::addition) {
-				exception::throw_with_trace(std::runtime_error("Only the assignment and addition operators are valid after a tag."));
+				throw std::runtime_error("Only the assignment and addition operators are valid after a tag.");
 			}
 
 			std::string &tag_name = this->current_key;

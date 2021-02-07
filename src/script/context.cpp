@@ -23,7 +23,6 @@
 //      along with this program; if not, write to the Free Software
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
-//
 
 #include "stratagus.h"
 
@@ -34,7 +33,6 @@
 #include "unit/unit.h"
 #include "unit/unit_manager.h"
 #include "unit/unit_ref.h"
-#include "util/exception_util.h"
 
 namespace wyrmgus {
 
@@ -57,14 +55,14 @@ void context_base<read_only>::process_sml_property(const sml_property &property)
 		const int slot = std::stoi(value);
 		this->current_unit = unit_manager::get()->GetSlotUnit(slot).acquire_ref();
 	} else {
-		exception::throw_with_trace(std::runtime_error("Invalid context property: \"" + key + "\"."));
+		throw std::runtime_error("Invalid context property: \"" + key + "\".");
 	}
 }
 
 template <bool read_only>
 void context_base<read_only>::process_sml_scope(const sml_data &scope)
 {
-	exception::throw_with_trace(std::runtime_error("Invalid context scope: \"" + scope.get_tag() + "\"."));
+	throw std::runtime_error("Invalid context scope: \"" + scope.get_tag() + "\".");
 }
 
 template <bool read_only>

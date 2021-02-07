@@ -23,7 +23,6 @@
 //      along with this program; if not, write to the Free Software
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
-//
 
 #include "stratagus.h"
 
@@ -41,7 +40,6 @@
 #include "unit/unit_type.h"
 #include "upgrade/upgrade_class.h"
 #include "upgrade/upgrade_structs.h"
-#include "util/exception_util.h"
 #include "util/queue_util.h"
 #include "util/string_util.h"
 
@@ -84,7 +82,7 @@ std::string text_processor::process_tokens(std::queue<std::string> &&tokens) con
 	std::queue<std::string> subtokens = string::split_to_queue(token, ':');
 
 	if (subtokens.size() > 2) {
-		exception::throw_with_trace(std::runtime_error("There can only be at most 2 subtokens."));
+		throw std::runtime_error("There can only be at most 2 subtokens.");
 	}
 
 	const std::string front_subtoken = queue::take(subtokens);
@@ -149,7 +147,7 @@ std::string text_processor::process_tokens(std::queue<std::string> &&tokens) con
 
 		str = this->process_word_tokens(word, tokens);
 	} else {
-		exception::throw_with_trace(std::runtime_error("Failed to process token \"" + token + "\"."));
+		throw std::runtime_error("Failed to process token \"" + token + "\".");
 	}
 
 	if (!tokens.empty()) {
@@ -162,7 +160,7 @@ std::string text_processor::process_tokens(std::queue<std::string> &&tokens) con
 std::string text_processor::process_string_tokens(std::string &&str, std::queue<std::string> &&tokens) const
 {
 	if (tokens.empty()) {
-		exception::throw_with_trace(std::runtime_error("No tokens provided when processing string tokens."));
+		throw std::runtime_error("No tokens provided when processing string tokens.");
 	}
 
 	const std::string token = queue::take(tokens);
@@ -172,7 +170,7 @@ std::string text_processor::process_string_tokens(std::string &&str, std::queue<
 	} else if (token == "normalized") {
 		string::normalize(str);
 	} else {
-		exception::throw_with_trace(std::runtime_error("Failed to process string token \"" + token + "\"."));
+		throw std::runtime_error("Failed to process string token \"" + token + "\".");
 	}
 
 	if (!tokens.empty()) {
@@ -185,24 +183,24 @@ std::string text_processor::process_string_tokens(std::string &&str, std::queue<
 std::string text_processor::process_named_data_entry_token(const named_data_entry *data_entry, const std::string &token) const
 {
 	if (data_entry == nullptr) {
-		exception::throw_with_trace(std::runtime_error("No data entry provided when processing a named data entry token."));
+		throw std::runtime_error("No data entry provided when processing a named data entry token.");
 	}
 
 	if (token == "name") {
 		return data_entry->get_name();
 	}
 
-	exception::throw_with_trace(std::runtime_error("Failed to process named data entry token \"" + token + "\"."));
+	throw std::runtime_error("Failed to process named data entry token \"" + token + "\".");
 }
 
 std::string text_processor::process_named_data_entry_tokens(const named_data_entry *data_entry, std::queue<std::string> &tokens) const
 {
 	if (data_entry == nullptr) {
-		exception::throw_with_trace(std::runtime_error("No data entry provided when processing named data entry tokens."));
+		throw std::runtime_error("No data entry provided when processing named data entry tokens.");
 	}
 
 	if (tokens.empty()) {
-		exception::throw_with_trace(std::runtime_error("No tokens provided when processing named data entry tokens."));
+		throw std::runtime_error("No tokens provided when processing named data entry tokens.");
 	}
 
 	const std::string token = queue::take(tokens);
@@ -212,11 +210,11 @@ std::string text_processor::process_named_data_entry_tokens(const named_data_ent
 std::string text_processor::process_civilization_tokens(const civilization *civilization, std::queue<std::string> &tokens) const
 {
 	if (civilization == nullptr) {
-		exception::throw_with_trace(std::runtime_error("No civilization provided when processing civilization tokens."));
+		throw std::runtime_error("No civilization provided when processing civilization tokens.");
 	}
 
 	if (tokens.empty()) {
-		exception::throw_with_trace(std::runtime_error("No tokens provided when processing civilization tokens."));
+		throw std::runtime_error("No tokens provided when processing civilization tokens.");
 	}
 
 	const std::string token = queue::take(tokens);
@@ -224,14 +222,14 @@ std::string text_processor::process_civilization_tokens(const civilization *civi
 	std::queue<std::string> subtokens = string::split_to_queue(token, ':');
 
 	if (subtokens.size() > 2) {
-		exception::throw_with_trace(std::runtime_error("There can only be at most 2 subtokens."));
+		throw std::runtime_error("There can only be at most 2 subtokens.");
 	}
 
 	const std::string front_subtoken = queue::take(subtokens);
 
 	if (front_subtoken == "class_unit_type") {
 		if (subtokens.empty()) {
-			exception::throw_with_trace(std::runtime_error("No unit class specified for the civilization \"class_unit_type\" token."));
+			throw std::runtime_error("No unit class specified for the civilization \"class_unit_type\" token.");
 		}
 
 		const unit_class *unit_class = unit_class::get(queue::take(subtokens));
@@ -240,7 +238,7 @@ std::string text_processor::process_civilization_tokens(const civilization *civi
 		return this->process_named_data_entry_tokens(unit_type, tokens);
 	} else if (front_subtoken == "class_upgrade") {
 		if (subtokens.empty()) {
-			exception::throw_with_trace(std::runtime_error("No unit class specified for the civilization \"class_upgrade\" token."));
+			throw std::runtime_error("No unit class specified for the civilization \"class_upgrade\" token.");
 		}
 
 		const upgrade_class *upgrade_class = upgrade_class::get(queue::take(subtokens));
@@ -255,11 +253,11 @@ std::string text_processor::process_civilization_tokens(const civilization *civi
 std::string text_processor::process_faction_tokens(const wyrmgus::faction *faction, std::queue<std::string> &tokens) const
 {
 	if (faction == nullptr) {
-		exception::throw_with_trace(std::runtime_error("No faction provided when processing faction tokens."));
+		throw std::runtime_error("No faction provided when processing faction tokens.");
 	}
 
 	if (tokens.empty()) {
-		exception::throw_with_trace(std::runtime_error("No tokens provided when processing faction tokens."));
+		throw std::runtime_error("No tokens provided when processing faction tokens.");
 	}
 
 	const std::string token = queue::take(tokens);
@@ -267,7 +265,7 @@ std::string text_processor::process_faction_tokens(const wyrmgus::faction *facti
 	std::queue<std::string> subtokens = string::split_to_queue(token, ':');
 
 	if (subtokens.size() > 2) {
-		exception::throw_with_trace(std::runtime_error("There can only be at most 2 subtokens."));
+		throw std::runtime_error("There can only be at most 2 subtokens.");
 	}
 
 	const std::string front_subtoken = queue::take(subtokens);
@@ -276,7 +274,7 @@ std::string text_processor::process_faction_tokens(const wyrmgus::faction *facti
 		return faction->get_default_titled_name();
 	} else if (front_subtoken == "class_unit_type") {
 		if (subtokens.empty()) {
-			exception::throw_with_trace(std::runtime_error("No unit class specified for the faction \"class_unit_type\" token."));
+			throw std::runtime_error("No unit class specified for the faction \"class_unit_type\" token.");
 		}
 
 		const unit_class *unit_class = unit_class::get(queue::take(subtokens));
@@ -285,7 +283,7 @@ std::string text_processor::process_faction_tokens(const wyrmgus::faction *facti
 		return this->process_named_data_entry_tokens(unit_type, tokens);
 	} else if (front_subtoken == "class_upgrade") {
 		if (subtokens.empty()) {
-			exception::throw_with_trace(std::runtime_error("No unit class specified for the civilization \"class_upgrade\" token."));
+			throw std::runtime_error("No unit class specified for the civilization \"class_upgrade\" token.");
 		}
 
 		const upgrade_class *upgrade_class = upgrade_class::get(queue::take(subtokens));
@@ -300,11 +298,11 @@ std::string text_processor::process_faction_tokens(const wyrmgus::faction *facti
 std::string text_processor::process_player_tokens(const CPlayer *player, std::queue<std::string> &tokens) const
 {
 	if (player == nullptr) {
-		exception::throw_with_trace(std::runtime_error("No player provided when processing player tokens."));
+		throw std::runtime_error("No player provided when processing player tokens.");
 	}
 
 	if (tokens.empty()) {
-		exception::throw_with_trace(std::runtime_error("No tokens provided when processing player tokens."));
+		throw std::runtime_error("No tokens provided when processing player tokens.");
 	}
 
 	const std::string token = queue::take(tokens);
@@ -312,7 +310,7 @@ std::string text_processor::process_player_tokens(const CPlayer *player, std::qu
 	std::queue<std::string> subtokens = string::split_to_queue(token, ':');
 
 	if (subtokens.size() > 2) {
-		exception::throw_with_trace(std::runtime_error("There can only be at most 2 subtokens."));
+		throw std::runtime_error("There can only be at most 2 subtokens.");
 	}
 
 	const std::string front_subtoken = queue::take(subtokens);
@@ -321,17 +319,17 @@ std::string text_processor::process_player_tokens(const CPlayer *player, std::qu
 		return this->process_unit_tokens(player->get_last_created_unit(), tokens);
 	}
 
-	exception::throw_with_trace(std::runtime_error("Failed to process player token \"" + front_subtoken + "\"."));
+	throw std::runtime_error("Failed to process player token \"" + front_subtoken + "\".");
 }
 
 std::string text_processor::process_site_tokens(const wyrmgus::site *site, std::queue<std::string> &tokens) const
 {
 	if (site == nullptr) {
-		exception::throw_with_trace(std::runtime_error("No site provided when processing site tokens."));
+		throw std::runtime_error("No site provided when processing site tokens.");
 	}
 
 	if (tokens.empty()) {
-		exception::throw_with_trace(std::runtime_error("No tokens provided when processing site tokens."));
+		throw std::runtime_error("No tokens provided when processing site tokens.");
 	}
 
 	const std::string token = queue::take(tokens);
@@ -339,7 +337,7 @@ std::string text_processor::process_site_tokens(const wyrmgus::site *site, std::
 	std::queue<std::string> subtokens = string::split_to_queue(token, ':');
 
 	if (subtokens.size() > 2) {
-		exception::throw_with_trace(std::runtime_error("There can only be at most 2 subtokens."));
+		throw std::runtime_error("There can only be at most 2 subtokens.");
 	}
 
 	const std::string front_subtoken = queue::take(subtokens);
@@ -354,11 +352,11 @@ std::string text_processor::process_site_tokens(const wyrmgus::site *site, std::
 std::string text_processor::process_unit_tokens(const CUnit *unit, std::queue<std::string> &tokens) const
 {
 	if (unit == nullptr) {
-		exception::throw_with_trace(std::runtime_error("No unit provided when processing unit tokens."));
+		throw std::runtime_error("No unit provided when processing unit tokens.");
 	}
 
 	if (tokens.empty()) {
-		exception::throw_with_trace(std::runtime_error("No tokens provided when processing unit tokens."));
+		throw std::runtime_error("No tokens provided when processing unit tokens.");
 	}
 
 	const std::string token = queue::take(tokens);
@@ -366,7 +364,7 @@ std::string text_processor::process_unit_tokens(const CUnit *unit, std::queue<st
 	std::queue<std::string> subtokens = string::split_to_queue(token, ':');
 
 	if (subtokens.size() > 2) {
-		exception::throw_with_trace(std::runtime_error("There can only be at most 2 subtokens."));
+		throw std::runtime_error("There can only be at most 2 subtokens.");
 	}
 
 	const std::string front_subtoken = queue::take(subtokens);
@@ -380,17 +378,17 @@ std::string text_processor::process_unit_tokens(const CUnit *unit, std::queue<st
 		return this->process_site_tokens(settlement, tokens);
 	}
 
-	exception::throw_with_trace(std::runtime_error("Failed to process unit token \"" + front_subtoken + "\"."));
+	throw std::runtime_error("Failed to process unit token \"" + front_subtoken + "\".");
 }
 
 std::string text_processor::process_word_tokens(const wyrmgus::word *word, std::queue<std::string> &tokens) const
 {
 	if (word == nullptr) {
-		exception::throw_with_trace(std::runtime_error("No word provided when processing word tokens."));
+		throw std::runtime_error("No word provided when processing word tokens.");
 	}
 
 	if (tokens.empty()) {
-		exception::throw_with_trace(std::runtime_error("No tokens provided when processing word tokens."));
+		throw std::runtime_error("No tokens provided when processing word tokens.");
 	}
 
 	const std::string token = queue::take(tokens);
@@ -405,11 +403,11 @@ std::string text_processor::process_word_tokens(const wyrmgus::word *word, std::
 std::string text_processor::process_word_meaning_tokens(const wyrmgus::word *word, std::queue<std::string> &tokens) const
 {
 	if (word == nullptr) {
-		exception::throw_with_trace(std::runtime_error("No word provided when processing word meaning tokens."));
+		throw std::runtime_error("No word provided when processing word meaning tokens.");
 	}
 
 	if (tokens.empty()) {
-		exception::throw_with_trace(std::runtime_error("No tokens provided when processing word meaning tokens."));
+		throw std::runtime_error("No tokens provided when processing word meaning tokens.");
 	}
 
 	const std::string token = queue::take(tokens);

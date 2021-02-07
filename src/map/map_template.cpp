@@ -70,7 +70,6 @@
 #include "unit/unit_class.h"
 #include "unit/unit_find.h"
 #include "unit/unit_type.h"
-#include "util/exception_util.h"
 #include "util/geocoordinate_util.h"
 #include "util/georectangle_util.h"
 #include "util/geoshape_util.h"
@@ -509,7 +508,7 @@ void map_template::apply_terrain_file(const bool overlay, const QPoint &template
 							tile->RemoveOverlayTerrain();
 						}
 					} else {
-						exception::throw_with_trace(std::runtime_error("\"0\" cannot be used for non-overlay terrain files."));
+						throw std::runtime_error("\"0\" cannot be used for non-overlay terrain files.");
 					}
 
 					continue;
@@ -518,7 +517,7 @@ void map_template::apply_terrain_file(const bool overlay, const QPoint &template
 				const character_unit *character_unit = this->get_character_unit(terrain_character);
 				if (character_unit != nullptr) {
 					if (!overlay) {
-						exception::throw_with_trace(std::runtime_error("Tried to use a character unit (character \""s + terrain_character + "\") in a non-overlay terrain map."));
+						throw std::runtime_error("Tried to use a character unit (character \""s + terrain_character + "\") in a non-overlay terrain map.");
 					}
 
 					character_unit->create_at(real_pos, z);
@@ -528,7 +527,7 @@ void map_template::apply_terrain_file(const bool overlay, const QPoint &template
 				const terrain_type *terrain = terrain_type::get_by_character(terrain_character);
 
 				if (this->is_constructed_only() && !terrain->is_constructed()) {
-					exception::throw_with_trace(std::runtime_error("A non-constructed terrain is present in constructed-only map template \"" + this->get_identifier() + "\", as character \"" + terrain_character + "\"."));
+					throw std::runtime_error("A non-constructed terrain is present in constructed-only map template \"" + this->get_identifier() + "\", as character \"" + terrain_character + "\".");
 				}
 
 				tile->SetTerrain(terrain);
@@ -614,7 +613,7 @@ void map_template::apply_terrain_image(const bool overlay, const QPoint &templat
 			} else {
 				if (terrain_feature == nullptr && (color != terrain_type::none_color || !overlay)) {
 					//fully black pixels represent areas in overlay terrain files that don't have any overlays
-					exception::throw_with_trace(std::runtime_error("Invalid map terrain: (" + std::to_string(x) + ", " + std::to_string(y) + ") (RGB: " + std::to_string(color.red()) + "/" + std::to_string(color.green()) + "/" + std::to_string(color.blue()) + ")."));
+					throw std::runtime_error("Invalid map terrain: (" + std::to_string(x) + ", " + std::to_string(y) + ") (RGB: " + std::to_string(color.red()) + "/" + std::to_string(color.green()) + "/" + std::to_string(color.blue()) + ").");
 				} else if (overlay && tile->get_overlay_terrain() != nullptr) { //fully black pixel or trade route on overlay terrain map = no overlay
 					tile->RemoveOverlayTerrain();
 				}
@@ -1150,7 +1149,7 @@ void map_template::apply_subtemplate(map_template *subtemplate, const QPoint &te
 
 			if (subtemplate_pos.x() < 0 || subtemplate_pos.y() < 0) {
 				if (!subtemplate->is_optional()) {
-					exception::throw_with_trace(std::runtime_error("No location available for map template \"" + subtemplate->get_identifier() + "\" to be applied to."));
+					throw std::runtime_error("No location available for map template \"" + subtemplate->get_identifier() + "\" to be applied to.");
 				}
 			} else {
 				found_location = true;
@@ -1198,7 +1197,7 @@ void map_template::apply_subtemplate(map_template *subtemplate, const QPoint &te
 		subtemplate->clear_application_data();
 
 		if (!subtemplate->is_optional()) {
-			exception::throw_with_trace(std::runtime_error("Failed to apply subtemplate \"" + subtemplate->get_identifier() + "\"."));
+			throw std::runtime_error("Failed to apply subtemplate \"" + subtemplate->get_identifier() + "\".");
 		}
 	}
 }
@@ -1438,17 +1437,17 @@ void map_template::apply_site(const site *site, const QPoint &site_pos, const in
 		}
 
 		if (unit_type->TerrainType != nullptr) {
-			exception::throw_with_trace(std::runtime_error("A terrain type building (e.g. a wall) cannot be applied from the list of historical building classes of a site."));
+			throw std::runtime_error("A terrain type building (e.g. a wall) cannot be applied from the list of historical building classes of a site.");
 		}
 
 		if (unit_type->BoolFlag[TOWNHALL_INDEX].value && !site->is_settlement()) {
-			exception::throw_with_trace(std::runtime_error("Site \"" + site->get_identifier() + "\" has a town hall, but isn't set as a settlement one."));
+			throw std::runtime_error("Site \"" + site->get_identifier() + "\" has a town hall, but isn't set as a settlement one.");
 		}
 
 		const QPoint building_unit_offset = unit_type->get_tile_center_pos_offset();
 		if (!is_position_shift_acceptable && first_building) {
 			if (!OnTopDetails(*unit_type, nullptr) && !UnitTypeCanBeAt(*unit_type, site_pos - building_unit_offset, z) && CMap::Map.Info.IsPointOnMap(site_pos - building_unit_offset, z) && CMap::Map.Info.IsPointOnMap(site_pos - building_unit_offset + size::to_point(unit_type->get_tile_size() - QSize(1, 1)), z)) {
-				exception::throw_with_trace(std::runtime_error("The \"" + unit_type->get_identifier() + "\" representing the minor site of \"" + site->get_identifier() + "\" should be placed on " + point::to_string(site->get_pos()) + ", but it cannot be there."));
+				throw std::runtime_error("The \"" + unit_type->get_identifier() + "\" representing the minor site of \"" + site->get_identifier() + "\" should be placed on " + point::to_string(site->get_pos()) + ", but it cannot be there.");
 			}
 		}
 
@@ -1933,7 +1932,7 @@ void map_template::apply_historical_unit(const historical_unit *historical_unit,
 	const historical_location *unit_location = unit_history->get_location();
 
 	if (unit_location == nullptr) {
-		exception::throw_with_trace(std::runtime_error("Historical unit \"" + historical_unit->get_identifier() + "\" has no historical location."));
+		throw std::runtime_error("Historical unit \"" + historical_unit->get_identifier() + "\" has no historical location.");
 	}
 
 	const bool in_another_map_template = unit_location->get_map_template() != this;
@@ -2030,7 +2029,7 @@ void map_template::apply_character(character *character, const QPoint &template_
 	const historical_location *character_location = character_history->get_location();
 
 	if (character_location == nullptr) {
-		exception::throw_with_trace(std::runtime_error("Character \"" + character->get_identifier() + "\" has no historical location."));
+		throw std::runtime_error("Character \"" + character->get_identifier() + "\" has no historical location.");
 	}
 
 	const bool in_another_map_template = character_location->get_map_template() != this;
@@ -2191,7 +2190,7 @@ void map_template::load_terrain_character_map(const bool overlay)
 	const std::string terrain_filename = LibraryFileName(terrain_file.string().c_str());
 
 	if (!CanAccessFile(terrain_filename.c_str())) {
-		exception::throw_with_trace(std::runtime_error("File \"" + terrain_filename + "\" not found."));
+		throw std::runtime_error("File \"" + terrain_filename + "\" not found.");
 	}
 
 	std::ifstream is_map(terrain_filename);
@@ -2214,7 +2213,7 @@ void map_template::load_terrain_character_map(const bool overlay)
 
 	const QSize character_map_size(terrain_character_map.front().size(), terrain_character_map.size());
 	if (character_map_size != this->get_size()) {
-		exception::throw_with_trace(std::runtime_error("The "s + (overlay ? "overlay " : "") + "terrain file for map template \"" + this->get_identifier() + "\" has a different size " + size::to_string(character_map_size) + " than that of the map template itself " + size::to_string(this->get_size()) + "."));
+		throw std::runtime_error("The "s + (overlay ? "overlay " : "") + "terrain file for map template \"" + this->get_identifier() + "\" has a different size " + size::to_string(character_map_size) + " than that of the map template itself " + size::to_string(this->get_size()) + ".");
 	}
 
 	this->do_character_substitutions(overlay);
@@ -2261,13 +2260,13 @@ QImage map_template::load_terrain_image_file(const std::filesystem::path &filepa
 	const std::string terrain_filename = LibraryFileName(filepath.string().c_str());
 
 	if (!CanAccessFile(terrain_filename.c_str())) {
-		exception::throw_with_trace(std::runtime_error("The terrain image file \"" + terrain_filename + "\" for map template \"" + this->get_identifier() + "\" does not exist."));
+		throw std::runtime_error("The terrain image file \"" + terrain_filename + "\" for map template \"" + this->get_identifier() + "\" does not exist.");
 	}
 
 	QImage terrain_image(terrain_filename.c_str());
 
 	if (terrain_image.size() != this->get_size()) {
-		exception::throw_with_trace(std::runtime_error("The terrain image for map template \"" + this->get_identifier() + "\" has a different size " + size::to_string(terrain_image.size()) + " than that of the map template itself " + size::to_string(this->get_size()) + "."));
+		throw std::runtime_error("The terrain image for map template \"" + this->get_identifier() + "\" has a different size " + size::to_string(terrain_image.size()) + " than that of the map template itself " + size::to_string(this->get_size()) + ".");
 	}
 
 	return terrain_image;
@@ -2581,7 +2580,7 @@ bool map_template::is_constructed_subtemplate_compatible_with_terrain_file(map_t
 				const terrain_type *terrain = terrain_type::get_by_character(terrain_character);
 
 				if (!terrain->is_constructed()) {
-					exception::throw_with_trace(std::runtime_error("A non-constructed terrain is present in constructed-only map template \"" + subtemplate->get_identifier() + "\", as character \"" + terrain_character + "\"."));
+					throw std::runtime_error("A non-constructed terrain is present in constructed-only map template \"" + subtemplate->get_identifier() + "\", as character \"" + terrain_character + "\".");
 				}
 
 				//the tile's overlay terrain must either match that in the map template exactly, or not be set
@@ -2800,7 +2799,7 @@ void map_template::save_terrain_image(const std::string &filename, const std::fi
 		image = QImage(QString::fromStdString(image_filepath.string()));
 
 		if (image.size() != this->get_size()) {
-			exception::throw_with_trace(std::runtime_error("Invalid terrain image size for map template \"" + this->get_identifier() + "\"."));
+			throw std::runtime_error("Invalid terrain image size for map template \"" + this->get_identifier() + "\".");
 		}
 	} else {
 		image = QImage(this->get_size(), QImage::Format_RGBA8888);
@@ -2823,7 +2822,7 @@ void map_template::create_terrain_image_from_file(QImage &image, const std::file
 	const std::string terrain_filename = LibraryFileName(filepath.string().c_str());
 
 	if (!CanAccessFile(terrain_filename.c_str())) {
-		exception::throw_with_trace(std::runtime_error("File \"" + terrain_filename + "\" not found."));
+		throw std::runtime_error("File \"" + terrain_filename + "\" not found.");
 	}
 
 	std::ifstream is_map(terrain_filename);
@@ -2894,7 +2893,7 @@ void map_template::save_territory_image(const std::string &filename, const site_
 		image = QImage(QString::fromStdString(territory_image.string()));
 
 		if (image.size() != this->get_size()) {
-			exception::throw_with_trace(std::runtime_error("Invalid territory image size for map template \"" + this->get_identifier() + "\"."));
+			throw std::runtime_error("Invalid territory image size for map template \"" + this->get_identifier() + "\".");
 		}
 	} else {
 		image = QImage(this->get_size(), QImage::Format_RGBA8888);
@@ -2907,7 +2906,7 @@ void map_template::save_territory_image(const std::string &filename, const site_
 		const site *settlement = kv_pair.first;
 		const QColor color = settlement->get_color();
 		if (!color.isValid()) {
-			exception::throw_with_trace(std::runtime_error("Settlement \"" + settlement->get_identifier() + "\" has no valid color."));
+			throw std::runtime_error("Settlement \"" + settlement->get_identifier() + "\" has no valid color.");
 		}
 
 		for (const auto &geoshape : kv_pair.second) {
@@ -2937,7 +2936,7 @@ void generated_terrain::process_sml_property(const sml_property &property)
 		const terrain_type *target_terrain_type = terrain_type::get(value);
 		this->TargetTerrainTypes.push_back(target_terrain_type);
 	} else {
-		exception::throw_with_trace(std::runtime_error("Invalid generated terrain property: \"" + key + "\"."));
+		throw std::runtime_error("Invalid generated terrain property: \"" + key + "\".");
 	}
 }
 
@@ -2945,7 +2944,7 @@ void generated_terrain::process_sml_scope(const sml_data &scope)
 {
 	const std::string &tag = scope.get_tag();
 
-	exception::throw_with_trace(std::runtime_error("Invalid generated terrain scope: \"" + tag + "\"."));
+	throw std::runtime_error("Invalid generated terrain scope: \"" + tag + "\".");
 }
 
 void generated_terrain::ProcessConfigData(const CConfigData *config_data)

@@ -24,7 +24,6 @@
 //      along with this program; if not, write to the Free Software
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
-//
 
 #include "stratagus.h"
 
@@ -59,7 +58,6 @@
 #include "spell/spell.h"
 #include "unit/unit.h"
 #include "unit/unit_type.h"
-#include "util/exception_util.h"
 #include "util/string_util.h"
 
 struct LabelsStruct {
@@ -138,7 +136,7 @@ int ParseAnimInt(const CUnit &unit, const std::string &parseint)
 		}
 
 		if (str_list.size() < 3) {
-			exception::throw_with_trace(std::runtime_error("Need also specify the variable for the \"" + cur + "\" tag."));
+			throw std::runtime_error("Need also specify the variable for the \"" + cur + "\" tag.");
 		}
 
 		const std::string &next = str_list[2];
@@ -154,7 +152,7 @@ int ParseAnimInt(const CUnit &unit, const std::string &parseint)
 			} else if (cur == "_Distance") {
 				return unit.MapDistanceTo(*goal);
 			}
-			exception::throw_with_trace(std::runtime_error("Bad variable name \"" + cur + "\"."));
+			throw std::runtime_error("Bad variable name \"" + cur + "\".");
 		}
 		if (next == "Value") {
 			//Wyrmgus start
@@ -190,7 +188,7 @@ int ParseAnimInt(const CUnit &unit, const std::string &parseint)
 		}
 		const int index = UnitTypeVar.BoolFlagNameLookup[cur];// User bool flags
 		if (index == -1) {
-			exception::throw_with_trace(std::runtime_error("Bad bool-flag name \"" + cur + "\"."));
+			throw std::runtime_error("Bad bool-flag name \"" + cur + "\".");
 		}
 		return goal->Type->BoolFlag[index].value;
 	} else if (parseint[0] == 's') { //spell type detected
@@ -263,7 +261,7 @@ int ParseAnimFlags(const CUnit &unit, const char *parseflag)
 			}  else if (!strcmp(cur, "setdirection")) {
 				flags |= SM_SetDirection;
 			} else {
-				exception::throw_with_trace(std::runtime_error("Unknown animation flag: \"" + std::string(cur) + "\"."));
+				throw std::runtime_error("Unknown animation flag: \"" + std::string(cur) + "\".");
 			}
 		}
 		cur = next;
@@ -502,7 +500,7 @@ void animation_set::process_sml_scope(const sml_data &scope)
 			} else if (key == "random-goto") {
 				anim = std::make_unique<CAnimation_RandomGoto>();
 			} else {
-				exception::throw_with_trace(std::runtime_error("Invalid animation property: \"" + key + "\"."));
+				throw std::runtime_error("Invalid animation property: \"" + key + "\".");
 			}
 
 			if (anim) {

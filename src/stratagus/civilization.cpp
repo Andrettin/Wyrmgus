@@ -23,7 +23,6 @@
 //      along with this program; if not, write to the Free Software
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
-//
 
 #include "stratagus.h"
 
@@ -46,7 +45,6 @@
 #include "ui/cursor.h"
 #include "unit/unit_class.h"
 #include "unit/unit_type.h"
-#include "util/exception_util.h"
 #include "util/string_util.h"
 #include "util/string_conversion_util.h"
 #include "video/video.h"
@@ -89,7 +87,7 @@ void civilization::process_sml_scope(const sml_data &scope)
 				PlayerRaces.ButtonIcons[this->ID][button_action].Icon = nullptr;
 				PlayerRaces.ButtonIcons[this->ID][button_action].Load();
 			} else {
-				exception::throw_with_trace(std::runtime_error("Button action \"" + key + "\" doesn't exist."));
+				throw std::runtime_error("Button action \"" + key + "\" doesn't exist.");
 			}
 		});
 	} else if (tag == "unit_sounds") {
@@ -120,7 +118,7 @@ void civilization::process_sml_scope(const sml_data &scope)
 			CFiller filler = CFiller();
 			const std::string filler_file = child_scope.get_property_value("file");
 			if (filler_file.empty()) {
-				exception::throw_with_trace(std::runtime_error("Filler graphic file is empty."));
+				throw std::runtime_error("Filler graphic file is empty.");
 			}
 			filler.G = CGraphic::New(filler_file);
 
@@ -161,7 +159,7 @@ void civilization::process_sml_scope(const sml_data &scope)
 				} else if (key == "per_settlement") {
 					building_template->set_per_settlement(string::to_bool(value));
 				} else {
-					exception::throw_with_trace(std::runtime_error("Invalid AI building template property: " + child_scope.get_tag() + "."));
+					throw std::runtime_error("Invalid AI building template property: " + child_scope.get_tag() + ".");
 				}
 			});
 
@@ -344,11 +342,11 @@ void civilization::check() const
 {
 	if (this != defines::get()->get_neutral_civilization()) {
 		if (this->get_species() == nullptr) {
-			exception::throw_with_trace(std::runtime_error("Civilization \"" + this->get_identifier() + "\" has no species."));
+			throw std::runtime_error("Civilization \"" + this->get_identifier() + "\" has no species.");
 		}
 
 		if (this->get_language() == nullptr) {
-			exception::throw_with_trace(std::runtime_error("Civilization \"" + this->get_identifier() + "\" has no language."));
+			throw std::runtime_error("Civilization \"" + this->get_identifier() + "\" has no language.");
 		}
 	}
 
@@ -377,7 +375,7 @@ int civilization::GetUpgradePriority(const CUpgrade *upgrade) const
 int civilization::get_force_type_weight(const ai_force_type force_type) const
 {
 	if (force_type == ai_force_type::none) {
-		exception::throw_with_trace(std::runtime_error("Error in civilization::get_force_type_weight: the force_type is none."));
+		throw std::runtime_error("Error in civilization::get_force_type_weight: the force_type is none.");
 	}
 	
 	const auto find_iterator = this->ai_force_type_weights.find(force_type);
@@ -658,7 +656,7 @@ const std::vector<std::unique_ptr<ai_force_template>> &civilization::get_ai_forc
 	static const std::vector<std::unique_ptr<ai_force_template>> empty_vector;
 
 	if (force_type == ai_force_type::none) {
-		exception::throw_with_trace(std::runtime_error("Error in civilization::get_ai_force_templates: the force_type is none."));
+		throw std::runtime_error("Error in civilization::get_ai_force_templates: the force_type is none.");
 	}
 	
 	const auto find_iterator = this->ai_force_templates.find(force_type);

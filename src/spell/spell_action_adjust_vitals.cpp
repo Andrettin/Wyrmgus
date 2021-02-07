@@ -24,7 +24,6 @@
 //      along with this program; if not, write to the Free Software
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
-//
 
 #include "stratagus.h"
 
@@ -33,7 +32,6 @@
 #include "script.h"
 #include "spell/spell.h"
 #include "unit/unit.h"
-#include "util/exception_util.h"
 
 namespace wyrmgus {
 
@@ -51,7 +49,7 @@ void spell_action_adjust_vitals::process_sml_property(const sml_property &proper
 	} else if (key == "max_multi_cast") {
 		this->MaxMultiCast = std::stoi(value);
 	} else {
-		exception::throw_with_trace(std::runtime_error("Invalid adjust vitals spell action property: \"" + key + "\"."));
+		throw std::runtime_error("Invalid adjust vitals spell action property: \"" + key + "\".");
 	}
 }
 

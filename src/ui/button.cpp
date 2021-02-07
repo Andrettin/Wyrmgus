@@ -23,7 +23,6 @@
 //      along with this program; if not, write to the Free Software
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
-//
 
 #include "stratagus.h"
 
@@ -44,7 +43,6 @@
 #include "unit/unit_manager.h"
 #include "upgrade/upgrade.h"
 #include "upgrade/upgrade_class.h"
-#include "util/exception_util.h"
 #include "util/string_conversion_util.h"
 #include "util/string_util.h"
 #include "video/font.h"
@@ -186,7 +184,7 @@ void button::process_sml_property(const sml_property &property)
 		if (button_action_id != ButtonCmd::None) {
 			this->Action = button_action_id;
 		} else {
-			exception::throw_with_trace(std::runtime_error("Invalid button action: \"" + value + "\"."));
+			throw std::runtime_error("Invalid button action: \"" + value + "\".");
 		}
 	} else if (key == "value") {
 		this->ValueStr = value;
@@ -244,7 +242,7 @@ void button::process_sml_property(const sml_property &property)
 		} else if (value == "check_has_sub_buttons") {
 			this->Allowed = ButtonCheckHasSubButtons;
 		} else {
-			exception::throw_with_trace(std::runtime_error("Invalid button check: \"" + value + "\"."));
+			throw std::runtime_error("Invalid button check: \"" + value + "\".");
 		}
 	} else {
 		data_entry::process_sml_property(property);
@@ -339,7 +337,7 @@ void button::initialize()
 	if (!this->Popup.empty()) {
 		CPopup *popup = PopupByIdent(this->Popup);
 		if (!popup) {
-			exception::throw_with_trace(std::runtime_error("Popup \"" + this->Popup + "\" hasn't defined."));
+			throw std::runtime_error("Popup \"" + this->Popup + "\" hasn't defined.");
 		}
 	}
 
@@ -723,7 +721,7 @@ std::string GetButtonActionNameById(const ButtonCmd button_action)
 			return "cancel-build";
 	}
 
-	exception::throw_with_trace(std::runtime_error("Invalid button action enum value: " + std::to_string(static_cast<int>(button_action))));
+	throw std::runtime_error("Invalid button action enum value: " + std::to_string(static_cast<int>(button_action)));
 }
 
 ButtonCmd GetButtonActionIdByName(const std::string &button_action)

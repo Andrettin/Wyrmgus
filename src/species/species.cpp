@@ -23,7 +23,6 @@
 //      along with this program; if not, write to the Free Software
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
-//
 
 #include "stratagus.h"
 
@@ -35,7 +34,6 @@
 #include "species/geological_era.h"
 #include "species/taxon.h"
 #include "species/taxonomic_rank.h"
-#include "util/exception_util.h"
 #include "util/vector_random_util.h"
 #include "util/vector_util.h"
 
@@ -196,11 +194,11 @@ taxonomic_rank species::get_rank() const
 std::string species::get_scientific_name() const
 {
 	if (this->get_supertaxon() == nullptr) {
-		exception::throw_with_trace(std::runtime_error("Cannot get the scientific name for species \"" + this->get_identifier() + "\", as it has no supertaxon."));
+		throw std::runtime_error("Cannot get the scientific name for species \"" + this->get_identifier() + "\", as it has no supertaxon.");
 	}
 
 	if (this->get_supertaxon()->get_rank() != taxonomic_rank::genus) {
-		exception::throw_with_trace(std::runtime_error("Cannot get the scientific name for species \"" + this->get_identifier() + "\", as its supertaxon is not a genus."));
+		throw std::runtime_error("Cannot get the scientific name for species \"" + this->get_identifier() + "\", as its supertaxon is not a genus.");
 	}
 
 	if (!this->get_specific_name().empty()) {

@@ -23,7 +23,6 @@
 //      along with this program; if not, write to the Free Software
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
-//
 
 #include "stratagus.h"
 
@@ -37,7 +36,6 @@
 #include "unit/unit.h"
 #include "unit/unit_manager.h"
 #include "unit/unit_ref.h"
-#include "util/exception_util.h"
 
 namespace wyrmgus {
 
@@ -90,7 +88,7 @@ void delayed_effect_instance<scope_type>::process_sml_property(const sml_propert
 	} else if (key == "remaining_cycles") {
 		this->remaining_cycles = std::stoi(value);
 	} else {
-		exception::throw_with_trace(std::runtime_error("Invalid delayed effect instance property: \"" + key + "\"."));
+		throw std::runtime_error("Invalid delayed effect instance property: \"" + key + "\".");
 	}
 }
 
@@ -103,7 +101,7 @@ void delayed_effect_instance<scope_type>::process_sml_scope(const sml_data &scop
 		this->context = wyrmgus::context();
 		database::process_sml_data(this->context, scope);
 	} else {
-		exception::throw_with_trace(std::runtime_error("Invalid delayed effect instance scope: \"" + scope.get_tag() + "\"."));
+		throw std::runtime_error("Invalid delayed effect instance scope: \"" + scope.get_tag() + "\".");
 	}
 }
 

@@ -23,7 +23,6 @@
 //      along with this program; if not, write to the Free Software
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
-//
 
 #include "script/factor_modifier.h"
 
@@ -31,7 +30,6 @@
 #include "database/sml_operator.h"
 #include "database/sml_property.h"
 #include "script/condition/and_condition.h"
-#include "util/exception_util.h"
 
 namespace wyrmgus {
 
@@ -57,7 +55,7 @@ void factor_modifier<scope_type>::process_sml_property(const sml_property &prope
 		if (sml_operator == sml_operator::assignment) {
 			this->factor = std::stoi(value);
 		} else {
-			exception::throw_with_trace(std::runtime_error("Invalid operator for property (\"" + property.get_key() + "\")."));
+			throw std::runtime_error("Invalid operator for property (\"" + property.get_key() + "\").");
 		}
 	} else {
 		std::unique_ptr<const condition> condition = wyrmgus::condition::from_sml_property(property);

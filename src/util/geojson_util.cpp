@@ -23,11 +23,8 @@
 //      along with this program; if not, write to the Free Software
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
-//
 
 #include "util/geojson_util.h"
-
-#include "util/exception_util.h"
 
 #ifdef USE_GEOJSON
 #include <QtLocation/private/qgeojson_p.h>
@@ -50,7 +47,7 @@ std::vector<QVariantList> parse_folder(const std::filesystem::path &path)
 		std::ifstream ifstream(dir_entry.path());
 
 		if (!ifstream) {
-			exception::throw_with_trace(std::runtime_error("Failed to open file: " + dir_entry.path().string()));
+			throw std::runtime_error("Failed to open file: " + dir_entry.path().string());
 		}
 
 		const std::string raw_geojson_data(std::istreambuf_iterator<char>{ifstream}, std::istreambuf_iterator<char>{});
@@ -60,7 +57,7 @@ std::vector<QVariantList> parse_folder(const std::filesystem::path &path)
 		const QJsonDocument json = QJsonDocument::fromJson(raw_geojson_byte_array, &json_error);
 
 		if (json.isNull()) {
-			exception::throw_with_trace(std::runtime_error("JSON parsing failed: " + json_error.errorString().toStdString() + "."));
+			throw std::runtime_error("JSON parsing failed: " + json_error.errorString().toStdString() + ".");
 		}
 
 		QVariantList geojson_data = QGeoJson::importGeoJson(json);
@@ -68,8 +65,9 @@ std::vector<QVariantList> parse_folder(const std::filesystem::path &path)
 	}
 
 	return geojson_data_list;
+
 #else
-	exception::throw_with_trace(std::runtime_error("GeoJSON support not enabled."));
+	throw std::runtime_error("GeoJSON support not enabled.");
 #endif
 }
 

@@ -23,11 +23,9 @@
 //      along with this program; if not, write to the Free Software
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
-//
 
 #include "util/string_conversion_util.h"
 
-#include "util/exception_util.h"
 #include "util/string_util.h"
 
 namespace wyrmgus::string {
@@ -60,7 +58,7 @@ QDateTime to_date(const std::string &date_str)
 	QDateTime date(QDate(years, months, days), QTime(hours, 0), Qt::UTC);
 
 	if (!date.isValid()) {
-		exception::throw_with_trace(std::runtime_error("Date \"" + date_str + "\" is not a valid date."));
+		throw std::runtime_error("Date \"" + date_str + "\" is not a valid date.");
 	}
 
 	return date;
@@ -94,7 +92,7 @@ QTime to_time(const std::string &time_str)
 	QTime time(hours, minutes, seconds, milliseconds);
 
 	if (!time.isValid()) {
-		exception::throw_with_trace(std::runtime_error("Time \"" + time_str + "\" is not a valid time."));
+		throw std::runtime_error("Time \"" + time_str + "\" is not a valid time.");
 	}
 
 	return time;

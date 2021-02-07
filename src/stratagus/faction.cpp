@@ -23,7 +23,6 @@
 //      along with this program; if not, write to the Free Software
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
-//
 
 #include "stratagus.h"
 
@@ -44,7 +43,6 @@
 #include "script/condition/and_condition.h"
 #include "unit/unit_type.h"
 #include "util/container_util.h"
-#include "util/exception_util.h"
 #include "util/string_util.h"
 #include "util/vector_util.h"
 
@@ -221,11 +219,11 @@ void faction::initialize()
 void faction::check() const
 {
 	if (this->civilization == nullptr) {
-		exception::throw_with_trace(std::runtime_error("Faction \"" + this->get_identifier() + "\" has no civilization."));
+		throw std::runtime_error("Faction \"" + this->get_identifier() + "\" has no civilization.");
 	}
 
 	if (this->get_type() == faction_type::none) {
-		exception::throw_with_trace(std::runtime_error("Faction \"" + this->get_identifier() + "\" has no type."));
+		throw std::runtime_error("Faction \"" + this->get_identifier() + "\" has no type.");
 	}
 
 	for (const auto &kv_pair : this->ai_force_templates) {
@@ -317,7 +315,7 @@ int faction::GetUpgradePriority(const CUpgrade *upgrade) const
 int faction::get_force_type_weight(const ai_force_type force_type) const
 {
 	if (force_type == ai_force_type::none) {
-		exception::throw_with_trace(std::runtime_error("Error in faction::get_force_type_weight: the force_type is none."));
+		throw std::runtime_error("Error in faction::get_force_type_weight: the force_type is none.");
 	}
 	
 	const auto find_iterator = this->ai_force_type_weights.find(force_type);
@@ -353,7 +351,7 @@ bool faction::uses_simple_name() const
 const std::vector<std::unique_ptr<ai_force_template>> &faction::get_ai_force_templates(const ai_force_type force_type) const
 {
 	if (force_type == ai_force_type::none) {
-		exception::throw_with_trace(std::runtime_error("Error in faction::get_ai_force_templates: the force_type is none."));
+		throw std::runtime_error("Error in faction::get_ai_force_templates: the force_type is none.");
 	}
 	
 	const auto find_iterator = this->ai_force_templates.find(force_type);

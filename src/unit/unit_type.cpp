@@ -63,7 +63,6 @@
 #include "unit/unit_type_type.h"
 #include "unit/unit_type_variation.h"
 #include "upgrade/upgrade.h"
-#include "util/exception_util.h"
 #include "util/size_util.h"
 #include "util/string_conversion_util.h"
 #include "util/string_util.h"
@@ -572,7 +571,7 @@ void unit_type::process_sml_property(const sml_property &property)
 			this->UnitType = UnitTypeType::Space;
 			this->AirUnit = true;
 		} else {
-			exception::throw_with_trace(std::runtime_error("Invalid unit type type: \"" + value + "\""));
+			throw std::runtime_error("Invalid unit type type: \"" + value + "\"");
 		}
 	} else if (key == "max_attack_range") {
 		this->DefaultStat.Variables[ATTACKRANGE_INDEX].Value = std::stoi(value);
@@ -625,7 +624,7 @@ void unit_type::process_sml_property(const sml_property &property)
 		} else if (value == "trade") {
 			this->MouseAction = MouseActionTrade;
 		} else {
-			exception::throw_with_trace(std::runtime_error("Invalid right mouse action: \"" + value + "\"."));
+			throw std::runtime_error("Invalid right mouse action: \"" + value + "\".");
 		}
 	} else if (key == "requirements_string") {
 		this->RequirementsString = value;
@@ -728,7 +727,7 @@ void unit_type::process_sml_scope(const sml_data &scope)
 			if (index != -1) {
 				this->BoolFlag[index].CanTransport = StringToCondition(value);
 			} else {
-				exception::throw_with_trace(std::runtime_error("Unsupported flag tag for CanTransport: " + key));
+				throw std::runtime_error("Unsupported flag tag for CanTransport: " + key);
 			}
 		});
 	} else if (tag == "starting_abilities") {
@@ -798,7 +797,7 @@ void unit_type::process_sml_scope(const sml_data &scope)
 				this->ButtonIcons[button_action].Icon = nullptr;
 				this->ButtonIcons[button_action].Load();
 			} else {
-				exception::throw_with_trace(std::runtime_error("Button action \"" + key + "\" doesn't exist."));
+				throw std::runtime_error("Button action \"" + key + "\" doesn't exist.");
 			}
 		});
 	} else if (tag == "sounds") {
@@ -832,7 +831,7 @@ void unit_type::process_sml_scope(const sml_data &scope)
 				} else if (key == "increase") {
 					this->DefaultStat.Variables[index].Increase = std::stoi(value);
 				} else {
-					exception::throw_with_trace(std::runtime_error("Invalid variable property: \"" + key + "\"."));
+					throw std::runtime_error("Invalid variable property: \"" + key + "\".");
 				}
 			});
 
@@ -1239,7 +1238,7 @@ void unit_type::initialize()
 
 	// FIXME: try to simplify/combine the flags instead
 	if (this->MouseAction == MouseActionAttack && !this->CanAttack) {
-		exception::throw_with_trace(std::runtime_error("Unit type \"" + this->get_identifier() + "\": right-attack is set, but can-attack is not."));
+		throw std::runtime_error("Unit type \"" + this->get_identifier() + "\": right-attack is set, but can-attack is not.");
 	}
 	this->UpdateDefaultBoolFlags();
 	if (GameRunning || Editor.Running == EditorEditing) {
@@ -1354,7 +1353,7 @@ void unit_type::check() const
 {
 	for (const spell *spell : this->get_autocast_spells()) {
 		if (spell->get_autocast_info() == nullptr) {
-			exception::throw_with_trace(std::runtime_error("The spell \"" + spell->get_identifier() + "\" is set to be autocast by default for unit type \"" + this->get_identifier() + "\", but has no defined autocast method."));
+			throw std::runtime_error("The spell \"" + spell->get_identifier() + "\" is set to be autocast by default for unit type \"" + this->get_identifier() + "\", but has no defined autocast method.");
 		}
 	}
 
@@ -1491,7 +1490,7 @@ bool unit_type::CanSelect(GroupSelectionMode mode) const
 void unit_type::set_parent(const unit_type *parent_type)
 {
 	if (!parent_type->is_defined()) {
-		exception::throw_with_trace(std::runtime_error("Unit type \"" + this->get_identifier() + "\" is inheriting features from non-defined parent \"" + parent_type->get_identifier() + "\"."));
+		throw std::runtime_error("Unit type \"" + this->get_identifier() + "\" is inheriting features from non-defined parent \"" + parent_type->get_identifier() + "\".");
 	}
 	
 	this->Parent = parent_type;
@@ -2160,13 +2159,13 @@ void resource_info::process_sml_property(const sml_property &property)
 	} else if (key == "lose_resources") {
 		this->LoseResources = string::to_bool(value);
 	} else {
-		exception::throw_with_trace(std::runtime_error("Invalid resource gathering info property: \"" + key + "\"."));
+		throw std::runtime_error("Invalid resource gathering info property: \"" + key + "\".");
 	}
 }
 
 void resource_info::process_sml_scope(const sml_data &scope)
 {
-	exception::throw_with_trace(std::runtime_error("Invalid resource gathering info scope: \"" + scope.get_tag() + "\"."));
+	throw std::runtime_error("Invalid resource gathering info scope: \"" + scope.get_tag() + "\".");
 }
 
 }

@@ -24,7 +24,6 @@
 //      along with this program; if not, write to the Free Software
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
-//
 
 #include "stratagus.h"
 
@@ -106,7 +105,6 @@
 //Wyrmgus end
 #include "upgrade/upgrade_class.h"
 #include "upgrade/upgrade_modifier.h"
-#include "util/exception_util.h"
 #include "util/log_util.h"
 #include "util/string_util.h"
 #include "util/vector_util.h"
@@ -873,7 +871,7 @@ CPlayer *GetOrAddFactionPlayer(const wyrmgus::faction *faction)
 		}
 	}
 	
-	exception::throw_with_trace(std::runtime_error("Cannot add player for faction \"" + faction->get_identifier() + "\": no player slots available."));
+	throw std::runtime_error("Cannot add player for faction \"" + faction->get_identifier() + "\": no player slots available.");
 }
 
 void CPlayer::Init(/* PlayerTypes */ int type)
@@ -1346,7 +1344,7 @@ void CPlayer::SetFaction(const wyrmgus::faction *faction)
 		}
 		
 		if (player_color == nullptr) {
-			exception::throw_with_trace(std::runtime_error("No player color chosen for player \"" + this->Name + "\" (" + std::to_string(this->Index) + ")."));
+			throw std::runtime_error("No player color chosen for player \"" + this->Name + "\" (" + std::to_string(this->Index) + ").");
 		}
 
 		this->player_color = player_color;
@@ -4029,7 +4027,7 @@ void CPlayer::set_overlord(CPlayer *overlord, const wyrmgus::vassalage_type)
 	}
 
 	if (overlord != nullptr && overlord->get_overlord() == this) {
-		exception::throw_with_trace(std::runtime_error("Cannot set player \"" + overlord->Name + "\" as the overlord of \"" + this->Name + "\", as the former is a vassal of the latter, and a vassal can't be the overlord of its own overlord."));
+		throw std::runtime_error("Cannot set player \"" + overlord->Name + "\" as the overlord of \"" + this->Name + "\", as the former is a vassal of the latter, and a vassal can't be the overlord of its own overlord.");
 	}
 
 	CPlayer *old_overlord = this->get_overlord();

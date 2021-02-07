@@ -25,7 +25,6 @@
 //      along with this program; if not, write to the Free Software
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
-//
 
 #include "stratagus.h"
 
@@ -64,7 +63,6 @@
 #include "unit/unit.h"
 #include "unit/unit_find.h"
 #include "unit/unit_type.h"
-#include "util/exception_util.h"
 #include "util/util.h"
 #include "util/vector_util.h"
 #include "video/font.h"
@@ -2356,7 +2354,7 @@ void CEditor::Init()
 	// Load and evaluate the editor configuration file
 	const std::string filename = LibraryFileName(Parameters::Instance.luaEditorStartFilename.c_str());
 	if (!CanAccessFile(filename.c_str())) {
-		exception::throw_with_trace(std::runtime_error("Editor configuration file \"" + Parameters::Instance.luaEditorStartFilename  + "\" was not found, specify another with '-E file.lua'"));
+		throw std::runtime_error("Editor configuration file \"" + Parameters::Instance.luaEditorStartFilename  + "\" was not found, specify another with '-E file.lua'");
 	}
 
 	ShowLoadProgress(_("Loading Script \"%s\""), filename.c_str());

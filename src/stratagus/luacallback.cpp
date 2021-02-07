@@ -25,7 +25,6 @@
 //      along with this program; if not, write to the Free Software
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
-//
 
 #include "stratagus.h"
 
@@ -158,7 +157,7 @@ void LuaCallback::run(int results)
 
 		lua_pop(luastate, 1);
 
-		exception::throw_with_trace(std::runtime_error(msg));
+		throw std::runtime_error(msg));
 	}
 	rescount = results;
 }

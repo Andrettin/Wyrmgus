@@ -23,7 +23,6 @@
 //      along with this program; if not, write to the Free Software
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
-//
 
 #include "stratagus.h"
 
@@ -36,7 +35,6 @@
 #include "translate.h"
 #include "ui/ui.h"
 #include "unit/unit.h"
-#include "util/exception_util.h"
 #include "video/video.h"
 
 namespace wyrmgus {
@@ -290,7 +288,7 @@ bool IconConfig::Load()
 {
 	const bool res = LoadNoLog();
 	if (!res) {
-		exception::throw_with_trace(std::runtime_error("Can't find icon \"" + this->Name + "\"."));
+		throw std::runtime_error("Can't find icon \"" + this->Name + "\".");
 	}
 	return res;
 }

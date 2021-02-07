@@ -28,8 +28,6 @@
 
 #include "database/sml_operator.h"
 
-#include "util/exception_util.h"
-
 namespace wyrmgus {
 
 void sml_property::print(std::ostream &ostream, const size_t indentation) const
@@ -47,7 +45,7 @@ void sml_property::print(std::ostream &ostream, const size_t indentation) const
 			ostream << "-=";
 			break;
 		case sml_operator::none:
-			exception::throw_with_trace(std::runtime_error("Cannot print the SML \"none\" operator."));
+			throw std::runtime_error("Cannot print the SML \"none\" operator.");
 	}
 
 	ostream << " " << this->get_value() << "\n";

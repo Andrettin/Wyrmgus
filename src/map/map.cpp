@@ -80,7 +80,6 @@
 #include "upgrade/upgrade.h"
 //Wyrmgus end
 #include "util/container_util.h"
-#include "util/exception_util.h"
 #include "util/point_util.h"
 #include "util/rect_util.h"
 #include "util/size_util.h"
@@ -325,14 +324,14 @@ QPoint CMap::generate_unit_location(const wyrmgus::unit_type *unit_type, const w
 	
 	QPoint random_pos(-1, -1);
 	
-	std::vector<const wyrmgus::terrain_type *> allowed_terrains;
+	std::vector<const terrain_type *> allowed_terrains;
 	if (unit_type->BoolFlag[FAUNA_INDEX].value && unit_type->get_species() != nullptr) { //if the unit is a fauna one, it has to start on terrain it is native to
 		allowed_terrains = unit_type->get_species()->get_native_terrain_types();
 	}
 	
 	for (const wyrmgus::unit_type *spawned_type : unit_type->SpawnUnits) {
 		if (spawned_type->BoolFlag[FAUNA_INDEX].value && spawned_type->get_species()) {
-			wyrmgus::vector::merge(allowed_terrains, spawned_type->get_species()->get_native_terrain_types());
+			vector::merge(allowed_terrains, spawned_type->get_species()->get_native_terrain_types());
 		}
 	}
 
@@ -346,7 +345,7 @@ QPoint CMap::generate_unit_location(const wyrmgus::unit_type *unit_type, const w
 	}
 	
 	while (!potential_positions.empty()) {
-		random_pos = wyrmgus::vector::take_random(potential_positions);
+		random_pos = vector::take_random(potential_positions);
 		
 		if (!this->Info.IsPointOnMap(random_pos, z) || (this->is_point_in_a_subtemplate_area(random_pos, z) && GameCycle == 0)) {
 			continue;
@@ -354,7 +353,7 @@ QPoint CMap::generate_unit_location(const wyrmgus::unit_type *unit_type, const w
 		
 		const wyrmgus::tile *tile = this->Field(random_pos, z);
 
-		if (!allowed_terrains.empty() && !wyrmgus::vector::contains(allowed_terrains, tile->get_top_terrain())) {
+		if (!allowed_terrains.empty() && !vector::contains(allowed_terrains, tile->get_top_terrain())) {
 			//if the unit is a fauna one, it has to start on terrain it is native to
 			continue;
 		}
@@ -1725,7 +1724,7 @@ void CMap::process_sml_property(const sml_property &property)
 {
 	const std::string &key = property.get_key();
 
-	exception::throw_with_trace(std::runtime_error("Invalid map data property: \"" + key + "\"."));
+	throw std::runtime_error("Invalid map data property: \"" + key + "\".");
 }
 
 void CMap::process_sml_scope(const sml_data &scope)
@@ -1764,7 +1763,7 @@ void CMap::process_sml_scope(const sml_data &scope)
 			database::process_sml_data(world->get_game_data(), child_scope);
 		});
 	} else {
-		exception::throw_with_trace(std::runtime_error("Invalid map data scope: \"" + scope.get_tag() + "\"."));
+		throw std::runtime_error("Invalid map data scope: \"" + scope.get_tag() + "\".");
 	}
 }
 
@@ -2342,7 +2341,7 @@ void CMap::calculate_tile_solid_tile(const QPoint &pos, const bool overlay, cons
 	}
 
 	if (terrain_type == nullptr) {
-		exception::throw_with_trace(std::runtime_error("Failed to calculate solid tile for tile " + wyrmgus::point::to_string(pos) + ", map layer " + std::to_string(z) + ": " + (overlay ? "overlay " : "") + "terrain is null."));
+		throw std::runtime_error("Failed to calculate solid tile for tile " + wyrmgus::point::to_string(pos) + ", map layer " + std::to_string(z) + ": " + (overlay ? "overlay " : "") + "terrain is null.");
 	}
 
 	if (terrain_type->has_tiled_background()) {

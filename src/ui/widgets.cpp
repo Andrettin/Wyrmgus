@@ -24,7 +24,6 @@
 //      along with this program; if not, write to the Free Software
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
-//
 
 #include "stratagus.h"
 
@@ -48,7 +47,6 @@
 //Wyrmgus start
 #include "results.h"
 //Wyrmgus end
-#include "util/exception_util.h"
 
 #ifdef USE_OPENGL
 #ifdef __APPLE__
@@ -1723,7 +1721,7 @@ void ImageTextField::draw(gcn::Graphics *graphics)
 	int x, y;
 	CGraphic *img = this->itemImage;
 	if (!img) {
-		exception::throw_with_trace(std::runtime_error("Not all graphics for ImageTextField were set."));
+		throw std::runtime_error("Not all graphics for ImageTextField were set.");
 	}
 	img->Resize(getWidth(), img->getHeight());
 	graphics->drawImage(img, 0, 0, 0, 0, getWidth(), img->getHeight());
@@ -2171,7 +2169,7 @@ void ImageListBoxWidget::draw(gcn::Graphics *graphics)
 	if (!this->upButtonImage || !this->downButtonImage || !this->leftButtonImage || !this->rightButtonImage
 		|| !this->upPressedButtonImage || !this->downPressedButtonImage || !this->leftPressedButtonImage || !this->rightPressedButtonImage
 		|| !this->markerImage || !this->hBarButtonImage || !this->vBarButtonImage) {
-		exception::throw_with_trace(std::runtime_error("Not all graphics for ImageListBoxWidget were set."));
+		throw std::runtime_error("Not all graphics for ImageListBoxWidget were set.");
 	}
 
 	gcn::Rectangle rect = getContentDimension();
@@ -2599,7 +2597,7 @@ void ImageDropDownWidget::draw(gcn::Graphics *graphics)
 
 	std::shared_ptr<CGraphic> img = this->itemImage;
 	if (!this->itemImage || !this->DownNormalImage || !this->DownPressedImage) {
-		exception::throw_with_trace(std::runtime_error("Not all graphics for ImageDropDownWidget were set."));
+		throw std::runtime_error("Not all graphics for ImageDropDownWidget were set.");
 	}
 
 	int alpha = getBaseColor().a;

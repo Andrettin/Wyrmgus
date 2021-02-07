@@ -26,7 +26,6 @@
 //      along with this program; if not, write to the Free Software
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
-//
 
 #include "stratagus.h"
 
@@ -108,7 +107,6 @@
 #include "unit/unit_type.h"
 #include "upgrade/upgrade.h"
 #include "util/date_util.h"
-#include "util/exception_util.h"
 #include "util/random.h"
 #include "util/string_util.h"
 //Wyrmgus start
@@ -192,7 +190,7 @@ void game::process_sml_property(const sml_property &property)
 {
 	const std::string &key = property.get_key();
 
-	exception::throw_with_trace(std::runtime_error("Invalid game data property: \"" + key + "\"."));
+	throw std::runtime_error("Invalid game data property: \"" + key + "\".");
 }
 
 void game::process_sml_scope(const sml_data &scope)
@@ -217,7 +215,7 @@ void game::process_sml_scope(const sml_data &scope)
 			database::process_sml_data(site->get_game_data(), child_scope);
 		});
 	} else {
-		exception::throw_with_trace(std::runtime_error("Invalid game data scope: \"" + scope.get_tag() + "\"."));
+		throw std::runtime_error("Invalid game data scope: \"" + scope.get_tag() + "\".");
 	}
 }
 
@@ -467,25 +465,25 @@ static void LoadStratagusMap(const std::string &smpname, const std::string &mapn
 	}
 
 	if (LcmPreventRecurse) {
-		exception::throw_with_trace(std::runtime_error("Recursive use of load map!"));
+		throw std::runtime_error("Recursive use of load map!");
 	}
 
 	InitPlayers();
 
 	LcmPreventRecurse = 1;
 	if (LuaLoadFile(mapfull) == -1) {
-		exception::throw_with_trace(std::runtime_error("Can't load lua file: " + std::string(mapfull)));
+		throw std::runtime_error("Can't load lua file: " + std::string(mapfull));
 	}
 	LcmPreventRecurse = 0;
 
 #if 0
 	// Not true if multiplayer levels!
 	if (!ThisPlayer) { /// ARI: bomb if nothing was loaded!
-		exception::throw_with_trace(std::runtime_error(mapname + ": invalid map"));
+		throw std::runtime_error(mapname + ": invalid map");
 	}
 #endif
 	if (!CMap::Map.Info.MapWidth || !CMap::Map.Info.MapHeight) {
-		exception::throw_with_trace(std::runtime_error(mapname + ": invalid map"));
+		throw std::runtime_error(mapname + ": invalid map");
 	}
 	CMap::Map.Info.Filename = mapname;
 }
@@ -1128,14 +1126,14 @@ int SaveStratagusMap(const std::string &mapName, CMap &map, int writeTerrain, bo
 //Wyrmgus end
 {
 	if (!map.Info.MapWidth || !map.Info.MapHeight) {
-		exception::throw_with_trace(std::runtime_error(mapName + ": invalid Stratagus map"));
+		throw std::runtime_error(mapName + ": invalid Stratagus map");
 	}
 
 	char mapSetup[PATH_MAX];
 	strcpy_s(mapSetup, sizeof(mapSetup), mapName.c_str());
 	char *setupExtension = strstr(mapSetup, ".smp");
 	if (!setupExtension) {
-		exception::throw_with_trace(std::runtime_error(mapName + ": invalid Stratagus map filename"));
+		throw std::runtime_error(mapName + ": invalid Stratagus map filename");
 	}
 
 	memcpy(setupExtension, ".sms", 4 * sizeof(char));
@@ -1207,7 +1205,7 @@ static void LoadMap(const std::string &filename, CMap &map, bool is_mod)
 		}
 	}
 
-	exception::throw_with_trace(std::runtime_error("Unrecognized map format."));
+	throw std::runtime_error("Unrecognized map format.");
 }
 
 /**

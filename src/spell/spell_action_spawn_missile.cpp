@@ -24,7 +24,6 @@
 //      along with this program; if not, write to the Free Software
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
-//
 
 #include "stratagus.h"
 
@@ -37,7 +36,6 @@
 #include "script.h"
 #include "unit/unit.h"
 #include "unit/unit_find.h"
-#include "util/exception_util.h"
 #include "util/string_conversion_util.h"
 
 struct CompareUnitDistance {
@@ -120,7 +118,7 @@ void spell_action_spawn_missile::process_sml_property(const sml_property &proper
 	} else if (key == "end_point") {
 		this->EndPoint = missile_location(spell_action_spawn_missile::string_to_location_base_type(value));
 	} else {
-		exception::throw_with_trace(std::runtime_error("Invalid spawn missile spell action property: \"" + key + "\"."));
+		throw std::runtime_error("Invalid spawn missile spell action property: \"" + key + "\".");
 	}
 }
 
@@ -133,14 +131,14 @@ void spell_action_spawn_missile::process_sml_scope(const sml_data &scope)
 	} else if (tag == "end_point") {
 		database::process_sml_data(this->EndPoint, scope);
 	} else {
-		exception::throw_with_trace(std::runtime_error("Invalid spawn missile spell action scope: \"" + tag + "\"."));
+		throw std::runtime_error("Invalid spawn missile spell action scope: \"" + tag + "\".");
 	}
 }
 
 void spell_action_spawn_missile::check() const
 {
 	if (this->Missile == nullptr) {
-		exception::throw_with_trace(std::runtime_error("Use a missile for spawn-missile (with missile)."));
+		throw std::runtime_error("Use a missile for spawn-missile (with missile).");
 	}
 }
 
@@ -304,13 +302,13 @@ void spell_action_spawn_missile::missile_location::process_sml_property(const sm
 	} else if (key == "add_rand_y") {
 		this->AddRandY = std::stoi(value);
 	} else {
-		exception::throw_with_trace(std::runtime_error("Invalid spawn missile spell location property: \"" + key + "\"."));
+		throw std::runtime_error("Invalid spawn missile spell location property: \"" + key + "\".");
 	}
 }
 
 void spell_action_spawn_missile::missile_location::process_sml_scope(const sml_data &scope)
 {
-	exception::throw_with_trace(std::runtime_error("Invalid spawn missile spell location scope: \"" + scope.get_tag() + "\"."));
+	throw std::runtime_error("Invalid spawn missile spell location scope: \"" + scope.get_tag() + "\".");
 }
 
 /**

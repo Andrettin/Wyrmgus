@@ -23,7 +23,6 @@
 //      along with this program; if not, write to the Free Software
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
-//
 
 #include "stratagus.h"
 
@@ -33,7 +32,6 @@
 #include "database/sml_property.h"
 #include "unit/unit.h"
 #include "unit/unit_type.h"
-#include "util/exception_util.h"
 #include "util/string_conversion_util.h"
 #include "util/vector_random_util.h"
 
@@ -50,7 +48,7 @@ void character_unit::process_sml_property(const sml_property &property)
 	} else if (key == "ai_active") {
 		this->ai_active = string::to_bool(value);
 	} else {
-		exception::throw_with_trace(std::runtime_error("Invalid character unit property: \"" + key + "\"."));
+		throw std::runtime_error("Invalid character unit property: \"" + key + "\".");
 	}
 }
 
@@ -73,7 +71,7 @@ void character_unit::process_sml_scope(const sml_data &scope)
 			}
 		});
 	} else {
-		exception::throw_with_trace(std::runtime_error("Invalid character unit scope: \"" + tag + "\"."));
+		throw std::runtime_error("Invalid character unit scope: \"" + tag + "\".");
 	}
 }
 

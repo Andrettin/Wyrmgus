@@ -24,7 +24,6 @@
 //      along with this program; if not, write to the Free Software
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
-//
 
 /**
 ** @page AiModule Module - AI
@@ -168,7 +167,6 @@
 #include "unit/unit_type.h"
 #include "unit/unit_type_type.h"
 #include "upgrade/upgrade.h"
-#include "util/exception_util.h"
 #include "util/vector_random_util.h"
 #include "util/vector_util.h"
 
@@ -655,7 +653,7 @@ void AiInit(CPlayer &player)
 	auto pai = std::make_unique<PlayerAi>();
 
 	if (!pai) {
-		exception::throw_with_trace(std::runtime_error("Out of memory."));
+		throw std::runtime_error("Out of memory.");
 	}
 
 	pai->Player = &player;
@@ -665,7 +663,7 @@ void AiInit(CPlayer &player)
 
 	//  Search correct AI type.
 	if (AiTypes.empty()) {
-		exception::throw_with_trace(std::runtime_error("AI: Got no scripts at all! You need at least one dummy fallback script. See the DefineAi() documentation."));
+		throw std::runtime_error("AI: Got no scripts at all! You need at least one dummy fallback script. See the DefineAi() documentation.");
 	}
 
 	CAiType *ait = nullptr;
@@ -681,7 +679,7 @@ void AiInit(CPlayer &player)
 		break;
 	}
 	if (ait == nullptr) {
-		exception::throw_with_trace(std::runtime_error("AI: Found no matching ai scripts at all!"));
+		throw std::runtime_error("AI: Found no matching ai scripts at all!");
 	}
 	if (player.AiName.empty()) {
 		DebugPrint("AI: not found!!!!!!!!!!\n");

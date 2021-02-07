@@ -23,7 +23,6 @@
 //      along with this program; if not, write to the Free Software
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
-//
 
 #include "stratagus.h"
 
@@ -72,7 +71,6 @@
 #include "unit/unit_find.h"
 #include "unit/unit_type.h"
 #include "unit/unit_type_type.h"
-#include "util/exception_util.h"
 #include "util/log_util.h"
 #include "util/vector_util.h"
 #include "video/font.h"
@@ -2014,7 +2012,7 @@ static int SendSpellCast(const Vec2i &tilePos, int flush)
 		// CursorValue here holds the spell type id
 		const wyrmgus::spell *spell = wyrmgus::spell::get_all().at(CursorValue);
 		if (!spell) {
-			exception::throw_with_trace(std::runtime_error("Unknown spell-id: " + std::to_string(CursorValue)));
+			throw std::runtime_error("Unknown spell-id: " + std::to_string(CursorValue));
 		}
 		
 		if (std::find(unit.Type->Spells.begin(), unit.Type->Spells.end(), spell) == unit.Type->Spells.end()) {

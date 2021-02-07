@@ -23,7 +23,6 @@
 //      along with this program; if not, write to the Free Software
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
-//
 
 #include "ai/ai_force_template.h"
 
@@ -31,7 +30,6 @@
 #include "database/sml_data.h"
 #include "database/sml_property.h"
 #include "unit/unit_class.h"
-#include "util/exception_util.h"
 
 namespace wyrmgus {
 
@@ -52,7 +50,7 @@ void ai_force_template::process_sml_property(const sml_property &property)
 	} else if (key == "weight") {
 		this->weight = std::stoi(value);
 	} else {
-		exception::throw_with_trace(std::runtime_error("Invalid AI force template property: \"" + key + "\"."));
+		throw std::runtime_error("Invalid AI force template property: \"" + key + "\".");
 	}
 }
 
@@ -70,14 +68,14 @@ void ai_force_template::process_sml_scope(const sml_data &scope)
 			this->add_unit(unit_class, unit_quantity);
 		});
 	} else {
-		exception::throw_with_trace(std::runtime_error("Invalid AI force template scope: \"" + tag + "\"."));
+		throw std::runtime_error("Invalid AI force template scope: \"" + tag + "\".");
 	}
 }
 
 void ai_force_template::check() const
 {
 	if (this->get_force_type() == ai_force_type::none) {
-		exception::throw_with_trace(std::runtime_error("AI force template has \"none\" as its force type."));
+		throw std::runtime_error("AI force template has \"none\" as its force type.");
 	}
 }
 
