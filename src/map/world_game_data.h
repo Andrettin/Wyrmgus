@@ -72,6 +72,11 @@ public:
 
 	void do_per_in_game_hour_loop();
 
+	void set_remaining_time_of_day_hours(const int hours)
+	{
+		this->remaining_time_of_day_hours = hours;
+	}
+
 private:
 	void decrement_remaining_time_of_day_hours();
 	void increment_time_of_day();

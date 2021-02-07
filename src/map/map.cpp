@@ -1393,18 +1393,54 @@ void ChangeCurrentMapLayer(const int z)
 */
 void SetTimeOfDay(const std::string &time_of_day_ident, int z)
 {
+	const std::unique_ptr<CMapLayer> &map_layer = CMap::get()->MapLayers[z];
+
 	if (time_of_day_ident.empty()) {
-		CMap::Map.MapLayers[z]->SetTimeOfDay(nullptr);
-		CMap::Map.MapLayers[z]->RemainingTimeOfDayHours = 0;
-	} else {
-		const time_of_day_schedule *schedule = CMap::Map.MapLayers[z]->get_time_of_day_schedule();
-		if (schedule != nullptr) {
-			for (const std::unique_ptr<scheduled_time_of_day> &time_of_day : schedule->get_scheduled_times_of_day()) {
-				if (time_of_day->get_time_of_day()->get_identifier() == time_of_day_ident)  {
-					CMap::Map.MapLayers[z]->SetTimeOfDay(time_of_day.get());
-					CMap::Map.MapLayers[z]->RemainingTimeOfDayHours = time_of_day->get_hours(CMap::Map.MapLayers[z]->GetSeason());
-					break;
-				}
+		map_layer->SetTimeOfDay(nullptr);
+		map_layer->RemainingTimeOfDayHours = 0;
+
+		for (const world *world : world::get_all()) {
+			world_game_data *world_game_data = world->get_game_data();
+
+			if (!world_game_data->is_on_map()) {
+				continue;
+			}
+
+			world_game_data->set_time_of_day(nullptr);
+			world_game_data->set_remaining_time_of_day_hours(0);
+		}
+
+		return;
+	}
+
+	const time_of_day *time_of_day = time_of_day::try_get(time_of_day_ident);
+	if (time_of_day == nullptr) {
+		return;
+	}
+
+	const time_of_day_schedule *schedule = map_layer->get_time_of_day_schedule();
+	if (schedule != nullptr) {
+		for (const std::unique_ptr<scheduled_time_of_day> &scheduled_time_of_day : schedule->get_scheduled_times_of_day()) {
+			if (scheduled_time_of_day->get_time_of_day() == time_of_day) {
+				map_layer->SetTimeOfDay(scheduled_time_of_day.get());
+				map_layer->RemainingTimeOfDayHours = scheduled_time_of_day->get_hours(map_layer->GetSeason());
+				break;
+			}
+		}
+	}
+
+	for (const world *world : world::get_all()) {
+		world_game_data *world_game_data = world->get_game_data();
+
+		if (!world_game_data->is_on_map()) {
+			continue;
+		}
+
+		for (const std::unique_ptr<scheduled_time_of_day> &scheduled_time_of_day : world->get_time_of_day_schedule()->get_scheduled_times_of_day()) {
+			if (scheduled_time_of_day->get_time_of_day() == time_of_day) {
+				world_game_data->set_time_of_day(scheduled_time_of_day.get());
+				world_game_data->set_remaining_time_of_day_hours(scheduled_time_of_day->get_hours(world_game_data->get_season()));
+				break;
 			}
 		}
 	}
