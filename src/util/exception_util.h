@@ -30,9 +30,4 @@ namespace wyrmgus::exception {
 
 extern void report(const std::exception &exception);
 
-template <typename exception_type>
-[[noreturn]] extern void throw_with_trace(const exception_type &exception);
-
-extern template [[noreturn]] void throw_with_trace<std::runtime_error>(const std::runtime_error &exception);
-
 }
