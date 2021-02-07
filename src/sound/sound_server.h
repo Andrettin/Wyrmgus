@@ -26,7 +26,6 @@
 //      along with this program; if not, write to the Free Software
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
-//
 
 #pragma once
 
@@ -99,6 +98,6 @@ extern bool IsMusicEnabled();
 /// Check if sound is enabled
 extern bool SoundEnabled();
 /// Initialize the sound card.
-extern int InitSound();
+extern bool InitSound();
 ///  Cleanup sound.
 extern void QuitSound();

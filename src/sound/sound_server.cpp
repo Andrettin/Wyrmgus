@@ -26,7 +26,6 @@
 //      along with this program; if not, write to the Free Software
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
-//
 
 #include "stratagus.h"
 
@@ -521,17 +520,23 @@ static void InitSdlSound()
 }
 
 /**
-**  Initialize sound card.
+**  Initialize sound.
 **
-**  @return  True if failure, false if everything ok.
+**  @return  True on success, or false otherwise.
 */
-int InitSound()
+bool InitSound()
 {
 	//
 	// Open sound device, 16-bit samples, stereo.
 	//
-	InitSdlSound();
-	SoundInitialized = true;
+	try {
+		InitSdlSound();
+		SoundInitialized = true;
+	} catch (const std::exception &exception) {
+		exception::report(exception);
+		SoundInitialized = false;
+		return false;
+	}
 
 	// ARI: The following must be done here to allow sound to work in
 	// pre-start menus!
@@ -549,7 +554,7 @@ int InitSound()
 	Mix_ResumeMusic();
 	Mix_Resume(-1);
 
-	return 0;
+	return true;
 }
 
 /**
@@ -557,6 +562,10 @@ int InitSound()
 */
 void QuitSound()
 {
+	if (!SoundInitialized) {
+		return;
+	}
+
 	wyrmgus::sound::unload_all();
 	wyrmgus::music::unload_all();
 
