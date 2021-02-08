@@ -30,6 +30,7 @@
 #include "name_generator.h"
 
 #include "gender.h"
+#include "unit/unit_class.h"
 #include "util/vector_util.h"
 #include "util/vector_random_util.h"
 
@@ -48,6 +49,21 @@ void name_generator::propagate_ungendered_names(const std::map<gender, std::uniq
 			target_name_map[gender::female] = std::make_unique<name_generator>();
 		}
 		target_name_map[gender::female]->add_names(find_iterator->second->get_names());
+	}
+}
+
+void name_generator::propagate_unit_class_names(const unit_class_map<std::unique_ptr<name_generator>> &unit_class_name_generators, std::unique_ptr<name_generator> &ship_name_generator)
+{
+	for (const auto &kv_pair : unit_class_name_generators) {
+		const unit_class *unit_class = kv_pair.first;
+
+		if (unit_class->is_ship()) {
+			if (ship_name_generator == nullptr) {
+				ship_name_generator = std::make_unique<name_generator>();
+			}
+
+			ship_name_generator->add_names(kv_pair.second->get_names());
+		}
 	}
 }
 

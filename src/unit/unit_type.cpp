@@ -2080,19 +2080,10 @@ const name_generator *unit_type::get_name_generator(const wyrmgus::faction *fact
 			return civilization->get_personal_name_generator(gender);
 		} else {
 			if (this->get_unit_class() != nullptr) {
-				const name_generator *unit_class_name_generator = civilization->get_unit_class_name_generator(this->get_unit_class());
-				if (unit_class_name_generator != nullptr) {
-					return unit_class_name_generator;
-				}
-			}
-
-			if (this->UnitType == UnitTypeType::Naval) { // if is a ship
-				if (faction != nullptr && faction->get_ship_name_generator() != nullptr) {
-					return faction->get_ship_name_generator();
-				}
-
-				if (civilization->get_ship_name_generator() != nullptr) {
-					return civilization->get_ship_name_generator();
+				if (faction != nullptr) {
+					return faction->get_unit_class_name_generator(this->get_unit_class());
+				} else {
+					return civilization->get_unit_class_name_generator(this->get_unit_class());
 				}
 			}
 		}

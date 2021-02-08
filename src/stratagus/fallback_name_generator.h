@@ -55,13 +55,7 @@ public:
 	void add_surnames(const std::vector<std::string> &surnames);
 
 	const name_generator *get_unit_class_name_generator(const unit_class *unit_class) const;
-
 	void add_unit_class_names(const unit_class_map<std::unique_ptr<name_generator>> &unit_class_names);
-
-	const name_generator *get_ship_name_generator() const
-	{
-		return this->ship_name_generator.get();
-	}
 
 	void add_ship_names(const std::vector<std::string> &ship_names);
 

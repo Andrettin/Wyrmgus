@@ -25,12 +25,15 @@
 //      02111-1307, USA.
 //
 
+#include "stratagus.h"
+
 #include "civilization_base.h"
 
 #include "civilization_group.h"
 #include "civilization_history.h"
 #include "database/sml_data.h"
 #include "database/sml_operator.h"
+#include "faction.h"
 #include "fallback_name_generator.h"
 #include "gender.h"
 #include "name_generator.h"
@@ -122,10 +125,11 @@ void civilization_base::initialize()
 	}
 	fallback_name_generator::get()->add_unit_class_names(this->unit_class_name_generators);
 	if (this->ship_name_generator != nullptr) {
-		fallback_name_generator::get()->add_surnames(this->ship_name_generator->get_names());
+		fallback_name_generator::get()->add_ship_names(this->ship_name_generator->get_names());
 	}
 
 	name_generator::propagate_ungendered_names(this->personal_name_generators);
+	name_generator::propagate_unit_class_names(this->unit_class_name_generators, this->ship_name_generator);
 
 	data_entry::initialize();
 }
@@ -237,6 +241,10 @@ const name_generator *civilization_base::get_unit_class_name_generator(const uni
 		return find_iterator->second.get();
 	}
 
+	if (unit_class->is_ship() && this->ship_name_generator != nullptr && this->ship_name_generator->get_name_count() >= name_generator::minimum_name_count) {
+		return this->ship_name_generator.get();
+	}
+
 	if (this->get_group() != nullptr) {
 		return this->get_group()->get_unit_class_name_generator(unit_class);
 	}
@@ -255,19 +263,6 @@ void civilization_base::add_unit_class_name(const unit_class *unit_class, const 
 	if (this->group != nullptr) {
 		this->group->add_unit_class_name(unit_class, name);
 	}
-}
-
-const name_generator *civilization_base::get_ship_name_generator() const
-{
-	if (this->ship_name_generator != nullptr && this->ship_name_generator->get_name_count() >= name_generator::minimum_name_count) {
-		return this->ship_name_generator.get();
-	}
-
-	if (this->get_group() != nullptr) {
-		return this->get_group()->get_ship_name_generator();
-	}
-
-	return fallback_name_generator::get()->get_ship_name_generator();
 }
 
 void civilization_base::add_ship_name(const std::string &ship_name)
@@ -311,6 +306,8 @@ void civilization_base::add_names_from(const civilization_base *other)
 		this->unit_class_name_generators[kv_pair.first]->add_names(kv_pair.second->get_names());
 	}
 
+	name_generator::propagate_unit_class_names(other->unit_class_name_generators, this->ship_name_generator);
+
 	if (other->ship_name_generator != nullptr) {
 		if (this->ship_name_generator == nullptr) {
 			this->ship_name_generator = std::make_unique<name_generator>();
@@ -321,6 +318,27 @@ void civilization_base::add_names_from(const civilization_base *other)
 
 	if (this->group != nullptr) {
 		this->group->add_names_from(other);
+	}
+}
+
+void civilization_base::add_names_from(const faction *faction)
+{
+	for (const auto &kv_pair : faction->get_unit_class_name_generators()) {
+		if (this->unit_class_name_generators.find(kv_pair.first) == this->unit_class_name_generators.end()) {
+			this->unit_class_name_generators[kv_pair.first] = std::make_unique<name_generator>();
+		}
+
+		this->unit_class_name_generators[kv_pair.first]->add_names(kv_pair.second->get_names());
+	}
+
+	name_generator::propagate_unit_class_names(faction->get_unit_class_name_generators(), this->ship_name_generator);
+
+	if (faction->get_ship_name_generator() != nullptr) {
+		if (this->ship_name_generator == nullptr) {
+			this->ship_name_generator = std::make_unique<name_generator>();
+		}
+
+		this->ship_name_generator->add_names(faction->get_ship_name_generator()->get_names());
 	}
 }
 

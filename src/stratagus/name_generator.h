@@ -27,6 +27,8 @@
 
 #pragma once
 
+#include "unit/unit_class_container.h"
+
 namespace wyrmgus {
 
 enum class gender;
@@ -42,6 +44,8 @@ public:
 	{
 		name_generator::propagate_ungendered_names(name_map, name_map);
 	}
+
+	static void propagate_unit_class_names(const unit_class_map<std::unique_ptr<name_generator>> &unit_class_name_generators, std::unique_ptr<name_generator> &ship_name_generator);
 
 	const std::vector<std::string> &get_names() const
 	{

@@ -36,11 +36,13 @@
 #include "faction_history.h"
 #include "faction_tier.h"
 #include "faction_type.h"
+#include "fallback_name_generator.h"
 #include "government_type.h"
 #include "luacallback.h"
 #include "name_generator.h"
 #include "player_color.h"
 #include "script/condition/and_condition.h"
+#include "unit/unit_class.h"
 #include "unit/unit_type.h"
 #include "util/container_util.h"
 #include "util/string_util.h"
@@ -163,6 +165,18 @@ void faction::process_sml_scope(const sml_data &scope)
 		auto conditions = std::make_unique<and_condition>();
 		database::process_sml_data(conditions, scope);
 		this->conditions = std::move(conditions);
+	} else if (tag == "unit_class_names") {
+		scope.for_each_child([&](const sml_data &child_scope) {
+			const std::string &tag = child_scope.get_tag();
+
+			const unit_class *unit_class = unit_class::get(tag);
+
+			if (this->unit_class_name_generators.find(unit_class) == this->unit_class_name_generators.end()) {
+				this->unit_class_name_generators[unit_class] = std::make_unique<name_generator>();
+			}
+
+			this->unit_class_name_generators[unit_class]->add_names(child_scope.get_values());
+		});
 	} else if (tag == "ship_names") {
 		if (this->ship_name_generator == nullptr) {
 			this->ship_name_generator = std::make_unique<name_generator>();
@@ -212,6 +226,21 @@ void faction::initialize()
 	if (this->get_max_tier() == faction_tier::none) {
 		this->max_tier = this->get_default_tier();
 	}
+
+	if (this->civilization != nullptr) {
+		if (!this->civilization->is_initialized()) {
+			this->civilization->initialize();
+		}
+
+		this->civilization->add_names_from(this);
+	}
+
+	fallback_name_generator::get()->add_unit_class_names(this->unit_class_name_generators);
+	if (this->ship_name_generator != nullptr) {
+		fallback_name_generator::get()->add_ship_names(this->ship_name_generator->get_names());
+	}
+
+	name_generator::propagate_unit_class_names(this->unit_class_name_generators, this->ship_name_generator);
 
 	data_entry::initialize();
 }
@@ -379,17 +408,18 @@ const std::vector<std::unique_ptr<CAiBuildingTemplate>> &faction::GetAiBuildingT
 	return this->civilization->GetAiBuildingTemplates();
 }
 
-const name_generator *faction::get_ship_name_generator() const
+const name_generator *faction::get_unit_class_name_generator(const unit_class *unit_class) const
 {
-	if (this->ship_name_generator != nullptr) {
+	const auto find_iterator = this->unit_class_name_generators.find(unit_class);
+	if (find_iterator != this->unit_class_name_generators.end() && find_iterator->second->get_name_count() >= name_generator::minimum_name_count) {
+		return find_iterator->second.get();
+	}
+
+	if (unit_class->is_ship() && this->ship_name_generator != nullptr && this->ship_name_generator->get_name_count() >= name_generator::minimum_name_count) {
 		return this->ship_name_generator.get();
 	}
-	
-	if (this->get_parent_faction() != nullptr) {
-		return this->get_parent_faction()->get_ship_name_generator();
-	}
-	
-	return this->civilization->get_ship_name_generator();
+
+	return this->get_civilization()->get_unit_class_name_generator(unit_class);
 }
 
 unit_type *faction::get_class_unit_type(const unit_class *unit_class) const

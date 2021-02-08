@@ -31,6 +31,7 @@
 
 #include "gender.h"
 #include "name_generator.h"
+#include "unit/unit_class.h"
 #include "util/vector_util.h"
 
 namespace wyrmgus {
@@ -105,6 +106,10 @@ const name_generator *fallback_name_generator::get_unit_class_name_generator(con
 		return find_iterator->second.get();
 	}
 
+	if (unit_class->is_ship() && this->ship_name_generator != nullptr) {
+		return this->ship_name_generator.get();
+	}
+
 	return nullptr;
 }
 
@@ -117,6 +122,8 @@ void fallback_name_generator::add_unit_class_names(const unit_class_map<std::uni
 
 		this->unit_class_name_generators[kv_pair.first]->add_names(kv_pair.second->get_names());
 	}
+
+	name_generator::propagate_unit_class_names(unit_class_names, this->ship_name_generator);
 }
 
 void fallback_name_generator::add_ship_names(const std::vector<std::string> &ship_names)

@@ -1220,8 +1220,8 @@ void CPlayer::SetFaction(const wyrmgus::faction *faction)
 		return;
 	}
 
-	const int old_faction_id = this->Faction;
-	
+	const wyrmgus::faction *old_faction = this->get_faction();
+
 	if (faction != nullptr && faction->get_civilization() != this->get_civilization()) {
 		this->set_civilization(faction->get_civilization());
 	}
@@ -1239,9 +1239,9 @@ void CPlayer::SetFaction(const wyrmgus::faction *faction)
 
 	const int faction_id = faction ? faction->ID : -1;
 	
-	if (old_faction_id != -1 && faction != nullptr) {
+	if (old_faction != nullptr && faction != nullptr) {
 		for (const wyrmgus::upgrade_class *upgrade_class : wyrmgus::upgrade_class::get_all()) {
-			const CUpgrade *old_faction_class_upgrade = wyrmgus::faction::get_all()[old_faction_id]->get_class_upgrade(upgrade_class);
+			const CUpgrade *old_faction_class_upgrade = old_faction->get_class_upgrade(upgrade_class);
 			const CUpgrade *new_faction_class_upgrade = faction->get_class_upgrade(upgrade_class);
 			if (old_faction_class_upgrade != new_faction_class_upgrade) { //if the upgrade for a certain class is different for the new faction than the old faction (and it has been acquired), remove the modifiers of the old upgrade and apply the modifiers of the new
 				if (old_faction_class_upgrade != nullptr && this->Allow.Upgrades[old_faction_class_upgrade->ID] == 'R') {
@@ -1256,10 +1256,9 @@ void CPlayer::SetFaction(const wyrmgus::faction *faction)
 	}
 	
 	bool personal_names_changed = true;
-	bool ship_names_changed = true;
 	if (this->get_faction() != nullptr && faction != nullptr) {
-		ship_names_changed = this->get_faction()->get_ship_name_generator() != faction->get_ship_name_generator();
-		personal_names_changed = false; // setting to a faction of the same civilization
+		//setting to a faction of the same civilization (if the civilization were different, then the set_civilization() call above would have led to the current faction becoming null)
+		personal_names_changed = false;
 	}
 	
 	this->Faction = faction_id;
@@ -1379,14 +1378,20 @@ void CPlayer::SetFaction(const wyrmgus::faction *faction)
 	
 	for (int i = 0; i < this->GetUnitCount(); ++i) {
 		CUnit &unit = this->GetUnit(i);
-		if (unit.get_unique() == nullptr) {
-			if (unit.Type->is_ship() && ship_names_changed) {
+
+		if (unit.Type->BoolFlag[ORGANIC_INDEX].value) {
+			if (personal_names_changed && unit.get_character() == nullptr && unit.Type->get_civilization() != nullptr && unit.Type->get_civilization()->get_species() == faction->get_civilization()->get_species() && unit.Type == faction->get_class_unit_type(unit.Type->get_unit_class())) {
 				unit.UpdatePersonalName();
 			}
+		} else {
+			if (unit.get_unique() == nullptr) {
+				const unit_class *unit_class = unit.Type->get_unit_class();
+				if (unit_class != nullptr && (old_faction == nullptr || faction == nullptr || old_faction->get_unit_class_name_generator(unit_class) != faction->get_unit_class_name_generator(unit_class))) {
+					unit.UpdatePersonalName();
+				}
+			}
 		}
-		if (personal_names_changed && unit.Type->BoolFlag[ORGANIC_INDEX].value && unit.get_character() == nullptr && unit.Type->get_civilization() != nullptr && unit.Type->get_civilization()->get_species() == faction->get_civilization()->get_species() && unit.Type == faction->get_class_unit_type(unit.Type->get_unit_class())) {
-			unit.UpdatePersonalName();
-		}
+
 		unit.UpdateSoldUnits();
 		unit.UpdateButtonIcons();
 	}

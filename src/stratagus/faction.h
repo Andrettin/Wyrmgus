@@ -33,6 +33,7 @@
 #include "gender.h"
 #include "player.h" //for certain enums
 #include "time/date.h"
+#include "unit/unit_class_container.h"
 
 class CAiBuildingTemplate;
 class CCurrency;
@@ -213,7 +214,18 @@ public:
 	int get_force_type_weight(const ai_force_type force_type) const;
 	const std::vector<std::unique_ptr<ai_force_template>> &get_ai_force_templates(const ai_force_type force_type) const;
 	const std::vector<std::unique_ptr<CAiBuildingTemplate>> &GetAiBuildingTemplates() const;
-	const name_generator *get_ship_name_generator() const;
+
+	const unit_class_map<std::unique_ptr<name_generator>> &get_unit_class_name_generators() const
+	{
+		return this->unit_class_name_generators;
+	}
+
+	const name_generator *get_unit_class_name_generator(const unit_class *unit_class) const;
+
+	const name_generator *get_ship_name_generator() const
+	{
+		return this->ship_name_generator.get();
+	}
 
 	unit_type *get_class_unit_type(const unit_class *unit_class) const;
 
@@ -343,7 +355,8 @@ private:
 public:
 	std::vector<std::string> ProvinceNames;								/// Province names for the faction
 private:
-	std::unique_ptr<name_generator> ship_name_generator; //ship names for the faction
+	unit_class_map<std::unique_ptr<name_generator>> unit_class_name_generators;
+	std::unique_ptr<name_generator> ship_name_generator;
 	std::vector<CFiller> ui_fillers;
 	std::unique_ptr<const and_condition> preconditions;
 	std::unique_ptr<const and_condition> conditions;

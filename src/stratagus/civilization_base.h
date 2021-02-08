@@ -34,6 +34,7 @@ namespace wyrmgus {
 
 class civilization_group;
 class civilization_history;
+class faction;
 class name_generator;
 class species;
 class unit_class;
@@ -83,10 +84,10 @@ public:
 	const name_generator *get_unit_class_name_generator(const unit_class *unit_class) const;
 	void add_unit_class_name(const unit_class *unit_class, const std::string &name);
 
-	const name_generator *get_ship_name_generator() const;
 	void add_ship_name(const std::string &ship_name);
 
 	void add_names_from(const civilization_base *other);
+	void add_names_from(const faction *faction);
 
 protected:
 	void set_species(wyrmgus::species *species)
