@@ -340,6 +340,10 @@ void civilization_base::add_names_from(const faction *faction)
 
 		this->ship_name_generator->add_names(faction->get_ship_name_generator()->get_names());
 	}
+
+	if (this->group != nullptr) {
+		this->group->add_names_from(faction);
+	}
 }
 
 }
