@@ -23,7 +23,6 @@
 //      along with this program; if not, write to the Free Software
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
-//
 
 #pragma once
 
@@ -40,6 +39,7 @@ class unit_class final : public named_data_entry, public data_type<unit_class>
 	Q_OBJECT
 
 	Q_PROPERTY(bool town_hall MEMBER town_hall READ is_town_hall)
+	Q_PROPERTY(bool ship MEMBER ship READ is_ship)
 
 public:
 	static constexpr const char *class_identifier = "unit_class";
@@ -79,6 +79,11 @@ public:
 
 	void set_town_hall(const bool town_hall);
 
+	bool is_ship() const
+	{
+		return this->ship;
+	}
+
 	const std::unique_ptr<condition> &get_preconditions() const
 	{
 		return this->preconditions;
@@ -106,6 +111,7 @@ public:
 private:
 	int index = -1;
 	bool town_hall = false; //whether the building class is a settlement head building class, e.g. a town hall or fortress
+	bool ship = false; //whether the unit class is a ship
 	std::unique_ptr<condition> preconditions;
 	std::unique_ptr<condition> conditions;
 	std::vector<unit_type *> unit_types;

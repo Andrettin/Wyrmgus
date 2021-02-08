@@ -2113,7 +2113,7 @@ bool unit_type::can_gain_experience() const
 
 bool unit_type::is_ship() const
 {
-	return this->UnitType == UnitTypeType::Naval && !this->BoolFlag[ORGANIC_INDEX].value;
+	return this->get_unit_class() != nullptr && this->get_unit_class()->is_ship();
 }
 
 gender unit_type::get_gender() const
