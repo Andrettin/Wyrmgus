@@ -2102,11 +2102,6 @@ bool unit_type::can_gain_experience() const
 	return this->BoolFlag[ORGANIC_INDEX].value;
 }
 
-bool unit_type::is_ship() const
-{
-	return this->get_unit_class() != nullptr && this->get_unit_class()->is_ship();
-}
-
 gender unit_type::get_gender() const
 {
 	return this->DefaultStat.get_gender();
