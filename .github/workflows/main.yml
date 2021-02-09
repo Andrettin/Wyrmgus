@@ -18,16 +18,29 @@ jobs:
     container: 'bergentroll/wyrmgus:focal'
     steps:
       - uses: actions/checkout@v2
+      - name: Set CPU number
+        run: echo "THREADS=$(nproc)" >> "$GITHUB_ENV"
       - name: Configure CMake
         run: >-
-          cmake -S "$GITHUB_WORKSPACE" -B "$BUILD_DIR"
-          -DCMAKE_BUILD_TYPE="$BUILD_TYPE" $CMAKE_FLAGS
+          cmake
+          -S "$GITHUB_WORKSPACE"
+          -B "$BUILD_DIR"
+          -DCMAKE_BUILD_TYPE="$BUILD_TYPE"
+          $CMAKE_FLAGS
       - name: Workaround for tolua.cpp target on CMake 3.16.3
         run: cmake -S "$GITHUB_WORKSPACE" -B "$BUILD_DIR"
       - name: Build Wyrmgus
-        run: cmake --build "$BUILD_DIR" --target stratagus_main
+        run: >-
+          cmake
+          --build "$BUILD_DIR"
+          --target stratagus_main
+          --parallel "$THREADS"
       - name: Build Wyrmgus test suite
-        run: cmake --build "$BUILD_DIR" --target stratagus_test
+        run: >-
+          cmake
+          --build "$BUILD_DIR"
+          --target stratagus_test
+          --parallel "$THREADS"
       - name: Test
         continue-on-error: true
         run: cmake --build "$BUILD_DIR" --target test
@@ -38,7 +51,8 @@ jobs:
       - name: Run Wyrmsun
         # TODO Test bad exit code
         run: >-
-          "${BUILD_DIR}/wyrmgus" -d "${BUILD_DIR}/Wyrmsun" & echo $! > PID
+          "${BUILD_DIR}/wyrmgus" -d "${BUILD_DIR}/Wyrmsun" &
+          echo "PID=$!" >> "$GITHUB_ENV"
         timeout-minutes: 10
       - name: Stop Wyrmsun
-        run: sleep 120 && kill $(cat PID)
+        run: sleep 120 && kill "$PID"
