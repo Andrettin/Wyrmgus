@@ -96,7 +96,4 @@ inline void log_qt_message(QtMsgType type, const QMessageLogContext &context, co
 	}
 }
 
-extern void log_stacktrace(const boost::stacktrace::stacktrace &stacktrace);
-extern void log_stacktrace();
-
 }

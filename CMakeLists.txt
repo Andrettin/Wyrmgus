@@ -501,7 +501,6 @@ set(util_SRCS
 	src/util/georectangle_util.cpp
 	src/util/geoshape_util.cpp
 	src/util/image_util.cpp
-	src/util/log_util.cpp
 	src/util/number_util.cpp
 	src/util/point_container.cpp
 	src/util/point_util.cpp
@@ -1346,12 +1345,6 @@ if (WIN32 AND MINGW)
 	set(stratagus_LIBS ${stratagus_LIBS} dxguid)
 endif()
 
-if (UNIX)
-	#linking with libdl and libbacktrace is necessary for Boost.Stacktrace
-	add_definitions(-DBOOST_STACKTRACE_USE_BACKTRACE)
-	set(stratagus_LIBS ${stratagus_LIBS} dl backtrace)
-endif()
-
 if(APPLE)
 	add_definitions(-DUSE_MAC)
 	set(SDL_LIBRARY ${SDL_LIBRARY} SDLmain)	
@@ -1682,8 +1675,7 @@ set_target_properties(stratagus_main PROPERTIES OUTPUT_NAME ${BINARY_NAME})
 
 if (MSVC)
 	#ignore linker warning due to missing .pdb files, as otherwise a stream of warnings comes from linking external libraries
-	#/PDBALTPATH:%_PDB% is necessary so that Boost.Stacktrace uses the PDB in the same directory as the executable; ${BINARY_NAME}.pdb is used instead of %_PDB% as the latter becomes "%%_PDB%%"
-	set_target_properties(stratagus_main PROPERTIES LINK_FLAGS "/ignore:4099 /PDBALTPATH:${BINARY_NAME}.pdb")
+	set_target_properties(stratagus_main PROPERTIES LINK_FLAGS "/ignore:4099")
 	set_target_properties(stratagus_test PROPERTIES LINK_FLAGS "/ignore:4099")
 endif()
 
