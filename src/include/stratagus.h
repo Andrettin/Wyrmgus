@@ -84,6 +84,13 @@
 ==  Debug definitions
 ============================================================================*/
 
+#ifndef NDEBUG
+//ensure DEBUG is defined is NDEBUG is not defined
+#ifndef DEBUG
+#define DEBUG
+#endif
+#endif
+
 /**
 **  This simulates vararg macros.
 **  Example:

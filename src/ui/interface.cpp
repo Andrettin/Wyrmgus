@@ -1020,7 +1020,7 @@ bool HandleCheats(const std::string &input)
 
 #if defined(DEBUG) || defined(PROF)
 	if (input == "ai me") {
-		if (ThisPlayer->AiEnabled) {
+		if (CPlayer::GetThisPlayer()->AiEnabled) {
 			// FIXME: UnitGoesUnderFog and UnitGoesOutOfFog change unit refs
 			// for human players.  We can't switch back to a human player or
 			// we'll be using the wrong ref counts.
@@ -1032,10 +1032,10 @@ bool HandleCheats(const std::string &input)
 			SetMessage("Cannot disable 'ai me' cheat");
 #endif
 		} else {
-			ThisPlayer->AiEnabled = true;
-			ThisPlayer->Type = PlayerComputer;
-			if (!ThisPlayer->Ai) {
-				AiInit(*ThisPlayer);
+			CPlayer::GetThisPlayer()->AiEnabled = true;
+			CPlayer::GetThisPlayer()->Type = PlayerComputer;
+			if (!CPlayer::GetThisPlayer()->Ai) {
+				AiInit(*CPlayer::GetThisPlayer());
 			}
 			SetMessage("I'm the BORG, resistance is futile!");
 		}

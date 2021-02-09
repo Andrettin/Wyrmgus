@@ -1395,120 +1395,117 @@ void MessagesDisplay::DrawMessages()
 {
 	if (show && Preference.ShowMessages) {
 		CLabel label(UI.MessageFont);
-			const int scale_factor = wyrmgus::defines::get()->get_scale_factor();
-			// background so the text is easier to read
-			if (MessagesCount) {
-				int textHeight = MessagesCount * (UI.MessageFont->Height() + 1 * scale_factor);
-				uint32_t color = CVideo::MapRGB(38, 38, 78);
+
+		const int scale_factor = wyrmgus::defines::get()->get_scale_factor();
+		// background so the text is easier to read
+		if (MessagesCount) {
+			int textHeight = MessagesCount * (UI.MessageFont->Height() + 1 * scale_factor);
+			uint32_t color = CVideo::MapRGB(38, 38, 78);
+			//Wyrmgus start
+			/*
+			Video.FillTransRectangleClip(color, UI.MapArea.X + 7, UI.MapArea.Y + 7,
+										 UI.MapArea.EndX - UI.MapArea.X - 16,
+										 textHeight - MessagesScrollY + 1, 0x80);
+
+			Video.DrawRectangle(color, UI.MapArea.X + 6, UI.MapArea.Y + 6,
+								UI.MapArea.EndX - UI.MapArea.X - 15,
+								textHeight - MessagesScrollY + 2);
+			*/
+			Video.FillTransRectangleClip(color, UI.MapArea.X + 6 * scale_factor + 1, UI.MapArea.EndY + (-16 - 2) * scale_factor + 1 - textHeight + MessagesScrollY,
+				UI.MapArea.EndX - UI.MapArea.X - 16 * scale_factor,
+				textHeight + 1 * scale_factor, 0x80);
+
+			Video.DrawRectangle(color, UI.MapArea.X + 6 * scale_factor, UI.MapArea.EndY + (-16 - 2) * scale_factor - textHeight + MessagesScrollY,
+				UI.MapArea.EndX - UI.MapArea.X - 15 * scale_factor,
+				textHeight + 2 * scale_factor);
+			//Wyrmgus end
+		}
+
+		// Draw message line(s)
+		for (int z = 0; z < MessagesCount; ++z) {
+			if (z == 0) {
+				PushClipping();
 				//Wyrmgus start
-				/*
-				Video.FillTransRectangleClip(color, UI.MapArea.X + 7, UI.MapArea.Y + 7,
-											 UI.MapArea.EndX - UI.MapArea.X - 16,
-											 textHeight - MessagesScrollY + 1, 0x80);
-
-				Video.DrawRectangle(color, UI.MapArea.X + 6, UI.MapArea.Y + 6,
-									UI.MapArea.EndX - UI.MapArea.X - 15,
-									textHeight - MessagesScrollY + 2);
-				*/
-				Video.FillTransRectangleClip(color, UI.MapArea.X + 6 * scale_factor + 1, UI.MapArea.EndY + (-16 - 2) * scale_factor + 1 - textHeight + MessagesScrollY,
-											 UI.MapArea.EndX - UI.MapArea.X - 16 * scale_factor,
-											 textHeight + 1 * scale_factor, 0x80);
-
-				Video.DrawRectangle(color, UI.MapArea.X + 6 * scale_factor, UI.MapArea.EndY + (-16 - 2) * scale_factor - textHeight + MessagesScrollY,
-									UI.MapArea.EndX - UI.MapArea.X - 15 * scale_factor,
-									textHeight + 2 * scale_factor);
-				//Wyrmgus end
-			}
-
-			// Draw message line(s)
-			for (int z = 0; z < MessagesCount; ++z) {
-				if (z == 0) {
-					PushClipping();
-					//Wyrmgus start
 //					SetClipping(UI.MapArea.X + 8, UI.MapArea.Y + 8, Video.Width - 1,
 //								Video.Height - 1);
-					SetClipping(UI.MapArea.X + 8 * scale_factor, UI.MapArea.Y + 8 * scale_factor, Video.Width - 1, UI.MapArea.EndY - 16 * scale_factor);
-					//Wyrmgus end
-				}
-				/*
-				 * Due parallel drawing we have to force message copy due temp
-				 * std::string(Messages[z]) creation because
-				 * char * pointer may change during text drawing.
-				 */
-				label.DrawClip(UI.MapArea.X + 8 * scale_factor,
-								//Wyrmgus start
+				SetClipping(UI.MapArea.X + 8 * scale_factor, UI.MapArea.Y + 8 * scale_factor, Video.Width - 1, UI.MapArea.EndY - 16 * scale_factor);
+				//Wyrmgus end
+			}
+			/*
+			 * Due parallel drawing we have to force message copy due temp
+			 * std::string(Messages[z]) creation because
+			 * char * pointer may change during text drawing.
+			 */
+			label.DrawClip(UI.MapArea.X + 8 * scale_factor,
+				//Wyrmgus start
 //							   UI.MapArea.Y + 8 +
 //							   z * (UI.MessageFont->Height() + 1) - MessagesScrollY,
-							   UI.MapArea.EndY - 16 * scale_factor - (UI.MessageFont->Height() + 1 * scale_factor) +
-							   (z * -1) * (UI.MessageFont->Height() + 1 * scale_factor) + MessagesScrollY,
-								//Wyrmgus end
-							   std::string(Messages[z]));
-				if (z == 0) {
-					PopClipping();
-				}
+UI.MapArea.EndY - 16 * scale_factor - (UI.MessageFont->Height() + 1 * scale_factor) +
+(z * -1) * (UI.MessageFont->Height() + 1 * scale_factor) + MessagesScrollY,
+//Wyrmgus end
+std::string(Messages[z]));
+			if (z == 0) {
+				PopClipping();
 			}
-			
-			//Wyrmgus start
-			// Draw objectives
-			int z = 0;
-			
-			for (int i = 0; i < ObjectivesCount; ++i, ++z) {
-				if (z == 0) {
-					PushClipping();
-					SetClipping(UI.MapArea.X + 8 * scale_factor, UI.MapArea.Y + 8 * scale_factor, Video.Width - 1, Video.Height - 1);
-				}
-				/*
-				 * Due parallel drawing we have to force message copy due temp
-				 * std::string(Objectives[i]) creation because
-				 * char * pointer may change during text drawing.
-				 */
-				label.DrawClip(UI.MapArea.X + 8 * scale_factor, UI.MapArea.Y + 8 * scale_factor + z * (UI.MessageFont->Height() + 1 * scale_factor), std::string(_(Objectives[i])));
-				if (z == 0) {
-					PopClipping();
-				}
-			}
-			
-			for (const wyrmgus::quest *quest : CPlayer::GetThisPlayer()->get_current_quests()) {
-				if (z == 0) {
-					PushClipping();
-					SetClipping(UI.MapArea.X + 8 * scale_factor, UI.MapArea.Y + 8 * scale_factor, Video.Width - 1, Video.Height - 1);
-				}
-				label.DrawClip(UI.MapArea.X + 8 * scale_factor, UI.MapArea.Y + 8 * scale_factor + z * (UI.MessageFont->Height() + 1 * scale_factor), std::string(_(quest->get_name().c_str())));
-				if (z == 0) {
-					PopClipping();
-				}
-				
-				++z;
-				
-				for (const auto &objective : CPlayer::GetThisPlayer()->get_quest_objectives()) {
-					const wyrmgus::quest_objective *quest_objective = objective->get_quest_objective();
-					if (quest_objective->get_quest() != quest) {
-						continue;
-					}
-
-					std::string objective_string = "- ";
-					if (!quest_objective->get_objective_string().empty()) {
-						objective_string += quest_objective->get_objective_string();
-					} else {
-						objective_string += quest_objective->generate_objective_string(CPlayer::GetThisPlayer());
-					}
-					if (quest_objective->get_quantity() != 0) {
-						objective_string += " (" + std::to_string(objective->get_counter()) + "/" + std::to_string(quest_objective->get_quantity()) + ")";
-					}
-
-					label.DrawClip(UI.MapArea.X + 8 * scale_factor, UI.MapArea.Y + 8 * scale_factor + z * (UI.MessageFont->Height() + 1 * scale_factor), objective_string);
-					++z;
-				}
-				for (const std::string &objective_string : quest->get_objective_strings()) {
-					label.DrawClip(UI.MapArea.X + 8 * scale_factor, UI.MapArea.Y + 8 * scale_factor + z * (UI.MessageFont->Height() + 1 * scale_factor), "- " + std::string(_(objective_string.c_str())));
-					++z;
-				}
-			}
-			//Wyrmgus end
-#ifdef DEBUG
 		}
-#endif
 
+		//Wyrmgus start
+		// Draw objectives
+		int z = 0;
+
+		for (int i = 0; i < ObjectivesCount; ++i, ++z) {
+			if (z == 0) {
+				PushClipping();
+				SetClipping(UI.MapArea.X + 8 * scale_factor, UI.MapArea.Y + 8 * scale_factor, Video.Width - 1, Video.Height - 1);
+			}
+			/*
+			 * Due parallel drawing we have to force message copy due temp
+			 * std::string(Objectives[i]) creation because
+			 * char * pointer may change during text drawing.
+			 */
+			label.DrawClip(UI.MapArea.X + 8 * scale_factor, UI.MapArea.Y + 8 * scale_factor + z * (UI.MessageFont->Height() + 1 * scale_factor), std::string(_(Objectives[i])));
+			if (z == 0) {
+				PopClipping();
+			}
+		}
+
+		for (const wyrmgus::quest *quest : CPlayer::GetThisPlayer()->get_current_quests()) {
+			if (z == 0) {
+				PushClipping();
+				SetClipping(UI.MapArea.X + 8 * scale_factor, UI.MapArea.Y + 8 * scale_factor, Video.Width - 1, Video.Height - 1);
+			}
+			label.DrawClip(UI.MapArea.X + 8 * scale_factor, UI.MapArea.Y + 8 * scale_factor + z * (UI.MessageFont->Height() + 1 * scale_factor), std::string(_(quest->get_name().c_str())));
+			if (z == 0) {
+				PopClipping();
+			}
+
+			++z;
+
+			for (const auto &objective : CPlayer::GetThisPlayer()->get_quest_objectives()) {
+				const wyrmgus::quest_objective *quest_objective = objective->get_quest_objective();
+				if (quest_objective->get_quest() != quest) {
+					continue;
+				}
+
+				std::string objective_string = "- ";
+				if (!quest_objective->get_objective_string().empty()) {
+					objective_string += quest_objective->get_objective_string();
+				} else {
+					objective_string += quest_objective->generate_objective_string(CPlayer::GetThisPlayer());
+				}
+				if (quest_objective->get_quantity() != 0) {
+					objective_string += " (" + std::to_string(objective->get_counter()) + "/" + std::to_string(quest_objective->get_quantity()) + ")";
+				}
+
+				label.DrawClip(UI.MapArea.X + 8 * scale_factor, UI.MapArea.Y + 8 * scale_factor + z * (UI.MessageFont->Height() + 1 * scale_factor), objective_string);
+				++z;
+			}
+			for (const std::string &objective_string : quest->get_objective_strings()) {
+				label.DrawClip(UI.MapArea.X + 8 * scale_factor, UI.MapArea.Y + 8 * scale_factor + z * (UI.MessageFont->Height() + 1 * scale_factor), "- " + std::string(_(objective_string.c_str())));
+				++z;
+			}
+		}
+		//Wyrmgus end
 	}
 }
 

@@ -53,6 +53,7 @@
 #include "unit/unit_find.h"
 #include "unit/unit_type.h"
 #include "unit/unit_type_type.h"
+#include "util/log_util.h"
 #include "video/video.h"
 
 //Wyrmgus start
@@ -316,7 +317,7 @@ int DoActionMove(CUnit &unit)
 	if (abs(unit.get_pixel_offset().x()) > (wyrmgus::defines::get()->get_tile_width() * 2) || abs(unit.get_pixel_offset().y()) > (wyrmgus::defines::get()->get_tile_height() * 2)) {
 		unit.pixel_offset = QPoint(0, 0);
 #ifdef DEBUG
-		fprintf(stderr, "Error in DoActionMove: unit's pixel movement was too big.\n");
+		log::log_error("Error in DoActionMove: unit's pixel movement was too big.");
 #endif
 		
 		if (unit.Type->BoolFlag[BRIDGE_INDEX].value) { // if is a raft, move everything on top of it as it moves

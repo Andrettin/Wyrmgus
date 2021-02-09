@@ -56,7 +56,10 @@
  * For comments regarding functions please see the header file.
  */
 #include "guichan/sdl/sdlinput.h"
+
 #include "guichan/exception.h"
+
+#include "util/log_util.h"
 
 namespace gcn
 {
@@ -223,7 +226,7 @@ namespace gcn
         }
 
 #ifdef DEBUG
-    	fprintf(stderr,"Unknown SDL mouse button.\n");
+    	log::log_error("Unknown SDL mouse button.");
 #endif
 
         return 0;

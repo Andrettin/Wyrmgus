@@ -429,9 +429,9 @@ static int CostMoveToCallBack_Default(unsigned int index, const CUnit &unit, int
 #ifdef DEBUG
 	{
 		Vec2i pos;
-		pos.y = index / Map.Info.MapWidths[z];
-		pos.x = index - pos.y * Map.Info.MapWidths[z];
-		Assert(Map.Info.IsPointOnMap(pos, z));
+		pos.y = index / CMap::Map.Info.MapWidths[z];
+		pos.x = index - pos.y * CMap::Map.Info.MapWidths[z];
+		Assert(CMap::Map.Info.IsPointOnMap(pos, z));
 	}
 #endif
 	int cost = 0;

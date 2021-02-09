@@ -804,10 +804,10 @@ static void DoNextReplay()
 #ifdef DEBUG
 		if (!ReplayStep->SyncRandSeed) {
 			// Replay without the 'sync info
-			ThisPlayer->Notify("%s", _("No sync info for this replay !"));
+			CPlayer::GetThisPlayer()->Notify("%s", _("No sync info for this replay !"));
 		} else {
-			ThisPlayer->Notify(_("Replay got out of sync (%lu) !"), GameCycle);
-			DebugPrint("OUT OF SYNC %u != %u\n" _C_ SyncRandSeed _C_ ReplayStep->SyncRandSeed);
+			CPlayer::GetThisPlayer()->Notify(_("Replay got out of sync (%lu) !"), GameCycle);
+			DebugPrint("OUT OF SYNC %u != %u\n" _C_ random::get()->get_seed() _C_ ReplayStep->SyncRandSeed);
 			DebugPrint("OUT OF SYNC GameCycle %lu \n" _C_ GameCycle);
 			Assert(0);
 			// ReplayStep = 0;

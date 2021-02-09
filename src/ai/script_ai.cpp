@@ -49,6 +49,7 @@
 #include "unit/unit_type_type.h"
 #include "upgrade/upgrade.h"
 #include "upgrade/upgrade_class.h"
+#include "util/log_util.h"
 #include "util/vector_util.h"
 
 /**
@@ -551,7 +552,7 @@ static int CclDefineAiHelper(lua_State *l)
 		) {
 			//Wyrmgus end
 #ifdef DEBUG
-			fprintf(stderr, "DefineAiHelper: Relation is computed from buttons, you may remove safely the block beginning with '\"%s\"'\n", value);
+			log::log_error("DefineAiHelper: Relation is computed from buttons, you may remove safely the block beginning with '\"" + std::string(value) + "\"'");
 #endif
 			continue;
 		} else if (!strcmp(value, "unit-equiv")) {

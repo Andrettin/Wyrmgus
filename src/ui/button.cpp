@@ -281,12 +281,6 @@ void button::initialize()
 		switch (this->Action) {
 			case ButtonCmd::SpellCast:
 				this->Value = spell::get(this->ValueStr)->Slot;
-#ifdef DEBUG
-				if (ba->Value < 0) {
-					DebugPrint("Spell %s does not exist?\n" _C_ value.c_str());
-					Assert(ba->Value >= 0);
-				}
-#endif
 				break;
 			case ButtonCmd::Train:
 			case ButtonCmd::Build:
