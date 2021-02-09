@@ -474,10 +474,7 @@ void PrintLocation(const char *file, int line, const char *funcName, std::ostrea
 
 void AbortAt(const char *file, int line, const char *funcName, const char *conditionStr)
 {
-	std::array<char, 1024> buf{};
-	snprintf(buf.data(), 1024, "Assertion failed at %s:%d: %s: %s\n", file, line, funcName, conditionStr);
-	fprintf(stderr, "%s\n", buf.data());
-	log::log_stacktrace();
+	log::log_error("Assertion failed at " + std::string(file) + ":" + std::to_string(line) + ": " + funcName + ": " + conditionStr);
 	fflush(stdout);
 	fflush(stderr);
 	abort();
