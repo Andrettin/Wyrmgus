@@ -426,7 +426,7 @@ int CTileset::tileFromQuad(unsigned fixed, unsigned quad) const
 	while (!(type1 = (fixed & 0xFF))) {
 		fixed >>= 8;
 		if (!fixed) {
-			ExitFatal(-1);
+			throw std::runtime_error("Could not get tile type from fixed tile.");
 		}
 	}
 	fixed >>= 8;

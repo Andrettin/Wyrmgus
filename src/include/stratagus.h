@@ -186,7 +186,6 @@ extern unsigned long GameCycle;				/// Game simulation cycle counter
 extern unsigned long FastForwardCycle;		/// Game Replay Fast Forward Counter
 
 extern void Exit(int err);                  /// Exit
-extern void ExitFatal(int err);             /// Exit with fatal error
 
 extern void UpdateDisplay();            /// Game display update
 extern void DrawMapArea();              /// Draw the map area

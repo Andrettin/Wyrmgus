@@ -382,18 +382,6 @@ void Exit(int err)
 }
 
 /**
-**  Do a fatal exit.
-**  Called on out of memory or crash.
-**
-**  @param err  Error code to pass to shell.
-*/
-void ExitFatal(int err)
-{
-	log::log_stacktrace();
-	exit(err);
-}
-
-/**
 **  Display the usage.
 */
 static void Usage()
@@ -543,17 +531,13 @@ static void ParseCommandLine(int argc, char **argv, Parameters &parameters)
 			case 'v': {
 				char *sep = strchr(optarg, 'x');
 				if (!sep || !*(sep + 1)) {
-					fprintf(stderr, "%s: incorrect format of video mode resolution -- '%s'\n", argv[0], optarg);
-					Usage();
-					ExitFatal(-1);
+					throw std::runtime_error(std::string(argv[0]) + ": incorrect format of video mode resolution -- '" + optarg + "'");
 				}
 				Video.Height = atoi(sep + 1);
 				*sep = 0;
 				Video.Width = atoi(optarg);
 				if (!Video.Height || !Video.Width) {
-					fprintf(stderr, "%s: incorrect format of video mode resolution -- '%sx%s'\n", argv[0], optarg, sep + 1);
-					Usage();
-					ExitFatal(-1);
+					throw std::runtime_error(std::string(argv[0]) + ": incorrect format of video mode resolution -- '" + optarg + "x + " + (sep + 1) + "'");
 				}
 #if defined(USE_OPENGL) || defined(USE_GLES)
 				if (ZoomNoResize) {
@@ -582,17 +566,17 @@ static void ParseCommandLine(int argc, char **argv, Parameters &parameters)
 				break;
 			case '?':
 			case 'h':
-			default:
 				Usage();
-				ExitFatal(-1);
+				Exit(EXIT_SUCCESS);
+				break;
+			default:
+				throw std::runtime_error("Invalid command line arguments.");
 		}
 		break;
 	}
 
 	if (argc - optind > 1) {
-		fprintf(stderr, "too many map files. if you meant to pass game arguments, these go after '--'\n");
-		Usage();
-		ExitFatal(-1);
+		throw std::runtime_error("too many map files. if you meant to pass game arguments, these go after '--'");
 	}
 
 	if (argc - optind) {
