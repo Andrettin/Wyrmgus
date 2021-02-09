@@ -31,10 +31,15 @@
 
 namespace wyrmgus {
 
-class random : public singleton<random>
+class geocoordinate;
+
+class random final : public singleton<random>
 {
 public:
 	static constexpr unsigned default_seed = 0x87654321;
+
+	template <typename int_type>
+	static int_type generate_in_range(std::mt19937 &engine, const int_type min_value, const int_type max_value);
 
 	random()
 	{
@@ -63,17 +68,18 @@ public:
 		}
 	}
 
-	int generate()
+	template <typename int_type>
+	int_type generate(const int_type modulo)
 	{
-		return this->engine();
+		static_assert(std::is_integral_v<int_type>);
+		return this->generate_in_range<int_type>(0, modulo - 1);
 	}
 
-	int generate(const int modulo)
+	template <typename int_type>
+	int_type generate_in_range(const int_type min_value, const int_type max_value)
 	{
-		return this->generate_in_range(0, modulo - 1);
+		return random::generate_in_range<int_type>(this->engine, min_value, max_value);
 	}
-
-	int generate_in_range(const int min_value, const int max_value);
 
 	QPoint generate_circle_point()
 	{
@@ -85,17 +91,20 @@ public:
 		return QColor(this->generate(256), this->generate(256), this->generate(256));
 	}
 
-	int generate_async()
+	geocoordinate generate_geocoordinate();
+
+	template <typename int_type>
+	int_type generate_async(const int_type modulo)
 	{
-		return this->async_engine();
+		static_assert(std::is_integral_v<int_type>);
+		return this->generate_in_range_async<int_type>(0, modulo - 1);
 	}
 
-	int generate_async(const int modulo)
+	template <typename int_type>
+	int_type generate_in_range_async(const int_type min_value, const int_type max_value)
 	{
-		return this->generate_in_range_async(0, modulo - 1);
+		return random::generate_in_range<int_type>(this->async_engine, min_value, max_value);
 	}
-
-	int generate_in_range_async(const int min_value, const int max_value);
 
 private:
 	std::random_device random_device;
@@ -103,5 +112,9 @@ private:
 	unsigned seed = random::default_seed;
 	std::mt19937 async_engine;
 };
+
+extern template int random::generate_in_range<int>(std::mt19937 &, const int, const int);
+extern template int64_t random::generate_in_range<int64_t>(std::mt19937 &, const int64_t, const int64_t);
+extern template size_t random::generate_in_range<size_t>(std::mt19937 &, const size_t, const size_t);
 
 }

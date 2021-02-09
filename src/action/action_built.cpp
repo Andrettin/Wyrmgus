@@ -288,7 +288,7 @@ static void Finish(COrder_Built &order, CUnit &unit)
 		//Wyrmgus start
 //		unit.ResourcesHeld = type.StartingResources[SyncRand(type.StartingResources.size())];
 		if (type.StartingResources.size() > 0) {
-			unit.SetResourcesHeld(wyrmgus::vector::get_random(type.StartingResources));
+			unit.SetResourcesHeld(vector::get_random(type.StartingResources));
 		}
 		unit.GivesResource = type.get_given_resource()->get_index();
 		//Wyrmgus end
