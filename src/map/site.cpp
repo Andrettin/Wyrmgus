@@ -397,6 +397,7 @@ QPoint site::astrocoordinate_to_pos(const wyrmgus::geocoordinate &astrocoordinat
 	astrodistance_value = isqrt(astrodistance_value);
 	astrodistance_value *= this->get_map_template()->get_astrodistance_multiplier();
 	astrodistance_value += this->get_map_template()->get_astrodistance_additive_modifier();
+	astrodistance_value += this->get_astrodistance_additive_modifier();
 	const int64_t x = direction_pos.x() * astrodistance_value / geocoordinate::number_type::divisor;
 	const int64_t y = direction_pos.y() * astrodistance_value / geocoordinate::number_type::divisor;
 

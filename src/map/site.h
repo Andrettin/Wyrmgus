@@ -72,6 +72,7 @@ class site final : public named_data_entry, public data_type<site>, public CData
 	Q_PROPERTY(bool random_astrocoordinate MEMBER random_astrocoordinate READ has_random_astrocoordinate)
 	Q_PROPERTY(wyrmgus::centesimal_int astrodistance MEMBER astrodistance READ get_astrodistance)
 	Q_PROPERTY(wyrmgus::centesimal_int astrodistance_pc READ get_astrodistance_pc WRITE set_astrodistance_pc)
+	Q_PROPERTY(int astrodistance_additive_modifier MEMBER astrodistance_additive_modifier READ get_astrodistance_additive_modifier)
 	Q_PROPERTY(wyrmgus::site* orbit_center MEMBER orbit_center WRITE set_orbit_center)
 	Q_PROPERTY(int distance_from_orbit_center MEMBER distance_from_orbit_center)
 	Q_PROPERTY(wyrmgus::centesimal_int distance_from_orbit_center_au READ get_distance_from_orbit_center_au WRITE set_distance_from_orbit_center_au)
@@ -190,6 +191,11 @@ public:
 	centesimal_int get_astrodistance_pc() const;
 	void set_astrodistance_pc(const centesimal_int &astrodistance_pc);
 
+	int get_astrodistance_additive_modifier() const
+	{
+		return this->astrodistance_additive_modifier;
+	}
+
 	void set_orbit_center(site *orbit_center);
 
 	const std::vector<site *> &get_satellites() const
@@ -283,6 +289,7 @@ private:
 	wyrmgus::geocoordinate astrocoordinate; //the site's position as an astrocoordinate
 	bool random_astrocoordinate = false; //whether a random astrocoordinate should be used to apply the site's position when its map template is applied
 	centesimal_int astrodistance; //the site's distance from its map template's center (in light-years)
+	int astrodistance_additive_modifier = 0;
 	site *orbit_center = nullptr;
 	int distance_from_orbit_center = 0; //in gigameters (millions of kilometers)
 	std::vector<site *> satellites;
