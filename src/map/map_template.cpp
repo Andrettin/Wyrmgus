@@ -1227,7 +1227,11 @@ void map_template::apply_sites(const QPoint &template_start_pos, const QPoint &m
 				continue;
 			}
 			if (base_unit_type != nullptr) {
-				site_pos = CMap::Map.generate_unit_location(base_unit_type, nullptr, map_start_pos, map_end - QPoint(1, 1), z);
+				if (site->has_random_astrocoordinate()) {
+					site_pos = site->astrocoordinate_to_pos(random::get()->generate_geocoordinate());
+				} else {
+					site_pos = CMap::Map.generate_unit_location(base_unit_type, nullptr, map_start_pos, map_end - QPoint(1, 1), z);
+				}
 				site_pos += unit_offset;
 			}
 		} else {

@@ -69,6 +69,7 @@ class site final : public named_data_entry, public data_type<site>, public CData
 	Q_PROPERTY(wyrmgus::geocoordinate astrocoordinate MEMBER astrocoordinate READ get_astrocoordinate)
 	Q_PROPERTY(QTime right_ascension READ get_right_ascension WRITE set_right_ascension)
 	Q_PROPERTY(wyrmgus::decimillesimal_int declination READ get_declination WRITE set_declination)
+	Q_PROPERTY(bool random_astrocoordinate MEMBER random_astrocoordinate READ has_random_astrocoordinate)
 	Q_PROPERTY(wyrmgus::centesimal_int astrodistance MEMBER astrodistance READ get_astrodistance)
 	Q_PROPERTY(wyrmgus::centesimal_int astrodistance_pc READ get_astrodistance_pc WRITE set_astrodistance_pc)
 	Q_PROPERTY(wyrmgus::site* orbit_center MEMBER orbit_center WRITE set_orbit_center)
@@ -176,6 +177,11 @@ public:
 		this->astrocoordinate.set_latitude(declination);
 	}
 
+	bool has_random_astrocoordinate() const
+	{
+		return this->random_astrocoordinate;
+	}
+
 	const centesimal_int &get_astrodistance() const
 	{
 		return this->astrodistance;
@@ -193,6 +199,8 @@ public:
 
 	centesimal_int get_distance_from_orbit_center_au() const;
 	void set_distance_from_orbit_center_au(const centesimal_int &distance_au);
+
+	QPoint astrocoordinate_to_pos(const wyrmgus::geocoordinate &astrocoordinate) const;
 
 	const unit_type *get_base_unit_type() const
 	{
@@ -273,6 +281,7 @@ private:
 	int longitude_scale = 100;
 	int latitude_scale = 100;
 	wyrmgus::geocoordinate astrocoordinate; //the site's position as an astrocoordinate
+	bool random_astrocoordinate = false; //whether a random astrocoordinate should be used to apply the site's position when its map template is applied
 	centesimal_int astrodistance; //the site's distance from its map template's center (in light-years)
 	site *orbit_center = nullptr;
 	int distance_from_orbit_center = 0; //in gigameters (millions of kilometers)
