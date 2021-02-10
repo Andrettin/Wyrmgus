@@ -287,8 +287,8 @@ static void Finish(COrder_Built &order, CUnit &unit)
 		// Has StartingResources, Use those
 		//Wyrmgus start
 //		unit.ResourcesHeld = type.StartingResources[SyncRand(type.StartingResources.size())];
-		if (type.StartingResources.size() > 0) {
-			unit.SetResourcesHeld(vector::get_random(type.StartingResources));
+		if (!type.get_starting_resources().empty()) {
+			unit.SetResourcesHeld(vector::get_random(type.get_starting_resources()));
 		}
 		unit.GivesResource = type.get_given_resource()->get_index();
 		//Wyrmgus end

@@ -1076,10 +1076,10 @@ static int CclDefineUnitType(lua_State *l)
 //		} else if (!strcmp(value, "StartingResources")) {
 //			type->StartingResources = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "StartingResources")) {
-			type->StartingResources.clear();
+			type->starting_resources.clear();
 			const int args = lua_rawlen(l, -1);
 			for (int j = 0; j < args; ++j) {
-				type->StartingResources.push_back(LuaToNumber(l, -1, j + 1));
+				type->starting_resources.push_back(LuaToNumber(l, -1, j + 1));
 			}
 		//Wyrmgus end
 		} else if (!strcmp(value, "RegenerationRate")) {

@@ -2850,8 +2850,8 @@ void CUnit::Init(const wyrmgus::unit_type &type, const bool loading_saved_unit)
 //	this->ResourcesHeld = type.StartingResources;
 	if (type.get_given_resource() != nullptr) {
 		this->GivesResource = type.get_given_resource()->get_index();
-		if (type.StartingResources.size() > 0) {
-			this->ResourcesHeld = type.StartingResources[SyncRand(type.StartingResources.size())];
+		if (type.get_starting_resources().size() > 0) {
+			this->ResourcesHeld = vector::get_random(type.get_starting_resources());
 		} else {
 			this->ResourcesHeld = 0;
 		}

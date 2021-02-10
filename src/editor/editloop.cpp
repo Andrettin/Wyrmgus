@@ -64,6 +64,7 @@
 #include "unit/unit_find.h"
 #include "unit/unit_type.h"
 #include "util/util.h"
+#include "util/vector_random_util.h"
 #include "util/vector_util.h"
 #include "video/font.h"
 #include "video/video.h"
@@ -523,13 +524,13 @@ static void EditorActionPlaceUnit(const Vec2i &pos, const wyrmgus::unit_type &ty
 		if (type.get_given_resource() != nullptr) {
 			//Wyrmgus start
 //			if (type.StartingResources != 0) {
-			if (type.StartingResources.size() > 0) {
+			if (type.get_starting_resources().size() > 0) {
 			//Wyrmgus end
 				//Wyrmgus start
 //				unit->ResourcesHeld = type.StartingResources;
 //				unit->Variable[GIVERESOURCE_INDEX].Value = type.StartingResources;
 //				unit->Variable[GIVERESOURCE_INDEX].Max = type.StartingResources;
-				unit->SetResourcesHeld(type.StartingResources[SyncRand(type.StartingResources.size())]);
+				unit->SetResourcesHeld(vector::get_random(type.get_starting_resources()));
 				unit->Variable[GIVERESOURCE_INDEX].Value = unit->ResourcesHeld;
 				unit->Variable[GIVERESOURCE_INDEX].Max = unit->ResourcesHeld;
 				//Wyrmgus end

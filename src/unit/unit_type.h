@@ -1003,6 +1003,11 @@ public:
 
 	bool can_produce_a_resource() const;
 
+	const std::vector<int> &get_starting_resources() const
+	{
+		return this->starting_resources;
+	}
+
 	int get_random_movement_probability() const
 	{
 		return this->random_movement_probability;
@@ -1171,9 +1176,9 @@ public:
 	std::string ButtonHint;			/// Hint of this unit's button
 private:
 	std::string button_key;			/// Hotkey of this unit's button
+//	int starting_resources = 0;          /// Amount of Resources on build
+	std::vector<int> starting_resources;          /// Amount of Resources on build
 public:
-//	int StartingResources;          /// Amount of Resources on build
-	std::vector<int> StartingResources;          /// Amount of Resources on build
 	//Wyrmgus end
 	/// originally only visual effect, we do more with this!
 	UnitTypeType UnitType;          /// Land / fly / naval

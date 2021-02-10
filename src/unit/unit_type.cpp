@@ -550,6 +550,9 @@ void unit_type::process_sml_property(const sml_property &property)
 	} else if (key == "priority") {
 		this->DefaultStat.Variables[PRIORITY_INDEX].Value = std::stoi(value);
 		this->DefaultStat.Variables[PRIORITY_INDEX].Max = std::stoi(value);
+	} else if (key == "starting_resources") {
+		this->starting_resources.clear();
+		this->starting_resources.push_back(std::stoi(value));
 	} else if (key == "button_key") {
 		this->button_key = value;
 	} else if (key == "button_hint") {
@@ -699,6 +702,10 @@ void unit_type::process_sml_scope(const sml_data &scope)
 			const wyrmgus::resource *resource = resource::get(key);
 			this->RepairCosts[resource->get_index()] = std::stoi(value);
 		});
+	} else if (tag == "starting_resources") {
+		for (const std::string &value : values) {
+			this->starting_resources.push_back(std::stoi(value));
+		}
 	} else if (tag == "weapon_classes") {
 		for (const std::string &value : values) {
 			this->WeaponClasses.push_back(string_to_item_class(value));
@@ -1625,7 +1632,7 @@ void unit_type::set_parent(const unit_type *parent_type)
 		this->Trains.push_back(parent_type->Trains[i]);
 		parent_type->Trains[i]->TrainedBy.push_back(this);
 	}
-	this->StartingResources = parent_type->StartingResources;
+	this->starting_resources = parent_type->starting_resources;
 
 	for (const auto &building_rule : parent_type->BuildingRules) {
 		this->BuildingRules.push_back(building_rule->duplicate());
