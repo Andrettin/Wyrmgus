@@ -37,4 +37,13 @@ QPoint geocoordinate::to_circle_edge_point() const
 	return point::get_nearest_circle_edge_point(circle_point, 1 * number_type::divisor);
 }
 
+bool geocoordinate_compare::operator()(const geocoordinate &geocoordinate, const wyrmgus::geocoordinate &other_geocoordinate) const
+{
+	if (geocoordinate.get_longitude() != other_geocoordinate.get_longitude()) {
+		return geocoordinate.get_longitude() < other_geocoordinate.get_longitude();
+	}
+
+	return geocoordinate.get_latitude() < other_geocoordinate.get_latitude();
+}
+
 }

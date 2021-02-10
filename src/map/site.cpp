@@ -421,7 +421,7 @@ QPoint site::astrocoordinate_to_pos(const wyrmgus::geocoordinate &astrocoordinat
 
 	QPoint base_pos;
 	if constexpr (use_map_pos) {
-		if (!CMap::get()->is_subtemplate_on_map(reference_subtemplate)) {
+		if (!reference_subtemplate->is_on_map()) {
 			throw std::runtime_error("Could not convert an astrocoordinate to a map pos for site \"" + this->get_identifier() + "\", as its reference subtemplate is not on the map.");
 		}
 

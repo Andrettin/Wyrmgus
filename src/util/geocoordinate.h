@@ -206,6 +206,16 @@ private:
 using longitude = geocoordinate::number_type;
 using latitude = geocoordinate::number_type;
 
+struct geocoordinate_compare final
+{
+	bool operator()(const geocoordinate &geocoordinate, const wyrmgus::geocoordinate &other_geocoordinate) const;
+};
+
+using geocoordinate_set = std::set<geocoordinate, geocoordinate_compare>;
+
+template <typename T>
+using geocoordinate_map = std::map<geocoordinate, T, geocoordinate_compare>;
+
 }
 
 Q_DECLARE_METATYPE(wyrmgus::geocoordinate)

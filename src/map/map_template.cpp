@@ -70,6 +70,7 @@
 #include "unit/unit_class.h"
 #include "unit/unit_find.h"
 #include "unit/unit_type.h"
+#include "util/container_util.h"
 #include "util/geocoordinate_util.h"
 #include "util/georectangle_util.h"
 #include "util/geoshape_util.h"
@@ -1232,7 +1233,7 @@ void map_template::apply_sites(const QPoint &template_start_pos, const QPoint &m
 			}
 			if (base_unit_type != nullptr) {
 				if (site->has_random_astrocoordinate()) {
-					site_pos = site->astrocoordinate_to_pos<true>(random::get()->generate_geocoordinate());
+					site_pos = this->generate_celestial_site_position(site, z);
 				} else {
 					site_pos = CMap::Map.generate_unit_location(base_unit_type, nullptr, map_start_pos, map_end - QPoint(1, 1), z);
 				}
@@ -1345,14 +1346,12 @@ void map_template::apply_site(const site *site, const QPoint &site_pos, const in
 		}
 	}
 
-	static constexpr int base_orbit_distance_increment = 2;
-
 	if (!site->get_satellites().empty()) {
 		int orbit_distance = 0;
 		if (site->get_base_unit_type() != nullptr) {
 			orbit_distance += site->get_base_unit_type()->get_tile_width() / 2;
 		}
-		orbit_distance += base_orbit_distance_increment;
+		orbit_distance += site::orbit_distance_increment;
 
 		for (const wyrmgus::site *satellite : site->get_satellites()) {
 			const QPoint orbit_circle_pos = random::get()->generate_circle_point();
@@ -1370,7 +1369,7 @@ void map_template::apply_site(const site *site, const QPoint &site_pos, const in
 				orbit_distance -= satellite->get_base_unit_type()->get_tile_width() / 2;
 				orbit_distance += satellite->get_base_unit_type()->get_tile_width();
 			}
-			orbit_distance += base_orbit_distance_increment;
+			orbit_distance += site::orbit_distance_increment;
 		}
 	}
 
@@ -2668,6 +2667,45 @@ bool map_template::is_constructed_subtemplate_compatible_with_terrain_image(map_
 	}
 
 	return true;
+}
+
+QPoint map_template::generate_celestial_site_position(const site *site, const int z) const
+{
+	geocoordinate_set astrocoordinate_set;
+
+	for (longitude lon = geocoordinate::min_longitude; lon <= geocoordinate::max_longitude; lon += longitude::from_value(1000)) {
+		for (latitude lat = geocoordinate::min_latitude; lat <= geocoordinate::max_latitude; lat += latitude::from_value(1000)) {
+			if (lon == 0 && lat == 0) {
+				continue;
+			}
+
+			astrocoordinate_set.insert(geocoordinate(lon, lat));
+		}
+	}
+
+	std::vector<geocoordinate> potential_astrocoordinates = container::to_vector(astrocoordinate_set);
+
+	const QSize celestial_site_size = site->get_size_with_satellites();
+
+	while (!potential_astrocoordinates.empty()) {
+		const geocoordinate astrocoordinate = vector::take_random(potential_astrocoordinates);
+		QPoint random_pos = site->astrocoordinate_to_pos<true>(astrocoordinate);
+
+		if (!CMap::get()->Info.IsPointOnMap(random_pos, z)) {
+			continue;
+		}
+
+		//ensure there are no units placed where the celestial site and its satellites would be
+		std::vector<CUnit *> units;
+		Select(random_pos - size::to_point((celestial_site_size + QSize(1, 1)) / 2), random_pos + size::to_point((celestial_site_size + QSize(1, 1)) / 2), units, z);
+		if (!units.empty()) {
+			continue;
+		}
+
+		return random_pos;
+	}
+
+	throw std::runtime_error("Failed to generate celestial site position for site \"" + site->get_identifier() + "\".");
 }
 
 /**

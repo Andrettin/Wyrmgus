@@ -320,6 +320,10 @@ public:
 
 	bool contains_map_pos(const QPoint &pos) const
 	{
+		if (!this->is_on_map()) {
+			return false;
+		}
+
 		const QPoint &start_pos = this->get_current_map_start_pos();
 		const QPoint end_pos = this->get_current_map_end_pos();
 		return pos.x() >= start_pos.x() && pos.y() >= start_pos.y() && pos.x() <= end_pos.x() && pos.y() <= end_pos.y();
@@ -332,8 +336,17 @@ public:
 
 	QPoint get_current_map_end_pos() const
 	{
+		if (!this->is_on_map()) {
+			return QPoint(-1, -1);
+		}
+
 		const QPoint &start_pos = this->get_current_map_start_pos();
 		return QPoint(start_pos.x() + this->get_applied_width() - 1, start_pos.y() + this->get_applied_height() - 1);
+	}
+
+	bool is_on_map() const
+	{
+		return this->get_current_map_start_pos() != QPoint(-1, -1);
 	}
 
 	//whether a position relative to the entire map is a usable part of the map template
@@ -574,6 +587,8 @@ public:
 	bool is_constructed_subtemplate_compatible_with_terrain_file(map_template *subtemplate, const QPoint &map_start_pos, int z) const;
 	bool is_constructed_subtemplate_compatible_with_terrain_image(map_template *subtemplate, const QPoint &map_start_pos, int z) const;
 
+	QPoint generate_celestial_site_position(const site *site, const int z) const;
+
 	Vec2i get_best_location_map_position(const std::vector<std::unique_ptr<historical_location>> &historical_location_list, bool &in_another_map_template, const Vec2i &template_start_pos, const Vec2i &map_start_pos, const bool random) const;
 
 	QPoint get_location_map_position(const historical_location *historical_location, const QPoint &template_start_pos, const QPoint &map_start_pos, const bool random) const;
@@ -697,6 +712,10 @@ public:
 
 	QPoint pos_to_map_pos(const QPoint &pos) const
 	{
+		if (!this->is_on_map()) {
+			throw std::runtime_error("Canot convert pos to map pos for map template \"" + this->get_identifier() + "\", as it is not on the map.");
+		}
+
 		return this->get_current_map_start_pos() + pos - this->get_start_pos();
 	}
 
@@ -745,7 +764,7 @@ private:
 	QPoint start_pos = QPoint(0, 0); //the start position within the map template to be applied when it is used
 	QPoint end_pos = QPoint(-1, -1); //the end position within the map template to be applied when it is used
 private:
-	QPoint current_map_start_pos = QPoint(0, 0);
+	QPoint current_map_start_pos = QPoint(-1, -1);
 public:
 	QPoint current_start_pos = QPoint(0, 0);
 	map_template *main_template = nullptr; //main template in which this one is located, if this is a subtemplate
