@@ -85,6 +85,7 @@ class site final : public named_data_entry, public data_type<site>, public CData
 public:
 	static constexpr const char *class_identifier = "site";
 	static constexpr const char *database_folder = "sites";
+	static constexpr int orbit_distance_increment = 2; //the space between celestial bodies in orbit, in tiles
 
 	static site *get_by_color(const QColor &color)
 	{
@@ -215,6 +216,9 @@ public:
 	{
 		return this->base_unit_type;
 	}
+
+	const QSize &get_size() const;
+	QSize get_size_with_satellites() const;
 
 	const site *get_connection_destination() const
 	{

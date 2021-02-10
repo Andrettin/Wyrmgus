@@ -53,6 +53,7 @@
 #include "util/geocoordinate_util.h"
 #include "util/point_util.h"
 #include "util/random.h"
+#include "util/size_util.h"
 #include "util/string_conversion_util.h"
 #include "util/time_util.h"
 #include "util/util.h"
@@ -440,6 +441,27 @@ QPoint site::astrocoordinate_to_pos(const wyrmgus::geocoordinate &astrocoordinat
 
 template QPoint site::astrocoordinate_to_pos<false>(const wyrmgus::geocoordinate &) const;
 template QPoint site::astrocoordinate_to_pos<true>(const wyrmgus::geocoordinate &) const;
+
+const QSize &site::get_size() const
+{
+	if (this->get_base_unit_type() != nullptr) {
+		return this->get_base_unit_type()->get_tile_size();
+	}
+
+	return size::empty_size;
+}
+
+QSize site::get_size_with_satellites() const
+{
+	QSize size = this->get_size();
+
+	for (const site *satellite : this->get_satellites()) {
+		size += QSize(site::orbit_distance_increment, site::orbit_distance_increment);
+		size += satellite->get_size_with_satellites();
+	}
+
+	return size;
+}
 
 QVariantList site::get_cores_qvariant_list() const
 {
