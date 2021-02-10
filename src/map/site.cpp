@@ -405,6 +405,7 @@ QPoint site::astrocoordinate_to_relative_pos(const wyrmgus::geocoordinate &astro
 	//the size of the reference subtemplate serves as a minimum distance in tiles
 	astrodistance_value += std::max(reference_subtemplate->get_applied_width(), reference_subtemplate->get_applied_height()) / 2;
 
+	astrodistance_value += site::base_astrodistance_additive_modifier;
 	astrodistance_value += this->get_map_template()->get_astrodistance_additive_modifier();
 	astrodistance_value += this->get_astrodistance_additive_modifier();
 	const int64_t x = direction_pos.x() * astrodistance_value / geocoordinate::number_type::divisor;

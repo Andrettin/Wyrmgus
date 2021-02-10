@@ -86,6 +86,7 @@ class site final : public named_data_entry, public data_type<site>, public CData
 public:
 	static constexpr const char *class_identifier = "site";
 	static constexpr const char *database_folder = "sites";
+	static constexpr int base_astrodistance_additive_modifier = 8;
 	static constexpr int orbit_distance_increment = 2; //the space between celestial bodies in orbit, in tiles
 
 	static site *get_by_color(const QColor &color)
