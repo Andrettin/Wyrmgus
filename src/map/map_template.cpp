@@ -70,6 +70,7 @@
 #include "unit/unit_class.h"
 #include "unit/unit_find.h"
 #include "unit/unit_type.h"
+#include "unit/unit_type_type.h"
 #include "util/container_util.h"
 #include "util/geocoordinate_util.h"
 #include "util/georectangle_util.h"
@@ -1347,28 +1348,20 @@ void map_template::apply_site(const site *site, const QPoint &site_pos, const in
 	}
 
 	if (!site->get_satellites().empty()) {
-		int orbit_distance = 0;
+		int64_t orbit_distance = 0;
 		if (site->get_base_unit_type() != nullptr) {
 			orbit_distance += site->get_base_unit_type()->get_tile_width() / 2;
 		}
 		orbit_distance += site::orbit_distance_increment;
 
 		for (const wyrmgus::site *satellite : site->get_satellites()) {
-			const QPoint orbit_circle_pos = random::get()->generate_circle_point();
+			const QSize satellite_size = satellite->get_size_with_satellites();
 
-			if (satellite->get_base_unit_type() != nullptr) {
-				orbit_distance += satellite->get_base_unit_type()->get_tile_width() / 2;
-			}
+			const QPoint satellite_pos = this->generate_site_orbit_position(satellite, z, orbit_distance + (satellite_size.width() / 2));
 
-			QPoint orbit_pos = point::get_nearest_circle_edge_point(orbit_circle_pos, orbit_distance);
+			this->apply_site(satellite, satellite_pos, z);
 
-			this->apply_site(satellite, site_pos + orbit_pos, z);
-
-			if (satellite->get_base_unit_type() != nullptr) {
-				//decrease the half-size and then add the full size, to ensure that the full size has been added for the next satellite (as for odd sizes the half-size faces integer rounding-down)
-				orbit_distance -= satellite->get_base_unit_type()->get_tile_width() / 2;
-				orbit_distance += satellite->get_base_unit_type()->get_tile_width();
-			}
+			orbit_distance += satellite_size.width();
 			orbit_distance += site::orbit_distance_increment;
 		}
 	}
@@ -2715,6 +2708,80 @@ QPoint map_template::generate_celestial_site_position(const site *site, const in
 	}
 
 	throw std::runtime_error("Failed to generate celestial site position for site \"" + site->get_identifier() + "\".");
+}
+
+QPoint map_template::generate_site_orbit_position(const site *site, const int z, const int64_t orbit_distance) const
+{
+	point_set circle_point_set;
+
+	for (int x = -180; x <= 180; ++x) {
+		for (int y = -180; y <= 180; ++y) {
+			if (x == 0 && y == 0) {
+				continue;
+			}
+
+			circle_point_set.insert(QPoint(x, y));
+		}
+	}
+
+	std::vector<QPoint> potential_circle_points = container::to_vector(circle_point_set);
+
+	const QSize site_size = site->get_size_with_satellites();
+
+	while (!potential_circle_points.empty()) {
+		const QPoint orbit_circle_pos = vector::take_random(potential_circle_points);
+		const QPoint orbit_pos = point::get_nearest_circle_edge_point(orbit_circle_pos, orbit_distance);
+		QPoint random_pos = site->get_orbit_center()->get_game_data()->get_map_pos() + orbit_pos;
+
+		if (!CMap::get()->Info.IsPointOnMap(random_pos, z)) {
+			continue;
+		}
+
+		//ensure there are no units placed where the celestial site and its satellites would be
+		std::vector<CUnit *> units;
+		Select(random_pos - size::to_point((site_size + QSize(1, 1)) / 2), random_pos + size::to_point((site_size + QSize(1, 1)) / 2), units, z);
+		if (!units.empty()) {
+			continue;
+		}
+
+		const unit_type *unit_type = site->get_base_unit_type();
+		if (unit_type != nullptr) {
+			const QPoint top_left_pos = random_pos - unit_type->get_tile_center_pos_offset();
+
+			if (!UnitTypeCanBeAt(*unit_type, top_left_pos, z) || (unit_type->BoolFlag[BUILDING_INDEX].value && !CanBuildUnitType(nullptr, *unit_type, top_left_pos, 0, true, z))) {
+				continue;
+			}
+
+			if (unit_type->UnitType == UnitTypeType::Space) {
+				//ensure that the generated unit will not be created on space transition
+				bool on_space_border = false;
+				for (int x = top_left_pos.x() - 1; x < top_left_pos.x() + unit_type->get_tile_width() + 1; ++x) {
+					for (int y = top_left_pos.y() - 1; y < top_left_pos.y() + unit_type->get_tile_height() + 1; ++y) {
+						const QPoint tile_pos(x, y);
+						if (!CMap::Map.Info.IsPointOnMap(tile_pos, z)) {
+							continue;
+						}
+
+						if (!(CMap::get()->Field(tile_pos, z)->get_flags() & MapFieldSpace)) {
+							on_space_border = true;
+							break;
+						}
+					}
+
+					if (on_space_border) {
+						break;
+					}
+				}
+				if (on_space_border) {
+					continue;
+				}
+			}
+		}
+
+		return random_pos;
+	}
+
+	throw std::runtime_error("Failed to generate site orbit position for site \"" + site->get_identifier() + "\".");
 }
 
 /**

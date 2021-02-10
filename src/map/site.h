@@ -198,6 +198,11 @@ public:
 		return this->astrodistance_additive_modifier;
 	}
 
+	const site *get_orbit_center() const
+	{
+		return this->orbit_center;
+	}
+
 	void set_orbit_center(site *orbit_center);
 
 	const std::vector<site *> &get_satellites() const

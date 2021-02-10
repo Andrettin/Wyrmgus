@@ -588,6 +588,7 @@ public:
 	bool is_constructed_subtemplate_compatible_with_terrain_image(map_template *subtemplate, const QPoint &map_start_pos, int z) const;
 
 	QPoint generate_celestial_site_position(const site *site, const int z) const;
+	QPoint generate_site_orbit_position(const site *site, const int z, const int64_t orbit_distance) const;
 
 	Vec2i get_best_location_map_position(const std::vector<std::unique_ptr<historical_location>> &historical_location_list, bool &in_another_map_template, const Vec2i &template_start_pos, const Vec2i &map_start_pos, const bool random) const;
 
