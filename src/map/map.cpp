@@ -825,8 +825,9 @@ bool CMap::TileHasUnitsIncompatibleWithTerrain(const Vec2i &pos, const wyrmgus::
 bool CMap::is_point_in_a_subtemplate_area(const QPoint &pos, const int z) const
 {
 	for (const auto &kv_pair : this->MapLayers[z]->subtemplate_areas) {
+		const map_template *subtemplate = kv_pair.first;
 		const QRect &subtemplate_rect = kv_pair.second;
-		if (subtemplate_rect.contains(pos)) {
+		if (subtemplate_rect.contains(pos) && subtemplate->is_map_pos_usable(pos)) {
 			return true;
 		}
 	}
