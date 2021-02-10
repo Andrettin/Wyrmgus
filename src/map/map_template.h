@@ -129,6 +129,7 @@ class map_template final : public named_data_entry, public data_type<map_templat
 	Q_PROPERTY(int max_latitude MEMBER max_latitude READ get_max_latitude)
 	Q_PROPERTY(int astrodistance_multiplier MEMBER astrodistance_multiplier READ get_astrodistance_multiplier)
 	Q_PROPERTY(int astrodistance_additive_modifier MEMBER astrodistance_additive_modifier READ get_astrodistance_additive_modifier)
+	Q_PROPERTY(wyrmgus::map_template* default_astrocoordinate_reference_subtemplate MEMBER default_astrocoordinate_reference_subtemplate)
 
 public:
 	using terrain_character_map_type = std::vector<std::vector<char>>;
@@ -384,6 +385,24 @@ public:
 	const std::vector<map_template *> &get_subtemplates() const
 	{
 		return this->subtemplates;
+	}
+
+	bool is_subtemplate_of(const map_template *other) const
+	{
+		return this->get_main_template() == other;
+	}
+
+	bool is_any_subtemplate_of(const map_template *other) const
+	{
+		if (this->is_subtemplate_of(other)) {
+			return true;
+		}
+
+		if (this->get_main_template() != nullptr) {
+			return this->get_main_template()->is_any_subtemplate_of(other);
+		}
+
+		return false;
 	}
 
 	const QPoint &get_min_adjacent_template_distance() const
@@ -649,6 +668,11 @@ public:
 		return this->astrodistance_additive_modifier;
 	}
 
+	const map_template *get_default_astrocoordinate_reference_subtemplate() const
+	{
+		return this->default_astrocoordinate_reference_subtemplate;
+	}
+
 	QRect get_georectangle() const
 	{
 		const QPoint top_left(this->get_min_longitude(), this->get_min_latitude());
@@ -772,6 +796,7 @@ private:
 	int max_latitude = 0;
 	int astrodistance_multiplier = 1;
 	int astrodistance_additive_modifier = 0;
+	map_template *default_astrocoordinate_reference_subtemplate = nullptr;
 	std::map<char, std::unique_ptr<character_unit>> character_units;
 	std::vector<std::unique_ptr<character_substitution>> character_substitutions; //substitutions applied to the terrain character map, in order
 	std::unique_ptr<map_template_history> history;

@@ -235,7 +235,7 @@ void site::initialize()
 	if (!this->get_geocoordinate().is_null()) {
 		this->pos = this->get_map_template()->get_geocoordinate_pos(this->get_geocoordinate());
 	} else if (!this->get_astrocoordinate().is_null()) {
-		this->pos = this->astrocoordinate_to_pos(this->get_astrocoordinate());
+		this->pos = this->astrocoordinate_to_pos<false>(this->get_astrocoordinate());
 	}
 
 	if (!this->satellites.empty()) {
@@ -390,21 +390,56 @@ void site::set_distance_from_orbit_center_au(const centesimal_int &distance_au)
 	this->distance_from_orbit_center = astronomy::au_to_gm(distance_au);
 }
 
-QPoint site::astrocoordinate_to_pos(const wyrmgus::geocoordinate &astrocoordinate) const
+QPoint site::astrocoordinate_to_relative_pos(const wyrmgus::geocoordinate &astrocoordinate, const wyrmgus::map_template *reference_subtemplate) const
 {
 	QPoint direction_pos = astrocoordinate.to_circle_edge_point();
 	int64_t astrodistance_value = this->get_astrodistance().to_int();
 	astrodistance_value = isqrt(astrodistance_value);
 	astrodistance_value *= this->get_map_template()->get_astrodistance_multiplier();
+
+	//the size of the reference subtemplate serves as a minimum distance in tiles
+	astrodistance_value += std::max(reference_subtemplate->get_applied_width(), reference_subtemplate->get_applied_height()) / 2;
+
 	astrodistance_value += this->get_map_template()->get_astrodistance_additive_modifier();
 	astrodistance_value += this->get_astrodistance_additive_modifier();
 	const int64_t x = direction_pos.x() * astrodistance_value / geocoordinate::number_type::divisor;
 	const int64_t y = direction_pos.y() * astrodistance_value / geocoordinate::number_type::divisor;
 
-	const QPoint relative_pos(x, y);
-	//apply the relative position of the celestial body to the map template's center
-	return QPoint(this->get_map_template()->get_width() / 2 - 1, this->get_map_template()->get_height() / 2 - 1) + relative_pos;
+	return QPoint(x, y);
 }
+
+template <bool use_map_pos>
+QPoint site::astrocoordinate_to_pos(const wyrmgus::geocoordinate &astrocoordinate) const
+{
+	const wyrmgus::map_template *reference_subtemplate = this->get_map_template()->get_default_astrocoordinate_reference_subtemplate();
+	if (reference_subtemplate == nullptr) {
+		throw std::runtime_error("Could not convert astrocoordinate to pos for site \"" + this->get_identifier() + "\", as its map template has no default astrocoordinate reference subtemplate.");
+	}
+
+	const QPoint relative_pos = this->astrocoordinate_to_relative_pos(astrocoordinate, reference_subtemplate);
+
+	QPoint base_pos;
+	if constexpr (use_map_pos) {
+		if (!CMap::get()->is_subtemplate_on_map(reference_subtemplate)) {
+			throw std::runtime_error("Could not convert an astrocoordinate to a map pos for site \"" + this->get_identifier() + "\", as its reference subtemplate is not on the map.");
+		}
+
+		base_pos = reference_subtemplate->get_current_map_start_pos();
+	} else {
+		if (reference_subtemplate->get_subtemplate_top_left_pos() == QPoint(-1, -1)) {
+			throw std::runtime_error("Could not convert an astrocoordinate to a pos for site \"" + this->get_identifier() + "\", as its reference subtemplate has no subtemplate position within the main template.");
+		}
+		base_pos = reference_subtemplate->get_subtemplate_top_left_pos();
+	}
+
+	base_pos += QPoint(reference_subtemplate->get_applied_width() / 2 - 1, reference_subtemplate->get_applied_height() / 2 - 1);
+
+	//apply the relative position of the celestial body to the reference subtemplate's center
+	return base_pos + relative_pos;
+}
+
+template QPoint site::astrocoordinate_to_pos<false>(const wyrmgus::geocoordinate &) const;
+template QPoint site::astrocoordinate_to_pos<true>(const wyrmgus::geocoordinate &) const;
 
 QVariantList site::get_cores_qvariant_list() const
 {

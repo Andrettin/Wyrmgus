@@ -436,6 +436,10 @@ void map_template::check() const
 	if (this->clear_terrain && this->get_base_terrain_type() != nullptr && this->get_base_overlay_terrain_type() != nullptr) {
 		throw std::runtime_error("Map template \"" + this->get_identifier() + "\" is set to clear terrain in its area, but also has a base terrain type and an overlay base terrain type.");
 	}
+
+	if (this->get_default_astrocoordinate_reference_subtemplate() != nullptr && !this->get_default_astrocoordinate_reference_subtemplate()->is_any_subtemplate_of(this)) {
+		throw std::runtime_error("Map template \"" + this->get_identifier() + "\" has \"" + this->get_default_astrocoordinate_reference_subtemplate()->get_identifier() + "\" as its default astrocoordinate reference subtemplate, but the latter is not a subtemplate of the former, even indirectly.");
+	}
 }
 
 data_entry_history *map_template::get_history_base()
@@ -1228,7 +1232,7 @@ void map_template::apply_sites(const QPoint &template_start_pos, const QPoint &m
 			}
 			if (base_unit_type != nullptr) {
 				if (site->has_random_astrocoordinate()) {
-					site_pos = site->astrocoordinate_to_pos(random::get()->generate_geocoordinate());
+					site_pos = site->astrocoordinate_to_pos<true>(random::get()->generate_geocoordinate());
 				} else {
 					site_pos = CMap::Map.generate_unit_location(base_unit_type, nullptr, map_start_pos, map_end - QPoint(1, 1), z);
 				}

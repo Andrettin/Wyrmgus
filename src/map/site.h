@@ -206,6 +206,9 @@ public:
 	centesimal_int get_distance_from_orbit_center_au() const;
 	void set_distance_from_orbit_center_au(const centesimal_int &distance_au);
 
+	QPoint astrocoordinate_to_relative_pos(const wyrmgus::geocoordinate &astrocoordinate, const wyrmgus::map_template *reference_subtemplate) const;
+
+	template <bool use_map_pos>
 	QPoint astrocoordinate_to_pos(const wyrmgus::geocoordinate &astrocoordinate) const;
 
 	const unit_type *get_base_unit_type() const
@@ -311,5 +314,8 @@ public:
 
 	friend int ::CclDefineSite(lua_State *l);
 };
+
+extern template QPoint site::astrocoordinate_to_pos<false>(const wyrmgus::geocoordinate &) const;
+extern template QPoint site::astrocoordinate_to_pos<true>(const wyrmgus::geocoordinate &) const;
 
 }
