@@ -87,7 +87,8 @@ public:
 	static constexpr const char *class_identifier = "site";
 	static constexpr const char *database_folder = "sites";
 	static constexpr int base_astrodistance_additive_modifier = 8;
-	static constexpr int orbit_distance_increment = 2; //the space between celestial bodies in orbit, in tiles
+	static constexpr int base_orbit_distance = 2; //the tile space between the orbit center and its first orbiting body
+	static constexpr int orbit_distance_increment = 1; //the increment per satellite when calculating orbit positions, in tiles
 
 	static site *get_by_color(const QColor &color)
 	{

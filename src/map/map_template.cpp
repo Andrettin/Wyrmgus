@@ -1352,7 +1352,7 @@ void map_template::apply_site(const site *site, const QPoint &site_pos, const in
 		if (site->get_base_unit_type() != nullptr) {
 			orbit_distance += site->get_base_unit_type()->get_tile_width() / 2;
 		}
-		orbit_distance += site::orbit_distance_increment;
+		orbit_distance += site::base_orbit_distance;
 
 		for (const wyrmgus::site *satellite : site->get_satellites()) {
 			const QSize satellite_size = satellite->get_size_with_satellites();
@@ -1361,7 +1361,6 @@ void map_template::apply_site(const site *site, const QPoint &site_pos, const in
 
 			this->apply_site(satellite, satellite_pos, z);
 
-			orbit_distance += satellite_size.width();
 			orbit_distance += site::orbit_distance_increment;
 		}
 	}
@@ -2737,16 +2736,15 @@ QPoint map_template::generate_site_orbit_position(const site *site, const int z,
 			continue;
 		}
 
-		//ensure there are no units placed where the celestial site and its satellites would be
-		std::vector<CUnit *> units;
-		Select(random_pos - size::to_point((site_size + QSize(1, 1)) / 2), random_pos + size::to_point((site_size + QSize(1, 1)) / 2), units, z);
-		if (!units.empty()) {
-			continue;
-		}
-
 		const unit_type *unit_type = site->get_base_unit_type();
 		if (unit_type != nullptr) {
+			//ensure there are no units placed where the celestial site and its satellites would be
+			std::vector<CUnit *> units;
 			const QPoint top_left_pos = random_pos - unit_type->get_tile_center_pos_offset();
+			Select(top_left_pos - QPoint(1, 1), top_left_pos + size::to_point(unit_type->get_tile_size()), units, z);
+			if (!units.empty()) {
+				continue;
+			}
 
 			if (!UnitTypeCanBeAt(*unit_type, top_left_pos, z) || (unit_type->BoolFlag[BUILDING_INDEX].value && !CanBuildUnitType(nullptr, *unit_type, top_left_pos, 0, true, z))) {
 				continue;
