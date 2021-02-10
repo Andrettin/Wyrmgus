@@ -670,7 +670,20 @@ void unit_type::process_sml_scope(const sml_data &scope)
 	const std::string &tag = scope.get_tag();
 	const std::vector<std::string> &values = scope.get_values();
 
-	if (tag == "costs") {
+	if (tag == "subtypes") {
+		for (const std::string &value : values) {
+			this->subtypes.push_back(unit_type::get(value));
+		}
+
+		scope.for_each_property([&](const wyrmgus::sml_property &property) {
+			const unit_type *subtype = unit_type::get(property.get_key());
+			const int weight = std::stoi(property.get_value());
+
+			for (int i = 0; i < weight; ++i) {
+				this->subtypes.push_back(subtype);
+			}
+		});
+	} else if (tag == "costs") {
 		scope.for_each_property([&](const wyrmgus::sml_property &property) {
 			const std::string &key = property.get_key();
 			const std::string &value = property.get_value();

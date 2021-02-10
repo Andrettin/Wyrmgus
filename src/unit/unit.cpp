@@ -3077,6 +3077,10 @@ const wyrmgus::civilization *CUnit::get_civilization() const
 */
 CUnit *MakeUnit(const wyrmgus::unit_type &type, CPlayer *player)
 {
+	if (!type.get_subtypes().empty()) {
+		return MakeUnit(*vector::get_random(type.get_subtypes()), player);
+	}
+
 	CUnit *unit = wyrmgus::unit_manager::get()->AllocUnit();
 	if (unit == nullptr) {
 		return nullptr;

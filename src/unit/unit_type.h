@@ -830,6 +830,11 @@ public:
 		return this->faction;
 	}
 
+	const std::vector<const unit_type *> &get_subtypes() const
+	{
+		return this->subtypes;
+	}
+
 	const QSize &get_tile_size() const
 	{
 		return this->tile_size;
@@ -1043,6 +1048,7 @@ private:
 	bool template_type = false;
 	wyrmgus::civilization *civilization = nullptr; //which civilization this unit belongs to, if any
 	wyrmgus::faction *faction = nullptr; //which faction this unit belongs to, if any
+	std::vector<const unit_type *> subtypes; //subtypes of this type; when a unit of this type is created, it has a subtype picked automatically instead
 public:
 	std::string RequirementsString;	/// Requirements string of the unit type
 	std::string ExperienceRequirementsString;	/// Experience requirements string of the unit type
