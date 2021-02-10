@@ -70,6 +70,7 @@ class site final : public named_data_entry, public data_type<site>, public CData
 	Q_PROPERTY(QTime right_ascension READ get_right_ascension WRITE set_right_ascension)
 	Q_PROPERTY(wyrmgus::decimillesimal_int declination READ get_declination WRITE set_declination)
 	Q_PROPERTY(bool random_astrocoordinate MEMBER random_astrocoordinate READ has_random_astrocoordinate)
+	Q_PROPERTY(wyrmgus::map_template* astrocoordinate_reference_subtemplate MEMBER astrocoordinate_reference_subtemplate)
 	Q_PROPERTY(wyrmgus::centesimal_int astrodistance MEMBER astrodistance READ get_astrodistance)
 	Q_PROPERTY(wyrmgus::centesimal_int astrodistance_pc READ get_astrodistance_pc WRITE set_astrodistance_pc)
 	Q_PROPERTY(int astrodistance_additive_modifier MEMBER astrodistance_additive_modifier READ get_astrodistance_additive_modifier)
@@ -295,6 +296,7 @@ private:
 	int latitude_scale = 100;
 	wyrmgus::geocoordinate astrocoordinate; //the site's position as an astrocoordinate
 	bool random_astrocoordinate = false; //whether a random astrocoordinate should be used to apply the site's position when its map template is applied
+	wyrmgus::map_template *astrocoordinate_reference_subtemplate = nullptr;
 	centesimal_int astrodistance; //the site's distance from its map template's center (in light-years)
 	int astrodistance_additive_modifier = 0;
 	site *orbit_center = nullptr;

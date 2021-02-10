@@ -1236,8 +1236,8 @@ void map_template::apply_sites(const QPoint &template_start_pos, const QPoint &m
 					site_pos = this->generate_celestial_site_position(site, z);
 				} else {
 					site_pos = CMap::Map.generate_unit_location(base_unit_type, nullptr, map_start_pos, map_end - QPoint(1, 1), z);
+					site_pos += unit_offset;
 				}
-				site_pos += unit_offset;
 			}
 		} else {
 			if (site_raw_pos.x() == -1 && site_raw_pos.y() == -1) {

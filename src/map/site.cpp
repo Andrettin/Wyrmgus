@@ -303,6 +303,10 @@ void site::check() const
 	if (this->orbit_center != nullptr && this->get_map_template() != nullptr) {
 		throw std::runtime_error("Site \"" + this->get_identifier() + "\" has an orbit center and is assigned to a map template. It should not be assigned to a map template if it is a satellite, as it will be applied in its orbit center's map template.");
 	}
+
+	if (this->astrocoordinate_reference_subtemplate != nullptr && !this->astrocoordinate_reference_subtemplate->is_any_subtemplate_of(this->get_map_template())) {
+		throw std::runtime_error("Site \"" + this->get_identifier() + "\" has \"" + this->astrocoordinate_reference_subtemplate->get_identifier() + "\" as its astrocoordinate reference subtemplate, but the latter is not a subtemplate of the site's map template, even indirectly.");
+	}
 }
 
 data_entry_history *site::get_history_base()
@@ -412,9 +416,13 @@ QPoint site::astrocoordinate_to_relative_pos(const wyrmgus::geocoordinate &astro
 template <bool use_map_pos>
 QPoint site::astrocoordinate_to_pos(const wyrmgus::geocoordinate &astrocoordinate) const
 {
-	const wyrmgus::map_template *reference_subtemplate = this->get_map_template()->get_default_astrocoordinate_reference_subtemplate();
+	const wyrmgus::map_template *reference_subtemplate = this->astrocoordinate_reference_subtemplate;
 	if (reference_subtemplate == nullptr) {
-		throw std::runtime_error("Could not convert astrocoordinate to pos for site \"" + this->get_identifier() + "\", as its map template has no default astrocoordinate reference subtemplate.");
+		reference_subtemplate = this->get_map_template()->get_default_astrocoordinate_reference_subtemplate();
+	}
+
+	if (reference_subtemplate == nullptr) {
+		throw std::runtime_error("Could not convert astrocoordinate to pos for site \"" + this->get_identifier() + "\", as it has no astrocoordinate reference subtemplate.");
 	}
 
 	const QPoint relative_pos = this->astrocoordinate_to_relative_pos(astrocoordinate, reference_subtemplate);
