@@ -1217,14 +1217,14 @@ void map_template::apply_sites(const QPoint &template_start_pos, const QPoint &m
 
 	for (const site *site : this->sites) {
 		const QPoint site_raw_pos = site->get_pos();
-		Vec2i site_pos(map_start_pos + site_raw_pos - template_start_pos);
+		QPoint site_pos(map_start_pos + site_raw_pos - template_start_pos);
 
-		Vec2i unit_offset(0, 0);
+		QPoint unit_offset(0, 0);
 
 		const unit_type *base_unit_type = site->get_base_unit_type();
 
 		if (base_unit_type != nullptr) {
-			unit_offset = (base_unit_type->get_tile_size() - QSize(1, 1)) / 2;
+			unit_offset = base_unit_type->get_tile_center_pos_offset();
 		}
 
 		if (random) {
@@ -1245,7 +1245,7 @@ void map_template::apply_sites(const QPoint &template_start_pos, const QPoint &m
 			}
 		}
 
-		if (!CMap::Map.Info.IsPointOnMap(site_pos, z) || site_pos.x < map_start_pos.x() || site_pos.y < map_start_pos.y()) {
+		if (!CMap::Map.Info.IsPointOnMap(site_pos, z) || site_pos.x() < map_start_pos.x() || site_pos.y() < map_start_pos.y()) {
 			continue;
 		}
 
@@ -2700,6 +2700,15 @@ QPoint map_template::generate_celestial_site_position(const site *site, const in
 		Select(random_pos - size::to_point((celestial_site_size + QSize(1, 1)) / 2), random_pos + size::to_point((celestial_site_size + QSize(1, 1)) / 2), units, z);
 		if (!units.empty()) {
 			continue;
+		}
+
+		const unit_type *unit_type = site->get_base_unit_type();
+		if (unit_type != nullptr) {
+			const QPoint top_left_pos = random_pos - unit_type->get_tile_center_pos_offset();
+
+			if (!UnitTypeCanBeAt(*unit_type, top_left_pos, z) || (unit_type->BoolFlag[BUILDING_INDEX].value && !CanBuildUnitType(nullptr, *unit_type, top_left_pos, 0, true, z))) {
+				continue;
+			}
 		}
 
 		return random_pos;
