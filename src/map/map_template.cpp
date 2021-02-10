@@ -1233,7 +1233,7 @@ void map_template::apply_sites(const QPoint &template_start_pos, const QPoint &m
 				continue;
 			}
 			if (base_unit_type != nullptr) {
-				if (site->has_random_astrocoordinate()) {
+				if (site->orbits_map_template()) {
 					site_pos = this->generate_celestial_site_position(site, z);
 				} else {
 					site_pos = CMap::Map.generate_unit_location(base_unit_type, nullptr, map_start_pos, map_end - QPoint(1, 1), z);
@@ -1357,11 +1357,13 @@ void map_template::apply_site(const site *site, const QPoint &site_pos, const in
 		for (const wyrmgus::site *satellite : site->get_satellites()) {
 			const QSize satellite_size = satellite->get_size_with_satellites();
 
-			const QPoint satellite_pos = this->generate_site_orbit_position(satellite, z, orbit_distance + (satellite_size.width() / 2));
+			int64_t satellite_orbit_distance = orbit_distance;
+			satellite_orbit_distance += satellite_size.width() / 2;
+			satellite_orbit_distance += isqrt(satellite->get_distance_from_orbit_center()) / site::distance_from_orbit_center_divider;
+
+			const QPoint satellite_pos = this->generate_site_orbit_position(satellite, z, satellite_orbit_distance);
 
 			this->apply_site(satellite, satellite_pos, z);
-
-			orbit_distance += site::orbit_distance_increment;
 		}
 	}
 

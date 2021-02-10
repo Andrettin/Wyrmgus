@@ -69,7 +69,7 @@ class site final : public named_data_entry, public data_type<site>, public CData
 	Q_PROPERTY(wyrmgus::geocoordinate astrocoordinate MEMBER astrocoordinate READ get_astrocoordinate)
 	Q_PROPERTY(QTime right_ascension READ get_right_ascension WRITE set_right_ascension)
 	Q_PROPERTY(wyrmgus::decimillesimal_int declination READ get_declination WRITE set_declination)
-	Q_PROPERTY(bool random_astrocoordinate MEMBER random_astrocoordinate READ has_random_astrocoordinate)
+	Q_PROPERTY(bool map_template_orbit MEMBER map_template_orbit READ orbits_map_template)
 	Q_PROPERTY(wyrmgus::map_template* astrocoordinate_reference_subtemplate MEMBER astrocoordinate_reference_subtemplate)
 	Q_PROPERTY(wyrmgus::centesimal_int astrodistance MEMBER astrodistance READ get_astrodistance)
 	Q_PROPERTY(wyrmgus::centesimal_int astrodistance_pc READ get_astrodistance_pc WRITE set_astrodistance_pc)
@@ -89,6 +89,7 @@ public:
 	static constexpr int base_astrodistance_additive_modifier = 8;
 	static constexpr int base_orbit_distance = 2; //the tile space between the orbit center and its first orbiting body
 	static constexpr int orbit_distance_increment = 1; //the increment per satellite when calculating orbit positions, in tiles
+	static constexpr int distance_from_orbit_center_divider = 10; //divider applied to the distance from orbit center
 
 	static site *get_by_color(const QColor &color)
 	{
@@ -182,9 +183,9 @@ public:
 		this->astrocoordinate.set_latitude(declination);
 	}
 
-	bool has_random_astrocoordinate() const
+	bool orbits_map_template() const
 	{
-		return this->random_astrocoordinate;
+		return this->map_template_orbit;
 	}
 
 	const centesimal_int &get_astrodistance() const
@@ -210,6 +211,11 @@ public:
 	const std::vector<site *> &get_satellites() const
 	{
 		return this->satellites;
+	}
+
+	int get_distance_from_orbit_center() const
+	{
+		return this->distance_from_orbit_center;
 	}
 
 	centesimal_int get_distance_from_orbit_center_au() const;
@@ -302,7 +308,7 @@ private:
 	int longitude_scale = 100;
 	int latitude_scale = 100;
 	wyrmgus::geocoordinate astrocoordinate; //the site's position as an astrocoordinate
-	bool random_astrocoordinate = false; //whether a random astrocoordinate should be used to apply the site's position when its map template is applied
+	bool map_template_orbit = false; //whether this site orbits a map template, with the consequence that a random astrocoordinate is used to apply the site's position when applied to the map
 	wyrmgus::map_template *astrocoordinate_reference_subtemplate = nullptr;
 	centesimal_int astrodistance; //the site's distance from its map template's center (in light-years)
 	int astrodistance_additive_modifier = 0;

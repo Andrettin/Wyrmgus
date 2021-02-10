@@ -299,8 +299,8 @@ void site::check() const
 		throw std::runtime_error("Site \"" + this->get_identifier() + "\" has an astrocoordinate, but its astrodistance is zero.");
 	}
 
-	if (!this->get_astrocoordinate().is_null() && this->has_random_astrocoordinate()) {
-		throw std::runtime_error("Site \"" + this->get_identifier() + "\" has both a fixed astrocoordinate, and is set to have a random one.");
+	if (!this->get_astrocoordinate().is_null() && this->orbits_map_template()) {
+		throw std::runtime_error("Site \"" + this->get_identifier() + "\" has both a fixed astrocoordinate, and is set to have a random one by orbiting a map template.");
 	}
 
 	if (this->orbit_center != nullptr && this->get_map_template() != nullptr) {
@@ -411,6 +411,9 @@ QPoint site::astrocoordinate_to_relative_pos(const wyrmgus::geocoordinate &astro
 	astrodistance_value += site::base_astrodistance_additive_modifier;
 	astrodistance_value += this->get_map_template()->get_astrodistance_additive_modifier();
 	astrodistance_value += this->get_astrodistance_additive_modifier();
+	if (this->orbits_map_template()) {
+		astrodistance_value += isqrt(this->get_distance_from_orbit_center()) / site::distance_from_orbit_center_divider;
+	}
 	const int64_t x = direction_pos.x() * astrodistance_value / geocoordinate::number_type::divisor;
 	const int64_t y = direction_pos.y() * astrodistance_value / geocoordinate::number_type::divisor;
 
