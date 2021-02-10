@@ -568,6 +568,16 @@ public:
 		return this->max_subtemplate_pos;
 	}
 
+	const QPoint get_top_template_relative_pos() const
+	{
+		//get the top-left position of this map template relative to its top template, if any
+		if (this->get_main_template() == nullptr) {
+			return QPoint(0, 0);
+		}
+
+		return this->get_main_template()->get_top_template_relative_pos() + this->get_subtemplate_top_left_pos();
+	}
+
 	bool is_dependent_on(const map_template *other_template) const;
 	void add_dependency_template(const map_template *other_template);
 

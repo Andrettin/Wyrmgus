@@ -442,7 +442,7 @@ QPoint site::astrocoordinate_to_pos(const wyrmgus::geocoordinate &astrocoordinat
 		if (reference_subtemplate->get_subtemplate_top_left_pos() == QPoint(-1, -1)) {
 			throw std::runtime_error("Could not convert an astrocoordinate to a pos for site \"" + this->get_identifier() + "\", as its reference subtemplate has no subtemplate position within the main template.");
 		}
-		base_pos = reference_subtemplate->get_subtemplate_top_left_pos();
+		base_pos = reference_subtemplate->get_top_template_relative_pos();
 	}
 
 	base_pos += QPoint(reference_subtemplate->get_applied_width() / 2 - 1, reference_subtemplate->get_applied_height() / 2 - 1);
