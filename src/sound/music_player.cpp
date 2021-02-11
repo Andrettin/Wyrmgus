@@ -34,6 +34,7 @@
 #include "sound/music_sample.h"
 #include "sound/music_type.h"
 #include "sound/sound_server.h"
+#include "util/exception_util.h"
 #include "util/log_util.h"
 #include "util/vector_random_util.h"
 
@@ -96,7 +97,12 @@ void music_player::play_music(const music *music)
 	this->played_submusic.clear();
 
 	//preload the music with all its submusic, so that transition between them is seamless
-	this->current_music->load();
+	try {
+		this->current_music->load();
+	} catch (const std::exception &exception) {
+		exception::report(exception);
+		return;
+	}
 
 	if (music->get_sample() != nullptr) {
 		this->current_volume_modifier = music->get_volume_percent();
@@ -119,8 +125,13 @@ void music_player::play_submusic(const music *submusic)
 
 void music_player::play_sample(music_sample *sample)
 {
-	if (!sample->is_loaded()) {
-		sample->load();
+	try {
+		if (!sample->is_loaded()) {
+			sample->load();
+		}
+	} catch (const std::exception &exception) {
+		exception::report(exception);
+		return;
 	}
 
 	const int volume = Mix_VolumeMusic(GetMusicVolume() * this->current_volume_modifier / 100 * MIX_MAX_VOLUME / MaxVolume);
