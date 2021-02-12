@@ -33,7 +33,7 @@ namespace wyrmgus::string {
 
 std::string get_indefinite_article(const std::string &str)
 {
-	if (!str.empty() && wyrmgus::character::is_vowel(str.front())) {
+	if (!str.empty() && wyrmgus::char_t::is_vowel(str.front())) {
 		const std::string lower_string = string::lowered(str);
 
 		if (lower_string != "university") {

@@ -26,7 +26,7 @@
 
 #pragma once
 
-namespace wyrmgus::character {
+namespace wyrmgus::char_t {
 
 inline bool is_vowel(const char c)
 {
