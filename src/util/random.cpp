@@ -45,9 +45,10 @@ int_type random::generate_in_range(std::mt19937 &engine, const int_type min_valu
 	return result;
 }
 
-template int random::generate_in_range<int>(std::mt19937 &, const int, const int);
+template int32_t random::generate_in_range<int32_t>(std::mt19937 &, const int32_t, const int32_t);
+template uint32_t random::generate_in_range<uint32_t>(std::mt19937 &, const uint32_t, const uint32_t);
 template int64_t random::generate_in_range<int64_t>(std::mt19937 &, const int64_t, const int64_t);
-template size_t random::generate_in_range<size_t>(std::mt19937 &, const size_t, const size_t);
+template uint64_t random::generate_in_range<uint64_t>(std::mt19937 &, const uint64_t, const uint64_t);
 
 geocoordinate random::generate_geocoordinate()
 {
