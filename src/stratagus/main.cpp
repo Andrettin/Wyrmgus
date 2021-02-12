@@ -30,6 +30,7 @@
 #include "database/database.h"
 #include "util/exception_util.h"
 #include "util/log_util.h"
+#include "version.h"
 
 #include <QCommandLineParser>
 #include <QQmlApplicationEngine>
@@ -44,6 +45,7 @@ int main(int argc, char **argv)
 
 		QApplication app(argc, argv);
 		app.setApplicationName("Wyrmsun");
+		app.setApplicationVersion(VERSION);
 
 		//  Setup some defaults.
 #ifdef MAC_BUNDLE
@@ -63,6 +65,13 @@ int main(int argc, char **argv)
 
 		QCommandLineOption data_path_option("d", "Specify a custom data path.", "data path");
 		cmd_parser.addOption(data_path_option);
+
+		QCommandLineOption test_option { "t", "Check startup and exit." };
+		cmd_parser.addOption(test_option);
+
+		cmd_parser.setApplicationDescription("The free real time strategy game engine.");
+		cmd_parser.addHelpOption();
+		cmd_parser.addVersionOption();
 
 		cmd_parser.process(app);
 

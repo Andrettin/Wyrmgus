@@ -471,7 +471,7 @@ static void RedirectOutput()
 static void ParseCommandLine(int argc, char **argv, Parameters &parameters)
 {
 	for (;;) {
-		switch (getopt(argc, argv, "ac:d:D:eE:FG:hiI:lN:oOP:ps:S:u:v:Wx:Z?-")) {
+		switch (getopt(argc, argv, "ac:d:D:eE:FG:hiI:lN:oOP:ps:S:tu:v:Wx:Z?-")) {
 			case 'a':
 				EnableAssert = true;
 				continue;
@@ -524,6 +524,8 @@ static void ParseCommandLine(int argc, char **argv, Parameters &parameters)
 				continue;
 			case 'S':
 				VideoSyncSpeed = atoi(optarg);
+				continue;
+			case 't':
 				continue;
 			case 'u':
 				Parameters::Instance.SetUserDirectory(optarg);
