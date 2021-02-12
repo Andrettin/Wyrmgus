@@ -526,6 +526,7 @@ static void ParseCommandLine(int argc, char **argv, Parameters &parameters)
 				VideoSyncSpeed = atoi(optarg);
 				continue;
 			case 't':
+				parameters.isTestRun = true;
 				continue;
 			case 'u':
 				Parameters::Instance.SetUserDirectory(optarg);
@@ -658,6 +659,8 @@ void stratagusMain(int argc, char **argv)
 
 	PrintHeader();
 	PrintLicense();
+
+	if (parameters.isTestRun) return;
 
 	// Setup video display
 	InitVideo();
