@@ -10,7 +10,7 @@
 //
 /**@name action_pickup.h - The pick up action headerfile. */
 //
-//      (c) Copyright 2015 by Andrettin
+//      (c) Copyright 2015-2021 by Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -31,11 +31,17 @@
 
 #include "actions.h"
 
+enum class pick_up_state {
+	init = 0,
+	initialized = 1,
+
+	target_reached = 128,
+};
+
 class COrder_PickUp final : public COrder
 {
-	friend std::unique_ptr<COrder> COrder::NewActionPickUp(CUnit &dest);
 public:
-	COrder_PickUp() : COrder(UnitAction::PickUp), State(0), Range(0), MapLayer(0)
+	COrder_PickUp() : COrder(UnitAction::PickUp)
 	{
 		goalPos.x = -1;
 		goalPos.y = -1;
@@ -56,10 +62,12 @@ public:
 	virtual void UpdatePathFinderData(PathFinderInput &input) override;
 
 private:
-	unsigned int State;
-	int Range;
+	pick_up_state state = pick_up_state::init;
+	int Range = 0;
 	Vec2i goalPos;
 	//Wyrmgus start
-	int MapLayer;
+	int MapLayer = 0;
 	//Wyrmgus end
+
+	friend std::unique_ptr<COrder> COrder::NewActionPickUp(CUnit &dest);
 };

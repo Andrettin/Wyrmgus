@@ -50,13 +50,6 @@
 #include "unit/unit_type_type.h"
 #include "video/video.h"
 
-enum {
-	State_Init = 0,
-	State_MoveToTransporterMax = 200, // Range from previous
-	State_WaitForTransporter = 201,
-	State_EnterTransporter = 202
-};
-
 std::unique_ptr<COrder> COrder::NewActionBoard(CUnit &unit)
 {
 	auto order = std::make_unique<COrder_Board>();
@@ -80,7 +73,7 @@ void COrder_Board::Save(CFile &file, const CUnit &unit) const
 	if (this->has_goal()) {
 		file.printf(" \"goal\", \"%s\",", UnitReference(this->get_goal()).c_str());
 	}
-	file.printf(" \"state\", %d", this->State);
+	file.printf(" \"state\", %d", static_cast<int>(this->state));
 
 	file.printf("}");
 }
@@ -91,7 +84,7 @@ bool COrder_Board::ParseSpecificData(lua_State *l, int &j, const char *value, co
 	
 	if (!strcmp("state", value)) {
 		++j;
-		this->State = LuaToNumber(l, -1, j + 1);
+		this->state = static_cast<board_state>(LuaToNumber(l, -1, j + 1));
 	} else if (!strcmp("range", value)) {
 		++j;
 		this->Range = LuaToNumber(l, -1, j + 1);
@@ -234,7 +227,7 @@ bool COrder_Board::WaitForTransporter(CUnit &unit)
 	// is not there. The unit searches with a big range, so it thinks
 	// it's there. This is why we reset the search. The transporter
 	// should be a lot closer now, so it's not as bad as it seems.
-	this->State = State_Init;
+	this->state = board_state::init;
 	this->Range = 1;
 	// Uhh wait a bit.
 	unit.Wait = 10;
@@ -277,35 +270,32 @@ static void EnterTransporter(CUnit &unit, COrder_Board &order)
 	DebugPrint("No free slot in transporter\n");
 }
 
-/* virtual */ void COrder_Board::Execute(CUnit &unit)
+void COrder_Board::Execute(CUnit &unit)
 {
-	switch (this->State) {
+	switch (this->state) {
 		// Wait for transporter
-		case State_WaitForTransporter:
+		case board_state::wait_for_transporter:
 			if (this->WaitForTransporter(unit)) {
-				this->State = State_EnterTransporter;
+				this->state = board_state::enter_transporter;
 			} else {
 				UnitShowAnimation(unit, unit.get_animation_set()->Still.get());
 			}
 			break;
 
-		case State_EnterTransporter: {
+		case board_state::enter_transporter: {
 			EnterTransporter(unit, *this);
 			this->Finished = true;
 			return ;
 		}
-		case State_Init:
+		case board_state::init:
 			if (unit.Wait) {
 				unit.Wait--;
 				return;
 			}
-			this->State = 1;
+			this->state = 1;
 		// FALL THROUGH
 		default: { // Move to transporter
-			//Wyrmgus start
-//			if (this->State <= State_MoveToTransporterMax) {
-			if (unit.CanMove() && this->State <= State_MoveToTransporterMax) {
-			//Wyrmgus end
+			if (unit.CanMove() && this->state <= board_state::move_to_transporter_max) {
 				const int pathRet = MoveToTransporter(unit);
 				// FIXME: if near transporter wait for enter
 				if (pathRet) {
@@ -326,21 +316,21 @@ static void EnterTransporter(CUnit &unit, COrder_Board &order)
 							}
 						}
 						//Wyrmgus end
-						if (++this->State == State_MoveToTransporterMax) {
+						if (++this->state == board_state::move_to_transporter_max) {
 							this->Finished = true;
 							return;
 						} else {
 							// Try with a bigger range.
 							this->Range++;
-							this->State--;
+							this->state--;
 						}
 					} else if (pathRet == PF_REACHED) {
-						this->State = State_WaitForTransporter;
+						this->state = board_state::wait_for_transporter;
 					}
 				}
 			//Wyrmgus start
 			} else if (!unit.CanMove()) { // if the unit can't move, go directly to the state of waiting for the transporter
-				this->State = State_WaitForTransporter;
+				this->state = board_state::wait_for_transporter;
 			//Wyrmgus end
 			}
 			break;

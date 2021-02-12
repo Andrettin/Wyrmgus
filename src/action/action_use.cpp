@@ -53,13 +53,6 @@
 #include "upgrade/upgrade.h"
 #include "video/video.h"
 
-enum {
-	State_Init = 0,
-	State_Initialized = 1,
-
-	State_TargetReached = 128,
-};
-
 std::unique_ptr<COrder> COrder::NewActionUse(CUnit &dest)
 {
 	auto order = std::make_unique<COrder_Use>();
@@ -93,7 +86,7 @@ void COrder_Use::Save(CFile &file, const CUnit &unit) const
 	file.printf(" \"tile\", {%d, %d},", this->goalPos.x, this->goalPos.y);
 	file.printf(" \"map-layer\", %d,", this->MapLayer);
 
-	file.printf(" \"state\", %d", this->State);
+	file.printf(" \"state\", %d", static_cast<int>(this->state));
 
 	file.printf("}");
 }
@@ -104,7 +97,7 @@ bool COrder_Use::ParseSpecificData(lua_State *l, int &j, const char *value, cons
 
 	if (!strcmp(value, "state")) {
 		++j;
-		this->State = LuaToNumber(l, -1, j + 1);
+		this->state = static_cast<use_state>(LuaToNumber(l, -1, j + 1));
 	} else if (!strcmp(value, "range")) {
 		++j;
 		this->Range = LuaToNumber(l, -1, j + 1);
@@ -186,7 +179,7 @@ bool COrder_Use::ParseSpecificData(lua_State *l, int &j, const char *value, cons
 	CUnit *goal = this->get_goal();
 
 	// Reached target
-	if (this->State == State_TargetReached || (goal && goal->Container == &unit) || this == unit.CriticalOrder.get()) {
+	if (this->state == use_state::target_reached || (goal && goal->Container == &unit) || this == unit.CriticalOrder.get()) {
 
 		if (!goal || (!goal->IsVisibleAsGoal(*unit.Player) && goal->Container != &unit)) {
 			DebugPrint("Goal gone\n");
@@ -284,8 +277,8 @@ bool COrder_Use::ParseSpecificData(lua_State *l, int &j, const char *value, cons
 		this->Finished = true;
 		return;
 	}
-	if (this->State == State_Init) { // first entry
-		this->State = State_Initialized;
+	if (this->state == use_state::init) { // first entry
+		this->state = use_state::initialized;
 	}
 	switch (DoActionMove(unit)) { // reached end-point?
 		case PF_UNREACHABLE:
@@ -370,7 +363,7 @@ bool COrder_Use::ParseSpecificData(lua_State *l, int &j, const char *value, cons
 			}
 			this->goalPos = goal->tilePos;
 			this->MapLayer = goal->MapLayer->ID;
-			this->State = State_TargetReached;
+			this->state = use_state::target_reached;
 		}
 		// FALL THROUGH
 		default:

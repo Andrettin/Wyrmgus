@@ -31,9 +31,15 @@
 
 #include "actions.h"
 
+enum class follow_state {
+	init = 0,
+	initialized = 1,
+
+	target_reached = 128,
+};
+
 class COrder_Follow final : public COrder
 {
-	friend std::unique_ptr<COrder> COrder::NewActionFollow(CUnit &dest);
 public:
 	COrder_Follow() : COrder(UnitAction::Follow)
 	{
@@ -56,10 +62,12 @@ public:
 	virtual void UpdatePathFinderData(PathFinderInput &input) override;
 
 private:
-	unsigned int State = 0;
+	follow_state state = follow_state::init;
 	int Range = 0;
 	Vec2i goalPos;
 	//Wyrmgus start
 	int MapLayer = 0;
 	//Wyrmgus end
+
+	friend std::unique_ptr<COrder> COrder::NewActionFollow(CUnit &dest);
 };

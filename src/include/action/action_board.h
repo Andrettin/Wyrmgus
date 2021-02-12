@@ -31,9 +31,15 @@
 
 #include "actions.h"
 
+enum board_state {
+	init = 0,
+	move_to_transporter_max = 200, // Range from previous
+	wait_for_transporter = 201,
+	enter_transporter = 202
+};
+
 class COrder_Board final : public COrder
 {
-	friend std::unique_ptr<COrder> COrder::NewActionBoard(CUnit &unit);
 public:
 	COrder_Board() : COrder(UnitAction::Board)
 	{
@@ -57,10 +63,12 @@ private:
 	int MoveToTransporter(CUnit &unit);
 
 private:
-	int State = 0;
+	int state = board_state::init;
 	int Range = 0;
 	Vec2i goalPos = Vec2i(-1, -1);
 	//Wyrmgus start
 	int MapLayer = 0;
 	//Wyrmgus end
+
+	friend std::unique_ptr<COrder> COrder::NewActionBoard(CUnit &unit);
 };

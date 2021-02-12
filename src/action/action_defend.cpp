@@ -51,12 +51,6 @@
 #include "unit/unit_type_type.h"
 #include "video/video.h"
 
-enum {
-	State_Init = 0,
-	State_MovingToTarget,
-	State_Defending
-};
-
 std::unique_ptr<COrder> COrder::NewActionDefend(CUnit &dest)
 {
 	auto order = std::make_unique<COrder_Defend>();
@@ -89,7 +83,7 @@ void COrder_Defend::Save(CFile &file, const CUnit &unit) const
 	file.printf(" \"map-layer\", %d,", this->MapLayer);
 	//Wyrmgus end
 
-	file.printf(" \"state\", %d", this->State);
+	file.printf(" \"state\", %d", static_cast<int>(this->state));
 
 	file.printf("}");
 }
@@ -100,7 +94,7 @@ bool COrder_Defend::ParseSpecificData(lua_State *l, int &j, const char *value, c
 
 	if (!strcmp(value, "state")) {
 		++j;
-		this->State = LuaToNumber(l, -1, j + 1);
+		this->state = static_cast<defend_state>(LuaToNumber(l, -1, j + 1));
 	} else if (!strcmp(value, "range")) {
 		++j;
 		this->Range = LuaToNumber(l, -1, j + 1);
@@ -192,13 +186,13 @@ bool COrder_Defend::ParseSpecificData(lua_State *l, int &j, const char *value, c
 	}
 	CUnit *goal = this->get_goal();
 
-	if (this->State == State_Init) {
+	if (this->state == defend_state::init) {
 		if (!goal || !goal->IsVisibleAsGoal(*unit.Player)) {
 			this->Finished = true;
 			return;
 		}
-		this->State = State_MovingToTarget;
-	} else if (this->State == State_Defending) {
+		this->state = defend_state::moving_to_target;
+	} else if (this->state == defend_state::defending) {
 		if (!goal || !goal->IsVisibleAsGoal(*unit.Player)) {
 			this->Finished = true;
 			return;
@@ -241,7 +235,7 @@ bool COrder_Defend::ParseSpecificData(lua_State *l, int &j, const char *value, c
 			// Now defend the goal
 			this->goalPos = goal->tilePos;
 			this->MapLayer = goal->MapLayer->ID;
-			this->State = State_Defending;
+			this->state = defend_state::defending;
 		}
 		default:
 			break;
@@ -254,7 +248,7 @@ bool COrder_Defend::ParseSpecificData(lua_State *l, int &j, const char *value, c
 		this->MapLayer = goal->MapLayer->ID;
 		this->clear_goal();
 		goal = nullptr;
-		if (this->State == State_Defending) {
+		if (this->state == defend_state::defending) {
 			this->Finished = true;
 			return;
 		}

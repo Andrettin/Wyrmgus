@@ -31,9 +31,14 @@
 
 #include "actions.h"
 
+enum class defend_state {
+	init = 0,
+	moving_to_target,
+	defending
+};
+
 class COrder_Defend final : public COrder
 {
-	friend std::unique_ptr<COrder> COrder::NewActionDefend(CUnit &dest);
 public:
 	COrder_Defend() : COrder(UnitAction::Defend)
 	{
@@ -56,10 +61,12 @@ public:
 	virtual void UpdatePathFinderData(PathFinderInput &input) override;
 
 private:
-	unsigned int State = 0;
+	defend_state state = defend_state::init;
 	int Range = 0;
 	Vec2i goalPos;
 	//Wyrmgus start
 	int MapLayer = 0;
 	//Wyrmgus end
+
+	friend std::unique_ptr<COrder> COrder::NewActionDefend(CUnit &dest);
 };

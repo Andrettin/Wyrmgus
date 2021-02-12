@@ -10,7 +10,7 @@
 //
 /**@name action_use.h - The use action headerfile. */
 //
-//      (c) Copyright 2015 by Andrettin
+//      (c) Copyright 2015-2021 by Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -31,6 +31,13 @@
 
 #include "actions.h"
 
+enum class use_state {
+	init = 0,
+	initialized = 1,
+
+	target_reached = 128,
+};
+
 class COrder_Use : public COrder
 {
 public:
@@ -43,16 +50,16 @@ public:
 		return std::make_unique<COrder_Use>(*this);
 	}
 
-	virtual bool IsValid() const;
+	virtual bool IsValid() const override;
 
-	virtual void Save(CFile &file, const CUnit &unit) const;
-	virtual bool ParseSpecificData(lua_State *l, int &j, const char *value, const CUnit &unit);
+	virtual void Save(CFile &file, const CUnit &unit) const override;
+	virtual bool ParseSpecificData(lua_State *l, int &j, const char *value, const CUnit &unit) override;
 
-	virtual void Execute(CUnit &unit);
-	virtual PixelPos Show(const CViewport &vp, const PixelPos &lastScreenPos) const;
-	virtual void UpdatePathFinderData(PathFinderInput &input);
+	virtual void Execute(CUnit &unit) override;
+	virtual PixelPos Show(const CViewport &vp, const PixelPos &lastScreenPos) const override;
+	virtual void UpdatePathFinderData(PathFinderInput &input) override;
 private:
-	unsigned int State = 0;
+	use_state state = use_state::init;
 	int Range = 0;
 	Vec2i goalPos = Vec2i(-1, -1);
 	int MapLayer = 0;

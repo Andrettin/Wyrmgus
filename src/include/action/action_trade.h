@@ -31,11 +31,19 @@
 
 #include "actions.h"
 
+enum class trade_state {
+	init = 0,
+	initialized = 1,
+
+	move_to_home_market = 70,
+
+	target_reached = 128,
+};
+
 class COrder_Trade final : public COrder
 {
-	friend std::unique_ptr<COrder> COrder::NewActionTrade(CUnit &dest, CUnit &home_market);
 public:
-	COrder_Trade() : COrder(UnitAction::Trade), State(0), Range(0), MapLayer(0), HomeMarket(nullptr)
+	COrder_Trade() : COrder(UnitAction::Trade)
 	{
 		goalPos.x = -1;
 		goalPos.y = -1;
@@ -56,11 +64,14 @@ public:
 	virtual void Execute(CUnit &unit) override;
 	virtual PixelPos Show(const CViewport &vp, const PixelPos &lastScreenPos) const override;
 	virtual void UpdatePathFinderData(PathFinderInput &input) override;
+
 private:
-	unsigned int State;
-	int Range;
+	trade_state state = trade_state::init;
+	int Range = 0;
 	Vec2i goalPos;
-	int MapLayer;
-	CUnit *HomeMarket;
+	int MapLayer = 0;
+	CUnit *HomeMarket = nullptr;
 	Vec2i HomeMarketPos;
+
+	friend std::unique_ptr<COrder> COrder::NewActionTrade(CUnit &dest, CUnit &home_market);
 };

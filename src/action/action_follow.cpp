@@ -50,13 +50,6 @@
 #include "unit/unit_type_type.h"
 #include "video/video.h"
 
-enum {
-	State_Init = 0,
-	State_Initialized = 1,
-
-	State_TargetReached = 128,
-};
-
 std::unique_ptr<COrder> COrder::NewActionFollow(CUnit &dest)
 {
 	auto order = std::make_unique<COrder_Follow>();
@@ -92,7 +85,7 @@ void COrder_Follow::Save(CFile &file, const CUnit &unit) const
 	file.printf(" \"map-layer\", %d,", this->MapLayer);
 	//Wyrmgus end
 
-	file.printf(" \"state\", %d", this->State);
+	file.printf(" \"state\", %d", static_cast<int>(this->state));
 
 	file.printf("}");
 }
@@ -103,7 +96,7 @@ bool COrder_Follow::ParseSpecificData(lua_State *l, int &j, const char *value, c
 	
 	if (!strcmp(value, "state")) {
 		++j;
-		this->State = LuaToNumber(l, -1, j + 1);
+		this->state = static_cast<follow_state>(LuaToNumber(l, -1, j + 1));
 	} else if (!strcmp(value, "range")) {
 		++j;
 		this->Range = LuaToNumber(l, -1, j + 1);
@@ -192,7 +185,7 @@ bool COrder_Follow::ParseSpecificData(lua_State *l, int &j, const char *value, c
 	CUnit *goal = this->get_goal();
 
 	// Reached target
-	if (this->State == State_TargetReached) {
+	if (this->state == follow_state::target_reached) {
 
 		if (!goal || !goal->IsVisibleAsGoal(*unit.Player)) {
 			DebugPrint("Goal gone\n");
@@ -219,14 +212,14 @@ bool COrder_Follow::ParseSpecificData(lua_State *l, int &j, const char *value, c
 			unit.Wait = 10;
 			if (this->Range > 1) {
 				this->Range = 1;
-				this->State = State_Init;
+				this->state = follow_state::init;
 			}
 			return ;
 		}
-		this->State = State_Init;
+		this->state = follow_state::init;
 	}
-	if (this->State == State_Init) { // first entry
-		this->State = State_Initialized;
+	if (this->state == follow_state::init) { // first entry
+		this->state = follow_state::initialized;
 	}
 	switch (DoActionMove(unit)) { // reached end-point?
 		case PF_UNREACHABLE:
@@ -319,7 +312,7 @@ bool COrder_Follow::ParseSpecificData(lua_State *l, int &j, const char *value, c
 			}
 			this->goalPos = goal->tilePos;
 			this->MapLayer = goal->MapLayer->ID;
-			this->State = State_TargetReached;
+			this->state = follow_state::target_reached;
 		}
 		// FALL THROUGH
 		default:
