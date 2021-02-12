@@ -85,7 +85,7 @@ static constexpr int SCROLL_LEFT = 7;
 //Wyrmgus end
 
 static std::array<Vec2i, 3> SavedMapPosition;				/// Saved map position
-static char Input[80];							/// line input for messages/long commands
+static std::array<char, 80> message_input;	/// line input for messages/long commands
 static int InputIndex;							/// current index into input
 static char InputStatusLine[99];				/// Last input status line
 const char DefaultGroupKeys[] = "0123456789`";	/// Default group keys
@@ -114,8 +114,8 @@ CUnit *LastLevelUpUnit;							/// Last called level up unit
 static void ShowInput()
 {
 	//Wyrmgus start
-//	snprintf(InputStatusLine, sizeof(InputStatusLine), _("MESSAGE:%s~!_"), Input);
-	snprintf(InputStatusLine, sizeof(InputStatusLine), _("Message: %s~!_"), Input);
+//	snprintf(InputStatusLine, sizeof(InputStatusLine), _("MESSAGE:%s~!_"), message_input.data());
+	snprintf(InputStatusLine, sizeof(InputStatusLine), _("Message: %s~!_"), message_input.data());
 	//Wyrmgus end
 	char *input = InputStatusLine;
 	// FIXME: This is slow!
@@ -134,7 +134,7 @@ static void ShowInput()
 static void UiBeginInput()
 {
 	KeyState = KeyStateInput;
-	Input[0] = '\0';
+	message_input[0] = '\0';
 	InputIndex = 0;
 	UI.StatusLine.ClearCosts();
 	ShowInput();
@@ -1102,12 +1102,12 @@ static int InputKey(int key)
 		case SDLK_RETURN:
 		case SDLK_KP_ENTER: { // RETURN
 			// Replace ~~ with ~
-			Replace2TildeByTilde(Input);
+			Replace2TildeByTilde(message_input.data());
 #ifdef DEBUG
-			if (Input[0] == '-') {
+			if (message_input[0] == '-') {
 				if (!GameObserve && !GamePaused && !GameEstablishing) {
 					CommandLog("input", NoUnitP, FlushCommands, -1, -1, NoUnitP, Input, -1);
-					CclCommand(Input + 1, false);
+					CclCommand(message_input.data() + 1, false);
 				}
 			} else
 #endif
@@ -1116,8 +1116,8 @@ static int InputKey(int key)
 //					if (!GameObserve && !GamePaused && !GameEstablishing) {
 					if (!GameObserve && !GamePaused && !GameEstablishing && !SaveGameLoading) {
 					//Wyrmgus end
-						if (HandleCheats(Input)) {
-							CommandLog("input", NoUnitP, FlushCommands, -1, -1, NoUnitP, Input, -1);
+						if (HandleCheats(message_input.data())) {
+							CommandLog("input", NoUnitP, FlushCommands, -1, -1, NoUnitP, message_input.data(), -1);
 						}
 					}
 				}
@@ -1126,18 +1126,18 @@ static int InputKey(int key)
 #ifdef DEBUG
 			if (strncmp(Input, "ffw ", 4) == 0) {
 #else
-			if (strncmp(Input, "ffw ", 4) == 0 && ReplayGameType != ReplayNone) {
+			if (strncmp(message_input.data(), "ffw ", 4) == 0 && ReplayGameType != ReplayNone) {
 #endif
-				FastForwardCycle = atoi(&Input[4]);
+				FastForwardCycle = atoi(&message_input[4]);
 			}
 
-			if (Input[0]) {
+			if (message_input[0]) {
 				// Replace ~ with ~~
-				ReplaceTildeBy2Tilde(Input);
-				char chatMessage[sizeof(Input) + 40];
+				ReplaceTildeBy2Tilde(message_input.data());
+				char chatMessage[message_input.size() + 40];
 				snprintf(chatMessage, sizeof(chatMessage), "~%s~<%s>~> %s",
 					CPlayer::GetThisPlayer()->get_player_color()->get_identifier().c_str(),
-					CPlayer::GetThisPlayer()->Name.c_str(), Input);
+					CPlayer::GetThisPlayer()->Name.c_str(), message_input.data());
 				// FIXME: only to selected players ...
 				NetworkSendChatMessage(chatMessage);
 			}
@@ -1153,23 +1153,23 @@ static int InputKey(int key)
 #endif
 		case SDLK_BACKSPACE:
 			if (InputIndex) {
-				if (Input[InputIndex - 1] == '~') {
-					Input[--InputIndex] = '\0';
+				if (message_input[InputIndex - 1] == '~') {
+					message_input[--InputIndex] = '\0';
 				}
-				InputIndex = UTF8GetPrev(Input, InputIndex);
+				InputIndex = UTF8GetPrev(message_input.data(), InputIndex);
 				if (InputIndex >= 0) {
-					Input[InputIndex] = '\0';
+					message_input[InputIndex] = '\0';
 					ShowInput();
 				}
 			}
 			return 1;
 
 		case SDLK_TAB: {
-			char *namestart = strrchr(Input, ' ');
+			char *namestart = strrchr(message_input.data(), ' ');
 			if (namestart) {
 				++namestart;
 			} else {
-				namestart = Input;
+				namestart = message_input.data();
 			}
 			if (!strlen(namestart)) {
 				return 1;
@@ -1180,10 +1180,10 @@ static int InputKey(int key)
 				}
 				if (!strncasecmp(namestart, CPlayer::Players[i]->Name.c_str(), strlen(namestart))) {
 					InputIndex += strlen(CPlayer::Players[i]->Name.c_str()) - strlen(namestart);
-					strcpy_s(namestart, sizeof(Input) - (namestart - Input), CPlayer::Players[i]->Name.c_str());
-					if (namestart == Input) {
+					strcpy_s(namestart, message_input.size() - (namestart - message_input.data()), CPlayer::Players[i]->Name.c_str());
+					if (namestart == message_input.data()) {
 						InputIndex += 2;
-						strcat_s(namestart, sizeof(Input) - (namestart - Input), ": ");
+						strcat_s(namestart, message_input.size() - (namestart - message_input.data()), ": ");
 					}
 					ShowInput();
 				}
@@ -1195,17 +1195,17 @@ static int InputKey(int key)
 				gcn::Key k(key);
 				std::string kstr = k.toString();
 				if (key == '~') {
-					if (InputIndex < (int)sizeof(Input) - 2) {
-						Input[InputIndex++] = key;
-						Input[InputIndex++] = key;
-						Input[InputIndex] = '\0';
+					if (InputIndex < static_cast<int>(message_input.size()) - 2) {
+						message_input[InputIndex++] = key;
+						message_input[InputIndex++] = key;
+						message_input[InputIndex] = '\0';
 						ShowInput();
 					}
-				} else if (InputIndex < (int)(sizeof(Input) - kstr.size())) {
+				} else if (InputIndex < static_cast<int>(message_input.size() - kstr.size())) {
 					for (size_t i = 0; i < kstr.size(); ++i) {
-						Input[InputIndex++] = kstr[i];
+						message_input[InputIndex++] = kstr[i];
 					}
-					Input[InputIndex] = '\0';
+					message_input[InputIndex] = '\0';
 					ShowInput();
 				}
 				return 1;
