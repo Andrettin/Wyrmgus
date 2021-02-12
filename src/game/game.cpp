@@ -112,6 +112,7 @@
 //Wyrmgus start
 #include "util/util.h"
 //Wyrmgus end
+#include "util/vector_random_util.h"
 #include "util/vector_util.h"
 #include "version.h"
 #include "video/font.h"
@@ -1514,7 +1515,7 @@ void CalculateItemsToLoad()
 	ResetItemsToLoad();
 
 	if (loadingBackgrounds.size() > 0) {
-		std::string loading_background_string = loadingBackgrounds[rand()%loadingBackgrounds.size()];
+		std::string loading_background_string = vector::get_random_async(loadingBackgrounds);
 		if (CanAccessFile(loading_background_string.c_str())) {
 			loadingBackground = CGraphic::New(loading_background_string);
 			loadingBackground->Load();
@@ -1539,7 +1540,7 @@ void CalculateItemsToLoad()
 	}
 
 	if (loadingTips.size() > 0) {
-		std::string base_loadingTip = _(loadingTips[rand()%loadingTips.size()].c_str());
+		std::string base_loadingTip = _(vector::get_random_async(loadingTips).c_str());
 		
 		int str_width_per_total_width = 1;
 		str_width_per_total_width += defines::get()->get_game_font()->Width(base_loadingTip) / Video.Width;

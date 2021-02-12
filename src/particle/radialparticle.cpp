@@ -31,6 +31,7 @@
 
 #include "particle.h"
 
+#include "util/random.h"
 #include "util/util.h"
 
 //Wyrmgus start
@@ -47,8 +48,8 @@ CRadialParticle::CRadialParticle(CPosition position, int z, GraphicAnimation *an
 
 	const int speedReduction = 10;
 
-	this->direction = (float)(MyRand() % 360);
-	this->speed = (MyRand() % maxSpeed) / speedReduction;
+	this->direction = (float)(random::get()->generate_async(360));
+	this->speed = random::get()->generate_async(maxSpeed) / speedReduction;
 	this->maxSpeed = maxSpeed;
 }
 

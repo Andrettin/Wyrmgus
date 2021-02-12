@@ -41,9 +41,6 @@
 
 extern int SyncRand(const int max);           /// Syncron rand
 
-///  rand only used on this computer.
-extern int MyRand();
-
 /*----------------------------------------------------------------------------
 --  Math
 ----------------------------------------------------------------------------*/

@@ -31,6 +31,7 @@
 
 #include "particle.h"
 
+#include "util/random.h"
 #include "util/util.h"
 #include "video/video.h"
 
@@ -53,15 +54,15 @@ CChunkParticle::CChunkParticle(CPosition position, int z, GraphicAnimation *smok
 	//Wyrmgus end
 	age(0), height(0.f)
 {
-	float radians = deg2rad(MyRand() % 360);
+	float radians = deg2rad(random::get()->generate_async(360));
 	direction.x = cos(radians);
 	direction.y = sin(radians);
 
 	this->minVelocity = minVelocity;
 	this->maxVelocity = maxVelocity;
 	this->minTrajectoryAngle = minTrajectoryAngle;
-	this->initialVelocity = this->minVelocity + MyRand() % (this->maxVelocity - this->minVelocity + 1);
-	this->trajectoryAngle = deg2rad(MyRand() % (90 - this->minTrajectoryAngle) + this->minTrajectoryAngle);
+	this->initialVelocity = this->minVelocity + random::get()->generate_async(this->maxVelocity - this->minVelocity + 1);
+	this->trajectoryAngle = deg2rad(random::get()->generate_async(90 - this->minTrajectoryAngle) + this->minTrajectoryAngle);
 	this->lifetime = (int)(1000 * (initialVelocity * sin(trajectoryAngle) / gravity) * 2);
 	if (maxTTL) {
 		this->lifetime = std::min(maxTTL, this->lifetime);
@@ -138,7 +139,7 @@ void CChunkParticle::update(int ticks)
 		//Wyrmgus end
 		ParticleManager.add(std::move(smoke));
 
-		nextSmokeTicks += MyRand() % randSmokeTicks + minSmokeTicks;
+		nextSmokeTicks += random::get()->generate_async(randSmokeTicks) + minSmokeTicks;
 	}
 
 	debrisAnimation->update(ticks);

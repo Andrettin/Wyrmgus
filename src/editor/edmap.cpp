@@ -40,6 +40,7 @@
 #include "unit/unit.h"
 #include "unit/unit_manager.h"
 #include "unit/unit_type.h"
+#include "util/random.h"
 #include "util/util.h"
 
 /// Callback for changed tile (with direction mask)
@@ -114,7 +115,7 @@ void EditorChangeTile(const Vec2i &pos, int tileIndex)
 				++n;
 			}
 		}
-		n = MyRand() % n;
+		n = random::get()->generate_async(n);
 		int i = -1;
 		do {
 			while (++i < 16 && !CMap::Map.Tileset->tiles[tile + i].tile) {
@@ -346,11 +347,11 @@ static void EditorRandomizeTile(int tile, int count, int max_size)
 	const Vec2i mpos(UI.CurrentMapLayer->get_width() - 1, UI.CurrentMapLayer->get_height() - 1);
 
 	for (int i = 0; i < count; ++i) {
-		const Vec2i rpos(rand() % ((1 + mpos.x) / 2), rand() % ((1 + mpos.y) / 2));
+		const Vec2i rpos(random::get()->generate_async((1 + mpos.x) / 2), random::get()->generate_async((1 + mpos.y) / 2));
 		const Vec2i mirror = mpos - rpos;
 		const Vec2i mirrorh(rpos.x, mirror.y);
 		const Vec2i mirrorv(mirror.x, rpos.y);
-		const int rz = rand() % max_size + 1;
+		const int rz = random::get()->generate_async(max_size) + 1;
 
 		TileFill(rpos, tile, rz);
 		TileFill(mirrorh, tile, rz);
@@ -381,7 +382,7 @@ static void EditorRandomizeUnit(const char *unit_type, int count, int value)
 	const Vec2i tpos(type.get_tile_size());
 
 	for (int i = 0; i < count; ++i) {
-		const Vec2i rpos(rand() % (mpos.x / 2 - tpos.x + 1), rand() % (mpos.y / 2 - tpos.y + 1));
+		const Vec2i rpos(random::get()->generate_async(mpos.x / 2 - tpos.x + 1), random::get()->generate_async(mpos.y / 2 - tpos.y + 1));
 		const Vec2i mirror(mpos.x - rpos.x - 1, mpos.y - rpos.y - 1);
 		const Vec2i mirrorh(rpos.x, mirror.y);
 		const Vec2i mirrorv(mirror.x, rpos.y);

@@ -665,10 +665,6 @@ void stratagusMain(int argc, char **argv)
 		InitMusic();
 	}
 
-#ifndef DEBUG			// For debug it's better not to have:
-	srand(time(nullptr));	// Random counter = random each start
-#endif
-
 	//  Show title screens.
 	SetClipping(0, 0, Video.Width - 1, Video.Height - 1);
 	Video.ClearScreen();

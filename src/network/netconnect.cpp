@@ -27,10 +27,6 @@
 //      02111-1307, USA.
 //
 
-//----------------------------------------------------------------------------
-// Includes
-//----------------------------------------------------------------------------
-
 #include "stratagus.h"
 
 #include "netconnect.h"
@@ -43,6 +39,7 @@
 #include "script.h"
 #include "settings.h"
 #include "ui/interface.h"
+#include "util/random.h"
 #include "version.h"
 #include "video/video.h"
 
@@ -1582,7 +1579,7 @@ void NetworkServerStartGame()
 		int j = h;
 		for (int i = 0; i < NetPlayers; ++i) {
 			Assert(j > 0);
-			int chosen = MyRand() % j;
+			int chosen = random::get()->generate_async(j);
 
 			n = num[chosen];
 			Hosts[i].PlyNr = n;

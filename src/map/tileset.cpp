@@ -174,6 +174,7 @@
 
 #include "map/tileset.h"
 
+#include "util/random.h"
 #include "util/util.h"
 #include "util/vector_random_util.h"
 #include "video/video.h"
@@ -631,7 +632,7 @@ unsigned int CTileset::getTileNumber(int basic, bool random, bool filler) const
 				++n;
 			}
 		}
-		n = MyRand() % n;
+		n = random::get()->generate_async(n);
 		int i = -1;
 		do {
 			while (++i < 16 && !tiles[tile + i].tile) {
