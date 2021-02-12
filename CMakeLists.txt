@@ -1261,6 +1261,12 @@ option(ENABLE_UPX "Compress Stratagus executable binary with UPX packer" OFF)
 option(ENABLE_STRIP "Strip all symbols from executables" OFF)
 option(ENABLE_USEGAMEDIR "Place all files created by Stratagus(logs, savegames) in game directory(old behavior), otherwise place everything in user directory(new behavior)" ON)
 option(ENABLE_MULTIBUILD "Compile Stratagus on all CPU cores simultaneously in MSVC" ON)
+
+if(${CMAKE_VERSION} VERSION_GREATER_EQUAL "3.18.0")
+	#unity builds using defined groups require CMake 3.18
+	option(ENABLE_UNITY_BUILD "Use unity builds for compilation" ON)
+endif()
+
 option(WITH_GEOJSON "Compile with support for generating map data from GeoJSON files" ON)
 
 if(NOT WITH_RENDERER)
@@ -1441,6 +1447,11 @@ if(ENABLE_MULTIBUILD)
 	endif()
 endif()
 
+
+if(ENABLE_UNITY_BUILD)
+	set(CMAKE_UNITY_BUILD ON)
+endif()
+
 # Print compile info
 
 message("==================================")
@@ -1586,68 +1597,49 @@ if (MSVC)
 	target_compile_options(stratagus_test PRIVATE /W4 /w44800 /wd4458)
 endif()
 
-target_precompile_headers(stratagus PRIVATE
-	<algorithm>
-	<array>
-	<cassert>
-	<cctype>
-	<cerrno>
-	<cinttypes>
-	<climits>
-	<cmath>
-	<cstdarg>
-	<cstdint>
-	<cstdio>
-	<cstdlib>
-	<cstring>
-	<ctime>
-	<deque>
-	<filesystem>
-	<fstream>
-	<functional>
-	<iostream>
-	<list>
-	<map>
-	<memory>
-	<mutex>
-	<optional>
-	<queue>
-	<random>
-	<set>
-	<shared_mutex>
-	<sstream>
-	<stack>
-	<stdexcept>
-	<string>
-	<thread>
-	<tuple>
-	<type_traits>
-	<typeinfo>
-	<variant>
-	<vector>
-	<QApplication>
-	<QColor>
-	<QDateTime>
-	<QDebug>
-	<QGeoCircle>
-	<QGeoCoordinate>
-	<QGeoPath>
-	<QGeoPolygon>
-	<QGeoRectangle>
-	<QImage>
-	<QJsonDocument>
-	<QMetaProperty>
-	<QObject>
-	<QPoint>
-	<QStandardPaths>
-	<QString>
-	<QThread>
-	<QTime>
-	<QVariant>
-	<QVariantList>
-	src/util/point_operators.h #to ensure the / operator with an int as RHS is used instead of the Qt one with qreal (which uses rounding)
-	src/util/size_operators.h #as above
-)
+target_precompile_headers(stratagus PRIVATE src/pch.h)
+
+if(ENABLE_UNITY_BUILD)
+	set_target_properties(stratagus PROPERTIES UNITY_BUILD_MODE GROUP)
+	
+	set_source_files_properties(${action_SRCS} PROPERTIES UNITY_GROUP "action")
+	set_source_files_properties(${animation_SRCS} PROPERTIES UNITY_GROUP "animation")
+	set_source_files_properties(${ai_SRCS} PROPERTIES UNITY_GROUP "ai")
+	set_source_files_properties(${beos_SRCS} PROPERTIES UNITY_GROUP "beos")
+	set_source_files_properties(${database_SRCS} PROPERTIES UNITY_GROUP "database")
+	set_source_files_properties(${editor_SRCS} PROPERTIES UNITY_GROUP "editor")
+	set_source_files_properties(${game_SRCS} PROPERTIES UNITY_GROUP "game")
+	set_source_files_properties(${guichan_SRCS} PROPERTIES UNITY_GROUP "guichan")
+	set_source_files_properties(${item_SRCS} PROPERTIES UNITY_GROUP "item")
+	set_source_files_properties(${language_SRCS} PROPERTIES UNITY_GROUP "language")
+	set_source_files_properties(${map_SRCS} PROPERTIES UNITY_GROUP "map")
+	set_source_files_properties(${missile_SRCS} PROPERTIES UNITY_GROUP "missile")
+	set_source_files_properties(${network_SRCS} PROPERTIES UNITY_GROUP "network")
+	set_source_files_properties(${particle_SRCS} PROPERTIES UNITY_GROUP "particle")
+	set_source_files_properties(${pathfinder_SRCS} PROPERTIES UNITY_GROUP "pathfinder")
+	set_source_files_properties(${quest_SRCS} ${quest_objective_SRCS} PROPERTIES UNITY_GROUP "quest")
+	set_source_files_properties(${religion_SRCS} PROPERTIES UNITY_GROUP "religion")
+	set_source_files_properties(${script_SRCS} PROPERTIES UNITY_GROUP "script")
+	set_source_files_properties(${script_condition_SRCS} PROPERTIES UNITY_GROUP "script_condition")
+	set_source_files_properties(${script_effect_SRCS} PROPERTIES UNITY_GROUP "script_effect")
+	set_source_files_properties(${sound_SRCS} PROPERTIES UNITY_GROUP "sound")
+	set_source_files_properties(${species_SRCS} PROPERTIES UNITY_GROUP "species")
+	set_source_files_properties(${spell_SRCS} PROPERTIES UNITY_GROUP "spell")
+	set_source_files_properties(${stratagusmain_SRCS} PROPERTIES UNITY_GROUP "stratagus")
+	set_source_files_properties(${time_SRCS} PROPERTIES UNITY_GROUP "time")
+	set_source_files_properties(${CMAKE_CURRENT_BINARY_DIR}/tolua.cpp PROPERTIES UNITY_GROUP "tolua")
+	set_source_files_properties(${ui_SRCS} PROPERTIES UNITY_GROUP "ui")
+	set_source_files_properties(${unit_SRCS} PROPERTIES UNITY_GROUP "unit")
+	set_source_files_properties(${upgrade_SRCS} PROPERTIES UNITY_GROUP "upgrade")
+	set_source_files_properties(${util_SRCS} PROPERTIES UNITY_GROUP "util")
+	set_source_files_properties(${video_SRCS} PROPERTIES UNITY_GROUP "video")
+	set_source_files_properties(${win32_SRCS} PROPERTIES UNITY_GROUP "win32")
+	set_source_files_properties(${xbrz_SRCS} PROPERTIES UNITY_GROUP "xbrz")
+	
+	set_target_properties(stratagus_test PROPERTIES UNITY_BUILD_MODE GROUP)
+	set_source_files_properties(test/main.cpp PROPERTIES UNITY_GROUP "test_main")
+	set_source_files_properties(${util_test_SRCS} PROPERTIES UNITY_GROUP "util_test")
+endif()
 
 target_link_libraries(stratagus ${stratagus_LIBS})
 if(stratagus_LIBS_RELEASE)
