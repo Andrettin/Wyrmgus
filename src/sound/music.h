@@ -25,6 +25,8 @@
 //      02111-1307, USA.
 //
 
+#pragma once
+
 #include "database/data_entry.h"
 #include "database/data_type.h"
 
