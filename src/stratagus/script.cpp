@@ -83,20 +83,6 @@ std::unique_ptr<NumberDesc> Damage;                   /// Damage calculation for
 static int NumberCounter = 0; /// Counter for lua function.
 static int StringCounter = 0; /// Counter for lua function.
 
-/// Useful for getComponent.
-enum UStrIntType {
-	USTRINT_STR, USTRINT_INT
-};
-struct UStrInt {
-	union {const char *s; int i;};
-	UStrIntType type;
-};
-
-/// Get component for unit variable.
-extern UStrInt GetComponent(const CUnit &unit, int index, VariableAttribute e, int t);
-/// Get component for unit type variable.
-extern UStrInt GetComponent(const wyrmgus::unit_type &type, int index, VariableAttribute e, int t);
-
 //Wyrmgus start
 std::map<std::string, std::string> DLCFileEquivalency;
 //Wyrmgus end

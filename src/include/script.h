@@ -395,6 +395,20 @@ extern void CclGetDate(lua_State *l, CDate *d, const int offset = -1);
 
 extern std::unique_ptr<NumberDesc> Damage;  /// Damage calculation for missile.
 
+/// Useful for getComponent.
+enum UStrIntType {
+	USTRINT_STR, USTRINT_INT
+};
+struct UStrInt {
+	union { const char *s; int i; };
+	UStrIntType type;
+};
+
+/// Get component for unit variable.
+extern UStrInt GetComponent(const CUnit &unit, int index, VariableAttribute e, int t);
+/// Get component for unit type variable.
+extern UStrInt GetComponent(const wyrmgus::unit_type &type, int index, VariableAttribute e, int t);
+
 /// transform string in corresponding index.
 extern VariableAttribute Str2VariableAttribute(lua_State *l, const char *s);
 extern std::unique_ptr<NumberDesc> CclParseNumberDesc(lua_State *l); /// Parse a number description.

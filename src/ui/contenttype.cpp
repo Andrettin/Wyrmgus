@@ -41,17 +41,6 @@
 #include "video/font.h"
 #include "video/video.h"
 
-enum UStrIntType {
-	USTRINT_STR, USTRINT_INT
-};
-struct UStrInt {
-	union {const char *s; int i;};
-	UStrIntType type;
-};
-
-extern UStrInt GetComponent(const CUnit &unit, int index, VariableAttribute e, int t);
-extern UStrInt GetComponent(const wyrmgus::unit_type &type, int index, VariableAttribute e);
-
 CContentType::~CContentType()
 {
 }

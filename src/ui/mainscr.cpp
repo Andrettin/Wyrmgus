@@ -318,14 +318,6 @@ static bool CanShowContent(const ConditionPanel *condition, const CUnit &unit)
 	return true;
 }
 
-enum UStrIntType {
-	USTRINT_STR, USTRINT_INT
-};
-struct UStrInt {
-	union {const char *s; int i;};
-	UStrIntType type;
-};
-
 /**
 **  Return the value corresponding.
 **
