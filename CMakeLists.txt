@@ -164,10 +164,10 @@ source_group(game FILES ${game_SRCS})
 
 set(guichan_SRCS
 	src/guichan/cliprectangle.cpp
-	src/guichan/color.cpp
 	src/guichan/defaultfont.cpp
 	src/guichan/exception.cpp
 	src/guichan/focushandler.cpp
+	src/guichan/gcn_color.cpp
 	src/guichan/gfont.cpp
 	src/guichan/graphics.cpp
 	src/guichan/gui.cpp
@@ -184,11 +184,11 @@ set(guichan_SRCS
 	src/guichan/sdl/gsdl.cpp
 	src/guichan/sdl/sdlinput.cpp
 	src/guichan/widget.cpp
-	src/guichan/widgets/button.cpp
 	src/guichan/widgets/container.cpp
 	src/guichan/widgets/dropdown.cpp
 	src/guichan/widgets/checkbox.cpp
-	src/guichan/widgets/icon.cpp
+	src/guichan/widgets/gcn_button.cpp
+	src/guichan/widgets/gcn_icon.cpp
 	src/guichan/widgets/label.cpp
 	src/guichan/widgets/listbox.cpp
 	src/guichan/widgets/radiobutton.cpp
