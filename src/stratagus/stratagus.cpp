@@ -660,8 +660,6 @@ void stratagusMain(int argc, char **argv)
 	PrintHeader();
 	PrintLicense();
 
-	if (parameters.isTestRun) return;
-
 	// Setup video display
 	InitVideo();
 

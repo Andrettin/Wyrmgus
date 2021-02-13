@@ -33,6 +33,7 @@
 #include "version.h"
 
 #include <QCommandLineParser>
+#include <QDir>
 #include <QQmlApplicationEngine>
 
 
@@ -89,14 +90,16 @@ int main(int argc, char **argv)
 		});
 
 		QQmlApplicationEngine engine;
-		engine.addImportPath(QString::fromStdString(database::get()->get_root_path().string() + "/libraries/qml"));
+		QString root_path { QString::fromStdString(database::get()->get_root_path().string()) };
+		engine.addImportPath(root_path + "/libraries/qml");
 
-		const QUrl url = "file:///" + QString::fromStdString(database::get()->get_root_path().string() + "/interface/Main.qml");
-		QObject::connect(&engine, &QQmlApplicationEngine::objectCreated, &app, [url](QObject *obj, const QUrl &objUrl) {
-			if (!obj && url == objUrl) {
-				QCoreApplication::exit(-1);
-			}
-		}, Qt::QueuedConnection);
+		const QUrl url = "file:///" + QDir(root_path + "/interface/").absoluteFilePath("Main.qml");
+		QObject::connect(
+				&engine, &QQmlApplicationEngine::objectCreated, &app,
+				[url](QObject *obj, const QUrl &objUrl) {
+					if (!obj && url == objUrl) QCoreApplication::exit(-1);
+				},
+				Qt::QueuedConnection);
 		engine.load(url);
 
 		const int result = app.exec();
