@@ -470,10 +470,21 @@ QSize site::get_size_with_satellites() const
 {
 	QSize size = this->get_size();
 
+	int max_satellite_space = 0;
+
 	for (const site *satellite : this->get_satellites()) {
-		size += QSize(site::orbit_distance_increment, site::orbit_distance_increment);
-		size += satellite->get_size_with_satellites();
+		const QSize satellite_size = satellite->get_size_with_satellites();
+
+		int satellite_space = site::base_orbit_distance;
+		satellite_space += isqrt(satellite->get_distance_from_orbit_center()) / site::distance_from_orbit_center_divider;
+		satellite_space += satellite_size.width();
+
+		if (satellite_space > max_satellite_space) {
+			max_satellite_space = satellite_space;
+		}
 	}
+
+	size += QSize(max_satellite_space, max_satellite_space);
 
 	return size;
 }
