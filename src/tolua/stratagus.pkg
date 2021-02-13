@@ -39,10 +39,6 @@ $#include "video/font.h"
 $#include "video/video.h"
 $#include "widgets.h"
 
-$#ifdef _MSC_VER
-$#pragma warning(disable:4800)
-$#endif
-
 $using namespace wyrmgus;
 
 $[

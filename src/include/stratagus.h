@@ -48,10 +48,6 @@
 #define WIN32_LEAN_AND_MEAN
 #define WINDOWS_IGNORE_PACKING_MISMATCH //for SDL
 
-#pragma warning(disable:4244)               /// Conversion from double to uchar
-#pragma warning(disable:4761)               /// Integral size mismatch
-#pragma warning(disable:4786)               /// Truncated to 255 chars
-
 #ifndef __func__
 #define __func__ __FUNCTION__
 #endif
