@@ -483,9 +483,13 @@ void set_scale_factor(const int factor)
 	wyrmgus::preferences::get()->set_scale_factor(factor);
 }
 
-void pack_image_folder(const std::string &dir_path)
+void pack_image_folder(const std::string &dir_path, const int frames_per_row)
 {
-	wyrmgus::image::pack_folder(dir_path, wyrmgus::image::frame_order::top_to_bottom);
+	try {
+		image::pack_folder(dir_path, image::frame_order::top_to_bottom, frames_per_row);
+	} catch (...) {
+		std::throw_with_nested(std::runtime_error("Failed to pack image folder \"" + dir_path + "\"."));
+	}
 }
 
 void index_image_to_image_palette(const std::string &image_path, const std::string &other_image_path)

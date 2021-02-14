@@ -32,5 +32,5 @@ void AddColorCyclingRange(unsigned int startColorIndex, unsigned int endColorInd
 int get_scale_factor();
 int get_scale_factor_preference();
 void set_scale_factor(const int factor);
-void pack_image_folder(const std::string dir_path);
+void pack_image_folder(const std::string dir_path, const int frames_per_row = 5);
 void index_image_to_image_palette(const std::string &image_path, const std::string &other_image_path);

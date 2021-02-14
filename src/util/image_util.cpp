@@ -24,6 +24,8 @@
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
 
+#include "stratagus.h"
+
 #include "util/image_util.h"
 
 #include "util/container_util.h"
@@ -175,34 +177,42 @@ QPoint get_frame_pos(const QImage &image, const QSize &frame_size, const int fra
 	}
 }
 
-void pack_folder(const std::filesystem::path &dir_path, const frame_order frame_order)
+void pack_folder(const std::filesystem::path &dir_path, const frame_order frame_order, const int frames_per_row)
 {
-	static constexpr int frames_per_row = 5;
-
-	std::filesystem::directory_iterator dir_iterator(dir_path);
+	const std::filesystem::directory_iterator dir_iterator(dir_path);
 
 	int frame_count = 0;
 	QSize frame_size;
+
+	std::set<std::filesystem::path> frame_image_paths;
 
 	for (const std::filesystem::directory_entry &dir_entry : dir_iterator) {
 		if (!dir_entry.is_regular_file()) {
 			continue;
 		}
 
-		const QImage frame_image(QString::fromStdString(dir_entry.path().string()));
+		frame_image_paths.insert(dir_entry.path());
+	}
 
-		if (frame_image.isNull()) {
-			continue;
-		}
+	for (const std::filesystem::path &frame_image_path : frame_image_paths) {
+		try {
+			const QImage frame_image(QString::fromStdString(frame_image_path.string()));
 
-		frame_count++;
-
-		if (!frame_size.isValid()) {
-			frame_size = frame_image.size();
-		} else {
-			if (frame_image.size() != frame_size) {
-				throw std::runtime_error("Inconsistent frame size when packing image files in directory \"" + dir_path.string() + "\": the frame size of the first image file is " + size::to_string(frame_size) + ", but that of image file \"" + dir_entry.path().string() + "\" is " + size::to_string(frame_image.size()) + ".");
+			if (frame_image.isNull()) {
+				continue;
 			}
+
+			frame_count++;
+
+			if (!frame_size.isValid()) {
+				frame_size = frame_image.size();
+			} else {
+				if (frame_image.size() != frame_size) {
+					throw std::runtime_error("Inconsistent frame size when packing image files in directory \"" + dir_path.string() + "\": the frame size of the first image file is " + size::to_string(frame_size) + ", but that of image file \"" + frame_image_path.string() + "\" is " + size::to_string(frame_image.size()) + ".");
+				}
+			}
+		} catch (...) {
+			std::throw_with_nested(std::runtime_error("Failed to preprocess frame image \"" + frame_image_path.string() + "\"."));
 		}
 	}
 
@@ -210,33 +220,31 @@ void pack_folder(const std::filesystem::path &dir_path, const frame_order frame_
 	QImage image(frame_size.width() * frames_per_row, frame_size.height() * frames_per_column, QImage::Format_RGBA8888);
 	image.fill(Qt::transparent);
 
-	dir_iterator = std::filesystem::directory_iterator(dir_path);
-
 	int frame_index = 0;
-	for (const std::filesystem::directory_entry &dir_entry : dir_iterator) {
-		if (!dir_entry.is_regular_file()) {
-			continue;
-		}
+	for (const std::filesystem::path &frame_image_path : frame_image_paths) {
+		try {
+			QImage frame_image(QString::fromStdString(frame_image_path.string()));
 
-		QImage frame_image(QString::fromStdString(dir_entry.path().string()));
-
-		if (frame_image.isNull()) {
-			continue;
-		}
-
-		const QPoint frame_pos = image::get_frame_pos(image, frame_size, frame_index, frame_order);
-		const QPoint frame_pixel_pos(frame_pos.x() * frame_size.width(), frame_pos.y() * frame_size.height());
-
-		for (int x = 0; x < frame_size.width(); ++x) {
-			for (int y = 0; y < frame_size.height(); ++y) {
-				const QColor pixel_color = frame_image.pixelColor(x, y);
-				const int pixel_x = frame_pixel_pos.x() + x;
-				const int pixel_y = frame_pixel_pos.y() + y;
-				image.setPixelColor(pixel_x, pixel_y, pixel_color);
+			if (frame_image.isNull()) {
+				continue;
 			}
-		}
 
-		frame_index++;
+			const QPoint frame_pos = image::get_frame_pos(image, frame_size, frame_index, frame_order);
+			const QPoint frame_pixel_pos(frame_pos.x() * frame_size.width(), frame_pos.y() * frame_size.height());
+
+			for (int x = 0; x < frame_size.width(); ++x) {
+				for (int y = 0; y < frame_size.height(); ++y) {
+					const QColor pixel_color = frame_image.pixelColor(x, y);
+					const int pixel_x = frame_pixel_pos.x() + x;
+					const int pixel_y = frame_pixel_pos.y() + y;
+					image.setPixelColor(pixel_x, pixel_y, pixel_color);
+				}
+			}
+
+			frame_index++;
+		} catch (...) {
+			std::throw_with_nested(std::runtime_error("Failed to process frame image \"" + frame_image_path.string() + "\"."));
+		}
 	}
 
 	image.save(QString::fromStdString(dir_path.string() + ".png"));
