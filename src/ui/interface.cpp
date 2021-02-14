@@ -1106,7 +1106,7 @@ static int InputKey(int key)
 #ifdef DEBUG
 			if (message_input[0] == '-') {
 				if (!GameObserve && !GamePaused && !GameEstablishing) {
-					CommandLog("input", NoUnitP, FlushCommands, -1, -1, NoUnitP, Input, -1);
+					CommandLog("input", NoUnitP, FlushCommands, -1, -1, NoUnitP, message_input.data(), -1);
 					CclCommand(message_input.data() + 1, false);
 				}
 			} else
@@ -1124,7 +1124,7 @@ static int InputKey(int key)
 
 			// Check for Replay and ffw x
 #ifdef DEBUG
-			if (strncmp(Input, "ffw ", 4) == 0) {
+			if (strncmp(message_input.data(), "ffw ", 4) == 0) {
 #else
 			if (strncmp(message_input.data(), "ffw ", 4) == 0 && ReplayGameType != ReplayNone) {
 #endif
