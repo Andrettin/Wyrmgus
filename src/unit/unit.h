@@ -815,7 +815,6 @@ public:
 		int Unbreakable;             /// Unbreakable
 	} Anim, WaitBackup;
 
-
 	std::vector<std::unique_ptr<COrder>> Orders; /// orders to process
 	std::unique_ptr<COrder> SavedOrder;         /// order to continue after current
 	std::unique_ptr<COrder> NewOrder;           /// order for new trained units
@@ -844,45 +843,33 @@ inline int UnitNumber(const CUnit &unit)
 /**
 **  User preference.
 */
-class CPreference
+class CPreference final
 {
 public:
-	CPreference() : ShowSightRange(false), ShowReactionRange(false),
-		ShowAttackRange(false), ShowMessages(true), BigScreen(false),
-		PauseOnLeave(true), AiExplores(true), GrayscaleIcons(false),
-		IconsShift(false), StereoSound(true), MineNotifications(false),
-		DeselectInMine(false),
-		//Wyrmgus start
-		PlayerColorCircle(false), SepiaForGrayscale(false),
-		ShowPathlines(false),
-//		ShowOrders(0), ShowNameDelay(0), ShowNameTime(0), AutosaveMinutes(5) {};
-		ShowOrders(0), ShowNameDelay(0), ShowNameTime(0), AutosaveMinutes(5), HotkeySetup(0) {};
-		//Wyrmgus end
-
-	bool ShowSightRange;     /// Show sight range.
-	bool ShowReactionRange;  /// Show reaction range.
-	bool ShowAttackRange;    /// Show attack range.
-	bool ShowMessages;		 /// Show messages.
-	bool BigScreen;			 /// If true, shows the big screen(without panels)
-	bool PauseOnLeave;       /// If true, game pauses when cursor is gone
-	bool AiExplores;         /// If true, AI sends explorers to search for resources (almost useless thing)
-	bool GrayscaleIcons;     /// Use grayscaled icons for unavailable units, upgrades, etc
-	bool IconsShift;         /// Shift icons slightly when you press on them
-	bool StereoSound;        /// Enables/disables stereo sound effects	
-	bool MineNotifications;  /// Show mine is running low/depleted messages
-	bool DeselectInMine;     /// Deselect peasants in mines
+	bool ShowSightRange = false;     /// Show sight range.
+	bool ShowReactionRange = false;  /// Show reaction range.
+	bool ShowAttackRange = false;    /// Show attack range.
+	bool ShowMessages = true;		 /// Show messages.
+	bool BigScreen = false;			 /// If true, shows the big screen(without panels)
+	bool PauseOnLeave = true;       /// If true, game pauses when cursor is gone
+	bool AiExplores = true;         /// If true, AI sends explorers to search for resources (almost useless thing)
+	bool GrayscaleIcons = false;     /// Use grayscaled icons for unavailable units, upgrades, etc
+	bool IconsShift = false;         /// Shift icons slightly when you press on them
+	bool StereoSound = true;        /// Enables/disables stereo sound effects	
+	bool MineNotifications = false;  /// Show mine is running low/depleted messages
+	bool DeselectInMine = false;     /// Deselect peasants in mines
 	//Wyrmgus start
-	bool SepiaForGrayscale;		/// Use a sepia filter for grayscale icons
-	bool PlayerColorCircle;		/// Show a player color circle below each unit
-	bool ShowPathlines;			/// Show order pathlines
+	bool SepiaForGrayscale = false;		/// Use a sepia filter for grayscale icons
+	bool PlayerColorCircle = false;		/// Show a player color circle below each unit
+	bool ShowPathlines = false;			/// Show order pathlines
 	//Wyrmgus end
 
-	int ShowOrders;			/// How many second show orders of unit on map.
-	int ShowNameDelay;		/// How many cycles need to wait until unit's name popup will appear.
-	int ShowNameTime;		/// How many cycles need to show unit's name popup.
-	int AutosaveMinutes;	/// Autosave the game every X minutes; autosave is disabled if the value is 0
+	int ShowOrders = 0;			/// How many second show orders of unit on map.
+	int ShowNameDelay = 0;		/// How many cycles need to wait until unit's name popup will appear.
+	int ShowNameTime = 0;		/// How many cycles need to show unit's name popup.
+	int AutosaveMinutes = 5;	/// Autosave the game every X minutes; autosave is disabled if the value is 0
 	//Wyrmgus start
-	int HotkeySetup;			/// Hotkey layout (0 = default, 1 = position-based, 2 = position-based (except commands))
+	int HotkeySetup = 0;			/// Hotkey layout (0 = default, 1 = position-based, 2 = position-based (except commands))
 	//Wyrmgus end
 	std::string SF2Soundfont;/// Path to SF2 soundfont
 };
