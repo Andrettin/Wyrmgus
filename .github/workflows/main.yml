@@ -49,10 +49,6 @@ jobs:
       - name: Run background services
         run: pulseaudio --exit-idle-time=-1 & Xvfb &
       - name: Run Wyrmsun
-        # TODO Test bad exit code
         run: >-
-          "${BUILD_DIR}/wyrmgus" -d "${BUILD_DIR}/Wyrmsun" &
-          echo "PID=$!" >> "$GITHUB_ENV"
-        timeout-minutes: 10
-      - name: Stop Wyrmsun
-        run: sleep 120 && kill "$PID"
+          "${BUILD_DIR}/wyrmgus" -t -d "${BUILD_DIR}/Wyrmsun"
+        timeout-minutes: 5
