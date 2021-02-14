@@ -833,6 +833,11 @@ void initialize_database()
 	}
 }
 
+bool is_test_run()
+{
+	return Parameters::Instance.isTestRun;
+}
+
 void save_preferences()
 {
 	wyrmgus::preferences::get()->save();
