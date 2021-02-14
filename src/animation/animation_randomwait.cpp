@@ -52,6 +52,11 @@ void CAnimation_RandomWait::Init(const char *s, lua_State *)
 {
 	const std::vector<std::string> str_list = wyrmgus::string::split(s, ' ');
 
-	this->min_wait = std::stoi(str_list.at(0));
-	this->max_wait = std::stoi(str_list.at(1));
+	if (str_list.size() >= 2) {
+		this->min_wait = std::stoi(str_list.at(0));
+		this->max_wait = std::stoi(str_list.at(1));
+	} else {
+		this->min_wait = 1;
+		this->max_wait = std::stoi(str_list.at(0));
+	}
 }
