@@ -51,7 +51,7 @@ jobs:
           git clone "$WYRMSUN_URL"
           git -C Wyrmsun checkout "$WYRMSUN_BRANCH"
       - name: Run background services
-        run: pulseaudio --exit-idle-time=-1 & Xvfb &
+        run: pulseaudio --exit-idle-time=-1 & Xvfb "$DISPLAY" &
       - name: Run Wyrmsun
         run: >-
           "${BUILD_DIR}/wyrmgus" -t -d "${BUILD_DIR}/Wyrmsun"
