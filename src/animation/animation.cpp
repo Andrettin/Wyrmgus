@@ -373,6 +373,54 @@ static const CAnimation *Advance(const CAnimation *anim, int n)
 	return anim;
 }
 
+/**
+**  Add a label
+*/
+static void AddLabel(CAnimation *anim, const std::string &name)
+{
+	LabelsStruct label;
+
+	label.Anim = anim;
+	label.Name = name;
+	Labels.push_back(label);
+}
+
+/**
+**  Find a label
+*/
+static CAnimation *FindLabel(const std::string &name)
+{
+	for (size_t i = 0; i < Labels.size(); ++i) {
+		if (Labels[i].Name == name) {
+			return Labels[i].Anim;
+		}
+	}
+
+	throw std::runtime_error("Label not found: " + name);
+}
+
+/**
+**  Find a label later
+*/
+void FindLabelLater(CAnimation **anim, const std::string &name)
+{
+	LabelsLaterStruct label;
+
+	label.Anim = anim;
+	label.Name = name;
+	LabelsLater.push_back(label);
+}
+
+/**
+**  Fix labels
+*/
+static void FixLabels()
+{
+	for (size_t i = 0; i < LabelsLater.size(); ++i) {
+		*LabelsLater[i].Anim = FindLabel(LabelsLater[i].Name);
+	}
+}
+
 namespace wyrmgus {
 
 void animation_set::LoadUnitAnim(lua_State *l, CUnit &unit, int luaIndex)
@@ -435,6 +483,9 @@ void animation_set::process_sml_scope(const sml_data &scope)
 {
 	const std::string &tag = scope.get_tag();
 
+	Labels.clear();
+	LabelsLater.clear();
+
 	if (
 		tag == "start"
 		|| tag == "still"
@@ -467,37 +518,40 @@ void animation_set::process_sml_scope(const sml_data &scope)
 				resource = resource::get(value);
 			} else if (key == "frame") {
 				anim = std::make_unique<CAnimation_Frame>();
-			} else if (key == "exact-frame") {
+			} else if (key == "exact_frame") {
 				anim = std::make_unique<CAnimation_ExactFrame>();
 			} else if (key == "wait") {
 				anim = std::make_unique<CAnimation_Wait>();
-			} else if (key == "random-wait") {
+			} else if (key == "random_wait") {
 				anim = std::make_unique<CAnimation_RandomWait>();
 			} else if (key == "sound") {
 				anim = std::make_unique<CAnimation_Sound>();
-			} else if (key == "random-sound") {
+			} else if (key == "random_sound") {
 				anim = std::make_unique<CAnimation_RandomSound>();
 			} else if (key == "attack") {
 				anim = std::make_unique<CAnimation_Attack>();
-			} else if (key == "spawn-missile") {
+			} else if (key == "spawn_missile") {
 				anim = std::make_unique<CAnimation_SpawnMissile>();
-			} else if (key == "if-var") {
+			} else if (key == "if_var") {
 				anim = std::make_unique<CAnimation_IfVar>();
-			} else if (key == "set-var") {
+			} else if (key == "set_var") {
 				anim = std::make_unique<CAnimation_SetVar>();
 			} else if (key == "die") {
 				anim = std::make_unique<CAnimation_Die>();
 			} else if (key == "rotate") {
 				anim = std::make_unique<CAnimation_Rotate>();
-			} else if (key == "random-rotate") {
+			} else if (key == "random_rotate") {
 				anim = std::make_unique<CAnimation_RandomRotate>();
 			} else if (key == "move") {
 				anim = std::make_unique<CAnimation_Move>();
 			} else if (key == "unbreakable") {
 				anim = std::make_unique<CAnimation_Unbreakable>();
+			} else if (key == "label") {
+				anim = std::make_unique<CAnimation_Label>();
+				AddLabel(anim.get(), value);
 			} else if (key == "goto") {
 				anim = std::make_unique<CAnimation_Goto>();
-			} else if (key == "random-goto") {
+			} else if (key == "random_goto") {
 				anim = std::make_unique<CAnimation_RandomGoto>();
 			} else {
 				throw std::runtime_error("Invalid animation property: \"" + key + "\".");
@@ -520,6 +574,8 @@ void animation_set::process_sml_scope(const sml_data &scope)
 		if (first_anim && prev_anim) {
 			prev_anim->set_next(first_anim.get());
 		}
+
+		FixLabels();
 
 		if (tag == "start") {
 			this->Start = std::move(first_anim);
@@ -582,55 +638,6 @@ void animation_set::initialize()
 }
 
 }
-
-/**
-**  Add a label
-*/
-static void AddLabel(CAnimation *anim, const std::string &name)
-{
-	LabelsStruct label;
-
-	label.Anim = anim;
-	label.Name = name;
-	Labels.push_back(label);
-}
-
-/**
-**  Find a label
-*/
-static CAnimation *FindLabel(lua_State *l, const std::string &name)
-{
-	for (size_t i = 0; i < Labels.size(); ++i) {
-		if (Labels[i].Name == name) {
-			return Labels[i].Anim;
-		}
-	}
-	LuaError(l, "Label not found: %s" _C_ name.c_str());
-	return nullptr;
-}
-
-/**
-**  Find a label later
-*/
-void FindLabelLater(CAnimation **anim, const std::string &name)
-{
-	LabelsLaterStruct label;
-
-	label.Anim = anim;
-	label.Name = name;
-	LabelsLater.push_back(label);
-}
-
-/**
-**  Fix labels
-*/
-static void FixLabels(lua_State *l)
-{
-	for (size_t i = 0; i < LabelsLater.size(); ++i) {
-		*LabelsLater[i].Anim = FindLabel(l, LabelsLater[i].Name);
-	}
-}
-
 
 /**
 **  Parse an animation frame
@@ -719,7 +726,7 @@ static std::unique_ptr<CAnimation> ParseAnimation(lua_State *l, int idx)
 		prev = temp_anim;
 	}
 	prev->set_next(firstAnim.get());
-	FixLabels(l);
+	FixLabels();
 	return firstAnim;
 }
 
