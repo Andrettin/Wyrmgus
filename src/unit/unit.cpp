@@ -2835,7 +2835,7 @@ void CUnit::Init(const wyrmgus::unit_type &type, const bool loading_saved_unit)
 	// Set a heading for the unit if it Handles Directions
 	// Don't set a building heading, as only 1 construction direction
 	//   is allowed.
-	if (type.NumDirections > 1 && type.BoolFlag[NORANDOMPLACING_INDEX].value == false && type.Sprite && !type.BoolFlag[BUILDING_INDEX].value) {
+	if (type.get_num_directions() > 1 && type.BoolFlag[NORANDOMPLACING_INDEX].value == false && type.Sprite && !type.BoolFlag[BUILDING_INDEX].value) {
 		this->Direction = SyncRand(256); // random heading
 		UnitUpdateHeading(*this);
 	}
@@ -4412,7 +4412,7 @@ enum {
 void CorrectWallDirections(CUnit &unit)
 {
 	Assert(unit.Type->BoolFlag[WALL_INDEX].value);
-	Assert(unit.Type->NumDirections == 16);
+	Assert(unit.Type->get_num_directions() == 16);
 	Assert(!unit.Type->Flip);
 
 	if (!CMap::Map.Info.IsPointOnMap(unit.tilePos, unit.MapLayer)) {
@@ -5096,7 +5096,7 @@ void UnitUpdateHeading(CUnit &unit)
 {
 	//Wyrmgus start
 	//fix direction if it does not correspond to one of the defined directions
-	int num_dir = std::max<int>(8, unit.Type->NumDirections);
+	int num_dir = std::max<int>(8, unit.Type->get_num_directions());
 	if (unit.Direction % (256 / num_dir) != 0) {
 		unit.Direction = unit.Direction - (unit.Direction % (256 / num_dir));
 	}
@@ -5112,11 +5112,11 @@ void UnitUpdateHeading(CUnit &unit)
 	} else {
 		neg = false;
 	}
-	unit.Frame /= unit.Type->NumDirections / 2 + 1;
-	unit.Frame *= unit.Type->NumDirections / 2 + 1;
+	unit.Frame /= unit.Type->get_num_directions() / 2 + 1;
+	unit.Frame *= unit.Type->get_num_directions() / 2 + 1;
 	// Remove heading, keep animation frame
 
-	nextdir = 256 / unit.Type->NumDirections;
+	nextdir = 256 / unit.Type->get_num_directions();
 	dir = ((unit.Direction + nextdir / 2) & 0xFF) / nextdir;
 	if (dir <= LookingS / nextdir) { // north->east->south
 		unit.Frame += dir;
@@ -5139,7 +5139,7 @@ void UnitHeadingFromDeltaXY(CUnit &unit, const Vec2i &delta)
 {
 	//Wyrmgus start
 //	unit.Direction = DirectionToHeading(delta);
-	int num_dir = std::max<int>(8, unit.Type->NumDirections);
+	int num_dir = std::max<int>(8, unit.Type->get_num_directions());
 	int heading = DirectionToHeading(delta) + ((256 / num_dir) / 2);
 	if (heading % (256 / num_dir) != 0) {
 		heading = heading - (heading % (256 / num_dir));

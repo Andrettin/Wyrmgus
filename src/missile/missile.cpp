@@ -464,7 +464,7 @@ static int CalculateDamageStats(const CUnit &attacker, const CUnitStats &goal_st
 		acid_damage /= 100;
 		
 		// extra backstab damage (only works against units (that are organic and non-building, and that have 8 facing directions) facing opposite to the attacker
-		if (attacker.Variable[BACKSTAB_INDEX].Value > 0 && goal->Type->BoolFlag[ORGANIC_INDEX].value && !goal->Type->BoolFlag[BUILDING_INDEX].value && goal->Type->NumDirections == 8) {
+		if (attacker.Variable[BACKSTAB_INDEX].Value > 0 && goal->Type->BoolFlag[ORGANIC_INDEX].value && !goal->Type->BoolFlag[BUILDING_INDEX].value && goal->Type->get_num_directions() == 8) {
 			if (attacker.Direction == goal->Direction) {
 				damage_modifier += attacker.Variable[BACKSTAB_INDEX].Value;
 			} else if (goal->Direction == (attacker.Direction - 32) || goal->Direction == (attacker.Direction + 32) || (attacker.Direction == 0 && goal->Direction == 224) || (attacker.Direction == 224 && goal->Direction == 0)) {
@@ -549,7 +549,7 @@ static int CalculateDamageStats(const CUnit &attacker, const CUnitStats &goal_st
 						damage -= goal->Variable[EVASION_INDEX].Value * evasion_modifier / 100;
 					}
 					
-					if (goal->Type->BoolFlag[ORGANIC_INDEX].value && !goal->Type->BoolFlag[BUILDING_INDEX].value && goal->Type->NumDirections == 8) { //flanking
+					if (goal->Type->BoolFlag[ORGANIC_INDEX].value && !goal->Type->BoolFlag[BUILDING_INDEX].value && goal->Type->get_num_directions() == 8) { //flanking
 						if (attacker.Direction == goal->Direction) {
 							damage += 4;
 						} else if (goal->Direction == (attacker.Direction - 32) || goal->Direction == (attacker.Direction + 32) || (attacker.Direction == 0 && goal->Direction == 224) || (attacker.Direction == 224 && goal->Direction == 0)) {
@@ -686,7 +686,7 @@ static bool CalculateHit(const CUnit &attacker, const CUnitStats &goal_stats, co
 			if (goal->Variable[EVASION_INDEX].Value && goal->Variable[STUN_INDEX].Value == 0) { //stunned targets cannot evade
 				evasion = goal->Variable[EVASION_INDEX].Value;
 			}
-			if (goal->Type->BoolFlag[ORGANIC_INDEX].value && !goal->Type->BoolFlag[BUILDING_INDEX].value && goal->Type->NumDirections == 8) { //flanking
+			if (goal->Type->BoolFlag[ORGANIC_INDEX].value && !goal->Type->BoolFlag[BUILDING_INDEX].value && goal->Type->get_num_directions() == 8) { //flanking
 				if (attacker.Direction == goal->Direction) {
 					evasion -= 4;
 				} else if (goal->Direction == (attacker.Direction - 32) || goal->Direction == (attacker.Direction + 32) || (attacker.Direction == 0 && goal->Direction == 224) || (attacker.Direction == 224 && goal->Direction == 0)) {
@@ -1679,7 +1679,7 @@ bool Missile::NextMissileFrame(char sign, char longAnimation)
 {
 	int neg = 0; // True for mirroring sprite.
 	bool animationIsFinished = false;
-	int numDirections = this->Type->get_num_directions() / 2 + 1;
+	int num_directions = this->Type->get_num_directions() / 2 + 1;
 	if (this->SpriteFrame < 0) {
 		neg = 1;
 		this->SpriteFrame = -this->SpriteFrame - 1;
@@ -1690,16 +1690,16 @@ bool Missile::NextMissileFrame(char sign, char longAnimation)
 		// Covered distance.
 		const int dx = Distance(this->position, this->source);
 		// Total number of frame (for one direction).
-		const int totalf = this->Type->get_frames() / numDirections;
+		const int totalf = this->Type->get_frames() / num_directions;
 		// Current frame (for one direction).
-		const int df = this->SpriteFrame / numDirections;
+		const int df = this->SpriteFrame / num_directions;
 
 		if ((sign == 1 && dx * totalf <= df * totalx)
 			|| (sign == -1 && dx * totalf > df * totalx)) {
 			return animationIsFinished;
 		}
 	}
-	this->SpriteFrame += sign * numDirections;
+	this->SpriteFrame += sign * num_directions;
 	if (sign > 0) {
 		if (this->SpriteFrame >= this->Type->get_frames()) {
 			this->SpriteFrame -= this->Type->get_frames();

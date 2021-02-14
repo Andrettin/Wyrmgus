@@ -672,11 +672,11 @@ void DrawShadow(const wyrmgus::unit_type &type, const std::shared_ptr<CGraphic> 
 			//Wyrmgus end
 		}
 	} else {
-		int row = type.NumDirections / 2 + 1;
+		int row = type.get_num_directions() / 2 + 1;
 		if (frame < 0) {
-			frame = ((-frame - 1) / row) * type.NumDirections + type.NumDirections - (-frame - 1) % row;
+			frame = ((-frame - 1) / row) * type.get_num_directions() + type.get_num_directions() - (-frame - 1) % row;
 		} else {
-			frame = (frame / row) * type.NumDirections + frame % row;
+			frame = (frame / row) * type.get_num_directions() + frame % row;
 		}
 		//Wyrmgus start
 //		type.ShadowSprite->DrawFrameClip(frame, pos.x, pos.y);
@@ -715,12 +715,12 @@ void DrawPlayerColorOverlay(const wyrmgus::unit_type &type, const std::shared_pt
 			}
 		}
 	} else {
-		const int row = type.NumDirections / 2 + 1;
+		const int row = type.get_num_directions() / 2 + 1;
 
 		if (frame < 0) {
-			frame = ((-frame - 1) / row) * type.NumDirections + type.NumDirections - (-frame - 1) % row;
+			frame = ((-frame - 1) / row) * type.get_num_directions() + type.get_num_directions() - (-frame - 1) % row;
 		} else {
-			frame = (frame / row) * type.NumDirections + frame % row;
+			frame = (frame / row) * type.get_num_directions() + frame % row;
 		}
 		if (type.Stats[player].Variables[TRANSPARENCY_INDEX].Value > 0) {
 			sprite->DrawPlayerColorFrameClipTrans(player_color, frame, pos.x, pos.y, int(256 - 2.56 * type.Stats[player].Variables[TRANSPARENCY_INDEX].Value), time_of_day);
@@ -756,12 +756,12 @@ void DrawOverlay(const wyrmgus::unit_type &type, const std::shared_ptr<CGraphic>
 			}
 		}
 	} else {
-		const int row = type.NumDirections / 2 + 1;
+		const int row = type.get_num_directions() / 2 + 1;
 
 		if (frame < 0) {
-			frame = ((-frame - 1) / row) * type.NumDirections + type.NumDirections - (-frame - 1) % row;
+			frame = ((-frame - 1) / row) * type.get_num_directions() + type.get_num_directions() - (-frame - 1) % row;
 		} else {
-			frame = (frame / row) * type.NumDirections + frame % row;
+			frame = (frame / row) * type.get_num_directions() + frame % row;
 		}
 		if (type.Stats[player].Variables[TRANSPARENCY_INDEX].Value > 0) {
 			sprite->DrawFrameClipTrans(frame, pos.x, pos.y, int(256 - 2.56 * type.Stats[player].Variables[TRANSPARENCY_INDEX].Value), time_of_day);

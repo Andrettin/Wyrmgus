@@ -352,7 +352,7 @@ static void Finish(COrder_Built &order, CUnit &unit)
 	UpdateForNewUnit(unit, 0);
 
 	// Set the direction of the building if it supports them
-	if (type.NumDirections > 1 && type.BoolFlag[NORANDOMPLACING_INDEX].value == false) {
+	if (type.get_num_directions() > 1 && type.BoolFlag[NORANDOMPLACING_INDEX].value == false) {
 		if (type.BoolFlag[WALL_INDEX].value) { // Special logic for walls
 			CorrectWallDirections(unit);
 			CorrectWallNeighBours(unit);

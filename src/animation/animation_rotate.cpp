@@ -42,7 +42,7 @@
 */
 void UnitRotate(CUnit &unit, int rotate)
 {
-	unit.Direction += rotate * 256 / unit.Type->NumDirections;
+	unit.Direction += rotate * 256 / unit.Type->get_num_directions();
 	UnitUpdateHeading(unit);
 }
 

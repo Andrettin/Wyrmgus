@@ -56,7 +56,7 @@
 **    @note There is currently a limit of 127 sprite frames, which
 **    can be lifted if needed.
 **
-**  missile_type::NumDirections
+**  missile_type::num_directions
 **
 **    Number of directions missile can face.
 **

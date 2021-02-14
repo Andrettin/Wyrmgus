@@ -1114,7 +1114,7 @@ static int CclDefineUnitType(lua_State *l)
 		} else if (!strcmp(value, "BoxOffset")) {
 			CclGetPos(l, &type->BoxOffsetX, &type->BoxOffsetY);
 		} else if (!strcmp(value, "NumDirections")) {
-			type->NumDirections = LuaToNumber(l, -1);
+			type->num_directions = LuaToNumber(l, -1);
 		//Wyrmgus start
 //		} else if (!strcmp(value, "ComputerReactionRange")) {
 //			type->ReactRangeComputer = LuaToNumber(l, -1);

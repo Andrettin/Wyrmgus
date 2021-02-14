@@ -181,7 +181,7 @@
 **
 **    Selected box size
 **
-**  unit_type::NumDirections
+**  unit_type::num_directions
 **
 **    Number of directions the unit can face
 **
@@ -1247,10 +1247,10 @@ void unit_type::initialize()
 
 	// If number of directions is not specified, make a guess
 	// Building have 1 direction and units 8
-	if (this->BoolFlag[BUILDING_INDEX].value && this->NumDirections == 0) {
-		this->NumDirections = 1;
-	} else if (this->NumDirections == 0) {
-		this->NumDirections = 8;
+	if (this->BoolFlag[BUILDING_INDEX].value && this->num_directions == 0) {
+		this->num_directions = 1;
+	} else if (this->num_directions == 0) {
+		this->num_directions = 8;
 	}
 
 	//unit type's level must be at least 1
@@ -1581,7 +1581,7 @@ void unit_type::set_parent(const unit_type *parent_type)
 		this->sound_set = std::make_unique<unit_sound_set>();
 		*this->sound_set = *parent_type->sound_set;
 	}
-	this->NumDirections = parent_type->NumDirections;
+	this->num_directions = parent_type->num_directions;
 	this->neutral_minimap_color = parent_type->neutral_minimap_color;
 	this->random_movement_probability = parent_type->random_movement_probability;
 	this->RandomMovementDistance = parent_type->RandomMovementDistance;
@@ -2435,12 +2435,12 @@ void DrawUnitType(const wyrmgus::unit_type &type, const std::shared_ptr<CPlayerC
 			sprite->DrawPlayerColorFrameClip(player, frame, pos.x, pos.y);
 		}
 	} else {
-		const int row = type.NumDirections / 2 + 1;
+		const int row = type.get_num_directions() / 2 + 1;
 
 		if (frame < 0) {
-			frame = ((-frame - 1) / row) * type.NumDirections + type.NumDirections - (-frame - 1) % row;
+			frame = ((-frame - 1) / row) * type.get_num_directions() + type.get_num_directions() - (-frame - 1) % row;
 		} else {
-			frame = (frame / row) * type.NumDirections + frame % row;
+			frame = (frame / row) * type.get_num_directions() + frame % row;
 		}
 		sprite->DrawPlayerColorFrameClip(player, frame, pos.x, pos.y);
 	}
@@ -2460,12 +2460,12 @@ void DrawUnitType(const wyrmgus::unit_type &type, const std::shared_ptr<CPlayerC
 			}
 		}
 	} else {
-		const int row = type.NumDirections / 2 + 1;
+		const int row = type.get_num_directions() / 2 + 1;
 
 		if (frame < 0) {
-			frame = ((-frame - 1) / row) * type.NumDirections + type.NumDirections - (-frame - 1) % row;
+			frame = ((-frame - 1) / row) * type.get_num_directions() + type.get_num_directions() - (-frame - 1) % row;
 		} else {
-			frame = (frame / row) * type.NumDirections + frame % row;
+			frame = (frame / row) * type.get_num_directions() + frame % row;
 		}
 		if (type.Stats[player].Variables[TRANSPARENCY_INDEX].Value > 0) {
 			sprite->DrawPlayerColorFrameClipTrans(player_color, frame, pos.x, pos.y, int(256 - 2.56 * type.Stats[player].Variables[TRANSPARENCY_INDEX].Value), time_of_day);
@@ -2491,7 +2491,7 @@ static int GetStillFrame(const wyrmgus::unit_type &type)
 		if (anim->Type == AnimationFrame) {
 			CAnimation_Frame &a_frame = *static_cast<CAnimation_Frame *>(anim);
 			// Use the frame facing down
-			return a_frame.get_frame() + type.NumDirections / 2;
+			return a_frame.get_frame() + type.get_num_directions() / 2;
 		} else if (anim->Type == AnimationExactFrame) {
 			CAnimation_ExactFrame &a_frame = *static_cast<CAnimation_ExactFrame *>(anim);
 
@@ -2499,7 +2499,7 @@ static int GetStillFrame(const wyrmgus::unit_type &type)
 		}
 		anim = anim->get_next();
 	}
-	return type.NumDirections / 2;
+	return type.get_num_directions() / 2;
 }
 
 /**

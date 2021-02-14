@@ -770,6 +770,7 @@ class unit_type final : public detailed_data_entry, public data_type<unit_type>,
 	Q_PROPERTY(QString image_file READ get_image_file_qstring)
 	Q_PROPERTY(QSize frame_size MEMBER frame_size READ get_frame_size)
 	Q_PROPERTY(QPoint offset MEMBER offset READ get_offset)
+	Q_PROPERTY(int num_directions MEMBER num_directions READ get_num_directions)
 	Q_PROPERTY(wyrmgus::player_color* conversible_player_color MEMBER conversible_player_color READ get_conversible_player_color)
 	Q_PROPERTY(int draw_level MEMBER draw_level READ get_draw_level)
 	Q_PROPERTY(wyrmgus::item_class item_class MEMBER item_class READ get_item_class)
@@ -917,6 +918,11 @@ public:
 	const QPoint &get_offset() const
 	{
 		return this->offset;
+	}
+
+	int get_num_directions() const
+	{
+		return this->num_directions;
 	}
 
 	player_color *get_conversible_player_color() const
@@ -1144,7 +1150,9 @@ private:
 public:
 	int BoxOffsetX = 0;				/// Selected box size horizontal offset
 	int BoxOffsetY = 0;				/// Selected box size vertical offset
-	int NumDirections = 0;			/// Number of directions unit can face
+private:
+	int num_directions = 0;			/// Number of directions unit can face
+public:
 	int MinAttackRange = 0;			/// Minimal attack range
 	//Wyrmgus start
 	/*
