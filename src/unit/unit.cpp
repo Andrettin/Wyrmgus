@@ -1294,8 +1294,8 @@ void CUnit::SetVariation(const wyrmgus::unit_type_variation *new_variation, cons
 {
 	if (image_layer == -1) {
 		if (
-			(this->GetVariation() && this->GetVariation()->Animations)
-			|| (new_variation && new_variation->Animations)
+			(this->GetVariation() != nullptr && this->GetVariation()->get_animation_set() != nullptr)
+			|| (new_variation != nullptr && new_variation->get_animation_set() != nullptr)
 		) { //if the old (if any) or the new variation has specific animations, set the unit's frame to its type's still frame
 			this->Frame = this->Type->StillFrame;
 		}
@@ -6673,8 +6673,8 @@ bool CUnit::HasAdjacentRailForUnitType(const wyrmgus::unit_type *type) const
 const wyrmgus::animation_set *CUnit::get_animation_set() const
 {
 	const wyrmgus::unit_type_variation *variation = this->GetVariation();
-	if (variation != nullptr && variation->Animations != nullptr) {
-		return variation->Animations;
+	if (variation != nullptr && variation->get_animation_set() != nullptr) {
+		return variation->get_animation_set();
 	} else {
 		return this->Type->get_animation_set();
 	}

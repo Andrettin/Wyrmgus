@@ -70,7 +70,7 @@ public:
 		variation->ResourceMax = this->ResourceMax;
 		variation->Weight = this->Weight;
 		variation->Icon = this->Icon;
-		variation->Animations = this->Animations;
+		variation->animation_set = this->animation_set;
 		variation->construction = this->construction;
 		variation->UpgradesRequired = this->UpgradesRequired;
 		variation->UpgradesForbidden = this->UpgradesForbidden;
@@ -128,6 +128,11 @@ public:
 		return this->button_key;
 	}
 	
+	const wyrmgus::animation_set *get_animation_set() const
+	{
+		return this->animation_set;
+	}
+	
 	const wyrmgus::construction *get_construction() const
 	{
 		return this->construction;
@@ -159,8 +164,8 @@ public:
 	std::shared_ptr<CPlayerColorGraphic> Sprite; /// The graphic corresponding to File.
 	std::shared_ptr<CGraphic> ShadowSprite;		/// The graphic corresponding to ShadowFile.
 	std::shared_ptr<CGraphic> LightSprite;		/// The graphic corresponding to LightFile.
-	animation_set *Animations = nullptr;		/// Animation scripts
 private:
+	wyrmgus::animation_set *animation_set = nullptr;
 	wyrmgus::construction *construction = nullptr;	/// What is shown in construction phase
 
 public:

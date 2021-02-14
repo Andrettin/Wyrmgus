@@ -73,6 +73,8 @@ void unit_type_variation::process_sml_property(const sml_property &property)
 		this->Icon.Name = value;
 	} else if (key == "weight") {
 		this->Weight = std::stoi(value);
+	} else if (key == "animation_set") {
+		this->animation_set = animation_set::get(value);
 	} else if (key == "resource_min") {
 		this->ResourceMin = std::stoi(value);
 	} else if (key == "resource_max") {
@@ -132,7 +134,7 @@ void unit_type_variation::ProcessConfigData(const CConfigData *config_data)
 			this->Icon.Icon = nullptr;
 			this->Icon.Load();
 		} else if (key == "animations") {
-			this->Animations = animation_set::get(value);
+			this->animation_set = animation_set::get(value);
 		} else if (key == "construction") {
 			this->construction = construction::get(value);
 		} else if (key == "required_upgrade") {

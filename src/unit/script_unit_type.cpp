@@ -752,9 +752,9 @@ static int CclDefineUnitType(lua_State *l)
 						variation->ButtonIcons[button_action].Icon = nullptr;
 						variation->ButtonIcons[button_action].Load();
 					} else if (!strcmp(value, "animations")) {
-						variation->Animations = wyrmgus::animation_set::get(LuaToString(l, -1, k + 1));
+						variation->animation_set = animation_set::get(LuaToString(l, -1, k + 1));
 					} else if (!strcmp(value, "construction")) {
-						variation->construction = wyrmgus::construction::get(LuaToString(l, -1, k + 1));
+						variation->construction = construction::get(LuaToString(l, -1, k + 1));
 					} else if (!strcmp(value, "upgrade-required")) {
 						const std::string upgrade_ident = LuaToString(l, -1, k + 1);
 						const CUpgrade *upgrade = CUpgrade::try_get(upgrade_ident);

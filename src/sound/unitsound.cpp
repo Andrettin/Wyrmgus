@@ -311,28 +311,30 @@ static void MapAnimSounds(wyrmgus::unit_type &type)
 	}
 	//Wyrmgus start
 	for (const auto &variation : type.get_variations()) {
-		if (!variation) {
+		if (variation == nullptr) {
 			throw std::runtime_error("Unit type \"" + type.get_identifier() + "\" has a null variation.");
 		}
-		if (!variation->Animations) {
+
+		if (variation->get_animation_set() == nullptr) {
 			continue;
 		}
-		MapAnimSounds2(variation->Animations->Start.get());
-		MapAnimSounds2(variation->Animations->Still.get());
-		MapAnimSounds2(variation->Animations->Move.get());
-		MapAnimSounds2(variation->Animations->Attack.get());
-		MapAnimSounds2(variation->Animations->RangedAttack.get());
-		MapAnimSounds2(variation->Animations->SpellCast.get());
+
+		MapAnimSounds2(variation->get_animation_set()->Start.get());
+		MapAnimSounds2(variation->get_animation_set()->Still.get());
+		MapAnimSounds2(variation->get_animation_set()->Move.get());
+		MapAnimSounds2(variation->get_animation_set()->Attack.get());
+		MapAnimSounds2(variation->get_animation_set()->RangedAttack.get());
+		MapAnimSounds2(variation->get_animation_set()->SpellCast.get());
 		for (int i = 0; i <= ANIMATIONS_DEATHTYPES; ++i) {
-			MapAnimSounds2(variation->Animations->Death[i].get());
+			MapAnimSounds2(variation->get_animation_set()->Death[i].get());
 		}
-		MapAnimSounds2(variation->Animations->Repair.get());
-		MapAnimSounds2(variation->Animations->Train.get());
-		MapAnimSounds2(variation->Animations->Research.get());
-		MapAnimSounds2(variation->Animations->Upgrade.get());
-		MapAnimSounds2(variation->Animations->Build.get());
+		MapAnimSounds2(variation->get_animation_set()->Repair.get());
+		MapAnimSounds2(variation->get_animation_set()->Train.get());
+		MapAnimSounds2(variation->get_animation_set()->Research.get());
+		MapAnimSounds2(variation->get_animation_set()->Upgrade.get());
+		MapAnimSounds2(variation->get_animation_set()->Build.get());
 		for (int i = 0; i < MaxCosts; ++i) {
-			MapAnimSounds2(variation->Animations->Harvest[i].get());
+			MapAnimSounds2(variation->get_animation_set()->Harvest[i].get());
 		}
 	}
 	//Wyrmgus end
