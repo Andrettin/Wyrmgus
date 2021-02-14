@@ -1021,6 +1021,7 @@ void map_template::apply(const QPoint &template_start_pos, const QPoint &map_sta
 		if (CPlayer::Players[i]->StartPos.x == 0 && CPlayer::Players[i]->StartPos.y == 0) {
 			continue;
 		}
+
 		// add five workers at the player's starting location
 		if (CPlayer::Players[i]->NumTownHalls > 0) {
 			const unit_type *worker_type = CPlayer::Players[i]->get_faction()->get_class_unit_type(unit_class::get("worker"));
@@ -1029,31 +1030,36 @@ void map_template::apply(const QPoint &template_start_pos, const QPoint &map_sta
 				
 				Vec2i worker_pos(CPlayer::Players[i]->StartPos);
 
-				bool start_pos_has_town_hall = false;
+				const CUnit *worker_town_hall = nullptr;
 				std::vector<CUnit *> table;
 				Select(worker_pos - Vec2i(4, 4), worker_pos + Vec2i(4, 4), table, z, HasSamePlayerAs(*CPlayer::Players[i]));
 				for (size_t j = 0; j < table.size(); ++j) {
 					if (table[j]->Type->BoolFlag[TOWNHALL_INDEX].value) {
-						start_pos_has_town_hall = true;
+						worker_town_hall = table[j];
 						break;
 					}
 				}
 				
-				if (!start_pos_has_town_hall) { //if the start pos doesn't have a town hall, create the workers in the position of a town hall the player has
+				if (worker_town_hall == nullptr) {
+					//if the start pos doesn't have a town hall, create the workers in the position of a town hall the player has
 					for (int j = 0; j < CPlayer::Players[i]->GetUnitCount(); ++j) {
 						CUnit *town_hall_unit = &CPlayer::Players[i]->GetUnit(j);
+
 						if (!town_hall_unit->Type->BoolFlag[TOWNHALL_INDEX].value) {
 							continue;
 						}
+
 						if (town_hall_unit->MapLayer->ID != z) {
 							continue;
 						}
+
 						worker_pos = town_hall_unit->tilePos;
+						worker_town_hall = town_hall_unit;
 					}
 				}
 				
 				for (int j = 0; j < 5; ++j) {
-					CreateUnit(worker_pos - worker_unit_offset, *worker_type, CPlayer::Players[i], CPlayer::Players[i]->StartMapLayer);
+					CreateUnit(worker_pos - worker_unit_offset, *worker_type, CPlayer::Players[i], CPlayer::Players[i]->StartMapLayer, false, worker_town_hall->settlement);
 				}
 			}
 		}
