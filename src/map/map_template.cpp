@@ -1997,8 +1997,13 @@ void map_template::apply_historical_unit(const historical_unit *historical_unit,
 	}
 
 	for (int i = 0; i < historical_unit->get_quantity(); ++i) {
+		const site *settlement = nullptr;
+		if (unit_location != nullptr && unit_location->get_site() != nullptr && unit_location->get_site()->is_settlement()) {
+			settlement = unit_location->get_site();
+		}
+
 		//item units only use factions to generate special properties for them
-		CUnit *unit = CreateUnit(unit_top_left_pos, *unit_type, unit_type->BoolFlag[ITEM_INDEX].value ? CPlayer::Players[PlayerNumNeutral] : unit_player, z);
+		CUnit *unit = CreateUnit(unit_top_left_pos, *unit_type, unit_type->BoolFlag[ITEM_INDEX].value ? CPlayer::Players[PlayerNumNeutral] : unit_player, z, false, settlement);
 
 		if (historical_unit->get_unique() != nullptr) {
 			unit->set_unique(historical_unit->get_unique());
