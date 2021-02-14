@@ -50,12 +50,19 @@ jobs:
         run: |
           git clone "$WYRMSUN_URL" "${BUILD_DIR}/Wyrmsun/"
           git -C "${BUILD_DIR}/Wyrmsun/" checkout "$WYRMSUN_BRANCH"
-      - name: Run background services
+      - name: Run sound server
         run: |
           pulseaudio --exit-idle-time=-1 &
+          until pulseaudio --check; do sleep 1; done
+        env:
+          HOME: /root/
+        timeout-minutes: 5
+      - name: Run graphic server
+        run: |
           Xvfb "$DISPLAY" &
           display_num=$(echo "$DISPLAY" | cut -c 2-)
           while [ ! -S "/tmp/.X11-unix/X${display_num}" ]; do sleep 1; done
+        timeout-minutes: 5
       - name: Run Wyrmsun
         run: >-
           "${BUILD_DIR}/wyrmgus" -t -d "${BUILD_DIR}/Wyrmsun/"
