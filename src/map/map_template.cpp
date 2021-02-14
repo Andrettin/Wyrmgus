@@ -439,9 +439,11 @@ void map_template::check() const
 		throw std::runtime_error("Map template \"" + this->get_identifier() + "\" is set to clear terrain in its area, but also has a base terrain type and an overlay base terrain type.");
 	}
 
+	/*
 	if (this->get_default_astrocoordinate_reference_subtemplate() != nullptr && !this->get_default_astrocoordinate_reference_subtemplate()->is_any_subtemplate_of(this)) {
 		throw std::runtime_error("Map template \"" + this->get_identifier() + "\" has \"" + this->get_default_astrocoordinate_reference_subtemplate()->get_identifier() + "\" as its default astrocoordinate reference subtemplate, but the latter is not a subtemplate of the former, even indirectly.");
 	}
+	*/
 }
 
 data_entry_history *map_template::get_history_base()
