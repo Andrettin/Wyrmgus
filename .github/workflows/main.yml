@@ -10,6 +10,8 @@ env:
     -DWITH_BZIP2=OFF
     -DWITH_GEOJSON=OFF
     -DWITH_X11=ON
+  WYRMSUN_URL: https://github.com/Andrettin/Wyrmsun
+  WYRMSUN_BRANCH: master
   DISPLAY: :0
 
 jobs:
@@ -45,7 +47,9 @@ jobs:
         continue-on-error: true
         run: cmake --build "$BUILD_DIR" --target test
       - name: Clone Wyrmsun data
-        run: git clone https://github.com/Andrettin/Wyrmsun
+        run: |
+          git clone "$WYRMSUN_URL"
+          git -C Wyrmsun checkout "$WYRMSUN_BRANCH"
       - name: Run background services
         run: pulseaudio --exit-idle-time=-1 & Xvfb &
       - name: Run Wyrmsun
