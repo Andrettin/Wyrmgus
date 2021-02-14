@@ -73,6 +73,10 @@ void unit_type_variation::process_sml_property(const sml_property &property)
 		this->Icon.Name = value;
 	} else if (key == "weight") {
 		this->Weight = std::stoi(value);
+	} else if (key == "resource_min") {
+		this->ResourceMin = std::stoi(value);
+	} else if (key == "resource_max") {
+		this->ResourceMax = std::stoi(value);
 	} else {
 		throw std::runtime_error("Invalid unit type variation property: \"" + key + "\".");
 	}

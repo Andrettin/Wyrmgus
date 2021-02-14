@@ -703,6 +703,10 @@ void unit_type::process_sml_scope(const sml_data &scope)
 			this->RepairCosts[resource->get_index()] = std::stoi(value);
 		});
 	} else if (tag == "starting_resources") {
+		if (scope.get_operator() == sml_operator::assignment) {
+			this->starting_resources.clear();
+		}
+
 		for (const std::string &value : values) {
 			this->starting_resources.push_back(std::stoi(value));
 		}
