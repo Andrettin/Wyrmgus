@@ -2,6 +2,7 @@ FROM ubuntu:focal
 LABEL Description="Environment to build and test Wyrmgus"
 ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get update
+# Build deps
 RUN apt-get -y install \
   build-essential \
   cmake \
@@ -18,5 +19,11 @@ RUN apt-get -y install \
   qtmultimedia5-dev \
   qtpositioning5-dev \
   xvfb \
+;
+# Runtime deps
+RUN apt-get -y install \
+  qml-module-qtquick-controls2 \
+  qml-module-qtquick-window2 \
+  qml-module-qtquick2 \
 ;
 RUN apt-get clean && rm -rf /var/lib/apt/lists/*

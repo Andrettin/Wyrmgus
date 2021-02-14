@@ -48,11 +48,15 @@ jobs:
         run: cmake --build "$BUILD_DIR" --target test
       - name: Clone Wyrmsun data
         run: |
-          git clone "$WYRMSUN_URL"
-          git -C Wyrmsun checkout "$WYRMSUN_BRANCH"
+          git clone "$WYRMSUN_URL" "${BUILD_DIR}/Wyrmsun/"
+          git -C "${BUILD_DIR}/Wyrmsun/" checkout "$WYRMSUN_BRANCH"
       - name: Run background services
-        run: pulseaudio --exit-idle-time=-1 & Xvfb "$DISPLAY" &
+        run: |
+          pulseaudio --exit-idle-time=-1 &
+          Xvfb "$DISPLAY" &
+          display_num=$(echo "$DISPLAY" | cut -c 2-)
+          while [ ! -S "/tmp/.X11-unix/X${display_num}" ]; do sleep 1; done
       - name: Run Wyrmsun
         run: >-
-          "${BUILD_DIR}/wyrmgus" -t -d "${BUILD_DIR}/Wyrmsun"
+          "${BUILD_DIR}/wyrmgus" -t -d "${BUILD_DIR}/Wyrmsun/"
         timeout-minutes: 5
