@@ -610,15 +610,15 @@ void database::parse_folder(const std::filesystem::path &path, std::vector<sml_d
 {
 	std::filesystem::recursive_directory_iterator dir_iterator(path);
 
-	std::map<int, std::vector<std::filesystem::path>> filepaths_by_depth;
+	std::map<int, std::set<std::filesystem::path>> filepaths_by_depth;
 
 	for (const std::filesystem::directory_entry &dir_entry : dir_iterator) {
 		if (!dir_entry.is_regular_file() || dir_entry.path().extension() != ".txt") {
 			continue;
 		}
 
-		//ensure that files with a lower depth will be processed earlier than those with a higher one
-		filepaths_by_depth[dir_iterator.depth()].push_back(dir_entry.path());
+		//ensure that files with a lower depth will be processed earlier than those with a higher one, and that files will be processed in alphabetical order
+		filepaths_by_depth[dir_iterator.depth()].insert(dir_entry.path());
 	}
 
 	for (const auto &kv_pair : filepaths_by_depth) {
