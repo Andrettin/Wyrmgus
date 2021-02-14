@@ -93,7 +93,8 @@ int main(int argc, char **argv)
 		QString root_path { QString::fromStdString(database::get()->get_root_path().string()) };
 		engine.addImportPath(root_path + "/libraries/qml");
 
-		const QUrl url = "file:///" + QDir(root_path + "/interface/").absoluteFilePath("Main.qml");
+		QUrl url = QDir(root_path + "/interface/").absoluteFilePath("Main.qml");
+		url.setScheme("file");
 		QObject::connect(
 				&engine, &QQmlApplicationEngine::objectCreated, &app,
 				[url](QObject *obj, const QUrl &objUrl) {
