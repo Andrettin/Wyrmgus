@@ -83,6 +83,7 @@
 #include "util/container_util.h"
 #include "util/point_util.h"
 #include "util/rect_util.h"
+#include "util/set_util.h"
 #include "util/size_util.h"
 #include "util/string_util.h"
 #include "util/util.h"
@@ -2663,14 +2664,15 @@ void CMap::AdjustTileMapIrregularities(const bool overlay, const Vec2i &min_pos,
 
 		for (int x = min_pos.x; x < max_pos.x; ++x) {
 			for (int y = min_pos.y; y < max_pos.y; ++y) {
-				wyrmgus::tile &mf = *this->Field(x, y, z);
-				const wyrmgus::terrain_type *terrain = overlay ? mf.get_overlay_terrain() : mf.get_terrain();
+				tile &mf = *this->Field(x, y, z);
+				const terrain_type *terrain = overlay ? mf.get_overlay_terrain() : mf.get_terrain();
 				if (!terrain || terrain->allows_single()) {
 					continue;
 				}
-				std::vector<const wyrmgus::terrain_type *> acceptable_adjacent_tile_types;
-				acceptable_adjacent_tile_types.push_back(terrain);
-				wyrmgus::vector::merge(acceptable_adjacent_tile_types, terrain->get_outer_border_terrain_types());
+
+				std::set<const terrain_type *> acceptable_adjacent_tile_types;
+				acceptable_adjacent_tile_types.insert(terrain);
+				set::merge(acceptable_adjacent_tile_types, terrain->get_outer_border_terrain_types());
 				
 				int horizontal_adjacent_tiles = 0;
 				int vertical_adjacent_tiles = 0;
@@ -2679,41 +2681,42 @@ void CMap::AdjustTileMapIrregularities(const bool overlay, const Vec2i &min_pos,
 				int sw_quadrant_adjacent_tiles = 0;
 				int se_quadrant_adjacent_tiles = 0;
 				
-				if ((x - 1) >= 0 && std::find(acceptable_adjacent_tile_types.begin(), acceptable_adjacent_tile_types.end(), this->GetTileTerrain(Vec2i(x - 1, y), overlay, z)) == acceptable_adjacent_tile_types.end()) {
+				if ((x - 1) >= 0 && !acceptable_adjacent_tile_types.contains(this->GetTileTerrain(Vec2i(x - 1, y), overlay, z))) {
 					horizontal_adjacent_tiles += 1;
 					nw_quadrant_adjacent_tiles += 1;
 					sw_quadrant_adjacent_tiles += 1;
 				}
-				if ((x + 1) < this->Info.MapWidths[z] && std::find(acceptable_adjacent_tile_types.begin(), acceptable_adjacent_tile_types.end(), this->GetTileTerrain(Vec2i(x + 1, y), overlay, z)) == acceptable_adjacent_tile_types.end()) {
+				if ((x + 1) < this->Info.MapWidths[z] && !acceptable_adjacent_tile_types.contains(this->GetTileTerrain(Vec2i(x + 1, y), overlay, z))) {
 					horizontal_adjacent_tiles += 1;
 					ne_quadrant_adjacent_tiles += 1;
 					se_quadrant_adjacent_tiles += 1;
 				}
 				
-				if ((y - 1) >= 0 && std::find(acceptable_adjacent_tile_types.begin(), acceptable_adjacent_tile_types.end(), this->GetTileTerrain(Vec2i(x, y - 1), overlay, z)) == acceptable_adjacent_tile_types.end()) {
+				if ((y - 1) >= 0 && !acceptable_adjacent_tile_types.contains(this->GetTileTerrain(Vec2i(x, y - 1), overlay, z))) {
 					vertical_adjacent_tiles += 1;
 					nw_quadrant_adjacent_tiles += 1;
 					ne_quadrant_adjacent_tiles += 1;
 				}
-				if ((y + 1) < this->Info.MapHeights[z] && std::find(acceptable_adjacent_tile_types.begin(), acceptable_adjacent_tile_types.end(), this->GetTileTerrain(Vec2i(x, y + 1), overlay, z)) == acceptable_adjacent_tile_types.end()) {
+				if ((y + 1) < this->Info.MapHeights[z] && !acceptable_adjacent_tile_types.contains(this->GetTileTerrain(Vec2i(x, y + 1), overlay, z))) {
 					vertical_adjacent_tiles += 1;
 					sw_quadrant_adjacent_tiles += 1;
 					se_quadrant_adjacent_tiles += 1;
 				}
 
-				if ((x - 1) >= 0 && (y - 1) >= 0 && std::find(acceptable_adjacent_tile_types.begin(), acceptable_adjacent_tile_types.end(), this->GetTileTerrain(Vec2i(x - 1, y - 1), overlay, z)) == acceptable_adjacent_tile_types.end()) {
+				if ((x - 1) >= 0 && (y - 1) >= 0 && !acceptable_adjacent_tile_types.contains(this->GetTileTerrain(Vec2i(x - 1, y - 1), overlay, z))) {
 					nw_quadrant_adjacent_tiles += 1;
 					se_quadrant_adjacent_tiles += 1;
 				}
-				if ((x - 1) >= 0 && (y + 1) < this->Info.MapHeights[z] && std::find(acceptable_adjacent_tile_types.begin(), acceptable_adjacent_tile_types.end(), GetTileTerrain(Vec2i(x - 1, y + 1), overlay, z)) == acceptable_adjacent_tile_types.end()) {
+
+				if ((x - 1) >= 0 && (y + 1) < this->Info.MapHeights[z] && !acceptable_adjacent_tile_types.contains(GetTileTerrain(Vec2i(x - 1, y + 1), overlay, z))) {
 					sw_quadrant_adjacent_tiles += 1;
 					ne_quadrant_adjacent_tiles += 1;
 				}
-				if ((x + 1) < this->Info.MapWidths[z] && (y - 1) >= 0 && std::find(acceptable_adjacent_tile_types.begin(), acceptable_adjacent_tile_types.end(), GetTileTerrain(Vec2i(x + 1, y - 1), overlay, z)) == acceptable_adjacent_tile_types.end()) {
+				if ((x + 1) < this->Info.MapWidths[z] && (y - 1) >= 0 && !acceptable_adjacent_tile_types.contains(GetTileTerrain(Vec2i(x + 1, y - 1), overlay, z))) {
 					ne_quadrant_adjacent_tiles += 1;
 					sw_quadrant_adjacent_tiles += 1;
 				}
-				if ((x + 1) < this->Info.MapWidths[z] && (y + 1) < this->Info.MapHeights[z] && std::find(acceptable_adjacent_tile_types.begin(), acceptable_adjacent_tile_types.end(), GetTileTerrain(Vec2i(x + 1, y + 1), overlay, z)) == acceptable_adjacent_tile_types.end()) {
+				if ((x + 1) < this->Info.MapWidths[z] && (y + 1) < this->Info.MapHeights[z] && !acceptable_adjacent_tile_types.contains(GetTileTerrain(Vec2i(x + 1, y + 1), overlay, z))) {
 					se_quadrant_adjacent_tiles += 1;
 					nw_quadrant_adjacent_tiles += 1;
 				}
