@@ -457,6 +457,13 @@ void map_template::reset_history()
 	this->history = std::make_unique<map_template_history>(this->is_active_by_default());
 }
 
+void map_template::reset_game_data()
+{
+	this->current_map_start_pos = QPoint(-1, -1);
+	this->current_map_end_pos = QPoint(-1, -1);
+	this->current_start_pos = QPoint(0, 0);
+}
+
 void map_template::apply_terrain_file(const bool overlay, const QPoint &template_start_pos, const QPoint &map_start_pos, const int z)
 {
 	using namespace std::string_literals;

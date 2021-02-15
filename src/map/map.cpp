@@ -1691,12 +1691,16 @@ void CMap::Clean()
 	UI.PreviousMapLayer = nullptr;
 	this->landmasses.clear();
 
-	for (wyrmgus::world *world : wyrmgus::world::get_all()) {
+	for (world *world : world::get_all()) {
 		world->reset_game_data();
 	}
 
-	for (wyrmgus::site *site : wyrmgus::site::get_all()) {
+	for (site *site : site::get_all()) {
 		site->reset_game_data();
+	}
+
+	for (map_template *map_template : map_template::get_all()) {
+		map_template->reset_game_data();
 	}
 
 	//Wyrmgus start

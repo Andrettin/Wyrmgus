@@ -150,6 +150,7 @@ public:
 	virtual void check() const override;
 	virtual data_entry_history *get_history_base() override;
 	virtual void reset_history() override;
+	void reset_game_data();
 
 	void apply_terrain_file(bool overlay, const QPoint &template_start_pos, const QPoint &map_start_pos, int z);
 	void apply_terrain_image(const bool overlay, const QPoint &template_start_pos, const QPoint &map_start_pos, const int z);
