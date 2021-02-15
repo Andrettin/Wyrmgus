@@ -30,8 +30,10 @@
 #include "database/database.h"
 #include "util/exception_util.h"
 #include "util/log_util.h"
+#include "version.h"
 
 #include <QCommandLineParser>
+#include <QDir>
 #include <QQmlApplicationEngine>
 
 
@@ -44,6 +46,7 @@ int main(int argc, char **argv)
 
 		QApplication app(argc, argv);
 		app.setApplicationName("Wyrmsun");
+		app.setApplicationVersion(VERSION);
 
 		//  Setup some defaults.
 #ifdef MAC_BUNDLE
@@ -64,6 +67,13 @@ int main(int argc, char **argv)
 		QCommandLineOption data_path_option("d", "Specify a custom data path.", "data path");
 		cmd_parser.addOption(data_path_option);
 
+		QCommandLineOption test_option { "t", "Check startup and exit." };
+		cmd_parser.addOption(test_option);
+
+		cmd_parser.setApplicationDescription("The free real time strategy game engine.");
+		cmd_parser.addHelpOption();
+		cmd_parser.addVersionOption();
+
 		cmd_parser.process(app);
 
 		if (cmd_parser.isSet(data_path_option)) {
@@ -80,14 +90,17 @@ int main(int argc, char **argv)
 		});
 
 		QQmlApplicationEngine engine;
-		engine.addImportPath(QString::fromStdString(database::get()->get_root_path().string() + "/libraries/qml"));
+		QString root_path { QString::fromStdString(database::get()->get_root_path().string()) };
+		engine.addImportPath(root_path + "/libraries/qml");
 
-		const QUrl url = "file:///" + QString::fromStdString(database::get()->get_root_path().string() + "/interface/Main.qml");
-		QObject::connect(&engine, &QQmlApplicationEngine::objectCreated, &app, [url](QObject *obj, const QUrl &objUrl) {
-			if (!obj && url == objUrl) {
-				QCoreApplication::exit(-1);
-			}
-		}, Qt::QueuedConnection);
+		QUrl url = QDir(root_path + "/interface/").absoluteFilePath("Main.qml");
+		url.setScheme("file");
+		QObject::connect(
+				&engine, &QQmlApplicationEngine::objectCreated, &app,
+				[url](QObject *obj, const QUrl &objUrl) {
+					if (!obj && url == objUrl) QCoreApplication::exit(-1);
+				},
+				Qt::QueuedConnection);
 		engine.load(url);
 
 		const int result = app.exec();

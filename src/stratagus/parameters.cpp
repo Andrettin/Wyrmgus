@@ -41,6 +41,7 @@ void Parameters::SetDefaultValues()
 	applicationName = "stratagus";
 	luaStartFilename = "scripts/stratagus.lua";
 	luaEditorStartFilename = "scripts/editor.lua";
+	isTestRun = false;
 	SetDefaultUserDirectory();
 }
 
