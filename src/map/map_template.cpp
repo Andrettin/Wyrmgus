@@ -2681,19 +2681,22 @@ bool map_template::is_constructed_subtemplate_compatible_with_terrain_image(map_
 
 QPoint map_template::generate_celestial_site_position(const site *site, const int z) const
 {
-	geocoordinate_set astrocoordinate_set;
+	static constexpr int max_potential_longitudes = (geocoordinate::max_longitude - geocoordinate::min_longitude).get_value() / 1000;
+	static constexpr int max_potential_latitudes = (geocoordinate::max_latitude - geocoordinate::min_latitude).get_value() / 500;
+	static constexpr int max_potential_astrocoordinates = max_potential_longitudes * max_potential_latitudes;
+
+	std::vector<geocoordinate> potential_astrocoordinates;
+	potential_astrocoordinates.reserve(max_potential_astrocoordinates);
 
 	for (longitude lon = geocoordinate::min_longitude; lon <= geocoordinate::max_longitude; lon += longitude::from_value(1000)) {
-		for (latitude lat = geocoordinate::min_latitude; lat <= geocoordinate::max_latitude; lat += latitude::from_value(1000)) {
+		for (latitude lat = geocoordinate::min_latitude; lat <= geocoordinate::max_latitude; lat += latitude::from_value(500)) {
 			if (lon == 0 && lat == 0) {
 				continue;
 			}
 
-			astrocoordinate_set.insert(geocoordinate(lon, lat));
+			potential_astrocoordinates.push_back(geocoordinate(lon, lat));
 		}
 	}
-
-	std::vector<geocoordinate> potential_astrocoordinates = container::to_vector(astrocoordinate_set);
 
 	const QSize celestial_site_size = site->get_size_with_satellites();
 
