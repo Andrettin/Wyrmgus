@@ -707,6 +707,7 @@ void map_template::apply(const QPoint &template_start_pos, const QPoint &map_sta
 	}
 
 	this->current_map_start_pos = map_start_pos;
+	this->current_map_end_pos = map_start_pos + size::to_point(this->get_applied_size()) - QPoint(1, 1);
 	this->current_start_pos = template_start_pos;
 
 	const campaign *current_campaign = game::get()->get_current_campaign();

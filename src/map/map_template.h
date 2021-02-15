@@ -325,7 +325,7 @@ public:
 		}
 
 		const QPoint &start_pos = this->get_current_map_start_pos();
-		const QPoint end_pos = this->get_current_map_end_pos();
+		const QPoint &end_pos = this->get_current_map_end_pos();
 		return pos.x() >= start_pos.x() && pos.y() >= start_pos.y() && pos.x() <= end_pos.x() && pos.y() <= end_pos.y();
 	}
 
@@ -334,14 +334,9 @@ public:
 		return this->current_map_start_pos;
 	}
 
-	QPoint get_current_map_end_pos() const
+	const QPoint &get_current_map_end_pos() const
 	{
-		if (!this->is_on_map()) {
-			return QPoint(-1, -1);
-		}
-
-		const QPoint &start_pos = this->get_current_map_start_pos();
-		return QPoint(start_pos.x() + this->get_applied_width() - 1, start_pos.y() + this->get_applied_height() - 1);
+		return this->current_map_end_pos;
 	}
 
 	bool is_on_map() const
@@ -776,6 +771,7 @@ private:
 	QPoint end_pos = QPoint(-1, -1); //the end position within the map template to be applied when it is used
 private:
 	QPoint current_map_start_pos = QPoint(-1, -1);
+	QPoint current_map_end_pos = QPoint(-1, -1);
 public:
 	QPoint current_start_pos = QPoint(0, 0);
 	map_template *main_template = nullptr; //main template in which this one is located, if this is a subtemplate
