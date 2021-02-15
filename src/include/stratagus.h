@@ -240,6 +240,7 @@ extern Vec2i GetDirectionOffset(int direction);
 
 extern void load_database(const bool initial_definition);
 extern void load_defines();
+extern bool is_test_run();
 extern void initialize_database();
 extern void save_preferences();
 

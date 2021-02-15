@@ -1,0 +1,69 @@
+---
+name: CMake
+on: [push, pull_request, workflow_dispatch]
+env:
+  BUILD_DIR: "${{ github.workspace }}/build/"
+  BUILD_TYPE: 'Release'
+  CMAKE_FLAGS: >-
+    -DENABLE_STATIC=OFF
+    -DOpenGL_GL_PREFERENCE=GLVND
+    -DWITH_BZIP2=OFF
+    -DWITH_GEOJSON=OFF
+    -DWITH_X11=ON
+  WYRMSUN_URL: https://github.com/Andrettin/Wyrmsun
+  WYRMSUN_BRANCH: master
+  DISPLAY: :0
+
+jobs:
+  build:
+    runs-on: 'ubuntu-latest'
+    container: 'bergentroll/wyrmgus:focal'
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set CPU number
+        run: echo "THREADS=$(nproc)" >> "$GITHUB_ENV"
+      - name: Configure CMake
+        run: >-
+          cmake
+          -S "$GITHUB_WORKSPACE"
+          -B "$BUILD_DIR"
+          -DCMAKE_BUILD_TYPE="$BUILD_TYPE"
+          $CMAKE_FLAGS
+      - name: Workaround for tolua.cpp target on CMake 3.16.3
+        run: cmake -S "$GITHUB_WORKSPACE" -B "$BUILD_DIR"
+      - name: Build Wyrmgus
+        run: >-
+          cmake
+          --build "$BUILD_DIR"
+          --target stratagus_main
+          --parallel "$THREADS"
+      - name: Build Wyrmgus test suite
+        run: >-
+          cmake
+          --build "$BUILD_DIR"
+          --target stratagus_test
+          --parallel "$THREADS"
+      - name: Test
+        continue-on-error: true
+        run: cmake --build "$BUILD_DIR" --target test
+      - name: Clone Wyrmsun data
+        run: |
+          git clone "$WYRMSUN_URL" "${BUILD_DIR}/Wyrmsun/"
+          git -C "${BUILD_DIR}/Wyrmsun/" checkout "$WYRMSUN_BRANCH"
+      - name: Run sound server
+        run: |
+          pulseaudio --exit-idle-time=-1 &
+          until pulseaudio --check; do sleep 1; done
+        env:
+          HOME: /root/
+        timeout-minutes: 5
+      - name: Run graphic server
+        run: |
+          Xvfb "$DISPLAY" &
+          display_num=$(echo "$DISPLAY" | cut -c 2-)
+          while [ ! -S "/tmp/.X11-unix/X${display_num}" ]; do sleep 1; done
+        timeout-minutes: 5
+      - name: Run Wyrmsun
+        run: >-
+          "${BUILD_DIR}/wyrmgus" -t -d "${BUILD_DIR}/Wyrmsun/"
+        timeout-minutes: 5

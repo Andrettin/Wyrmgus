@@ -1590,7 +1590,10 @@ set_property(SOURCE ${CMAKE_CURRENT_BINARY_DIR}/tolua.cpp PROPERTY SKIP_AUTOMOC 
 
 add_library(stratagus STATIC ${stratagus_SRCS} ${stratagus_HDRS})
 add_executable(stratagus_main WIN32 ${stratagus_main_SRCS})
+
 add_executable(stratagus_test ${stratagus_test_SRCS})
+add_test(stratagus_test stratagus_test)
+enable_testing()
 
 if (MSVC)
 	target_compile_options(stratagus PRIVATE /W4 /w44800 /wd4458)

@@ -471,7 +471,7 @@ static void RedirectOutput()
 static void ParseCommandLine(int argc, char **argv, Parameters &parameters)
 {
 	for (;;) {
-		switch (getopt(argc, argv, "ac:d:D:eE:FG:hiI:lN:oOP:ps:S:u:v:Wx:Z?-")) {
+		switch (getopt(argc, argv, "ac:d:D:eE:FG:hiI:lN:oOP:ps:S:tu:v:Wx:Z?-")) {
 			case 'a':
 				EnableAssert = true;
 				continue;
@@ -524,6 +524,9 @@ static void ParseCommandLine(int argc, char **argv, Parameters &parameters)
 				continue;
 			case 'S':
 				VideoSyncSpeed = atoi(optarg);
+				continue;
+			case 't':
+				parameters.isTestRun = true;
 				continue;
 			case 'u':
 				Parameters::Instance.SetUserDirectory(optarg);
@@ -828,6 +831,11 @@ void initialize_database()
 	} catch (...) {
 		std::throw_with_nested(std::runtime_error("Error initializing database."));
 	}
+}
+
+bool is_test_run()
+{
+	return Parameters::Instance.isTestRun;
 }
 
 void save_preferences()

@@ -170,4 +170,5 @@ extern void CallDialogueNodeOptionEffect(std::string dialogue_ident, int node, i
 extern void load_database(const bool initial_definition);
 extern void load_defines();
 extern void initialize_database();
+extern bool is_test_run();
 extern void save_preferences();
