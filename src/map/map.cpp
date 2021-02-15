@@ -340,9 +340,14 @@ QPoint CMap::generate_unit_location(const wyrmgus::unit_type *unit_type, const w
 	const CUnitStats &stats = player != nullptr ? unit_type->Stats[player->get_index()] : unit_type->MapDefaultStat;
 
 	std::vector<QPoint> potential_positions;
-	for (int x = min_pos.x(); x <= (max_pos.x() - (unit_type->get_tile_width() - 1)); ++x) {
-		for (int y = min_pos.y(); y <= (max_pos.y() - (unit_type->get_tile_height() - 1)); ++y) {
-			potential_positions.push_back(QPoint(x, y));
+
+	const int max_x_offset = (max_pos.x() - (unit_type->get_tile_width() - 1)) - min_pos.x();
+	const int max_y_offset = (max_pos.y() - (unit_type->get_tile_height() - 1)) - min_pos.y();
+	potential_positions.reserve(max_x_offset * max_y_offset);
+
+	for (int x_offset = 0; x_offset <= max_x_offset; ++x_offset) {
+		for (int y_offset = 0; y_offset <= max_y_offset; ++y_offset) {
+			potential_positions.emplace_back(min_pos.x() + x_offset, min_pos.y() + y_offset);
 		}
 	}
 	

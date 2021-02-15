@@ -2702,7 +2702,7 @@ QPoint map_template::generate_celestial_site_position(const site *site, const in
 				continue;
 			}
 
-			potential_astrocoordinates.push_back(geocoordinate(lon, lat));
+			potential_astrocoordinates.emplace_back(lon, lat);
 		}
 	}
 
