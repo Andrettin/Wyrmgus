@@ -574,10 +574,6 @@ static void DrawDecoration(const CUnit &unit, const wyrmgus::unit_type &type, co
 {
 	int x = screenPos.x;
 	int y = screenPos.y;
-#ifdef DEBUG
-	// Show the number of references.
-	CLabel(defines::get()->get_game_font()).DrawClip(x + 1, y + 1, unit.get_ref_count());
-#endif
 
 	UpdateUnitVariables(const_cast<CUnit &>(unit));
 	// Now show decoration for each variable.
