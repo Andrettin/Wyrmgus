@@ -1,7 +1,7 @@
 class Vec2i
 {
-	short int x;
-	short int y;
+	int x;
+	int y;
 };
 
 class CPreference

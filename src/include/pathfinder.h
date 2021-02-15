@@ -222,7 +222,7 @@ extern void InitPathfinder();
 extern void FreePathfinder();
 
 /// Returns the next element of the path
-extern int NextPathElement(CUnit &unit, short int &xdp, short int &ydp);
+extern int NextPathElement(CUnit &unit, int &xdp, int &ydp);
 /// Return distance to unit.
 //Wyrmgus start
 //extern int UnitReachable(const CUnit &unit, const CUnit &dst, int range);

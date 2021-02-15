@@ -507,7 +507,7 @@ static int NewPath(PathFinderInput &input, PathFinderOutput &output)
 **  @return >0 remaining path length, 0 wait for path, -1
 **  reached goal, -2 can't reach the goal.
 */
-int NextPathElement(CUnit &unit, short int &pxd, short int &pyd)
+int NextPathElement(CUnit &unit, int &pxd, int &pyd)
 {
 	PathFinderInput &input = unit.pathFinderData->input;
 	PathFinderOutput &output = unit.pathFinderData->output;

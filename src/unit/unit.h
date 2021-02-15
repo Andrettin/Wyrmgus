@@ -927,8 +927,6 @@ extern void RescueUnits();
 
 /// Convert direction (dx,dy) to heading (0-255)
 extern int DirectionToHeading(const Vec2i &dir);
-/// Convert direction (dx,dy) to heading (0-255)
-extern int DirectionToHeading(const PixelDiff &dir);
 
 ///Correct directions for placed wall.
 extern void CorrectWallDirections(CUnit &unit);
