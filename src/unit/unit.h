@@ -472,12 +472,12 @@ public:
 
 	int get_variable_value(const int var_index) const
 	{
-		return this->Variable.at(var_index).Value;
+		return this->Variable[var_index].Value;
 	}
 
 	void set_variable_value(const int var_index, const int value)
 	{
-		this->Variable.at(var_index).Value = value;
+		this->Variable[var_index].Value = value;
 	}
 
 	void change_variable_value(const int var_index, const int change)
@@ -487,17 +487,17 @@ public:
 
 	int get_variable_max(const int var_index) const
 	{
-		return this->Variable.at(var_index).Max;
+		return this->Variable[var_index].Max;
 	}
 
 	void set_variable_max(const int var_index, const int max)
 	{
-		this->Variable.at(var_index).Max = max;
+		this->Variable[var_index].Max = max;
 	}
 
 	char get_variable_increase(const int var_index) const
 	{
-		return this->Variable.at(var_index).Increase;
+		return this->Variable[var_index].Increase;
 	}
 
 	int GetModifiedVariable(const int index, const VariableAttribute variable_type) const;

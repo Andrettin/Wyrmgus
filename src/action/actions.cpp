@@ -355,6 +355,10 @@ static void HandleBuffsEachCycle(CUnit &unit)
 	static constexpr std::array SpellEffects = {BLOODLUST_INDEX, HASTE_INDEX, SLOW_INDEX, INVISIBLE_INDEX, UNHOLYARMOR_INDEX, POISON_INDEX, STUN_INDEX, BLEEDING_INDEX, LEADERSHIP_INDEX, BLESSING_INDEX, INSPIRE_INDEX, PRECISION_INDEX, REGENERATION_INDEX, BARKSKIN_INDEX, INFUSION_INDEX, TERROR_INDEX, WITHER_INDEX, DEHYDRATION_INDEX, HYDRATING_INDEX};
 	//  decrease spells effects time.
 	for (const auto spell_effect : SpellEffects) {
+		if (unit.get_variable_value(spell_effect) <= 0) {
+			continue;
+		}
+
 		unit.Variable[spell_effect].Increase = -1;
 		IncreaseVariable(unit, spell_effect);
 	}
