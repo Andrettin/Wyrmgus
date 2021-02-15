@@ -220,7 +220,7 @@ public:
 	centesimal_int get_distance_from_orbit_center_au() const;
 	void set_distance_from_orbit_center_au(const centesimal_int &distance_au);
 
-	QPoint astrocoordinate_to_relative_pos(const wyrmgus::geocoordinate &astrocoordinate, const wyrmgus::map_template *reference_subtemplate) const;
+	QPoint astrocoordinate_to_relative_pos(const wyrmgus::geocoordinate &astrocoordinate, const QSize &reference_subtemplate_applied_size) const;
 
 	template <bool use_map_pos>
 	QPoint astrocoordinate_to_pos(const wyrmgus::geocoordinate &astrocoordinate) const;

@@ -2962,8 +2962,7 @@ void CMap::GenerateTerrain(const std::unique_ptr<wyrmgus::generated_terrain> &ge
 			break;
 		}
 		
-		random_pos = potential_positions[SyncRand(potential_positions.size())];
-		potential_positions.erase(std::remove(potential_positions.begin(), potential_positions.end(), random_pos), potential_positions.end());
+		random_pos = vector::take_random(potential_positions);
 		
 		if (!this->Info.IsPointOnMap(random_pos, z) || this->is_point_in_a_subtemplate_area(random_pos, z)) {
 			continue;

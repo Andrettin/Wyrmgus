@@ -398,7 +398,7 @@ void site::set_distance_from_orbit_center_au(const centesimal_int &distance_au)
 	this->distance_from_orbit_center = astronomy::au_to_gm(distance_au);
 }
 
-QPoint site::astrocoordinate_to_relative_pos(const wyrmgus::geocoordinate &astrocoordinate, const wyrmgus::map_template *reference_subtemplate) const
+QPoint site::astrocoordinate_to_relative_pos(const wyrmgus::geocoordinate &astrocoordinate, const QSize &reference_subtemplate_applied_size) const
 {
 	QPoint direction_pos = astrocoordinate.to_circle_edge_point();
 	int64_t astrodistance_value = this->get_astrodistance().to_int();
@@ -406,7 +406,7 @@ QPoint site::astrocoordinate_to_relative_pos(const wyrmgus::geocoordinate &astro
 	astrodistance_value *= this->get_map_template()->get_astrodistance_multiplier();
 
 	//the size of the reference subtemplate serves as a minimum distance in tiles
-	astrodistance_value += std::max(reference_subtemplate->get_applied_width(), reference_subtemplate->get_applied_height()) / 2;
+	astrodistance_value += std::max(reference_subtemplate_applied_size.width(), reference_subtemplate_applied_size.height()) / 2;
 
 	astrodistance_value += site::base_astrodistance_additive_modifier;
 	astrodistance_value += this->get_map_template()->get_astrodistance_additive_modifier();
@@ -432,7 +432,9 @@ QPoint site::astrocoordinate_to_pos(const wyrmgus::geocoordinate &astrocoordinat
 		throw std::runtime_error("Could not convert astrocoordinate to pos for site \"" + this->get_identifier() + "\", as it has no astrocoordinate reference subtemplate.");
 	}
 
-	const QPoint relative_pos = this->astrocoordinate_to_relative_pos(astrocoordinate, reference_subtemplate);
+	const QSize reference_subtemplate_applied_size = reference_subtemplate->get_applied_size();
+
+	const QPoint relative_pos = this->astrocoordinate_to_relative_pos(astrocoordinate, reference_subtemplate_applied_size);
 
 	QPoint base_pos;
 	if constexpr (use_map_pos) {
@@ -448,7 +450,7 @@ QPoint site::astrocoordinate_to_pos(const wyrmgus::geocoordinate &astrocoordinat
 		base_pos = reference_subtemplate->get_top_template_relative_pos();
 	}
 
-	base_pos += QPoint(reference_subtemplate->get_applied_width() / 2 - 1, reference_subtemplate->get_applied_height() / 2 - 1);
+	base_pos += QPoint(reference_subtemplate_applied_size.width() / 2 - 1, reference_subtemplate_applied_size.height() / 2 - 1);
 
 	//apply the relative position of the celestial body to the reference subtemplate's center
 	return base_pos + relative_pos;
