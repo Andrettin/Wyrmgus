@@ -36,6 +36,7 @@
 #include "database/defines.h"
 #include "map/map_layer.h"
 #include "map/tile.h"
+#include "map/tile_flag.h"
 #include "map/tileset.h"
 #include "player.h"
 #include "ui/ui.h"
@@ -75,7 +76,7 @@ static SDL_Surface *OnlyFogSurface = nullptr;
 class _filter_flags
 {
 public:
-	_filter_flags(const CPlayer &p, int *fogmask) : player(&p), fogmask(fogmask)
+	explicit _filter_flags(const CPlayer &p, tile_flag *fogmask) : player(&p), fogmask(fogmask)
 	{
 		Assert(fogmask != nullptr);
 	}
@@ -88,7 +89,7 @@ public:
 	}
 private:
 	const CPlayer *player;
-	int *fogmask;
+	tile_flag *fogmask;
 };
 
 /**
@@ -101,11 +102,11 @@ private:
 **  @return        Filtered mask after taking fog into account
 */
 //Wyrmgus start
-//int MapFogFilterFlags(CPlayer &player, const unsigned int index, int mask)
-int MapFogFilterFlags(CPlayer &player, const unsigned int index, int mask, int z)
+//int MapFogFilterFlags(CPlayer &player, const unsigned int index, const tile_flag mask)
+tile_flag MapFogFilterFlags(CPlayer &player, const unsigned int index, const tile_flag mask, int z)
 //Wyrmgus end
 {
-	int fogMask = mask;
+	tile_flag fogMask = mask;
 
 	_filter_flags filter(player, &fogMask);
 	//Wyrmgus start
@@ -115,7 +116,7 @@ int MapFogFilterFlags(CPlayer &player, const unsigned int index, int mask, int z
 	return fogMask;
 }
 
-int MapFogFilterFlags(CPlayer &player, const Vec2i &pos, int mask, int z)
+tile_flag MapFogFilterFlags(CPlayer &player, const Vec2i &pos, const tile_flag mask, const int z)
 {
 	if (CMap::Map.Info.IsPointOnMap(pos, z)) {
 		return MapFogFilterFlags(player, CMap::Map.get_pos_index(pos, z), mask, z);
@@ -470,7 +471,7 @@ void MapSight(const CPlayer &player, const Vec2i &pos, int w, int h, int range, 
 		return;
 	}
 
-	static constexpr unsigned long sight_obstacle_flag = MapFieldAirUnpassable;
+	static constexpr tile_flag sight_obstacle_flag = tile_flag::air_impassable;
 	static constexpr int max_obstacle_difference = 1; //how many tiles are seen after the obstacle; set to 1 here so that the obstacle tiles themselves don't have fog drawn over them
 	
 	// Up hemi-cyle

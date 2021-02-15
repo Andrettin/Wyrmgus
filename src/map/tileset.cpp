@@ -174,10 +174,15 @@
 
 #include "map/tileset.h"
 
+#include "map/tile_flag.h"
 #include "util/random.h"
 #include "util/util.h"
 #include "util/vector_random_util.h"
 #include "video/video.h"
+
+CTile::CTile() : flag(tile_flag::none)
+{
+}
 
 void CTileset::clear()
 {
@@ -232,7 +237,7 @@ unsigned int CTileset::getDefaultWoodTileIndex() const
 			i += 256;
 		} else {
 			if (tileinfo.BaseTerrain != 0 && tileinfo.MixTerrain == 0) {
-				if (tile.flag & MapFieldForest) {
+				if ((tile.flag & tile_flag::tree) != tile_flag::none) {
 					solid = i;
 					break;
 				}
@@ -511,8 +516,8 @@ int CTileset::getFromMixedLookupTable(int base_terrain, int tile) const
 //Wyrmgus end
 
 //Wyrmgus start
-//int CTileset::getTileBySurrounding(unsigned short type,
-int CTileset::getTileBySurrounding(unsigned short type,
+//int CTileset::getTileBySurrounding(const tile_flag type,
+int CTileset::getTileBySurrounding(const tile_flag type,
 								   int tile_index,
 //Wyrmgus end
 								   int ttup, int ttright,
@@ -562,8 +567,8 @@ int CTileset::getTileBySurrounding(unsigned short type,
 	*/
 	//Wyrmgus end
 
-	Assert(type == MapFieldForest || type == MapFieldRocks);
-	const std::array<int, 20> &lookuptable = (type == MapFieldForest) ? woodTable : rockTable;
+	Assert(type == tile_flag::tree || type == tile_flag::rock);
+	const std::array<int, 20> &lookuptable = (type == tile_flag::tree) ? woodTable : rockTable;
 	tile = lookuptable[tile];
 
 	//Wyrmgus start
@@ -587,7 +592,7 @@ int CTileset::getTileBySurrounding(unsigned short type,
 bool CTileset::isEquivalentTile(unsigned int tile1, unsigned int tile2, int tile_index) const
 //Wyrmgus end
 {
-	//Assert(type == MapFieldForest || type == MapFieldRocks);
+	//Assert(type == tile_flag::tree || type == tile_flag::rock);
 
 	//Wyrmgus start
 //	return mixedLookupTable[tile1] == mixedLookupTable[tile2];

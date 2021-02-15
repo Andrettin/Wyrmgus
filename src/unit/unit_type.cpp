@@ -43,6 +43,7 @@
 #include "luacallback.h"
 #include "map/map.h"
 #include "map/terrain_type.h"
+#include "map/tile_flag.h"
 #include "map/tileset.h"
 #include "missile.h"
 #include "mod.h"
@@ -497,6 +498,8 @@ unit_type::unit_type(const std::string &identifier) : detailed_data_entry(identi
 //	StartingResources(0),
 	//Wyrmgus end
 	UnitType(UnitTypeType::Land),
+	FieldFlags(tile_flag::none),
+	MovementMask(tile_flag::none),
 	Flip(1), LandUnit(0), AirUnit(0), SeaUnit(0),
 	ExplodeWhenKilled(0),
 	CanAttack(0),
@@ -1681,26 +1684,26 @@ void unit_type::UpdateDefaultBoolFlags()
 
 void unit_type::calculate_movement_mask()
 {
-	this->MovementMask = 0;
+	this->MovementMask = tile_flag::none;
 
 	//non-solid units can always be entered and they don't block anything
 	if (this->BoolFlag[NONSOLID_INDEX].value) {
 		if (this->BoolFlag[BUILDING_INDEX].value) {
-			this->MovementMask = MapFieldLandUnit |
-				MapFieldSeaUnit |
-				MapFieldBuilding |
-				MapFieldItem |
-				MapFieldBridge |
-				MapFieldCoastAllowed |
-				MapFieldWaterAllowed |
-				MapFieldNoBuilding |
-				MapFieldUnpassable |
-				MapFieldSpace |
-				MapFieldSpaceCliff;
-			this->FieldFlags = MapFieldNoBuilding;
+			this->MovementMask = tile_flag::land_unit |
+				tile_flag::sea_unit |
+				tile_flag::building |
+				tile_flag::item |
+				tile_flag::bridge |
+				tile_flag::coast_allowed |
+				tile_flag::water_allowed |
+				tile_flag::no_building |
+				tile_flag::impassable |
+				tile_flag::space |
+				tile_flag::space_cliff;
+			this->FieldFlags = tile_flag::no_building;
 		} else {
-			this->MovementMask = 0;
-			this->FieldFlags = 0;
+			this->MovementMask = tile_flag::none;
+			this->FieldFlags = tile_flag::none;
 		}
 		return;
 	}
@@ -1708,73 +1711,73 @@ void unit_type::calculate_movement_mask()
 	switch (this->UnitType) {
 		case UnitTypeType::Land:                              // on land
 			this->MovementMask =
-				MapFieldBuilding | // already occuppied
-				MapFieldCoastAllowed |
-				MapFieldWaterAllowed | // can't move on this
-				MapFieldUnpassable |
-				MapFieldSpace |
-				MapFieldSpaceCliff;
+				tile_flag::building | // already occuppied
+				tile_flag::coast_allowed |
+				tile_flag::water_allowed | // can't move on this
+				tile_flag::impassable |
+				tile_flag::space |
+				tile_flag::space_cliff;
 
 			if (!this->BoolFlag[DIMINUTIVE_INDEX].value) {
 				// diminutive units can enter tiles occupied by other units and vice-versa
-				this->MovementMask |= MapFieldLandUnit | MapFieldSeaUnit;
+				this->MovementMask |= tile_flag::land_unit | tile_flag::sea_unit;
 			}
 
 			if (this->BoolFlag[RAIL_INDEX].value) { //rail units can only move over railroads
-				this->MovementMask |= MapFieldNoRail;
+				this->MovementMask |= tile_flag::no_rail;
 			}
 			break;
 		case UnitTypeType::Fly:                               // in air
-			this->MovementMask = MapFieldAirUnpassable | MapFieldSpace;
+			this->MovementMask = tile_flag::air_impassable | tile_flag::space;
 
 			if (!this->BoolFlag[DIMINUTIVE_INDEX].value) {
-				this->MovementMask |= MapFieldAirUnit; // already occuppied
+				this->MovementMask |= tile_flag::air_unit; // already occuppied
 			}
 			break;
 		case UnitTypeType::FlyLow:                               // in low air
 			this->MovementMask =
-				MapFieldBuilding |
-				MapFieldUnpassable |
-				MapFieldAirUnpassable |
-				MapFieldSpace |
-				MapFieldSpaceCliff;
+				tile_flag::building |
+				tile_flag::impassable |
+				tile_flag::air_impassable |
+				tile_flag::space |
+				tile_flag::space_cliff;
 
 			if (!this->BoolFlag[DIMINUTIVE_INDEX].value) {
-				this->MovementMask |= MapFieldLandUnit | MapFieldSeaUnit;
+				this->MovementMask |= tile_flag::land_unit | tile_flag::sea_unit;
 			}
 			break;
 		case UnitTypeType::Naval: // on water
 			this->MovementMask =
-				MapFieldBuilding | // already occuppied
-				MapFieldBridge |
-				MapFieldLandAllowed | // can't move on this
-				MapFieldUnpassable |
-				MapFieldSpace |
-				MapFieldSpaceCliff;
+				tile_flag::building | // already occuppied
+				tile_flag::bridge |
+				tile_flag::land_allowed | // can't move on this
+				tile_flag::impassable |
+				tile_flag::space |
+				tile_flag::space_cliff;
 
 			if (!this->BoolFlag[CANDOCK_INDEX].value) {
-				this->MovementMask |= MapFieldCoastAllowed;
+				this->MovementMask |= tile_flag::coast_allowed;
 			}
 
 			if (!this->BoolFlag[DIMINUTIVE_INDEX].value) {
-				this->MovementMask |= MapFieldLandUnit | MapFieldSeaUnit;
+				this->MovementMask |= tile_flag::land_unit | tile_flag::sea_unit;
 			}
 			break;
 		case UnitTypeType::Space:
-			this->MovementMask = MapFieldAirUnpassable;
+			this->MovementMask = tile_flag::air_impassable;
 
 			if (!this->BoolFlag[DIMINUTIVE_INDEX].value) {
-				this->MovementMask |= MapFieldAirUnit; // already occuppied
+				this->MovementMask |= tile_flag::air_unit; // already occuppied
 			}
 
 			if (this->BoolFlag[BUILDING_INDEX].value) {
 				//space buildings must be on space itself, they cannot be on land or water
-				this->MovementMask |= MapFieldLandAllowed | MapFieldCoastAllowed | MapFieldWaterAllowed;
+				this->MovementMask |= tile_flag::land_allowed | tile_flag::coast_allowed | tile_flag::water_allowed;
 			}
 			break;
 		default:
 			DebugPrint("Where moves this unit?\n");
-			this->MovementMask = 0;
+			this->MovementMask = tile_flag::none;
 			break;
 	}
 
@@ -1782,19 +1785,19 @@ void unit_type::calculate_movement_mask()
 		// Shore building is something special.
 		if (this->BoolFlag[SHOREBUILDING_INDEX].value) {
 			this->MovementMask =
-				MapFieldLandUnit |
-				MapFieldSeaUnit |
-				MapFieldBuilding | // already occuppied
-				MapFieldBridge |
-				MapFieldLandAllowed | // can't build on this
-				MapFieldSpace;
+				tile_flag::land_unit |
+				tile_flag::sea_unit |
+				tile_flag::building | // already occuppied
+				tile_flag::bridge |
+				tile_flag::land_allowed | // can't build on this
+				tile_flag::space;
 		}
-		this->MovementMask |= MapFieldNoBuilding;
-		this->MovementMask |= MapFieldItem;
+		this->MovementMask |= tile_flag::no_building;
+		this->MovementMask |= tile_flag::item;
 
 		if (this->TerrainType != nullptr) {
-			if (this->TerrainType->Flags & MapFieldRoad) {
-				this->MovementMask |= MapFieldRailroad;
+			if (this->TerrainType->has_flag(tile_flag::road)) {
+				this->MovementMask |= tile_flag::railroad;
 			}
 		}
 
@@ -1803,59 +1806,59 @@ void unit_type::calculate_movement_mask()
 		// The oil-patch is a very special case.
 		//
 		if (this->MapDefaultStat.Variables[HP_INDEX].Max) {
-			this->FieldFlags = MapFieldBuilding;
+			this->FieldFlags = tile_flag::building;
 		} else {
-			this->FieldFlags = MapFieldNoBuilding;
+			this->FieldFlags = tile_flag::no_building;
 		}
 	} else if (this->BoolFlag[ITEM_INDEX].value || this->BoolFlag[POWERUP_INDEX].value || this->BoolFlag[TRAP_INDEX].value) {
-		this->MovementMask = MapFieldLandUnit |
-			MapFieldSeaUnit |
-			MapFieldBuilding |
-			MapFieldCoastAllowed |
-			MapFieldWaterAllowed |
-			MapFieldUnpassable |
-			MapFieldSpace |
-			MapFieldSpaceCliff |
-			MapFieldItem;
-		this->FieldFlags = MapFieldItem;
+		this->MovementMask = tile_flag::land_unit |
+			tile_flag::sea_unit |
+			tile_flag::building |
+			tile_flag::coast_allowed |
+			tile_flag::water_allowed |
+			tile_flag::impassable |
+			tile_flag::space |
+			tile_flag::space_cliff |
+			tile_flag::item;
+		this->FieldFlags = tile_flag::item;
 	} else if (this->BoolFlag[BRIDGE_INDEX].value) {
-		this->MovementMask = MapFieldSeaUnit |
-			MapFieldBuilding |
-			MapFieldLandAllowed |
-			MapFieldUnpassable |
-			MapFieldSpace |
-			MapFieldSpaceCliff |
-			MapFieldBridge;
-		this->FieldFlags = MapFieldBridge;
+		this->MovementMask = tile_flag::sea_unit |
+			tile_flag::building |
+			tile_flag::land_allowed |
+			tile_flag::impassable |
+			tile_flag::space |
+			tile_flag::space_cliff |
+			tile_flag::bridge;
+		this->FieldFlags = tile_flag::bridge;
 	} else if (!this->BoolFlag[DIMINUTIVE_INDEX].value) {
 		switch (this->UnitType) {
 			case UnitTypeType::Land: // on land
-				this->FieldFlags = MapFieldLandUnit;
+				this->FieldFlags = tile_flag::land_unit;
 
 				if (this->BoolFlag[GRAVEL_INDEX].value) {
-					this->FieldFlags |= MapFieldGravel;
+					this->FieldFlags |= tile_flag::gravel;
 				}
 				break;
 			case UnitTypeType::Fly: // in air
 			case UnitTypeType::Space:
-				this->FieldFlags = MapFieldAirUnit;
+				this->FieldFlags = tile_flag::air_unit;
 				break;
 			case UnitTypeType::FlyLow: // in low air
-				this->FieldFlags = MapFieldLandUnit;
+				this->FieldFlags = tile_flag::land_unit;
 				break;
 			case UnitTypeType::Naval: // on water
-				this->FieldFlags = MapFieldSeaUnit;
+				this->FieldFlags = tile_flag::sea_unit;
 				break;
 			default:
 				DebugPrint("Where moves this unit?\n");
-				this->FieldFlags = 0;
+				this->FieldFlags = tile_flag::none;
 				break;
 		}
 	}
 
 	if (this->BoolFlag[AIRUNPASSABLE_INDEX].value) { // for air unpassable units (i.e. doors)
-		this->FieldFlags |= MapFieldUnpassable;
-		this->FieldFlags |= MapFieldAirUnpassable;
+		this->FieldFlags |= tile_flag::impassable;
+		this->FieldFlags |= tile_flag::air_impassable;
 	}
 }
 

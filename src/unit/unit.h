@@ -953,7 +953,7 @@ extern const CBuildRestrictionOnTop *OnTopDetails(const wyrmgus::unit_type &type
 /// @todo more docu
 extern CUnit *CanBuildHere(const CUnit *unit, const wyrmgus::unit_type &type, const QPoint &pos, const int z, const bool no_bordering_building = false);
 /// @todo more docu
-extern bool CanBuildOn(const QPoint &pos, const int mask, const int z, const CPlayer *player, const wyrmgus::unit_type *unit_type);
+extern bool CanBuildOn(const QPoint &pos, const tile_flag mask, const int z, const CPlayer *player, const wyrmgus::unit_type *unit_type);
 /// FIXME: more docu
 extern CUnit *CanBuildUnitType(const CUnit *unit, const wyrmgus::unit_type &type, const QPoint &pos, const int real, const bool ignore_exploration, const int z, const bool no_bordering_building = false);
 /// Get the suitable animation frame depends of unit's damaged type.

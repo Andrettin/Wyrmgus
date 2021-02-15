@@ -78,6 +78,7 @@ namespace wyrmgus {
 	enum class gender;
 	enum class item_class;
 	enum class item_slot;
+	enum class tile_flag : uint32_t;
 }
 
 constexpr int UnitSides = 8;
@@ -1261,12 +1262,8 @@ public:
 
 	// --- FILLED UP ---
 
-	//Wyrmgus start
-//	unsigned FieldFlags;            /// Unit map field flags
-//	unsigned MovementMask;          /// Unit check this map flags for move
-	unsigned long FieldFlags = 0;            /// Unit map field flags
-	unsigned long MovementMask = 0;          /// Unit check this map flags for move
-	//Wyrmgus end
+	tile_flag FieldFlags;            /// Unit map field flags
+	tile_flag MovementMask;          /// Unit check this map flags for move
 
 	/// @todo This stats should? be moved into the player struct
 	CUnitStats Stats[PlayerMax];     /// Unit status for each player

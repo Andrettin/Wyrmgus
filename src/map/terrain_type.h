@@ -44,6 +44,7 @@ namespace wyrmgus {
 class resource;
 class season;
 class unit_type;
+enum class tile_flag : uint32_t;
 enum class tile_transition_type;
 
 class terrain_type final : public named_data_entry, public data_type<terrain_type>, public CDataType
@@ -152,14 +153,10 @@ public:
 		terrain_type::terrain_types_by_tile_number.clear();
 	}
 
-	explicit terrain_type(const std::string &identifier) : named_data_entry(identifier), CDataType(identifier)
-	{
-	}
-	
+	explicit terrain_type(const std::string &identifier);
 	~terrain_type();
 	
 	static void LoadTerrainTypeGraphics();
-	static unsigned long GetTerrainFlagByName(const std::string &flag_name);
 	
 private:
 	static inline std::map<char, terrain_type *> terrain_types_by_character;
@@ -268,6 +265,8 @@ public:
 	{
 		return this->overlay;
 	}
+
+	bool has_flag(const tile_flag flag) const;
 
 	bool is_buildable() const
 	{
@@ -414,7 +413,7 @@ public:
 private:
 	wyrmgus::resource *resource = nullptr;
 public:
-	unsigned long Flags = 0;
+	tile_flag Flags;
 private:
 	bool overlay = false;				/// Whether this terrain type belongs to the overlay layer
 	bool buildable = false;				/// Whether structures can be built upon this terrain type

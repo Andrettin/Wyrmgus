@@ -44,6 +44,7 @@
 #include "map/map.h"
 #include "map/map_layer.h"
 #include "map/tile.h"
+#include "map/tile_flag.h"
 #include "map/tileset.h"
 #include "missile.h"
 #include "player.h"
@@ -445,7 +446,7 @@ bool COrder_Still::AutoAttackStand(CUnit &unit)
 	if (firstContainer->MapDistanceTo(*autoAttackUnit) > unit.get_best_attack_range()) {
 		return false;
 	}
-	if (unit.get_best_attack_range() > 1 && CheckObstaclesBetweenTiles(unit.tilePos, autoAttackUnit->tilePos, MapFieldAirUnpassable, autoAttackUnit->MapLayer->ID) == false) {
+	if (unit.get_best_attack_range() > 1 && CheckObstaclesBetweenTiles(unit.tilePos, autoAttackUnit->tilePos, tile_flag::air_impassable, autoAttackUnit->MapLayer->ID) == false) {
 		return false;
 	}
 	this->State = SUB_STILL_ATTACK; // Mark attacking.

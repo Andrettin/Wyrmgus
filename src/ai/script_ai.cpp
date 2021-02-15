@@ -1698,7 +1698,7 @@ static int CclDefineAiPlayer(lua_State *l)
 				}
 				pos.x = LuaToNumber(l, -1, 1);
 				pos.y = LuaToNumber(l, -1, 2);
-				const int mask = LuaToNumber(l, -1, 3);
+				const tile_flag mask = static_cast<tile_flag>(LuaToUnsignedNumber(l, -1, 3));
 				lua_pop(l, 1);
 				AiExplorationRequest queue(pos, mask);
 				ai->FirstExplorationRequest.push_back(queue);

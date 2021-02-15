@@ -41,6 +41,7 @@
 #include "map/map.h"
 #include "map/map_layer.h"
 #include "map/tile.h"
+#include "map/tile_flag.h"
 #include "map/tileset.h"
 #include "pathfinder.h"
 #include "script.h"
@@ -171,7 +172,7 @@ int DoActionMove(CUnit &unit)
 				}
 			}
 		}
-	} else if ((mf.Flags & MapFieldBridge) && !unit.Type->BoolFlag[BRIDGE_INDEX].value && unit.Type->UnitType == UnitTypeType::Land) { //if the unit is a land unit over a raft, don't move if the raft is still moving
+	} else if (mf.has_flag(tile_flag::bridge) && !unit.Type->BoolFlag[BRIDGE_INDEX].value && unit.Type->UnitType == UnitTypeType::Land) { //if the unit is a land unit over a raft, don't move if the raft is still moving
 		std::vector<CUnit *> table;
 		Select(unit.tilePos, unit.tilePos, table, unit.MapLayer->ID);
 		for (size_t i = 0; i != table.size(); ++i) {
@@ -369,7 +370,7 @@ void COrder_Move::Execute(CUnit &unit)
 		case PF_REACHED:
 			//Wyrmgus start
 			if (this->Range >= 1) {
-				if ((unit.MapLayer->Field(unit.tilePos)->Flags & MapFieldBridge) && !unit.Type->BoolFlag[BRIDGE_INDEX].value && unit.Type->UnitType == UnitTypeType::Land) { //if the unit is a land unit over a raft
+				if (unit.MapLayer->Field(unit.tilePos)->has_flag(tile_flag::bridge) && !unit.Type->BoolFlag[BRIDGE_INDEX].value && unit.Type->UnitType == UnitTypeType::Land) { //if the unit is a land unit over a raft
 					std::vector<CUnit *> table;
 					Select(unit.tilePos, unit.tilePos, table, unit.MapLayer->ID);
 					for (size_t i = 0; i != table.size(); ++i) {

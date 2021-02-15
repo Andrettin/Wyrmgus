@@ -32,6 +32,7 @@
 #include "database/defines.h"
 #include "iolib.h"
 #include "map/terrain_feature.h"
+#include "map/tile_flag.h"
 #include "map/tileset.h"
 #include "player_color.h"
 #include "time/season.h"
@@ -74,67 +75,11 @@ void terrain_type::LoadTerrainTypeGraphics()
 	}
 }
 
-/**
-**	@brief	Get a terrain flag by name
-**
-**	@param	flag_name	The name of the terrain flag
-**
-**	@return	The terrain flag if it exists, or 0 otherwise
-*/
-unsigned long terrain_type::GetTerrainFlagByName(const std::string &flag_name)
+terrain_type::terrain_type(const std::string &identifier)
+	: named_data_entry(identifier), CDataType(identifier), Flags(tile_flag::none)
 {
-	if (flag_name == "land") {
-		return MapFieldLandAllowed;
-	} else if (flag_name == "coast") {
-		return MapFieldCoastAllowed;
-	} else if (flag_name == "water") {
-		return MapFieldWaterAllowed;
-	} else if (flag_name == "no-building" || flag_name == "no_building") {
-		return MapFieldNoBuilding;
-	} else if (flag_name == "unpassable") {
-		return MapFieldUnpassable;
-	} else if (flag_name == "wall") {
-		return MapFieldWall;
-	} else if (flag_name == "rock") {
-		return MapFieldRocks;
-	} else if (flag_name == "forest") {
-		return MapFieldForest;
-	} else if (flag_name == "air-unpassable" || flag_name == "air_unpassable") {
-		return MapFieldAirUnpassable;
-	} else if (flag_name == "desert") {
-		return MapFieldDesert;
-	} else if (flag_name == "dirt") {
-		return MapFieldDirt;
-	} else if (flag_name == "grass") {
-		return MapFieldGrass;
-	} else if (flag_name == "gravel") {
-		return MapFieldGravel;
-	} else if (flag_name == "ice") {
-		return MapFieldIce;
-	} else if (flag_name == "mud") {
-		return MapFieldMud;
-	} else if (flag_name == "railroad") {
-		return MapFieldRailroad;
-	} else if (flag_name == "road") {
-		return MapFieldRoad;
-	} else if (flag_name == "no-rail") {
-		return MapFieldNoRail;
-	} else if (flag_name == "snow") {
-		return MapFieldSnow;
-	} else if (flag_name == "stone_floor") {
-		return MapFieldStoneFloor;
-	} else if (flag_name == "stumps") {
-		return MapFieldStumps;
-	} else if (flag_name == "underground") {
-		return MapFieldUnderground;
-	} else if (flag_name == "space") {
-		return MapFieldSpace;
-	} else if (flag_name == "space_cliff") {
-		return MapFieldSpaceCliff;
-	} else {
-		throw std::runtime_error("Flag \"" + flag_name + "\" doesn't exist.");
-	}
 }
+
 
 terrain_type::~terrain_type()
 {
@@ -167,7 +112,7 @@ void terrain_type::process_sml_scope(const sml_data &scope)
 		}
 	} else if (tag == "flags") {
 		for (const std::string &value : values) {
-			const unsigned long flag = terrain_type::GetTerrainFlagByName(value);
+			const tile_flag flag = string_to_tile_flag(value);
 			this->Flags |= flag;
 		}
 	} else if (tag == "solid_tiles") {
@@ -266,7 +211,7 @@ void terrain_type::ProcessConfigData(const CConfigData *config_data)
 			this->resource = resource::get(value);
 		} else if (key == "flag") {
 			value = FindAndReplaceString(value, "_", "-");
-			const unsigned long flag = terrain_type::GetTerrainFlagByName(value);
+			const tile_flag flag = string_to_tile_flag(value);
 			this->Flags |= flag;
 		} else if (key == "graphics") {
 			graphics_file = value;
@@ -559,19 +504,24 @@ void terrain_type::set_elevation_image_file(const std::filesystem::path &filepat
 	this->elevation_image_file = database::get()->get_graphics_path(this->get_module()) / filepath;
 }
 
+bool terrain_type::has_flag(const tile_flag flag) const
+{
+	return (this->Flags & flag) != tile_flag::none;
+}
+
 bool terrain_type::is_water() const
 {
-	return this->Flags & MapFieldWaterAllowed;
+	return this->has_flag(tile_flag::water_allowed);
 }
 
 bool terrain_type::is_wall() const
 {
-	return this->Flags & MapFieldWall;
+	return this->has_flag(tile_flag::wall);
 }
 
 bool terrain_type::is_constructed() const
 {
-	return this->is_overlay() && (this->is_wall() || (this->Flags & MapFieldRoad) || (this->Flags & MapFieldRailroad));
+	return this->is_overlay() && (this->is_wall() || this->has_flag(tile_flag::road) || this->has_flag(tile_flag::railroad));
 }
 
 QVariantList terrain_type::get_base_terrain_types_qvariant_list() const

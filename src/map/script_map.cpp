@@ -49,6 +49,7 @@
 #include "map/terrain_feature.h"
 #include "map/terrain_type.h"
 #include "map/tile.h"
+#include "map/tile_flag.h"
 #include "map/tileset.h"
 #include "map/world.h"
 //Wyrmgus start
@@ -958,7 +959,7 @@ static int CclSetTileFlags(lua_State *l)
 		LuaError(l, "Accessed a tile that's not defined");
 	}
 	int j = 0;
-	int flags = 0;
+	tile_flag flags = tile_flag::none;
 
 	ParseTilesetTileFlags(l, &flags, &j);
 	CMap::Map.Tileset->tiles[tilenumber].flag = flags;
@@ -1071,69 +1072,17 @@ static int CclGetTileTerrainHasFlag(lua_State *l)
 		lua_pushboolean(l, 0);
 		return 1;
 	}
-	
-//	unsigned short flag = 0;
-	unsigned long flag = 0;
 	//Wyrmgus end
-	const char *flag_name = LuaToString(l, 3);
-	if (!strcmp(flag_name, "water")) {
-		flag = MapFieldWaterAllowed;
-	} else if (!strcmp(flag_name, "land")) {
-		flag = MapFieldLandAllowed;
-	} else if (!strcmp(flag_name, "coast")) {
-		flag = MapFieldCoastAllowed;
-	} else if (!strcmp(flag_name, "no-building")) {
-		flag = MapFieldNoBuilding;
-	} else if (!strcmp(flag_name, "unpassable")) {
-		flag = MapFieldUnpassable;
-	//Wyrmgus start
-	} else if (!strcmp(flag_name, "air-unpassable")) {
-		flag = MapFieldAirUnpassable;
-	} else if (!strcmp(flag_name, "desert")) {
-		flag = MapFieldDesert;
-	} else if (!strcmp(flag_name, "dirt")) {
-		flag = MapFieldDirt;
-	} else if (!strcmp(flag_name, "grass")) {
-		flag = MapFieldGrass;
-	} else if (!strcmp(flag_name, "gravel")) {
-		flag = MapFieldGravel;
-	} else if (!strcmp(flag_name, "ice")) {
-		flag = MapFieldIce;
-	} else if (!strcmp(flag_name, "mud")) {
-		flag = MapFieldMud;
-	} else if (!strcmp(flag_name, "railroad")) {
-		flag = MapFieldRailroad;
-	} else if (!strcmp(flag_name, "road")) {
-		flag = MapFieldRoad;
-	} else if (!strcmp(flag_name, "no-rail")) {
-		flag = MapFieldNoRail;
-	} else if (!strcmp(flag_name, "snow")) {
-		flag = MapFieldSnow;
-	} else if (!strcmp(flag_name, "stone_floor")) {
-		flag = MapFieldStoneFloor;
-	} else if (!strcmp(flag_name, "stumps")) {
-		flag = MapFieldStumps;
-	//Wyrmgus end
-	} else if (!strcmp(flag_name, "underground")) {
-		flag = MapFieldUnderground;
-	} else if (!strcmp(flag_name, "space")) {
-		flag = MapFieldSpace;
-	} else if (!strcmp(flag_name, "wall")) {
-		flag = MapFieldWall;
-	} else if (!strcmp(flag_name, "rock")) {
-		flag = MapFieldRocks;
-	} else if (!strcmp(flag_name, "forest")) {
-		flag = MapFieldForest;
-	} else if (!strcmp(flag_name, "space_cliff")) {
-		flag = MapFieldSpaceCliff;
-	}
+
+	const std::string flag_name = LuaToString(l, 3);
+	const tile_flag flag = string_to_tile_flag(flag_name);
 
 	//Wyrmgus start
 //	const wyrmgus::tile &mf = *CMap::Map.Field(pos);
 	const wyrmgus::tile &mf = *CMap::Map.Field(pos, z);
 	//Wyrmgus end
 
-	if (mf.get_flags() & flag) {
+	if (mf.has_flag(flag)) {
 		lua_pushboolean(l, 1);
 	} else {
 		lua_pushboolean(l, 0);
@@ -1237,61 +1186,12 @@ static int CclDefineTerrainType(lua_State *l)
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument");
 			}
-			terrain->Flags = 0;
+			terrain->Flags = tile_flag::none;
 			const int subargs = lua_rawlen(l, -1);
 			for (int j = 0; j < subargs; ++j) {
-				std::string tile_flag = LuaToString(l, -1, j + 1);
-				if (tile_flag == "land") {
-					terrain->Flags |= MapFieldLandAllowed;
-				} else if (tile_flag == "coast") {
-					terrain->Flags |= MapFieldCoastAllowed;
-				} else if (tile_flag == "water") {
-					terrain->Flags |= MapFieldWaterAllowed;
-				} else if (tile_flag == "no-building") {
-					terrain->Flags |= MapFieldNoBuilding;
-				} else if (tile_flag == "unpassable") {
-					terrain->Flags |= MapFieldUnpassable;
-				} else if (tile_flag == "wall") {
-					terrain->Flags |= MapFieldWall;
-				} else if (tile_flag == "rock") {
-					terrain->Flags |= MapFieldRocks;
-				} else if (tile_flag == "forest") {
-					terrain->Flags |= MapFieldForest;
-				} else if (tile_flag == "air-unpassable") {
-					terrain->Flags |= MapFieldAirUnpassable;
-				} else if (tile_flag == "desert") {
-					terrain->Flags |= MapFieldDesert;
-				} else if (tile_flag == "dirt") {
-					terrain->Flags |= MapFieldDirt;
-				} else if (tile_flag == "grass") {
-					terrain->Flags |= MapFieldGrass;
-				} else if (tile_flag == "gravel") {
-					terrain->Flags |= MapFieldGravel;
-				} else if (tile_flag == "ice") {
-					terrain->Flags |= MapFieldIce;
-				} else if (tile_flag == "mud") {
-					terrain->Flags |= MapFieldMud;
-				} else if (tile_flag == "railroad") {
-					terrain->Flags |= MapFieldRailroad;
-				} else if (tile_flag == "road") {
-					terrain->Flags |= MapFieldRoad;
-				} else if (tile_flag == "no-rail") {
-					terrain->Flags |= MapFieldNoRail;
-				} else if (tile_flag == "snow") {
-					terrain->Flags |= MapFieldSnow;
-				} else if (tile_flag == "stone_floor") {
-					terrain->Flags |= MapFieldStoneFloor;
-				} else if (tile_flag == "stumps") {
-					terrain->Flags |= MapFieldStumps;
-				} else if (tile_flag == "underground") {
-					terrain->Flags |= MapFieldUnderground;
-				} else if (tile_flag == "space") {
-					terrain->Flags |= MapFieldSpace;
-				} else if (tile_flag == "space_cliff") {
-					terrain->Flags |= MapFieldSpaceCliff;
-				} else {
-					LuaError(l, "Flag \"%s\" doesn't exist." _C_ tile_flag.c_str());
-				}
+				const std::string tile_flag_str = LuaToString(l, -1, j + 1);
+				const tile_flag tile_flag = string_to_tile_flag(tile_flag_str);
+				terrain->Flags |= tile_flag;
 			}
 		} else if (!strcmp(value, "Graphics")) {
 			graphics_file = LuaToString(l, -1);

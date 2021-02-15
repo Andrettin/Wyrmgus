@@ -38,6 +38,7 @@
 #include "map/site_game_data.h"
 #include "map/terrain_feature.h"
 #include "map/terrain_type.h"
+#include "map/tile_flag.h"
 #include "map/tileset.h"
 #include "player.h"
 #include "script.h"
@@ -48,7 +49,7 @@
 
 namespace wyrmgus {
 
-tile::tile()
+tile::tile() : Flags(tile_flag::none)
 {
 	this->player_info = std::make_unique<tile_player_info>();
 }
@@ -86,7 +87,12 @@ const resource *tile::get_resource() const
 
 bool tile::is_destroyed_tree_tile() const
 {
-	return this->get_overlay_terrain() != nullptr && this->OverlayTerrainDestroyed && (this->get_flags() & MapFieldStumps);
+	return this->get_overlay_terrain() != nullptr && this->OverlayTerrainDestroyed && this->has_flag(tile_flag::stumps);
+}
+
+bool tile::has_flag(const tile_flag flag) const
+{
+	return (this->get_flags() & flag) != tile_flag::none;
 }
 
 //Wyrmgus start
@@ -108,15 +114,15 @@ void tile::SetTerrain(const terrain_type *terrain_type)
 			this->Flags &= ~(this->get_overlay_terrain()->Flags);
 
 			if (this->OverlayTerrainDestroyed) {
-				if (this->get_overlay_terrain()->Flags & MapFieldForest) {
-					this->Flags &= ~(MapFieldStumps);
+				if (this->get_overlay_terrain()->has_flag(tile_flag::tree)) {
+					this->Flags &= ~(tile_flag::stumps);
 				}
 
-				if (((this->get_overlay_terrain()->Flags & MapFieldRocks) || (this->get_overlay_terrain()->Flags & MapFieldWall)) && !(this->get_terrain()->Flags & MapFieldGravel)) {
-					this->Flags &= ~(MapFieldGravel);
+				if ((this->get_overlay_terrain()->has_flag(tile_flag::rock) || this->get_overlay_terrain()->has_flag(tile_flag::wall)) && !this->get_terrain()->has_flag(tile_flag::gravel)) {
+					this->Flags &= ~(tile_flag::gravel);
 				}
 			}
-			this->Flags &= ~(MapFieldGravel);
+			this->Flags &= ~(tile_flag::gravel);
 		}
 	} else {
 		if (this->get_terrain() == terrain_type) {
@@ -131,16 +137,16 @@ void tile::SetTerrain(const terrain_type *terrain_type)
 		if (this->get_terrain() == nullptr || !vector::contains(terrain_type->get_base_terrain_types(), this->get_terrain())) {
 			this->SetTerrain(terrain_type->get_base_terrain_types().front());
 		}
-		if ((terrain_type->Flags & MapFieldWaterAllowed) || terrain_type->Flags & MapFieldSpace) {
+		if (terrain_type->has_flag(tile_flag::water_allowed) || terrain_type->has_flag(tile_flag::space)) {
 			//if the overlay is water or space, remove all flags from the base terrain
 			this->Flags &= ~(this->get_terrain()->Flags);
 
-			if (terrain_type->Flags & MapFieldWaterAllowed) {
-				this->Flags &= ~(MapFieldCoastAllowed); // need to do this manually, since MapFieldCoast is added dynamically
+			if (terrain_type->has_flag(tile_flag::water_allowed)) {
+				this->Flags &= ~(tile_flag::coast_allowed); // need to do this manually, since MapFieldCoast is added dynamically
 			}
 
-			if (terrain_type->Flags & MapFieldSpace) {
-				this->Flags &= ~(MapFieldSpaceCliff); // need to do this manually, since MapFieldSpaceCliff is added dynamically
+			if (terrain_type->has_flag(tile_flag::space)) {
+				this->Flags &= ~(tile_flag::space_cliff); // need to do this manually, since tile_flag::space_cliff is added dynamically
 			}
 		}
 		this->overlay_terrain = terrain_type;
@@ -150,8 +156,8 @@ void tile::SetTerrain(const terrain_type *terrain_type)
 		this->terrain = terrain_type;
 		if (this->get_overlay_terrain() != nullptr && !vector::contains(this->get_overlay_terrain()->get_base_terrain_types(), terrain_type)) { //if the overlay terrain is incompatible with the new base terrain, remove the overlay
 			this->Flags &= ~(this->get_overlay_terrain()->Flags);
-			this->Flags &= ~(MapFieldCoastAllowed); // need to do this manually, since MapFieldCoast is added dynamically
-			this->Flags &= ~(MapFieldSpaceCliff); // need to do this manually, since MapFieldSpaceCliff is added dynamically
+			this->Flags &= ~(tile_flag::coast_allowed); // need to do this manually, since MapFieldCoast is added dynamically
+			this->Flags &= ~(tile_flag::space_cliff); // need to do this manually, since tile_flag::space_cliff is added dynamically
 			this->overlay_terrain = nullptr;
 			this->OverlayTransitionTiles.clear();
 		}
@@ -180,9 +186,9 @@ void tile::SetTerrain(const terrain_type *terrain_type)
 	for (size_t i = 0; i != cache.size(); ++i) {
 		CUnit &unit = *cache[i];
 		if (unit.IsAliveOnMap()) {
-			if (unit.Type->BoolFlag[AIRUNPASSABLE_INDEX].value) { // restore MapFieldAirUnpassable related to units (i.e. doors)
-				this->Flags |= MapFieldUnpassable;
-				this->Flags |= MapFieldAirUnpassable;
+			if (unit.Type->BoolFlag[AIRUNPASSABLE_INDEX].value) { // restore tile_flag::air_impassable related to units (i.e. doors)
+				this->Flags |= tile_flag::impassable;
+				this->Flags |= tile_flag::air_impassable;
 			}
 			const unit_type_variation *variation = unit.GetVariation();
 			if (variation != nullptr && !unit.can_have_variation(variation)) { // if a unit that is on the tile has a terrain-dependent variation that is not compatible with the current variation, repick the unit's variation
@@ -193,22 +199,22 @@ void tile::SetTerrain(const terrain_type *terrain_type)
 
 	this->update_movement_cost();
 
-	if (this->Flags & MapFieldRailroad) {
-		this->Flags &= ~(MapFieldNoRail);
+	if (this->has_flag(tile_flag::railroad)) {
+		this->Flags &= ~(tile_flag::no_rail);
 	} else {
-		this->Flags |= MapFieldNoRail;
+		this->Flags |= tile_flag::no_rail;
 	}
 
-	if (is_overlay && (this->Flags & MapFieldUnderground) && (this->Flags & MapFieldWall)) {
+	if (is_overlay && this->has_flag(tile_flag::underground) && this->has_flag(tile_flag::wall)) {
 		//underground walls are not passable by air units
-		this->Flags |= MapFieldAirUnpassable;
+		this->Flags |= tile_flag::air_impassable;
 	}
 
 	//wood and rock tiles must always begin with the default value for their respective resource types
 	if (is_overlay) {
 		if (terrain_type->get_resource() != nullptr) {
 			this->value = terrain_type->get_resource()->get_default_amount();
-		} else if ((terrain_type->Flags & MapFieldWall) && terrain_type->UnitType) {
+		} else if (terrain_type->has_flag(tile_flag::wall) && terrain_type->UnitType) {
 			this->value = terrain_type->UnitType->MapDefaultStat.Variables[HP_INDEX].Max;
 		}
 	}
@@ -231,7 +237,7 @@ void tile::RemoveOverlayTerrain()
 	if (this->get_resource() != nullptr && this->get_settlement() != nullptr) {
 		//decrement the resource tile count for the tile's settlement
 		//forest tiles aren't decremented on overlay destruction, since they can regrow, so we need to decrement them now even if the overlay terrain has already been destroyed
-		const bool already_decremented = this->OverlayTerrainDestroyed && !(this->get_overlay_terrain()->Flags & MapFieldForest);
+		const bool already_decremented = this->OverlayTerrainDestroyed && !this->get_overlay_terrain()->has_flag(tile_flag::tree);
 		if (!already_decremented) {
 			this->get_settlement()->get_game_data()->decrement_resource_tile_count(this->get_resource());
 		}
@@ -240,30 +246,30 @@ void tile::RemoveOverlayTerrain()
 	this->value = 0;
 	this->Flags &= ~(this->get_overlay_terrain()->Flags);
 
-	this->Flags &= ~(MapFieldCoastAllowed); // need to do this manually, since MapFieldCoast is added dynamically
-	this->Flags &= ~(MapFieldSpaceCliff); // need to do this manually, since MapFieldSpaceCliff is added dynamically
+	this->Flags &= ~(tile_flag::coast_allowed); // need to do this manually, since tile_flag::coast_allowed is added dynamically
+	this->Flags &= ~(tile_flag::space_cliff); // need to do this manually, since tile_flag::space_cliff is added dynamically
 	this->overlay_terrain = nullptr;
 	this->OverlayTerrainDestroyed = false;
 	this->OverlayTerrainDamaged = false;
 	this->OverlayTransitionTiles.clear();
 
 	this->Flags |= this->get_terrain()->Flags;
-	// restore MapFieldAirUnpassable related to units (i.e. doors)
+	// restore tile_flag::air_impassable related to units (i.e. doors)
 	const CUnitCache &cache = this->UnitCache;
 	for (size_t i = 0; i != cache.size(); ++i) {
 		CUnit &unit = *cache[i];
 		if (unit.IsAliveOnMap() && unit.Type->BoolFlag[AIRUNPASSABLE_INDEX].value) {
-			this->Flags |= MapFieldUnpassable;
-			this->Flags |= MapFieldAirUnpassable;
+			this->Flags |= tile_flag::impassable;
+			this->Flags |= tile_flag::air_impassable;
 		}
 	}
 
 	this->update_movement_cost();
 
-	if (this->Flags & MapFieldRailroad) {
-		this->Flags &= ~(MapFieldNoRail);
+	if (this->has_flag(tile_flag::railroad)) {
+		this->Flags &= ~(tile_flag::no_rail);
 	} else {
-		this->Flags |= MapFieldNoRail;
+		this->Flags |= tile_flag::no_rail;
 	}
 
 	if (this->get_terrain_feature() != nullptr) {
@@ -280,7 +286,7 @@ void tile::SetOverlayTerrainDestroyed(bool destroyed)
 	if (this->get_resource() != nullptr && this->get_settlement() != nullptr) {
 		//decrement the resource tile count for the tile's settlement
 		//forest tiles aren't decremented on overlay destruction, since they can regrow
-		if (!(this->get_overlay_terrain()->Flags & MapFieldForest)) {
+		if (!this->get_overlay_terrain()->has_flag(tile_flag::tree)) {
 			this->get_settlement()->get_game_data()->decrement_resource_tile_count(this->get_resource());
 		}
 	}
@@ -311,17 +317,17 @@ void tile::setTileIndex(const CTileset &tileset, unsigned int tileIndex, int val
 #if 0
 	this->Flags = tile.flag;
 #else
-	this->Flags &= ~(MapFieldLandAllowed | MapFieldCoastAllowed |
-					 MapFieldWaterAllowed | MapFieldNoBuilding | MapFieldUnpassable |
+	this->Flags &= ~(tile_flag::land_allowed | tile_flag::coast_allowed |
+					 tile_flag::water_allowed | tile_flag::no_building | tile_flag::impassable |
 					 //Wyrmgus start
-//					 MapFieldWall | MapFieldRocks | MapFieldForest);
-					 MapFieldWall | MapFieldRocks | MapFieldForest |
-					 MapFieldAirUnpassable | MapFieldDirt | MapFieldGrass |
-					 MapFieldGravel | MapFieldMud | MapFieldStoneFloor | MapFieldStumps);
+//					 tile_flag::wall | tile_flag::rock | tile_flag::tree);
+					 tile_flag::wall | tile_flag::rock | tile_flag::tree |
+					 tile_flag::air_impassable | tile_flag::dirt | tile_flag::grass |
+					 tile_flag::gravel | tile_flag::mud | tile_flag::stone_floor | tile_flag::stumps);
 					 //Wyrmgus end
 	this->Flags |= tile.flag;
 #endif
-	this->movement_cost = 1 << (tile.flag & MapFieldSpeedMask);
+	this->movement_cost = 8;
 #ifdef DEBUG
 	this->tilesetTile = tileIndex;
 #endif
@@ -331,9 +337,9 @@ void tile::setTileIndex(const CTileset &tileset, unsigned int tileIndex, int val
 	//Wyrmgus start
 	terrain_type *terrain = terrain_type::get(tileset.getTerrainName(tile.tileinfo.BaseTerrain));
 	if (terrain->is_overlay()) {
-		if (terrain->Flags & MapFieldForest) {
+		if (terrain->has_flag(tile_flag::tree)) {
 			this->SetTerrain(terrain_type::get(tileset.solidTerrainTypes[3].TerrainName));
-		} else if (terrain->Flags & MapFieldRocks || terrain->Flags & MapFieldWaterAllowed) {
+		} else if (terrain->has_flag(tile_flag::rock) || terrain->has_flag(tile_flag::water_allowed)) {
 			this->SetTerrain(terrain_type::get(tileset.solidTerrainTypes[2].TerrainName));
 		}
 	}
@@ -406,80 +412,77 @@ void tile::Save(CFile &file) const
 		file.printf(", \"explored\", \"%s\"", exploration_str.c_str());
 	}
 
-	if (Flags & MapFieldLandAllowed) {
+	if (this->has_flag(tile_flag::land_allowed)) {
 		file.printf(", \"land\"");
 	}
-	if (Flags & MapFieldCoastAllowed) {
+	if (this->has_flag(tile_flag::coast_allowed)) {
 		file.printf(", \"coast\"");
 	}
-	if (Flags & MapFieldWaterAllowed) {
+	if (this->has_flag(tile_flag::water_allowed)) {
 		file.printf(", \"water\"");
 	}
-	if (Flags & MapFieldSpace) {
+	if (this->has_flag(tile_flag::space)) {
 		file.printf(", \"space\"");
 	}
-	if (Flags & MapFieldUnderground) {
+	if (this->has_flag(tile_flag::underground)) {
 		file.printf(", \"underground\"");
 	}
-	if (Flags & MapFieldNoBuilding) {
-		//Wyrmgus start
-//		file.printf(", \"mud\"");
+	if (this->has_flag(tile_flag::no_building)) {
 		file.printf(", \"no-building\"");
-		//Wyrmgus end
 	}
-	if (Flags & MapFieldUnpassable) {
+	if (this->has_flag(tile_flag::impassable)) {
 		file.printf(", \"block\"");
 	}
-	if (Flags & MapFieldWall) {
+	if (this->has_flag(tile_flag::wall)) {
 		file.printf(", \"wall\"");
 	}
-	if (Flags & MapFieldRocks) {
+	if (this->has_flag(tile_flag::rock)) {
 		file.printf(", \"rock\"");
 	}
-	if (Flags & MapFieldForest) {
+	if (this->has_flag(tile_flag::tree)) {
 		file.printf(", \"wood\"");
 	}
-	if (Flags & MapFieldSpaceCliff) {
+	if (this->has_flag(tile_flag::space_cliff)) {
 		file.printf(", \"space_cliff\"");
 	}
 	//Wyrmgus start
-	if (Flags & MapFieldAirUnpassable) {
+	if (this->has_flag(tile_flag::air_impassable)) {
 		file.printf(", \"air-unpassable\"");
 	}
-	if (Flags & MapFieldDesert) {
+	if (this->has_flag(tile_flag::desert)) {
 		file.printf(", \"desert\"");
 	}
-	if (Flags & MapFieldDirt) {
+	if (this->has_flag(tile_flag::dirt)) {
 		file.printf(", \"dirt\"");
 	}
-	if (Flags & MapFieldIce) {
+	if (this->has_flag(tile_flag::ice)) {
 		file.printf(", \"ice\"");
 	}
-	if (Flags & MapFieldGrass) {
+	if (this->has_flag(tile_flag::grass)) {
 		file.printf(", \"grass\"");
 	}
-	if (Flags & MapFieldGravel) {
+	if (this->has_flag(tile_flag::gravel)) {
 		file.printf(", \"gravel\"");
 	}
-	if (Flags & MapFieldMud) {
+	if (this->has_flag(tile_flag::mud)) {
 		file.printf(", \"mud\"");
 	}
-	if (Flags & MapFieldRailroad) {
+	if (this->has_flag(tile_flag::railroad)) {
 		file.printf(", \"railroad\"");
 	}
-	if (Flags & MapFieldRoad) {
+	if (this->has_flag(tile_flag::road)) {
 		file.printf(", \"road\"");
 	}
-	if (Flags & MapFieldNoRail) {
+	if (this->has_flag(tile_flag::no_rail)) {
 		file.printf(", \"no-rail\"");
 	}
-	if (Flags & MapFieldSnow) {
+	if (this->has_flag(tile_flag::snow)) {
 		file.printf(", \"snow\"");
 	}
-	if (Flags & MapFieldStoneFloor) {
+	if (this->has_flag(tile_flag::stone_floor)) {
 		file.printf(", \"stone_floor\"");
 	}
-	if (Flags & MapFieldStumps) {
+	if (this->has_flag(tile_flag::stumps)) {
 		file.printf(", \"stumps\"");
 	}
 
@@ -487,23 +490,23 @@ void tile::Save(CFile &file) const
 	// Not Required for save
 	// These are required for now, UnitType::FieldFlags is 0 until
 	// UpdateStats is called which is after the game is loaded
-	if (Flags & MapFieldLandUnit) {
+	if (this->has_flag(tile_flag::land_unit)) {
 		file.printf(", \"ground\"");
 	}
-	if (Flags & MapFieldAirUnit) {
+	if (this->has_flag(tile_flag::air_unit)) {
 		file.printf(", \"air\"");
 	}
-	if (Flags & MapFieldSeaUnit) {
+	if (this->has_flag(tile_flag::sea_unit)) {
 		file.printf(", \"sea\"");
 	}
-	if (Flags & MapFieldBuilding) {
+	if (this->has_flag(tile_flag::building)) {
 		file.printf(", \"building\"");
 	}
 	//Wyrmgus start
-	if (Flags & MapFieldItem) {
+	if (this->has_flag(tile_flag::item)) {
 		file.printf(", \"item\"");
 	}
-	if (Flags & MapFieldBridge) {
+	if (this->has_flag(tile_flag::bridge)) {
 		file.printf(", \"bridge\"");
 	}
 	//Wyrmgus end
@@ -618,68 +621,65 @@ void tile::parse(lua_State *l)
 				}
 			}
 		} else if (!strcmp(value, "land")) {
-			this->Flags |= MapFieldLandAllowed;
+			this->Flags |= tile_flag::land_allowed;
 		} else if (!strcmp(value, "coast")) {
-			this->Flags |= MapFieldCoastAllowed;
+			this->Flags |= tile_flag::coast_allowed;
 		} else if (!strcmp(value, "water")) {
-			this->Flags |= MapFieldWaterAllowed;
-			//Wyrmgus start
-	//		} else if (!strcmp(value, "mud")) {
+			this->Flags |= tile_flag::water_allowed;
 		} else if (!strcmp(value, "no-building")) {
-			//Wyrmgus end
-			this->Flags |= MapFieldNoBuilding;
+			this->Flags |= tile_flag::no_building;
 		} else if (!strcmp(value, "block")) {
-			this->Flags |= MapFieldUnpassable;
+			this->Flags |= tile_flag::impassable;
 		} else if (!strcmp(value, "wall")) {
-			this->Flags |= MapFieldWall;
+			this->Flags |= tile_flag::wall;
 		} else if (!strcmp(value, "rock")) {
-			this->Flags |= MapFieldRocks;
+			this->Flags |= tile_flag::rock;
 		} else if (!strcmp(value, "wood")) {
-			this->Flags |= MapFieldForest;
+			this->Flags |= tile_flag::tree;
 		} else if (!strcmp(value, "space_cliff")) {
-			this->Flags |= MapFieldSpaceCliff;
+			this->Flags |= tile_flag::space_cliff;
 		} else if (!strcmp(value, "ground")) {
-			this->Flags |= MapFieldLandUnit;
+			this->Flags |= tile_flag::land_unit;
 		} else if (!strcmp(value, "air")) {
-			this->Flags |= MapFieldAirUnit;
+			this->Flags |= tile_flag::air_unit;
 		} else if (!strcmp(value, "sea")) {
-			this->Flags |= MapFieldSeaUnit;
+			this->Flags |= tile_flag::sea_unit;
 		} else if (!strcmp(value, "building")) {
-			this->Flags |= MapFieldBuilding;
+			this->Flags |= tile_flag::building;
 		} else if (!strcmp(value, "item")) {
-			this->Flags |= MapFieldItem;
+			this->Flags |= tile_flag::item;
 		} else if (!strcmp(value, "bridge")) {
-			this->Flags |= MapFieldBridge;
+			this->Flags |= tile_flag::bridge;
 		} else if (!strcmp(value, "air-unpassable")) {
-			this->Flags |= MapFieldAirUnpassable;
+			this->Flags |= tile_flag::air_impassable;
 		} else if (!strcmp(value, "desert")) {
-			this->Flags |= MapFieldDesert;
+			this->Flags |= tile_flag::desert;
 		} else if (!strcmp(value, "dirt")) {
-			this->Flags |= MapFieldDirt;
+			this->Flags |= tile_flag::dirt;
 		} else if (!strcmp(value, "grass")) {
-			this->Flags |= MapFieldGrass;
+			this->Flags |= tile_flag::grass;
 		} else if (!strcmp(value, "gravel")) {
-			this->Flags |= MapFieldGravel;
+			this->Flags |= tile_flag::gravel;
 		} else if (!strcmp(value, "ice")) {
-			this->Flags |= MapFieldIce;
+			this->Flags |= tile_flag::ice;
 		} else if (!strcmp(value, "mud")) {
-			this->Flags |= MapFieldMud;
+			this->Flags |= tile_flag::mud;
 		} else if (!strcmp(value, "railroad")) {
-			this->Flags |= MapFieldRailroad;
+			this->Flags |= tile_flag::railroad;
 		} else if (!strcmp(value, "road")) {
-			this->Flags |= MapFieldRoad;
+			this->Flags |= tile_flag::road;
 		} else if (!strcmp(value, "no-rail")) {
-			this->Flags |= MapFieldNoRail;
+			this->Flags |= tile_flag::no_rail;
 		} else if (!strcmp(value, "snow")) {
-			this->Flags |= MapFieldSnow;
+			this->Flags |= tile_flag::snow;
 		} else if (!strcmp(value, "stone_floor")) {
-			this->Flags |= MapFieldStoneFloor;
+			this->Flags |= tile_flag::stone_floor;
 		} else if (!strcmp(value, "stumps")) {
-			this->Flags |= MapFieldStumps;
+			this->Flags |= tile_flag::stumps;
 		} else if (!strcmp(value, "underground")) {
-			this->Flags |= MapFieldUnderground;
+			this->Flags |= tile_flag::underground;
 		} else if (!strcmp(value, "space")) {
-			this->Flags |= MapFieldSpace;
+			this->Flags |= tile_flag::space;
 		} else {
 			LuaError(l, "Unsupported tag: %s" _C_ value);
 		}
@@ -687,32 +687,32 @@ void tile::parse(lua_State *l)
 }
 
 /// Check if a field flags.
-bool tile::CheckMask(const int mask) const
+bool tile::CheckMask(const tile_flag mask) const
 {
 	//Wyrmgus start
-	//for purposes of this check, don't count MapFieldWaterAllowed and MapFieldCoastAllowed if there is a bridge present
-	int check_flags = this->Flags;
-	if (check_flags & MapFieldBridge) {
-		check_flags &= ~(MapFieldWaterAllowed | MapFieldCoastAllowed);
+	//for purposes of this check, don't count tile_flag::water_allowed and tile_flag::coast_allowed if there is a bridge present
+	tile_flag check_flags = this->Flags;
+	if ((check_flags & tile_flag::bridge) != tile_flag::none) {
+		check_flags &= ~(tile_flag::water_allowed | tile_flag::coast_allowed);
 	}
 	//	return (this->Flags & mask) != 0;
-	return (check_flags & mask) != 0;
+	return (check_flags & mask) != tile_flag::none;
 	//Wyrmgus end
 }
 
 bool tile::is_water() const
 {
-	return this->Flags & (MapFieldWaterAllowed | MapFieldCoastAllowed);
+	return (this->Flags & (tile_flag::water_allowed | tile_flag::coast_allowed)) != tile_flag::none;
 }
 
 bool tile::is_non_coastal_water() const
 {
-	return this->Flags & MapFieldWaterAllowed;
+	return this->has_flag(tile_flag::water_allowed);
 }
 
 bool tile::is_coastal_water() const
 {
-	return this->Flags & MapFieldCoastAllowed;
+	return this->has_flag(tile_flag::coast_allowed);
 }
 
 bool tile::is_river() const
@@ -722,36 +722,36 @@ bool tile::is_river() const
 
 bool tile::is_space() const
 {
-	return (this->Flags & MapFieldSpace) || (this->Flags & MapFieldSpaceCliff);
+	return this->has_flag(tile_flag::space) || this->has_flag(tile_flag::space_cliff);
 }
 
 /// Returns true, if water on the map tile field
 bool tile::WaterOnMap() const
 {
-	return CheckMask(MapFieldWaterAllowed);
+	return CheckMask(tile_flag::water_allowed);
 }
 
 /// Returns true, if coast on the map tile field
 bool tile::CoastOnMap() const
 {
-	return CheckMask(MapFieldCoastAllowed);
+	return CheckMask(tile_flag::coast_allowed);
 }
 
 /// Returns true, if water on the map tile field
 bool tile::ForestOnMap() const
 {
-	return CheckMask(MapFieldForest);
+	return CheckMask(tile_flag::tree);
 }
 
 /// Returns true, if coast on the map tile field
 bool tile::RockOnMap() const
 {
-	return CheckMask(MapFieldRocks);
+	return CheckMask(tile_flag::rock);
 }
 
 bool tile::isAWall() const
 {
-	return CheckMask(MapFieldWall);
+	return CheckMask(tile_flag::wall);
 }
 
 void tile::update_movement_cost()

@@ -242,6 +242,7 @@ set(map_SRCS
 	src/map/terrain_geodata_map.cpp
 	src/map/terrain_type.cpp
 	src/map/tile.cpp
+	src/map/tile_flag.cpp
 	src/map/tileset.cpp
 	src/map/world.cpp
 	src/map/world_game_data.cpp
@@ -756,6 +757,7 @@ set(stratagus_map_HDRS
 	src/map/terrain_geodata_map.h
 	src/map/terrain_type.h
 	src/map/tile.h
+	src/map/tile_flag.h
 	src/map/tileset.h
 	src/map/world.h
 	src/map/world_game_data.h

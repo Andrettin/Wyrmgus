@@ -44,6 +44,7 @@ enum class UnitTypeType;
 
 namespace wyrmgus {
 	class resource;
+	enum class tile_flag : uint32_t;
 }
 
 //
@@ -317,7 +318,7 @@ private:
 class UnitFinder final
 {
 public:
-	explicit UnitFinder(const CPlayer &player, const std::vector<CUnit *> &units, const int maxDist, const int movemask, CUnit **unitP, const int z)
+	explicit UnitFinder(const CPlayer &player, const std::vector<CUnit *> &units, const int maxDist, const tile_flag movemask, CUnit **unitP, const int z)
 		: player(player), units(units), maxDist(maxDist), movemask(movemask), unitP(unitP), z(z) 
 	{
 	}
@@ -331,7 +332,7 @@ private:
 	const CPlayer &player;
 	const std::vector<CUnit *> &units;
 	int maxDist = 0;
-	int movemask = 0;
+	tile_flag movemask;
 	CUnit **unitP = nullptr;
 	int z = 0;
 };
@@ -493,7 +494,7 @@ extern CUnit *FindHomeMarket(const CUnit &unit, int range);
 extern CUnit *FindIdleWorker(const CPlayer &player, const CUnit *last);
 
 /// Find the neareast piece of terrain with specific flags.
-extern bool FindTerrainType(int movemask, const wyrmgus::resource *resource, int range,
+extern bool FindTerrainType(const tile_flag movemask, const wyrmgus::resource *resource, int range,
 							const CPlayer &player, const Vec2i &startPos, Vec2i *pos, int z, const landmass *landmass = nullptr);
 
 extern void FindUnitsByType(const wyrmgus::unit_type &type, std::vector<CUnit *> &units, bool everybody = false);
@@ -522,8 +523,8 @@ extern CUnit *ResourceDepositOnMap(const Vec2i &pos, int resource, int z);
 
 /// Check map for obstacles in a line between 2 tiles
 //Wyrmgus start
-//extern bool CheckObstaclesBetweenTiles(const Vec2i &unitPos, const Vec2i &goalPos, unsigned short flags, int *distance = nullptr);
-extern bool CheckObstaclesBetweenTiles(const Vec2i &unitPos, const Vec2i &goalPos, unsigned long flags, int z, int max_difference = 0, int *distance = nullptr);
+//extern bool CheckObstaclesBetweenTiles(const Vec2i &unitPos, const Vec2i &goalPos, const tile_flag flags, int *distance = nullptr);
+extern bool CheckObstaclesBetweenTiles(const Vec2i &unitPos, const Vec2i &goalPos, const tile_flag flags, const int z, int max_difference = 0, int *distance = nullptr);
 //Wyrmgus end
 /// Find best enemy in numeric range to attack
 //Wyrmgus start
@@ -555,5 +556,5 @@ extern CUnit *AttackUnitsInReactRange(const CUnit &unit, CUnitFilter pred, bool 
 
 extern CUnit *AttackUnitsInReactRange(const CUnit &unit, bool include_neutral = false);
 
-extern bool CheckPathwayConnection(const CUnit &src_unit, const CUnit &dst_unit, unsigned int flags);
+extern bool CheckPathwayConnection(const CUnit &src_unit, const CUnit &dst_unit, const tile_flag flags);
 //Wyrmgus end

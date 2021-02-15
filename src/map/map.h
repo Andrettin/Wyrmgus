@@ -94,6 +94,7 @@ namespace wyrmgus {
 	class tile;
 	class unit_type;
 	class world;
+	enum class tile_flag : uint32_t;
 }
 
 /*----------------------------------------------------------------------------
@@ -209,7 +210,7 @@ public:
 	void generate_missing_terrain(const QRect &rect, const int z);
 	void expand_terrain_features_to_same_terrain(const int z);
 	void generate_settlement_territories(const int z);
-	wyrmgus::point_set expand_settlement_territories(std::vector<QPoint> &&seeds, const int z, const int block_flags = 0, const int same_flags = 0);
+	wyrmgus::point_set expand_settlement_territories(std::vector<QPoint> &&seeds, const int z, const tile_flag block_flags, const tile_flag same_flags);
 	void process_settlement_territory_tiles(const int z);
 	void calculate_settlement_resource_units();
 	void generate_neutral_units(const wyrmgus::unit_type *unit_type, const int quantity, const QPoint &min_pos, const QPoint &max_pos, const bool grouped, const int z);
@@ -270,7 +271,7 @@ public:
 	bool CurrentTerrainCanBeAt(const Vec2i &pos, bool overlay, int z);
 	bool TileBordersTerrain(const Vec2i &pos, const wyrmgus::terrain_type *terrain_type, const int z) const;
 	bool TileBordersOnlySameTerrain(const Vec2i &pos, const wyrmgus::terrain_type *new_terrain, const int z) const;
-	bool TileBordersFlag(const Vec2i &pos, int z, int flag, bool reverse = false) const; // reverse means that it returns true if the tile borders one tile without the flag
+	bool TileBordersFlag(const Vec2i &pos, const int z, const tile_flag flag, const bool reverse = false) const; // reverse means that it returns true if the tile borders one tile without the flag
 	bool tile_borders_other_terrain_feature(const QPoint &pos, const int z) const;
 	bool tile_borders_same_settlement_territory(const QPoint &pos, const int z, const bool diagonal_allowed) const;
 	bool tile_borders_other_settlement_territory(const QPoint &pos, const int z) const;
@@ -423,8 +424,8 @@ extern void MapUnmarkTileRadarJammer(const CPlayer &player, const unsigned int i
 // in map_fog.c
 //
 /// Filter map flags through fog
-extern int MapFogFilterFlags(CPlayer &player, const Vec2i &pos, int mask, int z);
-extern int MapFogFilterFlags(CPlayer &player, const unsigned int index, int mask, int z);
+extern tile_flag MapFogFilterFlags(CPlayer &player, const Vec2i &pos, const tile_flag mask, const int z);
+extern tile_flag MapFogFilterFlags(CPlayer &player, const unsigned int index, const tile_flag mask, const int z);
 
 /// Mark a tile for normal sight
 extern void MapMarkTileSight(const CPlayer &player, const unsigned int index, const int z);
@@ -512,7 +513,7 @@ extern int SaveStratagusMap(const std::string &filename, CMap &map, int writeTer
 extern void LoadStratagusMapInfo(const std::string &mapname);
 
 /// Returns true, if the unit-type(mask can enter field with bounds check
-extern bool CheckedCanMoveToMask(const Vec2i &pos, int mask, int z);
+extern bool CheckedCanMoveToMask(const Vec2i &pos, const tile_flag mask, const int z);
 /// Returns true, if the unit-type can enter the field
 extern bool UnitTypeCanBeAt(const wyrmgus::unit_type &type, const Vec2i &pos, int z);
 /// Returns true, if the unit can enter the field
@@ -541,7 +542,7 @@ void MapMarkUnitSight(CUnit &unit);
 void MapUnmarkUnitSight(CUnit &unit);
 
 /// Can a unit with 'mask' enter the field
-extern bool CanMoveToMask(const Vec2i &pos, int mask, int z);
+extern bool CanMoveToMask(const Vec2i &pos, tile_flag mask, const int z);
 
 /// Handle Marking and Unmarking of radar vision
 inline void MapMarkRadar(const CPlayer &player, const Vec2i &pos, int w, int h, int range, int z)

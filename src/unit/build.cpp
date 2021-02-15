@@ -39,6 +39,7 @@
 #include "map/terrain_feature.h"
 #include "map/terrain_type.h"
 #include "map/tile.h"
+#include "map/tile_flag.h"
 #include "map/tileset.h"
 #include "player.h"
 #include "unit/unit.h"
@@ -500,7 +501,7 @@ CUnit *CanBuildHere(const CUnit *unit, const wyrmgus::unit_type &type, const QPo
 		for (int x = pos.x() - 1; x < pos.x() + type.get_tile_width() + 1; ++x) {
 			for (int y = pos.y() - 1; y < pos.y() + type.get_tile_height() + 1; ++y) {
 				const QPoint tile_pos(x, y);
-				if (CMap::Map.Info.IsPointOnMap(tile_pos, z) && (CMap::Map.Field(tile_pos, z)->Flags & MapFieldBuilding)) {
+				if (CMap::Map.Info.IsPointOnMap(tile_pos, z) && CMap::Map.Field(tile_pos, z)->has_flag(tile_flag::building)) {
 					return nullptr;
 				}
 			}
@@ -529,7 +530,7 @@ CUnit *CanBuildHere(const CUnit *unit, const wyrmgus::unit_type &type, const QPo
 					success = true;
 				}
 				//Wyrmgus start
-				if (GameCycle == 0 && mf->WaterOnMap() && CMap::Map.TileBordersFlag(pos, z, MapFieldWaterAllowed, true)) { // if the game hasn't started, it is possible that coast map fields haven't been applied yet, so we have to check if the tile is a water tile with an adjacent non-water tile (which is what a coastal tile is)
+				if (GameCycle == 0 && mf->WaterOnMap() && CMap::Map.TileBordersFlag(pos, z, tile_flag::water_allowed, true)) { // if the game hasn't started, it is possible that coast map fields haven't been applied yet, so we have to check if the tile is a water tile with an adjacent non-water tile (which is what a coastal tile is)
 					success = true;
 				}
 				//Wyrmgus end
@@ -597,7 +598,7 @@ CUnit *CanBuildHere(const CUnit *unit, const wyrmgus::unit_type &type, const QPo
 **
 **  @return true if we can build on this point.
 */
-bool CanBuildOn(const QPoint &pos, const int mask, const int z, const CPlayer *player, const wyrmgus::unit_type *unit_type)
+bool CanBuildOn(const QPoint &pos, const tile_flag mask, const int z, const CPlayer *player, const wyrmgus::unit_type *unit_type)
 {
 	if (!CMap::Map.Info.IsPointOnMap(pos, z)) {
 		return false;
@@ -623,7 +624,7 @@ bool CanBuildOn(const QPoint &pos, const int mask, const int z, const CPlayer *p
 	const wyrmgus::terrain_type *overlay_terrain = tile->get_overlay_terrain();
 
 	//can only build a pathway on top of another pathway if the latter has a smaller movement bonus, or if the former is a railroad and the latter isn't
-	if (built_terrain != nullptr && built_terrain->is_pathway() && overlay_terrain != nullptr && overlay_terrain->is_pathway() && built_terrain->get_movement_bonus() <= overlay_terrain->get_movement_bonus() && (!(built_terrain->Flags & MapFieldRailroad) || (tile->get_flags() & MapFieldRailroad))) {
+	if (built_terrain != nullptr && built_terrain->is_pathway() && overlay_terrain != nullptr && overlay_terrain->is_pathway() && built_terrain->get_movement_bonus() <= overlay_terrain->get_movement_bonus() && (!built_terrain->has_flag(tile_flag::railroad) || tile->has_flag(tile_flag::railroad))) {
 		return false;
 	}
 
@@ -665,7 +666,7 @@ CUnit *CanBuildUnitType(const CUnit *unit, const wyrmgus::unit_type &type, const
 	//Wyrmgus end
 		player = unit->Player;
 	}
-	int testmask;
+	tile_flag testmask = tile_flag::none;
 	unsigned int index = pos.y() * CMap::Map.Info.MapWidths[z];
 	for (int h = 0; h < type.get_tile_height(); ++h) {
 		for (int w = type.get_tile_width(); w--;) {

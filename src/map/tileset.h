@@ -8,8 +8,6 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name tileset.h - The tileset headerfile. */
-//
 //      (c) Copyright 1998-2021 by Lutz Sammer, Jimmy Salmon and Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
@@ -29,10 +27,6 @@
 
 #pragma once
 
-/*----------------------------------------------------------------------------
---  Declarations
-----------------------------------------------------------------------------*/
-
 #include "vec2i.h"
 //Wyrmgus start
 #include "color.h"
@@ -46,48 +40,8 @@ class CPlayerColorGraphic;
 
 namespace wyrmgus {
 	class unit_type;
+	enum class tile_flag : uint32_t;
 }
-
-enum MapFieldFlag : uint64_t {
-	MapFieldSpeedMask = 1 << 0,		/// Move faster on this tile
-	
-	MapFieldLandAllowed = 1 << 1,	/// Land units allowed
-	MapFieldCoastAllowed = 1 << 2,	/// Coast (e.g. transporter) units allowed
-	MapFieldWaterAllowed = 1 << 3,	/// Water units allowed
-	MapFieldNoBuilding = 1 << 4,	/// No buildings allowed
-	
-	MapFieldUnpassable = 1 << 5,	/// Field is movement blocked
-	MapFieldAirUnpassable = 1 << 6,	/// Field is movement blocked for air units and missiles
-	MapFieldWall = 1 << 7,			/// Field contains wall
-	MapFieldRocks = 1 << 8,			/// Field contains rocks
-	MapFieldForest = 1 << 9,		/// Field contains forest
-	
-	MapFieldLandUnit = 1 << 10,		/// Land unit on field
-	MapFieldSeaUnit = 1 << 11,		/// Water unit on field
-	MapFieldAirUnit = 1 << 12,		/// Air unit on field
-	MapFieldBuilding = 1 << 13,		/// Building on field
-	MapFieldItem = 1 << 14,			/// Item on field
-	
-	MapFieldRoad = 1 << 15,			/// Road (moves faster)
-	MapFieldRailroad = 1 << 16,		/// Railroad (moves faster)
-	MapFieldNoRail = 1 << 17,		/// Marker that there's no railroad, used for rail movemasks
-	MapFieldBridge = 1 << 18,		/// Bridge or raft
-	
-	MapFieldGrass = 1 << 19,		/// Used for playing grass step sounds
-	MapFieldMud = 1 << 20,			/// Used for playing mud step sounds
-	MapFieldStoneFloor = 1 << 21,	/// Used for playing stone step sounds
-	MapFieldDirt = 1 << 22,			/// Used for playing dirt step sounds
-	MapFieldDesert = 1 << 23,		/// Used for identifying desert tiles for desertstalk and dehydration
-	MapFieldSnow = 1 << 24,			/// Used for playing snow step sounds
-	MapFieldIce = 1 << 25,			/// Used for playing ice step sounds
-	
-	MapFieldGravel = 1 << 26,		/// Used for playing gravel step sounds
-	MapFieldStumps = 1 << 27,		/// Used for playing stumps step sounds and identifying removed forests
-
-	MapFieldUnderground = 1 << 28,	/// The terrain is an underground one; this is used to make it always be "night" there, for graphical purposes as well as for unit sight
-	MapFieldSpace = 1 << 29, //the terrain is a space one, only being passable by space units
-	MapFieldSpaceCliff = 1 << 30 //used for the transition between land/water and space
-};
 
 /**
 **  These are used for lookup tiles types
@@ -162,12 +116,16 @@ enum class tile_transition_type {
 }
 
 /// Single tile definition
-struct CTileInfo {
+struct CTileInfo final
+{
 public:
-	CTileInfo() : BaseTerrain(0), MixTerrain(0)
-	{}
+	CTileInfo()
+	{
+	}
+
 	CTileInfo(unsigned char base, unsigned char mix) : BaseTerrain(base), MixTerrain(mix)
-	{}
+	{
+	}
 
 	bool operator ==(const CTileInfo &rhs) const
 	{
@@ -176,12 +134,13 @@ public:
 	bool operator !=(const CTileInfo &rhs) const { return !(*this == rhs); }
 
 public:
-	unsigned char BaseTerrain; /// Basic terrain of the tile
-	unsigned char MixTerrain;  /// Terrain mixed with this
+	unsigned char BaseTerrain = 0; /// Basic terrain of the tile
+	unsigned char MixTerrain = 0;  /// Terrain mixed with this
 };
 
 /// Definition for a terrain type
-struct SolidTerrainInfo {
+struct SolidTerrainInfo final
+{
 	std::string TerrainName;  /// Name of the terrain
 	// TODO: When drawing with the editor add some kind fo probabilities for every tile.
 	//Wyrmgus start
@@ -189,22 +148,18 @@ struct SolidTerrainInfo {
 	//Wyrmgus end
 };
 
-class CTile
+class CTile final
 {
 public:
-	CTile() : tile(0), flag(0) {}
+	CTile();
 
-public:
-	unsigned short tile;  /// graphical pos
-	//Wyrmgus start
-//	unsigned short flag;  /// Flag
-	unsigned long flag;  /// Flag
-	//Wyrmgus end
+	unsigned short tile = 0;  /// graphical pos
+	tile_flag flag;  /// Flag
 	CTileInfo tileinfo;   /// Tile descriptions
 };
 
 /// Tileset definition
-class CTileset
+class CTileset final
 {
 public:
 	void clear();
@@ -253,8 +208,8 @@ public:
 	//Wyrmgus end
 	//Wyrmgus start
 	int getFromMixedLookupTable(int base_terrain, int tile) const;
-//	int getTileBySurrounding(unsigned short type
-	int getTileBySurrounding(unsigned short type,
+//	int getTileBySurrounding(const tile_flag type
+	int getTileBySurrounding(const tile_flag type,
 							 int tile_index,
 	//Wyrmgus end
 							 int up, int right,
@@ -301,7 +256,7 @@ private:
 	//Wyrmgus start
 //	std::vector<SolidTerrainInfo> solidTerrainTypes; /// Information about solid terrains.
 	//Wyrmgus end
-#if 1
+
 	//Wyrmgus start
 //	std::vector<int> mixedLookupTable;  /// Lookup for what part of tile used
 	std::map<std::pair<int,int>, int> mixedLookupTable;  /// Lookup for what part of tile used; mapped to a pair, which has its first element as the tile type and the second element as the graphic tile
@@ -322,7 +277,6 @@ private:
 	std::array<int, 20> rockTable{};     /// Removed rock placement table
 	std::array<unsigned, 16> humanWallTable{};  /// Human wall placement table
 	std::array<unsigned, 16> orcWallTable{};    /// Orc wall placement table
-#endif
 };
 
 //Wyrmgus start
@@ -330,7 +284,7 @@ private:
 --  Functions
 ----------------------------------------------------------------------------*/
 
-extern void ParseTilesetTileFlags(lua_State *l, int *back, int *j);
+extern void ParseTilesetTileFlags(lua_State *l, tile_flag *back, int *j);
 //Wyrmgus start
 extern std::string GetTransitionTypeNameById(const wyrmgus::tile_transition_type transition_type);
 extern wyrmgus::tile_transition_type GetTransitionTypeIdByName(const std::string &transition_type);

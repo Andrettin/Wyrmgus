@@ -42,6 +42,7 @@
 #include "map/map.h"
 #include "map/map_layer.h"
 #include "map/tile.h"
+#include "map/tile_flag.h"
 #include "map/tileset.h"
 #include "player.h"
 #include "script.h"
@@ -189,7 +190,7 @@ void DrawUnitSelection(const CViewport &vp, const CUnit &unit)
 	//Wyrmgus start
 	int box_width = type.get_box_width();
 	int box_height = type.get_box_height();
-	if ((unit.MapLayer->Field(unit.tilePos)->Flags & MapFieldBridge) && !unit.Type->BoolFlag[BRIDGE_INDEX].value && unit.Type->UnitType == UnitTypeType::Land && !unit.Moving) { //if is on a raft, use the raft's box size instead
+	if (unit.MapLayer->Field(unit.tilePos)->has_flag(tile_flag::bridge) && !unit.Type->BoolFlag[BRIDGE_INDEX].value && unit.Type->UnitType == UnitTypeType::Land && !unit.Moving) { //if is on a raft, use the raft's box size instead
 		std::vector<CUnit *> table;
 		Select(unit.tilePos, unit.tilePos, table, unit.MapLayer->ID);
 		for (size_t i = 0; i != table.size(); ++i) {

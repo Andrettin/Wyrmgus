@@ -74,18 +74,18 @@
 **
 **    ::MapFieldVisible field is visible.
 **    ::MapFieldExplored field is explored.
-**    ::MapFieldLandAllowed land units are allowed.
-**    ::MapFieldCoastAllowed coast units (transporter) and coast buildings (shipyard) are allowed.
-**    ::MapFieldWaterAllowed water units allowed.
-**    ::MapFieldNoBuilding no buildings allowed.
-**    ::MapFieldUnpassable field is movement blocked.
-**    ::MapFieldWall field contains wall.
-**    ::MapFieldRocks field contains rocks.
-**    ::MapFieldForest field contains forest.
-**    ::MapFieldLandUnit land unit on field.
-**    ::MapFieldAirUnit air unit on field.
-**    ::MapFieldSeaUnit water unit on field.
-**    ::MapFieldBuilding building on field.
+**    ::tile_flag::land_allowed land units are allowed.
+**    ::tile_flag::coast_allowed coast units (transporter) and coast buildings (shipyard) are allowed.
+**    ::tile_flag::water_allowed water units allowed.
+**    ::tile_flag::no_building no buildings allowed.
+**    ::tile_flag::impassable field is movement blocked.
+**    ::tile_flag::wall field contains wall.
+**    ::tile_flag::rock field contains rocks.
+**    ::tile_flag::tree field contains forest.
+**    ::tile_flag::land_unit land unit on field.
+**    ::tile_flag::air_unit air unit on field.
+**    ::tile_flag::sea_unit water unit on field.
+**    ::tile_flag::building building on field.
 **
 **    Note: We want to add support for more unit-types like under
 **      ground units.
@@ -127,6 +127,7 @@ class site;
 class terrain_feature;
 class terrain_type;
 class world;
+enum class tile_flag : uint32_t;
 
 class tile_player_info final
 {
@@ -196,7 +197,7 @@ public:
 	//Wyrmgus end
 
 	/// Check if a field flags.
-	bool CheckMask(int mask) const;
+	bool CheckMask(const tile_flag mask) const;
 	
 	const terrain_type *get_terrain() const
 	{
@@ -246,10 +247,12 @@ public:
 
 	bool is_destroyed_tree_tile() const;
 	
-	unsigned long get_flags() const
+	tile_flag get_flags() const
 	{
 		return this->Flags;
 	}
+
+	bool has_flag(const tile_flag flag) const;
 
 	unsigned char get_movement_cost() const
 	{
@@ -334,9 +337,8 @@ public:
 	bool is_on_trade_route() const;
 
 public:
+	tile_flag Flags;      /// field flags
 	//Wyrmgus start
-//	unsigned short Flags = 0;      /// field flags
-	unsigned long Flags = 0;      /// field flags
 	unsigned char AnimationFrame = 0;		/// current frame of the tile's animation
 	unsigned char OverlayAnimationFrame = 0;		/// current frame of the overlay tile's animation
 private:

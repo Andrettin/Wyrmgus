@@ -56,6 +56,7 @@ namespace wyrmgus {
 	class unit_type;
 	class upgrade_class;
 	enum class ai_force_type;
+	enum class tile_flag : uint32_t;
 }
 
 /**
@@ -284,14 +285,16 @@ public:
 /**
 **  AI exploration request
 */
-class AiExplorationRequest
+class AiExplorationRequest final
 {
 public:
-	AiExplorationRequest(const Vec2i &pos, int mask) : pos(pos), Mask(mask) {}
+	explicit AiExplorationRequest(const Vec2i &pos, const tile_flag mask) : pos(pos), Mask(mask)
+	{
+	}
 
 public:
 	Vec2i pos;          /// pos on map
-	int Mask;           /// mask ( ex: MapFieldLandUnit )
+	tile_flag Mask;           /// mask ( ex: tile_flag::land_unit )
 };
 
 /**
@@ -668,7 +671,7 @@ extern void AiAddResearchRequest(const CUpgrade *upgrade);
 /// Periodic called resource manager handler
 extern void AiResourceManager();
 /// Ask the ai to explore around pos
-extern void AiExplore(const Vec2i &pos, int exploreMask);
+extern void AiExplore(const Vec2i &pos, const tile_flag exploreMask);
 /// Make two unittypes be considered equals
 extern void AiNewUnitTypeEquiv(const wyrmgus::unit_type &a, const wyrmgus::unit_type &b);
 /// Remove any equivalence between unittypes

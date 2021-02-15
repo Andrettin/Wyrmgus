@@ -45,6 +45,7 @@
 #include "map/site_game_data.h"
 #include "map/terrain_type.h"
 #include "map/tile.h"
+#include "map/tile_flag.h"
 #include "map/tileset.h"
 #include "pathfinder.h"
 #include "player.h"
@@ -355,9 +356,10 @@ static int AiBuildBuilding(const wyrmgus::unit_type &type, const wyrmgus::unit_t
 		if (building.BoolFlag[TOWNHALL_INDEX].value) { //for settlements, look farther for builders
 			maxRange = 9999;
 		}
-		int movemask = type.MovementMask & ~(MapFieldLandUnit | MapFieldAirUnit | MapFieldSeaUnit);
+
+		tile_flag movemask = type.MovementMask & ~(tile_flag::land_unit | tile_flag::air_unit | tile_flag::sea_unit);
 		if (OnTopDetails(building, nullptr)) { //if the building is built on top of something else, make sure the building it is built on top of doesn't block the movemask
-			movemask &= ~(MapFieldBuilding);
+			movemask &= ~(tile_flag::building);
 		}
 		UnitFinder unitFinder(*AiPlayer->Player, table, maxRange, movemask, &near_unit, z);
 
@@ -1328,7 +1330,7 @@ static int AiAssignHarvesterFromTerrain(CUnit &unit, const wyrmgus::resource *re
 	}
 	// Ask the AI to explore...
 	//Wyrmgus start
-//	AiExplore(unit.tilePos, MapFieldLandUnit);
+//	AiExplore(unit.tilePos, tile_flag::land_unit);
 	//Wyrmgus end
 
 	// Failed.
@@ -1392,18 +1394,18 @@ static int AiAssignHarvesterFromUnit(CUnit &unit, const wyrmgus::resource *resou
 		if (type && type->GivesResource == resource) {
 			switch (type->UnitType) {
 				case UnitTypeType::Land:
-					exploremask |= MapFieldLandUnit;
+					exploremask |= tile_flag::land_unit;
 					break;
 				case UnitTypeType::Fly:
-					exploremask |= MapFieldAirUnit;
+					exploremask |= tile_flag::air_unit;
 					break;
 				//Wyrmgus start
 				case UnitTypeType::FlyLow:
-					exploremask |= MapFieldLandUnit;
+					exploremask |= tile_flag::land_unit;
 					break;
 				//Wyrmgus end
 				case UnitTypeType::Naval:
-					exploremask |= MapFieldSeaUnit;
+					exploremask |= tile_flag::sea_unit;
 					break;
 				default:
 					Assert(0);
@@ -1950,7 +1952,7 @@ static bool AiRepairBuilding(const CPlayer &player, const wyrmgus::unit_type &ty
 	terrainTraversal.PushUnitPosAndNeighbor(building);
 
 	const int maxRange = 15;
-	const int movemask = type.MovementMask & ~(MapFieldLandUnit | MapFieldAirUnit | MapFieldSeaUnit);
+	const tile_flag movemask = type.MovementMask & ~(tile_flag::land_unit | tile_flag::air_unit | tile_flag::sea_unit);
 	CUnit *unit = nullptr;
 	UnitFinder unitFinder(player, table, maxRange, movemask, &unit, building.MapLayer->ID);
 
@@ -2118,7 +2120,7 @@ static bool build_pathway_for_pos(const QPoint &pathway_pos, const CMapLayer *ma
 	for (size_t p = 0; p < pathway_types.size(); ++p) {
 		const wyrmgus::unit_type *pathway_type = pathway_types[p];
 
-		if ((pathway_type->TerrainType->Flags & MapFieldRailroad) && !rail_allowed) {
+		if (pathway_type->TerrainType->has_flag(tile_flag::railroad) && !rail_allowed) {
 			//build roads around buildings, not railroads (except for mines)
 			continue;
 		}
@@ -2224,8 +2226,8 @@ static void AiCheckPathwayConstruction()
 			return terrain_type->get_movement_bonus() > other_terrain_type->get_movement_bonus();
 		}
 
-		if ((terrain_type->Flags & MapFieldRailroad) != (other_terrain_type->Flags & MapFieldRailroad)) {
-			return static_cast<bool>(terrain_type->Flags & MapFieldRailroad);
+		if (terrain_type->has_flag(tile_flag::railroad) != other_terrain_type->has_flag(tile_flag::railroad)) {
+			return terrain_type->has_flag(tile_flag::railroad);
 		}
 
 		return type->get_index() < other_type->get_index();
@@ -2279,7 +2281,7 @@ static void AiCheckPathwayConstruction()
 				}
 
 				const wyrmgus::tile *tile = unit.MapLayer->Field(pathway_pos);
-				if (tile->get_flags() & MapFieldBuilding) { //this is a tile where the building itself is located, continue
+				if (tile->has_flag(tile_flag::building)) { //this is a tile where the building itself is located, continue
 					continue;
 				}
 
@@ -2676,7 +2678,7 @@ static void AiCheckMinecartConstruction()
 					continue;
 				}
 				
-				if (CheckPathwayConnection(*mine_unit, *town_hall_unit, MapFieldRailroad)) {
+				if (CheckPathwayConnection(*mine_unit, *town_hall_unit, tile_flag::railroad)) {
 					potential_settlements.push_back(mine_settlement);
 				}
 			}
@@ -2777,7 +2779,7 @@ void AiAddUnitTypeRequest(const wyrmgus::unit_type &type, const int count, const
 **  @param pos   Pos of the zone
 **  @param mask  Mask to explore ( land/sea/air )
 */
-void AiExplore(const Vec2i &pos, int mask)
+void AiExplore(const Vec2i &pos, const tile_flag mask)
 {
 	if (!Preference.AiExplores) {
 		return;

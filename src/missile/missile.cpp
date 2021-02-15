@@ -40,6 +40,7 @@
 #include "map/map_layer.h"
 #include "map/terrain_type.h"
 #include "map/tile.h"
+#include "map/tile_flag.h"
 #include "map/tileset.h"
 #include "missile/missile_class.h"
 #include "mod.h"
@@ -107,7 +108,7 @@ void missile_type::ProcessConfigData(const CConfigData *config_data)
 		} else if (key == "smoke_precision") {
 			this->SmokePrecision = std::stoi(value);
 		} else if (key == "missile_stop_flags") {
-			this->MissileStopFlags = std::stoi(value);
+			this->MissileStopFlags = string_to_tile_flag(value);
 		} else if (key == "smoke_missile") {
 			value = FindAndReplaceString(value, "_", "-");
 			this->Smoke.Name = value;
@@ -1295,7 +1296,7 @@ bool PointToPointMissile(Missile &missile)
 		if (CMap::Map.Info.IsPointOnMap(tilePos, missile.MapLayer) && MissileHandleBlocking(missile, position)) {
 			return true;
 		}
-		if (missile.Type->MissileStopFlags) {
+		if (missile.Type->MissileStopFlags != tile_flag::none) {
 			if (!CMap::Map.Info.IsPointOnMap(tilePos, missile.MapLayer)) { // gone outside
 				missile.TTL = 0;
 				return false;
@@ -1304,7 +1305,7 @@ bool PointToPointMissile(Missile &missile)
 //			const wyrmgus::tile &mf = *CMap::Map.Field(tilePos);
 			const wyrmgus::tile &mf = *CMap::Map.Field(tilePos, missile.MapLayer);
 			//Wyrmgus end
-			if (missile.Type->MissileStopFlags & mf.Flags) { // incompatible terrain
+			if ((missile.Type->MissileStopFlags & mf.Flags) != tile_flag::none) { // incompatible terrain
 				missile.position = position;
 				missile.MissileHit();
 				missile.TTL = 0;
@@ -1919,7 +1920,8 @@ missile_type::missile_type(const std::string &identifier) : data_entry(identifie
 //	Flip(false), FriendlyFire(false),
 	Flip(true), FriendlyFire(true),
 	//Wyrmgus end
-	missile_class(missile_class::none)
+	missile_class(missile_class::none),
+	MissileStopFlags(tile_flag::none)
 {
 }
 

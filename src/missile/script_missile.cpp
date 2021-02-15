@@ -31,6 +31,7 @@
 #include "missile.h"
 
 #include "luacallback.h"
+#include "map/tile_flag.h"
 #include "missile/missile_class.h"
 #include "script.h"
 #include "sound/sound.h"
@@ -106,7 +107,7 @@ void missile_type::Load(lua_State *l)
 		} else if (!strcmp(value, "SmokePrecision")) {
 			this->SmokePrecision = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "MissileStopFlags")) {
-			this->MissileStopFlags = LuaToNumber(l, -1);
+			this->MissileStopFlags = string_to_tile_flag(LuaToString(l, -1));
 		} else if (!strcmp(value, "DrawLevel")) {
 			this->draw_level = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "Range")) {

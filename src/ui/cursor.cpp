@@ -37,6 +37,7 @@
 #include "map/map.h"
 #include "map/map_layer.h"
 #include "map/tile.h"
+#include "map/tile_flag.h"
 #include "map/tileset.h"
 #include "translate.h"
 #include "ui/cursor_type.h"
@@ -273,7 +274,7 @@ void DrawBuildingCursor()
 		}
 	}
 
-	const int mask = CursorBuilding->MovementMask;
+	const tile_flag mask = CursorBuilding->MovementMask;
 	int h = CursorBuilding->get_tile_height();
 	// reduce to view limits
 	h = std::min(h, vp.MapPos.y + vp.MapHeight - mpos.y);
@@ -289,7 +290,7 @@ void DrawBuildingCursor()
 			if (f && (ontop ||
 					  CanBuildOn(posIt, MapFogFilterFlags(*CPlayer::GetThisPlayer(), posIt,
 														  mask & ((!Selected.empty() && Selected[0]->tilePos == posIt) ?
-																  ~(MapFieldLandUnit | MapFieldSeaUnit) : -1), z), z, CPlayer::GetThisPlayer(), CursorBuilding))
+																  ~(tile_flag::land_unit | tile_flag::sea_unit) : static_cast<tile_flag>(-1)), z), z, CPlayer::GetThisPlayer(), CursorBuilding))
 				&& UI.CurrentMapLayer->Field(posIt)->player_info->IsTeamExplored(*CPlayer::GetThisPlayer())) {
 				color = ColorGreen;
 			} else {

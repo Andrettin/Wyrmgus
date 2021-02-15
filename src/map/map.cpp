@@ -48,6 +48,7 @@
 #include "map/terrain_feature.h"
 #include "map/terrain_type.h"
 #include "map/tile.h"
+#include "map/tile_flag.h"
 #include "map/tileset.h"
 #include "map/world.h"
 #include "map/world_game_data.h"
@@ -147,21 +148,21 @@ void CMap::MarkSeenTile(wyrmgus::tile &mf)
 
 		//  Handle wood changes. FIXME: check if for growing wood correct?
 		if (tile == this->Tileset->getRemovedTreeTile()) {
-			FixNeighbors(MapFieldForest, 1, pos);
+			FixNeighbors(tile_flag::tree, 1, pos);
 		} else if (seentile == this->Tileset->getRemovedTreeTile()) {
-			FixTile(MapFieldForest, 1, pos);
+			FixTile(tile_flag::tree, 1, pos);
 		} else if (mf.ForestOnMap()) {
-			FixTile(MapFieldForest, 1, pos);
-			FixNeighbors(MapFieldForest, 1, pos);
+			FixTile(tile_flag::tree, 1, pos);
+			FixNeighbors(tile_flag::tree, 1, pos);
 
 			// Handle rock changes.
 		} else if (tile == Tileset->getRemovedRockTile()) {
-			FixNeighbors(MapFieldRocks, 1, pos);
+			FixNeighbors(tile_flag::rock, 1, pos);
 		} else if (seentile == Tileset->getRemovedRockTile()) {
-			FixTile(MapFieldRocks, 1, pos);
+			FixTile(tile_flag::rock, 1, pos);
 		} else if (mf.RockOnMap()) {
-			FixTile(MapFieldRocks, 1, pos);
-			FixNeighbors(MapFieldRocks, 1, pos);
+			FixTile(tile_flag::rock, 1, pos);
+			FixNeighbors(tile_flag::rock, 1, pos);
 
 			//  Handle Walls changes.
 		} else if (this->Tileset->isAWallTile(tile)
@@ -359,7 +360,7 @@ QPoint CMap::generate_unit_location(const wyrmgus::unit_type *unit_type, const w
 		}
 
 		//do not generate organic units on deserts if they would die from that
-		if ((tile->get_flags() & MapFieldDesert) && unit_type->BoolFlag[ORGANIC_INDEX].value && stats.Variables[DEHYDRATIONIMMUNITY_INDEX].Value <= 0) {
+		if (tile->has_flag(tile_flag::desert) && unit_type->BoolFlag[ORGANIC_INDEX].value && stats.Variables[DEHYDRATIONIMMUNITY_INDEX].Value <= 0) {
 			continue;
 		}
 		
@@ -385,7 +386,7 @@ QPoint CMap::generate_unit_location(const wyrmgus::unit_type *unit_type, const w
 		bool passable_surroundings = true;
 		for (int x = random_pos.x() - 1; x < random_pos.x() + unit_type->get_tile_width() + 1; ++x) {
 			for (int y = random_pos.y() - 1; y < random_pos.y() + unit_type->get_tile_height() + 1; ++y) {
-				if (Map.Info.IsPointOnMap(x, y, z) && Map.Field(x, y, z)->CheckMask(MapFieldUnpassable)) {
+				if (Map.Info.IsPointOnMap(x, y, z) && Map.Field(x, y, z)->CheckMask(tile_flag::impassable)) {
 					passable_surroundings = false;
 					break;
 				}
@@ -535,7 +536,7 @@ bool CMap::TileBordersOnlySameTerrain(const Vec2i &pos, const wyrmgus::terrain_t
 	return true;
 }
 
-bool CMap::TileBordersFlag(const Vec2i &pos, int z, int flag, bool reverse) const
+bool CMap::TileBordersFlag(const Vec2i &pos, const int z, const tile_flag flag, const bool reverse) const
 {
 	for (int sub_x = -1; sub_x <= 1; ++sub_x) {
 		for (int sub_y = -1; sub_y <= 1; ++sub_y) {
@@ -646,7 +647,7 @@ bool CMap::TileBordersBuilding(const Vec2i &pos, int z)
 			}
 			const wyrmgus::tile &mf = *Map.Field(adjacent_pos, z);
 			
-			if (mf.CheckMask(MapFieldBuilding)) {
+			if (mf.CheckMask(tile_flag::building)) {
 				return true;
 			}
 		}
@@ -669,7 +670,7 @@ bool CMap::tile_borders_pathway(const QPoint &pos, const int z, const bool only_
 				continue;
 			}
 			
-			if (!only_railroad || mf.CheckMask(MapFieldRailroad)) {
+			if (!only_railroad || mf.CheckMask(tile_flag::railroad)) {
 				return true;
 			}
 		}
@@ -814,7 +815,7 @@ bool CMap::TileHasUnitsIncompatibleWithTerrain(const Vec2i &pos, const wyrmgus::
 	const CUnitCache &cache = mf.UnitCache;
 	for (size_t i = 0; i != cache.size(); ++i) {
 		const CUnit &unit = *cache[i];
-		if (unit.IsAliveOnMap() && (terrain_type->Flags & unit.Type->MovementMask) != 0) {
+		if (unit.IsAliveOnMap() && (terrain_type->Flags & unit.Type->MovementMask) != tile_flag::none) {
 			return true;
 		}
 	}
@@ -1176,7 +1177,7 @@ const wyrmgus::world *CMap::GetCurrentWorld() const
 **
 **  @return      True if could be entered, false otherwise.
 */
-bool CheckedCanMoveToMask(const Vec2i &pos, int mask, int z)
+bool CheckedCanMoveToMask(const Vec2i &pos, const tile_flag mask, const int z)
 {
 	return CMap::Map.Info.IsPointOnMap(pos, z) && CanMoveToMask(pos, mask, z);
 }
@@ -1191,7 +1192,7 @@ bool CheckedCanMoveToMask(const Vec2i &pos, int mask, int z)
 */
 bool UnitTypeCanBeAt(const wyrmgus::unit_type &type, const Vec2i &pos, int z)
 {
-	const int mask = type.MovementMask;
+	const tile_flag mask = type.MovementMask;
 	unsigned int index = pos.y * CMap::Map.Info.MapWidths[z];
 
 	for (int addy = 0; addy < type.get_tile_height(); ++addy) {
@@ -1521,7 +1522,7 @@ void SetSeasonSchedule(const std::string &season_schedule_ident, int z)
 }
 //Wyrmgus end
 
-bool CanMoveToMask(const Vec2i &pos, const int mask, const int z)
+bool CanMoveToMask(const Vec2i &pos, const tile_flag mask, const int z)
 {
 	return !CMap::Map.Field(pos, z)->CheckMask(mask);
 }
@@ -1894,7 +1895,7 @@ void CMap::save(CFile &file) const
 /*
 void CMap::FixTile(unsigned short type, int seen, const Vec2i &pos)
 {
-	Assert(type == MapFieldForest || type == MapFieldRocks);
+	Assert(type == tile_flag::tree || type == tile_flag::rock);
 
 	//  Outside of map or no wood.
 	if (!Info.IsPointOnMap(pos)) {
@@ -1903,8 +1904,8 @@ void CMap::FixTile(unsigned short type, int seen, const Vec2i &pos)
 	unsigned int index = getIndex(pos);
 	wyrmgus::tile &mf = *this->Field(index);
 
-	if (!((type == MapFieldForest && Tileset->isAWoodTile(mf.player_info->SeenTile))
-		  || (type == MapFieldRocks && Tileset->isARockTile(mf.player_info->SeenTile)))) {
+	if (!((type == tile_flag::tree && Tileset->isAWoodTile(mf.player_info->SeenTile))
+		  || (type == tile_flag::rock && Tileset->isARockTile(mf.player_info->SeenTile)))) {
 		if (seen) {
 			return;
 		}
@@ -1917,12 +1918,12 @@ void CMap::FixTile(unsigned short type, int seen, const Vec2i &pos)
 	// Select Table to lookup
 	int removedtile;
 	int flags;
-	if (type == MapFieldForest) {
+	if (type == tile_flag::tree) {
 		removedtile = this->Tileset->getRemovedTreeTile();
-		flags = (MapFieldForest | MapFieldUnpassable);
-	} else { // (type == MapFieldRocks)
+		flags = (tile_flag::tree | tile_flag::impassable);
+	} else { // (type == tile_flag::rock)
 		removedtile = this->Tileset->getRemovedRockTile();
-		flags = (MapFieldRocks | MapFieldUnpassable);
+		flags = (tile_flag::rock | tile_flag::impassable);
 	}
 	//  Find out what each tile has with respect to wood, or grass.
 	int ttup;
@@ -2132,19 +2133,19 @@ void CMap::SetOverlayTerrainDestroyed(const Vec2i &pos, bool destroyed, int z)
 	mf.SetOverlayTerrainDestroyed(destroyed);
 	
 	if (destroyed) {
-		if (mf.get_overlay_terrain()->Flags & MapFieldForest) {
-			mf.Flags &= ~(MapFieldForest | MapFieldUnpassable);
-			mf.Flags |= MapFieldStumps;
+		if (mf.get_overlay_terrain()->has_flag(tile_flag::tree)) {
+			mf.Flags &= ~(tile_flag::tree | tile_flag::impassable);
+			mf.Flags |= tile_flag::stumps;
 			map_layer->destroyed_tree_tiles.push_back(pos);
 		} else {
-			if (mf.get_overlay_terrain()->Flags & MapFieldRocks) {
-				mf.Flags &= ~(MapFieldRocks | MapFieldUnpassable);
-				mf.Flags |= MapFieldGravel;
-			} else if (mf.get_overlay_terrain()->Flags & MapFieldWall) {
-				mf.Flags &= ~(MapFieldWall | MapFieldUnpassable);
-				mf.Flags |= MapFieldGravel;
-				if (mf.Flags & MapFieldUnderground) {
-					mf.Flags &= ~(MapFieldAirUnpassable);
+			if (mf.get_overlay_terrain()->has_flag(tile_flag::rock)) {
+				mf.Flags &= ~(tile_flag::rock | tile_flag::impassable);
+				mf.Flags |= tile_flag::gravel;
+			} else if (mf.get_overlay_terrain()->has_flag(tile_flag::wall)) {
+				mf.Flags &= ~(tile_flag::wall | tile_flag::impassable);
+				mf.Flags |= tile_flag::gravel;
+				if (mf.has_flag(tile_flag::underground)) {
+					mf.Flags &= ~(tile_flag::air_impassable);
 				}
 			}
 
@@ -2153,9 +2154,9 @@ void CMap::SetOverlayTerrainDestroyed(const Vec2i &pos, bool destroyed, int z)
 
 		mf.set_value(0);
 	} else {
-		if (mf.Flags & MapFieldStumps) { //if is a cleared tree tile regrowing trees
-			mf.Flags &= ~(MapFieldStumps);
-			mf.Flags |= MapFieldForest | MapFieldUnpassable;
+		if (mf.has_flag(tile_flag::stumps)) { //if is a cleared tree tile regrowing trees
+			mf.Flags &= ~(tile_flag::stumps);
+			mf.Flags |= tile_flag::tree | tile_flag::impassable;
 			mf.set_value(mf.get_overlay_terrain()->get_resource()->get_default_amount());
 		}
 	}
@@ -2470,16 +2471,16 @@ void CMap::CalculateTileTransitions(const Vec2i &pos, bool overlay, int z)
 					}
 				}
 				
-				if ((mf.Flags & MapFieldWaterAllowed) && (!adjacent_terrain || !(adjacent_terrain->Flags & MapFieldWaterAllowed))) {
+				if (mf.has_flag(tile_flag::water_allowed) && (!adjacent_terrain || !adjacent_terrain->has_flag(tile_flag::water_allowed))) {
 					//if this is a water tile adjacent to a non-water tile, replace the water flag with a coast one
-					mf.Flags &= ~(MapFieldWaterAllowed);
-					mf.Flags |= MapFieldCoastAllowed;
+					mf.Flags &= ~(tile_flag::water_allowed);
+					mf.Flags |= tile_flag::coast_allowed;
 				}
 				
-				if ((mf.Flags & MapFieldSpace) && (!adjacent_terrain || !(adjacent_terrain->Flags & MapFieldSpace))) {
+				if (mf.has_flag(tile_flag::space) && (!adjacent_terrain || !adjacent_terrain->has_flag(tile_flag::space))) {
 					//if this is a space tile adjacent to a non-space tile, replace the space flag with a cliff one
-					mf.Flags &= ~(MapFieldSpace);
-					mf.Flags |= MapFieldSpaceCliff;
+					mf.Flags &= ~(tile_flag::space);
+					mf.Flags |= tile_flag::space_cliff;
 				}
 			}
 			
@@ -2537,14 +2538,14 @@ void CMap::CalculateTileLandmass(const Vec2i &pos, int z)
 		return; //already calculated
 	}
 	
-	const bool is_space = mf.Flags & MapFieldSpace;
+	const bool is_space = mf.has_flag(tile_flag::space);
 
 	if (is_space) {
 		return; //no landmass for space tiles
 	}
 
-	const bool is_water = (mf.Flags & MapFieldWaterAllowed) || (mf.Flags & MapFieldCoastAllowed);
-	const bool is_space_cliff = (mf.Flags & MapFieldSpaceCliff);
+	const bool is_water = mf.has_flag(tile_flag::water_allowed) || mf.has_flag(tile_flag::coast_allowed);
+	const bool is_space_cliff = mf.has_flag(tile_flag::space_cliff);
 
 	//doesn't have a landmass, and hasn't inherited one from another tile, so add a new one
 	const size_t landmass_index = this->landmasses.size();
@@ -2565,14 +2566,14 @@ void CMap::CalculateTileLandmass(const Vec2i &pos, int z)
 					if (this->Info.IsPointOnMap(adjacent_pos, z)) {
 						wyrmgus::tile &adjacent_mf = *this->Field(adjacent_pos, z);
 
-						const bool adjacent_is_space = adjacent_mf.Flags & MapFieldSpace;
+						const bool adjacent_is_space = adjacent_mf.has_flag(tile_flag::space);
 
 						if (adjacent_is_space) {
 							continue;
 						}
 
-						const bool adjacent_is_water = (adjacent_mf.Flags & MapFieldWaterAllowed) || (adjacent_mf.Flags & MapFieldCoastAllowed);
-						const bool adjacent_is_space_cliff = (adjacent_mf.Flags & MapFieldSpaceCliff);
+						const bool adjacent_is_water = adjacent_mf.has_flag(tile_flag::water_allowed) || adjacent_mf.has_flag(tile_flag::coast_allowed);
+						const bool adjacent_is_space_cliff = adjacent_mf.has_flag(tile_flag::space_cliff);
 						const bool adjacent_is_compatible = (adjacent_is_water == is_water) && (adjacent_is_space_cliff == is_space_cliff);
 									
 						if (adjacent_is_compatible) {
@@ -2974,9 +2975,9 @@ void CMap::GenerateTerrain(const std::unique_ptr<wyrmgus::generated_terrain> &ge
 					&& (!GetTileTopTerrain(random_pos, false, z)->is_overlay() || GetTileTopTerrain(random_pos, false, z) == terrain_type)
 				)
 			)
-			&& (!preserve_coastline || (terrain_type->Flags & MapFieldWaterAllowed) == (tile_terrain->Flags & MapFieldWaterAllowed))
+			&& (!preserve_coastline || terrain_type->has_flag(tile_flag::water_allowed) == tile_terrain->has_flag(tile_flag::water_allowed))
 			&& !this->TileHasUnitsIncompatibleWithTerrain(random_pos, terrain_type, z)
-			&& (!(terrain_type->Flags & MapFieldUnpassable) || !this->TileBordersUnit(random_pos, z)) // if the terrain is unpassable, don't expand to spots adjacent to units
+			&& (!terrain_type->has_flag(tile_flag::impassable) || !this->TileBordersUnit(random_pos, z)) // if the terrain is unpassable, don't expand to spots adjacent to units
 		) {
 			std::vector<Vec2i> adjacent_positions;
 			for (int sub_x = -1; sub_x <= 1; sub_x += 2) { // +2 so that only diagonals are used
@@ -3016,9 +3017,9 @@ void CMap::GenerateTerrain(const std::unique_ptr<wyrmgus::generated_terrain> &ge
 								&& (!GetTileTopTerrain(diagonal_pos, false, z)->is_overlay() || GetTileTopTerrain(diagonal_pos, false, z) == terrain_type) && (!GetTileTopTerrain(vertical_pos, false, z)->is_overlay() || GetTileTopTerrain(vertical_pos, false, z) == terrain_type) && (!GetTileTopTerrain(horizontal_pos, false, z)->is_overlay() || GetTileTopTerrain(horizontal_pos, false, z) == terrain_type)
 							)
 						)
-						&& (!preserve_coastline || ((terrain_type->Flags & MapFieldWaterAllowed) == (diagonal_tile_terrain->Flags & MapFieldWaterAllowed) && (terrain_type->Flags & MapFieldWaterAllowed) == (vertical_tile_terrain->Flags & MapFieldWaterAllowed) && (terrain_type->Flags & MapFieldWaterAllowed) == (horizontal_tile_terrain->Flags & MapFieldWaterAllowed)))
+						&& (!preserve_coastline || (terrain_type->has_flag(tile_flag::water_allowed) == diagonal_tile_terrain->has_flag(tile_flag::water_allowed) && terrain_type->has_flag(tile_flag::water_allowed) == vertical_tile_terrain->has_flag(tile_flag::water_allowed) && terrain_type->has_flag(tile_flag::water_allowed) == horizontal_tile_terrain->has_flag(tile_flag::water_allowed)))
 						&& !this->TileHasUnitsIncompatibleWithTerrain(diagonal_pos, terrain_type, z) && !this->TileHasUnitsIncompatibleWithTerrain(vertical_pos, terrain_type, z) && !this->TileHasUnitsIncompatibleWithTerrain(horizontal_pos, terrain_type, z)
-						&& (!(terrain_type->Flags & MapFieldUnpassable) || (!this->TileBordersUnit(diagonal_pos, z) && !this->TileBordersUnit(vertical_pos, z) && !this->TileBordersUnit(horizontal_pos, z))) // if the terrain is unpassable, don't expand to spots adjacent to buildings
+						&& (!terrain_type->has_flag(tile_flag::impassable) || (!this->TileBordersUnit(diagonal_pos, z) && !this->TileBordersUnit(vertical_pos, z) && !this->TileBordersUnit(horizontal_pos, z))) // if the terrain is unpassable, don't expand to spots adjacent to buildings
 						&& !this->is_point_in_a_subtemplate_area(diagonal_pos, z) && !this->is_point_in_a_subtemplate_area(vertical_pos, z) && !this->is_point_in_a_subtemplate_area(horizontal_pos, z)
 					) {
 						adjacent_positions.push_back(diagonal_pos);
@@ -3133,9 +3134,9 @@ void CMap::GenerateTerrain(const std::unique_ptr<wyrmgus::generated_terrain> &ge
 				if (
 					preserve_coastline
 					&& (
-						(terrain_type->Flags & MapFieldWaterAllowed) != (diagonal_tile_terrain->Flags & MapFieldWaterAllowed)
-						|| (terrain_type->Flags & MapFieldWaterAllowed) != (vertical_tile_terrain->Flags & MapFieldWaterAllowed)
-						|| (terrain_type->Flags & MapFieldWaterAllowed) != (horizontal_tile_terrain->Flags & MapFieldWaterAllowed)
+						terrain_type->has_flag(tile_flag::water_allowed) != diagonal_tile_terrain->has_flag(tile_flag::water_allowed)
+						|| terrain_type->has_flag(tile_flag::water_allowed) != vertical_tile_terrain->has_flag(tile_flag::water_allowed)
+						|| terrain_type->has_flag(tile_flag::water_allowed) != horizontal_tile_terrain->has_flag(tile_flag::water_allowed)
 					)
 				) {
 					continue;
@@ -3146,7 +3147,7 @@ void CMap::GenerateTerrain(const std::unique_ptr<wyrmgus::generated_terrain> &ge
 				}
 				
 				if ( // if the terrain is unpassable, don't expand to spots adjacent to buildings
-					(terrain_type->Flags & MapFieldUnpassable) && (this->TileBordersUnit(diagonal_pos, z) || this->TileBordersUnit(vertical_pos, z) || this->TileBordersUnit(horizontal_pos, z))
+					terrain_type->has_flag(tile_flag::impassable) && (this->TileBordersUnit(diagonal_pos, z) || this->TileBordersUnit(vertical_pos, z) || this->TileBordersUnit(horizontal_pos, z))
 				) {
 					continue;
 				}
@@ -3253,7 +3254,7 @@ void CMap::generate_missing_terrain(const QRect &rect, const int z)
 			return; //the seed must border a tile with null terrain
 		}
 
-		if (top_terrain->Flags & MapFieldSpace) {
+		if (top_terrain->has_flag(tile_flag::space)) {
 			//space tiles cannot be used as seeds, or else missing terrain generation wouldn't work properly for world terrain circles
 			return;
 		}
@@ -3398,7 +3399,7 @@ void CMap::generate_missing_terrain(const QRect &rect, const int z)
 				}
 
 				const wyrmgus::terrain_type *adjacent_top_terrain_type = adjacent_tile->get_top_terrain();
-				if (adjacent_top_terrain_type->Flags & MapFieldSpace) {
+				if (adjacent_top_terrain_type->has_flag(tile_flag::space)) {
 					//space tiles cannot be used as seeds, or else missing terrain generation wouldn't work properly for world terrain circles
 					continue;
 				}
@@ -3516,11 +3517,11 @@ void CMap::generate_settlement_territories(const int z)
 		return true;
 	});
 
-	seeds = this->expand_settlement_territories(wyrmgus::container::to_vector(seeds), z, (MapFieldUnpassable | MapFieldCoastAllowed | MapFieldSpace | MapFieldSpaceCliff), MapFieldWaterAllowed | MapFieldUnderground);
-	seeds = this->expand_settlement_territories(wyrmgus::container::to_vector(seeds), z, (MapFieldCoastAllowed | MapFieldSpace), MapFieldWaterAllowed | MapFieldUnderground);
-	seeds = this->expand_settlement_territories(wyrmgus::container::to_vector(seeds), z, MapFieldSpace, MapFieldUnderground);
-	seeds = this->expand_settlement_territories(wyrmgus::container::to_vector(seeds), z, MapFieldSpace);
-	this->expand_settlement_territories(wyrmgus::container::to_vector(seeds), z);
+	seeds = this->expand_settlement_territories(wyrmgus::container::to_vector(seeds), z, (tile_flag::impassable | tile_flag::coast_allowed | tile_flag::space | tile_flag::space_cliff), tile_flag::water_allowed | tile_flag::underground);
+	seeds = this->expand_settlement_territories(wyrmgus::container::to_vector(seeds), z, (tile_flag::coast_allowed | tile_flag::space), tile_flag::water_allowed | tile_flag::underground);
+	seeds = this->expand_settlement_territories(wyrmgus::container::to_vector(seeds), z, tile_flag::space, tile_flag::underground);
+	seeds = this->expand_settlement_territories(wyrmgus::container::to_vector(seeds), z, tile_flag::space, tile_flag::none);
+	this->expand_settlement_territories(wyrmgus::container::to_vector(seeds), z, tile_flag::none, tile_flag::none);
 
 	//set the settlement of the remaining tiles without any to their most-neighbored settlement
 	wyrmgus::rect::for_each_point(rect, [&](const QPoint &tile_pos) {
@@ -3580,7 +3581,7 @@ void CMap::generate_settlement_territories(const int z)
 	}
 }
 
-wyrmgus::point_set CMap::expand_settlement_territories(std::vector<QPoint> &&seeds, const int z, const int block_flags, const int same_flags)
+wyrmgus::point_set CMap::expand_settlement_territories(std::vector<QPoint> &&seeds, const int z, const tile_flag block_flags, const tile_flag same_flags)
 {
 	//the seeds blocked by the block flags are stored, and then returned by the function
 	wyrmgus::point_set blocked_seeds;
@@ -3770,11 +3771,11 @@ void CMap::ClearWoodTile(const Vec2i &pos)
 	wyrmgus::tile &mf = *this->Field(pos);
 
 	mf.setGraphicTile(this->Tileset->getRemovedTreeTile());
-	mf.Flags &= ~(MapFieldForest | MapFieldUnpassable);
+	mf.Flags &= ~(tile_flag::tree | tile_flag::impassable);
 	mf.set_value(0);
 
 	UI.get_minimap()->UpdateXY(pos);
-	FixNeighbors(MapFieldForest, 0, pos);
+	FixNeighbors(tile_flag::tree, 0, pos);
 
 	//maybe isExplored
 	if (mf.player_info->IsExplored(*ThisPlayer)) {
@@ -3789,11 +3790,11 @@ void CMap::ClearRockTile(const Vec2i &pos)
 	wyrmgus::tile &mf = *this->Field(pos);
 
 	mf.setGraphicTile(this->Tileset->getRemovedRockTile());
-	mf.Flags &= ~(MapFieldRocks | MapFieldUnpassable);
+	mf.Flags &= ~(tile_flag::rock | tile_flag::impassable);
 	mf.set_value(0);
 	
 	UI.get_minimap()->UpdateXY(pos);
-	FixNeighbors(MapFieldRocks, 0, pos);
+	FixNeighbors(tile_flag::rock, 0, pos);
 
 	//maybe isExplored
 	if (mf.player_info->IsExplored(*ThisPlayer)) {

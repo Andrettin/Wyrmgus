@@ -45,6 +45,7 @@
 #include "magic_domain.h"
 #include "map/map.h"
 #include "map/map_layer.h"
+#include "map/tile_flag.h"
 #include "map/tileset.h"
 #include "script.h"
 #include "sound/sound.h"
@@ -452,7 +453,7 @@ bool spell::IsUnitValidAutoCastTarget(const CUnit *target, const CUnit &caster, 
 
 	//Wyrmgus start
 	int range = this->get_range();
-	if (!CheckObstaclesBetweenTiles(caster.tilePos, target->tilePos, MapFieldAirUnpassable, target->MapLayer->ID)) {
+	if (!CheckObstaclesBetweenTiles(caster.tilePos, target->tilePos, tile_flag::air_impassable, target->MapLayer->ID)) {
 		range = 1; //if there are e.g. dungeon walls between the caster and the target, the unit reachable check must see if the target is reachable with a range of 1 instead of the spell's normal range (to make sure the spell can be cast; spells can't be cast through dungeon walls)
 	}
 

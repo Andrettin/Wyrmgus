@@ -39,6 +39,7 @@
 #include "map/map.h"
 #include "map/map_layer.h"
 #include "map/tile.h"
+#include "map/tile_flag.h"
 #include "map/tileset.h"
 #include "pathfinder.h"
 #include "player.h"
@@ -157,7 +158,7 @@ static bool IsUnitValidForNetwork(const CUnit &unit)
 static void StopRaft(CUnit &unit)
 {
 	wyrmgus::tile &mf = *unit.MapLayer->Field(unit.tilePos);
-	if ((mf.Flags & MapFieldBridge) && !unit.Type->BoolFlag[BRIDGE_INDEX].value && unit.Type->UnitType == UnitTypeType::Land) {
+	if (mf.has_flag(tile_flag::bridge) && !unit.Type->BoolFlag[BRIDGE_INDEX].value && unit.Type->UnitType == UnitTypeType::Land) {
 		std::vector<CUnit *> table;
 		Select(unit.tilePos, unit.tilePos, table, unit.MapLayer->ID);
 		for (size_t i = 0; i != table.size(); ++i) {
@@ -337,13 +338,13 @@ void CommandMove(CUnit &unit, const Vec2i &pos, int flush, int z)
 	wyrmgus::tile &mf = *unit.MapLayer->Field(unit.tilePos);
 	wyrmgus::tile &new_mf = *CMap::Map.Field(pos, z);
 	//if the unit is a land unit over a raft, move the raft instead of the unit
-	if ((mf.Flags & MapFieldBridge) && !unit.Type->BoolFlag[BRIDGE_INDEX].value && unit.Type->UnitType == UnitTypeType::Land) {
+	if (mf.has_flag(tile_flag::bridge) && !unit.Type->BoolFlag[BRIDGE_INDEX].value && unit.Type->UnitType == UnitTypeType::Land) {
 		std::vector<CUnit *> table;
 		Select(unit.tilePos, unit.tilePos, table, unit.MapLayer->ID);
 		for (size_t i = 0; i != table.size(); ++i) {
 			if (!table[i]->Removed && table[i]->Type->BoolFlag[BRIDGE_INDEX].value && table[i]->CanMove()) {
 				CommandStopUnit(*table[i]); //always stop the raft if a new command is issued
-				if ((new_mf.Flags & MapFieldWaterAllowed) || (new_mf.Flags & MapFieldCoastAllowed) || (mf.Flags & MapFieldWaterAllowed)) { // if is standing on water, tell the raft to go to the nearest coast, even if the ultimate goal is on land
+				if (new_mf.has_flag(tile_flag::water_allowed) || new_mf.has_flag(tile_flag::coast_allowed) || mf.has_flag(tile_flag::water_allowed)) { // if is standing on water, tell the raft to go to the nearest coast, even if the ultimate goal is on land
 					CommandStopUnit(unit);
 					CommandMove(*table[i], pos, flush, z);
 					return;
@@ -564,7 +565,7 @@ void CommandAttack(CUnit &unit, const Vec2i &pos, CUnit *target, int flush, int 
 	}
 	//Wyrmgus start
 	wyrmgus::tile &mf = *unit.MapLayer->Field(unit.tilePos);
-	if ((mf.Flags & MapFieldBridge) && !unit.Type->BoolFlag[BRIDGE_INDEX].value && unit.Type->UnitType == UnitTypeType::Land) {
+	if (mf.has_flag(tile_flag::bridge) && !unit.Type->BoolFlag[BRIDGE_INDEX].value && unit.Type->UnitType == UnitTypeType::Land) {
 		std::vector<CUnit *> table;
 		Select(unit.tilePos, unit.tilePos, table, unit.MapLayer->ID);
 		for (size_t i = 0; i != table.size(); ++i) {

@@ -35,6 +35,7 @@
 #include "map/map.h"
 #include "map/map_layer.h"
 #include "map/tile.h"
+#include "map/tile_flag.h"
 #include "map/tileset.h"
 #include "missile.h"
 #include "pathfinder.h"
@@ -110,7 +111,7 @@ public:
 	//Wyrmgus start
 //	TerrainFinder(const CPlayer &player, int maxDist, int movemask, int resmask, Vec2i *resPos) :
 //		player(player), maxDist(maxDist), movemask(movemask), resmask(resmask), resPos(resPos) {}
-	explicit TerrainFinder(const CPlayer &player, int maxDist, int movemask, const wyrmgus::resource *resource, Vec2i *resPos, int z, const landmass *landmass) :
+	explicit TerrainFinder(const CPlayer &player, const int maxDist, const tile_flag movemask, const wyrmgus::resource *resource, Vec2i *resPos, const int z, const landmass *landmass) :
 		player(player), maxDist(maxDist), movemask(movemask), resource(resource), resPos(resPos), z(z), landmass(landmass)
 	{
 	}
@@ -119,7 +120,7 @@ public:
 private:
 	const CPlayer &player;
 	int maxDist;
-	int movemask;
+	tile_flag movemask;
 	//Wyrmgus start
 //	int resmask;
 	const wyrmgus::resource *resource = nullptr;
@@ -182,7 +183,7 @@ VisitResult TerrainFinder::Visit(TerrainTraversal &terrainTraversal, const Vec2i
 **
 **  @return            True if wood was found.
 */
-bool FindTerrainType(int movemask, const wyrmgus::resource *resource, int range,
+bool FindTerrainType(const tile_flag movemask, const wyrmgus::resource *resource, int range,
 					 //Wyrmgus start
 //					 const CPlayer &player, const Vec2i &startPos, Vec2i *terrainPos)
 					 const CPlayer &player, const Vec2i &startPos, Vec2i *terrainPos, int z, const landmass *landmass)
@@ -196,8 +197,8 @@ bool FindTerrainType(int movemask, const wyrmgus::resource *resource, int range,
 	terrainTraversal.PushPos(startPos);
 
 	//Wyrmgus start
-//	TerrainFinder terrainFinder(player, range, movemask & ~(MapFieldLandUnit | MapFieldAirUnit | MapFieldSeaUnit), resmask, terrainPos);
-	TerrainFinder terrainFinder(player, range, movemask & ~(MapFieldLandUnit | MapFieldAirUnit | MapFieldSeaUnit), resource, terrainPos, z, landmass);
+//	TerrainFinder terrainFinder(player, range, movemask & ~(tile_flag::land_unit | tile_flag::air_unit | tile_flag::sea_unit), resmask, terrainPos);
+	TerrainFinder terrainFinder(player, range, movemask & ~(tile_flag::land_unit | tile_flag::air_unit | tile_flag::sea_unit), resource, terrainPos, z, landmass);
 	//Wyrmgus end
 
 	return terrainTraversal.Run(terrainFinder);
@@ -526,7 +527,7 @@ private:
 	const CUnit &worker;
 	const wyrmgus::resource_info &resinfo;
 	const CUnit *deposit;
-	unsigned int movemask;
+	tile_flag movemask;
 	int maxRange;
 	bool check_usage;
 	//Wyrmgus start
@@ -1051,7 +1052,7 @@ private:
 		}
 
 		//Wyrmgus start
-		if (attackrange > 1 && !CheckObstaclesBetweenTiles(attacker->tilePos, dest->tilePos, MapFieldAirUnpassable, attacker->MapLayer->ID)) {
+		if (attackrange > 1 && !CheckObstaclesBetweenTiles(attacker->tilePos, dest->tilePos, tile_flag::air_impassable, attacker->MapLayer->ID)) {
 			return INT_MAX;
 		}
 		//Wyrmgus end
@@ -1288,7 +1289,7 @@ public:
 //				if (d <= attackrange ||
 //					(d <= range && UnitReachable(*attacker, *dest, attackrange))) {
 				if ((d <= attackrange ||
-					(d <= range && UnitReachable(*attacker, *dest, attackrange, attacker->GetReactionRange() * 8))) && (attackrange <= 1 || CheckObstaclesBetweenTiles(attacker->tilePos, dest->tilePos, MapFieldAirUnpassable, attacker->MapLayer->ID))) {
+					(d <= range && UnitReachable(*attacker, *dest, attackrange, attacker->GetReactionRange() * 8))) && (attackrange <= 1 || CheckObstaclesBetweenTiles(attacker->tilePos, dest->tilePos, tile_flag::air_impassable, attacker->MapLayer->ID))) {
 				//Wyrmgus end
 					++enemy_count;
 				} else {
@@ -1469,8 +1470,8 @@ struct CompareUnitDistance {
 **  @return         False if an obstacle was found, or true otherwise
 */
 //Wyrmgus start
-//bool CheckObstaclesBetweenTiles(const Vec2i &unitPos, const Vec2i &goalPos, unsigned short flags, int *distance)
-bool CheckObstaclesBetweenTiles(const Vec2i &unitPos, const Vec2i &goalPos, unsigned long flags, int z, int max_difference, int *distance)
+//bool CheckObstaclesBetweenTiles(const Vec2i &unitPos, const Vec2i &goalPos, const tile_flag flags, int *distance)
+bool CheckObstaclesBetweenTiles(const Vec2i &unitPos, const Vec2i &goalPos, const tile_flag flags, const int z, int max_difference, int *distance)
 //Wyrmgus end
 {
 	const Vec2i delta(abs(goalPos.x - unitPos.x), abs(goalPos.y - unitPos.y));
@@ -1495,7 +1496,7 @@ bool CheckObstaclesBetweenTiles(const Vec2i &unitPos, const Vec2i &goalPos, unsi
 		//Wyrmgus start
 //		} else if (Map.Field(pos)->Flags & flags) {
 		} else if (
-			(CMap::Map.Field(pos, z)->Flags & flags)
+			(CMap::Map.Field(pos, z)->get_flags() & flags) != tile_flag::none
 			&& pos != goalPos
 			&& (abs(pos.x - goalPos.x) > max_difference || abs(pos.y - goalPos.y) > max_difference)
 		) { // the goal's tile itself shouldn't be checked for an obstacle
@@ -1642,10 +1643,10 @@ CUnit *AttackUnitsInReactRange(const CUnit &unit, bool include_neutral)
 	//Wyrmgus end
 }
 
-class PathwayConnectionFinder
+class PathwayConnectionFinder final
 {
 public:
-	PathwayConnectionFinder(const CUnit &src_unit, const CUnit &dst_unit, unsigned int flags, bool *result) :
+	explicit PathwayConnectionFinder(const CUnit &src_unit, const CUnit &dst_unit, const tile_flag flags, bool *result) :
 	//Wyrmgus end
 		src_unit(src_unit),
 		dst_unit(dst_unit),
@@ -1657,7 +1658,7 @@ public:
 private:
 	const CUnit &src_unit;
 	const CUnit &dst_unit;
-	unsigned int flags;
+	tile_flag flags;
 	bool *result;
 };
 
@@ -1678,7 +1679,7 @@ VisitResult PathwayConnectionFinder::Visit(TerrainTraversal &terrainTraversal, c
 	return VisitResult::Ok;
 }
 
-bool CheckPathwayConnection(const CUnit &src_unit, const CUnit &dst_unit, unsigned int flags)
+bool CheckPathwayConnection(const CUnit &src_unit, const CUnit &dst_unit, const tile_flag flags)
 {
 	TerrainTraversal terrainTraversal;
 

@@ -31,73 +31,12 @@
 
 #include "map/tileset.h"
 
+#include "map/tile_flag.h"
 #include "script.h"
 
-static bool ModifyFlag(const char *flagName, unsigned int *flag)
+static void ModifyFlag(const std::string &flag_name, tile_flag *flag)
 {
-	const struct {
-		const char *name;
-		unsigned int flag;
-	} flags[] = {
-		{"water", MapFieldWaterAllowed},
-		{"land", MapFieldLandAllowed},
-		{"coast", MapFieldCoastAllowed},
-		{"no-building", MapFieldNoBuilding},
-		{"unpassable", MapFieldUnpassable},
-		//Wyrmgus start
-		{"air-unpassable", MapFieldAirUnpassable},
-		{"desert", MapFieldDesert},
-		{"dirt", MapFieldDirt},
-		{"grass", MapFieldGrass},
-		{"gravel", MapFieldGravel},
-		{"ice", MapFieldIce},
-		{"mud", MapFieldMud},
-		{"railroad", MapFieldRailroad},
-		{"road", MapFieldRoad},
-		{"no-rail", MapFieldNoRail},
-		{"snow", MapFieldSnow},
-		{"stone_floor", MapFieldStoneFloor},
-		{"stumps", MapFieldStumps},
-		//Wyrmgus end
-		{"underground", MapFieldUnderground},
-		{"space", MapFieldSpace},
-		{"wall", MapFieldWall},
-		{"rock", MapFieldRocks},
-		{"forest", MapFieldForest},
-		{"space_cliff", MapFieldSpaceCliff},
-		{"land-unit", MapFieldLandUnit},
-		{"air-unit", MapFieldAirUnit},
-		{"sea-unit", MapFieldSeaUnit},
-		{"building", MapFieldBuilding},
-		{"item", MapFieldItem},
-		{"bridge", MapFieldBridge},
-	};
-
-	for (unsigned int i = 0; i != sizeof(flags) / sizeof(*flags); ++i) {
-		if (!strcmp(flagName, flags[i].name)) {
-			*flag |= flags[i].flag;
-			return true;
-		}
-	}
-
-	const struct {
-		const char *name;
-		unsigned int speed;
-	} speeds[] = {
-		{"fastest", 0},
-		{"fast", 1},
-		{"slow", 4},
-		{"slower", 5},
-		{"slowest", 7},
-	};
-
-	for (unsigned int i = 0; i != sizeof(speeds) / sizeof(*speeds); ++i) {
-		if (!strcmp(flagName, speeds[i].name)) {
-			*flag = (*flag & ~MapFieldSpeedMask) | speeds[i].speed;
-			return true;
-		}
-	}
-	return false;
+	*flag |= string_to_tile_flag(flag_name);
 }
 
 /**
@@ -108,9 +47,9 @@ static bool ModifyFlag(const char *flagName, unsigned int *flag)
 **  @param j     pointer for the location in the array. in and out
 **
 */
-void ParseTilesetTileFlags(lua_State *l, int *back, int *j)
+void ParseTilesetTileFlags(lua_State *l, tile_flag *back, int *j)
 {
-	unsigned int flags = 3;
+	tile_flag flags = static_cast<tile_flag>(3);
 
 	//  Parse the list: flags of the slot
 	while (1) {
@@ -124,9 +63,7 @@ void ParseTilesetTileFlags(lua_State *l, int *back, int *j)
 		lua_pop(l, 1);
 
 		//  Flags are only needed for the editor
-		if (ModifyFlag(value, &flags) == false) {
-			LuaError(l, "solid: unsupported tag: %s" _C_ value);
-		}
+		ModifyFlag(value, &flags);
 	}
 	*back = flags;
 }
@@ -209,7 +146,7 @@ void CTileset::parseSolid(lua_State *l)
 	const int basic_name = getOrAddSolidTileIndexByName(LuaToString(l, -1, j + 1));
 	++j;
 
-	int f = 0;
+	tile_flag f = tile_flag::none;
 	ParseTilesetTileFlags(l, &f, &j);
 	//  Vector: the tiles.
 	lua_rawgeti(l, -1, j + 1);
@@ -223,7 +160,7 @@ void CTileset::parseSolid(lua_State *l)
 		lua_rawgeti(l, -1, i + 1);
 		if (lua_istable(l, -1)) {
 			int k = 0;
-			int tile_flag = 0;
+			tile_flag tile_flag = tile_flag::none;
 			ParseTilesetTileFlags(l, &tile_flag, &k);
 			--j;
 			lua_pop(l, 1);
@@ -267,7 +204,7 @@ void CTileset::parseMixed(lua_State *l)
 	const int mixed_name = getOrAddSolidTileIndexByName(LuaToString(l, -1, j + 1));
 	++j;
 
-	int f = 0;
+	tile_flag f = tile_flag::none;
 	ParseTilesetTileFlags(l, &f, &j);
 
 	for (; j < args; ++j) {
@@ -368,16 +305,16 @@ void CTileset::buildTable(lua_State *l)
 		if (tile == 0) {
 			continue;
 		}
-		const unsigned flag = tiles[i].flag;
-		if (flag & MapFieldWaterAllowed) {
+		const tile_flag flag = tiles[i].flag;
+		if ((flag & tile_flag::water_allowed) != tile_flag::none) {
 			TileTypeTable[tile] = TileTypeWater;
-		} else if (flag & MapFieldCoastAllowed) {
+		} else if ((flag & tile_flag::coast_allowed) != tile_flag::none) {
 			TileTypeTable[tile] = TileTypeCoast;
-		} else if (flag & MapFieldWall) {
+		} else if ((flag & tile_flag::wall) != tile_flag::none) {
 			TileTypeTable[tile] = TileTypeWall;
-		} else if (flag & MapFieldRocks) {
+		} else if ((flag & tile_flag::rock) != tile_flag::none) {
 			TileTypeTable[tile] = TileTypeRock;
-		} else if (flag & MapFieldForest) {
+		} else if ((flag & tile_flag::tree) != tile_flag::none) {
 			TileTypeTable[tile] = TileTypeWood;
 		}
 	}
@@ -411,7 +348,7 @@ void CTileset::buildTable(lua_State *l)
 		const CTile &tile = tiles[i];
 		const CTileInfo &tileinfo = tile.tileinfo;
 		if (tileinfo.BaseTerrain && tileinfo.MixTerrain) {
-			if (tile.flag & MapFieldForest) {
+			if ((tile.flag & tile_flag::tree) != tile_flag::none) {
 				mixed = i;
 				//Wyrmgus start
 				//set the default terrain underlays for trees
@@ -423,7 +360,7 @@ void CTileset::buildTable(lua_State *l)
 			i += 256;
 		} else {
 			if (tileinfo.BaseTerrain != 0 && tileinfo.MixTerrain == 0) {
-				if (tile.flag & MapFieldForest) {
+				if ((tile.flag & tile_flag::tree) != tile_flag::none) {
 					solid = i;
 					//Wyrmgus start
 					wood_terrain_type = tileinfo.BaseTerrain;
@@ -532,7 +469,7 @@ void CTileset::buildTable(lua_State *l)
 		const CTile &tile = tiles[i];
 		const CTileInfo &tileinfo = tile.tileinfo;
 		if (tileinfo.BaseTerrain && tileinfo.MixTerrain) {
-			if (tile.flag & MapFieldRocks) {
+			if ((tile.flag & tile_flag::rock) != tile_flag::none) {
 				mixed = i;
 				//Wyrmgus start
 				//set the default terrain underlays for trees
@@ -544,7 +481,7 @@ void CTileset::buildTable(lua_State *l)
 			i += 256;
 		} else {
 			if (tileinfo.BaseTerrain != 0 && tileinfo.MixTerrain == 0) {
-				if (tile.flag & MapFieldRocks) {
+				if ((tile.flag & tile_flag::rock) != tile_flag::none) {
 					solid = i;
 					//Wyrmgus start
 					rock_terrain_type = tileinfo.BaseTerrain;

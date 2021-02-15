@@ -36,6 +36,7 @@
 #include "map/map.h"
 #include "map/map_layer.h"
 #include "map/tile.h"
+#include "map/tile_flag.h"
 #include "map/tileset.h"
 #include "missile.h"
 #include "pathfinder.h"
@@ -124,7 +125,7 @@ public:
 		unit(unit),
 		//Wyrmgus end
 		maxDist(maxDist),
-		movemask(unit.Type->MovementMask & ~(MapFieldLandUnit | MapFieldAirUnit | MapFieldSeaUnit)),
+		movemask(unit.Type->MovementMask & ~(tile_flag::land_unit | tile_flag::air_unit | tile_flag::sea_unit)),
 		resultPos(resultPos)
 	{}
 	VisitResult Visit(TerrainTraversal &terrainTraversal, const Vec2i &pos, const Vec2i &from);
@@ -133,7 +134,7 @@ private:
 	const CUnit &unit;
 	//Wyrmgus end
 	int maxDist;
-	int movemask;
+	tile_flag movemask;
 	Vec2i *resultPos;
 };
 
@@ -234,18 +235,20 @@ int AiFindWall(AiForce *force)
 class ReachableTerrainMarker
 {
 public:
-	ReachableTerrainMarker(const CUnit &unit) :
+	explicit ReachableTerrainMarker(const CUnit &unit) :
 		//Wyrmgus start
 		unit(unit),
 		//Wyrmgus end
-		movemask(unit.Type->MovementMask & ~(MapFieldLandUnit | MapFieldAirUnit | MapFieldSeaUnit))
-	{}
+		movemask(unit.Type->MovementMask & ~(tile_flag::land_unit | tile_flag::air_unit | tile_flag::sea_unit))
+	{
+	}
+
 	VisitResult Visit(TerrainTraversal &terrainTraversal, const Vec2i &pos, const Vec2i &from);
 private:
 	//Wyrmgus start
 	const CUnit &unit;
 	//Wyrmgus end
-	int movemask;
+	tile_flag movemask;
 };
 
 VisitResult ReachableTerrainMarker::Visit(TerrainTraversal &terrainTraversal, const Vec2i &pos, const Vec2i &from)
@@ -276,19 +279,23 @@ static void MarkReacheableTerrainType(const CUnit &unit, TerrainTraversal *terra
 class EnemyFinderWithTransporter
 {
 public:
-	EnemyFinderWithTransporter(const CUnit &unit, const TerrainTraversal &terrainTransporter, Vec2i *resultPos) :
+	explicit EnemyFinderWithTransporter(const CUnit &unit, const TerrainTraversal &terrainTransporter, Vec2i *resultPos) :
 		unit(unit),
 		terrainTransporter(terrainTransporter),
-		movemask(unit.Type->MovementMask & ~(MapFieldLandUnit | MapFieldAirUnit | MapFieldSeaUnit)),
+		movemask(unit.Type->MovementMask & ~(tile_flag::land_unit | tile_flag::air_unit | tile_flag::sea_unit)),
 		resultPos(resultPos)
-	{}
+	{
+	}
+
 	VisitResult Visit(TerrainTraversal &terrainTraversal, const Vec2i &pos, const Vec2i &from);
+
 private:
 	bool IsAccessibleForTransporter(const Vec2i &pos) const;
+
 private:
 	const CUnit &unit;
 	const TerrainTraversal &terrainTransporter;
-	int movemask;
+	tile_flag movemask;
 	Vec2i *resultPos;
 };
 
@@ -527,14 +534,14 @@ static CUnit *GetBestExplorer(const AiExplorationRequest &request, Vec2i *pos)
 				continue;
 			}
 			//Wyrmgus start
-//			if ((request.Mask & MapFieldLandUnit) && type.UnitType != UnitTypeType::Land) {
-			if ((request.Mask & MapFieldLandUnit) && type.UnitType != UnitTypeType::Land && type.UnitType != UnitTypeType::FlyLow) {
+//			if ((request.Mask & tile_flag::land_unit) && type.UnitType != UnitTypeType::Land) {
+			if ((request.Mask & tile_flag::land_unit) && type.UnitType != UnitTypeType::Land && type.UnitType != UnitTypeType::FlyLow) {
 			//Wyrmgus end
 				continue;
 			}
 			//Wyrmgus start
-//			if ((request.Mask & MapFieldSeaUnit) && type.UnitType != UnitTypeType::Naval) {
-			if ((request.Mask & MapFieldSeaUnit) && type.UnitType != UnitTypeType::Naval && type.UnitType != UnitTypeType::FlyLow) {
+//			if ((request.Mask & tile_flag::sea_unit) && type.UnitType != UnitTypeType::Naval) {
+			if ((request.Mask & tile_flag::sea_unit) && type.UnitType != UnitTypeType::Naval && type.UnitType != UnitTypeType::FlyLow) {
 			//Wyrmgus end
 				continue;
 			}

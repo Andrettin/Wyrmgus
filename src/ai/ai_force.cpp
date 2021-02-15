@@ -43,6 +43,7 @@
 #include "map/map.h"
 #include "map/map_layer.h"
 #include "map/tile.h"
+#include "map/tile_flag.h"
 #include "map/tileset.h"
 #include "network.h"
 #include "pathfinder.h"
@@ -69,7 +70,7 @@ public:
 	EnemyUnitFinder(const CUnit &unit, CUnit **result_unit, Vec2i *result_enemy_wall_pos, int *result_enemy_wall_map_layer, int find_type, bool include_neutral, bool allow_water) :
 	//Wyrmgus end
 		unit(unit),
-		movemask(unit.Type->MovementMask & ~(MapFieldLandUnit | MapFieldAirUnit | MapFieldSeaUnit)),
+		movemask(unit.Type->MovementMask & ~(tile_flag::land_unit | tile_flag::air_unit | tile_flag::sea_unit)),
 		attackrange(unit.get_best_attack_range()),
 		find_type(find_type),
 		include_neutral(include_neutral),
@@ -83,7 +84,7 @@ public:
 	VisitResult Visit(TerrainTraversal &terrainTraversal, const Vec2i &pos, const Vec2i &from);
 private:
 	const CUnit &unit;
-	unsigned int movemask;
+	tile_flag movemask;
 	const int attackrange;
 	const int find_type;
 	bool include_neutral;
@@ -102,7 +103,7 @@ VisitResult EnemyUnitFinder::Visit(TerrainTraversal &terrainTraversal, const Vec
 		return VisitResult::DeadEnd;
 	}
 	
-	if (unit.MapLayer->Field(pos)->CheckMask(MapFieldWall) && !CMap::Map.Info.IsPointOnMap(*result_enemy_wall_pos, *result_enemy_wall_map_layer)) {
+	if (unit.MapLayer->Field(pos)->CheckMask(tile_flag::wall) && !CMap::Map.Info.IsPointOnMap(*result_enemy_wall_pos, *result_enemy_wall_map_layer)) {
 		const CPlayer *tile_owner = unit.MapLayer->Field(pos)->get_owner();
 		if (
 			tile_owner != nullptr
@@ -118,8 +119,8 @@ VisitResult EnemyUnitFinder::Visit(TerrainTraversal &terrainTraversal, const Vec
 	
 	if (!CanMoveToMask(pos, movemask, unit.MapLayer->ID)) { // unreachable
 		if (allow_water) {
-			unsigned int water_movemask = movemask;
-			water_movemask &= ~(MapFieldWaterAllowed | MapFieldCoastAllowed);
+			tile_flag water_movemask = movemask;
+			water_movemask &= ~(tile_flag::water_allowed | tile_flag::coast_allowed);
 			if (CanMoveToMask(pos, water_movemask, unit.MapLayer->ID)) {
 				return VisitResult::Ok; //if movement through water is allowed (with transport ships), then don't make water tiles a dead end, but don't look for units in them either
 			}
@@ -509,22 +510,24 @@ class AiForceRallyPointFinder
 {
 public:
 	//Wyrmgus start
-//	AiForceRallyPointFinder(const CUnit &startUnit, int distance, const Vec2i &startPos, Vec2i *resultPos) :
-	AiForceRallyPointFinder(const CUnit &startUnit, int distance, const Vec2i &startPos, Vec2i *resultPos, int z) :
+//	explicit AiForceRallyPointFinder(const CUnit &startUnit, int distance, const Vec2i &startPos, Vec2i *resultPos) :
+	explicit AiForceRallyPointFinder(const CUnit &startUnit, int distance, const Vec2i &startPos, Vec2i *resultPos, int z) :
 	//Wyrmgus end
 		startUnit(startUnit), distance(distance), startPos(startPos),
-		movemask(startUnit.Type->MovementMask & ~(MapFieldLandUnit | MapFieldAirUnit | MapFieldSeaUnit | MapFieldBuilding)),
+		movemask(startUnit.Type->MovementMask & ~(tile_flag::land_unit | tile_flag::air_unit | tile_flag::sea_unit | tile_flag::building)),
 		//Wyrmgus start
 //		resultPos(resultPos)
 		resultPos(resultPos), z(z)
 		//Wyrmgus end
-	{}
+	{
+	}
+
 	VisitResult Visit(TerrainTraversal &terrainTraversal, const Vec2i &pos, const Vec2i &from);
 private:
 	const CUnit &startUnit;
 	const int distance;
 	const Vec2i startPos;
-	const int movemask;
+	const tile_flag movemask;
 	Vec2i *resultPos;
 	//Wyrmgus start
 	const int z;

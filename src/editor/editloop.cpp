@@ -42,6 +42,7 @@
 #include "map/minimap.h"
 #include "map/terrain_type.h"
 #include "map/tile.h"
+#include "map/tile_flag.h"
 #include "map/tileset.h"
 #include "menus.h"
 #include "network.h"
@@ -217,7 +218,7 @@ static void EditTile(const Vec2i &pos, wyrmgus::terrain_type *terrain)
 	
 	//Wyrmgus start
 	int value = 0;
-	if ((terrain->Flags & MapFieldForest) || (terrain->Flags & MapFieldRocks)) {
+	if (terrain->has_flag(tile_flag::tree) || terrain->has_flag(tile_flag::rock)) {
 		value = terrain->get_resource()->get_default_amount();
 	}
 //	mf.setTileIndex(tileset, tileIndex, 0);
@@ -1387,27 +1388,26 @@ static void DrawEditorInfo()
 	//
 	// Flags info
 	//
-	const unsigned flag = mf.get_flags();
-	sprintf(buf.data(), "%02X|%04X|%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c",
+	const tile_flag flag = mf.get_flags();
+	sprintf(buf.data(), "%02X|%04X|%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c",
 			mf.get_value(), flag,
-			flag & MapFieldUnpassable   ? 'u' : '-',
-			flag & MapFieldAirUnpassable   ? 'A' : '-',
-			flag & MapFieldNoBuilding   ? 'n' : '-',
-			flag & MapFieldWall         ? 'w' : '-',
-			flag & MapFieldRocks        ? 'r' : '-',
-			flag & MapFieldForest       ? 'f' : '-',
-			flag & MapFieldLandAllowed  ? 'L' : '-',
-			flag & MapFieldCoastAllowed ? 'C' : '-',
-			flag & MapFieldWaterAllowed ? 'W' : '-',
-			flag & MapFieldLandUnit     ? 'l' : '-',
-			flag & MapFieldAirUnit      ? 'a' : '-',
-			flag & MapFieldSeaUnit      ? 's' : '-',
-			flag & MapFieldBuilding     ? 'b' : '-',
-			flag & MapFieldItem         ? 'i' : '-',
-			flag & MapFieldStumps       ? 't' : '-',
-			flag & MapFieldGravel       ? 'g' : '-',
-			flag & MapFieldBridge       ? 'B' : '-',
-			flag & MapFieldSpace        ? 'S' : '-');
+			mf.has_flag(tile_flag::impassable) ? 'u' : '-',
+			mf.has_flag(tile_flag::air_impassable) ? 'A' : '-',
+			mf.has_flag(tile_flag::no_building) ? 'n' : '-',
+			mf.has_flag(tile_flag::wall) ? 'w' : '-',
+			mf.has_flag(tile_flag::rock) ? 'r' : '-',
+			mf.has_flag(tile_flag::tree) ? 'f' : '-',
+			mf.has_flag(tile_flag::land_allowed) ? 'L' : '-',
+			mf.has_flag(tile_flag::coast_allowed) ? 'C' : '-',
+			mf.has_flag(tile_flag::water_allowed) ? 'W' : '-',
+			mf.has_flag(tile_flag::land_unit) ? 'l' : '-',
+			mf.has_flag(tile_flag::air_unit) ? 'a' : '-',
+			mf.has_flag(tile_flag::sea_unit) ? 's' : '-',
+			mf.has_flag(tile_flag::building) ? 'b' : '-',
+			mf.has_flag(tile_flag::item) ? 'i' : '-',
+			mf.has_flag(tile_flag::stumps) ? 't' : '-',
+			mf.has_flag(tile_flag::bridge) ? 'B' : '-',
+			mf.has_flag(tile_flag::space) ? 'S' : '-');
 
 	CLabel(wyrmgus::defines::get()->get_game_font()).Draw(UI.StatusLine.TextX + 118 * scale_factor, UI.StatusLine.TextY - 12 * scale_factor, buf.data());
 

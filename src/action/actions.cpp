@@ -60,6 +60,7 @@
 #include "map/map.h"
 #include "map/map_layer.h"
 #include "map/tile.h"
+#include "map/tile_flag.h"
 #include "map/tileset.h"
 #include "missile.h"
 #include "pathfinder.h"
@@ -454,9 +455,9 @@ static void HandleBuffsEachSecond(CUnit &unit)
 		if ((unit.Variable[DESERTSTALK_INDEX].Value > 0 || unit.Variable[FORESTSTALK_INDEX].Value > 0 || unit.Variable[SWAMPSTALK_INDEX].Value > 0) && CMap::Map.Info.IsPointOnMap(unit.tilePos.x, unit.tilePos.y, unit.MapLayer)) {
 			if (
 				(
-					(unit.Variable[DESERTSTALK_INDEX].Value > 0 && (unit.MapLayer->Field(unit.tilePos.x, unit.tilePos.y)->Flags & MapFieldDesert))
-					|| (unit.Variable[FORESTSTALK_INDEX].Value > 0 && CMap::Map.TileBordersFlag(unit.tilePos, unit.MapLayer->ID, MapFieldForest))
-					|| (unit.Variable[SWAMPSTALK_INDEX].Value > 0 && (unit.MapLayer->Field(unit.tilePos.x, unit.tilePos.y)->Flags & MapFieldMud))
+					(unit.Variable[DESERTSTALK_INDEX].Value > 0 && unit.MapLayer->Field(unit.tilePos.x, unit.tilePos.y)->has_flag(tile_flag::desert))
+					|| (unit.Variable[FORESTSTALK_INDEX].Value > 0 && CMap::Map.TileBordersFlag(unit.tilePos, unit.MapLayer->ID, tile_flag::tree))
+					|| (unit.Variable[SWAMPSTALK_INDEX].Value > 0 && unit.MapLayer->Field(unit.tilePos.x, unit.tilePos.y)->has_flag(tile_flag::mud))
 				)
 				&& (unit.Variable[INVISIBLE_INDEX].Value > 0 || !unit.IsInCombat())
 			) {				
@@ -473,7 +474,7 @@ static void HandleBuffsEachSecond(CUnit &unit)
 		if ( //apply dehydration to an organic unit on a desert tile; only apply dehydration during day-time
 			unit.Type->BoolFlag[ORGANIC_INDEX].value
 			&& CMap::Map.Info.IsPointOnMap(unit.tilePos, unit.MapLayer)
-			&& (unit.MapLayer->Field(unit.tilePos)->Flags & MapFieldDesert)
+			&& unit.MapLayer->Field(unit.tilePos)->has_flag(tile_flag::desert)
 			&& unit.MapLayer->Field(unit.tilePos)->get_owner() != unit.Player
 			&& unit.get_center_tile_time_of_day() != nullptr
 			&& unit.get_center_tile_time_of_day()->is_day()

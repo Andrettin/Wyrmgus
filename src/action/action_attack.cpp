@@ -45,6 +45,7 @@
 #include "map/map.h"
 #include "map/map_layer.h"
 #include "map/tile.h"
+#include "map/tile_flag.h"
 #include "map/tileset.h"
 #include "missile.h"
 #include "pathfinder.h"
@@ -278,7 +279,7 @@ bool COrder_Attack::ParseSpecificData(lua_State *l, int &j, const char *value, c
 	input.SetMinRange(this->MinRange);
 	int distance = this->Range;
 	if (input.GetUnit()->get_best_attack_range() > 1) {
-		if (!CheckObstaclesBetweenTiles(input.GetUnitPos(), this->has_goal() ? this->get_goal()->tilePos : this->goalPos, MapFieldAirUnpassable, this->MapLayer)) {
+		if (!CheckObstaclesBetweenTiles(input.GetUnitPos(), this->has_goal() ? this->get_goal()->tilePos : this->goalPos, tile_flag::air_impassable, this->MapLayer)) {
 			distance = 1;
 		}
 	}
@@ -460,14 +461,14 @@ void COrder_Attack::MoveToTarget(CUnit &unit)
 
 	//Wyrmgus start
 	//if is on a moving raft and target is now within range, stop the raft
-	if ((unit.MapLayer->Field(unit.tilePos)->Flags & MapFieldBridge) && !unit.Type->BoolFlag[BRIDGE_INDEX].value && unit.Type->UnitType == UnitTypeType::Land) {
+	if (unit.MapLayer->Field(unit.tilePos)->has_flag(tile_flag::bridge) && !unit.Type->BoolFlag[BRIDGE_INDEX].value && unit.Type->UnitType == UnitTypeType::Land) {
 		std::vector<CUnit *> table;
 		Select(unit.tilePos, unit.tilePos, table, unit.MapLayer->ID);
 		for (size_t i = 0; i != table.size(); ++i) {
 			if (!table[i]->Removed && table[i]->Type->BoolFlag[BRIDGE_INDEX].value && table[i]->CanMove()) {
 				if (table[i]->CurrentAction() == UnitAction::Move) {
 					if ((this->get_goal() && unit.MapDistanceTo(*this->get_goal()) <= unit.get_best_attack_range()) || (!this->has_goal() && unit.MapDistanceTo(this->goalPos, this->MapLayer) <= unit.get_best_attack_range())) {
-						if (CheckObstaclesBetweenTiles(unit.tilePos, goalPos, MapFieldAirUnpassable, MapLayer)) {
+						if (CheckObstaclesBetweenTiles(unit.tilePos, goalPos, tile_flag::air_impassable, MapLayer)) {
 							CommandStopUnit(*table[i]);
 						}
 					}
@@ -487,7 +488,7 @@ void COrder_Attack::MoveToTarget(CUnit &unit)
 	if (err == 0 && !this->has_goal()) {
 		// Check if we're in range when attacking a location and we are waiting
 		if (unit.MapDistanceTo(this->goalPos, this->MapLayer) <= unit.get_best_attack_range()) {
-			if (CheckObstaclesBetweenTiles(unit.tilePos, goalPos, MapFieldAirUnpassable, MapLayer)) {
+			if (CheckObstaclesBetweenTiles(unit.tilePos, goalPos, tile_flag::air_impassable, MapLayer)) {
 				err = PF_REACHED;
 			}
 		}
@@ -502,7 +503,7 @@ void COrder_Attack::MoveToTarget(CUnit &unit)
 		CUnit *goal = this->get_goal();
 		// Have reached target? FIXME: could use the new return code?
 		if (goal && unit.MapDistanceTo(*goal) <= unit.get_best_attack_range()) {
-			if (CheckObstaclesBetweenTiles(unit.tilePos, goalPos, MapFieldAirUnpassable, MapLayer)) {
+			if (CheckObstaclesBetweenTiles(unit.tilePos, goalPos, tile_flag::air_impassable, MapLayer)) {
 				// Reached another unit, now attacking it
 				unsigned char oldDir = unit.Direction;
 				//Wyrmgus start
@@ -531,7 +532,7 @@ void COrder_Attack::MoveToTarget(CUnit &unit)
 			 || (!goal && (this->Action == UnitAction::AttackGround || CMap::Map.WallOnMap(this->goalPos, this->MapLayer))))
 			//Wyrmgus end
 			&& unit.MapDistanceTo(this->goalPos, this->MapLayer) <= unit.get_best_attack_range()) {
-			if (CheckObstaclesBetweenTiles(unit.tilePos, goalPos, MapFieldAirUnpassable, MapLayer)) {
+			if (CheckObstaclesBetweenTiles(unit.tilePos, goalPos, tile_flag::air_impassable, MapLayer)) {
 				// Reached wall or ground, now attacking it
 				unsigned char oldDir = unit.Direction;
 				UnitHeadingFromDeltaXY(unit, this->goalPos - unit.tilePos);
@@ -556,7 +557,7 @@ void COrder_Attack::MoveToTarget(CUnit &unit)
 	if (err == PF_UNREACHABLE) {
 		//Wyrmgus start
 		//if is unreachable and is on a raft, see if the raft can move closer to the enemy
-		if ((unit.MapLayer->Field(unit.tilePos)->Flags & MapFieldBridge) && !unit.Type->BoolFlag[BRIDGE_INDEX].value && unit.Type->UnitType == UnitTypeType::Land) {
+		if (unit.MapLayer->Field(unit.tilePos)->has_flag(tile_flag::bridge) && !unit.Type->BoolFlag[BRIDGE_INDEX].value && unit.Type->UnitType == UnitTypeType::Land) {
 			std::vector<CUnit *> table;
 			Select(unit.tilePos, unit.tilePos, table, unit.MapLayer->ID);
 			for (size_t i = 0; i != table.size(); ++i) {
@@ -672,7 +673,7 @@ void COrder_Attack::AttackTarget(CUnit &unit)
 	// Still near to target, if not goto target.
 	const int dist = unit.MapDistanceTo(*goal);
 	if (dist > unit.get_best_attack_range()
-		|| (CheckObstaclesBetweenTiles(unit.tilePos, goal->tilePos, MapFieldAirUnpassable, MapLayer) == false)) {
+		|| (CheckObstaclesBetweenTiles(unit.tilePos, goal->tilePos, tile_flag::air_impassable, MapLayer) == false)) {
 		//Wyrmgus start
 		// towers don't chase after goal
 		/*
@@ -776,7 +777,7 @@ void COrder_Attack::Execute(CUnit &unit)
 					&& !(unit.Player->AiEnabled && dist < unit.get_best_attack_range() && unit.Variable[SPEED_INDEX].Value > goal.Variable[SPEED_INDEX].Value && unit.get_best_attack_range() > goal.get_best_attack_range()) //makes fast AI ranged units move away from slower targets that have smaller range
 				) {
 					//Wyrmgus end
-					if (CheckObstaclesBetweenTiles(unit.tilePos, goalPos, MapFieldAirUnpassable, MapLayer)) {
+					if (CheckObstaclesBetweenTiles(unit.tilePos, goalPos, tile_flag::air_impassable, MapLayer)) {
 						//Wyrmgus start
 //						const Vec2i dir = goal.tilePos + goal.Type->GetHalfTileSize() - unit.tilePos;
 						const Vec2i dir = PixelSize(PixelSize(goal.tilePos) * wyrmgus::defines::get()->get_tile_size()) + goal.get_half_tile_pixel_size() - PixelSize(PixelSize(unit.tilePos) * wyrmgus::defines::get()->get_tile_size()) - unit.get_half_tile_pixel_size();
@@ -801,7 +802,7 @@ void COrder_Attack::Execute(CUnit &unit)
 			//Wyrmgus start
 			// add instance for attack ground without moving
 			} else if (this->Action == UnitAction::AttackGround && unit.MapDistanceTo(this->goalPos, this->MapLayer) <= unit.get_best_attack_range() && unit.Type->MinAttackRange < unit.MapDistanceTo(this->goalPos, this->MapLayer)) {
-				if (CheckObstaclesBetweenTiles(unit.tilePos, goalPos, MapFieldAirUnpassable, MapLayer)) {
+				if (CheckObstaclesBetweenTiles(unit.tilePos, goalPos, tile_flag::air_impassable, MapLayer)) {
 					// Reached wall or ground, now attacking it
 					unsigned char oldDir = unit.Direction;
 					UnitHeadingFromDeltaXY(unit, this->goalPos - unit.tilePos);

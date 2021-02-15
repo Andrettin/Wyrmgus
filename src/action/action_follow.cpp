@@ -39,6 +39,7 @@
 #include "luacallback.h"
 #include "map/map_layer.h"
 #include "map/tile.h"
+#include "map/tile_flag.h"
 #include "map/tileset.h"
 #include "missile.h"
 #include "pathfinder.h"
@@ -224,7 +225,7 @@ bool COrder_Follow::ParseSpecificData(lua_State *l, int &j, const char *value, c
 	switch (DoActionMove(unit)) { // reached end-point?
 		case PF_UNREACHABLE:
 			//Wyrmgus start
-			if ((unit.MapLayer->Field(unit.tilePos)->Flags & MapFieldBridge) && !unit.Type->BoolFlag[BRIDGE_INDEX].value && unit.Type->UnitType == UnitTypeType::Land) {
+			if (unit.MapLayer->Field(unit.tilePos)->has_flag(tile_flag::bridge) && !unit.Type->BoolFlag[BRIDGE_INDEX].value && unit.Type->UnitType == UnitTypeType::Land) {
 				std::vector<CUnit *> table;
 				Select(unit.tilePos, unit.tilePos, table, unit.MapLayer->ID);
 				for (size_t i = 0; i != table.size(); ++i) {

@@ -33,6 +33,7 @@
 #include "map/minimap.h"
 #include "map/terrain_type.h"
 #include "map/tile.h"
+#include "map/tile_flag.h"
 #include "map/tileset.h"
 #include "map/world.h"
 #include "map/world_game_data.h"
@@ -130,7 +131,7 @@ void CMapLayer::handle_destroyed_overlay_terrain()
 		const QPoint &pos = this->destroyed_overlay_terrain_tiles[i];
 		wyrmgus::tile &mf = *this->Field(pos);
 
-		if (mf.get_overlay_terrain() == nullptr || !mf.OverlayTerrainDestroyed || (mf.get_flags() & MapFieldStumps)) {
+		if (mf.get_overlay_terrain() == nullptr || !mf.OverlayTerrainDestroyed || mf.has_flag(tile_flag::stumps)) {
 			//the destroyed overlay terrain tile may have become invalid, e.g. because the terrain changed, or because of the handling of destroyed overlay tiles itself; we keep the removal of elements centralized here so that we can loop through the tiles reliably
 			this->destroyed_overlay_terrain_tiles.erase(this->destroyed_overlay_terrain_tiles.begin() + i);
 		} else {
@@ -189,15 +190,15 @@ void CMapLayer::regenerate_tree_tile(const QPoint &pos)
 	//  FIXME: a better looking result would be fine
 	//    Allow general updates to any tiletype that regrows
 
-	const unsigned long permanent_occupied_flag = (MapFieldWall | MapFieldUnpassable | MapFieldBuilding);
-	const unsigned long occupied_flag = (permanent_occupied_flag | MapFieldLandUnit | MapFieldItem);
+	const tile_flag permanent_occupied_flag = (tile_flag::wall | tile_flag::impassable | tile_flag::building);
+	const tile_flag occupied_flag = (permanent_occupied_flag | tile_flag::land_unit | tile_flag::item);
 	
-	if ((mf.Flags & permanent_occupied_flag)) { //if the tree tile is permanently occupied by buildings and the like, reset the regeneration process
+	if ((mf.get_flags() & permanent_occupied_flag) != tile_flag::none) { //if the tree tile is permanently occupied by buildings and the like, reset the regeneration process
 		mf.set_value(0);
 		return;
 	}
 
-	if (mf.Flags & occupied_flag) { // if the tree tile is temporarily occupied (e.g. by an item or unit), don't continue the regrowing process while the occupation occurs, but don't reset it either
+	if (mf.has_flag(occupied_flag)) { // if the tree tile is temporarily occupied (e.g. by an item or unit), don't continue the regrowing process while the occupation occurs, but don't reset it either
 		return;
 	}
 	
@@ -227,9 +228,9 @@ void CMapLayer::regenerate_tree_tile(const QPoint &pos)
 				CMap::Map.Info.IsPointOnMap(pos + diagonalOffset, this->ID)
 				&& CMap::Map.Info.IsPointOnMap(pos + verticalOffset, this->ID)
 				&& CMap::Map.Info.IsPointOnMap(pos + horizontalOffset, this->ID)
-				&& ((verticalMf.is_destroyed_tree_tile() && verticalMf.get_value() >= forest_regeneration_threshold && !(verticalMf.Flags & occupied_flag)) || (verticalMf.get_flags() & MapFieldForest))
-				&& ((diagonalMf.is_destroyed_tree_tile() && diagonalMf.get_value() >= forest_regeneration_threshold && !(diagonalMf.Flags & occupied_flag)) || (diagonalMf.get_flags() & MapFieldForest))
-				&& ((horizontalMf.is_destroyed_tree_tile() && horizontalMf.get_value() >= forest_regeneration_threshold && !(horizontalMf.Flags & occupied_flag)) || (horizontalMf.get_flags() & MapFieldForest))
+				&& ((verticalMf.is_destroyed_tree_tile() && verticalMf.get_value() >= forest_regeneration_threshold && !verticalMf.has_flag(occupied_flag)) || verticalMf.has_flag(tile_flag::tree))
+				&& ((diagonalMf.is_destroyed_tree_tile() && diagonalMf.get_value() >= forest_regeneration_threshold && !diagonalMf.has_flag(occupied_flag)) || diagonalMf.has_flag(tile_flag::tree))
+				&& ((horizontalMf.is_destroyed_tree_tile() && horizontalMf.get_value() >= forest_regeneration_threshold && !horizontalMf.has_flag(occupied_flag)) || horizontalMf.has_flag(tile_flag::tree))
 			) {
 				DebugPrint("Real place wood\n");
 				CMap::Map.SetOverlayTerrainDestroyed(pos + verticalOffset, false, this->ID);
@@ -251,7 +252,7 @@ void CMapLayer::regenerate_tree_tile(const QPoint &pos)
 		topMf.setGraphicTile(Map.Tileset->getTopOneTreeTile());
 		topMf.player_info->SeenTile = topMf.getGraphicTile();
 		topMf.set_value(0);
-		topMf.Flags |= MapFieldForest | MapFieldUnpassable;
+		topMf.Flags |= tile_flag::tree | tile_flag::impassable;
 		UI.get_minimap()->UpdateSeenXY(pos + offset);
 		UI.get_minimap()->UpdateXY(pos + offset);
 		
@@ -259,7 +260,7 @@ void CMapLayer::regenerate_tree_tile(const QPoint &pos)
 		mf.setGraphicTile(Map.Tileset->getBottomOneTreeTile());
 		mf.player_info->SeenTile = mf.getGraphicTile();
 		mf.set_value(0);
-		mf.Flags |= MapFieldForest | MapFieldUnpassable;
+		mf.Flags |= tile_flag::tree | tile_flag::impassable;
 		UI.get_minimap()->UpdateSeenXY(pos);
 		UI.get_minimap()->UpdateXY(pos);
 		
@@ -269,8 +270,8 @@ void CMapLayer::regenerate_tree_tile(const QPoint &pos)
 		if (Map.Field(pos + offset)->player_info->IsTeamVisible(*ThisPlayer)) {
 			MarkSeenTile(topMf);
 		}
-		FixNeighbors(MapFieldForest, 0, pos + offset);
-		FixNeighbors(MapFieldForest, 0, pos);
+		FixNeighbors(tile_flag::tree, 0, pos + offset);
+		FixNeighbors(tile_flag::tree, 0, pos);
 	}
 	*/
 }
@@ -380,11 +381,11 @@ const wyrmgus::time_of_day *CMapLayer::get_tile_time_of_day(const int tile_index
 {
 	const wyrmgus::tile *tile = this->Field(tile_index);
 
-	if (tile->Flags & MapFieldSpace) {
+	if (tile->has_flag(tile_flag::space)) {
 		return nullptr;
 	}
 
-	if (tile->Flags & MapFieldUnderground) {
+	if (tile->has_flag(tile_flag::underground)) {
 		return wyrmgus::defines::get()->get_underground_time_of_day();
 	}
 
@@ -508,11 +509,11 @@ const wyrmgus::season *CMapLayer::get_tile_season(const int tile_index) const
 {
 	const wyrmgus::tile *tile = this->Field(tile_index);
 
-	if (tile->Flags & MapFieldSpace) {
+	if (tile->has_flag(tile_flag::space)) {
 		return nullptr;
 	}
 
-	if (tile->Flags & MapFieldUnderground) {
+	if (tile->has_flag(tile_flag::underground)) {
 		return nullptr;
 	}
 

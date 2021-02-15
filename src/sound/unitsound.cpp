@@ -37,6 +37,7 @@
 #include "civilization.h"
 #include "map/map_layer.h"
 #include "map/tile.h"
+#include "map/tile_flag.h"
 #include "map/tileset.h"
 #include "player.h"
 #include "sound/game_sound_set.h"
@@ -190,15 +191,15 @@ const sound *unit_sound_set::get_sound_for_unit(const unit_sound_type unit_sound
 		case unit_sound_type::step: {
 			const tile *tile = unit->MapLayer->Field(unit->tilePos);
 
-			if (this->StepMud.Sound && ((tile->get_flags() & MapFieldMud) || (tile->get_flags() & MapFieldSnow))) {
+			if (this->StepMud.Sound && (tile->has_flag(tile_flag::mud) || tile->has_flag(tile_flag::snow))) {
 				return this->StepMud.Sound;
-			} else if (this->StepDirt.Sound && ((tile->get_flags() & MapFieldDirt) || (tile->get_flags() & MapFieldIce))) {
+			} else if (this->StepDirt.Sound && (tile->has_flag(tile_flag::dirt) || tile->has_flag(tile_flag::ice))) {
 				return this->StepDirt.Sound;
-			} else if (this->StepGravel.Sound && tile->get_flags() & MapFieldGravel) {
+			} else if (this->StepGravel.Sound && tile->has_flag(tile_flag::gravel)) {
 				return this->StepGravel.Sound;
-			} else if (this->StepGrass.Sound && ((tile->get_flags() & MapFieldGrass) || (tile->get_flags() & MapFieldStumps))) {
+			} else if (this->StepGrass.Sound && (tile->has_flag(tile_flag::grass) || tile->has_flag(tile_flag::stumps))) {
 				return this->StepGrass.Sound;
-			} else if (this->StepStone.Sound && tile->get_flags() & MapFieldStoneFloor) {
+			} else if (this->StepStone.Sound && tile->has_flag(tile_flag::stone_floor)) {
 				return this->StepStone.Sound;
 			} else {
 				return this->Step.Sound;

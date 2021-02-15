@@ -35,15 +35,15 @@
 #define AstarDebugPrint(x)
 #endif
 
-/*----------------------------------------------------------------------------
---  Declarations
-----------------------------------------------------------------------------*/
-
 #include "vec2i.h"
 
 class CUnit;
 class CFile;
 struct lua_State;
+
+namespace wyrmgus {
+	enum class tile_flag : uint32_t;
+}
 
 /**
 **  Result codes of the pathfinder.
@@ -148,14 +148,14 @@ public:
 	void Init();
 
 	void PushPos(const Vec2i &pos);
-	void push_pos_if_passable(const QPoint &pos, int z, unsigned long passability_mask);
+	void push_pos_if_passable(const QPoint &pos, const int z, const tile_flag passability_mask);
 	void PushNeighbor(const Vec2i &pos);
 	void push_pos_rect(const QRect &rect);
-	void push_pos_rect_if_passable(const QRect &rect, int z, unsigned long passability_mask);
+	void push_pos_rect_if_passable(const QRect &rect, const int z, const tile_flag passability_mask);
 	void push_pos_rect_borders(const QRect &rect);
-	void push_pos_rect_borders_if_passable(const QRect &rect, int z, unsigned long passability_mask);
+	void push_pos_rect_borders_if_passable(const QRect &rect, const int z, const tile_flag passability_mask);
 	void PushUnitPosAndNeighbor(const CUnit &unit);
-	void push_unit_pos_and_neighbor_if_passable(const CUnit &unit, unsigned long passability_mask);
+	void push_unit_pos_and_neighbor_if_passable(const CUnit &unit, const tile_flag passability_mask);
 
 	template <typename T>
 	bool Run(T &context);
@@ -201,11 +201,6 @@ bool TerrainTraversal::Run(T &context)
 	return false;
 }
 
-
-/*----------------------------------------------------------------------------
---  Variables
-----------------------------------------------------------------------------*/
-
 /// cost associated to move on a tile occupied by a fixed unit
 extern int AStarFixedUnitCrossingCost;
 /// cost associated to move on a tile occupied by a moving unit
@@ -220,10 +215,6 @@ extern int AStarUnknownTerrainCost;
 //  N NE  E SE  S SW  W NW
 constexpr std::array<int, 9> Heading2X = { 0, +1, +1, +1, 0, -1, -1, -1, 0 };
 constexpr std::array<int, 9> Heading2Y = { -1, -1, 0, +1, +1, +1, 0, -1, 0 };
-
-/*----------------------------------------------------------------------------
---  Functions
-----------------------------------------------------------------------------*/
 
 /// Init the pathfinder
 extern void InitPathfinder();

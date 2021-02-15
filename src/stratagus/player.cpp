@@ -64,6 +64,7 @@
 #include "map/minimap.h"
 #include "map/site.h"
 #include "map/site_game_data.h"
+#include "map/tile_flag.h"
 #include "network.h"
 #include "netconnect.h"
 //Wyrmgus start
@@ -1746,7 +1747,7 @@ bool CPlayer::HasSettlementNearWaterZone(const landmass *water_zone) const
 		}
 		
 		Vec2i pos(0, 0);
-		if (FindTerrainType(0, nullptr, 8, *this, settlement_unit->tilePos, &pos, settlement_unit->MapLayer->ID, water_zone)) {
+		if (FindTerrainType(tile_flag::none, nullptr, 8, *this, settlement_unit->tilePos, &pos, settlement_unit->MapLayer->ID, water_zone)) {
 			return true;
 		}
 	}

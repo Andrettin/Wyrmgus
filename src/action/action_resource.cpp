@@ -43,6 +43,7 @@
 #include "map/map.h"
 #include "map/map_layer.h"
 #include "map/tile.h"
+#include "map/tile_flag.h"
 #include "map/tileset.h"
 #include "pathfinder.h"
 #include "player.h"
@@ -74,16 +75,16 @@ static constexpr int SUB_MOVE_TO_DEPOT = 70;
 static constexpr int SUB_UNREACHABLE_DEPOT = 100;
 static constexpr int SUB_RETURN_RESOURCE = 120;
 
-class NearReachableTerrainFinder
+class NearReachableTerrainFinder final
 {
 public:
-	NearReachableTerrainFinder(const CPlayer &player, const int maxDist, const int movemask, const int resource, Vec2i *resPos, const int z) :
+	explicit NearReachableTerrainFinder(const CPlayer &player, const int maxDist, const tile_flag movemask, const int resource, Vec2i *resPos, const int z) :
 		player(player), maxDist(maxDist), movemask(movemask), resource(resource), resPos(resPos), z(z) {}
 	VisitResult Visit(TerrainTraversal &terrainTraversal, const Vec2i &pos, const Vec2i &from);
 private:
 	const CPlayer &player;
 	int maxDist;
-	int movemask;
+	tile_flag movemask;
 	//Wyrmgus start
 //	int resmask;
 	int resource;
@@ -132,12 +133,12 @@ VisitResult NearReachableTerrainFinder::Visit(TerrainTraversal &terrainTraversal
 }
 
 //Wyrmgus start
-//static bool FindNearestReachableTerrainType(int movemask, int resmask, int range,
-static bool FindNearestReachableTerrainType(int movemask, int resource, int range,
+//static bool FindNearestReachableTerrainType(const tile_flag movemask, int resmask, int range,
+static bool FindNearestReachableTerrainType(const tile_flag movemask, const int resource, const int range,
 //Wyrmgus end
 											//Wyrmgus start
 //											const CPlayer &player, const Vec2i &startPos, Vec2i *terrainPos)
-											const CPlayer &player, const Vec2i &startPos, Vec2i *terrainPos, int z)
+											const CPlayer &player, const Vec2i &startPos, Vec2i *terrainPos, const int z)
 											//Wyrmgus end
 {
 	TerrainTraversal terrainTraversal;
@@ -476,7 +477,7 @@ int COrder_Resource::MoveToResource_Terrain(CUnit &unit)
 	if ((CMap::Map.Info.IsPointOnMap(pos, z) == false || CMap::Map.Field(pos, z)->get_resource() != wyrmgus::resource::get_all()[this->CurrentResource])
 		&& (!unit.get_pixel_offset().x()) && (!unit.get_pixel_offset().y())) {
 		//Wyrmgus start
-//		if (!FindTerrainType(unit.Type->MovementMask, MapFieldForest, 16, *unit.Player, this->goalPos, &pos)) {
+//		if (!FindTerrainType(unit.Type->MovementMask, tile_flag::tree, 16, *unit.Player, this->goalPos, &pos)) {
 		if (!FindTerrainType(unit.Type->MovementMask, wyrmgus::resource::get_all()[this->CurrentResource], 16, *unit.Player, this->goalPos, &pos, this->MapLayer)) {
 		//Wyrmgus end
 			// no wood in range
@@ -489,7 +490,7 @@ int COrder_Resource::MoveToResource_Terrain(CUnit &unit)
 		case PF_UNREACHABLE:
 			//Wyrmgus start
 			//if is unreachable and is on a raft, see if the raft can move closer
-			if ((unit.MapLayer->Field(unit.tilePos)->Flags & MapFieldBridge) && !unit.Type->BoolFlag[BRIDGE_INDEX].value && unit.Type->UnitType == UnitTypeType::Land) {
+			if (unit.MapLayer->Field(unit.tilePos)->has_flag(tile_flag::bridge) && !unit.Type->BoolFlag[BRIDGE_INDEX].value && unit.Type->UnitType == UnitTypeType::Land) {
 				std::vector<CUnit *> table;
 				Select(unit.tilePos, unit.tilePos, table, unit.MapLayer->ID);
 				for (size_t i = 0; i != table.size(); ++i) {
@@ -512,7 +513,7 @@ int COrder_Resource::MoveToResource_Terrain(CUnit &unit)
 				}
 			}
 			//Wyrmgus start
-//			if (FindTerrainType(unit.Type->MovementMask, MapFieldForest, 9999, *unit.Player, unit.tilePos, &pos)) {
+//			if (FindTerrainType(unit.Type->MovementMask, tile_flag::tree, 9999, *unit.Player, unit.tilePos, &pos)) {
 			if (FindTerrainType(unit.Type->MovementMask, wyrmgus::resource::get_all()[this->CurrentResource], 9999, *unit.Player, unit.tilePos, &pos, z)) {
 			//Wyrmgus end
 				this->goalPos = pos;
@@ -552,7 +553,7 @@ int COrder_Resource::MoveToResource_Unit(CUnit &unit)
 		case PF_UNREACHABLE:
 			//Wyrmgus start
 			//if is unreachable and is on a raft, see if the raft can move closer
-			if ((unit.MapLayer->Field(unit.tilePos)->Flags & MapFieldBridge) && !unit.Type->BoolFlag[BRIDGE_INDEX].value && unit.Type->UnitType == UnitTypeType::Land) {
+			if (unit.MapLayer->Field(unit.tilePos)->has_flag(tile_flag::bridge) && !unit.Type->BoolFlag[BRIDGE_INDEX].value && unit.Type->UnitType == UnitTypeType::Land) {
 				std::vector<CUnit *> table;
 				Select(unit.tilePos, unit.tilePos, table, unit.MapLayer->ID);
 				for (size_t i = 0; i != table.size(); ++i) {
@@ -1269,7 +1270,7 @@ int COrder_Resource::MoveToDepot(CUnit &unit)
 		case PF_UNREACHABLE:
 			//Wyrmgus start
 			//if is unreachable and is on a raft, see if the raft can move closer
-			if ((unit.MapLayer->Field(unit.tilePos)->Flags & MapFieldBridge) && !unit.Type->BoolFlag[BRIDGE_INDEX].value && unit.Type->UnitType == UnitTypeType::Land) {
+			if (unit.MapLayer->Field(unit.tilePos)->has_flag(tile_flag::bridge) && !unit.Type->BoolFlag[BRIDGE_INDEX].value && unit.Type->UnitType == UnitTypeType::Land) {
 				std::vector<CUnit *> table;
 				Select(unit.tilePos, unit.tilePos, table, unit.MapLayer->ID);
 				for (size_t i = 0; i != table.size(); ++i) {
@@ -1418,7 +1419,7 @@ bool COrder_Resource::WaitInDepot(CUnit &unit)
 		int z = this->Resource.MapLayer = unit.MapLayer->ID;
 
 		//Wyrmgus start
-//		if (FindTerrainType(unit.Type->MovementMask, MapFieldForest, 10, *unit.Player, pos, &pos)) {
+//		if (FindTerrainType(unit.Type->MovementMask, tile_flag::tree, 10, *unit.Player, pos, &pos)) {
 		if (FindTerrainType(unit.Type->MovementMask, wyrmgus::resource::get_all()[this->CurrentResource], 10, *unit.Player, pos, &pos, z)) {
 		//Wyrmgus end
 			if (depot) {
@@ -1590,7 +1591,7 @@ bool COrder_Resource::FindAnotherResource(CUnit &unit)
 			} else {
 				Vec2i resPos;
 				//Wyrmgus start
-//				if (FindTerrainType(unit.Type->MovementMask, MapFieldForest, 8, *unit.Player, unit.tilePos, &resPos)) {
+//				if (FindTerrainType(unit.Type->MovementMask, tile_flag::tree, 8, *unit.Player, unit.tilePos, &resPos)) {
 				if (FindTerrainType(unit.Type->MovementMask, wyrmgus::resource::get_all()[this->CurrentResource], 8, *unit.Player, unit.tilePos, &resPos, unit.MapLayer->ID)) {
 				//Wyrmgus end
 					this->goalPos = resPos;

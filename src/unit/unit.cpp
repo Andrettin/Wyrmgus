@@ -60,6 +60,7 @@
 #include "map/site_game_data.h"
 #include "map/terrain_type.h"
 #include "map/tile.h"
+#include "map/tile_flag.h"
 #include "map/tileset.h"
 #include "missile.h"
 #include "name_generator.h"
@@ -2150,7 +2151,7 @@ void CUnit::GenerateDrop()
 		
 	if (chosen_drop != nullptr) {
 		const CBuildRestrictionOnTop *ontop_b = OnTopDetails(*this->Type, nullptr);
-		if (((chosen_drop->BoolFlag[ITEM_INDEX].value || chosen_drop->BoolFlag[POWERUP_INDEX].value) && (this->MapLayer->Field(drop_pos)->Flags & MapFieldItem)) || (ontop_b && ontop_b->ReplaceOnDie)) { //if the dropped unit is an item (and there's already another item there), or if this building is an ontop one (meaning another will appear under it after it is destroyed), search for another spot
+		if (((chosen_drop->BoolFlag[ITEM_INDEX].value || chosen_drop->BoolFlag[POWERUP_INDEX].value) && this->MapLayer->Field(drop_pos)->has_flag(tile_flag::item)) || (ontop_b && ontop_b->ReplaceOnDie)) { //if the dropped unit is an item (and there's already another item there), or if this building is an ontop one (meaning another will appear under it after it is destroyed), search for another spot
 			Vec2i resPos;
 			FindNearestDrop(*chosen_drop, drop_pos, resPos, LookingW, this->MapLayer->ID);
 			droppedUnit = MakeUnitAndPlace(resPos, *chosen_drop, CPlayer::Players[PlayerNumNeutral], this->MapLayer->ID);
@@ -3327,7 +3328,7 @@ void UpdateUnitSightRange(CUnit &unit)
 */
 void MarkUnitFieldFlags(const CUnit &unit)
 {
-	const unsigned int flags = unit.Type->FieldFlags;
+	const tile_flag flags = unit.Type->FieldFlags;
 	int h = unit.Type->get_tile_height();          // Tile height of the unit.
 	const int width = unit.Type->get_tile_width(); // Tile width of the unit.
 	unsigned int index = unit.Offset;
@@ -3374,7 +3375,7 @@ private:
 */
 void UnmarkUnitFieldFlags(const CUnit &unit)
 {
-	const unsigned int flags = ~unit.Type->FieldFlags;
+	const tile_flag flags = ~unit.Type->FieldFlags;
 	const int width = unit.Type->get_tile_width();
 	int h = unit.Type->get_tile_height();
 	unsigned int index = unit.Offset;

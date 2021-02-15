@@ -46,6 +46,7 @@
 #include "map/map.h"
 #include "map/map_layer.h"
 #include "map/tile.h"
+#include "map/tile_flag.h"
 #include "map/tileset.h"
 #include "missile.h"
 #include "pathfinder.h"
@@ -189,7 +190,7 @@ void COrder_SpellCast::UpdatePathFinderData(PathFinderInput &input)
 //	input.SetMaxRange(this->Range);
 	int distance = this->Range;
 	if (input.GetUnit()->GetModifiedVariable(ATTACKRANGE_INDEX) > 1) {
-		if (!CheckObstaclesBetweenTiles(input.GetUnitPos(), this->has_goal() ? this->get_goal()->tilePos : this->goalPos, MapFieldAirUnpassable, this->MapLayer)) {
+		if (!CheckObstaclesBetweenTiles(input.GetUnitPos(), this->has_goal() ? this->get_goal()->tilePos : this->goalPos, tile_flag::air_impassable, this->MapLayer)) {
 			distance = 1;
 		}
 	}
@@ -331,7 +332,7 @@ bool COrder_SpellCast::SpellMoveToTarget(CUnit &unit)
 	CUnit *goal = this->get_goal();
 	
 	//Wyrmgus start
-	bool obstacle_check = CheckObstaclesBetweenTiles(unit.tilePos, goal ? goal->tilePos : this->goalPos, MapFieldAirUnpassable, this->MapLayer);
+	bool obstacle_check = CheckObstaclesBetweenTiles(unit.tilePos, goal ? goal->tilePos : this->goalPos, tile_flag::air_impassable, this->MapLayer);
 	//Wyrmgus end
 
 	//Wyrmgus start
@@ -356,7 +357,7 @@ bool COrder_SpellCast::SpellMoveToTarget(CUnit &unit)
 	} else if (err == PF_UNREACHABLE || !unit.CanMove()) {
 		//Wyrmgus start
 		//if is unreachable and is on a raft, see if the raft can move closer to the target
-		if ((unit.MapLayer->Field(unit.tilePos)->Flags & MapFieldBridge) && !unit.Type->BoolFlag[BRIDGE_INDEX].value && unit.Type->UnitType == UnitTypeType::Land) {
+		if (unit.MapLayer->Field(unit.tilePos)->has_flag(tile_flag::bridge) && !unit.Type->BoolFlag[BRIDGE_INDEX].value && unit.Type->UnitType == UnitTypeType::Land) {
 			std::vector<CUnit *> table;
 			Select(unit.tilePos, unit.tilePos, table, unit.MapLayer->ID);
 			for (size_t i = 0; i != table.size(); ++i) {

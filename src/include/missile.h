@@ -298,6 +298,7 @@ namespace wyrmgus {
 class sound;
 class unit_ref;
 enum class missile_class;
+enum class tile_flag : uint32_t;
 
 /// Base structure of missile-types
 class missile_type final : public data_entry, public data_type<missile_type>, public CDataType
@@ -459,7 +460,7 @@ public:
 	int TTL = -1;                   /// missile time-to-live
 	int ReduceFactor = 100;          /// Multiplier for reduce or increase damage dealt to the next unit
 	int SmokePrecision = 0;        /// How frequently the smoke missile will generate itself
-	int MissileStopFlags = 0;      /// On which terrain types missile won't fly
+	tile_flag MissileStopFlags;      /// On which terrain types missile won't fly
 	std::unique_ptr<NumberDesc> Damage;        /// missile damage (used for non-direct missiles, e.g. impacts)
 
 private:

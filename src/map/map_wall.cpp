@@ -235,7 +235,7 @@ void CMap::RemoveWall(const Vec2i &pos)
 	mf.set_value(0);
 
 	MapFixWallTile(pos);
-	mf.Flags &= ~(MapFieldWall | MapFieldUnpassable);
+	mf.Flags &= ~(tile_flag::wall | tile_flag::impassable);
 	MapFixWallNeighbors(pos);
 
 	UI.get_minimap()->UpdateXY(pos);

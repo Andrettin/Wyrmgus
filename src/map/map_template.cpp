@@ -54,6 +54,7 @@
 #include "map/terrain_feature.h"
 #include "map/terrain_type.h"
 #include "map/tile.h"
+#include "map/tile_flag.h"
 #include "map/tileset.h"
 #include "map/world.h"
 #include "map/world_game_data.h"
@@ -864,7 +865,7 @@ void map_template::apply(const QPoint &template_start_pos, const QPoint &map_sta
 				}
 
 				if (historical_terrain) {
-					if (historical_terrain->is_overlay() && historical_terrain->is_pathway() && !(CMap::Map.Field(real_pos, z)->Flags & MapFieldLandAllowed)) {
+					if (historical_terrain->is_overlay() && historical_terrain->is_pathway() && !CMap::Map.Field(real_pos, z)->has_flag(tile_flag::land_allowed)) {
 						continue;
 					}
 					CMap::Map.Field(real_pos, z)->SetTerrain(historical_terrain);
@@ -1480,7 +1481,8 @@ void map_template::apply_site(const site *site, const QPoint &site_pos, const in
 						continue;
 					}
 					tile &mf = *unit->MapLayer->Field(x, y);
-					if (mf.Flags & MapFieldBuilding) { //this is a tile where the building itself is located, continue
+					if (mf.has_flag(tile_flag::building)) {
+						//this is a tile where the building itself is located, continue
 						continue;
 					}
 					const QPoint pathway_pos(x, y);
@@ -1554,7 +1556,8 @@ void map_template::apply_site(const site *site, const QPoint &site_pos, const in
 							continue;
 						}
 						tile &mf = *unit->MapLayer->Field(x, y);
-						if (mf.Flags & MapFieldBuilding) { //this is a tile where the building itself is located, continue
+						if (mf.has_flag(tile_flag::building)) {
+							//this is a tile where the building itself is located, continue
 							continue;
 						}
 						Vec2i pathway_pos(x, y);
@@ -2775,7 +2778,7 @@ QPoint map_template::generate_site_orbit_position(const site *site, const int z,
 							continue;
 						}
 
-						if (!(CMap::get()->Field(tile_pos, z)->get_flags() & MapFieldSpace)) {
+						if (!CMap::get()->Field(tile_pos, z)->has_flag(tile_flag::space)) {
 							on_space_border = true;
 							break;
 						}

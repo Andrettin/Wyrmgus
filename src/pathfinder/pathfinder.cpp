@@ -100,7 +100,7 @@ void TerrainTraversal::PushPos(const Vec2i &pos)
 	}
 }
 
-void TerrainTraversal::push_pos_if_passable(const QPoint &pos, int z, const unsigned long passability_mask)
+void TerrainTraversal::push_pos_if_passable(const QPoint &pos, const int z, const tile_flag passability_mask)
 {
 	if (!CMap::get()->Info.IsPointOnMap(pos, z) || !CanMoveToMask(pos, passability_mask, z)) {
 		return;
@@ -136,7 +136,7 @@ void TerrainTraversal::push_pos_rect(const QRect &rect)
 	}
 }
 
-void TerrainTraversal::push_pos_rect_if_passable(const QRect &rect, const int z, const unsigned long passability_mask)
+void TerrainTraversal::push_pos_rect_if_passable(const QRect &rect, const int z, const tile_flag passability_mask)
 {
 	const QPoint top_left = rect.topLeft();
 	const QPoint bottom_right = rect.bottomRight();
@@ -164,7 +164,7 @@ void TerrainTraversal::push_pos_rect_borders(const QRect &rect)
 	}
 }
 
-void TerrainTraversal::push_pos_rect_borders_if_passable(const QRect &rect, const int z, const unsigned long passability_mask)
+void TerrainTraversal::push_pos_rect_borders_if_passable(const QRect &rect, const int z, const tile_flag passability_mask)
 {
 	const QPoint top_left = rect.topLeft();
 	const QPoint bottom_right = rect.bottomRight();
@@ -200,7 +200,7 @@ void TerrainTraversal::PushUnitPosAndNeighbor(const CUnit &unit)
 	this->push_pos_rect(rect);
 }
 
-void TerrainTraversal::push_unit_pos_and_neighbor_if_passable(const CUnit &unit, const unsigned long passability_mask)
+void TerrainTraversal::push_unit_pos_and_neighbor_if_passable(const CUnit &unit, const tile_flag passability_mask)
 {
 	const CUnit *start_unit = unit.GetFirstContainer();
 

@@ -36,6 +36,7 @@
 #include "map/map_layer.h"
 #include "map/terrain_type.h"
 #include "map/tile.h"
+#include "map/tile_flag.h"
 #include "map/tileset.h"
 #include "map/world.h"
 #include "map/world_game_data.h"
@@ -307,12 +308,12 @@ void CViewport::DrawMapBackgroundInViewport() const
 			const std::vector<std::pair<const wyrmgus::terrain_type *, short>> &transition_tiles = ReplayRevealMap ? mf.TransitionTiles : mf.player_info->SeenTransitionTiles;
 			const std::vector<std::pair<const wyrmgus::terrain_type *, short>> &overlay_transition_tiles = ReplayRevealMap ? mf.OverlayTransitionTiles : mf.player_info->SeenOverlayTransitionTiles;
 
-			const bool is_unpassable = overlay_terrain && (overlay_terrain->Flags & MapFieldUnpassable) && !vector::contains(overlay_terrain->get_destroyed_tiles(), overlay_solid_tile);
-			const bool is_space = terrain && terrain->Flags & MapFieldSpace;
+			const bool is_unpassable = overlay_terrain && overlay_terrain->has_flag(tile_flag::impassable) && !vector::contains(overlay_terrain->get_destroyed_tiles(), overlay_solid_tile);
+			const bool is_space = terrain != nullptr && terrain->has_flag(tile_flag::space);
 
 			const wyrmgus::time_of_day *time_of_day = nullptr;
 			if (!is_space) {
-				const bool is_underground = terrain && terrain->Flags & MapFieldUnderground;
+				const bool is_underground = terrain != nullptr && terrain->has_flag(tile_flag::underground);
 				if (is_underground) {
 					time_of_day = defines::get()->get_underground_time_of_day();
 				} else {
@@ -336,11 +337,11 @@ void CViewport::DrawMapBackgroundInViewport() const
 				const std::shared_ptr<CPlayerColorGraphic> &transition_terrain_graphics = transition_terrain->get_graphics(season);
 
 				if (transition_terrain_graphics != nullptr) {
-					const bool is_transition_space = transition_terrain && transition_terrain->Flags & MapFieldSpace;
+					const bool is_transition_space = transition_terrain != nullptr && transition_terrain->has_flag(tile_flag::space);
 
 					const wyrmgus::time_of_day *transition_time_of_day = nullptr;
 					if (!is_transition_space) {
-						const bool is_transition_underground = transition_terrain->Flags & MapFieldUnderground;
+						const bool is_transition_underground = transition_terrain->has_flag(tile_flag::underground);
 
 						if (is_transition_underground) {
 							transition_time_of_day = defines::get()->get_underground_time_of_day();
@@ -361,7 +362,7 @@ void CViewport::DrawMapBackgroundInViewport() const
 			}
 
 			if (overlay_terrain && (overlay_transition_tiles.size() == 0 || overlay_terrain->has_transition_mask())) {
-				const bool is_overlay_space = overlay_terrain->Flags & MapFieldSpace;
+				const bool is_overlay_space = overlay_terrain->has_flag(tile_flag::space);
 				const std::shared_ptr<CPlayerColorGraphic> &overlay_terrain_graphics = overlay_terrain->get_graphics(season);
 				if (overlay_terrain_graphics != nullptr) {
 					overlay_terrain_graphics->DrawPlayerColorFrameClip(player_color, overlay_solid_tile + (overlay_terrain == mf.get_overlay_terrain() ? mf.OverlayAnimationFrame : 0), dx, dy, is_overlay_space ? nullptr : time_of_day);
@@ -374,7 +375,7 @@ void CViewport::DrawMapBackgroundInViewport() const
 					continue;
 				}
 
-				const bool is_overlay_transition_space = overlay_transition_terrain->Flags & MapFieldSpace;
+				const bool is_overlay_transition_space = overlay_transition_terrain->has_flag(tile_flag::space);
 				if (overlay_transition_terrain->get_transition_graphics(season)) {
 					overlay_transition_terrain->get_transition_graphics(season)->DrawPlayerColorFrameClip(player_color, overlay_transition_tiles[i].second, dx, dy, is_overlay_transition_space ? nullptr : time_of_day);
 				}

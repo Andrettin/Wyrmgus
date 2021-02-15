@@ -34,6 +34,7 @@
 #include "map/map.h"
 #include "map/map_layer.h"
 #include "map/tile.h"
+#include "map/tile_flag.h"
 #include "map/tileset.h"
 #include "pathfinder.h"
 #include "player.h"
@@ -51,12 +52,12 @@ static bool IsPosFree(const Vec2i &pos, const CUnit &exceptionUnit, int z)
 	if (std::find(unitCache.begin(), unitCache.end(), &exceptionUnit) != unitCache.end()) {
 		return true;
 	}
-	const unsigned int blockedFlag = (MapFieldUnpassable | MapFieldWall | MapFieldRocks | MapFieldForest | MapFieldBuilding | MapFieldSpaceCliff);
-	if (mf.Flags & blockedFlag) {
+	const tile_flag blocked_flag = (tile_flag::impassable | tile_flag::wall | tile_flag::rock | tile_flag::tree | tile_flag::building | tile_flag::space_cliff);
+	if ((mf.get_flags() & blocked_flag) != tile_flag::none) {
 		return false;
 	}
-	const unsigned int passableFlag = (MapFieldWaterAllowed | MapFieldCoastAllowed | MapFieldLandAllowed | MapFieldSpace);
-	return ((mf.Flags & passableFlag) != 0);
+	const tile_flag passable_flag = (tile_flag::water_allowed | tile_flag::coast_allowed | tile_flag::land_allowed | tile_flag::space);
+	return ((mf.get_flags() & passable_flag) != tile_flag::none);
 }
 
 /**
@@ -149,8 +150,8 @@ public:
 	explicit BuildingPlaceFinder(const CUnit &worker, const wyrmgus::unit_type &type, bool checkSurround, Vec2i *resultPos, bool ignore_exploration, int z, const landmass *landmass, const wyrmgus::site *settlement) :
 		worker(worker), type(type),
 			movemask(worker.Type->MovementMask 
-			& ~((type.BoolFlag[SHOREBUILDING_INDEX].value ? (MapFieldCoastAllowed | MapFieldLandUnit | MapFieldAirUnit | MapFieldSeaUnit) 
-			:  (MapFieldLandUnit | MapFieldAirUnit | MapFieldSeaUnit)))),
+			& ~((type.BoolFlag[SHOREBUILDING_INDEX].value ? (tile_flag::coast_allowed | tile_flag::land_unit | tile_flag::air_unit | tile_flag::sea_unit)
+			:  (tile_flag::land_unit | tile_flag::air_unit | tile_flag::sea_unit)))),
 		checkSurround(checkSurround),
 		//Wyrmgus start
 //		resultPos(resultPos)
@@ -168,7 +169,7 @@ public:
 private:
 	const CUnit &worker;
 	const wyrmgus::unit_type &type;
-	unsigned int movemask;
+	tile_flag movemask;
 	bool checkSurround;
 	Vec2i *resultPos;
 	//Wyrmgus start
@@ -275,8 +276,8 @@ public:
 	explicit HallPlaceFinder(const CUnit &worker, const wyrmgus::unit_type &type, int resource, Vec2i *resultPos, bool ignore_exploration, int z) :
 		worker(worker), type(type),
 		movemask(worker.Type->MovementMask
-			& ~((type.BoolFlag[SHOREBUILDING_INDEX].value ? (MapFieldCoastAllowed | MapFieldLandUnit | MapFieldAirUnit | MapFieldSeaUnit) 
-			:  (MapFieldLandUnit | MapFieldAirUnit | MapFieldSeaUnit)))),
+			& ~((type.BoolFlag[SHOREBUILDING_INDEX].value ? (tile_flag::coast_allowed | tile_flag::land_unit | tile_flag::air_unit | tile_flag::sea_unit)
+			:  (tile_flag::land_unit | tile_flag::air_unit | tile_flag::sea_unit)))),
 		resource(resource),
 		//Wyrmgus start
 //		resultPos(resultPos)
@@ -284,14 +285,18 @@ public:
 		IgnoreExploration(ignore_exploration),
 		z(z)
 		//Wyrmgus end
-	{}
+	{
+	}
+
 	VisitResult Visit(TerrainTraversal &terrainTraversal, const Vec2i &pos, const Vec2i &from);
+
 private:
 	bool IsAUsableMine(const CUnit &mine) const;
+
 private:
 	const CUnit &worker;
 	const wyrmgus::unit_type &type;
-	const unsigned int movemask;
+	const tile_flag movemask;
 	const int resource;
 	Vec2i *resultPos;
 	//Wyrmgus start
@@ -468,9 +473,9 @@ static bool AiFindHallPlace(const CUnit &worker,
 class LumberMillPlaceFinder
 {
 public:
-	LumberMillPlaceFinder(const CUnit &worker, const wyrmgus::unit_type &type, int resource, Vec2i *resultPos, bool ignore_exploration, int z, const wyrmgus::site *settlement) :
+	LumberMillPlaceFinder(const CUnit &worker, const wyrmgus::unit_type &type, const int resource, Vec2i *resultPos, bool ignore_exploration, const int z, const wyrmgus::site *settlement) :
 		worker(worker), type(type),
-		movemask(worker.Type->MovementMask & ~(MapFieldLandUnit | MapFieldAirUnit | MapFieldSeaUnit)),
+		movemask(worker.Type->MovementMask & ~(tile_flag::land_unit | tile_flag::air_unit | tile_flag::sea_unit)),
 		resource(resource),
 		//Wyrmgus start
 //		resultPos(resultPos)
@@ -484,7 +489,7 @@ public:
 private:
 	const CUnit &worker;
 	const wyrmgus::unit_type &type;
-	unsigned int movemask;
+	tile_flag movemask;
 	int resource;
 	Vec2i *resultPos;
 	//Wyrmgus start
