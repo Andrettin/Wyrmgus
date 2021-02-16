@@ -142,7 +142,7 @@ void tile::SetTerrain(const terrain_type *terrain_type)
 			this->Flags &= ~(this->get_terrain()->Flags);
 
 			if (terrain_type->has_flag(tile_flag::water_allowed)) {
-				this->Flags &= ~(tile_flag::coast_allowed); // need to do this manually, since MapFieldCoast is added dynamically
+				this->Flags &= ~(tile_flag::coast_allowed); // need to do this manually, since tile_flag::coast_allowed is added dynamically
 			}
 
 			if (terrain_type->has_flag(tile_flag::space)) {
@@ -178,7 +178,7 @@ void tile::SetTerrain(const terrain_type *terrain_type)
 	}
 
 	//apply the flags from the new terrain type
-	if (terrain_type != nullptr) {
+	if (terrain_type != nullptr && (is_overlay || this->get_overlay_terrain() == nullptr || (!this->get_overlay_terrain()->has_flag(tile_flag::water_allowed) && !this->get_overlay_terrain()->has_flag(tile_flag::space)))) {
 		this->Flags |= terrain_type->Flags;
 	}
 
