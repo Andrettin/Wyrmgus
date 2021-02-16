@@ -190,6 +190,7 @@ void tile::SetTerrain(const terrain_type *terrain_type)
 				this->Flags |= tile_flag::impassable;
 				this->Flags |= tile_flag::air_impassable;
 			}
+
 			const unit_type_variation *variation = unit.GetVariation();
 			if (variation != nullptr && !unit.can_have_variation(variation)) { // if a unit that is on the tile has a terrain-dependent variation that is not compatible with the current variation, repick the unit's variation
 				unit.ChooseVariation();
@@ -226,6 +227,8 @@ void tile::SetTerrain(const terrain_type *terrain_type)
 			this->terrain_feature = nullptr;
 		}
 	}
+
+	this->bump_incompatible_units();
 }
 
 void tile::RemoveOverlayTerrain()
@@ -793,6 +796,31 @@ const world *tile::get_world() const
 bool tile::is_on_trade_route() const
 {
 	return this->get_terrain_feature() != nullptr && this->get_terrain_feature()->is_trade_route();
+}
+
+void tile::bump_incompatible_units()
+{
+	//bump units incompatible with the tile's flags to the nearest valid position for them
+	std::vector<CUnit *> units_to_bump;
+
+	const CUnitCache &cache = this->UnitCache;
+	for (size_t i = 0; i != cache.size(); ++i) {
+		CUnit *unit = cache[i];
+		if (!unit->IsAliveOnMap()) {
+			continue;
+		}
+
+		const tile_flag movement_mask = unit->Type->MovementMask & ~(unit->Type->FieldFlags);
+		if (this->has_flag(movement_mask)) {
+			units_to_bump.push_back(unit);
+		}
+	}
+
+	for (CUnit *unit : units_to_bump) {
+		const QPoint tile_pos = unit->tilePos;
+		unit->Remove(nullptr);
+		DropOutNearest(*unit, unit->tilePos, nullptr);
+	}
 }
 
 //

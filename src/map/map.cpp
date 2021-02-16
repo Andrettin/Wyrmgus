@@ -1307,6 +1307,7 @@ void PreprocessMap()
 				wyrmgus::tile &mf = *CMap::Map.Field(tile_pos, z);
 				CMap::Map.CalculateTileLandmass(tile_pos, z);
 				CMap::Map.CalculateTileOwnershipTransition(tile_pos, z);
+				mf.bump_incompatible_units();
 				mf.UpdateSeenTile();
 				UI.get_minimap()->UpdateXY(tile_pos, z);
 				UI.get_minimap()->update_territory_xy(tile_pos, z);
