@@ -823,9 +823,14 @@ void map_template::apply(const QPoint &template_start_pos, const QPoint &map_sta
 					continue;
 				}
 
+				if (CMap::get()->is_point_in_a_subtemplate_area(tile_pos, z)) {
+					//already a part of a different subtemplate area, so don't change it
+					continue;
+				}
+
 				CMap::Map.Field(tile_pos, z)->SetTerrain(this->get_unusable_area_terrain_type());
 				
-				if (this->get_unusable_area_overlay_terrain_type()) {
+				if (this->get_unusable_area_overlay_terrain_type() != nullptr) {
 					CMap::Map.Field(tile_pos, z)->SetTerrain(this->get_unusable_area_overlay_terrain_type());
 				} else {
 					CMap::Map.Field(tile_pos, z)->RemoveOverlayTerrain();
