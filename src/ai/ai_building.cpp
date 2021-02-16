@@ -52,7 +52,7 @@ static bool IsPosFree(const Vec2i &pos, const CUnit &exceptionUnit, int z)
 	if (std::find(unitCache.begin(), unitCache.end(), &exceptionUnit) != unitCache.end()) {
 		return true;
 	}
-	const tile_flag blocked_flag = (tile_flag::impassable | tile_flag::wall | tile_flag::rock | tile_flag::tree | tile_flag::building | tile_flag::space_cliff);
+	const tile_flag blocked_flag = (tile_flag::impassable | tile_flag::wall | tile_flag::rock | tile_flag::tree | tile_flag::building | tile_flag::space_cliff | tile_flag::air_building);
 	if ((mf.get_flags() & blocked_flag) != tile_flag::none) {
 		return false;
 	}

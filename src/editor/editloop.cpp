@@ -1389,7 +1389,7 @@ static void DrawEditorInfo()
 	// Flags info
 	//
 	const tile_flag flag = mf.get_flags();
-	sprintf(buf.data(), "%02X|%04X|%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c",
+	sprintf(buf.data(), "%02X|%04X|%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c",
 			mf.get_value(), flag,
 			mf.has_flag(tile_flag::impassable) ? 'u' : '-',
 			mf.has_flag(tile_flag::air_impassable) ? 'A' : '-',
@@ -1404,6 +1404,7 @@ static void DrawEditorInfo()
 			mf.has_flag(tile_flag::air_unit) ? 'a' : '-',
 			mf.has_flag(tile_flag::sea_unit) ? 's' : '-',
 			mf.has_flag(tile_flag::building) ? 'b' : '-',
+			mf.has_flag(tile_flag::air_building) ? 'I' : '-',
 			mf.has_flag(tile_flag::item) ? 'i' : '-',
 			mf.has_flag(tile_flag::stumps) ? 't' : '-',
 			mf.has_flag(tile_flag::bridge) ? 'B' : '-',

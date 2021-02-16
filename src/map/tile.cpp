@@ -505,6 +505,9 @@ void tile::Save(CFile &file) const
 	if (this->has_flag(tile_flag::building)) {
 		file.printf(", \"building\"");
 	}
+	if (this->has_flag(tile_flag::air_building)) {
+		file.printf(", \"air_building\"");
+	}
 	//Wyrmgus start
 	if (this->has_flag(tile_flag::item)) {
 		file.printf(", \"item\"");
@@ -649,6 +652,8 @@ void tile::parse(lua_State *l)
 			this->Flags |= tile_flag::sea_unit;
 		} else if (!strcmp(value, "building")) {
 			this->Flags |= tile_flag::building;
+		} else if (!strcmp(value, "air_building")) {
+			this->Flags |= tile_flag::air_building;
 		} else if (!strcmp(value, "item")) {
 			this->Flags |= tile_flag::item;
 		} else if (!strcmp(value, "bridge")) {

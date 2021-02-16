@@ -1728,7 +1728,7 @@ void unit_type::calculate_movement_mask()
 			}
 			break;
 		case UnitTypeType::Fly:                               // in air
-			this->MovementMask = tile_flag::air_impassable | tile_flag::space;
+			this->MovementMask = tile_flag::air_impassable | tile_flag::space_cliff | tile_flag::space | tile_flag::air_building;
 
 			if (!this->BoolFlag[DIMINUTIVE_INDEX].value) {
 				this->MovementMask |= tile_flag::air_unit; // already occuppied
@@ -1764,7 +1764,7 @@ void unit_type::calculate_movement_mask()
 			}
 			break;
 		case UnitTypeType::Space:
-			this->MovementMask = tile_flag::air_impassable;
+			this->MovementMask = tile_flag::air_impassable | tile_flag::air_building;
 
 			if (!this->BoolFlag[DIMINUTIVE_INDEX].value) {
 				this->MovementMask |= tile_flag::air_unit; // already occuppied
@@ -1807,6 +1807,9 @@ void unit_type::calculate_movement_mask()
 		//
 		if (this->MapDefaultStat.Variables[HP_INDEX].Max) {
 			this->FieldFlags = tile_flag::building;
+			if (this->UnitType == UnitTypeType::Fly || this->UnitType == UnitTypeType::Space) {
+				this->FieldFlags |= tile_flag::air_building;
+			}
 		} else {
 			this->FieldFlags = tile_flag::no_building;
 		}

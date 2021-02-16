@@ -360,6 +360,7 @@ static int AiBuildBuilding(const wyrmgus::unit_type &type, const wyrmgus::unit_t
 		tile_flag movemask = type.MovementMask & ~(tile_flag::land_unit | tile_flag::air_unit | tile_flag::sea_unit);
 		if (OnTopDetails(building, nullptr)) { //if the building is built on top of something else, make sure the building it is built on top of doesn't block the movemask
 			movemask &= ~(tile_flag::building);
+			movemask &= ~(tile_flag::air_building);
 		}
 		UnitFinder unitFinder(*AiPlayer->Player, table, maxRange, movemask, &near_unit, z);
 

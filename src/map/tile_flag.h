@@ -67,7 +67,8 @@ enum class tile_flag : uint32_t {
 
 	underground = 1 << 28,	/// The terrain is an underground one; this is used to make it always be "night" there, for graphical purposes as well as for unit sight
 	space = 1 << 29, //the terrain is a space one, only being passable by space units
-	space_cliff = 1 << 30 //used for the transition between land/water and space
+	space_cliff = 1 << 30, //used for the transition between land/water and space
+	air_building = 1u << 31
 };
 
 inline tile_flag string_to_tile_flag(const std::string &tile_flag)
@@ -128,6 +129,8 @@ inline tile_flag string_to_tile_flag(const std::string &tile_flag)
 		return tile_flag::air_unit;
 	} else if (tile_flag == "building") {
 		return tile_flag::building;
+	} else if (tile_flag == "air_building") {
+		return tile_flag::air_building;
 	} else if (tile_flag == "item") {
 		return tile_flag::item;
 	} else if (tile_flag == "bridge") {

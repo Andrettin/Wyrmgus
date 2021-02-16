@@ -514,7 +514,7 @@ public:
 	explicit AiForceRallyPointFinder(const CUnit &startUnit, int distance, const Vec2i &startPos, Vec2i *resultPos, int z) :
 	//Wyrmgus end
 		startUnit(startUnit), distance(distance), startPos(startPos),
-		movemask(startUnit.Type->MovementMask & ~(tile_flag::land_unit | tile_flag::air_unit | tile_flag::sea_unit | tile_flag::building)),
+		movemask(startUnit.Type->MovementMask & ~(tile_flag::land_unit | tile_flag::air_unit | tile_flag::sea_unit | tile_flag::building | tile_flag::air_building)),
 		//Wyrmgus start
 //		resultPos(resultPos)
 		resultPos(resultPos), z(z)
