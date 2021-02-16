@@ -92,6 +92,11 @@ public:
 	void set_time_of_day(const scheduled_time_of_day *time_of_day);
 	const wyrmgus::time_of_day *get_time_of_day() const;
 
+	void set_remaining_season_hours(const int hours)
+	{
+		this->remaining_season_hours = hours;
+	}
+
 private:
 	void decrement_remaining_season_hours();
 	void increment_season();

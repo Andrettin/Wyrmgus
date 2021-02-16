@@ -1513,18 +1513,54 @@ void SetTimeOfDaySchedule(const std::string &time_of_day_schedule_ident, const i
 */
 void SetSeason(const std::string &season_ident, int z)
 {
+	const std::unique_ptr<CMapLayer> &map_layer = CMap::get()->MapLayers[z];
+
 	if (season_ident.empty()) {
-		CMap::Map.MapLayers[z]->SetSeason(nullptr);
-		CMap::Map.MapLayers[z]->RemainingSeasonHours = 0;
-	} else {
-		const season_schedule *schedule = CMap::Map.MapLayers[z]->get_season_schedule();
-		if (schedule != nullptr) {
-			for (const std::unique_ptr<scheduled_season> &season : schedule->get_scheduled_seasons()) {
-				if (season->get_season()->get_identifier() == season_ident)  {
-					CMap::Map.MapLayers[z]->SetSeason(season.get());
-					CMap::Map.MapLayers[z]->RemainingSeasonHours = season->get_hours();
-					break;
-				}
+		map_layer->SetSeason(nullptr);
+		map_layer->RemainingSeasonHours = 0;
+
+		for (const world *world : world::get_all()) {
+			world_game_data *world_game_data = world->get_game_data();
+
+			if (!world_game_data->is_on_map()) {
+				continue;
+			}
+
+			world_game_data->set_season(nullptr);
+			world_game_data->set_remaining_season_hours(0);
+		}
+
+		return;
+	}
+
+	const season *season = season::try_get(season_ident);
+	if (season == nullptr) {
+		return;
+	}
+
+	const season_schedule *schedule = map_layer->get_season_schedule();
+	if (schedule != nullptr) {
+		for (const std::unique_ptr<scheduled_season> &scheduled_season : schedule->get_scheduled_seasons()) {
+			if (scheduled_season->get_season() == season) {
+				map_layer->SetSeason(scheduled_season.get());
+				map_layer->RemainingSeasonHours = scheduled_season->get_hours();
+				break;
+			}
+		}
+	}
+
+	for (const world *world : world::get_all()) {
+		world_game_data *world_game_data = world->get_game_data();
+
+		if (!world_game_data->is_on_map()) {
+			continue;
+		}
+
+		for (const std::unique_ptr<scheduled_season> &scheduled_season : world->get_season_schedule()->get_scheduled_seasons()) {
+			if (scheduled_season->get_season() == season) {
+				world_game_data->set_season(scheduled_season.get());
+				world_game_data->set_remaining_season_hours(scheduled_season->get_hours());
+				break;
 			}
 		}
 	}
