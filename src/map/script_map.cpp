@@ -849,7 +849,12 @@ void ApplyCampaignMap(const std::string &campaign_ident)
 		if (i < campaign->MapTemplateStartPos.size()) {
 			start_pos = campaign->MapTemplateStartPos[i];
 		}
-		map_template->apply(start_pos, QPoint(0, 0), i);
+
+		try {
+			map_template->apply(start_pos, QPoint(0, 0), i);
+		} catch (...) {
+			std::throw_with_nested(std::runtime_error("Failed to apply map template \"" + map_template->get_identifier() + "\"."));
+		}
 	}
 }
 //Wyrmgus end

@@ -25,6 +25,8 @@
 //      02111-1307, USA.
 //
 
+#include "stratagus.h"
+
 #include "util/random.h"
 
 #include "util/geocoordinate.h"

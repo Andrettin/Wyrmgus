@@ -41,11 +41,15 @@ static EntriesType Entries;
 */
 const char *Translate(const char *str)
 {
-	EntriesType::iterator i = Entries.find(str);
-	if (i != Entries.end() && !i->second.empty()) {
-		return i->second.c_str();
-	} else {
-		return str;
+	try {
+		EntriesType::iterator i = Entries.find(str);
+		if (i != Entries.end() && !i->second.empty()) {
+			return i->second.c_str();
+		} else {
+			return str;
+		}
+	} catch (...) {
+		std::throw_with_nested(std::runtime_error("Failed to get translation for string."));
 	}
 }
 

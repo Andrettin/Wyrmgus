@@ -709,8 +709,7 @@ void map_template::apply(const QPoint &template_start_pos, const QPoint &map_sta
 	}
 	
 	if (template_start_pos.x() < 0 || template_start_pos.x() >= this->get_width() || template_start_pos.y() < 0 || template_start_pos.y() >= this->get_height()) {
-		fprintf(stderr, "Invalid map coordinate for map template \"%s\": (%d, %d)\n", this->Ident.c_str(), template_start_pos.x(), template_start_pos.y());
-		return;
+		throw std::runtime_error("Invalid map coordinate for map template \"" + this->get_identifier() + "\": " + point::to_string(template_start_pos) + ".");
 	}
 
 	const QSize applied_size = this->get_applied_size();
@@ -1194,7 +1193,11 @@ void map_template::apply_subtemplate(map_template *subtemplate, const QPoint &te
 
 	if (found_location) {
 		if (subtemplate_pos.x() >= 0 && subtemplate_pos.y() >= 0 && subtemplate_pos.x() < CMap::Map.Info.MapWidths[z] && subtemplate_pos.y() < CMap::Map.Info.MapHeights[z]) {
-			subtemplate->apply(subtemplate->get_start_pos(), subtemplate_pos, z);
+			try {
+				subtemplate->apply(subtemplate->get_start_pos(), subtemplate_pos, z);
+			} catch (...) {
+				std::throw_with_nested(std::runtime_error("Failed to apply map subtemplate \"" + subtemplate->get_identifier() + "\"."));
+			}
 
 			//also apply all dependent adjacent templates, if the other templates they depend on have also been applied, so that they are more likely to be close to this subtemplate
 			for (map_template *dependent_subtemplate : subtemplate->dependent_adjacent_templates) {
@@ -1222,7 +1225,7 @@ void map_template::apply_subtemplate(map_template *subtemplate, const QPoint &te
 		subtemplate->clear_application_data();
 
 		if (!subtemplate->is_optional()) {
-			throw std::runtime_error("Failed to apply subtemplate \"" + subtemplate->get_identifier() + "\".");
+			throw std::runtime_error("Failed to find a location for map subtemplate \"" + subtemplate->get_identifier() + "\".");
 		}
 	}
 }
@@ -1251,12 +1254,17 @@ void map_template::apply_sites(const QPoint &template_start_pos, const QPoint &m
 			if (site_raw_pos.x() != -1 || site_raw_pos.y() != -1) {
 				continue;
 			}
+
 			if (base_unit_type != nullptr) {
-				if (site->orbits_map_template()) {
-					site_pos = this->generate_celestial_site_position(site, z);
-				} else {
-					site_pos = CMap::Map.generate_unit_location(base_unit_type, nullptr, map_start_pos, map_end - QPoint(1, 1), z);
-					site_pos += unit_offset;
+				try {
+					if (site->orbits_map_template()) {
+						site_pos = this->generate_celestial_site_position(site, z);
+					} else {
+						site_pos = CMap::Map.generate_unit_location(base_unit_type, nullptr, map_start_pos, map_end - QPoint(1, 1), z);
+						site_pos += unit_offset;
+					}
+				} catch (...) {
+					std::throw_with_nested(std::runtime_error("Failed to generate position for site \"" + site->get_identifier() + "\"."));
 				}
 			}
 		} else {
@@ -1273,7 +1281,11 @@ void map_template::apply_sites(const QPoint &template_start_pos, const QPoint &m
 			continue;
 		}
 
-		this->apply_site(site, site_pos, z);
+		try {
+			this->apply_site(site, site_pos, z);
+		} catch (...) {
+			std::throw_with_nested(std::runtime_error("Failed to apply site \"" + site->get_identifier() + "\"."));
+		}
 	}
 }
 
@@ -1382,7 +1394,11 @@ void map_template::apply_site(const site *site, const QPoint &site_pos, const in
 
 			const QPoint satellite_pos = this->generate_site_orbit_position(satellite, z, satellite_orbit_distance);
 
-			this->apply_site(satellite, satellite_pos, z);
+			try {
+				this->apply_site(satellite, satellite_pos, z);
+			} catch (...) {
+				std::throw_with_nested(std::runtime_error("Failed to apply satellite site \"" + satellite->get_identifier() + "\"."));
+			}
 		}
 	}
 
