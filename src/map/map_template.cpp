@@ -1276,6 +1276,15 @@ void map_template::apply_sites(const QPoint &template_start_pos, const QPoint &m
 			if (site_raw_pos.x() == -1 && site_raw_pos.y() == -1) {
 				continue;
 			}
+
+			//as a special case for fixed space sites (e.g. stars), don't apply them if they would be applied on a pre-existing subtemplate area, so that e.g. if stars would be applied where the Nidavellir terrain circle is, they don't get applied, instead of being applied on the nearest available space (which would leave Nidavellir encircled with stars)
+			if (base_unit_type != nullptr && base_unit_type->UnitType == UnitTypeType::Space) {
+				const QPoint top_left_pos = site_pos - unit_offset;
+				const QPoint bottom_right_pos = top_left_pos + size::to_point(base_unit_type->get_tile_size()) - QPoint(1, 1);
+				if (CMap::get()->is_rect_in_a_subtemplate_area(QRect(top_left_pos, bottom_right_pos), z)) {
+					continue;
+				}
+			}
 		}
 
 		if (!CMap::Map.Info.IsPointOnMap(site_pos, z) || site_pos.x() < map_start_pos.x() || site_pos.y() < map_start_pos.y()) {
