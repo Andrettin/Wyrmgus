@@ -17,7 +17,7 @@ env:
 jobs:
   build:
     runs-on: 'ubuntu-latest'
-    container: 'bergentroll/wyrmgus:focal'
+    container: 'bergentroll/wyrmgus:bullseye'
     steps:
       - uses: actions/checkout@v2
       - name: Set CPU number
@@ -50,13 +50,10 @@ jobs:
         run: |
           git clone "$WYRMSUN_URL" "${BUILD_DIR}/Wyrmsun/"
           git -C "${BUILD_DIR}/Wyrmsun/" checkout "$WYRMSUN_BRANCH"
-      - name: Run sound server
-        run: |
-          pulseaudio --exit-idle-time=-1 &
-          until pulseaudio --check; do sleep 1; done
-        env:
-          HOME: /root/
-        timeout-minutes: 5
+      - name: Configure ALSA
+        run: >-
+          echo 'pcm.!default { type plug slave.pcm "null"; }'
+          > /etc/asound.conf
       - name: Run graphic server
         run: |
           Xvfb "$DISPLAY" &

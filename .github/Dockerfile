@@ -1,4 +1,4 @@
-FROM ubuntu:focal
+FROM debian:bullseye
 LABEL Description="Environment to build and test Wyrmgus"
 ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get update

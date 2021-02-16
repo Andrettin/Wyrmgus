@@ -9,7 +9,7 @@ and test Wyrmgus. Pipeline fetching the docker image from
 https://hub.docker.com, so an updated image should be uploaded. To build an
 image run command in directory with [Dockerfile](Dockerfile):
 ```
-$ docker image build -t 'image_name:tag'
+$ docker image build -tag 'image_name:tag' --compress --force-rm
 ```
 
 Pipeline may be ran locally with [act](https://github.com/nektos/act) tool. To
