@@ -2710,38 +2710,27 @@ bool map_template::is_constructed_subtemplate_compatible_with_terrain_image(map_
 
 QPoint map_template::generate_celestial_site_position(const site *site, const int z) const
 {
-	static constexpr int max_potential_longitudes = (geocoordinate::max_longitude - geocoordinate::min_longitude).get_value() / 1000;
-	static constexpr int max_potential_latitudes = (geocoordinate::max_latitude - geocoordinate::min_latitude).get_value() / 500;
-	static constexpr int max_potential_astrocoordinates = max_potential_longitudes * max_potential_latitudes;
-
-	std::vector<geocoordinate> potential_astrocoordinates;
-	potential_astrocoordinates.reserve(max_potential_astrocoordinates);
-
-	for (longitude lon = geocoordinate::min_longitude; lon <= geocoordinate::max_longitude; lon += longitude::from_value(1000)) {
-		for (latitude lat = geocoordinate::min_latitude; lat <= geocoordinate::max_latitude; lat += latitude::from_value(500)) {
-			if (lon == 0 && lat == 0) {
-				continue;
-			}
-
-			potential_astrocoordinates.emplace_back(lon, lat);
-		}
-	}
-
 	const QSize celestial_site_size = site->get_size_with_satellites();
 
-	while (!potential_astrocoordinates.empty()) {
-		const geocoordinate astrocoordinate = vector::take_random(potential_astrocoordinates);
+	//check each possible geocoordinate, going through them in a random manner
+	QPoint pos(-1, -1);
+
+	geocoordinate::for_each_random_until([&](const geocoordinate &astrocoordinate) {
+		if (astrocoordinate.get_longitude() == 0 && astrocoordinate.get_latitude() == 0) {
+			return false;
+		}
+
 		QPoint random_pos = site->astrocoordinate_to_pos<true>(astrocoordinate);
 
 		if (!CMap::get()->Info.IsPointOnMap(random_pos, z)) {
-			continue;
+			return false;
 		}
 
 		//ensure there are no units placed where the celestial site and its satellites would be
 		std::vector<CUnit *> units;
 		Select(random_pos - size::to_point((celestial_site_size + QSize(1, 1)) / 2), random_pos + size::to_point((celestial_site_size + QSize(1, 1)) / 2), units, z);
 		if (!units.empty()) {
-			continue;
+			return false;
 		}
 
 		const unit_type *unit_type = site->get_base_unit_type();
@@ -2749,14 +2738,19 @@ QPoint map_template::generate_celestial_site_position(const site *site, const in
 			const QPoint top_left_pos = random_pos - unit_type->get_tile_center_pos_offset();
 
 			if (!UnitTypeCanBeAt(*unit_type, top_left_pos, z) || (unit_type->BoolFlag[BUILDING_INDEX].value && !CanBuildUnitType(nullptr, *unit_type, top_left_pos, 0, true, z))) {
-				continue;
+				return false;
 			}
 		}
 
-		return random_pos;
+		pos = random_pos;
+		return true;
+	});
+
+	if (pos == QPoint(-1, -1)) {
+		throw std::runtime_error("Failed to generate celestial site position for site \"" + site->get_identifier() + "\".");
 	}
 
-	throw std::runtime_error("Failed to generate celestial site position for site \"" + site->get_identifier() + "\".");
+	return pos;
 }
 
 QPoint map_template::generate_site_orbit_position(const site *site, const int z, const int64_t orbit_distance) const

@@ -73,6 +73,8 @@ public:
 		return y.to_int();
 	}
 
+	static void for_each_random_until(const std::function<bool(const geocoordinate &)> &function);
+
 	constexpr geocoordinate()
 	{
 	}
