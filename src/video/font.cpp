@@ -697,8 +697,7 @@ void font::MeasureWidths()
 
 	const int maxy = image.width() / frame_size.width() * image.height() / frame_size.height();
 
-	this->char_width = std::make_unique<char[]>(maxy);
-	memset(this->char_width.get(), 0, maxy);
+	this->char_width = std::vector<char>(maxy, 0);
 	this->char_width[0] = frame_size.width() / 2 * scale_factor;  // a reasonable value for SPACE
 	const int ipr = image.width() / frame_size.width(); // images per row
 
