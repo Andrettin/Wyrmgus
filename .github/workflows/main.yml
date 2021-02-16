@@ -50,13 +50,11 @@ jobs:
         run: |
           git clone "$WYRMSUN_URL" "${BUILD_DIR}/Wyrmsun/"
           git -C "${BUILD_DIR}/Wyrmsun/" checkout "$WYRMSUN_BRANCH"
-      - name: Run sound server
-        run: |
-          pulseaudio --exit-idle-time=-1 &
-          until pulseaudio --check; do sleep 1; done
+      - name: Configure ALSA
+        run: >-
+          echo 'pcm.!default { type plug slave.pcm "null"; }'
+          > /etc/asound.conf
         env:
-          HOME: /root/
-        timeout-minutes: 5
       - name: Run graphic server
         run: |
           Xvfb "$DISPLAY" &
