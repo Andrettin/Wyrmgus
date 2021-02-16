@@ -54,7 +54,6 @@ jobs:
         run: >-
           echo 'pcm.!default { type plug slave.pcm "null"; }'
           > /etc/asound.conf
-        env:
       - name: Run graphic server
         run: |
           Xvfb "$DISPLAY" &
