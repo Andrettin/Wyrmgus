@@ -2770,10 +2770,17 @@ QPoint map_template::generate_site_orbit_position(const site *site, const int z,
 
 	const QSize site_size = site->get_size_with_satellites();
 
+	const site_game_data *orbit_center_game_data = site->get_orbit_center()->get_game_data();
+
+	QPoint orbit_center_pos = orbit_center_game_data->get_map_pos();
+	if (orbit_center_game_data->get_site_unit() != nullptr) {
+		orbit_center_pos = orbit_center_game_data->get_site_unit()->get_center_tile_pos();
+	}
+
 	while (!potential_circle_points.empty()) {
 		const QPoint orbit_circle_pos = vector::take_random(potential_circle_points);
 		const QPoint orbit_pos = point::get_nearest_circle_edge_point(orbit_circle_pos, orbit_distance);
-		QPoint random_pos = site->get_orbit_center()->get_game_data()->get_map_pos() + orbit_pos;
+		QPoint random_pos = orbit_center_pos + orbit_pos;
 
 		if (!CMap::get()->Info.IsPointOnMap(random_pos, z)) {
 			continue;
