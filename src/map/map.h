@@ -283,6 +283,7 @@ public:
 	bool TileBordersTerrainIncompatibleWithTerrainPair(const Vec2i &pos, const wyrmgus::terrain_type *terrain_type, const wyrmgus::terrain_type *overlay_terrain_type, const int z) const;
 	bool TileHasUnitsIncompatibleWithTerrain(const Vec2i &pos, const wyrmgus::terrain_type *terrain, const int z);
 	bool is_point_in_a_subtemplate_area(const QPoint &pos, const int z) const;
+	bool is_rect_in_a_subtemplate_area(const QRect &rect, const int z) const;
 	bool is_point_in_subtemplate_area(const QPoint &pos, const int z, const wyrmgus::map_template *subtemplate) const;
 	bool is_subtemplate_on_map(const wyrmgus::map_template *subtemplate) const;
 	const QRect &get_subtemplate_rect(const wyrmgus::map_template *subtemplate) const;

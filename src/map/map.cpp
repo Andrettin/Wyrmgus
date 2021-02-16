@@ -842,6 +842,30 @@ bool CMap::is_point_in_a_subtemplate_area(const QPoint &pos, const int z) const
 	return false;
 }
 
+bool CMap::is_rect_in_a_subtemplate_area(const QRect &rect, const int z) const
+{
+	for (const auto &kv_pair : this->MapLayers[z]->subtemplate_areas) {
+		const map_template *subtemplate = kv_pair.first;
+		const QRect &subtemplate_rect = kv_pair.second;
+
+		if (!rect.intersects(subtemplate_rect)) {
+			continue;
+		}
+
+		for (int x = rect.x(); x <= rect.right(); ++x) {
+			for (int y = rect.y(); y <= rect.bottom(); ++y) {
+				const QPoint tile_pos(x, y);
+
+				if (subtemplate->is_map_pos_usable(tile_pos)) {
+					return true;
+				}
+			}
+		}
+	}
+
+	return false;
+}
+
 bool CMap::is_point_in_subtemplate_area(const QPoint &pos, const int z, const wyrmgus::map_template *subtemplate) const
 {
 	const QRect &subtemplate_rect = this->MapLayers[z]->get_subtemplate_rect(subtemplate);
@@ -2496,7 +2520,7 @@ void CMap::CalculateTileTransitions(const Vec2i &pos, bool overlay, int z)
 			
 			if (adjacent_terrain && found_transition) {
 				for (size_t i = 0; i != iterator->second.size(); ++i) {
-					adjacent_terrain_directions[wyrmgus::terrain_type::get_all().size()].erase(std::remove(adjacent_terrain_directions[wyrmgus::terrain_type::get_all().size()].begin(), adjacent_terrain_directions[wyrmgus::terrain_type::get_all().size()].end(), iterator->second[i]), adjacent_terrain_directions[wyrmgus::terrain_type::get_all().size()].end());
+					vector::remove(adjacent_terrain_directions[terrain_type::get_all().size()], iterator->second[i]);
 				}
 			}
 		}
@@ -2508,8 +2532,8 @@ void CMap::CalculateTileTransitions(const Vec2i &pos, bool overlay, int z)
 		for (int passes = 0; passes < (int) mf.OverlayTransitionTiles.size() && swapped; ++passes) {
 			swapped = false;
 			for (int i = 0; i < ((int) mf.OverlayTransitionTiles.size()) - 1; ++i) {
-				if (wyrmgus::vector::contains(mf.OverlayTransitionTiles[i + 1].first->get_inner_border_terrain_types(), mf.OverlayTransitionTiles[i].first)) {
-					std::pair<const wyrmgus::terrain_type *, int> temp_transition = mf.OverlayTransitionTiles[i];
+				if (vector::contains(mf.OverlayTransitionTiles[i + 1].first->get_inner_border_terrain_types(), mf.OverlayTransitionTiles[i].first)) {
+					std::pair<const terrain_type *, int> temp_transition = mf.OverlayTransitionTiles[i];
 					mf.OverlayTransitionTiles[i] = mf.OverlayTransitionTiles[i + 1];
 					mf.OverlayTransitionTiles[i + 1] = temp_transition;
 					swapped = true;
@@ -2521,8 +2545,8 @@ void CMap::CalculateTileTransitions(const Vec2i &pos, bool overlay, int z)
 		for (int passes = 0; passes < (int) mf.TransitionTiles.size() && swapped; ++passes) {
 			swapped = false;
 			for (int i = 0; i < ((int) mf.TransitionTiles.size()) - 1; ++i) {
-				if (wyrmgus::vector::contains(mf.TransitionTiles[i + 1].first->get_inner_border_terrain_types(), mf.TransitionTiles[i].first)) {
-					std::pair<const wyrmgus::terrain_type *, int> temp_transition = mf.TransitionTiles[i];
+				if (vector::contains(mf.TransitionTiles[i + 1].first->get_inner_border_terrain_types(), mf.TransitionTiles[i].first)) {
+					std::pair<const terrain_type *, int> temp_transition = mf.TransitionTiles[i];
 					mf.TransitionTiles[i] = mf.TransitionTiles[i + 1];
 					mf.TransitionTiles[i + 1] = temp_transition;
 					swapped = true;
