@@ -1,20 +1,17 @@
-Source: stratagus
+Source: wyrmgus
 Section: games
 Priority: optional
 Maintainer: cybermind <iddqd_mail@mail.ru>
-Build-Depends: debhelper (>= 7), cmake (>= 2.6), doxygen,
- imagemagick, sharutils, liblua5.1-dev | liblua5.1-0-dev, libtolua++5.1-dev,
- zlib1g-dev, libbz2-dev, libpng12-dev (>= 1.2.5), libmng-dev,
- libmikmod2-dev, libogg-dev, libvorbis-dev, libtheora-dev,
- libsdl1.2-dev (>> 1.2.2), libx11-dev, libsqlite3-dev,
- libgles1-sgx-img-dev | libglu1-mesa-dev | libglu-dev | libgles1-mesa-dev,
- libsdl-gles1.2-dev | libglu1-mesa-dev | libglu-dev, libfluidsynth-dev
-Standards-Version: 3.9.6
+Build-Depends: debhelper (>= 13), cmake (>= 3.16), libboost-dev (>= 1.71),
+  libbz2-dev, liblua5.1-dev, libsdl-mixer1.2-dev, libsdl1.2-dev, libsqlite3-dev,
+  libtolua++5.1-dev, qtbase5-dev (>= 5.12), qtlocation5-dev (>= 5.12),
+  qtmultimedia5-dev (>= 5.12), qtpositioning5-dev (>= 5.12)
+Standards-Version: 4.5.1
 Homepage: https://launchpad.net/stratagus
 Vcs-Browser: https://code.launchpad.net/stratagus
 Vcs-Bzr: lp:stratagus
 
-Package: stratagus
+Package: wyrmgus
 Architecture: any
 Suggests: wargus, war1gus, stargus, stratagus-data
 Depends: ${misc:Depends}, ${shlibs:Depends}
@@ -44,100 +41,100 @@ Description: Strategy Gaming Engine
  gzip, bunzip2, SDL, vorbis, theora and OpenGL (or OpenGL ES 1.1) support.
  The sound options will depend on your personal election on SDL packages.
 
-Package: stratagus-dbg
-Section: debug
-Priority: extra
-Architecture: any
-Depends: ${misc:Depends}, ${shlibs:Depends}, libc6-dbg, stratagus (= ${binary:Version})
-Description: Strategy Gaming Engine (debugging symbols)
- Stratagus is a free cross-platform real-time strategy gaming engine.
- It includes support for playing over Internet/LAN, or playing vs.
- computer opponents. The engine is configurable and can be used to
- create games with a wide-range of features specific to your needs.
- .
- Stratagus is developed together for Windows, Linux and Mac OS X.
- .
- Games which use Stratagus:
-  * Wargus - Warcraft II - https://github.com/Wargus/wargus
-  * Doom Wars - http://stratagus.com/games/doom-wars
-  * Wyrmsun - https://github.com/andrettin/wyrmsun
-     (uses modified engine version : https://github.com/Andrettin/Wyrmgus)
-  * Stargus - Starcraft I - https://github.com/Wargus/stargus
-  * War1gus - Warcraft I - https://github.com/Wargus/war1gus
- .
- This package provides no game and no game data set. This is only engine.
- To play one of game, install package wargus, war1gus or stargus.
- .
- This is the stable release of Stratagus, and is both fairly playable and
- fairly bug-free. It also has network connectivity for up to 8 players.
- .
- This version is compiled with some of the possible options, and thus has
- gzip, bunzip2, SDL, vorbis, theora and OpenGL (or OpenGL ES 1.1) support.
- The sound options will depend on your personal election on SDL packages.
- .
- This package contains Stratagus binary with debugging symbols.
-
-Package: stratagus-doc
-Section: doc
-Architecture: all
-Depends: ${misc:Depends}, ${shlibs:Depends}
-Suggests: stratagus
-Description: Strategy Gaming Engine (documentation)
- Stratagus is a free cross-platform real-time strategy gaming engine.
- It includes support for playing over Internet/LAN, or playing vs.
- computer opponents. The engine is configurable and can be used to
- create games with a wide-range of features specific to your needs.
- .
- Stratagus is developed together for Windows, Linux and Mac OS X.
- .
- Games which use Stratagus:
-  * Wargus - Warcraft II - https://github.com/Wargus/wargus
-  * Doom Wars - http://stratagus.com/games/doom-wars
-  * Wyrmsun - https://github.com/andrettin/wyrmsun
-     (uses modified engine version : https://github.com/Andrettin/Wyrmgus)
-  * Stargus - Starcraft I - https://github.com/Wargus/stargus
-  * War1gus - Warcraft I - https://github.com/Wargus/war1gus
- .
- This package provides no game and no game data set. This is only engine.
- To play one of game, install package wargus, war1gus or stargus.
- .
- This is the stable release of Stratagus, and is both fairly playable and
- fairly bug-free. It also has network connectivity for up to 8 players.
- .
- This version is compiled with some of the possible options, and thus has
- gzip, bunzip2, SDL, vorbis, theora and OpenGL (or OpenGL ES 1.1) support.
- The sound options will depend on your personal election on SDL packages.
- .
- This package contains Stratagus documentation.
-
-Package: stratagus-dev
-Architecture: all
-Depends: ${misc:Depends}, ${shlibs:Depends}, stratagus (>= ${binary:Version})
-Description: Strategy Gaming Engine (development files)
- Stratagus is a free cross-platform real-time strategy gaming engine.
- It includes support for playing over Internet/LAN, or playing vs.
- computer opponents. The engine is configurable and can be used to
- create games with a wide-range of features specific to your needs.
- .
- Stratagus is developed together for Windows, Linux and Mac OS X.
- .
- Games which use Stratagus:
-  * Wargus - Warcraft II - https://github.com/Wargus/wargus
-  * Doom Wars - http://stratagus.com/games/doom-wars
-  * Wyrmsun - https://github.com/andrettin/wyrmsun
-     (uses modified engine version : https://github.com/Andrettin/Wyrmgus)
-  * Stargus - Starcraft I - https://github.com/Wargus/stargus
-  * War1gus - Warcraft I - https://github.com/Wargus/war1gus
- .
- This package provides no game and no game data set. This is only engine.
- To play one of game, install package wargus, war1gus or stargus.
- .
- This is the stable release of Stratagus, and is both fairly playable and
- fairly bug-free. It also has network connectivity for up to 8 players.
- .
- This version is compiled with some of the possible options, and thus has
- gzip, bunzip2, SDL, vorbis, theora and OpenGL (or OpenGL ES 1.1) support.
- The sound options will depend on your personal election on SDL packages.
- .
- This package contains Stratagus game development headers files needed for
- building Stratagus games.
+#Package: wyrmgus-dbg
+#Section: debug
+#Priority: extra
+#Architecture: any
+#Depends: ${misc:Depends}, ${shlibs:Depends}, libc6-dbg, stratagus (= ${binary:Version})
+#Description: Strategy Gaming Engine (debugging symbols)
+# Stratagus is a free cross-platform real-time strategy gaming engine.
+# It includes support for playing over Internet/LAN, or playing vs.
+# computer opponents. The engine is configurable and can be used to
+# create games with a wide-range of features specific to your needs.
+# .
+# Stratagus is developed together for Windows, Linux and Mac OS X.
+# .
+# Games which use Stratagus:
+#  * Wargus - Warcraft II - https://github.com/Wargus/wargus
+#  * Doom Wars - http://stratagus.com/games/doom-wars
+#  * Wyrmsun - https://github.com/andrettin/wyrmsun
+#     (uses modified engine version : https://github.com/Andrettin/Wyrmgus)
+#  * Stargus - Starcraft I - https://github.com/Wargus/stargus
+#  * War1gus - Warcraft I - https://github.com/Wargus/war1gus
+# .
+# This package provides no game and no game data set. This is only engine.
+# To play one of game, install package wargus, war1gus or stargus.
+# .
+# This is the stable release of Stratagus, and is both fairly playable and
+# fairly bug-free. It also has network connectivity for up to 8 players.
+# .
+# This version is compiled with some of the possible options, and thus has
+# gzip, bunzip2, SDL, vorbis, theora and OpenGL (or OpenGL ES 1.1) support.
+# The sound options will depend on your personal election on SDL packages.
+# .
+# This package contains Stratagus binary with debugging symbols.
+#
+#Package: wyrmgus-doc
+#Section: doc
+#Architecture: all
+#Depends: ${misc:Depends}, ${shlibs:Depends}
+#Suggests: stratagus
+#Description: Strategy Gaming Engine (documentation)
+# Stratagus is a free cross-platform real-time strategy gaming engine.
+# It includes support for playing over Internet/LAN, or playing vs.
+# computer opponents. The engine is configurable and can be used to
+# create games with a wide-range of features specific to your needs.
+# .
+# Stratagus is developed together for Windows, Linux and Mac OS X.
+# .
+# Games which use Stratagus:
+#  * Wargus - Warcraft II - https://github.com/Wargus/wargus
+#  * Doom Wars - http://stratagus.com/games/doom-wars
+#  * Wyrmsun - https://github.com/andrettin/wyrmsun
+#     (uses modified engine version : https://github.com/Andrettin/Wyrmgus)
+#  * Stargus - Starcraft I - https://github.com/Wargus/stargus
+#  * War1gus - Warcraft I - https://github.com/Wargus/war1gus
+# .
+# This package provides no game and no game data set. This is only engine.
+# To play one of game, install package wargus, war1gus or stargus.
+# .
+# This is the stable release of Stratagus, and is both fairly playable and
+# fairly bug-free. It also has network connectivity for up to 8 players.
+# .
+# This version is compiled with some of the possible options, and thus has
+# gzip, bunzip2, SDL, vorbis, theora and OpenGL (or OpenGL ES 1.1) support.
+# The sound options will depend on your personal election on SDL packages.
+# .
+# This package contains Stratagus documentation.
+#
+#Package: wyrmgus-dev
+#Architecture: all
+#Depends: ${misc:Depends}, ${shlibs:Depends}, stratagus (>= ${binary:Version})
+#Description: Strategy Gaming Engine (development files)
+# Stratagus is a free cross-platform real-time strategy gaming engine.
+# It includes support for playing over Internet/LAN, or playing vs.
+# computer opponents. The engine is configurable and can be used to
+# create games with a wide-range of features specific to your needs.
+# .
+# Stratagus is developed together for Windows, Linux and Mac OS X.
+# .
+# Games which use Stratagus:
+#  * Wargus - Warcraft II - https://github.com/Wargus/wargus
+#  * Doom Wars - http://stratagus.com/games/doom-wars
+#  * Wyrmsun - https://github.com/andrettin/wyrmsun
+#     (uses modified engine version : https://github.com/Andrettin/Wyrmgus)
+#  * Stargus - Starcraft I - https://github.com/Wargus/stargus
+#  * War1gus - Warcraft I - https://github.com/Wargus/war1gus
+# .
+# This package provides no game and no game data set. This is only engine.
+# To play one of game, install package wargus, war1gus or stargus.
+# .
+# This is the stable release of Stratagus, and is both fairly playable and
+# fairly bug-free. It also has network connectivity for up to 8 players.
+# .
+# This version is compiled with some of the possible options, and thus has
+# gzip, bunzip2, SDL, vorbis, theora and OpenGL (or OpenGL ES 1.1) support.
+# The sound options will depend on your personal election on SDL packages.
+# .
+# This package contains Stratagus game development headers files needed for
+# building Stratagus games.
