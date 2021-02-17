@@ -89,21 +89,13 @@
 //static void AllowUnitId(CPlayer &player, int id, int units);
 //Wyrmgus end
 
-CUnitStats::~CUnitStats()
-{
-}
-
 const CUnitStats &CUnitStats::operator = (const CUnitStats &rhs)
 {
-	for (unsigned int i = 0; i < MaxCosts; ++i) {
-		this->Costs[i] = rhs.Costs[i];
-		this->Storing[i] = rhs.Storing[i];
-		this->ImproveIncomes[i] = rhs.ImproveIncomes[i];
-		//Wyrmgus start
-		this->ResourceDemand[i] = rhs.ResourceDemand[i];
-		//Wyrmgus end
-	}
-	this->UnitStock = rhs.UnitStock;
+	this->costs = rhs.costs;
+	this->storing = rhs.storing;
+	this->improve_incomes = rhs.improve_incomes;
+	this->resource_demands = rhs.resource_demands;
+	this->unit_stocks = rhs.unit_stocks;
 	this->Variables = rhs.Variables;
 
 	return *this;
@@ -111,30 +103,32 @@ const CUnitStats &CUnitStats::operator = (const CUnitStats &rhs)
 
 bool CUnitStats::operator == (const CUnitStats &rhs) const
 {
-	for (int i = 0; i != MaxCosts; ++i) {
-		if (this->Costs[i] != rhs.Costs[i]) {
-			return false;
-		}
-		if (this->Storing[i] != rhs.Storing[i]) {
-			return false;
-		}
-		if (this->ImproveIncomes[i] != rhs.ImproveIncomes[i]) {
-			return false;
-		}
-		//Wyrmgus start
-		if (this->ResourceDemand[i] != rhs.ResourceDemand[i]) {
-			return false;
-		}
-		//Wyrmgus end
-	}
-	if (this->UnitStock != rhs.UnitStock) {
+	if (this->costs != rhs.costs) {
 		return false;
 	}
+
+	if (this->storing != rhs.storing) {
+		return false;
+	}
+
+	if (this->improve_incomes != rhs.improve_incomes) {
+		return false;
+	}
+
+	if (this->resource_demands != rhs.resource_demands) {
+		return false;
+	}
+
+	if (this->unit_stocks != rhs.unit_stocks) {
+		return false;
+	}
+
 	for (unsigned int i = 0; i != UnitTypeVar.GetNumberVariable(); ++i) {
 		if (this->Variables[i] != rhs.Variables[i]) {
 			return false;
 		}
 	}
+
 	return true;
 }
 
@@ -143,60 +137,35 @@ bool CUnitStats::operator != (const CUnitStats &rhs) const
 	return !(*this == rhs);
 }
 
-int CUnitStats::GetPrice() const
+int CUnitStats::get_price() const
 {
-	int cost = 0;
+	int price = 0;
 	
-	for (int i = 1; i < MaxCosts; ++i) {
-		if (this->Costs[i] > 0) {
-			if (i == CopperCost) {
-				cost += this->Costs[i];
+	for (const auto &kv_pair : this->get_costs()) {
+		const resource *resource = kv_pair.first;
+		const int resource_index = resource->get_index();
+
+		if (resource_index == TimeCost) {
+			continue;
+		}
+
+		const int resource_cost = kv_pair.second;
+		if (resource_cost > 0) {
+			if (resource_index == CopperCost) {
+				price += resource_cost;
 			} else {
-				cost += this->Costs[i] * wyrmgus::resource::get_all()[i]->get_base_price() / 100;
+				price += resource_cost * resource->get_base_price() / 100;
 			}
 		}
+
 	}
 	
-	return cost;
+	return price;
 }
 
-int CUnitStats::GetUnitStock(const wyrmgus::unit_type *unit_type) const
+gender CUnitStats::get_gender() const
 {
-	if (!unit_type) {
-		return 0;
-	}
-
-	auto find_iterator = this->UnitStock.find(unit_type->Slot);
-	if (find_iterator != this->UnitStock.end()) {
-		return find_iterator->second;
-	} else {
-		return 0;
-	}
-}
-
-void CUnitStats::SetUnitStock(const wyrmgus::unit_type *unit_type, int quantity)
-{
-	if (!unit_type) {
-		return;
-	}
-	
-	if (quantity <= 0) {
-		if (this->UnitStock.contains(unit_type->Slot)) {
-			this->UnitStock.erase(unit_type->Slot);
-		}
-	} else {
-		this->UnitStock[unit_type->Slot] = quantity;
-	}
-}
-
-void CUnitStats::ChangeUnitStock(const wyrmgus::unit_type *unit_type, int quantity)
-{
-	this->SetUnitStock(unit_type, this->GetUnitStock(unit_type) + quantity);
-}
-
-wyrmgus::gender CUnitStats::get_gender() const
-{
-	return static_cast<wyrmgus::gender>(this->Variables[GENDER_INDEX].Value);
+	return static_cast<gender>(this->Variables[GENDER_INDEX].Value);
 }
 
 CUpgrade::CUpgrade(const std::string &identifier) : detailed_data_entry(identifier), Work(wyrmgus::item_class::none)
@@ -697,41 +666,32 @@ static int CclDefineModifier(lua_State *l)
 		if (!strcmp(key, "regeneration-rate")) {
 			um->Modifier.Variables[HP_INDEX].Increase = LuaToNumber(l, j + 1, 2);
 		} else if (!strcmp(key, "cost")) {
-			//Wyrmgus start
-//			if (!lua_istable(l, j + 1) || lua_rawlen(l, j + 1) != 2) {
 			if (!lua_istable(l, j + 1) || lua_rawlen(l, j + 1) != 3) {
-			//Wyrmgus end
 				LuaError(l, "incorrect argument");
 			}
-			//Wyrmgus start
-//			const char *value = LuaToString(l, j + 1, 1);
 			const char *value = LuaToString(l, j + 1, 2);
-			//Wyrmgus end
-			const int resId = GetResourceIdByName(l, value);
-			//Wyrmgus start
-//			um->Modifier.Costs[resId] = LuaToNumber(l, j + 1, 2);
-			um->Modifier.Costs[resId] = LuaToNumber(l, j + 1, 3);
-			//Wyrmgus end
+			const resource *resource = resource::get(value);
+			um->Modifier.set_cost(resource, LuaToNumber(l, j + 1, 3));
 		} else if (!strcmp(key, "storing")) {
 			if (!lua_istable(l, j + 1) || lua_rawlen(l, j + 1) != 2) {
 				LuaError(l, "incorrect argument");
 			}
 			const char *value = LuaToString(l, j + 1, 1);
-			const int resId = GetResourceIdByName(l, value);
-			um->Modifier.Storing[resId] = LuaToNumber(l, j + 1, 2);
+			const resource *resource = resource::get(value);
+			um->Modifier.set_storing(resource, LuaToNumber(l, j + 1, 2));
 		} else if (!strcmp(key, "improve-production")) {
 			const char *value = LuaToString(l, j + 1, 2);
-			const int resId = GetResourceIdByName(l, value);
-			um->Modifier.ImproveIncomes[resId] = LuaToNumber(l, j + 1, 3);
+			const resource *resource = resource::get(value);
+			um->Modifier.set_improve_income(resource, LuaToNumber(l, j + 1, 3));
 		//Wyrmgus start
 		} else if (!strcmp(key, "resource-demand")) {
 			const char *value = LuaToString(l, j + 1, 2);
-			const int resId = GetResourceIdByName(l, value);
-			um->Modifier.ResourceDemand[resId] = LuaToNumber(l, j + 1, 3);
+			const resource *resource = resource::get(value);
+			um->Modifier.set_resource_demand(resource, LuaToNumber(l, j + 1, 3));
 		} else if (!strcmp(key, "unit-stock")) {
 			std::string value = LuaToString(l, j + 1, 2);
 			wyrmgus::unit_type *unit_type = wyrmgus::unit_type::get(value);
-			um->Modifier.SetUnitStock(unit_type, LuaToNumber(l, j + 1, 3));
+			um->Modifier.set_unit_stock(unit_type, LuaToNumber(l, j + 1, 3));
 		//Wyrmgus end
 		} else if (!strcmp(key, "allow-unit")) {
 			const char *value = LuaToString(l, j + 1, 2);
@@ -1411,32 +1371,35 @@ static void ApplyUpgradeModifier(CPlayer &player, const wyrmgus::upgrade_modifie
 			}
 			
 			// upgrade costs :)
-			for (unsigned int j = 0; j < MaxCosts; ++j) {
-				stat.Costs[j] += um->Modifier.Costs[j];
-				stat.Storing[j] += um->Modifier.Storing[j];
-				if (um->Modifier.ImproveIncomes[j]) {
-					if (!stat.ImproveIncomes[j]) {
-						stat.ImproveIncomes[j] += wyrmgus::resource::get_all()[j]->get_default_income() + um->Modifier.ImproveIncomes[j];
-					} else {
-						stat.ImproveIncomes[j] += um->Modifier.ImproveIncomes[j];
-					}
-					//update player's income
-					std::vector<CUnit *> unitupgrade;
-					FindUnitsByType(*unit_type, unitupgrade);
-					if (unitupgrade.size() > 0) {
-						player.Incomes[j] = std::max(player.Incomes[j], stat.ImproveIncomes[j]);
-					}
+			for (const auto &[resource, cost] : um->Modifier.get_costs()) {
+				stat.change_cost(resource, cost);
+			}
+
+			for (const auto &[resource, storing] : um->Modifier.get_storing()) {
+				stat.change_storing(resource, storing);
+			}
+
+			for (const auto &[resource, quantity] : um->Modifier.get_improve_incomes()) {
+				if (stat.get_improve_income(resource) == 0) {
+					stat.set_improve_income(resource, resource->get_default_income() + quantity);
+				} else {
+					stat.change_improve_income(resource, quantity);
 				}
 
-				stat.ResourceDemand[j] += um->Modifier.ResourceDemand[j];
+				//update player's income
+				std::vector<CUnit *> unitupgrade;
+				FindUnitsByType(*unit_type, unitupgrade);
+				if (unitupgrade.size() > 0) {
+					player.Incomes[resource->get_index()] = std::max(player.Incomes[resource->get_index()], stat.get_improve_income(resource));
+				}
+			}
+
+			for (const auto &[resource, quantity] : um->Modifier.get_resource_demands()) {
+				stat.change_resource_demand(resource, quantity);
 			}
 			
-			for (const auto &kv_pair : um->Modifier.UnitStock) {
-				const wyrmgus::unit_type *stock_unit_type = wyrmgus::unit_type::get_all()[kv_pair.first];
-				const int unit_stock = kv_pair.second;
-				if (unit_stock != 0) {
-					stat.ChangeUnitStock(stock_unit_type, unit_stock);
-				}
+			for (const auto &[stock_unit_type, unit_stock] : um->Modifier.get_unit_stocks()) {
+				stat.change_unit_stock(stock_unit_type, unit_stock);
 			}
 
 			int varModified = 0;
@@ -1548,9 +1511,7 @@ static void ApplyUpgradeModifier(CPlayer &player, const wyrmgus::upgrade_modifie
 						//Wyrmgus end
 					}
 					
-					for (const auto &kv_pair : um->Modifier.UnitStock) {
-						const wyrmgus::unit_type *stock_unit_type = wyrmgus::unit_type::get_all()[kv_pair.first];
-						const int unit_stock = kv_pair.second;
+					for (const auto &[stock_unit_type, unit_stock] : um->Modifier.get_unit_stocks()) {
 						if (unit_stock < 0) {
 							unit->ChangeUnitStock(stock_unit_type, unit_stock);
 						}
@@ -1686,35 +1647,42 @@ static void RemoveUpgradeModifier(CPlayer &player, const wyrmgus::upgrade_modifi
 			}
 			
 			// upgrade costs :)
-			for (unsigned int j = 0; j < MaxCosts; ++j) {
-				stat.Costs[j] -= um->Modifier.Costs[j];
-				stat.Storing[j] -= um->Modifier.Storing[j];
-				stat.ImproveIncomes[j] -= um->Modifier.ImproveIncomes[j];
-				//if this was the highest improve income, search for another
-				if (player.Incomes[j] && (stat.ImproveIncomes[j] + um->Modifier.ImproveIncomes[j]) == player.Incomes[j]) {
-					int m = wyrmgus::resource::get_all()[j]->get_default_income();
-
-					for (int k = 0; k < player.GetUnitCount(); ++k) {
-						//Wyrmgus start
-//						m = std::max(m, player.GetUnit(k).Type->Stats[player.Index].ImproveIncomes[j]);
-						if (player.GetUnit(k).Type != nullptr) {
-							m = std::max(m, player.GetUnit(k).Type->Stats[player.Index].ImproveIncomes[j]);
-						}
-						//Wyrmgus end
-					}
-					player.Incomes[j] = m;
-				}
-				//Wyrmgus start
-				stat.ResourceDemand[j] -= um->Modifier.ResourceDemand[j];
-				//Wyrmgus end
+			for (const auto &[resource, cost] : um->Modifier.get_costs()) {
+				stat.change_cost(resource, -cost);
 			}
 
-			for (const auto &kv_pair : um->Modifier.UnitStock) {
-				const wyrmgus::unit_type *stock_unit_type = wyrmgus::unit_type::get_all()[kv_pair.first];
-				const int unit_stock = kv_pair.second;
-				if (unit_stock != 0) {
-					stat.ChangeUnitStock(stock_unit_type, -unit_stock);
+			for (const auto &[resource, storing] : um->Modifier.get_storing()) {
+				stat.change_storing(resource, -storing);
+			}
+
+			for (const auto &[resource, quantity] : um->Modifier.get_improve_incomes()) {
+				stat.change_improve_income(resource, -quantity);
+
+				const int resource_index = resource->get_index();
+
+				//if this was the highest improve income, search for another
+				if (player.Incomes[resource_index] && (stat.get_improve_income(resource) + quantity) == player.Incomes[resource_index]) {
+					int m = resource->get_default_income();
+
+					for (int k = 0; k < player.GetUnitCount(); ++k) {
+						const CUnit &player_unit = player.GetUnit(k);
+						if (!player_unit.IsAlive()) {
+							continue;
+						}
+
+						m = std::max(m, player_unit.Type->Stats[player.Index].get_improve_income(resource));
+					}
+
+					player.Incomes[resource_index] = m;
 				}
+			}
+
+			for (const auto &[resource, quantity] : um->Modifier.get_resource_demands()) {
+				stat.change_resource_demand(resource, -quantity);
+			}
+
+			for (const auto &[stock_unit_type, unit_stock] : um->Modifier.get_unit_stocks()) {
+				stat.change_unit_stock(stock_unit_type, -unit_stock);
 			}
 
 			int varModified = 0;
@@ -1827,9 +1795,7 @@ static void RemoveUpgradeModifier(CPlayer &player, const wyrmgus::upgrade_modifi
 						//Wyrmgus end
 					}
 					
-					for (const auto &kv_pair : um->Modifier.UnitStock) {
-						const wyrmgus::unit_type *stock_unit_type = wyrmgus::unit_type::get_all()[kv_pair.first];
-						const int unit_stock = kv_pair.second;
+					for (const auto &[stock_unit_type, unit_stock] : um->Modifier.get_unit_stocks()) {
 						if (unit_stock > 0) {
 							unit->ChangeUnitStock(stock_unit_type, -unit_stock);
 						}
@@ -1937,9 +1903,7 @@ void ApplyIndividualUpgradeModifier(CUnit &unit, const wyrmgus::upgrade_modifier
 		//Wyrmgus end
 	}
 	
-	for (const auto &kv_pair : um->Modifier.UnitStock) {
-		const wyrmgus::unit_type *unit_type = wyrmgus::unit_type::get_all()[kv_pair.first];
-		const int unit_stock = kv_pair.second;
+	for (const auto &[unit_type, unit_stock] : um->Modifier.get_unit_stocks()) {
 		if (unit_stock < 0) {
 			unit.ChangeUnitStock(unit_type, unit_stock);
 		}
@@ -2019,9 +1983,7 @@ void RemoveIndividualUpgradeModifier(CUnit &unit, const wyrmgus::upgrade_modifie
 		//Wyrmgus end
 	}
 
-	for (const auto &kv_pair : um->Modifier.UnitStock) {
-		const wyrmgus::unit_type *unit_type = wyrmgus::unit_type::get_all()[kv_pair.first];
-		const int unit_stock = kv_pair.second;
+	for (const auto &[unit_type, unit_stock] : um->Modifier.get_unit_stocks()) {
 		if (unit_stock > 0) {
 			unit.ChangeUnitStock(unit_type, -unit_stock);
 		}
@@ -2522,39 +2484,37 @@ std::string GetUpgradeEffectsString(const std::string &upgrade_ident, bool grand
 				
 			if (!grand_strategy) {
 				bool first_res = true;
-				for (int i = 0; i < MaxCosts; ++i) {
-					if (modifier->Modifier.ImproveIncomes[i]) {
-						if (!first_res) {
-							upgrade_effects_string += padding_string;
-						} else {
-							first_res = false;
+				for (const auto &[resource, quantity] : modifier->Modifier.get_improve_incomes()) {
+					if (!first_res) {
+						upgrade_effects_string += padding_string;
+					} else {
+						first_res = false;
+					}
+
+					if (quantity > 0) {
+						upgrade_effects_string += "+";
+					}
+					upgrade_effects_string += std::to_string(quantity);
+					upgrade_effects_string += "%";
+					upgrade_effects_string += " ";
+					upgrade_effects_string += resource->get_name();
+					upgrade_effects_string += " Processing";
+
+					bool first_unit_type = true;
+					for (const unit_type *unit_type : unit_type::get_all()) {
+						if (unit_type->is_template()) {
+							continue;
 						}
-							
-						if (modifier->Modifier.ImproveIncomes[i] > 0) {
-							upgrade_effects_string += "+";
-						}
-						upgrade_effects_string += std::to_string(modifier->Modifier.ImproveIncomes[i]);
-						upgrade_effects_string += "%";
-						upgrade_effects_string += " ";
-						upgrade_effects_string += CapitalizeString(DefaultResourceNames[i]);
-						upgrade_effects_string += " Processing";
-							
-						bool first_unit_type = true;
-						for (const wyrmgus::unit_type *unit_type : wyrmgus::unit_type::get_all()) {
-							if (unit_type->is_template()) {
-								continue;
+
+						if (modifier->applies_to(unit_type)) {
+							if (!first_unit_type) {
+								upgrade_effects_string += ", ";
+							} else {
+								upgrade_effects_string += " for ";
+								first_unit_type = false;
 							}
 
-							if (modifier->applies_to(unit_type)) {
-								if (!first_unit_type) {
-									upgrade_effects_string += ", ";
-								} else {
-									upgrade_effects_string += " for ";
-									first_unit_type = false;
-								}
-										
-								upgrade_effects_string += unit_type->GetNamePlural();
-							}
+							upgrade_effects_string += unit_type->GetNamePlural();
 						}
 					}
 				}

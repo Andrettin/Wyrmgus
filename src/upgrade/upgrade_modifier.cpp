@@ -24,7 +24,6 @@
 //      along with this program; if not, write to the Free Software
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
-//
 
 #include "stratagus.h"
 
@@ -118,7 +117,7 @@ void upgrade_modifier::process_sml_scope(const sml_data &scope)
 			const std::string &value = property.get_value();
 
 			const resource *resource = resource::get(key);
-			this->Modifier.Costs[resource->get_index()] = std::stoi(value);
+			this->Modifier.set_cost(resource, std::stoi(value));
 		});
 	} else {
 		const std::string variable_name = string::snake_case_to_pascal_case(tag);

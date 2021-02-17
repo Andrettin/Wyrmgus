@@ -1714,10 +1714,12 @@ std::string EvalString(const StringDesc *s)
 			if (type != nullptr) {
 				std::string improve_incomes;
 				bool first = true;
-				for (int res_index = 1; res_index < MaxCosts; ++res_index) {
-					const wyrmgus::resource *loop_resource = wyrmgus::resource::get_all()[res_index];
+				for (const auto &[loop_resource, quantity] : (**type).Stats[CPlayer::GetThisPlayer()->Index].get_improve_incomes()) {
+					if (loop_resource->get_index() == TimeCost) {
+						continue;
+					}
 
-					if ((**type).Stats[CPlayer::GetThisPlayer()->Index].ImproveIncomes[res_index] > loop_resource->get_default_income()) {
+					if (quantity > loop_resource->get_default_income()) {
 						if (!first) {
 							improve_incomes += "\n";
 						} else {
@@ -1725,7 +1727,7 @@ std::string EvalString(const StringDesc *s)
 						}
 						improve_incomes += loop_resource->get_name();
 						improve_incomes += " Processing Bonus: +";
-						improve_incomes += std::to_string((**type).Stats[CPlayer::GetThisPlayer()->Index].ImproveIncomes[res_index] - loop_resource->get_default_income());
+						improve_incomes += std::to_string(quantity - loop_resource->get_default_income());
 						improve_incomes += "%";
 					}
 				}
@@ -1738,19 +1740,19 @@ std::string EvalString(const StringDesc *s)
 			if (type != nullptr) {
 				std::string luxury_demand;
 				bool first = true;
-				for (int res_index = 1; res_index < MaxCosts; ++res_index) {
-					const wyrmgus::resource *loop_resource = wyrmgus::resource::get_all()[res_index];
-
-					if ((**type).Stats[CPlayer::GetThisPlayer()->Index].ResourceDemand[res_index]) {
-						if (!first) {
-							luxury_demand += "\n";
-						} else {
-							first = false;
-						}
-						luxury_demand += loop_resource->get_name();
-						luxury_demand += " Demand: ";
-						luxury_demand += std::to_string((**type).Stats[CPlayer::GetThisPlayer()->Index].ResourceDemand[res_index]);
+				for (const auto &[loop_resource, quantity] : (**type).Stats[CPlayer::GetThisPlayer()->Index].get_resource_demands()) {
+					if (loop_resource->get_index() == TimeCost) {
+						continue;
 					}
+
+					if (!first) {
+						luxury_demand += "\n";
+					} else {
+						first = false;
+					}
+					luxury_demand += loop_resource->get_name();
+					luxury_demand += " Demand: ";
+					luxury_demand += std::to_string(quantity);
 				}
 				return luxury_demand;
 			} else { // ERROR.

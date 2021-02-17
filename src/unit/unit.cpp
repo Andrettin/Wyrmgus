@@ -4199,23 +4199,32 @@ void UnitLost(CUnit &unit)
 		player.Supply -= unit.Variable[SUPPLY_INDEX].Value;
 		// Decrease resource limit
 		for (int i = 0; i < MaxCosts; ++i) {
-			if (player.MaxResources[i] != -1 && type.Stats[player.Index].Storing[i]) {
-				const int newMaxValue = player.MaxResources[i] - type.Stats[player.Index].Storing[i];
+			const resource *resource = resource::get_all()[i];
+			if (player.MaxResources[i] != -1 && type.Stats[player.Index].get_storing(resource) != 0) {
+				const int newMaxValue = player.MaxResources[i] - type.Stats[player.Index].get_storing(resource);
 
 				player.MaxResources[i] = std::max(0, newMaxValue);
 				player.set_resource(wyrmgus::resource::get_all()[i], player.StoredResources[i], STORE_BUILDING);
 			}
 		}
+
 		//  Handle income improvements, look if a player loses a building
 		//  which have given him a better income, find the next best
 		//  income.
 		for (int i = 1; i < MaxCosts; ++i) {
-			if (player.Incomes[i] && type.Stats[player.Index].ImproveIncomes[i] == player.Incomes[i]) {
-				int m = wyrmgus::resource::get_all()[i]->get_default_income();
+			const resource *resource = resource::get_all()[i];
+			if (player.Incomes[i] && type.Stats[player.Index].get_improve_income(resource) == player.Incomes[i]) {
+				int m = resource->get_default_income();
 
 				for (int j = 0; j < player.GetUnitCount(); ++j) {
-					m = std::max(m, player.GetUnit(j).Type->Stats[player.Index].ImproveIncomes[i]);
+					const CUnit &player_unit = player.GetUnit(j);
+					if (!player_unit.IsAlive()) {
+						continue;
+					}
+
+					m = std::max(m, player_unit.Type->Stats[player.Index].get_improve_income(resource));
 				}
+
 				player.Incomes[i] = m;
 			}
 		}
@@ -4332,15 +4341,17 @@ void UpdateForNewUnit(const CUnit &unit, int upgrade)
 	if (!upgrade) {
 		player.Supply += unit.Variable[SUPPLY_INDEX].Value;
 		for (int i = 0; i < MaxCosts; ++i) {
-			if (player.MaxResources[i] != -1 && type.Stats[player.Index].Storing[i]) {
-				player.MaxResources[i] += type.Stats[player.Index].Storing[i];
+			const resource *resource = resource::get_all()[i];
+			if (player.MaxResources[i] != -1 && type.Stats[player.Index].get_storing(resource) != 0) {
+				player.MaxResources[i] += type.Stats[player.Index].get_storing(resource);
 			}
 		}
 	}
 
 	// Update resources
 	for (int u = 1; u < MaxCosts; ++u) {
-		player.Incomes[u] = std::max(player.Incomes[u], type.Stats[player.Index].ImproveIncomes[u]);
+		const resource *resource = resource::get_all()[u];
+		player.Incomes[u] = std::max(player.Incomes[u], type.Stats[player.Index].get_improve_income(resource));
 	}
 	
 	if (type.Stats[player.Index].Variables[TRADECOST_INDEX].Enable) {
@@ -4817,8 +4828,9 @@ void CUnit::ChangeOwner(CPlayer &newplayer, bool show_change)
 	newplayer.Supply += this->Variable[SUPPLY_INDEX].Value;
 	// Increase resource limit
 	for (int i = 0; i < MaxCosts; ++i) {
-		if (newplayer.MaxResources[i] != -1 && Type->Stats[newplayer.Index].Storing[i]) {
-			newplayer.MaxResources[i] += Type->Stats[newplayer.Index].Storing[i];
+		const resource *resource = resource::get_all()[i];
+		if (newplayer.MaxResources[i] != -1 && Type->Stats[newplayer.Index].get_storing(resource) != 0) {
+			newplayer.MaxResources[i] += Type->Stats[newplayer.Index].get_storing(resource);
 		}
 	}
 	//Wyrmgus start
@@ -5874,7 +5886,7 @@ int CUnit::GetDisplayPlayer() const
 
 int CUnit::GetPrice() const
 {
-	int cost = this->Type->Stats[this->Player->Index].GetPrice();
+	int cost = this->Type->Stats[this->Player->Index].get_price();
 	
 	if (this->Prefix != nullptr) {
 		cost += this->Prefix->get_magic_level() * 1000;
@@ -7226,14 +7238,16 @@ static void HitUnit_Raid(CUnit *attacker, CUnit &target, int damage)
 		return;
 	}
 	
-	for (int i = 0; i < MaxCosts; ++i) {
-		if (target.Type->Stats[target.Player->Index].Costs[i] > 0) {
-			int resource_change = target.Type->Stats[target.Player->Index].Costs[i] * damage * attacker->Variable[var_index].Value / target.GetModifiedVariable(HP_INDEX, VariableAttribute::Max) / 100;
-			resource_change = std::min(resource_change, target.Player->get_resource(wyrmgus::resource::get_all()[i], STORE_BOTH));
-			attacker->Player->change_resource(wyrmgus::resource::get_all()[i], resource_change);
-			attacker->Player->TotalResources[i] += resource_change;
-			target.Player->change_resource(wyrmgus::resource::get_all()[i], -resource_change);
+	for (const auto &[resource, cost] : target.Type->Stats[target.Player->Index].get_costs()) {
+		if (cost < 0) {
+			continue;
 		}
+
+		int resource_change = cost * damage * attacker->Variable[var_index].Value / target.GetModifiedVariable(HP_INDEX, VariableAttribute::Max) / 100;
+		resource_change = std::min(resource_change, target.Player->get_resource(resource, STORE_BOTH));
+		attacker->Player->change_resource(resource, resource_change);
+		attacker->Player->TotalResources[resource->get_index()] += resource_change;
+		target.Player->change_resource(resource, -resource_change);
 	}
 }
 

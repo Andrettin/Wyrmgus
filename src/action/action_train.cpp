@@ -25,7 +25,6 @@
 //      along with this program; if not, write to the Free Software
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
-//
 
 #include "stratagus.h"
 
@@ -66,7 +65,7 @@ std::unique_ptr<COrder> COrder::NewActionTrain(CUnit &trainer, const wyrmgus::un
 	//Wyrmgus start
 	order->Player = player;
 //	trainer.Player->SubUnitType(type);
-	CPlayer::Players[player]->SubUnitType(type, trainer.Type->Stats[trainer.Player->Index].GetUnitStock(&type) != 0);
+	CPlayer::Players[player]->SubUnitType(type, trainer.Type->Stats[trainer.Player->Index].get_unit_stock(&type) != 0);
 	//Wyrmgus end
 
 	return order;
@@ -144,8 +143,8 @@ void COrder_Train::Cancel(CUnit &unit)
 
 	unit.Variable[TRAINING_INDEX].Value = this->Ticks;
 	//Wyrmgus start
-//	unit.Variable[TRAINING_INDEX].Max = this->Type->Stats[unit.Player->Index].Costs[TimeCost];
-	unit.Variable[TRAINING_INDEX].Max = this->Type->Stats[this->Player].Costs[TimeCost];
+//	unit.Variable[TRAINING_INDEX].Max = this->Type->Stats[unit.Player->Index].get_cost(resource::get_all()[TimeCost]);
+	unit.Variable[TRAINING_INDEX].Max = this->Type->Stats[this->Player].get_cost(resource::get_all()[TimeCost]);
 	//Wyrmgus end
 }
 
@@ -157,8 +156,8 @@ void COrder_Train::ConvertUnitType(const CUnit &unit, wyrmgus::unit_type &newTyp
 //	const CPlayer &player = *unit.Player;
 	const CPlayer &player = *CPlayer::Players[this->Player];
 	//Wyrmgus end
-	const int oldCost = this->Type->Stats[player.Index].Costs[TimeCost];
-	const int newCost = newType.Stats[player.Index].Costs[TimeCost];
+	const int oldCost = this->Type->Stats[player.Index].get_cost(resource::get_all()[TimeCost]);
+	const int newCost = newType.Stats[player.Index].get_cost(resource::get_all()[TimeCost]);
 
 	// Must Adjust Ticks to the fraction that was trained
 	this->Ticks = this->Ticks * newCost / oldCost;
@@ -238,7 +237,7 @@ static void AnimateActionTrain(CUnit &unit)
 	CPlayer &player = *CPlayer::Players[this->Player];
 	//Wyrmgus end
 	const wyrmgus::unit_type &nType = *this->Type;
-	const int cost = nType.Stats[player.Index].Costs[TimeCost];
+	const int cost = nType.Stats[player.Index].get_cost(resource::get_all()[TimeCost]);
 	
 	//Wyrmgus start
 	// Check if enough supply available.
@@ -257,7 +256,7 @@ static void AnimateActionTrain(CUnit &unit)
 //	this->Ticks += std::max(1, player.SpeedTrain / SPEEDUP_FACTOR);
 	this->Ticks += std::max(1, (player.SpeedTrain + unit.Variable[TIMEEFFICIENCYBONUS_INDEX].Value) / SPEEDUP_FACTOR);
 	
-	if (unit.Type->Stats[unit.Player->Index].GetUnitStock(&nType) != 0) { // if the training unit/building has a "stock" of the trained unit, that means it should be created with no time wait
+	if (unit.Type->Stats[unit.Player->Index].get_unit_stock(&nType) != 0) { // if the training unit/building has a "stock" of the trained unit, that means it should be created with no time wait
 		this->Ticks = cost;
 	}
 	//Wyrmgus end
@@ -357,7 +356,7 @@ static void AnimateActionTrain(CUnit &unit)
 	}
 	*/
 	for (int i = 0; i < (this->Type->TrainQuantity ? this->Type->TrainQuantity : 1); ++i) {
-		if (unit.Type->Stats[unit.Player->Index].GetUnitStock(&nType) != 0) {
+		if (unit.Type->Stats[unit.Player->Index].get_unit_stock(&nType) != 0) {
 			if (unit.GetUnitStock(&nType) > 0) {
 				unit.ChangeUnitStock(&nType, -1);
 			} else {

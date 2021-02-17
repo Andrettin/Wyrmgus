@@ -25,7 +25,6 @@
 //      along with this program; if not, write to the Free Software
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
-//
 
 #include <iomanip>
 
@@ -401,8 +400,8 @@ void SaveUnit(const CUnit &unit, CFile &file)
 		}
 	}
 
-	for (const auto &kv_pair : unit.Type->Stats[unit.Player->Index].UnitStock) {
-		const wyrmgus::unit_type *unit_type = wyrmgus::unit_type::get_all()[kv_pair.first];
+	for (const auto &kv_pair : unit.Type->Stats[unit.Player->Index].get_unit_stocks()) {
+		const unit_type *unit_type = kv_pair.first;
 
 		if (unit.GetUnitStock(unit_type) != 0) {
 			file.printf(",\n  \"unit-stock\", \"%s\", %d", unit_type->Ident.c_str(), unit.GetUnitStock(unit_type));

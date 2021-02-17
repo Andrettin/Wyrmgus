@@ -335,7 +335,8 @@ static bool CanShowPopupContent(const PopupConditionPanel *condition,
 	}
 
 	if (condition->ImproveIncome != -1) {
-		if (!type || type->Stats[CPlayer::GetThisPlayer()->Index].ImproveIncomes[condition->ImproveIncome] <= wyrmgus::resource::get_all()[condition->ImproveIncome]->get_default_income()) {
+		const resource *resource = resource::get_all()[condition->ImproveIncome];
+		if (!type || type->Stats[CPlayer::GetThisPlayer()->Index].get_improve_income(resource) <= resource->get_default_income()) {
 			return false;
 		}
 	}
@@ -362,8 +363,12 @@ static bool CanShowPopupContent(const PopupConditionPanel *condition,
 			if (!type) {
 				return false;
 			}
-			for (int i = 1; i < MaxCosts; ++i) {
-				if (type->Stats[CPlayer::GetThisPlayer()->Index].ImproveIncomes[i] > wyrmgus::resource::get_all()[i]->get_default_income()) {
+			for (const auto &[resource, quantity] : type->Stats[CPlayer::GetThisPlayer()->Index].get_improve_incomes()) {
+				if (resource->get_index() == TimeCost) {
+					continue;
+				}
+
+				if (quantity > resource->get_default_income()) {
 					improve_incomes = true;
 					break;
 				}
@@ -795,7 +800,7 @@ void DrawPopup(const wyrmgus::button &button, int x, int y, bool above)
 		case ButtonCmd::TrainClass:
 		case ButtonCmd::UpgradeTo:
 		case ButtonCmd::UpgradeToClass:
-			CPlayer::GetThisPlayer()->GetUnitTypeCosts(unit_type, type_costs.data(), Selected[0]->Type->Stats[Selected[0]->Player->Index].GetUnitStock(unit_type) != 0);
+			CPlayer::GetThisPlayer()->GetUnitTypeCosts(unit_type, type_costs.data(), Selected[0]->Type->Stats[Selected[0]->Player->Index].get_unit_stock(unit_type) != 0);
 			memcpy(Costs.data(), type_costs.data(), sizeof(type_costs));
 			Costs[FoodCost] = unit_type->Stats[CPlayer::GetThisPlayer()->Index].Variables[DEMAND_INDEX].Value;
 			break;
@@ -1116,12 +1121,12 @@ void CButtonPanel::Draw()
 												   pos, buf, player_color, false, false, 100 - GetButtonCooldownPercent(*Selected[0], *button));
 												   
 				if (
-					((button->Action == ButtonCmd::Train || button->Action == ButtonCmd::TrainClass) && Selected[0]->Type->Stats[Selected[0]->Player->Index].GetUnitStock(button_unit_type) != 0)
+					((button->Action == ButtonCmd::Train || button->Action == ButtonCmd::TrainClass) && Selected[0]->Type->Stats[Selected[0]->Player->Index].get_unit_stock(button_unit_type) != 0)
 					|| button->Action == ButtonCmd::SellResource || button->Action == ButtonCmd::BuyResource
 				) {
 					std::string number_string;
-					if ((button->Action == ButtonCmd::Train || button->Action == ButtonCmd::TrainClass) && Selected[0]->Type->Stats[Selected[0]->Player->Index].GetUnitStock(button_unit_type) != 0) { //draw the quantity in stock for unit "training" cases which have it
-						number_string = std::to_string(Selected[0]->GetUnitStock(button_unit_type)) + "/" + std::to_string(Selected[0]->Type->Stats[Selected[0]->Player->Index].GetUnitStock(button_unit_type));
+					if ((button->Action == ButtonCmd::Train || button->Action == ButtonCmd::TrainClass) && Selected[0]->Type->Stats[Selected[0]->Player->Index].get_unit_stock(button_unit_type) != 0) { //draw the quantity in stock for unit "training" cases which have it
+						number_string = std::to_string(Selected[0]->GetUnitStock(button_unit_type)) + "/" + std::to_string(Selected[0]->Type->Stats[Selected[0]->Player->Index].get_unit_stock(button_unit_type));
 					} else if (button->Action == ButtonCmd::SellResource) {
 						number_string = std::to_string(Selected[0]->Player->GetEffectiveResourceSellPrice(button->Value));
 					} else if (button->Action == ButtonCmd::BuyResource) {
@@ -1315,14 +1320,14 @@ bool IsButtonAllowed(const CUnit &unit, const wyrmgus::button &buttonaction)
 //			res = unit.CurrentAction() == UnitAction::UpgradeTo
 //				  || unit.CurrentAction() == UnitAction::Research;
 			//don't show the cancel button for a quick moment if the time cost is 0
-			res = (unit.CurrentAction() == UnitAction::UpgradeTo && static_cast<COrder_UpgradeTo *>(unit.CurrentOrder())->GetUnitType().Stats[unit.Player->Index].Costs[TimeCost] > 0)
+			res = (unit.CurrentAction() == UnitAction::UpgradeTo && static_cast<COrder_UpgradeTo *>(unit.CurrentOrder())->GetUnitType().Stats[unit.Player->Index].get_cost(resource::get_all()[TimeCost]) > 0)
 				|| (unit.CurrentAction() == UnitAction::Research && static_cast<COrder_Research *>(unit.CurrentOrder())->GetUpgrade().Costs[TimeCost] > 0);
 			//Wyrmgus end
 			break;
 		case ButtonCmd::CancelTrain:
 			//Wyrmgus start
 //			res = unit.CurrentAction() == UnitAction::Train;
-			res = unit.CurrentAction() == UnitAction::Train && static_cast<COrder_Train *>(unit.CurrentOrder())->GetUnitType().Stats[unit.Player->Index].Costs[TimeCost] > 0; //don't show the cancel button for a quick moment if the time cost is 0
+			res = unit.CurrentAction() == UnitAction::Train && static_cast<COrder_Train *>(unit.CurrentOrder())->GetUnitType().Stats[unit.Player->Index].get_cost(resource::get_all()[TimeCost]) > 0; //don't show the cancel button for a quick moment if the time cost is 0
 			//Wyrmgus end
 			break;
 		case ButtonCmd::CancelBuild:
@@ -1995,7 +2000,7 @@ void CButtonPanel::DoClicked_Train(const std::unique_ptr<wyrmgus::button> &butto
 		if (Selected[best_training_place]->CurrentAction() == UnitAction::Train && !EnableTrainingQueue) {
 			CPlayer::GetThisPlayer()->Notify(NotifyYellow, Selected[best_training_place]->tilePos, Selected[best_training_place]->MapLayer->ID, "%s", _("Unit training queue is full"));
 			return;
-		} else if (CPlayer::GetThisPlayer()->CheckLimits(*unit_type) >= 0 && !CPlayer::GetThisPlayer()->CheckUnitType(*unit_type, Selected[best_training_place]->Type->Stats[Selected[best_training_place]->Player->Index].GetUnitStock(unit_type) != 0)) {
+		} else if (CPlayer::GetThisPlayer()->CheckLimits(*unit_type) >= 0 && !CPlayer::GetThisPlayer()->CheckUnitType(*unit_type, Selected[best_training_place]->Type->Stats[Selected[best_training_place]->Player->Index].get_unit_stock(unit_type) != 0)) {
 			SendCommandTrainUnit(*Selected[best_training_place], *unit_type, CPlayer::GetThisPlayer()->Index, FlushCommands);
 			UI.StatusLine.Clear();
 			UI.StatusLine.ClearCosts();

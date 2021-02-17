@@ -645,27 +645,26 @@ int WriteMapSetup(const char *mapSetup, CMap &map, int writeTerrain, bool is_mod
 			}
 			
 			f->printf("\tCosts = {");
-			for (unsigned int j = 0; j < MaxCosts; ++j) {
-				if (unit_type->DefaultStat.Costs[j] != 0 && (!unit_type->Parent || unit_type->DefaultStat.Costs[j] != unit_type->Parent->DefaultStat.Costs[j])) {
-					f->printf("\"%s\", ", DefaultResourceNames[j].c_str());
-					f->printf("%d, ", unit_type->DefaultStat.Costs[j]);
+			for (const auto &[resource, cost] : unit_type->DefaultStat.get_costs()) {
+				if (unit_type->Parent == nullptr || cost != unit_type->Parent->DefaultStat.get_cost(resource)) {
+					f->printf("\"%s\", ", resource->get_identifier().c_str());
+					f->printf("%d, ", cost);
 				}
 			}
 			f->printf("},\n");
-			f->printf("\tImproveProduction = {");
-			for (unsigned int j = 0; j < MaxCosts; ++j) {
-				if (unit_type->DefaultStat.ImproveIncomes[j] != 0 && (!unit_type->Parent || unit_type->DefaultStat.ImproveIncomes[j] != unit_type->Parent->DefaultStat.ImproveIncomes[j])) {
-					f->printf("\"%s\", ", DefaultResourceNames[j].c_str());
-					f->printf("%d, ", unit_type->DefaultStat.ImproveIncomes[j]);
-				}
-			}
-			f->printf("},\n");
-			f->printf("\tUnitStock = {");
-			for (const auto &kv_pair : unit_type->DefaultStat.UnitStock) {
-				const wyrmgus::unit_type *other_unit_type = unit_type::get_all()[kv_pair.first];
-				const int unit_stock = kv_pair.second;
 
-				if (unit_stock != 0 && (!unit_type->Parent || unit_stock != unit_type->Parent->DefaultStat.GetUnitStock(other_unit_type))) {
+			f->printf("\tImproveProduction = {");
+			for (const auto &[resource, quantity] : unit_type->DefaultStat.get_improve_incomes()) {
+				if (unit_type->Parent == nullptr || quantity != unit_type->Parent->DefaultStat.get_improve_income(resource)) {
+					f->printf("\"%s\", ", resource->get_identifier().c_str());
+					f->printf("%d, ", quantity);
+				}
+			}
+			f->printf("},\n");
+
+			f->printf("\tUnitStock = {");
+			for (const auto &[other_unit_type, unit_stock] : unit_type->DefaultStat.get_unit_stocks()) {
+				if (unit_stock != 0 && (!unit_type->Parent || unit_stock != unit_type->Parent->DefaultStat.get_unit_stock(other_unit_type))) {
 					f->printf("\"%s\", ", other_unit_type->get_identifier().c_str());
 					f->printf("%d, ", unit_stock);
 				}
@@ -913,24 +912,16 @@ int WriteMapSetup(const char *mapSetup, CMap &map, int writeTerrain, bool is_mod
 		f->printf("\n-- set map default stat and map sound for unit types\n");
 		for (unit_type *unit_type : unit_type::get_all()) {
 			if (unit_type->ModDefaultStats.find(CMap::Map.Info.Filename) != unit_type->ModDefaultStats.end()) {
-				for (unsigned int j = 0; j < MaxCosts; ++j) {
-					if (unit_type->ModDefaultStats[CMap::Map.Info.Filename].Costs[j] != 0) {
-						f->printf("SetModStat(\"%s\", \"%s\", \"Costs\", %d, \"%s\")\n", mod_file.c_str(), unit_type->Ident.c_str(), unit_type->ModDefaultStats[CMap::Map.Info.Filename].Costs[j], DefaultResourceNames[j].c_str());
-					}
-				}
-				for (unsigned int j = 0; j < MaxCosts; ++j) {
-					if (unit_type->ModDefaultStats[CMap::Map.Info.Filename].ImproveIncomes[j] != 0) {
-						f->printf("SetModStat(\"%s\", \"%s\", \"ImproveProduction\", %d, \"%s\")\n", mod_file.c_str(), unit_type->Ident.c_str(), unit_type->ModDefaultStats[CMap::Map.Info.Filename].ImproveIncomes[j], DefaultResourceNames[j].c_str());
-					}
+				for (const auto &[resource, cost] : unit_type->ModDefaultStats[CMap::Map.Info.Filename].get_costs()) {
+					f->printf("SetModStat(\"%s\", \"%s\", \"Costs\", %d, \"%s\")\n", mod_file.c_str(), unit_type->Ident.c_str(), cost, resource->get_identifier().c_str());
 				}
 
-				for (const auto &kv_pair : unit_type->ModDefaultStats[CMap::Map.Info.Filename].UnitStock) {
-					const wyrmgus::unit_type *other_unit_type = unit_type::get_all()[kv_pair.first];
-					const int unit_stock = kv_pair.second;
+				for (const auto &[resource, quantity] : unit_type->ModDefaultStats[CMap::Map.Info.Filename].get_improve_incomes()) {
+					f->printf("SetModStat(\"%s\", \"%s\", \"ImproveProduction\", %d, \"%s\")\n", mod_file.c_str(), unit_type->Ident.c_str(), quantity, resource->get_identifier().c_str());
+				}
 
-					if (unit_stock != 0) {
-						f->printf("SetModStat(\"%s\", \"%s\", \"UnitStock\", %d, \"%s\")\n", mod_file.c_str(), unit_type->get_identifier().c_str(), unit_stock, other_unit_type->get_identifier().c_str());
-					}
+				for (const auto &[other_unit_type, unit_stock] : unit_type->ModDefaultStats[CMap::Map.Info.Filename].get_unit_stocks()) {
+					f->printf("SetModStat(\"%s\", \"%s\", \"UnitStock\", %d, \"%s\")\n", mod_file.c_str(), unit_type->get_identifier().c_str(), unit_stock, other_unit_type->get_identifier().c_str());
 				}
 
 				for (size_t j = 0; j < UnitTypeVar.GetNumberVariable(); ++j) {

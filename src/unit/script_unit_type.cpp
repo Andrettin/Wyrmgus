@@ -977,10 +977,10 @@ static int CclDefineUnitType(lua_State *l)
 			const int subargs = lua_rawlen(l, -1);
 			for (int k = 0; k < subargs; ++k) {
 				lua_rawgeti(l, -1, k + 1);
-				const int res = CclGetResourceByName(l);
+				const resource *res = resource::get(LuaToString(l, -1));
 				lua_pop(l, 1);
 				++k;
-				type->DefaultStat.Costs[res] = LuaToNumber(l, -1, k + 1);
+				type->DefaultStat.set_cost(res, LuaToNumber(l, -1, k + 1));
 			}
 		} else if (!strcmp(value, "Storing")) {
 			if (!lua_istable(l, -1)) {
@@ -989,10 +989,10 @@ static int CclDefineUnitType(lua_State *l)
 			const int subargs = lua_rawlen(l, -1);
 			for (int k = 0; k < subargs; ++k) {
 				lua_rawgeti(l, -1, k + 1);
-				const int res = CclGetResourceByName(l);
+				const resource *res = resource::get(LuaToString(l, -1));
 				lua_pop(l, 1);
 				++k;
-				type->DefaultStat.Storing[res] = LuaToNumber(l, -1, k + 1);
+				type->DefaultStat.set_storing(res, LuaToNumber(l, -1, k + 1));
 			}
 		} else if (!strcmp(value, "ImproveProduction")) {
 			if (!lua_istable(l, -1)) {
@@ -1001,10 +1001,10 @@ static int CclDefineUnitType(lua_State *l)
 			const int subargs = lua_rawlen(l, -1);
 			for (int k = 0; k < subargs; ++k) {
 				lua_rawgeti(l, -1, k + 1);
-				const int res = CclGetResourceByName(l);
+				const resource *res = resource::get(LuaToString(l, -1));
 				lua_pop(l, 1);
 				++k;
-				type->DefaultStat.ImproveIncomes[res] = wyrmgus::resource::get_all()[res]->get_default_income() + LuaToNumber(l, -1, k + 1);
+				type->DefaultStat.set_improve_income(res, res->get_default_income() + LuaToNumber(l, -1, k + 1));
 			}
 		//Wyrmgus start
 		} else if (!strcmp(value, "ResourceDemand")) {
@@ -1014,10 +1014,10 @@ static int CclDefineUnitType(lua_State *l)
 			const int subargs = lua_rawlen(l, -1);
 			for (int k = 0; k < subargs; ++k) {
 				lua_rawgeti(l, -1, k + 1);
-				const int res = CclGetResourceByName(l);
+				const resource *res = resource::get(LuaToString(l, -1));
 				lua_pop(l, 1);
 				++k;
-				type->DefaultStat.ResourceDemand[res] = LuaToNumber(l, -1, k + 1);
+				type->DefaultStat.set_resource_demand(res, LuaToNumber(l, -1, k + 1));
 			}
 		} else if (!strcmp(value, "UnitStock")) {
 			if (!lua_istable(l, -1)) {
@@ -1027,7 +1027,7 @@ static int CclDefineUnitType(lua_State *l)
 			for (int k = 0; k < subargs; ++k) {
 				wyrmgus::unit_type *unit_type = wyrmgus::unit_type::get(LuaToString(l, -1, k + 1));
 				++k;
-				type->DefaultStat.SetUnitStock(unit_type, LuaToNumber(l, -1, k + 1));
+				type->DefaultStat.set_unit_stock(unit_type, LuaToNumber(l, -1, k + 1));
 			}
 		//Wyrmgus end
 		} else if (!strcmp(value, "Construction")) {
@@ -1759,8 +1759,8 @@ static int CclDefineUnitStats(lua_State *l)
 				lua_rawgeti(l, 3, j + 1);
 				value = LuaToString(l, -1, k + 1);
 				++k;
-				const int resId = GetResourceIdByName(l, value);
-				stats->Costs[resId] = LuaToNumber(l, -1, k + 1);
+				const resource *res = resource::get(value);
+				stats->set_cost(res, LuaToNumber(l, -1, k + 1));
 				lua_pop(l, 1);
 			}
 		} else if (!strcmp(value, "storing")) {
@@ -1774,8 +1774,8 @@ static int CclDefineUnitStats(lua_State *l)
 				lua_rawgeti(l, 3, j + 1);
 				value = LuaToString(l, -1, k + 1);
 				++k;
-				const int resId = GetResourceIdByName(l, value);
-				stats->Storing[resId] = LuaToNumber(l, -1, k + 1);
+				const resource *res = resource::get(value);
+				stats->set_storing(res, LuaToNumber(l, -1, k + 1));
 				lua_pop(l, 1);
 			}
 		} else if (!strcmp(value, "improve-production")) {
@@ -1789,8 +1789,8 @@ static int CclDefineUnitStats(lua_State *l)
 				lua_rawgeti(l, 3, j + 1);
 				value = LuaToString(l, -1, k + 1);
 				++k;
-				const int resId = GetResourceIdByName(l, value);
-				stats->ImproveIncomes[resId] = LuaToNumber(l, -1, k + 1);
+				const resource *res = resource::get(value);
+				stats->set_improve_income(res, LuaToNumber(l, -1, k + 1));
 				lua_pop(l, 1);
 			}
 		//Wyrmgus start
@@ -1805,8 +1805,8 @@ static int CclDefineUnitStats(lua_State *l)
 				lua_rawgeti(l, 3, j + 1);
 				value = LuaToString(l, -1, k + 1);
 				++k;
-				const int resId = GetResourceIdByName(l, value);
-				stats->ResourceDemand[resId] = LuaToNumber(l, -1, k + 1);
+				const resource *res = resource::get(value);
+				stats->set_resource_demand(res, LuaToNumber(l, -1, k + 1));
 				lua_pop(l, 1);
 			}
 		} else if (!strcmp(value, "unit-stock")) {
@@ -1820,7 +1820,7 @@ static int CclDefineUnitStats(lua_State *l)
 				lua_rawgeti(l, 3, j + 1);
 				wyrmgus::unit_type *unit_type = wyrmgus::unit_type::get(LuaToString(l, -1, k + 1));
 				++k;
-				stats->SetUnitStock(unit_type, LuaToNumber(l, -1, k + 1));
+				stats->set_unit_stock(unit_type, LuaToNumber(l, -1, k + 1));
 				lua_pop(l, 1);
 			}
 		//Wyrmgus end
@@ -2072,21 +2072,21 @@ static int CclGetUnitTypeData(lua_State *l)
 	} else if (!strcmp(data, "Costs")) {
 		LuaCheckArgs(l, 3);
 		const std::string res = LuaToString(l, 3);
-		const int resId = GetResourceIdByName(l, res.c_str());
+		const resource *resource = resource::get(res);
 		if (!GameRunning && Editor.Running != EditorEditing) {
-			lua_pushnumber(l, type->DefaultStat.Costs[resId]);
+			lua_pushnumber(l, type->DefaultStat.get_cost(resource));
 		} else {
-			lua_pushnumber(l, type->MapDefaultStat.Costs[resId]);
+			lua_pushnumber(l, type->MapDefaultStat.get_cost(resource));
 		}
 		return 1;
 	} else if (!strcmp(data, "ImproveProduction")) {
 		LuaCheckArgs(l, 3);
 		const std::string res = LuaToString(l, 3);
-		const int resId = GetResourceIdByName(l, res.c_str());
+		const resource *resource = resource::get(res);
 		if (!GameRunning && Editor.Running != EditorEditing) {
-			lua_pushnumber(l, type->DefaultStat.ImproveIncomes[resId]);
+			lua_pushnumber(l, type->DefaultStat.get_improve_income(resource));
 		} else {
-			lua_pushnumber(l, type->MapDefaultStat.ImproveIncomes[resId]);
+			lua_pushnumber(l, type->MapDefaultStat.get_improve_income(resource));
 		}
 		return 1;
 	//Wyrmgus start
@@ -2094,9 +2094,9 @@ static int CclGetUnitTypeData(lua_State *l)
 		LuaCheckArgs(l, 3);
 		wyrmgus::unit_type *unit_type = wyrmgus::unit_type::get(LuaToString(l, 3));
 		if (!GameRunning && Editor.Running != EditorEditing) {
-			lua_pushnumber(l, type->DefaultStat.GetUnitStock(unit_type));
+			lua_pushnumber(l, type->DefaultStat.get_unit_stock(unit_type));
 		} else {
-			lua_pushnumber(l, type->MapDefaultStat.GetUnitStock(unit_type));
+			lua_pushnumber(l, type->MapDefaultStat.get_unit_stock(unit_type));
 		}
 		return 1;
 	} else if (!strcmp(data, "TrainQuantity")) {
@@ -3591,48 +3591,49 @@ void SetModStat(const std::string &mod_file, const std::string &ident, const std
 	}
 	
 	if (variable_key == "Costs") {
-		const int resId = GetResourceIdByName(variable_type.c_str());
+		const resource *resource = resource::get(variable_type);
 		if (GameRunning || Editor.Running == EditorEditing) {
-			type->MapDefaultStat.Costs[resId] -= type->ModDefaultStats[mod_file].Costs[resId];
+			type->MapDefaultStat.change_cost(resource, -type->ModDefaultStats[mod_file].get_cost(resource));
 			for (int player = 0; player < PlayerMax; ++player) {
-				type->Stats[player].Costs[resId] -= type->ModDefaultStats[mod_file].Costs[resId];
+				type->Stats[player].change_cost(resource, -type->ModDefaultStats[mod_file].get_cost(resource));
 			}
 		}
-		type->ModDefaultStats[mod_file].Costs[resId] = value;
+
+		type->ModDefaultStats[mod_file].set_cost(resource, value);
 		if (GameRunning || Editor.Running == EditorEditing) {
-			type->MapDefaultStat.Costs[resId] += type->ModDefaultStats[mod_file].Costs[resId];
+			type->MapDefaultStat.change_cost(resource, type->ModDefaultStats[mod_file].get_cost(resource));
 			for (int player = 0; player < PlayerMax; ++player) {
-				type->Stats[player].Costs[resId] += type->ModDefaultStats[mod_file].Costs[resId];
+				type->Stats[player].change_cost(resource, type->ModDefaultStats[mod_file].get_cost(resource));
 			}
 		}
 	} else if (variable_key == "ImproveProduction") {
-		const int resId = GetResourceIdByName(variable_type.c_str());
+		const resource *resource = resource::get(variable_type);
 		if (GameRunning || Editor.Running == EditorEditing) {
-			type->MapDefaultStat.ImproveIncomes[resId] -= type->ModDefaultStats[mod_file].ImproveIncomes[resId];
+			type->MapDefaultStat.change_improve_income(resource, -type->ModDefaultStats[mod_file].get_improve_income(resource));
 			for (int player = 0; player < PlayerMax; ++player) {
-				type->Stats[player].ImproveIncomes[resId] -= type->ModDefaultStats[mod_file].ImproveIncomes[resId];
+				type->Stats[player].change_improve_income(resource, -type->ModDefaultStats[mod_file].get_improve_income(resource));
 			}
 		}
-		type->ModDefaultStats[mod_file].ImproveIncomes[resId] = value;
+		type->ModDefaultStats[mod_file].set_improve_income(resource, value);
 		if (GameRunning || Editor.Running == EditorEditing) {
-			type->MapDefaultStat.ImproveIncomes[resId] += type->ModDefaultStats[mod_file].ImproveIncomes[resId];
+			type->MapDefaultStat.change_improve_income(resource, type->ModDefaultStats[mod_file].get_improve_income(resource));
 			for (int player = 0; player < PlayerMax; ++player) {
-				type->Stats[player].ImproveIncomes[resId] += type->ModDefaultStats[mod_file].ImproveIncomes[resId];
+				type->Stats[player].change_improve_income(resource, type->ModDefaultStats[mod_file].get_improve_income(resource));
 			}
 		}
 	} else if (variable_key == "UnitStock") {
 		wyrmgus::unit_type *unit_type = wyrmgus::unit_type::get(variable_type);
 		if (GameRunning || Editor.Running == EditorEditing) {
-			type->MapDefaultStat.ChangeUnitStock(unit_type, - type->ModDefaultStats[mod_file].GetUnitStock(unit_type));
+			type->MapDefaultStat.change_unit_stock(unit_type, - type->ModDefaultStats[mod_file].get_unit_stock(unit_type));
 			for (int player = 0; player < PlayerMax; ++player) {
-				type->Stats[player].ChangeUnitStock(unit_type, - type->ModDefaultStats[mod_file].GetUnitStock(unit_type));
+				type->Stats[player].change_unit_stock(unit_type, - type->ModDefaultStats[mod_file].get_unit_stock(unit_type));
 			}
 		}
-		type->ModDefaultStats[mod_file].SetUnitStock(unit_type, value);
+		type->ModDefaultStats[mod_file].set_unit_stock(unit_type, value);
 		if (GameRunning || Editor.Running == EditorEditing) {
-			type->MapDefaultStat.ChangeUnitStock(unit_type, type->ModDefaultStats[mod_file].GetUnitStock(unit_type));
+			type->MapDefaultStat.change_unit_stock(unit_type, type->ModDefaultStats[mod_file].get_unit_stock(unit_type));
 			for (int player = 0; player < PlayerMax; ++player) {
-				type->Stats[player].ChangeUnitStock(unit_type, type->ModDefaultStats[mod_file].GetUnitStock(unit_type));
+				type->Stats[player].change_unit_stock(unit_type, type->ModDefaultStats[mod_file].get_unit_stock(unit_type));
 			}
 		}
 	} else {

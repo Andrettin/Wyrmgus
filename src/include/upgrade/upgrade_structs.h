@@ -34,8 +34,10 @@
 #include "database/detailed_data_entry.h"
 #include "data_type.h"
 #include "economy/resource.h"
+#include "economy/resource_container.h"
 #include "item/item_class.h"
 #include "stratagus.h"
+#include "unit/unit_type_container.h"
 #include "unit/unit_variable.h"
 
 struct lua_State;
@@ -68,34 +70,190 @@ namespace wyrmgus {
 class CUnitStats final
 {
 public:
-	CUnitStats()
-	{
-		memset(Costs, 0, sizeof(Costs));
-		memset(Storing, 0, sizeof(Storing));
-		memset(ImproveIncomes, 0, sizeof(ImproveIncomes));
-		memset(ResourceDemand, 0, sizeof(ResourceDemand));
-	}
-	~CUnitStats();
-
 	const CUnitStats &operator = (const CUnitStats &rhs);
 
 	bool operator == (const CUnitStats &rhs) const;
 	bool operator != (const CUnitStats &rhs) const;
-	
- 	int GetPrice() const;
-	int GetUnitStock(const wyrmgus::unit_type *unit_type) const;
-	void SetUnitStock(const wyrmgus::unit_type *unit_type, int quantity);
-	void ChangeUnitStock(const wyrmgus::unit_type *unit_type, int quantity);
 
-	wyrmgus::gender get_gender() const;
+	const resource_map<int> &get_costs() const
+	{
+		return this->costs;
+	}
+	
+	int get_cost(const resource *resource) const
+	{
+		const auto find_iterator = this->costs.find(resource);
+
+		if (find_iterator != this->costs.end()) {
+			return find_iterator->second;
+		}
+
+		return 0;
+	}
+
+	void set_cost(const resource *resource, const int quantity)
+	{
+		if (quantity == 0) {
+			if (this->costs.contains(resource)) {
+				this->costs.erase(resource);
+			}
+		} else {
+			this->costs[resource] = quantity;
+		}
+	}
+
+	void change_cost(const resource *resource, const int quantity)
+	{
+		this->set_cost(resource, this->get_cost(resource) + quantity);
+	}
+
+	const resource_map<int> &get_storing() const
+	{
+		return this->storing;
+	}
+
+	int get_storing(const resource *resource) const
+	{
+		const auto find_iterator = this->storing.find(resource);
+
+		if (find_iterator != this->storing.end()) {
+			return find_iterator->second;
+		}
+
+		return 0;
+	}
+
+	void set_storing(const resource *resource, const int quantity)
+	{
+		if (quantity == 0) {
+			if (this->storing.contains(resource)) {
+				this->storing.erase(resource);
+			}
+		} else {
+			this->storing[resource] = quantity;
+		}
+	}
+
+	void change_storing(const resource *resource, const int quantity)
+	{
+		this->set_storing(resource, this->get_storing(resource) + quantity);
+	}
+
+	const resource_map<int> &get_improve_incomes() const
+	{
+		return this->improve_incomes;
+	}
+
+	int get_improve_income(const resource *resource) const
+	{
+		const auto find_iterator = this->improve_incomes.find(resource);
+
+		if (find_iterator != this->improve_incomes.end()) {
+			return find_iterator->second;
+		}
+
+		return 0;
+	}
+
+	void set_improve_income(const resource *resource, const int quantity)
+	{
+		if (quantity == 0) {
+			if (this->improve_incomes.contains(resource)) {
+				this->improve_incomes.erase(resource);
+			}
+		} else {
+			this->improve_incomes[resource] = quantity;
+		}
+	}
+
+	void change_improve_income(const resource *resource, const int quantity)
+	{
+		this->set_improve_income(resource, this->get_improve_income(resource) + quantity);
+	}
+
+	const resource_map<int> &get_resource_demands() const
+	{
+		return this->resource_demands;
+	}
+
+	int get_resource_demand(const resource *resource) const
+	{
+		const auto find_iterator = this->resource_demands.find(resource);
+
+		if (find_iterator != this->resource_demands.end()) {
+			return find_iterator->second;
+		}
+
+		return 0;
+	}
+
+	void set_resource_demand(const resource *resource, const int quantity)
+	{
+		if (quantity == 0) {
+			if (this->resource_demands.contains(resource)) {
+				this->resource_demands.erase(resource);
+			}
+		} else {
+			this->resource_demands[resource] = quantity;
+		}
+	}
+
+	void change_resource_demand(const resource *resource, const int quantity)
+	{
+		this->set_resource_demand(resource, this->get_resource_demand(resource) + quantity);
+	}
+	
+	int get_price() const;
+
+	const unit_type_map<int> &get_unit_stocks() const
+	{
+		return this->unit_stocks;
+	}
+
+	int get_unit_stock(const unit_type *unit_type) const
+	{
+		if (unit_type == nullptr) {
+			return 0;
+		}
+
+		const auto find_iterator = this->unit_stocks.find(unit_type);
+		if (find_iterator != this->unit_stocks.end()) {
+			return find_iterator->second;
+		} else {
+			return 0;
+		}
+	}
+
+	void set_unit_stock(const unit_type *unit_type, const int quantity)
+	{
+		if (unit_type == nullptr) {
+			return;
+		}
+
+		if (quantity <= 0) {
+			if (this->unit_stocks.contains(unit_type)) {
+				this->unit_stocks.erase(unit_type);
+			}
+		} else {
+			this->unit_stocks[unit_type] = quantity;
+		}
+	}
+
+	void change_unit_stock(const unit_type *unit_type, const int quantity)
+	{
+		this->set_unit_stock(unit_type, this->get_unit_stock(unit_type) + quantity);
+	}
+
+	gender get_gender() const;
 
 public:
-	std::vector<wyrmgus::unit_variable> Variables;           /// user defined variable.
-	int Costs[MaxCosts];            /// current costs of the unit
-	int Storing[MaxCosts];          /// storage increasing
-	int ImproveIncomes[MaxCosts];   /// Gives player an improved income
-	int ResourceDemand[MaxCosts];	/// Resource demand
-	std::map<int, int> UnitStock;	/// Units in stock
+	std::vector<unit_variable> Variables;           /// user defined variable.
+private:
+	resource_map<int> costs;            /// current costs of the unit
+	resource_map<int> storing;          /// storage increasing
+	resource_map<int> improve_incomes;   /// Gives player an improved income
+	resource_map<int> resource_demands;	/// Resource demand
+	unit_type_map<int> unit_stocks;	/// Units in stock
 };
 
 class CUpgrade final : public wyrmgus::detailed_data_entry, public wyrmgus::data_type<CUpgrade>
@@ -284,9 +442,9 @@ public:
 
 	void add_modifier(std::unique_ptr<const wyrmgus::upgrade_modifier> &&modifier);
 
-	int get_scaled_cost(const wyrmgus::resource *resource) const
+	int get_scaled_cost(const resource *resource) const
 	{
-		auto find_iterator = this->scaled_costs.find(resource);
+		const auto find_iterator = this->scaled_costs.find(resource);
 
 		if (find_iterator != this->scaled_costs.end()) {
 			return find_iterator->second;
@@ -368,7 +526,7 @@ public:
 	int   ID = 0;						/// numerical id
 	int   Costs[MaxCosts];				/// costs for the upgrade
 private:
-	std::map<const wyrmgus::resource *, int> scaled_costs; //scaled costs for the upgrade
+	resource_map<int> scaled_costs; //scaled costs for the upgrade
 public:
 	//Wyrmgus start
 	int GrandStrategyProductionEfficiencyModifier[MaxCosts];	/// Production modifier for a particular resource for grand strategy mode
@@ -414,10 +572,13 @@ Q_DECLARE_METATYPE(std::vector<const CUpgrade *>)
 **    @li `E' -- enabled, allowed by level but currently forbidden
 **    @li `X' -- fixed, acquired can't be disabled
 */
-class CAllow
+class CAllow final
 {
 public:
-	CAllow() { this->Clear(); }
+	CAllow()
+	{
+		this->Clear();
+	}
 
 	void Clear()
 	{
@@ -433,10 +594,13 @@ public:
 **  Upgrade timer used in the player structure.
 **  Every player has an own UpgradeTimers struct.
 */
-class CUpgradeTimers
+class CUpgradeTimers final
 {
 public:
-	CUpgradeTimers() { this->Clear(); }
+	CUpgradeTimers()
+	{
+		this->Clear();
+	}
 
 	void Clear()
 	{

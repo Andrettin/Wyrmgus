@@ -25,7 +25,6 @@
 //      along with this program; if not, write to the Free Software
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
-//
 
 #include "stratagus.h"
 
@@ -141,10 +140,11 @@ int TransformUnitIntoType(CUnit &unit, const wyrmgus::unit_type &newtype)
 		player.Supply += newtype.Stats[player.Index].Variables[SUPPLY_INDEX].Value - oldtype.Stats[player.Index].Variables[SUPPLY_INDEX].Value;
 
 		// Change resource limit
-		for (size_t i = 0; i < wyrmgus::resource::get_all().size(); ++i) {
+		for (size_t i = 0; i < resource::get_all().size(); ++i) {
+			const resource *resource = resource::get_all()[i];
 			if (player.MaxResources[i] != -1) {
-				player.MaxResources[i] += newtype.Stats[player.Index].Storing[i] - oldtype.Stats[player.Index].Storing[i];
-				player.set_resource(wyrmgus::resource::get_all()[i], player.StoredResources[i], STORE_BUILDING);
+				player.MaxResources[i] += newtype.Stats[player.Index].get_storing(resource) - oldtype.Stats[player.Index].get_storing(resource);
+				player.set_resource(resource, player.StoredResources[i], STORE_BUILDING);
 			}
 		}
 	}
@@ -209,7 +209,7 @@ int TransformUnitIntoType(CUnit &unit, const wyrmgus::unit_type &newtype)
 	for (const auto &kv_pair : unit.UnitStock) {
 		const wyrmgus::unit_type *unit_type = wyrmgus::unit_type::get_all()[kv_pair.first];
 
-		const int unit_stock_change = newstats.GetUnitStock(unit_type) - oldstats.GetUnitStock(unit_type);
+		const int unit_stock_change = newstats.get_unit_stock(unit_type) - oldstats.get_unit_stock(unit_type);
 		if (unit_stock_change < 0) {
 			unit.ChangeUnitStock(unit_type, unit_stock_change);
 		}
@@ -485,13 +485,13 @@ static void AnimateActionUpgradeTo(CUnit &unit)
 //	this->Ticks += std::max(1, player.SpeedUpgrade / SPEEDUP_FACTOR);
 	this->Ticks += std::max(1, (player.SpeedUpgrade + unit.Variable[TIMEEFFICIENCYBONUS_INDEX].Value) / SPEEDUP_FACTOR);
 	//Wyrmgus end
-	if (this->Ticks < newstats.Costs[TimeCost]) {
+	if (this->Ticks < newstats.get_cost(resource::get_all()[TimeCost])) {
 		unit.Wait = CYCLES_PER_SECOND / 6;
 		return ;
 	}
 
 	if (unit.Anim.Unbreakable) {
-		this->Ticks = newstats.Costs[TimeCost];
+		this->Ticks = newstats.get_cost(resource::get_all()[TimeCost]);
 		return ;
 	}
 
@@ -538,14 +538,14 @@ void COrder_UpgradeTo::Cancel(CUnit &unit)
 	Assert(unit.CurrentOrder() == this);
 
 	unit.Variable[UPGRADINGTO_INDEX].Value = this->Ticks;
-	unit.Variable[UPGRADINGTO_INDEX].Max = this->Type->Stats[unit.Player->Index].Costs[TimeCost];
+	unit.Variable[UPGRADINGTO_INDEX].Max = this->Type->Stats[unit.Player->Index].get_cost(resource::get_all()[TimeCost]);
 }
 
 void COrder_UpgradeTo::ConvertUnitType(const CUnit &unit, wyrmgus::unit_type &newType)
 {
 	const CPlayer &player = *unit.Player;
-	const int oldCost = this->Type->Stats[player.Index].Costs[TimeCost];
-	const int newCost = newType.Stats[player.Index].Costs[TimeCost];
+	const int oldCost = this->Type->Stats[player.Index].get_cost(resource::get_all()[TimeCost]);
+	const int newCost = newType.Stats[player.Index].get_cost(resource::get_all()[TimeCost]);
 
 	// Must Adjust Ticks to the fraction that was upgraded
 	this->Ticks = this->Ticks * newCost / oldCost;

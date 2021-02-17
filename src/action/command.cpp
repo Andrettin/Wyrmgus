@@ -25,7 +25,6 @@
 //      along with this program; if not, write to the Free Software
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
-//
 
 #include "stratagus.h"
 
@@ -1033,12 +1032,12 @@ void CommandTrainUnit(CUnit &unit, const wyrmgus::unit_type &type, int player, i
 //	if (unit.Player->CheckLimits(type) < 0
 //		|| unit.Player->CheckUnitType(type)) {
 	if (CPlayer::Players[player]->CheckLimits(type) < 0
-		|| CPlayer::Players[player]->CheckUnitType(type, unit.Type->Stats[unit.Player->Index].GetUnitStock(&type) != 0)) {
+		|| CPlayer::Players[player]->CheckUnitType(type, unit.Type->Stats[unit.Player->Index].get_unit_stock(&type) != 0)) {
 	//Wyrmgus end
 		return;
 	}
 	//Wyrmgus start
-	if (unit.Type->Stats[unit.Player->Index].GetUnitStock(&type) != 0 && unit.GetUnitStock(&type) <= 0) {
+	if (unit.Type->Stats[unit.Player->Index].get_unit_stock(&type) != 0 && unit.GetUnitStock(&type) <= 0) {
 		if (player == CPlayer::GetThisPlayer()->Index) {
 			CPlayer::GetThisPlayer()->Notify(NotifyYellow, unit.tilePos, unit.MapLayer->ID, "%s", _("The stock is empty, wait until it is replenished."));
 		}
@@ -1049,7 +1048,7 @@ void CommandTrainUnit(CUnit &unit, const wyrmgus::unit_type &type, int player, i
 		CPlayer::Players[player]->ShareUpgradeProgress(*unit.Player, unit);
 	}
 
-	if (unit.Type->Stats[unit.Player->Index].GetUnitStock(&type) != 0) { //if the trainer unit/building has a stock of the unit type to be trained, do this as a critical order
+	if (unit.Type->Stats[unit.Player->Index].get_unit_stock(&type) != 0) { //if the trainer unit/building has a stock of the unit type to be trained, do this as a critical order
 		if (unit.CriticalOrder != nullptr && unit.CriticalOrder->Action == UnitAction::Train) {
 			return;
 		}

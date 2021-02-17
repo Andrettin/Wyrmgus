@@ -27,7 +27,6 @@
 //      02111-1307, USA.
 
 #include "stratagus.h"
-#include "version.h"
 
 #include "actions.h"
 
@@ -76,6 +75,7 @@
 #include "unit/unit_ref.h"
 #include "unit/unit_type.h"
 #include "util/random.h"
+#include "version.h"
 
 unsigned SyncHash; /// Hash calculated to find sync failures
 
@@ -331,10 +331,7 @@ static void HandleBuffsEachCycle(CUnit &unit)
 
 	unit.decrement_spell_cooldown_timers();
 
-	for (const auto &kv_pair : unit.Type->Stats[unit.Player->Index].UnitStock) {
-		wyrmgus::unit_type *unit_type = wyrmgus::unit_type::get_all()[kv_pair.first];
-		const int unit_stock = kv_pair.second;
-
+	for (const auto &[unit_type, unit_stock] : unit.Type->Stats[unit.Player->Index].get_unit_stocks()) {
 		if (unit_stock <= 0) {
 			continue;
 		}
@@ -348,7 +345,7 @@ static void HandleBuffsEachCycle(CUnit &unit)
 
 		//if the unit still has less stock than its max, re-init the unit stock timer
 		if (unit.GetUnitStockReplenishmentTimer(unit_type) == 0 && unit.GetUnitStock(unit_type) < unit_stock && check_conditions(unit_type, unit.Player)) {
-			unit.SetUnitStockReplenishmentTimer(unit_type, unit_type->Stats[unit.Player->Index].Costs[TimeCost] * 50);
+			unit.SetUnitStockReplenishmentTimer(unit_type, unit_type->Stats[unit.Player->Index].get_cost(resource::get_all()[TimeCost]) * 50);
 		}
 	}
 	

@@ -26,7 +26,6 @@
 //      along with this program; if not, write to the Free Software
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
-//
 
 #include "stratagus.h"
 
@@ -230,9 +229,9 @@ static std::vector<const wyrmgus::unit_type *> get_supply_units()
 		unsigned int cost = 0;
 		unsigned int other_cost = 0;
 
-		for (size_t j = 0; j < wyrmgus::resource::get_all().size(); ++j) {
-			cost += type->DefaultStat.Costs[j]; //this cannot be MapDefaultStat because this function is called when the AiHelper is defined, rather than when a game is started
-			other_cost += other_type->DefaultStat.Costs[j];
+		for (const resource *resource : resource::get_all()) {
+			cost += type->DefaultStat.get_cost(resource); //this cannot be MapDefaultStat because this function is called when the AiHelper is defined, rather than when a game is started
+			other_cost += other_type->DefaultStat.get_cost(resource);
 		}
 
 		const unsigned int score = type->DefaultStat.Variables[SUPPLY_INDEX].Value * 10000 / cost;

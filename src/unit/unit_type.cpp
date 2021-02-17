@@ -695,7 +695,7 @@ void unit_type::process_sml_scope(const sml_data &scope)
 			const std::string &value = property.get_value();
 
 			const wyrmgus::resource *resource = resource::get(key);
-			this->DefaultStat.Costs[resource->get_index()] = std::stoi(value);
+			this->DefaultStat.set_cost(resource, std::stoi(value));
 		});
 	} else if (tag == "repair_costs") {
 		scope.for_each_property([&](const wyrmgus::sml_property &property) {
@@ -1061,14 +1061,8 @@ void unit_type::ProcessConfigData(const CConfigData *config_data)
 				std::string key = child_config_data->Properties[j].first;
 				std::string value = child_config_data->Properties[j].second;
 				
-				key = FindAndReplaceString(key, "_", "-");
-				
-				const int resource = GetResourceIdByName(key.c_str());
-				if (resource != -1) {
-					this->DefaultStat.Costs[resource] = std::stoi(value);
-				} else {
-					fprintf(stderr, "Invalid resource: \"%s\".\n", key.c_str());
-				}
+				const resource *resource = resource::get(key);
+				this->DefaultStat.set_cost(resource, std::stoi(value));
 			}
 		} else if (child_config_data->Tag == "image") {
 			for (size_t j = 0; j < child_config_data->Properties.size(); ++j) {
@@ -1602,10 +1596,7 @@ void unit_type::set_parent(const unit_type *parent_type)
 	this->autocast_spells = parent_type->autocast_spells;
 
 	for (unsigned int i = 0; i < MaxCosts; ++i) {
-		this->DefaultStat.Costs[i] = parent_type->DefaultStat.Costs[i];
 		this->RepairCosts[i] = parent_type->RepairCosts[i];
-		this->DefaultStat.ImproveIncomes[i] = parent_type->DefaultStat.ImproveIncomes[i];
-		this->DefaultStat.ResourceDemand[i] = parent_type->DefaultStat.ResourceDemand[i];
 		this->CanStore[i] = parent_type->CanStore[i];
 		this->GrandStrategyProductionEfficiencyModifier[i] = parent_type->GrandStrategyProductionEfficiencyModifier[i];
 		
@@ -1614,14 +1605,8 @@ void unit_type::set_parent(const unit_type *parent_type)
 		}
 	}
 	
-	this->DefaultStat.UnitStock = parent_type->DefaultStat.UnitStock;
+	this->DefaultStat = parent_type->DefaultStat;
 
-	for (unsigned int i = 0; i < UnitTypeVar.GetNumberVariable(); ++i) {
-		this->DefaultStat.Variables[i].Enable = parent_type->DefaultStat.Variables[i].Enable;
-		this->DefaultStat.Variables[i].Value = parent_type->DefaultStat.Variables[i].Value;
-		this->DefaultStat.Variables[i].Max = parent_type->DefaultStat.Variables[i].Max;
-		this->DefaultStat.Variables[i].Increase = parent_type->DefaultStat.Variables[i].Increase;
-	}
 	for (unsigned int i = 0; i < UnitTypeVar.GetNumberBoolFlag(); ++i) {
 		this->BoolFlag[i].value = parent_type->BoolFlag[i].value;
 		this->BoolFlag[i].CanTransport = parent_type->BoolFlag[i].CanTransport;
@@ -2200,17 +2185,20 @@ void UpdateUnitStats(wyrmgus::unit_type &type, int reset)
 				}
 			}
 
-			for (const auto &unit_stock_kv_pair : iterator->second.UnitStock) {
-				const wyrmgus::unit_type *unit_type = wyrmgus::unit_type::get_all()[unit_stock_kv_pair.first];
-				const int unit_stock = unit_stock_kv_pair.second;
-
-				type.MapDefaultStat.ChangeUnitStock(unit_type, unit_stock);
+			for (const auto &[unit_type, unit_stock] : iterator->second.get_unit_stocks()) {
+				type.MapDefaultStat.change_unit_stock(unit_type, unit_stock);
 			}
 
-			for (int i = 0; i < MaxCosts; ++i) {
-				type.MapDefaultStat.Costs[i] += iterator->second.Costs[i];
-				type.MapDefaultStat.ImproveIncomes[i] += iterator->second.ImproveIncomes[i];
-				type.MapDefaultStat.ResourceDemand[i] += iterator->second.ResourceDemand[i];
+			for (const auto &[resource, cost] : iterator->second.get_costs()) {
+				type.MapDefaultStat.change_cost(resource, cost);
+			}
+
+			for (const auto &[resource, quantity] : iterator->second.get_improve_incomes()) {
+				type.MapDefaultStat.change_improve_income(resource, quantity);
+			}
+
+			for (const auto &[resource, quantity] : iterator->second.get_resource_demands()) {
+				type.MapDefaultStat.change_resource_demand(resource, quantity);
 			}
 		}
 		for (int player = 0; player < PlayerMax; ++player) {
@@ -2336,45 +2324,66 @@ static bool SaveUnitStats(const CUnitStats &stats, const wyrmgus::unit_type &typ
 					stats.Variables[i].Enable ? ", Enable = true" : "");
 	}
 	file.printf("\"costs\", {");
-	for (unsigned int i = 0; i < MaxCosts; ++i) {
-		if (i) {
+
+	bool first = true;
+	for (const auto &[resource, cost] : stats.get_costs()) {
+		if (first) {
+			first = false;
+		} else {
 			file.printf(" ");
 		}
-		file.printf("\"%s\", %d,", DefaultResourceNames[i].c_str(), stats.Costs[i]);
+		file.printf("\"%s\", %d,", resource->get_identifier().c_str(), cost);
 	}
+
 	file.printf("},\n\"storing\", {");
-	for (unsigned int i = 0; i < MaxCosts; ++i) {
-		if (i) {
+	first = true;
+	for (const auto &[resource, quantity] : stats.get_storing()) {
+		if (first) {
+			first = false;
+		} else {
 			file.printf(" ");
 		}
-		file.printf("\"%s\", %d,", DefaultResourceNames[i].c_str(), stats.Storing[i]);
+		file.printf("\"%s\", %d,", resource->get_identifier().c_str(), quantity);
 	}
+
 	file.printf("},\n\"improve-production\", {");
-	for (unsigned int i = 0; i < MaxCosts; ++i) {
-		if (i) {
+	first = true;
+	for (const auto &[resource, quantity] : stats.get_improve_incomes()) {
+		if (first) {
+			first = false;
+		} else {
 			file.printf(" ");
 		}
-		file.printf("\"%s\", %d,", DefaultResourceNames[i].c_str(), stats.ImproveIncomes[i]);
+		file.printf("\"%s\", %d,", resource->get_identifier().c_str(), quantity);
 	}
-	//Wyrmgus start
+
 	file.printf("},\n\"resource-demand\", {");
-	for (unsigned int i = 0; i < MaxCosts; ++i) {
-		if (i) {
+	first = true;
+	for (const auto &[resource, quantity] : stats.get_resource_demands()) {
+		if (first) {
+			first = false;
+		} else {
 			file.printf(" ");
 		}
-		file.printf("\"%s\", %d,", DefaultResourceNames[i].c_str(), stats.ResourceDemand[i]);
+		file.printf("\"%s\", %d,", resource->get_identifier().c_str(), quantity);
 	}
+
 	file.printf("},\n\"unit-stock\", {");
-	for (const wyrmgus::unit_type *unit_type : wyrmgus::unit_type::get_all()) {
-		if (stats.GetUnitStock(unit_type) == type.DefaultStat.GetUnitStock(unit_type)) {
+	first = true;
+	for (const auto &[unit_type, unit_stock] : stats.get_unit_stocks()) {
+		if (unit_stock == type.DefaultStat.get_unit_stock(unit_type)) {
 			continue;
 		}
-		if (unit_type->Slot > 0) {
+
+		if (first) {
+			first = false;
+		} else {
 			file.printf(" ");
 		}
-		file.printf("\"%s\", %d,", unit_type->Ident.c_str(), stats.GetUnitStock(unit_type));
+
+		file.printf("\"%s\", %d,", unit_type->get_identifier().c_str(), unit_stock);
 	}
-	//Wyrmgus end
+
 	file.printf("}})\n");
 	return true;
 }

@@ -3452,13 +3452,15 @@ void CPlayer::GetUnitTypeCosts(const wyrmgus::unit_type *type, int *type_costs, 
 	for (int i = 0; i < MaxCosts; ++i) {
 		type_costs[i] = 0;
 	}
+
 	if (hire) {
-		type_costs[CopperCost] = type->Stats[this->Index].GetPrice();
+		type_costs[CopperCost] = type->Stats[this->Index].get_price();
 	} else {
-		for (int i = 0; i < MaxCosts; ++i) {
-			type_costs[i] = type->Stats[this->Index].Costs[i];
+		for (const auto &[resource, cost] : type->Stats[this->Index].get_costs()) {
+			type_costs[resource->get_index()] = cost;
 		}
 	}
+
 	for (int i = 0; i < MaxCosts; ++i) {
 		if (type->TrainQuantity) {
 			type_costs[i] *= type->TrainQuantity;
@@ -3640,8 +3642,8 @@ void CPlayer::IncreaseCountsForUnit(CUnit *unit, const bool type_change)
 		this->NumTownHalls++;
 	}
 	
-	for (int i = 0; i < MaxCosts; ++i) {
-		this->ResourceDemand[i] += type->Stats[this->Index].ResourceDemand[i];
+	for (const auto &[resource, quantity] : type->Stats[this->Index].get_resource_demands()) {
+		this->ResourceDemand[resource->get_index()] += quantity;
 	}
 	
 	if (this->AiEnabled && type->BoolFlag[COWARD_INDEX].value && !type->BoolFlag[HARVESTER_INDEX].value && !type->CanTransport() && type->Spells.size() == 0 && CMap::Map.Info.IsPointOnMap(unit->tilePos, unit->MapLayer) && unit->CanMove() && unit->Active && unit->GroupId != 0 && unit->Variable[SIGHTRANGE_INDEX].Value > 0) { //assign coward, non-worker, non-transporter, non-spellcaster units to be scouts
@@ -3693,8 +3695,8 @@ void CPlayer::DecreaseCountsForUnit(CUnit *unit, const bool type_change)
 		this->NumTownHalls--;
 	}
 	
-	for (int i = 0; i < MaxCosts; ++i) {
-		this->ResourceDemand[i] -= type->Stats[this->Index].ResourceDemand[i];
+	for (const auto &[resource, quantity] : type->Stats[this->Index].get_resource_demands()) {
+		this->ResourceDemand[resource->get_index()] -= quantity;
 	}
 	
 	if (this->AiEnabled && this->Ai && std::find(this->Ai->Scouts.begin(), this->Ai->Scouts.end(), unit) != this->Ai->Scouts.end()) {
