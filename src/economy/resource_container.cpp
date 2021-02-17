@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-//      (c) Copyright 2018-2021 by Andrettin
+//      (c) Copyright 2021 by Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -26,49 +26,15 @@
 
 #include "stratagus.h"
 
-#include "economy/resource.h"
+#include "economy/resource_container.h"
 
-#include "database/defines.h"
-#include "video/video.h"
+#include "economy/resource.h"
 
 namespace wyrmgus {
 
-void resource::process_sml_property(const sml_property &property)
+bool resource_compare::operator()(const resource *resource, const wyrmgus::resource *other_resource) const
 {
-	const std::string &key = property.get_key();
-	const std::string &value = property.get_value();
-
-	if (key == "action_name") {
-		this->action_name = value;
-	} else {
-		data_entry::process_sml_property(property);
-	}
-}
-
-void resource::initialize()
-{
-	if (this->final_resource != nullptr) {
-		this->final_resource->ChildResources.push_back(this);
-	}
-
-	data_entry::initialize();
-}
-
-bool resource::IsMineResource() const
-{
-	switch (this->get_index()) {
-		case CopperCost:
-		case SilverCost:
-		case GoldCost:
-		case IronCost:
-		case MithrilCost:
-		case CoalCost:
-		case DiamondsCost:
-		case EmeraldsCost:
-			return true;
-		default:
-			return false;
-	}
+	return resource->get_index() < other_resource->get_index();
 }
 
 }

@@ -148,6 +148,7 @@ source_group(database FILES ${database_SRCS})
 
 set(economy_SRCS
 	src/economy/resource.cpp
+	src/economy/resource_container.cpp
 )
 source_group(economy FILES ${economy_SRCS})
 
@@ -725,6 +726,7 @@ set(stratagus_database_HDRS
 
 set(stratagus_economy_HDRS
 	src/economy/resource.h
+	src/economy/resource_container.h
 )
 
 set(stratagus_item_HDRS
