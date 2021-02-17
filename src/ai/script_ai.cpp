@@ -1303,12 +1303,12 @@ static int CclAiSetReserve(lua_State *l)
 		LuaError(l, "incorrect argument");
 	}
 	lua_newtable(l);
-	for (size_t i = 0; i < wyrmgus::resource::get_all().size(); ++i) {
-		lua_pushnumber(l, AiPlayer->Reserve[i]);
+	for (size_t i = 0; i < resource::get_all().size(); ++i) {
+		lua_pushnumber(l, AiPlayer->get_reserve(resource::get_all()[i]));
 		lua_rawseti(l, -2, i + 1);
 	}
 	for (size_t i = 0; i < wyrmgus::resource::get_all().size(); ++i) {
-		AiPlayer->Reserve[i] = LuaToNumber(l, 1, i + 1);
+		AiPlayer->set_reserve(resource::get_all()[i], LuaToNumber(l, 1, i + 1));
 	}
 	return 1;
 }
@@ -1336,11 +1336,11 @@ static int CclAiSetCollect(lua_State *l)
 		LuaError(l, "incorrect argument");
 	}
 	for (unsigned int j = 0; j < args; ++j) {
-		const std::string resource = LuaToString(l, j + 1);
-		const int resId = GetResourceIdByName(l, resource.c_str());
+		const std::string resource_str = LuaToString(l, j + 1);
+		const resource *resource = resource::get(resource_str);
 
 		++j;
-		AiPlayer->Collect[resId] = LuaToNumber(l, j + 1);
+		AiPlayer->set_collect(resource, LuaToNumber(l, j + 1));
 	}
 	//Wyrmgus end
 	return 0;
@@ -1631,8 +1631,8 @@ static int CclDefineAiPlayer(lua_State *l)
 				const char *type = LuaToString(l, j + 1, k + 1);
 				++k;
 				int num = LuaToNumber(l, j + 1, k + 1);
-				const int resId = GetResourceIdByName(l, type);
-				ai->Reserve[resId] = num;
+				const resource *res = resource::get(type);
+				ai->set_reserve(res, num);
 			}
 		} else if (!strcmp(value, "used")) {
 			if (!lua_istable(l, j + 1)) {
@@ -1643,8 +1643,8 @@ static int CclDefineAiPlayer(lua_State *l)
 				const char *type = LuaToString(l, j + 1, k + 1);
 				++k;
 				const int num = LuaToNumber(l, j + 1, k + 1);
-				const int resId = GetResourceIdByName(l, type);
-				ai->Used[resId] = num;
+				const resource *res = resource::get(type);
+				ai->Used[res] = num;
 			}
 		} else if (!strcmp(value, "needed")) {
 			if (!lua_istable(l, j + 1)) {
@@ -1655,8 +1655,8 @@ static int CclDefineAiPlayer(lua_State *l)
 				const char *type = LuaToString(l, j + 1, k + 1);
 				++k;
 				const int num = LuaToNumber(l, j + 1, k + 1);
-				const int resId = GetResourceIdByName(l, type);
-				ai->Needed[resId] = num;
+				const resource *res = resource::get(type);
+				ai->Needed[res] = num;
 			}
 		} else if (!strcmp(value, "collect")) {
 			if (!lua_istable(l, j + 1)) {
@@ -1667,8 +1667,8 @@ static int CclDefineAiPlayer(lua_State *l)
 				const char *type = LuaToString(l, j + 1, k + 1);
 				++k;
 				const int num = LuaToNumber(l, j + 1, k + 1);
-				const int resId = GetResourceIdByName(l, type);
-				ai->Collect[resId] = num;
+				const resource *res = resource::get(type);
+				ai->set_collect(res, num);
 			}
 		} else if (!strcmp(value, "need-mask")) {
 			if (!lua_istable(l, j + 1)) {

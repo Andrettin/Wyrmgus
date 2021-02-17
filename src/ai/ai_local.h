@@ -25,7 +25,6 @@
 //      along with this program; if not, write to the Free Software
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
-//
 
 #pragma once
 
@@ -305,12 +304,58 @@ class PlayerAi final
 public:
 	static constexpr int enforced_peace_cycle_count = CYCLES_PER_MINUTE * 20;
 
-	PlayerAi()
+	const resource_map<int> &get_reserve() const
 	{
-		memset(Reserve, 0, sizeof(Reserve));
-		memset(Used, 0, sizeof(Used));
-		memset(Needed, 0, sizeof(Needed));
-		memset(Collect, 0, sizeof(Collect));
+		return this->reserve;
+	}
+
+	int get_reserve(const resource *resource) const
+	{
+		const auto find_iterator = this->reserve.find(resource);
+
+		if (find_iterator != this->reserve.end()) {
+			return find_iterator->second;
+		}
+
+		return 0;
+	}
+
+	void set_reserve(const resource *resource, const int quantity)
+	{
+		if (quantity == 0) {
+			if (this->reserve.contains(resource)) {
+				this->reserve.erase(resource);
+			}
+		} else {
+			this->reserve[resource] = quantity;
+		}
+	}
+
+	const resource_map<int> &get_collect() const
+	{
+		return this->collect;
+	}
+
+	int get_collect(const resource *resource) const
+	{
+		const auto find_iterator = this->collect.find(resource);
+
+		if (find_iterator != this->collect.end()) {
+			return find_iterator->second;
+		}
+
+		return 0;
+	}
+
+	void set_collect(const resource *resource, const int quantity)
+	{
+		if (quantity == 0) {
+			if (this->collect.contains(resource)) {
+				this->collect.erase(resource);
+			}
+		} else {
+			this->collect[resource] = quantity;
+		}
 	}
 
 	void check_quest_units_to_build();
@@ -324,10 +369,14 @@ public:
 	class AiForceManager Force;			/// Forces controlled by AI
 
 	// resource manager
-	int Reserve[MaxCosts];			/// Resources to keep in reserve
-	int Used[MaxCosts];				/// Used resources
-	int Needed[MaxCosts];			/// Needed resources
-	int Collect[MaxCosts];			/// Collect % of resources
+private:
+	resource_map<int> reserve;			/// Resources to keep in reserve
+public:
+	resource_map<int> Used;				/// Used resources
+	resource_map<int> Needed;			/// Needed resources
+private:
+	resource_map<int> collect;			/// Collect % of resources
+public:
 	long long int NeededMask = 0;	/// Mask for needed resources
 	bool NeedSupply = false;		/// Flag need food
 	bool ScriptDebug = false;		/// Flag script debugging on/off

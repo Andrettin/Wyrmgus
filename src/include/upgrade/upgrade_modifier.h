@@ -80,7 +80,7 @@ public:
 	int UpgradeId = 0;						/// used to filter required modifier
 
 	CUnitStats Modifier;					/// modifier of unit stats.
-	std::unique_ptr<int[]> ModifyPercent;			/// use for percent modifiers
+	std::unique_ptr<int[]> ModifyPercent;	/// use for percent modifiers
 	int SpeedResearch = 0;					/// speed factor for researching
 	int ImproveIncomes[MaxCosts];			/// improve incomes
 	unit_type_map<int> UnitStock;	/// unit stock

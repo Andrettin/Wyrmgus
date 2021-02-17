@@ -492,26 +492,26 @@ static void SaveAiPlayer(CFile &file, int plynr, const PlayerAi &ai)
 	}
 
 	file.printf("  \"reserve\", {");
-	for (const wyrmgus::resource *resource : wyrmgus::resource::get_all()) {
-		file.printf("\"%s\", %d, ", resource->get_identifier().c_str(), ai.Reserve[resource->get_index()]);
+	for (const auto &[resource, quantity] : ai.get_reserve()) {
+		file.printf("\"%s\", %d, ", resource->get_identifier().c_str(), quantity);
 	}
 	file.printf("},\n");
 
 	file.printf("  \"used\", {");
-	for (const wyrmgus::resource *resource : wyrmgus::resource::get_all()) {
-		file.printf("\"%s\", %d, ", resource->get_identifier().c_str(), ai.Used[resource->get_index()]);
+	for (const auto &[resource, quantity] : ai.Used) {
+		file.printf("\"%s\", %d, ", resource->get_identifier().c_str(), quantity);
 	}
 	file.printf("},\n");
 
 	file.printf("  \"needed\", {");
-	for (const wyrmgus::resource *resource : wyrmgus::resource::get_all()) {
-		file.printf("\"%s\", %d, ", resource->get_identifier().c_str(), ai.Needed[resource->get_index()]);
+	for (const auto &[resource, quantity] : ai.Needed) {
+		file.printf("\"%s\", %d, ", resource->get_identifier().c_str(), quantity);
 	}
 	file.printf("},\n");
 
 	file.printf("  \"collect\", {");
-	for (const wyrmgus::resource *resource : wyrmgus::resource::get_all()) {
-		file.printf("\"%s\", %d, ", resource->get_identifier().c_str(), ai.Collect[resource->get_index()]);
+	for (const auto &[resource, quantity] : ai.get_collect()) {
+		file.printf("\"%s\", %d, ", resource->get_identifier().c_str(), quantity);
 	}
 	file.printf("},\n");
 
@@ -695,12 +695,12 @@ void AiInit(CPlayer &player)
 	//Wyrmgus start
 //	pai->Collect[GoldCost] = 50;
 //	pai->Collect[WoodCost] = 50;
-	pai->Collect[CopperCost] = 45;
-	pai->Collect[WoodCost] = 45;
+	pai->set_collect(defines::get()->get_wealth_resource(), 45);
+	pai->set_collect(resource::get_all()[WoodCost], 45);
 	//Wyrmgus end
-	pai->Collect[OilCost] = 0;
+	pai->set_collect(resource::get_all()[OilCost], 0);
 	//Wyrmgus start
-	pai->Collect[StoneCost] = 10;
+	pai->set_collect(resource::get_all()[StoneCost], 10);
 	//Wyrmgus end
 
 	player.Ai = std::move(pai);

@@ -10,8 +10,8 @@
 //
 /**@name ai_resource.cpp - AI resource manager. */
 //
-//      (c) Copyright 2000-2021 by Lutz Sammer, Antonis Chaniotis
-//		and Andrettin
+//      (c) Copyright 2000-2021 by Lutz Sammer, Antonis Chaniotis and 
+//      Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -26,7 +26,6 @@
 //      along with this program; if not, write to the Free Software
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
-//
 
 #include "stratagus.h"
 
@@ -76,11 +75,8 @@ static int AiMakeUnit(const wyrmgus::unit_type &type, const Vec2i &nearPos, int 
 static int AiCheckCosts(const resource_map<int> &costs)
 {
 	// FIXME: the used costs shouldn't be calculated here
-	int *used = AiPlayer->Used;
-
-	for (int i = 1; i < MaxCosts; ++i) {
-		used[i] = 0;
-	}
+	resource_map<int> &used = AiPlayer->Used;
+	used.clear();
 
 	const int nunits = AiPlayer->Player->GetUnitCount();
 	for (int i = 0; i < nunits; ++i) {
@@ -98,7 +94,7 @@ static int AiCheckCosts(const resource_map<int> &costs)
 						continue;
 					}
 
-					used[resource->get_index()] += cost;
+					used[resource] += cost;
 				}
 			}
 		}
@@ -107,7 +103,6 @@ static int AiCheckCosts(const resource_map<int> &costs)
 	int err = 0;
 	const int *resources = AiPlayer->Player->Resources;
 	const int *storedresources = AiPlayer->Player->StoredResources;
-	const int *reserve = AiPlayer->Reserve;
 
 	for (const auto &[resource, cost] : costs) {
 		if (resource == defines::get()->get_time_resource()) {
@@ -120,7 +115,7 @@ static int AiCheckCosts(const resource_map<int> &costs)
 
 		const int resource_index = resource->get_index();
 
-		if (resources[resource_index] + storedresources[resource_index] - used[resource_index] < cost - reserve[resource_index]) {
+		if (resources[resource_index] + storedresources[resource_index] - used[resource] < cost - AiPlayer->get_reserve(resource)) {
 			err |= 1 << resource_index;
 		}
 	}
@@ -1500,7 +1495,7 @@ static bool CmpWorkers(const CUnit *lhs, const CUnit *rhs)
 //Wyrmgus start
 static bool AiCanSellResource(int resource)
 {
-	if ((AiPlayer->Player->Resources[resource] + AiPlayer->Player->StoredResources[resource]) <= (AiPlayer->Collect[resource] * 100)) {
+	if ((AiPlayer->Player->Resources[resource] + AiPlayer->Player->StoredResources[resource]) <= (AiPlayer->get_collect(resource::get_all()[resource]) * 100)) {
 		return false;
 	}
 	
@@ -1653,7 +1648,7 @@ static void AiCollectResources()
 
 	int percent_total = 100;
 	for (int c = 1; c < MaxCosts; ++c) {
-		percent[c] = AiPlayer->Collect[c];
+		percent[c] = AiPlayer->get_collect(resource::get_all()[c]);
 		if ((AiPlayer->NeededMask & ((long long int) 1 << c))) { // Double percent if needed
 			percent_total += percent[c];
 			percent[c] <<= 1;
