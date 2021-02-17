@@ -886,8 +886,7 @@ void CommandDismiss(CUnit &unit, bool salvage)
 					return;
 				}
 			}
-			int type_costs[MaxCosts];
-			unit.Player->GetUnitTypeCosts(unit.Type, type_costs, false, true);
+			const resource_map<int> type_costs = unit.Player->GetUnitTypeCosts(unit.Type, false, true);
 			unit.Player->AddCostsFactor(type_costs, unit.Variable[SALVAGEFACTOR_INDEX].Value * unit.Variable[HP_INDEX].Value / unit.GetModifiedVariable(HP_INDEX, VariableAttribute::Max));
 		}
 		DebugPrint("Suicide unit ... \n");
@@ -1209,8 +1208,7 @@ void CommandResearch(CUnit &unit, const CUpgrade &what, CPlayer *player, const i
 	// Check if enough resources remains? (NETWORK!)
 	//Wyrmgus start
 //	if (unit.Player->CheckCosts(what.Costs)) {
-	int upgrade_costs[MaxCosts];
-	player->GetUpgradeCosts(&what, upgrade_costs);
+	const resource_map<int> upgrade_costs = player->GetUpgradeCosts(&what);
 	if (player->CheckCosts(upgrade_costs)) {
 	//Wyrmgus end
 		return;

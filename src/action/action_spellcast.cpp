@@ -419,7 +419,7 @@ bool COrder_SpellCast::SpellMoveToTarget(CUnit &unit)
 //										unit.Type->Name.c_str(), spell.Name.c_str());
 										unit.GetMessageName().c_str(), spell.get_name().c_str());
 										//Wyrmgus end
-				} else if (unit.Player->CheckCosts(spell.Costs, false)) {
+				} else if (unit.Player->CheckCosts(spell.get_costs(), false)) {
 					unit.Player->Notify(NotifyYellow, unit.tilePos,
 										//Wyrmgus start
 										unit.MapLayer->ID,

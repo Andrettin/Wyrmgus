@@ -591,7 +591,7 @@ static bool DrawUnitInfo_single_selection(const CUnit &unit)
 		case UnitAction::Train: { //  Building training units.
 			//Wyrmgus start
 			const COrder_Train &order = *static_cast<COrder_Train *>(unit.CurrentOrder());
-			if (order.GetUnitType().Stats[unit.Player->Index].get_cost(resource::get_all()[TimeCost]) == 0) { //don't show the training button for a quick moment if the time cost is 0
+			if (order.GetUnitType().Stats[unit.Player->Index].get_time_cost() == 0) { //don't show the training button for a quick moment if the time cost is 0
 				return false;
 			}
 			//Wyrmgus end
@@ -603,7 +603,7 @@ static bool DrawUnitInfo_single_selection(const CUnit &unit)
 				const COrder_UpgradeTo &order = *static_cast<COrder_UpgradeTo *>(unit.CurrentOrder());
 				
 				//Wyrmgus start
-				if (order.GetUnitType().Stats[unit.Player->Index].get_cost(resource::get_all()[TimeCost]) == 0) { //don't show the upgrading button for a quick moment if the time cost is 0
+				if (order.GetUnitType().Stats[unit.Player->Index].get_time_cost() == 0) { //don't show the upgrading button for a quick moment if the time cost is 0
 					return false;
 				}
 				//Wyrmgus end
@@ -623,7 +623,8 @@ static bool DrawUnitInfo_single_selection(const CUnit &unit)
 				COrder_Research &order = *static_cast<COrder_Research *>(unit.CurrentOrder());
 				
 				//Wyrmgus start
-				if (order.GetUpgrade().Costs[TimeCost] == 0) { //don't show the researching button for a quick moment if the time cost is 0
+				if (order.GetUpgrade().get_time_cost() == 0) {
+					//don't show the researching button for a quick moment if the time cost is 0
 					return false;
 				}
 				//Wyrmgus end
@@ -1122,7 +1123,7 @@ void DrawPopups()
 		if (CursorScreenPos.x >= UI.Resources[index].IconX && CursorScreenPos.x < (UI.Resources[index].TextX + UI.Resources[index].Font->Width(UI.Resources[index].Text)) && CursorScreenPos.y >= UI.Resources[index].IconY && CursorScreenPos.y < (UI.Resources[index].IconY + icon->get_graphics()->Height)) {
 			//hackish way to make the popup appear correctly for the resource
 			auto ba = std::make_unique<wyrmgus::button>();
-			ba->Hint = resource->get_name();;
+			ba->Hint = resource->get_name();
 			ba->Action = ButtonCmd::ProduceResource;
 			ba->Value = index;
 			ba->ValueStr = resource->get_identifier();
@@ -1947,9 +1948,9 @@ static void InfoPanel_draw_single_selection(CUnit *selUnit)
 	//draw icon panel frame, if any
 	if (
 		wyrmgus::defines::get()->get_infopanel_frame_graphics() != nullptr
-		&& (unit.CurrentAction() != UnitAction::Train || static_cast<COrder_Train *>(unit.CurrentOrder())->GetUnitType().Stats[unit.Player->Index].get_cost(resource::get_all()[TimeCost]) == 0) //don't stop showing the info panel frame for a quick moment if the time cost is 0
-		&& (unit.CurrentAction() != UnitAction::UpgradeTo || static_cast<COrder_UpgradeTo *>(unit.CurrentOrder())->GetUnitType().Stats[unit.Player->Index].get_cost(resource::get_all()[TimeCost]) == 0)
-		&& (unit.CurrentAction() != UnitAction::Research || static_cast<COrder_Research *>(unit.CurrentOrder())->GetUpgrade().Costs[TimeCost] == 0)
+		&& (unit.CurrentAction() != UnitAction::Train || static_cast<COrder_Train *>(unit.CurrentOrder())->GetUnitType().Stats[unit.Player->Index].get_time_cost() == 0) //don't stop showing the info panel frame for a quick moment if the time cost is 0
+		&& (unit.CurrentAction() != UnitAction::UpgradeTo || static_cast<COrder_UpgradeTo *>(unit.CurrentOrder())->GetUnitType().Stats[unit.Player->Index].get_time_cost() == 0)
+		&& (unit.CurrentAction() != UnitAction::Research || static_cast<COrder_Research *>(unit.CurrentOrder())->GetUpgrade().get_time_cost() == 0)
 		&& unit.CurrentAction() != UnitAction::Built
 		&& !unit.IsEnemy(*CPlayer::GetThisPlayer())
 		&& (unit.Player->Type != PlayerNeutral || unit.Type->get_given_resource() != nullptr)

@@ -56,9 +56,8 @@ std::unique_ptr<COrder> COrder::NewActionResearch(const CUpgrade &upgrade, CPlay
 	//Wyrmgus start
 	order->Player = player;
 //	unit.Player->SubCosts(upgrade.Costs);
-	int upgrade_costs[MaxCosts];
-	player->GetUpgradeCosts(&upgrade, upgrade_costs);
-	player->SubCosts(upgrade_costs);
+	const resource_map<int> upgrade_costs = player->GetUpgradeCosts(&upgrade);
+	player->subtract_costs(upgrade_costs);
 	//Wyrmgus end
 
 	order->SetUpgrade(upgrade);
@@ -117,7 +116,7 @@ bool COrder_Research::ParseSpecificData(lua_State *l, int &j, const char *value,
 //	unit.Variable[RESEARCH_INDEX].Value = unit.Player->UpgradeTimers.Upgrades[this->Upgrade->ID];
 	unit.Variable[RESEARCH_INDEX].Value = this->Player->UpgradeTimers.Upgrades[this->Upgrade->ID];
 	//Wyrmgus end
-	unit.Variable[RESEARCH_INDEX].Max = this->Upgrade->Costs[TimeCost];
+	unit.Variable[RESEARCH_INDEX].Max = this->Upgrade->get_time_cost();
 }
 
 /**
@@ -146,7 +145,7 @@ bool COrder_Research::ParseSpecificData(lua_State *l, int &j, const char *value,
 //	player.UpgradeTimers.Upgrades[upgrade.ID] += std::max(1, player.SpeedResearch / SPEEDUP_FACTOR);
 	player.UpgradeTimers.Upgrades[upgrade.ID] += std::max(1, (player.SpeedResearch + unit.Variable[TIMEEFFICIENCYBONUS_INDEX].Value + unit.Variable[RESEARCHSPEEDBONUS_INDEX].Value) / SPEEDUP_FACTOR);
 	//Wyrmgus end
-	if (player.UpgradeTimers.Upgrades[upgrade.ID] >= upgrade.Costs[TimeCost]) {
+	if (player.UpgradeTimers.Upgrades[upgrade.ID] >= upgrade.get_time_cost()) {
 		if (upgrade.get_name().empty()) {
 			//Wyrmgus start
 //			player.Notify(NotifyGreen, unit.tilePos, _("%s: research complete"), type.Name.c_str());
@@ -187,6 +186,6 @@ void COrder_Research::Cancel(CUnit &unit)
 //	unit.Player->AddCostsFactor(upgrade.Costs, CancelResearchCostsFactor);
 	this->Player->UpgradeTimers.Upgrades[upgrade.ID] = 0;
 
-	this->Player->AddCostsFactor(upgrade.Costs, CancelResearchCostsFactor);
+	this->Player->AddCostsFactor(upgrade.get_costs(), CancelResearchCostsFactor);
 	//Wyrmgus end
 }

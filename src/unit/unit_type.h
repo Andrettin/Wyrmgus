@@ -998,6 +998,11 @@ public:
 		return this->construction;
 	}
 
+	const resource_map<int> &get_repair_costs() const
+	{
+		return this->repair_costs;
+	}
+
 	const std::string &get_button_key() const
 	{
 		return this->button_key;
@@ -1143,7 +1148,8 @@ private:
 
 public:
 	int RepairHP = 0;				/// Amount of HP per repair
-	int RepairCosts[MaxCosts];      /// How much it costs to repair
+private:
+	resource_map<int> repair_costs;      /// How much it costs to repair
 
 private:
 	QSize tile_size = QSize(0, 0);

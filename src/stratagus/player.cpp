@@ -3309,34 +3309,38 @@ int CPlayer::CheckLimits(const wyrmgus::unit_type &type) const
 **
 **  @note The return values of the PlayerCheck functions are inconsistent.
 */
-int CPlayer::CheckCosts(const int *costs, bool notify) const
+int CPlayer::CheckCosts(const resource_map<int> &costs, const bool notify) const
 {
 	bool sound_played = false;
 	int err = 0;
 
-	for (int i = 1; i < MaxCosts; ++i) {
-		if (costs[i] == 0) {
+	for (const auto &[resource, cost] : costs) {
+		if (resource == defines::get()->get_time_resource()) {
 			continue;
 		}
 
-		if (this->Resources[i] + this->StoredResources[i] >= costs[i]) {
+		const int resource_index = resource->get_index();
+
+		if (this->Resources[resource_index] + this->StoredResources[resource_index] >= cost) {
 			continue;
 		}
+
 		if (notify) {
-			const char *name = DefaultResourceNames[i].c_str();
-			const char *action_name = wyrmgus::resource::get_all()[i]->get_action_name().c_str();
+			const std::string &name = resource->get_identifier();
+			const char *action_name = resource->get_action_name().c_str();
 
-			Notify(_("Not enough %s... %s more %s."), _(name), _(action_name), _(name));
+			Notify(_("Not enough %s... %s more %s."), _(name.c_str()), _(action_name), _(name.c_str()));
 
-			if (this == CPlayer::GetThisPlayer() && this->get_civilization() != nullptr && !sound_played ) {
-				const wyrmgus::sound *sound = this->get_civilization()->get_not_enough_resource_sound(wyrmgus::resource::get_all()[i]);
+			if (this == CPlayer::GetThisPlayer() && this->get_civilization() != nullptr && !sound_played) {
+				const wyrmgus::sound *sound = this->get_civilization()->get_not_enough_resource_sound(resource);
 				if (sound != nullptr) {
 					sound_played = true;
 					PlayGameSound(sound, MaxSampleVolume);
 				}
 			}
 		}
-		err |= 1 << i;
+
+		err |= 1 << resource_index;
 	}
 
 	return err;
@@ -3353,8 +3357,7 @@ int CPlayer::CheckUnitType(const wyrmgus::unit_type &type, bool hire) const
 {
 	//Wyrmgus start
 //	return this->CheckCosts(type.Stats[this->Index].Costs);
-	int type_costs[MaxCosts];
-	this->GetUnitTypeCosts(&type, type_costs, hire);
+	const resource_map<int> type_costs = this->GetUnitTypeCosts(&type, hire);
 	return this->CheckCosts(type_costs);
 	//Wyrmgus end
 }
@@ -3380,8 +3383,7 @@ void CPlayer::AddUnitType(const wyrmgus::unit_type &type, bool hire)
 {
 	//Wyrmgus start
 //	AddCosts(type.Stats[this->Index].Costs);
-	int type_costs[MaxCosts];
-	this->GetUnitTypeCosts(&type, type_costs, hire);
+	const resource_map<int> type_costs = this->GetUnitTypeCosts(&type, hire);
 	AddCostsFactor(type_costs, 100);
 	//Wyrmgus end
 }
@@ -3392,26 +3394,29 @@ void CPlayer::AddUnitType(const wyrmgus::unit_type &type, bool hire)
 **  @param costs   How many costs.
 **  @param factor  Factor of the costs to apply.
 */
-void CPlayer::AddCostsFactor(const int *costs, int factor)
+void CPlayer::AddCostsFactor(const resource_map<int> &costs, const int factor)
 {
-	if (!factor) {
+	if (factor == 0) {
 		return;
 	}
 	
-	for (int i = 1; i < MaxCosts; ++i) {
-		change_resource(wyrmgus::resource::get_all()[i], costs[i] * factor / 100, true);
+	for (const auto &[resource, cost] : costs) {
+		if (resource == defines::get()->get_time_resource()) {
+			continue;
+		}
+
+		change_resource(resource, cost * factor / 100, true);
 	}
 }
 
-/**
-**  Subtract costs from the resources
-**
-**  @param costs   How many costs.
-*/
-void CPlayer::SubCosts(const int *costs)
+void CPlayer::subtract_costs(const resource_map<int> &costs)
 {
-	for (int i = 1; i < MaxCosts; ++i) {
-		this->change_resource(wyrmgus::resource::get_all()[i], -costs[i], true);
+	for (const auto &[resource, cost] : costs) {
+		if (resource == defines::get()->get_time_resource()) {
+			continue;
+		}
+
+		this->change_resource(resource, -cost, true);
 	}
 }
 
@@ -3424,8 +3429,7 @@ void CPlayer::SubUnitType(const wyrmgus::unit_type &type, bool hire)
 {
 	//Wyrmgus start
 //	this->SubCosts(type.Stats[this->Index].Costs);
-	int type_costs[MaxCosts];
-	this->GetUnitTypeCosts(&type, type_costs, hire);
+	const resource_map<int> type_costs = this->GetUnitTypeCosts(&type, hire);
 	this->SubCostsFactor(type_costs, 100);
 	//Wyrmgus end
 }
@@ -3436,10 +3440,14 @@ void CPlayer::SubUnitType(const wyrmgus::unit_type &type, bool hire)
 **  @param costs   How many costs.
 **  @param factor  Factor of the costs to apply.
 */
-void CPlayer::SubCostsFactor(const int *costs, int factor)
+void CPlayer::SubCostsFactor(const resource_map<int> &costs, const int factor)
 {
-	for (int i = 1; i < MaxCosts; ++i) {
-		this->change_resource(wyrmgus::resource::get_all()[i], -costs[i] * 100 / factor);
+	for (const auto &[resource, cost] : costs) {
+		if (resource == defines::get()->get_time_resource()) {
+			continue;
+		}
+
+		this->change_resource(resource, -cost * 100 / factor);
 	}
 }
 
@@ -3447,47 +3455,50 @@ void CPlayer::SubCostsFactor(const int *costs, int factor)
 /**
 **  Gives the cost of a unit type for the player
 */
-void CPlayer::GetUnitTypeCosts(const wyrmgus::unit_type *type, int *type_costs, bool hire, bool ignore_one) const
+resource_map<int> CPlayer::GetUnitTypeCosts(const unit_type *type, const bool hire, const bool ignore_one) const
 {
-	for (int i = 0; i < MaxCosts; ++i) {
-		type_costs[i] = 0;
-	}
+	resource_map<int> costs;
 
 	if (hire) {
-		type_costs[CopperCost] = type->Stats[this->Index].get_price();
+		costs[defines::get()->get_wealth_resource()] = type->Stats[this->Index].get_price();
 	} else {
-		for (const auto &[resource, cost] : type->Stats[this->Index].get_costs()) {
-			type_costs[resource->get_index()] = cost;
-		}
+		costs = type->Stats[this->Index].get_costs();
 	}
 
-	for (int i = 0; i < MaxCosts; ++i) {
-		if (type->TrainQuantity) {
-			type_costs[i] *= type->TrainQuantity;
+	for (auto &[resource, cost] : costs) {
+		if (type->TrainQuantity != 0) {
+			cost *= type->TrainQuantity;
 		}
-		if (type->CostModifier) {
+
+		if (type->CostModifier != 0) {
 			int type_count = this->GetUnitTypeCount(type) + this->GetUnitTypeUnderConstructionCount(type);
 			if (ignore_one) {
 				type_count--;
 			}
+
 			for (int j = 0; j < type_count; ++j) {
-				type_costs[i] *= 100 + type->CostModifier;
-				type_costs[i] /= 100;
+				cost *= 100 + type->CostModifier;
+				cost /= 100;
 			}
 		}
 	}
+
+	return costs;
 }
 
 int CPlayer::GetUnitTypeCostsMask(const wyrmgus::unit_type *type, bool hire) const
 {
 	int costs_mask = 0;
 	
-	int type_costs[MaxCosts];
-	AiPlayer->Player->GetUnitTypeCosts(type, type_costs, hire);
+	const resource_map<int> type_costs = this->GetUnitTypeCosts(type, hire);
 	
-	for (int i = 1; i < MaxCosts; ++i) {
-		if (type_costs[i] > 0) {
-			costs_mask |= 1 << i;
+	for (const auto &[resource, cost] : type_costs) {
+		if (resource == defines::get()->get_time_resource()) {
+			continue;
+		}
+
+		if (cost > 0) {
+			costs_mask |= 1 << resource->get_index();
 		}
 	}
 	
@@ -3497,36 +3508,36 @@ int CPlayer::GetUnitTypeCostsMask(const wyrmgus::unit_type *type, bool hire) con
 /**
 **  Gives the cost of an upgrade for the player
 */
-void CPlayer::GetUpgradeCosts(const CUpgrade *upgrade, int *upgrade_costs)
+resource_map<int> CPlayer::GetUpgradeCosts(const CUpgrade *upgrade) const
 {
-	for (int i = 0; i < MaxCosts; ++i) {
-		upgrade_costs[i] = upgrade->Costs[i];
+	resource_map<int> costs = upgrade->get_costs();
 
-		const wyrmgus::resource *resource = wyrmgus::resource::get_all()[i];
+	for (const auto &[resource, scaled_cost] : upgrade->get_scaled_costs()) {
+		for (const wyrmgus::unit_type *unit_type : upgrade->get_scaled_cost_unit_types()) {
+			costs[resource] += scaled_cost * this->GetUnitTypeCount(unit_type);
+		}
 
-		const int scaled_cost = upgrade->get_scaled_cost(resource);
-		if (scaled_cost > 0) {
-			for (const wyrmgus::unit_type *unit_type : upgrade->get_scaled_cost_unit_types()) {
-				upgrade_costs[i] += scaled_cost * this->GetUnitTypeCount(unit_type);
-			}
-
-			for (const wyrmgus::unit_class *unit_class : upgrade->get_scaled_cost_unit_classes()) {
-				upgrade_costs[i] += scaled_cost * this->get_unit_class_count(unit_class);
-			}
+		for (const wyrmgus::unit_class *unit_class : upgrade->get_scaled_cost_unit_classes()) {
+			costs[resource] += scaled_cost * this->get_unit_class_count(unit_class);
 		}
 	}
+
+	return costs;
 }
 
 int CPlayer::GetUpgradeCostsMask(const CUpgrade *upgrade) const
 {
 	int costs_mask = 0;
 	
-	int upgrade_costs[MaxCosts];
-	AiPlayer->Player->GetUpgradeCosts(upgrade, upgrade_costs);
+	const resource_map<int> upgrade_costs = AiPlayer->Player->GetUpgradeCosts(upgrade);
 	
-	for (int i = 1; i < MaxCosts; ++i) {
-		if (upgrade_costs[i] > 0) {
-			costs_mask |= 1 << i;
+	for (const auto &[resource, cost] : upgrade_costs) {
+		if (resource == defines::get()->get_time_resource()) {
+			continue;
+		}
+
+		if (cost > 0) {
+			costs_mask |= 1 << resource->get_index();
 		}
 	}
 	

@@ -73,7 +73,7 @@ static int AiMakeUnit(const wyrmgus::unit_type &type, const Vec2i &nearPos, int 
 **
 **  @return       A bit field of the missing costs.
 */
-static int AiCheckCosts(const int *costs)
+static int AiCheckCosts(const resource_map<int> &costs)
 {
 	// FIXME: the used costs shouldn't be calculated here
 	int *used = AiPlayer->Used;
@@ -91,11 +91,14 @@ static int AiCheckCosts(const int *costs)
 
 			if (order.Action == UnitAction::Build) {
 				const COrder_Build &orderBuild = static_cast<const COrder_Build &>(order);
-				int building_costs[MaxCosts];
-				AiPlayer->Player->GetUnitTypeCosts(&orderBuild.GetUnitType(), building_costs);
+				const resource_map<int> building_costs = AiPlayer->Player->GetUnitTypeCosts(&orderBuild.GetUnitType());
 
-				for (int j = 1; j < MaxCosts; ++j) {
-					used[j] += building_costs[j];
+				for (const auto &[resource, cost] : building_costs) {
+					if (resource == defines::get()->get_time_resource()) {
+						continue;
+					}
+
+					used[resource->get_index()] += cost;
 				}
 			}
 		}
@@ -105,15 +108,23 @@ static int AiCheckCosts(const int *costs)
 	const int *resources = AiPlayer->Player->Resources;
 	const int *storedresources = AiPlayer->Player->StoredResources;
 	const int *reserve = AiPlayer->Reserve;
-	for (int i = 1; i < MaxCosts; ++i) {
-		if (costs[i] == 0) {
+
+	for (const auto &[resource, cost] : costs) {
+		if (resource == defines::get()->get_time_resource()) {
 			continue;
 		}
 
-		if (resources[i] + storedresources[i] - used[i] < costs[i] - reserve[i]) {
-			err |= 1 << i;
+		if (cost == 0) {
+			continue;
+		}
+
+		const int resource_index = resource->get_index();
+
+		if (resources[resource_index] + storedresources[resource_index] - used[resource_index] < cost - reserve[resource_index]) {
+			err |= 1 << resource_index;
 		}
 	}
+
 	return err;
 }
 
@@ -171,10 +182,9 @@ static int AiCheckSupply(const PlayerAi &pai, const wyrmgus::unit_type &type)
 **
 **  @return      A bit field of the missing costs.
 */
-int AiCheckUnitTypeCosts(const wyrmgus::unit_type &type)
+int AiCheckUnitTypeCosts(const unit_type &type)
 {
-	int type_costs[MaxCosts];
-	AiPlayer->Player->GetUnitTypeCosts(&type, type_costs);
+	const resource_map<int> type_costs = AiPlayer->Player->GetUnitTypeCosts(&type);
 	return AiCheckCosts(type_costs);
 }
 
@@ -189,8 +199,7 @@ int AiCheckUnitTypeCosts(const wyrmgus::unit_type &type)
 */
 static int AiCheckUpgradeCosts(const CUpgrade &upgrade)
 {
-	int upgrade_costs[MaxCosts];
-	AiPlayer->Player->GetUpgradeCosts(&upgrade, upgrade_costs);
+	const resource_map<int> upgrade_costs = AiPlayer->Player->GetUpgradeCosts(&upgrade);
 	return AiCheckCosts(upgrade_costs);
 }
 
@@ -573,11 +582,14 @@ void AiNewDepotRequest(CUnit &worker)
 
 		// Check if resources available.
 		//int needmask = AiCheckUnitTypeCosts(type);
-		int type_costs[MaxCosts];
-		worker.Player->GetUnitTypeCosts(&type, type_costs);
+		const resource_map<int> type_costs = worker.Player->GetUnitTypeCosts(&type);
 		int cost = 0;
-		for (int c = 1; c < MaxCosts; ++c) {
-			cost += type_costs[c];
+		for (const auto &[cost_resource, type_cost] : type_costs) {
+			if (cost_resource == defines::get()->get_time_resource()) {
+				continue;
+			}
+
+			cost += type_cost;
 		}
 
 		if (best_type == nullptr || (cost < best_cost)) {
@@ -717,11 +729,14 @@ void AiTransportCapacityRequest(const int capacity_needed, const landmass *landm
 			continue;
 		}
 
-		int type_costs[MaxCosts];
-		AiPlayer->Player->GetUnitTypeCosts(type, type_costs);
+		const resource_map<int> type_costs = AiPlayer->Player->GetUnitTypeCosts(type);
 		int cost = 0;
-		for (int c = 1; c < MaxCosts; ++c) {
-			cost += type_costs[c];
+		for (const auto &[resource, type_cost] : type_costs) {
+			if (resource == defines::get()->get_time_resource()) {
+				continue;
+			}
+
+			cost += type_cost;
 		}
 		cost /= type->MaxOnBoard;
 
@@ -895,12 +910,16 @@ static bool AiRequestSupply()
 		//
 		cache[j].needmask = AiCheckUnitTypeCosts(type);
 
-		int type_costs[MaxCosts];
-		AiPlayer->Player->GetUnitTypeCosts(&type, type_costs);
+		const resource_map<int> type_costs = AiPlayer->Player->GetUnitTypeCosts(&type);
 
-		for (int c = 1; c < MaxCosts; ++c) {
-			cache[j].unit_cost += type_costs[c];
+		for (const auto &[resource, cost] : type_costs) {
+			if (resource == defines::get()->get_time_resource()) {
+				continue;
+			}
+
+			cache[j].unit_cost += cost;
 		}
+
 		cache[j].unit_cost += type.Stats[AiPlayer->Player->Index].Variables[SUPPLY_INDEX].Value - 1;
 		cache[j].unit_cost /= type.Stats[AiPlayer->Player->Index].Variables[SUPPLY_INDEX].Value;
 		cache[j++].type = &type;
@@ -1588,7 +1607,7 @@ static void AiCollectResources()
 			const wyrmgus::resource *cost_resource = wyrmgus::resource::get_all()[order.GetCurrentResource()]->get_final_resource();
 			if (cost_resource->LuxuryResource) {
 				num_units_assigned[cost_resource->get_index()]++;
-				cost_resource = wyrmgus::resource::get_all()[CopperCost];
+				cost_resource = defines::get()->get_wealth_resource();
 			}
 			//Wyrmgus end
 			units_assigned[cost_resource->get_index()].push_back(&unit);
@@ -2038,8 +2057,7 @@ static void AiCheckRepair()
 			continue;
 		}
 
-		int type_costs[MaxCosts];
-		AiPlayer->Player->GetUnitTypeCosts(unit.Type, type_costs);
+		const resource_map<int> type_costs = AiPlayer->Player->GetUnitTypeCosts(unit.Type);
 			
 		// Unit damaged?
 		// Don't repair attacked unit (wait 5 sec before repairing)
@@ -2064,9 +2082,14 @@ static void AiCheckRepair()
 			//
 			// Must check, if there are enough resources
 			//
-			for (int j = 1; j < MaxCosts; ++j) {
-				if (type_costs[j]
-					&& (AiPlayer->Player->Resources[j] + AiPlayer->Player->StoredResources[j])  < 99) {
+			for (const auto &[resource, cost] : type_costs) {
+				if (resource == defines::get()->get_time_resource()) {
+					continue;
+				}
+
+				const int resource_index = resource->get_index();
+
+				if (cost != 0 && (AiPlayer->Player->Resources[resource_index] + AiPlayer->Player->StoredResources[resource_index]) < 99) {
 					repair_flag = false;
 					break;
 				}
@@ -2094,15 +2117,26 @@ static void AiCheckRepair()
 					}
 				}
 			}
+
 			if (j == AiPlayer->Player->GetUnitCount()) {
 				// Make sure we have enough resources first
-				for (j = 0; j < MaxCosts; ++j) {
+				bool enough_resources = true;
+
+				for (const auto &[resource, cost] : type_costs) {
+					if (resource == defines::get()->get_time_resource()) {
+						continue;
+					}
+
+					const int resource_index = resource->get_index();
+
 					// FIXME: the resources don't necessarily have to be in storage
-					if (AiPlayer->Player->Resources[j] + AiPlayer->Player->StoredResources[j] < type_costs[j]) {
+					if (AiPlayer->Player->Resources[resource_index] + AiPlayer->Player->StoredResources[resource_index] < cost) {
+						enough_resources = false;
 						break;
 					}
 				}
-				if (j == MaxCosts) {
+
+				if (enough_resources) {
 					AiRepairUnit(unit);
 					AiPlayer->LastRepairBuilding = UnitNumber(unit);
 					return;

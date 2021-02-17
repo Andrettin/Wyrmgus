@@ -206,27 +206,30 @@ bool COrder_Repair::ParseSpecificData(lua_State *l, int &j, const char *value, c
 
 bool SubRepairCosts(const CUnit &unit, CPlayer &player, CUnit &goal)
 {
-	int RepairCosts[MaxCosts];
+	resource_map<int> repair_costs;
 
 	// Check if enough resources are available
-	for (int i = 1; i < MaxCosts; ++i) {
-		RepairCosts[i] = goal.Type->RepairCosts[i] *
-						 (goal.CurrentAction() == UnitAction::Built ? ResourcesMultiBuildersMultiplier : 1);
+	for (const auto &[resource, cost] : goal.Type->get_repair_costs()) {
+		if (resource == defines::get()->get_time_resource()) {
+			continue;
+		}
+
+		repair_costs[resource] = cost * (goal.CurrentAction() == UnitAction::Built ? ResourcesMultiBuildersMultiplier : 1);
 	}
-	for (int i = 1; i < MaxCosts; ++i) {
-		if (!player.CheckResource(i, RepairCosts[i])) {
+
+	for (const auto &[resource, cost] : repair_costs) {
+		if (!player.CheckResource(resource->get_index(), cost)) {
 			player.Notify(NotifyYellow, unit.tilePos,
 						  //Wyrmgus start
 						  unit.MapLayer->ID,
-//						  _("We need more %s for repair!"), DefaultResourceNames[i].c_str());
-						  _("We need more %s to repair!"), DefaultResourceNames[i].c_str());
 						  //Wyrmgus end
+						  _("We need more %s to repair!"), resource->get_identifier().c_str());
 			return true;
 		}
 	}
 
 	// Subtract the resources
-	player.SubCosts(RepairCosts);
+	player.subtract_costs(repair_costs);
 	return false;
 }
 

@@ -30,7 +30,7 @@
 #include "database/data_type.h"
 #include "database/named_data_entry.h"
 #include "data_type.h"
-#include "economy/resource.h" //for MaxCosts
+#include "economy/resource_container.h"
 #include "item/item_class.h"
 #include "luacallback.h"
 #include "vec2i.h"
@@ -250,6 +250,11 @@ public:
 		return this->stackable;
 	}
 
+	const resource_map<int> &get_costs() const
+	{
+		return this->costs;
+	}
+
 	int get_cooldown() const
 	{
 		return this->cooldown;
@@ -310,9 +315,7 @@ private:
 	int range = 0;              /// Max range of the target.
 	bool repeat_cast = false; //if the spell will be cast again until out of targets.
 	bool stackable = true;		/// Whether the spell has an effect if cast multiple times at the same target
-public:
-	int Costs[MaxCosts];        /// Resource costs of spell.
-private:
+	resource_map<int> costs;        /// Resource costs of spell.
 	int cooldown = 0;           /// How much time spell needs to be cast again.
 	std::string effects_string;
 	CUpgrade *dependency_upgrade = nullptr;

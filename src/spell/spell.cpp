@@ -102,7 +102,7 @@ static bool PassCondition(const CUnit &caster, const wyrmgus::spell &spell, cons
 		return false;
 	}
 	// Check caster's resources
-	if (caster.Player->CheckCosts(spell.Costs, false)) {
+	if (caster.Player->CheckCosts(spell.get_costs(), false)) {
 		return false;
 	}
 	if (spell.get_target() == wyrmgus::spell_target_type::unit) { // Casting a unit spell without a target.
@@ -271,7 +271,6 @@ spell *spell::add(const std::string &identifier, const wyrmgus::data_module *dat
 
 spell::spell(const std::string &identifier) : named_data_entry(identifier)
 {
-	memset(Costs, 0, sizeof(Costs));
 	//Wyrmgus start
 	memset(ItemSpell, 0, sizeof(ItemSpell));
 	//Wyrmgus end
@@ -338,7 +337,7 @@ void spell::process_sml_scope(const sml_data &scope)
 			const std::string &value = property.get_value();
 
 			const wyrmgus::resource *resource = resource::get(key);
-			this->Costs[resource->get_index()] = std::stoi(value);
+			this->costs[resource] = std::stoi(value);
 		});
 	} else {
 		data_entry::process_sml_scope(scope);
@@ -726,7 +725,7 @@ int SpellCast(CUnit &caster, const wyrmgus::spell &spell, CUnit *target, const V
 		if (mustSubtractMana) {
 			caster.Variable[MANA_INDEX].Value -= spell.get_mana_cost();
 		}
-		caster.Player->SubCosts(spell.Costs);
+		caster.Player->subtract_costs(spell.get_costs());
 		if (spell.get_cooldown() > 0) {
 			caster.set_spell_cooldown_timer(&spell, spell.get_cooldown());
 		}

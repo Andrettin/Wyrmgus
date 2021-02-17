@@ -107,6 +107,8 @@ public:
 		this->set_cost(resource, this->get_cost(resource) + quantity);
 	}
 
+	int get_time_cost() const;
+
 	const resource_map<int> &get_storing() const
 	{
 		return this->storing;
@@ -442,6 +444,29 @@ public:
 
 	void add_modifier(std::unique_ptr<const wyrmgus::upgrade_modifier> &&modifier);
 
+	const resource_map<int> &get_costs() const
+	{
+		return this->costs;
+	}
+
+	int get_cost(const resource *resource) const
+	{
+		const auto find_iterator = this->costs.find(resource);
+
+		if (find_iterator != this->costs.end()) {
+			return find_iterator->second;
+		}
+
+		return 0;
+	}
+
+	int get_time_cost() const;
+
+	const resource_map<int> &get_scaled_costs() const
+	{
+		return this->scaled_costs;
+	}
+
 	int get_scaled_cost(const resource *resource) const
 	{
 		const auto find_iterator = this->scaled_costs.find(resource);
@@ -524,12 +549,12 @@ private:
 	wyrmgus::unit_type *item = nullptr;
 public:
 	int   ID = 0;						/// numerical id
-	int   Costs[MaxCosts];				/// costs for the upgrade
 private:
+	resource_map<int> costs; //costs for the upgrade
 	resource_map<int> scaled_costs; //scaled costs for the upgrade
 public:
 	//Wyrmgus start
-	int GrandStrategyProductionEfficiencyModifier[MaxCosts];	/// Production modifier for a particular resource for grand strategy mode
+	resource_map<int> GrandStrategyProductionEfficiencyModifier; //production modifier for a particular resource for the grand strategy mode
 	int MaxLimit = 1;					/// Maximum amount of times this upgrade can be acquired as an individual upgrade
 	wyrmgus::item_class Work;			/// Form in which was inscribed (i.e. scroll or book), if is a literary work
 	int Year = 0;						/// Year of publication, if is a literary work

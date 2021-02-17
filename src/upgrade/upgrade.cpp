@@ -40,6 +40,7 @@
 #include "civilization.h"
 #include "commands.h"
 #include "config.h"
+#include "database/defines.h"
 #include "dynasty.h"
 //Wyrmgus start
 #include "editor.h"
@@ -137,6 +138,11 @@ bool CUnitStats::operator != (const CUnitStats &rhs) const
 	return !(*this == rhs);
 }
 
+int CUnitStats::get_time_cost() const
+{
+	return this->get_cost(defines::get()->get_time_resource());
+}
+
 int CUnitStats::get_price() const
 {
 	int price = 0;
@@ -170,9 +176,7 @@ gender CUnitStats::get_gender() const
 
 CUpgrade::CUpgrade(const std::string &identifier) : detailed_data_entry(identifier), Work(wyrmgus::item_class::none)
 {
-	memset(this->Costs, 0, sizeof(this->Costs));
 	//Wyrmgus start
-	memset(this->GrandStrategyProductionEfficiencyModifier, 0, sizeof(this->GrandStrategyProductionEfficiencyModifier));
 	memset(this->IncompatibleAffixes, 0, sizeof(this->IncompatibleAffixes));
 	//Wyrmgus end
 }
@@ -207,7 +211,7 @@ void CUpgrade::process_sml_scope(const wyrmgus::sml_data &scope)
 			const std::string &value = property.get_value();
 
 			const wyrmgus::resource *resource = wyrmgus::resource::get(key);
-			this->Costs[resource->get_index()] = std::stoi(value);
+			this->costs[resource] = std::stoi(value);
 		});
 	} else if (tag == "scaled_costs") {
 		scope.for_each_property([&](const wyrmgus::sml_property &property) {
@@ -328,11 +332,9 @@ void CUpgrade::set_parent(const CUpgrade *parent_upgrade)
 	this->set_background(parent_upgrade->get_background());
 	this->effects_string = parent_upgrade->get_effects_string();
 	this->requirements_string = parent_upgrade->get_requirements_string();
-	for (int i = 0; i < MaxCosts; ++i) {
-		this->Costs[i] = parent_upgrade->Costs[i];
-		this->GrandStrategyProductionEfficiencyModifier[i] = parent_upgrade->GrandStrategyProductionEfficiencyModifier[i];
-	}
+	this->costs = parent_upgrade->costs;
 	this->scaled_costs = parent_upgrade->scaled_costs;
+	this->GrandStrategyProductionEfficiencyModifier = parent_upgrade->GrandStrategyProductionEfficiencyModifier;
 	this->affixed_item_classes = parent_upgrade->affixed_item_classes;
 	this->MaxLimit = parent_upgrade->MaxLimit;
 	this->magic_level = parent_upgrade->magic_level;
@@ -393,6 +395,11 @@ void CUpgrade::set_upgrade_class(wyrmgus::upgrade_class *upgrade_class)
 void CUpgrade::add_modifier(std::unique_ptr<const wyrmgus::upgrade_modifier> &&modifier)
 {
 	this->modifiers.push_back(std::move(modifier));
+}
+
+int CUpgrade::get_time_cost() const
+{
+	return this->get_cost(defines::get()->get_time_resource());
 }
 
 /**
@@ -519,13 +526,10 @@ static int CclDefineUpgrade(lua_State *l)
 			}
 			const int subargs = lua_rawlen(l, -1);
 			for (int j = 0; j < subargs; ++j) {
-				int resource = GetResourceIdByName(LuaToString(l, -1, j + 1));
-				if (resource == -1) {
-					LuaError(l, "Resource doesn't exist.");
-				}
+				const resource *resource = resource::get(LuaToString(l, -1, j + 1));
 				++j;
 				
-				upgrade->Costs[resource] = LuaToNumber(l, -1, j + 1);
+				upgrade->costs[resource] = LuaToNumber(l, -1, j + 1);
 			}
 		} else if (!strcmp(value, "ScaledCosts")) {
 			if (!lua_istable(l, -1)) {
@@ -544,10 +548,7 @@ static int CclDefineUpgrade(lua_State *l)
 			}
 			const int subargs = lua_rawlen(l, -1);
 			for (int j = 0; j < subargs; ++j) {
-				int resource = GetResourceIdByName(LuaToString(l, -1, j + 1));
-				if (resource == -1) {
-					LuaError(l, "Resource doesn't exist.");
-				}
+				const resource *resource = resource::get(LuaToString(l, -1, j + 1));
 				++j;
 				
 				upgrade->GrandStrategyProductionEfficiencyModifier[resource] = LuaToNumber(l, -1, j + 1);
@@ -2023,7 +2024,7 @@ void UpgradeAcquire(CPlayer &player, const CUpgrade *upgrade)
 	}
 	//Wyrmgus end
 	int id = upgrade->ID;
-	player.UpgradeTimers.Upgrades[id] = upgrade->Costs[TimeCost];
+	player.UpgradeTimers.Upgrades[id] = upgrade->get_time_cost();
 	AllowUpgradeId(player, id, 'R');  // research done
 
 	const wyrmgus::deity *upgrade_deity = upgrade->get_deity();
@@ -2106,7 +2107,7 @@ void ApplyUpgrades()
 		for (int p = 0; p < PlayerMax; ++p) {
 			if (CPlayer::Players[p]->Allow.Upgrades[upgrade->ID] == 'R') {
 				int id = upgrade->ID;
-				CPlayer::Players[p]->UpgradeTimers.Upgrades[id] = upgrade->Costs[TimeCost];
+				CPlayer::Players[p]->UpgradeTimers.Upgrades[id] = upgrade->get_time_cost();
 				AllowUpgradeId(*CPlayer::Players[p], id, 'R');  // research done
 
 				for (const auto &modifier : upgrade->get_modifiers()) {

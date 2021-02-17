@@ -485,13 +485,13 @@ static void AnimateActionUpgradeTo(CUnit &unit)
 //	this->Ticks += std::max(1, player.SpeedUpgrade / SPEEDUP_FACTOR);
 	this->Ticks += std::max(1, (player.SpeedUpgrade + unit.Variable[TIMEEFFICIENCYBONUS_INDEX].Value) / SPEEDUP_FACTOR);
 	//Wyrmgus end
-	if (this->Ticks < newstats.get_cost(resource::get_all()[TimeCost])) {
+	if (this->Ticks < newstats.get_time_cost()) {
 		unit.Wait = CYCLES_PER_SECOND / 6;
 		return ;
 	}
 
 	if (unit.Anim.Unbreakable) {
-		this->Ticks = newstats.get_cost(resource::get_all()[TimeCost]);
+		this->Ticks = newstats.get_time_cost();
 		return ;
 	}
 
@@ -527,25 +527,24 @@ void COrder_UpgradeTo::Cancel(CUnit &unit)
 {
 	CPlayer &player = *unit.Player;
 	
-	int type_costs[MaxCosts];
-	player.GetUnitTypeCosts(this->Type, type_costs);
+	const resource_map<int> type_costs = player.GetUnitTypeCosts(this->Type);
 
 	player.AddCostsFactor(type_costs, CancelUpgradeCostsFactor);
 }
 
-/* virtual */ void COrder_UpgradeTo::UpdateUnitVariables(CUnit &unit) const
+void COrder_UpgradeTo::UpdateUnitVariables(CUnit &unit) const
 {
 	Assert(unit.CurrentOrder() == this);
 
 	unit.Variable[UPGRADINGTO_INDEX].Value = this->Ticks;
-	unit.Variable[UPGRADINGTO_INDEX].Max = this->Type->Stats[unit.Player->Index].get_cost(resource::get_all()[TimeCost]);
+	unit.Variable[UPGRADINGTO_INDEX].Max = this->Type->Stats[unit.Player->Index].get_time_cost();
 }
 
 void COrder_UpgradeTo::ConvertUnitType(const CUnit &unit, wyrmgus::unit_type &newType)
 {
 	const CPlayer &player = *unit.Player;
-	const int oldCost = this->Type->Stats[player.Index].get_cost(resource::get_all()[TimeCost]);
-	const int newCost = newType.Stats[player.Index].get_cost(resource::get_all()[TimeCost]);
+	const int oldCost = this->Type->Stats[player.Index].get_time_cost();
+	const int newCost = newType.Stats[player.Index].get_time_cost();
 
 	// Must Adjust Ticks to the fraction that was upgraded
 	this->Ticks = this->Ticks * newCost / oldCost;

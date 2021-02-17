@@ -782,16 +782,20 @@ void DrawPopup(const wyrmgus::button &button, int x, int y, bool above)
 	const wyrmgus::unit_type *unit_type = button.get_unit_type();
 	const CUpgrade *upgrade = button.get_value_upgrade();
 
-	std::array<int, MaxCosts> type_costs{};
-
 	switch (button.Action) {
 		case ButtonCmd::Research:
 		case ButtonCmd::ResearchClass:
-		case ButtonCmd::Dynasty:
-			CPlayer::GetThisPlayer()->GetUpgradeCosts(upgrade, Costs.data());
+		case ButtonCmd::Dynasty: {
+			const resource_map<int> upgrade_costs = CPlayer::GetThisPlayer()->GetUpgradeCosts(upgrade);
+			for (const auto &[resource, cost] : upgrade_costs) {
+				Costs[resource->get_index()] = cost;
+			}
 			break;
+		}
 		case ButtonCmd::SpellCast:
-			memcpy(Costs.data(), wyrmgus::spell::get_all()[button.Value]->Costs, sizeof(wyrmgus::spell::get_all()[button.Value]->Costs));
+			for (const auto &[resource, cost] : spell::get_all()[button.Value]->get_costs()) {
+				Costs[resource->get_index()] = cost;
+			}
 			Costs[ManaResCost] = wyrmgus::spell::get_all()[button.Value]->get_mana_cost();
 			break;
 		case ButtonCmd::Build:
@@ -799,11 +803,16 @@ void DrawPopup(const wyrmgus::button &button, int x, int y, bool above)
 		case ButtonCmd::Train:
 		case ButtonCmd::TrainClass:
 		case ButtonCmd::UpgradeTo:
-		case ButtonCmd::UpgradeToClass:
-			CPlayer::GetThisPlayer()->GetUnitTypeCosts(unit_type, type_costs.data(), Selected[0]->Type->Stats[Selected[0]->Player->Index].get_unit_stock(unit_type) != 0);
-			memcpy(Costs.data(), type_costs.data(), sizeof(type_costs));
+		case ButtonCmd::UpgradeToClass: {
+			const resource_map<int> type_costs = CPlayer::GetThisPlayer()->GetUnitTypeCosts(unit_type, Selected[0]->Type->Stats[Selected[0]->Player->Index].get_unit_stock(unit_type) != 0);
+
+			for (const auto &[resource, cost] : type_costs) {
+				Costs[resource->get_index()] = cost;
+			}
+
 			Costs[FoodCost] = unit_type->Stats[CPlayer::GetThisPlayer()->Index].Variables[DEMAND_INDEX].Value;
 			break;
+		}
 		case ButtonCmd::Buy:
 			Costs[FoodCost] = wyrmgus::unit_manager::get()->GetSlotUnit(button.Value).Variable[DEMAND_INDEX].Value;
 			Costs[CopperCost] = wyrmgus::unit_manager::get()->GetSlotUnit(button.Value).GetPrice();
@@ -1294,7 +1303,7 @@ bool IsButtonAllowed(const CUnit &unit, const wyrmgus::button &buttonaction)
 			res = check_conditions<true>(upgrade, unit.Player, false, !CPlayer::GetThisPlayer()->IsTeamed(unit));
 			if (res) {
 				res = (UpgradeIdAllowed(*CPlayer::GetThisPlayer(), upgrade->ID) == 'A' || UpgradeIdAllowed(*CPlayer::GetThisPlayer(), upgrade->ID) == 'R') && check_conditions<true>(upgrade, CPlayer::GetThisPlayer(), false); //also check for the conditions for this player (rather than the unit) as an extra for researches, so that the player doesn't research too advanced technologies at neutral buildings
-				res = res && (!unit.Player->UpgradeTimers.Upgrades[upgrade->ID] || unit.Player->UpgradeTimers.Upgrades[upgrade->ID] == upgrade->Costs[TimeCost]); //don't show if is being researched elsewhere
+				res = res && (!unit.Player->UpgradeTimers.Upgrades[upgrade->ID] || unit.Player->UpgradeTimers.Upgrades[upgrade->ID] == upgrade->get_time_cost()); //don't show if is being researched elsewhere
 			}
 			break;
 		case ButtonCmd::ExperienceUpgradeTo:
@@ -1320,14 +1329,14 @@ bool IsButtonAllowed(const CUnit &unit, const wyrmgus::button &buttonaction)
 //			res = unit.CurrentAction() == UnitAction::UpgradeTo
 //				  || unit.CurrentAction() == UnitAction::Research;
 			//don't show the cancel button for a quick moment if the time cost is 0
-			res = (unit.CurrentAction() == UnitAction::UpgradeTo && static_cast<COrder_UpgradeTo *>(unit.CurrentOrder())->GetUnitType().Stats[unit.Player->Index].get_cost(resource::get_all()[TimeCost]) > 0)
-				|| (unit.CurrentAction() == UnitAction::Research && static_cast<COrder_Research *>(unit.CurrentOrder())->GetUpgrade().Costs[TimeCost] > 0);
+			res = (unit.CurrentAction() == UnitAction::UpgradeTo && static_cast<COrder_UpgradeTo *>(unit.CurrentOrder())->GetUnitType().Stats[unit.Player->Index].get_time_cost() > 0)
+				|| (unit.CurrentAction() == UnitAction::Research && static_cast<COrder_Research *>(unit.CurrentOrder())->GetUpgrade().get_time_cost() > 0);
 			//Wyrmgus end
 			break;
 		case ButtonCmd::CancelTrain:
 			//Wyrmgus start
 //			res = unit.CurrentAction() == UnitAction::Train;
-			res = unit.CurrentAction() == UnitAction::Train && static_cast<COrder_Train *>(unit.CurrentOrder())->GetUnitType().Stats[unit.Player->Index].get_cost(resource::get_all()[TimeCost]) > 0; //don't show the cancel button for a quick moment if the time cost is 0
+			res = unit.CurrentAction() == UnitAction::Train && static_cast<COrder_Train *>(unit.CurrentOrder())->GetUnitType().Stats[unit.Player->Index].get_time_cost() > 0; //don't show the cancel button for a quick moment if the time cost is 0
 			//Wyrmgus end
 			break;
 		case ButtonCmd::CancelBuild:
@@ -1340,7 +1349,7 @@ bool IsButtonAllowed(const CUnit &unit, const wyrmgus::button &buttonaction)
 			res = CPlayer::GetThisPlayer()->get_faction() != nullptr && buttonaction.Value != -1 && buttonaction.Value < static_cast<int>(CPlayer::GetThisPlayer()->get_faction()->get_dynasties().size()) && CPlayer::GetThisPlayer()->can_choose_dynasty<true>(CPlayer::GetThisPlayer()->get_faction()->get_dynasties()[buttonaction.Value]) && CPlayer::GetThisPlayer()->get_faction()->get_dynasties()[buttonaction.Value]->get_icon() != nullptr;
 			if (res) {
 				upgrade = CPlayer::GetThisPlayer()->get_faction()->get_dynasties()[buttonaction.Value]->get_upgrade();
-				res = (!unit.Player->UpgradeTimers.Upgrades[upgrade->ID] || unit.Player->UpgradeTimers.Upgrades[upgrade->ID] == upgrade->Costs[TimeCost]);
+				res = (!unit.Player->UpgradeTimers.Upgrades[upgrade->ID] || unit.Player->UpgradeTimers.Upgrades[upgrade->ID] == upgrade->get_time_cost());
 			}
 			break;
 		case ButtonCmd::Quest:
@@ -2071,8 +2080,7 @@ void CButtonPanel::DoClicked_Research(const std::unique_ptr<wyrmgus::button> &bu
 {
 	const CUpgrade *button_upgrade = button->get_value_upgrade(Selected[0]);
 
-	int upgrade_costs[MaxCosts];
-	CPlayer::GetThisPlayer()->GetUpgradeCosts(button_upgrade, upgrade_costs);
+	const resource_map<int> upgrade_costs = CPlayer::GetThisPlayer()->GetUpgradeCosts(button_upgrade);
 	if (!CPlayer::GetThisPlayer()->CheckCosts(upgrade_costs)) {
 		//PlayerSubCosts(player,Upgrades[i].Costs);
 		SendCommandResearch(*Selected[0], *button_upgrade, CPlayer::GetThisPlayer()->Index, !(KeyModifiers & ModifierShift));
@@ -2125,9 +2133,9 @@ void CButtonPanel::DoClicked_Quest(int button)
 
 void CButtonPanel::DoClicked_Buy(int button)
 {
-	int buy_costs[MaxCosts];
-	memset(buy_costs, 0, sizeof(buy_costs));
-	buy_costs[CopperCost] = wyrmgus::unit_manager::get()->GetSlotUnit(CurrentButtons[button]->Value).GetPrice();
+	resource_map<int> buy_costs;
+	buy_costs[defines::get()->get_wealth_resource()] = unit_manager::get()->GetSlotUnit(CurrentButtons[button]->Value).GetPrice();
+
 	if (!CPlayer::GetThisPlayer()->CheckCosts(buy_costs) && CPlayer::GetThisPlayer()->CheckLimits(*wyrmgus::unit_manager::get()->GetSlotUnit(CurrentButtons[button]->Value).Type) >= 0) {
 		SendCommandBuy(*Selected[0], &wyrmgus::unit_manager::get()->GetSlotUnit(CurrentButtons[button]->Value), CPlayer::GetThisPlayer()->Index);
 		ButtonUnderCursor = -1;
@@ -2162,9 +2170,8 @@ void CButtonPanel::DoClicked_SellResource(int button)
 	if (toggle_autosell && Selected[0]->Player == CPlayer::GetThisPlayer()) {
 		SendCommandAutosellResource(CPlayer::GetThisPlayer()->Index, resource);
 	} else {
-		int sell_resource_costs[MaxCosts];
-		memset(sell_resource_costs, 0, sizeof(sell_resource_costs));
-		sell_resource_costs[resource] = 100;
+		resource_map<int> sell_resource_costs;
+		sell_resource_costs[resource::get_all()[resource]] = 100;
 		if (!CPlayer::GetThisPlayer()->CheckCosts(sell_resource_costs)) {
 			SendCommandSellResource(*Selected[0], resource, CPlayer::GetThisPlayer()->Index);
 		}
@@ -2174,9 +2181,8 @@ void CButtonPanel::DoClicked_SellResource(int button)
 void CButtonPanel::DoClicked_BuyResource(int button)
 {
 	const int resource = CurrentButtons[button]->Value;
-	int buy_resource_costs[MaxCosts];
-	memset(buy_resource_costs, 0, sizeof(buy_resource_costs));
-	buy_resource_costs[CopperCost] = Selected[0]->Player->GetEffectiveResourceBuyPrice(resource);
+	resource_map<int> buy_resource_costs;
+	buy_resource_costs[defines::get()->get_wealth_resource()] = Selected[0]->Player->GetEffectiveResourceBuyPrice(resource);
 	if (!CPlayer::GetThisPlayer()->CheckCosts(buy_resource_costs)) {
 		SendCommandBuyResource(*Selected[0], resource, CPlayer::GetThisPlayer()->Index);
 	}

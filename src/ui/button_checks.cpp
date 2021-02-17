@@ -340,9 +340,9 @@ bool ButtonCheckNoWork(const CUnit &unit, const wyrmgus::button &)
 //		   && action != UnitAction::UpgradeTo
 //		   && action != UnitAction::Research;
 	//don't stop showing the button for a quick moment if the time cost is 0
-	return (action != UnitAction::Train || static_cast<COrder_Train *>(unit.CurrentOrder())->GetUnitType().Stats[unit.Player->Index].get_cost(resource::get_all()[TimeCost]) == 0)
-		   && (action != UnitAction::UpgradeTo || static_cast<COrder_UpgradeTo *>(unit.CurrentOrder())->GetUnitType().Stats[unit.Player->Index].get_cost(resource::get_all()[TimeCost]) == 0)
-		   && (action != UnitAction::Research || static_cast<COrder_Research *>(unit.CurrentOrder())->GetUpgrade().Costs[TimeCost] == 0);
+	return (action != UnitAction::Train || static_cast<COrder_Train *>(unit.CurrentOrder())->GetUnitType().Stats[unit.Player->Index].get_time_cost() == 0)
+		   && (action != UnitAction::UpgradeTo || static_cast<COrder_UpgradeTo *>(unit.CurrentOrder())->GetUnitType().Stats[unit.Player->Index].get_time_cost() == 0)
+		   && (action != UnitAction::Research || static_cast<COrder_Research *>(unit.CurrentOrder())->GetUpgrade().get_time_cost() == 0);
 	//Wyrmgus end
 }
 
@@ -443,7 +443,7 @@ bool ButtonCheckSingleResearch(const CUnit &unit, const wyrmgus::button &button)
 	if (ButtonCheckResearch(unit, button)
 		//Wyrmgus start
 //		&& !unit.Player->UpgradeTimers.Upgrades[UpgradeIdByIdent(button.ValueStr)]) {
-		&& (!unit.Player->UpgradeTimers.Upgrades[UpgradeIdByIdent(button.ValueStr)] || unit.Player->UpgradeTimers.Upgrades[UpgradeIdByIdent(button.ValueStr)] == CUpgrade::get(button.ValueStr)->Costs[TimeCost])
+		&& (!unit.Player->UpgradeTimers.Upgrades[UpgradeIdByIdent(button.ValueStr)] || unit.Player->UpgradeTimers.Upgrades[UpgradeIdByIdent(button.ValueStr)] == CUpgrade::get(button.ValueStr)->get_time_cost())
 	) {
 		//Wyrmgus end
 		return true;

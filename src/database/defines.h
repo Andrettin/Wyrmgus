@@ -41,6 +41,7 @@ class font;
 class font_color;
 class music;
 class player_color;
+class resource;
 class resource_icon;
 class season;
 class season_schedule;
@@ -72,6 +73,8 @@ class defines final : public QObject, public singleton<defines>
 	Q_PROPERTY(wyrmgus::civilization* neutral_civilization MEMBER neutral_civilization READ get_neutral_civilization)
 	Q_PROPERTY(int minimap_color_index MEMBER minimap_color_index READ get_minimap_color_index)
 	Q_PROPERTY(int minimap_non_land_territory_alpha MEMBER minimap_non_land_territory_alpha READ get_minimap_non_land_territory_alpha)
+	Q_PROPERTY(wyrmgus::resource* time_resource MEMBER time_resource)
+	Q_PROPERTY(wyrmgus::resource* wealth_resource MEMBER wealth_resource)
 	Q_PROPERTY(wyrmgus::time_of_day* underground_time_of_day MEMBER underground_time_of_day)
 	Q_PROPERTY(wyrmgus::time_of_day_schedule* default_time_of_day_schedule MEMBER default_time_of_day_schedule)
 	Q_PROPERTY(wyrmgus::season_schedule* default_season_schedule MEMBER default_season_schedule)
@@ -204,6 +207,16 @@ public:
 	int get_minimap_non_land_territory_alpha() const
 	{
 		return this->minimap_non_land_territory_alpha;
+	}
+
+	const resource *get_time_resource() const
+	{
+		return this->time_resource;
+	}
+
+	const resource *get_wealth_resource() const
+	{
+		return this->wealth_resource;
 	}
 
 	const time_of_day *get_underground_time_of_day() const
@@ -340,6 +353,8 @@ private:
 	int minimap_color_index = 0;
 	int minimap_non_land_territory_alpha = 64;
 	terrain_type *border_terrain_type = nullptr;
+	resource *time_resource = nullptr;
+	resource *wealth_resource = nullptr;
 	time_of_day *underground_time_of_day = nullptr;
 	time_of_day_schedule *default_time_of_day_schedule = nullptr;
 	season_schedule *default_season_schedule = nullptr;

@@ -345,7 +345,7 @@ static void HandleBuffsEachCycle(CUnit &unit)
 
 		//if the unit still has less stock than its max, re-init the unit stock timer
 		if (unit.GetUnitStockReplenishmentTimer(unit_type) == 0 && unit.GetUnitStock(unit_type) < unit_stock && check_conditions(unit_type, unit.Player)) {
-			unit.SetUnitStockReplenishmentTimer(unit_type, unit_type->Stats[unit.Player->Index].get_cost(resource::get_all()[TimeCost]) * 50);
+			unit.SetUnitStockReplenishmentTimer(unit_type, unit_type->Stats[unit.Player->Index].get_time_cost() * 50);
 		}
 	}
 	

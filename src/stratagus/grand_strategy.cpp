@@ -358,14 +358,6 @@ void CGrandStrategyProvince::SetModifier(CUpgrade *modifier, bool has_modifier)
 	} else {
 		this->Modifiers.erase(std::remove(this->Modifiers.begin(), this->Modifiers.end(), modifier), this->Modifiers.end());
 	}
-
-	int change = has_modifier ? 1 : -1;
-
-	for (int i = 0; i < MaxCosts; ++i) {
-		if (modifier->GrandStrategyProductionEfficiencyModifier[i] != 0) {
-			this->ProductionEfficiencyModifier[i] += modifier->GrandStrategyProductionEfficiencyModifier[i] * change;
-		}
-	}
 }
 
 void CGrandStrategyProvince::SetUnitQuantity(int unit_type_id, int quantity)

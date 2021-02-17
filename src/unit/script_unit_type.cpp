@@ -1278,10 +1278,10 @@ static int CclDefineUnitType(lua_State *l)
 			const int subargs = lua_rawlen(l, -1);
 			for (int k = 0; k < subargs; ++k) {
 				lua_rawgeti(l, -1, k + 1);
-				const int res = CclGetResourceByName(l);
+				const resource *res = resource::get(LuaToString(l, -1));
 				lua_pop(l, 1);
 				++k;
-				type->RepairCosts[res] = LuaToNumber(l, -1, k + 1);
+				type->repair_costs[res] = LuaToNumber(l, -1, k + 1);
 			}
 		} else if (!strcmp(value, "CanTargetLand")) {
 			if (LuaToBoolean(l, -1)) {

@@ -309,12 +309,9 @@ static int CclDefineSpell(lua_State *l)
 			}
 			const int len = lua_rawlen(l, -1);
 			for (int j = 0; j < len; ++j) {
-				int resource = GetResourceIdByName(LuaToString(l, -1, j + 1));
-				if (resource == -1) {
-					LuaError(l, "Resource doesn't exist.");
-				}
+				const resource *resource = resource::get(LuaToString(l, -1, j + 1));
 				++j;
-				spell->Costs[j] = LuaToNumber(l, -1, j + 1);
+				spell->costs[resource] = LuaToNumber(l, -1, j + 1);
 			}
 			lua_pop(l, 1);
 		} else if (!strcmp(value, "range")) {

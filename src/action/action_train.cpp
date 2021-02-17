@@ -35,6 +35,7 @@
 //Wyrmgus start
 #include "commands.h"
 //Wyrmgus end
+#include "database/defines.h"
 #include "iolib.h"
 #include "map/map_layer.h"
 #include "map/tile.h"
@@ -118,7 +119,6 @@ PixelPos COrder_Train::Show(const CViewport &, const PixelPos &lastScreenPos) co
 	return lastScreenPos;
 }
 
-
 void COrder_Train::Cancel(CUnit &unit)
 {
 	Q_UNUSED(unit)
@@ -131,20 +131,19 @@ void COrder_Train::Cancel(CUnit &unit)
 
 	//Wyrmgus start
 //	player.AddCostsFactor(this->Type->Stats[player.Index].Costs, CancelTrainingCostsFactor);
-	int type_costs[MaxCosts];
-	player.GetUnitTypeCosts(this->Type, type_costs);
+	const resource_map<int> type_costs = player.GetUnitTypeCosts(this->Type);
 	player.AddCostsFactor(type_costs, CancelTrainingCostsFactor);
 	//Wyrmgus end
 }
 
-/* virtual */ void COrder_Train::UpdateUnitVariables(CUnit &unit) const
+void COrder_Train::UpdateUnitVariables(CUnit &unit) const
 {
 	Assert(unit.CurrentOrder() == this);
 
 	unit.Variable[TRAINING_INDEX].Value = this->Ticks;
 	//Wyrmgus start
-//	unit.Variable[TRAINING_INDEX].Max = this->Type->Stats[unit.Player->Index].get_cost(resource::get_all()[TimeCost]);
-	unit.Variable[TRAINING_INDEX].Max = this->Type->Stats[this->Player].get_cost(resource::get_all()[TimeCost]);
+//	unit.Variable[TRAINING_INDEX].Max = this->Type->Stats[unit.Player->Index].get_time_cost();
+	unit.Variable[TRAINING_INDEX].Max = this->Type->Stats[this->Player].get_time_cost();
 	//Wyrmgus end
 }
 
@@ -156,8 +155,8 @@ void COrder_Train::ConvertUnitType(const CUnit &unit, wyrmgus::unit_type &newTyp
 //	const CPlayer &player = *unit.Player;
 	const CPlayer &player = *CPlayer::Players[this->Player];
 	//Wyrmgus end
-	const int oldCost = this->Type->Stats[player.Index].get_cost(resource::get_all()[TimeCost]);
-	const int newCost = newType.Stats[player.Index].get_cost(resource::get_all()[TimeCost]);
+	const int oldCost = this->Type->Stats[player.Index].get_time_cost();
+	const int newCost = newType.Stats[player.Index].get_time_cost();
 
 	// Must Adjust Ticks to the fraction that was trained
 	this->Ticks = this->Ticks * newCost / oldCost;
@@ -237,7 +236,7 @@ static void AnimateActionTrain(CUnit &unit)
 	CPlayer &player = *CPlayer::Players[this->Player];
 	//Wyrmgus end
 	const wyrmgus::unit_type &nType = *this->Type;
-	const int cost = nType.Stats[player.Index].get_cost(resource::get_all()[TimeCost]);
+	const int cost = nType.Stats[player.Index].get_time_cost();
 	
 	//Wyrmgus start
 	// Check if enough supply available.
@@ -405,7 +404,7 @@ static void AnimateActionTrain(CUnit &unit)
 
 		//Wyrmgus start
 		if (this->Player != unit.Player->Index && unit.Player->Type != PlayerNeutral && CPlayer::Players[this->Player]->has_building_access(unit.Player)) { //if the player who gave the order is different from the owner of the building, and the latter is non-neutral (i.e. if the owner of the building is a mercenary company), provide the owner of the building with appropriate recompensation
-			unit.Player->change_resource(wyrmgus::resource::get_all()[CopperCost], newUnit->GetPrice(), true);
+			unit.Player->change_resource(defines::get()->get_wealth_resource(), newUnit->GetPrice(), true);
 		}
 		//Wyrmgus end
 		

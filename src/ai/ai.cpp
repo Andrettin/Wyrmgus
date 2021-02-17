@@ -132,6 +132,7 @@
 #include "action/action_attack.h"
 #include "civilization.h"
 #include "commands.h"
+#include "database/defines.h"
 //Wyrmgus start
 #include "editor.h"
 //Wyrmgus end
@@ -319,9 +320,9 @@ static void AiCheckUnits()
 						continue;
 					}
 
-					int buy_costs[MaxCosts];
-					memset(buy_costs, 0, sizeof(buy_costs));
-					buy_costs[CopperCost] = hero->GetPrice();
+					resource_map<int> buy_costs;
+					buy_costs[defines::get()->get_wealth_resource()] = hero->GetPrice();
+
 					if (!AiPlayer->Player->CheckCosts(buy_costs) && AiPlayer->Player->CheckLimits(*hero->Type) >= 1) {
 						CommandBuy(*hero_recruiter, hero, AiPlayer->Player->Index);
 						break;
@@ -350,9 +351,9 @@ static void AiCheckUnits()
 							continue;
 						}
 
-						int buy_costs[MaxCosts];
-						memset(buy_costs, 0, sizeof(buy_costs));
-						buy_costs[CopperCost] = mercenary_hero->GetPrice();
+						resource_map<int> buy_costs;
+						buy_costs[defines::get()->get_wealth_resource()] = mercenary_hero->GetPrice();
+
 						if (!AiPlayer->Player->CheckCosts(buy_costs) && AiPlayer->Player->CheckLimits(*mercenary_hero->Type) >= 1) {
 							CommandBuy(*mercenary_building, mercenary_hero, AiPlayer->Player->Index);
 							break;

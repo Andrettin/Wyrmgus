@@ -505,7 +505,6 @@ unit_type::unit_type(const std::string &identifier) : detailed_data_entry(identi
 	CanAttack(0),
 	Neutral(0)
 {
-	memset(RepairCosts, 0, sizeof(RepairCosts));
 	memset(CanStore, 0, sizeof(CanStore));
 	//Wyrmgus start
 	memset(GrandStrategyProductionEfficiencyModifier, 0, sizeof(GrandStrategyProductionEfficiencyModifier));
@@ -703,7 +702,7 @@ void unit_type::process_sml_scope(const sml_data &scope)
 			const std::string &value = property.get_value();
 
 			const wyrmgus::resource *resource = resource::get(key);
-			this->RepairCosts[resource->get_index()] = std::stoi(value);
+			this->repair_costs[resource] = std::stoi(value);
 		});
 	} else if (tag == "starting_resources") {
 		if (scope.get_operator() == sml_operator::assignment) {
@@ -1595,8 +1594,9 @@ void unit_type::set_parent(const unit_type *parent_type)
 	this->Spells = parent_type->Spells;
 	this->autocast_spells = parent_type->autocast_spells;
 
+	this->repair_costs = parent_type->repair_costs;
+
 	for (unsigned int i = 0; i < MaxCosts; ++i) {
-		this->RepairCosts[i] = parent_type->RepairCosts[i];
 		this->CanStore[i] = parent_type->CanStore[i];
 		this->GrandStrategyProductionEfficiencyModifier[i] = parent_type->GrandStrategyProductionEfficiencyModifier[i];
 		

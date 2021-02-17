@@ -2644,7 +2644,7 @@ void CUnit::SellUnit(CUnit *sold_unit, int player)
 	if (!sold_unit->Type->BoolFlag[ITEM_INDEX].value) {
 		sold_unit->ChangeOwner(*CPlayer::Players[player]);
 	}
-	CPlayer::Players[player]->change_resource(wyrmgus::resource::get_all()[CopperCost], -sold_unit->GetPrice(), true);
+	CPlayer::Players[player]->change_resource(defines::get()->get_wealth_resource(), -sold_unit->GetPrice(), true);
 	if (CPlayer::Players[player]->AiEnabled && !sold_unit->Type->BoolFlag[ITEM_INDEX].value && !sold_unit->Type->BoolFlag[HARVESTER_INDEX].value) { //add the hero to an AI force, if the hero isn't a harvester
 		CPlayer::Players[player]->Ai->Force.
 			remove_dead_units();
@@ -2705,7 +2705,7 @@ void CUnit::SellResource(const int resource, const int player)
 	}
 
 	CPlayer::Players[player]->change_resource(wyrmgus::resource::get_all()[resource], -100, true);
-	CPlayer::Players[player]->change_resource(wyrmgus::resource::get_all()[CopperCost], this->Player->GetEffectiveResourceSellPrice(resource), true);
+	CPlayer::Players[player]->change_resource(defines::get()->get_wealth_resource(), this->Player->GetEffectiveResourceSellPrice(resource), true);
 	
 	this->Player->DecreaseResourcePrice(resource);
 }
@@ -2722,7 +2722,7 @@ void CUnit::BuyResource(const int resource, const int player)
 	}
 
 	CPlayer::Players[player]->change_resource(wyrmgus::resource::get_all()[resource], 100, true);
-	CPlayer::Players[player]->change_resource(wyrmgus::resource::get_all()[CopperCost], -this->Player->GetEffectiveResourceBuyPrice(resource), true);
+	CPlayer::Players[player]->change_resource(defines::get()->get_wealth_resource(), -this->Player->GetEffectiveResourceBuyPrice(resource), true);
 	
 	this->Player->IncreaseResourcePrice(resource);
 }

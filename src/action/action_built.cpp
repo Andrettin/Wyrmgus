@@ -167,8 +167,7 @@ static void CancelBuilt(COrder_Built &order, CUnit &unit)
 		DropOutOnSide(*worker, LookingW, &unit);
 	}
 	// Player gets back 75% of the original cost for a building.
-	int type_costs[MaxCosts];
-	unit.Player->GetUnitTypeCosts(unit.Type, type_costs, false, true);
+	const resource_map<int> type_costs = unit.Player->GetUnitTypeCosts(unit.Type, false, true);
 	unit.Player->AddCostsFactor(type_costs, CancelBuildingCostsFactor);
 	// Cancel building
 	LetUnitDie(unit);
@@ -235,7 +234,7 @@ static void Finish(COrder_Built &order, CUnit &unit)
 	}
 	
 	//give builders experience for the construction of the structure
-	int xp_gained = type.Stats[unit.Player->Index].get_cost(resource::get_all()[TimeCost]) / 10;
+	int xp_gained = type.Stats[unit.Player->Index].get_time_cost() / 10;
 	//Wyrmgus end
 
 	if (worker != nullptr) {
@@ -408,7 +407,7 @@ static void Finish(COrder_Built &order, CUnit &unit)
 		return ;
 	}
 
-	const int maxProgress = type.Stats[unit.Player->Index].get_cost(resource::get_all()[TimeCost]) * 600;
+	const int maxProgress = type.Stats[unit.Player->Index].get_time_cost() * 600;
 
 	// Check if building ready. Note we can both build and repair.
 	if (!unit.Anim.Unbreakable && this->ProgressCounter >= maxProgress) {
@@ -428,7 +427,7 @@ void COrder_Built::Cancel(CUnit &unit)
 	Assert(unit.CurrentOrder() == this);
 
 	unit.Variable[BUILD_INDEX].Value = this->ProgressCounter;
-	unit.Variable[BUILD_INDEX].Max = unit.Type->Stats[unit.Player->Index].get_cost(resource::get_all()[TimeCost]) * 600;
+	unit.Variable[BUILD_INDEX].Max = unit.Type->Stats[unit.Player->Index].get_time_cost() * 600;
 
 	// This should happen when building unit with several peons
 	// Maybe also with only one.
@@ -477,7 +476,7 @@ void COrder_Built::UpdateConstructionFrame(CUnit &unit)
 {
 	const wyrmgus::unit_type &type = *unit.Type;
 
-	const int time_cost = type.Stats[unit.Player->Index].get_cost(resource::get_all()[TimeCost]);
+	const int time_cost = type.Stats[unit.Player->Index].get_time_cost();
 
 	if (time_cost == 0) {
 		wyrmgus::log::log_error("Error in COrder_Built::UpdateConstructionFrame(): the unit's time cost is 0.");
@@ -537,7 +536,7 @@ void COrder_Built::Boost(CUnit &building, int amount, int varIndex) const
 {
 	Assert(building.CurrentOrder() == this);
 
-	const int time_cost = building.Stats->get_cost(resource::get_all()[TimeCost]);
+	const int time_cost = building.Stats->get_time_cost();
 	if (time_cost == 0) {
 		wyrmgus::log::log_error("Error in COrder_Built::Boost(): the unit's time cost is 0.");
 	}

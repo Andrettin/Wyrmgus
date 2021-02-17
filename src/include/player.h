@@ -27,6 +27,7 @@
 
 #pragma once
 
+#include "economy/resource_container.h"
 #include "map/landmass_container.h"
 #include "player_container.h"
 #include "ui/icon.h"
@@ -491,7 +492,7 @@ public:
 	int CheckLimits(const wyrmgus::unit_type &type) const;
 
 	/// Check if enough resources are available for costs
-	int CheckCosts(const int *costs, bool notify = true) const;
+	int CheckCosts(const resource_map<int> &costs, const bool notify = true) const;
 	/// Check if enough resources are available for a new unit-type
 	int CheckUnitType(const wyrmgus::unit_type &type, bool hire = false) const;
 
@@ -500,18 +501,18 @@ public:
 	/// Add costs for an unit-type to the resources
 	void AddUnitType(const wyrmgus::unit_type &type, bool hire = false);
 	/// Add a factor of costs to the resources
-	void AddCostsFactor(const int *costs, int factor);
+	void AddCostsFactor(const resource_map<int> &costs, const int factor);
 	/// Remove costs from the resources
-	void SubCosts(const int *costs);
+	void subtract_costs(const resource_map<int> &costs);
 	/// Remove costs for an unit-type from the resources
 	void SubUnitType(const wyrmgus::unit_type &type, bool hire = false);
 	/// Remove a factor of costs from the resources
-	void SubCostsFactor(const int *costs, int factor);
+	void SubCostsFactor(const resource_map<int> &costs, const int factor);
 	
 	//Wyrmgus start
-	void GetUnitTypeCosts(const wyrmgus::unit_type *type, int *type_costs, bool hire = false, bool ignore_one = false) const;
+	resource_map<int> GetUnitTypeCosts(const unit_type *type, const bool hire = false, const bool ignore_one = false) const;
 	int GetUnitTypeCostsMask(const wyrmgus::unit_type *type, bool hire = false) const;
-	void GetUpgradeCosts(const CUpgrade *upgrade, int *upgrade_costs);
+	resource_map<int> GetUpgradeCosts(const CUpgrade *upgrade) const;
 	int GetUpgradeCostsMask(const CUpgrade *upgrade) const;
 	
 	void SetUnitTypeCount(const wyrmgus::unit_type *type, int quantity);
