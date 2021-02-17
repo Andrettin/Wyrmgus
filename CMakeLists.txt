@@ -146,6 +146,11 @@ set(database_SRCS
 )
 source_group(database FILES ${database_SRCS})
 
+set(economy_SRCS
+	src/economy/resource.cpp
+)
+source_group(economy FILES ${economy_SRCS})
+
 set(editor_SRCS
 	src/editor/editloop.cpp
 	src/editor/editor.cpp
@@ -413,7 +418,6 @@ set(stratagusmain_SRCS
 	src/stratagus/player.cpp
 	src/stratagus/player_color.cpp
 	src/stratagus/province.cpp
-	src/stratagus/resource.cpp
 	src/stratagus/script.cpp
 	src/stratagus/script_character.cpp
 	src/stratagus/script_grand_strategy.cpp
@@ -570,6 +574,7 @@ set(stratagus_SRCS
 	${animation_SRCS}
 	${ai_SRCS}
 	${database_SRCS}
+	${economy_SRCS}
 	${editor_SRCS}
 	${game_SRCS}
 	${guichan_SRCS}
@@ -716,6 +721,10 @@ set(stratagus_database_HDRS
 	src/database/sml_parser.h
 	src/database/sml_property.h
 	src/database/sml_property_visitor.h
+)
+
+set(stratagus_economy_HDRS
+	src/economy/resource.h
 )
 
 set(stratagus_item_HDRS
@@ -1054,7 +1063,6 @@ set(stratagus_generic_HDRS
 	src/include/player_color.h
 	src/include/province.h
 	src/include/replay.h
-	src/include/resource.h
 	src/include/results.h
 	src/include/script.h
 	src/include/settings.h
@@ -1097,6 +1105,7 @@ source_group(ai FILES ${stratagus_ai_HDRS})
 source_group(animation FILES ${stratagus_animation_HDRS})
 source_group(database FILES ${stratagus_database_HDRS})
 source_group(guichan FILES ${stratagus_guichan_HDRS})
+source_group(economy FILES ${stratagus_economy_HDRS})
 source_group(item FILES ${stratagus_item_HDRS})
 source_group(language FILES ${stratagus_language_HDRS})
 source_group(map FILES ${stratagus_map_HDRS})
@@ -1124,6 +1133,7 @@ set(stratagus_HDRS
 	${stratagus_ai_HDRS}
 	${stratagus_animation_HDRS}
 	${stratagus_database_HDRS}
+	${stratagus_economy_HDRS}
 	${stratagus_guichan_HDRS}
 	${stratagus_item_HDRS}
 	${stratagus_language_HDRS}
@@ -1614,6 +1624,7 @@ if(ENABLE_UNITY_BUILD)
 	set_source_files_properties(${ai_SRCS} PROPERTIES UNITY_GROUP "ai")
 	set_source_files_properties(${beos_SRCS} PROPERTIES UNITY_GROUP "beos")
 	set_source_files_properties(${database_SRCS} PROPERTIES UNITY_GROUP "database")
+	set_source_files_properties(${economy_SRCS} PROPERTIES UNITY_GROUP "economy")
 	set_source_files_properties(${editor_SRCS} PROPERTIES UNITY_GROUP "editor")
 	set_source_files_properties(${game_SRCS} PROPERTIES UNITY_GROUP "game")
 	set_source_files_properties(${guichan_SRCS} PROPERTIES UNITY_GROUP "guichan")

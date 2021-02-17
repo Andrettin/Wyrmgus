@@ -1247,7 +1247,7 @@ public:
 	std::vector<std::unique_ptr<unit_type_variation>> LayerVariations[MaxImageLayers];	/// Layer variation information
 	//Wyrmgus end
 	std::vector<std::unique_ptr<CBuildRestriction>> BuildingRules;   /// Rules list for building a building.
-	std::vector< std::unique_ptr<CBuildRestriction>> AiBuildingRules; /// Rules list for for AI to build a building.
+	std::vector<std::unique_ptr<CBuildRestriction>> AiBuildingRules; /// Rules list for for AI to build a building.
 private:
 	QColor neutral_minimap_color; //minimap color for neutral units
 
