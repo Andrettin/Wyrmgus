@@ -27,7 +27,7 @@
 
 #include "stratagus.h"
 
-#include "resource.h"
+#include "economy/resource.h"
 
 #include "database/defines.h"
 #include "video/video.h"

@@ -45,6 +45,7 @@
 #include "database/sml_data.h"
 #include "database/sml_parser.h"
 #include "diplomacy_state.h"
+#include "economy/resource.h"
 #include "editor.h"
 #include "faction.h"
 #include "faction_type.h"
@@ -80,7 +81,6 @@
 #include "quest/quest.h"
 //Wyrmgus end
 #include "replay.h"
-#include "resource.h"
 #include "results.h"
 //Wyrmgus start
 #include "script.h"

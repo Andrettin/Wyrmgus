@@ -39,6 +39,7 @@
 #include "commands.h"
 //Wyrmgus end
 #include "database/defines.h"
+#include "economy/resource.h"
 #include "iolib.h"
 #include "map/map.h"
 #include "map/map_layer.h"
@@ -49,7 +50,6 @@
 #include "player.h"
 #include "quest/objective_type.h"
 #include "quest/player_quest_objective.h"
-#include "resource.h"
 #include "script.h"
 //Wyrmgus start
 #include "settings.h"

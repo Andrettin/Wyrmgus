@@ -31,9 +31,9 @@
 #include "database/data_type.h"
 #include "database/named_data_entry.h"
 #include "data_type.h"
+#include "economy/resource.h" //for MaxCosts
 #include "item/item_class.h"
 #include "luacallback.h"
-#include "resource.h" //for MaxCosts
 #include "vec2i.h"
 
 #ifdef __MORPHOS__

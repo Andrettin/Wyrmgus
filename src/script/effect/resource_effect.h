@@ -1,6 +1,6 @@
 #pragma once
 
-#include "resource.h"
+#include "economy/resource.h"
 #include "script/effect/effect.h"
 #include "util/string_util.h"
 
