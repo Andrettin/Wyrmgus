@@ -18,12 +18,12 @@ RUN apt-get -y install \
   qtlocation5-dev \
   qtmultimedia5-dev \
   qtpositioning5-dev \
-  xvfb \
 ;
 # Runtime deps
 RUN apt-get -y install \
   qml-module-qtquick-controls2 \
   qml-module-qtquick-window2 \
   qml-module-qtquick2 \
+  xvfb \
 ;
 RUN apt-get clean && rm -rf /var/lib/apt/lists/*
