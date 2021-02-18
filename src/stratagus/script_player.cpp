@@ -347,48 +347,36 @@ void CPlayer::Load(lua_State *l)
 				LuaError(l, "incorrect argument");
 			}
 			const int subargs = lua_rawlen(l, j + 1);
-			//Wyrmgus start
-//			if (subargs != MaxCosts) {
-//				LuaError(l, "Wrong number of total-resources: %d" _C_ subargs);
-//			}
-			if (subargs != MaxCosts) {
-				fprintf(stderr, "Wrong number of total-resources: %d.\n", subargs);
-			}
-			//Wyrmgus end
 			for (int k = 0; k < subargs; ++k) {
-				this->TotalResources[k] = LuaToNumber(l, j + 1, k + 1);
+				value = LuaToString(l, j + 1, k + 1);
+				++k;
+
+				const resource *res = resource::get(value);
+				this->set_resource_total(res, LuaToNumber(l, j + 1, k + 1));
 			}
 		} else if (!strcmp(value, "speed-resource-harvest")) {
 			if (!lua_istable(l, j + 1)) {
 				LuaError(l, "incorrect argument");
 			}
 			const int subargs = lua_rawlen(l, j + 1);
-			//Wyrmgus start
-//			if (subargs != MaxCosts) {
-//				LuaError(l, "Wrong number of speed-resource-harvest: %d" _C_ subargs);
-//			}
-			if (subargs != MaxCosts) {
-				fprintf(stderr, "Wrong number of speed-resource-harvest: %d.\n", subargs);
-			}
-			//Wyrmgus end
 			for (int k = 0; k < subargs; ++k) {
-				this->SpeedResourcesHarvest[k] = LuaToNumber(l, j + 1, k + 1);
+				value = LuaToString(l, j + 1, k + 1);
+				++k;
+
+				const resource *res = resource::get(value);
+				this->set_resource_harvest_speed(res, LuaToNumber(l, j + 1, k + 1));
 			}
 		} else if (!strcmp(value, "speed-resource-return")) {
 			if (!lua_istable(l, j + 1)) {
 				LuaError(l, "incorrect argument");
 			}
 			const int subargs = lua_rawlen(l, j + 1);
-			//Wyrmgus start
-//			if (subargs != MaxCosts) {
-//				LuaError(l, "Wrong number of speed-resource-harvest: %d" _C_ subargs);
-//			}
-			if (subargs != MaxCosts) {
-				fprintf(stderr, "Wrong number of speed-resource-return: %d.\n", subargs);
-			}
-			//Wyrmgus end
 			for (int k = 0; k < subargs; ++k) {
-				this->SpeedResourcesReturn[k] = LuaToNumber(l, j + 1, k + 1);
+				value = LuaToString(l, j + 1, k + 1);
+				++k;
+
+				const resource *res = resource::get(value);
+				this->set_resource_return_speed(res, LuaToNumber(l, j + 1, k + 1));
 			}
 		} else if (!strcmp(value, "speed-build")) {
 			this->SpeedBuild = LuaToNumber(l, j + 1);
@@ -2421,8 +2409,8 @@ static int CclGetPlayerData(lua_State *l)
 		LuaCheckArgs(l, 3);
 
 		const std::string res = LuaToString(l, 3);
-		const int resId = GetResourceIdByName(l, res.c_str());
-		lua_pushnumber(l, p->TotalResources[resId]);
+		const resource *resource = resource::get(res);
+		lua_pushnumber(l, p->get_resource_total(resource));
 		return 1;
 	} else if (!strcmp(data, "TotalRazings")) {
 		lua_pushnumber(l, p->TotalRazings);
@@ -2442,15 +2430,15 @@ static int CclGetPlayerData(lua_State *l)
 		LuaCheckArgs(l, 3);
 
 		const std::string res = LuaToString(l, 3);
-		const int resId = GetResourceIdByName(l, res.c_str());
-		lua_pushnumber(l, p->SpeedResourcesHarvest[resId]);
+		const resource *resource = resource::get(res);
+		lua_pushnumber(l, p->get_resource_harvest_speed(resource));
 		return 1;
 	} else if (!strcmp(data, "SpeedResourcesReturn")) {
 		LuaCheckArgs(l, 3);
 
 		const std::string res = LuaToString(l, 3);
-		const int resId = GetResourceIdByName(l, res.c_str());
-		lua_pushnumber(l, p->SpeedResourcesReturn[resId]);
+		const resource *resource = resource::get(res);
+		lua_pushnumber(l, p->get_resource_return_speed(resource));
 		return 1;
 	} else if (!strcmp(data, "SpeedBuild")) {
 		lua_pushnumber(l, p->SpeedBuild);
@@ -2614,8 +2602,8 @@ static int CclSetPlayerData(lua_State *l)
 		LuaCheckArgs(l, 4);
 
 		const std::string res = LuaToString(l, 3);
-		const int resId = GetResourceIdByName(l, res.c_str());
-		p->TotalResources[resId] = LuaToNumber(l, 4);
+		const resource *resource = resource::get(res);
+		p->set_resource_total(resource, LuaToNumber(l, 4));
 	} else if (!strcmp(data, "TotalRazings")) {
 		p->TotalRazings = LuaToNumber(l, 3);
 	} else if (!strcmp(data, "TotalKills")) {
@@ -2624,14 +2612,14 @@ static int CclSetPlayerData(lua_State *l)
 		LuaCheckArgs(l, 4);
 
 		const std::string res = LuaToString(l, 3);
-		const int resId = GetResourceIdByName(l, res.c_str());
-		p->SpeedResourcesHarvest[resId] = LuaToNumber(l, 4);
+		const resource *resource = resource::get(res);
+		p->set_resource_harvest_speed(resource, LuaToNumber(l, 4));
 	} else if (!strcmp(data, "SpeedResourcesReturn")) {
 		LuaCheckArgs(l, 4);
 
 		const std::string res = LuaToString(l, 3);
-		const int resId = GetResourceIdByName(l, res.c_str());
-		p->SpeedResourcesReturn[resId] = LuaToNumber(l, 4);
+		const resource *resource = resource::get(res);
+		p->set_resource_return_speed(resource, LuaToNumber(l, 4));
 	} else if (!strcmp(data, "SpeedBuild")) {
 		p->SpeedBuild = LuaToNumber(l, 3);
 	} else if (!strcmp(data, "SpeedTrain")) {

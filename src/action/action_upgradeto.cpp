@@ -482,8 +482,8 @@ static void AnimateActionUpgradeTo(CUnit &unit)
 	const CUnitStats &newstats = newtype.Stats[player.Index];
 
 	//Wyrmgus start
-//	this->Ticks += std::max(1, player.SpeedUpgrade / SPEEDUP_FACTOR);
-	this->Ticks += std::max(1, (player.SpeedUpgrade + unit.Variable[TIMEEFFICIENCYBONUS_INDEX].Value) / SPEEDUP_FACTOR);
+//	this->Ticks += std::max(1, player.SpeedUpgrade / CPlayer::base_speed_factor);
+	this->Ticks += std::max(1, (player.SpeedUpgrade + unit.Variable[TIMEEFFICIENCYBONUS_INDEX].Value) / CPlayer::base_speed_factor);
 	//Wyrmgus end
 	if (this->Ticks < newstats.get_time_cost()) {
 		unit.Wait = CYCLES_PER_SECOND / 6;

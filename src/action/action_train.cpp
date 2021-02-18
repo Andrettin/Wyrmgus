@@ -252,8 +252,8 @@ static void AnimateActionTrain(CUnit &unit)
 	//Wyrmgus end
 	
 	//Wyrmgus start
-//	this->Ticks += std::max(1, player.SpeedTrain / SPEEDUP_FACTOR);
-	this->Ticks += std::max(1, (player.SpeedTrain + unit.Variable[TIMEEFFICIENCYBONUS_INDEX].Value) / SPEEDUP_FACTOR);
+//	this->Ticks += std::max(1, player.SpeedTrain / CPlayer::base_speed_factor);
+	this->Ticks += std::max(1, (player.SpeedTrain + unit.Variable[TIMEEFFICIENCYBONUS_INDEX].Value) / CPlayer::base_speed_factor);
 	
 	if (unit.Type->Stats[unit.Player->Index].get_unit_stock(&nType) != 0) { // if the training unit/building has a "stock" of the trained unit, that means it should be created with no time wait
 		this->Ticks = cost;

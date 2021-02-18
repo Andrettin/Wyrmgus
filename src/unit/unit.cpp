@@ -7252,7 +7252,7 @@ static void HitUnit_Raid(CUnit *attacker, CUnit &target, int damage)
 		int resource_change = cost * damage * attacker->Variable[var_index].Value / target.GetModifiedVariable(HP_INDEX, VariableAttribute::Max) / 100;
 		resource_change = std::min(resource_change, target.Player->get_resource(resource, resource_storage_type::both));
 		attacker->Player->change_resource(resource, resource_change, false);
-		attacker->Player->TotalResources[resource->get_index()] += resource_change;
+		attacker->Player->change_resource_total(resource, resource_change);
 		target.Player->change_resource(resource, -resource_change, false);
 	}
 }

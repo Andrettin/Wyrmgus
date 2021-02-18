@@ -142,8 +142,8 @@ bool COrder_Research::ParseSpecificData(lua_State *l, int &j, const char *value,
 	//Wyrmgus start
 //	CPlayer &player = *unit.Player;
 	CPlayer &player = *this->Player;
-//	player.UpgradeTimers.Upgrades[upgrade.ID] += std::max(1, player.SpeedResearch / SPEEDUP_FACTOR);
-	player.UpgradeTimers.Upgrades[upgrade.ID] += std::max(1, (player.SpeedResearch + unit.Variable[TIMEEFFICIENCYBONUS_INDEX].Value + unit.Variable[RESEARCHSPEEDBONUS_INDEX].Value) / SPEEDUP_FACTOR);
+//	player.UpgradeTimers.Upgrades[upgrade.ID] += std::max(1, player.SpeedResearch / CPlayer::base_speed_factor);
+	player.UpgradeTimers.Upgrades[upgrade.ID] += std::max(1, (player.SpeedResearch + unit.Variable[TIMEEFFICIENCYBONUS_INDEX].Value + unit.Variable[RESEARCHSPEEDBONUS_INDEX].Value) / CPlayer::base_speed_factor);
 	//Wyrmgus end
 	if (player.UpgradeTimers.Upgrades[upgrade.ID] >= upgrade.get_time_cost()) {
 		if (upgrade.get_name().empty()) {

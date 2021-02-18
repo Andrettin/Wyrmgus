@@ -506,8 +506,8 @@ void COrder_Built::Progress(CUnit &unit, int amount)
 	Boost(unit, amount, SHIELD_INDEX);
 
 	//Wyrmgus start
-//	this->ProgressCounter += std::max(1, amount * unit.Player->SpeedBuild / SPEEDUP_FACTOR);
-	this->ProgressCounter += std::max(0, amount * unit.Player->SpeedBuild / SPEEDUP_FACTOR);
+//	this->ProgressCounter += std::max(1, amount * unit.Player->SpeedBuild / CPlayer::base_speed_factor);
+	this->ProgressCounter += std::max(0, amount * unit.Player->SpeedBuild / CPlayer::base_speed_factor);
 	//Wyrmgus end
 	UpdateConstructionFrame(unit);
 }
@@ -517,8 +517,8 @@ void COrder_Built::ProgressHp(CUnit &unit, int amount)
 	Boost(unit, amount, HP_INDEX);
 
 	//Wyrmgus start
-//	this->ProgressCounter += std::max(1, amount * unit.Player->SpeedBuild / SPEEDUP_FACTOR);
-	this->ProgressCounter += std::max(0, amount * unit.Player->SpeedBuild / SPEEDUP_FACTOR);
+//	this->ProgressCounter += std::max(1, amount * unit.Player->SpeedBuild / CPlayer::base_speed_factor);
+	this->ProgressCounter += std::max(0, amount * unit.Player->SpeedBuild / CPlayer::base_speed_factor);
 	//Wyrmgus end
 	UpdateConstructionFrame(unit);
 }
@@ -545,8 +545,8 @@ void COrder_Built::Boost(CUnit &building, int amount, int varIndex) const
 
 	const int progress = this->ProgressCounter;
 	//Wyrmgus start
-//	const int newProgress = progress + std::max(1, amount * building.Player->SpeedBuild / SPEEDUP_FACTOR);
-	const int newProgress = progress + std::max(0, amount * building.Player->SpeedBuild / SPEEDUP_FACTOR);
+//	const int newProgress = progress + std::max(1, amount * building.Player->SpeedBuild / CPlayer::base_speed_factor);
+	const int newProgress = progress + std::max(0, amount * building.Player->SpeedBuild / CPlayer::base_speed_factor);
 	//Wyrmgus end
 	const int maxValue = building.Variable[varIndex].Max;
 

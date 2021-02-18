@@ -682,11 +682,12 @@ void CPlayer::Save(CFile &file) const
 	file.printf("\n  \"total-units\", %d,", p.TotalUnits);
 	file.printf("\n  \"total-buildings\", %d,", p.TotalBuildings);
 	file.printf("\n  \"total-resources\", {");
-	for (int j = 0; j < MaxCosts; ++j) {
-		if (j) {
-			file.printf(" ");
+	for (const auto &[resource, quantity] : p.resource_totals) {
+		if (quantity == 0) {
+			continue;
 		}
-		file.printf("%d,", p.TotalResources[j]);
+
+		file.printf("\"%s\", %d, ", resource->get_identifier().c_str(), quantity);
 	}
 	file.printf("},");
 	file.printf("\n  \"total-razings\", %d,", p.TotalRazings);
@@ -709,19 +710,21 @@ void CPlayer::Save(CFile &file) const
 	//Wyrmgus end
 
 	file.printf("\n  \"speed-resource-harvest\", {");
-	for (int j = 0; j < MaxCosts; ++j) {
-		if (j) {
-			file.printf(" ");
+	for (const auto &[resource, speed] : p.resource_harvest_speeds) {
+		if (speed == CPlayer::base_speed_factor) {
+			continue;
 		}
-		file.printf("%d,", p.SpeedResourcesHarvest[j]);
+
+		file.printf("\"%s\", %d, ", resource->get_identifier().c_str(), speed);
 	}
 	file.printf("},");
 	file.printf("\n  \"speed-resource-return\", {");
-	for (int j = 0; j < MaxCosts; ++j) {
-		if (j) {
-			file.printf(" ");
+	for (const auto &[resource, speed] : p.resource_return_speeds) {
+		if (speed == CPlayer::base_speed_factor) {
+			continue;
 		}
-		file.printf("%d,", p.SpeedResourcesReturn[j]);
+
+		file.printf("\"%s\", %d, ", resource->get_identifier().c_str(), speed);
 	}
 	file.printf("},");
 	file.printf("\n  \"speed-build\", %d,", p.SpeedBuild);
@@ -2246,7 +2249,7 @@ void CPlayer::Clear()
 	this->Score = 0;
 	this->TotalUnits = 0;
 	this->TotalBuildings = 0;
-	memset(this->TotalResources, 0, sizeof(this->TotalResources));
+	this->resource_totals.clear();
 	this->TotalRazings = 0;
 	this->TotalKills = 0;
 	//Wyrmgus start
@@ -2255,19 +2258,17 @@ void CPlayer::Clear()
 	this->HeroCooldownTimer = 0;
 	//Wyrmgus end
 	this->UpgradeTimers.Clear();
-	for (size_t i = 0; i < MaxCosts; ++i) {
-		this->SpeedResourcesHarvest[i] = SPEEDUP_FACTOR;
-		this->SpeedResourcesReturn[i] = SPEEDUP_FACTOR;
-	}
+	this->resource_harvest_speeds.clear();
+	this->resource_return_speeds.clear();
 
 	for (const resource *resource : resource::get_all()) {
 		this->set_price(resource, resource->get_base_price());
 	}
 
-	this->SpeedBuild = SPEEDUP_FACTOR;
-	this->SpeedTrain = SPEEDUP_FACTOR;
-	this->SpeedUpgrade = SPEEDUP_FACTOR;
-	this->SpeedResearch = SPEEDUP_FACTOR;
+	this->SpeedBuild = CPlayer::base_speed_factor;
+	this->SpeedTrain = CPlayer::base_speed_factor;
+	this->SpeedUpgrade = CPlayer::base_speed_factor;
+	this->SpeedResearch = CPlayer::base_speed_factor;
 }
 
 
@@ -3234,7 +3235,7 @@ void CPlayer::pay_overlord_tax(const wyrmgus::resource *resource, const int taxa
 	}
 
 	this->get_overlord()->change_resource(resource, quantity, true);
-	this->get_overlord()->TotalResources[resource->get_index()] += quantity;
+	this->get_overlord()->change_resource_total(resource, quantity);
 	this->change_resource(resource, -quantity, true);
 
 	//make the overlord pay tax to their overlord in turn (if they have one)

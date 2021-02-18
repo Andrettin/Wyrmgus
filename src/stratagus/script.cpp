@@ -897,9 +897,8 @@ static int GetPlayerData(const int player_index, const char *prop, const char *a
 	} else if (!strcmp(prop, "TotalBuildings")) {
 		return player->TotalBuildings;
 	} else if (!strcmp(prop, "TotalResources")) {
-		const wyrmgus::resource *resource = wyrmgus::resource::get(arg);
-		const int res_id = resource->get_index();
-		return player->TotalResources[res_id];
+		const resource *resource = resource::get(arg);
+		return player->get_resource_total(resource);
 	} else if (!strcmp(prop, "TotalRazings")) {
 		return player->TotalRazings;
 	} else if (!strcmp(prop, "TotalKills")) {

@@ -662,7 +662,7 @@ int COrder_Resource::StartGathering(CUnit &unit)
 #endif
 		UnitHeadingFromDeltaXY(unit, this->goalPos - unit.tilePos);
 		if (resinfo->WaitAtResource) {
-			this->TimeToHarvest = std::max<int>(1, resinfo->WaitAtResource * SPEEDUP_FACTOR / std::max(1, unit.Player->SpeedResourcesHarvest[this->CurrentResource]));
+			this->TimeToHarvest = std::max<int>(1, resinfo->WaitAtResource * CPlayer::base_speed_factor / std::max(1, unit.Player->get_resource_harvest_speed(resource::get_all()[this->CurrentResource])));
 		} else {
 			this->TimeToHarvest = 1;
 		}
@@ -756,12 +756,12 @@ int COrder_Resource::StartGathering(CUnit &unit)
 
 	if (resinfo->WaitAtResource) {
 		//Wyrmgus start
-//		this->TimeToHarvest = std::max<int>(1, resinfo.WaitAtResource * SPEEDUP_FACTOR / unit.Player->SpeedResourcesHarvest[resinfo.ResourceId]);
+//		this->TimeToHarvest = std::max<int>(1, resinfo.WaitAtResource * CPlayer::base_speed_factor / unit.Player->SpeedResourcesHarvest[resinfo.ResourceId]);
 		int wait_at_resource = resinfo->WaitAtResource;
 		if (!goal->Type->BoolFlag[HARVESTFROMOUTSIDE_INDEX].value) {
 			wait_at_resource = resinfo->WaitAtResource * 100 / std::max(1, unit.GetResourceStep(this->CurrentResource));
 		}
-		this->TimeToHarvest = std::max<int>(1, wait_at_resource * SPEEDUP_FACTOR / std::max(1, unit.Player->SpeedResourcesHarvest[resinfo->get_resource()->get_index()] + goal->Variable[TIMEEFFICIENCYBONUS_INDEX].Value));
+		this->TimeToHarvest = std::max<int>(1, wait_at_resource * CPlayer::base_speed_factor / std::max(1, unit.Player->get_resource_harvest_speed(resinfo->get_resource()) + goal->Variable[TIMEEFFICIENCYBONUS_INDEX].Value));
 		//Wyrmgus end
 	} else {
 		this->TimeToHarvest = 1;
@@ -927,16 +927,16 @@ int COrder_Resource::GatherResource(CUnit &unit)
 		//FIXME: rb - how should it look for WaitAtResource == 0
 		if (resinfo->WaitAtResource) {
 			// Wyrmgus start
-//			this->TimeToHarvest += std::max<int>(1, resinfo.WaitAtResource * SPEEDUP_FACTOR / unit.Player->SpeedResourcesHarvest[resinfo.ResourceId]);
+//			this->TimeToHarvest += std::max<int>(1, resinfo.WaitAtResource * CPlayer::base_speed_factor / unit.Player->SpeedResourcesHarvest[resinfo.ResourceId]);
 			int wait_at_resource = resinfo->WaitAtResource;
-			int resource_harvest_speed = unit.Player->SpeedResourcesHarvest[resinfo->get_resource()->get_index()];
+			int resource_harvest_speed = unit.Player->get_resource_harvest_speed(resinfo->get_resource());
 			if (!CMap::Map.Info.IsPointOnMap(this->goalPos, this->MapLayer) && !harvest_from_outside) {
 				wait_at_resource = resinfo->WaitAtResource * 100 / std::max(1, unit.GetResourceStep(this->CurrentResource));
 			}
 			if (this->get_goal()) {
 				resource_harvest_speed += this->get_goal()->Variable[TIMEEFFICIENCYBONUS_INDEX].Value;
 			}
-			this->TimeToHarvest += std::max<int>(1, wait_at_resource * SPEEDUP_FACTOR / std::max(1, resource_harvest_speed));
+			this->TimeToHarvest += std::max<int>(1, wait_at_resource * CPlayer::base_speed_factor / std::max(1, resource_harvest_speed));
 			//Wyrmgus end
 		} else {
 			this->TimeToHarvest += 1;
@@ -1364,7 +1364,7 @@ int COrder_Resource::MoveToDepot(CUnit &unit)
 	}
 	
 	player.change_resource(final_resource, final_resource_change, true);
-	player.TotalResources[final_resource->get_index()] += final_resource_change;
+	player.change_resource_total(final_resource, final_resource_change);
 	player.pay_overlord_tax(final_resource, final_resource_change);
 	
 	//give XP to the worker according to how much was gathered, based on their base price in relation to gold
@@ -1386,8 +1386,8 @@ int COrder_Resource::MoveToDepot(CUnit &unit)
 
 	if (unit.Wait) {
 		//Wyrmgus start
-//		unit.Wait /= std::max(1, unit.Player->SpeedResourcesReturn[resinfo->ResourceId] / SPEEDUP_FACTOR);
-		unit.Wait /= std::max(1, (unit.Player->SpeedResourcesReturn[resinfo->get_resource()->get_index()] + goal.Variable[TIMEEFFICIENCYBONUS_INDEX].Value) / SPEEDUP_FACTOR);
+//		unit.Wait /= std::max(1, unit.Player->SpeedResourcesReturn[resinfo->ResourceId] / CPlayer::base_speed_factor);
+		unit.Wait /= std::max(1, (unit.Player->get_resource_return_speed(resinfo->get_resource()) + goal.Variable[TIMEEFFICIENCYBONUS_INDEX].Value) / CPlayer::base_speed_factor);
 		//Wyrmgus end
 		if (unit.Wait) {
 			unit.Wait--;

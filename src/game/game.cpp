@@ -2005,9 +2005,9 @@ static int CclSetSpeedResourcesHarvest(lua_State *l)
 
 	const int player = LuaToNumber(l, 1);
 	const std::string resource = LuaToString(l, 2);
-	const int resId = GetResourceIdByName(l, resource.c_str());
+	const wyrmgus::resource *res = resource::get(resource);
 
-	CPlayer::Players[player]->SpeedResourcesHarvest[resId] = LuaToNumber(l, 3);
+	CPlayer::Players[player]->set_resource_harvest_speed(res, LuaToNumber(l, 3));
 	return 0;
 }
 
@@ -2022,9 +2022,9 @@ static int CclSetSpeedResourcesReturn(lua_State *l)
 
 	const int player = LuaToNumber(l, 1);
 	const std::string resource = LuaToString(l, 2);
-	const int resId = GetResourceIdByName(l, resource.c_str());
+	const wyrmgus::resource *res = resource::get(resource);
 
-	CPlayer::Players[player]->SpeedResourcesReturn[resId] = LuaToNumber(l, 3);
+	CPlayer::Players[player]->set_resource_return_speed(res, LuaToNumber(l, 3));
 	return 0;
 }
 
@@ -2124,9 +2124,9 @@ static int CclSetSpeeds(lua_State *l)
 	LuaCheckArgs(l, 1);
 	const int speed = LuaToNumber(l, 1);
 	for (int i = 0; i < PlayerMax; ++i) {
-		for (int j = 0; j < MaxCosts; ++j) {
-			CPlayer::Players[i]->SpeedResourcesHarvest[j] = speed;
-			CPlayer::Players[i]->SpeedResourcesReturn[j] = speed;
+		for (const resource *resource : resource::get_all()) {
+			CPlayer::Players[i]->set_resource_harvest_speed(resource, speed);
+			CPlayer::Players[i]->set_resource_return_speed(resource, speed);
 		}
 		CPlayer::Players[i]->SpeedBuild = CPlayer::Players[i]->SpeedTrain = CPlayer::Players[i]->SpeedUpgrade = CPlayer::Players[i]->SpeedResearch = speed;
 	}

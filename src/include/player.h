@@ -27,7 +27,6 @@
 
 #pragma once
 
-#include "economy/resource.h"
 #include "economy/resource_container.h"
 #include "map/landmass_container.h"
 #include "player_container.h"
@@ -38,8 +37,6 @@
 #include "unit/unit_class_container.h"
 #include "unit/unit_type_container.h"
 #include "vec2i.h"
-
-constexpr int SPEEDUP_FACTOR = 100;
 
 constexpr int DefaultTradeCost = 30;
 
@@ -92,6 +89,7 @@ class CPlayer
 public:
 	static constexpr int max_quest_pool = 4;
 	static constexpr size_t max_current_quests = 4;
+	static constexpr int base_speed_factor = 100;
 
 	static void SetThisPlayer(CPlayer *player);
 	static CPlayer *GetThisPlayer();
@@ -552,6 +550,50 @@ public:
 		this->set_price(resource, this->get_price(resource) + quantity);
 	}
 
+	int get_resource_harvest_speed(const resource *resource) const
+	{
+		const auto find_iterator = this->resource_harvest_speeds.find(resource);
+
+		if (find_iterator != this->resource_harvest_speeds.end()) {
+			return find_iterator->second;
+		}
+
+		return CPlayer::base_speed_factor;
+	}
+
+	void set_resource_harvest_speed(const resource *resource, const int quantity)
+	{
+		if (quantity == CPlayer::base_speed_factor) {
+			if (this->resource_harvest_speeds.contains(resource)) {
+				this->resource_harvest_speeds.erase(resource);
+			}
+		} else {
+			this->resource_harvest_speeds[resource] = quantity;
+		}
+	}
+
+	int get_resource_return_speed(const resource *resource) const
+	{
+		const auto find_iterator = this->resource_return_speeds.find(resource);
+
+		if (find_iterator != this->resource_return_speeds.end()) {
+			return find_iterator->second;
+		}
+
+		return CPlayer::base_speed_factor;
+	}
+
+	void set_resource_return_speed(const resource *resource, const int quantity)
+	{
+		if (quantity == CPlayer::base_speed_factor) {
+			if (this->resource_return_speeds.contains(resource)) {
+				this->resource_return_speeds.erase(resource);
+			}
+		} else {
+			this->resource_return_speeds[resource] = quantity;
+		}
+	}
+
 	const wyrmgus::unit_type_map<std::vector<CUnit *>> &get_units_by_type() const
 	{
 		return this->units_by_type;
@@ -593,6 +635,33 @@ public:
 
 	void set_revealed(const bool revealed);
 
+	int get_resource_total(const resource *resource) const
+	{
+		const auto find_iterator = this->resource_totals.find(resource);
+
+		if (find_iterator != this->resource_totals.end()) {
+			return find_iterator->second;
+		}
+
+		return 0;
+	}
+
+	void set_resource_total(const resource *resource, const int quantity)
+	{
+		if (quantity == 0) {
+			if (this->resource_totals.contains(resource)) {
+				this->resource_totals.erase(resource);
+			}
+		} else {
+			this->resource_totals[resource] = quantity;
+		}
+	}
+
+	void change_resource_total(const resource *resource, const int quantity)
+	{
+		this->set_resource_total(resource, this->get_resource_total(resource) + quantity);
+	}
+
 private:
 	resource_map<int> resources;      /// resources in overall store
 	resource_map<int> max_resources;   /// max resources can be stored
@@ -609,8 +678,10 @@ public:
 	int TradeCost;					/// cost of trading
 	//Wyrmgus end
 
-	int SpeedResourcesHarvest[MaxCosts]; /// speed factor for harvesting resources
-	int SpeedResourcesReturn[MaxCosts];  /// speed factor for returning resources
+private:
+	resource_map<int> resource_harvest_speeds; /// speed factor for harvesting resources
+	resource_map<int> resource_return_speeds;  /// speed factor for returning resources
+public:
 	int SpeedBuild;                  /// speed factor for building
 	int SpeedTrain;                  /// speed factor for training
 	int SpeedUpgrade;                /// speed factor for upgrading
@@ -657,7 +728,9 @@ public:
 	int Score = 0;           /// Player score points
 	int TotalUnits = 0;
 	int TotalBuildings = 0;
-	int TotalResources[MaxCosts];
+private:
+	resource_map<int> resource_totals;
+public:
 	int TotalRazings = 0;
 	int TotalKills = 0;      /// How many units killed
 	//Wyrmgus start
