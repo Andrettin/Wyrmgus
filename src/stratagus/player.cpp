@@ -43,6 +43,7 @@
 #include "dialogue.h"
 #include "diplomacy_state.h"
 #include "dynasty.h"
+#include "economy/resource_storage_type.h"
 #include "editor.h"
 #include "faction.h"
 #include "faction_history.h"
@@ -1103,14 +1104,14 @@ void CPlayer::apply_history(const CDate &start_date)
 
 	for (const auto &kv_pair : faction->HistoricalResources) { //set the appropriate historical resource quantities
 		if (kv_pair.first.first.Year == 0 || start_date.ContainsDate(kv_pair.first.first)) {
-			this->set_resource(wyrmgus::resource::get_all()[kv_pair.first.second], kv_pair.second, STORE_OVERALL);
+			this->set_resource(wyrmgus::resource::get_all()[kv_pair.first.second], kv_pair.second, resource_storage_type::overall);
 		}
 	}
 
 	for (const auto &kv_pair : faction_history->get_resources()) {
 		const wyrmgus::resource *resource = kv_pair.first;
 		const int quantity = kv_pair.second;
-		this->set_resource(resource, quantity, STORE_OVERALL);
+		this->set_resource(resource, quantity, resource_storage_type::overall);
 	}
 }
 
@@ -2966,14 +2967,14 @@ int CPlayer::GetUnitCount() const
 **
 **  @note Storing types: 0 - overall store, 1 - store buildings, 2 - both
 */
-int CPlayer::get_resource(const wyrmgus::resource *resource, const int type) const
+int CPlayer::get_resource(const wyrmgus::resource *resource, const resource_storage_type type) const
 {
 	switch (type) {
-		case STORE_OVERALL:
+		case resource_storage_type::overall:
 			return this->get_resource(resource);
-		case STORE_BUILDING:
+		case resource_storage_type::building:
 			return this->get_stored_resource(resource);
-		case STORE_BOTH:
+		case resource_storage_type::both:
 			return this->get_resource(resource) + this->get_stored_resource(resource);
 		default:
 			DebugPrint("Wrong resource type\n");
@@ -3011,20 +3012,28 @@ void CPlayer::change_resource(const wyrmgus::resource *resource, const int value
 **  @param value     How many of this resource.
 **  @param type      Resource types: 0 - overall store, 1 - store buildings, 2 - both
 */
-void CPlayer::set_resource(const wyrmgus::resource *resource, const int value, const int type)
+void CPlayer::set_resource(const wyrmgus::resource *resource, const int value, const resource_storage_type type)
 {
-	if (type == STORE_BOTH) {
-		if (this->get_max_resource(resource) != -1) {
-			const int to_res = std::max(0, value - this->get_stored_resource(resource));
-			this->set_resource(resource, std::max(0, to_res));
-			this->set_stored_resource(resource, std::min(value - to_res, this->get_max_resource(resource)));
-		} else {
+	switch (type) {
+		case resource_storage_type::both:
+			if (this->get_max_resource(resource) != -1) {
+				const int to_res = std::max(0, value - this->get_stored_resource(resource));
+				this->set_resource(resource, std::max(0, to_res));
+				this->set_stored_resource(resource, std::min(value - to_res, this->get_max_resource(resource)));
+			} else {
+				this->set_resource(resource, std::max(0, value));
+			}
+			break;
+		case resource_storage_type::building:
+			if (this->get_max_resource(resource) != -1) {
+				this->set_stored_resource(resource, std::min(value, this->get_max_resource(resource)));
+			}
+			break;
+		case resource_storage_type::overall:
 			this->set_resource(resource, std::max(0, value));
-		}
-	} else if (type == STORE_BUILDING && this->get_max_resource(resource) != -1) {
-		this->set_stored_resource(resource, std::min(value, this->get_max_resource(resource)));
-	} else if (type == STORE_OVERALL) {
-		this->set_resource(resource, std::max(0, value));
+			break;
+		default:
+			break;
 	}
 }
 

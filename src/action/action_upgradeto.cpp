@@ -33,6 +33,7 @@
 #include "ai.h"
 #include "animation.h"
 #include "civilization.h"
+#include "economy/resource_storage_type.h"
 #include "faction.h"
 //Wyrmgus start
 #include "game.h"
@@ -143,7 +144,7 @@ int TransformUnitIntoType(CUnit &unit, const wyrmgus::unit_type &newtype)
 		for (const resource *resource : resource::get_all()) {
 			if (player.get_max_resource(resource) != -1) {
 				player.change_max_resource(resource, newtype.Stats[player.Index].get_storing(resource) - oldtype.Stats[player.Index].get_storing(resource));
-				player.set_resource(resource, player.get_stored_resource(resource), STORE_BUILDING);
+				player.set_resource(resource, player.get_stored_resource(resource), resource_storage_type::building);
 			}
 		}
 	}

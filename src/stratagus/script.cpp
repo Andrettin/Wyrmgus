@@ -37,6 +37,7 @@
 //Wyrmgus end
 #include "civilization.h"
 #include "config.h"
+#include "economy/resource_storage_type.h"
 //Wyrmgus start
 #include "editor.h"
 //Wyrmgus end
@@ -825,7 +826,7 @@ static int GetPlayerData(const int player_index, const char *prop, const char *a
 		return player->Race;
 	} else if (!strcmp(prop, "Resources")) {
 		const resource *resource = resource::get(arg);
-		return player->get_resource(resource, STORE_BOTH);
+		return player->get_resource(resource, resource_storage_type::both);
 	} else if (!strcmp(prop, "StoredResources")) {
 		const resource *resource = resource::get(arg);
 		return player->get_stored_resource(resource);

@@ -36,6 +36,7 @@
 #include "action/action_resource.h"
 #include "commands.h"
 #include "database/defines.h"
+#include "economy/resource_storage_type.h"
 #include "faction.h"
 #include "map/landmass.h"
 #include "map/map.h"
@@ -1493,7 +1494,7 @@ static bool CmpWorkers(const CUnit *lhs, const CUnit *rhs)
 //Wyrmgus start
 static bool AiCanSellResource(const resource *resource)
 {
-	if (AiPlayer->Player->get_resource(resource, STORE_BOTH) <= (AiPlayer->get_collect(resource) * 100)) {
+	if (AiPlayer->Player->get_resource(resource, resource_storage_type::both) <= (AiPlayer->get_collect(resource) * 100)) {
 		return false;
 	}
 	
@@ -2086,7 +2087,7 @@ static void AiCheckRepair()
 					continue;
 				}
 
-				if (cost != 0 && AiPlayer->Player->get_resource(resource, STORE_BOTH) < 99) {
+				if (cost != 0 && AiPlayer->Player->get_resource(resource, resource_storage_type::both) < 99) {
 					repair_flag = false;
 					break;
 				}
@@ -2125,7 +2126,7 @@ static void AiCheckRepair()
 					}
 
 					// FIXME: the resources don't necessarily have to be in storage
-					if (AiPlayer->Player->get_resource(resource, STORE_BOTH) < cost) {
+					if (AiPlayer->Player->get_resource(resource, resource_storage_type::both) < cost) {
 						enough_resources = false;
 						break;
 					}

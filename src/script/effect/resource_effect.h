@@ -27,6 +27,7 @@
 #pragma once
 
 #include "economy/resource.h"
+#include "economy/resource_storage_type.h"
 #include "script/effect/effect.h"
 #include "util/string_util.h"
 
@@ -51,7 +52,7 @@ public:
 
 	virtual void do_assignment_effect(CPlayer *player) const override
 	{
-		player->set_resource(this->resource, this->quantity, STORE_OVERALL);
+		player->set_resource(this->resource, this->quantity, resource_storage_type::overall);
 	}
 
 	virtual void do_addition_effect(CPlayer *player) const override

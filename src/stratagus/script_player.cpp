@@ -40,6 +40,7 @@
 #include "currency.h"
 #include "diplomacy_state.h"
 #include "dynasty.h"
+#include "economy/resource_storage_type.h"
 #include "editor.h"
 #include "faction.h"
 #include "faction_type.h"
@@ -511,7 +512,7 @@ void CPlayer::Load(lua_State *l)
 	// Manage max
 	for (const resource *resource : resource::get_all()) {
 		if (this->get_max_resource(resource) != -1) {
-			this->set_resource(resource, this->get_resource(resource) + this->get_stored_resource(resource), STORE_BOTH);
+			this->set_resource(resource, this->get_resource(resource) + this->get_stored_resource(resource), resource_storage_type::both);
 		}
 	}
 }
@@ -2583,14 +2584,14 @@ static int CclSetPlayerData(lua_State *l)
 		LuaCheckArgs(l, 4);
 
 		const std::string res = LuaToString(l, 3);
-		const int resId = GetResourceIdByName(l, res.c_str());
-		p->set_resource(wyrmgus::resource::get_all()[resId], LuaToNumber(l, 4), STORE_OVERALL);
+		const resource *resource = resource::get(res);
+		p->set_resource(resource, LuaToNumber(l, 4), resource_storage_type::overall);
 	} else if (!strcmp(data, "StoredResources")) {
 		LuaCheckArgs(l, 4);
 
 		const std::string res = LuaToString(l, 3);
 		const resource *resource = resource::get(res);
-		p->set_resource(resource, LuaToNumber(l, 4), STORE_BUILDING);
+		p->set_resource(resource, LuaToNumber(l, 4), resource_storage_type::building);
 		// } else if (!strcmp(data, "UnitTypesCount")) {
 		// } else if (!strcmp(data, "AiEnabled")) {
 		// } else if (!strcmp(data, "TotalNumUnits")) {

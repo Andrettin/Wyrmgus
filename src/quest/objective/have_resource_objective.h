@@ -27,6 +27,7 @@
 
 #pragma once
 
+#include "economy/resource_storage_type.h"
 #include "quest/objective/quest_objective.h"
 #include "quest/objective_type.h"
 
@@ -72,7 +73,7 @@ public:
 
 	virtual void update_counter(player_quest_objective *player_quest_objective) const override
 	{
-		const int resource_quantity = player_quest_objective->get_player()->get_resource(this->resource, STORE_BOTH);
+		const int resource_quantity = player_quest_objective->get_player()->get_resource(this->resource, resource_storage_type::both);
 		player_quest_objective->set_counter(resource_quantity);
 	}
 

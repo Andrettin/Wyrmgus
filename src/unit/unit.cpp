@@ -43,6 +43,7 @@
 #include "civilization.h"
 #include "commands.h"
 #include "database/defines.h"
+#include "economy/resource_storage_type.h"
 #include "faction.h"
 #include "game.h"
 #include "editor.h"
@@ -2700,7 +2701,7 @@ void CUnit::ProduceResource(const wyrmgus::resource *resource)
 */
 void CUnit::sell_resource(const resource *resource, const int player)
 {
-	if (CPlayer::Players[player]->get_resource(resource, STORE_BOTH) < 100) {
+	if (CPlayer::Players[player]->get_resource(resource, resource_storage_type::both) < 100) {
 		return;
 	}
 
@@ -2717,7 +2718,7 @@ void CUnit::sell_resource(const resource *resource, const int player)
 */
 void CUnit::buy_resource(const resource *resource, const int player)
 {
-	if (CPlayer::Players[player]->get_resource(defines::get()->get_wealth_resource(), STORE_BOTH) < this->Player->get_effective_resource_buy_price(resource)) {
+	if (CPlayer::Players[player]->get_resource(defines::get()->get_wealth_resource(), resource_storage_type::both) < this->Player->get_effective_resource_buy_price(resource)) {
 		return;
 	}
 
@@ -4203,7 +4204,7 @@ void UnitLost(CUnit &unit)
 				const int new_max_value = player.get_max_resource(resource) - type.Stats[player.Index].get_storing(resource);
 
 				player.set_max_resource(resource, std::max(0, new_max_value));
-				player.set_resource(resource, player.get_stored_resource(resource), STORE_BUILDING);
+				player.set_resource(resource, player.get_stored_resource(resource), resource_storage_type::building);
 			}
 		}
 
@@ -7249,7 +7250,7 @@ static void HitUnit_Raid(CUnit *attacker, CUnit &target, int damage)
 		}
 
 		int resource_change = cost * damage * attacker->Variable[var_index].Value / target.GetModifiedVariable(HP_INDEX, VariableAttribute::Max) / 100;
-		resource_change = std::min(resource_change, target.Player->get_resource(resource, STORE_BOTH));
+		resource_change = std::min(resource_change, target.Player->get_resource(resource, resource_storage_type::both));
 		attacker->Player->change_resource(resource, resource_change, false);
 		attacker->Player->TotalResources[resource->get_index()] += resource_change;
 		target.Player->change_resource(resource, -resource_change, false);

@@ -39,6 +39,7 @@
 //Wyrmgus end
 #include "database/defines.h"
 #include "economy/resource.h"
+#include "economy/resource_storage_type.h"
 #include "iolib.h"
 #include "map/map.h"
 #include "map/map_layer.h"
@@ -633,7 +634,7 @@ int COrder_Resource::StartGathering(CUnit &unit)
 
 	//Wyrmgus start
 	const resource *input_resource = wyrmgus::resource::get_all()[this->CurrentResource]->get_input_resource();
-	if (input_resource != nullptr && unit.Player->get_resource(input_resource, STORE_BOTH) == 0) { //if the resource requires an input, but there's none in store, don't gather
+	if (input_resource != nullptr && unit.Player->get_resource(input_resource, resource_storage_type::both) == 0) { //if the resource requires an input, but there's none in store, don't gather
 		const std::string &input_name = input_resource->get_identifier();
 		const std::string &input_action_name = input_resource->get_action_name();
 		unit.Player->Notify(_("Not enough %s... %s more %s."), _(input_name.c_str()), _(input_action_name.c_str()), _(input_name.c_str())); //added extra space to look better
@@ -1010,7 +1011,7 @@ int COrder_Resource::GatherResource(CUnit &unit)
 //				source->ResourcesHeld -= addload;
 				const resource *input_resource = wyrmgus::resource::get_all()[this->CurrentResource]->get_input_resource();
 				if (input_resource != nullptr) {
-					addload = std::min(unit.Player->get_resource(input_resource, STORE_BOTH), addload);
+					addload = std::min(unit.Player->get_resource(input_resource, resource_storage_type::both), addload);
 					
 					if (!addload) {
 						const char *input_name = input_resource->get_identifier().c_str();

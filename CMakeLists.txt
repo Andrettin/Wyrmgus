@@ -727,6 +727,7 @@ set(stratagus_database_HDRS
 set(stratagus_economy_HDRS
 	src/economy/resource.h
 	src/economy/resource_container.h
+	src/economy/resource_storage_type.h
 )
 
 set(stratagus_item_HDRS

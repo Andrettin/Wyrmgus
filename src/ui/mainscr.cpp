@@ -39,6 +39,7 @@
 #endif
 #include "civilization.h"
 #include "database/defines.h"
+#include "economy/resource_storage_type.h"
 #include "game.h"
 #include "map/map.h"
 #include "map/map_layer.h"
@@ -815,7 +816,7 @@ void DrawResources()
 
 		if (resource_info.TextX != -1) {
 			if (CPlayer::GetThisPlayer()->get_max_resource(resource) != -1) {
-				const int res_amount = CPlayer::GetThisPlayer()->get_resource(resource, STORE_BOTH);
+				const int res_amount = CPlayer::GetThisPlayer()->get_resource(resource, resource_storage_type::both);
 				const std::string tmp = std::to_string(res_amount) + " (" + std::to_string(CPlayer::GetThisPlayer()->get_max_resource(resource) - CPlayer::GetThisPlayer()->get_stored_resource(resource)) + ")";
 				
 				resource_info.Text = tmp;

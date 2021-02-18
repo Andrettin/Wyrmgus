@@ -39,10 +39,6 @@
 #include "unit/unit_type_container.h"
 #include "vec2i.h"
 
-constexpr int STORE_OVERALL = 0;
-constexpr int STORE_BUILDING = 1;
-constexpr int STORE_BOTH = 2;
-
 constexpr int SPEEDUP_FACTOR = 100;
 
 constexpr int DefaultTradeCost = 30;
@@ -87,6 +83,7 @@ namespace wyrmgus {
 	enum class faction_tier;
 	enum class government_type;
 	enum class gender;
+	enum class resource_storage_type;
 	enum class vassalage_type;
 }
 
@@ -686,11 +683,11 @@ public:
 	CUpgradeTimers UpgradeTimers; /// Timer for the upgrades
 
 	/// Get a resource of the player
-	int get_resource(const wyrmgus::resource *resource, const int type) const;
+	int get_resource(const wyrmgus::resource *resource, const resource_storage_type type) const;
 	/// Adds/subtracts some resources to/from the player store
 	void change_resource(const wyrmgus::resource *resource, const int value, const bool store);
 	/// Set a resource of the player
-	void set_resource(const wyrmgus::resource *resource, const int value, const int type);
+	void set_resource(const wyrmgus::resource *resource, const int value, const resource_storage_type type);
 	/// Check, if there enough resources for action.
 	bool check_resource(const resource *resource, const int value);
 	//Wyrmgus start
