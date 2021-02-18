@@ -1,16 +1,9 @@
 #!/usr/bin/make -f
-#       _________ __                 __
-#      /   _____//  |_____________ _/  |______     ____  __ __  ______
-#      \_____  \\   __\_  __ \__  \\   __\__  \   / ___\|  |  \/  ___/
-#      /        \|  |  |  | \// __ \|  |  / __ \_/ /_/  >  |  /\___ |
-#     /_______  /|__|  |__|  (____  /__| (____  /\___  /|____//____  >
-#             \/                  \/          \//_____/            \/
-#  ______________________                           ______________________
-#                        T H E   W A R   B E G I N S
-#         Stratagus - A free fantasy real time strategy game engine
+#    Wyrmgus - a free fantasy real time strategy game engine
 #
 #    debian/rules
 #    Copyright (C) 2010-2011  Pali Rohár <pali.rohar@gmail.com>
+#    Copyright (C) 2021  Anton Karmanov <a.karmanov@inventati.org>
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
