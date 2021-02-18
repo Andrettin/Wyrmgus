@@ -1,9 +1,9 @@
-#       _________ __                 __
-#      /   _____//  |_____________ _/  |______     ____  __ __  ______
-#      \_____  \\   __\_  __ \__  \\   __\__  \   / ___\|  |  \/  ___/
-#      /        \|  |  |  | \// __ \|  |  / __ \_/ /_/  >  |  /\___ |
-#     /_______  /|__|  |__|  (____  /__| (____  /\___  /|____//____  >
-#             \/                  \/          \//_____/            \/
+#   
+#                _     _    _ ____  _    __ ____ __   _ _____ 
+#               | |   / /\ / / __ )/ |  / // __ / /  / / ___/
+#               | |/|/ /\ '// ,  // /|// // / / | (_/ /\__ \
+#               |_/ |_/ /_//_/ \_\_/  /_/ \___ / \___//_____)
+#                                        /____/              
 #  ______________________                           ______________________
 #                        T H E   W A R   B E G I N S
 #         Stratagus - A free fantasy real time strategy game engine
@@ -1849,6 +1849,8 @@ endif()
 set(CPACK_GENERATOR DEB)
 set(CPACK_PACKAGE_CONTACT a.karmanov@insiberia.net)
 set(CPACK_DEBIAN_PACKAGE_SHLIBDEPS ON)
+set(CPACK_DEBIAN_PACKAGE_SECTION games)
+set(CPACK_DEBIAN_PACKAGE_SUGGESTS wyrmsun)
 
 include(CPack)
 
