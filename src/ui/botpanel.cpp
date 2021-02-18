@@ -42,6 +42,7 @@
 #include "commands.h"
 #include "database/defines.h"
 #include "dynasty.h"
+#include "economy/resource.h"
 #include "faction.h"
 #include "game.h"
 //Wyrmgus start
@@ -350,11 +351,12 @@ static bool CanShowPopupContent(const PopupConditionPanel *condition,
 	if (condition->ImproveIncomes != CONDITION_TRUE) {
 		bool improve_incomes = false;
 		if (button.Action == ButtonCmd::ProduceResource) {
-			if (CPlayer::GetThisPlayer()->Incomes[button.Value] > wyrmgus::resource::get_all()[button.Value]->get_default_income()) {
+			if (CPlayer::GetThisPlayer()->get_income(button.get_value_resource()) > button.get_value_resource()->get_default_income()) {
 				improve_incomes = true;
 			}
-			for (const wyrmgus::resource *child_resource : wyrmgus::resource::get_all()[button.Value]->ChildResources) {
-				if (CPlayer::GetThisPlayer()->Incomes[child_resource->get_index()] > child_resource->get_default_income()) {
+
+			for (const resource *child_resource : resource::get_all()[button.Value]->ChildResources) {
+				if (CPlayer::GetThisPlayer()->get_income(child_resource) > child_resource->get_default_income()) {
 					improve_incomes = true;
 					break;
 				}
@@ -451,7 +453,7 @@ static bool CanShowPopupContent(const PopupConditionPanel *condition,
 	}
 	
 	if (condition->LuxuryResource != CONDITION_TRUE) {
-		if ((condition->LuxuryResource == CONDITION_ONLY) ^ (button.Action == ButtonCmd::ProduceResource && wyrmgus::resource::get_all()[button.Value]->LuxuryResource)) {
+		if ((condition->LuxuryResource == CONDITION_ONLY) ^ (button.Action == ButtonCmd::ProduceResource && button.get_value_resource()->LuxuryResource)) {
 			return false;
 		}
 	}
@@ -1137,9 +1139,9 @@ void CButtonPanel::Draw()
 					if ((button->Action == ButtonCmd::Train || button->Action == ButtonCmd::TrainClass) && Selected[0]->Type->Stats[Selected[0]->Player->Index].get_unit_stock(button_unit_type) != 0) { //draw the quantity in stock for unit "training" cases which have it
 						number_string = std::to_string(Selected[0]->GetUnitStock(button_unit_type)) + "/" + std::to_string(Selected[0]->Type->Stats[Selected[0]->Player->Index].get_unit_stock(button_unit_type));
 					} else if (button->Action == ButtonCmd::SellResource) {
-						number_string = std::to_string(Selected[0]->Player->GetEffectiveResourceSellPrice(button->Value));
+						number_string = std::to_string(Selected[0]->Player->get_effective_resource_sell_price(button->get_value_resource()));
 					} else if (button->Action == ButtonCmd::BuyResource) {
-						number_string = std::to_string(Selected[0]->Player->GetEffectiveResourceBuyPrice(button->Value));
+						number_string = std::to_string(Selected[0]->Player->get_effective_resource_buy_price(button->get_value_resource()));
 					}
 					CLabel label(wyrmgus::defines::get()->get_game_font());
 
@@ -2180,11 +2182,11 @@ void CButtonPanel::DoClicked_SellResource(int button)
 
 void CButtonPanel::DoClicked_BuyResource(int button)
 {
-	const int resource = CurrentButtons[button]->Value;
+	const resource *resource = CurrentButtons[button]->get_value_resource();
 	resource_map<int> buy_resource_costs;
-	buy_resource_costs[defines::get()->get_wealth_resource()] = Selected[0]->Player->GetEffectiveResourceBuyPrice(resource);
+	buy_resource_costs[defines::get()->get_wealth_resource()] = Selected[0]->Player->get_effective_resource_buy_price(resource);
 	if (!CPlayer::GetThisPlayer()->CheckCosts(buy_resource_costs)) {
-		SendCommandBuyResource(*Selected[0], resource, CPlayer::GetThisPlayer()->Index);
+		SendCommandBuyResource(*Selected[0], resource->get_index(), CPlayer::GetThisPlayer()->Index);
 	}
 }
 

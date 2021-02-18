@@ -33,11 +33,12 @@
 /// @todo all user interface variables should go here and be configurable
 
 #include "color.h"
-#include "viewport.h"
+#include "economy/resource.h"
 #include "ui/interface.h"
 #include "ui/statusline.h"
 #include "ui/uitimer.h"
 #include "util/singleton.h"
+#include "viewport.h"
 
 class CContentType;
 class CFile;

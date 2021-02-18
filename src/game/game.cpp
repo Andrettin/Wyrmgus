@@ -856,18 +856,18 @@ int WriteMapSetup(const char *mapSetup, CMap &map, int writeTerrain, bool is_mod
 				f->printf("SetStartView(%d, %d, %d)\n", i, CPlayer::Players[i]->StartPos.x, CPlayer::Players[i]->StartPos.y);
 				f->printf("SetPlayerData(%d, \"Resources\", \"%s\", %d)\n",
 						  i, DefaultResourceNames[WoodCost].c_str(),
-						  CPlayer::Players[i]->Resources[WoodCost]);
+						  CPlayer::Players[i]->get_resource(resource::get_all()[WoodCost]));
 				f->printf("SetPlayerData(%d, \"Resources\", \"%s\", %d)\n",
-						  i, DefaultResourceNames[CopperCost].c_str(),
-						  CPlayer::Players[i]->Resources[CopperCost]);
-				if (CPlayer::Players[i]->Resources[OilCost]) {
+						  i, defines::get()->get_wealth_resource()->get_identifier().c_str(),
+						  CPlayer::Players[i]->get_resource(defines::get()->get_wealth_resource()));
+				if (CPlayer::Players[i]->get_resource(resource::get_all()[OilCost]) != 0) {
 					f->printf("SetPlayerData(%d, \"Resources\", \"%s\", %d)\n",
 							  i, DefaultResourceNames[OilCost].c_str(),
-							  CPlayer::Players[i]->Resources[OilCost]);
+							  CPlayer::Players[i]->get_resource(resource::get_all()[OilCost]));
 				}
 				f->printf("SetPlayerData(%d, \"Resources\", \"%s\", %d)\n",
 						  i, DefaultResourceNames[StoneCost].c_str(),
-						  CPlayer::Players[i]->Resources[StoneCost]);
+						  CPlayer::Players[i]->get_resource(resource::get_all()[StoneCost]));
 				f->printf("SetPlayerData(%d, \"RaceName\", \"%s\")\n",
 						  i, civilization::get_all()[CPlayer::Players[i]->Race]->get_identifier().c_str());
 				if (CPlayer::Players[i]->Faction != -1) {
@@ -2181,12 +2181,9 @@ static int CclDefineResource(lua_State *l)
 		} else if (!strcmp(value, "DemandElasticity")) {
 			resource->DemandElasticity = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "InputResource")) {
-			std::string input_resource_ident = LuaToString(l, -1);
-			int input_resource_id = GetResourceIdByName(input_resource_ident.c_str());
-			if (input_resource_id == -1) {
-				LuaError(l, "Resource \"%s\" doesn't exist." _C_ input_resource_ident.c_str());
-			}
-			resource->InputResource = input_resource_id;
+			const std::string input_resource_ident = LuaToString(l, -1);
+			wyrmgus::resource *input_resource = resource::get(input_resource_ident);
+			resource->input_resource = input_resource;
 		} else if (!strcmp(value, "Hidden")) {
 			resource->Hidden = LuaToBoolean(l, -1);
 		} else {

@@ -87,6 +87,7 @@ class resource final : public named_data_entry, public data_type<resource>
 	Q_PROPERTY(wyrmgus::resource* final_resource MEMBER final_resource)
 	Q_PROPERTY(int final_resource_conversion_rate MEMBER final_resource_conversion_rate READ get_final_resource_conversion_rate)
 	Q_PROPERTY(int base_price MEMBER base_price READ get_base_price)
+	Q_PROPERTY(wyrmgus::resource* input_resource MEMBER input_resource)
 
 public:
 	static constexpr const char *class_identifier = "resource";
@@ -145,6 +146,11 @@ public:
 
 	bool IsMineResource() const;
 
+	const resource *get_input_resource() const
+	{
+		return this->input_resource;
+	}
+
 private:
 	int index = -1;
 	resource_icon *icon = nullptr;
@@ -160,7 +166,9 @@ private:
 	int base_price = 0;
 public:
 	int DemandElasticity = 100;
-	int InputResource = 0;
+private:
+	resource *input_resource = nullptr;
+public:
 	bool LuxuryResource = false;
 	bool Hidden = false;
 	std::vector<resource *> ChildResources; //resources (other than this one) that have this resource as their final resource

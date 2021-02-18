@@ -147,17 +147,13 @@ int CUnitStats::get_price() const
 {
 	int price = 0;
 	
-	for (const auto &kv_pair : this->get_costs()) {
-		const resource *resource = kv_pair.first;
-		const int resource_index = resource->get_index();
-
-		if (resource_index == TimeCost) {
+	for (const auto &[resource, resource_cost] : this->get_costs()) {
+		if (resource == defines::get()->get_time_resource()) {
 			continue;
 		}
 
-		const int resource_cost = kv_pair.second;
 		if (resource_cost > 0) {
-			if (resource_index == CopperCost) {
+			if (resource == defines::get()->get_wealth_resource()) {
 				price += resource_cost;
 			} else {
 				price += resource_cost * resource->get_base_price() / 100;
@@ -1391,7 +1387,7 @@ static void ApplyUpgradeModifier(CPlayer &player, const wyrmgus::upgrade_modifie
 				std::vector<CUnit *> unitupgrade;
 				FindUnitsByType(*unit_type, unitupgrade);
 				if (unitupgrade.size() > 0) {
-					player.Incomes[resource->get_index()] = std::max(player.Incomes[resource->get_index()], stat.get_improve_income(resource));
+					player.set_income(resource, std::max(player.get_income(resource), stat.get_improve_income(resource)));
 				}
 			}
 
@@ -1659,10 +1655,8 @@ static void RemoveUpgradeModifier(CPlayer &player, const wyrmgus::upgrade_modifi
 			for (const auto &[resource, quantity] : um->Modifier.get_improve_incomes()) {
 				stat.change_improve_income(resource, -quantity);
 
-				const int resource_index = resource->get_index();
-
 				//if this was the highest improve income, search for another
-				if (player.Incomes[resource_index] && (stat.get_improve_income(resource) + quantity) == player.Incomes[resource_index]) {
+				if (player.get_income(resource) != 0 && (stat.get_improve_income(resource) + quantity) == player.get_income(resource)) {
 					int m = resource->get_default_income();
 
 					for (int k = 0; k < player.GetUnitCount(); ++k) {
@@ -1674,7 +1668,7 @@ static void RemoveUpgradeModifier(CPlayer &player, const wyrmgus::upgrade_modifi
 						m = std::max(m, player_unit.Type->Stats[player.Index].get_improve_income(resource));
 					}
 
-					player.Incomes[resource_index] = m;
+					player.set_income(resource, m);
 				}
 			}
 

@@ -807,26 +807,29 @@ void DrawResources()
 
 		icon->get_graphics()->DrawFrameClip(icon->get_frame(), UI.Resources[i].IconX, UI.Resources[i].IconY);
 	}
-	for (int i = 0; i < MaxCosts; ++i) {
-		if (UI.Resources[i].TextX != -1) {
-			const int resourceAmount = CPlayer::GetThisPlayer()->Resources[i];
 
-			if (CPlayer::GetThisPlayer()->MaxResources[i] != -1) {
-				const int resAmount = CPlayer::GetThisPlayer()->StoredResources[i] + CPlayer::GetThisPlayer()->Resources[i];
-				char tmp[256];
-				snprintf(tmp, sizeof(tmp), "%d (%d)", resAmount, CPlayer::GetThisPlayer()->MaxResources[i] - CPlayer::GetThisPlayer()->StoredResources[i]);
+	for (const resource *resource : resource::get_all()) {
+		const int index = resource->get_index();
+
+		CResourceInfo &resource_info = UI.Resources[index];
+
+		if (resource_info.TextX != -1) {
+			if (CPlayer::GetThisPlayer()->get_max_resource(resource) != -1) {
+				const int res_amount = CPlayer::GetThisPlayer()->get_resource(resource, STORE_BOTH);
+				const std::string tmp = std::to_string(res_amount) + " (" + std::to_string(CPlayer::GetThisPlayer()->get_max_resource(resource) - CPlayer::GetThisPlayer()->get_stored_resource(resource)) + ")";
 				
-				UI.Resources[i].Text = tmp;
-				UI.Resources[i].Font = wyrmgus::defines::get()->get_small_font();
-				label.SetFont(UI.Resources[i].Font);
+				resource_info.Text = tmp;
+				resource_info.Font = wyrmgus::defines::get()->get_small_font();
+				label.SetFont(resource_info.Font);
 
-				label.Draw(UI.Resources[i].TextX, UI.Resources[i].TextY + 3 * wyrmgus::defines::get()->get_scale_factor(), tmp);
+				label.Draw(resource_info.TextX, resource_info.TextY + 3 * wyrmgus::defines::get()->get_scale_factor(), tmp);
 			} else {
-				UI.Resources[i].Text = FormatNumber(resourceAmount);
-				UI.Resources[i].Font = resourceAmount > 99999 ? wyrmgus::defines::get()->get_small_font() : wyrmgus::defines::get()->get_game_font();
-				label.SetFont(UI.Resources[i].Font);
+				const int resource_amount = CPlayer::GetThisPlayer()->get_resource(resource);
+				resource_info.Text = FormatNumber(resource_amount);
+				resource_info.Font = resource_amount > 99999 ? wyrmgus::defines::get()->get_small_font() : wyrmgus::defines::get()->get_game_font();
+				label.SetFont(resource_info.Font);
 
-				label.Draw(UI.Resources[i].TextX, UI.Resources[i].TextY + (resourceAmount > 99999) * 3, UI.Resources[i].Text);
+				label.Draw(resource_info.TextX, resource_info.TextY + (resource_amount > 99999) * 3, resource_info.Text);
 			}
 		}
 	}

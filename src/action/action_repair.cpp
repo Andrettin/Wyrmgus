@@ -218,7 +218,7 @@ bool SubRepairCosts(const CUnit &unit, CPlayer &player, CUnit &goal)
 	}
 
 	for (const auto &[resource, cost] : repair_costs) {
-		if (!player.CheckResource(resource->get_index(), cost)) {
+		if (!player.check_resource(resource, cost)) {
 			player.Notify(NotifyYellow, unit.tilePos,
 						  //Wyrmgus start
 						  unit.MapLayer->ID,

@@ -1812,23 +1812,15 @@ static int CclGetUnitVariable(lua_State *l)
 		lua_pushnumber(l, unit->MapLayer->ID);
 	} else if (!strcmp(value, "EffectiveResourceSellPrice")) {
 		LuaCheckArgs(l, 3);
-		std::string resource_ident = LuaToString(l, 3);
-		int resource = GetResourceIdByName(resource_ident.c_str());
-		if (resource != -1) {
-			lua_pushnumber(l, unit->Player->GetEffectiveResourceSellPrice(resource));
-		} else {
-			LuaError(l, "Resource \"%s\" doesn't exist." _C_ resource_ident.c_str());
-		}
+		const std::string resource_ident = LuaToString(l, 3);
+		const resource *resource = resource::get(resource_ident);
+		lua_pushnumber(l, unit->Player->get_effective_resource_sell_price(resource));
 		return 1;
 	} else if (!strcmp(value, "EffectiveResourceBuyPrice")) {
 		LuaCheckArgs(l, 3);
-		std::string resource_ident = LuaToString(l, 3);
-		int resource = GetResourceIdByName(resource_ident.c_str());
-		if (resource != -1) {
-			lua_pushnumber(l, unit->Player->GetEffectiveResourceBuyPrice(resource));
-		} else {
-			LuaError(l, "Resource \"%s\" doesn't exist." _C_ resource_ident.c_str());
-		}
+		const std::string resource_ident = LuaToString(l, 3);
+		const resource *resource = resource::get(resource_ident);
+		lua_pushnumber(l, unit->Player->get_effective_resource_buy_price(resource));
 		return 1;
 	//Wyrmgus end
 	} else {

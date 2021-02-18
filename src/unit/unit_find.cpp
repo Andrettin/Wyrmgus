@@ -579,9 +579,9 @@ void ResourceUnitFinder::ResourceUnitFinder_Cost::SetFrom(const CUnit &mine, con
 	distance = distance * 100 / resource->get_final_resource_conversion_rate();
 	
 	//alter the distance score by the conversion rate, so that the unit will prefer resources with better conversion rates, but without going for ones that are too far away
-	int price_modifier = worker.Player->GetResourcePrice(resource->get_final_resource()->get_index()) * resource->get_final_resource_conversion_rate() / 100;
-	if (resource->InputResource) {
-		price_modifier -= worker.Player->GetResourcePrice(resource->InputResource);
+	int price_modifier = worker.Player->get_resource_price(resource->get_final_resource()) * resource->get_final_resource_conversion_rate() / 100;
+	if (resource->get_input_resource() != nullptr) {
+		price_modifier -= worker.Player->get_resource_price(resource->get_input_resource());
 	}
 	price_modifier = std::max(price_modifier, 1);
 	distance = distance * 100 / price_modifier;

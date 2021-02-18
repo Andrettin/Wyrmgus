@@ -140,11 +140,10 @@ int TransformUnitIntoType(CUnit &unit, const wyrmgus::unit_type &newtype)
 		player.Supply += newtype.Stats[player.Index].Variables[SUPPLY_INDEX].Value - oldtype.Stats[player.Index].Variables[SUPPLY_INDEX].Value;
 
 		// Change resource limit
-		for (size_t i = 0; i < resource::get_all().size(); ++i) {
-			const resource *resource = resource::get_all()[i];
-			if (player.MaxResources[i] != -1) {
-				player.MaxResources[i] += newtype.Stats[player.Index].get_storing(resource) - oldtype.Stats[player.Index].get_storing(resource);
-				player.set_resource(resource, player.StoredResources[i], STORE_BUILDING);
+		for (const resource *resource : resource::get_all()) {
+			if (player.get_max_resource(resource) != -1) {
+				player.change_max_resource(resource, newtype.Stats[player.Index].get_storing(resource) - oldtype.Stats[player.Index].get_storing(resource));
+				player.set_resource(resource, player.get_stored_resource(resource), STORE_BUILDING);
 			}
 		}
 	}

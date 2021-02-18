@@ -30,6 +30,7 @@
 
 #include "config.h"
 #include "dynasty.h"
+#include "economy/resource.h"
 #include "faction.h"
 #include "map/map.h"
 #include "map/map_layer.h"
@@ -303,7 +304,7 @@ void button::initialize()
 			case ButtonCmd::ProduceResource:
 			case ButtonCmd::SellResource:
 			case ButtonCmd::BuyResource:
-				this->Value = GetResourceIdByName(this->ValueStr.c_str());
+				this->Value = resource::get(this->ValueStr)->get_index();
 				break;
 			case ButtonCmd::Button:
 				if (!this->ValueStr.empty()) {
@@ -431,6 +432,20 @@ const CUpgrade *button::get_value_upgrade(const CUnit *unit) const
 			if (this->Value != -1) {
 				return CPlayer::GetThisPlayer()->get_faction()->get_dynasties()[this->Value]->get_upgrade();
 			}
+		default:
+			break;
+	}
+
+	return nullptr;
+}
+
+const resource *button::get_value_resource() const
+{
+	switch (this->Action) {
+		case ButtonCmd::ProduceResource:
+		case ButtonCmd::SellResource:
+		case ButtonCmd::BuyResource:
+			return resource::get_all()[this->Value];
 		default:
 			break;
 	}

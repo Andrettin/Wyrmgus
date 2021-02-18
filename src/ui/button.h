@@ -42,7 +42,9 @@ namespace wyrmgus {
 
 class button;
 class button_level;
+class resource;
 class unit_class;
+class unit_type;
 
 typedef bool (*button_check_func)(const CUnit &, const button &);
 
@@ -122,6 +124,8 @@ public:
 	{
 		return this->get_value_upgrade(this->get_unit());
 	}
+
+	const resource *get_value_resource() const;
 
 	void SetTriggerData() const;
 	void CleanTriggerData() const;

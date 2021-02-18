@@ -29,11 +29,6 @@ class CPlayer
 	void SetStartView(const Vec2i &pos, int z);
 	//Wyrmgus end
 
-	int Resources[MaxCosts];
-	int StoredResources[MaxCosts];
-	int Incomes[MaxCosts];
-	const int Revenue[MaxCosts];
-
 	bool AiEnabled;
 
 	int NumBuildings;

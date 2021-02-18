@@ -270,9 +270,9 @@ public:
 	void GenerateUnique(CUnit *dropper, CPlayer *dropper_player);
 	void UpdateSoldUnits();
 	void SellUnit(CUnit *sold_unit, int player);
-	void ProduceResource(const wyrmgus::resource *resource);
-	void SellResource(const int resource, const int player);
-	void BuyResource(const int resource, const int player);
+	void ProduceResource(const resource *resource);
+	void sell_resource(const resource *resource, const int player);
+	void buy_resource(const resource *resource, const int player);
 	void Scout();
 	//Wyrmgus end
 	

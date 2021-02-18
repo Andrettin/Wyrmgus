@@ -2698,16 +2698,16 @@ void CUnit::ProduceResource(const wyrmgus::resource *resource)
 **
 **  @param resource  Resource to be sold.
 */
-void CUnit::SellResource(const int resource, const int player)
+void CUnit::sell_resource(const resource *resource, const int player)
 {
-	if ((CPlayer::Players[player]->Resources[resource] + CPlayer::Players[player]->StoredResources[resource]) < 100) {
+	if (CPlayer::Players[player]->get_resource(resource, STORE_BOTH) < 100) {
 		return;
 	}
 
-	CPlayer::Players[player]->change_resource(wyrmgus::resource::get_all()[resource], -100, true);
-	CPlayer::Players[player]->change_resource(defines::get()->get_wealth_resource(), this->Player->GetEffectiveResourceSellPrice(resource), true);
+	CPlayer::Players[player]->change_resource(resource, -100, true);
+	CPlayer::Players[player]->change_resource(defines::get()->get_wealth_resource(), this->Player->get_effective_resource_sell_price(resource), true);
 	
-	this->Player->DecreaseResourcePrice(resource);
+	this->Player->decrease_resource_price(resource);
 }
 
 /**
@@ -2715,16 +2715,16 @@ void CUnit::SellResource(const int resource, const int player)
 **
 **  @param resource  Resource to be bought.
 */
-void CUnit::BuyResource(const int resource, const int player)
+void CUnit::buy_resource(const resource *resource, const int player)
 {
-	if ((CPlayer::Players[player]->Resources[CopperCost] + CPlayer::Players[player]->StoredResources[CopperCost]) < this->Player->GetEffectiveResourceBuyPrice(resource)) {
+	if (CPlayer::Players[player]->get_resource(defines::get()->get_wealth_resource(), STORE_BOTH) < this->Player->get_effective_resource_buy_price(resource)) {
 		return;
 	}
 
-	CPlayer::Players[player]->change_resource(wyrmgus::resource::get_all()[resource], 100, true);
-	CPlayer::Players[player]->change_resource(defines::get()->get_wealth_resource(), -this->Player->GetEffectiveResourceBuyPrice(resource), true);
+	CPlayer::Players[player]->change_resource(resource, 100, true);
+	CPlayer::Players[player]->change_resource(defines::get()->get_wealth_resource(), -this->Player->get_effective_resource_buy_price(resource), true);
 	
-	this->Player->IncreaseResourcePrice(resource);
+	this->Player->increase_resource_price(resource);
 }
 
 void CUnit::Scout()
@@ -4198,22 +4198,24 @@ void UnitLost(CUnit &unit)
 	if (unit.CurrentAction() != UnitAction::Built) {
 		player.Supply -= unit.Variable[SUPPLY_INDEX].Value;
 		// Decrease resource limit
-		for (int i = 0; i < MaxCosts; ++i) {
-			const resource *resource = resource::get_all()[i];
-			if (player.MaxResources[i] != -1 && type.Stats[player.Index].get_storing(resource) != 0) {
-				const int newMaxValue = player.MaxResources[i] - type.Stats[player.Index].get_storing(resource);
+		for (const resource *resource : resource::get_all()) {
+			if (player.get_max_resource(resource) != -1 && type.Stats[player.Index].get_storing(resource) != 0) {
+				const int new_max_value = player.get_max_resource(resource) - type.Stats[player.Index].get_storing(resource);
 
-				player.MaxResources[i] = std::max(0, newMaxValue);
-				player.set_resource(wyrmgus::resource::get_all()[i], player.StoredResources[i], STORE_BUILDING);
+				player.set_max_resource(resource, std::max(0, new_max_value));
+				player.set_resource(resource, player.get_stored_resource(resource), STORE_BUILDING);
 			}
 		}
 
 		//  Handle income improvements, look if a player loses a building
 		//  which have given him a better income, find the next best
 		//  income.
-		for (int i = 1; i < MaxCosts; ++i) {
-			const resource *resource = resource::get_all()[i];
-			if (player.Incomes[i] && type.Stats[player.Index].get_improve_income(resource) == player.Incomes[i]) {
+		for (const resource *resource : resource::get_all()) {
+			if (resource == defines::get()->get_time_resource()) {
+				continue;
+			}
+
+			if (player.get_income(resource) != 0 && type.Stats[player.Index].get_improve_income(resource) == player.get_income(resource)) {
 				int m = resource->get_default_income();
 
 				for (int j = 0; j < player.GetUnitCount(); ++j) {
@@ -4225,10 +4227,10 @@ void UnitLost(CUnit &unit)
 					m = std::max(m, player_unit.Type->Stats[player.Index].get_improve_income(resource));
 				}
 
-				player.Incomes[i] = m;
+				player.set_income(resource, m);
 			}
 		}
-		
+
 		if (type.Stats[player.Index].Variables[TRADECOST_INDEX].Enable) {
 			int m = DefaultTradeCost;
 
@@ -4340,18 +4342,20 @@ void UpdateForNewUnit(const CUnit &unit, int upgrade)
 	// Note an upgraded unit can't give more supply.
 	if (!upgrade) {
 		player.Supply += unit.Variable[SUPPLY_INDEX].Value;
-		for (int i = 0; i < MaxCosts; ++i) {
-			const resource *resource = resource::get_all()[i];
-			if (player.MaxResources[i] != -1 && type.Stats[player.Index].get_storing(resource) != 0) {
-				player.MaxResources[i] += type.Stats[player.Index].get_storing(resource);
+		for (const resource *resource : resource::get_all()) {
+			if (player.get_max_resource(resource) != -1 && type.Stats[player.Index].get_storing(resource) != 0) {
+				player.change_max_resource(resource, type.Stats[player.Index].get_storing(resource));
 			}
 		}
 	}
 
 	// Update resources
-	for (int u = 1; u < MaxCosts; ++u) {
-		const resource *resource = resource::get_all()[u];
-		player.Incomes[u] = std::max(player.Incomes[u], type.Stats[player.Index].get_improve_income(resource));
+	for (const resource *resource : resource::get_all()) {
+		if (resource == defines::get()->get_time_resource()) {
+			continue;
+		}
+
+		player.set_income(resource, std::max(player.get_income(resource), type.Stats[player.Index].get_improve_income(resource)));
 	}
 	
 	if (type.Stats[player.Index].Variables[TRADECOST_INDEX].Enable) {
@@ -4826,13 +4830,14 @@ void CUnit::ChangeOwner(CPlayer &newplayer, bool show_change)
 	}
 	newplayer.Demand += Type->Stats[newplayer.Index].Variables[DEMAND_INDEX].Value;
 	newplayer.Supply += this->Variable[SUPPLY_INDEX].Value;
+
 	// Increase resource limit
-	for (int i = 0; i < MaxCosts; ++i) {
-		const resource *resource = resource::get_all()[i];
-		if (newplayer.MaxResources[i] != -1 && Type->Stats[newplayer.Index].get_storing(resource) != 0) {
-			newplayer.MaxResources[i] += Type->Stats[newplayer.Index].get_storing(resource);
+	for (const resource *resource : resource::get_all()) {
+		if (newplayer.get_max_resource(resource) != -1 && Type->Stats[newplayer.Index].get_storing(resource) != 0) {
+			newplayer.change_max_resource(resource, Type->Stats[newplayer.Index].get_storing(resource));
 		}
 	}
+
 	//Wyrmgus start
 //	if (Type->BoolFlag[BUILDING_INDEX].value && !Type->BoolFlag[WALL_INDEX].value) {
 	if (Type->BoolFlag[BUILDING_INDEX].value) {
@@ -7245,9 +7250,9 @@ static void HitUnit_Raid(CUnit *attacker, CUnit &target, int damage)
 
 		int resource_change = cost * damage * attacker->Variable[var_index].Value / target.GetModifiedVariable(HP_INDEX, VariableAttribute::Max) / 100;
 		resource_change = std::min(resource_change, target.Player->get_resource(resource, STORE_BOTH));
-		attacker->Player->change_resource(resource, resource_change);
+		attacker->Player->change_resource(resource, resource_change, false);
 		attacker->Player->TotalResources[resource->get_index()] += resource_change;
-		target.Player->change_resource(resource, -resource_change);
+		target.Player->change_resource(resource, -resource_change, false);
 	}
 }
 

@@ -23,7 +23,6 @@
 //      along with this program; if not, write to the Free Software
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
-//
 
 #include "stratagus.h"
 
@@ -218,8 +217,8 @@ void CPlayer::Load(lua_State *l)
 			for (int k = 0; k < subargs; ++k) {
 				value = LuaToString(l, j + 1, k + 1);
 				++k;
-				const int resId = GetResourceIdByName(l, value);
-				this->Resources[resId] = LuaToNumber(l, j + 1, k + 1);
+				const resource *res = resource::get(value);
+				this->set_resource(res, LuaToNumber(l, j + 1, k + 1));
 			}
 		} else if (!strcmp(value, "stored-resources")) {
 			if (!lua_istable(l, j + 1)) {
@@ -230,8 +229,8 @@ void CPlayer::Load(lua_State *l)
 				value = LuaToString(l, j + 1, k + 1);
 				++k;
 
-				const int resId = GetResourceIdByName(l, value);
-				this->StoredResources[resId] = LuaToNumber(l, j + 1, k + 1);
+				const resource *res = resource::get(value);
+				this->set_stored_resource(res, LuaToNumber(l, j + 1, k + 1));
 			}
 		} else if (!strcmp(value, "max-resources")) {
 			if (!lua_istable(l, j + 1)) {
@@ -241,8 +240,8 @@ void CPlayer::Load(lua_State *l)
 			for (int k = 0; k < subargs; ++k) {
 				value = LuaToString(l, j + 1, k + 1);
 				++k;
-				const int resId = GetResourceIdByName(l, value);
-				this->MaxResources[resId] = LuaToNumber(l, j + 1, k + 1);
+				const resource *res = resource::get(value);
+				this->max_resources[res] = LuaToNumber(l, j + 1, k + 1);
 			}
 		} else if (!strcmp(value, "last-resources")) {
 			if (!lua_istable(l, j + 1)) {
@@ -252,8 +251,8 @@ void CPlayer::Load(lua_State *l)
 			for (int k = 0; k < subargs; ++k) {
 				value = LuaToString(l, j + 1, k + 1);
 				++k;
-				const int resId = GetResourceIdByName(l, value);
-				this->LastResources[resId] = LuaToNumber(l, j + 1, k + 1);
+				const resource *res = resource::get(value);
+				this->set_last_resource(res, LuaToNumber(l, j + 1, k + 1));
 			}
 		} else if (!strcmp(value, "incomes")) {
 			if (!lua_istable(l, j + 1)) {
@@ -264,8 +263,8 @@ void CPlayer::Load(lua_State *l)
 				value = LuaToString(l, j + 1, k + 1);
 				++k;
 
-				const int resId = GetResourceIdByName(l, value);
-				this->Incomes[resId] = LuaToNumber(l, j + 1, k + 1);
+				const resource *res = resource::get(value);
+				this->set_income(res, LuaToNumber(l, j + 1, k + 1));
 			}
 		} else if (!strcmp(value, "revenue")) {
 			if (!lua_istable(l, j + 1)) {
@@ -276,8 +275,8 @@ void CPlayer::Load(lua_State *l)
 				value = LuaToString(l, j + 1, k + 1);
 				++k;
 
-				const int resId = GetResourceIdByName(l, value);
-				this->Revenue[resId] = LuaToNumber(l, j + 1, k + 1);
+				const resource *res = resource::get(value);
+				this->set_revenue(res, LuaToNumber(l, j + 1, k + 1));
 			}
 		//Wyrmgus start
 		} else if (!strcmp(value, "prices")) {
@@ -289,8 +288,8 @@ void CPlayer::Load(lua_State *l)
 				value = LuaToString(l, j + 1, k + 1);
 				++k;
 
-				const int resId = GetResourceIdByName(l, value);
-				this->Prices[resId] = LuaToNumber(l, j + 1, k + 1);
+				const resource *res = resource::get(value);
+				this->set_price(res, LuaToNumber(l, j + 1, k + 1));
 			}
 		//Wyrmgus end
 		} else if (!strcmp(value, "ai-enabled")) {
@@ -508,10 +507,11 @@ void CPlayer::Load(lua_State *l)
 			LuaError(l, "Unsupported tag: %s" _C_ value);
 		}
 	}
+
 	// Manage max
-	for (int i = 0; i < MaxCosts; ++i) {
-		if (this->MaxResources[i] != -1) {
-			this->set_resource(wyrmgus::resource::get_all()[i], this->Resources[i] + this->StoredResources[i], STORE_BOTH);
+	for (const resource *resource : resource::get_all()) {
+		if (this->get_max_resource(resource) != -1) {
+			this->set_resource(resource, this->get_resource(resource) + this->get_stored_resource(resource), STORE_BOTH);
 		}
 	}
 }
@@ -2254,65 +2254,65 @@ static int CclGetPlayerData(lua_State *l)
 		LuaCheckArgs(l, 3);
 
 		const std::string res = LuaToString(l, 3);
-		const int resId = GetResourceIdByName(l, res.c_str());
-		lua_pushnumber(l, p->Resources[resId] + p->StoredResources[resId]);
+		const resource *resource = resource::get(res);
+		lua_pushnumber(l, p->get_resource(resource) + p->get_stored_resource(resource));
 		return 1;
 	} else if (!strcmp(data, "StoredResources")) {
 		LuaCheckArgs(l, 3);
 
 		const std::string res = LuaToString(l, 3);
-		const int resId = GetResourceIdByName(l, res.c_str());
-		lua_pushnumber(l, p->StoredResources[resId]);
+		const resource *resource = resource::get(res);
+		lua_pushnumber(l, p->get_stored_resource(resource));
 		return 1;
 	} else if (!strcmp(data, "MaxResources")) {
 		LuaCheckArgs(l, 3);
 
 		const std::string res = LuaToString(l, 3);
-		const int resId = GetResourceIdByName(l, res.c_str());
-		lua_pushnumber(l, p->MaxResources[resId]);
+		const resource *resource = resource::get(res);
+		lua_pushnumber(l, p->get_max_resource(resource));
 		return 1;
 	//Wyrmgus start
 	} else if (!strcmp(data, "Prices")) {
 		LuaCheckArgs(l, 3);
 
 		const std::string res = LuaToString(l, 3);
-		const int resId = GetResourceIdByName(l, res.c_str());
-		lua_pushnumber(l, p->GetResourcePrice(resId));
+		const resource *resource = resource::get(res);
+		lua_pushnumber(l, p->get_resource_price(resource));
 		return 1;
 	} else if (!strcmp(data, "ResourceDemand")) {
 		LuaCheckArgs(l, 3);
 
 		const std::string res = LuaToString(l, 3);
-		const int resId = GetResourceIdByName(l, res.c_str());
-		lua_pushnumber(l, p->ResourceDemand[resId]);
+		const resource *resource = resource::get(res);
+		lua_pushnumber(l, p->get_resource_demand(resource));
 		return 1;
 	} else if (!strcmp(data, "StoredResourceDemand")) {
 		LuaCheckArgs(l, 3);
 
 		const std::string res = LuaToString(l, 3);
-		const int resId = GetResourceIdByName(l, res.c_str());
-		lua_pushnumber(l, p->StoredResourceDemand[resId]);
+		const resource *resource = resource::get(res);
+		lua_pushnumber(l, p->get_stored_resource_demand(resource));
 		return 1;
 	} else if (!strcmp(data, "EffectiveResourceDemand")) {
 		LuaCheckArgs(l, 3);
 
 		const std::string res = LuaToString(l, 3);
-		const int resId = GetResourceIdByName(l, res.c_str());
-		lua_pushnumber(l, p->GetEffectiveResourceDemand(resId));
+		const resource *resource = resource::get(res);
+		lua_pushnumber(l, p->get_effective_resource_demand(resource));
 		return 1;
 	} else if (!strcmp(data, "EffectiveResourceSellPrice")) {
 		LuaCheckArgs(l, 3);
 
 		const std::string res = LuaToString(l, 3);
-		const int resId = GetResourceIdByName(l, res.c_str());
-		lua_pushnumber(l, p->GetEffectiveResourceSellPrice(resId));
+		const resource *resource = resource::get(res);
+		lua_pushnumber(l, p->get_effective_resource_sell_price(resource));
 		return 1;
 	} else if (!strcmp(data, "EffectiveResourceBuyPrice")) {
 		LuaCheckArgs(l, 3);
 
 		const std::string res = LuaToString(l, 3);
-		const int resId = GetResourceIdByName(l, res.c_str());
-		lua_pushnumber(l, p->GetEffectiveResourceBuyPrice(resId));
+		const resource *resource = resource::get(res);
+		lua_pushnumber(l, p->get_effective_resource_buy_price(resource));
 		return 1;
 	} else if (!strcmp(data, "TotalPriceDifferenceWith")) {
 		LuaCheckArgs(l, 3);
@@ -2584,13 +2584,13 @@ static int CclSetPlayerData(lua_State *l)
 
 		const std::string res = LuaToString(l, 3);
 		const int resId = GetResourceIdByName(l, res.c_str());
-		p->set_resource(wyrmgus::resource::get_all()[resId], LuaToNumber(l, 4));
+		p->set_resource(wyrmgus::resource::get_all()[resId], LuaToNumber(l, 4), STORE_OVERALL);
 	} else if (!strcmp(data, "StoredResources")) {
 		LuaCheckArgs(l, 4);
 
 		const std::string res = LuaToString(l, 3);
-		const int resId = GetResourceIdByName(l, res.c_str());
-		p->set_resource(wyrmgus::resource::get_all()[resId], LuaToNumber(l, 4), STORE_BUILDING);
+		const resource *resource = resource::get(res);
+		p->set_resource(resource, LuaToNumber(l, 4), STORE_BUILDING);
 		// } else if (!strcmp(data, "UnitTypesCount")) {
 		// } else if (!strcmp(data, "AiEnabled")) {
 		// } else if (!strcmp(data, "TotalNumUnits")) {

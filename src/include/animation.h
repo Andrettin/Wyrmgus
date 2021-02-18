@@ -32,7 +32,7 @@
 #include "database/data_entry.h"
 #include "database/data_type.h"
 #include "data_type.h"
-#include "upgrade/upgrade_structs.h" // MaxCost
+#include "economy/resource.h" // MaxCosts
 
 constexpr int ANIMATIONS_DEATHTYPES = 40;
 

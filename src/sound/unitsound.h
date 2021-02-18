@@ -31,7 +31,7 @@
 #pragma once
 
 #include "animation.h" //for the ANIMATIONS_DEATHTYPES constant
-#include "upgrade/upgrade_structs.h"
+#include "economy/resource.h" // MaxCosts
 
 class CUnit;
 

@@ -471,9 +471,9 @@ void CommandProduceResource(CUnit &unit, const wyrmgus::resource *resource)
 void CommandSellResource(CUnit &unit, int resource, int player)
 {
 	if (IsUnitValidForNetwork(unit) == false) {
-		return ;
+		return;
 	}
-	unit.SellResource(resource, player);
+	unit.sell_resource(resource::get_all()[resource], player);
 }
 
 /**
@@ -485,9 +485,9 @@ void CommandSellResource(CUnit &unit, int resource, int player)
 void CommandBuyResource(CUnit &unit, int resource, int player)
 {
 	if (IsUnitValidForNetwork(unit) == false) {
-		return ;
+		return;
 	}
-	unit.BuyResource(resource, player);
+	unit.buy_resource(resource::get_all()[resource], player);
 }
 //Wyrmgus end
 

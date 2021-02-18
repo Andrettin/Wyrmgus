@@ -632,13 +632,13 @@ int COrder_Resource::StartGathering(CUnit &unit)
 	Assert(!unit.get_pixel_offset().y());
 
 	//Wyrmgus start
-	const int input_resource = wyrmgus::resource::get_all()[this->CurrentResource]->InputResource;
-	if (input_resource && (unit.Player->Resources[input_resource] + unit.Player->StoredResources[input_resource]) == 0) { //if the resource requires an input, but there's none in store, don't gather
-		const char *input_name = DefaultResourceNames[input_resource].c_str();
-		const char *input_action_name = wyrmgus::resource::get_all()[input_resource]->get_action_name().c_str();
-		unit.Player->Notify(_("Not enough %s... %s more %s."), _(input_name), _(input_action_name), _(input_name)); //added extra space to look better
+	const resource *input_resource = wyrmgus::resource::get_all()[this->CurrentResource]->get_input_resource();
+	if (input_resource != nullptr && unit.Player->get_resource(input_resource, STORE_BOTH) == 0) { //if the resource requires an input, but there's none in store, don't gather
+		const std::string &input_name = input_resource->get_identifier();
+		const std::string &input_action_name = input_resource->get_action_name();
+		unit.Player->Notify(_("Not enough %s... %s more %s."), _(input_name.c_str()), _(input_action_name.c_str()), _(input_name.c_str())); //added extra space to look better
 		if (unit.Player == CPlayer::GetThisPlayer() && unit.Player->get_civilization() != nullptr) {
-			const wyrmgus::sound *sound = unit.Player->get_civilization()->get_not_enough_resource_sound(wyrmgus::resource::get_all()[input_resource]);
+			const wyrmgus::sound *sound = unit.Player->get_civilization()->get_not_enough_resource_sound(input_resource);
 			if (sound != nullptr) {
 				PlayGameSound(sound, MaxSampleVolume);
 			}
@@ -1008,16 +1008,16 @@ int COrder_Resource::GatherResource(CUnit &unit)
 				//Wyrmgus start
 //				unit.ResourcesHeld += addload;
 //				source->ResourcesHeld -= addload;
-				const int input_resource = wyrmgus::resource::get_all()[this->CurrentResource]->InputResource;
-				if (input_resource) {
-					addload = std::min(unit.Player->Resources[input_resource] + unit.Player->StoredResources[input_resource], addload);
+				const resource *input_resource = wyrmgus::resource::get_all()[this->CurrentResource]->get_input_resource();
+				if (input_resource != nullptr) {
+					addload = std::min(unit.Player->get_resource(input_resource, STORE_BOTH), addload);
 					
 					if (!addload) {
-						const char *input_name = DefaultResourceNames[input_resource].c_str();
-						const char *input_action_name = wyrmgus::resource::get_all()[input_resource]->get_action_name().c_str();
+						const char *input_name = input_resource->get_identifier().c_str();
+						const char *input_action_name = input_resource->get_action_name().c_str();
 						unit.Player->Notify(_("Not enough %s... %s more %s."), _(input_name), _(input_action_name), _(input_name));
 						if (unit.Player == CPlayer::GetThisPlayer() && unit.Player->get_civilization() != nullptr) {
-							const wyrmgus::sound *sound = unit.Player->get_civilization()->get_not_enough_resource_sound(wyrmgus::resource::get_all()[input_resource]);
+							const wyrmgus::sound *sound = unit.Player->get_civilization()->get_not_enough_resource_sound(input_resource);
 							if (sound != nullptr) {
 								PlayGameSound(sound, MaxSampleVolume);
 							}
@@ -1030,7 +1030,7 @@ int COrder_Resource::GatherResource(CUnit &unit)
 						return 0;
 					}
 					
-					unit.Player->change_resource(wyrmgus::resource::get_all()[input_resource], -addload, true);
+					unit.Player->change_resource(input_resource, -addload, true);
 				}
 				unit.ChangeResourcesHeld(addload);
 				if (!source->Type->BoolFlag[INEXHAUSTIBLE_INDEX].value) {
@@ -1347,9 +1347,9 @@ int COrder_Resource::MoveToDepot(CUnit &unit)
 	}
 
 	// Update resource.
-	const wyrmgus::resource *final_resource = wyrmgus::resource::get_all()[this->CurrentResource]->get_final_resource();
-	const int processed_resource_change = unit.ResourcesHeld * player.Incomes[this->CurrentResource] / 100;
-	int final_resource_change = processed_resource_change * wyrmgus::resource::get_all()[this->CurrentResource]->get_final_resource_conversion_rate() / 100;
+	const resource *final_resource = resource::get_all()[this->CurrentResource]->get_final_resource();
+	const int processed_resource_change = unit.ResourcesHeld * player.get_income(resource::get_all()[this->CurrentResource]) / 100;
+	int final_resource_change = processed_resource_change * resource::get_all()[this->CurrentResource]->get_final_resource_conversion_rate() / 100;
 	
 	if (player.AiEnabled) {
 		if (GameSettings.Difficulty == DifficultyEasy) {

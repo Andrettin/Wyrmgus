@@ -51,17 +51,17 @@ public:
 
 	virtual void do_assignment_effect(CPlayer *player) const override
 	{
-		player->set_resource(this->resource, this->quantity);
+		player->set_resource(this->resource, this->quantity, STORE_OVERALL);
 	}
 
 	virtual void do_addition_effect(CPlayer *player) const override
 	{
-		player->change_resource(this->resource, this->quantity);
+		player->change_resource(this->resource, this->quantity, false);
 	}
 
 	virtual void do_subtraction_effect(CPlayer *player) const override
 	{
-		player->change_resource(this->resource, -this->quantity);
+		player->change_resource(this->resource, -this->quantity, false);
 	}
 
 	virtual std::string get_assignment_string() const override

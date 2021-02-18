@@ -1377,9 +1377,9 @@ static int CclAiDump(lua_State *l)
 			//
 
 			printf("------\n");
-			for (size_t i = 0; i < wyrmgus::resource::get_all().size(); ++i) {
-				printf("%s(%4d, %4d/%4d) ", DefaultResourceNames[i].c_str(),
-					   aip.Resources[i], aip.StoredResources[i], aip.MaxResources[i]);
+			for (const resource *resource : resource::get_all()) {
+				printf("%s(%4d, %4d/%4d) ", resource->get_identifier().c_str(),
+					   aip.get_resource(resource), aip.get_stored_resource(resource), aip.get_max_resource(resource));
 			}
 			printf("\n");
 			printf("Player %d:", aip.Index);

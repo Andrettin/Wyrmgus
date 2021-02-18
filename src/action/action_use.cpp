@@ -227,8 +227,8 @@ bool COrder_Use::ParseSpecificData(lua_State *l, int &j, const char *value, cons
 					if (unit.Player == CPlayer::GetThisPlayer()) {
 						unit.Player->Notify(NotifyGreen, unit.tilePos, unit.MapLayer->ID, _("Gained %d %s"), goal->ResourcesHeld, DefaultResourceNames[goal->Type->get_given_resource()->get_index()].c_str());
 					}
-					unit.Player->change_resource(goal->Type->get_given_resource(), goal->ResourcesHeld);
-					unit.Player->TotalResources[goal->Type->get_given_resource()->get_index()] += (goal->ResourcesHeld * unit.Player->Incomes[goal->Type->get_given_resource()->get_index()]) / 100;
+					unit.Player->change_resource(goal->Type->get_given_resource(), goal->ResourcesHeld, false);
+					unit.Player->TotalResources[goal->Type->get_given_resource()->get_index()] += goal->ResourcesHeld * unit.Player->get_income(goal->Type->get_given_resource()) / 100;
 				} else if (goal->Variable[HITPOINTHEALING_INDEX].Value > 0) {
 					const int hp_healed = std::min(goal->Variable[HITPOINTHEALING_INDEX].Value, (unit.GetModifiedVariable(HP_INDEX, VariableAttribute::Max) - unit.Variable[HP_INDEX].Value));
 					if (unit.Player == CPlayer::GetThisPlayer()) {

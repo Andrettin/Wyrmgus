@@ -27,6 +27,7 @@
 
 #pragma once
 
+#include "economy/resource.h"
 #include "economy/resource_container.h"
 #include "map/landmass_container.h"
 #include "player_container.h"
@@ -36,7 +37,6 @@
 //Wyrmgus end
 #include "unit/unit_class_container.h"
 #include "unit/unit_type_container.h"
-#include "upgrade/upgrade_structs.h"
 #include "vec2i.h"
 
 constexpr int STORE_OVERALL = 0;
@@ -323,9 +323,237 @@ private:
 
 public:
 	//Wyrmgus start
-//	inline void SetStartView(const Vec2i &pos) { StartPos = pos; }
-	inline void SetStartView(const Vec2i &pos, int z) { StartPos = pos; StartMapLayer = z; }
+//	void SetStartView(const Vec2i &pos) { StartPos = pos; }
+	void SetStartView(const Vec2i &pos, int z) { StartPos = pos; StartMapLayer = z; }
 	//Wyrmgus end
+
+	int get_resource(const resource *resource) const
+	{
+		const auto find_iterator = this->resources.find(resource);
+
+		if (find_iterator != this->resources.end()) {
+			return find_iterator->second;
+		}
+
+		return 0;
+	}
+
+	void set_resource(const resource *resource, const int quantity)
+	{
+		if (quantity <= 0) {
+			if (this->resources.contains(resource)) {
+				this->resources.erase(resource);
+			}
+		} else {
+			this->resources[resource] = quantity;
+		}
+	}
+
+	void change_resource(const resource *resource, const int quantity)
+	{
+		this->set_resource(resource, this->get_resource(resource) + quantity);
+	}
+
+	int get_max_resource(const resource *resource) const
+	{
+		const auto find_iterator = this->max_resources.find(resource);
+
+		if (find_iterator != this->max_resources.end()) {
+			return find_iterator->second;
+		}
+
+		return 0;
+	}
+
+	void set_max_resource(const resource *resource, const int quantity)
+	{
+		if (quantity == 0) {
+			if (this->max_resources.contains(resource)) {
+				this->max_resources.erase(resource);
+			}
+		} else {
+			this->max_resources[resource] = quantity;
+		}
+	}
+
+	void change_max_resource(const resource *resource, const int quantity)
+	{
+		this->set_max_resource(resource, this->get_max_resource(resource) + quantity);
+	}
+
+	int get_last_resource(const resource *resource) const
+	{
+		const auto find_iterator = this->last_resources.find(resource);
+
+		if (find_iterator != this->last_resources.end()) {
+			return find_iterator->second;
+		}
+
+		return 0;
+	}
+
+	void set_last_resource(const resource *resource, const int quantity)
+	{
+		if (quantity == 0) {
+			if (this->last_resources.contains(resource)) {
+				this->last_resources.erase(resource);
+			}
+		} else {
+			this->last_resources[resource] = quantity;
+		}
+	}
+
+	int get_stored_resource(const resource *resource) const
+	{
+		const auto find_iterator = this->stored_resources.find(resource);
+
+		if (find_iterator != this->stored_resources.end()) {
+			return find_iterator->second;
+		}
+
+		return 0;
+	}
+
+	void set_stored_resource(const resource *resource, const int quantity)
+	{
+		if (quantity == 0) {
+			if (this->stored_resources.contains(resource)) {
+				this->stored_resources.erase(resource);
+			}
+		} else {
+			this->stored_resources[resource] = quantity;
+		}
+	}
+
+	void change_stored_resource(const resource *resource, const int quantity)
+	{
+		this->set_stored_resource(resource, this->get_stored_resource(resource) + quantity);
+	}
+
+	int get_resource_demand(const resource *resource) const
+	{
+		const auto find_iterator = this->resource_demands.find(resource);
+
+		if (find_iterator != this->resource_demands.end()) {
+			return find_iterator->second;
+		}
+
+		return 0;
+	}
+
+	void set_resource_demand(const resource *resource, const int quantity)
+	{
+		if (quantity == 0) {
+			if (this->resource_demands.contains(resource)) {
+				this->resource_demands.erase(resource);
+			}
+		} else {
+			this->resource_demands[resource] = quantity;
+		}
+	}
+
+	void change_resource_demand(const resource *resource, const int quantity)
+	{
+		this->set_resource_demand(resource, this->get_resource_demand(resource) + quantity);
+	}
+
+	int get_stored_resource_demand(const resource *resource) const
+	{
+		const auto find_iterator = this->stored_resource_demands.find(resource);
+
+		if (find_iterator != this->stored_resource_demands.end()) {
+			return find_iterator->second;
+		}
+
+		return 0;
+	}
+
+	void set_stored_resource_demand(const resource *resource, const int quantity)
+	{
+		if (quantity == 0) {
+			if (this->stored_resource_demands.contains(resource)) {
+				this->stored_resource_demands.erase(resource);
+			}
+		} else {
+			this->stored_resource_demands[resource] = quantity;
+		}
+	}
+
+	void change_stored_resource_demand(const resource *resource, const int quantity)
+	{
+		this->set_stored_resource_demand(resource, this->get_stored_resource_demand(resource) + quantity);
+	}
+
+	int get_income(const resource *resource) const
+	{
+		const auto find_iterator = this->incomes.find(resource);
+
+		if (find_iterator != this->incomes.end()) {
+			return find_iterator->second;
+		}
+
+		return 0;
+	}
+
+	void set_income(const resource *resource, const int quantity)
+	{
+		if (quantity == 0) {
+			if (this->incomes.contains(resource)) {
+				this->incomes.erase(resource);
+			}
+		} else {
+			this->incomes[resource] = quantity;
+		}
+	}
+
+	int get_revenue(const resource *resource) const
+	{
+		const auto find_iterator = this->revenues.find(resource);
+
+		if (find_iterator != this->revenues.end()) {
+			return find_iterator->second;
+		}
+
+		return 0;
+	}
+
+	void set_revenue(const resource *resource, const int quantity)
+	{
+		if (quantity == 0) {
+			if (this->revenues.contains(resource)) {
+				this->revenues.erase(resource);
+			}
+		} else {
+			this->revenues[resource] = quantity;
+		}
+	}
+
+	int get_price(const resource *resource) const
+	{
+		const auto find_iterator = this->prices.find(resource);
+
+		if (find_iterator != this->prices.end()) {
+			return find_iterator->second;
+		}
+
+		return 0;
+	}
+
+	void set_price(const resource *resource, const int quantity)
+	{
+		if (quantity == 0) {
+			if (this->prices.contains(resource)) {
+				this->prices.erase(resource);
+			}
+		} else {
+			this->prices[resource] = quantity;
+		}
+	}
+
+	void change_price(const resource *resource, const int quantity)
+	{
+		this->set_price(resource, this->get_price(resource) + quantity);
+	}
 
 	const wyrmgus::unit_type_map<std::vector<CUnit *>> &get_units_by_type() const
 	{
@@ -368,17 +596,19 @@ public:
 
 	void set_revealed(const bool revealed);
 
-	int Resources[MaxCosts];      /// resources in overall store
-	int MaxResources[MaxCosts];   /// max resources can be stored
-	int StoredResources[MaxCosts];/// resources in store buildings (can't exceed MaxResources)
-	int LastResources[MaxCosts];  /// last values for revenue
-	int Incomes[MaxCosts];        /// income of the resources
-	int Revenue[MaxCosts];        /// income rate of the resources
+private:
+	resource_map<int> resources;      /// resources in overall store
+	resource_map<int> max_resources;   /// max resources can be stored
+	resource_map<int> stored_resources;/// resources in store buildings (can't exceed MaxResources)
+	resource_map<int> last_resources;  /// last values for revenue
+	resource_map<int> incomes;        /// income of the resources
+	resource_map<int> revenues;       /// income rate of the resources
 	//Wyrmgus start
-	int Prices[MaxCosts];		  /// price of each resource
-	int ResourceDemand[MaxCosts]; /// demand for the resources
-	int StoredResourceDemand[MaxCosts]; /// stored demand for the resources (converted into a trade action when reaches 100)
+	resource_map<int> prices;		  /// price of each resource
+	resource_map<int> resource_demands; /// demand for the resources
+	resource_map<int> stored_resource_demands; /// stored demand for the resources (converted into a trade action when reaches 100)
 	
+public:
 	int TradeCost;					/// cost of trading
 	//Wyrmgus end
 
@@ -458,25 +688,25 @@ public:
 	/// Get a resource of the player
 	int get_resource(const wyrmgus::resource *resource, const int type) const;
 	/// Adds/subtracts some resources to/from the player store
-	void change_resource(const wyrmgus::resource *resource, const int value, const bool store = false);
+	void change_resource(const wyrmgus::resource *resource, const int value, const bool store);
 	/// Set a resource of the player
-	void set_resource(const wyrmgus::resource *resource, const int value, const int type = STORE_OVERALL);
+	void set_resource(const wyrmgus::resource *resource, const int value, const int type);
 	/// Check, if there enough resources for action.
-	bool CheckResource(const int resource, const int value);
+	bool check_resource(const resource *resource, const int value);
 	//Wyrmgus start
 	/// Increase resource price
-	void IncreaseResourcePrice(const int resource);
+	void increase_resource_price(const resource *resource);
 	/// Decrease resource price
-	void DecreaseResourcePrice(const int resource);
+	void decrease_resource_price(const resource *resource);
 	/// Converges prices with another player
 	int ConvergePricesWith(CPlayer &player, int max_convergences);
 	/// Get the resource price
-	int GetResourcePrice(const int resource) const;
+	int get_resource_price(const resource *resource) const;
 	/// Get the effective resource demand for the player, given the current prices
-	int GetEffectiveResourceDemand(const int resource) const;
+	int get_effective_resource_demand(const resource *resource) const;
 	
-	int GetEffectiveResourceSellPrice(const int resource, int traded_quantity = 100) const;
-	int GetEffectiveResourceBuyPrice(const int resource, int traded_quantity = 100) const;
+	int get_effective_resource_sell_price(const resource *resource, const int traded_quantity = 100) const;
+	int get_effective_resource_buy_price(const resource *resource, const int traded_quantity = 100) const;
 
 	/// Get the total price difference between this player and another one
 	int GetTotalPriceDifferenceWith(const CPlayer &player) const;

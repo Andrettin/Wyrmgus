@@ -101,8 +101,6 @@ static int AiCheckCosts(const resource_map<int> &costs)
 	}
 
 	int err = 0;
-	const int *resources = AiPlayer->Player->Resources;
-	const int *storedresources = AiPlayer->Player->StoredResources;
 
 	for (const auto &[resource, cost] : costs) {
 		if (resource == defines::get()->get_time_resource()) {
@@ -115,7 +113,7 @@ static int AiCheckCosts(const resource_map<int> &costs)
 
 		const int resource_index = resource->get_index();
 
-		if (resources[resource_index] + storedresources[resource_index] - used[resource] < cost - AiPlayer->get_reserve(resource)) {
+		if (AiPlayer->Player->get_resource(resource) + AiPlayer->Player->get_stored_resource(resource) - used[resource] < cost - AiPlayer->get_reserve(resource)) {
 			err |= 1 << resource_index;
 		}
 	}
@@ -1493,13 +1491,13 @@ static bool CmpWorkers(const CUnit *lhs, const CUnit *rhs)
 }
 
 //Wyrmgus start
-static bool AiCanSellResource(int resource)
+static bool AiCanSellResource(const resource *resource)
 {
-	if ((AiPlayer->Player->Resources[resource] + AiPlayer->Player->StoredResources[resource]) <= (AiPlayer->get_collect(resource::get_all()[resource]) * 100)) {
+	if (AiPlayer->Player->get_resource(resource, STORE_BOTH) <= (AiPlayer->get_collect(resource) * 100)) {
 		return false;
 	}
 	
-	if ((AiPlayer->NeededMask & ((long long int) 1 << resource))) {
+	if ((AiPlayer->NeededMask & ((long long int) 1 << resource->get_index()))) {
 		return false;
 	}
 	
@@ -1525,7 +1523,7 @@ static void AiProduceResources()
 		const wyrmgus::resource *chosen_resource = nullptr;
 		int best_value = 0;
 		for (const wyrmgus::resource *resource : produced_resources) {
-			if (!resource->LuxuryResource && AiCanSellResource(resource->get_index())) {
+			if (!resource->LuxuryResource && AiCanSellResource(resource)) {
 				continue;
 			}
 			
@@ -1533,15 +1531,15 @@ static void AiProduceResources()
 				continue;
 			}
 			
-			const int input_resource = resource->InputResource;
+			const wyrmgus::resource *input_resource = resource->get_input_resource();
 
-			if (input_resource && !AiCanSellResource(input_resource) && !(input_resource == CopperCost && resource->LuxuryResource)) { //if the resource is a luxury resource and the input is copper skip this check, the AI should produce it as long as its price is greater than that of copper
+			if (input_resource != nullptr && !AiCanSellResource(input_resource) && !(input_resource == defines::get()->get_wealth_resource() && resource->LuxuryResource)) { //if the resource is a luxury resource and the input is copper skip this check, the AI should produce it as long as its price is greater than that of copper
 				continue;
 			}
 			
-			int resource_value = AiPlayer->Player->GetEffectiveResourceSellPrice(resource->get_index());
+			int resource_value = AiPlayer->Player->get_effective_resource_sell_price(resource);
 			if (input_resource) {
-				resource_value -= AiPlayer->Player->GetEffectiveResourceSellPrice(input_resource);
+				resource_value -= AiPlayer->Player->get_effective_resource_sell_price(input_resource);
 			}
 
 			if (resource_value > best_value) {
@@ -1816,17 +1814,23 @@ static void AiCollectResources()
 	
 	//Wyrmgus start
 	//buy or sell resources
-	for (int c = 1; c < MaxCosts; ++c) {
-		if (c == CopperCost) {
+	for (const resource *resource : resource::get_all()) {
+		if (resource == defines::get()->get_time_resource()) {
 			continue;
 		}
-		
+
+		if (resource == defines::get()->get_wealth_resource()) {
+			continue;
+		}
+
+		const int c = resource->get_index();
+
 		//buy resource
 		if (
 			percent[c] > 0 //don't buy a resource if the AI isn't instructed to collect that resource
 			&& num_units_assigned[c] == 0 //don't buy a resource if there are already workers assigned to harvesting it
-			&& AiCanSellResource(CopperCost)
-			&& !AiCanSellResource(c) //if there's enough of the resource stored to sell, then there's no need to buy it
+			&& AiCanSellResource(defines::get()->get_wealth_resource())
+			&& !AiCanSellResource(resource) //if there's enough of the resource stored to sell, then there's no need to buy it
 		) {
 			if ((c - 1) >= ((int) AiHelpers.BuyMarkets.size())) {
 				continue;
@@ -1852,12 +1856,12 @@ static void AiCollectResources()
 		} else if (
 			(percent[c] == 0 || num_units_assigned[c] > 0) //only sell the resource if either the AI isn't instructed to collect it, or if there are harvesters assigned to it
 			&& num_units_assigned[CopperCost] == 0 //don't sell a resource if there are already workers assigned to obtaining copper
-			&& !AiCanSellResource(CopperCost)
-			&& AiCanSellResource(c)
+			&& !AiCanSellResource(defines::get()->get_wealth_resource())
+			&& AiCanSellResource(resource)
 		) {
 			bool is_luxury_input = false;
 			for (int i = 1; i < MaxCosts; ++i) {
-				if (wyrmgus::resource::get_all()[i]->LuxuryResource && wyrmgus::resource::get_all()[i]->InputResource == c && num_units_assigned[i] > 0) {
+				if (wyrmgus::resource::get_all()[i]->LuxuryResource && wyrmgus::resource::get_all()[i]->get_input_resource() != nullptr && wyrmgus::resource::get_all()[i]->get_input_resource() == resource && num_units_assigned[i] > 0) {
 					is_luxury_input = true;
 					break;
 				}
@@ -2082,9 +2086,7 @@ static void AiCheckRepair()
 					continue;
 				}
 
-				const int resource_index = resource->get_index();
-
-				if (cost != 0 && (AiPlayer->Player->Resources[resource_index] + AiPlayer->Player->StoredResources[resource_index]) < 99) {
+				if (cost != 0 && AiPlayer->Player->get_resource(resource, STORE_BOTH) < 99) {
 					repair_flag = false;
 					break;
 				}
@@ -2122,10 +2124,8 @@ static void AiCheckRepair()
 						continue;
 					}
 
-					const int resource_index = resource->get_index();
-
 					// FIXME: the resources don't necessarily have to be in storage
-					if (AiPlayer->Player->Resources[resource_index] + AiPlayer->Player->StoredResources[resource_index] < cost) {
+					if (AiPlayer->Player->get_resource(resource, STORE_BOTH) < cost) {
 						enough_resources = false;
 						break;
 					}

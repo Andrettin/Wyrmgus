@@ -924,9 +924,9 @@ void map_template::apply(const QPoint &template_start_pos, const QPoint &map_sta
 		if (current_faction != nullptr && !this->IsSubtemplateArea() && CPlayer::GetThisPlayer()->Faction != current_faction->ID) {
 			CPlayer::GetThisPlayer()->set_civilization(current_faction->get_civilization());
 			CPlayer::GetThisPlayer()->SetFaction(current_faction);
-			CPlayer::GetThisPlayer()->Resources[CopperCost] = 2500; // give the player enough resources to start up
-			CPlayer::GetThisPlayer()->Resources[WoodCost] = 2500;
-			CPlayer::GetThisPlayer()->Resources[StoneCost] = 2500;
+			CPlayer::GetThisPlayer()->set_resource(defines::get()->get_wealth_resource(), 2500); // give the player enough resources to start up
+			CPlayer::GetThisPlayer()->set_resource(resource::get_all()[WoodCost], 2500);
+			CPlayer::GetThisPlayer()->set_resource(resource::get_all()[StoneCost], 2500);
 		}
 	}
 	

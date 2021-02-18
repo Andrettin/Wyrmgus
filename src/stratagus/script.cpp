@@ -824,46 +824,36 @@ static int GetPlayerData(const int player_index, const char *prop, const char *a
 	if (!strcmp(prop, "RaceName")) {
 		return player->Race;
 	} else if (!strcmp(prop, "Resources")) {
-		const wyrmgus::resource *resource = wyrmgus::resource::get(arg);
-		const int res_id = resource->get_index();
-		return player->Resources[res_id] + player->StoredResources[res_id];
+		const resource *resource = resource::get(arg);
+		return player->get_resource(resource, STORE_BOTH);
 	} else if (!strcmp(prop, "StoredResources")) {
-		const wyrmgus::resource *resource = wyrmgus::resource::get(arg);
-		const int res_id = resource->get_index();
-		return player->StoredResources[res_id];
+		const resource *resource = resource::get(arg);
+		return player->get_stored_resource(resource);
 	} else if (!strcmp(prop, "MaxResources")) {
-		const wyrmgus::resource *resource = wyrmgus::resource::get(arg);
-		const int res_id = resource->get_index();
-		return player->MaxResources[res_id];
+		const resource *resource = resource::get(arg);
+		return player->get_max_resource(resource);
 	} else if (!strcmp(prop, "Incomes")) {
-		const wyrmgus::resource *resource = wyrmgus::resource::get(arg);
-		const int res_id = resource->get_index();
-		return player->Incomes[res_id];
+		const resource *resource = resource::get(arg);
+		return player->get_income(resource);
 		//Wyrmgus start
 	} else if (!strcmp(prop, "Prices")) {
-		const wyrmgus::resource *resource = wyrmgus::resource::get(arg);
-		const int res_id = resource->get_index();
-		return player->GetResourcePrice(res_id);
+		const resource *resource = resource::get(arg);
+		return player->get_resource_price(resource);
 	} else if (!strcmp(prop, "ResourceDemand")) {
-		const wyrmgus::resource *resource = wyrmgus::resource::get(arg);
-		const int res_id = resource->get_index();
-		return player->ResourceDemand[res_id];
+		const resource *resource = resource::get(arg);
+		return player->get_resource_demand(resource);
 	} else if (!strcmp(prop, "StoredResourceDemand")) {
-		const wyrmgus::resource *resource = wyrmgus::resource::get(arg);
-		const int res_id = resource->get_index();
-		return player->StoredResourceDemand[res_id];
+		const resource *resource = resource::get(arg);
+		return player->get_stored_resource_demand(resource);
 	} else if (!strcmp(prop, "EffectiveResourceDemand")) {
-		const wyrmgus::resource *resource = wyrmgus::resource::get(arg);
-		const int res_id = resource->get_index();
-		return player->GetEffectiveResourceDemand(res_id);
+		const resource *resource = resource::get(arg);
+		return player->get_effective_resource_demand(resource);
 	} else if (!strcmp(prop, "EffectiveResourceBuyPrice")) {
-		const wyrmgus::resource *resource = wyrmgus::resource::get(arg);
-		const int res_id = resource->get_index();
-		return player->GetEffectiveResourceBuyPrice(res_id);
+		const resource *resource = resource::get(arg);
+		return player->get_effective_resource_buy_price(resource);
 	} else if (!strcmp(prop, "EffectiveResourceSellPrice")) {
-		const wyrmgus::resource *resource = wyrmgus::resource::get(arg);
-		const int res_id = resource->get_index();
-		return player->GetEffectiveResourceSellPrice(res_id);
+		const resource *resource = resource::get(arg);
+		return player->get_effective_resource_sell_price(resource);
 	} else if (!strcmp(prop, "TradeCost")) {
 		return player->TradeCost;
 		//Wyrmgus end
@@ -1882,18 +1872,19 @@ std::string EvalString(const StringDesc *s)
 			if (resource != nullptr) {
 				std::string improve_incomes;
 				bool first = true;
-				if (CPlayer::GetThisPlayer()->Incomes[(*resource)->get_index()] > (*resource)->get_default_income()) {
+				if (CPlayer::GetThisPlayer()->get_income((*resource)) > (*resource)->get_default_income()) {
 					first = false;
 					improve_incomes += (*resource)->get_name();
 					improve_incomes += " Processing Bonus: +";
-					improve_incomes += std::to_string(CPlayer::GetThisPlayer()->Incomes[(*resource)->get_index()] - (*resource)->get_default_income());
+					improve_incomes += std::to_string(CPlayer::GetThisPlayer()->get_income((*resource)) - (*resource)->get_default_income());
 					improve_incomes += "%";
 				}
 				for (const wyrmgus::resource *child_resource : (*resource)->ChildResources) {
 					if (child_resource->get_index() == TradeCost || child_resource->Hidden) {
 						continue;
 					}
-					if (CPlayer::GetThisPlayer()->Incomes[child_resource->get_index()] > child_resource->get_default_income()) {
+
+					if (CPlayer::GetThisPlayer()->get_income(child_resource) > child_resource->get_default_income()) {
 						if (!first) {
 							improve_incomes += "\n";
 						} else {
@@ -1901,7 +1892,7 @@ std::string EvalString(const StringDesc *s)
 						}
 						improve_incomes += child_resource->get_name();
 						improve_incomes += " Processing Bonus: +";
-						improve_incomes += std::to_string(CPlayer::GetThisPlayer()->Incomes[child_resource->get_index()] - child_resource->get_default_income());
+						improve_incomes += std::to_string(CPlayer::GetThisPlayer()->get_income(child_resource) - child_resource->get_default_income());
 						improve_incomes += "%";
 					}
 				}
