@@ -1844,6 +1844,14 @@ if(ENABLE_DEV)
 	install(FILES ${gameheaders_HDRS} DESTINATION ${STRATAGUS_HEADERS})
 endif()
 
+########### packages ##################
+
+set(CPACK_GENERATOR DEB)
+set(CPACK_PACKAGE_CONTACT a.karmanov@insiberia.net)
+set(CPACK_DEBIAN_PACKAGE_SHLIBDEPS ON)
+
+include(CPack)
+
 ########### clean files ###############
 
 set_directory_properties(PROPERTIES ADDITIONAL_MAKE_CLEAN_FILES "${CLEAN_FILES}")
