@@ -32,6 +32,7 @@
 #include "database/detailed_data_entry.h"
 #include "database/data_type.h"
 #include "data_type.h"
+#include "economy/resource.h"
 #include "missileconfig.h"
 #include "ui/icon.h"
 #include "upgrade/upgrade_structs.h"

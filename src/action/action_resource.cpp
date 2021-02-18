@@ -777,8 +777,9 @@ int COrder_Resource::StartGathering(CUnit &unit)
 */
 static void AnimateActionHarvest(CUnit &unit)
 {
-	Assert(unit.get_animation_set()->Harvest[unit.CurrentResource]);
-	UnitShowAnimation(unit, unit.get_animation_set()->Harvest[unit.CurrentResource].get());
+	const CAnimation *animation = unit.get_animation_set()->get_harvest_animation(resource::get_all()[unit.CurrentResource]);
+	Assert(animation != nullptr);
+	UnitShowAnimation(unit, animation);
 }
 
 /**

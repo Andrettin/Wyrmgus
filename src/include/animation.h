@@ -32,13 +32,15 @@
 #include "database/data_entry.h"
 #include "database/data_type.h"
 #include "data_type.h"
-#include "economy/resource.h" // MaxCosts
+#include "economy/resource_container.h"
 
 constexpr int ANIMATIONS_DEATHTYPES = 40;
 
 class CFile;
 class CUnit;
 struct lua_State;
+
+static int CclDefineAnimations(lua_State *l);
 
 namespace wyrmgus {
 	class animation_set;
@@ -161,13 +163,31 @@ public:
 
 	virtual void process_sml_scope(const sml_data &scope) override;
 	virtual void initialize() override;
+
+	const resource_map<std::unique_ptr<CAnimation>> &get_harvest_animations() const
+	{
+		return this->harvest_animations;
+	}
+
+	const CAnimation *get_harvest_animation(const resource *resource) const
+	{
+		const auto find_iterator = this->harvest_animations.find(resource);
+
+		if (find_iterator != this->harvest_animations.end()) {
+			return find_iterator->second.get();
+		}
+
+		return nullptr;
+	}
 	
 public:
 	std::unique_ptr<CAnimation> Attack;
 	std::unique_ptr<CAnimation> RangedAttack;
 	std::unique_ptr<CAnimation> Build;
 	std::unique_ptr<CAnimation> Death[ANIMATIONS_DEATHTYPES + 1];
-	std::unique_ptr<CAnimation> Harvest[MaxCosts];
+private:
+	resource_map<std::unique_ptr<CAnimation>> harvest_animations;
+public:
 	std::unique_ptr<CAnimation> Move;
 	std::unique_ptr<CAnimation> Repair;
 	std::unique_ptr<CAnimation> Research;
@@ -176,6 +196,8 @@ public:
 	std::unique_ptr<CAnimation> Still;
 	std::unique_ptr<CAnimation> Train;
 	std::unique_ptr<CAnimation> Upgrade;
+
+	friend int ::CclDefineAnimations(lua_State *l);
 };
 
 }

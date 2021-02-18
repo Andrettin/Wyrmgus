@@ -307,9 +307,10 @@ static void MapAnimSounds(wyrmgus::unit_type &type)
 	MapAnimSounds2(type.get_animation_set()->Research.get());
 	MapAnimSounds2(type.get_animation_set()->Upgrade.get());
 	MapAnimSounds2(type.get_animation_set()->Build.get());
-	for (int i = 0; i < MaxCosts; ++i) {
-		MapAnimSounds2(type.get_animation_set()->Harvest[i].get());
+	for (const auto &kv_pair : type.get_animation_set()->get_harvest_animations()) {
+		MapAnimSounds2(kv_pair.second.get());
 	}
+
 	//Wyrmgus start
 	for (const auto &variation : type.get_variations()) {
 		if (variation == nullptr) {
@@ -334,8 +335,8 @@ static void MapAnimSounds(wyrmgus::unit_type &type)
 		MapAnimSounds2(variation->get_animation_set()->Research.get());
 		MapAnimSounds2(variation->get_animation_set()->Upgrade.get());
 		MapAnimSounds2(variation->get_animation_set()->Build.get());
-		for (int i = 0; i < MaxCosts; ++i) {
-			MapAnimSounds2(variation->get_animation_set()->Harvest[i].get());
+		for (const auto &kv_pair : variation->get_animation_set()->get_harvest_animations()) {
+			MapAnimSounds2(kv_pair.second.get());
 		}
 	}
 	//Wyrmgus end

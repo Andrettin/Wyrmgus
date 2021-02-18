@@ -613,7 +613,7 @@ void animation_set::process_sml_scope(const sml_data &scope)
 		} else if (tag == "build") {
 			this->Build = std::move(first_anim);
 		} else if (tag == "harvest") {
-			this->Harvest[resource->get_index()] = std::move(first_anim);
+			this->harvest_animations[resource] = std::move(first_anim);
 		}
 	}
 }
@@ -632,8 +632,9 @@ void animation_set::initialize()
 	animation_set::AddAnimationToArray(this->Move.get());
 	animation_set::AddAnimationToArray(this->Repair.get());
 	animation_set::AddAnimationToArray(this->Train.get());
-	for (int i = 0; i != MaxCosts; ++i) {
-		animation_set::AddAnimationToArray(this->Harvest[i].get());
+
+	for (const auto &kv_pair : this->harvest_animations) {
+		animation_set::AddAnimationToArray(kv_pair.second.get());
 	}
 
 	data_entry::initialize();
@@ -798,8 +799,9 @@ static int CclDefineAnimations(lua_State *l)
 		} else if (!strcmp(value, "Build")) {
 			anims->Build = ParseAnimation(l, -1);
 		} else if (!strncmp(value, "Harvest_", 8)) {
-			const int res = GetResourceIdByName(l, value + 8);
-			anims->Harvest[res] = ParseAnimation(l, -1);
+			const std::string resource_str = value + 8;
+			const resource *res = resource::get(resource_str);
+			anims->harvest_animations[res] = ParseAnimation(l, -1);
 		} else {
 			LuaError(l, "Unsupported animation: %s" _C_ value);
 		}
