@@ -967,7 +967,7 @@ public:
 		return (unit->Type->can_store(this->resource) && !unit->IsUnusable());
 	}
 private:
-	const resource *resource = nullptr;
+	const wyrmgus::resource *resource = nullptr;
 };
 
 /**
