@@ -104,6 +104,7 @@
 #include "util/qunique_ptr.h"
 #include "util/string_util.h"
 #include "util/string_conversion_util.h"
+#include "util/thread_pool.h"
 #include "video/font.h"
 #include "video/font_color.h"
 
@@ -643,9 +644,20 @@ void database::parse()
 		const std::filesystem::path &path = kv_pair.first;
 		const data_module *data_module = kv_pair.second;
 
+		std::vector<std::future<void>> futures;
+
 		//parse the files in each data type's folder
 		for (const std::unique_ptr<data_type_metadata> &metadata : this->metadata) {
-			metadata->get_parsing_function()(path, data_module);
+			std::future<void> future = thread_pool::get()->async([&]() {
+				metadata->get_parsing_function()(path, data_module);
+			});
+
+			futures.push_back(std::move(future));
+		}
+
+		//we need to wait for the futures per module, so that this remains lock-free, as each data type has its own parsed SML data list
+		for (std::future<void> &future : futures) {
+			future.wait();
 		}
 	}
 }
