@@ -31,6 +31,7 @@
 #include "util/container_util.h"
 #include "util/point_util.h"
 #include "util/size_util.h"
+#include "util/thread_pool.h"
 #include "xbrz.h"
 
 namespace wyrmgus::image {
@@ -80,25 +81,36 @@ QImage scale(const QImage &src_image, const int scale_factor, const QSize &old_f
 	const int vertical_frame_count = src_image.height() / old_frame_size.height();
 
 	//scale each frame individually
+	std::vector<std::future<void>> futures;
+
 	for (int frame_x = 0; frame_x < horizontal_frame_count; ++frame_x) {
 		for (int frame_y = 0; frame_y < vertical_frame_count; ++frame_y) {
 			const QImage src_frame_image = src_image.copy(frame_x * old_frame_size.width(), frame_y * old_frame_size.height(), old_frame_size.width(), old_frame_size.height());
-			QImage result_frame_image = image::scale(src_frame_image, scale_factor);
 
-			const unsigned char *frame_data = result_frame_image.constBits();
+			std::future<void> future = thread_pool::get()->async([&, src_frame_image, frame_x, frame_y]() {
+				QImage result_frame_image = image::scale(src_frame_image, scale_factor);
 
-			for (int x = 0; x < new_frame_size.width(); ++x) {
-				for (int y = 0; y < new_frame_size.height(); ++y) {
-					const int frame_pixel_index = y * new_frame_size.width() + x;
-					const int pixel_x = frame_x * new_frame_size.width() + x;
-					const int pixel_y = frame_y * new_frame_size.height() + y;
-					const int pixel_index = pixel_y * result_image.width() + pixel_x;
-					for (int i = 0; i < bpp; ++i) {
-						dst_data[pixel_index * bpp + i] = frame_data[frame_pixel_index * bpp + i];
+				const unsigned char *frame_data = result_frame_image.constBits();
+
+				for (int x = 0; x < new_frame_size.width(); ++x) {
+					for (int y = 0; y < new_frame_size.height(); ++y) {
+						const int frame_pixel_index = y * new_frame_size.width() + x;
+						const int pixel_x = frame_x * new_frame_size.width() + x;
+						const int pixel_y = frame_y * new_frame_size.height() + y;
+						const int pixel_index = pixel_y * result_image.width() + pixel_x;
+						for (int i = 0; i < bpp; ++i) {
+							dst_data[pixel_index * bpp + i] = frame_data[frame_pixel_index * bpp + i];
+						}
 					}
 				}
-			}
+			});
+
+			futures.push_back(std::move(future));
 		}
+	}
+
+	for (std::future<void> &future : futures) {
+		future.wait();
 	}
 
 	return result_image;
