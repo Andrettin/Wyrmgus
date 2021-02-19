@@ -6,7 +6,7 @@
 #                                        /____/
 #  ______________________                           ______________________
 #                        T H E   W A R   B E G I N S
-#         Stratagus - A free fantasy real time strategy game engine
+#         Wyrmgus - A free fantasy real time strategy game engine
 #
 #    CMakeLists.txt
 #    Copyright (C) 2011-2021  Pali Rohár <pali.rohar@gmail.com>,
@@ -27,33 +27,18 @@
 #
 #
 
-#########################
-# Version configuration #
-#########################
-# Stratagus major version
-set(STRATAGUS_MAJOR_VERSION 4)
-# Stratagus minor version (maximum 99)
-set(STRATAGUS_MINOR_VERSION 1)
-# Stratagus patch level (maximum 99)
-set(STRATAGUS_PATCH_LEVEL 5)
-# Stratagus patch level 2
-set(STRATAGUS_PATCH_LEVEL2 0)
-#########################
-
-project(wyrmgus)
 cmake_minimum_required(VERSION 3.7.0)
 
-set(
-  STRATAGUS_VERSION
-  "${STRATAGUS_MAJOR_VERSION}.${STRATAGUS_MINOR_VERSION}.${STRATAGUS_PATCH_LEVEL}")
-set(STRATAGUS_VERSION_FULL "${STRATAGUS_VERSION}.${STRATAGUS_PATCH_LEVEL2}")
+project(wyrmgus VERSION 4.1.5.0)
+add_compile_definitions(
+  StratagusMajorVersion=${CMAKE_PROJECT_VERSION_MAJOR}
+  StratagusMinorVersion=${CMAKE_PROJECT_VERSION_MINOR}
+  StratagusPatchLevel=${CMAKE_PROJECT_VERSION_PATCH}
+  StratagusPatchLevel2=${CMAKE_PROJECT_VERSION_TWEAK})
 
-if(${STRATAGUS_PATCH_LEVEL2} GREATER 0)
-  set(STRATAGUS_VERSION "${STRATAGUS_VERSION_FULL}")
-endif()
+set(STRATAGUS_VERSION ${CMAKE_PROJECT_VERSION})
 
 # Stratagus sources
-
 include_directories(
   src/
   src/include/
@@ -1743,6 +1728,7 @@ endif()
 
 ########### next target ###############
 
+# TODO Check build with ENABLE_NSIS=ON required after versions logic update
 if(WIN32 AND ENABLE_NSIS AND MAKENSIS_FOUND)
   file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/COPYING DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
   file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/src/win32/wyrmsun.ico DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
@@ -1755,17 +1741,19 @@ if(WIN32 AND ENABLE_NSIS AND MAKENSIS_FOUND)
   file(COPY ${SDL_DLL} DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
   set(MAKENSIS_FLAGS ${MAKENSIS_FLAGS} -DSDL=SDL.dll)
   add_custom_command(
-    OUTPUT Stratagus-${STRATAGUS_VERSION}${MAKENSIS_SUFFIX}
+    OUTPUT Stratagus-${CMAKE_PROJECT_VERSION}${MAKENSIS_SUFFIX}
     COMMAND ${MAKENSIS}
     ARGS
-      ${MAKENSIS_FLAGS} -DVERSION=${STRATAGUS_VERSION}
-      -DVIVERSION=${STRATAGUS_VERSION_FULL}
+      ${MAKENSIS_FLAGS} -DVERSION=${CMAKE_PROJECT_VERSION}
+      -DVIVERSION=${CMAKE_PROJECT_VERSION}
       ${CMAKE_CURRENT_SOURCE_DIR}/src/win32/stratagus.nsi
     DEPENDS src/win32/stratagus.nsi wyrmgus COPYING
     COMMENT "Generating Stratagus Windows NSIS Installer"
-    VERBATIM
-  )
-  add_custom_target(nsis ALL DEPENDS Stratagus-${STRATAGUS_VERSION}${MAKENSIS_SUFFIX})
+    VERBATIM)
+  add_custom_target(
+    nsis
+    ALL
+    DEPENDS Stratagus-${CMAKE_PROJECT_VERSION}${MAKENSIS_SUFFIX})
 endif()
 
 ########### install files ###############

@@ -4,10 +4,21 @@
 /// Description
 #define DESCRIPTION NAME " - Strategy Gaming Engine"
 
-#define StratagusMajorVersion 4
-#define StratagusMinorVersion 1
-#define StratagusPatchLevel 5
-#define StratagusPatchLevel2 0
+#ifndef StratagusMajorVersion
+  #define StratagusMajorVersion 0
+#endif
+
+#ifndef StratagusMinorVersion
+  #define StratagusMinorVersion 0
+#endif
+
+#ifndef StratagusPatchLevel
+  #define StratagusPatchLevel 0
+#endif
+
+#ifndef StratagusPatchLevel2
+  #define StratagusPatchLevel2 0
+#endif
 
 #define _version_stringify_(s) #s
 #define _version_stringify(s) _version_stringify_(s)
@@ -15,9 +26,9 @@
 #define _version_str1 _version_stringify(StratagusMajorVersion) "." _version_stringify(StratagusMinorVersion) "." _version_stringify(StratagusPatchLevel)
 
 #if StratagusPatchLevel2 > 0
-#define _version_str2 _version_str1 "." _version_stringify(StratagusPatchLevel2)
+  #define _version_str2 _version_str1 "." _version_stringify(StratagusPatchLevel2)
 #else
-#define _version_str2 _version_str1
+  #define _version_str2 _version_str1
 #endif
 
 /// Engine version string
