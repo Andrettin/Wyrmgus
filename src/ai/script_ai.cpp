@@ -33,6 +33,8 @@
 #include "ai_local.h"
 
 #include "civilization.h"
+#include "database/defines.h"
+#include "economy/resource.h"
 #include "map/map.h"
 #include "map/site.h"
 #include "pathfinder.h"
@@ -373,10 +375,14 @@ static void InitAiHelper(AiHelper &aiHelper)
 	}
 	//Wyrmgus end
 
-	for (int i = 1; i < MaxCosts; ++i) {
+	for (const resource *resource : resource::get_all()) {
+		if (resource == defines::get()->get_time_resource()) {
+			continue;
+		}
+
 		for (const wyrmgus::unit_type *mine_unit_type : mine_units) {
-			if (mine_unit_type->get_given_resource()->get_index() == i) {
-				AiHelperInsert(aiHelper.Mines, i, mine_unit_type);
+			if (mine_unit_type->get_given_resource() == resource) {
+				AiHelperInsert(aiHelper.Mines, resource->get_index(), mine_unit_type);
 			}
 		}
 		for (const wyrmgus::unit_type *unit_type : wyrmgus::unit_type::get_all()) {
@@ -384,8 +390,8 @@ static void InitAiHelper(AiHelper &aiHelper)
 				continue;
 			}
 
-			if (unit_type->CanStore[i] > 0) {
-				AiHelperInsert(aiHelper.Depots, i, unit_type);
+			if (unit_type->can_store(resource)) {
+				AiHelperInsert(aiHelper.Depots, resource->get_index(), unit_type);
 			}
 		}
 	}

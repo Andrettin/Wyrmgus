@@ -184,8 +184,8 @@ static bool CanHandleOrder(const CUnit &unit, COrder *order)
 		//  Also check if new unit can harvest this specific resource.
 		CUnit *goal = order->get_goal();
 		//Wyrmgus start
-//		if (goal && !unit.Type->ResInfo[goal->Type->GivesResource]) {
-		if (goal && !unit.Type->ResInfo[goal->GivesResource]) {
+//		if (goal && unit.Type->get_resource_info(goal->Type->get_give_n_resource()) == nullptr) {
+		if (goal && unit.Type->get_resource_info(goal->get_given_resource()) == nullptr) {
 		//Wyrmgus end
 			return false;
 		}
@@ -447,7 +447,7 @@ static void AnimateActionTrain(CUnit &unit)
 				} else if (newUnit->CanHarvest(table[j])) { // see if can harvest
 					CommandResource(*newUnit, *table[j], FlushCommands);
 					command_found = true;
-				} else if (newUnit->Type->BoolFlag[HARVESTER_INDEX].value && table[j]->Type->get_given_resource() != nullptr && newUnit->Type->ResInfo[table[j]->Type->get_given_resource()->get_index()] && !table[j]->Type->BoolFlag[CANHARVEST_INDEX].value && (table[j]->Player == newUnit->Player || table[j]->Player->Index == PlayerNumNeutral)) { // see if can build mine on top of deposit
+				} else if (newUnit->Type->BoolFlag[HARVESTER_INDEX].value && table[j]->Type->get_given_resource() != nullptr && newUnit->Type->get_resource_info(table[j]->Type->get_given_resource()) != nullptr && !table[j]->Type->BoolFlag[CANHARVEST_INDEX].value && (table[j]->Player == newUnit->Player || table[j]->Player->Index == PlayerNumNeutral)) { // see if can build mine on top of deposit
 					for (const wyrmgus::unit_type *other_unit_type : wyrmgus::unit_type::get_all()) {
 						if (other_unit_type->is_template()) {
 							continue;
@@ -468,7 +468,7 @@ static void AnimateActionTrain(CUnit &unit)
 			
 			if (!command_found && unit.get_rally_point_map_layer()->Field(unit.get_rally_point_pos())->player_info->IsTeamExplored(*newUnit->Player)) { // see if can harvest terrain
 				for (const wyrmgus::resource *resource : wyrmgus::resource::get_all()) {
-					if (newUnit->Type->ResInfo[resource->get_index()] && CMap::Map.Field(unit.get_rally_point_pos(), unit.get_rally_point_map_layer()->ID)->get_resource() == resource) {
+					if (newUnit->Type->get_resource_info(resource) != nullptr && CMap::Map.Field(unit.get_rally_point_pos(), unit.get_rally_point_map_layer()->ID)->get_resource() == resource) {
 						CommandResourceLoc(*newUnit, unit.get_rally_point_pos(), FlushCommands, unit.get_rally_point_map_layer()->ID);
 						command_found = true;
 						break;

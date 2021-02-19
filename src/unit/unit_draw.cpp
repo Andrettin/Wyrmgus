@@ -1167,18 +1167,19 @@ void CUnit::Draw(const CViewport &vp) const
 	// Adjust sprite for Harvesters.
 	//
 	std::shared_ptr<CPlayerColorGraphic> sprite = type->Sprite;
-	if (type->BoolFlag[HARVESTER_INDEX].value && this->CurrentResource) {
-		const auto &resinfo = type->ResInfo[this->CurrentResource];
+	if (type->BoolFlag[HARVESTER_INDEX].value && this->get_current_resource() != nullptr) {
+		const resource_info *res_info = type->get_resource_info(this->get_current_resource());
 		if (this->ResourcesHeld) {
-			if (resinfo->SpriteWhenLoaded) {
-				sprite = resinfo->SpriteWhenLoaded;
+			if (res_info->SpriteWhenLoaded) {
+				sprite = res_info->SpriteWhenLoaded;
 			}
 		} else {
-			if (resinfo->SpriteWhenEmpty) {
-				sprite = resinfo->SpriteWhenEmpty;
+			if (res_info->SpriteWhenEmpty) {
+				sprite = res_info->SpriteWhenEmpty;
 			}
 		}
 	}
+
 	//Wyrmgus start
 	// Adjust sprite for variations.
 	if (variation && variation->get_unit_type() == type) {

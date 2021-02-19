@@ -521,8 +521,8 @@ int AiGetBuildRequestsCount(const PlayerAi &pai, int (&counter)[UnitTypeMax])
 }
 
 //Wyrmgus start
-//extern CUnit *FindDepositNearLoc(CPlayer &p, const Vec2i &pos, int range, int resource);
-extern CUnit *FindDepositNearLoc(CPlayer &p, const Vec2i &pos, int range, int resource, int z);
+//extern CUnit *FindDepositNearLoc(CPlayer &p, const Vec2i &pos, int range, const resource *resource);
+extern CUnit *FindDepositNearLoc(CPlayer &p, const Vec2i &pos, int range, const resource *resource, int z);
 //Wyrmgus end
 
 void AiNewDepotRequest(CUnit &worker)
@@ -535,7 +535,7 @@ void AiNewDepotRequest(CUnit &worker)
 #endif
 	Assert(worker.CurrentAction() == UnitAction::Resource);
 	COrder_Resource &order = *static_cast<COrder_Resource *>(worker.CurrentOrder());
-	const int resource = order.GetCurrentResource();
+	const resource *resource = order.get_current_resource();
 
 	const Vec2i pos = order.GetHarvestLocation();
 	//Wyrmgus start
@@ -558,10 +558,10 @@ void AiNewDepotRequest(CUnit &worker)
 
 	AiGetBuildRequestsCount(*worker.Player->Ai, counter);
 
-	const int n = AiHelpers.Depots[resource].size();
+	const int n = AiHelpers.Depots[resource->get_index()].size();
 
 	for (int i = 0; i < n; ++i) {
-		const wyrmgus::unit_type &type = *AiHelpers.Depots[resource][i];
+		const wyrmgus::unit_type &type = *AiHelpers.Depots[resource->get_index()][i];
 
 		if (worker.Player->get_faction() != nullptr && !worker.Player->get_faction()->is_class_unit_type(&type)) {
 			continue;
@@ -653,7 +653,7 @@ CUnit *AiGetSuitableDepot(const CUnit &worker, const CUnit &oldDepot, CUnit **re
 {
 	Assert(worker.CurrentAction() == UnitAction::Resource);
 	COrder_Resource &order = *static_cast<COrder_Resource *>(worker.CurrentOrder());
-	const int resource = order.GetCurrentResource();
+	const resource *resource = order.get_current_resource();
 	std::vector<CUnit *> depots;
 	const Vec2i offset(MaxMapWidth, MaxMapHeight);
 
@@ -662,7 +662,7 @@ CUnit *AiGetSuitableDepot(const CUnit &worker, const CUnit &oldDepot, CUnit **re
 
 		//Wyrmgus start
 //		if (unit.Type->CanStore[resource] && !unit.IsUnusable()) {
-		if (worker.CanReturnGoodsTo(&unit, resource) && !unit.IsUnusable()) {
+		if (worker.can_return_goods_to(&unit, resource) && !unit.IsUnusable()) {
 		//Wyrmgus end
 			depots.push_back(&unit);
 		}
@@ -1365,12 +1365,12 @@ static int AiAssignHarvesterFromUnit(CUnit &unit, const wyrmgus::resource *resou
 //Wyrmgus end
 {
 	// Try to find the nearest depot first.
-	CUnit *depot = FindDeposit(unit, 1000, resource->get_index());
+	CUnit *depot = FindDeposit(unit, 1000, resource);
 	
 	// Find a resource to harvest from.
 	//Wyrmgus start
 //	CUnit *mine = UnitFindResource(unit, depot ? *depot : unit, 1000, resource, true);
-	CUnit *mine = UnitFindResource(unit, depot ? *depot : unit, resource_range, resource->get_index(), true, nullptr, false, false, false, resource->get_index() == CopperCost && AiPlayer->Player->HasMarketUnit());
+	CUnit *mine = UnitFindResource(unit, depot ? *depot : unit, resource_range, resource, true, nullptr, false, false, false, resource->get_index() == CopperCost && AiPlayer->Player->HasMarketUnit());
 	//Wyrmgus end
 
 	if (mine) {
@@ -1632,12 +1632,18 @@ static void AiCollectResources()
 		}
 
 		// Look what the unit can do
-		for (int c = 1; c < MaxCosts; ++c) {
-			if (unit.Type->ResInfo[c]) {
-				units_unassigned[c].push_back(&unit);
-				num_units_unassigned[c]++;
+		for (const auto &kv_pair : unit.Type->get_resource_infos()) {
+			const resource *resource = kv_pair.first;
+
+			if (resource == defines::get()->get_time_resource()) {
+				continue;
 			}
+			
+			const int res_index = resource->get_index();
+			units_unassigned[res_index].push_back(&unit);
+			num_units_unassigned[res_index]++;
 		}
+
 		++total_harvester;
 	}
 
@@ -1707,14 +1713,19 @@ static void AiCollectResources()
 				unit = unassigned_unit;
 					
 				// remove it from other ressources
-				for (size_t j = 0; j < wyrmgus::resource::get_all().size(); ++j) {
-					if (static_cast<int>(j) == c || !unit->Type->ResInfo[j]) {
+				for (const auto &kv_pair : unit->Type->get_resource_infos()) {
+					const resource *resource = kv_pair.first;
+
+					const int res_index = resource->get_index();
+
+					if (res_index == c) {
 						continue;
 					}
-					for (int k = 0; k < num_units_unassigned[j]; ++k) {
-						if (units_unassigned[j][k] == unit) {
-							units_unassigned[j][k] = units_unassigned[j][--num_units_unassigned[j]];
-							units_unassigned[j].pop_back();
+
+					for (int k = 0; k < num_units_unassigned[res_index]; ++k) {
+						if (units_unassigned[res_index][k] == unit) {
+							units_unassigned[res_index][k] = units_unassigned[res_index][--num_units_unassigned[res_index]];
+							units_unassigned[res_index].pop_back();
 							break;
 						}
 					}
@@ -1793,7 +1804,7 @@ static void AiCollectResources()
 					//Wyrmgus end
 					
 					// unit can't harvest : next one
-					if (!unit->Type->ResInfo[c] || !AiAssignHarvester(*unit, wyrmgus::resource::get_all()[c])) {
+					if (unit->Type->get_resource_info(resource::get_all()[c]) == nullptr || !AiAssignHarvester(*unit, resource::get_all()[c])) {
 						unit = nullptr;
 						continue;
 					}
@@ -2670,16 +2681,18 @@ static void AiCheckMinecartConstruction()
 	
 	std::vector<const wyrmgus::site *> potential_settlements;
 		
-	for (size_t res = 0; res < wyrmgus::resource::get_all().size(); ++res) {
-		if (res >= (int) AiHelpers.Mines.size()) {
+	for (const resource *resource : resource::get_all()) {
+		const int res_index = resource->get_index();
+		if (res_index >= (int) AiHelpers.Mines.size()) {
 			break;
 		}
-		if (!minecart_type->ResInfo[res]) {
+
+		if (minecart_type->get_resource_info(resource) == nullptr) {
 			continue;
 		}
 				
-		for (size_t i = 0; i < AiHelpers.Mines[res].size(); ++i) {
-			const wyrmgus::unit_type &mine_type = *AiHelpers.Mines[res][i];
+		for (size_t i = 0; i < AiHelpers.Mines[res_index].size(); ++i) {
+			const wyrmgus::unit_type &mine_type = *AiHelpers.Mines[res_index][i];
 					
 			std::vector<CUnit *> mine_table;
 			FindPlayerUnitsByType(*AiPlayer->Player, mine_type, mine_table, true);
@@ -2744,12 +2757,10 @@ static void AiCheckMinecartSalvaging()
 		
 		bool has_accessible_mine = false;
 		
-		for (size_t res = 0; res < wyrmgus::resource::get_all().size(); ++res) {
-			if (!minecart_type->ResInfo[res]) {
-				continue;
-			}
+		for (const auto &kv_pair : minecart_type->get_resource_infos()) {
+			const resource *resource = kv_pair.first;
 			
-			if (UnitFindResource(*minecart_unit, *minecart_unit, 1000, res, false, nullptr, true, true, false, false) != nullptr) {
+			if (UnitFindResource(*minecart_unit, *minecart_unit, 1000, resource, false, nullptr, true, true, false, false) != nullptr) {
 				has_accessible_mine = true;
 				break;
 			}

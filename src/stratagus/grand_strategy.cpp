@@ -338,13 +338,6 @@ void CGrandStrategyProvince::SetSettlementBuilding(int building_id, bool has_set
 	}
 	
 	this->SettlementBuildings[building_id] = has_settlement_building;
-	
-	int change = has_settlement_building ? 1 : -1;
-	for (int i = 0; i < MaxCosts; ++i) {
-		if (wyrmgus::unit_type::get_all()[building_id]->GrandStrategyProductionEfficiencyModifier[i] != 0) {
-			this->ProductionEfficiencyModifier[i] += wyrmgus::unit_type::get_all()[building_id]->GrandStrategyProductionEfficiencyModifier[i] * change;
-		}
-	}
 }
 
 void CGrandStrategyProvince::SetModifier(CUpgrade *modifier, bool has_modifier)

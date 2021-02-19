@@ -211,9 +211,9 @@ class BestDepotFinder
 	void operator()(CUnit *const dest)
 	{
 		/* Only resource depots */
-		if (dest->Type->CanStore[resource]
+		if (dest->Type->can_store(resource)
 			//Wyrmgus start
-			&& (NEARLOCATION || u_near.worker->CanReturnGoodsTo(dest, resource))
+			&& (NEARLOCATION || u_near.worker->can_return_goods_to(dest, resource))
 			//Wyrmgus end
 			&& dest->IsAliveOnMap()
 			&& dest->CurrentAction() != UnitAction::Built) {
@@ -265,15 +265,15 @@ class BestDepotFinder
 	}
 
 public:
-	explicit BestDepotFinder(const CUnit &w, const int res, const int ran)
+	explicit BestDepotFinder(const CUnit &w, const resource *res, const int ran)
 		: resource(res), range(ran)
 	{
 		u_near.worker = &w;
 	}
 
 	//Wyrmgus start
-//	explicit BestDepotFinder(const Vec2i &pos, const int res, const int ran)
-	explicit BestDepotFinder(const Vec2i &pos, const int res, const int ran, const int z)
+//	explicit BestDepotFinder(const Vec2i &pos, const resource *res, const int ran)
+	explicit BestDepotFinder(const Vec2i &pos, const resource *res, const int ran, const int z)
 	//Wyrmgus end
 		: resource(res), range(ran)
 	{
@@ -301,7 +301,7 @@ private:
 		Vec2i loc;
 		int layer;
 	} u_near;
-	const int resource;
+	const wyrmgus::resource *resource = nullptr;
 	const int range;
 	int best_dist = INT_MAX;
 public:
@@ -411,13 +411,13 @@ public:
 };
 //Wyrmgus end
 
-CUnit *FindDepositNearLoc(CPlayer &p, const Vec2i &pos, int range, int resource, int z)
+CUnit *FindDepositNearLoc(CPlayer &p, const Vec2i &pos, const int range, const resource *resource, const int z)
 {
 	BestDepotFinder<true> finder(pos, resource, range, z);
 	std::vector<CUnit *> table;
 	for (const auto &kv_pair : p.get_units_by_type()) {
 		const wyrmgus::unit_type *unit_type = kv_pair.first;
-		if (unit_type->CanStore[resource]) {
+		if (unit_type->can_store(resource)) {
 			wyrmgus::vector::merge(table, kv_pair.second);
 		}
 	}
@@ -426,7 +426,7 @@ CUnit *FindDepositNearLoc(CPlayer &p, const Vec2i &pos, int range, int resource,
 		if (other_player->IsAllied(p) && p.IsAllied(*other_player)) {
 			for (const auto &kv_pair : other_player->get_units_by_type()) {
 				const wyrmgus::unit_type *unit_type = kv_pair.first;
-				if (unit_type->CanStore[resource]) {
+				if (unit_type->can_store(resource)) {
 					wyrmgus::vector::merge(table, kv_pair.second);
 				}
 			}
@@ -435,19 +435,23 @@ CUnit *FindDepositNearLoc(CPlayer &p, const Vec2i &pos, int range, int resource,
 	return finder.Find(table.begin(), table.end());
 }
 
-class CResourceFinder
+class CResourceFinder final
 {
 public:
 	//Wyrmgus start
 //	CResourceFinder(int r, bool on_top) : resource(r), mine_on_top(on_top) {}
-	CResourceFinder(int r, bool harvestable, bool luxury, bool same) : resource(r), only_harvestable(harvestable), include_luxury(luxury), only_same(same) {}
+	explicit CResourceFinder(const resource *r, const bool harvestable, const bool luxury, const bool same)
+		: resource(r), only_harvestable(harvestable), include_luxury(luxury), only_same(same)
+	{
+	}
 	//Wyrmgus end
+
 	bool operator()(const CUnit *const unit) const
 	{
 		const wyrmgus::unit_type &type = *unit->Type;
 		//Wyrmgus start
 //		return (type.GivesResource == resource
-		return ((unit->GivesResource == resource || (!only_same && unit->GivesResource != TradeCost && wyrmgus::resource::get_all()[unit->GivesResource]->get_final_resource()->get_index() == resource) || (include_luxury && wyrmgus::resource::get_all()[unit->GivesResource]->LuxuryResource))
+		return ((unit->get_given_resource() == resource || (!only_same && unit->GivesResource != TradeCost && wyrmgus::resource::get_all()[unit->GivesResource]->get_final_resource() == resource) || (include_luxury && wyrmgus::resource::get_all()[unit->GivesResource]->LuxuryResource))
 		//Wyrmgus end
 				&& unit->ResourcesHeld != 0
 				//Wyrmgus start
@@ -458,7 +462,7 @@ public:
 			   );
 	}
 private:
-	const int resource;
+	const wyrmgus::resource *resource = nullptr;
 	//Wyrmgus start
 //	const bool mine_on_top;
 	const bool only_harvestable;
@@ -471,11 +475,11 @@ class ResourceUnitFinder final
 {
 public:
 	//Wyrmgus start
-//	explicit ResourceUnitFinder(const CUnit &worker, const CUnit *deposit, int resource, int maxRange, bool check_usage, CUnit **resultMine) :
-	explicit ResourceUnitFinder(const CUnit &worker, const CUnit *deposit, int resource, int maxRange, bool check_usage, CUnit **resultMine, bool only_harvestable, bool ignore_exploration, bool only_unsettled_area, bool include_luxury, bool only_same) :
+//	explicit ResourceUnitFinder(const CUnit &worker, const CUnit *deposit, const resource *resource, int maxRange, bool check_usage, CUnit **resultMine) :
+	explicit ResourceUnitFinder(const CUnit &worker, const CUnit *deposit, const resource *resource, int maxRange, bool check_usage, CUnit **resultMine, bool only_harvestable, bool ignore_exploration, bool only_unsettled_area, bool include_luxury, bool only_same) :
 	//Wyrmgus end
 		worker(worker),
-		resinfo(*worker.Type->ResInfo[resource]),
+		res_info(worker.Type->get_resource_info(resource)),
 		deposit(deposit),
 		movemask(worker.Type->MovementMask),
 		maxRange(maxRange),
@@ -525,7 +529,7 @@ private:
 
 private:
 	const CUnit &worker;
-	const wyrmgus::resource_info &resinfo;
+	const resource_info *res_info = nullptr;
 	const CUnit *deposit;
 	tile_flag movemask;
 	int maxRange;
@@ -671,7 +675,7 @@ VisitResult ResourceUnitFinder::Visit(TerrainTraversal &terrainTraversal, const 
 **
 **  @return            null or resource unit
 */
-CUnit *UnitFindResource(const CUnit &unit, const CUnit &start_unit, const int range, const int resource,
+CUnit *UnitFindResource(const CUnit &unit, const CUnit &start_unit, const int range, const resource *resource,
 						//Wyrmgus start
 //						bool check_usage, const CUnit *depot)
 						const bool check_usage, const CUnit *depot, const bool only_harvestable, const bool ignore_exploration, const bool only_unsettled_area, const bool include_luxury, const bool only_same)
@@ -720,13 +724,13 @@ CUnit *UnitFindResource(const CUnit &unit, const CUnit &start_unit, const int ra
 **
 **  @return            null or deposit unit
 */
-CUnit *FindDeposit(const CUnit &unit, int range, int resource)
+CUnit *FindDeposit(const CUnit &unit, const int range, const resource *resource)
 {
 	BestDepotFinder<false> finder(unit, resource, range);
 	std::vector<CUnit *> table;
 	for (const auto &kv_pair : unit.Player->get_units_by_type()) {
 		const wyrmgus::unit_type *unit_type = kv_pair.first;
-		if (unit_type->CanStore[resource]) {
+		if (unit_type->can_store(resource)) {
 			wyrmgus::vector::merge(table, kv_pair.second);
 		}
 	}
@@ -735,8 +739,8 @@ CUnit *FindDeposit(const CUnit &unit, int range, int resource)
 		if (other_player->IsAllied(*unit.Player) && unit.Player->IsAllied(*other_player)) {
 			for (const auto &kv_pair : other_player->get_units_by_type()) {
 				const wyrmgus::unit_type *unit_type = kv_pair.first;
-				if (unit_type->CanStore[resource]) {
-					wyrmgus::vector::merge(table, kv_pair.second);
+				if (unit_type->can_store(resource)) {
+					vector::merge(table, kv_pair.second);
 				}
 			}
 		}
@@ -941,8 +945,8 @@ CUnit *TargetOnMap(const CUnit &source, const Vec2i &pos1, const Vec2i &pos2, in
 **  @return          Returns the deposit if found, or null.
 */
 //Wyrmgus start
-//CUnit *ResourceOnMap(const Vec2i &pos, int resource, bool mine_on_top)
-CUnit *ResourceOnMap(const Vec2i &pos, int resource, int z, bool only_harvestable, bool only_same)
+//CUnit *ResourceOnMap(const Vec2i &pos, const resource *resource, const bool mine_on_top)
+CUnit *ResourceOnMap(const Vec2i &pos, const resource *resource, const int z, const bool only_harvestable, const bool only_same)
 //Wyrmgus end
 {
 	//Wyrmgus start
@@ -954,13 +958,16 @@ CUnit *ResourceOnMap(const Vec2i &pos, int resource, int z, bool only_harvestabl
 class IsADepositForResource
 {
 public:
-	explicit IsADepositForResource(const int r) : resource(r) {}
+	explicit IsADepositForResource(const resource *r) : resource(r) 
+	{
+	}
+
 	bool operator()(const CUnit *const unit) const
 	{
-		return (unit->Type->CanStore[resource] && !unit->IsUnusable());
+		return (unit->Type->can_store(this->resource) && !unit->IsUnusable());
 	}
 private:
-	const int resource;
+	const resource *resource = nullptr;
 };
 
 /**
@@ -978,7 +985,7 @@ CUnit *ResourceDepositOnMap(const Vec2i &pos, int resource, int z)
 {
 	//Wyrmgus start
 //	return CMap::Map.Field(pos)->UnitCache.find(IsADepositForResource(resource));
-	return CMap::Map.Field(pos, z)->UnitCache.find(IsADepositForResource(resource));
+	return CMap::Map.Field(pos, z)->UnitCache.find(IsADepositForResource(resource::get_all()[resource]));
 	//Wyrmgus end
 }
 

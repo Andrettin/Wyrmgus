@@ -288,7 +288,7 @@
 **    This equals to the resource Id of the resource given
 **    or 0 (TimeCost) for other buildings.
 **
-**  unit_type::ResInfo[::MaxCosts]
+**  unit_type::resource_infos
 **
 **    Information about resource harvesting. If null, it can't
 **    harvest it.
@@ -505,11 +505,6 @@ unit_type::unit_type(const std::string &identifier) : detailed_data_entry(identi
 	CanAttack(0),
 	Neutral(0)
 {
-	memset(CanStore, 0, sizeof(CanStore));
-	//Wyrmgus start
-	memset(GrandStrategyProductionEfficiencyModifier, 0, sizeof(GrandStrategyProductionEfficiencyModifier));
-	//Wyrmgus end
-	memset(ResInfo, 0, sizeof(ResInfo));
 	memset(MissileOffsets, 0, sizeof(MissileOffsets));
 	//Wyrmgus start
 	memset(LayerSprites, 0, sizeof(LayerSprites));
@@ -778,12 +773,12 @@ void unit_type::process_sml_scope(const sml_data &scope)
 			const std::string &tag = child_scope.get_tag();
 			const resource *resource = resource::get(tag);
 
-			if (this->ResInfo[resource->get_index()] == nullptr) {
+			if (!this->resource_infos.contains(resource)) {
 				auto resource_info = std::make_unique<wyrmgus::resource_info>(this, resource);
-				this->ResInfo[resource->get_index()] = std::move(resource_info);
+				this->resource_infos[resource] = std::move(resource_info);
 			}
 
-			resource_info *res_info_ptr = this->ResInfo[resource->get_index()].get();
+			resource_info *res_info_ptr = this->resource_infos[resource].get();
 			database::process_sml_data(res_info_ptr, child_scope);
 		});
 	} else if (tag == "variations") {
@@ -1377,6 +1372,12 @@ void unit_type::check() const
 		}
 	}
 
+	for (const resource *resource : this->get_stored_resources()) {
+		if (resource == nullptr) {
+			throw std::runtime_error("Unit type \"" + this->get_identifier() + "\" is set to be able to store a null resource.");
+		}
+	}
+
 	if (this->get_preconditions() != nullptr) {
 		this->get_preconditions()->check_validity();
 	}
@@ -1595,16 +1596,12 @@ void unit_type::set_parent(const unit_type *parent_type)
 	this->autocast_spells = parent_type->autocast_spells;
 
 	this->repair_costs = parent_type->repair_costs;
+	this->stored_resources = parent_type->stored_resources;
 
-	for (unsigned int i = 0; i < MaxCosts; ++i) {
-		this->CanStore[i] = parent_type->CanStore[i];
-		this->GrandStrategyProductionEfficiencyModifier[i] = parent_type->GrandStrategyProductionEfficiencyModifier[i];
-		
-		if (parent_type->ResInfo[i] != nullptr) {
-			this->ResInfo[i] = parent_type->ResInfo[i]->duplicate(this);
-		}
+	for (const auto &[resource, res_info] : parent_type->resource_infos) {
+		this->resource_infos[resource] = res_info->duplicate(this);
 	}
-	
+
 	this->DefaultStat = parent_type->DefaultStat;
 
 	for (unsigned int i = 0; i < UnitTypeVar.GetNumberBoolFlag(); ++i) {
@@ -1898,39 +1895,43 @@ int unit_type::GetAvailableLevelUpUpgrades() const
 	return value;
 }
 
-int unit_type::GetResourceStep(const int resource, const int player) const
+int unit_type::get_resource_step(const resource *resource, const int player) const
 {
-	if (!this->ResInfo[resource]) {
+	const resource_info *res_info = this->get_resource_info(resource);
+
+	if (res_info == nullptr) {
 		return 0;
 	}
 
-	int resource_step = this->ResInfo[resource]->ResourceStep;
+	int resource_step = res_info->ResourceStep;
 	
 	resource_step += this->Stats[player].Variables[GATHERINGBONUS_INDEX].Value;
+
+	const int res_index = resource->get_index();
 	
-	if (resource == CopperCost) {
+	if (res_index == CopperCost) {
 		resource_step += this->Stats[player].Variables[COPPERGATHERINGBONUS_INDEX].Value;
-	} else if (resource == SilverCost) {
+	} else if (res_index == SilverCost) {
 		resource_step += this->Stats[player].Variables[SILVERGATHERINGBONUS_INDEX].Value;
-	} else if (resource == GoldCost) {
+	} else if (res_index == GoldCost) {
 		resource_step += this->Stats[player].Variables[GOLDGATHERINGBONUS_INDEX].Value;
-	} else if (resource == IronCost) {
+	} else if (res_index == IronCost) {
 		resource_step += this->Stats[player].Variables[IRONGATHERINGBONUS_INDEX].Value;
-	} else if (resource == MithrilCost) {
+	} else if (res_index == MithrilCost) {
 		resource_step += this->Stats[player].Variables[MITHRILGATHERINGBONUS_INDEX].Value;
-	} else if (resource == WoodCost) {
+	} else if (res_index == WoodCost) {
 		resource_step += this->Stats[player].Variables[LUMBERGATHERINGBONUS_INDEX].Value;
-	} else if (resource == StoneCost || resource == LimestoneCost) {
+	} else if (res_index == StoneCost || res_index == LimestoneCost) {
 		resource_step += this->Stats[player].Variables[STONEGATHERINGBONUS_INDEX].Value;
-	} else if (resource == CoalCost) {
+	} else if (res_index == CoalCost) {
 		resource_step += this->Stats[player].Variables[COALGATHERINGBONUS_INDEX].Value;
-	} else if (resource == JewelryCost) {
+	} else if (res_index == JewelryCost) {
 		resource_step += this->Stats[player].Variables[JEWELRYGATHERINGBONUS_INDEX].Value;
-	} else if (resource == FurnitureCost) {
+	} else if (res_index == FurnitureCost) {
 		resource_step += this->Stats[player].Variables[FURNITUREGATHERINGBONUS_INDEX].Value;
-	} else if (resource == LeatherCost) {
+	} else if (res_index == LeatherCost) {
 		resource_step += this->Stats[player].Variables[LEATHERGATHERINGBONUS_INDEX].Value;
-	} else if (resource == DiamondsCost || resource == EmeraldsCost) {
+	} else if (res_index == DiamondsCost || res_index == EmeraldsCost) {
 		resource_step += this->Stats[player].Variables[GEMSGATHERINGBONUS_INDEX].Value;
 	}
 	
@@ -2584,20 +2585,17 @@ void LoadUnitTypeSprite(wyrmgus::unit_type &type)
 	}
 
 	if (type.BoolFlag[HARVESTER_INDEX].value) {
-		for (int i = 0; i < MaxCosts; ++i) {
-			const std::unique_ptr<wyrmgus::resource_info> &resinfo = type.ResInfo[i];
-			if (!resinfo) {
-				continue;
+		for (const auto &kv_pair : type.get_resource_infos()) {
+			resource_info *res_info = kv_pair.second.get();
+
+			if (!res_info->get_image_file().empty()) {
+				res_info->SpriteWhenEmpty = CPlayerColorGraphic::New(res_info->get_image_file().string(), type.get_frame_size(), type.get_conversible_player_color());
+				res_info->SpriteWhenEmpty->Load(false, wyrmgus::defines::get()->get_scale_factor());
 			}
 
-			if (!resinfo->get_image_file().empty()) {
-				resinfo->SpriteWhenEmpty = CPlayerColorGraphic::New(resinfo->get_image_file().string(), type.get_frame_size(), type.get_conversible_player_color());
-				resinfo->SpriteWhenEmpty->Load(false, wyrmgus::defines::get()->get_scale_factor());
-			}
-
-			if (!resinfo->get_loaded_image_file().empty()) {
-				resinfo->SpriteWhenLoaded = CPlayerColorGraphic::New(resinfo->get_loaded_image_file().string(), type.get_frame_size(), type.get_conversible_player_color());
-				resinfo->SpriteWhenLoaded->Load(false, wyrmgus::defines::get()->get_scale_factor());
+			if (!res_info->get_loaded_image_file().empty()) {
+				res_info->SpriteWhenLoaded = CPlayerColorGraphic::New(res_info->get_loaded_image_file().string(), type.get_frame_size(), type.get_conversible_player_color());
+				res_info->SpriteWhenLoaded->Load(false, wyrmgus::defines::get()->get_scale_factor());
 			}
 		}
 	}

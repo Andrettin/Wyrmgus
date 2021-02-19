@@ -152,7 +152,7 @@ static void DoRightButton_ForForeignUnit(CUnit *dest)
 	// tell to go and harvest from a unit
 	//Wyrmgus start
 //	const int res = unit.Type->GivesResource;
-	const int res = unit.GivesResource;
+	const resource *res = unit.get_given_resource();
 	//Wyrmgus end
 
 	//Wyrmgus start
@@ -163,7 +163,7 @@ static void DoRightButton_ForForeignUnit(CUnit *dest)
 //		&& unit.Type->BoolFlag[CANHARVEST_INDEX].value) {
 	if (
 		dest->CanHarvest(&unit)
-		&& dest->ResourcesHeld < dest->Type->ResInfo[res]->ResourceCapacity
+		&& dest->ResourcesHeld < dest->Type->get_resource_info(res)->ResourceCapacity
 	) {
 	//Wyrmgus end
 		unit.Blink = 4;
@@ -283,7 +283,7 @@ static bool DoRightButton_Harvest_Unit(CUnit &unit, CUnit &dest, int flush, int 
 //		&& dest.Type->CanStore[unit.CurrentResource]
 //		&& (dest.Player == unit.Player
 //			|| (dest.Player->IsAllied(*unit.Player) && unit.Player->IsAllied(*dest.Player)))) {
-		&& unit.CanReturnGoodsTo(&dest)) {
+		&& unit.can_return_goods_to(&dest)) {
 	//Wyrmgus end
 		dest.Blink = 4;
 		if (!acknowledged) {
@@ -296,7 +296,7 @@ static bool DoRightButton_Harvest_Unit(CUnit &unit, CUnit &dest, int flush, int 
 	// Go and harvest from a unit
 	//Wyrmgus start
 //	const int res = dest.Type->GivesResource;
-	const int res = dest.GivesResource;
+	const resource *res = dest.get_given_resource();
 	//Wyrmgus end
 	const wyrmgus::unit_type &type = *unit.Type;
 	//Wyrmgus start
@@ -306,7 +306,7 @@ static bool DoRightButton_Harvest_Unit(CUnit &unit, CUnit &dest, int flush, int 
 	//Wyrmgus end
 			//Wyrmgus start
 //			if (unit.ResourcesHeld < type.ResInfo[res]->ResourceCapacity) {
-			if (unit.CurrentResource != res || unit.ResourcesHeld < type.ResInfo[res]->ResourceCapacity) {
+			if (unit.get_current_resource() != res || unit.ResourcesHeld < type.get_resource_info(res)->ResourceCapacity) {
 			//Wyrmgus end
 				dest.Blink = 4;
 				SendCommandResource(unit, dest, flush);
@@ -316,7 +316,7 @@ static bool DoRightButton_Harvest_Unit(CUnit &unit, CUnit &dest, int flush, int 
 				}
 				return true;
 			} else {
-				CUnit *depot = FindDeposit(unit, 1000, unit.CurrentResource);
+				CUnit *depot = FindDeposit(unit, 1000, unit.get_current_resource());
 				if (depot) {
 					dest.Blink = 4;
 					if (!acknowledged) {
@@ -332,18 +332,18 @@ static bool DoRightButton_Harvest_Unit(CUnit &unit, CUnit &dest, int flush, int 
 			}
 	//Wyrmgus start
 	// make unit build harvesting building on top if right-clicked
-	} else if (res && type.ResInfo[res] && !dest.Type->BoolFlag[CANHARVEST_INDEX].value
+	} else if (res && type.get_resource_info(res) != nullptr && !dest.Type->BoolFlag[CANHARVEST_INDEX].value
 		&& (dest.Player == unit.Player || dest.Player->Index == PlayerNumNeutral)) {
 			//Wyrmgus start
 //			if (unit.ResourcesHeld < type.ResInfo[res]->ResourceCapacity) {
-			if (unit.CurrentResource != res || unit.ResourcesHeld < type.ResInfo[res]->ResourceCapacity) {
+			if (unit.get_current_resource() != res || unit.ResourcesHeld < type.get_resource_info(res)->ResourceCapacity) {
 			//Wyrmgus end
 				for (const wyrmgus::unit_type *unit_type : wyrmgus::unit_type::get_all()) {
 					if (unit_type->is_template()) {
 						continue;
 					}
 
-					if (unit_type->get_given_resource() != nullptr && unit_type->get_given_resource()->get_index() == res && unit_type->BoolFlag[CANHARVEST_INDEX].value && CanBuildUnitType(&unit, *unit_type, dest.tilePos, 1, false, dest.MapLayer->ID)) {
+					if (unit_type->get_given_resource() != nullptr && unit_type->get_given_resource() == res && unit_type->BoolFlag[CANHARVEST_INDEX].value && CanBuildUnitType(&unit, *unit_type, dest.tilePos, 1, false, dest.MapLayer->ID)) {
 						if (check_conditions(unit_type, unit.Player)) {
 							if (wyrmgus::vector::contains(AiHelpers.get_builders(unit_type), unit.Type) || wyrmgus::vector::contains(AiHelpers.get_builder_classes(unit_type->get_unit_class()), unit.Type->get_unit_class())) {
 								dest.Blink = 4;
@@ -362,7 +362,7 @@ static bool DoRightButton_Harvest_Unit(CUnit &unit, CUnit &dest, int flush, int 
 				}
 				return true;
 			} else {
-				CUnit *depot = FindDeposit(unit, 1000, unit.CurrentResource);
+				CUnit *depot = FindDeposit(unit, 1000, unit.get_current_resource());
 				if (depot) {
 					dest.Blink = 4;
 					if (!acknowledged) {
@@ -376,7 +376,7 @@ static bool DoRightButton_Harvest_Unit(CUnit &unit, CUnit &dest, int flush, int 
 							continue;
 						}
 
-						if (unit_type->get_given_resource() != nullptr && unit_type->get_given_resource()->get_index() == res && unit_type->BoolFlag[CANHARVEST_INDEX].value && CanBuildUnitType(&unit, *unit_type, dest.tilePos, 1, false, dest.MapLayer->ID)) {
+						if (unit_type->get_given_resource() != nullptr && unit_type->get_given_resource() == res && unit_type->BoolFlag[CANHARVEST_INDEX].value && CanBuildUnitType(&unit, *unit_type, dest.tilePos, 1, false, dest.MapLayer->ID)) {
 							if (check_conditions(unit_type, unit.Player)) {
 								SendCommandBuildBuilding(unit, dest.tilePos, *unit_type, 0, dest.MapLayer->ID);
 								break;
@@ -403,7 +403,7 @@ static bool DoRightButton_Harvest_Pos(CUnit &unit, const Vec2i &pos, int flush, 
 	const wyrmgus::unit_type &type = *unit.Type;
 	// FIXME: support harvesting more types of terrain.
 	for (const wyrmgus::resource *resource : wyrmgus::resource::get_all()) {
-		if (type.ResInfo[resource->get_index()]
+		if (type.get_resource_info(resource) != nullptr
 			//Wyrmgus start
 //			&& type.ResInfo[res]->TerrainHarvester
 			&& UI.CurrentMapLayer->Field(pos)->get_resource() == resource
@@ -421,14 +421,14 @@ static bool DoRightButton_Harvest_Pos(CUnit &unit, const Vec2i &pos, int flush, 
 				acknowledged = 1;
 			}
 			*/
-			if (unit.CurrentResource != resource->get_index() || unit.ResourcesHeld < type.ResInfo[resource->get_index()]->ResourceCapacity) {
+			if (unit.CurrentResource != resource->get_index() || unit.ResourcesHeld < type.get_resource_info(resource)->ResourceCapacity) {
 				SendCommandResourceLoc(unit, pos, flush, UI.CurrentMapLayer->ID);
 				if (!acknowledged) {
 					PlayUnitSound(unit, wyrmgus::unit_sound_type::harvesting);
 					acknowledged = 1;
 				}
 			} else {
-				CUnit *depot = FindDeposit(unit, 1000, unit.CurrentResource);
+				CUnit *depot = FindDeposit(unit, 1000, unit.get_current_resource());
 				if (depot) {
 					if (!acknowledged) {
 						PlayUnitSound(unit, wyrmgus::unit_sound_type::acknowledging);
@@ -776,7 +776,7 @@ static bool DoRightButton_Follow(CUnit &unit, CUnit &dest, int flush, int &ackno
 static bool DoRightButton_Harvest_Reverse(CUnit &unit, CUnit &dest, int flush, int &acknowledged)
 {
 	// tell to return a loaded harvester to deposit
-	if (dest.ResourcesHeld > 0 && dest.CanReturnGoodsTo(&unit)
+	if (dest.ResourcesHeld > 0 && dest.can_return_goods_to(&unit)
 		&& dest.Player == unit.Player) {
 		dest.Blink = 4;
 		SendCommandReturnGoods(dest, &unit, flush);
@@ -788,9 +788,9 @@ static bool DoRightButton_Harvest_Reverse(CUnit &unit, CUnit &dest, int flush, i
 	}
 
 	// tell to go and harvest from a building
-	const int res = unit.GivesResource;
+	const resource *res = unit.get_given_resource();
 
-	if (dest.CanHarvest(&unit) && dest.ResourcesHeld < dest.Type->ResInfo[res]->ResourceCapacity && dest.Player == unit.Player) {
+	if (dest.CanHarvest(&unit) && dest.ResourcesHeld < dest.Type->get_resource_info(res)->ResourceCapacity && dest.Player == unit.Player) {
 		unit.Blink = 4;
 		SendCommandResource(dest, unit, flush);
 		return true;
@@ -1429,7 +1429,7 @@ static void handle_mouse_move_on_map(const PixelPos &cursor_pos)
 		const CViewport &cursor_vp = *UI.MouseViewport;
 		const Vec2i cursor_tile_pos = cursor_vp.ScreenToTilePos(cursor_pos);
 		for (const wyrmgus::resource *resource : wyrmgus::resource::get_all()) {
-			if (Selected[0]->Type->ResInfo[resource->get_index()]
+			if (Selected[0]->Type->get_resource_info(resource) != nullptr
 				//Wyrmgus start
 //					&& Selected[0]->Type->ResInfo[res]->TerrainHarvester
 					//Wyrmgus end
@@ -1582,7 +1582,7 @@ void UIHandleMouseMove(const PixelPos &cursorPos)
 				Selected.size() >= 1 && Selected[0]->Player == CPlayer::GetThisPlayer() &&
 				(
 					Selected[0]->CanHarvest(UnitUnderCursor, false)
-					&& (!Selected[0]->CurrentResource || !UnitUnderCursor->Type->CanStore[Selected[0]->CurrentResource] || (Selected[0]->CurrentResource == TradeCost && UnitUnderCursor->Player != CPlayer::GetThisPlayer()))
+					&& (!Selected[0]->CurrentResource || !UnitUnderCursor->Type->can_store(Selected[0]->get_current_resource()) || (Selected[0]->CurrentResource == TradeCost && UnitUnderCursor->Player != CPlayer::GetThisPlayer()))
 				)
 			) {
 				GameCursor = UI.get_cursor(wyrmgus::cursor_type::yellow_hair);
@@ -1867,7 +1867,6 @@ static int SendPatrol(const Vec2i &tilePos, int flush)
 static int SendResource(const Vec2i &pos, int flush)
 //Wyrmgus end
 {
-	int res;
 	CUnit *dest = UnitUnderCursor;
 	int ret = 0;
 	//Wyrmgus start
@@ -1882,13 +1881,13 @@ static int SendResource(const Vec2i &pos, int flush)
 			if (dest
 				//Wyrmgus start
 //				&& (res = dest->Type->GivesResource) != 0
-				&& (res = dest->GivesResource) != 0
+				&& dest->get_given_resource() != nullptr
 				//Wyrmgus end
 				//Wyrmgus start
 //				&& unit.Type->ResInfo[res]
 				&& unit.CanHarvest(dest)
 				//Wyrmgus end
-				&& unit.ResourcesHeld < unit.Type->ResInfo[res]->ResourceCapacity
+				&& unit.ResourcesHeld < unit.Type->get_resource_info(dest->get_given_resource())->ResourceCapacity
 				//Wyrmgus start
 //				&& dest->Type->BoolFlag[CANHARVEST_INDEX].value
 //				&& (dest->Player == unit.Player || dest->Player->Index == PlayerMax - 1)) {
@@ -1899,25 +1898,27 @@ static int SendResource(const Vec2i &pos, int flush)
 				ret = 1;
 				continue;
 			} else {
-				for (res = 0; res < MaxCosts; ++res) {
-					if (unit.Type->ResInfo[res]
+				bool resource_found = false;
+				for (const resource *resource : resource::get_all()) {
+					if (unit.Type->get_resource_info(resource) != nullptr
 						//Wyrmgus start
 //						&& unit.Type->ResInfo[res]->TerrainHarvester
 //						&& mf.player_info->IsExplored(*unit.Player)
 						&& mf.player_info->IsTeamExplored(*unit.Player)
 						//Wyrmgus end
-						&& mf.get_resource() == wyrmgus::resource::get_all()[res]
-						&& unit.ResourcesHeld < unit.Type->ResInfo[res]->ResourceCapacity
-						&& (unit.CurrentResource != res || unit.ResourcesHeld < unit.Type->ResInfo[res]->ResourceCapacity)) {
+						&& mf.get_resource() == resource
+						&& unit.ResourcesHeld < unit.Type->get_resource_info(resource)->ResourceCapacity
+						&& (unit.get_current_resource() != resource || unit.ResourcesHeld < unit.Type->get_resource_info(resource)->ResourceCapacity)) {
 						//Wyrmgus start
 //						SendCommandResourceLoc(unit, pos, flush);
 						SendCommandResourceLoc(unit, pos, flush, UI.CurrentMapLayer->ID);
 						//Wyrmgus end
 						ret = 1;
+						resource_found = true;
 						break;
 					}
 				}
-				if (res != MaxCosts) {
+				if (resource_found) {
 					continue;
 				}
 			}

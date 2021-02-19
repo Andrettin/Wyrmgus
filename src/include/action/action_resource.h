@@ -31,15 +31,12 @@
 
 #include "actions.h"
 
+namespace wyrmgus {
+	class resource;
+}
+
 class COrder_Resource final : public COrder
 {
-	//Wyrmgus start
-//	friend std::unique_ptr<COrder> COrder::NewActionResource(CUnit &harvester, const Vec2i &pos);
-	friend std::unique_ptr<COrder> COrder::NewActionResource(CUnit &harvester, const Vec2i &pos, int z);
-	//Wyrmgus end
-	friend std::unique_ptr<COrder> COrder::NewActionResource(CUnit &harvester, CUnit &mine);
-	friend std::unique_ptr<COrder> COrder::NewActionReturnGoods(CUnit &harvester, CUnit *depot);
-
 public:
 	explicit COrder_Resource(CUnit &harvester);
 	virtual ~COrder_Resource() override;
@@ -59,6 +56,7 @@ public:
 	virtual void UpdatePathFinderData(PathFinderInput &input) override;
 	virtual bool OnAiHitUnit(CUnit &unit, CUnit *attacker, int /*damage*/) override;
 
+	const resource *get_current_resource() const;
 	int GetCurrentResource() const { return CurrentResource; }
 	Vec2i GetHarvestLocation() const;
 	//Wyrmgus start
@@ -108,4 +106,11 @@ private:
 	//Wyrmgus start
 	int MapLayer = 0;;
 	//Wyrmgus end
+
+	//Wyrmgus start
+//	friend std::unique_ptr<COrder> COrder::NewActionResource(CUnit &harvester, const Vec2i &pos);
+	friend std::unique_ptr<COrder> COrder::NewActionResource(CUnit &harvester, const Vec2i &pos, int z);
+	//Wyrmgus end
+	friend std::unique_ptr<COrder> COrder::NewActionResource(CUnit &harvester, CUnit &mine);
+	friend std::unique_ptr<COrder> COrder::NewActionReturnGoods(CUnit &harvester, CUnit *depot);
 };

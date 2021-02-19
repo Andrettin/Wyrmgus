@@ -219,13 +219,13 @@ static void Finish(COrder_Built &order, CUnit &unit)
 	for (size_t i = 0; i != table.size(); ++i) {
 		if (table[i]->CurrentAction() == UnitAction::Repair && table[i]->CurrentOrder()->get_goal() == &unit) {
 			// If we can harvest from the new building, do it.
-			if (type.get_given_resource() != nullptr && table[i]->Type->ResInfo[type.get_given_resource()->get_index()] != nullptr) {
+			if (type.get_given_resource() != nullptr && table[i]->Type->get_resource_info(type.get_given_resource()) != nullptr) {
 				CommandResource(*table[i], unit, 0);
 			}
 			// If we can reurn goods to a new depot, do it.
 			//Wyrmgus start
 //			if (table[i]->CurrentResource && table[i]->ResourcesHeld > 0 && type.CanStore[table[i]->CurrentResource]) {
-			if (table[i]->CanReturnGoodsTo(&unit) && table[i]->ResourcesHeld > 0) {
+			if (table[i]->can_return_goods_to(&unit) && table[i]->ResourcesHeld > 0) {
 			//Wyrmgus end
 				CommandReturnGoods(*table[i], &unit, 0);
 			}
@@ -252,13 +252,13 @@ static void Finish(COrder_Built &order, CUnit &unit)
 			DropOutOnSide(*worker, LookingW, &unit);
 
 			// If we can harvest from the new building, do it.
-			if (type.get_given_resource() != nullptr && worker->Type->ResInfo[type.get_given_resource()->get_index()] != nullptr) {
+			if (type.get_given_resource() != nullptr && worker->Type->get_resource_info(type.get_given_resource()) != nullptr) {
 				CommandResource(*worker, unit, 0);
 			}
 			// If we can reurn goods to a new depot, do it.
 			//Wyrmgus start
 //			if (worker->CurrentResource && worker->ResourcesHeld > 0 && type.CanStore[worker->CurrentResource]) {
-			if (worker->CanReturnGoodsTo(&unit) && worker->ResourcesHeld > 0) {
+			if (worker->can_return_goods_to(&unit) && worker->ResourcesHeld > 0) {
 			//Wyrmgus end
 				CommandReturnGoods(*worker, &unit, 0);
 			}

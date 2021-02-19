@@ -330,7 +330,7 @@ static bool CanShowPopupContent(const PopupConditionPanel *condition,
 	}
 
 	if (condition->CanStore != -1) {
-		if (!type || !type->CanStore[condition->CanStore]) {
+		if (!type || !type->can_store(resource::get_all()[condition->CanStore])) {
 			return false;
 		}
 	}
@@ -1249,9 +1249,9 @@ bool IsButtonAllowed(const CUnit &unit, const wyrmgus::button &buttonaction)
 			break;
 		case ButtonCmd::Harvest:
 			if (!unit.CurrentResource
-				|| !(unit.ResourcesHeld > 0 && !unit.Type->ResInfo[unit.CurrentResource]->LoseResources)
-				|| (unit.ResourcesHeld != unit.Type->ResInfo[unit.CurrentResource]->ResourceCapacity
-					&& unit.Type->ResInfo[unit.CurrentResource]->LoseResources)) {
+				|| !(unit.ResourcesHeld > 0 && !unit.Type->get_resource_info(unit.get_current_resource())->LoseResources)
+				|| (unit.ResourcesHeld != unit.Type->get_resource_info(unit.get_current_resource())->ResourceCapacity
+					&& unit.Type->get_resource_info(unit.get_current_resource())->LoseResources)) {
 				res = true;
 			}
 			//Wyrmgus start
@@ -1262,9 +1262,9 @@ bool IsButtonAllowed(const CUnit &unit, const wyrmgus::button &buttonaction)
 			break;
 		case ButtonCmd::Return:
 			if (!(!unit.CurrentResource
-				  || !(unit.ResourcesHeld > 0 && !unit.Type->ResInfo[unit.CurrentResource]->LoseResources)
-				  || (unit.ResourcesHeld != unit.Type->ResInfo[unit.CurrentResource]->ResourceCapacity
-					  && unit.Type->ResInfo[unit.CurrentResource]->LoseResources))) {
+				  || !(unit.ResourcesHeld > 0 && !unit.Type->get_resource_info(unit.get_current_resource())->LoseResources)
+				  || (unit.ResourcesHeld != unit.Type->get_resource_info(unit.get_current_resource())->ResourceCapacity
+					  && unit.Type->get_resource_info(unit.get_current_resource())->LoseResources))) {
 				res = true;
 			}
 			break;

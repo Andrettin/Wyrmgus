@@ -442,6 +442,9 @@ public:
 	}
 
 	QPoint get_scaled_pixel_offset() const;
+
+	const resource *get_given_resource() const;
+	const resource *get_current_resource() const;
 	
 	CUnit *GetFirstContainer() const;
 
@@ -517,12 +520,12 @@ public:
 	int GetUnitStockReplenishmentTimer(const wyrmgus::unit_type *unit_type) const;
 	void SetUnitStockReplenishmentTimer(const wyrmgus::unit_type *unit_type, int quantity);
 	void ChangeUnitStockReplenishmentTimer(const wyrmgus::unit_type *unit_type, int quantity);
-	int GetResourceStep(const int resource) const;
+	int get_resource_step(const resource *resource) const;
 	int GetTotalInsideCount(const CPlayer *player = nullptr, const bool ignore_items = true, const bool ignore_saved_cargo = false, const wyrmgus::unit_type *type = nullptr) const;
 	bool CanAttack(bool count_inside = true) const;
 	bool IsInCombat() const;
 	bool CanHarvest(const CUnit *dest, bool only_harvestable = true) const;
-	bool CanReturnGoodsTo(const CUnit *dest, int resource = 0) const;
+	bool can_return_goods_to(const CUnit *dest, const resource *resource = nullptr) const;
 	bool CanCastSpell(const wyrmgus::spell *spell, const bool ignore_mana_and_cooldown) const;
 	bool CanCastAnySpell() const;
 

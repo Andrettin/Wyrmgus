@@ -30,6 +30,7 @@
 
 #include "ai_local.h"
 
+#include "database/defines.h"
 #include "map/map.h"
 #include "map/map_layer.h"
 #include "map/tile.h"
@@ -272,8 +273,8 @@ static bool AiFindBuildingPlace2(const CUnit &worker, const wyrmgus::unit_type &
 class HallPlaceFinder final
 {
 public:
-	explicit HallPlaceFinder(const CUnit &worker, const wyrmgus::unit_type &type, int resource, Vec2i *resultPos, bool ignore_exploration, int z) :
-		worker(worker), type(type),
+	explicit HallPlaceFinder(const CUnit &worker, const wyrmgus::unit_type &type, const resource *resource, Vec2i *resultPos, const bool ignore_exploration, const int z)
+		: worker(worker), type(type),
 		movemask(worker.Type->MovementMask
 			& ~((type.BoolFlag[SHOREBUILDING_INDEX].value ? (tile_flag::coast_allowed | tile_flag::land_unit | tile_flag::air_unit | tile_flag::sea_unit)
 			:  (tile_flag::land_unit | tile_flag::air_unit | tile_flag::sea_unit)))),
@@ -296,7 +297,7 @@ private:
 	const CUnit &worker;
 	const wyrmgus::unit_type &type;
 	const tile_flag movemask;
-	const int resource;
+	const wyrmgus::resource *resource = nullptr;
 	Vec2i *resultPos;
 	//Wyrmgus start
 	bool IgnoreExploration;
@@ -336,7 +337,7 @@ bool HallPlaceFinder::IsAUsableMine(const CUnit &mine) const
 		// Town hall near mine
 		//Wyrmgus start
 //		if (unit.Type->CanStore[resource]) {
-		if (unit.Type->CanStore[mine.GivesResource]) {
+		if (unit.Type->can_store(mine.get_given_resource())) {
 		//Wyrmgus end
 			return false;
 		}
@@ -382,12 +383,16 @@ VisitResult HallPlaceFinder::Visit(TerrainTraversal &terrainTraversal, const Vec
 	
 //	CUnit *mine = ResourceOnMap(pos, resource);
 	CUnit *mine = nullptr;
-	if (resource != -1) {
-		mine = ResourceOnMap(pos, resource, z, false);
+	if (this->resource != nullptr) {
+		mine = ResourceOnMap(pos, this->resource, z, false);
 	} else {
-		for (int i = 1; i < MaxCosts; ++i) {
-			if (type.CanStore[i]) {
-				mine = ResourceOnMap(pos, i, z, false);
+		for (const wyrmgus::resource *resource : resource::get_all()) {
+			if (resource == defines::get()->get_time_resource()) {
+				continue;
+			}
+
+			if (type.can_store(resource)) {
+				mine = ResourceOnMap(pos, resource, z, false);
 				if (mine) {
 					break;
 				}
@@ -436,9 +441,9 @@ VisitResult HallPlaceFinder::Visit(TerrainTraversal &terrainTraversal, const Vec
 **                 two flood fills, is not a perfect solution.
 */
 static bool AiFindHallPlace(const CUnit &worker,
-							const wyrmgus::unit_type &type,
+							const unit_type &type,
 							const Vec2i &startPos,
-							int resource,
+							const resource *resource,
 							//Wyrmgus start
 //							Vec2i *resultPos)
 							Vec2i *resultPos, bool ignore_exploration, int z)
@@ -630,12 +635,13 @@ bool AiFindBuildingPlace(const CUnit &worker, const wyrmgus::unit_type &type, co
 	
 	//Mines and Depots
 	for (int i = 1; i < MaxCosts; ++i) {
-		const std::unique_ptr<wyrmgus::resource_info> &resinfo = worker.Type->ResInfo[i];
+		const resource *resource = resource::get_all()[i];
+		const resource_info *res_info = worker.Type->get_resource_info(resource);
 		//Depots
-		if (type.CanStore[i]) {
+		if (type.can_store(resource)) {
 			//Wyrmgus start
 //			if (resinfo && resinfo->TerrainHarvester) {
-			if (resinfo && i == WoodCost) {
+			if (res_info != nullptr && i == WoodCost) {
 			//Wyrmgus end
 				//Wyrmgus start
 //				return AiFindLumberMillPlace(worker, type, startPos, i, resultPos);
@@ -651,7 +657,7 @@ bool AiFindBuildingPlace(const CUnit &worker, const wyrmgus::unit_type &type, co
 			//Wyrmgus end
 				//Wyrmgus start
 //				return AiFindHallPlace(worker, type, startPos, i, resultPos);
-				return AiFindHallPlace(worker, type, startPos, -1, resultPos, ignore_exploration, z);
+				return AiFindHallPlace(worker, type, startPos, nullptr, resultPos, ignore_exploration, z);
 				//Wyrmgus end
 			}
 		} else {
@@ -660,7 +666,7 @@ bool AiFindBuildingPlace(const CUnit &worker, const wyrmgus::unit_type &type, co
 //			if (type.GivesResource == i) {
 			if (type.get_given_resource() != nullptr && type.get_given_resource()->get_index() == i && type.get_given_resource()->get_index() != TradeCost) {
 			//Wyrmgus end
-				if (resinfo) {
+				if (res_info != nullptr) {
 					//Mine have to be build ONTOP resources
 					//Wyrmgus start
 //					return AiFindMiningPlace(worker, type, startPos, i, resultPos);

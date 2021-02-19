@@ -210,7 +210,7 @@ std::unique_ptr<COrder> COrder::NewActionReturnGoods(CUnit &harvester, CUnit *de
 	order->DoneHarvesting = true;
 
 	if (depot == nullptr) {
-		depot = FindDeposit(harvester, 1000, harvester.CurrentResource);
+		depot = FindDeposit(harvester, 1000, harvester.get_current_resource());
 	}
 	if (depot) {
 		order->Depot = depot->acquire_ref();
@@ -221,6 +221,15 @@ std::unique_ptr<COrder> COrder::NewActionReturnGoods(CUnit &harvester, CUnit *de
 		order->MapLayer = harvester.MapLayer->ID;
 	}
 	return order;
+}
+
+const resource *COrder_Resource::get_current_resource() const
+{
+	if (this->CurrentResource != 0) {
+		return resource::get_all()[this->CurrentResource];
+	}
+
+	return nullptr;
 }
 
 Vec2i COrder_Resource::GetHarvestLocation() const
@@ -628,7 +637,7 @@ void COrder_Resource::UnitGotoGoal(CUnit &unit, CUnit *const goal, int state)
 int COrder_Resource::StartGathering(CUnit &unit)
 {
 	CUnit *goal;
-	const std::unique_ptr<wyrmgus::resource_info> &resinfo = unit.Type->ResInfo[this->CurrentResource];
+	const resource_info *res_info = unit.Type->get_resource_info(this->get_current_resource());
 	Assert(!unit.get_pixel_offset().x());
 	Assert(!unit.get_pixel_offset().y());
 
@@ -661,8 +670,8 @@ int COrder_Resource::StartGathering(CUnit &unit)
 		}
 #endif
 		UnitHeadingFromDeltaXY(unit, this->goalPos - unit.tilePos);
-		if (resinfo->WaitAtResource) {
-			this->TimeToHarvest = std::max<int>(1, resinfo->WaitAtResource * CPlayer::base_speed_factor / std::max(1, unit.Player->get_resource_harvest_speed(resource::get_all()[this->CurrentResource])));
+		if (res_info->WaitAtResource) {
+			this->TimeToHarvest = std::max<int>(1, res_info->WaitAtResource * CPlayer::base_speed_factor / std::max(1, unit.Player->get_resource_harvest_speed(resource::get_all()[this->CurrentResource])));
 		} else {
 			this->TimeToHarvest = 1;
 		}
@@ -686,8 +695,8 @@ int COrder_Resource::StartGathering(CUnit &unit)
 		this->goalPos.x = -1;
 		this->goalPos.y = -1;
 		//Wyrmgus start
-//		if ((goal = UnitFindResource(unit, unit, 15, this->CurrentResource, unit.Player->AiEnabled))) {
-		if ((goal = UnitFindResource(unit, unit, 15, this->CurrentResource, true, nullptr, true, false, false, false, true))) {
+//		if ((goal = UnitFindResource(unit, unit, 15, this->get_current_resource(), unit.Player->AiEnabled))) {
+		if ((goal = UnitFindResource(unit, unit, 15, this->get_current_resource(), true, nullptr, true, false, false, false, true))) {
 		//Wyrmgus end
 			this->State = SUB_START_RESOURCE;
 			this->set_goal(goal);
@@ -754,14 +763,14 @@ int COrder_Resource::StartGathering(CUnit &unit)
 	// Activate the resource
 	goal->Resource.Active++;
 
-	if (resinfo->WaitAtResource) {
+	if (res_info->WaitAtResource) {
 		//Wyrmgus start
 //		this->TimeToHarvest = std::max<int>(1, resinfo.WaitAtResource * CPlayer::base_speed_factor / unit.Player->SpeedResourcesHarvest[resinfo.ResourceId]);
-		int wait_at_resource = resinfo->WaitAtResource;
+		int wait_at_resource = res_info->WaitAtResource;
 		if (!goal->Type->BoolFlag[HARVESTFROMOUTSIDE_INDEX].value) {
-			wait_at_resource = resinfo->WaitAtResource * 100 / std::max(1, unit.GetResourceStep(this->CurrentResource));
+			wait_at_resource = res_info->WaitAtResource * 100 / std::max(1, unit.get_resource_step(this->get_current_resource()));
 		}
-		this->TimeToHarvest = std::max<int>(1, wait_at_resource * CPlayer::base_speed_factor / std::max(1, unit.Player->get_resource_harvest_speed(resinfo->get_resource()) + goal->Variable[TIMEEFFICIENCYBONUS_INDEX].Value));
+		this->TimeToHarvest = std::max<int>(1, wait_at_resource * CPlayer::base_speed_factor / std::max(1, unit.Player->get_resource_harvest_speed(res_info->get_resource()) + goal->Variable[TIMEEFFICIENCYBONUS_INDEX].Value));
 		//Wyrmgus end
 	} else {
 		this->TimeToHarvest = 1;
@@ -792,7 +801,7 @@ static void AnimateActionHarvest(CUnit &unit)
 void COrder_Resource::LoseResource(CUnit &unit, CUnit &source)
 {
 	CUnit *depot;
-	const std::unique_ptr<wyrmgus::resource_info> &resinfo = unit.Type->ResInfo[this->CurrentResource];
+	const resource_info *res_info = unit.Type->get_resource_info(this->get_current_resource());
 
 	//Wyrmgus start
 	const wyrmgus::unit_type &source_type = *source.Type;
@@ -814,11 +823,11 @@ void COrder_Resource::LoseResource(CUnit &unit, CUnit &source)
 	// Continue to harvest if we aren't fully loaded
 	//Wyrmgus start
 //	if (resinfo.HarvestFromOutside && unit.ResourcesHeld < resinfo.ResourceCapacity) {
-	if (source_type.BoolFlag[HARVESTFROMOUTSIDE_INDEX].value && unit.ResourcesHeld < resinfo->ResourceCapacity) {
+	if (source_type.BoolFlag[HARVESTFROMOUTSIDE_INDEX].value && unit.ResourcesHeld < res_info->ResourceCapacity) {
 	//Wyrmgus end
 		//Wyrmgus start
-//		CUnit *goal = UnitFindResource(unit, unit, 15, this->CurrentResource, 1);
-		CUnit *goal = UnitFindResource(unit, unit, 15, this->CurrentResource, 1, nullptr, true, false, false, false, true);
+//		CUnit *goal = UnitFindResource(unit, unit, 15, this->get_current_resource(), 1);
+		CUnit *goal = UnitFindResource(unit, unit, 15, this->get_current_resource(), 1, nullptr, true, false, false, false, true);
 		//Wyrmgus end
 
 		if (goal) {
@@ -831,7 +840,7 @@ void COrder_Resource::LoseResource(CUnit &unit, CUnit &source)
 	}
 
 	// If we are fully loaded first search for a depot.
-	if (unit.ResourcesHeld && (depot = FindDeposit(unit, 1000, unit.CurrentResource))) {
+	if (unit.ResourcesHeld && (depot = FindDeposit(unit, 1000, unit.get_current_resource()))) {
 		if (unit.Container) {
 			DropOutNearest(unit, depot->tilePos + depot->GetHalfTileSize(), &source);
 		}
@@ -858,8 +867,8 @@ void COrder_Resource::LoseResource(CUnit &unit, CUnit &source)
 	this->goalPos.y = -1;
 	//use depot as goal
 	//Wyrmgus start
-//	depot = UnitFindResource(unit, unit, 15, this->CurrentResource, unit.Player->AiEnabled);
-	depot = UnitFindResource(unit, unit, 15, this->CurrentResource, true, nullptr, true, false, false, false, true);
+//	depot = UnitFindResource(unit, unit, 15, this->get_current_resource(), unit.Player->AiEnabled);
+	depot = UnitFindResource(unit, unit, 15, this->get_current_resource(), true, nullptr, true, false, false, false, true);
 	//Wyrmgus end
 	if (depot) {
 		DebugPrint("%d: Worker %d report: Resource is exhausted, Found another resource.\n"
@@ -885,7 +894,7 @@ void COrder_Resource::LoseResource(CUnit &unit, CUnit &source)
 int COrder_Resource::GatherResource(CUnit &unit)
 {
 	CUnit *source = nullptr;
-	const std::unique_ptr<wyrmgus::resource_info> &resinfo = unit.Type->ResInfo[this->CurrentResource];
+	const resource_info *res_info = unit.Type->get_resource_info(this->get_current_resource());
 	int addload;
 
 	//Wyrmgus start
@@ -926,13 +935,13 @@ int COrder_Resource::GatherResource(CUnit &unit)
 
 	while (!this->DoneHarvesting && this->TimeToHarvest < 0) {
 		//FIXME: rb - how should it look for WaitAtResource == 0
-		if (resinfo->WaitAtResource) {
+		if (res_info->WaitAtResource) {
 			// Wyrmgus start
 //			this->TimeToHarvest += std::max<int>(1, resinfo.WaitAtResource * CPlayer::base_speed_factor / unit.Player->SpeedResourcesHarvest[resinfo.ResourceId]);
-			int wait_at_resource = resinfo->WaitAtResource;
-			int resource_harvest_speed = unit.Player->get_resource_harvest_speed(resinfo->get_resource());
+			int wait_at_resource = res_info->WaitAtResource;
+			int resource_harvest_speed = unit.Player->get_resource_harvest_speed(res_info->get_resource());
 			if (!CMap::Map.Info.IsPointOnMap(this->goalPos, this->MapLayer) && !harvest_from_outside) {
-				wait_at_resource = resinfo->WaitAtResource * 100 / std::max(1, unit.GetResourceStep(this->CurrentResource));
+				wait_at_resource = res_info->WaitAtResource * 100 / std::max(1, unit.get_resource_step(this->get_current_resource()));
 			}
 			if (this->get_goal()) {
 				resource_harvest_speed += this->get_goal()->Variable[TIMEEFFICIENCYBONUS_INDEX].Value;
@@ -944,22 +953,22 @@ int COrder_Resource::GatherResource(CUnit &unit)
 		}
 
 		// Calculate how much we can load.
-		if (unit.GetResourceStep(this->CurrentResource) && (harvest_from_outside || CMap::Map.Info.IsPointOnMap(this->goalPos, this->MapLayer))) {
-			addload = unit.GetResourceStep(this->CurrentResource);
+		if (unit.get_resource_step(this->get_current_resource()) && (harvest_from_outside || CMap::Map.Info.IsPointOnMap(this->goalPos, this->MapLayer))) {
+			addload = unit.get_resource_step(this->get_current_resource());
 		} else {
 			//Wyrmgus start
 //			addload = resinfo.ResourceCapacity;
 			if (this->CurrentResource == TradeCost) { // the load added when trading depends on the price difference between the two players
-				addload = unit.Player->ConvergePricesWith(*unit.Container->Player, resinfo->ResourceCapacity);
+				addload = unit.Player->ConvergePricesWith(*unit.Container->Player, res_info->ResourceCapacity);
 				addload = std::max(10, addload);
 			} else {
-				addload = std::min(100, resinfo->ResourceCapacity);
+				addload = std::min(100, res_info->ResourceCapacity);
 			}
 			//Wyrmgus end
 		}
 		// Make sure we don't bite more than we can chew.
-		if (unit.ResourcesHeld + addload > resinfo->ResourceCapacity) {
-			addload = resinfo->ResourceCapacity - unit.ResourcesHeld;
+		if (unit.ResourcesHeld + addload > res_info->ResourceCapacity) {
+			addload = res_info->ResourceCapacity - unit.ResourcesHeld;
 		}
 
 		//Wyrmgus start
@@ -1081,7 +1090,7 @@ int COrder_Resource::GatherResource(CUnit &unit)
 //		if (resinfo.TerrainHarvester) {
 		if (CMap::Map.Info.IsPointOnMap(this->goalPos, this->MapLayer)) {
 		//Wyrmgus end
-			if (unit.ResourcesHeld == resinfo->ResourceCapacity) {
+			if (unit.ResourcesHeld == res_info->ResourceCapacity) {
 				// Mark as complete.
 				this->DoneHarvesting = true;
 			}
@@ -1091,13 +1100,13 @@ int COrder_Resource::GatherResource(CUnit &unit)
 //			if (resinfo.HarvestFromOutside) {
 			if (harvest_from_outside) {
 			//Wyrmgus end
-				if ((unit.ResourcesHeld == resinfo->ResourceCapacity) || (source == nullptr)) {
+				if ((unit.ResourcesHeld == res_info->ResourceCapacity) || (source == nullptr)) {
 					// Mark as complete.
 					this->DoneHarvesting = true;
 				}
 				return 0;
 			} else {
-				return unit.ResourcesHeld == resinfo->ResourceCapacity && source;
+				return unit.ResourcesHeld == res_info->ResourceCapacity && source;
 			}
 		}
 	}
@@ -1215,7 +1224,7 @@ bool COrder_Resource::StopGathering(CUnit &unit)
 #endif
 
 	// Find and send to resource deposit.
-	CUnit *depot = FindDeposit(unit, 1000, unit.CurrentResource);
+	CUnit *depot = FindDeposit(unit, 1000, unit.get_current_resource());
 	if (!depot || !unit.ResourcesHeld || this->Finished) {
 		//Wyrmgus start
 //		if (!(resinfo.HarvestFromOutside || resinfo.TerrainHarvester)) {
@@ -1262,7 +1271,7 @@ bool COrder_Resource::StopGathering(CUnit &unit)
 */
 int COrder_Resource::MoveToDepot(CUnit &unit)
 {
-	const std::unique_ptr<wyrmgus::resource_info> &resinfo = unit.Type->ResInfo[this->CurrentResource];
+	const resource_info *res_info = unit.Type->get_resource_info(this->get_current_resource());
 	CUnit &goal = *this->get_goal();
 	CPlayer &player = *unit.Player;
 	Assert(&goal);
@@ -1311,7 +1320,7 @@ int COrder_Resource::MoveToDepot(CUnit &unit)
 
 		unit.CurrentOrder()->clear_goal();
 
-		CUnit *depot = FindDeposit(unit, 1000, unit.CurrentResource);
+		CUnit *depot = FindDeposit(unit, 1000, unit.get_current_resource());
 
 		if (depot) {
 			UnitGotoGoal(unit, depot, SUB_MOVE_TO_DEPOT);
@@ -1333,7 +1342,7 @@ int COrder_Resource::MoveToDepot(CUnit &unit)
 	}
 
 	this->clear_goal();
-	unit.Wait = resinfo->WaitAtDepot;
+	unit.Wait = res_info->WaitAtDepot;
 
 	// Place unit inside the depot
 	if (unit.Wait) {
@@ -1388,7 +1397,7 @@ int COrder_Resource::MoveToDepot(CUnit &unit)
 	if (unit.Wait) {
 		//Wyrmgus start
 //		unit.Wait /= std::max(1, unit.Player->SpeedResourcesReturn[resinfo->ResourceId] / CPlayer::base_speed_factor);
-		unit.Wait /= std::max(1, (unit.Player->get_resource_return_speed(resinfo->get_resource()) + goal.Variable[TIMEEFFICIENCYBONUS_INDEX].Value) / CPlayer::base_speed_factor);
+		unit.Wait /= std::max(1, (unit.Player->get_resource_return_speed(res_info->get_resource()) + goal.Variable[TIMEEFFICIENCYBONUS_INDEX].Value) / CPlayer::base_speed_factor);
 		//Wyrmgus end
 		if (unit.Wait) {
 			unit.Wait--;
@@ -1406,8 +1415,8 @@ int COrder_Resource::MoveToDepot(CUnit &unit)
 */
 bool COrder_Resource::WaitInDepot(CUnit &unit)
 {
-	const std::unique_ptr<wyrmgus::resource_info> &resinfo = unit.Type->ResInfo[this->CurrentResource];
-	const CUnit *depot = ResourceDepositOnMap(unit.tilePos, resinfo->get_resource()->get_index(), unit.MapLayer->ID);
+	const resource_info *res_info = unit.Type->get_resource_info(this->get_current_resource());
+	const CUnit *depot = ResourceDepositOnMap(unit.tilePos, res_info->get_resource()->get_index(), unit.MapLayer->ID);
 
 	//Assert(depot);
 
@@ -1478,7 +1487,7 @@ bool COrder_Resource::WaitInDepot(CUnit &unit)
 				//Wyrmgus start
 	//			goal = UnitFindResource(unit, newdepot ? *newdepot : (mine ? *mine : unit), mine ? range : 1000,
 	//									this->CurrentResource, unit.Player->AiEnabled, newdepot ? newdepot : depot);
-				goal = UnitFindResource(unit, start_unit ? *start_unit : unit, 1000, this->CurrentResource, true, newdepot ? newdepot : depot, true, false, false, false, true);
+				goal = UnitFindResource(unit, start_unit ? *start_unit : unit, 1000, this->get_current_resource(), true, newdepot ? newdepot : depot, true, false, false, false, true);
 				//Wyrmgus end
 			}
 		}
@@ -1565,15 +1574,15 @@ void COrder_Resource::ResourceGiveUp(CUnit &unit)
 bool COrder_Resource::FindAnotherResource(CUnit &unit)
 {
 	if (this->CurrentResource) {
-		const std::unique_ptr<wyrmgus::resource_info> &resinfo = unit.Type->ResInfo[this->CurrentResource];
-		if (resinfo) {
+		const resource_info *res_info = unit.Type->get_resource_info(this->get_current_resource());
+		if (res_info != nullptr) {
 			//Wyrmgus start
 	//		if (!resinfo.TerrainHarvester) {
 			if (!CMap::Map.Info.IsPointOnMap(this->goalPos, this->MapLayer)) {
 			//Wyrmgus end
 				//Wyrmgus start
 //				CUnit *newGoal = UnitFindResource(unit, this->Resource.get_mine() ? *this->Resource.get_mine() : unit, 8, this->CurrentResource, 1);
-				CUnit *newGoal = UnitFindResource(unit, (this->Resource.get_mine() && this->Resource.get_mine()->Type) ? *this->Resource.get_mine() : unit, 8, this->CurrentResource, 1, nullptr, true, false, false, false, true);
+				CUnit *newGoal = UnitFindResource(unit, (this->Resource.get_mine() && this->Resource.get_mine()->Type) ? *this->Resource.get_mine() : unit, 8, this->get_current_resource(), 1, nullptr, true, false, false, false, true);
 				//Wyrmgus end
 
 				if (newGoal) {

@@ -492,8 +492,8 @@ void CUnit::Init()
 	MineLow = 0;
 	memset(&Anim, 0, sizeof(Anim));
 	memset(&WaitBackup, 0, sizeof(WaitBackup));
-	GivesResource = 0;
-	CurrentResource = 0;
+	this->GivesResource = 0;
+	this->CurrentResource = 0;
 	this->reset_step_count();
 	this->Orders.clear();
 	this->clear_special_orders();
@@ -731,10 +731,11 @@ void CUnit::IncreaseLevel(int level_quantity, bool automatic_learning)
 					const wyrmgus::unit_type *experience_upgrade_type = AiHelpers.ExperienceUpgrades[Type->Slot][i];
 					if (check_conditions(experience_upgrade_type, this, true)) {
 						if (this->get_character() == nullptr || !wyrmgus::vector::contains(this->get_character()->ForbiddenUpgrades, experience_upgrade_type)) {
-							if (!experience_upgrade_type->ResInfo[this->CurrentResource]) {
+							if (experience_upgrade_type->get_resource_info(this->get_current_resource()) == nullptr) {
 								continue;
 							}
-							unsigned int gathering_rate = experience_upgrade_type->GetResourceStep(this->CurrentResource, this->Player->Index);
+
+							unsigned int gathering_rate = experience_upgrade_type->get_resource_step(this->get_current_resource(), this->Player->Index);
 							if (gathering_rate >= best_gathering_rate) {
 								if (gathering_rate > best_gathering_rate) {
 									best_gathering_rate = gathering_rate;
@@ -5566,6 +5567,24 @@ QPoint CUnit::get_scaled_pixel_offset() const
 	return this->get_pixel_offset() * wyrmgus::defines::get()->get_scale_factor();
 }
 
+const resource *CUnit::get_given_resource() const
+{
+	if (this->GivesResource != 0) {
+		return resource::get_all()[this->GivesResource];
+	}
+
+	return nullptr;
+}
+
+const resource *CUnit::get_current_resource() const
+{
+	if (this->CurrentResource != 0) {
+		return resource::get_all()[this->CurrentResource];
+	}
+
+	return nullptr;
+}
+
 void CUnit::SetIndividualUpgrade(const CUpgrade *upgrade, int quantity)
 {
 	if (!upgrade) {
@@ -5983,39 +6002,43 @@ void CUnit::ChangeUnitStockReplenishmentTimer(const wyrmgus::unit_type *unit_typ
 	this->SetUnitStockReplenishmentTimer(unit_type, this->GetUnitStockReplenishmentTimer(unit_type) + quantity);
 }
 
-int CUnit::GetResourceStep(const int resource) const
+int CUnit::get_resource_step(const resource *resource) const
 {
-	if (!this->Type->ResInfo[resource]) {
-		throw std::runtime_error("Tried to get the resource step for resource \"" + std::to_string(resource) + "\" for a unit of type \"" + this->Type->get_identifier() + "\", which doesn't support gathering that resource.");
+	const resource_info *res_info = this->Type->get_resource_info(resource);
+
+	if (res_info == nullptr) {
+		throw std::runtime_error("Tried to get the resource step for resource \"" + resource->get_identifier() + "\" for a unit of type \"" + this->Type->get_identifier() + "\", which doesn't support gathering that resource.");
 	}
 
-	int resource_step = this->Type->ResInfo[resource]->ResourceStep;
+	int resource_step = res_info->ResourceStep;
 	
 	resource_step += this->Variable[GATHERINGBONUS_INDEX].Value;
+
+	const int res_index = resource->get_index();
 	
-	if (resource == CopperCost) {
+	if (res_index == CopperCost) {
 		resource_step += this->Variable[COPPERGATHERINGBONUS_INDEX].Value;
-	} else if (resource == SilverCost) {
+	} else if (res_index == SilverCost) {
 		resource_step += this->Variable[SILVERGATHERINGBONUS_INDEX].Value;
-	} else if (resource == GoldCost) {
+	} else if (res_index == GoldCost) {
 		resource_step += this->Variable[GOLDGATHERINGBONUS_INDEX].Value;
-	} else if (resource == IronCost) {
+	} else if (res_index == IronCost) {
 		resource_step += this->Variable[IRONGATHERINGBONUS_INDEX].Value;
-	} else if (resource == MithrilCost) {
+	} else if (res_index == MithrilCost) {
 		resource_step += this->Variable[MITHRILGATHERINGBONUS_INDEX].Value;
-	} else if (resource == WoodCost) {
+	} else if (res_index == WoodCost) {
 		resource_step += this->Variable[LUMBERGATHERINGBONUS_INDEX].Value;
-	} else if (resource == StoneCost || resource == LimestoneCost) {
+	} else if (res_index == StoneCost || res_index == LimestoneCost) {
 		resource_step += this->Variable[STONEGATHERINGBONUS_INDEX].Value;
-	} else if (resource == CoalCost) {
+	} else if (res_index == CoalCost) {
 		resource_step += this->Variable[COALGATHERINGBONUS_INDEX].Value;
-	} else if (resource == JewelryCost) {
+	} else if (res_index == JewelryCost) {
 		resource_step += this->Variable[JEWELRYGATHERINGBONUS_INDEX].Value;
-	} else if (resource == FurnitureCost) {
+	} else if (res_index == FurnitureCost) {
 		resource_step += this->Variable[FURNITUREGATHERINGBONUS_INDEX].Value;
-	} else if (resource == LeatherCost) {
+	} else if (res_index == LeatherCost) {
 		resource_step += this->Variable[LEATHERGATHERINGBONUS_INDEX].Value;
-	} else if (resource == DiamondsCost || resource == EmeraldsCost) {
+	} else if (res_index == DiamondsCost || res_index == EmeraldsCost) {
 		resource_step += this->Variable[GEMSGATHERINGBONUS_INDEX].Value;
 	}
 	
@@ -6100,11 +6123,11 @@ bool CUnit::CanHarvest(const CUnit *dest, bool only_harvestable) const
 		return false;
 	}
 	
-	if (!dest->GivesResource) {
+	if (dest->get_given_resource() == nullptr) {
 		return false;
 	}
 	
-	if (!this->Type->ResInfo[dest->GivesResource]) {
+	if (!this->Type->get_resource_info(dest->get_given_resource())) {
 		return false;
 	}
 	
@@ -6140,25 +6163,25 @@ bool CUnit::CanHarvest(const CUnit *dest, bool only_harvestable) const
 	return true;
 }
 
-bool CUnit::CanReturnGoodsTo(const CUnit *dest, int resource) const
+bool CUnit::can_return_goods_to(const CUnit *dest, const resource *resource) const
 {
 	if (!dest) {
 		return false;
 	}
 	
-	if (!resource) {
-		resource = this->CurrentResource;
+	if (resource == nullptr) {
+		resource = this->get_current_resource();
 	}
 	
-	if (!resource) {
+	if (resource == nullptr) {
 		return false;
 	}
 	
-	if (!dest->Type->CanStore[this->CurrentResource]) {
+	if (!dest->Type->can_store(resource)) {
 		return false;
 	}
 	
-	if (resource == TradeCost) {
+	if (resource->get_index() == TradeCost) {
 		if (dest->Player != this->Player) { //can only return trade to markets owned by the same player
 			return false;
 		}

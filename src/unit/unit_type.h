@@ -23,7 +23,6 @@
 //      along with this program; if not, write to the Free Software
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
-//
 
 #pragma once
 
@@ -32,7 +31,7 @@
 #include "database/detailed_data_entry.h"
 #include "database/data_type.h"
 #include "data_type.h"
-#include "economy/resource.h"
+#include "economy/resource_container.h"
 #include "missileconfig.h"
 #include "ui/icon.h"
 #include "upgrade/upgrade_structs.h"
@@ -956,7 +955,7 @@ public:
 	void calculate_movement_mask();
 
 	int GetAvailableLevelUpUpgrades() const;
-	int GetResourceStep(const int resource, const int player) const;
+	int get_resource_step(const resource *resource, const int player) const;
 	const unit_type_variation *GetDefaultVariation(const CPlayer *player, const int image_layer = -1) const;
 	unit_type_variation *GetVariation(const std::string &variation_name, int image_layer = -1) const;
 	std::string GetRandomVariationIdent(int image_layer = -1) const;
@@ -1009,12 +1008,42 @@ public:
 		return this->button_key;
 	}
 
+	const resource_set &get_stored_resources() const
+	{
+		return this->stored_resources;
+	}
+
+	bool can_store(const resource *resource) const
+	{
+		if (resource == nullptr) {
+			throw std::runtime_error("A null resource was provided to unit_type::can_store().");
+		}
+
+		return this->stored_resources.contains(resource);
+	}
+
 	const resource *get_given_resource() const
 	{
 		return this->given_resource;
 	}
 
 	bool can_produce_a_resource() const;
+
+	const resource_map<std::unique_ptr<resource_info>> &get_resource_infos() const
+	{
+		return this->resource_infos;
+	}
+
+	const resource_info *get_resource_info(const resource *resource) const
+	{
+		const auto find_iterator = this->resource_infos.find(resource);
+
+		if (find_iterator != this->resource_infos.end()) {
+			return find_iterator->second.get();
+		}
+
+		return nullptr;
+	}
 
 	const std::vector<int> &get_starting_resources() const
 	{
@@ -1239,15 +1268,10 @@ public:
 	};
 	std::vector<BoolFlags> BoolFlag;
 
-	int CanStore[MaxCosts];             /// Resources that we can store here.
 private:
+	resource_set stored_resources;             /// Resources that we can store here.
 	resource *given_resource = nullptr; //the resource this unit gives
-public:
-	//Wyrmgus start
-	int GrandStrategyProductionEfficiencyModifier[MaxCosts];	/// production modifier for a particular resource for grand strategy mode (used for buildings)
-	//Wyrmgus end
-	std::unique_ptr<resource_info> ResInfo[MaxCosts];    /// Resource information.
-private:
+	resource_map<std::unique_ptr<resource_info>> resource_infos;    /// Resource information.
 	std::vector<std::unique_ptr<unit_type_variation>> variations;
 public:
 	//Wyrmgus start

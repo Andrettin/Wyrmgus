@@ -1380,11 +1380,12 @@ static int CclDefineUnitType(lua_State *l)
 					++k;
 					if (!strcmp(value, "resource-id")) {
 						lua_rawgeti(l, -1, k + 1);
-						int resource_id = CclGetResourceByName(l);
-						if (type->ResInfo[resource_id] == nullptr) {
-							type->ResInfo[resource_id] = std::make_unique<wyrmgus::resource_info>(type, wyrmgus::resource::get_all()[resource_id]);
+						const int resource_id = CclGetResourceByName(l);
+						const resource *resource = resource::get_all()[resource_id];
+						if (type->get_resource_info(resource) == nullptr) {
+							type->resource_infos[resource] = std::make_unique<resource_info>(type, resource);
 						}
-						res = type->ResInfo[resource_id].get();
+						res = type->resource_infos[resource].get();
 						lua_pop(l, 1);
 					} else if (!strcmp(value, "resource-step")) {
 						res->ResourceStep = LuaToNumber(l, -1, k + 1);
@@ -1419,23 +1420,9 @@ static int CclDefineUnitType(lua_State *l)
 			const int subargs = lua_rawlen(l, -1);
 			for (int k = 0; k < subargs; ++k) {
 				lua_rawgeti(l, -1, k + 1);
-				type->CanStore[CclGetResourceByName(l)] = 1;
+				type->stored_resources.insert(resource::get_all()[CclGetResourceByName(l)]);
 				lua_pop(l, 1);
 			}
-		//Wyrmgus start
-		} else if (!strcmp(value, "GrandStrategyProductionEfficiencyModifier")) {
-			if (!lua_istable(l, -1)) {
-				LuaError(l, "incorrect argument");
-			}
-			const int subargs = lua_rawlen(l, -1);
-			for (int k = 0; k < subargs; ++k) {
-				lua_rawgeti(l, -1, k + 1);
-				const int res = CclGetResourceByName(l);
-				lua_pop(l, 1);
-				++k;
-				type->GrandStrategyProductionEfficiencyModifier[res] = LuaToNumber(l, -1, k + 1);
-			}
-		//Wyrmgus end
 		} else if (!strcmp(value, "CanCastSpell")) {
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument");
@@ -3093,9 +3080,9 @@ void UpdateUnitVariables(CUnit &unit)
 		unit.Variable[GIVERESOURCE_INDEX].Enable = 1;
 		//Wyrmgus end
 	}
-	if (unit.Type->BoolFlag[HARVESTER_INDEX].value && unit.CurrentResource) {
+	if (unit.Type->BoolFlag[HARVESTER_INDEX].value && unit.get_current_resource() != nullptr) {
 		unit.Variable[CARRYRESOURCE_INDEX].Value = unit.ResourcesHeld;
-		unit.Variable[CARRYRESOURCE_INDEX].Max = unit.Type->ResInfo[unit.CurrentResource]->ResourceCapacity;
+		unit.Variable[CARRYRESOURCE_INDEX].Max = unit.Type->get_resource_info(unit.get_current_resource())->ResourceCapacity;
 	}
 
 	//Wyrmgus start

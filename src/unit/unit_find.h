@@ -480,12 +480,12 @@ CUnit *FindUnit_If(const Vec2i &ltPos, const Vec2i &rbPos, int z, Pred pred)
 /// Find resource
 extern CUnit *UnitFindResource(const CUnit &unit, const CUnit &start_unit, int range,
 								//Wyrmgus Start
-//							   int resource, bool check_usage = false, const CUnit *deposit = nullptr);
-							   int resource, bool check_usage = false, const CUnit *deposit = nullptr, bool only_harvestable = true, bool ignore_exploration = false, bool only_unsettled_area = false, bool include_luxury = false, bool only_same = false);
+//							   const resource *resource, bool check_usage = false, const CUnit *deposit = nullptr);
+							   const resource *resource, bool check_usage = false, const CUnit *deposit = nullptr, bool only_harvestable = true, bool ignore_exploration = false, bool only_unsettled_area = false, bool include_luxury = false, bool only_same = false);
 								//Wyrmgus end
 
 /// Find nearest deposit
-extern CUnit *FindDeposit(const CUnit &unit, int range, int resource);
+extern CUnit *FindDeposit(const CUnit &unit, const int range, const resource *resource);
 //Wyrmgus start
 /// Find nearest home market
 extern CUnit *FindHomeMarket(const CUnit &unit, int range);
@@ -512,8 +512,8 @@ extern CUnit *TargetOnMap(const CUnit &unit, const Vec2i &pos1, const Vec2i &pos
 
 /// Return resource, if on map tile
 //Wyrmgus start
-//extern CUnit *ResourceOnMap(const Vec2i &pos, int resource, bool mine_on_top = true);
-extern CUnit *ResourceOnMap(const Vec2i &pos, int resource, int z, bool only_harvestable = true, bool only_same = true);
+//extern CUnit *ResourceOnMap(const Vec2i &pos, const resource *resource, bool mine_on_top = true);
+extern CUnit *ResourceOnMap(const Vec2i &pos, const resource *resource, const int z, const bool only_harvestable = true, const bool only_same = true);
 //Wyrmgus end
 /// Return resource deposit, if on map tile
 //Wyrmgus start
