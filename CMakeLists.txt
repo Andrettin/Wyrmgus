@@ -513,6 +513,7 @@ set(util_SRCS
 	src/util/random.cpp
 	src/util/string_conversion_util.cpp
 	src/util/string_util.cpp
+	src/util/thread_pool.cpp
 	src/util/time_util.cpp
 	src/util/util.cpp
 )
@@ -1011,6 +1012,7 @@ set(stratagus_util_HDRS
 	src/util/size_util.h
 	src/util/string_conversion_util.h
 	src/util/string_util.h
+	src/util/thread_pool.h
 	src/util/time_util.h
 	src/util/type_traits.h
 	src/util/util.h

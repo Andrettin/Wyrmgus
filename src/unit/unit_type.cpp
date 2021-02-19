@@ -1258,7 +1258,7 @@ void unit_type::initialize()
 	this->UpdateDefaultBoolFlags();
 	if (GameRunning || Editor.Running == EditorEditing) {
 		InitUnitType(*this);
-		LoadUnitType(*this);
+		LoadUnitType(this);
 	}
 
 	if (!CclInConfigFile || GameRunning || Editor.Running == EditorEditing) {
@@ -2689,47 +2689,47 @@ int GetUnitTypesCount()
 */
 void LoadUnitTypes()
 {
-	for (wyrmgus::unit_type *unit_type : wyrmgus::unit_type::get_all()) {
-		ShowLoadProgress(_("Loading Unit Types (%d%%)"), (unit_type->Slot + 1) * 100 / wyrmgus::unit_type::get_all().size());
-		LoadUnitType(*unit_type);
+	for (unit_type *unit_type : unit_type::get_all()) {
+		ShowLoadProgress(_("Loading Unit Types (%d%%)"), (unit_type->get_index() + 1) * 100 / unit_type::get_all().size());
+		LoadUnitType(unit_type);
 	}
 }
 
 //Wyrmgus start
-void LoadUnitType(wyrmgus::unit_type &type)
+void LoadUnitType(unit_type *unit_type)
 {
 	// Lookup icons.
-	if (!type.Icon.Name.empty()) {
-		type.Icon.Load();
+	if (!unit_type->Icon.Name.empty()) {
+		unit_type->Icon.Load();
 	}
 
-	for (const auto &variation : type.get_variations()) {
+	for (const auto &variation : unit_type->get_variations()) {
 		if (!variation->Icon.Name.empty()) {
 			variation->Icon.Load();
 		}
 	}
 
 	// Lookup missiles.
-	type.Missile.MapMissile();
+	unit_type->Missile.MapMissile();
 	//Wyrmgus start
-	type.FireMissile.MapMissile();
+	unit_type->FireMissile.MapMissile();
 	//Wyrmgus end
-	type.Explosion.MapMissile();
+	unit_type->Explosion.MapMissile();
 
 	// Lookup impacts
 	for (int i = 0; i < ANIMATIONS_DEATHTYPES + 2; ++i) {
-		type.Impact[i].MapMissile();
+		unit_type->Impact[i].MapMissile();
 	}
 
 #ifndef DYNAMIC_LOAD
 	// Load Sprite
-	if (!type.Sprite) {
-		LoadUnitTypeSprite(type);
+	if (unit_type->Sprite == nullptr) {
+		LoadUnitTypeSprite(*unit_type);
 
 		IncItemsLoaded();
 	}
 #endif
-	// FIXME: should i copy the animations of same graphics?
+	// FIXME: should I copy the animations of the same graphics?
 }
 //Wyrmgus end
 

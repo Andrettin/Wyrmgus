@@ -52,7 +52,7 @@ extern bool ZoomNoResize;
 
 class CGraphic : public gcn::Image
 {
-	struct frame_pos_t {
+	struct frame_pos_t final {
 		short int x;
 		short int y;
 	};
@@ -119,7 +119,10 @@ public:
 	void Resize(int w, int h);
 	void SetOriginalSize();
 
-	inline bool IsLoaded() const { return !this->image.isNull(); }
+	bool IsLoaded() const
+	{
+		return !this->image.isNull();
+	}
 
 	const std::filesystem::path &get_filepath() const
 	{

@@ -1588,8 +1588,9 @@ void UpdateLoadingBar()
 
 void IncItemsLoaded()
 {
-	if (itemsToLoad == 0 || itemsLoaded >= itemsToLoad)
+	if (itemsToLoad == 0 || itemsLoaded >= itemsToLoad) {
 		return;
+	}
 
 	itemsLoaded++;
 }

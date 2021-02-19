@@ -1471,7 +1471,7 @@ extern void LoadUnitTypeSprite(wyrmgus::unit_type &unittype); /// Load the sprit
 extern int GetUnitTypesCount();                     /// Get the amount of unit-types
 extern void LoadUnitTypes();                     /// Load the unit-type data
 //Wyrmgus start
-extern void LoadUnitType(wyrmgus::unit_type &unittype);	/// Load a unittype
+extern void LoadUnitType(unit_type *unit_type);	/// Load a unittype
 //Wyrmgus end
 extern void CleanUnitTypeVariables();                    /// Cleanup unit-type module
 
