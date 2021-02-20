@@ -54,7 +54,6 @@
 #include "map/map.h"
 #include "map/map_layer.h"
 #include "map/tile.h"
-#include "map/tileset.h"
 //Wyrmgus start
 #include "network.h"
 //Wyrmgus end

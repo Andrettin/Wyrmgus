@@ -49,7 +49,6 @@
 #include "map/site_game_data.h"
 #include "map/terrain_feature.h"
 #include "map/tile.h"
-#include "map/tileset.h"
 #include "map/world.h"
 #include "menus.h"
 #include "network.h"

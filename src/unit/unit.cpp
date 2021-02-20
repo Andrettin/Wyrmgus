@@ -62,7 +62,6 @@
 #include "map/terrain_type.h"
 #include "map/tile.h"
 #include "map/tile_flag.h"
-#include "map/tileset.h"
 #include "missile.h"
 #include "name_generator.h"
 #include "network.h"

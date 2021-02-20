@@ -29,9 +29,6 @@
 
 #include "province.h"
 
-#include "map/map.h" // for the terrain features, which are cleaned here
-#include "map/tileset.h" // for the terrain types, which are cleaned here
-
 std::vector<CProvince *> Provinces;
 std::vector<CWorldMapTerrainType *> WorldMapTerrainTypes;
 std::map<std::string, int> WorldMapTerrainTypeStringToIndex;

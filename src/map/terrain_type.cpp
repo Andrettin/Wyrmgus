@@ -33,7 +33,6 @@
 #include "iolib.h"
 #include "map/terrain_feature.h"
 #include "map/tile_flag.h"
-#include "map/tileset.h"
 #include "player_color.h"
 #include "time/season.h"
 #include "upgrade/upgrade_structs.h"

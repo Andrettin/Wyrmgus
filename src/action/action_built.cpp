@@ -44,7 +44,6 @@
 #include "map/site_game_data.h"
 #include "map/terrain_type.h"
 #include "map/tile.h"
-#include "map/tileset.h"
 #include "player.h"
 #include "quest/objective_type.h"
 #include "quest/player_quest_objective.h"

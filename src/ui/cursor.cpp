@@ -38,7 +38,6 @@
 #include "map/map_layer.h"
 #include "map/tile.h"
 #include "map/tile_flag.h"
-#include "map/tileset.h"
 #include "translate.h"
 #include "ui/cursor_type.h"
 #include "ui/interface.h"

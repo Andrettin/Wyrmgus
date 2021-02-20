@@ -42,7 +42,6 @@
 #include "item/item_slot.h"
 #include "map/map.h"
 #include "map/map_layer.h"
-#include "map/tileset.h"
 #include "player.h"
 #include "quest/objective_type.h"
 #include "quest/player_quest_objective.h"

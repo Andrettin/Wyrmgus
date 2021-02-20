@@ -41,7 +41,6 @@
 #include "map/terrain_type.h"
 #include "map/tile.h"
 #include "map/tile_flag.h"
-#include "map/tileset.h"
 #include "missile/missile_class.h"
 #include "mod.h"
 #include "player.h"

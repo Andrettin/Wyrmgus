@@ -37,7 +37,6 @@
 #include "map/site_game_data.h"
 #include "map/terrain_type.h"
 #include "map/tile.h"
-#include "map/tileset.h"
 #include "player.h"
 #include "player_color.h"
 #include "province.h"

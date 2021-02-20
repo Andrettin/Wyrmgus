@@ -43,7 +43,6 @@
 #include "map/minimap.h"
 #include "map/terrain_type.h"
 #include "map/tile.h"
-#include "map/tileset.h"
 #include "map/world.h"
 #include "menus.h"
 #include "missile.h"

@@ -44,7 +44,6 @@
 #include "map/site.h"
 #include "map/site_game_data.h"
 #include "map/terrain_type.h"
-#include "map/tileset.h"
 #include "missile.h"
 #include "particle.h"
 #include "pathfinder.h"

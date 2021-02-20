@@ -44,7 +44,6 @@
 #include "map/map.h"
 #include "map/terrain_type.h"
 #include "map/tile_flag.h"
-#include "map/tileset.h"
 #include "missile.h"
 #include "mod.h"
 #include "name_generator.h"
@@ -434,14 +433,6 @@
 **  resource_info::WaitAtDepot
 **
 **    Cycles the unit waits while inside the depot to unload.
-**
-**  resource_info::TerrainHarvester
-**
-**    The unit will harvest terrain. For now this only works
-**    for wood. maybe it could be made to work for rocks, but
-**    more than that requires a tileset rewrite.
-**  @todo more configurable.
-**
 */
 
 /**

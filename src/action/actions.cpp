@@ -60,7 +60,6 @@
 #include "map/map_layer.h"
 #include "map/tile.h"
 #include "map/tile_flag.h"
-#include "map/tileset.h"
 #include "missile.h"
 #include "pathfinder.h"
 #include "player.h"

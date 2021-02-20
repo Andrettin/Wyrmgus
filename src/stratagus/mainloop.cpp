@@ -46,7 +46,6 @@
 #include "map/map_layer.h"
 #include "map/minimap.h"
 #include "map/terrain_type.h"
-#include "map/tileset.h" //for tile animation
 #include "missile.h"
 #include "network.h"
 #include "particle.h"

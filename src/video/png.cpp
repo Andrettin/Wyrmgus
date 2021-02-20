@@ -28,18 +28,9 @@
 
 #include "stratagus.h"
 
-#include "database/defines.h"
-#include "map/map.h"
-#include "map/map_layer.h"
-#include "map/map_template.h"
-//Wyrmgus start
-#include "map/terrain_type.h"
-#include "map/tileset.h"
-//Wyrmgus end
-#include "ui/ui.h"
-#include "video/video.h"
 #include "iolib.h"
 #include "iocompat.h"
+#include "video/video.h"
 
 #ifdef USE_OPENGL
 #ifdef __APPLE__

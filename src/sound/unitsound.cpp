@@ -38,7 +38,6 @@
 #include "map/map_layer.h"
 #include "map/tile.h"
 #include "map/tile_flag.h"
-#include "map/tileset.h"
 #include "player.h"
 #include "sound/game_sound_set.h"
 #include "sound/sound.h"

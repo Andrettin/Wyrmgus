@@ -57,7 +57,6 @@
 #include "item/item_class.h"
 #include "magic_domain.h"
 #include "map/map.h"
-#include "map/tileset.h"
 //Wyrmgus start
 #include "network.h"
 //Wyrmgus end

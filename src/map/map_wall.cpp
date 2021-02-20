@@ -33,7 +33,6 @@
 
 #include "map/terrain_type.h"
 #include "map/tile.h"
-#include "map/tileset.h"
 #include "ui/ui.h"
 #include "player.h"
 #include "settings.h"
@@ -56,38 +55,6 @@
 
 //Wyrmgus start
 /*
-static unsigned int getWallTile(const CTileset &tileset, bool humanWall, int dirFlag, int value, unsigned int oldTile = 0)
-{
-	unsigned int tileIndex, newTile;
-	if (humanWall) {
-		if (value == 0) {
-			tileIndex = tileset.getHumanWallTileIndex_destroyed(dirFlag);
-		} else if (UnitTypeHumanWall && value <= UnitTypeHumanWall->MapDefaultStat.Variables[HP_INDEX].Max / 2) {
-			tileIndex = tileset.getHumanWallTileIndex_broken(dirFlag);
-		} else {
-			tileIndex = tileset.getHumanWallTileIndex(dirFlag);
-		}
-	} else { // orcWall
-		if (value == 0) {
-			tileIndex = tileset.getOrcWallTileIndex_destroyed(dirFlag);
-		} else if (UnitTypeOrcWall && value <= UnitTypeOrcWall->MapDefaultStat.Variables[HP_INDEX].Max / 2) {
-			tileIndex = tileset.getOrcWallTileIndex_broken(dirFlag);
-		} else {
-			tileIndex = tileset.getOrcWallTileIndex(dirFlag);
-		}
-	}
-	newTile = tileset.tiles[tileIndex].tile;
-	if (!newTile && oldTile) {
-		unsigned int oldTileIndex = tileset.findTileIndexByTile(oldTile);
-		return getWallTile(tileset, humanWall, tileset.getWallDirection(oldTileIndex, humanWall), value);
-	} else {
-		return newTile;
-	}
-}
-
-
-
-
 //  Calculate the correct tile. Depends on the surrounding.
 static int GetDirectionFromSurrounding(const Vec2i &pos, bool human, bool seen)
 {

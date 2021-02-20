@@ -46,7 +46,6 @@
 #include "map/map.h"
 #include "map/map_layer.h"
 #include "map/tile_flag.h"
-#include "map/tileset.h"
 #include "script.h"
 #include "sound/sound.h"
 #include "spell/spell_action.h"
