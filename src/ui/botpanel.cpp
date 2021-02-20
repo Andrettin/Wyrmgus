@@ -1009,7 +1009,7 @@ void CButtonPanel::Draw()
 	const std::vector<std::unique_ptr<wyrmgus::button>> &buttons(CurrentButtons);
 
 	Assert(!Selected.empty());
-	char buf[8];
+	std::string str;
 
 	//  Draw all buttons.
 	for (size_t i = 0; i < buttons.size(); ++i) {
@@ -1053,19 +1053,16 @@ void CButtonPanel::Draw()
 		if (ShowCommandKey) {
 			const int key = button->get_key();
 			if (key == gcn::Key::K_ESCAPE) {
-				strcpy_s(buf, sizeof(buf), "Esc");
+				str = "Esc";
 			} else if (key == gcn::Key::K_PAGE_UP) {
-				strcpy_s(buf, sizeof(buf), "PgUp");
+				str = "PgUp";
 			} else if (key == gcn::Key::K_PAGE_DOWN) {
-				strcpy_s(buf, sizeof(buf), "PgDwn");
+				str = "PgDwn";
 			} else if (key == gcn::Key::K_DELETE) {
-				strcpy_s(buf, sizeof(buf), "Del");
+				str = "Del";
 			} else {
-				buf[0] = toupper(key);
-				buf[1] = '\0';
+				str = static_cast<char>(toupper(key));
 			}
-		} else {
-			buf[0] = '\0';
 		}
 
 		//
@@ -1128,7 +1125,7 @@ void CButtonPanel::Draw()
 			if (IsButtonUsable(*Selected[0], *button)) {
 				button_icon->DrawUnitIcon(*UI.ButtonPanel.Buttons[i].Style,
 												   GetButtonStatus(*button, ButtonUnderCursor),
-												   pos, buf, player_color, false, false, 100 - GetButtonCooldownPercent(*Selected[0], *button));
+												   pos, str, player_color, false, false, 100 - GetButtonCooldownPercent(*Selected[0], *button));
 												   
 				if (
 					((button->Action == ButtonCmd::Train || button->Action == ButtonCmd::TrainClass) && Selected[0]->Type->Stats[Selected[0]->Player->Index].get_unit_stock(button_unit_type) != 0)
@@ -1152,11 +1149,11 @@ void CButtonPanel::Draw()
 			) {
 				button_icon->DrawUnitIcon(*UI.ButtonPanel.Buttons[i].Style,
 												   GetButtonStatus(*button, ButtonUnderCursor),
-												   pos, buf, player_color, false, true);
+												   pos, str, player_color, false, true);
 			} else {
 				button_icon->DrawUnitIcon(*UI.ButtonPanel.Buttons[i].Style,
 												   GetButtonStatus(*button, ButtonUnderCursor),
-												   pos, buf, player_color, true);
+												   pos, str, player_color, true);
 			}
 		}
 	}
