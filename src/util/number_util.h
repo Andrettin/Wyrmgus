@@ -60,15 +60,20 @@ inline constexpr number_type pow(const number_type base, const number_type exp)
 	return value;
 }
 
-inline constexpr uint64_t cbrt(uint64_t n)
+//integer cube root
+template <typename number_type>
+inline constexpr number_type cbrt(number_type n)
 {
-	//integer cube root
+	static_assert(std::is_integral_v<number_type>);
 
-	int s = 0;
-	uint64_t ret = 0;;
-	uint64_t b = 0;
+	constexpr number_type bit_size = sizeof(number_type) * 8;
 
-	for (s = 63; s >= 0; s -= 3) {
+	//static_assert((bit_size - 1) % 3 == 0);
+
+	number_type ret = 0;
+	number_type b = 0;
+
+	for (int s = bit_size - (bit_size % 3); s >= 0; s -= 3) {
 		ret += ret;
 		b = 3 * ret * (ret + 1) + 1;
 		if ((n >> s) >= b) {
