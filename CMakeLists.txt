@@ -1729,6 +1729,7 @@ endif()
 ########### next target ###############
 
 # TODO Check build with ENABLE_NSIS=ON required after versions logic update
+# TODO Try to make NSIS with CPack
 if(WIN32 AND ENABLE_NSIS AND MAKENSIS_FOUND)
   file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/COPYING DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
   file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/src/win32/wyrmsun.ico DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
@@ -1777,8 +1778,7 @@ if(ENABLE_DOC AND DOXYGEN_FOUND)
     doc/media.html
     doc/metaserver_protocol.txt
     doc/README-SDL.txt
-    DESTINATION share/doc/wyrmgus
-  )
+    DESTINATION share/doc/wyrmgus)
   install(
     DIRECTORY doc/graphics doc/scripts ${CMAKE_CURRENT_BINARY_DIR}/doxygen
     DESTINATION ${DOCDIR})
@@ -1788,10 +1788,29 @@ if(ENABLE_DEV)
   install(FILES ${gameheaders_HDRS} DESTINATION ${STRATAGUS_HEADERS})
 endif()
 
+install(
+  FILES "doc/copyright-deb.txt"
+  TYPE DOC
+  RENAME "${CMAKE_PROJECT_NAME}/copyright"
+  OPTIONAL
+  COMPONENT deb-package)
+
 ########### packages ##################
 
 set(CPACK_GENERATOR DEB)
-set(CPACK_PACKAGE_CONTACT  techie@bastardi.net)
+set(CPACK_PACKAGE_CONTACT "Anton Karmanov <techie@bastardi.net>")
+set(
+  CPACK_PACKAGE_DESCRIPTION
+  "Modified Stratagus engine for Wyrmsun
+Wyrmsun is an open-source real-time strategy game which features elements of
+mythology, history and fiction.
+
+In the Wyrmsun universe a myriad of inhabited planets exist. Humans dwell on
+Earth, while dwarves inhabit Nidavellir and elves nourish the world of Alfheim.
+These peoples struggle to carve a place for themselves with their tools of
+stone, bronze and iron. And perhaps one day they will meet one another, beyond
+the stars...")
+
 set(CPACK_DEBIAN_PACKAGE_SHLIBDEPS ON)
 set(CPACK_DEBIAN_PACKAGE_SECTION games)
 set(CPACK_DEBIAN_PACKAGE_SUGGESTS wyrmsun)
