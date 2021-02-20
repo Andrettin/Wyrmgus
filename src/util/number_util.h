@@ -60,4 +60,24 @@ inline constexpr number_type pow(const number_type base, const number_type exp)
 	return value;
 }
 
+inline constexpr uint64_t cbrt(uint64_t n)
+{
+	//integer cube root
+
+	int s = 0;
+	uint64_t ret = 0;;
+	uint64_t b = 0;
+
+	for (s = 63; s >= 0; s -= 3) {
+		ret += ret;
+		b = 3 * ret * (ret + 1) + 1;
+		if ((n >> s) >= b) {
+			n -= b << s;
+			++ret;
+		}
+	}
+
+	return ret;
+}
+
 }

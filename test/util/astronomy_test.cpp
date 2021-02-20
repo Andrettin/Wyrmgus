@@ -23,15 +23,14 @@
 //      along with this program; if not, write to the Free Software
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
-//
+
+#include "stratagus.h"
 
 #include "util/astronomy_util.h"
 
 #include "util/fractional_int.h"
 
 #include <boost/test/unit_test.hpp>
-
-using namespace wyrmgus;
 
 BOOST_AUTO_TEST_CASE(pc_to_ly_test)
 {

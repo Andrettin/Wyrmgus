@@ -23,14 +23,14 @@
 //      along with this program; if not, write to the Free Software
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
-//
+
+#include "stratagus.h"
 
 #include "util/geocoordinate.h"
+
 #include "util/point_util.h"
 
 #include <boost/test/unit_test.hpp>
-
-using namespace wyrmgus;
 
 BOOST_AUTO_TEST_CASE(geocoordinate_to_circle_edge_point_test_1)
 {
