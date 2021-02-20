@@ -266,7 +266,7 @@ bool CTileset::isAWoodTile(unsigned tile) const
 	}
 	*/
 	for (int i = 0; i < 20; ++i) {
-		if (woodTable[i] != -1 && woodTable[i] == tile) {
+		if (woodTable[i] != -1 && static_cast<unsigned>(woodTable[i]) == tile) {
 			return true;
 		}
 	}
@@ -282,7 +282,7 @@ bool CTileset::isARockTile(unsigned tile) const
 	}
 	*/
 	for (int i = 0; i < 20; ++i) {
-		if (rockTable[i] != -1 && rockTable[i] == tile) {
+		if (rockTable[i] != -1 && static_cast<unsigned>(rockTable[i]) == tile) {
 			return true;
 		}
 	}
@@ -723,19 +723,6 @@ void CTileset::fillSolidTiles(std::vector<unsigned int> *solidTiles) const
 			//Wyrmgus end
 		}
 	}
-}
-
-unsigned CTileset::getWallDirection(int tileIndex, bool human) const
-{
-	int i;
-	tileIndex &= 0xff0; // only the base indices are in the tables
-	for (i = 0; i < 16; i++) {
-		if ((human && humanWallTable[i] == tileIndex) || orcWallTable[i] == tileIndex) {
-			return i;
-		}
-	}
-	
-	return 0;
 }
 
 unsigned CTileset::getHumanWallTileIndex(int dirFlag) const
