@@ -31,25 +31,76 @@
 
 #include <boost/test/unit_test.hpp>
 
-BOOST_AUTO_TEST_CASE(isqrt_test)
+template <typename number_type>
+static void check_sqrt()
 {
-    BOOST_CHECK(isqrt(1) == 1);
-    BOOST_CHECK(isqrt(2) == 1);
-    BOOST_CHECK(isqrt(3) == 1);
-    BOOST_CHECK(isqrt(4) == 2);
-    BOOST_CHECK(isqrt(5) == 2);
-    BOOST_CHECK(isqrt(6) == 2);
-    BOOST_CHECK(isqrt(7) == 2);
-    BOOST_CHECK(isqrt(8) == 2);
-    BOOST_CHECK(isqrt(9) == 3);
-    BOOST_CHECK(isqrt(10) == 3);
-    BOOST_CHECK(isqrt(27) == 5);
-    BOOST_CHECK(isqrt(32) == 5);
-    BOOST_CHECK(isqrt(64) == 8);
-    BOOST_CHECK(isqrt(317) == 17);
-    BOOST_CHECK(isqrt(778) == 27);
-    BOOST_CHECK(isqrt(1030) == 32);
-    BOOST_CHECK(isqrt(75900) == 275);
+    BOOST_CHECK(isqrt<number_type>(1) == 1);
+    BOOST_CHECK(isqrt<number_type>(2) == 1);
+    BOOST_CHECK(isqrt<number_type>(3) == 1);
+    BOOST_CHECK(isqrt<number_type>(4) == 2);
+    BOOST_CHECK(isqrt<number_type>(5) == 2);
+    BOOST_CHECK(isqrt<number_type>(6) == 2);
+    BOOST_CHECK(isqrt<number_type>(7) == 2);
+    BOOST_CHECK(isqrt<number_type>(8) == 2);
+    BOOST_CHECK(isqrt<number_type>(9) == 3);
+    BOOST_CHECK(isqrt<number_type>(10) == 3);
+    BOOST_CHECK(isqrt<number_type>(27) == 5);
+    BOOST_CHECK(isqrt<number_type>(32) == 5);
+    BOOST_CHECK(isqrt<number_type>(64) == 8);
+
+    if constexpr (static_cast<uint64_t>(std::numeric_limits<number_type>::max()) >= static_cast<uint64_t>(std::numeric_limits<int16_t>::max())) {
+        BOOST_CHECK(isqrt<number_type>(317) == 17);
+        BOOST_CHECK(isqrt<number_type>(778) == 27);
+        BOOST_CHECK(isqrt<number_type>(1030) == 32);
+    }
+
+    if constexpr (static_cast<uint64_t>(std::numeric_limits<number_type>::max()) >= static_cast<uint64_t>(std::numeric_limits<int32_t>::max())) {
+        BOOST_CHECK(isqrt<number_type>(75900) == 275);
+    }
+
+    if constexpr (static_cast<uint64_t>(std::numeric_limits<number_type>::max()) >= static_cast<uint64_t>(std::numeric_limits<int64_t>::max())) {
+        BOOST_CHECK(isqrt<number_type>(14400000000) == 120000);
+    }
+}
+
+BOOST_AUTO_TEST_CASE(isqrt_test_int8)
+{
+    check_sqrt<int8_t>();
+}
+
+BOOST_AUTO_TEST_CASE(isqrt_test_uint8)
+{
+    check_sqrt<uint8_t>();
+}
+
+BOOST_AUTO_TEST_CASE(isqrt_test_int16)
+{
+    check_sqrt<int16_t>();
+}
+
+BOOST_AUTO_TEST_CASE(isqrt_test_uint16)
+{
+    check_sqrt<uint16_t>();
+}
+
+BOOST_AUTO_TEST_CASE(isqrt_test_int32)
+{
+    check_sqrt<int32_t>();
+}
+
+BOOST_AUTO_TEST_CASE(isqrt_test_uint32)
+{
+    check_sqrt<uint32_t>();
+}
+
+BOOST_AUTO_TEST_CASE(isqrt_test_int64)
+{
+    check_sqrt<int64_t>();
+}
+
+BOOST_AUTO_TEST_CASE(isqrt_test_uint64)
+{
+    check_sqrt<uint64_t>();
 }
 
 BOOST_AUTO_TEST_CASE(icbrt_test)
@@ -71,4 +122,5 @@ BOOST_AUTO_TEST_CASE(icbrt_test)
     BOOST_CHECK(number::cbrt(778) == 9);
     BOOST_CHECK(number::cbrt(1030) == 10);
     BOOST_CHECK(number::cbrt(75900) == 42);
+    BOOST_CHECK(number::cbrt(14400000000) == 2432);
 }
