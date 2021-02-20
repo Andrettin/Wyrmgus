@@ -51,6 +51,7 @@
 #include "util/container_util.h"
 #include "util/geocoordinate.h"
 #include "util/geocoordinate_util.h"
+#include "util/number_util.h"
 #include "util/point_util.h"
 #include "util/random.h"
 #include "util/size_util.h"
@@ -412,7 +413,7 @@ QPoint site::astrocoordinate_to_relative_pos(const wyrmgus::geocoordinate &astro
 	astrodistance_value += this->get_map_template()->get_astrodistance_additive_modifier();
 	astrodistance_value += this->get_astrodistance_additive_modifier();
 	if (this->orbits_map_template()) {
-		astrodistance_value += isqrt(this->get_distance_from_orbit_center()) / site::distance_from_orbit_center_divider;
+		astrodistance_value += number::cbrt(this->get_distance_from_orbit_center()) / site::distance_from_orbit_center_divider;
 	}
 	const int64_t x = direction_pos.x() * astrodistance_value / geocoordinate::number_type::divisor;
 	const int64_t y = direction_pos.y() * astrodistance_value / geocoordinate::number_type::divisor;
@@ -478,7 +479,7 @@ QSize site::get_size_with_satellites() const
 		const QSize satellite_size = satellite->get_size_with_satellites();
 
 		int satellite_space = site::base_orbit_distance;
-		satellite_space += isqrt(satellite->get_distance_from_orbit_center()) / site::distance_from_orbit_center_divider;
+		satellite_space += number::cbrt(satellite->get_distance_from_orbit_center()) / site::distance_from_orbit_center_divider;
 		satellite_space += satellite_size.width();
 
 		if (satellite_space > max_satellite_space) {

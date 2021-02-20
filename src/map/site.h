@@ -88,7 +88,7 @@ public:
 	static constexpr const char *database_folder = "sites";
 	static constexpr int base_astrodistance_additive_modifier = 8;
 	static constexpr int base_orbit_distance = 2; //the tile space between the orbit center and its first orbiting body
-	static constexpr int distance_from_orbit_center_divider = 10; //divider applied to the distance from orbit center
+	static constexpr int distance_from_orbit_center_divider = 4; //divider applied to the distance from orbit center
 
 	static site *get_by_color(const QColor &color)
 	{
