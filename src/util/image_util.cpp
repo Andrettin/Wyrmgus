@@ -36,6 +36,24 @@
 
 namespace wyrmgus::image {
 
+static void copy_frame_data(const uint32_t *src_frame_data, uint32_t *dst_data, const QSize &frame_size, const int frame_x, const int frame_y, const int dst_width)
+{
+	//BPP is assumed to be 4, hence why uint32_t buffers are used
+
+	const int frame_width = frame_size.width();
+	const int frame_height = frame_size.height();
+
+	for (int x = 0; x < frame_width; ++x) {
+		for (int y = 0; y < frame_height; ++y) {
+			const int frame_pixel_index = y * frame_width + x;
+			const int pixel_x = frame_x * frame_width + x;
+			const int pixel_y = frame_y * frame_height + y;
+			const int pixel_index = pixel_y * dst_width + pixel_x;
+			dst_data[pixel_index] = src_frame_data[frame_pixel_index];
+		}
+	}
+}
+
 QImage scale(const QImage &src_image, const int scale_factor)
 {
 	if (src_image.format() != QImage::Format_RGBA8888) {
@@ -67,6 +85,11 @@ QImage scale(const QImage &src_image, const int scale_factor, const QSize &old_f
 	const QSize new_frame_size = old_frame_size * scale_factor;
 
 	const int bpp = src_image.depth() / 8;
+
+	if (bpp != 4) {
+		throw std::runtime_error("BPP must be 4 when scaling an image.");
+	}
+
 	const QSize result_size = src_image.size() * scale_factor;
 	QImage result_image(result_size, QImage::Format_RGBA8888);
 
@@ -74,7 +97,7 @@ QImage scale(const QImage &src_image, const int scale_factor, const QSize &old_f
 		throw std::runtime_error("Failed to allocate image to be scaled.");
 	}
 
-	unsigned char *dst_data = result_image.bits();
+	uint32_t *dst_data = reinterpret_cast<uint32_t *>(result_image.bits());
 
 	//if a simple scale factor is being used for the resizing, then use xBRZ for the rescaling
 	const int horizontal_frame_count = src_image.width() / old_frame_size.width();
@@ -82,27 +105,17 @@ QImage scale(const QImage &src_image, const int scale_factor, const QSize &old_f
 
 	//scale each frame individually
 	std::vector<std::future<void>> futures;
+	const int result_width = result_size.width();
 
 	for (int frame_x = 0; frame_x < horizontal_frame_count; ++frame_x) {
 		for (int frame_y = 0; frame_y < vertical_frame_count; ++frame_y) {
-			const QImage src_frame_image = src_image.copy(frame_x * old_frame_size.width(), frame_y * old_frame_size.height(), old_frame_size.width(), old_frame_size.height());
+			std::future<void> future = thread_pool::get()->async([&, frame_x, frame_y]() {
+				const QImage src_frame_image = src_image.copy(frame_x * old_frame_size.width(), frame_y * old_frame_size.height(), old_frame_size.width(), old_frame_size.height());
 
-			std::future<void> future = thread_pool::get()->async([&, src_frame_image, frame_x, frame_y]() {
 				QImage result_frame_image = image::scale(src_frame_image, scale_factor);
 
-				const unsigned char *frame_data = result_frame_image.constBits();
-
-				for (int x = 0; x < new_frame_size.width(); ++x) {
-					for (int y = 0; y < new_frame_size.height(); ++y) {
-						const int frame_pixel_index = y * new_frame_size.width() + x;
-						const int pixel_x = frame_x * new_frame_size.width() + x;
-						const int pixel_y = frame_y * new_frame_size.height() + y;
-						const int pixel_index = pixel_y * result_image.width() + pixel_x;
-						for (int i = 0; i < bpp; ++i) {
-							dst_data[pixel_index * bpp + i] = frame_data[frame_pixel_index * bpp + i];
-						}
-					}
-				}
+				const uint32_t *frame_data = reinterpret_cast<const uint32_t *>(result_frame_image.constBits());
+				image::copy_frame_data(frame_data, dst_data, new_frame_size, frame_x, frame_y, result_width);
 			});
 
 			futures.push_back(std::move(future));
