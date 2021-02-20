@@ -35,13 +35,13 @@ jobs:
         run: >-
           cmake
           --build "$BUILD_DIR"
-          --target stratagus_main
+          --target wyrmgus_main
           --parallel "$THREADS"
       - name: Build Wyrmgus test suite
         run: >-
           cmake
           --build "$BUILD_DIR"
-          --target stratagus_test
+          --target wyrmgus_test
           --parallel "$THREADS"
       - name: Test
         continue-on-error: true
