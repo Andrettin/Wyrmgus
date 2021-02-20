@@ -628,8 +628,6 @@ static int strchrlen(const std::string &s, char c, unsigned int maxlen, wyrmgus:
 		if (res == -1) {
 			// line too long
 			return maxlen;
-		} else {
-			return res;
 		}
 	} else {
 		res = s.rfind(' ', res);
@@ -642,10 +640,9 @@ static int strchrlen(const std::string &s, char c, unsigned int maxlen, wyrmgus:
 			//Wyrmgus start
 			return maxlen / font->Width(1);
 			//Wyrmgus end
-		} else {
-			return res;
 		}
 	}
+
 	return res;
 }
 
