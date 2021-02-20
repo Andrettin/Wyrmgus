@@ -79,8 +79,7 @@ inline constexpr number_type isqrt(const number_type num)
 	//  This portable load replaces the loop that used to be
 	//  here, and was donated by  legalize@xmission.com
 	//
-	static constexpr unsigned_type unsigned_bits = static_cast<unsigned_type>(~0L);
-	squaredbit = static_cast<number_type>((unsigned_bits >> 1) & ~(unsigned_bits >> 2));
+	squaredbit = static_cast<number_type>((static_cast<unsigned_type>(~0L) >> 1) & ~(static_cast<unsigned_type>(~0L) >> 2));
 
 	// Form bits of the answer.
 	remainder = num;
