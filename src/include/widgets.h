@@ -184,7 +184,7 @@ public:
 	virtual void draw(gcn::Graphics *graphics);
 
 	virtual void mousePress(int x, int y, int button);
-	virtual void mouseRelease(int x, int y, int button);
+	virtual void mouseRelease(int button) override;
 	virtual void mouseClick(int x, int y, int button, int count);
 	virtual void adjustSize();
 
@@ -214,7 +214,7 @@ public:
 	virtual void drawBox(gcn::Graphics *graphics);
 
 	virtual void mousePress(int x, int y, int button);
-	virtual void mouseRelease(int x, int y, int button);
+	virtual void mouseRelease(int button) override;
 	virtual void mouseClick(int x, int y, int button, int count);
 	virtual void adjustSize();
 

@@ -2295,7 +2295,7 @@ static void UISelectStateButtonDown(unsigned)
 	UI.ButtonPanel.Update();
 }
 
-static void UIHandleButtonDown_OnMap(unsigned button)
+static void UIHandleButtonDown_OnMap()
 {
 	Assert(UI.MouseViewport);
 	
@@ -2402,7 +2402,7 @@ static void UIHandleButtonDown_OnMap(unsigned button)
 	}
 }
 
-static void UIHandleButtonDown_OnMinimap(unsigned button)
+static void UIHandleButtonDown_OnMinimap()
 {
 	const Vec2i cursor_tile_pos = UI.get_minimap()->screen_to_tile_pos(CursorScreenPos);
 
@@ -2424,7 +2424,7 @@ static void UIHandleButtonDown_OnMinimap(unsigned button)
 	}
 }
 
-static void UIHandleButtonDown_OnButton(unsigned button)
+static void UIHandleButtonDown_OnButton()
 {
 	// clicked on info panel - selection shown
 	//Wyrmgus start
@@ -2756,13 +2756,13 @@ void UIHandleButtonDown(unsigned button)
 
 	//  Cursor is on the map area
 	if (CursorOn == cursor_on::map) {
-		UIHandleButtonDown_OnMap(button);
+		UIHandleButtonDown_OnMap();
 	} else if (CursorOn == cursor_on::minimap) {
 		//  Cursor is on the minimap area
-		UIHandleButtonDown_OnMinimap(button);
+		UIHandleButtonDown_OnMinimap();
 	} else if (CursorOn == cursor_on::button) {
 		//  Cursor is on the buttons: group or command
-		UIHandleButtonDown_OnButton(button);
+		UIHandleButtonDown_OnButton();
 	}
 }
 

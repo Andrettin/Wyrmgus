@@ -111,7 +111,7 @@ namespace gcn
          *          itself.
          * @param button the button released.
          */
-        virtual void mouseRelease(int, int, int) { }
+        virtual void mouseRelease(int) { }
 
 
         /**

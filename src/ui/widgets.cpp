@@ -63,17 +63,11 @@ static EventCallback GuichanCallbacks;
 
 static std::stack<MenuScreen *> MenuStack;
 
-//Wyrmgus start
-//static void MenuHandleButtonDown(unsigned)
-static void MenuHandleButtonDown(unsigned button)
-//Wyrmgus end
+static void MenuHandleButtonDown(unsigned)
 {
 }
 
-//Wyrmgus start
-//static void MenuHandleButtonUp(unsigned)
-static void MenuHandleButtonUp(unsigned button)
-//Wyrmgus end
+static void MenuHandleButtonUp(unsigned)
 {
 }
 
@@ -930,7 +924,7 @@ void ImageRadioButton::mousePress(int, int, int button)
 /**
 **  Mouse button released callback
 */
-void ImageRadioButton::mouseRelease(int, int, int button)
+void ImageRadioButton::mouseRelease(int button)
 {
 	if (button == gcn::MouseInput::LEFT) {
 		mMouseDown = false;
@@ -1096,7 +1090,7 @@ void ImageCheckBox::mousePress(int, int, int button)
 /**
 **  Mouse button released callback
 */
-void ImageCheckBox::mouseRelease(int, int, int button)
+void ImageCheckBox::mouseRelease(int button)
 {
 	if (button == gcn::MouseInput::LEFT) {
 		mMouseDown = false;

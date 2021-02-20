@@ -486,7 +486,7 @@ namespace gcn
               {
                   for (iter = mMouseListeners.begin(); iter != mMouseListeners.end(); ++iter)
                   {
-                      (*iter)->mouseRelease(x, y, b);
+                      (*iter)->mouseRelease(b);
                   }
               }
 

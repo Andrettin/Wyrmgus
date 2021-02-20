@@ -232,11 +232,10 @@ namespace gcn
         }
     }
 
-	//Wyrmgus start
-//    void Slider::mouseRelease(int, int, int)
-    void Slider::mouseRelease(int x, int y, int button)
-	//Wyrmgus end
+    void Slider::mouseRelease(int button)
     {
+        Q_UNUSED(button)
+
 		//Wyrmgus start
         if (mMouseDrag) {
 			//sliders now generate their actions when the mouse is released, not pressed

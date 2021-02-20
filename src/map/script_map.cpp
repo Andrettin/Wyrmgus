@@ -944,7 +944,7 @@ static int CclBuildTilesetTables(lua_State *l)
 {
 	LuaCheckArgs(l, 0);
 
-	CMap::Map.Tileset->buildTable(l);
+	CMap::Map.Tileset->buildTable();
 	return 0;
 }
 /**

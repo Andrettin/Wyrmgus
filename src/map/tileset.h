@@ -219,7 +219,7 @@ public:
 	//Wyrmgus end
 
 	void parse(lua_State *l);
-	void buildTable(lua_State *l);
+	void buildTable();
 
 private:
 	unsigned int getOrAddSolidTileIndexByName(const std::string &name);

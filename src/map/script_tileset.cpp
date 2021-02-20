@@ -287,15 +287,13 @@ void CTileset::parse(lua_State *l)
 	}
 }
 
-void CTileset::buildTable(lua_State *l)
+void CTileset::buildTable()
 {
 	//  Calculate number of tiles in graphic tile
 	const int n = tiles.size();
 
 	mixedLookupTable.clear();
-	//Wyrmgus start
-//	mixedLookupTable.resize(n, 0);
-	//Wyrmgus end
+
 	//  Build the TileTypeTable
 	TileTypeTable.resize(n, 0);
 
@@ -338,9 +336,7 @@ void CTileset::buildTable(lua_State *l)
 	}
 
 	//  Build wood removement table.
-	//Wyrmgus start
 	int wood_terrain_type = 0;
-	//Wyrmgus end
 	int solid = 0;
 	int mixed = 0;
 	for (int i = 0; i < n;) {
@@ -361,9 +357,7 @@ void CTileset::buildTable(lua_State *l)
 			if (tileinfo.BaseTerrain != 0 && tileinfo.MixTerrain == 0) {
 				if ((tile.flag & tile_flag::tree) != tile_flag::none) {
 					solid = i;
-					//Wyrmgus start
 					wood_terrain_type = tileinfo.BaseTerrain;
-					//Wyrmgus end
 				}
 			}
 			i += 16;

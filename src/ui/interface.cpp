@@ -113,10 +113,7 @@ CUnit *LastLevelUpUnit;							/// Last called level up unit
 */
 static void ShowInput()
 {
-	//Wyrmgus start
-//	snprintf(InputStatusLine, sizeof(InputStatusLine), _("MESSAGE:%s~!_"), message_input.data());
 	snprintf(InputStatusLine, sizeof(InputStatusLine), _("Message: %s~!_"), message_input.data());
-	//Wyrmgus end
 	char *input = InputStatusLine;
 	// FIXME: This is slow!
 	while (UI.StatusLine.Font->Width(input) > UI.StatusLine.Width) {

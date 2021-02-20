@@ -369,7 +369,7 @@ namespace gcn
         }
     }
 
-    void ScrollArea::mouseRelease(int, int, int)
+    void ScrollArea::mouseRelease(int)
     {
         mUpButtonPressed = false;
         mDownButtonPressed = false;

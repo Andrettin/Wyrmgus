@@ -2520,25 +2520,7 @@ void InitUnitTypes(int reset_player_stats)
 			continue;
 		}
 		
-		//Wyrmgus start
-		/*
-		// Determine still frame
-		type.StillFrame = GetStillFrame(type);
-
-		// Lookup BuildingTypes
-		for (std::vector<CBuildRestriction *>::iterator b = type.BuildingRules.begin();
-			 b < type.BuildingRules.end(); ++b) {
-			(*b)->Init();
-		}
-
-		// Lookup AiBuildingTypes
-		for (std::vector<CBuildRestriction *>::iterator b = type.AiBuildingRules.begin();
-			 b < type.AiBuildingRules.end(); ++b) {
-			(*b)->Init();
-		}
-		*/
 		InitUnitType(*unit_type);
-		//Wyrmgus end
 	}
 
 	// LUDO : called after game is loaded -> don't reset stats !
@@ -2596,7 +2578,6 @@ void LoadUnitTypeSprite(wyrmgus::unit_type &type)
 		type.Sprite->Load(false, wyrmgus::defines::get()->get_scale_factor());
 	}
 
-	//Wyrmgus start
 	if (!type.LightFile.empty()) {
 		type.LightSprite = CGraphic::New(type.LightFile, type.get_frame_size());
 		type.LightSprite->Load(false, wyrmgus::defines::get()->get_scale_factor());
@@ -2607,9 +2588,7 @@ void LoadUnitTypeSprite(wyrmgus::unit_type &type)
 			type.LayerSprites[i]->Load(false, wyrmgus::defines::get()->get_scale_factor());
 		}
 	}
-	//Wyrmgus end
 
-	//Wyrmgus start
 	for (const auto &variation : type.get_variations()) {
 		QSize frame_size = type.get_frame_size();
 		if (variation->get_frame_size() != QSize(0, 0)) {
@@ -2654,7 +2633,6 @@ void LoadUnitTypeSprite(wyrmgus::unit_type &type)
 			}
 		}
 	}
-	//Wyrmgus end
 }
 
 /**
@@ -2686,7 +2664,6 @@ void LoadUnitTypes()
 	}
 }
 
-//Wyrmgus start
 void LoadUnitType(unit_type *unit_type)
 {
 	// Lookup icons.
@@ -2702,9 +2679,7 @@ void LoadUnitType(unit_type *unit_type)
 
 	// Lookup missiles.
 	unit_type->Missile.MapMissile();
-	//Wyrmgus start
 	unit_type->FireMissile.MapMissile();
-	//Wyrmgus end
 	unit_type->Explosion.MapMissile();
 
 	// Lookup impacts
@@ -2722,7 +2697,6 @@ void LoadUnitType(unit_type *unit_type)
 #endif
 	// FIXME: should I copy the animations of the same graphics?
 }
-//Wyrmgus end
 
 void CUnitTypeVar::Init()
 {

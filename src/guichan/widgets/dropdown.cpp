@@ -389,7 +389,7 @@ namespace gcn
         }
     }
 
-    void DropDown::mouseRelease(int, int, int button)
+    void DropDown::mouseRelease(int button)
     {
         if (button == MouseInput::LEFT)
         {

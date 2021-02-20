@@ -163,7 +163,7 @@ namespace gcn
 
         virtual void mousePress(int x, int y, int button);
 
-        virtual void mouseRelease(int x, int y, int button);
+        virtual void mouseRelease(int button) override;
 
 
         // Inherited from KeyListener

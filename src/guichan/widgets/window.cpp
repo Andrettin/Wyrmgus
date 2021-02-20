@@ -325,7 +325,7 @@ namespace gcn
         }
     }
 
-    void Window::mouseRelease(int, int, int button)
+    void Window::mouseRelease(int button)
     {
         if (button == 1)
         {

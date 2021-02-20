@@ -1019,7 +1019,7 @@ void CButtonPanel::Draw()
 			continue;
 		}
 
-		Assert(button->get_pos() == i + 1);
+		Assert(button->get_pos() == static_cast<int>(i + 1));
 
 		//Wyrmgus start
 		//for neutral units, don't draw buttons that aren't training buttons (in other words, only draw buttons which are usable by neutral buildings)

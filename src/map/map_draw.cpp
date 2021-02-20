@@ -403,56 +403,6 @@ void CViewport::DrawMapBackgroundInViewport() const
 }
 
 /**
-**  Show unit's name under cursor or print the message if territory is invisible.
-**
-**  @param pos  Mouse position.
-**  @param unit  Unit to show name.
-**  @param hidden  If true, write "Unrevealed terrain"
-**
-*/
-static void ShowUnitName(const CViewport &vp, PixelPos pos, CUnit *unit, bool hidden = false)
-{
-	wyrmgus::font *font = wyrmgus::defines::get()->get_small_font();
-	int width;
-	int height = font->Height() + 6;
-	CLabel label(font, wyrmgus::defines::get()->get_default_font_color(), wyrmgus::defines::get()->get_default_highlight_font_color());
-	int x;
-	int y = std::min<int>(GameCursor->get_graphics()->Height + pos.y + 10, vp.BottomRightPos.y - 1 - height);
-	const CPlayer *tplayer = CPlayer::GetThisPlayer();
-
-	if (unit && unit->IsAliveOnMap()) {
-		int backgroundColor;
-		if (unit->Player->Index == (*tplayer).Index) {
-			backgroundColor = CVideo::MapRGB(0, 0, 252);
-		} else if (unit->Player->IsAllied(*tplayer)) {
-			backgroundColor = CVideo::MapRGB(0, 176, 0);
-		} else if (unit->Player->IsEnemy(*tplayer)) {
-			backgroundColor = CVideo::MapRGB(252, 0, 0);
-		} else {
-			backgroundColor = CVideo::MapRGB(176, 176, 176);
-		}
-		//Wyrmgus start
-//		width = font->getWidth(unit->Type->Name) + 10;
-		width = font->getWidth(unit->get_type_name()) + 10;
-		//Wyrmgus end
-		x = std::min<int>(GameCursor->get_graphics()->Width + pos.x, vp.BottomRightPos.x - 1 - width);
-		Video.FillTransRectangle(backgroundColor, x, y, width, height, 128);
-		Video.DrawRectangle(ColorWhite, x, y, width, height);
-		//Wyrmgus start
-//		label.DrawCentered(x + width / 2, y + 3, unit->Type->Name);
-		label.DrawCentered(x + width / 2, y + 3, unit->get_type_name());
-		//Wyrmgus end
-	} else if (hidden) {
-		const std::string str("Unrevealed terrain");
-		width = font->getWidth(str) + 10;
-		x = std::min<int>(GameCursor->get_graphics()->Width + pos.x, vp.BottomRightPos.x - 1 - width);
-		Video.FillTransRectangle(ColorBlue, x, y, width, height, 128);
-		Video.DrawRectangle(ColorWhite, x, y, width, height);
-		label.DrawCentered(x + width / 2, y + 3, str);
-	}
-}
-
-/**
 **  Draw a map viewport.
 */
 void CViewport::Draw() const

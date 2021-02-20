@@ -262,7 +262,7 @@ namespace gcn
         }
     }
 
-    void Button::mouseRelease(int, int, int button)
+    void Button::mouseRelease(int button)
     {
         if (button == MouseInput::LEFT)
         {
