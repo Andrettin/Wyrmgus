@@ -46,7 +46,9 @@ BOOST_AUTO_TEST_CASE(isqrt_test)
     BOOST_CHECK(isqrt(27) == 5);
     BOOST_CHECK(isqrt(32) == 5);
     BOOST_CHECK(isqrt(64) == 8);
+    BOOST_CHECK(isqrt(317) == 17);
     BOOST_CHECK(isqrt(778) == 27);
+    BOOST_CHECK(isqrt(1030) == 32);
     BOOST_CHECK(isqrt(75900) == 275);
 }
 
@@ -65,6 +67,8 @@ BOOST_AUTO_TEST_CASE(icbrt_test)
     BOOST_CHECK(number::cbrt(27) == 3);
     BOOST_CHECK(number::cbrt(32) == 3);
     BOOST_CHECK(number::cbrt(64) == 4);
+    BOOST_CHECK(number::cbrt(317) == 6);
     BOOST_CHECK(number::cbrt(778) == 9);
+    BOOST_CHECK(number::cbrt(1030) == 10);
     BOOST_CHECK(number::cbrt(75900) == 42);
 }
