@@ -2696,11 +2696,15 @@ bool CPlayer::can_quest_be_available(const wyrmgus::quest *quest) const
 
 bool CPlayer::can_accept_quest(const wyrmgus::quest *quest) const
 {
+	if (this->get_faction() == nullptr) {
+		return false;
+	}
+
 	if (quest->CurrentCompleted) {
 		return false;
 	}
 	
-	if (wyrmgus::vector::contains(this->current_quests, quest) || wyrmgus::vector::contains(this->completed_quests, quest)) {
+	if (vector::contains(this->current_quests, quest) || vector::contains(this->completed_quests, quest)) {
 		return false;
 	}
 
