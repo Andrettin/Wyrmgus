@@ -375,7 +375,7 @@ QPoint CMap::generate_unit_location(const wyrmgus::unit_type *unit_type, const w
 			Select(random_pos - QPoint(32, 32), random_pos + QPoint(unit_type->get_tile_width() - 1, unit_type->get_tile_height() - 1) + QPoint(32, 32), table, z, MakeAndPredicate(HasNotSamePlayerAs(*player), HasNotSamePlayerAs(*CPlayer::Players[PlayerNumNeutral])));
 		} else if (unit_type->get_given_resource() == nullptr) {
 			if (unit_type->BoolFlag[NEUTRAL_HOSTILE_INDEX].value || unit_type->BoolFlag[PREDATOR_INDEX].value || (unit_type->BoolFlag[PEOPLEAVERSION_INDEX].value && (unit_type->UnitType == UnitTypeType::Fly || unit_type->UnitType == UnitTypeType::Space))) {
-				Select(random_pos - QPoint(16, 16), random_pos + QPoint(unit_type->get_tile_width() - 1, unit_type->get_tile_height() - 1) + QPoint(16, 16), table, z, MakeOrPredicate(HasNotSamePlayerAs(*CPlayer::Players[PlayerNumNeutral]), HasSameTypeAs(*settlement_site_unit_type)));
+				Select(random_pos - QPoint(16, 16), random_pos + QPoint(unit_type->get_tile_width() - 1, unit_type->get_tile_height() - 1) + QPoint(16, 16), table, z, HasNotSamePlayerAs(*CPlayer::Players[PlayerNumNeutral]));
 			} else {
 				Select(random_pos - QPoint(8, 8), random_pos + QPoint(unit_type->get_tile_width() - 1, unit_type->get_tile_height() - 1) + QPoint(8, 8), table, z, HasNotSamePlayerAs(*CPlayer::Players[PlayerNumNeutral]));
 			}
