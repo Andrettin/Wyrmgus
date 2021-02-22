@@ -1,0 +1,63 @@
+Setting up the Steam runtime chroots
+====================================
+
+1) Install an Ubuntu 12.04 LTS 64-bit virtual machine (an other Debian-based distro/release with debootstrap and schroot might work too)
+
+2) Retrieve the upstream git repo for the steam-runtime
+  sudo apt-get install git
+  git clone https://github.com/ValveSoftware/steam-runtime
+
+3) Initialize the 64-bit and 32-bit steam chroots
+  cd steam-runtime
+  ./setup-chroot.sh --amd64
+  ./setup-chroot.sh --i386
+There should now be Steam chroots in /var/chroots/steamrt_scout_amd64 and /var/chroots/steamrt_scout_i386.
+
+4) Initialize the build environment for Wyrmgus in each chroot (one at a time)
+  sudo chroot /var/chroots/steamrt_scout_amd64
+     resp. sudo chroot /var/chroots/steamrt_scout_i386
+  sudo apt-get install git liblua5.1-devel tolua++
+  cd /home
+  git clone https://github.com/andrettin/wyrmgus.git
+  exit
+
+5) Prepare a script to handle retrieving the binaries and putting them in an archive to transfer out of the VM
+  mkdir ~/wyrmsun
+  cd ~/wyrmsun
+  cat << EOF > fetch-bins.sh
+    #!/bin/sh
+
+    bindir=wyrmsun-bin-$(date +%Y%m%d)
+    rm -rf $bindir && mkdir $bindir
+
+    cp /var/chroots/steamrt_scout_i386/home/wyrmgus/wyrmsun32 $bindir
+    cp /var/chroots/steamrt_scout_amd64/home/wyrmgus/wyrmsun64 $bindir
+
+    tar cvzf $bindir.tar.gz $bindir
+  EOF
+  chmod +x fetch-bins.sh
+
+
+Building the binaries
+=====================
+
+1) Build the 64-bit binary
+  sudo chroot /var/chroots/steamrt_scout_amd64
+  cd /home/wyrmgus.git
+  git pull --rebase
+  # Optionally, to build a version different from HEAD: git checkout <commit_hash>
+  sh tools/build-steam-binary.sh
+  exit
+
+2) Build the 32-bit binary
+  sudo chroot /var/chroots/steamrt_scout_i386
+  cd /home/wyrmgus.git
+  git pull --rebase
+  # Optionally, to build a version different from HEAD: git checkout <commit_hash>
+  sh tools/build-steam-binary.sh
+  exit
+
+3) Gather binaries
+  cd ~/wyrmsun
+  sh fetch-bins.sh
+  # Upload the resulting dated tarball somewhere accessible from your host, or use a VM shared directory if you manage to setup that
