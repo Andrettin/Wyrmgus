@@ -1,0 +1,70 @@
+---
+name: Create deb packages
+on:
+  push:
+    tags:
+      'v**'
+  workflow_dispatch:
+  custom_debpkg:
+env:
+  BUILD_DIR: "${{ github.workspace }}/build/"
+  BUILD_TYPE: 'Release'
+  CMAKE_FLAGS: >-
+    -DENABLE_STATIC=OFF
+    -DOpenGL_GL_PREFERENCE=GLVND
+    -DENABLE_STRIP=ON
+    -DWITH_GEOJSON=OFF
+    -DWITH_X11=ON
+
+jobs:
+  pack:
+    # TODO Matrix
+    runs-on: 'ubuntu-latest'
+    container: 'bergentroll/wyrmgus:bullseye'
+    steps:
+      - name: Check code
+        uses: actions/checkout@v2
+      - name: Set CPU number
+        run: echo "THREADS=$(nproc)" >> "$GITHUB_ENV"
+      - name: Configure CMake
+        run: >-
+          cmake
+          -S "$GITHUB_WORKSPACE"
+          -B "$BUILD_DIR"
+          -DCMAKE_BUILD_TYPE="$BUILD_TYPE"
+          $CMAKE_FLAGS
+      - name: Workaround for tolua.cpp target on CMake 3.16.3
+        run: cmake -S "$GITHUB_WORKSPACE" -B "$BUILD_DIR"
+      - name: Build Wyrmgus
+        run: >-
+          cmake
+          --build "$BUILD_DIR"
+          --target wyrmgus_main
+          --parallel "$THREADS"
+      - name: Create package
+        run: >-
+          cmake
+          --build "$BUILD_DIR"
+          --target package
+          --parallel "$THREADS"
+      - name: Get package name
+        run: echo "PACKAGE_NAME=$(ls wyrmgus*.deb)" >> "$GITHUB_ENV"
+        working-directory: "$BUILD_DIR"
+      - name: Create release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: deb packages ${{ github.ref }}
+          draft: true
+          # TODO body-path:
+      - name: Upload Release Asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: "$PACKAGE_NAME"
+          asset_name: "wyrmgus-${{ github.ref }}-${{ job.container.id }}.deb"
+          asset_content_type: application/vnd.debian.binary-package
