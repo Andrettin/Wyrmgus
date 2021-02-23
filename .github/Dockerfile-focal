@@ -26,4 +26,8 @@ RUN apt-get -y install \
   qml-module-qtquick2 \
   xvfb \
 ;
+# CI deps
+RUN apt-get -y install \
+  lintian \
+;
 RUN apt-get clean && rm -rf /var/lib/apt/lists/*

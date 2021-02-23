@@ -1,14 +1,13 @@
 ---
 name: Create deb packages
-on:
+'on':
   push:
     tags:
-      'v**'
+      v**
   workflow_dispatch:
-  custom_debpkg:
 env:
-  BUILD_DIR: "${{ github.workspace }}/build/"
-  BUILD_TYPE: 'Release'
+  BUILD_DIR: ${{ github.workspace }}/build/
+  BUILD_TYPE: Release
   CMAKE_FLAGS: >-
     -DENABLE_STATIC=OFF
     -DOpenGL_GL_PREFERENCE=GLVND
@@ -17,13 +16,42 @@ env:
     -DWITH_X11=ON
 
 jobs:
+  common:
+    runs-on: ubuntu-latest
+    outputs:
+      upload_url: ${{ steps.create_release.outputs.upload_url }}
+      release_version: ${{ env.RELEASE_VERSION }}
+    steps:
+      - name: Create release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: deb packages ${{ github.ref }}
+          draft: true
+          # TODO Add 'body-path:' or 'body:'
+      - name: Get release version
+        run: echo "RELEASE_VERSION=${GITHUB_REF#refs/*/}" >> "$GITHUB_ENV"
   pack:
-    # TODO Matrix
-    runs-on: 'ubuntu-latest'
-    container: 'bergentroll/wyrmgus:bullseye'
+    runs-on: ubuntu-latest
+    needs: common
+    strategy:
+      fail-fast: false
+      matrix:
+        container:
+          - bergentroll/wyrmgus:bullseye
+          - bergentroll/wyrmgus:focal
+    container: ${{ matrix.container }}
     steps:
       - name: Check code
         uses: actions/checkout@v2
+      - name: Get distro info
+        run: |
+          lsb_id=$(lsb_release -si | tr -d '\n')
+          lsb_codename=$(lsb_release -sc | tr -d '\n')
+          echo "DISTRIB=${lsb_id}_${lsb_codename}" >> "$GITHUB_ENV"
       - name: Set CPU number
         run: echo "THREADS=$(nproc)" >> "$GITHUB_ENV"
       - name: Configure CMake
@@ -49,22 +77,17 @@ jobs:
           --parallel "$THREADS"
       - name: Get package name
         run: echo "PACKAGE_NAME=$(ls wyrmgus*.deb)" >> "$GITHUB_ENV"
-        working-directory: "$BUILD_DIR"
-      - name: Create release
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tag_name: ${{ github.ref }}
-          release_name: deb packages ${{ github.ref }}
-          draft: true
-          # TODO body-path:
+        working-directory: ${{ env.BUILD_DIR }}
+      - name: Lint package
+        run: lintian "${BUILD_DIR}/${PACKAGE_NAME}"
       - name: Upload Release Asset
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: "$PACKAGE_NAME"
-          asset_name: "wyrmgus-${{ github.ref }}-${{ job.container.id }}.deb"
+          upload_url: ${{ needs.common.outputs.upload_url }}
+          asset_path: ${{ env.BUILD_DIR }}/${{ env.PACKAGE_NAME }}
+          # Be careful here
+          asset_name: "wyrmgus-${{ needs.common.outputs.release_version }}-\
+            ${{ env.DISTRIB }}.deb"
           asset_content_type: application/vnd.debian.binary-package
