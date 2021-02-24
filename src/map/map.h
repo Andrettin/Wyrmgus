@@ -267,7 +267,8 @@ public:
 	bool WallOnMap(const Vec2i &pos, int z) const;
 	
 	//Wyrmgus start
-	bool CurrentTerrainCanBeAt(const Vec2i &pos, bool overlay, int z);
+	bool CurrentTerrainCanBeAt(const Vec2i &pos, const bool overlay, const int z) const;
+	bool is_tile_on_map_borders(const QPoint &tile_pos, const int z) const;
 	bool TileBordersTerrain(const Vec2i &pos, const wyrmgus::terrain_type *terrain_type, const int z) const;
 	bool TileBordersOnlySameTerrain(const Vec2i &pos, const wyrmgus::terrain_type *new_terrain, const int z) const;
 	bool TileBordersFlag(const Vec2i &pos, const int z, const tile_flag flag, const bool reverse = false) const; // reverse means that it returns true if the tile borders one tile without the flag

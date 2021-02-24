@@ -3607,9 +3607,17 @@ void CUnit::UpdateSettlement()
 			}
 			
 			if (potential_settlements.size() > 0) {
-				this->settlement = wyrmgus::vector::take_random(potential_settlements);
+				this->settlement = vector::take_random(potential_settlements);
 				this->set_site(this->settlement);
 				CMap::Map.add_settlement_unit(this);
+
+				//set the tiles the settlement unit is located to its settlement
+				for (int x = this->tilePos.x; x < (this->tilePos.x + this->Type->get_tile_width()); ++x) {
+					for (int y = this->tilePos.y; y < (this->tilePos.y + this->Type->get_tile_height()); ++y) {
+						const QPoint tile_pos(x, y);
+						this->MapLayer->Field(tile_pos)->set_settlement(this->settlement);
+					}
+				}
 			}
 		}
 		if (this->settlement != nullptr) {

@@ -142,6 +142,8 @@ void site_game_data::process_territory_tile(const tile *tile, const QPoint &tile
 {
 	if (CMap::get()->tile_borders_other_settlement_territory(tile_pos, z)) {
 		this->add_border_tile(tile_pos);
+	} else if (CMap::get()->is_tile_on_map_borders(tile_pos, z)) {
+		this->add_tile_pos_to_territory_rect(tile_pos);
 	}
 
 	if (tile->is_on_trade_route()) {

@@ -428,7 +428,7 @@ bool CMap::WallOnMap(const Vec2i &pos, int z) const
 }
 
 //Wyrmgus start
-bool CMap::CurrentTerrainCanBeAt(const Vec2i &pos, bool overlay, int z)
+bool CMap::CurrentTerrainCanBeAt(const Vec2i &pos, const bool overlay, const int z) const
 {
 	wyrmgus::tile &mf = *this->Field(pos, z);
 	const wyrmgus::terrain_type *terrain = nullptr;
@@ -474,7 +474,15 @@ bool CMap::CurrentTerrainCanBeAt(const Vec2i &pos, bool overlay, int z)
 
 	return true;
 }
+//Wyrmgus end
 
+bool CMap::is_tile_on_map_borders(const QPoint &tile_pos, const int z) const
+{
+	const CMapLayer *map_layer = this->MapLayers[z].get();
+	return tile_pos.x() == 0 || tile_pos.y() == 0 || tile_pos.x() == (map_layer->get_width() - 1) || tile_pos.y() == (map_layer->get_height() - 1);
+}
+
+//Wyrmgus start
 bool CMap::TileBordersTerrain(const Vec2i &pos, const wyrmgus::terrain_type *terrain_type, const int z) const
 {
 	bool overlay = terrain_type != nullptr ? terrain_type->is_overlay() : false;

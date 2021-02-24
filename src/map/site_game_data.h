@@ -94,6 +94,11 @@ public:
 	{
 		this->border_tiles.push_back(tile_pos);
 
+		this->add_tile_pos_to_territory_rect(tile_pos);
+	}
+
+	void add_tile_pos_to_territory_rect(const QPoint &tile_pos)
+	{
 		if (this->territory_rect.isNull()) {
 			this->territory_rect = QRect(tile_pos, QSize(1, 1));
 		} else {
