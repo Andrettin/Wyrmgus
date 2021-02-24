@@ -64,6 +64,7 @@
 #include "unit/unit.h"
 #include "unit/unit_find.h"
 #include "unit/unit_type.h"
+#include "util/enum_util.h"
 #include "util/util.h"
 #include "util/vector_random_util.h"
 #include "util/vector_util.h"
@@ -1390,7 +1391,7 @@ static void DrawEditorInfo()
 	//
 	const tile_flag flag = mf.get_flags();
 	sprintf(buf.data(), "%02X|%04X|%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c",
-			mf.get_value(), flag,
+			mf.get_value(), enumeration::to_underlying(flag),
 			mf.has_flag(tile_flag::impassable) ? 'u' : '-',
 			mf.has_flag(tile_flag::air_impassable) ? 'A' : '-',
 			mf.has_flag(tile_flag::no_building) ? 'n' : '-',
