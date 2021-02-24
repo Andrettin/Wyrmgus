@@ -44,6 +44,7 @@
 #include "editor.h"
 #include "faction.h"
 #include "faction_type.h"
+#include "gender.h"
 #include "government_type.h"
 #include "grand_strategy.h"
 #include "language/language.h"

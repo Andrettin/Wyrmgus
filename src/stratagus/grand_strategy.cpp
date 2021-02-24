@@ -23,7 +23,6 @@
 //      along with this program; if not, write to the Free Software
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
-//
 
 #include "stratagus.h"
 
@@ -35,6 +34,7 @@
 #include "faction.h"
 #include "faction_type.h"
 #include "game.h"	// for loading screen elements
+#include "gender.h"
 #include "iolib.h"
 #include "luacallback.h"
 #include "menus.h"

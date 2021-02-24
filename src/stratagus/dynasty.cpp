@@ -23,7 +23,6 @@
 //      along with this program; if not, write to the Free Software
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
-//
 
 #include "stratagus.h"
 
@@ -31,6 +30,7 @@
 
 #include "faction.h"
 #include "script/condition/and_condition.h"
+#include "upgrade/upgrade_structs.h"
 #include "util/container_util.h"
 #include "util/vector_util.h"
 

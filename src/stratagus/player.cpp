@@ -50,6 +50,9 @@
 #include "faction_type.h"
 //Wyrmgus start
 #include "game.h"
+//Wyrmgus end
+#include "gender.h"
+//Wyrmgus start
 #include "grand_strategy.h"
 #include "iocompat.h"
 //Wyrmgus end
