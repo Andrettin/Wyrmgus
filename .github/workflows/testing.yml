@@ -2,8 +2,8 @@
 name: Test on GNU/Linux
 on: [push, pull_request, workflow_dispatch]
 env:
-  BUILD_DIR: "${{ github.workspace }}/build/"
-  BUILD_TYPE: 'Release'
+  BUILD_DIR: ${{ github.workspace }}/build/
+  BUILD_TYPE: Release
   CMAKE_FLAGS: >-
     -DENABLE_STATIC=OFF
     -DOpenGL_GL_PREFERENCE=GLVND
@@ -16,8 +16,14 @@ env:
 
 jobs:
   build:
-    runs-on: 'ubuntu-latest'
-    container: 'bergentroll/wyrmgus:bullseye'
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        container:
+          - bergentroll/wyrmgus:bullseye
+          - bergentroll/wyrmgus:focal
+    container: ${{ matrix.container }}
     steps:
       - uses: actions/checkout@v2
       - name: Set CPU number
