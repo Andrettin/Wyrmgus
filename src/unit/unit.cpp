@@ -557,11 +557,9 @@ void CUnit::Release(const bool final)
 		throw std::runtime_error("Unit of type \"" + this->Type->get_identifier() + "\" being released despite there still being " + std::to_string(this->get_ref_count()) + " references to it.");
 	}
 
-	//
 	// No more references remaining, but the network could have an order
 	// on the way. We must wait a little time before we could free the
 	// memory.
-	//
 
 	//Wyrmgus start
 	this->character = nullptr;

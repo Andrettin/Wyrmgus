@@ -46,9 +46,7 @@ namespace wyrmgus {
 	enum class tile_flag : uint32_t;
 }
 
-//
 //  Some predicates
-//
 
 class CUnitFilter
 {
