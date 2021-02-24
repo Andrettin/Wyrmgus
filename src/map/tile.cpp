@@ -829,9 +829,7 @@ void tile::bump_incompatible_units()
 	}
 }
 
-//
 //  tile_player_info
-//
 
 unsigned char tile_player_info::TeamVisibilityState(const CPlayer &player) const
 {

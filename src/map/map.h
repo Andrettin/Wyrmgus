@@ -24,7 +24,6 @@
 //      along with this program; if not, write to the Free Software
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
-//
 
 #pragma once
 
@@ -405,9 +404,7 @@ using map_marker_func_ptr = void(*)(const CPlayer &player, const unsigned int in
 
 }
 
-//
 // in map_radar.c
-//
 
 /// Mark a tile as radar visible, or increase radar vision
 extern void MapMarkTileRadar(const CPlayer &player, const unsigned int index, const int z);

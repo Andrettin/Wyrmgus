@@ -266,10 +266,8 @@ static int CclIfNearUnit(lua_State *l)
 		lua_pop(l, 1);
 	}
 	
-	//
 	// Get all unit types 'near'.
-	//
-
+	
 	std::vector<CUnit *> unitsOfType;
 
 	FindUnitsByType(*ut2, unitsOfType);

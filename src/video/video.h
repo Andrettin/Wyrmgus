@@ -26,7 +26,6 @@
 //      along with this program; if not, write to the Free Software
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
-//
 
 #pragma once
 
@@ -567,9 +566,7 @@ void DrawTexture(const CGraphic *g, const GLuint *textures, int sx, int sy,
 				 int ex, int ey, int x, int y, int flip);
 #endif
 
-//
 //  Color Cycling stuff
-//
 
 extern void VideoPaletteListAdd(SDL_Surface *surface);
 extern void VideoPaletteListRemove(SDL_Surface *surface);

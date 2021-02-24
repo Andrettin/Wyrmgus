@@ -35,6 +35,7 @@
 #include "actions.h"
 #include "animation.h"
 #include "character.h"
+#include "economy/resource.h"
 #include "iolib.h"
 #include "item/unique_item.h"
 #include "map/map.h"
@@ -285,13 +286,13 @@ void SaveUnit(const CUnit &unit, CFile &file)
 	file.printf("\"resources-held\", %d,\n  ", unit.ResourcesHeld);
 	if (unit.CurrentResource) {
 		file.printf("\"current-resource\", \"%s\",\n  ",
-					DefaultResourceNames[unit.CurrentResource].c_str());
+					unit.get_current_resource()->get_identifier().c_str());
 	}
 	
 	//Wyrmgus start
 	if (unit.GivesResource) {
 		file.printf("\"gives-resource\", \"%s\",\n  ",
-					DefaultResourceNames[unit.GivesResource].c_str());
+					unit.get_given_resource()->get_identifier().c_str());
 	}
 	//Wyrmgus end
 

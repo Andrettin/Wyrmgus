@@ -25,7 +25,6 @@
 //      along with this program; if not, write to the Free Software
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
-//
 
 #pragma once
 
@@ -126,10 +125,7 @@ public:
 	PathFinderOutput output;
 };
 
-
-//
 //  Terrain traversal stuff.
-//
 
 enum class VisitResult {
 	Finished,
@@ -235,9 +231,7 @@ extern int PlaceReachable(const CUnit &src, const Vec2i &pos, int w, int h,
 						  int minrange, int maxrange, int max_length, int z, bool from_outside_container = false);
 						  //Wyrmgus end
 
-//
 // in astar.cpp
-//
 
 extern void SetAStarFixedUnitCrossingCost(int cost);
 extern int GetAStarFixedUnitCrossingCost();

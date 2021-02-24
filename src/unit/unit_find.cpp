@@ -31,6 +31,7 @@
 #include "unit/unit_find.h"
 
 #include "actions.h"
+#include "economy/resource.h"
 #include "map/map.h"
 #include "map/map_layer.h"
 #include "map/tile.h"

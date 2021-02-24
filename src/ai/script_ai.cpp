@@ -1378,9 +1378,7 @@ static int CclAiDump(lua_State *l)
 	for (int p = 0; p < PlayerMax - 1; ++p) {
 		CPlayer &aip = *CPlayer::Players[p];
 		if (aip.AiEnabled) {
-			//
 			// Script
-			//
 
 			printf("------\n");
 			for (const resource *resource : resource::get_all()) {
