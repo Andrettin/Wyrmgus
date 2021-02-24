@@ -51,7 +51,7 @@ jobs:
         run: |
           lsb_id=$(lsb_release -si | tr -d '\n')
           lsb_codename=$(lsb_release -sc | tr -d '\n')
-          echo "DISTRIB=${lsb_id}_${lsb_codename}" >> "$GITHUB_ENV"
+          echo "DISTRIB=${lsb_id}-${lsb_codename}" >> "$GITHUB_ENV"
       - name: Set CPU number
         run: echo "THREADS=$(nproc)" >> "$GITHUB_ENV"
       - name: Configure CMake
