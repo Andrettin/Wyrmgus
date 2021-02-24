@@ -23,22 +23,21 @@
 //      along with this program; if not, write to the Free Software
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
-//
 
 #pragma once
 
 #include "database/data_type.h"
 #include "database/detailed_data_entry.h"
-#include "faction_tier.h"
-#include "gender.h"
-#include "player.h" //for certain enums
 #include "time/date.h"
+#include "ui/icon.h"
+#include "ui/ui.h"
 #include "unit/unit_class_container.h"
 
 class CAiBuildingTemplate;
 class CCurrency;
 class CUpgrade;
 class LuaCallback;
+enum class ButtonCmd;
 
 static int CclDefineFaction(lua_State *l);
 
@@ -62,6 +61,7 @@ enum class character_title;
 enum class diplomacy_state;
 enum class faction_tier;
 enum class faction_type;
+enum class gender;
 enum class government_type;
 
 class faction final : public detailed_data_entry, public data_type<faction>
@@ -348,7 +348,7 @@ private:
 	character_title_name_map character_title_names;
 public:
 	std::map<const CUpgrade *, int> UpgradePriorities;					/// Priority for each upgrade
-	std::map<ButtonCmd, IconConfig> ButtonIcons;								/// icons for button actions
+	std::map<ButtonCmd, IconConfig> ButtonIcons;						/// icons for button actions
 private:
 	unit_class_map<unit_type *> class_unit_types; //the unit type slot of a particular class for the faction
 	std::map<const upgrade_class *, CUpgrade *> class_upgrades; //the upgrade slot of a particular class for the faction

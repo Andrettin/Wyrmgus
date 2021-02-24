@@ -23,7 +23,6 @@
 //      along with this program; if not, write to the Free Software
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
-//
 
 #pragma once
 
@@ -38,13 +37,14 @@
 class CAnimation;
 class CBuildRestrictionOnTop;
 class CFile;
-class Missile;
+class CMapLayer;
 class COrder;
 class CPlayer;
 class CUnit;
 class CUnitStats;
 class CUpgrade;
 class CViewport;
+class Missile;
 class PathFinderData;
 enum class UnitAction : char;
 enum class VariableAttribute;

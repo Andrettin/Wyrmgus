@@ -46,6 +46,7 @@
 #include "economy/resource_storage_type.h"
 #include "faction.h"
 #include "game.h"
+#include "gender.h"
 #include "editor.h"
 //Wyrmgus start
 #include "grand_strategy.h"

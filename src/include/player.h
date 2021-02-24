@@ -23,7 +23,6 @@
 //      along with this program; if not, write to the Free Software
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
-//
 
 #pragma once
 
@@ -31,11 +30,9 @@
 #include "map/landmass_container.h"
 #include "player_container.h"
 #include "ui/icon.h"
-//Wyrmgus start
-#include "ui/ui.h" // for the UI fillers
-//Wyrmgus end
 #include "unit/unit_class_container.h"
 #include "unit/unit_type_container.h"
+#include "upgrade/upgrade_structs.h"
 #include "vec2i.h"
 
 constexpr int DefaultTradeCost = 30;
@@ -47,10 +44,6 @@ class CGraphic;
 class CProvince;
 class CUnit;
 class PlayerAi;
-//Wyrmgus start
-class CFiller;
-class LuaCallback;
-//Wyrmgus end
 enum class ButtonCmd;
 enum class DiplomacyState;
 struct lua_State;
@@ -65,6 +58,7 @@ namespace wyrmgus {
 	class civilization_base;
 	class deity;
 	class dynasty;
+	class faction;
 	class language;
 	class player_color;
 	class player_quest_objective;

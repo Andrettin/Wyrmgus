@@ -23,11 +23,11 @@
 //      along with this program; if not, write to the Free Software
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
-//
 
 #pragma once
 
 #include "character.h"
+#include "economy/resource.h"
 #include "faction_tier.h"
 #include "map/map.h"
 #include "province.h"

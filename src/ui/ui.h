@@ -187,7 +187,6 @@ public:
 	std::unique_ptr<ConditionPanel> Condition; /// Condition to show the panel; if null, no condition.
 };
 
-
 class CFiller final
 {
 public:

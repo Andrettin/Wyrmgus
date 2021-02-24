@@ -36,6 +36,7 @@
 #include "civilization.h"
 #include "editor.h"
 #include "faction.h"
+#include "gender.h"
 #include "item/item_slot.h"
 #include "item/unique_item.h"
 #include "luacallback.h"

@@ -23,16 +23,13 @@
 //      along with this program; if not, write to the Free Software
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
-//
 
 #pragma once
 
 #include "civilization_base.h"
 #include "database/data_type.h"
-#include "faction_tier.h"
-#include "gender.h"
-#include "player.h" //for certain enums
 #include "time/date.h"
+#include "ui/ui.h"
 
 class CAiBuildingTemplate;
 class CCurrency;
@@ -45,18 +42,23 @@ namespace wyrmgus {
 
 class ai_force_template;
 class calendar;
+class character;
 class deity;
 class language;
 class quest;
 class resource;
+class site;
 class sound;
 class species;
 class unit_class;
 class unit_sound_set;
+class unit_type;
 class upgrade_class;
 enum class ai_force_type;
 enum class character_title;
+enum class faction_tier;
 enum class faction_type;
+enum class gender;
 enum class government_type;
 
 class civilization final : public civilization_base, public data_type<civilization>

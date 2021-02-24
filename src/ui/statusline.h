@@ -25,17 +25,16 @@
 //      along with this program; if not, write to the Free Software
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
-//
 
 #pragma once
 
-#include "upgrade/upgrade_structs.h"
+#include "economy/resource.h"
 
 namespace wyrmgus {
 	class font;
 }
 
-class CStatusLine
+class CStatusLine final
 {
 public:
 	CStatusLine()

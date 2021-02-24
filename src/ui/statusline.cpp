@@ -31,7 +31,6 @@
 #include "ui/statusline.h"
 
 #include "database/defines.h"
-#include "economy/resource.h"
 #include "ui/interface.h"
 #include "ui/resource_icon.h"
 #include "ui/ui.h"

@@ -27,6 +27,7 @@
 
 #pragma once
 
+#include "economy/resource.h"
 #include "unit/unit_type_container.h"
 #include "upgrade/upgrade_structs.h" //for CUnitStats
 
