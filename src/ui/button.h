@@ -33,6 +33,7 @@
 #include "ui/icon.h"
 
 class CUnit;
+class CUpgrade;
 enum class ButtonCmd;
 struct lua_State;
 
