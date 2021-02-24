@@ -53,6 +53,7 @@ class faction_history;
 class icon;
 class name_generator;
 class resource;
+class site;
 class unit_class;
 class unit_type;
 class upgrade_class;
