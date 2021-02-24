@@ -38,6 +38,7 @@
 #include "time/season_schedule.h"
 #include "time/time_of_day.h"
 #include "time/time_of_day_schedule.h"
+#include "ui/ui.h"
 #include "unit/unit.h"
 #include "unit/unit_find.h"
 

@@ -28,6 +28,7 @@
 
 #include "map/tile.h"
 
+#include "economy/resource.h"
 //Wyrmgus start
 #include "editor.h"
 //Wyrmgus end
