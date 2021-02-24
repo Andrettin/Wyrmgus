@@ -168,6 +168,7 @@
 #include "unit/unit_type.h"
 #include "unit/unit_type_type.h"
 #include "upgrade/upgrade.h"
+#include "util/enum_util.h"
 #include "util/vector_random_util.h"
 #include "util/vector_util.h"
 
@@ -532,7 +533,7 @@ static void SaveAiPlayer(CFile &file, int plynr, const PlayerAi &ai)
 		const size_t FirstExplorationRequestCount = ai.FirstExplorationRequest.size();
 		for (size_t i = 0; i != FirstExplorationRequestCount; ++i) {
 			const AiExplorationRequest &ptr = ai.FirstExplorationRequest[i];
-			file.printf("{%d, %d, %d}, ", ptr.pos.x, ptr.pos.y, ptr.Mask);
+			file.printf("{%d, %d, %" PRIu32 "}, ", ptr.pos.x, ptr.pos.y, enumeration::to_underlying(ptr.Mask));
 		}
 		file.printf("},\n");
 	}
