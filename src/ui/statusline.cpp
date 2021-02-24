@@ -25,13 +25,13 @@
 //      along with this program; if not, write to the Free Software
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
-//
 
 #include "stratagus.h"
 
 #include "ui/statusline.h"
 
 #include "database/defines.h"
+#include "economy/resource.h"
 #include "ui/interface.h"
 #include "ui/resource_icon.h"
 #include "ui/ui.h"
