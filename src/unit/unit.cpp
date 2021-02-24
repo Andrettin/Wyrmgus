@@ -6571,21 +6571,6 @@ bool CUnit::can_learn_ability(const CUpgrade *ability) const
 template bool CUnit::can_learn_ability<false>(const CUpgrade *ability) const;
 template bool CUnit::can_learn_ability<true>(const CUpgrade *ability) const;
 
-bool CUnit::can_hire_mercenary(const wyrmgus::unit_type *type, const wyrmgus::civilization *civilization) const
-{
-	if (civilization == nullptr) {
-		civilization = type->get_civilization();
-	}
-
-	for (const CPlayer *player : CPlayer::Players) {
-		if (player->Type != PlayerNobody && player->Type != PlayerNeutral && civilization == player->get_civilization() && check_conditions(type, player, true) && player->StartMapLayer == this->MapLayer->ID) {
-			return true;
-		}
-	}
-	
-	return false;
-}
-
 bool CUnit::CanEat(const CUnit &unit) const
 {
 	if (this->Type->BoolFlag[CARNIVORE_INDEX].value && unit.Type->BoolFlag[FLESH_INDEX].value) {

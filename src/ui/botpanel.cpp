@@ -1282,9 +1282,6 @@ bool IsButtonAllowed(const CUnit &unit, const wyrmgus::button &buttonaction)
 			if (!EnableTrainingQueue && unit.CurrentAction() == UnitAction::Train) {
 				break;
 			}
-			if (unit.Player->Index == PlayerNumNeutral && !unit.can_hire_mercenary(unit_type)) {
-				break;
-			}
 		// FALL THROUGH
 		case ButtonCmd::UpgradeTo:
 		case ButtonCmd::UpgradeToClass:

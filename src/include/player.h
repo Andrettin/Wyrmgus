@@ -193,7 +193,8 @@ public:
 	int get_player_color_usage_count(const wyrmgus::player_color *player_color) const;
 	void update_minimap_territory();
 
-	wyrmgus::unit_type *get_class_unit_type(const wyrmgus::unit_class *unit_class) const;
+	unit_type *get_class_unit_type(const wyrmgus::unit_class *unit_class) const;
+	bool is_class_unit_type(const unit_type *unit_type) const;
 	CUpgrade *get_class_upgrade(const wyrmgus::upgrade_class *upgrade_class) const;
 	bool has_upgrade_class(const wyrmgus::upgrade_class *upgrade_class) const;
 

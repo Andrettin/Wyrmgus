@@ -1634,14 +1634,24 @@ void CPlayer::update_minimap_territory()
 	}
 }
 
-wyrmgus::unit_type *CPlayer::get_class_unit_type(const wyrmgus::unit_class *unit_class) const
+unit_type *CPlayer::get_class_unit_type(const unit_class *unit_class) const
 {
-	const wyrmgus::faction *faction = this->get_faction();
+	const faction *faction = this->get_faction();
 	if (faction == nullptr) {
 		return nullptr;
 	}
 
 	return faction->get_class_unit_type(unit_class);
+}
+
+bool CPlayer::is_class_unit_type(const unit_type *unit_type) const
+{
+	const faction *faction = this->get_faction();
+	if (faction == nullptr) {
+		return false;
+	}
+
+	return faction->is_class_unit_type(unit_type);
 }
 
 CUpgrade *CPlayer::get_class_upgrade(const wyrmgus::upgrade_class *upgrade_class) const

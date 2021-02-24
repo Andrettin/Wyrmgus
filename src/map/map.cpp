@@ -3574,7 +3574,7 @@ void CMap::generate_settlement_territories(const int z)
 
 	const QRect rect = this->get_rect(z);
 
-	wyrmgus::point_set seeds = wyrmgus::rect::find_point_set_if(rect, [&](const QPoint &tile_pos) {
+	point_set seeds = rect::find_point_set_if(rect, [&](const QPoint &tile_pos) {
 		const wyrmgus::tile *tile = this->Field(tile_pos, z);
 
 		const wyrmgus::site *settlement = tile->get_settlement();
@@ -3589,21 +3589,21 @@ void CMap::generate_settlement_territories(const int z)
 		return true;
 	});
 
-	seeds = this->expand_settlement_territories(wyrmgus::container::to_vector(seeds), z, (tile_flag::impassable | tile_flag::coast_allowed | tile_flag::space | tile_flag::space_cliff), tile_flag::water_allowed | tile_flag::underground);
-	seeds = this->expand_settlement_territories(wyrmgus::container::to_vector(seeds), z, (tile_flag::coast_allowed | tile_flag::space), tile_flag::water_allowed | tile_flag::underground);
-	seeds = this->expand_settlement_territories(wyrmgus::container::to_vector(seeds), z, tile_flag::space, tile_flag::underground);
-	seeds = this->expand_settlement_territories(wyrmgus::container::to_vector(seeds), z, tile_flag::space, tile_flag::none);
-	this->expand_settlement_territories(wyrmgus::container::to_vector(seeds), z, tile_flag::none, tile_flag::none);
+	seeds = this->expand_settlement_territories(container::to_vector(seeds), z, (tile_flag::impassable | tile_flag::coast_allowed | tile_flag::space | tile_flag::space_cliff), tile_flag::water_allowed | tile_flag::underground);
+	seeds = this->expand_settlement_territories(container::to_vector(seeds), z, (tile_flag::coast_allowed | tile_flag::space), tile_flag::water_allowed | tile_flag::underground);
+	seeds = this->expand_settlement_territories(container::to_vector(seeds), z, tile_flag::space, tile_flag::underground);
+	seeds = this->expand_settlement_territories(container::to_vector(seeds), z, tile_flag::space, tile_flag::none);
+	this->expand_settlement_territories(container::to_vector(seeds), z, tile_flag::none, tile_flag::none);
 
 	//set the settlement of the remaining tiles without any to their most-neighbored settlement
-	wyrmgus::rect::for_each_point(rect, [&](const QPoint &tile_pos) {
+	rect::for_each_point(rect, [&](const QPoint &tile_pos) {
 		wyrmgus::tile *tile = this->Field(tile_pos, z);
 
 		if (tile->get_settlement() != nullptr) {
 			return;
 		}
 
-		wyrmgus::site_map<int> settlement_neighbor_count;
+		site_map<int> settlement_neighbor_count;
 
 		for (int x_offset = -1; x_offset <= 1; ++x_offset) {
 			for (int y_offset = -1; y_offset <= 1; ++y_offset) {

@@ -364,7 +364,7 @@ static void AiCheckUnits()
 
 				bool mercenary_recruited = false;
 				for (const auto &kv_pair : mercenary_building->UnitStock) {
-					wyrmgus::unit_type *mercenary_type = wyrmgus::unit_type::get_all()[kv_pair.first];
+					const unit_type *mercenary_type = unit_type::get_all()[kv_pair.first];
 					const int unit_stock = kv_pair.second;
 					if (
 						unit_stock > 0
@@ -372,6 +372,7 @@ static void AiCheckUnits()
 						&& check_conditions(mercenary_type, CPlayer::Players[i])
 						&& AiPlayer->Player->CheckLimits(*mercenary_type) >= 1
 						&& !AiPlayer->Player->CheckUnitType(*mercenary_type, true)
+						&& (mercenary_type->get_unit_class() == nullptr || CPlayer::Players[i]->is_class_unit_type(mercenary_type))
 					) {
 						//see if there are any unit type requests for units of the same class as the mercenary
 						for (size_t k = 0; k < AiPlayer->UnitTypeBuilt.size(); ++k) {
