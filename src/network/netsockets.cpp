@@ -25,11 +25,6 @@
 //      along with this program; if not, write to the Free Software
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
-//
-
-//----------------------------------------------------------------------------
-//  Includes
-//----------------------------------------------------------------------------
 
 #include "stratagus.h"
 
@@ -40,9 +35,7 @@
 #undef socket
 #endif
 
-//
 // CHost
-//
 
 CHost::CHost(const char *name, int port)
 {
@@ -65,9 +58,7 @@ bool CHost::isValid() const
 	//Wyrmgus end
 }
 
-//
 // CUDPSocket_Impl
-//
 
 class CUDPSocket_Impl
 {
@@ -94,9 +85,7 @@ private:
 	Socket socket;
 };
 
-//
 // CUDPSocket
-//
 
 #ifdef DEBUG
 
@@ -179,9 +168,7 @@ bool CUDPSocket::IsValid() const
 	return m_impl->IsValid();
 }
 
-//
 // CTCPSocket_Impl
-//
 
 class CTCPSocket_Impl
 {
@@ -213,9 +200,7 @@ bool CTCPSocket_Impl::Open(const CHost &host)
 	return this->socket != INVALID_SOCKET;
 }
 
-//
 // CTCPSocket
-//
 
 CTCPSocket::CTCPSocket()
 {

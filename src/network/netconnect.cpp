@@ -25,7 +25,6 @@
 //      along with this program; if not, write to the Free Software
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
-//
 
 #include "stratagus.h"
 
@@ -180,9 +179,7 @@ private:
 static CServer Server;
 static CClient Client;
 
-//
 // CClient
-//
 
 /**
 ** Send an InitConfig message across the Network
@@ -892,9 +889,7 @@ void CClient::Parse_AreYouThere()
 	NetworkSendICMessage(*socket, serverHost, message);
 }
 
-//
 // CServer
-//
 
 void CServer::KickClient(int c)
 {
@@ -1358,9 +1353,7 @@ void CServer::Parse(unsigned long frameCounter, const unsigned char *buf, const 
 	}
 }
 
-//
 // Functions
-//
 
 /**
 **  Parse a setup event. (Command type <= MessageInitEvent)

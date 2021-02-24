@@ -186,9 +186,7 @@ int CFile::printf(const char *format, ...)
 	return ret;
 }
 
-//
 //  Implementation.
-//
 
 CFile::PImpl::PImpl()
 {

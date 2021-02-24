@@ -510,10 +510,9 @@ int ToggleUnitsByType(CUnit &base)
 	if (!SelectUnit(base)) { // Add base to selection
 		return 0;
 	}
-	//
-	//  Search for other visible units of the same type
-	//
 
+	//  Search for other visible units of the same type
+	
 	// select all visible units.
 	// StephanR: should be (MapX,MapY,MapX+MapWidth-1,MapY+MapHeight-1) ???
 	// FIXME: this should probably be cleaner implemented if SelectUnitsByType()

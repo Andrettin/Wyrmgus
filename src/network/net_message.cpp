@@ -25,11 +25,6 @@
 //      along with this program; if not, write to the Free Software
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
-//
-
-//----------------------------------------------------------------------------
-// Includes
-//----------------------------------------------------------------------------
 
 #include "stratagus.h"
 
@@ -187,9 +182,7 @@ size_t deserialize(const unsigned char *buf, std::vector<unsigned char> &data)
 	//Wyrmgus end
 }
 
-//
 // CNetworkHost
-//
 
 size_t CNetworkHost::Serialize(unsigned char *buf) const
 {
@@ -227,9 +220,7 @@ void CNetworkHost::SetName(const char *name)
 	strncpy_s(this->PlyName, sizeof(this->PlyName), name, _TRUNCATE);
 }
 
-//
 // CServerSetup
-//
 
 size_t CServerSetup::Serialize(unsigned char *buf) const
 {
@@ -331,9 +322,7 @@ bool CServerSetup::operator == (const CServerSetup &rhs) const
 			&& memcmp(Race, rhs.Race, sizeof(Race)) == 0);
 }
 
-//
 //  CInitMessage_Header
-//
 
 size_t CInitMessage_Header::Serialize(unsigned char *p) const
 {
@@ -351,9 +340,7 @@ size_t CInitMessage_Header::Deserialize(const unsigned char *p)
 	return p - buf;
 }
 
-//
 // CInitMessage_Hello
-//
 
 CInitMessage_Hello::CInitMessage_Hello(const char *name) :
 	header(MessageInit_FromClient, ICMHello)
@@ -383,9 +370,7 @@ void CInitMessage_Hello::Deserialize(const unsigned char *p)
 	p += deserialize32(p, &this->Version);
 }
 
-//
 // CInitMessage_Config
-//
 
 CInitMessage_Config::CInitMessage_Config() :
 	header(MessageInit_FromServer, ICMConfig)
@@ -416,9 +401,7 @@ void CInitMessage_Config::Deserialize(const unsigned char *p)
 	}
 }
 
-//
 // CInitMessage_EngineMismatch
-//
 
 CInitMessage_EngineMismatch::CInitMessage_EngineMismatch() :
 	header(MessageInit_FromServer, ICMEngineMismatch)
@@ -442,9 +425,7 @@ void CInitMessage_EngineMismatch::Deserialize(const unsigned char *p)
 	p += deserialize32(p, &this->Stratagus);
 }
 
-//
 // CInitMessage_ProtocolMismatch
-//
 
 CInitMessage_ProtocolMismatch::CInitMessage_ProtocolMismatch() :
 	header(MessageInit_FromServer, ICMProtocolMismatch)
@@ -468,9 +449,7 @@ void CInitMessage_ProtocolMismatch::Deserialize(const unsigned char *p)
 	p += deserialize32(p, &this->Version);
 }
 
-//
 // CInitMessage_Welcome
-//
 
 CInitMessage_Welcome::CInitMessage_Welcome() :
 	header(MessageInit_FromServer, ICMWelcome)
@@ -503,9 +482,7 @@ void CInitMessage_Welcome::Deserialize(const unsigned char *p)
 	p += deserialize32(p, &this->gameCyclesPerUpdate);
 }
 
-//
 // CInitMessage_Map
-//
 
 CInitMessage_Map::CInitMessage_Map(const char *path, uint32_t mapUID) :
 	header(MessageInit_FromServer, ICMMap),
@@ -532,9 +509,7 @@ void CInitMessage_Map::Deserialize(const unsigned char *p)
 	p += deserialize32(p, &this->MapUID);
 }
 
-//
 // CInitMessage_State
-//
 
 CInitMessage_State::CInitMessage_State(int type, const CServerSetup &data) :
 	header(type, ICMState),
@@ -558,9 +533,7 @@ void CInitMessage_State::Deserialize(const unsigned char *p)
 	p += this->State.Deserialize(p);
 }
 
-//
 // CInitMessage_Resync
-//
 
 CInitMessage_Resync::CInitMessage_Resync() :
 	header(MessageInit_FromServer, ICMResync)
@@ -587,9 +560,7 @@ void CInitMessage_Resync::Deserialize(const unsigned char *p)
 	}
 }
 
-//
 // CNetworkCommand
-//
 
 size_t CNetworkCommand::Serialize(unsigned char *buf) const
 {
@@ -611,9 +582,7 @@ size_t CNetworkCommand::Deserialize(const unsigned char *buf)
 	return p - buf;
 }
 
-//
 // CNetworkExtendedCommand
-//
 
 size_t CNetworkExtendedCommand::Serialize(unsigned char *buf) const
 {
@@ -637,9 +606,7 @@ size_t CNetworkExtendedCommand::Deserialize(const unsigned char *buf)
 	return p - buf;
 }
 
-//
 // CNetworkChat
-//
 
 size_t CNetworkChat::Serialize(unsigned char *buf) const
 {
@@ -662,9 +629,7 @@ size_t CNetworkChat::Size() const
 	return size;
 }
 
-//
 // CNetworkCommandSync
-//
 
 size_t CNetworkCommandSync::Serialize(unsigned char *buf) const
 {
@@ -682,9 +647,7 @@ size_t CNetworkCommandSync::Deserialize(const unsigned char *buf)
 	return p - buf;
 }
 
-//
 // CNetworkCommandQuit
-//
 
 size_t CNetworkCommandQuit::Serialize(unsigned char *buf) const
 {
@@ -700,9 +663,7 @@ size_t CNetworkCommandQuit::Deserialize(const unsigned char *buf)
 	return p - buf;
 }
 
-//
 // CNetworkSelection
-//
 
 size_t CNetworkSelection::Serialize(unsigned char *buf) const
 {
@@ -735,9 +696,7 @@ size_t CNetworkSelection::Size() const
 	return 2 + 2 + 2 * Units.size();
 }
 
-//
 // CNetworkPacketHeader
-//
 
 size_t CNetworkPacketHeader::Serialize(unsigned char *p) const
 {
@@ -763,9 +722,7 @@ size_t CNetworkPacketHeader::Deserialize(const unsigned char *buf)
 	return p - buf;
 }
 
-//
 // CNetworkPacket
-//
 
 size_t CNetworkPacket::Serialize(unsigned char *buf, int numcommands) const
 {

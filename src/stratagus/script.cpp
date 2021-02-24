@@ -429,8 +429,6 @@ void LuaGarbageCollect()
 #endif
 }
 
-// ////////////////////
-
 /**
 **  Parse binary operation with number.
 **
