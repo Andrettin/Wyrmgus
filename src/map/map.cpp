@@ -89,7 +89,6 @@
 #include "util/util.h"
 #include "util/vector_random_util.h"
 #include "util/vector_util.h"
-#include "version.h"
 #include "video/video.h"
 
 CMap CMap::Map; //the current map
@@ -1893,7 +1892,7 @@ void CMap::save(CFile &file) const
 	file.printf("%s", str.c_str());
 
 	file.printf("StratagusMap(\n");
-	file.printf("  \"version\", \"%s\",\n", VERSION);
+	file.printf("  \"version\", \"%s\",\n", QApplication::applicationVersion().toStdString().c_str());
 	file.printf("  \"description\", \"%s\",\n", this->Info.Description.c_str());
 	file.printf("  \"the-map\", {\n");
 	file.printf("  \"%s\",\n", this->NoFogOfWar ? "no-fog-of-war" : "fog-of-war");

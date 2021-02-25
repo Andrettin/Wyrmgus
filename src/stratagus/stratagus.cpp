@@ -225,9 +225,6 @@ unsigned long __stack = 1000000;
 __attribute__ ((section(".text"))) UBYTE VString[] = "$VER: Wyrmsun " VERSION "\r\n";
 #endif
 
-/// Name, Version, Copyright
-const char NameLine[] = NAME " v" VERSION ", " COPYRIGHT;
-
 std::string CliMapName;				/// Filename of the map given on the command line
 std::string MenuRace;
 
@@ -323,13 +320,16 @@ static void PrintHeader()
 #endif
 		"";
 
+	//Name, Version, Copyright
+	const std::string name_line = (QApplication::applicationName() + " v" + QApplication::applicationVersion() + ", " + COPYRIGHT).toStdString();
+
 	fprintf(stdout,
 			"%s\n  written by Lutz Sammer, Fabrice Rossi, Vladi Shabanski, Patrice Fortier,\n"
 			"  Jon Gabrielson, Andreas Arens, Nehal Mistry, Jimmy Salmon, Pali Rohar,\n"
 			"  cybermind, Andrettin and others.\n"
 			"\t" HOMEPAGE "\n"
 			"Compile options %s",
-			NameLine, CompileOptions.c_str());
+			name_line.c_str(), CompileOptions.c_str());
 }
 
 void PrintLicense()

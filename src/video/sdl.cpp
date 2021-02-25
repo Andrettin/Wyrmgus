@@ -76,7 +76,6 @@
 #include "ui/interface.h"
 #include "ui/ui.h"
 #include "unit/unit.h"
-#include "version.h"
 #include "video/font.h"
 #include "video/video.h"
 #include "widgets.h"
@@ -465,7 +464,8 @@ void InitVideoSdl()
 		} else if (!Parameters::Instance.applicationName.empty()) {
 			SDL_WM_SetCaption(Parameters::Instance.applicationName.c_str(), Parameters::Instance.applicationName.c_str());
 		} else {
-			SDL_WM_SetCaption(NAME, NAME);
+			const std::string name = QApplication::applicationName().toStdString();
+			SDL_WM_SetCaption(name.c_str(), name.c_str());
 		}
 
 #if ! defined(USE_WIN32)

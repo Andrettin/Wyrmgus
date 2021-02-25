@@ -80,7 +80,6 @@
 #include "util/point_util.h"
 #include "util/util.h"
 #include "upgrade/upgrade.h"
-#include "version.h"
 #include "video/font.h"
 #include "video/font_color.h"
 #include "video/video.h"
@@ -1873,7 +1872,7 @@ static void InfoPanel_draw_no_selection()
 		int y = UI.InfoPanel.Y + 8 * scale_factor;
 
 		CLabel label(wyrmgus::defines::get()->get_game_font());
-		label.Draw(x, y, NAME);
+		label.Draw(x, y, QApplication::applicationName().toStdString());
 		y += 16 * scale_factor;
 		label.Draw(x, y,  _("Cycle:"));
 		label.Draw(x + 48 * scale_factor, y, GameCycle);

@@ -69,7 +69,6 @@
 #include "unit/unit_class.h"
 #include "util/point_util.h"
 #include "util/util.h"
-#include "version.h"
 #include "video/video.h"
 
 /**
@@ -87,9 +86,8 @@ static int CclStratagusMap(lua_State *l)
 		if (!strcmp(value, "version")) {
 			std::array<char, 64> buf{};
 
-			const char *version = LuaToString(l, j + 1);
-			strncpy(buf.data(), VERSION, sizeof(buf));
-			if (strcmp(buf.data(), version)) {
+			const std::string save_version = LuaToString(l, j + 1);
+			if (save_version != QApplication::applicationVersion().toStdString()) {
 				fprintf(stderr, "Warning: not saved with this version.\n");
 			}
 		} else if (!strcmp(value, "uid")) {
