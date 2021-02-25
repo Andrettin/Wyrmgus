@@ -25,5 +25,11 @@
 //      02111-1307, USA.
 
 #define BOOST_TEST_MAIN
+
+#ifdef BOOST_TEST_DYN_LINK
+#define BOOST_TEST_MODULE multiunit test
+#else
 #define BOOST_TEST_MODULE header-only multiunit test
+#endif
+
 #include <boost/test/included/unit_test.hpp>

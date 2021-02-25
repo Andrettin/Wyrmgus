@@ -26,8 +26,6 @@
 
 #pragma once
 
-#include <boost/stacktrace/stacktrace_fwd.hpp>
-
 namespace wyrmgus::log {
 
 constexpr const char *date_string_format = "yyyy.MM.dd hh:mm:ss";
