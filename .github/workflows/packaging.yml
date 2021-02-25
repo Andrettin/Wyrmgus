@@ -81,6 +81,7 @@ jobs:
         working-directory: ${{ env.BUILD_DIR }}
       - name: Lint package
         run: lintian "${BUILD_DIR}/${PACKAGE_NAME}"
+        continue-on-error: true
       - name: Upload Release Asset
         uses: actions/upload-release-asset@v1
         env:
