@@ -1,6 +1,9 @@
 ---
 name: Test on GNU/Linux
-on: [push, pull_request, workflow_dispatch]
+'on':
+  - push
+  - pull_request
+  - workflow_dispatch
 env:
   BUILD_DIR: ${{ github.workspace }}/build/
   BUILD_TYPE: Release
