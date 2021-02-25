@@ -44,7 +44,7 @@ int main(int argc, char **argv)
 		qInstallMessageHandler(log::log_qt_message);
 
 		QApplication app(argc, argv);
-		app.setApplicationName("Wyrmsun");
+		app.setApplicationName(NAME);
 		app.setApplicationVersion(VERSION);
 
 		//  Setup some defaults.

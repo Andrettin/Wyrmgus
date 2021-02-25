@@ -1,8 +1,10 @@
+#pragma once
+
 /// Name
-#define NAME "Stratagus"
+#define NAME "Wyrmsun"
 
 /// Description
-#define DESCRIPTION NAME " - Strategy Gaming Engine"
+#define DESCRIPTION NAME " - Real-Time Strategy Game"
 
 #ifndef StratagusMajorVersion
 	#define StratagusMajorVersion 0
