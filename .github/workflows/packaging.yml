@@ -43,6 +43,7 @@ jobs:
         container:
           - bergentroll/wyrmgus:bullseye
           - bergentroll/wyrmgus:focal
+          - bergentroll/wyrmgus:groovy
     container: ${{ matrix.container }}
     steps:
       - name: Check code
