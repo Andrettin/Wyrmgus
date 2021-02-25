@@ -1,9 +1,12 @@
 ---
-name: CMake
-on: [push, pull_request, workflow_dispatch]
+name: Test on GNU/Linux
+'on':
+  - push
+  - pull_request
+  - workflow_dispatch
 env:
-  BUILD_DIR: "${{ github.workspace }}/build/"
-  BUILD_TYPE: 'Release'
+  BUILD_DIR: ${{ github.workspace }}/build/
+  BUILD_TYPE: Release
   CMAKE_FLAGS: >-
     -DENABLE_STATIC=OFF
     -DOpenGL_GL_PREFERENCE=GLVND
@@ -16,8 +19,15 @@ env:
 
 jobs:
   build:
-    runs-on: 'ubuntu-latest'
-    container: 'bergentroll/wyrmgus:bullseye'
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        container:
+          - bergentroll/wyrmgus:bullseye
+          - bergentroll/wyrmgus:focal
+          - bergentroll/wyrmgus:groovy
+    container: ${{ matrix.container }}
     steps:
       - uses: actions/checkout@v2
       - name: Set CPU number
@@ -35,13 +45,13 @@ jobs:
         run: >-
           cmake
           --build "$BUILD_DIR"
-          --target stratagus_main
+          --target wyrmgus_main
           --parallel "$THREADS"
       - name: Build Wyrmgus test suite
         run: >-
           cmake
           --build "$BUILD_DIR"
-          --target stratagus_test
+          --target wyrmgus_test
           --parallel "$THREADS"
       - name: Test
         continue-on-error: true

@@ -1,21 +1,21 @@
-![pipeline status](
-https://github.com/Andrettin/Wyrmgus/workflows/CMake/badge.svg?branch=master)
-
-# GitHub Actions for Wyrmgus
-
-Dirctory contains all necessary file for running CI processes on GitHub.
-[Dockerfile](Dockerfile) is used to maintain a GNU/Linux environment to build
-and test Wyrmgus. Pipeline fetching the docker image from
-https://hub.docker.com, so an updated image should be uploaded. To build an
-image run command in directory with [Dockerfile](Dockerfile):
 ```
-$ docker image build -tag 'image_name:tag' --compress --force-rm
-```
-
-Pipeline may be ran locally with [act](https://github.com/nektos/act) tool. To
-do so run act at root of the repository with a trigger name (requires Docker):
-```
-$ act -v push`
+    ________________________________README_________________________________
+                  _       _
+                 ( |     / )  _ ____  __  __ ____ __   _ ____
+                 | | _  / /(_/ / _  )/  |/  / __ \ /  / / ___)
+                 | |/ |/ /\  // /  // /(// / (_  |(__/ /\__ \
+                 (__/|__/ /_//_/ \_\_/  (_/\___ /_____/(_____)
+                                          (____/
+    ______________________                           ______________________
+                          T H E   W A R   B E G I N S
+           Stratagus - A free fantasy real time strategy game engine
 ```
 
-The `-v` key for verbose output.
+Read [doc/index.html](../doc/index.html) for general information and license information.
+
+Read [doc/install.html](../doc/install.html) for Stratagus installation instructions.
+
+Read [doc/changelog.html](../doc/changelog.html) for the Stratagus changelog.
+
+Look at [.github/README_ACTIONS.md](./README_ACTIONS.md) for Wyrmsung GitHub
+Actions starting point.
