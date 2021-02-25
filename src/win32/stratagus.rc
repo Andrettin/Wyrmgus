@@ -5,8 +5,8 @@
 
 1 ICON ICO
 1 VERSIONINFO
-FILEVERSION	StratagusMajorVersion,StratagusMinorVersion,StratagusPatchLevel,StratagusPatchLevel2
-PRODUCTVERSION	StratagusMajorVersion,StratagusMinorVersion,StratagusPatchLevel,StratagusPatchLevel2
+FILEVERSION	StratagusMajorVersion,StratagusMinorVersion,StratagusPatchLevel,0
+PRODUCTVERSION	StratagusMajorVersion,StratagusMinorVersion,StratagusPatchLevel,0
 FILEOS		4
 FILETYPE	1
 
@@ -23,8 +23,8 @@ BEGIN
 			VALUE "FileVersion",		VERSION
 			VALUE "InternalName",		NAME
 			VALUE "LegalCopyright",		COPYRIGHT
-			VALUE "License",		LICENSE
-			VALUE "Homepage",		HOMEPAGE
+			VALUE "License",			LICENSE
+			VALUE "Homepage",			HOMEPAGE
 			VALUE "OriginalFilename",	EXE
 			VALUE "ProductName",		NAME
 			VALUE "ProductVersion",		VERSION

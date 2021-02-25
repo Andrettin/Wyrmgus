@@ -5,19 +5,15 @@
 #define DESCRIPTION NAME " - Strategy Gaming Engine"
 
 #ifndef StratagusMajorVersion
-  #define StratagusMajorVersion 0
+	#define StratagusMajorVersion 0
 #endif
 
 #ifndef StratagusMinorVersion
-  #define StratagusMinorVersion 0
+	#define StratagusMinorVersion 0
 #endif
 
 #ifndef StratagusPatchLevel
-  #define StratagusPatchLevel 0
-#endif
-
-#ifndef StratagusPatchLevel2
-  #define StratagusPatchLevel2 0
+	#define StratagusPatchLevel 0
 #endif
 
 #define _version_stringify_(s) #s
@@ -25,14 +21,8 @@
 
 #define _version_str1 _version_stringify(StratagusMajorVersion) "." _version_stringify(StratagusMinorVersion) "." _version_stringify(StratagusPatchLevel)
 
-#if StratagusPatchLevel2 > 0
-  #define _version_str2 _version_str1 "." _version_stringify(StratagusPatchLevel2)
-#else
-  #define _version_str2 _version_str1
-#endif
-
 /// Engine version string
-#define VERSION _version_str2
+#define VERSION _version_str1
 
 /// Stratagus version (1,2,3) -> 10203
 #define StratagusVersion (StratagusMajorVersion * 10000 + StratagusMinorVersion * 100 + StratagusPatchLevel)
