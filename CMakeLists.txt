@@ -1272,7 +1272,6 @@ if(${CMAKE_VERSION} VERSION_GREATER_EQUAL "3.18.0")
 	option(ENABLE_UNITY_BUILD "Use unity builds for compilation" ON)
 endif()
 
-option(WITH_BOOST_TEST_HEADER_ONLY "Compile with the header-only variant of Boost.Test" ON)
 option(WITH_GEOJSON "Compile with support for generating map data from GeoJSON files" ON)
 
 if(NOT WITH_RENDERER)
@@ -1281,10 +1280,6 @@ if(NOT WITH_RENDERER)
 	else()
 		set(WITH_RENDERER "NativeSDL")
 	endif()
-endif()
-
-if(NOT WITH_BOOST_TEST_HEADER_ONLY)
-	find_package(Boost COMPONENTS system filesystem unit_test_framework REQUIRED)
 endif()
 
 # Binary name
@@ -1619,15 +1614,6 @@ add_executable(wyrmgus_main WIN32 ${wyrmgus_main_SRCS})
 add_executable(wyrmgus_test ${wyrmgus_test_SRCS})
 add_test(wyrmgus_test wyrmgus_test)
 enable_testing()
-
-if(NOT WITH_BOOST_TEST_HEADER_ONLY)
-	target_compile_definitions(wyrmgus_test PRIVATE BOOST_TEST_DYN_LINK)
-	target_link_libraries(wyrmgus_test 
-		${Boost_FILESYSTEM_LIBRARY}
-		${Boost_SYSTEM_LIBRARY}
-		${Boost_UNIT_TEST_FRAMEWORK_LIBRARY}
-	)
-endif()
 
 if (MSVC)
 	target_compile_options(wyrmgus PRIVATE /W4 /w44800 /wd4458)

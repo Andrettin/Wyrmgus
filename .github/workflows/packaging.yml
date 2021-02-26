@@ -14,7 +14,6 @@ env:
     -DENABLE_STRIP=ON
     -DWITH_GEOJSON=OFF
     -DWITH_X11=ON
-    -DWITH_BOOST_TEST_HEADER_ONLY=OFF
 
 jobs:
   common:

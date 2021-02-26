@@ -26,10 +26,6 @@
 
 #define BOOST_TEST_MAIN
 
-#ifdef BOOST_TEST_DYN_LINK
-#define BOOST_TEST_MODULE multiunit test
-#include <boost/test/unit_test.hpp>
-#else
-#define BOOST_TEST_MODULE header-only multiunit test
+#define BOOST_TEST_MODULE wyrmgus_test
+//header-only variant
 #include <boost/test/included/unit_test.hpp>
-#endif
