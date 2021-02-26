@@ -1283,6 +1283,10 @@ if(NOT WITH_RENDERER)
 	endif()
 endif()
 
+if(NOT WITH_BOOST_TEST_HEADER_ONLY)
+	find_package(Boost COMPONENTS system filesystem unit_test_framework REQUIRED)
+endif()
+
 # Binary name
 set(BINARY_NAME "wyrmgus" CACHE PATH "Sets the name of the binary.")
 
@@ -1618,6 +1622,11 @@ enable_testing()
 
 if(NOT WITH_BOOST_TEST_HEADER_ONLY)
 	target_compile_definitions(wyrmgus_test PRIVATE BOOST_TEST_DYN_LINK)
+	target_link_libraries(wyrmgus_test 
+		${Boost_FILESYSTEM_LIBRARY}
+		${Boost_SYSTEM_LIBRARY}
+		${Boost_UNIT_TEST_FRAMEWORK_LIBRARY}
+	)
 endif()
 
 if (MSVC)
