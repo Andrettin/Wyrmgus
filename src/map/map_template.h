@@ -661,7 +661,7 @@ public:
 		this->tile_terrains[tile_pos] = terrain;
 	}
 
-	const map_projection *get_map_projection() const;
+	const wyrmgus::map_projection *get_map_projection() const;
 
 	int get_min_longitude() const
 	{
