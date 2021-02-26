@@ -38,6 +38,7 @@ class civilization;
 class dialogue;
 class font;
 class font_color;
+class map_projection;
 class music;
 class player_color;
 class resource;
@@ -77,6 +78,7 @@ class defines final : public QObject, public singleton<defines>
 	Q_PROPERTY(wyrmgus::time_of_day* underground_time_of_day MEMBER underground_time_of_day)
 	Q_PROPERTY(wyrmgus::time_of_day_schedule* default_time_of_day_schedule MEMBER default_time_of_day_schedule)
 	Q_PROPERTY(wyrmgus::season_schedule* default_season_schedule MEMBER default_season_schedule)
+	Q_PROPERTY(wyrmgus::map_projection* default_map_projection MEMBER default_map_projection)
 	Q_PROPERTY(wyrmgus::terrain_type* border_terrain_type MEMBER border_terrain_type)
 	Q_PROPERTY(wyrmgus::dialogue* campaign_victory_dialogue MEMBER campaign_victory_dialogue READ get_campaign_victory_dialogue)
 	Q_PROPERTY(wyrmgus::dialogue* campaign_defeat_dialogue MEMBER campaign_defeat_dialogue READ get_campaign_defeat_dialogue)
@@ -233,6 +235,11 @@ public:
 		return this->default_season_schedule;
 	}
 
+	map_projection *get_default_map_projection() const
+	{
+		return this->default_map_projection;
+	}
+
 	const terrain_type *get_border_terrain_type() const
 	{
 		return this->border_terrain_type;
@@ -357,6 +364,7 @@ private:
 	time_of_day *underground_time_of_day = nullptr;
 	time_of_day_schedule *default_time_of_day_schedule = nullptr;
 	season_schedule *default_season_schedule = nullptr;
+	map_projection *default_map_projection = nullptr;
 	dialogue *campaign_victory_dialogue = nullptr;
 	dialogue *campaign_defeat_dialogue = nullptr;
 	button_level *inventory_button_level = nullptr;

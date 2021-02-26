@@ -220,6 +220,7 @@ set(map_SRCS
 	src/map/map_draw.cpp
 	src/map/map_fog.cpp
 	src/map/map_layer.cpp
+	src/map/map_projection.cpp
 	src/map/map_radar.cpp
 	src/map/map_template.cpp
 	src/map/map_template_container.cpp
@@ -420,7 +421,7 @@ set(wyrmgus_base_SRCS
 	src/stratagus/title.cpp
 	src/stratagus/translate.cpp
 )
-source_group(stratagus FILES ${wyrmgus_base_SRCS})
+source_group(wyrmgus FILES ${wyrmgus_base_SRCS})
 
 set(time_SRCS
 	src/time/calendar.cpp
@@ -739,11 +740,13 @@ set(wyrmgus_language_HDRS
 set(wyrmgus_map_HDRS
 	src/map/character_substitution.h
 	src/map/character_unit.h
+	src/map/equirectangular_map_projection.h
 	src/map/historical_location.h
 	src/map/landmass.h
 	src/map/landmass_container.h
 	src/map/map.h
 	src/map/map_layer.h
+	src/map/map_projection.h
 	src/map/map_template.h
 	src/map/map_template_container.h
 	src/map/map_template_history.h

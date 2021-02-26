@@ -50,26 +50,14 @@ public:
 		return geocoordinate(lon, lat);
 	}
 
-	static constexpr number_type longitude_per_pixel(const int lon_size, const QSize &size)
+	static constexpr number_type longitude_to_unsigned_longitude(const number_type &longitude)
 	{
-		return number_type(lon_size) / size.width();
+		return longitude + number_type(geocoordinate::longitude_size / 2);
 	}
 
-	static constexpr number_type latitude_per_pixel(const int lat_size, const QSize &size)
+	static constexpr number_type latitude_to_unsigned_latitude(const number_type &latitude)
 	{
-		return number_type(lat_size) / size.height();
-	}
-
-	static constexpr int unsigned_longitude_to_x(const number_type &unsigned_longitude, const number_type &lon_per_pixel)
-	{
-		const number_type x = unsigned_longitude / lon_per_pixel;
-		return x.to_int();
-	}
-
-	static constexpr int unsigned_latitude_to_y(const number_type &unsigned_latitude, const number_type &lat_per_pixel)
-	{
-		const number_type y = unsigned_latitude / lat_per_pixel;
-		return y.to_int();
+		return latitude * -1 + number_type(geocoordinate::latitude_size / 2);
 	}
 
 	static void for_each_random_until(const std::function<bool(const geocoordinate &)> &function);
@@ -132,54 +120,17 @@ public:
 		return QGeoCoordinate(this->latitude.to_double(), this->longitude.to_double());
 	}
 
-	constexpr number_type longitude_to_unsigned_longitude() const
-	{
-		return this->get_longitude() + number_type(geocoordinate::longitude_size / 2);
-	}
-
-	constexpr number_type latitude_to_unsigned_latitude() const
-	{
-		return this->get_latitude() * -1 + number_type(geocoordinate::latitude_size / 2);
-	}
-
 	geocoordinate to_unsigned_geocoordinate() const
 	{
 		//converts a geocoordinate into an unsigned one, i.e. having x values from 0 to 360, and y values from 0 to 180 (top to bottom, contrary to geocoordinates, which work south to north)
-		const number_type x = this->longitude_to_unsigned_longitude();
-		const number_type y = this->latitude_to_unsigned_latitude();
+		const number_type x = this->longitude_to_unsigned_longitude(this->get_longitude());
+		const number_type y = this->latitude_to_unsigned_latitude(this->get_latitude());
 		return geocoordinate(x, y);
-	}
-
-	constexpr int longitude_to_x(const number_type &lon_per_pixel) const
-	{
-		const number_type x = this->longitude_to_unsigned_longitude();
-		return geocoordinate::unsigned_longitude_to_x(x, lon_per_pixel);
-	}
-
-	constexpr int latitude_to_y(const number_type &lat_per_pixel) const
-	{
-		const number_type y = this->latitude_to_unsigned_latitude();
-		return geocoordinate::unsigned_latitude_to_y(y, lat_per_pixel);
 	}
 
 	constexpr QPoint to_point() const
 	{
 		return QPoint(this->get_longitude().to_int(), this->get_latitude().to_int());
-	}
-
-	constexpr QPoint to_point(const number_type &lon_per_pixel, const number_type &lat_per_pixel) const
-	{
-		const int x = this->longitude_to_x(lon_per_pixel);
-		const int y = this->latitude_to_y(lat_per_pixel);
-		return QPoint(x, y);
-	}
-
-	constexpr QPoint to_point(const QRect &georectangle, const QSize &area_size) const
-	{
-		const number_type lon_per_pixel = geocoordinate::longitude_per_pixel(georectangle.width(), area_size);
-		const number_type lat_per_pixel = geocoordinate::latitude_per_pixel(georectangle.height(), area_size);
-		const QPoint geocoordinate_offset = geocoordinate(georectangle.bottomLeft()).to_point(lon_per_pixel, lat_per_pixel);
-		return this->to_point(lon_per_pixel, lat_per_pixel) - geocoordinate_offset;
 	}
 
 	constexpr QPoint to_circle_point() const

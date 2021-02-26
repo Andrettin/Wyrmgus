@@ -45,6 +45,7 @@
 #include "map/historical_location.h"
 #include "map/map.h"
 #include "map/map_layer.h"
+#include "map/map_projection.h"
 #include "map/map_template_history.h"
 #include "map/plane.h"
 #include "map/site.h"
@@ -2902,15 +2903,24 @@ QPoint map_template::get_location_map_position(const historical_location *histor
 	return QPoint(-1, -1);
 }
 
+const map_projection *map_template::get_map_projection() const
+{
+	if (this->map_projection != nullptr) {
+		return this->map_projection;
+	}
+
+	return defines::get()->get_default_map_projection();
+}
+
 QPoint map_template::get_geocoordinate_pos(const geocoordinate &geocoordinate) const
 {
-	return geocoordinate.to_point(this->get_georectangle(), this->get_size());
+	return this->get_map_projection()->geocoordinate_to_point(geocoordinate, this->get_georectangle(), this->get_size());
 }
 
 geocoordinate map_template::get_pos_geocoordinate(const QPoint &pos) const
 {
 	const QRect unsigned_georectangle = georectangle::to_unsigned_georectangle(this->get_georectangle());
-	return point::to_geocoordinate(pos, this->get_size(), unsigned_georectangle);
+	return this->get_map_projection()->point_to_geocoordinate(pos, this->get_size(), unsigned_georectangle);
 }
 
 void map_template::save_terrain_images() const

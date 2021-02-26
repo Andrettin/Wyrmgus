@@ -49,6 +49,7 @@ class character_unit;
 class faction;
 class historical_location;
 class historical_unit;
+class map_projection;
 class map_template_history;
 class plane;
 class site;
@@ -122,6 +123,7 @@ class map_template final : public named_data_entry, public data_type<map_templat
 	Q_PROPERTY(bool clear_terrain MEMBER clear_terrain)
 	Q_PROPERTY(bool output_terrain_image MEMBER output_terrain_image READ outputs_terrain_image)
 	Q_PROPERTY(bool output_territory_image MEMBER output_territory_image READ outputs_territory_image)
+	Q_PROPERTY(wyrmgus::map_projection* map_projection MEMBER map_projection)
 	Q_PROPERTY(int min_longitude MEMBER min_longitude READ get_min_longitude)
 	Q_PROPERTY(int max_longitude MEMBER max_longitude READ get_max_longitude)
 	Q_PROPERTY(int min_latitude MEMBER min_latitude READ get_min_latitude)
@@ -659,6 +661,8 @@ public:
 		this->tile_terrains[tile_pos] = terrain;
 	}
 
+	const map_projection *get_map_projection() const;
+
 	int get_min_longitude() const
 	{
 		return this->min_longitude;
@@ -816,6 +820,7 @@ private:
 public:
 	std::vector<std::tuple<Vec2i, terrain_type *, CDate>> HistoricalTerrains; //terrain changes
 private:
+	wyrmgus::map_projection *map_projection = nullptr;
 	int min_longitude = 0;
 	int max_longitude = 0;
 	int min_latitude = 0;

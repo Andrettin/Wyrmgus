@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-//      (c) Copyright 2020-2021 by Andrettin
+//      (c) Copyright 2021 by Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -24,26 +24,15 @@
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
 
-#include "stratagus.h"
+#pragma once
 
-#include "util/point_util.h"
+#include "map/map_projection.h"
+#include "util/singleton.h"
 
-#include "util/geocoordinate.h"
-#include "util/geocoordinate_util.h"
-#include "util/number_util.h"
-#include "util/util.h"
+namespace wyrmgus {
 
-namespace wyrmgus::point {
-
-QGeoCoordinate to_qgeocoordinate(const QPoint &point, const QSize &area_size, const QRectF &unsigned_georectangle)
+class equirectangular_map_projection final : public map_projection, public singleton<equirectangular_map_projection>
 {
-	const QPointF unsigned_geocoordinate = point::to_unsigned_geocoordinate(point, area_size, unsigned_georectangle);
-	return qgeocoordinate::from_unsigned_geocoordinate(unsigned_geocoordinate);
-}
-
-int distance_to(const QPoint &point, const QPoint &other_point)
-{
-	return isqrt(point::square_distance_to(point, other_point));
-}
+};
 
 }
