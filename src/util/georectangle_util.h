@@ -26,16 +26,10 @@
 
 #pragma once
 
-namespace wyrmgus {
-	class degree_scaling;
-}
-
 namespace wyrmgus::georectangle {
 
 extern QRect to_unsigned_georectangle(const QRect &georectangle);
 
 extern QRectF to_unsigned_georectangle(const QGeoRectangle &georectangle);
-
-extern QRectF to_scaled_georectangle(const QGeoRectangle &georectangle, const std::vector<std::unique_ptr<degree_scaling>> &longitude_scalings, const std::vector<std::unique_ptr<degree_scaling>> &latitude_scalings);
 
 }

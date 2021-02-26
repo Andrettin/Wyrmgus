@@ -491,7 +491,6 @@ set(util_SRCS
 	src/util/date_util.cpp
 	src/util/exception_util.cpp
 	src/util/geocoordinate.cpp
-	src/util/geocoordinate_util.cpp
 	src/util/geojson_util.cpp
 	src/util/geopath_util.cpp
 	src/util/georectangle_util.cpp
@@ -976,7 +975,6 @@ set(wyrmgus_util_HDRS
 	src/util/color_container.h
 	src/util/container_util.h
 	src/util/date_util.h
-	src/util/degree_scaling.h
 	src/util/enum_util.h
 	src/util/exception_util.h
 	src/util/fractional_int.h

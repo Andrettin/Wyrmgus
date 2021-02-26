@@ -26,10 +26,6 @@
 
 #pragma once
 
-namespace wyrmgus {
-	class degree_scaling;
-}
-
 namespace wyrmgus::qgeocoordinate {
 
 constexpr int longitude_size = 360;
@@ -93,20 +89,6 @@ inline double latitude_per_pixel(const double lat_size, const QSize &size)
 {
 	return lat_size / static_cast<double>(size.height());
 }
-
-extern double longitude_to_scaled_longitude(const double longitude, const std::vector<std::unique_ptr<degree_scaling>> &degree_scalings);
-extern double latitude_to_scaled_latitude(const double latitude, const std::vector<std::unique_ptr<degree_scaling>> &degree_scalings);
-
-inline QPointF to_scaled_geocoordinate(const QGeoCoordinate &geocoordinate, const std::vector<std::unique_ptr<degree_scaling>> &longitude_scalings, const std::vector<std::unique_ptr<degree_scaling>> &latitude_scalings)
-{
-	//converts a geocoordinate into an unsigned scaled geocoordinate
-	const double x = qgeocoordinate::longitude_to_scaled_longitude(geocoordinate.longitude(), longitude_scalings);
-	const double y = qgeocoordinate::latitude_to_scaled_latitude(geocoordinate.latitude(), latitude_scalings);
-	return QPointF(x, y);
-}
-
-extern double scaled_longitude_size(const QGeoRectangle &georectangle, const std::vector<std::unique_ptr<degree_scaling>> &degree_scalings);
-extern double scaled_latitude_size(const QGeoRectangle &georectangle, const std::vector<std::unique_ptr<degree_scaling>> &degree_scalings);
 
 inline QPoint to_point(const QGeoCoordinate &geocoordinate, const double lon_per_pixel, const double lat_per_pixel)
 {

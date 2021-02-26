@@ -43,9 +43,4 @@ QRectF to_unsigned_georectangle(const QGeoRectangle &georectangle)
 	return QRectF(qgeocoordinate::to_unsigned_geocoordinate(georectangle.topLeft()), qgeocoordinate::to_unsigned_geocoordinate(georectangle.bottomRight()));
 }
 
-QRectF to_scaled_georectangle(const QGeoRectangle &georectangle, const std::vector<std::unique_ptr<degree_scaling>> &longitude_scalings, const std::vector<std::unique_ptr<degree_scaling>> &latitude_scalings)
-{
-	return QRectF(qgeocoordinate::to_scaled_geocoordinate(georectangle.topLeft(), longitude_scalings, latitude_scalings), qgeocoordinate::to_scaled_geocoordinate(georectangle.bottomRight(), longitude_scalings, latitude_scalings));
-}
-
 }
