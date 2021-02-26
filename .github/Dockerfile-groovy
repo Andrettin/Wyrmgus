@@ -7,7 +7,7 @@ RUN apt-get -y install \
   build-essential \
   cmake \
   git \
-  libboost-dev \
+  libboost1.73-dev \
   libbz2-dev \
   liblua5.1-dev \
   libsdl-mixer1.2-dev \
