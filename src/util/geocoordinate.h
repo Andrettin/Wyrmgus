@@ -85,6 +85,10 @@ public:
 	{
 	}
 
+	explicit constexpr geocoordinate(const QGeoCoordinate &geocoordinate) : geocoordinate(number_type(geocoordinate.longitude()), number_type(geocoordinate.latitude()))
+	{
+	}
+
 	constexpr const number_type &get_longitude() const
 	{
 		return this->longitude;
@@ -117,7 +121,9 @@ public:
 
 	QGeoCoordinate to_qgeocoordinate() const
 	{
-		return QGeoCoordinate(this->latitude.to_double(), this->longitude.to_double());
+		const double latitude = this->latitude.to_double();
+		const double longitude = this->longitude.to_double();
+		return QGeoCoordinate(latitude, longitude);
 	}
 
 	geocoordinate to_unsigned_geocoordinate() const
