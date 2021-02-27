@@ -97,17 +97,12 @@ geocoordinate map_projection::point_to_unsigned_geocoordinate(const QPoint &poin
 	const longitude lon_per_pixel = this->longitude_per_pixel(unsigned_georectangle.width() - 1, area_size);
 	const latitude lat_per_pixel = this->latitude_per_pixel(unsigned_georectangle.height() - 1, area_size);
 
-	const int rect_width = unsigned_georectangle.width() - 1;
-	const int rect_height = unsigned_georectangle.height() - 1;
-
 	longitude lon = longitude(point.x());
-	lon *= rect_width;
-	lon /= area_size.width();
+	lon *= lon_per_pixel;
 	lon += unsigned_georectangle.x();
 
 	latitude lat = latitude(point.y());
-	lat *= rect_height;
-	lat /= area_size.height();
+	lat *= lat_per_pixel;
 	lat += unsigned_georectangle.y();
 
 	return geocoordinate(lon, lat);
