@@ -95,7 +95,7 @@ public:
 	{
 	}
 
-	explicit constexpr geocoordinate(const QGeoCoordinate &geocoordinate) : geocoordinate(number_type(geocoordinate.longitude()), number_type(geocoordinate.latitude()))
+	explicit constexpr geocoordinate(const QGeoCoordinate &qgeocoordinate) : geocoordinate(number_type(qgeocoordinate.longitude()), number_type(qgeocoordinate.latitude()))
 	{
 	}
 
