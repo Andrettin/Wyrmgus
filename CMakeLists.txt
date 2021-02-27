@@ -486,6 +486,7 @@ set(upgrade_SRCS
 source_group(upgrade FILES ${upgrade_SRCS})
 
 set(util_SRCS
+	src/util/angle_util.cpp
 	src/util/astronomy_util.cpp
 	src/util/color_container.cpp
 	src/util/date_util.cpp
@@ -970,6 +971,7 @@ set(wyrmgus_upgrade_HDRS
 )
 
 set(wyrmgus_util_HDRS
+	src/util/angle_util.h
 	src/util/astronomy_util.h
 	src/util/char_util.h
 	src/util/color_container.h
@@ -1157,6 +1159,7 @@ set(wyrmgus_main_SRCS
 )
 
 set(util_test_SRCS
+	test/util/angle_test.cpp
 	test/util/astronomy_test.cpp
 	test/util/geocoordinate_test.cpp
 	test/util/image_test.cpp
