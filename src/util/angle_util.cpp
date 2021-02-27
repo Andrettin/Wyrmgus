@@ -29,6 +29,7 @@
 #include "util/angle_util.h"
 
 #include "util/fractional_int.h"
+#include "util/number_util.h"
 
 namespace wyrmgus::angle {
 
@@ -42,6 +43,20 @@ number_type degrees_to_radians(const number_type &degrees)
 number_type radians_to_degrees(const number_type &radians)
 {
 	return radians * 180 / angle::pi;
+}
+
+//n is in the -pi to +pi range
+number_type gudermannian(const number_type &n)
+{
+	const double d = n.to_double();
+	return angle::radians_to_degrees(number_type(atan(sinh(d))));
+}
+
+number_type gudermannian_inverse(const number_type &degrees)
+{
+	const number_type sign = number::sign(degrees);
+	const double sin = std::sin((angle::degrees_to_radians(degrees) * sign).to_double());
+	return sign * (number_type(log((1.0 + sin) / (1.0 - sin))) / 2);
 }
 
 }
