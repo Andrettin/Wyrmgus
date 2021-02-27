@@ -86,6 +86,11 @@ public:
 		this->value = n * fractional_int::divisor;
 	}
 
+	explicit constexpr fractional_int(const double n)
+	{
+		this->value = static_cast<int64_t>(n * fractional_int::divisor);
+	}
+
 	explicit fractional_int(const std::string &str)
 	{
 		try {
