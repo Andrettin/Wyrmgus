@@ -31,12 +31,14 @@ namespace wyrmgus::number {
 template <typename number_type>
 inline constexpr number_type sign(const number_type &n)
 {
+	static_assert(!std::is_unsigned_v<number_type>);
+
 	if (n == 0) {
-		return 0;
+		return number_type(0);
 	} else if (n < 0) {
-		return -1;
+		return number_type(-1);
 	} else {
-		return 1;
+		return number_type(1);
 	}
 }
 

@@ -27,15 +27,32 @@
 #include "stratagus.h"
 
 #include "util/number_util.h"
+
+#include "util/fractional_int.h"
 #include "util/util.h"
 
 #include <boost/test/unit_test.hpp>
 
+template <typename number_type>
+static void check_sign()
+{
+    BOOST_CHECK(number::sign(number_type(6)) == 1);
+    BOOST_CHECK(number::sign(number_type(-5)) == -1);
+    BOOST_CHECK(number::sign(number_type(0)) == 0);
+}
+
 BOOST_AUTO_TEST_CASE(sign_test)
 {
-    BOOST_CHECK(number::sign(6) == 1);
-    BOOST_CHECK(number::sign(-5) == -1);
-    BOOST_CHECK(number::sign(0) == 0);
+    check_sign<int8_t>();
+    check_sign<int16_t>();
+    check_sign<int32_t>();
+    check_sign<int64_t>();
+    check_sign<float>();
+    check_sign<double>();
+    check_sign<fractional_int<1>>();
+    check_sign<fractional_int<2>>();
+    check_sign<fractional_int<3>>();
+    check_sign<fractional_int<4>>();
 }
 
 template <typename number_type>
