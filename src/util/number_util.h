@@ -28,6 +28,18 @@
 
 namespace wyrmgus::number {
 
+template <typename number_type>
+inline constexpr number_type sign(const number_type &n)
+{
+	if (n == 0) {
+		return 0;
+	} else if (n < 0) {
+		return -1;
+	} else {
+		return 1;
+	}
+}
+
 extern std::string to_formatted_string(const int number);
 
 inline std::string to_signed_string(const int number)
@@ -67,8 +79,6 @@ inline constexpr number_type cbrt(number_type n)
 	static_assert(std::is_integral_v<number_type>);
 
 	constexpr number_type bit_size = sizeof(number_type) * 8;
-
-	//static_assert((bit_size - 1) % 3 == 0);
 
 	number_type ret = 0;
 	number_type b = 0;

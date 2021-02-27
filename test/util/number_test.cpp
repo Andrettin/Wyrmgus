@@ -31,6 +31,13 @@
 
 #include <boost/test/unit_test.hpp>
 
+BOOST_AUTO_TEST_CASE(sign_test)
+{
+    BOOST_CHECK(number::sign(6) == 1);
+    BOOST_CHECK(number::sign(-5) == -1);
+    BOOST_CHECK(number::sign(0) == 0);
+}
+
 template <typename number_type>
 static void check_sqrt()
 {
