@@ -28,6 +28,8 @@
 
 #include "util/geoshape_util.h"
 
+#include "map/map_projection.h"
+#include "util/geocoordinate.h"
 #include "util/geocoordinate_util.h"
 #include "util/geopath_util.h"
 #include "util/georectangle_util.h"
@@ -35,17 +37,18 @@
 
 namespace wyrmgus::geoshape {
 
-void write_to_image(const QGeoShape &geoshape, QImage &image, const QColor &color, const QGeoRectangle &georectangle, const std::string &image_checkpoint_save_filename)
+void write_to_image(const QGeoShape &geoshape, QImage &image, const QColor &color, const QRect &georectangle, const map_projection *map_projection, const std::string &image_checkpoint_save_filename)
 {
+	const QGeoRectangle qgeorectangle = georectangle::to_qgeorectangle(georectangle);
 	QGeoRectangle bounding_georectangle = geoshape.boundingGeoRectangle();
 
-	if (!bounding_georectangle.intersects(georectangle)) {
+	if (!bounding_georectangle.intersects(qgeorectangle)) {
 		return;
 	}
 
 	if (geoshape.type() == QGeoShape::PathType) {
 		const QGeoPath &geopath = static_cast<const QGeoPath &>(geoshape);
-		geopath::write_to_image(geopath, image, color, georectangle);
+		geopath::write_to_image(geopath, image, color, georectangle, map_projection);
 
 		//if the geopath's width is 0, there is nothing further to do here, but otherwise, use the normal method of geoshape writing as well
 		if (geopath.width() == 0) {
@@ -63,22 +66,22 @@ void write_to_image(const QGeoShape &geoshape, QImage &image, const QColor &colo
 		bounding_georectangle.setTopRight(top_right);
 	}
 
-	const double lon_per_pixel = qgeocoordinate::longitude_per_pixel(georectangle.width(), image.size());
-	const double lat_per_pixel = qgeocoordinate::latitude_per_pixel(georectangle.height(), image.size());
+	const longitude lon_per_pixel = map_projection->longitude_per_pixel(georectangle.width() - 1, image.size());
+	const latitude lat_per_pixel = map_projection->latitude_per_pixel(georectangle.height() - 1, image.size());
 
-	const QRectF unsigned_georectangle = georectangle::to_unsigned_georectangle(georectangle);
+	const QRect unsigned_georectangle = georectangle::to_unsigned_georectangle(georectangle);
 
 	const QRectF unsigned_bounding_georectangle = georectangle::to_unsigned_georectangle(bounding_georectangle);
 
-	const double start_lon = std::max(unsigned_bounding_georectangle.x(), unsigned_georectangle.x());
-	const double end_lon = std::min(unsigned_bounding_georectangle.right(), unsigned_georectangle.right());
-	const int start_x = std::max(qgeocoordinate::unsigned_longitude_to_x(start_lon - unsigned_georectangle.x(), lon_per_pixel) - 1, 0);
-	const int end_x = std::min(qgeocoordinate::unsigned_longitude_to_x(end_lon - unsigned_georectangle.x(), lon_per_pixel) + 1, image.width() - 1);
+	const longitude start_lon = longitude(std::max<double>(unsigned_bounding_georectangle.x(), unsigned_georectangle.x()));
+	const longitude end_lon = longitude(std::min<double>(unsigned_bounding_georectangle.right(), unsigned_georectangle.right()));
+	const int start_x = std::max(map_projection->unsigned_longitude_to_x(start_lon - unsigned_georectangle.x(), lon_per_pixel) - 1, 0);
+	const int end_x = std::min(map_projection->unsigned_longitude_to_x(end_lon - unsigned_georectangle.x(), lon_per_pixel) + 1, image.width() - 1);
 
-	const double start_lat = std::min(unsigned_bounding_georectangle.y(), unsigned_georectangle.y());
-	const double end_lat = std::max(unsigned_bounding_georectangle.bottom(), unsigned_georectangle.bottom());
-	const int start_y = std::max(qgeocoordinate::unsigned_latitude_to_y(start_lat - unsigned_georectangle.y(), lat_per_pixel) - 1, 0);
-	const int end_y = std::min(qgeocoordinate::unsigned_latitude_to_y(end_lat - unsigned_georectangle.y(), lat_per_pixel) + 1, image.height() - 1);
+	const latitude start_lat = latitude(std::min<double>(unsigned_bounding_georectangle.y(), unsigned_georectangle.y()));
+	const latitude end_lat = latitude(std::max<double>(unsigned_bounding_georectangle.bottom(), unsigned_georectangle.bottom()));
+	const int start_y = std::max(map_projection->unsigned_latitude_to_y(start_lat - unsigned_georectangle.y(), lat_per_pixel) - 1, 0);
+	const int end_y = std::min(map_projection->unsigned_latitude_to_y(end_lat - unsigned_georectangle.y(), lat_per_pixel) + 1, image.height() - 1);
 
 	int pixel_checkpoint_count = 0;
 	static constexpr int pixel_checkpoint_threshold = 32 * 32;
@@ -86,13 +89,15 @@ void write_to_image(const QGeoShape &geoshape, QImage &image, const QColor &colo
 	for (int x = start_x; x <= end_x; ++x) {
 		for (int y = start_y; y <= end_y; ++y) {
 			const QPoint pixel_pos(x, y);
-			const QGeoCoordinate coordinate = point::to_qgeocoordinate(pixel_pos, image.size(), unsigned_georectangle);
 
 			if (image.pixelColor(pixel_pos).alpha() != 0) {
 				continue; //ignore already-written pixels
 			}
 
-			if (!geoshape.contains(coordinate)) {
+			const geocoordinate geocoordinate = map_projection->point_to_geocoordinate(pixel_pos, image.size(), unsigned_georectangle);
+			const QGeoCoordinate qgeocoordinate = geocoordinate.to_qgeocoordinate();
+
+			if (!geoshape.contains(qgeocoordinate)) {
 				continue;
 			}
 

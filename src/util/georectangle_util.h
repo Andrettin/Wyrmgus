@@ -28,6 +28,11 @@
 
 namespace wyrmgus::georectangle {
 
+inline QGeoRectangle to_qgeorectangle(const QRect &georectangle)
+{
+	return QGeoRectangle(QGeoCoordinate(georectangle.bottom(), georectangle.x()), QGeoCoordinate(georectangle.y(), georectangle.right()));
+}
+
 extern QRect to_unsigned_georectangle(const QRect &georectangle);
 
 extern QRectF to_unsigned_georectangle(const QGeoRectangle &georectangle);

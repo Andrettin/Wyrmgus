@@ -35,7 +35,13 @@ namespace wyrmgus::georectangle {
 
 QRect to_unsigned_georectangle(const QRect &georectangle)
 {
-	return QRect(geocoordinate(georectangle.topLeft()).to_unsigned_geocoordinate().to_point(), geocoordinate(georectangle.bottomRight()).to_unsigned_geocoordinate().to_point());
+	const geocoordinate min_geocoordinate = geocoordinate(georectangle.topLeft()).to_unsigned_geocoordinate();
+	const geocoordinate max_geocoordinate = geocoordinate(georectangle.bottomRight()).to_unsigned_geocoordinate();
+
+	const QPoint top_left(min_geocoordinate.get_longitude().to_int(), max_geocoordinate.get_latitude().to_int());
+	const QPoint bottom_right(max_geocoordinate.get_longitude().to_int(), min_geocoordinate.get_latitude().to_int());
+
+	return QRect(top_left, bottom_right);
 }
 
 QRectF to_unsigned_georectangle(const QGeoRectangle &georectangle)

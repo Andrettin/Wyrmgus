@@ -86,19 +86,30 @@ QPoint map_projection::geocoordinate_to_point(const geocoordinate &geocoordinate
 
 QPoint map_projection::geocoordinate_to_point(const geocoordinate &geocoordinate, const QRect &georectangle, const QSize &area_size) const
 {
-	const longitude lon_per_pixel = this->longitude_per_pixel(georectangle.width(), area_size);
-	const latitude lat_per_pixel = this->latitude_per_pixel(georectangle.height(), area_size);
+	const longitude lon_per_pixel = this->longitude_per_pixel(georectangle.width() - 1, area_size);
+	const latitude lat_per_pixel = this->latitude_per_pixel(georectangle.height() - 1, area_size);
 	const QPoint geocoordinate_offset = this->geocoordinate_to_point(wyrmgus::geocoordinate(georectangle.bottomLeft()), lon_per_pixel, lat_per_pixel);
 	return this->geocoordinate_to_point(geocoordinate, lon_per_pixel, lat_per_pixel) - geocoordinate_offset;
 }
 
 geocoordinate map_projection::point_to_unsigned_geocoordinate(const QPoint &point, const QSize &area_size, const QRect &unsigned_georectangle) const
 {
-	const longitude lon_per_pixel = this->longitude_per_pixel(unsigned_georectangle.width(), area_size);
-	const latitude lat_per_pixel = this->latitude_per_pixel(unsigned_georectangle.height(), area_size);
+	const longitude lon_per_pixel = this->longitude_per_pixel(unsigned_georectangle.width() - 1, area_size);
+	const latitude lat_per_pixel = this->latitude_per_pixel(unsigned_georectangle.height() - 1, area_size);
 
-	const longitude lon = longitude(point.x()) * lon_per_pixel + longitude(unsigned_georectangle.x());
-	const latitude lat = latitude(point.y()) * lat_per_pixel + latitude(unsigned_georectangle.y());
+	const int rect_width = unsigned_georectangle.width() - 1;
+	const int rect_height = unsigned_georectangle.height() - 1;
+
+	longitude lon = longitude(point.x());
+	lon *= rect_width;
+	lon /= area_size.width();
+	lon += unsigned_georectangle.x();
+
+	latitude lat = latitude(point.y());
+	lat *= rect_height;
+	lat /= area_size.height();
+	lat += unsigned_georectangle.y();
+
 	return geocoordinate(lon, lat);
 }
 

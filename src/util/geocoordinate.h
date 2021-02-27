@@ -43,10 +43,20 @@ public:
 	static constexpr number_type min_latitude = number_type(geocoordinate::latitude_size / 2 * -1);
 	static constexpr number_type max_latitude = number_type(geocoordinate::latitude_size / 2);
 
+	static constexpr number_type unsigned_longitude_to_longitude(const number_type &unsigned_longitude)
+	{
+		return unsigned_longitude - number_type(geocoordinate::longitude_size / 2);
+	}
+
+	static constexpr number_type unsigned_latitude_to_latitude(const number_type &unsigned_latitude)
+	{
+		return (unsigned_latitude - number_type(geocoordinate::latitude_size / 2)) * -1;
+	}
+
 	static constexpr geocoordinate from_unsigned_geocoordinate(const geocoordinate &unsigned_geocoordinate)
 	{
-		const number_type lon = unsigned_geocoordinate.get_longitude() - number_type(geocoordinate::longitude_size / 2);
-		const number_type lat = (unsigned_geocoordinate.get_latitude() - number_type(geocoordinate::latitude_size / 2)) * -1;
+		const number_type lon = geocoordinate::unsigned_longitude_to_longitude(unsigned_geocoordinate.get_longitude());
+		const number_type lat = geocoordinate::unsigned_latitude_to_latitude(unsigned_geocoordinate.get_latitude());
 		return geocoordinate(lon, lat);
 	}
 

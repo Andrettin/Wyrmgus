@@ -28,18 +28,23 @@
 
 #include "util/geopath_util.h"
 
+#include "map/map_projection.h"
+#include "util/geocoordinate.h"
 #include "util/geocoordinate_util.h"
+#include "util/georectangle_util.h"
 #include "util/point_util.h"
 
 namespace wyrmgus::geopath {
 
-void write_to_image(const QGeoPath &geopath, QImage &image, const QColor &color, const QGeoRectangle &georectangle)
+void write_to_image(const QGeoPath &geopath, QImage &image, const QColor &color, const QRect &georectangle, const map_projection *map_projection)
 {
+	const QGeoRectangle qgeorectangle = georectangle::to_qgeorectangle(georectangle);
+
 	QPoint previous_pixel_pos(-1, -1);
 	for (const QGeoCoordinate &geocoordinate : geopath.path()) {
-		const QPoint pixel_pos = qgeocoordinate::to_point(geocoordinate, georectangle, image.size());
+		const QPoint pixel_pos = map_projection->geocoordinate_to_point(wyrmgus::geocoordinate(geocoordinate), georectangle, image.size());
 
-		const bool pos_in_image = georectangle.contains(geocoordinate);
+		const bool pos_in_image = qgeorectangle.contains(geocoordinate);
 
 		if (pos_in_image) {
 			//only write to the image if the position is actually in it, but take the position into account either way for the purpose of getting the previous pixel pos, so that map templates fit together well

@@ -705,11 +705,6 @@ public:
 		return QRect(top_left, bottom_right);
 	}
 
-	QGeoRectangle get_qgeorectangle() const
-	{
-		return QGeoRectangle(QGeoCoordinate(this->get_max_latitude(), this->get_min_longitude()), QGeoCoordinate(this->get_min_latitude(), this->get_max_longitude()));
-	}
-
 	QPoint get_geocoordinate_pos(const geocoordinate &geocoordinate) const;
 	geocoordinate get_pos_geocoordinate(const QPoint &pos) const;
 

@@ -3046,7 +3046,7 @@ void map_template::create_terrain_image_from_file(QImage &image, const std::file
 
 void map_template::create_terrain_image_from_geodata(QImage &image, const terrain_geodata_ptr_map &terrain_data, const std::string &image_checkpoint_save_filename) const
 {
-	const QGeoRectangle georectangle = this->get_qgeorectangle();
+	const QRect georectangle = this->get_georectangle();
 
 	for (const auto &kv_pair : terrain_data) {
 		const terrain_type *terrain = nullptr;
@@ -3063,7 +3063,7 @@ void map_template::create_terrain_image_from_geodata(QImage &image, const terrai
 		}
 
 		for (const auto &geoshape : kv_pair.second) {
-			geoshape::write_to_image(*geoshape, image, color, georectangle, image_checkpoint_save_filename);
+			geoshape::write_to_image(*geoshape, image, color, georectangle, this->get_map_projection(), image_checkpoint_save_filename);
 		}
 	}
 }
@@ -3093,7 +3093,7 @@ void map_template::save_territory_image(const std::string &filename, const site_
 		image.fill(Qt::transparent);
 	}
 
-	const QGeoRectangle georectangle = this->get_qgeorectangle();
+	const QRect georectangle = this->get_georectangle();
 
 	for (const auto &kv_pair : territory_data) {
 		const site *settlement = kv_pair.first;
@@ -3103,7 +3103,7 @@ void map_template::save_territory_image(const std::string &filename, const site_
 		}
 
 		for (const auto &geoshape : kv_pair.second) {
-			geoshape::write_to_image(*geoshape, image, color, georectangle, filename);
+			geoshape::write_to_image(*geoshape, image, color, georectangle, this->get_map_projection(), filename);
 		}
 	}
 
