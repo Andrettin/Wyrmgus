@@ -81,9 +81,17 @@ public:
 		}
 	}
 
-	explicit constexpr fractional_int(const int n)
+	explicit constexpr fractional_int(const int64_t n)
 	{
 		this->value = n * fractional_int::divisor;
+	}
+
+	explicit constexpr fractional_int(const uint64_t n) : fractional_int(static_cast<int64_t>(n))
+	{
+	}
+
+	explicit constexpr fractional_int(const int n) : fractional_int(static_cast<int64_t>(n))
+	{
 	}
 
 	explicit constexpr fractional_int(const double n)
@@ -134,6 +142,11 @@ public:
 	constexpr int to_int() const
 	{
 		return static_cast<int>(this->value / fractional_int::divisor);
+	}
+
+	constexpr int to_uint64() const
+	{
+		return static_cast<uint64_t>(this->value / fractional_int::divisor);
 	}
 
 	constexpr double to_double() const
