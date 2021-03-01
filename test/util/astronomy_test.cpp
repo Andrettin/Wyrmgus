@@ -81,3 +81,15 @@ BOOST_AUTO_TEST_CASE(ra_to_lon_test_2)
 
     BOOST_CHECK(lon == decimillesimal_int("-64.977"));
 }
+
+BOOST_AUTO_TEST_CASE(jovian_mass_to_zg_test)
+{
+    uint64_t zg = astronomy::jovian_mass_to_zg(centesimal_int(1));
+    BOOST_CHECK(zg == astronomy::zg_per_jovian_mass);
+
+    zg = astronomy::jovian_mass_to_zg(centesimal_int("1.19"));
+    BOOST_CHECK(zg == 2258774700);
+
+    zg = astronomy::jovian_mass_to_zg(centesimal_int("1.5"));
+    BOOST_CHECK(zg == 2847195000);
+}

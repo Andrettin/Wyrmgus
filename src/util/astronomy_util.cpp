@@ -24,6 +24,8 @@
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
 
+#include "stratagus.h"
+
 #include "util/astronomy_util.h"
 
 #include "util/fractional_int.h"
@@ -78,6 +80,18 @@ decimillesimal_int lon_to_ra(const decimillesimal_int &lon)
 	}
 
 	return res;
+}
+
+centesimal_int zg_to_jovian_mass(const uint64_t zg)
+{
+	return centesimal_int(zg) / astronomy::zg_per_jovian_mass;
+}
+
+uint64_t jovian_mass_to_zg(const centesimal_int &jm)
+{
+	const centesimal_int zg_dec = jm * astronomy::zg_per_jovian_mass;
+	const uint64_t zg = zg_dec.to_uint64();
+	return zg;
 }
 
 }
