@@ -276,6 +276,12 @@ public:
 		return *this;
 	}
 
+	constexpr const fractional_int<N> &operator *=(const uint64_t other)
+	{
+		this->value *= static_cast<int64_t>(other);
+		return *this;
+	}
+
 	template <int N2>
 	constexpr const fractional_int<N> &operator /=(const fractional_int<N2> &other)
 	{
@@ -287,6 +293,12 @@ public:
 	constexpr const fractional_int<N> &operator /=(const int other)
 	{
 		this->value /= other;
+		return *this;
+	}
+
+	constexpr const fractional_int<N> &operator /=(const uint64_t other)
+	{
+		this->value /= static_cast<int64_t>(other);
 		return *this;
 	}
 
@@ -333,6 +345,13 @@ public:
 		return res;
 	}
 
+	constexpr fractional_int<N> operator *(const uint64_t other) const
+	{
+		fractional_int res(*this);
+		res *= other;
+		return res;
+	}
+
 	template <int N2>
 	constexpr fractional_int<N> operator /(const fractional_int<N2> &other) const
 	{
@@ -342,6 +361,13 @@ public:
 	}
 
 	constexpr fractional_int<N> operator /(const int other) const
+	{
+		fractional_int res(*this);
+		res /= other;
+		return res;
+	}
+
+	constexpr fractional_int<N> operator /(const uint64_t other) const
 	{
 		fractional_int res(*this);
 		res /= other;
