@@ -141,12 +141,20 @@ public:
 
 	constexpr int to_int() const
 	{
-		return static_cast<int>(this->value / fractional_int::divisor);
+		const int64_t ret = this->to_int64();
+		return static_cast<int>(ret);
 	}
 
-	constexpr int to_uint64() const
+	constexpr int64_t to_int64() const
 	{
-		return static_cast<uint64_t>(this->value / fractional_int::divisor);
+		const int64_t ret = this->value / fractional_int::divisor;
+		return ret;
+	}
+
+	constexpr uint64_t to_uint64() const
+	{
+		const int64_t ret = this->to_int64();
+		return static_cast<uint64_t>(ret);
 	}
 
 	constexpr double to_double() const
